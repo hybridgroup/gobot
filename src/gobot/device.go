@@ -1,32 +1,70 @@
 package gobot
 
-import "fmt"
+import (
+  "fmt"
+  "strconv"
+)
 
 type Device struct {
   Name string
   Pin string
-  Parent string
   Connection string
   Interval string
   Driver string
+  Params map[string]string
+  Robot Robot
 }
 
-//func (d *Device) New() *Device{
-//  return d
-//}
+type DeviceType struct {
+  Name string
+  Pin string
+  Robot Robot
+  Connection ConnectionType 
+  Interval float64
+  Driver Driver
+  Params map[string]string
+}
 
-func (d *Device) Start() {
-  fmt.Println("Device " + d.Name + "started")
+func NewDevice(d Device) *DeviceType {
+  dt := new(DeviceType)
+  dt.Name = d.Name
+  dt.Pin = d.Pin
+  dt.Robot = d.Robot
+  dt.Params = d.Params
+//  dt.Connection = determine_connection(params[:connection]) || default_connection
+  dt.Connection = ConnectionType{Name: d.Connection,}
+  if d.Interval == "" {
+    dt.Interval = 0.5
+  } else {
+    f, err := strconv.ParseFloat(d.Interval, 64)
+    if err == nil {
+      dt.Interval = f
+    } else {
+      fmt.Println(err)
+      dt.Interval = 0.5
+    }
+  }
+
+  //dt.Driver = Driver.New(Driver{Robot: d.Robot, Params: d.Params,})
+  return dt
+}
+
+func (dt *DeviceType) Start() {
+  fmt.Println("Device " + dt.Name + "started")
+  dt.Driver.Start()
 }
     
-func (d *Device) determineConnection(c Connection){
-  //d.Parent.connections(c) if c
-}
 
-func (d *Device) defaultConnection() {
-  //d.Parent.connections.first
-}
+//    def publish(event, *data)
+//      if data.first
+//        driver.publish(event_topic_name(event), *data)
+//      else
+//        driver.publish(event_topic_name(event))
+//      end
+//    end
 
-func requireDriver(driverName string) {
-  fmt.Println("dynamic load driver" + driverName)
+
+// Execute driver command
+func (dt *DeviceType) Command(method_name string, arguments []string) {
+  //dt.Driver.Command(method_name, arguments)
 }

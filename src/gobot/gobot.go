@@ -12,11 +12,18 @@ import (
 //  Work func()
 //}
 
-func Every(t time.Duration, ret func()) {
+func Every(t time.Duration, f func()) {
   go func(){ 
     for{
-      ret()
       time.Sleep(t)  
+      f()
     }
+  }()
+}
+
+func After(t time.Duration, f func()) {
+  go func(){ 
+    time.Sleep(t)  
+    f()
   }()
 }
