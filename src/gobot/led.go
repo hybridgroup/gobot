@@ -2,7 +2,6 @@ package gobot
 
 type Led struct {
   Driver
-  //Beaglebone *AdaptorInterface
   Beaglebone *Beaglebone
   High bool
 }

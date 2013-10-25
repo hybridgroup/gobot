@@ -12,8 +12,7 @@ type DigitalPin struct {
   Status string
 }
 
-//const GPIO_PATH = "/sys/class/gpio"
-const GPIO_PATH = "/tmp/gpio"
+const GPIO_PATH = "/sys/class/gpio"
 const GPIO_DIRECTION_READ = "in"
 const GPIO_DIRECTION_WRITE = "out"
 const HIGH = 1
