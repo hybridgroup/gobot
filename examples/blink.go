@@ -3,29 +3,28 @@ package main
 import (
   . "gobot"
   "time"
-  "fmt"
 )
 
 func main() {
 
-  connections := []Connection{
-    Connection {
-      Name: "arduino",
-      Adaptor: "arduino",
-      Port: "/dev/ttyACM0",
-    },
+  beaglebone := new(Beaglebone)
+  beaglebone.Name = "Beaglebone"
+
+  led := NewLed(beaglebone)
+  led.Driver = Driver{
+    Name: "led",
+    Pin: "P9_12",
   }
 
-  devices := []Device{
-    Device{
-      Name: "led",
-      Driver: "arduino",
-      Pin: "13",
-    },
+  connections := []interface{} {
+    beaglebone,
+  }
+  devices := []interface{} {
+    led,
   }
 
   work := func(){
-    Every(300 * time.Millisecond, func(){ fmt.Println("Greetings Human")})
+    Every(1000 * time.Millisecond, func(){ led.Toggle() })
   }
   
   robot := Robot{
@@ -34,5 +33,6 @@ func main() {
       Work: work,
   }
 
+  beaglebone.Connect()
   robot.Start()
 }

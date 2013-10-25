@@ -2,77 +2,40 @@ package gobot
 
 import (
   "fmt"
-  "math/rand"
-  "time"
+  "reflect"
 )
 
 type Connection struct {
-  ConnectionId string
   Name string
-  Adaptor string
-  Port string
-  Params map[string]string
-  Robot Robot
-}
-
-type ConnectionType struct {
-  ConnectionId string
-  Name string
-  Adaptor Adaptor
+  Adaptor *Adaptor
   Port Port
-  Robot Robot
+  Robot *Robot
   Params map[string]string
 }
 
-func NewConnection(c Connection) *ConnectionType {
-  ct := new(ConnectionType)
-  if c.ConnectionId == "" {
-    rand.Seed( time.Now().UTC().UnixNano())
-    i := rand.Int()
-    ct.ConnectionId = fmt.Sprintf("%v", i)
-  } else {
-    ct.ConnectionId = c.ConnectionId
-  }
-  ct.Name = c.Name
-  //ct.Port = Port.New(c.Port)
-  ct.Robot = c.Robot
-  ct.Params = c.Params
-  ct.Adaptor = Adaptor{ Port: ct.Port, Robot: ct.Robot, Params: ct.Params, }
-
-  return ct
+func NewConnection(a reflect.Value, r *Robot) *Connection {
+  c := new(Connection)
+  c.Name = reflect.ValueOf(a).FieldByName("Name").String()
+  c.Robot = r
+  c.Adaptor = new(Adaptor)
+  c.Adaptor.Name = reflect.ValueOf(a).FieldByName("Name").String()
+  return c
 }
 
-func (ct *ConnectionType) Connect() {
-  fmt.Println("Connecting to "+ ct.Name + " on port " + ct.Port.ToString() + "...")
-  ct.Adaptor.Connect()
+func (c *Connection) Connect() {
+  fmt.Println("Connecting to "+ c.Adaptor.Name + " on port " + c.Port.ToString() + "...")
+  c.Adaptor.Connect()
 }
 
-func (ct *ConnectionType) Disconnect() {
-  fmt.Println("Diconnecting from "+ ct.Name + " on port " + ct.Port.ToString() + "...")
-  ct.Adaptor.Disconnect()
+func (c *Connection) Disconnect() {
+  fmt.Println("Diconnecting from "+ c.Adaptor.Name + " on port " + c.Port.ToString() + "...")
+  c.Adaptor.Disconnect()
 }
 
-// @return [Boolean] Connection status
-func (ct *ConnectionType) IsConnected() bool {
-  return ct.Adaptor.IsConnected()
+func (c *Connection) IsConnected() bool {
+  return c.Adaptor.IsConnected()
 }
 
-// @return [String] Adaptor class name
-func (ct *ConnectionType) AdaptorName() string {
-  return ct.Adaptor.Name
+func (c *Connection) AdaptorName() string {
+  return c.Adaptor.Name
 }
-
-//    # Redirects missing methods to adaptor,
-//    # attemps reconnection if adaptor not connected
-//    def method_missing(method_name, *arguments, &block)
-//      unless adaptor.connected?
-//        Logger.warn "Cannot call unconnected adaptor '#{name}', attempting to reconnect..."
-//        adaptor.reconnect
-//        return nil
-//      end
-//      adaptor.send(method_name, *arguments, &block)
-//    rescue Exception => e
-//      Logger.error e.message
-//      Logger.error e.backtrace.inspect
-//      return nil
-//    end

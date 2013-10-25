@@ -4,14 +4,15 @@ import (
   "time"
   "fmt"
   "math/rand"
+  "reflect"
 )
 
-var connectionTypes []*ConnectionType
-var deviceTypes []*DeviceType
+var connections []*Connection
+var devices []*Device
 
 type Robot struct {
-  Connections []Connection
-  Devices []Device
+  Connections []interface{}
+  Devices []interface{}
   Name string
   Work func()
 }
@@ -22,78 +23,44 @@ func (r *Robot) Start() {
     i := rand.Int()
     r.Name = fmt.Sprintf("Robot %v", i)
   }
-  r.initConnections(r.Connections)
-  r.initDevices(r.Devices)
+  r.initConnections()
+  r.initDevices()
   r.startConnections()
   r.startDevices()
   r.Work()
-  for{time.Sleep(1 * time.Second)}
+  for{time.Sleep(10 * time.Millisecond)}
 }
 
-func (r *Robot) initConnections(connections []Connection) {
-  connectionTypes := make([]*ConnectionType, len(connections))
+func (r *Robot) initConnections() {
+  connections := make([]*Connection, len(r.Connections))
   fmt.Println("Initializing connections...")
-  for i := range connections {
-    fmt.Println("Initializing connection " + connections[i].Name + "...")
-    connections[i].Robot = *r
-    connectionTypes[i] = NewConnection(connections[i])
+  for i := range r.Connections {
+    fmt.Println("Initializing connection " + reflect.ValueOf(r.Connections[i]).Elem().FieldByName("Name").String() + "...")
+    connections[i] = NewConnection(reflect.ValueOf(r.Connections[i]).Elem().FieldByName("Adaptor"), r)
   }
 }
 
-func (r *Robot) initDevices(devices []Device) {
-  deviceTypes := make([]*DeviceType, len(devices))
+func (r *Robot) initDevices() {
+  devices := make([]*Device, len(r.Devices))
   fmt.Println("Initializing devices...")
-  for i := range devices {
-    fmt.Println("Initializing device " + devices[i].Name + "...")
-    devices[i].Robot = *r
-    deviceTypes[i] = NewDevice(devices[i])
+  for i := range r.Devices {
+    fmt.Println("Initializing device " + reflect.ValueOf(r.Devices[i]).Elem().FieldByName("Name").String() + "...")
+    devices[i] = NewDevice(reflect.ValueOf(r.Connections[i]).Elem().FieldByName("Driver"), r)
   }
 }
 
 func (r *Robot) startConnections() {
   fmt.Println("Starting connections...")
-  for i := range connectionTypes {
-    fmt.Println("Starting connection " + connectionTypes[i].Name + "...")
-    connectionTypes[i].Connect()
+  for i := range connections {
+    fmt.Println("Starting connection " + connections[i].Name + "...")
+    connections[i].Connect()
   }
 }
 
 func (r *Robot) startDevices() {
   fmt.Println("Starting devices...")
-  for i := range deviceTypes {
-    fmt.Println("Starting device " + deviceTypes[i].Name + "...")
-    deviceTypes[i].Start()
+  for i := range devices {
+    fmt.Println("Starting device " + devices[i].Name + "...")
+    devices[i].Start()
   }
 }
-//    # Terminate all connections
-//    def disconnect
-//      connections.each {|k, c| c.async.disconnect}
-//    end
-
-//    # @return [Connection] default connection
-//    def default_connection
-//      connections.values.first
-//    end
-
-//    # @return [Collection] connection types
-//    def connection_types
-//      current_class.connection_types ||= [{:name => :passthru}]
-//    end
-
-//    # @return [Collection] device types
-//    def device_types
-//      current_class.device_types ||= []
-//      current_class.device_types
-//    end
-
-//    # @return [Proc] current working code
-//    def working_code
-//      current_class.working_code ||= proc {puts "No work defined."}
-//    end
-
-//    # @param [Symbol] period
-//    # @param [Numeric] interval
-//    # @return [Boolean] True if there is recurring work for the period and interval
-//    def has_work?(period, interval)
-//      current_instance.timers.find {|t| t.recurring == (period == :every) && t.interval == interval}
-//    end

@@ -3,8 +3,10 @@ package gobot
 import "fmt"
 
 type Driver struct {
+  Interval float64
+  Pin string
   Name string
-  Robot Robot
+  //Robot Robot
   Params map[string]string
 }
 
@@ -13,19 +15,20 @@ func NewDriver(d Driver) Driver {
 }
 
 // @return [Connection] parent connection
-func (d *Driver) Connection() Connection {
-  return d.Robot.Connections[0]
+func (d *Driver) Connection() *interface{}{
+  //return d.Robot.Connections[0]
+  return new(interface{})
 }
 
 // @return [String] parent pin
-func (d *Driver) pin() string {
-  return d.Robot.Devices[0].Pin
-}
+//func (d *Driver) Pin() string {
+//  return d.Robot.Devices[0].Pin
+//}
 
 // @return [String] parent interval
-func (d *Driver) Interval() string {
-  return d.Robot.Devices[0].Interval
-}
+//func (d *Driver) Interval() string {
+//  return d.Robot.Devices[0].Interval
+//}
 
 // Generic driver start
 func (d *Driver) Start() {

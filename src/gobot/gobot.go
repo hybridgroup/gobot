@@ -4,14 +4,6 @@ import (
   "time"
 )
 
-//type Gobot struct{
-//  Robot
-//  Connections []Connection
-//  Devices []Device
-//  Name string
-//  Work func()
-//}
-
 func Every(t time.Duration, f func()) {
   go func(){ 
     for{
