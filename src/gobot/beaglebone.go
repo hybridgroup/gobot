@@ -6,7 +6,6 @@ type Beaglebone struct {
   Translations map[string]int
 }
 
-
 func (b *Beaglebone) Connect() {
   b.Pins = make([]*DigitalPin,120)
   b.Translations = map[string]int {
@@ -76,6 +75,11 @@ func (b *Beaglebone) Connect() {
     "P9_30": 112,
     "P9_31": 110,
   }
+}
+
+func (b *Beaglebone) Disconnect(){}
+func (b *Beaglebone) IsConnected() bool {
+  return true
 }
 
 func (b *Beaglebone) DigitalWrite(pin string, val string) {

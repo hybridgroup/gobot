@@ -7,14 +7,13 @@ import (
   "reflect"
 )
 
-var connections []*Connection
-var devices []*Device
-
 type Robot struct {
   Connections []interface{}
   Devices []interface{}
   Name string
   Work func()
+  connections []*Connection
+  devices []*Device
 }
 
 func (r *Robot) Start() {
@@ -32,35 +31,35 @@ func (r *Robot) Start() {
 }
 
 func (r *Robot) initConnections() {
-  connections := make([]*Connection, len(r.Connections))
+  r.connections = make([]*Connection, len(r.Connections))
   fmt.Println("Initializing connections...")
   for i := range r.Connections {
     fmt.Println("Initializing connection " + reflect.ValueOf(r.Connections[i]).Elem().FieldByName("Name").String() + "...")
-    connections[i] = NewConnection(reflect.ValueOf(r.Connections[i]).Elem().FieldByName("Adaptor"), r)
+    r.connections[i] = NewConnection(r.Connections[i], r)
   }
 }
 
 func (r *Robot) initDevices() {
-  devices := make([]*Device, len(r.Devices))
+  r.devices = make([]*Device, len(r.Devices))
   fmt.Println("Initializing devices...")
   for i := range r.Devices {
     fmt.Println("Initializing device " + reflect.ValueOf(r.Devices[i]).Elem().FieldByName("Name").String() + "...")
-    devices[i] = NewDevice(reflect.ValueOf(r.Connections[i]).Elem().FieldByName("Driver"), r)
+    r.devices[i] = NewDevice(reflect.ValueOf(r.Connections[i]).Elem().FieldByName("Driver"), r)
   }
 }
 
 func (r *Robot) startConnections() {
   fmt.Println("Starting connections...")
-  for i := range connections {
-    fmt.Println("Starting connection " + connections[i].Name + "...")
-    connections[i].Connect()
+  for i := range r.connections {
+    fmt.Println("Starting connection " + r.connections[i].Name + "...")
+    r.connections[i].Connect()
   }
 }
 
 func (r *Robot) startDevices() {
   fmt.Println("Starting devices...")
-  for i := range devices {
-    fmt.Println("Starting device " + devices[i].Name + "...")
-    devices[i].Start()
+  for i := range r.devices {
+    fmt.Println("Starting device " + r.devices[i].Name + "...")
+    r.devices[i].Start()
   }
 }

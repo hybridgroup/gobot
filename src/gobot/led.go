@@ -2,12 +2,13 @@ package gobot
 
 type Led struct {
   Driver
+  //Beaglebone *AdaptorInterface
   Beaglebone *Beaglebone
   High bool
 }
 
-func NewLed(beaglebone *Beaglebone) *Led{
-  l := Led{High: false, Beaglebone: beaglebone}
+func NewLed(b *Beaglebone) *Led{
+  l := Led{High: false, Beaglebone: b}
   return &l
 }
 

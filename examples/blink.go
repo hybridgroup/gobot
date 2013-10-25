@@ -33,6 +33,5 @@ func main() {
       Work: work,
   }
 
-  beaglebone.Connect()
   robot.Start()
 }

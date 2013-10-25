@@ -7,35 +7,34 @@ import (
 
 type Connection struct {
   Name string
-  Adaptor *Adaptor
+  Adaptor interface{}
   Port Port
   Robot *Robot
   Params map[string]string
+
 }
 
-func NewConnection(a reflect.Value, r *Robot) *Connection {
+func NewConnection(a interface{}, r *Robot) *Connection {
   c := new(Connection)
-  c.Name = reflect.ValueOf(a).FieldByName("Name").String()
+  c.Name = reflect.ValueOf(a).Elem().FieldByName("Name").String()
   c.Robot = r
-  c.Adaptor = new(Adaptor)
-  c.Adaptor.Name = reflect.ValueOf(a).FieldByName("Name").String()
+  c.Adaptor = a
   return c
 }
 
 func (c *Connection) Connect() {
-  fmt.Println("Connecting to "+ c.Adaptor.Name + " on port " + c.Port.ToString() + "...")
-  c.Adaptor.Connect()
+  fmt.Println("Connecting to " + reflect.ValueOf(c).Elem().FieldByName("Name").String() + " on port " + c.Port.ToString() + "...")
+  reflect.ValueOf(c.Adaptor).MethodByName("Connect").Call([]reflect.Value{})
 }
 
 func (c *Connection) Disconnect() {
-  fmt.Println("Diconnecting from "+ c.Adaptor.Name + " on port " + c.Port.ToString() + "...")
-  c.Adaptor.Disconnect()
+  reflect.ValueOf(c.Adaptor).MethodByName("Disconnect").Call([]reflect.Value{})
 }
 
 func (c *Connection) IsConnected() bool {
-  return c.Adaptor.IsConnected()
+  return reflect.ValueOf(c.Adaptor).MethodByName("IsConnect").Call([]reflect.Value{})[0].Bool()
 }
 
 func (c *Connection) AdaptorName() string {
-  return c.Adaptor.Name
+  return c.Name
 }
