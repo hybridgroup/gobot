@@ -2,6 +2,7 @@ package gobot
 
 type Adaptor struct {
   Name string
+  Port string
   Connected bool 
   Params map[string]string
 }
