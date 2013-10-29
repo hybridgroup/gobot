@@ -34,3 +34,10 @@ func On(cs chan interface{}) interface{}{
   }
   return nil
 }
+
+func Work(robots []Robot) {
+  for s := range robots {
+    go robots[s].Start()
+  }
+  for{time.Sleep(10 * time.Millisecond)}
+}
