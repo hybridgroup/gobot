@@ -10,26 +10,24 @@ type Device struct {
   Interval string
   Robot *Robot
   Connection *Connection 
-  Driver *Driver
+  Driver interface{}
   Params map[string]string
 }
 
-func NewDevice(d interface{}, r *Robot) *Device {
-  dt := new(Device)
-  dt.Name = reflect.ValueOf(d).Elem().FieldByName("Name").String()
-  dt.Robot = r
-  dt.Driver = new(Driver)
-  dt.Driver.Pin = reflect.ValueOf(d).Elem().FieldByName("Pin").String()
-  dt.Driver.Interval = reflect.ValueOf(d).Elem().FieldByName("Interval").String()
-  dt.Driver.Name = reflect.ValueOf(d).Elem().FieldByName("Name").String()
-  dt.Connection = new(Connection)
-  return dt
+func NewDevice(driver interface{}, r *Robot) *Device {
+  d := new(Device)
+  d.Name = reflect.ValueOf(driver).Elem().FieldByName("Name").String()
+  d.Robot = r
+  d.Driver = driver
+  d.Connection = new(Connection)
+  return d
 }
 
-func (dt *Device) Start() {
-  fmt.Println("Device " + dt.Name + " started")
-  dt.Driver.Start()
+func (d *Device) Start() {
+  fmt.Println("Device " + d.Name + " started")
+  reflect.ValueOf(d.Driver).MethodByName("StartDriver").Call([]reflect.Value{})
 }
-func (dt *Device) Command(method_name string, arguments []string) {
+
+func (d *Device) Command(method_name string, arguments []string) {
   //dt.Driver.Command(method_name, arguments)
 }

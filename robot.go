@@ -44,7 +44,7 @@ func (r *Robot) initDevices() {
   fmt.Println("Initializing devices...")
   for i := range r.Devices {
     fmt.Println("Initializing device " + reflect.ValueOf(r.Devices[i]).Elem().FieldByName("Name").String() + "...")
-    r.devices[i] = NewDevice(r.Connections[i], r)
+    r.devices[i] = NewDevice(r.Devices[i], r)
   }
 }
 
