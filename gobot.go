@@ -27,3 +27,10 @@ func Random(min int, max int) int {
   rand.Seed(time.Now().UTC().UnixNano())
   return rand.Intn(max - min) + min
 }
+
+func On(cs chan interface{}) interface{}{
+  for s := range cs {
+    return s
+  }
+  return nil
+}
