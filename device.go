@@ -9,7 +9,6 @@ type Device struct {
   Name string
   Interval string
   Robot *Robot
-  Connection *Connection 
   Driver interface{}
   Params map[string]string
 }
@@ -19,7 +18,6 @@ func NewDevice(driver interface{}, r *Robot) *Device {
   d.Name = reflect.ValueOf(driver).Elem().FieldByName("Name").String()
   d.Robot = r
   d.Driver = driver
-  d.Connection = new(Connection)
   return d
 }
 

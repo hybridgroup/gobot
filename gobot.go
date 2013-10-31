@@ -3,24 +3,36 @@ package gobot
 import (
   "time"
   "math/rand"
+  "net"
 )
 
 func Every(t string, f func()) {
-  dur,_ := time.ParseDuration(t)
+  dur := parseDuration(t)
   go func(){ 
     for{
       time.Sleep(dur)
-      f()
+      go f()
     }
   }()
 }
 
 func After(t string, f func()) {
-  dur,_ := time.ParseDuration(t)
+  dur := parseDuration(t)
   go func(){ 
     time.Sleep(dur)
     f()
   }()
+}
+
+func parseDuration(t string) time.Duration {
+  return ParseDuration(t)
+}
+func ParseDuration(t string) time.Duration {
+  dur, err := time.ParseDuration(t)
+  if err != nil {
+    panic(err)
+  }
+  return dur
 }
 
 func Random(min int, max int) int {
@@ -40,4 +52,12 @@ func Work(robots []Robot) {
     go robots[s].Start()
   }
   for{time.Sleep(10 * time.Millisecond)}
+}
+
+func ConnectTo(port string) net.Conn {
+ tcpPort, err := net.Dial("tcp", port)
+ if err != nil {
+  panic(err)
+ }
+ return tcpPort
 }
