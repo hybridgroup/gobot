@@ -1,0 +1,1090 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+<meta name="description">
+<meta content="The Hybrid Group" name="author">
+<title>Cylon.js - Sphero Driver</title>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><link href="http://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,500,700" rel="stylesheet" type="text/css">
+<link href="/stylesheets/style.css" rel="stylesheet">
+<link href="/favicon.ico" rel="shortcut icon" type="image/gif">
+<script>
+      $(document).ready(function() {
+        $('header .subtitle').hover(function() {
+          $('.easter', this).show();
+          $('.main', this).hide();
+        }, function () {
+          $('.easter', this).hide();
+          $('.main', this).show();
+        });
+      });
+    </script>
+</head>
+<body>
+    <div class="app">
+      <div class="w">
+        <header class="app-header" role="banner"><div class="display">
+            <h1 class="cylon-logo">
+              <a href="/">Cylon</a>
+            </h1>
+          </div>
+          <span class="menu">
+            <a href="/documentation" class="item">Docs</a>
+            <a href="/hardware" class="item">Hardware</a>
+            
+            
+            <a class="item" target="blanck" href="https://github.com/hybridgroup/cylon/">Github</a>
+          </span>
+        </header>
+</div>
+      <div class="page-title">
+        <div class="w">
+          <h1 class="title">Sphero</h1>
+          <h2 class="subtitle">Driver</h2>
+        </div>
+      </div>
+      <div class="container">
+        <div class="main" role="main">
+          <section class="content full"><div class="documentation">
+              <section class="intro"><img class="display" src="/images/sphero.jpg"><p>
+                  Allows user to interact with the Sphero robotic sphero using Cylon.js.
+                </p>
+              </section><section class="how-to"><h2>How to establish a connection and setup the driver</h2>
+                <p>
+                  That is pretty simple once the Sphero is ready (connected and listening), you just need three lines of code and you are set,
+                  Cylon.js and the Sphero driver take care of the rest.
+                  </p>
+<h3>JavaScript</h3>
+                  <pre class="CodeRay"><span class="keyword">var</span> Cylon = require(<span class="string"><span class="delimiter">'</span><span class="content">cylon</span><span class="delimiter">'</span></span>);
+
+Cylon.robot({
+  <span class="key">connection</span>: {<span class="key">name</span>: <span class="string"><span class="delimiter">'</span><span class="content">sphero</span><span class="delimiter">'</span></span>, <span class="key">adaptor</span>: <span class="string"><span class="delimiter">'</span><span class="content">sphero</span><span class="delimiter">'</span></span>, <span class="key">port</span>: <span class="string"><span class="delimiter">'</span><span class="content">/dev/rfcomm0</span><span class="delimiter">'</span></span>},
+
+  <span class="key">device</span>: {<span class="key">name</span>: <span class="string"><span class="delimiter">'</span><span class="content">sphero</span><span class="delimiter">'</span></span>, <span class="key">driver</span>: <span class="string"><span class="delimiter">'</span><span class="content">sphero</span><span class="delimiter">'</span></span>},
+...
+</pre>
+                  <h3>CoffeeScript</h3>
+                  <pre class="CodeRay">Cylon = require <span class="string"><span class="delimiter">'</span><span class="content">cylon</span><span class="delimiter">'</span></span>
+
+Cylon.robot
+  connection:
+    name: <span class="string"><span class="delimiter">'</span><span class="content">sphero</span><span class="delimiter">'</span></span>, <span class="key">adaptor</span>: <span class="string"><span class="delimiter">'</span><span class="content">sphero</span><span class="delimiter">'</span></span>, <span class="key">port</span>: <span class="string"><span class="delimiter">'</span><span class="content">/dev/rfcomm0</span><span class="delimiter">'</span></span>
+
+  device:
+    name: <span class="string"><span class="delimiter">'</span><span class="content">sphero</span><span class="delimiter">'</span></span>, <span class="key">driver</span>: <span class="string"><span class="delimiter">'</span><span class="content">sphero</span><span class="delimiter">'</span></span>
+  ...
+</pre>
+                
+              </section><section class="public-methods"><h2>Commands:</h2>
+                <dl class="methods">
+<dt>abortMacro → (ID code , command number)</dt>
+                  <dd></dd>
+                  <dt>abortOrbBasicProgram</dt>
+                  <dd></dd>
+                  <dt>appendMacroChunck(MACRO Chunk)</dt>
+                  <dd></dd>
+                  <dt>appendOrbBasicFragment(Area, Program Code)</dt>
+                  <dd></dd>
+                  <dt>configureCollisionDetection(Meth,(Xt, Yt),(Xspd, Yspd),Dead)</dt>
+                  <dd>Sets the sphero to detect collisions and report them.</dd>
+                  <dt>configureLocator(flag, x, y, Yaw Tare)</dt>
+                  <dd></dd>
+                  <dt>detectCollisions</dt>
+                  <dd>Sets the sphero to detect collisions and report them.</dd>
+                  <dt>eraseOrbBasicStorage(Area)</dt>
+                  <dd></dd>
+                  <dt>executeOrbBasicProgram(Area, Start Line, Start Line)</dt>
+                  <dd></dd>
+                  <dt>getApplicationConfigurationBlock</dt>
+                  <dd></dd>
+                  <dt>getConfigurationBlock(ID)</dt>
+                  <dd></dd>
+                  <dt>getDeviceMode → (Mode), options: 00h (Normal mode) | 01h (User Hack mode)</dt>
+                  <dd></dd>
+                  <dt>getMacroStatus → (ID code , cmd number, cmd number)</dt>
+                  <dd></dd>
+                  <dt>getPermanentOptionFlags → (FLAGS), options: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 6-31</dt>
+                  <dd></dd>
+                  <dt>getRGB → (red,green,blue) | (color)</dt>
+                  <dd></dd>
+                  <dt>getTemporaryOptionFlags → (FLAGS), options: 0 | 1-31</dt>
+                  <dd></dd>
+                  <dt>reInitializeMacroExecutive</dt>
+                  <dd></dd>
+                  <dt>readLocator → (XPOS, YPOS, XVEL, YVEL, SOG)</dt>
+                  <dd></dd>
+                  <dt>roll(speed, heading, state)</dt>
+                  <dd>This commands Sphero to roll along the provided vector. Both a speed and a heading are required; the latter is considered relative to the last calibrated direction.</dd>
+                  <dt>runMacro(SEQ, DLEN, ID)</dt>
+                  <dd></dd>
+                  <dt>saveMacro(data)</dt>
+                  <dd></dd>
+                  <dt>saveTemporaryMacro(data)</dt>
+                  <dd></dd>
+                  <dt>selfLevel(Options, Angle Limit, Timeout, True Time), options: ((0 | 1 | 2 |3 ), (0 | 1 to 90), (0 | 1 to 255), (0 | 1 to 255)</dt>
+                  <dd></dd>
+                  <dt>setAccelerometerRange(Range Idx), options: 0 | 1 | 2 | 3</dt>
+                  <dd></dd>
+                  <dt>setApplicationConfigurationBlock</dt>
+                  <dd></dd>
+                  <dt>setBackLED(BRIGHT)</dt>
+                  <dd></dd>
+                  <dt>setBoostWithTime(STATE)</dt>
+                  <dd></dd>
+                  <dt>setColor(color)</dt>
+                  <dd>This allows you to set the color of the sphero, just pass an array containing RGB hex or a string with one of the color names of the list.</dd>
+                  <dt>setConfigurationBlock(value)</dt>
+                  <dd></dd>
+                  <dt>setDataStreaming(N, M, MASK, PCNT, MASK2)</dt>
+                  <dd></dd>
+                  <dt>setDeviceMode(MODE)</dt>
+                  <dd></dd>
+                  <dt>setHeading(HEADING)</dt>
+                  <dd></dd>
+                  <dt>setMacroParameter(Param, Val1, Val2)</dt>
+                  <dd></dd>
+                  <dt>setMotionTimeout(TIME)</dt>
+                  <dd></dd>
+                  <dt>setPermanentOptionFlags(FLAGS)</dt>
+                  <dd></dd>
+                  <dt>setRGB(color, persist)</dt>
+                  <dd>This allows you to set the RGB LED color, just pass an array containing RGB hex or a string with one of the color names of the list.</dd>
+                  <dt>setRawMotorValues(L-MODE, L-POWER, R-MODE, R-POWER)</dt>
+                  <dd></dd>
+                  <dt>setRotationRate(RATE)</dt>
+                  <dd></dd>
+                  <dt>setStabalisation(bool)</dt>
+                  <dd></dd>
+                  <dt>setTemporaryOptionFlags(FLAGS)</dt>
+                  <dd></dd>
+                  <dt>stop</dt>
+                  <dd>Stops the sphero.</dd>
+                  <dt>submitValueToInputStatement(VAL)</dt>
+                  <dd></dd>
+                </dl></section><section class="public-events"><h2>Events:</h2>
+                <dl class="methods">
+<dt>update</dt>
+                  <dd>
+                    This event will contain one of the following events.
+                    <br>
+                    You can also subscribe to one of the specific events, if that is the information you are interested in.
+                  </dd>
+                  <dt>collision</dt>
+                  <dd>Gets triggered when the sphero hits something or falls from a step.</dd>
+                  <dt>messages(data)</dt>
+                  <dd>Gets triggered when has a message.</dd>
+                  <dt>notifications(data)</dt>
+                  <dd>Gets triggered when has a notification.</dd>
+                  <dt>connect</dt>
+                  <dd>Opens the connection to Sphero.</dd>
+                  <dt>start</dt>
+                  <dd>Sent when the device has been started and is ready to use.</dd>
+                </dl></section><section class="how-to"><h2>How to use</h2>
+                <p>
+                  This example rolls the sphero in a random direction and change direction every second.
+                  </p>
+<h3>JavaScript</h3>
+                  <pre class="CodeRay"><span class="keyword">var</span> Cylon = require(<span class="string"><span class="delimiter">'</span><span class="content">cylon</span><span class="delimiter">'</span></span>);
+
+Cylon.robot({
+  <span class="key">connection</span>: {<span class="key">name</span>: <span class="string"><span class="delimiter">'</span><span class="content">sphero</span><span class="delimiter">'</span></span>, <span class="key">adaptor</span>: <span class="string"><span class="delimiter">'</span><span class="content">sphero</span><span class="delimiter">'</span></span>, <span class="key">port</span>: <span class="string"><span class="delimiter">'</span><span class="content">/dev/rfcomm0</span><span class="delimiter">'</span></span>},
+
+  <span class="key">device</span>: {<span class="key">name</span>: <span class="string"><span class="delimiter">'</span><span class="content">sphero</span><span class="delimiter">'</span></span>, <span class="key">driver</span>: <span class="string"><span class="delimiter">'</span><span class="content">sphero</span><span class="delimiter">'</span></span>},
+
+  <span class="function">work</span>: <span class="keyword">function</span>(me) {
+    every((<span class="integer">1</span>).second(), <span class="keyword">function</span>() {
+      me.sphero.roll <span class="integer">60</span>, Math.floor(Math.random() * <span class="integer">360</span>)
+    });
+  }
+}).start();
+</pre>
+                  <h3>CoffeeScript</h3>
+                  <pre class="CodeRay">Cylon = require(<span class="string"><span class="delimiter">'</span><span class="content">..</span><span class="delimiter">'</span></span>)
+
+Cylon.robot
+  connection:
+    name: <span class="string"><span class="delimiter">'</span><span class="content">sphero</span><span class="delimiter">'</span></span>, <span class="key">adaptor</span>: <span class="string"><span class="delimiter">'</span><span class="content">sphero</span><span class="delimiter">'</span></span>, <span class="key">port</span>: <span class="string"><span class="delimiter">'</span><span class="content">/dev/rfcomm0</span><span class="delimiter">'</span></span>
+
+  device:
+    name: <span class="string"><span class="delimiter">'</span><span class="content">sphero</span><span class="delimiter">'</span></span>, <span class="key">driver</span>: <span class="string"><span class="delimiter">'</span><span class="content">sphero</span><span class="delimiter">'</span></span>
+
+  work: (me) -&gt;
+    every <span class="integer">1</span>.second(), -&gt;
+      me.sphero.roll <span class="integer">60</span>, Math.floor(Math.random() * <span class="integer">360</span>)
+
+.start()
+</pre>
+                
+              </section><section><h2>Sphero Colors</h2>
+                <dl class="colors">
+<dt>aliceblue</dt>
+                  <dd>
+                    <div class="aliceblue square"></div>
+                    <p>0xF0F8FF</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>antiquewhite</dt>
+                  <dd>
+                    <div class="antiquewhite square"></div>
+                    <p>0xFAEBD7</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>aqua</dt>
+                  <dd>
+                    <div class="square aqua"></div>
+                    <p>0x00FFFF</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>aquamarine</dt>
+                  <dd>
+                    <div class="square aquamarine"></div>
+                    <p>0x7FFFD4</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>azure</dt>
+                  <dd>
+                    <div class="square azure"></div>
+                    <p>0xF0FFFF</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>beige</dt>
+                  <dd>
+                    <div class="square beige"></div>
+                    <p>0xF5F5DC</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>bisque</dt>
+                  <dd>
+                    <div class="square bisque"></div>
+                    <p>0xFFE4C4</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>black</dt>
+                  <dd>
+                    <div class="square black"></div>
+                    <p>0x000000</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>blanchedalmond</dt>
+                  <dd>
+                    <div class="square blanchedalmond"></div>
+                    <p>0xFFEBCD</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>blue</dt>
+                  <dd>
+                    <div class="square blue"></div>
+                    <p>0x0000FF</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>blueviolet</dt>
+                  <dd>
+                    <div class="square blueviolet"></div>
+                    <p>0x8A2BE2</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>brown</dt>
+                  <dd>
+                    <div class="square brown"></div>
+                    <p>0xA52A2A</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>burlywood</dt>
+                  <dd>
+                    <div class="square burlywood"></div>
+                    <p>0xDEB887</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>cadetblue</dt>
+                  <dd>
+                    <div class="square cadetblue"></div>
+                    <p>0x5F9EA0</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>chartreuse</dt>
+                  <dd>
+                    <div class="square chartreuse"></div>
+                    <p>0x7FFF00</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>chocolate</dt>
+                  <dd>
+                    <div class="square chocolate"></div>
+                    <p>0xD2691E</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>coral</dt>
+                  <dd>
+                    <div class="square coral"></div>
+                    <p>0xFF7F50</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>cornflowerblue</dt>
+                  <dd>
+                    <div class="square cornflowerblue"></div>
+                    <p>0x6495ED</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>cornsilk</dt>
+                  <dd>
+                    <div class="square cornsilk"></div>
+                    <p>0xFFF8DC</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>crimson</dt>
+                  <dd>
+                    <div class="square crimson"></div>
+                    <p>0xDC143C</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>cyan</dt>
+                  <dd>
+                    <div class="square cyan"></div>
+                    <p>0x00FFFF</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>darkblue</dt>
+                  <dd>
+                    <div class="square darkblue"></div>
+                    <p>0x00008B</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>darkcyan</dt>
+                  <dd>
+                    <div class="square darkcyan"></div>
+                    <p>0x008B8B</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>darkgoldenrod</dt>
+                  <dd>
+                    <div class="square darkgoldenrod"></div>
+                    <p>0xB8860B</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>darkgray</dt>
+                  <dd>
+                    <div class="square darkgray"></div>
+                    <p>0xA9A9A9</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>darkgreen</dt>
+                  <dd>
+                    <div class="square darkgreen"></div>
+                    <p>0x006400</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>darkkhaki</dt>
+                  <dd>
+                    <div class="square darkkhaki"></div>
+                    <p>0xBDB76B</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>darkmagenta</dt>
+                  <dd>
+                    <div class="square darkmagenta"></div>
+                    <p>0x8B008B</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>darkolivegreen</dt>
+                  <dd>
+                    <div class="square darkolivegreen"></div>
+                    <p>0x556B2F</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>darkorange</dt>
+                  <dd>
+                    <div class="square darkorange"></div>
+                    <p>0xFF8C00</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>darkorchid</dt>
+                  <dd>
+                    <div class="square darkorchid"></div>
+                    <p>0x9932CC</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>darkred</dt>
+                  <dd>
+                    <div class="square darkred"></div>
+                    <p>0x8B0000</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>darksalmon</dt>
+                  <dd>
+                    <div class="square darksalmon"></div>
+                    <p>0xE9967A</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>darkseagreen</dt>
+                  <dd>
+                    <div class="square darkseagreen"></div>
+                    <p>0x8FBC8F</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>darkslateblue</dt>
+                  <dd>
+                    <div class="square darkslateblue"></div>
+                    <p>0x483D8B</p>
+                  </dd>
+                  <div class="clear"></div>
+                </dl>
+<dl class="colors">
+<dt>darkslategray</dt>
+                  <dd>
+                    <div class="square darkslategray"></div>
+                    <p>0x2F4F4F</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>darkturquoise</dt>
+                  <dd>
+                    <div class="square darkturquoise"></div>
+                    <p>0x00CED1</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>darkviolet</dt>
+                  <dd>
+                    <div class="square darkviolet"></div>
+                    <p>0x9400D3</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>deeppink</dt>
+                  <dd>
+                    <div class="square deeppink"></div>
+                    <p>0xFF1493</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>deepskyblue</dt>
+                  <dd>
+                    <div class="square deepskyblue"></div>
+                    <p>0x00BFFF</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>dimgray</dt>
+                  <dd>
+                    <div class="square dimgray"></div>
+                    <p>0x696969</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>dodgerblue</dt>
+                  <dd>
+                    <div class="square dodgerblue"></div>
+                    <p>0x1E90FF</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>firebrick:</dt>
+                  <dd>
+                    <div class="square firebrick"></div>
+                    <p>0xB22222</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>floralwhite</dt>
+                  <dd>
+                    <div class="square floralwhite"></div>
+                    <p>0xFFFAF0</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>forestgreen</dt>
+                  <dd>
+                    <div class="square forestgreen"></div>
+                    <p>0x228B22</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>fuchsia</dt>
+                  <dd>
+                    <div class="square fuchsia"></div>
+                    <p>0xFF00FF</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>gainsboro</dt>
+                  <dd>
+                    <div class="square gainsboro"></div>
+                    <p>0xDCDCDC</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>ghostwhite</dt>
+                  <dd>
+                    <div class="square ghostwhite"></div>
+                    <p>0xF8F8FF</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>gold</dt>
+                  <dd>
+                    <div class="square gold"></div>
+                    <p>0xFFD700</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>goldenrod</dt>
+                  <dd>
+                    <div class="square goldenrod"></div>
+                    <p>0xDAA520</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>gray</dt>
+                  <dd>
+                    <div class="square gray"></div>
+                    <p>0x808080</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>green</dt>
+                  <dd>
+                    <div class="square green"></div>
+                    <p>0x008000</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>greenyellow</dt>
+                  <dd>
+                    <div class="square greenyellow"></div>
+                    <p>0xADFF2F</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>honeydew</dt>
+                  <dd>
+                    <div class="square honeydew"></div>
+                    <p>0xF0FFF0</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>hotpink</dt>
+                  <dd>
+                    <div class="square hotpink"></div>
+                    <p>0xFF69B4</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>indianred</dt>
+                  <dd>
+                    <div class="square indianred"></div>
+                    <p>0xCD5C5C</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>indigo</dt>
+                  <dd>
+                    <div class="square indigo"></div>
+                    <p>0x4B0082</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>ivory</dt>
+                  <dd>
+                    <div class="square ivory"></div>
+                    <p>0xFFFFF0</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>khaki</dt>
+                  <dd>
+                    <div class="square khaki"></div>
+                    <p>0xF0E68C</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>lavender</dt>
+                  <dd>
+                    <div class="square lavender"></div>
+                    <p>0xE6E6FA</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>lavenderblush</dt>
+                  <dd>
+                    <div class="square lavenderblush"></div>
+                    <p>0xFFF0F5</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>lawngreen</dt>
+                  <dd>
+                    <div class="square lawngreen"></div>
+                    <p>0x7CFC00</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>lemonchiffon</dt>
+                  <dd>
+                    <div class="square lemonchiffon"></div>
+                    <p>0xFFFACD</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>lightblue</dt>
+                  <dd>
+                    <div class="square lightblue"></div>
+                    <p>0xADD8E6</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>lightcoral</dt>
+                  <dd>
+                    <div class="square lightcoral"></div>
+                    <p>0xF08080</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>lightcyan</dt>
+                  <dd>
+                    <div class="square lightcyan"></div>
+                    <p>0xE0FFFF</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>lightgoldenrodyellow</dt>
+                  <dd>
+                    <div class="square lightgoldenrodyellow"></div>
+                    <p>0xFAFAD2</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>lightgreen</dt>
+                  <dd>
+                    <div class="square lightgreen"></div>
+                    <p>0x90EE90</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>lightgrey</dt>
+                  <dd>
+                    <div class="square lightgrey"></div>
+                    <p>0xD3D3D3</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>lightpink</dt>
+                  <dd>
+                    <div class="square lightpink"></div>
+                    <p>0xFFB6C1</p>
+                  </dd>
+                  <div class="clear"></div>
+                </dl>
+<dl class="colors">
+<dt>lightsalmon</dt>
+                  <dd>
+                    <div class="square lightsalmon"></div>
+                    <p>0xFFA07A</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>lightseagreen</dt>
+                  <dd>
+                    <div class="square lightseagreen"></div>
+                    <p>0x20B2AA</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>lightskyblue</dt>
+                  <dd>
+                    <div class="square lightskyblue"></div>
+                    <p>0x87CEFA</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>lightslategray</dt>
+                  <dd>
+                    <div class="square lightslategray"></div>
+                    <p>0x778899</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>lightsteelblue</dt>
+                  <dd>
+                    <div class="square lightsteelblue"></div>
+                    <p>0xB0C4DE</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>lightyellow</dt>
+                  <dd>
+                    <div class="square lightyellow"></div>
+                    <p>0xFFFFE0</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>lime</dt>
+                  <dd>
+                    <div class="square lime"></div>
+                    <p>0x00FF00</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>limegreen</dt>
+                  <dd>
+                    <div class="square limegreen"></div>
+                    <p>0x32CD32</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>linen</dt>
+                  <dd>
+                    <div class="square linen"></div>
+                    <p>0xFAF0E6</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>magenta</dt>
+                  <dd>
+                    <div class="square magenta"></div>
+                    <p>0xFF00FF</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>maroon</dt>
+                  <dd>
+                    <div class="square maroon"></div>
+                    <p>0x800000</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>mediumaquamarine</dt>
+                  <dd>
+                    <div class="square mediumaquamarine"></div>
+                    <p>0x66CDAA</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>mediumblue</dt>
+                  <dd>
+                    <div class="square mediumblue"></div>
+                    <p>0x0000CD</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>mediumorchid</dt>
+                  <dd>
+                    <div class="square mediumorchid"></div>
+                    <p>0xBA55D3</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>mediumpurple</dt>
+                  <dd>
+                    <div class="square mediumpurple"></div>
+                    <p>0x9370DB</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>mediumseagreen</dt>
+                  <dd>
+                    <div class="square mediumseagreen"></div>
+                    <p>0x3CB371</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>mediumslateblue</dt>
+                  <dd>
+                    <div class="square mediumslateblue"></div>
+                    <p>0x7B68EE</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>mediumspringgreen</dt>
+                  <dd>
+                    <div class="square mediumspringgreen"></div>
+                    <p>0x00FA9A</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>mediumturquoise</dt>
+                  <dd>
+                    <div class="square mediumturquoise"></div>
+                    <p>0x48D1CC</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>mediumvioletred</dt>
+                  <dd>
+                    <div class="square mediumvioletred"></div>
+                    <p>0xC71585</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>midnightblue</dt>
+                  <dd>
+                    <div class="square midnightblue"></div>
+                    <p>0x191970</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>mintcream</dt>
+                  <dd>
+                    <div class="square mintcream"></div>
+                    <p>0xF5FFFA</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>mistyrose</dt>
+                  <dd>
+                    <div class="square mistyrose"></div>
+                    <p>0xFFE4E1</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>moccasin</dt>
+                  <dd>
+                    <div class="square moccasin"></div>
+                    <p>0xFFE4B5</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>navajowhite</dt>
+                  <dd>
+                    <div class="square navajowhite"></div>
+                    <p>0xFFDEAD</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>navy</dt>
+                  <dd>
+                    <div class="square navy"></div>
+                    <p>0x000080</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>oldlace</dt>
+                  <dd>
+                    <div class="square oldlace"></div>
+                    <p>0xFDF5E6</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>olive</dt>
+                  <dd>
+                    <div class="square olive"></div>
+                    <p>0x808000</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>olivedrab</dt>
+                  <dd>
+                    <div class="square olivedrab"></div>
+                    <p>0x6B8E23</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>orange</dt>
+                  <dd>
+                    <div class="square orange"></div>
+                    <p>0xFFA500</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>orangered</dt>
+                  <dd>
+                    <div class="square orangered"></div>
+                    <p>0xFF4500</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>orchid</dt>
+                  <dd>
+                    <div class="square orchid"></div>
+                    <p>0xDA70D6</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>palegoldenrod</dt>
+                  <dd>
+                    <div class="square palegoldenrod"></div>
+                    <p>0xEEE8AA</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>palegreen</dt>
+                  <dd>
+                    <div class="square palegreen"></div>
+                    <p>0x98FB98</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>paleturquoise</dt>
+                  <dd>
+                    <div class="square paleturquoise"></div>
+                    <p>0xAFEEEE</p>
+                  </dd>
+                  <div class="clear"></div>
+                </dl>
+<dl class="colors">
+<dt>palevioletred</dt>
+                  <dd>
+                    <div class="square palevioletred"></div>
+                    <p>0xDB7093</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>papayawhip</dt>
+                  <dd>
+                    <div class="square papayawhip"></div>
+                    <p>0xFFEFD5</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>peachpuff</dt>
+                  <dd>
+                    <div class="square peachpuff"></div>
+                    <p>0xFFDAB9</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>peru</dt>
+                  <dd>
+                    <div class="square peru"></div>
+                    <p>0xCD853F</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>pink</dt>
+                  <dd>
+                    <div class="square pink"></div>
+                    <p>0xFFC0CB</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>plum</dt>
+                  <dd>
+                    <div class="square plum"></div>
+                    <p>0xDDA0DD</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>powderblue</dt>
+                  <dd>
+                    <div class="square powderblue"></div>
+                    <p>0xB0E0E6</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>purple</dt>
+                  <dd>
+                    <div class="square purple"></div>
+                    <p>0x800080</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>red</dt>
+                  <dd>
+                    <div class="square red"></div>
+                    <p>0xFF0000</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>rosybrown</dt>
+                  <dd>
+                    <div class="square rosybrown"></div>
+                    <p>0xBC8F8F</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>royalblue</dt>
+                  <dd>
+                    <div class="square royalblue"></div>
+                    <p>0x4169E1</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>saddlebrown</dt>
+                  <dd>
+                    <div class="square saddlebrown"></div>
+                    <p>0x8B4513</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>salmon</dt>
+                  <dd>
+                    <div class="square salmon"></div>
+                    <p>0xFA8072</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>sandybrown</dt>
+                  <dd>
+                    <div class="square sandybrown"></div>
+                    <p>0xF4A460</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>seagreen</dt>
+                  <dd>
+                    <div class="square seagreen"></div>
+                    <p>0x2E8B57</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>seashell</dt>
+                  <dd>
+                    <div class="square seashell"></div>
+                    <p>0xFFF5EE</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>sienna</dt>
+                  <dd>
+                    <div class="square sienna"></div>
+                    <p>0xA0522D</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>silver</dt>
+                  <dd>
+                    <div class="square silver"></div>
+                    <p>0xC0C0C0</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>skyblue</dt>
+                  <dd>
+                    <div class="square skyblue"></div>
+                    <p>0x87CEEB</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>slateblue</dt>
+                  <dd>
+                    <div class="square slateblue"></div>
+                    <p>0x6A5ACD</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>slategray</dt>
+                  <dd>
+                    <div class="square slategray"></div>
+                    <p>0x708090</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>snow</dt>
+                  <dd>
+                    <div class="square snow"></div>
+                    <p>0xFFFAFA</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>springgreen</dt>
+                  <dd>
+                    <div class="square springgreen"></div>
+                    <p>0x00FF7F</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>steelblue</dt>
+                  <dd>
+                    <div class="square steelblue"></div>
+                    <p>0x4682B4</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>tan</dt>
+                  <dd>
+                    <div class="square tan"></div>
+                    <p>0xD2B48C</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>teal</dt>
+                  <dd>
+                    <div class="square teal"></div>
+                    <p>0x008080</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>thistle</dt>
+                  <dd>
+                    <div class="square thistle"></div>
+                    <p>0xD8BFD8</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>tomato</dt>
+                  <dd>
+                    <div class="square tomato"></div>
+                    <p>0xFF6347</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>turquoise</dt>
+                  <dd>
+                    <div class="square turquoise"></div>
+                    <p>0x40E0D0</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>violet</dt>
+                  <dd>
+                    <div class="square violet"></div>
+                    <p>0xEE82EE</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>wheat</dt>
+                  <dd>
+                    <div class="square wheat"></div>
+                    <p>0xF5DEB3</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>white</dt>
+                  <dd>
+                    <div class="square white"></div>
+                    <p>0xFFFFFF</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>whitesmoke</dt>
+                  <dd>
+                    <div class="square whitesmoke"></div>
+                    <p>0xF5F5F5</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>yellow</dt>
+                  <dd>
+                    <div class="square yellow"></div>
+                    <p>0xFFFF00</p>
+                  </dd>
+                  <div class="clear"></div>
+                  <dt>yellowgreen</dt>
+                  <dd>
+                    <div class="square yellowgreen"></div>
+                    <p>0x9ACD32</p>
+                  </dd>
+                  <div class="clear"></div>
+                </dl></section><div class="clear"></div>
+              <section class="compatability hardware"><h2>Works with:</h2>
+                
+                <div class="devices">
+                  <a class="device" href="/documentation/platforms/sphero" title="Sphero">
+                    <img src="/images/sphero.jpg"></a>
+                </div>
+              </section>
+</div>
+          </section>
+</div>
+      </div>
+    </div>
+    <footer class="app-footer"><div class="w">
+        <div class="copyright">
+          © Copyright 2012-2013
+          <a href="http://hybridgroup.com">The Hybrid Group.</a>
+        </div>
+      </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+<meta name="description">
+<meta content="The Hybrid Group" name="author">
+<title>Travis with Cylon.js</title>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><link href="http://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,500,700" rel="stylesheet" type="text/css">
+<link href="/stylesheets/style.css" rel="stylesheet">
+<link href="/favicon.ico" rel="shortcut icon" type="image/gif">
+<script>
+      $(document).ready(function() {
+        $('header .subtitle').hover(function() {
+          $('.easter', this).show();
+          $('.main', this).hide();
+        }, function () {
+          $('.easter', this).hide();
+          $('.main', this).show();
+        });
+      });
+    </script>
+</head>
+<body>
+    <div class="app">
+      <div class="w">
+        <header class="app-header" role="banner"><div class="display">
+            <h1 class="cylon-logo">
+              <a href="/">Cylon</a>
+            </h1>
+          </div>
+          <span class="menu">
+            <a href="/documentation" class="item">Docs</a>
+            <a href="/hardware" class="item">Hardware</a>
+            
+            
+            <a class="item" target="blanck" href="https://github.com/hybridgroup/cylon/">Github</a>
+          </span>
+        </header>
+</div>
+      <div class="page-title">
+        <div class="w">
+          <h1 class="title">Travis with Sphero</h1>
+          <h2 class="subtitle">You can find the examples on this two repositories here:<br><a href="https://github.com/hybridgroup/cylon/blob/master/examples/travis.js%20" target="blanck" class="repository">javascript</a><a href="https://github.com/hybridgroup/cylon/blob/master/examples/travis.coffee" target="blanck" class="repository">coffeescript</a>
+</h2>
+        </div>
+      </div>
+      <div class="container">
+        <div class="main" role="main">
+          <section class="content full"><div class="documentation">
+              <section class="intro"><h2>Examples</h2>
+                <h3>Javascript</h3>
+                <pre class="CodeRay"><span class="keyword">var</span> Cylon = require(<span class="string"><span class="delimiter">'</span><span class="content">cylon</span><span class="delimiter">'</span></span>)
+<span class="keyword">var</span> Travis = require(<span class="string"><span class="delimiter">'</span><span class="content">travis-ci</span><span class="delimiter">'</span></span>)
+
+<span class="keyword">var</span> travis = <span class="keyword">new</span> Travis({<span class="key">version</span>: <span class="string"><span class="delimiter">'</span><span class="content">2.0.0</span><span class="delimiter">'</span></span>});
+
+<span class="keyword">var</span> BLUE = <span class="hex">0x0000ff</span>
+<span class="keyword">var</span> GREEN = <span class="hex">0x00ff00</span>
+<span class="keyword">var</span> RED = <span class="hex">0xff0000</span>
+
+Cylon.robot({
+  <span class="key">connection</span>: {<span class="key">name</span>: <span class="string"><span class="delimiter">'</span><span class="content">sphero</span><span class="delimiter">'</span></span>, <span class="key">adaptor</span>: <span class="string"><span class="delimiter">'</span><span class="content">sphero</span><span class="delimiter">'</span></span>, <span class="key">port</span>: <span class="string"><span class="delimiter">'</span><span class="content">/dev/rfcomm0</span><span class="delimiter">'</span></span>},
+  <span class="key">device</span>: {<span class="key">name</span>: <span class="string"><span class="delimiter">'</span><span class="content">sphero</span><span class="delimiter">'</span></span>, <span class="key">driver</span>: <span class="string"><span class="delimiter">'</span><span class="content">sphero</span><span class="delimiter">'</span></span>},
+
+  <span class="function">work</span>: <span class="keyword">function</span>(me) {
+    <span class="keyword">var</span> user = <span class="string"><span class="delimiter">"</span><span class="content">hybridgroup</span><span class="delimiter">"</span></span>
+    <span class="keyword">var</span> name = <span class="string"><span class="delimiter">"</span><span class="content">cylon</span><span class="delimiter">"</span></span>
+
+    me.<span class="function">checkTravis</span> = <span class="keyword">function</span>() {
+      Logger.info(<span class="string"><span class="delimiter">"</span><span class="content">Checking repo </span><span class="delimiter">"</span></span>+user+<span class="string"><span class="delimiter">"</span><span class="content">/</span><span class="delimiter">"</span></span>+name);
+      me.sphero.setRGB(BLUE, <span class="predefined-constant">true</span>);
+
+      travis.repos(
+        { <span class="key">owner_name</span>: user, <span class="key">name</span>: name },
+          <span class="keyword">function</span>(err, res) {
+            <span class="keyword">if</span> (res.repo != <span class="predefined-constant">undefined</span>) {
+            <span class="keyword">if</span> (res.repo.last_build_state == <span class="string"><span class="delimiter">'</span><span class="content">passed</span><span class="delimiter">'</span></span>) {
+              me.sphero.setRGB(GREEN, <span class="predefined-constant">true</span>);
+            } <span class="keyword">else</span> <span class="keyword">if</span> (res.repo.last_build_state == <span class="string"><span class="delimiter">'</span><span class="content">failed</span><span class="delimiter">'</span></span>) {
+              me.sphero.setRGB(RED, <span class="predefined-constant">true</span>);
+            } <span class="keyword">else</span> {
+              me.sphero.setRGB(BLUE, <span class="predefined-constant">true</span>);
+            }
+            } <span class="keyword">else</span> {
+              me.sphero.setRGB BLUE, <span class="predefined-constant">true</span>
+            }
+          });
+      }
+
+      me.checkTravis();
+
+      every((<span class="integer">10</span>).seconds(), <span class="keyword">function</span>() {
+        me.checkTravis();
+      });
+    }
+  }).start();
+</pre>
+                <h3>CoffeeScript</h3>
+                <pre class="CodeRay">Cylon = require <span class="string"><span class="delimiter">'</span><span class="content">cylon</span><span class="delimiter">'</span></span>
+Travis = require <span class="string"><span class="delimiter">'</span><span class="content">travis-ci</span><span class="delimiter">'</span></span>
+
+travis = <span class="keyword">new</span> Travis
+  version: <span class="string"><span class="delimiter">'</span><span class="content">2.0.0</span><span class="delimiter">'</span></span>
+
+BLUE = <span class="hex">0x0000ff</span>
+GREEN = <span class="hex">0x00ff00</span>
+RED = <span class="hex">0xff0000</span>
+
+Cylon.robot
+  connection:
+    name: <span class="string"><span class="delimiter">'</span><span class="content">sphero</span><span class="delimiter">'</span></span>, <span class="key">adaptor</span>: <span class="string"><span class="delimiter">'</span><span class="content">sphero</span><span class="delimiter">'</span></span>, <span class="key">port</span>: <span class="string"><span class="delimiter">'</span><span class="content">/dev/rfcomm0</span><span class="delimiter">'</span></span>
+
+  device:
+    name: <span class="string"><span class="delimiter">'</span><span class="content">sphero</span><span class="delimiter">'</span></span>, <span class="key">driver</span>: <span class="string"><span class="delimiter">'</span><span class="content">sphero</span><span class="delimiter">'</span></span>
+
+  work: (me) -&gt;
+    user = <span class="string"><span class="delimiter">"</span><span class="content">hybridgroup</span><span class="delimiter">"</span></span>
+    name = <span class="string"><span class="delimiter">"</span><span class="content">cylon</span><span class="delimiter">"</span></span>
+
+    me.checkTravis = -&gt;
+      Logger.info <span class="string"><span class="delimiter">"</span><span class="content">Checking repo #{user}/#{name}</span><span class="delimiter">"</span></span>
+      me.sphero.setRGB BLUE, <span class="predefined-constant">true</span>
+
+      travis.repos {
+        <span class="key">owner_name</span>: user,
+        <span class="key">name</span>: name
+      }, (err, res) -&gt;
+        <span class="keyword">if</span> res.repo
+          <span class="keyword">switch</span> res.repo.last_build_state
+            when <span class="string"><span class="delimiter">'</span><span class="content">passed</span><span class="delimiter">'</span></span> then me.sphero.setRGB(GREEN, <span class="predefined-constant">true</span>)
+            when <span class="string"><span class="delimiter">'</span><span class="content">failed</span><span class="delimiter">'</span></span> then me.sphero.setRGB(RED, <span class="predefined-constant">true</span>)
+            <span class="keyword">else</span> me.sphero.setRGB(BLUE, <span class="predefined-constant">true</span>)
+        <span class="keyword">else</span>
+          me.sphero.setRGB BLUE, <span class="predefined-constant">true</span>
+
+    me.checkTravis()
+
+    every <span class="integer">10</span>.seconds(), -&gt;
+      me.checkTravis()
+
+    .start()
+</pre>
+              </section>
+</div>
+          </section>
+</div>
+      </div>
+    </div>
+    <footer class="app-footer"><div class="w">
+        <div class="copyright">
+          © Copyright 2012-2013
+          <a href="http://hybridgroup.com">The Hybrid Group.</a>
+        </div>
+      </div>
+    </footer>
+</body>
+</html>

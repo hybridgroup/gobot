@@ -1,0 +1,108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+<meta name="description">
+<meta content="The Hybrid Group" name="author">
+<title>Roomba with Cylon.js</title>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><link href="http://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,500,700" rel="stylesheet" type="text/css">
+<link href="/stylesheets/style.css" rel="stylesheet">
+<link href="/favicon.ico" rel="shortcut icon" type="image/gif">
+<script>
+      $(document).ready(function() {
+        $('header .subtitle').hover(function() {
+          $('.easter', this).show();
+          $('.main', this).hide();
+        }, function () {
+          $('.easter', this).hide();
+          $('.main', this).show();
+        });
+      });
+    </script>
+</head>
+<body>
+    <div class="app">
+      <div class="w">
+        <header class="app-header" role="banner"><div class="display">
+            <h1 class="cylon-logo">
+              <a href="/">Cylon</a>
+            </h1>
+          </div>
+          <span class="menu">
+            <a href="/documentation" class="item">Docs</a>
+            <a href="/hardware" class="item">Hardware</a>
+            
+            
+            <a class="item" target="blanck" href="https://github.com/hybridgroup/cylon/">Github</a>
+          </span>
+        </header>
+</div>
+      <div class="page-title">
+        <div class="w">
+          <h1 class="title">Roomba</h1>
+          <h2 class="subtitle">
+<a href="https://github.com/hybridgroup/Cylon.js-roomba" class="repository">Repository</a> <a class href="https://github.com/hybridgroup/Cylon.js-roomba/issues">Issues</a>
+</h2>
+        </div>
+      </div>
+      <div class="container">
+        <div class="main" role="main">
+          <section class="content full"><div class="documentation">
+              <section class="intro"><img class="display" src="/images/roomba.jpg"><p>
+                  The Roomba is a simple robot that usually cleans floors.
+                </p>
+                <p>
+                  For more info about the Roomba platform click
+                  <a target="blank" href="http://www.irobot.com/us/learn/Educators/Create.aspx">here</a>.
+                </p>
+              </section><section class="how-to"><h2>How to install</h2>
+                <p>
+                  Installing Cylon.js with roomba support is pretty easy using ruby gems.
+                </p>
+                <pre class="CodeRay">gem install Cylon.js-roomba
+</pre>
+                <h2>How to use</h2>
+                <p>
+                  This small program controls a Roomba.
+                </p>
+                <pre class="CodeRay">require <span class="string"><span class="delimiter">'</span><span class="content">Cylon.js</span><span class="delimiter">'</span></span>
+
+connection <span class="symbol">:roomba</span>, <span class="symbol">:adaptor</span> =&gt; <span class="symbol">:roomba</span>, <span class="symbol">:port</span> =&gt; <span class="string"><span class="delimiter">'</span><span class="content">/dev/ttyUSB0</span><span class="delimiter">'</span></span>
+device <span class="symbol">:roomba</span>, <span class="symbol">:driver</span> =&gt; <span class="symbol">:roomba</span>, <span class="symbol">:connection</span> =&gt; <span class="symbol">:roomba</span>
+
+work <span class="keyword">do</span>
+  roomba.safe_mode
+  roomba.nudge_left
+  roomba.nudge_right
+  roomba.nudge_right
+  roomba.nudge_left
+<span class="keyword">end</span>
+</pre>
+              </section><section class="drivers"><h2>Drivers</h2>
+                <p>
+                  There is only one driver for the Roomba platform, as listed below.
+                </p>
+                <div class="hardware">
+                  <div class="devices">
+                    <a class="device" href="/documentation/drivers/roomba" title="Roomba">
+                      <img src="/images/roomba.jpg"></a>
+                  </div>
+                </div>
+              </section>
+</div>
+          </section>
+</div>
+      </div>
+    </div>
+    <footer class="app-footer"><div class="w">
+        <div class="copyright">
+          © Copyright 2012-2013
+          <a href="http://hybridgroup.com">The Hybrid Group.</a>
+        </div>
+      </div>
+    </footer>
+</body>
+</html>

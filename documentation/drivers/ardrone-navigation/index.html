@@ -1,0 +1,173 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+<meta name="description">
+<meta content="The Hybrid Group" name="author">
+<title>Cylon.js - ARDrone Navigation Driver</title>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><link href="http://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,500,700" rel="stylesheet" type="text/css">
+<link href="/stylesheets/style.css" rel="stylesheet">
+<link href="/favicon.ico" rel="shortcut icon" type="image/gif">
+<script>
+      $(document).ready(function() {
+        $('header .subtitle').hover(function() {
+          $('.easter', this).show();
+          $('.main', this).hide();
+        }, function () {
+          $('.easter', this).hide();
+          $('.main', this).show();
+        });
+      });
+    </script>
+</head>
+<body>
+    <div class="app">
+      <div class="w">
+        <header class="app-header" role="banner"><div class="display">
+            <h1 class="cylon-logo">
+              <a href="/">Cylon</a>
+            </h1>
+          </div>
+          <span class="menu">
+            <a href="/documentation" class="item">Docs</a>
+            <a href="/hardware" class="item">Hardware</a>
+            
+            
+            <a class="item" target="blanck" href="https://github.com/hybridgroup/cylon/">Github</a>
+          </span>
+        </header>
+</div>
+      <div class="page-title">
+        <div class="w">
+          <h1 class="title">ARDrone Navigation</h1>
+          <h2 class="subtitle">Driver</h2>
+        </div>
+      </div>
+      <div class="container">
+        <div class="main" role="main">
+          <section class="content full"><div class="documentation">
+              <section class="intro"><img class="display" src="/images/ardrone-navigation.jpg"><p>
+                  Allows user to receive in-flight navgation data from an ARDrone. Navigation data includes such information as the ARDrone's current pitch and yaw, along with many other data elements.
+                </p>
+              </section><section class="how-to"><h2>How to establish a connection and setup the driver</h2>
+                <p>
+                  Communication with the ARDrone's navigation data interface takes place using a WiFi connection. The ARDrone is a WiFi access point, so it normally can be the only device you connect to, without some additional effort to reconfigure the drone itself to put it into infrastructure mode.
+                </p>
+                <h3>JavaScript</h3>
+                <pre class="CodeRay"><span class="keyword">var</span> Cylon = require(<span class="string"><span class="delimiter">'</span><span class="content">cylon</span><span class="delimiter">'</span></span>)
+
+Cylon.robot({
+  <span class="key">connection</span>: {<span class="key">name</span>: <span class="string"><span class="delimiter">'</span><span class="content">ardrone</span><span class="delimiter">'</span></span>, <span class="key">adaptor</span>: <span class="string"><span class="delimiter">'</span><span class="content">ardrone</span><span class="delimiter">'</span></span>, <span class="key">port</span>: <span class="string"><span class="delimiter">'</span><span class="content">192.168.1.1</span><span class="delimiter">'</span></span>},
+
+  <span class="key">devices</span>:
+    [{<span class="key">name</span>: <span class="string"><span class="delimiter">'</span><span class="content">drone</span><span class="delimiter">'</span></span>, <span class="key">driver</span>: <span class="string"><span class="delimiter">'</span><span class="content">ardrone</span><span class="delimiter">'</span></span>},
+    {<span class="key">name</span>: <span class="string"><span class="delimiter">'</span><span class="content">nav</span><span class="delimiter">'</span></span>, <span class="key">driver</span>: <span class="string"><span class="delimiter">'</span><span class="content">ardroneNav</span><span class="delimiter">'</span></span>}]
+...
+</pre>
+                <h3>CoffeeScript</h3>
+                <pre class="CodeRay">Cylon = require <span class="string"><span class="delimiter">'</span><span class="content">cylon</span><span class="delimiter">'</span></span>
+
+Cylon.robot
+  connection:
+    name: <span class="string"><span class="delimiter">'</span><span class="content">ardrone</span><span class="delimiter">'</span></span>, <span class="key">adaptor</span>: <span class="string"><span class="delimiter">'</span><span class="content">ardrone</span><span class="delimiter">'</span></span>, <span class="key">port</span>: <span class="string"><span class="delimiter">'</span><span class="content">192.168.1.1</span><span class="delimiter">'</span></span>
+
+  devices:
+    [
+      {<span class="key">name</span>: <span class="string"><span class="delimiter">'</span><span class="content">drone</span><span class="delimiter">'</span></span>, <span class="key">driver</span>: <span class="string"><span class="delimiter">'</span><span class="content">ardrone</span><span class="delimiter">'</span></span>},
+      {<span class="key">name</span>: <span class="string"><span class="delimiter">'</span><span class="content">nav</span><span class="delimiter">'</span></span>, <span class="key">driver</span>: <span class="string"><span class="delimiter">'</span><span class="content">ardroneNav</span><span class="delimiter">'</span></span>}
+    ]
+...
+</pre>
+              </section><section class="public-methods"><h2>Events</h2>
+                <dl class="methods">
+<dt>update</dt>
+                  <dd>
+                    This event will contain one of the following events.
+                    <br>
+                    You can also subscribe to one of the specific events, if that is the information you are interested in.
+                  </dd>
+                  <dt>navdata</dt>
+                  <dd>Gets triggered every time interval amount of time passes, returns and lets you access a NavData object.</dd>
+                  <dt>landing</dt>
+                  <dd>Gets triggered when is landing.</dd>
+                  <dt>landed</dt>
+                  <dd>Gets triggered when has landing.</dd>
+                  <dt>takeoff</dt>
+                  <dd>Gets triggered when has takeoff.</dd>
+                  <dt>hovering</dt>
+                  <dd>Gets triggered when is hovering.</dd>
+                  <dt>flying</dt>
+                  <dd>Gets triggered when is flying.</dd>
+                  <dt>lowBattery</dt>
+                  <dd>Gets triggered when have low battery.</dd>
+                  <dt>batteryChange</dt>
+                  <dd>Gets triggered when the battery has changed.</dd>
+                  <dt>altitudeChange</dt>
+                  <dd>Gets triggered when the altitude has changed.</dd>
+                  <dt>start</dt>
+                  <dd>Sent when the device has been started and is ready to use.</dd>
+                </dl></section><section class="how-to"><h2>How to use events and call them on your drivers</h2>
+                <p>Once the connection and the devices have been setup (as explained above) you can receive navigation events on them as follows:</p>
+                <h3>JavaScript</h3>
+                <pre class="CodeRay"><span class="keyword">var</span> Cylon = require(<span class="string"><span class="delimiter">'</span><span class="content">cylon</span><span class="delimiter">'</span></span>)
+
+Cylon.robot({
+  <span class="key">connection</span>: {<span class="key">name</span>: <span class="string"><span class="delimiter">'</span><span class="content">ardrone</span><span class="delimiter">'</span></span>, <span class="key">adaptor</span>: <span class="string"><span class="delimiter">'</span><span class="content">ardrone</span><span class="delimiter">'</span></span>, <span class="key">port</span>: <span class="string"><span class="delimiter">'</span><span class="content">192.168.1.1</span><span class="delimiter">'</span></span>},
+
+  <span class="key">devices</span>:
+    [{<span class="key">name</span>: <span class="string"><span class="delimiter">'</span><span class="content">drone</span><span class="delimiter">'</span></span>, <span class="key">driver</span>: <span class="string"><span class="delimiter">'</span><span class="content">ardrone</span><span class="delimiter">'</span></span>},
+    {<span class="key">name</span>: <span class="string"><span class="delimiter">'</span><span class="content">nav</span><span class="delimiter">'</span></span>, <span class="key">driver</span>: <span class="string"><span class="delimiter">'</span><span class="content">ardroneNav</span><span class="delimiter">'</span></span>}],
+
+  <span class="function">work</span>: <span class="keyword">function</span>(my) {
+    my.drone.config(<span class="string"><span class="delimiter">'</span><span class="content">general:navdata_demo</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">TRUE</span><span class="delimiter">'</span></span>);
+
+    my.nav.on(<span class="string"><span class="delimiter">'</span><span class="content">update</span><span class="delimiter">'</span></span>, <span class="keyword">function</span>(data) {
+      Logger.info(data);
+    }
+  }
+}).start();
+</pre>
+                <h3>CoffeeScript</h3>
+                <pre class="CodeRay">Cylon = require <span class="string"><span class="delimiter">'</span><span class="content">cylon</span><span class="delimiter">'</span></span>
+
+Cylon.robot
+  connection:
+    name: <span class="string"><span class="delimiter">'</span><span class="content">ardrone</span><span class="delimiter">'</span></span>, <span class="key">adaptor</span>: <span class="string"><span class="delimiter">'</span><span class="content">ardrone</span><span class="delimiter">'</span></span>, <span class="key">port</span>: <span class="string"><span class="delimiter">'</span><span class="content">192.168.1.1</span><span class="delimiter">'</span></span>
+
+  devices:
+    [
+      {<span class="key">name</span>: <span class="string"><span class="delimiter">'</span><span class="content">drone</span><span class="delimiter">'</span></span>, <span class="key">driver</span>: <span class="string"><span class="delimiter">'</span><span class="content">ardrone</span><span class="delimiter">'</span></span>},
+      {<span class="key">name</span>: <span class="string"><span class="delimiter">'</span><span class="content">nav</span><span class="delimiter">'</span></span>, <span class="key">driver</span>: <span class="string"><span class="delimiter">'</span><span class="content">ardroneNav</span><span class="delimiter">'</span></span>}
+    ]
+
+  work: (my) -&gt;
+    my.drone.config <span class="string"><span class="delimiter">'</span><span class="content">general:navdata_demo</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">TRUE</span><span class="delimiter">'</span></span>
+
+    my.nav.on <span class="string"><span class="delimiter">'</span><span class="content">update</span><span class="delimiter">'</span></span>, (data) -&gt;
+      Logger.info data
+
+.start()
+</pre>
+              </section><section class="compatability hardware"><h2>Works with:</h2>
+                <div class="devices">
+                  <a class="device" href="/documentation/platforms/ardrone" title="AR Drone">
+                    <img src="/images/ardrone.jpg"></a>
+                </div>
+              </section>
+</div>
+          </section>
+</div>
+      </div>
+    </div>
+    <footer class="app-footer"><div class="w">
+        <div class="copyright">
+          © Copyright 2012-2013
+          <a href="http://hybridgroup.com">The Hybrid Group.</a>
+        </div>
+      </div>
+    </footer>
+</body>
+</html>

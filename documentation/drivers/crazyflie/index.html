@@ -1,0 +1,152 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+<meta name="description">
+<meta content="The Hybrid Group" name="author">
+<title>Cylon.js - Crazyflie Driver</title>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><link href="http://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,500,700" rel="stylesheet" type="text/css">
+<link href="/stylesheets/style.css" rel="stylesheet">
+<link href="/favicon.ico" rel="shortcut icon" type="image/gif">
+<script>
+      $(document).ready(function() {
+        $('header .subtitle').hover(function() {
+          $('.easter', this).show();
+          $('.main', this).hide();
+        }, function () {
+          $('.easter', this).hide();
+          $('.main', this).show();
+        });
+      });
+    </script>
+</head>
+<body>
+    <div class="app">
+      <div class="w">
+        <header class="app-header" role="banner"><div class="display">
+            <h1 class="cylon-logo">
+              <a href="/">Cylon</a>
+            </h1>
+          </div>
+          <span class="menu">
+            <a href="/documentation" class="item">Docs</a>
+            <a href="/hardware" class="item">Hardware</a>
+            
+            
+            <a class="item" target="blanck" href="https://github.com/hybridgroup/cylon/">Github</a>
+          </span>
+        </header>
+</div>
+      <div class="page-title">
+        <div class="w">
+          <h1 class="title">Crazyflie</h1>
+          <h2 class="subtitle">Driver</h2>
+        </div>
+      </div>
+      <div class="container">
+        <div class="main" role="main">
+          <section class="content full"><div class="documentation">
+              <section class="intro"><img class="display" src="/images/crazyflie.jpg"><p>
+                  Allows user to send flight control commands to a Crazyflie micro-quadcopter. Flight control commands are those used to tell the Crazyflie to take off, land, and or any number of other autonomous flight manuvers.
+                </p>
+              </section><section class="how-to"><h2>How to establish a connection and setup the driver</h2>
+                <p>
+                  Communication with the Crazyflie's flight control interface takes place using a 2.4GHz radio connection. The Crazyflie is controlled from your computer using a Crazyradio, which is a custom USB 2.4GHz radio device.
+                </p>
+                <pre class="CodeRay">require <span class="string"><span class="delimiter">'</span><span class="content">Cylon.js</span><span class="delimiter">'</span></span>
+connection <span class="symbol">:crazyflie</span>, <span class="symbol">:adaptor</span> =&gt; <span class="symbol">:crazyflie</span>
+device <span class="symbol">:drone</span>, <span class="symbol">:driver</span> =&gt; <span class="symbol">:crazyflie</span>, <span class="symbol">:connection</span> =&gt; <span class="symbol">:crazyflie</span>, <span class="symbol">:interval</span> =&gt; <span class="float">0.1</span>
+</pre>
+              </section><section class="public-methods"><h2>Public instance methods:</h2>
+                <h3>start</h3>
+                <p>
+                  Starts the crazyfly's motors and controls.
+                </p>
+                <h3>stop</h3>
+                <p>
+                  Stops the crazyfly's motors.
+                </p>
+                <h3>hover</h3>
+                <p>
+                  Makes the crazyflie hover in a position.
+                </p>
+                <h3>land</h3>
+                <p>
+                  Initiates a landing sequence.
+                </p>
+                <h3>take_off</h3>
+                <p>
+                  Initiates take off sequence.
+                </p>
+                <h3>up</h3>
+                <p>
+                  Orders crazy flie to go up.
+                </p>
+                <h3>down</h3>
+                <p>
+                  Orders crazy flie to go down.
+                </p>
+                <h3>left(deg)</h3>
+                <p>
+                  Orders crazyflie to go left the amount specified by deg (roll left).
+                </p>
+                <h3>right(deg)</h3>
+                <p>
+                  Orders crazyflie to go right the amount specified by deg (roll right).
+                </p>
+                <h3>forward(deg)</h3>
+                <p>
+                  Orders crazyflie to go forward the amount specified by deg (pitch forward).
+                </p>
+                <h3>backward(deg)</h3>
+                <p>
+                  Orders crazyflie to go backward the amount specified by deg (pitch backward).
+                </p>
+                <h3>turn_left(deg)</h3>
+                <p>
+                  Orders crazyflie to turn left the amount specified by deg (yaw left).
+                </p>
+                <h3>turn_right(deg)</h3>
+                <p>
+                  Orders crazyflie to turn right the amount specified by deg (yaw right).
+                </p>
+                <h3>power(deg)</h3>
+                <p>
+                  Sets thrust power to deg.
+                </p>
+              </section><section class="how-to"><h2>How to use</h2>
+                <h3>Example of controlling a Crazyflie.</h3>
+                <pre class="CodeRay">require <span class="string"><span class="delimiter">'</span><span class="content">Cylon.js</span><span class="delimiter">'</span></span>
+
+connection <span class="symbol">:crazyflie</span>, <span class="symbol">:adaptor</span> =&gt; <span class="symbol">:crazyflie</span>
+device <span class="symbol">:drone</span>, <span class="symbol">:driver</span> =&gt; <span class="symbol">:crazyflie</span>, <span class="symbol">:connection</span> =&gt; <span class="symbol">:crazyflie</span>, <span class="symbol">:interval</span> =&gt; <span class="float">0.1</span>
+
+work <span class="keyword">do</span>
+  drone.forward(<span class="integer">0</span>)
+  drone.set_thrust_on
+  after(<span class="integer">1</span>.seconds) {drone.stop}
+<span class="keyword">end</span>
+</pre>
+              </section><section class="compatability hardware"><h2>Works with:</h2>
+                <div class="devices">
+                  <a class="device" href="/documentation/platforms/crazyflie" title="Crazyflie">
+                    <img src="/images/crazyflie.jpg"></a>
+                </div>
+              </section>
+</div>
+          </section>
+</div>
+      </div>
+    </div>
+    <footer class="app-footer"><div class="w">
+        <div class="copyright">
+          © Copyright 2012-2013
+          <a href="http://hybridgroup.com">The Hybrid Group.</a>
+        </div>
+      </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+<meta name="description">
+<meta content="The Hybrid Group" name="author">
+<title>Digispark with Cylon.js</title>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><link href="http://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,500,700" rel="stylesheet" type="text/css">
+<link href="/stylesheets/style.css" rel="stylesheet">
+<link href="/favicon.ico" rel="shortcut icon" type="image/gif">
+<script>
+      $(document).ready(function() {
+        $('header .subtitle').hover(function() {
+          $('.easter', this).show();
+          $('.main', this).hide();
+        }, function () {
+          $('.easter', this).hide();
+          $('.main', this).show();
+        });
+      });
+    </script>
+</head>
+<body>
+    <div class="app">
+      <div class="w">
+        <header class="app-header" role="banner"><div class="display">
+            <h1 class="cylon-logo">
+              <a href="/">Cylon</a>
+            </h1>
+          </div>
+          <span class="menu">
+            <a href="/documentation" class="item">Docs</a>
+            <a href="/hardware" class="item">Hardware</a>
+            
+            
+            <a class="item" target="blanck" href="https://github.com/hybridgroup/cylon/">Github</a>
+          </span>
+        </header>
+</div>
+      <div class="page-title">
+        <div class="w">
+          <h1 class="title">Digispark</h1>
+          <h2 class="subtitle">
+<a href="https://github.com/hybridgroup/Cylon.js-digispark" class="repository">Repository</a> <a class href="https://github.com/hybridgroup/Cylon.js-digispark/issues">Issues</a>
+</h2>
+        </div>
+      </div>
+      <div class="container">
+        <div class="main" role="main">
+          <section class="content full"><div class="documentation">
+              <section class="intro"><img class="display" src="/images/digispark.jpg"><p>
+                  The Digispark is an Attiny85 based microcontroller development board similar to the Arduino line, only cheaper, smaller,
+                  and a bit less powerful. With a whole host of shields to extend its functionality and the ability to
+                  use the familiar Arduino IDE the Digispark is a great way to jump into electronics, or perfect for when
+                  an Arduino is too big or too much.
+                </p>
+                <p>
+                  For more info about the Digispark platform click
+                  <a target="blank" href="http://digistump.com/category/1">here</a>.
+                </p>
+              </section><section class="how-to"><h2>How to install</h2>
+                <p>
+                  Installing Cylon.js with digispark support is pretty easy using ruby gems.
+                </p>
+                <pre class="CodeRay">gem install Cylon.js-digispark
+</pre>
+                <h2>How to use</h2>
+                <p>
+                  This small program lets you toggle an LED on and off.
+                </p>
+                <pre class="CodeRay">require <span class="string"><span class="delimiter">'</span><span class="content">Cylon.js</span><span class="delimiter">'</span></span>
+
+connection <span class="symbol">:digispark</span>, <span class="symbol">:adaptor</span> =&gt; <span class="symbol">:littlewire</span>, <span class="symbol">:vendor</span> =&gt; <span class="integer">0x1781</span>, <span class="symbol">:product</span> =&gt; <span class="integer">0x0c9f</span>
+device <span class="symbol">:board</span>, <span class="symbol">:driver</span> =&gt; <span class="symbol">:device_info</span>
+device <span class="symbol">:led</span>, <span class="symbol">:driver</span> =&gt; <span class="symbol">:led</span>, <span class="symbol">:pin</span> =&gt; <span class="integer">1</span>
+
+work <span class="keyword">do</span>
+  puts <span class="string"><span class="delimiter">"</span><span class="content">Firmware name: </span><span class="inline"><span class="inline-delimiter">#{</span>board.firmware_name<span class="inline-delimiter">}</span></span><span class="delimiter">"</span></span>
+  puts <span class="string"><span class="delimiter">"</span><span class="content">Firmware version: </span><span class="inline"><span class="inline-delimiter">#{</span>board.version<span class="inline-delimiter">}</span></span><span class="delimiter">"</span></span>
+
+  every <span class="integer">1</span>.second <span class="keyword">do</span>
+    led.toggle
+  <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre>
+                <h2>How to connect</h2>
+                <p>
+                  If your Digispark (
+                  <a href="http://www.kickstarter.com/projects/digistump/digispark-the-tiny-arduino-enabled-usb-dev-board">http://www.kickstarter.com/projects/digistump/digispark-the-tiny-arduino-enabled-usb-dev-board</a>
+                  ) ATTiny-based USB development board already has the Little Wire (
+                  <a href="http://littlewire.cc/">http://littlewire.cc/</a>
+                  ) protocol firmware installed, you can connect right away with Cylon.js.
+                </p>
+                <p>
+                  Otherwise, for instructions on how to install Little Wire on a Digispark check out
+                  <a href="http://digistump.com/board/index.php/topic,160.0.html%20">http://digistump.com/board/index.php/topic,160.0.html</a>
+                </p>
+                <h3>OSX</h3>
+                <p>
+                  The main steps are:
+                </p>
+                <ul>
+<li>Plug in the Digispark to the USB port</li>
+                  <li>Connect to the device via Cylon.js</li>
+                </ul>
+<p>First plug the Digispark into your computer via the USB port. Then... (directions go here)</p>
+                <h3>Ubuntu</h3>
+                <p>
+                  The main steps are:
+                </p>
+                <ul>
+<li>Add a udev rule to allow access to the Digispark device</li>
+                  <li>Plug in the Digispark to the USB port</li>
+                  <li>Connect to the device via Cylon.js</li>
+                </ul>
+<p>
+                  First, you must add a udev rule, so that Cylon.js can communicate with the USB device. Ubuntu and
+                  other modern Linux distibutions use udev to manage device files when USB devices are added and
+                  removed. By default, udev will create a device with read-only permission which will not allow to
+                  you download code. You must place the udev rules below into a file named /etc/udev/rules.d/49-micronucleus.rules.
+                </p>
+                <pre class="CodeRay"># UDEV Rules for Micronucleus boards including the Digispark.
+# This file must be placed at:
+#
+# /etc/udev/rules.d/49-micronucleus.rules    (preferred location)
+#   or
+# /lib/udev/rules.d/49-micronucleus.rules    (req'd on some broken systems)
+#
+# After this file is copied, physically unplug and reconnect the board.
+#
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="1781", ATTRS{idProduct}=="0c9f", MODE:="0666"
+KERNEL=="ttyACM*", ATTRS{idVendor}=="1781", ATTRS{idProduct}=="0c9f", MODE:="0666", ENV{ID_MM_DEVICE_IGNORE}="1"
+
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="16d0", ATTRS{idProduct}=="0753", MODE:="0666"
+KERNEL=="ttyACM*", ATTRS{idVendor}=="16d0", ATTRS{idProduct}=="0753", MODE:="0666", ENV{ID_MM_DEVICE_IGNORE}="1"
+#
+# If you share your linux system with other users, or just don't like the
+# idea of write permission for everybody, you can replace MODE:="0666" with
+# OWNER:="yourusername" to create the device owned by you, or with
+# GROUP:="somegroupname" and mange access using standard unix groups.
+</pre>
+                <p>
+                  Thanks to @bluebie for these instructions! (
+                  <a href="https://github.com/Bluebie/micronucleus-t85/wiki/Ubuntu-Linux">https://github.com/Bluebie/micronucleus-t85/wiki/Ubuntu-Linux</a>
+                  )
+                </p>
+                <p>Now plug the Digispark into your computer via the USB port.</p>
+                <p>Once plugged in, use the Cylon.js connect scan command with the -t usb option to verify your connection info:</p>
+                <pre class="CodeRay">$ Cylon.js connect scan -t usb
+</pre>
+                <p>
+                  Now use the ID info returned to find the product and vendor ID's for the connection info Digispark in your Cylon.js code.
+                </p>
+              </section><section class="drivers"><h2>Drivers</h2>
+                <p>
+                  Thanks to
+                  <b>Cylon.js</b>
+                  and
+                  <b>ruby</b>
+                  it is possible to interact with several I/O hardware devices and interfaces connected to the digispark
+                  using a set of already defined and easy to use drivers, all of this thanks to the Cylon.js architecture,
+                  in conjuction with Cylon.js-digispark adaptor (using the littlewire communication protocol),
+                  which makes it even possible to swap the entire platform for something else like arduino,
+                  and keep using the same code you just wrote for digispark, this just by swapping a couple
+                  of lines in your program.
+                </p>
+                <p>
+                  Available drivers for the digispark platform are listed below, the drivers contain detailed documentation and examples of what kind
+                  physical computing (using Cylon.js and ruby) you could be doing:
+                </p>
+                <div class="hardware">
+                  <div class="devices">
+                    <a class="device" href="/documentation/drivers/analog-sensor" title="Analog Sensor">
+                      <img src="/images/analog-sensor.jpg"></a>
+                    <a class="device" href="/documentation/drivers/button" title="Button">
+                      <img src="/images/button.jpg"></a>
+                    <a class="device" href="/documentation/drivers/led" title="LED">
+                      <img src="/images/LED.jpg"></a>
+                    <a class="device" href="/documentation/drivers/maxbotix" title="Maxbotix Range Finder">
+                      <img src="/images/maxbotix.jpg"></a>
+                    <a class="device" href="/documentation/drivers/motor" title="Motor">
+                      <img src="/images/motor.jpg"></a>
+                    <a class="device" href="/documentation/drivers/servo" title="Servo">
+                      <img src="/images/servo.jpg"></a>
+                    <a class="device" href="/documentation/drivers/blinkm" title="Wii Nunchuck">
+                      <img src="/images/blinkm.jpg"></a>
+                    <a class="device" href="/documentation/drivers/hmc6352-compass" title="Wii Nunchuck">
+                      <img src="/images/hmc6352-compass.jpg"></a>
+                    <a class="device" href="/documentation/drivers/wiichuck" title="Wii Nunchuck">
+                      <img src="/images/wii-chuck.jpg"></a>
+                    <a class="device" href="/documentation/drivers/wiiclassic" title="Wii Classic Controller">
+                      <img src="/images/wii-classic-controller.jpg"></a>
+                  </div>
+                </div>
+              </section>
+</div>
+          </section>
+</div>
+      </div>
+    </div>
+    <footer class="app-footer"><div class="w">
+        <div class="copyright">
+          © Copyright 2012-2013
+          <a href="http://hybridgroup.com">The Hybrid Group.</a>
+        </div>
+      </div>
+    </footer>
+</body>
+</html>
