@@ -26,14 +26,14 @@
         %header.app-header{role: "banner"}
           .display
             %h1.cylon-logo
-              %a{href: '/'} Cylon
+              %a{href: '/'} Gobot
 
           %span.menu
-            = link_to "Docs", "", (menu_item("documentation"))
-            =  link_to "Hardware", "", (menu_item("hardware"))
+            = # link_to "Docs", "", (menu_item("documentation"))
+            = # link_to "Hardware", "", (menu_item("hardware"))
             = # link_to "Videos", "", (menu_item("videos"))
             = # link_to "Blog", "", (menu_item("blog"))
-            =  link_to "Github", "https://github.com/hybridgroup/cylon/", class: "item", target: "blanck"
+            =  link_to "Github", "https://github.com/hybridgroup/gobot/", class: "item", target: "blanck"
       - unless current_page.data.hero.nil?
         .hero
           .container
@@ -41,25 +41,25 @@
               /It is time to have Robots and JavaScript
               /%br
               /working together.
-              JavaScript Robotics, By Your Command
+              Go, Robot, Go! Golang for Robotics.
             %h2.subtitle
-              Cylon.js makes robotics 
+              Gobot makes robotics 
               = link_to "Simple", "", (menu_item("documentation/getting-started"))  
               and 
               = link_to "Extensible.", "", (menu_item("documentation/platforms"))
 
-            = link_to "Get Started", "/documentation/getting-started", class: "cta" 
+            = link_to "Get Started", "https://github.com/hybridgroup/gobot/", class: "cta" 
       - unless current_page.data.social.nil?
         .social
           .container
             .splitter
-              %iframe{:allowtransparency => "true", :frameborder => "0", :height => "20", :scrolling => "0", :src => "http://ghbtns.com/github-btn.html?user=hybridgroup&repo=cylon&type=watch&count=true", :width => "95"}
-              %iframe{:allowtransparency => "true", :frameborder => "0", :height => "20", :scrolling => "0", :src => "http://ghbtns.com/github-btn.html?user=hybridgroup&repo=cylon&type=fork&count=true", :width => "95"}
+              %iframe{:allowtransparency => "true", :frameborder => "0", :height => "20", :scrolling => "0", :src => "http://ghbtns.com/github-btn.html?user=hybridgroup&repo=gobot&type=watch&count=true", :width => "95"}
+              %iframe{:allowtransparency => "true", :frameborder => "0", :height => "20", :scrolling => "0", :src => "http://ghbtns.com/github-btn.html?user=hybridgroup&repo=gobot&type=fork&count=true", :width => "95"}
             .splitter
-              %a.twitter-share-button{"data-dnt" => "true", "data-text" => "JavaScript Robotics, By Your Command.", "data-url" => "http://cylonjs.com", "data-via" => "cylonjs", :href => "https://twitter.com/share"} Tweet
+              %a.twitter-share-button{"data-dnt" => "true", "data-text" => "Go, Robot, Go! Golang for Robotics.", "data-url" => "http://gobot.io", "data-via" => "gobotio", :href => "https://twitter.com/share"} Tweet
               :javascript
                 !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
-              %a.twitter-follow-button{"data-dnt" => "true", "data-show-count" => "false", :href => "https://twitter.com/cylonjs"} Follow @Cylon.jsio
+              %a.twitter-follow-button{"data-dnt" => "true", "data-show-count" => "false", :href => "https://twitter.com/gobotio"} Follow @gobotio
               :javascript
                 !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
       - unless current_page.data.page_title.nil?

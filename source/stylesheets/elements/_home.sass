@@ -1,11 +1,11 @@
 .hero
   margin: 15px 0 0 0
-  background: #580a25
+  background: #ff7e5b
   padding: 25px 0
   +small-screen
     margin-top: -8px
   .title
-    @include title-font(47px, #FAFAF1)
+    @include title-font(47px, #ffffff)
     line-height: 54px
     width: 100%
     clear: both
@@ -21,25 +21,26 @@
       font-size: 33px
       line-height: 42px
   .subtitle
-    @include title-font(24px, #B39F89)
+    @include title-font(24px, #FAFAF1)
     font-weight: 550
     opacity: 0.94
     margin: 0
     line-height: 36px
     margin-top: 3px
 
+    a
+      @extend .anchors-blue
+
     +small-screen
       font-size: 18px
       line-height: 22px
       margin-top: 4px
       padding: 0
-  a
-    @extend .anchors-blue
 
 .social
   line-height: 0
   padding: 10px 0
-  background: #FDFCF5
+  background: #fdfcf5
   .twitter-follow-button
     vertical-align: top
   .splitter
@@ -51,24 +52,24 @@
       margin-bottom: 5px
   
 .cta
-  background: #c51f3c
+  background: #FFF3CF
   padding: 10px 20px
   display: inline-block
   margin: 17px 0 0 0
   font-size: 19px
-  color: #FFF
+  color: #BD583D
   font-weight: bold
   &:hover
-    background: #9e162e
+    background: #FFE7A9
   &:visited
-    color: #fff
+    color: #BD583D
   +small-screen
     font-size: 16px
     padding: 8px 15px
 
 .catcher
   margin: 0 0 38px 0
-  background: #FDFCF5
+  background: #fdfcf5
   padding: 20px
   .phrase
     margin: 0
