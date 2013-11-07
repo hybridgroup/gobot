@@ -1297,7 +1297,7 @@ ol.CodeRay li {
 
 /* line 1, /Users/mario/Dropbox/development/hybridgroup/internal/gobot.io/source/stylesheets/shared/_base.sass */
 body {
-  background-color: #f8f4ef;
+  background-color: #fff6ee;
   background-repeat: no-repeat;
   background-position: top; }
 
@@ -1325,10 +1325,10 @@ a {
     word-wrap: normal; } }
 
 /* line 21, /Users/mario/Dropbox/development/hybridgroup/internal/gobot.io/source/stylesheets/shared/_base.sass */
-.anchors-blue, .app-footer a, .hero a, .page-title a, .anchors-blue:active, .app-footer a:active, .hero a:active, .page-title a:active, .anchors-blue:visited, .app-footer a:visited, .hero a:visited, .page-title a:visited {
+.anchors-blue, .app-footer a, .hero .subtitle a, .page-title a, .anchors-blue:active, .app-footer a:active, .hero .subtitle a:active, .page-title a:active, .anchors-blue:visited, .app-footer a:visited, .hero .subtitle a:visited, .page-title a:visited {
   color: #fffbda; }
 /* line 23, /Users/mario/Dropbox/development/hybridgroup/internal/gobot.io/source/stylesheets/shared/_base.sass */
-.anchors-blue:hover, .app-footer a:hover, .hero a:hover, .page-title a:hover {
+.anchors-blue:hover, .app-footer a:hover, .hero .subtitle a:hover, .page-title a:hover {
   color: white; }
 
 /* line 26, /Users/mario/Dropbox/development/hybridgroup/internal/gobot.io/source/stylesheets/shared/_base.sass */
@@ -1452,9 +1452,9 @@ a {
   font-family: "Montserrat", sans-serif;
   font-weight: 700;
   font-size: 12px;
-  color: #e6d6d6;
+  color: white;
   line-height: 39px;
-  background: #510922;
+  background: #ff7e5b;
   font-weight: normal; }
 
 /* line 1, /Users/mario/Dropbox/development/hybridgroup/internal/gobot.io/source/stylesheets/shared/_coderay.sass */
@@ -1510,7 +1510,7 @@ a {
       clear: both; }
     /* line 34, /Users/mario/Dropbox/development/hybridgroup/internal/gobot.io/source/stylesheets/layouts/_home.sass */
     .main[role="main"] .content h1, .main[role="main"] .content h2 {
-      color: #971542; }
+      color: #ff7e5b; }
     /* line 37, /Users/mario/Dropbox/development/hybridgroup/internal/gobot.io/source/stylesheets/layouts/_home.sass */
     .main[role="main"] .content h1 {
       font-size: 1.9em;
@@ -1546,7 +1546,7 @@ a {
 /* line 1, /Users/mario/Dropbox/development/hybridgroup/internal/gobot.io/source/stylesheets/elements/_home.sass */
 .hero {
   margin: 15px 0 0 0;
-  background: #580a25;
+  background: #ff7e5b;
   padding: 25px 0; }
   @media only screen and (max-width: 767px) {
     /* line 1, /Users/mario/Dropbox/development/hybridgroup/internal/gobot.io/source/stylesheets/elements/_home.sass */
@@ -1557,7 +1557,7 @@ a {
     font-family: "Montserrat", sans-serif;
     font-weight: 700;
     font-size: 47px;
-    color: #fafaf1;
+    color: white;
     line-height: 54px;
     width: 100%;
     clear: both;
@@ -1582,7 +1582,7 @@ a {
     font-family: "Montserrat", sans-serif;
     font-weight: 700;
     font-size: 24px;
-    color: #b39f89;
+    color: #fafaf1;
     font-weight: 550;
     opacity: 0.94;
     margin: 0;
@@ -1596,54 +1596,54 @@ a {
         margin-top: 4px;
         padding: 0; } }
 
-/* line 39, /Users/mario/Dropbox/development/hybridgroup/internal/gobot.io/source/stylesheets/elements/_home.sass */
+/* line 40, /Users/mario/Dropbox/development/hybridgroup/internal/gobot.io/source/stylesheets/elements/_home.sass */
 .social {
   line-height: 0;
   padding: 10px 0;
   background: #fdfcf5; }
-  /* line 43, /Users/mario/Dropbox/development/hybridgroup/internal/gobot.io/source/stylesheets/elements/_home.sass */
+  /* line 44, /Users/mario/Dropbox/development/hybridgroup/internal/gobot.io/source/stylesheets/elements/_home.sass */
   .social .twitter-follow-button {
     vertical-align: top; }
-  /* line 45, /Users/mario/Dropbox/development/hybridgroup/internal/gobot.io/source/stylesheets/elements/_home.sass */
+  /* line 46, /Users/mario/Dropbox/development/hybridgroup/internal/gobot.io/source/stylesheets/elements/_home.sass */
   .social .splitter {
     display: inline-block;
     height: 21px; }
   @media only screen and (max-width: 767px) {
-    /* line 49, /Users/mario/Dropbox/development/hybridgroup/internal/gobot.io/source/stylesheets/elements/_home.sass */
+    /* line 50, /Users/mario/Dropbox/development/hybridgroup/internal/gobot.io/source/stylesheets/elements/_home.sass */
     .social .splitter {
       display: block;
       margin-bottom: 5px; } }
 
-/* line 53, /Users/mario/Dropbox/development/hybridgroup/internal/gobot.io/source/stylesheets/elements/_home.sass */
+/* line 54, /Users/mario/Dropbox/development/hybridgroup/internal/gobot.io/source/stylesheets/elements/_home.sass */
 .cta {
-  background: #c51f3c;
+  background: #fff3cf;
   padding: 10px 20px;
   display: inline-block;
   margin: 17px 0 0 0;
   font-size: 19px;
-  color: white;
+  color: #bd583d;
   font-weight: bold; }
-  /* line 61, /Users/mario/Dropbox/development/hybridgroup/internal/gobot.io/source/stylesheets/elements/_home.sass */
+  /* line 62, /Users/mario/Dropbox/development/hybridgroup/internal/gobot.io/source/stylesheets/elements/_home.sass */
   .cta:hover {
-    background: #9e162e; }
-  /* line 63, /Users/mario/Dropbox/development/hybridgroup/internal/gobot.io/source/stylesheets/elements/_home.sass */
+    background: #ffe7a9; }
+  /* line 64, /Users/mario/Dropbox/development/hybridgroup/internal/gobot.io/source/stylesheets/elements/_home.sass */
   .cta:visited {
-    color: white; }
+    color: #bd583d; }
   @media only screen and (max-width: 767px) {
-    /* line 53, /Users/mario/Dropbox/development/hybridgroup/internal/gobot.io/source/stylesheets/elements/_home.sass */
+    /* line 54, /Users/mario/Dropbox/development/hybridgroup/internal/gobot.io/source/stylesheets/elements/_home.sass */
     .cta {
       font-size: 16px;
       padding: 8px 15px; } }
 
-/* line 69, /Users/mario/Dropbox/development/hybridgroup/internal/gobot.io/source/stylesheets/elements/_home.sass */
+/* line 70, /Users/mario/Dropbox/development/hybridgroup/internal/gobot.io/source/stylesheets/elements/_home.sass */
 .catcher {
   margin: 0 0 38px 0;
   background: #fdfcf5;
   padding: 20px; }
-  /* line 73, /Users/mario/Dropbox/development/hybridgroup/internal/gobot.io/source/stylesheets/elements/_home.sass */
+  /* line 74, /Users/mario/Dropbox/development/hybridgroup/internal/gobot.io/source/stylesheets/elements/_home.sass */
   .catcher .phrase {
     margin: 0; }
-  /* line 75, /Users/mario/Dropbox/development/hybridgroup/internal/gobot.io/source/stylesheets/elements/_home.sass */
+  /* line 76, /Users/mario/Dropbox/development/hybridgroup/internal/gobot.io/source/stylesheets/elements/_home.sass */
   .catcher .cta {
     margin-top: 8px; }
 
@@ -1753,7 +1753,7 @@ a {
     margin-bottom: 10px; } }
 /* line 1, /Users/mario/Dropbox/development/hybridgroup/internal/gobot.io/source/stylesheets/elements/_page.sass */
 .page-title {
-  background: #580a25;
+  background: #ff7e5b;
   padding: 25px 0;
   margin: 10px 0 25px 0; }
   /* line 5, /Users/mario/Dropbox/development/hybridgroup/internal/gobot.io/source/stylesheets/elements/_page.sass */
