@@ -1,0 +1,10 @@
+---
+title: Cylon.js Blog
+page_title: Blog
+author: The Hybrid Group
+layout: blog
+---
+- content_for(:subtitle, "Articles tagged with “#{tagname}”")
+
+- page_articles.each_with_index do |article, i|
+  = partial "/blog/article", locals: {article: article}

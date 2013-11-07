@@ -1,0 +1,107 @@
+---
+title: Travis with Cylon.js
+author: The Hybrid Group
+page_title: Travis with Sphero
+page_subtitle: "You can find the examples on this two repositories here:<br><a href='https://github.com/hybridgroup/cylon/blob/master/examples/travis.js ' target='blanck' class='repository'>javascript</a><a href='https://github.com/hybridgroup/cylon/blob/master/examples/travis.coffee' target='blanck' class='repository'>coffeescript</a>"
+layout: page
+---
+
+
+.documentation
+  %section.intro
+    %h2 Examples
+    %h3 Javascript
+    :markdown
+          :::javascript
+          var Cylon = require('cylon')
+          var Travis = require('travis-ci')
+
+          var travis = new Travis({version: '2.0.0'});
+
+          var BLUE = 0x0000ff
+          var GREEN = 0x00ff00
+          var RED = 0xff0000
+
+          Cylon.robot({
+            connection: {name: 'sphero', adaptor: 'sphero', port: '/dev/rfcomm0'},
+            device: {name: 'sphero', driver: 'sphero'},
+
+            work: function(me) {
+              var user = "hybridgroup"
+              var name = "cylon"
+
+              me.checkTravis = function() {
+                Logger.info("Checking repo "+user+"/"+name);
+                me.sphero.setRGB(BLUE, true);
+
+                travis.repos(
+                  { owner_name: user, name: name },
+                    function(err, res) {
+                      if (res.repo != undefined) {
+                      if (res.repo.last_build_state == 'passed') {
+                        me.sphero.setRGB(GREEN, true);
+                      } else if (res.repo.last_build_state == 'failed') {
+                        me.sphero.setRGB(RED, true);
+                      } else {
+                        me.sphero.setRGB(BLUE, true);
+                      }
+                      } else {
+                        me.sphero.setRGB BLUE, true
+                      }
+                    });
+                }
+
+                me.checkTravis();
+
+                every((10).seconds(), function() {
+                  me.checkTravis();
+                });
+              }
+            }).start();
+
+    %h3 CoffeeScript
+    :markdown
+          :::javascript
+          Cylon = require 'cylon'
+          Travis = require 'travis-ci'
+
+          travis = new Travis
+            version: '2.0.0'
+
+          BLUE = 0x0000ff
+          GREEN = 0x00ff00
+          RED = 0xff0000
+
+          Cylon.robot
+            connection:
+              name: 'sphero', adaptor: 'sphero', port: '/dev/rfcomm0'
+
+            device:
+              name: 'sphero', driver: 'sphero'
+
+            work: (me) ->
+              user = "hybridgroup"
+              name = "cylon"
+
+              me.checkTravis = ->
+                Logger.info "Checking repo \#{user}/\#{name}"
+                me.sphero.setRGB BLUE, true
+
+                travis.repos {
+                  owner_name: user,
+                  name: name
+                }, (err, res) ->
+                  if res.repo
+                    switch res.repo.last_build_state
+                      when 'passed' then me.sphero.setRGB(GREEN, true)
+                      when 'failed' then me.sphero.setRGB(RED, true)
+                      else me.sphero.setRGB(BLUE, true)
+                  else
+                    me.sphero.setRGB BLUE, true
+
+              me.checkTravis()
+
+              every 10.seconds(), ->
+                me.checkTravis()
+
+              .start()   

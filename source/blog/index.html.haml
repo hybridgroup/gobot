@@ -1,0 +1,9 @@
+---
+title: Blog
+page_title: Blog
+description: Cylon.js blog entries.
+layout: blog
+---
+
+- page_articles.each_with_index do |article, i|
+  = partial "article", locals: {article: article}

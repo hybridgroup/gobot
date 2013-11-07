@@ -1,0 +1,68 @@
+---
+title: Cylon.js - Maxbotix Driver
+author: The Hybrid Group
+page_title: Maxbotix
+page_subtitle: Driver
+layout: page
+---
+.documentation
+  %section.intro
+    =image_tag "/images/maxbotix.jpg", class: "display"
+    %p
+      Provides tools to use maxbotix sonar (range finder).
+
+  %section.how-to
+    %h2 How to stablish a connection and setup the driver
+    %h3 For Arduino:
+    :markdown
+          :::ruby
+          comming soon
+
+    -#%h3 For Digispark:
+    -#:markdown
+          -#:::ruby
+
+  %section.public-methods
+    %h2 Commands:
+
+    %h3 range → distance_in_inches(float)
+    %p
+      Returns the distance measured by the sonar in inches.
+
+    %h3 range_cm → distance_in_cm(float)
+    %p
+      Returns the distance measured by the sonar in cm.
+
+  %section.public-events
+    %h2 Events:
+    %p
+      The events will be triggered when the amount of time specified by the param :interval, when setting up the driver, passes.
+    %h3 :range
+    %p
+      Gets triggered after :interval amount of time passes, everytime the range will be read and the event triggered.
+
+    %h3 How to use events and call them on your drivers
+    %p Pretty simple, when the connection and the driver have been setup (as explained above) you can call events on them as follows:
+    :markdown
+          :::ruby
+          comming soon
+
+  %section.how-to
+    %h2 How to use
+    %h3 Example: Setups a maxbotix driver and range event, displays the range every :interval amount of time.
+    :markdown
+          :::ruby
+          comming soon
+
+
+  %section.circuit
+    %h2 Circuit and Schematic
+    %p
+      =link_to "http://www.electrojoystick.com/tutorial/?page_id=285", "http://www.electrojoystick.com/tutorial/?page_id=285"
+
+  %section.compatability.hardware
+    %h2 Works with:
+    =# TODO: Update platform list with all that work with this driver in Cylon.js.
+    .devices
+      = partial "documentation/partials/arduino"
+      =# partial "documentation/partials/digispark"

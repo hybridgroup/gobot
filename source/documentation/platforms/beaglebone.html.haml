@@ -1,0 +1,58 @@
+---
+title: BeagleBone with Artroo
+author: The Hybrid Group
+page_title: BeagleBone
+page_subtitle: "<a href='https://github.com/hybridgroup/Cylon.js-beaglebone' class='repository'>Repository</a> <a class+'issues' href='https://github.com/hybridgroup/Cylon.js-beaglebone/issues'>Issues</a>"
+layout: page
+---
+.documentation
+  %section.intro
+    = image_tag "/images/beaglebone.jpg", class: "display"
+
+    %p The BeagleBone is an ARM based single board computer, with many different GPIO interfaces built in.
+
+    %p
+      For more info about the BeagleBone platform click
+      = succeed "." do
+        = link_to "here", "http://beagleboard.org/Products/BeagleBone", target: :blank
+    %p
+      We have created a bootable image of Arch Linux that contains the needed drivers to use the Beaglebone Black with Cylon.js. You can download it from
+      = succeed "." do
+        = link_to "here", "https://s3.amazonaws.com/Cylon.js-images/beaglebone/Cylon.js-arch-armv7-1380751200.tar.xz", target: :blank
+
+  %section.how-to
+    %h2 How to install
+    %p
+      Installing Cylon.js for beaglebone is pretty easy using ruby gems.
+    :markdown
+          :::bash
+          gem install Cylon.js-beaglebone
+
+    %h2 How to use
+    %p
+      This small program causes an LED to blink.
+    :markdown
+          :::ruby
+          require 'Cylon.js'
+
+          connection :beaglebone, :adaptor => :beaglebone
+          device :led, :driver => :led, :pin => :P9_12
+
+          work do
+            every 1.second do
+              led.on? ? led.off : led.on
+            end
+          end
+
+  %section.drivers
+    %h2 Drivers
+    %p All Cylon.js digital GPIO and i2c drivers listed below should work with the BeagleBone:
+
+    .hardware
+      .devices
+        = partial "documentation/partials/button"
+        = partial "documentation/partials/led"
+        = partial "documentation/partials/blinkm"
+        = partial "documentation/partials/hmc6352-compass"
+        = partial "documentation/partials/wiichuck"
+        = partial "documentation/partials/wiiclassic"

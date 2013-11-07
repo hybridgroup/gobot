@@ -1,0 +1,84 @@
+%html
+  %head
+    %meta{:charset => "utf-8"}
+    %meta{:content => "width=device-width, initial-scale=1.0", :name => "viewport"}/
+    %meta{:content => "IE=edge,chrome=1", "http-equiv" => "X-UA-Compatible"}
+    %meta{:content => current_page.data.description, :name => "description"}
+    %meta{:content => current_page.data.author, :name => "author"}
+    %title= current_page.data.title
+    %script{:src => "//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"}
+    %link{href: "http://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,500,700", rel: "stylesheet", type: "text/css"}/
+    %link(rel="stylesheet" href="/stylesheets/style.css")
+    %link{ href: '/favicon.ico', rel: 'shortcut icon', type: 'image/gif' }/
+    :javascript
+      $(document).ready(function() {
+        $('header .subtitle').hover(function() {
+          $('.easter', this).show();
+          $('.main', this).hide();
+        }, function () {
+          $('.easter', this).hide();
+          $('.main', this).show();
+        });
+      });
+  %body
+    .app
+      .w
+        %header.app-header{role: "banner"}
+          .display
+            %h1.cylon-logo
+              %a{href: '/'} Cylon
+
+          %span.menu
+            = link_to "Docs", "", (menu_item("documentation"))
+            =  link_to "Hardware", "", (menu_item("hardware"))
+            = # link_to "Videos", "", (menu_item("videos"))
+            = # link_to "Blog", "", (menu_item("blog"))
+            =  link_to "Github", "https://github.com/hybridgroup/cylon/", class: "item", target: "blanck"
+      - unless current_page.data.hero.nil?
+        .hero
+          .container
+            %h1.title
+              /It is time to have Robots and JavaScript
+              /%br
+              /working together.
+              JavaScript Robotics, By Your Command
+            %h2.subtitle
+              Cylon.js makes robotics 
+              = link_to "Simple", "", (menu_item("documentation/getting-started"))  
+              and 
+              = link_to "Extensible.", "", (menu_item("documentation/platforms"))
+
+            = link_to "Get Started", "/documentation/getting-started", class: "cta" 
+      - unless current_page.data.social.nil?
+        .social
+          .container
+            .splitter
+              %iframe{:allowtransparency => "true", :frameborder => "0", :height => "20", :scrolling => "0", :src => "http://ghbtns.com/github-btn.html?user=hybridgroup&repo=cylon&type=watch&count=true", :width => "95"}
+              %iframe{:allowtransparency => "true", :frameborder => "0", :height => "20", :scrolling => "0", :src => "http://ghbtns.com/github-btn.html?user=hybridgroup&repo=cylon&type=fork&count=true", :width => "95"}
+            .splitter
+              %a.twitter-share-button{"data-dnt" => "true", "data-text" => "JavaScript Robotics, By Your Command.", "data-url" => "http://cylonjs.com", "data-via" => "cylonjs", :href => "https://twitter.com/share"} Tweet
+              :javascript
+                !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
+              %a.twitter-follow-button{"data-dnt" => "true", "data-show-count" => "false", :href => "https://twitter.com/cylonjs"} Follow @Cylon.jsio
+              :javascript
+                !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
+      - unless current_page.data.page_title.nil?
+        .page-title
+          .w
+            %h1.title= current_page.data.page_title
+            - unless current_page.data.page_subtitle.nil?
+              %h2.subtitle= current_page.data.page_subtitle
+            - if content_for? :subtitle
+              %h2.subtitle= yield_content(:subtitle)
+      .container
+        = yield
+      - unless current_page.data.catcher.nil?
+        %section.catcher
+          .w
+            %h3.phrase Ready to build the next big thing with JavaScript?
+            = link_to "Get Started", "/documentation/getting-started", class: "cta"
+    %footer.app-footer
+      .w
+        .copyright
+          &copy; Copyright 2012-2013
+          %a{:href => "http://hybridgroup.com"} The Hybrid Group.

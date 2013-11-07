@@ -1,0 +1,20 @@
+- wrap_layout :layout do
+  .main.blog{:role => "main"}
+    .articles
+      .article
+        - if is_blog_article?
+          = partial "blog/header", {locals: { article: page_articles.first } }
+          = yield
+        - else 
+          = yield
+    .categories
+      %h4
+        Tags
+      %ul
+        %li= link_to "Robots", "/blog/tags/robots/"
+        %li= link_to "Events", "/blog/tags/events/"
+    .network
+      %h4
+        Network
+      = link_to image_tag("twitter.png"), "https://twitter.com/Cylon.jsio"
+      = link_to image_tag("github.png"), "https://github.com/hybridgroup/Cylon.js"

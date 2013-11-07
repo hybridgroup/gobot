@@ -1,0 +1,32 @@
+---
+title: Documentation
+page_title: Documentation
+page_subtitle: Made by Humans, for Humans.
+layout: page
+---
+
+.documentation
+  %ol.index
+    %li
+      .link= link_to "Getting Started", "/documentation/getting-started"
+      .description The best way to get going with Cylon.js.
+    %li
+      .link= link_to "Platforms", "/documentation/platforms"
+      .description Cylon.js has a extensible system for connecting to multiple hardware platforms such as Arduino & ARDrone. 
+    %li
+      .link= link_to "Drivers", "/documentation/drivers"
+      .description Cylon.js  supports many different hardware devices, from LEDs to ultrasonic rangefinders, to drone flight control.
+    -#%li
+      -#.link= link_to "Generated Documentation", "http://rubydoc.info/gems/Cylon.js/frames"
+      -#.description YARD Generated Documentation.
+    %li
+      .link Examples
+      %small= link_to "Blink", "/documentation/examples/blink"
+      %br/ 
+      %small= link_to "ARDrone", "/documentation/examples/ardrone"
+      %br/ 
+      %small= link_to "Sphero - TravisCI Build Status", "/documentation/examples/travis"
+
+    %li 
+      .link= link_to "API Server", "/api" 
+      .description The Cylon.js API Server makes it easy to communicate with your robots using a REST and Websockets-based interface. You can access the Cylon.js master class and retrieve information about the robots being controlled, and even send them commands.

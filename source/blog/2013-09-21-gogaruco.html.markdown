@@ -1,0 +1,13 @@
+---
+title: GoGaRuCo
+page_title: Blog
+date: 2013-09-21
+tags: events
+author: Damen Evans
+---
+
+The Cylon.js team has been having a great time at gogaruco here in San Francisco!
+
+So far we have been treated to some amazing data visualizations, entranced by rubic’s cubes, and been inspired to look beyond our code, to our fellow coders, and the power of the community itself... 
+
+And that was just the first day!

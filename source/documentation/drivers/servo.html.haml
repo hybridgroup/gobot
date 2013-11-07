@@ -1,0 +1,123 @@
+---
+title: Cylon.js - Servo Driver
+author: The Hybrid Group
+page_title: Servo
+page_subtitle: Driver
+layout: page
+---
+.documentation
+  %section.intro
+    = image_tag "/images/servo.jpg", class: "display"
+    %p
+      Provides an interface for making servos easy to work and interact with from Cylon.js.
+
+  %section.how-to
+    %h2 How to establish a connection and setup the driver
+    %h3 JavaScript
+    :markdown
+          :::javascript
+          var Cylon = require('cylon');
+
+          Cylon.robot({
+            connection: {name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0'},
+
+            device: {name: 'servo', driver: 'servo', pin: 3},
+          ...
+
+    %h3 CoffeeScript
+    :markdown
+          :::javascript
+          Cylon = require 'cylon'
+
+          Cylon.robot
+            connection:
+              name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0'
+
+            device:
+              name: 'servo', driver: 'servo', pin: 3
+          ...
+
+    -#%h3 For Digispark:
+    -#:markdown
+          -#:::ruby
+
+  %section.public-methods
+    %h2 Commands:
+    
+    %dl.methods 
+      %dt angle → true | nil
+      %dd Moves the servo to the specified angle, angle must be an integer value between 0 and 180.
+      %dt currentAngle → integer_value (0 - 180)
+      %dd Returns the current angle of the servo, an integer value between 0 and 180.
+
+    %h2 Events
+
+    %dl.methods 
+      %dt start
+      %dd Sent when the device has been started and is ready to use.
+    
+
+  %section.how-to
+    %h2 How to use
+    %p
+      This example moves a servo from angle 45 to 90 to 135.
+
+    %h3 JavaScript
+    :markdown
+          :::javascript
+          var Cylon = require('cylon');
+
+          Cylon.robot({
+            connection: {name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0'},
+
+            device: {name: 'servo', driver: 'servo', pin: 3},
+
+            work: function(my) {
+              var angle = 45 ;
+              my.servo.angle(angle);
+              every((1).second(), function() {
+                angle = angle + 45 ;
+                if (angle > 135) {
+                  angle = 45
+                }
+                my.servo.angle(angle);
+              });
+            }
+          }).start();
+
+    %h3 CoffeeScript
+    :markdown
+          :::javascript
+          Cylon = require 'cylon'
+
+          Cylon.robot
+            connection:
+              name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0'
+
+            device:
+              name: 'servo', driver: 'servo', pin: 3
+
+            work: (my) ->
+              angle = 45
+              my.servo.angle angle
+              every 1.second(), ->
+                angle += 45
+                angle = 45 if angle > 135
+                my.servo.angle angle
+
+          .start()
+
+
+  %section.circuit
+    %h2 Circuit and Schematic
+    %p
+      =link_to "http://arduino.cc/en/Tutorial/Sweep", "http://arduino.cc/en/Tutorial/Sweep", target:"_blank" 
+
+  %section.compatability.hardware
+    %h2 Works with:
+    =# TODO: Update platform list with all that work with this driver in Cylon.js.
+    .devices
+      = partial "documentation/partials/arduino"
+      = #partial "documentation/partials/digispark"
+
+

@@ -1,0 +1,253 @@
+---
+title: Cylon.js API
+author: The Hybrid Group
+page_title: API
+page_subtitle: "The Cylon API provides an interface for retrieving information and communicating with the currently running robots."
+layout: page
+---
+
+:markdown
+	## How To Connect
+
+	Now you are ready to write your own code you can access a running Cylon.js API server.
+
+	### Running your robot:
+	
+	To test your code you can type this on your console:
+
+	#### Javascript
+
+	    :::javascript
+	      node robotfilename.js
+
+	#### CoffeeScript      
+
+	    :::javascript
+	      coffee robotfilename.coffee
+	
+	For example, on this code:
+
+	#### Javascript
+	    :::javascript
+	    var Cylon = require('..');
+
+		Cylon.robot({
+		  connection: { name: 'looped', adaptor: 'loopback'},
+
+		  work: function() {
+		    every((1).second(), function() { Logger.info("Hello, human!"); });
+		    after((10).seconds(), function() { Logger.info("Impressive."); });
+		  }
+		}).start();
+
+	#### CoffeeScript 
+
+	    :::javascript
+	    Cylon = require('cylon')
+
+		Cylon.robot
+		  work: ->
+		    every 1.second(), ->
+		      Logger.info("Hello, human!")
+
+		    after 10.seconds(), ->
+		      Logger.info "Impressive."
+
+		.start()
+
+	`.start(); - .start()` automatically, starts the server.
+
+	## How To Configure
+	
+	The Cylon.js API server, allows a configuration for your robots.
+
+	You can set it up like this:
+
+	    :::javascript
+		  Cylon.api(host: '0.0.0.0', port: '80')
+		
+	Now you can run the server on the curl : `http://0.0.0.0:80`.
+
+	## Routes
+
+	### GET /robots
+
+	Our first route returns all the Robots the master class knows about in JSON
+	format.
+      	
+	   
+	    [
+	      {
+	        "name": "SpheroBot",
+	        "connections": [
+	          {
+	            "name": "sphero",
+	            "port": "/dev/rfcomm0",
+	            "adaptor": "Sphero",
+	            "connection_id": 2778
+	          }
+	        ],
+	        "devices": [
+	          {
+	            "name": "sphero",
+	            "driver": "Sphero",
+	            "pin": null,
+	            "connection": {
+	              "name": "sphero",
+	              "port": "/dev/rfcomm0",
+	              "adaptor": "Sphero",
+	              "connection_id": 2778
+	            },
+	            "commands": [
+	              "detectCollisions",
+	              "roll",
+	              "setColor",
+	              "setRGB",
+	              "stop"
+	            ]
+	          }
+	        ]
+	      }
+	    ]
+
+	### GET /robots/:robotname
+
+	Given a robot's name, returns JSON information about the requested Robot:
+
+	    {
+	      "name": "SpheroBot",
+	      "connections": [
+	        {
+	          "name": "sphero",
+	          "port": "/dev/rfcomm0",
+	          "adaptor": "Sphero",
+	          "connection_id": 2778
+	        }
+	      ],
+	      "devices": [
+	        {
+	          "name": "sphero",
+	          "driver": "Sphero",
+	          "pin": null,
+	          "connection": {
+	            "name": "sphero",
+	            "port": "/dev/rfcomm0",
+	            "adaptor": "Sphero",
+	            "connection_id": 2778
+	          },
+	          "commands": [
+	            "detectCollisions",
+	            "roll",
+	            "setColor",
+	            "setRGB",
+	            "stop"
+	          ]
+	        }
+	      ]
+	    }
+
+	### GET /robots/:robotname/devices
+
+	Given a robot's name, returns JSON information about the devices belonging to
+	the requested Robot:
+
+	    [
+	      {
+	        "name": "sphero",
+	        "driver": "Sphero",
+	        "pin": null,
+	        "connection": {
+	          "name": "sphero",
+	          "port": "/dev/rfcomm0",
+	          "adaptor": "Sphero",
+	          "connection_id": 2778
+	        },
+	        "commands": [
+	          "detectCollisions",
+	          "roll",
+	          "setColor",
+	          "setRGB",
+	          "stop"
+	        ]
+	      }
+	    ]
+
+	### GET /robots/:robotname/devices/:devicename
+
+	Given the names of a device and the robot it belongs to, returns data on the
+	specified device.
+
+	    {
+	      "name": "sphero",
+	      "driver": "Sphero",
+	      "pin": null,
+	      "connection": {
+	        "name": "sphero",
+	        "port": "/dev/rfcomm0",
+	        "adaptor": "Sphero",
+	        "connection_id": 2778
+	      },
+	      "commands": [
+	        "detectCollisions",
+	        "roll",
+	        "setColor",
+	        "setRGB",
+	        "stop"
+	      ]
+	    }
+
+	### GET /robots/:robotname/devices/:devicename/commands
+
+	Given the names of a device and the robot it belongs to, returns all commands
+	available for the specified device.
+
+	    [
+	      "detectCollisions",
+	      "roll",
+	      "setColor",
+	      "setRGB",
+	      "stop"
+	    ]
+
+	### POST /robots/:robotname/devices/:devicename/commands/:commandname
+
+	Given a robot name, device name, and command name, executes a robot's command
+	and returns the result.
+
+	    // example pending
+
+	### GET /robots/:robotname/connections
+
+	Given a robot's name, returns JSON information about the connections belonging
+	to the requested Robot:
+
+	    [
+	      {
+	        "name": "sphero",
+	        "port": "/dev/rfcomm0",
+	        "adaptor": "Sphero",
+	        "connection_id": 2778
+	      }
+	    ]
+
+	### GET /robots/:robotname/connections/:connectionname
+
+	Given a robot's name, returns JSON information about the connections belonging
+	to the requested Robot:
+
+	    {
+	      "name": "sphero",
+	      "port": "/dev/rfcomm0",
+	      "adaptor": "Sphero",
+	      "connection_id": 2778
+	    }
+
+	### GET /robots/:robotname/devices/:devicename/events
+
+	Routes to a Socket.IO route to handle WebSockets connections requesting updates
+	on device events.
+
+	### WS_GET /events
+
+	A Socket.IO route to handle updating clients whenever a device sends
+	an 'update' event.

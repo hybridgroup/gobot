@@ -1,0 +1,6 @@
+- wrap_layout :layout do
+  .main{:role => "main"}
+    .aside.right
+      %img{:src => "images/cylon.png"}
+    %section.content
+      = yield

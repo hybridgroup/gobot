@@ -1,0 +1,95 @@
+---
+title: Raspberry Pi with Artroo
+author: The Hybrid Group
+page_title: Raspberry Pi
+page_subtitle: "<a href='https://github.com/hybridgroup/Cylon.js-raspi' class='repository'>Repository</a> <a class+'issues' href='https://github.com/hybridgroup/Cylon.js-raspi/issues'>Issues</a>"
+layout: page
+---
+.documentation
+  %section.intro
+    = image_tag "/images/raspi.jpg", class: "display"
+
+    %p The Raspberry Pi is an inexpensive and popular ARM based single board computer with digital & PWM GPIO, and i2c interfaces built in.
+
+    %p
+      For more info about the Raspberry Pi platform go to
+      = succeed "." do
+        = link_to "http://www.raspberrypi.org/", "http://www.raspberrypi.org/", target: :blank
+
+
+  %section.how-to
+    %h2 How to install
+    %p If you do not have ruby installed, you'll need to do that first.
+    %p
+      Then install the Cylon.js-raspi gem:
+    :markdown
+          :::bash
+          sudo gem install Cylon.js-raspi
+
+    %h2 How to use
+    %p
+      This small program causes an LED to blink.
+    :markdown
+          :::ruby
+          require 'Cylon.js'
+
+          connection :raspi, :adaptor => :raspi
+          device :led, :driver => :led, :pin => 11
+
+          work do
+            every 1.second do
+              led.toggle
+            end
+          end
+    %p To run the examples, requires sudo access on the Raspberry Pi:
+
+    :markdown
+          :::bash
+          sudo ruby examples/raspi_led.rb
+
+    %h2 How to connect
+    %h3 Connecting to Raspberry Pi GPIO
+    %p
+      This gem only works on a real Raspberry Pi. Do not bother trying on any other kind of
+      computer it will not work. Also note you will need to connect actual circuits to the Raspberry Pi's
+      GPIO pins.
+
+    %h3 Enabling the Raspberry Pi i2c on raspbian
+    %p You must add these two entries in your /etc/modules
+
+    :markdown
+          :::bash
+          i2c-bcm2708
+          i2c-dev
+
+    %p You must also ensure that these entries are commented in your /etc/modprobe.d/raspi-blacklist.conf
+
+    :markdown
+          :::bash
+          #blacklist spi-bcm2708
+          #blacklist i2c-bcm2708
+
+    %p Now restart your raspberry pi.
+
+    %h3 Enabling PWM output on GPIO pins.
+
+    %p
+      You need to install and have pi-blaster running in the raspberry-pi, you can follow
+      the instructions for pi-blaster install on our repo here:
+
+    %a{ href:"https://github.com/hybridgroup/pi-blaster" } https://github.com/hybridgroup/pi-blaster
+
+  %section.drivers
+    %h2 Drivers
+    %p All Cylon.js digital and PWM GPIO, and i2c drivers listed below should work with the Raspberry Pi:
+
+    .hardware
+      .devices
+        = partial "documentation/partials/button"
+        = partial "documentation/partials/led"
+        = partial "documentation/partials/servo"
+        = partial "documentation/partials/motor"
+        = partial "documentation/partials/blinkm"
+        = partial "documentation/partials/hmc6352-compass"
+        = partial "documentation/partials/wiichuck"
+        = partial "documentation/partials/wiiclassic"

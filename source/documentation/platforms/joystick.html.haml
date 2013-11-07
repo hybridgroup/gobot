@@ -1,0 +1,68 @@
+---
+title: Joysticks with Cylon.js
+author: The Hybrid Group
+page_title: Joysticks
+page_subtitle: "<a href='https://github.com/hybridgroup/Cylon.js-joystick' class='repository'>Repository</a> <a class+'issues' href='https://github.com/hybridgroup/Cylon.js-joystick/issues'>Issues</a>"
+layout: page
+---
+.documentation
+  %section.intro
+    = image_tag "/images/joystick.jpg", class: "display"
+
+    %p
+      You can use Cylon.js with a PS3 game controller, an XBox360 game controller, or any other USB joystick or game controller that is compatible with Simple DirectMedia Layer (SDL).
+
+    %p
+      For more info about Simple DirectMedia Layer (SDL) go to
+      = succeed "." do
+        = link_to "http://www.libsdl.org/", "http://www.libsdl.org/", target: :blank
+
+  %section.how-to
+    %h2 How to install
+    %p
+      Installing Cylon.js with arduino support is pretty easy using ruby gems.
+    :markdown
+          :::bash
+          gem install Cylon.js-joystick
+
+    %h2 How to use
+    %p
+      This small program receives joystick and button press events from an XBox 360 game controller.
+    :markdown
+          :::ruby
+          require 'Cylon.js'
+
+          connection :joystick, :adaptor => :joystick
+          device :joystick, :driver => :xbox360, :connection => :joystick, :interval => 0.1
+
+          work do
+            on controller, :joystick => proc { |*value|
+              puts "joystick \#{value[1][:s]} x:\#{value[1][:x]} y:\#{value[1][:y]}"
+            }
+            on controller, :button_a => proc { |*value|
+              puts "ayyyy!"
+            }
+            on controller, :button_b => proc { |*value|
+              puts "bee!"
+            }
+            on controller, :button_x => proc { |*value|
+              puts "exxx!"
+            }
+            on controller, :button_y => proc { |*value|
+              puts "why!"
+            }
+          end
+
+    %h2 How to connect
+    %p Plug your USB joystick or game controller into your USB port. If your device is supported by SDL, you are now ready.
+
+  %section.drivers
+    %h2 Drivers
+    %p
+      There are 3 driver for different joysticks, as listed below:
+
+    .hardware
+      .devices
+        = partial "documentation/partials/joystick-driver"
+        = partial "documentation/partials/ps3"
+        = partial "documentation/partials/xbox360"

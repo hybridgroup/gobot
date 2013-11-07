@@ -1,0 +1,15 @@
+%header.header
+  .date
+    .blue
+      .month
+        = article.date.strftime('%b')
+      .day
+        = article.date.strftime('%d')
+    .red
+      .year
+        = article.date.strftime('%Y')
+  .data
+    %h3
+      = link_to article.title, article
+    .author
+      = "by #{article.data.author}"

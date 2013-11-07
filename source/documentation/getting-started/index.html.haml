@@ -1,0 +1,178 @@
+---
+title: Cylon.js Getting Started
+author: The Hybrid Group
+description: Cylon.js Getting Started
+page_title: Getting Started
+page_subtitle: A Guide by Humans, for Humans.
+layout: page
+---
+
+%section.intro
+
+  = partial "../what_is_cylon"
+
+
+%section.how-to
+  %h2 How to Install Node.js
+  %h3 OSX
+  %p 
+  Go to the Node.js downloads page at 
+  = link_to "http://nodejs.org/download/", "http://nodejs.org/download/", target:"blank"  
+  download the installer file and run it.
+  %h3 Ubuntu
+  %p 
+  Follow the installation instructions at 
+  =link_to "https://github.com/joyent/node/wiki/Installation", "https://github.com/joyent/node/wiki/Installation", target:"_blank"  
+  to install the latest Node.js
+  %h3 Windows
+  %p 
+  Go to the Node.js downloads page at 
+  = link_to "http://nodejs.org/download/", "http://nodejs.org/download/", target:"blank"  
+  download the installer file and run it.
+
+%section.cylon-installation
+  %h2 How to Install Cylon.js
+  :markdown
+    In order to use Cylon.js, you must install the Cylon.js node modules needed to control your particular hardware setup. For example, to use Cylon.js with an Arduino, you will need to install the `cylon-firmata` module. Check out these examples:
+
+  %h3 OSX
+  :markdown
+        :::javascript
+        npm install cylon
+        npm install cylon-firmata
+
+  %h3 Ubuntu
+  :markdown
+        :::javascript
+        npm install cylon
+        npm install cylon-firmata
+
+  %h3 Windows
+  %p
+    Windows setup for cylon.
+
+  %section.cylon-running
+  %h2 Cylon.js Robots
+  %h3 Writing your robot code:
+
+  %p 
+  Now you are ready to write your own code. Take a look at the examples below, or go to the 
+  = link_to "examples", "https://github.com/hybridgroup/cylon/tree/master/examples", target:"blank"  
+  directory for a whole bunch of code you can use to help get started. We recommend using Test-Driven Robotics (TDR) with your preferred test frameworks.
+
+  %h3 Running your robot:
+
+  :markdown
+        :::javascript
+        node robotfilename.js
+
+  %p or
+  
+  :markdown
+        :::javascript
+        coffee robotfilename.coffee
+
+%section.cylon-code
+  %h2 Cylon.js Code Examples
+
+  %h3 Example: Arduino with LED and a button
+  :markdown
+    To use this example, you must first run `npm install cylon-firmata`
+  %h4 Javascript
+  :markdown
+        :::javascript
+       
+        var Cylon = require('cylon');
+
+        Cylon.robot({
+          connection: { name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0' },
+          devices: [{name: 'led', driver: 'led', pin: 13},
+                    {name: 'button', driver: 'button', pin: 2}],
+
+          work: function(my) {
+            my.button.on('push', function() {my.led.toggle()});
+          }
+        }).start();
+
+  %h4 CoffeeScript
+  :markdown
+        :::javascript
+        Cylon = require 'cylon'
+
+        Cylon.robot
+          connection:
+            name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0'
+
+          devices:
+            [
+              {name: 'led', driver: 'led', pin: 13},
+              {name: 'button', driver: 'button', pin: 2}
+            ]
+
+          work: (my) ->
+            my.button.on 'push', -> my.led.toggle()
+
+        .start()
+
+  %h3 Parrot ARDrone 2.0
+  :markdown
+    To use this example, you must first run `npm install cylon-ardrone`
+  %h4 Javascript
+  :markdown
+        :::javascript
+        var Cylon = require('cylon');
+
+        Cylon.robot({
+          connection: {name: 'ardrone', adaptor: 'ardrone', port: '192.168.1.1'},
+          device: {name: 'drone', driver: 'ardrone'},
+          work: function(my) {
+            my.drone.takeoff();
+
+            after((10).seconds(), function() {
+              my.drone.land();
+            }
+
+            after((15).seconds(), function() {
+              my.drone.stop();
+            }
+          }
+        }).start();
+
+  %h4 CoffeeScript 
+  :markdown
+        :::javascript
+        Cylon = require 'cylon'
+
+        Cylon.robot
+          connection:
+            name: 'ardrone', adaptor: 'ardrone', port: '192.168.1.1'
+
+          device:
+            name: 'drone', driver: 'ardrone'
+
+          work: (my) ->
+            my.drone.takeoff()
+
+            after 10.seconds(), ->
+              my.drone.land()
+
+            after 15.seconds(), ->
+              my.drone.stop()
+
+        .start()
+
+%section.contributing
+  %h2 Contributing
+
+  %p 
+    You can help cylon grow by contributing your code, new drivers or platforms to the project, check the Github page
+    = link_to "cylon on github.","https://github.com/hybridgroup/cylon" 
+
+  %ul
+    %li Fork it
+    %li Create your feature branch (git checkout -b my-new-feature)
+    %li Commit your changes (git commit -am 'Add some feature')
+    %li Push to the branch (git push origin my-new-feature)
+    %li Create new Pull Request
+
+%section.footer

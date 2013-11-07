@@ -1,0 +1,96 @@
+.cylon-logo
+  a
+    background: transparent url('/images/logo.png') left top no-repeat
+    display: inline-block
+    text-indent: -99999px
+    color: $red
+    width: 256px
+    height: 27px
+
+.github-menu
+  a
+    color: #580a25
+  padding: 10px 10px 10px 40px
+  font-weight: bold
+  background: url(../../images/github-mark.png) top left no-repeat
+  &:hover
+    color: #ee274a
+    text-decoration: underline
+
+.app-header
+  margin: 16px 0 15px 0
+
+  .Cylon.js-logo, .display, .subtitle, .menu, h1 
+    vertical-align: middle
+    margin: 0
+    display: inline-block
+
+  .display
+    margin: -1px 0 0 0
+
+  .subtitle
+    @include title-font(20px, $light_gray)
+    padding: 8px 0 0 15px
+    width: 200px
+
+  .easter
+    display: none
+
+  .heart
+    color: red
+    font-size: 20px
+    vertical-align: middle
+    margin-top: -2px
+    display: inline-block
+    width: 38px
+    text-align: center
+
+  .menu
+    width: 510px
+    text-align: right
+    display: inline-block
+    margin: 3px 0 0 0 
+    float: right
+
+    .active
+      color: $red
+
+    .item
+      font-size: 15px
+      font-weight: bold
+      margin: 10px
+      padding: 8px 4px
+
+      &, &:visited
+        color: #505252
+
+      &:hover
+        color: $red
+
+      &:active
+        color: $red
+
+    @media only screen and (min-width: $medium-screen) and (max-width: $big-screen) 
+      width: 360px
+      padding: 0
+      .item
+        margin: 0
+        padding: 0 5px
+
+  @media only screen and (max-width: $medium-screen)
+    width: 100%
+    text-align: center
+    .Cylon.js-logo, .subtitle
+      width: 100%
+      display: block
+      margin: 0 0 5px 0
+    .subtitle
+      font-size: 19px
+      line-height: 15px
+      padding: 0
+    .menu
+      width: 100%
+      text-align: center
+      .item
+        margin: 0
+        padding: 0 2px

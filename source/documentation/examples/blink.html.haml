@@ -1,0 +1,44 @@
+---
+title: Blink with Cylon.js
+author: The Hybrid Group
+page_title: Blink
+page_subtitle: "You can find the examples on this two repositories here:<br><a href='https://github.com/hybridgroup/cylon/blob/master/examples/blink.js ' target='blanck' class='repository'>javascript</a><a href='https://github.com/hybridgroup/cylon/blob/master/examples/blink.coffee' target='blanck' class='repository'>coffeescript</a>"
+layout: page
+---
+.documentation
+  %section.intro
+    %h2 Examples
+    %h3 Javascript
+    :markdown
+          :::javascript
+          var Cylon = require('..');
+
+          // Initialize the robot
+          Cylon.robot({
+            connection: { name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0' },
+            device: {name: 'led', driver: 'led', pin: 13},
+
+            work: function(my) {
+              every((1).seconds(), function() {my.led.toggle()});
+            }
+          }).start();
+
+    %h3 CoffeeScript
+    :markdown
+          :::javascript
+          Cylon = require('..')
+
+          # Initialize the robot
+          Cylon.robot
+            connection:
+              name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0'
+
+            device:
+              name: 'led', driver: 'led', pin: 13
+
+            work: (my) ->
+              # we do our thing here
+              every 1.second(), -> my.led.toggle()
+
+          .start()      
+	          

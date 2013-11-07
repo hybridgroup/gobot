@@ -1,0 +1,13 @@
+%html
+  %head
+    %meta{:charset => "utf-8"}
+    %meta{:content => "width=device-width, initial-scale=1.0", :name => "viewport"}/
+    %meta{:content => "IE=edge,chrome=1", "http-equiv" => "X-UA-Compatible"}
+    %meta{:content => current_page.data.description, :name => "description"}
+    %meta{:content => current_page.data.author, :name => "author"}
+    %title= current_page.data.title
+    %meta{content: "text/html; charset=US-ASCII", "http-equiv" => "content-type"}/
+    %meta{content: "width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;", name: "viewport"}/
+    %link{href: "/stylesheets/styledocco.css", media: "all", rel: "stylesheet"}/
+  %body
+    = yield 

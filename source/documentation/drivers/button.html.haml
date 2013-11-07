@@ -1,0 +1,127 @@
+---
+title: Cylon.js - Button Driver
+author: The Hybrid Group
+page_title: Button
+page_subtitle: Driver
+layout: page
+---
+.documentation
+  %section.intro
+    = image_tag "/images/button.jpg", class: "display"
+    %p
+      Simple interface that makes it possible to register clicks through physical input.
+
+  %section.how_to
+    %h2 How to establish a connection and setup the driver 
+    %h3 JavaScript
+    :markdown
+          :::javascript
+
+          var Cylon = require('cylon');
+
+          Cylon.robot({
+            connection: {name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0'},
+
+            device: {name: 'button', driver: 'button', pin: 2},
+            ...
+
+    %h3 CoffeeScript
+    :markdown
+          :::javascript
+          Cylon = require 'cylon'
+
+          Cylon.robot
+            connection:
+              name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0'
+
+            device:
+              name: 'button', driver: 'button', pin: 2
+            ...
+
+    -#%h3 For Digispark:
+    -#:markdown
+          -#:::ruby
+
+  %section.public-methods
+    %h2 Commands:
+
+    %dl.methods
+      %dt isPressed → true | false
+      %dd
+        Returns true or false matching state of the button.
+
+
+  %section.public-events
+    %h2 Events:
+
+    %dl.methods 
+      %dt update
+      %dd 
+        This event will contain one of the following events.
+        %br/  
+        You can also subscribe to one of the specific events, if that is the information you are interested in.
+      %dt push
+      %dd This event gets triggered when the button changes state from released to pushed.
+      %dt release
+      %dd This event gets triggered when the button changes state from pushed to released.
+      %dt start
+      %dd Sent when the device has been started and is ready to use. 
+
+
+    -#%h3 How to use events and call them on your drivers
+    -#%p Pretty simple, when the connection and the driver have been setup (as explained above) you can call events on them as follows:
+    -#:markdown
+          -#:::ruby
+
+  %section.how-to
+    %h2 How to use
+    %p 
+      This example detects when a button has been pushed.
+
+    %h3 JavaScript    
+    :markdown
+          :::javascript
+
+          var Cylon = require('cylon');
+
+          Cylon.robot({
+            connection: {name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0'},
+
+            device: {name: 'button', driver: 'button', pin: 2},
+
+            work: function(my) {
+              my.button.on('push', function() {
+                Logger.info("Button pushed!");
+              });
+            }
+          }).start();
+
+    %h3 CoffeeScript
+    :markdown
+          :::javascript
+          Cylon = require 'cylon'
+
+          Cylon.robot
+            connection:
+              name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0'
+
+            device:
+              name: 'button', driver: 'button', pin: 2
+
+            work: (my) ->
+              my.button.on 'push', -> Logger.info "Button pushed!"
+
+          .start()
+
+  %section.circuit
+    %h2 Circuit and Schematic
+    =link_to "http://arduino.cc/en/tutorial/button", "http://arduino.cc/en/tutorial/button", target:"_blank" 
+
+  %section.compatability.hardware
+    %h2 Works with:
+    =# TODO: Update platform list with all that work with this driver in Cylon.js.
+    .devices
+      = partial "documentation/partials/arduino"
+      = #partial "documentation/partials/beaglebone"
+      = #partial "documentation/partials/digispark"
+      = #partial "documentation/partials/raspberry-pi"

@@ -1,0 +1,57 @@
+---
+title: Ardrone with Cylon.js
+author: The Hybrid Group
+page_title: Ardrone
+page_subtitle: "You can find the examples on this two repositories here:<br><a href='https://github.com/hybridgroup/cylon/blob/master/examples/drone.js' target='blanck' class='repository'>javascript</a><a href='https://github.com/hybridgroup/cylon/blob/master/examples/drone.coffee' target='blanck' class='repository'>coffeescript</a>"
+layout: page
+---
+
+.documentation
+  %section.intro
+    %h2 Examples
+    %h3 Javascript
+    :markdown
+          :::javascript
+          var Cylon = require('cylon');
+
+          Cylon.robot({
+            connection: {name: 'ardrone', adaptor: 'ardrone', port: '192.168.1.1'},
+            device: {name: 'drone', driver: 'ardrone'},
+
+            work: function(my) {
+              my.drone.takeoff();
+
+              after((10).seconds(), function() {
+                my.drone.land();
+              }
+
+              after((15).seconds(), function() {
+                my.drone.stop();
+              }
+            }
+          }).start();
+          
+
+    %h3 CoffeeScript
+    :markdown
+          :::javascript
+          Cylon = require('cylon')
+
+          Cylon.robot
+            connection:
+              name: 'ardrone', adaptor: 'ardrone', port: '192.168.1.1'
+
+            device:
+              name: 'drone', driver: 'ardrone'
+
+            work: (my) ->
+              my.drone.takeoff()
+
+              after 10.seconds(), ->
+                my.drone.land()
+
+              after 15.seconds(), ->
+                my.drone.stop()
+
+          .start() 
+          

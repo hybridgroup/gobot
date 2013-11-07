@@ -1,0 +1,103 @@
+---
+title: Pebble with Cylon.js
+author: The Hybrid Group
+page_title: Pebble
+page_subtitle: "<a href='https://github.com/hybridgroup/Cylon.js-pebble' class='repository'>Repository</a> <a class+'issues' href='https://github.com/hybridgroup/Cylon.js-pebble/issues'>Issues</a>"
+layout: page
+---
+.documentation
+  %section.intro
+    = image_tag "/images/pebble.jpg", class: "display"
+
+    %p
+      The Pebble is a smart watch, that connects via bluetooth.
+
+    %p
+      For more info about the Pebble platform click
+      = succeed "." do
+        = link_to "here", "http://getpebble.com/", target: :blank
+
+  %section.how-to
+    %h2 How to install
+    %p
+      Installing Cylon.js with pebble support is pretty easy using ruby gems.
+    :markdown
+          :::bash
+          gem install Cylon.js-pebble
+    %h2 How to use
+    %p
+      This small program receives button press events from a Pebble smart watch.
+    :markdown
+          :::ruby
+          require 'Cylon.js'
+
+          connection :pebble, :adaptor => :pebble, :port => "/dev/rfcomm0", :id => "378B"
+          device :watch, :driver => :pebble
+
+          work do
+            on watch, :media_control => :button_push
+          end
+
+          def button_push(caller, data)
+            puts data.button unless data.nil?
+          end
+    %h2 How to connect
+    %p This software requires version 1.12.0 of the Pebble watch firmware.
+
+    %h3 OSX
+
+    %p The main steps are:
+
+    %ul
+      %li Pair your computer and the Pebble
+      %li Use a socket to serial connection to map a TCP socket to the local port
+      %li Connect to the device via Cylon.js
+      %li To figure out which port your pebble is connected to, use the Cylon.js connect scan command:
+
+    :markdown
+          :::bash
+          $ Cylon.js connect scan
+
+    %p Now you are ready to connect to the Sphero using the socket, in this example port 4567:
+
+    :markdown
+          :::bash
+          Cylon.js connect serial 4567 pebble
+
+    %h3 Ubuntu
+
+    %p The main steps are:
+
+    %ul
+      %li Pair your computer and the Pebble
+      %li Map your device to a port
+      %li Use a socket to serial connection to map a TCP socket to the local port
+      %li Connect to the device via Cylon.js
+      %li You will need to pair with the Pebble, entering any needed password.
+
+    %p Then you can find the Bluetooth address, for example 00:18:33:86:37:8B, by using the Cylon.js connect scan command:
+
+    :markdown
+          :::bash
+          $ Cylon.js connect scan
+
+    %p Once you know the address, you can use the Cylon.js connect bind command to map a port to the device:
+
+    :markdown
+          :::bash
+          Cylon.js connect bind 00:18:33:86:37:8B pebble
+
+    %p Now you are ready to connect to the Pebble using a socket, in this example port 4567:
+
+    :markdown
+          :::bash
+          Cylon.js connect socat pebble 4567
+
+  %section.drivers
+    %h2 Drivers
+    %p
+      There is only one driver for the Pebble platform, as listed below.
+
+    .hardware
+      .devices
+        = partial "documentation/partials/pebble-driver"

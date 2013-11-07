@@ -1,0 +1,104 @@
+---
+hero: true
+social: true
+title: Gobot
+author: The Hybrid Group
+description: Gobot is a Go framework for robotics and physical computing. It provides a simple, but powerful DSL (domain-specific language) for robots and physical computing.
+layout: home
+---
+
+:markdown
+  ## About
+  
+  Gobot is a Go framework for robotics and physical computing.
+
+  It provides a simple, yet powerful way to create solutions that incorporate multiple, different hardware devices at the same time.
+
+  Want to use Ruby on robots? Check out our sister project Artoo [(http://artoo.io)](http://artoo.io).
+
+  ## Meet The Code
+
+  Cylon.js’s makes commanding robots incredibly simple and fun.
+
+  All you need to get started is the `cylon` module:
+
+      :::javascript
+      npm install cylon
+
+  ... and whichever `cylon` module is needed for your specific hardware (in this case, a [Sphero](http://gosphero.com)):
+
+      :::javascript
+      npm install cylon-sphero
+
+  Now write your robot code. Require Cylon.js, and create a robot:
+
+      :::javascript
+      var Cylon = require('cylon');
+
+      // Initialize the robot
+      var robot = Cylon.robot({
+
+  Then tell the robot code about your hardware to hook it up:
+
+      :::javascript
+        connection: {name: 'sphero', adaptor: 'sphero', port: '/dev/rfcomm0'},
+
+        device: {name: 'ball', driver: 'sphero'},
+
+  And tell it what work to do. This code tells the Sphero that every second, it should roll around in a random direction:
+
+      :::javascript
+        work: function(my) {
+          every((1).second(), function() { 
+            my.ball.roll(60, Math.floor(Math.random() * 360));
+          });
+        }
+      });
+
+  Last, tell the robot to start. That's it!
+
+      :::javascript
+      
+      robot.start();
+
+  ## Getting Started
+
+  Ready to build JavaScript robots with Cylon.js? [Get Started Here!](/documentation/getting-started)
+
+%h2 Hardware Support
+%p
+  Cylon.js has a extensible system for connecting to hardware devices. The following robotics and physical computing platforms are currently supported:
+  %ul
+    %li
+      = link_to "Arduino", "http://www.arduino.cc/", target:"_blank" 
+      &lt;==&gt;
+      = link_to "Cylon.js for Firmata (Adaptor)", "https://github.com/hybridgroup/cylon-firmata", target:"_blank" 
+    %li
+      = link_to "Ardrone", "http://ardrone2.parrot.com/", target:"_blank"  
+      &lt;==&gt;
+      = link_to "Cylon.js for ARDrone (Adaptor/Drivers)", "https://github.com/hybridgroup/cylon-ardrone", target:"_blank" 
+    %li
+      = link_to "Sphero", "http://www.gosphero.com/", target:"_blank"  
+      &lt;==&gt;
+      = link_to "Cylon.js for Sphero (Adaptor/Driver)", "https://github.com/hybridgroup/cylon-sphero", target:"_blank" 
+%p Support for common shared device drivers, is provded using the General Purpose Input/Output (GPIO) module:
+%ul
+  %li
+    = link_to "GPIO", "https://en.wikipedia.org/wiki/General_Purpose_Input/Output" , target:"_blank" 
+    &lt;==&gt;
+    = link_to "Cylon.js for GPIO (Drivers)", "https://github.com/hybridgroup/cylon-gpio" , target:"_blank"  
+
+%p Support for devices that use Inter-Integrated Circuit (I2C) have a shared set of drivers provded using the cylon-i2c module:
+%ul 
+  %li  
+    = link_to "I2C", "https://en.wikipedia.org/wiki/I%C2%B2C", target:"_blank" 
+    &lt;==&gt;
+    = link_to "Cylon.js for I2C (Drivers)", "https://github.com/hybridgroup/cylon-i2c", target:"_blank"     
+%p More platforms and drivers are coming soon...
+
+:markdown
+  ## Be Part Of The Robot Evolution
+
+  - Code on Github:   [https://github.com/hybridgroup/cylon](https://github.com/hybridgroup/cylon)
+  - Join us on IRC:   `#cylon @ irc.freenode.net`
+  - Join us on our [Trello Board](https://trello.com/b/l1aEuqMU/cylon).

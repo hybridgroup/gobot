@@ -1,0 +1,108 @@
+---
+title: Cylon.js - XBox360 Controller Driver
+author: The Hybrid Group
+page_title: XBox360 Controller
+page_subtitle: Driver
+layout: page
+---
+.documentation
+  %section.intro
+    =image_tag "/images/xbox360.jpg", class: "display"
+    %p
+      Allows user to interact with Cylon.js devices using a XBox360 game controller.
+
+  %section.how-to
+    %h2 How to establish a connection and setup the driver
+    :markdown
+          :::ruby
+          require 'Cylon.js'
+          connection :joystick, :adaptor => :joystick
+          device :controller, :driver => :xbox360, :connection => :joystick, :interval => 0.1
+
+  %section.public-methods
+    %h2 Public driver events
+    %h3 button_a
+    %p
+      Get's triggered every interval amount of time if the a button is pressed.
+
+    %h3 button_b
+    %p
+      Get's triggered every interval amount of time if the b button is pressed.
+
+    %h3 button_x
+    %p
+      Get's triggered every interval amount of time if the x button is pressed.
+
+    %h3 button_y
+    %p
+      Get's triggered every interval amount of time if the y button is pressed.
+
+    %h3 button_lb
+    %p
+      Get's triggered every interval amount of time if the left bumper button is pressed.
+
+    %h3 button_rb
+    %p
+      Get's triggered every interval amount of time if the right bumper button is pressed.
+
+    %h3 button_start
+    %p
+      Get's triggered every interval amount of time if the start button is pressed.
+
+    %h3 button_back
+    %p
+      Get's triggered every interval amount of time if the back button is pressed.
+
+    %h3 joystick
+    %p
+      Get's triggered every interval amount of time if a joystick event occured, you can access values x, y, s(joystick number, 0 and 1 for left and right).
+
+    %h3 joystick_0
+    %p
+      Get's triggered every interval amount of time if a joystick_0 event occured, you can access values x, y.
+
+    %h3 joystick_1
+    %p
+      Get's triggered every interval amount of time if a joystick_1 event occured, you can access values x, y.
+
+    %h3 How to use events and call them on your drivers
+    %p Pretty simple, when the connection and the driver have been setup (as explained above) you can call events on them as follows:
+    :markdown
+          :::ruby
+          on controller, :button_a => proc { |*value| puts "ayyyy!" }
+
+  %section.how-to
+    %h2 How to use
+    %h3 Example receiving button events from XBox360 controller joystick.
+    :markdown
+          :::ruby
+          require 'Cylon.js'
+
+          connection :joystick, :adaptor => :joystick
+          device :controller, :driver => :xbox360, :connection => :joystick, :interval => 0.1
+
+          work do
+            on controller, :joystick_0 => proc { |*value|
+              puts "joystick 0 - x:\#{value[1][:x]} y:\#{value[1][:y]}"
+            }
+            on controller, :joystick_1 => proc { |*value|
+              puts "joystick 1 - x:\#{value[1][:x]} y:\#{value[1][:y]}"
+            }
+            on controller, :button_a => proc { |*value|
+              puts "ayyyy!"
+            }
+            on controller, :button_b => proc { |*value|
+              puts "bee!"
+            }
+            on controller, :button_x => proc { |*value|
+              puts "exxx!"
+            }
+            on controller, :button_y => proc { |*value|
+              puts "why!"
+            }
+          end
+
+  %section.compatability.hardware
+    %h2 Works with:
+    .devices
+      = partial "documentation/partials/joystick"
