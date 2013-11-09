@@ -2,7 +2,7 @@
 
 A Go library for robotics and physical computing 
 
-Gobot (http://gobot.io/) is a library for robotics and physical computing using Go
+Gobot (http://gobot.io/) is a set of libraries for robotics and physical computing using Go
 
 It provides a simple, yet powerful way to create solutions that incorporate multiple, different hardware devices at the same time.
 
