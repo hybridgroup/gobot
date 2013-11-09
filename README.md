@@ -22,7 +22,6 @@ package main
 import (
   "github.com/hybridgroup/gobot"
   "github.com/hybridgroup/gobot-sphero"
-  "fmt"
 )
 
 func main() {
