@@ -18,6 +18,74 @@ layout: home
 
   Want to use Node.js? Check out our sister project Cylon [(http://cylonjs.com)](http://cylonjs.com).
 
+  ## Meet The Code
+
+  Gobot makes commanding robots incredibly simple and fun.
+
+  All you need to get started is install the library with :  
+
+  `go get -u github.com/hybridgroup/gobot`.
+
+  Then install additional libraries for whatever hardware support you want to use from your robot. For example, `go get -u github.com/hybridgroup/gobot-sphero` to use Gobot with a Sphero.
+
+  ## Example
+
+      :::javascript
+      package main
+      import (
+        "github.com/hybridgroup/gobot"
+        "github.com/hybridgroup/gobot-sphero"
+      )
+
+      func main() {
+
+        spheroAdaptor := new(gobotSphero.SpheroAdaptor)
+        spheroAdaptor.Name = "Sphero"
+        spheroAdaptor.Port = "127.0.0.1:4560"
+
+        sphero := gobotSphero.NewSphero(spheroAdaptor)
+        sphero.Name = "Sphero"
+
+        connections := []interface{} {
+          spheroAdaptor,
+        }
+
+        devices := []interface{} {
+          sphero,
+        }
+
+        work := func(){
+          gobot.Every("2s", func(){ 
+            sphero.Roll(100, uint16(gobot.Random(0, 360))) 
+          })
+        }
+
+        robot := gobot.Robot{
+          Connections: connections, 
+          Devices: devices,
+          Work: work,
+        }
+
+        robot.Start()
+        }  
+
+
+%h2 Hardware Support
+%p
+  Gobot has a extensible system for connecting to hardware devices. The following robotics and physical computing platforms are currently supported:
+  %ul
+    %li
+      = link_to "Beaglebone Black", "http://beagleboard.org/Products/BeagleBone+Black/", target:"_blank" 
+      &lt;==&gt;
+      = link_to "Library", "https://github.com/hybridgroup/gobot-beaglebone", target:"_blank" 
+    %li
+      = link_to "Sphero", "http://www.gosphero.com/", target:"_blank"  
+      &lt;==&gt;
+      = link_to "Library", "https://github.com/hybridgroup/gobot-sphero", target:"_blank" 
+      
+%p More platforms and drivers are coming soon...
+
+:markdown
   ## Be Part Of The Robot Evolution
 
   - Code on Github:   [https://github.com/hybridgroup/gobot](https://github.com/hybridgroup/gobot)

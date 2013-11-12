@@ -1,5 +1,5 @@
 ---
-title: Cylon.js Getting Started
+title: Gobot Getting Started
 author: The Hybrid Group
 description: Cylon.js Getting Started
 page_title: Getting Started
@@ -9,164 +9,176 @@ layout: page
 
 %section.intro
 
-  = partial "../what_is_cylon"
+  = partial "../what_is_gobot"
 
 
 %section.how-to
-  %h2 How to Install Node.js
-  %h3 OSX
-  %p 
-  Go to the Node.js downloads page at 
-  = link_to "http://nodejs.org/download/", "http://nodejs.org/download/", target:"blank"  
-  download the installer file and run it.
-  %h3 Ubuntu
-  %p 
-  Follow the installation instructions at 
-  =link_to "https://github.com/joyent/node/wiki/Installation", "https://github.com/joyent/node/wiki/Installation", target:"_blank"  
-  to install the latest Node.js
-  %h3 Windows
-  %p 
-  Go to the Node.js downloads page at 
-  = link_to "http://nodejs.org/download/", "http://nodejs.org/download/", target:"blank"  
-  download the installer file and run it.
+  -#%h2 How to Install Node.js
+  -#%h3 OSX
+  -#%p 
+  -#Go to the Node.js downloads page at 
+  -#= link_to "http://nodejs.org/download/", "http://nodejs.org/download/", target:"blank"  
+  -#download the installer file and run it.
+  -#%h3 Ubuntu
+  -#%p 
+  -#Follow the installation instructions at 
+  -#=link_to "https://github.com/joyent/node/wiki/Installation", "https://github.com/joyent/node/wiki/Installation", target:"_blank"  
+  -#to install the latest Node.js
+  -#%h3 Windows
+  -#%p 
+  -#Go to the Node.js downloads page at 
+  -#= link_to "http://nodejs.org/download/", "http://nodejs.org/download/", target:"blank"  
+  -#download the installer file and run it.
 
 %section.cylon-installation
-  %h2 How to Install Cylon.js
+  %h2 How to Install Gobot
   :markdown
-    In order to use Cylon.js, you must install the Cylon.js node modules needed to control your particular hardware setup. For example, to use Cylon.js with an Arduino, you will need to install the `cylon-firmata` module. Check out these examples:
+    Install the library with: `go get -u github.com/hybridgroup/gobot`
+
+    In order to use Gobot, you must install the libraries needed to control your particular hardware setup. For example, to use Gobot with an Beaglebone, you will need to install the `go get -u github.com/hybridgroup/gobot-beaglebone` library. Check out these examples:
 
   %h3 OSX
   :markdown
         :::javascript
-        npm install cylon
-        npm install cylon-firmata
+        go get -u github.com/hybridgroup/gobot
+        go get -u github.com/hybridgroup/gobot-beaglebone
 
   %h3 Ubuntu
   :markdown
         :::javascript
-        npm install cylon
-        npm install cylon-firmata
+        go get -u github.com/hybridgroup/gobot
+        go get -u github.com/hybridgroup/gobot-beaglebone
 
   %h3 Windows
   %p
     Windows setup for cylon.
 
   %section.cylon-running
-  %h2 Cylon.js Robots
+  %h2 Gobot Robots
   %h3 Writing your robot code:
 
   %p 
   Now you are ready to write your own code. Take a look at the examples below, or go to the 
-  = link_to "examples", "https://github.com/hybridgroup/cylon/tree/master/examples", target:"blank"  
+  = link_to "examples", "https://github.com/hybridgroup/gobot/tree/master/examples", target:"blank"  
   directory for a whole bunch of code you can use to help get started. We recommend using Test-Driven Robotics (TDR) with your preferred test frameworks.
 
-  %h3 Running your robot:
-
-  :markdown
-        :::javascript
-        node robotfilename.js
-
-  %p or
-  
-  :markdown
-        :::javascript
-        coffee robotfilename.coffee
 
 %section.cylon-code
-  %h2 Cylon.js Code Examples
+  %h2 Gobot Code Examples
 
-  %h3 Example: Arduino with LED and a button
+  %h3 Example: Beaglebone with blinkm.
   :markdown
-    To use this example, you must first run `npm install cylon-firmata`
-  %h4 Javascript
+    To use this example, you must first run `go get -u github.com/hybridgroup/gobot-beaglebone`
+
   :markdown
         :::javascript
-       
-        var Cylon = require('cylon');
+        package main
 
-        Cylon.robot({
-          connection: { name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0' },
-          devices: [{name: 'led', driver: 'led', pin: 13},
-                    {name: 'button', driver: 'button', pin: 2}],
+        import (
+          . "gobot"
+          "time"
+        )
 
-          work: function(my) {
-            my.button.on('push', function() {my.led.toggle()});
+        func main() {
+
+          beaglebone := new(Beaglebone)
+          beaglebone.Name = "Beaglebone"
+
+          led := NewLed(beaglebone)
+          led.Driver = Driver{
+            Name: "led",
+            Pin: "P9_12",
           }
-        }).start();
 
-  %h4 CoffeeScript
-  :markdown
-        :::javascript
-        Cylon = require 'cylon'
-
-        Cylon.robot
-          connection:
-            name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0'
-
-          devices:
-            [
-              {name: 'led', driver: 'led', pin: 13},
-              {name: 'button', driver: 'button', pin: 2}
-            ]
-
-          work: (my) ->
-            my.button.on 'push', -> my.led.toggle()
-
-        .start()
-
-  %h3 Parrot ARDrone 2.0
-  :markdown
-    To use this example, you must first run `npm install cylon-ardrone`
-  %h4 Javascript
-  :markdown
-        :::javascript
-        var Cylon = require('cylon');
-
-        Cylon.robot({
-          connection: {name: 'ardrone', adaptor: 'ardrone', port: '192.168.1.1'},
-          device: {name: 'drone', driver: 'ardrone'},
-          work: function(my) {
-            my.drone.takeoff();
-
-            after((10).seconds(), function() {
-              my.drone.land();
-            }
-
-            after((15).seconds(), function() {
-              my.drone.stop();
-            }
+          connections := []interface{} {
+            beaglebone,
           }
-        }).start();
+          devices := []interface{} {
+            led,
+          }
 
-  %h4 CoffeeScript 
+          work := func(){
+            Every(1000 * time.Millisecond, func(){ led.Toggle() })
+          }
+          
+          robot := Robot{
+              Connections: connections, 
+              Devices: devices,
+              Work: work,
+          }
+
+          robot.Start()
+        }
+
+  %h3 Sphero 2.0
+  :markdown
+    To use this example, you must first run `go get -u github.com/hybridgroup/gobot-sphero`
   :markdown
         :::javascript
-        Cylon = require 'cylon'
+        package main
+        import (
+          "github.com/hybridgroup/gobot"
+          "github.com/hybridgroup/gobot-sphero"
+          "fmt"
+        )
 
-        Cylon.robot
-          connection:
-            name: 'ardrone', adaptor: 'ardrone', port: '192.168.1.1'
+        func main() {
 
-          device:
-            name: 'drone', driver: 'ardrone'
+          spheroAdaptor := new(gobotSphero.SpheroAdaptor)
+          spheroAdaptor.Name = "Sphero"
+          spheroAdaptor.Port = "127.0.0.1:4560"
 
-          work: (my) ->
-            my.drone.takeoff()
+          sphero := gobotSphero.NewSphero(spheroAdaptor)
+          sphero.Name = "Sphero"
 
-            after 10.seconds(), ->
-              my.drone.land()
+          connections := []interface{} {
+            spheroAdaptor,
+          }
+          devices := []interface{} {
+            sphero,
+          }
 
-            after 15.seconds(), ->
-              my.drone.stop()
+          work := func(){
 
-        .start()
+            sphero.Stop()
+
+            go func() {
+              for{
+                gobot.On(sphero.Events["Collision"])
+                fmt.Println("Collision Detected!")
+              }
+            }()    
+            
+            gobot.Every("2s", func(){ 
+              dir := uint16(gobot.Random(0, 360))
+              sphero.Roll(100, dir) 
+            })
+
+            gobot.Every("3s", func(){ 
+              r := uint8(gobot.Random(0, 255))
+              g := uint8(gobot.Random(0, 255))
+              b := uint8(gobot.Random(0, 255))
+              sphero.SetRGB(r, g, b)
+            })
+          }
+          
+          robot := gobot.Robot{
+              Connections: connections, 
+              Devices: devices,
+              Work: work,
+          }
+
+          robot.Start()
+        }
+
+  
 
 %section.contributing
   %h2 Contributing
 
   %p 
-    You can help cylon grow by contributing your code, new drivers or platforms to the project, check the Github page
-    = link_to "cylon on github.","https://github.com/hybridgroup/cylon" 
+    You can help gobot grow by contributing your code, new drivers or platforms to the project, check the Github page
+    = link_to "gobot on github.","https://github.com/hybridgroup/gobot" 
 
   %ul
     %li Fork it

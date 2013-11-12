@@ -1,5 +1,5 @@
 ---
-title: Cylon.js - BlinkM Driver
+title: Gobot - BlinkM Driver
 author: The Hybrid Group
 page_title: BlinkM
 page_subtitle: Driver
@@ -14,29 +14,36 @@ layout: page
   %section.how-to
     %h2 How to establish a connection and setup the driver
     :markdown
-      Install the module with `npm install cylon-i2c`
-    %h3 JavaScript
+      Install the library with `go get -u github.com/hybridgroup/gobot`
     :markdown
           :::javascript
-          var Cylon = require('cylon');
+          package main
 
-          Cylon.robot({
-            connection: { name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0' },
-            device: {name: 'led', driver: 'led', pin: 13},
+          import (
+            "github.com/hybridgroup/gobot"
+            "github.com/hybridgroup/gobot-beaglebone"
+            "time"
+          )
+
+          func main() {
+
+            beaglebone := new(gobotBeaglebone.Beaglebone)
+            beaglebone.Name = "Beaglebone"
+
+            led := gobotBeaglebone.NewLed(beaglebone)
+            led.Driver = gobot.Driver{
+              Name: "led",
+              Pin: "P9_12",
+            }
+
+            connections := []interface{} {
+              beaglebone,
+            }
+            devices := []interface{} {
+              led,
+            }
             ...
 
-    %h3 CoffeeScript
-    :markdown
-          :::javascript
-          Cylon = require('cylon')
-
-          Cylon.robot
-            connection:
-              name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0'
-
-            device:
-              name: 'led', driver: 'led', pin: 13
-            ...
   %section.public-events
     %h2 Commands:
     
@@ -62,37 +69,47 @@ layout: page
   %section.how-to
     %h2 How to use
     %p Example using a BlinkM.
-    %h3 JavaScript
     :markdown
           :::javascript
-          var Cylon = require('cylon');
+          package main
 
-          Cylon.robot({
-            connection: { name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0' },
-            device: {name: 'led', driver: 'led', pin: 13},
+          import (
+            "github.com/hybridgroup/gobot"
+            "github.com/hybridgroup/gobot-beaglebone"
+            "time"
+          )
 
-            work: function(my) {
-              every((1).seconds(), function() {my.led.toggle()});
+          func main() {
+
+            beaglebone := new(gobotBeaglebone.Beaglebone)
+            beaglebone.Name = "Beaglebone"
+
+            led := gobotBeaglebone.NewLed(beaglebone)
+            led.Driver = gobot.Driver{
+              Name: "led",
+              Pin: "P9_12",
             }
-          }).start();
 
-    %h3 CoffeeScript
-    :markdown
-          :::javascript
-          Cylon = require('cylon')
+            connections := []interface{} {
+              beaglebone,
+            }
+            devices := []interface{} {
+              led,
+            }
 
-          Cylon.robot
-            connection:
-              name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0'
+            work := func(){
+              gobot.Every(1000 * time.Millisecond, func(){ led.Toggle() })
+            }
+            
+            robot := gobot.Robot{
+                Connections: connections, 
+                Devices: devices,
+                Work: work,
+            }
 
-            device:
-              name: 'led', driver: 'led', pin: 13
-
-            work: (my) ->
-              # we do our thing here
-              every 1.second(), -> my.led.toggle()
-
-          .start()
+            robot.Start()
+          }
+    
 
   %section.circuit
     %h2 Circuit and Schematic
@@ -102,7 +119,7 @@ layout: page
   %section.compatability.hardware
     %h2 Works with:
     .devices
-      = partial "documentation/partials/arduino"
-      =# partial "documentation/partials/beaglebone"
+      = #partial "documentation/partials/arduino"
+      =partial "documentation/partials/beaglebone"
       =# partial "documentation/partials/digispark"
       =#s partial "documentation/partials/raspberry-pi"
