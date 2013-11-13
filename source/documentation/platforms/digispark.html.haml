@@ -1,8 +1,8 @@
 ---
-title: Digispark with Cylon.js
+title: Digispark with Gobot
 author: The Hybrid Group
 page_title: Digispark
-page_subtitle: "<a href='https://github.com/hybridgroup/Cylon.js-digispark' class='repository'>Repository</a> <a class+'issues' href='https://github.com/hybridgroup/Cylon.js-digispark/issues'>Issues</a>"
+page_subtitle: "<a href='https://github.com/hybridgroup/gobot-digispark' class='repository'>Repository</a> <a class+'issues' href='https://github.com/hybridgroup/gobot-digispark/issues'>Issues</a>"
 layout: page
 ---
 .documentation
@@ -23,29 +23,61 @@ layout: page
   %section.how-to
     %h2 How to install
     %p
-      Installing Cylon.js with digispark support is pretty easy using ruby gems.
+      Installing Gobot with digispark support is pretty easy.
     :markdown
           :::bash
-          gem install Cylon.js-digispark
+          go get -u github.com/hybridgroup/gobot-digispark
     %h2 How to use
     %p
       This small program lets you toggle an LED on and off.
     :markdown
-          :::ruby
-          require 'Cylon.js'
+          :::javascript
+          package main
 
-          connection :digispark, :adaptor => :littlewire, :vendor => 0x1781, :product => 0x0c9f
-          device :board, :driver => :device_info
-          device :led, :driver => :led, :pin => 1
+          import (
+            "github.com/hybridgroup/gobot"
+            "github.com/hybridgroup/gobot-digispark"
+            "github.com/hybridgroup/gobot-gpio"
+            "fmt"
+          )
 
-          work do
-            puts "Firmware name: \#{board.firmware_name}"
-            puts "Firmware version: \#{board.version}"
+          func main() {
 
-            every 1.second do
-              led.toggle
-            end
-          end
+            digispark := new(gobotDigispark.DigisparkAdaptor)
+            digispark.Name = "Digispark"
+
+            led := gobotGPIO.NewLed(&digispark)
+            led.Driver = gobot.Driver{
+              Name: "led",
+              Pin: "2",
+            }
+
+            connections := []interface{} {
+              digispark,
+            }
+            devices := []interface{} {
+              led,
+            }
+
+            work := func(){
+              gobot.Every("0.5s", func(){ 
+                led.Toggle() 
+                if led.IsOn() {
+                  fmt.Println("On")
+                } else {
+                  fmt.Println("Off")
+                }
+              })
+            }
+            
+            robot := gobot.Robot{
+                Connections: connections, 
+                Devices: devices,
+                Work: work,
+            }
+
+            robot.Start()
+          }
 
     %h2 How to connect
     %p
@@ -53,77 +85,77 @@ layout: page
       %a{ href:"http://www.kickstarter.com/projects/digistump/digispark-the-tiny-arduino-enabled-usb-dev-board"} http://www.kickstarter.com/projects/digistump/digispark-the-tiny-arduino-enabled-usb-dev-board
       ) ATTiny-based USB development board already has the Little Wire (
       %a{ href:"http://littlewire.cc/"} http://littlewire.cc/
-      ) protocol firmware installed, you can connect right away with Cylon.js.
+      ) protocol firmware installed, you can connect right away with Gobot.
 
     %p
       Otherwise, for instructions on how to install Little Wire on a Digispark check out 
       %a{ href:"http://digistump.com/board/index.php/topic,160.0.html " } http://digistump.com/board/index.php/topic,160.0.html 
 
-    %h3 OSX
-    %p
-      The main steps are:
-    %ul
-      %li Plug in the Digispark to the USB port
-      %li Connect to the device via Cylon.js
-    %p First plug the Digispark into your computer via the USB port. Then... (directions go here)
+    -#%h3 OSX
+    -#%p
+      -#The main steps are:
+    -#%ul
+      -#%li Plug in the Digispark to the USB port
+      -#%li Connect to the device via Gobot
+    -#%p First plug the Digispark into your computer via the USB port. Then... (directions go here)
 
-    %h3 Ubuntu
-    %p
-      The main steps are:
-    %ul
-      %li Add a udev rule to allow access to the Digispark device
-      %li Plug in the Digispark to the USB port
-      %li Connect to the device via Cylon.js
-    %p
-      First, you must add a udev rule, so that Cylon.js can communicate with the USB device. Ubuntu and
-      other modern Linux distibutions use udev to manage device files when USB devices are added and
-      removed. By default, udev will create a device with read-only permission which will not allow to
-      you download code. You must place the udev rules below into a file named /etc/udev/rules.d/49-micronucleus.rules.
-    :markdown
-          :::bash
-          # UDEV Rules for Micronucleus boards including the Digispark.
-          # This file must be placed at:
-          #
-          # /etc/udev/rules.d/49-micronucleus.rules    (preferred location)
-          #   or
-          # /lib/udev/rules.d/49-micronucleus.rules    (req'd on some broken systems)
-          #
-          # After this file is copied, physically unplug and reconnect the board.
-          #
-          SUBSYSTEMS=="usb", ATTRS{idVendor}=="1781", ATTRS{idProduct}=="0c9f", MODE:="0666"
-          KERNEL=="ttyACM*", ATTRS{idVendor}=="1781", ATTRS{idProduct}=="0c9f", MODE:="0666", ENV{ID_MM_DEVICE_IGNORE}="1"
+    -#%h3 Ubuntu
+    -#%p
+      -#The main steps are:
+    -#%ul
+      -#%li Add a udev rule to allow access to the Digispark device
+      -#%li Plug in the Digispark to the USB port
+      -#%li Connect to the device via Gobot
+    -#%p
+      -#First, you must add a udev rule, so that Cylon.js can communicate with the USB device. Ubuntu and
+      -#other modern Linux distibutions use udev to manage device files when USB devices are added and
+      -#removed. By default, udev will create a device with read-only permission which will not allow to
+      -#you download code. You must place the udev rules below into a file named /etc/udev/rules.d/49-micronucleus.rules.
+    -#:markdown
+          -#:::bash
+          -## UDEV Rules for Micronucleus boards including the Digispark.
+          -## This file must be placed at:
+          -##
+          -## /etc/udev/rules.d/49-micronucleus.rules    (preferred location)
+          -##   or
+          -## /lib/udev/rules.d/49-micronucleus.rules    (req'd on some broken systems)
+          -##
+          -## After this file is copied, physically unplug and reconnect the board.
+          -##
+          -#SUBSYSTEMS=="usb", ATTRS{idVendor}=="1781", ATTRS{idProduct}=="0c9f", MODE:="0666"
+          -#KERNEL=="ttyACM*", ATTRS{idVendor}=="1781", ATTRS{idProduct}=="0c9f", MODE:="0666", ENV{ID_MM_DEVICE_IGNORE}="1"
 
-          SUBSYSTEMS=="usb", ATTRS{idVendor}=="16d0", ATTRS{idProduct}=="0753", MODE:="0666"
-          KERNEL=="ttyACM*", ATTRS{idVendor}=="16d0", ATTRS{idProduct}=="0753", MODE:="0666", ENV{ID_MM_DEVICE_IGNORE}="1"
-          #
-          # If you share your linux system with other users, or just don't like the
-          # idea of write permission for everybody, you can replace MODE:="0666" with
-          # OWNER:="yourusername" to create the device owned by you, or with
-          # GROUP:="somegroupname" and mange access using standard unix groups.
-    %p
-      Thanks to @bluebie for these instructions! (
-      %a{ href:"https://github.com/Bluebie/micronucleus-t85/wiki/Ubuntu-Linux" } https://github.com/Bluebie/micronucleus-t85/wiki/Ubuntu-Linux
-      )
+          -#SUBSYSTEMS=="usb", ATTRS{idVendor}=="16d0", ATTRS{idProduct}=="0753", MODE:="0666"
+          -#KERNEL=="ttyACM*", ATTRS{idVendor}=="16d0", ATTRS{idProduct}=="0753", MODE:="0666", ENV{ID_MM_DEVICE_IGNORE}="1"
+          -##
+          -## If you share your linux system with other users, or just don't like the
+          -## idea of write permission for everybody, you can replace MODE:="0666" with
+          -## OWNER:="yourusername" to create the device owned by you, or with
+          -## GROUP:="somegroupname" and mange access using standard unix groups.
+    -#%p
+      -#Thanks to @bluebie for these instructions! (
+      -#%a{ href:"https://github.com/Bluebie/micronucleus-t85/wiki/Ubuntu-Linux" } https://github.com/Bluebie/micronucleus-t85/wiki/Ubuntu-Linux
+      -#)
 
-    %p Now plug the Digispark into your computer via the USB port.
+    -#%p Now plug the Digispark into your computer via the USB port.
 
-    %p Once plugged in, use the Cylon.js connect scan command with the -t usb option to verify your connection info:
+    -#%p Once plugged in, use the Cylon.js connect scan command with the -t usb option to verify your connection info:
 
-    :markdown
-          :::bash
-          $ Cylon.js connect scan -t usb
-    %p
-      Now use the ID info returned to find the product and vendor ID's for the connection info Digispark in your Cylon.js code.
+    -#:markdown
+          -#:::bash
+          -#$ Cylon.js connect scan -t usb
+    -#%p
+      -#Now use the ID info returned to find the product and vendor ID's for the connection info Digispark in your Cylon.js code.
   %section.drivers
     %h2 Drivers
     %p
       Thanks to
-      %b Cylon.js
+      %b Gobot
       and
-      %b ruby
+      %b go
       it is possible to interact with several I/O hardware devices and interfaces connected to the digispark
-      using a set of already defined and easy to use drivers, all of this thanks to the Cylon.js architecture,
-      in conjuction with Cylon.js-digispark adaptor (using the littlewire communication protocol),
+      using a set of already defined and easy to use drivers, all of this thanks to the Gobot architecture,
+      in conjuction with gobot-digispark adaptor (using the littlewire communication protocol),
       which makes it even possible to swap the entire platform for something else like arduino,
       and keep using the same code you just wrote for digispark, this just by swapping a couple
       of lines in your program.
@@ -133,13 +165,13 @@ layout: page
 
     .hardware
       .devices
-        = partial "documentation/partials/analog-sensor"
-        = partial "documentation/partials/button"
-        = partial "documentation/partials/led"
-        = partial "documentation/partials/maxbotix"
-        = partial "documentation/partials/motor"
-        = partial "documentation/partials/servo"
+        =# partial "documentation/partials/analog-sensor"
+        =# partial "documentation/partials/button"
+        =# partial "documentation/partials/led"
+        =# partial "documentation/partials/maxbotix"
+        =# partial "documentation/partials/motor"
+        =# partial "documentation/partials/servo"
         = partial "documentation/partials/blinkm"
-        = partial "documentation/partials/hmc6352-compass"
-        = partial "documentation/partials/wiichuck"
-        = partial "documentation/partials/wiiclassic"
+        =# partial "documentation/partials/hmc6352-compass"
+        =# partial "documentation/partials/wiichuck"
+        =# partial "documentation/partials/wiiclassic"
