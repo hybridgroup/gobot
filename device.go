@@ -23,7 +23,10 @@ func NewDevice(driver interface{}, r *Robot) *Device {
 
 func (d *Device) Start() {
   fmt.Println("Device " + d.Name + " started")
-  reflect.ValueOf(d.Driver).MethodByName("StartDriver").Call([]reflect.Value{})
+  r := reflect.ValueOf(d.Driver).MethodByName("StartDriver")
+  if r.IsValid() {
+    r.Call([]reflect.Value{})
+  }
 }
 
 func (d *Device) Command(method_name string, arguments []string) {
