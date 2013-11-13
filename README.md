@@ -58,6 +58,7 @@ func main() {
 Gobot has a extensible system for connecting to hardware devices. The following robotics and physical computing platforms are currently supported:
 
   - [Beaglebone Black](http://beagleboard.org/Products/BeagleBone+Black/) <=> [Library](https://github.com/hybridgroup/gobot-beaglebone)
+  - [Digispark](http://digistump.com/products/1) <=> [Library](https://github.com/hybridgroup/gobot-digispark)
   - [Sphero](http://www.gosphero.com/) <=> [Library](https://github.com/hybridgroup/gobot-sphero)
 
 More platforms and drivers are coming soon...
