@@ -91,61 +91,6 @@ layout: page
       Otherwise, for instructions on how to install Little Wire on a Digispark check out 
       %a{ href:"http://digistump.com/board/index.php/topic,160.0.html " } http://digistump.com/board/index.php/topic,160.0.html 
 
-    -#%h3 OSX
-    -#%p
-      -#The main steps are:
-    -#%ul
-      -#%li Plug in the Digispark to the USB port
-      -#%li Connect to the device via Gobot
-    -#%p First plug the Digispark into your computer via the USB port. Then... (directions go here)
-
-    -#%h3 Ubuntu
-    -#%p
-      -#The main steps are:
-    -#%ul
-      -#%li Add a udev rule to allow access to the Digispark device
-      -#%li Plug in the Digispark to the USB port
-      -#%li Connect to the device via Gobot
-    -#%p
-      -#First, you must add a udev rule, so that Cylon.js can communicate with the USB device. Ubuntu and
-      -#other modern Linux distibutions use udev to manage device files when USB devices are added and
-      -#removed. By default, udev will create a device with read-only permission which will not allow to
-      -#you download code. You must place the udev rules below into a file named /etc/udev/rules.d/49-micronucleus.rules.
-    -#:markdown
-          -#:::bash
-          -## UDEV Rules for Micronucleus boards including the Digispark.
-          -## This file must be placed at:
-          -##
-          -## /etc/udev/rules.d/49-micronucleus.rules    (preferred location)
-          -##   or
-          -## /lib/udev/rules.d/49-micronucleus.rules    (req'd on some broken systems)
-          -##
-          -## After this file is copied, physically unplug and reconnect the board.
-          -##
-          -#SUBSYSTEMS=="usb", ATTRS{idVendor}=="1781", ATTRS{idProduct}=="0c9f", MODE:="0666"
-          -#KERNEL=="ttyACM*", ATTRS{idVendor}=="1781", ATTRS{idProduct}=="0c9f", MODE:="0666", ENV{ID_MM_DEVICE_IGNORE}="1"
-
-          -#SUBSYSTEMS=="usb", ATTRS{idVendor}=="16d0", ATTRS{idProduct}=="0753", MODE:="0666"
-          -#KERNEL=="ttyACM*", ATTRS{idVendor}=="16d0", ATTRS{idProduct}=="0753", MODE:="0666", ENV{ID_MM_DEVICE_IGNORE}="1"
-          -##
-          -## If you share your linux system with other users, or just don't like the
-          -## idea of write permission for everybody, you can replace MODE:="0666" with
-          -## OWNER:="yourusername" to create the device owned by you, or with
-          -## GROUP:="somegroupname" and mange access using standard unix groups.
-    -#%p
-      -#Thanks to @bluebie for these instructions! (
-      -#%a{ href:"https://github.com/Bluebie/micronucleus-t85/wiki/Ubuntu-Linux" } https://github.com/Bluebie/micronucleus-t85/wiki/Ubuntu-Linux
-      -#)
-
-    -#%p Now plug the Digispark into your computer via the USB port.
-
-    -#%p Once plugged in, use the Cylon.js connect scan command with the -t usb option to verify your connection info:
-
-    -#:markdown
-          -#:::bash
-          -#$ Cylon.js connect scan -t usb
-    -#%p
-      -#Now use the ID info returned to find the product and vendor ID's for the connection info Digispark in your Cylon.js code.
   %section.drivers
     %h2 Drivers
     %p
@@ -161,7 +106,7 @@ layout: page
       of lines in your program.
     %p
       Available drivers for the digispark platform are listed below, the drivers contain detailed documentation and examples of what kind
-      physical computing (using Cylon.js and ruby) you could be doing:
+      physical computing (using Gobot and Go) you could be doing:
 
     .hardware
       .devices
