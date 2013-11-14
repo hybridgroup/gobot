@@ -1,37 +1,37 @@
 package main
 
 import (
-  . "gobot"
-  "time"
+	. "gobot"
+	"time"
 )
 
 func main() {
 
-  beaglebone := new(Beaglebone)
-  beaglebone.Name = "Beaglebone"
+	beaglebone := new(Beaglebone)
+	beaglebone.Name = "Beaglebone"
 
-  led := NewLed(beaglebone)
-  led.Driver = Driver{
-    Name: "led",
-    Pin: "P9_12",
-  }
+	led := NewLed(beaglebone)
+	led.Driver = Driver{
+		Name: "led",
+		Pin:  "P9_12",
+	}
 
-  connections := []interface{} {
-    beaglebone,
-  }
-  devices := []interface{} {
-    led,
-  }
+	connections := []interface{}{
+		beaglebone,
+	}
+	devices := []interface{}{
+		led,
+	}
 
-  work := func(){
-    Every(1000 * time.Millisecond, func(){ led.Toggle() })
-  }
-  
-  robot := Robot{
-      Connections: connections, 
-      Devices: devices,
-      Work: work,
-  }
+	work := func() {
+		Every(1000*time.Millisecond, func() { led.Toggle() })
+	}
 
-  robot.Start()
+	robot := Robot{
+		Connections: connections,
+		Devices:     devices,
+		Work:        work,
+	}
+
+	robot.Start()
 }
