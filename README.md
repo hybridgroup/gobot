@@ -17,6 +17,7 @@ Then install additional libraries for whatever hardware support you want to use 
 
 ```go
 package main
+
 import (
   "github.com/hybridgroup/gobot"
   "github.com/hybridgroup/gobot-sphero"
@@ -31,23 +32,23 @@ func main() {
   sphero := gobotSphero.NewSphero(spheroAdaptor)
   sphero.Name = "Sphero"
 
-  connections := []interface{} {
+  connections := []interface{}{
     spheroAdaptor,
   }
-  devices := []interface{} {
+  devices := []interface{}{
     sphero,
   }
 
-  work := func(){
-    gobot.Every("2s", func(){ 
-      sphero.Roll(100, uint16(gobot.Random(0, 360))) 
+  work := func() {
+    gobot.Every("2s", func() {
+      sphero.Roll(100, uint16(gobot.Random(0, 360)))
     })
   }
-  
+
   robot := gobot.Robot{
-      Connections: connections, 
-      Devices: devices,
-      Work: work,
+    Connections: connections,
+    Devices:     devices,
+    Work:        work,
   }
 
   robot.Start()
