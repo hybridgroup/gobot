@@ -29,8 +29,8 @@
               %a{href: '/'} Gobot
 
           %span.menu
-            = # link_to "Docs", "", (menu_item("documentation"))
-            = # link_to "Hardware", "", (menu_item("hardware"))
+            =  link_to "Docs", "", (menu_item("documentation"))
+            =  link_to "Hardware", "", (menu_item("hardware"))
             = # link_to "Videos", "", (menu_item("videos"))
             = # link_to "Blog", "", (menu_item("blog"))
             =  link_to "Github", "https://github.com/hybridgroup/gobot/", class: "item", target: "blanck"
@@ -43,12 +43,13 @@
               /working together.
               Go, Robot, Go! Go Powered Robotics
             %h2.subtitle
-              Gobot makes robotics Simple and Extensible.
-              -#= link_to "Simple", "", (menu_item("documentation/getting-started"))  
-              -#and 
-              -#= link_to "Extensible.", "", (menu_item("documentation/platforms"))
+              Gobot makes robotics
+              = link_to "Simple", "", (menu_item("documentation/getting-started"))  
+              and
+              = link_to "Extensible.", "", (menu_item("documentation/platforms"))
 
-            = link_to "Get Started", "https://github.com/hybridgroup/gobot/", class: "cta" 
+
+            = link_to "Get Started", "documentation/getting-started", class: "cta" 
       - unless current_page.data.social.nil?
         .social
           .container

@@ -1,5 +1,5 @@
 ---
-title: Cylon.js - Sphero Driver
+title: Gobot - Sphero Driver
 author: The Hybrid Group
 page_title: Sphero
 page_subtitle: Driver
@@ -9,37 +9,41 @@ layout: page
   %section.intro
     =image_tag "/images/sphero.jpg", class: "display"
     %p
-      Allows user to interact with the Sphero robotic sphero using Cylon.js.
+      Allows user to interact with the Sphero robotic sphero using Gobot.
 
   %section.how-to
     %h2 How to establish a connection and setup the driver
     %p
       That is pretty simple once the Sphero is ready (connected and listening), you just need three lines of code and you are set,
-      Cylon.js and the Sphero driver take care of the rest.
+      Gobot and the Sphero driver take care of the rest.
 
-      %h3 JavaScript
       :markdown
+        Install the library with: `go get -u github.com/hybridgroup/gobot-sphero`
+
             :::javascript
-            var Cylon = require('cylon');
+            package main
+            import (
+              "github.com/hybridgroup/gobot"
+              "github.com/hybridgroup/gobot-sphero"
+              "fmt"
+            )
 
-            Cylon.robot({
-              connection: {name: 'sphero', adaptor: 'sphero', port: '/dev/rfcomm0'},
+            func main() {
 
-              device: {name: 'sphero', driver: 'sphero'},
+              spheroAdaptor := new(gobotSphero.SpheroAdaptor)
+              spheroAdaptor.Name = "Sphero"
+              spheroAdaptor.Port = "127.0.0.1:4560"
+
+              sphero := gobotSphero.NewSphero(spheroAdaptor)
+              sphero.Name = "Sphero"
+
+              connections := []interface{} {
+                spheroAdaptor,
+              }
+              devices := []interface{} {
+                sphero,
+              }
             ...
-
-      %h3 CoffeeScript
-      :markdown
-            :::javascript
-            Cylon = require 'cylon'
-
-            Cylon.robot
-              connection:
-                name: 'sphero', adaptor: 'sphero', port: '/dev/rfcomm0'
-
-              device:
-                name: 'sphero', driver: 'sphero'
-              ...
 
   %section.public-methods
     %h2 Commands:
@@ -204,44 +208,49 @@ layout: page
   %section.how-to
     %h2 How to use
     %p 
-      This example rolls the sphero in a random direction and change direction every second.
+      This example rolls the sphero in a random direction and change direction every 2 seconds.
 
       %h3 JavaScript
       :markdown
             :::javascript
+            package main
+            import (
+              "github.com/hybridgroup/gobot"
+              "github.com/hybridgroup/gobot-sphero"
+              "fmt"
+            )
 
-            var Cylon = require('cylon');
+            func main() {
 
-            Cylon.robot({
-              connection: {name: 'sphero', adaptor: 'sphero', port: '/dev/rfcomm0'},
+              spheroAdaptor := new(gobotSphero.SpheroAdaptor)
+              spheroAdaptor.Name = "Sphero"
+              spheroAdaptor.Port = "127.0.0.1:4560"
 
-              device: {name: 'sphero', driver: 'sphero'},
+              sphero := gobotSphero.NewSphero(spheroAdaptor)
+              sphero.Name = "Sphero"
 
-              work: function(me) {
-                every((1).second(), function() {
-                  me.sphero.roll 60, Math.floor(Math.random() * 360)
-                });
+              connections := []interface{} {
+                spheroAdaptor,
               }
-            }).start();
+              devices := []interface{} {
+                sphero,
+              }
 
-      %h3 CoffeeScript
-      :markdown
-            :::javascript
+              work := func(){
+                gobot.Every("2s", func(){ 
+                  sphero.Roll(100, uint16(gobot.Random(0, 360))) 
+                })
+              }
 
-            Cylon = require('..')
+              robot := gobot.Robot{
+                  Connections: connections, 
+                  Devices: devices,
+                  Work: work,
+              }
 
-            Cylon.robot
-              connection:
-                name: 'sphero', adaptor: 'sphero', port: '/dev/rfcomm0'
+              robot.Start()
+            }
 
-              device:
-                name: 'sphero', driver: 'sphero'
-
-              work: (me) ->
-                every 1.second(), ->
-                  me.sphero.roll 60, Math.floor(Math.random() * 360)
-
-            .start()
   
   %section 
     %h2 Sphero Colors 
