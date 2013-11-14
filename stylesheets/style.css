@@ -1,498 +1,498 @@
 /* normalize.css v2.0.1 | MIT License | git.io/normalize */
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 article, aside, details, figcaption, figure, footer, header, hgroup, nav, section, summary {
   display: block; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 audio, canvas, video {
   display: inline-block; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 audio:not([controls]) {
   display: none;
   height: 0; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 [hidden] {
   display: none; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 html {
   font-family: sans-serif;
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 body {
   margin: 0; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 a:focus {
   outline: thin dotted; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 a:active, a:hover {
   outline: 0; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 h1 {
   font-size: 2em; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 abbr[title] {
   border-bottom: 1px dotted; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 b, strong {
   font-weight: bold; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 dfn {
   font-style: italic; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 mark {
   background: #ff0;
   color: #000; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 code, kbd, pre, samp {
   font-family: monospace,serif;
   font-size: 1em; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 pre {
   white-space: pre;
   white-space: pre-wrap;
   word-wrap: break-word; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 q {
   quotes: "\201C" "\201D" "\2018" "\2019"; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 small {
   font-size: 80%; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 sub, sup {
   font-size: 75%;
   line-height: 0;
   position: relative;
   vertical-align: baseline; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 sup {
   top: -0.5em; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 sub {
   bottom: -0.25em; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 img {
   border: 0; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 svg:not(:root) {
   overflow: hidden; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 figure {
   margin: 0; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 fieldset {
   border: 1px solid silver;
   margin: 0 2px;
   padding: 0.35em 0.625em 0.75em; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 legend {
   border: 0;
   padding: 0; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 button, input, select, textarea {
   font-family: inherit;
   font-size: 100%;
   margin: 0; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 button, input {
   line-height: normal; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 button, html input[type="button"], input[type="reset"], input[type="submit"] {
   -webkit-appearance: button;
   cursor: pointer; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 button[disabled], input[disabled] {
   cursor: default; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 input[type="checkbox"], input[type="radio"] {
   box-sizing: border-box;
   padding: 0; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 input[type="search"] {
   -webkit-appearance: textfield;
   -moz-box-sizing: content-box;
   -webkit-box-sizing: content-box;
   box-sizing: content-box; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 input[type="search"]::-webkit-search-cancel-button, input[type="search"]::-webkit-search-decoration {
   -webkit-appearance: none; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 button::-moz-focus-inner, input::-moz-focus-inner {
   border: 0;
   padding: 0; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 textarea {
   overflow: auto;
   vertical-align: top; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 table {
   border-collapse: collapse;
   border-spacing: 0; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .container {
   position: relative;
   width: 960px;
   margin: 0 auto; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .column, .columns {
   float: left;
   display: inline;
   margin: 0 10px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .row {
   margin-bottom: 21px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .column.alpha, .columns.alpha {
   margin-left: 0; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .column.omega, .columns.omega {
   margin-right: 0; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .container .one.column {
   width: 40px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .container .two.columns {
   width: 100px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .container .three.columns {
   width: 160px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .container .four.columns {
   width: 220px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .container .five.columns {
   width: 280px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .container .six.columns {
   width: 340px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .container .seven.columns {
   width: 400px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .container .eight.columns {
   width: 460px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .container .nine.columns {
   width: 520px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .container .ten.columns {
   width: 580px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .container .eleven.columns {
   width: 640px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .container .twelve.columns {
   width: 700px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .container .thirteen.columns {
   width: 760px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .container .fourteen.columns {
   width: 820px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .container .fifteen.columns {
   width: 880px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .container .sixteen.columns {
   width: 940px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .container .one-third.column {
   width: 300px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .container .two-thirds.column {
   width: 620px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .container .offset-by-one {
   margin-left: 60px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .container .offset-by-two {
   margin-left: 120px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .container .offset-by-three {
   margin-left: 180px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .container .offset-by-four {
   margin-left: 240px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .container .offset-by-five {
   margin-left: 300px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .container .offset-by-six {
   margin-left: 360px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .container .offset-by-seven {
   margin-left: 420px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .container .offset-by-eight {
   margin-left: 480px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .container .offset-by-nine {
   margin-left: 540px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .container .offset-by-ten {
   margin-left: 600px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .container .offset-by-eleven {
   margin-left: 660px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .container .offset-by-twelve {
   margin-left: 720px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .container .offset-by-thirteen {
   margin-left: 780px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .container .offset-by-fourteen {
   margin-left: 840px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .container .offset-by-fifteen {
   margin-left: 900px; }
 
 @media only screen and (min-width: 768px) and (max-width: 959px) {
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .container {
     width: 768px; }
 
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .column.alpha, .columns.alpha {
     margin-right: 10px; }
 
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .column.omega, .columns.omega {
     margin-left: 10px; }
 
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .container .one.column {
     width: 28px; }
 
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .container .two.columns {
     width: 76px; }
 
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .container .three.columns {
     width: 124px; }
 
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .container .four.columns {
     width: 172px; }
 
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .container .five.columns {
     width: 220px; }
 
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .container .six.columns {
     width: 268px; }
 
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .container .seven.columns {
     width: 316px; }
 
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .container .eight.columns {
     width: 364px; }
 
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .container .nine.columns {
     width: 412px; }
 
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .container .ten.columns {
     width: 460px; }
 
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .container .eleven.columns {
     width: 508px; }
 
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .container .twelve.columns {
     width: 556px; }
 
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .container .thirteen.columns {
     width: 604px; }
 
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .container .fourteen.columns {
     width: 652px; }
 
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .container .fifteen.columns {
     width: 700px; }
 
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .container .sixteen.columns {
     width: 748px; }
 
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .container .one-third.column {
     width: 236px; }
 
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .container .two-thirds.column {
     width: 492px; }
 
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .container .offset-by-one {
     margin-left: 48px; }
 
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .container .offset-by-two {
     margin-left: 96px; }
 
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .container .offset-by-three {
     margin-left: 144px; }
 
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .container .offset-by-four {
     margin-left: 192px; }
 
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .container .offset-by-five {
     margin-left: 240px; }
 
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .container .offset-by-six {
     margin-left: 288px; }
 
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .container .offset-by-seven {
     margin-left: 336px; }
 
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .container .offset-by-eight {
     margin-left: 348px; }
 
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .container .offset-by-nine {
     margin-left: 432px; }
 
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .container .offset-by-ten {
     margin-left: 480px; }
 
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .container .offset-by-eleven {
     margin-left: 528px; }
 
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .container .offset-by-twelve {
     margin-left: 576px; }
 
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .container .offset-by-thirteen {
     margin-left: 624px; }
 
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .container .offset-by-fourteen {
     margin-left: 672px; }
 
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .container .offset-by-fifteen {
     margin-left: 720px; } }
 @media only screen and (max-width: 767px) {
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .container {
     width: 300px; }
 
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .column, .columns {
     margin: 0; }
 
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .container .one.column, .container .two.columns, .container .three.columns, .container .four.columns, .container .five.columns, .container .six.columns, .container .seven.columns, .container .eight.columns, .container .nine.columns, .container .ten.columns, .container .eleven.columns, .container .twelve.columns, .container .thirteen.columns, .container .fourteen.columns, .container .fifteen.columns, .container .sixteen.columns, .container .one-third.column, .container .two-thirds.column {
     width: 300px; }
 
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .container .offset-by-one, .container .offset-by-two, .container .offset-by-three, .container .offset-by-four, .container .offset-by-five, .container .offset-by-six, .container .offset-by-seven, .container .offset-by-eight, .container .offset-by-nine, .container .offset-by-ten, .container .offset-by-eleven, .container .offset-by-twelve, .container .offset-by-thirteen, .container .offset-by-fourteen, .container .offset-by-fifteen {
     margin-left: 0; } }
 @media only screen and (min-width: 480px) and (max-width: 767px) {
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .container {
     width: 420px; }
 
-  /* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
   .container .one.column, .container .two.columns, .container .three.columns, .container .four.columns, .container .five.columns, .container .six.columns, .container .seven.columns, .container .eight.columns, .container .nine.columns, .container .ten.columns, .container .eleven.columns, .container .twelve.columns, .container .thirteen.columns, .container .fourteen.columns, .container .fifteen.columns, .container .sixteen.columns, .container .one-third.column, .container .two-thirds.column {
     width: 420px; } }
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 * {
   box-sizing: border-box;
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 body {
   font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
   font-size: 16px;
@@ -500,31 +500,31 @@ body {
   color: #444;
   background: #fff; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 small {
   font-size: 14px;
   color: #515151; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 p {
   margin-bottom: 10.5px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 hr {
   margin: 21px 0;
   border: 0;
   border-bottom: 1px solid #bbb; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 a, a:visited {
   text-decoration: none;
   color: #08c; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 a:hover {
   color: #005580; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 h1, h2, h3, h4, h5, h6 {
   color: black;
   font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
@@ -532,63 +532,63 @@ h1, h2, h3, h4, h5, h6 {
   margin-top: 10.5px;
   text-rendering: optimizeLegibility; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 h1 {
   font-size: 2.286em;
   line-height: 42px;
   margin-bottom: 16.2px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 h2 {
   font-size: 1.714em;
   line-height: 35.7px;
   margin-bottom: 12.6px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 h3 {
   font-size: 1.5em;
   line-height: 31.5px;
   margin-bottom: 9px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 h4 {
   font-size: 1.286em;
   line-height: 27.3px;
   margin-bottom: 5.4px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 h5 {
   font-size: 1.143em;
   line-height: 23.1px;
   margin-bottom: 5.4px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 h6 {
   font-size: 1em;
   line-height: 21px;
   margin-bottom: 5.4px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 blockquote {
   padding: 0 0 0 15px;
   margin: 0 0 21px;
   border-left: 5px solid #b3b3b3; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 blockquote p {
   margin-bottom: 0; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 blockquote cite {
   display: block;
   font-size: 16px;
   color: #999; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 blockquote cite:before {
   content: "\2014 \0020"; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 blockquote.pull-right {
   float: right;
   padding-left: 0;
@@ -596,75 +596,75 @@ blockquote.pull-right {
   border-left: 0;
   border-right: 5px solid #999; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 blockquote.pull-right p, blockquote.pull-right cite {
   text-align: right; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 ul, ol {
   padding: 0;
   margin: 0 0 10.5px 25px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 ul ul, ul ol, ol ol, ol ul {
   margin-bottom: 0; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 ul {
   list-style: square outside; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 ol {
   list-style: decimal; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 li {
   line-height: 21px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 ul.unstyled, ul.circle, ul.disc {
   margin-left: 0; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 ul.unstyled {
   list-style: none outside; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 ul.circle {
   list-style: circle outside; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 ul.disc {
   list-style: disc outside; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 dl {
   margin-bottom: 21px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 dl.horizontal dt {
   float: left;
   width: 120px;
   clear: left;
   text-align: right; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 dl.horizontal dd {
   margin-left: 130px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 dt, dd {
   line-height: 21px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 dt {
   font-weight: bold; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 dd {
   margin-left: 10.5px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 code, pre {
   font-family: Inconsolata,Menlo,Monaco,"Bitstream Vera Sans Mono","Courier New",monospace;
   font-size: 14px;
@@ -673,97 +673,97 @@ code, pre {
   border: 1px solid #ccc;
   color: #444; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 code {
   padding: 1px 3px;
   border-radius: 3px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 pre {
   display: block;
   padding: 10.5px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 pre code {
   padding: 0;
   background-color: transparent;
   border: none; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 abbr[title] {
   cursor: help;
   border-bottom: 1px dotted #ddd; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 table {
   width: 100%;
   margin-bottom: 21px;
   border-collapse: collapse;
   border-spacing: 0; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 table th, table td {
   padding: 8px;
   line-height: 21px;
   text-align: left;
   border-top: 1px solid #a6a6a6; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 table th {
   font-weight: bold;
   vertical-align: bottom; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 table td {
   vertical-align: top; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 table thead:first-child th, table thead:first-child td {
   border-top: 0; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 table tbody + tbody {
   border-top: 2px solid #a6a6a6; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 table.condensed th, table.condensed td {
   padding: 4px 5px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 table.striped tbody tr:nth-child(odd) td, table.striped tbody tr:nth-child(odd) th {
   background-color: #f7f7f7; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 table.bordered {
   border: 1px solid #a6a6a6;
   border-collapse: separate;
   border-radius: 3px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 table.bordered th + th, table.bordered td + td, table.bordered th + td, table.bordered td + th {
   border-left: 1px solid #a6a6a6; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 table.bordered thead:first-child tr:first-child th, table.bordered tbody:first-child tr:first-child th, table.bordered tbody:first-child tr:first-child td {
   border-top: 0; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 table.bordered thead:first-child tr:first-child th:first-child, table.bordered tbody:first-child tr:first-child td:first-child {
   border-radius: 3px 0 0 0; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 table.bordered thead:first-child tr:first-child th:last-child, table.bordered tbody:first-child tr:first-child td:last-child {
   border-radius: 0 3px 0 0; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 table.bordered thead:last-child tr:last-child th:first-child, table.bordered tbody:last-child tr:last-child td:first-child {
   border-radius: 0 0 0 3px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 table.bordered thead:last-child tr:last-child th:last-child, table.bordered tbody:last-child tr:last-child td:last-child {
   border-radius: 0 0 3px 0; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .flash {
   width: 100%;
   height: 40px;
@@ -774,35 +774,35 @@ table.bordered thead:last-child tr:last-child th:last-child, table.bordered tbod
   padding: 0 10px;
   border-radius: 3px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .flash .close {
   float: right; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .flash.info {
   background: #d9edf7;
   border-color: #c4e3f3;
   color: #257fad; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .flash.notice {
   background: #f8edba;
   border-color: #f5e8a3;
   color: #a28911; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .flash.error {
   background: #f2dede;
   border-color: #ebcccc;
   color: #963c3c; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .flash.success {
   background: #d1eac8;
   border-color: #c2e2b6;
   color: #488132; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 input[type="email"], input[type="number"], input[type="password"], input[type="search"], input[type="tel"], input[type="text"], input[type="url"], input[type="color"], input[type="date"], input[type="datetime"], input[type="datetime-local"], input[type="month"], input[type="time"], input[type="week"], textarea {
   border: 1px solid #ccc;
   color: #777;
@@ -810,18 +810,18 @@ input[type="email"], input[type="number"], input[type="password"], input[type="s
   padding: 6px 4px;
   border-radius: 2px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 input[type="email"]:not(:last-of-type), input[type="number"]:not(:last-of-type), input[type="password"]:not(:last-of-type), input[type="search"]:not(:last-of-type), input[type="tel"]:not(:last-of-type), input[type="text"]:not(:last-of-type), input[type="url"]:not(:last-of-type), input[type="color"]:not(:last-of-type), input[type="date"]:not(:last-of-type), input[type="datetime"]:not(:last-of-type), input[type="datetime-local"]:not(:last-of-type), input[type="month"]:not(:last-of-type), input[type="time"]:not(:last-of-type), input[type="week"]:not(:last-of-type), textarea:not(:last-of-type) {
   margin-bottom: 20px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 input[type="email"]:focus, input[type="number"]:focus, input[type="password"]:focus, input[type="search"]:focus, input[type="tel"]:focus, input[type="text"]:focus, input[type="url"]:focus, input[type="color"]:focus, input[type="date"]:focus, input[type="datetime"]:focus, input[type="datetime-local"]:focus, input[type="month"]:focus, input[type="time"]:focus, input[type="week"]:focus, textarea:focus {
   border: 1px solid #aaa;
   box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
   color: #444;
   outline: none; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 input[type="email"], input[type="number"], input[type="password"], input[type="search"], input[type="tel"], input[type="text"], input[type="url"], input[type="color"], input[type="date"], input[type="datetime"], input[type="datetime-local"], input[type="month"], input[type="time"], input[type="week"], select, textarea {
   font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
   width: 210px;
@@ -829,28 +829,28 @@ input[type="email"], input[type="number"], input[type="password"], input[type="s
   font-size: 13px;
   max-width: 100%; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 input[type='checkbox'], input[type='radio'] {
   margin: 4px 3px 0;
   line-height: normal; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 label, legend {
   display: block;
   font-weight: bold;
   font-size: 13px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 fieldset {
   border: none;
   margin-bottom: 18px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 fieldset > legend {
   font-size: 18px;
   margin-bottom: 10px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .button, button, input[type="submit"], input[type="reset"], input[type="button"] {
   background: #efefef;
   border: 1px solid #ccc;
@@ -866,16 +866,16 @@ fieldset > legend {
   padding: 8px 10px;
   font-family: "HelveticaNeue","Helvetica Neue",Helvetica,Arial,sans-serif; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .button:hover, button:hover, input[type="submit"]:hover, input[type="reset"]:hover, input[type="button"]:hover {
   background: #ddd;
   border-color: #bbb; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_barebones.scss */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
 .button:active, button:active, input[type="submit"]:active, input[type="reset"]:active, input[type="button"]:active {
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3); }
 
-/* line 1, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay {
   background-color: #FFF;
   border: 1px solid #CCC;
@@ -884,465 +884,465 @@ fieldset > legend {
   padding: 1em 0px 1em 1em;
   clear: both; }
 
-/* line 10, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 10, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay pre {
   margin: 0px; }
 
-/* line 15, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 15, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 span.CodeRay {
   white-space: pre;
   border: 0px;
   padding: 2px; }
 
-/* line 17, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 17, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 table.CodeRay {
   border-collapse: collapse;
   width: 100%;
   padding: 2px; }
 
-/* line 18, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 18, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 table.CodeRay td {
   padding: 1em 0.5em;
   vertical-align: top; }
 
-/* line 23, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 23, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .line-numbers, .CodeRay .no {
   background-color: #ECECEC;
   color: #AAA;
   text-align: right; }
 
-/* line 29, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 29, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .line-numbers a {
   color: #AAA; }
 
-/* line 33, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 33, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .line-numbers tt {
   font-weight: bold; }
 
-/* line 34, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 34, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .line-numbers .highlighted {
   color: red; }
 
-/* line 35, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 35, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .line {
   display: block;
   float: left;
   width: 100%; }
 
-/* line 36, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 36, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay span.line-numbers {
   padding: 0px 4px; }
 
-/* line 37, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 37, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .code {
   width: 100%; }
 
-/* line 39, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 39, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 ol.CodeRay {
   font-size: 10pt; }
 
-/* line 40, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 40, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 ol.CodeRay li {
   white-space: pre; }
 
-/* line 42, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 42, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .code pre {
   overflow: auto; }
 
-/* line 43, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 43, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .debug {
   color: white !important;
   background: blue !important; }
 
-/* line 45, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 45, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .annotation {
   color: #000077; }
 
-/* line 46, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 46, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .attribute-name {
   color: #ff0088; }
 
-/* line 47, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 47, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .attribute-value {
   color: #770000; }
 
-/* line 48, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 48, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .binary {
   color: #509;
   font-weight: bold; }
 
-/* line 49, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 49, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .comment {
   color: #998;
   font-style: italic; }
 
-/* line 50, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 50, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .char {
   color: #0044dd; }
 
-/* line 51, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 51, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .char .content {
   color: #0044dd; }
 
-/* line 52, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 52, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .char .delimiter {
   color: #003399; }
 
-/* line 53, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 53, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .class {
   color: #458;
   font-weight: bold; }
 
-/* line 54, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 54, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .complex {
   color: #A08;
   font-weight: bold; }
 
-/* line 55, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 55, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .constant {
   color: teal; }
 
-/* line 56, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 56, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .color {
   color: #00aa00; }
 
-/* line 57, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 57, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .class-variable {
   color: #336699; }
 
-/* line 58, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 58, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .decorator {
   color: #B0B; }
 
-/* line 59, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 59, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .definition {
   color: #099;
   font-weight: bold; }
 
-/* line 60, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 60, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .directive {
   color: #088;
   font-weight: bold; }
 
-/* line 61, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 61, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .delimiter {
   color: black; }
 
-/* line 62, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 62, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .doc {
   color: #997700; }
 
-/* line 63, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 63, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .doctype {
   color: #3344bb; }
 
-/* line 64, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 64, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .doc-string {
   color: #D42;
   font-weight: bold; }
 
-/* line 65, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 65, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .escape {
   color: #666;
   font-weight: bold; }
 
-/* line 66, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 66, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .entity {
   color: #800;
   font-weight: bold; }
 
-/* line 67, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 67, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .error {
   color: #F00;
   background-color: #ffaaaa; }
 
-/* line 68, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 68, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .exception {
   color: #C00;
   font-weight: bold; }
 
-/* line 69, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 69, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .filename {
   color: #099; }
 
-/* line 70, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 70, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .function {
   color: #900;
   font-weight: bold; }
 
-/* line 71, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 71, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .global-variable {
   color: teal;
   font-weight: bold; }
 
-/* line 72, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 72, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .hex {
   color: #058;
   font-weight: bold; }
 
-/* line 73, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 73, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .integer {
   color: #099; }
 
-/* line 74, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 74, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .include {
   color: #B44;
   font-weight: bold; }
 
-/* line 75, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 75, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .inline {
   color: black; }
 
-/* line 76, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 76, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .inline .inline {
   background: #cccccc; }
 
-/* line 77, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 77, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .inline .inline .inline {
   background: #bbbbbb; }
 
-/* line 78, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 78, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .inline .inline-delimiter {
   color: #D14; }
 
-/* line 79, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 79, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .inline-delimiter {
   color: #D14; }
 
-/* line 80, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 80, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .important {
   color: #f00; }
 
-/* line 81, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 81, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .interpreted {
   color: #B2B;
   font-weight: bold; }
 
-/* line 82, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 82, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .instance-variable {
   color: teal; }
 
-/* line 83, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 83, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .label {
   color: #970;
   font-weight: bold; }
 
-/* line 84, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 84, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .local-variable {
   color: #996633; }
 
-/* line 85, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 85, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .octal {
   color: #40E;
   font-weight: bold; }
 
-/* line 87, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 87, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .predefined-constant {
   font-weight: bold; }
 
-/* line 88, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 88, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .predefined {
   color: #369;
   font-weight: bold; }
 
-/* line 89, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 89, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .preprocessor {
   color: #579; }
 
-/* line 90, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 90, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .pseudo-class {
   color: #00C;
   font-weight: bold; }
 
-/* line 91, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 91, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .predefined-type {
   color: #074;
   font-weight: bold; }
 
-/* line 92, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 92, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .reserved, .keyword {
   color: #000;
   font-weight: bold; }
 
-/* line 94, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 94, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .key {
   color: #808; }
 
-/* line 95, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 95, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .key .delimiter {
   color: #606; }
 
-/* line 96, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 96, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .key .char {
   color: #80f; }
 
-/* line 97, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 97, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .value {
   color: #088; }
 
-/* line 99, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 99, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .regexp {
   background-color: #fff0ff; }
 
-/* line 100, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 100, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .regexp .content {
   color: #880088; }
 
-/* line 101, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 101, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .regexp .delimiter {
   color: #440044; }
 
-/* line 102, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 102, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .regexp .modifier {
   color: #cc22cc; }
 
-/* line 103, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 103, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .regexp .function {
   color: #404;
   font-weight: bold; }
 
-/* line 105, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 105, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .string {
   color: #D20; }
 
-/* line 107, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 107, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .string .string .string {
   background-color: #ffd0d0; }
 
-/* line 108, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 108, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .string .content {
   color: #D14; }
 
-/* line 109, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 109, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .string .char {
   color: #D14; }
 
-/* line 110, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 110, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .string .delimiter {
   color: #D14; }
 
-/* line 112, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 112, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .shell {
   color: #dd1144; }
 
-/* line 114, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 114, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .shell .delimiter {
   color: #dd1144; }
 
-/* line 116, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 116, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .symbol {
   color: #990073; }
 
-/* line 117, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 117, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .symbol .content {
   color: #aa6600; }
 
-/* line 118, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 118, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .symbol .delimiter {
   color: #663300; }
 
-/* line 120, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 120, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .tag {
   color: #007700; }
 
-/* line 121, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 121, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .tag-special {
   color: #D70;
   font-weight: bold; }
 
-/* line 122, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 122, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .type {
   color: #339;
   font-weight: bold; }
 
-/* line 123, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 123, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .variable {
   color: #003366; }
 
-/* line 125, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 125, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .insert {
   background: #afa; }
 
-/* line 126, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 126, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .delete {
   background: #faa; }
 
-/* line 127, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 127, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .change {
   color: #aaf;
   background: #007; }
 
-/* line 128, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 128, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .head {
   color: #f8f;
   background: #550055; }
 
-/* line 130, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 130, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .insert .insert {
   color: #080;
   font-weight: bold; }
 
-/* line 131, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 131, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .delete .delete {
   color: #800;
   font-weight: bold; }
 
-/* line 132, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 132, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .change .change {
   color: #66f; }
 
-/* line 133, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/coderay.css */
+/* line 133, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
 .CodeRay .head .head {
   color: #f4f; }
 
-/* line 1, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_base.sass */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_base.sass */
 body {
   background-color: #fff6ee;
   background-repeat: no-repeat;
   background-position: top; }
 
-/* line 6, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_base.sass */
+/* line 6, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_base.sass */
 .app {
   min-height: 100%;
   margin-bottom: -38px; }
 
-/* line 10, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_base.sass */
+/* line 10, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_base.sass */
 h3, h4, h5, ul, ol {
   color: #523d47; }
 
-/* line 13, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_base.sass */
+/* line 13, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_base.sass */
 a {
   color: #ff7e5b; }
-  /* line 15, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_base.sass */
+  /* line 15, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_base.sass */
   a, a:visited {
     color: #ff7e5b; }
-  /* line 17, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_base.sass */
+  /* line 17, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_base.sass */
   a:hover {
     color: #fc4c1d; }
 
 @media only screen and (max-width: 767px) {
-  /* line 19, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_base.sass */
+  /* line 19, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_base.sass */
   pre {
     white-space: pre;
     overflow: scroll;
     word-wrap: normal; } }
 
-/* line 23, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_base.sass */
+/* line 23, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_base.sass */
 .anchors-blue, .app-footer a, .hero .subtitle a, .page-title a, .anchors-blue:active, .app-footer a:active, .hero .subtitle a:active, .page-title a:active, .anchors-blue:visited, .app-footer a:visited, .hero .subtitle a:visited, .page-title a:visited {
   color: #fffbda; }
-/* line 25, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_base.sass */
+/* line 25, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_base.sass */
 .anchors-blue:hover, .app-footer a:hover, .hero .subtitle a:hover, .page-title a:hover {
   color: white; }
 
-/* line 28, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_base.sass */
+/* line 28, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_base.sass */
 .notice {
   background: white;
   padding: 20px 25px; }
 
-/* line 1, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
 .cylon-logo {
   width: 405px; }
-  /* line 3, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+  /* line 3, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
   .cylon-logo a {
     background: transparent url("/images/logo.png") left top no-repeat;
     display: inline-block;
@@ -1351,31 +1351,31 @@ a {
     width: 256px;
     height: 27px; }
 
-/* line 12, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+/* line 12, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
 .github-menu {
   padding: 10px 10px 10px 40px;
   font-weight: bold;
   background: url(../../images/github-mark.png) top left no-repeat; }
-  /* line 13, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+  /* line 13, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
   .github-menu a {
     color: #580a25; }
-  /* line 18, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+  /* line 18, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
   .github-menu:hover {
     color: #ee274a;
     text-decoration: underline; }
 
-/* line 22, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+/* line 22, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
 .app-header {
   margin: 16px 0 15px 0; }
-  /* line 25, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+  /* line 25, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
   .app-header .Cylon.js-logo, .app-header .display, .app-header .subtitle, .app-header .menu, .app-header h1 {
     vertical-align: middle;
     margin: 0;
     display: inline-block; }
-  /* line 30, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+  /* line 30, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
   .app-header .display {
     margin: -1px 0 0 0; }
-  /* line 33, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+  /* line 33, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
   .app-header .subtitle {
     font-family: "Montserrat", sans-serif;
     font-weight: 700;
@@ -1383,10 +1383,10 @@ a {
     color: #505252;
     padding: 8px 0 0 15px;
     width: 200px; }
-  /* line 38, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+  /* line 38, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
   .app-header .easter {
     display: none; }
-  /* line 41, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+  /* line 41, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
   .app-header .heart {
     color: red;
     font-size: 20px;
@@ -1395,64 +1395,64 @@ a {
     display: inline-block;
     width: 38px;
     text-align: center; }
-  /* line 50, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+  /* line 50, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
   .app-header .menu {
     width: 510px;
     text-align: right;
     display: inline-block;
     margin: 3px 0 0 0; }
-    /* line 56, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+    /* line 56, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
     .app-header .menu .active {
       color: #fc4c1d; }
-    /* line 59, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+    /* line 59, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
     .app-header .menu .item {
       font-size: 15px;
       font-weight: bold;
       margin: 10px;
       padding: 8px 4px; }
-      /* line 65, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+      /* line 65, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
       .app-header .menu .item, .app-header .menu .item:visited {
         color: #505252; }
-      /* line 68, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+      /* line 68, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
       .app-header .menu .item:hover {
         color: #fc4c1d; }
-      /* line 71, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+      /* line 71, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
       .app-header .menu .item:active {
         color: #fc4c1d; }
     @media only screen and (min-width: 767px) and (max-width: 964px) {
-      /* line 50, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+      /* line 50, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
       .app-header .menu {
         width: 360px;
         padding: 0; }
-        /* line 77, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+        /* line 77, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
         .app-header .menu .item {
           margin: 0;
           padding: 0 5px; } }
   @media only screen and (max-width: 767px) {
-    /* line 22, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+    /* line 22, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
     .app-header {
       width: 100%;
       text-align: center; }
-      /* line 84, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+      /* line 84, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
       .app-header .Cylon.js-logo, .app-header .subtitle {
         width: 100%;
         display: block;
         margin: 0 0 5px 0; }
-      /* line 88, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+      /* line 88, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
       .app-header .subtitle {
         font-size: 19px;
         line-height: 15px;
         padding: 0; }
-      /* line 92, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+      /* line 92, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
       .app-header .menu {
         width: 100%;
         text-align: center; }
-        /* line 95, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+        /* line 95, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
         .app-header .menu .item {
           margin: 0;
           padding: 0 2px; } }
 
-/* line 1, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_footers.sass */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_footers.sass */
 .app-footer {
   font-family: "Montserrat", sans-serif;
   font-weight: 700;
@@ -1462,102 +1462,102 @@ a {
   background: #ff7e5b;
   font-weight: normal; }
 
-/* line 1, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_coderay.sass */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_coderay.sass */
 .CodeRay {
   font-family: Inconsolata, Menlo, Monaco, "Bitstream Vera Sans Mono", "Courier New", monospace; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/layouts/_home.sass */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/layouts/_home.sass */
 .container {
   position: relative;
   overflow: hidden; }
 
-/* line 6, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/layouts/_home.sass */
+/* line 6, /home/ron/Development/gobot/gobot.io/source/stylesheets/layouts/_home.sass */
 .container, .w {
   width: 964px;
   margin: 0 auto; }
   @media only screen and (min-width: 767px) and (max-width: 964px) {
-    /* line 6, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/layouts/_home.sass */
+    /* line 6, /home/ron/Development/gobot/gobot.io/source/stylesheets/layouts/_home.sass */
     .container, .w {
       width: 767px;
       padding: 0 15px; } }
   @media only screen and (max-width: 767px) {
-    /* line 6, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/layouts/_home.sass */
+    /* line 6, /home/ron/Development/gobot/gobot.io/source/stylesheets/layouts/_home.sass */
     .container, .w {
       width: 100%;
       padding: 0 15px; } }
 
-/* line 15, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/layouts/_home.sass */
+/* line 15, /home/ron/Development/gobot/gobot.io/source/stylesheets/layouts/_home.sass */
 .main[role="main"] {
   padding-bottom: 50px; }
-  /* line 19, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/layouts/_home.sass */
+  /* line 19, /home/ron/Development/gobot/gobot.io/source/stylesheets/layouts/_home.sass */
   .main[role="main"] .videos iframe, .main[role="main"] .videos object {
     width: 600;
     height: 400px; }
-    /* line 8, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_mixins.sass */
+    /* line 8, /home/ron/Development/gobot/gobot.io/source/stylesheets/_mixins.sass */
     .main[role="main"] .videos iframe:not(:last-child), .main[role="main"] .videos object:not(:last-child) {
       margin-bottom: 20px; }
     @media only screen and (min-width: 767px) and (max-width: 964px) {
-      /* line 19, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/layouts/_home.sass */
+      /* line 19, /home/ron/Development/gobot/gobot.io/source/stylesheets/layouts/_home.sass */
       .main[role="main"] .videos iframe, .main[role="main"] .videos object {
         width: 420px;
         height: 236px; } }
     @media only screen and (max-width: 767px) {
-      /* line 19, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/layouts/_home.sass */
+      /* line 19, /home/ron/Development/gobot/gobot.io/source/stylesheets/layouts/_home.sass */
       .main[role="main"] .videos iframe, .main[role="main"] .videos object {
         width: 290px;
         height: 169px; } }
-  /* line 28, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/layouts/_home.sass */
+  /* line 28, /home/ron/Development/gobot/gobot.io/source/stylesheets/layouts/_home.sass */
   .main[role="main"] .content {
     width: 70%; }
-    /* line 30, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/layouts/_home.sass */
+    /* line 30, /home/ron/Development/gobot/gobot.io/source/stylesheets/layouts/_home.sass */
     .main[role="main"] .content.full {
       width: 100%;
       clear: both; }
-    /* line 34, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/layouts/_home.sass */
+    /* line 34, /home/ron/Development/gobot/gobot.io/source/stylesheets/layouts/_home.sass */
     .main[role="main"] .content h1, .main[role="main"] .content h2 {
       color: #ff7e5b; }
-    /* line 37, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/layouts/_home.sass */
+    /* line 37, /home/ron/Development/gobot/gobot.io/source/stylesheets/layouts/_home.sass */
     .main[role="main"] .content h1 {
       font-size: 1.9em;
       padding: 10px 0; }
-  /* line 42, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/layouts/_home.sass */
+  /* line 42, /home/ron/Development/gobot/gobot.io/source/stylesheets/layouts/_home.sass */
   .main[role="main"] .aside.right {
     width: 30%;
     float: right;
     padding-top: 0px;
     text-align: right; }
-  /* line 8, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_mixins.sass */
+  /* line 8, /home/ron/Development/gobot/gobot.io/source/stylesheets/_mixins.sass */
   .main[role="main"] section:not(:last-child) {
     margin-bottom: 20px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/layouts/_hardware.sass */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/layouts/_hardware.sass */
 .hardware .devices {
   text-align: center; }
-/* line 4, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/layouts/_hardware.sass */
+/* line 4, /home/ron/Development/gobot/gobot.io/source/stylesheets/layouts/_hardware.sass */
 .hardware img {
   width: 300px; }
-  /* line 8, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/_mixins.sass */
+  /* line 8, /home/ron/Development/gobot/gobot.io/source/stylesheets/_mixins.sass */
   .hardware img:not(:last-child) {
     margin-bottom: 20px; }
   @media only screen and (min-width: 767px) and (max-width: 964px) {
-    /* line 4, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/layouts/_hardware.sass */
+    /* line 4, /home/ron/Development/gobot/gobot.io/source/stylesheets/layouts/_hardware.sass */
     .hardware img {
       width: 420px; } }
   @media only screen and (max-width: 767px) {
-    /* line 4, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/layouts/_hardware.sass */
+    /* line 4, /home/ron/Development/gobot/gobot.io/source/stylesheets/layouts/_hardware.sass */
     .hardware img {
       width: 290px; } }
 
-/* line 1, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_home.sass */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_home.sass */
 .hero {
   margin: 15px 0 0 0;
   background: #ff7e5b;
   padding: 25px 0; }
   @media only screen and (max-width: 767px) {
-    /* line 1, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_home.sass */
+    /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_home.sass */
     .hero {
       margin-top: -8px; } }
-  /* line 7, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_home.sass */
+  /* line 7, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_home.sass */
   .hero .title {
     font-family: "Montserrat", sans-serif;
     font-weight: 700;
@@ -1569,20 +1569,20 @@ a {
     opacity: 0.94;
     margin: 0; }
     @media only screen and (max-width: 767px) {
-      /* line 7, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_home.sass */
+      /* line 7, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_home.sass */
       .hero .title {
         font-size: 23px;
         line-height: 27px;
         padding: 0; }
-        /* line 18, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_home.sass */
+        /* line 18, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_home.sass */
         .hero .title br {
           display: none; } }
     @media only screen and (min-width: 767px) and (max-width: 964px) {
-      /* line 7, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_home.sass */
+      /* line 7, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_home.sass */
       .hero .title {
         font-size: 33px;
         line-height: 42px; } }
-  /* line 23, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_home.sass */
+  /* line 23, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_home.sass */
   .hero .subtitle {
     font-family: "Montserrat", sans-serif;
     font-weight: 700;
@@ -1594,32 +1594,32 @@ a {
     line-height: 36px;
     margin-top: 3px; }
     @media only screen and (max-width: 767px) {
-      /* line 23, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_home.sass */
+      /* line 23, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_home.sass */
       .hero .subtitle {
         font-size: 18px;
         line-height: 22px;
         margin-top: 4px;
         padding: 0; } }
 
-/* line 40, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_home.sass */
+/* line 40, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_home.sass */
 .social {
   line-height: 0;
   padding: 10px 0;
   background: #fdfcf5; }
-  /* line 44, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_home.sass */
+  /* line 44, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_home.sass */
   .social .twitter-follow-button {
     vertical-align: top; }
-  /* line 46, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_home.sass */
+  /* line 46, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_home.sass */
   .social .splitter {
     display: inline-block;
     height: 21px; }
   @media only screen and (max-width: 767px) {
-    /* line 50, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_home.sass */
+    /* line 50, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_home.sass */
     .social .splitter {
       display: block;
       margin-bottom: 5px; } }
 
-/* line 54, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_home.sass */
+/* line 54, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_home.sass */
 .cta {
   background: #fff3cf;
   padding: 10px 20px;
@@ -1628,48 +1628,48 @@ a {
   font-size: 19px;
   color: #bd583d;
   font-weight: bold; }
-  /* line 62, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_home.sass */
+  /* line 62, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_home.sass */
   .cta:hover {
     background: #ffe7a9; }
-  /* line 64, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_home.sass */
+  /* line 64, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_home.sass */
   .cta:visited {
     color: #bd583d; }
   @media only screen and (max-width: 767px) {
-    /* line 54, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_home.sass */
+    /* line 54, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_home.sass */
     .cta {
       font-size: 16px;
       padding: 8px 15px; } }
 
-/* line 70, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_home.sass */
+/* line 70, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_home.sass */
 .catcher {
   margin: 0 0 38px 0;
   background: #fdfcf5;
   padding: 20px; }
-  /* line 74, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_home.sass */
+  /* line 74, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_home.sass */
   .catcher .phrase {
     margin: 0; }
-  /* line 76, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_home.sass */
+  /* line 76, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_home.sass */
   .catcher .cta {
     margin-top: 8px; }
 
-/* line 1, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_blog.sass */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
 .articles {
   max-width: 706px;
   margin-right: 40px;
   margin-bottom: 80px;
   float: left; }
   @media only screen and (max-width: 767px) {
-    /* line 1, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_blog.sass */
+    /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
     .articles {
       margin-right: 0; } }
-  /* line 8, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_blog.sass */
+  /* line 8, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
   .articles .article {
     display: inline-block;
     margin-bottom: 30px; }
-    /* line 12, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_blog.sass */
+    /* line 12, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
     .articles .article h3, .articles .article h4, .articles .article a {
       color: #fc4c1d; }
-    /* line 15, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_blog.sass */
+    /* line 15, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
     .articles .article h3 {
       display: inline-block;
       font-size: 24px;
@@ -1677,91 +1677,91 @@ a {
       vertical-align: top;
       margin: 0px;
       max-width: 80%; }
-    /* line 23, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_blog.sass */
+    /* line 23, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
     .articles .article p {
       text-align: justify; }
-    /* line 26, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_blog.sass */
+    /* line 26, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
     .articles .article .data {
       padding-left: 71px; }
-    /* line 28, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_blog.sass */
+    /* line 28, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
     .articles .article .date {
       color: white;
       width: 50px;
       text-align: center;
       margin-right: 20px;
       float: left; }
-      /* line 35, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_blog.sass */
+      /* line 35, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
       .articles .article .date .blue {
         padding: 5px;
         background-color: #79bee8; }
-        /* line 39, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_blog.sass */
+        /* line 39, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
         .articles .article .date .blue .month {
           text-transform: uppercase;
           font-size: 12px;
           line-height: 12px; }
-        /* line 44, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_blog.sass */
+        /* line 44, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
         .articles .article .date .blue .day {
           font-size: 16px;
           line-height: 16px; }
-      /* line 48, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_blog.sass */
+      /* line 48, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
       .articles .article .date .red {
         padding: 2px;
         background-color: #fc4c1d; }
-        /* line 52, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_blog.sass */
+        /* line 52, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
         .articles .article .date .red .year {
           font-size: 10px;
           line-height: 10px; }
-    /* line 56, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_blog.sass */
+    /* line 56, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
     .articles .article .comments, .articles .article .tags {
       display: inline-block; }
-      /* line 59, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_blog.sass */
+      /* line 59, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
       .articles .article .comments .img, .articles .article .tags .img {
         vertical-align: top;
         display: inline-block;
         width: 24px;
         height: 24px; }
-      /* line 65, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_blog.sass */
+      /* line 65, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
       .articles .article .comments a, .articles .article .tags a {
         vertical-align: top;
         text-decoration: underline; }
-      /* line 69, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_blog.sass */
+      /* line 69, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
       .articles .article .comments img, .articles .article .tags img {
         margin-right: 4px; }
-    /* line 72, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_blog.sass */
+    /* line 72, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
     .articles .article .comments {
       margin-right: 60px; }
 
-/* line 75, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_blog.sass */
+/* line 75, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
 .categories, .network, .tweets {
   display: inline-block;
   vertical-align: top;
   width: 200px;
   margin-bottom: 40px;
   float: left; }
-  /* line 81, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_blog.sass */
+  /* line 81, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
   .categories a, .network a, .tweets a {
     color: black; }
-  /* line 84, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_blog.sass */
+  /* line 84, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
   .categories h4, .network h4, .tweets h4 {
     color: #fc4c1d;
     font-size: 20px;
     line-height: 24px; }
 
-/* line 91, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_blog.sass */
+/* line 91, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
 .categories ul {
   margin: 0;
   list-style: none; }
 
 @media only screen and (max-width: 400) {
-  /* line 97, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_blog.sass */
+  /* line 97, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
   .twitter-share-button {
     margin-bottom: 10px; } }
-/* line 1, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_page.sass */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_page.sass */
 .page-title {
   background: #ff7e5b;
   padding: 25px 0;
   margin: 10px 0 25px 0; }
-  /* line 5, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_page.sass */
+  /* line 5, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_page.sass */
   .page-title .title {
     font-family: "Montserrat", sans-serif;
     font-weight: 700;
@@ -1772,7 +1772,7 @@ a {
     clear: both;
     opacity: 0.94;
     margin: 0; }
-  /* line 15, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_page.sass */
+  /* line 15, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_page.sass */
   .page-title .subtitle {
     font-family: "Montserrat", sans-serif;
     font-weight: 700;
@@ -1784,7 +1784,7 @@ a {
     line-height: 21px;
     margin-top: 7px; }
 
-/* line 1, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_hardware.sass */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_hardware.sass */
 .more {
   text-align: center;
   width: 50%;
@@ -1793,48 +1793,48 @@ a {
   padding: 15px 30px;
   color: #277dac; }
   @media only screen and (max-width: 767px) {
-    /* line 1, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_hardware.sass */
+    /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_hardware.sass */
     .more {
       width: 100%; } }
 
-/* line 1, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_documentation.sass */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_documentation.sass */
 .repository {
   margin-right: 10px; }
 
-/* line 4, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_documentation.sass */
+/* line 4, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_documentation.sass */
 .documentation .index {
   padding: 0 0 0 8px; }
-  /* line 6, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_documentation.sass */
+  /* line 6, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_documentation.sass */
   .documentation .index li {
     margin: 8px 0; }
-/* line 8, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_documentation.sass */
+/* line 8, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_documentation.sass */
 .documentation .link {
   font-size: 20px; }
-/* line 10, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_documentation.sass */
+/* line 10, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_documentation.sass */
 .documentation .description {
   color: gray;
   font-size: 14px;
   line-height: 21px;
   margin: 10px; }
-/* line 16, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_documentation.sass */
+/* line 16, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_documentation.sass */
 .documentation .display {
   width: 300px;
   float: right;
   border: 1px solid rgba(255, 126, 91, 0.14);
   margin: 0 0 19px 20px; }
-/* line 22, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_documentation.sass */
+/* line 22, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_documentation.sass */
 .documentation .hardware .devices {
   text-align: left; }
 
-/* line 27, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_documentation.sass */
+/* line 27, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_documentation.sass */
 .clear {
   clear: both; }
 
-/* line 29, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_documentation.sass */
+/* line 29, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_documentation.sass */
 .image-size-300 {
   width: 200px; }
 
-/* line 33, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_documentation.sass */
+/* line 33, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_documentation.sass */
 .methods dt {
   font-weight: bold;
   background: white;
@@ -1844,16 +1844,16 @@ a {
   font-family: Inconsolata, Menlo, Monaco, "Bitstream Vera Sans Mono", "Courier New", monospace;
   font-size: 17px;
   border: aliceblue; }
-/* line 42, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_documentation.sass */
+/* line 42, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_documentation.sass */
 .methods dd {
   margin-bottom: 29px;
   padding-left: 10px; }
 
-/* line 46, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_documentation.sass */
+/* line 46, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_documentation.sass */
 .colors {
   width: 23%;
   float: left; }
-  /* line 49, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_documentation.sass */
+  /* line 49, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_documentation.sass */
   .colors dt {
     font-weight: bold;
     padding: 5px;
@@ -1862,16 +1862,16 @@ a {
     font-size: 15px;
     border: aliceblue;
     margin-top: 15px; }
-  /* line 57, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_documentation.sass */
+  /* line 57, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_documentation.sass */
   .colors dd {
     margin-bottom: 20px;
     padding-left: 5px; }
-    /* line 60, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_documentation.sass */
+    /* line 60, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_documentation.sass */
     .colors dd p {
       float: left;
       margin-left: 5px; }
 
-/* line 1, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .square {
   width: 50px;
   height: 50px;
@@ -1879,562 +1879,562 @@ a {
   float: left;
   margin-right: 10px; }
 
-/* line 8, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 8, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .aliceblue {
   background: aliceblue; }
 
-/* line 10, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 10, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .antiquewhite {
   background: antiquewhite; }
 
-/* line 12, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 12, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .aqua {
   background: cyan; }
 
-/* line 14, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 14, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .aquamarine {
   background: aquamarine; }
 
-/* line 16, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 16, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .azure {
   background: azure; }
 
-/* line 18, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 18, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .beige {
   background: beige; }
 
-/* line 20, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 20, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .bisque {
   background: bisque; }
 
-/* line 22, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 22, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .black {
   background: black; }
 
-/* line 24, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 24, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .blanchedalmond {
   background: blanchedalmond; }
 
-/* line 26, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 26, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .blue {
   background: blue; }
 
-/* line 28, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 28, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .blueviolet {
   background: blueviolet; }
 
-/* line 30, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 30, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .brown {
   background: brown; }
 
-/* line 32, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 32, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .burlywood {
   background: burlywood; }
 
-/* line 34, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 34, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .cadetblue {
   background: cadetblue; }
 
-/* line 36, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 36, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .chartreuse {
   background: chartreuse; }
 
-/* line 38, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 38, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .chocolate {
   background: chocolate; }
 
-/* line 40, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 40, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .coral {
   background: coral; }
 
-/* line 42, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 42, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .cornflowerblue {
   background: cornflowerblue; }
 
-/* line 44, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 44, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .cornsilk {
   background: cornsilk; }
 
-/* line 46, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 46, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .crimson {
   background: crimson; }
 
-/* line 48, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 48, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .cyan {
   background: cyan; }
 
-/* line 50, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 50, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .darkblue {
   background: darkblue; }
 
-/* line 52, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 52, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .darkcyan {
   background: darkcyan; }
 
-/* line 54, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 54, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .darkgoldenrod {
   background: darkgoldenrod; }
 
-/* line 56, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 56, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .darkgray {
   background: darkgrey; }
 
-/* line 58, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 58, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .darkgreen {
   background: darkgreen; }
 
-/* line 60, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 60, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .darkkhaki {
   background: darkkhaki; }
 
-/* line 62, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 62, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .darkmagenta {
   background: darkmagenta; }
 
-/* line 64, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 64, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .darkolivegreen {
   background: darkolivegreen; }
 
-/* line 66, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 66, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .darkorange {
   background: darkorange; }
 
-/* line 68, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 68, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .darkorchid {
   background: darkorchid; }
 
-/* line 70, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 70, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .darkred {
   background: darkred; }
 
-/* line 72, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 72, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .darksalmon {
   background: darksalmon; }
 
-/* line 74, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 74, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .darkseagreen {
   background: darkseagreen; }
 
-/* line 76, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 76, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .darkslateblue {
   background: darkslateblue; }
 
-/* line 78, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 78, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .darkslategray {
   background: darkslategrey; }
 
-/* line 80, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 80, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .darkturquoise {
   background: darkturquoise; }
 
-/* line 82, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 82, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .darkviolet {
   background: darkviolet; }
 
-/* line 84, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 84, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .deeppink {
   background: deeppink; }
 
-/* line 86, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 86, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .deepskyblue {
   background: deepskyblue; }
 
-/* line 88, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 88, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .dimgray {
   background: dimgrey; }
 
-/* line 90, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 90, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .dodgerblue {
   background: dodgerblue; }
 
-/* line 92, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 92, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .firebrick {
   background: firebrick; }
 
-/* line 94, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 94, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .floralwhite {
   background: floralwhite; }
 
-/* line 96, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 96, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .forestgreen {
   background: forestgreen; }
 
-/* line 98, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 98, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .fuchsia {
   background: magenta; }
 
-/* line 100, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 100, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .gainsboro {
   background: gainsboro; }
 
-/* line 102, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 102, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .ghostwhite {
   background: ghostwhite; }
 
-/* line 104, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 104, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .gold {
   background: gold; }
 
-/* line 106, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 106, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .goldenrod {
   background: goldenrod; }
 
-/* line 108, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 108, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .gray {
   background: gray; }
 
-/* line 110, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 110, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .green {
   background: green; }
 
-/* line 112, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 112, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .greenyellow {
   background: greenyellow; }
 
-/* line 114, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 114, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .honeydew {
   background: honeydew; }
 
-/* line 116, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 116, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .hotpink {
   background: hotpink; }
 
-/* line 118, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 118, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .indianred {
   background: indianred; }
 
-/* line 120, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 120, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .indigo {
   background: indigo; }
 
-/* line 122, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 122, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .ivory {
   background: ivory; }
 
-/* line 124, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 124, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .khaki {
   background: khaki; }
 
-/* line 126, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 126, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .lavender {
   background: lavender; }
 
-/* line 128, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 128, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .lavenderblush {
   background: lavenderblush; }
 
-/* line 130, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 130, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .lawngreen {
   background: lawngreen; }
 
-/* line 132, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 132, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .lemonchiffon {
   background: lemonchiffon; }
 
-/* line 134, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 134, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .lightblue {
   background: lightblue; }
 
-/* line 136, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 136, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .lightcoral {
   background: lightcoral; }
 
-/* line 138, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 138, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .lightcyan {
   background: lightcyan; }
 
-/* line 140, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 140, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .lightgoldenrodyellow {
   background: lightgoldenrodyellow; }
 
-/* line 142, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 142, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .lightgreen {
   background: lightgreen; }
 
-/* line 144, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 144, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .lightgrey {
   background: lightgrey; }
 
-/* line 146, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 146, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .lightpink {
   background: lightpink; }
 
-/* line 148, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 148, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .lightsalmon {
   background: lightsalmon; }
 
-/* line 150, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 150, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .lightseagreen {
   background: lightseagreen; }
 
-/* line 152, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 152, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .lightskyblue {
   background: lightskyblue; }
 
-/* line 154, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 154, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .lightslategray {
   background: lightslategrey; }
 
-/* line 156, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 156, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .lightsteelblue {
   background: lightsteelblue; }
 
-/* line 158, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 158, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .lightyellow {
   background: lightyellow; }
 
-/* line 160, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 160, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .lime {
   background: lime; }
 
-/* line 162, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 162, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .limegreen {
   background: limegreen; }
 
-/* line 164, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 164, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .linen {
   background: linen; }
 
-/* line 166, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 166, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .magenta {
   background: magenta; }
 
-/* line 168, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 168, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .maroon {
   background: maroon; }
 
-/* line 170, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 170, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .mediumaquamarine {
   background: mediumaquamarine; }
 
-/* line 172, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 172, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .mediumblue {
   background: mediumblue; }
 
-/* line 174, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 174, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .mediumorchid {
   background: mediumorchid; }
 
-/* line 176, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 176, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .mediumpurple {
   background: mediumpurple; }
 
-/* line 178, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 178, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .mediumseagreen {
   background: mediumseagreen; }
 
-/* line 180, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 180, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .mediumslateblue {
   background: mediumslateblue; }
 
-/* line 182, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 182, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .mediumspringgreen {
   background: mediumspringgreen; }
 
-/* line 184, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 184, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .mediumturquoise {
   background: mediumturquoise; }
 
-/* line 186, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 186, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .mediumvioletred {
   background: mediumvioletred; }
 
-/* line 188, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 188, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .midnightblue {
   background: midnightblue; }
 
-/* line 190, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 190, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .mintcream {
   background: mintcream; }
 
-/* line 192, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 192, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .mistyrose {
   background: mistyrose; }
 
-/* line 194, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 194, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .moccasin {
   background: moccasin; }
 
-/* line 196, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 196, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .navajowhite {
   background: navajowhite; }
 
-/* line 198, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 198, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .navy {
   background: navy; }
 
-/* line 200, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 200, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .oldlace {
   background: oldlace; }
 
-/* line 202, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 202, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .olive {
   background: olive; }
 
-/* line 204, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 204, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .olivedrab {
   background: olivedrab; }
 
-/* line 206, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 206, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .orange {
   background: orange; }
 
-/* line 208, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 208, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .orangered {
   background: orangered; }
 
-/* line 210, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 210, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .orchid {
   background: orchid; }
 
-/* line 212, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 212, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .palegoldenrod {
   background: palegoldenrod; }
 
-/* line 214, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 214, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .palegreen {
   background: palegreen; }
 
-/* line 216, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 216, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .paleturquoise {
   background: paleturquoise; }
 
-/* line 218, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 218, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .palevioletred {
   background: palevioletred; }
 
-/* line 220, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 220, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .papayawhip {
   background: papayawhip; }
 
-/* line 222, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 222, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .peachpuff {
   background: peachpuff; }
 
-/* line 224, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 224, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .peru {
   background: peru; }
 
-/* line 226, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 226, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .pink {
   background: pink; }
 
-/* line 228, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 228, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .plum {
   background: plum; }
 
-/* line 230, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 230, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .powderblue {
   background: powderblue; }
 
-/* line 232, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 232, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .purple {
   background: purple; }
 
-/* line 234, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 234, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .red {
   background: red; }
 
-/* line 236, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 236, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .rosybrown {
   background: rosybrown; }
 
-/* line 238, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 238, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .royalblue {
   background: royalblue; }
 
-/* line 240, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 240, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .saddlebrown {
   background: saddlebrown; }
 
-/* line 242, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 242, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .salmon {
   background: salmon; }
 
-/* line 244, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 244, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .sandybrown {
   background: sandybrown; }
 
-/* line 246, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 246, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .seagreen {
   background: seagreen; }
 
-/* line 248, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 248, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .seashell {
   background: seashell; }
 
-/* line 250, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 250, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .sienna {
   background: sienna; }
 
-/* line 252, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 252, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .silver {
   background: silver; }
 
-/* line 254, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 254, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .skyblue {
   background: skyblue; }
 
-/* line 256, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 256, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .slateblue {
   background: slateblue; }
 
-/* line 258, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 258, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .slategray {
   background: slategrey; }
 
-/* line 260, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 260, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .snow {
   background: snow; }
 
-/* line 262, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 262, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .springgreen {
   background: springgreen; }
 
-/* line 264, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 264, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .steelblue {
   background: steelblue; }
 
-/* line 266, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 266, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .tan {
   background: tan; }
 
-/* line 268, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 268, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .teal {
   background: teal; }
 
-/* line 270, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 270, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .thistle {
   background: thistle; }
 
-/* line 272, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 272, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .tomato {
   background: tomato; }
 
-/* line 274, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 274, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .turquoise {
   background: turquoise; }
 
-/* line 276, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 276, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .violet {
   background: violet; }
 
-/* line 278, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 278, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .wheat {
   background: wheat; }
 
-/* line 280, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 280, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .white {
   background: white; }
 
-/* line 282, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 282, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .whitesmoke {
   background: whitesmoke; }
 
-/* line 284, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 284, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .yellow {
   background: yellow; }
 
-/* line 286, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 286, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .yellowgreen {
   background: yellowgreen; }
