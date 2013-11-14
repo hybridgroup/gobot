@@ -7,7 +7,7 @@
 <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
 <meta content="Cylon.js Getting Started" name="description">
 <meta content="The Hybrid Group" name="author">
-<title>Cylon.js Getting Started</title>
+<title>Gobot Getting Started</title>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><link href="http://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,500,700" rel="stylesheet" type="text/css">
 <link href="/stylesheets/style.css" rel="stylesheet">
 <link href="/favicon.ico" rel="shortcut icon" type="image/gif">
@@ -32,8 +32,8 @@
             </h1>
           </div>
           <span class="menu">
-            
-            
+            <a href="/documentation" class="item">Docs</a>
+            <a href="/hardware" class="item">Hardware</a>
             
             
             <a class="item" target="blanck" href="https://github.com/hybridgroup/gobot/">Github</a>
@@ -48,139 +48,161 @@
       </div>
       <div class="container">
         <div class="main" role="main">
-          <section class="content full"><section class="intro"><h2>What is Cylon.js?</h2>
+          <section class="content full"><section class="intro"><h2>What is Gobot?</h2>
+              <p>Gobot is a set of Go libraries for robotics and physical computing.</p>
+              <p>It provides a simple, yet powerful way to create solutions that incorporate multiple, different hardware devices at the same time.</p>
               <p>
-                Cylon.js is a JavaScript framework for robotics and physical computing using node.js.
-              </p>
-              <p>
-                It provides a simple, yet powerful way to create solutions that incorporate multiple, different hardware devices at the same time.
+                Want to use Node.js on robots? Check out our sister project Cylon.js
+                <a target="_blank" href="http://cylonjs.com">(http://cylonjs.com)</a>
               </p>
               <p>
                 Want to use Ruby on robots? Check out our sister project Artoo
                 <a target="_blank" href="http://artoo.io">(http://artoo.io)</a>
               </p>
-            </section><section class="how-to"><h2>How to Install Node.js</h2>
+            </section><section class="how-to"><h2>How to Install Go</h2>
+              <p></p>
+              Go is an open source programming environment that makes it easy to build simple, reliable, and efficient software.
+              <a target="blank" href="http://golang.org/doc/install">http://golang.org/doc/install</a>
               <h3>OSX</h3>
               <p></p>
-              Go to the Node.js downloads page at
-              <a target="blank" href="http://nodejs.org/download/">http://nodejs.org/download/</a>
+              Go to the Go downloads page at
+              <a target="blank" href="https://code.google.com/p/go/downloads/list">https://code.google.com/p/go/downloads/list</a>
               download the installer file and run it.
               <h3>Ubuntu</h3>
               <p></p>
-              Follow the installation instructions at
-              <a target="_blank" href="https://github.com/joyent/node/wiki/Installation">https://github.com/joyent/node/wiki/Installation</a>
-              to install the latest Node.js
+              Go to the Go downloads page at
+              <a target="blank" href="https://code.google.com/p/go/downloads/list">https://code.google.com/p/go/downloads/list</a>
+              download the installer file and run it.
               <h3>Windows</h3>
               <p></p>
-              Go to the Node.js downloads page at
-              <a target="blank" href="http://nodejs.org/download/">http://nodejs.org/download/</a>
+              Go to the Go downloads page at
+              <a target="blank" href="https://code.google.com/p/go/downloads/list">https://code.google.com/p/go/downloads/list</a>
               download the installer file and run it.
-            </section><section class="cylon-installation"><h2>How to Install Cylon.js</h2>
-              <p>In order to use Cylon.js, you must install the Cylon.js node modules needed to control your particular hardware setup. For example, to use Cylon.js with an Arduino, you will need to install the <code>cylon-firmata</code> module. Check out these examples:</p>
+            </section><section class="cylon-installation"><h2>How to Install Gobot</h2>
+              <p>Install the library with: <code>go get -u github.com/hybridgroup/gobot</code></p>
+              
+              <p>In order to use Gobot, you must install the libraries needed to control your particular hardware setup. For example, to use Gobot with an Beaglebone, you will need to install the <code>go get -u github.com/hybridgroup/gobot-beaglebone</code> library. Check out these examples:</p>
               <h3>OSX</h3>
-              <pre class="CodeRay">npm install cylon
-npm install cylon-firmata
+              <pre class="CodeRay">go get -u github.com/hybridgroup/gobot
+go get -u github.com/hybridgroup/gobot-beaglebone
 </pre>
               <h3>Ubuntu</h3>
-              <pre class="CodeRay">npm install cylon
-npm install cylon-firmata
+              <pre class="CodeRay">go get -u github.com/hybridgroup/gobot
+go get -u github.com/hybridgroup/gobot-beaglebone
 </pre>
               <h3>Windows</h3>
               <p>
-                Windows setup for cylon.
+                Windows setup for gobot.
               </p>
-              <section class="cylon-running"></section><h2>Cylon.js Robots</h2>
+              <section class="cylon-running"></section><h2>Gobot Robots</h2>
               <h3>Writing your robot code:</h3>
               <p></p>
               Now you are ready to write your own code. Take a look at the examples below, or go to the
-              <a target="blank" href="https://github.com/hybridgroup/cylon/tree/master/examples">examples</a>
+              <a target="blank" href="https://github.com/hybridgroup/gobot/tree/master/examples">examples</a>
               directory for a whole bunch of code you can use to help get started. We recommend using Test-Driven Robotics (TDR) with your preferred test frameworks.
-              <h3>Running your robot:</h3>
-              <pre class="CodeRay">node robotfilename.js
-</pre>
-              <p>or</p>
-              <pre class="CodeRay">coffee robotfilename.coffee
-</pre>
-            </section><section class="cylon-code"><h2>Cylon.js Code Examples</h2>
-              <h3>Example: Arduino with LED and a button</h3>
-              <p>To use this example, you must first run <code>npm install cylon-firmata</code></p>
-              <h4>Javascript</h4>
-              <pre class="CodeRay"><span class="keyword">var</span> Cylon = require(<span class="string"><span class="delimiter">'</span><span class="content">cylon</span><span class="delimiter">'</span></span>);
+            </section><section class="cylon-code"><h2>Gobot Code Examples</h2>
+              <h3>Example: Beaglebone with LED.</h3>
+              <p>To use this example, you must first run <code>go get -u github.com/hybridgroup/gobot-beaglebone</code></p>
+              <pre class="CodeRay"><span class="reserved">package</span> main
 
-Cylon.robot({
-  <span class="key">connection</span>: { <span class="key">name</span>: <span class="string"><span class="delimiter">'</span><span class="content">arduino</span><span class="delimiter">'</span></span>, <span class="key">adaptor</span>: <span class="string"><span class="delimiter">'</span><span class="content">firmata</span><span class="delimiter">'</span></span>, <span class="key">port</span>: <span class="string"><span class="delimiter">'</span><span class="content">/dev/ttyACM0</span><span class="delimiter">'</span></span> },
-  <span class="key">devices</span>: [{<span class="key">name</span>: <span class="string"><span class="delimiter">'</span><span class="content">led</span><span class="delimiter">'</span></span>, <span class="key">driver</span>: <span class="string"><span class="delimiter">'</span><span class="content">led</span><span class="delimiter">'</span></span>, <span class="key">pin</span>: <span class="integer">13</span>},
-            {<span class="key">name</span>: <span class="string"><span class="delimiter">'</span><span class="content">button</span><span class="delimiter">'</span></span>, <span class="key">driver</span>: <span class="string"><span class="delimiter">'</span><span class="content">button</span><span class="delimiter">'</span></span>, <span class="key">pin</span>: <span class="integer">2</span>}],
+<span class="reserved">import</span> (
+  . <span class="string"><span class="delimiter">"</span><span class="content">gobot</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">time</span><span class="delimiter">"</span></span>
+)
 
-  <span class="function">work</span>: <span class="keyword">function</span>(my) {
-    my.button.on(<span class="string"><span class="delimiter">'</span><span class="content">push</span><span class="delimiter">'</span></span>, <span class="keyword">function</span>() {my.led.toggle()});
+func main() {
+
+  <span class="key">beaglebone</span> := <span class="keyword">new</span>(Beaglebone)
+  beaglebone.Name = <span class="string"><span class="delimiter">"</span><span class="content">Beaglebone</span><span class="delimiter">"</span></span>
+
+  led := NewLed(beaglebone)
+  led.Driver = Driver{
+    <span class="key">Name</span>: <span class="string"><span class="delimiter">"</span><span class="content">led</span><span class="delimiter">"</span></span>,
+    <span class="key">Pin</span>: <span class="string"><span class="delimiter">"</span><span class="content">P9_12</span><span class="delimiter">"</span></span>,
   }
-}).start();
-</pre>
-              <h4>CoffeeScript</h4>
-              <pre class="CodeRay">Cylon = require <span class="string"><span class="delimiter">'</span><span class="content">cylon</span><span class="delimiter">'</span></span>
 
-Cylon.robot
-  connection:
-    name: <span class="string"><span class="delimiter">'</span><span class="content">arduino</span><span class="delimiter">'</span></span>, <span class="key">adaptor</span>: <span class="string"><span class="delimiter">'</span><span class="content">firmata</span><span class="delimiter">'</span></span>, <span class="key">port</span>: <span class="string"><span class="delimiter">'</span><span class="content">/dev/ttyACM0</span><span class="delimiter">'</span></span>
-
-  devices:
-    [
-      {<span class="key">name</span>: <span class="string"><span class="delimiter">'</span><span class="content">led</span><span class="delimiter">'</span></span>, <span class="key">driver</span>: <span class="string"><span class="delimiter">'</span><span class="content">led</span><span class="delimiter">'</span></span>, <span class="key">pin</span>: <span class="integer">13</span>},
-      {<span class="key">name</span>: <span class="string"><span class="delimiter">'</span><span class="content">button</span><span class="delimiter">'</span></span>, <span class="key">driver</span>: <span class="string"><span class="delimiter">'</span><span class="content">button</span><span class="delimiter">'</span></span>, <span class="key">pin</span>: <span class="integer">2</span>}
-    ]
-
-  work: (my) -&gt;
-    my.button.on <span class="string"><span class="delimiter">'</span><span class="content">push</span><span class="delimiter">'</span></span>, -&gt; my.led.toggle()
-
-.start()
-</pre>
-              <h3>Parrot ARDrone 2.0</h3>
-              <p>To use this example, you must first run <code>npm install cylon-ardrone</code></p>
-              <h4>Javascript</h4>
-              <pre class="CodeRay"><span class="keyword">var</span> Cylon = require(<span class="string"><span class="delimiter">'</span><span class="content">cylon</span><span class="delimiter">'</span></span>);
-
-Cylon.robot({
-  <span class="key">connection</span>: {<span class="key">name</span>: <span class="string"><span class="delimiter">'</span><span class="content">ardrone</span><span class="delimiter">'</span></span>, <span class="key">adaptor</span>: <span class="string"><span class="delimiter">'</span><span class="content">ardrone</span><span class="delimiter">'</span></span>, <span class="key">port</span>: <span class="string"><span class="delimiter">'</span><span class="content">192.168.1.1</span><span class="delimiter">'</span></span>},
-  <span class="key">device</span>: {<span class="key">name</span>: <span class="string"><span class="delimiter">'</span><span class="content">drone</span><span class="delimiter">'</span></span>, <span class="key">driver</span>: <span class="string"><span class="delimiter">'</span><span class="content">ardrone</span><span class="delimiter">'</span></span>},
-  <span class="function">work</span>: <span class="keyword">function</span>(my) {
-    my.drone.takeoff();
-
-    after((<span class="integer">10</span>).seconds(), <span class="keyword">function</span>() {
-      my.drone.land();
-    }
-
-    after((<span class="integer">15</span>).seconds(), <span class="keyword">function</span>() {
-      my.drone.stop();
-    }
+  connections := []<span class="reserved">interface</span>{} {
+    beaglebone,
   }
-}).start();
+  devices := []<span class="reserved">interface</span>{} {
+    led,
+  }
+
+  work := func(){
+    Every(<span class="integer">1000</span> * time.Millisecond, func(){ led.Toggle() })
+  }
+  
+  robot := Robot{
+      <span class="key">Connections</span>: connections, 
+      <span class="key">Devices</span>: devices,
+      <span class="key">Work</span>: work,
+  }
+
+  robot.Start()
+}
 </pre>
-              <h4>CoffeeScript</h4>
-              <pre class="CodeRay">Cylon = require <span class="string"><span class="delimiter">'</span><span class="content">cylon</span><span class="delimiter">'</span></span>
+              <h3>Sphero 2.0</h3>
+              <p>To use this example, you must first run <code>go get -u github.com/hybridgroup/gobot-sphero</code></p>
+              <pre class="CodeRay"><span class="reserved">package</span> main
+<span class="reserved">import</span> (
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-sphero</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
+)
 
-Cylon.robot
-  connection:
-    name: <span class="string"><span class="delimiter">'</span><span class="content">ardrone</span><span class="delimiter">'</span></span>, <span class="key">adaptor</span>: <span class="string"><span class="delimiter">'</span><span class="content">ardrone</span><span class="delimiter">'</span></span>, <span class="key">port</span>: <span class="string"><span class="delimiter">'</span><span class="content">192.168.1.1</span><span class="delimiter">'</span></span>
+func main() {
 
-  device:
-    name: <span class="string"><span class="delimiter">'</span><span class="content">drone</span><span class="delimiter">'</span></span>, <span class="key">driver</span>: <span class="string"><span class="delimiter">'</span><span class="content">ardrone</span><span class="delimiter">'</span></span>
+  <span class="key">spheroAdaptor</span> := <span class="keyword">new</span>(gobotSphero.SpheroAdaptor)
+  spheroAdaptor.Name = <span class="string"><span class="delimiter">"</span><span class="content">Sphero</span><span class="delimiter">"</span></span>
+  spheroAdaptor.Port = <span class="string"><span class="delimiter">"</span><span class="content">127.0.0.1:4560</span><span class="delimiter">"</span></span>
 
-  work: (my) -&gt;
-    my.drone.takeoff()
+  sphero := gobotSphero.NewSphero(spheroAdaptor)
+  sphero.Name = <span class="string"><span class="delimiter">"</span><span class="content">Sphero</span><span class="delimiter">"</span></span>
 
-    after <span class="integer">10</span>.seconds(), -&gt;
-      my.drone.land()
+  connections := []<span class="reserved">interface</span>{} {
+    spheroAdaptor,
+  }
+  devices := []<span class="reserved">interface</span>{} {
+    sphero,
+  }
 
-    after <span class="integer">15</span>.seconds(), -&gt;
-      my.drone.stop()
+  work := func(){
 
-.start()
+    sphero.Stop()
+
+    go func() {
+      <span class="keyword">for</span>{
+        gobot.On(sphero.Events[<span class="string"><span class="delimiter">"</span><span class="content">Collision</span><span class="delimiter">"</span></span>])
+        fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">Collision Detected!</span><span class="delimiter">"</span></span>)
+      }
+    }()    
+    
+    gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">2s</span><span class="delimiter">"</span></span>, func(){ 
+      <span class="key">dir</span> := uint16(gobot.Random(<span class="integer">0</span>, <span class="integer">360</span>))
+      sphero.Roll(<span class="integer">100</span>, dir) 
+    })
+
+    gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">3s</span><span class="delimiter">"</span></span>, func(){ 
+      <span class="key">r</span> := uint8(gobot.Random(<span class="integer">0</span>, <span class="integer">255</span>))
+      g := uint8(gobot.Random(<span class="integer">0</span>, <span class="integer">255</span>))
+      b := uint8(gobot.Random(<span class="integer">0</span>, <span class="integer">255</span>))
+      sphero.SetRGB(r, g, b)
+    })
+  }
+  
+  robot := gobot.Robot{
+      <span class="key">Connections</span>: connections, 
+      <span class="key">Devices</span>: devices,
+      <span class="key">Work</span>: work,
+  }
+
+  robot.Start()
+}
 </pre>
             </section><section class="contributing"><h2>Contributing</h2>
               <p>
-                You can help cylon grow by contributing your code, new drivers or platforms to the project, check the Github page
-                <a href="https://github.com/hybridgroup/cylon">cylon on github.</a>
+                You can help gobot grow by contributing your code, new drivers or platforms to the project, check the Github page
+                <a href="https://github.com/hybridgroup/gobot">gobot on github.</a>
               </p>
               <ul>
 <li>Fork it</li>

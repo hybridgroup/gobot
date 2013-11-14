@@ -1312,64 +1312,70 @@ h3, h4, h5, ul, ol {
 
 /* line 13, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_base.sass */
 a {
-  color: #580a25; }
+  color: #ff7e5b; }
   /* line 15, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_base.sass */
   a, a:visited {
-    color: #9e162e; }
+    color: #ff7e5b; }
+  /* line 17, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_base.sass */
+  a:hover {
+    color: #fc4c1d; }
 
 @media only screen and (max-width: 767px) {
-  /* line 17, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_base.sass */
+  /* line 19, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_base.sass */
   pre {
     white-space: pre;
     overflow: scroll;
     word-wrap: normal; } }
 
-/* line 21, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_base.sass */
+/* line 23, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_base.sass */
 .anchors-blue, .app-footer a, .hero .subtitle a, .page-title a, .anchors-blue:active, .app-footer a:active, .hero .subtitle a:active, .page-title a:active, .anchors-blue:visited, .app-footer a:visited, .hero .subtitle a:visited, .page-title a:visited {
   color: #fffbda; }
-/* line 23, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_base.sass */
+/* line 25, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_base.sass */
 .anchors-blue:hover, .app-footer a:hover, .hero .subtitle a:hover, .page-title a:hover {
   color: white; }
 
-/* line 26, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_base.sass */
+/* line 28, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_base.sass */
 .notice {
   background: white;
   padding: 20px 25px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
-.cylon-logo a {
-  background: transparent url("/images/logo.png") left top no-repeat;
-  display: inline-block;
-  text-indent: -99999px;
-  color: #cc3300;
-  width: 256px;
-  height: 27px; }
+/* line 1, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+.cylon-logo {
+  width: 405px; }
+  /* line 3, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+  .cylon-logo a {
+    background: transparent url("/images/logo.png") left top no-repeat;
+    display: inline-block;
+    text-indent: -99999px;
+    color: #fc4c1d;
+    width: 256px;
+    height: 27px; }
 
-/* line 10, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+/* line 12, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
 .github-menu {
   padding: 10px 10px 10px 40px;
   font-weight: bold;
   background: url(../../images/github-mark.png) top left no-repeat; }
-  /* line 11, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+  /* line 13, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
   .github-menu a {
     color: #580a25; }
-  /* line 16, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+  /* line 18, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
   .github-menu:hover {
     color: #ee274a;
     text-decoration: underline; }
 
-/* line 20, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+/* line 22, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
 .app-header {
   margin: 16px 0 15px 0; }
-  /* line 23, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+  /* line 25, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
   .app-header .Cylon.js-logo, .app-header .display, .app-header .subtitle, .app-header .menu, .app-header h1 {
     vertical-align: middle;
     margin: 0;
     display: inline-block; }
-  /* line 28, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+  /* line 30, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
   .app-header .display {
     margin: -1px 0 0 0; }
-  /* line 31, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+  /* line 33, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
   .app-header .subtitle {
     font-family: "Montserrat", sans-serif;
     font-weight: 700;
@@ -1377,10 +1383,10 @@ a {
     color: #505252;
     padding: 8px 0 0 15px;
     width: 200px; }
-  /* line 36, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+  /* line 38, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
   .app-header .easter {
     display: none; }
-  /* line 39, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+  /* line 41, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
   .app-header .heart {
     color: red;
     font-size: 20px;
@@ -1389,60 +1395,59 @@ a {
     display: inline-block;
     width: 38px;
     text-align: center; }
-  /* line 48, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+  /* line 50, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
   .app-header .menu {
     width: 510px;
     text-align: right;
     display: inline-block;
-    margin: 3px 0 0 0;
-    float: right; }
-    /* line 55, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+    margin: 3px 0 0 0; }
+    /* line 56, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
     .app-header .menu .active {
-      color: #cc3300; }
-    /* line 58, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+      color: #fc4c1d; }
+    /* line 59, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
     .app-header .menu .item {
       font-size: 15px;
       font-weight: bold;
       margin: 10px;
       padding: 8px 4px; }
-      /* line 64, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+      /* line 65, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
       .app-header .menu .item, .app-header .menu .item:visited {
         color: #505252; }
-      /* line 67, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+      /* line 68, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
       .app-header .menu .item:hover {
-        color: #cc3300; }
-      /* line 70, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+        color: #fc4c1d; }
+      /* line 71, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
       .app-header .menu .item:active {
-        color: #cc3300; }
+        color: #fc4c1d; }
     @media only screen and (min-width: 767px) and (max-width: 964px) {
-      /* line 48, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+      /* line 50, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
       .app-header .menu {
         width: 360px;
         padding: 0; }
-        /* line 76, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+        /* line 77, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
         .app-header .menu .item {
           margin: 0;
           padding: 0 5px; } }
   @media only screen and (max-width: 767px) {
-    /* line 20, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+    /* line 22, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
     .app-header {
       width: 100%;
       text-align: center; }
-      /* line 83, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+      /* line 84, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
       .app-header .Cylon.js-logo, .app-header .subtitle {
         width: 100%;
         display: block;
         margin: 0 0 5px 0; }
-      /* line 87, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+      /* line 88, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
       .app-header .subtitle {
         font-size: 19px;
         line-height: 15px;
         padding: 0; }
-      /* line 91, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+      /* line 92, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
       .app-header .menu {
         width: 100%;
         text-align: center; }
-        /* line 94, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
+        /* line 95, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/shared/_headers.sass */
         .app-header .menu .item {
           margin: 0;
           padding: 0 2px; } }
@@ -1663,7 +1668,7 @@ a {
     margin-bottom: 30px; }
     /* line 12, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_blog.sass */
     .articles .article h3, .articles .article h4, .articles .article a {
-      color: #cc3300; }
+      color: #fc4c1d; }
     /* line 15, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_blog.sass */
     .articles .article h3 {
       display: inline-block;
@@ -1701,7 +1706,7 @@ a {
       /* line 48, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_blog.sass */
       .articles .article .date .red {
         padding: 2px;
-        background-color: #cc3300; }
+        background-color: #fc4c1d; }
         /* line 52, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_blog.sass */
         .articles .article .date .red .year {
           font-size: 10px;
@@ -1738,7 +1743,7 @@ a {
     color: black; }
   /* line 84, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_blog.sass */
   .categories h4, .network h4, .tweets h4 {
-    color: #cc3300;
+    color: #fc4c1d;
     font-size: 20px;
     line-height: 24px; }
 
@@ -1761,7 +1766,7 @@ a {
     font-family: "Montserrat", sans-serif;
     font-weight: 700;
     font-size: 33px;
-    color: #fafaf1;
+    color: white;
     line-height: 28px;
     width: 100%;
     clear: both;
@@ -1772,7 +1777,7 @@ a {
     font-family: "Montserrat", sans-serif;
     font-weight: 700;
     font-size: 21px;
-    color: #b39f89;
+    color: #fafaf1;
     font-weight: 550;
     opacity: 0.94;
     margin: 0;
@@ -1815,7 +1820,7 @@ a {
 .documentation .display {
   width: 300px;
   float: right;
-  border: 1px solid rgba(88, 10, 37, 0.14);
+  border: 1px solid rgba(255, 126, 91, 0.14);
   margin: 0 0 19px 20px; }
 /* line 22, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_documentation.sass */
 .documentation .hardware .devices {

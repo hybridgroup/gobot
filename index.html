@@ -32,8 +32,8 @@
             </h1>
           </div>
           <span class="menu">
-            
-            
+            <a href="/documentation" class="item">Docs</a>
+            <a href="/hardware" class="item">Hardware</a>
             
             
             <a class="item" target="blanck" href="https://github.com/hybridgroup/gobot/">Github</a>
@@ -49,9 +49,12 @@
             Go, Robot, Go! Go Powered Robotics
           </h1>
           <h2 class="subtitle">
-            Gobot makes robotics Simple and Extensible.
+            Gobot makes robotics
+            <a href="/documentation/getting-started" class="item">Simple</a>
+            and
+            <a href="/documentation/platforms" class="item">Extensible.</a>
           </h2>
-          <a class="cta" href="https://github.com/hybridgroup/gobot/">Get Started</a>
+          <a class="cta" href="documentation/getting-started">Get Started</a>
         </div>
       </div>
       <div class="social">
@@ -88,6 +91,78 @@
             
             <p>Want to use Node.js? Check out our sister project Cylon <a href="http://cylonjs.com">(http://cylonjs.com)</a>.</p>
             
+            <h2 id="meet-the-code">Meet The Code</h2>
+            
+            <p>Gobot makes commanding robots incredibly simple and fun.</p>
+            
+            <p>All you need to get started is install the library with :  </p>
+            
+            <p><code>go get -u github.com/hybridgroup/gobot</code>.</p>
+            
+            <p>Then install additional libraries for whatever hardware support you want to use from your robot. For example, <code>go get -u github.com/hybridgroup/gobot-sphero</code> to use Gobot with a Sphero.</p>
+            
+            <h2 id="example">Example</h2>
+            
+            <pre class="CodeRay"><span class="reserved">package</span> main
+<span class="reserved">import</span> (
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-sphero</span><span class="delimiter">"</span></span>
+)
+
+func main() {
+
+  <span class="key">spheroAdaptor</span> := <span class="keyword">new</span>(gobotSphero.SpheroAdaptor)
+  spheroAdaptor.Name = <span class="string"><span class="delimiter">"</span><span class="content">Sphero</span><span class="delimiter">"</span></span>
+  spheroAdaptor.Port = <span class="string"><span class="delimiter">"</span><span class="content">127.0.0.1:4560</span><span class="delimiter">"</span></span>
+
+  sphero := gobotSphero.NewSphero(spheroAdaptor)
+  sphero.Name = <span class="string"><span class="delimiter">"</span><span class="content">Sphero</span><span class="delimiter">"</span></span>
+
+  connections := []<span class="reserved">interface</span>{} {
+    spheroAdaptor,
+  }
+
+  devices := []<span class="reserved">interface</span>{} {
+    sphero,
+  }
+
+  work := func(){
+    gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">2s</span><span class="delimiter">"</span></span>, func(){ 
+      sphero.Roll(<span class="integer">100</span>, uint16(gobot.Random(<span class="integer">0</span>, <span class="integer">360</span>))) 
+    })
+  }
+
+  robot := gobot.Robot{
+    <span class="key">Connections</span>: connections, 
+    <span class="key">Devices</span>: devices,
+    <span class="key">Work</span>: work,
+  }
+
+  robot.Start()
+  }  
+</pre>
+            <h2>Getting Started</h2>
+            <p>
+              Ready to build Go robots with Gobot?
+              <a href="/documentation/getting-started" class="item">Get Started Here!</a>
+            </p>
+            <h2>Hardware Support</h2>
+            <p>
+              Gobot has a extensible system for connecting to hardware devices. The following robotics and physical computing platforms are currently supported:
+              </p>
+<ul>
+<li>
+                  <a target="_blank" href="http://beagleboard.org/Products/BeagleBone+Black/">Beaglebone Black</a>
+                  &lt;==&gt;
+                  <a target="_blank" href="https://github.com/hybridgroup/gobot-beaglebone">Library</a>
+                </li>
+                <li>
+                  <a target="_blank" href="http://www.gosphero.com/">Sphero</a>
+                  &lt;==&gt;
+                  <a target="_blank" href="https://github.com/hybridgroup/gobot-sphero">Library</a>
+                </li>
+              </ul>
+<p>More platforms and drivers are coming soon...</p>
             <h2 id="be-part-of-the-robot-evolution">Be Part Of The Robot Evolution</h2>
             
             <ul>

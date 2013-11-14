@@ -32,8 +32,8 @@
             </h1>
           </div>
           <span class="menu">
-            
-            
+            <a href="/documentation" class="item">Docs</a>
+            <a href="/hardware" class="item">Hardware</a>
             
             
             <a class="item" target="blanck" href="https://github.com/hybridgroup/gobot/">Github</a>
@@ -53,33 +53,48 @@
                   Allows user to interact with LEDs through digital output and PWM (Pulse Width Modulation)
                 </p>
               </section><section class="how-to"><h2>How to establish a connection and setup the driver</h2>
-                <h3>JavaScript</h3>
-                <pre class="CodeRay"><span class="keyword">var</span> Cylon = require(<span class="string"><span class="delimiter">'</span><span class="content">cylon</span><span class="delimiter">'</span></span>);
+                <h3>For Beaglebone:</h3>
+                <pre class="CodeRay"><span class="reserved">package</span> main
 
-Cylon.robot({
-  <span class="key">connection</span>: {<span class="key">name</span>: <span class="string"><span class="delimiter">'</span><span class="content">arduino</span><span class="delimiter">'</span></span>, <span class="key">adaptor</span>: <span class="string"><span class="delimiter">'</span><span class="content">firmata</span><span class="delimiter">'</span></span>, <span class="key">port</span>: <span class="string"><span class="delimiter">'</span><span class="content">/dev/ttyACM0</span><span class="delimiter">'</span></span>},
+<span class="reserved">import</span> (
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-beaglebone</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">time</span><span class="delimiter">"</span></span>
+)
 
-  <span class="key">device</span>: {<span class="key">name</span>: <span class="string"><span class="delimiter">'</span><span class="content">led</span><span class="delimiter">'</span></span>, <span class="key">driver</span>: <span class="string"><span class="delimiter">'</span><span class="content">led</span><span class="delimiter">'</span></span>, <span class="key">pin</span>: <span class="integer">13</span>},
-  ...
-</pre>
-                <h3>CoffeeScript</h3>
-                <pre class="CodeRay">Cylon = require <span class="string"><span class="delimiter">'</span><span class="content">cylon</span><span class="delimiter">'</span></span>
+func main() {
 
-Cylon.robot
-  connection:
-    name: <span class="string"><span class="delimiter">'</span><span class="content">arduino</span><span class="delimiter">'</span></span>, <span class="key">adaptor</span>: <span class="string"><span class="delimiter">'</span><span class="content">firmata</span><span class="delimiter">'</span></span>, <span class="key">port</span>: <span class="string"><span class="delimiter">'</span><span class="content">/dev/ttyACM0</span><span class="delimiter">'</span></span>
+  <span class="key">beaglebone</span> := <span class="keyword">new</span>(gobotBeaglebone.Beaglebone)
+  beaglebone.Name = <span class="string"><span class="delimiter">"</span><span class="content">Beaglebone</span><span class="delimiter">"</span></span>
+
+  led := gobotBeaglebone.NewLed(beaglebone)
+  led.Driver = gobot.Driver{
+    <span class="key">Name</span>: <span class="string"><span class="delimiter">"</span><span class="content">led</span><span class="delimiter">"</span></span>,
+    <span class="key">Pin</span>: <span class="string"><span class="delimiter">"</span><span class="content">P9_12</span><span class="delimiter">"</span></span>,
+  }
+
+  connections := []<span class="reserved">interface</span>{} {
+    beaglebone,
+  }
+  devices := []<span class="reserved">interface</span>{} {
+    led,
+  }
   ...
 </pre>
               </section><section class="public-methods"><h2>Commands:</h2>
                 <dl class="methods">
-<dt>turnOn</dt>
+<dt>IsOn</dt>
+                  <dd>Returns true if LED is on, otherwise returns false.</dd>
+                  <dt>IsOff</dt>
+                  <dd>Returns true if LED is off, otherwise returns false.</dd>
+                  <dt>On</dt>
                   <dd>Turns LED on.</dd>
-                  <dt>turnOff</dt>
+                  <dt>Off</dt>
                   <dd>Turns LED off.</dd>
                   <dt>toggle</dt>
                   <dd>Turns the LED on, or off, depending on if it is already off, or on, respectively.</dd>
-                  <dt>brightness(brightness_int) → true | nil</dt>
-                  <dd>Sets brightness of the led to the specified brightness value passed to brightness(brightness_int) using PWM, brightness can be any integer value between 0 and 255.</dd>
+                  <dt>changeState(pin,level)</dt>
+                  <dd></dd>
                 </dl>
 <h2>Events</h2>
                 <dl class="methods">
@@ -87,47 +102,65 @@ Cylon.robot
                   <dd>Sent when the device has been started and is ready to use.</dd>
                 </dl></section><section class="how-to"><h2>How to use</h2>
                 <p>
-                  This example turns an LED on and off.
+                  This example turns an LED on and off, with digispark.
                 </p>
-                <h3>JavaScript</h3>
-                <pre class="CodeRay"><span class="keyword">var</span> Cylon = require(<span class="string"><span class="delimiter">'</span><span class="content">cylon</span><span class="delimiter">'</span></span>);
+                <pre class="CodeRay"><span class="reserved">package</span> main
 
-Cylon.robot({
-  <span class="key">connection</span>: {<span class="key">name</span>: <span class="string"><span class="delimiter">'</span><span class="content">arduino</span><span class="delimiter">'</span></span>, <span class="key">adaptor</span>: <span class="string"><span class="delimiter">'</span><span class="content">firmata</span><span class="delimiter">'</span></span>, <span class="key">port</span>: <span class="string"><span class="delimiter">'</span><span class="content">/dev/ttyACM0</span><span class="delimiter">'</span></span>},
+<span class="reserved">import</span> (
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-digispark</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
+)
 
-  <span class="key">device</span>: {<span class="key">name</span>: <span class="string"><span class="delimiter">'</span><span class="content">led</span><span class="delimiter">'</span></span>, <span class="key">driver</span>: <span class="string"><span class="delimiter">'</span><span class="content">led</span><span class="delimiter">'</span></span>, <span class="key">pin</span>: <span class="integer">13</span>},
+func main() {
 
-  <span class="function">work</span>: <span class="keyword">function</span>(my) {
-    every((<span class="integer">1</span>).second(), <span class="keyword">function</span>(my) {
-      my.led.toggle();
-    });
+  <span class="key">digispark</span> := <span class="keyword">new</span>(gobotDigispark.DigisparkAdaptor)
+  digispark.Name = <span class="string"><span class="delimiter">"</span><span class="content">Digispark</span><span class="delimiter">"</span></span>
+
+  led := gobotGPIO.NewLed(&amp;digispark)
+  led.Driver = gobot.Driver{
+    <span class="key">Name</span>: <span class="string"><span class="delimiter">"</span><span class="content">led</span><span class="delimiter">"</span></span>,
+    <span class="key">Pin</span>: <span class="string"><span class="delimiter">"</span><span class="content">2</span><span class="delimiter">"</span></span>,
   }
-}).start();
-</pre>
-                <h3>CoffeeScript</h3>
-                <pre class="CodeRay">Cylon = require <span class="string"><span class="delimiter">'</span><span class="content">cylon</span><span class="delimiter">'</span></span>
 
-Cylon.robot
-  connection:
-    name: <span class="string"><span class="delimiter">'</span><span class="content">arduino</span><span class="delimiter">'</span></span>, <span class="key">adaptor</span>: <span class="string"><span class="delimiter">'</span><span class="content">firmata</span><span class="delimiter">'</span></span>, <span class="key">port</span>: <span class="string"><span class="delimiter">'</span><span class="content">/dev/ttyACM0</span><span class="delimiter">'</span></span>
+  connections := []<span class="reserved">interface</span>{} {
+    digispark,
+  }
+  devices := []<span class="reserved">interface</span>{} {
+    led,
+  }
 
-  device:
-    name: <span class="string"><span class="delimiter">'</span><span class="content">led</span><span class="delimiter">'</span></span>, <span class="key">driver</span>: <span class="string"><span class="delimiter">'</span><span class="content">led</span><span class="delimiter">'</span></span>, <span class="key">pin</span>: <span class="integer">13</span>
+  work := func(){
+    gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">0.5s</span><span class="delimiter">"</span></span>, func(){ 
+      led.Toggle() 
+      <span class="keyword">if</span> led.IsOn() {
+        fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">On</span><span class="delimiter">"</span></span>)
+      } <span class="keyword">else</span> {
+        fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">Off</span><span class="delimiter">"</span></span>)
+      }
+    })
+  }
+  
+  robot := gobot.Robot{
+      <span class="key">Connections</span>: connections, 
+      <span class="key">Devices</span>: devices,
+      <span class="key">Work</span>: work,
+  }
 
-  work: (my) -&gt;
-    every <span class="integer">1</span>.second(), -&gt; my.led.toggle()
-
-.start()
+  robot.Start()
+}
 </pre>
               </section><section class="circuit"><h2>Circuit and Schematic</h2>
                 <a href="http://arduino.cc/en/Tutorial/Blink">http://arduino.cc/en/Tutorial/Blink</a>
               </section><section class="compatability hardware"><h2>Works with:</h2>
                 
                 <div class="devices">
-                  <a class="device" href="/documentation/platforms/arduino" title="Arduino">
-                    <img src="/images/arduino.jpg"></a>
                   
-                  
+                  <a class="device" href="/documentation/platforms/beaglebone" title="BeagleBone">
+                    <img src="/images/beaglebone.jpg"></a>
+                  <a class="device" href="/documentation/platforms/digispark" title="Digispark">
+                    <img src="/images/digispark.jpg"></a>
                   
                 </div>
               </section>
