@@ -1871,569 +1871,570 @@ a {
       float: left;
       margin-left: 5px; }
 
-/* line 2, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 1, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .square {
   width: 50px;
   height: 50px;
   border: 1px solid #cccccc;
-  float: left; }
+  float: left;
+  margin-right: 10px; }
 
-/* line 7, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 8, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .aliceblue {
   background: aliceblue; }
 
-/* line 9, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 10, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .antiquewhite {
   background: antiquewhite; }
 
-/* line 11, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 12, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .aqua {
   background: cyan; }
 
-/* line 13, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 14, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .aquamarine {
   background: aquamarine; }
 
-/* line 15, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 16, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .azure {
   background: azure; }
 
-/* line 17, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 18, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .beige {
   background: beige; }
 
-/* line 19, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 20, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .bisque {
   background: bisque; }
 
-/* line 21, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 22, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .black {
   background: black; }
 
-/* line 23, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 24, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .blanchedalmond {
   background: blanchedalmond; }
 
-/* line 25, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 26, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .blue {
   background: blue; }
 
-/* line 27, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 28, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .blueviolet {
   background: blueviolet; }
 
-/* line 29, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 30, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .brown {
   background: brown; }
 
-/* line 31, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 32, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .burlywood {
   background: burlywood; }
 
-/* line 33, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 34, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .cadetblue {
   background: cadetblue; }
 
-/* line 35, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 36, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .chartreuse {
   background: chartreuse; }
 
-/* line 37, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 38, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .chocolate {
   background: chocolate; }
 
-/* line 39, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 40, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .coral {
   background: coral; }
 
-/* line 41, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 42, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .cornflowerblue {
   background: cornflowerblue; }
 
-/* line 43, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 44, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .cornsilk {
   background: cornsilk; }
 
-/* line 45, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 46, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .crimson {
   background: crimson; }
 
-/* line 47, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 48, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .cyan {
   background: cyan; }
 
-/* line 49, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 50, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .darkblue {
   background: darkblue; }
 
-/* line 51, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 52, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .darkcyan {
   background: darkcyan; }
 
-/* line 53, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 54, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .darkgoldenrod {
   background: darkgoldenrod; }
 
-/* line 55, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 56, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .darkgray {
   background: darkgrey; }
 
-/* line 57, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 58, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .darkgreen {
   background: darkgreen; }
 
-/* line 59, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 60, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .darkkhaki {
   background: darkkhaki; }
 
-/* line 61, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 62, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .darkmagenta {
   background: darkmagenta; }
 
-/* line 63, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 64, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .darkolivegreen {
   background: darkolivegreen; }
 
-/* line 65, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 66, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .darkorange {
   background: darkorange; }
 
-/* line 67, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 68, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .darkorchid {
   background: darkorchid; }
 
-/* line 69, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 70, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .darkred {
   background: darkred; }
 
-/* line 71, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 72, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .darksalmon {
   background: darksalmon; }
 
-/* line 73, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 74, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .darkseagreen {
   background: darkseagreen; }
 
-/* line 75, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 76, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .darkslateblue {
   background: darkslateblue; }
 
-/* line 77, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 78, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .darkslategray {
   background: darkslategrey; }
 
-/* line 79, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 80, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .darkturquoise {
   background: darkturquoise; }
 
-/* line 81, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 82, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .darkviolet {
   background: darkviolet; }
 
-/* line 83, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 84, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .deeppink {
   background: deeppink; }
 
-/* line 85, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 86, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .deepskyblue {
   background: deepskyblue; }
 
-/* line 87, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 88, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .dimgray {
   background: dimgrey; }
 
-/* line 89, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 90, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .dodgerblue {
   background: dodgerblue; }
 
-/* line 91, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 92, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .firebrick {
   background: firebrick; }
 
-/* line 93, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 94, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .floralwhite {
   background: floralwhite; }
 
-/* line 95, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 96, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .forestgreen {
   background: forestgreen; }
 
-/* line 97, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 98, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .fuchsia {
   background: magenta; }
 
-/* line 99, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 100, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .gainsboro {
   background: gainsboro; }
 
-/* line 101, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 102, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .ghostwhite {
   background: ghostwhite; }
 
-/* line 103, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 104, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .gold {
   background: gold; }
 
-/* line 105, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 106, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .goldenrod {
   background: goldenrod; }
 
-/* line 107, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 108, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .gray {
   background: gray; }
 
-/* line 109, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 110, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .green {
   background: green; }
 
-/* line 111, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 112, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .greenyellow {
   background: greenyellow; }
 
-/* line 113, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 114, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .honeydew {
   background: honeydew; }
 
-/* line 115, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 116, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .hotpink {
   background: hotpink; }
 
-/* line 117, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 118, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .indianred {
   background: indianred; }
 
-/* line 119, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 120, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .indigo {
   background: indigo; }
 
-/* line 121, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 122, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .ivory {
   background: ivory; }
 
-/* line 123, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 124, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .khaki {
   background: khaki; }
 
-/* line 125, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 126, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .lavender {
   background: lavender; }
 
-/* line 127, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 128, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .lavenderblush {
   background: lavenderblush; }
 
-/* line 129, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 130, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .lawngreen {
   background: lawngreen; }
 
-/* line 131, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 132, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .lemonchiffon {
   background: lemonchiffon; }
 
-/* line 133, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 134, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .lightblue {
   background: lightblue; }
 
-/* line 135, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 136, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .lightcoral {
   background: lightcoral; }
 
-/* line 137, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 138, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .lightcyan {
   background: lightcyan; }
 
-/* line 139, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 140, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .lightgoldenrodyellow {
   background: lightgoldenrodyellow; }
 
-/* line 141, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 142, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .lightgreen {
   background: lightgreen; }
 
-/* line 143, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 144, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .lightgrey {
   background: lightgrey; }
 
-/* line 145, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 146, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .lightpink {
   background: lightpink; }
 
-/* line 147, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 148, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .lightsalmon {
   background: lightsalmon; }
 
-/* line 149, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 150, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .lightseagreen {
   background: lightseagreen; }
 
-/* line 151, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 152, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .lightskyblue {
   background: lightskyblue; }
 
-/* line 153, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 154, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .lightslategray {
   background: lightslategrey; }
 
-/* line 155, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 156, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .lightsteelblue {
   background: lightsteelblue; }
 
-/* line 157, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 158, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .lightyellow {
   background: lightyellow; }
 
-/* line 159, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 160, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .lime {
   background: lime; }
 
-/* line 161, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 162, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .limegreen {
   background: limegreen; }
 
-/* line 163, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 164, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .linen {
   background: linen; }
 
-/* line 165, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 166, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .magenta {
   background: magenta; }
 
-/* line 167, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 168, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .maroon {
   background: maroon; }
 
-/* line 169, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 170, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .mediumaquamarine {
   background: mediumaquamarine; }
 
-/* line 171, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 172, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .mediumblue {
   background: mediumblue; }
 
-/* line 173, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 174, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .mediumorchid {
   background: mediumorchid; }
 
-/* line 175, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 176, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .mediumpurple {
   background: mediumpurple; }
 
-/* line 177, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 178, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .mediumseagreen {
   background: mediumseagreen; }
 
-/* line 179, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 180, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .mediumslateblue {
   background: mediumslateblue; }
 
-/* line 181, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 182, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .mediumspringgreen {
   background: mediumspringgreen; }
 
-/* line 183, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 184, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .mediumturquoise {
   background: mediumturquoise; }
 
-/* line 185, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 186, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .mediumvioletred {
   background: mediumvioletred; }
 
-/* line 187, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 188, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .midnightblue {
   background: midnightblue; }
 
-/* line 189, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 190, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .mintcream {
   background: mintcream; }
 
-/* line 191, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 192, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .mistyrose {
   background: mistyrose; }
 
-/* line 193, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 194, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .moccasin {
   background: moccasin; }
 
-/* line 195, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 196, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .navajowhite {
   background: navajowhite; }
 
-/* line 197, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 198, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .navy {
   background: navy; }
 
-/* line 199, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 200, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .oldlace {
   background: oldlace; }
 
-/* line 201, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 202, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .olive {
   background: olive; }
 
-/* line 203, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 204, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .olivedrab {
   background: olivedrab; }
 
-/* line 205, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 206, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .orange {
   background: orange; }
 
-/* line 207, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 208, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .orangered {
   background: orangered; }
 
-/* line 209, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 210, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .orchid {
   background: orchid; }
 
-/* line 211, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 212, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .palegoldenrod {
   background: palegoldenrod; }
 
-/* line 213, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 214, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .palegreen {
   background: palegreen; }
 
-/* line 215, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 216, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .paleturquoise {
   background: paleturquoise; }
 
-/* line 217, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 218, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .palevioletred {
   background: palevioletred; }
 
-/* line 219, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 220, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .papayawhip {
   background: papayawhip; }
 
-/* line 221, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 222, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .peachpuff {
   background: peachpuff; }
 
-/* line 223, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 224, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .peru {
   background: peru; }
 
-/* line 225, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 226, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .pink {
   background: pink; }
 
-/* line 227, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 228, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .plum {
   background: plum; }
 
-/* line 229, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 230, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .powderblue {
   background: powderblue; }
 
-/* line 231, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 232, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .purple {
   background: purple; }
 
-/* line 233, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 234, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .red {
   background: red; }
 
-/* line 235, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 236, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .rosybrown {
   background: rosybrown; }
 
-/* line 237, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 238, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .royalblue {
   background: royalblue; }
 
-/* line 239, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 240, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .saddlebrown {
   background: saddlebrown; }
 
-/* line 241, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 242, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .salmon {
   background: salmon; }
 
-/* line 243, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 244, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .sandybrown {
   background: sandybrown; }
 
-/* line 245, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 246, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .seagreen {
   background: seagreen; }
 
-/* line 247, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 248, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .seashell {
   background: seashell; }
 
-/* line 249, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 250, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .sienna {
   background: sienna; }
 
-/* line 251, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 252, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .silver {
   background: silver; }
 
-/* line 253, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 254, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .skyblue {
   background: skyblue; }
 
-/* line 255, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 256, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .slateblue {
   background: slateblue; }
 
-/* line 257, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 258, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .slategray {
   background: slategrey; }
 
-/* line 259, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 260, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .snow {
   background: snow; }
 
-/* line 261, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 262, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .springgreen {
   background: springgreen; }
 
-/* line 263, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 264, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .steelblue {
   background: steelblue; }
 
-/* line 265, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 266, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .tan {
   background: tan; }
 
-/* line 267, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 268, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .teal {
   background: teal; }
 
-/* line 269, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 270, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .thistle {
   background: thistle; }
 
-/* line 271, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 272, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .tomato {
   background: tomato; }
 
-/* line 273, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 274, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .turquoise {
   background: turquoise; }
 
-/* line 275, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 276, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .violet {
   background: violet; }
 
-/* line 277, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 278, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .wheat {
   background: wheat; }
 
-/* line 279, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 280, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .white {
   background: white; }
 
-/* line 281, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 282, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .whitesmoke {
   background: whitesmoke; }
 
-/* line 283, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 284, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .yellow {
   background: yellow; }
 
-/* line 285, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 286, /Users/xixebombilla/Desktop/THG/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
 .yellowgreen {
   background: yellowgreen; }
