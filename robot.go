@@ -65,3 +65,12 @@ func (r *Robot) startDevices() {
 		r.devices[i].Start()
 	}
 }
+
+func (r *Robot) Device(name string) *Device {
+	for i := range r.devices {
+		if r.devices[i].Name == name {
+			return r.devices[i]
+		}
+	}
+	return nil
+}

@@ -1,65 +1,58 @@
 package gobot
 
-import (
-	"math/rand"
-	"net"
-	"time"
-)
+import "time"
 
-func Every(t string, f func()) {
-	dur := parseDuration(t)
-	go func() {
-		for {
-			time.Sleep(dur)
-			go f()
-		}
-	}()
+type Gobot struct {
+	//  Master *Master
+	Robots []Robot
 }
 
-func After(t string, f func()) {
-	dur := parseDuration(t)
-	go func() {
-		time.Sleep(dur)
-		f()
-	}()
+func NewGobot() *Gobot {
+	g := new(Gobot)
+	//  g.Master = new(Master)
+	return g
 }
 
-func parseDuration(t string) time.Duration {
-	return ParseDuration(t)
-}
-func ParseDuration(t string) time.Duration {
-	dur, err := time.ParseDuration(t)
-	if err != nil {
-		panic(err)
+func (g *Gobot) Start() {
+	//  g.Master.robots = g.Robots
+	for s := range g.Robots {
+		go g.Robots[s].Start()
 	}
-	return dur
-}
 
-func Random(min int, max int) int {
-	rand.Seed(time.Now().UTC().UnixNano())
-	return rand.Intn(max-min) + min
-}
-
-func On(cs chan interface{}) interface{} {
-	for s := range cs {
-		return s
-	}
-	return nil
-}
-
-func Work(robots []Robot) {
-	for s := range robots {
-		go robots[s].Start()
-	}
 	for {
 		time.Sleep(10 * time.Millisecond)
 	}
 }
 
-func ConnectTo(port string) net.Conn {
-	tcpPort, err := net.Dial("tcp", port)
-	if err != nil {
-		panic(err)
+func (m *Gobot) FindRobot(name string) *Robot {
+	for s := range m.Robots {
+		if m.Robots[s].Name == name {
+			return &m.Robots[s]
+		}
 	}
-	return tcpPort
+	return nil
+}
+func (m *Gobot) FindRobotDevice(name string, device string) *Device {
+	for r := range m.Robots {
+		if m.Robots[r].Name == name {
+			for d := range m.Robots[r].devices {
+				if m.Robots[r].devices[d].Name == device {
+					return m.Robots[r].devices[d]
+				}
+			}
+		}
+	}
+	return nil
+}
+func (m *Gobot) FindRobotConnection(name string, connection string) *Connection {
+	for r := range m.Robots {
+		if m.Robots[r].Name == name {
+			for c := range m.Robots[r].connections {
+				if m.Robots[r].connections[c].Name == connection {
+					return m.Robots[r].connections[c]
+				}
+			}
+		}
+	}
+	return nil
 }
