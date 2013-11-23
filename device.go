@@ -8,7 +8,7 @@ import (
 type Device struct {
 	Name     string
 	Interval string
-	Robot    *Robot
+	Robot    *Robot `json:"-"`
 	Driver   interface{}
 	Params   map[string]string
 }

@@ -7,6 +7,7 @@ import (
 
 func main() {
   bot := gobot.NewGobot()
+  gobot.Api(bot)
 
   spheros := map[string]string{
     "Sphero-BPO": "127.0.0.1:4560",
@@ -32,15 +33,6 @@ func main() {
       Work: work,
     })
   }
-
-  bot.Robots = append(bot.Robots, gobot.Robot {
-    Work: func(){
-      sphero := bot.FindRobot("Sphero-BPO")
-      gobot.Every("1s", func () {
-        gobot.Call(sphero.GetDevice("sphero").Driver, "SetRGB", uint8(gobot.Rand(255)), uint8(gobot.Rand(255)), uint8(gobot.Rand(255)))
-      })
-    },
-  })
 
   bot.Start()
 }

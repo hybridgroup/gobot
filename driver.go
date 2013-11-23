@@ -7,7 +7,7 @@ type Driver struct {
 	Pin      string
 	Name     string
 	Params   map[string]string
-	Events   map[string]chan interface{}
+	Events   map[string]chan interface{} `json:"-"`
 }
 
 func NewDriver(d Driver) Driver {

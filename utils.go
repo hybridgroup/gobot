@@ -1,6 +1,7 @@
 package gobot
 
 import (
+	"encoding/json"
 	"math/rand"
 	"net"
 	"reflect"
@@ -60,4 +61,9 @@ func Call(thing interface{}, method string, params ...interface{}) (result []ref
 	}
 	result = reflect.ValueOf(thing).MethodByName(method).Call(in)
 	return
+}
+
+func toJson(obj interface{}) string {
+	b, _ := json.Marshal(obj)
+	return string(b)
 }

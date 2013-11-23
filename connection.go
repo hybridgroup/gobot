@@ -9,7 +9,7 @@ type Connection struct {
 	Name    string
 	Adaptor interface{}
 	Port    string
-	Robot   *Robot
+	Robot   *Robot `json:"-"`
 	Params  map[string]string
 }
 
