@@ -6,7 +6,10 @@ import (
 	"net/http"
 )
 
+type api struct{}
+
 func Api(bot *Gobot) {
+	a := new(api)
 	m := martini.Classic()
 
 	m.Get("/robots", func() string {
@@ -29,20 +32,29 @@ func Api(bot *Gobot) {
 		return toJson(bot.FindRobotDevice(params["robotname"], params["devicename"]).Commands())
 	})
 
-	m.Post("/robots/:robotname/devices/:devicename/commands/:command", func(params martini.Params, res http.ResponseWriter, req *http.Request) string {
-		decoder := json.NewDecoder(req.Body)
-		var body map[string]interface{}
-		decoder.Decode(&body)
-		robot := bot.FindRobotDevice(params["robotname"], params["devicename"])
-		commands := robot.Commands().([]string)
-		for command := range commands {
-			if commands[command] == params["command"] {
-				ret := Call(robot.Driver, params["command"], body)
-				return toJson(map[string]interface{}{"results": ret})
-			}
-		}
-		return toJson(map[string]interface{}{"results": "Unknown Command"})
+	command_route := "/robots/:robotname/devices/:devicename/commands/:command"
+
+	m.Get(command_route, func(params martini.Params, res http.ResponseWriter, req *http.Request) string {
+		return a.executeCommand(bot, params, res, req)
+	})
+	m.Post(command_route, func(params martini.Params, res http.ResponseWriter, req *http.Request) string {
+		return a.executeCommand(bot, params, res, req)
 	})
 
 	go m.Run()
+}
+
+func (a *api) executeCommand(bot *Gobot, params martini.Params, res http.ResponseWriter, req *http.Request) string {
+	decoder := json.NewDecoder(req.Body)
+	var body map[string]interface{}
+	decoder.Decode(&body)
+	robot := bot.FindRobotDevice(params["robotname"], params["devicename"])
+	commands := robot.Commands().([]string)
+	for command := range commands {
+		if commands[command] == params["command"] {
+			ret := Call(robot.Driver, params["command"], body)
+			return toJson(map[string]interface{}{"results": ret})
+		}
+	}
+	return toJson(map[string]interface{}{"results": "Unknown Command"})
 }
