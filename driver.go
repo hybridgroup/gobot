@@ -7,6 +7,7 @@ type Driver struct {
 	Pin      string
 	Name     string
 	Params   map[string]string
+	Commands []string
 	Events   map[string]chan interface{} `json:"-"`
 }
 

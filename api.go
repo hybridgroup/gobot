@@ -25,19 +25,23 @@ func Api(bot *Gobot) {
 		return toJson(bot.FindRobotDevice(params["robotname"], params["devicename"]))
 	})
 
+	m.Get("/robots/:robotname/devices/:devicename/commands", func(params martini.Params) string {
+		return toJson(bot.FindRobotDevice(params["robotname"], params["devicename"]).Commands())
+	})
+
 	m.Post("/robots/:robotname/devices/:devicename/commands/:command", func(params martini.Params, res http.ResponseWriter, req *http.Request) string {
 		decoder := json.NewDecoder(req.Body)
 		var response_hash map[string]interface{}
 		decoder.Decode(&response_hash)
 		robot := bot.FindRobotDevice(params["robotname"], params["devicename"])
-		p := make([]interface{}, len(response_hash))
-		i := 0
-		for _, v := range response_hash {
-			p[i] = v
-			i++
+		commands := robot.Commands().([]string)
+		for command := range commands {
+			if commands[command] == params["command"] {
+				ret := Call(robot.Driver, params["command"], response_hash)
+				return toJson(map[string]interface{}{"results": ret})
+			}
 		}
-		Call(robot.Driver, params["command"], p...)
-		return ""
+		return toJson(map[string]interface{}{"results": "Unknown Command"})
 	})
 
 	go m.Run()

@@ -54,13 +54,12 @@ func ConnectTo(port string) net.Conn {
 	return tcpPort
 }
 
-func Call(thing interface{}, method string, params ...interface{}) (result []reflect.Value, err error) {
+func Call(thing interface{}, method string, params ...interface{}) []reflect.Value {
 	in := make([]reflect.Value, len(params))
 	for k, param := range params {
 		in[k] = reflect.ValueOf(param)
 	}
-	result = reflect.ValueOf(thing).MethodByName(method).Call(in)
-	return
+	return reflect.ValueOf(thing).MethodByName(method).Call(in)
 }
 
 func toJson(obj interface{}) string {

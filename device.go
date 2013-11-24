@@ -29,6 +29,6 @@ func (d *Device) Start() {
 	}
 }
 
-func (d *Device) Command(method_name string, arguments []string) {
-	//dt.Driver.Command(method_name, arguments)
+func (d *Device) Commands() interface{} {
+	return reflect.ValueOf(d.Driver).Elem().FieldByName("Commands").Interface()
 }
