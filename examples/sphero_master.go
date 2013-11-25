@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	bot := gobot.GobotMaster()
+	master := gobot.GobotMaster()
 
 	spheros := map[string]string{
 		"Sphero-BPO": "127.0.0.1:4560",
@@ -25,7 +25,7 @@ func main() {
 			sphero.SetRGB(uint8(255), uint8(0), uint8(0))
 		}
 
-		bot.Robots = append(bot.Robots, gobot.Robot{
+		master.Robots = append(master.Robots, gobot.Robot{
 			Name:        name,
 			Connections: []interface{}{spheroAdaptor},
 			Devices:     []interface{}{sphero},
@@ -33,14 +33,14 @@ func main() {
 		})
 	}
 
-	bot.Robots = append(bot.Robots, gobot.Robot{
+	master.Robots = append(master.Robots, gobot.Robot{
 		Work: func() {
-			sphero := bot.FindRobot("Sphero-BPO")
+			sphero := master.FindRobot("Sphero-BPO")
 			gobot.Every("1s", func() {
 				gobot.Call(sphero.GetDevice("sphero").Driver, "SetRGB", uint8(gobot.Rand(255)), uint8(gobot.Rand(255)), uint8(gobot.Rand(255)))
 			})
 		},
 	})
 
-	bot.Start()
+	master.Start()
 }

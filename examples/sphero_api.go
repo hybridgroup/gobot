@@ -6,8 +6,8 @@ import (
 )
 
 func main() {
-	bot := gobot.GobotMaster()
-	gobot.Api(bot)
+	master := gobot.GobotMaster()
+	gobot.Api(master)
 
 	spheros := map[string]string{
 		"Sphero-BPO": "127.0.0.1:4560",
@@ -26,7 +26,7 @@ func main() {
 			sphero.SetRGB(uint8(255), uint8(0), uint8(0))
 		}
 
-		bot.Robots = append(bot.Robots, gobot.Robot{
+		master.Robots = append(master.Robots, gobot.Robot{
 			Name:        name,
 			Connections: []interface{}{spheroAdaptor},
 			Devices:     []interface{}{sphero},
@@ -34,5 +34,5 @@ func main() {
 		})
 	}
 
-	bot.Start()
+	master.Start()
 }

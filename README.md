@@ -61,7 +61,7 @@ Gobot includes a RESTful API to query the status of any robot running within a g
 To activate the API, use the `Api` command like this:
 
 ```go	
-  master := gobot.NewGobot()
+  master := gobot.GobotMaster()
   gobot.Api(master)
 ```
 To specify the api port run your Gobot program with the `PORT` environment variable
