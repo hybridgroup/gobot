@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	bot := gobot.NewGobot()
+	bot := gobot.GobotMaster()
 
 	spheros := map[string]string{
 		"Sphero-BPO": "127.0.0.1:4560",

@@ -8,7 +8,7 @@ import (
 
 type api struct{}
 
-func Api(bot *Gobot) {
+func Api(bot *Master) {
 	a := new(api)
 	m := martini.Classic()
 
@@ -44,7 +44,7 @@ func Api(bot *Gobot) {
 	go m.Run()
 }
 
-func (a *api) executeCommand(bot *Gobot, params martini.Params, res http.ResponseWriter, req *http.Request) string {
+func (a *api) executeCommand(bot *Master, params martini.Params, res http.ResponseWriter, req *http.Request) string {
 	decoder := json.NewDecoder(req.Body)
 	var body map[string]interface{}
 	decoder.Decode(&body)

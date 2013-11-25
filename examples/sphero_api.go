@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	bot := gobot.NewGobot()
+	bot := gobot.GobotMaster()
 	gobot.Api(bot)
 
 	spheros := map[string]string{
