@@ -11,9 +11,9 @@ type Robot struct {
 	Connections []interface{}
 	Devices     []interface{}
 	Name        string
-	Work        func()
-	connections []*Connection
-	devices     []*Device
+	Work        func()        `json:"-"`
+	connections []*Connection `json:"-"`
+	devices     []*Device     `json:"-"`
 }
 
 func (r *Robot) Start() {
@@ -64,4 +64,17 @@ func (r *Robot) startDevices() {
 		fmt.Println("Starting device " + r.devices[i].Name + "...")
 		r.devices[i].Start()
 	}
+}
+
+func (r *Robot) GetDevices() []*Device {
+	return r.devices
+}
+
+func (r *Robot) GetDevice(name string) *Device {
+	for i := range r.devices {
+		if r.devices[i].Name == name {
+			return r.devices[i]
+		}
+	}
+	return nil
 }

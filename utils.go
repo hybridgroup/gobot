@@ -1,8 +1,10 @@
 package gobot
 
 import (
+	"encoding/json"
 	"math/rand"
 	"net"
+	"reflect"
 	"time"
 )
 
@@ -25,9 +27,6 @@ func After(t string, f func()) {
 }
 
 func parseDuration(t string) time.Duration {
-	return ParseDuration(t)
-}
-func ParseDuration(t string) time.Duration {
 	dur, err := time.ParseDuration(t)
 	if err != nil {
 		panic(err)
@@ -35,9 +34,9 @@ func ParseDuration(t string) time.Duration {
 	return dur
 }
 
-func Random(min int, max int) int {
+func Rand(max int) int {
 	rand.Seed(time.Now().UTC().UnixNano())
-	return rand.Intn(max-min) + min
+	return rand.Intn(max)
 }
 
 func On(cs chan interface{}) interface{} {
@@ -47,19 +46,23 @@ func On(cs chan interface{}) interface{} {
 	return nil
 }
 
-func Work(robots []Robot) {
-	for s := range robots {
-		go robots[s].Start()
-	}
-	for {
-		time.Sleep(10 * time.Millisecond)
-	}
-}
-
 func ConnectTo(port string) net.Conn {
 	tcpPort, err := net.Dial("tcp", port)
 	if err != nil {
 		panic(err)
 	}
 	return tcpPort
+}
+
+func Call(thing interface{}, method string, params ...interface{}) []reflect.Value {
+	in := make([]reflect.Value, len(params))
+	for k, param := range params {
+		in[k] = reflect.ValueOf(param)
+	}
+	return reflect.ValueOf(thing).MethodByName(method).Call(in)
+}
+
+func toJson(obj interface{}) string {
+	b, _ := json.Marshal(obj)
+	return string(b)
 }
