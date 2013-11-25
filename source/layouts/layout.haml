@@ -10,16 +10,6 @@
     %link{href: "http://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,500,700", rel: "stylesheet", type: "text/css"}/
     %link(rel="stylesheet" href="/stylesheets/style.css")
     %link{ href: '/favicon.ico', rel: 'shortcut icon', type: 'image/gif' }/
-    :javascript
-      $(document).ready(function() {
-        $('header .subtitle').hover(function() {
-          $('.easter', this).show();
-          $('.main', this).hide();
-        }, function () {
-          $('.easter', this).hide();
-          $('.main', this).show();
-        });
-      });
   %body
     .app
       .w
@@ -38,9 +28,9 @@
         .hero
           .container
             %h1.title
-              /It is time to have Robots and JavaScript
-              /%br
-              /working together.
+              It is time to have Robots and JavaScript
+              %br
+              working together.
               Go, Robot, Go! Go Powered Robotics
             %h2.subtitle
               Gobot makes robotics
