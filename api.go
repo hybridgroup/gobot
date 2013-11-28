@@ -31,6 +31,10 @@ func Api(bot *Master) {
 		decoder := json.NewDecoder(req.Body)
 		var body map[string]interface{}
 		decoder.Decode(&body)
+		if len(body) == 0 {
+			body = map[string]interface{}{}
+		}
+		body["robotname"] = params["robotname"]
 		return a.executeRobotCommand(bot, params, body)
 	})
 

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot-sphero"
 )
@@ -9,9 +8,7 @@ import (
 var Master *gobot.Master = gobot.GobotMaster()
 
 func TurnBlue(params map[string]interface{}) bool {
-	name := params["name"].(string)
-	device := params["device"].(string)
-	sphero := Master.FindRobotDevice(name, device)
+	sphero := Master.FindRobotDevice(params["robotname"].(string), "sphero")
 	gobot.Call(sphero.Driver, "SetRGB", uint8(0), uint8(0), uint8(255))
 	return true
 }
