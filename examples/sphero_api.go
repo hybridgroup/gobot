@@ -1,13 +1,23 @@
 package main
 
 import (
+	"fmt"
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot-sphero"
 )
 
+var Master *gobot.Master = gobot.GobotMaster()
+
+func TurnBlue(params map[string]interface{}) bool {
+	name := params["name"].(string)
+	device := params["device"].(string)
+	sphero := Master.FindRobotDevice(name, device)
+	gobot.Call(sphero.Driver, "SetRGB", uint8(0), uint8(0), uint8(255))
+	return true
+}
+
 func main() {
-	master := gobot.GobotMaster()
-	gobot.Api(master)
+	gobot.Api(Master)
 
 	spheros := map[string]string{
 		"Sphero-BPO": "127.0.0.1:4560",
@@ -26,13 +36,14 @@ func main() {
 			sphero.SetRGB(uint8(255), uint8(0), uint8(0))
 		}
 
-		master.Robots = append(master.Robots, gobot.Robot{
+		Master.Robots = append(Master.Robots, gobot.Robot{
 			Name:        name,
 			Connections: []interface{}{spheroAdaptor},
 			Devices:     []interface{}{sphero},
 			Work:        work,
+			Commands:    map[string]interface{}{"TurnBlue": TurnBlue},
 		})
 	}
 
-	master.Start()
+	Master.Start()
 }
