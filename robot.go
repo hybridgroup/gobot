@@ -19,11 +19,7 @@ type Robot struct {
 }
 
 func (r *Robot) Start() {
-	if r.Name == "" {
-		rand.Seed(time.Now().UTC().UnixNano())
-		i := rand.Int()
-		r.Name = fmt.Sprintf("Robot %v", i)
-	}
+	r.initName()
 	for k, _ := range r.Commands {
 		r.RobotCommands = append(r.RobotCommands, k)
 	}
@@ -33,6 +29,14 @@ func (r *Robot) Start() {
 	r.startDevices()
 	r.Work()
 	select {}
+}
+
+func (r *Robot) initName() {
+	if r.Name == "" {
+		rand.Seed(time.Now().UTC().UnixNano())
+		i := rand.Int()
+		r.Name = fmt.Sprintf("Robot %v", i)
+	}
 }
 
 func (r *Robot) initConnections() {
