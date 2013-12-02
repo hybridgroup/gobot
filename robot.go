@@ -12,10 +12,10 @@ type Robot struct {
 	Devices       []interface{}
 	Name          string
 	Commands      map[string]interface{} `json:"-"`
-	RobotCommands []string
-	Work          func()        `json:"-"`
-	connections   []*Connection `json:"-"`
-	devices       []*Device     `json:"-"`
+	RobotCommands []string               `json:"Commands"`
+	Work          func()                 `json:"-"`
+	connections   []*Connection          `json:"-"`
+	devices       []*Device              `json:"-"`
 }
 
 func (r *Robot) Start() {
