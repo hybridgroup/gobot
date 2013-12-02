@@ -54,6 +54,20 @@ func main() {
   robot.Start()
 }
 ```
+## API:
+
+Gobot includes a RESTful API to query the status of any robot running within a group, including the connection and device status, and execute device commands.
+
+To activate the API, use the `Api` command like this:
+
+```go	
+  master := gobot.GobotMaster()
+  gobot.Api(master)
+```
+To specify the api port run your Gobot program with the `PORT` environment variable
+```
+  $ PORT=8080 go run gobotProgram.go
+```
 
 ## Hardware Support
 Gobot has a extensible system for connecting to hardware devices. The following robotics and physical computing platforms are currently supported:
