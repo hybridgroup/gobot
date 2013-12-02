@@ -17,11 +17,7 @@ type Robot struct {
 }
 
 func (r *Robot) Start() {
-	if r.Name == "" {
-		rand.Seed(time.Now().UTC().UnixNano())
-		i := rand.Int()
-		r.Name = fmt.Sprintf("Robot %v", i)
-	}
+	r.initName()
 	r.initConnections()
 	r.initDevices()
 	r.startConnections()
@@ -29,6 +25,14 @@ func (r *Robot) Start() {
 	r.Work()
 	for {
 		time.Sleep(10 * time.Millisecond)
+	}
+}
+
+func (r *Robot) initName() {
+	if r.Name == "" {
+		rand.Seed(time.Now().UTC().UnixNano())
+		i := rand.Int()
+		r.Name = fmt.Sprintf("Robot %v", i)
 	}
 }
 

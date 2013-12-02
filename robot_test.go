@@ -19,6 +19,16 @@ var _ = Describe("Robot", func() {
   })
 
   Context("when valid", func() {
+    It("initName should not change name when already set", func() {
+      someRobot.Name = "Bumblebee"
+      someRobot.initName()
+      Expect(someRobot.Name).To(Equal("Bumblebee"))
+    })
+    It("initName should set random name when not set", func() {
+      someRobot.initName()
+      Expect(someRobot.Name).NotTo(BeNil())
+      Expect(someRobot.Name).NotTo(Equal("Bumblebee"))
+    })
     PIt("should Start", func() {
       Expect(true)
     })
