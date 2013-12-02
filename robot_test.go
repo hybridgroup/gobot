@@ -18,29 +18,27 @@ var _ = Describe("Robot", func() {
     }
   })
 
-  Describe("Robot", func() {
-    Context("when valid", func() {
-      PIt("should Start", func() {
-        Expect(true)
-      })
-      PIt("should initConnections", func() {
-        Expect(true)
-      })
-      PIt("should initDevices", func() {
-        Expect(true)
-      })
-      PIt("should startConnections", func() {
-        Expect(true)
-      })
-      PIt("should startDevices", func() {
-        Expect(true)
-      })
-      PIt("should GetDevices", func() {
-        Expect(true)
-      })
-      PIt("should GetDevice", func() {
-        Expect(true)
-      })
+  Context("when valid", func() {
+    PIt("should Start", func() {
+      Expect(true)
+    })
+    PIt("should initConnections", func() {
+      Expect(true)
+    })
+    PIt("should initDevices", func() {
+      Expect(true)
+    })
+    PIt("should startConnections", func() {
+      Expect(true)
+    })
+    PIt("should startDevices", func() {
+      Expect(true)
+    })
+    PIt("should GetDevices", func() {
+      Expect(true)
+    })
+    PIt("should GetDevice", func() {
+      Expect(true)
     })
   })
 })
