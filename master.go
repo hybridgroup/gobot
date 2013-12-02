@@ -1,7 +1,5 @@
 package gobot
 
-import "time"
-
 type Master struct {
 	Robots []Robot
 }
@@ -15,10 +13,7 @@ func (m *Master) Start() {
 	for s := range m.Robots {
 		go m.Robots[s].Start()
 	}
-
-	for {
-		time.Sleep(10 * time.Millisecond)
-	}
+	select {}
 }
 
 func (m *Master) FindRobot(name string) *Robot {
@@ -29,6 +24,7 @@ func (m *Master) FindRobot(name string) *Robot {
 	}
 	return nil
 }
+
 func (m *Master) FindRobotDevice(name string, device string) *Device {
 	for r := range m.Robots {
 		if m.Robots[r].Name == name {
@@ -41,6 +37,7 @@ func (m *Master) FindRobotDevice(name string, device string) *Device {
 	}
 	return nil
 }
+
 func (m *Master) FindRobotConnection(name string, connection string) *Connection {
 	for r := range m.Robots {
 		if m.Robots[r].Name == name {

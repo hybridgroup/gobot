@@ -8,24 +8,27 @@ import (
 )
 
 type Robot struct {
-	Connections []interface{}
-	Devices     []interface{}
-	Name        string
-	Work        func()        `json:"-"`
-	connections []*Connection `json:"-"`
-	devices     []*Device     `json:"-"`
+	Connections   []interface{}
+	Devices       []interface{}
+	Name          string
+	Commands      map[string]interface{} `json:"-"`
+	RobotCommands []string               `json:"Commands"`
+	Work          func()                 `json:"-"`
+	connections   []*Connection          `json:"-"`
+	devices       []*Device              `json:"-"`
 }
 
 func (r *Robot) Start() {
 	r.initName()
+	for k, _ := range r.Commands {
+		r.RobotCommands = append(r.RobotCommands, k)
+	}
 	r.initConnections()
 	r.initDevices()
 	r.startConnections()
 	r.startDevices()
 	r.Work()
-	for {
-		time.Sleep(10 * time.Millisecond)
-	}
+	select {}
 }
 
 func (r *Robot) initName() {
