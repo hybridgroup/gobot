@@ -2,15 +2,13 @@ package main
 
 import (
 	"fmt"
-	. "gobot"
-	"time"
+	"github.com/hybridgroup/gobot"
 )
 
 func main() {
-
-	robot := Robot{
+	robot := gobot.Robot{
 		Work: func() {
-			Every(300*time.Millisecond, func() { fmt.Println("Greetings human") })
+			gobot.Every("0.5s", func() { fmt.Println("Greetings human") })
 		},
 	}
 

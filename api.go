@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/codegangsta/martini"
 	"net/http"
+	"reflect"
 )
 
 type api struct{}
@@ -18,6 +19,23 @@ func Api(bot *Master) {
 
 	m.Get("/robots/:robotname", func(params martini.Params) string {
 		return toJson(bot.FindRobot(params["robotname"]))
+	})
+
+	m.Get("/robots/:robotname/commands", func(params martini.Params) string {
+		return toJson(bot.FindRobot(params["robotname"]).RobotCommands)
+	})
+
+	robot_command_route := "/robots/:robotname/commands/:command"
+
+	m.Get(robot_command_route, func(params martini.Params, res http.ResponseWriter, req *http.Request) string {
+		decoder := json.NewDecoder(req.Body)
+		var body map[string]interface{}
+		decoder.Decode(&body)
+		if len(body) == 0 {
+			body = map[string]interface{}{}
+		}
+		body["robotname"] = params["robotname"]
+		return a.executeRobotCommand(bot, params, body)
 	})
 
 	m.Get("/robots/:robotname/devices", func(params martini.Params) string {
@@ -57,4 +75,14 @@ func (a *api) executeCommand(bot *Master, params martini.Params, res http.Respon
 		}
 	}
 	return toJson(map[string]interface{}{"results": "Unknown Command"})
+}
+
+func (a *api) executeRobotCommand(bot *Master, m_params martini.Params, params ...interface{}) string {
+	robot := bot.FindRobot(m_params["robotname"])
+	in := make([]reflect.Value, len(params))
+	for k, param := range params {
+		in[k] = reflect.ValueOf(param)
+	}
+	ret := reflect.ValueOf(robot.Commands[m_params["command"]]).Call(in)
+	return toJson(map[string]interface{}{"results": ret[0].Interface()})
 }
