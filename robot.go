@@ -25,7 +25,9 @@ func (r *Robot) Start() {
 	r.initDevices()
 	r.startConnections()
 	r.startDevices()
-	r.Work()
+	if r.Work != nil {
+		r.Work()
+	}
 	select {}
 }
 
