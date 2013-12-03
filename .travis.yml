@@ -5,6 +5,6 @@ go:
  - release
  - tip
 install: 
- - go get -d -v . && go build -v .
+ - go get -v . && go build -v .
 script:
  - go test -v .
