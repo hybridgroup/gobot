@@ -20,9 +20,7 @@ type Robot struct {
 
 func (r *Robot) Start() {
 	r.initName()
-	for k, _ := range r.Commands {
-		r.RobotCommands = append(r.RobotCommands, k)
-	}
+	r.initCommands()
 	r.initConnections()
 	r.initDevices()
 	r.startConnections()
@@ -36,6 +34,12 @@ func (r *Robot) initName() {
 		rand.Seed(time.Now().UTC().UnixNano())
 		i := rand.Int()
 		r.Name = fmt.Sprintf("Robot %v", i)
+	}
+}
+
+func (r *Robot) initCommands() {
+	for k, _ := range r.Commands {
+		r.RobotCommands = append(r.RobotCommands, k)
 	}
 }
 
