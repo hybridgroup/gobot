@@ -6,4 +6,4 @@ go:
  - tip
 
 script:
- - ginkgo
+ - go test -v ./...

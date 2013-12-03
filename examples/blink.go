@@ -1,7 +1,7 @@
 package main
 
 import (
-	. "gobot"
+	"github.com/hybridgroup/gobot"
 	"time"
 )
 

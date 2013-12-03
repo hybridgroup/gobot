@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	. "gobot"
+	"github.com/hybridgroup/gobot"
 )
 
 func Hello(params map[string]interface{}) string {
