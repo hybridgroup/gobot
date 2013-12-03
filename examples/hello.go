@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/hybridgroup/gobot"
+	. "gobot"
 )
 
 func main() {
