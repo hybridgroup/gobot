@@ -9,7 +9,7 @@ func main() {
 	master := gobot.GobotMaster()
 
 	spheros := map[string]string{
-		"Sphero-BPO": "127.0.0.1:4560",
+		"Sphero-BPO": "/dev/rfcomm0",
 	}
 
 	for name, port := range spheros {

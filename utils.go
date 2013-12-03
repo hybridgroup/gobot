@@ -2,11 +2,16 @@ package gobot
 
 import (
 	"encoding/json"
+	"github.com/tarm/goserial"
+	"io"
 	"math/rand"
 	"net"
 	"reflect"
+	"regexp"
 	"time"
 )
+
+type Port io.ReadWriteCloser
 
 func Every(t string, f func()) {
 	dur := parseDuration(t)
@@ -46,12 +51,26 @@ func On(cs chan interface{}) interface{} {
 	return nil
 }
 
-func ConnectTo(port string) net.Conn {
+func ConnectToTcp(port string) io.ReadWriteCloser {
 	tcpPort, err := net.Dial("tcp", port)
 	if err != nil {
 		panic(err)
 	}
 	return tcpPort
+}
+
+func ConnectToSerial(port string, baud int) io.ReadWriteCloser {
+	c := &serial.Config{Name: port, Baud: baud}
+	s, err := serial.OpenPort(c)
+	if err != nil {
+		panic(err)
+	}
+	return s
+}
+
+func IsUrl(url string) bool {
+	rp := regexp.MustCompile("([^A-Za-z0-9]+).([^A-Za-z0-9]+).([^A-Za-z0-9]+)")
+	return rp.MatchString(url)
 }
 
 func Call(thing interface{}, method string, params ...interface{}) []reflect.Value {
