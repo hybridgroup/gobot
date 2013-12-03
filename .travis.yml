@@ -4,6 +4,7 @@ go:
  - 1.2
  - release
  - tip
-
+install: 
+ - go get -d -v . && go build -v .
 script:
- - go test -v ./...
+ - go test -v .
