@@ -95,7 +95,6 @@ func driver() string {
 	return `package gobot{{ .Name }}
 
 import (
-	"fmt"
 	"github.com/hybridgroup/gobot"
 )
 
