@@ -6,6 +6,7 @@ It provides a simple, yet powerful way to create solutions that incorporate mult
 
 Want to use Ruby or Javascript on robots? Check out our sister projects Artoo (http://artoo.io) and Cylon.js (http://cylonjs.com/)
 
+[![Build Status](https://travis-ci.org/hybridgroup/gobot.png?branch=master)](https://travis-ci.org/hybridgroup/gobot)
 
 ## Getting Started
 
