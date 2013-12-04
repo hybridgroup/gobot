@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/hybridgroup/gobot"
-	// "github.com/hybridgroup/gobot-sphero"
+	"github.com/hybridgroup/gobot-sphero"
 )
 
 func main() {

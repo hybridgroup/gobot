@@ -2,14 +2,14 @@ package main
 
 import (
 	"github.com/hybridgroup/gobot"
-	//"github.com/hybridgroup/gobot-sphero"
+	"github.com/hybridgroup/gobot-sphero"
 )
 
 func main() {
 
 	spheroAdaptor := new(gobotSphero.SpheroAdaptor)
 	spheroAdaptor.Name = "Sphero"
-	spheroAdaptor.Port = "127.0.0.1:4560"
+	spheroAdaptor.Port = "/dev/rfcomm0"
 
 	sphero := gobotSphero.NewSphero(spheroAdaptor)
 	sphero.Name = "Sphero"
@@ -23,7 +23,7 @@ func main() {
 
 	work := func() {
 		gobot.Every("2s", func() {
-			sphero.Roll(100, uint16(gobot.Random(0, 360)))
+			sphero.Roll(100, uint16(gobot.Rand(360)))
 		})
 	}
 

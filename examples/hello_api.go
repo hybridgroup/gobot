@@ -16,7 +16,6 @@ func main() {
 
 	hello := new(gobot.Robot)
 	hello.Name = "hello"
-	hello.Work = func() {}
 	hello.Commands = map[string]interface{}{"Hello": Hello}
 
 	master.Robots = append(master.Robots, *hello)

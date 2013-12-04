@@ -1,33 +1,41 @@
 package main
 
 import (
+	"fmt"
 	"github.com/hybridgroup/gobot"
-	"time"
+	"github.com/hybridgroup/gobot-firmata"
+	"github.com/hybridgroup/gobot-gpio"
 )
 
 func main() {
 
-	beaglebone := new(Beaglebone)
-	beaglebone.Name = "Beaglebone"
+	firmata := new(gobotFirmata.FirmataAdaptor)
+	firmata.Name = "firmata"
+	firmata.Port = "/dev/ttyACM0"
 
-	led := NewLed(beaglebone)
-	led.Driver = Driver{
-		Name: "led",
-		Pin:  "P9_12",
-	}
+	led := gobotGPIO.NewLed(firmata)
+	led.Name = "led"
+	led.Pin = "13"
 
 	connections := []interface{}{
-		beaglebone,
+		firmata,
 	}
 	devices := []interface{}{
 		led,
 	}
 
 	work := func() {
-		Every(1000*time.Millisecond, func() { led.Toggle() })
+		gobot.Every("1s", func() {
+			led.Toggle()
+			if led.IsOn() {
+				fmt.Println("On")
+			} else {
+				fmt.Println("Off")
+			}
+		})
 	}
 
-	robot := Robot{
+	robot := gobot.Robot{
 		Connections: connections,
 		Devices:     devices,
 		Work:        work,
