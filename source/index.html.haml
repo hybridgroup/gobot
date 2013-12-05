@@ -12,25 +12,28 @@ layout: home
   =link_to "Go programming language", "http://golang.org/", target: "_blank" 
   for robotics and physical computing.
 
+%p It provides a simple, yet powerful way to create solutions that incorporate multiple, different hardware devices at the same time.
+
+%p 
+  Want to use Ruby on robots? Check out our sister project Artoo 
+  =link_to "(http://artoo.io).", "http://artoo.io", target: :blank
+
+%p 
+  Want to use Node.js? Check out our sister project Cylon 
+  =link_to "(http://cylonjs.com).", "http://cylonjs.com", target: :blank
+
+%h2  Meet The Code
+
+%p Gobot makes commanding robots incredibly simple and fun.
+
+%p All you need to get started is install the library with :  
 :markdown
-  It provides a simple, yet powerful way to create solutions that incorporate multiple, different hardware devices at the same time.
-
-  Want to use Ruby on robots? Check out our sister project Artoo [(http://artoo.io)](http://artoo.io).
-
-  Want to use Node.js? Check out our sister project Cylon [(http://cylonjs.com)](http://cylonjs.com).
-
-  ## Meet The Code
-
-  Gobot makes commanding robots incredibly simple and fun.
-
-  All you need to get started is install the library with :  
-
   `go get -u github.com/hybridgroup/gobot`.
 
-  Then install additional libraries for whatever hardware support you want to use from your robot. For example, `go get -u github.com/hybridgroup/gobot-sphero` to use Gobot with a Sphero.
+%p Then install additional libraries for whatever hardware support you want to use from your robot. For example, `go get -u github.com/hybridgroup/gobot-sphero` to use Gobot with a Sphero.
 
-  ## Example
-
+%h2  Example
+:markdown
       :::go
       package main
 
@@ -76,6 +79,21 @@ layout: home
 %p 
   Ready to build Go robots with Gobot? 
   =link_to "Get Started Here!", "", (menu_item("documentation/getting-started"))
+
+%h2 API
+%p Gobot includes a RESTful API to query the status of any robot running within a group, including the connection and device status, and execute device commands.
+
+:markdown
+  To activate the API, use the `Api` command like this:
+
+      :::bash
+      master := gobot.GobotMaster()
+      gobot.Api(master)
+
+  To specify the api port run your Gobot program with the `PORT` environment variable
+
+      :::bash
+      $ PORT=8080 go run gobotProgram.go
 
 %h2 Hardware Support
 %p
