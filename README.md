@@ -1,18 +1,14 @@
-# Gobot
+[![Gobot](https://github.com/hybridgroup/gobot/blob/gh-pages/images/logo.png)](http://gobot.io/)
 
-Gobot (http://gobot.io/) is a set of libraries for robotics and physical computing using the Go programming language (http://golang.org/)
+http://gobot.io/
+
+Gobot is a set of libraries for robotics and physical computing using the Go programming language (http://golang.org/)
 
 It provides a simple, yet powerful way to create solutions that incorporate multiple, different hardware devices at the same time.
 
 Want to use Ruby or Javascript on robots? Check out our sister projects Artoo (http://artoo.io) and Cylon.js (http://cylonjs.com/)
 
 [![Build Status](https://travis-ci.org/hybridgroup/gobot.png?branch=master)](https://travis-ci.org/hybridgroup/gobot)
-
-## Getting Started
-
-Install the library with: `go get -u github.com/hybridgroup/gobot`
-
-Then install additional libraries for whatever hardware support you want to use from your robot. For example, `go get -u github.com/hybridgroup/gobot-sphero` to use Gobot with a Sphero.
 
 ## Examples
 
@@ -55,21 +51,6 @@ func main() {
   robot.Start()
 }
 ```
-## API:
-
-Gobot includes a RESTful API to query the status of any robot running within a group, including the connection and device status, and execute device commands.
-
-To activate the API, use the `Api` command like this:
-
-```go	
-  master := gobot.GobotMaster()
-  gobot.Api(master)
-```
-To specify the api port run your Gobot program with the `PORT` environment variable
-```
-  $ PORT=8080 go run gobotProgram.go
-```
-
 ## Hardware Support
 Gobot has a extensible system for connecting to hardware devices. The following robotics and physical computing platforms are currently supported:
 
@@ -78,6 +59,27 @@ Gobot has a extensible system for connecting to hardware devices. The following 
   - [Sphero](http://www.gosphero.com/) <=> [Library](https://github.com/hybridgroup/gobot-sphero)
 
 More platforms and drivers are coming soon...
+
+## Getting Started
+
+Install the library with: `go get -u github.com/hybridgroup/gobot`
+
+Then install additional libraries for whatever hardware support you want to use from your robot. For example, `go get -u github.com/hybridgroup/gobot-sphero` to use Gobot with a Sphero.
+
+## API:
+
+Gobot includes a RESTful API to query the status of any robot running within a group, including the connection and device status, and execute device commands.
+
+To activate the API, use the `Api` command like this:
+
+```go 
+  master := gobot.GobotMaster()
+  gobot.Api(master)
+```
+To specify the api port run your Gobot program with the `PORT` environment variable
+```
+  $ PORT=8080 go run gobotProgram.go
+```
 
 ## Documentation
 We're busy adding documentation to our web site at http://gobot.io/ please check there as we continue to work on Gobot
