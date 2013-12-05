@@ -1,0 +1,236 @@
+#!/usr/bin/env ruby
+
+# This script is used to import examples from the master branch, and convert
+# them to HAML so that Middleman can compile them. This provides a (mostly)
+# automated way to keep examples in sync between the GitHub repo and site.
+
+require 'fileutils'
+
+# The git URL for the repository we'll be pulling examples from
+GITHUB_REPO = "https://github.com/hybridgroup/gobot.git"
+
+# The dir the cloned repo will be (temporarily) stored in
+REPO_DIR = File.expand_path "./.gobot"
+
+# The dir where Middleman's source content lives
+SITE_DIR = File.expand_path "./source"
+
+# The name of the project
+PROJECT = "gobot"
+
+# An array of hashes, containing the name of the language and extensions that
+# language uses.
+#
+# :name should be the string name for the language, lowercased. e.g.
+# 'coffeescript', or 'golang'
+#
+# :ext should be a comma-seperated list of file extensions for the lang. e.g.
+# "listcoffee,coffee.md"
+#
+# :pretty is a properly-formatted version of the language name, e.g.
+# "CoffeeScript" or "Ruby" or "Node.js"
+LANGS = [
+  { :name => "golang", :ext => "go", :pretty => "Golang" }
+]
+
+# The base layout for the Examples index page.
+# Will be put into SITE_DIR/documentation/examples/index.html.
+INDEX_LAYOUT = <<-EOS
+---
+layout: page
+title: Examples
+page_title: Examples
+author: The Hybrid Group
+description: Examples of using #{PROJECT} with different hardware configurations
+page_subtitle: How you can get started.
+---
+
+.documentation.examples
+  %table
+    %thead
+      %th Example
+      %th.links{:colspan => '#{LANGS.length}'} Links
+    %tbody
+  EOS
+
+class ExampleImporter
+  attr_reader :files
+
+  def initialize
+    @files = {}
+
+    LANGS.each { |lang| @files[lang[:name]] = [] }
+
+    clone_repo
+    get_examples_from_repo
+    remove_existing_examples
+    create_index_page
+    create_example_pages
+    remove_local_repo
+  end
+
+  # Public: Extracts example files from the local copy of the remote repo for
+  # all languages in LANGS.
+  #
+  # Returns a hash containing example files for each language
+  def get_examples_from_repo
+    say "Extracting examples from repo."
+
+    LANGS.each do |lang|
+      get_examples_for_lang lang
+    end
+
+    @files
+  end
+
+  # Public: Gets examples from local copy of remote repo for a specific language
+  #
+  # lang - language hash to fetch examples for
+  #
+  # Returns an array of matching files
+  def get_examples_for_lang(lang)
+    say "- Extracting examples for #{lang[:name]}.", :indent_level => 2
+    Dir[REPO_DIR + "/examples/**/*.{#{lang[:ext]}}"].each do |file|
+      @files[lang[:name]] << {
+        :name => file.match(/\/([A-Za-z_-]+)\..+$/)[1],
+        :path => file,
+        :content => File.read(file)
+      }
+    end
+
+    @files[lang[:name]]
+  end
+
+  # Public: Removes existing example pages from Middleman's source.
+  #
+  # Returns nothing.
+  def remove_existing_examples
+    say "Removing existing example pages."
+
+    FileUtils.rm Dir[SITE_DIR + "/documentation/examples/**/*.html.haml"]
+  end
+
+  # Public: Creates an index page for examples, containing links to all examples
+  # in a table.
+  #
+  # Returns nothing
+  def create_index_page
+    say "Creating example index page."
+
+    @table = {}
+    @page_content = INDEX_LAYOUT
+    @filename = SITE_DIR + "/documentation/examples/index.html.haml"
+
+    @files.each do |lang, files|
+      files.each do |file|
+        name = file[:name]
+        prettyLangName = LANGS.find { |l| l[:name] == lang }[:pretty]
+        path = "/documentation/examples/#{lang}/#{name}"
+
+        if @table[name]
+          @table[name][lang] = path
+        else
+          @table[name] = { lang => path }
+        end
+      end
+    end
+
+    @table.each do |example, links|
+      string = "%tr\n"
+      string << "  %td #{example}\n"
+
+      links.each do |type, link|
+        lang = LANGS.find { |l| l[:name] == type }[:pretty]
+        string << "  %td.links= link_to '#{lang}', '#{link}'\n"
+      end
+
+      string.gsub! /^(.+)/, '      \1'
+      @page_content << string
+    end
+
+    File.write @filename, @page_content
+  end
+
+  # Public: Creates all example pages in HAML format, ready for Middleman to
+  # convert.
+  #
+  # Returns nothing
+  def create_example_pages
+    say "Creating example pages."
+
+    @files.each do |lang, files|
+      say "#{lang}:", :indent_level => 2
+
+      examples_dir = SITE_DIR + "/documentation/examples/#{lang}"
+      FileUtils.mkdir_p(examples_dir) unless File.directory?(examples_dir)
+
+      files.each do |file|
+        say "- #{file[:name]}", :indent_level => 3
+
+        filename = examples_dir + "/#{file[:name]}.html.haml"
+        body = file[:content]
+
+        # escape interpolation as to not confuse HAML
+        body.gsub! /(#\{)/, '\\\1'
+
+        # indent by eight spaces
+        body.gsub! /^(.+)/, '        \1'
+
+        content = <<-EOS
+---
+layout: page
+title: #{PROJECT} Example - #{file[:name]}
+page_title: "Example: #{file[:name]}"
+author: The Hybrid Group
+description: A #{PROJECT} code example
+---
+
+.example
+  :markdown
+        :::#{lang}
+#{body}
+EOS
+
+        File.write filename, content
+      end
+    end
+  end
+
+  # Public: Clones the remote repository defined by GITHUB_REPO into the
+  # directory defined by REPO_DIR.  Removes REPO_DIR and recreates it if it
+  # already exists.
+  #
+  # Returns nothing.
+  def clone_repo
+    say "Cloning remote repo."
+    FileUtils.rm_rf(REPO_DIR) if File.directory?(REPO_DIR)
+    Dir.mkdir REPO_DIR
+    `git clone #{GITHUB_REPO} #{REPO_DIR} &> /dev/null`
+  end
+
+  # Public: Removes the local copy of the remote repo.
+  #
+  # Returns nothing.
+  def remove_local_repo
+    say "Removing local copy of remote repo."
+    FileUtils.rm_rf REPO_DIR
+  end
+
+  # Public: Indents words by two spaces, and prints to the console.
+  #
+  # words - thing to print to the console.
+  # opts - hash of options.
+  #
+  # Returns the printed statement.
+  def say(words, opts = {})
+    indent = opts[:indent_level] || 1
+    spaces = (1..indent).collect { "  " }.join('')
+
+    words.gsub! /^(.+)/, spaces + '\1'
+
+    puts words
+    words
+  end
+end
+
+ExampleImporter.new
