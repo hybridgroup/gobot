@@ -1,4 +1,4 @@
-[![Gobot](https://github.com/hybridgroup/gobot/blob/gh-pages/images/logo.png)](http://gobot.io/)
+[![Gobot](https://raw.github.com/hybridgroup/gobot/gh-pages/images/logo.png)](http://gobot.io/)
 
 http://gobot.io/
 
@@ -11,6 +11,10 @@ Want to use Ruby or Javascript on robots? Check out our sister projects Artoo (h
 [![Build Status](https://travis-ci.org/hybridgroup/gobot.png?branch=master)](https://travis-ci.org/hybridgroup/gobot)
 
 ## Examples
+
+### Basic
+
+#### Go with a Sphero
 
 ```go
 package main
@@ -51,6 +55,56 @@ func main() {
   robot.Start()
 }
 ```
+#### Go with a Blink
+
+```go
+package main
+
+import (
+        "fmt"
+        "github.com/hybridgroup/gobot"
+        "github.com/hybridgroup/gobot-firmata"
+        "github.com/hybridgroup/gobot-gpio"
+)
+
+func main() {
+
+        firmata := new(gobotFirmata.FirmataAdaptor)
+        firmata.Name = "firmata"
+        firmata.Port = "/dev/ttyACM0"
+
+        led := gobotGPIO.NewLed(firmata)
+        led.Name = "led"
+        led.Pin = "13"
+
+        connections := []interface{}{
+                firmata,
+        }
+        devices := []interface{}{
+                led,
+        }
+
+        work := func() {
+                gobot.Every("1s", func() {
+                        led.Toggle()
+                        if led.IsOn() {
+                                fmt.Println("On")
+                        } else {
+                                fmt.Println("Off")
+                        }
+                })
+        }
+
+        robot := gobot.Robot{
+                Connections: connections,
+                Devices:     devices,
+                Work:        work,
+        }
+
+        robot.Start()
+}
+```
+
 ## Hardware Support
 Gobot has a extensible system for connecting to hardware devices. The following robotics and physical computing platforms are currently supported:
 
