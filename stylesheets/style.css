@@ -1341,7 +1341,7 @@ a {
 
 /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
 .cylon-logo {
-  width: 405px; }
+  width: 155px; }
   /* line 3, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
   .cylon-logo a {
     background: transparent url("/images/logo.png") left top no-repeat;
@@ -1352,30 +1352,17 @@ a {
     height: 27px; }
 
 /* line 12, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
-.github-menu {
-  padding: 10px 10px 10px 40px;
-  font-weight: bold;
-  background: url(../../images/github-mark.png) top left no-repeat; }
-  /* line 13, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
-  .github-menu a {
-    color: #580a25; }
-  /* line 18, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
-  .github-menu:hover {
-    color: #ee274a;
-    text-decoration: underline; }
-
-/* line 22, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
 .app-header {
   margin: 16px 0 15px 0; }
-  /* line 25, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+  /* line 15, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
   .app-header .Cylon.js-logo, .app-header .display, .app-header .subtitle, .app-header .menu, .app-header h1 {
     vertical-align: middle;
     margin: 0;
     display: inline-block; }
-  /* line 30, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+  /* line 20, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
   .app-header .display {
     margin: -1px 0 0 0; }
-  /* line 33, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+  /* line 23, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
   .app-header .subtitle {
     font-family: "Montserrat", sans-serif;
     font-weight: 700;
@@ -1383,10 +1370,10 @@ a {
     color: #505252;
     padding: 8px 0 0 15px;
     width: 200px; }
-  /* line 38, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+  /* line 28, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
   .app-header .easter {
     display: none; }
-  /* line 41, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+  /* line 31, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
   .app-header .heart {
     color: red;
     font-size: 20px;
@@ -1395,59 +1382,59 @@ a {
     display: inline-block;
     width: 38px;
     text-align: center; }
-  /* line 50, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+  /* line 40, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
   .app-header .menu {
     width: 510px;
     text-align: right;
     display: inline-block;
     margin: 3px 0 0 0; }
-    /* line 56, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+    /* line 46, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
     .app-header .menu .active {
       color: #fc4c1d; }
-    /* line 59, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+    /* line 49, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
     .app-header .menu .item {
       font-size: 15px;
       font-weight: bold;
       margin: 10px;
       padding: 8px 4px; }
-      /* line 65, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+      /* line 55, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
       .app-header .menu .item, .app-header .menu .item:visited {
         color: #505252; }
-      /* line 68, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+      /* line 58, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
       .app-header .menu .item:hover {
         color: #fc4c1d; }
-      /* line 71, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+      /* line 61, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
       .app-header .menu .item:active {
         color: #fc4c1d; }
     @media only screen and (min-width: 767px) and (max-width: 964px) {
-      /* line 50, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+      /* line 40, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
       .app-header .menu {
         width: 360px;
         padding: 0; }
-        /* line 77, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+        /* line 67, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
         .app-header .menu .item {
           margin: 0;
           padding: 0 5px; } }
   @media only screen and (max-width: 767px) {
-    /* line 22, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+    /* line 12, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
     .app-header {
       width: 100%;
       text-align: center; }
-      /* line 84, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+      /* line 74, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
       .app-header .Cylon.js-logo, .app-header .subtitle {
         width: 100%;
         display: block;
         margin: 0 0 5px 0; }
-      /* line 88, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+      /* line 78, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
       .app-header .subtitle {
         font-size: 19px;
         line-height: 15px;
         padding: 0; }
-      /* line 92, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+      /* line 82, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
       .app-header .menu {
         width: 100%;
         text-align: center; }
-        /* line 95, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+        /* line 85, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
         .app-header .menu .item {
           margin: 0;
           padding: 0 2px; } }

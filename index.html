@@ -86,23 +86,20 @@
               for robotics and physical computing.
             </p>
             <p>It provides a simple, yet powerful way to create solutions that incorporate multiple, different hardware devices at the same time.</p>
-            
-            <p>Want to use Ruby on robots? Check out our sister project Artoo <a href="http://artoo.io">(http://artoo.io)</a>.</p>
-            
-            <p>Want to use Node.js? Check out our sister project Cylon <a href="http://cylonjs.com">(http://cylonjs.com)</a>.</p>
-            
-            <h2 id="meet-the-code">Meet The Code</h2>
-            
+            <p>
+              Want to use Ruby on robots? Check out our sister project Artoo
+              <a target="blank" href="http://artoo.io">(http://artoo.io).</a>
+            </p>
+            <p>
+              Want to use Node.js? Check out our sister project Cylon
+              <a target="blank" href="http://cylonjs.com">(http://cylonjs.com).</a>
+            </p>
+            <h2>Meet The Code</h2>
             <p>Gobot makes commanding robots incredibly simple and fun.</p>
-            
-            <p>All you need to get started is install the library with :  </p>
-            
+            <p>All you need to get started is install the library with :</p>
             <p><code>go get -u github.com/hybridgroup/gobot</code>.</p>
-            
-            <p>Then install additional libraries for whatever hardware support you want to use from your robot. For example, <code>go get -u github.com/hybridgroup/gobot-sphero</code> to use Gobot with a Sphero.</p>
-            
-            <h2 id="example">Example</h2>
-            
+            <p>Then install additional libraries for whatever hardware support you want to use from your robot. For example, `go get -u github.com/hybridgroup/gobot-sphero` to use Gobot with a Sphero.</p>
+            <h2>Example</h2>
             <pre class="CodeRay"><span class="keyword">package</span> main
 
 <span class="keyword">import</span> (
@@ -146,6 +143,18 @@
               Ready to build Go robots with Gobot?
               <a href="/documentation/getting-started" class="item">Get Started Here!</a>
             </p>
+            <h2>API</h2>
+            <p>Gobot includes a RESTful API to query the status of any robot running within a group, including the connection and device status, and execute device commands.</p>
+            <p>To activate the API, use the <code>Api</code> command like this:</p>
+            
+            <pre class="CodeRay">master := gobot.GobotMaster()
+gobot.Api(master)
+</pre>
+            
+            <p>To specify the api port run your Gobot program with the <code>PORT</code> environment variable</p>
+            
+            <pre class="CodeRay">$ PORT=8080 go run gobotProgram.go
+</pre>
             <h2>Hardware Support</h2>
             <p>
               Gobot has a extensible system for connecting to hardware devices. The following robotics and physical computing platforms are currently supported:
