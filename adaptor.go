@@ -4,7 +4,7 @@ type Adaptor struct {
 	Name      string
 	Port      string
 	Connected bool
-	Params    map[string]string
+	Params    map[string]interface{}
 }
 
 func (Adaptor) NewAdaptor(a Adaptor) Adaptor {

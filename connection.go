@@ -10,13 +10,18 @@ type Connection struct {
 	Adaptor interface{}
 	Port    string
 	Robot   *Robot `json:"-"`
-	Params  map[string]string
+	Params  map[string]interface{}
 }
 
 func NewConnection(a interface{}, r *Robot) *Connection {
 	c := new(Connection)
 	c.Name = reflect.ValueOf(a).Elem().FieldByName("Name").String()
 	c.Port = reflect.ValueOf(a).Elem().FieldByName("Port").String()
+	c.Params = make(map[string]interface{})
+	keys := reflect.ValueOf(a).Elem().FieldByName("Params").MapKeys()
+	for k := range keys {
+		c.Params[keys[k].String()] = reflect.ValueOf(a).Elem().FieldByName("Params").MapIndex(keys[k])
+	}
 	c.Robot = r
 	c.Adaptor = a
 	return c
