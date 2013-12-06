@@ -76,6 +76,9 @@ Gobot has a extensible system for connecting to hardware devices. The following 
   - [Beaglebone Black](http://beagleboard.org/Products/BeagleBone+Black/) <=> [Library](https://github.com/hybridgroup/gobot-beaglebone)
   - [Digispark](http://digistump.com/products/1) <=> [Library](https://github.com/hybridgroup/gobot-digispark)
   - [Sphero](http://www.gosphero.com/) <=> [Library](https://github.com/hybridgroup/gobot-sphero)
+  - [Leap Motion](https://www.leapmotion.com/) <=> [Library](https://github.com/hybridgroup/gobot-leap)
+  - [Firmata](http://firmata.org/wiki/Main_Page) <=> [Library](https://github.com/hybridgroup/gobot-firmata)
+  - [GPIO](https://github.com/hybridgroup/gobot-gpio)
 
 More platforms and drivers are coming soon...
 
