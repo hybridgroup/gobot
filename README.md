@@ -33,13 +33,6 @@ func main() {
   sphero := gobotSphero.NewSphero(spheroAdaptor)
   sphero.Name = "Sphero"
 
-  connections := []interface{}{
-    spheroAdaptor,
-  }
-  devices := []interface{}{
-    sphero,
-  }
-
   work := func() {
     gobot.Every("2s", func() {
       sphero.Roll(100, uint16(gobot.Rand(360)))
@@ -47,8 +40,8 @@ func main() {
   }
 
   robot := gobot.Robot{
-    Connections: connections,
-    Devices:     devices,
+    Connections: []interface{} { spheroAdaptor },
+    Devices:     []interface{} { sphero },
     Work:        work,
   }
 
