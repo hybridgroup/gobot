@@ -1,0 +1,28 @@
+---
+layout: page
+title: gobot Example - hello
+page_title: "Example: hello"
+author: The Hybrid Group
+description: A gobot code example
+---
+
+.example
+  :markdown
+        :::golang
+        package main
+
+        import (
+        	"fmt"
+        	"github.com/hybridgroup/gobot"
+        )
+
+        func main() {
+        	robot := gobot.Robot{
+        		Work: func() {
+        			gobot.Every("0.5s", func() { fmt.Println("Greetings human") })
+        		},
+        	}
+
+        	robot.Start()
+        }
+
