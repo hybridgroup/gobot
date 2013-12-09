@@ -1,45 +1,63 @@
-@mixin title-font($size, $color)
-  font-family: 'Montserrat', sans-serif
-  font-weight: 700
-  font-size: $size
-  color: $color
+@mixin title-font($size, $color) {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 700;
+  font-size: $size;
+  color: $color;
+}
 
-@mixin margin-not-last-child()
-  &:not(:last-child)
-    margin-bottom: 20px
+@mixin margin-not-last-child {
+  &:not(:last-child) {
+    margin-bottom: 20px;
+  }
+}
 
-@mixin tiny-screen($width: "", $height: "")
-  @media only screen and (max-width: 400) 
-    @if $width != ""
-      width: $width
-    @if $height != ""
-      height: $height
-    @content
+@mixin tiny-screen($width: "", $height: "") {
+  @media only screen and (max-width: 400) {
+    @if $width != "" {
+      width: $width;
+    }
+    @if $height != "" {
+      height: $height;
+    }
+    @content;
+  }
+}
 
-@mixin small-screen($width: "", $height: "")
-  @media only screen and (max-width: $medium-screen) 
-    @if $width != ""
-      width: $width
-    @if $height != ""
-      height: $height
-    @content
+@mixin small-screen($width: "", $height: "") {
+  @media only screen and (max-width: $medium-screen) {
+    @if $width != "" {
+      width: $width;
+    }
+    @if $height != "" {
+      height: $height;
+    }
+    @content;
+  }
+}
 
-@mixin medium-screen($width: "", $height: "")
-  @media only screen and (min-width: $medium-screen) and (max-width: $big-screen) 
-    @if $width != ""
-      width: $width
-    @if $height != ""
-      height: $height
-    @content
+@mixin medium-screen($width: "", $height: "") {
+  @media only screen and (min-width: $medium-screen) and (max-width: $big-screen) {
+    @if $width != "" {
+      width: $width;
+    }
+    @if $height != "" {
+      height: $height;
+    }
+    @content;
+  }
+}
 
-@mixin medium-screen-pre()
-  @media only screen and (max-width: $medium-screen) 
-    white-space: pre
-    overflow: scroll
-    word-wrap: normal
+@mixin medium-screen-pre {
+  @media only screen and (max-width: $medium-screen) {
+    white-space: pre;
+    overflow: scroll;
+    word-wrap: normal;
+  }
+}
 
-@mixin medium-screen-content()
-  @media only screen and (max-width: $medium-screen) 
-    padding-top: 0
-    width: 100%
-
+@mixin medium-screen-content {
+  @media only screen and (max-width: $medium-screen) {
+    padding-top: 0;
+    width: 100%;
+  }
+}

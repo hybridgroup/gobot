@@ -1,5 +1,5 @@
 body
-  background-color: $blue
+  background-color: $body-bg-color
   background-repeat: no-repeat
   background-position: top
 
@@ -8,22 +8,22 @@ body
   margin-bottom: -38px
 
 h3, h4, h5, ul, ol
-  color: #523D47
+  color: $lesser-title-color
 
 a
-  color: #ff7e5b
   &, &:visited
-    color: #ff7e5b
-  &:hover
-    color: #fc4c1d  
+    color: $link-color
+  &:hover, &:focus
+    color: $link-hover-color
+
 pre
   @include medium-screen-pre
 
-.anchors-blue
+.hero-anchors
   &, &:active, &:visited
-    color: #FFFBDA
-  &:hover
-    color: #fff
+    color: $hero-link-color
+  &:hover, &:focus
+    color: $hero-link-hover-color
 
 .notice
   background: #fff

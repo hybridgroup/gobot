@@ -1,0 +1,52 @@
+.container {
+  position: relative;
+  overflow: hidden;
+}
+
+.container, .w {
+  width: $big-screen;
+  margin: 0 auto;
+  @include medium-screen($medium-screen, "") {
+    padding: 0 15px;
+  }
+
+  @include small-screen(100%, "") {
+    padding: 0 15px;
+  }
+}
+
+.main[role="main"] {
+  padding-bottom: 50px;
+  .videos {
+    iframe, object {
+      width: 600px;
+      height: 400px;
+      @include margin-not-last-child;
+      @include medium-screen(420px, 236px);
+      @include small-screen(290px, 169px);
+    }
+  }
+  .content {
+    width: 70%;
+    &.full {
+      width: 100%;
+      clear: both;
+    }
+    h1, h2 {
+      color: $title-color;
+    }
+    h1 {
+      font-size: 1.9em;
+      padding: 10px 0;
+    }
+  }
+  .aside.right {
+    width: 30%;
+    float: right;
+    padding-top: 0px;
+    text-align: right;
+  }
+  section {
+    @include margin-not-last-child;
+  }
+}

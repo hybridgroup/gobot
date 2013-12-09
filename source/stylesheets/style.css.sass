@@ -3,14 +3,33 @@
 @import 'coderay'
 
 // Config
-$red           : #fc4c1d
-$blue          : #fff6ee
-$gray          : #373737
-$light_gray    : #505252
-$bright-red    : #FF7E5B
+
+$body-bg-color          : #FFF6EE
+$footer-text-color      : #FFFFFF
+
+$link-color             : #FF7E5B
+$link-hover-color       : #FC4C1D
+
+$title-color            : #FF7E5B
+$lesser-title-color     : #523D47
+$header-subtitle-color  : #505252
+
+$hero-color             : #FF7E5B
+$hero-title-color       : #FFFFFF
+$hero-subtitle-color    : #FAFAF1
+$hero-link-color        : #FFFBDA
+$hero-link-hover-color  : #FFFFFF
+
+$cta-color              : #FFF3CF
+$cta-hover-color        : $cta-color - 30
+$cta-text-color         : #BD583D
+$cta-text-hover-color   : $cta-text-color - 10
+
+$blog-title-color       : #FC4C1D
+$blog-date-top-color    : #B39F89
 
 $header-size   : 66px
-$logo-size     : 155px
+$logo-size     : 118px
 
 $small-screen  : 479px
 $medium-screen : 767px
@@ -35,3 +54,6 @@ $big-screen    : 964px
 @import 'elements/documentation'
 @import 'elements/sphero_colors'
 
+// Custom
+.app-logo a
+  @extend .hidden-text

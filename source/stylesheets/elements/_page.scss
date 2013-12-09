@@ -1,0 +1,27 @@
+.page-title {
+  background: $hero-color;
+  padding: 25px 0;
+  margin: 10px 0 25px 0;
+  .title {
+    font-family: "Montserrat", sans-serif;
+    font-weight: 700;
+    font-size: 33px;
+    color: $hero-title-color;
+    line-height: 28px;
+    width: 100%;
+    clear: both;
+    opacity: 0.94;
+    margin: 0;
+  }
+  .subtitle {
+    @include title-font(21px, $hero-subtitle-color);
+    font-weight: 550;
+    opacity: 0.94;
+    margin: 0;
+    line-height: 21px;
+    margin-top: 7px;
+  }
+  a {
+    @extend .hero-anchors;
+  }
+}

@@ -1,0 +1,9 @@
+.app-footer {
+  @include title-font(12px, $footer-text-color);
+  line-height: 39px;
+  background: $hero-color;
+  font-weight: normal;
+  a {
+    @extend .hero-anchors;
+  }
+}
