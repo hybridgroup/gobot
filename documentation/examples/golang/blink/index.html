@@ -5,9 +5,9 @@
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
 <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
-<meta name="description">
-<meta name="author">
-<title></title>
+<meta content="A gobot code example" name="description">
+<meta content="The Hybrid Group" name="author">
+<title>gobot Example - blink</title>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><link href="http://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,500,700" rel="stylesheet" type="text/css">
 <link href="/stylesheets/style.css" rel="stylesheet">
 <link href="/favicon.ico" rel="shortcut icon" type="image/gif">
@@ -40,9 +40,61 @@
           </span>
         </header>
 </div>
+      <div class="page-title">
+        <div class="w">
+          <h1 class="title">Example: blink</h1>
+        </div>
+      </div>
       <div class="container">
         <div class="main" role="main">
-          <section class="content full"><h2 id="source-code">Source Code</h2>
+          <section class="content full"><div class="example">
+              <pre class="CodeRay">package main
+
+import (
+        "fmt"
+        "github.com/hybridgroup/gobot"
+        "github.com/hybridgroup/gobot-firmata"
+        "github.com/hybridgroup/gobot-gpio"
+)
+
+func main() {
+
+        firmata := new(gobotFirmata.FirmataAdaptor)
+        firmata.Name = "firmata"
+        firmata.Port = "/dev/ttyACM0"
+
+        led := gobotGPIO.NewLed(firmata)
+        led.Name = "led"
+        led.Pin = "13"
+
+        connections := []interface{}{
+                firmata,
+        }
+        devices := []interface{}{
+                led,
+        }
+
+        work := func() {
+                gobot.Every("1s", func() {
+                        led.Toggle()
+                        if led.IsOn() {
+                                fmt.Println("On")
+                        } else {
+                                fmt.Println("Off")
+                        }
+                })
+        }
+
+        robot := gobot.Robot{
+                Connections: connections,
+                Devices:     devices,
+                Work:        work,
+        }
+
+        robot.Start()
+}
+</pre>
+            </div>
           </section>
 </div>
       </div>

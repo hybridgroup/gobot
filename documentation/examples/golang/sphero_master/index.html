@@ -5,9 +5,9 @@
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
 <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
-<meta name="description">
-<meta name="author">
-<title></title>
+<meta content="A gobot code example" name="description">
+<meta content="The Hybrid Group" name="author">
+<title>gobot Example - sphero_master</title>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><link href="http://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,500,700" rel="stylesheet" type="text/css">
 <link href="/stylesheets/style.css" rel="stylesheet">
 <link href="/favicon.ico" rel="shortcut icon" type="image/gif">
@@ -40,9 +40,62 @@
           </span>
         </header>
 </div>
+      <div class="page-title">
+        <div class="w">
+          <h1 class="title">Example: sphero_master</h1>
+        </div>
+      </div>
       <div class="container">
         <div class="main" role="main">
-          <section class="content full"><h2 id="source-code">Source Code</h2>
+          <section class="content full"><div class="example">
+              <pre class="CodeRay">package main
+
+import (
+        "github.com/hybridgroup/gobot"
+        "github.com/hybridgroup/gobot-sphero"
+)
+
+func main() {
+        master := gobot.GobotMaster()
+
+        spheros := map[string]string{
+                "Sphero-BPO": "/dev/rfcomm0",
+        }
+
+        for name, port := range spheros {
+                spheroAdaptor := new(gobotSphero.SpheroAdaptor)
+                spheroAdaptor.Name = "sphero"
+                spheroAdaptor.Port = port
+
+                sphero := gobotSphero.NewSphero(spheroAdaptor)
+                sphero.Name = "sphero"
+                sphero.Interval = "0.5s"
+
+                work := func() {
+                        sphero.SetRGB(uint8(255), uint8(0), uint8(0))
+                }
+
+                master.Robots = append(master.Robots, gobot.Robot{
+                        Name:        name,
+                        Connections: []interface{}{spheroAdaptor},
+                        Devices:     []interface{}{sphero},
+                        Work:        work,
+                })
+        }
+
+        master.Robots = append(master.Robots, gobot.Robot{
+                Work: func() {
+                        sphero := master.FindRobot("Sphero-BPO")
+                        gobot.Every("1s", func() {
+                                gobot.Call(sphero.GetDevice("sphero").Driver, "SetRGB", uint8(gobot.Rand(255)), uint8(gobot.Rand(255)), uint8(gobot.Rand(255)))
+                        })
+                },
+        })
+
+        master.Start()
+}
+</pre>
+            </div>
           </section>
 </div>
       </div>
