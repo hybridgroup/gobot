@@ -1,7 +1,3 @@
-.container
-  position: relative
-  overflow: hidden
-
 .container, .w
   width: $big-screen
   margin: 0 auto
@@ -12,18 +8,38 @@
 
 .main[role="main"]
   padding-bottom: 50px
+  @include outer-container
 
   .videos
-    iframe, object
-      width: 600px
-      height: 400px
-
-      @include margin-not-last-child
-      @include medium-screen(420px, 236px)
-      @include small-screen(290px, 169px)
+    @include outer-container
+    .video
+      @include span-columns(6)
+      margin: .5%
+      h3
+        font-size: 16px
+      iframe, object
+        width: 100%
+        height: 300px
+      @media only screen and (min-width: $medium-screen) and (max-width: $big-screen) 
+        iframe, object
+          height: 240px
+      @media only screen and (max-width: $medium-screen)
+        @include span-columns(12)
+        iframe, object
+          height: 240px
+    .video_index
+      @include span-columns(10)
+      iframe, object
+        width: 100%
+        height: 400px
+      @media only screen and (min-width: $medium-screen) and (max-width: $big-screen) 
+        iframe, object
+          height: 300px
+      @media only screen and (max-width: $medium-screen)
+        iframe, object
+          height: 180px
 
   .content
-    width: 70%
     &.full
       width: 100%
       clear: both
@@ -36,10 +52,14 @@
       padding: 10px 0
 
   .aside.right
-    width: 30%
-    float: right
+    @include span-columns(3)
     padding-top: 0px
     text-align: right
+    img
+      width: 100%
+      margin-top: 20px
 
-  section
-    @include margin-not-last-child
+  section.content
+    .index_content
+      @include margin-not-last-child
+      @include span-columns(9)

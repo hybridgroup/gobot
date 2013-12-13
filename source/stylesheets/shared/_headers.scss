@@ -8,20 +8,21 @@
 }
 
 .hidden-text {
-  background: url("/images/logo.png") left top no-repeat;
+  background: url($header-logo-src) left top no-repeat;
   text-indent: -99999px;
   height: 27px;
 }
 
 .app-header {
-  margin: 16px 0 15px 0;
+  @include outer-container;
+  margin: 9px 0 15px 0;
   .display, .subtitle, .menu, h1 {
     vertical-align: middle;
     margin: 0;
     display: inline-block;
   }
   .display {
-    width: 430px;
+    @include span-columns(5);
     margin: -1px 0 0 0;
   }
   .subtitle {
@@ -42,10 +43,10 @@
     text-align: center;
   }
   .menu {
-    width: 510px;
+    @include span-columns(7);
     text-align: right;
     display: inline-block;
-    margin: 3px 0 0 0;
+    margin: 5px 0 0 0;
     .active {
       color: $blog-title-color;
     }
@@ -62,7 +63,7 @@
       }
     }
     @media only screen and (min-width: $medium-screen) and (max-width: $big-screen) {
-      width: 360px;
+      @include span-columns(6);
       padding: 0;
       .item {
         margin: 0;
@@ -72,12 +73,10 @@
   }
   @media only screen and (min-width: $medium-screen) and (max-width: $big-screen) {
     .display {
-      width: 360px;
+      @include span-columns(6);
     }
   }
   @media only screen and (max-width: $medium-screen) {
-    width: 100%;
-    text-align: center;
     .subtitle, .menu {
       width: auto;
       display: block;
@@ -89,7 +88,8 @@
       margin: 0 0 5px 0;
     }
     .display {
-      width: auto;
+      @include span-columns(12);
+      text-align: center;
       margin: -1px 0 0;
     }
     .app-logo a {
@@ -103,6 +103,7 @@
     .menu {
       margin: 5px 0 0 0;
       text-align: center;
+      @include span-columns(12);
       .item {
         margin: 0;
         padding: 0 2px;

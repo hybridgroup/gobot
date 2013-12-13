@@ -1,8 +1,8 @@
 .articles {
-  max-width: 706px;
-  margin-right: 40px;
-  margin-bottom: 80px;
-  float: left;
+  @include span-columns(9);
+  @media only screen and (max-width: $medium-screen) {
+    @include span-columns(12);
+  }
   @include small-screen {
     margin-right: 0;
   }
@@ -78,11 +78,13 @@
 }
 
 .categories, .network, .tweets {
-  display: inline-block;
   vertical-align: top;
-  width: 200px;
   margin-bottom: 40px;
-  float: left;
+  @include span-columns(2);
+  @media only screen and (max-width: $medium-screen) {
+    @include span-columns(12);
+  }
+    
   a {
     color: black;
   }

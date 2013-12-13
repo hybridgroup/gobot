@@ -174,7 +174,20 @@ layout: page
           robot.Start()
         }
 
-  
+%h2 API
+%p Gobot includes a RESTful API to query the status of any robot running within a group, including the connection and device status, and execute device commands.
+
+:markdown
+  To activate the API, use the `Api` command like this:
+
+      :::bash
+      master := gobot.GobotMaster()
+      gobot.Api(master)
+
+  To specify the api port run your Gobot program with the `PORT` environment variable
+
+      :::bash
+      $ PORT=8080 go run gobotProgram.go 
 
 %section.contributing
   %h2 Contributing

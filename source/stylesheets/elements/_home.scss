@@ -49,7 +49,7 @@
 .social {
   line-height: 0;
   padding: 10px 0;
-  background: #fdfcf5;
+  background: $social-catcher-background-color;
   .twitter-follow-button {
     vertical-align: top;
   }
@@ -93,7 +93,7 @@
 
 .catcher {
   margin: 0 0 38px 0;
-  background: #fdfcf5;
+  background: $social-catcher-background-color;
   padding: 20px;
   .phrase {
     margin: 0;

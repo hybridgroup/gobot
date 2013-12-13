@@ -1,8 +1,7 @@
 .articles
-  max-width: 706px
-  margin-right: 40px
-  margin-bottom: 80px
-  float: left
+  @include span-columns(9)
+  @media only screen and (max-width: $medium-screen)
+    @include span-columns(12)
   
   +small-screen
     margin-right: 0
@@ -24,7 +23,7 @@
     .data
       padding-left: 71px
     .date
-      color: #FFF
+      color: white
       width: 50px
       text-align: center
       margin-right: 20px
@@ -63,12 +62,13 @@
         margin-right: 4px
     .comments
       margin-right: 60px
+      
 .categories, .network, .tweets
-  display: inline-block
   vertical-align: top
-  width: 200px
   margin-bottom: 40px
-  float: left
+  @include span-columns(2)
+  @media only screen and (max-width: $medium-screen)
+    @include span-columns(12)
 
   a
     color: #000

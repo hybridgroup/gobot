@@ -1,5 +1,5 @@
 @mixin title-font($size, $color) {
-  font-family: "Montserrat", sans-serif;
+  font-family: $page-title-font;
   font-weight: 700;
   font-size: $size;
   color: $color;

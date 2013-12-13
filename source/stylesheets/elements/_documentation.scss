@@ -3,6 +3,7 @@
 }
 
 .documentation {
+  @include span-columns(12);
   .index {
     padding: 0 0 0 8px;
     li {
@@ -13,7 +14,7 @@
     font-size: 20px;
   }
   .description {
-    color: gray;
+    color: $doc-description-color;
     font-size: 14px;
     line-height: 21px;
     margin: 10px;
@@ -23,9 +24,6 @@
     float: right;
     border: 1px solid rgba($hero-color, 0.14);
     margin: 0 0 19px 20px;
-  }
-  .hardware .devices {
-    text-align: left;
   }
 }
 
@@ -58,8 +56,18 @@
 }
 
 .colors {
-  width: 23%;
-  float: left;
+  @include span-columns(3);
+  @media only screen and (min-width: $medium-screen) and (max-width: $big-screen) {
+    @include span-columns(3);
+    p {
+      font-size: 10px
+    }
+  }
+  
+  @media only screen and (max-width: $medium-screen) {
+    @include span-columns(12);
+  }
+    
   dt {
     font-weight: bold;
     padding: 5px;
