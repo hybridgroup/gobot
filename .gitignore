@@ -14,3 +14,6 @@
 /.sass-cache
 
 .DS_Store
+
+# Used for the import_examples script
+/.gobot
