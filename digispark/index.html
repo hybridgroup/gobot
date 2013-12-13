@@ -8,26 +8,15 @@
 <meta content="Guetting started page for Cylon.js-digispark" name="description">
 <meta content="The Hybrid Group" name="author">
 <title>Cylon.js - Digispark - Guetting started</title>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><link href="http://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,500,700" rel="stylesheet" type="text/css">
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><!-- %link{href: "http://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,500,700", rel: "stylesheet", type: "text/css"}/ --><link href="//fonts.googleapis.com/css?family=Inconsolata:400,700%7CMontserrat:700" rel="stylesheet">
 <link href="/stylesheets/style.css" rel="stylesheet">
 <link href="/favicon.ico" rel="shortcut icon" type="image/gif">
-<script>
-      $(document).ready(function() {
-        $('header .subtitle').hover(function() {
-          $('.easter', this).show();
-          $('.main', this).hide();
-        }, function () {
-          $('.easter', this).hide();
-          $('.main', this).show();
-        });
-      });
-    </script>
 </head>
 <body>
     <div class="app">
       <div class="w">
         <header class="app-header" role="banner"><div class="display">
-            <h1 class="cylon-logo">
+            <h1 class="app-logo">
               <a href="/">Gobot</a>
             </h1>
           </div>
@@ -140,7 +129,7 @@
               <h3>Running your robot:</h3>
               <pre class="CodeRay">ruby ./examples/blink.rb
 </pre>
-            </section><section class="Cylon js-code"><h2>What the code looks like</h2>
+            </section><section class="app-code"><h2>What the code looks like</h2>
               <h3>Example: Digispark with LED and a button, using the Littlewire protocol.</h3>
               <pre class="CodeRay">require <span class="string"><span class="delimiter">'</span><span class="content">Cylon.js</span><span class="delimiter">'</span></span>
 

@@ -8,26 +8,15 @@
 <meta content="Cylon.js Drivers" name="description">
 <meta content="The Hybrid Group" name="author">
 <title>Gobot Drivers</title>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><link href="http://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,500,700" rel="stylesheet" type="text/css">
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><!-- %link{href: "http://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,500,700", rel: "stylesheet", type: "text/css"}/ --><link href="//fonts.googleapis.com/css?family=Inconsolata:400,700%7CMontserrat:700" rel="stylesheet">
 <link href="/stylesheets/style.css" rel="stylesheet">
 <link href="/favicon.ico" rel="shortcut icon" type="image/gif">
-<script>
-      $(document).ready(function() {
-        $('header .subtitle').hover(function() {
-          $('.easter', this).show();
-          $('.main', this).hide();
-        }, function () {
-          $('.easter', this).hide();
-          $('.main', this).show();
-        });
-      });
-    </script>
 </head>
 <body>
     <div class="app">
       <div class="w">
         <header class="app-header" role="banner"><div class="display">
-            <h1 class="cylon-logo">
+            <h1 class="app-logo">
               <a href="/">Gobot</a>
             </h1>
           </div>
@@ -58,10 +47,9 @@
                   <img src="/images/LED.jpg"></a>
                 
                 
-                
+                <a class="device" href="/documentation/drivers/servo" title="Servo">
+                  <img src="/images/servo.jpg"></a>
               </div>
-              <h2>i2c Drivers</h2>
-              Gobot's i2c drivers work with several different platforms that support the required interfaces. For example, the Beaglebone Black.
               <div class="devices">
                 
                 

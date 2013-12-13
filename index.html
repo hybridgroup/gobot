@@ -8,26 +8,15 @@
 <meta content="Gobot is a Go framework for robotics and physical computing. It provides a simple, but powerful DSL (domain-specific language) for robots and physical computing." name="description">
 <meta content="The Hybrid Group" name="author">
 <title>Gobot</title>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><link href="http://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,500,700" rel="stylesheet" type="text/css">
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><!-- %link{href: "http://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,500,700", rel: "stylesheet", type: "text/css"}/ --><link href="//fonts.googleapis.com/css?family=Inconsolata:400,700%7CMontserrat:700" rel="stylesheet">
 <link href="/stylesheets/style.css" rel="stylesheet">
 <link href="/favicon.ico" rel="shortcut icon" type="image/gif">
-<script>
-      $(document).ready(function() {
-        $('header .subtitle').hover(function() {
-          $('.easter', this).show();
-          $('.main', this).hide();
-        }, function () {
-          $('.easter', this).hide();
-          $('.main', this).show();
-        });
-      });
-    </script>
 </head>
 <body>
     <div class="app">
       <div class="w">
         <header class="app-header" role="banner"><div class="display">
-            <h1 class="cylon-logo">
+            <h1 class="app-logo">
               <a href="/">Gobot</a>
             </h1>
           </div>
@@ -43,9 +32,6 @@
       <div class="hero">
         <div class="container">
           <h1 class="title">
-            <!-- It is time to have Robots and JavaScript -->
-            <!-- %br -->
-            <!-- working together. -->
             Go, Robot, Go! Go Powered Robotics
           </h1>
           <h2 class="subtitle">
@@ -76,31 +62,29 @@
       </div>
       <div class="container">
         <div class="main" role="main">
-          <div class="aside right">
-            <img src="images/gophy.png">
-</div>
-          <section class="content"><h2>About</h2>
-            <p>
-              Gobot is set of libraries in the
-              <a target="_blank" href="http://golang.org/">Go programming language</a>
-              for robotics and physical computing.
-            </p>
-            <p>It provides a simple, yet powerful way to create solutions that incorporate multiple, different hardware devices at the same time.</p>
-            <p>
-              Want to use Ruby on robots? Check out our sister project Artoo
-              <a target="blank" href="http://artoo.io">(http://artoo.io).</a>
-            </p>
-            <p>
-              Want to use Node.js? Check out our sister project Cylon
-              <a target="blank" href="http://cylonjs.com">(http://cylonjs.com).</a>
-            </p>
-            <h2>Meet The Code</h2>
-            <p>Gobot makes commanding robots incredibly simple and fun.</p>
-            <p>All you need to get started is install the library with :</p>
-            <p><code>go get -u github.com/hybridgroup/gobot</code>.</p>
-            <p>Then install additional libraries for whatever hardware support you want to use from your robot. For example, `go get -u github.com/hybridgroup/gobot-sphero` to use Gobot with a Sphero.</p>
-            <h2>Example</h2>
-            <pre class="CodeRay"><span class="keyword">package</span> main
+          <section class="content"><div class="index_content">
+              <h2>About</h2>
+              <p>
+                Gobot is set of libraries in the
+                <a target="_blank" href="http://golang.org/">Go programming language</a>
+                for robotics and physical computing.
+              </p>
+              <p>It provides a simple, yet powerful way to create solutions that incorporate multiple, different hardware devices at the same time.</p>
+              <p>
+                Want to use Ruby on robots? Check out our sister project Artoo
+                <a target="blank" href="http://artoo.io">(http://artoo.io).</a>
+              </p>
+              <p>
+                Want to use Node.js? Check out our sister project Cylon
+                <a target="blank" href="http://cylonjs.com">(http://cylonjs.com).</a>
+              </p>
+              <h2>Meet The Code</h2>
+              <p>Gobot makes commanding robots incredibly simple and fun.</p>
+              <p>All you need to get started is install the library with :</p>
+              <p><code>go get -u github.com/hybridgroup/gobot</code>.</p>
+              <p>Then install additional libraries for whatever hardware support you want to use from your robot. For example, `go get -u github.com/hybridgroup/gobot-sphero` to use Gobot with a Sphero.</p>
+              <h2>Example</h2>
+              <pre class="CodeRay"><span class="keyword">package</span> main
 
 <span class="keyword">import</span> (
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
@@ -138,55 +122,94 @@
   robot.Start()
 }  
 </pre>
-            <h2>Getting Started</h2>
-            <p>
-              Ready to build Go robots with Gobot?
-              <a href="/documentation/getting-started" class="item">Get Started Here!</a>
-            </p>
-            <h2>API</h2>
-            <p>Gobot includes a RESTful API to query the status of any robot running within a group, including the connection and device status, and execute device commands.</p>
-            <p>To activate the API, use the <code>Api</code> command like this:</p>
-            
-            <pre class="CodeRay">master := gobot.GobotMaster()
-gobot.Api(master)
-</pre>
-            
-            <p>To specify the api port run your Gobot program with the <code>PORT</code> environment variable</p>
-            
-            <pre class="CodeRay">$ PORT=8080 go run gobotProgram.go
-</pre>
-            <h2>Hardware Support</h2>
-            <p>
-              Gobot has a extensible system for connecting to hardware devices. The following robotics and physical computing platforms are currently supported:
-              </p>
+              <h2>Hardware Support</h2>
+              <p>
+                Gobot has a extensible system for connecting to hardware devices. The following robotics and physical computing platforms are currently supported:
+                </p>
 <ul>
 <li>
-                  <a target="_blank" href="http://beagleboard.org/Products/BeagleBone+Black/">Beaglebone Black</a>
+                    <a target="_blank" href="http://www.arduino.cc/">Arduino</a>
+                    &lt;==&gt;
+                    <a target="_blank" href="https://github.com/hybridgroup/gobot-firmata">Library</a>
+                  </li>
+                  <li>
+                    <a target="_blank" href="http://beagleboard.org/Products/BeagleBone+Black/">Beaglebone Black</a>
+                    &lt;==&gt;
+                    <a target="_blank" href="https://github.com/hybridgroup/gobot-beaglebone">Library</a>
+                  </li>
+                  <li>
+                    <a target="_blank" href="http://digistump.com/category/1">Digispark</a>
+                    &lt;==&gt;
+                    <a target="_blank" href="https://github.com/hybridgroup/gobot-digispark">Library</a>
+                  </li>
+                  <li>
+                    <a target="_blank" href="http://firmata.org/wiki/Main_Page">Firmata</a>
+                    &lt;==&gt;
+                    <a target="_blank" href="https://github.com/hybridgroup/gobot-firmata">Library</a>
+                  </li>
+                  <li>
+                    <a target="_blank" href="https://www.leapmotion.com/">Leap Motion</a>
+                    &lt;==&gt;
+                    <a target="_blank" href="https://github.com/hybridgroup/gobot-leapmotion">Library</a>
+                  </li>
+                  <li>
+                    <a target="_blank" href="https://www.spark.io/">Spark</a>
+                    &lt;==&gt;
+                    <a target="_blank" href="https://github.com/hybridgroup/gobot-spark">Library</a>
+                  </li>
+                  <li>
+                    <a target="_blank" href="http://www.gosphero.com/">Sphero</a>
+                    &lt;==&gt;
+                    <a target="_blank" href="https://github.com/hybridgroup/gobot-sphero">Library</a>
+                  </li>
+                </ul>
+<p>Support for many devices that use General Purpose Input/Output (GPIO) have a shared set of drivers provded using the cylon-gpio module:</p>
+              <ul>
+<li>
+                  <a target="_blank" href="https://en.wikipedia.org/wiki/General_Purpose_Input/Output">GPIO</a>
                   &lt;==&gt;
-                  <a target="_blank" href="https://github.com/hybridgroup/gobot-beaglebone">Library</a>
-                </li>
-                <li>
-                  <a target="_blank" href="http://www.gosphero.com/">Sphero</a>
-                  &lt;==&gt;
-                  <a target="_blank" href="https://github.com/hybridgroup/gobot-sphero">Library</a>
-                </li>
-                <li>
-                  <a target="_blank" href="http://digistump.com/category/1">Digispark</a>
-                  &lt;==&gt;
-                  <a target="_blank" href="https://github.com/hybridgroup/gobot-digispark">Library</a>
-                </li>
+                  <a target="_blank" href="https://github.com/hybridgroup/gobot-gpio">Drivers</a>
+                  <ul>
+<li>Button</li>
+                    <li>LED</li>
+                    <li>Servo</li>
+                  </ul>
+</li>
               </ul>
 <p>More platforms and drivers are coming soon...</p>
-            <h2 id="be-part-of-the-robot-evolution">Be Part Of The Robot Evolution</h2>
-            
-            <ul>
+              <h2>Getting Started</h2>
+              <p>Install the library with: <code>go get -u github.com/hybridgroup/gobot</code></p>
+              <p>Then install additional libraries for whatever hardware support you want to use from your robot. For example, <code>go get -u github.com/hybridgroup/gobot-sphero</code> to use Gobot with a Sphero.</p>
+              <p>
+                Ready to build Go robots with Gobot?
+                <a href="/documentation/getting-started" class="item">Get Started Here!</a>
+              </p>
+              <h2>API</h2>
+              <p>Gobot includes a RESTful API to query the status of any robot running within a group, including the connection and device status, and execute device commands.</p>
+              <p>To activate the API, use the <code>Api</code> command like this:</p>
+              
+              <pre class="CodeRay">master := gobot.GobotMaster()
+gobot.Api(master)
+</pre>
+              
+              <p>To specify the api port run your Gobot program with the <code>PORT</code> environment variable</p>
+              
+              <pre class="CodeRay">$ PORT=8080 go run gobotProgram.go
+</pre>
+              <h2 id="be-part-of-the-robot-evolution">Be Part Of The Robot Evolution</h2>
+              
+              <ul>
 <li>Code on Github:   <a href="https://github.com/hybridgroup/gobot">https://github.com/hybridgroup/gobot</a>
 </li>
-              <li>Join us on IRC:   <code>#gobot @ irc.freenode.net</code>
+                <li>Join us on IRC:   <code>#gobot @ irc.freenode.net</code>
 </li>
-              <li>Join us on our <a href="https://trello.com/b/kQPsldtk/gobot">Trello Board</a>.</li>
-            </ul></section>
+                <li>Join us on our <a href="https://trello.com/b/kQPsldtk/gobot">Trello Board</a>.</li>
+              </ul>
 </div>
+          </section><div class="aside right">
+            <img src="images/gophy.png">
+</div>
+        </div>
       </div>
     </div>
     <footer class="app-footer"><div class="w">

@@ -7,7 +7,7 @@
 <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
 <meta name="description">
 <meta content="The Hybrid Group" name="author">
-<title>Arduino with Gobot</title>
+<title>Spark with Gobot</title>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><!-- %link{href: "http://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,500,700", rel: "stylesheet", type: "text/css"}/ --><link href="//fonts.googleapis.com/css?family=Inconsolata:400,700%7CMontserrat:700" rel="stylesheet">
 <link href="/stylesheets/style.css" rel="stylesheet">
 <link href="/favicon.ico" rel="shortcut icon" type="image/gif">
@@ -31,87 +31,64 @@
 </div>
       <div class="page-title">
         <div class="w">
-          <h1 class="title">Arduino</h1>
+          <h1 class="title">Spark</h1>
           <h2 class="subtitle">
-<a href="https://github.com/hybridgroup/gobot-firmata" target="blanck" class="repository">Repository</a> <a class href="https://github.com/hybridgroup/gobot-firmata/issues" target="blanck">Issues</a>
+<a href="https://github.com/hybridgroup/gobot-spark" target="blanck" class="repository">Repository</a> <a class="issues" href="https://github.com/hybridgroup/gobot-spark/issues" target="blanck">Issues</a>
 </h2>
         </div>
       </div>
       <div class="container">
         <div class="main" role="main">
           <section class="content full"><div class="documentation">
-              <section class="intro"><img class="display" src="/images/arduino.jpg"><p>
-                  Arduino is an open-source electronics prototyping platform based on flexible,
-                  easy-to-use hardware and software. It's intended for artists, designers, hobbyists and
-                  anyone interested in creating interactive objects or environments.
-                </p>
+              <section class="intro"><img class="display" src="/images/spark.jpg"><p>The Spark Core contains a Wi-Fi connected microcontroller. Once it connects to a Wi-Fi network, it automatically connects with a central server (the "Spark Cloud") and stays connected so it can be controlled from external systems, such as a Cylon.js program.</p>
                 <p>
-                  For more info about the arduino platform click
-                  <a target="blank" href="http://arduino.cc/">here</a>.
+                  For more info about the Spark platform go to
+                  <a target="blank" href="https://www.spark.io/">https://www.spark.io/</a>.
                 </p>
               </section><section class="how_to"><h2>How to install</h2>
-                <p>
-                  Installing Gobot with Arduino support is pretty easy.
-                </p>
-                <pre class="CodeRay">go get -u github.com/hybridgroup/gobot-firmata
+                <p>Installing Gobot with Spark support is pretty easy.</p>
+                <pre class="CodeRay">go get -u github.com/hybridgroup/gobot-spark
 </pre>
                 <h2>How to use</h2>
-                <p>This small program lets you turn on and off  a LED every 1s.</p>
-                <pre class="CodeRay"><span class="keyword">package</span> main
+                <p>This small program lets you turn on or off a LED for every 1 sec.</p>
+                <h3>Javascript</h3>
+                <pre class="CodeRay"><span class="reserved">package</span> main
 
-<span class="keyword">import</span> (
-        <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
+<span class="reserved">import</span> (
         <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
-        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-firmata</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-spark</span><span class="delimiter">"</span></span>
         <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
 )
 
-<span class="keyword">func</span> main() {
+func main() {
 
-        firmata := <span class="predefined">new</span>(gobotFirmata.FirmataAdaptor)
-        firmata.Name = <span class="string"><span class="delimiter">"</span><span class="content">firmata</span><span class="delimiter">"</span></span>
-        firmata.Port = <span class="string"><span class="delimiter">"</span><span class="content">/dev/ttyACM0</span><span class="delimiter">"</span></span>
+        <span class="key">spark</span> := <span class="keyword">new</span>(gobotSpark.SparkAdaptor)
+        spark.Name = <span class="string"><span class="delimiter">"</span><span class="content">spark</span><span class="delimiter">"</span></span>
+        spark.Params = make(map[string]<span class="reserved">interface</span>{})
+        spark.Params[<span class="string"><span class="delimiter">"</span><span class="content">device_id</span><span class="delimiter">"</span></span>] = <span class="string"><span class="delimiter">"</span><span class="content">55ff6f064989495346582587</span><span class="delimiter">"</span></span>
+        spark.Params[<span class="string"><span class="delimiter">"</span><span class="content">access_token</span><span class="delimiter">"</span></span>] = <span class="string"><span class="delimiter">"</span><span class="content">043225bc38f331d9bd965a5e9bdac40ac068d5c2</span><span class="delimiter">"</span></span>
 
-        led := gobotGPIO.NewLed(firmata)
+        led := gobotGPIO.NewLed(spark)
         led.Name = <span class="string"><span class="delimiter">"</span><span class="content">led</span><span class="delimiter">"</span></span>
-        led.Pin = <span class="string"><span class="delimiter">"</span><span class="content">13</span><span class="delimiter">"</span></span>
+        led.Pin = <span class="string"><span class="delimiter">"</span><span class="content">D7</span><span class="delimiter">"</span></span>
 
-        work := <span class="keyword">func</span>() {
-                gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">1s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() {
+        work := func() {
+                gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">1s</span><span class="delimiter">"</span></span>, func() {
                         led.Toggle()
                 })
         }
 
         robot := gobot.Robot{
-                Connections: []<span class="keyword">interface</span>{}{firmata},
-                Devices:     []<span class="keyword">interface</span>{led},
-                Work:        work,
+                <span class="key">Connections</span>: []<span class="reserved">interface</span>{}{ spark }, 
+                <span class="key">Devices</span>:     []<span class="reserved">interface</span>{}{ led },
+                <span class="key">Work</span>:        work,
         }
 
         robot.Start()
 }
 </pre>
-                <h2>How to connect</h2>
-                <h3>OSX</h3>
-                <p>Coming soon.</p>
-                <h3>Ubuntu</h3>
-                <p>Coming soon.</p>
               </section><section class="drivers"><h2>Drivers</h2>
-                <p>
-                  Thanks to
-                  <b>Gobot</b>
-                  and
-                  <b>Go</b>
-                  it is possible to interact with several I/O hardware devices and interfaces connected to the arduino
-                  using a set of already defined and easy to use drivers, all of this thanks to the Gobot architecture, in conjuction with the gobot-firmata
-                  adaptor (using the firmata communication protocol),
-                  which makes it even possible to swap the entire platform for something else like digispark, and keep using the same code you just wrote for
-                  arduino, this just by swapping a couple of lines in your program.
-                </p>
-                <p>
-                  Available drivers for the arduino platform are listed below, the drivers contain detailed documentation and examples of what kind
-                  physical computing (using Gobot and Go) you could be doing:
-                </p>
+                <p>Available drivers for the spark platform are listed below, the drivers contain detailed documentation and examples of what kinds of physical computing (using Cylon.js and Node.js) you can be doing:</p>
                 <div class="hardware">
                   <div class="devices">
                     
@@ -123,10 +100,6 @@
                     
                     <a class="device" href="/documentation/drivers/servo" title="Servo">
                       <img src="/images/servo.jpg"></a>
-                    
-                    
-                    
-                    
                   </div>
                 </div>
               </section>

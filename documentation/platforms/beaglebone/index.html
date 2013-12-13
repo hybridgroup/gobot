@@ -8,26 +8,15 @@
 <meta name="description">
 <meta content="The Hybrid Group" name="author">
 <title>BeagleBone with Gobot</title>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><link href="http://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,500,700" rel="stylesheet" type="text/css">
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><!-- %link{href: "http://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,500,700", rel: "stylesheet", type: "text/css"}/ --><link href="//fonts.googleapis.com/css?family=Inconsolata:400,700%7CMontserrat:700" rel="stylesheet">
 <link href="/stylesheets/style.css" rel="stylesheet">
 <link href="/favicon.ico" rel="shortcut icon" type="image/gif">
-<script>
-      $(document).ready(function() {
-        $('header .subtitle').hover(function() {
-          $('.easter', this).show();
-          $('.main', this).hide();
-        }, function () {
-          $('.easter', this).hide();
-          $('.main', this).show();
-        });
-      });
-    </script>
 </head>
 <body>
     <div class="app">
       <div class="w">
         <header class="app-header" role="banner"><div class="display">
-            <h1 class="cylon-logo">
+            <h1 class="app-logo">
               <a href="/">Gobot</a>
             </h1>
           </div>
@@ -66,40 +55,40 @@
                 <p>
                   This small program causes an LED to blink.
                 </p>
-                <pre class="CodeRay">package main
+                <pre class="CodeRay"><span class="keyword">package</span> main
 
-import (
+<span class="keyword">import</span> (
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-beaglebone</span><span class="delimiter">"</span></span>
   <span class="string"><span class="delimiter">"</span><span class="content">time</span><span class="delimiter">"</span></span>
 )
 
-func main() {
+<span class="keyword">func</span> main() {
 
-  beaglebone := new(gobotBeaglebone.Beaglebone)
+  beaglebone := <span class="predefined">new</span>(gobotBeaglebone.Beaglebone)
   beaglebone.Name = <span class="string"><span class="delimiter">"</span><span class="content">Beaglebone</span><span class="delimiter">"</span></span>
 
   led := gobotBeaglebone.NewLed(beaglebone)
   led.Driver = gobot.Driver{
-    <span class="key">Name</span>: <span class="string"><span class="delimiter">"</span><span class="content">led</span><span class="delimiter">"</span></span>,
-    <span class="key">Pin</span>: <span class="string"><span class="delimiter">"</span><span class="content">P9_12</span><span class="delimiter">"</span></span>,
+    Name: <span class="string"><span class="delimiter">"</span><span class="content">led</span><span class="delimiter">"</span></span>,
+    Pin: <span class="string"><span class="delimiter">"</span><span class="content">P9_12</span><span class="delimiter">"</span></span>,
   }
 
-  connections := []interface{} {
+  connections := []<span class="keyword">interface</span>{} {
     beaglebone,
   }
-  devices := []interface{} {
+  devices := []<span class="keyword">interface</span>{} {
     led,
   }
 
-  work := func(){
-    gobot.Every(<span class="integer">1000</span> * time.Millisecond, func(){ led.Toggle() })
+  work := <span class="keyword">func</span>(){
+    gobot.Every(<span class="integer">1000</span> * time.Millisecond, <span class="keyword">func</span>(){ led.Toggle() })
   }
   
   robot := gobot.Robot{
-      <span class="key">Connections</span>: connections, 
-      <span class="key">Devices</span>: devices,
-      <span class="key">Work</span>: work,
+      Connections: connections, 
+      Devices: devices,
+      Work: work,
   }
 
   robot.Start()
@@ -109,7 +98,8 @@ func main() {
                 <p>All Gobot digital GPIO and i2c drivers listed below should work with the BeagleBone:</p>
                 <div class="hardware">
                   <div class="devices">
-                    
+                    <a class="device" href="/documentation/drivers/button" title="Button">
+                      <img src="/images/button.jpg"></a>
                     <a class="device" href="/documentation/drivers/led" title="LED">
                       <img src="/images/LED.jpg"></a>
                     

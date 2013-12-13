@@ -8,26 +8,15 @@
 <meta content="Cylon.js Getting Started" name="description">
 <meta content="The Hybrid Group" name="author">
 <title>Gobot Getting Started</title>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><link href="http://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,500,700" rel="stylesheet" type="text/css">
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><!-- %link{href: "http://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,500,700", rel: "stylesheet", type: "text/css"}/ --><link href="//fonts.googleapis.com/css?family=Inconsolata:400,700%7CMontserrat:700" rel="stylesheet">
 <link href="/stylesheets/style.css" rel="stylesheet">
 <link href="/favicon.ico" rel="shortcut icon" type="image/gif">
-<script>
-      $(document).ready(function() {
-        $('header .subtitle').hover(function() {
-          $('.easter', this).show();
-          $('.main', this).hide();
-        }, function () {
-          $('.easter', this).hide();
-          $('.main', this).show();
-        });
-      });
-    </script>
 </head>
 <body>
     <div class="app">
       <div class="w">
         <header class="app-header" role="banner"><div class="display">
-            <h1 class="cylon-logo">
+            <h1 class="app-logo">
               <a href="/">Gobot</a>
             </h1>
           </div>
@@ -78,7 +67,7 @@
               Go to the Go downloads page at
               <a target="blank" href="https://code.google.com/p/go/downloads/list">https://code.google.com/p/go/downloads/list</a>
               download the installer file and run it.
-            </section><section class="cylon-installation"><h2>How to Install Gobot</h2>
+            </section><section><h2>How to Install Gobot</h2>
               <p>Install the library with: <code>go get -u github.com/hybridgroup/gobot</code></p>
               
               <p>In order to use Gobot, you must install the libraries needed to control your particular hardware setup. For example, to use Gobot with an Beaglebone, you will need to install the <code>go get -u github.com/hybridgroup/gobot-beaglebone</code> library. Check out these examples:</p>
@@ -94,13 +83,13 @@ go get -u github.com/hybridgroup/gobot-beaglebone
               <p>
                 Windows setup for gobot.
               </p>
-              <section class="cylon-running"></section><h2>Gobot Robots</h2>
+              <section></section><h2>Gobot Robots</h2>
               <h3>Writing your robot code:</h3>
               <p></p>
               Now you are ready to write your own code. Take a look at the examples below, or go to the
               <a target="blank" href="https://github.com/hybridgroup/gobot/tree/master/examples">examples</a>
               directory for a whole bunch of code you can use to help get started. We recommend using Test-Driven Robotics (TDR) with your preferred test frameworks.
-            </section><section class="cylon-code"><h2>Gobot Code Examples</h2>
+            </section><section><h2>Gobot Code Examples</h2>
               <h3>Example: Beaglebone with LED.</h3>
               <p>To use this example, you must first run <code>go get -u github.com/hybridgroup/gobot-beaglebone</code></p>
               <pre class="CodeRay"><span class="reserved">package</span> main
@@ -199,7 +188,19 @@ func main() {
   robot.Start()
 }
 </pre>
-            </section><section class="contributing"><h2>Contributing</h2>
+            </section><h2>API</h2>
+            <p>Gobot includes a RESTful API to query the status of any robot running within a group, including the connection and device status, and execute device commands.</p>
+            <p>To activate the API, use the <code>Api</code> command like this:</p>
+            
+            <pre class="CodeRay">master := gobot.GobotMaster()
+gobot.Api(master)
+</pre>
+            
+            <p>To specify the api port run your Gobot program with the <code>PORT</code> environment variable</p>
+            
+            <pre class="CodeRay">$ PORT=8080 go run gobotProgram.go 
+</pre>
+            <section class="contributing"><h2>Contributing</h2>
               <p>
                 You can help gobot grow by contributing your code, new drivers or platforms to the project, check the Github page
                 <a href="https://github.com/hybridgroup/gobot">gobot on github.</a>

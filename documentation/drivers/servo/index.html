@@ -7,27 +7,16 @@
 <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
 <meta name="description">
 <meta content="The Hybrid Group" name="author">
-<title>Cylon.js - Servo Driver</title>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><link href="http://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,500,700" rel="stylesheet" type="text/css">
+<title>Gobot - Servo Driver</title>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><!-- %link{href: "http://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,500,700", rel: "stylesheet", type: "text/css"}/ --><link href="//fonts.googleapis.com/css?family=Inconsolata:400,700%7CMontserrat:700" rel="stylesheet">
 <link href="/stylesheets/style.css" rel="stylesheet">
 <link href="/favicon.ico" rel="shortcut icon" type="image/gif">
-<script>
-      $(document).ready(function() {
-        $('header .subtitle').hover(function() {
-          $('.easter', this).show();
-          $('.main', this).hide();
-        }, function () {
-          $('.easter', this).hide();
-          $('.main', this).show();
-        });
-      });
-    </script>
 </head>
 <body>
     <div class="app">
       <div class="w">
         <header class="app-header" role="banner"><div class="display">
-            <h1 class="cylon-logo">
+            <h1 class="app-logo">
               <a href="/">Gobot</a>
             </h1>
           </div>
@@ -50,35 +39,38 @@
         <div class="main" role="main">
           <section class="content full"><div class="documentation">
               <section class="intro"><img class="display" src="/images/servo.jpg"><p>
-                  Provides an interface for making servos easy to work and interact with from Cylon.js.
+                  Provides an interface for making servos easy to work and interact with from Gobot.
                 </p>
               </section><section class="how-to"><h2>How to establish a connection and setup the driver</h2>
                 <h3>JavaScript</h3>
-                <pre class="CodeRay"><span class="keyword">var</span> Cylon = require(<span class="string"><span class="delimiter">'</span><span class="content">cylon</span><span class="delimiter">'</span></span>);
+                <pre class="CodeRay"><span class="reserved">package</span> main
 
-Cylon.robot({
-  <span class="key">connection</span>: {<span class="key">name</span>: <span class="string"><span class="delimiter">'</span><span class="content">arduino</span><span class="delimiter">'</span></span>, <span class="key">adaptor</span>: <span class="string"><span class="delimiter">'</span><span class="content">firmata</span><span class="delimiter">'</span></span>, <span class="key">port</span>: <span class="string"><span class="delimiter">'</span><span class="content">/dev/ttyACM0</span><span class="delimiter">'</span></span>},
+<span class="reserved">import</span> (
+        <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-digispark</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
+)
 
-  <span class="key">device</span>: {<span class="key">name</span>: <span class="string"><span class="delimiter">'</span><span class="content">servo</span><span class="delimiter">'</span></span>, <span class="key">driver</span>: <span class="string"><span class="delimiter">'</span><span class="content">servo</span><span class="delimiter">'</span></span>, <span class="key">pin</span>: <span class="integer">3</span>},
-...
-</pre>
-                <h3>CoffeeScript</h3>
-                <pre class="CodeRay">Cylon = require <span class="string"><span class="delimiter">'</span><span class="content">cylon</span><span class="delimiter">'</span></span>
+func main() {
 
-Cylon.robot
-  connection:
-    name: <span class="string"><span class="delimiter">'</span><span class="content">arduino</span><span class="delimiter">'</span></span>, <span class="key">adaptor</span>: <span class="string"><span class="delimiter">'</span><span class="content">firmata</span><span class="delimiter">'</span></span>, <span class="key">port</span>: <span class="string"><span class="delimiter">'</span><span class="content">/dev/ttyACM0</span><span class="delimiter">'</span></span>
+        <span class="key">digispark</span> := <span class="keyword">new</span>(gobotDigispark.DigisparkAdaptor)
+        digispark.Name = <span class="string"><span class="delimiter">"</span><span class="content">Digispark</span><span class="delimiter">"</span></span>
 
-  device:
-    name: <span class="string"><span class="delimiter">'</span><span class="content">servo</span><span class="delimiter">'</span></span>, <span class="key">driver</span>: <span class="string"><span class="delimiter">'</span><span class="content">servo</span><span class="delimiter">'</span></span>, <span class="key">pin</span>: <span class="integer">3</span>
+        servo := gobotGPIO.NewServo(digispark)
+        servo.Name = <span class="string"><span class="delimiter">"</span><span class="content">servo</span><span class="delimiter">"</span></span>
 ...
 </pre>
               </section><section class="public-methods"><h2>Commands:</h2>
                 <dl class="methods">
-<dt>angle → true | nil</dt>
+<dt>MoveC</dt>
                   <dd>Moves the servo to the specified angle, angle must be an integer value between 0 and 180.</dd>
-                  <dt>currentAngle → integer_value (0 - 180)</dt>
-                  <dd>Returns the current angle of the servo, an integer value between 0 and 180.</dd>
+                  <dt>MinC</dt>
+                  <dd>Moves the servo to the min angle 0.</dd>
+                  <dt>CenterC</dt>
+                  <dd>Moves the servo to the center angle 90.</dd>
+                  <dt>MaxC</dt>
+                  <dd>Moves the servo to the max angle 180.</dd>
                 </dl>
 <h2>Events</h2>
                 <dl class="methods">
@@ -86,48 +78,43 @@ Cylon.robot
                   <dd>Sent when the device has been started and is ready to use.</dd>
                 </dl></section><section class="how-to"><h2>How to use</h2>
                 <p>
-                  This example moves a servo from angle 45 to 90 to 135.
+                  This example moves a servo from a random angle.
                 </p>
-                <h3>JavaScript</h3>
-                <pre class="CodeRay"><span class="keyword">var</span> Cylon = require(<span class="string"><span class="delimiter">'</span><span class="content">cylon</span><span class="delimiter">'</span></span>);
+                <h3>Example</h3>
+                <pre class="CodeRay"><span class="reserved">package</span> main
 
-Cylon.robot({
-  <span class="key">connection</span>: {<span class="key">name</span>: <span class="string"><span class="delimiter">'</span><span class="content">arduino</span><span class="delimiter">'</span></span>, <span class="key">adaptor</span>: <span class="string"><span class="delimiter">'</span><span class="content">firmata</span><span class="delimiter">'</span></span>, <span class="key">port</span>: <span class="string"><span class="delimiter">'</span><span class="content">/dev/ttyACM0</span><span class="delimiter">'</span></span>},
+<span class="reserved">import</span> (
+        <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-digispark</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
+)
 
-  <span class="key">device</span>: {<span class="key">name</span>: <span class="string"><span class="delimiter">'</span><span class="content">servo</span><span class="delimiter">'</span></span>, <span class="key">driver</span>: <span class="string"><span class="delimiter">'</span><span class="content">servo</span><span class="delimiter">'</span></span>, <span class="key">pin</span>: <span class="integer">3</span>},
+func main() {
 
-  <span class="function">work</span>: <span class="keyword">function</span>(my) {
-    <span class="keyword">var</span> angle = <span class="integer">45</span> ;
-    my.servo.angle(angle);
-    every((<span class="integer">1</span>).second(), <span class="keyword">function</span>() {
-      angle = angle + <span class="integer">45</span> ;
-      <span class="keyword">if</span> (angle &gt; <span class="integer">135</span>) {
-        angle = <span class="integer">45</span>
-      }
-      my.servo.angle(angle);
-    });
-  }
-}).start();
-</pre>
-                <h3>CoffeeScript</h3>
-                <pre class="CodeRay">Cylon = require <span class="string"><span class="delimiter">'</span><span class="content">cylon</span><span class="delimiter">'</span></span>
+        <span class="key">digispark</span> := <span class="keyword">new</span>(gobotDigispark.DigisparkAdaptor)
+        digispark.Name = <span class="string"><span class="delimiter">"</span><span class="content">Digispark</span><span class="delimiter">"</span></span>
 
-Cylon.robot
-  connection:
-    name: <span class="string"><span class="delimiter">'</span><span class="content">arduino</span><span class="delimiter">'</span></span>, <span class="key">adaptor</span>: <span class="string"><span class="delimiter">'</span><span class="content">firmata</span><span class="delimiter">'</span></span>, <span class="key">port</span>: <span class="string"><span class="delimiter">'</span><span class="content">/dev/ttyACM0</span><span class="delimiter">'</span></span>
+        servo := gobotGPIO.NewServo(digispark)
+        servo.Name = <span class="string"><span class="delimiter">"</span><span class="content">servo</span><span class="delimiter">"</span></span>
 
-  device:
-    name: <span class="string"><span class="delimiter">'</span><span class="content">servo</span><span class="delimiter">'</span></span>, <span class="key">driver</span>: <span class="string"><span class="delimiter">'</span><span class="content">servo</span><span class="delimiter">'</span></span>, <span class="key">pin</span>: <span class="integer">3</span>
+        work := func() {
+                servo.InitServo()
+                gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">1s</span><span class="delimiter">"</span></span>, func() {
+                        <span class="key">i</span> := <span class="reserved">int</span>(gobot.Rand(<span class="integer">180</span>))
+                        fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">Turning</span><span class="delimiter">"</span></span>, i)
+                        servo.Move(i)
+                })
+        }
 
-  work: (my) -&gt;
-    angle = <span class="integer">45</span>
-    my.servo.angle angle
-    every <span class="integer">1</span>.second(), -&gt;
-      angle += <span class="integer">45</span>
-      angle = <span class="integer">45</span> <span class="keyword">if</span> angle &gt; <span class="integer">135</span>
-      my.servo.angle angle
+        robot := gobot.Robot{
+                <span class="key">Connections</span>: []<span class="reserved">interface</span>{}{digispark},
+                <span class="key">Devices</span>:     []<span class="reserved">interface</span>{}{servo},
+                <span class="key">Work</span>:        work,
+        }
 
-.start()
+        robot.Start()
+}
 </pre>
               </section><section class="circuit"><h2>Circuit and Schematic</h2>
                 <p>
