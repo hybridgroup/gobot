@@ -1,5 +1,5 @@
 ---
-title: Cylon.js - Button Driver
+title: Gobot - Button Driver
 author: The Hybrid Group
 page_title: Button
 page_subtitle: Driver
@@ -13,42 +13,17 @@ layout: page
 
   %section.how_to
     %h2 How to establish a connection and setup the driver 
-    %h3 JavaScript
+    
     :markdown
-          :::javascript
-
-          var Cylon = require('cylon');
-
-          Cylon.robot({
-            connection: {name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0'},
-
-            device: {name: 'button', driver: 'button', pin: 2},
-            ...
-
-    %h3 CoffeeScript
-    :markdown
-          :::javascript
-          Cylon = require 'cylon'
-
-          Cylon.robot
-            connection:
-              name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0'
-
-            device:
-              name: 'button', driver: 'button', pin: 2
-            ...
-
-    -#%h3 For Digispark:
-    -#:markdown
-          -#:::ruby
+          :::bash
+          ...
 
   %section.public-methods
-    %h2 Commands:
+    -#%h2 Commands:
 
-    %dl.methods
-      %dt isPressed → true | false
-      %dd
-        Returns true or false matching state of the button.
+    -#%dl.methods
+      -#%dt 
+      -#%dd
 
 
   %section.public-events
@@ -68,50 +43,14 @@ layout: page
       %dd Sent when the device has been started and is ready to use. 
 
 
-    -#%h3 How to use events and call them on your drivers
-    -#%p Pretty simple, when the connection and the driver have been setup (as explained above) you can call events on them as follows:
-    -#:markdown
-          -#:::ruby
-
   %section.how-to
     %h2 How to use
     %p 
       This example detects when a button has been pushed.
-
-    %h3 JavaScript    
+   
     :markdown
-          :::javascript
-
-          var Cylon = require('cylon');
-
-          Cylon.robot({
-            connection: {name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0'},
-
-            device: {name: 'button', driver: 'button', pin: 2},
-
-            work: function(my) {
-              my.button.on('push', function() {
-                Logger.info("Button pushed!");
-              });
-            }
-          }).start();
-
-    %h3 CoffeeScript
-    :markdown
-          :::javascript
-          Cylon = require 'cylon'
-
-          Cylon.robot
-            connection:
-              name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0'
-
-            device:
-              name: 'button', driver: 'button', pin: 2
-
-            work: (my) ->
-              my.button.on 'push', -> Logger.info "Button pushed!"
-
-          .start()
+          :::bash
+          ...
 
   %section.circuit
     %h2 Circuit and Schematic
@@ -122,6 +61,6 @@ layout: page
     =# TODO: Update platform list with all that work with this driver in Cylon.js.
     .devices
       = partial "documentation/partials/arduino"
-      = #partial "documentation/partials/beaglebone"
-      = #partial "documentation/partials/digispark"
+      = partial "documentation/partials/beaglebone"
+      = partial "documentation/partials/digispark"
       = #partial "documentation/partials/raspberry-pi"
