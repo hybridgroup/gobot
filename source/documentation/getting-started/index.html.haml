@@ -33,7 +33,7 @@ layout: page
   = link_to "https://code.google.com/p/go/downloads/list", "https://code.google.com/p/go/downloads/list", target:"blank"  
   download the installer file and run it.
 
-%section.cylon-installation
+%section
   %h2 How to Install Gobot
   :markdown
     Install the library with: `go get -u github.com/hybridgroup/gobot`
@@ -56,7 +56,7 @@ layout: page
   %p
     Windows setup for gobot.
 
-  %section.cylon-running
+  %section
   %h2 Gobot Robots
   %h3 Writing your robot code:
 
@@ -66,7 +66,7 @@ layout: page
   directory for a whole bunch of code you can use to help get started. We recommend using Test-Driven Robotics (TDR) with your preferred test frameworks.
 
 
-%section.cylon-code
+%section
   %h2 Gobot Code Examples
 
   %h3 Example: Beaglebone with LED.
@@ -174,7 +174,20 @@ layout: page
           robot.Start()
         }
 
-  
+%h2 API
+%p Gobot includes a RESTful API to query the status of any robot running within a group, including the connection and device status, and execute device commands.
+
+:markdown
+  To activate the API, use the `Api` command like this:
+
+      :::bash
+      master := gobot.GobotMaster()
+      gobot.Api(master)
+
+  To specify the api port run your Gobot program with the `PORT` environment variable
+
+      :::bash
+      $ PORT=8080 go run gobotProgram.go 
 
 %section.contributing
   %h2 Contributing

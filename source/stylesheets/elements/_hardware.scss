@@ -1,0 +1,11 @@
+.more {
+  text-align: center;
+  width: 50%;
+  margin: 30px auto 10px auto;
+  background: white;
+  padding: 15px 30px;
+  color: $hero-color;
+  @include small-screen {
+    width: 100%;
+  }
+}

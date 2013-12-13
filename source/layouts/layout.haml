@@ -7,25 +7,16 @@
     %meta{:content => current_page.data.author, :name => "author"}
     %title= current_page.data.title
     %script{:src => "//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"}
-    %link{href: "http://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,500,700", rel: "stylesheet", type: "text/css"}/
-    %link(rel="stylesheet" href="/stylesheets/style.css")
-    %link{ href: '/favicon.ico', rel: 'shortcut icon', type: 'image/gif' }/
-    :javascript
-      $(document).ready(function() {
-        $('header .subtitle').hover(function() {
-          $('.easter', this).show();
-          $('.main', this).hide();
-        }, function () {
-          $('.easter', this).hide();
-          $('.main', this).show();
-        });
-      });
+    /%link{href: "http://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,500,700", rel: "stylesheet", type: "text/css"}/
+    %link{href: "//fonts.googleapis.com/css?family=Inconsolata:400,700|Montserrat:700", rel: "stylesheet"}
+    %link{href: "/stylesheets/style.css", rel: "stylesheet"}
+    %link{href: '/favicon.ico', rel: 'shortcut icon', type: 'image/gif' }/
   %body
     .app
       .w
         %header.app-header{role: "banner"}
           .display
-            %h1.cylon-logo
+            %h1.app-logo
               %a{href: '/'} Gobot
 
           %span.menu
@@ -38,9 +29,6 @@
         .hero
           .container
             %h1.title
-              /It is time to have Robots and JavaScript
-              /%br
-              /working together.
               Go, Robot, Go! Go Powered Robotics
             %h2.subtitle
               Gobot makes robotics
@@ -92,3 +80,4 @@
 
       ga('create', 'UA-46433484-3', 'gobot.io');
       ga('send', 'pageview');
+

@@ -1,6 +1,8 @@
 - wrap_layout :layout do
   .main{:role => "main"}
+    %section.content
+      .index_content
+        = yield
     .aside.right
       %img{:src => "images/gophy.png"}
-    %section.content
-      = yield
+    

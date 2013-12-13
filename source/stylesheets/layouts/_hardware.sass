@@ -1,9 +1,10 @@
 .hardware
   .devices
+    @include outer-container
     text-align: center
-  img
-    width: 300px
+    .device
+      display: inline-block
+      width: 300px
+      img
+        width: 100%
 
-    @include margin-not-last-child
-    @include medium-screen(420px, '')
-    @include small-screen(290px, '')

@@ -1,0 +1,88 @@
+.container, .w {
+  width: $big-screen;
+  margin: 0 auto;
+  @include medium-screen($medium-screen, "") {
+    padding: 0 15px;
+  }
+
+  @include small-screen(100%, "") {
+    padding: 0 15px;
+  }
+}
+
+.main[role="main"] {
+  padding-bottom: 50px;
+  @include outer-container;
+  .videos {
+    .video {
+      @include span-columns(6);
+      margin: .5%;
+      h3 {
+        font-size: 16px;
+      }
+      iframe, object {
+        width: 100%;
+        height: 300px;
+      }
+      @media only screen and (min-width: $medium-screen) and (max-width: $big-screen) {
+        iframe, object {
+          height: 240px;
+        }
+      }
+      @media only screen and (max-width: $medium-screen) {
+        @include span-columns(12);
+        iframe, object {
+          height: 240px;
+        }
+      }
+    }
+    .video_index {
+      @include span-columns(10)
+      iframe, object {
+        width: 100%
+        height: 400px
+      }
+      @media only screen and (min-width: $medium-screen) and (max-width: $big-screen)  {
+        iframe, object {
+          height: 300px
+        }
+      }
+      @media only screen and (max-width: $medium-screen) {
+        iframe, object {
+          height: 180px
+        }
+      }
+  }
+  
+  .content {
+    &.full {
+      width: 100%;
+      clear: both;
+    }
+    h1, h2 {
+      color: $title-color;
+    }
+    h1 {
+      font-size: 1.9em;
+      padding: 10px 0;
+    }
+  }
+  .aside.right {
+    @include span-columns(3);
+    padding-top: 0px;
+    text-align: right;
+    img {
+      width: 100%;
+      margin-top: 20px;
+    }
+      
+  }
+  section.content {
+    .index_content {
+      @include margin-not-last-child;
+      @include span-columns(9);
+    }
+  }
+    
+      
+}

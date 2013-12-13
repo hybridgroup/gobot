@@ -1,8 +1,8 @@
 .CodeRay {
-  background-color: #FFF;
+  background-color: white;
   border: 1px solid #CCC;
   font-family: Monaco, "Courier New", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", monospace;
-  color: #000;
+  color: black;
   padding: 1em 0px 1em 1em;
   clear:both;
 }
