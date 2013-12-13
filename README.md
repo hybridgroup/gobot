@@ -15,3 +15,6 @@ For deploying the webpage, your must be in 'gobot.io' branch and run the followi
 
       rake publish
 
+You must not have any uncomitted or untracked files in the site dirs, or the publish operation will fail with a message such as `Directory not clean`.
+
+If the publish fails, you might need to remove the `build` dir before trying to run `rake publish` again.
