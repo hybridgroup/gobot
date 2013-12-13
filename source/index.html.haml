@@ -73,9 +73,58 @@ layout: home
         robot.Start()
       }  
 
+%h2 Hardware Support
+%p
+  Gobot has a extensible system for connecting to hardware devices. The following robotics and physical computing platforms are currently supported:
+  %ul
+    %li
+      = link_to "Arduino", "http://www.arduino.cc/", target:"_blank" 
+      &lt;==&gt;
+      = link_to "Library", "https://github.com/hybridgroup/gobot-firmata", target:"_blank" 
+    %li
+      = link_to "Beaglebone Black", "http://beagleboard.org/Products/BeagleBone+Black/", target:"_blank" 
+      &lt;==&gt;
+      = link_to "Library", "https://github.com/hybridgroup/gobot-beaglebone", target:"_blank" 
+    %li
+      = link_to "Digispark", "http://digistump.com/category/1", target:"_blank"  
+      &lt;==&gt;
+      = link_to "Library", "https://github.com/hybridgroup/gobot-digispark", target:"_blank" 
+    %li
+      = link_to "Firmata", "http://firmata.org/wiki/Main_Page", target:"_blank"  
+      &lt;==&gt;
+      = link_to "Library", "https://github.com/hybridgroup/gobot-firmata", target:"_blank"
+    %li
+      = link_to "Leap Motion", "https://www.leapmotion.com/", target:"_blank"  
+      &lt;==&gt;
+      = link_to "Library", "https://github.com/hybridgroup/gobot-leapmotion", target:"_blank"
+    %li
+      = link_to "Spark", "https://www.spark.io/", target:"_blank"  
+      &lt;==&gt;
+      = link_to "Library", "https://github.com/hybridgroup/gobot-spark", target:"_blank" 
+    %li
+      = link_to "Sphero", "http://www.gosphero.com/", target:"_blank"  
+      &lt;==&gt;
+      = link_to "Library", "https://github.com/hybridgroup/gobot-sphero", target:"_blank" 
 
+%p Support for many devices that use General Purpose Input/Output (GPIO) have a shared set of drivers provded using the cylon-gpio module:
+%ul
+  %li
+    = link_to "GPIO", "https://en.wikipedia.org/wiki/General_Purpose_Input/Output" , target:"_blank" 
+    &lt;==&gt;
+    = link_to "Drivers", "https://github.com/hybridgroup/gobot-gpio" , target:"_blank"
+    %ul 
+      %li Button
+      %li LED
+      %li Servo 
+ 
+%p More platforms and drivers are coming soon...
 
 %h2 Getting Started
+
+:markdown
+  Install the library with: `go get -u github.com/hybridgroup/gobot`
+:markdown
+  Then install additional libraries for whatever hardware support you want to use from your robot. For example, `go get -u github.com/hybridgroup/gobot-sphero` to use Gobot with a Sphero.
 %p 
   Ready to build Go robots with Gobot? 
   =link_to "Get Started Here!", "", (menu_item("documentation/getting-started"))
@@ -95,24 +144,7 @@ layout: home
       :::bash
       $ PORT=8080 go run gobotProgram.go
 
-%h2 Hardware Support
-%p
-  Gobot has a extensible system for connecting to hardware devices. The following robotics and physical computing platforms are currently supported:
-  %ul
-    %li
-      = link_to "Beaglebone Black", "http://beagleboard.org/Products/BeagleBone+Black/", target:"_blank" 
-      &lt;==&gt;
-      = link_to "Library", "https://github.com/hybridgroup/gobot-beaglebone", target:"_blank" 
-    %li
-      = link_to "Sphero", "http://www.gosphero.com/", target:"_blank"  
-      &lt;==&gt;
-      = link_to "Library", "https://github.com/hybridgroup/gobot-sphero", target:"_blank" 
-    %li
-      = link_to "Digispark", "http://digistump.com/category/1", target:"_blank"  
-      &lt;==&gt;
-      = link_to "Library", "https://github.com/hybridgroup/gobot-digispark", target:"_blank" 
-      
-%p More platforms and drivers are coming soon...
+
 
 :markdown
   ## Be Part Of The Robot Evolution

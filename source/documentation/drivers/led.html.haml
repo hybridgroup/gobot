@@ -45,27 +45,17 @@ layout: page
           
     
 
-    -#%h3 For Digispark:
-    -#:markdown
-          -#:::ruby
-
   %section.public-methods
     %h2 Commands:
     
     %dl.methods 
-      %dt IsOn
-      %dd Returns true if LED is on, otherwise returns false.
-      %dt IsOff
-      %dd Returns true if LED is off, otherwise returns false.
-      %dt On
+      %dt OnC
       %dd Turns LED on.
-      %dt Off
+      %dt OffC
       %dd Turns LED off.
-      %dt toggle
+      %dt ToggleC
       %dd Turns the LED on, or off, depending on if it is already off, or on, respectively.
-      %dt changeState(pin,level)
-      %dd 
-
+      
 
     %h2 Events
 
@@ -139,4 +129,5 @@ layout: page
       = partial "documentation/partials/arduino"
       = partial "documentation/partials/beaglebone"
       = partial "documentation/partials/digispark"
+      = partial "documentation/partials/spark"
       =# partial "documentation/partials/raspberry-pi"
