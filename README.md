@@ -100,13 +100,23 @@ func main() {
 
 ## Hardware Support
 Gobot has a extensible system for connecting to hardware devices. The following robotics and physical computing platforms are currently supported:
-
+  
+  - [Arduino](http://www.arduino.cc/) <==> [Library](https://github.com/hybridgroup/gobot-firmata)
   - [Beaglebone Black](http://beagleboard.org/Products/BeagleBone+Black/) <=> [Library](https://github.com/hybridgroup/gobot-beaglebone)
   - [Digispark](http://digistump.com/products/1) <=> [Library](https://github.com/hybridgroup/gobot-digispark)
-  - [Sphero](http://www.gosphero.com/) <=> [Library](https://github.com/hybridgroup/gobot-sphero)
-  - [Leap Motion](https://www.leapmotion.com/) <=> [Library](https://github.com/hybridgroup/gobot-leap)
   - [Firmata](http://firmata.org/wiki/Main_Page) <=> [Library](https://github.com/hybridgroup/gobot-firmata)
-  - [GPIO](https://github.com/hybridgroup/gobot-gpio)
+  - [Leap Motion](https://www.leapmotion.com/) <=> [Library](https://github.com/hybridgroup/gobot-leap)
+  - [Spark](https://www.spark.io/) <=> [Library](https://github.com/hybridgroup/gobot-spark)
+  - [Sphero](http://www.gosphero.com/) <=> [Library](https://github.com/hybridgroup/gobot-sphero)
+  
+
+Support for many devices that use General Purpose Input/Output (GPIO) have
+a shared set of drivers provded using the cylon-gpio module:
+
+  - [GPIO](https://en.wikipedia.org/wiki/General_Purpose_Input/Output) <=> [Drivers](https://github.com/hybridgroup/gobot-gpio)
+    - Button
+    - LED
+    - Servo
 
 More platforms and drivers are coming soon...
 
