@@ -1,8 +1,8 @@
 ---
-title: Leapmotion with Artroo
+title: Leapmotion with Gobot
 author: The Hybrid Group
 page_title: Leapmotion
-page_subtitle: "<a href='https://github.com/hybridgroup/Cylon.js-leapmotion' class='repository'>Repository</a> <a class+'issues' href='https://github.com/hybridgroup/Cylon.js-leapmotion/issues'>Issues</a>"
+page_subtitle: "<a href='https://github.com/hybridgroup/gobot-leapmotion' class='repository'>Repository</a> <a class+'issues' href='https://github.com/hybridgroup/gobot-leapmotion/issues'>Issues</a>"
 layout: page
 ---
 .documentation
@@ -20,42 +20,49 @@ layout: page
   %section.how-to
     %h2 How to install
     %p
-      Installing Cylon.js with leapmotion support is pretty easy using ruby gems.
+      Installing Gobot with leapmotion support is pretty easy.
     :markdown
           :::bash
-          gem install Cylon.js-leapmotion --pre
+          go get -u github.com/hybridgroup/gobot-leapmotion
 
     %h2 How to use
     %p
-      This small program uses a Leap Motion to detect the user's hand position
+      This small program uses a Leap Motion Adaptor.
     :markdown
-          :::ruby
-          require 'Cylon.js'
+          :::go
+          package main
 
-          connection :leapmotion, :adaptor => :leapmotion, :port => '127.0.0.1:6437'
-          device :leapmotion, :driver => :leapmotion
+          import (
+                  "fmt"
+                  "github.com/hybridgroup/gobot"
+                  "github.com/hybridgroup/gobot-leapmotion"
+          )
 
-          work do
-            on leapmotion, :open => :on_open
-            on leapmotion, :frame => :on_frame
-            on leapmotion, :close => :on_close
-          end
+          func main() {
+                  leapAdaptor := new(gobotLeap.LeapAdaptor)
+                  leapAdaptor.Name = "leap"
+                  leapAdaptor.Port = "127.0.0.1:6437"
 
-          def on_open(*args)
-            puts args
-          end
+                  leap := gobotLeap.NewLeap(leapAdaptor)
+                  leap.Name = "leap"
 
-          def on_frame(*args)
-            frame = args[1]
-            puts frame
-            puts frame.hands
-            puts frame.gestures
-            puts frame.pointables
-          end
+                  work := func() {
+                          go func() {
+                                  for {
+                                          fmt.Println(gobot.On(leap.Events["Message"]))
+                                  }
+                          }()
+                  }
 
-          def on_close(*args)
-            puts args
-          end
+                  robot := gobot.Robot{
+                          Connections: []interface{}{ leapAdaptor },
+                          Devices:     []interface{}{ leap }, 
+                          Work:        work,
+                  }
+
+                  robot.Start()
+          }
+
     %h2 How to connect
     %h3 OSX
     %p
@@ -67,7 +74,7 @@ layout: page
     %ul
       %li Run Leap Motion.app
       %li Connect your Computer and Leap Motion Controller.
-      %li Connect to the device via Cylon.js.
+      %li Connect to the device via Gobot.
 
     %h3 Ubuntu
     %p
@@ -78,7 +85,7 @@ layout: page
     %ul
       %li Run the leapd daemon.
       %li Connect your computer and the Leap Motion controller
-      %li Connect to the device via Cylon.js
+      %li Connect to the device via Gobot
 
   %section.drivers
     %h2 Drivers

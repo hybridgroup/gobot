@@ -1,5 +1,5 @@
 ---
-title: Cylon.js - Leap Motion Driver
+title: Gobot - Leap Motion Driver
 author: The Hybrid Group
 page_title: Leap Motion
 page_subtitle: Driver
@@ -9,57 +9,93 @@ layout: page
   %section.intro
     =image_tag "/images/leap_motion.jpg", class: "display"
     %p
-      Allows user to interact with Cylon.js devices using a Leap Motion controller. The Leap Motion uses its built in cameras to track the user's hand motions, and translations those to events that Cylon.js can use to trigger actions or control hardware.
+      Allows user to interact with Gobot devices using a Leap Motion controller. The Leap Motion uses its built in cameras to track the user's hand motions, and translations those to events that Gobot can use to trigger actions or control hardware.
 
   %section.how-to
     %h2 How to establish a connection and setup the driver
     :markdown
-          :::ruby
-          require 'Cylon.js'
-          connection :leapmotion, :adaptor => :leapmotion, :port => '127.0.0.1:6437'
-          device :leapmotion, :connection => :leapmotion, :driver => :leapmotion
+          :::go
+          package main
+
+          import (
+                  "fmt"
+                  "github.com/hybridgroup/gobot"
+                  "github.com/hybridgroup/gobot-leapmotion"
+          )
+
+          func main() {
+                  leapAdaptor := new(gobotLeap.LeapAdaptor)
+                  leapAdaptor.Name = "leap"
+                  leapAdaptor.Port = "127.0.0.1:6437"
+
+                  leap := gobotLeap.NewLeap(leapAdaptor)
+                  leap.Name = "leap"
+          ...
 
   %section.public-methods
-    %h2 Public driver events
-    %h3 hand
-    %p
-      Gets triggered when doing a hand motion, makes hand input available.
+    %h2 Events
 
-    %h3 gesture
-    %p
-      Gets triggered when doing a gesture motion, makes hand input available.
+    %dl.methods 
+      %dt message
+      %dd Gets triggered when receiving a message.
+      %dt start
+      %dd Sent when the device has been started and is ready to use.
 
-    %h3 pointable
-    %p
-      Gets triggered when doing a pointable motion, makes hand input available.
+    -#%h3 hand
+    -#%p Gets triggered when doing a hand motion, makes hand input available.
 
-    %h3 frame
-    %p
-      Gets triggered with every motion detected, makes frame input available.
+    -#%h3 gesture
+    -#%p Gets triggered when doing a gesture motion, makes hand input available.
 
-    %h3 How to use events and call them on your drivers
-    %p Pretty simple, when the connection and the driver have been setup (as explained above) you can call events on them as follows:
-    :markdown
-          :::ruby
-          on leapmotion, :hand => proc { |sender, hand| puts hand.inspect }
+    -#%h3 pointable
+    -#%p Gets triggered when doing a pointable motion, makes hand input available.
+
+    -#%h3 frame
+    -#%p Gets triggered with every motion detected, makes frame input available.
+
+    -#%h3 How to use events and call them on your drivers
+    -#%p Pretty simple, when the connection and the driver have been setup (as explained above) you can call events on them as follows:
+    -#:markdown
+          -#%:::go 
+          -#on leapmotion, :hand => proc { |sender, hand| puts hand.inspect }
 
   %section.how-to
     %h2 How to use
-    %h3 Example receiving hand motion events from a Leap Motion.
+    %h3 Example receiving message events from a Leap Motion.
     :markdown
-          :::ruby
-          require 'Cylon.js'
+          :::go
+          package main
 
-          connection :leapmotion, :adaptor => :leapmotion, :port => '127.0.0.1:6437'
-          device :leapmotion, :connection => :leapmotion, :driver => :leapmotion
- 
-          work do
-            on leapmotion, :hand => :wave
-          end
+          import (
+                  "fmt"
+                  "github.com/hybridgroup/gobot"
+                  "github.com/hybridgroup/gobot-leapmotion"
+          )
 
-          def wave(sender, hand)
-            puts hand.inspect
-          end
+          func main() {
+                  leapAdaptor := new(gobotLeap.LeapAdaptor)
+                  leapAdaptor.Name = "leap"
+                  leapAdaptor.Port = "127.0.0.1:6437"
+
+                  leap := gobotLeap.NewLeap(leapAdaptor)
+                  leap.Name = "leap"
+
+                  work := func() {
+                          go func() {
+                                  for {
+                                          fmt.Println(gobot.On(leap.Events["Message"]))
+                                  }
+                          }()
+                  }
+
+                  robot := gobot.Robot{
+                          Connections: []interface{}{ leapAdaptor },
+                          Devices:     []interface{}{ leap }, 
+                          Work:        work,
+                  }
+
+                  robot.Start()
+          }
 
   %section.compatability.hardware
     %h2 Works with:
