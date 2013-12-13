@@ -1,5 +1,5 @@
 ---
-title: Cylon.js - Servo Driver
+title: Gobot - Servo Driver
 author: The Hybrid Group
 page_title: Servo
 page_subtitle: Driver
@@ -9,46 +9,45 @@ layout: page
   %section.intro
     = image_tag "/images/servo.jpg", class: "display"
     %p
-      Provides an interface for making servos easy to work and interact with from Cylon.js.
+      Provides an interface for making servos easy to work and interact with from Gobot.
 
   %section.how-to
     %h2 How to establish a connection and setup the driver
     %h3 JavaScript
     :markdown
           :::javascript
-          var Cylon = require('cylon');
+          package main
 
-          Cylon.robot({
-            connection: {name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0'},
+          import (
+                  "fmt"
+                  "github.com/hybridgroup/gobot"
+                  "github.com/hybridgroup/gobot-digispark"
+                  "github.com/hybridgroup/gobot-gpio"
+          )
 
-            device: {name: 'servo', driver: 'servo', pin: 3},
+          func main() {
+
+                  digispark := new(gobotDigispark.DigisparkAdaptor)
+                  digispark.Name = "Digispark"
+
+                  servo := gobotGPIO.NewServo(digispark)
+                  servo.Name = "servo"
           ...
 
-    %h3 CoffeeScript
-    :markdown
-          :::javascript
-          Cylon = require 'cylon'
-
-          Cylon.robot
-            connection:
-              name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0'
-
-            device:
-              name: 'servo', driver: 'servo', pin: 3
-          ...
-
-    -#%h3 For Digispark:
-    -#:markdown
-          -#:::ruby
+    
 
   %section.public-methods
     %h2 Commands:
     
     %dl.methods 
-      %dt angle → true | nil
+      %dt MoveC
       %dd Moves the servo to the specified angle, angle must be an integer value between 0 and 180.
-      %dt currentAngle → integer_value (0 - 180)
-      %dd Returns the current angle of the servo, an integer value between 0 and 180.
+      %dt MinC
+      %dd Moves the servo to the min angle 0.
+      %dt CenterC
+      %dd Moves the servo to the center angle 90.
+      %dt MaxC
+      %dd Moves the servo to the max angle 180.
 
     %h2 Events
 
@@ -60,53 +59,46 @@ layout: page
   %section.how-to
     %h2 How to use
     %p
-      This example moves a servo from angle 45 to 90 to 135.
+      This example moves a servo from a random angle.
 
-    %h3 JavaScript
+    %h3 Example
     :markdown
           :::javascript
-          var Cylon = require('cylon');
+          package main
 
-          Cylon.robot({
-            connection: {name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0'},
+          import (
+                  "fmt"
+                  "github.com/hybridgroup/gobot"
+                  "github.com/hybridgroup/gobot-digispark"
+                  "github.com/hybridgroup/gobot-gpio"
+          )
 
-            device: {name: 'servo', driver: 'servo', pin: 3},
+          func main() {
 
-            work: function(my) {
-              var angle = 45 ;
-              my.servo.angle(angle);
-              every((1).second(), function() {
-                angle = angle + 45 ;
-                if (angle > 135) {
-                  angle = 45
-                }
-                my.servo.angle(angle);
-              });
-            }
-          }).start();
+                  digispark := new(gobotDigispark.DigisparkAdaptor)
+                  digispark.Name = "Digispark"
 
-    %h3 CoffeeScript
-    :markdown
-          :::javascript
-          Cylon = require 'cylon'
+                  servo := gobotGPIO.NewServo(digispark)
+                  servo.Name = "servo"
 
-          Cylon.robot
-            connection:
-              name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0'
+                  work := func() {
+                          servo.InitServo()
+                          gobot.Every("1s", func() {
+                                  i := int(gobot.Rand(180))
+                                  fmt.Println("Turning", i)
+                                  servo.Move(i)
+                          })
+                  }
 
-            device:
-              name: 'servo', driver: 'servo', pin: 3
+                  robot := gobot.Robot{
+                          Connections: []interface{}{digispark},
+                          Devices:     []interface{}{servo},
+                          Work:        work,
+                  }
 
-            work: (my) ->
-              angle = 45
-              my.servo.angle angle
-              every 1.second(), ->
-                angle += 45
-                angle = 45 if angle > 135
-                my.servo.angle angle
-
-          .start()
-
+                  robot.Start()
+          }
+    
 
   %section.circuit
     %h2 Circuit and Schematic
