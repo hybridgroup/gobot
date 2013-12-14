@@ -7,7 +7,7 @@
 <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
 <meta name="description">
 <meta content="The Hybrid Group" name="author">
-<title>Leapmotion with Artroo</title>
+<title>Leapmotion with Gobot</title>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><!-- %link{href: "http://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,500,700", rel: "stylesheet", type: "text/css"}/ --><link href="//fonts.googleapis.com/css?family=Inconsolata:400,700%7CMontserrat:700" rel="stylesheet">
 <link href="/stylesheets/style.css" rel="stylesheet">
 <link href="/favicon.ico" rel="shortcut icon" type="image/gif">
@@ -33,7 +33,7 @@
         <div class="w">
           <h1 class="title">Leapmotion</h1>
           <h2 class="subtitle">
-<a href="https://github.com/hybridgroup/Cylon.js-leapmotion" class="repository">Repository</a> <a class href="https://github.com/hybridgroup/Cylon.js-leapmotion/issues">Issues</a>
+<a href="https://github.com/hybridgroup/gobot-leapmotion" class="repository">Repository</a> <a class href="https://github.com/hybridgroup/gobot-leapmotion/issues">Issues</a>
 </h2>
         </div>
       </div>
@@ -49,40 +49,46 @@
                 </p>
               </section><section class="how-to"><h2>How to install</h2>
                 <p>
-                  Installing Cylon.js with leapmotion support is pretty easy using ruby gems.
+                  Installing Gobot with leapmotion support is pretty easy.
                 </p>
-                <pre class="CodeRay">gem install Cylon.js-leapmotion --pre
+                <pre class="CodeRay">go get -u github.com/hybridgroup/gobot-leapmotion
 </pre>
                 <h2>How to use</h2>
                 <p>
-                  This small program uses a Leap Motion to detect the user's hand position
+                  This small program uses a Leap Motion Adaptor.
                 </p>
-                <pre class="CodeRay">require <span class="string"><span class="delimiter">'</span><span class="content">Cylon.js</span><span class="delimiter">'</span></span>
+                <pre class="CodeRay"><span class="keyword">package</span> main
 
-connection <span class="symbol">:leapmotion</span>, <span class="symbol">:adaptor</span> =&gt; <span class="symbol">:leapmotion</span>, <span class="symbol">:port</span> =&gt; <span class="string"><span class="delimiter">'</span><span class="content">127.0.0.1:6437</span><span class="delimiter">'</span></span>
-device <span class="symbol">:leapmotion</span>, <span class="symbol">:driver</span> =&gt; <span class="symbol">:leapmotion</span>
+<span class="keyword">import</span> (
+        <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-leapmotion</span><span class="delimiter">"</span></span>
+)
 
-work <span class="keyword">do</span>
-  on leapmotion, <span class="symbol">:open</span> =&gt; <span class="symbol">:on_open</span>
-  on leapmotion, <span class="symbol">:frame</span> =&gt; <span class="symbol">:on_frame</span>
-  on leapmotion, <span class="symbol">:close</span> =&gt; <span class="symbol">:on_close</span>
-<span class="keyword">end</span>
+<span class="keyword">func</span> main() {
+        leapAdaptor := <span class="predefined">new</span>(gobotLeap.LeapAdaptor)
+        leapAdaptor.Name = <span class="string"><span class="delimiter">"</span><span class="content">leap</span><span class="delimiter">"</span></span>
+        leapAdaptor.Port = <span class="string"><span class="delimiter">"</span><span class="content">127.0.0.1:6437</span><span class="delimiter">"</span></span>
 
-<span class="keyword">def</span> <span class="function">on_open</span>(*args)
-  puts args
-<span class="keyword">end</span>
+        leap := gobotLeap.NewLeap(leapAdaptor)
+        leap.Name = <span class="string"><span class="delimiter">"</span><span class="content">leap</span><span class="delimiter">"</span></span>
 
-<span class="keyword">def</span> <span class="function">on_frame</span>(*args)
-  frame = args[<span class="integer">1</span>]
-  puts frame
-  puts frame.hands
-  puts frame.gestures
-  puts frame.pointables
-<span class="keyword">end</span>
+        work := <span class="keyword">func</span>() {
+                <span class="keyword">go</span> <span class="keyword">func</span>() {
+                        <span class="keyword">for</span> {
+                                fmt.Println(gobot.On(leap.Events[<span class="string"><span class="delimiter">"</span><span class="content">Message</span><span class="delimiter">"</span></span>]))
+                        }
+                }()
+        }
 
-<span class="keyword">def</span> <span class="function">on_close</span>(*args)
-  puts args
-<span class="keyword">end</span>
+        robot := gobot.Robot{
+                Connections: []<span class="keyword">interface</span>{}{ leapAdaptor },
+                Devices:     []<span class="keyword">interface</span>{}{ leap }, 
+                Work:        work,
+        }
+
+        robot.Start()
+}
 </pre>
                 <h2>How to connect</h2>
                 <h3>OSX</h3>
@@ -94,7 +100,7 @@ work <span class="keyword">do</span>
                 <ul>
 <li>Run Leap Motion.app</li>
                   <li>Connect your Computer and Leap Motion Controller.</li>
-                  <li>Connect to the device via Cylon.js.</li>
+                  <li>Connect to the device via Gobot.</li>
                 </ul>
 <h3>Ubuntu</h3>
                 <p>
@@ -106,7 +112,7 @@ work <span class="keyword">do</span>
                 <ul>
 <li>Run the leapd daemon.</li>
                   <li>Connect your computer and the Leap Motion controller</li>
-                  <li>Connect to the device via Cylon.js</li>
+                  <li>Connect to the device via Gobot</li>
                 </ul></section><section class="drivers"><h2>Drivers</h2>
                 <p>
                   There is only one driver for the Leap Motion platform as listed below.

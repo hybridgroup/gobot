@@ -7,7 +7,7 @@
 <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
 <meta name="description">
 <meta content="The Hybrid Group" name="author">
-<title>Cylon.js - Leap Motion Driver</title>
+<title>Gobot - Leap Motion Driver</title>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><!-- %link{href: "http://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,500,700", rel: "stylesheet", type: "text/css"}/ --><link href="//fonts.googleapis.com/css?family=Inconsolata:400,700%7CMontserrat:700" rel="stylesheet">
 <link href="/stylesheets/style.css" rel="stylesheet">
 <link href="/favicon.ico" rel="shortcut icon" type="image/gif">
@@ -39,48 +39,66 @@
         <div class="main" role="main">
           <section class="content full"><div class="documentation">
               <section class="intro"><img class="display" src="/images/leap_motion.jpg"><p>
-                  Allows user to interact with Cylon.js devices using a Leap Motion controller. The Leap Motion uses its built in cameras to track the user's hand motions, and translations those to events that Cylon.js can use to trigger actions or control hardware.
+                  Allows user to interact with Gobot devices using a Leap Motion controller. The Leap Motion uses its built in cameras to track the user's hand motions, and translations those to events that Gobot can use to trigger actions or control hardware.
                 </p>
               </section><section class="how-to"><h2>How to establish a connection and setup the driver</h2>
-                <pre class="CodeRay">require <span class="string"><span class="delimiter">'</span><span class="content">Cylon.js</span><span class="delimiter">'</span></span>
-connection <span class="symbol">:leapmotion</span>, <span class="symbol">:adaptor</span> =&gt; <span class="symbol">:leapmotion</span>, <span class="symbol">:port</span> =&gt; <span class="string"><span class="delimiter">'</span><span class="content">127.0.0.1:6437</span><span class="delimiter">'</span></span>
-device <span class="symbol">:leapmotion</span>, <span class="symbol">:connection</span> =&gt; <span class="symbol">:leapmotion</span>, <span class="symbol">:driver</span> =&gt; <span class="symbol">:leapmotion</span>
+                <pre class="CodeRay"><span class="keyword">package</span> main
+
+<span class="keyword">import</span> (
+        <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-leapmotion</span><span class="delimiter">"</span></span>
+)
+
+<span class="keyword">func</span> main() {
+        leapAdaptor := <span class="predefined">new</span>(gobotLeap.LeapAdaptor)
+        leapAdaptor.Name = <span class="string"><span class="delimiter">"</span><span class="content">leap</span><span class="delimiter">"</span></span>
+        leapAdaptor.Port = <span class="string"><span class="delimiter">"</span><span class="content">127.0.0.1:6437</span><span class="delimiter">"</span></span>
+
+        leap := gobotLeap.NewLeap(leapAdaptor)
+        leap.Name = <span class="string"><span class="delimiter">"</span><span class="content">leap</span><span class="delimiter">"</span></span>
+...
 </pre>
-              </section><section class="public-methods"><h2>Public driver events</h2>
-                <h3>hand</h3>
-                <p>
-                  Gets triggered when doing a hand motion, makes hand input available.
-                </p>
-                <h3>gesture</h3>
-                <p>
-                  Gets triggered when doing a gesture motion, makes hand input available.
-                </p>
-                <h3>pointable</h3>
-                <p>
-                  Gets triggered when doing a pointable motion, makes hand input available.
-                </p>
-                <h3>frame</h3>
-                <p>
-                  Gets triggered with every motion detected, makes frame input available.
-                </p>
-                <h3>How to use events and call them on your drivers</h3>
-                <p>Pretty simple, when the connection and the driver have been setup (as explained above) you can call events on them as follows:</p>
-                <pre class="CodeRay">on leapmotion, <span class="symbol">:hand</span> =&gt; proc { |sender, hand| puts hand.inspect }
-</pre>
-              </section><section class="how-to"><h2>How to use</h2>
-                <h3>Example receiving hand motion events from a Leap Motion.</h3>
-                <pre class="CodeRay">require <span class="string"><span class="delimiter">'</span><span class="content">Cylon.js</span><span class="delimiter">'</span></span>
+              </section><section class="public-methods"><h2>Events</h2>
+                <dl class="methods">
+<dt>message</dt>
+                  <dd>Gets triggered when receiving a message.</dd>
+                  <dt>start</dt>
+                  <dd>Sent when the device has been started and is ready to use.</dd>
+                </dl></section><section class="how-to"><h2>How to use</h2>
+                <h3>Example receiving message events from a Leap Motion.</h3>
+                <pre class="CodeRay"><span class="keyword">package</span> main
 
-connection <span class="symbol">:leapmotion</span>, <span class="symbol">:adaptor</span> =&gt; <span class="symbol">:leapmotion</span>, <span class="symbol">:port</span> =&gt; <span class="string"><span class="delimiter">'</span><span class="content">127.0.0.1:6437</span><span class="delimiter">'</span></span>
-device <span class="symbol">:leapmotion</span>, <span class="symbol">:connection</span> =&gt; <span class="symbol">:leapmotion</span>, <span class="symbol">:driver</span> =&gt; <span class="symbol">:leapmotion</span>
+<span class="keyword">import</span> (
+        <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-leapmotion</span><span class="delimiter">"</span></span>
+)
 
-work <span class="keyword">do</span>
-  on leapmotion, <span class="symbol">:hand</span> =&gt; <span class="symbol">:wave</span>
-<span class="keyword">end</span>
+<span class="keyword">func</span> main() {
+        leapAdaptor := <span class="predefined">new</span>(gobotLeap.LeapAdaptor)
+        leapAdaptor.Name = <span class="string"><span class="delimiter">"</span><span class="content">leap</span><span class="delimiter">"</span></span>
+        leapAdaptor.Port = <span class="string"><span class="delimiter">"</span><span class="content">127.0.0.1:6437</span><span class="delimiter">"</span></span>
 
-<span class="keyword">def</span> <span class="function">wave</span>(sender, hand)
-  puts hand.inspect
-<span class="keyword">end</span>
+        leap := gobotLeap.NewLeap(leapAdaptor)
+        leap.Name = <span class="string"><span class="delimiter">"</span><span class="content">leap</span><span class="delimiter">"</span></span>
+
+        work := <span class="keyword">func</span>() {
+                <span class="keyword">go</span> <span class="keyword">func</span>() {
+                        <span class="keyword">for</span> {
+                                fmt.Println(gobot.On(leap.Events[<span class="string"><span class="delimiter">"</span><span class="content">Message</span><span class="delimiter">"</span></span>]))
+                        }
+                }()
+        }
+
+        robot := gobot.Robot{
+                Connections: []<span class="keyword">interface</span>{}{ leapAdaptor },
+                Devices:     []<span class="keyword">interface</span>{}{ leap }, 
+                Work:        work,
+        }
+
+        robot.Start()
+}
 </pre>
               </section><section class="compatability hardware"><h2>Works with:</h2>
                 <div class="devices">
