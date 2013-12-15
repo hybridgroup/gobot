@@ -17,11 +17,9 @@ func NewDevice(driver interface{}, r *Robot) *Device {
 	d := new(Device)
 	d.Name = reflect.ValueOf(driver).Elem().FieldByName("Name").String()
 	d.Robot = r
-	interval := reflect.ValueOf(driver).Elem().FieldByName("Interval").String()
-	if interval == "" {
-		interval = "0.1s"
+	if reflect.ValueOf(driver).Elem().FieldByName("Interval").String() == "" {
+		reflect.ValueOf(driver).Elem().FieldByName("Interval").SetString("0.1s")
 	}
-	reflect.ValueOf(driver).Elem().FieldByName("Interval").SetString(interval)
 	d.Driver = driver
 	return d
 }
