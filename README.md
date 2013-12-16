@@ -118,6 +118,12 @@ a shared set of drivers provded using the cylon-gpio module:
     - LED
     - Servo
 
+Support for devices that use Inter-Integrated Circuit (I2C) have a shared set of
+drivers provded using the gobot-i2c module:
+
+  - [I2C](https://en.wikipedia.org/wiki/I%C2%B2C) <=> [Drivers](https://github.com/hybridgroup/gobot-i2c)
+    - Wii Nunchuck Controller
+
 More platforms and drivers are coming soon...
 
 ## Getting Started
