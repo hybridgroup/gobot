@@ -44,11 +44,12 @@ func Rand(max int) int {
 	return rand.Intn(max)
 }
 
-func On(cs chan interface{}) interface{} {
-	for s := range cs {
-		return s
-	}
-	return nil
+func On(cs chan interface{}, f func(s interface{})) {
+	go func() {
+		for s := range cs {
+			f(s)
+		}
+	}()
 }
 
 func ConnectToTcp(port string) io.ReadWriteCloser {
