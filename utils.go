@@ -82,6 +82,13 @@ func Call(thing interface{}, method string, params ...interface{}) []reflect.Val
 	return reflect.ValueOf(thing).MethodByName(method).Call(in)
 }
 
+func FieldByName(thing interface{}, field string) reflect.Value {
+	return reflect.ValueOf(thing).FieldByName(field)
+}
+func FieldByNamePtr(thing interface{}, field string) reflect.Value {
+	return reflect.ValueOf(thing).Elem().FieldByName(field)
+}
+
 func toJson(obj interface{}) string {
 	b, _ := json.Marshal(obj)
 	return string(b)

@@ -2,44 +2,54 @@ package gobot
 
 import (
 	"fmt"
-	"reflect"
 )
 
-type Connection struct {
+type connection struct {
 	Name    string
-	Adaptor interface{}
-	Port    string
-	Robot   *Robot `json:"-"`
-	Params  map[string]interface{}
+	Adaptor AdaptorInterface
+	Port    string                 `json:"-"`
+	Robot   *Robot                 `json:"-"`
+	Params  map[string]interface{} `json:"-"`
 }
 
-func NewConnection(a interface{}, r *Robot) *Connection {
-	c := new(Connection)
-	c.Name = reflect.ValueOf(a).Elem().FieldByName("Name").String()
-	c.Port = reflect.ValueOf(a).Elem().FieldByName("Port").String()
+type Connection interface {
+	Connect() bool
+	Disconnect() bool
+	Finalize() bool
+	Reconnect() bool
+}
+
+func NewConnection(adaptor AdaptorInterface, r *Robot) *connection {
+	c := new(connection)
+	c.Name = FieldByNamePtr(adaptor, "Name").String()
+	c.Port = FieldByNamePtr(adaptor, "Port").String()
 	c.Params = make(map[string]interface{})
-	keys := reflect.ValueOf(a).Elem().FieldByName("Params").MapKeys()
+	keys := FieldByNamePtr(adaptor, "Params").MapKeys()
 	for k := range keys {
-		c.Params[keys[k].String()] = reflect.ValueOf(a).Elem().FieldByName("Params").MapIndex(keys[k])
+		c.Params[keys[k].String()] = FieldByNamePtr(adaptor, "Params").MapIndex(keys[k])
 	}
 	c.Robot = r
-	c.Adaptor = a
+	c.Adaptor = adaptor
 	return c
 }
 
-func (c *Connection) Connect() {
+func (c *connection) Connect() bool {
 	fmt.Println("Connecting to " + c.Name + " on port " + c.Port + "...")
-	reflect.ValueOf(c.Adaptor).MethodByName("Connect").Call([]reflect.Value{})
+	return c.Adaptor.Connect()
 }
 
-func (c *Connection) Disconnect() {
-	reflect.ValueOf(c.Adaptor).MethodByName("Disconnect").Call([]reflect.Value{})
+func (c *connection) Disconnect() bool {
+	return c.Adaptor.Disconnect()
 }
 
-func (c *Connection) IsConnected() bool {
-	return reflect.ValueOf(c.Adaptor).MethodByName("IsConnected").Call([]reflect.Value{})[0].Bool()
+func (c *connection) Finalize() bool {
+	return c.Adaptor.Finalize()
 }
 
-func (c *Connection) AdaptorName() string {
+func (c *connection) Reconnect() bool {
+	return c.Adaptor.Reconnect()
+}
+
+func (c *connection) AdaptorName() string {
 	return c.Name
 }

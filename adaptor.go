@@ -7,34 +7,9 @@ type Adaptor struct {
 	Params    map[string]interface{}
 }
 
-func (Adaptor) NewAdaptor(a Adaptor) Adaptor {
-	return a
-}
-
-func (a *Adaptor) Finalize() bool {
-	if a.IsConnected() {
-		a.Disconnect()
-	}
-	return true
-}
-
-func (a *Adaptor) Connect() bool {
-	a.Connected = true
-	return true
-}
-
-func (a *Adaptor) Disconnect() bool {
-	a.Connected = false
-	return true
-}
-
-func (a *Adaptor) Reconnect() bool {
-	if !a.IsConnected() {
-		return a.Connect()
-	}
-	return true
-}
-
-func (a *Adaptor) IsConnected() bool {
-	return a.Connected
+type AdaptorInterface interface {
+	Finalize() bool
+	Connect() bool
+	Disconnect() bool
+	Reconnect() bool
 }

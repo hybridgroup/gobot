@@ -25,7 +25,7 @@ func (m *Master) FindRobot(name string) *Robot {
 	return nil
 }
 
-func (m *Master) FindRobotDevice(name string, device string) *Device {
+func (m *Master) FindRobotDevice(name string, device string) *device {
 	for r := range m.Robots {
 		if m.Robots[r].Name == name {
 			for d := range m.Robots[r].devices {
@@ -38,7 +38,7 @@ func (m *Master) FindRobotDevice(name string, device string) *Device {
 	return nil
 }
 
-func (m *Master) FindRobotConnection(name string, connection string) *Connection {
+func (m *Master) FindRobotConnection(name string, connection string) *connection {
 	for r := range m.Robots {
 		if m.Robots[r].Name == name {
 			for c := range m.Robots[r].connections {

@@ -2,36 +2,37 @@ package gobot
 
 import (
 	"fmt"
-	"reflect"
 )
 
-type Device struct {
+type device struct {
 	Name     string
-	Interval string
+	Interval string `json:"-"`
 	Robot    *Robot `json:"-"`
-	Driver   interface{}
-	Params   map[string]string
+	Driver   DriverInterface
+	Params   map[string]string `json:"-"`
 }
 
-func NewDevice(driver interface{}, r *Robot) *Device {
-	d := new(Device)
-	d.Name = reflect.ValueOf(driver).Elem().FieldByName("Name").String()
+type Device interface {
+	Start() bool
+}
+
+func NewDevice(driver DriverInterface, r *Robot) *device {
+	d := new(device)
+	d.Name = FieldByNamePtr(driver, "Name").String()
 	d.Robot = r
-	if reflect.ValueOf(driver).Elem().FieldByName("Interval").String() == "" {
-		reflect.ValueOf(driver).Elem().FieldByName("Interval").SetString("0.1s")
+	if FieldByNamePtr(driver, "Interval").String() == "" {
+		FieldByNamePtr(driver, "Interval").SetString("0.1s")
 	}
 	d.Driver = driver
 	return d
 }
 
-func (d *Device) Start() {
+func (d *device) Start() bool {
 	fmt.Println("Device " + d.Name + " started")
-	r := reflect.ValueOf(d.Driver).MethodByName("StartDriver")
-	if r.IsValid() {
-		r.Call([]reflect.Value{})
-	}
+	d.Driver.Start()
+	return true
 }
 
-func (d *Device) Commands() interface{} {
-	return reflect.ValueOf(d.Driver).Elem().FieldByName("Commands").Interface()
+func (d *device) Commands() interface{} {
+	return FieldByNamePtr(d.Driver, "Commands").Interface()
 }
