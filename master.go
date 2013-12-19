@@ -1,17 +1,22 @@
 package gobot
 
+import "runtime"
+
 type Master struct {
 	Robots []Robot
+	NumCPU int
 }
 
 func GobotMaster() *Master {
 	m := new(Master)
+	m.NumCPU = runtime.NumCPU()
 	return m
 }
 
 func (m *Master) Start() {
+	runtime.GOMAXPROCS(m.NumCPU)
 	for s := range m.Robots {
-		go m.Robots[s].Start()
+		go m.Robots[s].startRobot()
 	}
 	select {}
 }

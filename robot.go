@@ -18,6 +18,12 @@ type Robot struct {
 }
 
 func (r *Robot) Start() {
+	m := GobotMaster()
+	m.Robots = []Robot{*r}
+	m.Start()
+}
+
+func (r *Robot) startRobot() {
 	r.initName()
 	r.initCommands()
 	r.initConnections()
@@ -27,7 +33,6 @@ func (r *Robot) Start() {
 	if r.Work != nil {
 		r.Work()
 	}
-	select {}
 }
 
 func (r *Robot) initName() {
