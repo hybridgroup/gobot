@@ -13,9 +13,11 @@ layout: page
 
   %section.how_to
     %h2 How to establish a connection and setup the driver 
+    :markdown
+      Install the library with: `go get -u github.com/hybridgroup/gobot-gpio`
     %h3 For Spark:
     :markdown
-          :::bash
+          :::go
           package main
 
           import (
@@ -42,6 +44,7 @@ layout: page
                   led := gobotGPIO.NewLed(spark)
                   led.Name = "led"
                   led.Pin = "D7"
+          ...
 
   %section.public-methods
     -#%h2 Commands:
@@ -73,7 +76,7 @@ layout: page
     %p This example detects when a button has been pushed, it turns on and off a LED
    
     :markdown
-          :::bash
+          :::go
           package main
 
           import (
@@ -102,29 +105,18 @@ layout: page
                   led.Pin = "D7"
 
                   work := func() {
-                          led.Off()
-                          go func() {
-                                  for {
-                                          fmt.Println("update", gobot.On(button.Events["update"]))
-                                  }
-                          }()
-                          go func() {
-                                  for {
-                                          fmt.Println("push", gobot.On(button.Events["push"]))
-                                          led.On()
-                                  }
-                          }()
-                          go func() {
-                                  for {
-                                          fmt.Println("release", gobot.On(button.Events["release"]))
-                                          led.Off()
-                                  }
-                          }()
+                          gobot.On(button.Events["push"], func(data interface{}) {
+                                  led.On()
+                          })
+
+                          gobot.On(button.Events["release"], func(data interface{}) {
+                                  led.Off()
+                          })
                   }
 
                   robot := gobot.Robot{
-                          Connections: []interface{}{spark},
-                          Devices:     []interface{}{button, led},
+                          Connections: []gobot.Connection{spark},
+                          Devices:     []gobot.Device{button, led},
                           Work:        work,
                   }
 

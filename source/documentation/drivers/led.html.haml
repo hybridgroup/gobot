@@ -13,35 +13,27 @@ layout: page
 
   %section.how-to
     %h2 How to establish a connection and setup the driver
+    :markdown
+      Install the library with: `go get -u github.com/hybridgroup/gobot-gpio`
     %h3 For Beaglebone:
     :markdown
-          :::javascript
+          :::go
           package main
 
           import (
-            "github.com/hybridgroup/gobot"
-            "github.com/hybridgroup/gobot-beaglebone"
-            "time"
+                  "github.com/hybridgroup/gobot"
+                  "github.com/hybridgroup/gobot-beaglebone"
+                  "github.com/hybridgroup/gobot-gpio"
           )
 
           func main() {
+                  beaglebone := new(gobotBeaglebone.Beaglebone)
+                  beaglebone.Name = "beaglebone"
 
-            beaglebone := new(gobotBeaglebone.Beaglebone)
-            beaglebone.Name = "Beaglebone"
-
-            led := gobotBeaglebone.NewLed(beaglebone)
-            led.Driver = gobot.Driver{
-              Name: "led",
-              Pin: "P9_12",
-            }
-
-            connections := []interface{} {
-              beaglebone,
-            }
-            devices := []interface{} {
-              led,
-            }
-            ...
+                  led := gobotGPIO.NewLed(beaglebone)
+                  led.Name = "led"
+                  led.Pin = "P9_12"
+          ...
           
     
 
@@ -66,55 +58,37 @@ layout: page
   %section.how-to
     %h2 How to use
     %p
-      This example turns an LED on and off, with digispark.
+      This example turns an LED on and off every 1s.
 
     :markdown
           :::javascript
           package main
 
           import (
-            "github.com/hybridgroup/gobot"
-            "github.com/hybridgroup/gobot-digispark"
-            "github.com/hybridgroup/gobot-gpio"
-            "fmt"
+                  "github.com/hybridgroup/gobot"
+                  "github.com/hybridgroup/gobot-beaglebone"
+                  "github.com/hybridgroup/gobot-gpio"
           )
 
           func main() {
+                  beaglebone := new(gobotBeaglebone.Beaglebone)
+                  beaglebone.Name = "beaglebone"
 
-            digispark := new(gobotDigispark.DigisparkAdaptor)
-            digispark.Name = "Digispark"
+                  led := gobotGPIO.NewLed(beaglebone)
+                  led.Name = "led"
+                  led.Pin = "P9_12"
 
-            led := gobotGPIO.NewLed(&digispark)
-            led.Driver = gobot.Driver{
-              Name: "led",
-              Pin: "2",
-            }
+                  work := func() {
+                          gobot.Every("1s", func() { led.Toggle() })
+                  }
 
-            connections := []interface{} {
-              digispark,
-            }
-            devices := []interface{} {
-              led,
-            }
+                  robot := gobot.Robot{
+                          Connections: []interface{}{beaglebone},
+                          Devices:     []interface{}{led},
+                          Work:        work,
+                  }
 
-            work := func(){
-              gobot.Every("0.5s", func(){ 
-                led.Toggle() 
-                if led.IsOn() {
-                  fmt.Println("On")
-                } else {
-                  fmt.Println("Off")
-                }
-              })
-            }
-            
-            robot := gobot.Robot{
-                Connections: connections, 
-                Devices: devices,
-                Work: work,
-            }
-
-            robot.Start()
+                  robot.Start()
           }
 
 

@@ -52,10 +52,10 @@ layout: page
             sphero := gobotSphero.NewSphero(spheroAdaptor)
             sphero.Name = "Sphero"
 
-            connections := []interface{} {
+            connections := []gobot.Connection {
               spheroAdaptor,
             }
-            devices := []interface{} {
+            devices := []gobot.Device {
               sphero,
             }
 
@@ -74,16 +74,6 @@ layout: page
             robot.Start()
           }
 
-    -#%h2 How to connect
-    -#%h3 OSX
-
-    -#%p In order to allow Cylon.js running on your Mac to access the Sphero, go to "Bluetooth > Open Bluetooth Preferences > Sharing Setup" and make sure that "Bluetooth Sharing" is checked.
-
-    -#%p Thank you to [@kopipejst](https://github.com/kopipejst) for the above connnection info.
-
-    -#%h3 Ubuntu
-
-    -#%p Coming soon.
 
   %section.drivers
     %h2 Drivers

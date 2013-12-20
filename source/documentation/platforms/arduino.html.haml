@@ -29,7 +29,7 @@ layout: page
           :::bash
           go get -u github.com/hybridgroup/gobot-firmata
     %h2 How to use
-    %p This small program lets you turn on and off  a LED every 1s. 
+    %p This small program lets you turn on and off a LED every 1s. 
     :markdown
           :::go
           package main
@@ -51,15 +51,27 @@ layout: page
                   led.Name = "led"
                   led.Pin = "13"
 
+                  connections := []interface{}{
+                          firmata,
+                  }
+                  devices := []interface{}{
+                          led,
+                  }
+
                   work := func() {
                           gobot.Every("1s", func() {
                                   led.Toggle()
+                                  if led.IsOn() {
+                                          fmt.Println("On")
+                                  } else {
+                                          fmt.Println("Off")
+                                  }
                           })
                   }
 
                   robot := gobot.Robot{
-                          Connections: []interface{}{firmata},
-                          Devices:     []interface{led},
+                          Connections: connections,
+                          Devices:     devices,
                           Work:        work,
                   }
 

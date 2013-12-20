@@ -14,49 +14,40 @@ layout: page
   %section.how-to
     %h2 How to establish a connection and setup the driver
     :markdown
-      Install the library with `go get -u github.com/hybridgroup/gobot`
+      Install the library with: `go get -u github.com/hybridgroup/gobot-i2c`
+    %h3 For Arduino
     :markdown
-          :::javascript
+          :::go
           package main
 
           import (
-            "github.com/hybridgroup/gobot"
-            "github.com/hybridgroup/gobot-beaglebone"
-            "time"
+                  "fmt"
+                  "github.com/hybridgroup/gobot"
+                  "github.com/hybridgroup/gobot-firmata"
+                  "github.com/hybridgroup/gobot-i2c"
           )
 
           func main() {
+                  firmata := new(gobotFirmata.FirmataAdaptor)
+                  firmata.Name = "firmata"
+                  firmata.Port = "/dev/ttyACM0"
 
-            beaglebone := new(gobotBeaglebone.Beaglebone)
-            beaglebone.Name = "Beaglebone"
-
-            led := gobotBeaglebone.NewLed(beaglebone)
-            led.Driver = gobot.Driver{
-              Name: "led",
-              Pin: "P9_12",
-            }
-
-            connections := []interface{} {
-              beaglebone,
-            }
-            devices := []interface{} {
-              led,
-            }
-            ...
+                  blinkm := gobotI2C.NewBlinkM(firmata)
+                  blinkm.Name = "blinkm"
+          ...
+          
 
   %section.public-events
     %h2 Commands:
     
     %dl.methods 
-      %dt off
-      %dd Turns BlinkM off.
-      %dt rgb → nil
+      %dt RgbC
       %dd Sets the color of the BlinkM RGB LED to the specified combination of RGB color provided (red, green and blue values should be between 0 and 255).
-      %dt fade → nil
+      %dt FadeC
       %dd Fades the color of the BlinkM RGB LED to the specified combination of RGB color provided (red, green and blue values should be between 0 and 255).
-      %dt color → [red, green, blue] (integer)
+      %dt ColorC
       %dd Returns an array containing the RGB values for the current color (all integer between 0 and 255).
-      %dt version → String
+      %dt FirmwareVersionC
       %dd Returns an sring describing the I2C firmware version being used.
 
     %h2 Events
@@ -68,46 +59,40 @@ layout: page
 
   %section.how-to
     %h2 How to use
-    %p Example using a BlinkM.
+    %p Example using a BlinkM and Arduino
     :markdown
-          :::javascript
+          :::go
           package main
 
           import (
-            "github.com/hybridgroup/gobot"
-            "github.com/hybridgroup/gobot-beaglebone"
-            "time"
+                  "fmt"
+                  "github.com/hybridgroup/gobot"
+                  "github.com/hybridgroup/gobot-firmata"
+                  "github.com/hybridgroup/gobot-i2c"
           )
 
           func main() {
+                  firmata := new(gobotFirmata.FirmataAdaptor)
+                  firmata.Name = "firmata"
+                  firmata.Port = "/dev/ttyACM0"
 
-            beaglebone := new(gobotBeaglebone.Beaglebone)
-            beaglebone.Name = "Beaglebone"
+                  blinkm := gobotI2C.NewBlinkM(firmata)
+                  blinkm.Name = "blinkm"
 
-            led := gobotBeaglebone.NewLed(beaglebone)
-            led.Driver = gobot.Driver{
-              Name: "led",
-              Pin: "P9_12",
-            }
+                  work := func() {
+                          gobot.Every("3s", func() {
+                                  blinkm.Rgb(byte(gobot.Rand(255)), byte(gobot.Rand(255)), byte(gobot.Rand(255)))
+                                  fmt.Println("color", blinkm.Color())
+                          })
+                  }
 
-            connections := []interface{} {
-              beaglebone,
-            }
-            devices := []interface{} {
-              led,
-            }
+                  robot := gobot.Robot{
+                          Connections: []gobot.Connection{firmata},
+                          Devices:     []gobot.Device{blinkm},
+                          Work:        work,
+                  }
 
-            work := func(){
-              gobot.Every(1000 * time.Millisecond, func(){ led.Toggle() })
-            }
-            
-            robot := gobot.Robot{
-                Connections: connections, 
-                Devices: devices,
-                Work: work,
-            }
-
-            robot.Start()
+                  robot.Start()
           }
     
 
