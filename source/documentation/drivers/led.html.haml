@@ -21,18 +21,18 @@ layout: page
           package main
 
           import (
-                  "github.com/hybridgroup/gobot"
-                  "github.com/hybridgroup/gobot-beaglebone"
-                  "github.com/hybridgroup/gobot-gpio"
+            "github.com/hybridgroup/gobot"
+            "github.com/hybridgroup/gobot-beaglebone"
+            "github.com/hybridgroup/gobot-gpio"
           )
 
           func main() {
-                  beaglebone := new(gobotBeaglebone.Beaglebone)
-                  beaglebone.Name = "beaglebone"
+            beaglebone := new(gobotBeaglebone.Beaglebone)
+            beaglebone.Name = "beaglebone"
 
-                  led := gobotGPIO.NewLed(beaglebone)
-                  led.Name = "led"
-                  led.Pin = "P9_12"
+            led := gobotGPIO.NewLed(beaglebone)
+            led.Name = "led"
+            led.Pin = "P9_12"
           ...
           
     
@@ -65,30 +65,30 @@ layout: page
           package main
 
           import (
-                  "github.com/hybridgroup/gobot"
-                  "github.com/hybridgroup/gobot-beaglebone"
-                  "github.com/hybridgroup/gobot-gpio"
+            "github.com/hybridgroup/gobot"
+            "github.com/hybridgroup/gobot-beaglebone"
+            "github.com/hybridgroup/gobot-gpio"
           )
 
           func main() {
-                  beaglebone := new(gobotBeaglebone.Beaglebone)
-                  beaglebone.Name = "beaglebone"
+            beaglebone := new(gobotBeaglebone.Beaglebone)
+            beaglebone.Name = "beaglebone"
 
-                  led := gobotGPIO.NewLed(beaglebone)
-                  led.Name = "led"
-                  led.Pin = "P9_12"
+            led := gobotGPIO.NewLed(beaglebone)
+            led.Name = "led"
+            led.Pin = "P9_12"
 
-                  work := func() {
-                          gobot.Every("1s", func() { led.Toggle() })
-                  }
+            work := func() {
+              gobot.Every("1s", func() { led.Toggle() })
+            }
 
-                  robot := gobot.Robot{
-                          Connections: []interface{}{beaglebone},
-                          Devices:     []interface{}{led},
-                          Work:        work,
-                  }
+            robot := gobot.Robot{
+              Connections: []interface{}{beaglebone},
+              Devices:     []interface{}{led},
+              Work:        work,
+            }
 
-                  robot.Start()
+            robot.Start()
           }
 
 
