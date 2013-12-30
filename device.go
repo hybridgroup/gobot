@@ -9,7 +9,6 @@ type device struct {
 	Interval string `json:"-"`
 	Robot    *Robot `json:"-"`
 	Driver   DriverInterface
-	Params   map[string]string `json:"-"`
 }
 
 type Device interface {
