@@ -27,8 +27,8 @@ func main() {
 
 		master.Robots = append(master.Robots, gobot.Robot{
 			Name:        name,
-			Connections: []interface{}{spheroAdaptor},
-			Devices:     []interface{}{sphero},
+			Connections: []gobot.Connection{spheroAdaptor},
+			Devices:     []gobot.Device{sphero},
 			Work:        work,
 		})
 	}

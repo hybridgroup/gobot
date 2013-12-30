@@ -17,7 +17,7 @@ func main() {
 	gobot.Api(Master)
 
 	spheros := map[string]string{
-		"Sphero-BPO": "127.0.0.1:4560",
+		"Sphero-BPO": "/dev/rfcomm0",
 	}
 
 	for name, port := range spheros {
@@ -35,8 +35,8 @@ func main() {
 
 		Master.Robots = append(Master.Robots, gobot.Robot{
 			Name:        name,
-			Connections: []interface{}{spheroAdaptor},
-			Devices:     []interface{}{sphero},
+			Connections: []gobot.Connection{spheroAdaptor},
+			Devices:     []gobot.Device{sphero},
 			Work:        work,
 			Commands:    map[string]interface{}{"TurnBlue": TurnBlue},
 		})
