@@ -13,25 +13,27 @@ layout: page
 
   %section.how-to
     %h2 How to establish a connection and setup the driver
+    :markdown
+      Install the library with: `go get -u github.com/hybridgroup/gobot-i2c`
     %h3 For Arduino:
     :markdown
           :::go
           package main
 
           import (
-              "fmt"
-              "github.com/hybridgroup/gobot"
-              "github.com/hybridgroup/gobot-firmata"
-              "github.com/hybridgroup/gobot-i2c"
+            "fmt"
+            "github.com/hybridgroup/gobot"
+            "github.com/hybridgroup/gobot-firmata"
+            "github.com/hybridgroup/gobot-i2c"
           )
 
           func main() {
-              firmata := new(gobotFirmata.FirmataAdaptor)
-              firmata.Name = "firmata"
-              firmata.Port = "/dev/ttyACM0"
+            firmata := new(gobotFirmata.FirmataAdaptor)
+            firmata.Name = "firmata"
+            firmata.Port = "/dev/ttyACM0"
 
-              wiichuck := gobotI2C.NewWiichuck(firmata)
-              wiichuck.Name = "wiichuck"
+            wiichuck := gobotI2C.NewWiichuck(firmata)
+            wiichuck.Name = "wiichuck"
           ...
 
   %section.public-methods
@@ -60,45 +62,45 @@ layout: page
           package main
 
           import (
-              "fmt"
-              "github.com/hybridgroup/gobot"
-              "github.com/hybridgroup/gobot-firmata"
-              "github.com/hybridgroup/gobot-i2c"
+            "fmt"
+            "github.com/hybridgroup/gobot"
+            "github.com/hybridgroup/gobot-firmata"
+            "github.com/hybridgroup/gobot-i2c"
           )
 
           func main() {
-              firmata := new(gobotFirmata.FirmataAdaptor)
-              firmata.Name = "firmata"
-              firmata.Port = "/dev/ttyACM0"
+            firmata := new(gobotFirmata.FirmataAdaptor)
+            firmata.Name = "firmata"
+            firmata.Port = "/dev/ttyACM0"
 
-              wiichuck := gobotI2C.NewWiichuck(firmata)
-              wiichuck.Name = "wiichuck"
+            wiichuck := gobotI2C.NewWiichuck(firmata)
+            wiichuck.Name = "wiichuck"
 
-              work := func() {
-                  go func() {
-                      for {
-                          fmt.Println("joystick", gobot.On(wiichuck.Events["joystick"]))
-                      }
-                  }()
-                  go func() {
-                      for {
-                          fmt.Println("c", gobot.On(wiichuck.Events["c_button"]))
-                      }
-                  }()
-                  go func() {
-                      for {
-                          fmt.Println("z", gobot.On(wiichuck.Events["z_button"]))
-                      }
-                  }()
-              }
+            work := func() {
+              go func() {
+                for {
+                  fmt.Println("joystick", gobot.On(wiichuck.Events["joystick"]))
+                }
+              }()
+              go func() {
+                for {
+                  fmt.Println("c", gobot.On(wiichuck.Events["c_button"]))
+                }
+              }()
+              go func() {
+                for {
+                  fmt.Println("z", gobot.On(wiichuck.Events["z_button"]))
+                }
+              }()
+            }
 
-              robot := gobot.Robot{
-                  Connections: []interface{}{firmata},
-                  Devices:     []interface{}{wiichuck},
-                  Work:        work,
-              }
+            robot := gobot.Robot{
+              Connections: []interface{}{firmata},
+              Devices:     []interface{}{wiichuck},
+              Work:        work,
+            }
 
-              robot.Start()
+            robot.Start()
           }
 
   %section.circuit

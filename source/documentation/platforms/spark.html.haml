@@ -24,43 +24,44 @@ layout: page
           :::ruby
           go get -u github.com/hybridgroup/gobot-spark
     %h2 How to use
-    %p This small program lets you turn on or off a LED for every 1 sec.
+    %p This small program lets you turn on or off a LED for every 2 sec.
     %h3 Javascript  
     :markdown
           :::javascript
           package main
 
           import (
-                  "github.com/hybridgroup/gobot"
-                  "github.com/hybridgroup/gobot-spark"
-                  "github.com/hybridgroup/gobot-gpio"
+            "github.com/hybridgroup/gobot"
+            "github.com/hybridgroup/gobot-gpio"
+            "github.com/hybridgroup/gobot-spark"
           )
 
           func main() {
 
-                  spark := new(gobotSpark.SparkAdaptor)
-                  spark.Name = "spark"
-                  spark.Params = make(map[string]interface{})
-                  spark.Params["device_id"] = "55ff6f064989495346582587"
-                  spark.Params["access_token"] = "043225bc38f331d9bd965a5e9bdac40ac068d5c2"
+            spark := new(gobotSpark.SparkAdaptor)
+            spark.Name = "spark"
+            spark.Params = map[string]interface{}{
+              "device_id":    "",
+              "access_token": "",
+            }
 
-                  led := gobotGPIO.NewLed(spark)
-                  led.Name = "led"
-                  led.Pin = "D7"
+            led := gobotGPIO.NewLed(spark)
+            led.Name = "led"
+            led.Pin = "D7"
 
-                  work := func() {
-                          gobot.Every("1s", func() {
-                                  led.Toggle()
-                          })
-                  }
+            work := func() {
+              gobot.Every("2s", func() {
+                led.Toggle()
+              })
+            }
 
-                  robot := gobot.Robot{
-                          Connections: []interface{}{ spark }, 
-                          Devices:     []interface{}{ led },
-                          Work:        work,
-                  }
+            robot := gobot.Robot{
+              Connections: []gobot.Connection{spark},
+              Devices:     []gobot.Device{led},
+              Work:        work,
+            }
 
-                  robot.Start()
+            robot.Start()
           }
 
 

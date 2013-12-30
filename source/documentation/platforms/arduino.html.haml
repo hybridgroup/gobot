@@ -29,41 +29,53 @@ layout: page
           :::bash
           go get -u github.com/hybridgroup/gobot-firmata
     %h2 How to use
-    %p This small program lets you turn on and off  a LED every 1s. 
+    %p This small program lets you turn on and off a LED every 1s. 
     :markdown
           :::go
           package main
 
           import (
-                  "fmt"
-                  "github.com/hybridgroup/gobot"
-                  "github.com/hybridgroup/gobot-firmata"
-                  "github.com/hybridgroup/gobot-gpio"
+            "fmt"
+            "github.com/hybridgroup/gobot"
+            "github.com/hybridgroup/gobot-firmata"
+            "github.com/hybridgroup/gobot-gpio"
           )
 
           func main() {
 
-                  firmata := new(gobotFirmata.FirmataAdaptor)
-                  firmata.Name = "firmata"
-                  firmata.Port = "/dev/ttyACM0"
+            firmata := new(gobotFirmata.FirmataAdaptor)
+            firmata.Name = "firmata"
+            firmata.Port = "/dev/ttyACM0"
 
-                  led := gobotGPIO.NewLed(firmata)
-                  led.Name = "led"
-                  led.Pin = "13"
+            led := gobotGPIO.NewLed(firmata)
+            led.Name = "led"
+            led.Pin = "13"
 
-                  work := func() {
-                          gobot.Every("1s", func() {
-                                  led.Toggle()
-                          })
-                  }
+            connections := []interface{}{
+              firmata,
+            }
+            devices := []interface{}{
+              led,
+            }
 
-                  robot := gobot.Robot{
-                          Connections: []interface{}{firmata},
-                          Devices:     []interface{led},
-                          Work:        work,
-                  }
+            work := func() {
+              gobot.Every("1s", func() {
+                led.Toggle()
+                if led.IsOn() {
+                  fmt.Println("On")
+                } else {
+                  fmt.Println("Off")
+                }
+              })
+            }
 
-                  robot.Start()
+            robot := gobot.Robot{
+              Connections: connections,
+              Devices:     devices,
+              Work:        work,
+            }
+
+            robot.Start()
           }
 
 
