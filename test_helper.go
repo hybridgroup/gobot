@@ -30,3 +30,15 @@ func newTestAdaptor(name string) *testAdaptor {
 	a.Name = name
 	return a
 }
+
+func newTestRobot(name string) Robot {
+	return Robot{
+		Name:        name,
+		Connections: []Connection{newTestAdaptor("Connection 1"), newTestAdaptor("Connection 2"), newTestAdaptor("Connection 3")},
+		Devices:     []Device{newTestDriver("Device 1"), newTestDriver("Device 2"), newTestDriver("Device 3")},
+		Commands: map[string]interface{}{
+			"Command1": func() {},
+			"Command2": func() {},
+		},
+	}
+}

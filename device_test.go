@@ -12,10 +12,7 @@ var _ = Describe("Device", func() {
 	)
 
 	BeforeEach(func() {
-		someRobot = Robot{
-			Connections: []Connection{newTestAdaptor("Connection 1")},
-			Devices:     []Device{newTestDriver("Device 1")},
-		}
+		someRobot = newTestRobot("")
 	})
 
 	Context("when valid", func() {

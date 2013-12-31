@@ -8,31 +8,19 @@ import (
 var _ = Describe("Master", func() {
 
 	var (
-		myMaster Master
+		myMaster *Master
 	)
 
 	BeforeEach(func() {
-		myMaster = Master{
-			Robots: []Robot{
-				Robot{
-					Name:        "Robot 1",
-					Connections: []Connection{newTestAdaptor("Connection 1")},
-					Devices:     []Device{newTestDriver("Device 1")},
-				},
-				Robot{
-					Name:        "Robot 2",
-					Connections: []Connection{newTestAdaptor("Connection 2")},
-					Devices:     []Device{newTestDriver("Device 2")},
-				},
-				Robot{
-					Name:        "Robot 3",
-					Connections: []Connection{newTestAdaptor("Connection 3")},
-					Devices:     []Device{newTestDriver("Device 3")},
-				},
-			},
+		myMaster = GobotMaster()
+		myMaster.Robots = []Robot{
+			newTestRobot("Robot 1"),
+			newTestRobot("Robot 2"),
+			newTestRobot("Robot 3"),
 		}
-		myMaster.Robots[0].initDevices()
-		myMaster.Robots[0].initConnections()
+		for s := range myMaster.Robots {
+			myMaster.Robots[s].startRobot()
+		}
 	})
 
 	Context("when valid", func() {
