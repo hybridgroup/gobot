@@ -1,7 +1,7 @@
 package gobot
 
 import (
-	"fmt"
+	"log"
 )
 
 type connection struct {
@@ -34,22 +34,22 @@ func NewConnection(adaptor AdaptorInterface, r *Robot) *connection {
 }
 
 func (c *connection) Connect() bool {
-	fmt.Println("Connecting to " + c.Name + " on port " + c.Port + "...")
+	log.Println("Connecting to " + c.Name + " on port " + c.Port + "...")
 	return c.Adaptor.Connect()
 }
 
 func (c *connection) Disconnect() bool {
-	fmt.Println("Disconnecting " + c.Name + "...")
+	log.Println("Disconnecting " + c.Name + "...")
 	return c.Adaptor.Disconnect()
 }
 
 func (c *connection) Finalize() bool {
-	fmt.Println("Finalizing " + c.Name + "...")
+	log.Println("Finalizing " + c.Name + "...")
 	return c.Adaptor.Finalize()
 }
 
 func (c *connection) Reconnect() bool {
-	fmt.Println("Reconnecting to " + c.Name + " on port " + c.Port + "...")
+	log.Println("Reconnecting to " + c.Name + " on port " + c.Port + "...")
 	return c.Adaptor.Reconnect()
 }
 

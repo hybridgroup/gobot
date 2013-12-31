@@ -2,6 +2,7 @@ package gobot
 
 import (
 	"fmt"
+	"log"
 	"math/rand"
 	"time"
 )
@@ -55,27 +56,27 @@ func (r *Robot) initCommands() {
 
 func (r *Robot) initConnections() {
 	r.connections = make([]*connection, len(r.Connections))
-	fmt.Println("Initializing connections...")
+	log.Println("Initializing connections...")
 	for i := range r.Connections {
-		fmt.Sprintln("Initializing connection %v...", FieldByNamePtr(r.Connections[i], "Name"))
+		log.Println("Initializing connection ", FieldByNamePtr(r.Connections[i], "Name"), "...")
 		r.connections[i] = NewConnection(r.Connections[i], r)
 	}
 }
 
 func (r *Robot) initDevices() {
 	r.devices = make([]*device, len(r.Devices))
-	fmt.Println("Initializing devices...")
+	log.Println("Initializing devices...")
 	for i := range r.Devices {
-		fmt.Sprintln("Initializing device %v...", FieldByNamePtr(r.Devices[i], "Name"))
+		log.Println("Initializing device ", FieldByNamePtr(r.Devices[i], "Name"), "...")
 		r.devices[i] = NewDevice(r.Devices[i], r)
 	}
 }
 
 func (r *Robot) startConnections() bool {
-	fmt.Println("Starting connections...")
+	log.Println("Starting connections...")
 	success := true
 	for i := range r.connections {
-		fmt.Println("Starting connection " + r.connections[i].Name + "...")
+		log.Println("Starting connection " + r.connections[i].Name + "...")
 		if r.connections[i].Connect() == false {
 			success = false
 			break
@@ -85,10 +86,10 @@ func (r *Robot) startConnections() bool {
 }
 
 func (r *Robot) startDevices() bool {
-	fmt.Println("Starting devices...")
+	log.Println("Starting devices...")
 	success := true
 	for i := range r.devices {
-		fmt.Println("Starting device " + r.devices[i].Name + "...")
+		log.Println("Starting device " + r.devices[i].Name + "...")
 		if r.devices[i].Start() == false {
 			success = false
 			break

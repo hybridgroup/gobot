@@ -1,7 +1,7 @@
 package gobot
 
 import (
-	"fmt"
+	"log"
 )
 
 type device struct {
@@ -27,7 +27,7 @@ func NewDevice(driver DriverInterface, r *Robot) *device {
 }
 
 func (d *device) Start() bool {
-	fmt.Println("Device " + d.Name + " started")
+	log.Println("Device " + d.Name + " started")
 	return d.Driver.Start()
 }
 
