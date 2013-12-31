@@ -97,6 +97,12 @@ func (r *Robot) startDevices() bool {
 	return success
 }
 
+func (r *Robot) finalizeConnections() {
+	for i := range r.connections {
+		r.connections[i].Finalize()
+	}
+}
+
 func (r *Robot) GetDevices() []*device {
 	return r.devices
 }

@@ -39,14 +39,17 @@ func (c *connection) Connect() bool {
 }
 
 func (c *connection) Disconnect() bool {
+	fmt.Println("Disconnecting " + c.Name + "...")
 	return c.Adaptor.Disconnect()
 }
 
 func (c *connection) Finalize() bool {
+	fmt.Println("Finalizing " + c.Name + "...")
 	return c.Adaptor.Finalize()
 }
 
 func (c *connection) Reconnect() bool {
+	fmt.Println("Reconnecting to " + c.Name + " on port " + c.Port + "...")
 	return c.Adaptor.Reconnect()
 }
 

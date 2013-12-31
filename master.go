@@ -1,6 +1,10 @@
 package gobot
 
-import "runtime"
+import (
+	"os"
+	"os/signal"
+	"runtime"
+)
 
 type Master struct {
 	Robots []Robot
@@ -15,10 +19,20 @@ func GobotMaster() *Master {
 
 func (m *Master) Start() {
 	runtime.GOMAXPROCS(m.NumCPU)
+
 	for s := range m.Robots {
 		go m.Robots[s].startRobot()
 	}
-	select {}
+
+	c := make(chan os.Signal)
+	signal.Notify(c, os.Interrupt)
+
+	for _ = range c {
+		for r := range m.Robots {
+			m.Robots[r].finalizeConnections()
+		}
+		break
+	}
 }
 
 func (m *Master) FindRobot(name string) *Robot {
