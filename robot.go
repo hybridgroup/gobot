@@ -28,8 +28,12 @@ func (r *Robot) startRobot() {
 	r.initCommands()
 	r.initConnections()
 	r.initDevices()
-	r.startConnections()
-	r.startDevices()
+	if r.startConnections() != true {
+		panic("Could not start connections")
+	}
+	if r.startDevices() != true {
+		panic("Could not start devices")
+	}
 	if r.Work != nil {
 		r.Work()
 	}
@@ -67,20 +71,30 @@ func (r *Robot) initDevices() {
 	}
 }
 
-func (r *Robot) startConnections() {
+func (r *Robot) startConnections() bool {
 	fmt.Println("Starting connections...")
+	success := true
 	for i := range r.connections {
 		fmt.Println("Starting connection " + r.connections[i].Name + "...")
-		r.connections[i].Connect()
+		if r.connections[i].Connect() == false {
+			success = false
+			break
+		}
 	}
+	return success
 }
 
-func (r *Robot) startDevices() {
+func (r *Robot) startDevices() bool {
 	fmt.Println("Starting devices...")
+	success := true
 	for i := range r.devices {
 		fmt.Println("Starting device " + r.devices[i].Name + "...")
-		r.devices[i].Start()
+		if r.devices[i].Start() == false {
+			success = false
+			break
+		}
 	}
+	return success
 }
 
 func (r *Robot) GetDevices() []*device {

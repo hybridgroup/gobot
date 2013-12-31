@@ -28,8 +28,7 @@ func NewDevice(driver DriverInterface, r *Robot) *device {
 
 func (d *device) Start() bool {
 	fmt.Println("Device " + d.Name + " started")
-	d.Driver.Start()
-	return true
+	return d.Driver.Start()
 }
 
 func (d *device) Commands() interface{} {

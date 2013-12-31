@@ -13,7 +13,11 @@ var _ = Describe("Robot", func() {
 
 	BeforeEach(func() {
 		someRobot = Robot{
-			Work: func() {
+			Connections: []Connection{newTestAdaptor("Connection 1"), newTestAdaptor("Connection 2"), newTestAdaptor("Connection 3")},
+			Devices:     []Device{newTestDriver("Device 1"), newTestDriver("Device 2"), newTestDriver("Device 3")},
+			Commands: map[string]interface{}{
+				"Command1": func() {},
+				"Command2": func() {},
 			},
 		}
 	})
@@ -29,26 +33,33 @@ var _ = Describe("Robot", func() {
 			Expect(someRobot.Name).NotTo(BeNil())
 			Expect(someRobot.Name).NotTo(Equal("Bumblebee"))
 		})
-		PIt("should Start", func() {
-			Expect(true)
+		It("initCommands should set RobotCommands equal to Commands Key", func() {
+			someRobot.initCommands()
+			Expect(someRobot.RobotCommands).To(Equal([]string{"Command1", "Command2"}))
 		})
-		PIt("should initConnections", func() {
-			Expect(true)
+		It("GetDevices should return robot devices", func() {
+			someRobot.initDevices()
+			Expect(someRobot.GetDevices).NotTo(BeNil())
 		})
-		PIt("should initDevices", func() {
-			Expect(true)
+		It("GetDevice should return a robot device", func() {
+			someRobot.initDevices()
+			Expect(someRobot.GetDevice("Device 1").Name).To(Equal("Device 1"))
 		})
-		PIt("should startConnections", func() {
-			Expect(true)
+		It("initConnections should initialize connections", func() {
+			someRobot.initConnections()
+			Expect(len(someRobot.connections)).To(Equal(3))
 		})
-		PIt("should startDevices", func() {
-			Expect(true)
+		It("initDevices should initialize devices", func() {
+			someRobot.initDevices()
+			Expect(len(someRobot.devices)).To(Equal(3))
 		})
-		PIt("should GetDevices", func() {
-			Expect(true)
+		It("startConnections should connect all connections", func() {
+			someRobot.initConnections()
+			Expect(someRobot.startConnections()).To(Equal(true))
 		})
-		PIt("should GetDevice", func() {
-			Expect(true)
+		It("startDevices should start all devices", func() {
+			someRobot.initDevices()
+			Expect(someRobot.startDevices()).To(Equal(true))
 		})
 	})
 })
