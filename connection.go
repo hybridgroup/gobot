@@ -52,7 +52,3 @@ func (c *connection) Reconnect() bool {
 	log.Println("Reconnecting to " + c.Name + " on port " + c.Port + "...")
 	return c.Adaptor.Reconnect()
 }
-
-func (c *connection) AdaptorName() string {
-	return c.Name
-}
