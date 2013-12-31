@@ -31,6 +31,21 @@ func After(t string, f func()) {
 	}()
 }
 
+func Publish(c chan interface{}, val interface{}) {
+	select {
+	case c <- val:
+	default:
+	}
+}
+
+func On(c chan interface{}, f func(s interface{})) {
+	go func() {
+		for s := range c {
+			f(s)
+		}
+	}()
+}
+
 func parseDuration(t string) time.Duration {
 	dur, err := time.ParseDuration(t)
 	if err != nil {
@@ -42,14 +57,6 @@ func parseDuration(t string) time.Duration {
 func Rand(max int) int {
 	rand.Seed(time.Now().UTC().UnixNano())
 	return rand.Intn(max)
-}
-
-func On(cs chan interface{}, f func(s interface{})) {
-	go func() {
-		for s := range cs {
-			f(s)
-		}
-	}()
 }
 
 func ConnectToTcp(port string) io.ReadWriteCloser {
