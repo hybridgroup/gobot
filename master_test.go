@@ -28,10 +28,10 @@ var _ = Describe("Master", func() {
 			Expect(myMaster.FindRobot("Robot 1").Name).To(Equal("Robot 1"))
 		})
 		It("should Find the specific robot device", func() {
-			Expect(myMaster.FindRobotDevice("Robot 1", "Device 1").Name).To(Equal("Device 1"))
+			Expect(myMaster.FindRobotDevice("Robot 2", "Device 2").Name).To(Equal("Device 2"))
 		})
 		It("should Find the specific robot connection", func() {
-			Expect(myMaster.FindRobotConnection("Robot 1", "Connection 1").Name).To(Equal("Connection 1"))
+			Expect(myMaster.FindRobotConnection("Robot 3", "Connection 1").Name).To(Equal("Connection 1"))
 		})
 	})
 })

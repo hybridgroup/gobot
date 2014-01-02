@@ -57,27 +57,27 @@ func (r *Robot) initCommands() {
 func (r *Robot) initConnections() {
 	r.connections = make([]*connection, len(r.Connections))
 	log.Println("Initializing connections...")
-	for i := range r.Connections {
-		log.Println("Initializing connection ", FieldByNamePtr(r.Connections[i], "Name"), "...")
-		r.connections[i] = NewConnection(r.Connections[i], r)
+	for i, connection := range r.Connections {
+		log.Println("Initializing connection ", FieldByNamePtr(connection, "Name"), "...")
+		r.connections[i] = NewConnection(connection, r)
 	}
 }
 
 func (r *Robot) initDevices() {
 	r.devices = make([]*device, len(r.Devices))
 	log.Println("Initializing devices...")
-	for i := range r.Devices {
-		log.Println("Initializing device ", FieldByNamePtr(r.Devices[i], "Name"), "...")
-		r.devices[i] = NewDevice(r.Devices[i], r)
+	for i, device := range r.Devices {
+		log.Println("Initializing device ", FieldByNamePtr(device, "Name"), "...")
+		r.devices[i] = NewDevice(device, r)
 	}
 }
 
 func (r *Robot) startConnections() bool {
 	log.Println("Starting connections...")
 	success := true
-	for i := range r.connections {
-		log.Println("Starting connection " + r.connections[i].Name + "...")
-		if r.connections[i].Connect() == false {
+	for _, connection := range r.connections {
+		log.Println("Starting connection " + connection.Name + "...")
+		if connection.Connect() == false {
 			success = false
 			break
 		}
@@ -88,9 +88,9 @@ func (r *Robot) startConnections() bool {
 func (r *Robot) startDevices() bool {
 	log.Println("Starting devices...")
 	success := true
-	for i := range r.devices {
-		log.Println("Starting device " + r.devices[i].Name + "...")
-		if r.devices[i].Start() == false {
+	for _, device := range r.devices {
+		log.Println("Starting device " + device.Name + "...")
+		if device.Start() == false {
 			success = false
 			break
 		}
@@ -99,8 +99,8 @@ func (r *Robot) startDevices() bool {
 }
 
 func (r *Robot) finalizeConnections() {
-	for i := range r.connections {
-		r.connections[i].Finalize()
+	for _, connection := range r.connections {
+		connection.Finalize()
 	}
 }
 
@@ -109,9 +109,22 @@ func (r *Robot) GetDevices() []*device {
 }
 
 func (r *Robot) GetDevice(name string) *device {
-	for i := range r.devices {
-		if r.devices[i].Name == name {
-			return r.devices[i]
+	for _, device := range r.devices {
+		if device.Name == name {
+			return device
+		}
+	}
+	return nil
+}
+
+func (r *Robot) GetConnections() []*connection {
+	return r.connections
+}
+
+func (r *Robot) GetConnection(name string) *connection {
+	for _, connection := range r.connections {
+		if connection.Name == name {
+			return connection
 		}
 	}
 	return nil

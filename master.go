@@ -21,7 +21,7 @@ func (m *Master) Start() {
 	runtime.GOMAXPROCS(m.NumCPU)
 
 	for s := range m.Robots {
-		go m.Robots[s].startRobot()
+		m.Robots[s].startRobot()
 	}
 
 	c := make(chan os.Signal)
@@ -36,36 +36,26 @@ func (m *Master) Start() {
 }
 
 func (m *Master) FindRobot(name string) *Robot {
-	for s := range m.Robots {
-		if m.Robots[s].Name == name {
-			return &m.Robots[s]
+	for _, robot := range m.Robots {
+		if robot.Name == name {
+			return &robot
 		}
 	}
 	return nil
 }
 
 func (m *Master) FindRobotDevice(name string, device string) *device {
-	for r := range m.Robots {
-		if m.Robots[r].Name == name {
-			for d := range m.Robots[r].devices {
-				if m.Robots[r].devices[d].Name == device {
-					return m.Robots[r].devices[d]
-				}
-			}
-		}
+	robot := m.FindRobot(name)
+	if robot != nil {
+		return robot.GetDevice(device)
 	}
 	return nil
 }
 
 func (m *Master) FindRobotConnection(name string, connection string) *connection {
-	for r := range m.Robots {
-		if m.Robots[r].Name == name {
-			for c := range m.Robots[r].connections {
-				if m.Robots[r].connections[c].Name == connection {
-					return m.Robots[r].connections[c]
-				}
-			}
-		}
+	robot := m.FindRobot(name)
+	if robot != nil {
+		return robot.GetConnection(connection)
 	}
 	return nil
 }
