@@ -95,32 +95,25 @@
 
   spheroAdaptor := <span class="predefined">new</span>(gobotSphero.SpheroAdaptor)
   spheroAdaptor.Name = <span class="string"><span class="delimiter">"</span><span class="content">Sphero</span><span class="delimiter">"</span></span>
-  spheroAdaptor.Port = <span class="string"><span class="delimiter">"</span><span class="content">127.0.0.1:4560</span><span class="delimiter">"</span></span>
+  spheroAdaptor.Port = <span class="string"><span class="delimiter">"</span><span class="content">/dev/rfcomm0</span><span class="delimiter">"</span></span>
 
   sphero := gobotSphero.NewSphero(spheroAdaptor)
   sphero.Name = <span class="string"><span class="delimiter">"</span><span class="content">Sphero</span><span class="delimiter">"</span></span>
 
-  connections := []<span class="keyword">interface</span>{}{
-    spheroAdaptor,
-  }
-  devices := []<span class="keyword">interface</span>{}{
-    sphero,
-  }
-
   work := <span class="keyword">func</span>() {
     gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">2s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() {
-      sphero.Roll(<span class="integer">100</span>, <span class="predefined-type">uint16</span>(gobot.Random(<span class="integer">0</span>, <span class="integer">360</span>)))
+      sphero.Roll(<span class="integer">100</span>, <span class="predefined-type">uint16</span>(gobot.Rand(<span class="integer">360</span>)))
     })
   }
 
   robot := gobot.Robot{
-    Connections: connections,
-    Devices:     devices,
+    Connections: []<span class="keyword">interface</span>{} { spheroAdaptor },
+    Devices:     []<span class="keyword">interface</span>{} { sphero },
     Work:        work,
   }
 
   robot.Start()
-}  
+} 
 </pre>
               <h2>Hardware Support</h2>
               <p>
@@ -171,6 +164,17 @@
                   </ul>
 </li>
               </ul>
+<p>Support for devices that use Inter-Integrated Circuit (I2C) have a shared set of drivers provded using the gobot-i2c module:</p>
+              <ul>
+<li>
+                  <a target="_blank" href="https://en.wikipedia.org/wiki/I%C2%B2C">I2C</a>
+                  &lt;==&gt;
+                  <a target="_blank" href="https://github.com/hybridgroup/gobot-i2c">Drivers</a>
+                  <ul>
+<li>Wii Nunchuck Controller</li>
+                  </ul>
+</li>
+              </ul>
 <p>More platforms and drivers are coming soon...</p>
               <h2>Getting Started</h2>
               <p>Install the library with: <code>go get -u github.com/hybridgroup/gobot</code></p>
@@ -209,7 +213,7 @@ gobot.Api(master)
     </div>
     <footer class="app-footer"><div class="w">
         <div class="copyright">
-          © Copyright 2012-2013
+          © Copyright 2012-2014
           <a href="http://hybridgroup.com">The Hybrid Group.</a>
         </div>
       </div>

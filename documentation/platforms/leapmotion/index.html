@@ -54,40 +54,36 @@
                 <pre class="CodeRay">go get -u github.com/hybridgroup/gobot-leapmotion
 </pre>
                 <h2>How to use</h2>
-                <p>
-                  This small program uses a Leap Motion Adaptor.
-                </p>
+                <p>This small program uses a Leap Motion Adaptor.</p>
                 <pre class="CodeRay"><span class="keyword">package</span> main
 
 <span class="keyword">import</span> (
-        <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
-        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
-        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-leapmotion</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-leapmotion</span><span class="delimiter">"</span></span>
 )
 
 <span class="keyword">func</span> main() {
-        leapAdaptor := <span class="predefined">new</span>(gobotLeap.LeapAdaptor)
-        leapAdaptor.Name = <span class="string"><span class="delimiter">"</span><span class="content">leap</span><span class="delimiter">"</span></span>
-        leapAdaptor.Port = <span class="string"><span class="delimiter">"</span><span class="content">127.0.0.1:6437</span><span class="delimiter">"</span></span>
+  leapAdaptor := <span class="predefined">new</span>(gobotLeap.LeapAdaptor)
+  leapAdaptor.Name = <span class="string"><span class="delimiter">"</span><span class="content">leap</span><span class="delimiter">"</span></span>
+  leapAdaptor.Port = <span class="string"><span class="delimiter">"</span><span class="content">127.0.0.1:6437</span><span class="delimiter">"</span></span>
 
-        leap := gobotLeap.NewLeap(leapAdaptor)
-        leap.Name = <span class="string"><span class="delimiter">"</span><span class="content">leap</span><span class="delimiter">"</span></span>
+  leap := gobotLeap.NewLeap(leapAdaptor)
+  leap.Name = <span class="string"><span class="delimiter">"</span><span class="content">leap</span><span class="delimiter">"</span></span>
 
-        work := <span class="keyword">func</span>() {
-                <span class="keyword">go</span> <span class="keyword">func</span>() {
-                        <span class="keyword">for</span> {
-                                fmt.Println(gobot.On(leap.Events[<span class="string"><span class="delimiter">"</span><span class="content">Message</span><span class="delimiter">"</span></span>]))
-                        }
-                }()
-        }
+  work := <span class="keyword">func</span>() {
+    gobot.On(leap.Events[<span class="string"><span class="delimiter">"</span><span class="content">Message</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+      fmt.Println(data)
+    })
+  }
 
-        robot := gobot.Robot{
-                Connections: []<span class="keyword">interface</span>{}{ leapAdaptor },
-                Devices:     []<span class="keyword">interface</span>{}{ leap }, 
-                Work:        work,
-        }
+  robot := gobot.Robot{
+    Connections: []gobot.Connection{leapAdaptor},
+    Devices:     []gobot.Device{leap},
+    Work:        work,
+  }
 
-        robot.Start()
+  robot.Start()
 }
 </pre>
                 <h2>How to connect</h2>
@@ -131,7 +127,7 @@
     </div>
     <footer class="app-footer"><div class="w">
         <div class="copyright">
-          © Copyright 2012-2013
+          © Copyright 2012-2014
           <a href="http://hybridgroup.com">The Hybrid Group.</a>
         </div>
       </div>

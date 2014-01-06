@@ -66,7 +66,6 @@
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-digispark</span><span class="delimiter">"</span></span>
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
-  <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
 )
 
 func main() {
@@ -74,34 +73,20 @@ func main() {
   <span class="key">digispark</span> := <span class="keyword">new</span>(gobotDigispark.DigisparkAdaptor)
   digispark.Name = <span class="string"><span class="delimiter">"</span><span class="content">Digispark</span><span class="delimiter">"</span></span>
 
-  led := gobotGPIO.NewLed(&amp;digispark)
-  led.Driver = gobot.Driver{
-    <span class="key">Name</span>: <span class="string"><span class="delimiter">"</span><span class="content">led</span><span class="delimiter">"</span></span>,
-    <span class="key">Pin</span>: <span class="string"><span class="delimiter">"</span><span class="content">2</span><span class="delimiter">"</span></span>,
-  }
+  led := gobotGPIO.NewLed(digispark)
+  led.Name = <span class="string"><span class="delimiter">"</span><span class="content">led</span><span class="delimiter">"</span></span>
+  led.Pin = <span class="string"><span class="delimiter">"</span><span class="content">2</span><span class="delimiter">"</span></span>
 
-  connections := []<span class="reserved">interface</span>{} {
-    digispark,
-  }
-  devices := []<span class="reserved">interface</span>{} {
-    led,
-  }
-
-  work := func(){
-    gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">0.5s</span><span class="delimiter">"</span></span>, func(){ 
-      led.Toggle() 
-      <span class="keyword">if</span> led.IsOn() {
-        fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">On</span><span class="delimiter">"</span></span>)
-      } <span class="keyword">else</span> {
-        fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">Off</span><span class="delimiter">"</span></span>)
-      }
+  work := func() {
+    gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">0.5s</span><span class="delimiter">"</span></span>, func() {
+      led.Toggle()
     })
   }
-  
+
   robot := gobot.Robot{
-      <span class="key">Connections</span>: connections, 
-      <span class="key">Devices</span>: devices,
-      <span class="key">Work</span>: work,
+    <span class="key">Connections</span>: []<span class="reserved">interface</span>{}{digispark},
+    <span class="key">Devices</span>:     []<span class="reserved">interface</span>{}{led},
+    <span class="key">Work</span>:        work,
   }
 
   robot.Start()
@@ -161,7 +146,7 @@ func main() {
     </div>
     <footer class="app-footer"><div class="w">
         <div class="copyright">
-          © Copyright 2012-2013
+          © Copyright 2012-2014
           <a href="http://hybridgroup.com">The Hybrid Group.</a>
         </div>
       </div>

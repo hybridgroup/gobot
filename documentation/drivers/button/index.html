@@ -42,33 +42,35 @@
                   Simple interface that makes it possible to register clicks through physical input.
                 </p>
               </section><section class="how_to"><h2>How to establish a connection and setup the driver</h2>
+                <p>Install the library with: <code>go get -u github.com/hybridgroup/gobot-gpio</code></p>
                 <h3>For Spark:</h3>
-                <pre class="CodeRay">package main
+                <pre class="CodeRay"><span class="keyword">package</span> main
 
-import (
-        "fmt"
-        "github.com/hybridgroup/gobot"
-        "github.com/hybridgroup/gobot-gpio"
-        "github.com/hybridgroup/gobot-spark"
+<span class="keyword">import</span> (
+  <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-spark</span><span class="delimiter">"</span></span>
 )
 
-func main() {
+<span class="keyword">func</span> main() {
 
-        spark := new(gobotSpark.SparkAdaptor)
-        spark.Name = "spark"
-        spark.Params = map[string]interface{}{
-                "device_id":    "",
-                "access_token": "",
-        }
+  spark := <span class="predefined">new</span>(gobotSpark.SparkAdaptor)
+  spark.Name = <span class="string"><span class="delimiter">"</span><span class="content">spark</span><span class="delimiter">"</span></span>
+  spark.Params = <span class="keyword">map</span>[<span class="predefined-type">string</span>]<span class="keyword">interface</span>{}{
+    <span class="string"><span class="delimiter">"</span><span class="content">device_id</span><span class="delimiter">"</span></span>:    <span class="string"><span class="delimiter">"</span><span class="delimiter">"</span></span>,
+    <span class="string"><span class="delimiter">"</span><span class="content">access_token</span><span class="delimiter">"</span></span>: <span class="string"><span class="delimiter">"</span><span class="delimiter">"</span></span>,
+  }
 
-        button := gobotGPIO.NewButton(spark)
-        button.Name = "button"
-        button.Pin = "D5"
-        button.Interval = "2s"
+  button := gobotGPIO.NewButton(spark)
+  button.Name = <span class="string"><span class="delimiter">"</span><span class="content">button</span><span class="delimiter">"</span></span>
+  button.Pin = <span class="string"><span class="delimiter">"</span><span class="content">D5</span><span class="delimiter">"</span></span>
+  button.Interval = <span class="string"><span class="delimiter">"</span><span class="content">2s</span><span class="delimiter">"</span></span>
 
-        led := gobotGPIO.NewLed(spark)
-        led.Name = "led"
-        led.Pin = "D7"
+  led := gobotGPIO.NewLed(spark)
+  led.Name = <span class="string"><span class="delimiter">"</span><span class="content">led</span><span class="delimiter">"</span></span>
+  led.Pin = <span class="string"><span class="delimiter">"</span><span class="content">D7</span><span class="delimiter">"</span></span>
+...
 </pre>
               </section><section class="public-methods"></section><section class="public-events"><h2>Events:</h2>
                 <dl class="methods">
@@ -86,61 +88,50 @@ func main() {
                   <dd>Sent when the device has been started and is ready to use.</dd>
                 </dl></section><section class="how-to"><h2>How to use</h2>
                 <p>This example detects when a button has been pushed, it turns on and off a LED</p>
-                <pre class="CodeRay">package main
+                <pre class="CodeRay"><span class="keyword">package</span> main
 
-import (
-        "fmt"
-        "github.com/hybridgroup/gobot"
-        "github.com/hybridgroup/gobot-gpio"
-        "github.com/hybridgroup/gobot-spark"
+<span class="keyword">import</span> (
+  <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-spark</span><span class="delimiter">"</span></span>
 )
 
-func main() {
+<span class="keyword">func</span> main() {
 
-        spark := new(gobotSpark.SparkAdaptor)
-        spark.Name = "spark"
-        spark.Params = map[string]interface{}{
-                "device_id":    "",
-                "access_token": "",
-        }
+  spark := <span class="predefined">new</span>(gobotSpark.SparkAdaptor)
+  spark.Name = <span class="string"><span class="delimiter">"</span><span class="content">spark</span><span class="delimiter">"</span></span>
+  spark.Params = <span class="keyword">map</span>[<span class="predefined-type">string</span>]<span class="keyword">interface</span>{}{
+    <span class="string"><span class="delimiter">"</span><span class="content">device_id</span><span class="delimiter">"</span></span>:    <span class="string"><span class="delimiter">"</span><span class="delimiter">"</span></span>,
+    <span class="string"><span class="delimiter">"</span><span class="content">access_token</span><span class="delimiter">"</span></span>: <span class="string"><span class="delimiter">"</span><span class="delimiter">"</span></span>,
+  }
 
-        button := gobotGPIO.NewButton(spark)
-        button.Name = "button"
-        button.Pin = "D5"
-        button.Interval = "2s"
+  button := gobotGPIO.NewButton(spark)
+  button.Name = <span class="string"><span class="delimiter">"</span><span class="content">button</span><span class="delimiter">"</span></span>
+  button.Pin = <span class="string"><span class="delimiter">"</span><span class="content">D5</span><span class="delimiter">"</span></span>
+  button.Interval = <span class="string"><span class="delimiter">"</span><span class="content">2s</span><span class="delimiter">"</span></span>
 
-        led := gobotGPIO.NewLed(spark)
-        led.Name = "led"
-        led.Pin = "D7"
+  led := gobotGPIO.NewLed(spark)
+  led.Name = <span class="string"><span class="delimiter">"</span><span class="content">led</span><span class="delimiter">"</span></span>
+  led.Pin = <span class="string"><span class="delimiter">"</span><span class="content">D7</span><span class="delimiter">"</span></span>
 
-        work := func() {
-                led.Off()
-                go func() {
-                        for {
-                                fmt.Println("update", gobot.On(button.Events["update"]))
-                        }
-                }()
-                go func() {
-                        for {
-                                fmt.Println("push", gobot.On(button.Events["push"]))
-                                led.On()
-                        }
-                }()
-                go func() {
-                        for {
-                                fmt.Println("release", gobot.On(button.Events["release"]))
-                                led.Off()
-                        }
-                }()
-        }
+  work := <span class="keyword">func</span>() {
+    gobot.On(button.Events[<span class="string"><span class="delimiter">"</span><span class="content">push</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+      led.On()
+    })
 
-        robot := gobot.Robot{
-                Connections: []interface{}{spark},
-                Devices:     []interface{}{button, led},
-                Work:        work,
-        }
+    gobot.On(button.Events[<span class="string"><span class="delimiter">"</span><span class="content">release</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+      led.Off()
+    })
+  }
 
-        robot.Start()
+  robot := gobot.Robot{
+    Connections: []gobot.Connection{spark},
+    Devices:     []gobot.Device{button, led},
+    Work:        work,
+  }
+
+  robot.Start()
 }
 </pre>
               </section><section class="circuit"><h2>Circuit and Schematic</h2>
@@ -164,7 +155,7 @@ func main() {
     </div>
     <footer class="app-footer"><div class="w">
         <div class="copyright">
-          © Copyright 2012-2013
+          © Copyright 2012-2014
           <a href="http://hybridgroup.com">The Hybrid Group.</a>
         </div>
       </div>

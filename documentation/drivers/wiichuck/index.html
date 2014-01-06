@@ -7,7 +7,7 @@
 <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
 <meta name="description">
 <meta content="The Hybrid Group" name="author">
-<title>Cylon.js - Wii Nunchuck Driver</title>
+<title>Gobot - Wii Nunchuck Driver</title>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><!-- %link{href: "http://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,500,700", rel: "stylesheet", type: "text/css"}/ --><link href="//fonts.googleapis.com/css?family=Inconsolata:400,700%7CMontserrat:700" rel="stylesheet">
 <link href="/stylesheets/style.css" rel="stylesheet">
 <link href="/favicon.ico" rel="shortcut icon" type="image/gif">
@@ -42,28 +42,78 @@
                   Allows user to use a Nintendo Wii Nunchuck controller via i2c interface
                 </p>
               </section><section class="how-to"><h2>How to establish a connection and setup the driver</h2>
+                <p>Install the library with: <code>go get -u github.com/hybridgroup/gobot-i2c</code></p>
                 <h3>For Arduino:</h3>
-                <pre class="CodeRay">comming soon
+                <pre class="CodeRay"><span class="keyword">package</span> main
+
+<span class="keyword">import</span> (
+  <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-firmata</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-i2c</span><span class="delimiter">"</span></span>
+)
+
+<span class="keyword">func</span> main() {
+  firmata := <span class="predefined">new</span>(gobotFirmata.FirmataAdaptor)
+  firmata.Name = <span class="string"><span class="delimiter">"</span><span class="content">firmata</span><span class="delimiter">"</span></span>
+  firmata.Port = <span class="string"><span class="delimiter">"</span><span class="content">/dev/ttyACM0</span><span class="delimiter">"</span></span>
+
+  wiichuck := gobotI2C.NewWiichuck(firmata)
+  wiichuck.Name = <span class="string"><span class="delimiter">"</span><span class="content">wiichuck</span><span class="delimiter">"</span></span>
+...
 </pre>
-              </section><section class="public-methods"><h2>Public driver events</h2>
-                <h3>c_button</h3>
-                <p>
-                  Get's triggered every interval amount of time if the square button is pressed.
-                </p>
-                <h3>z_button</h3>
-                <p>
-                  Get's triggered every interval amount of time if the square button is pressed.
-                </p>
-                <h3>joystick</h3>
-                <p>
-                  Get's triggered every "interval" amount of time if a joystick event occured, you can access values x, y.
-                </p>
-                <h3>How to use events and call them on your drivers</h3>
-                <p>Pretty simple, when the connection and the driver have been setup (as explained above) you can call events on them as follows:</p>
-                <pre class="CodeRay">comming soon
-</pre>
-              </section><section class="how_to"><h2>Example using a Nintendo Wii Nunchuck.</h2>
-                <pre class="CodeRay">comming soon
+              </section><section class="public-methods"><h2>Events</h2>
+                <dl class="methods">
+<dt>c_button</dt>
+                  <dd>Get's triggered every interval amount of time if the square button is pressed.</dd>
+                  <dt>z_button</dt>
+                  <dd>Get's triggered every interval amount of time if the square button is pressed.</dd>
+                  <dt>joystick</dt>
+                  <dd>Get's triggered every "interval" amount of time if a joystick event occured, you can access values x, y.</dd>
+                </dl></section><section class="how_to"><h2>Example using a Nintendo Wii Nunchuck.</h2>
+                <pre class="CodeRay"><span class="keyword">package</span> main
+
+<span class="keyword">import</span> (
+  <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-firmata</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-i2c</span><span class="delimiter">"</span></span>
+)
+
+<span class="keyword">func</span> main() {
+  firmata := <span class="predefined">new</span>(gobotFirmata.FirmataAdaptor)
+  firmata.Name = <span class="string"><span class="delimiter">"</span><span class="content">firmata</span><span class="delimiter">"</span></span>
+  firmata.Port = <span class="string"><span class="delimiter">"</span><span class="content">/dev/ttyACM0</span><span class="delimiter">"</span></span>
+
+  wiichuck := gobotI2C.NewWiichuck(firmata)
+  wiichuck.Name = <span class="string"><span class="delimiter">"</span><span class="content">wiichuck</span><span class="delimiter">"</span></span>
+
+  work := <span class="keyword">func</span>() {
+    <span class="keyword">go</span> <span class="keyword">func</span>() {
+      <span class="keyword">for</span> {
+        fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">joystick</span><span class="delimiter">"</span></span>, gobot.On(wiichuck.Events[<span class="string"><span class="delimiter">"</span><span class="content">joystick</span><span class="delimiter">"</span></span>]))
+      }
+    }()
+    <span class="keyword">go</span> <span class="keyword">func</span>() {
+      <span class="keyword">for</span> {
+        fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">c</span><span class="delimiter">"</span></span>, gobot.On(wiichuck.Events[<span class="string"><span class="delimiter">"</span><span class="content">c_button</span><span class="delimiter">"</span></span>]))
+      }
+    }()
+    <span class="keyword">go</span> <span class="keyword">func</span>() {
+      <span class="keyword">for</span> {
+        fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">z</span><span class="delimiter">"</span></span>, gobot.On(wiichuck.Events[<span class="string"><span class="delimiter">"</span><span class="content">z_button</span><span class="delimiter">"</span></span>]))
+      }
+    }()
+  }
+
+  robot := gobot.Robot{
+    Connections: []<span class="keyword">interface</span>{}{firmata},
+    Devices:     []<span class="keyword">interface</span>{}{wiichuck},
+    Work:        work,
+  }
+
+  robot.Start()
+}
 </pre>
               </section><section class="circuit"><h2>Circuit and Schematic</h2>
                 <p>
@@ -73,8 +123,10 @@
                 <div class="devices">
                   <a class="device" href="/documentation/platforms/arduino" title="Arduino">
                     <img src="/images/arduino.jpg"></a>
-                  
-                  
+                  <a class="device" href="/documentation/platforms/beaglebone" title="BeagleBone">
+                    <img src="/images/beaglebone.jpg"></a>
+                  <a class="device" href="/documentation/platforms/digispark" title="Digispark">
+                    <img src="/images/digispark.jpg"></a>
                   
                 </div>
               </section>
@@ -85,7 +137,7 @@
     </div>
     <footer class="app-footer"><div class="w">
         <div class="copyright">
-          © Copyright 2012-2013
+          © Copyright 2012-2014
           <a href="http://hybridgroup.com">The Hybrid Group.</a>
         </div>
       </div>

@@ -40,47 +40,47 @@
               <pre class="CodeRay">package main
 
 import (
-        "fmt"
-        "github.com/hybridgroup/gobot"
-        "github.com/hybridgroup/gobot-firmata"
-        "github.com/hybridgroup/gobot-gpio"
+    "fmt"
+    "github.com/hybridgroup/gobot"
+    "github.com/hybridgroup/gobot-firmata"
+    "github.com/hybridgroup/gobot-gpio"
 )
 
 func main() {
 
-        firmata := new(gobotFirmata.FirmataAdaptor)
-        firmata.Name = "firmata"
-        firmata.Port = "/dev/ttyACM0"
+    firmata := new(gobotFirmata.FirmataAdaptor)
+    firmata.Name = "firmata"
+    firmata.Port = "/dev/ttyACM0"
 
-        led := gobotGPIO.NewLed(firmata)
-        led.Name = "led"
-        led.Pin = "13"
+    led := gobotGPIO.NewLed(firmata)
+    led.Name = "led"
+    led.Pin = "13"
 
-        connections := []interface{}{
-                firmata,
-        }
-        devices := []interface{}{
-                led,
-        }
+    connections := []interface{}{
+        firmata,
+    }
+    devices := []interface{}{
+        led,
+    }
 
-        work := func() {
-                gobot.Every("1s", func() {
-                        led.Toggle()
-                        if led.IsOn() {
-                                fmt.Println("On")
-                        } else {
-                                fmt.Println("Off")
-                        }
-                })
-        }
+    work := func() {
+        gobot.Every("1s", func() {
+            led.Toggle()
+            if led.IsOn() {
+                fmt.Println("On")
+            } else {
+                fmt.Println("Off")
+            }
+        })
+    }
 
-        robot := gobot.Robot{
-                Connections: connections,
-                Devices:     devices,
-                Work:        work,
-        }
+    robot := gobot.Robot{
+        Connections: connections,
+        Devices:     devices,
+        Work:        work,
+    }
 
-        robot.Start()
+    robot.Start()
 }
 </pre>
             </div>
@@ -90,7 +90,7 @@ func main() {
     </div>
     <footer class="app-footer"><div class="w">
         <div class="copyright">
-          © Copyright 2012-2013
+          © Copyright 2012-2014
           <a href="http://hybridgroup.com">The Hybrid Group.</a>
         </div>
       </div>

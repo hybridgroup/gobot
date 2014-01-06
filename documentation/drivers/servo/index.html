@@ -42,23 +42,25 @@
                   Provides an interface for making servos easy to work and interact with from Gobot.
                 </p>
               </section><section class="how-to"><h2>How to establish a connection and setup the driver</h2>
+                <p>Install the library with: <code>go get -u github.com/hybridgroup/gobot-gpio</code></p>
                 <h3>For Digispark:</h3>
-                <pre class="CodeRay"><span class="reserved">package</span> main
+                <pre class="CodeRay"><span class="keyword">package</span> main
 
-<span class="reserved">import</span> (
-        <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
-        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
-        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-digispark</span><span class="delimiter">"</span></span>
-        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
+<span class="keyword">import</span> (
+  <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-digispark</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
 )
 
-func main() {
+<span class="keyword">func</span> main() {
 
-        <span class="key">digispark</span> := <span class="keyword">new</span>(gobotDigispark.DigisparkAdaptor)
-        digispark.Name = <span class="string"><span class="delimiter">"</span><span class="content">Digispark</span><span class="delimiter">"</span></span>
+  digispark := <span class="predefined">new</span>(gobotDigispark.DigisparkAdaptor)
+  digispark.Name = <span class="string"><span class="delimiter">"</span><span class="content">digispark</span><span class="delimiter">"</span></span>
 
-        servo := gobotGPIO.NewServo(digispark)
-        servo.Name = <span class="string"><span class="delimiter">"</span><span class="content">servo</span><span class="delimiter">"</span></span>
+  servo := gobotGPIO.NewServo(digispark)
+  servo.Name = <span class="string"><span class="delimiter">"</span><span class="content">servo</span><span class="delimiter">"</span></span>
+  servo.Pin = <span class="string"><span class="delimiter">"</span><span class="content">0</span><span class="delimiter">"</span></span>
 ...
 </pre>
               </section><section class="public-methods"><h2>Commands:</h2>
@@ -81,39 +83,40 @@ func main() {
                   This example moves a servo from a random angle.
                 </p>
                 <h3>Example</h3>
-                <pre class="CodeRay"><span class="reserved">package</span> main
+                <pre class="CodeRay"><span class="keyword">package</span> main
 
-<span class="reserved">import</span> (
-        <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
-        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
-        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-digispark</span><span class="delimiter">"</span></span>
-        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
+<span class="keyword">import</span> (
+  <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-digispark</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
 )
 
-func main() {
+<span class="keyword">func</span> main() {
 
-        <span class="key">digispark</span> := <span class="keyword">new</span>(gobotDigispark.DigisparkAdaptor)
-        digispark.Name = <span class="string"><span class="delimiter">"</span><span class="content">Digispark</span><span class="delimiter">"</span></span>
+  digispark := <span class="predefined">new</span>(gobotDigispark.DigisparkAdaptor)
+  digispark.Name = <span class="string"><span class="delimiter">"</span><span class="content">digispark</span><span class="delimiter">"</span></span>
 
-        servo := gobotGPIO.NewServo(digispark)
-        servo.Name = <span class="string"><span class="delimiter">"</span><span class="content">servo</span><span class="delimiter">"</span></span>
+  servo := gobotGPIO.NewServo(digispark)
+  servo.Name = <span class="string"><span class="delimiter">"</span><span class="content">servo</span><span class="delimiter">"</span></span>
+  servo.Pin = <span class="string"><span class="delimiter">"</span><span class="content">0</span><span class="delimiter">"</span></span>
 
-        work := func() {
-                servo.InitServo()
-                gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">1s</span><span class="delimiter">"</span></span>, func() {
-                        <span class="key">i</span> := <span class="reserved">int</span>(gobot.Rand(<span class="integer">180</span>))
-                        fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">Turning</span><span class="delimiter">"</span></span>, i)
-                        servo.Move(i)
-                })
-        }
+  work := <span class="keyword">func</span>() {
+    servo.InitServo()
+    gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">1s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() {
+      i := <span class="predefined-type">uint8</span>(gobot.Rand(<span class="integer">180</span>))
+      fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">Turning</span><span class="delimiter">"</span></span>, i)
+      servo.Move(i)
+    })
+  }
 
-        robot := gobot.Robot{
-                <span class="key">Connections</span>: []<span class="reserved">interface</span>{}{digispark},
-                <span class="key">Devices</span>:     []<span class="reserved">interface</span>{}{servo},
-                <span class="key">Work</span>:        work,
-        }
+  robot := gobot.Robot{
+    Connections: []<span class="keyword">interface</span>{}{digispark},
+    Devices:     []<span class="keyword">interface</span>{}{servo},
+    Work:        work,
+  }
 
-        robot.Start()
+  robot.Start()
 }
 </pre>
               </section><section class="circuit"><h2>Circuit and Schematic</h2>
@@ -135,7 +138,7 @@ func main() {
     </div>
     <footer class="app-footer"><div class="w">
         <div class="copyright">
-          © Copyright 2012-2013
+          © Copyright 2012-2014
           <a href="http://hybridgroup.com">The Hybrid Group.</a>
         </div>
       </div>

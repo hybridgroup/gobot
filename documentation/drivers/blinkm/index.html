@@ -42,45 +42,35 @@
                   Allows user to control BlinkM RGB LED via i2c interface.
                 </p>
               </section><section class="how-to"><h2>How to establish a connection and setup the driver</h2>
-                <p>Install the library with <code>go get -u github.com/hybridgroup/gobot</code></p>
-                <pre class="CodeRay"><span class="reserved">package</span> main
+                <p>Install the library with: <code>go get -u github.com/hybridgroup/gobot-i2c</code></p>
+                <h3>For Arduino</h3>
+                <pre class="CodeRay"><span class="keyword">package</span> main
 
-<span class="reserved">import</span> (
+<span class="keyword">import</span> (
+  <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
-  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-beaglebone</span><span class="delimiter">"</span></span>
-  <span class="string"><span class="delimiter">"</span><span class="content">time</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-firmata</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-i2c</span><span class="delimiter">"</span></span>
 )
 
-func main() {
+<span class="keyword">func</span> main() {
+  firmata := <span class="predefined">new</span>(gobotFirmata.FirmataAdaptor)
+  firmata.Name = <span class="string"><span class="delimiter">"</span><span class="content">firmata</span><span class="delimiter">"</span></span>
+  firmata.Port = <span class="string"><span class="delimiter">"</span><span class="content">/dev/ttyACM0</span><span class="delimiter">"</span></span>
 
-  <span class="key">beaglebone</span> := <span class="keyword">new</span>(gobotBeaglebone.Beaglebone)
-  beaglebone.Name = <span class="string"><span class="delimiter">"</span><span class="content">Beaglebone</span><span class="delimiter">"</span></span>
-
-  led := gobotBeaglebone.NewLed(beaglebone)
-  led.Driver = gobot.Driver{
-    <span class="key">Name</span>: <span class="string"><span class="delimiter">"</span><span class="content">led</span><span class="delimiter">"</span></span>,
-    <span class="key">Pin</span>: <span class="string"><span class="delimiter">"</span><span class="content">P9_12</span><span class="delimiter">"</span></span>,
-  }
-
-  connections := []<span class="reserved">interface</span>{} {
-    beaglebone,
-  }
-  devices := []<span class="reserved">interface</span>{} {
-    led,
-  }
-  ...
+  blinkm := gobotI2C.NewBlinkM(firmata)
+  blinkm.Name = <span class="string"><span class="delimiter">"</span><span class="content">blinkm</span><span class="delimiter">"</span></span>
+...
 </pre>
               </section><section class="public-events"><h2>Commands:</h2>
                 <dl class="methods">
-<dt>off</dt>
-                  <dd>Turns BlinkM off.</dd>
-                  <dt>rgb → nil</dt>
+<dt>RgbC</dt>
                   <dd>Sets the color of the BlinkM RGB LED to the specified combination of RGB color provided (red, green and blue values should be between 0 and 255).</dd>
-                  <dt>fade → nil</dt>
+                  <dt>FadeC</dt>
                   <dd>Fades the color of the BlinkM RGB LED to the specified combination of RGB color provided (red, green and blue values should be between 0 and 255).</dd>
-                  <dt>color → [red, green, blue] (integer)</dt>
+                  <dt>ColorC</dt>
                   <dd>Returns an array containing the RGB values for the current color (all integer between 0 and 255).</dd>
-                  <dt>version → String</dt>
+                  <dt>FirmwareVersionC</dt>
                   <dd>Returns an sring describing the I2C firmware version being used.</dd>
                 </dl>
 <h2>Events</h2>
@@ -88,41 +78,35 @@ func main() {
 <dt>start</dt>
                   <dd>Sent when the device has been started and is ready to use.</dd>
                 </dl></section><section class="how-to"><h2>How to use</h2>
-                <p>Example using a BlinkM.</p>
-                <pre class="CodeRay"><span class="reserved">package</span> main
+                <p>Example using a BlinkM and Arduino</p>
+                <pre class="CodeRay"><span class="keyword">package</span> main
 
-<span class="reserved">import</span> (
+<span class="keyword">import</span> (
+  <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
-  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-beaglebone</span><span class="delimiter">"</span></span>
-  <span class="string"><span class="delimiter">"</span><span class="content">time</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-firmata</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-i2c</span><span class="delimiter">"</span></span>
 )
 
-func main() {
+<span class="keyword">func</span> main() {
+  firmata := <span class="predefined">new</span>(gobotFirmata.FirmataAdaptor)
+  firmata.Name = <span class="string"><span class="delimiter">"</span><span class="content">firmata</span><span class="delimiter">"</span></span>
+  firmata.Port = <span class="string"><span class="delimiter">"</span><span class="content">/dev/ttyACM0</span><span class="delimiter">"</span></span>
 
-  <span class="key">beaglebone</span> := <span class="keyword">new</span>(gobotBeaglebone.Beaglebone)
-  beaglebone.Name = <span class="string"><span class="delimiter">"</span><span class="content">Beaglebone</span><span class="delimiter">"</span></span>
+  blinkm := gobotI2C.NewBlinkM(firmata)
+  blinkm.Name = <span class="string"><span class="delimiter">"</span><span class="content">blinkm</span><span class="delimiter">"</span></span>
 
-  led := gobotBeaglebone.NewLed(beaglebone)
-  led.Driver = gobot.Driver{
-    <span class="key">Name</span>: <span class="string"><span class="delimiter">"</span><span class="content">led</span><span class="delimiter">"</span></span>,
-    <span class="key">Pin</span>: <span class="string"><span class="delimiter">"</span><span class="content">P9_12</span><span class="delimiter">"</span></span>,
+  work := <span class="keyword">func</span>() {
+    gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">3s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() {
+      blinkm.Rgb(<span class="predefined-type">byte</span>(gobot.Rand(<span class="integer">255</span>)), <span class="predefined-type">byte</span>(gobot.Rand(<span class="integer">255</span>)), <span class="predefined-type">byte</span>(gobot.Rand(<span class="integer">255</span>)))
+      fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">color</span><span class="delimiter">"</span></span>, blinkm.Color())
+    })
   }
 
-  connections := []<span class="reserved">interface</span>{} {
-    beaglebone,
-  }
-  devices := []<span class="reserved">interface</span>{} {
-    led,
-  }
-
-  work := func(){
-    gobot.Every(<span class="integer">1000</span> * time.Millisecond, func(){ led.Toggle() })
-  }
-  
   robot := gobot.Robot{
-      <span class="key">Connections</span>: connections, 
-      <span class="key">Devices</span>: devices,
-      <span class="key">Work</span>: work,
+    Connections: []gobot.Connection{firmata},
+    Devices:     []gobot.Device{blinkm},
+    Work:        work,
   }
 
   robot.Start()
@@ -149,7 +133,7 @@ func main() {
     </div>
     <footer class="app-footer"><div class="w">
         <div class="copyright">
-          © Copyright 2012-2013
+          © Copyright 2012-2014
           <a href="http://hybridgroup.com">The Hybrid Group.</a>
         </div>
       </div>
