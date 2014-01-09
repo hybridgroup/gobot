@@ -3,33 +3,36 @@ title: Cylon.js - ARDrone Video Driver
 author: The Hybrid Group
 page_title: ARDrone Video
 page_subtitle: Driver
-layout: page
+page_title_show: true
+layout: documentation
+
+ardrone_platform: true
 ---
-.documentation
-  %section.intro
-    =image_tag "/images/ardrone-video.jpg", class: "display"
-    %p
-      Allows user to receive in-flight video data from an ARDrone. Video data from the ARDrone is returned from either the front-facing, or the bottom-facing cameras.
 
-    %h2 How to establish a connection and setup the driver
-    %p
-      Communication with the ARDrone's video interface takes place using a WiFi connection. The ARDrone is a WiFi access point, so it normally can be the only device you connect to, without some additional effort to reconfigure the drone itself to put it into infrastructure mode.
+%section.intro
+  =image_tag "/images/devices/ardrone-video.jpg", class: "display"
+  %p
+    Allows user to receive in-flight video data from an ARDrone. Video data from the ARDrone is returned from either the front-facing, or the bottom-facing cameras.
 
-    :markdown
-          :::ruby
-          comming soon
+  %h2 How to establish a connection and setup the driver
+  %p
+    Communication with the ARDrone's video interface takes place using a WiFi connection. The ARDrone is a WiFi access point, so it normally can be the only device you connect to, without some additional effort to reconfigure the drone itself to put it into infrastructure mode.
 
-  %section.public-methods
-    %h2 Events
-    We're working on the documentation for the events. Stay tuned.
+  :markdown
+        :::ruby
+        comming soon
 
-  %section.example
-    %h2 Example of receiving video data from an ARDrone.
-    :markdown
-          :::ruby
-          comming soon
+%section.public-methods
+  %h2 Events
+  We're working on the documentation for the events. Stay tuned.
 
-  %section.compatability.hardware
-    %h2 Works with:
-    .devices
-      = partial "documentation/partials/ardrone"
+%section.example
+  %h2 Example of receiving video data from an ARDrone.
+  :markdown
+        :::ruby
+        comming soon
+
+%section.compatability.hardware
+  %h2 Works with:
+  .devices
+    = partial "documentation/partials/devices_platforms"

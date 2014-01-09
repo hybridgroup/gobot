@@ -3,55 +3,54 @@ title: Cylon.js - HMC6352 Digital Compass Driver
 author: The Hybrid Group
 page_title: HMC6352 Digital Compass
 page_subtitle: Driver
-layout: page
+page_title_show: true
+layout: documentation
+
+arduino_platform: true
 ---
-.documentation
-  %section.intro
-    =image_tag "/images/hmc6352-compass.jpg", class: "display"
-    %p
-      Allows user to read heading from HMC6352 Digital Compass via i2c interface
+%section.intro
+  =image_tag "/images/devices/hmc6352-compass.jpg", class: "display"
+  %p
+    Allows user to read heading from HMC6352 Digital Compass via i2c interface
 
-  %section.how-to
-    %h2 How to establish a connection and setup the driver
-    %h3 For Arduino:
-    :markdown
-          :::ruby
-          comming soon
+%section.how-to
+  %h2 How to establish a connection and setup the driver
+  %h3 For Arduino:
+  :markdown
+        :::ruby
+        comming soon
 
-  %section.public-methods
-    %h2 Public instance methods:
-    %h3 heading → float
-    %p
-      Returns the heading data for the compass.
+%section.public-methods
+  %h2 Public instance methods:
+  %h3 heading → float
+  %p
+    Returns the heading data for the compass.
 
-  %section.public-events
-    %h2 Public driver events:
-    %h3 heading
-    %p
-      Gets triggered every time the specified interval is met.
+%section.public-events
+  %h2 Public driver events:
+  %h3 heading
+  %p
+    Gets triggered every time the specified interval is met.
 
-    %h3 How to use events and call them on your drivers
-    %p Pretty simple, when the connection and the driver have been setup (as explained above) you can call events on them as follows:
-    :markdown
-          :::ruby
-          comming soon
+  %h3 How to use events and call them on your drivers
+  %p Pretty simple, when the connection and the driver have been setup (as explained above) you can call events on them as follows:
+  :markdown
+        :::ruby
+        comming soon
 
-  %section.how-to
-    %h2 How to use
-    %h3 Example using a HMC6352 Digital Compass.
-    :markdown
-          :::ruby
-          comming soon
+%section.how-to
+  %h2 How to use
+  %h3 Example using a HMC6352 Digital Compass.
+  :markdown
+        :::ruby
+        comming soon
 
-  %section.circuit
-    %h2 Circuit and Schematic
-    %p
-      Coming soon...
+%section.circuit
+  %h2 Circuit and Schematic
+  %p
+    Coming soon...
 
-  %section.compatability.hardware
-    %h2 Works with:
-    .devices
-      = partial "documentation/partials/arduino"
-      = #partial "documentation/partials/beaglebone"
-      =# partial "documentation/partials/digispark"
-      =# partial "documentation/partials/raspberry-pi"
+%section.compatability.hardware
+  %h2 Works with:
+  .devices
+    = partial "documentation/partials/devices_platforms"

@@ -37,7 +37,8 @@ LANGS = [
 # Will be put into SITE_DIR/documentation/examples/index.html.
 INDEX_LAYOUT = <<-EOS
 ---
-layout: page
+page_title_show: true
+layout: documentation
 title: Examples
 page_title: Examples
 author: The Hybrid Group
@@ -178,7 +179,8 @@ class ExampleImporter
 
         content = <<-EOS
 ---
-layout: page
+page_title_show: true
+layout: documentation
 title: #{PROJECT} Example - #{file[:name]}
 page_title: "Example: #{file[:name]}"
 author: The Hybrid Group

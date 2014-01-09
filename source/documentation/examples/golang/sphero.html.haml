@@ -1,5 +1,6 @@
 ---
-layout: page
+page_title_show: true
+layout: documentation
 title: gobot Example - sphero
 page_title: "Example: sphero"
 author: The Hybrid Group
@@ -25,13 +26,6 @@ description: A gobot code example
         	sphero := gobotSphero.NewSphero(spheroAdaptor)
         	sphero.Name = "Sphero"
 
-        	connections := []interface{}{
-        		spheroAdaptor,
-        	}
-        	devices := []interface{}{
-        		sphero,
-        	}
-
         	work := func() {
         		gobot.Every("2s", func() {
         			sphero.Roll(100, uint16(gobot.Rand(360)))
@@ -39,8 +33,8 @@ description: A gobot code example
         	}
 
         	robot := gobot.Robot{
-        		Connections: connections,
-        		Devices:     devices,
+        		Connections: []gobot.Connection{spheroAdaptor},
+        		Devices:     []gobot.Device{sphero},
         		Work:        work,
         	}
 

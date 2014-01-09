@@ -3,108 +3,110 @@ title: Gobot - BlinkM Driver
 author: The Hybrid Group
 page_title: BlinkM
 page_subtitle: Driver
-layout: page
+page_title_show: true
+layout: documentation
+
+beaglebone_platform: true
+digispark_platform: true
 ---
-.documentation
-  %section.intro
-    =image_tag "/images/blinkm.jpg", class: "display"
-    %p
-      Allows user to control BlinkM RGB LED via i2c interface.
 
-  %section.how-to
-    %h2 How to establish a connection and setup the driver
-    :markdown
-      Install the library with: `go get -u github.com/hybridgroup/gobot-i2c`
-    %h3 For Arduino
-    :markdown
-          :::go
-          package main
+%section.intro
+  =image_tag "/images/devices/blinkm.jpg", class: "display"
+  %p
+    Allows user to control BlinkM RGB LED via i2c interface.
 
-          import (
-            "fmt"
-            "github.com/hybridgroup/gobot"
-            "github.com/hybridgroup/gobot-firmata"
-            "github.com/hybridgroup/gobot-i2c"
-          )
+%section.how-to
+  %h2 How to establish a connection and setup the driver
+  :markdown
+    Install the library with: `go get -u github.com/hybridgroup/gobot-i2c`
+  %h3 For Arduino
+  :markdown
+        :::go
+        package main
 
-          func main() {
-            firmata := new(gobotFirmata.FirmataAdaptor)
-            firmata.Name = "firmata"
-            firmata.Port = "/dev/ttyACM0"
+        import (
+          "fmt"
+          "github.com/hybridgroup/gobot"
+          "github.com/hybridgroup/gobot-firmata"
+          "github.com/hybridgroup/gobot-i2c"
+        )
 
-            blinkm := gobotI2C.NewBlinkM(firmata)
-            blinkm.Name = "blinkm"
-          ...
-          
+        func main() {
+          firmata := new(gobotFirmata.FirmataAdaptor)
+          firmata.Name = "firmata"
+          firmata.Port = "/dev/ttyACM0"
 
-  %section.public-events
-    %h2 Commands:
-    
-    %dl.methods 
-      %dt RgbC
-      %dd Sets the color of the BlinkM RGB LED to the specified combination of RGB color provided (red, green and blue values should be between 0 and 255).
-      %dt FadeC
-      %dd Fades the color of the BlinkM RGB LED to the specified combination of RGB color provided (red, green and blue values should be between 0 and 255).
-      %dt ColorC
-      %dd Returns an array containing the RGB values for the current color (all integer between 0 and 255).
-      %dt FirmwareVersionC
-      %dd Returns an sring describing the I2C firmware version being used.
+          blinkm := gobotI2C.NewBlinkM(firmata)
+          blinkm.Name = "blinkm"
+        ...
+        
 
-    %h2 Events
+%section.public-events
+  %h2 Commands:
+  
+  %dl.methods 
+    %dt RgbC
+    %dd Sets the color of the BlinkM RGB LED to the specified combination of RGB color provided (red, green and blue values should be between 0 and 255).
+    %dt FadeC
+    %dd Fades the color of the BlinkM RGB LED to the specified combination of RGB color provided (red, green and blue values should be between 0 and 255).
+    %dt ColorC
+    %dd Returns an array containing the RGB values for the current color (all integer between 0 and 255).
+    %dt FirmwareVersionC
+    %dd Returns an sring describing the I2C firmware version being used.
 
-    %dl.methods 
-      %dt start
-      %dd Sent when the device has been started and is ready to use.  
+  %h2 Events
+
+  %dl.methods 
+    %dt start
+    %dd Sent when the device has been started and is ready to use.  
 
 
-  %section.how-to
-    %h2 How to use
-    %p Example using a BlinkM and Arduino
-    :markdown
-          :::go
-          package main
+%section.how-to
+  %h2 How to use
+  %p Example using a BlinkM and Arduino
+  :markdown
+        :::go
+        package main
 
-          import (
-            "fmt"
-            "github.com/hybridgroup/gobot"
-            "github.com/hybridgroup/gobot-firmata"
-            "github.com/hybridgroup/gobot-i2c"
-          )
+        import (
+          "fmt"
+          "github.com/hybridgroup/gobot"
+          "github.com/hybridgroup/gobot-firmata"
+          "github.com/hybridgroup/gobot-i2c"
+        )
 
-          func main() {
-            firmata := new(gobotFirmata.FirmataAdaptor)
-            firmata.Name = "firmata"
-            firmata.Port = "/dev/ttyACM0"
+        func main() {
+          firmata := new(gobotFirmata.FirmataAdaptor)
+          firmata.Name = "firmata"
+          firmata.Port = "/dev/ttyACM0"
 
-            blinkm := gobotI2C.NewBlinkM(firmata)
-            blinkm.Name = "blinkm"
+          blinkm := gobotI2C.NewBlinkM(firmata)
+          blinkm.Name = "blinkm"
 
-            work := func() {
-              gobot.Every("3s", func() {
-                blinkm.Rgb(byte(gobot.Rand(255)), byte(gobot.Rand(255)), byte(gobot.Rand(255)))
-                fmt.Println("color", blinkm.Color())
-              })
-            }
-
-            robot := gobot.Robot{
-              Connections: []gobot.Connection{firmata},
-              Devices:     []gobot.Device{blinkm},
-              Work:        work,
-            }
-
-            robot.Start()
+          work := func() {
+            gobot.Every("3s", func() {
+              blinkm.Rgb(byte(gobot.Rand(255)), byte(gobot.Rand(255)), byte(gobot.Rand(255)))
+              fmt.Println("color", blinkm.Color())
+            })
           }
+
+          robot := gobot.Robot{
+            Connections: []gobot.Connection{firmata},
+            Devices:     []gobot.Device{blinkm},
+            Work:        work,
+          }
+
+          robot.Start()
+        }
+  
+
+%section.circuit
+  %h2 Circuit and Schematic
+  %p
+    Coming soon...
+
+%section.compatability.hardware
+  %h2 Works with:
+  .devices
+    = partial "documentation/partials/devices_platforms"
     
-
-  %section.circuit
-    %h2 Circuit and Schematic
-    %p
-      Coming soon...
-
-  %section.compatability.hardware
-    %h2 Works with:
-    .devices
-      = #partial "documentation/partials/arduino"
-      =partial "documentation/partials/beaglebone"
-      =partial "documentation/partials/digispark"
-      =#s partial "documentation/partials/raspberry-pi"

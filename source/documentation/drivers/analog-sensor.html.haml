@@ -3,133 +3,135 @@ title: Cylon.js - Analog Sensor Driver
 author: The Hybrid Group
 page_title: Analog Sensor
 page_subtitle: Driver
-layout: page
+page_title_show: true
+layout: documentation
+
+arduino_platform: true
 ---
-.documentation
-  %section.intro
-    = image_tag "/images/analog-sensor.jpg", class: "display"
-    %p
-      Makes it possible to interact with analog inputs on your device and obtain values that represent the analog input send by the sensors.
-      The value received from an analog input read from the sensor goes from 0 to 1027.
 
-  %section.how_to
-    %h2 How to establish a connection and setup the driver
-    %h3 JavaScript
-    :markdown
-          :::javascript
-          var Cylon = require('cylon');
+%section.intro
+  = image_tag "/images/devices/analog-sensor.jpg", class: "display"
+  %p
+    Makes it possible to interact with analog inputs on your device and obtain values that represent the analog input send by the sensors.
+    The value received from an analog input read from the sensor goes from 0 to 1027.
 
-          Cylon.robot({
-            connection: {name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0'},
+%section.how_to
+  %h2 How to establish a connection and setup the driver
+  %h3 JavaScript
+  :markdown
+        :::javascript
+        var Cylon = require('cylon');
 
-            device: {name: 'sensor', driver: 'analogSensor', pin: 0, lowerLimit: 100, upperLimit: 900},
-            ...
+        Cylon.robot({
+          connection: {name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0'},
 
-    %h3 CoffeeScript
-    :markdown
-          :::javascript
-          Cylon = require 'cylon'
+          device: {name: 'sensor', driver: 'analogSensor', pin: 0, lowerLimit: 100, upperLimit: 900},
+          ...
 
-          Cylon.robot
-            connection:
-              name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0'
+  %h3 CoffeeScript
+  :markdown
+        :::javascript
+        Cylon = require 'cylon'
 
-            device:
-              name: 'sensor', driver: 'analogSensor', pin: 0, lowerLimit: 100, upperLimit: 900
-            ...
+        Cylon.robot
+          connection:
+            name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0'
 
-    -#%h3 For Digispark:
-    -#:markdown
-          -#:::ruby
+          device:
+            name: 'sensor', driver: 'analogSensor', pin: 0, lowerLimit: 100, upperLimit: 900
+          ...
 
-  %section.public-methods
-    %h2 Commands:
-    %dl.methods 
-      %dt analogRead(pin_number) → integer_value
-      %dd Returns an integer value that represents the analog read from the sensor.
-    
+  -#%h3 For Digispark:
+  -#:markdown
+        -#:::ruby
 
-  %section.public-events
-    %h2 Events:
+%section.public-methods
+  %h2 Commands:
+  %dl.methods 
+    %dt analogRead(pin_number) → integer_value
+    %dd Returns an integer value that represents the analog read from the sensor.
+  
 
-    %dl.methods
-      %dt update
-      %dd
-        This event will contain one of the following events.
-        %br/  
-        You can also subscribe to one of the specific events, if that is the information you are interested in.
-      %dt analogRead
-      %dd Returns an integer value that represents the analog read from the sensor.
-      %dt upperLimit → integer_value
-      %dd Gets triggered if the value read by the sensor is greater or equal to upperLimit (value passed when setting up the sensor).
-      %dt lowerLimit → integer_value
-      %dd Gets triggered if the value read by the sensor is less or equal to lowerLimit (value passed when setting up the sensor).
-      %dt start
-      %dd Sent when the device has been started and is ready to use.
+%section.public-events
+  %h2 Events:
+
+  %dl.methods
+    %dt update
+    %dd
+      This event will contain one of the following events.
+      %br/  
+      You can also subscribe to one of the specific events, if that is the information you are interested in.
+    %dt analogRead
+    %dd Returns an integer value that represents the analog read from the sensor.
+    %dt upperLimit → integer_value
+    %dd Gets triggered if the value read by the sensor is greater or equal to upperLimit (value passed when setting up the sensor).
+    %dt lowerLimit → integer_value
+    %dd Gets triggered if the value read by the sensor is less or equal to lowerLimit (value passed when setting up the sensor).
+    %dt start
+    %dd Sent when the device has been started and is ready to use.
 
 
-    -#%h3 How to use events and call them on your drivers
-    -#%p Pretty simple, when the connection and the driver have been setup (as explained above) you can call events on them as follows:
-    -#:markdown
-          -#:::ruby
+  -#%h3 How to use events and call them on your drivers
+  -#%p Pretty simple, when the connection and the driver have been setup (as explained above) you can call events on them as follows:
+  -#:markdown
+        -#:::ruby
 
-  %section.how-to
-    %h2 How to use
-    %p 
-      This example detects lower and upper limits on a photoresistor sensor.
-    %h3 JavaScript
-    :markdown
-          :::javascript
-          var Cylon = require('cylon');
+%section.how-to
+  %h2 How to use
+  %p 
+    This example detects lower and upper limits on a photoresistor sensor.
+  %h3 JavaScript
+  :markdown
+        :::javascript
+        var Cylon = require('cylon');
 
-          Cylon.robot({
-            connection: {name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0'},
+        Cylon.robot({
+          connection: {name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0'},
 
-            device: {name: 'sensor', driver: 'analogSensor', pin: 0, lowerLimit: 100, upperLimit: 900},
+          device: {name: 'sensor', driver: 'analogSensor', pin: 0, lowerLimit: 100, upperLimit: 900},
 
-            work: function(my) {
-              my.sensor.on('lowerLimit', function() {
-                Logger.info("Lower limit reached!");
-              });
-              my.sensor.on('upperLimit', function() {
-                Logger.info("Upper limit reached!");
-              });
-            }
-          }).start();
+          work: function(my) {
+            my.sensor.on('lowerLimit', function() {
+              Logger.info("Lower limit reached!");
+            });
+            my.sensor.on('upperLimit', function() {
+              Logger.info("Upper limit reached!");
+            });
+          }
+        }).start();
 
-    %h3 CoffeeScript
-    :markdown
-          :::javascript
-          Cylon = require 'cylon'
+  %h3 CoffeeScript
+  :markdown
+        :::javascript
+        Cylon = require 'cylon'
 
-          Cylon.robot
-            connection:
-              name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0'
+        Cylon.robot
+          connection:
+            name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0'
 
-            device:
-              name: 'sensor', driver: 'analogSensor', pin: 0, lowerLimit: 100, upperLimit: 900
+          device:
+            name: 'sensor', driver: 'analogSensor', pin: 0, lowerLimit: 100, upperLimit: 900
 
-            work: (my) ->
-              my.sensor.on 'lowerLimit', -> Logger.info "Lower limit reached!"
-              my.sensor.on 'upperLimit', -> Logger.info "Upper limit reached!"
+          work: (my) ->
+            my.sensor.on 'lowerLimit', -> Logger.info "Lower limit reached!"
+            my.sensor.on 'upperLimit', -> Logger.info "Upper limit reached!"
 
-          .start()
+        .start()
 
-  %section.circuit
-    %h2 Circuit and Schematic
-    %p
-      Circuit for analog sensors is pretty much the same as the button circuit, you just need to substitute
-      the button for a photoresistor.
-      <br />
-      =link_to "http://arduino.cc/en/tutorial/button", "http://arduino.cc/en/tutorial/button", target:"_blank" 
-    %p
-      It should look like the circuit in this example.
-      <br />
-      =link_to "http://arduino.cc/en/Tutorial/SwitchCase", "http://arduino.cc/en/Tutorial/SwitchCase", target:"_blank" 
+%section.circuit
+  %h2 Circuit and Schematic
+  %p
+    Circuit for analog sensors is pretty much the same as the button circuit, you just need to substitute
+    the button for a photoresistor.
+    <br />
+    =link_to "http://arduino.cc/en/tutorial/button", "http://arduino.cc/en/tutorial/button", target:"_blank" 
+  %p
+    It should look like the circuit in this example.
+    <br />
+    =link_to "http://arduino.cc/en/Tutorial/SwitchCase", "http://arduino.cc/en/Tutorial/SwitchCase", target:"_blank" 
 
-  %section.compatibility.hardware
-    %h2 Works with:
-    =# TODO: Update platform list with all that work with this driver in Cylon.js.
-    .devices
-      = partial "documentation/partials/arduino"
-      = #partial "documentation/partials/digispark"
+%section.compatibility.hardware
+  %h2 Works with:
+  =# TODO: Update platform list with all that work with this driver in Cylon.js.
+  .devices
+    = partial "documentation/partials/devices_platforms"

@@ -3,116 +3,118 @@ title: Gobot - Servo Driver
 author: The Hybrid Group
 page_title: Servo
 page_subtitle: Driver
-layout: page
+page_title_show: true
+layout: documentation
+
+arduino_platform: true
+digispark_platform: true
 ---
-.documentation
-  %section.intro
-    = image_tag "/images/servo.jpg", class: "display"
-    %p
-      Provides an interface for making servos easy to work and interact with from Gobot.
+%section.intro
+  = image_tag "/images/devices/servo.jpg", class: "display"
+  %p
+    Provides an interface for making servos easy to work and interact with from Gobot.
 
-  %section.how-to
-    %h2 How to establish a connection and setup the driver
-    :markdown
-      Install the library with: `go get -u github.com/hybridgroup/gobot-gpio`
-    %h3 For Digispark:
-    :markdown
-          :::go
-          package main
+%section.how-to
+  %h2 How to establish a connection and setup the driver
+  :markdown
+    Install the library with: `go get -u github.com/hybridgroup/gobot-gpio`
+  %h3 For Digispark:
+  :markdown
+        :::go
+        package main
 
-          import (
-            "fmt"
-            "github.com/hybridgroup/gobot"
-            "github.com/hybridgroup/gobot-digispark"
-            "github.com/hybridgroup/gobot-gpio"
-          )
+        import (
+          "fmt"
+          "github.com/hybridgroup/gobot"
+          "github.com/hybridgroup/gobot-digispark"
+          "github.com/hybridgroup/gobot-gpio"
+        )
 
-          func main() {
+        func main() {
 
-            digispark := new(gobotDigispark.DigisparkAdaptor)
-            digispark.Name = "digispark"
+          digispark := new(gobotDigispark.DigisparkAdaptor)
+          digispark.Name = "digispark"
 
-            servo := gobotGPIO.NewServo(digispark)
-            servo.Name = "servo"
-            servo.Pin = "0"
-          ...
+          servo := gobotGPIO.NewServo(digispark)
+          servo.Name = "servo"
+          servo.Pin = "0"
+        ...
 
-    
+  
 
-  %section.public-methods
-    %h2 Commands:
-    
-    %dl.methods 
-      %dt MoveC
-      %dd Moves the servo to the specified angle, angle must be an integer value between 0 and 180.
-      %dt MinC
-      %dd Moves the servo to the min angle 0.
-      %dt CenterC
-      %dd Moves the servo to the center angle 90.
-      %dt MaxC
-      %dd Moves the servo to the max angle 180.
+%section.public-methods
+  %h2 Commands:
+  
+  %dl.methods 
+    %dt MoveC
+    %dd Moves the servo to the specified angle, angle must be an integer value between 0 and 180.
+    %dt MinC
+    %dd Moves the servo to the min angle 0.
+    %dt CenterC
+    %dd Moves the servo to the center angle 90.
+    %dt MaxC
+    %dd Moves the servo to the max angle 180.
 
-    %h2 Events
+  %h2 Events
 
-    %dl.methods 
-      %dt start
-      %dd Sent when the device has been started and is ready to use.
-    
+  %dl.methods 
+    %dt start
+    %dd Sent when the device has been started and is ready to use.
+  
 
-  %section.how-to
-    %h2 How to use
-    %p
-      This example moves a servo from a random angle.
+%section.how-to
+  %h2 How to use
+  %p
+    This example moves a servo from a random angle.
 
-    %h3 Example
-    :markdown
-          :::go
-          package main
+  %h3 Example
+  :markdown
+        :::go
+        package main
 
-          import (
-            "fmt"
-            "github.com/hybridgroup/gobot"
-            "github.com/hybridgroup/gobot-digispark"
-            "github.com/hybridgroup/gobot-gpio"
-          )
+        import (
+          "fmt"
+          "github.com/hybridgroup/gobot"
+          "github.com/hybridgroup/gobot-digispark"
+          "github.com/hybridgroup/gobot-gpio"
+        )
 
-          func main() {
+        func main() {
 
-            digispark := new(gobotDigispark.DigisparkAdaptor)
-            digispark.Name = "digispark"
+          digispark := new(gobotDigispark.DigisparkAdaptor)
+          digispark.Name = "digispark"
 
-            servo := gobotGPIO.NewServo(digispark)
-            servo.Name = "servo"
-            servo.Pin = "0"
+          servo := gobotGPIO.NewServo(digispark)
+          servo.Name = "servo"
+          servo.Pin = "0"
 
-            work := func() {
-              servo.InitServo()
-              gobot.Every("1s", func() {
-                i := uint8(gobot.Rand(180))
-                fmt.Println("Turning", i)
-                servo.Move(i)
-              })
-            }
-
-            robot := gobot.Robot{
-              Connections: []interface{}{digispark},
-              Devices:     []interface{}{servo},
-              Work:        work,
-            }
-
-            robot.Start()
+          work := func() {
+            servo.InitServo()
+            gobot.Every("1s", func() {
+              i := uint8(gobot.Rand(180))
+              fmt.Println("Turning", i)
+              servo.Move(i)
+            })
           }
-    
 
-  %section.circuit
-    %h2 Circuit and Schematic
-    %p
-      =link_to "http://arduino.cc/en/Tutorial/Sweep", "http://arduino.cc/en/Tutorial/Sweep", target:"_blank" 
+          robot := gobot.Robot{
+            Connections: []interface{}{digispark},
+            Devices:     []interface{}{servo},
+            Work:        work,
+          }
 
-  %section.compatability.hardware
-    %h2 Works with:
-    .devices
-      = partial "documentation/partials/arduino"
-      = partial "documentation/partials/digispark"
+          robot.Start()
+        }
+  
+
+%section.circuit
+  %h2 Circuit and Schematic
+  %p
+    =link_to "http://arduino.cc/en/Tutorial/Sweep", "http://arduino.cc/en/Tutorial/Sweep", target:"_blank" 
+
+%section.compatability.hardware
+  %h2 Works with:
+  .devices
+    = partial "documentation/partials/devices_platforms"
 
 

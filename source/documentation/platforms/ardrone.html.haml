@@ -3,98 +3,98 @@ title: Ardrone with Cylon.js
 author: The Hybrid Group
 page_title: Ardrone
 page_subtitle: "<a href='https://github.com/hybridgroup/cylon-ardrone' target='blanck' class='repository'>Repository</a> <a class+'issues' href='https://github.com/hybridgroup/cylon-ardrone/issues' target='blanck'>Issues</a>"
-layout: page
+
+page_title_show: true
+layout: documentation
 ---
-.documentation
-  %section.intro
-    = image_tag "/images/ardrone.jpg", class: "display"
 
-    %p
-      The ARDrone from Parrot is an inexpensive quadcopter that is controlled using WiFi. It includes a built-in front-facing HD video camera, as well as a second lower resolution bottom facing video camera.
+%section.intro
+  = image_tag "/images/devices/ardrone.jpg", class: "display"
 
-    %p
-      For more info about the ARDrone platform click
-      = succeed "." do
-        = link_to "here", "http://ardrone2.parrot.com/", target: :blank
-    
+  %p
+    The ARDrone from Parrot is an inexpensive quadcopter that is controlled using WiFi. It includes a built-in front-facing HD video camera, as well as a second lower resolution bottom facing video camera.
 
-  %section.how-to
-    %h2 How to install
-    %p
-      Installing cylon.js with ardrone support is pretty easy.
-    :markdown
-          :::ruby
-          npm install cylon-ardrone
+  %p
+    For more info about the ARDrone platform click
+    = succeed "." do
+      = link_to "here", "http://ardrone2.parrot.com/", target: :blank
+  
 
-    %h2 How to use
-    %p
-      This small program lets the ARDrone take-off, hover, and land.
-    
-    %h3 Javascript
-    
-    :markdown
-          :::javascript
-          var Cylon = require('cylon');
+%section.how-to
+  %h2 How to install
+  %p
+    Installing cylon.js with ardrone support is pretty easy.
+  :markdown
+        :::ruby
+        npm install cylon-ardrone
 
-          Cylon.robot({
-            connection: { name: 'ardrone', adaptor: 'ardrone', port: '192.168.1.1' },
-            device: {name: 'drone', driver: 'ardrone'},
+  %h2 How to use
+  %p
+    This small program lets the ARDrone take-off, hover, and land.
+  
+  %h3 Javascript
+  
+  :markdown
+        :::javascript
+        var Cylon = require('cylon');
 
-            work: function(my) {
-              my.drone.takeoff();
-              after((10).seconds(), function() { 
-                my.drone.land();
-              });
-              after((15).seconds(), function() { 
-                my.drone.stop();
-              });    
-            }
-          }).start();
-    
-    %h3 CoffeeScript
+        Cylon.robot({
+          connection: { name: 'ardrone', adaptor: 'ardrone', port: '192.168.1.1' },
+          device: {name: 'drone', driver: 'ardrone'},
 
-    :markdown
-          :::javascript
-          Cylon = require('cylon')
+          work: function(my) {
+            my.drone.takeoff();
+            after((10).seconds(), function() { 
+              my.drone.land();
+            });
+            after((15).seconds(), function() { 
+              my.drone.stop();
+            });    
+          }
+        }).start();
+  
+  %h3 CoffeeScript
 
-          Cylon.robot
-            connection:
-              name: 'ardrone', adaptor: 'ardrone', port: '192.168.1.1'
+  :markdown
+        :::javascript
+        Cylon = require('cylon')
 
-            device:
-              name: 'ardrone', driver: 'ardrone'
+        Cylon.robot
+          connection:
+            name: 'ardrone', adaptor: 'ardrone', port: '192.168.1.1'
 
-            work: (my) ->
-              my.drone.takeoff()
-              after 10.seconds(), ->
-                my.drone.land()
-              after 15.seconds(), ->
-                my.drone.stop()
+          device:
+            name: 'ardrone', driver: 'ardrone'
 
-          .start()
+          work: (my) ->
+            my.drone.takeoff()
+            after 10.seconds(), ->
+              my.drone.land()
+            after 15.seconds(), ->
+              my.drone.stop()
 
-    %h2 How to connect
-    %p
-      The ARDrone is a WiFi device, so there is no additional work to establish a
-      connection to a single drone. However, in order to connect to multiple drones,
-      you need to perform some configuration steps on each drone via SSH.
+        .start()
 
-    %h2 Automatic Reset From Emergency Mode
+  %h2 How to connect
+  %p
+    The ARDrone is a WiFi device, so there is no additional work to establish a
+    connection to a single drone. However, in order to connect to multiple drones,
+    you need to perform some configuration steps on each drone via SSH.
 
-    %p
-      When you first connect to the ARDrone by calling the `start` method, if it is in "emergency" mode, the ARDrone will not take off. Cylon can automatically reset it back "normal" mode, to be able to fly IF you pass in the navigation like this example:
+  %h2 Automatic Reset From Emergency Mode
 
-    :markdown
-          :::ruby
+  %p
+    When you first connect to the ARDrone by calling the `start` method, if it is in "emergency" mode, the ARDrone will not take off. Cylon can automatically reset it back "normal" mode, to be able to fly IF you pass in the navigation like this example:
 
-          Coming soon.
-  %section.drivers
-    %h2 Drivers
-    %p
-      Available drivers for the ARDrone platform are listed below. There are three drivers for the ARDrone: the ARDrone for flight control and the ARDroneNav for navigation data.
+  :markdown
+        :::ruby
 
-    .hardware
-      .devices
-        = partial "documentation/partials/ardrone-flight"
-        = partial "documentation/partials/ardrone-navigation"
-        = #partial "documentation/partials/ardrone-video"
+        Coming soon.
+%section.drivers
+  %h2 Drivers
+  %p
+    Available drivers for the ARDrone platform are listed below. There are three drivers for the ARDrone: the ARDrone for flight control and the ARDroneNav for navigation data.
+
+  .hardware
+    .devices
+      = partial "documentation/partials/devices_ardrone_drivers"

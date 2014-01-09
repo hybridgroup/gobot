@@ -1,6 +1,8 @@
 require 'rack/codehighlighter'
 require "coderay"
 
+use Rack::GoogleAnalytics, :tracker => 'UA-46433484-3', :domain => 'gobot.io'
+
 use Rack::Codehighlighter, :coderay, :markdown => true,
   :element => "pre>code", :pattern => /\A:::(\w+)\s*\n/
 
@@ -15,6 +17,7 @@ activate :blog do |blog|
 end
 
 activate :directory_indexes
+activate :neat
 
 configure :build do
 end

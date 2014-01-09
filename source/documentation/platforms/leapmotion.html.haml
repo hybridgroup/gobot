@@ -3,92 +3,94 @@ title: Leapmotion with Gobot
 author: The Hybrid Group
 page_title: Leapmotion
 page_subtitle: "<a href='https://github.com/hybridgroup/gobot-leapmotion' class='repository'>Repository</a> <a class+'issues' href='https://github.com/hybridgroup/gobot-leapmotion/issues'>Issues</a>"
-layout: page
+page_title_show: true
+layout: documentation
+
+leapmotion_driver: true
 ---
-.documentation
-  %section.intro
-    = image_tag "/images/leap_motion.jpg", class: "display"
+%section.intro
+  = image_tag "/images/devices/leap_motion.jpg", class: "display"
 
-    %p
-      The Leap Motion is a user-interface device that tracks the user's hand motions, and translates them into events that can control robots and physical computing hardware.
+  %p
+    The Leap Motion is a user-interface device that tracks the user's hand motions, and translates them into events that can control robots and physical computing hardware.
 
-    %p
-      For more info about the Leap Motion platform click
-      = succeed "." do
-        = link_to "here", "https://www.leapmotion.com/", target: :blank
+  %p
+    For more info about the Leap Motion platform click
+    = succeed "." do
+      = link_to "here", "https://www.leapmotion.com/", target: :blank
 
-  %section.how-to
-    %h2 How to install
-    %p
-      Installing Gobot with leapmotion support is pretty easy.
-    :markdown
-          :::bash
-          go get -u github.com/hybridgroup/gobot-leapmotion
+%section.how-to
+  %h2 How to install
+  %p
+    Installing Gobot with leapmotion support is pretty easy.
+  :markdown
+        :::bash
+        go get -u github.com/hybridgroup/gobot-leapmotion
 
-    %h2 How to use
-    %p This small program uses a Leap Motion Adaptor.
-    :markdown
-          :::go
-          package main
+  %h2 How to use
+  %p This small program uses a Leap Motion Adaptor.
+  :markdown
+        :::go
+        package main
 
-          import (
-            "fmt"
-            "github.com/hybridgroup/gobot"
-            "github.com/hybridgroup/gobot-leapmotion"
-          )
+        import (
+          "fmt"
+          "github.com/hybridgroup/gobot"
+          "github.com/hybridgroup/gobot-leapmotion"
+        )
 
-          func main() {
-            leapAdaptor := new(gobotLeap.LeapAdaptor)
-            leapAdaptor.Name = "leap"
-            leapAdaptor.Port = "127.0.0.1:6437"
+        func main() {
+          leapAdaptor := new(gobotLeap.LeapAdaptor)
+          leapAdaptor.Name = "leap"
+          leapAdaptor.Port = "127.0.0.1:6437"
 
-            leap := gobotLeap.NewLeap(leapAdaptor)
-            leap.Name = "leap"
+          leap := gobotLeap.NewLeap(leapAdaptor)
+          leap.Name = "leap"
 
-            work := func() {
-              gobot.On(leap.Events["Message"], func(data interface{}) {
-                fmt.Println(data)
-              })
-            }
-
-            robot := gobot.Robot{
-              Connections: []gobot.Connection{leapAdaptor},
-              Devices:     []gobot.Device{leap},
-              Work:        work,
-            }
-
-            robot.Start()
+          work := func() {
+            gobot.On(leap.Events["Message"], func(data interface{}) {
+              fmt.Println(data)
+            })
           }
 
-    %h2 How to connect
-    %h3 OSX
-    %p
-      This driver works out of the box with the vanilla installation of the Leap Motion Software that you get in their 
-      %a{ href:"https://www.leapmotion.com/setup" } Setup Guide.
+          robot := gobot.Robot{
+            Connections: []gobot.Connection{leapAdaptor},
+            Devices:     []gobot.Device{leap},
+            Work:        work,
+          }
 
-    %p The main steps are:
+          robot.Start()
+        }
 
-    %ul
-      %li Run Leap Motion.app
-      %li Connect your Computer and Leap Motion Controller.
-      %li Connect to the device via Gobot.
+  %h2 How to connect
+  %h3 OSX
+  %p
+    This driver works out of the box with the vanilla installation of the Leap Motion Software that you get in their 
+    %a{ href:"https://www.leapmotion.com/setup" } Setup Guide.
 
-    %h3 Ubuntu
-    %p
-      The Linux download of the Leap Motion software can be obtained from
-      %a{ href:"https://developer.leapmotion.com/downloads" } Leap Motion Dev Center
-      (requires free signup)
-    %p The main steps are:
-    %ul
-      %li Run the leapd daemon.
-      %li Connect your computer and the Leap Motion controller
-      %li Connect to the device via Gobot
+  %p The main steps are:
 
-  %section.drivers
-    %h2 Drivers
-    %p
-      There is only one driver for the Leap Motion platform as listed below.
+  %ul
+    %li Run Leap Motion.app
+    %li Connect your Computer and Leap Motion Controller.
+    %li Connect to the device via Gobot.
 
-    .hardware
-      .devices
-        = partial "documentation/partials/leapmotion-driver"
+  %h3 Ubuntu
+  %p
+    The Linux download of the Leap Motion software can be obtained from
+    %a{ href:"https://developer.leapmotion.com/downloads" } Leap Motion Dev Center
+    (requires free signup)
+  %p The main steps are:
+  %ul
+    %li Run the leapd daemon.
+    %li Connect your computer and the Leap Motion controller
+    %li Connect to the device via Gobot
+
+%section.drivers
+  %h2 Drivers
+  %p
+    There is only one driver for the Leap Motion platform as listed below.
+
+  .hardware
+    .devices
+      = partial "documentation/partials/devices_leapmotion_drivers"

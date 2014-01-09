@@ -3,49 +3,51 @@ title: Cylon.js - Pebble Driver
 author: The Hybrid Group
 page_title: Pebble
 page_subtitle: Driver
-layout: page
+page_title_show: true
+layout: documentation
+
+pebble_platform: true
 ---
-.documentation
-  %section.intro
-    =image_tag "/images/pebble.jpg", class: "display"
-    %p
-      Allows user to interact with Cylon.js devices using a Pebble smart watch.
+%section.intro
+  =image_tag "/images/devices/pebble.jpg", class: "display"
+  %p
+    Allows user to interact with Cylon.js devices using a Pebble smart watch.
 
-  %section.how-to
-    %h2 How to establish a connection and setup the driver
-    :markdown
-          :::ruby
-          require 'Cylon.js'
-          connection :pebble, :adaptor => :pebble, :port => "/dev/rfcomm0", :id => "378B"
-          device :watch, :driver => :pebble
+%section.how-to
+  %h2 How to establish a connection and setup the driver
+  :markdown
+        :::ruby
+        require 'Cylon.js'
+        connection :pebble, :adaptor => :pebble, :port => "/dev/rfcomm0", :id => "378B"
+        device :watch, :driver => :pebble
 
-  %section.public-methods
-    %h2 Public instance methods
-    %p
-      We're working on the documentation for the events for the Pebble smart watch. Thanks for your patience.
-    %h2 Public driver events
-    %p
-      We're working on the documentation for the events for the Pebble smart watch. Thanks for your patience.
+%section.public-methods
+  %h2 Public instance methods
+  %p
+    We're working on the documentation for the events for the Pebble smart watch. Thanks for your patience.
+  %h2 Public driver events
+  %p
+    We're working on the documentation for the events for the Pebble smart watch. Thanks for your patience.
 
-  %section.how-to
-    %h2 How to use
-    %h3 Example receiving button events from a Pebble smart watch.
-    :markdown
-          :::ruby
-          require 'Cylon.js'
+%section.how-to
+  %h2 How to use
+  %h3 Example receiving button events from a Pebble smart watch.
+  :markdown
+        :::ruby
+        require 'Cylon.js'
 
-          connection :pebble, :adaptor => :pebble, :port => "/dev/rfcomm0", :id => "378B"
-          device :watch, :driver => :pebble
+        connection :pebble, :adaptor => :pebble, :port => "/dev/rfcomm0", :id => "378B"
+        device :watch, :driver => :pebble
 
-          work do
-            on watch, :media_control => :button_push
-          end
+        work do
+          on watch, :media_control => :button_push
+        end
 
-          def button_push(caller, data)
-            puts data.button unless data.nil?
-          end
+        def button_push(caller, data)
+          puts data.button unless data.nil?
+        end
 
-  %section.compatability.hardware
-    %h2 Works with:
-    .devices
-      = partial "documentation/partials/pebble"
+%section.compatability.hardware
+  %h2 Works with:
+  .devices
+    = partial "documentation/partials/devices_platforms"
