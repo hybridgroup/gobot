@@ -1,0 +1,8 @@
+- unless current_page.data.page_title.nil?
+  .page-title
+    .w
+      %h1.title= current_page.data.page_title
+      - unless current_page.data.page_subtitle.nil?
+        %h2.subtitle= current_page.data.page_subtitle
+      - if content_for? :subtitle
+        %h2.subtitle= yield_content(:subtitle)

@@ -1,6 +1,6 @@
 source 'http://rubygems.org'
 
-gem 'middleman'
+gem 'middleman', '3.1'
 gem 'middleman-blog'
 gem 'middleman-gh-pages'
 gem "rack-codehighlighter"
@@ -9,4 +9,4 @@ gem 'rake'
 gem "therubyracer"
 gem 'bourbon'
 gem "middleman-neat"
-
+gem 'rack-google-analytics'

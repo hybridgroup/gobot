@@ -3,927 +3,929 @@ title: Gobot - Sphero Driver
 author: The Hybrid Group
 page_title: Sphero
 page_subtitle: Driver
-layout: page
+page_title_show: true
+layout: documentation
+
+sphero_platform: true
 ---
-.documentation
-  %section.intro
-    =image_tag "/images/sphero.jpg", class: "display"
-    %p
-      Allows user to interact with the Sphero robotic sphero using Gobot.
+%section.intro
+  =image_tag "/images/devices/sphero.jpg", class: "display"
+  %p
+    Allows user to interact with the Sphero robotic sphero using Gobot.
 
-  %section.how-to
-    %h2 How to establish a connection and setup the driver
-    %p
-      That is pretty simple once the Sphero is ready (connected and listening), you just need three lines of code and you are set,
-      Gobot and the Sphero driver take care of the rest.
+%section.how-to
+  %h2 How to establish a connection and setup the driver
+  %p
+    That is pretty simple once the Sphero is ready (connected and listening), you just need three lines of code and you are set,
+    Gobot and the Sphero driver take care of the rest.
 
-      :markdown
-        Install the library with: `go get -u github.com/hybridgroup/gobot-sphero`
+    :markdown
+      Install the library with: `go get -u github.com/hybridgroup/gobot-sphero`
 
-            :::go
-            package main
+          :::go
+          package main
 
-            import (
-              "github.com/hybridgroup/gobot"
-              "github.com/hybridgroup/gobot-sphero"
-            )
+          import (
+            "github.com/hybridgroup/gobot"
+            "github.com/hybridgroup/gobot-sphero"
+          )
 
-            func main() {
+          func main() {
 
-              spheroAdaptor := new(gobotSphero.SpheroAdaptor)
-              spheroAdaptor.Name = "Sphero"
-              spheroAdaptor.Port = "/dev/rfcomm0"
+            spheroAdaptor := new(gobotSphero.SpheroAdaptor)
+            spheroAdaptor.Name = "Sphero"
+            spheroAdaptor.Port = "/dev/rfcomm0"
 
-              sphero := gobotSphero.NewSphero(spheroAdaptor)
-              sphero.Name = "Sphero"
-            ...
+            sphero := gobotSphero.NewSphero(spheroAdaptor)
+            sphero.Name = "Sphero"
+          ...
 
-  %section.public-methods
-    %h2 Commands:
-    
-    %dl.methods
-      %dt abortMacro → (ID code , command number)
-      %dd 
-
-      %dt abortOrbBasicProgram 
-      %dd
-
-      %dt appendMacroChunck(MACRO Chunk) 
-      %dd 
-
-      %dt appendOrbBasicFragment(Area, Program Code) 
-      %dd  
-
-      %dt configureCollisionDetection(Meth,(Xt, Yt),(Xspd, Yspd),Dead) 
-      %dd Sets the sphero to detect collisions and report them.
-
-      %dt configureLocator(flag, x, y, Yaw Tare) 
-      %dd 
-
-      %dt detectCollisions 
-      %dd Sets the sphero to detect collisions and report them.
-
-      %dt eraseOrbBasicStorage(Area) 
-      %dd 
-
-      %dt executeOrbBasicProgram(Area, Start Line, Start Line) 
-      %dd 
-
-      %dt getApplicationConfigurationBlock 
-      %dd 
-
-      %dt getConfigurationBlock(ID) 
-      %dd 
-
-      %dt getDeviceMode → (Mode), options: 00h (Normal mode) | 01h (User Hack mode)
-      %dd 
-
-      %dt getMacroStatus → (ID code , cmd number, cmd number)
-      %dd 
-
-      %dt getPermanentOptionFlags → (FLAGS), options: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 6-31
-      %dd 
-
-      %dt getRGB → (red,green,blue) | (color)
-      %dd 
-
-      %dt getTemporaryOptionFlags → (FLAGS), options: 0 | 1-31
-      %dd 
-
-      %dt reInitializeMacroExecutive 
-      %dd 
-
-      %dt readLocator → (XPOS, YPOS, XVEL, YVEL, SOG)
-      %dd 
-
-      %dt roll(speed, heading, state) 
-      %dd This commands Sphero to roll along the provided vector. Both a speed and a heading are required; the latter is considered relative to the last calibrated direction.
-
-      %dt runMacro(SEQ, DLEN, ID) 
-      %dd 
-
-      %dt saveMacro(data) 
-      %dd 
-
-      %dt saveTemporaryMacro(data) 
-      %dd 
-
-      %dt selfLevel(Options, Angle Limit, Timeout, True Time), options: ((0 | 1 | 2 |3 ), (0 | 1 to 90), (0 | 1 to 255), (0 | 1 to 255) 
-      %dd 
-
-      %dt setAccelerometerRange(Range Idx), options: 0 | 1 | 2 | 3 
-      %dd 
-
-      %dt setApplicationConfigurationBlock
-      %dd 
-
-      %dt setBackLED(BRIGHT) 
-      %dd 
-
-      %dt setBoostWithTime(STATE) 
-      %dd 
-
-      %dt setColor(color) 
-      %dd This allows you to set the color of the sphero, just pass an array containing RGB hex or a string with one of the color names of the list.
-
-      %dt setConfigurationBlock(value) 
-      %dd 
-
-      %dt setDataStreaming(N, M, MASK, PCNT, MASK2) 
-      %dd 
-
-      %dt setDeviceMode(MODE) 
-      %dd 
-
-      %dt setHeading(HEADING) 
-      %dd
-
-      %dt setMacroParameter(Param, Val1, Val2) 
-      %dd 
-
-      %dt setMotionTimeout(TIME) 
-      %dd 
-
-      %dt setPermanentOptionFlags(FLAGS) 
-      %dd 
-
-      %dt setRGB(color, persist) 
-      %dd This allows you to set the RGB LED color, just pass an array containing RGB hex or a string with one of the color names of the list.  
-
-      %dt setRawMotorValues(L-MODE, L-POWER, R-MODE, R-POWER) 
-      %dd 
-
-      %dt setRotationRate(RATE) 
-      %dd 
-
-      %dt setStabalisation(bool) 
-      %dd 
-
-      %dt setTemporaryOptionFlags(FLAGS) 
-      %dd 
-
-      %dt stop
-      %dd Stops the sphero.
-
-      %dt submitValueToInputStatement(VAL) 
-      %dd 
-
-
-
-  %section.public-events
-    %h2 Events:
-
-    %dl.methods 
-      %dt update
-      %dd 
-        This event will contain one of the following events.
-        %br/  
-        You can also subscribe to one of the specific events, if that is the information you are interested in.
-      %dt collision
-      %dd Gets triggered when the sphero hits something or falls from a step.
-      %dt messages(data)
-      %dd Gets triggered when has a message.
-      %dt notifications(data)
-      %dd Gets triggered when has a notification.
-      %dt connect
-      %dd Opens the connection to Sphero.
-      %dt start
-      %dd Sent when the device has been started and is ready to use.
+%section.public-methods
+  %h2 Commands:
   
+  %dl.methods
+    %dt abortMacro → (ID code , command number)
+    %dd 
 
-    -#%h3 How to use events and call them on your drivers
-    -#%p
-      -#Pretty simple, when the connection and the driver have been setup (as explained above)
-      -#you can call events on the sphero driver as follows:
-    -#:markdown
-          -#:::ruby
+    %dt abortOrbBasicProgram 
+    %dd
 
-  %section.how-to
-    %h2 How to use
-    %p 
-      This example rolls the sphero in a random direction and change direction every 2 seconds.
+    %dt appendMacroChunck(MACRO Chunk) 
+    %dd 
 
-      %h3 JavaScript
-      :markdown
-            :::javascript
-            package main
+    %dt appendOrbBasicFragment(Area, Program Code) 
+    %dd  
 
-            import (
-              "github.com/hybridgroup/gobot"
-              "github.com/hybridgroup/gobot-sphero"
-            )
+    %dt configureCollisionDetection(Meth,(Xt, Yt),(Xspd, Yspd),Dead) 
+    %dd Sets the sphero to detect collisions and report them.
 
-            func main() {
+    %dt configureLocator(flag, x, y, Yaw Tare) 
+    %dd 
 
-              spheroAdaptor := new(gobotSphero.SpheroAdaptor)
-              spheroAdaptor.Name = "Sphero"
-              spheroAdaptor.Port = "/dev/rfcomm0"
+    %dt detectCollisions 
+    %dd Sets the sphero to detect collisions and report them.
 
-              sphero := gobotSphero.NewSphero(spheroAdaptor)
-              sphero.Name = "Sphero"
+    %dt eraseOrbBasicStorage(Area) 
+    %dd 
 
-              work := func() {
-                gobot.Every("2s", func() {
-                  sphero.Roll(100, uint16(gobot.Rand(360)))
-                })
-              }
+    %dt executeOrbBasicProgram(Area, Start Line, Start Line) 
+    %dd 
 
-              robot := gobot.Robot{
-                Connections: []interface{}{spheroAdaptor},
-                Devices:     []interface{}{sphero},
-                Work:        work,
-              }
+    %dt getApplicationConfigurationBlock 
+    %dd 
 
-              robot.Start()
+    %dt getConfigurationBlock(ID) 
+    %dd 
+
+    %dt getDeviceMode → (Mode), options: 00h (Normal mode) | 01h (User Hack mode)
+    %dd 
+
+    %dt getMacroStatus → (ID code , cmd number, cmd number)
+    %dd 
+
+    %dt getPermanentOptionFlags → (FLAGS), options: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 6-31
+    %dd 
+
+    %dt getRGB → (red,green,blue) | (color)
+    %dd 
+
+    %dt getTemporaryOptionFlags → (FLAGS), options: 0 | 1-31
+    %dd 
+
+    %dt reInitializeMacroExecutive 
+    %dd 
+
+    %dt readLocator → (XPOS, YPOS, XVEL, YVEL, SOG)
+    %dd 
+
+    %dt roll(speed, heading, state) 
+    %dd This commands Sphero to roll along the provided vector. Both a speed and a heading are required; the latter is considered relative to the last calibrated direction.
+
+    %dt runMacro(SEQ, DLEN, ID) 
+    %dd 
+
+    %dt saveMacro(data) 
+    %dd 
+
+    %dt saveTemporaryMacro(data) 
+    %dd 
+
+    %dt selfLevel(Options, Angle Limit, Timeout, True Time), options: ((0 | 1 | 2 |3 ), (0 | 1 to 90), (0 | 1 to 255), (0 | 1 to 255) 
+    %dd 
+
+    %dt setAccelerometerRange(Range Idx), options: 0 | 1 | 2 | 3 
+    %dd 
+
+    %dt setApplicationConfigurationBlock
+    %dd 
+
+    %dt setBackLED(BRIGHT) 
+    %dd 
+
+    %dt setBoostWithTime(STATE) 
+    %dd 
+
+    %dt setColor(color) 
+    %dd This allows you to set the color of the sphero, just pass an array containing RGB hex or a string with one of the color names of the list.
+
+    %dt setConfigurationBlock(value) 
+    %dd 
+
+    %dt setDataStreaming(N, M, MASK, PCNT, MASK2) 
+    %dd 
+
+    %dt setDeviceMode(MODE) 
+    %dd 
+
+    %dt setHeading(HEADING) 
+    %dd
+
+    %dt setMacroParameter(Param, Val1, Val2) 
+    %dd 
+
+    %dt setMotionTimeout(TIME) 
+    %dd 
+
+    %dt setPermanentOptionFlags(FLAGS) 
+    %dd 
+
+    %dt setRGB(color, persist) 
+    %dd This allows you to set the RGB LED color, just pass an array containing RGB hex or a string with one of the color names of the list.  
+
+    %dt setRawMotorValues(L-MODE, L-POWER, R-MODE, R-POWER) 
+    %dd 
+
+    %dt setRotationRate(RATE) 
+    %dd 
+
+    %dt setStabalisation(bool) 
+    %dd 
+
+    %dt setTemporaryOptionFlags(FLAGS) 
+    %dd 
+
+    %dt stop
+    %dd Stops the sphero.
+
+    %dt submitValueToInputStatement(VAL) 
+    %dd 
+
+
+
+%section.public-events
+  %h2 Events:
+
+  %dl.methods 
+    %dt update
+    %dd 
+      This event will contain one of the following events.
+      %br/  
+      You can also subscribe to one of the specific events, if that is the information you are interested in.
+    %dt collision
+    %dd Gets triggered when the sphero hits something or falls from a step.
+    %dt messages(data)
+    %dd Gets triggered when has a message.
+    %dt notifications(data)
+    %dd Gets triggered when has a notification.
+    %dt connect
+    %dd Opens the connection to Sphero.
+    %dt start
+    %dd Sent when the device has been started and is ready to use.
+
+
+  -#%h3 How to use events and call them on your drivers
+  -#%p
+    -#Pretty simple, when the connection and the driver have been setup (as explained above)
+    -#you can call events on the sphero driver as follows:
+  -#:markdown
+        -#:::ruby
+
+%section.how-to
+  %h2 How to use
+  %p 
+    This example rolls the sphero in a random direction and change direction every 2 seconds.
+
+    %h3 JavaScript
+    :markdown
+          :::javascript
+          package main
+
+          import (
+            "github.com/hybridgroup/gobot"
+            "github.com/hybridgroup/gobot-sphero"
+          )
+
+          func main() {
+
+            spheroAdaptor := new(gobotSphero.SpheroAdaptor)
+            spheroAdaptor.Name = "Sphero"
+            spheroAdaptor.Port = "/dev/rfcomm0"
+
+            sphero := gobotSphero.NewSphero(spheroAdaptor)
+            sphero.Name = "Sphero"
+
+            work := func() {
+              gobot.Every("2s", func() {
+                sphero.Roll(100, uint16(gobot.Rand(360)))
+              })
             }
 
-  
-  %section 
-    %h2 Sphero Colors (R,G,B)
+            robot := gobot.Robot{
+              Connections: []interface{}{spheroAdaptor},
+              Devices:     []interface{}{sphero},
+              Work:        work,
+            }
 
-    %dl.colors 
-      %dt aliceblue            
-      %dd 
-        .aliceblue.square
-        %p (240, 248, 255)
-      .clear  
-      %dt antiquewhite         
-      %dd 
-        .antiquewhite.square
-        %p (250, 235, 215) 
-      %dt aqua                 
-      %dd 
-        .square.aqua
-        %p (0, 255, 255)
-      %dt aquamarine           
-      %dd
-        .square.aquamarine 
-        %p (127, 255, 212)
-      %dt azure                 
-      %dd 
-        .square.azure
-        %p (240, 255, 255)
-      %dt beige                 
-      %dd 
-        .square.beige
-        %p (245, 245, 220)
-      %dt bisque                
-      %dd 
-        .square.bisque
-        %p (255, 228, 196)
-      %dt black                 
-      %dd 
-        .square.black
-        %p (0, 0, 0)
-      %dt blanchedalmond        
-      %dd 
-        .square.blanchedalmond
-        %p (255, 235, 205)
-      %dt blue                 
-      %dd 
-        .square.blue
-        %p (0, 0, 255)
-      %dt blueviolet            
-      %dd 
-        .square.blueviolet
-        %p (138, 43, 226)
-      %dt brown                 
-      %dd 
-        .square.brown
-        %p (165, 42, 42)
-      %dt burlywood             
-      %dd 
-        .square.burlywood
-        %p (222, 184, 135)
-      %dt cadetblue             
-      %dd
-        .square.cadetblue 
-        %p (95, 158, 160)
-      %dt chartreuse            
-      %dd 
-        .square.chartreuse
-        %p (127, 255, 0)
-      %dt chocolate             
-      %dd 
-        .square.chocolate
-        %p (210, 105, 30)
-      %dt coral                 
-      %dd 
-        .square.coral
-        %p (255, 127, 80)
-      %dt cornflowerblue        
-      %dd 
-        .square.cornflowerblue
-        %p (100, 149, 237)
-      %dt cornsilk              
-      %dd   
-        .square.cornsilk
-        %p (255, 248, 220)
-      %dt crimson               
-      %dd 
-        .square.crimson
-        %p (220, 20, 60)
-      %dt cyan                  
-      %dd 
-        .square.cyan
-        %p (0, 255, 255)
-      %dt darkblue              
-      %dd 
-        .square.darkblue
-        %p (0, 0, 139)
-        
-      %dt darkcyan              
-      %dd 
-        .square.darkcyan
-        %p (0, 139, 139)
-        
-      %dt darkgoldenrod         
-      %dd 
-        .square.darkgoldenrod
-        %p (184, 134, 11)
-        
-      %dt darkgray              
-      %dd 
-        .square.darkgray
-        %p (169, 169, 169)
-        
-      %dt darkgreen             
-      %dd 
-        .square.darkgreen
-        %p (0, 100, 0)
-        
-      %dt darkkhaki             
-      %dd 
-        .square.darkkhaki
-        %p (189, 183, 107)
-        
-      %dt darkmagenta           
-      %dd 
-        .square.darkmagenta
-        %p (139, 0, 139)
-        
-      %dt darkolivegreen        
-      %dd 
-        .square.darkolivegreen
-        %p (85, 107, 47)
-        
-      %dt darkorange            
-      %dd 
-        .square.darkorange
-        %p (255, 140, 0)
-        
-      %dt darkorchid            
-      %dd 
-        .square.darkorchid
-        %p (153, 50, 204)
-        
-      %dt darkred               
-      %dd 
-        .square.darkred
-        %p (139, 0, 0)
-        
-      %dt darksalmon            
-      %dd 
-        .square.darksalmon
-        %p (233, 150, 122)
-        
-      %dt darkseagreen          
-      %dd 
-        .square.darkseagreen
-        %p (143, 188, 143)
-        
-      %dt darkslateblue         
-      %dd 
-        .square.darkslateblue
-        %p (72, 61, 139)
-        
-    %dl.colors   
-      %dt darkslategray         
-      %dd 
-        .square.darkslategray
-        %p (47, 79, 79)
-      %dt darkturquoise         
-      %dd 
-        .square.darkturquoise
-        %p (0, 206, 209)
-      %dt darkviolet            
-      %dd 
-        .square.darkviolet
-        %p (148, 0, 211)
-      %dt deeppink              
-      %dd 
-        .square.deeppink
-        %p (255, 20, 147)
-      %dt deepskyblue           
-      %dd 
-        .square.deepskyblue
-        %p (0, 191, 255)
-      %dt dimgray               
-      %dd 
-        .square.dimgray
-        %p (105, 105, 105)
-      %dt dodgerblue            
-      %dd 
-        .square.dodgerblue
-        %p (30, 144, 255)
-        
-      %dt firebrick:             
-      %dd 
-        .square.firebrick
-        %p (178, 34, 34)
-        
-      %dt floralwhite           
-      %dd 
-        .square.floralwhite
-        %p (255, 250, 240)
-        
-      %dt forestgreen           
-      %dd 
-        .square.forestgreen
-        %p (34, 139, 34)
-        
-      %dt fuchsia               
-      %dd 
-        .square.fuchsia
-        %p (255, 0, 255)
-        
-      %dt gainsboro             
-      %dd 
-        .square.gainsboro
-        %p (220, 220, 220)
-        
-      %dt ghostwhite            
-      %dd 
-        .square.ghostwhite
-        %p (248, 248, 255)
-        
-      %dt gold                  
-      %dd 
-        .square.gold
-        %p (255, 215, 0)
-        
-      %dt goldenrod             
-      %dd 
-        .square.goldenrod
-        %p (218, 165, 32)
-        
-      %dt gray                  
-      %dd 
-        .square.gray
-        %p (128, 128, 128)
-        
-      %dt green                 
-      %dd 
-        .square.green
-        %p (0, 128, 0)
-        
-      %dt greenyellow           
-      %dd 
-        .square.greenyellow
-        %p (173, 255, 47)
-        
-      %dt honeydew              
-      %dd 
-        .square.honeydew
-        %p (240, 255, 240)
-        
-      %dt hotpink               
-      %dd 
-        .square.hotpink
-        %p (255, 105, 180)
-        
-      %dt indianred             
-      %dd 
-        .square.indianred
-        %p (205, 92, 92)
-        
-      %dt indigo                
-      %dd 
-        .square.indigo
-        %p (75, 0, 130)
-        
-      %dt ivory                 
-      %dd 
-        .square.ivory
-        %p (255, 255, 240)
-        
-      %dt khaki                 
-      %dd 
-        .square.khaki
-        %p (240, 230, 140)
-        
-      %dt lavender              
-      %dd 
-        .square.lavender
-        %p (230, 230, 250)
-        
-      %dt lavenderblush         
-      %dd 
-        .square.lavenderblush
-        %p (255, 240, 245)
-        
-      %dt lawngreen             
-      %dd 
-        .square.lawngreen
-        %p (124, 252, 0)
-        
-      %dt lemonchiffon          
-      %dd 
-        .square.lemonchiffon
-        %p (255, 250, 205)
-        
-      %dt lightblue             
-      %dd 
-        .square.lightblue
-        %p (173, 216, 230)
-        
-      %dt lightcoral            
-      %dd 
-        .square.lightcoral
-        %p (240, 128, 128)
-        
-      %dt lightcyan             
-      %dd 
-        .square.lightcyan
-        %p (224, 255, 255)
-        
-      %dt lightgoldenrodyellow  
-      %dd 
-        .square.lightgoldenrodyellow
-        %p (250, 250, 210)
-        
-      %dt lightgreen            
-      %dd 
-        .square.lightgreen
-        %p (144, 238, 144)
-        
-      %dt lightgrey             
-      %dd 
-        .square.lightgrey
-        %p (211, 211, 211)
-        
-      %dt lightpink             
-      %dd 
-        .square.lightpink
-        %p (255, 182, 193)
-        
-    %dl.colors   
-      %dt lightsalmon           
-      %dd 
-        .square.lightsalmon
-        %p (255, 160, 122)
-        
-      %dt lightseagreen         
-      %dd 
-        .square.lightseagreen
-        %p (32, 178, 170)
-        
-      %dt lightskyblue          
-      %dd 
-        .square.lightskyblue
-        %p (135, 206, 250)
-        
-      %dt lightslategray        
-      %dd 
-        .square.lightslategray
-        %p (119, 136, 153)
-        
-      %dt lightsteelblue        
-      %dd 
-        .square.lightsteelblue
-        %p (176, 196, 222)
-        
-      %dt lightyellow           
-      %dd 
-        .square.lightyellow
-        %p (255, 255, 224)
-        
-      %dt lime                  
-      %dd 
-        .square.lime
-        %p (0, 255, 0)
-        
-      %dt limegreen             
-      %dd 
-        .square.limegreen
-        %p (50, 205, 50)
-        
-      %dt linen                 
-      %dd 
-        .square.linen
-        %p (250, 240, 230)
-        
-      %dt magenta               
-      %dd 
-        .square.magenta
-        %p (255, 0, 255)
-        
-      %dt maroon                
-      %dd 
-        .square.maroon
-        %p (128, 0, 0)
-        
-      %dt mediumaquamarine      
-      %dd 
-        .square.mediumaquamarine
-        %p (102, 205, 170)
-        
-      %dt mediumblue            
-      %dd 
-        .square.mediumblue
-        %p (0, 0, 205)
-        
-      %dt mediumorchid          
-      %dd 
-        .square.mediumorchid
-        %p (186, 85, 211)
-        
-      %dt mediumpurple          
-      %dd 
-        .square.mediumpurple
-        %p (147, 112, 219)
-        
-      %dt mediumseagreen        
-      %dd 
-        .square.mediumseagreen
-        %p (60, 179, 113)
-        
-      %dt mediumslateblue       
-      %dd 
-        .square.mediumslateblue
-        %p (123, 104, 238)
-        
-      %dt mediumspringgreen     
-      %dd 
-        .square.mediumspringgreen
-        %p (0, 250, 154)
-        
-      %dt mediumturquoise       
-      %dd 
-        .square.mediumturquoise
-        %p (72, 209, 204)
-        
-      %dt mediumvioletred       
-      %dd 
-        .square.mediumvioletred
-        %p (199, 21, 133)
-        
-      %dt midnightblue          
-      %dd 
-        .square.midnightblue
-        %p (25, 25, 112)
-        
-      %dt mintcream             
-      %dd 
-        .square.mintcream
-        %p (245, 255, 250)
-        
-      %dt mistyrose             
-      %dd 
-        .square.mistyrose
-        %p (255, 228, 225)
-        
-      %dt moccasin              
-      %dd 
-        .square.moccasin
-        %p (255, 228, 181)
-        
-      %dt navajowhite           
-      %dd 
-        .square.navajowhite
-        %p (255, 222, 173)
-        
-      %dt navy                  
-      %dd 
-        .square.navy
-        %p (0, 0, 128)
-        
-      %dt oldlace               
-      %dd 
-        .square.oldlace
-        %p (253, 245, 230)
-        
-      %dt olive                 
-      %dd 
-        .square.olive
-        %p (128, 128, 0)
-        
-      %dt olivedrab             
-      %dd 
-        .square.olivedrab
-        %p (107, 142, 35)
-        
-      %dt orange                
-      %dd 
-        .square.orange
-        %p (255, 165, 0)
-        
-      %dt orangered             
-      %dd 
-        .square.orangered
-        %p (255, 69, 0)
-        
-      %dt orchid                
-      %dd 
-        .square.orchid
-        %p (218, 112, 214)
-        
-      %dt palegoldenrod         
-      %dd 
-        .square.palegoldenrod
-        %p (238, 232, 170)
-        
-      %dt palegreen             
-      %dd 
-        .square.palegreen
-        %p (152, 251, 152)
-        
-      %dt paleturquoise         
-      %dd 
-        .square.paleturquoise
-        %p (175, 238, 238)
-        
-    %dl.colors   
-      %dt palevioletred         
-      %dd 
-        .square.palevioletred
-        %p (219, 112, 147)
-        
-      %dt papayawhip            
-      %dd 
-        .square.papayawhip
-        %p (255, 239, 213)
-        
-      %dt peachpuff             
-      %dd 
-        .square.peachpuff
-        %p (255, 218, 185)
-        
-      %dt peru                  
-      %dd 
-        .square.peru
-        %p (205, 133, 63)
-        
-      %dt pink                  
-      %dd 
-        .square.pink
-        %p (255, 192, 203)
-        
-      %dt plum                  
-      %dd 
-        .square.plum
-        %p (221, 160, 221)
-        
-      %dt powderblue            
-      %dd 
-        .square.powderblue
-        %p (176, 224, 230)
-        
-      %dt purple                
-      %dd 
-        .square.purple
-        %p (128, 0, 128)
-        
-      %dt red                   
-      %dd 
-        .square.red
-        %p (255, 0, 0)
-        
-      %dt rosybrown             
-      %dd 
-        .square.rosybrown
-        %p (188, 143, 143)
-        
-      %dt royalblue             
-      %dd 
-        .square.royalblue
-        %p (65, 105, 225)
-        
-      %dt saddlebrown           
-      %dd 
-        .square.saddlebrown
-        %p (139, 69, 19)
-        
-      %dt salmon                
-      %dd 
-        .square.salmon
-        %p (250, 128, 114)
-        
-      %dt sandybrown            
-      %dd 
-        .square.sandybrown
-        %p (244, 164, 96)
-        
-      %dt seagreen              
-      %dd 
-        .square.seagreen
-        %p (46, 139, 87)
-        
-      %dt seashell              
-      %dd 
-        .square.seashell
-        %p (255, 245, 238)
-        
-      %dt sienna                
-      %dd 
-        .square.sienna
-        %p (160, 82, 45)
-        
-      %dt silver                
-      %dd 
-        .square.silver
-        %p (192, 192, 192)
-        
-      %dt skyblue               
-      %dd 
-        .square.skyblue
-        %p (135, 206, 235)
-        
-      %dt slateblue             
-      %dd 
-        .square.slateblue
-        %p (106, 90, 205)
-        
-      %dt slategray             
-      %dd 
-        .square.slategray
-        %p (112, 128, 144)
-        
-      %dt snow                  
-      %dd 
-        .square.snow
-        %p (255, 250, 250)
-        
-      %dt springgreen           
-      %dd 
-        .square.springgreen
-        %p (0, 255, 127)
-        
-      %dt steelblue             
-      %dd 
-        .square.steelblue
-        %p (70, 130, 180)
-        
-      %dt tan                   
-      %dd 
-        .square.tan
-        %p (210, 180, 140)
-        
-      %dt teal                  
-      %dd 
-        .square.teal
-        %p (0, 128, 128)
-        
-      %dt thistle               
-      %dd 
-        .square.thistle
-        %p (216, 191, 216)
-        
-      %dt tomato                
-      %dd 
-        .square.tomato
-        %p (255, 99, 71)
-        
-      %dt turquoise             
-      %dd 
-        .square.turquoise
-        %p (64, 224, 208)
-        
-      %dt violet                
-      %dd 
-        .square.violet
-        %p (238, 130, 238)
-        
-      %dt wheat                 
-      %dd 
-        .square.wheat
-        %p (245, 222, 179)
-        
-      %dt white                 
-      %dd 
-        .square.white
-        %p (255, 255, 255)
-        
-      %dt whitesmoke            
-      %dd 
-        .square.whitesmoke
-        %p (245, 245, 245)
-        
-      %dt yellow                
-      %dd 
-        .square.yellow
-        %p (255, 255, 0)
-        
-      %dt yellowgreen           
-      %dd 
-        .square.yellowgreen
-        %p (154, 205, 50)
-        
-      .clear 
-  .clear
+            robot.Start()
+          }
 
-  %section.compatability.hardware
-    %h2 Works with:
-    =# TODO: Update platform list with all that work with this driver in Cylon.js.
-    .devices
-      = partial "documentation/partials/sphero"
+
+%section 
+  %h2 Sphero Colors (R,G,B)
+
+  %dl.colors 
+    %dt aliceblue            
+    %dd 
+      .aliceblue.square
+      %p (240, 248, 255)
+    .clear  
+    %dt antiquewhite         
+    %dd 
+      .antiquewhite.square
+      %p (250, 235, 215) 
+    %dt aqua                 
+    %dd 
+      .square.aqua
+      %p (0, 255, 255)
+    %dt aquamarine           
+    %dd
+      .square.aquamarine 
+      %p (127, 255, 212)
+    %dt azure                 
+    %dd 
+      .square.azure
+      %p (240, 255, 255)
+    %dt beige                 
+    %dd 
+      .square.beige
+      %p (245, 245, 220)
+    %dt bisque                
+    %dd 
+      .square.bisque
+      %p (255, 228, 196)
+    %dt black                 
+    %dd 
+      .square.black
+      %p (0, 0, 0)
+    %dt blanchedalmond        
+    %dd 
+      .square.blanchedalmond
+      %p (255, 235, 205)
+    %dt blue                 
+    %dd 
+      .square.blue
+      %p (0, 0, 255)
+    %dt blueviolet            
+    %dd 
+      .square.blueviolet
+      %p (138, 43, 226)
+    %dt brown                 
+    %dd 
+      .square.brown
+      %p (165, 42, 42)
+    %dt burlywood             
+    %dd 
+      .square.burlywood
+      %p (222, 184, 135)
+    %dt cadetblue             
+    %dd
+      .square.cadetblue 
+      %p (95, 158, 160)
+    %dt chartreuse            
+    %dd 
+      .square.chartreuse
+      %p (127, 255, 0)
+    %dt chocolate             
+    %dd 
+      .square.chocolate
+      %p (210, 105, 30)
+    %dt coral                 
+    %dd 
+      .square.coral
+      %p (255, 127, 80)
+    %dt cornflowerblue        
+    %dd 
+      .square.cornflowerblue
+      %p (100, 149, 237)
+    %dt cornsilk              
+    %dd   
+      .square.cornsilk
+      %p (255, 248, 220)
+    %dt crimson               
+    %dd 
+      .square.crimson
+      %p (220, 20, 60)
+    %dt cyan                  
+    %dd 
+      .square.cyan
+      %p (0, 255, 255)
+    %dt darkblue              
+    %dd 
+      .square.darkblue
+      %p (0, 0, 139)
+      
+    %dt darkcyan              
+    %dd 
+      .square.darkcyan
+      %p (0, 139, 139)
+      
+    %dt darkgoldenrod         
+    %dd 
+      .square.darkgoldenrod
+      %p (184, 134, 11)
+      
+    %dt darkgray              
+    %dd 
+      .square.darkgray
+      %p (169, 169, 169)
+      
+    %dt darkgreen             
+    %dd 
+      .square.darkgreen
+      %p (0, 100, 0)
+      
+    %dt darkkhaki             
+    %dd 
+      .square.darkkhaki
+      %p (189, 183, 107)
+      
+    %dt darkmagenta           
+    %dd 
+      .square.darkmagenta
+      %p (139, 0, 139)
+      
+    %dt darkolivegreen        
+    %dd 
+      .square.darkolivegreen
+      %p (85, 107, 47)
+      
+    %dt darkorange            
+    %dd 
+      .square.darkorange
+      %p (255, 140, 0)
+      
+    %dt darkorchid            
+    %dd 
+      .square.darkorchid
+      %p (153, 50, 204)
+      
+    %dt darkred               
+    %dd 
+      .square.darkred
+      %p (139, 0, 0)
+      
+    %dt darksalmon            
+    %dd 
+      .square.darksalmon
+      %p (233, 150, 122)
+      
+    %dt darkseagreen          
+    %dd 
+      .square.darkseagreen
+      %p (143, 188, 143)
+      
+    %dt darkslateblue         
+    %dd 
+      .square.darkslateblue
+      %p (72, 61, 139)
+      
+  %dl.colors   
+    %dt darkslategray         
+    %dd 
+      .square.darkslategray
+      %p (47, 79, 79)
+    %dt darkturquoise         
+    %dd 
+      .square.darkturquoise
+      %p (0, 206, 209)
+    %dt darkviolet            
+    %dd 
+      .square.darkviolet
+      %p (148, 0, 211)
+    %dt deeppink              
+    %dd 
+      .square.deeppink
+      %p (255, 20, 147)
+    %dt deepskyblue           
+    %dd 
+      .square.deepskyblue
+      %p (0, 191, 255)
+    %dt dimgray               
+    %dd 
+      .square.dimgray
+      %p (105, 105, 105)
+    %dt dodgerblue            
+    %dd 
+      .square.dodgerblue
+      %p (30, 144, 255)
+      
+    %dt firebrick:             
+    %dd 
+      .square.firebrick
+      %p (178, 34, 34)
+      
+    %dt floralwhite           
+    %dd 
+      .square.floralwhite
+      %p (255, 250, 240)
+      
+    %dt forestgreen           
+    %dd 
+      .square.forestgreen
+      %p (34, 139, 34)
+      
+    %dt fuchsia               
+    %dd 
+      .square.fuchsia
+      %p (255, 0, 255)
+      
+    %dt gainsboro             
+    %dd 
+      .square.gainsboro
+      %p (220, 220, 220)
+      
+    %dt ghostwhite            
+    %dd 
+      .square.ghostwhite
+      %p (248, 248, 255)
+      
+    %dt gold                  
+    %dd 
+      .square.gold
+      %p (255, 215, 0)
+      
+    %dt goldenrod             
+    %dd 
+      .square.goldenrod
+      %p (218, 165, 32)
+      
+    %dt gray                  
+    %dd 
+      .square.gray
+      %p (128, 128, 128)
+      
+    %dt green                 
+    %dd 
+      .square.green
+      %p (0, 128, 0)
+      
+    %dt greenyellow           
+    %dd 
+      .square.greenyellow
+      %p (173, 255, 47)
+      
+    %dt honeydew              
+    %dd 
+      .square.honeydew
+      %p (240, 255, 240)
+      
+    %dt hotpink               
+    %dd 
+      .square.hotpink
+      %p (255, 105, 180)
+      
+    %dt indianred             
+    %dd 
+      .square.indianred
+      %p (205, 92, 92)
+      
+    %dt indigo                
+    %dd 
+      .square.indigo
+      %p (75, 0, 130)
+      
+    %dt ivory                 
+    %dd 
+      .square.ivory
+      %p (255, 255, 240)
+      
+    %dt khaki                 
+    %dd 
+      .square.khaki
+      %p (240, 230, 140)
+      
+    %dt lavender              
+    %dd 
+      .square.lavender
+      %p (230, 230, 250)
+      
+    %dt lavenderblush         
+    %dd 
+      .square.lavenderblush
+      %p (255, 240, 245)
+      
+    %dt lawngreen             
+    %dd 
+      .square.lawngreen
+      %p (124, 252, 0)
+      
+    %dt lemonchiffon          
+    %dd 
+      .square.lemonchiffon
+      %p (255, 250, 205)
+      
+    %dt lightblue             
+    %dd 
+      .square.lightblue
+      %p (173, 216, 230)
+      
+    %dt lightcoral            
+    %dd 
+      .square.lightcoral
+      %p (240, 128, 128)
+      
+    %dt lightcyan             
+    %dd 
+      .square.lightcyan
+      %p (224, 255, 255)
+      
+    %dt lightgoldenrodyellow  
+    %dd 
+      .square.lightgoldenrodyellow
+      %p (250, 250, 210)
+      
+    %dt lightgreen            
+    %dd 
+      .square.lightgreen
+      %p (144, 238, 144)
+      
+    %dt lightgrey             
+    %dd 
+      .square.lightgrey
+      %p (211, 211, 211)
+      
+    %dt lightpink             
+    %dd 
+      .square.lightpink
+      %p (255, 182, 193)
+      
+  %dl.colors   
+    %dt lightsalmon           
+    %dd 
+      .square.lightsalmon
+      %p (255, 160, 122)
+      
+    %dt lightseagreen         
+    %dd 
+      .square.lightseagreen
+      %p (32, 178, 170)
+      
+    %dt lightskyblue          
+    %dd 
+      .square.lightskyblue
+      %p (135, 206, 250)
+      
+    %dt lightslategray        
+    %dd 
+      .square.lightslategray
+      %p (119, 136, 153)
+      
+    %dt lightsteelblue        
+    %dd 
+      .square.lightsteelblue
+      %p (176, 196, 222)
+      
+    %dt lightyellow           
+    %dd 
+      .square.lightyellow
+      %p (255, 255, 224)
+      
+    %dt lime                  
+    %dd 
+      .square.lime
+      %p (0, 255, 0)
+      
+    %dt limegreen             
+    %dd 
+      .square.limegreen
+      %p (50, 205, 50)
+      
+    %dt linen                 
+    %dd 
+      .square.linen
+      %p (250, 240, 230)
+      
+    %dt magenta               
+    %dd 
+      .square.magenta
+      %p (255, 0, 255)
+      
+    %dt maroon                
+    %dd 
+      .square.maroon
+      %p (128, 0, 0)
+      
+    %dt mediumaquamarine      
+    %dd 
+      .square.mediumaquamarine
+      %p (102, 205, 170)
+      
+    %dt mediumblue            
+    %dd 
+      .square.mediumblue
+      %p (0, 0, 205)
+      
+    %dt mediumorchid          
+    %dd 
+      .square.mediumorchid
+      %p (186, 85, 211)
+      
+    %dt mediumpurple          
+    %dd 
+      .square.mediumpurple
+      %p (147, 112, 219)
+      
+    %dt mediumseagreen        
+    %dd 
+      .square.mediumseagreen
+      %p (60, 179, 113)
+      
+    %dt mediumslateblue       
+    %dd 
+      .square.mediumslateblue
+      %p (123, 104, 238)
+      
+    %dt mediumspringgreen     
+    %dd 
+      .square.mediumspringgreen
+      %p (0, 250, 154)
+      
+    %dt mediumturquoise       
+    %dd 
+      .square.mediumturquoise
+      %p (72, 209, 204)
+      
+    %dt mediumvioletred       
+    %dd 
+      .square.mediumvioletred
+      %p (199, 21, 133)
+      
+    %dt midnightblue          
+    %dd 
+      .square.midnightblue
+      %p (25, 25, 112)
+      
+    %dt mintcream             
+    %dd 
+      .square.mintcream
+      %p (245, 255, 250)
+      
+    %dt mistyrose             
+    %dd 
+      .square.mistyrose
+      %p (255, 228, 225)
+      
+    %dt moccasin              
+    %dd 
+      .square.moccasin
+      %p (255, 228, 181)
+      
+    %dt navajowhite           
+    %dd 
+      .square.navajowhite
+      %p (255, 222, 173)
+      
+    %dt navy                  
+    %dd 
+      .square.navy
+      %p (0, 0, 128)
+      
+    %dt oldlace               
+    %dd 
+      .square.oldlace
+      %p (253, 245, 230)
+      
+    %dt olive                 
+    %dd 
+      .square.olive
+      %p (128, 128, 0)
+      
+    %dt olivedrab             
+    %dd 
+      .square.olivedrab
+      %p (107, 142, 35)
+      
+    %dt orange                
+    %dd 
+      .square.orange
+      %p (255, 165, 0)
+      
+    %dt orangered             
+    %dd 
+      .square.orangered
+      %p (255, 69, 0)
+      
+    %dt orchid                
+    %dd 
+      .square.orchid
+      %p (218, 112, 214)
+      
+    %dt palegoldenrod         
+    %dd 
+      .square.palegoldenrod
+      %p (238, 232, 170)
+      
+    %dt palegreen             
+    %dd 
+      .square.palegreen
+      %p (152, 251, 152)
+      
+    %dt paleturquoise         
+    %dd 
+      .square.paleturquoise
+      %p (175, 238, 238)
+      
+  %dl.colors   
+    %dt palevioletred         
+    %dd 
+      .square.palevioletred
+      %p (219, 112, 147)
+      
+    %dt papayawhip            
+    %dd 
+      .square.papayawhip
+      %p (255, 239, 213)
+      
+    %dt peachpuff             
+    %dd 
+      .square.peachpuff
+      %p (255, 218, 185)
+      
+    %dt peru                  
+    %dd 
+      .square.peru
+      %p (205, 133, 63)
+      
+    %dt pink                  
+    %dd 
+      .square.pink
+      %p (255, 192, 203)
+      
+    %dt plum                  
+    %dd 
+      .square.plum
+      %p (221, 160, 221)
+      
+    %dt powderblue            
+    %dd 
+      .square.powderblue
+      %p (176, 224, 230)
+      
+    %dt purple                
+    %dd 
+      .square.purple
+      %p (128, 0, 128)
+      
+    %dt red                   
+    %dd 
+      .square.red
+      %p (255, 0, 0)
+      
+    %dt rosybrown             
+    %dd 
+      .square.rosybrown
+      %p (188, 143, 143)
+      
+    %dt royalblue             
+    %dd 
+      .square.royalblue
+      %p (65, 105, 225)
+      
+    %dt saddlebrown           
+    %dd 
+      .square.saddlebrown
+      %p (139, 69, 19)
+      
+    %dt salmon                
+    %dd 
+      .square.salmon
+      %p (250, 128, 114)
+      
+    %dt sandybrown            
+    %dd 
+      .square.sandybrown
+      %p (244, 164, 96)
+      
+    %dt seagreen              
+    %dd 
+      .square.seagreen
+      %p (46, 139, 87)
+      
+    %dt seashell              
+    %dd 
+      .square.seashell
+      %p (255, 245, 238)
+      
+    %dt sienna                
+    %dd 
+      .square.sienna
+      %p (160, 82, 45)
+      
+    %dt silver                
+    %dd 
+      .square.silver
+      %p (192, 192, 192)
+      
+    %dt skyblue               
+    %dd 
+      .square.skyblue
+      %p (135, 206, 235)
+      
+    %dt slateblue             
+    %dd 
+      .square.slateblue
+      %p (106, 90, 205)
+      
+    %dt slategray             
+    %dd 
+      .square.slategray
+      %p (112, 128, 144)
+      
+    %dt snow                  
+    %dd 
+      .square.snow
+      %p (255, 250, 250)
+      
+    %dt springgreen           
+    %dd 
+      .square.springgreen
+      %p (0, 255, 127)
+      
+    %dt steelblue             
+    %dd 
+      .square.steelblue
+      %p (70, 130, 180)
+      
+    %dt tan                   
+    %dd 
+      .square.tan
+      %p (210, 180, 140)
+      
+    %dt teal                  
+    %dd 
+      .square.teal
+      %p (0, 128, 128)
+      
+    %dt thistle               
+    %dd 
+      .square.thistle
+      %p (216, 191, 216)
+      
+    %dt tomato                
+    %dd 
+      .square.tomato
+      %p (255, 99, 71)
+      
+    %dt turquoise             
+    %dd 
+      .square.turquoise
+      %p (64, 224, 208)
+      
+    %dt violet                
+    %dd 
+      .square.violet
+      %p (238, 130, 238)
+      
+    %dt wheat                 
+    %dd 
+      .square.wheat
+      %p (245, 222, 179)
+      
+    %dt white                 
+    %dd 
+      .square.white
+      %p (255, 255, 255)
+      
+    %dt whitesmoke            
+    %dd 
+      .square.whitesmoke
+      %p (245, 245, 245)
+      
+    %dt yellow                
+    %dd 
+      .square.yellow
+      %p (255, 255, 0)
+      
+    %dt yellowgreen           
+    %dd 
+      .square.yellowgreen
+      %p (154, 205, 50)
+      
+    .clear 
+.clear
+
+%section.compatability.hardware
+  %h2 Works with:
+  =# TODO: Update platform list with all that work with this driver in Cylon.js.
+  .devices
+    = partial "documentation/partials/devices_platforms"

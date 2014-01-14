@@ -3,99 +3,101 @@ title: Cylon.js - Crazyflie Driver
 author: The Hybrid Group
 page_title: Crazyflie
 page_subtitle: Driver
-layout: page
+page_title_show: true
+layout: documentation
+
+crazyflie_platform: true
 ---
-.documentation
-  %section.intro
-    =image_tag "/images/crazyflie.jpg", class: "display"
-    %p
-      Allows user to send flight control commands to a Crazyflie micro-quadcopter. Flight control commands are those used to tell the Crazyflie to take off, land, and or any number of other autonomous flight manuvers.
+%section.intro
+  =image_tag "/images/devices/crazyflie.jpg", class: "display"
+  %p
+    Allows user to send flight control commands to a Crazyflie micro-quadcopter. Flight control commands are those used to tell the Crazyflie to take off, land, and or any number of other autonomous flight manuvers.
 
-  %section.how-to
-    %h2 How to establish a connection and setup the driver
-    %p
-      Communication with the Crazyflie's flight control interface takes place using a 2.4GHz radio connection. The Crazyflie is controlled from your computer using a Crazyradio, which is a custom USB 2.4GHz radio device. 
-    :markdown
-          :::ruby
-          require 'Cylon.js'
-          connection :crazyflie, :adaptor => :crazyflie
-          device :drone, :driver => :crazyflie, :connection => :crazyflie, :interval => 0.1
+%section.how-to
+  %h2 How to establish a connection and setup the driver
+  %p
+    Communication with the Crazyflie's flight control interface takes place using a 2.4GHz radio connection. The Crazyflie is controlled from your computer using a Crazyradio, which is a custom USB 2.4GHz radio device. 
+  :markdown
+        :::ruby
+        require 'Cylon.js'
+        connection :crazyflie, :adaptor => :crazyflie
+        device :drone, :driver => :crazyflie, :connection => :crazyflie, :interval => 0.1
 
-  %section.public-methods
-    %h2 Public instance methods:
-    %h3 start
-    %p
-      Starts the crazyfly's motors and controls.
+%section.public-methods
+  %h2 Public instance methods:
+  %h3 start
+  %p
+    Starts the crazyfly's motors and controls.
 
-    %h3 stop
-    %p
-      Stops the crazyfly's motors.
+  %h3 stop
+  %p
+    Stops the crazyfly's motors.
 
-    %h3 hover
-    %p
-      Makes the crazyflie hover in a position.
+  %h3 hover
+  %p
+    Makes the crazyflie hover in a position.
 
-    %h3 land
-    %p
-      Initiates a landing sequence.
+  %h3 land
+  %p
+    Initiates a landing sequence.
 
-    %h3 take_off
-    %p
-      Initiates take off sequence.
+  %h3 take_off
+  %p
+    Initiates take off sequence.
 
-    %h3 up
-    %p
-      Orders crazy flie to go up.
+  %h3 up
+  %p
+    Orders crazy flie to go up.
 
-    %h3 down
-    %p
-      Orders crazy flie to go down.
+  %h3 down
+  %p
+    Orders crazy flie to go down.
 
-    %h3 left(deg)
-    %p
-      Orders crazyflie to go left the amount specified by deg (roll left).
+  %h3 left(deg)
+  %p
+    Orders crazyflie to go left the amount specified by deg (roll left).
 
-    %h3 right(deg)
-    %p
-      Orders crazyflie to go right the amount specified by deg (roll right).
+  %h3 right(deg)
+  %p
+    Orders crazyflie to go right the amount specified by deg (roll right).
 
-    %h3 forward(deg)
-    %p
-      Orders crazyflie to go forward the amount specified by deg (pitch forward).
+  %h3 forward(deg)
+  %p
+    Orders crazyflie to go forward the amount specified by deg (pitch forward).
 
-    %h3 backward(deg)
-    %p
-      Orders crazyflie to go backward the amount specified by deg (pitch backward).
+  %h3 backward(deg)
+  %p
+    Orders crazyflie to go backward the amount specified by deg (pitch backward).
 
-    %h3 turn_left(deg)
-    %p
-      Orders crazyflie to turn left the amount specified by deg (yaw left).
+  %h3 turn_left(deg)
+  %p
+    Orders crazyflie to turn left the amount specified by deg (yaw left).
 
-    %h3 turn_right(deg)
-    %p
-      Orders crazyflie to turn right the amount specified by deg (yaw right).
+  %h3 turn_right(deg)
+  %p
+    Orders crazyflie to turn right the amount specified by deg (yaw right).
 
-    %h3 power(deg)
-    %p
-      Sets thrust power to deg.
+  %h3 power(deg)
+  %p
+    Sets thrust power to deg.
 
-  %section.how-to
-    %h2 How to use
-    %h3 Example of controlling a Crazyflie.
-    :markdown
-          :::ruby
-          require 'Cylon.js'
+%section.how-to
+  %h2 How to use
+  %h3 Example of controlling a Crazyflie.
+  :markdown
+        :::ruby
+        require 'Cylon.js'
 
-          connection :crazyflie, :adaptor => :crazyflie
-          device :drone, :driver => :crazyflie, :connection => :crazyflie, :interval => 0.1
+        connection :crazyflie, :adaptor => :crazyflie
+        device :drone, :driver => :crazyflie, :connection => :crazyflie, :interval => 0.1
 
-          work do
-            drone.forward(0)
-            drone.set_thrust_on
-            after(1.seconds) {drone.stop}
-          end
+        work do
+          drone.forward(0)
+          drone.set_thrust_on
+          after(1.seconds) {drone.stop}
+        end
 
-  %section.compatability.hardware
-    %h2 Works with:
-    .devices
-      = partial "documentation/partials/crazyflie"
+%section.compatability.hardware
+  %h2 Works with:
+  .devices
+    = partial "documentation/partials/devices_platforms"

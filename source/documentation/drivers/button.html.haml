@@ -3,135 +3,137 @@ title: Gobot - Button Driver
 author: The Hybrid Group
 page_title: Button
 page_subtitle: Driver
-layout: page
+page_title_show: true
+layout: documentation
+
+arduino_platform: true
+beaglebone_platform: true
+digispark_platform: true
 ---
-.documentation
-  %section.intro
-    = image_tag "/images/button.jpg", class: "display"
-    %p
-      Simple interface that makes it possible to register clicks through physical input.
+%section.intro
+  = image_tag "/images/devices/button.jpg", class: "display"
+  %p
+    Simple interface that makes it possible to register clicks through physical input.
 
-  %section.how_to
-    %h2 How to establish a connection and setup the driver 
-    :markdown
-      Install the library with: `go get -u github.com/hybridgroup/gobot-gpio`
-    %h3 For Spark:
-    :markdown
-          :::go
-          package main
+%section.how_to
+  %h2 How to establish a connection and setup the driver 
+  :markdown
+    Install the library with: `go get -u github.com/hybridgroup/gobot-gpio`
+  %h3 For Spark:
+  :markdown
+        :::go
+        package main
 
-          import (
-            "fmt"
-            "github.com/hybridgroup/gobot"
-            "github.com/hybridgroup/gobot-gpio"
-            "github.com/hybridgroup/gobot-spark"
-          )
+        import (
+          "fmt"
+          "github.com/hybridgroup/gobot"
+          "github.com/hybridgroup/gobot-gpio"
+          "github.com/hybridgroup/gobot-spark"
+        )
 
-          func main() {
+        func main() {
 
-            spark := new(gobotSpark.SparkAdaptor)
-            spark.Name = "spark"
-            spark.Params = map[string]interface{}{
-              "device_id":    "",
-              "access_token": "",
-            }
-
-            button := gobotGPIO.NewButton(spark)
-            button.Name = "button"
-            button.Pin = "D5"
-            button.Interval = "2s"
-
-            led := gobotGPIO.NewLed(spark)
-            led.Name = "led"
-            led.Pin = "D7"
-          ...
-
-  %section.public-methods
-    -#%h2 Commands:
-
-    -#%dl.methods
-      -#%dt 
-      -#%dd
-
-
-  %section.public-events
-    %h2 Events:
-
-    %dl.methods 
-      %dt update
-      %dd 
-        This event will contain one of the following events.
-        %br/  
-        You can also subscribe to one of the specific events, if that is the information you are interested in.
-      %dt push
-      %dd This event gets triggered when the button changes state from released to pushed.
-      %dt release
-      %dd This event gets triggered when the button changes state from pushed to released.
-      %dt start
-      %dd Sent when the device has been started and is ready to use. 
-
-
-  %section.how-to
-    %h2 How to use
-    %p This example detects when a button has been pushed, it turns on and off a LED
-   
-    :markdown
-          :::go
-          package main
-
-          import (
-            "fmt"
-            "github.com/hybridgroup/gobot"
-            "github.com/hybridgroup/gobot-gpio"
-            "github.com/hybridgroup/gobot-spark"
-          )
-
-          func main() {
-
-            spark := new(gobotSpark.SparkAdaptor)
-            spark.Name = "spark"
-            spark.Params = map[string]interface{}{
-              "device_id":    "",
-              "access_token": "",
-            }
-
-            button := gobotGPIO.NewButton(spark)
-            button.Name = "button"
-            button.Pin = "D5"
-            button.Interval = "2s"
-
-            led := gobotGPIO.NewLed(spark)
-            led.Name = "led"
-            led.Pin = "D7"
-
-            work := func() {
-              gobot.On(button.Events["push"], func(data interface{}) {
-                led.On()
-              })
-
-              gobot.On(button.Events["release"], func(data interface{}) {
-                led.Off()
-              })
-            }
-
-            robot := gobot.Robot{
-              Connections: []gobot.Connection{spark},
-              Devices:     []gobot.Device{button, led},
-              Work:        work,
-            }
-
-            robot.Start()
+          spark := new(gobotSpark.SparkAdaptor)
+          spark.Name = "spark"
+          spark.Params = map[string]interface{}{
+            "device_id":    "",
+            "access_token": "",
           }
 
-  %section.circuit
-    %h2 Circuit and Schematic
-    =link_to "http://arduino.cc/en/tutorial/button", "http://arduino.cc/en/tutorial/button", target:"_blank" 
+          button := gobotGPIO.NewButton(spark)
+          button.Name = "button"
+          button.Pin = "D5"
+          button.Interval = "2s"
 
-  %section.compatability.hardware
-    %h2 Works with:
-    =# TODO: Update platform list with all that work with this driver in Cylon.js.
-    .devices
-      = partial "documentation/partials/arduino"
-      = partial "documentation/partials/beaglebone"
-      = partial "documentation/partials/digispark"
-      = #partial "documentation/partials/raspberry-pi"
+          led := gobotGPIO.NewLed(spark)
+          led.Name = "led"
+          led.Pin = "D7"
+        ...
+
+%section.public-methods
+  -#%h2 Commands:
+
+  -#%dl.methods
+    -#%dt 
+    -#%dd
+
+
+%section.public-events
+  %h2 Events:
+
+  %dl.methods 
+    %dt update
+    %dd 
+      This event will contain one of the following events.
+      %br/  
+      You can also subscribe to one of the specific events, if that is the information you are interested in.
+    %dt push
+    %dd This event gets triggered when the button changes state from released to pushed.
+    %dt release
+    %dd This event gets triggered when the button changes state from pushed to released.
+    %dt start
+    %dd Sent when the device has been started and is ready to use. 
+
+
+%section.how-to
+  %h2 How to use
+  %p This example detects when a button has been pushed, it turns on and off a LED
+ 
+  :markdown
+        :::go
+        package main
+
+        import (
+          "fmt"
+          "github.com/hybridgroup/gobot"
+          "github.com/hybridgroup/gobot-gpio"
+          "github.com/hybridgroup/gobot-spark"
+        )
+
+        func main() {
+
+          spark := new(gobotSpark.SparkAdaptor)
+          spark.Name = "spark"
+          spark.Params = map[string]interface{}{
+            "device_id":    "",
+            "access_token": "",
+          }
+
+          button := gobotGPIO.NewButton(spark)
+          button.Name = "button"
+          button.Pin = "D5"
+          button.Interval = "2s"
+
+          led := gobotGPIO.NewLed(spark)
+          led.Name = "led"
+          led.Pin = "D7"
+
+          work := func() {
+            gobot.On(button.Events["push"], func(data interface{}) {
+              led.On()
+            })
+
+            gobot.On(button.Events["release"], func(data interface{}) {
+              led.Off()
+            })
+          }
+
+          robot := gobot.Robot{
+            Connections: []gobot.Connection{spark},
+            Devices:     []gobot.Device{button, led},
+            Work:        work,
+          }
+
+          robot.Start()
+        }
+
+%section.circuit
+  %h2 Circuit and Schematic
+  =link_to "http://arduino.cc/en/tutorial/button", "http://arduino.cc/en/tutorial/button", target:"_blank" 
+
+%section.compatability.hardware
+  %h2 Works with:
+  =# TODO: Update platform list with all that work with this driver in Cylon.js.
+  .devices
+    = partial "documentation/partials/devices_platforms"
+   

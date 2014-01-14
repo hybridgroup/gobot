@@ -3,107 +3,110 @@ title: Cylon.js - Roomba Driver
 author: The Hybrid Group
 page_title: Roomba
 page_subtitle: Driver
-layout: page
+page_title_show: true
+layout: documentation
+
+roomba_platform: true
 ---
-.documentation
-  %section.intro
-    =image_tag "/images/roomba.jpg", class: "display"
-    %p
-      Allows user to control a Roomba iRobot Create using Cylon.js.
 
-  %section.how-to
-    %h2 How to establish a connection and setup the driver
-    :markdown
-          :::ruby
-          require 'Cylon.js'
-          connection :roomba, :adaptor => :roomba, :port => '/dev/ttyUSB0'
-          device :roomba, :driver => :roomba, :connection => :roomba
+%section.intro
+  =image_tag "/images/devices/roomba.jpg", class: "display"
+  %p
+    Allows user to control a Roomba iRobot Create using Cylon.js.
 
-  %section.public-methods
-    %h2 Public instance methods
-    %h3 start
-    %p
-      Puts roomba in start mode.
+%section.how-to
+  %h2 How to establish a connection and setup the driver
+  :markdown
+        :::ruby
+        require 'Cylon.js'
+        connection :roomba, :adaptor => :roomba, :port => '/dev/ttyUSB0'
+        device :roomba, :driver => :roomba, :connection => :roomba
 
-    %h3 safe_mode
-    %p
-      Puts roomba in safe mode.
+%section.public-methods
+  %h2 Public instance methods
+  %h3 start
+  %p
+    Puts roomba in start mode.
 
-    %h3 full_mode
-    %p
-      Puts roomba in full mode.
+  %h3 safe_mode
+  %p
+    Puts roomba in safe mode.
 
-    %h3 forward(seconds, speed=slow) → nil
-    %p
-      Moves roomba forward for &lt;seconds&gt; amount of time at &lt;speed&gt; (speed(int) between 0 and 500).
+  %h3 full_mode
+  %p
+    Puts roomba in full mode.
 
-    %h3 fast_forward(seconds) → nil
-    %p
-      Moves roomba forward for &lt;seconds&gt; amount of time at max speed.
+  %h3 forward(seconds, speed=slow) → nil
+  %p
+    Moves roomba forward for &lt;seconds&gt; amount of time at &lt;speed&gt; (speed(int) between 0 and 500).
 
-    %h3 stop
-    %p
-      Stops the roomba.
+  %h3 fast_forward(seconds) → nil
+  %p
+    Moves roomba forward for &lt;seconds&gt; amount of time at max speed.
 
-    %h3 backwards(seconds) → nil
-    %p
-      Moves roomba backwards for &lt;seconds&gt; amount of time at default speed.
+  %h3 stop
+  %p
+    Stops the roomba.
 
-    %h3 nudge_left
-    %p
-      Turns roomba a little bit to the left.
+  %h3 backwards(seconds) → nil
+  %p
+    Moves roomba backwards for &lt;seconds&gt; amount of time at default speed.
 
-    %h3 nudge_right
-    %p
-      Turns roomba a little bit to the right.
+  %h3 nudge_left
+  %p
+    Turns roomba a little bit to the left.
 
-    %h3 turn_left(seconds=1) → nil
-    %p
-      Turns roomba to the left the specefied amount of seconds.
+  %h3 nudge_right
+  %p
+    Turns roomba a little bit to the right.
 
-    %h3 turn_right(seconds=1) → nil
-    %p
-      Turns roomba to the right the specefied amount of seconds.
+  %h3 turn_left(seconds=1) → nil
+  %p
+    Turns roomba to the left the specefied amount of seconds.
 
-    %h3 turn_around
-    %p
-      Turns roomba 180 degrees.
+  %h3 turn_right(seconds=1) → nil
+  %p
+    Turns roomba to the right the specefied amount of seconds.
 
-    %h3 drive(speed, direction, seconds = 0)  → nil
-    %p
-      Drives the roomba at speed (from 0 to 500) and direction (straight=32768, clockwise=65535, counterclockwise=1) for the specefied amount of time (seconds).
+  %h3 turn_around
+  %p
+    Turns roomba 180 degrees.
 
-    %h3 play(song_number)  → nil
-    %p
-      Plays the song specified by song_numer.
+  %h3 drive(speed, direction, seconds = 0)  → nil
+  %p
+    Drives the roomba at speed (from 0 to 500) and direction (straight=32768, clockwise=65535, counterclockwise=1) for the specefied amount of time (seconds).
 
-    %h3 song(notes[Collection], song_number[Integer])  → nil
-    %p
-      Stores a song in the roomba.
+  %h3 play(song_number)  → nil
+  %p
+    Plays the song specified by song_numer.
 
-    %h3 beep
-    %p
-      Makes roomba beep.
+  %h3 song(notes[Collection], song_number[Integer])  → nil
+  %p
+    Stores a song in the roomba.
 
-  %section.how-to
-    %h2 How to use
-    %h3 Example controlling a Roomba.
-    :markdown
-          :::ruby
-          require 'Cylon.js'
+  %h3 beep
+  %p
+    Makes roomba beep.
 
-          connection :roomba, :adaptor => :roomba, :port => '/dev/ttyUSB0'
-          device :roomba, :driver => :roomba, :connection => :roomba
+%section.how-to
+  %h2 How to use
+  %h3 Example controlling a Roomba.
+  :markdown
+        :::ruby
+        require 'Cylon.js'
 
-          work do
-            roomba.safe_mode
-            roomba.nudge_left
-            roomba.nudge_right
-            roomba.nudge_right
-            roomba.nudge_left
-          end
+        connection :roomba, :adaptor => :roomba, :port => '/dev/ttyUSB0'
+        device :roomba, :driver => :roomba, :connection => :roomba
 
-  %section.compatability.hardware
-    %h2 Works with:
-    .devices
-      = partial "documentation/partials/roomba"
+        work do
+          roomba.safe_mode
+          roomba.nudge_left
+          roomba.nudge_right
+          roomba.nudge_right
+          roomba.nudge_left
+        end
+
+%section.compatability.hardware
+  %h2 Works with:
+  .devices
+    = partial "documentation/partials/devices_platforms"

@@ -3,117 +3,119 @@ title: Arduino with Gobot
 author: The Hybrid Group
 page_title: Arduino
 page_subtitle: "<a href='https://github.com/hybridgroup/gobot-firmata' target='blanck' class='repository'>Repository</a> <a class+'issues' href='https://github.com/hybridgroup/gobot-firmata/issues' target='blanck'>Issues</a>"
-layout: page
+page_title_show: true
+layout: documentation
+
+button_driver: true
+led_driver: true
+servo_driver: true
 ---
-.documentation
-  %section.intro
-    = image_tag "/images/arduino.jpg", class: "display"
 
-    %p
-      Arduino is an open-source electronics prototyping platform based on flexible,
-      easy-to-use hardware and software. It's intended for artists, designers, hobbyists and
-      anyone interested in creating interactive objects or environments.
+%section.intro
+  = image_tag "/images/devices/arduino.jpg", class: "display"
 
-    %p
-      For more info about the arduino platform click
-      = succeed "." do
-        = link_to "here", "http://arduino.cc/", target: :blank
+  %p
+    Arduino is an open-source electronics prototyping platform based on flexible,
+    easy-to-use hardware and software. It's intended for artists, designers, hobbyists and
+    anyone interested in creating interactive objects or environments.
 
-    
+  %p
+    For more info about the arduino platform click
+    = succeed "." do
+      = link_to "here", "http://arduino.cc/", target: :blank
 
-  %section.how_to
-    %h2 How to install
-    %p
-      Installing Gobot with Arduino support is pretty easy.
-    :markdown
-          :::bash
-          go get -u github.com/hybridgroup/gobot-firmata
-    %h2 How to use
-    %p This small program lets you turn on and off a LED every 1s. 
-    :markdown
-          :::go
-          package main
+  
 
-          import (
-            "fmt"
-            "github.com/hybridgroup/gobot"
-            "github.com/hybridgroup/gobot-firmata"
-            "github.com/hybridgroup/gobot-gpio"
-          )
+%section.how_to
+  %h2 How to install
+  %p
+    Installing Gobot with Arduino support is pretty easy.
+  :markdown
+        :::bash
+        go get -u github.com/hybridgroup/gobot-firmata
+  %h2 How to use
+  %p This small program lets you turn on and off a LED every 1s. 
+  :markdown
+        :::go
+        package main
 
-          func main() {
+        import (
+          "fmt"
+          "github.com/hybridgroup/gobot"
+          "github.com/hybridgroup/gobot-firmata"
+          "github.com/hybridgroup/gobot-gpio"
+        )
 
-            firmata := new(gobotFirmata.FirmataAdaptor)
-            firmata.Name = "firmata"
-            firmata.Port = "/dev/ttyACM0"
+        func main() {
 
-            led := gobotGPIO.NewLed(firmata)
-            led.Name = "led"
-            led.Pin = "13"
+          firmata := new(gobotFirmata.FirmataAdaptor)
+          firmata.Name = "firmata"
+          firmata.Port = "/dev/ttyACM0"
 
-            connections := []interface{}{
-              firmata,
-            }
-            devices := []interface{}{
-              led,
-            }
+          led := gobotGPIO.NewLed(firmata)
+          led.Name = "led"
+          led.Pin = "13"
 
-            work := func() {
-              gobot.Every("1s", func() {
-                led.Toggle()
-                if led.IsOn() {
-                  fmt.Println("On")
-                } else {
-                  fmt.Println("Off")
-                }
-              })
-            }
-
-            robot := gobot.Robot{
-              Connections: connections,
-              Devices:     devices,
-              Work:        work,
-            }
-
-            robot.Start()
+          connections := []interface{}{
+            firmata,
+          }
+          devices := []interface{}{
+            led,
           }
 
+          work := func() {
+            gobot.Every("1s", func() {
+              led.Toggle()
+              if led.IsOn() {
+                fmt.Println("On")
+              } else {
+                fmt.Println("Off")
+              }
+            })
+          }
 
-    %h2 How to connect
-    %h3 OSX
-    %p Coming soon.
+          robot := gobot.Robot{
+            Connections: connections,
+            Devices:     devices,
+            Work:        work,
+          }
 
-    %h3 Ubuntu
+          robot.Start()
+        }
 
-    %p Coming soon.
 
-   
-  %section.drivers
-    %h2 Drivers
-    %p
-      Thanks to
-      %b Gobot
-      and
-      %b Go
-      it is possible to interact with several I/O hardware devices and interfaces connected to the arduino
-      using a set of already defined and easy to use drivers, all of this thanks to the Gobot architecture, in conjuction with the gobot-firmata
-      adaptor (using the firmata communication protocol),
-      which makes it even possible to swap the entire platform for something else like digispark, and keep using the same code you just wrote for
-      arduino, this just by swapping a couple of lines in your program.
-    %p
-      Available drivers for the arduino platform are listed below, the drivers contain detailed documentation and examples of what kind
-      physical computing (using Gobot and Go) you could be doing:
+  %h2 How to connect
+  %h3 OSX
+  %p Coming soon.
 
-    .hardware
-      .devices
-        = #partial "documentation/partials/analog-sensor"
-        = partial "documentation/partials/button"
-        = partial "documentation/partials/led"
-        = #partial "documentation/partials/maxbotix"
-        = #partial "documentation/partials/motor"
-        = partial "documentation/partials/servo"
-        = #partial "documentation/partials/blinkm"
-        = #partial "documentation/partials/hmc6352-compass"
-        = #partial "documentation/partials/wiichuck"
-        = #partial "documentation/partials/wiiclassic"
+  %h3 Ubuntu
+
+  %p Coming soon.
+
+ 
+%section.drivers
+  %h2 Drivers
+  %p
+    Thanks to
+    %b Gobot
+    and
+    %b Go
+    it is possible to interact with several I/O hardware devices and interfaces connected to the arduino
+    using a set of already defined and easy to use drivers, all of this thanks to the Gobot architecture, in conjuction with the gobot-firmata
+    adaptor (using the firmata communication protocol),
+    which makes it even possible to swap the entire platform for something else like digispark, and keep using the same code you just wrote for
+    arduino, this just by swapping a couple of lines in your program.
+  %p
+    Available drivers for the arduino platform are listed below, the drivers contain detailed documentation and examples of what kind
+    physical computing (using Gobot and Go) you could be doing:
+
+  .hardware
+    %h2 GPIO Drivers
+    .devices
+      // TODO: Update drivers list at the top of the page.
+      = partial "documentation/partials/devices_gpio_drivers"
+    -#%h2 i2c Drivers
+    -#.devices
+      = partial "documentation/partials/devices_i2c_drivers"
+      
 

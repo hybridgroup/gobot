@@ -3,98 +3,101 @@ title: Gobot - Leap Motion Driver
 author: The Hybrid Group
 page_title: Leap Motion
 page_subtitle: Driver
-layout: page
+page_title_show: true
+layout: documentation
+
+leapmotion_platform: true
 ---
-.documentation
-  %section.intro
-    =image_tag "/images/leap_motion.jpg", class: "display"
-    %p
-      Allows user to interact with Gobot devices using a Leap Motion controller. The Leap Motion uses its built in cameras to track the user's hand motions, and translations those to events that Gobot can use to trigger actions or control hardware.
 
-  %section.how-to
-    %h2 How to establish a connection and setup the driver
-    :markdown
-          :::go
-          package main
+%section.intro
+  =image_tag "/images/devices/leap_motion.jpg", class: "display"
+  %p
+    Allows user to interact with Gobot devices using a Leap Motion controller. The Leap Motion uses its built in cameras to track the user's hand motions, and translations those to events that Gobot can use to trigger actions or control hardware.
 
-          import (
-            "fmt"
-            "github.com/hybridgroup/gobot"
-            "github.com/hybridgroup/gobot-leapmotion"
-          )
+%section.how-to
+  %h2 How to establish a connection and setup the driver
+  :markdown
+        :::go
+        package main
 
-          func main() {
-            leapAdaptor := new(gobotLeap.LeapAdaptor)
-            leapAdaptor.Name = "leap"
-            leapAdaptor.Port = "127.0.0.1:6437"
+        import (
+          "fmt"
+          "github.com/hybridgroup/gobot"
+          "github.com/hybridgroup/gobot-leapmotion"
+        )
 
-            leap := gobotLeap.NewLeap(leapAdaptor)
-            leap.Name = "leap"
-          ...
-  %section.public-methods
-    %h2 Events
+        func main() {
+          leapAdaptor := new(gobotLeap.LeapAdaptor)
+          leapAdaptor.Name = "leap"
+          leapAdaptor.Port = "127.0.0.1:6437"
 
-    %dl.methods 
-      %dt message
-      %dd Gets triggered when receiving a message.
-      %dt start
-      %dd Sent when the device has been started and is ready to use.
+          leap := gobotLeap.NewLeap(leapAdaptor)
+          leap.Name = "leap"
+        ...
+%section.public-methods
+  %h2 Events
 
-    -#%h3 hand
-    -#%p Gets triggered when doing a hand motion, makes hand input available.
+  %dl.methods 
+    %dt message
+    %dd Gets triggered when receiving a message.
+    %dt start
+    %dd Sent when the device has been started and is ready to use.
 
-    -#%h3 gesture
-    -#%p Gets triggered when doing a gesture motion, makes hand input available.
+  -#%h3 hand
+  -#%p Gets triggered when doing a hand motion, makes hand input available.
 
-    -#%h3 pointable
-    -#%p Gets triggered when doing a pointable motion, makes hand input available.
+  -#%h3 gesture
+  -#%p Gets triggered when doing a gesture motion, makes hand input available.
 
-    -#%h3 frame
-    -#%p Gets triggered with every motion detected, makes frame input available.
+  -#%h3 pointable
+  -#%p Gets triggered when doing a pointable motion, makes hand input available.
 
-    -#%h3 How to use events and call them on your drivers
-    -#%p Pretty simple, when the connection and the driver have been setup (as explained above) you can call events on them as follows:
-    -#:markdown
-          -#%:::go 
-          -#on leapmotion, :hand => proc { |sender, hand| puts hand.inspect }
+  -#%h3 frame
+  -#%p Gets triggered with every motion detected, makes frame input available.
 
-  %section.how-to
-    %h2 How to use
-    %h3 Example receiving message events from a Leap Motion.
-    :markdown
-          :::go
-          package main
+  -#%h3 How to use events and call them on your drivers
+  -#%p Pretty simple, when the connection and the driver have been setup (as explained above) you can call events on them as follows:
+  -#:markdown
+        -#%:::go 
+        -#on leapmotion, :hand => proc { |sender, hand| puts hand.inspect }
 
-          import (
-            "fmt"
-            "github.com/hybridgroup/gobot"
-            "github.com/hybridgroup/gobot-leapmotion"
-          )
+%section.how-to
+  %h2 How to use
+  %h3 Example receiving message events from a Leap Motion.
+  :markdown
+        :::go
+        package main
 
-          func main() {
-            leapAdaptor := new(gobotLeap.LeapAdaptor)
-            leapAdaptor.Name = "leap"
-            leapAdaptor.Port = "127.0.0.1:6437"
+        import (
+          "fmt"
+          "github.com/hybridgroup/gobot"
+          "github.com/hybridgroup/gobot-leapmotion"
+        )
 
-            leap := gobotLeap.NewLeap(leapAdaptor)
-            leap.Name = "leap"
+        func main() {
+          leapAdaptor := new(gobotLeap.LeapAdaptor)
+          leapAdaptor.Name = "leap"
+          leapAdaptor.Port = "127.0.0.1:6437"
 
-            work := func() {
-              gobot.On(leap.Events["Message"], func(data interface{}) {
-                fmt.Println(data)
-              })
-            }
+          leap := gobotLeap.NewLeap(leapAdaptor)
+          leap.Name = "leap"
 
-            robot := gobot.Robot{
-              Connections: []gobot.Connection{leapAdaptor},
-              Devices:     []gobot.Device{leap},
-              Work:        work,
-            }
-
-            robot.Start()
+          work := func() {
+            gobot.On(leap.Events["Message"], func(data interface{}) {
+              fmt.Println(data)
+            })
           }
 
-  %section.compatability.hardware
-    %h2 Works with:
-    .devices
-      = partial "documentation/partials/leapmotion"
+          robot := gobot.Robot{
+            Connections: []gobot.Connection{leapAdaptor},
+            Devices:     []gobot.Device{leap},
+            Work:        work,
+          }
+
+          robot.Start()
+        }
+
+%section.compatability.hardware
+  %h2 Works with:
+  .devices
+    = partial "documentation/partials/devices_platforms"

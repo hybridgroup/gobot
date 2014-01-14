@@ -3,115 +3,116 @@ title: Gobot - Wii Nunchuck Driver
 author: The Hybrid Group
 page_title: Wii Nunchuk
 page_subtitle: Driver
-layout: page
+page_title_show: true
+layout: documentation
+
+arduino_platform: true
+beaglebone_platform: true
+digispark_platform: true
 ---
-.documentation
-  %section.intro
-    =image_tag "/images/wii-chuck.jpg", class: "display"
-    %p
-      Allows user to use a Nintendo Wii Nunchuck controller via i2c interface
+%section.intro
+  =image_tag "/images/devices/wii-chuck.jpg", class: "display"
+  %p
+    Allows user to use a Nintendo Wii Nunchuck controller via i2c interface
 
-  %section.how-to
-    %h2 How to establish a connection and setup the driver
-    :markdown
-      Install the library with: `go get -u github.com/hybridgroup/gobot-i2c`
-    %h3 For Arduino:
-    :markdown
-          :::go
-          package main
+%section.how-to
+  %h2 How to establish a connection and setup the driver
+  :markdown
+    Install the library with: `go get -u github.com/hybridgroup/gobot-i2c`
+  %h3 For Arduino:
+  :markdown
+        :::go
+        package main
 
-          import (
-            "fmt"
-            "github.com/hybridgroup/gobot"
-            "github.com/hybridgroup/gobot-firmata"
-            "github.com/hybridgroup/gobot-i2c"
-          )
+        import (
+          "fmt"
+          "github.com/hybridgroup/gobot"
+          "github.com/hybridgroup/gobot-firmata"
+          "github.com/hybridgroup/gobot-i2c"
+        )
 
-          func main() {
-            firmata := new(gobotFirmata.FirmataAdaptor)
-            firmata.Name = "firmata"
-            firmata.Port = "/dev/ttyACM0"
+        func main() {
+          firmata := new(gobotFirmata.FirmataAdaptor)
+          firmata.Name = "firmata"
+          firmata.Port = "/dev/ttyACM0"
 
-            wiichuck := gobotI2C.NewWiichuck(firmata)
-            wiichuck.Name = "wiichuck"
-          ...
+          wiichuck := gobotI2C.NewWiichuck(firmata)
+          wiichuck.Name = "wiichuck"
+        ...
 
-  %section.public-methods
-    %h2 Events
+%section.public-methods
+  %h2 Events
 
-    %dl.methods 
-      %dt c_button
-      %dd Get's triggered every interval amount of time if the square button is pressed.
-      %dt z_button
-      %dd Get's triggered every interval amount of time if the square button is pressed.
-      %dt joystick
-      %dd Get's triggered every "interval" amount of time if a joystick event occured, you can access values x, y.
+  %dl.methods 
+    %dt c_button
+    %dd Get's triggered every interval amount of time if the square button is pressed.
+    %dt z_button
+    %dd Get's triggered every interval amount of time if the square button is pressed.
+    %dt joystick
+    %dd Get's triggered every "interval" amount of time if a joystick event occured, you can access values x, y.
 
 
-    
-    -#%h3 How to use events and call them on your drivers
-    -#%p Pretty simple, when the connection and the driver have been setup (as explained above) you can call events on them as follows:
-    -#:markdown
-          -#:::go
-          -#comming soon
+  
+  -#%h3 How to use events and call them on your drivers
+  -#%p Pretty simple, when the connection and the driver have been setup (as explained above) you can call events on them as follows:
+  -#:markdown
+        -#:::go
+        -#comming soon
 
-  %section.how_to
-    %h2 Example using a Nintendo Wii Nunchuck.
-    :markdown
-          :::go
-          package main
+%section.how_to
+  %h2 Example using a Nintendo Wii Nunchuck.
+  :markdown
+        :::go
+        package main
 
-          import (
-            "fmt"
-            "github.com/hybridgroup/gobot"
-            "github.com/hybridgroup/gobot-firmata"
-            "github.com/hybridgroup/gobot-i2c"
-          )
+        import (
+          "fmt"
+          "github.com/hybridgroup/gobot"
+          "github.com/hybridgroup/gobot-firmata"
+          "github.com/hybridgroup/gobot-i2c"
+        )
 
-          func main() {
-            firmata := new(gobotFirmata.FirmataAdaptor)
-            firmata.Name = "firmata"
-            firmata.Port = "/dev/ttyACM0"
+        func main() {
+          firmata := new(gobotFirmata.FirmataAdaptor)
+          firmata.Name = "firmata"
+          firmata.Port = "/dev/ttyACM0"
 
-            wiichuck := gobotI2C.NewWiichuck(firmata)
-            wiichuck.Name = "wiichuck"
+          wiichuck := gobotI2C.NewWiichuck(firmata)
+          wiichuck.Name = "wiichuck"
 
-            work := func() {
-              go func() {
-                for {
-                  fmt.Println("joystick", gobot.On(wiichuck.Events["joystick"]))
-                }
-              }()
-              go func() {
-                for {
-                  fmt.Println("c", gobot.On(wiichuck.Events["c_button"]))
-                }
-              }()
-              go func() {
-                for {
-                  fmt.Println("z", gobot.On(wiichuck.Events["z_button"]))
-                }
-              }()
-            }
-
-            robot := gobot.Robot{
-              Connections: []interface{}{firmata},
-              Devices:     []interface{}{wiichuck},
-              Work:        work,
-            }
-
-            robot.Start()
+          work := func() {
+            go func() {
+              for {
+                fmt.Println("joystick", gobot.On(wiichuck.Events["joystick"]))
+              }
+            }()
+            go func() {
+              for {
+                fmt.Println("c", gobot.On(wiichuck.Events["c_button"]))
+              }
+            }()
+            go func() {
+              for {
+                fmt.Println("z", gobot.On(wiichuck.Events["z_button"]))
+              }
+            }()
           }
 
-  %section.circuit
-    %h2 Circuit and Schematic
-    %p
-      Coming soon
+          robot := gobot.Robot{
+            Connections: []interface{}{firmata},
+            Devices:     []interface{}{wiichuck},
+            Work:        work,
+          }
 
-  %section.compatability.hardware
-    %h2 Works with:
-    .devices
-      = partial "documentation/partials/arduino"
-      = partial "documentation/partials/beaglebone"
-      = partial "documentation/partials/digispark"
-      = #partial "documentation/partials/raspberry-pi"
+          robot.Start()
+        }
+
+%section.circuit
+  %h2 Circuit and Schematic
+  %p
+    Coming soon
+
+%section.compatability.hardware
+  %h2 Works with:
+  .devices
+    = partial "documentation/partials/devices_platforms"

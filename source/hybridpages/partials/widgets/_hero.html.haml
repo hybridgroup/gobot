@@ -1,0 +1,10 @@
+- unless current_page.data.hero.nil?
+  .hero
+    .container
+      %h1.title
+        = current_page.data.hero_title
+        
+      %h2.subtitle
+        = current_page.data.hero_subtitle
+        
+      = current_page.data.getting_started_button

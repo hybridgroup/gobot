@@ -1,0 +1,10 @@
+-content_for :tags do
+  %ul
+    %li= link_to "Robots", "/blog/tags/robots/"
+    %li= link_to "Events", "/blog/tags/events/"
+
+-content_for :network do
+  .network-links
+    = link_to image_tag("elements/twitter.png"), "https://twitter.com/Cylon.jsio"
+    = link_to image_tag("elements/github.png"), "https://github.com/hybridgroup/Cylon.js"
+

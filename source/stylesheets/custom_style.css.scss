@@ -1,0 +1,43 @@
+// Config
+
+$body-bg-color: #fff6ee;
+$footer-text-color: white;
+
+$link-color: #ff7e5b;
+$link-hover-color: #fc4c1d;
+
+$title-color: #ff7e5b;
+$lesser-title-color: #523d47;
+$header-subtitle-color: #505252;
+
+$hero-color: #ff7e5b;
+$hero-title-color: white;
+$hero-subtitle-color: #fafaf1;
+$hero-link-color: #fffbda;
+$hero-link-hover-color: white;
+
+$cta-color: #fff3cf;
+$cta-hover-color: $cta-color - 30;
+$cta-text-color: #bd583d;
+$cta-text-hover-color: $cta-text-color - 10;
+
+$blog-title-color: #fc4c1d;
+$blog-date-top-color: #b39f89;
+
+$doc-description-color:  #808080;
+
+$social-catcher-background-color: #FDFCF5;
+
+$header-size: 66px;
+$logo-size: 118px;
+
+$small-screen: 479px;
+$medium-screen: 767px;
+$big-screen: 964px;
+
+//URL SRC
+$body-background-src: '../images/elements/bg-artoo.png';
+$header-logo-src: '/images/elements/logo.png';
+
+//Page Font
+$page-title-font: "Montserrat", sans-serif;

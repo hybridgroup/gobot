@@ -3,126 +3,126 @@ title: Cylon.js - Motor Driver
 author: The Hybrid Group
 page_title: Motor
 page_subtitle: Driver
-layout: page
+page_title_show: true
+layout: documentation
+
+arduino_platform: true
 ---
-.documentation
-  %section.intro
-    =image_tag "/images/motor.jpg", class: "display"
-    %p
-      Provides motor manipulation tools for Cylon.js like on/off, speed modulation using PWM,
-      use of bidirectional motors using forward/backward pins.
 
-  %section.how-to
-    %h2 How to establish a connection and setup the driver
-    %h3 JavaScript
-    :markdown
-          :::javascript
+%section.intro
+  =image_tag "/images/devices/motor.jpg", class: "display"
+  %p
+    Provides motor manipulation tools for Cylon.js like on/off, speed modulation using PWM,
+    use of bidirectional motors using forward/backward pins.
 
-          var Cylon = require('cylon');
+%section.how-to
+  %h2 How to establish a connection and setup the driver
+  %h3 JavaScript
+  :markdown
+        :::javascript
 
-          Cylon.robot({
-            connection: {name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0'},
+        var Cylon = require('cylon');
 
-            device: {name: 'motor', driver: 'motor', pin: 3},
-            ...
+        Cylon.robot({
+          connection: {name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0'},
 
-    %h3 CoffeeScript
-    :markdown
-          :::ruby
-          Cylon = require 'cylon'
+          device: {name: 'motor', driver: 'motor', pin: 3},
+          ...
 
-          Cylon.robot
-            connection:
-              name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0'
+  %h3 CoffeeScript
+  :markdown
+        :::ruby
+        Cylon = require 'cylon'
 
-            device:
-              name: 'motor', driver: 'motor', pin: 3
-            ...
+        Cylon.robot
+          connection:
+            name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0'
 
-    -#%h3 For Digispark:
-    -#:markdown
-          -#:::ruby
+          device:
+            name: 'motor', driver: 'motor', pin: 3
+          ...
 
-  %section.public-methods
-    %h2 Commands:
-    
-    %dl.methods 
-      %dt turnOn → true | nil
-      %dd Starts the motor.
-      %dt turnOff → true | nil
-      %dd Stops the motor.
-      %dt toggle → true | nil
-      %dd Sets the state of the motor to the oposite of the current state, if motor is on then sets it to off.
-      %dt speed(speed_value) → true | nil
-      %dd Sets the speed of the motor to the value provided in the speed param, speed value must be an integer between 0 and 255.
-      %dt currentSpeed → speed
-      %dd Returns the current speed of the motor as an integer between 0 and 255.
+  -#%h3 For Digispark:
+  -#:markdown
+        -#:::ruby
 
-    %h2 Events
+%section.public-methods
+  %h2 Commands:
+  
+  %dl.methods 
+    %dt turnOn → true | nil
+    %dd Starts the motor.
+    %dt turnOff → true | nil
+    %dd Stops the motor.
+    %dt toggle → true | nil
+    %dd Sets the state of the motor to the oposite of the current state, if motor is on then sets it to off.
+    %dt speed(speed_value) → true | nil
+    %dd Sets the speed of the motor to the value provided in the speed param, speed value must be an integer between 0 and 255.
+    %dt currentSpeed → speed
+    %dd Returns the current speed of the motor as an integer between 0 and 255.
 
-    %dl.methods 
-      %dt start
-      %dd Sent when the device has been started and is ready to use.
- 
-  %section.how-to
-    %h2 How to use
-    %p
-      This example turns on a DC motor using PWM.
+  %h2 Events
 
-    %h3 JavaScript
-    :markdown
-          :::javascript
+  %dl.methods 
+    %dt start
+    %dd Sent when the device has been started and is ready to use.
 
-          var Cylon = require('cylon');
+%section.how-to
+  %h2 How to use
+  %p
+    This example turns on a DC motor using PWM.
 
-          Cylon.robot({
-            connection: {name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0'},
+  %h3 JavaScript
+  :markdown
+        :::javascript
 
-            device: {name: 'motor', driver: 'motor', pin: 3},
+        var Cylon = require('cylon');
 
-            work: function(my) {
-              my.motor.speed(100);
+        Cylon.robot({
+          connection: {name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0'},
 
-              after((5).seconds(), function(my) {
-                my.motor.stop();
-              });
-            }
-          }).start();
+          device: {name: 'motor', driver: 'motor', pin: 3},
 
-    %h3 CoffeeScript
-    :markdown
-          :::javascript
-          Cylon = require 'cylon'
+          work: function(my) {
+            my.motor.speed(100);
 
-          Cylon.robot
-            connection:
-              name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0'
+            after((5).seconds(), function(my) {
+              my.motor.stop();
+            });
+          }
+        }).start();
 
-            device:
-              name: 'motor', driver: 'motor', pin: 3
+  %h3 CoffeeScript
+  :markdown
+        :::javascript
+        Cylon = require 'cylon'
 
-            work: (my) ->
-              my.motor.speed 100
-              
-              after 5.seconds(), ->
-                my.motor.stop()
+        Cylon.robot
+          connection:
+            name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0'
 
-          .start()
+          device:
+            name: 'motor', driver: 'motor', pin: 3
 
-    -#%h2 Example of a dc motor with direction and speed change.
-    -#:markdown
-          -#:::ruby
+          work: (my) ->
+            my.motor.speed 100
+            
+            after 5.seconds(), ->
+              my.motor.stop()
 
-    %h2 Circuit and Schematic
-    %p
-      =link_to "http://learn.adafruit.com/adafruit-arduino-lesson-13-dc-motors/breadboard-layout", "http://learn.adafruit.com/adafruit-arduino-lesson-13-dc-motors/breadboard-layout", target:"_blank" 
+        .start()
 
-  %section.compatability.hardware
-    %h2 Works with:
-    =# TODO: Update platform list with all that work with this driver in Cylon.js.
-    .devices
-      = partial "documentation/partials/arduino"
-      =# partial "documentation/partials/beaglebone"
-      =# partial "documentation/partials/digispark"
-      =# partial "documentation/partials/raspberry-pi"
+  -#%h2 Example of a dc motor with direction and speed change.
+  -#:markdown
+        -#:::ruby
+
+  %h2 Circuit and Schematic
+  %p
+    =link_to "http://learn.adafruit.com/adafruit-arduino-lesson-13-dc-motors/breadboard-layout", "http://learn.adafruit.com/adafruit-arduino-lesson-13-dc-motors/breadboard-layout", target:"_blank" 
+
+%section.compatability.hardware
+  %h2 Works with:
+  =# TODO: Update platform list with all that work with this driver in Cylon.js.
+  .devices
+    = partial "documentation/partials/devices_platforms"
 

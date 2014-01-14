@@ -3,6 +3,6 @@
   = article.body
   .tags
     .img
-      = image_tag "tag.png"
+      = image_tag "elements/tag.png"
     - article.tags.each do |tag_name|
       = link_to tag_name, tag_path(tag_name)

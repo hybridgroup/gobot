@@ -3,105 +3,106 @@ title: Gobot - LED Driver
 author: The Hybrid Group
 page_title: LED
 page_subtitle: Driver
-layout: page
+page_title_show: true
+layout: documentation
+
+arduino_platform: true
+beaglebone_platform: true
+digispark_platform: true
+spark_platform: true
 ---
-.documentation
-  %section.intro
-    =image_tag "/images/LED.jpg", class: "display"
-    %p
-      Allows user to interact with LEDs through digital output and PWM (Pulse Width Modulation)
+%section.intro
+  =image_tag "/images/devices/LED.jpg", class: "display"
+  %p
+    Allows user to interact with LEDs through digital output and PWM (Pulse Width Modulation)
 
-  %section.how-to
-    %h2 How to establish a connection and setup the driver
-    :markdown
-      Install the library with: `go get -u github.com/hybridgroup/gobot-gpio`
-    %h3 For Beaglebone:
-    :markdown
-          :::go
-          package main
+%section.how-to
+  %h2 How to establish a connection and setup the driver
+  :markdown
+    Install the library with: `go get -u github.com/hybridgroup/gobot-gpio`
+  %h3 For Beaglebone:
+  :markdown
+        :::go
+        package main
 
-          import (
-            "github.com/hybridgroup/gobot"
-            "github.com/hybridgroup/gobot-beaglebone"
-            "github.com/hybridgroup/gobot-gpio"
-          )
+        import (
+          "github.com/hybridgroup/gobot"
+          "github.com/hybridgroup/gobot-beaglebone"
+          "github.com/hybridgroup/gobot-gpio"
+        )
 
-          func main() {
-            beaglebone := new(gobotBeaglebone.Beaglebone)
-            beaglebone.Name = "beaglebone"
+        func main() {
+          beaglebone := new(gobotBeaglebone.Beaglebone)
+          beaglebone.Name = "beaglebone"
 
-            led := gobotGPIO.NewLed(beaglebone)
-            led.Name = "led"
-            led.Pin = "P9_12"
-          ...
-          
+          led := gobotGPIO.NewLed(beaglebone)
+          led.Name = "led"
+          led.Pin = "P9_12"
+        ...
+        
+  
+
+%section.public-methods
+  %h2 Commands:
+  
+  %dl.methods 
+    %dt OnC
+    %dd Turns LED on.
+    %dt OffC
+    %dd Turns LED off.
+    %dt ToggleC
+    %dd Turns the LED on, or off, depending on if it is already off, or on, respectively.
     
 
-  %section.public-methods
-    %h2 Commands:
-    
-    %dl.methods 
-      %dt OnC
-      %dd Turns LED on.
-      %dt OffC
-      %dd Turns LED off.
-      %dt ToggleC
-      %dd Turns the LED on, or off, depending on if it is already off, or on, respectively.
-      
+  %h2 Events
 
-    %h2 Events
+  %dl.methods 
+    %dt start
+    %dd Sent when the device has been started and is ready to use.  
 
-    %dl.methods 
-      %dt start
-      %dd Sent when the device has been started and is ready to use.  
+%section.how-to
+  %h2 How to use
+  %p
+    This example turns an LED on and off every 1s.
 
-  %section.how-to
-    %h2 How to use
-    %p
-      This example turns an LED on and off every 1s.
+  :markdown
+        :::javascript
+        package main
 
-    :markdown
-          :::javascript
-          package main
+        import (
+          "github.com/hybridgroup/gobot"
+          "github.com/hybridgroup/gobot-beaglebone"
+          "github.com/hybridgroup/gobot-gpio"
+        )
 
-          import (
-            "github.com/hybridgroup/gobot"
-            "github.com/hybridgroup/gobot-beaglebone"
-            "github.com/hybridgroup/gobot-gpio"
-          )
+        func main() {
+          beaglebone := new(gobotBeaglebone.Beaglebone)
+          beaglebone.Name = "beaglebone"
 
-          func main() {
-            beaglebone := new(gobotBeaglebone.Beaglebone)
-            beaglebone.Name = "beaglebone"
+          led := gobotGPIO.NewLed(beaglebone)
+          led.Name = "led"
+          led.Pin = "P9_12"
 
-            led := gobotGPIO.NewLed(beaglebone)
-            led.Name = "led"
-            led.Pin = "P9_12"
-
-            work := func() {
-              gobot.Every("1s", func() { led.Toggle() })
-            }
-
-            robot := gobot.Robot{
-              Connections: []interface{}{beaglebone},
-              Devices:     []interface{}{led},
-              Work:        work,
-            }
-
-            robot.Start()
+          work := func() {
+            gobot.Every("1s", func() { led.Toggle() })
           }
 
+          robot := gobot.Robot{
+            Connections: []interface{}{beaglebone},
+            Devices:     []interface{}{led},
+            Work:        work,
+          }
 
-  %section.circuit
-    %h2 Circuit and Schematic
-    =link_to "http://arduino.cc/en/Tutorial/Blink", "http://arduino.cc/en/Tutorial/Blink"
+          robot.Start()
+        }
 
-  %section.compatability.hardware
-    %h2 Works with:
-    =# TODO: Update platform list with all that work with this driver in Cylon.js.
-    .devices
-      = partial "documentation/partials/arduino"
-      = partial "documentation/partials/beaglebone"
-      = partial "documentation/partials/digispark"
-      = partial "documentation/partials/spark"
-      =# partial "documentation/partials/raspberry-pi"
+
+%section.circuit
+  %h2 Circuit and Schematic
+  =link_to "http://arduino.cc/en/Tutorial/Blink", "http://arduino.cc/en/Tutorial/Blink"
+
+%section.compatability.hardware
+  %h2 Works with:
+  =# TODO: Update platform list with all that work with this driver in Cylon.js.
+  .devices
+    = partial "documentation/partials/devices_platforms"

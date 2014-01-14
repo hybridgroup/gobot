@@ -1,0 +1,34 @@
+-content_for :logo do
+  %a{:href => "/"} Gobot
+
+-content_for :logo_subtitle do
+  .main 
+
+-content_for :menu do 
+  =  link_to "Docs", "", (menu_item("documentation"))
+  =  link_to "Hardware", "", (menu_item("hardware"))
+  = # link_to "Videos", "", (menu_item("videos"))
+  = # link_to "Blog", "", (menu_item("blog"))
+  =  link_to "Github", "https://github.com/hybridgroup/gobot/", class: "item", target: "blanck"
+
+-content_for :social_links do
+  .splitter
+    %iframe{:allowtransparency => "true", :frameborder => "0", :height => "20", :scrolling => "0", :src => "http://ghbtns.com/github-btn.html?user=hybridgroup&repo=gobot&type=watch&count=true", :width => "95"}
+    %iframe{:allowtransparency => "true", :frameborder => "0", :height => "20", :scrolling => "0", :src => "http://ghbtns.com/github-btn.html?user=hybridgroup&repo=gobot&type=fork&count=true", :width => "95"}
+  .splitter
+    %a.twitter-share-button{"data-dnt" => "true", "data-text" => "Go, Robot, Go! Golang for Robotics.", "data-url" => "http://gobot.io", "data-via" => "gobotio", :href => "https://twitter.com/share"} Tweet
+    :javascript
+      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
+    %a.twitter-follow-button{"data-dnt" => "true", "data-show-count" => "false", :href => "https://twitter.com/gobotio"} Follow @gobotio
+    :javascript
+      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
+
+-content_for :footer do 
+  .w
+    .copyright
+      &copy; Copyright 2012-2014
+      %a{:href => "http://hybridgroup.com"} The Hybrid Group.
+
+
+
+

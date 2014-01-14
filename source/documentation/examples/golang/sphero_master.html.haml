@@ -1,9 +1,11 @@
 ---
-layout: page
+page_title_show: true
+layout: documentation
 title: gobot Example - sphero_master
 page_title: "Example: sphero_master"
 author: The Hybrid Group
 description: A gobot code example
+page_subtitle: "You can find this example <a href='https://github.com/hybridgroup/gobot/blob/master/examples/sphero_master.go' target='blank' class='repository'>here.</a>"
 ---
 
 .example
@@ -38,8 +40,8 @@ description: A gobot code example
 
         		master.Robots = append(master.Robots, gobot.Robot{
         			Name:        name,
-        			Connections: []interface{}{spheroAdaptor},
-        			Devices:     []interface{}{sphero},
+        			Connections: []gobot.Connection{spheroAdaptor},
+        			Devices:     []gobot.Device{sphero},
         			Work:        work,
         		})
         	}

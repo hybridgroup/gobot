@@ -1,9 +1,11 @@
 ---
-layout: page
+page_title_show: true
+layout: documentation
 title: gobot Example - sphero_api
 page_title: "Example: sphero_api"
 author: The Hybrid Group
 description: A gobot code example
+page_subtitle: "You can find this example <a href='https://github.com/hybridgroup/gobot/blob/master/examples/sphero_api.go' target='blank' class='repository'>here.</a>"
 ---
 
 .example
@@ -28,7 +30,7 @@ description: A gobot code example
         	gobot.Api(Master)
 
         	spheros := map[string]string{
-        		"Sphero-BPO": "127.0.0.1:4560",
+        		"Sphero-BPO": "/dev/rfcomm0",
         	}
 
         	for name, port := range spheros {
@@ -46,8 +48,8 @@ description: A gobot code example
 
         		Master.Robots = append(Master.Robots, gobot.Robot{
         			Name:        name,
-        			Connections: []interface{}{spheroAdaptor},
-        			Devices:     []interface{}{sphero},
+        			Connections: []gobot.Connection{spheroAdaptor},
+        			Devices:     []gobot.Device{sphero},
         			Work:        work,
         			Commands:    map[string]interface{}{"TurnBlue": TurnBlue},
         		})

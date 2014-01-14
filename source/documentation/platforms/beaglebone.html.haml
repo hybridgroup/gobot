@@ -3,74 +3,78 @@ title: BeagleBone with Gobot
 author: The Hybrid Group
 page_title: BeagleBone
 page_subtitle: "<a href='https://github.com/hybridgroup/gobot-beaglebone' class='repository'>Repository</a> <a class+'issues' href='https://github.com/hybridgroup/gobot-beaglebone/issues'>Issues</a>"
-layout: page
+page_title_show: true
+layout: documentation
+
+button_driver: true
+led_driver: true
 ---
-.documentation
-  %section.intro
-    = image_tag "/images/beaglebone.jpg", class: "display"
 
-    %p The BeagleBone is an ARM based single board computer, with many different GPIO interfaces built in.
+%section.intro
+  = image_tag "/images/devices/beaglebone.jpg", class: "display"
 
-    %p
-      For more info about the BeagleBone platform click
-      = succeed "." do
-        = link_to "here", "http://beagleboard.org/Products/BeagleBone", target: :blank
-    -#%p
-      -#We have created a bootable image of Arch Linux that contains the needed drivers to use the Beaglebone Black with Cylon.js. You can download it from
-      -#= succeed "." do
-        -#= link_to "here", "https://s3.amazonaws.com/Cylon.js-images/beaglebone/Cylon.js-arch-armv7-1380751200.tar.xz", target: :blank
+  %p The BeagleBone is an ARM based single board computer, with many different GPIO interfaces built in.
 
-  %section.how-to
-    %h2 How to install
-    %p
-      Installing Gobot for beaglebone is pretty easy.
-    :markdown
-          :::bash
-          go get -u github.com/hybridgroup/gobot-beaglebone
+  %p
+    For more info about the BeagleBone platform click
+    = succeed "." do
+      = link_to "here", "http://beagleboard.org/Products/BeagleBone", target: :blank
+  -#%p
+    -#We have created a bootable image of Arch Linux that contains the needed drivers to use the Beaglebone Black with Cylon.js. You can download it from
+    -#= succeed "." do
+      -#= link_to "here", "https://s3.amazonaws.com/Cylon.js-images/beaglebone/Cylon.js-arch-armv7-1380751200.tar.xz", target: :blank
 
-    %h2 How to use
-    %p
-      This small program causes an LED to blink.
-    :markdown
-          :::go
-          package main
+%section.how-to
+  %h2 How to install
+  %p
+    Installing Gobot for beaglebone is pretty easy.
+  :markdown
+        :::bash
+        go get -u github.com/hybridgroup/gobot-beaglebone
 
-          import (
-            "github.com/hybridgroup/gobot"
-            "github.com/hybridgroup/gobot-beaglebone"
-            "github.com/hybridgroup/gobot-gpio"
-          )
+  %h2 How to use
+  %p
+    This small program causes an LED to blink.
+  :markdown
+        :::go
+        package main
 
-          func main() {
-            beaglebone := new(gobotBeaglebone.Beaglebone)
-            beaglebone.Name = "beaglebone"
+        import (
+          "github.com/hybridgroup/gobot"
+          "github.com/hybridgroup/gobot-beaglebone"
+          "github.com/hybridgroup/gobot-gpio"
+        )
 
-            led := gobotGPIO.NewLed(beaglebone)
-            led.Name = "led"
-            led.Pin = "P9_12"
+        func main() {
+          beaglebone := new(gobotBeaglebone.Beaglebone)
+          beaglebone.Name = "beaglebone"
 
-            work := func() {
-              gobot.Every("1s", func() { led.Toggle() })
-            }
+          led := gobotGPIO.NewLed(beaglebone)
+          led.Name = "led"
+          led.Pin = "P9_12"
 
-            robot := gobot.Robot{
-              Connections: []interface{}{beaglebone},
-              Devices:     []interface{}{led},
-              Work:        work,
-            }
-
-            robot.Start()
+          work := func() {
+            gobot.Every("1s", func() { led.Toggle() })
           }
 
-  %section.drivers
-    %h2 Drivers
-    %p All Gobot digital GPIO and i2c drivers listed below should work with the BeagleBone:
+          robot := gobot.Robot{
+            Connections: []interface{}{beaglebone},
+            Devices:     []interface{}{led},
+            Work:        work,
+          }
 
-    .hardware
-      .devices
-        = partial "documentation/partials/button"
-        = partial "documentation/partials/led"
-        = #partial "documentation/partials/blinkm"
-        = #partial "documentation/partials/hmc6352-compass"
-        = #partial "documentation/partials/wiichuck"
-        = #partial "documentation/partials/wiiclassic"
+          robot.Start()
+        }
+
+%section.drivers
+  %h2 Drivers
+  %p All Gobot digital GPIO and i2c drivers listed below should work with the BeagleBone:
+
+  .hardware
+    %h2 GPIO Drivers
+    .devices
+      = partial "documentation/partials/devices_gpio_drivers"
+    -#%h2 i2c Drivers
+    -#.devices
+      = partial "documentation/partials/devices_i2c_drivers"
+      

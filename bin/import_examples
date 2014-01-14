@@ -37,7 +37,8 @@ LANGS = [
 # Will be put into SITE_DIR/documentation/examples/index.html.
 INDEX_LAYOUT = <<-EOS
 ---
-layout: page
+page_title_show: true
+layout: documentation
 title: Examples
 page_title: Examples
 author: The Hybrid Group
@@ -45,7 +46,7 @@ description: Examples of using #{PROJECT} with different hardware configurations
 page_subtitle: How you can get started.
 ---
 
-.documentation.examples
+.examples
   %table
     %thead
       %th Example
@@ -178,11 +179,13 @@ class ExampleImporter
 
         content = <<-EOS
 ---
-layout: page
+page_title_show: true
+layout: documentation
 title: #{PROJECT} Example - #{file[:name]}
 page_title: "Example: #{file[:name]}"
 author: The Hybrid Group
 description: A #{PROJECT} code example
+page_subtitle: "You can find this example <a href='https://github.com/hybridgroup/gobot/blob/master/examples/#{file[:name]}.go' target='blank' class='repository'>here.</a>"
 ---
 
 .example

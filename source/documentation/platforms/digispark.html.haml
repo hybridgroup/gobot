@@ -3,104 +3,106 @@ title: Digispark with Gobot
 author: The Hybrid Group
 page_title: Digispark
 page_subtitle: "<a href='https://github.com/hybridgroup/gobot-digispark' class='repository'>Repository</a> <a class+'issues' href='https://github.com/hybridgroup/gobot-digispark/issues'>Issues</a>"
-layout: page
+page_title_show: true
+layout: documentation
+
+button_driver: true
+led_driver: true
+servo_driver: true
+
 ---
-.documentation
-  %section.intro
-    = image_tag "/images/digispark.jpg", class: "display"
 
-    %p
-      The Digispark is an Attiny85 based microcontroller development board similar to the Arduino line, only cheaper, smaller,
-      and a bit less powerful. With a whole host of shields to extend its functionality and the ability to
-      use the familiar Arduino IDE the Digispark is a great way to jump into electronics, or perfect for when
-      an Arduino is too big or too much.
+%section.intro
+  = image_tag "/images/devices/digispark.jpg", class: "display"
 
-    %p
-      For more info about the Digispark platform click
-      = succeed "." do
-        = link_to "here", "http://digistump.com/category/1", target: :blank
+  %p
+    The Digispark is an Attiny85 based microcontroller development board similar to the Arduino line, only cheaper, smaller,
+    and a bit less powerful. With a whole host of shields to extend its functionality and the ability to
+    use the familiar Arduino IDE the Digispark is a great way to jump into electronics, or perfect for when
+    an Arduino is too big or too much.
 
-  %section.how-to
-    %h2 How to install
-    %p
-      Installing Gobot with digispark support is pretty easy.
-    :markdown
-          :::bash
-          go get -u github.com/hybridgroup/gobot-digispark
-    %h2 How to use
-    %p
-      This small program lets you toggle an LED on and off.
-    :markdown
-          :::javascript
-          package main
+  %p
+    For more info about the Digispark platform click
+    = succeed "." do
+      = link_to "here", "http://digistump.com/category/1", target: :blank
 
-          import (
-            "github.com/hybridgroup/gobot"
-            "github.com/hybridgroup/gobot-digispark"
-            "github.com/hybridgroup/gobot-gpio"
-          )
+%section.how-to
+  %h2 How to install
+  %p
+    Installing Gobot with digispark support is pretty easy.
+  :markdown
+        :::bash
+        go get -u github.com/hybridgroup/gobot-digispark
+  %h2 How to use
+  %p
+    This small program lets you toggle an LED on and off.
+  :markdown
+        :::javascript
+        package main
 
-          func main() {
+        import (
+          "github.com/hybridgroup/gobot"
+          "github.com/hybridgroup/gobot-digispark"
+          "github.com/hybridgroup/gobot-gpio"
+        )
 
-            digispark := new(gobotDigispark.DigisparkAdaptor)
-            digispark.Name = "Digispark"
+        func main() {
 
-            led := gobotGPIO.NewLed(digispark)
-            led.Name = "led"
-            led.Pin = "2"
+          digispark := new(gobotDigispark.DigisparkAdaptor)
+          digispark.Name = "Digispark"
 
-            work := func() {
-              gobot.Every("0.5s", func() {
-                led.Toggle()
-              })
-            }
+          led := gobotGPIO.NewLed(digispark)
+          led.Name = "led"
+          led.Pin = "2"
 
-            robot := gobot.Robot{
-              Connections: []interface{}{digispark},
-              Devices:     []interface{}{led},
-              Work:        work,
-            }
-
-            robot.Start()
+          work := func() {
+            gobot.Every("0.5s", func() {
+              led.Toggle()
+            })
           }
-    %h2 How to connect
-    %p
-      If your Digispark (
-      %a{ href:"http://www.kickstarter.com/projects/digistump/digispark-the-tiny-arduino-enabled-usb-dev-board"} http://www.kickstarter.com/projects/digistump/digispark-the-tiny-arduino-enabled-usb-dev-board
-      ) ATTiny-based USB development board already has the Little Wire (
-      %a{ href:"http://littlewire.cc/"} http://littlewire.cc/
-      ) protocol firmware installed, you can connect right away with Gobot.
 
-    %p
-      Otherwise, for instructions on how to install Little Wire on a Digispark check out 
-      %a{ href:"http://digistump.com/board/index.php/topic,160.0.html " } http://digistump.com/board/index.php/topic,160.0.html 
+          robot := gobot.Robot{
+            Connections: []interface{}{digispark},
+            Devices:     []interface{}{led},
+            Work:        work,
+          }
 
-  %section.drivers
-    %h2 Drivers
-    %p
-      Thanks to
-      %b Gobot
-      and
-      %b go
-      it is possible to interact with several I/O hardware devices and interfaces connected to the digispark
-      using a set of already defined and easy to use drivers, all of this thanks to the Gobot architecture,
-      in conjuction with gobot-digispark adaptor (using the littlewire communication protocol),
-      which makes it even possible to swap the entire platform for something else like arduino,
-      and keep using the same code you just wrote for digispark, this just by swapping a couple
-      of lines in your program.
-    %p
-      Available drivers for the digispark platform are listed below, the drivers contain detailed documentation and examples of what kind
-      physical computing (using Gobot and Go) you could be doing:
+          robot.Start()
+        }
+  %h2 How to connect
+  %p
+    If your Digispark (
+    %a{ href:"http://www.kickstarter.com/projects/digistump/digispark-the-tiny-arduino-enabled-usb-dev-board"} http://www.kickstarter.com/projects/digistump/digispark-the-tiny-arduino-enabled-usb-dev-board
+    ) ATTiny-based USB development board already has the Little Wire (
+    %a{ href:"http://littlewire.cc/"} http://littlewire.cc/
+    ) protocol firmware installed, you can connect right away with Gobot.
 
-    .hardware
-      .devices
-        =# partial "documentation/partials/analog-sensor"
-        = partial "documentation/partials/button"
-        = partial "documentation/partials/led"
-        =# partial "documentation/partials/maxbotix"
-        =# partial "documentation/partials/motor"
-        = partial "documentation/partials/servo"
-        = #partial "documentation/partials/blinkm"
-        =# partial "documentation/partials/hmc6352-compass"
-        =# partial "documentation/partials/wiichuck"
-        =# partial "documentation/partials/wiiclassic"
+  %p
+    Otherwise, for instructions on how to install Little Wire on a Digispark check out 
+    %a{ href:"http://digistump.com/board/index.php/topic,160.0.html " } http://digistump.com/board/index.php/topic,160.0.html 
+
+%section.drivers
+  %h2 Drivers
+  %p
+    Thanks to
+    %b Gobot
+    and
+    %b go
+    it is possible to interact with several I/O hardware devices and interfaces connected to the digispark
+    using a set of already defined and easy to use drivers, all of this thanks to the Gobot architecture,
+    in conjuction with gobot-digispark adaptor (using the littlewire communication protocol),
+    which makes it even possible to swap the entire platform for something else like arduino,
+    and keep using the same code you just wrote for digispark, this just by swapping a couple
+    of lines in your program.
+  %p
+    Available drivers for the digispark platform are listed below, the drivers contain detailed documentation and examples of what kind
+    physical computing (using Gobot and Go) you could be doing:
+
+  .hardware
+    %h2 GPIO Drivers
+    .devices
+      = partial "documentation/partials/devices_gpio_drivers"
+    -#%h2 i2c Drivers
+    .devices
+      = partial "documentation/partials/devices_i2c_drivers"
+    

@@ -1,0 +1,16 @@
+
+-if current_page.data.joystick_driver == true
+  // Joystick
+  %a.device{href:"/documentation/drivers/joystick", title: "Joystick"}
+    %img{src: "/images/devices/joystick.jpg"}
+
+-if current_page.data.ps3_driver == true
+  /// PS3
+  %a.device{href:"/documentation/drivers/ps3", title: "PS3 Controller"}
+    %img{src: "/images/devices/ps3.jpg"}
+
+-if current_page.data.xbox360_driver == true
+  /// Xbox 360
+  %a.device{href:"/documentation/drivers/xbox360", title: "XBox360 Controller"}
+    %img{src: "/images/devices/xbox360.jpg"}
+
