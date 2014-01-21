@@ -10,3 +10,6 @@ install:
  - go get github.com/onsi/gomega
 script:
  - go test -v .
+branches:
+  except:
+    - gobot.io
