@@ -33,6 +33,8 @@ func Api(bot *Master) {
 	a := new(api)
 	m := martini.Classic()
 
+	m.Use(martini.Static("robeaux"))
+
 	m.Get("/robots", func() string {
 		jsonRobots := make([]*jsonRobot, 0)
 		for _, robot := range bot.Robots {
