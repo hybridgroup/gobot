@@ -42,8 +42,24 @@ func Api(bot *Master) {
 		return toJson(bot.FindRobot(params["robotname"]).GetDevices())
 	})
 
+	type jsonDevice struct {
+		Name       string                 `json:"name"`
+		Driver     string                 `json:"driver"`
+		Connection map[string]interface{} `json:"connection"`
+		Commands   []string               `json:"commands"`
+	}
+
 	m.Get("/robots/:robotname/devices/:devicename", func(params martini.Params) string {
-		return toJson(bot.FindRobotDevice(params["robotname"], params["devicename"]))
+		device := bot.FindRobotDevice(params["robotname"], params["devicename"])
+		jsonDevice := new(jsonDevice)
+		jsonDevice.Name = device.Name
+		jsonDevice.Driver = FieldByNamePtr(device.Driver, "Name").Interface().(string)
+		jsonDevice.Connection = make(map[string]interface{})
+		jsonDevice.Connection["name"] = FieldByNamePtr(FieldByNamePtr(device.Driver, "Adaptor").Interface().(AdaptorInterface), "Name").Interface().(string)
+		jsonDevice.Connection["port"] = FieldByNamePtr(FieldByNamePtr(device.Driver, "Adaptor").Interface().(AdaptorInterface), "Port").Interface().(string)
+		jsonDevice.Connection["adaptor"] = FieldByNamePtr(FieldByNamePtr(device.Driver, "Adaptor").Interface().(AdaptorInterface), "Name").Interface().(string)
+		jsonDevice.Commands = FieldByNamePtr(device.Driver, "Commands").Interface().([]string)
+		return toJson(jsonDevice)
 	})
 
 	m.Get("/robots/:robotname/devices/:devicename/commands", func(params martini.Params) string {

@@ -5,10 +5,10 @@ import (
 )
 
 type device struct {
-	Name     string
-	Interval string `json:"-"`
-	Robot    *Robot `json:"-"`
-	Driver   DriverInterface
+	Name     string          `json:"name"`
+	Interval string          `json:"-"`
+	Robot    *Robot          `json:"-"`
+	Driver   DriverInterface `json:"driver"`
 }
 
 type Device interface {

@@ -8,11 +8,11 @@ import (
 )
 
 type Robot struct {
-	Connections   []Connection
-	Devices       []Device
-	Name          string
+	Connections   []Connection           `json:"connections"`
+	Devices       []Device               `json:"devices"`
+	Name          string                 `json:"name"`
 	Commands      map[string]interface{} `json:"-"`
-	RobotCommands []string               `json:"Commands"`
+	RobotCommands []string               `json:"commands"`
 	Work          func()                 `json:"-"`
 	connections   []*connection          `json:"-"`
 	devices       []*device              `json:"-"`
