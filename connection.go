@@ -5,8 +5,8 @@ import (
 )
 
 type connection struct {
-	Name    string
-	Adaptor AdaptorInterface
+	Name    string                 `json:"name"`
+	Adaptor AdaptorInterface       `json:"adaptor"`
 	Port    string                 `json:"-"`
 	Robot   *Robot                 `json:"-"`
 	Params  map[string]interface{} `json:"-"`
