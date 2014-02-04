@@ -147,6 +147,8 @@ To specify the api port run your Gobot program with the `PORT` environment varia
   $ PORT=8080 go run gobotProgram.go
 ```
 
+In order to use the [robeaux](https://github.com/hybridgroup/robeaux) AngularJS interface with Gobot you simply clone the robeaux repo and place it in the directory of your Gobot program. The robeaux assets must be in a folder called `robeaux`.
+
 ## Documentation
 We're busy adding documentation to our web site at http://gobot.io/ please check there as we continue to work on Gobot
 
