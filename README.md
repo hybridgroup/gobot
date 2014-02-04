@@ -40,8 +40,8 @@ func main() {
   }
 
   robot := gobot.Robot{
-    Connections: []gobot.Connection{ spheroAdaptor },
-    Devices:     []gobot.Device{ sphero },
+    Connections: []gobot.Connection{spheroAdaptor},
+    Devices:     []gobot.Device{sphero},
     Work:        work,
   }
 
@@ -54,47 +54,34 @@ func main() {
 package main
 
 import (
-        "fmt"
-        "github.com/hybridgroup/gobot"
-        "github.com/hybridgroup/gobot-firmata"
-        "github.com/hybridgroup/gobot-gpio"
+  "github.com/hybridgroup/gobot"
+  "github.com/hybridgroup/gobot-firmata"
+  "github.com/hybridgroup/gobot-gpio"
 )
 
 func main() {
 
-        firmata := new(gobotFirmata.FirmataAdaptor)
-        firmata.Name = "firmata"
-        firmata.Port = "/dev/ttyACM0"
+  firmata := new(gobotFirmata.FirmataAdaptor)
+  firmata.Name = "firmata"
+  firmata.Port = "/dev/ttyACM0"
 
-        led := gobotGPIO.NewLed(firmata)
-        led.Name = "led"
-        led.Pin = "13"
+  led := gobotGPIO.NewLed(firmata)
+  led.Name = "led"
+  led.Pin = "13"
 
-        connections := []gobot.Connection{
-                firmata,
-        }
-        devices := []gobot.Device{}{
-                led,
-        }
+  work := func() {
+    gobot.Every("1s", func() {
+      led.Toggle()
+    })
+  }
 
-        work := func() {
-                gobot.Every("1s", func() {
-                        led.Toggle()
-                        if led.IsOn() {
-                                fmt.Println("On")
-                        } else {
-                                fmt.Println("Off")
-                        }
-                })
-        }
+  robot := gobot.Robot{
+    Connections: []gobot.Connection{firmata},
+    Devices:     []gobot.Device{led},
+    Work:        work,
+  }
 
-        robot := gobot.Robot{
-                Connections: connections,
-                Devices:     devices,
-                Work:        work,
-        }
-
-        robot.Start()
+  robot.Start()
 }
 ```
 
