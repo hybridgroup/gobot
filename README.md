@@ -40,8 +40,8 @@ func main() {
   }
 
   robot := gobot.Robot{
-    Connections: []interface{} { spheroAdaptor },
-    Devices:     []interface{} { sphero },
+    Connections: []gobot.Connection{ spheroAdaptor },
+    Devices:     []gobot.Device{ sphero },
     Work:        work,
   }
 
@@ -70,10 +70,10 @@ func main() {
         led.Name = "led"
         led.Pin = "13"
 
-        connections := []interface{}{
+        connections := []gobot.Connection{
                 firmata,
         }
-        devices := []interface{}{
+        devices := []gobot.Device{}{
                 led,
         }
 
