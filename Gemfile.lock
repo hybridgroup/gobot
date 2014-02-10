@@ -22,6 +22,7 @@ GEM
       multi_json (~> 1.0)
     ffi (1.9.3)
     fssm (0.2.10)
+    git (1.2.6)
     haml (4.0.5)
       tilt
     hike (1.2.3)
@@ -118,6 +119,7 @@ PLATFORMS
 DEPENDENCIES
   bourbon
   coderay
+  git
   middleman (= 3.1)
   middleman-blog
   middleman-gh-pages
