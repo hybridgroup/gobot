@@ -40,28 +40,6 @@ digispark_platform: true
           servo.Pin = "0"
         ...
 
-  
-
-%section.public-methods
-  %h2 Commands:
-  
-  %dl.methods 
-    %dt MoveC
-    %dd Moves the servo to the specified angle, angle must be an integer value between 0 and 180.
-    %dt MinC
-    %dd Moves the servo to the min angle 0.
-    %dt CenterC
-    %dd Moves the servo to the center angle 90.
-    %dt MaxC
-    %dd Moves the servo to the max angle 180.
-
-  %h2 Events
-
-  %dl.methods 
-    %dt start
-    %dd Sent when the device has been started and is ready to use.
-  
-
 %section.how-to
   %h2 How to use
   %p
@@ -106,6 +84,11 @@ digispark_platform: true
           robot.Start()
         }
   
+%section.public-methods
+  .commands_api
+    = #partial "/documentation/drivers/partials/gpio/commands_servo"
+  .commands_api
+    = #partial "/documentation/drivers/partials/gpio/events_servo"   
 
 %section.circuit
   %h2 Circuit and Schematic

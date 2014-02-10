@@ -41,93 +41,30 @@ arduino_platform: true
             name: 'sensor', driver: 'analogSensor', pin: 0, lowerLimit: 100, upperLimit: 900
           ...
 
-  -#%h3 For Digispark:
-  -#:markdown
-        -#:::ruby
-
-%section.public-methods
-  %h2 Commands:
-  %dl.methods 
-    %dt analogRead(pin_number) → integer_value
-    %dd Returns an integer value that represents the analog read from the sensor.
-  
-
-%section.public-events
-  %h2 Events:
-
-  %dl.methods
-    %dt update
-    %dd
-      This event will contain one of the following events.
-      %br/  
-      You can also subscribe to one of the specific events, if that is the information you are interested in.
-    %dt analogRead
-    %dd Returns an integer value that represents the analog read from the sensor.
-    %dt upperLimit → integer_value
-    %dd Gets triggered if the value read by the sensor is greater or equal to upperLimit (value passed when setting up the sensor).
-    %dt lowerLimit → integer_value
-    %dd Gets triggered if the value read by the sensor is less or equal to lowerLimit (value passed when setting up the sensor).
-    %dt start
-    %dd Sent when the device has been started and is ready to use.
-
-
-  -#%h3 How to use events and call them on your drivers
-  -#%p Pretty simple, when the connection and the driver have been setup (as explained above) you can call events on them as follows:
-  -#:markdown
-        -#:::ruby
-
 %section.how-to
   %h2 How to use
   %p 
     This example detects lower and upper limits on a photoresistor sensor.
-  %h3 JavaScript
   :markdown
         :::javascript
-        var Cylon = require('cylon');
+        ...
 
-        Cylon.robot({
-          connection: {name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0'},
-
-          device: {name: 'sensor', driver: 'analogSensor', pin: 0, lowerLimit: 100, upperLimit: 900},
-
-          work: function(my) {
-            my.sensor.on('lowerLimit', function() {
-              Logger.info("Lower limit reached!");
-            });
-            my.sensor.on('upperLimit', function() {
-              Logger.info("Upper limit reached!");
-            });
-          }
-        }).start();
-
-  %h3 CoffeeScript
-  :markdown
-        :::javascript
-        Cylon = require 'cylon'
-
-        Cylon.robot
-          connection:
-            name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0'
-
-          device:
-            name: 'sensor', driver: 'analogSensor', pin: 0, lowerLimit: 100, upperLimit: 900
-
-          work: (my) ->
-            my.sensor.on 'lowerLimit', -> Logger.info "Lower limit reached!"
-            my.sensor.on 'upperLimit', -> Logger.info "Upper limit reached!"
-
-        .start()
+%section.public-methods
+  .commands_api
+    = #partial "/documentation/drivers/partials/gpio/commands_analog_sensor"
+  .commands_api
+    = #partial "/documentation/drivers/partials/gpio/events_analog_sensor"   
 
 %section.circuit
   %h2 Circuit and Schematic
   %p
     Circuit for analog sensors is pretty much the same as the button circuit, you just need to substitute
     the button for a photoresistor.
-    <br />
+    %br/ 
     =link_to "http://arduino.cc/en/tutorial/button", "http://arduino.cc/en/tutorial/button", target:"_blank" 
   %p
     It should look like the circuit in this example.
-    <br />
+    %br/ 
     =link_to "http://arduino.cc/en/Tutorial/SwitchCase", "http://arduino.cc/en/Tutorial/SwitchCase", target:"_blank" 
 
 %section.compatibility.hardware

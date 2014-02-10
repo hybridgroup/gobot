@@ -34,32 +34,6 @@ leapmotion_platform: true
           leap := gobotLeap.NewLeap(leapAdaptor)
           leap.Name = "leap"
         ...
-%section.public-methods
-  %h2 Events
-
-  %dl.methods 
-    %dt message
-    %dd Gets triggered when receiving a message.
-    %dt start
-    %dd Sent when the device has been started and is ready to use.
-
-  -#%h3 hand
-  -#%p Gets triggered when doing a hand motion, makes hand input available.
-
-  -#%h3 gesture
-  -#%p Gets triggered when doing a gesture motion, makes hand input available.
-
-  -#%h3 pointable
-  -#%p Gets triggered when doing a pointable motion, makes hand input available.
-
-  -#%h3 frame
-  -#%p Gets triggered with every motion detected, makes frame input available.
-
-  -#%h3 How to use events and call them on your drivers
-  -#%p Pretty simple, when the connection and the driver have been setup (as explained above) you can call events on them as follows:
-  -#:markdown
-        -#%:::go 
-        -#on leapmotion, :hand => proc { |sender, hand| puts hand.inspect }
 
 %section.how-to
   %h2 How to use
@@ -96,6 +70,12 @@ leapmotion_platform: true
 
           robot.Start()
         }
+
+%section.public-methods
+  .commands_api
+    = #partial "/documentation/drivers/partials/leapmotion/commands"
+  .commands_api
+    = #partial "/documentation/drivers/partials/leapmotion/events"   
 
 %section.compatability.hardware
   %h2 Works with:
