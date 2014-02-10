@@ -27,6 +27,74 @@
   }
 }
 
+
+.commands_api {
+  h2 {
+    background: $title-color;
+    color: white !important;
+    padding: 5px 10px;
+    font-size: 12pt;
+    margin: 20px 0 0 0;
+
+  }
+  h4 {
+    background: transparent;
+    font-size: 11pt;
+    font-weight: normal;
+  }
+  h5 {
+    background: white;
+    padding: 10px;
+    margin: 0;
+    font-size: 11pt;
+  }
+  p, ul{
+    background: white;
+    font-size: 10.5pt;
+    margin: 0;
+    padding: 10px;
+    font-family: Inconsolata,Menlo,Monaco,"Bitstream Vera Sans Mono","Courier New",monospace;
+  }
+  li {
+    margin-left: 20px;
+  }
+}
+
+.commands {
+  background: white;
+  font-size: 10.5pt;
+  span {
+      font-family: Inconsolata,Menlo,Monaco,"Bitstream Vera Sans Mono","Courier New",monospace;
+      font-size: 14px;
+      line-height: 21px;
+      background: #fafafa;
+      border: 1px solid #ccc;
+      color: #444;
+      padding: 5px;
+  }
+  th {
+    background: $title-color;
+    color: white;
+  }
+  td {
+    border-bottom: 1px solid #d4d4d4;
+  }
+  .command {
+    font-family: Inconsolata, Menlo, Monaco, "Bitstream Vera Sans Mono", "Courier New", monospace;
+    font-weight: bold;
+    font-size: 11pt;
+  }
+  .param {
+    .markdown {
+      span {
+        background:none;
+        border: none;
+        padding: 0;
+      }
+    }
+  }
+}
+
 .clear {
   clear: both;
 }

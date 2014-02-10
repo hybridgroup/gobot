@@ -40,26 +40,6 @@ spark_platform: true
           led.Pin = "P9_12"
         ...
         
-  
-
-%section.public-methods
-  %h2 Commands:
-  
-  %dl.methods 
-    %dt OnC
-    %dd Turns LED on.
-    %dt OffC
-    %dd Turns LED off.
-    %dt ToggleC
-    %dd Turns the LED on, or off, depending on if it is already off, or on, respectively.
-    
-
-  %h2 Events
-
-  %dl.methods 
-    %dt start
-    %dd Sent when the device has been started and is ready to use.  
-
 %section.how-to
   %h2 How to use
   %p
@@ -95,6 +75,45 @@ spark_platform: true
 
           robot.Start()
         }
+
+%section.public-methods
+  .commands_api
+    = #partial "/documentation/drivers/partials/gpio/commands_led"
+  .commands_api
+    = #partial "/documentation/drivers/partials/gpio/events_led"   
+
+%section.public-methods
+  .commands_api
+    %h1 Commands
+    
+    %h2 OnC
+    %p Turns LED on.
+    %h5 Params
+    %p `no params`
+    %h5 Returns
+    %p nil
+
+    %h2 OffC
+    %p Turns LED off.
+    %h5 Params
+    %p `no params`
+    %h5 Returns
+    %p nil
+
+    %h2 ToggleC
+    %p Turns the LED on, or off, depending on if it is already off, or on, respectively.
+    %h5 Params
+    %p `no params`
+    %h5 Returns
+    %p nil
+
+  .commands_api
+    %h1 Events
+
+    %h2 start
+    %p Sent when the device has been started and is ready to use.  
+   
+
 
 
 %section.circuit

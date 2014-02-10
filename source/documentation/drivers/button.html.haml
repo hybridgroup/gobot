@@ -50,29 +50,24 @@ digispark_platform: true
           led.Pin = "D7"
         ...
 
-%section.public-methods
-  -#%h2 Commands:
-
-  -#%dl.methods
-    -#%dt 
-    -#%dd
-
-
 %section.public-events
-  %h2 Events:
-
-  %dl.methods 
-    %dt update
-    %dd 
+  .commands_api
+    %h1 Events
+    
+    %h2 update
+    %p 
       This event will contain one of the following events.
       %br/  
       You can also subscribe to one of the specific events, if that is the information you are interested in.
-    %dt push
-    %dd This event gets triggered when the button changes state from released to pushed.
-    %dt release
-    %dd This event gets triggered when the button changes state from pushed to released.
-    %dt start
-    %dd Sent when the device has been started and is ready to use. 
+  
+    %h2 push
+    %p This event gets triggered when the button changes state from released to pushed.
+
+    %h2 release
+    %p This event gets triggered when the button changes state from pushed to released.
+
+    %h2 start
+    %p Sent when the device has been started and is ready to use.  
 
 
 %section.how-to
