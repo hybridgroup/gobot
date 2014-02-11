@@ -40,26 +40,6 @@ beaglebone_platform: true
         ...
         
 
-%section.public-events
-  %h2 Commands:
-  
-  %dl.methods 
-    %dt RgbC
-    %dd Sets the color of the BlinkM RGB LED to the specified combination of RGB color provided (red, green and blue values should be between 0 and 255).
-    %dt FadeC
-    %dd Fades the color of the BlinkM RGB LED to the specified combination of RGB color provided (red, green and blue values should be between 0 and 255).
-    %dt ColorC
-    %dd Returns an array containing the RGB values for the current color (all integer between 0 and 255).
-    %dt FirmwareVersionC
-    %dd Returns an sring describing the I2C firmware version being used.
-
-  %h2 Events
-
-  %dl.methods 
-    %dt start
-    %dd Sent when the device has been started and is ready to use.  
-
-
 %section.how-to
   %h2 How to use
   %p Example using a BlinkM and Arduino
@@ -98,6 +78,11 @@ beaglebone_platform: true
           robot.Start()
         }
   
+%section.public-methods
+  .commands_api
+    = partial "/documentation/drivers/partials/i2c/commands_blinkm"
+  .commands_api
+    = partial "/documentation/drivers/partials/i2c/events_blinkm"   
 
 %section.circuit
   %h2 Circuit and Schematic

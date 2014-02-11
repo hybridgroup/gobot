@@ -40,165 +40,6 @@ sphero_platform: true
             sphero.Name = "Sphero"
           ...
 
-%section.public-methods
-  %h2 Commands:
-  
-  %dl.methods
-    %dt abortMacro → (ID code , command number)
-    %dd 
-
-    %dt abortOrbBasicProgram 
-    %dd
-
-    %dt appendMacroChunck(MACRO Chunk) 
-    %dd 
-
-    %dt appendOrbBasicFragment(Area, Program Code) 
-    %dd  
-
-    %dt configureCollisionDetection(Meth,(Xt, Yt),(Xspd, Yspd),Dead) 
-    %dd Sets the sphero to detect collisions and report them.
-
-    %dt configureLocator(flag, x, y, Yaw Tare) 
-    %dd 
-
-    %dt detectCollisions 
-    %dd Sets the sphero to detect collisions and report them.
-
-    %dt eraseOrbBasicStorage(Area) 
-    %dd 
-
-    %dt executeOrbBasicProgram(Area, Start Line, Start Line) 
-    %dd 
-
-    %dt getApplicationConfigurationBlock 
-    %dd 
-
-    %dt getConfigurationBlock(ID) 
-    %dd 
-
-    %dt getDeviceMode → (Mode), options: 00h (Normal mode) | 01h (User Hack mode)
-    %dd 
-
-    %dt getMacroStatus → (ID code , cmd number, cmd number)
-    %dd 
-
-    %dt getPermanentOptionFlags → (FLAGS), options: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 6-31
-    %dd 
-
-    %dt getRGB → (red,green,blue) | (color)
-    %dd 
-
-    %dt getTemporaryOptionFlags → (FLAGS), options: 0 | 1-31
-    %dd 
-
-    %dt reInitializeMacroExecutive 
-    %dd 
-
-    %dt readLocator → (XPOS, YPOS, XVEL, YVEL, SOG)
-    %dd 
-
-    %dt roll(speed, heading, state) 
-    %dd This commands Sphero to roll along the provided vector. Both a speed and a heading are required; the latter is considered relative to the last calibrated direction.
-
-    %dt runMacro(SEQ, DLEN, ID) 
-    %dd 
-
-    %dt saveMacro(data) 
-    %dd 
-
-    %dt saveTemporaryMacro(data) 
-    %dd 
-
-    %dt selfLevel(Options, Angle Limit, Timeout, True Time), options: ((0 | 1 | 2 |3 ), (0 | 1 to 90), (0 | 1 to 255), (0 | 1 to 255) 
-    %dd 
-
-    %dt setAccelerometerRange(Range Idx), options: 0 | 1 | 2 | 3 
-    %dd 
-
-    %dt setApplicationConfigurationBlock
-    %dd 
-
-    %dt setBackLED(BRIGHT) 
-    %dd 
-
-    %dt setBoostWithTime(STATE) 
-    %dd 
-
-    %dt setColor(color) 
-    %dd This allows you to set the color of the sphero, just pass an array containing RGB hex or a string with one of the color names of the list.
-
-    %dt setConfigurationBlock(value) 
-    %dd 
-
-    %dt setDataStreaming(N, M, MASK, PCNT, MASK2) 
-    %dd 
-
-    %dt setDeviceMode(MODE) 
-    %dd 
-
-    %dt setHeading(HEADING) 
-    %dd
-
-    %dt setMacroParameter(Param, Val1, Val2) 
-    %dd 
-
-    %dt setMotionTimeout(TIME) 
-    %dd 
-
-    %dt setPermanentOptionFlags(FLAGS) 
-    %dd 
-
-    %dt setRGB(color, persist) 
-    %dd This allows you to set the RGB LED color, just pass an array containing RGB hex or a string with one of the color names of the list.  
-
-    %dt setRawMotorValues(L-MODE, L-POWER, R-MODE, R-POWER) 
-    %dd 
-
-    %dt setRotationRate(RATE) 
-    %dd 
-
-    %dt setStabalisation(bool) 
-    %dd 
-
-    %dt setTemporaryOptionFlags(FLAGS) 
-    %dd 
-
-    %dt stop
-    %dd Stops the sphero.
-
-    %dt submitValueToInputStatement(VAL) 
-    %dd 
-
-
-
-%section.public-events
-  %h2 Events:
-
-  %dl.methods 
-    %dt update
-    %dd 
-      This event will contain one of the following events.
-      %br/  
-      You can also subscribe to one of the specific events, if that is the information you are interested in.
-    %dt collision
-    %dd Gets triggered when the sphero hits something or falls from a step.
-    %dt messages(data)
-    %dd Gets triggered when has a message.
-    %dt notifications(data)
-    %dd Gets triggered when has a notification.
-    %dt connect
-    %dd Opens the connection to Sphero.
-    %dt start
-    %dd Sent when the device has been started and is ready to use.
-
-
-  -#%h3 How to use events and call them on your drivers
-  -#%p
-    -#Pretty simple, when the connection and the driver have been setup (as explained above)
-    -#you can call events on the sphero driver as follows:
-  -#:markdown
-        -#:::ruby
 
 %section.how-to
   %h2 How to use
@@ -238,6 +79,12 @@ sphero_platform: true
 
             robot.Start()
           }
+
+%section.public-methods
+  .commands_api
+    = partial "/documentation/drivers/partials/sphero/commands"
+  .commands_api
+    = partial "/documentation/drivers/partials/sphero/events"   
 
 
 %section 
