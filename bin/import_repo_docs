@@ -106,6 +106,26 @@ def add_docs_to_site(repo_name, docs)
   end
 end
 
+def extract_breadboard_images_from_repo(path)
+  puts "  - Importing breadboard images from #{File.basename(path)}"
+  images = Dir.glob(path + "/docs/breadboards/*_bb.png")
+  images.each { |image| puts "    - #{File.basename(image)}" }
+  images
+end
+
+def add_breadboard_images_to_site(repo_name, images)
+  return if images == []
+
+  images_path = File.expand_path("#{__dir__}/../source/documentation/drivers/breadboards/")
+  images_path += "/" + repo_name[/^gobot-(.*)$/, 1]
+
+  FileUtils.rm_rf images_path if File.directory?(images_path)
+  FileUtils.mkdir_p images_path
+
+  FileUtils.cp images, images_path
+end
+
+
 # Public: Removes the existing git repository
 #
 # path - path to git repository to remove
@@ -121,8 +141,13 @@ def main
     puts "Importing docs from #{name}."
 
     path, repo = clone_repo repo
+
     docs = extract_docs_from_repo path
     add_docs_to_site name, docs
+
+    images = extract_breadboard_images_from_repo path
+    add_breadboard_images_to_site name, images
+
     remove_repo path
   end
 end
