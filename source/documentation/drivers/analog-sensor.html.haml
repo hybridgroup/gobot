@@ -16,38 +16,19 @@ arduino_platform: true
     The value received from an analog input read from the sensor goes from 0 to 1027.
 
 %section.how_to
-  %h2 How to establish a connection and setup the driver
-  %h3 JavaScript
+  %h2 How To Connect
   :markdown
-        :::javascript
-        var Cylon = require('cylon');
-
-        Cylon.robot({
-          connection: {name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0'},
-
-          device: {name: 'sensor', driver: 'analogSensor', pin: 0, lowerLimit: 100, upperLimit: 900},
-          ...
-
-  %h3 CoffeeScript
-  :markdown
-        :::javascript
-        Cylon = require 'cylon'
-
-        Cylon.robot
-          connection:
-            name: 'arduino', adaptor: 'firmata', port: '/dev/ttyACM0'
-
-          device:
-            name: 'sensor', driver: 'analogSensor', pin: 0, lowerLimit: 100, upperLimit: 900
-          ...
+        :::bash
+        coming soon
+        
 
 %section.how-to
-  %h2 How to use
+  %h2 How To Use
   %p 
     This example detects lower and upper limits on a photoresistor sensor.
   :markdown
         :::javascript
-        ...
+        coming soon
 
 %section.public-methods
   .commands_api
@@ -56,7 +37,7 @@ arduino_platform: true
     = partial "/documentation/drivers/partials/gpio/events_analog_sensor"   
 
 %section.circuit
-  %h2 Circuit and Schematic
+  %h2 Circuit
   %p
     Circuit for analog sensors is pretty much the same as the button circuit, you just need to substitute
     the button for a photoresistor.
@@ -68,7 +49,7 @@ arduino_platform: true
     =link_to "http://arduino.cc/en/Tutorial/SwitchCase", "http://arduino.cc/en/Tutorial/SwitchCase", target:"_blank" 
 
 %section.compatibility.hardware
-  %h2 Works with:
+  %h2 Compatibility
   =# TODO: Update platform list with all that work with this driver in Cylon.js.
   .devices
     = partial "documentation/partials/devices_platforms"
