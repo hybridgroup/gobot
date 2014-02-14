@@ -27,6 +27,19 @@
   }
 }
 
+.circuit {
+  .image_circuit {
+    width: 50%;
+    float: left;
+    img {
+      height: 300px;
+    }
+  }
+  .description_circuit {
+    width: 50%;
+    float: right;
+  }
+}
 
 .commands_api {
   h2 {
