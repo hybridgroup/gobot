@@ -5,6 +5,7 @@ page_title: Digispark
 page_subtitle: "<a href='https://github.com/hybridgroup/gobot-digispark' class='repository'>Repository</a> <a class+'issues' href='https://github.com/hybridgroup/gobot-digispark/issues'>Issues</a>"
 page_title_show: true
 layout: documentation
+subnav_platform: true
 
 button_driver: true
 led_driver: true
@@ -26,14 +27,16 @@ servo_driver: true
         = link_to "here", "http://digistump.com/category/1", target: :blank
   .clear
   
-%section.how-to
-  %h2 How to install
+%section.how-to#HowToInstall
+  %h2 How To Install
   %p
     Installing Gobot with digispark support is pretty easy.
   :markdown
         :::bash
         go get -u github.com/hybridgroup/gobot-digispark
-  %h2 How to use
+
+%section.how-to#HowToUse
+  %h2 How To Use
   %p
     This small program lets you toggle an LED on and off.
   :markdown
@@ -69,7 +72,9 @@ servo_driver: true
 
           robot.Start()
         }
-  %h2 How to connect
+        
+%section.how-to#HowToConnect
+  %h2 How To Connect
   %p
     If your Digispark (
     %a{ href:"http://www.kickstarter.com/projects/digistump/digispark-the-tiny-arduino-enabled-usb-dev-board"} http://www.kickstarter.com/projects/digistump/digispark-the-tiny-arduino-enabled-usb-dev-board
@@ -81,7 +86,7 @@ servo_driver: true
     Otherwise, for instructions on how to install Little Wire on a Digispark check out 
     %a{ href:"http://digistump.com/board/index.php/topic,160.0.html " } http://digistump.com/board/index.php/topic,160.0.html 
 
-%section.drivers
+%section.drivers#Drivers
   %h2 Drivers
   %p
     Thanks to

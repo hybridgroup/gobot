@@ -5,6 +5,7 @@ page_title: Sphero
 page_subtitle: "<a href='https://github.com/hybridgroup/gobot-sphero' target='blanck' class='repository'>Repository</a> <a class+'issues' href='https://github.com/hybridgroup/gobot-sphero/issues' target='blanck' >Issues</a>"
 page_title_show: true
 layout: documentation
+subnav_platform: true
 
 sphero_driver: true
 ---
@@ -25,15 +26,16 @@ sphero_driver: true
       = link_to "GoSphero.", "http://www.gosphero.com/", target: "_blank"
   .clear
 
-%section.how-to
-  %h2 How to install
+%section.how-to#HowToInstall
+  %h2 How To Install
   %p
     Installing Gobot with sphero support is pretty easy.
   :markdown
         :::bash
         go get -u github.com/hybridgroup/gobot-sphero
 
-  %h2 How to use
+%section.how-to#HowToUse
+  %h2 How To Use
   %p Example of a simple program that makes the Sphero roll.
 
   :markdown
@@ -78,7 +80,7 @@ sphero_driver: true
         }
 
 
-%section.drivers
+%section.drivers#Drivers
   %h2 Drivers
   %p
     There is only one driver for the Sphero.
