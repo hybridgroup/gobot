@@ -8,15 +8,16 @@ layout: documentation
 ---
 %section.intro
   = image_tag "/images/devices/joystick.jpg", class: "display"
+  .info_intro
+    %p
+      You can use Cylon.js with a PS3 game controller, an XBox360 game controller, or any other USB joystick or game controller that is compatible with Simple DirectMedia Layer (SDL).
 
-  %p
-    You can use Cylon.js with a PS3 game controller, an XBox360 game controller, or any other USB joystick or game controller that is compatible with Simple DirectMedia Layer (SDL).
-
-  %p
-    For more info about Simple DirectMedia Layer (SDL) go to
-    = succeed "." do
-      = link_to "http://www.libsdl.org/", "http://www.libsdl.org/", target: :blank
-
+    %p
+      For more info about Simple DirectMedia Layer (SDL) go to
+      = succeed "." do
+        = link_to "http://www.libsdl.org/", "http://www.libsdl.org/", target: :blank
+  .clear
+  
 %section.how-to
   %h2 How to install
   %p

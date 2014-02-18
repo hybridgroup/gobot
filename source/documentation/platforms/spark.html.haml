@@ -5,6 +5,7 @@ page_title: Spark
 page_subtitle: "<a href='https://github.com/hybridgroup/gobot-spark' target='blanck' class='repository'>Repository</a> <a class='issues' href='https://github.com/hybridgroup/gobot-spark/issues' target='blanck'>Issues</a>"
 page_title_show: true
 layout: documentation
+subnav_platform: true
 
 button_driver: true
 led_driver: true
@@ -13,21 +14,23 @@ servo_driver: true
 
 %section.intro
   = image_tag "/images/devices/spark.jpg", class: "display"
+  .info_intro
+    %p The Spark Core contains a Wi-Fi connected microcontroller. Once it connects to a Wi-Fi network, it automatically connects with a central server (the "Spark Cloud") and stays connected so it can be controlled from external systems, such as a Cylon.js program.
 
-  %p The Spark Core contains a Wi-Fi connected microcontroller. Once it connects to a Wi-Fi network, it automatically connects with a central server (the "Spark Cloud") and stays connected so it can be controlled from external systems, such as a Cylon.js program.
-
-  %p
-    For more info about the Spark platform go to
-    = succeed "." do
-      = link_to "https://www.spark.io/", "https://www.spark.io/", target: :blank
-
-%section.how_to
-  %h2 How to install
+    %p
+      For more info about the Spark platform go to
+      = succeed "." do
+        = link_to "https://www.spark.io/", "https://www.spark.io/", target: :blank
+  .clear
+  
+%section.how-to#HowToInstall
+  %h2 How To Install
   %p Installing Gobot with Spark support is pretty easy.
   :markdown
         :::ruby
         go get -u github.com/hybridgroup/gobot-spark
-  %h2 How to use
+%section.how-to#HowToUse
+  %h2 How To Use
   %p This small program lets you turn on or off a LED for every 2 sec.
   %h3 Javascript  
   :markdown
@@ -70,7 +73,7 @@ servo_driver: true
 
 
 
-%section.drivers
+%section.drivers#Drivers
   %h2 Drivers
   
   %p Available drivers for the spark platform are listed below, the drivers contain detailed documentation and examples of what kinds of physical computing (using Cylon.js and Node.js) you can be doing:

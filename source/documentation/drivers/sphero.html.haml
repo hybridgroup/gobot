@@ -5,16 +5,19 @@ page_title: Sphero
 page_subtitle: Driver
 page_title_show: true
 layout: documentation
+subnav_driver: true
+sphero_colors_driver: true
 
 sphero_platform: true
 ---
 %section.intro
   =image_tag "/images/devices/sphero.jpg", class: "display"
-  %p
-    Allows user to interact with the Sphero robotic sphero using Gobot.
+  .info_intro
+    %p  Allows user to interact with the Sphero robotic sphero using Gobot.
+  .clear
 
-%section.how-to
-  %h2 How to establish a connection and setup the driver
+%section.how-to#HowToConnect
+  %h2 How To Connect
   %p
     That is pretty simple once the Sphero is ready (connected and listening), you just need three lines of code and you are set,
     Gobot and the Sphero driver take care of the rest.
@@ -41,8 +44,8 @@ sphero_platform: true
           ...
 
 
-%section.how-to
-  %h2 How to use
+%section.how-to#HowToUse
+  %h2 How To Use
   %p 
     This example rolls the sphero in a random direction and change direction every 2 seconds.
 
@@ -81,695 +84,794 @@ sphero_platform: true
           }
 
 %section.public-methods
-  .commands_api
+  .commands_api#Commands
     = partial "/documentation/drivers/partials/sphero/commands"
-  .commands_api
+  .commands_api#Events
     = partial "/documentation/drivers/partials/sphero/events"   
 
 
-%section 
+%section#SpheroColors
   %h2 Sphero Colors (R,G,B)
+  
+  %table.commands 
+    %tr 
+      %th Example
+      %th Name
+      %th Code
+      %th Example
+      %th Name
+      %th Code
+    %tr 
+      %td
+        .aliceblue.square
+      %td.command 
+        %span aliceblue
+      %td (240, 248, 255)
+      %td
+        .antiquewhite.square
+      %td.command 
+        %span antiquewhite
+      %td (250, 235, 215) 
+    %tr 
+      %td
+        .square.aqua
+      %td.command 
+        %span aqua
+      %td (0, 255, 255)
+      %td
+        .square.aquamarine 
+      %td.command 
+        %span aquamarine
+      %td (127, 255, 212)
+    %tr 
+      %td
+        .square.azure
+      %td.command 
+        %span azure
+      %td (240, 255, 255)
+      %td
+        .square.beige
+      %td.command 
+        %span beige
+      %td (245, 245, 220)
+    %tr 
+      %td
+        .square.bisque
+      %td.command 
+        %span bisque
+      %td (255, 228, 196)
+      %td
+        .square.black
+      %td.command 
+        %span black
+      %td (0, 0, 0)
+    %tr 
+      %td
+        .square.blanchedalmond
+      %td.command 
+        %span blanchedalmond
+      %td (255, 235, 205)
+      %td
+        .square.blue
+      %td.command 
+        %span blue
+      %td (0, 0, 255)
+    %tr 
+      %td
+        .square.blueviolet
+      %td.command 
+        %span blueviolet
+      %td (138, 43, 226)
+      %td
+        .square.brown
+      %td.command 
+        %span brown
+      %td (165, 42, 42)
+    %tr 
+      %td
+        .square.burlywood
+      %td.command 
+        %span burlywood
+      %td (222, 184, 135)
+      %td
+        .square.cadetblue
+      %td.command 
+        %span cadetblue
+      %td (95, 158, 160)
+    %tr 
+      %td
+        .square.chartreuse
+      %td.command 
+        %span chartreuse
+      %td (127, 255, 0)
+      %td
+        .square.chocolate
+      %td.command 
+        %span chocolate
+      %td (210, 105, 30)
+    %tr 
+      %td
+        .square.coral
+      %td.command 
+        %span coral
+      %td (255, 127, 80)
+      %td
+        .square.cornflowerblue
+      %td.command 
+        %span cornflowerblue
+      %td (100, 149, 237)
+    %tr 
+      %td
+        .square.cornsilk
+      %td.command 
+        %span cornsilk
+      %td (255, 248, 220)
+      %td
+        .square.crimson
+      %td.command 
+        %span crimson
+      %td (220, 20, 60)
+    %tr 
+      %td
+        .square.cyan
+      %td.command 
+        %span cyan
+      %td (0, 255, 255)
+      %td
+        .square.darkblue
+      %td.command 
+        %span darkblue
+      %td (0, 0, 139)
+    %tr 
+      %td
+        .square.darkcyan
+      %td.command 
+        %span darkcyan
+      %td (0, 139, 139)
+      %td
+        .square.darkgoldenrod
+      %td.command 
+        %span darkgoldenrod
+      %td (184, 134, 11)
+    %tr 
+      %td
+        .square.darkgray
+      %td.command 
+        %span darkgray
+      %td (169, 169, 169)
+      %td
+        .square.darkgreen
+      %td.command 
+        %span darkgreen
+      %td (0, 100, 0)
+    %tr 
+      %td
+        .square.darkkhaki
+      %td.command 
+        %span darkkhaki
+      %td (189, 183, 107)
+      %td
+        .square.darkmagenta
+      %td.command 
+        %span darkmagenta
+      %td (139, 0, 139)
+    %tr 
+      %td
+        .square.darkolivegreen
+      %td.command 
+        %span darkolivegreen
+      %td (85, 107, 47)
+      %td
+        .square.darkorange
+      %td.command 
+        %span darkorange
+      %td (255, 140, 0)
+    %tr 
+      %td
+        .square.darkorchid
+      %td.command 
+        %span darkorchid
+      %td (153, 50, 204)
+      %td
+        .square.darkred
+      %td.command 
+        %span darkred
+      %td (139, 0, 0)
+    %tr 
+      %td
+        .square.darksalmon
+      %td.command 
+        %span darksalmon
+      %td (233, 150, 122)
+      %td
+        .square.darkseagreen
+      %td.command 
+        %span darkseagreen
+      %td (143, 188, 143)
+    %tr 
+      %td
+        .square.darkslateblue
+      %td.command 
+        %span darkslateblue
+      %td (72, 61, 139)
+      %td
+        .square.darkslategray
+      %td.command 
+        %span darkslategray
+      %td (47, 79, 79)
+    %tr 
+      %td
+        .square.darkturquoise
+      %td.command 
+        %span darkturquoise
+      %td (0, 206, 209)
+      %td
+        .square.darkviolet
+      %td.command 
+        %span darkviolet
+      %td (148, 0, 211)
+    %tr 
+      %td
+        .square.deeppink
+      %td.command 
+        %span deeppink
+      %td (255, 20, 147)
+      %td
+        .square.deepskyblue
+      %td.command 
+        %span deepskyblue
+      %td (0, 191, 255)
+    %tr 
+      %td
+        .square.dimgray
+      %td.command 
+        %span dimgray
+      %td (105, 105, 105)
+      %td
+        .square.dodgerblue
+      %td.command 
+        %span dodgerblue
+      %td (30, 144, 255)
+    %tr 
+      %td
+        .square.firebrick
+      %td.command 
+        %span firebrick
+      %td (178, 34, 34)
+      %td
+        .square.floralwhite
+      %td.command 
+        %span floralwhite
+      %td (255, 250, 240)
+    %tr 
+      %td
+        .square.forestgreen
+      %td.command 
+        %span forestgreen
+      %td (34, 139, 34)
+      %td
+        .square.fuchsia
+      %td.command 
+        %span fuchsia
+      %td (255, 0, 255)
+    %tr 
+      %td
+        .square.gainsboro
+      %td.command 
+        %span gainsboro
+      %td (220, 220, 220)
+      %td
+        .square.ghostwhite
+      %td.command 
+        %span ghostwhite
+      %td (248, 248, 255)
+    %tr 
+      %td
+        .square.gold
+      %td.command 
+        %span gold
+      %td (255, 215, 0)
+      %td
+        .square.goldenrod
+      %td.command 
+        %span goldenrod
+      %td (218, 165, 32)
+    %tr 
+      %td
+        .square.gray
+      %td.command 
+        %span gray
+      %td (128, 128, 128)
+      %td
+        .square.green
+      %td.command 
+        %span green
+      %td (0, 128, 0)
+    %tr 
+      %td
+        .square.greenyellow
+      %td.command 
+        %span greenyellow
+      %td (173, 255, 47)
+      %td
+        .square.honeydew
+      %td.command 
+        %span honeydew
+      %td (240, 255, 240)
+    %tr 
+      %td
+        .square.hotpink
+      %td.command 
+        %span hotpink
+      %td (255, 105, 180)
+      %td
+        .square.indianred
+      %td.command 
+        %span indianred
+      %td (205, 92, 92)
+    %tr 
+      %td
+        .square.indigo
+      %td.command 
+        %span indigo
+      %td (75, 0, 130)
+      %td
+        .square.ivory
+      %td.command 
+        %span ivory
+      %td (255, 255, 240)
+    %tr 
+      %td
+        .square.khaki
+      %td.command 
+        %span khaki
+      %td (240, 230, 140)
+      %td
+        .square.lavender
+      %td.command 
+        %span lavender
+      %td (230, 230, 250)
+    %tr 
+      %td
+        .square.lavenderblush
+      %td.command 
+        %span lavenderblush
+      %td (255, 240, 245)
+      %td
+        .square.lawngreen
+      %td.command 
+        %span lawngreen
+      %td (124, 252, 0)
+    %tr 
+      %td
+        .square.lemonchiffon
+      %td.command 
+        %span lemonchiffon
+      %td (255, 250, 205)
+      %td
+        .square.lightblue
+      %td.command 
+        %span lightblue
+      %td (173, 216, 230)
+    %tr 
+      %td
+        .square.lightcoral
+      %td.command 
+        %span lightcoral
+      %td (240, 128, 128)
+      %td
+        .square.lightcyan
+      %td.command 
+        %span lightcyan
+      %td (224, 255, 255)
+    %tr 
+      %td
+        .square.lightgoldenrodyellow
+      %td.command 
+        %span lightgoldenrodyellow
+      %td (250, 250, 210)
+      %td
+        .square.lightgreen
+      %td.command 
+        %span lightgreen
+      %td (144, 238, 144)
+    %tr 
+      %td
+        .square.lightgrey
+      %td.command 
+        %span lightgrey
+      %td (211, 211, 211)
+      %td
+        .square.lightpink
+      %td.command 
+        %span lightpink
+      %td (255, 182, 193)
+    %tr 
+      %td
+        .square.lightsalmon
+      %td.command 
+        %span lightsalmon
+      %td (255, 160, 122)
+      %td
+        .square.lightseagreen
+      %td.command 
+        %span lightseagreen
+      %td (32, 178, 170)
+    %tr 
+      %td
+        .square.lightskyblue
+      %td.command 
+        %span lightskyblue
+      %td (135, 206, 250)
+      %td
+        .square.lightslategray
+      %td.command 
+        %span lightslategray
+      %td (119, 136, 153)
+    %tr 
+      %td
+        .square.lightsteelblue
+      %td.command 
+        %span lightsteelblue
+      %td (176, 196, 222)
+      %td
+        .square.lightyellow
+      %td.command 
+        %span lightyellow
+      %td (255, 255, 224)
+    %tr 
+      %td
+        .square.lime
+      %td.command 
+        %span lime
+      %td (0, 255, 0)
+      %td
+        .square.limegreen
+      %td.command 
+        %span limegreen
+      %td (50, 205, 50)
+    %tr 
+      %td
+        .square.linen
+      %td.command 
+        %span linen
+      %td (250, 240, 230)
+      %td
+        .square.magenta
+      %td.command 
+        %span magenta
+      %td (255, 0, 255)
+    %tr 
+      %td
+        .square.maroon
+      %td.command 
+        %span maroon
+      %td (128, 0, 0)
+      %td
+        .square.mediumaquamarine
+      %td.command 
+        %span mediumaquamarine
+      %td (102, 205, 170)
+    %tr 
+      %td
+        .square.mediumblue
+      %td.command 
+        %span mediumblue
+      %td (0, 0, 205)
+      %td
+        .square.mediumorchid
+      %td.command 
+        %span mediumorchid
+      %td (186, 85, 211)
+    %tr 
+      %td
+        .square.mediumpurple
+      %td.command 
+        %span mediumpurple
+      %td (147, 112, 219)
+      %td
+        .square.mediumseagreen
+      %td.command 
+        %span mediumseagreen
+      %td (60, 179, 113)
+    %tr 
+      %td
+        .square.mediumslateblue
+      %td.command 
+        %span mediumslateblue
+      %td (123, 104, 238)
+      %td
+        .square.mediumspringgreen
+      %td.command 
+        %span mediumspringgreen
+      %td (0, 250, 154)
+    %tr 
+      %td
+        .square.mediumturquoise
+      %td.command 
+        %span mediumturquoise
+      %td (72, 209, 204)
+      %td
+        .square.mediumvioletred
+      %td.command 
+        %span mediumvioletred
+      %td (199, 21, 133)
+    %tr 
+      %td
+        .square.midnightblue
+      %td.command 
+        %span midnightblue
+      %td (25, 25, 112)
+      %td
+        .square.mintcream
+      %td.command 
+        %span mintcream
+      %td (245, 255, 250)
+    %tr 
+      %td
+        .square.mistyrose
+      %td.command 
+        %span mistyrose
+      %td (255, 228, 225)
+      %td
+        .square.moccasin
+      %td.command 
+        %span moccasin
+      %td (255, 228, 181)
+    %tr 
+      %td
+        .square.navajowhite
+      %td.command 
+        %span navajowhite
+      %td (255, 222, 173)
+      %td
+        .square.navy
+      %td.command 
+        %span navy
+      %td (0, 0, 128)
+    %tr 
+      %td
+        .square.oldlace
+      %td.command 
+        %span oldlace
+      %td (253, 245, 230)
+      %td
+        .square.olive
+      %td.command 
+        %span olive
+      %td (128, 128, 0)
+    %tr 
+      %td
+        .square.olivedrab
+      %td.command 
+        %span olivedrab
+      %td (107, 142, 35)
+      %td
+        .square.orange
+      %td.command 
+        %span orange
+      %td (255, 165, 0)
+    %tr 
+      %td
+        .square.orangered
+      %td.command 
+        %span orangered
+      %td (255, 69, 0)
+      %td
+        .square.orchid
+      %td.command 
+        %span orchid
+      %td (218, 112, 214)
+    %tr 
+      %td
+        .square.palegoldenrod
+      %td.command 
+        %span palegoldenrod
+      %td (238, 232, 170)
+      %td
+        .square.palegreen
+      %td.command 
+        %span palegreen
+      %td (152, 251, 152)
+    %tr 
+      %td
+        .square.paleturquoise
+      %td.command 
+        %span paleturquoise
+      %td (175, 238, 238)
+      %td
+        .square.palevioletred
+      %td.command 
+        %span palevioletred
+      %td (219, 112, 147)
+    %tr 
+      %td
+        .square.papayawhip
+      %td.command 
+        %span papayawhip
+      %td (255, 239, 213)
+      %td
+        .square.peachpuff
+      %td.command 
+        %span peachpuff
+      %td (255, 218, 185)
+    %tr 
+      %td
+        .square.peru
+      %td.command 
+        %span peru
+      %td (205, 133, 63)
+      %td
+        .square.pink
+      %td.command 
+        %span pink
+      %td (255, 192, 203)
+    %tr 
+      %td
+        .square.plum
+      %td.command 
+        %span plum
+      %td (221, 160, 221)
+      %td
+        .square.powderblue
+      %td.command 
+        %span powderblue
+      %td (176, 224, 230)
+    %tr 
+      %td
+        .square.purple
+      %td.command 
+        %span purple
+      %td (128, 0, 128)
+      %td
+        .square.red
+      %td.command 
+        %span red
+      %td (255, 0, 0)
+    %tr 
+      %td
+        .square.rosybrown
+      %td.command 
+        %span rosybrown
+      %td (188, 143, 143)
+      %td
+        .square.royalblue
+      %td.command 
+        %span royalblue
+      %td (65, 105, 225)
+    %tr 
+      %td
+        .square.saddlebrown
+      %td.command 
+        %span saddlebrown
+      %td (139, 69, 19)
+      %td
+        .square.salmon
+      %td.command 
+        %span salmon
+      %td (250, 128, 114)
+    %tr 
+      %td
+        .square.sandybrown
+      %td.command 
+        %span sandybrown
+      %td (244, 164, 96)
+      %td
+        .square.seagreen
+      %td.command 
+        %span seagreen
+      %td (46, 139, 87)
+    %tr 
+      %td
+        .square.seashell
+      %td.command 
+        %span seashell
+      %td (255, 245, 238)
+      %td
+        .square.sienna
+      %td.command 
+        %span sienna
+      %td (160, 82, 45)
+    %tr 
+      %td
+        .square.silver
+      %td.command 
+        %span silver
+      %td (192, 192, 192)
+      %td
+        .square.skyblue
+      %td.command 
+        %span skyblue
+      %td (135, 206, 235)
+    %tr 
+      %td
+        .square.slateblue
+      %td.command 
+        %span slateblue
+      %td (106, 90, 205)
+      %td
+        .square.slategray
+      %td.command 
+        %span slategray
+      %td (112, 128, 144)
+    %tr 
+      %td
+        .square.snow
+      %td.command 
+        %span snow
+      %td (255, 250, 250)
+      %td
+        .square.springgreen
+      %td.command 
+        %span springgreen
+      %td (0, 255, 127)
+    %tr 
+      %td
+        .square.steelblue
+      %td.command 
+        %span steelblue
+      %td (70, 130, 180)
+      %td
+        .square.tan
+      %td.command 
+        %span tan
+      %td (210, 180, 140)
+    %tr 
+      %td
+        .square.teal
+      %td.command 
+        %span teal
+      %td (0, 128, 128)
+      %td
+        .square.thistle
+      %td.command 
+        %span thistle
+      %td (216, 191, 216)
+    %tr 
+      %td
+        .square.tomato
+      %td.command 
+        %span tomato
+      %td (255, 99, 71)
+      %td
+        .square.turquoise
+      %td.command 
+        %span turquoise
+      %td (64, 224, 208)
+    %tr 
+      %td
+        .square.violet
+      %td.command 
+        %span violet
+      %td (238, 130, 238)
+      %td
+        .square.wheat
+      %td.command 
+        %span wheat
+      %td (245, 222, 179)
+    %tr 
+      %td
+        .square.white
+      %td.command 
+        %span white
+      %td (255, 255, 255)
+      %td
+        .square.whitesmoke
+      %td.command 
+        %span whitesmoke
+      %td (245, 245, 245)
+    %tr 
+      %td
+        .square.yellow
+      %td.command 
+        %span yellow
+      %td (255, 255, 0)
+      %td
+        .square.yellowgreen
+      %td.command 
+        %span yellowgreen
+      %td (154, 205, 50)
 
-  %dl.colors 
-    %dt aliceblue            
-    %dd 
-      .aliceblue.square
-      %p (240, 248, 255)
-    .clear  
-    %dt antiquewhite         
-    %dd 
-      .antiquewhite.square
-      %p (250, 235, 215) 
-    %dt aqua                 
-    %dd 
-      .square.aqua
-      %p (0, 255, 255)
-    %dt aquamarine           
-    %dd
-      .square.aquamarine 
-      %p (127, 255, 212)
-    %dt azure                 
-    %dd 
-      .square.azure
-      %p (240, 255, 255)
-    %dt beige                 
-    %dd 
-      .square.beige
-      %p (245, 245, 220)
-    %dt bisque                
-    %dd 
-      .square.bisque
-      %p (255, 228, 196)
-    %dt black                 
-    %dd 
-      .square.black
-      %p (0, 0, 0)
-    %dt blanchedalmond        
-    %dd 
-      .square.blanchedalmond
-      %p (255, 235, 205)
-    %dt blue                 
-    %dd 
-      .square.blue
-      %p (0, 0, 255)
-    %dt blueviolet            
-    %dd 
-      .square.blueviolet
-      %p (138, 43, 226)
-    %dt brown                 
-    %dd 
-      .square.brown
-      %p (165, 42, 42)
-    %dt burlywood             
-    %dd 
-      .square.burlywood
-      %p (222, 184, 135)
-    %dt cadetblue             
-    %dd
-      .square.cadetblue 
-      %p (95, 158, 160)
-    %dt chartreuse            
-    %dd 
-      .square.chartreuse
-      %p (127, 255, 0)
-    %dt chocolate             
-    %dd 
-      .square.chocolate
-      %p (210, 105, 30)
-    %dt coral                 
-    %dd 
-      .square.coral
-      %p (255, 127, 80)
-    %dt cornflowerblue        
-    %dd 
-      .square.cornflowerblue
-      %p (100, 149, 237)
-    %dt cornsilk              
-    %dd   
-      .square.cornsilk
-      %p (255, 248, 220)
-    %dt crimson               
-    %dd 
-      .square.crimson
-      %p (220, 20, 60)
-    %dt cyan                  
-    %dd 
-      .square.cyan
-      %p (0, 255, 255)
-    %dt darkblue              
-    %dd 
-      .square.darkblue
-      %p (0, 0, 139)
-      
-    %dt darkcyan              
-    %dd 
-      .square.darkcyan
-      %p (0, 139, 139)
-      
-    %dt darkgoldenrod         
-    %dd 
-      .square.darkgoldenrod
-      %p (184, 134, 11)
-      
-    %dt darkgray              
-    %dd 
-      .square.darkgray
-      %p (169, 169, 169)
-      
-    %dt darkgreen             
-    %dd 
-      .square.darkgreen
-      %p (0, 100, 0)
-      
-    %dt darkkhaki             
-    %dd 
-      .square.darkkhaki
-      %p (189, 183, 107)
-      
-    %dt darkmagenta           
-    %dd 
-      .square.darkmagenta
-      %p (139, 0, 139)
-      
-    %dt darkolivegreen        
-    %dd 
-      .square.darkolivegreen
-      %p (85, 107, 47)
-      
-    %dt darkorange            
-    %dd 
-      .square.darkorange
-      %p (255, 140, 0)
-      
-    %dt darkorchid            
-    %dd 
-      .square.darkorchid
-      %p (153, 50, 204)
-      
-    %dt darkred               
-    %dd 
-      .square.darkred
-      %p (139, 0, 0)
-      
-    %dt darksalmon            
-    %dd 
-      .square.darksalmon
-      %p (233, 150, 122)
-      
-    %dt darkseagreen          
-    %dd 
-      .square.darkseagreen
-      %p (143, 188, 143)
-      
-    %dt darkslateblue         
-    %dd 
-      .square.darkslateblue
-      %p (72, 61, 139)
-      
-  %dl.colors   
-    %dt darkslategray         
-    %dd 
-      .square.darkslategray
-      %p (47, 79, 79)
-    %dt darkturquoise         
-    %dd 
-      .square.darkturquoise
-      %p (0, 206, 209)
-    %dt darkviolet            
-    %dd 
-      .square.darkviolet
-      %p (148, 0, 211)
-    %dt deeppink              
-    %dd 
-      .square.deeppink
-      %p (255, 20, 147)
-    %dt deepskyblue           
-    %dd 
-      .square.deepskyblue
-      %p (0, 191, 255)
-    %dt dimgray               
-    %dd 
-      .square.dimgray
-      %p (105, 105, 105)
-    %dt dodgerblue            
-    %dd 
-      .square.dodgerblue
-      %p (30, 144, 255)
-      
-    %dt firebrick:             
-    %dd 
-      .square.firebrick
-      %p (178, 34, 34)
-      
-    %dt floralwhite           
-    %dd 
-      .square.floralwhite
-      %p (255, 250, 240)
-      
-    %dt forestgreen           
-    %dd 
-      .square.forestgreen
-      %p (34, 139, 34)
-      
-    %dt fuchsia               
-    %dd 
-      .square.fuchsia
-      %p (255, 0, 255)
-      
-    %dt gainsboro             
-    %dd 
-      .square.gainsboro
-      %p (220, 220, 220)
-      
-    %dt ghostwhite            
-    %dd 
-      .square.ghostwhite
-      %p (248, 248, 255)
-      
-    %dt gold                  
-    %dd 
-      .square.gold
-      %p (255, 215, 0)
-      
-    %dt goldenrod             
-    %dd 
-      .square.goldenrod
-      %p (218, 165, 32)
-      
-    %dt gray                  
-    %dd 
-      .square.gray
-      %p (128, 128, 128)
-      
-    %dt green                 
-    %dd 
-      .square.green
-      %p (0, 128, 0)
-      
-    %dt greenyellow           
-    %dd 
-      .square.greenyellow
-      %p (173, 255, 47)
-      
-    %dt honeydew              
-    %dd 
-      .square.honeydew
-      %p (240, 255, 240)
-      
-    %dt hotpink               
-    %dd 
-      .square.hotpink
-      %p (255, 105, 180)
-      
-    %dt indianred             
-    %dd 
-      .square.indianred
-      %p (205, 92, 92)
-      
-    %dt indigo                
-    %dd 
-      .square.indigo
-      %p (75, 0, 130)
-      
-    %dt ivory                 
-    %dd 
-      .square.ivory
-      %p (255, 255, 240)
-      
-    %dt khaki                 
-    %dd 
-      .square.khaki
-      %p (240, 230, 140)
-      
-    %dt lavender              
-    %dd 
-      .square.lavender
-      %p (230, 230, 250)
-      
-    %dt lavenderblush         
-    %dd 
-      .square.lavenderblush
-      %p (255, 240, 245)
-      
-    %dt lawngreen             
-    %dd 
-      .square.lawngreen
-      %p (124, 252, 0)
-      
-    %dt lemonchiffon          
-    %dd 
-      .square.lemonchiffon
-      %p (255, 250, 205)
-      
-    %dt lightblue             
-    %dd 
-      .square.lightblue
-      %p (173, 216, 230)
-      
-    %dt lightcoral            
-    %dd 
-      .square.lightcoral
-      %p (240, 128, 128)
-      
-    %dt lightcyan             
-    %dd 
-      .square.lightcyan
-      %p (224, 255, 255)
-      
-    %dt lightgoldenrodyellow  
-    %dd 
-      .square.lightgoldenrodyellow
-      %p (250, 250, 210)
-      
-    %dt lightgreen            
-    %dd 
-      .square.lightgreen
-      %p (144, 238, 144)
-      
-    %dt lightgrey             
-    %dd 
-      .square.lightgrey
-      %p (211, 211, 211)
-      
-    %dt lightpink             
-    %dd 
-      .square.lightpink
-      %p (255, 182, 193)
-      
-  %dl.colors   
-    %dt lightsalmon           
-    %dd 
-      .square.lightsalmon
-      %p (255, 160, 122)
-      
-    %dt lightseagreen         
-    %dd 
-      .square.lightseagreen
-      %p (32, 178, 170)
-      
-    %dt lightskyblue          
-    %dd 
-      .square.lightskyblue
-      %p (135, 206, 250)
-      
-    %dt lightslategray        
-    %dd 
-      .square.lightslategray
-      %p (119, 136, 153)
-      
-    %dt lightsteelblue        
-    %dd 
-      .square.lightsteelblue
-      %p (176, 196, 222)
-      
-    %dt lightyellow           
-    %dd 
-      .square.lightyellow
-      %p (255, 255, 224)
-      
-    %dt lime                  
-    %dd 
-      .square.lime
-      %p (0, 255, 0)
-      
-    %dt limegreen             
-    %dd 
-      .square.limegreen
-      %p (50, 205, 50)
-      
-    %dt linen                 
-    %dd 
-      .square.linen
-      %p (250, 240, 230)
-      
-    %dt magenta               
-    %dd 
-      .square.magenta
-      %p (255, 0, 255)
-      
-    %dt maroon                
-    %dd 
-      .square.maroon
-      %p (128, 0, 0)
-      
-    %dt mediumaquamarine      
-    %dd 
-      .square.mediumaquamarine
-      %p (102, 205, 170)
-      
-    %dt mediumblue            
-    %dd 
-      .square.mediumblue
-      %p (0, 0, 205)
-      
-    %dt mediumorchid          
-    %dd 
-      .square.mediumorchid
-      %p (186, 85, 211)
-      
-    %dt mediumpurple          
-    %dd 
-      .square.mediumpurple
-      %p (147, 112, 219)
-      
-    %dt mediumseagreen        
-    %dd 
-      .square.mediumseagreen
-      %p (60, 179, 113)
-      
-    %dt mediumslateblue       
-    %dd 
-      .square.mediumslateblue
-      %p (123, 104, 238)
-      
-    %dt mediumspringgreen     
-    %dd 
-      .square.mediumspringgreen
-      %p (0, 250, 154)
-      
-    %dt mediumturquoise       
-    %dd 
-      .square.mediumturquoise
-      %p (72, 209, 204)
-      
-    %dt mediumvioletred       
-    %dd 
-      .square.mediumvioletred
-      %p (199, 21, 133)
-      
-    %dt midnightblue          
-    %dd 
-      .square.midnightblue
-      %p (25, 25, 112)
-      
-    %dt mintcream             
-    %dd 
-      .square.mintcream
-      %p (245, 255, 250)
-      
-    %dt mistyrose             
-    %dd 
-      .square.mistyrose
-      %p (255, 228, 225)
-      
-    %dt moccasin              
-    %dd 
-      .square.moccasin
-      %p (255, 228, 181)
-      
-    %dt navajowhite           
-    %dd 
-      .square.navajowhite
-      %p (255, 222, 173)
-      
-    %dt navy                  
-    %dd 
-      .square.navy
-      %p (0, 0, 128)
-      
-    %dt oldlace               
-    %dd 
-      .square.oldlace
-      %p (253, 245, 230)
-      
-    %dt olive                 
-    %dd 
-      .square.olive
-      %p (128, 128, 0)
-      
-    %dt olivedrab             
-    %dd 
-      .square.olivedrab
-      %p (107, 142, 35)
-      
-    %dt orange                
-    %dd 
-      .square.orange
-      %p (255, 165, 0)
-      
-    %dt orangered             
-    %dd 
-      .square.orangered
-      %p (255, 69, 0)
-      
-    %dt orchid                
-    %dd 
-      .square.orchid
-      %p (218, 112, 214)
-      
-    %dt palegoldenrod         
-    %dd 
-      .square.palegoldenrod
-      %p (238, 232, 170)
-      
-    %dt palegreen             
-    %dd 
-      .square.palegreen
-      %p (152, 251, 152)
-      
-    %dt paleturquoise         
-    %dd 
-      .square.paleturquoise
-      %p (175, 238, 238)
-      
-  %dl.colors   
-    %dt palevioletred         
-    %dd 
-      .square.palevioletred
-      %p (219, 112, 147)
-      
-    %dt papayawhip            
-    %dd 
-      .square.papayawhip
-      %p (255, 239, 213)
-      
-    %dt peachpuff             
-    %dd 
-      .square.peachpuff
-      %p (255, 218, 185)
-      
-    %dt peru                  
-    %dd 
-      .square.peru
-      %p (205, 133, 63)
-      
-    %dt pink                  
-    %dd 
-      .square.pink
-      %p (255, 192, 203)
-      
-    %dt plum                  
-    %dd 
-      .square.plum
-      %p (221, 160, 221)
-      
-    %dt powderblue            
-    %dd 
-      .square.powderblue
-      %p (176, 224, 230)
-      
-    %dt purple                
-    %dd 
-      .square.purple
-      %p (128, 0, 128)
-      
-    %dt red                   
-    %dd 
-      .square.red
-      %p (255, 0, 0)
-      
-    %dt rosybrown             
-    %dd 
-      .square.rosybrown
-      %p (188, 143, 143)
-      
-    %dt royalblue             
-    %dd 
-      .square.royalblue
-      %p (65, 105, 225)
-      
-    %dt saddlebrown           
-    %dd 
-      .square.saddlebrown
-      %p (139, 69, 19)
-      
-    %dt salmon                
-    %dd 
-      .square.salmon
-      %p (250, 128, 114)
-      
-    %dt sandybrown            
-    %dd 
-      .square.sandybrown
-      %p (244, 164, 96)
-      
-    %dt seagreen              
-    %dd 
-      .square.seagreen
-      %p (46, 139, 87)
-      
-    %dt seashell              
-    %dd 
-      .square.seashell
-      %p (255, 245, 238)
-      
-    %dt sienna                
-    %dd 
-      .square.sienna
-      %p (160, 82, 45)
-      
-    %dt silver                
-    %dd 
-      .square.silver
-      %p (192, 192, 192)
-      
-    %dt skyblue               
-    %dd 
-      .square.skyblue
-      %p (135, 206, 235)
-      
-    %dt slateblue             
-    %dd 
-      .square.slateblue
-      %p (106, 90, 205)
-      
-    %dt slategray             
-    %dd 
-      .square.slategray
-      %p (112, 128, 144)
-      
-    %dt snow                  
-    %dd 
-      .square.snow
-      %p (255, 250, 250)
-      
-    %dt springgreen           
-    %dd 
-      .square.springgreen
-      %p (0, 255, 127)
-      
-    %dt steelblue             
-    %dd 
-      .square.steelblue
-      %p (70, 130, 180)
-      
-    %dt tan                   
-    %dd 
-      .square.tan
-      %p (210, 180, 140)
-      
-    %dt teal                  
-    %dd 
-      .square.teal
-      %p (0, 128, 128)
-      
-    %dt thistle               
-    %dd 
-      .square.thistle
-      %p (216, 191, 216)
-      
-    %dt tomato                
-    %dd 
-      .square.tomato
-      %p (255, 99, 71)
-      
-    %dt turquoise             
-    %dd 
-      .square.turquoise
-      %p (64, 224, 208)
-      
-    %dt violet                
-    %dd 
-      .square.violet
-      %p (238, 130, 238)
-      
-    %dt wheat                 
-    %dd 
-      .square.wheat
-      %p (245, 222, 179)
-      
-    %dt white                 
-    %dd 
-      .square.white
-      %p (255, 255, 255)
-      
-    %dt whitesmoke            
-    %dd 
-      .square.whitesmoke
-      %p (245, 245, 245)
-      
-    %dt yellow                
-    %dd 
-      .square.yellow
-      %p (255, 255, 0)
-      
-    %dt yellowgreen           
-    %dd 
-      .square.yellowgreen
-      %p (154, 205, 50)
-      
-    .clear 
-.clear
 
 %section.compatability.hardware
   %h2 Works with:

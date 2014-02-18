@@ -5,17 +5,21 @@ page_title: BlinkM
 page_subtitle: Driver
 page_title_show: true
 layout: documentation
+subnav_driver: true
+subnav_circuit_driver: true
 
 beaglebone_platform: true
 ---
 
 %section.intro
   =image_tag "/images/devices/blinkm.jpg", class: "display"
-  %p
-    Allows user to control BlinkM RGB LED via i2c interface.
-
-%section.how-to
-  %h2 How to establish a connection and setup the driver
+  .info_intro  
+    %p
+      Allows user to control BlinkM RGB LED via i2c interface.
+  .clear
+  
+%section.how-to#HowToConnect
+  %h2 How To Connect
   :markdown
     Install the library with: `go get -u github.com/hybridgroup/gobot-i2c`
   %h3 For Arduino
@@ -39,9 +43,8 @@ beaglebone_platform: true
           blinkm.Name = "blinkm"
         ...
         
-
-%section.how-to
-  %h2 How to use
+%section.how-to#HowToUse
+  %h2 How To Use
   %p Example using a BlinkM and Arduino
   :markdown
         :::go
@@ -79,9 +82,9 @@ beaglebone_platform: true
         }
   
 %section.public-methods
-  .commands_api
+  .commands_api#Commands
     = partial "/documentation/drivers/partials/i2c/commands_blinkm"
-  .commands_api
+  .commands_api#Events
     = partial "/documentation/drivers/partials/i2c/events_blinkm"   
 
 %section.circuit#Circuit
@@ -92,8 +95,8 @@ beaglebone_platform: true
     %img{:src => "/documentation/drivers/breadboards/i2c/blinkm_bb.png", :alt => ""}/ 
   .clear 
 
-%section.compatability.hardware
-  %h2 Works with:
+%section.compatability.hardware#Compatability
+  %h2 Compatibility
   .devices
     = partial "documentation/partials/devices_platforms"
     

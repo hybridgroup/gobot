@@ -1,21 +1,24 @@
 ---
-title: Cylon.js - ARDrone Driver
+title: Gobot - ARDrone Driver
 author: The Hybrid Group
 page_title: ARDrone
 page_subtitle: Driver
-page_title_show: true
 layout: documentation
+page_title_show: true
+subnav_driver: true
+
 
 ardrone_platform: true
 ---
-
 %section.intro
   =image_tag "/images/devices/ardrone-flight.jpg", class: "display"
-  %p
-    Allows user to send flight control commands to an ARDrone. Flight control commands are those used to tell the ARDrone to take off, land, and or any number of other autonomous flight manuvers.
-
-%section.how-to
-  %h2 How to establish a connection and setup the driver
+  .info_intro
+    %p
+      Allows user to send flight control commands to an ARDrone. Flight control commands are those used to tell the ARDrone to take off, land, and or any number of other autonomous flight manuvers.
+  .clear
+  
+%section.how-to#HowToConnect
+  %h2 How To Connect
   %p
     Communication with the ARDrone's flight control interface takes place using a WiFi connection. The ARDrone is a WiFi access point, so it normally can be the only device you connect to, without some additional effort to reconfigure the drone itself to put it into infrastructure mode.
   
@@ -43,109 +46,9 @@ ardrone_platform: true
             name: 'ardrone', driver: 'ardrone'
         ...
 
-%section.public-methods
-  %h2 Commands:
 
-  %dl.methods 
-    %dt takeoff(callback)
-    %dd 
-      :markdown
-        Sets the internal `fly` state to `true`, `callback` is invoked after the drone reports that it is hovering.
-    %dt land(callback)
-    %dd 
-      :markdown
-        Sets the internal `fly` state to `false`, `callback` is invoked after the drone reports it has landed.
-    %dt stop
-    %dd 
-      :markdown
-        Sets all drone movement commands to `0`, making it effectively hover in place.
-    %dt up(speed) 
-    %dd 
-      Makes the drone gain altitude. 
-      :markdown
-        `speed` can be a value from `0` to `1`.
-    %dt down(speed) 
-    %dd 
-      Makes the drone reduce altitude. 
-      :markdown
-        `speed` can be a value from `0` to `1`.
-    %dt left(speed) 
-    %dd  
-      Causes the drone to bank to the left, controls the roll, which is a horizontal movement using the camera as a reference point. 
-      :markdown
-        `speed` can be a value from `0` to `1`.
-    %dt right(speed) 
-    %dd 
-      Causes the drone to bank to the right, controls the roll, which is a horizontal movement using the camera as a reference point. 
-      :markdown
-        `speed`can be a value from `0` to `1`.
-    %dt front(speed) 
-    %dd 
-      Causes the drone to bank to the front, controls the pitch, which a horizontal movement using the camera as a reference point. 
-      :markdown
-        `speed` can be a value from `0` to `1`.
-    %dt back(speed) 
-    %dd 
-      Causes the drone to bank to the back, controls the pitch, which a horizontal movement using the camera as a reference point. 
-      :markdown
-        `speed` can be a value from `0` to `1`.
-    %dt clockwise
-    %dd 
-      Causes the drone to spin.
-      :markdown
-        `speed` can be a value from `0` to `1`.
-    %dt counterClockwise
-    %dd
-      Causes the drone to spin. 
-      :markdown
-        `speed` can be a value from `0` to `1`.
-    %dt calibrate(device_num)
-    %dd Asks the drone to calibrate a device.
-    %dt config(key, value, callback)
-    %dd 
-      Sends a config command to the drone.
-    %dt animate(animation, duration)
-    %dd 
-      :markdown
-        Performs a pre-programmed flight sequence for a given `duration` (in ms). 
-        `animation` can be one of the following:
-
-      :markdown
-            :::javascript
-            ['phiM30Deg', 'phi30Deg', 'thetaM30Deg', 'theta30Deg', 'theta20degYaw200deg',
-            'theta20degYawM200deg', 'turnaround', 'turnaroundGodown', 'yawShake',
-            'yawDance', 'phiDance', 'thetaDance', 'vzDance', 'wave', 'phiThetaMixed',
-            'doublePhiThetaMixed', 'flipAhead', 'flipBehind', 'flipLeft', 'flipRight']
-
-    %dt animateLeds(animation, hz, duration)
-    %dd 
-      :markdown
-        Performs a pre-programmed led sequence at given `hz` frequency and `duration` (in sec!). `animation` can be one of the following:
-
-      :markdown
-            :::javascript
-            ['blinkGreenRed', 'blinkGreen', 'blinkRed', 'blinkOrange', 'snakeGreenRed',
-            'fire', 'standard', 'red', 'green', 'redSnake', 'blank', 'rightMissile',
-            'leftMissile', 'doubleMissile', 'frontLeftGreenOthersRed',
-            'frontRightGreenOthersRed', 'rearRightGreenOthersRed',
-            'rearLeftGreenOthersRed', 'leftGreenRightRed', 'leftRedRightGreen',
-            'blinkStandard']  
-
-
-    %dt disableEmergency
-    %dd 
-      :markdown
-        Causes the emergency REF bit to be set to 1 until `navdata.droneState.emergencyLanding is 0`. This recovers a drone that has flipped over and is showing red lights to be flyable again and show green lights. It is also done implicitly when creating a new high level client.
-
-  %h2 Events
-
-  %dl.methods 
-    %dt start
-    %dd Sent when the device has been started and is ready to use.  
-                   
-
-%section.how-to
-  %h2 How to use
+%section.how-to#HowToUse
+  %h2 How To Use
   %p 
     This example controls an ARDrone to take off, and then land.
 
@@ -193,7 +96,13 @@ ardrone_platform: true
 
         .start()
 
-%section.compatability.hardware
-  %h2 Works with:
+%section.public-methods
+  .commands_api#Commands
+    = partial "/documentation/drivers/partials/ardrone/commands_flight"
+  .commands_api#Events
+    = partial "/documentation/drivers/partials/ardrone/events_flight"
+
+%section.compatability.hardware#Compatability
+  %h2 Compatibility
   .devices
     = partial "documentation/partials/devices_platforms"

@@ -5,6 +5,7 @@ page_title: BeagleBone
 page_subtitle: "<a href='https://github.com/hybridgroup/gobot-beaglebone' class='repository'>Repository</a> <a class+'issues' href='https://github.com/hybridgroup/gobot-beaglebone/issues'>Issues</a>"
 page_title_show: true
 layout: documentation
+subnav_platform: true
 
 button_driver: true
 led_driver: true
@@ -12,27 +13,25 @@ led_driver: true
 
 %section.intro
   = image_tag "/images/devices/beaglebone.jpg", class: "display"
+  .info_intro
+    %p The BeagleBone is an ARM based single board computer, with many different GPIO interfaces built in.
 
-  %p The BeagleBone is an ARM based single board computer, with many different GPIO interfaces built in.
+    %p
+      For more info about the BeagleBone platform click
+      = succeed "." do
+        = link_to "here", "http://beagleboard.org/Products/BeagleBone", target: :blank
+  .clear 
 
-  %p
-    For more info about the BeagleBone platform click
-    = succeed "." do
-      = link_to "here", "http://beagleboard.org/Products/BeagleBone", target: :blank
-  -#%p
-    -#We have created a bootable image of Arch Linux that contains the needed drivers to use the Beaglebone Black with Cylon.js. You can download it from
-    -#= succeed "." do
-      -#= link_to "here", "https://s3.amazonaws.com/Cylon.js-images/beaglebone/Cylon.js-arch-armv7-1380751200.tar.xz", target: :blank
-
-%section.how-to
-  %h2 How to install
+%section.how-to#HowToInstall
+  %h2 How To Install
   %p
     Installing Gobot for beaglebone is pretty easy.
   :markdown
         :::bash
         go get -u github.com/hybridgroup/gobot-beaglebone
 
-  %h2 How to use
+%section.how-to#HowToUse
+  %h2 How To Use
   %p
     This small program causes an LED to blink.
   :markdown
@@ -66,7 +65,7 @@ led_driver: true
           robot.Start()
         }
 
-%section.drivers
+%section.drivers#Drivers
   %h2 Drivers
   %p All Gobot digital GPIO and i2c drivers listed below should work with the BeagleBone:
 
