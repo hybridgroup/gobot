@@ -5,6 +5,7 @@ page_title: Leap Motion
 page_subtitle: Driver
 page_title_show: true
 layout: documentation
+subnav_driver: true
 
 leapmotion_platform: true
 ---
@@ -16,8 +17,8 @@ leapmotion_platform: true
       Allows user to interact with Gobot devices using a Leap Motion controller. The Leap Motion uses its built in cameras to track the user's hand motions, and translations those to events that Gobot can use to trigger actions or control hardware.
   .clear
   
-%section.how-to
-  %h2 How to establish a connection and setup the driver
+%section.how-to#HowToConnect
+  %h2 How To Connect
   :markdown
         :::go
         package main
@@ -37,8 +38,8 @@ leapmotion_platform: true
           leap.Name = "leap"
         ...
 
-%section.how-to
-  %h2 How to use
+%section.how-to#HowToUse
+  %h2 How To Use
   %h3 Example receiving message events from a Leap Motion.
   :markdown
         :::go
@@ -74,10 +75,13 @@ leapmotion_platform: true
         }
 
 %section.public-methods
-  .commands_api
+  .commands_api#Commands
+    %h1 Commands
+    %p No commands
+  .commands_api#Events
     = partial "/documentation/drivers/partials/leapmotion/events_leapmotion"   
 
-%section.compatability.hardware
-  %h2 Works with:
+%section.compatability.hardware#Compatability
+  %h2 Compatibility
   .devices
     = partial "documentation/partials/devices_platforms"

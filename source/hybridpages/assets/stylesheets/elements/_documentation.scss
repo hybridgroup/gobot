@@ -16,11 +16,10 @@
   .index {
     @include outer-container;
     padding-left: 30px;
-
     section {
       margin: 0 auto;
       @include span-columns(3 of 9.5);
-      background: $title-color;
+      background: $color-background-subnav-drivers;
       height: 100px;
       margin-bottom: 20px;
       border-radius: 5px;

@@ -5,6 +5,8 @@ page_title: Button
 page_subtitle: Driver
 page_title_show: true
 layout: documentation
+subnav_driver: true
+subnav_circuit_driver: true
 
 arduino_platform: true
 beaglebone_platform: true
@@ -16,8 +18,8 @@ digispark_platform: true
     %p Simple interface that makes it possible to register clicks through physical input.
   .clear
   
-%section.how_to
-  %h2 How to establish a connection and setup the driver 
+%section.how_to#HowToConnect
+  %h2 How To Connect
   :markdown
     Install the library with: `go get -u github.com/hybridgroup/gobot-gpio`
   %h3 For Spark:
@@ -52,8 +54,8 @@ digispark_platform: true
         ...
 
 
-%section.how-to
-  %h2 How to use
+%section.how-to#HowToUse
+  %h2 How To Use
   %p This example detects when a button has been pushed, it turns on and off a LED
  
   :markdown
@@ -105,7 +107,10 @@ digispark_platform: true
         }
 
 %section.public-methods
-  .commands_api
+  .commands_api#Commands
+    %h1 Commands
+    %p No commands
+  .commands_api#Events
     = partial "/documentation/drivers/partials/gpio/events_button"   
 
 %section.circuit#Circuit
@@ -116,8 +121,8 @@ digispark_platform: true
     %img{:src => "/documentation/drivers/breadboards/gpio/button_bb.png", :alt => ""}/ 
   .clear
   
-%section.compatability.hardware
-  %h2 Works with:
+%section.compatability.hardware#Compatability
+  %h2 Compatability
   =# TODO: Update platform list with all that work with this driver in Cylon.js.
   .devices
     = partial "documentation/partials/devices_platforms"

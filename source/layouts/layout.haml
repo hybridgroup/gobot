@@ -23,6 +23,13 @@
       - if current_page.data.page_title_show == true
         = partial "/hybridpages/partials/widgets/page_title" 
 
+      - if current_page.data.subnav_driver == true
+        = partial "/hybridpages/partials/widgets/subnav_drivers" 
+
+      - if current_page.data.subnav_platform == true
+        = partial "/hybridpages/partials/widgets/subnav_platforms"  
+
+
       .container
         = yield
 

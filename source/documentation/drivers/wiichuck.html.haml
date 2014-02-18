@@ -5,6 +5,7 @@ page_title: Wii Nunchuk
 page_subtitle: Driver
 page_title_show: true
 layout: documentation
+subnav_driver: true
 
 arduino_platform: true
 beaglebone_platform: true
@@ -15,8 +16,8 @@ beaglebone_platform: true
     %p Allows user to use a Nintendo Wii Nunchuck controller via i2c interface
   .clear
   
-%section.how-to
-  %h2 How to establish a connection and setup the driver
+%section.how-to#HowToConnect
+  %h2 How To Connect
   :markdown
     Install the library with: `go get -u github.com/hybridgroup/gobot-i2c`
   %h3 For Arduino:
@@ -41,8 +42,9 @@ beaglebone_platform: true
         ...
 
 
-%section.how_to
-  %h2 Example using a Nintendo Wii Nunchuck.
+%section.how-to#HowToUse
+  %h2 How To Use
+  %h3 Example using a Nintendo Wii Nunchuck.
   :markdown
         :::go
         package main
@@ -90,14 +92,13 @@ beaglebone_platform: true
         }
 
 %section.public-methods
-  .commands_api
+  .commands_api#Commands
+    %h1 Commands
+    %p No commands
+  .commands_api#Events
     = partial "/documentation/drivers/partials/i2c/events_wiichuck"   
 
-%section.circuit
-  %h2 Circuit
-  %p Coming soon
-
-%section.compatability.hardware
-  %h2 Works with:
+%section.compatability.hardware#Compatability
+  %h2 Compatability
   .devices
     = partial "documentation/partials/devices_platforms"

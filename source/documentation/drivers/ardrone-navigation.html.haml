@@ -5,6 +5,7 @@ page_title: ARDrone Navigation
 page_subtitle: Driver
 page_title_show: true
 layout: documentation
+subnav_driver: true
 
 ardrone_platform: true
 ---
@@ -16,8 +17,8 @@ ardrone_platform: true
       Allows user to receive in-flight navgation data from an ARDrone. Navigation data includes such information as the ARDrone's current pitch and yaw, along with many other data elements.
   .clear
   
-%section.how-to
-  %h2 How to establish a connection and setup the driver
+%section.how-to#HowToConnect
+  %h2 How To Connect
   %p
     Communication with the ARDrone's navigation data interface takes place using a WiFi connection. The ARDrone is a WiFi access point, so it normally can be the only device you connect to, without some additional effort to reconfigure the drone itself to put it into infrastructure mode.
 
@@ -50,39 +51,9 @@ ardrone_platform: true
             ]
         ...
 
-%section.public-methods
-  %h2 Events
-
-  %dl.methods 
-    %dt update
-    %dd 
-      This event will contain one of the following events.
-      %br/  
-      You can also subscribe to one of the specific events, if that is the information you are interested in.
-    %dt navdata
-    %dd Gets triggered every time interval amount of time passes, returns and lets you access a NavData object.
-    %dt landing
-    %dd Gets triggered when is landing.
-    %dt landed
-    %dd Gets triggered when has landing.
-    %dt takeoff
-    %dd Gets triggered when has takeoff.
-    %dt hovering
-    %dd Gets triggered when is hovering.
-    %dt flying
-    %dd Gets triggered when is flying.
-    %dt lowBattery
-    %dd Gets triggered when have low battery.
-    %dt batteryChange
-    %dd Gets triggered when the battery has changed.
-    %dt altitudeChange
-    %dd Gets triggered when the altitude has changed. 
-    %dt start
-    %dd Sent when the device has been started and is ready to use.
-
   
-%section.how-to
-  %h2 How to use events and call them on your drivers
+%section.how-to#HowToUse
+  %h2 How To Use
   %p Once the connection and the devices have been setup (as explained above) you can receive navigation events on them as follows:
 
   %h3 JavaScript
@@ -130,7 +101,15 @@ ardrone_platform: true
 
         .start()
 
-%section.compatability.hardware
-  %h2 Works with:
+
+%section.public-methods
+  .commands_api#Commands
+    = #partial "/documentation/drivers/partials/gpio/commands_analog_sensor"
+  .commands_api#Events
+    = #partial "/documentation/drivers/partials/gpio/events_analog_sensor" 
+
+
+%section.compatability.hardware#Compatability
+  %h2 Compatibility
   .devices
     = partial "documentation/partials/devices_platforms"

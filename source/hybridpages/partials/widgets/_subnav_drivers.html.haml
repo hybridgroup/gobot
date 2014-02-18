@@ -1,0 +1,13 @@
+%section.subnav_drivers#mainsubnav
+	.container
+		%nav 
+			%a{:href => "#HowToConnect"} How to Connect
+			%a{:href => "#HowToUse"} How To Use
+			%a{:href => "#Commands"} Commands
+			%a{:href => "#Events"} Events
+			- if current_page.data.subnav_circuit_driver == true
+				%a{:href => "#Circuit"} Circuit
+			- if current_page.data.sphero_colors_driver == true
+				%a{:href => "#SpheroColors"} Sphero Colors
+			%a{:href => "#Compatability"} Compatibility
+			%a{:href => "#top"} Top
