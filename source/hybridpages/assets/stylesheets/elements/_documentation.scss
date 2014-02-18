@@ -20,7 +20,7 @@
     section {
       margin: 0 auto;
       @include span-columns(3 of 9.5);
-      background: #620020;
+      background: $title-color;
       height: 100px;
       margin-bottom: 20px;
       border-radius: 5px;
@@ -35,7 +35,7 @@
       }
 
       &:hover {
-        background: darken(#620020, 5);
+        background: darken($title-color, 5);
       }
 
       .title {
@@ -44,7 +44,7 @@
       }
 
       .description {
-        color: #b39f89;
+        color: $hero-subtitle-color;
       }
     }
   }
@@ -76,6 +76,20 @@
     @media only screen and (max-width: $medium-screen) {
         width: 100%;
     }
+  }
+}
+
+.circuit {
+  .image_circuit {
+    width: 50%;
+    float: left;
+    img {
+      height: 300px;
+    }
+  }
+  .description_circuit {
+    width: 50%;
+    float: right;
   }
 }
 

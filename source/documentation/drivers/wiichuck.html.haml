@@ -11,9 +11,10 @@ beaglebone_platform: true
 ---
 %section.intro
   =image_tag "/images/devices/wii-chuck.jpg", class: "display"
-  %p
-    Allows user to use a Nintendo Wii Nunchuck controller via i2c interface
-
+  .info_intro
+    %p Allows user to use a Nintendo Wii Nunchuck controller via i2c interface
+  .clear
+  
 %section.how-to
   %h2 How to establish a connection and setup the driver
   :markdown
@@ -93,9 +94,8 @@ beaglebone_platform: true
     = partial "/documentation/drivers/partials/i2c/events_wiichuck"   
 
 %section.circuit
-  %h2 Circuit and Schematic
-  %p
-    Coming soon
+  %h2 Circuit
+  %p Coming soon
 
 %section.compatability.hardware
   %h2 Works with:

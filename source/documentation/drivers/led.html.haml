@@ -13,9 +13,10 @@ spark_platform: true
 ---
 %section.intro
   =image_tag "/images/devices/LED.jpg", class: "display"
-  %p
-    Allows user to interact with LEDs through digital output and PWM (Pulse Width Modulation)
-
+  .info_intro
+    %p  Allows user to interact with LEDs through digital output and PWM (Pulse Width Modulation)
+  .clear
+  
 %section.how-to
   %h2 How to establish a connection and setup the driver
   :markdown
@@ -83,10 +84,14 @@ spark_platform: true
     = partial "/documentation/drivers/partials/gpio/events_led"   
 
 
-%section.circuit
-  %h2 Circuit and Schematic
-  =link_to "http://arduino.cc/en/Tutorial/Blink", "http://arduino.cc/en/Tutorial/Blink"
-
+%section.circuit#Circuit
+  %h2 Circuit 
+  .description_circuit
+    %p 
+  .image_circuit
+    %img{:src => "/documentation/drivers/breadboards/gpio/led_bb.png", :alt => ""}/ 
+  .clear
+  
 %section.compatability.hardware
   %h2 Works with:
   =# TODO: Update platform list with all that work with this driver in Cylon.js.

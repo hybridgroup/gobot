@@ -11,9 +11,11 @@ ardrone_platform: true
 
 %section.intro
   =image_tag "/images/devices/ardrone-video.jpg", class: "display"
-  %p
-    Allows user to receive in-flight video data from an ARDrone. Video data from the ARDrone is returned from either the front-facing, or the bottom-facing cameras.
-
+  .info_intro
+    %p
+      Allows user to receive in-flight video data from an ARDrone. Video data from the ARDrone is returned from either the front-facing, or the bottom-facing cameras.
+  .clear
+  
   %h2 How to establish a connection and setup the driver
   %p
     Communication with the ARDrone's video interface takes place using a WiFi connection. The ARDrone is a WiFi access point, so it normally can be the only device you connect to, without some additional effort to reconfigure the drone itself to put it into infrastructure mode.

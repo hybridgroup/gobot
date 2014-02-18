@@ -13,14 +13,15 @@ servo_driver: true
 
 %section.intro
   = image_tag "/images/devices/spark.jpg", class: "display"
+  .info_intro
+    %p The Spark Core contains a Wi-Fi connected microcontroller. Once it connects to a Wi-Fi network, it automatically connects with a central server (the "Spark Cloud") and stays connected so it can be controlled from external systems, such as a Cylon.js program.
 
-  %p The Spark Core contains a Wi-Fi connected microcontroller. Once it connects to a Wi-Fi network, it automatically connects with a central server (the "Spark Cloud") and stays connected so it can be controlled from external systems, such as a Cylon.js program.
-
-  %p
-    For more info about the Spark platform go to
-    = succeed "." do
-      = link_to "https://www.spark.io/", "https://www.spark.io/", target: :blank
-
+    %p
+      For more info about the Spark platform go to
+      = succeed "." do
+        = link_to "https://www.spark.io/", "https://www.spark.io/", target: :blank
+  .clear
+  
 %section.how_to
   %h2 How to install
   %p Installing Gobot with Spark support is pretty easy.

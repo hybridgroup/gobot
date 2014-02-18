@@ -10,23 +10,19 @@ layout: documentation
 
 
 .index
-  %li
-    .link= link_to "Getting Started", "/documentation/getting-started"
-    .description The best way to get going with Gobot.
-  %li
-    .link= link_to "Platforms", "/documentation/platforms"
-    .description Gobot has a extensible system for connecting to multiple hardware platforms such as Beaglebone Black and Sphero. 
-  %li
-    .link= link_to "Drivers", "/documentation/drivers"
-    .description Gobot supports many different hardware devices, coming soon more...
-    -#Gobot supports many different hardware devices, from LEDs to ultrasonic rangefinders, to drone flight control.
-  -#%li
-    -#.link= link_to "Generated Documentation", "http://rubydoc.info/gems/Cylon.js/frames"
-    -#.description YARD Generated Documentation.
-  %li
-    .link= link_to "Examples", "/documentation/examples"
-    .description Examples of how to use Gobot with a number of hardware configurations.
-
-  -#%li 
-    -#.link= link_to "API Server", "/documentation/api" 
-    -#.description The Cylon.js API Server makes it easy to communicate with your robots using a REST and Websockets-based interface. You can access the Cylon.js master class and retrieve information about the robots being controlled, and even send them commands.
+  %section
+    %a{href: '/documentation/getting-started'}
+      .title Getting Started
+      .description The best way to get started with Gobot.
+  %section
+    %a{:href => "/documentation/platforms"} 
+      .title Platforms
+      .description Multiple hardware platforms.
+  %section 
+    %a{:href => "/documentation/drivers"} 
+      .title Drivers
+      .description Gobot supports many different hardware devices.
+  %section
+    %a{:href => "/documentation/examples"} 
+      .title Examples
+      .description Examples of how to use Gobot with a number of hardware configurations.

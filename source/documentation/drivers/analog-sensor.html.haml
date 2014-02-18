@@ -11,9 +11,11 @@ arduino_platform: true
 
 %section.intro
   = image_tag "/images/devices/analog-sensor.jpg", class: "display"
-  %p
-    Makes it possible to interact with analog inputs on your device and obtain values that represent the analog input send by the sensors.
-    The value received from an analog input read from the sensor goes from 0 to 1027.
+  .info_intro
+    %p
+      Makes it possible to interact with analog inputs on your device and obtain values that represent the analog input send by the sensors.
+      The value received from an analog input read from the sensor goes from 0 to 1027.
+  .clear
 
 %section.how_to
   %h2 How To Connect
@@ -36,17 +38,14 @@ arduino_platform: true
   .commands_api
     = partial "/documentation/drivers/partials/gpio/events_analog_sensor"   
 
-%section.circuit
-  %h2 Circuit
-  %p
-    Circuit for analog sensors is pretty much the same as the button circuit, you just need to substitute
-    the button for a photoresistor.
-    %br/ 
-    =link_to "http://arduino.cc/en/tutorial/button", "http://arduino.cc/en/tutorial/button", target:"_blank" 
-  %p
-    It should look like the circuit in this example.
-    %br/ 
-    =link_to "http://arduino.cc/en/Tutorial/SwitchCase", "http://arduino.cc/en/Tutorial/SwitchCase", target:"_blank" 
+%section.circuit#Circuit
+  %h2 Circuit 
+  .description_circuit
+    %p
+  .image_circuit
+    %img{:src => "/documentation/drivers/breadboards/gpio/analog_sensor_bb.png", :alt => ""}/ 
+  .clear 
+   
 
 %section.compatibility.hardware
   %h2 Compatibility

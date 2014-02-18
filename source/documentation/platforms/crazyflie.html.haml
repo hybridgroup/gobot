@@ -9,15 +9,16 @@ layout: documentation
 
 %section.intro
   = image_tag "/images/devices/crazyflie.jpg", class: "display"
+  .info_intro
+    %p
+      You can use Cylon.js with the Crazyflie micro-quadcopter.
 
-  %p
-    You can use Cylon.js with the Crazyflie micro-quadcopter.
-
-  %p
-    For more info about Crazyflie click
-    = succeed "." do
-      = link_to "here", "http://www.bitcraze.se/", target: :blank
-
+    %p
+      For more info about Crazyflie click
+      = succeed "." do
+        = link_to "here", "http://www.bitcraze.se/", target: :blank
+  .clear
+  
 %section.how_to
   %h2 How to install
   %p

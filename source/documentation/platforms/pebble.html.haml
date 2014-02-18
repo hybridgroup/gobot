@@ -9,15 +9,16 @@ layout: documentation
 
 %section.intro
   = image_tag "/images/devices/pebble.jpg", class: "display"
+  .info_intro
+    %p
+      The Pebble is a smart watch, that connects via bluetooth.
 
-  %p
-    The Pebble is a smart watch, that connects via bluetooth.
-
-  %p
-    For more info about the Pebble platform click
-    = succeed "." do
-      = link_to "here", "http://getpebble.com/", target: :blank
-
+    %p
+      For more info about the Pebble platform click
+      = succeed "." do
+        = link_to "here", "http://getpebble.com/", target: :blank
+  .clear
+  
 %section.how-to
   %h2 How to install
   %p

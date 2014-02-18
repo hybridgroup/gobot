@@ -11,10 +11,11 @@ arduino_platform: true
 
 %section.intro
   =image_tag "/images/devices/motor.jpg", class: "display"
-  %p
-    Provides motor manipulation tools for Cylon.js like on/off, speed modulation using PWM,
-    use of bidirectional motors using forward/backward pins.
-
+  .info_intro
+    %p
+      Provides motor manipulation tools for Cylon.js like on/off, speed modulation using PWM,use of bidirectional motors using forward/backward pins.
+  .clear
+  
 %section.how-to
   %h2 How To Connect
   :markdown
@@ -35,11 +36,13 @@ arduino_platform: true
   .commands_api
     = partial "/documentation/drivers/partials/gpio/events_analog_sensor" 
 
-
-%section.circuit
+%section.circuit#Circuit
   %h2 Circuit
-  %p
-    =link_to "http://learn.adafruit.com/adafruit-arduino-lesson-13-dc-motors/breadboard-layout", "http://learn.adafruit.com/adafruit-arduino-lesson-13-dc-motors/breadboard-layout", target:"_blank" 
+  .description_circuit
+    %p  
+  .image_circuit 
+    %img{:src => "/documentation/drivers/breadboards/gpio/motor_bb.png", :alt => ""}/ 
+  .clear 
 
 %section.compatibility.hardware
   %h2 Compatibility

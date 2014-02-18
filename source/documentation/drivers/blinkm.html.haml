@@ -11,9 +11,11 @@ beaglebone_platform: true
 
 %section.intro
   =image_tag "/images/devices/blinkm.jpg", class: "display"
-  %p
-    Allows user to control BlinkM RGB LED via i2c interface.
-
+  .info_intro  
+    %p
+      Allows user to control BlinkM RGB LED via i2c interface.
+  .clear
+  
 %section.how-to
   %h2 How to establish a connection and setup the driver
   :markdown
@@ -84,10 +86,13 @@ beaglebone_platform: true
   .commands_api
     = partial "/documentation/drivers/partials/i2c/events_blinkm"   
 
-%section.circuit
-  %h2 Circuit and Schematic
-  %p
-    Coming soon...
+%section.circuit#Circuit
+  %h2 Circuit 
+  .description_circuit
+    %p
+  .image_circuit 
+    %img{:src => "/documentation/drivers/breadboards/i2c/blinkm_bb.png", :alt => ""}/ 
+  .clear 
 
 %section.compatability.hardware
   %h2 Works with:
