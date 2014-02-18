@@ -90,11 +90,14 @@ digispark_platform: true
   .commands_api
     = partial "/documentation/drivers/partials/gpio/events_servo"   
 
-%section.circuit
-  %h2 Circuit and Schematic
-  %p
-    =link_to "http://arduino.cc/en/Tutorial/Sweep", "http://arduino.cc/en/Tutorial/Sweep", target:"_blank" 
-
+%section.circuit#Circuit
+  %h2 Circuit
+  .description_circuit
+    %p 
+  .image_circuit 
+    %img{:src => "/documentation/drivers/breadboards/gpio/servo_bb.png", :alt => ""}/ 
+  .clear 
+  
 %section.compatability.hardware
   %h2 Works with:
   .devices

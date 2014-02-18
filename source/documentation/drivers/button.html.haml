@@ -107,10 +107,14 @@ digispark_platform: true
   .commands_api
     = partial "/documentation/drivers/partials/gpio/events_button"   
 
-%section.circuit
-  %h2 Circuit and Schematic
-  =link_to "http://arduino.cc/en/tutorial/button", "http://arduino.cc/en/tutorial/button", target:"_blank" 
-
+%section.circuit#Circuit
+  %h2 Circuit
+  .description_circuit
+    %p 
+  .image_circuit
+    %img{:src => "/documentation/drivers/breadboards/gpio/button_bb.png", :alt => ""}/ 
+  .clear
+  
 %section.compatability.hardware
   %h2 Works with:
   =# TODO: Update platform list with all that work with this driver in Cylon.js.
