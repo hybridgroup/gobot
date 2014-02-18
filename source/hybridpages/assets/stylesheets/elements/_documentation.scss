@@ -3,6 +3,55 @@
 }
 
 .documentation {
+  .intro {
+    .info_intro {
+      float: left;
+      width: 60%;
+      margin: 0;
+      @media only screen and (max-width: $medium-screen) {
+        width: 100%;
+      }
+    }
+  }
+  .index {
+    @include outer-container;
+    padding-left: 30px;
+
+    section {
+      margin: 0 auto;
+      @include span-columns(3 of 9.5);
+      background: #620020;
+      height: 100px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+      @media only screen and (max-width: $medium-screen) {
+        @include span-columns(12);
+      }
+      a {
+        width: 100%;
+        height: 100%;
+        padding: 10px;
+        display: block;
+      }
+
+      &:hover {
+        background: darken(#620020, 5);
+      }
+
+      .title {
+        color: #EFECE5;
+        font-weight: bold;
+      }
+
+      .description {
+        color: #b39f89;
+      }
+    }
+  }
+}
+
+
+.documentation {
   @include span-columns(12);
   .index {
     padding: 0 0 0 8px;
@@ -20,13 +69,15 @@
     margin: 10px;
   }
   .display {
-    width: 300px;
+    width: 35%;
     float: right;
     border: 1px solid rgba($hero-color, 0.14);
     margin: 0 0 19px 20px;
+    @media only screen and (max-width: $medium-screen) {
+        width: 100%;
+    }
   }
 }
-
 
 .commands_api {
   h2 {
