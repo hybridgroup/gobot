@@ -83,47 +83,72 @@ getting_started_button: "<a href='/documentation/getting-started' class='cta'> G
     %li
       = link_to "Arduino", "http://www.arduino.cc/", target:"_blank" 
       &lt;==&gt;
-      = link_to "Library", "https://github.com/hybridgroup/gobot-firmata", target:"_blank" 
+      = link_to "Adaptor", "/documentation/platforms/arduino", target:"_blank" 
+      (
+      = link_to "repo", "https://github.com/hybridgroup/gobot-firmata", target:"_blank" 
+      )
     %li
       = link_to "Beaglebone Black", "http://beagleboard.org/Products/BeagleBone+Black/", target:"_blank" 
       &lt;==&gt;
-      = link_to "Library", "https://github.com/hybridgroup/gobot-beaglebone", target:"_blank" 
+      = link_to "Adaptor", "/documentation/platforms/beaglebone", target:"_blank" 
+      (
+      = link_to "repo", "https://github.com/hybridgroup/gobot-beaglebone", target:"_blank" 
+      )
     %li
       = link_to "Digispark", "http://digistump.com/category/1", target:"_blank"  
       &lt;==&gt;
-      = link_to "Library", "https://github.com/hybridgroup/gobot-digispark", target:"_blank" 
+      = link_to "Adaptor", "/documentation/platforms/digispark", target:"_blank"
+      (
+      = link_to "repo", "https://github.com/hybridgroup/gobot-digispark", target:"_blank" 
+      ) 
     %li
       = link_to "Leap Motion", "https://www.leapmotion.com/", target:"_blank"  
       &lt;==&gt;
-      = link_to "Library", "https://github.com/hybridgroup/gobot-leapmotion", target:"_blank"
+      = link_to "Adaptor/Driver", "/documentation/platforms/leapmotion", target:"_blank"
+      (
+      = link_to "repo", "https://github.com/hybridgroup/gobot-leapmotion", target:"_blank" 
+      )
     %li
       = link_to "Spark", "https://www.spark.io/", target:"_blank"  
       &lt;==&gt;
-      = link_to "Library", "https://github.com/hybridgroup/gobot-spark", target:"_blank" 
+      = link_to "Adaptor", "/documentation/platforms/spark", target:"_blank" 
+      (
+      = link_to "repo", "https://github.com/hybridgroup/gobot-spark", target:"_blank" 
+      )
     %li
       = link_to "Sphero", "http://www.gosphero.com/", target:"_blank"  
       &lt;==&gt;
-      = link_to "Library", "https://github.com/hybridgroup/gobot-sphero", target:"_blank" 
+      = link_to "Adaptor/Driver", "/documentation/platforms/sphero", target:"_blank" 
+      (
+      = link_to "repo", "https://github.com/hybridgroup/gobot-sphero", target:"_blank" 
+      )
 
 %p Support for many devices that use General Purpose Input/Output (GPIO) have a shared set of drivers provded using the cylon-gpio module:
 %ul
   %li
     = link_to "GPIO", "https://en.wikipedia.org/wiki/General_Purpose_Input/Output" , target:"_blank" 
-    &lt;==&gt;
-    = link_to "Drivers", "https://github.com/hybridgroup/gobot-gpio" , target:"_blank"
+    &lt;==&gt; Drivers
+    (
+    = link_to "repo", "https://github.com/hybridgroup/gobot-gpio" , target:"_blank"
+    )
+    
     %ul 
-      %li Button
-      %li LED
-      %li Servo 
+      %li= link_to "Button", "/documentation/drivers/button" , target:"_blank" 
+      %li= link_to "LED", "/documentation/drivers/led" , target:"_blank"  
+      %li= link_to "Servo", "/documentation/drivers/servo" , target:"_blank"  
 
 %p Support for devices that use Inter-Integrated Circuit (I2C) have a shared set of drivers provded using the gobot-i2c module:
 %ul
   %li
     = link_to "I2C", "https://en.wikipedia.org/wiki/I%C2%B2C" , target:"_blank" 
-    &lt;==&gt;
-    = link_to "Drivers", "https://github.com/hybridgroup/gobot-i2c" , target:"_blank"
+    &lt;==&gt; Drivers
+    (
+    = link_to "repo", "https://github.com/hybridgroup/gobot-i2c" , target:"_blank"
+    )
+    
     %ul 
-      %li Wii Nunchuck Controller
+      %li= link_to "BlinkM", "/documentation/drivers/blinkm" , target:"_blank" 
+      %li= link_to "Wii Nunchuck Controller", "/documentation/drivers/wiichuck" , target:"_blank" 
 
 
 %p More platforms and drivers are coming soon...
