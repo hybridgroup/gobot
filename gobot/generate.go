@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
-	"github.com/gonuts/commander"
-	"github.com/gonuts/flag"
 	"os"
 	"text/template"
 	"unicode"
+
+	"github.com/gonuts/commander"
+	"github.com/gonuts/flag"
 )
 
 func generate() *commander.Command {
@@ -29,10 +30,10 @@ type Generate struct {
 	Name string
 }
 
-func doGenerate(cmd *commander.Command, args []string) {
+func doGenerate(cmd *commander.Command, args []string) error {
 	if len(args) == 0 {
 		fmt.Println(cmd.Long)
-		return
+		return nil
 	}
 	pwd, _ := os.Getwd()
 	dir := fmt.Sprintf("%s/gobot-%s", pwd, args[0])
@@ -69,7 +70,7 @@ func doGenerate(cmd *commander.Command, args []string) {
 	}
 	driver, _ := template.New("").Parse(driver())
 	driver.Execute(f, name)
-	f.Close()
+	return f.Close()
 }
 
 func adaptor() string {
