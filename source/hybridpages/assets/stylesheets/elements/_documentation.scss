@@ -112,6 +112,17 @@
     margin: 0;
     font-size: 11pt;
   }
+  h3 {
+    background: white;
+    padding: 10px;
+    margin: 0;
+    font-size: 11pt;
+    color: $title-color;
+  }
+  pre {
+    background: white;
+    margin: 0;
+  }
   p, ul{
     background: white;
     font-size: 10.5pt;
