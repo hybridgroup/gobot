@@ -22,79 +22,68 @@ ardrone_platform: true
   %p
     Communication with the ARDrone's flight control interface takes place using a WiFi connection. The ARDrone is a WiFi access point, so it normally can be the only device you connect to, without some additional effort to reconfigure the drone itself to put it into infrastructure mode.
   
-  %h3 JavaScript
   :markdown
-        :::javascript
-        var Cylon = require('cylon');
+        :::bash
+        package main
 
-        Cylon.robot({
-          connection: {name: 'ardrone', adaptor: 'ardrone', port: '192.168.1.1'},
+        import (
+          "github.com/hybridgroup/gobot"
+          "github.com/hybridgroup/gobot-ardrone"
+        )
 
-          device: {name: 'ardrone', driver: 'ardrone'},
-        ...
+        func main() {
 
-  %h3 CoffeeScript
-  :markdown
-        :::javascript
-        Cylon = require 'cylon'
+          ardroneAdaptor := new(gobotArdrone.ArdroneAdaptor)
+          ardroneAdaptor.Name = "Drone"
 
-        Cylon.robot
-          connection:
-            name: 'ardrone', adaptor: 'ardrone', port: '192.168.1.1'
-
-          device:
-            name: 'ardrone', driver: 'ardrone'
-        ...
-
+          drone := gobotArdrone.NewArdrone(ardroneAdaptor)
+          drone.Name = "Drone"
+          ...
 
 %section.how-to#HowToUse
   %h2 How To Use
   %p 
     This example controls an ARDrone to take off, and then land.
-
-  %h3 JavaScript
   :markdown
-        :::javascript
-        var Cylon = require('cylon');
+        :::bash
+        package main
 
-        Cylon.robot({
-          connection: {name: 'ardrone', adaptor: 'ardrone', port: '192.168.1.1'},
-          device: {name: 'drone', driver: 'ardrone'},
-          work: function(my) {
-            my.drone.takeoff();
+        import (
+          "github.com/hybridgroup/gobot"
+          "github.com/hybridgroup/gobot-ardrone"
+        )
 
-            after((10).seconds(), function() {
-              my.drone.land();
-            }
+        func main() {
 
-            after((15).seconds(), function() {
-              my.drone.stop();
-            }
+          ardroneAdaptor := new(gobotArdrone.ArdroneAdaptor)
+          ardroneAdaptor.Name = "Drone"
+
+          drone := gobotArdrone.NewArdrone(ardroneAdaptor)
+          drone.Name = "Drone"
+
+          work := func() {
+            drone.TakeOff()
+            gobot.On(drone.Events["Flying"], func(data interface{}) {
+              gobot.After("1s", func() {
+                drone.Right(0.1)
+              })
+              gobot.After("2s", func() {
+                drone.Left(0.1)
+              })
+              gobot.After("3s", func() {
+                drone.Land()
+              })
+            })
           }
-        }).start();
 
-  %h3 CoffeeScript
-  :markdown
-        :::javascript
-        Cylon = require 'cylon'
+          robot := gobot.Robot{
+            Connections: []gobot.Connection{ardroneAdaptor},
+            Devices:     []gobot.Device{drone},
+            Work:        work,
+          }
 
-        Cylon.robot
-          connection:
-            name: 'ardrone', adaptor: 'ardrone', port: '192.168.1.1'
-
-          device:
-            name: 'drone', driver: 'ardrone'
-
-          work: (my) ->
-            my.drone.takeoff()
-
-            after 10.seconds(), ->
-              my.drone.land()
-
-            after 15.seconds(), ->
-              my.drone.stop()
-
-        .start()
+          robot.Start()
+        }
 
 %section.public-methods
   .commands_api#Commands

@@ -1,10 +1,14 @@
--if current_page.data.ardrone_drivers == true
+-if current_page.data.ardrone_flight_driver == true
   /// Ardrone Flight
   %a.device{href:"/documentation/drivers/ardrone", title: "ARDrone Flight Control"}
     %img{src: "/images/devices/ardrone-flight.jpg"}
+
+-if current_page.data.ardrone_nav_driver == true
   /// Ardrone Navigation
   %a.device{href:"/documentation/drivers/ardrone-navigation", title: "ARDrone Navigation Data"}
     %img{src: "/images/devices/ardrone-navigation.jpg"}
+
+-if current_page.data.ardrone_video_driver == true
   /// Ardrone Video
   %a.device{href:"/documentation/drivers/ardrone-video", title: "ARDrone Video Data"}
     %img{src: "/images/devices/ardrone-video.jpg"}
