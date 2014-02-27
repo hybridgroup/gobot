@@ -1,16 +1,20 @@
 ---
-title: Joysticks with Cylon.js
+title: Joysticks with Gobot
 author: The Hybrid Group
 page_title: Joysticks
-page_subtitle: "<a href='https://github.com/hybridgroup/Cylon.js-joystick' class='repository'>Repository</a> <a class+'issues' href='https://github.com/hybridgroup/Cylon.js-joystick/issues'>Issues</a>"
+page_subtitle: "<a href='https://github.com/hybridgroup/gobot-joystick' class='repository'>Repository</a> <a class+'issues' href='https://github.com/hybridgroup/gobot-joystick/issues'>Issues</a>"
 page_title_show: true
 layout: documentation
+subnav_platform: true
+
+ps3_driver: true
+xbox360_driver: true
 ---
 %section.intro
   = image_tag "/images/devices/joystick.jpg", class: "display"
   .info_intro
     %p
-      You can use Cylon.js with a PS3 game controller, an XBox360 game controller, or any other USB joystick or game controller that is compatible with Simple DirectMedia Layer (SDL).
+      You can use Gobot with a PS3 game controller, an XBox360 game controller, or any other USB joystick or game controller that is compatible with Simple DirectMedia Layer (SDL).
 
     %p
       For more info about Simple DirectMedia Layer (SDL) go to
@@ -18,49 +22,89 @@ layout: documentation
         = link_to "http://www.libsdl.org/", "http://www.libsdl.org/", target: :blank
   .clear
   
-%section.how-to
+%section.how-to#HowToInstall
   %h2 How to install
   %p
-    Installing Cylon.js with arduino support is pretty easy using ruby gems.
+    Installing Gobot support is pretty easy using ruby gems.
   :markdown
         :::bash
-        gem install Cylon.js-joystick
+        go get path/to/repo/gobot-joystick
 
+%section.how-to#HowToUse
   %h2 How to use
-  %p
-    This small program receives joystick and button press events from an XBox 360 game controller.
+  %p This small program receives joystick and button press events from an XBox 360 game controller.
+
   :markdown
-        :::ruby
-        require 'Cylon.js'
+        :::bash
+        package main
 
-        connection :joystick, :adaptor => :joystick
-        device :joystick, :driver => :xbox360, :connection => :joystick, :interval => 0.1
+        import (
+          "fmt"
+          "github.com/hybridgroup/gobot"
+          "github.com/hybridgroup/gobot-joystick"
+        )
 
-        work do
-          on controller, :joystick => proc { |*value|
-            puts "joystick \#{value[1][:s]} x:\#{value[1][:x]} y:\#{value[1][:y]}"
+        func main() {
+          joystickAdaptor := new(gobotJoystick.JoystickAdaptor)
+          joystickAdaptor.Name = "xbox360"
+          joystickAdaptor.Params = map[string]interface{}{
+            "config": "./configs/xbox360_power_a_mini_proex.json",
           }
-          on controller, :button_a => proc { |*value|
-            puts "ayyyy!"
+
+          joystick := gobotJoystick.NewJoystick(joystickAdaptor)
+          joystick.Name = "xbox360"
+
+          work := func() {
+            gobot.On(joystick.Events["a"], func(data interface{}) {
+              fmt.Println("a", data)
+            })
+            gobot.On(joystick.Events["b"], func(data interface{}) {
+              fmt.Println("b", data)
+            })
+            gobot.On(joystick.Events["up"], func(data interface{}) {
+              fmt.Println("up", data)
+            })
+            gobot.On(joystick.Events["down"], func(data interface{}) {
+              fmt.Println("down", data)
+            })
+            gobot.On(joystick.Events["left"], func(data interface{}) {
+              fmt.Println("left", data)
+            })
+            gobot.On(joystick.Events["right"], func(data interface{}) {
+              fmt.Println("right", data)
+            })
+            gobot.On(joystick.Events["left_x"], func(data interface{}) {
+              fmt.Println("left_x", data)
+            })
+            gobot.On(joystick.Events["left_y"], func(data interface{}) {
+              fmt.Println("left_y", data)
+            })
+            gobot.On(joystick.Events["right_x"], func(data interface{}) {
+              fmt.Println("right_x", data)
+            })
+            gobot.On(joystick.Events["right_y"], func(data interface{}) {
+              fmt.Println("right_y", data)
+            })
           }
-          on controller, :button_b => proc { |*value|
-            puts "bee!"
+
+          robot := gobot.Robot{
+            Connections: []gobot.Connection{joystickAdaptor},
+            Devices:     []gobot.Device{joystick},
+            Work:        work,
           }
-          on controller, :button_x => proc { |*value|
-            puts "exxx!"
-          }
-          on controller, :button_y => proc { |*value|
-            puts "why!"
-          }
+
+          robot.Start()
+        }
         end
-
+        
+%section.how-to#HowToConnect
   %h2 How to connect
   %p Plug your USB joystick or game controller into your USB port. If your device is supported by SDL, you are now ready.
 
-%section.drivers
+%section.drivers#Drivers
   %h2 Drivers
   %p
-    There are 3 driver for different joysticks, as listed below:
+    There are 2 driver for different joysticks, as listed below:
 
   .hardware
     .devices

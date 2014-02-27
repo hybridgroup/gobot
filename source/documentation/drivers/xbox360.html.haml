@@ -1,10 +1,11 @@
 ---
-title: Cylon.js - XBox360 Controller Driver
+page_title_show: true
+title: Gobot - XBox360 Controller Driver
 author: The Hybrid Group
 page_title: XBox360 Controller
 page_subtitle: Driver
-page_title_show: true
 layout: documentation
+subnav_driver: true
 
 joystick_platform: true
 ---
@@ -12,101 +13,103 @@ joystick_platform: true
 %section.intro
   =image_tag "/images/devices/xbox360.jpg", class: "display"
   .info_intro
-    %p Allows user to interact with Cylon.js devices using a XBox360 game controller.
+    %p Allows user to interact with Artoo devices using a XBox360 game controller.
   .clear
   
-%section.how-to
-  %h2 How to establish a connection and setup the driver
+%section.how_to#HowToConnect
+  %h2 How To Connect
   :markdown
-        :::ruby
-        require 'Cylon.js'
-        connection :joystick, :adaptor => :joystick
-        device :controller, :driver => :xbox360, :connection => :joystick, :interval => 0.1
+        :::bash
+        package main
 
-%section.public-methods
-  %h2 Public driver events
-  %h3 button_a
-  %p
-    Get's triggered every interval amount of time if the a button is pressed.
+        import (
+          "fmt"
+          "github.com/hybridgroup/gobot"
+          "github.com/hybridgroup/gobot-joystick"
+        )
 
-  %h3 button_b
-  %p
-    Get's triggered every interval amount of time if the b button is pressed.
+        func main() {
+          joystickAdaptor := new(gobotJoystick.JoystickAdaptor)
+          joystickAdaptor.Name = "xbox360"
+          joystickAdaptor.Params = map[string]interface{}{
+            "config": "./configs/xbox360_power_a_mini_proex.json",
+          }
 
-  %h3 button_x
-  %p
-    Get's triggered every interval amount of time if the x button is pressed.
+          joystick := gobotJoystick.NewJoystick(joystickAdaptor)
+          joystick.Name = "xbox360"
+        ...
 
-  %h3 button_y
-  %p
-    Get's triggered every interval amount of time if the y button is pressed.
-
-  %h3 button_lb
-  %p
-    Get's triggered every interval amount of time if the left bumper button is pressed.
-
-  %h3 button_rb
-  %p
-    Get's triggered every interval amount of time if the right bumper button is pressed.
-
-  %h3 button_start
-  %p
-    Get's triggered every interval amount of time if the start button is pressed.
-
-  %h3 button_back
-  %p
-    Get's triggered every interval amount of time if the back button is pressed.
-
-  %h3 joystick
-  %p
-    Get's triggered every interval amount of time if a joystick event occured, you can access values x, y, s(joystick number, 0 and 1 for left and right).
-
-  %h3 joystick_0
-  %p
-    Get's triggered every interval amount of time if a joystick_0 event occured, you can access values x, y.
-
-  %h3 joystick_1
-  %p
-    Get's triggered every interval amount of time if a joystick_1 event occured, you can access values x, y.
-
-  %h3 How to use events and call them on your drivers
-  %p Pretty simple, when the connection and the driver have been setup (as explained above) you can call events on them as follows:
-  :markdown
-        :::ruby
-        on controller, :button_a => proc { |*value| puts "ayyyy!" }
-
-%section.how-to
-  %h2 How to use
+%section.how-to#HowToUse
+  %h2 How To Use
   %h3 Example receiving button events from XBox360 controller joystick.
   :markdown
-        :::ruby
-        require 'Cylon.js'
+        :::bash
+        package main
 
-        connection :joystick, :adaptor => :joystick
-        device :controller, :driver => :xbox360, :connection => :joystick, :interval => 0.1
+        import (
+          "fmt"
+          "github.com/hybridgroup/gobot"
+          "github.com/hybridgroup/gobot-joystick"
+        )
 
-        work do
-          on controller, :joystick_0 => proc { |*value|
-            puts "joystick 0 - x:\#{value[1][:x]} y:\#{value[1][:y]}"
+        func main() {
+          joystickAdaptor := new(gobotJoystick.JoystickAdaptor)
+          joystickAdaptor.Name = "xbox360"
+          joystickAdaptor.Params = map[string]interface{}{
+            "config": "./configs/xbox360_power_a_mini_proex.json",
           }
-          on controller, :joystick_1 => proc { |*value|
-            puts "joystick 1 - x:\#{value[1][:x]} y:\#{value[1][:y]}"
-          }
-          on controller, :button_a => proc { |*value|
-            puts "ayyyy!"
-          }
-          on controller, :button_b => proc { |*value|
-            puts "bee!"
-          }
-          on controller, :button_x => proc { |*value|
-            puts "exxx!"
-          }
-          on controller, :button_y => proc { |*value|
-            puts "why!"
-          }
-        end
 
-%section.compatability.hardware
-  %h2 Works with:
+          joystick := gobotJoystick.NewJoystick(joystickAdaptor)
+          joystick.Name = "xbox360"
+
+          work := func() {
+            gobot.On(joystick.Events["a"], func(data interface{}) {
+              fmt.Println("a", data)
+            })
+            gobot.On(joystick.Events["b"], func(data interface{}) {
+              fmt.Println("b", data)
+            })
+            gobot.On(joystick.Events["up"], func(data interface{}) {
+              fmt.Println("up", data)
+            })
+            gobot.On(joystick.Events["down"], func(data interface{}) {
+              fmt.Println("down", data)
+            })
+            gobot.On(joystick.Events["left"], func(data interface{}) {
+              fmt.Println("left", data)
+            })
+            gobot.On(joystick.Events["right"], func(data interface{}) {
+              fmt.Println("right", data)
+            })
+            gobot.On(joystick.Events["left_x"], func(data interface{}) {
+              fmt.Println("left_x", data)
+            })
+            gobot.On(joystick.Events["left_y"], func(data interface{}) {
+              fmt.Println("left_y", data)
+            })
+            gobot.On(joystick.Events["right_x"], func(data interface{}) {
+              fmt.Println("right_x", data)
+            })
+            gobot.On(joystick.Events["right_y"], func(data interface{}) {
+              fmt.Println("right_y", data)
+            })
+          }
+
+          robot := gobot.Robot{
+            Connections: []gobot.Connection{joystickAdaptor},
+            Devices:     []gobot.Device{joystick},
+            Work:        work,
+          }
+
+          robot.Start()
+        }
+
+%section.public-methods
+  .commands_api#Events
+    = #partial "/documentation/drivers/partials/joystick/events_xbox360"
+
+%section.compatability.hardware#Compatability
+  %h2 Compatibility
   .devices
+    =# TODO: Update platform list at the top of the page.
     = partial "documentation/partials/devices_platforms"
