@@ -1,19 +1,19 @@
 ---
-title: Ardrone with Cylon.js
+title: Ardrone with Gobot
 author: The Hybrid Group
 page_title: Ardrone
-page_subtitle: "<a href='https://github.com/hybridgroup/cylon-ardrone' target='blanck' class='repository'>Repository</a> <a class+'issues' href='https://github.com/hybridgroup/cylon-ardrone/issues' target='blanck'>Issues</a>"
-
-page_title_show: true
+page_subtitle: "<a href='https://github.com/hybridgroup/gobot-ardrone' target='blanck' class='repository'>Repository</a> <a class+'issues' href='https://github.com/hybridgroup/gobot-ardrone/issues' target='blanck'>Issues</a>"
 layout: documentation
+page_title_show: true
 subnav_platform: true
+
+ardrone_flight_driver: true
 ---
 
 %section.intro
   = image_tag "/images/devices/ardrone.jpg", class: "display"
   .info_intro
-    %p
-     The ARDrone from Parrot is an inexpensive quadcopter that is controlled using WiFi. It includes a built-in front-facing HD video camera, as well as a second lower resolution bottom facing video camera.
+    %p The ARDrone from Parrot is an inexpensive quadcopter that is controlled using WiFi. It includes a built-in front-facing HD video camera, as well as a second lower resolution bottom facing video camera.
 
     %p
       For more info about the ARDrone platform click
@@ -21,82 +21,75 @@ subnav_platform: true
         = link_to "here", "http://ardrone2.parrot.com/", target: :blank
   .clear
   
-
-%section.how-to
-  %h2 How to install
-  %p
-    Installing cylon.js with ardrone support is pretty easy.
+%section.how-to#HowToInstall
+  %h2 How To Install
+  %p Installing Gobot with ardrone support is pretty easy.
   :markdown
-        :::ruby
-        npm install cylon-ardrone
+        :::bash
+        go get github.com/hybridgroup/gobot-ardrone
 
-  %h2 How to use
-  %p
-    This small program lets the ARDrone take-off, hover, and land.
-  
-  %h3 Javascript
-  
-  :markdown
-        :::javascript
-        var Cylon = require('cylon');
-
-        Cylon.robot({
-          connection: { name: 'ardrone', adaptor: 'ardrone', port: '192.168.1.1' },
-          device: {name: 'drone', driver: 'ardrone'},
-
-          work: function(my) {
-            my.drone.takeoff();
-            after((10).seconds(), function() { 
-              my.drone.land();
-            });
-            after((15).seconds(), function() { 
-              my.drone.stop();
-            });    
-          }
-        }).start();
-  
-  %h3 CoffeeScript
+%section.how-to#HowToUse
+  %h2 How To Use
+  %p This small program lets the ARDrone take-off, hover, and land.
 
   :markdown
         :::javascript
-        Cylon = require('cylon')
+        package main
 
-        Cylon.robot
-          connection:
-            name: 'ardrone', adaptor: 'ardrone', port: '192.168.1.1'
+        import (
+            "github.com/hybridgroup/gobot"
+            "github.com/hybridgroup/gobot-ardrone"
+        )
 
-          device:
-            name: 'ardrone', driver: 'ardrone'
+        func main() {
 
-          work: (my) ->
-            my.drone.takeoff()
-            after 10.seconds(), ->
-              my.drone.land()
-            after 15.seconds(), ->
-              my.drone.stop()
+            ardroneAdaptor := new(gobotArdrone.ArdroneAdaptor)
+            ardroneAdaptor.Name = "Drone"
 
-        .start()
+            drone := gobotArdrone.NewArdrone(ardroneAdaptor)
+            drone.Name = "Drone"
 
-  %h2 How to connect
-  %p
-    The ARDrone is a WiFi device, so there is no additional work to establish a
-    connection to a single drone. However, in order to connect to multiple drones,
-    you need to perform some configuration steps on each drone via SSH.
+            work := func() {
+                drone.TakeOff()
+                gobot.On(drone.Events["Flying"], func(data interface{}) {
+                    gobot.After("1s", func() {
+                        drone.Right(0.1)
+                    })
+                    gobot.After("2s", func() {
+                        drone.Left(0.1)
+                    })
+                    gobot.After("3s", func() {
+                        drone.Land()
+                    })
+                })
+            }
+
+            robot := gobot.Robot{
+                Connections: []gobot.Connection{ardroneAdaptor},
+                Devices:     []gobot.Device{drone},
+                Work:        work,
+            }
+
+            robot.Start()
+        }
+
+%section.how-to#HowToConnect
+  %h2 How To Connect
+  %p The ARDrone is a WiFi device, so there is no additional work to establish a connection to a single drone. However, in order to connect to multiple drones, you need to perform some configuration steps on each drone via SSH.
 
   %h2 Automatic Reset From Emergency Mode
 
-  %p
-    When you first connect to the ARDrone by calling the `start` method, if it is in "emergency" mode, the ARDrone will not take off. Cylon can automatically reset it back "normal" mode, to be able to fly IF you pass in the navigation like this example:
+  %p When you first connect to the ARDrone by calling the `start` method, if it is in "emergency" mode, the ARDrone will not take off. Gobot can automatically reset it back "normal" mode, to be able to fly IF you pass in the navigation like this example:
 
   :markdown
-        :::ruby
-
+        :::bash
         Coming soon.
-%section.drivers
+
+%section.drivers#Drivers
   %h2 Drivers
-  %p
-    Available drivers for the ARDrone platform are listed below. There are three drivers for the ARDrone: the ARDrone for flight control and the ARDroneNav for navigation data.
+  %p Available drivers for the ARDrone platform are listed below. There are three drivers for the ARDrone: the ARDrone for flight control and the ARDroneNav for navigation data.
 
   .hardware
     .devices
+      // TODO: Update drivers list at the top of the page.
       = partial "documentation/partials/devices_ardrone_drivers"
