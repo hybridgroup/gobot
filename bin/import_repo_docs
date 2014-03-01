@@ -27,6 +27,7 @@ else
     https://github.com/hybridgroup/gobot-leapmotion.git
     https://github.com/hybridgroup/gobot-spark.git
     https://github.com/hybridgroup/gobot-sphero.git
+    https://github.com/hybridgroup/gobot-joystick.git
   )
 end
 
