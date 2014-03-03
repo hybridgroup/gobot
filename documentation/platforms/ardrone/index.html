@@ -7,22 +7,47 @@
 <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
 <meta name="description">
 <meta content="The Hybrid Group" name="author">
-<title>Ardrone with Cylon.js</title>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><!-- %link{href: "http://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,500,700", rel: "stylesheet", type: "text/css"}/ --><link href="//fonts.googleapis.com/css?family=Inconsolata:400,700%7CMontserrat:700" rel="stylesheet">
+<title>Ardrone with Gobot</title>
 <link href="/stylesheets/style.css" rel="stylesheet">
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><script src="/javascripts/script.js"></script><script src="/hybridpages/assets/javascript/subnav.js"></script><link href="//fonts.googleapis.com/css?family=Inconsolata:400,700%7CMontserrat:700" rel="stylesheet">
 <link href="/favicon.ico" rel="shortcut icon" type="image/gif">
-</head>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+
+  _gaq.push(['_setAccount', "UA-46433484-3"]);
+
+
+
+
+
+
+
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script></head>
 <body>
+    
     <div class="app">
       <div class="w">
         <header class="app-header" role="banner"><div class="display">
             <h1 class="app-logo">
               <a href="/">Gobot</a>
             </h1>
+            <span class="subtitle">
+              <div class="main"></div>
+            </span>
           </div>
           <span class="menu">
             <a href="/documentation" class="item">Docs</a>
-            <a href="/hardware" class="item">Hardware</a>
+            <a href="/documentation/platforms" class="item">Platforms</a>
             
             
             <a class="item" target="blanck" href="https://github.com/hybridgroup/gobot/">Github</a>
@@ -33,90 +58,88 @@
         <div class="w">
           <h1 class="title">Ardrone</h1>
           <h2 class="subtitle">
-<a href="https://github.com/hybridgroup/cylon-ardrone" target="blanck" class="repository">Repository</a> <a class href="https://github.com/hybridgroup/cylon-ardrone/issues" target="blanck">Issues</a>
+<a href="https://github.com/hybridgroup/gobot-ardrone" target="blanck" class="repository">Repository</a> <a class href="https://github.com/hybridgroup/gobot-ardrone/issues" target="blanck">Issues</a>
 </h2>
         </div>
       </div>
-      <div class="container">
+      <section class="subnav_drivers" id="mainsubnav"><div class="container">
+          <nav><a href="#HowToInstall">How To Install</a>
+            <a href="#HowToUse">How To Use</a>
+            <a href="#HowToConnect">How To Connect</a>
+            <a href="#Drivers">Drivers</a>
+            <a href="#top">Top</a>
+          </nav>
+</div>
+      </section><div class="container">
         <div class="main" role="main">
           <section class="content full"><div class="documentation">
-              <section class="intro"><img class="display" src="/images/ardrone.jpg"><p>
-                  The ARDrone from Parrot is an inexpensive quadcopter that is controlled using WiFi. It includes a built-in front-facing HD video camera, as well as a second lower resolution bottom facing video camera.
-                </p>
-                <p>
-                  For more info about the ARDrone platform click
-                  <a target="blank" href="http://ardrone2.parrot.com/">here</a>.
-                </p>
-              </section><section class="how-to"><h2>How to install</h2>
-                <p>
-                  Installing cylon.js with ardrone support is pretty easy.
-                </p>
-                <pre class="CodeRay">npm install cylon-ardrone
+              <section class="intro"><img class="display" src="/images/devices/ardrone.jpg"><div class="info_intro">
+                  <p>The ARDrone from Parrot is an inexpensive quadcopter that is controlled using WiFi. It includes a built-in front-facing HD video camera, as well as a second lower resolution bottom facing video camera.</p>
+                  <p>
+                    For more info about the ARDrone platform click
+                    <a target="blank" href="http://ardrone2.parrot.com/">here</a>.
+                  </p>
+                </div>
+                <div class="clear"></div>
+              </section><section class="how-to" id="HowToInstall"><h2>How To Install</h2>
+                <p>Installing Gobot with ardrone support is pretty easy.</p>
+                <pre class="CodeRay">go get github.com/hybridgroup/gobot-ardrone
 </pre>
-                <h2>How to use</h2>
-                <p>
-                  This small program lets the ARDrone take-off, hover, and land.
-                </p>
-                <h3>Javascript</h3>
-                <pre class="CodeRay"><span class="keyword">var</span> Cylon = require(<span class="string"><span class="delimiter">'</span><span class="content">cylon</span><span class="delimiter">'</span></span>);
+              </section><section class="how-to" id="HowToUse"><h2>How To Use</h2>
+                <p>This small program lets the ARDrone take-off, hover, and land.</p>
+                <pre class="CodeRay"><span class="reserved">package</span> main
 
-Cylon.robot({
-  <span class="key">connection</span>: { <span class="key">name</span>: <span class="string"><span class="delimiter">'</span><span class="content">ardrone</span><span class="delimiter">'</span></span>, <span class="key">adaptor</span>: <span class="string"><span class="delimiter">'</span><span class="content">ardrone</span><span class="delimiter">'</span></span>, <span class="key">port</span>: <span class="string"><span class="delimiter">'</span><span class="content">192.168.1.1</span><span class="delimiter">'</span></span> },
-  <span class="key">device</span>: {<span class="key">name</span>: <span class="string"><span class="delimiter">'</span><span class="content">drone</span><span class="delimiter">'</span></span>, <span class="key">driver</span>: <span class="string"><span class="delimiter">'</span><span class="content">ardrone</span><span class="delimiter">'</span></span>},
+<span class="reserved">import</span> (
+    <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+    <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-ardrone</span><span class="delimiter">"</span></span>
+)
 
-  <span class="function">work</span>: <span class="keyword">function</span>(my) {
-    my.drone.takeoff();
-    after((<span class="integer">10</span>).seconds(), <span class="keyword">function</span>() { 
-      my.drone.land();
-    });
-    after((<span class="integer">15</span>).seconds(), <span class="keyword">function</span>() { 
-      my.drone.stop();
-    });    
-  }
-}).start();
+func main() {
+
+    <span class="key">ardroneAdaptor</span> := <span class="keyword">new</span>(gobotArdrone.ArdroneAdaptor)
+    ardroneAdaptor.Name = <span class="string"><span class="delimiter">"</span><span class="content">Drone</span><span class="delimiter">"</span></span>
+
+    drone := gobotArdrone.NewArdrone(ardroneAdaptor)
+    drone.Name = <span class="string"><span class="delimiter">"</span><span class="content">Drone</span><span class="delimiter">"</span></span>
+
+    work := func() {
+        drone.TakeOff()
+        gobot.On(drone.Events[<span class="string"><span class="delimiter">"</span><span class="content">Flying</span><span class="delimiter">"</span></span>], func(data <span class="reserved">interface</span>{}) {
+            gobot.After(<span class="string"><span class="delimiter">"</span><span class="content">1s</span><span class="delimiter">"</span></span>, func() {
+                drone.Right(<span class="float">0.1</span>)
+            })
+            gobot.After(<span class="string"><span class="delimiter">"</span><span class="content">2s</span><span class="delimiter">"</span></span>, func() {
+                drone.Left(<span class="float">0.1</span>)
+            })
+            gobot.After(<span class="string"><span class="delimiter">"</span><span class="content">3s</span><span class="delimiter">"</span></span>, func() {
+                drone.Land()
+            })
+        })
+    }
+
+    robot := gobot.Robot{
+        <span class="key">Connections</span>: []gobot.Connection{ardroneAdaptor},
+        <span class="key">Devices</span>:     []gobot.Device{drone},
+        <span class="key">Work</span>:        work,
+    }
+
+    robot.Start()
+}
 </pre>
-                <h3>CoffeeScript</h3>
-                <pre class="CodeRay">Cylon = require(<span class="string"><span class="delimiter">'</span><span class="content">cylon</span><span class="delimiter">'</span></span>)
-
-Cylon.robot
-  connection:
-    name: <span class="string"><span class="delimiter">'</span><span class="content">ardrone</span><span class="delimiter">'</span></span>, <span class="key">adaptor</span>: <span class="string"><span class="delimiter">'</span><span class="content">ardrone</span><span class="delimiter">'</span></span>, <span class="key">port</span>: <span class="string"><span class="delimiter">'</span><span class="content">192.168.1.1</span><span class="delimiter">'</span></span>
-
-  device:
-    name: <span class="string"><span class="delimiter">'</span><span class="content">ardrone</span><span class="delimiter">'</span></span>, <span class="key">driver</span>: <span class="string"><span class="delimiter">'</span><span class="content">ardrone</span><span class="delimiter">'</span></span>
-
-  work: (my) -&gt;
-    my.drone.takeoff()
-    after <span class="integer">10</span>.seconds(), -&gt;
-      my.drone.land()
-    after <span class="integer">15</span>.seconds(), -&gt;
-      my.drone.stop()
-
-.start()
-</pre>
-                <h2>How to connect</h2>
-                <p>
-                  The ARDrone is a WiFi device, so there is no additional work to establish a
-                  connection to a single drone. However, in order to connect to multiple drones,
-                  you need to perform some configuration steps on each drone via SSH.
-                </p>
+              </section><section class="how-to" id="HowToConnect"><h2>How To Connect</h2>
+                <p>The ARDrone is a WiFi device, so there is no additional work to establish a connection to a single drone. However, in order to connect to multiple drones, you need to perform some configuration steps on each drone via SSH.</p>
                 <h2>Automatic Reset From Emergency Mode</h2>
-                <p>
-                  When you first connect to the ARDrone by calling the `start` method, if it is in "emergency" mode, the ARDrone will not take off. Cylon can automatically reset it back "normal" mode, to be able to fly IF you pass in the navigation like this example:
-                </p>
-                <pre class="CodeRay"><span class="constant">Coming</span> soon.
+                <p>When you first connect to the ARDrone by calling the `start` method, if it is in "emergency" mode, the ARDrone will not take off. Gobot can automatically reset it back "normal" mode, to be able to fly IF you pass in the navigation like this example:</p>
+                <pre class="CodeRay">Coming soon.
 </pre>
-              </section><section class="drivers"><h2>Drivers</h2>
-                <p>
-                  Available drivers for the ARDrone platform are listed below. There are three drivers for the ARDrone: the ARDrone for flight control and the ARDroneNav for navigation data.
-                </p>
+              </section><section class="drivers" id="Drivers"><h2>Drivers</h2>
+                <p>Available drivers for the ARDrone platform are listed below. There are three drivers for the ARDrone: the ARDrone for flight control and the ARDroneNav for navigation data.</p>
                 <div class="hardware">
                   <div class="devices">
+                    <!-- / TODO: Update drivers list at the top of the page. -->
+                    <!-- // Ardrone Flight -->
                     <a class="device" href="/documentation/drivers/ardrone" title="ARDrone Flight Control">
-                      <img src="/images/ardrone-flight.jpg"></a>
-                    <a class="device" href="/documentation/drivers/ardrone-navigation" title="ARDrone Navigation Data">
-                      <img src="/images/ardrone-navigation.jpg"></a>
-                    
+                      <img src="/images/devices/ardrone-flight.jpg"></a>
                   </div>
                 </div>
               </section>
@@ -131,14 +154,6 @@ Cylon.robot
           <a href="http://hybridgroup.com">The Hybrid Group.</a>
         </div>
       </div>
-    </footer><script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-      
-      ga('create', 'UA-46433484-3', 'gobot.io');
-      ga('send', 'pageview');
-    </script>
+    </footer>
 </body>
 </html>

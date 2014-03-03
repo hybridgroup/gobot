@@ -8,21 +8,46 @@
 <meta content="A gobot code example" name="description">
 <meta content="The Hybrid Group" name="author">
 <title>gobot Example - blink</title>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><!-- %link{href: "http://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,500,700", rel: "stylesheet", type: "text/css"}/ --><link href="//fonts.googleapis.com/css?family=Inconsolata:400,700%7CMontserrat:700" rel="stylesheet">
 <link href="/stylesheets/style.css" rel="stylesheet">
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><script src="/javascripts/script.js"></script><script src="/hybridpages/assets/javascript/subnav.js"></script><link href="//fonts.googleapis.com/css?family=Inconsolata:400,700%7CMontserrat:700" rel="stylesheet">
 <link href="/favicon.ico" rel="shortcut icon" type="image/gif">
-</head>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+
+  _gaq.push(['_setAccount', "UA-46433484-3"]);
+
+
+
+
+
+
+
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script></head>
 <body>
+    
     <div class="app">
       <div class="w">
         <header class="app-header" role="banner"><div class="display">
             <h1 class="app-logo">
               <a href="/">Gobot</a>
             </h1>
+            <span class="subtitle">
+              <div class="main"></div>
+            </span>
           </div>
           <span class="menu">
             <a href="/documentation" class="item">Docs</a>
-            <a href="/hardware" class="item">Hardware</a>
+            <a href="/documentation/platforms" class="item">Platforms</a>
             
             
             <a class="item" target="blanck" href="https://github.com/hybridgroup/gobot/">Github</a>
@@ -32,57 +57,48 @@
       <div class="page-title">
         <div class="w">
           <h1 class="title">Example: blink</h1>
+          <h2 class="subtitle">You can find this example <a href="https://github.com/hybridgroup/gobot/blob/master/examples/blink.go" target="blank" class="repository">here.</a>
+</h2>
         </div>
       </div>
       <div class="container">
         <div class="main" role="main">
-          <section class="content full"><div class="example">
-              <pre class="CodeRay">package main
+          <section class="content full"><div class="documentation">
+              <div class="example">
+                <pre class="CodeRay">package main
 
 import (
-    "fmt"
-    "github.com/hybridgroup/gobot"
-    "github.com/hybridgroup/gobot-firmata"
-    "github.com/hybridgroup/gobot-gpio"
+        "github.com/hybridgroup/gobot"
+        "github.com/hybridgroup/gobot-firmata"
+        "github.com/hybridgroup/gobot-gpio"
 )
 
 func main() {
 
-    firmata := new(gobotFirmata.FirmataAdaptor)
-    firmata.Name = "firmata"
-    firmata.Port = "/dev/ttyACM0"
+        firmata := new(gobotFirmata.FirmataAdaptor)
+        firmata.Name = "firmata"
+        firmata.Port = "/dev/ttyACM0"
 
-    led := gobotGPIO.NewLed(firmata)
-    led.Name = "led"
-    led.Pin = "13"
+        led := gobotGPIO.NewLed(firmata)
+        led.Name = "led"
+        led.Pin = "13"
 
-    connections := []interface{}{
-        firmata,
-    }
-    devices := []interface{}{
-        led,
-    }
+        work := func() {
+                gobot.Every("1s", func() {
+                        led.Toggle()
+                })
+        }
 
-    work := func() {
-        gobot.Every("1s", func() {
-            led.Toggle()
-            if led.IsOn() {
-                fmt.Println("On")
-            } else {
-                fmt.Println("Off")
-            }
-        })
-    }
+        robot := gobot.Robot{
+                Connections: []gobot.Connection{firmata},
+                Devices:     []gobot.Device{led},
+                Work:        work,
+        }
 
-    robot := gobot.Robot{
-        Connections: connections,
-        Devices:     devices,
-        Work:        work,
-    }
-
-    robot.Start()
+        robot.Start()
 }
 </pre>
+              </div>
             </div>
           </section>
 </div>
@@ -94,14 +110,6 @@ func main() {
           <a href="http://hybridgroup.com">The Hybrid Group.</a>
         </div>
       </div>
-    </footer><script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-      
-      ga('create', 'UA-46433484-3', 'gobot.io');
-      ga('send', 'pageview');
-    </script>
+    </footer>
 </body>
 </html>

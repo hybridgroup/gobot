@@ -1,498 +1,498 @@
 /* normalize.css v2.0.1 | MIT License | git.io/normalize */
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 article, aside, details, figcaption, figure, footer, header, hgroup, nav, section, summary {
   display: block; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 audio, canvas, video {
   display: inline-block; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 audio:not([controls]) {
   display: none;
   height: 0; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 [hidden] {
   display: none; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 html {
   font-family: sans-serif;
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 body {
   margin: 0; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 a:focus {
   outline: thin dotted; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 a:active, a:hover {
   outline: 0; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 h1 {
   font-size: 2em; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 abbr[title] {
   border-bottom: 1px dotted; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 b, strong {
   font-weight: bold; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 dfn {
   font-style: italic; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 mark {
   background: #ff0;
   color: #000; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 code, kbd, pre, samp {
   font-family: monospace,serif;
   font-size: 1em; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 pre {
   white-space: pre;
   white-space: pre-wrap;
   word-wrap: break-word; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 q {
   quotes: "\201C" "\201D" "\2018" "\2019"; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 small {
   font-size: 80%; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 sub, sup {
   font-size: 75%;
   line-height: 0;
   position: relative;
   vertical-align: baseline; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 sup {
   top: -0.5em; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 sub {
   bottom: -0.25em; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 img {
   border: 0; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 svg:not(:root) {
   overflow: hidden; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 figure {
   margin: 0; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 fieldset {
   border: 1px solid silver;
   margin: 0 2px;
   padding: 0.35em 0.625em 0.75em; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 legend {
   border: 0;
   padding: 0; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 button, input, select, textarea {
   font-family: inherit;
   font-size: 100%;
   margin: 0; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 button, input {
   line-height: normal; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 button, html input[type="button"], input[type="reset"], input[type="submit"] {
   -webkit-appearance: button;
   cursor: pointer; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 button[disabled], input[disabled] {
   cursor: default; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 input[type="checkbox"], input[type="radio"] {
   box-sizing: border-box;
   padding: 0; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 input[type="search"] {
   -webkit-appearance: textfield;
   -moz-box-sizing: content-box;
   -webkit-box-sizing: content-box;
   box-sizing: content-box; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 input[type="search"]::-webkit-search-cancel-button, input[type="search"]::-webkit-search-decoration {
   -webkit-appearance: none; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 button::-moz-focus-inner, input::-moz-focus-inner {
   border: 0;
   padding: 0; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 textarea {
   overflow: auto;
   vertical-align: top; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 table {
   border-collapse: collapse;
   border-spacing: 0; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .container {
   position: relative;
   width: 960px;
   margin: 0 auto; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .column, .columns {
   float: left;
   display: inline;
   margin: 0 10px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .row {
   margin-bottom: 21px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .column.alpha, .columns.alpha {
   margin-left: 0; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .column.omega, .columns.omega {
   margin-right: 0; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .container .one.column {
   width: 40px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .container .two.columns {
   width: 100px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .container .three.columns {
   width: 160px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .container .four.columns {
   width: 220px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .container .five.columns {
   width: 280px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .container .six.columns {
   width: 340px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .container .seven.columns {
   width: 400px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .container .eight.columns {
   width: 460px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .container .nine.columns {
   width: 520px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .container .ten.columns {
   width: 580px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .container .eleven.columns {
   width: 640px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .container .twelve.columns {
   width: 700px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .container .thirteen.columns {
   width: 760px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .container .fourteen.columns {
   width: 820px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .container .fifteen.columns {
   width: 880px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .container .sixteen.columns {
   width: 940px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .container .one-third.column {
   width: 300px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .container .two-thirds.column {
   width: 620px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .container .offset-by-one {
   margin-left: 60px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .container .offset-by-two {
   margin-left: 120px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .container .offset-by-three {
   margin-left: 180px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .container .offset-by-four {
   margin-left: 240px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .container .offset-by-five {
   margin-left: 300px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .container .offset-by-six {
   margin-left: 360px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .container .offset-by-seven {
   margin-left: 420px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .container .offset-by-eight {
   margin-left: 480px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .container .offset-by-nine {
   margin-left: 540px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .container .offset-by-ten {
   margin-left: 600px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .container .offset-by-eleven {
   margin-left: 660px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .container .offset-by-twelve {
   margin-left: 720px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .container .offset-by-thirteen {
   margin-left: 780px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .container .offset-by-fourteen {
   margin-left: 840px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .container .offset-by-fifteen {
   margin-left: 900px; }
 
 @media only screen and (min-width: 768px) and (max-width: 959px) {
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .container {
     width: 768px; }
 
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .column.alpha, .columns.alpha {
     margin-right: 10px; }
 
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .column.omega, .columns.omega {
     margin-left: 10px; }
 
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .container .one.column {
     width: 28px; }
 
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .container .two.columns {
     width: 76px; }
 
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .container .three.columns {
     width: 124px; }
 
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .container .four.columns {
     width: 172px; }
 
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .container .five.columns {
     width: 220px; }
 
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .container .six.columns {
     width: 268px; }
 
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .container .seven.columns {
     width: 316px; }
 
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .container .eight.columns {
     width: 364px; }
 
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .container .nine.columns {
     width: 412px; }
 
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .container .ten.columns {
     width: 460px; }
 
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .container .eleven.columns {
     width: 508px; }
 
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .container .twelve.columns {
     width: 556px; }
 
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .container .thirteen.columns {
     width: 604px; }
 
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .container .fourteen.columns {
     width: 652px; }
 
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .container .fifteen.columns {
     width: 700px; }
 
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .container .sixteen.columns {
     width: 748px; }
 
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .container .one-third.column {
     width: 236px; }
 
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .container .two-thirds.column {
     width: 492px; }
 
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .container .offset-by-one {
     margin-left: 48px; }
 
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .container .offset-by-two {
     margin-left: 96px; }
 
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .container .offset-by-three {
     margin-left: 144px; }
 
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .container .offset-by-four {
     margin-left: 192px; }
 
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .container .offset-by-five {
     margin-left: 240px; }
 
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .container .offset-by-six {
     margin-left: 288px; }
 
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .container .offset-by-seven {
     margin-left: 336px; }
 
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .container .offset-by-eight {
     margin-left: 348px; }
 
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .container .offset-by-nine {
     margin-left: 432px; }
 
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .container .offset-by-ten {
     margin-left: 480px; }
 
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .container .offset-by-eleven {
     margin-left: 528px; }
 
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .container .offset-by-twelve {
     margin-left: 576px; }
 
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .container .offset-by-thirteen {
     margin-left: 624px; }
 
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .container .offset-by-fourteen {
     margin-left: 672px; }
 
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .container .offset-by-fifteen {
     margin-left: 720px; } }
 @media only screen and (max-width: 767px) {
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .container {
     width: 300px; }
 
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .column, .columns {
     margin: 0; }
 
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .container .one.column, .container .two.columns, .container .three.columns, .container .four.columns, .container .five.columns, .container .six.columns, .container .seven.columns, .container .eight.columns, .container .nine.columns, .container .ten.columns, .container .eleven.columns, .container .twelve.columns, .container .thirteen.columns, .container .fourteen.columns, .container .fifteen.columns, .container .sixteen.columns, .container .one-third.column, .container .two-thirds.column {
     width: 300px; }
 
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .container .offset-by-one, .container .offset-by-two, .container .offset-by-three, .container .offset-by-four, .container .offset-by-five, .container .offset-by-six, .container .offset-by-seven, .container .offset-by-eight, .container .offset-by-nine, .container .offset-by-ten, .container .offset-by-eleven, .container .offset-by-twelve, .container .offset-by-thirteen, .container .offset-by-fourteen, .container .offset-by-fifteen {
     margin-left: 0; } }
 @media only screen and (min-width: 480px) and (max-width: 767px) {
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .container {
     width: 420px; }
 
-  /* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+  /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
   .container .one.column, .container .two.columns, .container .three.columns, .container .four.columns, .container .five.columns, .container .six.columns, .container .seven.columns, .container .eight.columns, .container .nine.columns, .container .ten.columns, .container .eleven.columns, .container .twelve.columns, .container .thirteen.columns, .container .fourteen.columns, .container .fifteen.columns, .container .sixteen.columns, .container .one-third.column, .container .two-thirds.column {
     width: 420px; } }
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 * {
   box-sizing: border-box;
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 body {
   font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
   font-size: 16px;
@@ -500,31 +500,31 @@ body {
   color: #444;
   background: #fff; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 small {
   font-size: 14px;
   color: #515151; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 p {
   margin-bottom: 10.5px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 hr {
   margin: 21px 0;
   border: 0;
   border-bottom: 1px solid #bbb; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 a, a:visited {
   text-decoration: none;
   color: #08c; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 a:hover {
   color: #005580; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 h1, h2, h3, h4, h5, h6 {
   color: black;
   font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
@@ -532,63 +532,63 @@ h1, h2, h3, h4, h5, h6 {
   margin-top: 10.5px;
   text-rendering: optimizeLegibility; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 h1 {
   font-size: 2.286em;
   line-height: 42px;
   margin-bottom: 16.2px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 h2 {
   font-size: 1.714em;
   line-height: 35.7px;
   margin-bottom: 12.6px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 h3 {
   font-size: 1.5em;
   line-height: 31.5px;
   margin-bottom: 9px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 h4 {
   font-size: 1.286em;
   line-height: 27.3px;
   margin-bottom: 5.4px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 h5 {
   font-size: 1.143em;
   line-height: 23.1px;
   margin-bottom: 5.4px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 h6 {
   font-size: 1em;
   line-height: 21px;
   margin-bottom: 5.4px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 blockquote {
   padding: 0 0 0 15px;
   margin: 0 0 21px;
   border-left: 5px solid #b3b3b3; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 blockquote p {
   margin-bottom: 0; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 blockquote cite {
   display: block;
   font-size: 16px;
   color: #999; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 blockquote cite:before {
   content: "\2014 \0020"; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 blockquote.pull-right {
   float: right;
   padding-left: 0;
@@ -596,75 +596,75 @@ blockquote.pull-right {
   border-left: 0;
   border-right: 5px solid #999; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 blockquote.pull-right p, blockquote.pull-right cite {
   text-align: right; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 ul, ol {
   padding: 0;
   margin: 0 0 10.5px 25px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 ul ul, ul ol, ol ol, ol ul {
   margin-bottom: 0; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 ul {
   list-style: square outside; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 ol {
   list-style: decimal; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 li {
   line-height: 21px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 ul.unstyled, ul.circle, ul.disc {
   margin-left: 0; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 ul.unstyled {
   list-style: none outside; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 ul.circle {
   list-style: circle outside; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 ul.disc {
   list-style: disc outside; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 dl {
   margin-bottom: 21px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 dl.horizontal dt {
   float: left;
   width: 120px;
   clear: left;
   text-align: right; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 dl.horizontal dd {
   margin-left: 130px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 dt, dd {
   line-height: 21px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 dt {
   font-weight: bold; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 dd {
   margin-left: 10.5px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 code, pre {
   font-family: Inconsolata,Menlo,Monaco,"Bitstream Vera Sans Mono","Courier New",monospace;
   font-size: 14px;
@@ -673,97 +673,97 @@ code, pre {
   border: 1px solid #ccc;
   color: #444; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 code {
   padding: 1px 3px;
   border-radius: 3px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 pre {
   display: block;
   padding: 10.5px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 pre code {
   padding: 0;
   background-color: transparent;
   border: none; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 abbr[title] {
   cursor: help;
   border-bottom: 1px dotted #ddd; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 table {
   width: 100%;
   margin-bottom: 21px;
   border-collapse: collapse;
   border-spacing: 0; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 table th, table td {
   padding: 8px;
   line-height: 21px;
   text-align: left;
   border-top: 1px solid #a6a6a6; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 table th {
   font-weight: bold;
   vertical-align: bottom; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 table td {
   vertical-align: top; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 table thead:first-child th, table thead:first-child td {
   border-top: 0; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 table tbody + tbody {
   border-top: 2px solid #a6a6a6; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 table.condensed th, table.condensed td {
   padding: 4px 5px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 table.striped tbody tr:nth-child(odd) td, table.striped tbody tr:nth-child(odd) th {
   background-color: #f7f7f7; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 table.bordered {
   border: 1px solid #a6a6a6;
   border-collapse: separate;
   border-radius: 3px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 table.bordered th + th, table.bordered td + td, table.bordered th + td, table.bordered td + th {
   border-left: 1px solid #a6a6a6; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 table.bordered thead:first-child tr:first-child th, table.bordered tbody:first-child tr:first-child th, table.bordered tbody:first-child tr:first-child td {
   border-top: 0; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 table.bordered thead:first-child tr:first-child th:first-child, table.bordered tbody:first-child tr:first-child td:first-child {
   border-radius: 3px 0 0 0; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 table.bordered thead:first-child tr:first-child th:last-child, table.bordered tbody:first-child tr:first-child td:last-child {
   border-radius: 0 3px 0 0; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 table.bordered thead:last-child tr:last-child th:first-child, table.bordered tbody:last-child tr:last-child td:first-child {
   border-radius: 0 0 0 3px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 table.bordered thead:last-child tr:last-child th:last-child, table.bordered tbody:last-child tr:last-child td:last-child {
   border-radius: 0 0 3px 0; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .flash {
   width: 100%;
   height: 40px;
@@ -774,35 +774,35 @@ table.bordered thead:last-child tr:last-child th:last-child, table.bordered tbod
   padding: 0 10px;
   border-radius: 3px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .flash .close {
   float: right; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .flash.info {
   background: #d9edf7;
   border-color: #c4e3f3;
   color: #257fad; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .flash.notice {
   background: #f8edba;
   border-color: #f5e8a3;
   color: #a28911; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .flash.error {
   background: #f2dede;
   border-color: #ebcccc;
   color: #963c3c; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .flash.success {
   background: #d1eac8;
   border-color: #c2e2b6;
   color: #488132; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 input[type="email"], input[type="number"], input[type="password"], input[type="search"], input[type="tel"], input[type="text"], input[type="url"], input[type="color"], input[type="date"], input[type="datetime"], input[type="datetime-local"], input[type="month"], input[type="time"], input[type="week"], textarea {
   border: 1px solid #ccc;
   color: #777;
@@ -810,18 +810,18 @@ input[type="email"], input[type="number"], input[type="password"], input[type="s
   padding: 6px 4px;
   border-radius: 2px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 input[type="email"]:not(:last-of-type), input[type="number"]:not(:last-of-type), input[type="password"]:not(:last-of-type), input[type="search"]:not(:last-of-type), input[type="tel"]:not(:last-of-type), input[type="text"]:not(:last-of-type), input[type="url"]:not(:last-of-type), input[type="color"]:not(:last-of-type), input[type="date"]:not(:last-of-type), input[type="datetime"]:not(:last-of-type), input[type="datetime-local"]:not(:last-of-type), input[type="month"]:not(:last-of-type), input[type="time"]:not(:last-of-type), input[type="week"]:not(:last-of-type), textarea:not(:last-of-type) {
   margin-bottom: 20px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 input[type="email"]:focus, input[type="number"]:focus, input[type="password"]:focus, input[type="search"]:focus, input[type="tel"]:focus, input[type="text"]:focus, input[type="url"]:focus, input[type="color"]:focus, input[type="date"]:focus, input[type="datetime"]:focus, input[type="datetime-local"]:focus, input[type="month"]:focus, input[type="time"]:focus, input[type="week"]:focus, textarea:focus {
   border: 1px solid #aaa;
   box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
   color: #444;
   outline: none; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 input[type="email"], input[type="number"], input[type="password"], input[type="search"], input[type="tel"], input[type="text"], input[type="url"], input[type="color"], input[type="date"], input[type="datetime"], input[type="datetime-local"], input[type="month"], input[type="time"], input[type="week"], select, textarea {
   font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
   width: 210px;
@@ -829,28 +829,28 @@ input[type="email"], input[type="number"], input[type="password"], input[type="s
   font-size: 13px;
   max-width: 100%; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 input[type='checkbox'], input[type='radio'] {
   margin: 4px 3px 0;
   line-height: normal; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 label, legend {
   display: block;
   font-weight: bold;
   font-size: 13px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 fieldset {
   border: none;
   margin-bottom: 18px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 fieldset > legend {
   font-size: 18px;
   margin-bottom: 10px; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .button, button, input[type="submit"], input[type="reset"], input[type="button"] {
   background: #efefef;
   border: 1px solid #ccc;
@@ -866,16 +866,16 @@ fieldset > legend {
   padding: 8px 10px;
   font-family: "HelveticaNeue","Helvetica Neue",Helvetica,Arial,sans-serif; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .button:hover, button:hover, input[type="submit"]:hover, input[type="reset"]:hover, input[type="button"]:hover {
   background: #ddd;
   border-color: #bbb; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/_barebones.scss */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_barebones.scss */
 .button:active, button:active, input[type="submit"]:active, input[type="reset"]:active, input[type="button"]:active {
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3); }
 
-/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay {
   background-color: white;
   border: 1px solid #CCC;
@@ -884,414 +884,414 @@ fieldset > legend {
   padding: 1em 0px 1em 1em;
   clear: both; }
 
-/* line 10, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 10, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay pre {
   margin: 0px; }
 
-/* line 15, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 15, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 span.CodeRay {
   white-space: pre;
   border: 0px;
   padding: 2px; }
 
-/* line 17, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 17, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 table.CodeRay {
   border-collapse: collapse;
   width: 100%;
   padding: 2px; }
 
-/* line 18, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 18, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 table.CodeRay td {
   padding: 1em 0.5em;
   vertical-align: top; }
 
-/* line 23, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 23, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .line-numbers, .CodeRay .no {
   background-color: #ECECEC;
   color: #AAA;
   text-align: right; }
 
-/* line 29, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 29, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .line-numbers a {
   color: #AAA; }
 
-/* line 33, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 33, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .line-numbers tt {
   font-weight: bold; }
 
-/* line 34, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 34, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .line-numbers .highlighted {
   color: red; }
 
-/* line 35, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 35, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .line {
   display: block;
   float: left;
   width: 100%; }
 
-/* line 36, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 36, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay span.line-numbers {
   padding: 0px 4px; }
 
-/* line 37, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 37, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .code {
   width: 100%; }
 
-/* line 39, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 39, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 ol.CodeRay {
   font-size: 10pt; }
 
-/* line 40, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 40, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 ol.CodeRay li {
   white-space: pre; }
 
-/* line 42, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 42, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .code pre {
   overflow: auto; }
 
-/* line 43, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 43, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .debug {
   color: white !important;
   background: blue !important; }
 
-/* line 45, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 45, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .annotation {
   color: #000077; }
 
-/* line 46, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 46, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .attribute-name {
   color: #ff0088; }
 
-/* line 47, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 47, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .attribute-value {
   color: #770000; }
 
-/* line 48, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 48, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .binary {
   color: #509;
   font-weight: bold; }
 
-/* line 49, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 49, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .comment {
   color: #998;
   font-style: italic; }
 
-/* line 50, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 50, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .char {
   color: #0044dd; }
 
-/* line 51, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 51, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .char .content {
   color: #0044dd; }
 
-/* line 52, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 52, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .char .delimiter {
   color: #003399; }
 
-/* line 53, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 53, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .class {
   color: #458;
   font-weight: bold; }
 
-/* line 54, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 54, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .complex {
   color: #A08;
   font-weight: bold; }
 
-/* line 55, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 55, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .constant {
   color: teal; }
 
-/* line 56, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 56, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .color {
   color: #00aa00; }
 
-/* line 57, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 57, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .class-variable {
   color: #336699; }
 
-/* line 58, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 58, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .decorator {
   color: #B0B; }
 
-/* line 59, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 59, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .definition {
   color: #099;
   font-weight: bold; }
 
-/* line 60, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 60, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .directive {
   color: #088;
   font-weight: bold; }
 
-/* line 61, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 61, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .delimiter {
   color: black; }
 
-/* line 62, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 62, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .doc {
   color: #997700; }
 
-/* line 63, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 63, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .doctype {
   color: #3344bb; }
 
-/* line 64, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 64, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .doc-string {
   color: #D42;
   font-weight: bold; }
 
-/* line 65, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 65, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .escape {
   color: #666;
   font-weight: bold; }
 
-/* line 66, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 66, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .entity {
   color: #800;
   font-weight: bold; }
 
-/* line 67, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 67, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .error {
   color: #F00;
   background-color: #ffaaaa; }
 
-/* line 68, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 68, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .exception {
   color: #C00;
   font-weight: bold; }
 
-/* line 69, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 69, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .filename {
   color: #099; }
 
-/* line 70, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 70, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .function {
   color: #900;
   font-weight: bold; }
 
-/* line 71, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 71, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .global-variable {
   color: teal;
   font-weight: bold; }
 
-/* line 72, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 72, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .hex {
   color: #058;
   font-weight: bold; }
 
-/* line 73, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 73, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .integer {
   color: #099; }
 
-/* line 74, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 74, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .include {
   color: #B44;
   font-weight: bold; }
 
-/* line 75, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 75, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .inline {
   color: black; }
 
-/* line 76, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 76, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .inline .inline {
   background: #cccccc; }
 
-/* line 77, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 77, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .inline .inline .inline {
   background: #bbbbbb; }
 
-/* line 78, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 78, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .inline .inline-delimiter {
   color: #D14; }
 
-/* line 79, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 79, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .inline-delimiter {
   color: #D14; }
 
-/* line 80, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 80, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .important {
   color: #f00; }
 
-/* line 81, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 81, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .interpreted {
   color: #B2B;
   font-weight: bold; }
 
-/* line 82, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 82, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .instance-variable {
   color: teal; }
 
-/* line 83, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 83, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .label {
   color: #970;
   font-weight: bold; }
 
-/* line 84, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 84, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .local-variable {
   color: #996633; }
 
-/* line 85, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 85, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .octal {
   color: #40E;
   font-weight: bold; }
 
-/* line 87, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 87, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .predefined-constant {
   font-weight: bold; }
 
-/* line 88, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 88, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .predefined {
   color: #369;
   font-weight: bold; }
 
-/* line 89, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 89, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .preprocessor {
   color: #579; }
 
-/* line 90, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 90, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .pseudo-class {
   color: #00C;
   font-weight: bold; }
 
-/* line 91, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 91, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .predefined-type {
   color: #074;
   font-weight: bold; }
 
-/* line 92, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 92, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .reserved, .keyword {
   color: #000;
   font-weight: bold; }
 
-/* line 94, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 94, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .key {
   color: #808; }
 
-/* line 95, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 95, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .key .delimiter {
   color: #606; }
 
-/* line 96, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 96, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .key .char {
   color: #80f; }
 
-/* line 97, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 97, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .value {
   color: #088; }
 
-/* line 99, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 99, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .regexp {
   background-color: #fff0ff; }
 
-/* line 100, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 100, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .regexp .content {
   color: #880088; }
 
-/* line 101, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 101, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .regexp .delimiter {
   color: #440044; }
 
-/* line 102, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 102, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .regexp .modifier {
   color: #cc22cc; }
 
-/* line 103, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 103, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .regexp .function {
   color: #404;
   font-weight: bold; }
 
-/* line 105, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 105, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .string {
   color: #D20; }
 
-/* line 107, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 107, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .string .string .string {
   background-color: #ffd0d0; }
 
-/* line 108, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 108, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .string .content {
   color: #D14; }
 
-/* line 109, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 109, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .string .char {
   color: #D14; }
 
-/* line 110, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 110, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .string .delimiter {
   color: #D14; }
 
-/* line 112, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 112, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .shell {
   color: #dd1144; }
 
-/* line 114, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 114, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .shell .delimiter {
   color: #dd1144; }
 
-/* line 116, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 116, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .symbol {
   color: #990073; }
 
-/* line 117, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 117, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .symbol .content {
   color: #aa6600; }
 
-/* line 118, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 118, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .symbol .delimiter {
   color: #663300; }
 
-/* line 120, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 120, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .tag {
   color: #007700; }
 
-/* line 121, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 121, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .tag-special {
   color: #D70;
   font-weight: bold; }
 
-/* line 122, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 122, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .type {
   color: #339;
   font-weight: bold; }
 
-/* line 123, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 123, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .variable {
   color: #003366; }
 
-/* line 125, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 125, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .insert {
   background: #afa; }
 
-/* line 126, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 126, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .delete {
   background: #faa; }
 
-/* line 127, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 127, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .change {
   color: #aaf;
   background: #007; }
 
-/* line 128, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 128, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .head {
   color: #f8f;
   background: #550055; }
 
-/* line 130, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 130, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .insert .insert {
   color: #080;
   font-weight: bold; }
 
-/* line 131, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 131, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .delete .delete {
   color: #800;
   font-weight: bold; }
 
-/* line 132, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 132, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .change .change {
   color: #66f; }
 
-/* line 133, /home/ron/Development/gobot/gobot.io/source/stylesheets/coderay.css */
+/* line 133, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/coderay.scss */
 .CodeRay .head .head {
   color: #f4f; }
 
@@ -1301,64 +1301,64 @@ ol.CodeRay li {
   -moz-box-sizing: border-box;
   box-sizing: border-box; }
 
-/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_base.sass */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_base.scss */
 body {
   background-color: #fff6ee;
-  background-image: url("../images/bg-artoo.png");
+  background-image: url("../images/elements/bg-artoo.png");
   background-repeat: no-repeat;
   background-position: top; }
 
-/* line 7, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_base.sass */
+/* line 8, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_base.scss */
 .app {
   min-height: 100%;
   margin-bottom: -38px; }
 
-/* line 11, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_base.sass */
+/* line 13, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_base.scss */
 h3, h4, h5, ul, ol {
   color: #523d47; }
 
-/* line 15, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_base.sass */
+/* line 18, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_base.scss */
 a, a:visited {
   color: #ff7e5b; }
-/* line 17, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_base.sass */
+/* line 21, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_base.scss */
 a:hover, a:focus {
   color: #fc4c1d; }
 
 @media only screen and (max-width: 767px) {
-  /* line 20, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_base.sass */
+  /* line 26, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_base.scss */
   pre {
     white-space: pre;
     overflow: scroll;
     word-wrap: normal; } }
 
-/* line 24, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_base.sass */
+/* line 31, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_base.scss */
 .hero-anchors, .app-footer a, .hero a, .page-title a, .hero-anchors:active, .app-footer a:active, .hero a:active, .page-title a:active, .hero-anchors:visited, .app-footer a:visited, .hero a:visited, .page-title a:visited {
   color: #fffbda; }
-/* line 26, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_base.sass */
+/* line 34, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_base.scss */
 .hero-anchors:hover, .app-footer a:hover, .hero a:hover, .page-title a:hover, .hero-anchors:focus, .app-footer a:focus, .hero a:focus, .page-title a:focus {
   color: white; }
 
-/* line 29, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_base.sass */
+/* line 39, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_base.scss */
 .notice {
   background: white;
   padding: 20px 25px; }
 
-/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_headers.scss */
 .app-logo {
   width: 168px; }
-  /* line 3, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+  /* line 3, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_headers.scss */
   .app-logo a {
     display: block;
     width: 100%;
     color: #fc4c1d; }
 
-/* line 8, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+/* line 10, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_headers.scss */
 .hidden-text, .app-logo a {
-  background: url("/images/logo.png") left top no-repeat;
+  background: url("/images/elements/logo.png") left top no-repeat;
   text-indent: -99999px;
   height: 27px; }
 
-/* line 13, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+/* line 16, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_headers.scss */
 .app-header {
   *zoom: 1;
   max-width: 68em;
@@ -1372,12 +1372,12 @@ a:hover, a:focus {
   /* line 23, /home/ron/.rvm/gems/ruby-2.0.0-p247@gobot.io/gems/bourbon-3.1.8/app/assets/stylesheets/addons/_clearfix.scss */
   .app-header:after {
     clear: both; }
-  /* line 16, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+  /* line 19, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_headers.scss */
   .app-header .display, .app-header .subtitle, .app-header .menu, .app-header h1 {
     vertical-align: middle;
     margin: 0;
     display: inline-block; }
-  /* line 20, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+  /* line 24, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_headers.scss */
   .app-header .display {
     float: left;
     display: block;
@@ -1387,7 +1387,7 @@ a:hover, a:focus {
     /* line 40, /home/ron/.rvm/gems/ruby-2.0.0-p247@gobot.io/gems/neat-1.5.0/app/assets/stylesheets/grid/_span-columns.scss */
     .app-header .display:last-child {
       margin-right: 0; }
-  /* line 23, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+  /* line 28, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_headers.scss */
   .app-header .subtitle {
     font-family: "Montserrat", sans-serif;
     font-weight: 700;
@@ -1395,10 +1395,10 @@ a:hover, a:focus {
     color: #505252;
     padding: 8px 0 0 15px;
     width: 190px; }
-  /* line 27, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+  /* line 33, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_headers.scss */
   .app-header .easter {
     display: none; }
-  /* line 29, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+  /* line 36, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_headers.scss */
   .app-header .heart {
     color: red;
     font-size: 20px;
@@ -1407,7 +1407,7 @@ a:hover, a:focus {
     display: inline-block;
     width: 38px;
     text-align: center; }
-  /* line 37, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+  /* line 45, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_headers.scss */
   .app-header .menu {
     float: left;
     display: block;
@@ -1415,42 +1415,42 @@ a:hover, a:focus {
     width: 57.35098%;
     text-align: right;
     display: inline-block;
-    margin: 10px 0 0 0; }
+    margin: 13px 0 0 0; }
     /* line 40, /home/ron/.rvm/gems/ruby-2.0.0-p247@gobot.io/gems/neat-1.5.0/app/assets/stylesheets/grid/_span-columns.scss */
     .app-header .menu:last-child {
       margin-right: 0; }
-    /* line 42, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+    /* line 50, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_headers.scss */
     .app-header .menu .active {
       color: #fc4c1d; }
-    /* line 44, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+    /* line 53, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_headers.scss */
     .app-header .menu .item {
       font-size: 15px;
       font-weight: bold;
       margin: 10px;
       padding: 8px 4px; }
-      /* line 50, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+      /* line 58, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_headers.scss */
       .app-header .menu .item, .app-header .menu .item:visited, .app-header .menu .item:active {
         color: #505252; }
-      /* line 53, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+      /* line 61, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_headers.scss */
       .app-header .menu .item:hover, .app-header .menu .item:focus {
         color: #fc4c1d; }
     @media only screen and (min-width: 767px) and (max-width: 964px) {
-      /* line 37, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+      /* line 45, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_headers.scss */
       .app-header .menu {
-        padding: 0;
         float: left;
         display: block;
         margin-right: 2.35765%;
-        width: 48.82117%; }
+        width: 48.82117%;
+        padding: 0; }
         /* line 40, /home/ron/.rvm/gems/ruby-2.0.0-p247@gobot.io/gems/neat-1.5.0/app/assets/stylesheets/grid/_span-columns.scss */
         .app-header .menu:last-child {
           margin-right: 0; }
-        /* line 59, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+        /* line 68, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_headers.scss */
         .app-header .menu .item {
           margin: 0;
           padding: 0 5px; } }
   @media only screen and (min-width: 767px) and (max-width: 964px) {
-    /* line 64, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+    /* line 75, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_headers.scss */
     .app-header .display {
       float: left;
       display: block;
@@ -1460,17 +1460,17 @@ a:hover, a:focus {
       .app-header .display:last-child {
         margin-right: 0; } }
   @media only screen and (max-width: 767px) {
-    /* line 68, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+    /* line 80, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_headers.scss */
     .app-header .subtitle, .app-header .menu {
       width: auto;
       display: block; }
-    /* line 71, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+    /* line 84, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_headers.scss */
     .app-header .display, .app-header .app-logo {
       display: inline-block; }
-    /* line 73, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+    /* line 87, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_headers.scss */
     .app-header .app-logo, .app-header .subtitle, .app-header .menu {
       margin: 0 0 5px 0; }
-    /* line 75, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+    /* line 90, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_headers.scss */
     .app-header .display {
       float: left;
       display: block;
@@ -1481,15 +1481,15 @@ a:hover, a:focus {
       /* line 40, /home/ron/.rvm/gems/ruby-2.0.0-p247@gobot.io/gems/neat-1.5.0/app/assets/stylesheets/grid/_span-columns.scss */
       .app-header .display:last-child {
         margin-right: 0; }
-    /* line 79, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+    /* line 95, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_headers.scss */
     .app-header .app-logo a {
       background-position: center center; }
-    /* line 81, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+    /* line 98, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_headers.scss */
     .app-header .subtitle {
       font-size: 19px;
       line-height: 15px;
       padding: 0; }
-    /* line 85, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+    /* line 103, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_headers.scss */
     .app-header .menu {
       margin: 5px 0 0 0;
       text-align: center;
@@ -1500,12 +1500,12 @@ a:hover, a:focus {
       /* line 40, /home/ron/.rvm/gems/ruby-2.0.0-p247@gobot.io/gems/neat-1.5.0/app/assets/stylesheets/grid/_span-columns.scss */
       .app-header .menu:last-child {
         margin-right: 0; }
-      /* line 89, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_headers.sass */
+      /* line 107, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_headers.scss */
       .app-header .menu .item {
         margin: 0;
         padding: 0 2px; } }
 
-/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_footers.sass */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_footers.scss */
 .app-footer {
   font-family: "Montserrat", sans-serif;
   font-weight: 700;
@@ -1515,32 +1515,33 @@ a:hover, a:focus {
   background: #ff7e5b;
   font-weight: normal; }
 
-/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_coderay.sass */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_coderay.scss */
 .CodeRay {
   font-family: Inconsolata, Menlo, Monaco, "Bitstream Vera Sans Mono", "Courier New", monospace;
   text-align: left; }
-  /* line 4, /home/ron/Development/gobot/gobot.io/source/stylesheets/shared/_coderay.sass */
+  /* line 4, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_coderay.scss */
   .CodeRay .span {
     display: inline-block; }
 
-/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/layouts/_home.sass */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/layouts/_home.scss */
 .container, .w {
   width: 964px;
   margin: 0 auto; }
   @media only screen and (min-width: 767px) and (max-width: 964px) {
-    /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/layouts/_home.sass */
+    /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/layouts/_home.scss */
     .container, .w {
       width: 767px;
       padding: 0 15px; } }
   @media only screen and (max-width: 767px) {
-    /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/layouts/_home.sass */
+    /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/layouts/_home.scss */
     .container, .w {
       width: 100%;
       padding: 0 15px; } }
 
-/* line 9, /home/ron/Development/gobot/gobot.io/source/stylesheets/layouts/_home.sass */
+/* line 12, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/layouts/_home.scss */
 .main[role="main"] {
   padding-bottom: 50px;
+  margin-top: 20px;
   *zoom: 1;
   max-width: 68em;
   margin-left: auto;
@@ -1552,86 +1553,73 @@ a:hover, a:focus {
   /* line 23, /home/ron/.rvm/gems/ruby-2.0.0-p247@gobot.io/gems/bourbon-3.1.8/app/assets/stylesheets/addons/_clearfix.scss */
   .main[role="main"]:after {
     clear: both; }
-  /* line 13, /home/ron/Development/gobot/gobot.io/source/stylesheets/layouts/_home.sass */
-  .main[role="main"] .videos {
-    *zoom: 1;
-    max-width: 68em;
-    margin-left: auto;
-    margin-right: auto; }
-    /* line 18, /home/ron/.rvm/gems/ruby-2.0.0-p247@gobot.io/gems/bourbon-3.1.8/app/assets/stylesheets/addons/_clearfix.scss */
-    .main[role="main"] .videos:before, .main[role="main"] .videos:after {
-      content: " ";
-      display: table; }
-    /* line 23, /home/ron/.rvm/gems/ruby-2.0.0-p247@gobot.io/gems/bourbon-3.1.8/app/assets/stylesheets/addons/_clearfix.scss */
-    .main[role="main"] .videos:after {
-      clear: both; }
-    /* line 15, /home/ron/Development/gobot/gobot.io/source/stylesheets/layouts/_home.sass */
-    .main[role="main"] .videos .video {
-      float: left;
-      display: block;
-      margin-right: 2.35765%;
-      width: 48.82117%;
-      margin: 0.5%; }
-      /* line 40, /home/ron/.rvm/gems/ruby-2.0.0-p247@gobot.io/gems/neat-1.5.0/app/assets/stylesheets/grid/_span-columns.scss */
-      .main[role="main"] .videos .video:last-child {
-        margin-right: 0; }
-      /* line 18, /home/ron/Development/gobot/gobot.io/source/stylesheets/layouts/_home.sass */
-      .main[role="main"] .videos .video h3 {
-        font-size: 16px; }
-      /* line 20, /home/ron/Development/gobot/gobot.io/source/stylesheets/layouts/_home.sass */
+  /* line 17, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/layouts/_home.scss */
+  .main[role="main"] .videos .video {
+    float: left;
+    display: block;
+    margin-right: 2.35765%;
+    width: 48.82117%;
+    margin: .5%; }
+    /* line 40, /home/ron/.rvm/gems/ruby-2.0.0-p247@gobot.io/gems/neat-1.5.0/app/assets/stylesheets/grid/_span-columns.scss */
+    .main[role="main"] .videos .video:last-child {
+      margin-right: 0; }
+    /* line 20, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/layouts/_home.scss */
+    .main[role="main"] .videos .video h3 {
+      font-size: 16px; }
+    /* line 23, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/layouts/_home.scss */
+    .main[role="main"] .videos .video iframe, .main[role="main"] .videos .video object {
+      width: 100%;
+      height: 300px; }
+    @media only screen and (min-width: 767px) and (max-width: 964px) {
+      /* line 28, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/layouts/_home.scss */
       .main[role="main"] .videos .video iframe, .main[role="main"] .videos .video object {
-        width: 100%;
-        height: 300px; }
-      @media only screen and (min-width: 767px) and (max-width: 964px) {
-        /* line 24, /home/ron/Development/gobot/gobot.io/source/stylesheets/layouts/_home.sass */
+        height: 240px; } }
+    @media only screen and (max-width: 767px) {
+      /* line 17, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/layouts/_home.scss */
+      .main[role="main"] .videos .video {
+        float: left;
+        display: block;
+        margin-right: 2.35765%;
+        width: 100%; }
+        /* line 40, /home/ron/.rvm/gems/ruby-2.0.0-p247@gobot.io/gems/neat-1.5.0/app/assets/stylesheets/grid/_span-columns.scss */
+        .main[role="main"] .videos .video:last-child {
+          margin-right: 0; }
+        /* line 34, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/layouts/_home.scss */
         .main[role="main"] .videos .video iframe, .main[role="main"] .videos .video object {
           height: 240px; } }
-      @media only screen and (max-width: 767px) {
-        /* line 15, /home/ron/Development/gobot/gobot.io/source/stylesheets/layouts/_home.sass */
-        .main[role="main"] .videos .video {
-          float: left;
-          display: block;
-          margin-right: 2.35765%;
-          width: 100%; }
-          /* line 40, /home/ron/.rvm/gems/ruby-2.0.0-p247@gobot.io/gems/neat-1.5.0/app/assets/stylesheets/grid/_span-columns.scss */
-          .main[role="main"] .videos .video:last-child {
-            margin-right: 0; }
-          /* line 28, /home/ron/Development/gobot/gobot.io/source/stylesheets/layouts/_home.sass */
-          .main[role="main"] .videos .video iframe, .main[role="main"] .videos .video object {
-            height: 240px; } }
-    /* line 30, /home/ron/Development/gobot/gobot.io/source/stylesheets/layouts/_home.sass */
-    .main[role="main"] .videos .video_index {
-      float: left;
-      display: block;
-      margin-right: 2.35765%;
-      width: 82.94039%; }
-      /* line 40, /home/ron/.rvm/gems/ruby-2.0.0-p247@gobot.io/gems/neat-1.5.0/app/assets/stylesheets/grid/_span-columns.scss */
-      .main[role="main"] .videos .video_index:last-child {
-        margin-right: 0; }
-      /* line 32, /home/ron/Development/gobot/gobot.io/source/stylesheets/layouts/_home.sass */
+  /* line 39, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/layouts/_home.scss */
+  .main[role="main"] .videos .video_index {
+    float: left;
+    display: block;
+    margin-right: 2.35765%;
+    width: 82.94039%; }
+    /* line 40, /home/ron/.rvm/gems/ruby-2.0.0-p247@gobot.io/gems/neat-1.5.0/app/assets/stylesheets/grid/_span-columns.scss */
+    .main[role="main"] .videos .video_index:last-child {
+      margin-right: 0; }
+    /* line 41, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/layouts/_home.scss */
+    .main[role="main"] .videos .video_index iframe, .main[role="main"] .videos .video_index object {
+      width: 100%;
+      height: 400px; }
+    @media only screen and (min-width: 767px) and (max-width: 964px) {
+      /* line 46, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/layouts/_home.scss */
       .main[role="main"] .videos .video_index iframe, .main[role="main"] .videos .video_index object {
-        width: 100%;
-        height: 400px; }
-      @media only screen and (min-width: 767px) and (max-width: 964px) {
-        /* line 36, /home/ron/Development/gobot/gobot.io/source/stylesheets/layouts/_home.sass */
-        .main[role="main"] .videos .video_index iframe, .main[role="main"] .videos .video_index object {
-          height: 300px; } }
-      @media only screen and (max-width: 767px) {
-        /* line 39, /home/ron/Development/gobot/gobot.io/source/stylesheets/layouts/_home.sass */
-        .main[role="main"] .videos .video_index iframe, .main[role="main"] .videos .video_index object {
-          height: 180px; } }
-  /* line 43, /home/ron/Development/gobot/gobot.io/source/stylesheets/layouts/_home.sass */
+        height: 300px; } }
+    @media only screen and (max-width: 767px) {
+      /* line 51, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/layouts/_home.scss */
+      .main[role="main"] .videos .video_index iframe, .main[role="main"] .videos .video_index object {
+        height: 180px; } }
+  /* line 59, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/layouts/_home.scss */
   .main[role="main"] .content.full {
     width: 100%;
     clear: both; }
-  /* line 47, /home/ron/Development/gobot/gobot.io/source/stylesheets/layouts/_home.sass */
+  /* line 63, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/layouts/_home.scss */
   .main[role="main"] .content h1, .main[role="main"] .content h2 {
     color: #ff7e5b; }
-  /* line 50, /home/ron/Development/gobot/gobot.io/source/stylesheets/layouts/_home.sass */
+  /* line 66, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/layouts/_home.scss */
   .main[role="main"] .content h1 {
     font-size: 1.9em;
     padding: 10px 0; }
-  /* line 54, /home/ron/Development/gobot/gobot.io/source/stylesheets/layouts/_home.sass */
+  /* line 71, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/layouts/_home.scss */
   .main[role="main"] .aside.right {
     float: left;
     display: block;
@@ -1642,24 +1630,24 @@ a:hover, a:focus {
     /* line 40, /home/ron/.rvm/gems/ruby-2.0.0-p247@gobot.io/gems/neat-1.5.0/app/assets/stylesheets/grid/_span-columns.scss */
     .main[role="main"] .aside.right:last-child {
       margin-right: 0; }
-    /* line 58, /home/ron/Development/gobot/gobot.io/source/stylesheets/layouts/_home.sass */
+    /* line 75, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/layouts/_home.scss */
     .main[role="main"] .aside.right img {
       width: 100%;
       margin-top: 20px; }
-  /* line 63, /home/ron/Development/gobot/gobot.io/source/stylesheets/layouts/_home.sass */
+  /* line 81, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/layouts/_home.scss */
   .main[role="main"] section.content .index_content {
     float: left;
     display: block;
     margin-right: 2.35765%;
     width: 74.41059%; }
-    /* line 8, /home/ron/Development/gobot/gobot.io/source/stylesheets/_mixins.sass */
+    /* line 9, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/_mixins.scss */
     .main[role="main"] section.content .index_content:not(:last-child) {
       margin-bottom: 20px; }
     /* line 40, /home/ron/.rvm/gems/ruby-2.0.0-p247@gobot.io/gems/neat-1.5.0/app/assets/stylesheets/grid/_span-columns.scss */
     .main[role="main"] section.content .index_content:last-child {
       margin-right: 0; }
 
-/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/layouts/_hardware.sass */
+/* line 2, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/layouts/_hardware.scss */
 .hardware .devices {
   *zoom: 1;
   max-width: 68em;
@@ -1673,24 +1661,24 @@ a:hover, a:focus {
   /* line 23, /home/ron/.rvm/gems/ruby-2.0.0-p247@gobot.io/gems/bourbon-3.1.8/app/assets/stylesheets/addons/_clearfix.scss */
   .hardware .devices:after {
     clear: both; }
-  /* line 5, /home/ron/Development/gobot/gobot.io/source/stylesheets/layouts/_hardware.sass */
+  /* line 5, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/layouts/_hardware.scss */
   .hardware .devices .device {
     display: inline-block;
     width: 300px; }
-    /* line 8, /home/ron/Development/gobot/gobot.io/source/stylesheets/layouts/_hardware.sass */
+    /* line 8, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/layouts/_hardware.scss */
     .hardware .devices .device img {
       width: 100%; }
 
-/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_home.sass */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
 .hero {
   margin: 15px 0 0 0;
   background: #ff7e5b;
   padding: 25px 0; }
   @media only screen and (max-width: 767px) {
-    /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_home.sass */
+    /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
     .hero {
       margin-top: -8px; } }
-  /* line 7, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_home.sass */
+  /* line 9, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
   .hero .title {
     font-family: "Montserrat", sans-serif;
     font-weight: 700;
@@ -1702,20 +1690,20 @@ a:hover, a:focus {
     opacity: 0.94;
     margin: 0; }
     @media only screen and (max-width: 767px) {
-      /* line 7, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_home.sass */
+      /* line 9, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
       .hero .title {
         font-size: 23px;
         line-height: 27px;
         padding: 0; }
-        /* line 19, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_home.sass */
+        /* line 20, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
         .hero .title br {
           display: none; } }
     @media only screen and (min-width: 767px) and (max-width: 964px) {
-      /* line 7, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_home.sass */
+      /* line 9, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
       .hero .title {
         font-size: 33px;
         line-height: 42px; } }
-  /* line 25, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_home.sass */
+  /* line 30, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
   .hero .subtitle {
     font-family: "Montserrat", sans-serif;
     font-weight: 700;
@@ -1727,65 +1715,65 @@ a:hover, a:focus {
     line-height: 36px;
     margin-top: 3px; }
     @media only screen and (max-width: 767px) {
-      /* line 25, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_home.sass */
+      /* line 30, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
       .hero .subtitle {
         font-size: 18px;
         line-height: 22px;
         margin-top: 4px;
         padding: 0; } }
 
-/* line 42, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_home.sass */
+/* line 49, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
 .social {
   line-height: 0;
   padding: 10px 0;
   background: #fdfcf5; }
-  /* line 46, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_home.sass */
+  /* line 53, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
   .social .twitter-follow-button {
     vertical-align: top; }
-  /* line 48, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_home.sass */
+  /* line 56, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
   .social .splitter {
     display: inline-block;
     height: 21px; }
   @media only screen and (max-width: 767px) {
-    /* line 53, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_home.sass */
+    /* line 61, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
     .social .splitter {
       display: block;
       margin-bottom: 5px; } }
 
-/* line 57, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_home.sass */
+/* line 68, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
 .cta, .hero a.cta {
   padding: 10px 20px;
   display: inline-block;
   margin: 17px 0 0 0;
   font-size: 19px;
   font-weight: bold; }
-  /* line 63, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_home.sass */
+  /* line 74, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
   .cta, .hero a.cta, .cta:visited, .hero a.cta:visited, .cta:active, .hero a.cta:active {
     background: #fff3cf;
     color: #bd583d; }
-  /* line 66, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_home.sass */
+  /* line 78, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
   .cta:hover, .hero a.cta:hover, .cta:focus, .hero a.cta:focus {
     background: #e1d5b1;
     color: #b34e33; }
   @media only screen and (max-width: 767px) {
-    /* line 57, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_home.sass */
+    /* line 68, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
     .cta, .hero a.cta {
       font-size: 16px;
       padding: 8px 15px; } }
 
-/* line 77, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_home.sass */
+/* line 94, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
 .catcher {
   margin: 0 0 38px 0;
   background: #fdfcf5;
   padding: 20px; }
-  /* line 81, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_home.sass */
+  /* line 98, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
   .catcher .phrase {
     margin: 0; }
-  /* line 83, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_home.sass */
+  /* line 101, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
   .catcher .cta, .catcher .hero a.cta, .hero .catcher a.cta {
     margin-top: 8px; }
 
-/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
 .articles {
   float: left;
   display: block;
@@ -1795,7 +1783,7 @@ a:hover, a:focus {
   .articles:last-child {
     margin-right: 0; }
   @media only screen and (max-width: 767px) {
-    /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
+    /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
     .articles {
       float: left;
       display: block;
@@ -1805,17 +1793,17 @@ a:hover, a:focus {
       .articles:last-child {
         margin-right: 0; } }
   @media only screen and (max-width: 767px) {
-    /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
+    /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
     .articles {
       margin-right: 0; } }
-  /* line 8, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
+  /* line 10, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
   .articles .article {
     display: inline-block;
     margin-bottom: 30px; }
-    /* line 12, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
+    /* line 13, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
     .articles .article h3, .articles .article h4, .articles .article a {
       color: #fc4c1d; }
-    /* line 14, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
+    /* line 16, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
     .articles .article h3 {
       display: inline-block;
       font-size: 24px;
@@ -1823,61 +1811,61 @@ a:hover, a:focus {
       vertical-align: top;
       margin: 0px;
       max-width: 80%; }
-    /* line 21, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
+    /* line 24, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
     .articles .article p {
       text-align: justify; }
-    /* line 23, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
+    /* line 27, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
     .articles .article .data {
       padding-left: 71px; }
-    /* line 25, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
+    /* line 30, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
     .articles .article .date {
       color: white;
       width: 50px;
       text-align: center;
       margin-right: 20px;
       float: left; }
-      /* line 32, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
+      /* line 36, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
       .articles .article .date .blue {
         padding: 5px;
         background-color: #b39f89; }
-        /* line 36, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
+        /* line 39, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
         .articles .article .date .blue .month {
           text-transform: uppercase;
           font-size: 12px;
           line-height: 12px; }
-        /* line 40, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
+        /* line 44, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
         .articles .article .date .blue .day {
           font-size: 16px;
           line-height: 16px; }
-      /* line 43, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
+      /* line 49, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
       .articles .article .date .red {
         padding: 2px;
         background-color: #fc4c1d; }
-        /* line 47, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
+        /* line 52, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
         .articles .article .date .red .year {
           font-size: 10px;
           line-height: 10px; }
-    /* line 50, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
+    /* line 58, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
     .articles .article .comments, .articles .article .tags {
       display: inline-block; }
-      /* line 53, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
+      /* line 60, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
       .articles .article .comments .img, .articles .article .tags .img {
         vertical-align: top;
         display: inline-block;
         width: 24px;
         height: 24px; }
-      /* line 58, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
+      /* line 66, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
       .articles .article .comments a, .articles .article .tags a {
         vertical-align: top;
         text-decoration: underline; }
-      /* line 61, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
+      /* line 70, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
       .articles .article .comments img, .articles .article .tags img {
         margin-right: 4px; }
-    /* line 63, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
+    /* line 74, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
     .articles .article .comments {
       margin-right: 60px; }
 
-/* line 66, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
+/* line 80, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
 .categories, .network, .tweets {
   vertical-align: top;
   margin-bottom: 40px;
@@ -1889,7 +1877,7 @@ a:hover, a:focus {
   .categories:last-child, .network:last-child, .tweets:last-child {
     margin-right: 0; }
   @media only screen and (max-width: 767px) {
-    /* line 66, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
+    /* line 80, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
     .categories, .network, .tweets {
       float: left;
       display: block;
@@ -1898,30 +1886,39 @@ a:hover, a:focus {
       /* line 40, /home/ron/.rvm/gems/ruby-2.0.0-p247@gobot.io/gems/neat-1.5.0/app/assets/stylesheets/grid/_span-columns.scss */
       .categories:last-child, .network:last-child, .tweets:last-child {
         margin-right: 0; } }
-  /* line 73, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
+  /* line 87, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
   .categories a, .network a, .tweets a {
     color: black; }
-  /* line 75, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
+    /* line 89, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
+    .categories a:hover, .network a:hover, .tweets a:hover {
+      text-decoration: underline; }
+  /* line 93, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
   .categories h4, .network h4, .tweets h4 {
     color: #fc4c1d;
     font-size: 20px;
     line-height: 24px; }
 
-/* line 80, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
+/* line 101, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
 .categories ul {
   margin: 0;
   list-style: none; }
+  /* line 104, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
+  .categories ul a {
+    color: black; }
+    /* line 106, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
+    .categories ul a:hover {
+      text-decoration: underline; }
 
 @media only screen and (max-width: 400) {
-  /* line 84, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_blog.sass */
+  /* line 114, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
   .twitter-share-button {
     margin-bottom: 10px; } }
-/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_page.sass */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_page.scss */
 .page-title {
   background: #ff7e5b;
   padding: 25px 0;
-  margin: 10px 0 25px 0; }
-  /* line 5, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_page.sass */
+  margin: 10px 0 0 0; }
+  /* line 5, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_page.scss */
   .page-title .title {
     font-family: "Montserrat", sans-serif;
     font-weight: 700;
@@ -1931,7 +1928,7 @@ a:hover, a:focus {
     clear: both;
     opacity: 0.94;
     margin: 0; }
-  /* line 14, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_page.sass */
+  /* line 15, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_page.scss */
   .page-title .subtitle {
     font-family: "Montserrat", sans-serif;
     font-weight: 700;
@@ -1943,7 +1940,41 @@ a:hover, a:focus {
     line-height: 21px;
     margin-top: 7px; }
 
-/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_hardware.sass */
+/* line 31, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_page.scss */
+.subNavfixed {
+  width: 100%;
+  left: 0;
+  position: fixed;
+  top: 0;
+  z-index: 99; }
+
+/* line 39, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_page.scss */
+.marginTopSubnav {
+  padding-top: 65px; }
+
+/* line 44, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_page.scss */
+.subnav_drivers {
+  background: #694f38;
+  padding: 20px 0; }
+  @media only screen and (max-width: 767px) {
+    /* line 44, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_page.scss */
+    .subnav_drivers {
+      display: none; } }
+  /* line 51, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_page.scss */
+  .subnav_drivers nav a {
+    padding: 5px 10px;
+    margin: 20px 10px;
+    color: #ff7e5b; }
+    /* line 55, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_page.scss */
+    .subnav_drivers nav a:hover {
+      color: white;
+      background: #504338; }
+  /* line 60, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_page.scss */
+  .subnav_drivers nav .active {
+    color: white;
+    background: #504338; }
+
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_hardware.scss */
 .more {
   text-align: center;
   width: 50%;
@@ -1952,15 +1983,79 @@ a:hover, a:focus {
   padding: 15px 30px;
   color: #ff7e5b; }
   @media only screen and (max-width: 767px) {
-    /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_hardware.sass */
+    /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_hardware.scss */
     .more {
       width: 100%; } }
 
-/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_documentation.sass */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
 .repository {
   margin-right: 10px; }
 
-/* line 3, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_documentation.sass */
+/* line 7, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+.documentation .intro .info_intro {
+  float: left;
+  width: 60%;
+  margin: 0; }
+  @media only screen and (max-width: 767px) {
+    /* line 7, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+    .documentation .intro .info_intro {
+      width: 100%; } }
+/* line 16, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+.documentation .index {
+  *zoom: 1;
+  max-width: 68em;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 30px; }
+  /* line 18, /home/ron/.rvm/gems/ruby-2.0.0-p247@gobot.io/gems/bourbon-3.1.8/app/assets/stylesheets/addons/_clearfix.scss */
+  .documentation .index:before, .documentation .index:after {
+    content: " ";
+    display: table; }
+  /* line 23, /home/ron/.rvm/gems/ruby-2.0.0-p247@gobot.io/gems/bourbon-3.1.8/app/assets/stylesheets/addons/_clearfix.scss */
+  .documentation .index:after {
+    clear: both; }
+  /* line 19, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+  .documentation .index section {
+    margin: 0 auto;
+    float: left;
+    display: block;
+    margin-right: 2.99668%;
+    width: 29.52859%;
+    background: #694f38;
+    height: 100px;
+    margin-bottom: 20px;
+    border-radius: 5px; }
+    /* line 40, /home/ron/.rvm/gems/ruby-2.0.0-p247@gobot.io/gems/neat-1.5.0/app/assets/stylesheets/grid/_span-columns.scss */
+    .documentation .index section:last-child {
+      margin-right: 0; }
+    @media only screen and (max-width: 767px) {
+      /* line 19, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+      .documentation .index section {
+        float: left;
+        display: block;
+        margin-right: 2.35765%;
+        width: 100%; }
+        /* line 40, /home/ron/.rvm/gems/ruby-2.0.0-p247@gobot.io/gems/neat-1.5.0/app/assets/stylesheets/grid/_span-columns.scss */
+        .documentation .index section:last-child {
+          margin-right: 0; } }
+    /* line 29, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+    .documentation .index section a {
+      width: 100%;
+      height: 100%;
+      padding: 10px;
+      display: block; }
+    /* line 36, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+    .documentation .index section:hover {
+      background: #ff6a42; }
+    /* line 40, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+    .documentation .index section .title {
+      color: #EFECE5;
+      font-weight: bold; }
+    /* line 45, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+    .documentation .index section .description {
+      color: #fafaf1; }
+
+/* line 53, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
 .documentation {
   float: left;
   display: block;
@@ -1969,37 +2064,124 @@ a:hover, a:focus {
   /* line 40, /home/ron/.rvm/gems/ruby-2.0.0-p247@gobot.io/gems/neat-1.5.0/app/assets/stylesheets/grid/_span-columns.scss */
   .documentation:last-child {
     margin-right: 0; }
-  /* line 5, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_documentation.sass */
+  /* line 55, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
   .documentation .index {
     padding: 0 0 0 8px; }
-    /* line 7, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_documentation.sass */
+    /* line 57, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
     .documentation .index li {
       margin: 8px 0; }
-  /* line 9, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_documentation.sass */
+  /* line 61, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
   .documentation .link {
     font-size: 20px; }
-  /* line 11, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_documentation.sass */
+  /* line 64, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
   .documentation .description {
     color: gray;
     font-size: 14px;
     line-height: 21px;
     margin: 10px; }
-  /* line 16, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_documentation.sass */
+  /* line 70, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
   .documentation .display {
-    width: 300px;
+    width: 35%;
     float: right;
     border: 1px solid rgba(255, 126, 91, 0.14);
     margin: 0 0 19px 20px; }
+    @media only screen and (max-width: 767px) {
+      /* line 70, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+      .documentation .display {
+        width: 100%; } }
 
-/* line 21, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_documentation.sass */
+/* line 82, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+.circuit .image_circuit {
+  width: 50%;
+  float: left; }
+  /* line 85, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+  .circuit .image_circuit img {
+    height: 300px; }
+/* line 89, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+.circuit .description_circuit {
+  width: 50%;
+  float: right; }
+
+/* line 96, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+.commands_api h2 {
+  background: #ff7e5b;
+  color: white !important;
+  padding: 5px 10px;
+  font-size: 12pt;
+  margin: 20px 0 0 0; }
+/* line 104, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+.commands_api h4 {
+  background: transparent;
+  font-size: 11pt;
+  font-weight: normal; }
+/* line 109, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+.commands_api h5 {
+  background: white;
+  padding: 10px;
+  margin: 0;
+  font-size: 11pt; }
+/* line 115, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+.commands_api h3 {
+  background: white;
+  padding: 10px;
+  margin: 0;
+  font-size: 11pt;
+  color: #ff7e5b; }
+/* line 122, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+.commands_api pre {
+  background: white;
+  margin: 0; }
+/* line 126, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+.commands_api p, .commands_api ul {
+  background: white;
+  font-size: 10.5pt;
+  margin: 0;
+  padding: 10px;
+  font-family: Inconsolata,Menlo,Monaco,"Bitstream Vera Sans Mono","Courier New",monospace; }
+/* line 133, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+.commands_api li {
+  margin-left: 20px; }
+
+/* line 138, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+.commands {
+  background: white;
+  font-size: 10.5pt; }
+  /* line 141, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+  .commands span {
+    font-family: Inconsolata,Menlo,Monaco,"Bitstream Vera Sans Mono","Courier New",monospace;
+    font-size: 14px;
+    line-height: 21px;
+    background: #fafafa;
+    border: 1px solid #ccc;
+    color: #444;
+    padding: 5px; }
+  /* line 150, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+  .commands th {
+    background: #ff7e5b;
+    color: white; }
+  /* line 154, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+  .commands td {
+    border-bottom: 1px solid #d4d4d4; }
+  /* line 157, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+  .commands .command {
+    font-family: Inconsolata, Menlo, Monaco, "Bitstream Vera Sans Mono", "Courier New", monospace;
+    font-weight: bold;
+    font-size: 11pt; }
+  /* line 164, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+  .commands .param .markdown span {
+    background: none;
+    border: none;
+    padding: 0; }
+
+/* line 173, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
 .clear {
   clear: both; }
 
-/* line 23, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_documentation.sass */
+/* line 177, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
 .image-size-300 {
   width: 200px; }
 
-/* line 26, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_documentation.sass */
+/* line 182, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
 .methods dt {
   font-weight: bold;
   background: white;
@@ -2009,15 +2191,15 @@ a:hover, a:focus {
   font-family: Inconsolata, Menlo, Monaco, "Bitstream Vera Sans Mono", "Courier New", monospace;
   font-size: 17px;
   border: aliceblue; }
-/* line 35, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_documentation.sass */
+/* line 192, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
 .methods dd {
   margin-bottom: 29px;
   padding-left: 10px; }
-/* line 38, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_documentation.sass */
+/* line 196, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
 .methods li {
   font-family: Inconsolata, Menlo, Monaco, "Bitstream Vera Sans Mono", "Courier New", monospace; }
 
-/* line 40, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_documentation.sass */
+/* line 201, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
 .colors {
   float: left;
   display: block;
@@ -2027,7 +2209,7 @@ a:hover, a:focus {
   .colors:last-child {
     margin-right: 0; }
   @media only screen and (min-width: 767px) and (max-width: 964px) {
-    /* line 40, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_documentation.sass */
+    /* line 201, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
     .colors {
       float: left;
       display: block;
@@ -2036,11 +2218,11 @@ a:hover, a:focus {
       /* line 40, /home/ron/.rvm/gems/ruby-2.0.0-p247@gobot.io/gems/neat-1.5.0/app/assets/stylesheets/grid/_span-columns.scss */
       .colors:last-child {
         margin-right: 0; }
-      /* line 44, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_documentation.sass */
+      /* line 205, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
       .colors p {
         font-size: 10px; } }
   @media only screen and (max-width: 767px) {
-    /* line 40, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_documentation.sass */
+    /* line 201, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
     .colors {
       float: left;
       display: block;
@@ -2049,7 +2231,7 @@ a:hover, a:focus {
       /* line 40, /home/ron/.rvm/gems/ruby-2.0.0-p247@gobot.io/gems/neat-1.5.0/app/assets/stylesheets/grid/_span-columns.scss */
       .colors:last-child {
         margin-right: 0; } }
-  /* line 48, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_documentation.sass */
+  /* line 214, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
   .colors dt {
     font-weight: bold;
     padding: 5px;
@@ -2058,16 +2240,16 @@ a:hover, a:focus {
     font-size: 15px;
     border: aliceblue;
     margin-top: 15px; }
-  /* line 56, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_documentation.sass */
+  /* line 223, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
   .colors dd {
     margin-bottom: 20px;
     display: block; }
-    /* line 60, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_documentation.sass */
+    /* line 226, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
     .colors dd p {
       margin: 0;
       line-height: 50px; }
 
-/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .square {
   width: 50px;
   height: 50px;
@@ -2075,566 +2257,566 @@ a:hover, a:focus {
   float: left;
   margin-right: 10px; }
 
-/* line 8, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 9, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .aliceblue {
   background: aliceblue; }
 
-/* line 10, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 13, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .antiquewhite {
   background: antiquewhite; }
 
-/* line 12, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 17, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .aqua {
   background: cyan; }
 
-/* line 14, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 21, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .aquamarine {
   background: aquamarine; }
 
-/* line 16, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 25, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .azure {
   background: azure; }
 
-/* line 18, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 29, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .beige {
   background: beige; }
 
-/* line 20, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 33, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .bisque {
   background: bisque; }
 
-/* line 22, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 37, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .black {
   background: black; }
 
-/* line 24, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 41, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .blanchedalmond {
   background: blanchedalmond; }
 
-/* line 26, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 45, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .blue {
   background: blue; }
 
-/* line 28, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 49, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .blueviolet {
   background: blueviolet; }
 
-/* line 30, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 53, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .brown {
   background: brown; }
 
-/* line 32, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 57, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .burlywood {
   background: burlywood; }
 
-/* line 34, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 61, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .cadetblue {
   background: cadetblue; }
 
-/* line 36, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 65, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .chartreuse {
   background: chartreuse; }
 
-/* line 38, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 69, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .chocolate {
   background: chocolate; }
 
-/* line 40, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 73, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .coral {
   background: coral; }
 
-/* line 42, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 77, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .cornflowerblue {
   background: cornflowerblue; }
 
-/* line 44, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 81, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .cornsilk {
   background: cornsilk; }
 
-/* line 46, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 85, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .crimson {
   background: crimson; }
 
-/* line 48, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 89, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .cyan {
   background: cyan; }
 
-/* line 50, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 93, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .darkblue {
   background: darkblue; }
 
-/* line 52, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 97, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .darkcyan {
   background: darkcyan; }
 
-/* line 54, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 101, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .darkgoldenrod {
   background: darkgoldenrod; }
 
-/* line 56, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 105, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .darkgray {
   background: darkgrey; }
 
-/* line 58, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 109, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .darkgreen {
   background: darkgreen; }
 
-/* line 60, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 113, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .darkkhaki {
   background: darkkhaki; }
 
-/* line 62, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 117, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .darkmagenta {
   background: darkmagenta; }
 
-/* line 64, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 121, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .darkolivegreen {
   background: darkolivegreen; }
 
-/* line 66, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 125, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .darkorange {
   background: darkorange; }
 
-/* line 68, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 129, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .darkorchid {
   background: darkorchid; }
 
-/* line 70, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 133, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .darkred {
   background: darkred; }
 
-/* line 72, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 137, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .darksalmon {
   background: darksalmon; }
 
-/* line 74, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 141, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .darkseagreen {
   background: darkseagreen; }
 
-/* line 76, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 145, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .darkslateblue {
   background: darkslateblue; }
 
-/* line 78, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 149, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .darkslategray {
   background: darkslategrey; }
 
-/* line 80, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 153, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .darkturquoise {
   background: darkturquoise; }
 
-/* line 82, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 157, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .darkviolet {
   background: darkviolet; }
 
-/* line 84, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 161, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .deeppink {
   background: deeppink; }
 
-/* line 86, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 165, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .deepskyblue {
   background: deepskyblue; }
 
-/* line 88, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 169, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .dimgray {
   background: dimgrey; }
 
-/* line 90, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 173, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .dodgerblue {
   background: dodgerblue; }
 
-/* line 92, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 177, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .firebrick {
   background: firebrick; }
 
-/* line 94, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 181, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .floralwhite {
   background: floralwhite; }
 
-/* line 96, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 185, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .forestgreen {
   background: forestgreen; }
 
-/* line 98, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 189, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .fuchsia {
   background: magenta; }
 
-/* line 100, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 193, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .gainsboro {
   background: gainsboro; }
 
-/* line 102, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 197, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .ghostwhite {
   background: ghostwhite; }
 
-/* line 104, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 201, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .gold {
   background: gold; }
 
-/* line 106, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 205, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .goldenrod {
   background: goldenrod; }
 
-/* line 108, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 209, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .gray {
   background: gray; }
 
-/* line 110, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 213, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .green {
   background: green; }
 
-/* line 112, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 217, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .greenyellow {
   background: greenyellow; }
 
-/* line 114, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 221, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .honeydew {
   background: honeydew; }
 
-/* line 116, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 225, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .hotpink {
   background: hotpink; }
 
-/* line 118, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 229, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .indianred {
   background: indianred; }
 
-/* line 120, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 233, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .indigo {
   background: indigo; }
 
-/* line 122, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 237, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .ivory {
   background: ivory; }
 
-/* line 124, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 241, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .khaki {
   background: khaki; }
 
-/* line 126, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 245, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .lavender {
   background: lavender; }
 
-/* line 128, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 249, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .lavenderblush {
   background: lavenderblush; }
 
-/* line 130, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 253, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .lawngreen {
   background: lawngreen; }
 
-/* line 132, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 257, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .lemonchiffon {
   background: lemonchiffon; }
 
-/* line 134, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 261, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .lightblue {
   background: lightblue; }
 
-/* line 136, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 265, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .lightcoral {
   background: lightcoral; }
 
-/* line 138, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 269, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .lightcyan {
   background: lightcyan; }
 
-/* line 140, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 273, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .lightgoldenrodyellow {
   background: lightgoldenrodyellow; }
 
-/* line 142, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 277, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .lightgreen {
   background: lightgreen; }
 
-/* line 144, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 281, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .lightgrey {
   background: lightgrey; }
 
-/* line 146, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 285, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .lightpink {
   background: lightpink; }
 
-/* line 148, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 289, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .lightsalmon {
   background: lightsalmon; }
 
-/* line 150, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 293, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .lightseagreen {
   background: lightseagreen; }
 
-/* line 152, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 297, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .lightskyblue {
   background: lightskyblue; }
 
-/* line 154, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 301, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .lightslategray {
   background: lightslategrey; }
 
-/* line 156, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 305, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .lightsteelblue {
   background: lightsteelblue; }
 
-/* line 158, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 309, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .lightyellow {
   background: lightyellow; }
 
-/* line 160, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 313, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .lime {
   background: lime; }
 
-/* line 162, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 317, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .limegreen {
   background: limegreen; }
 
-/* line 164, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 321, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .linen {
   background: linen; }
 
-/* line 166, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 325, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .magenta {
   background: magenta; }
 
-/* line 168, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 329, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .maroon {
   background: maroon; }
 
-/* line 170, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 333, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .mediumaquamarine {
   background: mediumaquamarine; }
 
-/* line 172, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 337, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .mediumblue {
   background: mediumblue; }
 
-/* line 174, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 341, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .mediumorchid {
   background: mediumorchid; }
 
-/* line 176, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 345, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .mediumpurple {
   background: mediumpurple; }
 
-/* line 178, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 349, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .mediumseagreen {
   background: mediumseagreen; }
 
-/* line 180, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 353, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .mediumslateblue {
   background: mediumslateblue; }
 
-/* line 182, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 357, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .mediumspringgreen {
   background: mediumspringgreen; }
 
-/* line 184, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 361, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .mediumturquoise {
   background: mediumturquoise; }
 
-/* line 186, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 365, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .mediumvioletred {
   background: mediumvioletred; }
 
-/* line 188, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 369, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .midnightblue {
   background: midnightblue; }
 
-/* line 190, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 373, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .mintcream {
   background: mintcream; }
 
-/* line 192, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 377, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .mistyrose {
   background: mistyrose; }
 
-/* line 194, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 381, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .moccasin {
   background: moccasin; }
 
-/* line 196, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 385, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .navajowhite {
   background: navajowhite; }
 
-/* line 198, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 389, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .navy {
   background: navy; }
 
-/* line 200, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 393, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .oldlace {
   background: oldlace; }
 
-/* line 202, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 397, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .olive {
   background: olive; }
 
-/* line 204, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 401, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .olivedrab {
   background: olivedrab; }
 
-/* line 206, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 405, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .orange {
   background: orange; }
 
-/* line 208, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 409, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .orangered {
   background: orangered; }
 
-/* line 210, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 413, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .orchid {
   background: orchid; }
 
-/* line 212, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 417, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .palegoldenrod {
   background: palegoldenrod; }
 
-/* line 214, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 421, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .palegreen {
   background: palegreen; }
 
-/* line 216, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 425, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .paleturquoise {
   background: paleturquoise; }
 
-/* line 218, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 429, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .palevioletred {
   background: palevioletred; }
 
-/* line 220, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 433, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .papayawhip {
   background: papayawhip; }
 
-/* line 222, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 437, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .peachpuff {
   background: peachpuff; }
 
-/* line 224, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 441, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .peru {
   background: peru; }
 
-/* line 226, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 445, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .pink {
   background: pink; }
 
-/* line 228, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 449, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .plum {
   background: plum; }
 
-/* line 230, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 453, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .powderblue {
   background: powderblue; }
 
-/* line 232, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 457, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .purple {
   background: purple; }
 
-/* line 234, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 461, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .red {
   background: red; }
 
-/* line 236, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 465, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .rosybrown {
   background: rosybrown; }
 
-/* line 238, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 469, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .royalblue {
   background: royalblue; }
 
-/* line 240, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 473, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .saddlebrown {
   background: saddlebrown; }
 
-/* line 242, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 477, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .salmon {
   background: salmon; }
 
-/* line 244, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 481, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .sandybrown {
   background: sandybrown; }
 
-/* line 246, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 485, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .seagreen {
   background: seagreen; }
 
-/* line 248, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 489, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .seashell {
   background: seashell; }
 
-/* line 250, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 493, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .sienna {
   background: sienna; }
 
-/* line 252, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 497, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .silver {
   background: silver; }
 
-/* line 254, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 501, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .skyblue {
   background: skyblue; }
 
-/* line 256, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 505, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .slateblue {
   background: slateblue; }
 
-/* line 258, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 509, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .slategray {
   background: slategrey; }
 
-/* line 260, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 513, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .snow {
   background: snow; }
 
-/* line 262, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 517, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .springgreen {
   background: springgreen; }
 
-/* line 264, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 521, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .steelblue {
   background: steelblue; }
 
-/* line 266, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 525, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .tan {
   background: tan; }
 
-/* line 268, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 529, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .teal {
   background: teal; }
 
-/* line 270, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 533, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .thistle {
   background: thistle; }
 
-/* line 272, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 537, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .tomato {
   background: tomato; }
 
-/* line 274, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 541, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .turquoise {
   background: turquoise; }
 
-/* line 276, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 545, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .violet {
   background: violet; }
 
-/* line 278, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 549, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .wheat {
   background: wheat; }
 
-/* line 280, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 553, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .white {
   background: white; }
 
-/* line 282, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 557, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .whitesmoke {
   background: whitesmoke; }
 
-/* line 284, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 561, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .yellow {
   background: yellow; }
 
-/* line 286, /home/ron/Development/gobot/gobot.io/source/stylesheets/elements/_sphero_colors.sass */
+/* line 565, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_sphero_colors.scss */
 .yellowgreen {
   background: yellowgreen; }
 
-/* line 71, /home/ron/Development/gobot/gobot.io/source/stylesheets/style.css.sass */
+/* line 4, /home/ron/Development/gobot/gobot.io/source/stylesheets/style.css.scss */
 .app-logo a {
   margin-top: 10px; }

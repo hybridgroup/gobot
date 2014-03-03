@@ -1,0 +1,320 @@
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta content='width=device-width, initial-scale=1.0' name='viewport'>
+    <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
+    <meta name='description'>
+    <meta name='author'>
+    <title></title>
+    <link href='/stylesheets/style.css' rel='stylesheet'>
+    <script src='//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js'></script>
+    <script src='/javascripts/script.js'></script>
+    <script src='/hybridpages/assets/javascript/subnav.js'></script>
+    <link href='//fonts.googleapis.com/css?family=Inconsolata:400,700|Montserrat:700' rel='stylesheet'>
+    <link href='/favicon.ico' rel='shortcut icon' type='image/gif'>
+  </head>
+  <body>
+    
+    <div class='app'>
+      <div class='w'>
+        <header class='app-header' role='banner'>
+          <div class='display'>
+            <h1 class='app-logo'>
+              <a href='/'>Gobot</a>
+            </h1>
+            <span class='subtitle'>
+              <div class='main'></div>
+            </span>
+          </div>
+          <span class='menu'>
+            <a href="/documentation" class="item">Docs</a>
+            <a href="/documentation/platforms" class="item">Platforms</a>
+            
+            
+            <a class="item" target="blanck" href="https://github.com/hybridgroup/gobot/">Github</a>
+          </span>
+        </header>
+      </div>
+      <div class='container'>
+        /* line 1, ../hybridpages/assets/stylesheets/pygments.scss */
+        .highlight {
+          /* Comment */
+          /* Error */
+          /* Keyword */
+          /* Operator */
+          /* Comment.Multiline */
+          /* Comment.Preproc */
+          /* Comment.Single */
+          /* Comment.Special */
+          /* Generic.Deleted */
+          /* Generic.Emph */
+          /* Generic.Error */
+          /* Generic.Heading */
+          /* Generic.Inserted */
+          /* Generic.Output */
+          /* Generic.Prompt */
+          /* Generic.Strong */
+          /* Generic.Subheading */
+          /* Generic.Traceback */
+          /* Keyword.Constant */
+          /* Keyword.Declaration */
+          /* Keyword.Namespace */
+          /* Keyword.Pseudo */
+          /* Keyword.Reserved */
+          /* Keyword.Type */
+          /* Literal.Number */
+          /* Literal.String */
+          /* Name.Attribute */
+          /* Name.Builtin */
+          /* Name.Class */
+          /* Name.Constant */
+          /* Name.Decorator */
+          /* Name.Entity */
+          /* Name.Exception */
+          /* Name.Function */
+          /* Name.Label */
+          /* Name.Namespace */
+          /* Name.Tag */
+          /* Name.Variable */
+          /* Operator.Word */
+          /* Text.Whitespace */
+          /* Literal.Number.Float */
+          /* Literal.Number.Hex */
+          /* Literal.Number.Integer */
+          /* Literal.Number.Oct */
+          /* Literal.String.Backtick */
+          /* Literal.String.Char */
+          /* Literal.String.Doc */
+          /* Literal.String.Double */
+          /* Literal.String.Escape */
+          /* Literal.String.Heredoc */
+          /* Literal.String.Interpol */
+          /* Literal.String.Other */
+          /* Literal.String.Regex */
+          /* Literal.String.Single */
+          /* Literal.String.Symbol */
+          /* Name.Builtin.Pseudo */
+          /* Name.Variable.Class */
+          /* Name.Variable.Global */
+          /* Name.Variable.Instance */
+          /* Literal.Number.Integer.Long */ }
+          /* line 2, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .hll {
+            background-color: #ffffcc; }
+          /* line 3, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .c {
+            color: #999988;
+            font-style: italic; }
+          /* line 4, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .err {
+            color: #a61717;
+            background-color: #e3d2d2; }
+          /* line 5, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .k {
+            color: #000000;
+            font-weight: bold; }
+          /* line 6, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .o {
+            color: #000000;
+            font-weight: bold; }
+          /* line 7, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .cm {
+            color: #999988;
+            font-style: italic; }
+          /* line 8, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .cp {
+            color: #999999;
+            font-weight: bold;
+            font-style: italic; }
+          /* line 9, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .c1 {
+            color: #999988;
+            font-style: italic; }
+          /* line 10, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .cs {
+            color: #999999;
+            font-weight: bold;
+            font-style: italic; }
+          /* line 11, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .gd {
+            color: #000000;
+            background-color: #ffdddd; }
+          /* line 12, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .ge {
+            color: #000000;
+            font-style: italic; }
+          /* line 13, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .gr {
+            color: #aa0000; }
+          /* line 14, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .gh {
+            color: #999999; }
+          /* line 15, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .gi {
+            color: #000000;
+            background-color: #ddffdd; }
+          /* line 16, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .go {
+            color: #888888; }
+          /* line 17, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .gp {
+            color: #555555; }
+          /* line 18, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .gs {
+            font-weight: bold; }
+          /* line 19, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .gu {
+            color: #aaaaaa; }
+          /* line 20, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .gt {
+            color: #aa0000; }
+          /* line 21, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .kc {
+            color: #000000;
+            font-weight: bold; }
+          /* line 22, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .kd {
+            color: #000000;
+            font-weight: bold; }
+          /* line 23, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .kn {
+            color: #000000;
+            font-weight: bold; }
+          /* line 24, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .kp {
+            color: #000000;
+            font-weight: bold; }
+          /* line 25, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .kr {
+            color: #000000;
+            font-weight: bold; }
+          /* line 26, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .kt {
+            color: #445588;
+            font-weight: bold; }
+          /* line 27, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .m {
+            color: #009999; }
+          /* line 28, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .s {
+            color: #d01040; }
+          /* line 29, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .na {
+            color: teal; }
+          /* line 30, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .nb {
+            color: #0086b3; }
+          /* line 31, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .nc {
+            color: #445588;
+            font-weight: bold; }
+          /* line 32, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .no {
+            color: teal; }
+          /* line 33, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .nd {
+            color: #3c5d5d;
+            font-weight: bold; }
+          /* line 34, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .ni {
+            color: purple; }
+          /* line 35, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .ne {
+            color: #990000;
+            font-weight: bold; }
+          /* line 36, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .nf {
+            color: #990000;
+            font-weight: bold; }
+          /* line 37, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .nl {
+            color: #990000;
+            font-weight: bold; }
+          /* line 38, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .nn {
+            color: #555555; }
+          /* line 39, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .nt {
+            color: navy; }
+          /* line 40, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .nv {
+            color: teal; }
+          /* line 41, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .ow {
+            color: #000000;
+            font-weight: bold; }
+          /* line 42, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .w {
+            color: #bbbbbb; }
+          /* line 43, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .mf {
+            color: #009999; }
+          /* line 44, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .mh {
+            color: #009999; }
+          /* line 45, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .mi {
+            color: #009999; }
+          /* line 46, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .mo {
+            color: #009999; }
+          /* line 47, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .sb {
+            color: #d01040; }
+          /* line 48, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .sc {
+            color: #d01040; }
+          /* line 49, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .sd {
+            color: #d01040; }
+          /* line 50, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .s2 {
+            color: #d01040; }
+          /* line 51, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .se {
+            color: #d01040; }
+          /* line 52, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .sh {
+            color: #d01040; }
+          /* line 53, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .si {
+            color: #d01040; }
+          /* line 54, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .sx {
+            color: #d01040; }
+          /* line 55, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .sr {
+            color: #009926; }
+          /* line 56, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .s1 {
+            color: #d01040; }
+          /* line 57, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .ss {
+            color: #990073; }
+          /* line 58, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .bp {
+            color: #999999; }
+          /* line 59, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .vc {
+            color: teal; }
+          /* line 60, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .vg {
+            color: teal; }
+          /* line 61, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .vi {
+            color: teal; }
+          /* line 62, ../hybridpages/assets/stylesheets/pygments.scss */
+          .highlight .il {
+            color: #009999; }
+      </div>
+    </div>
+    <footer class='app-footer'>
+      <div class='w'>
+        <div class='copyright'>
+          &copy; Copyright 2012-2014
+          <a href='http://hybridgroup.com'>The Hybrid Group.</a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

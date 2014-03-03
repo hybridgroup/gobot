@@ -8,21 +8,46 @@
 <meta name="description">
 <meta content="The Hybrid Group" name="author">
 <title>Gobot - Sphero Driver</title>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><!-- %link{href: "http://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,500,700", rel: "stylesheet", type: "text/css"}/ --><link href="//fonts.googleapis.com/css?family=Inconsolata:400,700%7CMontserrat:700" rel="stylesheet">
 <link href="/stylesheets/style.css" rel="stylesheet">
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><script src="/javascripts/script.js"></script><script src="/hybridpages/assets/javascript/subnav.js"></script><link href="//fonts.googleapis.com/css?family=Inconsolata:400,700%7CMontserrat:700" rel="stylesheet">
 <link href="/favicon.ico" rel="shortcut icon" type="image/gif">
-</head>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+
+  _gaq.push(['_setAccount', "UA-46433484-3"]);
+
+
+
+
+
+
+
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script></head>
 <body>
+    
     <div class="app">
       <div class="w">
         <header class="app-header" role="banner"><div class="display">
             <h1 class="app-logo">
               <a href="/">Gobot</a>
             </h1>
+            <span class="subtitle">
+              <div class="main"></div>
+            </span>
           </div>
           <span class="menu">
             <a href="/documentation" class="item">Docs</a>
-            <a href="/hardware" class="item">Hardware</a>
+            <a href="/documentation/platforms" class="item">Platforms</a>
             
             
             <a class="item" target="blanck" href="https://github.com/hybridgroup/gobot/">Github</a>
@@ -35,13 +60,24 @@
           <h2 class="subtitle">Driver</h2>
         </div>
       </div>
-      <div class="container">
+      <section class="subnav_drivers" id="mainsubnav"><div class="container">
+          <nav><a href="#HowToConnect">How to Connect</a>
+            <a href="#HowToUse">How To Use</a>
+            <a href="#Commands">Commands</a>
+            <a href="#Events">Events</a>
+            <a href="#SpheroColors">Sphero Colors</a>
+            <a href="#Compatability">Compatibility</a>
+            <a href="#top">Top</a>
+          </nav>
+</div>
+      </section><div class="container">
         <div class="main" role="main">
           <section class="content full"><div class="documentation">
-              <section class="intro"><img class="display" src="/images/sphero.jpg"><p>
-                  Allows user to interact with the Sphero robotic sphero using Gobot.
-                </p>
-              </section><section class="how-to"><h2>How to establish a connection and setup the driver</h2>
+              <section class="intro"><img class="display" src="/images/devices/sphero.jpg"><div class="info_intro">
+                  <p>Allows user to interact with the Sphero robotic sphero using Gobot.</p>
+                </div>
+                <div class="clear"></div>
+              </section><section class="how-to" id="HowToConnect"><h2>How To Connect</h2>
                 <p>
                   That is pretty simple once the Sphero is ready (connected and listening), you just need three lines of code and you are set,
                   Gobot and the Sphero driver take care of the rest.
@@ -66,111 +102,7 @@
 ...
 </pre>
                 
-              </section><section class="public-methods"><h2>Commands:</h2>
-                <dl class="methods">
-<dt>abortMacro → (ID code , command number)</dt>
-                  <dd></dd>
-                  <dt>abortOrbBasicProgram</dt>
-                  <dd></dd>
-                  <dt>appendMacroChunck(MACRO Chunk)</dt>
-                  <dd></dd>
-                  <dt>appendOrbBasicFragment(Area, Program Code)</dt>
-                  <dd></dd>
-                  <dt>configureCollisionDetection(Meth,(Xt, Yt),(Xspd, Yspd),Dead)</dt>
-                  <dd>Sets the sphero to detect collisions and report them.</dd>
-                  <dt>configureLocator(flag, x, y, Yaw Tare)</dt>
-                  <dd></dd>
-                  <dt>detectCollisions</dt>
-                  <dd>Sets the sphero to detect collisions and report them.</dd>
-                  <dt>eraseOrbBasicStorage(Area)</dt>
-                  <dd></dd>
-                  <dt>executeOrbBasicProgram(Area, Start Line, Start Line)</dt>
-                  <dd></dd>
-                  <dt>getApplicationConfigurationBlock</dt>
-                  <dd></dd>
-                  <dt>getConfigurationBlock(ID)</dt>
-                  <dd></dd>
-                  <dt>getDeviceMode → (Mode), options: 00h (Normal mode) | 01h (User Hack mode)</dt>
-                  <dd></dd>
-                  <dt>getMacroStatus → (ID code , cmd number, cmd number)</dt>
-                  <dd></dd>
-                  <dt>getPermanentOptionFlags → (FLAGS), options: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 6-31</dt>
-                  <dd></dd>
-                  <dt>getRGB → (red,green,blue) | (color)</dt>
-                  <dd></dd>
-                  <dt>getTemporaryOptionFlags → (FLAGS), options: 0 | 1-31</dt>
-                  <dd></dd>
-                  <dt>reInitializeMacroExecutive</dt>
-                  <dd></dd>
-                  <dt>readLocator → (XPOS, YPOS, XVEL, YVEL, SOG)</dt>
-                  <dd></dd>
-                  <dt>roll(speed, heading, state)</dt>
-                  <dd>This commands Sphero to roll along the provided vector. Both a speed and a heading are required; the latter is considered relative to the last calibrated direction.</dd>
-                  <dt>runMacro(SEQ, DLEN, ID)</dt>
-                  <dd></dd>
-                  <dt>saveMacro(data)</dt>
-                  <dd></dd>
-                  <dt>saveTemporaryMacro(data)</dt>
-                  <dd></dd>
-                  <dt>selfLevel(Options, Angle Limit, Timeout, True Time), options: ((0 | 1 | 2 |3 ), (0 | 1 to 90), (0 | 1 to 255), (0 | 1 to 255)</dt>
-                  <dd></dd>
-                  <dt>setAccelerometerRange(Range Idx), options: 0 | 1 | 2 | 3</dt>
-                  <dd></dd>
-                  <dt>setApplicationConfigurationBlock</dt>
-                  <dd></dd>
-                  <dt>setBackLED(BRIGHT)</dt>
-                  <dd></dd>
-                  <dt>setBoostWithTime(STATE)</dt>
-                  <dd></dd>
-                  <dt>setColor(color)</dt>
-                  <dd>This allows you to set the color of the sphero, just pass an array containing RGB hex or a string with one of the color names of the list.</dd>
-                  <dt>setConfigurationBlock(value)</dt>
-                  <dd></dd>
-                  <dt>setDataStreaming(N, M, MASK, PCNT, MASK2)</dt>
-                  <dd></dd>
-                  <dt>setDeviceMode(MODE)</dt>
-                  <dd></dd>
-                  <dt>setHeading(HEADING)</dt>
-                  <dd></dd>
-                  <dt>setMacroParameter(Param, Val1, Val2)</dt>
-                  <dd></dd>
-                  <dt>setMotionTimeout(TIME)</dt>
-                  <dd></dd>
-                  <dt>setPermanentOptionFlags(FLAGS)</dt>
-                  <dd></dd>
-                  <dt>setRGB(color, persist)</dt>
-                  <dd>This allows you to set the RGB LED color, just pass an array containing RGB hex or a string with one of the color names of the list.</dd>
-                  <dt>setRawMotorValues(L-MODE, L-POWER, R-MODE, R-POWER)</dt>
-                  <dd></dd>
-                  <dt>setRotationRate(RATE)</dt>
-                  <dd></dd>
-                  <dt>setStabalisation(bool)</dt>
-                  <dd></dd>
-                  <dt>setTemporaryOptionFlags(FLAGS)</dt>
-                  <dd></dd>
-                  <dt>stop</dt>
-                  <dd>Stops the sphero.</dd>
-                  <dt>submitValueToInputStatement(VAL)</dt>
-                  <dd></dd>
-                </dl></section><section class="public-events"><h2>Events:</h2>
-                <dl class="methods">
-<dt>update</dt>
-                  <dd>
-                    This event will contain one of the following events.
-                    <br>
-                    You can also subscribe to one of the specific events, if that is the information you are interested in.
-                  </dd>
-                  <dt>collision</dt>
-                  <dd>Gets triggered when the sphero hits something or falls from a step.</dd>
-                  <dt>messages(data)</dt>
-                  <dd>Gets triggered when has a message.</dd>
-                  <dt>notifications(data)</dt>
-                  <dd>Gets triggered when has a notification.</dd>
-                  <dt>connect</dt>
-                  <dd>Opens the connection to Sphero.</dd>
-                  <dt>start</dt>
-                  <dd>Sent when the device has been started and is ready to use.</dd>
-                </dl></section><section class="how-to"><h2>How to use</h2>
+              </section><section class="how-to" id="HowToUse"><h2>How To Use</h2>
                 <p>
                   This example rolls the sphero in a random direction and change direction every 2 seconds.
                   </p>
@@ -207,722 +139,1784 @@ func main() {
 }
 </pre>
                 
-              </section><section><h2>Sphero Colors (R,G,B)</h2>
-                <dl class="colors">
-<dt>aliceblue</dt>
-                  <dd>
-                    <div class="aliceblue square"></div>
-                    <p>(240, 248, 255)</p>
-                  </dd>
-                  <div class="clear"></div>
-                  <dt>antiquewhite</dt>
-                  <dd>
-                    <div class="antiquewhite square"></div>
-                    <p>(250, 235, 215)</p>
-                  </dd>
-                  <dt>aqua</dt>
-                  <dd>
-                    <div class="square aqua"></div>
-                    <p>(0, 255, 255)</p>
-                  </dd>
-                  <dt>aquamarine</dt>
-                  <dd>
-                    <div class="square aquamarine"></div>
-                    <p>(127, 255, 212)</p>
-                  </dd>
-                  <dt>azure</dt>
-                  <dd>
-                    <div class="square azure"></div>
-                    <p>(240, 255, 255)</p>
-                  </dd>
-                  <dt>beige</dt>
-                  <dd>
-                    <div class="square beige"></div>
-                    <p>(245, 245, 220)</p>
-                  </dd>
-                  <dt>bisque</dt>
-                  <dd>
-                    <div class="square bisque"></div>
-                    <p>(255, 228, 196)</p>
-                  </dd>
-                  <dt>black</dt>
-                  <dd>
-                    <div class="square black"></div>
-                    <p>(0, 0, 0)</p>
-                  </dd>
-                  <dt>blanchedalmond</dt>
-                  <dd>
-                    <div class="square blanchedalmond"></div>
-                    <p>(255, 235, 205)</p>
-                  </dd>
-                  <dt>blue</dt>
-                  <dd>
-                    <div class="square blue"></div>
-                    <p>(0, 0, 255)</p>
-                  </dd>
-                  <dt>blueviolet</dt>
-                  <dd>
-                    <div class="square blueviolet"></div>
-                    <p>(138, 43, 226)</p>
-                  </dd>
-                  <dt>brown</dt>
-                  <dd>
-                    <div class="square brown"></div>
-                    <p>(165, 42, 42)</p>
-                  </dd>
-                  <dt>burlywood</dt>
-                  <dd>
-                    <div class="square burlywood"></div>
-                    <p>(222, 184, 135)</p>
-                  </dd>
-                  <dt>cadetblue</dt>
-                  <dd>
-                    <div class="square cadetblue"></div>
-                    <p>(95, 158, 160)</p>
-                  </dd>
-                  <dt>chartreuse</dt>
-                  <dd>
-                    <div class="square chartreuse"></div>
-                    <p>(127, 255, 0)</p>
-                  </dd>
-                  <dt>chocolate</dt>
-                  <dd>
-                    <div class="square chocolate"></div>
-                    <p>(210, 105, 30)</p>
-                  </dd>
-                  <dt>coral</dt>
-                  <dd>
-                    <div class="square coral"></div>
-                    <p>(255, 127, 80)</p>
-                  </dd>
-                  <dt>cornflowerblue</dt>
-                  <dd>
-                    <div class="square cornflowerblue"></div>
-                    <p>(100, 149, 237)</p>
-                  </dd>
-                  <dt>cornsilk</dt>
-                  <dd>
-                    <div class="square cornsilk"></div>
-                    <p>(255, 248, 220)</p>
-                  </dd>
-                  <dt>crimson</dt>
-                  <dd>
-                    <div class="square crimson"></div>
-                    <p>(220, 20, 60)</p>
-                  </dd>
-                  <dt>cyan</dt>
-                  <dd>
-                    <div class="square cyan"></div>
-                    <p>(0, 255, 255)</p>
-                  </dd>
-                  <dt>darkblue</dt>
-                  <dd>
-                    <div class="square darkblue"></div>
-                    <p>(0, 0, 139)</p>
-                  </dd>
-                  <dt>darkcyan</dt>
-                  <dd>
-                    <div class="square darkcyan"></div>
-                    <p>(0, 139, 139)</p>
-                  </dd>
-                  <dt>darkgoldenrod</dt>
-                  <dd>
-                    <div class="square darkgoldenrod"></div>
-                    <p>(184, 134, 11)</p>
-                  </dd>
-                  <dt>darkgray</dt>
-                  <dd>
-                    <div class="square darkgray"></div>
-                    <p>(169, 169, 169)</p>
-                  </dd>
-                  <dt>darkgreen</dt>
-                  <dd>
-                    <div class="square darkgreen"></div>
-                    <p>(0, 100, 0)</p>
-                  </dd>
-                  <dt>darkkhaki</dt>
-                  <dd>
-                    <div class="square darkkhaki"></div>
-                    <p>(189, 183, 107)</p>
-                  </dd>
-                  <dt>darkmagenta</dt>
-                  <dd>
-                    <div class="square darkmagenta"></div>
-                    <p>(139, 0, 139)</p>
-                  </dd>
-                  <dt>darkolivegreen</dt>
-                  <dd>
-                    <div class="square darkolivegreen"></div>
-                    <p>(85, 107, 47)</p>
-                  </dd>
-                  <dt>darkorange</dt>
-                  <dd>
-                    <div class="square darkorange"></div>
-                    <p>(255, 140, 0)</p>
-                  </dd>
-                  <dt>darkorchid</dt>
-                  <dd>
-                    <div class="square darkorchid"></div>
-                    <p>(153, 50, 204)</p>
-                  </dd>
-                  <dt>darkred</dt>
-                  <dd>
-                    <div class="square darkred"></div>
-                    <p>(139, 0, 0)</p>
-                  </dd>
-                  <dt>darksalmon</dt>
-                  <dd>
-                    <div class="square darksalmon"></div>
-                    <p>(233, 150, 122)</p>
-                  </dd>
-                  <dt>darkseagreen</dt>
-                  <dd>
-                    <div class="square darkseagreen"></div>
-                    <p>(143, 188, 143)</p>
-                  </dd>
-                  <dt>darkslateblue</dt>
-                  <dd>
-                    <div class="square darkslateblue"></div>
-                    <p>(72, 61, 139)</p>
-                  </dd>
-                </dl>
-<dl class="colors">
-<dt>darkslategray</dt>
-                  <dd>
-                    <div class="square darkslategray"></div>
-                    <p>(47, 79, 79)</p>
-                  </dd>
-                  <dt>darkturquoise</dt>
-                  <dd>
-                    <div class="square darkturquoise"></div>
-                    <p>(0, 206, 209)</p>
-                  </dd>
-                  <dt>darkviolet</dt>
-                  <dd>
-                    <div class="square darkviolet"></div>
-                    <p>(148, 0, 211)</p>
-                  </dd>
-                  <dt>deeppink</dt>
-                  <dd>
-                    <div class="square deeppink"></div>
-                    <p>(255, 20, 147)</p>
-                  </dd>
-                  <dt>deepskyblue</dt>
-                  <dd>
-                    <div class="square deepskyblue"></div>
-                    <p>(0, 191, 255)</p>
-                  </dd>
-                  <dt>dimgray</dt>
-                  <dd>
-                    <div class="square dimgray"></div>
-                    <p>(105, 105, 105)</p>
-                  </dd>
-                  <dt>dodgerblue</dt>
-                  <dd>
-                    <div class="square dodgerblue"></div>
-                    <p>(30, 144, 255)</p>
-                  </dd>
-                  <dt>firebrick:</dt>
-                  <dd>
-                    <div class="square firebrick"></div>
-                    <p>(178, 34, 34)</p>
-                  </dd>
-                  <dt>floralwhite</dt>
-                  <dd>
-                    <div class="square floralwhite"></div>
-                    <p>(255, 250, 240)</p>
-                  </dd>
-                  <dt>forestgreen</dt>
-                  <dd>
-                    <div class="square forestgreen"></div>
-                    <p>(34, 139, 34)</p>
-                  </dd>
-                  <dt>fuchsia</dt>
-                  <dd>
-                    <div class="square fuchsia"></div>
-                    <p>(255, 0, 255)</p>
-                  </dd>
-                  <dt>gainsboro</dt>
-                  <dd>
-                    <div class="square gainsboro"></div>
-                    <p>(220, 220, 220)</p>
-                  </dd>
-                  <dt>ghostwhite</dt>
-                  <dd>
-                    <div class="square ghostwhite"></div>
-                    <p>(248, 248, 255)</p>
-                  </dd>
-                  <dt>gold</dt>
-                  <dd>
-                    <div class="square gold"></div>
-                    <p>(255, 215, 0)</p>
-                  </dd>
-                  <dt>goldenrod</dt>
-                  <dd>
-                    <div class="square goldenrod"></div>
-                    <p>(218, 165, 32)</p>
-                  </dd>
-                  <dt>gray</dt>
-                  <dd>
-                    <div class="square gray"></div>
-                    <p>(128, 128, 128)</p>
-                  </dd>
-                  <dt>green</dt>
-                  <dd>
-                    <div class="square green"></div>
-                    <p>(0, 128, 0)</p>
-                  </dd>
-                  <dt>greenyellow</dt>
-                  <dd>
-                    <div class="square greenyellow"></div>
-                    <p>(173, 255, 47)</p>
-                  </dd>
-                  <dt>honeydew</dt>
-                  <dd>
-                    <div class="square honeydew"></div>
-                    <p>(240, 255, 240)</p>
-                  </dd>
-                  <dt>hotpink</dt>
-                  <dd>
-                    <div class="square hotpink"></div>
-                    <p>(255, 105, 180)</p>
-                  </dd>
-                  <dt>indianred</dt>
-                  <dd>
-                    <div class="square indianred"></div>
-                    <p>(205, 92, 92)</p>
-                  </dd>
-                  <dt>indigo</dt>
-                  <dd>
-                    <div class="square indigo"></div>
-                    <p>(75, 0, 130)</p>
-                  </dd>
-                  <dt>ivory</dt>
-                  <dd>
-                    <div class="square ivory"></div>
-                    <p>(255, 255, 240)</p>
-                  </dd>
-                  <dt>khaki</dt>
-                  <dd>
-                    <div class="square khaki"></div>
-                    <p>(240, 230, 140)</p>
-                  </dd>
-                  <dt>lavender</dt>
-                  <dd>
-                    <div class="square lavender"></div>
-                    <p>(230, 230, 250)</p>
-                  </dd>
-                  <dt>lavenderblush</dt>
-                  <dd>
-                    <div class="square lavenderblush"></div>
-                    <p>(255, 240, 245)</p>
-                  </dd>
-                  <dt>lawngreen</dt>
-                  <dd>
-                    <div class="square lawngreen"></div>
-                    <p>(124, 252, 0)</p>
-                  </dd>
-                  <dt>lemonchiffon</dt>
-                  <dd>
-                    <div class="square lemonchiffon"></div>
-                    <p>(255, 250, 205)</p>
-                  </dd>
-                  <dt>lightblue</dt>
-                  <dd>
-                    <div class="square lightblue"></div>
-                    <p>(173, 216, 230)</p>
-                  </dd>
-                  <dt>lightcoral</dt>
-                  <dd>
-                    <div class="square lightcoral"></div>
-                    <p>(240, 128, 128)</p>
-                  </dd>
-                  <dt>lightcyan</dt>
-                  <dd>
-                    <div class="square lightcyan"></div>
-                    <p>(224, 255, 255)</p>
-                  </dd>
-                  <dt>lightgoldenrodyellow</dt>
-                  <dd>
-                    <div class="square lightgoldenrodyellow"></div>
-                    <p>(250, 250, 210)</p>
-                  </dd>
-                  <dt>lightgreen</dt>
-                  <dd>
-                    <div class="square lightgreen"></div>
-                    <p>(144, 238, 144)</p>
-                  </dd>
-                  <dt>lightgrey</dt>
-                  <dd>
-                    <div class="square lightgrey"></div>
-                    <p>(211, 211, 211)</p>
-                  </dd>
-                  <dt>lightpink</dt>
-                  <dd>
-                    <div class="square lightpink"></div>
-                    <p>(255, 182, 193)</p>
-                  </dd>
-                </dl>
-<dl class="colors">
-<dt>lightsalmon</dt>
-                  <dd>
-                    <div class="square lightsalmon"></div>
-                    <p>(255, 160, 122)</p>
-                  </dd>
-                  <dt>lightseagreen</dt>
-                  <dd>
-                    <div class="square lightseagreen"></div>
-                    <p>(32, 178, 170)</p>
-                  </dd>
-                  <dt>lightskyblue</dt>
-                  <dd>
-                    <div class="square lightskyblue"></div>
-                    <p>(135, 206, 250)</p>
-                  </dd>
-                  <dt>lightslategray</dt>
-                  <dd>
-                    <div class="square lightslategray"></div>
-                    <p>(119, 136, 153)</p>
-                  </dd>
-                  <dt>lightsteelblue</dt>
-                  <dd>
-                    <div class="square lightsteelblue"></div>
-                    <p>(176, 196, 222)</p>
-                  </dd>
-                  <dt>lightyellow</dt>
-                  <dd>
-                    <div class="square lightyellow"></div>
-                    <p>(255, 255, 224)</p>
-                  </dd>
-                  <dt>lime</dt>
-                  <dd>
-                    <div class="square lime"></div>
-                    <p>(0, 255, 0)</p>
-                  </dd>
-                  <dt>limegreen</dt>
-                  <dd>
-                    <div class="square limegreen"></div>
-                    <p>(50, 205, 50)</p>
-                  </dd>
-                  <dt>linen</dt>
-                  <dd>
-                    <div class="square linen"></div>
-                    <p>(250, 240, 230)</p>
-                  </dd>
-                  <dt>magenta</dt>
-                  <dd>
-                    <div class="square magenta"></div>
-                    <p>(255, 0, 255)</p>
-                  </dd>
-                  <dt>maroon</dt>
-                  <dd>
-                    <div class="square maroon"></div>
-                    <p>(128, 0, 0)</p>
-                  </dd>
-                  <dt>mediumaquamarine</dt>
-                  <dd>
-                    <div class="square mediumaquamarine"></div>
-                    <p>(102, 205, 170)</p>
-                  </dd>
-                  <dt>mediumblue</dt>
-                  <dd>
-                    <div class="square mediumblue"></div>
-                    <p>(0, 0, 205)</p>
-                  </dd>
-                  <dt>mediumorchid</dt>
-                  <dd>
-                    <div class="square mediumorchid"></div>
-                    <p>(186, 85, 211)</p>
-                  </dd>
-                  <dt>mediumpurple</dt>
-                  <dd>
-                    <div class="square mediumpurple"></div>
-                    <p>(147, 112, 219)</p>
-                  </dd>
-                  <dt>mediumseagreen</dt>
-                  <dd>
-                    <div class="square mediumseagreen"></div>
-                    <p>(60, 179, 113)</p>
-                  </dd>
-                  <dt>mediumslateblue</dt>
-                  <dd>
-                    <div class="square mediumslateblue"></div>
-                    <p>(123, 104, 238)</p>
-                  </dd>
-                  <dt>mediumspringgreen</dt>
-                  <dd>
-                    <div class="square mediumspringgreen"></div>
-                    <p>(0, 250, 154)</p>
-                  </dd>
-                  <dt>mediumturquoise</dt>
-                  <dd>
-                    <div class="square mediumturquoise"></div>
-                    <p>(72, 209, 204)</p>
-                  </dd>
-                  <dt>mediumvioletred</dt>
-                  <dd>
-                    <div class="square mediumvioletred"></div>
-                    <p>(199, 21, 133)</p>
-                  </dd>
-                  <dt>midnightblue</dt>
-                  <dd>
-                    <div class="square midnightblue"></div>
-                    <p>(25, 25, 112)</p>
-                  </dd>
-                  <dt>mintcream</dt>
-                  <dd>
-                    <div class="square mintcream"></div>
-                    <p>(245, 255, 250)</p>
-                  </dd>
-                  <dt>mistyrose</dt>
-                  <dd>
-                    <div class="square mistyrose"></div>
-                    <p>(255, 228, 225)</p>
-                  </dd>
-                  <dt>moccasin</dt>
-                  <dd>
-                    <div class="square moccasin"></div>
-                    <p>(255, 228, 181)</p>
-                  </dd>
-                  <dt>navajowhite</dt>
-                  <dd>
-                    <div class="square navajowhite"></div>
-                    <p>(255, 222, 173)</p>
-                  </dd>
-                  <dt>navy</dt>
-                  <dd>
-                    <div class="square navy"></div>
-                    <p>(0, 0, 128)</p>
-                  </dd>
-                  <dt>oldlace</dt>
-                  <dd>
-                    <div class="square oldlace"></div>
-                    <p>(253, 245, 230)</p>
-                  </dd>
-                  <dt>olive</dt>
-                  <dd>
-                    <div class="square olive"></div>
-                    <p>(128, 128, 0)</p>
-                  </dd>
-                  <dt>olivedrab</dt>
-                  <dd>
-                    <div class="square olivedrab"></div>
-                    <p>(107, 142, 35)</p>
-                  </dd>
-                  <dt>orange</dt>
-                  <dd>
-                    <div class="square orange"></div>
-                    <p>(255, 165, 0)</p>
-                  </dd>
-                  <dt>orangered</dt>
-                  <dd>
-                    <div class="square orangered"></div>
-                    <p>(255, 69, 0)</p>
-                  </dd>
-                  <dt>orchid</dt>
-                  <dd>
-                    <div class="square orchid"></div>
-                    <p>(218, 112, 214)</p>
-                  </dd>
-                  <dt>palegoldenrod</dt>
-                  <dd>
-                    <div class="square palegoldenrod"></div>
-                    <p>(238, 232, 170)</p>
-                  </dd>
-                  <dt>palegreen</dt>
-                  <dd>
-                    <div class="square palegreen"></div>
-                    <p>(152, 251, 152)</p>
-                  </dd>
-                  <dt>paleturquoise</dt>
-                  <dd>
-                    <div class="square paleturquoise"></div>
-                    <p>(175, 238, 238)</p>
-                  </dd>
-                </dl>
-<dl class="colors">
-<dt>palevioletred</dt>
-                  <dd>
-                    <div class="square palevioletred"></div>
-                    <p>(219, 112, 147)</p>
-                  </dd>
-                  <dt>papayawhip</dt>
-                  <dd>
-                    <div class="square papayawhip"></div>
-                    <p>(255, 239, 213)</p>
-                  </dd>
-                  <dt>peachpuff</dt>
-                  <dd>
-                    <div class="square peachpuff"></div>
-                    <p>(255, 218, 185)</p>
-                  </dd>
-                  <dt>peru</dt>
-                  <dd>
-                    <div class="square peru"></div>
-                    <p>(205, 133, 63)</p>
-                  </dd>
-                  <dt>pink</dt>
-                  <dd>
-                    <div class="square pink"></div>
-                    <p>(255, 192, 203)</p>
-                  </dd>
-                  <dt>plum</dt>
-                  <dd>
-                    <div class="square plum"></div>
-                    <p>(221, 160, 221)</p>
-                  </dd>
-                  <dt>powderblue</dt>
-                  <dd>
-                    <div class="square powderblue"></div>
-                    <p>(176, 224, 230)</p>
-                  </dd>
-                  <dt>purple</dt>
-                  <dd>
-                    <div class="square purple"></div>
-                    <p>(128, 0, 128)</p>
-                  </dd>
-                  <dt>red</dt>
-                  <dd>
-                    <div class="square red"></div>
-                    <p>(255, 0, 0)</p>
-                  </dd>
-                  <dt>rosybrown</dt>
-                  <dd>
-                    <div class="square rosybrown"></div>
-                    <p>(188, 143, 143)</p>
-                  </dd>
-                  <dt>royalblue</dt>
-                  <dd>
-                    <div class="square royalblue"></div>
-                    <p>(65, 105, 225)</p>
-                  </dd>
-                  <dt>saddlebrown</dt>
-                  <dd>
-                    <div class="square saddlebrown"></div>
-                    <p>(139, 69, 19)</p>
-                  </dd>
-                  <dt>salmon</dt>
-                  <dd>
-                    <div class="square salmon"></div>
-                    <p>(250, 128, 114)</p>
-                  </dd>
-                  <dt>sandybrown</dt>
-                  <dd>
-                    <div class="square sandybrown"></div>
-                    <p>(244, 164, 96)</p>
-                  </dd>
-                  <dt>seagreen</dt>
-                  <dd>
-                    <div class="square seagreen"></div>
-                    <p>(46, 139, 87)</p>
-                  </dd>
-                  <dt>seashell</dt>
-                  <dd>
-                    <div class="square seashell"></div>
-                    <p>(255, 245, 238)</p>
-                  </dd>
-                  <dt>sienna</dt>
-                  <dd>
-                    <div class="square sienna"></div>
-                    <p>(160, 82, 45)</p>
-                  </dd>
-                  <dt>silver</dt>
-                  <dd>
-                    <div class="square silver"></div>
-                    <p>(192, 192, 192)</p>
-                  </dd>
-                  <dt>skyblue</dt>
-                  <dd>
-                    <div class="square skyblue"></div>
-                    <p>(135, 206, 235)</p>
-                  </dd>
-                  <dt>slateblue</dt>
-                  <dd>
-                    <div class="square slateblue"></div>
-                    <p>(106, 90, 205)</p>
-                  </dd>
-                  <dt>slategray</dt>
-                  <dd>
-                    <div class="square slategray"></div>
-                    <p>(112, 128, 144)</p>
-                  </dd>
-                  <dt>snow</dt>
-                  <dd>
-                    <div class="square snow"></div>
-                    <p>(255, 250, 250)</p>
-                  </dd>
-                  <dt>springgreen</dt>
-                  <dd>
-                    <div class="square springgreen"></div>
-                    <p>(0, 255, 127)</p>
-                  </dd>
-                  <dt>steelblue</dt>
-                  <dd>
-                    <div class="square steelblue"></div>
-                    <p>(70, 130, 180)</p>
-                  </dd>
-                  <dt>tan</dt>
-                  <dd>
-                    <div class="square tan"></div>
-                    <p>(210, 180, 140)</p>
-                  </dd>
-                  <dt>teal</dt>
-                  <dd>
-                    <div class="square teal"></div>
-                    <p>(0, 128, 128)</p>
-                  </dd>
-                  <dt>thistle</dt>
-                  <dd>
-                    <div class="square thistle"></div>
-                    <p>(216, 191, 216)</p>
-                  </dd>
-                  <dt>tomato</dt>
-                  <dd>
-                    <div class="square tomato"></div>
-                    <p>(255, 99, 71)</p>
-                  </dd>
-                  <dt>turquoise</dt>
-                  <dd>
-                    <div class="square turquoise"></div>
-                    <p>(64, 224, 208)</p>
-                  </dd>
-                  <dt>violet</dt>
-                  <dd>
-                    <div class="square violet"></div>
-                    <p>(238, 130, 238)</p>
-                  </dd>
-                  <dt>wheat</dt>
-                  <dd>
-                    <div class="square wheat"></div>
-                    <p>(245, 222, 179)</p>
-                  </dd>
-                  <dt>white</dt>
-                  <dd>
-                    <div class="square white"></div>
-                    <p>(255, 255, 255)</p>
-                  </dd>
-                  <dt>whitesmoke</dt>
-                  <dd>
-                    <div class="square whitesmoke"></div>
-                    <p>(245, 245, 245)</p>
-                  </dd>
-                  <dt>yellow</dt>
-                  <dd>
-                    <div class="square yellow"></div>
-                    <p>(255, 255, 0)</p>
-                  </dd>
-                  <dt>yellowgreen</dt>
-                  <dd>
-                    <div class="square yellowgreen"></div>
-                    <p>(154, 205, 50)</p>
-                  </dd>
-                  <div class="clear"></div>
-                </dl></section><div class="clear"></div>
-              <section class="compatability hardware"><h2>Works with:</h2>
+              </section><section class="public-methods"><div class="commands_api" id="Commands">
+                  <h1 id="commands">Commands</h1>
+                  
+                  <h2 id="abortmacro">abortMacro</h2>
+                  
+                  <p>This command aborts any executing macro, and returns both it's ID code
+                  and the command number currently in progress.</p>
+                  
+                  <h5 id="returns">Returns</h5>
+                  
+                  <p>an array containing the ID code and command number.</p>
+                  
+                  <h2 id="abortorbbasicprogram">abortOrbBasicProgram</h2>
+                  
+                  <p>Aborts execution of any currently-running orbBasic program.</p>
+                  
+                  <h5 id="returns-1">Returns</h5>
+                  
+                  <p>`null</p>
+                  
+                  <h2 id="appendmacrochunckchunk">appendMacroChunck(chunk)</h2>
+                  
+                  <p>Stores an attached macro definition into a temporary RAM buffer for
+                  later execution. It's similar to the <code>saveTemporaryMacro</code> function, but allows
+                  you to build up a longer temporary macros.</p>
+                  
+                  <h5 id="params">Params</h5>
+                  
+                  <ul>
+<li>
+<strong>chunk</strong> - macro definition to be executed later. Will throw an
+                  error if any larger than 254 bytes.</li>
+                  </ul>
+<h5 id="returns-2">Returns</h5>
+                  
+                  <p>a boolean indicating whether or not the macro could be packeted.</p>
+                  
+                  <h2 id="appendorbbasicfragmentarea-programcode">appendOrbBasicFragment(area, programCode)</h2>
+                  
+                  <p>Appends a fragment of an orbBasic program to a buffer that will be
+                  written to the Sphero eventually.</p>
+                  
+                  <h5 id="params-1">Params</h5>
+                  
+                  <ul>
+<li>
+<strong>area</strong> - value to start buffer with</li>
+                    <li>
+<strong>fragment</strong> - fragment of orbBasic to be sent to the Sphero. Will throw an
+                  error if larger than 253 bytes</li>
+                  </ul>
+<h5 id="returns-3">Returns</h5>
+                  
+                  <p>a boolean indicating whether or not the fragment could be packeted</p>
+                  
+                  <h2 id="configurecollisiondetectionmethod-thresholdx-thresholdy-speedx-speedy-deadtime">configureCollisionDetection(method, thresholdX, thresholdY, speedX, speedY, deadTime)</h2>
+                  
+                  <p>Internal: Configures collision detection on the Sphero, using the provided
+                  params to decide what constitutes a 'collision'.</p>
+                  
+                  <h5 id="params-2">Params</h5>
+                  
+                  <ul>
+<li>
+<strong>method</strong> - detection method to use. Pass <code>0x01</code> to enable collision detection</li>
+                    <li>
+<strong>thresholdX</strong> - an 8-bit settable threshold for the X axis of the Sphero.
+                  A setting of <code>0x00</code> disables the contribution of this axis</li>
+                    <li>
+<strong>thresholdY</strong> - an 8-bit settable threshold for the Y axis of the Sphero.
+                  A setting of <code>0x00</code> disables the contribution of this aYis</li>
+                    <li>
+<strong>speedX</strong> - an 8-bit settable speed value for the X speed. This is ranged,
+                  then added to <code>thresholdX</code> to generate the final threshold value.</li>
+                    <li>
+<strong>speedY</strong> - an 8-bit settable speed value for the Y speed. This is ranged,
+                  then added to <code>thresholdY</code> to generate the final threshold value.</li>
+                    <li>
+<strong>deadTime</strong> - an 8-bit post-collision dead time to prevent re-triggering of
+                  the collision event. Specified in 10ms increments</li>
+                  </ul>
+<h5 id="returns-4">Returns</h5>
+                  
+                  <p>a boolean whether or not the packet to be sent to the Sphero has been built successfully</p>
+                  
+                  <h2 id="configurelocatorflag-x-y-yawtare">configureLocator(flag, x, y, yawTare)</h2>
+                  
+                  <p>Through the streaming interface, Sphero provides real-time location
+                  data in the form of X, Y coordinates on the ground plane.</p>
+                  
+                  <h5 id="params-3">Params</h5>
+                  
+                  <ul>
+<li>
+<strong>flag</strong> - number (0-1), determines whether the calibrate commands automatically set the
+                  yaw tare value.</li>
+                    <li>
+<strong>y</strong> - set the current X coordinates of Sphero on the ground plane in
+                  centimeters.</li>
+                    <li>
+<strong>x</strong> - set the current Y coordinates of Sphero on the ground plane in
+                  centimeters.</li>
+                    <li>
+<strong>yawTare</strong> - (0-359) value for the orientation the Sphero should use after
+                  calibration.</li>
+                  </ul>
+<h5 id="returns-5">Returns</h5>
+                  
+                  <p>a boolean whether or not the packet to be sent to the Sphero has beenbuilt successfully</p>
+                  
+                  <h2 id="detectcollisions">detectCollisions</h2>
+                  
+                  <p>Enables collision detection for the Sphero. When the Sphero detects
+                  a collision, it will emit the <code>collision</code> event.</p>
+                  
+                  <p>Shortcut method to <code>configureCollisionDetection</code> so you don't have to deal
+                  with setting it up manually.</p>
+                  
+                  <h5 id="returns-6">Returns</h5>
+                  
+                  <p><code>nil</code></p>
+                  
+                  <h2 id="eraseorbbasicstoragearea">eraseOrbBasicStorage(area)</h2>
+                  
+                  <p>Internal: This erases any existing program in the specified storage area.
+                  Specify 00h for the temporary RAM buffer or 01h for the persistent storage area.</p>
+                  
+                  <h5 id="params-4">Params</h5>
+                  
+                  <ul>
+<li>
+<strong>area</strong> - which buffer should be erased, <code>0x00</code> for the temporary RAM buffer or
+                  <code>0x01</code> for the persistent storage area</li>
+                  </ul>
+<h5 id="returns-7">Returns</h5>
+                  
+                  <p><code>nil</code></p>
+                  
+                  <h2 id="executeorbbasicprogramarea-start-line-start-line">executeOrbBasicProgram(Area, Start Line, Start Line)</h2>
+                  
+                  <p>This attempts to run a program in the specified storage area beginning
+                  at the specified line number. This command will fail if there is already
+                  an orbBasic program executing.</p>
+                  
+                  <h5 id="params-5">Params</h5>
+                  
+                  <ul>
+<li>
+<strong>area</strong> - params</li>
+                    <li>
+<strong>startLine</strong> - params</li>
+                  </ul>
+<h5 id="returns-8">Returns</h5>
+                  
+                  <p><code>nil</code></p>
+                  
+                  <h2 id="getapplicationconfigurationblock">getApplicationConfigurationBlock</h2>
+                  
+                  <p>This allows you to retrieve the application configuration block that
+                  is set aside for exclusive use by applications.</p>
+                  
+                  <h5 id="returns-9">Returns</h5>
+                  
+                  <p><code>nil</code></p>
+                  
+                  <h2 id="getconfigurationblockid">getConfigurationBlock(ID)</h2>
+                  
+                  <p>This command retrieves one of the configuration blocks.</p>
+                  
+                  <h5 id="params-6">Params</h5>
+                  
+                  <ul>
+<li>
+<strong>id</strong> - params</li>
+                  </ul>
+<h5 id="returns-10">Returns</h5>
+                  
+                  <p><code>nil</code></p>
+                  
+                  <h2 id="getdevicemode">getDeviceMode</h2>
+                  
+                  <p>Gets the operation mode of Sphero based on the supplied mode value.</p>
+                  
+                  <h5 id="returns-11">Returns</h5>
+                  
+                  <p><code>00h (Normal mode) or 01h (User Hack mode)</code></p>
+                  
+                  <h2 id="getmacrostatus">getMacroStatus</h2>
+                  
+                  <p>This command returns the ID code and command number of the currently
+                  executing macro.</p>
+                  
+                  <h5 id="returns-12">Returns</h5>
+                  
+                  <p><code>(ID code, cmd number, cmd number)</code></p>
+                  
+                  <h2 id="getpermanentoptionflags">getPermanentOptionFlags()</h2>
+                  
+                  <p>This command returns the ID code and command number of the currently
+                  executing macro.</p>
+                  
+                  <h5 id="returns-13">Returns</h5>
+                  
+                  <p>an array of option flags</p>
+                  
+                  <h2 id="getrgbc">GetRGBC</h2>
+                  
+                  <p>This retrieves the "user LED color" which is stored in the config
+                  block.</p>
+                  
+                  <h5 id="returns-14">Returns</h5>
+                  
+                  <p>the sphero's LED color</p>
+                  
+                  <h2 id="gettemporaryoptionflags">getTemporaryOptionFlags</h2>
+                  
+                  <p>Returns the temporary option flags.</p>
+                  
+                  <h5 id="returns-15">Returns</h5>
+                  
+                  <p>FLAGS</p>
+                  
+                  <h2 id="reinitializemacroexecutive">reInitializeMacroExecutive</h2>
+                  
+                  <p>This terminates any running macro and reinitializes the macro system.</p>
+                  
+                  <h5 id="returns-16">Returns</h5>
+                  
+                  <p><code>nil</code></p>
+                  
+                  <h2 id="readlocator">readLocator</h2>
+                  
+                  <p>This reads Sphero's current position (X,Y), component velocities and
+                  SOG (speed over ground).</p>
+                  
+                  <h5 id="returns-17">Returns</h5>
+                  
+                  <p><code>(XPOS, YPOS, XVEL, YVEL, SOG)</code></p>
+                  
+                  <h2 id="rollcspeed-heading">RollC(speed, heading)</h2>
+                  
+                  <p>This commands Sphero to roll along the provided vector. Both a speed
+                  and a heading are required; the latter is considered relative to the last
+                  calibrated direction.</p>
+                  
+                  <h5 id="params-7">Params</h5>
+                  
+                  <ul>
+<li>
+<strong>speed</strong> - params</li>
+                    <li>
+<strong>heading</strong> - params</li>
+                  </ul>
+<h5 id="returns-18">Returns</h5>
+                  
+                  <p><code>nil</code></p>
+                  
+                  <h2 id="runmacroseq-dlen-id">runMacro(SEQ, DLEN, ID)</h2>
+                  
+                  <p>This attempts to execute the specified macro.</p>
+                  
+                  <h5 id="params-8">Params</h5>
+                  
+                  <ul>
+<li>
+<strong>seq</strong> - params</li>
+                    <li>
+<strong>dLen</strong> - params</li>
+                    <li>
+<strong>id</strong> - params</li>
+                  </ul>
+<h5 id="returns-19">Returns</h5>
+                  
+                  <p><code>nil</code></p>
+                  
+                  <h2 id="savemacrodata">saveMacro(data)</h2>
+                  
+                  <p>This stores the attached macro definition into the persistent store
+                  for later execution.</p>
+                  
+                  <h5 id="params-9">Params</h5>
+                  
+                  <ul>
+<li>
+<strong>data</strong> - params</li>
+                  </ul>
+<h5 id="returns-20">Returns</h5>
+                  
+                  <p><code>nil</code></p>
+                  
+                  <h2 id="savetemporarymacrodata">saveTemporaryMacro(data)</h2>
+                  
+                  <p>This command controls the self level routine.</p>
+                  
+                  <h5 id="params-10">Params</h5>
+                  
+                  <ul>
+<li>
+<strong>options</strong> - params</li>
+                    <li>
+<strong>angleLimit</strong> - params</li>
+                    <li>
+<strong>timeout</strong> - params</li>
+                    <li>
+<strong>trueTime</strong> - params</li>
+                  </ul>
+<h5 id="returns-21">Returns</h5>
+                  
+                  <p>options: <code>array</code> [(0 , 1 , 2 ,3 ), (0 , 1 to 90), (0 , 1 to 255), (0 , 1 to 255)].</p>
+                  
+                  <h2 id="selfleveloptions-angle-limit-timeout-true-time-options-0--1--2-3--0--1-to-90-0--1-to-255-0--1-to-255">selfLevel(Options, Angle Limit, Timeout, True Time), options: ((0 | 1 | 2 |3 ), (0 | 1 to 90), (0 | 1 to 255), (0 | 1 to 255)</h2>
+                  
+                  <p>This command controls the self level routine.</p>
+                  
+                  <h5 id="params-11">Params</h5>
+                  
+                  <ul>
+<li>
+<strong>range</strong> - params</li>
+                  </ul>
+<h5 id="returns-22">Returns</h5>
+                  
+                  <p><code>integer</code> opt: 0 , 1 , 2 , 3.</p>
+                  
+                  <h2 id="setaccelerometerrangerange-idx-options-0--1--2--3">setAccelerometerRange(Range Idx), options: 0 | 1 | 2 | 3</h2>
+                  
+                  <h2 id="setapplicationconfigurationblock">setApplicationConfigurationBlock</h2>
+                  
+                  <h2 id="setbackledclevel">SetBackLEDC(level)</h2>
+                  
+                  <p>This allows you to control the brightness of the back LED. The value does
+                  not persist across power cycles.</p>
+                  
+                  <h5 id="params-12">Params</h5>
+                  
+                  <ul>
+<li>
+<strong>level</strong> - params</li>
+                  </ul>
+<h5 id="returns-23">Returns</h5>
+                  
+                  <p><code>nil</code></p>
+                  
+                  <h2 id="setboostwithtimestate">setBoostWithTime(STATE)</h2>
+                  
+                  <p>setBoostWithTime(state)</p>
+                  
+                  <h5 id="params-13">Params</h5>
+                  
+                  <ul>
+<li>
+<strong>state</strong> - params</li>
+                  </ul>
+<h5 id="returns-24">Returns</h5>
+                  
+                  <p><code>nil</code></p>
+                  
+                  <h2 id="setcolorcolor">setColor(color)</h2>
+                  
+                  <p>Allows for convenient setting of the Sphero's color using a hex value
+                  or a color name string</p>
+                  
+                  <h5 id="params-14">Params</h5>
+                  
+                  <ul>
+<li>
+<strong>color</strong> - hex number (<code>0xFF1500</code>) or string color name to set the Sphero
+                  to</li>
+                    <li>
+<strong>persist</strong> - boolean, whether or not the color should persist. Defaults to
+                  <code>true</code>
+</li>
+                  </ul>
+<h5 id="returns-25">Returns</h5>
+                  
+                  <p><code>nil</code></p>
+                  
+                  <h2 id="setrandomcolor">setRandomColor</h2>
+                  
+                  <p>Changes the Sphero to a random color.</p>
+                  
+                  <h5 id="params-15">Params</h5>
+                  
+                  <ul>
+<li>
+<strong>persist</strong> - boolean, whether or not the color should persist. Defaults to
+                  <code>true</code>
+</li>
+                  </ul>
+<h5 id="returns-26">Returns</h5>
+                  
+                  <p><code>nil</code></p>
+                  
+                  <h2 id="setconfigurationblockvalue">setConfigurationBlock(value)</h2>
+                  
+                  <p>This command accepts an exact copy of the configuration block and
+                  loads it into the RAM copy of the configuration block.</p>
+                  
+                  <h5 id="params-16">Params</h5>
+                  
+                  <ul>
+<li>
+<strong>value</strong> - params</li>
+                  </ul>
+<h5 id="returns-27">Returns</h5>
+                  
+                  <p><code>nil</code></p>
+                  
+                  <h2 id="setdatastreamingn-m-mask-pcnt-mask2">setDataStreaming(N, M, MASK, PCNT, MASK2)</h2>
+                  
+                  <p>Sphero supports asynchronous data streaming of certain control system and sensor parameters.</p>
+                  
+                  <h5 id="params-17">Params</h5>
+                  
+                  <ul>
+<li>
+<strong>n</strong> - params</li>
+                    <li>
+<strong>m</strong> -params</li>
+                    <li>
+<strong>mask</strong> - params</li>
+                    <li>
+<strong>pcnt</strong> - params</li>
+                    <li>
+<em>*mask2</em>+ - params</li>
+                  </ul>
+<h5 id="returns-28">Returns</h5>
+                  
+                  <p><code>nil</code></p>
+                  
+                  <h2 id="setdevicemodemode">setDeviceMode(MODE)</h2>
+                  
+                  <p>Assigns the operation mode of Sphero based on the supplied mode value.</p>
+                  
+                  <h5 id="params-18">Params</h5>
+                  
+                  <ul>
+<li>
+<em>*mode</em>+ - params</li>
+                  </ul>
+<h5 id="returns-29">Returns</h5>
+                  
+                  <p><code>nil</code></p>
+                  
+                  <h2 id="setheadingcheading">SetHeadingC(heading)</h2>
+                  
+                  <p>This allows the smartphone client to adjust the orientation of Sphero
+                  by commanding a new reference heading in degrees, which ranges from 0 to 359.</p>
+                  
+                  <h5 id="params-19">Params</h5>
+                  
+                  <ul>
+<li>
+<strong>heading</strong> - params</li>
+                  </ul>
+<h5 id="returns-30">Returns</h5>
+                  
+                  <p><code>nil</code></p>
+                  
+                  <h2 id="setmacroparameterparam-val1-val2">setMacroParameter(Param, Val1, Val2)</h2>
+                  
+                  <p>This command allows system globals that influence certain macro
+                  commands to be selectively altered from outside of the macro system itself.</p>
+                  
+                  <h5 id="params-20">Params</h5>
+                  
+                  <ul>
+<li>
+<strong>param</strong> - params</li>
+                    <li>
+<strong>val1</strong> - params</li>
+                    <li>
+<strong>val2</strong> - params</li>
+                  </ul>
+<h5 id="returns-31">Returns</h5>
+                  
+                  <p><code>nil</code></p>
+                  
+                  <h2 id="setmotiontimeouttime">setMotionTimeout(TIME)</h2>
+                  
+                  <p>This sets the ultimate timeout for the last motion command to keep
+                  Sphero from rolling away in the case of a crashed (or paused) client app.</p>
+                  
+                  <h5 id="params-21">Params</h5>
+                  
+                  <ul>
+<li>
+<strong>time</strong> - params</li>
+                  </ul>
+<h5 id="returns-32">Returns</h5>
+                  
+                  <p><code>nil</code></p>
+                  
+                  <h2 id="setpermanentoptionflagsflags">setPermanentOptionFlags(FLAGS)</h2>
+                  
+                  <p>Assigns the permanent option flags to the provided value and writes them
+                  immediately to the config block for persistence across power cycles.</p>
+                  
+                  <ul>
+<li>
+<strong>flags</strong> - params</li>
+                  </ul>
+<h5 id="returns-33">Returns</h5>
+                  
+                  <p><code>nil</code></p>
+                  
+                  <h2 id="setrgbcr-g-b">SetRGBC(r, g, b)</h2>
+                  
+                  <p>Allows for convenient setting of the Sphero's color using a hex value
+                  or a color name string</p>
+                  
+                  <h5 id="params-22">Params</h5>
+                  
+                  <ul>
+<li>
+<strong>r</strong> -red value</li>
+                    <li>
+<strong>g</strong> -green value</li>
+                    <li>
+<strong>b</strong> - blue value</li>
+                  </ul>
+<h5 id="returns-34">Returns</h5>
+                  
+                  <p><code>nil</code></p>
+                  
+                  <h2 id="setrawmotorvaluesl-mode-l-power-r-mode-r-power">setRawMotorValues(L-MODE, L-POWER, R-MODE, R-POWER)</h2>
+                  
+                  <p>This allows you to take over one or both of the motor output values,
+                  instead of having the stabilization system control them.</p>
+                  
+                  <h5 id="params-23">Params</h5>
+                  
+                  <ul>
+<li>
+<strong>lMode</strong> - params</li>
+                    <li>
+<strong>lPower</strong> - params</li>
+                    <li>
+<strong>rMode</strong> - params</li>
+                    <li>
+<strong>rPower</strong> - params</li>
+                  </ul>
+<h5 id="returns-35">Returns</h5>
+                  
+                  <p><code>nil</code></p>
+                  
+                  <h2 id="setrotationraterate">setRotationRate(RATE)</h2>
+                  
+                  <p>Sets the rotation rate of the Sphero</p>
+                  
+                  <h5 id="params-24">Params</h5>
+                  
+                  <ul>
+<li>
+<strong>rate</strong> - params</li>
+                  </ul>
+<h5 id="returns-36">Returns</h5>
+                  
+                  <p><code>nil</code></p>
+                  
+                  <h2 id="setstabilizationcon">SetStabilizationC(on)</h2>
+                  
+                  <p>Sets whether the Sphero should have stabilization enabled</p>
+                  
+                  <ul>
+<li>
+<strong>on</strong> - whether or not the sphero should have stabilization</li>
+                  </ul>
+<h5 id="returns-37">Returns</h5>
+                  
+                  <p><code>nil</code></p>
+                  
+                  <h2 id="settemporaryoptionflagsflags">setTemporaryOptionFlags(FLAGS)</h2>
+                  
+                  <p>Assigns the temporary option flags to the provided value. These do not
+                  persist across a power cycle. See below for the bit definitions.</p>
+                  
+                  <h5 id="params-25">Params</h5>
+                  
+                  <ul>
+<li>
+<em>*flags</em>+ - params</li>
+                  </ul>
+<h5 id="returns-38">Returns</h5>
+                  
+                  <p><code>nil</code></p>
+                  
+                  <h2 id="stopc">StopC</h2>
+                  
+                  <p>Stops the Sphero from rolling around.</p>
+                  
+                  <h5 id="returns-39">Returns</h5>
+                  
+                  <p><code>nil</code></p>
+                  
+                  <h2 id="submitvaluetoinputstatementval">submitValueToInputStatement(VAL)</h2>
+                  
+                  <p>This takes the place of the typical user console in orbBasic and allows a
+                  user to answer an input request.</p>
+                  
+                  <h5 id="params-26">Params</h5>
+                  
+                  <ul>
+<li>
+<strong>val</strong> - params</li>
+                  </ul>
+<h5 id="returns-40">Returns</h5>
+                  
+                  <p><code>nil</code></p>
+                </div>
+                <div class="commands_api" id="Events">
+                  <h1 id="events">Events</h1>
+                  
+                  <h2 id="update">update</h2>
+                  
+                  <p>This is a meta-event that will be triggered when any of the other events are. If
+                  you're looking for specific information, you might wish to subscribe to one of
+                  the specific events instead.</p>
+                  
+                  <h2 id="collision">collision</h2>
+                  
+                  <p>Assuming that collision detection has been enabled, gets emitted when the sphero
+                  hits something, falls from a step, or otherwise detects a collision.</p>
+                  
+                  <h2 id="messagesdata">messages(data)</h2>
+                  
+                  <p>Gets triggered when the Sphero has data to send to the user.</p>
+                  
+                  <h2 id="notificationsdata">notifications(data)</h2>
+                  
+                  <p>Gets triggered when the Sphero has a notification to send to the user.</p>
+                  
+                  <h2 id="connect">connect</h2>
+                  
+                  <p>Gets triggered when the connection to the Sphero over Bluetooth has been opened.</p>
+                  
+                  <h2 id="start">start</h2>
+                  
+                  <p>Gets triggered when the Sphero is started and ready to be used.</p>
+                </div>
+              </section><section id="SpheroColors"><h2>Sphero Colors (R,G,B)</h2>
+                <table class="commands">
+<tr>
+<th>Example</th>
+                    <th>Name</th>
+                    <th>Code</th>
+                    <th>Example</th>
+                    <th>Name</th>
+                    <th>Code</th>
+                  </tr>
+<tr>
+<td>
+                      <div class="aliceblue square"></div>
+                    </td>
+                    <td class="command">
+                      <span>aliceblue</span>
+                    </td>
+                    <td>(240, 248, 255)</td>
+                    <td>
+                      <div class="antiquewhite square"></div>
+                    </td>
+                    <td class="command">
+                      <span>antiquewhite</span>
+                    </td>
+                    <td>(250, 235, 215)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square aqua"></div>
+                    </td>
+                    <td class="command">
+                      <span>aqua</span>
+                    </td>
+                    <td>(0, 255, 255)</td>
+                    <td>
+                      <div class="square aquamarine"></div>
+                    </td>
+                    <td class="command">
+                      <span>aquamarine</span>
+                    </td>
+                    <td>(127, 255, 212)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square azure"></div>
+                    </td>
+                    <td class="command">
+                      <span>azure</span>
+                    </td>
+                    <td>(240, 255, 255)</td>
+                    <td>
+                      <div class="square beige"></div>
+                    </td>
+                    <td class="command">
+                      <span>beige</span>
+                    </td>
+                    <td>(245, 245, 220)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square bisque"></div>
+                    </td>
+                    <td class="command">
+                      <span>bisque</span>
+                    </td>
+                    <td>(255, 228, 196)</td>
+                    <td>
+                      <div class="square black"></div>
+                    </td>
+                    <td class="command">
+                      <span>black</span>
+                    </td>
+                    <td>(0, 0, 0)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square blanchedalmond"></div>
+                    </td>
+                    <td class="command">
+                      <span>blanchedalmond</span>
+                    </td>
+                    <td>(255, 235, 205)</td>
+                    <td>
+                      <div class="square blue"></div>
+                    </td>
+                    <td class="command">
+                      <span>blue</span>
+                    </td>
+                    <td>(0, 0, 255)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square blueviolet"></div>
+                    </td>
+                    <td class="command">
+                      <span>blueviolet</span>
+                    </td>
+                    <td>(138, 43, 226)</td>
+                    <td>
+                      <div class="square brown"></div>
+                    </td>
+                    <td class="command">
+                      <span>brown</span>
+                    </td>
+                    <td>(165, 42, 42)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square burlywood"></div>
+                    </td>
+                    <td class="command">
+                      <span>burlywood</span>
+                    </td>
+                    <td>(222, 184, 135)</td>
+                    <td>
+                      <div class="square cadetblue"></div>
+                    </td>
+                    <td class="command">
+                      <span>cadetblue</span>
+                    </td>
+                    <td>(95, 158, 160)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square chartreuse"></div>
+                    </td>
+                    <td class="command">
+                      <span>chartreuse</span>
+                    </td>
+                    <td>(127, 255, 0)</td>
+                    <td>
+                      <div class="square chocolate"></div>
+                    </td>
+                    <td class="command">
+                      <span>chocolate</span>
+                    </td>
+                    <td>(210, 105, 30)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square coral"></div>
+                    </td>
+                    <td class="command">
+                      <span>coral</span>
+                    </td>
+                    <td>(255, 127, 80)</td>
+                    <td>
+                      <div class="square cornflowerblue"></div>
+                    </td>
+                    <td class="command">
+                      <span>cornflowerblue</span>
+                    </td>
+                    <td>(100, 149, 237)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square cornsilk"></div>
+                    </td>
+                    <td class="command">
+                      <span>cornsilk</span>
+                    </td>
+                    <td>(255, 248, 220)</td>
+                    <td>
+                      <div class="square crimson"></div>
+                    </td>
+                    <td class="command">
+                      <span>crimson</span>
+                    </td>
+                    <td>(220, 20, 60)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square cyan"></div>
+                    </td>
+                    <td class="command">
+                      <span>cyan</span>
+                    </td>
+                    <td>(0, 255, 255)</td>
+                    <td>
+                      <div class="square darkblue"></div>
+                    </td>
+                    <td class="command">
+                      <span>darkblue</span>
+                    </td>
+                    <td>(0, 0, 139)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square darkcyan"></div>
+                    </td>
+                    <td class="command">
+                      <span>darkcyan</span>
+                    </td>
+                    <td>(0, 139, 139)</td>
+                    <td>
+                      <div class="square darkgoldenrod"></div>
+                    </td>
+                    <td class="command">
+                      <span>darkgoldenrod</span>
+                    </td>
+                    <td>(184, 134, 11)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square darkgray"></div>
+                    </td>
+                    <td class="command">
+                      <span>darkgray</span>
+                    </td>
+                    <td>(169, 169, 169)</td>
+                    <td>
+                      <div class="square darkgreen"></div>
+                    </td>
+                    <td class="command">
+                      <span>darkgreen</span>
+                    </td>
+                    <td>(0, 100, 0)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square darkkhaki"></div>
+                    </td>
+                    <td class="command">
+                      <span>darkkhaki</span>
+                    </td>
+                    <td>(189, 183, 107)</td>
+                    <td>
+                      <div class="square darkmagenta"></div>
+                    </td>
+                    <td class="command">
+                      <span>darkmagenta</span>
+                    </td>
+                    <td>(139, 0, 139)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square darkolivegreen"></div>
+                    </td>
+                    <td class="command">
+                      <span>darkolivegreen</span>
+                    </td>
+                    <td>(85, 107, 47)</td>
+                    <td>
+                      <div class="square darkorange"></div>
+                    </td>
+                    <td class="command">
+                      <span>darkorange</span>
+                    </td>
+                    <td>(255, 140, 0)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square darkorchid"></div>
+                    </td>
+                    <td class="command">
+                      <span>darkorchid</span>
+                    </td>
+                    <td>(153, 50, 204)</td>
+                    <td>
+                      <div class="square darkred"></div>
+                    </td>
+                    <td class="command">
+                      <span>darkred</span>
+                    </td>
+                    <td>(139, 0, 0)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square darksalmon"></div>
+                    </td>
+                    <td class="command">
+                      <span>darksalmon</span>
+                    </td>
+                    <td>(233, 150, 122)</td>
+                    <td>
+                      <div class="square darkseagreen"></div>
+                    </td>
+                    <td class="command">
+                      <span>darkseagreen</span>
+                    </td>
+                    <td>(143, 188, 143)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square darkslateblue"></div>
+                    </td>
+                    <td class="command">
+                      <span>darkslateblue</span>
+                    </td>
+                    <td>(72, 61, 139)</td>
+                    <td>
+                      <div class="square darkslategray"></div>
+                    </td>
+                    <td class="command">
+                      <span>darkslategray</span>
+                    </td>
+                    <td>(47, 79, 79)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square darkturquoise"></div>
+                    </td>
+                    <td class="command">
+                      <span>darkturquoise</span>
+                    </td>
+                    <td>(0, 206, 209)</td>
+                    <td>
+                      <div class="square darkviolet"></div>
+                    </td>
+                    <td class="command">
+                      <span>darkviolet</span>
+                    </td>
+                    <td>(148, 0, 211)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square deeppink"></div>
+                    </td>
+                    <td class="command">
+                      <span>deeppink</span>
+                    </td>
+                    <td>(255, 20, 147)</td>
+                    <td>
+                      <div class="square deepskyblue"></div>
+                    </td>
+                    <td class="command">
+                      <span>deepskyblue</span>
+                    </td>
+                    <td>(0, 191, 255)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square dimgray"></div>
+                    </td>
+                    <td class="command">
+                      <span>dimgray</span>
+                    </td>
+                    <td>(105, 105, 105)</td>
+                    <td>
+                      <div class="square dodgerblue"></div>
+                    </td>
+                    <td class="command">
+                      <span>dodgerblue</span>
+                    </td>
+                    <td>(30, 144, 255)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square firebrick"></div>
+                    </td>
+                    <td class="command">
+                      <span>firebrick</span>
+                    </td>
+                    <td>(178, 34, 34)</td>
+                    <td>
+                      <div class="square floralwhite"></div>
+                    </td>
+                    <td class="command">
+                      <span>floralwhite</span>
+                    </td>
+                    <td>(255, 250, 240)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square forestgreen"></div>
+                    </td>
+                    <td class="command">
+                      <span>forestgreen</span>
+                    </td>
+                    <td>(34, 139, 34)</td>
+                    <td>
+                      <div class="square fuchsia"></div>
+                    </td>
+                    <td class="command">
+                      <span>fuchsia</span>
+                    </td>
+                    <td>(255, 0, 255)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square gainsboro"></div>
+                    </td>
+                    <td class="command">
+                      <span>gainsboro</span>
+                    </td>
+                    <td>(220, 220, 220)</td>
+                    <td>
+                      <div class="square ghostwhite"></div>
+                    </td>
+                    <td class="command">
+                      <span>ghostwhite</span>
+                    </td>
+                    <td>(248, 248, 255)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square gold"></div>
+                    </td>
+                    <td class="command">
+                      <span>gold</span>
+                    </td>
+                    <td>(255, 215, 0)</td>
+                    <td>
+                      <div class="square goldenrod"></div>
+                    </td>
+                    <td class="command">
+                      <span>goldenrod</span>
+                    </td>
+                    <td>(218, 165, 32)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square gray"></div>
+                    </td>
+                    <td class="command">
+                      <span>gray</span>
+                    </td>
+                    <td>(128, 128, 128)</td>
+                    <td>
+                      <div class="square green"></div>
+                    </td>
+                    <td class="command">
+                      <span>green</span>
+                    </td>
+                    <td>(0, 128, 0)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square greenyellow"></div>
+                    </td>
+                    <td class="command">
+                      <span>greenyellow</span>
+                    </td>
+                    <td>(173, 255, 47)</td>
+                    <td>
+                      <div class="square honeydew"></div>
+                    </td>
+                    <td class="command">
+                      <span>honeydew</span>
+                    </td>
+                    <td>(240, 255, 240)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square hotpink"></div>
+                    </td>
+                    <td class="command">
+                      <span>hotpink</span>
+                    </td>
+                    <td>(255, 105, 180)</td>
+                    <td>
+                      <div class="square indianred"></div>
+                    </td>
+                    <td class="command">
+                      <span>indianred</span>
+                    </td>
+                    <td>(205, 92, 92)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square indigo"></div>
+                    </td>
+                    <td class="command">
+                      <span>indigo</span>
+                    </td>
+                    <td>(75, 0, 130)</td>
+                    <td>
+                      <div class="square ivory"></div>
+                    </td>
+                    <td class="command">
+                      <span>ivory</span>
+                    </td>
+                    <td>(255, 255, 240)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square khaki"></div>
+                    </td>
+                    <td class="command">
+                      <span>khaki</span>
+                    </td>
+                    <td>(240, 230, 140)</td>
+                    <td>
+                      <div class="square lavender"></div>
+                    </td>
+                    <td class="command">
+                      <span>lavender</span>
+                    </td>
+                    <td>(230, 230, 250)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square lavenderblush"></div>
+                    </td>
+                    <td class="command">
+                      <span>lavenderblush</span>
+                    </td>
+                    <td>(255, 240, 245)</td>
+                    <td>
+                      <div class="square lawngreen"></div>
+                    </td>
+                    <td class="command">
+                      <span>lawngreen</span>
+                    </td>
+                    <td>(124, 252, 0)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square lemonchiffon"></div>
+                    </td>
+                    <td class="command">
+                      <span>lemonchiffon</span>
+                    </td>
+                    <td>(255, 250, 205)</td>
+                    <td>
+                      <div class="square lightblue"></div>
+                    </td>
+                    <td class="command">
+                      <span>lightblue</span>
+                    </td>
+                    <td>(173, 216, 230)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square lightcoral"></div>
+                    </td>
+                    <td class="command">
+                      <span>lightcoral</span>
+                    </td>
+                    <td>(240, 128, 128)</td>
+                    <td>
+                      <div class="square lightcyan"></div>
+                    </td>
+                    <td class="command">
+                      <span>lightcyan</span>
+                    </td>
+                    <td>(224, 255, 255)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square lightgoldenrodyellow"></div>
+                    </td>
+                    <td class="command">
+                      <span>lightgoldenrodyellow</span>
+                    </td>
+                    <td>(250, 250, 210)</td>
+                    <td>
+                      <div class="square lightgreen"></div>
+                    </td>
+                    <td class="command">
+                      <span>lightgreen</span>
+                    </td>
+                    <td>(144, 238, 144)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square lightgrey"></div>
+                    </td>
+                    <td class="command">
+                      <span>lightgrey</span>
+                    </td>
+                    <td>(211, 211, 211)</td>
+                    <td>
+                      <div class="square lightpink"></div>
+                    </td>
+                    <td class="command">
+                      <span>lightpink</span>
+                    </td>
+                    <td>(255, 182, 193)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square lightsalmon"></div>
+                    </td>
+                    <td class="command">
+                      <span>lightsalmon</span>
+                    </td>
+                    <td>(255, 160, 122)</td>
+                    <td>
+                      <div class="square lightseagreen"></div>
+                    </td>
+                    <td class="command">
+                      <span>lightseagreen</span>
+                    </td>
+                    <td>(32, 178, 170)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square lightskyblue"></div>
+                    </td>
+                    <td class="command">
+                      <span>lightskyblue</span>
+                    </td>
+                    <td>(135, 206, 250)</td>
+                    <td>
+                      <div class="square lightslategray"></div>
+                    </td>
+                    <td class="command">
+                      <span>lightslategray</span>
+                    </td>
+                    <td>(119, 136, 153)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square lightsteelblue"></div>
+                    </td>
+                    <td class="command">
+                      <span>lightsteelblue</span>
+                    </td>
+                    <td>(176, 196, 222)</td>
+                    <td>
+                      <div class="square lightyellow"></div>
+                    </td>
+                    <td class="command">
+                      <span>lightyellow</span>
+                    </td>
+                    <td>(255, 255, 224)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square lime"></div>
+                    </td>
+                    <td class="command">
+                      <span>lime</span>
+                    </td>
+                    <td>(0, 255, 0)</td>
+                    <td>
+                      <div class="square limegreen"></div>
+                    </td>
+                    <td class="command">
+                      <span>limegreen</span>
+                    </td>
+                    <td>(50, 205, 50)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square linen"></div>
+                    </td>
+                    <td class="command">
+                      <span>linen</span>
+                    </td>
+                    <td>(250, 240, 230)</td>
+                    <td>
+                      <div class="square magenta"></div>
+                    </td>
+                    <td class="command">
+                      <span>magenta</span>
+                    </td>
+                    <td>(255, 0, 255)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square maroon"></div>
+                    </td>
+                    <td class="command">
+                      <span>maroon</span>
+                    </td>
+                    <td>(128, 0, 0)</td>
+                    <td>
+                      <div class="square mediumaquamarine"></div>
+                    </td>
+                    <td class="command">
+                      <span>mediumaquamarine</span>
+                    </td>
+                    <td>(102, 205, 170)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square mediumblue"></div>
+                    </td>
+                    <td class="command">
+                      <span>mediumblue</span>
+                    </td>
+                    <td>(0, 0, 205)</td>
+                    <td>
+                      <div class="square mediumorchid"></div>
+                    </td>
+                    <td class="command">
+                      <span>mediumorchid</span>
+                    </td>
+                    <td>(186, 85, 211)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square mediumpurple"></div>
+                    </td>
+                    <td class="command">
+                      <span>mediumpurple</span>
+                    </td>
+                    <td>(147, 112, 219)</td>
+                    <td>
+                      <div class="square mediumseagreen"></div>
+                    </td>
+                    <td class="command">
+                      <span>mediumseagreen</span>
+                    </td>
+                    <td>(60, 179, 113)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square mediumslateblue"></div>
+                    </td>
+                    <td class="command">
+                      <span>mediumslateblue</span>
+                    </td>
+                    <td>(123, 104, 238)</td>
+                    <td>
+                      <div class="square mediumspringgreen"></div>
+                    </td>
+                    <td class="command">
+                      <span>mediumspringgreen</span>
+                    </td>
+                    <td>(0, 250, 154)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square mediumturquoise"></div>
+                    </td>
+                    <td class="command">
+                      <span>mediumturquoise</span>
+                    </td>
+                    <td>(72, 209, 204)</td>
+                    <td>
+                      <div class="square mediumvioletred"></div>
+                    </td>
+                    <td class="command">
+                      <span>mediumvioletred</span>
+                    </td>
+                    <td>(199, 21, 133)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square midnightblue"></div>
+                    </td>
+                    <td class="command">
+                      <span>midnightblue</span>
+                    </td>
+                    <td>(25, 25, 112)</td>
+                    <td>
+                      <div class="square mintcream"></div>
+                    </td>
+                    <td class="command">
+                      <span>mintcream</span>
+                    </td>
+                    <td>(245, 255, 250)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square mistyrose"></div>
+                    </td>
+                    <td class="command">
+                      <span>mistyrose</span>
+                    </td>
+                    <td>(255, 228, 225)</td>
+                    <td>
+                      <div class="square moccasin"></div>
+                    </td>
+                    <td class="command">
+                      <span>moccasin</span>
+                    </td>
+                    <td>(255, 228, 181)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square navajowhite"></div>
+                    </td>
+                    <td class="command">
+                      <span>navajowhite</span>
+                    </td>
+                    <td>(255, 222, 173)</td>
+                    <td>
+                      <div class="square navy"></div>
+                    </td>
+                    <td class="command">
+                      <span>navy</span>
+                    </td>
+                    <td>(0, 0, 128)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square oldlace"></div>
+                    </td>
+                    <td class="command">
+                      <span>oldlace</span>
+                    </td>
+                    <td>(253, 245, 230)</td>
+                    <td>
+                      <div class="square olive"></div>
+                    </td>
+                    <td class="command">
+                      <span>olive</span>
+                    </td>
+                    <td>(128, 128, 0)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square olivedrab"></div>
+                    </td>
+                    <td class="command">
+                      <span>olivedrab</span>
+                    </td>
+                    <td>(107, 142, 35)</td>
+                    <td>
+                      <div class="square orange"></div>
+                    </td>
+                    <td class="command">
+                      <span>orange</span>
+                    </td>
+                    <td>(255, 165, 0)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square orangered"></div>
+                    </td>
+                    <td class="command">
+                      <span>orangered</span>
+                    </td>
+                    <td>(255, 69, 0)</td>
+                    <td>
+                      <div class="square orchid"></div>
+                    </td>
+                    <td class="command">
+                      <span>orchid</span>
+                    </td>
+                    <td>(218, 112, 214)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square palegoldenrod"></div>
+                    </td>
+                    <td class="command">
+                      <span>palegoldenrod</span>
+                    </td>
+                    <td>(238, 232, 170)</td>
+                    <td>
+                      <div class="square palegreen"></div>
+                    </td>
+                    <td class="command">
+                      <span>palegreen</span>
+                    </td>
+                    <td>(152, 251, 152)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square paleturquoise"></div>
+                    </td>
+                    <td class="command">
+                      <span>paleturquoise</span>
+                    </td>
+                    <td>(175, 238, 238)</td>
+                    <td>
+                      <div class="square palevioletred"></div>
+                    </td>
+                    <td class="command">
+                      <span>palevioletred</span>
+                    </td>
+                    <td>(219, 112, 147)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square papayawhip"></div>
+                    </td>
+                    <td class="command">
+                      <span>papayawhip</span>
+                    </td>
+                    <td>(255, 239, 213)</td>
+                    <td>
+                      <div class="square peachpuff"></div>
+                    </td>
+                    <td class="command">
+                      <span>peachpuff</span>
+                    </td>
+                    <td>(255, 218, 185)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square peru"></div>
+                    </td>
+                    <td class="command">
+                      <span>peru</span>
+                    </td>
+                    <td>(205, 133, 63)</td>
+                    <td>
+                      <div class="square pink"></div>
+                    </td>
+                    <td class="command">
+                      <span>pink</span>
+                    </td>
+                    <td>(255, 192, 203)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square plum"></div>
+                    </td>
+                    <td class="command">
+                      <span>plum</span>
+                    </td>
+                    <td>(221, 160, 221)</td>
+                    <td>
+                      <div class="square powderblue"></div>
+                    </td>
+                    <td class="command">
+                      <span>powderblue</span>
+                    </td>
+                    <td>(176, 224, 230)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square purple"></div>
+                    </td>
+                    <td class="command">
+                      <span>purple</span>
+                    </td>
+                    <td>(128, 0, 128)</td>
+                    <td>
+                      <div class="square red"></div>
+                    </td>
+                    <td class="command">
+                      <span>red</span>
+                    </td>
+                    <td>(255, 0, 0)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square rosybrown"></div>
+                    </td>
+                    <td class="command">
+                      <span>rosybrown</span>
+                    </td>
+                    <td>(188, 143, 143)</td>
+                    <td>
+                      <div class="square royalblue"></div>
+                    </td>
+                    <td class="command">
+                      <span>royalblue</span>
+                    </td>
+                    <td>(65, 105, 225)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square saddlebrown"></div>
+                    </td>
+                    <td class="command">
+                      <span>saddlebrown</span>
+                    </td>
+                    <td>(139, 69, 19)</td>
+                    <td>
+                      <div class="square salmon"></div>
+                    </td>
+                    <td class="command">
+                      <span>salmon</span>
+                    </td>
+                    <td>(250, 128, 114)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square sandybrown"></div>
+                    </td>
+                    <td class="command">
+                      <span>sandybrown</span>
+                    </td>
+                    <td>(244, 164, 96)</td>
+                    <td>
+                      <div class="square seagreen"></div>
+                    </td>
+                    <td class="command">
+                      <span>seagreen</span>
+                    </td>
+                    <td>(46, 139, 87)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square seashell"></div>
+                    </td>
+                    <td class="command">
+                      <span>seashell</span>
+                    </td>
+                    <td>(255, 245, 238)</td>
+                    <td>
+                      <div class="square sienna"></div>
+                    </td>
+                    <td class="command">
+                      <span>sienna</span>
+                    </td>
+                    <td>(160, 82, 45)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square silver"></div>
+                    </td>
+                    <td class="command">
+                      <span>silver</span>
+                    </td>
+                    <td>(192, 192, 192)</td>
+                    <td>
+                      <div class="square skyblue"></div>
+                    </td>
+                    <td class="command">
+                      <span>skyblue</span>
+                    </td>
+                    <td>(135, 206, 235)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square slateblue"></div>
+                    </td>
+                    <td class="command">
+                      <span>slateblue</span>
+                    </td>
+                    <td>(106, 90, 205)</td>
+                    <td>
+                      <div class="square slategray"></div>
+                    </td>
+                    <td class="command">
+                      <span>slategray</span>
+                    </td>
+                    <td>(112, 128, 144)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square snow"></div>
+                    </td>
+                    <td class="command">
+                      <span>snow</span>
+                    </td>
+                    <td>(255, 250, 250)</td>
+                    <td>
+                      <div class="square springgreen"></div>
+                    </td>
+                    <td class="command">
+                      <span>springgreen</span>
+                    </td>
+                    <td>(0, 255, 127)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square steelblue"></div>
+                    </td>
+                    <td class="command">
+                      <span>steelblue</span>
+                    </td>
+                    <td>(70, 130, 180)</td>
+                    <td>
+                      <div class="square tan"></div>
+                    </td>
+                    <td class="command">
+                      <span>tan</span>
+                    </td>
+                    <td>(210, 180, 140)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square teal"></div>
+                    </td>
+                    <td class="command">
+                      <span>teal</span>
+                    </td>
+                    <td>(0, 128, 128)</td>
+                    <td>
+                      <div class="square thistle"></div>
+                    </td>
+                    <td class="command">
+                      <span>thistle</span>
+                    </td>
+                    <td>(216, 191, 216)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square tomato"></div>
+                    </td>
+                    <td class="command">
+                      <span>tomato</span>
+                    </td>
+                    <td>(255, 99, 71)</td>
+                    <td>
+                      <div class="square turquoise"></div>
+                    </td>
+                    <td class="command">
+                      <span>turquoise</span>
+                    </td>
+                    <td>(64, 224, 208)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square violet"></div>
+                    </td>
+                    <td class="command">
+                      <span>violet</span>
+                    </td>
+                    <td>(238, 130, 238)</td>
+                    <td>
+                      <div class="square wheat"></div>
+                    </td>
+                    <td class="command">
+                      <span>wheat</span>
+                    </td>
+                    <td>(245, 222, 179)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square white"></div>
+                    </td>
+                    <td class="command">
+                      <span>white</span>
+                    </td>
+                    <td>(255, 255, 255)</td>
+                    <td>
+                      <div class="square whitesmoke"></div>
+                    </td>
+                    <td class="command">
+                      <span>whitesmoke</span>
+                    </td>
+                    <td>(245, 245, 245)</td>
+                  </tr>
+<tr>
+<td>
+                      <div class="square yellow"></div>
+                    </td>
+                    <td class="command">
+                      <span>yellow</span>
+                    </td>
+                    <td>(255, 255, 0)</td>
+                    <td>
+                      <div class="square yellowgreen"></div>
+                    </td>
+                    <td class="command">
+                      <span>yellowgreen</span>
+                    </td>
+                    <td>(154, 205, 50)</td>
+                  </tr>
+</table></section><section class="compatability hardware"><h2>Works with:</h2>
                 
                 <div class="devices">
+                  <!-- /Platforms All -->
+                  <!-- /Platforms Parts -->
+                  <!-- // Sphero -->
                   <a class="device" href="/documentation/platforms/sphero" title="Sphero">
-                    <img src="/images/sphero.jpg"></a>
+                    <img src="/images/devices/sphero.jpg"></a>
                 </div>
               </section>
 </div>
@@ -936,14 +1930,6 @@ func main() {
           <a href="http://hybridgroup.com">The Hybrid Group.</a>
         </div>
       </div>
-    </footer><script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-      
-      ga('create', 'UA-46433484-3', 'gobot.io');
-      ga('send', 'pageview');
-    </script>
+    </footer>
 </body>
 </html>

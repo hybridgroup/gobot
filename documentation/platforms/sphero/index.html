@@ -8,21 +8,46 @@
 <meta name="description">
 <meta content="The Hybrid Group" name="author">
 <title>Sphero with Gobot</title>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><!-- %link{href: "http://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,500,700", rel: "stylesheet", type: "text/css"}/ --><link href="//fonts.googleapis.com/css?family=Inconsolata:400,700%7CMontserrat:700" rel="stylesheet">
 <link href="/stylesheets/style.css" rel="stylesheet">
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><script src="/javascripts/script.js"></script><script src="/hybridpages/assets/javascript/subnav.js"></script><link href="//fonts.googleapis.com/css?family=Inconsolata:400,700%7CMontserrat:700" rel="stylesheet">
 <link href="/favicon.ico" rel="shortcut icon" type="image/gif">
-</head>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+
+  _gaq.push(['_setAccount', "UA-46433484-3"]);
+
+
+
+
+
+
+
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script></head>
 <body>
+    
     <div class="app">
       <div class="w">
         <header class="app-header" role="banner"><div class="display">
             <h1 class="app-logo">
               <a href="/">Gobot</a>
             </h1>
+            <span class="subtitle">
+              <div class="main"></div>
+            </span>
           </div>
           <span class="menu">
             <a href="/documentation" class="item">Docs</a>
-            <a href="/hardware" class="item">Hardware</a>
+            <a href="/documentation/platforms" class="item">Platforms</a>
             
             
             <a class="item" target="blanck" href="https://github.com/hybridgroup/gobot/">Github</a>
@@ -37,30 +62,41 @@
 </h2>
         </div>
       </div>
-      <div class="container">
+      <section class="subnav_drivers" id="mainsubnav"><div class="container">
+          <nav><a href="#HowToInstall">How To Install</a>
+            <a href="#HowToUse">How To Use</a>
+            <a href="#HowToConnect">How To Connect</a>
+            <a href="#Drivers">Drivers</a>
+            <a href="#top">Top</a>
+          </nav>
+</div>
+      </section><div class="container">
         <div class="main" role="main">
           <section class="content full"><div class="documentation">
-              <section class="intro"><img class="display" src="/images/sphero.jpg"><h3>What is Sphero?</h3>
-                <p>
-                  Sphero is a sophisticated and programmable robot housed in a polycarbonate sphere shell.
-                </p>
-                <p>
-                  The gobot-sphero adaptor makes it easy to interact with Sphero using Go, once you have your Sphero setup and connected to your computer
-                  you can start writing code to make Sphero move, change direction, speed and colors, or detect Sphero events and execute some
-                  code when they occur.
-                </p>
-                <h3>Where can I get a Sphero or find more info about it?</h3>
-                <p>
-                  You can do it by following this link
-                  <a target="_blank" href="http://www.gosphero.com/">GoSphero.</a>
-                </p>
-              </section><section class="how-to"><h2>How to install</h2>
+              <section class="intro"><img class="display" src="/images/devices/sphero.jpg"><div class="info_intro">
+                  <h4>What is Sphero?</h4>
+                  <p>
+                    Sphero is a sophisticated and programmable robot housed in a polycarbonate sphere shell.
+                  </p>
+                  <p>
+                    The gobot-sphero adaptor makes it easy to interact with Sphero using Go, once you have your Sphero setup and connected to your computer
+                    you can start writing code to make Sphero move, change direction, speed and colors, or detect Sphero events and execute some
+                    code when they occur.
+                  </p>
+                  <h4>Where can I get a Sphero or find more info about it?</h4>
+                  <p>
+                    You can do it by following this link
+                    <a target="_blank" href="http://www.gosphero.com/">GoSphero.</a>
+                  </p>
+                </div>
+                <div class="clear"></div>
+              </section><section class="how-to" id="HowToInstall"><h2>How To Install</h2>
                 <p>
                   Installing Gobot with sphero support is pretty easy.
                 </p>
                 <pre class="CodeRay">go get -u github.com/hybridgroup/gobot-sphero
 </pre>
-                <h2>How to use</h2>
+              </section><section class="how-to" id="HowToUse"><h2>How To Use</h2>
                 <p>Example of a simple program that makes the Sphero roll.</p>
                 <pre class="CodeRay"><span class="reserved">package</span> main
 
@@ -101,14 +137,15 @@ func main() {
   robot.Start()
 }
 </pre>
-              </section><section class="drivers"><h2>Drivers</h2>
+              </section><section class="drivers" id="Drivers"><h2>Drivers</h2>
                 <p>
                   There is only one driver for the Sphero.
                 </p>
                 <div class="hardware">
                   <div class="devices">
+                    <!-- // Sphero -->
                     <a class="device" href="/documentation/drivers/sphero" title="Sphero">
-                      <img src="/images/sphero.jpg"></a>
+                      <img src="/images/devices/sphero.jpg"></a>
                   </div>
                 </div>
               </section>
@@ -123,14 +160,6 @@ func main() {
           <a href="http://hybridgroup.com">The Hybrid Group.</a>
         </div>
       </div>
-    </footer><script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-      
-      ga('create', 'UA-46433484-3', 'gobot.io');
-      ga('send', 'pageview');
-    </script>
+    </footer>
 </body>
 </html>

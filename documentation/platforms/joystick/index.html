@@ -7,22 +7,47 @@
 <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
 <meta name="description">
 <meta content="The Hybrid Group" name="author">
-<title>Joysticks with Cylon.js</title>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><!-- %link{href: "http://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,500,700", rel: "stylesheet", type: "text/css"}/ --><link href="//fonts.googleapis.com/css?family=Inconsolata:400,700%7CMontserrat:700" rel="stylesheet">
+<title>Joysticks with Gobot</title>
 <link href="/stylesheets/style.css" rel="stylesheet">
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><script src="/javascripts/script.js"></script><script src="/hybridpages/assets/javascript/subnav.js"></script><link href="//fonts.googleapis.com/css?family=Inconsolata:400,700%7CMontserrat:700" rel="stylesheet">
 <link href="/favicon.ico" rel="shortcut icon" type="image/gif">
-</head>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+
+  _gaq.push(['_setAccount', "UA-46433484-3"]);
+
+
+
+
+
+
+
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script></head>
 <body>
+    
     <div class="app">
       <div class="w">
         <header class="app-header" role="banner"><div class="display">
             <h1 class="app-logo">
               <a href="/">Gobot</a>
             </h1>
+            <span class="subtitle">
+              <div class="main"></div>
+            </span>
           </div>
           <span class="menu">
             <a href="/documentation" class="item">Docs</a>
-            <a href="/hardware" class="item">Hardware</a>
+            <a href="/documentation/platforms" class="item">Platforms</a>
             
             
             <a class="item" target="blanck" href="https://github.com/hybridgroup/gobot/">Github</a>
@@ -33,67 +58,114 @@
         <div class="w">
           <h1 class="title">Joysticks</h1>
           <h2 class="subtitle">
-<a href="https://github.com/hybridgroup/Cylon.js-joystick" class="repository">Repository</a> <a class href="https://github.com/hybridgroup/Cylon.js-joystick/issues">Issues</a>
+<a href="https://github.com/hybridgroup/gobot-joystick" class="repository">Repository</a> <a class href="https://github.com/hybridgroup/gobot-joystick/issues">Issues</a>
 </h2>
         </div>
       </div>
-      <div class="container">
+      <section class="subnav_drivers" id="mainsubnav"><div class="container">
+          <nav><a href="#HowToInstall">How To Install</a>
+            <a href="#HowToUse">How To Use</a>
+            <a href="#HowToConnect">How To Connect</a>
+            <a href="#Drivers">Drivers</a>
+            <a href="#top">Top</a>
+          </nav>
+</div>
+      </section><div class="container">
         <div class="main" role="main">
           <section class="content full"><div class="documentation">
-              <section class="intro"><img class="display" src="/images/joystick.jpg"><p>
-                  You can use Cylon.js with a PS3 game controller, an XBox360 game controller, or any other USB joystick or game controller that is compatible with Simple DirectMedia Layer (SDL).
-                </p>
+              <section class="intro"><img class="display" src="/images/devices/joystick.jpg"><div class="info_intro">
+                  <p>
+                    You can use Gobot with a PS3 game controller, an XBox360 game controller, or any other USB joystick or game controller that is compatible with Simple DirectMedia Layer (SDL).
+                  </p>
+                  <p>
+                    For more info about Simple DirectMedia Layer (SDL) go to
+                    <a target="blank" href="http://www.libsdl.org/">http://www.libsdl.org/</a>.
+                  </p>
+                </div>
+                <div class="clear"></div>
+              </section><section class="how-to" id="HowToInstall"><h2>How to install</h2>
                 <p>
-                  For more info about Simple DirectMedia Layer (SDL) go to
-                  <a target="blank" href="http://www.libsdl.org/">http://www.libsdl.org/</a>.
+                  Installing Gobot support is pretty easy using ruby gems.
                 </p>
-              </section><section class="how-to"><h2>How to install</h2>
-                <p>
-                  Installing Cylon.js with arduino support is pretty easy using ruby gems.
-                </p>
-                <pre class="CodeRay">gem install Cylon.js-joystick
+                <pre class="CodeRay">go get path/to/repo/gobot-joystick
 </pre>
-                <h2>How to use</h2>
-                <p>
-                  This small program receives joystick and button press events from an XBox 360 game controller.
-                </p>
-                <pre class="CodeRay">require <span class="string"><span class="delimiter">'</span><span class="content">Cylon.js</span><span class="delimiter">'</span></span>
+              </section><section class="how-to" id="HowToUse"><h2>How to use</h2>
+                <p>This small program receives joystick and button press events from an XBox 360 game controller.</p>
+                <pre class="CodeRay">package main
 
-connection <span class="symbol">:joystick</span>, <span class="symbol">:adaptor</span> =&gt; <span class="symbol">:joystick</span>
-device <span class="symbol">:joystick</span>, <span class="symbol">:driver</span> =&gt; <span class="symbol">:xbox360</span>, <span class="symbol">:connection</span> =&gt; <span class="symbol">:joystick</span>, <span class="symbol">:interval</span> =&gt; <span class="float">0.1</span>
+import (
+  "fmt"
+  "github.com/hybridgroup/gobot"
+  "github.com/hybridgroup/gobot-joystick"
+)
 
-work <span class="keyword">do</span>
-  on controller, <span class="symbol">:joystick</span> =&gt; proc { |*value|
-    puts <span class="string"><span class="delimiter">"</span><span class="content">joystick </span><span class="inline"><span class="inline-delimiter">#{</span>value[<span class="integer">1</span>][<span class="symbol">:s</span>]<span class="inline-delimiter">}</span></span><span class="content"> x:</span><span class="inline"><span class="inline-delimiter">#{</span>value[<span class="integer">1</span>][<span class="symbol">:x</span>]<span class="inline-delimiter">}</span></span><span class="content"> y:</span><span class="inline"><span class="inline-delimiter">#{</span>value[<span class="integer">1</span>][<span class="symbol">:y</span>]<span class="inline-delimiter">}</span></span><span class="delimiter">"</span></span>
+func main() {
+  joystickAdaptor := new(gobotJoystick.JoystickAdaptor)
+  joystickAdaptor.Name = "xbox360"
+  joystickAdaptor.Params = map[string]interface{}{
+    "config": "./configs/xbox360_power_a_mini_proex.json",
   }
-  on controller, <span class="symbol">:button_a</span> =&gt; proc { |*value|
-    puts <span class="string"><span class="delimiter">"</span><span class="content">ayyyy!</span><span class="delimiter">"</span></span>
+
+  joystick := gobotJoystick.NewJoystick(joystickAdaptor)
+  joystick.Name = "xbox360"
+
+  work := func() {
+    gobot.On(joystick.Events["a"], func(data interface{}) {
+      fmt.Println("a", data)
+    })
+    gobot.On(joystick.Events["b"], func(data interface{}) {
+      fmt.Println("b", data)
+    })
+    gobot.On(joystick.Events["up"], func(data interface{}) {
+      fmt.Println("up", data)
+    })
+    gobot.On(joystick.Events["down"], func(data interface{}) {
+      fmt.Println("down", data)
+    })
+    gobot.On(joystick.Events["left"], func(data interface{}) {
+      fmt.Println("left", data)
+    })
+    gobot.On(joystick.Events["right"], func(data interface{}) {
+      fmt.Println("right", data)
+    })
+    gobot.On(joystick.Events["left_x"], func(data interface{}) {
+      fmt.Println("left_x", data)
+    })
+    gobot.On(joystick.Events["left_y"], func(data interface{}) {
+      fmt.Println("left_y", data)
+    })
+    gobot.On(joystick.Events["right_x"], func(data interface{}) {
+      fmt.Println("right_x", data)
+    })
+    gobot.On(joystick.Events["right_y"], func(data interface{}) {
+      fmt.Println("right_y", data)
+    })
   }
-  on controller, <span class="symbol">:button_b</span> =&gt; proc { |*value|
-    puts <span class="string"><span class="delimiter">"</span><span class="content">bee!</span><span class="delimiter">"</span></span>
+
+  robot := gobot.Robot{
+    Connections: []gobot.Connection{joystickAdaptor},
+    Devices:     []gobot.Device{joystick},
+    Work:        work,
   }
-  on controller, <span class="symbol">:button_x</span> =&gt; proc { |*value|
-    puts <span class="string"><span class="delimiter">"</span><span class="content">exxx!</span><span class="delimiter">"</span></span>
-  }
-  on controller, <span class="symbol">:button_y</span> =&gt; proc { |*value|
-    puts <span class="string"><span class="delimiter">"</span><span class="content">why!</span><span class="delimiter">"</span></span>
-  }
-<span class="keyword">end</span>
+
+  robot.Start()
+}
+end
 </pre>
-                <h2>How to connect</h2>
+              </section><section class="how-to" id="HowToConnect"><h2>How to connect</h2>
                 <p>Plug your USB joystick or game controller into your USB port. If your device is supported by SDL, you are now ready.</p>
-              </section><section class="drivers"><h2>Drivers</h2>
+              </section><section class="drivers" id="Drivers"><h2>Drivers</h2>
                 <p>
-                  There are 3 driver for different joysticks, as listed below:
+                  There are 2 driver for different joysticks, as listed below:
                 </p>
                 <div class="hardware">
                   <div class="devices">
-                    <a class="device" href="/documentation/drivers/joystick" title="Joystick">
-                      <img src="/images/joystick.jpg"></a>
+                    <!-- // PS3 -->
                     <a class="device" href="/documentation/drivers/ps3" title="PS3 Controller">
-                      <img src="/images/ps3.jpg"></a>
+                      <img src="/images/devices/ps3.jpg"></a>
+                    <!-- // Xbox 360 -->
                     <a class="device" href="/documentation/drivers/xbox360" title="XBox360 Controller">
-                      <img src="/images/xbox360.jpg"></a>
+                      <img src="/images/devices/xbox360.jpg"></a>
                   </div>
                 </div>
               </section>
@@ -108,14 +180,6 @@ work <span class="keyword">do</span>
           <a href="http://hybridgroup.com">The Hybrid Group.</a>
         </div>
       </div>
-    </footer><script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-      
-      ga('create', 'UA-46433484-3', 'gobot.io');
-      ga('send', 'pageview');
-    </script>
+    </footer>
 </body>
 </html>
