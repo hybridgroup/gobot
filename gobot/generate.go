@@ -113,11 +113,11 @@ func (me *{{ .UpperName }}Adaptor) Reconnect() bool {
   return true
 }
 
-func (me *{{ .Name }}Adaptor) Disconnect() bool {
+func (me *{{ .UpperName }}Adaptor) Disconnect() bool {
   return true
 }
 
-func (me *{{ .Name }}Adaptor) Finalize() bool {
+func (me *{{ .UpperName }}Adaptor) Finalize() bool {
   return true
 }
 `
