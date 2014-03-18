@@ -1,8 +1,11 @@
 .page-title {
+
   background: $hero-color;
   padding: 25px 0;
   margin: 10px 0 0 0;
+
   .title {
+
     font-family: $page-title-font;
     font-weight: 700;
     font-size: 33px;
@@ -12,7 +15,9 @@
     opacity: 0.94;
     margin: 0;
   }
+
   .subtitle {
+
     @include title-font(21px, $hero-subtitle-color);
     font-weight: 550;
     opacity: 0.94;
@@ -20,7 +25,9 @@
     line-height: 21px;
     margin-top: 7px;
   }
+
   a {
+
     @extend .hero-anchors;
   }
 }
@@ -29,6 +36,7 @@
 //subnav drivers
 
 .subNavfixed {
+
   width: 100%;
   left: 0;
   position: fixed;
@@ -37,27 +45,38 @@
 }
 
 .marginTopSubnav {
+
   padding-top: 65px;
 
 }
 
 .subnav_drivers {
+
   background: $color-background-subnav-drivers;
   padding: 20px 0;
+
   @media only screen and (max-width: $medium-screen) {
+
      display: none;
   }
+
   nav {
+
     a {
+
       padding: 5px 10px;
       margin: 20px 10px;
       color: $title-color;
+
       &:hover {
+
         color: white;
         background: $color-text-subnav-drivers;
       }
     }
+
     .active {
+    
       color: white;
       background: $color-text-subnav-drivers;
     }
