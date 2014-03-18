@@ -1,54 +1,84 @@
 .container, .w {
+
   width: $big-screen;
   margin: 0 auto;
+
   @include medium-screen($medium-screen, "") {
+
     padding: 0 15px;
   }
+
   @include small-screen(100%, "") {
+
     padding: 0 15px;
   }
 }
 
 .main[role="main"] {
+
   padding-bottom: 50px;
   margin-top: 20px;
   @include outer-container;
+
   .videos {
+
     .video {
+
       @include span-columns(6);
       margin: .5%;
+
       h3 {
+
         font-size: 16px;
       }
+
       iframe, object {
+
         width: 100%;
         height: 300px;
       }
+
       @media only screen and (min-width: $medium-screen) and (max-width: $big-screen) {
+
         iframe, object {
+
           height: 240px;
         }
       }
+
       @media only screen and (max-width: $medium-screen) {
+
         @include span-columns(12);
+
         iframe, object {
+
           height: 240px;
         }
       }
     }
+
     .video_index {
+
       @include span-columns(10);
+
       iframe, object {
+
         width: 100%;
         height: 400px;
       }
+
       @media only screen and (min-width: $medium-screen) and (max-width: $big-screen)  {
+
         iframe, object {
+
           height: 300px;
         }
       }
+
       @media only screen and (max-width: $medium-screen) {
+
         iframe, object {
+        
           height: 180px;
         }
       }

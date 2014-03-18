@@ -1,32 +1,46 @@
 .repository {
+
   margin-right: 10px;
 }
 
 .documentation {
+
   .intro {
+
     .info_intro {
+
       float: left;
       width: 60%;
       margin: 0;
+
       @media only screen and (max-width: $medium-screen) {
+
         width: 100%;
       }
     }
   }
+
   .index {
+
     @include outer-container;
     padding-left: 30px;
+
     section {
+
       margin: 0 auto;
       @include span-columns(3 of 9.5);
       background: $color-background-subnav-drivers;
       height: 100px;
       margin-bottom: 20px;
       border-radius: 5px;
+
       @media only screen and (max-width: $medium-screen) {
+
         @include span-columns(12);
       }
+
       a {
+
         width: 100%;
         height: 100%;
         padding: 10px;
@@ -34,15 +48,18 @@
       }
 
       &:hover {
+
         background: darken($title-color, 5);
       }
 
       .title {
+
         color: #EFECE5;
         font-weight: bold;
       }
 
       .description {
+
         color: $hero-subtitle-color;
       }
     }
@@ -51,49 +68,70 @@
 
 
 .documentation {
+
   @include span-columns(12);
+
   .index {
+
     padding: 0 0 0 8px;
+
     li {
+
       margin: 8px 0;
     }
   }
+
   .link {
+
     font-size: 20px;
   }
+
   .description {
+
     color: $doc-description-color;
     font-size: 14px;
     line-height: 21px;
     margin: 10px;
   }
+
   .display {
+
     width: 35%;
     float: right;
     border: 1px solid rgba($hero-color, 0.14);
     margin: 0 0 19px 20px;
+
     @media only screen and (max-width: $medium-screen) {
+
         width: 100%;
     }
   }
 }
 
 .circuit {
+
   .image_circuit {
+
     width: 50%;
     float: left;
+
     img {
+
       height: 300px;
     }
   }
+
   .description_circuit {
+
     width: 50%;
     float: right;
   }
 }
 
 .commands_api {
+
   h2 {
+
     background: $title-color;
     color: white !important;
     padding: 5px 10px;
@@ -101,44 +139,59 @@
     margin: 20px 0 0 0;
 
   }
+
   h4 {
+
     background: transparent;
     font-size: 11pt;
     font-weight: normal;
   }
+
   h5 {
+
     background: white;
     padding: 10px;
     margin: 0;
     font-size: 11pt;
   }
+
   h3 {
+
     background: white;
     padding: 10px;
     margin: 0;
     font-size: 11pt;
     color: $title-color;
   }
+
   pre {
+
     background: white;
     margin: 0;
   }
+
   p, ul{
+
     background: white;
     font-size: 10.5pt;
     margin: 0;
     padding: 10px;
     font-family: Inconsolata,Menlo,Monaco,"Bitstream Vera Sans Mono","Courier New",monospace;
   }
+
   li {
+
     margin-left: 20px;
   }
 }
 
 .commands {
+
   background: white;
   font-size: 10.5pt;
+
   span {
+
       font-family: Inconsolata,Menlo,Monaco,"Bitstream Vera Sans Mono","Courier New",monospace;
       font-size: 14px;
       line-height: 21px;
@@ -147,21 +200,31 @@
       color: #444;
       padding: 5px;
   }
+
   th {
+
     background: $title-color;
     color: white;
   }
+
   td {
+
     border-bottom: 1px solid #d4d4d4;
   }
+
   .command {
+
     font-family: Inconsolata, Menlo, Monaco, "Bitstream Vera Sans Mono", "Courier New", monospace;
     font-weight: bold;
     font-size: 11pt;
   }
+
   .param {
+
     .markdown {
+
       span {
+
         background:none;
         border: none;
         padding: 0;
@@ -171,15 +234,19 @@
 }
 
 .clear {
+
   clear: both;
 }
 
 .image-size-300 {
+
   width: 200px;
 }
 
 .methods {
+
   dt {
+
     font-weight: bold;
     background: white;
     padding: 5px 10px;
@@ -189,29 +256,40 @@
     font-size: 17px;
     border: aliceblue;
   }
+
   dd {
+
     margin-bottom: 29px;
     padding-left: 10px;
   }
+
   li {
+
     font-family: Inconsolata, Menlo, Monaco, "Bitstream Vera Sans Mono", "Courier New", monospace;
   }
 }
 
 .colors {
+
   @include span-columns(3);
+
   @media only screen and (min-width: $medium-screen) and (max-width: $big-screen) {
+
     @include span-columns(3);
+
     p {
+
       font-size: 10px
     }
   }
   
   @media only screen and (max-width: $medium-screen) {
+
     @include span-columns(12);
   }
     
   dt {
+
     font-weight: bold;
     padding: 5px;
     display: inline-block;
@@ -220,10 +298,14 @@
     border: aliceblue;
     margin-top: 15px;
   }
+
   dd {
+
     margin-bottom: 20px;
     display: block;
+
     p {
+    
       margin: 0;
       line-height: 50px;
     }

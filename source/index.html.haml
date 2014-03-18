@@ -79,91 +79,116 @@ getting_started_button: "<a href='/documentation/getting-started' class='cta'> G
 %h2 Hardware Support
 %p
   Gobot has a extensible system for connecting to hardware devices. The following robotics and physical computing platforms are currently supported:
-  %ul
+  %ul.homepage-platform
     %li
-      = link_to "ARDrone", "http://ardrone2.parrot.com/", target:"_blank" 
-      &lt;==&gt;
-      = link_to "Adaptor", "/documentation/platforms/ardrone", target:"_blank" 
-      (
-      = link_to "repo", "https://github.com/hybridgroup/gobot-ardrone", target:"_blank" 
-      )
+      .title
+        = link_to "ARDrone", "http://ardrone2.parrot.com/", target:"_blank"  
+      %a{:href => "/documentation/platforms/ardrone"} 
+        %img{src: "/images/devices/ardrone.jpg", style: "width: 90%"}  
+      .repo
+        = link_to "repo", "https://github.com/hybridgroup/gobot-ardrone", target:"_blank"
+
     %li
-      = link_to "Arduino", "http://www.arduino.cc/", target:"_blank" 
-      &lt;==&gt;
-      = link_to "Adaptor", "/documentation/platforms/arduino", target:"_blank" 
-      (
-      = link_to "repo", "https://github.com/hybridgroup/gobot-firmata", target:"_blank" 
-      )
+      .title
+        = link_to "Arduino", "http://www.arduino.cc/", target:"_blank" 
+      %a{:href => "/documentation/platforms/arduino"} 
+        %img{src: "/images/devices/arduino.jpg", style: "width: 90%"}  
+      .repo
+        = link_to "repo", "https://github.com/hybridgroup/gobot-firmata", target:"_blank"
+
     %li
-      = link_to "Beaglebone Black", "http://beagleboard.org/Products/BeagleBone+Black/", target:"_blank" 
-      &lt;==&gt;
-      = link_to "Adaptor", "/documentation/platforms/beaglebone", target:"_blank" 
-      (
-      = link_to "repo", "https://github.com/hybridgroup/gobot-beaglebone", target:"_blank" 
-      )
+      .title
+        = link_to "Beaglebone Black", "http://beagleboard.org/Products/BeagleBone+Black/", target:"_blank" 
+      %a{:href => "/documentation/platforms/beaglebone"} 
+        %img{src: "/images/devices/beaglebone.jpg", style: "width: 90%"}  
+      .repo
+        = link_to "repo", "https://github.com/hybridgroup/gobot-beaglebone", target:"_blank"
+
     %li
-      = link_to "Digispark", "http://digistump.com/category/1", target:"_blank"  
-      &lt;==&gt;
-      = link_to "Adaptor", "/documentation/platforms/digispark", target:"_blank"
-      (
-      = link_to "repo", "https://github.com/hybridgroup/gobot-digispark", target:"_blank" 
-      ) 
+      .title
+        = link_to "Digispark", "http://digistump.com/category/1", target:"_blank"  
+      %a{:href => "/documentation/platforms/digispark"} 
+        %img{src: "/images/devices/digispark.jpg", style: "width: 90%"}  
+      .repo
+        = link_to "repo", "https://github.com/hybridgroup/gobot-digispark", target:"_blank" 
+
     %li
-      = link_to "Joystick", "http://en.wikipedia.org/wiki/Joystick", target:"_blank"  
-      &lt;==&gt;
-      = link_to "Adaptor/Driver", "/documentation/platforms/joystick", target:"_blank"
-      (
-      = link_to "repo", "https://github.com/hybridgroup/gobot-joystick", target:"_blank" 
-      )
+      .title
+        = link_to "Joystick", "http://en.wikipedia.org/wiki/Joystick", target:"_blank"  
+      %a{:href => "/documentation/platforms/joystick"} 
+        %img{src: "/images/devices/joystick.jpg", style: "width: 90%"}  
+      .repo
+        = link_to "repo", "https://github.com/hybridgroup/gobot-joystick", target:"_blank"
+
     %li
-      = link_to "Leap Motion", "https://www.leapmotion.com/", target:"_blank"  
-      &lt;==&gt;
-      = link_to "Adaptor/Driver", "/documentation/platforms/leapmotion", target:"_blank"
-      (
-      = link_to "repo", "https://github.com/hybridgroup/gobot-leapmotion", target:"_blank" 
-      )
+      .title
+        = link_to "Leap Motion", "https://www.leapmotion.com/", target:"_blank"  
+      %a{:href => "/documentation/platforms/leapmotion"} 
+        %img{src: "/images/devices/leap_motion.jpg", style: "width: 90%"}  
+      .repo
+        = link_to "repo", "https://github.com/hybridgroup/gobot-leapmotion", target:"_blank"
+
     %li
-      = link_to "Spark", "https://www.spark.io/", target:"_blank"  
-      &lt;==&gt;
-      = link_to "Adaptor", "/documentation/platforms/spark", target:"_blank" 
-      (
-      = link_to "repo", "https://github.com/hybridgroup/gobot-spark", target:"_blank" 
-      )
+      .title
+        = link_to "Spark", "https://www.spark.io/", target:"_blank"  
+      %a{:href => "/documentation/platforms/spark"} 
+        %img{src: "/images/devices/spark.jpg", style: "width: 90%"}  
+      .repo
+        = link_to "repo", "https://github.com/hybridgroup/gobot-spark", target:"_blank"
+
     %li
-      = link_to "Sphero", "http://www.gosphero.com/", target:"_blank"  
-      &lt;==&gt;
-      = link_to "Adaptor/Driver", "/documentation/platforms/sphero", target:"_blank" 
-      (
-      = link_to "repo", "https://github.com/hybridgroup/gobot-sphero", target:"_blank" 
-      )
+      .title
+        = link_to "Sphero", "http://www.gosphero.com/", target:"_blank"  
+      %a{:href => "/documentation/platforms/sphero"} 
+        %img{src: "/images/devices/sphero.jpg", style: "width: 90%"}  
+      .repo
+        = link_to "repo", "https://github.com/hybridgroup/gobot-sphero", target:"_blank"
+  .clear
 
 %p Support for many devices that use General Purpose Input/Output (GPIO) have a shared set of drivers provded using the cylon-gpio module:
-%ul
+%h4= link_to "GPIO", "https://en.wikipedia.org/wiki/General_Purpose_Input/Output" , target:"_blank" 
+%ul.homepage-platform
   %li
-    = link_to "GPIO", "https://en.wikipedia.org/wiki/General_Purpose_Input/Output" , target:"_blank" 
-    &lt;==&gt; Drivers
-    (
-    = link_to "repo", "https://github.com/hybridgroup/gobot-gpio" , target:"_blank"
-    )
-    
-    %ul 
-      %li= link_to "Button", "/documentation/drivers/button" , target:"_blank" 
-      %li= link_to "LED", "/documentation/drivers/led" , target:"_blank"  
-      %li= link_to "Servo", "/documentation/drivers/servo" , target:"_blank"  
+    .title
+      Button
+    %a{:href => "/documentation/drivers/button"} 
+      %img{src: "/images/devices/button.jpg", style: "width: 90%"}  
+    .repo
+      = link_to "repo", "https://github.com/hybridgroup/gobot-gpio" , target:"_blank"
+  %li
+    .title
+      LED 
+    %a{:href => "/documentation/drivers/led"} 
+      %img{src: "/images/devices/LED.jpg", style: "width: 90%"}  
+    .repo
+      = link_to "repo", "https://github.com/hybridgroup/gobot-gpio" , target:"_blank"
+  %li
+    .title
+      Servo
+    %a{:href => "/documentation/drivers/servo"} 
+      %img{src: "/images/devices/servo.jpg", style: "width: 90%"}  
+    .repo
+      = link_to "repo", "https://github.com/hybridgroup/gobot-gpio" , target:"_blank"
+.clear
 
 %p Support for devices that use Inter-Integrated Circuit (I2C) have a shared set of drivers provded using the gobot-i2c module:
-%ul
-  %li
-    = link_to "I2C", "https://en.wikipedia.org/wiki/I%C2%B2C" , target:"_blank" 
-    &lt;==&gt; Drivers
-    (
-    = link_to "repo", "https://github.com/hybridgroup/gobot-i2c" , target:"_blank"
-    )
-    
-    %ul 
-      %li= link_to "BlinkM", "/documentation/drivers/blinkm" , target:"_blank" 
-      %li= link_to "Wii Nunchuck Controller", "/documentation/drivers/wiichuck" , target:"_blank" 
-
+%h4= link_to "I2C", "https://en.wikipedia.org/wiki/I%C2%B2C", target:"_blank" 
+%ul.homepage-platform 
+  %li  
+    .title
+      BlinkM
+    %a{:href => "/documentation/drivers/blinkm"} 
+      %img{src: "/images/devices/blinkm.jpg", style: "width: 90%"}  
+    .repo
+      = link_to "repo", "https://github.com/hybridgroup/gobot-i2c", target:"_blank"
+  %li  
+    .title
+      Wii Nunchuck
+    %a{:href => "/documentation/drivers/wiichuck"} 
+      %img{src: "/images/devices/wii-chuck.jpg", style: "width: 90%"}  
+    .repo
+      = link_to "repo", "https://github.com/hybridgroup/gobot-i2c", target:"_blank"
+.clear
 
 %p More platforms and drivers are coming soon...
 
