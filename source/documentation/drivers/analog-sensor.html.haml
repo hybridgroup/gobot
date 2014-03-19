@@ -13,7 +13,7 @@ arduino_platform: true
 
 %section.intro
   = image_tag "/images/devices/analog-sensor.jpg", class: "display"
-  .info_intro
+  .info-intro
     %p
       Makes it possible to interact with analog inputs on your device and obtain values that represent the analog input send by the sensors.
       The value received from an analog input read from the sensor goes from 0 to 1027.
@@ -35,16 +35,16 @@ arduino_platform: true
         coming soon
 
 %section.public-methods
-  .commands_api#Commands
+  .commands-api#Commands
     = partial "/documentation/drivers/partials/gpio/commands_analog_sensor"
-  .commands_api#Events
+  .commands-api#Events
     = partial "/documentation/drivers/partials/gpio/events_analog_sensor"   
 
 %section.circuit#Circuit
   %h2 Circuit 
-  .description_circuit
+  .description-circuit
     %p
-  .image_circuit
+  .image-circuit
     %img{:src => "/documentation/drivers/breadboards/gpio/analog_sensor_bb.png", :alt => ""}/ 
   .clear 
    

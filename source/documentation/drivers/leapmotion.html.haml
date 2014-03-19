@@ -12,7 +12,7 @@ leapmotion_platform: true
 
 %section.intro
   =image_tag "/images/devices/leap_motion.jpg", class: "display"
-  .info_intro
+  .info-intro
     %p
       Allows user to interact with Gobot devices using a Leap Motion controller. The Leap Motion uses its built in cameras to track the user's hand motions, and translations those to events that Gobot can use to trigger actions or control hardware.
   .clear
@@ -75,10 +75,10 @@ leapmotion_platform: true
         }
 
 %section.public-methods
-  .commands_api#Commands
+  .commands-api#Commands
     %h1 Commands
     %p No commands
-  .commands_api#Events
+  .commands-api#Events
     = partial "/documentation/drivers/partials/leapmotion/events_leapmotion"   
 
 %section.compatability.hardware#Compatability

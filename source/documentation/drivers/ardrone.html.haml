@@ -12,7 +12,7 @@ ardrone_platform: true
 ---
 %section.intro
   =image_tag "/images/devices/ardrone-flight.jpg", class: "display"
-  .info_intro
+  .info-intro
     %p
       Allows user to send flight control commands to an ARDrone. Flight control commands are those used to tell the ARDrone to take off, land, and or any number of other autonomous flight manuvers.
   .clear
@@ -86,9 +86,9 @@ ardrone_platform: true
         }
 
 %section.public-methods
-  .commands_api#Commands
+  .commands-api#Commands
     = partial "/documentation/drivers/partials/ardrone/commands_flight"
-  .commands_api#Events
+  .commands-api#Events
     = partial "/documentation/drivers/partials/ardrone/events_flight"
 
 %section.compatability.hardware#Compatability
