@@ -52,11 +52,13 @@
     clear: both;
     opacity: 0.94;
     margin: 0;
+
     @include small-screen {
 
       font-size: 23px;
       line-height: 27px;
       padding: 0;
+
       br {
 
         display: none;
@@ -69,6 +71,7 @@
       line-height: 42px;
     }
   }
+
   .subtitle {
 
     @include title-font(24px, $hero-subtitle-color);
@@ -77,6 +80,7 @@
     margin: 0;
     line-height: 36px;
     margin-top: 3px;
+
     @include small-screen {
 
       font-size: 18px;
@@ -85,6 +89,7 @@
       padding: 0;
     }
   }
+
   a {
 
     @extend .hero-anchors;
@@ -96,15 +101,18 @@
   line-height: 0;
   padding: 10px 0;
   background: $social-catcher-background-color;
+
   .twitter-follow-button {
 
     vertical-align: top;
   }
+
   .splitter {
 
     display: inline-block;
     height: 21px;
   }
+  
   @include small-screen {
 
     .splitter {

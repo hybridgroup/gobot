@@ -12,7 +12,7 @@ ardrone_platform: true
 
 %section.intro
   =image_tag "/images/devices/ardrone-navigation.jpg", class: "display"
-  .info_intro
+  .info-intro
     %p
       Allows user to receive in-flight navgation data from an ARDrone. Navigation data includes such information as the ARDrone's current pitch and yaw, along with many other data elements.
   .clear
@@ -37,9 +37,9 @@ ardrone_platform: true
 
 
 %section.public-methods
-  .commands_api#Commands
+  .commands-api#Commands
     = #partial "/documentation/drivers/partials/gpio/commands_analog_sensor"
-  .commands_api#Events
+  .commands-api#Events
     = #partial "/documentation/drivers/partials/gpio/events_analog_sensor" 
 
 

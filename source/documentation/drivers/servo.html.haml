@@ -13,7 +13,7 @@ digispark_platform: true
 ---
 %section.intro
   = image_tag "/images/devices/servo.jpg", class: "display"
-  .info_intro
+  .info-intro
     %p Provides an interface for making servos easy to work and interact with from Gobot.
   .clear
   
@@ -88,16 +88,16 @@ digispark_platform: true
         }
   
 %section.public-methods
-  .commands_api#Commands
+  .commands-api#Commands
     = partial "/documentation/drivers/partials/gpio/commands_servo"
-  .commands_api#Events
+  .commands-api#Events
     = partial "/documentation/drivers/partials/gpio/events_servo"   
 
 %section.circuit#Circuit
   %h2 Circuit
-  .description_circuit
+  .description-circuit
     %p 
-  .image_circuit 
+  .image-circuit 
     %img{:src => "/documentation/drivers/breadboards/gpio/servo_bb.png", :alt => ""}/ 
   .clear 
   

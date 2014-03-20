@@ -15,7 +15,7 @@ spark_platform: true
 ---
 %section.intro
   =image_tag "/images/devices/LED.jpg", class: "display"
-  .info_intro
+  .info-intro
     %p  Allows user to interact with LEDs through digital output and PWM (Pulse Width Modulation)
   .clear
   
@@ -80,17 +80,17 @@ spark_platform: true
         }
 
 %section.public-methods
-  .commands_api#Commands
+  .commands-api#Commands
     = partial "/documentation/drivers/partials/gpio/commands_led"
-  .commands_api#Events
+  .commands-api#Events
     = partial "/documentation/drivers/partials/gpio/events_led"   
 
 
 %section.circuit#Circuit
   %h2 Circuit 
-  .description_circuit
+  .description-circuit
     %p 
-  .image_circuit
+  .image-circuit
     %img{:src => "/documentation/drivers/breadboards/gpio/led_bb.png", :alt => ""}/ 
   .clear
   
