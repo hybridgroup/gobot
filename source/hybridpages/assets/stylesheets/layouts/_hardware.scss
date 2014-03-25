@@ -8,7 +8,17 @@
     .device {
 
       display: inline-block;
-      width: 300px;
+      width: 225px;
+
+      &:hover {
+
+        img {
+      
+          opacity: .9;
+        }
+
+        background: $title-color;
+      }
 
       img {
       

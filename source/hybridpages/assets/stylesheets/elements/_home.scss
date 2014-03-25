@@ -13,11 +13,26 @@
       float: none;
     }
 
+    img {
+
+      &:hover {
+
+        opacity: .8;
+      }
+    }
+
+
     .title {
 
       background: $title-color;
       padding:10px;
       color: $hero-title-color;
+
+      &:hover {
+
+        background: darken( $title-color ,5 );
+      }
+
       a {
 
         color: $hero-title-color;
@@ -27,6 +42,12 @@
 
       background: $hero-subtitle-color;
       padding:10px;
+
+      &:hover {
+
+        background: darken( $hero-subtitle-color ,5 );
+      }
+
       a {
 
         color: $title-color;
