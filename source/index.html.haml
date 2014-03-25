@@ -26,11 +26,11 @@ getting_started_button: "<a href='/documentation/getting-started' class='cta'> G
 
 %p 
   Want to use Ruby on robots? Check out our sister project Artoo 
-  =link_to "(http://artoo.io).", "http://artoo.io", target: :blank
+  = link_to "(http://artoo.io).", "http://artoo.io", target: :blank
 
 %p 
   Want to use JavaScript? Check out our sister project Cylon 
-  =link_to "(http://cylonjs.com).", "http://cylonjs.com", target: :blank
+  = link_to "(http://cylonjs.com).", "http://cylonjs.com", target: :blank
 
 %h2  Meet The Code
 
@@ -150,21 +150,21 @@ getting_started_button: "<a href='/documentation/getting-started' class='cta'> G
 %ul.homepage-platform
   %li
     .title
-      Button
+      = link_to "Button", "/documentation/drivers/button"
     %a{:href => "/documentation/drivers/button"} 
       %img{src: "/images/devices/button.jpg", style: "width: 90%"}  
     .repo
       = link_to "repo", "https://github.com/hybridgroup/gobot-gpio" , target:"_blank"
   %li
     .title
-      LED 
+      = link_to "LED", "/documentation/drivers/led" 
     %a{:href => "/documentation/drivers/led"} 
       %img{src: "/images/devices/LED.jpg", style: "width: 90%"}  
     .repo
       = link_to "repo", "https://github.com/hybridgroup/gobot-gpio" , target:"_blank"
   %li
     .title
-      Servo
+      = link_to "Servo", "/documentation/drivers/servo"
     %a{:href => "/documentation/drivers/servo"} 
       %img{src: "/images/devices/servo.jpg", style: "width: 90%"}  
     .repo
@@ -176,14 +176,14 @@ getting_started_button: "<a href='/documentation/getting-started' class='cta'> G
 %ul.homepage-platform 
   %li  
     .title
-      BlinkM
+      = link_to "BlinkM", "/documentation/drivers/blinkm"
     %a{:href => "/documentation/drivers/blinkm"} 
       %img{src: "/images/devices/blinkm.jpg", style: "width: 90%"}  
     .repo
       = link_to "repo", "https://github.com/hybridgroup/gobot-i2c", target:"_blank"
   %li  
     .title
-      Wii Nunchuck
+      = link_to "Wii Nunchuck", "/documentation/drivers/wiichuck"
     %a{:href => "/documentation/drivers/wiichuck"} 
       %img{src: "/images/devices/wii-chuck.jpg", style: "width: 90%"}  
     .repo
