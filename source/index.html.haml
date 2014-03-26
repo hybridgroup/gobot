@@ -40,9 +40,13 @@ getting_started_button: "<a href='/documentation/getting-started' class='cta'> G
 :markdown
   `go get -u github.com/hybridgroup/gobot`.
 
-%p Then install additional libraries for whatever hardware support you want to use from your robot. For example, `go get -u github.com/hybridgroup/gobot-sphero` to use Gobot with a Sphero.
+%p 
+  :markdown
+    Then install additional libraries for whatever hardware support you want to use from your robot. For example, 
+    `go get -u github.com/hybridgroup/gobot-sphero` 
+    to use Gobot with a Sphero.
 
-%h2  Example
+%h2  Go with Sphero
 :markdown
       :::go
       package main
@@ -75,6 +79,42 @@ getting_started_button: "<a href='/documentation/getting-started' class='cta'> G
 
         robot.Start()
       } 
+
+%h2  Go with a Blink
+:markdown
+      :::go
+      package main
+
+      import (
+        "github.com/hybridgroup/gobot"
+        "github.com/hybridgroup/gobot-firmata"
+        "github.com/hybridgroup/gobot-gpio"
+      )
+
+      func main() {
+
+        firmata := new(gobotFirmata.FirmataAdaptor)
+        firmata.Name = "firmata"
+        firmata.Port = "/dev/ttyACM0"
+
+        led := gobotGPIO.NewLed(firmata)
+        led.Name = "led"
+        led.Pin = "13"
+
+        work := func() {
+          gobot.Every("1s", func() {
+            led.Toggle()
+          })
+        }
+
+        robot := gobot.Robot{
+          Connections: []gobot.Connection{firmata},
+          Devices:     []gobot.Device{led},
+          Work:        work,
+        }
+
+        robot.Start()
+      }
 
 %h2 Hardware Support
 %p
@@ -217,11 +257,15 @@ getting_started_button: "<a href='/documentation/getting-started' class='cta'> G
       :::bash
       $ PORT=8080 go run gobotProgram.go
 
+%p
+  :markdown 
+    In order to use the 
+    [robeaux](https://github.com/hybridgroup/robeaux) 
+    AngularJS interface with Gobot you simply clone the robeaux repo and place it in the directory of your Gobot program. The robeaux assets must be in a folder called 
+    `robeaux`.
 
-
+%h2 Be Part Of The Robot Evolution
 :markdown
-  ## Be Part Of The Robot Evolution
-
   - Code on Github:   [https://github.com/hybridgroup/gobot](https://github.com/hybridgroup/gobot)
   - Join us on IRC:   `#gobotio @ irc.freenode.net`
   - Join us on our [Trello Board](https://trello.com/b/kQPsldtk/gobot).
