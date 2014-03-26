@@ -1,56 +1,57 @@
 ---
-title: Gobot- HMC6352 Digital Compass Driver
+title: Gobot - HMC6352 Digital Compass Driver
 author: The Hybrid Group
 page_title: HMC6352 Digital Compass
 page_subtitle: Driver
 page_title_show: true
 layout: documentation
+subnav_driver: true
+subnav_circuit_driver: true
 
+beaglebone_platform: true
 arduino_platform: true
+
 ---
+
 %section.intro
   =image_tag "/images/devices/hmc6352-compass.jpg", class: "display"
-  .info-intro
+  .info-intro  
     %p Allows user to read heading from HMC6352 Digital Compass via i2c interface
   .clear
-%section.how-to
-  %h2 How to establish a connection and setup the driver
-  %h3 For Arduino:
+  
+%section.how-to#HowToConnect
+  %h2 How To Connect
   :markdown
-        :::ruby
-        comming soon
+        :::javascript
+        coming soon
 
-%section.public-methods
-  %h2 Public instance methods:
-  %h3 heading → float
-  %p
-    Returns the heading data for the compass.
-
-%section.public-events
-  %h2 Public driver events:
-  %h3 heading
-  %p
-    Gets triggered every time the specified interval is met.
-
-  %h3 How to use events and call them on your drivers
-  %p Pretty simple, when the connection and the driver have been setup (as explained above) you can call events on them as follows:
+%section.how-to#HowToUse
+  %h2 How To Use
+  %p To read the current compass heading, just use the `heading()` function:
   :markdown
-        :::ruby
-        comming soon
-
-%section.how-to
-  %h2 How to use
+        :::javascript
+        coming soon
   %h3 Example using a HMC6352 Digital Compass.
   :markdown
-        :::ruby
-        comming soon
+        :::javascript
+        coming soon
 
-%section.circuit
-  %h2 Circuit and Schematic
-  %p
-    Coming soon...
+%section.public-methods
+  .commands-api#Commands
+    = #partial "/documentation/drivers/partials/i2c/commands_hmc6352"
+  .commands-api#Events
+    = #partial "/documentation/drivers/partials/i2c/events_hmc6352"
 
-%section.compatability.hardware
-  %h2 Works with:
+%section.circuit#Circuit
+  %h2 Circuit
+  .description-circuit
+    %p 
+  .image-circuit 
+    %img{:src => "/documentation/drivers/breadboards/i2c/hmc6352_bb.png", :alt => ""}/ 
+  .clear 
+
+%section.compatability.hardware#Compatability
+  %h2 Compatibility
   .devices
     = partial "documentation/partials/devices_platforms"
+   
