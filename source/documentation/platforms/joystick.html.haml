@@ -7,14 +7,14 @@ page_title_show: true
 layout: documentation
 subnav_platform: true
 
-ps3_driver: true
+dualshock3_driver: true
 xbox360_driver: true
 ---
 %section.intro
   = image_tag "/images/devices/joystick.jpg", class: "display"
   .info-intro
     %p
-      You can use Gobot with a PS3 game controller, an XBox360 game controller, or any other USB joystick or game controller that is compatible with Simple DirectMedia Layer (SDL).
+      You can use Gobot with a Dualshock3 game controller, an XBox360 game controller, or any other USB joystick or game controller that is compatible with Simple DirectMedia Layer (SDL).
 
     %p
       For more info about Simple DirectMedia Layer (SDL) go to
@@ -35,7 +35,7 @@ xbox360_driver: true
   %p This small program receives joystick and button press events from an XBox 360 game controller.
 
   :markdown
-        :::bash
+        :::go
         package main
 
         import (

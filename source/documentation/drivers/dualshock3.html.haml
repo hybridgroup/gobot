@@ -1,8 +1,8 @@
 ---
 page_title_show: true
-title: Gobot - PS3 Controller Driver
+title: Gobot - Dualshock3 Controller Driver
 author: The Hybrid Group
-page_title: PS3 Controller
+page_title: Dualshock3 Controller
 page_subtitle: Driver
 layout: documentation
 subnav_driver: true
@@ -10,15 +10,15 @@ subnav_driver: true
 joystick_platform: true
 ---
 %section.intro
-  =image_tag "/images/devices/ps3.jpg", class: "display"
+  =image_tag "/images/devices/dualshock3.jpg", class: "display"
   .info-intro
-    %p Allows user to interact with Artoo devices using a PS3 game controller.
+    %p Allows user to interact with Artoo devices using a Dualshock3 game controller.
   .clear
   
 %section.how_to#HowToConnect
   %h2 How To Connect
   :markdown
-        :::bash
+        :::go
         package main
 
         import (
@@ -40,9 +40,9 @@ joystick_platform: true
 
 %section.how-to#HowToUse
   %h2 How To Use
-  %h3 Example receiving button events from PS3 controller joystick.
+  %h3 Example receiving button events from Dualshock3 controller joystick.
   :markdown
-        :::bash
+        :::go
         package main
 
         import (
