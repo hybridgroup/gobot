@@ -88,11 +88,14 @@ func main() {
 ## Hardware Support
 Gobot has a extensible system for connecting to hardware devices. The following robotics and physical computing platforms are currently supported:
   
+  - [Ardrone](http://ardrone2.parrot.com/) <==> [Library](https://github.com/hybridgroup/gobot-ardrone)
   - [Arduino](http://www.arduino.cc/) <==> [Library](https://github.com/hybridgroup/gobot-firmata)
   - [Beaglebone Black](http://beagleboard.org/Products/BeagleBone+Black/) <=> [Library](https://github.com/hybridgroup/gobot-beaglebone)
+  - [Joystick](http://en.wikipedia.org/wiki/Joystick) <=> [Library](https://github.com/hybridgroup/gobot-joystick)
   - [Digispark](http://digistump.com/products/1) <=> [Library](https://github.com/hybridgroup/gobot-digispark)
   - [Firmata](http://firmata.org/wiki/Main_Page) <=> [Library](https://github.com/hybridgroup/gobot-firmata)
   - [Leap Motion](https://www.leapmotion.com/) <=> [Library](https://github.com/hybridgroup/gobot-leap)
+  - [OpenCV](http://opencv.org/) <=> [Library](https://github.com/hybridgroup/gobot-opencv)
   - [Spark](https://www.spark.io/) <=> [Library](https://github.com/hybridgroup/gobot-spark)
   - [Sphero](http://www.gosphero.com/) <=> [Library](https://github.com/hybridgroup/gobot-sphero)
   
@@ -101,14 +104,19 @@ Support for many devices that use General Purpose Input/Output (GPIO) have
 a shared set of drivers provded using the cylon-gpio module:
 
   - [GPIO](https://en.wikipedia.org/wiki/General_Purpose_Input/Output) <=> [Drivers](https://github.com/hybridgroup/gobot-gpio)
+    - Analog Sensor
     - Button
+    - Digital Sensor
     - LED
+    - Motor
     - Servo
 
 Support for devices that use Inter-Integrated Circuit (I2C) have a shared set of
 drivers provded using the gobot-i2c module:
 
   - [I2C](https://en.wikipedia.org/wiki/I%C2%B2C) <=> [Drivers](https://github.com/hybridgroup/gobot-i2c)
+    - BlinkM
+    - HMC6352
     - Wii Nunchuck Controller
 
 More platforms and drivers are coming soon...
