@@ -1,0 +1,87 @@
+---
+title: OpenCV with Gobot
+author: The Hybrid Group
+page_title: OpenCV
+page_subtitle: "<a href='https://github.com/hybridgroup/gobot-opencv' class='repository'>Repository</a> <a class='issues' href='https://github.com/hybridgroup/gobot-opencv/issues'>Issues</a>"
+page_title_show: true
+layout: documentation
+page_title_show: true
+subnav_platform: true
+---
+
+%section.intro
+  = image_tag "/images/devices/opencv.jpg", class: "display"
+  .info-intro
+    %p OpenCV is a real-time computer vision library.
+    %p OpenCV (Open Source Computer Vision Library) is an open source computer vision and machine learning software library. OpenCV was built to provide a common infrastructure for computer vision applications and to accelerate the use of machine perception in the commercial products. Being a BSD-licensed product, OpenCV makes it easy for businesses to utilize and modify the code.
+
+    %p
+      For more info about OpenCV click 
+      = succeed "." do
+        = link_to "here", "http://opencv.org/", target: :blank
+
+  .clear
+  
+%section.how-to#HowToInstall
+  %h2 How To Install
+  %p Installing Gobot with Opencv support is pretty easy.
+  :markdown
+        :::bash
+        go get path/to/repo/gobot-opencv
+
+
+  %p If you don't already have OpenCV installed
+  %h3 Ubuntu
+  :markdown
+        :::bash
+        #!/bin/bash
+        sudo apt-get -y install autoconf automake build-essential git libass-dev libgpac-dev \
+          libsdl1.2-dev libtheora-dev libtool libva-dev libvdpau-dev libvorbis-dev libx11-dev \
+          libxext-dev libxfixes-dev pkg-config texi2html zlib1g-dev yasm libmp3lame-dev \
+          libopus-dev libvpx-dev cmake libgtk2.0-dev pkg-config libjpeg8 libjpeg8-dev \
+          libgstreamer0.10-0 libgstreamer0.10-dev gstreamer0.10-tools gstreamer0.10-plugins-base \
+          libgstreamer-plugins-base0.10-dev gstreamer0.10-plugins-good gstreamer0.10-plugins-ugly \
+          gstreamer0.10-plugins-bad gstreamer0.10-ffmpeg
+        mkdir ~/ffmpeg_sources
+        cd ~/ffmpeg_sources
+        git clone --depth 1 git://git.videolan.org/x264.git
+        cd x264
+        ./configure --prefix="/usr/local" --bindir="/usr/local/bin" --enable-shared --enable-pic
+        make
+        sudo make install
+        cd ~/ffmpeg_sources
+        git clone --depth 1 git://git.code.sf.net/p/opencore-amr/fdk-aac
+        cd fdk-aac
+        autoreconf -fiv
+        ./configure --prefix="/usr/local" --bindir="/usr/local/bin" --enable-shared --with-pic
+        make
+        sudo make install
+        cd ~/ffmpeg_sources
+        git clone --depth 1 git://source.ffmpeg.org/ffmpeg
+        cd ffmpeg
+        export PKG_CONFIG_PATH="/usr/local/lib/pkgconfig"
+        ./configure --prefix="/usr/local"   --extra-cflags="-I/usr/local/include" --extra-ldflags="-L/usr/local/lib"   --bindir="/usr/local/bin" \
+          --extra-libs="-ldl" --enable-gpl --enable-libass --enable-libfdk-aac   --enable-libmp3lame --enable-libopus --enable-libtheora \
+          --enable-libvorbis --enable-libvpx   --enable-libx264 --enable-nonfree --enable-x11grab --enable-shared --enable-pic
+        make
+        sudo make install
+        hash -r
+        cd ~
+        git clone --depth 1 -b 2.4.6.2 https://github.com/Itseez/opencv.git
+        cd opencv
+        mkdir release
+        cd release
+        cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local ..
+        make
+        sudo make install
+
+%section.how-to#HowToUse
+  %h2 How To Use
+  %p Example using face detection.
+  :markdown
+        :::go
+        ...
+
+				      
+				  
+

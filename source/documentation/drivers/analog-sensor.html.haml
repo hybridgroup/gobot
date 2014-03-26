@@ -9,6 +9,7 @@ subnav_driver: true
 subnav_circuit_driver: true
 
 arduino_platform: true
+spark_platform: true
 ---
 
 %section.intro
@@ -21,6 +22,8 @@ arduino_platform: true
 
 %section.how_to#HowToConnect
   %h2 How To Connect
+  :markdown
+    Install the library with: `go get -u github.com/hybridgroup/gobot-gpio`
   :markdown
         :::bash
         coming soon
@@ -49,7 +52,7 @@ arduino_platform: true
   .clear 
    
 
-%section.compatibility.hardware#Compatibility
+%section.compatibility.hardware#Compatability
   %h2 Compatibility
   =# TODO: Update platform list with all that work with this driver in Cylon.js.
   .devices
