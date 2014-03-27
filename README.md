@@ -1,8 +1,8 @@
-[![Gobot](https://raw.github.com/hybridgroup/gobot/gh-pages/images/logo.png)](http://gobot.io/)
+[![Gobot](https://raw.github.com/hybridgroup/gobot/gh-pages/images/elements/logo.png)](http://gobot.io/)
 
 http://gobot.io/
 
-Gobot is a set of libraries for robotics and physical computing using the Go programming language (http://golang.org/)
+Gobot is a set of libraries for robotics, physical computing, and the Internet of Things, using the Go programming language (http://golang.org/)
 
 It provides a simple, yet powerful way to create solutions that incorporate multiple, different hardware devices at the same time.
 
@@ -157,4 +157,4 @@ Thank you!
 
 
 ## License
-Copyright (c) 2013 The Hybrid Group. Licensed under the Apache 2.0 license.
+Copyright (c) 2013-2014 The Hybrid Group. Licensed under the Apache 2.0 license.
