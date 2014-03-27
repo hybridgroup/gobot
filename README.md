@@ -101,8 +101,10 @@ Support for many devices that use General Purpose Input/Output (GPIO) have
 a shared set of drivers provded using the cylon-gpio module:
 
   - [GPIO](https://en.wikipedia.org/wiki/General_Purpose_Input/Output) <=> [Drivers](https://github.com/hybridgroup/gobot-gpio)
+    - Analog Sensor
     - Button
     - LED
+    - Motor
     - Servo
 
 Support for devices that use Inter-Integrated Circuit (I2C) have a shared set of
