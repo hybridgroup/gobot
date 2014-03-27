@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/tarm/goserial"
 	"io"
+	"math"
 	"math/rand"
 	"net"
 	"reflect"
@@ -99,4 +100,19 @@ func FieldByNamePtr(thing interface{}, field string) reflect.Value {
 func toJson(obj interface{}) string {
 	b, _ := json.Marshal(obj)
 	return string(b)
+}
+
+func FromScale(input, min, max float64) float64 {
+	return (input - math.Min(min, max)) / (math.Max(min, max) - math.Min(min, max))
+}
+
+func ToScale(input, min, max float64) float64 {
+	i := input*(math.Max(min, max)-math.Min(min, max)) + math.Min(min, max)
+	if i < math.Min(min, max) {
+		return math.Min(min, max)
+	} else if i > math.Max(min, max) {
+		return math.Max(min, max)
+	} else {
+		return i
+	}
 }
