@@ -1,4 +1,4 @@
-## Cylon Website
+## Gobot Website
 
 This site is build using [Middleman](http://middlemanapp.com/getting-started/)  
   
