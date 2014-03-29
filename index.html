@@ -104,8 +104,13 @@
               <p>Gobot makes commanding robots incredibly simple and fun.</p>
               <p>All you need to get started is install the library with :</p>
               <p><code>go get -u github.com/hybridgroup/gobot</code>.</p>
-              <p>Then install additional libraries for whatever hardware support you want to use from your robot. For example, `go get -u github.com/hybridgroup/gobot-sphero` to use Gobot with a Sphero.</p>
-              <h2>Example</h2>
+              <p>
+                </p>
+<p>Then install additional libraries for whatever hardware support you want to use from your robot. For example, 
+                <code>go get -u github.com/hybridgroup/gobot-sphero</code> 
+                to use Gobot with a Sphero.</p>
+              
+              <h2>Go with Sphero</h2>
               <pre class="CodeRay"><span class="keyword">package</span> main
 
 <span class="keyword">import</span> (
@@ -136,6 +141,40 @@
 
   robot.Start()
 } 
+</pre>
+              <h2>Go with a Blink</h2>
+              <pre class="CodeRay"><span class="keyword">package</span> main
+
+<span class="keyword">import</span> (
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-firmata</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
+)
+
+<span class="keyword">func</span> main() {
+
+  firmata := <span class="predefined">new</span>(gobotFirmata.FirmataAdaptor)
+  firmata.Name = <span class="string"><span class="delimiter">"</span><span class="content">firmata</span><span class="delimiter">"</span></span>
+  firmata.Port = <span class="string"><span class="delimiter">"</span><span class="content">/dev/ttyACM0</span><span class="delimiter">"</span></span>
+
+  led := gobotGPIO.NewLed(firmata)
+  led.Name = <span class="string"><span class="delimiter">"</span><span class="content">led</span><span class="delimiter">"</span></span>
+  led.Pin = <span class="string"><span class="delimiter">"</span><span class="content">13</span><span class="delimiter">"</span></span>
+
+  work := <span class="keyword">func</span>() {
+    gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">1s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() {
+      led.Toggle()
+    })
+  }
+
+  robot := gobot.Robot{
+    Connections: []gobot.Connection{firmata},
+    Devices:     []gobot.Device{led},
+    Work:        work,
+  }
+
+  robot.Start()
+}
 </pre>
               <h2>Hardware Support</h2>
               <p>
@@ -230,7 +269,7 @@
               <ul class="homepage-platform">
 <li>
                   <div class="title">
-                    Button
+                    <a href="/documentation/drivers/button">Button</a>
                   </div>
                   <a href="/documentation/drivers/button">
                     <img src="/images/devices/button.jpg" style="width: 90%"></a>
@@ -240,7 +279,7 @@
                 </li>
                 <li>
                   <div class="title">
-                    LED
+                    <a href="/documentation/drivers/led">LED</a>
                   </div>
                   <a href="/documentation/drivers/led">
                     <img src="/images/devices/LED.jpg" style="width: 90%"></a>
@@ -250,7 +289,7 @@
                 </li>
                 <li>
                   <div class="title">
-                    Servo
+                    <a href="/documentation/drivers/servo">Servo</a>
                   </div>
                   <a href="/documentation/drivers/servo">
                     <img src="/images/devices/servo.jpg" style="width: 90%"></a>
@@ -265,7 +304,7 @@
               <ul class="homepage-platform">
 <li>
                   <div class="title">
-                    BlinkM
+                    <a href="/documentation/drivers/blinkm">BlinkM</a>
                   </div>
                   <a href="/documentation/drivers/blinkm">
                     <img src="/images/devices/blinkm.jpg" style="width: 90%"></a>
@@ -275,7 +314,7 @@
                 </li>
                 <li>
                   <div class="title">
-                    Wii Nunchuck
+                    <a href="/documentation/drivers/wiichuck">Wii Nunchuck</a>
                   </div>
                   <a href="/documentation/drivers/wiichuck">
                     <img src="/images/devices/wii-chuck.jpg" style="width: 90%"></a>
@@ -305,8 +344,14 @@ gobot.Api(master)
               
               <pre class="CodeRay">$ PORT=8080 go run gobotProgram.go
 </pre>
-              <h2 id="be-part-of-the-robot-evolution">Be Part Of The Robot Evolution</h2>
+              <p>
+                </p>
+<p>In order to use the 
+                <a href="https://github.com/hybridgroup/robeaux">robeaux</a> 
+                AngularJS interface with Gobot you simply clone the robeaux repo and place it in the directory of your Gobot program. The robeaux assets must be in a folder called 
+                <code>robeaux</code>.</p>
               
+              <h2>Be Part Of The Robot Evolution</h2>
               <ul>
 <li>Code on Github:   <a href="https://github.com/hybridgroup/gobot">https://github.com/hybridgroup/gobot</a>
 </li>

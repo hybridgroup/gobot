@@ -1588,25 +1588,25 @@ a:hover, a:focus {
         .main[role="main"] .videos .video iframe, .main[role="main"] .videos .video object {
           height: 240px; } }
   /* line 60, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/layouts/_home.scss */
-  .main[role="main"] .videos .video_index {
+  .main[role="main"] .videos .video-index {
     float: left;
     display: block;
     margin-right: 2.35765%;
     width: 82.94039%; }
     /* line 40, /Users/stewart/go/src/github.com/hybridgroup/gobot/vendor/bundle/ruby/2.0.0/gems/neat-1.5.0/app/assets/stylesheets/grid/_span-columns.scss */
-    .main[role="main"] .videos .video_index:last-child {
+    .main[role="main"] .videos .video-index:last-child {
       margin-right: 0; }
     /* line 64, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/layouts/_home.scss */
-    .main[role="main"] .videos .video_index iframe, .main[role="main"] .videos .video_index object {
+    .main[role="main"] .videos .video-index iframe, .main[role="main"] .videos .video-index object {
       width: 100%;
       height: 400px; }
     @media only screen and (min-width: 767px) and (max-width: 964px) {
       /* line 72, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/layouts/_home.scss */
-      .main[role="main"] .videos .video_index iframe, .main[role="main"] .videos .video_index object {
+      .main[role="main"] .videos .video-index iframe, .main[role="main"] .videos .video-index object {
         height: 300px; } }
     @media only screen and (max-width: 767px) {
       /* line 80, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/layouts/_home.scss */
-      .main[role="main"] .videos .video_index iframe, .main[role="main"] .videos .video_index object {
+      .main[role="main"] .videos .video-index iframe, .main[role="main"] .videos .video-index object {
         height: 180px; } }
   /* line 89, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/layouts/_home.scss */
   .main[role="main"] .content.full {
@@ -1664,8 +1664,14 @@ a:hover, a:focus {
   /* line 8, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/layouts/_hardware.scss */
   .hardware .devices .device {
     display: inline-block;
-    width: 300px; }
+    width: 225px; }
     /* line 13, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/layouts/_hardware.scss */
+    .hardware .devices .device:hover {
+      background: #ff7e5b; }
+      /* line 15, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/layouts/_hardware.scss */
+      .hardware .devices .device:hover img {
+        opacity: .9; }
+    /* line 23, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/layouts/_hardware.scss */
     .hardware .devices .device img {
       width: 100%; }
 
@@ -1684,32 +1690,41 @@ a:hover, a:focus {
       .homepage-platform li {
         width: 100%;
         float: none; } }
-    /* line 16, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
+    /* line 18, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
+    .homepage-platform li img:hover {
+      opacity: .8; }
+    /* line 25, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
     .homepage-platform li .title {
       background: #ff7e5b;
       padding: 10px;
       color: white; }
-      /* line 21, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
+      /* line 31, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
+      .homepage-platform li .title:hover {
+        background: #ff6a42; }
+      /* line 36, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
       .homepage-platform li .title a {
         color: white; }
-    /* line 26, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
+    /* line 41, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
     .homepage-platform li .repo {
       background: #fafaf1;
       padding: 10px; }
-      /* line 30, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
+      /* line 46, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
+      .homepage-platform li .repo:hover {
+        background: #f3f3de; }
+      /* line 51, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
       .homepage-platform li .repo a {
         color: #ff7e5b; }
 
-/* line 38, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
+/* line 59, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
 .hero {
   margin: 15px 0 0 0;
   background: #ff7e5b;
   padding: 25px 0; }
   @media only screen and (max-width: 767px) {
-    /* line 38, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
+    /* line 59, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
     .hero {
       margin-top: -8px; } }
-  /* line 47, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
+  /* line 68, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
   .hero .title {
     font-family: "Montserrat", sans-serif;
     font-weight: 700;
@@ -1721,20 +1736,20 @@ a:hover, a:focus {
     opacity: 0.94;
     margin: 0; }
     @media only screen and (max-width: 767px) {
-      /* line 47, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
+      /* line 68, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
       .hero .title {
         font-size: 23px;
         line-height: 27px;
         padding: 0; }
-        /* line 60, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
+        /* line 83, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
         .hero .title br {
           display: none; } }
     @media only screen and (min-width: 767px) and (max-width: 964px) {
-      /* line 47, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
+      /* line 68, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
       .hero .title {
         font-size: 33px;
         line-height: 42px; } }
-  /* line 72, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
+  /* line 96, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
   .hero .subtitle {
     font-family: "Montserrat", sans-serif;
     font-weight: 700;
@@ -1746,61 +1761,61 @@ a:hover, a:focus {
     line-height: 36px;
     margin-top: 3px; }
     @media only screen and (max-width: 767px) {
-      /* line 72, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
+      /* line 96, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
       .hero .subtitle {
         font-size: 18px;
         line-height: 22px;
         margin-top: 4px;
         padding: 0; } }
 
-/* line 94, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
+/* line 120, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
 .social {
   line-height: 0;
   padding: 10px 0;
   background: #fdfcf5; }
-  /* line 99, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
+  /* line 126, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
   .social .twitter-follow-button {
     vertical-align: top; }
-  /* line 103, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
+  /* line 131, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
   .social .splitter {
     display: inline-block;
     height: 21px; }
   @media only screen and (max-width: 767px) {
-    /* line 110, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
+    /* line 139, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
     .social .splitter {
       display: block;
       margin-bottom: 5px; } }
 
-/* line 118, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
+/* line 147, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
 .cta, .hero a.cta {
   padding: 10px 20px;
   display: inline-block;
   margin: 17px 0 0 0;
   font-size: 19px;
   font-weight: bold; }
-  /* line 126, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
+  /* line 155, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
   .cta, .hero a.cta, .cta:visited, .hero a.cta:visited, .cta:active, .hero a.cta:active {
     background: #fff3cf;
     color: #bd583d; }
-  /* line 132, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
+  /* line 161, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
   .cta:hover, .hero a.cta:hover, .cta:focus, .hero a.cta:focus {
     background: #e1d5b1;
     color: #b34e33; }
   @media only screen and (max-width: 767px) {
-    /* line 118, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
+    /* line 147, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
     .cta, .hero a.cta {
       font-size: 16px;
       padding: 8px 15px; } }
 
-/* line 153, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
+/* line 182, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
 .catcher {
   margin: 0 0 38px 0;
   background: #fdfcf5;
   padding: 20px; }
-  /* line 158, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
+  /* line 187, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
   .catcher .phrase {
     margin: 0; }
-  /* line 162, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
+  /* line 191, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_home.scss */
   .catcher .cta, .catcher .hero a.cta, .hero .catcher a.cta {
     margin-top: 8px; }
 
@@ -1984,24 +1999,24 @@ a:hover, a:focus {
   padding-top: 65px; }
 
 /* line 53, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_page.scss */
-.subnav_drivers {
+.subnav-drivers {
   background: #694f38;
   padding: 20px 0; }
   @media only screen and (max-width: 767px) {
     /* line 53, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_page.scss */
-    .subnav_drivers {
+    .subnav-drivers {
       display: none; } }
   /* line 65, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_page.scss */
-  .subnav_drivers nav a {
+  .subnav-drivers nav a {
     padding: 5px 10px;
     margin: 20px 10px;
     color: #ff7e5b; }
     /* line 71, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_page.scss */
-    .subnav_drivers nav a:hover {
+    .subnav-drivers nav a:hover {
       color: white;
       background: #504338; }
   /* line 78, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_page.scss */
-  .subnav_drivers nav .active {
+  .subnav-drivers nav .active {
     color: white;
     background: #504338; }
 
@@ -2023,13 +2038,13 @@ a:hover, a:focus {
   margin-right: 10px; }
 
 /* line 10, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
-.documentation .intro .info_intro {
+.documentation .intro .info-intro {
   float: left;
   width: 60%;
   margin: 0; }
   @media only screen and (max-width: 767px) {
     /* line 10, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
-    .documentation .intro .info_intro {
+    .documentation .intro .info-intro {
       width: 100%; } }
 /* line 23, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
 .documentation .index {
@@ -2122,55 +2137,55 @@ a:hover, a:focus {
         width: 100%; } }
 
 /* line 113, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
-.circuit .image_circuit {
+.circuit .image-circuit {
   width: 50%;
   float: left; }
   /* line 118, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
-  .circuit .image_circuit img {
+  .circuit .image-circuit img {
     height: 300px; }
 /* line 124, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
-.circuit .description_circuit {
+.circuit .description-circuit {
   width: 50%;
   float: right; }
 
 /* line 133, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
-.commands_api h2 {
+.commands-api h2 {
   background: #ff7e5b;
   color: white !important;
   padding: 5px 10px;
   font-size: 12pt;
   margin: 20px 0 0 0; }
 /* line 143, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
-.commands_api h4 {
+.commands-api h4 {
   background: transparent;
   font-size: 11pt;
   font-weight: normal; }
 /* line 150, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
-.commands_api h5 {
+.commands-api h5 {
   background: white;
   padding: 10px;
   margin: 0;
   font-size: 11pt; }
 /* line 158, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
-.commands_api h3 {
+.commands-api h3 {
   background: white;
   padding: 10px;
   margin: 0;
   font-size: 11pt;
   color: #ff7e5b; }
 /* line 167, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
-.commands_api pre {
+.commands-api pre {
   background: white;
   margin: 0; }
 /* line 173, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
-.commands_api p, .commands_api ul {
+.commands-api p, .commands-api ul {
   background: white;
   font-size: 10.5pt;
   margin: 0;
   padding: 10px;
   font-family: Inconsolata,Menlo,Monaco,"Bitstream Vera Sans Mono","Courier New",monospace; }
 /* line 182, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
-.commands_api li {
+.commands-api li {
   margin-left: 20px; }
 
 /* line 188, /Users/stewart/go/src/github.com/hybridgroup/gobot/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */

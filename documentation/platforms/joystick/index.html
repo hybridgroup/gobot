@@ -62,7 +62,7 @@
 </h2>
         </div>
       </div>
-      <section class="subnav_drivers" id="mainsubnav"><div class="container">
+      <section class="subnav-drivers" id="mainsubnav"><div class="container">
           <nav><a href="#HowToInstall">How To Install</a>
             <a href="#HowToUse">How To Use</a>
             <a href="#HowToConnect">How To Connect</a>
@@ -73,9 +73,9 @@
       </section><div class="container">
         <div class="main" role="main">
           <section class="content full"><div class="documentation">
-              <section class="intro"><img class="display" src="/images/devices/joystick.jpg"><div class="info_intro">
+              <section class="intro"><img class="display" src="/images/devices/joystick.jpg"><div class="info-intro">
                   <p>
-                    You can use Gobot with a PS3 game controller, an XBox360 game controller, or any other USB joystick or game controller that is compatible with Simple DirectMedia Layer (SDL).
+                    You can use Gobot with a Dualshock3 game controller, an XBox360 game controller, or any other USB joystick or game controller that is compatible with Simple DirectMedia Layer (SDL).
                   </p>
                   <p>
                     For more info about Simple DirectMedia Layer (SDL) go to
@@ -91,54 +91,54 @@
 </pre>
               </section><section class="how-to" id="HowToUse"><h2>How to use</h2>
                 <p>This small program receives joystick and button press events from an XBox 360 game controller.</p>
-                <pre class="CodeRay">package main
+                <pre class="CodeRay"><span class="keyword">package</span> main
 
-import (
-  "fmt"
-  "github.com/hybridgroup/gobot"
-  "github.com/hybridgroup/gobot-joystick"
+<span class="keyword">import</span> (
+  <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-joystick</span><span class="delimiter">"</span></span>
 )
 
-func main() {
-  joystickAdaptor := new(gobotJoystick.JoystickAdaptor)
-  joystickAdaptor.Name = "xbox360"
-  joystickAdaptor.Params = map[string]interface{}{
-    "config": "./configs/xbox360_power_a_mini_proex.json",
+<span class="keyword">func</span> main() {
+  joystickAdaptor := <span class="predefined">new</span>(gobotJoystick.JoystickAdaptor)
+  joystickAdaptor.Name = <span class="string"><span class="delimiter">"</span><span class="content">xbox360</span><span class="delimiter">"</span></span>
+  joystickAdaptor.Params = <span class="keyword">map</span>[<span class="predefined-type">string</span>]<span class="keyword">interface</span>{}{
+    <span class="string"><span class="delimiter">"</span><span class="content">config</span><span class="delimiter">"</span></span>: <span class="string"><span class="delimiter">"</span><span class="content">./configs/xbox360_power_a_mini_proex.json</span><span class="delimiter">"</span></span>,
   }
 
   joystick := gobotJoystick.NewJoystick(joystickAdaptor)
-  joystick.Name = "xbox360"
+  joystick.Name = <span class="string"><span class="delimiter">"</span><span class="content">xbox360</span><span class="delimiter">"</span></span>
 
-  work := func() {
-    gobot.On(joystick.Events["a"], func(data interface{}) {
-      fmt.Println("a", data)
+  work := <span class="keyword">func</span>() {
+    gobot.On(joystick.Events[<span class="string"><span class="delimiter">"</span><span class="content">a</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+      fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">a</span><span class="delimiter">"</span></span>, data)
     })
-    gobot.On(joystick.Events["b"], func(data interface{}) {
-      fmt.Println("b", data)
+    gobot.On(joystick.Events[<span class="string"><span class="delimiter">"</span><span class="content">b</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+      fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">b</span><span class="delimiter">"</span></span>, data)
     })
-    gobot.On(joystick.Events["up"], func(data interface{}) {
-      fmt.Println("up", data)
+    gobot.On(joystick.Events[<span class="string"><span class="delimiter">"</span><span class="content">up</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+      fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">up</span><span class="delimiter">"</span></span>, data)
     })
-    gobot.On(joystick.Events["down"], func(data interface{}) {
-      fmt.Println("down", data)
+    gobot.On(joystick.Events[<span class="string"><span class="delimiter">"</span><span class="content">down</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+      fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">down</span><span class="delimiter">"</span></span>, data)
     })
-    gobot.On(joystick.Events["left"], func(data interface{}) {
-      fmt.Println("left", data)
+    gobot.On(joystick.Events[<span class="string"><span class="delimiter">"</span><span class="content">left</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+      fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">left</span><span class="delimiter">"</span></span>, data)
     })
-    gobot.On(joystick.Events["right"], func(data interface{}) {
-      fmt.Println("right", data)
+    gobot.On(joystick.Events[<span class="string"><span class="delimiter">"</span><span class="content">right</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+      fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">right</span><span class="delimiter">"</span></span>, data)
     })
-    gobot.On(joystick.Events["left_x"], func(data interface{}) {
-      fmt.Println("left_x", data)
+    gobot.On(joystick.Events[<span class="string"><span class="delimiter">"</span><span class="content">left_x</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+      fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">left_x</span><span class="delimiter">"</span></span>, data)
     })
-    gobot.On(joystick.Events["left_y"], func(data interface{}) {
-      fmt.Println("left_y", data)
+    gobot.On(joystick.Events[<span class="string"><span class="delimiter">"</span><span class="content">left_y</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+      fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">left_y</span><span class="delimiter">"</span></span>, data)
     })
-    gobot.On(joystick.Events["right_x"], func(data interface{}) {
-      fmt.Println("right_x", data)
+    gobot.On(joystick.Events[<span class="string"><span class="delimiter">"</span><span class="content">right_x</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+      fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">right_x</span><span class="delimiter">"</span></span>, data)
     })
-    gobot.On(joystick.Events["right_y"], func(data interface{}) {
-      fmt.Println("right_y", data)
+    gobot.On(joystick.Events[<span class="string"><span class="delimiter">"</span><span class="content">right_y</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+      fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">right_y</span><span class="delimiter">"</span></span>, data)
     })
   }
 
@@ -161,8 +161,8 @@ end
                 <div class="hardware">
                   <div class="devices">
                     <!-- // PS3 -->
-                    <a class="device" href="/documentation/drivers/ps3" title="PS3 Controller">
-                      <img src="/images/devices/ps3.jpg"></a>
+                    <a class="device" href="/documentation/drivers/dualshock3" title="Dualshock3 Controller">
+                      <img src="/images/devices/dualshock3.jpg"></a>
                     <!-- // Xbox 360 -->
                     <a class="device" href="/documentation/drivers/xbox360" title="XBox360 Controller">
                       <img src="/images/devices/xbox360.jpg"></a>
