@@ -170,6 +170,14 @@ getting_started_button: "<a href='/documentation/getting-started' class='cta'> G
 
     %li
       .title
+        = link_to "OpenCV", "http://opencv.org/", target:"_blank"  
+      %a{:href => "/documentation/platforms/opencv"} 
+        %img{src: "/images/devices/opencv.jpg", style: "width: 90%"}  
+      .repo
+        = link_to "repo", "https://github.com/hybridgroup/gobot-opencv", target:"_blank"
+
+    %li
+      .title
         = link_to "Spark", "https://www.spark.io/", target:"_blank"  
       %a{:href => "/documentation/platforms/spark"} 
         %img{src: "/images/devices/spark.jpg", style: "width: 90%"}  
