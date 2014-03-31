@@ -4,6 +4,7 @@ type testDriver struct {
 	Driver
 }
 
+func (me *testDriver) Init() bool  { return true }
 func (me *testDriver) Start() bool { return true }
 func (me *testDriver) Halt() bool  { return true }
 

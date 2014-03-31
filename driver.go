@@ -9,6 +9,7 @@ type Driver struct {
 }
 
 type DriverInterface interface {
+	Init() bool
 	Start() bool
 	Halt() bool
 }

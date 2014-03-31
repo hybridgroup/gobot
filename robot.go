@@ -28,9 +28,11 @@ func (r *Robot) startRobot() {
 	r.initName()
 	r.initCommands()
 	r.initConnections()
-	r.initDevices()
 	if r.startConnections() != true {
 		panic("Could not start connections")
+	}
+	if r.initDevices() != true {
+		panic("Could not initialize devices")
 	}
 	if r.startDevices() != true {
 		panic("Could not start devices")
@@ -63,13 +65,21 @@ func (r *Robot) initConnections() {
 	}
 }
 
-func (r *Robot) initDevices() {
+func (r *Robot) initDevices() bool {
 	r.devices = make([]*device, len(r.Devices))
 	log.Println("Initializing devices...")
 	for i, device := range r.Devices {
-		log.Println("Initializing device ", FieldByNamePtr(device, "Name"), "...")
 		r.devices[i] = NewDevice(device, r)
 	}
+	success := true
+	for _, device := range r.devices {
+		log.Println("Initializing device " + device.Name + "...")
+		if device.Init() == false {
+			success = false
+			break
+		}
+	}
+	return success
 }
 
 func (r *Robot) startConnections() bool {
