@@ -5,6 +5,7 @@ type testDriver struct {
 }
 
 func (me *testDriver) Start() bool { return true }
+func (me *testDriver) Halt() bool  { return true }
 
 type testAdaptor struct {
 	Adaptor

@@ -98,6 +98,12 @@ func (r *Robot) startDevices() bool {
 	return success
 }
 
+func (r *Robot) haltDevices() {
+	for _, device := range r.devices {
+		device.Halt()
+	}
+}
+
 func (r *Robot) finalizeConnections() {
 	for _, connection := range r.connections {
 		connection.Finalize()

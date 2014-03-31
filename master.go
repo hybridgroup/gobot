@@ -29,6 +29,7 @@ func (m *Master) Start() {
 
 	for _ = range c {
 		for r := range m.Robots {
+			m.Robots[r].haltDevices()
 			m.Robots[r].finalizeConnections()
 		}
 		break

@@ -10,4 +10,5 @@ type Driver struct {
 
 type DriverInterface interface {
 	Start() bool
+	Halt() bool
 }

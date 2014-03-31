@@ -13,6 +13,7 @@ type device struct {
 
 type Device interface {
 	Start() bool
+	Halt() bool
 }
 
 func NewDevice(driver DriverInterface, r *Robot) *device {
@@ -29,6 +30,11 @@ func NewDevice(driver DriverInterface, r *Robot) *device {
 func (d *device) Start() bool {
 	log.Println("Device " + d.Name + " started")
 	return d.Driver.Start()
+}
+
+func (d *device) Halt() bool {
+	log.Println("Device " + d.Name + " halted")
+	return d.Driver.Halt()
 }
 
 func (d *device) Commands() interface{} {
