@@ -91,6 +91,39 @@ func doGenerate(cmd *commander.Command, args []string) error {
 		err = nil
 	}
 	f.Close()
+
+	driverTest, _ := template.New("").Parse(driverTest())
+	file_location = fmt.Sprintf("%s/%s_driver_test.go", dir, args[0])
+	fmt.Println("Creating", file_location)
+	f, err = os.Create(file_location)
+	if err != nil {
+		fmt.Println(err)
+		err = nil
+	}
+	driverTest.Execute(f, name)
+	f.Close()
+
+	adaptorTest, _ := template.New("").Parse(adaptorTest())
+	file_location = fmt.Sprintf("%s/%s_adaptor_test.go", dir, args[0])
+	fmt.Println("Creating", file_location)
+	f, err = os.Create(file_location)
+	if err != nil {
+		fmt.Println(err)
+		err = nil
+	}
+	adaptorTest.Execute(f, name)
+	f.Close()
+
+	testSuite, _ := template.New("").Parse(testSuite())
+	file_location = fmt.Sprintf("%s/gobot-%s_suite_test.go", dir, args[0])
+	fmt.Println("Creating", file_location)
+	f, err = os.Create(file_location)
+	if err != nil {
+		fmt.Println(err)
+		err = nil
+	}
+	testSuite.Execute(f, name)
+	f.Close()
 	return nil
 }
 
@@ -135,7 +168,7 @@ type {{ .UpperName }}Driver struct {
 	{{ .UpperName }}Adaptor *{{ .UpperName }}Adaptor
 }
 
-type {{ .UpperName}}Interface interface {
+type {{ .UpperName }}Interface interface {
 }
 
 func New{{ .UpperName }}(adaptor *{{ .UpperName }}Adaptor) *{{ .UpperName }}Driver {
@@ -146,14 +179,88 @@ func New{{ .UpperName }}(adaptor *{{ .UpperName }}Adaptor) *{{ .UpperName }}Driv
 	return d
 }
 
-func (me *{{ .UpperName }}Driver) Start() bool {
-	gobot.Every(sd.Interval, func() {
-		me.handleMessageEvents()
-	})
-  return true
+func (me *{{ .UpperName }}Driver) Init() bool { return true }
+func (me *{{ .UpperName }}Driver) Start() bool { return true }
+func (me *{{ .UpperName }}Driver) Halt() bool { return true }
+`
 }
 
-func (me *{{ .UpperName }}Driver) handleMessageEvents() {
+func driverTest() string {
+	return `package gobot{{ .UpperName }}
+
+import (
+  . "github.com/onsi/ginkgo"
+  . "github.com/onsi/gomega"
+)
+
+var _ = Describe("{{ .UpperName }}Driver", func() {
+  var (
+    driver *{{ .UpperName }}Driver
+  )
+
+  BeforeEach(func() {
+    driver = New{{ .UpperName }}(new({{ .UpperName }}Adaptor))
+  })
+
+  It("Must be able to Start", func() {
+    Expect(driver.Start()).To(Equal(true))
+  })
+  It("Must be able to Init", func() {
+    Expect(driver.Init()).To(Equal(true))
+  })
+  It("Must be able to Halt", func() {
+    Expect(driver.Halt()).To(Equal(true))
+  })
+})
+`
+}
+
+func adaptorTest() string {
+	return `package gobot{{ .UpperName }}
+
+import (
+  . "github.com/onsi/ginkgo"
+  . "github.com/onsi/gomega"
+)
+
+var _ = Describe("{{ .UpperName }}Adaptor", func() {
+  var (
+    adaptor *{{ .UpperName }}Adaptor
+  )
+
+  BeforeEach(func() {
+    adaptor = new({{ .UpperName }}Adaptor)
+  })
+
+  It("Must be able to Finalize", func() {
+    Expect(adaptor.Finalize()).To(Equal(true))
+  })
+  It("Must be able to Connect", func() {
+    Expect(adaptor.Connect()).To(Equal(true))
+  })
+  It("Must be able to Disconnect", func() {
+    Expect(adaptor.Disconnect()).To(Equal(true))
+  })
+  It("Must be able to Reconnect", func() {
+    Expect(adaptor.Reconnect()).To(Equal(true))
+  })
+})
+`
+}
+
+func testSuite() string {
+	return `package gobot{{ .UpperName }}
+
+import (
+  . "github.com/onsi/ginkgo"
+  . "github.com/onsi/gomega"
+
+  "testing"
+)
+
+func TestGobot{{ .UpperName }}(t *testing.T) {
+  RegisterFailHandler(Fail)
+  RunSpecs(t, "Gobot-{{ .UpperName }} Suite")
 }
 `
 }

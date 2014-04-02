@@ -2,10 +2,9 @@ package main
 
 import (
 	"fmt"
-	"os"
-
 	"github.com/gonuts/commander"
 	"github.com/gonuts/flag"
+	"os"
 )
 
 var g_cmd *commander.Command
