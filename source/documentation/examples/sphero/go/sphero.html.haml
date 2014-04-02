@@ -1,11 +1,11 @@
 ---
-page_title_show: true
 layout: documentation
-title: gobot Example - sphero
+page_title_show: true
+title: "Gobot Example - sphero"
 page_title: "Example: sphero"
 author: The Hybrid Group
-description: A gobot code example
-page_subtitle: "You can find this example <a href='https://github.com/hybridgroup/gobot/blob/master/examples/sphero.go' target='blank' class='repository'>here.</a>"
+description: A Gobot code example
+page_subtitle: "<a href='https://github.com/hybridgroup/gobot-sphero/tree/master/examples' target='_blank'>View In Repo</a>"
 ---
 
 .example
@@ -14,6 +14,7 @@ page_subtitle: "You can find this example <a href='https://github.com/hybridgrou
         package main
 
         import (
+        	"fmt"
         	"github.com/hybridgroup/gobot"
         	"github.com/hybridgroup/gobot-sphero"
         )
@@ -25,11 +26,22 @@ page_subtitle: "You can find this example <a href='https://github.com/hybridgrou
         	spheroAdaptor.Port = "/dev/rfcomm0"
 
         	sphero := gobotSphero.NewSphero(spheroAdaptor)
-        	sphero.Name = "Sphero"
+        	sphero.Name = "sphero"
 
         	work := func() {
-        		gobot.Every("2s", func() {
-        			sphero.Roll(100, uint16(gobot.Rand(360)))
+        		gobot.On(sphero.Events["Collision"], func(data interface{}) {
+        			fmt.Println("Collision Detected!")
+        		})
+
+        		gobot.Every("3s", func() {
+        			sphero.Roll(30, uint16(gobot.Rand(360)))
+        		})
+
+        		gobot.Every("1s", func() {
+        			r := uint8(gobot.Rand(255))
+        			g := uint8(gobot.Rand(255))
+        			b := uint8(gobot.Rand(255))
+        			sphero.SetRGB(r, g, b)
         		})
         	}
 

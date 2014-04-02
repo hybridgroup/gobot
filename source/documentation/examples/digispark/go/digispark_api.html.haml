@@ -1,0 +1,41 @@
+---
+layout: documentation
+page_title_show: true
+title: "Gobot Example - digispark_api"
+page_title: "Example: digispark_api"
+author: The Hybrid Group
+description: A Gobot code example
+page_subtitle: "<a href='https://github.com/hybridgroup/gobot-digispark/tree/master/examples' target='_blank'>View In Repo</a>"
+---
+
+.example
+  :markdown
+        :::golang
+        package main
+
+        import (
+        	"github.com/hybridgroup/gobot"
+        	"github.com/hybridgroup/gobot-digispark"
+        	"github.com/hybridgroup/gobot-gpio"
+        )
+
+        func main() {
+        	master := gobot.GobotMaster()
+        	gobot.Api(master)
+
+        	digispark := new(gobotDigispark.DigisparkAdaptor)
+        	digispark.Name = "digispark"
+
+        	led := gobotGPIO.NewLed(digispark)
+        	led.Name = "led"
+        	led.Pin = "0"
+
+        	master.Robots = append(master.Robots, gobot.Robot{
+        		Name:        "digispark",
+        		Connections: []gobot.Connection{digispark},
+        		Devices:     []gobot.Device{led},
+        	})
+
+        	master.Start()
+        }
+

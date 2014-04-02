@@ -1,0 +1,141 @@
+---
+layout: documentation
+page_title_show: true
+title: "Gobot Example - conway_sphero"
+page_title: "Example: conway_sphero"
+author: The Hybrid Group
+description: A Gobot code example
+page_subtitle: "<a href='https://github.com/hybridgroup/gobot-sphero/tree/master/examples' target='_blank'>View In Repo</a>"
+---
+
+.example
+  :markdown
+        :::golang
+        package main
+
+        import (
+          "github.com/hybridgroup/gobot"
+          "github.com/hybridgroup/gobot-sphero"
+          "fmt"
+        )
+
+        type conway struct {
+          alive bool
+          age int
+          contacts int
+          sphero *gobotSphero.SpheroDriver
+        }
+
+        func main() {
+
+          var robots []gobot.Robot
+          spheros := []string{
+            "127.0.0.1:4560",
+            "127.0.0.1:4561",
+            "127.0.0.1:4562",
+            "127.0.0.1:4563",
+          }
+
+          for s := range spheros {
+            spheroAdaptor := new(gobotSphero.SpheroAdaptor)
+            spheroAdaptor.Name = "Sphero"
+            spheroAdaptor.Port = spheros[s]
+
+            sphero := gobotSphero.NewSphero(spheroAdaptor)
+            sphero.Name = "Sphero" + spheros[s]
+            sphero.Interval = "0.5s"
+
+            work := func() {
+
+              conway := new(conway)
+              conway.sphero = sphero
+
+              conway.birth()
+
+              go func() {
+                for{
+                  gobot.On(sphero.Events["Collision"])
+                  conway.contact()
+                }
+              }()    
+
+              gobot.Every("3s", func() { 
+                if conway.alive == true {
+                  conway.movement() 
+                }  
+              })
+              gobot.Every("10s", func() { 
+                if conway.alive == true {
+                  conway.birthday()
+                }
+              })
+            }
+
+            robots = append(robots, gobot.Robot{Connections: []interface{} {spheroAdaptor}, Devices: []interface{} {sphero}, Work: work,})
+          }
+
+          gobot.Work(robots)
+        }
+
+        func (c *conway) resetContacts() {
+          c.contacts = 0
+        }
+
+        func (c *conway) contact() {
+          c.contacts += 1
+        }
+
+        func (c *conway) rebirth() {
+          fmt.Println("Welcome back", c.sphero.Name, "!")
+          c.life()
+        }
+
+        func (c *conway) birth() {
+          c.resetContacts()
+          c.age = 0
+          c.life()
+          c.movement()
+        }
+
+        func (c *conway) life() {
+          c.sphero.SetRGB(0, 255, 0)
+          c.alive = true
+        }
+
+        func (c *conway) death() {
+          fmt.Println(c.sphero.Name, "died :(")
+          c.alive = false
+          c.sphero.SetRGB(255, 0, 0)
+          c.sphero.Stop()
+        }
+
+        func (c *conway) enoughContacts() bool {
+          if c.contacts >= 2 && c.contacts < 7 {
+            return true
+          } else {
+            return false
+          }
+        }
+
+        func (c *conway) birthday() {
+          c.age += 1
+            
+          fmt.Println("Happy birthday", c.sphero.Name, "you are", c.age, "and had", c.contacts, "contacts.")
+
+          if c.enoughContacts() == true {
+            if c.alive == false {
+              c.rebirth()
+            }
+          } else {
+            c.death()
+          }
+
+          c.resetContacts()
+        }
+
+        func (c *conway) movement() {
+          if c.alive == true {
+            c.sphero.Roll(100, uint16(gobot.Random(0,360)))
+          }
+        }
+

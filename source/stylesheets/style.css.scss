@@ -6,3 +6,15 @@
   @extend .hidden-text;
   margin-top: 10px;
 }
+
+.content {
+  .documentation {
+    .examples {
+      table {
+        tbody tr td:first-child, thead tr th:first-child {
+          width: 580px;
+        }
+      }
+    }
+  }
+}

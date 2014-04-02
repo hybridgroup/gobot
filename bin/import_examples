@@ -1,239 +1,285 @@
 #!/usr/bin/env ruby
 
-# This script is used to import examples from the master branch, and convert
-# them to HAML so that Middleman can compile them. This provides a (mostly)
-# automated way to keep examples in sync between the GitHub repo and site.
+# Change project details here
+Project = Struct
+  .new(:name, :pretty_name, :language, :extension)
+  .new('gobot', 'Gobot', 'golang', 'go')
 
+require 'bundler'
+Bundler.setup
+
+require 'git'
 require 'fileutils'
 
-# The git URL for the repository we'll be pulling examples from
-GITHUB_REPO = "https://github.com/hybridgroup/gobot.git"
+if ARGV.any?
+  REPOS = ARGV.collect do |arg|
+    arg[/^([\w-]+\/[\w-]+)$/, 1] ? "https://github.com/#{arg}.git" : arg
+  end
+else
+  REPOS = %w(
+    https://github.com/hybridgroup/gobot.git
+    https://github.com/hybridgroup/gobot-ardrone.git
+    https://github.com/hybridgroup/gobot-beaglebone.git
+    https://github.com/hybridgroup/gobot-digispark.git
+    https://github.com/hybridgroup/gobot-firmata.git
+    https://github.com/hybridgroup/gobot-gpio.git
+    https://github.com/hybridgroup/gobot-i2c.git
+    https://github.com/hybridgroup/gobot-joystick.git
+    https://github.com/hybridgroup/gobot-leapmotion.git
+    https://github.com/hybridgroup/gobot-opencv.git
+    https://github.com/hybridgroup/gobot-spark.git
+    https://github.com/hybridgroup/gobot-sphero.git
+  )
+end
 
-# The dir the cloned repo will be (temporarily) stored in
-REPO_DIR = File.expand_path "./.gobot"
+INDENTED_CODE_REGEX = / # Match a MARKDOWN CODE section.
+  (\r?\n)              # $1: CODE must be preceded by blank line
+  (                    # $2: CODE contents
+    (?:                # Group for multiple lines of code.
+      (?:\r?\n)+       # Each line preceded by a newline,
+      (?:[ ]{4}|\t).*  # and begins with four spaces or tab.
+    )+                 # One or more CODE lines
+    \r?\n              # CODE folowed by blank line.
+  )                    # End $2: CODE contents
+  (?=\r?\n)?           # CODE folowed by blank line.
+  /x
 
-# The dir where Middleman's source content lives
-SITE_DIR = File.expand_path "./source"
+class Example
+  attr_reader :path, :name, :content, :markdown_content
 
-# The name of the project
-PROJECT = "gobot"
+  def initialize(filename)
+    @path = filename
+    @repo = filename[/\.examples\/([a-zA-Z-]+)\//, 1]
+    @name = File.basename(filename, ".#{Project.extension}")
+    @content = File.read(filename)
 
-# An array of hashes, containing the name of the language and extensions that
-# language uses.
-#
-# :name should be the string name for the language, lowercased. e.g.
-# 'coffeescript', or 'golang'
-#
-# :ext should be a comma-seperated list of file extensions for the lang. e.g.
-# "listcoffee,coffee.md"
-#
-# :pretty is a properly-formatted version of the language name, e.g.
-# "CoffeeScript" or "Ruby" or "Node.js"
-LANGS = [
-  { :name => "golang", :ext => "go", :pretty => "Golang" }
-]
+    if File.exists? filename.gsub(/#{Project.extension}$/, 'markdown')
+      @markdown_content = File.read(filename.gsub(/#{Project.extension}$/, 'markdown'))
+    end
+  end
 
-# The base layout for the Examples index page.
-# Will be put into SITE_DIR/documentation/examples/index.html.
-INDEX_LAYOUT = <<-EOS
+  def markdown_version?
+    !@markdown_content.nil?
+  end
+
+  def title
+    if markdown_version?
+      @markdown_content[/\A#\s+(.+)$/, 1]
+    else
+      @name
+    end
+  end
+
+  def annotated_page
+    return unless markdown_version?
+    body = @markdown_content.dup
+
+    # mark all indented blocks for syntax highlighting
+    body.gsub! INDENTED_CODE_REGEX do |code|
+      code.gsub! /\A\n+/, "\n\n    :::#{Project.language}\n"
+      code
+    end
+
+    # escape interpolation as to not confuse HAML
+    body.gsub! /(#\{)/, "\\\#{"
+
+    # change import path
+    body.gsub! /\.\.\/\.\./, Project.name
+
+    # indent by two spaces
+    body.gsub! /^(.+)/, '  \1'
+
+    <<-EOS
 ---
-page_title_show: true
 layout: documentation
-title: Examples
-page_title: Examples
-author: The Hybrid Group
-description: Examples of using #{PROJECT} with different hardware configurations
-page_subtitle: How you can get started.
----
-
-.examples
-  %table
-    %thead
-      %th Example
-      %th.links{:colspan => '#{LANGS.length}'} Links
-    %tbody
-  EOS
-
-class ExampleImporter
-  attr_reader :files
-
-  def initialize
-    @files = {}
-
-    LANGS.each { |lang| @files[lang[:name]] = [] }
-
-    clone_repo
-    get_examples_from_repo
-    remove_existing_examples
-    create_index_page
-    create_example_pages
-    remove_local_repo
-  end
-
-  # Public: Extracts example files from the local copy of the remote repo for
-  # all languages in LANGS.
-  #
-  # Returns a hash containing example files for each language
-  def get_examples_from_repo
-    say "Extracting examples from repo."
-
-    LANGS.each do |lang|
-      get_examples_for_lang lang
-    end
-
-    @files
-  end
-
-  # Public: Gets examples from local copy of remote repo for a specific language
-  #
-  # lang - language hash to fetch examples for
-  #
-  # Returns an array of matching files
-  def get_examples_for_lang(lang)
-    say "- Extracting examples for #{lang[:name]}.", :indent_level => 2
-    Dir[REPO_DIR + "/examples/**/*.{#{lang[:ext]}}"].each do |file|
-      @files[lang[:name]] << {
-        :name => file.match(/\/([A-Za-z_-]+)\..+$/)[1],
-        :path => file,
-        :content => File.read(file)
-      }
-    end
-
-    @files[lang[:name]]
-  end
-
-  # Public: Removes existing example pages from Middleman's source.
-  #
-  # Returns nothing.
-  def remove_existing_examples
-    say "Removing existing example pages."
-
-    FileUtils.rm Dir[SITE_DIR + "/documentation/examples/**/*.html.haml"]
-  end
-
-  # Public: Creates an index page for examples, containing links to all examples
-  # in a table.
-  #
-  # Returns nothing
-  def create_index_page
-    say "Creating example index page."
-
-    @table = {}
-    @page_content = INDEX_LAYOUT
-    @filename = SITE_DIR + "/documentation/examples/index.html.haml"
-
-    @files.each do |lang, files|
-      files.each do |file|
-        name = file[:name]
-        prettyLangName = LANGS.find { |l| l[:name] == lang }[:pretty]
-        path = "/documentation/examples/#{lang}/#{name}"
-
-        if @table[name]
-          @table[name][lang] = path
-        else
-          @table[name] = { lang => path }
-        end
-      end
-    end
-
-    @table.each do |example, links|
-      string = "%tr\n"
-      string << "  %td #{example}\n"
-
-      links.each do |type, link|
-        lang = LANGS.find { |l| l[:name] == type }[:pretty]
-        string << "  %td.links= link_to '#{lang}', '#{link}'\n"
-      end
-
-      string.gsub! /^(.+)/, '      \1'
-      @page_content << string
-    end
-
-    File.write @filename, @page_content
-  end
-
-  # Public: Creates all example pages in HAML format, ready for Middleman to
-  # convert.
-  #
-  # Returns nothing
-  def create_example_pages
-    say "Creating example pages."
-
-    @files.each do |lang, files|
-      say "#{lang}:", :indent_level => 2
-
-      examples_dir = SITE_DIR + "/documentation/examples/#{lang}"
-      FileUtils.mkdir_p(examples_dir) unless File.directory?(examples_dir)
-
-      files.each do |file|
-        say "- #{file[:name]}", :indent_level => 3
-
-        filename = examples_dir + "/#{file[:name]}.html.haml"
-        body = file[:content]
-
-        # escape interpolation as to not confuse HAML
-        body.gsub! /(#\{)/, '\\\1'
-
-        # indent by eight spaces
-        body.gsub! /^(.+)/, '        \1'
-
-        content = <<-EOS
----
 page_title_show: true
-layout: documentation
-title: #{PROJECT} Example - #{file[:name]}
-page_title: "Example: #{file[:name]}"
+title: "#{Project.pretty_name} Example - #{title}"
+page_title: "Example: #{title}"
 author: The Hybrid Group
-description: A #{PROJECT} code example
-page_subtitle: "You can find this example <a href='https://github.com/hybridgroup/gobot/blob/master/examples/#{file[:name]}.go' target='blank' class='repository'>here.</a>"
+description: A #{Project.pretty_name} code example
+page_subtitle: "<a href='https://github.com/hybridgroup/#{@repo}/tree/master/examples' target='_blank'>View In Repo</a>"
+---
+
+:markdown
+#{body}
+EOS
+  end
+
+  def code_page
+    body = @content.dup
+
+    # change import path
+    body.gsub! /\.\.\/\.\./, Project.name
+
+    # indent by eight spaces
+    body.gsub! /^(.+)/, '        \1'
+
+    page_content = <<-EOS
+---
+layout: documentation
+page_title_show: true
+title: "#{Project.pretty_name} Example - #{title}"
+page_title: "Example: #{title}"
+author: The Hybrid Group
+description: A #{Project.pretty_name} code example
+page_subtitle: "<a href='https://github.com/hybridgroup/#{@repo}/tree/master/examples' target='_blank'>View In Repo</a>"
 ---
 
 .example
   :markdown
-        :::#{lang}
+        :::#{Project.language}
 #{body}
 EOS
 
-        File.write filename, content
-      end
-    end
-  end
-
-  # Public: Clones the remote repository defined by GITHUB_REPO into the
-  # directory defined by REPO_DIR.  Removes REPO_DIR and recreates it if it
-  # already exists.
-  #
-  # Returns nothing.
-  def clone_repo
-    say "Cloning remote repo."
-    FileUtils.rm_rf(REPO_DIR) if File.directory?(REPO_DIR)
-    Dir.mkdir REPO_DIR
-    `git clone #{GITHUB_REPO} #{REPO_DIR} &> /dev/null`
-  end
-
-  # Public: Removes the local copy of the remote repo.
-  #
-  # Returns nothing.
-  def remove_local_repo
-    say "Removing local copy of remote repo."
-    FileUtils.rm_rf REPO_DIR
-  end
-
-  # Public: Indents words by two spaces, and prints to the console.
-  #
-  # words - thing to print to the console.
-  # opts - hash of options.
-  #
-  # Returns the printed statement.
-  def say(words, opts = {})
-    indent = opts[:indent_level] || 1
-    spaces = (1..indent).collect { "  " }.join('')
-
-    words.gsub! /^(.+)/, spaces + '\1'
-
-    puts words
-    words
   end
 end
 
-ExampleImporter.new
+# Public: Gets the name of the repository from it's GitHub clone URI
+#
+# uri - string git clone URI to extract a name from
+#
+# Examples
+#
+#   get_repo_name "https://github.com/hybridgroup/cylon-ardrone.git"
+#   #=> "cylon-ardrone"
+#
+#   get_repo_name "git@github.com:hybridgroup/cylon.git"
+#   #=> "cylon"
+#
+#   get_repo_name ""
+#   #=> nil
+#
+# Returns a string or nil if it couldn't be parsed
+def get_repo_name(uri)
+  uri[/.*\/(.*).git/, 1]
+end
+
+# Public: Uses the git gem to clone down a remote git repository
+#
+# uri - string URI of remote git repo to clone down
+#
+# Returns an array containing the path to the cloned repository, and the Git
+# repository instance
+def clone_repo(uri)
+  name = get_repo_name(uri)
+  path = File.expand_path("#{__dir__}/../.examples/#{name}")
+
+  FileUtils.rm_rf(path) if File.directory?(path)
+
+  puts "  - Cloning #{name}."
+  repo = Git.clone(uri, path)
+
+  return [path, repo]
+end
+
+def extract_examples_from_repo(path)
+  examples = []
+
+  Dir.glob(path + "/examples/**/*.#{Project.extension}") do |file|
+    examples << Example.new(file)
+  end
+
+  examples
+end
+
+def remove_existing_examples
+  puts "  - Removing existing example pages."
+  Dir.glob("#{__dir__}/../source/documentation/examples/*") do |path|
+    if File.directory?(path)
+      FileUtils.rm_rf(path)
+    end
+  end
+end
+
+def add_examples_to_site(name, examples)
+  return unless examples.any?
+  adaptor_name = name[/^#{Project.name}-(.*)$/, 1]
+  name = adaptor_name if adaptor_name
+
+  create_code_pages name, examples
+  create_annotated_pages name, examples
+  create_index_partial name, examples
+end
+
+def create_annotated_pages(name, examples)
+  examples.each do |example|
+    next unless example.markdown_version?
+    puts "  - #{example.title}"
+
+    examples_dir = "/source/documentation/examples"
+    filename = "/#{name}/annotated/#{example.name}.html.haml"
+
+    path = File.expand_path(__dir__ + "/../" + examples_dir + filename)
+    content = example.annotated_page
+
+    FileUtils.mkdir_p(File.dirname(path)) unless File.directory?(path)
+    File.write(path, content)
+  end
+end
+
+def create_code_pages(name, examples)
+  examples.each do |example|
+    puts "  - #{example.title}"
+
+    examples_dir = "/source/documentation/examples"
+    filename = "/#{name}/#{Project.extension}/#{example.name}.html.haml"
+
+    path = File.expand_path(__dir__ + "/../" + examples_dir + filename)
+    content = example.code_page
+
+    FileUtils.mkdir_p(File.dirname(path)) unless File.directory?(path)
+    File.write(path, content)
+  end
+end
+
+def create_index_partial(name, examples)
+  path = File.expand_path "#{__dir__}/../source/documentation/examples/partials"
+  filename = File.join(path, "/_#{name}.html.haml")
+
+  FileUtils.mkdir_p(path) unless File.directory?(path)
+
+  partial = <<-EOS
+
+%h2 \#{name}
+%table
+  %thead
+    %th Example
+    %th.links{:colspan => '2'} Links
+  %tbody
+  EOS
+
+  examples.each do |example|
+    string = "%tr\n"
+    string << "  %td #{example.title}\n"
+    string << "  %td.links= link_to 'Code', '/documentation/examples/#{name}/#{Project.extension}/#{example.name}'\n"
+    if example.markdown_version?
+      string << "  %td.links= link_to 'Annotated Code', '/documentation/examples/#{name}/annotated/#{example.name}'\n"
+    else
+      string << "  %td.links\n"
+    end
+    string.gsub! /^(.+)/, '    \1'
+    partial << string
+  end
+
+  File.write(filename, partial)
+end
+
+def main
+  remove_existing_examples
+
+  REPOS.each do |repo|
+    name = get_repo_name(repo)
+
+    puts "Importing examples from #{name}."
+
+    path, repo = clone_repo repo
+
+    examples = extract_examples_from_repo path
+
+    add_examples_to_site name, examples
+
+    FileUtils.rm_rf path
+  end
+end
+
+main
