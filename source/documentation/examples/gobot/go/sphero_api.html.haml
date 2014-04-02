@@ -1,11 +1,11 @@
 ---
-page_title_show: true
 layout: documentation
-title: gobot Example - sphero_master
-page_title: "Example: sphero_master"
+page_title_show: true
+title: "Gobot Example - sphero_api"
+page_title: "Example: sphero_api"
 author: The Hybrid Group
-description: A gobot code example
-page_subtitle: "You can find this example <a href='https://github.com/hybridgroup/gobot/blob/master/examples/sphero_master.go' target='blank' class='repository'>here.</a>"
+description: A Gobot code example
+page_subtitle: "<a href='https://github.com/hybridgroup/gobot/tree/master/examples' target='_blank'>View In Repo</a>"
 ---
 
 .example
@@ -18,8 +18,16 @@ page_subtitle: "You can find this example <a href='https://github.com/hybridgrou
         	"github.com/hybridgroup/gobot-sphero"
         )
 
+        var Master *gobot.Master = gobot.GobotMaster()
+
+        func TurnBlue(params map[string]interface{}) bool {
+        	sphero := Master.FindRobotDevice(params["robotname"].(string), "sphero")
+        	gobot.Call(sphero.Driver, "SetRGB", uint8(0), uint8(0), uint8(255))
+        	return true
+        }
+
         func main() {
-        	master := gobot.GobotMaster()
+        	gobot.Api(Master)
 
         	spheros := map[string]string{
         		"Sphero-BPO": "/dev/rfcomm0",
@@ -38,23 +46,15 @@ page_subtitle: "You can find this example <a href='https://github.com/hybridgrou
         			sphero.SetRGB(uint8(255), uint8(0), uint8(0))
         		}
 
-        		master.Robots = append(master.Robots, gobot.Robot{
+        		Master.Robots = append(Master.Robots, gobot.Robot{
         			Name:        name,
         			Connections: []gobot.Connection{spheroAdaptor},
         			Devices:     []gobot.Device{sphero},
         			Work:        work,
+        			Commands:    map[string]interface{}{"TurnBlue": TurnBlue},
         		})
         	}
 
-        	master.Robots = append(master.Robots, gobot.Robot{
-        		Work: func() {
-        			sphero := master.FindRobot("Sphero-BPO")
-        			gobot.Every("1s", func() {
-        				gobot.Call(sphero.GetDevice("sphero").Driver, "SetRGB", uint8(gobot.Rand(255)), uint8(gobot.Rand(255)), uint8(gobot.Rand(255)))
-        			})
-        		},
-        	})
-
-        	master.Start()
+        	Master.Start()
         }
 

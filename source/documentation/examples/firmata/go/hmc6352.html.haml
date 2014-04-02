@@ -1,11 +1,11 @@
 ---
-page_title_show: true
 layout: documentation
-title: gobot Example - blink
-page_title: "Example: blink"
+page_title_show: true
+title: "Gobot Example - hmc6352"
+page_title: "Example: hmc6352"
 author: The Hybrid Group
-description: A gobot code example
-page_subtitle: "You can find this example <a href='https://github.com/hybridgroup/gobot/blob/master/examples/blink.go' target='blank' class='repository'>here.</a>"
+description: A Gobot code example
+page_subtitle: "<a href='https://github.com/hybridgroup/gobot-firmata/tree/master/examples' target='_blank'>View In Repo</a>"
 ---
 
 .example
@@ -14,30 +14,29 @@ page_subtitle: "You can find this example <a href='https://github.com/hybridgrou
         package main
 
         import (
+        	"fmt"
         	"github.com/hybridgroup/gobot"
         	"github.com/hybridgroup/gobot-firmata"
-        	"github.com/hybridgroup/gobot-gpio"
+        	"github.com/hybridgroup/gobot-i2c"
         )
 
         func main() {
-
         	firmata := new(gobotFirmata.FirmataAdaptor)
         	firmata.Name = "firmata"
         	firmata.Port = "/dev/ttyACM0"
 
-        	led := gobotGPIO.NewLed(firmata)
-        	led.Name = "led"
-        	led.Pin = "13"
+        	hmc6352 := gobotI2C.NewHMC6352(firmata)
+        	hmc6352.Name = "hmc6352"
 
         	work := func() {
-        		gobot.Every("1s", func() {
-        			led.Toggle()
+        		gobot.Every("0.1s", func() {
+        			fmt.Println("Heading", hmc6352.Heading)
         		})
         	}
 
         	robot := gobot.Robot{
         		Connections: []gobot.Connection{firmata},
-        		Devices:     []gobot.Device{led},
+        		Devices:     []gobot.Device{hmc6352},
         		Work:        work,
         	}
 
