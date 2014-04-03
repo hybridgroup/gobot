@@ -1,3 +1,18 @@
+#THG-logo {
+
+  img {
+
+    margin-bottom: -15px;
+    width: 150px;
+    padding: 5px;
+
+    &:hover {
+
+      background: darken($hero-color, 5);
+    }
+  }
+}
+
 .container, .w {
 
   width: $big-screen;
@@ -12,6 +27,7 @@
 
     padding: 0 15px;
   }
+
 }
 
 .main[role="main"] {
@@ -86,31 +102,45 @@
   }
   
   .content {
+
     &.full {
+
       width: 100%;
       clear: both;
     }
+
     h1, h2 {
+
       color: $title-color;
     }
+
     h1 {
+
       font-size: 1.9em;
       padding: 10px 0;
     }
   }
+  
   .aside.right {
+
     @include span-columns(3);
     padding-top: 0px;
     text-align: right;
+
     img {
+
       width: 100%;
       margin-top: 20px;
+      margin-left: 20px;
     }
   }
+
   section.content {
-    .index_content {
+
+    .index-content {
+    
       @include margin-not-last-child;
-      @include span-columns(9);
+      @include span-columns(8);
     }
   }
 }

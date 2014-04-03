@@ -9,28 +9,36 @@ description: Gobot is a framework for robotics, physical computing, and the Inte
 layout: home
 
 hero_title: "Go, Robot, Go! Go Powered Robotics"
-hero_subtitle: "Gobot makes robotics <a href='/documentation/getting-started'>Simple</a> and <a href='/documentation/platforms'>Extensible</a>"
+hero_subtitle: "Gobot makes robotics <a href='/documentation/getting-started'>Simple</a> and <a href='/documentation/platforms'>Extensible</a> with support for <a href='#platforms'>9 different platforms</a>."
 
 img_character: "<img src='images/elements/gophy.png'>"
 
 catcher_phrase: Ready to build the next big thing with Go?
 getting_started_button: "<a href='/documentation/getting-started' class='cta'> Get Started</a>"
 ---
-%h2 About
-%p 
-  Gobot is a framework and set of libraries in the 
-  =link_to "Go programming language", "http://golang.org/", target: "_blank" 
-  for robotics, physical computing, and the Internet of Things.
 
-%p It provides a simple, yet powerful way to create solutions that incorporate multiple, different hardware devices at the same time.
+.index-content
 
-%p 
-  Want to use Ruby on robots? Check out our sister project Artoo 
-  = link_to "(http://artoo.io).", "http://artoo.io", target: :blank
+  %h2 About
+  %p 
+    Gobot is a framework and set of libraries in the 
+    =link_to "Go programming language", "http://golang.org/", target: "_blank" 
+    for robotics, physical computing, and the Internet of Things.
 
-%p 
-  Want to use JavaScript? Check out our sister project Cylon 
-  = link_to "(http://cylonjs.com).", "http://cylonjs.com", target: :blank
+  %p It provides a simple, yet powerful way to create solutions that incorporate multiple, different hardware devices at the same time.
+
+  %p 
+    Want to use Ruby on robots? Check out our sister project Artoo 
+    = link_to "(http://artoo.io).", "http://artoo.io", target: :blank
+
+  %p 
+    Want to use JavaScript? Check out our sister project Cylon 
+    = link_to "(http://cylonjs.com).", "http://cylonjs.com", target: :blank
+
+.aside.right
+  = current_page.data.img_character
+
+.clear
 
 %h2  Meet The Code
 
@@ -116,9 +124,13 @@ getting_started_button: "<a href='/documentation/getting-started' class='cta'> G
         robot.Start()
       }
 
-%h2 Hardware Support
+%h2#platforms Platform Support
 %p
   Gobot has a extensible system for connecting to hardware devices. The following robotics and physical computing platforms are currently supported:
+
+  %p.important-title 
+    9 Platforms
+
   %ul.homepage-platform
     %li
       .title
@@ -194,7 +206,12 @@ getting_started_button: "<a href='/documentation/getting-started' class='cta'> G
   .clear
 
 %p Support for many devices that use General Purpose Input/Output (GPIO) have a shared set of drivers provded using the cylon-gpio module:
-%h4= link_to "GPIO", "https://en.wikipedia.org/wiki/General_Purpose_Input/Output" , target:"_blank" 
+
+%p.important-title
+  5
+  = link_to "GPIO", "https://en.wikipedia.org/wiki/General_Purpose_Input/Output" , target:"_blank" 
+  drivers
+
 %ul.homepage-platform
   %li
     .title
@@ -234,7 +251,13 @@ getting_started_button: "<a href='/documentation/getting-started' class='cta'> G
 .clear
 
 %p Support for devices that use Inter-Integrated Circuit (I2C) have a shared set of drivers provded using the gobot-i2c module:
-%h4= link_to "I2C", "https://en.wikipedia.org/wiki/I%C2%B2C", target:"_blank" 
+
+%p.important-title 
+  3
+  = link_to "I2C", "https://en.wikipedia.org/wiki/I%C2%B2C", target:"_blank" 
+  drivers
+
+
 %ul.homepage-platform 
   %li  
     .title
@@ -258,6 +281,10 @@ getting_started_button: "<a href='/documentation/getting-started' class='cta'> G
     .repo
       = link_to "repo", "https://github.com/hybridgroup/gobot-i2c", target:"_blank"
 .clear
+
+%p.important-title 
+  See more drivers 
+  = link_to "here", "/documentation/drivers"
 
 %p More platforms and drivers are coming soon...
 

@@ -1,13 +1,30 @@
+.important-title {
+  
+  color: $hero-title-color;
+  background: $title-color;
+  text-align: center;
+  text-transform: uppercase;
+  padding: 20px 0;
+
+  a {
+
+    color: $hero-subtitle-color;
+  }
+}
+
+
 .homepage-platform {
 
   list-style: none !important;
   margin: 0;
+  text-align: center;
+
   li {
 
-    float: left; 
-    width: 25%;
+    display: inline-block;
+    width: 19%;
     padding: 10px;
-    text-align: center;
+
     @include small-screen {
       width: 100%;
       float: none;
@@ -24,33 +41,36 @@
 
     .title {
 
-      background: $title-color;
-      padding:10px;
-      color: $hero-title-color;
-
-      &:hover {
-
-        background: darken( $title-color ,5 );
-      }
-
       a {
 
         color: $hero-title-color;
+        background: $title-color;
+        padding:10px;
+        color: $hero-title-color;
+        display: block;
+        width: 100%;
+
+        &:hover {
+
+          background: darken( $title-color ,5 );
+        }
+
       }
     }
     .repo {
 
-      background: $hero-subtitle-color;
-      padding:10px;
-
-      &:hover {
-
-        background: darken( $hero-subtitle-color ,5 );
-      }
-
       a {
 
         color: $title-color;
+        background: $hero-subtitle-color;
+        padding:10px;
+        display: block;
+        width: 100%;
+
+        &:hover {
+
+          background: darken( $hero-subtitle-color ,5 );
+        }
       }
     }
   }
