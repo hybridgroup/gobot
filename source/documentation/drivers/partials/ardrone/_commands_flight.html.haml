@@ -5,120 +5,85 @@
 
   Sets the internal `fly` state to `true`.
 
-
-  ##### Returns 
-
-  `nil`
-
   ## Land
 
   Sets the internal `fly` state to `false`.
 
-  ##### Returns 
-
-  `nil`
-
-  ## Up(speed) 
+  ## Up(speed float64) 
 
   Makes the drone gain altitude. 
-  speed can be a value from `0` to `1`.
+  speed can be a value from `0.0` to `1.0`.
 
   ##### Params
 
-  - **speed** - The speed for which to return data
+  - **speed** - **float64** - The speed at which the drone moves
 
-  ##### Returns 
-
-  `integer`
-
-  ## Down(speed) 
+  ## Down(speed float64) 
 
   Makes the drone reduce altitude. 
-  speed can be a value from `0` to `1`.
+  speed can be a value from `0.0` to `1.0`.
 
   ##### Params
 
-  - **speed** - The speed for which to return data
+  - **speed** - **float64** - The speed at which the drone moves
 
-  ##### Returns 
-
-  `integer`
-
-  ## Left(speed) 
+  ## Left(speed float64) 
 
   Causes the drone to bank to the left, controls the roll, which is 
   a horizontal movement using the camera as a reference point.
-  speed can be a value from `0` to `1`.
+  speed can be a value from `0.0` to `1.0`.
 
   ##### Params
 
-  - **speed** - The speed for which to return data
+  - **speed** - **float64** - The speed at which the drone moves
 
-  ##### Returns 
-
-  `integer`
-
-  ## Right(speed) 
+  ## Right(speed float64) 
 
   Causes the drone to bank to the right, controls the roll, which is 
   a horizontal movement using the camera as a reference point.
-  speed can be a value from `0` to `1`.
+  speed can be a value from `0.0` to `1.0`.
 
   ##### Params
 
-  - **speed** - The speed for which to return data
+  - **speed** - **float64** - The speed at which the drone moves
 
-  ##### Returns 
+  ## Forward(speed float64)
 
-  `integer`
+  Causes the drone go forward, controls the pitch.
+  speed can be a value from `0.0` to `1.0`.
 
-  ## Forward
+  ##### Params
 
-  Causes the drone to go forward.
+  - **speed** - **float64** - The speed at which the drone moves
 
-  ##### Returns 
 
-  `nil`
+  ## Backward(speed float64)
 
-  ## Backward
+  Causes the drone go backward, controls the pitch.
+  speed can be a value from `0.0` to `1.0`.
 
-  Causes the drone to go forward.
+  ##### Params
 
-  ##### Returns 
+  - **speed** - **float64** - The speed at which the drone moves
 
-  `nil`
-
-  ## Clockwise(speed)
+  ## Clockwise(speed float64)
 
   Causes the drone to spin.
-  speed can be a value from `0` to `1`.
+  speed can be a value from `0.0` to `1.0`.
 
   ##### Params
 
-  - **speed** - The speed for which to return data
+  - **speed** - **float64** - The speed at which the drone moves
 
-  ##### Returns 
-
-  `integer`
-
-  ## CounterClockwise(speed)
+  ## CounterClockwise(speed float64)
 
   Causes the drone to spin.
-  speed can be a value from `0` to `1`.
+  speed can be a value from `0.0` to `1.0`.
 
   ##### Params
 
-  - **speed** - The speed for which to return data
-
-  ##### Returns 
-
-  `integer`
+  - **speed** - **float64** - The speed at which the drone moves
 
   ## Hover
 
-  Causes the drone to go hover.
-
-  ##### Returns 
-
-  `nil`
-
+  Causes the drone to hover in place.

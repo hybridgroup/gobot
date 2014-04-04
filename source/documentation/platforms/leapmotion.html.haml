@@ -2,7 +2,7 @@
 title: Leapmotion with Gobot
 author: The Hybrid Group
 page_title: Leapmotion
-page_subtitle: "<a href='https://github.com/hybridgroup/gobot-leapmotion' class='repository'>Repository</a> <a class+'issues' href='https://github.com/hybridgroup/gobot-leapmotion/issues'>Issues</a>"
+page_subtitle: "<a href='https://github.com/hybridgroup/gobot-leapmotion' target='_blank' class='repository'>Repository</a> <a class+'issues' target='_blank' href='https://github.com/hybridgroup/gobot-leapmotion/issues'>Issues</a>"
 page_title_show: true
 layout: documentation
 subnav_platform: true
@@ -37,32 +37,32 @@ leapmotion_driver: true
         package main
 
         import (
-          "fmt"
-          "github.com/hybridgroup/gobot"
-          "github.com/hybridgroup/gobot-leapmotion"
+            "fmt"
+            "github.com/hybridgroup/gobot"
+            "github.com/hybridgroup/gobot-leapmotion"
         )
 
         func main() {
-          leapAdaptor := new(gobotLeap.LeapAdaptor)
-          leapAdaptor.Name = "leap"
-          leapAdaptor.Port = "127.0.0.1:6437"
+            leapAdaptor := new(gobotLeap.LeapAdaptor)
+            leapAdaptor.Name = "leap"
+            leapAdaptor.Port = "127.0.0.1:6437"
 
-          leap := gobotLeap.NewLeap(leapAdaptor)
-          leap.Name = "leap"
+            leap := gobotLeap.NewLeap(leapAdaptor)
+            leap.Name = "leap"
 
-          work := func() {
-            gobot.On(leap.Events["Message"], func(data interface{}) {
-              fmt.Println(data)
-            })
-          }
+            work := func() {
+                gobot.On(leap.Events["Message"], func(data interface{}) {
+                    fmt.Println(data)
+                })
+            }
 
-          robot := gobot.Robot{
-            Connections: []gobot.Connection{leapAdaptor},
-            Devices:     []gobot.Device{leap},
-            Work:        work,
-          }
+            robot := gobot.Robot{
+                Connections: []gobot.Connection{leapAdaptor},
+                Devices:     []gobot.Device{leap},
+                Work:        work,
+            }
 
-          robot.Start()
+            robot.Start()
         }
 
 %section.how-to#HowToConnect

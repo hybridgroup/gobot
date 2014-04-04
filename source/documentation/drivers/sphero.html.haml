@@ -23,21 +23,22 @@ sphero_platform: true
     Gobot and the Sphero driver take care of the rest.
 
     :markdown
-      Install the library with: `go get -u github.com/hybridgroup/gobot-sphero`
+      Install the library with: 
+      `go get -u github.com/hybridgroup/gobot-sphero`
 
           :::go
           package main
-
           import (
             "github.com/hybridgroup/gobot"
             "github.com/hybridgroup/gobot-sphero"
+            "fmt"
           )
 
           func main() {
 
             spheroAdaptor := new(gobotSphero.SpheroAdaptor)
             spheroAdaptor.Name = "Sphero"
-            spheroAdaptor.Port = "/dev/rfcomm0"
+            spheroAdaptor.Port = "127.0.0.1:4560"
 
             sphero := gobotSphero.NewSphero(spheroAdaptor)
             sphero.Name = "Sphero"
@@ -49,35 +50,41 @@ sphero_platform: true
   %p 
     This example rolls the sphero in a random direction and change direction every 2 seconds.
 
-    %h3 JavaScript
     :markdown
           :::javascript
           package main
-
           import (
             "github.com/hybridgroup/gobot"
             "github.com/hybridgroup/gobot-sphero"
+            "fmt"
           )
 
           func main() {
 
             spheroAdaptor := new(gobotSphero.SpheroAdaptor)
             spheroAdaptor.Name = "Sphero"
-            spheroAdaptor.Port = "/dev/rfcomm0"
+            spheroAdaptor.Port = "127.0.0.1:4560"
 
             sphero := gobotSphero.NewSphero(spheroAdaptor)
             sphero.Name = "Sphero"
 
-            work := func() {
-              gobot.Every("2s", func() {
-                sphero.Roll(100, uint16(gobot.Rand(360)))
+            connections := []gobot.Connection {
+              spheroAdaptor,
+            }
+            devices := []gobot.Device {
+              sphero,
+            }
+
+            work := func(){
+              gobot.Every("2s", func(){ 
+                sphero.Roll(100, uint16(gobot.Random(0, 360))) 
               })
             }
 
             robot := gobot.Robot{
-              Connections: []interface{}{spheroAdaptor},
-              Devices:     []interface{}{sphero},
-              Work:        work,
+                Connections: connections, 
+                Devices: devices,
+                Work: work,
             }
 
             robot.Start()
@@ -873,8 +880,8 @@ sphero_platform: true
       %td (154, 205, 50)
 
 
-%section.compatability.hardware
-  %h2 Works with:
+%section.compatability.hardware#Compatability
+  %h2 Compatibility:
   =# TODO: Update platform list with all that work with this driver in Cylon.js.
   .devices
     = partial "documentation/partials/devices_platforms"

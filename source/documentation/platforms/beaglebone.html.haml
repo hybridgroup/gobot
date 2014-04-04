@@ -2,7 +2,7 @@
 title: BeagleBone with Gobot
 author: The Hybrid Group
 page_title: BeagleBone
-page_subtitle: "<a href='https://github.com/hybridgroup/gobot-beaglebone' class='repository'>Repository</a> <a class+'issues' href='https://github.com/hybridgroup/gobot-beaglebone/issues'>Issues</a>"
+page_subtitle: "<a href='https://github.com/hybridgroup/gobot-beaglebone' class='repository' target='_blank'>Repository</a> <a class+'issues' href='https://github.com/hybridgroup/gobot-beaglebone/issues' target='_blank'>Issues</a>"
 page_title_show: true
 layout: documentation
 subnav_platform: true
@@ -39,30 +39,30 @@ led_driver: true
         package main
 
         import (
-          "github.com/hybridgroup/gobot"
-          "github.com/hybridgroup/gobot-beaglebone"
-          "github.com/hybridgroup/gobot-gpio"
+                "github.com/hybridgroup/gobot"
+                "github.com/hybridgroup/gobot-beaglebone"
+                "github.com/hybridgroup/gobot-gpio"
         )
 
         func main() {
-          beaglebone := new(gobotBeaglebone.Beaglebone)
-          beaglebone.Name = "beaglebone"
+                beaglebone := new(gobotBeaglebone.Beaglebone)
+                beaglebone.Name = "beaglebone"
 
-          led := gobotGPIO.NewLed(beaglebone)
-          led.Name = "led"
-          led.Pin = "P9_12"
+                led := gobotGPIO.NewLed(beaglebone)
+                led.Name = "led"
+                led.Pin = "P9_12"
 
-          work := func() {
-            gobot.Every("1s", func() { led.Toggle() })
-          }
+                work := func() {
+                        gobot.Every("1s", func() { led.Toggle() })
+                }
 
-          robot := gobot.Robot{
-            Connections: []interface{}{beaglebone},
-            Devices:     []interface{}{led},
-            Work:        work,
-          }
+                robot := gobot.Robot{
+                        Connections: []interface{}{beaglebone},
+                        Devices:     []interface{}{led},
+                        Work:        work,
+                }
 
-          robot.Start()
+                robot.Start()
         }
 
 %section.drivers#Drivers

@@ -23,7 +23,7 @@ ardrone_platform: true
     Communication with the ARDrone's flight control interface takes place using a WiFi connection. The ARDrone is a WiFi access point, so it normally can be the only device you connect to, without some additional effort to reconfigure the drone itself to put it into infrastructure mode.
   
   :markdown
-        :::bash
+        :::go
         package main
 
         import (
@@ -38,14 +38,14 @@ ardrone_platform: true
 
           drone := gobotArdrone.NewArdrone(ardroneAdaptor)
           drone.Name = "Drone"
-          ...
+                  ...
 
 %section.how-to#HowToUse
   %h2 How To Use
   %p 
     This example controls an ARDrone to take off, and then land.
   :markdown
-        :::bash
+        :::go
         package main
 
         import (
