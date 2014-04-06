@@ -60,7 +60,7 @@
             Go, Robot, Go! Go Powered Robotics
           </h1>
           <h2 class="subtitle">
-            Gobot makes robotics <a href="/documentation/getting-started">Simple</a> and <a href="/documentation/platforms">Extensible</a>
+            Next generation robotics framework with support for <a href="#platforms">9 different platforms</a>
           </h2>
           <a href="/documentation/getting-started" class="cta"> Get Started</a>
         </div>
@@ -84,7 +84,7 @@
       </div>
       <div class="container">
         <div class="main" role="main">
-          <section class="content"><div class="index_content">
+          <section class="content"><div class="index-content">
               <h2>About</h2>
               <p>
                 Gobot is a framework and set of libraries in the
@@ -100,18 +100,23 @@
                 Want to use JavaScript? Check out our sister project Cylon
                 <a target="blank" href="http://cylonjs.com">(http://cylonjs.com).</a>
               </p>
-              <h2>Meet The Code</h2>
-              <p>Gobot makes commanding robots incredibly simple and fun.</p>
-              <p>All you need to get started is install the library with :</p>
-              <p><code>go get -u github.com/hybridgroup/gobot</code>.</p>
-              <p>
-                </p>
+            </div>
+            <div class="aside right">
+              <img src="images/elements/gophy.png">
+</div>
+            <div class="clear"></div>
+            <h2>Meet The Code</h2>
+            <p>Gobot makes commanding robots incredibly simple and fun.</p>
+            <p>All you need to get started is install the library with :</p>
+            <p><code>go get -u github.com/hybridgroup/gobot</code>.</p>
+            <p>
+              </p>
 <p>Then install additional libraries for whatever hardware support you want to use from your robot. For example, 
-                <code>go get -u github.com/hybridgroup/gobot-sphero</code> 
-                to use Gobot with a Sphero.</p>
-              
-              <h2>Go with Sphero</h2>
-              <pre class="CodeRay"><span class="keyword">package</span> main
+              <code>go get -u github.com/hybridgroup/gobot-sphero</code> 
+              to use Gobot with a Sphero.</p>
+            
+            <h2>Go with Sphero</h2>
+            <pre class="CodeRay"><span class="keyword">package</span> main
 
 <span class="keyword">import</span> (
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
@@ -142,8 +147,8 @@
   robot.Start()
 } 
 </pre>
-              <h2>Go with a Blink</h2>
-              <pre class="CodeRay"><span class="keyword">package</span> main
+            <h2>Go with a Blink</h2>
+            <pre class="CodeRay"><span class="keyword">package</span> main
 
 <span class="keyword">import</span> (
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
@@ -176,234 +181,245 @@
   robot.Start()
 }
 </pre>
-              <h2>Hardware Support</h2>
-              <p>
-                Gobot has a extensible system for connecting to hardware devices. The following robotics and physical computing platforms are currently supported:
-                </p>
-<ul class="homepage-platform">
-<li>
-                    <div class="title">
-                      <a target="_blank" href="http://ardrone2.parrot.com/">ARDrone</a>
-                    </div>
-                    <a href="/documentation/platforms/ardrone">
-                      <img src="/images/devices/ardrone.jpg" style="width: 90%"></a>
-                    <div class="repo">
-                      <a target="_blank" href="https://github.com/hybridgroup/gobot-ardrone">repo</a>
-                    </div>
-                  </li>
-                  <li>
-                    <div class="title">
-                      <a target="_blank" href="http://www.arduino.cc/">Arduino</a>
-                    </div>
-                    <a href="/documentation/platforms/arduino">
-                      <img src="/images/devices/arduino.jpg" style="width: 90%"></a>
-                    <div class="repo">
-                      <a target="_blank" href="https://github.com/hybridgroup/gobot-firmata">repo</a>
-                    </div>
-                  </li>
-                  <li>
-                    <div class="title">
-                      <a target="_blank" href="http://beagleboard.org/Products/BeagleBone+Black/">Beaglebone Black</a>
-                    </div>
-                    <a href="/documentation/platforms/beaglebone">
-                      <img src="/images/devices/beaglebone.jpg" style="width: 90%"></a>
-                    <div class="repo">
-                      <a target="_blank" href="https://github.com/hybridgroup/gobot-beaglebone">repo</a>
-                    </div>
-                  </li>
-                  <li>
-                    <div class="title">
-                      <a target="_blank" href="http://digistump.com/category/1">Digispark</a>
-                    </div>
-                    <a href="/documentation/platforms/digispark">
-                      <img src="/images/devices/digispark.jpg" style="width: 90%"></a>
-                    <div class="repo">
-                      <a target="_blank" href="https://github.com/hybridgroup/gobot-digispark">repo</a>
-                    </div>
-                  </li>
-                  <li>
-                    <div class="title">
-                      <a target="_blank" href="http://en.wikipedia.org/wiki/Joystick">Joystick</a>
-                    </div>
-                    <a href="/documentation/platforms/joystick">
-                      <img src="/images/devices/joystick.jpg" style="width: 90%"></a>
-                    <div class="repo">
-                      <a target="_blank" href="https://github.com/hybridgroup/gobot-joystick">repo</a>
-                    </div>
-                  </li>
-                  <li>
-                    <div class="title">
-                      <a target="_blank" href="https://www.leapmotion.com/">Leap Motion</a>
-                    </div>
-                    <a href="/documentation/platforms/leapmotion">
-                      <img src="/images/devices/leap_motion.jpg" style="width: 90%"></a>
-                    <div class="repo">
-                      <a target="_blank" href="https://github.com/hybridgroup/gobot-leapmotion">repo</a>
-                    </div>
-                  </li>
-                  <li>
-                    <div class="title">
-                      <a target="_blank" href="http://opencv.org/">OpenCV</a>
-                    </div>
-                    <a href="/documentation/platforms/opencv">
-                      <img src="/images/devices/opencv.jpg" style="width: 90%"></a>
-                    <div class="repo">
-                      <a target="_blank" href="https://github.com/hybridgroup/gobot-opencv">repo</a>
-                    </div>
-                  </li>
-                  <li>
-                    <div class="title">
-                      <a target="_blank" href="https://www.spark.io/">Spark</a>
-                    </div>
-                    <a href="/documentation/platforms/spark">
-                      <img src="/images/devices/spark.jpg" style="width: 90%"></a>
-                    <div class="repo">
-                      <a target="_blank" href="https://github.com/hybridgroup/gobot-spark">repo</a>
-                    </div>
-                  </li>
-                  <li>
-                    <div class="title">
-                      <a target="_blank" href="http://www.gosphero.com/">Sphero</a>
-                    </div>
-                    <a href="/documentation/platforms/sphero">
-                      <img src="/images/devices/sphero.jpg" style="width: 90%"></a>
-                    <div class="repo">
-                      <a target="_blank" href="https://github.com/hybridgroup/gobot-sphero">repo</a>
-                    </div>
-                  </li>
-                </ul>
-<div class="clear"></div>
-              
-              <p>Support for many devices that use General Purpose Input/Output (GPIO) have a shared set of drivers provded using the cylon-gpio module:</p>
-              <h4><a target="_blank" href="https://en.wikipedia.org/wiki/General_Purpose_Input/Output">GPIO</a></h4>
-              <ul class="homepage-platform">
-<li>
-                  <div class="title">
-                    <a href="/documentation/drivers/analog-sensor">Analog Sensor</a>
-                  </div>
-                  <a href="/documentation/drivers/analog-sensor">
-                    <img src="/images/devices/analog-sensor.jpg" style="width: 90%"></a>
-                  <div class="repo">
-                    <a target="_blank" href="https://github.com/hybridgroup/gobot-gpio">repo</a>
-                  </div>
-                </li>
-                <li>
-                  <div class="title">
-                    <a href="/documentation/drivers/button">Button</a>
-                  </div>
-                  <a href="/documentation/drivers/button">
-                    <img src="/images/devices/button.jpg" style="width: 90%"></a>
-                  <div class="repo">
-                    <a target="_blank" href="https://github.com/hybridgroup/gobot-gpio">repo</a>
-                  </div>
-                </li>
-                <li>
-                  <div class="title">
-                    <a href="/documentation/drivers/led">LED</a>
-                  </div>
-                  <a href="/documentation/drivers/led">
-                    <img src="/images/devices/LED.jpg" style="width: 90%"></a>
-                  <div class="repo">
-                    <a target="_blank" href="https://github.com/hybridgroup/gobot-gpio">repo</a>
-                  </div>
-                </li>
-                <li>
-                  <div class="title">
-                    <a href="/documentation/drivers/motor">Motor</a>
-                  </div>
-                  <a href="/documentation/drivers/motor">
-                    <img src="/images/devices/motor.jpg" style="width: 90%"></a>
-                  <div class="repo">
-                    <a target="_blank" href="https://github.com/hybridgroup/gobot-gpio">repo</a>
-                  </div>
-                </li>
-                <li>
-                  <div class="title">
-                    <a href="/documentation/drivers/servo">Servo</a>
-                  </div>
-                  <a href="/documentation/drivers/servo">
-                    <img src="/images/devices/servo.jpg" style="width: 90%"></a>
-                  <div class="repo">
-                    <a target="_blank" href="https://github.com/hybridgroup/gobot-gpio">repo</a>
-                  </div>
-                </li>
-              </ul>
-<div class="clear"></div>
-              <p>Support for devices that use Inter-Integrated Circuit (I2C) have a shared set of drivers provded using the gobot-i2c module:</p>
-              <h4><a target="_blank" href="https://en.wikipedia.org/wiki/I%C2%B2C">I2C</a></h4>
-              <ul class="homepage-platform">
-<li>
-                  <div class="title">
-                    <a href="/documentation/drivers/blinkm">BlinkM</a>
-                  </div>
-                  <a href="/documentation/drivers/blinkm">
-                    <img src="/images/devices/blinkm.jpg" style="width: 90%"></a>
-                  <div class="repo">
-                    <a target="_blank" href="https://github.com/hybridgroup/gobot-i2c">repo</a>
-                  </div>
-                </li>
-                <li>
-                  <div class="title">
-                    <a href="/documentation/drivers/hmc6352-compass">HMC6352</a>
-                  </div>
-                  <a href="/documentation/drivers/hmc6352-compass">
-                    <img src="/images/devices/hmc6352-compass.jpg" style="width: 90%"></a>
-                  <div class="repo">
-                    <a target="_blank" href="https://github.com/hybridgroup/gobot-i2c">repo</a>
-                  </div>
-                </li>
-                <li>
-                  <div class="title">
-                    <a href="/documentation/drivers/wiichuck">Wii Nunchuck</a>
-                  </div>
-                  <a href="/documentation/drivers/wiichuck">
-                    <img src="/images/devices/wii-chuck.jpg" style="width: 90%"></a>
-                  <div class="repo">
-                    <a target="_blank" href="https://github.com/hybridgroup/gobot-i2c">repo</a>
-                  </div>
-                </li>
-              </ul>
-<div class="clear"></div>
-              <p>More platforms and drivers are coming soon...</p>
-              <h2>Getting Started</h2>
-              <p>Install the library with: <code>go get -u github.com/hybridgroup/gobot</code></p>
-              <p>Then install additional libraries for whatever hardware support you want to use from your robot. For example, <code>go get -u github.com/hybridgroup/gobot-sphero</code> to use Gobot with a Sphero.</p>
-              <p>
-                Ready to build Go robots with Gobot?
-                <a href="/documentation/getting-started" class="item">Get Started Here!</a>
+            <h2 id="platforms">Platform Support</h2>
+            <p>
+              Gobot has a extensible system for connecting to hardware devices. The following robotics and physical computing platforms are currently supported:
               </p>
-              <h2>API</h2>
-              <p>Gobot includes a RESTful API to query the status of any robot running within a group, including the connection and device status, and execute device commands.</p>
-              <p>To activate the API, use the <code>Api</code> command like this:</p>
-              
-              <pre class="CodeRay">master := gobot.GobotMaster()
+<p class="important-title">
+                9 Platforms
+              </p>
+              <ul class="homepage-platform">
+<li>
+                  <div class="title">
+                    <a target="_blank" href="http://ardrone2.parrot.com/">ARDrone</a>
+                  </div>
+                  <a href="/documentation/platforms/ardrone">
+                    <img src="/images/devices/ardrone.jpg" style="width: 90%"></a>
+                  <div class="repo">
+                    <a target="_blank" href="https://github.com/hybridgroup/gobot-ardrone">repo</a>
+                  </div>
+                </li>
+                <li>
+                  <div class="title">
+                    <a target="_blank" href="http://www.arduino.cc/">Arduino</a>
+                  </div>
+                  <a href="/documentation/platforms/arduino">
+                    <img src="/images/devices/arduino.jpg" style="width: 90%"></a>
+                  <div class="repo">
+                    <a target="_blank" href="https://github.com/hybridgroup/gobot-firmata">repo</a>
+                  </div>
+                </li>
+                <li>
+                  <div class="title">
+                    <a target="_blank" href="http://beagleboard.org/Products/BeagleBone+Black/">Beaglebone Black</a>
+                  </div>
+                  <a href="/documentation/platforms/beaglebone">
+                    <img src="/images/devices/beaglebone.jpg" style="width: 90%"></a>
+                  <div class="repo">
+                    <a target="_blank" href="https://github.com/hybridgroup/gobot-beaglebone">repo</a>
+                  </div>
+                </li>
+                <li>
+                  <div class="title">
+                    <a target="_blank" href="http://digistump.com/category/1">Digispark</a>
+                  </div>
+                  <a href="/documentation/platforms/digispark">
+                    <img src="/images/devices/digispark.jpg" style="width: 90%"></a>
+                  <div class="repo">
+                    <a target="_blank" href="https://github.com/hybridgroup/gobot-digispark">repo</a>
+                  </div>
+                </li>
+                <li>
+                  <div class="title">
+                    <a target="_blank" href="http://en.wikipedia.org/wiki/Joystick">Joystick</a>
+                  </div>
+                  <a href="/documentation/platforms/joystick">
+                    <img src="/images/devices/joystick.jpg" style="width: 90%"></a>
+                  <div class="repo">
+                    <a target="_blank" href="https://github.com/hybridgroup/gobot-joystick">repo</a>
+                  </div>
+                </li>
+                <li>
+                  <div class="title">
+                    <a target="_blank" href="https://www.leapmotion.com/">Leap Motion</a>
+                  </div>
+                  <a href="/documentation/platforms/leapmotion">
+                    <img src="/images/devices/leap_motion.jpg" style="width: 90%"></a>
+                  <div class="repo">
+                    <a target="_blank" href="https://github.com/hybridgroup/gobot-leapmotion">repo</a>
+                  </div>
+                </li>
+                <li>
+                  <div class="title">
+                    <a target="_blank" href="http://opencv.org/">OpenCV</a>
+                  </div>
+                  <a href="/documentation/platforms/opencv">
+                    <img src="/images/devices/opencv.jpg" style="width: 90%"></a>
+                  <div class="repo">
+                    <a target="_blank" href="https://github.com/hybridgroup/gobot-opencv">repo</a>
+                  </div>
+                </li>
+                <li>
+                  <div class="title">
+                    <a target="_blank" href="https://www.spark.io/">Spark</a>
+                  </div>
+                  <a href="/documentation/platforms/spark">
+                    <img src="/images/devices/spark.jpg" style="width: 90%"></a>
+                  <div class="repo">
+                    <a target="_blank" href="https://github.com/hybridgroup/gobot-spark">repo</a>
+                  </div>
+                </li>
+                <li>
+                  <div class="title">
+                    <a target="_blank" href="http://www.gosphero.com/">Sphero</a>
+                  </div>
+                  <a href="/documentation/platforms/sphero">
+                    <img src="/images/devices/sphero.jpg" style="width: 90%"></a>
+                  <div class="repo">
+                    <a target="_blank" href="https://github.com/hybridgroup/gobot-sphero">repo</a>
+                  </div>
+                </li>
+              </ul>
+<div class="clear"></div>
+            
+            <p>Support for many devices that use General Purpose Input/Output (GPIO) have a shared set of drivers provded using the cylon-gpio module:</p>
+            <p class="important-title">
+              5
+              <a target="_blank" href="https://en.wikipedia.org/wiki/General_Purpose_Input/Output">GPIO</a>
+              drivers
+            </p>
+            <ul class="homepage-platform">
+<li>
+                <div class="title">
+                  <a href="/documentation/drivers/analog-sensor">Analog Sensor</a>
+                </div>
+                <a href="/documentation/drivers/analog-sensor">
+                  <img src="/images/devices/analog-sensor.jpg" style="width: 90%"></a>
+                <div class="repo">
+                  <a target="_blank" href="https://github.com/hybridgroup/gobot-gpio">repo</a>
+                </div>
+              </li>
+              <li>
+                <div class="title">
+                  <a href="/documentation/drivers/button">Button</a>
+                </div>
+                <a href="/documentation/drivers/button">
+                  <img src="/images/devices/button.jpg" style="width: 90%"></a>
+                <div class="repo">
+                  <a target="_blank" href="https://github.com/hybridgroup/gobot-gpio">repo</a>
+                </div>
+              </li>
+              <li>
+                <div class="title">
+                  <a href="/documentation/drivers/led">LED</a>
+                </div>
+                <a href="/documentation/drivers/led">
+                  <img src="/images/devices/LED.jpg" style="width: 90%"></a>
+                <div class="repo">
+                  <a target="_blank" href="https://github.com/hybridgroup/gobot-gpio">repo</a>
+                </div>
+              </li>
+              <li>
+                <div class="title">
+                  <a href="/documentation/drivers/motor">Motor</a>
+                </div>
+                <a href="/documentation/drivers/motor">
+                  <img src="/images/devices/motor.jpg" style="width: 90%"></a>
+                <div class="repo">
+                  <a target="_blank" href="https://github.com/hybridgroup/gobot-gpio">repo</a>
+                </div>
+              </li>
+              <li>
+                <div class="title">
+                  <a href="/documentation/drivers/servo">Servo</a>
+                </div>
+                <a href="/documentation/drivers/servo">
+                  <img src="/images/devices/servo.jpg" style="width: 90%"></a>
+                <div class="repo">
+                  <a target="_blank" href="https://github.com/hybridgroup/gobot-gpio">repo</a>
+                </div>
+              </li>
+            </ul>
+<div class="clear"></div>
+            <p>Support for devices that use Inter-Integrated Circuit (I2C) have a shared set of drivers provded using the gobot-i2c module:</p>
+            <p class="important-title">
+              3
+              <a target="_blank" href="https://en.wikipedia.org/wiki/I%C2%B2C">I2C</a>
+              drivers
+            </p>
+            <ul class="homepage-platform">
+<li>
+                <div class="title">
+                  <a href="/documentation/drivers/blinkm">BlinkM</a>
+                </div>
+                <a href="/documentation/drivers/blinkm">
+                  <img src="/images/devices/blinkm.jpg" style="width: 90%"></a>
+                <div class="repo">
+                  <a target="_blank" href="https://github.com/hybridgroup/gobot-i2c">repo</a>
+                </div>
+              </li>
+              <li>
+                <div class="title">
+                  <a href="/documentation/drivers/hmc6352-compass">HMC6352</a>
+                </div>
+                <a href="/documentation/drivers/hmc6352-compass">
+                  <img src="/images/devices/hmc6352-compass.jpg" style="width: 90%"></a>
+                <div class="repo">
+                  <a target="_blank" href="https://github.com/hybridgroup/gobot-i2c">repo</a>
+                </div>
+              </li>
+              <li>
+                <div class="title">
+                  <a href="/documentation/drivers/wiichuck">Wii Nunchuck</a>
+                </div>
+                <a href="/documentation/drivers/wiichuck">
+                  <img src="/images/devices/wii-chuck.jpg" style="width: 90%"></a>
+                <div class="repo">
+                  <a target="_blank" href="https://github.com/hybridgroup/gobot-i2c">repo</a>
+                </div>
+              </li>
+            </ul>
+<div class="clear"></div>
+            <p class="important-title">
+              See more drivers
+              <a href="/documentation/drivers">here</a>
+            </p>
+            <p>More platforms and drivers are coming soon...</p>
+            <h2>Getting Started</h2>
+            <p>Install the library with: <code>go get -u github.com/hybridgroup/gobot</code></p>
+            <p>Then install additional libraries for whatever hardware support you want to use from your robot. For example, <code>go get -u github.com/hybridgroup/gobot-sphero</code> to use Gobot with a Sphero.</p>
+            <p>
+              Ready to build Go robots with Gobot?
+              <a href="/documentation/getting-started" class="item">Get Started Here!</a>
+            </p>
+            <h2>API</h2>
+            <p>Gobot includes a RESTful API to query the status of any robot running within a group, including the connection and device status, and execute device commands.</p>
+            <p>To activate the API, use the <code>Api</code> command like this:</p>
+            
+            <pre class="CodeRay">master := gobot.GobotMaster()
 gobot.Api(master)
 </pre>
-              
-              <p>To specify the api port run your Gobot program with the <code>PORT</code> environment variable</p>
-              
-              <pre class="CodeRay">$ PORT=8080 go run gobotProgram.go
+            
+            <p>To specify the api port run your Gobot program with the <code>PORT</code> environment variable</p>
+            
+            <pre class="CodeRay">$ PORT=8080 go run gobotProgram.go
 </pre>
-              <p>
-                </p>
+            <p>
+              </p>
 <p>In order to use the 
-                <a href="https://github.com/hybridgroup/robeaux">robeaux</a> 
-                AngularJS interface with Gobot you simply clone the robeaux repo and place it in the directory of your Gobot program. The robeaux assets must be in a folder called 
-                <code>robeaux</code>.</p>
-              
-              <h2>Be Part Of The Robot Evolution</h2>
-              <ul>
+              <a href="https://github.com/hybridgroup/robeaux">robeaux</a> 
+              AngularJS interface with Gobot you simply clone the robeaux repo and place it in the directory of your Gobot program. The robeaux assets must be in a folder called 
+              <code>robeaux</code>.</p>
+            
+            <h2>Be Part Of The Robot Evolution</h2>
+            <ul>
 <li>Code on Github:   <a href="https://github.com/hybridgroup/gobot">https://github.com/hybridgroup/gobot</a>
 </li>
-                <li>Join us on IRC:   <code>#gobotio @ irc.freenode.net</code>
+              <li>Join us on IRC:   <code>#gobotio @ irc.freenode.net</code>
 </li>
-                <li>Join us on our <a href="https://trello.com/b/kQPsldtk/gobot">Trello Board</a>.</li>
-              </ul>
+              <li>Join us on our <a href="https://trello.com/b/kQPsldtk/gobot">Trello Board</a>.</li>
+            </ul></section>
 </div>
-          </section><div class="aside right">
-            <img src="images/elements/gophy.png">
-</div>
-        </div>
       </div>
       <section class="catcher"><div class="w">
           <h3 class="phrase">Ready to build the next big thing with Go?</h3>
@@ -414,7 +430,8 @@ gobot.Api(master)
     <footer class="app-footer"><div class="w">
         <div class="copyright">
           © Copyright 2012-2014
-          <a href="http://hybridgroup.com">The Hybrid Group.</a>
+          <a href="http://hybridgroup.com" id="THG-logo" target="_blank">
+            <img alt="The Hybrid Group" src="../images/elements/THG_logo.png"></a>
         </div>
       </div>
     </footer>

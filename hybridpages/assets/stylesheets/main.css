@@ -1561,22 +1561,31 @@
           .CodeRay .span {
             display: inline-block; }
         
-        /* line 1, ../hybridpages/assets/stylesheets/layouts/_home.scss */
+        /* line 3, ../hybridpages/assets/stylesheets/layouts/_home.scss */
+        #THG-logo img {
+          margin-bottom: -15px;
+          width: 150px;
+          padding: 5px; }
+          /* line 9, ../hybridpages/assets/stylesheets/layouts/_home.scss */
+          #THG-logo img:hover {
+            background: #ff6a42; }
+        
+        /* line 16, ../hybridpages/assets/stylesheets/layouts/_home.scss */
         .container, .w {
           width: 964px;
           margin: 0 auto; }
           @media only screen and (min-width: 767px) and (max-width: 964px) {
-            /* line 1, ../hybridpages/assets/stylesheets/layouts/_home.scss */
+            /* line 16, ../hybridpages/assets/stylesheets/layouts/_home.scss */
             .container, .w {
               width: 767px;
               padding: 0 15px; } }
           @media only screen and (max-width: 767px) {
-            /* line 1, ../hybridpages/assets/stylesheets/layouts/_home.scss */
+            /* line 16, ../hybridpages/assets/stylesheets/layouts/_home.scss */
             .container, .w {
               width: 100%;
               padding: 0 15px; } }
         
-        /* line 17, ../hybridpages/assets/stylesheets/layouts/_home.scss */
+        /* line 33, ../hybridpages/assets/stylesheets/layouts/_home.scss */
         .main[role="main"] {
           padding-bottom: 50px;
           margin-top: 20px;
@@ -1591,7 +1600,7 @@
           /* line 23, ../../../../../.rvm/gems/ruby-2.0.0-p247@gobot.io/gems/bourbon-3.1.8/app/assets/stylesheets/addons/_clearfix.scss */
           .main[role="main"]:after {
             clear: both; }
-          /* line 25, ../hybridpages/assets/stylesheets/layouts/_home.scss */
+          /* line 41, ../hybridpages/assets/stylesheets/layouts/_home.scss */
           .main[role="main"] .videos .video {
             float: left;
             display: block;
@@ -1601,19 +1610,19 @@
             /* line 40, ../../../../../.rvm/gems/ruby-2.0.0-p247@gobot.io/gems/neat-1.5.0/app/assets/stylesheets/grid/_span-columns.scss */
             .main[role="main"] .videos .video:last-child {
               margin-right: 0; }
-            /* line 30, ../hybridpages/assets/stylesheets/layouts/_home.scss */
+            /* line 46, ../hybridpages/assets/stylesheets/layouts/_home.scss */
             .main[role="main"] .videos .video h3 {
               font-size: 16px; }
-            /* line 35, ../hybridpages/assets/stylesheets/layouts/_home.scss */
+            /* line 51, ../hybridpages/assets/stylesheets/layouts/_home.scss */
             .main[role="main"] .videos .video iframe, .main[role="main"] .videos .video object {
               width: 100%;
               height: 300px; }
             @media only screen and (min-width: 767px) and (max-width: 964px) {
-              /* line 43, ../hybridpages/assets/stylesheets/layouts/_home.scss */
+              /* line 59, ../hybridpages/assets/stylesheets/layouts/_home.scss */
               .main[role="main"] .videos .video iframe, .main[role="main"] .videos .video object {
                 height: 240px; } }
             @media only screen and (max-width: 767px) {
-              /* line 25, ../hybridpages/assets/stylesheets/layouts/_home.scss */
+              /* line 41, ../hybridpages/assets/stylesheets/layouts/_home.scss */
               .main[role="main"] .videos .video {
                 float: left;
                 display: block;
@@ -1622,10 +1631,10 @@
                 /* line 40, ../../../../../.rvm/gems/ruby-2.0.0-p247@gobot.io/gems/neat-1.5.0/app/assets/stylesheets/grid/_span-columns.scss */
                 .main[role="main"] .videos .video:last-child {
                   margin-right: 0; }
-                /* line 53, ../hybridpages/assets/stylesheets/layouts/_home.scss */
+                /* line 69, ../hybridpages/assets/stylesheets/layouts/_home.scss */
                 .main[role="main"] .videos .video iframe, .main[role="main"] .videos .video object {
                   height: 240px; } }
-          /* line 60, ../hybridpages/assets/stylesheets/layouts/_home.scss */
+          /* line 76, ../hybridpages/assets/stylesheets/layouts/_home.scss */
           .main[role="main"] .videos .video-index {
             float: left;
             display: block;
@@ -1634,30 +1643,30 @@
             /* line 40, ../../../../../.rvm/gems/ruby-2.0.0-p247@gobot.io/gems/neat-1.5.0/app/assets/stylesheets/grid/_span-columns.scss */
             .main[role="main"] .videos .video-index:last-child {
               margin-right: 0; }
-            /* line 64, ../hybridpages/assets/stylesheets/layouts/_home.scss */
+            /* line 80, ../hybridpages/assets/stylesheets/layouts/_home.scss */
             .main[role="main"] .videos .video-index iframe, .main[role="main"] .videos .video-index object {
               width: 100%;
               height: 400px; }
             @media only screen and (min-width: 767px) and (max-width: 964px) {
-              /* line 72, ../hybridpages/assets/stylesheets/layouts/_home.scss */
+              /* line 88, ../hybridpages/assets/stylesheets/layouts/_home.scss */
               .main[role="main"] .videos .video-index iframe, .main[role="main"] .videos .video-index object {
                 height: 300px; } }
             @media only screen and (max-width: 767px) {
-              /* line 80, ../hybridpages/assets/stylesheets/layouts/_home.scss */
+              /* line 96, ../hybridpages/assets/stylesheets/layouts/_home.scss */
               .main[role="main"] .videos .video-index iframe, .main[role="main"] .videos .video-index object {
                 height: 180px; } }
-          /* line 89, ../hybridpages/assets/stylesheets/layouts/_home.scss */
+          /* line 106, ../hybridpages/assets/stylesheets/layouts/_home.scss */
           .main[role="main"] .content.full {
             width: 100%;
             clear: both; }
-          /* line 93, ../hybridpages/assets/stylesheets/layouts/_home.scss */
+          /* line 112, ../hybridpages/assets/stylesheets/layouts/_home.scss */
           .main[role="main"] .content h1, .main[role="main"] .content h2 {
             color: #ff7e5b; }
-          /* line 96, ../hybridpages/assets/stylesheets/layouts/_home.scss */
+          /* line 117, ../hybridpages/assets/stylesheets/layouts/_home.scss */
           .main[role="main"] .content h1 {
             font-size: 1.9em;
             padding: 10px 0; }
-          /* line 101, ../hybridpages/assets/stylesheets/layouts/_home.scss */
+          /* line 124, ../hybridpages/assets/stylesheets/layouts/_home.scss */
           .main[role="main"] .aside.right {
             float: left;
             display: block;
@@ -1668,21 +1677,22 @@
             /* line 40, ../../../../../.rvm/gems/ruby-2.0.0-p247@gobot.io/gems/neat-1.5.0/app/assets/stylesheets/grid/_span-columns.scss */
             .main[role="main"] .aside.right:last-child {
               margin-right: 0; }
-            /* line 105, ../hybridpages/assets/stylesheets/layouts/_home.scss */
+            /* line 130, ../hybridpages/assets/stylesheets/layouts/_home.scss */
             .main[role="main"] .aside.right img {
               width: 100%;
-              margin-top: 20px; }
-          /* line 111, ../hybridpages/assets/stylesheets/layouts/_home.scss */
-          .main[role="main"] section.content .index_content {
+              margin-top: 20px;
+              margin-left: 20px; }
+          /* line 140, ../hybridpages/assets/stylesheets/layouts/_home.scss */
+          .main[role="main"] section.content .index-content {
             float: left;
             display: block;
             margin-right: 2.35765%;
-            width: 74.41059%; }
+            width: 65.88078%; }
             /* line 11, ../hybridpages/assets/stylesheets/_mixins.scss */
-            .main[role="main"] section.content .index_content:not(:last-child) {
+            .main[role="main"] section.content .index-content:not(:last-child) {
               margin-bottom: 20px; }
             /* line 40, ../../../../../.rvm/gems/ruby-2.0.0-p247@gobot.io/gems/neat-1.5.0/app/assets/stylesheets/grid/_span-columns.scss */
-            .main[role="main"] section.content .index_content:last-child {
+            .main[role="main"] section.content .index-content:last-child {
               margin-right: 0; }
         
         /* line 3, ../hybridpages/assets/stylesheets/layouts/_hardware.scss */
@@ -1714,55 +1724,66 @@
               width: 100%; }
         
         /* line 1, ../hybridpages/assets/stylesheets/elements/_home.scss */
+        .important-title {
+          color: white;
+          background: #ff7e5b;
+          text-align: center;
+          text-transform: uppercase;
+          padding: 20px 0; }
+          /* line 9, ../hybridpages/assets/stylesheets/elements/_home.scss */
+          .important-title a {
+            color: #fafaf1; }
+        
+        /* line 16, ../hybridpages/assets/stylesheets/elements/_home.scss */
         .homepage-platform {
           list-style: none !important;
-          margin: 0; }
-          /* line 5, ../hybridpages/assets/stylesheets/elements/_home.scss */
+          margin: 0;
+          text-align: center; }
+          /* line 22, ../hybridpages/assets/stylesheets/elements/_home.scss */
           .homepage-platform li {
-            float: left;
-            width: 25%;
-            padding: 10px;
-            text-align: center; }
+            display: inline-block;
+            width: 19%;
+            padding: 10px; }
             @media only screen and (max-width: 767px) {
-              /* line 5, ../hybridpages/assets/stylesheets/elements/_home.scss */
+              /* line 22, ../hybridpages/assets/stylesheets/elements/_home.scss */
               .homepage-platform li {
                 width: 100%;
                 float: none; } }
-            /* line 18, ../hybridpages/assets/stylesheets/elements/_home.scss */
+            /* line 35, ../hybridpages/assets/stylesheets/elements/_home.scss */
             .homepage-platform li img:hover {
               opacity: .8; }
-            /* line 25, ../hybridpages/assets/stylesheets/elements/_home.scss */
-            .homepage-platform li .title {
+            /* line 44, ../hybridpages/assets/stylesheets/elements/_home.scss */
+            .homepage-platform li .title a {
+              color: white;
               background: #ff7e5b;
               padding: 10px;
-              color: white; }
-              /* line 31, ../hybridpages/assets/stylesheets/elements/_home.scss */
-              .homepage-platform li .title:hover {
+              color: white;
+              display: block;
+              width: 100%; }
+              /* line 53, ../hybridpages/assets/stylesheets/elements/_home.scss */
+              .homepage-platform li .title a:hover {
                 background: #ff6a42; }
-              /* line 36, ../hybridpages/assets/stylesheets/elements/_home.scss */
-              .homepage-platform li .title a {
-                color: white; }
-            /* line 41, ../hybridpages/assets/stylesheets/elements/_home.scss */
-            .homepage-platform li .repo {
+            /* line 62, ../hybridpages/assets/stylesheets/elements/_home.scss */
+            .homepage-platform li .repo a {
+              color: #ff7e5b;
               background: #fafaf1;
-              padding: 10px; }
-              /* line 46, ../hybridpages/assets/stylesheets/elements/_home.scss */
-              .homepage-platform li .repo:hover {
+              padding: 10px;
+              display: block;
+              width: 100%; }
+              /* line 70, ../hybridpages/assets/stylesheets/elements/_home.scss */
+              .homepage-platform li .repo a:hover {
                 background: #f3f3de; }
-              /* line 51, ../hybridpages/assets/stylesheets/elements/_home.scss */
-              .homepage-platform li .repo a {
-                color: #ff7e5b; }
         
-        /* line 59, ../hybridpages/assets/stylesheets/elements/_home.scss */
+        /* line 79, ../hybridpages/assets/stylesheets/elements/_home.scss */
         .hero {
           margin: 15px 0 0 0;
           background: #ff7e5b;
           padding: 25px 0; }
           @media only screen and (max-width: 767px) {
-            /* line 59, ../hybridpages/assets/stylesheets/elements/_home.scss */
+            /* line 79, ../hybridpages/assets/stylesheets/elements/_home.scss */
             .hero {
               margin-top: -8px; } }
-          /* line 68, ../hybridpages/assets/stylesheets/elements/_home.scss */
+          /* line 88, ../hybridpages/assets/stylesheets/elements/_home.scss */
           .hero .title {
             font-family: "Montserrat", sans-serif;
             font-weight: 700;
@@ -1774,20 +1795,20 @@
             opacity: 0.94;
             margin: 0; }
             @media only screen and (max-width: 767px) {
-              /* line 68, ../hybridpages/assets/stylesheets/elements/_home.scss */
+              /* line 88, ../hybridpages/assets/stylesheets/elements/_home.scss */
               .hero .title {
                 font-size: 23px;
                 line-height: 27px;
                 padding: 0; }
-                /* line 83, ../hybridpages/assets/stylesheets/elements/_home.scss */
+                /* line 103, ../hybridpages/assets/stylesheets/elements/_home.scss */
                 .hero .title br {
                   display: none; } }
             @media only screen and (min-width: 767px) and (max-width: 964px) {
-              /* line 68, ../hybridpages/assets/stylesheets/elements/_home.scss */
+              /* line 88, ../hybridpages/assets/stylesheets/elements/_home.scss */
               .hero .title {
                 font-size: 33px;
                 line-height: 42px; } }
-          /* line 96, ../hybridpages/assets/stylesheets/elements/_home.scss */
+          /* line 116, ../hybridpages/assets/stylesheets/elements/_home.scss */
           .hero .subtitle {
             font-family: "Montserrat", sans-serif;
             font-weight: 700;
@@ -1799,61 +1820,61 @@
             line-height: 36px;
             margin-top: 3px; }
             @media only screen and (max-width: 767px) {
-              /* line 96, ../hybridpages/assets/stylesheets/elements/_home.scss */
+              /* line 116, ../hybridpages/assets/stylesheets/elements/_home.scss */
               .hero .subtitle {
                 font-size: 18px;
                 line-height: 22px;
                 margin-top: 4px;
                 padding: 0; } }
         
-        /* line 120, ../hybridpages/assets/stylesheets/elements/_home.scss */
+        /* line 140, ../hybridpages/assets/stylesheets/elements/_home.scss */
         .social {
           line-height: 0;
           padding: 10px 0;
           background: #fdfcf5; }
-          /* line 126, ../hybridpages/assets/stylesheets/elements/_home.scss */
+          /* line 146, ../hybridpages/assets/stylesheets/elements/_home.scss */
           .social .twitter-follow-button {
             vertical-align: top; }
-          /* line 131, ../hybridpages/assets/stylesheets/elements/_home.scss */
+          /* line 151, ../hybridpages/assets/stylesheets/elements/_home.scss */
           .social .splitter {
             display: inline-block;
             height: 21px; }
           @media only screen and (max-width: 767px) {
-            /* line 139, ../hybridpages/assets/stylesheets/elements/_home.scss */
+            /* line 159, ../hybridpages/assets/stylesheets/elements/_home.scss */
             .social .splitter {
               display: block;
               margin-bottom: 5px; } }
         
-        /* line 147, ../hybridpages/assets/stylesheets/elements/_home.scss */
+        /* line 167, ../hybridpages/assets/stylesheets/elements/_home.scss */
         .cta, .hero a.cta {
           padding: 10px 20px;
           display: inline-block;
           margin: 17px 0 0 0;
           font-size: 19px;
           font-weight: bold; }
-          /* line 155, ../hybridpages/assets/stylesheets/elements/_home.scss */
+          /* line 175, ../hybridpages/assets/stylesheets/elements/_home.scss */
           .cta, .hero a.cta, .cta:visited, .hero a.cta:visited, .cta:active, .hero a.cta:active {
             background: #fff3cf;
             color: #bd583d; }
-          /* line 161, ../hybridpages/assets/stylesheets/elements/_home.scss */
+          /* line 181, ../hybridpages/assets/stylesheets/elements/_home.scss */
           .cta:hover, .hero a.cta:hover, .cta:focus, .hero a.cta:focus {
             background: #e1d5b1;
             color: #b34e33; }
           @media only screen and (max-width: 767px) {
-            /* line 147, ../hybridpages/assets/stylesheets/elements/_home.scss */
+            /* line 167, ../hybridpages/assets/stylesheets/elements/_home.scss */
             .cta, .hero a.cta {
               font-size: 16px;
               padding: 8px 15px; } }
         
-        /* line 182, ../hybridpages/assets/stylesheets/elements/_home.scss */
+        /* line 202, ../hybridpages/assets/stylesheets/elements/_home.scss */
         .catcher {
           margin: 0 0 38px 0;
           background: #fdfcf5;
           padding: 20px; }
-          /* line 187, ../hybridpages/assets/stylesheets/elements/_home.scss */
+          /* line 207, ../hybridpages/assets/stylesheets/elements/_home.scss */
           .catcher .phrase {
             margin: 0; }
-          /* line 191, ../hybridpages/assets/stylesheets/elements/_home.scss */
+          /* line 211, ../hybridpages/assets/stylesheets/elements/_home.scss */
           .catcher .cta, .catcher .hero a.cta, .hero .catcher a.cta {
             margin-top: 8px; }
         
@@ -2906,7 +2927,9 @@
       <div class='w'>
         <div class='copyright'>
           &copy; Copyright 2012-2014
-          <a href='http://hybridgroup.com'>The Hybrid Group.</a>
+          <a href='http://hybridgroup.com' id='THG-logo' target='_blank'>
+            <img alt='The Hybrid Group' src='../images/elements/THG_logo.png'>
+          </a>
         </div>
       </div>
     </footer>
