@@ -13,3 +13,6 @@ script:
 branches:
   except:
     - gobot.io
+
+notifications:
+  irc: "irc.freenode.org#gobotio"
