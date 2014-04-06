@@ -1,0 +1,15 @@
+language: go
+go:
+ - 1.1
+ - 1.2
+ - release
+ - tip
+install: 
+ - go get -v . && go build -v .
+ - go get github.com/onsi/ginkgo
+ - go get github.com/onsi/gomega
+script:
+ - go test -v .
+branches:
+  except:
+    - gobot.io
