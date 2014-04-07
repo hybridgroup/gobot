@@ -1,6 +1,7 @@
 ---
 title: GoGaRuCo
 page_title: Blog
+page_title_show: true
 date: 2013-09-21
 tags: events
 author: Damen Evans

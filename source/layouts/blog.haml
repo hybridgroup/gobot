@@ -8,9 +8,14 @@
           = yield
         - else 
           = yield
-    .categories
-      %h4 Tags
-      = yield_content :tags
-    .network
-      %h4 Network
-      = yield_content :network
+    .side-column
+      .categories
+        %h4 Tags
+        = yield_content :tags
+      .network
+        %h4 Network
+        = yield_content :network
+      .titles
+        %h4 Posts
+        %ul 
+          = partial "blog/sidebar_links", {locals: { article: current_article } }

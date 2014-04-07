@@ -1,6 +1,6 @@
 .articles {
 
-  @include span-columns(9);
+  @include span-columns(8);
 
   @media only screen and (max-width: $medium-screen) {
 
@@ -14,8 +14,12 @@
 
   .article {
 
-    display: inline-block;
     margin-bottom: 30px;
+
+    img {
+
+      width: 100%;
+    }
 
     h3, h4, a {
 
@@ -113,42 +117,20 @@
   }
 }
 
-.categories, .network, .tweets {
 
-  vertical-align: top;
-  margin-bottom: 40px;
-  @include span-columns(2);
+.side-column {
+  @include span-columns(3);
 
   @media only screen and (max-width: $medium-screen) {
 
     @include span-columns(12);
   }
 
-  a {
+  .categories, .network, .tweets, .titles {
 
-    color: black;
-
-    &:hover {
-
-      text-decoration: underline;
-    }
-  }
-
-  h4 {
-
-    color: $blog-title-color;
-    font-size: 20px;
-    line-height: 24px;
-  }
-}
-
-.categories {
-
-  ul {
-
-    margin: 0;
-    list-style: none;
-
+    vertical-align: top;
+    margin-bottom: 20px;
+    
     a {
 
       color: black;
@@ -158,8 +140,72 @@
         text-decoration: underline;
       }
     }
+
+    h4 {
+
+      color: $blog-title-color;
+      font-size: 20px;
+      line-height: 24px;
+    }
+
   }
+
+  .titles {
+    ul {
+
+      list-style: none;
+      margin: 0;
+    } 
+
+    li {
+
+      font-size: .8em;
+      border-bottom: $hero-color 1px solid;
+      padding: 2px 5px;
+
+      &:hover {
+
+        background: $hero-color;
+
+        a {
+
+          color: white;
+          text-decoration: none;
+        }
+      }
+    }    
+  }
+
+  .network {
+
+    img {
+
+      width: 30px;
+    }
+  }
+  .categories {
+
+    ul {
+
+      margin: 0;
+      list-style: none;
+
+      a {
+
+        color: black;
+        font-size: .9em;
+
+        &:hover {
+
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+
 }
+
+
 
 @include tiny-screen {
 
