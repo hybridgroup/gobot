@@ -8,6 +8,11 @@
   %a.device{href:"/documentation/drivers/button", title: "Button"}
     %img{src: "/images/devices/button.jpg"}
 
+-if current_page.data.direct_pin_driver == true
+  /// direct-pin
+  %a.device{href:"/documentation/drivers/direct-pin", title: "Direct Pin"}
+    %img{src: "/images/devices/direct-pin.jpg"}
+
 -if current_page.data.led_driver == true
   /// LED
   %a.device{href: "/documentation/drivers/led", title: "LED"}

@@ -2,7 +2,7 @@
 title: Digispark with Gobot
 author: The Hybrid Group
 page_title: Digispark
-page_subtitle: "<a href='https://github.com/hybridgroup/gobot-digispark' class='repository'>Repository</a> <a class+'issues' href='https://github.com/hybridgroup/gobot-digispark/issues'>Issues</a>"
+page_subtitle: "<a href='https://github.com/hybridgroup/gobot-digispark' target='_blank' class='repository'>Repository</a> <a class+'issues' target='_blank' href='https://github.com/hybridgroup/gobot-digispark/issues'>Issues</a>"
 page_title_show: true
 layout: documentation
 subnav_platform: true
@@ -29,8 +29,22 @@ servo_driver: true
   
 %section.how-to#HowToInstall
   %h2 How To Install
-  %p
-    Installing Gobot with digispark support is pretty easy.
+  %p Installing gobot-digispark requires the libusb package already be installed.
+
+  %h3 OSX
+  %p To install libusb on OSX using Homebrew:
+  :markdown
+        :::bash
+        brew install libusb
+
+  %h3 Ubuntu
+  %p To install libusb on linux:
+  :markdown
+        :::bash
+        sudo apt-get install libusb-dev
+
+  %p Now you can install the library with:
+
   :markdown
         :::bash
         go get -u github.com/hybridgroup/gobot-digispark
@@ -44,33 +58,33 @@ servo_driver: true
         package main
 
         import (
-          "github.com/hybridgroup/gobot"
-          "github.com/hybridgroup/gobot-digispark"
-          "github.com/hybridgroup/gobot-gpio"
+                "github.com/hybridgroup/gobot"
+                "github.com/hybridgroup/gobot-digispark"
+                "github.com/hybridgroup/gobot-gpio"
         )
 
         func main() {
 
-          digispark := new(gobotDigispark.DigisparkAdaptor)
-          digispark.Name = "Digispark"
+                digispark := new(gobotDigispark.DigisparkAdaptor)
+                digispark.Name = "Digispark"
 
-          led := gobotGPIO.NewLed(digispark)
-          led.Name = "led"
-          led.Pin = "2"
+                led := gobotGPIO.NewLed(digispark)
+                led.Name = "led"
+                led.Pin = "0"
 
-          work := func() {
-            gobot.Every("0.5s", func() {
-              led.Toggle()
-            })
-          }
+                work := func() {
+                        gobot.Every("0.5s", func() {
+                                led.Toggle()
+                        })
+                }
 
-          robot := gobot.Robot{
-            Connections: []interface{}{digispark},
-            Devices:     []interface{}{led},
-            Work:        work,
-          }
+                robot := gobot.Robot{
+                        Connections: []gobot.Connection{digispark},
+                        Devices:     []gobot.Device{led},
+                        Work:        work,
+                }
 
-          robot.Start()
+                robot.Start()
         }
         
 %section.how-to#HowToConnect
@@ -85,6 +99,50 @@ servo_driver: true
   %p
     Otherwise, for instructions on how to install Little Wire on a Digispark check out 
     %a{ href:"http://digistump.com/board/index.php/topic,160.0.html " } http://digistump.com/board/index.php/topic,160.0.html 
+
+  %h3 OSX
+  :markdown
+        :::bash
+        Important: 2012 MBP The USB ports on the 2012 MBPs (Retina and non) cause issues due to their USB3 controllers,currently the best work around is to use a cheap USB hub (non USB3) - we are working on future solutions. The hub on a Cinema display will work as well.
+  %p The main steps are:
+  %ul 
+    %li Plug in the Digispark to the USB port
+    %li Connect to the device via Gobot
+
+  %h3 Ubuntu
+  %p The main steps are:
+  %ul 
+    %li Add a udev rule to allow access to the Digispark device
+    %li Plug in the Digispark to the USB port
+    %li Connect to the device via Gobot
+  %p First, you must add a udev rule, so that Gobot can communicate with the USB device. Ubuntu and other modern Linux distibutions use udev to manage device files when USB devices are added and removed. By default, udev will create a device with read-only permission which will not allow to you download code. You must place the udev rules below into a file named /etc/udev/rules.d/49-micronucleus.rules.
+  :markdown
+        :::bash
+        # UDEV Rules for Micronucleus boards including the Digispark.
+        # This file must be placed at:
+        #
+        # /etc/udev/rules.d/49-micronucleus.rules    (preferred location)
+        #   or
+        # /lib/udev/rules.d/49-micronucleus.rules    (req'd on some broken systems)
+        #
+        # After this file is copied, physically unplug and reconnect the board.
+        #
+        SUBSYSTEMS=="usb", ATTRS{idVendor}=="1781", ATTRS{idProduct}=="0c9f", MODE:="0666"
+        KERNEL=="ttyACM*", ATTRS{idVendor}=="1781", ATTRS{idProduct}=="0c9f", MODE:="0666", ENV{ID_MM_DEVICE_IGNORE}="1"
+
+        SUBSYSTEMS=="usb", ATTRS{idVendor}=="16d0", ATTRS{idProduct}=="0753", MODE:="0666"
+        KERNEL=="ttyACM*", ATTRS{idVendor}=="16d0", ATTRS{idProduct}=="0753", MODE:="0666", ENV{ID_MM_DEVICE_IGNORE}="1"
+        #
+        # If you share your linux system with other users, or just don't like the
+        # idea of write permission for everybody, you can replace MODE:="0666" with
+        # OWNER:="yourusername" to create the device owned by you, or with
+        # GROUP:="somegroupname" and mange access using standard unix groups.
+  %p 
+    Thanks to 
+    = link_to "@bluebie", "https://github.com/Bluebie" 
+    for these instructions! 
+    = link_to "(https://github.com/Bluebie/micronucleus-t85/wiki/Ubuntu-Linux)", "https://github.com/Bluebie/micronucleus-t85/wiki/Ubuntu-Linux"
+  %p Now plug the Digispark into your computer via the USB port.
 
 %section.drivers#Drivers
   %h2 Drivers

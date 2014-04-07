@@ -41,11 +41,10 @@ sphero_driver: true
   :markdown
         :::javascript
         package main
-
         import (
-          "fmt"
           "github.com/hybridgroup/gobot"
           "github.com/hybridgroup/gobot-sphero"
+          "fmt"
         )
 
         func main() {
@@ -57,23 +56,23 @@ sphero_driver: true
           sphero := gobotSphero.NewSphero(spheroAdaptor)
           sphero.Name = "Sphero"
 
-          connections := []gobot.Connection{
+          connections := []gobot.Connection {
             spheroAdaptor,
           }
-          devices := []gobot.Device{
+          devices := []gobot.Device {
             sphero,
           }
 
-          work := func() {
-            gobot.Every("2s", func() {
-              sphero.Roll(100, uint16(gobot.Random(0, 360)))
+          work := func(){
+            gobot.Every("2s", func(){ 
+              sphero.Roll(100, uint16(gobot.Random(0, 360))) 
             })
           }
 
           robot := gobot.Robot{
-            Connections: connections,
-            Devices:     devices,
-            Work:        work,
+              Connections: connections, 
+              Devices: devices,
+              Work: work,
           }
 
           robot.Start()

@@ -2,7 +2,7 @@
 title: Joysticks with Gobot
 author: The Hybrid Group
 page_title: Joysticks
-page_subtitle: "<a href='https://github.com/hybridgroup/gobot-joystick' class='repository'>Repository</a> <a class+'issues' href='https://github.com/hybridgroup/gobot-joystick/issues'>Issues</a>"
+page_subtitle: "<a href='https://github.com/hybridgroup/gobot-joystick' target='_blank'  class='repository'>Repository</a> <a class+'issues' target='_blank'  href='https://github.com/hybridgroup/gobot-joystick/issues'>Issues</a>"
 page_title_show: true
 layout: documentation
 subnav_platform: true
@@ -55,11 +55,17 @@ xbox360_driver: true
           joystick.Name = "xbox360"
 
           work := func() {
-            gobot.On(joystick.Events["a"], func(data interface{}) {
-              fmt.Println("a", data)
+            gobot.On(joystick.Events["a_press"], func(data interface{}) {
+              fmt.Println("a_press")
             })
-            gobot.On(joystick.Events["b"], func(data interface{}) {
-              fmt.Println("b", data)
+            gobot.On(joystick.Events["a_release"], func(data interface{}) {
+              fmt.Println("a_release")
+            })
+            gobot.On(joystick.Events["b_press"], func(data interface{}) {
+              fmt.Println("b_press")
+            })
+            gobot.On(joystick.Events["b_release"], func(data interface{}) {
+              fmt.Println("b_release")
             })
             gobot.On(joystick.Events["up"], func(data interface{}) {
               fmt.Println("up", data)
@@ -95,10 +101,9 @@ xbox360_driver: true
 
           robot.Start()
         }
-        end
         
 %section.how-to#HowToConnect
-  %h2 How to connect
+  %h2 How to Connect
   %p Plug your USB joystick or game controller into your USB port. If your device is supported by SDL, you are now ready.
 
 %section.drivers#Drivers

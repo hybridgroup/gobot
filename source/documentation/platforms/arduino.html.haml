@@ -2,7 +2,7 @@
 title: Arduino with Gobot
 author: The Hybrid Group
 page_title: Arduino
-page_subtitle: "<a href='https://github.com/hybridgroup/gobot-firmata' target='blanck' class='repository'>Repository</a> <a class+'issues' href='https://github.com/hybridgroup/gobot-firmata/issues' target='blanck'>Issues</a>"
+page_subtitle: "<a href='https://github.com/hybridgroup/gobot-firmata' target='_blank' class='repository'>Repository</a> <a class+'issues' href='https://github.com/hybridgroup/gobot-firmata/issues' target='_blank'>Issues</a>"
 page_title_show: true
 layout: documentation
 subnav_platform: true
@@ -34,6 +34,10 @@ servo_driver: true
   :markdown
         :::bash
         go get -u github.com/hybridgroup/gobot-firmata
+
+  %p 
+    %b Note:
+    Works with any Arduino or compatible that can run Firmata, which is a universal serial interface to microcontrollers.
         
 %section.how-to#HowToUse
   %h2 How To Use
@@ -43,54 +47,40 @@ servo_driver: true
         package main
 
         import (
-          "fmt"
-          "github.com/hybridgroup/gobot"
-          "github.com/hybridgroup/gobot-firmata"
-          "github.com/hybridgroup/gobot-gpio"
+            "github.com/hybridgroup/gobot"
+            "github.com/hybridgroup/gobot-firmata"
+            "github.com/hybridgroup/gobot-gpio"
         )
 
         func main() {
 
-          firmata := new(gobotFirmata.FirmataAdaptor)
-          firmata.Name = "firmata"
-          firmata.Port = "/dev/ttyACM0"
+            firmata := new(gobotFirmata.FirmataAdaptor)
+            firmata.Name = "firmata"
+            firmata.Port = "/dev/ttyACM0"
 
-          led := gobotGPIO.NewLed(firmata)
-          led.Name = "led"
-          led.Pin = "13"
+            led := gobotGPIO.NewLed(firmata)
+            led.Name = "led"
+            led.Pin = "13"
 
-          connections := []interface{}{
-            firmata,
-          }
-          devices := []interface{}{
-            led,
-          }
+            work := func() {
+                gobot.Every("1s", func() {
+                    led.Toggle()
+                })
+            }
 
-          work := func() {
-            gobot.Every("1s", func() {
-              led.Toggle()
-              if led.IsOn() {
-                fmt.Println("On")
-              } else {
-                fmt.Println("Off")
-              }
-            })
-          }
+            robot := gobot.Robot{
+                Connections: []gobot.Connection{firmata},
+                Devices:     []gobot.Device{led},
+                Work:        work,
+            }
 
-          robot := gobot.Robot{
-            Connections: connections,
-            Devices:     devices,
-            Work:        work,
-          }
-
-          robot.Start()
+            robot.Start()
         }
 
 
 %section.how-to#HowToConnect
   %h2 How To Connect
-
-  %h2 How to connect
+  
   %h3 OSX
   %p Coming soon.
 

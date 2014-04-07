@@ -1,105 +1,70 @@
 :markdown
-  # Commands
+  # Functions
 
-  ## OffC
-
-  Stops the motor.
-
-  ##### Returns
-
-  `true or nil`
-
-  ## OnC
+  ## On
 
   Starts the motor.
 
-  ##### Returns
+  ## Off
 
-  `true or nil`
+  Stops the motor.
 
-  ## IsOnC
+  ## IsOn
 
-  Starts the motor if is not started.
+  Returns true if the motor is on
 
-  ##### Returns
+  #### Returns
 
-  `true or nil`
+  - **bool**
 
-  ## IsOffC
+  ## IsOff
 
-  Stops the motor if is not stoped.
+  Returns true if the motor is off
 
-  ##### Returns
+  #### Returns
 
-  `true or nil`
+  - **bool**
 
-  ## ToggleC
+  ## Toggle
 
   Sets the state of the motor to the oposite of the current state, if motor is on then sets it to off.
 
-  ##### Returns
-
-  `true or nil`
-
-  ## SpeedC(value byte)
+  ## Speed(value byte)
 
   Sets the speed of the motor to the value provided in the speed param, speed value must be an integer between 0 and 255.
 
-  ##### Params
+  #### Params
 
-  - **value** - params
-  - **byte** - params
+  - **value** - **byte**
 
-  ##### Returns
+  ## Min
 
-  `integer`
+  Sets the motor to it's minimum speed.
 
-  ## MinC
+  ## Max
 
-  Sets the min speed value.
+  Sets the motor to it's max speed.
 
-  ##### Returns
+  ## Forward(speed byte) 
 
-  `nil`
+  Sets the motor to a forward direction at the specified speed.
 
-  ## MaxC
+  #### Params
 
-  Sets the max speed value.
+  - **speed** - **byte**
 
-  ##### Returns
+  ## Backward(speed byte)
 
-  `nil`
+  Sets the motor to a backward direction at the specified speed.
 
-  ## ForwardC(speed byte) 
+  #### Params
 
-  Sets the motor to go forward.
+  - **speed** - **byte**
 
-  ##### Params
+  ## Direction(direction string) 
 
-  - **speed** - params
-  - **byte** - params
+  Sets the direction of the motor
 
-  ##### Returns
+  #### Params
 
-  `nil`
-
-  ## BackwardC(speed byte)
-
-  Sets the motor to go backward.
-
-  ##### Params
-
-  - **speed** - params
-  - **byte** - params
-
-  ##### Returns
-
-  `nil`
-
-  ## CurrentSpeedC
-
-  Returns the current speed of the motor as an integer between 0 and 255.
-
-  ##### Returns
-
-  `integer`
+  - **direction** - **string**

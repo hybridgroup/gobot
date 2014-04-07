@@ -1,0 +1,63 @@
+---
+title: Gobot - Direct Pin Driver
+author: The Hybrid Group
+page_title: Direct Pin
+page_subtitle: Driver
+page_title_show: true
+layout: documentation
+subnav_driver: true
+
+arduino_platform: true
+beaglebone_platform: true
+digispark_platform: true
+spark_platform: true
+---
+
+%section.intro
+  =image_tag "/images/devices/direct-pin.jpg", class: "display"
+  .info-intro
+    %p This a prototyping driver.
+  .clear
+  
+%section.how-to#HowToConnect
+  %h2 How To Connect
+  :markdown
+    Install the library with: `go get -u github.com/hybridgroup/gobot-gpio`
+  %h3 For Beaglebone:
+  :markdown
+        :::go
+        package main
+
+        import (
+          "github.com/hybridgroup/gobot"
+          "github.com/hybridgroup/gobot-beaglebone"
+          "github.com/hybridgroup/gobot-gpio"
+        )
+
+        func main() {
+          beaglebone := new(gobotBeaglebone.Beaglebone)
+          beaglebone.Name = "beaglebone"
+
+          DirectPin := gobotGPIO.NewLed(beaglebone)
+          DirectPin.Name = "DirectPin"
+        ...
+        
+%section.how-to#HowToUse
+  %h2 How To Use
+
+  :markdown
+        :::go
+        coming soon
+
+%section.public-methods
+  .commands-api#Commands
+    = partial "/documentation/drivers/partials/gpio/commands_direct_pin"
+  .commands-api#Events
+    = partial "/documentation/drivers/partials/gpio/events_direct_pin"   
+
+  
+%section.compatability.hardware#Compatability
+  %h2 Compatability
+  =# TODO: Update platform list with all that work with this driver in Cylon.js.
+  .devices
+    = partial "documentation/partials/devices_platforms"
