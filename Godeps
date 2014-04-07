@@ -1,6 +1,6 @@
 github.com/hybridgroup/gobot .
-github.com/tarm/goserial b1a1181412bc617a989d8bce3d0d29f7bce2ab7f 
-github.com/codegangsta/inject 9aea7a2fa5b79ef7fc00f63a575e72df33b4e886 
 github.com/go-martini/martini 7cea1b34e29976de64195b7cca1f668cad9abc8d
+github.com/codegangsta/inject 9aea7a2fa5b79ef7fc00f63a575e72df33b4e886 
+github.com/tarm/goserial b1a1181412bc617a989d8bce3d0d29f7bce2ab7f 
 github.com/onsi/ginkgo 3632cbe0b58a9005513942e9d4c4920e375d6778
 github.com/onsi/gomega bad854a45453ec22d99c8bd982e2302f64d3fc37
