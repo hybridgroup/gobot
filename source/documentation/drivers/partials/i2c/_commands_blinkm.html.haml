@@ -1,42 +1,54 @@
 :markdown
-  # Commands
+  # Functions
 
-  ## RgbC
+  ## FirmwareVersion
 
-  Text here
+  Returs the version of the current Frimware.
 
-  ##### Params
+  ### Returns
 
-  ##### Returns
+  - **string** - Firmware Version 
 
-  `nil`
+  #### API Command
 
-  ## ColorC
+  **FirmwareVersionC**
 
-  Text here
+  ## Color
 
-  ##### Params
+  Returns the color of the LED.
 
-  ##### Returns
+  #### Returns
 
-  `nil`
+  - **[]byte** - the RGB LED color
 
-  ## FadeC
+  #### API Command
 
-  Text here
+  **ColorC**
 
-  ##### Params
+  ## Rgb(r byte, g byte, b byte)
 
-  ##### Returns
+  Sets the RGB color.
 
-  `nil`
+  #### Params
 
-  ## FirmwareVersionC
+  - **r** - **byte** - Red
+  - **g** - **byte** - Green
+  - **b** - **byte** - Blue
 
-  Text here
+  #### API Command
 
-  ##### Params
+  **RgbC**
 
-  ##### Returns
+  ## Fade(r byte, g byte, b byte)
 
-  `nil`
+  Fades the RGB color.
+
+  #### Params
+
+  - **r** - **byte** - Red
+  - **g** - **byte** - Green
+  - **b** - **byte** - Blue
+
+  #### API Command
+
+  **FadeC**

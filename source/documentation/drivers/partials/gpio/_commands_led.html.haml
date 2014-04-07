@@ -1,51 +1,38 @@
 :markdown
-  # Commands
+  # Functions
 
-  ## OnC
-
-  Turns LED on.
-
-  ##### Params
-
-  `no params`
-
-  ##### Returns
-
-  nil
-
-  ## OffC
-
-  Turns LED off.
-
-  ##### Params
-
-  `no params`
-
-  ##### Returns
-
-  nil
-
-  ## ToggleC
+  ## Toggle
 
   Turns the LED on, or off, depending on if it is already off, or on, respectively.
 
-  ##### Params
+  #### API Command
 
-  `no params`
+  **ToggleC**
 
-  ##### Returns
+  ## On
 
-  nil
+  Turns LED on.
 
-  ## BrightnessC(level byte)
+  #### API Command
+
+  **OnC**
+
+  ## Off
+
+  Turns LED off.
+
+  #### API Command
+
+  **OffC**
+
+  ## Brightness(level byte)
 
   Sets brightness of the led to the specified brightness value passed to brightness(level byte).
 
-  ##### Params
+  #### Params
 
-  - **level** - params
-  - **byte** - params
+  - **level** - **byte**
 
-  ##### Returns
+  #### API Command
 
-  integer
+  **BrightnessC**
