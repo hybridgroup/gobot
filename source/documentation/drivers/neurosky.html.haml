@@ -1,0 +1,47 @@
+---
+title: Gobot - Neurosky Mindwave Driver
+author: The Hybrid Group
+page_title: Neurosky Mindwave
+page_subtitle: Driver
+layout: documentation
+page_title_show: true
+subnav_driver: true
+
+neurosky_platform: true
+---
+%section.intro
+  = image_tag "/images/devices/neurosky.jpg", class: "display"
+  .info-intro
+    %p
+      The MindWave headset turns your computer into a brain activity monitor. The headset safely measures brainwave signals and monitors the attention levels of individuals as they interact with math, memory and pattern recognition applications. 
+    
+  .clear
+  
+%section.how_to#HowToConnect
+  %h2 How To Connect
+  :markdown
+        :::javascript
+        ...
+
+          
+%section.how-to#HowToUse
+  %h2 How To Use
+  %p This small program use the Neurosky with the attention-meditation.
+  :markdown
+        :::javascript
+        ....
+
+
+%section.public-methods
+  .commands-api#Commands
+    %h1 Commands
+    %p no commands
+  .commands-api#Events
+    = #partial "/documentation/drivers/partials/neurosky/events"
+  
+    
+%section.compatibility.hardware#Compatability
+  %h2 Compatibility
+  =# TODO: Update platform list with all that work with this driver in Cylon.js.
+  .devices
+    = partial "documentation/partials/devices_platforms"

@@ -33,6 +33,11 @@
   %a.device{href:"/documentation/platforms/leapmotion", title: "Leap Motion"}
     %img{src: "/images/devices/leap_motion.jpg"}
 
+- if current_page.data.neurosky_platform == true
+  /// Neurosky
+  %a.device{href:"/documentation/platforms/neurosky", title: "Neurosky"}
+    %img{src: "/images/devices/neurosky.jpg"}
+
 - if current_page.data.opencv_platform == true
   /// Open CV
   %a.device{href:"/documentation/platforms/opencv", title: "OpenCV"}
