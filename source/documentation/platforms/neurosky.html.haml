@@ -25,8 +25,8 @@ neurosky_driver: true
   %h2 How To Install
   %p Installing cylon.js with Neurosky support is pretty easy.
   :markdown
-        :::javascript
-        ...
+        :::bash
+        go get path/to/repo/gobot-neurosky
 
 %section.how-to#HowToUse
   %h2 How To Use
@@ -34,7 +34,64 @@ neurosky_driver: true
     
   :markdown
         :::javascript
-        ....
+        package main
+
+        import (
+          "github.com/hybridgroup/gobot"
+          "github.com/hybridgroup/gobot-neurosky"
+          "fmt"
+        )
+
+        func main() {
+
+          adaptor := new(gobotNeurosky.NeuroskyAdaptor)
+          adaptor.Name = "neurosky"
+          adaptor.Port = "/dev/rfcomm0"
+
+          neuro := gobotNeurosky.NewNeurosky(adaptor)
+          neuro.Name = "neuro"
+
+          work := func() {
+            gobot.On(neuro.Events["Extended"], func(data interface{}) {
+              fmt.Println("Extended", data)
+            })
+            gobot.On(neuro.Events["Signal"], func(data interface{}) {
+              fmt.Println("Signal", data)
+            })
+            gobot.On(neuro.Events["Attention"], func(data interface{}) {
+              fmt.Println("Attention", data)
+            })
+            gobot.On(neuro.Events["Meditation"], func(data interface{}) {
+              fmt.Println("Meditation", data)
+            })
+            gobot.On(neuro.Events["Blink"], func(data interface{}) {
+              fmt.Println("Blink", data)
+            })
+            gobot.On(neuro.Events["Wave"], func(data interface{}) {
+              fmt.Println("Wave", data)
+            })
+            gobot.On(neuro.Events["EEG"], func(data interface{}) {
+              eeg := data.(gobotNeurosky.EEG)
+              fmt.Println("Delta", eeg.Delta)
+              fmt.Println("Theta", eeg.Theta)
+              fmt.Println("LoAlpha", eeg.LoAlpha)
+              fmt.Println("HiAlpha", eeg.HiAlpha)
+              fmt.Println("LoBeta", eeg.LoBeta)
+              fmt.Println("HiBeta", eeg.HiBeta)
+              fmt.Println("LoGamma", eeg.LoGamma)
+              fmt.Println("MidGamma", eeg.MidGamma)
+              fmt.Println("\n")
+            })
+          }
+
+          robot := gobot.Robot{
+            Connections: []gobot.Connection{adaptor},
+            Devices:     []gobot.Device{neuro},
+            Work:        work,
+          }
+
+          robot.Start()
+        }
   
 
 %section.how-to#HowToConnect
@@ -43,24 +100,24 @@ neurosky_driver: true
 
   %p In order to allow Gobot running on your Mac to access the Mindwave, go to "Bluetooth > Open Bluetooth Preferences > Sharing Setup" and make sure that "Bluetooth Sharing" is checked.
 
-  %h3  Ubuntu
+  -#%h3  Ubuntu
 
-  %p Connecting to the Mindwave from Ubuntu or any other Linux-based OS can be done entirely from the command line using Gobot CLI commands. Here are the steps.
+  -#%p Connecting to the Mindwave from Ubuntu or any other Linux-based OS can be done entirely from the command line using Gobot CLI commands. Here are the steps.
 
-  %p Find the address of the Mindwave, by using:
-  :markdown
-        :::bash
-        gobot scan bluetooth
+  -#%p Find the address of the Mindwave, by using:
+  -#:markdown
+        -#:::bash
+        -#gobot scan bluetooth
 
-  %p Pair to Mindwave using this command (substituting the actual address of your Mindwave):
-  :markdown
-        :::bash
-        gobot bluetooth pair <address>
+  -#%p Pair to Mindwave using this command (substituting the actual address of your Mindwave):
+  -#:markdown
+        -#:::bash
+        -#gobot bluetooth pair <address>
 
-  %p Connect to the Mindwave using this command (substituting the actual address of your Mindwave):
-  :markdown
-        :::bash
-        gobot bluetooth connect <address>
+  -#%p Connect to the Mindwave using this command (substituting the actual address of your Mindwave):
+  -#:markdown
+        -#:::bash
+        -#gobot bluetooth connect <address>
   
 
   %h3  Windows
