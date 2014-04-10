@@ -9,7 +9,7 @@ description: Gobot is a framework for robotics, physical computing, and the Inte
 layout: home
 
 hero_title: "Go, Robot, Go! Go Powered Robotics"
-hero_subtitle: "Next generation robotics framework with support for <a href='#platforms'>9 different platforms</a>"
+hero_subtitle: "Next generation robotics framework with support for <a href='#platforms'>10 different platforms</a>"
 
 img_character: "<img src='images/elements/gophy.png'>"
 
@@ -129,7 +129,7 @@ getting_started_button: "<a href='/documentation/getting-started' class='cta'> G
   Gobot has a extensible system for connecting to hardware devices. The following robotics and physical computing platforms are currently supported:
 
   %p.important-title 
-    9 Platforms
+    10 Platforms
 
   %ul.homepage-platform
     %li
@@ -179,6 +179,14 @@ getting_started_button: "<a href='/documentation/getting-started' class='cta'> G
         %img{src: "/images/devices/leap_motion.jpg", style: "width: 90%"}  
       .repo
         = link_to "repo", "https://github.com/hybridgroup/gobot-leapmotion", target:"_blank"
+
+    %li
+      .title
+        = link_to "Neurosky", "http://neurosky.com/products-markets/eeg-biosensors/hardware/", target:"_blank"  
+      %a{:href => "/documentation/platforms/neurosky"} 
+        %img{src: "/images/devices/neurosky.jpg", style: "width: 90%"}  
+      .repo
+        = link_to "repo", "https://github.com/hybridgroup/gobot-neurosky", target:"_blank"
 
     %li
       .title

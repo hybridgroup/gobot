@@ -1,0 +1,120 @@
+---
+title: Gobot - Neurosky Mindwave Driver
+author: The Hybrid Group
+page_title: Neurosky Mindwave
+page_subtitle: Driver
+layout: documentation
+page_title_show: true
+subnav_driver: true
+
+neurosky_platform: true
+---
+%section.intro
+  = image_tag "/images/devices/neurosky.jpg", class: "display"
+  .info-intro
+    %p
+      The MindWave headset turns your computer into a brain activity monitor. The headset safely measures brainwave signals and monitors the attention levels of individuals as they interact with math, memory and pattern recognition applications. 
+    
+  .clear
+  
+%section.how_to#HowToConnect
+  %h2 How To Connect
+  :markdown
+        :::javascript
+        package main
+
+        import (
+          "github.com/hybridgroup/gobot"
+          "github.com/hybridgroup/gobot-neurosky"
+          "fmt"
+        )
+
+        func main() {
+
+          adaptor := new(gobotNeurosky.NeuroskyAdaptor)
+          adaptor.Name = "neurosky"
+          adaptor.Port = "/dev/rfcomm0"
+
+          neuro := gobotNeurosky.NewNeurosky(adaptor)
+          neuro.Name = "neuro"
+        ...
+
+          
+%section.how-to#HowToUse
+  %h2 How To Use
+  %p This small program use the Neurosky.
+  :markdown
+        :::javascript
+        package main
+
+        import (
+          "github.com/hybridgroup/gobot"
+          "github.com/hybridgroup/gobot-neurosky"
+          "fmt"
+        )
+
+        func main() {
+
+          adaptor := new(gobotNeurosky.NeuroskyAdaptor)
+          adaptor.Name = "neurosky"
+          adaptor.Port = "/dev/rfcomm0"
+
+          neuro := gobotNeurosky.NewNeurosky(adaptor)
+          neuro.Name = "neuro"
+
+          work := func() {
+            gobot.On(neuro.Events["Extended"], func(data interface{}) {
+              fmt.Println("Extended", data)
+            })
+            gobot.On(neuro.Events["Signal"], func(data interface{}) {
+              fmt.Println("Signal", data)
+            })
+            gobot.On(neuro.Events["Attention"], func(data interface{}) {
+              fmt.Println("Attention", data)
+            })
+            gobot.On(neuro.Events["Meditation"], func(data interface{}) {
+              fmt.Println("Meditation", data)
+            })
+            gobot.On(neuro.Events["Blink"], func(data interface{}) {
+              fmt.Println("Blink", data)
+            })
+            gobot.On(neuro.Events["Wave"], func(data interface{}) {
+              fmt.Println("Wave", data)
+            })
+            gobot.On(neuro.Events["EEG"], func(data interface{}) {
+              eeg := data.(gobotNeurosky.EEG)
+              fmt.Println("Delta", eeg.Delta)
+              fmt.Println("Theta", eeg.Theta)
+              fmt.Println("LoAlpha", eeg.LoAlpha)
+              fmt.Println("HiAlpha", eeg.HiAlpha)
+              fmt.Println("LoBeta", eeg.LoBeta)
+              fmt.Println("HiBeta", eeg.HiBeta)
+              fmt.Println("LoGamma", eeg.LoGamma)
+              fmt.Println("MidGamma", eeg.MidGamma)
+              fmt.Println("\n")
+            })
+          }
+
+          robot := gobot.Robot{
+            Connections: []gobot.Connection{adaptor},
+            Devices:     []gobot.Device{neuro},
+            Work:        work,
+          }
+
+          robot.Start()
+        }
+
+
+%section.public-methods
+  .commands-api#Commands
+    %h1 Functions
+    %p no commands
+  .commands-api#Events
+    = partial "/documentation/drivers/partials/neurosky/events"
+  
+    
+%section.compatibility.hardware#Compatability
+  %h2 Compatibility
+  =# TODO: Update platform list with all that work with this driver in Cylon.js.
+  .devices
+    = partial "documentation/partials/devices_platforms"
