@@ -82,20 +82,21 @@
                   That is pretty simple once the Sphero is ready (connected and listening), you just need three lines of code and you are set,
                   Gobot and the Sphero driver take care of the rest.
                   </p>
-<p>Install the library with: <code>go get -u github.com/hybridgroup/gobot-sphero</code></p>
+<p>Install the library with: 
+                  <code>go get -u github.com/hybridgroup/gobot-sphero</code></p>
                   
                   <pre class="CodeRay"><span class="keyword">package</span> main
-
 <span class="keyword">import</span> (
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-sphero</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
 )
 
 <span class="keyword">func</span> main() {
 
   spheroAdaptor := <span class="predefined">new</span>(gobotSphero.SpheroAdaptor)
   spheroAdaptor.Name = <span class="string"><span class="delimiter">"</span><span class="content">Sphero</span><span class="delimiter">"</span></span>
-  spheroAdaptor.Port = <span class="string"><span class="delimiter">"</span><span class="content">/dev/rfcomm0</span><span class="delimiter">"</span></span>
+  spheroAdaptor.Port = <span class="string"><span class="delimiter">"</span><span class="content">127.0.0.1:4560</span><span class="delimiter">"</span></span>
 
   sphero := gobotSphero.NewSphero(spheroAdaptor)
   sphero.Name = <span class="string"><span class="delimiter">"</span><span class="content">Sphero</span><span class="delimiter">"</span></span>
@@ -106,33 +107,39 @@
                 <p>
                   This example rolls the sphero in a random direction and change direction every 2 seconds.
                   </p>
-<h3>JavaScript</h3>
-                  <pre class="CodeRay"><span class="reserved">package</span> main
-
+<pre class="CodeRay"><span class="reserved">package</span> main
 <span class="reserved">import</span> (
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-sphero</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
 )
 
 func main() {
 
   <span class="key">spheroAdaptor</span> := <span class="keyword">new</span>(gobotSphero.SpheroAdaptor)
   spheroAdaptor.Name = <span class="string"><span class="delimiter">"</span><span class="content">Sphero</span><span class="delimiter">"</span></span>
-  spheroAdaptor.Port = <span class="string"><span class="delimiter">"</span><span class="content">/dev/rfcomm0</span><span class="delimiter">"</span></span>
+  spheroAdaptor.Port = <span class="string"><span class="delimiter">"</span><span class="content">127.0.0.1:4560</span><span class="delimiter">"</span></span>
 
   sphero := gobotSphero.NewSphero(spheroAdaptor)
   sphero.Name = <span class="string"><span class="delimiter">"</span><span class="content">Sphero</span><span class="delimiter">"</span></span>
 
-  work := func() {
-    gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">2s</span><span class="delimiter">"</span></span>, func() {
-      sphero.Roll(<span class="integer">100</span>, uint16(gobot.Rand(<span class="integer">360</span>)))
+  connections := []gobot.Connection {
+    spheroAdaptor,
+  }
+  devices := []gobot.Device {
+    sphero,
+  }
+
+  work := func(){
+    gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">2s</span><span class="delimiter">"</span></span>, func(){ 
+      sphero.Roll(<span class="integer">100</span>, uint16(gobot.Random(<span class="integer">0</span>, <span class="integer">360</span>))) 
     })
   }
 
   robot := gobot.Robot{
-    <span class="key">Connections</span>: []<span class="reserved">interface</span>{}{spheroAdaptor},
-    <span class="key">Devices</span>:     []<span class="reserved">interface</span>{}{sphero},
-    <span class="key">Work</span>:        work,
+      <span class="key">Connections</span>: connections, 
+      <span class="key">Devices</span>: devices,
+      <span class="key">Work</span>: work,
   }
 
   robot.Start()
@@ -140,644 +147,114 @@ func main() {
 </pre>
                 
               </section><section class="public-methods"><div class="commands-api" id="Commands">
-                  <h1 id="commands">Commands</h1>
+                  <h1 id="functions">Functions</h1>
                   
-                  <h2 id="abortmacro">abortMacro</h2>
-                  
-                  <p>This command aborts any executing macro, and returns both it's ID code
-                  and the command number currently in progress.</p>
-                  
-                  <h5 id="returns">Returns</h5>
-                  
-                  <p>an array containing the ID code and command number.</p>
-                  
-                  <h2 id="abortorbbasicprogram">abortOrbBasicProgram</h2>
-                  
-                  <p>Aborts execution of any currently-running orbBasic program.</p>
-                  
-                  <h5 id="returns-1">Returns</h5>
-                  
-                  <p>`null</p>
-                  
-                  <h2 id="appendmacrochunckchunk">appendMacroChunck(chunk)</h2>
-                  
-                  <p>Stores an attached macro definition into a temporary RAM buffer for
-                  later execution. It's similar to the <code>saveTemporaryMacro</code> function, but allows
-                  you to build up a longer temporary macros.</p>
-                  
-                  <h5 id="params">Params</h5>
-                  
-                  <ul>
-<li>
-<strong>chunk</strong> - macro definition to be executed later. Will throw an
-                  error if any larger than 254 bytes.</li>
-                  </ul>
-<h5 id="returns-2">Returns</h5>
-                  
-                  <p>a boolean indicating whether or not the macro could be packeted.</p>
-                  
-                  <h2 id="appendorbbasicfragmentarea-programcode">appendOrbBasicFragment(area, programCode)</h2>
-                  
-                  <p>Appends a fragment of an orbBasic program to a buffer that will be
-                  written to the Sphero eventually.</p>
-                  
-                  <h5 id="params-1">Params</h5>
-                  
-                  <ul>
-<li>
-<strong>area</strong> - value to start buffer with</li>
-                    <li>
-<strong>fragment</strong> - fragment of orbBasic to be sent to the Sphero. Will throw an
-                  error if larger than 253 bytes</li>
-                  </ul>
-<h5 id="returns-3">Returns</h5>
-                  
-                  <p>a boolean indicating whether or not the fragment could be packeted</p>
-                  
-                  <h2 id="configurecollisiondetectionmethod-thresholdx-thresholdy-speedx-speedy-deadtime">configureCollisionDetection(method, thresholdX, thresholdY, speedX, speedY, deadTime)</h2>
-                  
-                  <p>Internal: Configures collision detection on the Sphero, using the provided
-                  params to decide what constitutes a 'collision'.</p>
-                  
-                  <h5 id="params-2">Params</h5>
-                  
-                  <ul>
-<li>
-<strong>method</strong> - detection method to use. Pass <code>0x01</code> to enable collision detection</li>
-                    <li>
-<strong>thresholdX</strong> - an 8-bit settable threshold for the X axis of the Sphero.
-                  A setting of <code>0x00</code> disables the contribution of this axis</li>
-                    <li>
-<strong>thresholdY</strong> - an 8-bit settable threshold for the Y axis of the Sphero.
-                  A setting of <code>0x00</code> disables the contribution of this aYis</li>
-                    <li>
-<strong>speedX</strong> - an 8-bit settable speed value for the X speed. This is ranged,
-                  then added to <code>thresholdX</code> to generate the final threshold value.</li>
-                    <li>
-<strong>speedY</strong> - an 8-bit settable speed value for the Y speed. This is ranged,
-                  then added to <code>thresholdY</code> to generate the final threshold value.</li>
-                    <li>
-<strong>deadTime</strong> - an 8-bit post-collision dead time to prevent re-triggering of
-                  the collision event. Specified in 10ms increments</li>
-                  </ul>
-<h5 id="returns-4">Returns</h5>
-                  
-                  <p>a boolean whether or not the packet to be sent to the Sphero has been built successfully</p>
-                  
-                  <h2 id="configurelocatorflag-x-y-yawtare">configureLocator(flag, x, y, yawTare)</h2>
-                  
-                  <p>Through the streaming interface, Sphero provides real-time location
-                  data in the form of X, Y coordinates on the ground plane.</p>
-                  
-                  <h5 id="params-3">Params</h5>
-                  
-                  <ul>
-<li>
-<strong>flag</strong> - number (0-1), determines whether the calibrate commands automatically set the
-                  yaw tare value.</li>
-                    <li>
-<strong>y</strong> - set the current X coordinates of Sphero on the ground plane in
-                  centimeters.</li>
-                    <li>
-<strong>x</strong> - set the current Y coordinates of Sphero on the ground plane in
-                  centimeters.</li>
-                    <li>
-<strong>yawTare</strong> - (0-359) value for the orientation the Sphero should use after
-                  calibration.</li>
-                  </ul>
-<h5 id="returns-5">Returns</h5>
-                  
-                  <p>a boolean whether or not the packet to be sent to the Sphero has beenbuilt successfully</p>
-                  
-                  <h2 id="detectcollisions">detectCollisions</h2>
-                  
-                  <p>Enables collision detection for the Sphero. When the Sphero detects
-                  a collision, it will emit the <code>collision</code> event.</p>
-                  
-                  <p>Shortcut method to <code>configureCollisionDetection</code> so you don't have to deal
-                  with setting it up manually.</p>
-                  
-                  <h5 id="returns-6">Returns</h5>
-                  
-                  <p><code>nil</code></p>
-                  
-                  <h2 id="eraseorbbasicstoragearea">eraseOrbBasicStorage(area)</h2>
-                  
-                  <p>Internal: This erases any existing program in the specified storage area.
-                  Specify 00h for the temporary RAM buffer or 01h for the persistent storage area.</p>
-                  
-                  <h5 id="params-4">Params</h5>
-                  
-                  <ul>
-<li>
-<strong>area</strong> - which buffer should be erased, <code>0x00</code> for the temporary RAM buffer or
-                  <code>0x01</code> for the persistent storage area</li>
-                  </ul>
-<h5 id="returns-7">Returns</h5>
-                  
-                  <p><code>nil</code></p>
-                  
-                  <h2 id="executeorbbasicprogramarea-start-line-start-line">executeOrbBasicProgram(Area, Start Line, Start Line)</h2>
-                  
-                  <p>This attempts to run a program in the specified storage area beginning
-                  at the specified line number. This command will fail if there is already
-                  an orbBasic program executing.</p>
-                  
-                  <h5 id="params-5">Params</h5>
-                  
-                  <ul>
-<li>
-<strong>area</strong> - params</li>
-                    <li>
-<strong>startLine</strong> - params</li>
-                  </ul>
-<h5 id="returns-8">Returns</h5>
-                  
-                  <p><code>nil</code></p>
-                  
-                  <h2 id="getapplicationconfigurationblock">getApplicationConfigurationBlock</h2>
-                  
-                  <p>This allows you to retrieve the application configuration block that
-                  is set aside for exclusive use by applications.</p>
-                  
-                  <h5 id="returns-9">Returns</h5>
-                  
-                  <p><code>nil</code></p>
-                  
-                  <h2 id="getconfigurationblockid">getConfigurationBlock(ID)</h2>
-                  
-                  <p>This command retrieves one of the configuration blocks.</p>
-                  
-                  <h5 id="params-6">Params</h5>
-                  
-                  <ul>
-<li>
-<strong>id</strong> - params</li>
-                  </ul>
-<h5 id="returns-10">Returns</h5>
-                  
-                  <p><code>nil</code></p>
-                  
-                  <h2 id="getdevicemode">getDeviceMode</h2>
-                  
-                  <p>Gets the operation mode of Sphero based on the supplied mode value.</p>
-                  
-                  <h5 id="returns-11">Returns</h5>
-                  
-                  <p><code>00h (Normal mode) or 01h (User Hack mode)</code></p>
-                  
-                  <h2 id="getmacrostatus">getMacroStatus</h2>
-                  
-                  <p>This command returns the ID code and command number of the currently
-                  executing macro.</p>
-                  
-                  <h5 id="returns-12">Returns</h5>
-                  
-                  <p><code>(ID code, cmd number, cmd number)</code></p>
-                  
-                  <h2 id="getpermanentoptionflags">getPermanentOptionFlags()</h2>
-                  
-                  <p>This command returns the ID code and command number of the currently
-                  executing macro.</p>
-                  
-                  <h5 id="returns-13">Returns</h5>
-                  
-                  <p>an array of option flags</p>
-                  
-                  <h2 id="getrgbc">GetRGBC</h2>
-                  
-                  <p>This retrieves the "user LED color" which is stored in the config
-                  block.</p>
-                  
-                  <h5 id="returns-14">Returns</h5>
-                  
-                  <p>the sphero's LED color</p>
-                  
-                  <h2 id="gettemporaryoptionflags">getTemporaryOptionFlags</h2>
-                  
-                  <p>Returns the temporary option flags.</p>
-                  
-                  <h5 id="returns-15">Returns</h5>
-                  
-                  <p>FLAGS</p>
-                  
-                  <h2 id="reinitializemacroexecutive">reInitializeMacroExecutive</h2>
-                  
-                  <p>This terminates any running macro and reinitializes the macro system.</p>
-                  
-                  <h5 id="returns-16">Returns</h5>
-                  
-                  <p><code>nil</code></p>
-                  
-                  <h2 id="readlocator">readLocator</h2>
-                  
-                  <p>This reads Sphero's current position (X,Y), component velocities and
-                  SOG (speed over ground).</p>
-                  
-                  <h5 id="returns-17">Returns</h5>
-                  
-                  <p><code>(XPOS, YPOS, XVEL, YVEL, SOG)</code></p>
-                  
-                  <h2 id="rollcspeed-heading">RollC(speed, heading)</h2>
+                  <h2 id="rollspeed-uint8-heading-uint16">Roll(speed uint8, heading uint16)</h2>
                   
                   <p>This commands Sphero to roll along the provided vector. Both a speed
                   and a heading are required; the latter is considered relative to the last
                   calibrated direction.</p>
                   
-                  <h5 id="params-7">Params</h5>
+                  <h4 id="params">Params</h4>
                   
                   <ul>
 <li>
-<strong>speed</strong> - params</li>
+<strong>speed</strong> - <strong>uint8</strong> - rotation speed</li>
                     <li>
-<strong>heading</strong> - params</li>
+<strong>heading</strong> - <strong>uint16</strong> - direction</li>
                   </ul>
-<h5 id="returns-18">Returns</h5>
+<h4 id="api-command">API Command</h4>
                   
-                  <p><code>nil</code></p>
+                  <p><strong>RollC</strong></p>
                   
-                  <h2 id="runmacroseq-dlen-id">runMacro(SEQ, DLEN, ID)</h2>
+                  <h2 id="stop">Stop</h2>
                   
-                  <p>This attempts to execute the specified macro.</p>
+                  <p>Stops the Sphero from rolling around.</p>
                   
-                  <h5 id="params-8">Params</h5>
+                  <h4 id="api-command-1">API Command</h4>
                   
-                  <ul>
-<li>
-<strong>seq</strong> - params</li>
-                    <li>
-<strong>dLen</strong> - params</li>
-                    <li>
-<strong>id</strong> - params</li>
-                  </ul>
-<h5 id="returns-19">Returns</h5>
+                  <p><strong>StopC</strong></p>
                   
-                  <p><code>nil</code></p>
-                  
-                  <h2 id="savemacrodata">saveMacro(data)</h2>
-                  
-                  <p>This stores the attached macro definition into the persistent store
-                  for later execution.</p>
-                  
-                  <h5 id="params-9">Params</h5>
-                  
-                  <ul>
-<li>
-<strong>data</strong> - params</li>
-                  </ul>
-<h5 id="returns-20">Returns</h5>
-                  
-                  <p><code>nil</code></p>
-                  
-                  <h2 id="savetemporarymacrodata">saveTemporaryMacro(data)</h2>
-                  
-                  <p>This command controls the self level routine.</p>
-                  
-                  <h5 id="params-10">Params</h5>
-                  
-                  <ul>
-<li>
-<strong>options</strong> - params</li>
-                    <li>
-<strong>angleLimit</strong> - params</li>
-                    <li>
-<strong>timeout</strong> - params</li>
-                    <li>
-<strong>trueTime</strong> - params</li>
-                  </ul>
-<h5 id="returns-21">Returns</h5>
-                  
-                  <p>options: <code>array</code> [(0 , 1 , 2 ,3 ), (0 , 1 to 90), (0 , 1 to 255), (0 , 1 to 255)].</p>
-                  
-                  <h2 id="selfleveloptions-angle-limit-timeout-true-time-options-0--1--2-3--0--1-to-90-0--1-to-255-0--1-to-255">selfLevel(Options, Angle Limit, Timeout, True Time), options: ((0 | 1 | 2 |3 ), (0 | 1 to 90), (0 | 1 to 255), (0 | 1 to 255)</h2>
-                  
-                  <p>This command controls the self level routine.</p>
-                  
-                  <h5 id="params-11">Params</h5>
-                  
-                  <ul>
-<li>
-<strong>range</strong> - params</li>
-                  </ul>
-<h5 id="returns-22">Returns</h5>
-                  
-                  <p><code>integer</code> opt: 0 , 1 , 2 , 3.</p>
-                  
-                  <h2 id="setaccelerometerrangerange-idx-options-0--1--2--3">setAccelerometerRange(Range Idx), options: 0 | 1 | 2 | 3</h2>
-                  
-                  <h2 id="setapplicationconfigurationblock">setApplicationConfigurationBlock</h2>
-                  
-                  <h2 id="setbackledclevel">SetBackLEDC(level)</h2>
+                  <h2 id="setbackledlevel-uint8">SetBackLED(level uint8)</h2>
                   
                   <p>This allows you to control the brightness of the back LED. The value does
                   not persist across power cycles.</p>
                   
-                  <h5 id="params-12">Params</h5>
+                  <h4 id="params-1">Params</h4>
                   
                   <ul>
 <li>
-<strong>level</strong> - params</li>
+<strong>level</strong> - <strong>uint8</strong> - brightness of back lED</li>
                   </ul>
-<h5 id="returns-23">Returns</h5>
+<h4 id="api-command-2">API Command</h4>
                   
-                  <p><code>nil</code></p>
+                  <p><strong>SetBackLEDC</strong></p>
                   
-                  <h2 id="setboostwithtimestate">setBoostWithTime(STATE)</h2>
+                  <h2 id="setrgbr-uint8-g-uint8-b-uint8">SetRGB(r uint8, g uint8, b uint8)</h2>
                   
-                  <p>setBoostWithTime(state)</p>
+                  <p>Sets the sphero's LED color</p>
                   
-                  <h5 id="params-13">Params</h5>
-                  
-                  <ul>
-<li>
-<strong>state</strong> - params</li>
-                  </ul>
-<h5 id="returns-24">Returns</h5>
-                  
-                  <p><code>nil</code></p>
-                  
-                  <h2 id="setcolorcolor">setColor(color)</h2>
-                  
-                  <p>Allows for convenient setting of the Sphero's color using a hex value
-                  or a color name string</p>
-                  
-                  <h5 id="params-14">Params</h5>
+                  <h4 id="params-2">Params</h4>
                   
                   <ul>
 <li>
-<strong>color</strong> - hex number (<code>0xFF1500</code>) or string color name to set the Sphero
-                  to</li>
+<strong>r</strong> - <strong>uint8</strong> - Red</li>
                     <li>
-<strong>persist</strong> - boolean, whether or not the color should persist. Defaults to
-                  <code>true</code>
-</li>
+<strong>g</strong> - <strong>uint8</strong> - Green</li>
+                    <li>
+<strong>b</strong> - <strong>uintu</strong> - Blue</li>
                   </ul>
-<h5 id="returns-25">Returns</h5>
+<h4 id="api-command-3">API Command</h4>
                   
-                  <p><code>nil</code></p>
+                  <p><strong>SetRGBC</strong></p>
                   
-                  <h2 id="setrandomcolor">setRandomColor</h2>
+                  <h2 id="getrgb">GetRGB()</h2>
                   
-                  <p>Changes the Sphero to a random color.</p>
+                  <p>This retrieves the "user LED color" which is stored in the config block.</p>
                   
-                  <h5 id="params-15">Params</h5>
+                  <h4 id="returns">Returns</h4>
                   
                   <ul>
 <li>
-<strong>persist</strong> - boolean, whether or not the color should persist. Defaults to
-                  <code>true</code>
-</li>
+<strong>[]uint8</strong> - the sphero's LED color</li>
                   </ul>
-<h5 id="returns-26">Returns</h5>
+<h4 id="api-command-4">API Command</h4>
                   
-                  <p><code>nil</code></p>
+                  <p><strong>GetRGBC</strong></p>
                   
-                  <h2 id="setconfigurationblockvalue">setConfigurationBlock(value)</h2>
-                  
-                  <p>This command accepts an exact copy of the configuration block and
-                  loads it into the RAM copy of the configuration block.</p>
-                  
-                  <h5 id="params-16">Params</h5>
-                  
-                  <ul>
-<li>
-<strong>value</strong> - params</li>
-                  </ul>
-<h5 id="returns-27">Returns</h5>
-                  
-                  <p><code>nil</code></p>
-                  
-                  <h2 id="setdatastreamingn-m-mask-pcnt-mask2">setDataStreaming(N, M, MASK, PCNT, MASK2)</h2>
-                  
-                  <p>Sphero supports asynchronous data streaming of certain control system and sensor parameters.</p>
-                  
-                  <h5 id="params-17">Params</h5>
-                  
-                  <ul>
-<li>
-<strong>n</strong> - params</li>
-                    <li>
-<strong>m</strong> -params</li>
-                    <li>
-<strong>mask</strong> - params</li>
-                    <li>
-<strong>pcnt</strong> - params</li>
-                    <li>
-<em>*mask2</em>+ - params</li>
-                  </ul>
-<h5 id="returns-28">Returns</h5>
-                  
-                  <p><code>nil</code></p>
-                  
-                  <h2 id="setdevicemodemode">setDeviceMode(MODE)</h2>
-                  
-                  <p>Assigns the operation mode of Sphero based on the supplied mode value.</p>
-                  
-                  <h5 id="params-18">Params</h5>
-                  
-                  <ul>
-<li>
-<em>*mode</em>+ - params</li>
-                  </ul>
-<h5 id="returns-29">Returns</h5>
-                  
-                  <p><code>nil</code></p>
-                  
-                  <h2 id="setheadingcheading">SetHeadingC(heading)</h2>
-                  
-                  <p>This allows the smartphone client to adjust the orientation of Sphero
-                  by commanding a new reference heading in degrees, which ranges from 0 to 359.</p>
-                  
-                  <h5 id="params-19">Params</h5>
-                  
-                  <ul>
-<li>
-<strong>heading</strong> - params</li>
-                  </ul>
-<h5 id="returns-30">Returns</h5>
-                  
-                  <p><code>nil</code></p>
-                  
-                  <h2 id="setmacroparameterparam-val1-val2">setMacroParameter(Param, Val1, Val2)</h2>
-                  
-                  <p>This command allows system globals that influence certain macro
-                  commands to be selectively altered from outside of the macro system itself.</p>
-                  
-                  <h5 id="params-20">Params</h5>
-                  
-                  <ul>
-<li>
-<strong>param</strong> - params</li>
-                    <li>
-<strong>val1</strong> - params</li>
-                    <li>
-<strong>val2</strong> - params</li>
-                  </ul>
-<h5 id="returns-31">Returns</h5>
-                  
-                  <p><code>nil</code></p>
-                  
-                  <h2 id="setmotiontimeouttime">setMotionTimeout(TIME)</h2>
-                  
-                  <p>This sets the ultimate timeout for the last motion command to keep
-                  Sphero from rolling away in the case of a crashed (or paused) client app.</p>
-                  
-                  <h5 id="params-21">Params</h5>
-                  
-                  <ul>
-<li>
-<strong>time</strong> - params</li>
-                  </ul>
-<h5 id="returns-32">Returns</h5>
-                  
-                  <p><code>nil</code></p>
-                  
-                  <h2 id="setpermanentoptionflagsflags">setPermanentOptionFlags(FLAGS)</h2>
-                  
-                  <p>Assigns the permanent option flags to the provided value and writes them
-                  immediately to the config block for persistence across power cycles.</p>
-                  
-                  <ul>
-<li>
-<strong>flags</strong> - params</li>
-                  </ul>
-<h5 id="returns-33">Returns</h5>
-                  
-                  <p><code>nil</code></p>
-                  
-                  <h2 id="setrgbcr-g-b">SetRGBC(r, g, b)</h2>
-                  
-                  <p>Allows for convenient setting of the Sphero's color using a hex value
-                  or a color name string</p>
-                  
-                  <h5 id="params-22">Params</h5>
-                  
-                  <ul>
-<li>
-<strong>r</strong> -red value</li>
-                    <li>
-<strong>g</strong> -green value</li>
-                    <li>
-<strong>b</strong> - blue value</li>
-                  </ul>
-<h5 id="returns-34">Returns</h5>
-                  
-                  <p><code>nil</code></p>
-                  
-                  <h2 id="setrawmotorvaluesl-mode-l-power-r-mode-r-power">setRawMotorValues(L-MODE, L-POWER, R-MODE, R-POWER)</h2>
-                  
-                  <p>This allows you to take over one or both of the motor output values,
-                  instead of having the stabilization system control them.</p>
-                  
-                  <h5 id="params-23">Params</h5>
-                  
-                  <ul>
-<li>
-<strong>lMode</strong> - params</li>
-                    <li>
-<strong>lPower</strong> - params</li>
-                    <li>
-<strong>rMode</strong> - params</li>
-                    <li>
-<strong>rPower</strong> - params</li>
-                  </ul>
-<h5 id="returns-35">Returns</h5>
-                  
-                  <p><code>nil</code></p>
-                  
-                  <h2 id="setrotationraterate">setRotationRate(RATE)</h2>
-                  
-                  <p>Sets the rotation rate of the Sphero</p>
-                  
-                  <h5 id="params-24">Params</h5>
-                  
-                  <ul>
-<li>
-<strong>rate</strong> - params</li>
-                  </ul>
-<h5 id="returns-36">Returns</h5>
-                  
-                  <p><code>nil</code></p>
-                  
-                  <h2 id="setstabilizationcon">SetStabilizationC(on)</h2>
+                  <h2 id="setstabalisationon-bool">SetStabalisation(on bool)</h2>
                   
                   <p>Sets whether the Sphero should have stabilization enabled</p>
                   
                   <ul>
 <li>
-<strong>on</strong> - whether or not the sphero should have stabilization</li>
+<strong>on</strong> - <strong>bool</strong> - whether or not the sphero should have stabilization</li>
                   </ul>
-<h5 id="returns-37">Returns</h5>
+<h4 id="api-command-5">API Command</h4>
                   
-                  <p><code>nil</code></p>
+                  <p><strong>SetStabalisationC</strong></p>
                   
-                  <h2 id="settemporaryoptionflagsflags">setTemporaryOptionFlags(FLAGS)</h2>
+                  <h2 id="setheadingheading-uint16">SetHeading(heading uint16)</h2>
                   
-                  <p>Assigns the temporary option flags to the provided value. These do not
-                  persist across a power cycle. See below for the bit definitions.</p>
+                  <p>This allows the client to adjust the orientation of Sphero
+                  by commanding a new reference heading in degrees, which ranges from 0 to 359.</p>
                   
-                  <h5 id="params-25">Params</h5>
+                  <h4 id="params-3">Params</h4>
                   
                   <ul>
 <li>
-<em>*flags</em>+ - params</li>
+<strong>heading</strong> - <strong>uint16</strong> - heading</li>
                   </ul>
-<h5 id="returns-38">Returns</h5>
+<h4 id="api-command-6">API Command</h4>
                   
-                  <p><code>nil</code></p>
-                  
-                  <h2 id="stopc">StopC</h2>
-                  
-                  <p>Stops the Sphero from rolling around.</p>
-                  
-                  <h5 id="returns-39">Returns</h5>
-                  
-                  <p><code>nil</code></p>
-                  
-                  <h2 id="submitvaluetoinputstatementval">submitValueToInputStatement(VAL)</h2>
-                  
-                  <p>This takes the place of the typical user console in orbBasic and allows a
-                  user to answer an input request.</p>
-                  
-                  <h5 id="params-26">Params</h5>
-                  
-                  <ul>
-<li>
-<strong>val</strong> - params</li>
-                  </ul>
-<h5 id="returns-40">Returns</h5>
-                  
-                  <p><code>nil</code></p>
+                  <p><strong>SetHeadingC</strong></p>
                 </div>
                 <div class="commands-api" id="Events">
                   <h1 id="events">Events</h1>
                   
-                  <h2 id="update">update</h2>
+                  <h2 id="collision">Collision</h2>
                   
-                  <p>This is a meta-event that will be triggered when any of the other events are. If
-                  you're looking for specific information, you might wish to subscribe to one of
-                  the specific events instead.</p>
-                  
-                  <h2 id="collision">collision</h2>
-                  
-                  <p>Assuming that collision detection has been enabled, gets emitted when the sphero
-                  hits something, falls from a step, or otherwise detects a collision.</p>
-                  
-                  <h2 id="messagesdata">messages(data)</h2>
-                  
-                  <p>Gets triggered when the Sphero has data to send to the user.</p>
-                  
-                  <h2 id="notificationsdata">notifications(data)</h2>
-                  
-                  <p>Gets triggered when the Sphero has a notification to send to the user.</p>
-                  
-                  <h2 id="connect">connect</h2>
-                  
-                  <p>Gets triggered when the connection to the Sphero over Bluetooth has been opened.</p>
-                  
-                  <h2 id="start">start</h2>
-                  
-                  <p>Gets triggered when the Sphero is started and ready to be used.</p>
+                  <p>Emitted when the sphero hits something, falls from a step, or otherwise detects a collision.</p>
                 </div>
               </section><section id="SpheroColors"><h2>Sphero Colors (R,G,B)</h2>
                 <table class="commands">
@@ -1909,7 +1386,7 @@ func main() {
                     </td>
                     <td>(154, 205, 50)</td>
                   </tr>
-</table></section><section class="compatability hardware"><h2>Works with:</h2>
+</table></section><section class="compatability hardware" id="Compatability"><h2>Compatibility:</h2>
                 
                 <div class="devices">
                   <!-- // Sphero -->
@@ -1926,7 +1403,7 @@ func main() {
         <div class="copyright">
           © Copyright 2012-2014
           <a href="http://hybridgroup.com" id="THG-logo" target="_blank">
-            <img alt="The Hybrid Group" src="../images/elements/THG_logo.png"></a>
+            <img alt="The Hybrid Group" src="/images/elements/THG_logo.png"></a>
         </div>
       </div>
     </footer>

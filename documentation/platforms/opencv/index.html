@@ -58,7 +58,7 @@
         <div class="w">
           <h1 class="title">OpenCV</h1>
           <h2 class="subtitle">
-<a href="https://github.com/hybridgroup/gobot-opencv" class="repository">Repository</a> <a class="issues" href="https://github.com/hybridgroup/gobot-opencv/issues">Issues</a>
+<a href="https://github.com/hybridgroup/gobot-opencv" target="_blank" class="repository">Repository</a> <a class="issues" target="_blank" href="https://github.com/hybridgroup/gobot-opencv/issues">Issues</a>
 </h2>
         </div>
       </div>
@@ -130,8 +130,53 @@ make
 sudo make install
 </pre>
               </section><section class="how-to" id="HowToUse"><h2>How To Use</h2>
-                <p>Example using face detection.</p>
-                <pre class="CodeRay">...
+                <p>Example using the camera.</p>
+                <pre class="CodeRay"><span class="keyword">package</span> gobotOpencv
+
+<span class="keyword">import</span> (
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/go-opencv/opencv</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+)
+
+<span class="keyword">type</span> Camera <span class="keyword">struct</span> {
+  gobot.Driver
+  Adaptor *Opencv
+  camera  *opencv.Capture
+  Source  <span class="predefined-type">string</span>
+}
+
+<span class="keyword">type</span> CameraInterface <span class="keyword">interface</span> {
+}
+
+<span class="keyword">func</span> NewCamera(adaptor *Opencv) *Camera {
+  d := <span class="predefined">new</span>(Camera)
+  d.Events = <span class="predefined">make</span>(<span class="keyword">map</span>[<span class="predefined-type">string</span>]<span class="keyword">chan</span> <span class="keyword">interface</span>{})
+  d.Adaptor = adaptor
+  d.Commands = []<span class="predefined-type">string</span>{}
+  <span class="keyword">return</span> d
+}
+
+<span class="keyword">func</span> (me *Camera) Start() <span class="predefined-type">bool</span> {
+  me.Events[<span class="string"><span class="delimiter">"</span><span class="content">Frame</span><span class="delimiter">"</span></span>] = <span class="predefined">make</span>(<span class="keyword">chan</span> <span class="keyword">interface</span>{}, <span class="integer">0</span>)
+  <span class="keyword">if</span> me.Source != <span class="string"><span class="delimiter">"</span><span class="delimiter">"</span></span> {
+    me.camera = opencv.NewFileCapture(me.Source)
+  } <span class="keyword">else</span> {
+    me.camera = opencv.NewCameraCapture(<span class="integer">0</span>)
+  }
+  <span class="keyword">go</span> <span class="keyword">func</span>() {
+    <span class="keyword">for</span> {
+      <span class="keyword">if</span> me.camera.GrabFrame() {
+        image := me.camera.RetrieveFrame(<span class="integer">1</span>)
+        <span class="keyword">if</span> image != <span class="predefined-constant">nil</span> {
+          gobot.Publish(me.Events[<span class="string"><span class="delimiter">"</span><span class="content">Frame</span><span class="delimiter">"</span></span>], image)
+        }
+      }
+    }
+  }()
+  <span class="keyword">return</span> <span class="predefined-constant">true</span>
+}
+<span class="keyword">func</span> (me *Camera) Halt() <span class="predefined-type">bool</span> { <span class="keyword">return</span> <span class="predefined-constant">true</span> }
+<span class="keyword">func</span> (me *Camera) Init() <span class="predefined-type">bool</span> { <span class="keyword">return</span> <span class="predefined-constant">true</span> }
 </pre>
               </section>
 </div>
@@ -143,7 +188,7 @@ sudo make install
         <div class="copyright">
           © Copyright 2012-2014
           <a href="http://hybridgroup.com" id="THG-logo" target="_blank">
-            <img alt="The Hybrid Group" src="../images/elements/THG_logo.png"></a>
+            <img alt="The Hybrid Group" src="/images/elements/THG_logo.png"></a>
         </div>
       </div>
     </footer>

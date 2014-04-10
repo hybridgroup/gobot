@@ -7,7 +7,7 @@
 <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
 <meta name="description">
 <meta content="The Hybrid Group" name="author">
-<title>Gobot - Servo Driver</title>
+<title>Gobot - Direct Pin Driver</title>
 <link href="/stylesheets/style.css" rel="stylesheet">
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><script src="/javascripts/script.js"></script><script src="/hybridpages/assets/javascript/subnav.js"></script><link href="//fonts.googleapis.com/css?family=Inconsolata:400,700%7CMontserrat:700" rel="stylesheet">
 <link href="/favicon.ico" rel="shortcut icon" type="image/gif">
@@ -56,7 +56,7 @@
 </div>
       <div class="page-title">
         <div class="w">
-          <h1 class="title">Servo</h1>
+          <h1 class="title">Direct Pin</h1>
           <h2 class="subtitle">Driver</h2>
         </div>
       </div>
@@ -65,7 +65,6 @@
             <a href="#HowToUse">How To Use</a>
             <a href="#Commands">Commands</a>
             <a href="#Events">Events</a>
-            <a href="#Circuit">Circuit</a>
             <a href="#Compatability">Compatibility</a>
             <a href="#top">Top</a>
           </nav>
@@ -73,139 +72,160 @@
       </section><div class="container">
         <div class="main" role="main">
           <section class="content full"><div class="documentation">
-              <section class="intro"><img class="display" src="/images/devices/servo.jpg"><div class="info-intro">
-                  <p>Provides an interface for making servos easy to work and interact with from Gobot.</p>
+              <section class="intro"><img class="display" src="/images/devices/direct-pin.jpg"><div class="info-intro">
+                  <p>This a prototyping driver.</p>
                 </div>
                 <div class="clear"></div>
               </section><section class="how-to" id="HowToConnect"><h2>How To Connect</h2>
                 <p>Install the library with: <code>go get -u github.com/hybridgroup/gobot-gpio</code></p>
-                <h3>For Digispark:</h3>
+                <h3>For Beaglebone:</h3>
                 <pre class="CodeRay"><span class="keyword">package</span> main
 
 <span class="keyword">import</span> (
-  <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
-  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-digispark</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-beaglebone</span><span class="delimiter">"</span></span>
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
 )
 
 <span class="keyword">func</span> main() {
+  beaglebone := <span class="predefined">new</span>(gobotBeaglebone.Beaglebone)
+  beaglebone.Name = <span class="string"><span class="delimiter">"</span><span class="content">beaglebone</span><span class="delimiter">"</span></span>
 
-  digispark := <span class="predefined">new</span>(gobotDigispark.DigisparkAdaptor)
-  digispark.Name = <span class="string"><span class="delimiter">"</span><span class="content">digispark</span><span class="delimiter">"</span></span>
-
-  servo := gobotGPIO.NewServo(digispark)
-  servo.Name = <span class="string"><span class="delimiter">"</span><span class="content">servo</span><span class="delimiter">"</span></span>
-  servo.Pin = <span class="string"><span class="delimiter">"</span><span class="content">0</span><span class="delimiter">"</span></span>
+  DirectPin := gobotGPIO.NewLed(beaglebone)
+  DirectPin.Name = <span class="string"><span class="delimiter">"</span><span class="content">DirectPin</span><span class="delimiter">"</span></span>
 ...
 </pre>
               </section><section class="how-to" id="HowToUse"><h2>How To Use</h2>
-                <p>
-                  This example moves a servo from a random angle.
-                </p>
-                <h3>Example</h3>
-                <pre class="CodeRay"><span class="keyword">package</span> main
-
-<span class="keyword">import</span> (
-  <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
-  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
-  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-digispark</span><span class="delimiter">"</span></span>
-  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
-)
-
-<span class="keyword">func</span> main() {
-
-  digispark := <span class="predefined">new</span>(gobotDigispark.DigisparkAdaptor)
-  digispark.Name = <span class="string"><span class="delimiter">"</span><span class="content">digispark</span><span class="delimiter">"</span></span>
-
-  servo := gobotGPIO.NewServo(digispark)
-  servo.Name = <span class="string"><span class="delimiter">"</span><span class="content">servo</span><span class="delimiter">"</span></span>
-  servo.Pin = <span class="string"><span class="delimiter">"</span><span class="content">0</span><span class="delimiter">"</span></span>
-
-  work := <span class="keyword">func</span>() {
-    servo.InitServo()
-    gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">1s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() {
-      i := <span class="predefined-type">uint8</span>(gobot.Rand(<span class="integer">180</span>))
-      fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">Turning</span><span class="delimiter">"</span></span>, i)
-      servo.Move(i)
-    })
-  }
-
-  robot := gobot.Robot{
-    Connections: []<span class="keyword">interface</span>{}{digispark},
-    Devices:     []<span class="keyword">interface</span>{}{servo},
-    Work:        work,
-  }
-
-  robot.Start()
-}
+                <pre class="CodeRay">coming soon
 </pre>
               </section><section class="public-methods"><div class="commands-api" id="Commands">
                   <h1 id="functions">Functions</h1>
                   
-                  <h2 id="moveangle-uint8">Move(angle uint8)</h2>
+                  <h2 id="digitalread">DigitalRead</h2>
                   
-                  <p>Moves the servo to the specified angle, angle must be an integer value between 0 and 180.</p>
+                  <p>Returns an integer value that represents the digital read from the pin.</p>
+                  
+                  <h4 id="returns">Returns</h4>
+                  
+                  <ul>
+<li>
+<strong>int</strong> - integer value</li>
+                  </ul>
+<h4 id="api-command">API Command</h4>
+                  
+                  <p><strong>DigitalReadC</strong></p>
+                  
+                  <h2 id="digitalwritelevel-byte">DigitalWrite(level byte)</h2>
+                  
+                  <p>Writes a ON/OFF using digital write to a pin</p>
                   
                   <h4 id="params">Params</h4>
                   
                   <ul>
 <li>
-<strong>angle</strong> - <strong>uint8</strong>
-</li>
+<strong>level</strong> - <strong>[]byte</strong> - on/off value</li>
                   </ul>
-<h4 id="returns">Returns</h4>
+<h4 id="returns-1">Returns</h4>
                   
                   <ul>
 <li>
-<strong>angle</strong> - angle value</li>
+<strong>byte(level)</strong> - on/off value</li>
                   </ul>
-<h4 id="api-command">API Command</h4>
+<h4 id="api-command-1">API Command</h4>
                   
-                  <p><strong>MoveC</strong></p>
+                  <p><strong>DigitalWriteC</strong></p>
                   
-                  <h2 id="min">Min</h2>
+                  <h2 id="analogread">AnalogRead</h2>
                   
-                  <p>Moves the servo to 0.</p>
+                  <p>Returns an integer value that represents the analog read from the pin.</p>
                   
-                  <h4 id="api-command-1">API Command</h4>
+                  <h4 id="returns-2">Returns</h4>
                   
-                  <p><strong>MinC</strong></p>
+                  <ul>
+<li>
+<strong>int</strong>- the analog read</li>
+                  </ul>
+<h4 id="api-command-2">API Command</h4>
                   
-                  <h2 id="center">Center</h2>
+                  <p><strong>AnalogReadC</strong></p>
                   
-                  <p>Moves the servo to 90</p>
+                  <h2 id="analogwritelevel-byte">AnalogWrite(level byte)</h2>
                   
-                  <h4 id="api-command-2">API Command</h4>
+                  <p>Writes a value using analog write to a pin</p>
                   
-                  <p><strong>CenterC</strong></p>
+                  <h4 id="params-1">Params</h4>
                   
-                  <h2 id="max">Max</h2>
+                  <ul>
+<li>
+<strong>level</strong> - <strong>byte</strong>
+</li>
+                  </ul>
+<h4 id="returns-3">Returns</h4>
                   
-                  <p>Moves the servo to 180</p>
+                  <ul>
+<li>
+<strong>byte(level)</strong> - pin value</li>
+                  </ul>
+<h4 id="api-command-3">API Command</h4>
                   
-                  <h4 id="api-command-3">API Command</h4>
+                  <p><strong>AnalogWriteC</strong></p>
                   
-                  <p><strong>MaxC</strong></p>
+                  <h2 id="pwmwritelevel-byte">PwmWrite(level byte)</h2>
+                  
+                  <p>Writes a value using Pulse Width Modulation (PWM) to a pin</p>
+                  
+                  <h4 id="params-2">Params</h4>
+                  
+                  <ul>
+<li>
+<strong>level</strong> - <strong>byte</strong>
+</li>
+                  </ul>
+<h4 id="returns-4">Returns</h4>
+                  
+                  <ul>
+<li>
+<strong>byte(level)</strong> - PWM value</li>
+                  </ul>
+<h4 id="api-command-4">API Command</h4>
+                  
+                  <p><strong>PwmWriteC</strong></p>
+                  
+                  <h2 id="servowritelevel-byte">ServoWrite(level byte)</h2>
+                  
+                  <p>Writes a value using servo write to a pin</p>
+                  
+                  <h5 id="params-3">Params</h5>
+                  
+                  <ul>
+<li>
+<strong>level</strong> - <strong>byte</strong>
+</li>
+                  </ul>
+<h4 id="returns-5">Returns</h4>
+                  
+                  <ul>
+<li>
+<strong>byte(level)</strong> - pin value</li>
+                  </ul>
+<h4 id="api-command-5">API Command</h4>
+                  
+                  <p><strong>ServoWriteC</strong></p>
                 </div>
                 <div class="commands-api" id="Events">
                   <h1 id="events">Events</h1>
                   
                   <p>no events</p>
                 </div>
-              </section><section class="circuit" id="Circuit"><h2>Circuit</h2>
-                <div class="description-circuit">
-                  <p></p>
-                </div>
-                <div class="image-circuit">
-                  <img alt="" src="/documentation/drivers/breadboards/gpio/servo_bb.png">
-</div>
-                <div class="clear"></div>
               </section><section class="compatability hardware" id="Compatability"><h2>Compatability</h2>
+                
                 <div class="devices">
                   <!-- // Arduino -->
                   <a class="device" href="/documentation/platforms/arduino" title="Arduino">
                     <img src="/images/devices/arduino.jpg"></a>
+                  <!-- // Beaglebone -->
+                  <a class="device" href="/documentation/platforms/beaglebone" title="BeagleBone">
+                    <img src="/images/devices/beaglebone.jpg"></a>
                   <!-- // Analog Sensor -->
                   <a class="device" href="/documentation/platforms/digispark" title="Digispark">
                     <img src="/images/devices/digispark.jpg"></a>

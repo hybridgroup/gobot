@@ -58,7 +58,7 @@
         <div class="w">
           <h1 class="title">Joysticks</h1>
           <h2 class="subtitle">
-<a href="https://github.com/hybridgroup/gobot-joystick" class="repository">Repository</a> <a class href="https://github.com/hybridgroup/gobot-joystick/issues">Issues</a>
+<a href="https://github.com/hybridgroup/gobot-joystick" target="_blank" class="repository">Repository</a> <a class target="_blank" href="https://github.com/hybridgroup/gobot-joystick/issues">Issues</a>
 </h2>
         </div>
       </div>
@@ -110,11 +110,17 @@
   joystick.Name = <span class="string"><span class="delimiter">"</span><span class="content">xbox360</span><span class="delimiter">"</span></span>
 
   work := <span class="keyword">func</span>() {
-    gobot.On(joystick.Events[<span class="string"><span class="delimiter">"</span><span class="content">a</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
-      fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">a</span><span class="delimiter">"</span></span>, data)
+    gobot.On(joystick.Events[<span class="string"><span class="delimiter">"</span><span class="content">a_press</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+      fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">a_press</span><span class="delimiter">"</span></span>)
     })
-    gobot.On(joystick.Events[<span class="string"><span class="delimiter">"</span><span class="content">b</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
-      fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">b</span><span class="delimiter">"</span></span>, data)
+    gobot.On(joystick.Events[<span class="string"><span class="delimiter">"</span><span class="content">a_release</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+      fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">a_release</span><span class="delimiter">"</span></span>)
+    })
+    gobot.On(joystick.Events[<span class="string"><span class="delimiter">"</span><span class="content">b_press</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+      fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">b_press</span><span class="delimiter">"</span></span>)
+    })
+    gobot.On(joystick.Events[<span class="string"><span class="delimiter">"</span><span class="content">b_release</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+      fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">b_release</span><span class="delimiter">"</span></span>)
     })
     gobot.On(joystick.Events[<span class="string"><span class="delimiter">"</span><span class="content">up</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
       fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">up</span><span class="delimiter">"</span></span>, data)
@@ -150,9 +156,8 @@
 
   robot.Start()
 }
-end
 </pre>
-              </section><section class="how-to" id="HowToConnect"><h2>How to connect</h2>
+              </section><section class="how-to" id="HowToConnect"><h2>How to Connect</h2>
                 <p>Plug your USB joystick or game controller into your USB port. If your device is supported by SDL, you are now ready.</p>
               </section><section class="drivers" id="Drivers"><h2>Drivers</h2>
                 <p>
@@ -178,7 +183,7 @@ end
         <div class="copyright">
           © Copyright 2012-2014
           <a href="http://hybridgroup.com" id="THG-logo" target="_blank">
-            <img alt="The Hybrid Group" src="../images/elements/THG_logo.png"></a>
+            <img alt="The Hybrid Group" src="/images/elements/THG_logo.png"></a>
         </div>
       </div>
     </footer>

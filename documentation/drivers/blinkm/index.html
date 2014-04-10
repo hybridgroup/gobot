@@ -136,54 +136,76 @@
 }
 </pre>
               </section><section class="public-methods"><div class="commands-api" id="Commands">
-                  <h1 id="commands">Commands</h1>
+                  <h1 id="functions">Functions</h1>
                   
-                  <h2 id="rgbc">RgbC</h2>
+                  <h2 id="firmwareversion">FirmwareVersion</h2>
                   
-                  <p>Text here</p>
+                  <p>Returs the version of the current Frimware.</p>
                   
-                  <h5 id="params">Params</h5>
+                  <h3 id="returns">Returns</h3>
                   
-                  <h5 id="returns">Returns</h5>
+                  <ul>
+<li>
+<strong>string</strong> - Firmware Version </li>
+                  </ul>
+<h4 id="api-command">API Command</h4>
                   
-                  <p><code>nil</code></p>
+                  <p><strong>FirmwareVersionC</strong></p>
                   
-                  <h2 id="colorc">ColorC</h2>
+                  <h2 id="color">Color</h2>
                   
-                  <p>Text here</p>
+                  <p>Returns the color of the LED.</p>
                   
-                  <h5 id="params-1">Params</h5>
+                  <h4 id="returns-1">Returns</h4>
                   
-                  <h5 id="returns-1">Returns</h5>
+                  <ul>
+<li>
+<strong>[]byte</strong> - the RGB LED color</li>
+                  </ul>
+<h4 id="api-command-1">API Command</h4>
                   
-                  <p><code>nil</code></p>
+                  <p><strong>ColorC</strong></p>
                   
-                  <h2 id="fadec">FadeC</h2>
+                  <h2 id="rgbr-byte-g-byte-b-byte">Rgb(r byte, g byte, b byte)</h2>
                   
-                  <p>Text here</p>
+                  <p>Sets the RGB color.</p>
                   
-                  <h5 id="params-2">Params</h5>
+                  <h4 id="params">Params</h4>
                   
-                  <h5 id="returns-2">Returns</h5>
+                  <ul>
+<li>
+<strong>r</strong> - <strong>byte</strong> - Red</li>
+                    <li>
+<strong>g</strong> - <strong>byte</strong> - Green</li>
+                    <li>
+<strong>b</strong> - <strong>byte</strong> - Blue</li>
+                  </ul>
+<h4 id="api-command-2">API Command</h4>
                   
-                  <p><code>nil</code></p>
+                  <p><strong>RgbC</strong></p>
                   
-                  <h2 id="firmwareversionc">FirmwareVersionC</h2>
+                  <h2 id="fader-byte-g-byte-b-byte">Fade(r byte, g byte, b byte)</h2>
                   
-                  <p>Text here</p>
+                  <p>Fades the RGB color.</p>
                   
-                  <h5 id="params-3">Params</h5>
+                  <h4 id="params-1">Params</h4>
                   
-                  <h5 id="returns-3">Returns</h5>
+                  <ul>
+<li>
+<strong>r</strong> - <strong>byte</strong> - Red</li>
+                    <li>
+<strong>g</strong> - <strong>byte</strong> - Green</li>
+                    <li>
+<strong>b</strong> - <strong>byte</strong> - Blue</li>
+                  </ul>
+<h4 id="api-command-3">API Command</h4>
                   
-                  <p><code>nil</code></p>
+                  <p><strong>FadeC</strong></p>
                 </div>
                 <div class="commands-api" id="Events">
                   <h1 id="events">Events</h1>
                   
-                  <h2 id="start">start</h2>
-                  
-                  <p>Sent when the device has been started and is ready to use.</p>
+                  <p>no events</p>
                 </div>
               </section><section class="circuit" id="Circuit"><h2>Circuit</h2>
                 <div class="description-circuit">
@@ -215,7 +237,7 @@
         <div class="copyright">
           © Copyright 2012-2014
           <a href="http://hybridgroup.com" id="THG-logo" target="_blank">
-            <img alt="The Hybrid Group" src="../images/elements/THG_logo.png"></a>
+            <img alt="The Hybrid Group" src="/images/elements/THG_logo.png"></a>
         </div>
       </div>
     </footer>

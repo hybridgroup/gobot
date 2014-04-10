@@ -58,7 +58,7 @@
         <div class="w">
           <h1 class="title">Leapmotion</h1>
           <h2 class="subtitle">
-<a href="https://github.com/hybridgroup/gobot-leapmotion" class="repository">Repository</a> <a class href="https://github.com/hybridgroup/gobot-leapmotion/issues">Issues</a>
+<a href="https://github.com/hybridgroup/gobot-leapmotion" target="_blank" class="repository">Repository</a> <a class target="_blank" href="https://github.com/hybridgroup/gobot-leapmotion/issues">Issues</a>
 </h2>
         </div>
       </div>
@@ -94,32 +94,32 @@
                 <pre class="CodeRay"><span class="keyword">package</span> main
 
 <span class="keyword">import</span> (
-  <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
-  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
-  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-leapmotion</span><span class="delimiter">"</span></span>
+    <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
+    <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+    <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-leapmotion</span><span class="delimiter">"</span></span>
 )
 
 <span class="keyword">func</span> main() {
-  leapAdaptor := <span class="predefined">new</span>(gobotLeap.LeapAdaptor)
-  leapAdaptor.Name = <span class="string"><span class="delimiter">"</span><span class="content">leap</span><span class="delimiter">"</span></span>
-  leapAdaptor.Port = <span class="string"><span class="delimiter">"</span><span class="content">127.0.0.1:6437</span><span class="delimiter">"</span></span>
+    leapAdaptor := <span class="predefined">new</span>(gobotLeap.LeapAdaptor)
+    leapAdaptor.Name = <span class="string"><span class="delimiter">"</span><span class="content">leap</span><span class="delimiter">"</span></span>
+    leapAdaptor.Port = <span class="string"><span class="delimiter">"</span><span class="content">127.0.0.1:6437</span><span class="delimiter">"</span></span>
 
-  leap := gobotLeap.NewLeap(leapAdaptor)
-  leap.Name = <span class="string"><span class="delimiter">"</span><span class="content">leap</span><span class="delimiter">"</span></span>
+    leap := gobotLeap.NewLeap(leapAdaptor)
+    leap.Name = <span class="string"><span class="delimiter">"</span><span class="content">leap</span><span class="delimiter">"</span></span>
 
-  work := <span class="keyword">func</span>() {
-    gobot.On(leap.Events[<span class="string"><span class="delimiter">"</span><span class="content">Message</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
-      fmt.Println(data)
-    })
-  }
+    work := <span class="keyword">func</span>() {
+        gobot.On(leap.Events[<span class="string"><span class="delimiter">"</span><span class="content">Message</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+            fmt.Println(data)
+        })
+    }
 
-  robot := gobot.Robot{
-    Connections: []gobot.Connection{leapAdaptor},
-    Devices:     []gobot.Device{leap},
-    Work:        work,
-  }
+    robot := gobot.Robot{
+        Connections: []gobot.Connection{leapAdaptor},
+        Devices:     []gobot.Device{leap},
+        Work:        work,
+    }
 
-  robot.Start()
+    robot.Start()
 }
 </pre>
               </section><section class="how-to" id="HowToConnect"><h2>How To Connect</h2>
@@ -166,7 +166,7 @@
         <div class="copyright">
           © Copyright 2012-2014
           <a href="http://hybridgroup.com" id="THG-logo" target="_blank">
-            <img alt="The Hybrid Group" src="../images/elements/THG_logo.png"></a>
+            <img alt="The Hybrid Group" src="/images/elements/THG_logo.png"></a>
         </div>
       </div>
     </footer>

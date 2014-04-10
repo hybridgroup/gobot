@@ -99,11 +99,10 @@
               </section><section class="how-to" id="HowToUse"><h2>How To Use</h2>
                 <p>Example of a simple program that makes the Sphero roll.</p>
                 <pre class="CodeRay"><span class="reserved">package</span> main
-
 <span class="reserved">import</span> (
-  <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-sphero</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
 )
 
 func main() {
@@ -115,23 +114,23 @@ func main() {
   sphero := gobotSphero.NewSphero(spheroAdaptor)
   sphero.Name = <span class="string"><span class="delimiter">"</span><span class="content">Sphero</span><span class="delimiter">"</span></span>
 
-  connections := []gobot.Connection{
+  connections := []gobot.Connection {
     spheroAdaptor,
   }
-  devices := []gobot.Device{
+  devices := []gobot.Device {
     sphero,
   }
 
-  work := func() {
-    gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">2s</span><span class="delimiter">"</span></span>, func() {
-      sphero.Roll(<span class="integer">100</span>, uint16(gobot.Random(<span class="integer">0</span>, <span class="integer">360</span>)))
+  work := func(){
+    gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">2s</span><span class="delimiter">"</span></span>, func(){ 
+      sphero.Roll(<span class="integer">100</span>, uint16(gobot.Random(<span class="integer">0</span>, <span class="integer">360</span>))) 
     })
   }
 
   robot := gobot.Robot{
-    <span class="key">Connections</span>: connections,
-    <span class="key">Devices</span>:     devices,
-    <span class="key">Work</span>:        work,
+      <span class="key">Connections</span>: connections, 
+      <span class="key">Devices</span>: devices,
+      <span class="key">Work</span>: work,
   }
 
   robot.Start()
@@ -158,7 +157,7 @@ func main() {
         <div class="copyright">
           © Copyright 2012-2014
           <a href="http://hybridgroup.com" id="THG-logo" target="_blank">
-            <img alt="The Hybrid Group" src="../images/elements/THG_logo.png"></a>
+            <img alt="The Hybrid Group" src="/images/elements/THG_logo.png"></a>
         </div>
       </div>
     </footer>

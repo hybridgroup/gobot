@@ -58,7 +58,7 @@
         <div class="w">
           <h1 class="title">Arduino</h1>
           <h2 class="subtitle">
-<a href="https://github.com/hybridgroup/gobot-firmata" target="blanck" class="repository">Repository</a> <a class href="https://github.com/hybridgroup/gobot-firmata/issues" target="blanck">Issues</a>
+<a href="https://github.com/hybridgroup/gobot-firmata" target="_blank" class="repository">Repository</a> <a class href="https://github.com/hybridgroup/gobot-firmata/issues" target="_blank">Issues</a>
 </h2>
         </div>
       </div>
@@ -91,56 +91,46 @@
                 </p>
                 <pre class="CodeRay">go get -u github.com/hybridgroup/gobot-firmata
 </pre>
+                <p>
+                  <b>Note:</b>
+                  Works with any Arduino or compatible that can run Firmata, which is a universal serial interface to microcontrollers.
+                </p>
               </section><section class="how-to" id="HowToUse"><h2>How To Use</h2>
                 <p>This small program lets you turn on and off a LED every 1s.</p>
                 <pre class="CodeRay"><span class="keyword">package</span> main
 
 <span class="keyword">import</span> (
-  <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
-  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
-  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-firmata</span><span class="delimiter">"</span></span>
-  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
+    <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+    <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-firmata</span><span class="delimiter">"</span></span>
+    <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
 )
 
 <span class="keyword">func</span> main() {
 
-  firmata := <span class="predefined">new</span>(gobotFirmata.FirmataAdaptor)
-  firmata.Name = <span class="string"><span class="delimiter">"</span><span class="content">firmata</span><span class="delimiter">"</span></span>
-  firmata.Port = <span class="string"><span class="delimiter">"</span><span class="content">/dev/ttyACM0</span><span class="delimiter">"</span></span>
+    firmata := <span class="predefined">new</span>(gobotFirmata.FirmataAdaptor)
+    firmata.Name = <span class="string"><span class="delimiter">"</span><span class="content">firmata</span><span class="delimiter">"</span></span>
+    firmata.Port = <span class="string"><span class="delimiter">"</span><span class="content">/dev/ttyACM0</span><span class="delimiter">"</span></span>
 
-  led := gobotGPIO.NewLed(firmata)
-  led.Name = <span class="string"><span class="delimiter">"</span><span class="content">led</span><span class="delimiter">"</span></span>
-  led.Pin = <span class="string"><span class="delimiter">"</span><span class="content">13</span><span class="delimiter">"</span></span>
+    led := gobotGPIO.NewLed(firmata)
+    led.Name = <span class="string"><span class="delimiter">"</span><span class="content">led</span><span class="delimiter">"</span></span>
+    led.Pin = <span class="string"><span class="delimiter">"</span><span class="content">13</span><span class="delimiter">"</span></span>
 
-  connections := []<span class="keyword">interface</span>{}{
-    firmata,
-  }
-  devices := []<span class="keyword">interface</span>{}{
-    led,
-  }
+    work := <span class="keyword">func</span>() {
+        gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">1s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() {
+            led.Toggle()
+        })
+    }
 
-  work := <span class="keyword">func</span>() {
-    gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">1s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() {
-      led.Toggle()
-      <span class="keyword">if</span> led.IsOn() {
-        fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">On</span><span class="delimiter">"</span></span>)
-      } <span class="keyword">else</span> {
-        fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">Off</span><span class="delimiter">"</span></span>)
-      }
-    })
-  }
+    robot := gobot.Robot{
+        Connections: []gobot.Connection{firmata},
+        Devices:     []gobot.Device{led},
+        Work:        work,
+    }
 
-  robot := gobot.Robot{
-    Connections: connections,
-    Devices:     devices,
-    Work:        work,
-  }
-
-  robot.Start()
+    robot.Start()
 }
 </pre>
               </section><section class="how-to" id="HowToConnect"><h2>How To Connect</h2>
-                <h2>How to connect</h2>
                 <h3>OSX</h3>
                 <p>Coming soon.</p>
                 <h3>Ubuntu</h3>
@@ -186,7 +176,7 @@
         <div class="copyright">
           © Copyright 2012-2014
           <a href="http://hybridgroup.com" id="THG-logo" target="_blank">
-            <img alt="The Hybrid Group" src="../images/elements/THG_logo.png"></a>
+            <img alt="The Hybrid Group" src="/images/elements/THG_logo.png"></a>
         </div>
       </div>
     </footer>

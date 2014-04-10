@@ -58,7 +58,7 @@
         <div class="w">
           <h1 class="title">Spark</h1>
           <h2 class="subtitle">
-<a href="https://github.com/hybridgroup/gobot-spark" target="blanck" class="repository">Repository</a> <a class="issues" href="https://github.com/hybridgroup/gobot-spark/issues" target="blanck">Issues</a>
+<a href="https://github.com/hybridgroup/gobot-spark" target="_blank" class="repository">Repository</a> <a class="issues" href="https://github.com/hybridgroup/gobot-spark/issues" target="_blank">Issues</a>
 </h2>
         </div>
       </div>
@@ -87,41 +87,40 @@
 </pre>
               </section><section class="how-to" id="HowToUse"><h2>How To Use</h2>
                 <p>This small program lets you turn on or off a LED for every 2 sec.</p>
-                <h3>Javascript</h3>
                 <pre class="CodeRay"><span class="reserved">package</span> main
 
 <span class="reserved">import</span> (
-  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
-  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
-  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-spark</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-spark</span><span class="delimiter">"</span></span>
 )
 
 func main() {
 
-  <span class="key">spark</span> := <span class="keyword">new</span>(gobotSpark.SparkAdaptor)
-  spark.Name = <span class="string"><span class="delimiter">"</span><span class="content">spark</span><span class="delimiter">"</span></span>
-  spark.Params = map[string]<span class="reserved">interface</span>{}{
-    <span class="key"><span class="delimiter">"</span><span class="content">device_id</span><span class="delimiter">"</span></span>:    <span class="string"><span class="delimiter">"</span><span class="delimiter">"</span></span>,
-    <span class="key"><span class="delimiter">"</span><span class="content">access_token</span><span class="delimiter">"</span></span>: <span class="string"><span class="delimiter">"</span><span class="delimiter">"</span></span>,
-  }
+        <span class="key">spark</span> := <span class="keyword">new</span>(gobotSpark.SparkAdaptor)
+        spark.Name = <span class="string"><span class="delimiter">"</span><span class="content">spark</span><span class="delimiter">"</span></span>
+        spark.Params = map[string]<span class="reserved">interface</span>{}{
+                <span class="key"><span class="delimiter">"</span><span class="content">device_id</span><span class="delimiter">"</span></span>:    <span class="string"><span class="delimiter">"</span><span class="delimiter">"</span></span>,
+                <span class="key"><span class="delimiter">"</span><span class="content">access_token</span><span class="delimiter">"</span></span>: <span class="string"><span class="delimiter">"</span><span class="delimiter">"</span></span>,
+        }
 
-  led := gobotGPIO.NewLed(spark)
-  led.Name = <span class="string"><span class="delimiter">"</span><span class="content">led</span><span class="delimiter">"</span></span>
-  led.Pin = <span class="string"><span class="delimiter">"</span><span class="content">D7</span><span class="delimiter">"</span></span>
+        led := gobotGPIO.NewLed(spark)
+        led.Name = <span class="string"><span class="delimiter">"</span><span class="content">led</span><span class="delimiter">"</span></span>
+        led.Pin = <span class="string"><span class="delimiter">"</span><span class="content">D7</span><span class="delimiter">"</span></span>
 
-  work := func() {
-    gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">2s</span><span class="delimiter">"</span></span>, func() {
-      led.Toggle()
-    })
-  }
+        work := func() {
+                gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">2s</span><span class="delimiter">"</span></span>, func() {
+                        led.Toggle()
+                })
+        }
 
-  robot := gobot.Robot{
-    <span class="key">Connections</span>: []gobot.Connection{spark},
-    <span class="key">Devices</span>:     []gobot.Device{led},
-    <span class="key">Work</span>:        work,
-  }
+        robot := gobot.Robot{
+                <span class="key">Connections</span>: []gobot.Connection{spark},
+                <span class="key">Devices</span>:     []gobot.Device{led},
+                <span class="key">Work</span>:        work,
+        }
 
-  robot.Start()
+        robot.Start()
 }
 </pre>
               </section><section class="drivers" id="Drivers"><h2>Drivers</h2>
@@ -150,7 +149,7 @@ func main() {
         <div class="copyright">
           © Copyright 2012-2014
           <a href="http://hybridgroup.com" id="THG-logo" target="_blank">
-            <img alt="The Hybrid Group" src="../images/elements/THG_logo.png"></a>
+            <img alt="The Hybrid Group" src="/images/elements/THG_logo.png"></a>
         </div>
       </div>
     </footer>

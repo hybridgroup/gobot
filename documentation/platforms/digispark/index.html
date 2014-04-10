@@ -58,7 +58,7 @@
         <div class="w">
           <h1 class="title">Digispark</h1>
           <h2 class="subtitle">
-<a href="https://github.com/hybridgroup/gobot-digispark" class="repository">Repository</a> <a class href="https://github.com/hybridgroup/gobot-digispark/issues">Issues</a>
+<a href="https://github.com/hybridgroup/gobot-digispark" target="_blank" class="repository">Repository</a> <a class target="_blank" href="https://github.com/hybridgroup/gobot-digispark/issues">Issues</a>
 </h2>
         </div>
       </div>
@@ -87,9 +87,16 @@
                 </div>
                 <div class="clear"></div>
               </section><section class="how-to" id="HowToInstall"><h2>How To Install</h2>
-                <p>
-                  Installing Gobot with digispark support is pretty easy.
-                </p>
+                <p>Installing gobot-digispark requires the libusb package already be installed.</p>
+                <h3>OSX</h3>
+                <p>To install libusb on OSX using Homebrew:</p>
+                <pre class="CodeRay">brew install libusb
+</pre>
+                <h3>Ubuntu</h3>
+                <p>To install libusb on linux:</p>
+                <pre class="CodeRay">sudo apt-get install libusb-dev
+</pre>
+                <p>Now you can install the library with:</p>
                 <pre class="CodeRay">go get -u github.com/hybridgroup/gobot-digispark
 </pre>
               </section><section class="how-to" id="HowToUse"><h2>How To Use</h2>
@@ -99,33 +106,33 @@
                 <pre class="CodeRay"><span class="reserved">package</span> main
 
 <span class="reserved">import</span> (
-  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
-  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-digispark</span><span class="delimiter">"</span></span>
-  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-digispark</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
 )
 
 func main() {
 
-  <span class="key">digispark</span> := <span class="keyword">new</span>(gobotDigispark.DigisparkAdaptor)
-  digispark.Name = <span class="string"><span class="delimiter">"</span><span class="content">Digispark</span><span class="delimiter">"</span></span>
+        <span class="key">digispark</span> := <span class="keyword">new</span>(gobotDigispark.DigisparkAdaptor)
+        digispark.Name = <span class="string"><span class="delimiter">"</span><span class="content">Digispark</span><span class="delimiter">"</span></span>
 
-  led := gobotGPIO.NewLed(digispark)
-  led.Name = <span class="string"><span class="delimiter">"</span><span class="content">led</span><span class="delimiter">"</span></span>
-  led.Pin = <span class="string"><span class="delimiter">"</span><span class="content">2</span><span class="delimiter">"</span></span>
+        led := gobotGPIO.NewLed(digispark)
+        led.Name = <span class="string"><span class="delimiter">"</span><span class="content">led</span><span class="delimiter">"</span></span>
+        led.Pin = <span class="string"><span class="delimiter">"</span><span class="content">0</span><span class="delimiter">"</span></span>
 
-  work := func() {
-    gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">0.5s</span><span class="delimiter">"</span></span>, func() {
-      led.Toggle()
-    })
-  }
+        work := func() {
+                gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">0.5s</span><span class="delimiter">"</span></span>, func() {
+                        led.Toggle()
+                })
+        }
 
-  robot := gobot.Robot{
-    <span class="key">Connections</span>: []<span class="reserved">interface</span>{}{digispark},
-    <span class="key">Devices</span>:     []<span class="reserved">interface</span>{}{led},
-    <span class="key">Work</span>:        work,
-  }
+        robot := gobot.Robot{
+                <span class="key">Connections</span>: []gobot.Connection{digispark},
+                <span class="key">Devices</span>:     []gobot.Device{led},
+                <span class="key">Work</span>:        work,
+        }
 
-  robot.Start()
+        robot.Start()
 }
 </pre>
               </section><section class="how-to" id="HowToConnect"><h2>How To Connect</h2>
@@ -140,6 +147,49 @@ func main() {
                   Otherwise, for instructions on how to install Little Wire on a Digispark check out
                   <a href="http://digistump.com/board/index.php/topic,160.0.html%20">http://digistump.com/board/index.php/topic,160.0.html</a>
                 </p>
+                <h3>OSX</h3>
+                <pre class="CodeRay">Important: 2012 MBP The USB ports on the 2012 MBPs (Retina and non) cause issues due to their USB3 controllers,currently the best work around is to use a cheap USB hub (non USB3) - we are working on future solutions. The hub on a Cinema display will work as well.
+</pre>
+                <p>The main steps are:</p>
+                <ul>
+<li>Plug in the Digispark to the USB port</li>
+                  <li>Connect to the device via Gobot</li>
+                </ul>
+<h3>Ubuntu</h3>
+                <p>The main steps are:</p>
+                <ul>
+<li>Add a udev rule to allow access to the Digispark device</li>
+                  <li>Plug in the Digispark to the USB port</li>
+                  <li>Connect to the device via Gobot</li>
+                </ul>
+<p>First, you must add a udev rule, so that Gobot can communicate with the USB device. Ubuntu and other modern Linux distibutions use udev to manage device files when USB devices are added and removed. By default, udev will create a device with read-only permission which will not allow to you download code. You must place the udev rules below into a file named /etc/udev/rules.d/49-micronucleus.rules.</p>
+                <pre class="CodeRay"># UDEV Rules for Micronucleus boards including the Digispark.
+# This file must be placed at:
+#
+# /etc/udev/rules.d/49-micronucleus.rules    (preferred location)
+#   or
+# /lib/udev/rules.d/49-micronucleus.rules    (req'd on some broken systems)
+#
+# After this file is copied, physically unplug and reconnect the board.
+#
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="1781", ATTRS{idProduct}=="0c9f", MODE:="0666"
+KERNEL=="ttyACM*", ATTRS{idVendor}=="1781", ATTRS{idProduct}=="0c9f", MODE:="0666", ENV{ID_MM_DEVICE_IGNORE}="1"
+
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="16d0", ATTRS{idProduct}=="0753", MODE:="0666"
+KERNEL=="ttyACM*", ATTRS{idVendor}=="16d0", ATTRS{idProduct}=="0753", MODE:="0666", ENV{ID_MM_DEVICE_IGNORE}="1"
+#
+# If you share your linux system with other users, or just don't like the
+# idea of write permission for everybody, you can replace MODE:="0666" with
+# OWNER:="yourusername" to create the device owned by you, or with
+# GROUP:="somegroupname" and mange access using standard unix groups.
+</pre>
+                <p>
+                  Thanks to
+                  <a href="https://github.com/Bluebie">@bluebie</a>
+                  for these instructions!
+                  <a href="https://github.com/Bluebie/micronucleus-t85/wiki/Ubuntu-Linux">(https://github.com/Bluebie/micronucleus-t85/wiki/Ubuntu-Linux)</a>
+                </p>
+                <p>Now plug the Digispark into your computer via the USB port.</p>
               </section><section class="drivers" id="Drivers"><h2>Drivers</h2>
                 <p>
                   Thanks to
@@ -184,7 +234,7 @@ func main() {
         <div class="copyright">
           © Copyright 2012-2014
           <a href="http://hybridgroup.com" id="THG-logo" target="_blank">
-            <img alt="The Hybrid Group" src="../images/elements/THG_logo.png"></a>
+            <img alt="The Hybrid Group" src="/images/elements/THG_logo.png"></a>
         </div>
       </div>
     </footer>

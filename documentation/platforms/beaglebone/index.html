@@ -58,7 +58,7 @@
         <div class="w">
           <h1 class="title">BeagleBone</h1>
           <h2 class="subtitle">
-<a href="https://github.com/hybridgroup/gobot-beaglebone" class="repository">Repository</a> <a class href="https://github.com/hybridgroup/gobot-beaglebone/issues">Issues</a>
+<a href="https://github.com/hybridgroup/gobot-beaglebone" class="repository" target="_blank">Repository</a> <a class href="https://github.com/hybridgroup/gobot-beaglebone/issues" target="_blank">Issues</a>
 </h2>
         </div>
       </div>
@@ -94,30 +94,30 @@
                 <pre class="CodeRay"><span class="keyword">package</span> main
 
 <span class="keyword">import</span> (
-  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
-  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-beaglebone</span><span class="delimiter">"</span></span>
-  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-beaglebone</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
 )
 
 <span class="keyword">func</span> main() {
-  beaglebone := <span class="predefined">new</span>(gobotBeaglebone.Beaglebone)
-  beaglebone.Name = <span class="string"><span class="delimiter">"</span><span class="content">beaglebone</span><span class="delimiter">"</span></span>
+        beaglebone := <span class="predefined">new</span>(gobotBeaglebone.Beaglebone)
+        beaglebone.Name = <span class="string"><span class="delimiter">"</span><span class="content">beaglebone</span><span class="delimiter">"</span></span>
 
-  led := gobotGPIO.NewLed(beaglebone)
-  led.Name = <span class="string"><span class="delimiter">"</span><span class="content">led</span><span class="delimiter">"</span></span>
-  led.Pin = <span class="string"><span class="delimiter">"</span><span class="content">P9_12</span><span class="delimiter">"</span></span>
+        led := gobotGPIO.NewLed(beaglebone)
+        led.Name = <span class="string"><span class="delimiter">"</span><span class="content">led</span><span class="delimiter">"</span></span>
+        led.Pin = <span class="string"><span class="delimiter">"</span><span class="content">P9_12</span><span class="delimiter">"</span></span>
 
-  work := <span class="keyword">func</span>() {
-    gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">1s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() { led.Toggle() })
-  }
+        work := <span class="keyword">func</span>() {
+                gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">1s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() { led.Toggle() })
+        }
 
-  robot := gobot.Robot{
-    Connections: []<span class="keyword">interface</span>{}{beaglebone},
-    Devices:     []<span class="keyword">interface</span>{}{led},
-    Work:        work,
-  }
+        robot := gobot.Robot{
+                Connections: []<span class="keyword">interface</span>{}{beaglebone},
+                Devices:     []<span class="keyword">interface</span>{}{led},
+                Work:        work,
+        }
 
-  robot.Start()
+        robot.Start()
 }
 </pre>
               </section><section class="drivers" id="Drivers"><h2>Drivers</h2>
@@ -143,7 +143,7 @@
         <div class="copyright">
           © Copyright 2012-2014
           <a href="http://hybridgroup.com" id="THG-logo" target="_blank">
-            <img alt="The Hybrid Group" src="../images/elements/THG_logo.png"></a>
+            <img alt="The Hybrid Group" src="/images/elements/THG_logo.png"></a>
         </div>
       </div>
     </footer>

@@ -101,96 +101,87 @@
                 <p>
                   This example turns an LED on and off every 1s.
                 </p>
-                <pre class="CodeRay"><span class="reserved">package</span> main
+                <pre class="CodeRay"><span class="keyword">package</span> main
 
-<span class="reserved">import</span> (
+<span class="keyword">import</span> (
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-beaglebone</span><span class="delimiter">"</span></span>
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
 )
 
-func main() {
-  <span class="key">beaglebone</span> := <span class="keyword">new</span>(gobotBeaglebone.Beaglebone)
+<span class="keyword">func</span> main() {
+  beaglebone := <span class="predefined">new</span>(gobotBeaglebone.Beaglebone)
   beaglebone.Name = <span class="string"><span class="delimiter">"</span><span class="content">beaglebone</span><span class="delimiter">"</span></span>
 
   led := gobotGPIO.NewLed(beaglebone)
   led.Name = <span class="string"><span class="delimiter">"</span><span class="content">led</span><span class="delimiter">"</span></span>
   led.Pin = <span class="string"><span class="delimiter">"</span><span class="content">P9_12</span><span class="delimiter">"</span></span>
 
-  work := func() {
-    gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">1s</span><span class="delimiter">"</span></span>, func() { led.Toggle() })
+  work := <span class="keyword">func</span>() {
+    gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">1s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() { led.Toggle() })
   }
 
   robot := gobot.Robot{
-    <span class="key">Connections</span>: []<span class="reserved">interface</span>{}{beaglebone},
-    <span class="key">Devices</span>:     []<span class="reserved">interface</span>{}{led},
-    <span class="key">Work</span>:        work,
+    Connections: []<span class="keyword">interface</span>{}{beaglebone},
+    Devices:     []<span class="keyword">interface</span>{}{led},
+    Work:        work,
   }
 
   robot.Start()
 }
 </pre>
               </section><section class="public-methods"><div class="commands-api" id="Commands">
-                  <h1 id="commands">Commands</h1>
+                  <h1 id="functions">Functions</h1>
                   
-                  <h2 id="onc">OnC</h2>
-                  
-                  <p>Turns LED on.</p>
-                  
-                  <h5 id="params">Params</h5>
-                  
-                  <p><code>no params</code></p>
-                  
-                  <h5 id="returns">Returns</h5>
-                  
-                  <p>nil</p>
-                  
-                  <h2 id="offc">OffC</h2>
-                  
-                  <p>Turns LED off.</p>
-                  
-                  <h5 id="params-1">Params</h5>
-                  
-                  <p><code>no params</code></p>
-                  
-                  <h5 id="returns-1">Returns</h5>
-                  
-                  <p>nil</p>
-                  
-                  <h2 id="togglec">ToggleC</h2>
+                  <h2 id="toggle">Toggle</h2>
                   
                   <p>Turns the LED on, or off, depending on if it is already off, or on, respectively.</p>
                   
-                  <h5 id="params-2">Params</h5>
+                  <h4 id="api-command">API Command</h4>
                   
-                  <p><code>no params</code></p>
+                  <p><strong>ToggleC</strong></p>
                   
-                  <h5 id="returns-2">Returns</h5>
+                  <h2 id="on">On</h2>
                   
-                  <p>nil</p>
+                  <p>Turns LED on.</p>
                   
-                  <h2 id="brightnessclevel-byte">BrightnessC(level byte)</h2>
+                  <h4 id="api-command-1">API Command</h4>
+                  
+                  <p><strong>OnC</strong></p>
+                  
+                  <h2 id="off">Off</h2>
+                  
+                  <p>Turns LED off.</p>
+                  
+                  <h4 id="api-command-2">API Command</h4>
+                  
+                  <p><strong>OffC</strong></p>
+                  
+                  <h2 id="brightnesslevel-byte">Brightness(level byte)</h2>
                   
                   <p>Sets brightness of the led to the specified brightness value passed to brightness(level byte).</p>
                   
-                  <h5 id="params-3">Params</h5>
+                  <h4 id="params">Params</h4>
                   
                   <ul>
 <li>
-<strong>level</strong> - params</li>
-                    <li>
-<strong>byte</strong> - params</li>
+<strong>level</strong> - <strong>byte</strong>
+</li>
                   </ul>
-<h5 id="returns-3">Returns</h5>
+<h4 id="returns">Returns</h4>
                   
-                  <p>integer</p>
+                  <ul>
+<li>
+<strong>level</strong> - brightness value</li>
+                  </ul>
+<h4 id="api-command-3">API Command</h4>
+                  
+                  <p><strong>BrightnessC</strong></p>
                 </div>
                 <div class="commands-api" id="Events">
                   <h1 id="events">Events</h1>
                   
-                  <h2 id="start">start</h2>
-                  
-                  <p>Sent when the device has been started and is ready to use.</p>
+                  <p>no events</p>
                 </div>
               </section><section class="circuit" id="Circuit"><h2>Circuit</h2>
                 <div class="description-circuit">
@@ -226,7 +217,7 @@ func main() {
         <div class="copyright">
           © Copyright 2012-2014
           <a href="http://hybridgroup.com" id="THG-logo" target="_blank">
-            <img alt="The Hybrid Group" src="../images/elements/THG_logo.png"></a>
+            <img alt="The Hybrid Group" src="/images/elements/THG_logo.png"></a>
         </div>
       </div>
     </footer>

@@ -82,51 +82,51 @@
                 <p>
                   Communication with the ARDrone's flight control interface takes place using a WiFi connection. The ARDrone is a WiFi access point, so it normally can be the only device you connect to, without some additional effort to reconfigure the drone itself to put it into infrastructure mode.
                 </p>
-                <pre class="CodeRay">package main
+                <pre class="CodeRay"><span class="keyword">package</span> main
 
-import (
-  "github.com/hybridgroup/gobot"
-  "github.com/hybridgroup/gobot-ardrone"
+<span class="keyword">import</span> (
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-ardrone</span><span class="delimiter">"</span></span>
 )
 
-func main() {
+<span class="keyword">func</span> main() {
 
-  ardroneAdaptor := new(gobotArdrone.ArdroneAdaptor)
-  ardroneAdaptor.Name = "Drone"
+  ardroneAdaptor := <span class="predefined">new</span>(gobotArdrone.ArdroneAdaptor)
+  ardroneAdaptor.Name = <span class="string"><span class="delimiter">"</span><span class="content">Drone</span><span class="delimiter">"</span></span>
 
   drone := gobotArdrone.NewArdrone(ardroneAdaptor)
-  drone.Name = "Drone"
-  ...
+  drone.Name = <span class="string"><span class="delimiter">"</span><span class="content">Drone</span><span class="delimiter">"</span></span>
+          ...
 </pre>
               </section><section class="how-to" id="HowToUse"><h2>How To Use</h2>
                 <p>
                   This example controls an ARDrone to take off, and then land.
                 </p>
-                <pre class="CodeRay">package main
+                <pre class="CodeRay"><span class="keyword">package</span> main
 
-import (
-  "github.com/hybridgroup/gobot"
-  "github.com/hybridgroup/gobot-ardrone"
+<span class="keyword">import</span> (
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-ardrone</span><span class="delimiter">"</span></span>
 )
 
-func main() {
+<span class="keyword">func</span> main() {
 
-  ardroneAdaptor := new(gobotArdrone.ArdroneAdaptor)
-  ardroneAdaptor.Name = "Drone"
+  ardroneAdaptor := <span class="predefined">new</span>(gobotArdrone.ArdroneAdaptor)
+  ardroneAdaptor.Name = <span class="string"><span class="delimiter">"</span><span class="content">Drone</span><span class="delimiter">"</span></span>
 
   drone := gobotArdrone.NewArdrone(ardroneAdaptor)
-  drone.Name = "Drone"
+  drone.Name = <span class="string"><span class="delimiter">"</span><span class="content">Drone</span><span class="delimiter">"</span></span>
 
-  work := func() {
+  work := <span class="keyword">func</span>() {
     drone.TakeOff()
-    gobot.On(drone.Events["Flying"], func(data interface{}) {
-      gobot.After("1s", func() {
-        drone.Right(0.1)
+    gobot.On(drone.Events[<span class="string"><span class="delimiter">"</span><span class="content">Flying</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+      gobot.After(<span class="string"><span class="delimiter">"</span><span class="content">1s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() {
+        drone.Right(<span class="float">0.1</span>)
       })
-      gobot.After("2s", func() {
-        drone.Left(0.1)
+      gobot.After(<span class="string"><span class="delimiter">"</span><span class="content">2s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() {
+        drone.Left(<span class="float">0.1</span>)
       })
-      gobot.After("3s", func() {
+      gobot.After(<span class="string"><span class="delimiter">"</span><span class="content">3s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() {
         drone.Land()
       })
     })
@@ -148,144 +148,110 @@ func main() {
                   
                   <p>Sets the internal <code>fly</code> state to <code>true</code>.</p>
                   
-                  <h5 id="returns">Returns</h5>
-                  
-                  <p><code>nil</code></p>
-                  
                   <h2 id="land">Land</h2>
                   
                   <p>Sets the internal <code>fly</code> state to <code>false</code>.</p>
                   
-                  <h5 id="returns-1">Returns</h5>
-                  
-                  <p><code>nil</code></p>
-                  
-                  <h2 id="upspeed">Up(speed)</h2>
+                  <h2 id="upspeed-float64">Up(speed float64)</h2>
                   
                   <p>Makes the drone gain altitude. 
-                  speed can be a value from <code>0</code> to <code>1</code>.</p>
+                  speed can be a value from <code>0.0</code> to <code>1.0</code>.</p>
                   
                   <h5 id="params">Params</h5>
                   
                   <ul>
 <li>
-<strong>speed</strong> - The speed for which to return data</li>
+<strong>speed</strong> - <strong>float64</strong> - The speed at which the drone moves</li>
                   </ul>
-<h5 id="returns-2">Returns</h5>
-                  
-                  <p><code>integer</code></p>
-                  
-                  <h2 id="downspeed">Down(speed)</h2>
+<h2 id="downspeed-float64">Down(speed float64)</h2>
                   
                   <p>Makes the drone reduce altitude. 
-                  speed can be a value from <code>0</code> to <code>1</code>.</p>
+                  speed can be a value from <code>0.0</code> to <code>1.0</code>.</p>
                   
                   <h5 id="params-1">Params</h5>
                   
                   <ul>
 <li>
-<strong>speed</strong> - The speed for which to return data</li>
+<strong>speed</strong> - <strong>float64</strong> - The speed at which the drone moves</li>
                   </ul>
-<h5 id="returns-3">Returns</h5>
-                  
-                  <p><code>integer</code></p>
-                  
-                  <h2 id="leftspeed">Left(speed)</h2>
+<h2 id="leftspeed-float64">Left(speed float64)</h2>
                   
                   <p>Causes the drone to bank to the left, controls the roll, which is 
                   a horizontal movement using the camera as a reference point.
-                  speed can be a value from <code>0</code> to <code>1</code>.</p>
+                  speed can be a value from <code>0.0</code> to <code>1.0</code>.</p>
                   
                   <h5 id="params-2">Params</h5>
                   
                   <ul>
 <li>
-<strong>speed</strong> - The speed for which to return data</li>
+<strong>speed</strong> - <strong>float64</strong> - The speed at which the drone moves</li>
                   </ul>
-<h5 id="returns-4">Returns</h5>
-                  
-                  <p><code>integer</code></p>
-                  
-                  <h2 id="rightspeed">Right(speed)</h2>
+<h2 id="rightspeed-float64">Right(speed float64)</h2>
                   
                   <p>Causes the drone to bank to the right, controls the roll, which is 
                   a horizontal movement using the camera as a reference point.
-                  speed can be a value from <code>0</code> to <code>1</code>.</p>
+                  speed can be a value from <code>0.0</code> to <code>1.0</code>.</p>
                   
                   <h5 id="params-3">Params</h5>
                   
                   <ul>
 <li>
-<strong>speed</strong> - The speed for which to return data</li>
+<strong>speed</strong> - <strong>float64</strong> - The speed at which the drone moves</li>
                   </ul>
-<h5 id="returns-5">Returns</h5>
+<h2 id="forwardspeed-float64">Forward(speed float64)</h2>
                   
-                  <p><code>integer</code></p>
-                  
-                  <h2 id="forward">Forward</h2>
-                  
-                  <p>Causes the drone to go forward.</p>
-                  
-                  <h5 id="returns-6">Returns</h5>
-                  
-                  <p><code>nil</code></p>
-                  
-                  <h2 id="backward">Backward</h2>
-                  
-                  <p>Causes the drone to go forward.</p>
-                  
-                  <h5 id="returns-7">Returns</h5>
-                  
-                  <p><code>nil</code></p>
-                  
-                  <h2 id="clockwisespeed">Clockwise(speed)</h2>
-                  
-                  <p>Causes the drone to spin.
-                  speed can be a value from <code>0</code> to <code>1</code>.</p>
+                  <p>Causes the drone go forward, controls the pitch.
+                  speed can be a value from <code>0.0</code> to <code>1.0</code>.</p>
                   
                   <h5 id="params-4">Params</h5>
                   
                   <ul>
 <li>
-<strong>speed</strong> - The speed for which to return data</li>
+<strong>speed</strong> - <strong>float64</strong> - The speed at which the drone moves</li>
                   </ul>
-<h5 id="returns-8">Returns</h5>
+<h2 id="backwardspeed-float64">Backward(speed float64)</h2>
                   
-                  <p><code>integer</code></p>
-                  
-                  <h2 id="counterclockwisespeed">CounterClockwise(speed)</h2>
-                  
-                  <p>Causes the drone to spin.
-                  speed can be a value from <code>0</code> to <code>1</code>.</p>
+                  <p>Causes the drone go backward, controls the pitch.
+                  speed can be a value from <code>0.0</code> to <code>1.0</code>.</p>
                   
                   <h5 id="params-5">Params</h5>
                   
                   <ul>
 <li>
-<strong>speed</strong> - The speed for which to return data</li>
+<strong>speed</strong> - <strong>float64</strong> - The speed at which the drone moves</li>
                   </ul>
-<h5 id="returns-9">Returns</h5>
+<h2 id="clockwisespeed-float64">Clockwise(speed float64)</h2>
                   
-                  <p><code>integer</code></p>
+                  <p>Causes the drone to spin.
+                  speed can be a value from <code>0.0</code> to <code>1.0</code>.</p>
                   
-                  <h2 id="hover">Hover</h2>
+                  <h5 id="params-6">Params</h5>
                   
-                  <p>Causes the drone to go hover.</p>
+                  <ul>
+<li>
+<strong>speed</strong> - <strong>float64</strong> - The speed at which the drone moves</li>
+                  </ul>
+<h2 id="counterclockwisespeed-float64">CounterClockwise(speed float64)</h2>
                   
-                  <h5 id="returns-10">Returns</h5>
+                  <p>Causes the drone to spin.
+                  speed can be a value from <code>0.0</code> to <code>1.0</code>.</p>
                   
-                  <p><code>nil</code></p>
+                  <h5 id="params-7">Params</h5>
+                  
+                  <ul>
+<li>
+<strong>speed</strong> - <strong>float64</strong> - The speed at which the drone moves</li>
+                  </ul>
+<h2 id="hover">Hover</h2>
+                  
+                  <p>Causes the drone to hover in place.</p>
                 </div>
                 <div class="commands-api" id="Events">
                   <h1 id="events">Events</h1>
                   
-                  <h2 id="start">start</h2>
-                  
-                  <p>Sent when the device has been started and is ready to use.</p>
-                  
                   <h2 id="flying">Flying</h2>
                   
-                  <p>Sent when the device has takeoff.</p>
+                  <p>Sent when the device has taken off.</p>
                 </div>
               </section><section class="compatability hardware" id="Compatability"><h2>Compatibility</h2>
                 <div class="devices">
@@ -303,7 +269,7 @@ func main() {
         <div class="copyright">
           © Copyright 2012-2014
           <a href="http://hybridgroup.com" id="THG-logo" target="_blank">
-            <img alt="The Hybrid Group" src="../images/elements/THG_logo.png"></a>
+            <img alt="The Hybrid Group" src="/images/elements/THG_logo.png"></a>
         </div>
       </div>
     </footer>

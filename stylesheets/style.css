@@ -1845,7 +1845,7 @@ a:hover, a:focus {
   float: left;
   display: block;
   margin-right: 2.35765%;
-  width: 74.41059%; }
+  width: 65.88078%; }
   /* line 40, /home/ron/.rvm/gems/ruby-2.0.0-p247@gobot.io/gems/neat-1.5.0/app/assets/stylesheets/grid/_span-columns.scss */
   .articles:last-child {
     margin-right: 0; }
@@ -1865,12 +1865,14 @@ a:hover, a:focus {
       margin-right: 0; } }
   /* line 15, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
   .articles .article {
-    display: inline-block;
     margin-bottom: 30px; }
-    /* line 20, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
+    /* line 19, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
+    .articles .article img {
+      width: 100%; }
+    /* line 24, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
     .articles .article h3, .articles .article h4, .articles .article a {
       color: #fc4c1d; }
-    /* line 25, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
+    /* line 29, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
     .articles .article h3 {
       display: inline-block;
       font-size: 24px;
@@ -1878,106 +1880,127 @@ a:hover, a:focus {
       vertical-align: top;
       margin: 0px;
       max-width: 80%; }
-    /* line 35, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
+    /* line 39, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
     .articles .article p {
       text-align: justify; }
-    /* line 40, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
+    /* line 44, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
     .articles .article .data {
       padding-left: 71px; }
-    /* line 45, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
+    /* line 49, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
     .articles .article .date {
       color: white;
       width: 50px;
       text-align: center;
       margin-right: 20px;
       float: left; }
-      /* line 53, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
+      /* line 57, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
       .articles .article .date .blue {
         padding: 5px;
         background-color: #b39f89; }
-        /* line 58, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
+        /* line 62, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
         .articles .article .date .blue .month {
           text-transform: uppercase;
           font-size: 12px;
           line-height: 12px; }
-        /* line 65, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
+        /* line 69, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
         .articles .article .date .blue .day {
           font-size: 16px;
           line-height: 16px; }
-      /* line 72, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
+      /* line 76, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
       .articles .article .date .red {
         padding: 2px;
         background-color: #fc4c1d; }
-        /* line 77, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
+        /* line 81, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
         .articles .article .date .red .year {
           font-size: 10px;
           line-height: 10px; }
-    /* line 85, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
+    /* line 89, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
     .articles .article .comments, .articles .article .tags {
       display: inline-block; }
-      /* line 89, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
+      /* line 93, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
       .articles .article .comments .img, .articles .article .tags .img {
         vertical-align: top;
         display: inline-block;
         width: 24px;
         height: 24px; }
-      /* line 97, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
+      /* line 101, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
       .articles .article .comments a, .articles .article .tags a {
         vertical-align: top;
         text-decoration: underline; }
-      /* line 103, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
+      /* line 107, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
       .articles .article .comments img, .articles .article .tags img {
         margin-right: 4px; }
-    /* line 109, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
+    /* line 113, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
     .articles .article .comments {
       margin-right: 60px; }
 
-/* line 116, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
-.categories, .network, .tweets {
-  vertical-align: top;
-  margin-bottom: 40px;
+/* line 121, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
+.side-column {
   float: left;
   display: block;
   margin-right: 2.35765%;
-  width: 14.70196%; }
+  width: 23.23176%; }
   /* line 40, /home/ron/.rvm/gems/ruby-2.0.0-p247@gobot.io/gems/neat-1.5.0/app/assets/stylesheets/grid/_span-columns.scss */
-  .categories:last-child, .network:last-child, .tweets:last-child {
+  .side-column:last-child {
     margin-right: 0; }
   @media only screen and (max-width: 767px) {
-    /* line 116, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
-    .categories, .network, .tweets {
+    /* line 121, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
+    .side-column {
       float: left;
       display: block;
       margin-right: 2.35765%;
       width: 100%; }
       /* line 40, /home/ron/.rvm/gems/ruby-2.0.0-p247@gobot.io/gems/neat-1.5.0/app/assets/stylesheets/grid/_span-columns.scss */
-      .categories:last-child, .network:last-child, .tweets:last-child {
+      .side-column:last-child {
         margin-right: 0; } }
-  /* line 127, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
-  .categories a, .network a, .tweets a {
-    color: black; }
-    /* line 131, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
-    .categories a:hover, .network a:hover, .tweets a:hover {
-      text-decoration: underline; }
-  /* line 137, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
-  .categories h4, .network h4, .tweets h4 {
-    color: #fc4c1d;
-    font-size: 20px;
-    line-height: 24px; }
-
-/* line 147, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
-.categories ul {
-  margin: 0;
-  list-style: none; }
-  /* line 152, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
-  .categories ul a {
-    color: black; }
-    /* line 156, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
-    .categories ul a:hover {
-      text-decoration: underline; }
+  /* line 129, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
+  .side-column .categories, .side-column .network, .side-column .tweets, .side-column .titles {
+    vertical-align: top;
+    margin-bottom: 20px; }
+    /* line 134, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
+    .side-column .categories a, .side-column .network a, .side-column .tweets a, .side-column .titles a {
+      color: black; }
+      /* line 138, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
+      .side-column .categories a:hover, .side-column .network a:hover, .side-column .tweets a:hover, .side-column .titles a:hover {
+        text-decoration: underline; }
+    /* line 144, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
+    .side-column .categories h4, .side-column .network h4, .side-column .tweets h4, .side-column .titles h4 {
+      color: #fc4c1d;
+      font-size: 20px;
+      line-height: 24px; }
+  /* line 154, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
+  .side-column .titles ul {
+    list-style: none;
+    margin: 0; }
+  /* line 160, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
+  .side-column .titles li {
+    font-size: .8em;
+    border-bottom: #ff7e5b 1px solid;
+    padding: 2px 5px; }
+    /* line 166, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
+    .side-column .titles li:hover {
+      background: #ff7e5b; }
+      /* line 170, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
+      .side-column .titles li:hover a {
+        color: white;
+        text-decoration: none; }
+  /* line 181, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
+  .side-column .network img {
+    width: 30px; }
+  /* line 188, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
+  .side-column .categories ul {
+    margin: 0;
+    list-style: none; }
+    /* line 193, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
+    .side-column .categories ul a {
+      color: black;
+      font-size: .9em; }
+      /* line 198, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
+      .side-column .categories ul a:hover {
+        text-decoration: underline; }
 
 @media only screen and (max-width: 400) {
-  /* line 166, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
+  /* line 212, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_blog.scss */
   .twitter-share-button {
     margin-bottom: 10px; } }
 /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_page.scss */
@@ -2180,40 +2203,41 @@ a:hover, a:focus {
 .commands-api h4 {
   background: transparent;
   font-size: 11pt;
-  font-weight: normal; }
-/* line 150, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+  font-weight: normal;
+  margin-left: 10px; }
+/* line 151, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
 .commands-api h5 {
   background: white;
   padding: 10px;
   margin: 0;
   font-size: 11pt; }
-/* line 158, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+/* line 159, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
 .commands-api h3 {
   background: white;
   padding: 10px;
   margin: 0;
   font-size: 11pt;
   color: #ff7e5b; }
-/* line 167, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+/* line 168, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
 .commands-api pre {
   background: white;
   margin: 0; }
-/* line 173, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+/* line 174, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
 .commands-api p, .commands-api ul {
   background: white;
   font-size: 10.5pt;
   margin: 0;
   padding: 10px;
   font-family: Inconsolata,Menlo,Monaco,"Bitstream Vera Sans Mono","Courier New",monospace; }
-/* line 182, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+/* line 183, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
 .commands-api li {
   margin-left: 20px; }
 
-/* line 188, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+/* line 189, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
 .commands {
   background: white;
   font-size: 10.5pt; }
-  /* line 193, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+  /* line 194, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
   .commands span {
     font-family: Inconsolata,Menlo,Monaco,"Bitstream Vera Sans Mono","Courier New",monospace;
     font-size: 14px;
@@ -2222,33 +2246,33 @@ a:hover, a:focus {
     border: 1px solid #ccc;
     color: #444;
     padding: 5px; }
-  /* line 204, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+  /* line 205, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
   .commands th {
     background: #ff7e5b;
     color: white; }
-  /* line 210, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+  /* line 211, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
   .commands td {
     border-bottom: 1px solid #d4d4d4; }
-  /* line 215, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+  /* line 216, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
   .commands .command {
     font-family: Inconsolata, Menlo, Monaco, "Bitstream Vera Sans Mono", "Courier New", monospace;
     font-weight: bold;
     font-size: 11pt; }
-  /* line 226, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+  /* line 227, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
   .commands .param .markdown span {
     background: none;
     border: none;
     padding: 0; }
 
-/* line 236, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+/* line 237, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
 .clear {
   clear: both; }
 
-/* line 241, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+/* line 242, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
 .image-size-300 {
   width: 200px; }
 
-/* line 248, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+/* line 249, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
 .methods dt {
   font-weight: bold;
   background: white;
@@ -2258,15 +2282,15 @@ a:hover, a:focus {
   font-family: Inconsolata, Menlo, Monaco, "Bitstream Vera Sans Mono", "Courier New", monospace;
   font-size: 17px;
   border: aliceblue; }
-/* line 260, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+/* line 261, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
 .methods dd {
   margin-bottom: 29px;
   padding-left: 10px; }
-/* line 266, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+/* line 267, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
 .methods li {
   font-family: Inconsolata, Menlo, Monaco, "Bitstream Vera Sans Mono", "Courier New", monospace; }
 
-/* line 272, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+/* line 273, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
 .colors {
   float: left;
   display: block;
@@ -2276,7 +2300,7 @@ a:hover, a:focus {
   .colors:last-child {
     margin-right: 0; }
   @media only screen and (min-width: 767px) and (max-width: 964px) {
-    /* line 272, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+    /* line 273, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
     .colors {
       float: left;
       display: block;
@@ -2285,11 +2309,11 @@ a:hover, a:focus {
       /* line 40, /home/ron/.rvm/gems/ruby-2.0.0-p247@gobot.io/gems/neat-1.5.0/app/assets/stylesheets/grid/_span-columns.scss */
       .colors:last-child {
         margin-right: 0; }
-      /* line 280, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+      /* line 281, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
       .colors p {
         font-size: 10px; } }
   @media only screen and (max-width: 767px) {
-    /* line 272, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+    /* line 273, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
     .colors {
       float: left;
       display: block;
@@ -2298,7 +2322,7 @@ a:hover, a:focus {
       /* line 40, /home/ron/.rvm/gems/ruby-2.0.0-p247@gobot.io/gems/neat-1.5.0/app/assets/stylesheets/grid/_span-columns.scss */
       .colors:last-child {
         margin-right: 0; } }
-  /* line 291, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+  /* line 292, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
   .colors dt {
     font-weight: bold;
     padding: 5px;
@@ -2307,11 +2331,11 @@ a:hover, a:focus {
     font-size: 15px;
     border: aliceblue;
     margin-top: 15px; }
-  /* line 302, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+  /* line 303, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
   .colors dd {
     margin-bottom: 20px;
     display: block; }
-    /* line 307, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
+    /* line 308, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/elements/_documentation.scss */
     .colors dd p {
       margin: 0;
       line-height: 50px; }
