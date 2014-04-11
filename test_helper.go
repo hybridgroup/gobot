@@ -1,5 +1,11 @@
 package gobot
 
+type null struct{}
+
+func (null) Write(p []byte) (int, error) {
+	return len(p), nil
+}
+
 type testDriver struct {
 	Driver
 }

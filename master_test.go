@@ -6,7 +6,6 @@ import (
 )
 
 var _ = Describe("Master", func() {
-
 	var (
 		myMaster *Master
 	)
@@ -18,9 +17,12 @@ var _ = Describe("Master", func() {
 			newTestRobot("Robot 2"),
 			newTestRobot("Robot 3"),
 		}
-		for s := range myMaster.Robots {
-			myMaster.Robots[s].startRobot()
+		startRobots = func(m *Master) {
+			for s := range m.Robots {
+				m.Robots[s].startRobot()
+			}
 		}
+		myMaster.Start()
 	})
 
 	Context("when valid", func() {

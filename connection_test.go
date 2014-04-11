@@ -13,7 +13,10 @@ var _ = Describe("Connection", func() {
 
 	BeforeEach(func() {
 		someRobot = newTestRobot("")
-		someRobot.startRobot()
+		start = func(r *Robot) {
+			r.startRobot()
+		}
+		someRobot.Start()
 	})
 
 	Context("when valid", func() {

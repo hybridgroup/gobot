@@ -17,7 +17,7 @@ func GobotMaster() *Master {
 	return m
 }
 
-func (m *Master) Start() {
+var startRobots = func(m *Master) {
 	runtime.GOMAXPROCS(m.NumCPU)
 
 	for s := range m.Robots {
@@ -34,6 +34,10 @@ func (m *Master) Start() {
 		}
 		break
 	}
+}
+
+func (m *Master) Start() {
+	startRobots(m)
 }
 
 func (m *Master) FindRobot(name string) *Robot {

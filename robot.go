@@ -18,10 +18,14 @@ type Robot struct {
 	devices       []*device              `json:"-"`
 }
 
-func (r *Robot) Start() {
+var start = func(r *Robot) {
 	m := GobotMaster()
 	m.Robots = []Robot{*r}
 	m.Start()
+}
+
+func (r *Robot) Start() {
+	start(r)
 }
 
 func (r *Robot) startRobot() {

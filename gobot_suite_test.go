@@ -7,12 +7,6 @@ import (
 	"testing"
 )
 
-type null struct{}
-
-func (null) Write(p []byte) (int, error) {
-	return len(p), nil
-}
-
 func TestGobot(t *testing.T) {
 	log.SetOutput(new(null))
 	RegisterFailHandler(Fail)
