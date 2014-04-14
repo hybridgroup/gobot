@@ -1,5 +1,5 @@
 ---
-title: Cylon.js CLI
+title: Gobot CLI
 author: The Hybrid Group
 page_title: CLI
 page_subtitle: "Cylon CLI (Command Line Interface) provides several tools to make RobotOps easier."
@@ -9,17 +9,21 @@ page_title_show: true
 .cli
   %h2 What is it?
   %p
-    Cylon CLI is a powerful command line interface tool that provides several tools to make RobotOps and
-    setting up your devices to work with cylon a lot easier.
+    Gobot CLI is a powerful command line interface tool that provides several tools to make RobotOps and setting up your devices to work with cylon a lot easier.
 
   %h2 How to install
-  %p
-    For the commands to be available everywhere the cylon module needs to be installed globally.
-    Here's how to do it.
+  %p For the commands to be available everywhere the gobot module needs to be installed globally.
+
+  %p Here's how to do it.
 
   :markdown
         :::bash
-        $ sudo go github.com/hybridgroup/gobot-cli
+        $ sudo go get -u github.com/hybridgroup/gobot-cli
+
+  %p 
+    If you need more help to install golang click
+    = link_to "here.", "http://golang.org/doc/install", target: "_blank"
+  
 
   %h2 How can I use it?
   %p
@@ -29,26 +33,31 @@ page_title_show: true
   %h3 Printing a list of available commands
   :markdown
         :::bash
-        ...
+        gobot - 
 
+        Commands:
 
-  %h3 Scanning serial port for connected devices
-  :markdown
-        :::bash
-        ...
+            generate    Generates a Gobot library skeleton
 
+        Use "gobot help <command>" for more information about a command.
 
-  %h3 Important note about Gobot CLI commands.
-  
   %h2 What Gobot CLI commands are available?
   %p
     If you have only installed gobot, the list of available commands is the one printed in the section above, let's review them one by one.
 
-  %h2 command
-  %h4 Description
-  %p
-    text here.
+  %h3 gobot generate [name]
+  %h5 Description
+  %p Generates a new Gobot component or adaptor module.
   :markdown
         :::bash
-        ...
+        gobot generate test
+        Creating /private/tmp/gobot-test
+        Creating /private/tmp/gobot-test/test_adaptor.go
+        Creating /private/tmp/gobot-test/test_driver.go
+        Creating /private/tmp/gobot-test/README.md
+        Creating /private/tmp/gobot-test/LICENSE
+        Creating /private/tmp/gobot-test/test_driver_test.go
+        Creating /private/tmp/gobot-test/test_adaptor_test.go
+        Creating /private/tmp/gobot-test/gobot-test_suite_test.go
+
   

@@ -10,28 +10,28 @@ layout: documentation
 
 :markdown
 
-  ## Every(var)
+  ## Every(interval, action)
 
-  description
+  Function to start a goroutine that repeatedly executes at a specific interval of time.
 
-  - **var** - text
+  - **interval** - interval to run action on
+  - **action** - action to perform on interval
 
-
-  Returns a 
+  Returns a value every interval of time.
 
   ### Examples:
 
       :::bash
-      ...
+      gobot.Every("0.5s", func() { fmt.Println("Greetings human") })
 
-  ## After(var)
+  ## After(interval, action)
 
-  description
+  Function to start a goroutine that repeatedly executes after waiting a specified number of milliseconds.
 
-  - **var** - text
+  - **interval** - interval to run action on
+  - **action** - action to perform on interval
 
-
-  Returns a 
+  Returns a value after waiting a specified number of milliseconds.
 
   ### Examples:
 
