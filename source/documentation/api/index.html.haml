@@ -2,13 +2,36 @@
 title: Gobot API
 author: The Hybrid Group
 page_title: API
-page_subtitle: "The Cylon API provides an interface for retrieving information and communicating with the currently running robots."
+page_subtitle: "The Gobot API provides an interface for retrieving information and communicating with the currently running robots."
 layout: documentation
 page_title_show: true
 ---
 .api
   %h2  How To Connect
-  %p Now you're ready to write code that will let you access your robots on a Cylon.js API server.
+  %p Now you're ready to write code that will let you access your robots on a Gobot API server.
+  %p Gobot includes a RESTful API to query the status of any robot running within a group, including the connection and device status, and execute device commands.
+  %p 
+    :markdown
+      To activate the API, use the `Api` command like this:
+
+          :::bash
+          master := gobot.GobotMaster()
+          gobot.Api(master)
+
+      To specify the api port run your Gobot program with the `PORT` environment variable
+
+          :::bash
+          $ PORT=8080 go run gobotProgram.go
+  
+  %p 
+    In order to use the 
+    = link_to "robeaux", "https://github.com/hybridgroup/robeaux", target: "_blank" 
+    AngularJS interface with Gobot you simply clone the robeaux repo and place it in the directory of your Gobot program. 
+  %p 
+    :markdown 
+      The robeaux assets must be in a folder called `robeaux`.
+
+
   %h3  Running your robot:
   %p The following code example will spin up an API server:
 
@@ -41,26 +64,10 @@ page_title_show: true
 
     `robot.Start()` automatically starts up the API server.
 
-  -#%h2  How To Configure
-  -#%p The Gobot API server allows for port, host, SSL and auth configuration.
-  -#%p In your scripts, you can set it up like this:
-  -#:markdown
-        -#:::go
-        -#...
-
-    -#If you run a Gobot script with this code in it, it will start an API server
-    -#listening on `https://127.0.0.1:4321`, that will require basic auth for all
-    -#routes.
-
-    -#By default, an unconfigured API instance will listen on
-    -#`https://127.0.0.1:3000`, using a self-signed cert and with no
-    -#authentication.
-
   %h2 Routes
   %h3 GET /
   %p This route will serve up the Angular app bundled with Gobot, which can be used to view and control your robots and devices.
-  -#%a{:href => "/images/screenshots/api-ng-app.png", :target => "_blank"}
-    -#%img{:src => "/images/screenshots/api-ng-app.png", :alt => "Angular App Screenshot"}/  
+
   %h3 GET /robots
   %p Our first route returns all the Robots the master class knows about in JSON format.
   :markdown
@@ -88,11 +95,13 @@ page_title_show: true
                   "connection_id": 2778
                 },
                 "commands": [
-                  "detectCollisions",
-                  "roll",
-                  "setColor",
-                  "setRGB",
-                  "stop"
+                  "SetRGB",
+                  "Roll",
+                  "SetBackLED",
+                  "Stop",
+                  "SetHeading",
+                  "GetRGB",
+                  "SetStabilization"
                 ]
               }
             ]
@@ -124,11 +133,13 @@ page_title_show: true
                 "connection_id": 2778
               },
               "commands": [
-                "detectCollisions",
-                "roll",
-                "setColor",
-                "setRGB",
-                "stop"
+                "SetRGB",
+                "Roll",
+                "SetBackLED",
+                "Stop",
+                "SetHeading",
+                "GetRGB",
+                "SetStabilization"
               ]
             }
           ]
@@ -138,11 +149,13 @@ page_title_show: true
   :markdown
         :::bash
         [
-          "detectCollisions",
-          "roll",
-          "setColor",
-          "setRGB",
-          "stop"
+          "SetRGB",
+          "Roll",
+          "SetBackLED",
+          "Stop",
+          "SetHeading",
+          "GetRGB",
+          "SetStabilization"
         ]
   %h3 POST /robots/:robotname/commands/:commandrobotname
   %p Given a robot name, commands, and command name, executes a robot's command and returns the result.
@@ -167,11 +180,13 @@ page_title_show: true
               "connection_id": 2778
             },
             "commands": [
-              "detectCollisions",
-              "roll",
-              "setColor",
-              "setRGB",
-              "stop"
+              "SetRGB",
+              "Roll",
+              "SetBackLED",
+              "Stop",
+              "SetHeading",
+              "GetRGB",
+              "SetStabilization"
             ]
           }
         ]
@@ -190,11 +205,13 @@ page_title_show: true
             "connection_id": 2778
           },
           "commands": [
-            "detectCollisions",
-            "roll",
-            "setColor",
-            "setRGB",
-            "stop"
+            "SetRGB",
+            "Roll",
+            "SetBackLED",
+            "Stop",
+            "SetHeading",
+            "GetRGB",
+            "SetStabilization"
           ]
         }
   %h3 GET /robots/:robotname/devices/:devicename/commands
@@ -202,11 +219,13 @@ page_title_show: true
   :markdown
         :::bash
         [
-          "detectCollisions",
-          "roll",
-          "setColor",
-          "setRGB",
-          "stop"
+          "SetRGB",
+          "Roll",
+          "SetBackLED",
+          "Stop",
+          "SetHeading",
+          "GetRGB",
+          "SetStabilization"
         ]
   %h3 POST /robots/:robotname/devices/:devicename/commands/:command
   %p Given a robot name, device name, and command name, executes a robot's command and returns the result.
