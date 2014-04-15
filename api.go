@@ -38,7 +38,7 @@ func Api(bot *Master) {
 	m.Get("/robots", func() string {
 		jsonRobots := make([]*jsonRobot, 0)
 		for _, robot := range bot.Robots {
-			jsonRobots = append(jsonRobots, a.formatJsonRobot(&robot))
+			jsonRobots = append(jsonRobots, a.formatJsonRobot(robot))
 		}
 		return toJson(jsonRobots)
 	})

@@ -7,7 +7,7 @@ import (
 )
 
 type Master struct {
-	Robots []Robot
+	Robots []*Robot
 	NumCPU int
 }
 
@@ -17,15 +17,19 @@ func GobotMaster() *Master {
 	return m
 }
 
-var startRobots = func(m *Master) {
+var trap = func(c chan os.Signal) {
+	signal.Notify(c, os.Interrupt)
+}
+
+func (m *Master) Start() {
 	runtime.GOMAXPROCS(m.NumCPU)
 
 	for s := range m.Robots {
 		m.Robots[s].startRobot()
 	}
 
-	c := make(chan os.Signal)
-	signal.Notify(c, os.Interrupt)
+	var c = make(chan os.Signal, 1)
+	trap(c)
 
 	for _ = range c {
 		for r := range m.Robots {
@@ -36,14 +40,10 @@ var startRobots = func(m *Master) {
 	}
 }
 
-func (m *Master) Start() {
-	startRobots(m)
-}
-
 func (m *Master) FindRobot(name string) *Robot {
 	for _, robot := range m.Robots {
 		if robot.Name == name {
-			return &robot
+			return robot
 		}
 	}
 	return nil
