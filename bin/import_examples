@@ -29,6 +29,7 @@ else
     https://github.com/hybridgroup/gobot-opencv.git
     https://github.com/hybridgroup/gobot-spark.git
     https://github.com/hybridgroup/gobot-sphero.git
+    https://github.com/hybridgroup/gobot-neurosky.git
   )
 end
 
