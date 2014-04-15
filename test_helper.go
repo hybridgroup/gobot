@@ -33,17 +33,23 @@ func newTestDriver(name string) *testDriver {
 	}
 	return d
 }
+
 func newTestAdaptor(name string) *testAdaptor {
 	a := new(testAdaptor)
 	a.Name = name
+	a.Params = map[string]interface{}{
+		"param1": "1",
+		"param2": 2,
+	}
 	return a
 }
 
-func newTestRobot(name string) Robot {
-	return Robot{
+func newTestRobot(name string) *Robot {
+	return &Robot{
 		Name:        name,
 		Connections: []Connection{newTestAdaptor("Connection 1"), newTestAdaptor("Connection 2"), newTestAdaptor("Connection 3")},
 		Devices:     []Device{newTestDriver("Device 1"), newTestDriver("Device 2"), newTestDriver("Device 3")},
+		Work:        func() {},
 		Commands: map[string]interface{}{
 			"Command1": func() {},
 			"Command2": func() {},
