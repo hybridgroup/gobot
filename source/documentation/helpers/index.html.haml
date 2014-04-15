@@ -1,0 +1,191 @@
+---
+page_title_show: true
+title: Helpers
+author: The Hybrid Group
+description: Gobot Helpers
+page_title: Helpers
+page_subtitle: Some helpful utility functions
+layout: documentation
+---
+
+:markdown
+
+  ## Every(interval string, action func())
+
+  Function to start a goroutine that repeatedly executes at a specific interval of time.
+
+  - **interval** - string - interval to run action on, valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+  - **action** - func() - action to perform on interval
+
+  ### Examples:
+
+      :::bash
+      gobot.Every("0.5s", func() { fmt.Println("Greetings human") })
+
+  ## After(interval string, action func())
+
+  Function to start a goroutine that executes after waiting a specified interval of time.
+
+  - **interval** - string - interval to run action on, valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+  - **action** - func() - action to perform on interval
+
+
+  ### Examples:
+
+      :::bash
+      gobot.After("0.5s", func() { fmt.Println("Greetings human") })
+
+  ## Publish(c chan interface{}, val interface{})
+
+  Sends c <- val, does not block if c has a full buffer
+
+  - **c** - chan interface{} - channel to send to
+  - **val** - interface{} - value to send to channel
+
+  ### Examples:
+
+      :::bash
+      gobot.Publish(channel, data)
+
+  ## On(c chan interface{}, f func(s interface{}))
+
+  Executes function f with the value of channel c when channel c has data
+
+  - **c** - chan interface{} - channel to read from 
+  - **f** - func(s interface{}) - function to execute with the contents of channel c
+
+  ### Examples:
+
+      :::bash
+      gobot.On(channel, func(data interface{}) {
+        fmt.Println(data)
+      })
+      ...
+
+  ## Rand(max int) int
+
+  Generates a random int with the supplied max
+
+  - **max** - int - Maximum number in random number generation 
+
+  Returns a random int
+
+  ### Examples:
+
+      :::bash
+      i := gobot.Rand(100)
+
+  ## ConnectToTcp(port string) io.ReadWriteCloser
+
+  Connects to the specified tcp port
+
+  - **port** - string - address of tcp port to connect to 
+
+  Returns a tcp connection
+
+  ### Examples:
+
+      :::bash
+      tcpPort := gobot.ConnectToTcp("127.0.0.1:4567")
+  
+  ## ConnectToSerial(port string, baud int) io.ReadWriteCloser
+
+  Connects to the specified serial port with baud rate
+
+  - **port** - string - address of serial port to connect to 
+  - **baud** - int - the baud rate of the serial port
+
+  Returns a serial connection
+
+  ### Examples:
+
+      :::bash
+      serialPort := gobot.ConnectToSerial("/dev/ttyACM0", 115200)
+  
+  ## IsUrl(url string) bool
+
+  Determins if the string is a url
+
+  - **url** - string - String to be checked 
+
+  Returns true if the string is a url
+
+  ### Examples:
+
+      :::bash
+      if gobot.IsUrl("https://www.google.com") {
+        fmt.Println("Its a url!")
+      }
+
+  ## Call(thing interface{}, method string, params ...interface{}) []reflect.Value
+
+  Calls the specific interface method with the provided params
+
+  - **thing** - interface{} - The interface to call the method on 
+  - **method** - string - The name of the method to call
+  - **params** - ...interface{} - The params to pass to the method 
+
+  Returns []reflect.Value
+
+  ### Examples:
+
+      :::bash
+      return := gobot.Call(myStruct, "MyFunction", param1, param2, param3)
+
+  ## FieldByName(thing interface{}, field string) reflect.Value
+
+  Returns the value of the the specified interfaces field
+
+  - **thing** - interface{} - The interface for which the field resides
+  - **field** - string - The field to return
+
+  Returns a reflect.Value of the field 
+
+  ### Examples:
+
+      :::bash
+      val := gobot.FieldByName(myRect, "width")
+
+  ## FieldByNamePtr(thing interface{}, field string)
+
+  Returns the value of the the specified interfaces field if the interface is a pointer
+
+  - **thing** - interface{} - The interface for which the field resides
+  - **field** - string - The field to return
+
+  Returns a reflect.Value of the field 
+
+  ### Examples:
+
+      :::bash
+      val := gobot.FieldByNamePtr(myRect, "width")
+
+  ## FromScale(input, min, max float64) float64
+
+  Converts input from min, max scale to 0.0...1.0
+
+  - **input** - float64 - Number to Convert 
+  - **min** - float64 - Min number in scale 
+  - **max** - float64 - Max number in scale
+
+  Returns a float64 representing the scaled value
+
+  ### Examples:
+
+      :::bash
+      i := gobot.FromScale(100.0, 1.0, 10.0)
+
+  ## ToScale(input, min, max float64) float64
+
+  Converts input from 0...1 to min...max scale 
+
+  - **input** - float64 - Number to Convert 
+  - **min** - float64 - Min number in scale 
+  - **max** - float64 - Max number in scale
+
+  Returns a float64 representing the scaled value
+
+  ### Examples:
+
+      :::bash
+      i := gobot.ToScale(0.2, 10.0, 100.0)

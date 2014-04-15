@@ -1,0 +1,63 @@
+---
+title: Gobot CLI
+author: The Hybrid Group
+page_title: CLI
+page_subtitle: "Gobot CLI (Command Line Interface) provides several tools to make RobotOps easier."
+layout: documentation
+page_title_show: true
+---
+.cli
+  %h2 What is it?
+  %p
+    Gobot CLI is a powerful command line interface tool that provides several tools to make RobotOps and setting up your devices to work with gobot a lot easier.
+
+  %h2 How to install
+  %p For the commands to be available everywhere the gobot module needs to be installed globally.
+
+  %p Here's how to do it.
+
+  :markdown
+        :::bash
+        go get -u github.com/hybridgroup/gobot/gobot
+
+  %p 
+    If you need more help to install golang click
+    = link_to "here.", "http://golang.org/doc/install", target: "_blank"
+  
+
+  %h2 How can I use it?
+  %p
+    :markdown
+      The Gobot CLI tools are easy to use, designed to be intuitive, and offer contextual help regarding the commands you're using. Once you have the `gobot-cli` module installed globally, the toolkit will be available at all times. To find all available commands, just run `gobot help`.
+
+  %h3 Printing a list of available commands
+  :markdown
+        :::bash
+        gobot - 
+
+        Commands:
+
+            generate    Generates a Gobot library skeleton
+
+        Use "gobot help <command>" for more information about a command.
+
+  %h2 What Gobot CLI commands are available?
+  %p
+    If you have only installed gobot, the list of available commands is the one printed in the section above, let's review them one by one.
+
+  %h3 gobot generate [name]
+  %h5 Description
+  %p Generates a new Gobot component or adaptor module.
+  :markdown
+        :::bash
+        gobot generate test
+        Creating /private/tmp/gobot-test
+        Creating /private/tmp/gobot-test/test_adaptor.go
+        Creating /private/tmp/gobot-test/test_driver.go
+        Creating /private/tmp/gobot-test/README.md
+        Creating /private/tmp/gobot-test/LICENSE
+        Creating /private/tmp/gobot-test/test_driver_test.go
+        Creating /private/tmp/gobot-test/test_adaptor_test.go
+        Creating /private/tmp/gobot-test/gobot-test_suite_test.go
+
+  
