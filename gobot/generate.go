@@ -165,7 +165,7 @@ import (
 
 type {{ .UpperName }}Driver struct {
 	gobot.Driver
-	{{ .UpperName }}Adaptor *{{ .UpperName }}Adaptor
+	Adaptor *{{ .UpperName }}Adaptor
 }
 
 type {{ .UpperName }}Interface interface {
@@ -174,7 +174,7 @@ type {{ .UpperName }}Interface interface {
 func New{{ .UpperName }}(adaptor *{{ .UpperName }}Adaptor) *{{ .UpperName }}Driver {
 	d := new({{ .UpperName }}Driver)
 	d.Events = make(map[string]chan interface{})
-	d.{{ .UpperName }}Adaptor = adaptor
+	d.Adaptor = adaptor
 	d.Commands = []string{}
 	return d
 }
