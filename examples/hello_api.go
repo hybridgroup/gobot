@@ -18,7 +18,7 @@ func main() {
 	hello.Name = "hello"
 	hello.Commands = map[string]interface{}{"Hello": Hello}
 
-	master.Robots = append(master.Robots, *hello)
+	master.Robots = append(master.Robots, hello)
 
 	master.Start()
 }

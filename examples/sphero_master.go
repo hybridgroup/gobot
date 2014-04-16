@@ -25,7 +25,7 @@ func main() {
 			sphero.SetRGB(uint8(255), uint8(0), uint8(0))
 		}
 
-		master.Robots = append(master.Robots, gobot.Robot{
+		master.Robots = append(master.Robots, &gobot.Robot{
 			Name:        name,
 			Connections: []gobot.Connection{spheroAdaptor},
 			Devices:     []gobot.Device{sphero},
@@ -33,7 +33,7 @@ func main() {
 		})
 	}
 
-	master.Robots = append(master.Robots, gobot.Robot{
+	master.Robots = append(master.Robots, &gobot.Robot{
 		Work: func() {
 			sphero := master.FindRobot("Sphero-BPO")
 			gobot.Every("1s", func() {

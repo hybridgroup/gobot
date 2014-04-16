@@ -33,7 +33,7 @@ func main() {
 			sphero.SetRGB(uint8(255), uint8(0), uint8(0))
 		}
 
-		Master.Robots = append(Master.Robots, gobot.Robot{
+		Master.Robots = append(Master.Robots, &gobot.Robot{
 			Name:        name,
 			Connections: []gobot.Connection{spheroAdaptor},
 			Devices:     []gobot.Device{sphero},
