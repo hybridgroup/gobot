@@ -1,8 +1,6 @@
 package gobot
 
 import (
-	"github.com/tarm/goserial"
-	"io"
 	"math"
 	"math/rand"
 	"reflect"
@@ -45,15 +43,6 @@ func On(c chan interface{}, f func(s interface{})) {
 func Rand(max int) int {
 	rand.Seed(time.Now().UTC().UnixNano())
 	return rand.Intn(max)
-}
-
-func ConnectToSerial(port string, baud int) io.ReadWriteCloser {
-	c := &serial.Config{Name: port, Baud: baud}
-	s, err := serial.OpenPort(c)
-	if err != nil {
-		panic(err)
-	}
-	return s
 }
 
 func Call(thing interface{}, method string, params ...interface{}) []reflect.Value {
