@@ -3,11 +3,14 @@ package gobot
 import (
 	"encoding/json"
 	"github.com/go-martini/martini"
+	"io/ioutil"
 	"net/http"
 	"reflect"
 )
 
-type api struct{}
+type api struct {
+	master *Master
+}
 
 type jsonRobot struct {
 	Name        string            `json:"name"`
@@ -29,68 +32,103 @@ type jsonConnection struct {
 	Adaptor string `json:"adaptor"`
 }
 
-func Api(bot *Master) {
+var startApi = func(m *martini.ClassicMartini) {
+	go m.Run()
+}
+
+func Api(bot *Master) *api {
 	a := new(api)
+	a.master = bot
 	m := martini.Classic()
 
 	m.Use(martini.Static("robeaux"))
 
-	m.Get("/robots", func() string {
-		jsonRobots := make([]*jsonRobot, 0)
-		for _, robot := range bot.Robots {
-			jsonRobots = append(jsonRobots, a.formatJsonRobot(robot))
-		}
-		return toJson(jsonRobots)
+	m.Get("/robots", func(res http.ResponseWriter, req *http.Request) {
+		a.robots(res, req)
 	})
 
-	m.Get("/robots/:robotname", func(params martini.Params) string {
-		return toJson(a.formatJsonRobot(bot.FindRobot(params["robotname"])))
+	m.Get("/robots/:robotname", func(params martini.Params, res http.ResponseWriter, req *http.Request) {
+		a.robot(params["robotname"], res, req)
 	})
 
-	m.Get("/robots/:robotname/commands", func(params martini.Params) string {
-		return toJson(bot.FindRobot(params["robotname"]).RobotCommands)
+	m.Get("/robots/:robotname/commands", func(params martini.Params, res http.ResponseWriter, req *http.Request) {
+		a.robot_commands(params["robotname"], res, req)
 	})
 
 	robot_command_route := "/robots/:robotname/commands/:command"
 
-	m.Get(robot_command_route, func(params martini.Params, res http.ResponseWriter, req *http.Request) string {
-		decoder := json.NewDecoder(req.Body)
-		var body map[string]interface{}
-		decoder.Decode(&body)
-		if len(body) == 0 {
-			body = map[string]interface{}{}
-		}
-		body["robotname"] = params["robotname"]
-		return a.executeRobotCommand(bot, params, body)
+	m.Get(robot_command_route, func(params martini.Params, res http.ResponseWriter, req *http.Request) {
+		a.executeRobotCommand(bot, params, res, req)
 	})
 
-	m.Get("/robots/:robotname/devices", func(params martini.Params) string {
-		devices := bot.FindRobot(params["robotname"]).GetDevices()
-		jsonDevices := make([]*jsonDevice, 0)
-		for _, device := range devices {
-			jsonDevices = append(jsonDevices, a.formatJsonDevice(device))
-		}
-		return toJson(jsonDevices)
+	m.Get("/robots/:robotname/devices", func(params martini.Params, res http.ResponseWriter, req *http.Request) {
+		a.robot_devices(params["robotname"], res, req)
 	})
 
-	m.Get("/robots/:robotname/devices/:devicename", func(params martini.Params) string {
-		return toJson(a.formatJsonDevice(bot.FindRobotDevice(params["robotname"], params["devicename"])))
+	m.Get("/robots/:robotname/devices/:devicename", func(params martini.Params, res http.ResponseWriter, req *http.Request) {
+		a.robot_device(params["robotname"], params["devicename"], res, req)
 	})
 
-	m.Get("/robots/:robotname/devices/:devicename/commands", func(params martini.Params) string {
-		return toJson(bot.FindRobotDevice(params["robotname"], params["devicename"]).Commands())
+	m.Get("/robots/:robotname/devices/:devicename/commands", func(params martini.Params, res http.ResponseWriter, req *http.Request) {
+		a.robot_device_commands(params["robotname"], params["devicename"], res, req)
 	})
 
 	command_route := "/robots/:robotname/devices/:devicename/commands/:command"
 
-	m.Get(command_route, func(params martini.Params, res http.ResponseWriter, req *http.Request) string {
-		return a.executeCommand(bot, params, res, req)
+	m.Get(command_route, func(params martini.Params, res http.ResponseWriter, req *http.Request) {
+		a.executeCommand(params["robotname"], params["devicename"], params["command"], res, req)
 	})
-	m.Post(command_route, func(params martini.Params, res http.ResponseWriter, req *http.Request) string {
-		return a.executeCommand(bot, params, res, req)
+	m.Post(command_route, func(params martini.Params, res http.ResponseWriter, req *http.Request) {
+		a.executeCommand(params["robotname"], params["devicename"], params["command"], res, req)
 	})
 
-	go m.Run()
+	startApi(m)
+	return a
+}
+
+func (me *api) robots(res http.ResponseWriter, req *http.Request) {
+	jsonRobots := make([]*jsonRobot, 0)
+	for _, robot := range me.master.Robots {
+		jsonRobots = append(jsonRobots, me.formatJsonRobot(robot))
+	}
+	data, _ := json.Marshal(jsonRobots)
+	res.Header().Set("Content-Type", "application/json; charset=utf-8")
+	res.Write(data)
+}
+
+func (me *api) robot(name string, res http.ResponseWriter, req *http.Request) {
+	data, _ := json.Marshal(me.formatJsonRobot(me.master.FindRobot(name)))
+	res.Header().Set("Content-Type", "application/json; charset=utf-8")
+	res.Write(data)
+}
+
+func (me *api) robot_commands(name string, res http.ResponseWriter, req *http.Request) {
+	data, _ := json.Marshal(me.master.FindRobot(name).RobotCommands)
+	res.Header().Set("Content-Type", "application/json; charset=utf-8")
+	res.Write(data)
+}
+
+func (me *api) robot_devices(name string, res http.ResponseWriter, req *http.Request) {
+	devices := me.master.FindRobot(name).GetDevices()
+	jsonDevices := make([]*jsonDevice, 0)
+	for _, device := range devices {
+		jsonDevices = append(jsonDevices, me.formatJsonDevice(device))
+	}
+	data, _ := json.Marshal(jsonDevices)
+	res.Header().Set("Content-Type", "application/json; charset=utf-8")
+	res.Write(data)
+}
+
+func (me *api) robot_device(robot string, device string, res http.ResponseWriter, req *http.Request) {
+	data, _ := json.Marshal(me.formatJsonDevice(me.master.FindRobotDevice(robot, device)))
+	res.Header().Set("Content-Type", "application/json; charset=utf-8")
+	res.Write(data)
+}
+
+func (me *api) robot_device_commands(robot string, device string, res http.ResponseWriter, req *http.Request) {
+	data, _ := json.Marshal(me.master.FindRobotDevice(robot, device).Commands())
+	res.Header().Set("Content-Type", "application/json; charset=utf-8")
+	res.Write(data)
 }
 
 func (a *api) formatJsonRobot(robot *Robot) *jsonRobot {
@@ -118,27 +156,39 @@ func (a *api) formatJsonDevice(device *device) *jsonDevice {
 	return jsonDevice
 }
 
-func (a *api) executeCommand(bot *Master, params martini.Params, res http.ResponseWriter, req *http.Request) string {
+func (a *api) executeCommand(robotname string, devicename string, commandname string, res http.ResponseWriter, req *http.Request) {
+	data, _ := ioutil.ReadAll(req.Body)
+	var body map[string]interface{}
+	json.Unmarshal(data, &body)
+	robot := a.master.FindRobotDevice(robotname, devicename)
+	commands := robot.Commands().([]string)
+	for command := range commands {
+		if commands[command] == commandname {
+			ret := Call(robot.Driver, commandname, body)
+			data, _ = json.Marshal(map[string]interface{}{"result": ret[0].Interface()})
+			res.Header().Set("Content-Type", "application/json; charset=utf-8")
+			res.Write(data)
+			return
+		}
+	}
+	data, _ = json.Marshal(map[string]interface{}{"result": "Unknown Command"})
+	res.Header().Set("Content-Type", "application/json; charset=utf-8")
+	res.Write(data)
+}
+
+func (a *api) executeRobotCommand(bot *Master, params martini.Params, res http.ResponseWriter, req *http.Request) string {
 	decoder := json.NewDecoder(req.Body)
 	var body map[string]interface{}
 	decoder.Decode(&body)
-	robot := bot.FindRobotDevice(params["robotname"], params["devicename"])
-	commands := robot.Commands().([]string)
-	for command := range commands {
-		if commands[command] == params["command"] {
-			ret := Call(robot.Driver, params["command"], body)
-			return toJson(map[string]interface{}{"results": ret})
-		}
+	if len(body) == 0 {
+		body = map[string]interface{}{}
 	}
-	return toJson(map[string]interface{}{"results": "Unknown Command"})
-}
-
-func (a *api) executeRobotCommand(bot *Master, m_params martini.Params, params ...interface{}) string {
-	robot := bot.FindRobot(m_params["robotname"])
+	body["robotname"] = params["robotname"]
+	robot := bot.FindRobot(params["robotname"])
 	in := make([]reflect.Value, len(params))
-	for k, param := range params {
-		in[k] = reflect.ValueOf(param)
-	}
-	ret := reflect.ValueOf(robot.Commands[m_params["command"]]).Call(in)
-	return toJson(map[string]interface{}{"results": ret[0].Interface()})
+	//for k, param := range params {
+	//	in[k] = reflect.ValueOf(param)
+	//}
+	ret := reflect.ValueOf(robot.Commands[params["command"]]).Call(in)
+	return toJson(map[string]interface{}{"result": ret[0].Interface()})
 }

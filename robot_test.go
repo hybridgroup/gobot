@@ -3,6 +3,7 @@ package gobot
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"os"
 )
 
 var _ = Describe("Robot", func() {
@@ -14,6 +15,9 @@ var _ = Describe("Robot", func() {
 	Context("when valid", func() {
 		BeforeEach(func() {
 			someRobot = newTestRobot("")
+			trap = func(c chan os.Signal) {
+				c <- os.Interrupt
+			}
 			someRobot.Start()
 		})
 
