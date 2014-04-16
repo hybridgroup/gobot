@@ -18,14 +18,10 @@ type Robot struct {
 	devices       []*device              `json:"-"`
 }
 
-var start = func(r *Robot) {
-	m := GobotMaster()
-	m.Robots = []Robot{*r}
-	m.Start()
-}
-
 func (r *Robot) Start() {
-	start(r)
+	m := GobotMaster()
+	m.Robots = []*Robot{r}
+	m.Start()
 }
 
 func (r *Robot) startRobot() {
@@ -50,7 +46,7 @@ func (r *Robot) initName() {
 	if r.Name == "" {
 		rand.Seed(time.Now().UTC().UnixNano())
 		i := rand.Int()
-		r.Name = fmt.Sprintf("Robot %v", i)
+		r.Name = fmt.Sprintf("Robot%v", i)
 	}
 }
 
