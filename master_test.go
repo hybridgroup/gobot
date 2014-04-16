@@ -44,7 +44,7 @@ var _ = Describe("Master", func() {
 			Expect(myMaster.FindRobotConnection("Robot 4", "Connection 1")).To(BeNil())
 		})
 		It("Commands should return device commands", func() {
-			Expect(myMaster.FindRobotDevice("Robot 2", "Device 1").Commands()).To(Equal([]string{"DriverCommand1", "DriverCommand2", "DriverCommand3"}))
+			Expect(myMaster.FindRobotDevice("Robot 2", "Device 1").Commands()).To(Equal([]string{"TestDriverCommand", "DriverCommand"}))
 		})
 	})
 })

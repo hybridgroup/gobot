@@ -16,7 +16,7 @@ type testDriver struct {
 func (me *testDriver) Init() bool  { return true }
 func (me *testDriver) Start() bool { return true }
 func (me *testDriver) Halt() bool  { return true }
-func (me *testDriver) DriverCommand1(params map[string]interface{}) string {
+func (me *testDriver) TestDriverCommand(params map[string]interface{}) string {
 	name := params["name"].(string)
 	return fmt.Sprintf("hello %v", name)
 }
@@ -35,9 +35,8 @@ func newTestDriver(name string, adaptor *testAdaptor) *testDriver {
 	d.Name = name
 	d.Adaptor = adaptor
 	d.Commands = []string{
-		"DriverCommand1",
-		"DriverCommand2",
-		"DriverCommand3",
+		"TestDriverCommand",
+		"DriverCommand",
 	}
 	return d
 }
@@ -50,6 +49,12 @@ func newTestAdaptor(name string) *testAdaptor {
 		"param2": 2,
 	}
 	return a
+}
+
+func robotTestFunction(params map[string]interface{}) string {
+	message := params["message"].(string)
+	robotname := params["robotname"].(string)
+	return fmt.Sprintf("hey %v, %v", robotname, message)
 }
 
 func newTestRobot(name string) *Robot {
@@ -65,8 +70,7 @@ func newTestRobot(name string) *Robot {
 		Devices:     []Device{driver1, driver2, driver3},
 		Work:        func() {},
 		Commands: map[string]interface{}{
-			"Command1": func() { fmt.Println("hi") },
-			"Command2": func() {},
+			"robotTestFunction": robotTestFunction,
 		},
 	}
 }

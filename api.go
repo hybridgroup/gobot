@@ -58,7 +58,10 @@ func Api(bot *Master) *api {
 	robot_command_route := "/robots/:robotname/commands/:command"
 
 	m.Get(robot_command_route, func(params martini.Params, res http.ResponseWriter, req *http.Request) {
-		a.executeRobotCommand(bot, params, res, req)
+		a.executeRobotCommand(params["robotname"], params["command"], res, req)
+	})
+	m.Post(robot_command_route, func(params martini.Params, res http.ResponseWriter, req *http.Request) {
+		a.executeRobotCommand(params["robotname"], params["command"], res, req)
 	})
 
 	m.Get("/robots/:robotname/devices", func(params martini.Params, res http.ResponseWriter, req *http.Request) {
@@ -176,19 +179,21 @@ func (a *api) executeCommand(robotname string, devicename string, commandname st
 	res.Write(data)
 }
 
-func (a *api) executeRobotCommand(bot *Master, params martini.Params, res http.ResponseWriter, req *http.Request) string {
-	decoder := json.NewDecoder(req.Body)
+func (a *api) executeRobotCommand(robotname string, commandname string, res http.ResponseWriter, req *http.Request) {
+	data, _ := ioutil.ReadAll(req.Body)
 	var body map[string]interface{}
-	decoder.Decode(&body)
-	if len(body) == 0 {
-		body = map[string]interface{}{}
+	json.Unmarshal(data, &body)
+	robot := a.master.FindRobot(robotname)
+	in := make([]reflect.Value, 1)
+	body["robotname"] = robotname
+	in[0] = reflect.ValueOf(body)
+	command := robot.Commands[commandname]
+	if command != nil {
+		ret := reflect.ValueOf(robot.Commands[commandname]).Call(in)
+		data, _ = json.Marshal(map[string]interface{}{"result": ret[0].Interface()})
+	} else {
+		data, _ = json.Marshal(map[string]interface{}{"result": "Unknown Command"})
 	}
-	body["robotname"] = params["robotname"]
-	robot := bot.FindRobot(params["robotname"])
-	in := make([]reflect.Value, len(params))
-	//for k, param := range params {
-	//	in[k] = reflect.ValueOf(param)
-	//}
-	ret := reflect.ValueOf(robot.Commands[params["command"]]).Call(in)
-	return toJson(map[string]interface{}{"result": ret[0].Interface()})
+	res.Header().Set("Content-Type", "application/json; charset=utf-8")
+	res.Write(data)
 }
