@@ -5,13 +5,9 @@ import (
 	"io"
 	"math"
 	"math/rand"
-	"net"
 	"reflect"
-	"regexp"
 	"time"
 )
-
-type Port io.ReadWriteCloser
 
 func Every(t string, f func()) {
 	dur := parseDuration(t)
@@ -51,14 +47,6 @@ func Rand(max int) int {
 	return rand.Intn(max)
 }
 
-func ConnectToTcp(port string) io.ReadWriteCloser {
-	tcpPort, err := net.Dial("tcp", port)
-	if err != nil {
-		panic(err)
-	}
-	return tcpPort
-}
-
 func ConnectToSerial(port string, baud int) io.ReadWriteCloser {
 	c := &serial.Config{Name: port, Baud: baud}
 	s, err := serial.OpenPort(c)
@@ -66,12 +54,6 @@ func ConnectToSerial(port string, baud int) io.ReadWriteCloser {
 		panic(err)
 	}
 	return s
-}
-
-func IsUrl(s string) bool {
-	ip := regexp.MustCompile("([^A-Za-z0-9]+).([^A-Za-z0-9]+).([^A-Za-z0-9]+)")
-	url := regexp.MustCompile("([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?(/.*)?")
-	return ip.MatchString(s) || url.MatchString(s)
 }
 
 func Call(thing interface{}, method string, params ...interface{}) []reflect.Value {

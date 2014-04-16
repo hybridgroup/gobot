@@ -57,11 +57,6 @@ var _ = Describe("Utils", func() {
 			Expect(ToScale(-1, 0, 10)).To(Equal(float64(0)))
 			Expect(ToScale(0.5, 0, 10)).To(Equal(float64(5)))
 		})
-		It("should return true on url or ip address", func() {
-			Expect(IsUrl("127.0.0.1")).To(Equal(true))
-			Expect(IsUrl("http://www.google.com")).To(Equal(true))
-			Expect(IsUrl("/dev/ttyACM0")).To(Equal(false))
-		})
 		It("should return random int", func() {
 			a := Rand(100)
 			b := Rand(100)
