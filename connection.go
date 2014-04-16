@@ -14,9 +14,7 @@ type connection struct {
 
 type Connection interface {
 	Connect() bool
-	Disconnect() bool
 	Finalize() bool
-	Reconnect() bool
 }
 
 func NewConnection(adaptor AdaptorInterface, r *Robot) *connection {
@@ -38,17 +36,7 @@ func (c *connection) Connect() bool {
 	return c.Adaptor.Connect()
 }
 
-func (c *connection) Disconnect() bool {
-	log.Println("Disconnecting " + c.Name + "...")
-	return c.Adaptor.Disconnect()
-}
-
 func (c *connection) Finalize() bool {
 	log.Println("Finalizing " + c.Name + "...")
 	return c.Adaptor.Finalize()
-}
-
-func (c *connection) Reconnect() bool {
-	log.Println("Reconnecting to " + c.Name + " on port " + c.Port + "...")
-	return c.Adaptor.Reconnect()
 }

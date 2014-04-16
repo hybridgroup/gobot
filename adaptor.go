@@ -10,6 +10,4 @@ type Adaptor struct {
 type AdaptorInterface interface {
 	Finalize() bool
 	Connect() bool
-	Disconnect() bool
-	Reconnect() bool
 }

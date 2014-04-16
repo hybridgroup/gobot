@@ -25,10 +25,8 @@ type testAdaptor struct {
 	Adaptor
 }
 
-func (me *testAdaptor) Finalize() bool   { return true }
-func (me *testAdaptor) Connect() bool    { return true }
-func (me *testAdaptor) Disconnect() bool { return true }
-func (me *testAdaptor) Reconnect() bool  { return true }
+func (me *testAdaptor) Finalize() bool { return true }
+func (me *testAdaptor) Connect() bool  { return true }
 
 func newTestDriver(name string, adaptor *testAdaptor) *testDriver {
 	d := new(testDriver)
