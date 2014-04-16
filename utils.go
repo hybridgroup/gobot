@@ -1,7 +1,6 @@
 package gobot
 
 import (
-	"encoding/json"
 	"github.com/tarm/goserial"
 	"io"
 	"math"
@@ -47,14 +46,6 @@ func On(c chan interface{}, f func(s interface{})) {
 	}()
 }
 
-func parseDuration(t string) time.Duration {
-	dur, err := time.ParseDuration(t)
-	if err != nil {
-		panic(err)
-	}
-	return dur
-}
-
 func Rand(max int) int {
 	rand.Seed(time.Now().UTC().UnixNano())
 	return rand.Intn(max)
@@ -77,9 +68,10 @@ func ConnectToSerial(port string, baud int) io.ReadWriteCloser {
 	return s
 }
 
-func IsUrl(url string) bool {
-	rp := regexp.MustCompile("([^A-Za-z0-9]+).([^A-Za-z0-9]+).([^A-Za-z0-9]+)")
-	return rp.MatchString(url)
+func IsUrl(s string) bool {
+	ip := regexp.MustCompile("([^A-Za-z0-9]+).([^A-Za-z0-9]+).([^A-Za-z0-9]+)")
+	url := regexp.MustCompile("([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?(/.*)?")
+	return ip.MatchString(s) || url.MatchString(s)
 }
 
 func Call(thing interface{}, method string, params ...interface{}) []reflect.Value {
@@ -97,11 +89,6 @@ func FieldByNamePtr(thing interface{}, field string) reflect.Value {
 	return reflect.ValueOf(thing).Elem().FieldByName(field)
 }
 
-func toJson(obj interface{}) string {
-	b, _ := json.Marshal(obj)
-	return string(b)
-}
-
 func FromScale(input, min, max float64) float64 {
 	return (input - math.Min(min, max)) / (math.Max(min, max) - math.Min(min, max))
 }
@@ -115,4 +102,12 @@ func ToScale(input, min, max float64) float64 {
 	} else {
 		return i
 	}
+}
+
+func parseDuration(t string) time.Duration {
+	dur, err := time.ParseDuration(t)
+	if err != nil {
+		panic(err)
+	}
+	return dur
 }

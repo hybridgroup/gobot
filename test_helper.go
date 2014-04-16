@@ -2,6 +2,15 @@ package gobot
 
 import "fmt"
 
+type testStruct struct {
+	i int
+	f float64
+}
+
+func (me *testStruct) Hello(name string, message string) string {
+	return fmt.Sprintf("Hello %v! %v", name, message)
+}
+
 type null struct{}
 
 func (null) Write(p []byte) (int, error) {
@@ -71,4 +80,11 @@ func newTestRobot(name string) *Robot {
 			"robotTestFunction": robotTestFunction,
 		},
 	}
+}
+
+func newTestStruct() *testStruct {
+	s := new(testStruct)
+	s.i = 10
+	s.f = 0.2
+	return s
 }
