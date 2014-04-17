@@ -29,18 +29,21 @@ spark_platform: true
         package main
 
         import (
-          "github.com/hybridgroup/gobot"
-          "github.com/hybridgroup/gobot-beaglebone"
-          "github.com/hybridgroup/gobot-gpio"
+                "fmt"
+                "github.com/hybridgroup/gobot"
+                "github.com/hybridgroup/gobot-firmata"
+                "github.com/hybridgroup/gobot-gpio"
         )
 
         func main() {
-          beaglebone := new(gobotBeaglebone.Beaglebone)
-          beaglebone.Name = "beaglebone"
 
-          led := gobotGPIO.NewLed(beaglebone)
-          led.Name = "led"
-          led.Pin = "P9_12"
+                firmata := new(gobotFirmata.FirmataAdaptor)
+                firmata.Name = "firmata"
+                firmata.Port = "/dev/ttyACM0"
+
+                led := gobotGPIO.NewLed(firmata)
+                led.Name = "led"
+                led.Pin = "13"
         ...
         
 %section.how-to#HowToUse
@@ -53,30 +56,35 @@ spark_platform: true
         package main
 
         import (
-          "github.com/hybridgroup/gobot"
-          "github.com/hybridgroup/gobot-beaglebone"
-          "github.com/hybridgroup/gobot-gpio"
+                "fmt"
+                "github.com/hybridgroup/gobot"
+                "github.com/hybridgroup/gobot-firmata"
+                "github.com/hybridgroup/gobot-gpio"
         )
 
         func main() {
-          beaglebone := new(gobotBeaglebone.Beaglebone)
-          beaglebone.Name = "beaglebone"
 
-          led := gobotGPIO.NewLed(beaglebone)
-          led.Name = "led"
-          led.Pin = "P9_12"
+                firmata := new(gobotFirmata.FirmataAdaptor)
+                firmata.Name = "firmata"
+                firmata.Port = "/dev/ttyACM0"
 
-          work := func() {
-            gobot.Every("1s", func() { led.Toggle() })
-          }
+                led := gobotGPIO.NewLed(firmata)
+                led.Name = "led"
+                led.Pin = "13"
 
-          robot := gobot.Robot{
-            Connections: []interface{}{beaglebone},
-            Devices:     []interface{}{led},
-            Work:        work,
-          }
+                work := func() {
+                        gobot.Every("1s", func() {
+                                led.Toggle()
+                        })
+                }
 
-          robot.Start()
+                robot := gobot.Robot{
+                        Connections: []interface{}{firmata},
+                        Devices:     []interface{led},
+                        Work:        work,
+                }
+
+                robot.Start()
         }
 
 %section.public-methods

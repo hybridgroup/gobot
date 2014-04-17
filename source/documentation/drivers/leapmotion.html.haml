@@ -40,7 +40,7 @@ leapmotion_platform: true
 
 %section.how-to#HowToUse
   %h2 How To Use
-  %h3 Example receiving message events from a Leap Motion.
+  %h3 Example receiving hand events from a Leap Motion.
   :markdown
         :::go
         package main
@@ -61,7 +61,7 @@ leapmotion_platform: true
 
           work := func() {
             gobot.On(leap.Events["Message"], func(data interface{}) {
-              fmt.Println(data)
+              printHands(data.(gobotLeap.LeapFrame))
             })
           }
 
@@ -72,6 +72,12 @@ leapmotion_platform: true
           }
 
           robot.Start()
+        }
+
+        func printHands(frame gobotLeap.LeapFrame) {
+          for key, hand := range frame.Hands {
+            fmt.Println("Hand", key, hand)
+          }
         }
 
 %section.public-methods

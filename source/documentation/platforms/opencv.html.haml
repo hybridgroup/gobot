@@ -77,55 +77,45 @@ subnav_platform: true
 
 %section.how-to#HowToUse
   %h2 How To Use
-  %p Example using the camera.
+  %p Example using the camera and face detection.
   :markdown
         :::go
-        package gobotOpencv
+        package main
 
         import (
-          "github.com/hybridgroup/go-opencv/opencv"
+          cv "github.com/hybridgroup/go-opencv/opencv"
           "github.com/hybridgroup/gobot"
+          "github.com/hybridgroup/gobot-opencv"
+          "path"
+          "runtime"
         )
 
-        type Camera struct {
-          gobot.Driver
-          Adaptor *Opencv
-          camera  *opencv.Capture
-          Source  string
-        }
+        func main() {
+          _, currentfile, _, _ := runtime.Caller(0)
+          cascade := path.Join(path.Dir(currentfile), "haarcascade_frontalface_alt.xml")
 
-        type CameraInterface interface {
-        }
+          opencv := new(gobotOpencv.Opencv)
+          opencv.Name = "opencv"
 
-        func NewCamera(adaptor *Opencv) *Camera {
-          d := new(Camera)
-          d.Events = make(map[string]chan interface{})
-          d.Adaptor = adaptor
-          d.Commands = []string{}
-          return d
-        }
+          window := gobotOpencv.NewWindow(opencv)
+          window.Name = "window"
 
-        func (me *Camera) Start() bool {
-          me.Events["Frame"] = make(chan interface{}, 0)
-          if me.Source != "" {
-            me.camera = opencv.NewFileCapture(me.Source)
-          } else {
-            me.camera = opencv.NewCameraCapture(0)
+          camera := gobotOpencv.NewCamera(opencv)
+          camera.Name = "camera"
+
+          work := func() {
+            gobot.On(camera.Events["Frame"], func(data interface{}) {
+              i := data.(*cv.IplImage)
+              window.ShowImage(gobotOpencv.DrawRectangles(i, gobotOpencv.DetectFaces(cascade, i)))
+            })
           }
-          go func() {
-            for {
-              if me.camera.GrabFrame() {
-                image := me.camera.RetrieveFrame(1)
-                if image != nil {
-                  gobot.Publish(me.Events["Frame"], image)
-                }
-              }
-            }
-          }()
-          return true
+
+          robot := gobot.Robot{
+            Connections: []gobot.Connection{opencv},
+            Devices:     []gobot.Device{window, camera},
+            Work:        work,
+          }
+
+          robot.Start()
         }
-        func (me *Camera) Halt() bool { return true }
-        func (me *Camera) Init() bool { return true }
-				      
-				  
 
