@@ -16,6 +16,7 @@ script:
 branches:
   except:
     - gobot.io
+    - /^gobot-.*$/
 
 notifications:
   irc: "irc.freenode.org#gobotio"
