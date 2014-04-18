@@ -141,11 +141,11 @@ end
 #
 # Examples
 #
-#   get_repo_name "https://github.com/hybridgroup/cylon-ardrone.git"
-#   #=> "cylon-ardrone"
+#   get_repo_name "https://github.com/hybridgroup/gobot-ardrone.git"
+#   #=> "gobot-ardrone"
 #
-#   get_repo_name "git@github.com:hybridgroup/cylon.git"
-#   #=> "cylon"
+#   get_repo_name "git@github.com:hybridgroup/gobot.git"
+#   #=> "gobot"
 #
 #   get_repo_name ""
 #   #=> nil

@@ -2,7 +2,7 @@
 title: Raspberry Pi with Artroo
 author: The Hybrid Group
 page_title: Raspberry Pi
-page_subtitle: "<a href='https://github.com/hybridgroup/Cylon.js-raspi' class='repository'>Repository</a> <a class+'issues' href='https://github.com/hybridgroup/Cylon.js-raspi/issues'>Issues</a>"
+page_subtitle: "<a href='https://github.com/hybridgroup/gobot-raspi' class='repository'>Repository</a> <a class+'issues' href='https://github.com/hybridgroup/gobot-raspi/issues'>Issues</a>"
 page_title_show: true
 layout: documentation
 ---
@@ -22,17 +22,17 @@ layout: documentation
   %h2 How to install
   %p If you do not have ruby installed, you'll need to do that first.
   %p
-    Then install the Cylon.js-raspi gem:
+    Then install the gobot-raspi gem:
   :markdown
         :::bash
-        sudo gem install Cylon.js-raspi
+        sudo gem install gobot-raspi
 
   %h2 How to use
   %p
     This small program causes an LED to blink.
   :markdown
-        :::ruby
-        require 'Cylon.js'
+        :::go
+        require 'gobot'
 
         connection :raspi, :adaptor => :raspi
         device :led, :driver => :led, :pin => 11
@@ -82,7 +82,7 @@ layout: documentation
 
 %section.drivers
   %h2 Drivers
-  %p All Cylon.js digital and PWM GPIO, and i2c drivers listed below should work with the Raspberry Pi:
+  %p All gobot digital and PWM GPIO, and i2c drivers listed below should work with the Raspberry Pi:
 
   .hardware
     %h2 GPIO Drivers

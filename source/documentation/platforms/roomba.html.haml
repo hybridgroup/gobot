@@ -1,8 +1,8 @@
 ---
-title: Roomba with Cylon.js
+title: Roomba with gobot
 author: The Hybrid Group
 page_title: Roomba
-page_subtitle: "<a href='https://github.com/hybridgroup/Cylon.js-roomba' class='repository'>Repository</a> <a class+'issues' href='https://github.com/hybridgroup/Cylon.js-roomba/issues'>Issues</a>"
+page_subtitle: "<a href='https://github.com/hybridgroup/gobot-roomba' class='repository'>Repository</a> <a class+'issues' href='https://github.com/hybridgroup/gobot-roomba/issues'>Issues</a>"
 page_title_show: true
 layout: documentation
 ---
@@ -21,16 +21,16 @@ layout: documentation
 %section.how-to
   %h2 How to install
   %p
-    Installing Cylon.js with roomba support is pretty easy using ruby gems.
+    Installing gobot with roomba support is pretty easy using ruby gems.
   :markdown
         :::bash
-        gem install Cylon.js-roomba
+        gem install gobot-roomba
   %h2 How to use
   %p
     This small program controls a Roomba.
   :markdown
         :::ruby
-        require 'Cylon.js'
+        require 'gobot'
 
         connection :roomba, :adaptor => :roomba, :port => '/dev/ttyUSB0'
         device :roomba, :driver => :roomba, :connection => :roomba

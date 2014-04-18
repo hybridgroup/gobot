@@ -1,8 +1,8 @@
 ---
-title: Crazyflie with Cylon.js
+title: Crazyflie with gobot
 author: The Hybrid Group
 page_title: Crazyflie
-page_subtitle: "<a href='https://github.com/hybridgroup/Cylon.js-crazyflie' class='repository'>Repository</a> <a class+'issues' href='https://github.com/hybridgroup/Cylon.js-crazyflie/issues'>Issues</a>"
+page_subtitle: "<a href='https://github.com/hybridgroup/gobot-crazyflie' class='repository'>Repository</a> <a class+'issues' href='https://github.com/hybridgroup/gobot-crazyflie/issues'>Issues</a>"
 page_title_show: true
 layout: documentation
 ---
@@ -11,7 +11,7 @@ layout: documentation
   = image_tag "/images/devices/crazyflie.jpg", class: "display"
   .info-intro
     %p
-      You can use Cylon.js with the Crazyflie micro-quadcopter.
+      You can use gobot with the Crazyflie micro-quadcopter.
 
     %p
       For more info about Crazyflie click
@@ -22,17 +22,17 @@ layout: documentation
 %section.how_to
   %h2 How to install
   %p
-    Installing Cylon.js with arduino support is pretty easy using ruby gems.
+    Installing gobot with arduino support is pretty easy using ruby gems.
   :markdown
         :::bash
-        gem install Cylon.js-crazyflie
+        gem install gobot-crazyflie
 
   %h2 How to use
   %p
     This small program causes the Crazyflie to 'hop' up in the air for 1 second.
   :markdown
-        :::ruby
-        require 'Cylon.js'
+        :::go
+        require 'gobot'
 
         connection :crazyflie, :adaptor => :crazyflie
         device :drone, :driver => :crazyflie, :connection => :crazyflie, :interval => 0.1
@@ -62,7 +62,7 @@ layout: documentation
     and then use the Crazyflie PC tools to update the Crazyflie firmware.
 
   %p
-    Once you have updated the Crazyflie firmware, you will NEED to use the following syntax in your Cylon.js code to use it:
+    Once you have updated the Crazyflie firmware, you will NEED to use the following syntax in your gobot code to use it:
 
   :markdown
         :::ruby

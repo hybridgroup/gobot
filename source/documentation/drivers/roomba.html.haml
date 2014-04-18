@@ -12,14 +12,14 @@ roomba_platform: true
 %section.intro
   =image_tag "/images/devices/roomba.jpg", class: "display"
   .info-intro
-    %p Allows user to control a Roomba iRobot Create using Cylon.js.
+    %p Allows user to control a Roomba iRobot Create using gobot.
   .clear
   
 %section.how-to
   %h2 How to establish a connection and setup the driver
   :markdown
-        :::ruby
-        require 'Cylon.js'
+        :::go
+        require 'gobot'
         connection :roomba, :adaptor => :roomba, :port => '/dev/ttyUSB0'
         device :roomba, :driver => :roomba, :connection => :roomba
 
@@ -94,7 +94,7 @@ roomba_platform: true
   %h3 Example controlling a Roomba.
   :markdown
         :::ruby
-        require 'Cylon.js'
+        require 'gobot'
 
         connection :roomba, :adaptor => :roomba, :port => '/dev/ttyUSB0'
         device :roomba, :driver => :roomba, :connection => :roomba

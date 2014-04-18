@@ -12,13 +12,13 @@ joystick_platform: true
   =image_tag "/images/devices/joystick.jpg", class: "display"
   .info-intro
     %p
-      Allows user to interact with Cylon.js devices using any joystick or game controller that is compatible with SDL.
+      Allows user to interact with gobot devices using any joystick or game controller that is compatible with SDL.
   .clear
 %section.how-to
   %h2 How to establish a connection and setup the driver
   :markdown
-        :::ruby
-        require 'Cylon.js'
+        :::go
+        require 'gobot'
         connection :joystick, :adaptor => :joystick
         device :controller, :driver => :joystick, :connection => :joystick, :interval => 0.1
 
@@ -43,7 +43,7 @@ joystick_platform: true
   %h3 Example receiving button events from a generic joystick.
   :markdown
         :::ruby
-        require 'Cylon.js'
+        require 'gobot'
 
         connection :joystick, :adaptor => :joystick
         device :joystick, :driver => :joystick, :connection => :joystick, :interval => 0.1
