@@ -11,6 +11,8 @@ import (
 type api struct {
 	master *Master
 	server *martini.ClassicMartini
+	Host   string
+	Port   string
 }
 
 type jsonRobot struct {
@@ -34,7 +36,13 @@ type jsonConnection struct {
 }
 
 var startApi = func(me *api) {
-	go me.server.Run()
+	port := me.Port
+	if port == "" {
+		port = "3000"
+	}
+
+	host := me.Host
+	go http.ListenAndServe(host+":"+port, me.server)
 }
 
 func (me *api) StartApi() {
@@ -93,7 +101,6 @@ func Api(bot *Master) *api {
 		a.executeCommand(params["robotname"], params["devicename"], params["command"], res, req)
 	})
 
-	//startApi(m)
 	return a
 }
 
