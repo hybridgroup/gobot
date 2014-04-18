@@ -2,7 +2,7 @@
 
 http://gobot.io/
 
-Gobot is a set of libraries for robotics, physical computing, and the Internet of Things, using the Go programming language (http://golang.org/)
+Gobot is a framework and set of libraries using the Go programming language (http://golang.org/) for robotics, physical computing, and the Internet of Things. 
 
 It provides a simple, yet powerful way to create solutions that incorporate multiple, different hardware devices at the same time.
 
@@ -93,8 +93,9 @@ Gobot has a extensible system for connecting to hardware devices. The following 
   - [Beaglebone Black](http://beagleboard.org/Products/BeagleBone+Black/) <=> [Library](https://github.com/hybridgroup/gobot-beaglebone)
   - [Joystick](http://en.wikipedia.org/wiki/Joystick) <=> [Library](https://github.com/hybridgroup/gobot-joystick)
   - [Digispark](http://digistump.com/products/1) <=> [Library](https://github.com/hybridgroup/gobot-digispark)
-  - [Firmata](http://firmata.org/wiki/Main_Page) <=> [Library](https://github.com/hybridgroup/gobot-firmata)
-  - [Leap Motion](https://www.leapmotion.com/) <=> [Library](https://github.com/hybridgroup/gobot-leap)
+  - [Joystick](http://en.wikipedia.org/wiki/Joystick) <=> [Library](https://github.com/hybridgroup/gobot-joystick)
+  - [Leap Motion](https://www.leapmotion.com/) <=> [Library](https://github.com/hybridgroup/gobot-leapmotion)
+  - [Neurosky](http://neurosky.com/products-markets/eeg-biosensors/hardware/) <=> [Library](https://github.com/hybridgroup/gobot-neurosky)
   - [OpenCV](http://opencv.org/) <=> [Library](https://github.com/hybridgroup/gobot-opencv)
   - [Spark](https://www.spark.io/) <=> [Library](https://github.com/hybridgroup/gobot-spark)
   - [Sphero](http://www.gosphero.com/) <=> [Library](https://github.com/hybridgroup/gobot-sphero)
