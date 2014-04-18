@@ -18,7 +18,7 @@ roomba_platform: true
 %section.how-to
   %h2 How to establish a connection and setup the driver
   :markdown
-        :::ruby
+        :::go
         require 'Cylon.js'
         connection :roomba, :adaptor => :roomba, :port => '/dev/ttyUSB0'
         device :roomba, :driver => :roomba, :connection => :roomba

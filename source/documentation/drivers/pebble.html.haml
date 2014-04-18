@@ -17,7 +17,7 @@ pebble_platform: true
 %section.how-to
   %h2 How to establish a connection and setup the driver
   :markdown
-        :::ruby
+        :::go
         require 'Cylon.js'
         connection :pebble, :adaptor => :pebble, :port => "/dev/rfcomm0", :id => "378B"
         device :watch, :driver => :pebble
@@ -34,7 +34,7 @@ pebble_platform: true
   %h2 How to use
   %h3 Example receiving button events from a Pebble smart watch.
   :markdown
-        :::ruby
+        :::go
         require 'Cylon.js'
 
         connection :pebble, :adaptor => :pebble, :port => "/dev/rfcomm0", :id => "378B"

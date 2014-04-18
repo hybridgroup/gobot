@@ -216,7 +216,7 @@ getting_started_button: "<a href='/documentation/getting-started' class='cta'> G
 %p Support for many devices that use General Purpose Input/Output (GPIO) have a shared set of drivers provded using the cylon-gpio module:
 
 %p.important-title
-  5
+  6
   = link_to "GPIO", "https://en.wikipedia.org/wiki/General_Purpose_Input/Output" , target:"_blank" 
   drivers
 
@@ -233,6 +233,13 @@ getting_started_button: "<a href='/documentation/getting-started' class='cta'> G
       = link_to "Button", "/documentation/drivers/button"
     %a{:href => "/documentation/drivers/button"} 
       %img{src: "/images/devices/button.jpg", style: "width: 90%"}  
+    .repo
+      = link_to "repo", "https://github.com/hybridgroup/gobot-gpio" , target:"_blank"
+  %li
+    .title
+      = link_to "Direct Pin", "/documentation/drivers/direct-pin"
+    %a{:href => "/documentation/drivers/direct-pin"} 
+      %img{src: "/images/devices/direct-pin.jpg", style: "width: 90%"}  
     .repo
       = link_to "repo", "https://github.com/hybridgroup/gobot-gpio" , target:"_blank"
   %li
