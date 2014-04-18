@@ -9,7 +9,7 @@ import (
 type Master struct {
 	Robots []*Robot
 	NumCPU int
-	Api *api
+	Api    *api
 }
 
 func GobotMaster() *Master {
@@ -26,7 +26,7 @@ func (m *Master) Start() {
 	runtime.GOMAXPROCS(m.NumCPU)
 
 	if m.Api != nil {
-    m.Api.StartApi()
+		m.Api.StartApi()
 	}
 
 	for s := range m.Robots {

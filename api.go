@@ -10,12 +10,14 @@ import (
 )
 
 type api struct {
-	master 		*Master
-	server 		*martini.ClassicMartini
-	Host   		string
-	Port   		string
-	Username  string
-	Password 	string
+	master   *Master
+	server   *martini.ClassicMartini
+	Host     string
+	Port     string
+	Username string
+	Password string
+	Cert     string
+	Key      string
 }
 
 type jsonRobot struct {
@@ -51,7 +53,14 @@ var startApi = func(me *api) {
 	}
 
 	host := me.Host
-	go http.ListenAndServe(host+":"+port, me.server)
+	cert := me.Cert
+	key := me.Key
+
+	if cert != "" && key != "" {
+		go http.ListenAndServeTLS(host+":"+port, cert, key, me.server)
+	} else {
+		go http.ListenAndServe(host+":"+port, me.server)
+	}
 }
 
 func (me *api) StartApi() {
