@@ -1,15 +1,19 @@
 language: go
 go:
- - 1.1
  - 1.2
  - release
  - tip
-install: 
+install:
  - go get -v . && go build -v .
  - go get github.com/onsi/ginkgo
  - go get github.com/onsi/gomega
+ - go get code.google.com/p/go.tools/cmd/cover
+ - go get github.com/mattn/goveralls
 script:
- - go test -v .
+ - go test -covermode=count -coverprofile=profile.cov github.com/hybridgroup/gobot
+ - export PATH=$PATH:$HOME/gopath/bin/
+ - goveralls -coverprofile=profile.cov -service=travis-ci -repotoken=sFrR9ZmLP5FLc34lOaqir67RPzYOvFPUB
 branches:
   except:
     - gobot.io
+    - /^gobot-.*$/
