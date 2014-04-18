@@ -33,8 +33,12 @@ type jsonConnection struct {
 	Adaptor string `json:"adaptor"`
 }
 
-func (me *api) StartApi() {
+var startApi = func(me *api) {
 	go me.server.Run()
+}
+
+func (me *api) StartApi() {
+	startApi(me)
 }
 
 func Api(bot *Master) *api {
