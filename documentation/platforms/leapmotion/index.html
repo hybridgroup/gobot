@@ -94,32 +94,38 @@
                 <pre class="CodeRay"><span class="keyword">package</span> main
 
 <span class="keyword">import</span> (
-    <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
-    <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
-    <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-leapmotion</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-leapmotion</span><span class="delimiter">"</span></span>
 )
 
 <span class="keyword">func</span> main() {
-    leapAdaptor := <span class="predefined">new</span>(gobotLeap.LeapAdaptor)
-    leapAdaptor.Name = <span class="string"><span class="delimiter">"</span><span class="content">leap</span><span class="delimiter">"</span></span>
-    leapAdaptor.Port = <span class="string"><span class="delimiter">"</span><span class="content">127.0.0.1:6437</span><span class="delimiter">"</span></span>
+  leapAdaptor := <span class="predefined">new</span>(gobotLeap.LeapAdaptor)
+  leapAdaptor.Name = <span class="string"><span class="delimiter">"</span><span class="content">leap</span><span class="delimiter">"</span></span>
+  leapAdaptor.Port = <span class="string"><span class="delimiter">"</span><span class="content">127.0.0.1:6437</span><span class="delimiter">"</span></span>
 
-    leap := gobotLeap.NewLeap(leapAdaptor)
-    leap.Name = <span class="string"><span class="delimiter">"</span><span class="content">leap</span><span class="delimiter">"</span></span>
+  leap := gobotLeap.NewLeap(leapAdaptor)
+  leap.Name = <span class="string"><span class="delimiter">"</span><span class="content">leap</span><span class="delimiter">"</span></span>
 
-    work := <span class="keyword">func</span>() {
-        gobot.On(leap.Events[<span class="string"><span class="delimiter">"</span><span class="content">Message</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
-            fmt.Println(data)
-        })
-    }
+  work := <span class="keyword">func</span>() {
+    gobot.On(leap.Events[<span class="string"><span class="delimiter">"</span><span class="content">Message</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+      printHands(data.(gobotLeap.LeapFrame))
+    })
+  }
 
-    robot := gobot.Robot{
-        Connections: []gobot.Connection{leapAdaptor},
-        Devices:     []gobot.Device{leap},
-        Work:        work,
-    }
+  robot := gobot.Robot{
+    Connections: []gobot.Connection{leapAdaptor},
+    Devices:     []gobot.Device{leap},
+    Work:        work,
+  }
 
-    robot.Start()
+  robot.Start()
+}
+
+<span class="keyword">func</span> printHands(frame gobotLeap.LeapFrame) {
+  <span class="keyword">for</span> key, hand := <span class="keyword">range</span> frame.Hands {
+    fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">Hand</span><span class="delimiter">"</span></span>, key, hand)
+  }
 }
 </pre>
               </section><section class="how-to" id="HowToConnect"><h2>How To Connect</h2>

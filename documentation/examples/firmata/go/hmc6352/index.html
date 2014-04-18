@@ -64,26 +64,26 @@
         <div class="main" role="main">
           <section class="content full"><div class="documentation">
               <div class="example">
-                <pre class="CodeRay">package main
+                <pre class="CodeRay"><span class="keyword">package</span> main
 
-import (
-        "fmt"
-        "github.com/hybridgroup/gobot"
-        "github.com/hybridgroup/gobot-firmata"
-        "github.com/hybridgroup/gobot-i2c"
+<span class="keyword">import</span> (
+        <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-firmata</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-i2c</span><span class="delimiter">"</span></span>
 )
 
-func main() {
-        firmata := new(gobotFirmata.FirmataAdaptor)
-        firmata.Name = "firmata"
-        firmata.Port = "/dev/ttyACM0"
+<span class="keyword">func</span> main() {
+        firmata := <span class="predefined">new</span>(gobotFirmata.FirmataAdaptor)
+        firmata.Name = <span class="string"><span class="delimiter">"</span><span class="content">firmata</span><span class="delimiter">"</span></span>
+        firmata.Port = <span class="string"><span class="delimiter">"</span><span class="content">/dev/ttyACM0</span><span class="delimiter">"</span></span>
 
         hmc6352 := gobotI2C.NewHMC6352(firmata)
-        hmc6352.Name = "hmc6352"
+        hmc6352.Name = <span class="string"><span class="delimiter">"</span><span class="content">hmc6352</span><span class="delimiter">"</span></span>
 
-        work := func() {
-                gobot.Every("0.1s", func() {
-                        fmt.Println("Heading", hmc6352.Heading)
+        work := <span class="keyword">func</span>() {
+                gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">0.1s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() {
+                        fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">Heading</span><span class="delimiter">"</span></span>, hmc6352.Heading)
                 })
         }
 

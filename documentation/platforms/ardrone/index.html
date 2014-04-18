@@ -90,50 +90,42 @@
                 <pre class="CodeRay"><span class="reserved">package</span> main
 
 <span class="reserved">import</span> (
-    <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
-    <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-ardrone</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-ardrone</span><span class="delimiter">"</span></span>
 )
 
 func main() {
 
-    <span class="key">ardroneAdaptor</span> := <span class="keyword">new</span>(gobotArdrone.ArdroneAdaptor)
-    ardroneAdaptor.Name = <span class="string"><span class="delimiter">"</span><span class="content">Drone</span><span class="delimiter">"</span></span>
+  <span class="key">ardroneAdaptor</span> := <span class="keyword">new</span>(gobotArdrone.ArdroneAdaptor)
+  ardroneAdaptor.Name = <span class="string"><span class="delimiter">"</span><span class="content">Drone</span><span class="delimiter">"</span></span>
 
-    drone := gobotArdrone.NewArdrone(ardroneAdaptor)
-    drone.Name = <span class="string"><span class="delimiter">"</span><span class="content">Drone</span><span class="delimiter">"</span></span>
+  drone := gobotArdrone.NewArdrone(ardroneAdaptor)
+  drone.Name = <span class="string"><span class="delimiter">"</span><span class="content">Drone</span><span class="delimiter">"</span></span>
 
-    work := func() {
-        drone.TakeOff()
-        gobot.On(drone.Events[<span class="string"><span class="delimiter">"</span><span class="content">Flying</span><span class="delimiter">"</span></span>], func(data <span class="reserved">interface</span>{}) {
-            gobot.After(<span class="string"><span class="delimiter">"</span><span class="content">1s</span><span class="delimiter">"</span></span>, func() {
-                drone.Right(<span class="float">0.1</span>)
-            })
-            gobot.After(<span class="string"><span class="delimiter">"</span><span class="content">2s</span><span class="delimiter">"</span></span>, func() {
-                drone.Left(<span class="float">0.1</span>)
-            })
-            gobot.After(<span class="string"><span class="delimiter">"</span><span class="content">3s</span><span class="delimiter">"</span></span>, func() {
-                drone.Land()
-            })
-        })
-    }
+  work := func() {
+    drone.TakeOff()
+    gobot.On(drone.Events[<span class="string"><span class="delimiter">"</span><span class="content">Flying</span><span class="delimiter">"</span></span>], func(data <span class="reserved">interface</span>{}) {
+      gobot.After(<span class="string"><span class="delimiter">"</span><span class="content">15s</span><span class="delimiter">"</span></span>, func() {
+        drone.Land()
+      })
+    })
+  }
 
-    robot := gobot.Robot{
-        <span class="key">Connections</span>: []gobot.Connection{ardroneAdaptor},
-        <span class="key">Devices</span>:     []gobot.Device{drone},
-        <span class="key">Work</span>:        work,
-    }
+  robot := gobot.Robot{
+    <span class="key">Connections</span>: []gobot.Connection{ardroneAdaptor},
+    <span class="key">Devices</span>:     []gobot.Device{drone},
+    <span class="key">Work</span>:        work,
+  }
 
-    robot.Start()
+  robot.Start()
 }
 </pre>
               </section><section class="how-to" id="HowToConnect"><h2>How To Connect</h2>
                 <p>The ARDrone is a WiFi device, so there is no additional work to establish a connection to a single drone. However, in order to connect to multiple drones, you need to perform some configuration steps on each drone via SSH.</p>
                 <h2>Automatic Reset From Emergency Mode</h2>
-                <p>When you first connect to the ARDrone by calling the `start` method, if it is in "emergency" mode, the ARDrone will not take off. Gobot can automatically reset it back "normal" mode, to be able to fly IF you pass in the navigation like this example:</p>
-                <pre class="CodeRay">Coming soon.
-</pre>
+                <p>Gobot will automatically reset the emergency mode back to the "normal" state on TakeOff</p>
               </section><section class="drivers" id="Drivers"><h2>Drivers</h2>
-                <p>Available drivers for the ARDrone platform are listed below. There are three drivers for the ARDrone: the ARDrone for flight control and the ARDroneNav for navigation data.</p>
+                <p>Available drivers for the ARDrone platform are listed below..</p>
                 <div class="hardware">
                   <div class="devices">
                     <!-- / TODO: Update drivers list at the top of the page. -->

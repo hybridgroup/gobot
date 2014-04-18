@@ -64,29 +64,29 @@
         <div class="main" role="main">
           <section class="content full"><div class="documentation">
               <div class="example">
-                <pre class="CodeRay">package main
+                <pre class="CodeRay"><span class="keyword">package</span> main
 
-import (
-        "github.com/hybridgroup/gobot"
-        "github.com/hybridgroup/gobot-beaglebone"
-        "github.com/hybridgroup/gobot-gpio"
+<span class="keyword">import</span> (
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-beaglebone</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
 )
 
-func main() {
-        beaglebone := new(gobotBeaglebone.Beaglebone)
-        beaglebone.Name = "beaglebone"
+<span class="keyword">func</span> main() {
+        beaglebone := <span class="predefined">new</span>(gobotBeaglebone.Beaglebone)
+        beaglebone.Name = <span class="string"><span class="delimiter">"</span><span class="content">beaglebone</span><span class="delimiter">"</span></span>
 
         led := gobotGPIO.NewLed(beaglebone)
-        led.Name = "led"
-        led.Pin = "P9_12"
+        led.Name = <span class="string"><span class="delimiter">"</span><span class="content">led</span><span class="delimiter">"</span></span>
+        led.Pin = <span class="string"><span class="delimiter">"</span><span class="content">P9_12</span><span class="delimiter">"</span></span>
 
-        work := func() {
-                gobot.Every("1s", func() { led.Toggle() })
+        work := <span class="keyword">func</span>() {
+                gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">1s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() { led.Toggle() })
         }
 
         robot := gobot.Robot{
-                Connections: []interface{}{beaglebone},
-                Devices:     []interface{}{led},
+                Connections: []gobot.Connection{beaglebone},
+                Devices:     []gobot.Device{led},
                 Work:        work,
         }
 

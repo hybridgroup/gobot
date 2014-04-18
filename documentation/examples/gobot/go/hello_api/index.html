@@ -64,27 +64,27 @@
         <div class="main" role="main">
           <section class="content full"><div class="documentation">
               <div class="example">
-                <pre class="CodeRay">package main
+                <pre class="CodeRay"><span class="keyword">package</span> main
 
-import (
-        "fmt"
-        "github.com/hybridgroup/gobot"
+<span class="keyword">import</span> (
+        <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
 )
 
-func Hello(params map[string]interface{}) string {
-        name := params["name"].(string)
-        return fmt.Sprintf("hi %v", name)
+<span class="keyword">func</span> Hello(params <span class="keyword">map</span>[<span class="predefined-type">string</span>]<span class="keyword">interface</span>{}) <span class="predefined-type">string</span> {
+        name := params[<span class="string"><span class="delimiter">"</span><span class="content">name</span><span class="delimiter">"</span></span>].(<span class="predefined-type">string</span>)
+        <span class="keyword">return</span> fmt.Sprintf(<span class="string"><span class="delimiter">"</span><span class="content">hi %v</span><span class="delimiter">"</span></span>, name)
 }
 
-func main() {
+<span class="keyword">func</span> main() {
         master := gobot.GobotMaster()
         gobot.Api(master)
 
-        hello := new(gobot.Robot)
-        hello.Name = "hello"
-        hello.Commands = map[string]interface{}{"Hello": Hello}
+        hello := <span class="predefined">new</span>(gobot.Robot)
+        hello.Name = <span class="string"><span class="delimiter">"</span><span class="content">hello</span><span class="delimiter">"</span></span>
+        hello.Commands = <span class="keyword">map</span>[<span class="predefined-type">string</span>]<span class="keyword">interface</span>{}{<span class="string"><span class="delimiter">"</span><span class="content">Hello</span><span class="delimiter">"</span></span>: Hello}
 
-        master.Robots = append(master.Robots, *hello)
+        master.Robots = <span class="predefined">append</span>(master.Robots, hello)
 
         master.Start()
 }

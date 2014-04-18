@@ -115,7 +115,7 @@
               <code>go get -u github.com/hybridgroup/gobot-sphero</code> 
               to use Gobot with a Sphero.</p>
             
-            <h2>Go with Sphero</h2>
+            <h2>Gobot with Sphero</h2>
             <pre class="CodeRay"><span class="keyword">package</span> main
 
 <span class="keyword">import</span> (
@@ -139,15 +139,15 @@
   }
 
   robot := gobot.Robot{
-    Connections: []<span class="keyword">interface</span>{} { spheroAdaptor },
-    Devices:     []<span class="keyword">interface</span>{} { sphero },
+    Connections: []gobot.Connection{spheroAdaptor},
+    Devices:     []gobot.Device{sphero},
     Work:        work,
   }
 
   robot.Start()
-} 
+}
 </pre>
-            <h2>Go with a Blink</h2>
+            <h2>Gobot with a Blink</h2>
             <pre class="CodeRay"><span class="keyword">package</span> main
 
 <span class="keyword">import</span> (

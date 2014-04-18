@@ -117,11 +117,17 @@
   joystick.Name = <span class="string"><span class="delimiter">"</span><span class="content">xbox360</span><span class="delimiter">"</span></span>
 
   work := <span class="keyword">func</span>() {
-    gobot.On(joystick.Events[<span class="string"><span class="delimiter">"</span><span class="content">a</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
-      fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">a</span><span class="delimiter">"</span></span>, data)
+    gobot.On(joystick.Events[<span class="string"><span class="delimiter">"</span><span class="content">a_press</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+      fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">a_press</span><span class="delimiter">"</span></span>)
     })
-    gobot.On(joystick.Events[<span class="string"><span class="delimiter">"</span><span class="content">b</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
-      fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">b</span><span class="delimiter">"</span></span>, data)
+    gobot.On(joystick.Events[<span class="string"><span class="delimiter">"</span><span class="content">a_release</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+      fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">a_release</span><span class="delimiter">"</span></span>)
+    })
+    gobot.On(joystick.Events[<span class="string"><span class="delimiter">"</span><span class="content">b_press</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+      fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">b_press</span><span class="delimiter">"</span></span>)
+    })
+    gobot.On(joystick.Events[<span class="string"><span class="delimiter">"</span><span class="content">b_release</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+      fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">b_release</span><span class="delimiter">"</span></span>)
     })
     gobot.On(joystick.Events[<span class="string"><span class="delimiter">"</span><span class="content">up</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
       fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">up</span><span class="delimiter">"</span></span>, data)

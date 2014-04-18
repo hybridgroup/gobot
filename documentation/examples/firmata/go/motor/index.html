@@ -64,31 +64,31 @@
         <div class="main" role="main">
           <section class="content full"><div class="documentation">
               <div class="example">
-                <pre class="CodeRay">package main
+                <pre class="CodeRay"><span class="keyword">package</span> main
 
-import (
-        "github.com/hybridgroup/gobot"
-        "github.com/hybridgroup/gobot-firmata"
-        "github.com/hybridgroup/gobot-gpio"
+<span class="keyword">import</span> (
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-firmata</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
 )
 
-func main() {
-        firmata := new(gobotFirmata.FirmataAdaptor)
-        firmata.Name = "firmata"
-        firmata.Port = "/dev/ttyACM0"
+<span class="keyword">func</span> main() {
+        firmata := <span class="predefined">new</span>(gobotFirmata.FirmataAdaptor)
+        firmata.Name = <span class="string"><span class="delimiter">"</span><span class="content">firmata</span><span class="delimiter">"</span></span>
+        firmata.Port = <span class="string"><span class="delimiter">"</span><span class="content">/dev/ttyACM0</span><span class="delimiter">"</span></span>
 
         motor := gobotGPIO.NewMotor(firmata)
-        motor.Name = "motor"
-        motor.SpeedPin = "3"
+        motor.Name = <span class="string"><span class="delimiter">"</span><span class="content">motor</span><span class="delimiter">"</span></span>
+        motor.SpeedPin = <span class="string"><span class="delimiter">"</span><span class="content">3</span><span class="delimiter">"</span></span>
 
-        work := func() {
-                speed := byte(0)
-                fade_amount := byte(15)
+        work := <span class="keyword">func</span>() {
+                speed := <span class="predefined-type">byte</span>(<span class="integer">0</span>)
+                fade_amount := <span class="predefined-type">byte</span>(<span class="integer">15</span>)
 
-                gobot.Every("0.1s", func() {
+                gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">0.1s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() {
                         motor.Speed(speed)
                         speed = speed + fade_amount
-                        if speed == 0 || speed == 255 {
+                        <span class="keyword">if</span> speed == <span class="integer">0</span> || speed == <span class="integer">255</span> {
                                 fade_amount = -fade_amount
                         }
                 })

@@ -64,28 +64,28 @@
         <div class="main" role="main">
           <section class="content full"><div class="documentation">
               <div class="example">
-                <pre class="CodeRay">package main
+                <pre class="CodeRay"><span class="keyword">package</span> main
 
-import (
-        "fmt"
-        "github.com/hybridgroup/gobot"
-        "github.com/hybridgroup/gobot-digispark"
-        "github.com/hybridgroup/gobot-gpio"
+<span class="keyword">import</span> (
+        <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-digispark</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
 )
 
-func main() {
+<span class="keyword">func</span> main() {
 
-        digispark := new(gobotDigispark.DigisparkAdaptor)
-        digispark.Name = "digispark"
+        digispark := <span class="predefined">new</span>(gobotDigispark.DigisparkAdaptor)
+        digispark.Name = <span class="string"><span class="delimiter">"</span><span class="content">digispark</span><span class="delimiter">"</span></span>
 
         servo := gobotGPIO.NewServo(digispark)
-        servo.Name = "servo"
-        servo.Pin = "0"
+        servo.Name = <span class="string"><span class="delimiter">"</span><span class="content">servo</span><span class="delimiter">"</span></span>
+        servo.Pin = <span class="string"><span class="delimiter">"</span><span class="content">0</span><span class="delimiter">"</span></span>
 
-        work := func() {
-                gobot.Every("1s", func() {
-                        i := uint8(gobot.Rand(180))
-                        fmt.Println("Turning", i)
+        work := <span class="keyword">func</span>() {
+                gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">1s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() {
+                        i := <span class="predefined-type">uint8</span>(gobot.Rand(<span class="integer">180</span>))
+                        fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">Turning</span><span class="delimiter">"</span></span>, i)
                         servo.Move(i)
                 })
         }

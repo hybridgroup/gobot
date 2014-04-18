@@ -7,7 +7,7 @@
 <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
 <meta name="description">
 <meta content="The Hybrid Group" name="author">
-<title>Cylon.js API</title>
+<title>Gobot API</title>
 <link href="/stylesheets/style.css" rel="stylesheet">
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><script src="/javascripts/script.js"></script><script src="/hybridpages/assets/javascript/subnav.js"></script><link href="//fonts.googleapis.com/css?family=Inconsolata:400,700%7CMontserrat:700" rel="stylesheet">
 <link href="/favicon.ico" rel="shortcut icon" type="image/gif">
@@ -57,81 +57,73 @@
       <div class="page-title">
         <div class="w">
           <h1 class="title">API</h1>
-          <h2 class="subtitle">The Cylon API provides an interface for retrieving information and communicating with the currently running robots.</h2>
+          <h2 class="subtitle">The Gobot API provides an interface for retrieving information and communicating with the currently running robots.</h2>
         </div>
       </div>
       <div class="container">
         <div class="main" role="main">
           <section class="content full"><div class="documentation">
-              <h2 id="how-to-connect">How To Connect</h2>
-              
-              <p>Now you are ready to write your own code you can access a running Cylon.js API server.</p>
-              
-              <h3 id="running-your-robot">Running your robot:</h3>
-              
-              <p>To test your code you can type this on your console:</p>
-              
-              <h4 id="javascript">Javascript</h4>
-              
-              <pre class="CodeRay">  node robotfilename.js
+              <div class="api">
+                <h2>How To Connect</h2>
+                <p>Now you're ready to write code that will let you access your robots on a Gobot API server.</p>
+                <p>Gobot includes a RESTful API to query the status of any robot running within a group, including the connection and device status, and execute device commands.</p>
+                <p>
+                  </p>
+<p>To activate the API, use the <code>Api</code> command like this:</p>
+                  
+                  <pre class="CodeRay">master := gobot.GobotMaster()
+gobot.Api(master)
 </pre>
-              
-              <h4 id="coffeescript">CoffeeScript</h4>
-              
-              <pre class="CodeRay">  coffee robotfilename.coffee
+                  
+                  <p>To specify the api port run your Gobot program with the <code>PORT</code> environment variable</p>
+                  
+                  <pre class="CodeRay">$ PORT=8080 go run gobotProgram.go
 </pre>
-              
-              <p>For example, on this code:</p>
-              
-              <h4 id="javascript-1">Javascript</h4>
-              <pre class="CodeRay"><span class="keyword">var</span> Cylon = require(<span class="string"><span class="delimiter">'</span><span class="content">..</span><span class="delimiter">'</span></span>);
+                
+                <p>
+                  In order to use the
+                  <a target="_blank" href="https://github.com/hybridgroup/robeaux">robeaux</a>
+                  AngularJS interface with Gobot you simply clone the robeaux repo and place it in the directory of your Gobot program.
+                </p>
+                <p>
+                  </p>
+<p>The robeaux assets must be in a folder called <code>robeaux</code>.</p>
+                
+                <h3>Running your robot:</h3>
+                <p>The following code example will spin up an API server:</p>
+                <pre class="CodeRay"><span class="keyword">package</span> main
 
-Cylon.robot({
-  <span class="key">connection</span>: { <span class="key">name</span>: <span class="string"><span class="delimiter">'</span><span class="content">looped</span><span class="delimiter">'</span></span>, <span class="key">adaptor</span>: <span class="string"><span class="delimiter">'</span><span class="content">loopback</span><span class="delimiter">'</span></span>},
+<span class="keyword">import</span> (  
+  <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+)
 
-  <span class="function">work</span>: <span class="keyword">function</span>() {
-    every((<span class="integer">1</span>).second(), <span class="keyword">function</span>() { Logger.info(<span class="string"><span class="delimiter">"</span><span class="content">Hello, human!</span><span class="delimiter">"</span></span>); });
-    after((<span class="integer">10</span>).seconds(), <span class="keyword">function</span>() { Logger.info(<span class="string"><span class="delimiter">"</span><span class="content">Impressive.</span><span class="delimiter">"</span></span>); });
-  }
-}).start();
+<span class="keyword">func</span> Hello(params <span class="keyword">map</span>[<span class="predefined-type">string</span>]<span class="keyword">interface</span>{}) <span class="predefined-type">string</span> {
+  name := params[<span class="string"><span class="delimiter">"</span><span class="content">name</span><span class="delimiter">"</span></span>].(<span class="predefined-type">string</span>)
+  <span class="keyword">return</span> fmt.Sprintf(<span class="string"><span class="delimiter">"</span><span class="content">hi %v</span><span class="delimiter">"</span></span>, name)
+}
+
+<span class="keyword">func</span> main() {
+  master := gobot.GobotMaster()
+  gobot.Api(master)
+
+  hello := <span class="predefined">new</span>(gobot.Robot)
+  hello.Name = <span class="string"><span class="delimiter">"</span><span class="content">hello</span><span class="delimiter">"</span></span>
+  hello.Commands = <span class="keyword">map</span>[<span class="predefined-type">string</span>]<span class="keyword">interface</span>{}{<span class="string"><span class="delimiter">"</span><span class="content">Hello</span><span class="delimiter">"</span></span>: Hello}
+
+  master.Robots = <span class="predefined">append</span>(master.Robots, *hello)
+
+  master.Start()
+}
 </pre>
-              
-              <h4 id="coffeescript-1">CoffeeScript</h4>
-              
-              <pre class="CodeRay">Cylon = require(<span class="string"><span class="delimiter">'</span><span class="content">cylon</span><span class="delimiter">'</span></span>)
-
-Cylon.robot
-  work: -&gt;
-    every <span class="integer">1</span>.second(), -&gt;
-      Logger.info(<span class="string"><span class="delimiter">"</span><span class="content">Hello, human!</span><span class="delimiter">"</span></span>)
-
-    after <span class="integer">10</span>.seconds(), -&gt;
-      Logger.info <span class="string"><span class="delimiter">"</span><span class="content">Impressive.</span><span class="delimiter">"</span></span>
-
-.start()
-</pre>
-              
-              <p><code>.start(); - .start()</code> automatically, starts the server.</p>
-              
-              <h2 id="how-to-configure">How To Configure</h2>
-              
-              <p>The Cylon.js API server, allows a configuration for your robots.</p>
-              
-              <p>You can set it up like this:</p>
-              
-              <pre class="CodeRay">  Cylon.api(host: <span class="string"><span class="delimiter">'</span><span class="content">0.0.0.0</span><span class="delimiter">'</span></span>, <span class="key">port</span>: <span class="string"><span class="delimiter">'</span><span class="content">80</span><span class="delimiter">'</span></span>)
-</pre>
-              
-              <p>Now you can run the server on the curl : <code>http://0.0.0.0:80</code>.</p>
-              
-              <h2 id="routes">Routes</h2>
-              
-              <h3 id="get-robots">GET /robots</h3>
-              
-              <p>Our first route returns all the Robots the master class knows about in JSON
-              format.</p>
-              
-              <pre class="CodeRay">[
+                
+                <p><code>robot.Start()</code> automatically starts up the API server.</p>
+                <h2>Routes</h2>
+                <h3>GET /</h3>
+                <p>This route will serve up the Angular app bundled with Gobot, which can be used to view and control your robots and devices.</p>
+                <h3>GET /robots</h3>
+                <p>Our first route returns all the Robots the master class knows about in JSON format.</p>
+                <pre class="CodeRay">[
   {
     "name": "SpheroBot",
     "connections": [
@@ -154,23 +146,22 @@ Cylon.robot
           "connection_id": 2778
         },
         "commands": [
-          "detectCollisions",
-          "roll",
-          "setColor",
-          "setRGB",
-          "stop"
+          "SetRGB",
+          "Roll",
+          "SetBackLED",
+          "Stop",
+          "SetHeading",
+          "GetRGB",
+          "SetStabilization"
         ]
       }
     ]
   }
 ]
 </pre>
-              
-              <h3 id="get-robotsrobotname">GET /robots/:robotname</h3>
-              
-              <p>Given a robot's name, returns JSON information about the requested Robot:</p>
-              
-              <pre class="CodeRay">{
+                <h3>GET /robots/:robotname</h3>
+                <p>Given a robot's name, returns JSON information about the requested Robot:</p>
+                <pre class="CodeRay">{
   "name": "SpheroBot",
   "connections": [
     {
@@ -192,23 +183,39 @@ Cylon.robot
         "connection_id": 2778
       },
       "commands": [
-        "detectCollisions",
-        "roll",
-        "setColor",
-        "setRGB",
-        "stop"
+        "SetRGB",
+        "Roll",
+        "SetBackLED",
+        "Stop",
+        "SetHeading",
+        "GetRGB",
+        "SetStabilization"
       ]
     }
   ]
 }
 </pre>
-              
-              <h3 id="get-robotsrobotnamedevices">GET /robots/:robotname/devices</h3>
-              
-              <p>Given a robot's name, returns JSON information about the devices belonging to
-              the requested Robot:</p>
-              
-              <pre class="CodeRay">[
+                <h3>GET /robots/:robotname/commands</h3>
+                <p>Given a robot's name, returns JSON information about the commands belonging to the requested Robot:</p>
+                <pre class="CodeRay">[
+  "SetRGB",
+  "Roll",
+  "SetBackLED",
+  "Stop",
+  "SetHeading",
+  "GetRGB",
+  "SetStabilization"
+]
+</pre>
+                <h3>POST /robots/:robotname/commands/:commandrobotname</h3>
+                <p>Given a robot name, commands, and command name, executes a robot's command and returns the result.</p>
+                <pre class="CodeRay">{
+  result: "successful"
+}
+</pre>
+                <h3>GET /robots/:robotname/devices</h3>
+                <p>Given a robot's name, returns JSON information about the devices belonging to the requested Robot:</p>
+                <pre class="CodeRay">[
   {
     "name": "sphero",
     "driver": "Sphero",
@@ -220,22 +227,20 @@ Cylon.robot
       "connection_id": 2778
     },
     "commands": [
-      "detectCollisions",
-      "roll",
-      "setColor",
-      "setRGB",
-      "stop"
+      "SetRGB",
+      "Roll",
+      "SetBackLED",
+      "Stop",
+      "SetHeading",
+      "GetRGB",
+      "SetStabilization"
     ]
   }
 ]
 </pre>
-              
-              <h3 id="get-robotsrobotnamedevicesdevicename">GET /robots/:robotname/devices/:devicename</h3>
-              
-              <p>Given the names of a device and the robot it belongs to, returns data on the
-              specified device.</p>
-              
-              <pre class="CodeRay">{
+                <h3>GET /robots/:robotname/devices/:devicename</h3>
+                <p>Given the names of a device and the robot it belongs to, returns data on the specified device.</p>
+                <pre class="CodeRay">{
   "name": "sphero",
   "driver": "Sphero",
   "pin": null,
@@ -246,74 +251,35 @@ Cylon.robot
     "connection_id": 2778
   },
   "commands": [
-    "detectCollisions",
-    "roll",
-    "setColor",
-    "setRGB",
-    "stop"
+    "SetRGB",
+    "Roll",
+    "SetBackLED",
+    "Stop",
+    "SetHeading",
+    "GetRGB",
+    "SetStabilization"
   ]
 }
 </pre>
-              
-              <h3 id="get-robotsrobotnamedevicesdevicenamecommands">GET /robots/:robotname/devices/:devicename/commands</h3>
-              
-              <p>Given the names of a device and the robot it belongs to, returns all commands
-              available for the specified device.</p>
-              
-              <pre class="CodeRay">[
-  "detectCollisions",
-  "roll",
-  "setColor",
-  "setRGB",
-  "stop"
+                <h3>GET /robots/:robotname/devices/:devicename/commands</h3>
+                <p>Given the names of a device and the robot it belongs to, returns all commands available for the specified device.</p>
+                <pre class="CodeRay">[
+  "SetRGB",
+  "Roll",
+  "SetBackLED",
+  "Stop",
+  "SetHeading",
+  "GetRGB",
+  "SetStabilization"
 ]
 </pre>
-              
-              <h3 id="post-robotsrobotnamedevicesdevicenamecommandscommandname">POST /robots/:robotname/devices/:devicename/commands/:commandname</h3>
-              
-              <p>Given a robot name, device name, and command name, executes a robot's command
-              and returns the result.</p>
-              
-              <pre class="CodeRay">// example pending
-</pre>
-              
-              <h3 id="get-robotsrobotnameconnections">GET /robots/:robotname/connections</h3>
-              
-              <p>Given a robot's name, returns JSON information about the connections belonging
-              to the requested Robot:</p>
-              
-              <pre class="CodeRay">[
-  {
-    "name": "sphero",
-    "port": "/dev/rfcomm0",
-    "adaptor": "Sphero",
-    "connection_id": 2778
-  }
-]
-</pre>
-              
-              <h3 id="get-robotsrobotnameconnectionsconnectionname">GET /robots/:robotname/connections/:connectionname</h3>
-              
-              <p>Given a robot's name, returns JSON information about the connections belonging
-              to the requested Robot:</p>
-              
-              <pre class="CodeRay">{
-  "name": "sphero",
-  "port": "/dev/rfcomm0",
-  "adaptor": "Sphero",
-  "connection_id": 2778
+                <h3>POST /robots/:robotname/devices/:devicename/commands/:command</h3>
+                <p>Given a robot name, device name, and command name, executes a robot's command and returns the result.</p>
+                <pre class="CodeRay">{
+  result: "successful"
 }
 </pre>
-              
-              <h3 id="get-robotsrobotnamedevicesdevicenameevents">GET /robots/:robotname/devices/:devicename/events</h3>
-              
-              <p>Routes to a Socket.IO route to handle WebSockets connections requesting updates
-              on device events.</p>
-              
-              <h3 id="wsget-events">WS_GET /events</h3>
-              
-              <p>A Socket.IO route to handle updating clients whenever a device sends
-              an 'update' event.</p>
+              </div>
             </div>
           </section>
 </div>

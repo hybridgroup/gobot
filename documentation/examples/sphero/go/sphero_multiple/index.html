@@ -64,52 +64,56 @@
         <div class="main" role="main">
           <section class="content full"><div class="documentation">
               <div class="example">
-                <pre class="CodeRay">package main
+                <pre class="CodeRay"><span class="keyword">package</span> main
 
-import (
-        "fmt"
-        "github.com/hybridgroup/gobot"
-        "github.com/hybridgroup/gobot-sphero"
+<span class="keyword">import</span> (
+        <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-sphero</span><span class="delimiter">"</span></span>
 )
 
-func main() {
+<span class="keyword">func</span> main() {
+        master := gobot.GobotMaster()
 
-        var robots []gobot.Robot
-        spheros := []string{
-                "127.0.0.1:4560",
-                "127.0.0.1:4561",
-                "127.0.0.1:4562",
-                "127.0.0.1:4563",
+        spheros := []<span class="predefined-type">string</span>{
+                <span class="string"><span class="delimiter">"</span><span class="content">/dev/rfcomm0</span><span class="delimiter">"</span></span>,
+                <span class="string"><span class="delimiter">"</span><span class="content">/dev/rfcomm1</span><span class="delimiter">"</span></span>,
+                <span class="string"><span class="delimiter">"</span><span class="content">/dev/rfcomm2</span><span class="delimiter">"</span></span>,
+                <span class="string"><span class="delimiter">"</span><span class="content">/dev/rfcomm3</span><span class="delimiter">"</span></span>,
         }
 
-        for s := range spheros {
-                spheroAdaptor := new(gobotSphero.SpheroAdaptor)
-                spheroAdaptor.Name = "Sphero"
+        <span class="keyword">for</span> s := <span class="keyword">range</span> spheros {
+                spheroAdaptor := <span class="predefined">new</span>(gobotSphero.SpheroAdaptor)
+                spheroAdaptor.Name = <span class="string"><span class="delimiter">"</span><span class="content">Sphero</span><span class="delimiter">"</span></span>
                 spheroAdaptor.Port = spheros[s]
 
                 sphero := gobotSphero.NewSphero(spheroAdaptor)
-                sphero.Name = "Sphero" + spheros[s]
-                sphero.Interval = "0.5s"
+                sphero.Name = <span class="string"><span class="delimiter">"</span><span class="content">Sphero</span><span class="delimiter">"</span></span> + spheros[s]
+                sphero.Interval = <span class="string"><span class="delimiter">"</span><span class="content">0.5s</span><span class="delimiter">"</span></span>
 
-                work := func() {
+                work := <span class="keyword">func</span>() {
                         sphero.Stop()
 
-                        gobot.On(sphero.Events["Collision"], func(data interface{}) {
-                                fmt.Println("Collision Detected!")
+                        gobot.On(sphero.Events[<span class="string"><span class="delimiter">"</span><span class="content">Collision</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+                                fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">Collision Detected!</span><span class="delimiter">"</span></span>)
                         })
 
-                        gobot.Every("1s", func() {
-                                sphero.Roll(100, uint16(gobot.Random(0, 360)))
+                        gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">1s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() {
+                                sphero.Roll(<span class="integer">100</span>, <span class="predefined-type">uint16</span>(gobot.Rand(<span class="integer">360</span>)))
                         })
-                        gobot.Every("3s", func() {
-                                sphero.SetRGB(uint8(gobot.Random(0, 255)), uint8(gobot.Random(0, 255)), uint8(gobot.Random(0, 255)))
+                        gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">3s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() {
+                                sphero.SetRGB(<span class="predefined-type">uint8</span>(gobot.Rand(<span class="integer">255</span>)), <span class="predefined-type">uint8</span>(gobot.Rand(<span class="integer">255</span>)), <span class="predefined-type">uint8</span>(gobot.Rand(<span class="integer">255</span>)))
                         })
                 }
 
-                robots = append(robots, gobot.Robot{Connections: []interface{}{spheroAdaptor}, Devices: []interface{}{sphero}, Work: work})
+                master.Robots = <span class="predefined">append</span>(master.Robots, &amp;gobot.Robot{
+                        Connections: []gobot.Connection{spheroAdaptor},
+                        Devices:     []gobot.Device{sphero},
+                        Work:        work,
+                })
         }
 
-        gobot.Work(robots)
+        master.Start()
 }
 </pre>
               </div>

@@ -1,0 +1,297 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+<meta content="Gobot Helpers" name="description">
+<meta content="The Hybrid Group" name="author">
+<title>Helpers</title>
+<link href="/stylesheets/style.css" rel="stylesheet">
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><script src="/javascripts/script.js"></script><script src="/hybridpages/assets/javascript/subnav.js"></script><link href="//fonts.googleapis.com/css?family=Inconsolata:400,700%7CMontserrat:700" rel="stylesheet">
+<link href="/favicon.ico" rel="shortcut icon" type="image/gif">
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+
+  _gaq.push(['_setAccount', "UA-46433484-3"]);
+
+
+
+
+
+
+
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script></head>
+<body>
+    
+    <div class="app">
+      <div class="w">
+        <header class="app-header" role="banner"><div class="display">
+            <h1 class="app-logo">
+              <a href="/">Gobot</a>
+            </h1>
+            <span class="subtitle">
+              <div class="main"></div>
+            </span>
+          </div>
+          <span class="menu">
+            <a href="/documentation" class="item">Docs</a>
+            <a href="/documentation/platforms" class="item">Platforms</a>
+            
+            <a href="/blog" class="item">Blog</a>
+            <a class="item" target="blanck" href="https://github.com/hybridgroup/gobot/">Github</a>
+          </span>
+        </header>
+</div>
+      <div class="page-title">
+        <div class="w">
+          <h1 class="title">Helpers</h1>
+          <h2 class="subtitle">Some helpful utility functions</h2>
+        </div>
+      </div>
+      <div class="container">
+        <div class="main" role="main">
+          <section class="content full"><div class="documentation">
+              <h2 id="everyinterval-string-action-func">Every(interval string, action func())</h2>
+              
+              <p>Function to start a goroutine that repeatedly executes at a specific interval of time.</p>
+              
+              <ul>
+<li>
+<strong>interval</strong> - string - interval to run action on, valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".</li>
+                <li>
+<strong>action</strong> - func() - action to perform on interval</li>
+              </ul>
+<h3 id="examples">Examples:</h3>
+              
+              <pre class="CodeRay">gobot.Every("0.5s", func() { fmt.Println("Greetings human") })
+</pre>
+              
+              <h2 id="afterinterval-string-action-func">After(interval string, action func())</h2>
+              
+              <p>Function to start a goroutine that executes after waiting a specified interval of time.</p>
+              
+              <ul>
+<li>
+<strong>interval</strong> - string - interval to run action on, valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".</li>
+                <li>
+<strong>action</strong> - func() - action to perform on interval</li>
+              </ul>
+<h3 id="examples-1">Examples:</h3>
+              
+              <pre class="CodeRay">gobot.After("0.5s", func() { fmt.Println("Greetings human") })
+</pre>
+              
+              <h2 id="publishc-chan-interface-val-interface">Publish(c chan interface{}, val interface{})</h2>
+              
+              <p>Sends c &lt;- val, does not block if c has a full buffer</p>
+              
+              <ul>
+<li>
+<strong>c</strong> - chan interface{} - channel to send to</li>
+                <li>
+<strong>val</strong> - interface{} - value to send to channel</li>
+              </ul>
+<h3 id="examples-2">Examples:</h3>
+              
+              <pre class="CodeRay">gobot.Publish(channel, data)
+</pre>
+              
+              <h2 id="onc-chan-interface-f-funcs-interface">On(c chan interface{}, f func(s interface{}))</h2>
+              
+              <p>Executes function f with the value of channel c when channel c has data</p>
+              
+              <ul>
+<li>
+<strong>c</strong> - chan interface{} - channel to read from </li>
+                <li>
+<strong>f</strong> - func(s interface{}) - function to execute with the contents of channel c</li>
+              </ul>
+<h3 id="examples-3">Examples:</h3>
+              
+              <pre class="CodeRay">gobot.On(channel, func(data interface{}) {
+  fmt.Println(data)
+})
+...
+</pre>
+              
+              <h2 id="randmax-int-int">Rand(max int) int</h2>
+              
+              <p>Generates a random int with the supplied max</p>
+              
+              <ul>
+<li>
+<strong>max</strong> - int - Maximum number in random number generation </li>
+              </ul>
+<p>Returns a random int</p>
+              
+              <h3 id="examples-4">Examples:</h3>
+              
+              <pre class="CodeRay">i := gobot.Rand(100)
+</pre>
+              
+              <h2 id="connecttotcpport-string-ioreadwritecloser">ConnectToTcp(port string) io.ReadWriteCloser</h2>
+              
+              <p>Connects to the specified tcp port</p>
+              
+              <ul>
+<li>
+<strong>port</strong> - string - address of tcp port to connect to </li>
+              </ul>
+<p>Returns a tcp connection</p>
+              
+              <h3 id="examples-5">Examples:</h3>
+              
+              <pre class="CodeRay">tcpPort := gobot.ConnectToTcp("127.0.0.1:4567")
+</pre>
+              
+              <h2 id="connecttoserialport-string-baud-int-ioreadwritecloser">ConnectToSerial(port string, baud int) io.ReadWriteCloser</h2>
+              
+              <p>Connects to the specified serial port with baud rate</p>
+              
+              <ul>
+<li>
+<strong>port</strong> - string - address of serial port to connect to </li>
+                <li>
+<strong>baud</strong> - int - the baud rate of the serial port</li>
+              </ul>
+<p>Returns a serial connection</p>
+              
+              <h3 id="examples-6">Examples:</h3>
+              
+              <pre class="CodeRay">serialPort := gobot.ConnectToSerial("/dev/ttyACM0", 115200)
+</pre>
+              
+              <h2 id="isurlurl-string-bool">IsUrl(url string) bool</h2>
+              
+              <p>Determins if the string is a url</p>
+              
+              <ul>
+<li>
+<strong>url</strong> - string - String to be checked </li>
+              </ul>
+<p>Returns true if the string is a url</p>
+              
+              <h3 id="examples-7">Examples:</h3>
+              
+              <pre class="CodeRay">if gobot.IsUrl("https://www.google.com") {
+  fmt.Println("Its a url!")
+}
+</pre>
+              
+              <h2 id="callthing-interface-method-string-params-interface-reflectvalue">Call(thing interface{}, method string, params …interface{}) []reflect.Value</h2>
+              
+              <p>Calls the specific interface method with the provided params</p>
+              
+              <ul>
+<li>
+<strong>thing</strong> - interface{} - The interface to call the method on </li>
+                <li>
+<strong>method</strong> - string - The name of the method to call</li>
+                <li>
+<strong>params</strong> - …interface{} - The params to pass to the method </li>
+              </ul>
+<p>Returns []reflect.Value</p>
+              
+              <h3 id="examples-8">Examples:</h3>
+              
+              <pre class="CodeRay">return := gobot.Call(myStruct, "MyFunction", param1, param2, param3)
+</pre>
+              
+              <h2 id="fieldbynamething-interface-field-string-reflectvalue">FieldByName(thing interface{}, field string) reflect.Value</h2>
+              
+              <p>Returns the value of the the specified interfaces field</p>
+              
+              <ul>
+<li>
+<strong>thing</strong> - interface{} - The interface for which the field resides</li>
+                <li>
+<strong>field</strong> - string - The field to return</li>
+              </ul>
+<p>Returns a reflect.Value of the field </p>
+              
+              <h3 id="examples-9">Examples:</h3>
+              
+              <pre class="CodeRay">val := gobot.FieldByName(myRect, "width")
+</pre>
+              
+              <h2 id="fieldbynameptrthing-interface-field-string">FieldByNamePtr(thing interface{}, field string)</h2>
+              
+              <p>Returns the value of the the specified interfaces field if the interface is a pointer</p>
+              
+              <ul>
+<li>
+<strong>thing</strong> - interface{} - The interface for which the field resides</li>
+                <li>
+<strong>field</strong> - string - The field to return</li>
+              </ul>
+<p>Returns a reflect.Value of the field </p>
+              
+              <h3 id="examples-10">Examples:</h3>
+              
+              <pre class="CodeRay">val := gobot.FieldByNamePtr(myRect, "width")
+</pre>
+              
+              <h2 id="fromscaleinput-min-max-float64-float64">FromScale(input, min, max float64) float64</h2>
+              
+              <p>Converts input from min, max scale to 0.0…1.0</p>
+              
+              <ul>
+<li>
+<strong>input</strong> - float64 - Number to Convert </li>
+                <li>
+<strong>min</strong> - float64 - Min number in scale </li>
+                <li>
+<strong>max</strong> - float64 - Max number in scale</li>
+              </ul>
+<p>Returns a float64 representing the scaled value</p>
+              
+              <h3 id="examples-11">Examples:</h3>
+              
+              <pre class="CodeRay">i := gobot.FromScale(100.0, 1.0, 10.0)
+</pre>
+              
+              <h2 id="toscaleinput-min-max-float64-float64">ToScale(input, min, max float64) float64</h2>
+              
+              <p>Converts input from 0…1 to min…max scale </p>
+              
+              <ul>
+<li>
+<strong>input</strong> - float64 - Number to Convert </li>
+                <li>
+<strong>min</strong> - float64 - Min number in scale </li>
+                <li>
+<strong>max</strong> - float64 - Max number in scale</li>
+              </ul>
+<p>Returns a float64 representing the scaled value</p>
+              
+              <h3 id="examples-12">Examples:</h3>
+              
+              <pre class="CodeRay">i := gobot.ToScale(0.2, 10.0, 100.0)
+</pre>
+            </div>
+          </section>
+</div>
+      </div>
+    </div>
+    <footer class="app-footer"><div class="w">
+        <div class="copyright">
+          © Copyright 2012-2014
+          <a href="http://hybridgroup.com" id="THG-logo" target="_blank">
+            <img alt="The Hybrid Group" src="/images/elements/THG_logo.png"></a>
+        </div>
+      </div>
+    </footer>
+</body>
+</html>

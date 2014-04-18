@@ -82,49 +82,49 @@
                 </div>
                 <div class="clear"></div>
               </section><section class="how-to" id="HowToInstall"><h2>How To Install</h2>
-                <p>Installing cylon.js with Neurosky support is pretty easy.</p>
-                <pre class="CodeRay">go get path/to/repo/gobot-neurosky
+                <p>Installing Gobot with Neurosky support is pretty easy.</p>
+                <pre class="CodeRay">go get github.com/hybridgroup/gobot-neurosky
 </pre>
               </section><section class="how-to" id="HowToUse"><h2>How To Use</h2>
                 <p>This small program let you connect the Neurosky an load data.</p>
-                <pre class="CodeRay"><span class="reserved">package</span> main
+                <pre class="CodeRay"><span class="keyword">package</span> main
 
-<span class="reserved">import</span> (
+<span class="keyword">import</span> (
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-neurosky</span><span class="delimiter">"</span></span>
   <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
 )
 
-func main() {
+<span class="keyword">func</span> main() {
 
-  <span class="key">adaptor</span> := <span class="keyword">new</span>(gobotNeurosky.NeuroskyAdaptor)
+  adaptor := <span class="predefined">new</span>(gobotNeurosky.NeuroskyAdaptor)
   adaptor.Name = <span class="string"><span class="delimiter">"</span><span class="content">neurosky</span><span class="delimiter">"</span></span>
   adaptor.Port = <span class="string"><span class="delimiter">"</span><span class="content">/dev/rfcomm0</span><span class="delimiter">"</span></span>
 
   neuro := gobotNeurosky.NewNeurosky(adaptor)
   neuro.Name = <span class="string"><span class="delimiter">"</span><span class="content">neuro</span><span class="delimiter">"</span></span>
 
-  work := func() {
-    gobot.On(neuro.Events[<span class="string"><span class="delimiter">"</span><span class="content">Extended</span><span class="delimiter">"</span></span>], func(data <span class="reserved">interface</span>{}) {
+  work := <span class="keyword">func</span>() {
+    gobot.On(neuro.Events[<span class="string"><span class="delimiter">"</span><span class="content">Extended</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
       fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">Extended</span><span class="delimiter">"</span></span>, data)
     })
-    gobot.On(neuro.Events[<span class="string"><span class="delimiter">"</span><span class="content">Signal</span><span class="delimiter">"</span></span>], func(data <span class="reserved">interface</span>{}) {
+    gobot.On(neuro.Events[<span class="string"><span class="delimiter">"</span><span class="content">Signal</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
       fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">Signal</span><span class="delimiter">"</span></span>, data)
     })
-    gobot.On(neuro.Events[<span class="string"><span class="delimiter">"</span><span class="content">Attention</span><span class="delimiter">"</span></span>], func(data <span class="reserved">interface</span>{}) {
+    gobot.On(neuro.Events[<span class="string"><span class="delimiter">"</span><span class="content">Attention</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
       fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">Attention</span><span class="delimiter">"</span></span>, data)
     })
-    gobot.On(neuro.Events[<span class="string"><span class="delimiter">"</span><span class="content">Meditation</span><span class="delimiter">"</span></span>], func(data <span class="reserved">interface</span>{}) {
+    gobot.On(neuro.Events[<span class="string"><span class="delimiter">"</span><span class="content">Meditation</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
       fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">Meditation</span><span class="delimiter">"</span></span>, data)
     })
-    gobot.On(neuro.Events[<span class="string"><span class="delimiter">"</span><span class="content">Blink</span><span class="delimiter">"</span></span>], func(data <span class="reserved">interface</span>{}) {
+    gobot.On(neuro.Events[<span class="string"><span class="delimiter">"</span><span class="content">Blink</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
       fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">Blink</span><span class="delimiter">"</span></span>, data)
     })
-    gobot.On(neuro.Events[<span class="string"><span class="delimiter">"</span><span class="content">Wave</span><span class="delimiter">"</span></span>], func(data <span class="reserved">interface</span>{}) {
+    gobot.On(neuro.Events[<span class="string"><span class="delimiter">"</span><span class="content">Wave</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
       fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">Wave</span><span class="delimiter">"</span></span>, data)
     })
-    gobot.On(neuro.Events[<span class="string"><span class="delimiter">"</span><span class="content">EEG</span><span class="delimiter">"</span></span>], func(data <span class="reserved">interface</span>{}) {
-      <span class="key">eeg</span> := data.(gobotNeurosky.EEG)
+    gobot.On(neuro.Events[<span class="string"><span class="delimiter">"</span><span class="content">EEG</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+      eeg := data.(gobotNeurosky.EEG)
       fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">Delta</span><span class="delimiter">"</span></span>, eeg.Delta)
       fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">Theta</span><span class="delimiter">"</span></span>, eeg.Theta)
       fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">LoAlpha</span><span class="delimiter">"</span></span>, eeg.LoAlpha)
@@ -138,9 +138,9 @@ func main() {
   }
 
   robot := gobot.Robot{
-    <span class="key">Connections</span>: []gobot.Connection{adaptor},
-    <span class="key">Devices</span>:     []gobot.Device{neuro},
-    <span class="key">Work</span>:        work,
+    Connections: []gobot.Connection{adaptor},
+    Devices:     []gobot.Device{neuro},
+    Work:        work,
   }
 
   robot.Start()

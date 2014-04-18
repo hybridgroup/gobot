@@ -97,7 +97,7 @@
 ...
 </pre>
               </section><section class="how-to" id="HowToUse"><h2>How To Use</h2>
-                <h3>Example receiving message events from a Leap Motion.</h3>
+                <h3>Example receiving hand events from a Leap Motion.</h3>
                 <pre class="CodeRay"><span class="keyword">package</span> main
 
 <span class="keyword">import</span> (
@@ -116,7 +116,7 @@
 
   work := <span class="keyword">func</span>() {
     gobot.On(leap.Events[<span class="string"><span class="delimiter">"</span><span class="content">Message</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
-      fmt.Println(data)
+      printHands(data.(gobotLeap.LeapFrame))
     })
   }
 
@@ -127,6 +127,12 @@
   }
 
   robot.Start()
+}
+
+<span class="keyword">func</span> printHands(frame gobotLeap.LeapFrame) {
+  <span class="keyword">for</span> key, hand := <span class="keyword">range</span> frame.Hands {
+    fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">Hand</span><span class="delimiter">"</span></span>, key, hand)
+  }
 }
 </pre>
               </section><section class="public-methods"><div class="commands-api" id="Commands">

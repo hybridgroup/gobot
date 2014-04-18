@@ -64,36 +64,35 @@
         <div class="main" role="main">
           <section class="content full"><div class="documentation">
               <div class="example">
-                <pre class="CodeRay">package main
+                <pre class="CodeRay"><span class="keyword">package</span> main
 
-import (
-        "fmt"
-        "github.com/hybridgroup/gobot"
-        "github.com/hybridgroup/gobot-sphero"
+<span class="keyword">import</span> (
+        <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-sphero</span><span class="delimiter">"</span></span>
 )
 
-func main() {
-
-        spheroAdaptor := new(gobotSphero.SpheroAdaptor)
-        spheroAdaptor.Name = "Sphero"
-        spheroAdaptor.Port = "/dev/rfcomm0"
+<span class="keyword">func</span> main() {
+        spheroAdaptor := <span class="predefined">new</span>(gobotSphero.SpheroAdaptor)
+        spheroAdaptor.Name = <span class="string"><span class="delimiter">"</span><span class="content">Sphero</span><span class="delimiter">"</span></span>
+        spheroAdaptor.Port = <span class="string"><span class="delimiter">"</span><span class="content">/dev/rfcomm0</span><span class="delimiter">"</span></span>
 
         sphero := gobotSphero.NewSphero(spheroAdaptor)
-        sphero.Name = "sphero"
+        sphero.Name = <span class="string"><span class="delimiter">"</span><span class="content">sphero</span><span class="delimiter">"</span></span>
 
-        work := func() {
-                gobot.On(sphero.Events["Collision"], func(data interface{}) {
-                        fmt.Println("Collision Detected!")
+        work := <span class="keyword">func</span>() {
+                gobot.On(sphero.Events[<span class="string"><span class="delimiter">"</span><span class="content">Collision</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+                        fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">Collision Detected!</span><span class="delimiter">"</span></span>)
                 })
 
-                gobot.Every("3s", func() {
-                        sphero.Roll(30, uint16(gobot.Rand(360)))
+                gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">3s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() {
+                        sphero.Roll(<span class="integer">30</span>, <span class="predefined-type">uint16</span>(gobot.Rand(<span class="integer">360</span>)))
                 })
 
-                gobot.Every("1s", func() {
-                        r := uint8(gobot.Rand(255))
-                        g := uint8(gobot.Rand(255))
-                        b := uint8(gobot.Rand(255))
+                gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">1s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() {
+                        r := <span class="predefined-type">uint8</span>(gobot.Rand(<span class="integer">255</span>))
+                        g := <span class="predefined-type">uint8</span>(gobot.Rand(<span class="integer">255</span>))
+                        b := <span class="predefined-type">uint8</span>(gobot.Rand(<span class="integer">255</span>))
                         sphero.SetRGB(r, g, b)
                 })
         }

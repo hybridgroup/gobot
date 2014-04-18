@@ -64,31 +64,31 @@
         <div class="main" role="main">
           <section class="content full"><div class="documentation">
               <div class="example">
-                <pre class="CodeRay">package main
+                <pre class="CodeRay"><span class="keyword">package</span> main
 
-import (
-        "github.com/hybridgroup/gobot"
-        "github.com/hybridgroup/gobot-firmata"
-        "github.com/hybridgroup/gobot-gpio"
+<span class="keyword">import</span> (
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-firmata</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
 )
 
-func main() {
-        firmata := new(gobotFirmata.FirmataAdaptor)
-        firmata.Name = "firmata"
-        firmata.Port = "/dev/ttyACM0"
+<span class="keyword">func</span> main() {
+        firmata := <span class="predefined">new</span>(gobotFirmata.FirmataAdaptor)
+        firmata.Name = <span class="string"><span class="delimiter">"</span><span class="content">firmata</span><span class="delimiter">"</span></span>
+        firmata.Port = <span class="string"><span class="delimiter">"</span><span class="content">/dev/ttyACM0</span><span class="delimiter">"</span></span>
 
         led := gobotGPIO.NewLed(firmata)
-        led.Name = "led"
-        led.Pin = "3"
+        led.Name = <span class="string"><span class="delimiter">"</span><span class="content">led</span><span class="delimiter">"</span></span>
+        led.Pin = <span class="string"><span class="delimiter">"</span><span class="content">3</span><span class="delimiter">"</span></span>
 
-        work := func() {
-                brightness := uint8(0)
-                fade_amount := uint8(15)
+        work := <span class="keyword">func</span>() {
+                brightness := <span class="predefined-type">uint8</span>(<span class="integer">0</span>)
+                fade_amount := <span class="predefined-type">uint8</span>(<span class="integer">15</span>)
 
-                gobot.Every("0.1s", func() {
+                gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">0.1s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() {
                         led.Brightness(brightness)
                         brightness = brightness + fade_amount
-                        if brightness == 0 || brightness == 255 {
+                        <span class="keyword">if</span> brightness == <span class="integer">0</span> || brightness == <span class="integer">255</span> {
                                 fade_amount = -fade_amount
                         }
                 })

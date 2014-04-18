@@ -64,25 +64,25 @@
         <div class="main" role="main">
           <section class="content full"><div class="documentation">
               <div class="example">
-                <pre class="CodeRay">package main
+                <pre class="CodeRay"><span class="keyword">package</span> main
 
-import (
-        "github.com/hybridgroup/gobot"
-        "github.com/hybridgroup/gobot-digispark"
-        "github.com/hybridgroup/gobot-gpio"
+<span class="keyword">import</span> (
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-digispark</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
 )
 
-func main() {
+<span class="keyword">func</span> main() {
 
-        digispark := new(gobotDigispark.DigisparkAdaptor)
-        digispark.Name = "Digispark"
+        digispark := <span class="predefined">new</span>(gobotDigispark.DigisparkAdaptor)
+        digispark.Name = <span class="string"><span class="delimiter">"</span><span class="content">Digispark</span><span class="delimiter">"</span></span>
 
         led := gobotGPIO.NewLed(digispark)
-        led.Name = "led"
-        led.Pin = "0"
+        led.Name = <span class="string"><span class="delimiter">"</span><span class="content">led</span><span class="delimiter">"</span></span>
+        led.Pin = <span class="string"><span class="delimiter">"</span><span class="content">0</span><span class="delimiter">"</span></span>
 
-        work := func() {
-                gobot.Every("0.5s", func() {
+        work := <span class="keyword">func</span>() {
+                gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">0.5s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() {
                         led.Toggle()
                 })
         }

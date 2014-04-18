@@ -64,27 +64,27 @@
         <div class="main" role="main">
           <section class="content full"><div class="documentation">
               <div class="example">
-                <pre class="CodeRay">package main
+                <pre class="CodeRay"><span class="keyword">package</span> main
 
-import (
-        "github.com/hybridgroup/gobot"
-        "github.com/hybridgroup/gobot-digispark"
-        "github.com/hybridgroup/gobot-gpio"
+<span class="keyword">import</span> (
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-digispark</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
 )
 
-func main() {
+<span class="keyword">func</span> main() {
         master := gobot.GobotMaster()
         gobot.Api(master)
 
-        digispark := new(gobotDigispark.DigisparkAdaptor)
-        digispark.Name = "digispark"
+        digispark := <span class="predefined">new</span>(gobotDigispark.DigisparkAdaptor)
+        digispark.Name = <span class="string"><span class="delimiter">"</span><span class="content">digispark</span><span class="delimiter">"</span></span>
 
         led := gobotGPIO.NewLed(digispark)
-        led.Name = "led"
-        led.Pin = "0"
+        led.Name = <span class="string"><span class="delimiter">"</span><span class="content">led</span><span class="delimiter">"</span></span>
+        led.Pin = <span class="string"><span class="delimiter">"</span><span class="content">0</span><span class="delimiter">"</span></span>
 
-        master.Robots = append(master.Robots, gobot.Robot{
-                Name:        "digispark",
+        master.Robots = <span class="predefined">append</span>(master.Robots, &amp;gobot.Robot{
+                Name:        <span class="string"><span class="delimiter">"</span><span class="content">digispark</span><span class="delimiter">"</span></span>,
                 Connections: []gobot.Connection{digispark},
                 Devices:     []gobot.Device{led},
         })

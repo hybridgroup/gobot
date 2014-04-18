@@ -64,93 +64,93 @@
         <div class="main" role="main">
           <section class="content full"><div class="documentation">
               <div class="example">
-                <pre class="CodeRay">package main
+                <pre class="CodeRay"><span class="keyword">package</span> main
 
-import (
-        "encoding/json"
-        "fmt"
-        "github.com/hybridgroup/gobot"
-        "github.com/hybridgroup/gobot-firmata"
-        "github.com/hybridgroup/gobot-gpio"
-        "io/ioutil"
-        "net/http"
+<span class="keyword">import</span> (
+        <span class="string"><span class="delimiter">"</span><span class="content">encoding/json</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-firmata</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">io/ioutil</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">net/http</span><span class="delimiter">"</span></span>
 )
 
-type TravisResponse struct {
-        ID                  int    `json:"id"`
-        Slug                string `json:"slug"`
-        Description         string `json:"description"`
-        PublicKey           string `json:"public_key"`
-        LastBuildID         int    `json:"last_build_id"`
-        LastBuildNumber     string `json:"last_build_number"`
-        LastBuildStatus     int    `json:"last_build_status"`
-        LastBuildResult     int    `json:"last_build_result"`
-        LastBuildDuration   int    `json:"last_build_duration"`
-        LastBuildLanguage   string `json:"last_build_language"`
-        LastBuildStartedAt  string `json:"last_build_started_at"`
-        LastBuildFinishedAt string `json:"last_build_finished_at"`
+<span class="keyword">type</span> TravisResponse <span class="keyword">struct</span> {
+        ID                  <span class="predefined-type">int</span>    <span class="shell"><span class="delimiter">`</span><span class="content">json:"id"</span><span class="delimiter">`</span></span>
+        Slug                <span class="predefined-type">string</span> <span class="shell"><span class="delimiter">`</span><span class="content">json:"slug"</span><span class="delimiter">`</span></span>
+        Description         <span class="predefined-type">string</span> <span class="shell"><span class="delimiter">`</span><span class="content">json:"description"</span><span class="delimiter">`</span></span>
+        PublicKey           <span class="predefined-type">string</span> <span class="shell"><span class="delimiter">`</span><span class="content">json:"public_key"</span><span class="delimiter">`</span></span>
+        LastBuildID         <span class="predefined-type">int</span>    <span class="shell"><span class="delimiter">`</span><span class="content">json:"last_build_id"</span><span class="delimiter">`</span></span>
+        LastBuildNumber     <span class="predefined-type">string</span> <span class="shell"><span class="delimiter">`</span><span class="content">json:"last_build_number"</span><span class="delimiter">`</span></span>
+        LastBuildStatus     <span class="predefined-type">int</span>    <span class="shell"><span class="delimiter">`</span><span class="content">json:"last_build_status"</span><span class="delimiter">`</span></span>
+        LastBuildResult     <span class="predefined-type">int</span>    <span class="shell"><span class="delimiter">`</span><span class="content">json:"last_build_result"</span><span class="delimiter">`</span></span>
+        LastBuildDuration   <span class="predefined-type">int</span>    <span class="shell"><span class="delimiter">`</span><span class="content">json:"last_build_duration"</span><span class="delimiter">`</span></span>
+        LastBuildLanguage   <span class="predefined-type">string</span> <span class="shell"><span class="delimiter">`</span><span class="content">json:"last_build_language"</span><span class="delimiter">`</span></span>
+        LastBuildStartedAt  <span class="predefined-type">string</span> <span class="shell"><span class="delimiter">`</span><span class="content">json:"last_build_started_at"</span><span class="delimiter">`</span></span>
+        LastBuildFinishedAt <span class="predefined-type">string</span> <span class="shell"><span class="delimiter">`</span><span class="content">json:"last_build_finished_at"</span><span class="delimiter">`</span></span>
 }
 
-func resetLeds(robot *gobot.Robot) {
-        gobot.Call(robot.GetDevice("red").Driver, "Off")
-        gobot.Call(robot.GetDevice("green").Driver, "Off")
-        gobot.Call(robot.GetDevice("blue").Driver, "Off")
+<span class="keyword">func</span> resetLeds(robot *gobot.Robot) {
+        gobot.Call(robot.GetDevice(<span class="string"><span class="delimiter">"</span><span class="content">red</span><span class="delimiter">"</span></span>).Driver, <span class="string"><span class="delimiter">"</span><span class="content">Off</span><span class="delimiter">"</span></span>)
+        gobot.Call(robot.GetDevice(<span class="string"><span class="delimiter">"</span><span class="content">green</span><span class="delimiter">"</span></span>).Driver, <span class="string"><span class="delimiter">"</span><span class="content">Off</span><span class="delimiter">"</span></span>)
+        gobot.Call(robot.GetDevice(<span class="string"><span class="delimiter">"</span><span class="content">blue</span><span class="delimiter">"</span></span>).Driver, <span class="string"><span class="delimiter">"</span><span class="content">Off</span><span class="delimiter">"</span></span>)
 }
 
-func checkTravis(robot *gobot.Robot) {
+<span class="keyword">func</span> checkTravis(robot *gobot.Robot) {
         resetLeds(robot)
-        user := "hybridgroup"
-        name := "gobot"
-        //name := "broken-arrow"
-        fmt.Printf("Checking repo %s/%s\n", user, name)
-        gobot.Call(robot.GetDevice("blue").Driver, "On")
-        resp, err := http.Get(fmt.Sprintf("https://api.travis-ci.org/repos/%s/%s.json", user, name))
-        defer resp.Body.Close()
-        if err != nil {
-                panic(err)
+        user := <span class="string"><span class="delimiter">"</span><span class="content">hybridgroup</span><span class="delimiter">"</span></span>
+        name := <span class="string"><span class="delimiter">"</span><span class="content">gobot</span><span class="delimiter">"</span></span>
+        <span class="comment">//name := "broken-arrow"</span>
+        fmt.Printf(<span class="string"><span class="delimiter">"</span><span class="content">Checking repo %s/%s</span><span class="char">\n</span><span class="delimiter">"</span></span>, user, name)
+        gobot.Call(robot.GetDevice(<span class="string"><span class="delimiter">"</span><span class="content">blue</span><span class="delimiter">"</span></span>).Driver, <span class="string"><span class="delimiter">"</span><span class="content">On</span><span class="delimiter">"</span></span>)
+        resp, err := http.Get(fmt.Sprintf(<span class="string"><span class="delimiter">"</span><span class="content">https://api.travis-ci.org/repos/%s/%s.json</span><span class="delimiter">"</span></span>, user, name))
+        <span class="keyword">defer</span> resp.Body.Close()
+        <span class="keyword">if</span> err != <span class="predefined-constant">nil</span> {
+                <span class="predefined">panic</span>(err)
         }
         body, err := ioutil.ReadAll(resp.Body)
-        if err != nil {
-                panic(err)
+        <span class="keyword">if</span> err != <span class="predefined-constant">nil</span> {
+                <span class="predefined">panic</span>(err)
         }
-        var travis TravisResponse
+        <span class="keyword">var</span> travis TravisResponse
         json.Unmarshal(body, &amp;travis)
         resetLeds(robot)
-        if travis.LastBuildStatus == 0 {
-                gobot.Call(robot.GetDevice("green").Driver, "On")
-        } else {
-                gobot.Call(robot.GetDevice("red").Driver, "On")
+        <span class="keyword">if</span> travis.LastBuildStatus == <span class="integer">0</span> {
+                gobot.Call(robot.GetDevice(<span class="string"><span class="delimiter">"</span><span class="content">green</span><span class="delimiter">"</span></span>).Driver, <span class="string"><span class="delimiter">"</span><span class="content">On</span><span class="delimiter">"</span></span>)
+        } <span class="keyword">else</span> {
+                gobot.Call(robot.GetDevice(<span class="string"><span class="delimiter">"</span><span class="content">red</span><span class="delimiter">"</span></span>).Driver, <span class="string"><span class="delimiter">"</span><span class="content">On</span><span class="delimiter">"</span></span>)
         }
 }
 
-func main() {
+<span class="keyword">func</span> main() {
         master := gobot.GobotMaster()
 
-        firmata := new(gobotFirmata.FirmataAdaptor)
-        firmata.Name = "firmata"
-        firmata.Port = "/dev/ttyACM0"
+        firmata := <span class="predefined">new</span>(gobotFirmata.FirmataAdaptor)
+        firmata.Name = <span class="string"><span class="delimiter">"</span><span class="content">firmata</span><span class="delimiter">"</span></span>
+        firmata.Port = <span class="string"><span class="delimiter">"</span><span class="content">/dev/ttyACM0</span><span class="delimiter">"</span></span>
 
         red := gobotGPIO.NewLed(firmata)
-        red.Name = "red"
-        red.Pin = "7"
+        red.Name = <span class="string"><span class="delimiter">"</span><span class="content">red</span><span class="delimiter">"</span></span>
+        red.Pin = <span class="string"><span class="delimiter">"</span><span class="content">7</span><span class="delimiter">"</span></span>
 
         green := gobotGPIO.NewLed(firmata)
-        green.Name = "green"
-        green.Pin = "6"
+        green.Name = <span class="string"><span class="delimiter">"</span><span class="content">green</span><span class="delimiter">"</span></span>
+        green.Pin = <span class="string"><span class="delimiter">"</span><span class="content">6</span><span class="delimiter">"</span></span>
 
         blue := gobotGPIO.NewLed(firmata)
-        blue.Name = "blue"
-        blue.Pin = "5"
+        blue.Name = <span class="string"><span class="delimiter">"</span><span class="content">blue</span><span class="delimiter">"</span></span>
+        blue.Pin = <span class="string"><span class="delimiter">"</span><span class="content">5</span><span class="delimiter">"</span></span>
 
-        work := func() {
-                checkTravis(master.FindRobot("travis"))
-                gobot.Every("10s", func() {
-                        checkTravis(master.FindRobot("travis"))
+        work := <span class="keyword">func</span>() {
+                checkTravis(master.FindRobot(<span class="string"><span class="delimiter">"</span><span class="content">travis</span><span class="delimiter">"</span></span>))
+                gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">10s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() {
+                        checkTravis(master.FindRobot(<span class="string"><span class="delimiter">"</span><span class="content">travis</span><span class="delimiter">"</span></span>))
                 })
         }
 
-        master.Robots = append(master.Robots, gobot.Robot{
-                Name:        "travis",
+        master.Robots = <span class="predefined">append</span>(master.Robots, &amp;gobot.Robot{
+                Name:        <span class="string"><span class="delimiter">"</span><span class="content">travis</span><span class="delimiter">"</span></span>,
                 Connections: []gobot.Connection{firmata},
                 Devices:     []gobot.Device{red, green, blue},
                 Work:        work,

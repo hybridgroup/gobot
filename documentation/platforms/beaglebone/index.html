@@ -77,7 +77,7 @@
                   <p>The BeagleBone is an ARM based single board computer, with many different GPIO interfaces built in.</p>
                   <p>
                     For more info about the BeagleBone platform click
-                    <a target="blank" href="http://beagleboard.org/Products/BeagleBone">here</a>.
+                    <a target="blank" href="http://beagleboard.org/Products/BeagleBone+Black">here</a>.
                   </p>
                 </div>
                 <div class="clear"></div>
@@ -94,30 +94,30 @@
                 <pre class="CodeRay"><span class="keyword">package</span> main
 
 <span class="keyword">import</span> (
-        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
-        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-beaglebone</span><span class="delimiter">"</span></span>
-        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-beaglebone</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
 )
 
 <span class="keyword">func</span> main() {
-        beaglebone := <span class="predefined">new</span>(gobotBeaglebone.Beaglebone)
-        beaglebone.Name = <span class="string"><span class="delimiter">"</span><span class="content">beaglebone</span><span class="delimiter">"</span></span>
+  beaglebone := <span class="predefined">new</span>(gobotBeaglebone.Beaglebone)
+  beaglebone.Name = <span class="string"><span class="delimiter">"</span><span class="content">beaglebone</span><span class="delimiter">"</span></span>
 
-        led := gobotGPIO.NewLed(beaglebone)
-        led.Name = <span class="string"><span class="delimiter">"</span><span class="content">led</span><span class="delimiter">"</span></span>
-        led.Pin = <span class="string"><span class="delimiter">"</span><span class="content">P9_12</span><span class="delimiter">"</span></span>
+  led := gobotGPIO.NewLed(beaglebone)
+  led.Name = <span class="string"><span class="delimiter">"</span><span class="content">led</span><span class="delimiter">"</span></span>
+  led.Pin = <span class="string"><span class="delimiter">"</span><span class="content">P9_12</span><span class="delimiter">"</span></span>
 
-        work := <span class="keyword">func</span>() {
-                gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">1s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() { led.Toggle() })
-        }
+  work := <span class="keyword">func</span>() {
+    gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">1s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() { led.Toggle() })
+  }
 
-        robot := gobot.Robot{
-                Connections: []<span class="keyword">interface</span>{}{beaglebone},
-                Devices:     []<span class="keyword">interface</span>{}{led},
-                Work:        work,
-        }
+  robot := gobot.Robot{
+    Connections: []gobot.Connection{beaglebone},
+    Devices:     []gobot.Device{led},
+    Work:        work,
+  }
 
-        robot.Start()
+  robot.Start()
 }
 </pre>
               </section><section class="drivers" id="Drivers"><h2>Drivers</h2>

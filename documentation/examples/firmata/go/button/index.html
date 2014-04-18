@@ -64,33 +64,33 @@
         <div class="main" role="main">
           <section class="content full"><div class="documentation">
               <div class="example">
-                <pre class="CodeRay">package main
+                <pre class="CodeRay"><span class="keyword">package</span> main
 
-import (
-        "github.com/hybridgroup/gobot"
-        "github.com/hybridgroup/gobot-firmata"
-        "github.com/hybridgroup/gobot-gpio"
+<span class="keyword">import</span> (
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-firmata</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
 )
 
-func main() {
-        firmata := new(gobotFirmata.FirmataAdaptor)
-        firmata.Name = "firmata"
-        firmata.Port = "/dev/ttyACM0"
+<span class="keyword">func</span> main() {
+        firmata := <span class="predefined">new</span>(gobotFirmata.FirmataAdaptor)
+        firmata.Name = <span class="string"><span class="delimiter">"</span><span class="content">firmata</span><span class="delimiter">"</span></span>
+        firmata.Port = <span class="string"><span class="delimiter">"</span><span class="content">/dev/ttyACM0</span><span class="delimiter">"</span></span>
 
         button := gobotGPIO.NewButton(firmata)
-        button.Name = "button"
-        button.Pin = "2"
+        button.Name = <span class="string"><span class="delimiter">"</span><span class="content">button</span><span class="delimiter">"</span></span>
+        button.Pin = <span class="string"><span class="delimiter">"</span><span class="content">2</span><span class="delimiter">"</span></span>
 
         led := gobotGPIO.NewLed(firmata)
-        led.Name = "led"
-        led.Pin = "13"
+        led.Name = <span class="string"><span class="delimiter">"</span><span class="content">led</span><span class="delimiter">"</span></span>
+        led.Pin = <span class="string"><span class="delimiter">"</span><span class="content">13</span><span class="delimiter">"</span></span>
 
-        work := func() {
-                gobot.On(button.Events["push"], func(data interface{}) {
+        work := <span class="keyword">func</span>() {
+                gobot.On(button.Events[<span class="string"><span class="delimiter">"</span><span class="content">push</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
                         led.On()
                 })
 
-                gobot.On(button.Events["release"], func(data interface{}) {
+                gobot.On(button.Events[<span class="string"><span class="delimiter">"</span><span class="content">release</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
                         led.Off()
                 })
         }

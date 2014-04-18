@@ -79,33 +79,27 @@
                 <div class="clear"></div>
               </section><section class="how_to" id="HowToConnect"><h2>How To Connect</h2>
                 <p>Install the library with: <code>go get -u github.com/hybridgroup/gobot-gpio</code></p>
-                <h3>For Spark:</h3>
+                <h3>For Firmata:</h3>
                 <pre class="CodeRay"><span class="keyword">package</span> main
 
 <span class="keyword">import</span> (
-  <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-firmata</span><span class="delimiter">"</span></span>
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
-  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-spark</span><span class="delimiter">"</span></span>
 )
 
 <span class="keyword">func</span> main() {
+  firmata := <span class="predefined">new</span>(gobotFirmata.FirmataAdaptor)
+  firmata.Name = <span class="string"><span class="delimiter">"</span><span class="content">firmata</span><span class="delimiter">"</span></span>
+  firmata.Port = <span class="string"><span class="delimiter">"</span><span class="content">/dev/ttyACM0</span><span class="delimiter">"</span></span>
 
-  spark := <span class="predefined">new</span>(gobotSpark.SparkAdaptor)
-  spark.Name = <span class="string"><span class="delimiter">"</span><span class="content">spark</span><span class="delimiter">"</span></span>
-  spark.Params = <span class="keyword">map</span>[<span class="predefined-type">string</span>]<span class="keyword">interface</span>{}{
-    <span class="string"><span class="delimiter">"</span><span class="content">device_id</span><span class="delimiter">"</span></span>:    <span class="string"><span class="delimiter">"</span><span class="delimiter">"</span></span>,
-    <span class="string"><span class="delimiter">"</span><span class="content">access_token</span><span class="delimiter">"</span></span>: <span class="string"><span class="delimiter">"</span><span class="delimiter">"</span></span>,
-  }
-
-  button := gobotGPIO.NewButton(spark)
+  button := gobotGPIO.NewButton(firmata)
   button.Name = <span class="string"><span class="delimiter">"</span><span class="content">button</span><span class="delimiter">"</span></span>
-  button.Pin = <span class="string"><span class="delimiter">"</span><span class="content">D5</span><span class="delimiter">"</span></span>
-  button.Interval = <span class="string"><span class="delimiter">"</span><span class="content">2s</span><span class="delimiter">"</span></span>
+  button.Pin = <span class="string"><span class="delimiter">"</span><span class="content">2</span><span class="delimiter">"</span></span>
 
-  led := gobotGPIO.NewLed(spark)
+  led := gobotGPIO.NewLed(firmata)
   led.Name = <span class="string"><span class="delimiter">"</span><span class="content">led</span><span class="delimiter">"</span></span>
-  led.Pin = <span class="string"><span class="delimiter">"</span><span class="content">D7</span><span class="delimiter">"</span></span>
+  led.Pin = <span class="string"><span class="delimiter">"</span><span class="content">13</span><span class="delimiter">"</span></span>
 ...
 </pre>
               </section><section class="how-to" id="HowToUse"><h2>How To Use</h2>
@@ -113,29 +107,23 @@
                 <pre class="CodeRay"><span class="keyword">package</span> main
 
 <span class="keyword">import</span> (
-  <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-firmata</span><span class="delimiter">"</span></span>
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
-  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-spark</span><span class="delimiter">"</span></span>
 )
 
 <span class="keyword">func</span> main() {
+  firmata := <span class="predefined">new</span>(gobotFirmata.FirmataAdaptor)
+  firmata.Name = <span class="string"><span class="delimiter">"</span><span class="content">firmata</span><span class="delimiter">"</span></span>
+  firmata.Port = <span class="string"><span class="delimiter">"</span><span class="content">/dev/ttyACM0</span><span class="delimiter">"</span></span>
 
-  spark := <span class="predefined">new</span>(gobotSpark.SparkAdaptor)
-  spark.Name = <span class="string"><span class="delimiter">"</span><span class="content">spark</span><span class="delimiter">"</span></span>
-  spark.Params = <span class="keyword">map</span>[<span class="predefined-type">string</span>]<span class="keyword">interface</span>{}{
-    <span class="string"><span class="delimiter">"</span><span class="content">device_id</span><span class="delimiter">"</span></span>:    <span class="string"><span class="delimiter">"</span><span class="delimiter">"</span></span>,
-    <span class="string"><span class="delimiter">"</span><span class="content">access_token</span><span class="delimiter">"</span></span>: <span class="string"><span class="delimiter">"</span><span class="delimiter">"</span></span>,
-  }
-
-  button := gobotGPIO.NewButton(spark)
+  button := gobotGPIO.NewButton(firmata)
   button.Name = <span class="string"><span class="delimiter">"</span><span class="content">button</span><span class="delimiter">"</span></span>
-  button.Pin = <span class="string"><span class="delimiter">"</span><span class="content">D5</span><span class="delimiter">"</span></span>
-  button.Interval = <span class="string"><span class="delimiter">"</span><span class="content">2s</span><span class="delimiter">"</span></span>
+  button.Pin = <span class="string"><span class="delimiter">"</span><span class="content">2</span><span class="delimiter">"</span></span>
 
-  led := gobotGPIO.NewLed(spark)
+  led := gobotGPIO.NewLed(firmata)
   led.Name = <span class="string"><span class="delimiter">"</span><span class="content">led</span><span class="delimiter">"</span></span>
-  led.Pin = <span class="string"><span class="delimiter">"</span><span class="content">D7</span><span class="delimiter">"</span></span>
+  led.Pin = <span class="string"><span class="delimiter">"</span><span class="content">13</span><span class="delimiter">"</span></span>
 
   work := <span class="keyword">func</span>() {
     gobot.On(button.Events[<span class="string"><span class="delimiter">"</span><span class="content">push</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
@@ -148,7 +136,7 @@
   }
 
   robot := gobot.Robot{
-    Connections: []gobot.Connection{spark},
+    Connections: []gobot.Connection{firmata},
     Devices:     []gobot.Device{button, led},
     Work:        work,
   }

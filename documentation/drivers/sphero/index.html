@@ -86,17 +86,17 @@
                   <code>go get -u github.com/hybridgroup/gobot-sphero</code></p>
                   
                   <pre class="CodeRay"><span class="keyword">package</span> main
+
 <span class="keyword">import</span> (
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-sphero</span><span class="delimiter">"</span></span>
-  <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
 )
 
 <span class="keyword">func</span> main() {
 
   spheroAdaptor := <span class="predefined">new</span>(gobotSphero.SpheroAdaptor)
   spheroAdaptor.Name = <span class="string"><span class="delimiter">"</span><span class="content">Sphero</span><span class="delimiter">"</span></span>
-  spheroAdaptor.Port = <span class="string"><span class="delimiter">"</span><span class="content">127.0.0.1:4560</span><span class="delimiter">"</span></span>
+  spheroAdaptor.Port = <span class="string"><span class="delimiter">"</span><span class="content">/dev/rfcomm0</span><span class="delimiter">"</span></span>
 
   sphero := gobotSphero.NewSphero(spheroAdaptor)
   sphero.Name = <span class="string"><span class="delimiter">"</span><span class="content">Sphero</span><span class="delimiter">"</span></span>
@@ -107,39 +107,32 @@
                 <p>
                   This example rolls the sphero in a random direction and change direction every 2 seconds.
                   </p>
-<pre class="CodeRay"><span class="reserved">package</span> main
-<span class="reserved">import</span> (
+<pre class="CodeRay"><span class="keyword">package</span> main
+
+<span class="keyword">import</span> (
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-sphero</span><span class="delimiter">"</span></span>
-  <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
 )
 
-func main() {
+<span class="keyword">func</span> main() {
 
-  <span class="key">spheroAdaptor</span> := <span class="keyword">new</span>(gobotSphero.SpheroAdaptor)
+  spheroAdaptor := <span class="predefined">new</span>(gobotSphero.SpheroAdaptor)
   spheroAdaptor.Name = <span class="string"><span class="delimiter">"</span><span class="content">Sphero</span><span class="delimiter">"</span></span>
-  spheroAdaptor.Port = <span class="string"><span class="delimiter">"</span><span class="content">127.0.0.1:4560</span><span class="delimiter">"</span></span>
+  spheroAdaptor.Port = <span class="string"><span class="delimiter">"</span><span class="content">/dev/rfcomm0</span><span class="delimiter">"</span></span>
 
   sphero := gobotSphero.NewSphero(spheroAdaptor)
   sphero.Name = <span class="string"><span class="delimiter">"</span><span class="content">Sphero</span><span class="delimiter">"</span></span>
 
-  connections := []gobot.Connection {
-    spheroAdaptor,
-  }
-  devices := []gobot.Device {
-    sphero,
-  }
-
-  work := func(){
-    gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">2s</span><span class="delimiter">"</span></span>, func(){ 
-      sphero.Roll(<span class="integer">100</span>, uint16(gobot.Random(<span class="integer">0</span>, <span class="integer">360</span>))) 
+  work := <span class="keyword">func</span>() {
+    gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">2s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() {
+      sphero.Roll(<span class="integer">100</span>, <span class="predefined-type">uint16</span>(gobot.Rand(<span class="integer">360</span>)))
     })
   }
 
   robot := gobot.Robot{
-      <span class="key">Connections</span>: connections, 
-      <span class="key">Devices</span>: devices,
-      <span class="key">Work</span>: work,
+    Connections: []gobot.Connection{spheroAdaptor},
+    Devices:     []gobot.Device{sphero},
+    Work:        work,
   }
 
   robot.Start()

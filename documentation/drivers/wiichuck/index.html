@@ -82,19 +82,19 @@
                 <pre class="CodeRay"><span class="keyword">package</span> main
 
 <span class="keyword">import</span> (
-  <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
-  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
-  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-firmata</span><span class="delimiter">"</span></span>
-  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-i2c</span><span class="delimiter">"</span></span>
+    <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
+    <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+    <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-firmata</span><span class="delimiter">"</span></span>
+    <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-i2c</span><span class="delimiter">"</span></span>
 )
 
 <span class="keyword">func</span> main() {
-  firmata := <span class="predefined">new</span>(gobotFirmata.FirmataAdaptor)
-  firmata.Name = <span class="string"><span class="delimiter">"</span><span class="content">firmata</span><span class="delimiter">"</span></span>
-  firmata.Port = <span class="string"><span class="delimiter">"</span><span class="content">/dev/ttyACM0</span><span class="delimiter">"</span></span>
+    firmata := <span class="predefined">new</span>(gobotFirmata.FirmataAdaptor)
+    firmata.Name = <span class="string"><span class="delimiter">"</span><span class="content">firmata</span><span class="delimiter">"</span></span>
+    firmata.Port = <span class="string"><span class="delimiter">"</span><span class="content">/dev/ttyACM0</span><span class="delimiter">"</span></span>
 
-  wiichuck := gobotI2C.NewWiichuck(firmata)
-  wiichuck.Name = <span class="string"><span class="delimiter">"</span><span class="content">wiichuck</span><span class="delimiter">"</span></span>
+    wiichuck := gobotI2C.NewWiichuck(firmata)
+    wiichuck.Name = <span class="string"><span class="delimiter">"</span><span class="content">wiichuck</span><span class="delimiter">"</span></span>
 ...
 </pre>
               </section><section class="how-to" id="HowToUse"><h2>How To Use</h2>
@@ -102,45 +102,41 @@
                 <pre class="CodeRay"><span class="keyword">package</span> main
 
 <span class="keyword">import</span> (
-  <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
-  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
-  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-firmata</span><span class="delimiter">"</span></span>
-  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-i2c</span><span class="delimiter">"</span></span>
+    <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
+    <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+    <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-firmata</span><span class="delimiter">"</span></span>
+    <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-i2c</span><span class="delimiter">"</span></span>
 )
 
 <span class="keyword">func</span> main() {
-  firmata := <span class="predefined">new</span>(gobotFirmata.FirmataAdaptor)
-  firmata.Name = <span class="string"><span class="delimiter">"</span><span class="content">firmata</span><span class="delimiter">"</span></span>
-  firmata.Port = <span class="string"><span class="delimiter">"</span><span class="content">/dev/ttyACM0</span><span class="delimiter">"</span></span>
+    firmata := <span class="predefined">new</span>(gobotFirmata.FirmataAdaptor)
+    firmata.Name = <span class="string"><span class="delimiter">"</span><span class="content">firmata</span><span class="delimiter">"</span></span>
+    firmata.Port = <span class="string"><span class="delimiter">"</span><span class="content">/dev/ttyACM0</span><span class="delimiter">"</span></span>
 
-  wiichuck := gobotI2C.NewWiichuck(firmata)
-  wiichuck.Name = <span class="string"><span class="delimiter">"</span><span class="content">wiichuck</span><span class="delimiter">"</span></span>
+    wiichuck := gobotI2C.NewWiichuck(firmata)
+    wiichuck.Name = <span class="string"><span class="delimiter">"</span><span class="content">wiichuck</span><span class="delimiter">"</span></span>
 
-  work := <span class="keyword">func</span>() {
-    <span class="keyword">go</span> <span class="keyword">func</span>() {
-      <span class="keyword">for</span> {
-        fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">joystick</span><span class="delimiter">"</span></span>, gobot.On(wiichuck.Events[<span class="string"><span class="delimiter">"</span><span class="content">joystick</span><span class="delimiter">"</span></span>]))
-      }
-    }()
-    <span class="keyword">go</span> <span class="keyword">func</span>() {
-      <span class="keyword">for</span> {
-        fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">c</span><span class="delimiter">"</span></span>, gobot.On(wiichuck.Events[<span class="string"><span class="delimiter">"</span><span class="content">c_button</span><span class="delimiter">"</span></span>]))
-      }
-    }()
-    <span class="keyword">go</span> <span class="keyword">func</span>() {
-      <span class="keyword">for</span> {
-        fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">z</span><span class="delimiter">"</span></span>, gobot.On(wiichuck.Events[<span class="string"><span class="delimiter">"</span><span class="content">z_button</span><span class="delimiter">"</span></span>]))
-      }
-    }()
-  }
+    work := <span class="keyword">func</span>() {
+        gobot.On(wiichuck.Events[<span class="string"><span class="delimiter">"</span><span class="content">joystick</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+            fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">joystick</span><span class="delimiter">"</span></span>)
+        })
 
-  robot := gobot.Robot{
-    Connections: []<span class="keyword">interface</span>{}{firmata},
-    Devices:     []<span class="keyword">interface</span>{}{wiichuck},
-    Work:        work,
-  }
+        gobot.On(wiichuck.Events[<span class="string"><span class="delimiter">"</span><span class="content">c_button</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+            fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">c</span><span class="delimiter">"</span></span>)
+        })
 
-  robot.Start()
+        gobot.On(wiichuck.Events[<span class="string"><span class="delimiter">"</span><span class="content">z_button</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+            fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">z</span><span class="delimiter">"</span></span>)
+        })
+    }
+
+    robot := gobot.Robot{
+        Connections: []gobot.Connection{firmata},
+        Devices:     []gobot.Device{wiichuck},
+        Work:        work,
+    }
+
+    robot.Start()
 }
 </pre>
               </section><section class="public-methods"><div class="commands-api" id="Commands">

@@ -90,37 +90,37 @@
                 <pre class="CodeRay"><span class="reserved">package</span> main
 
 <span class="reserved">import</span> (
-        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
-        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
-        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-spark</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-spark</span><span class="delimiter">"</span></span>
 )
 
 func main() {
 
-        <span class="key">spark</span> := <span class="keyword">new</span>(gobotSpark.SparkAdaptor)
-        spark.Name = <span class="string"><span class="delimiter">"</span><span class="content">spark</span><span class="delimiter">"</span></span>
-        spark.Params = map[string]<span class="reserved">interface</span>{}{
-                <span class="key"><span class="delimiter">"</span><span class="content">device_id</span><span class="delimiter">"</span></span>:    <span class="string"><span class="delimiter">"</span><span class="delimiter">"</span></span>,
-                <span class="key"><span class="delimiter">"</span><span class="content">access_token</span><span class="delimiter">"</span></span>: <span class="string"><span class="delimiter">"</span><span class="delimiter">"</span></span>,
-        }
+  <span class="key">spark</span> := <span class="keyword">new</span>(gobotSpark.SparkAdaptor)
+  spark.Name = <span class="string"><span class="delimiter">"</span><span class="content">spark</span><span class="delimiter">"</span></span>
+  spark.Params = map[string]<span class="reserved">interface</span>{}{
+    <span class="key"><span class="delimiter">"</span><span class="content">device_id</span><span class="delimiter">"</span></span>:    <span class="string"><span class="delimiter">"</span><span class="delimiter">"</span></span>,
+    <span class="key"><span class="delimiter">"</span><span class="content">access_token</span><span class="delimiter">"</span></span>: <span class="string"><span class="delimiter">"</span><span class="delimiter">"</span></span>,
+  }
 
-        led := gobotGPIO.NewLed(spark)
-        led.Name = <span class="string"><span class="delimiter">"</span><span class="content">led</span><span class="delimiter">"</span></span>
-        led.Pin = <span class="string"><span class="delimiter">"</span><span class="content">D7</span><span class="delimiter">"</span></span>
+  led := gobotGPIO.NewLed(spark)
+  led.Name = <span class="string"><span class="delimiter">"</span><span class="content">led</span><span class="delimiter">"</span></span>
+  led.Pin = <span class="string"><span class="delimiter">"</span><span class="content">D7</span><span class="delimiter">"</span></span>
 
-        work := func() {
-                gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">2s</span><span class="delimiter">"</span></span>, func() {
-                        led.Toggle()
-                })
-        }
+  work := func() {
+    gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">2s</span><span class="delimiter">"</span></span>, func() {
+      led.Toggle()
+    })
+  }
 
-        robot := gobot.Robot{
-                <span class="key">Connections</span>: []gobot.Connection{spark},
-                <span class="key">Devices</span>:     []gobot.Device{led},
-                <span class="key">Work</span>:        work,
-        }
+  robot := gobot.Robot{
+    <span class="key">Connections</span>: []gobot.Connection{spark},
+    <span class="key">Devices</span>:     []gobot.Device{led},
+    <span class="key">Work</span>:        work,
+  }
 
-        robot.Start()
+  robot.Start()
 }
 </pre>
               </section><section class="drivers" id="Drivers"><h2>Drivers</h2>

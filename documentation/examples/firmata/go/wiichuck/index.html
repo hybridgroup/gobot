@@ -64,34 +64,34 @@
         <div class="main" role="main">
           <section class="content full"><div class="documentation">
               <div class="example">
-                <pre class="CodeRay">package main
+                <pre class="CodeRay"><span class="keyword">package</span> main
 
-import (
-        "fmt"
-        "github.com/hybridgroup/gobot"
-        "github.com/hybridgroup/gobot-firmata"
-        "github.com/hybridgroup/gobot-i2c"
+<span class="keyword">import</span> (
+        <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-firmata</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-i2c</span><span class="delimiter">"</span></span>
 )
 
-func main() {
-        firmata := new(gobotFirmata.FirmataAdaptor)
-        firmata.Name = "firmata"
-        firmata.Port = "/dev/ttyACM0"
+<span class="keyword">func</span> main() {
+        firmata := <span class="predefined">new</span>(gobotFirmata.FirmataAdaptor)
+        firmata.Name = <span class="string"><span class="delimiter">"</span><span class="content">firmata</span><span class="delimiter">"</span></span>
+        firmata.Port = <span class="string"><span class="delimiter">"</span><span class="content">/dev/ttyACM0</span><span class="delimiter">"</span></span>
 
         wiichuck := gobotI2C.NewWiichuck(firmata)
-        wiichuck.Name = "wiichuck"
+        wiichuck.Name = <span class="string"><span class="delimiter">"</span><span class="content">wiichuck</span><span class="delimiter">"</span></span>
 
-        work := func() {
-                gobot.On(wiichuck.Events["joystick"], func(data interface{}) {
-                        fmt.Println("joystick")
+        work := <span class="keyword">func</span>() {
+                gobot.On(wiichuck.Events[<span class="string"><span class="delimiter">"</span><span class="content">joystick</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+                        fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">joystick</span><span class="delimiter">"</span></span>)
                 })
 
-                gobot.On(wiichuck.Events["c_button"], func(data interface{}) {
-                        fmt.Println("c")
+                gobot.On(wiichuck.Events[<span class="string"><span class="delimiter">"</span><span class="content">c_button</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+                        fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">c</span><span class="delimiter">"</span></span>)
                 })
 
-                gobot.On(wiichuck.Events["z_button"], func(data interface{}) {
-                        fmt.Println("z")
+                gobot.On(wiichuck.Events[<span class="string"><span class="delimiter">"</span><span class="content">z_button</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+                        fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">z</span><span class="delimiter">"</span></span>)
                 })
         }
 

@@ -84,7 +84,7 @@
                 <div class="clear"></div>
               </section><section class="how-to" id="HowToInstall"><h2>How To Install</h2>
                 <p>Installing Gobot with Opencv support is pretty easy.</p>
-                <pre class="CodeRay">go get path/to/repo/gobot-opencv
+                <pre class="CodeRay">go get github.com/hybridgroup/gobot-opencv
 </pre>
                 <p>If you don't already have OpenCV installed</p>
                 <h3>Ubuntu</h3>
@@ -131,52 +131,39 @@ sudo make install
 </pre>
               </section><section class="how-to" id="HowToUse"><h2>How To Use</h2>
                 <p>Example using the camera.</p>
-                <pre class="CodeRay"><span class="keyword">package</span> gobotOpencv
+                <pre class="CodeRay"><span class="keyword">package</span> main
 
 <span class="keyword">import</span> (
-  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/go-opencv/opencv</span><span class="delimiter">"</span></span>
+  cv <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/go-opencv/opencv</span><span class="delimiter">"</span></span>
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-opencv</span><span class="delimiter">"</span></span>
 )
 
-<span class="keyword">type</span> Camera <span class="keyword">struct</span> {
-  gobot.Driver
-  Adaptor *Opencv
-  camera  *opencv.Capture
-  Source  <span class="predefined-type">string</span>
-}
+<span class="keyword">func</span> main() {
 
-<span class="keyword">type</span> CameraInterface <span class="keyword">interface</span> {
-}
+  opencv := <span class="predefined">new</span>(gobotOpencv.Opencv)
+  opencv.Name = <span class="string"><span class="delimiter">"</span><span class="content">opencv</span><span class="delimiter">"</span></span>
 
-<span class="keyword">func</span> NewCamera(adaptor *Opencv) *Camera {
-  d := <span class="predefined">new</span>(Camera)
-  d.Events = <span class="predefined">make</span>(<span class="keyword">map</span>[<span class="predefined-type">string</span>]<span class="keyword">chan</span> <span class="keyword">interface</span>{})
-  d.Adaptor = adaptor
-  d.Commands = []<span class="predefined-type">string</span>{}
-  <span class="keyword">return</span> d
-}
+  window := gobotOpencv.NewWindow(opencv)
+  window.Name = <span class="string"><span class="delimiter">"</span><span class="content">window</span><span class="delimiter">"</span></span>
 
-<span class="keyword">func</span> (me *Camera) Start() <span class="predefined-type">bool</span> {
-  me.Events[<span class="string"><span class="delimiter">"</span><span class="content">Frame</span><span class="delimiter">"</span></span>] = <span class="predefined">make</span>(<span class="keyword">chan</span> <span class="keyword">interface</span>{}, <span class="integer">0</span>)
-  <span class="keyword">if</span> me.Source != <span class="string"><span class="delimiter">"</span><span class="delimiter">"</span></span> {
-    me.camera = opencv.NewFileCapture(me.Source)
-  } <span class="keyword">else</span> {
-    me.camera = opencv.NewCameraCapture(<span class="integer">0</span>)
+  camera := gobotOpencv.NewCamera(opencv)
+  camera.Name = <span class="string"><span class="delimiter">"</span><span class="content">camera</span><span class="delimiter">"</span></span>
+
+  work := <span class="keyword">func</span>() {
+    gobot.On(camera.Events[<span class="string"><span class="delimiter">"</span><span class="content">Frame</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+      window.ShowImage(data.(*cv.IplImage))
+    })
   }
-  <span class="keyword">go</span> <span class="keyword">func</span>() {
-    <span class="keyword">for</span> {
-      <span class="keyword">if</span> me.camera.GrabFrame() {
-        image := me.camera.RetrieveFrame(<span class="integer">1</span>)
-        <span class="keyword">if</span> image != <span class="predefined-constant">nil</span> {
-          gobot.Publish(me.Events[<span class="string"><span class="delimiter">"</span><span class="content">Frame</span><span class="delimiter">"</span></span>], image)
-        }
-      }
-    }
-  }()
-  <span class="keyword">return</span> <span class="predefined-constant">true</span>
+
+  robot := gobot.Robot{
+    Connections: []gobot.Connection{opencv},
+    Devices:     []gobot.Device{window, camera},
+    Work:        work,
+  }
+
+  robot.Start()
 }
-<span class="keyword">func</span> (me *Camera) Halt() <span class="predefined-type">bool</span> { <span class="keyword">return</span> <span class="predefined-constant">true</span> }
-<span class="keyword">func</span> (me *Camera) Init() <span class="predefined-type">bool</span> { <span class="keyword">return</span> <span class="predefined-constant">true</span> }
 </pre>
               </section>
 </div>

@@ -64,31 +64,31 @@
         <div class="main" role="main">
           <section class="content full"><div class="documentation">
               <div class="example">
-                <pre class="CodeRay">package main
+                <pre class="CodeRay"><span class="keyword">package</span> main
 
-import (
-        cv "github.com/hybridgroup/go-opencv/opencv"
-        "github.com/hybridgroup/gobot"
-        "github.com/hybridgroup/gobot-opencv"
-        "path"
-        "runtime"
+<span class="keyword">import</span> (
+        cv <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/go-opencv/opencv</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-opencv</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">path</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">runtime</span><span class="delimiter">"</span></span>
 )
 
-func main() {
-        _, currentfile, _, _ := runtime.Caller(0)
-        cascade := path.Join(path.Dir(currentfile), "haarcascade_frontalface_alt.xml")
+<span class="keyword">func</span> main() {
+        _, currentfile, _, _ := runtime.Caller(<span class="integer">0</span>)
+        cascade := path.Join(path.Dir(currentfile), <span class="string"><span class="delimiter">"</span><span class="content">haarcascade_frontalface_alt.xml</span><span class="delimiter">"</span></span>)
 
-        opencv := new(gobotOpencv.Opencv)
-        opencv.Name = "opencv"
+        opencv := <span class="predefined">new</span>(gobotOpencv.Opencv)
+        opencv.Name = <span class="string"><span class="delimiter">"</span><span class="content">opencv</span><span class="delimiter">"</span></span>
 
         window := gobotOpencv.NewWindow(opencv)
-        window.Name = "window"
+        window.Name = <span class="string"><span class="delimiter">"</span><span class="content">window</span><span class="delimiter">"</span></span>
 
         camera := gobotOpencv.NewCamera(opencv)
-        camera.Name = "camera"
+        camera.Name = <span class="string"><span class="delimiter">"</span><span class="content">camera</span><span class="delimiter">"</span></span>
 
-        work := func() {
-                gobot.On(camera.Events["Frame"], func(data interface{}) {
+        work := <span class="keyword">func</span>() {
+                gobot.On(camera.Events[<span class="string"><span class="delimiter">"</span><span class="content">Frame</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
                         i := data.(*cv.IplImage)
                         window.ShowImage(gobotOpencv.DrawRectangles(i, gobotOpencv.DetectFaces(cascade, i)))
                 })

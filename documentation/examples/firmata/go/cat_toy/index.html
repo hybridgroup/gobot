@@ -64,50 +64,50 @@
         <div class="main" role="main">
           <section class="content full"><div class="documentation">
               <div class="example">
-                <pre class="CodeRay">package main
+                <pre class="CodeRay"><span class="keyword">package</span> main
 
-import (
-        "fmt"
-        "github.com/hybridgroup/gobot"
-        "github.com/hybridgroup/gobot-firmata"
-        "github.com/hybridgroup/gobot-gpio"
-        "github.com/hybridgroup/gobot-leapmotion"
+<span class="keyword">import</span> (
+        <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-firmata</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-leapmotion</span><span class="delimiter">"</span></span>
 )
 
-func main() {
-        firmata := new(gobotFirmata.FirmataAdaptor)
-        firmata.Name = "firmata"
-        firmata.Port = "/dev/ttyACM0"
+<span class="keyword">func</span> main() {
+        firmata := <span class="predefined">new</span>(gobotFirmata.FirmataAdaptor)
+        firmata.Name = <span class="string"><span class="delimiter">"</span><span class="content">firmata</span><span class="delimiter">"</span></span>
+        firmata.Port = <span class="string"><span class="delimiter">"</span><span class="content">/dev/ttyACM0</span><span class="delimiter">"</span></span>
 
         servo1 := gobotGPIO.NewServo(firmata)
-        servo1.Name = "servo"
-        servo1.Pin = "5"
+        servo1.Name = <span class="string"><span class="delimiter">"</span><span class="content">servo</span><span class="delimiter">"</span></span>
+        servo1.Pin = <span class="string"><span class="delimiter">"</span><span class="content">5</span><span class="delimiter">"</span></span>
 
         servo2 := gobotGPIO.NewServo(firmata)
-        servo2.Name = "servo"
-        servo2.Pin = "3"
+        servo2.Name = <span class="string"><span class="delimiter">"</span><span class="content">servo</span><span class="delimiter">"</span></span>
+        servo2.Pin = <span class="string"><span class="delimiter">"</span><span class="content">3</span><span class="delimiter">"</span></span>
 
-        leapAdaptor := new(gobotLeap.LeapAdaptor)
-        leapAdaptor.Name = "leap"
-        leapAdaptor.Port = "127.0.0.1:6437"
+        leapAdaptor := <span class="predefined">new</span>(gobotLeap.LeapAdaptor)
+        leapAdaptor.Name = <span class="string"><span class="delimiter">"</span><span class="content">leap</span><span class="delimiter">"</span></span>
+        leapAdaptor.Port = <span class="string"><span class="delimiter">"</span><span class="content">127.0.0.1:6437</span><span class="delimiter">"</span></span>
 
         leap := gobotLeap.NewLeap(leapAdaptor)
-        leap.Name = "leap"
+        leap.Name = <span class="string"><span class="delimiter">"</span><span class="content">leap</span><span class="delimiter">"</span></span>
 
-        work := func() {
-                x := 90.0
-                z := 90.0
-                gobot.On(leap.Events["Message"], func(data interface{}) {
-                        if len(data.(gobotLeap.LeapFrame).Hands) &gt; 0 {
-                                hand := data.(gobotLeap.LeapFrame).Hands[0]
-                                x = gobot.ToScale(gobot.FromScale(hand.X(), -300, 300), 30, 150)
-                                z = gobot.ToScale(gobot.FromScale(hand.Z(), -300, 300), 30, 150)
+        work := <span class="keyword">func</span>() {
+                x := <span class="float">90.0</span>
+                z := <span class="float">90.0</span>
+                gobot.On(leap.Events[<span class="string"><span class="delimiter">"</span><span class="content">Message</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+                        <span class="keyword">if</span> <span class="predefined">len</span>(data.(gobotLeap.LeapFrame).Hands) &gt; <span class="integer">0</span> {
+                                hand := data.(gobotLeap.LeapFrame).Hands[<span class="integer">0</span>]
+                                x = gobot.ToScale(gobot.FromScale(hand.X(), <span class="integer">-300</span>, <span class="integer">300</span>), <span class="integer">30</span>, <span class="integer">150</span>)
+                                z = gobot.ToScale(gobot.FromScale(hand.Z(), <span class="integer">-300</span>, <span class="integer">300</span>), <span class="integer">30</span>, <span class="integer">150</span>)
                         }
                 })
-                gobot.Every("0.01s", func() {
-                        servo1.Move(uint8(x))
-                        servo2.Move(uint8(z))
-                        fmt.Println("Current Angle: ", servo1.CurrentAngle, ",", servo2.CurrentAngle)
+                gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">0.01s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() {
+                        servo1.Move(<span class="predefined-type">uint8</span>(x))
+                        servo2.Move(<span class="predefined-type">uint8</span>(z))
+                        fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">Current Angle: </span><span class="delimiter">"</span></span>, servo1.CurrentAngle, <span class="string"><span class="delimiter">"</span><span class="content">,</span><span class="delimiter">"</span></span>, servo2.CurrentAngle)
                 })
         }
 

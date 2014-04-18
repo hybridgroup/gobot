@@ -64,39 +64,39 @@
         <div class="main" role="main">
           <section class="content full"><div class="documentation">
               <div class="example">
-                <pre class="CodeRay">package main
+                <pre class="CodeRay"><span class="keyword">package</span> main
 
-import (
-        "fmt"
-        "github.com/hybridgroup/gobot"
-        "github.com/hybridgroup/gobot-gpio"
-        "github.com/hybridgroup/gobot-spark"
+<span class="keyword">import</span> (
+        <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-spark</span><span class="delimiter">"</span></span>
 )
 
-func main() {
+<span class="keyword">func</span> main() {
 
-        spark := new(gobotSpark.SparkAdaptor)
-        spark.Name = "spark"
-        spark.Params = map[string]interface{}{
-                "device_id":    "",
-                "access_token": "",
+        spark := <span class="predefined">new</span>(gobotSpark.SparkAdaptor)
+        spark.Name = <span class="string"><span class="delimiter">"</span><span class="content">spark</span><span class="delimiter">"</span></span>
+        spark.Params = <span class="keyword">map</span>[<span class="predefined-type">string</span>]<span class="keyword">interface</span>{}{
+                <span class="string"><span class="delimiter">"</span><span class="content">device_id</span><span class="delimiter">"</span></span>:    <span class="string"><span class="delimiter">"</span><span class="delimiter">"</span></span>,
+                <span class="string"><span class="delimiter">"</span><span class="content">access_token</span><span class="delimiter">"</span></span>: <span class="string"><span class="delimiter">"</span><span class="delimiter">"</span></span>,
         }
 
         button := gobotGPIO.NewButton(spark)
-        button.Name = "button"
-        button.Pin = "D5"
-        button.Interval = "2s"
+        button.Name = <span class="string"><span class="delimiter">"</span><span class="content">button</span><span class="delimiter">"</span></span>
+        button.Pin = <span class="string"><span class="delimiter">"</span><span class="content">D5</span><span class="delimiter">"</span></span>
+        button.Interval = <span class="string"><span class="delimiter">"</span><span class="content">2s</span><span class="delimiter">"</span></span>
 
         led := gobotGPIO.NewLed(spark)
-        led.Name = "led"
-        led.Pin = "D7"
+        led.Name = <span class="string"><span class="delimiter">"</span><span class="content">led</span><span class="delimiter">"</span></span>
+        led.Pin = <span class="string"><span class="delimiter">"</span><span class="content">D7</span><span class="delimiter">"</span></span>
 
-        work := func() {
-                gobot.On(button.Events["push"], func(data interface{}) {
+        work := <span class="keyword">func</span>() {
+                gobot.On(button.Events[<span class="string"><span class="delimiter">"</span><span class="content">push</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
                         led.On()
                 })
 
-                gobot.On(button.Events["release"], func(data interface{}) {
+                gobot.On(button.Events[<span class="string"><span class="delimiter">"</span><span class="content">release</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
                         led.Off()
                 })
         }

@@ -80,16 +80,22 @@
                 <pre class="CodeRay"><span class="keyword">package</span> main
 
 <span class="keyword">import</span> (
-  <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-ardrone</span><span class="delimiter">"</span></span>
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-joystick</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">math</span><span class="delimiter">"</span></span>
 )
+
+<span class="keyword">type</span> pair <span class="keyword">struct</span> {
+  x <span class="predefined-type">float64</span>
+  y <span class="predefined-type">float64</span>
+}
 
 <span class="keyword">func</span> main() {
   joystickAdaptor := <span class="predefined">new</span>(gobotJoystick.JoystickAdaptor)
   joystickAdaptor.Name = <span class="string"><span class="delimiter">"</span><span class="content">ps3</span><span class="delimiter">"</span></span>
   joystickAdaptor.Params = <span class="keyword">map</span>[<span class="predefined-type">string</span>]<span class="keyword">interface</span>{}{
-    <span class="string"><span class="delimiter">"</span><span class="content">config</span><span class="delimiter">"</span></span>: <span class="string"><span class="delimiter">"</span><span class="content">./configs/dualshock3.json</span><span class="delimiter">"</span></span>,
+    <span class="string"><span class="delimiter">"</span><span class="content">config</span><span class="delimiter">"</span></span>: <span class="string"><span class="delimiter">"</span><span class="content">./examples/dualshock3.json</span><span class="delimiter">"</span></span>,
   }
 
   joystick := gobotJoystick.NewJoystick(joystickAdaptor)
@@ -97,53 +103,136 @@
 ...
 </pre>
               </section><section class="how-to" id="HowToUse"><h2>How To Use</h2>
-                <h3>Example receiving button events from Dualshock3 controller joystick.</h3>
+                <h3>Example using Dualshock3 controller joystick and an Ardrone.</h3>
                 <pre class="CodeRay"><span class="keyword">package</span> main
 
 <span class="keyword">import</span> (
-  <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-ardrone</span><span class="delimiter">"</span></span>
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-joystick</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">math</span><span class="delimiter">"</span></span>
 )
+
+<span class="keyword">type</span> pair <span class="keyword">struct</span> {
+  x <span class="predefined-type">float64</span>
+  y <span class="predefined-type">float64</span>
+}
 
 <span class="keyword">func</span> main() {
   joystickAdaptor := <span class="predefined">new</span>(gobotJoystick.JoystickAdaptor)
   joystickAdaptor.Name = <span class="string"><span class="delimiter">"</span><span class="content">ps3</span><span class="delimiter">"</span></span>
   joystickAdaptor.Params = <span class="keyword">map</span>[<span class="predefined-type">string</span>]<span class="keyword">interface</span>{}{
-    <span class="string"><span class="delimiter">"</span><span class="content">config</span><span class="delimiter">"</span></span>: <span class="string"><span class="delimiter">"</span><span class="content">./configs/dualshock3.json</span><span class="delimiter">"</span></span>,
+    <span class="string"><span class="delimiter">"</span><span class="content">config</span><span class="delimiter">"</span></span>: <span class="string"><span class="delimiter">"</span><span class="content">./examples/dualshock3.json</span><span class="delimiter">"</span></span>,
   }
 
   joystick := gobotJoystick.NewJoystick(joystickAdaptor)
   joystick.Name = <span class="string"><span class="delimiter">"</span><span class="content">ps3</span><span class="delimiter">"</span></span>
 
+  ardroneAdaptor := <span class="predefined">new</span>(gobotArdrone.ArdroneAdaptor)
+  ardroneAdaptor.Name = <span class="string"><span class="delimiter">"</span><span class="content">Drone</span><span class="delimiter">"</span></span>
+
+  drone := gobotArdrone.NewArdrone(ardroneAdaptor)
+  drone.Name = <span class="string"><span class="delimiter">"</span><span class="content">Drone</span><span class="delimiter">"</span></span>
+
   work := <span class="keyword">func</span>() {
-    gobot.On(joystick.Events[<span class="string"><span class="delimiter">"</span><span class="content">square</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
-      fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">square</span><span class="delimiter">"</span></span>, data)
+
+    offset := <span class="float">32767.0</span>
+    right_stick := pair{x: <span class="integer">0</span>, y: <span class="integer">0</span>}
+    left_stick := pair{x: <span class="integer">0</span>, y: <span class="integer">0</span>}
+
+    gobot.On(joystick.Events[<span class="string"><span class="delimiter">"</span><span class="content">square_press</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+      drone.TakeOff()
     })
-    gobot.On(joystick.Events[<span class="string"><span class="delimiter">"</span><span class="content">triangle</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
-      fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">triangle</span><span class="delimiter">"</span></span>, data)
+    gobot.On(joystick.Events[<span class="string"><span class="delimiter">"</span><span class="content">triangle_press</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+      drone.Hover()
+    })
+    gobot.On(joystick.Events[<span class="string"><span class="delimiter">"</span><span class="content">x_press</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+      drone.Land()
     })
     gobot.On(joystick.Events[<span class="string"><span class="delimiter">"</span><span class="content">left_x</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
-      fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">left_x</span><span class="delimiter">"</span></span>, data)
+      val := <span class="predefined-type">float64</span>(data.(<span class="predefined-type">int16</span>))
+      <span class="keyword">if</span> left_stick.x != val {
+        left_stick.x = val
+      }
     })
     gobot.On(joystick.Events[<span class="string"><span class="delimiter">"</span><span class="content">left_y</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
-      fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">left_y</span><span class="delimiter">"</span></span>, data)
+      val := <span class="predefined-type">float64</span>(data.(<span class="predefined-type">int16</span>))
+      <span class="keyword">if</span> left_stick.y != val {
+        left_stick.y = val
+      }
     })
     gobot.On(joystick.Events[<span class="string"><span class="delimiter">"</span><span class="content">right_x</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
-      fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">right_x</span><span class="delimiter">"</span></span>, data)
+      val := <span class="predefined-type">float64</span>(data.(<span class="predefined-type">int16</span>))
+      <span class="keyword">if</span> right_stick.x != val {
+        right_stick.x = val
+      }
     })
     gobot.On(joystick.Events[<span class="string"><span class="delimiter">"</span><span class="content">right_y</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
-      fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">right_y</span><span class="delimiter">"</span></span>, data)
+      val := <span class="predefined-type">float64</span>(data.(<span class="predefined-type">int16</span>))
+      <span class="keyword">if</span> right_stick.y != val {
+        right_stick.y = val
+      }
+    })
+
+    gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">0.01s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() {
+      pair := left_stick
+      <span class="keyword">if</span> pair.y &lt; <span class="integer">-10</span> {
+        drone.Forward(validatePitch(pair.y, offset))
+      } <span class="keyword">else</span> <span class="keyword">if</span> pair.y &gt; <span class="integer">10</span> {
+        drone.Backward(validatePitch(pair.y, offset))
+      } <span class="keyword">else</span> {
+        drone.Forward(<span class="integer">0</span>)
+      }
+
+      <span class="keyword">if</span> pair.x &gt; <span class="integer">10</span> {
+        drone.Right(validatePitch(pair.x, offset))
+      } <span class="keyword">else</span> <span class="keyword">if</span> pair.x &lt; <span class="integer">-10</span> {
+        drone.Left(validatePitch(pair.x, offset))
+      } <span class="keyword">else</span> {
+        drone.Right(<span class="integer">0</span>)
+      }
+    })
+
+    gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">0.01s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() {
+      pair := right_stick
+      <span class="keyword">if</span> pair.y &lt; <span class="integer">-10</span> {
+        drone.Up(validatePitch(pair.y, offset))
+      } <span class="keyword">else</span> <span class="keyword">if</span> pair.y &gt; <span class="integer">10</span> {
+        drone.Down(validatePitch(pair.y, offset))
+      } <span class="keyword">else</span> {
+        drone.Up(<span class="integer">0</span>)
+      }
+
+      <span class="keyword">if</span> pair.x &gt; <span class="integer">20</span> {
+        drone.Clockwise(validatePitch(pair.x, offset))
+      } <span class="keyword">else</span> <span class="keyword">if</span> pair.x &lt; <span class="integer">-20</span> {
+        drone.CounterClockwise(validatePitch(pair.x, offset))
+      } <span class="keyword">else</span> {
+        drone.Clockwise(<span class="integer">0</span>)
+      }
     })
   }
 
   robot := gobot.Robot{
-    Connections: []gobot.Connection{joystickAdaptor},
-    Devices:     []gobot.Device{joystick},
+    Connections: []gobot.Connection{joystickAdaptor, ardroneAdaptor},
+    Devices:     []gobot.Device{joystick, drone},
     Work:        work,
   }
 
   robot.Start()
+}
+
+<span class="keyword">func</span> validatePitch(data <span class="predefined-type">float64</span>, offset <span class="predefined-type">float64</span>) <span class="predefined-type">float64</span> {
+  value := math.Abs(data) / offset
+  <span class="keyword">if</span> value &gt;= <span class="float">0.1</span> {
+    <span class="keyword">if</span> value &lt;= <span class="float">1.0</span> {
+      <span class="keyword">return</span> <span class="predefined-type">float64</span>(<span class="predefined-type">int</span>(value*<span class="integer">100</span>)) / <span class="integer">100</span>
+    } <span class="keyword">else</span> {
+      <span class="keyword">return</span> <span class="float">1.0</span>
+    }
+  } <span class="keyword">else</span> {
+    <span class="keyword">return</span> <span class="float">0.0</span>
+  }
 }
 </pre>
               </section><section class="public-events"><div class="commands-api" id="Commands">

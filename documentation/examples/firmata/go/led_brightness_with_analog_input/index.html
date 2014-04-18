@@ -64,34 +64,34 @@
         <div class="main" role="main">
           <section class="content full"><div class="documentation">
               <div class="example">
-                <pre class="CodeRay">package main
+                <pre class="CodeRay"><span class="keyword">package</span> main
 
-import (
-        "fmt"
-        "github.com/hybridgroup/gobot"
-        "github.com/hybridgroup/gobot-firmata"
-        "github.com/hybridgroup/gobot-gpio"
+<span class="keyword">import</span> (
+        <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-firmata</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
 )
 
-func main() {
-        firmata := new(gobotFirmata.FirmataAdaptor)
-        firmata.Name = "firmata"
-        firmata.Port = "/dev/ttyACM0"
+<span class="keyword">func</span> main() {
+        firmata := <span class="predefined">new</span>(gobotFirmata.FirmataAdaptor)
+        firmata.Name = <span class="string"><span class="delimiter">"</span><span class="content">firmata</span><span class="delimiter">"</span></span>
+        firmata.Port = <span class="string"><span class="delimiter">"</span><span class="content">/dev/ttyACM0</span><span class="delimiter">"</span></span>
 
         sensor := gobotGPIO.NewAnalogSensor(firmata)
-        sensor.Name = "sensor"
-        sensor.Pin = "0"
+        sensor.Name = <span class="string"><span class="delimiter">"</span><span class="content">sensor</span><span class="delimiter">"</span></span>
+        sensor.Pin = <span class="string"><span class="delimiter">"</span><span class="content">0</span><span class="delimiter">"</span></span>
 
         led := gobotGPIO.NewLed(firmata)
-        led.Name = "led"
-        led.Pin = "3"
+        led.Name = <span class="string"><span class="delimiter">"</span><span class="content">led</span><span class="delimiter">"</span></span>
+        led.Pin = <span class="string"><span class="delimiter">"</span><span class="content">3</span><span class="delimiter">"</span></span>
 
-        work := func() {
-                gobot.Every("0.1s", func() {
+        work := <span class="keyword">func</span>() {
+                gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">0.1s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() {
                         val := sensor.Read()
-                        brightness := uint8(gobotGPIO.ToPwm(val))
-                        fmt.Println("sensor", val)
-                        fmt.Println("brightness", brightness)
+                        brightness := <span class="predefined-type">uint8</span>(gobotGPIO.ToPwm(val))
+                        fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">sensor</span><span class="delimiter">"</span></span>, val)
+                        fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">brightness</span><span class="delimiter">"</span></span>, brightness)
                         led.Brightness(brightness)
                 })
         }

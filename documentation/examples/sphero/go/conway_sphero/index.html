@@ -64,132 +64,132 @@
         <div class="main" role="main">
           <section class="content full"><div class="documentation">
               <div class="example">
-                <pre class="CodeRay">package main
+                <pre class="CodeRay"><span class="keyword">package</span> main
 
-import (
-  "github.com/hybridgroup/gobot"
-  "github.com/hybridgroup/gobot-sphero"
-  "fmt"
+<span class="keyword">import</span> (
+        <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-sphero</span><span class="delimiter">"</span></span>
 )
 
-type conway struct {
-  alive bool
-  age int
-  contacts int
-  sphero *gobotSphero.SpheroDriver
+<span class="keyword">type</span> conway <span class="keyword">struct</span> {
+        alive    <span class="predefined-type">bool</span>
+        age      <span class="predefined-type">int</span>
+        contacts <span class="predefined-type">int</span>
+        sphero   *gobotSphero.SpheroDriver
 }
 
-func main() {
+<span class="keyword">func</span> main() {
+        master := gobot.GobotMaster()
 
-  var robots []gobot.Robot
-  spheros := []string{
-    "127.0.0.1:4560",
-    "127.0.0.1:4561",
-    "127.0.0.1:4562",
-    "127.0.0.1:4563",
-  }
-
-  for s := range spheros {
-    spheroAdaptor := new(gobotSphero.SpheroAdaptor)
-    spheroAdaptor.Name = "Sphero"
-    spheroAdaptor.Port = spheros[s]
-
-    sphero := gobotSphero.NewSphero(spheroAdaptor)
-    sphero.Name = "Sphero" + spheros[s]
-    sphero.Interval = "0.5s"
-
-    work := func() {
-
-      conway := new(conway)
-      conway.sphero = sphero
-
-      conway.birth()
-
-      go func() {
-        for{
-          gobot.On(sphero.Events["Collision"])
-          conway.contact()
+        spheros := []<span class="predefined-type">string</span>{
+                <span class="string"><span class="delimiter">"</span><span class="content">/dev/rfcomm0</span><span class="delimiter">"</span></span>,
+                <span class="string"><span class="delimiter">"</span><span class="content">/dev/rfcomm1</span><span class="delimiter">"</span></span>,
+                <span class="string"><span class="delimiter">"</span><span class="content">/dev/rfcomm2</span><span class="delimiter">"</span></span>,
         }
-      }()    
 
-      gobot.Every("3s", func() { 
-        if conway.alive == true {
-          conway.movement() 
-        }  
-      })
-      gobot.Every("10s", func() { 
-        if conway.alive == true {
-          conway.birthday()
+        <span class="keyword">for</span> s := <span class="keyword">range</span> spheros {
+                spheroAdaptor := <span class="predefined">new</span>(gobotSphero.SpheroAdaptor)
+                spheroAdaptor.Name = <span class="string"><span class="delimiter">"</span><span class="content">Sphero</span><span class="delimiter">"</span></span>
+                spheroAdaptor.Port = spheros[s]
+
+                sphero := gobotSphero.NewSphero(spheroAdaptor)
+                sphero.Name = <span class="string"><span class="delimiter">"</span><span class="content">Sphero</span><span class="delimiter">"</span></span> + spheros[s]
+
+                work := <span class="keyword">func</span>() {
+
+                        conway := <span class="predefined">new</span>(conway)
+                        conway.sphero = sphero
+
+                        conway.birth()
+
+                        gobot.On(sphero.Events[<span class="string"><span class="delimiter">"</span><span class="content">Collision</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+                                conway.contact()
+                        })
+
+                        gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">3s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() {
+                                <span class="keyword">if</span> conway.alive == <span class="predefined-constant">true</span> {
+                                        conway.movement()
+                                }
+                        })
+
+                        gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">10s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() {
+                                <span class="keyword">if</span> conway.alive == <span class="predefined-constant">true</span> {
+                                        conway.birthday()
+                                }
+                        })
+                }
+
+                master.Robots = <span class="predefined">append</span>(master.Robots, &amp;gobot.Robot{
+                        Connections: []gobot.Connection{spheroAdaptor},
+                        Devices:     []gobot.Device{sphero},
+                        Work:        work,
+                })
         }
-      })
-    }
 
-    robots = append(robots, gobot.Robot{Connections: []interface{} {spheroAdaptor}, Devices: []interface{} {sphero}, Work: work,})
-  }
-
-  gobot.Work(robots)
+        master.Start()
 }
 
-func (c *conway) resetContacts() {
-  c.contacts = 0
+<span class="keyword">func</span> (c *conway) resetContacts() {
+        c.contacts = <span class="integer">0</span>
 }
 
-func (c *conway) contact() {
-  c.contacts += 1
+<span class="keyword">func</span> (c *conway) contact() {
+        c.contacts += <span class="integer">1</span>
 }
 
-func (c *conway) rebirth() {
-  fmt.Println("Welcome back", c.sphero.Name, "!")
-  c.life()
+<span class="keyword">func</span> (c *conway) rebirth() {
+        fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">Welcome back</span><span class="delimiter">"</span></span>, c.sphero.Name, <span class="string"><span class="delimiter">"</span><span class="content">!</span><span class="delimiter">"</span></span>)
+        c.life()
 }
 
-func (c *conway) birth() {
-  c.resetContacts()
-  c.age = 0
-  c.life()
-  c.movement()
+<span class="keyword">func</span> (c *conway) birth() {
+        c.resetContacts()
+        c.age = <span class="integer">0</span>
+        c.life()
+        c.movement()
 }
 
-func (c *conway) life() {
-  c.sphero.SetRGB(0, 255, 0)
-  c.alive = true
+<span class="keyword">func</span> (c *conway) life() {
+        c.sphero.SetRGB(<span class="integer">0</span>, <span class="integer">255</span>, <span class="integer">0</span>)
+        c.alive = <span class="predefined-constant">true</span>
 }
 
-func (c *conway) death() {
-  fmt.Println(c.sphero.Name, "died :(")
-  c.alive = false
-  c.sphero.SetRGB(255, 0, 0)
-  c.sphero.Stop()
+<span class="keyword">func</span> (c *conway) death() {
+        fmt.Println(c.sphero.Name, <span class="string"><span class="delimiter">"</span><span class="content">died :(</span><span class="delimiter">"</span></span>)
+        c.alive = <span class="predefined-constant">false</span>
+        c.sphero.SetRGB(<span class="integer">255</span>, <span class="integer">0</span>, <span class="integer">0</span>)
+        c.sphero.Stop()
 }
 
-func (c *conway) enoughContacts() bool {
-  if c.contacts &gt;= 2 &amp;&amp; c.contacts &lt; 7 {
-    return true
-  } else {
-    return false
-  }
+<span class="keyword">func</span> (c *conway) enoughContacts() <span class="predefined-type">bool</span> {
+        <span class="keyword">if</span> c.contacts &gt;= <span class="integer">2</span> &amp;&amp; c.contacts &lt; <span class="integer">7</span> {
+                <span class="keyword">return</span> <span class="predefined-constant">true</span>
+        } <span class="keyword">else</span> {
+                <span class="keyword">return</span> <span class="predefined-constant">false</span>
+        }
 }
 
-func (c *conway) birthday() {
-  c.age += 1
-    
-  fmt.Println("Happy birthday", c.sphero.Name, "you are", c.age, "and had", c.contacts, "contacts.")
+<span class="keyword">func</span> (c *conway) birthday() {
+        c.age += <span class="integer">1</span>
 
-  if c.enoughContacts() == true {
-    if c.alive == false {
-      c.rebirth()
-    }
-  } else {
-    c.death()
-  }
+        fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">Happy birthday</span><span class="delimiter">"</span></span>, c.sphero.Name, <span class="string"><span class="delimiter">"</span><span class="content">you are</span><span class="delimiter">"</span></span>, c.age, <span class="string"><span class="delimiter">"</span><span class="content">and had</span><span class="delimiter">"</span></span>, c.contacts, <span class="string"><span class="delimiter">"</span><span class="content">contacts.</span><span class="delimiter">"</span></span>)
 
-  c.resetContacts()
+        <span class="keyword">if</span> c.enoughContacts() == <span class="predefined-constant">true</span> {
+                <span class="keyword">if</span> c.alive == <span class="predefined-constant">false</span> {
+                        c.rebirth()
+                }
+        } <span class="keyword">else</span> {
+                c.death()
+        }
+
+        c.resetContacts()
 }
 
-func (c *conway) movement() {
-  if c.alive == true {
-    c.sphero.Roll(100, uint16(gobot.Random(0,360)))
-  }
+<span class="keyword">func</span> (c *conway) movement() {
+        <span class="keyword">if</span> c.alive == <span class="predefined-constant">true</span> {
+                c.sphero.Roll(<span class="integer">100</span>, <span class="predefined-type">uint16</span>(gobot.Rand(<span class="integer">360</span>)))
+        }
 }
 </pre>
               </div>

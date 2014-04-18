@@ -96,7 +96,7 @@
 
   drone := gobotArdrone.NewArdrone(ardroneAdaptor)
   drone.Name = <span class="string"><span class="delimiter">"</span><span class="content">Drone</span><span class="delimiter">"</span></span>
-          ...
+...
 </pre>
               </section><section class="how-to" id="HowToUse"><h2>How To Use</h2>
                 <p>
@@ -120,13 +120,7 @@
   work := <span class="keyword">func</span>() {
     drone.TakeOff()
     gobot.On(drone.Events[<span class="string"><span class="delimiter">"</span><span class="content">Flying</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
-      gobot.After(<span class="string"><span class="delimiter">"</span><span class="content">1s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() {
-        drone.Right(<span class="float">0.1</span>)
-      })
-      gobot.After(<span class="string"><span class="delimiter">"</span><span class="content">2s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() {
-        drone.Left(<span class="float">0.1</span>)
-      })
-      gobot.After(<span class="string"><span class="delimiter">"</span><span class="content">3s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() {
+      gobot.After(<span class="string"><span class="delimiter">"</span><span class="content">15s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() {
         drone.Land()
       })
     })

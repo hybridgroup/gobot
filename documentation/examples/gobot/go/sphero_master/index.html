@@ -64,34 +64,34 @@
         <div class="main" role="main">
           <section class="content full"><div class="documentation">
               <div class="example">
-                <pre class="CodeRay">package main
+                <pre class="CodeRay"><span class="keyword">package</span> main
 
-import (
-        "github.com/hybridgroup/gobot"
-        "github.com/hybridgroup/gobot-sphero"
+<span class="keyword">import</span> (
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-sphero</span><span class="delimiter">"</span></span>
 )
 
-func main() {
+<span class="keyword">func</span> main() {
         master := gobot.GobotMaster()
 
-        spheros := map[string]string{
-                "Sphero-BPO": "/dev/rfcomm0",
+        spheros := <span class="keyword">map</span>[<span class="predefined-type">string</span>]<span class="predefined-type">string</span>{
+                <span class="string"><span class="delimiter">"</span><span class="content">Sphero-BPO</span><span class="delimiter">"</span></span>: <span class="string"><span class="delimiter">"</span><span class="content">/dev/rfcomm0</span><span class="delimiter">"</span></span>,
         }
 
-        for name, port := range spheros {
-                spheroAdaptor := new(gobotSphero.SpheroAdaptor)
-                spheroAdaptor.Name = "sphero"
+        <span class="keyword">for</span> name, port := <span class="keyword">range</span> spheros {
+                spheroAdaptor := <span class="predefined">new</span>(gobotSphero.SpheroAdaptor)
+                spheroAdaptor.Name = <span class="string"><span class="delimiter">"</span><span class="content">sphero</span><span class="delimiter">"</span></span>
                 spheroAdaptor.Port = port
 
                 sphero := gobotSphero.NewSphero(spheroAdaptor)
-                sphero.Name = "sphero"
-                sphero.Interval = "0.5s"
+                sphero.Name = <span class="string"><span class="delimiter">"</span><span class="content">sphero</span><span class="delimiter">"</span></span>
+                sphero.Interval = <span class="string"><span class="delimiter">"</span><span class="content">0.5s</span><span class="delimiter">"</span></span>
 
-                work := func() {
-                        sphero.SetRGB(uint8(255), uint8(0), uint8(0))
+                work := <span class="keyword">func</span>() {
+                        sphero.SetRGB(<span class="predefined-type">uint8</span>(<span class="integer">255</span>), <span class="predefined-type">uint8</span>(<span class="integer">0</span>), <span class="predefined-type">uint8</span>(<span class="integer">0</span>))
                 }
 
-                master.Robots = append(master.Robots, gobot.Robot{
+                master.Robots = <span class="predefined">append</span>(master.Robots, &amp;gobot.Robot{
                         Name:        name,
                         Connections: []gobot.Connection{spheroAdaptor},
                         Devices:     []gobot.Device{sphero},
@@ -99,11 +99,11 @@ func main() {
                 })
         }
 
-        master.Robots = append(master.Robots, gobot.Robot{
-                Work: func() {
-                        sphero := master.FindRobot("Sphero-BPO")
-                        gobot.Every("1s", func() {
-                                gobot.Call(sphero.GetDevice("sphero").Driver, "SetRGB", uint8(gobot.Rand(255)), uint8(gobot.Rand(255)), uint8(gobot.Rand(255)))
+        master.Robots = <span class="predefined">append</span>(master.Robots, &amp;gobot.Robot{
+                Work: <span class="keyword">func</span>() {
+                        sphero := master.FindRobot(<span class="string"><span class="delimiter">"</span><span class="content">Sphero-BPO</span><span class="delimiter">"</span></span>)
+                        gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">1s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() {
+                                gobot.Call(sphero.GetDevice(<span class="string"><span class="delimiter">"</span><span class="content">sphero</span><span class="delimiter">"</span></span>).Driver, <span class="string"><span class="delimiter">"</span><span class="content">SetRGB</span><span class="delimiter">"</span></span>, <span class="predefined-type">uint8</span>(gobot.Rand(<span class="integer">255</span>)), <span class="predefined-type">uint8</span>(gobot.Rand(<span class="integer">255</span>)), <span class="predefined-type">uint8</span>(gobot.Rand(<span class="integer">255</span>)))
                         })
                 },
         })

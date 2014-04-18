@@ -64,24 +64,24 @@
         <div class="main" role="main">
           <section class="content full"><div class="documentation">
               <div class="example">
-                <pre class="CodeRay">package main
+                <pre class="CodeRay"><span class="keyword">package</span> main
 
-import (
-        "fmt"
-        "github.com/hybridgroup/gobot"
-        "github.com/hybridgroup/gobot-leapmotion"
+<span class="keyword">import</span> (
+        <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-leapmotion</span><span class="delimiter">"</span></span>
 )
 
-func main() {
-        leapAdaptor := new(gobotLeap.LeapAdaptor)
-        leapAdaptor.Name = "leap"
-        leapAdaptor.Port = "127.0.0.1:6437"
+<span class="keyword">func</span> main() {
+        leapAdaptor := <span class="predefined">new</span>(gobotLeap.LeapAdaptor)
+        leapAdaptor.Name = <span class="string"><span class="delimiter">"</span><span class="content">leap</span><span class="delimiter">"</span></span>
+        leapAdaptor.Port = <span class="string"><span class="delimiter">"</span><span class="content">127.0.0.1:6437</span><span class="delimiter">"</span></span>
 
         leap := gobotLeap.NewLeap(leapAdaptor)
-        leap.Name = "leap"
+        leap.Name = <span class="string"><span class="delimiter">"</span><span class="content">leap</span><span class="delimiter">"</span></span>
 
-        work := func() {
-                gobot.On(leap.Events["Message"], func(data interface{}) {
+        work := <span class="keyword">func</span>() {
+                gobot.On(leap.Events[<span class="string"><span class="delimiter">"</span><span class="content">Message</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
                         fmt.Println(data)
                 })
         }

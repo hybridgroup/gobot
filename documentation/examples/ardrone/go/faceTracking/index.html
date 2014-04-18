@@ -64,80 +64,80 @@
         <div class="main" role="main">
           <section class="content full"><div class="documentation">
               <div class="example">
-                <pre class="CodeRay">package main
+                <pre class="CodeRay"><span class="keyword">package</span> main
 
-import (
-        "fmt"
-        cv "github.com/hybridgroup/go-opencv/opencv"
-        "github.com/hybridgroup/gobot"
-        "github.com/hybridgroup/gobot-ardrone"
-        "github.com/hybridgroup/gobot-opencv"
-        "math"
-        "path"
-        "runtime"
+<span class="keyword">import</span> (
+        <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
+        cv <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/go-opencv/opencv</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-ardrone</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-opencv</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">math</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">path</span><span class="delimiter">"</span></span>
+        <span class="string"><span class="delimiter">"</span><span class="content">runtime</span><span class="delimiter">"</span></span>
 )
 
-func main() {
-        _, currentfile, _, _ := runtime.Caller(0)
-        cascade := path.Join(path.Dir(currentfile), "haarcascade_frontalface_alt.xml")
+<span class="keyword">func</span> main() {
+        _, currentfile, _, _ := runtime.Caller(<span class="integer">0</span>)
+        cascade := path.Join(path.Dir(currentfile), <span class="string"><span class="delimiter">"</span><span class="content">haarcascade_frontalface_alt.xml</span><span class="delimiter">"</span></span>)
 
-        opencv := new(gobotOpencv.Opencv)
-        opencv.Name = "opencv"
+        opencv := <span class="predefined">new</span>(gobotOpencv.Opencv)
+        opencv.Name = <span class="string"><span class="delimiter">"</span><span class="content">opencv</span><span class="delimiter">"</span></span>
 
         window := gobotOpencv.NewWindow(opencv)
-        window.Name = "window"
+        window.Name = <span class="string"><span class="delimiter">"</span><span class="content">window</span><span class="delimiter">"</span></span>
 
         camera := gobotOpencv.NewCamera(opencv)
-        camera.Name = "camera"
-        camera.Source = "tcp://192.168.1.1:5555"
+        camera.Name = <span class="string"><span class="delimiter">"</span><span class="content">camera</span><span class="delimiter">"</span></span>
+        camera.Source = <span class="string"><span class="delimiter">"</span><span class="content">tcp://192.168.1.1:5555</span><span class="delimiter">"</span></span>
 
-        ardroneAdaptor := new(gobotArdrone.ArdroneAdaptor)
-        ardroneAdaptor.Name = "Drone"
+        ardroneAdaptor := <span class="predefined">new</span>(gobotArdrone.ArdroneAdaptor)
+        ardroneAdaptor.Name = <span class="string"><span class="delimiter">"</span><span class="content">Drone</span><span class="delimiter">"</span></span>
 
         drone := gobotArdrone.NewArdrone(ardroneAdaptor)
-        drone.Name = "Drone"
+        drone.Name = <span class="string"><span class="delimiter">"</span><span class="content">Drone</span><span class="delimiter">"</span></span>
 
-        work := func() {
-                detect := false
+        work := <span class="keyword">func</span>() {
+                detect := <span class="predefined-constant">false</span>
                 drone.TakeOff()
-                var image *cv.IplImage
-                gobot.On(camera.Events["Frame"], func(data interface{}) {
+                <span class="keyword">var</span> image *cv.IplImage
+                gobot.On(camera.Events[<span class="string"><span class="delimiter">"</span><span class="content">Frame</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
                         image = data.(*cv.IplImage)
-                        if detect == false {
+                        <span class="keyword">if</span> detect == <span class="predefined-constant">false</span> {
                                 window.ShowImage(image)
                         }
                 })
-                gobot.On(drone.Events["Flying"], func(data interface{}) {
-                        gobot.After("1s", func() { drone.Up(0.2) })
-                        gobot.After("2s", func() { drone.Hover() })
-                        gobot.After("5s", func() {
-                                detect = true
-                                gobot.Every("0.3s", func() {
+                gobot.On(drone.Events[<span class="string"><span class="delimiter">"</span><span class="content">Flying</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+                        gobot.After(<span class="string"><span class="delimiter">"</span><span class="content">1s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() { drone.Up(<span class="float">0.2</span>) })
+                        gobot.After(<span class="string"><span class="delimiter">"</span><span class="content">2s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() { drone.Hover() })
+                        gobot.After(<span class="string"><span class="delimiter">"</span><span class="content">5s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() {
+                                detect = <span class="predefined-constant">true</span>
+                                gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">0.3s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() {
                                         drone.Hover()
                                         i := image
                                         faces := gobotOpencv.DetectFaces(cascade, i)
-                                        biggest := 0
-                                        var face *cv.Rect
-                                        for _, f := range faces {
-                                                if f.Width() &gt; biggest {
+                                        biggest := <span class="integer">0</span>
+                                        <span class="keyword">var</span> face *cv.Rect
+                                        <span class="keyword">for</span> _, f := <span class="keyword">range</span> faces {
+                                                <span class="keyword">if</span> f.Width() &gt; biggest {
                                                         biggest = f.Width()
                                                         face = f
                                                 }
                                         }
-                                        if face != nil {
+                                        <span class="keyword">if</span> face != <span class="predefined-constant">nil</span> {
                                                 gobotOpencv.DrawRectangles(i, []*cv.Rect{face})
-                                                center_x := float64(image.Width()) * 0.5
-                                                turn := -(float64(face.X()) - center_x) / center_x
-                                                fmt.Println("turning:", turn)
-                                                if turn &lt; 0 {
-                                                        drone.Clockwise(math.Abs(turn * 0.4))
-                                                } else {
-                                                        drone.CounterClockwise(math.Abs(turn * 0.4))
+                                                center_x := <span class="predefined-type">float64</span>(image.Width()) * <span class="float">0.5</span>
+                                                turn := -(<span class="predefined-type">float64</span>(face.X()) - center_x) / center_x
+                                                fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">turning:</span><span class="delimiter">"</span></span>, turn)
+                                                <span class="keyword">if</span> turn &lt; <span class="integer">0</span> {
+                                                        drone.Clockwise(math.Abs(turn * <span class="float">0.4</span>))
+                                                } <span class="keyword">else</span> {
+                                                        drone.CounterClockwise(math.Abs(turn * <span class="float">0.4</span>))
                                                 }
                                         }
                                         window.ShowImage(i)
                                 })
-                                gobot.After("20s", func() { drone.Land() })
+                                gobot.After(<span class="string"><span class="delimiter">"</span><span class="content">20s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() { drone.Land() })
                         })
                 })
         }
