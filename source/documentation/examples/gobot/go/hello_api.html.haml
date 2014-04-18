@@ -10,7 +10,7 @@ page_subtitle: "<a href='https://github.com/hybridgroup/gobot/tree/master/exampl
 
 .example
   :markdown
-        :::golang
+        :::go
         package main
 
         import (
@@ -31,7 +31,7 @@ page_subtitle: "<a href='https://github.com/hybridgroup/gobot/tree/master/exampl
         	hello.Name = "hello"
         	hello.Commands = map[string]interface{}{"Hello": Hello}
 
-        	master.Robots = append(master.Robots, *hello)
+        	master.Robots = append(master.Robots, hello)
 
         	master.Start()
         }

@@ -10,7 +10,7 @@ page_subtitle: "<a href='https://github.com/hybridgroup/gobot-beaglebone/tree/ma
 
 .example
   :markdown
-        :::golang
+        :::go
         package main
 
         import (
@@ -32,8 +32,8 @@ page_subtitle: "<a href='https://github.com/hybridgroup/gobot-beaglebone/tree/ma
         	}
 
         	robot := gobot.Robot{
-        		Connections: []interface{}{beaglebone},
-        		Devices:     []interface{}{led},
+        		Connections: []gobot.Connection{beaglebone},
+        		Devices:     []gobot.Device{led},
         		Work:        work,
         	}
 

@@ -10,7 +10,7 @@ page_subtitle: "<a href='https://github.com/hybridgroup/gobot-spark/tree/master/
 
 .example
   :markdown
-        :::golang
+        :::go
         package main
 
         import (
@@ -40,7 +40,7 @@ page_subtitle: "<a href='https://github.com/hybridgroup/gobot-spark/tree/master/
         		})
         	}
 
-        	master.Robots = append(master.Robots, gobot.Robot{
+        	master.Robots = append(master.Robots, &gobot.Robot{
         		Name:        "spark",
         		Connections: []gobot.Connection{spark},
         		Devices:     []gobot.Device{led},

@@ -10,7 +10,7 @@ page_subtitle: "<a href='https://github.com/hybridgroup/gobot/tree/master/exampl
 
 .example
   :markdown
-        :::golang
+        :::go
         package main
 
         import (
@@ -46,7 +46,7 @@ page_subtitle: "<a href='https://github.com/hybridgroup/gobot/tree/master/exampl
         			sphero.SetRGB(uint8(255), uint8(0), uint8(0))
         		}
 
-        		Master.Robots = append(Master.Robots, gobot.Robot{
+        		Master.Robots = append(Master.Robots, &gobot.Robot{
         			Name:        name,
         			Connections: []gobot.Connection{spheroAdaptor},
         			Devices:     []gobot.Device{sphero},
