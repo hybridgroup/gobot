@@ -27,7 +27,7 @@ subnav_platform: true
   %p Installing Gobot with Opencv support is pretty easy.
   :markdown
         :::bash
-        go get path/to/repo/gobot-opencv
+        go get github.com/hybridgroup/gobot-opencv
 
 
   %p If you don't already have OpenCV installed
@@ -80,52 +80,37 @@ subnav_platform: true
   %p Example using the camera.
   :markdown
         :::go
-        package gobotOpencv
+        package main
 
         import (
-          "github.com/hybridgroup/go-opencv/opencv"
+          cv "github.com/hybridgroup/go-opencv/opencv"
           "github.com/hybridgroup/gobot"
+          "github.com/hybridgroup/gobot-opencv"
         )
 
-        type Camera struct {
-          gobot.Driver
-          Adaptor *Opencv
-          camera  *opencv.Capture
-          Source  string
-        }
+        func main() {
 
-        type CameraInterface interface {
-        }
+          opencv := new(gobotOpencv.Opencv)
+          opencv.Name = "opencv"
 
-        func NewCamera(adaptor *Opencv) *Camera {
-          d := new(Camera)
-          d.Events = make(map[string]chan interface{})
-          d.Adaptor = adaptor
-          d.Commands = []string{}
-          return d
-        }
+          window := gobotOpencv.NewWindow(opencv)
+          window.Name = "window"
 
-        func (me *Camera) Start() bool {
-          me.Events["Frame"] = make(chan interface{}, 0)
-          if me.Source != "" {
-            me.camera = opencv.NewFileCapture(me.Source)
-          } else {
-            me.camera = opencv.NewCameraCapture(0)
+          camera := gobotOpencv.NewCamera(opencv)
+          camera.Name = "camera"
+
+          work := func() {
+            gobot.On(camera.Events["Frame"], func(data interface{}) {
+              window.ShowImage(data.(*cv.IplImage))
+            })
           }
-          go func() {
-            for {
-              if me.camera.GrabFrame() {
-                image := me.camera.RetrieveFrame(1)
-                if image != nil {
-                  gobot.Publish(me.Events["Frame"], image)
-                }
-              }
-            }
-          }()
-          return true
+
+          robot := gobot.Robot{
+            Connections: []gobot.Connection{opencv},
+            Devices:     []gobot.Device{window, camera},
+            Work:        work,
+          }
+
+          robot.Start()
         }
-        func (me *Camera) Halt() bool { return true }
-        func (me *Camera) Init() bool { return true }
-				      
-				  
 

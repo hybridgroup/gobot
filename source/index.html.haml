@@ -54,7 +54,7 @@ getting_started_button: "<a href='/documentation/getting-started' class='cta'> G
     `go get -u github.com/hybridgroup/gobot-sphero` 
     to use Gobot with a Sphero.
 
-%h2  Go with Sphero
+%h2  Gobot with Sphero
 :markdown
       :::go
       package main
@@ -80,15 +80,15 @@ getting_started_button: "<a href='/documentation/getting-started' class='cta'> G
         }
 
         robot := gobot.Robot{
-          Connections: []interface{} { spheroAdaptor },
-          Devices:     []interface{} { sphero },
+          Connections: []gobot.Connection{spheroAdaptor},
+          Devices:     []gobot.Device{sphero},
           Work:        work,
         }
 
         robot.Start()
-      } 
+      }
 
-%h2  Go with a Blink
+%h2  Gobot with a Blink
 :markdown
       :::go
       package main

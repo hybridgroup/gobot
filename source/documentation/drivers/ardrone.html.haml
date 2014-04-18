@@ -38,7 +38,7 @@ ardrone_platform: true
 
           drone := gobotArdrone.NewArdrone(ardroneAdaptor)
           drone.Name = "Drone"
-                  ...
+        ...
 
 %section.how-to#HowToUse
   %h2 How To Use
@@ -64,13 +64,7 @@ ardrone_platform: true
           work := func() {
             drone.TakeOff()
             gobot.On(drone.Events["Flying"], func(data interface{}) {
-              gobot.After("1s", func() {
-                drone.Right(0.1)
-              })
-              gobot.After("2s", func() {
-                drone.Left(0.1)
-              })
-              gobot.After("3s", func() {
+              gobot.After("15s", func() {
                 drone.Land()
               })
             })

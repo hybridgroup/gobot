@@ -39,45 +39,37 @@ sphero_driver: true
   %p Example of a simple program that makes the Sphero roll.
 
   :markdown
-        :::javascript
+        :::go
         package main
+
         import (
           "github.com/hybridgroup/gobot"
           "github.com/hybridgroup/gobot-sphero"
-          "fmt"
         )
 
         func main() {
 
           spheroAdaptor := new(gobotSphero.SpheroAdaptor)
           spheroAdaptor.Name = "Sphero"
-          spheroAdaptor.Port = "127.0.0.1:4560"
+          spheroAdaptor.Port = "/dev/rfcomm0"
 
           sphero := gobotSphero.NewSphero(spheroAdaptor)
           sphero.Name = "Sphero"
 
-          connections := []gobot.Connection {
-            spheroAdaptor,
-          }
-          devices := []gobot.Device {
-            sphero,
-          }
-
-          work := func(){
-            gobot.Every("2s", func(){ 
-              sphero.Roll(100, uint16(gobot.Random(0, 360))) 
+          work := func() {
+            gobot.Every("2s", func() {
+              sphero.Roll(100, uint16(gobot.Rand(360)))
             })
           }
 
           robot := gobot.Robot{
-              Connections: connections, 
-              Devices: devices,
-              Work: work,
+            Connections: []gobot.Connection{spheroAdaptor},
+            Devices:     []gobot.Device{sphero},
+            Work:        work,
           }
 
           robot.Start()
         }
-
 
 %section.drivers#Drivers
   %h2 Drivers

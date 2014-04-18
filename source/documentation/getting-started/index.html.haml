@@ -80,47 +80,34 @@ layout: documentation
         package main
 
         import (
-                "fmt"
-                "github.com/hybridgroup/gobot"
-                "github.com/hybridgroup/gobot-firmata"
-                "github.com/hybridgroup/gobot-gpio"
+          "github.com/hybridgroup/gobot"
+          "github.com/hybridgroup/gobot-firmata"
+          "github.com/hybridgroup/gobot-gpio"
         )
 
         func main() {
 
-                firmata := new(gobotFirmata.FirmataAdaptor)
-                firmata.Name = "firmata"
-                firmata.Port = "/dev/ttyACM0"
+          firmata := new(gobotFirmata.FirmataAdaptor)
+          firmata.Name = "firmata"
+          firmata.Port = "/dev/ttyACM0"
 
-                led := gobotGPIO.NewLed(firmata)
-                led.Name = "led"
-                led.Pin = "13"
+          led := gobotGPIO.NewLed(firmata)
+          led.Name = "led"
+          led.Pin = "13"
 
-                connections := []interface{}{
-                        firmata,
-                }
-                devices := []interface{}{
-                        led,
-                }
+          work := func() {
+            gobot.Every("1s", func() {
+              led.Toggle()
+            })
+          }
 
-                work := func() {
-                        gobot.Every("1s", func() {
-                                led.Toggle()
-                                if led.IsOn() {
-                                        fmt.Println("On")
-                                } else {
-                                        fmt.Println("Off")
-                                }
-                        })
-                }
+          robot := gobot.Robot{
+            Connections: []gobot.Connection{firmata},
+            Devices:     []gobot.Device{led},
+            Work:        work,
+          }
 
-                robot := gobot.Robot{
-                        Connections: connections,
-                        Devices:     devices,
-                        Work:        work,
-                }
-
-                robot.Start()
+          robot.Start()
         }
 
   %h3 Sphero 2.0
@@ -151,8 +138,8 @@ layout: documentation
           }
 
           robot := gobot.Robot{
-            Connections: []interface{} { spheroAdaptor },
-            Devices:     []interface{} { sphero },
+            Connections: []gobot.Connection{spheroAdaptor},
+            Devices:     []gobot.Device{sphero},
             Work:        work,
           }
 
@@ -182,10 +169,20 @@ layout: documentation
     = link_to "gobot on github.","https://github.com/hybridgroup/gobot" 
 
   %ul
-    %li Fork it
-    %li Create your feature branch (git checkout -b my-new-feature)
-    %li Commit your changes (git commit -am 'Add some feature')
-    %li Push to the branch (git push origin my-new-feature)
-    %li Create new Pull Request
+    %li All patches must be provided under the Apache 2.0 License
+    %li Please use the -s option in git to "sign off" that the commit is your work and you are providing it under the Apache 2.0 License
+    %li Submit a Github Pull Request to the appropriate branch and ideally discuss the changes with us in IRC.
+    %li We will look at the patch, test it out, and give you feedback.
+    %li Avoid doing minor whitespace changes, renamings, etc. along with merged content. These will be done by the maintainers from time to time but they can complicate merges and should be done seperately.
+    %li Take care to maintain the existing coding style.
+    %li Add unit tests for any new or changed functionality.
+    %li All pull requests should be "fast forward".
+    %ul 
+      %li If there are commits after yours use “git rebase -i ”
+      %li If you have local changes you may need to use “git stash”
+      %li 
+        For git help see 
+        = link_to "progit","http://git-scm.com/book", target: "_blank" 
+        which is an awesome (and free) book on git
 
 %section.footer
