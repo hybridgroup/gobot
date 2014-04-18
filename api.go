@@ -3,16 +3,19 @@ package gobot
 import (
 	"encoding/json"
 	"github.com/go-martini/martini"
+	"github.com/martini-contrib/auth"
 	"io/ioutil"
 	"net/http"
 	"reflect"
 )
 
 type api struct {
-	master *Master
-	server *martini.ClassicMartini
-	Host   string
-	Port   string
+	master 		*Master
+	server 		*martini.ClassicMartini
+	Host   		string
+	Port   		string
+	Username  string
+	Password 	string
 }
 
 type jsonRobot struct {
@@ -36,6 +39,12 @@ type jsonConnection struct {
 }
 
 var startApi = func(me *api) {
+	username := me.Username
+	if username != "" {
+		password := me.Password
+		me.server.Use(auth.Basic(username, password))
+	}
+
 	port := me.Port
 	if port == "" {
 		port = "3000"
