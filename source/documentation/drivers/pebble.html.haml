@@ -11,14 +11,14 @@ pebble_platform: true
 %section.intro
   =image_tag "/images/devices/pebble.jpg", class: "display"
   .info-intro
-    %p Allows user to interact with Cylon.js devices using a Pebble smart watch.
+    %p Allows user to interact with gobot devices using a Pebble smart watch.
   .clear
   
 %section.how-to
   %h2 How to establish a connection and setup the driver
   :markdown
         :::go
-        require 'Cylon.js'
+        require 'gobot'
         connection :pebble, :adaptor => :pebble, :port => "/dev/rfcomm0", :id => "378B"
         device :watch, :driver => :pebble
 
@@ -35,7 +35,7 @@ pebble_platform: true
   %h3 Example receiving button events from a Pebble smart watch.
   :markdown
         :::go
-        require 'Cylon.js'
+        require 'gobot'
 
         connection :pebble, :adaptor => :pebble, :port => "/dev/rfcomm0", :id => "378B"
         device :watch, :driver => :pebble
