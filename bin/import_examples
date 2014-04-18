@@ -3,7 +3,7 @@
 # Change project details here
 Project = Struct
   .new(:name, :pretty_name, :language, :extension)
-  .new('gobot', 'Gobot', 'golang', 'go')
+  .new('gobot', 'Gobot', 'go', 'go')
 
 require 'bundler'
 Bundler.setup
