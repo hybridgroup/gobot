@@ -37,49 +37,43 @@ ardrone_flight_driver: true
         package main
 
         import (
-            "github.com/hybridgroup/gobot"
-            "github.com/hybridgroup/gobot-ardrone"
+          "github.com/hybridgroup/gobot"
+          "github.com/hybridgroup/gobot-ardrone"
         )
 
         func main() {
 
-            ardroneAdaptor := new(gobotArdrone.ArdroneAdaptor)
-            ardroneAdaptor.Name = "Drone"
+          ardroneAdaptor := new(gobotArdrone.ArdroneAdaptor)
+          ardroneAdaptor.Name = "Drone"
 
-            drone := gobotArdrone.NewArdrone(ardroneAdaptor)
-            drone.Name = "Drone"
+          drone := gobotArdrone.NewArdrone(ardroneAdaptor)
+          drone.Name = "Drone"
 
-            work := func() {
-                drone.TakeOff()
-                gobot.On(drone.Events["Flying"], func(data interface{}) {
-                    gobot.After("1s", func() {
-                        drone.Right(0.1)
-                    })
-                    gobot.After("2s", func() {
-                        drone.Left(0.1)
-                    })
-                    gobot.After("3s", func() {
-                        drone.Land()
-                    })
-                })
-            }
+          work := func() {
+            drone.TakeOff()
+            gobot.On(drone.Events["Flying"], func(data interface{}) {
+              gobot.After("15s", func() {
+                drone.Land()
+              })
+            })
+          }
 
-            robot := gobot.Robot{
-                Connections: []gobot.Connection{ardroneAdaptor},
-                Devices:     []gobot.Device{drone},
-                Work:        work,
-            }
+          robot := gobot.Robot{
+            Connections: []gobot.Connection{ardroneAdaptor},
+            Devices:     []gobot.Device{drone},
+            Work:        work,
+          }
 
-            robot.Start()
+          robot.Start()
         }
 
 %section.how-to#HowToConnect
   %h2 How To Connect
   %p The ARDrone is a WiFi device, so there is no additional work to establish a connection to a single drone. However, in order to connect to multiple drones, you need to perform some configuration steps on each drone via SSH.
 
-  -#%h2 Automatic Reset From Emergency Mode
+  %h2 Automatic Reset From Emergency Mode
 
-  -#%p When you first connect to the ARDrone by calling the `start` method, if it is in "emergency" mode, the ARDrone will not take off. Gobot can automatically reset it back "normal" mode, to be able to fly IF you pass in the navigation like this example:
+  %p Gobot will automatically reset the emergency mode back to the "normal" state on TakeOff
 
   -#:markdown
         -#:::bash
@@ -87,7 +81,7 @@ ardrone_flight_driver: true
 
 %section.drivers#Drivers
   %h2 Drivers
-  %p Available drivers for the ARDrone platform are listed below. There are three drivers for the ARDrone: the ARDrone for flight control and the ARDroneNav for navigation data.
+  %p Available drivers for the ARDrone platform are listed below..
 
   .hardware
     .devices

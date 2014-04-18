@@ -23,35 +23,29 @@ spark_platform: true
   %h2 How To Connect
   :markdown
     Install the library with: `go get -u github.com/hybridgroup/gobot-gpio`
-  %h3 For Spark:
+  %h3 For Firmata:
   :markdown
         :::go
         package main
 
         import (
-          "fmt"
           "github.com/hybridgroup/gobot"
+          "github.com/hybridgroup/gobot-firmata"
           "github.com/hybridgroup/gobot-gpio"
-          "github.com/hybridgroup/gobot-spark"
         )
 
         func main() {
+          firmata := new(gobotFirmata.FirmataAdaptor)
+          firmata.Name = "firmata"
+          firmata.Port = "/dev/ttyACM0"
 
-          spark := new(gobotSpark.SparkAdaptor)
-          spark.Name = "spark"
-          spark.Params = map[string]interface{}{
-            "device_id":    "",
-            "access_token": "",
-          }
-
-          button := gobotGPIO.NewButton(spark)
+          button := gobotGPIO.NewButton(firmata)
           button.Name = "button"
-          button.Pin = "D5"
-          button.Interval = "2s"
+          button.Pin = "2"
 
-          led := gobotGPIO.NewLed(spark)
+          led := gobotGPIO.NewLed(firmata)
           led.Name = "led"
-          led.Pin = "D7"
+          led.Pin = "13"
         ...
 
 
@@ -64,29 +58,23 @@ spark_platform: true
         package main
 
         import (
-          "fmt"
           "github.com/hybridgroup/gobot"
+          "github.com/hybridgroup/gobot-firmata"
           "github.com/hybridgroup/gobot-gpio"
-          "github.com/hybridgroup/gobot-spark"
         )
 
         func main() {
+          firmata := new(gobotFirmata.FirmataAdaptor)
+          firmata.Name = "firmata"
+          firmata.Port = "/dev/ttyACM0"
 
-          spark := new(gobotSpark.SparkAdaptor)
-          spark.Name = "spark"
-          spark.Params = map[string]interface{}{
-            "device_id":    "",
-            "access_token": "",
-          }
-
-          button := gobotGPIO.NewButton(spark)
+          button := gobotGPIO.NewButton(firmata)
           button.Name = "button"
-          button.Pin = "D5"
-          button.Interval = "2s"
+          button.Pin = "2"
 
-          led := gobotGPIO.NewLed(spark)
+          led := gobotGPIO.NewLed(firmata)
           led.Name = "led"
-          led.Pin = "D7"
+          led.Pin = "13"
 
           work := func() {
             gobot.On(button.Events["push"], func(data interface{}) {
@@ -99,7 +87,7 @@ spark_platform: true
           }
 
           robot := gobot.Robot{
-            Connections: []gobot.Connection{spark},
+            Connections: []gobot.Connection{firmata},
             Devices:     []gobot.Device{button, led},
             Work:        work,
           }

@@ -27,7 +27,7 @@ subnav_platform: true
   %p Installing Gobot with Opencv support is pretty easy.
   :markdown
         :::bash
-        go get path/to/repo/gobot-opencv
+        go get github.com/hybridgroup/gobot-opencv
 
 
   %p If you don't already have OpenCV installed
@@ -77,7 +77,7 @@ subnav_platform: true
 
 %section.how-to#HowToUse
   %h2 How To Use
-  %p Example using the camera and face detection.
+  %p Example using the camera.
   :markdown
         :::go
         package main
@@ -86,13 +86,9 @@ subnav_platform: true
           cv "github.com/hybridgroup/go-opencv/opencv"
           "github.com/hybridgroup/gobot"
           "github.com/hybridgroup/gobot-opencv"
-          "path"
-          "runtime"
         )
 
         func main() {
-          _, currentfile, _, _ := runtime.Caller(0)
-          cascade := path.Join(path.Dir(currentfile), "haarcascade_frontalface_alt.xml")
 
           opencv := new(gobotOpencv.Opencv)
           opencv.Name = "opencv"
@@ -105,8 +101,7 @@ subnav_platform: true
 
           work := func() {
             gobot.On(camera.Events["Frame"], func(data interface{}) {
-              i := data.(*cv.IplImage)
-              window.ShowImage(gobotOpencv.DrawRectangles(i, gobotOpencv.DetectFaces(cascade, i)))
+              window.ShowImage(data.(*cv.IplImage))
             })
           }
 

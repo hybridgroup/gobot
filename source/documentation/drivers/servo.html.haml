@@ -22,7 +22,7 @@ digispark_platform: true
   %h2 How To Connect
   :markdown
     Install the library with: `go get -u github.com/hybridgroup/gobot-gpio`
-  %h3 For Digispark:
+  %h3 For Firmata:
   :markdown
         :::go
         package main
@@ -30,18 +30,19 @@ digispark_platform: true
         import (
           "fmt"
           "github.com/hybridgroup/gobot"
-          "github.com/hybridgroup/gobot-digispark"
+          "github.com/hybridgroup/gobot-firmata"
           "github.com/hybridgroup/gobot-gpio"
         )
 
         func main() {
 
-          digispark := new(gobotDigispark.DigisparkAdaptor)
-          digispark.Name = "digispark"
+          firmata := new(gobotFirmata.FirmataAdaptor)
+          firmata.Name = "firmata"
+          firmata.Port = "/dev/ttyACM0"
 
-          servo := gobotGPIO.NewServo(digispark)
+          servo := gobotGPIO.NewServo(firmata)
           servo.Name = "servo"
-          servo.Pin = "0"
+          servo.Pin = "3"
         ...
 
 %section.how-to#HowToUse
@@ -57,21 +58,21 @@ digispark_platform: true
         import (
           "fmt"
           "github.com/hybridgroup/gobot"
-          "github.com/hybridgroup/gobot-digispark"
+          "github.com/hybridgroup/gobot-firmata"
           "github.com/hybridgroup/gobot-gpio"
         )
 
         func main() {
 
-          digispark := new(gobotDigispark.DigisparkAdaptor)
-          digispark.Name = "digispark"
+          firmata := new(gobotFirmata.FirmataAdaptor)
+          firmata.Name = "firmata"
+          firmata.Port = "/dev/ttyACM0"
 
-          servo := gobotGPIO.NewServo(digispark)
+          servo := gobotGPIO.NewServo(firmata)
           servo.Name = "servo"
-          servo.Pin = "0"
+          servo.Pin = "3"
 
           work := func() {
-            servo.InitServo()
             gobot.Every("1s", func() {
               i := uint8(gobot.Rand(180))
               fmt.Println("Turning", i)
@@ -80,8 +81,8 @@ digispark_platform: true
           }
 
           robot := gobot.Robot{
-            Connections: []interface{}{digispark},
-            Devices:     []interface{}{servo},
+            Connections: []gobot.Connection{firmata},
+            Devices:     []gobot.Device{servo},
             Work:        work,
           }
 
