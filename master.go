@@ -9,6 +9,7 @@ import (
 type Master struct {
 	Robots []*Robot
 	NumCPU int
+	Api *api
 }
 
 func GobotMaster() *Master {
@@ -23,6 +24,10 @@ var trap = func(c chan os.Signal) {
 
 func (m *Master) Start() {
 	runtime.GOMAXPROCS(m.NumCPU)
+
+	if m.Api != nil {
+    m.Api.StartApi()
+	}
 
 	for s := range m.Robots {
 		m.Robots[s].startRobot()

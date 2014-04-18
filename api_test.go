@@ -3,7 +3,7 @@ package gobot
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/go-martini/martini"
+	//"github.com/go-martini/martini"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"io/ioutil"
@@ -19,8 +19,8 @@ var _ = Describe("Master", func() {
 	)
 
 	BeforeEach(func() {
-		myMaster = GobotMaster()
-		startApi = func(m *martini.ClassicMartini) {}
+		myMaster = GobotMaster()		
+		//startApi = func(m *martini.ClassicMartini) {}
 		a = Api(myMaster)
 		myMaster.Robots = []*Robot{
 			newTestRobot("Robot 1"),

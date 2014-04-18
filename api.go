@@ -10,6 +10,7 @@ import (
 
 type api struct {
 	master *Master
+	server *martini.ClassicMartini
 }
 
 type jsonRobot struct {
@@ -32,14 +33,17 @@ type jsonConnection struct {
 	Adaptor string `json:"adaptor"`
 }
 
-var startApi = func(m *martini.ClassicMartini) {
-	go m.Run()
+func (me *api) StartApi() {
+	go me.server.Run()
 }
 
 func Api(bot *Master) *api {
 	a := new(api)
 	a.master = bot
+	bot.Api = a
+
 	m := martini.Classic()
+	a.server = m
 
 	m.Use(martini.Static("robeaux"))
 
@@ -85,7 +89,7 @@ func Api(bot *Master) *api {
 		a.executeCommand(params["robotname"], params["devicename"], params["command"], res, req)
 	})
 
-	startApi(m)
+	//startApi(m)
 	return a
 }
 
