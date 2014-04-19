@@ -3,13 +3,21 @@ package gobot
 import (
 	"encoding/json"
 	"github.com/go-martini/martini"
+	"github.com/martini-contrib/auth"
 	"io/ioutil"
 	"net/http"
 	"reflect"
 )
 
 type api struct {
-	master *Master
+	master   *Master
+	server   *martini.ClassicMartini
+	Host     string
+	Port     string
+	Username string
+	Password string
+	Cert     string
+	Key      string
 }
 
 type jsonRobot struct {
@@ -32,14 +40,40 @@ type jsonConnection struct {
 	Adaptor string `json:"adaptor"`
 }
 
-var startApi = func(m *martini.ClassicMartini) {
-	go m.Run()
+var startApi = func(me *api) {
+	username := me.Username
+	if username != "" {
+		password := me.Password
+		me.server.Use(auth.Basic(username, password))
+	}
+
+	port := me.Port
+	if port == "" {
+		port = "3000"
+	}
+
+	host := me.Host
+	cert := me.Cert
+	key := me.Key
+
+	if cert != "" && key != "" {
+		go http.ListenAndServeTLS(host+":"+port, cert, key, me.server)
+	} else {
+		go http.ListenAndServe(host+":"+port, me.server)
+	}
+}
+
+func (me *api) startApi() {
+	startApi(me)
 }
 
 func Api(bot *Master) *api {
 	a := new(api)
 	a.master = bot
+	bot.Api = a
+
 	m := martini.Classic()
+	a.server = m
 
 	m.Use(martini.Static("robeaux"))
 
@@ -85,7 +119,6 @@ func Api(bot *Master) *api {
 		a.executeCommand(params["robotname"], params["devicename"], params["command"], res, req)
 	})
 
-	startApi(m)
 	return a
 }
 

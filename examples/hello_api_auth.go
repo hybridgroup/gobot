@@ -13,7 +13,8 @@ func Hello(params map[string]interface{}) string {
 func main() {
 	master := gobot.GobotMaster()
 	api := gobot.Api(master)
-	api.Port = "4000"
+	api.Username = "gort"
+	api.Password = "klatuu"
 
 	hello := new(gobot.Robot)
 	hello.Name = "hello"

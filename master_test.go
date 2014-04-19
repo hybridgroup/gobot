@@ -18,6 +18,7 @@ var _ = Describe("Master", func() {
 			newTestRobot("Robot 2"),
 			newTestRobot("Robot 3"),
 		}
+		startApi = func(m *api) {}
 		trap = func(c chan os.Signal) {
 			c <- os.Interrupt
 		}
