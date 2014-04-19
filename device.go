@@ -2,13 +2,15 @@ package gobot
 
 import (
 	"log"
+	"reflect"
 )
 
 type device struct {
 	Name     string          `json:"name"`
+	Type     string          `json:"driver"`
 	Interval string          `json:"-"`
 	Robot    *Robot          `json:"-"`
-	Driver   DriverInterface `json:"driver"`
+	Driver   DriverInterface `json:"-"`
 }
 
 type Device interface {
@@ -19,6 +21,7 @@ type Device interface {
 
 func NewDevice(driver DriverInterface, r *Robot) *device {
 	d := new(device)
+	d.Type = reflect.ValueOf(driver).Type().String()
 	d.Name = FieldByNamePtr(driver, "Name").String()
 	d.Robot = r
 	if FieldByNamePtr(driver, "Interval").String() == "" {

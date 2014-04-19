@@ -51,6 +51,7 @@ func (r *Robot) initName() {
 }
 
 func (r *Robot) initCommands() {
+	r.RobotCommands = make([]string, 0)
 	for k, _ := range r.Commands {
 		r.RobotCommands = append(r.RobotCommands, k)
 	}

@@ -119,6 +119,14 @@ func Api(bot *Master) *api {
 		a.executeCommand(params["robotname"], params["devicename"], params["command"], res, req)
 	})
 
+	m.Get("/robots/:robotname/connections", func(params martini.Params, res http.ResponseWriter, req *http.Request) {
+		a.robot_connections(params["robotname"], res, req)
+	})
+
+	m.Get("/robots/:robotname/connections/:connectionname", func(params martini.Params, res http.ResponseWriter, req *http.Request) {
+		a.robot_connection(params["robotname"], params["connectionname"], res, req)
+	})
+
 	return a
 }
 
@@ -167,6 +175,23 @@ func (me *api) robot_device_commands(robot string, device string, res http.Respo
 	res.Write(data)
 }
 
+func (me *api) robot_connections(name string, res http.ResponseWriter, req *http.Request) {
+	connections := me.master.FindRobot(name).GetConnections()
+	jsonConnections := make([]*jsonConnection, 0)
+	for _, connection := range connections {
+		jsonConnections = append(jsonConnections, me.formatJsonConnection(connection))
+	}
+	data, _ := json.Marshal(jsonConnections)
+	res.Header().Set("Content-Type", "application/json; charset=utf-8")
+	res.Write(data)
+}
+
+func (me *api) robot_connection(robot string, connection string, res http.ResponseWriter, req *http.Request) {
+	data, _ := json.Marshal(me.formatJsonConnection(me.master.FindRobotConnection(robot, connection)))
+	res.Header().Set("Content-Type", "application/json; charset=utf-8")
+	res.Write(data)
+}
+
 func (a *api) formatJsonRobot(robot *Robot) *jsonRobot {
 	jsonRobot := new(jsonRobot)
 	jsonRobot.Name = robot.Name
@@ -180,14 +205,19 @@ func (a *api) formatJsonRobot(robot *Robot) *jsonRobot {
 	return jsonRobot
 }
 
+func (a *api) formatJsonConnection(connection *connection) *jsonConnection {
+	jsonConnection := new(jsonConnection)
+	jsonConnection.Name = connection.Name
+	jsonConnection.Port = connection.Port
+	jsonConnection.Adaptor = connection.Type
+	return jsonConnection
+}
+
 func (a *api) formatJsonDevice(device *device) *jsonDevice {
 	jsonDevice := new(jsonDevice)
 	jsonDevice.Name = device.Name
-	jsonDevice.Driver = FieldByNamePtr(device.Driver, "Name").Interface().(string)
-	jsonDevice.Connection = new(jsonConnection)
-	jsonDevice.Connection.Name = FieldByNamePtr(FieldByNamePtr(device.Driver, "Adaptor").Interface().(AdaptorInterface), "Name").Interface().(string)
-	jsonDevice.Connection.Port = FieldByNamePtr(FieldByNamePtr(device.Driver, "Adaptor").Interface().(AdaptorInterface), "Port").Interface().(string)
-	jsonDevice.Connection.Adaptor = FieldByNamePtr(device.Driver, "Adaptor").Type().Name()
+	jsonDevice.Driver = device.Type
+	jsonDevice.Connection = a.formatJsonConnection(a.master.FindRobotConnection(device.Robot.Name, FieldByNamePtr(FieldByNamePtr(device.Driver, "Adaptor").Interface().(AdaptorInterface), "Name").Interface().(string)))
 	jsonDevice.Commands = FieldByNamePtr(device.Driver, "Commands").Interface().([]string)
 	return jsonDevice
 }

@@ -2,11 +2,13 @@ package gobot
 
 import (
 	"log"
+	"reflect"
 )
 
 type connection struct {
 	Name    string                 `json:"name"`
-	Adaptor AdaptorInterface       `json:"adaptor"`
+	Type    string                 `json:"adaptor"`
+	Adaptor AdaptorInterface       `json:"-"`
 	Port    string                 `json:"-"`
 	Robot   *Robot                 `json:"-"`
 	Params  map[string]interface{} `json:"-"`
@@ -19,6 +21,7 @@ type Connection interface {
 
 func NewConnection(adaptor AdaptorInterface, r *Robot) *connection {
 	c := new(connection)
+	c.Type = reflect.ValueOf(adaptor).Type().String()
 	c.Name = FieldByNamePtr(adaptor, "Name").String()
 	c.Port = FieldByNamePtr(adaptor, "Port").String()
 	c.Params = make(map[string]interface{})
