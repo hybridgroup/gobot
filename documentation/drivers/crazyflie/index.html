@@ -82,9 +82,9 @@
                 <p>
                   Communication with the Crazyflie's flight control interface takes place using a 2.4GHz radio connection. The Crazyflie is controlled from your computer using a Crazyradio, which is a custom USB 2.4GHz radio device.
                 </p>
-                <pre class="CodeRay">require <span class="string"><span class="delimiter">'</span><span class="content">Cylon.js</span><span class="delimiter">'</span></span>
-connection <span class="symbol">:crazyflie</span>, <span class="symbol">:adaptor</span> =&gt; <span class="symbol">:crazyflie</span>
-device <span class="symbol">:drone</span>, <span class="symbol">:driver</span> =&gt; <span class="symbol">:crazyflie</span>, <span class="symbol">:connection</span> =&gt; <span class="symbol">:crazyflie</span>, <span class="symbol">:interval</span> =&gt; <span class="float">0.1</span>
+                <pre class="CodeRay">require <span class="char">'g</span>obot<span class="char">'</span>
+connection :crazyflie, :adaptor =&gt; :crazyflie
+device :drone, :driver =&gt; :crazyflie, :connection =&gt; :crazyflie, :interval =&gt; <span class="float">0.1</span>
 </pre>
               </section><section class="public-methods"><h2>Public instance methods:</h2>
                 <h3>start</h3>
@@ -145,7 +145,7 @@ device <span class="symbol">:drone</span>, <span class="symbol">:driver</span> =
                 </p>
               </section><section class="how-to"><h2>How to use</h2>
                 <h3>Example of controlling a Crazyflie.</h3>
-                <pre class="CodeRay">require <span class="string"><span class="delimiter">'</span><span class="content">Cylon.js</span><span class="delimiter">'</span></span>
+                <pre class="CodeRay">require <span class="string"><span class="delimiter">'</span><span class="content">gobot</span><span class="delimiter">'</span></span>
 
 connection <span class="symbol">:crazyflie</span>, <span class="symbol">:adaptor</span> =&gt; <span class="symbol">:crazyflie</span>
 device <span class="symbol">:drone</span>, <span class="symbol">:driver</span> =&gt; <span class="symbol">:crazyflie</span>, <span class="symbol">:connection</span> =&gt; <span class="symbol">:crazyflie</span>, <span class="symbol">:interval</span> =&gt; <span class="float">0.1</span>

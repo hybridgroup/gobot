@@ -7,7 +7,7 @@
 <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
 <meta name="description">
 <meta content="The Hybrid Group" name="author">
-<title>Pebble with Cylon.js</title>
+<title>Pebble with gobot</title>
 <link href="/stylesheets/style.css" rel="stylesheet">
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><script src="/javascripts/script.js"></script><script src="/hybridpages/assets/javascript/subnav.js"></script><link href="//fonts.googleapis.com/css?family=Inconsolata:400,700%7CMontserrat:700" rel="stylesheet">
 <link href="/favicon.ico" rel="shortcut icon" type="image/gif">
@@ -58,7 +58,7 @@
         <div class="w">
           <h1 class="title">Pebble</h1>
           <h2 class="subtitle">
-<a href="https://github.com/hybridgroup/Cylon.js-pebble" class="repository">Repository</a> <a class href="https://github.com/hybridgroup/Cylon.js-pebble/issues">Issues</a>
+<a href="https://github.com/hybridgroup/gobot-pebble" class="repository">Repository</a> <a class href="https://github.com/hybridgroup/gobot-pebble/issues">Issues</a>
 </h2>
         </div>
       </div>
@@ -77,26 +77,26 @@
                 <div class="clear"></div>
               </section><section class="how-to"><h2>How to install</h2>
                 <p>
-                  Installing Cylon.js with pebble support is pretty easy using ruby gems.
+                  Installing gobot with pebble support is pretty easy using ruby gems.
                 </p>
-                <pre class="CodeRay">gem install Cylon.js-pebble
+                <pre class="CodeRay">gem install gobot-pebble
 </pre>
                 <h2>How to use</h2>
                 <p>
                   This small program receives button press events from a Pebble smart watch.
                 </p>
-                <pre class="CodeRay">require <span class="string"><span class="delimiter">'</span><span class="content">Cylon.js</span><span class="delimiter">'</span></span>
+                <pre class="CodeRay">require <span class="char">'g</span>obot<span class="char">'</span>
 
-connection <span class="symbol">:pebble</span>, <span class="symbol">:adaptor</span> =&gt; <span class="symbol">:pebble</span>, <span class="symbol">:port</span> =&gt; <span class="string"><span class="delimiter">"</span><span class="content">/dev/rfcomm0</span><span class="delimiter">"</span></span>, <span class="symbol">:id</span> =&gt; <span class="string"><span class="delimiter">"</span><span class="content">378B</span><span class="delimiter">"</span></span>
-device <span class="symbol">:watch</span>, <span class="symbol">:driver</span> =&gt; <span class="symbol">:pebble</span>
+connection :pebble, :adaptor =&gt; :pebble, :port =&gt; <span class="string"><span class="delimiter">"</span><span class="content">/dev/rfcomm0</span><span class="delimiter">"</span></span>, :id =&gt; <span class="string"><span class="delimiter">"</span><span class="content">378B</span><span class="delimiter">"</span></span>
+device :watch, :driver =&gt; :pebble
 
-work <span class="keyword">do</span>
-  on watch, <span class="symbol">:media_control</span> =&gt; <span class="symbol">:button_push</span>
-<span class="keyword">end</span>
+work do
+  on watch, :media_control =&gt; :button_push
+end
 
-<span class="keyword">def</span> <span class="function">button_push</span>(caller, data)
-  puts data.button <span class="keyword">unless</span> data.nil?
-<span class="keyword">end</span>
+def button_push(caller, data)
+  puts data.button unless data.<span class="predefined-constant">nil</span>?
+end
 </pre>
                 <h2>How to connect</h2>
                 <p>This software requires version 1.12.0 of the Pebble watch firmware.</p>
@@ -105,13 +105,13 @@ work <span class="keyword">do</span>
                 <ul>
 <li>Pair your computer and the Pebble</li>
                   <li>Use a socket to serial connection to map a TCP socket to the local port</li>
-                  <li>Connect to the device via Cylon.js</li>
-                  <li>To figure out which port your pebble is connected to, use the Cylon.js connect scan command:</li>
+                  <li>Connect to the device via gobot</li>
+                  <li>To figure out which port your pebble is connected to, use the gobot connect scan command:</li>
                 </ul>
-<pre class="CodeRay">$ Cylon.js connect scan
+<pre class="CodeRay">$ gobot connect scan
 </pre>
                 <p>Now you are ready to connect to the Sphero using the socket, in this example port 4567:</p>
-                <pre class="CodeRay">Cylon.js connect serial 4567 pebble
+                <pre class="CodeRay">gobot connect serial 4567 pebble
 </pre>
                 <h3>Ubuntu</h3>
                 <p>The main steps are:</p>
@@ -119,17 +119,17 @@ work <span class="keyword">do</span>
 <li>Pair your computer and the Pebble</li>
                   <li>Map your device to a port</li>
                   <li>Use a socket to serial connection to map a TCP socket to the local port</li>
-                  <li>Connect to the device via Cylon.js</li>
+                  <li>Connect to the device via gobot</li>
                   <li>You will need to pair with the Pebble, entering any needed password.</li>
                 </ul>
-<p>Then you can find the Bluetooth address, for example 00:18:33:86:37:8B, by using the Cylon.js connect scan command:</p>
-                <pre class="CodeRay">$ Cylon.js connect scan
+<p>Then you can find the Bluetooth address, for example 00:18:33:86:37:8B, by using the gobot connect scan command:</p>
+                <pre class="CodeRay">$ gobot connect scan
 </pre>
-                <p>Once you know the address, you can use the Cylon.js connect bind command to map a port to the device:</p>
-                <pre class="CodeRay">Cylon.js connect bind 00:18:33:86:37:8B pebble
+                <p>Once you know the address, you can use the gobot connect bind command to map a port to the device:</p>
+                <pre class="CodeRay">gobot connect bind 00:18:33:86:37:8B pebble
 </pre>
                 <p>Now you are ready to connect to the Pebble using a socket, in this example port 4567:</p>
-                <pre class="CodeRay">Cylon.js connect socat pebble 4567
+                <pre class="CodeRay">gobot connect socat pebble 4567
 </pre>
               </section><section class="drivers"><h2>Drivers</h2>
                 <p>

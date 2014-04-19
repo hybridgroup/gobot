@@ -87,34 +87,34 @@
 </pre>
               </section><section class="how-to" id="HowToUse"><h2>How To Use</h2>
                 <p>This small program lets the ARDrone take-off, hover, and land.</p>
-                <pre class="CodeRay"><span class="reserved">package</span> main
+                <pre class="CodeRay"><span class="keyword">package</span> main
 
-<span class="reserved">import</span> (
+<span class="keyword">import</span> (
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-ardrone</span><span class="delimiter">"</span></span>
 )
 
-func main() {
+<span class="keyword">func</span> main() {
 
-  <span class="key">ardroneAdaptor</span> := <span class="keyword">new</span>(gobotArdrone.ArdroneAdaptor)
+  ardroneAdaptor := <span class="predefined">new</span>(gobotArdrone.ArdroneAdaptor)
   ardroneAdaptor.Name = <span class="string"><span class="delimiter">"</span><span class="content">Drone</span><span class="delimiter">"</span></span>
 
   drone := gobotArdrone.NewArdrone(ardroneAdaptor)
   drone.Name = <span class="string"><span class="delimiter">"</span><span class="content">Drone</span><span class="delimiter">"</span></span>
 
-  work := func() {
+  work := <span class="keyword">func</span>() {
     drone.TakeOff()
-    gobot.On(drone.Events[<span class="string"><span class="delimiter">"</span><span class="content">Flying</span><span class="delimiter">"</span></span>], func(data <span class="reserved">interface</span>{}) {
-      gobot.After(<span class="string"><span class="delimiter">"</span><span class="content">15s</span><span class="delimiter">"</span></span>, func() {
+    gobot.On(drone.Events[<span class="string"><span class="delimiter">"</span><span class="content">Flying</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+      gobot.After(<span class="string"><span class="delimiter">"</span><span class="content">15s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() {
         drone.Land()
       })
     })
   }
 
   robot := gobot.Robot{
-    <span class="key">Connections</span>: []gobot.Connection{ardroneAdaptor},
-    <span class="key">Devices</span>:     []gobot.Device{drone},
-    <span class="key">Work</span>:        work,
+    Connections: []gobot.Connection{ardroneAdaptor},
+    Devices:     []gobot.Device{drone},
+    Work:        work,
   }
 
   robot.Start()

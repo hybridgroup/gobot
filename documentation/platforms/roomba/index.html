@@ -7,7 +7,7 @@
 <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
 <meta name="description">
 <meta content="The Hybrid Group" name="author">
-<title>Roomba with Cylon.js</title>
+<title>Roomba with gobot</title>
 <link href="/stylesheets/style.css" rel="stylesheet">
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><script src="/javascripts/script.js"></script><script src="/hybridpages/assets/javascript/subnav.js"></script><link href="//fonts.googleapis.com/css?family=Inconsolata:400,700%7CMontserrat:700" rel="stylesheet">
 <link href="/favicon.ico" rel="shortcut icon" type="image/gif">
@@ -58,7 +58,7 @@
         <div class="w">
           <h1 class="title">Roomba</h1>
           <h2 class="subtitle">
-<a href="https://github.com/hybridgroup/Cylon.js-roomba" class="repository">Repository</a> <a class href="https://github.com/hybridgroup/Cylon.js-roomba/issues">Issues</a>
+<a href="https://github.com/hybridgroup/gobot-roomba" class="repository">Repository</a> <a class href="https://github.com/hybridgroup/gobot-roomba/issues">Issues</a>
 </h2>
         </div>
       </div>
@@ -77,15 +77,15 @@
                 <div class="clear"></div>
               </section><section class="how-to"><h2>How to install</h2>
                 <p>
-                  Installing Cylon.js with roomba support is pretty easy using ruby gems.
+                  Installing gobot with roomba support is pretty easy using ruby gems.
                 </p>
-                <pre class="CodeRay">gem install Cylon.js-roomba
+                <pre class="CodeRay">gem install gobot-roomba
 </pre>
                 <h2>How to use</h2>
                 <p>
                   This small program controls a Roomba.
                 </p>
-                <pre class="CodeRay">require <span class="string"><span class="delimiter">'</span><span class="content">Cylon.js</span><span class="delimiter">'</span></span>
+                <pre class="CodeRay">require <span class="string"><span class="delimiter">'</span><span class="content">gobot</span><span class="delimiter">'</span></span>
 
 connection <span class="symbol">:roomba</span>, <span class="symbol">:adaptor</span> =&gt; <span class="symbol">:roomba</span>, <span class="symbol">:port</span> =&gt; <span class="string"><span class="delimiter">'</span><span class="content">/dev/ttyUSB0</span><span class="delimiter">'</span></span>
 device <span class="symbol">:roomba</span>, <span class="symbol">:driver</span> =&gt; <span class="symbol">:roomba</span>, <span class="symbol">:connection</span> =&gt; <span class="symbol">:roomba</span>

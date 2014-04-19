@@ -64,13 +64,13 @@
         <div class="main" role="main">
           <section class="content full"><div class="documentation">
               <section class="intro"><img class="display" src="/images/devices/pebble.jpg"><div class="info-intro">
-                  <p>Allows user to interact with Cylon.js devices using a Pebble smart watch.</p>
+                  <p>Allows user to interact with gobot devices using a Pebble smart watch.</p>
                 </div>
                 <div class="clear"></div>
               </section><section class="how-to"><h2>How to establish a connection and setup the driver</h2>
-                <pre class="CodeRay">require <span class="string"><span class="delimiter">'</span><span class="content">Cylon.js</span><span class="delimiter">'</span></span>
-connection <span class="symbol">:pebble</span>, <span class="symbol">:adaptor</span> =&gt; <span class="symbol">:pebble</span>, <span class="symbol">:port</span> =&gt; <span class="string"><span class="delimiter">"</span><span class="content">/dev/rfcomm0</span><span class="delimiter">"</span></span>, <span class="symbol">:id</span> =&gt; <span class="string"><span class="delimiter">"</span><span class="content">378B</span><span class="delimiter">"</span></span>
-device <span class="symbol">:watch</span>, <span class="symbol">:driver</span> =&gt; <span class="symbol">:pebble</span>
+                <pre class="CodeRay">require <span class="char">'g</span>obot<span class="char">'</span>
+connection :pebble, :adaptor =&gt; :pebble, :port =&gt; <span class="string"><span class="delimiter">"</span><span class="content">/dev/rfcomm0</span><span class="delimiter">"</span></span>, :id =&gt; <span class="string"><span class="delimiter">"</span><span class="content">378B</span><span class="delimiter">"</span></span>
+device :watch, :driver =&gt; :pebble
 </pre>
               </section><section class="public-methods"><h2>Public instance methods</h2>
                 <p>
@@ -82,18 +82,18 @@ device <span class="symbol">:watch</span>, <span class="symbol">:driver</span> =
                 </p>
               </section><section class="how-to"><h2>How to use</h2>
                 <h3>Example receiving button events from a Pebble smart watch.</h3>
-                <pre class="CodeRay">require <span class="string"><span class="delimiter">'</span><span class="content">Cylon.js</span><span class="delimiter">'</span></span>
+                <pre class="CodeRay">require <span class="char">'g</span>obot<span class="char">'</span>
 
-connection <span class="symbol">:pebble</span>, <span class="symbol">:adaptor</span> =&gt; <span class="symbol">:pebble</span>, <span class="symbol">:port</span> =&gt; <span class="string"><span class="delimiter">"</span><span class="content">/dev/rfcomm0</span><span class="delimiter">"</span></span>, <span class="symbol">:id</span> =&gt; <span class="string"><span class="delimiter">"</span><span class="content">378B</span><span class="delimiter">"</span></span>
-device <span class="symbol">:watch</span>, <span class="symbol">:driver</span> =&gt; <span class="symbol">:pebble</span>
+connection :pebble, :adaptor =&gt; :pebble, :port =&gt; <span class="string"><span class="delimiter">"</span><span class="content">/dev/rfcomm0</span><span class="delimiter">"</span></span>, :id =&gt; <span class="string"><span class="delimiter">"</span><span class="content">378B</span><span class="delimiter">"</span></span>
+device :watch, :driver =&gt; :pebble
 
-work <span class="keyword">do</span>
-  on watch, <span class="symbol">:media_control</span> =&gt; <span class="symbol">:button_push</span>
-<span class="keyword">end</span>
+work do
+  on watch, :media_control =&gt; :button_push
+end
 
-<span class="keyword">def</span> <span class="function">button_push</span>(caller, data)
-  puts data.button <span class="keyword">unless</span> data.nil?
-<span class="keyword">end</span>
+def button_push(caller, data)
+  puts data.button unless data.<span class="predefined-constant">nil</span>?
+end
 </pre>
               </section><section class="compatability hardware"><h2>Works with:</h2>
                 <div class="devices">

@@ -103,33 +103,33 @@
                 <p>
                   This small program lets you toggle an LED on and off.
                 </p>
-                <pre class="CodeRay"><span class="reserved">package</span> main
+                <pre class="CodeRay"><span class="keyword">package</span> main
 
-<span class="reserved">import</span> (
+<span class="keyword">import</span> (
         <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
         <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-digispark</span><span class="delimiter">"</span></span>
         <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
 )
 
-func main() {
+<span class="keyword">func</span> main() {
 
-        <span class="key">digispark</span> := <span class="keyword">new</span>(gobotDigispark.DigisparkAdaptor)
+        digispark := <span class="predefined">new</span>(gobotDigispark.DigisparkAdaptor)
         digispark.Name = <span class="string"><span class="delimiter">"</span><span class="content">Digispark</span><span class="delimiter">"</span></span>
 
         led := gobotGPIO.NewLed(digispark)
         led.Name = <span class="string"><span class="delimiter">"</span><span class="content">led</span><span class="delimiter">"</span></span>
         led.Pin = <span class="string"><span class="delimiter">"</span><span class="content">0</span><span class="delimiter">"</span></span>
 
-        work := func() {
-                gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">0.5s</span><span class="delimiter">"</span></span>, func() {
+        work := <span class="keyword">func</span>() {
+                gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">0.5s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() {
                         led.Toggle()
                 })
         }
 
         robot := gobot.Robot{
-                <span class="key">Connections</span>: []gobot.Connection{digispark},
-                <span class="key">Devices</span>:     []gobot.Device{led},
-                <span class="key">Work</span>:        work,
+                Connections: []gobot.Connection{digispark},
+                Devices:     []gobot.Device{led},
+                Work:        work,
         }
 
         robot.Start()

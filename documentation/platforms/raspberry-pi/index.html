@@ -58,7 +58,7 @@
         <div class="w">
           <h1 class="title">Raspberry Pi</h1>
           <h2 class="subtitle">
-<a href="https://github.com/hybridgroup/Cylon.js-raspi" class="repository">Repository</a> <a class href="https://github.com/hybridgroup/Cylon.js-raspi/issues">Issues</a>
+<a href="https://github.com/hybridgroup/gobot-raspi" class="repository">Repository</a> <a class href="https://github.com/hybridgroup/gobot-raspi/issues">Issues</a>
 </h2>
         </div>
       </div>
@@ -76,24 +76,24 @@
               </section><section class="how-to"><h2>How to install</h2>
                 <p>If you do not have ruby installed, you'll need to do that first.</p>
                 <p>
-                  Then install the Cylon.js-raspi gem:
+                  Then install the gobot-raspi gem:
                 </p>
-                <pre class="CodeRay">sudo gem install Cylon.js-raspi
+                <pre class="CodeRay">sudo gem install gobot-raspi
 </pre>
                 <h2>How to use</h2>
                 <p>
                   This small program causes an LED to blink.
                 </p>
-                <pre class="CodeRay">require <span class="string"><span class="delimiter">'</span><span class="content">Cylon.js</span><span class="delimiter">'</span></span>
+                <pre class="CodeRay">require <span class="char">'g</span>obot<span class="char">'</span>
 
-connection <span class="symbol">:raspi</span>, <span class="symbol">:adaptor</span> =&gt; <span class="symbol">:raspi</span>
-device <span class="symbol">:led</span>, <span class="symbol">:driver</span> =&gt; <span class="symbol">:led</span>, <span class="symbol">:pin</span> =&gt; <span class="integer">11</span>
+connection :raspi, :adaptor =&gt; :raspi
+device :led, :driver =&gt; :led, :pin =&gt; <span class="integer">11</span>
 
-work <span class="keyword">do</span>
-  every <span class="integer">1</span>.second <span class="keyword">do</span>
+work do
+  every <span class="float">1.</span>second do
     led.toggle
-  <span class="keyword">end</span>
-<span class="keyword">end</span>
+  end
+end
 </pre>
                 <p>To run the examples, requires sudo access on the Raspberry Pi:</p>
                 <pre class="CodeRay">sudo ruby examples/raspi_led.rb
@@ -122,7 +122,7 @@ i2c-dev
                 </p>
                 <a href="https://github.com/hybridgroup/pi-blaster">https://github.com/hybridgroup/pi-blaster</a>
               </section><section class="drivers"><h2>Drivers</h2>
-                <p>All Cylon.js digital and PWM GPIO, and i2c drivers listed below should work with the Raspberry Pi:</p>
+                <p>All gobot digital and PWM GPIO, and i2c drivers listed below should work with the Raspberry Pi:</p>
                 <div class="hardware">
                   <h2>GPIO Drivers</h2>
                   <div class="devices">

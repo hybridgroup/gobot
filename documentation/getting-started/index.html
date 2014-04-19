@@ -67,7 +67,7 @@
                 <p>Gobot is a set of Go libraries for robotics and physical computing.</p>
                 <p>It provides a simple, yet powerful way to create solutions that incorporate multiple, different hardware devices at the same time.</p>
                 <p>
-                  Want to use Node.js on robots? Check out our sister project Cylon.js
+                  Want to use Node.js on robots? Check out our sister project CylonJS
                   <a target="_blank" href="http://cylonjs.com">(http://cylonjs.com)</a>
                 </p>
                 <p>
@@ -118,17 +118,17 @@ go get -u github.com/hybridgroup/gobot-beaglebone
               </section><section><h2>Gobot Code Examples</h2>
                 <h3>Example: Arduino with LED.</h3>
                 <p>To use this example, you must first run <code>go get -u github.com/hybridgroup/gobot-firmata</code></p>
-                <pre class="CodeRay"><span class="reserved">package</span> main
+                <pre class="CodeRay"><span class="keyword">package</span> main
 
-<span class="reserved">import</span> (
+<span class="keyword">import</span> (
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-firmata</span><span class="delimiter">"</span></span>
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
 )
 
-func main() {
+<span class="keyword">func</span> main() {
 
-  <span class="key">firmata</span> := <span class="keyword">new</span>(gobotFirmata.FirmataAdaptor)
+  firmata := <span class="predefined">new</span>(gobotFirmata.FirmataAdaptor)
   firmata.Name = <span class="string"><span class="delimiter">"</span><span class="content">firmata</span><span class="delimiter">"</span></span>
   firmata.Port = <span class="string"><span class="delimiter">"</span><span class="content">/dev/ttyACM0</span><span class="delimiter">"</span></span>
 
@@ -136,16 +136,16 @@ func main() {
   led.Name = <span class="string"><span class="delimiter">"</span><span class="content">led</span><span class="delimiter">"</span></span>
   led.Pin = <span class="string"><span class="delimiter">"</span><span class="content">13</span><span class="delimiter">"</span></span>
 
-  work := func() {
-    gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">1s</span><span class="delimiter">"</span></span>, func() {
+  work := <span class="keyword">func</span>() {
+    gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">1s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() {
       led.Toggle()
     })
   }
 
   robot := gobot.Robot{
-    <span class="key">Connections</span>: []gobot.Connection{firmata},
-    <span class="key">Devices</span>:     []gobot.Device{led},
-    <span class="key">Work</span>:        work,
+    Connections: []gobot.Connection{firmata},
+    Devices:     []gobot.Device{led},
+    Work:        work,
   }
 
   robot.Start()
@@ -153,32 +153,32 @@ func main() {
 </pre>
                 <h3>Sphero 2.0</h3>
                 <p>To use this example, you must first run <code>go get -u github.com/hybridgroup/gobot-sphero</code></p>
-                <pre class="CodeRay"><span class="reserved">package</span> main
+                <pre class="CodeRay"><span class="keyword">package</span> main
 
-<span class="reserved">import</span> (
+<span class="keyword">import</span> (
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-sphero</span><span class="delimiter">"</span></span>
 )
 
-func main() {
+<span class="keyword">func</span> main() {
 
-  <span class="key">spheroAdaptor</span> := <span class="keyword">new</span>(gobotSphero.SpheroAdaptor)
+  spheroAdaptor := <span class="predefined">new</span>(gobotSphero.SpheroAdaptor)
   spheroAdaptor.Name = <span class="string"><span class="delimiter">"</span><span class="content">Sphero</span><span class="delimiter">"</span></span>
   spheroAdaptor.Port = <span class="string"><span class="delimiter">"</span><span class="content">/dev/rfcomm0</span><span class="delimiter">"</span></span>
 
   sphero := gobotSphero.NewSphero(spheroAdaptor)
   sphero.Name = <span class="string"><span class="delimiter">"</span><span class="content">Sphero</span><span class="delimiter">"</span></span>
 
-  work := func() {
-    gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">2s</span><span class="delimiter">"</span></span>, func() {
-      sphero.Roll(<span class="integer">100</span>, uint16(gobot.Rand(<span class="integer">360</span>)))
+  work := <span class="keyword">func</span>() {
+    gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">2s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() {
+      sphero.Roll(<span class="integer">100</span>, <span class="predefined-type">uint16</span>(gobot.Rand(<span class="integer">360</span>)))
     })
   }
 
   robot := gobot.Robot{
-    <span class="key">Connections</span>: []gobot.Connection{spheroAdaptor},
-    <span class="key">Devices</span>:     []gobot.Device{sphero},
-    <span class="key">Work</span>:        work,
+    Connections: []gobot.Connection{spheroAdaptor},
+    Devices:     []gobot.Device{sphero},
+    Work:        work,
   }
 
   robot.Start()

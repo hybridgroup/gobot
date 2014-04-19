@@ -64,13 +64,13 @@
         <div class="main" role="main">
           <section class="content full"><div class="documentation">
               <section class="intro"><img class="display" src="/images/devices/roomba.jpg"><div class="info-intro">
-                  <p>Allows user to control a Roomba iRobot Create using Cylon.js.</p>
+                  <p>Allows user to control a Roomba iRobot Create using gobot.</p>
                 </div>
                 <div class="clear"></div>
               </section><section class="how-to"><h2>How to establish a connection and setup the driver</h2>
-                <pre class="CodeRay">require <span class="string"><span class="delimiter">'</span><span class="content">Cylon.js</span><span class="delimiter">'</span></span>
-connection <span class="symbol">:roomba</span>, <span class="symbol">:adaptor</span> =&gt; <span class="symbol">:roomba</span>, <span class="symbol">:port</span> =&gt; <span class="string"><span class="delimiter">'</span><span class="content">/dev/ttyUSB0</span><span class="delimiter">'</span></span>
-device <span class="symbol">:roomba</span>, <span class="symbol">:driver</span> =&gt; <span class="symbol">:roomba</span>, <span class="symbol">:connection</span> =&gt; <span class="symbol">:roomba</span>
+                <pre class="CodeRay">require <span class="char">'g</span>obot<span class="char">'</span>
+connection :roomba, :adaptor =&gt; :roomba, :port =&gt; <span class="char">'/</span>dev/ttyUSB0<span class="char">'</span>
+device :roomba, :driver =&gt; :roomba, :connection =&gt; :roomba
 </pre>
               </section><section class="public-methods"><h2>Public instance methods</h2>
                 <h3>start</h3>
@@ -139,7 +139,7 @@ device <span class="symbol">:roomba</span>, <span class="symbol">:driver</span> 
                 </p>
               </section><section class="how-to"><h2>How to use</h2>
                 <h3>Example controlling a Roomba.</h3>
-                <pre class="CodeRay">require <span class="string"><span class="delimiter">'</span><span class="content">Cylon.js</span><span class="delimiter">'</span></span>
+                <pre class="CodeRay">require <span class="string"><span class="delimiter">'</span><span class="content">gobot</span><span class="delimiter">'</span></span>
 
 connection <span class="symbol">:roomba</span>, <span class="symbol">:adaptor</span> =&gt; <span class="symbol">:roomba</span>, <span class="symbol">:port</span> =&gt; <span class="string"><span class="delimiter">'</span><span class="content">/dev/ttyUSB0</span><span class="delimiter">'</span></span>
 device <span class="symbol">:roomba</span>, <span class="symbol">:driver</span> =&gt; <span class="symbol">:roomba</span>, <span class="symbol">:connection</span> =&gt; <span class="symbol">:roomba</span>
