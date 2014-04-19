@@ -21,7 +21,8 @@ type Connection interface {
 
 func NewConnection(adaptor AdaptorInterface, r *Robot) *connection {
 	c := new(connection)
-	c.Type = reflect.ValueOf(adaptor).Type().String()
+	s := reflect.ValueOf(adaptor).Type().String()
+	c.Type = s[1:len(s)]
 	c.Name = FieldByNamePtr(adaptor, "Name").String()
 	c.Port = FieldByNamePtr(adaptor, "Port").String()
 	c.Params = make(map[string]interface{})

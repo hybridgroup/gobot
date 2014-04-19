@@ -21,7 +21,8 @@ type Device interface {
 
 func NewDevice(driver DriverInterface, r *Robot) *device {
 	d := new(device)
-	d.Type = reflect.ValueOf(driver).Type().String()
+	s := reflect.ValueOf(driver).Type().String()
+	d.Type = s[1:len(s)]
 	d.Name = FieldByNamePtr(driver, "Name").String()
 	d.Robot = r
 	if FieldByNamePtr(driver, "Interval").String() == "" {
