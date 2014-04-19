@@ -14,7 +14,7 @@ Want to use Ruby or Javascript on robots? Check out our sister projects Artoo (h
 
 ### Basic
 
-#### Go with a Sphero
+#### Gobot on Sphero
 
 ```go
 package main
@@ -48,7 +48,7 @@ func main() {
   robot.Start()
 }
 ```
-#### Go with a Blink
+#### Gobot on Arduino
 
 ```go
 package main
@@ -138,9 +138,14 @@ To activate the API, use the `Api` command like this:
   master := gobot.GobotMaster()
   gobot.Api(master)
 ```
-To specify the api port run your Gobot program with the `PORT` environment variable
-```
-  $ PORT=8080 go run gobotProgram.go
+
+You can also specify the api host and port, and turn on authentication:
+```go 
+  master := gobot.GobotMaster()
+  api := gobot.Api(master)
+  api.Port = "4000"
+  api.Username = "Gort"
+  api.Password = "klaatu"
 ```
 
 In order to use the [robeaux](https://github.com/hybridgroup/robeaux) AngularJS interface with Gobot you simply clone the robeaux repo and place it in the directory of your Gobot program. The robeaux assets must be in a folder called `robeaux`.
