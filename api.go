@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"reflect"
+	"log"
 )
 
 type api struct {
@@ -56,9 +57,11 @@ var startApi = func(me *api) {
 	cert := me.Cert
 	key := me.Key
 
+	log.Println("Initializing API on "+host+":"+port+"...")
 	if cert != "" && key != "" {
 		go http.ListenAndServeTLS(host+":"+port, cert, key, me.server)
 	} else {
+		log.Println("WARNING: API using insecure connection. We recommend using an SSL certificate with Gobot.")
 		go http.ListenAndServe(host+":"+port, me.server)
 	}
 }
