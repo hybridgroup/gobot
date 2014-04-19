@@ -26,7 +26,7 @@ func (m *Master) Start() {
 	runtime.GOMAXPROCS(m.NumCPU)
 
 	if m.Api != nil {
-		m.Api.StartApi()
+		m.Api.startApi()
 	}
 
 	for s := range m.Robots {

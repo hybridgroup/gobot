@@ -63,7 +63,7 @@ var startApi = func(me *api) {
 	}
 }
 
-func (me *api) StartApi() {
+func (me *api) startApi() {
 	startApi(me)
 }
 
