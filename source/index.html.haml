@@ -88,7 +88,7 @@ getting_started_button: "<a href='/documentation/getting-started' class='cta'> G
         robot.Start()
       }
 
-%h2  Gobot with a Blink
+%h2  Gobot with Arduino
 :markdown
       :::go
       package main
@@ -326,14 +326,18 @@ getting_started_button: "<a href='/documentation/getting-started' class='cta'> G
 :markdown
   To activate the API, use the `Api` command like this:
 
-      :::bash
+      :::go
       master := gobot.GobotMaster()
       gobot.Api(master)
 
-  To specify the api port run your Gobot program with the `PORT` environment variable
+  You can also specify the api host and port, and turn on authentication:
 
-      :::bash
-      $ PORT=8080 go run gobotProgram.go
+      :::go
+      master := gobot.GobotMaster()
+      api := gobot.Api(master)
+      api.Port = "4000"
+      api.Username = "Gort"
+      api.Password = "klaatu"
 
 %p
   :markdown 
