@@ -147,7 +147,7 @@
   robot.Start()
 }
 </pre>
-            <h2>Gobot with a Blink</h2>
+            <h2>Gobot with Arduino</h2>
             <pre class="CodeRay"><span class="keyword">package</span> main
 
 <span class="keyword">import</span> (
@@ -430,9 +430,13 @@
 gobot.Api(master)
 </pre>
             
-            <p>To specify the api port run your Gobot program with the <code>PORT</code> environment variable</p>
+            <p>You can also specify the api host and port, and turn on authentication:</p>
             
-            <pre class="CodeRay">$ PORT=8080 go run gobotProgram.go
+            <pre class="CodeRay">master := gobot.GobotMaster()
+api := gobot.Api(master)
+api.Port = <span class="string"><span class="delimiter">"</span><span class="content">4000</span><span class="delimiter">"</span></span>
+api.Username = <span class="string"><span class="delimiter">"</span><span class="content">Gort</span><span class="delimiter">"</span></span>
+api.Password = <span class="string"><span class="delimiter">"</span><span class="content">klaatu</span><span class="delimiter">"</span></span>
 </pre>
             <p>
               </p>
