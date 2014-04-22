@@ -18,6 +18,11 @@
   %a.device{href: "/documentation/drivers/led", title: "LED"}
     %img{src: "/images/devices/LED.jpg"}
 
+-if current_page.data.makey_driver == true
+  /// Makey Button
+  %a.device{href:"/documentation/drivers/makey", title: "Makey Button"}
+    %img{src: "/images/devices/makey.jpg"}
+
 -if current_page.data.maxbotix_driver == true
   /// Maxbotix
   %a.device{href: "/documentation/drivers/maxbotix", title: "Maxbotix Range Finder"}

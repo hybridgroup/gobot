@@ -1,0 +1,122 @@
+---
+title: Gobot - Makey Button Driver
+author: The Hybrid Group
+page_title: Makey Button
+page_subtitle: Driver
+page_title_show: true
+layout: documentation
+subnav_driver: true
+subnav_circuit_driver: true
+
+arduino_platform: true
+beaglebone_platform: true
+digispark_platform: true
+spark_platform: true
+
+---
+%section.intro
+  = image_tag "/images/devices/makey.jpg", class: "display"
+  .info-intro
+    %p
+      Inspired by the awesome MakeyMakey (<a href='http://makeymakey.com'>http://makeymakey.com</a>), this GPIO driver allows you to connect a 10 MOhm resistor to a digital pin on your Arduino to control your robots with bananas, clay, or drawable circuitry.
+    %p 
+      For more information click
+      = link_to "here.", "https://learn.sparkfun.com/tutorials/makey-makey-quickstart-guide", target: "_blank"
+  .clear
+  
+%section.how_to#HowToConnect
+  %h2 How To Connect
+  :markdown
+    Install the library with: `go get -u github.com/hybridgroup/gobot-gpio`
+  %h3 For Firmata:
+  :markdown
+        :::go
+        package main
+
+        import (
+          "github.com/hybridgroup/gobot"
+          "github.com/hybridgroup/gobot-firmata"
+          "github.com/hybridgroup/gobot-gpio"
+        )
+
+        func main() {
+          firmata := new(gobotFirmata.FirmataAdaptor)
+          firmata.Name = "firmata"
+          firmata.Port = "/dev/ttyACM0"
+
+          button := gobotGPIO.NewMakeyButton(firmata)
+          button.Name = "button"
+          button.Pin = "2"
+
+          led := gobotGPIO.NewLed(firmata)
+          led.Name = "led"
+          led.Pin = "13"
+        ...
+
+
+%section.how-to#HowToUse
+  %h2 How To Use
+  %p This example detects when a button has been pushed, it turns on and off a LED
+ 
+  :markdown
+        :::go
+        package main
+
+        import (
+          "github.com/hybridgroup/gobot"
+          "github.com/hybridgroup/gobot-firmata"
+          "github.com/hybridgroup/gobot-gpio"
+        )
+
+        func main() {
+          firmata := new(gobotFirmata.FirmataAdaptor)
+          firmata.Name = "firmata"
+          firmata.Port = "/dev/ttyACM0"
+
+          button := gobotGPIO.NewMakeyButton(firmata)
+          button.Name = "button"
+          button.Pin = "2"
+
+          led := gobotGPIO.NewLed(firmata)
+          led.Name = "led"
+          led.Pin = "13"
+
+          work := func() {
+            gobot.On(button.Events["push"], func(data interface{}) {
+              led.On()
+            })
+
+            gobot.On(button.Events["release"], func(data interface{}) {
+              led.Off()
+            })
+          }
+
+          robot := gobot.Robot{
+            Connections: []gobot.Connection{firmata},
+            Devices:     []gobot.Device{button, led},
+            Work:        work,
+          }
+
+          robot.Start()
+        }
+
+%section.public-methods
+  .commands-api#Commands
+    = partial "/documentation/drivers/partials/gpio/commands_makey"   
+  .commands-api#Events
+    = partial "/documentation/drivers/partials/gpio/events_makey"   
+
+%section.circuit#Circuit
+  %h2 Circuit
+  .description-circuit
+    %p 
+  .image-circuit
+    %img{:src => "/documentation/drivers/breadboards/gpio/makey_button_bb.png", :alt => ""}/ 
+  .clear
+  
+%section.compatability.hardware#Compatability
+  %h2 Compatability
+  =# TODO: Update platform list with all that work with this driver in gobot.
+  .devices
+    = partial "documentation/partials/devices_platforms"
+   
