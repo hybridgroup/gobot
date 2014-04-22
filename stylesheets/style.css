@@ -1515,6 +1515,23 @@ a:hover, a:focus {
   background: #ff7e5b;
   font-weight: normal; }
 
+/* line 14, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_footers.scss */
+.copyright {
+  clear: both; }
+  /* line 18, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_footers.scss */
+  .copyright .left-side {
+    float: left; }
+  /* line 23, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_footers.scss */
+  .copyright .right-side {
+    float: right;
+    text-align: right; }
+    /* line 28, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_footers.scss */
+    .copyright .right-side a {
+      color: white; }
+      /* line 31, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_footers.scss */
+      .copyright .right-side a:hover {
+        color: #f2f2f2; }
+
 /* line 1, /home/ron/Development/gobot/gobot.io/source/stylesheets/../hybridpages/assets/stylesheets/shared/_coderay.scss */
 .CodeRay {
   font-family: Inconsolata, Menlo, Monaco, "Bitstream Vera Sans Mono", "Courier New", monospace;

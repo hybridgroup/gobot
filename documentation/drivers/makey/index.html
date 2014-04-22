@@ -7,7 +7,7 @@
 <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
 <meta name="description">
 <meta content="The Hybrid Group" name="author">
-<title>Gobot - BlinkM Driver</title>
+<title>Gobot - Makey Button Driver</title>
 <link href="/stylesheets/style.css" rel="stylesheet">
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><script src="/javascripts/script.js"></script><script src="/hybridpages/assets/javascript/subnav.js"></script><link href="//fonts.googleapis.com/css?family=Inconsolata:400,700%7CMontserrat:700" rel="stylesheet">
 <link href="/favicon.ico" rel="shortcut icon" type="image/gif">
@@ -56,7 +56,7 @@
 </div>
       <div class="page-title">
         <div class="w">
-          <h1 class="title">BlinkM</h1>
+          <h1 class="title">Makey Button</h1>
           <h2 class="subtitle">Driver</h2>
         </div>
       </div>
@@ -73,22 +73,25 @@
       </section><div class="container">
         <div class="main" role="main">
           <section class="content full"><div class="documentation">
-              <section class="intro"><img class="display" src="/images/devices/blinkm.jpg"><div class="info-intro">
+              <section class="intro"><img class="display" src="/images/devices/makey.jpg"><div class="info-intro">
                   <p>
-                    Allows user to control BlinkM RGB LED via i2c interface.
+                    Inspired by the awesome MakeyMakey (<a href="http://makeymakey.com">http://makeymakey.com</a>), this GPIO driver allows you to connect a 10 MOhm resistor to a digital pin on your Arduino to control your robots with bananas, clay, or drawable circuitry.
+                  </p>
+                  <p>
+                    For more information click
+                    <a target="_blank" href="https://learn.sparkfun.com/tutorials/makey-makey-quickstart-guide">here.</a>
                   </p>
                 </div>
                 <div class="clear"></div>
-              </section><section class="how-to" id="HowToConnect"><h2>How To Connect</h2>
-                <p>Install the library with: <code>go get -u github.com/hybridgroup/gobot-i2c</code></p>
-                <h3>For Arduino</h3>
+              </section><section class="how_to" id="HowToConnect"><h2>How To Connect</h2>
+                <p>Install the library with: <code>go get -u github.com/hybridgroup/gobot-gpio</code></p>
+                <h3>For Firmata:</h3>
                 <pre class="CodeRay"><span class="keyword">package</span> main
 
 <span class="keyword">import</span> (
-  <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-firmata</span><span class="delimiter">"</span></span>
-  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-i2c</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
 )
 
 <span class="keyword">func</span> main() {
@@ -96,19 +99,19 @@
   firmata.Name = <span class="string"><span class="delimiter">"</span><span class="content">firmata</span><span class="delimiter">"</span></span>
   firmata.Port = <span class="string"><span class="delimiter">"</span><span class="content">/dev/ttyACM0</span><span class="delimiter">"</span></span>
 
-  blinkm := gobotI2C.NewBlinkM(firmata)
-  blinkm.Name = <span class="string"><span class="delimiter">"</span><span class="content">blinkm</span><span class="delimiter">"</span></span>
+  button := gobotGPIO.NewMakeyButton(firmata)
+  button.Name = <span class="string"><span class="delimiter">"</span><span class="content">button</span><span class="delimiter">"</span></span>
+  button.Pin = <span class="string"><span class="delimiter">"</span><span class="content">2</span><span class="delimiter">"</span></span>
 ...
 </pre>
               </section><section class="how-to" id="HowToUse"><h2>How To Use</h2>
-                <p>Example using a BlinkM and Arduino</p>
+                <p>This example detects when a button has been pushed, it turns on and off a LED</p>
                 <pre class="CodeRay"><span class="keyword">package</span> main
 
 <span class="keyword">import</span> (
-  <span class="string"><span class="delimiter">"</span><span class="content">fmt</span><span class="delimiter">"</span></span>
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-firmata</span><span class="delimiter">"</span></span>
-  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-i2c</span><span class="delimiter">"</span></span>
+  <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot-gpio</span><span class="delimiter">"</span></span>
 )
 
 <span class="keyword">func</span> main() {
@@ -116,19 +119,27 @@
   firmata.Name = <span class="string"><span class="delimiter">"</span><span class="content">firmata</span><span class="delimiter">"</span></span>
   firmata.Port = <span class="string"><span class="delimiter">"</span><span class="content">/dev/ttyACM0</span><span class="delimiter">"</span></span>
 
-  blinkm := gobotI2C.NewBlinkM(firmata)
-  blinkm.Name = <span class="string"><span class="delimiter">"</span><span class="content">blinkm</span><span class="delimiter">"</span></span>
+  button := gobotGPIO.NewMakeyButton(firmata)
+  button.Name = <span class="string"><span class="delimiter">"</span><span class="content">button</span><span class="delimiter">"</span></span>
+  button.Pin = <span class="string"><span class="delimiter">"</span><span class="content">2</span><span class="delimiter">"</span></span>
+
+  led := gobotGPIO.NewLed(firmata)
+  led.Name = <span class="string"><span class="delimiter">"</span><span class="content">led</span><span class="delimiter">"</span></span>
+  led.Pin = <span class="string"><span class="delimiter">"</span><span class="content">13</span><span class="delimiter">"</span></span>
 
   work := <span class="keyword">func</span>() {
-    gobot.Every(<span class="string"><span class="delimiter">"</span><span class="content">3s</span><span class="delimiter">"</span></span>, <span class="keyword">func</span>() {
-      blinkm.Rgb(<span class="predefined-type">byte</span>(gobot.Rand(<span class="integer">255</span>)), <span class="predefined-type">byte</span>(gobot.Rand(<span class="integer">255</span>)), <span class="predefined-type">byte</span>(gobot.Rand(<span class="integer">255</span>)))
-      fmt.Println(<span class="string"><span class="delimiter">"</span><span class="content">color</span><span class="delimiter">"</span></span>, blinkm.Color())
+    gobot.On(button.Events[<span class="string"><span class="delimiter">"</span><span class="content">push</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+      led.On()
+    })
+
+    gobot.On(button.Events[<span class="string"><span class="delimiter">"</span><span class="content">release</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
+      led.Off()
     })
   }
 
   robot := gobot.Robot{
     Connections: []gobot.Connection{firmata},
-    Devices:     []gobot.Device{blinkm},
+    Devices:     []gobot.Device{button, led},
     Work:        work,
   }
 
@@ -138,84 +149,29 @@
               </section><section class="public-methods"><div class="commands-api" id="Commands">
                   <h1 id="functions">Functions</h1>
                   
-                  <h2 id="firmwareversion">FirmwareVersion</h2>
-                  
-                  <p>Returs the version of the current Frimware.</p>
-                  
-                  <h3 id="returns">Returns</h3>
-                  
-                  <ul>
-<li>
-<strong>string</strong> - Firmware Version </li>
-                  </ul>
-<h4 id="api-command">API Command</h4>
-                  
-                  <p><strong>FirmwareVersionC</strong></p>
-                  
-                  <h2 id="color">Color</h2>
-                  
-                  <p>Returns the color of the LED.</p>
-                  
-                  <h4 id="returns-1">Returns</h4>
-                  
-                  <ul>
-<li>
-<strong>[]byte</strong> - the RGB LED color</li>
-                  </ul>
-<h4 id="api-command-1">API Command</h4>
-                  
-                  <p><strong>ColorC</strong></p>
-                  
-                  <h2 id="rgbr-byte-g-byte-b-byte">Rgb(r byte, g byte, b byte)</h2>
-                  
-                  <p>Sets the RGB color.</p>
-                  
-                  <h4 id="params">Params</h4>
-                  
-                  <ul>
-<li>
-<strong>r</strong> - <strong>byte</strong> - Red</li>
-                    <li>
-<strong>g</strong> - <strong>byte</strong> - Green</li>
-                    <li>
-<strong>b</strong> - <strong>byte</strong> - Blue</li>
-                  </ul>
-<h4 id="api-command-2">API Command</h4>
-                  
-                  <p><strong>RgbC</strong></p>
-                  
-                  <h2 id="fader-byte-g-byte-b-byte">Fade(r byte, g byte, b byte)</h2>
-                  
-                  <p>Fades the RGB color.</p>
-                  
-                  <h4 id="params-1">Params</h4>
-                  
-                  <ul>
-<li>
-<strong>r</strong> - <strong>byte</strong> - Red</li>
-                    <li>
-<strong>g</strong> - <strong>byte</strong> - Green</li>
-                    <li>
-<strong>b</strong> - <strong>byte</strong> - Blue</li>
-                  </ul>
-<h4 id="api-command-3">API Command</h4>
-                  
-                  <p><strong>FadeC</strong></p>
+                  <p>no commands</p>
                 </div>
                 <div class="commands-api" id="Events">
                   <h1 id="events">Events</h1>
                   
-                  <p>no events</p>
+                  <h2 id="push">push</h2>
+                  
+                  <p>This event gets triggered when the button changes state from released to pushed.</p>
+                  
+                  <h2 id="release">release</h2>
+                  
+                  <p>This event gets triggered when the button changes state from pushed to released.</p>
                 </div>
               </section><section class="circuit" id="Circuit"><h2>Circuit</h2>
                 <div class="description-circuit">
                   <p></p>
                 </div>
                 <div class="image-circuit">
-                  <img alt="" src="/documentation/drivers/breadboards/i2c/blinkm_bb.png">
+                  <img alt="" src="/documentation/drivers/breadboards/gpio/makey_button_bb.png">
 </div>
                 <div class="clear"></div>
-              </section><section class="compatability hardware" id="Compatability"><h2>Compatibility</h2>
+              </section><section class="compatability hardware" id="Compatability"><h2>Compatability</h2>
+                
                 <div class="devices">
                   <!-- // Arduino -->
                   <a class="device" href="/documentation/platforms/arduino" title="Arduino">
@@ -226,6 +182,9 @@
                   <!-- // Analog Sensor -->
                   <a class="device" href="/documentation/platforms/digispark" title="Digispark">
                     <img src="/images/devices/digispark.jpg"></a>
+                  <!-- // Spark -->
+                  <a class="device" href="/documentation/platforms/spark" title="Spark">
+                    <img src="/images/devices/spark.jpg"></a>
                 </div>
               </section>
 </div>
