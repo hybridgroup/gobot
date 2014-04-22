@@ -10,3 +10,28 @@
     @extend .hero-anchors;
   }
 }
+
+.copyright {
+	
+	clear: both;
+	
+	.left-side {
+
+		float: left;
+	}	
+
+	.right-side {
+
+		float: right;
+		text-align: right;
+
+		a {
+
+			color: $footer-text-color;
+			&:hover {
+
+				color: darken($footer-text-color,5);
+			}
+		}
+	}
+}

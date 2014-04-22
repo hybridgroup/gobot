@@ -26,9 +26,13 @@
 -content_for :footer do 
   .w
     .copyright
-      &copy; Copyright 2012-2014
-      %a#THG-logo{href: "http://hybridgroup.com", target: "_blank"} 
-        %img{src: "/images/elements/THG_logo.png", alt: "The Hybrid Group"}/ 
+      .left-side
+        &copy; Copyright 2012-2014
+        %a#THG-logo{href: "http://hybridgroup.com", target: "_blank"} 
+          %img{src: "/images/elements/THG_logo.png", alt: "The Hybrid Group"}/ 
+      .right-side
+        %a{:href => "#top"} Top
+      .clear 
 
 
 
