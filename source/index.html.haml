@@ -216,7 +216,7 @@ getting_started_button: "<a href='/documentation/getting-started' class='cta'> G
 %p Support for many devices that use General Purpose Input/Output (GPIO) have a shared set of drivers provded using the gobot-gpio module:
 
 %p.important-title
-  6
+  7
   = link_to "GPIO", "https://en.wikipedia.org/wiki/General_Purpose_Input/Output" , target:"_blank" 
   drivers
 
@@ -247,6 +247,13 @@ getting_started_button: "<a href='/documentation/getting-started' class='cta'> G
       = link_to "LED", "/documentation/drivers/led" 
     %a{:href => "/documentation/drivers/led"} 
       %img{src: "/images/devices/LED.jpg", style: "width: 90%"}  
+    .repo
+      = link_to "repo", "https://github.com/hybridgroup/gobot-gpio" , target:"_blank"
+  %li
+    .title
+      = link_to "Makey Button", "/documentation/drivers/makey" 
+    %a{:href => "/documentation/drivers/makey"} 
+      %img{src: "/images/devices/makey.jpg", style: "width: 90%"}  
     .repo
       = link_to "repo", "https://github.com/hybridgroup/gobot-gpio" , target:"_blank"
   %li
