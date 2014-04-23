@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"github.com/go-martini/martini"
 	"github.com/martini-contrib/auth"
+	"github.com/martini-contrib/cors"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"reflect"
-	"log"
 )
 
 type api struct {
@@ -57,7 +58,7 @@ var startApi = func(me *api) {
 	cert := me.Cert
 	key := me.Key
 
-	log.Println("Initializing API on "+host+":"+port+"...")
+	log.Println("Initializing API on " + host + ":" + port + "...")
 	if cert != "" && key != "" {
 		go http.ListenAndServeTLS(host+":"+port, cert, key, me.server)
 	} else {
@@ -79,6 +80,9 @@ func Api(bot *Master) *api {
 	a.server = m
 
 	m.Use(martini.Static("robeaux"))
+	m.Use(cors.Allow(&cors.Options{
+		AllowAllOrigins: true,
+	}))
 
 	m.Get("/robots", func(res http.ResponseWriter, req *http.Request) {
 		a.robots(res, req)
@@ -247,7 +251,7 @@ func (a *api) executeCommand(robotname string, devicename string, commandname st
 
 func (a *api) executeRobotCommand(robotname string, commandname string, res http.ResponseWriter, req *http.Request) {
 	data, _ := ioutil.ReadAll(req.Body)
-	var body map[string]interface{}
+	body := make(map[string]interface{})
 	json.Unmarshal(data, &body)
 	robot := a.master.FindRobot(robotname)
 	in := make([]reflect.Value, 1)
