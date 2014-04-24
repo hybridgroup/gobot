@@ -4,11 +4,28 @@
 -content_for :logo_subtitle do
   .main 
 
--content_for :menu do 
-  =  link_to "Docs", "", (menu_item("documentation"))
-  =  link_to "Platforms", "", (menu_item("documentation/platforms"))
-  = # link_to "Videos", "", (menu_item("videos"))
-  =  link_to "Blog", "", (menu_item("blog"))
+-content_for :menu do
+
+  - if current_page.data.active_menu_docs == true
+    = link_to "Docs", "/documentation", (menu_item("documentation")), class: "active"
+  -else
+    = link_to "Docs", "", (menu_item("documentation"))
+
+  - if current_page.data.active_menu_platforms == true
+    = link_to "Platforms", "/documentation/platforms", (menu_item("documentation/platforms")), class: "active"
+  -else
+    = link_to "Platforms", "", (menu_item("documentation/platforms"))
+  
+  - if current_page.data.active_menu_videos == true
+    = #link_to "Videos", "/videos", (menu_item("videos")), class: "active"
+  -else
+    = #link_to "Videos", "", (menu_item("videos"))
+  
+  - if current_page.data.active_menu_blog == true
+    = link_to "Blog", "/blog", (menu_item("blog")), class: "active"
+  -else
+    = link_to "Blog", "", (menu_item("blog"))
+
   =  link_to "Github", "https://github.com/hybridgroup/gobot/", class: "item", target: "blanck"
 
 -content_for :social_links do

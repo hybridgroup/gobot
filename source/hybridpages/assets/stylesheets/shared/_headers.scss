@@ -67,7 +67,11 @@
 
     .active {
 
-      color: $blog-title-color;
+      color: $blog-title-color; 
+      font-size: 15px;
+      font-weight: bold;
+      margin: 10px;
+      padding: 8px 4px;
     }
 
     .item {

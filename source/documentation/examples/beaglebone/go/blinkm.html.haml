@@ -1,8 +1,8 @@
 ---
 layout: documentation
 page_title_show: true
-title: "Gobot Example - blink"
-page_title: "Example: blink"
+title: "Gobot Example - blinkm"
+page_title: "Example: blinkm"
 author: The Hybrid Group
 description: A Gobot code example
 page_subtitle: "<a href='https://github.com/hybridgroup/gobot-beaglebone/tree/master/examples' target='_blank'>View In Repo</a>"
@@ -15,26 +15,32 @@ active_menu_docs: true
         package main
 
         import (
+        	"fmt"
         	"github.com/hybridgroup/gobot"
         	"github.com/hybridgroup/gobot-beaglebone"
-        	"github.com/hybridgroup/gobot-gpio"
+        	"github.com/hybridgroup/gobot-i2c"
         )
 
         func main() {
         	beaglebone := new(gobotBeaglebone.Beaglebone)
         	beaglebone.Name = "beaglebone"
 
-        	led := gobotGPIO.NewLed(beaglebone)
-        	led.Name = "led"
-        	led.Pin = "P9_12"
+        	blinkm := gobotI2C.NewBlinkM(beaglebone)
+        	blinkm.Name = "blinkm"
 
         	work := func() {
-        		gobot.Every("1s", func() { led.Toggle() })
+        		gobot.Every("3s", func() {
+        			r := byte(gobot.Rand(255))
+        			g := byte(gobot.Rand(255))
+        			b := byte(gobot.Rand(255))
+        			blinkm.Rgb(r, g, b)
+        			fmt.Println("color", blinkm.Color())
+        		})
         	}
 
         	robot := gobot.Robot{
         		Connections: []gobot.Connection{beaglebone},
-        		Devices:     []gobot.Device{led},
+        		Devices:     []gobot.Device{blinkm},
         		Work:        work,
         	}
 

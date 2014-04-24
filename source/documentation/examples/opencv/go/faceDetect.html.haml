@@ -6,6 +6,7 @@ page_title: "Example: faceDetect"
 author: The Hybrid Group
 description: A Gobot code example
 page_subtitle: "<a href='https://github.com/hybridgroup/gobot-opencv/tree/master/examples' target='_blank'>View In Repo</a>"
+active_menu_docs: true
 ---
 
 .example
@@ -35,10 +36,21 @@ page_subtitle: "<a href='https://github.com/hybridgroup/gobot-opencv/tree/master
         	camera.Name = "camera"
 
         	work := func() {
+        		var image *cv.IplImage
         		gobot.On(camera.Events["Frame"], func(data interface{}) {
-        			i := data.(*cv.IplImage)
-        			window.ShowImage(gobotOpencv.DrawRectangles(i, gobotOpencv.DetectFaces(cascade, i)))
+        			image = data.(*cv.IplImage)
         		})
+
+        		go func() {
+        			for {
+        				if image != nil {
+        					i := image.Clone()
+        					faces := gobotOpencv.DetectFaces(cascade, i)
+        					i = gobotOpencv.DrawRectangles(i, faces, 0, 255, 0, 5)
+        					window.ShowImage(i)
+        				}
+        			}
+        		}()
         	}
 
         	robot := gobot.Robot{
