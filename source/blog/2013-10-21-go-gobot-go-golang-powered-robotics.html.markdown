@@ -5,6 +5,7 @@ page_title: Blog
 date: 2013-10-21
 tags: robots
 author: Ron Evans
+active_menu_blog: true
 ---
 
 We are very excited to introduce Gobot (<a href="http://gobot.io" target="blank">http://gobot.io</a>), a new and powerful open source robotics platform written using the Go programming language. Go has remarkable abilities when it comes to massive concurrency with only modest use of system resources. In addition, the expressive nature of the programming language makes it really nice code to work with.

@@ -1,8 +1,8 @@
 ---
 layout: documentation
 page_title_show: true
-title: "Gobot Example - hello_api"
-page_title: "Example: hello_api"
+title: "Gobot Example - hello_api_auth"
+page_title: "Example: hello_api_auth"
 author: The Hybrid Group
 description: A Gobot code example
 page_subtitle: "<a href='https://github.com/hybridgroup/gobot/tree/master/examples' target='_blank'>View In Repo</a>"
@@ -27,7 +27,8 @@ active_menu_docs: true
         func main() {
         	master := gobot.GobotMaster()
         	api := gobot.Api(master)
-        	api.Port = "4000"
+        	api.Username = "gort"
+        	api.Password = "klatuu"
 
         	hello := new(gobot.Robot)
         	hello.Name = "hello"

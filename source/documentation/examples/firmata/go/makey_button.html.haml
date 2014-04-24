@@ -1,8 +1,8 @@
 ---
 layout: documentation
 page_title_show: true
-title: "Gobot Example - motor"
-page_title: "Example: motor"
+title: "Gobot Example - makey_button"
+page_title: "Example: makey_button"
 author: The Hybrid Group
 description: A Gobot code example
 page_subtitle: "<a href='https://github.com/hybridgroup/gobot-firmata/tree/master/examples' target='_blank'>View In Repo</a>"
@@ -25,26 +25,27 @@ active_menu_docs: true
         	firmata.Name = "firmata"
         	firmata.Port = "/dev/ttyACM0"
 
-        	motor := gobotGPIO.NewMotor(firmata)
-        	motor.Name = "motor"
-        	motor.SpeedPin = "3"
+        	button := gobotGPIO.NewMakeyButton(firmata)
+        	button.Name = "button"
+        	button.Pin = "2"
+
+        	led := gobotGPIO.NewLed(firmata)
+        	led.Name = "led"
+        	led.Pin = "13"
 
         	work := func() {
-        		speed := byte(0)
-        		fade_amount := byte(15)
+        		gobot.On(button.Events["push"], func(data interface{}) {
+        			led.On()
+        		})
 
-        		gobot.Every("0.1s", func() {
-        			motor.Speed(speed)
-        			speed = speed + fade_amount
-        			if speed == 0 || speed == 255 {
-        				fade_amount = -fade_amount
-        			}
+        		gobot.On(button.Events["release"], func(data interface{}) {
+        			led.Off()
         		})
         	}
 
         	robot := gobot.Robot{
         		Connections: []gobot.Connection{firmata},
-        		Devices:     []gobot.Device{motor},
+        		Devices:     []gobot.Device{button, led},
         		Work:        work,
         	}
 

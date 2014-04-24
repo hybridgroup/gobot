@@ -1,8 +1,8 @@
 ---
 layout: documentation
 page_title_show: true
-title: "Gobot Example - blink"
-page_title: "Example: blink"
+title: "Gobot Example - led_brightness"
+page_title: "Example: led_brightness"
 author: The Hybrid Group
 description: A Gobot code example
 page_subtitle: "<a href='https://github.com/hybridgroup/gobot-beaglebone/tree/master/examples' target='_blank'>View In Repo</a>"
@@ -26,10 +26,19 @@ active_menu_docs: true
 
         	led := gobotGPIO.NewLed(beaglebone)
         	led.Name = "led"
-        	led.Pin = "P9_12"
+        	led.Pin = "P9_14"
 
         	work := func() {
-        		gobot.Every("1s", func() { led.Toggle() })
+        		brightness := uint8(0)
+        		fade_amount := uint8(5)
+
+        		gobot.Every("0.1s", func() {
+        			led.Brightness(brightness)
+        			brightness = brightness + fade_amount
+        			if brightness == 0 || brightness == 255 {
+        				fade_amount = -fade_amount
+        			}
+        		})
         	}
 
         	robot := gobot.Robot{
