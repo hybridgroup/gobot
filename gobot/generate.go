@@ -293,7 +293,7 @@ Explain how to connect from the computer to the device here...
 
 ## Documentation
 
-## Contirbuting
+## Contributing
 
 ## License
 
