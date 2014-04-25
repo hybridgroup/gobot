@@ -275,6 +275,10 @@ This repository contains the Gobot adaptor for {{ .Name }}.
 For more information about Gobot, check out the github repo at
 https://github.com/hybridgroup/gobot
 
+Want to use Ruby on robots? Check out our sister project Artoo (http://artoo.io)
+
+Want to use JavaScript on robots? Check out our sister project Cylon.js (http://cylonjs.com)
+
 ## Installing
 
     go get path/to/repo/gobot-{{ .Name }}
@@ -286,6 +290,10 @@ https://github.com/hybridgroup/gobot
 ## Connecting
 
 Explain how to connect from the computer to the device here...
+
+## Documentation
+
+## Contributing
 
 ## License
 
