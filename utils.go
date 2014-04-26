@@ -7,22 +7,24 @@ import (
 	"time"
 )
 
+// Every triggers f every `t` time until the end of days.
 func Every(t string, f func()) {
-	dur := parseDuration(t)
+	c := time.Tick(parseDuration(t))
+	// start a go routine to not bloc the function
 	go func() {
 		for {
-			time.Sleep(dur)
+			// wait for the ticker to tell us to run
+			<-c
+			// run the passed function in another go routine
+			// so we don't slow down the loop.
 			go f()
 		}
 	}()
 }
 
+// After triggers the passed function after `t` duration.
 func After(t string, f func()) {
-	dur := parseDuration(t)
-	go func() {
-		time.Sleep(dur)
-		f()
-	}()
+	time.AfterFunc(parseDuration(t), f)
 }
 
 func Publish(c chan interface{}, val interface{}) {
