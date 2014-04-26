@@ -1,9 +1,9 @@
 package gobot
 
 import (
+	"time"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"time"
 )
 
 var _ = Describe("Utils", func() {
@@ -15,22 +15,18 @@ var _ = Describe("Utils", func() {
 	Context("when valid", func() {
 		It("should execute function at every interval", func() {
 			var i = 0
-			Every("500ms", func() {
-				i = i + 1
+			Every("2ms", func() {
+				i++
 			})
-			time.Sleep(600 * time.Millisecond)
-			Expect(i).To(Equal(1))
-			time.Sleep(600 * time.Millisecond)
-			Expect(i).To(Equal(2))
+			time.Sleep(5 * time.Millisecond)
+			Expect(2).To(Equal(i))
 		})
 		It("should execute function after specific interval", func() {
 			var i = 0
-			After("500ms", func() {
+			After("1ms", func() {
 				i = i + 1
 			})
-			time.Sleep(600 * time.Millisecond)
-			Expect(i).To(Equal(1))
-			time.Sleep(600 * time.Millisecond)
+			time.Sleep(2 * time.Millisecond)
 			Expect(i).To(Equal(1))
 		})
 		It("should Publish message to channel without blocking", func() {
