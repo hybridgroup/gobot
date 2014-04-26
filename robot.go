@@ -16,12 +16,16 @@ type Robot struct {
 	Work          func()                 `json:"-"`
 	connections   []*connection          `json:"-"`
 	devices       []*device              `json:"-"`
+	master        *Master                `json:"-"`
 }
 
 func (r *Robot) Start() {
-	m := NewMaster()
-	m.Robots = []*Robot{r}
-	m.Start()
+	if r.master == nil {
+		r.master = NewMaster()
+	}
+
+	r.master.Robots = []*Robot{r}
+	r.master.Start()
 }
 
 func (r *Robot) startRobot() {
