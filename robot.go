@@ -19,7 +19,7 @@ type Robot struct {
 }
 
 func (r *Robot) Start() {
-	m := GobotMaster()
+	m := NewMaster()
 	m.Robots = []*Robot{r}
 	m.Start()
 }
@@ -126,6 +126,9 @@ func (r *Robot) GetDevices() []*device {
 }
 
 func (r *Robot) GetDevice(name string) *device {
+	if r == nil {
+		return nil
+	}
 	for _, device := range r.devices {
 		if device.Name == name {
 			return device
@@ -139,6 +142,9 @@ func (r *Robot) GetConnections() []*connection {
 }
 
 func (r *Robot) GetConnection(name string) *connection {
+	if r == nil {
+		return nil
+	}
 	for _, connection := range r.connections {
 		if connection.Name == name {
 			return connection
