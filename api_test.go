@@ -13,23 +13,24 @@ import (
 
 var _ = Describe("Master", func() {
 	var (
-		myMaster *Master
-		a        *api
+		m *Master
+		a *api
 	)
 
 	BeforeEach(func() {
-		myMaster = GobotMaster()
-		startApi = func(m *api) {}
-		a = Api(myMaster)
-		myMaster.Robots = []*Robot{
+		m = NewMaster()
+		a = Api(m)
+		a.startFunc = func(m *api) {}
+
+		m.Robots = []*Robot{
 			newTestRobot("Robot 1"),
 			newTestRobot("Robot 2"),
 			newTestRobot("Robot 3"),
 		}
-		trap = func(c chan os.Signal) {
+		m.trap = func(c chan os.Signal) {
 			c <- os.Interrupt
 		}
-		myMaster.Start()
+		m.Start()
 	})
 
 	Context("when valid", func() {
