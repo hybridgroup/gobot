@@ -1,9 +1,9 @@
 package gobot
 
 import (
+	"os"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"os"
 )
 
 var _ = Describe("Master", func() {
@@ -12,16 +12,16 @@ var _ = Describe("Master", func() {
 	)
 
 	BeforeEach(func() {
-		myMaster = GobotMaster()
+		myMaster = NewMaster()
+		myMaster.trap = func(c chan os.Signal) {
+			c <- os.Interrupt
+		}
 		myMaster.Robots = []*Robot{
 			newTestRobot("Robot 1"),
 			newTestRobot("Robot 2"),
 			newTestRobot("Robot 3"),
 		}
 		startApi = func(m *api) {}
-		trap = func(c chan os.Signal) {
-			c <- os.Interrupt
-		}
 		myMaster.Start()
 	})
 

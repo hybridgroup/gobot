@@ -2,73 +2,74 @@ package gobot
 
 import (
 	"encoding/json"
-	"github.com/go-martini/martini"
-	"github.com/martini-contrib/auth"
-	"github.com/martini-contrib/cors"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"reflect"
+
+	"github.com/go-martini/martini"
+	"github.com/martini-contrib/auth"
+	"github.com/martini-contrib/cors"
 )
 
+type startFuncAlias func(*api)
+
+// Optional restful API through the master to access
+// all the robots.
 type api struct {
-	master   *Master
-	server   *martini.ClassicMartini
-	Host     string
-	Port     string
-	Username string
-	Password string
-	Cert     string
-	Key      string
+	master    *Master
+	server    *martini.ClassicMartini
+	Host      string
+	Port      string
+	Username  string
+	Password  string
+	Cert      string
+	Key       string
+	startFunc startFuncAlias
 }
 
-type jsonRobot struct {
-	Name        string            `json:"name"`
-	Commands    []string          `json:"commands"`
-	Connections []*jsonConnection `json:"connections"`
-	Devices     []*jsonDevice     `json:"devices"`
+func NewApi() *api {
+	return &api{startFunc: defaultStartFunc}
 }
 
-type jsonDevice struct {
-	Name       string          `json:"name"`
-	Driver     string          `json:"driver"`
-	Connection *jsonConnection `json:"connection"`
-	Commands   []string        `json:"commands"`
-}
-
-type jsonConnection struct {
-	Name    string `json:"name"`
-	Port    string `json:"port"`
-	Adaptor string `json:"adaptor"`
-}
-
-var startApi = func(me *api) {
-	username := me.Username
-	if username != "" {
-		password := me.Password
-		me.server.Use(auth.Basic(username, password))
+var defaultStartFunc = func(a *api) {
+	if a == nil {
+		return
 	}
 
-	port := me.Port
+	username := a.Username
+	if username != "" {
+		password := a.Password
+		a.server.Use(auth.Basic(username, password))
+	}
+
+	port := a.Port
 	if port == "" {
 		port = "3000"
 	}
 
-	host := me.Host
-	cert := me.Cert
-	key := me.Key
+	host := a.Host
+	cert := a.Cert
+	key := a.Key
 
 	log.Println("Initializing API on " + host + ":" + port + "...")
-	if cert != "" && key != "" {
-		go http.ListenAndServeTLS(host+":"+port, cert, key, me.server)
-	} else {
-		log.Println("WARNING: API using insecure connection. We recommend using an SSL certificate with Gobot.")
-		go http.ListenAndServe(host+":"+port, me.server)
-	}
+	go func() {
+		if cert != "" && key != "" {
+			http.ListenAndServeTLS(host+":"+port, cert, key, a.server)
+		} else {
+			log.Println("WARNING: API using insecure connection. We recommend using an SSL certificate with Gobot.")
+			http.ListenAndServe(host+":"+port, a.server)
+		}
+	}()
 }
 
-func (me *api) startApi() {
-	startApi(me)
+// start starts the api using the start function
+// sets on the API on initialization.
+func (a *api) start() {
+	if a == nil {
+		return
+	}
+	a.startFunc(a)
 }
 
 func Api(bot *Master) *api {
@@ -171,13 +172,13 @@ func (me *api) robot_devices(name string, res http.ResponseWriter, req *http.Req
 }
 
 func (me *api) robot_device(robot string, device string, res http.ResponseWriter, req *http.Request) {
-	data, _ := json.Marshal(me.formatJsonDevice(me.master.FindRobotDevice(robot, device)))
+	data, _ := json.Marshal(me.formatJsonDevice(me.master.FindRobot(robot).GetDevice(device)))
 	res.Header().Set("Content-Type", "application/json; charset=utf-8")
 	res.Write(data)
 }
 
 func (me *api) robot_device_commands(robot string, device string, res http.ResponseWriter, req *http.Request) {
-	data, _ := json.Marshal(me.master.FindRobotDevice(robot, device).Commands())
+	data, _ := json.Marshal(me.master.FindRobot(robot).GetDevice(device).Commands())
 	res.Header().Set("Content-Type", "application/json; charset=utf-8")
 	res.Write(data)
 }
@@ -194,7 +195,7 @@ func (me *api) robot_connections(name string, res http.ResponseWriter, req *http
 }
 
 func (me *api) robot_connection(robot string, connection string, res http.ResponseWriter, req *http.Request) {
-	data, _ := json.Marshal(me.formatJsonConnection(me.master.FindRobotConnection(robot, connection)))
+	data, _ := json.Marshal(me.formatJsonConnection(me.master.FindRobot(robot).GetConnection(connection)))
 	res.Header().Set("Content-Type", "application/json; charset=utf-8")
 	res.Write(data)
 }
@@ -224,7 +225,11 @@ func (a *api) formatJsonDevice(device *device) *jsonDevice {
 	jsonDevice := new(jsonDevice)
 	jsonDevice.Name = device.Name
 	jsonDevice.Driver = device.Type
-	jsonDevice.Connection = a.formatJsonConnection(a.master.FindRobotConnection(device.Robot.Name, FieldByNamePtr(FieldByNamePtr(device.Driver, "Adaptor").Interface().(AdaptorInterface), "Name").Interface().(string)))
+	jsonDevice.Connection = a.formatJsonConnection(
+		a.master.FindRobot(device.Robot.Name).
+			GetConnection(FieldByNamePtr(FieldByNamePtr(device.Driver, "Adaptor").
+			Interface().(AdaptorInterface), "Name").
+			Interface().(string)))
 	jsonDevice.Commands = FieldByNamePtr(device.Driver, "Commands").Interface().([]string)
 	return jsonDevice
 }
@@ -233,7 +238,7 @@ func (a *api) executeCommand(robotname string, devicename string, commandname st
 	data, _ := ioutil.ReadAll(req.Body)
 	var body map[string]interface{}
 	json.Unmarshal(data, &body)
-	robot := a.master.FindRobotDevice(robotname, devicename)
+	robot := a.master.FindRobot(robotname).GetDevice(devicename)
 	commands := robot.Commands().([]string)
 	for command := range commands {
 		if commands[command] == commandname {
