@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot-sphero"
+	"github.com/hybridgroup/gobot/sphero"
 )
 
 var Master *gobot.Master = gobot.GobotMaster()
@@ -21,11 +21,11 @@ func main() {
 	}
 
 	for name, port := range spheros {
-		spheroAdaptor := new(gobotSphero.SpheroAdaptor)
+		spheroAdaptor := new(sphero.Adaptor)
 		spheroAdaptor.Name = "sphero"
 		spheroAdaptor.Port = port
 
-		sphero := gobotSphero.NewSphero(spheroAdaptor)
+		sphero := sphero.NewSphero(spheroAdaptor)
 		sphero.Name = "sphero"
 		sphero.Interval = "0.5s"
 
