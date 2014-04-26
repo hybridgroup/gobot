@@ -2,16 +2,16 @@ package main
 
 import (
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot-sphero"
+	"github.com/hybridgroup/gobot/sphero"
 )
 
 func main() {
 
-	spheroAdaptor := new(gobotSphero.SpheroAdaptor)
+	spheroAdaptor := new(sphero.Adaptor)
 	spheroAdaptor.Name = "Sphero"
 	spheroAdaptor.Port = "/dev/rfcomm0"
 
-	sphero := gobotSphero.NewSphero(spheroAdaptor)
+	sphero := sphero.NewSphero(spheroAdaptor)
 	sphero.Name = "Sphero"
 
 	work := func() {

@@ -2,17 +2,17 @@ package main
 
 import (
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/firmata"
-	"github.com/hybridgroup/gobot/gpio"
+	"github.com/hybridgroup/gobot-firmata"
+	"github.com/hybridgroup/gobot-gpio"
 )
 
 func main() {
 
-	firmata := new(firmata.Adaptor)
+	firmata := new(gobotFirmata.FirmataAdaptor)
 	firmata.Name = "firmata"
 	firmata.Port = "/dev/ttyACM0"
 
-	led := gpio.NewLed(firmata)
+	led := gobotGPIO.NewLed(firmata)
 	led.Name = "led"
 	led.Pin = "13"
 
