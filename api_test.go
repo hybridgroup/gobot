@@ -75,9 +75,9 @@ var _ = Describe("Master", func() {
 			response := httptest.NewRecorder()
 			a.executeRobotCommand("Robot 1", "robotTestFunction", response, request)
 			body, _ := ioutil.ReadAll(response.Body)
-			var i map[string]interface{}
+			var i []interface{}
 			json.Unmarshal(body, &i)
-			Expect(i["result"]).To(Equal("hey Robot 1, Beep Boop"))
+			Expect(i[0]).To(Equal("hey Robot 1, Beep Boop"))
 		})
 		It("should not execute unknown robot command", func() {
 			request, _ := http.NewRequest("GET", "/robots/Robot%201/commands/robotTestFuntion1", bytes.NewBufferString(`{"message":"Beep Boop"}`))
@@ -85,9 +85,9 @@ var _ = Describe("Master", func() {
 			response := httptest.NewRecorder()
 			a.executeRobotCommand("Robot 1", "robotTestFunction1", response, request)
 			body, _ := ioutil.ReadAll(response.Body)
-			var i map[string]interface{}
+			var i []interface{}
 			json.Unmarshal(body, &i)
-			Expect(i["result"]).To(Equal("Unknown Command"))
+			Expect(i[0]).To(Equal("Unknown Command"))
 		})
 		It("should return robot device", func() {
 			request, _ := http.NewRequest("GET", "/robots/Robot%201/devices/Device%201", nil)
@@ -113,9 +113,9 @@ var _ = Describe("Master", func() {
 			response := httptest.NewRecorder()
 			a.executeCommand("Robot 1", "Device 1", "TestDriverCommand", response, request)
 			body, _ := ioutil.ReadAll(response.Body)
-			var i map[string]interface{}
+			var i []interface{}
 			json.Unmarshal(body, &i)
-			Expect(i["result"]).To(Equal("hello human"))
+			Expect(i[0]).To(Equal("hello human"))
 		})
 		It("should not execute unknown device command", func() {
 			request, _ := http.NewRequest("GET", "/robots/Robot%201/devices/Device%201/commands/DriverCommand1", bytes.NewBufferString(`{"name":"human"}`))
@@ -123,9 +123,9 @@ var _ = Describe("Master", func() {
 			response := httptest.NewRecorder()
 			a.executeCommand("Robot 1", "Device 1", "DriverCommand4", response, request)
 			body, _ := ioutil.ReadAll(response.Body)
-			var i map[string]interface{}
+			var i []interface{}
 			json.Unmarshal(body, &i)
-			Expect(i["result"]).To(Equal("Unknown Command"))
+			Expect(i[0]).To(Equal("Unknown Command"))
 		})
 	})
 })

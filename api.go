@@ -237,14 +237,17 @@ func (a *api) executeCommand(robotname string, devicename string, commandname st
 	commands := robot.Commands().([]string)
 	for command := range commands {
 		if commands[command] == commandname {
-			ret := Call(robot.Driver, commandname, body)
-			data, _ = json.Marshal(map[string]interface{}{"result": ret[0].Interface()})
+			ret := make([]interface{}, 0)
+			for _, v := range Call(robot.Driver, commandname, body) {
+				ret = append(ret, v.Interface())
+			}
+			data, _ = json.Marshal(ret)
 			res.Header().Set("Content-Type", "application/json; charset=utf-8")
 			res.Write(data)
 			return
 		}
 	}
-	data, _ = json.Marshal(map[string]interface{}{"result": "Unknown Command"})
+	data, _ = json.Marshal([]interface{}{"Unknown Command"})
 	res.Header().Set("Content-Type", "application/json; charset=utf-8")
 	res.Write(data)
 }
@@ -259,10 +262,13 @@ func (a *api) executeRobotCommand(robotname string, commandname string, res http
 	in[0] = reflect.ValueOf(body)
 	command := robot.Commands[commandname]
 	if command != nil {
-		ret := reflect.ValueOf(robot.Commands[commandname]).Call(in)
-		data, _ = json.Marshal(map[string]interface{}{"result": ret[0].Interface()})
+		ret := make([]interface{}, 0)
+		for _, v := range reflect.ValueOf(robot.Commands[commandname]).Call(in) {
+			ret = append(ret, v.Interface())
+		}
+		data, _ = json.Marshal(ret)
 	} else {
-		data, _ = json.Marshal(map[string]interface{}{"result": "Unknown Command"})
+		data, _ = json.Marshal([]interface{}{"Unknown Command"})
 	}
 	res.Header().Set("Content-Type", "application/json; charset=utf-8")
 	res.Write(data)
