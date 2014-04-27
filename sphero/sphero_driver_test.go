@@ -1,4 +1,4 @@
-package gobotSphero
+package sphero
 
 import (
 	. "github.com/onsi/ginkgo"
@@ -7,23 +7,23 @@ import (
 
 var _ = Describe("SpheroDriver", func() {
 	var (
-		driver  *SpheroDriver
-		adaptor *SpheroAdaptor
+		s *Sphero
+		a *SpheroAdaptor
 	)
 
 	BeforeEach(func() {
-		adaptor = new(SpheroAdaptor)
-		adaptor.sp = sp{}
-		driver = NewSphero(adaptor)
+		a = NewSpheroAdaptor()
+		a.sp = sp{}
+		s = NewSphero(a)
 	})
 
 	It("Must be able to Start", func() {
-		Expect(driver.Start()).To(Equal(true))
+		Expect(s.Start()).To(Equal(true))
 	})
 	It("Must be able to Init", func() {
-		Expect(driver.Init()).To(Equal(true))
+		Expect(s.Init()).To(Equal(true))
 	})
 	It("Must be able to Halt", func() {
-		Expect(driver.Halt()).To(Equal(true))
+		Expect(s.Halt()).To(Equal(true))
 	})
 })
