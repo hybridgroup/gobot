@@ -1,4 +1,4 @@
-package gobotSpark
+package spark
 
 import (
 	. "github.com/onsi/ginkgo"
