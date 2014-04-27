@@ -3,11 +3,11 @@ package main
 import (
 	"fmt"
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot-sphero"
+	"github.com/hybridgroup/gobot/sphero"
 )
 
 func main() {
-	master := gobot.GobotMaster()
+	master := gobot.NewMaster()
 
 	spheros := []string{
 		"/dev/rfcomm0",
@@ -17,11 +17,11 @@ func main() {
 	}
 
 	for s := range spheros {
-		spheroAdaptor := new(gobotSphero.SpheroAdaptor)
+		spheroAdaptor := sphero.NewSpheroAdaptor()
 		spheroAdaptor.Name = "Sphero"
 		spheroAdaptor.Port = spheros[s]
 
-		sphero := gobotSphero.NewSphero(spheroAdaptor)
+		sphero := sphero.NewSphero(spheroAdaptor)
 		sphero.Name = "Sphero" + spheros[s]
 		sphero.Interval = "0.5s"
 

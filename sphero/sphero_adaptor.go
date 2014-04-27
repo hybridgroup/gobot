@@ -1,4 +1,4 @@
-package gobotSphero
+package sphero
 
 import (
 	"github.com/hybridgroup/gobot"
@@ -8,37 +8,42 @@ import (
 
 type SpheroAdaptor struct {
 	gobot.Adaptor
-	sp io.ReadWriteCloser
+	sp      io.ReadWriteCloser
+	connect func(*SpheroAdaptor)
 }
 
-var connect = func(me *SpheroAdaptor) {
-	c := &serial.Config{Name: me.Adaptor.Port, Baud: 115200}
-	s, err := serial.OpenPort(c)
-	if err != nil {
-		panic(err)
+func NewSpheroAdaptor() *SpheroAdaptor {
+	return &SpheroAdaptor{
+		connect: func(a *SpheroAdaptor) {
+			c := &serial.Config{Name: a.Port, Baud: 115200}
+			s, err := serial.OpenPort(c)
+			if err != nil {
+				panic(err)
+			}
+			a.sp = s
+		},
 	}
-	me.sp = s
 }
 
-func (me *SpheroAdaptor) Connect() bool {
-	connect(me)
-	me.Connected = true
+func (a *SpheroAdaptor) Connect() bool {
+	a.connect(a)
+	a.Connected = true
 	return true
 }
 
-func (me *SpheroAdaptor) Reconnect() bool {
-	if me.Connected == true {
-		me.Disconnect()
+func (a *SpheroAdaptor) Reconnect() bool {
+	if a.Connected == true {
+		a.Disconnect()
 	}
-	return me.Connect()
+	return a.Connect()
 }
 
-func (me *SpheroAdaptor) Disconnect() bool {
-	me.sp.Close()
-	me.Connected = false
+func (a *SpheroAdaptor) Disconnect() bool {
+	a.sp.Close()
+	a.Connected = false
 	return true
 }
 
-func (me *SpheroAdaptor) Finalize() bool {
+func (a *SpheroAdaptor) Finalize() bool {
 	return true
 }

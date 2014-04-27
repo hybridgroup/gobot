@@ -1,4 +1,4 @@
-package gobotSphero
+package sphero
 
 type sp struct{}
 

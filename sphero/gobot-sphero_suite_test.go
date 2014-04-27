@@ -1,4 +1,4 @@
-package gobotSphero
+package sphero
 
 import (
 	. "github.com/onsi/ginkgo"
@@ -9,5 +9,5 @@ import (
 
 func TestGobotSphero(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Gobot-Sphero Suite")
+	RunSpecs(t, "Sphero Suite")
 }

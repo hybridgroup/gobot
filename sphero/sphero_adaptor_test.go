@@ -1,4 +1,4 @@
-package gobotSphero
+package sphero
 
 import (
 	. "github.com/onsi/ginkgo"
@@ -7,26 +7,25 @@ import (
 
 var _ = Describe("SpheroAdaptor", func() {
 	var (
-		adaptor *SpheroAdaptor
+		a *SpheroAdaptor
 	)
 
 	BeforeEach(func() {
-		adaptor = new(SpheroAdaptor)
-		adaptor.sp = sp{}
-		connect = func(sa *SpheroAdaptor) {
-		}
+		a = NewSpheroAdaptor()
+		a.sp = sp{}
+		a.connect = func(a *SpheroAdaptor) {}
 	})
 
 	It("Must be able to Finalize", func() {
-		Expect(adaptor.Finalize()).To(Equal(true))
+		Expect(a.Finalize()).To(Equal(true))
 	})
 	It("Must be able to Connect", func() {
-		Expect(adaptor.Connect()).To(Equal(true))
+		Expect(a.Connect()).To(Equal(true))
 	})
 	It("Must be able to Disconnect", func() {
-		Expect(adaptor.Disconnect()).To(Equal(true))
+		Expect(a.Disconnect()).To(Equal(true))
 	})
 	It("Must be able to Reconnect", func() {
-		Expect(adaptor.Reconnect()).To(Equal(true))
+		Expect(a.Reconnect()).To(Equal(true))
 	})
 })
