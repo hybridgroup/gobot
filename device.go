@@ -5,6 +5,12 @@ import (
 	"reflect"
 )
 
+type Device interface {
+	Init() bool
+	Start() bool
+	Halt() bool
+}
+
 type device struct {
 	Name     string          `json:"name"`
 	Type     string          `json:"driver"`
@@ -13,10 +19,13 @@ type device struct {
 	Driver   DriverInterface `json:"-"`
 }
 
-type Device interface {
-	Init() bool
-	Start() bool
-	Halt() bool
+type devices []*device
+
+// Halt() stop all the devices.
+func (d devices) Halt() {
+	for _, device := range d {
+		device.Halt()
+	}
 }
 
 func NewDevice(driver DriverInterface, r *Robot) *device {
