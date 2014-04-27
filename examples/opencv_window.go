@@ -3,18 +3,15 @@ package main
 import (
 	cv "github.com/hybridgroup/go-opencv/opencv"
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot-opencv"
+	"github.com/hybridgroup/gobot/opencv"
 )
 
 func main() {
 
-	opencv := new(gobotOpencv.Opencv)
-	opencv.Name = "opencv"
-
-	window := gobotOpencv.NewWindow(opencv)
+	window := opencv.NewWindowDriver()
 	window.Name = "window"
 
-	camera := gobotOpencv.NewCamera(opencv)
+	camera := opencv.NewCameraDriver()
 	camera.Name = "camera"
 
 	work := func() {
@@ -24,7 +21,7 @@ func main() {
 	}
 
 	robot := gobot.Robot{
-		Connections: []gobot.Connection{opencv},
+		Connections: []gobot.Connection{},
 		Devices:     []gobot.Device{window, camera},
 		Work:        work,
 	}
