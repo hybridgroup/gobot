@@ -3,7 +3,7 @@ package main
 import (
 	cv "github.com/hybridgroup/go-opencv/opencv"
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot-opencv"
+	"github.com/hybridgroup/gobot/opencv"
 	"path"
 	"runtime"
 )
@@ -12,13 +12,10 @@ func main() {
 	_, currentfile, _, _ := runtime.Caller(0)
 	cascade := path.Join(path.Dir(currentfile), "haarcascade_frontalface_alt.xml")
 
-	opencv := new(gobotOpencv.Opencv)
-	opencv.Name = "opencv"
-
-	window := gobotOpencv.NewWindow(opencv)
+	window := opencv.NewWindowDriver()
 	window.Name = "window"
 
-	camera := gobotOpencv.NewCamera(opencv)
+	camera := opencv.NewCameraDriver()
 	camera.Name = "camera"
 
 	work := func() {
@@ -31,8 +28,8 @@ func main() {
 			for {
 				if image != nil {
 					i := image.Clone()
-					faces := gobotOpencv.DetectFaces(cascade, i)
-					i = gobotOpencv.DrawRectangles(i, faces, 0, 255, 0, 5)
+					faces := opencv.DetectFaces(cascade, i)
+					i = opencv.DrawRectangles(i, faces, 0, 255, 0, 5)
 					window.ShowImage(i)
 				}
 			}
@@ -40,7 +37,7 @@ func main() {
 	}
 
 	robot := gobot.Robot{
-		Connections: []gobot.Connection{opencv},
+		Connections: []gobot.Connection{},
 		Devices:     []gobot.Device{window, camera},
 		Work:        work,
 	}

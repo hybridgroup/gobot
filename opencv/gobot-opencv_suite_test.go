@@ -1,4 +1,4 @@
-package gobotOpencv
+package opencv
 
 import (
 	. "github.com/onsi/ginkgo"
