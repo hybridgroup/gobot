@@ -2,22 +2,22 @@ package main
 
 import (
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot-gpio"
-	"github.com/hybridgroup/gobot-spark"
+	"github.com/hybridgroup/gobot/gpio"
+	"github.com/hybridgroup/gobot/spark"
 )
 
 func main() {
-	master := gobot.GobotMaster()
+	master := gobot.NewMaster()
 	gobot.Api(master)
 
-	spark := new(gobotSpark.SparkAdaptor)
-	spark.Name = "spark"
-	spark.Params = map[string]interface{}{
+	sparkCore := spark.NewSparkCoreAdaptor()
+	sparkCore.Name = "spark"
+	sparkCore.Params = map[string]interface{}{
 		"device_id":    "",
 		"access_token": "",
 	}
 
-	led := gobotGPIO.NewLed(spark)
+	led := gpio.NewLed(sparkCore)
 	led.Name = "led"
 	led.Pin = "D7"
 
@@ -29,7 +29,7 @@ func main() {
 
 	master.Robots = append(master.Robots, &gobot.Robot{
 		Name:        "spark",
-		Connections: []gobot.Connection{spark},
+		Connections: []gobot.Connection{sparkCore},
 		Devices:     []gobot.Device{led},
 		Work:        work,
 	})
