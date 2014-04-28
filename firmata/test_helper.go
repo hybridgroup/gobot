@@ -1,13 +1,13 @@
-package gobotFirmata
+package firmata
 
 type sp struct{}
 
-func (me sp) Write(b []byte) (int, error) {
+func (s sp) Write(b []byte) (int, error) {
 	return len(b), nil
 }
-func (me sp) Read(b []byte) (int, error) {
+func (s sp) Read(b []byte) (int, error) {
 	return len(b), nil
 }
-func (me sp) Close() error {
+func (s sp) Close() error {
 	return nil
 }

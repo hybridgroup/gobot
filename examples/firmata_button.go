@@ -2,20 +2,20 @@ package main
 
 import (
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot-firmata"
-	"github.com/hybridgroup/gobot-gpio"
+	"github.com/hybridgroup/gobot/firmata"
+	"github.com/hybridgroup/gobot/gpio"
 )
 
 func main() {
-	firmata := new(gobotFirmata.FirmataAdaptor)
-	firmata.Name = "firmata"
-	firmata.Port = "/dev/ttyACM0"
+	firmataAdaptor := firmata.NewFirmataAdaptor()
+	firmataAdaptor.Name = "firmata"
+	firmataAdaptor.Port = "/dev/ttyACM0"
 
-	button := gobotGPIO.NewButton(firmata)
+	button := gpio.NewButtonDriver(firmataAdaptor)
 	button.Name = "button"
 	button.Pin = "2"
 
-	led := gobotGPIO.NewLed(firmata)
+	led := gpio.NewLedDriver(firmataAdaptor)
 	led.Name = "led"
 	led.Pin = "13"
 
@@ -30,7 +30,7 @@ func main() {
 	}
 
 	robot := gobot.Robot{
-		Connections: []gobot.Connection{firmata},
+		Connections: []gobot.Connection{firmataAdaptor},
 		Devices:     []gobot.Device{button, led},
 		Work:        work,
 	}
