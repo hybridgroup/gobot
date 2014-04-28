@@ -1,40 +1,42 @@
-package gobotI2C
+package i2c
 
 import (
 	"fmt"
 	"github.com/hybridgroup/gobot"
 )
 
-type Wiichuck struct {
+type WiichuckDriver struct {
 	gobot.Driver
 	Adaptor  I2cInterface
 	joystick map[string]float64
 	data     map[string]float64
 }
 
-func NewWiichuck(a I2cInterface) *Wiichuck {
-	w := new(Wiichuck)
-	w.Adaptor = a
-	w.Events = make(map[string]chan interface{})
-	w.Events["z_button"] = make(chan interface{})
-	w.Events["c_button"] = make(chan interface{})
-	w.Events["joystick"] = make(chan interface{})
-	w.joystick = map[string]float64{
-		"sy_origin": -1,
-		"sx_origin": -1,
+func NewWiichuckDriver(a I2cInterface) *WiichuckDriver {
+	return &WiichuckDriver{
+		Driver: gobot.Driver{
+			Events: map[string]chan interface{}{
+				"z_button": make(chan interface{}),
+				"c_button": make(chan interface{}),
+				"joystick": make(chan interface{}),
+			},
+		},
+		joystick: map[string]float64{
+			"sy_origin": -1,
+			"sx_origin": -1,
+		},
+		data: map[string]float64{
+			"sx": 0,
+			"sy": 0,
+			"z":  0,
+			"c":  0,
+		},
 	}
-	w.data = map[string]float64{
-		"sx": 0,
-		"sy": 0,
-		"z":  0,
-		"c":  0,
-	}
-	return w
 }
 
-func (w *Wiichuck) Start() bool {
+func (w *WiichuckDriver) Start() bool {
 	w.Adaptor.I2cStart(byte(0x52))
-	gobot.Every(w.Interval, func() {
+	gobot.Every("100ms", func() {
 		w.Adaptor.I2cWrite([]uint16{uint16(0x40), uint16(0x00)})
 		w.Adaptor.I2cWrite([]uint16{uint16(0x00)})
 		new_value := w.Adaptor.I2cRead(uint16(6))
@@ -44,10 +46,10 @@ func (w *Wiichuck) Start() bool {
 	})
 	return true
 }
-func (w *Wiichuck) Init() bool { return true }
-func (w *Wiichuck) Halt() bool { return true }
+func (w *WiichuckDriver) Init() bool { return true }
+func (w *WiichuckDriver) Halt() bool { return true }
 
-func (w *Wiichuck) update(value []uint16) {
+func (w *WiichuckDriver) update(value []uint16) {
 	if w.isEncrypted(value) {
 		fmt.Println("Encrypted bytes from wii device!")
 	} else {
@@ -58,17 +60,17 @@ func (w *Wiichuck) update(value []uint16) {
 	}
 }
 
-func (w *Wiichuck) setJoystickDefaultValue(joystick_axis string, default_value float64) {
+func (w *WiichuckDriver) setJoystickDefaultValue(joystick_axis string, default_value float64) {
 	if w.joystick[joystick_axis] == -1 {
 		w.joystick[joystick_axis] = default_value
 	}
 }
 
-func (w *Wiichuck) calculateJoystickValue(axis float64, origin float64) float64 {
+func (w *WiichuckDriver) calculateJoystickValue(axis float64, origin float64) float64 {
 	return float64(axis - origin)
 }
 
-func (w *Wiichuck) isEncrypted(value []uint16) bool {
+func (w *WiichuckDriver) isEncrypted(value []uint16) bool {
 	if value[0] == value[1] && value[2] == value[3] && value[4] == value[5] {
 		return true
 	} else {
@@ -76,32 +78,32 @@ func (w *Wiichuck) isEncrypted(value []uint16) bool {
 	}
 }
 
-func (w *Wiichuck) decode(x uint16) float64 {
+func (w *WiichuckDriver) decode(x uint16) float64 {
 	return float64((x ^ 0x17) + 0x17)
 }
 
-func (w *Wiichuck) adjustOrigins() {
+func (w *WiichuckDriver) adjustOrigins() {
 	w.setJoystickDefaultValue("sy_origin", w.data["sy"])
 	w.setJoystickDefaultValue("sx_origin", w.data["sx"])
 }
 
-func (w *Wiichuck) updateButtons() {
+func (w *WiichuckDriver) updateButtons() {
 	if w.data["c"] == 0 {
-		w.Events["c_button"] <- ""
+		gobot.Publish(w.Events["c_button"], true)
 	}
 	if w.data["z"] == 0 {
-		w.Events["z_button"] <- ""
+		gobot.Publish(w.Events["z_button"], true)
 	}
 }
 
-func (w *Wiichuck) updateJoystick() {
-	w.Events["joystick"] <- map[string]float64{
+func (w *WiichuckDriver) updateJoystick() {
+	gobot.Publish(w.Events["joystick"], map[string]float64{
 		"x": w.calculateJoystickValue(w.data["sx"], w.joystick["sx_origin"]),
 		"y": w.calculateJoystickValue(w.data["sy"], w.joystick["sy_origin"]),
-	}
+	})
 }
 
-func (w *Wiichuck) parse(value []uint16) {
+func (w *WiichuckDriver) parse(value []uint16) {
 	w.data["sx"] = w.decode(value[0])
 	w.data["sy"] = w.decode(value[1])
 	w.data["z"] = float64(uint8(w.decode(value[5])) & 0x01)

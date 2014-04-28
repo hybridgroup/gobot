@@ -1,4 +1,4 @@
-package gobotI2C
+package i2c
 
 type I2cInterface interface {
 	I2cStart(byte)

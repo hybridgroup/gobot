@@ -1,4 +1,4 @@
-package gobotI2C
+package i2c
 
 import (
 	. "github.com/onsi/ginkgo"
@@ -7,16 +7,15 @@ import (
 
 var _ = Describe("HMC6352", func() {
 	var (
-		someAdaptor TestAdaptor
-		someDriver  *HMC6352
+		t TestAdaptor
+		h *HMC6352Driver
 	)
 
 	BeforeEach(func() {
-		someDriver = NewHMC6352(someAdaptor)
-		someDriver.Interval = "1s"
+		h = NewHMC6352Driver(t)
 	})
 
 	It("Must be able to Start", func() {
-		Expect(someDriver.Start()).To(Equal(true))
+		Expect(h.Start()).To(Equal(true))
 	})
 })
