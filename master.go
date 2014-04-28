@@ -42,7 +42,7 @@ func (m *Master) Start() {
 	// waiting on something coming on the channel
 	_ = <-c
 	for _, r := range m.Robots {
-		r.haltDevices()
+		r.GetDevices().Halt()
 		r.finalizeConnections()
 	}
 
