@@ -1,21 +1,21 @@
-package gobotI2C
+package i2c
 
 // blinkm
-func (self *BlinkM) FirmwareVersionC(params map[string]interface{}) string {
-	return self.FirmwareVersion()
+func (b *BlinkMDriver) FirmwareVersionC(params map[string]interface{}) string {
+	return b.FirmwareVersion()
 }
-func (self *BlinkM) ColorC(params map[string]interface{}) []byte {
-	return self.Color()
+func (b *BlinkMDriver) ColorC(params map[string]interface{}) []byte {
+	return b.Color()
 }
-func (self *BlinkM) RgbC(params map[string]interface{}) {
-	r := byte(params["r"].(float64))
-	g := byte(params["g"].(float64))
-	b := byte(params["b"].(float64))
-	self.Rgb(r, g, b)
+func (b *BlinkMDriver) RgbC(params map[string]interface{}) {
+	red := byte(params["red"].(float64))
+	green := byte(params["green"].(float64))
+	blue := byte(params["blue"].(float64))
+	b.Rgb(red, green, blue)
 }
-func (self *BlinkM) FadeC(params map[string]interface{}) {
-	r := byte(params["r"].(float64))
-	g := byte(params["g"].(float64))
-	b := byte(params["b"].(float64))
-	self.Fade(r, g, b)
+func (b *BlinkMDriver) FadeC(params map[string]interface{}) {
+	red := byte(params["red"].(float64))
+	green := byte(params["green"].(float64))
+	blue := byte(params["blue"].(float64))
+	b.Fade(red, green, blue)
 }

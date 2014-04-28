@@ -1,4 +1,4 @@
-package gobotI2C
+package i2c
 
 import (
 	. "github.com/onsi/ginkgo"
