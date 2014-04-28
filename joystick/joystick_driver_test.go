@@ -1,4 +1,4 @@
-package gobotJoystick
+package joystick
 
 import (
 	. "github.com/onsi/ginkgo"
@@ -7,20 +7,20 @@ import (
 
 var _ = Describe("JoystickDriver", func() {
 	var (
-		driver *JoystickDriver
+		d *JoystickDriver
 	)
 
 	BeforeEach(func() {
-		driver = NewJoystick(new(JoystickAdaptor))
+		d = NewJoystickDriver(NewJoystickAdaptor())
 	})
 
 	PIt("Must be able to Start", func() {
-		Expect(driver.Start()).To(Equal(true))
+		Expect(d.Start()).To(Equal(true))
 	})
 	PIt("Must be able to Init", func() {
-		Expect(driver.Init()).To(Equal(true))
+		Expect(d.Init()).To(Equal(true))
 	})
 	PIt("Must be able to Halt", func() {
-		Expect(driver.Halt()).To(Equal(true))
+		Expect(d.Halt()).To(Equal(true))
 	})
 })

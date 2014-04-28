@@ -1,4 +1,4 @@
-package gobotJoystick
+package joystick
 
 import (
 	"github.com/hybridgroup/go-sdl2/sdl"
@@ -8,27 +8,28 @@ import (
 type JoystickAdaptor struct {
 	gobot.Adaptor
 	joystick *sdl.Joystick
+	connect  func(*JoystickAdaptor)
 }
 
-func (me *JoystickAdaptor) Connect() bool {
-	sdl.Init(sdl.INIT_JOYSTICK)
-	if sdl.NumJoysticks() > 0 {
-		me.joystick = sdl.JoystickOpen(0)
-	} else {
-		panic("No joystick available")
+func NewJoystickAdaptor() *JoystickAdaptor {
+	return &JoystickAdaptor{
+		connect: func(j *JoystickAdaptor) {
+			sdl.Init(sdl.INIT_JOYSTICK)
+			if sdl.NumJoysticks() > 0 {
+				j.joystick = sdl.JoystickOpen(0)
+			} else {
+				panic("No joystick available")
+			}
+		},
 	}
+}
+
+func (j *JoystickAdaptor) Connect() bool {
+	j.connect(j)
 	return true
 }
 
-func (me *JoystickAdaptor) Reconnect() bool {
-	return true
-}
-
-func (me *JoystickAdaptor) Disconnect() bool {
-	me.joystick.Close()
-	return true
-}
-
-func (me *JoystickAdaptor) Finalize() bool {
+func (j *JoystickAdaptor) Finalize() bool {
+	j.joystick.Close()
 	return true
 }

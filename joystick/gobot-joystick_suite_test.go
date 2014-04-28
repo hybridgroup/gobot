@@ -1,4 +1,4 @@
-package gobotJoystick
+package joystick
 
 import (
 	. "github.com/onsi/ginkgo"
