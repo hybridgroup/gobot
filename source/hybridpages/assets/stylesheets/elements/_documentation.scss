@@ -3,6 +3,83 @@
   margin-right: 10px;
 }
 
+.breadcrumbs {
+  
+   ul {
+    list-style: none;
+    display: inline-table;
+    margin: 10px 0;
+
+    li {
+
+      display: inline;
+
+      &:first-child a {
+        border-top-left-radius: 10px; 
+        border-bottom-left-radius: 10px;
+      }
+
+      &:first-child a:before {
+        display: none; 
+      }
+
+      &:last-child a {
+        padding-right: 20px;
+        border-top-right-radius: 10px; 
+        border-bottom-right-radius: 10px;
+        background: $hero-color;
+        
+      }
+
+      &:last-child a:after {
+        display: none; 
+      }
+
+      a {
+
+        display: block;
+        float: left;
+        height: 30px;
+        text-align: center;
+        padding: 5px 20px 0 25px;
+        position: relative;
+        margin: 0 5px 0 0; 
+        background: $lesser-title-color;     
+        text-decoration: none;
+        font-size: 10pt;
+        color: #fff;
+
+        &:hover {
+          background: $hero-color;
+        }
+
+        &:hover:after {
+          border-left-color: $hero-color;
+        }
+
+        &:after {
+
+          content: "";  
+          border-top: 15px solid transparent;
+          border-bottom: 15px solid transparent;
+            border-left: 15px solid $lesser-title-color;
+          position: absolute; right: -15px; top: 0;
+          z-index: 1;
+        }
+
+        &:before {
+          
+          content: "";  
+          border-top: 15px solid transparent;
+            border-bottom: 15px solid transparent;
+            border-left: 15px solid $body-bg-color;
+          position: absolute; left: 0; top: 0;
+        }
+      }
+    }
+  }
+}
+
 .documentation {
 
   .intro {
