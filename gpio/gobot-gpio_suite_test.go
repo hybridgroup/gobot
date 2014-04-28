@@ -1,4 +1,4 @@
-package gobotGPIO
+package gpio
 
 import (
 	. "github.com/onsi/ginkgo"
