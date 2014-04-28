@@ -1,4 +1,4 @@
-package gobotJoystick
+package joystick
 
 import (
 	"encoding/json"
@@ -11,8 +11,8 @@ import (
 
 type JoystickDriver struct {
 	gobot.Driver
-	JoystickAdaptor *JoystickAdaptor
-	config          joystickConfig
+	Adaptor *JoystickAdaptor
+	config  joystickConfig
 }
 
 type pair struct {
@@ -34,17 +34,16 @@ type joystickConfig struct {
 	Hats    []hat  `json:"Hats"`
 }
 
-type JoystickInterface interface {
-}
-
-func NewJoystick(adaptor *JoystickAdaptor) *JoystickDriver {
-	d := new(JoystickDriver)
-	d.Events = make(map[string]chan interface{})
-	d.JoystickAdaptor = adaptor
-	d.Commands = []string{}
+func NewJoystickDriver(a *JoystickAdaptor) *JoystickDriver {
+	d := &JoystickDriver{
+		Driver: gobot.Driver{
+			Events: make(map[string]chan interface{}),
+		},
+		Adaptor: a,
+	}
 
 	var configFile string
-	if value, ok := d.JoystickAdaptor.Params["config"]; ok {
+	if value, ok := d.Adaptor.Params["config"]; ok {
 		configFile = value.(string)
 	} else {
 		panic("No joystick config specified")
@@ -70,41 +69,41 @@ func NewJoystick(adaptor *JoystickAdaptor) *JoystickDriver {
 	return d
 }
 
-func (me *JoystickDriver) Start() bool {
+func (j *JoystickDriver) Start() bool {
 	go func() {
 		var event sdl.Event
 		for {
 			for event = sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
 				switch data := event.(type) {
 				case *sdl.JoyAxisEvent:
-					if data.Which == me.JoystickAdaptor.joystick.InstanceID() {
-						axis := me.findName(data.Axis, me.config.Axis)
+					if data.Which == j.Adaptor.joystick.InstanceID() {
+						axis := j.findName(data.Axis, j.config.Axis)
 						if axis == "" {
 							fmt.Println("Unknown Axis:", data.Axis)
 						} else {
-							gobot.Publish(me.Events[axis], data.Value)
+							gobot.Publish(j.Events[axis], data.Value)
 						}
 					}
 				case *sdl.JoyButtonEvent:
-					if data.Which == me.JoystickAdaptor.joystick.InstanceID() {
-						button := me.findName(data.Button, me.config.Buttons)
+					if data.Which == j.Adaptor.joystick.InstanceID() {
+						button := j.findName(data.Button, j.config.Buttons)
 						if button == "" {
 							fmt.Println("Unknown Button:", data.Button)
 						} else {
 							if data.State == 1 {
-								gobot.Publish(me.Events[fmt.Sprintf("%s_press", button)], nil)
+								gobot.Publish(j.Events[fmt.Sprintf("%s_press", button)], nil)
 							} else {
-								gobot.Publish(me.Events[fmt.Sprintf("%s_release", button)], nil)
+								gobot.Publish(j.Events[fmt.Sprintf("%s_release", button)], nil)
 							}
 						}
 					}
 				case *sdl.JoyHatEvent:
-					if data.Which == me.JoystickAdaptor.joystick.InstanceID() {
-						hat := me.findHatName(data.Value, data.Hat, me.config.Hats)
+					if data.Which == j.Adaptor.joystick.InstanceID() {
+						hat := j.findHatName(data.Value, data.Hat, j.config.Hats)
 						if hat == "" {
 							fmt.Println("Unknown Hat:", data.Hat, data.Value)
 						} else {
-							gobot.Publish(me.Events[hat], true)
+							gobot.Publish(j.Events[hat], true)
 						}
 					}
 				}
@@ -114,10 +113,10 @@ func (me *JoystickDriver) Start() bool {
 	}()
 	return true
 }
-func (me *JoystickDriver) Init() bool { return true }
-func (me *JoystickDriver) Halt() bool { return true }
+func (j *JoystickDriver) Init() bool { return true }
+func (j *JoystickDriver) Halt() bool { return true }
 
-func (me *JoystickDriver) findName(id uint8, list []pair) string {
+func (j *JoystickDriver) findName(id uint8, list []pair) string {
 	for _, value := range list {
 		if int(id) == value.Id {
 			return value.Name
@@ -126,7 +125,7 @@ func (me *JoystickDriver) findName(id uint8, list []pair) string {
 	return ""
 }
 
-func (me *JoystickDriver) findHatName(id uint8, hat uint8, list []hat) string {
+func (j *JoystickDriver) findHatName(id uint8, hat uint8, list []hat) string {
 	for _, value := range list {
 		if int(id) == value.Id && int(hat) == value.Hat {
 			return value.Name
