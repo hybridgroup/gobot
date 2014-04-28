@@ -1,4 +1,4 @@
-package gobotGPIO
+package gpio
 
 import (
 	. "github.com/onsi/ginkgo"
@@ -7,36 +7,36 @@ import (
 
 var _ = Describe("Button", func() {
 	var (
-		someAdaptor TestAdaptor
-		someDriver  *Button
+		t TestAdaptor
+		b *ButtonDriver
 	)
 
 	BeforeEach(func() {
-		someDriver = NewButton(someAdaptor)
-		someDriver.Pin = "1"
+		b = NewButtonDriver(t)
+		b.Pin = "1"
 	})
 
 	It("Must be able to readState", func() {
-		Expect(someDriver.readState()).To(Equal(1))
+		Expect(b.readState()).To(Equal(1))
 	})
 
 	It("Must update on button state change to on", func() {
-		someDriver.update(1)
-		Expect(someDriver.Active).To(Equal(true))
+		b.update(1)
+		Expect(b.Active).To(Equal(true))
 	})
 
 	It("Must update on button state change to off", func() {
-		someDriver.update(0)
-		Expect(someDriver.Active).To(Equal(false))
+		b.update(0)
+		Expect(b.Active).To(Equal(false))
 	})
 
 	It("Must be able to Start", func() {
-		Expect(someDriver.Start()).To(Equal(true))
+		Expect(b.Start()).To(Equal(true))
 	})
 	It("Must be able to Init", func() {
-		Expect(someDriver.Init()).To(Equal(true))
+		Expect(b.Init()).To(Equal(true))
 	})
 	It("Must be able to Halt", func() {
-		Expect(someDriver.Halt()).To(Equal(true))
+		Expect(b.Halt()).To(Equal(true))
 	})
 })

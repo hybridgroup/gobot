@@ -1,17 +1,12 @@
-package gobotGPIO
+package gpio
 
 import (
 	"github.com/hybridgroup/gobot"
 )
 
-type MotorInterface interface {
-	PwmWrite(string, byte)
-	DigitalWrite(string, byte)
-}
-
-type Motor struct {
+type MotorDriver struct {
 	gobot.Driver
-	Adaptor          MotorInterface
+	Adaptor          PwmDigitalWriter
 	SpeedPin         string
 	SwitchPin        string
 	DirectionPin     string
@@ -23,34 +18,36 @@ type Motor struct {
 	CurrentDirection string
 }
 
-func NewMotor(a MotorInterface) *Motor {
-	m := new(Motor)
-	m.Adaptor = a
-	m.Commands = []string{
-		"OffC",
-		"OnC",
-		"IsOnC",
-		"IsOffC",
-		"ToggleC",
-		"SpeedC",
-		"MinC",
-		"MaxC",
-		"ForwardC",
-		"BackwardC",
-		"CurrentSpeedC",
+func NewMotorDriver(a PwmDigitalWriter) *MotorDriver {
+	return &MotorDriver{
+		Driver: gobot.Driver{
+			Commands: []string{
+				"OffC",
+				"OnC",
+				"IsOnC",
+				"IsOffC",
+				"ToggleC",
+				"SpeedC",
+				"MinC",
+				"MaxC",
+				"ForwardC",
+				"BackwardC",
+				"CurrentSpeedC",
+			},
+		},
+		CurrentState:     0,
+		CurrentSpeed:     0,
+		CurrentMode:      "digital",
+		CurrentDirection: "forward",
+		Adaptor:          a,
 	}
-	m.CurrentState = 0
-	m.CurrentSpeed = 0
-	m.CurrentMode = "digital"
-	m.CurrentDirection = "forward"
-	return m
 }
 
-func (m *Motor) Start() bool { return true }
-func (m *Motor) Halt() bool  { return true }
-func (m *Motor) Init() bool  { return true }
+func (m *MotorDriver) Start() bool { return true }
+func (m *MotorDriver) Halt() bool  { return true }
+func (m *MotorDriver) Init() bool  { return true }
 
-func (m *Motor) Off() {
+func (m *MotorDriver) Off() {
 	if m.isDigital() {
 		m.changeState(0)
 	} else {
@@ -58,7 +55,7 @@ func (m *Motor) Off() {
 	}
 }
 
-func (m *Motor) On() {
+func (m *MotorDriver) On() {
 	if m.isDigital() {
 		m.changeState(1)
 	} else {
@@ -69,15 +66,15 @@ func (m *Motor) On() {
 	}
 }
 
-func (m *Motor) Min() {
+func (m *MotorDriver) Min() {
 	m.Off()
 }
 
-func (m *Motor) Max() {
+func (m *MotorDriver) Max() {
 	m.Speed(255)
 }
 
-func (m *Motor) IsOn() bool {
+func (m *MotorDriver) IsOn() bool {
 	if m.isDigital() {
 		return m.CurrentState == 1
 	} else {
@@ -85,11 +82,11 @@ func (m *Motor) IsOn() bool {
 	}
 }
 
-func (m *Motor) IsOff() bool {
+func (m *MotorDriver) IsOff() bool {
 	return !m.IsOn()
 }
 
-func (m *Motor) Toggle() {
+func (m *MotorDriver) Toggle() {
 	if m.IsOn() {
 		m.Off()
 	} else {
@@ -97,23 +94,23 @@ func (m *Motor) Toggle() {
 	}
 }
 
-func (m *Motor) Speed(value byte) {
+func (m *MotorDriver) Speed(value byte) {
 	m.CurrentMode = "analog"
 	m.CurrentSpeed = value
 	m.Adaptor.PwmWrite(m.SpeedPin, value)
 }
 
-func (m *Motor) Forward(speed byte) {
+func (m *MotorDriver) Forward(speed byte) {
 	m.Direction("forward")
 	m.Speed(speed)
 }
 
-func (m *Motor) Backward(speed byte) {
+func (m *MotorDriver) Backward(speed byte) {
 	m.Direction("backward")
 	m.Speed(speed)
 }
 
-func (m *Motor) Direction(direction string) {
+func (m *MotorDriver) Direction(direction string) {
 	m.CurrentDirection = direction
 	if m.DirectionPin != "" {
 		var level byte
@@ -141,14 +138,14 @@ func (m *Motor) Direction(direction string) {
 	}
 }
 
-func (m *Motor) isDigital() bool {
+func (m *MotorDriver) isDigital() bool {
 	if m.CurrentMode == "digital" {
 		return true
 	}
 	return false
 }
 
-func (m *Motor) changeState(state byte) {
+func (m *MotorDriver) changeState(state byte) {
 	m.CurrentState = state
 	if state == 1 {
 		m.CurrentSpeed = 0

@@ -1,4 +1,4 @@
-package gobotGPIO
+package gpio
 
 type TestAdaptor struct{}
 
