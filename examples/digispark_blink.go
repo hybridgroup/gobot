@@ -2,16 +2,15 @@ package main
 
 import (
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot-digispark"
-	"github.com/hybridgroup/gobot-gpio"
+	"github.com/hybridgroup/gobot/digispark"
+	"github.com/hybridgroup/gobot/gpio"
 )
 
 func main() {
+	digisparkAdaptor := digispark.NewDigisparkAdaptor()
+	digisparkAdaptor.Name = "Digispark"
 
-	digispark := new(gobotDigispark.DigisparkAdaptor)
-	digispark.Name = "Digispark"
-
-	led := gobotGPIO.NewLed(digispark)
+	led := gpio.NewLedDriver(digisparkAdaptor)
 	led.Name = "led"
 	led.Pin = "0"
 
@@ -22,7 +21,7 @@ func main() {
 	}
 
 	robot := gobot.Robot{
-		Connections: []gobot.Connection{digispark},
+		Connections: []gobot.Connection{digisparkAdaptor},
 		Devices:     []gobot.Device{led},
 		Work:        work,
 	}

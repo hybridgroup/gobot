@@ -1,4 +1,4 @@
-package gobotDigispark
+package digispark
 
 //#include "littleWire_util.h"
 import "C"

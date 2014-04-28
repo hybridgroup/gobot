@@ -1,4 +1,4 @@
-package gobotDigispark
+package digispark
 
 import (
 	"github.com/hybridgroup/gobot"
@@ -7,54 +7,59 @@ import (
 
 type DigisparkAdaptor struct {
 	gobot.Adaptor
-	LittleWire *LittleWire
+	littleWire *LittleWire
 	servo      bool
 	pwm        bool
+	connect    func(*DigisparkAdaptor)
 }
 
-var connect = func() *LittleWire {
-	return LittleWireConnect()
+func NewDigisparkAdaptor() *DigisparkAdaptor {
+	return &DigisparkAdaptor{
+		connect: func(d *DigisparkAdaptor) {
+			d.littleWire = LittleWireConnect()
+		},
+	}
 }
 
-func (da *DigisparkAdaptor) Connect() bool {
-	da.LittleWire = connect()
-	da.Connected = true
+func (d *DigisparkAdaptor) Connect() bool {
+	d.connect(d)
+	d.Connected = true
 	return true
 }
 
-func (da *DigisparkAdaptor) Reconnect() bool {
-	return da.Connect()
+func (d *DigisparkAdaptor) Reconnect() bool {
+	return d.Connect()
 }
 
-func (da *DigisparkAdaptor) Finalize() bool   { return true }
-func (da *DigisparkAdaptor) Disconnect() bool { return true }
+func (d *DigisparkAdaptor) Finalize() bool   { return true }
+func (d *DigisparkAdaptor) Disconnect() bool { return true }
 
-func (da *DigisparkAdaptor) DigitalWrite(pin string, level byte) {
+func (d *DigisparkAdaptor) DigitalWrite(pin string, level byte) {
 	p, _ := strconv.Atoi(pin)
 
-	da.LittleWire.PinMode(uint8(p), 0)
-	da.LittleWire.DigitalWrite(uint8(p), level)
+	d.littleWire.PinMode(uint8(p), 0)
+	d.littleWire.DigitalWrite(uint8(p), level)
 }
-func (da *DigisparkAdaptor) DigitalRead(pin string, level byte) {}
-func (da *DigisparkAdaptor) PwmWrite(pin string, value byte) {
-	if da.pwm == false {
-		da.LittleWire.PwmInit()
-		da.LittleWire.PwmUpdatePrescaler(1)
-		da.pwm = true
+func (d *DigisparkAdaptor) DigitalRead(pin string, level byte) {}
+func (d *DigisparkAdaptor) PwmWrite(pin string, value byte) {
+	if d.pwm == false {
+		d.littleWire.PwmInit()
+		d.littleWire.PwmUpdatePrescaler(1)
+		d.pwm = true
 	}
-	da.LittleWire.PwmUpdateCompare(value, value)
+	d.littleWire.PwmUpdateCompare(value, value)
 }
-func (da *DigisparkAdaptor) AnalogRead(string) int { return -1 }
+func (d *DigisparkAdaptor) AnalogRead(string) int { return -1 }
 
-func (da *DigisparkAdaptor) InitServo() {}
-func (da *DigisparkAdaptor) ServoWrite(pin string, angle uint8) {
-	if da.servo == false {
-		da.LittleWire.ServoInit()
-		da.servo = true
+func (d *DigisparkAdaptor) InitServo() {}
+func (d *DigisparkAdaptor) ServoWrite(pin string, angle uint8) {
+	if d.servo == false {
+		d.littleWire.ServoInit()
+		d.servo = true
 	}
-	da.LittleWire.ServoUpdateLocation(angle, angle)
+	d.littleWire.ServoUpdateLocation(angle, angle)
 }
 
-func (da *DigisparkAdaptor) I2cStart(byte)           {}
-func (da *DigisparkAdaptor) I2cRead(uint16) []uint16 { return make([]uint16, 0) }
-func (da *DigisparkAdaptor) I2cWrite([]uint16)       {}
+func (d *DigisparkAdaptor) I2cStart(byte)           {}
+func (d *DigisparkAdaptor) I2cRead(uint16) []uint16 { return make([]uint16, 0) }
+func (d *DigisparkAdaptor) I2cWrite([]uint16)       {}

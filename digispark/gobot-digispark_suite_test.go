@@ -1,4 +1,4 @@
-package gobotDigispark
+package digispark
 
 import (
 	. "github.com/onsi/ginkgo"
