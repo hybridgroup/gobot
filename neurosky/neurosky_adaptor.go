@@ -1,4 +1,4 @@
-package gobotNeurosky
+package neurosky
 
 import (
 	"github.com/hybridgroup/gobot"
@@ -8,33 +8,30 @@ import (
 
 type NeuroskyAdaptor struct {
 	gobot.Adaptor
-	sp io.ReadWriteCloser
+	sp      io.ReadWriteCloser
+	connect func(string) io.ReadWriteCloser
 }
 
-func (me *NeuroskyAdaptor) Connect() bool {
-	c := &serial.Config{Name: me.Adaptor.Port, Baud: 57600}
-	s, err := serial.OpenPort(c)
-	if err != nil {
-		panic(err)
+func NewNeuroskyAdaptor() *NeuroskyAdaptor {
+	return &NeuroskyAdaptor{
+		connect: func(port string) io.ReadWriteCloser {
+			sp, err := serial.OpenPort(&serial.Config{Name: port, Baud: 57600})
+			if err != nil {
+				panic(err)
+			}
+			return sp
+		},
 	}
-	me.sp = s
-	me.Connected = true
+}
+
+func (n *NeuroskyAdaptor) Connect() bool {
+	n.sp = n.connect(n.Adaptor.Port)
+	n.Connected = true
 	return true
 }
 
-func (me *NeuroskyAdaptor) Reconnect() bool {
-	if me.Connected == true {
-		me.Disconnect()
-	}
-	return me.Connect()
-}
-
-func (me *NeuroskyAdaptor) Disconnect() bool {
-	me.sp.Close()
-	me.Connected = false
-	return true
-}
-
-func (me *NeuroskyAdaptor) Finalize() bool {
+func (n *NeuroskyAdaptor) Finalize() bool {
+	n.sp.Close()
+	n.Connected = false
 	return true
 }

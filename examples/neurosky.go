@@ -3,16 +3,16 @@ package main
 import (
 	"fmt"
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot-neurosky"
+	"github.com/hybridgroup/gobot/neurosky"
 )
 
 func main() {
 
-	adaptor := new(gobotNeurosky.NeuroskyAdaptor)
+	adaptor := neurosky.NewNeuroskyAdaptor()
 	adaptor.Name = "neurosky"
 	adaptor.Port = "/dev/rfcomm0"
 
-	neuro := gobotNeurosky.NewNeurosky(adaptor)
+	neuro := neurosky.NewNeuroskyDriver(adaptor)
 	neuro.Name = "neuro"
 
 	work := func() {
