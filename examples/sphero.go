@@ -11,29 +11,29 @@ func main() {
 	adaptor.Name = "Sphero"
 	adaptor.Port = "/dev/rfcomm0"
 
-	sphero := sphero.NewSphero(adaptor)
-	sphero.Name = "sphero"
+	spheroDriver := sphero.NewSpheroDriver(adaptor)
+	spheroDriver.Name = "sphero"
 
 	work := func() {
-		gobot.On(sphero.Events["Collision"], func(data interface{}) {
+		gobot.On(spheroDriver.Events["Collision"], func(data interface{}) {
 			fmt.Println("Collision Detected!")
 		})
 
 		gobot.Every("3s", func() {
-			sphero.Roll(30, uint16(gobot.Rand(360)))
+			spheroDriver.Roll(30, uint16(gobot.Rand(360)))
 		})
 
 		gobot.Every("1s", func() {
 			r := uint8(gobot.Rand(255))
 			g := uint8(gobot.Rand(255))
 			b := uint8(gobot.Rand(255))
-			sphero.SetRGB(r, g, b)
+			spheroDriver.SetRGB(r, g, b)
 		})
 	}
 
 	robot := gobot.Robot{
 		Connections: []gobot.Connection{adaptor},
-		Devices:     []gobot.Device{sphero},
+		Devices:     []gobot.Device{spheroDriver},
 		Work:        work,
 	}
 

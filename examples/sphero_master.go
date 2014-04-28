@@ -17,18 +17,18 @@ func main() {
 		spheroAdaptor.Name = "sphero"
 		spheroAdaptor.Port = port
 
-		sphero := sphero.NewSphero(spheroAdaptor)
-		sphero.Name = "sphero"
-		sphero.Interval = "0.5s"
+		spheroDriver := sphero.NewSpheroDriver(spheroAdaptor)
+		spheroDriver.Name = "sphero"
+		spheroDriver.Interval = "0.5s"
 
 		work := func() {
-			sphero.SetRGB(uint8(255), uint8(0), uint8(0))
+			spheroDriver.SetRGB(uint8(255), uint8(0), uint8(0))
 		}
 
 		master.Robots = append(master.Robots, &gobot.Robot{
 			Name:        name,
 			Connections: []gobot.Connection{spheroAdaptor},
-			Devices:     []gobot.Device{sphero},
+			Devices:     []gobot.Device{spheroDriver},
 			Work:        work,
 		})
 	}
@@ -36,7 +36,7 @@ func main() {
 	master.Robots = append(master.Robots, &gobot.Robot{
 		Work: func() {
 			gobot.Every("1s", func() {
-				gobot.Call(master.FindRobot("Sphero-BPO").GetDevice("sphero").Driver, "SetRGB", uint8(gobot.Rand(255)), uint8(gobot.Rand(255)), uint8(gobot.Rand(255)))
+				gobot.Call(master.FindRobot("Sphero-BPO").GetDevice("spheroDriver").Driver, "SetRGB", uint8(gobot.Rand(255)), uint8(gobot.Rand(255)), uint8(gobot.Rand(255)))
 			})
 		},
 	})

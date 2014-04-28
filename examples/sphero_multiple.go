@@ -21,28 +21,28 @@ func main() {
 		spheroAdaptor.Name = "Sphero"
 		spheroAdaptor.Port = spheros[s]
 
-		sphero := sphero.NewSphero(spheroAdaptor)
-		sphero.Name = "Sphero" + spheros[s]
-		sphero.Interval = "0.5s"
+		spheroDriver := sphero.NewSpheroDriver(spheroAdaptor)
+		spheroDriver.Name = "Sphero" + spheros[s]
+		spheroDriver.Interval = "0.5s"
 
 		work := func() {
-			sphero.Stop()
+			spheroDriver.Stop()
 
-			gobot.On(sphero.Events["Collision"], func(data interface{}) {
+			gobot.On(spheroDriver.Events["Collision"], func(data interface{}) {
 				fmt.Println("Collision Detected!")
 			})
 
 			gobot.Every("1s", func() {
-				sphero.Roll(100, uint16(gobot.Rand(360)))
+				spheroDriver.Roll(100, uint16(gobot.Rand(360)))
 			})
 			gobot.Every("3s", func() {
-				sphero.SetRGB(uint8(gobot.Rand(255)), uint8(gobot.Rand(255)), uint8(gobot.Rand(255)))
+				spheroDriver.SetRGB(uint8(gobot.Rand(255)), uint8(gobot.Rand(255)), uint8(gobot.Rand(255)))
 			})
 		}
 
 		master.Robots = append(master.Robots, &gobot.Robot{
 			Connections: []gobot.Connection{spheroAdaptor},
-			Devices:     []gobot.Device{sphero},
+			Devices:     []gobot.Device{spheroDriver},
 			Work:        work,
 		})
 	}
