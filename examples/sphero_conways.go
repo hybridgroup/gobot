@@ -3,18 +3,18 @@ package main
 import (
 	"fmt"
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot-sphero"
+	"github.com/hybridgroup/gobot/sphero"
 )
 
 type conway struct {
 	alive    bool
 	age      int
 	contacts int
-	sphero   *gobotSphero.SpheroDriver
+	cell     *sphero.SpheroDriver
 }
 
 func main() {
-	master := gobot.GobotMaster()
+	master := gobot.NewMaster()
 
 	spheros := []string{
 		"/dev/rfcomm0",
@@ -23,17 +23,17 @@ func main() {
 	}
 
 	for s := range spheros {
-		spheroAdaptor := new(gobotSphero.SpheroAdaptor)
+		spheroAdaptor := sphero.NewSpheroAdaptor()
 		spheroAdaptor.Name = "Sphero"
 		spheroAdaptor.Port = spheros[s]
 
-		sphero := gobotSphero.NewSphero(spheroAdaptor)
-		sphero.Name = "Sphero" + spheros[s]
+		cell := sphero.NewSpheroDriver(spheroAdaptor)
+		cell.Name = "Sphero" + spheros[s]
 
 		work := func() {
 
 			conway := new(conway)
-			conway.sphero = sphero
+			conway.cell = cell
 
 			conway.birth()
 
@@ -56,7 +56,7 @@ func main() {
 
 		master.Robots = append(master.Robots, &gobot.Robot{
 			Connections: []gobot.Connection{spheroAdaptor},
-			Devices:     []gobot.Device{sphero},
+			Devices:     []gobot.Device{cell},
 			Work:        work,
 		})
 	}
@@ -73,7 +73,7 @@ func (c *conway) contact() {
 }
 
 func (c *conway) rebirth() {
-	fmt.Println("Welcome back", c.sphero.Name, "!")
+	fmt.Println("Welcome back", c.cell.Name, "!")
 	c.life()
 }
 
@@ -85,15 +85,15 @@ func (c *conway) birth() {
 }
 
 func (c *conway) life() {
-	c.sphero.SetRGB(0, 255, 0)
+	c.cell.SetRGB(0, 255, 0)
 	c.alive = true
 }
 
 func (c *conway) death() {
-	fmt.Println(c.sphero.Name, "died :(")
+	fmt.Println(c.cell.Name, "died :(")
 	c.alive = false
-	c.sphero.SetRGB(255, 0, 0)
-	c.sphero.Stop()
+	c.cell.SetRGB(255, 0, 0)
+	c.cell.Stop()
 }
 
 func (c *conway) enoughContacts() bool {
@@ -107,7 +107,7 @@ func (c *conway) enoughContacts() bool {
 func (c *conway) birthday() {
 	c.age += 1
 
-	fmt.Println("Happy birthday", c.sphero.Name, "you are", c.age, "and had", c.contacts, "contacts.")
+	fmt.Println("Happy birthday", c.cell.Name, "you are", c.age, "and had", c.contacts, "contacts.")
 
 	if c.enoughContacts() == true {
 		if c.alive == false {
@@ -122,6 +122,6 @@ func (c *conway) birthday() {
 
 func (c *conway) movement() {
 	if c.alive == true {
-		c.sphero.Roll(100, uint16(gobot.Rand(360)))
+		c.cell.Roll(100, uint16(gobot.Rand(360)))
 	}
 }
