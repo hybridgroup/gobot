@@ -1,4 +1,4 @@
-package gobotArdrone
+package ardrone
 
 import (
 	. "github.com/onsi/ginkgo"
@@ -11,12 +11,11 @@ var _ = Describe("ArdroneDriver", func() {
 	)
 
 	BeforeEach(func() {
-		connect = func(me *ArdroneAdaptor) {
-			d := new(testDrone)
-			me.ardrone = d
+		adaptor := NewArdroneAdaptor()
+		adaptor.connect = func(a *ArdroneAdaptor) {
+			a.drone = &testDrone{}
 		}
-		adaptor := new(ArdroneAdaptor)
-		driver = NewArdrone(adaptor)
+		driver = NewArdroneDriver(adaptor)
 		adaptor.Connect()
 	})
 

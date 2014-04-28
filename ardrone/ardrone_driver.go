@@ -1,4 +1,4 @@
-package gobotArdrone
+package ardrone
 
 import (
 	"github.com/hybridgroup/gobot"
@@ -13,13 +13,15 @@ type DroneInterface interface {
 	Drone() drone
 }
 
-func NewArdrone(adaptor DroneInterface) *ArdroneDriver {
-	d := new(ArdroneDriver)
-	d.Adaptor = adaptor
-	d.Events = make(map[string]chan interface{})
-	d.Events["Flying"] = make(chan interface{}, 1)
-	d.Commands = []string{}
-	return d
+func NewArdroneDriver(adaptor DroneInterface) *ArdroneDriver {
+	return &ArdroneDriver{
+		Driver: gobot.Driver{
+			Events: map[string]chan interface{}{
+				"Flying": make(chan interface{}, 1),
+			},
+		},
+		Adaptor: adaptor,
+	}
 }
 
 func (me *ArdroneDriver) Start() bool {

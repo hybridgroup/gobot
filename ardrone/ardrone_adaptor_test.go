@@ -1,4 +1,4 @@
-package gobotArdrone
+package ardrone
 
 import (
 	. "github.com/onsi/ginkgo"
@@ -8,15 +8,15 @@ import (
 var _ = Describe("ArdroneAdaptor", func() {
 	var (
 		adaptor *ArdroneAdaptor
-		ardrone drone
+		drone   *testDrone
 	)
 
 	BeforeEach(func() {
-		ardrone = new(testDrone)
-		connect = func(me *ArdroneAdaptor) {
-			me.ardrone = ardrone
+		drone = &testDrone{}
+		adaptor = NewArdroneAdaptor()
+		adaptor.connect = func(a *ArdroneAdaptor) {
+			a.drone = drone
 		}
-		adaptor = new(ArdroneAdaptor)
 	})
 
 	It("Must be able to Finalize", func() {
@@ -33,6 +33,6 @@ var _ = Describe("ArdroneAdaptor", func() {
 	})
 	It("Must be able to return a Drone", func() {
 		adaptor.Connect()
-		Expect(adaptor.Drone()).To(Equal(ardrone))
+		Expect(adaptor.Drone()).To(Equal(drone))
 	})
 })

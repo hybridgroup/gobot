@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot-ardrone"
-	"github.com/hybridgroup/gobot-joystick"
+	"github.com/hybridgroup/gobot/ardrone"
+	"github.com/hybridgroup/gobot/joystick"
 	"math"
 )
 
@@ -13,19 +13,19 @@ type pair struct {
 }
 
 func main() {
-	joystickAdaptor := new(gobotJoystick.JoystickAdaptor)
+	joystickAdaptor := joystick.NewJoystickAdaptor()
 	joystickAdaptor.Name = "ps3"
 	joystickAdaptor.Params = map[string]interface{}{
-		"config": "./examples/dualshock3.json",
+		"config": "../joytsitkc/configs/dualshock3.json",
 	}
 
-	joystick := gobotJoystick.NewJoystick(joystickAdaptor)
+	joystick := joystick.NewJoystickDriver(joystickAdaptor)
 	joystick.Name = "ps3"
 
-	ardroneAdaptor := new(gobotArdrone.ArdroneAdaptor)
+	ardroneAdaptor := ardrone.NewArdroneAdaptor()
 	ardroneAdaptor.Name = "Drone"
 
-	drone := gobotArdrone.NewArdrone(ardroneAdaptor)
+	drone := ardrone.NewArdroneDriver(ardroneAdaptor)
 	drone.Name = "Drone"
 
 	work := func() {

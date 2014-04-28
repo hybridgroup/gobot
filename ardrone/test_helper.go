@@ -1,4 +1,4 @@
-package gobotArdrone
+package ardrone
 
 type testDrone struct{}
 
