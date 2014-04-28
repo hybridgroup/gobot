@@ -1,4 +1,4 @@
-package gobotLeap
+package leap
 
 import (
 	. "github.com/onsi/ginkgo"
