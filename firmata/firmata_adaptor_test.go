@@ -1,4 +1,4 @@
-package gobotFirmata
+package firmata
 
 import (
 	"fmt"
@@ -12,13 +12,13 @@ var _ = Describe("FirmataAdaptor", func() {
 	)
 
 	BeforeEach(func() {
-		connect = func(me *FirmataAdaptor) {
-			me.Board = newBoard(sp{})
-			me.Board.Events = append(me.Board.Events, event{Name: "firmware_query"})
-			me.Board.Events = append(me.Board.Events, event{Name: "capability_query"})
-			me.Board.Events = append(me.Board.Events, event{Name: "analog_mapping_query"})
+		adaptor = NewFirmataAdaptor()
+		adaptor.connect = func(f *FirmataAdaptor) {
+			f.Board = newBoard(sp{})
+			f.Board.Events = append(f.Board.Events, event{Name: "firmware_query"})
+			f.Board.Events = append(f.Board.Events, event{Name: "capability_query"})
+			f.Board.Events = append(f.Board.Events, event{Name: "analog_mapping_query"})
 		}
-		adaptor = new(FirmataAdaptor)
 		adaptor.Connect()
 	})
 
@@ -27,9 +27,6 @@ var _ = Describe("FirmataAdaptor", func() {
 	})
 	It("Must be able to Disconnect", func() {
 		Expect(adaptor.Disconnect()).To(Equal(true))
-	})
-	It("Must be able to Reconnect", func() {
-		Expect(adaptor.Reconnect()).To(Equal(true))
 	})
 	It("Must be able to InitServo", func() {
 		adaptor.InitServo()

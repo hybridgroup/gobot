@@ -1,4 +1,4 @@
-package gobotFirmata
+package firmata
 
 import (
 	. "github.com/onsi/ginkgo"

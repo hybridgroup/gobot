@@ -3,16 +3,16 @@ package main
 import (
 	"fmt"
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot-firmata"
-	"github.com/hybridgroup/gobot-i2c"
+	"github.com/hybridgroup/gobot/firmata"
+	"github.com/hybridgroup/gobot/i2c"
 )
 
 func main() {
-	firmata := new(gobotFirmata.FirmataAdaptor)
-	firmata.Name = "firmata"
-	firmata.Port = "/dev/ttyACM0"
+	firmataAdaptor := firmata.NewFirmataAdaptor()
+	firmataAdaptor.Name = "firmata"
+	firmataAdaptor.Port = "/dev/ttyACM0"
 
-	wiichuck := gobotI2C.NewWiichuck(firmata)
+	wiichuck := i2c.NewWiichuckDriver(firmataAdaptor)
 	wiichuck.Name = "wiichuck"
 
 	work := func() {
@@ -30,7 +30,7 @@ func main() {
 	}
 
 	robot := gobot.Robot{
-		Connections: []gobot.Connection{firmata},
+		Connections: []gobot.Connection{firmataAdaptor},
 		Devices:     []gobot.Device{wiichuck},
 		Work:        work,
 	}

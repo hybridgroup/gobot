@@ -1,4 +1,4 @@
-package gobotFirmata
+package firmata
 
 import (
 	"bytes"

@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot-firmata"
-	"github.com/hybridgroup/gobot-gpio"
+	"github.com/hybridgroup/gobot/firmata"
+	"github.com/hybridgroup/gobot/gpio"
 	"io/ioutil"
 	"net/http"
 )
@@ -58,21 +58,21 @@ func checkTravis(robot *gobot.Robot) {
 }
 
 func main() {
-	master := gobot.GobotMaster()
+	master := gobot.NewMaster()
 
-	firmata := new(gobotFirmata.FirmataAdaptor)
-	firmata.Name = "firmata"
-	firmata.Port = "/dev/ttyACM0"
+	firmataAdaptor := firmata.NewFirmataAdaptor()
+	firmataAdaptor.Name = "firmata"
+	firmataAdaptor.Port = "/dev/ttyACM0"
 
-	red := gobotGPIO.NewLed(firmata)
+	red := gpio.NewLedDriver(firmata)
 	red.Name = "red"
 	red.Pin = "7"
 
-	green := gobotGPIO.NewLed(firmata)
+	green := gpio.NewLedDriver(firmata)
 	green.Name = "green"
 	green.Pin = "6"
 
-	blue := gobotGPIO.NewLed(firmata)
+	blue := gpio.NewLedDriver(firmata)
 	blue.Name = "blue"
 	blue.Pin = "5"
 
@@ -85,7 +85,7 @@ func main() {
 
 	master.Robots = append(master.Robots, &gobot.Robot{
 		Name:        "travis",
-		Connections: []gobot.Connection{firmata},
+		Connections: []gobot.Connection{firmataAdaptor},
 		Devices:     []gobot.Device{red, green, blue},
 		Work:        work,
 	})
