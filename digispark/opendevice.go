@@ -1,4 +1,4 @@
-package gobotDigispark
+package digispark
 
 /*
 #include <opendevice.h>
