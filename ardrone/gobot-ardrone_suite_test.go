@@ -1,4 +1,4 @@
-package gobotArdrone
+package ardrone
 
 import (
 	. "github.com/onsi/ginkgo"

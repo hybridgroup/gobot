@@ -4,8 +4,8 @@ import (
 	"fmt"
 	cv "github.com/hybridgroup/go-opencv/opencv"
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot-ardrone"
-	"github.com/hybridgroup/gobot-opencv"
+	"github.com/hybridgroup/gobot/ardrone"
+	"github.com/hybridgroup/gobot/opencv"
 	"math"
 	"path"
 	"runtime"
@@ -15,20 +15,17 @@ func main() {
 	_, currentfile, _, _ := runtime.Caller(0)
 	cascade := path.Join(path.Dir(currentfile), "haarcascade_frontalface_alt.xml")
 
-	opencv := new(gobotOpencv.Opencv)
-	opencv.Name = "opencv"
-
-	window := gobotOpencv.NewWindow(opencv)
+	window := opencv.NewWindowDriver()
 	window.Name = "window"
 
-	camera := gobotOpencv.NewCamera(opencv)
+	camera := opencv.NewCamera()
 	camera.Name = "camera"
 	camera.Source = "tcp://192.168.1.1:5555"
 
-	ardroneAdaptor := new(gobotArdrone.ArdroneAdaptor)
+	ardroneAdaptor := ardrone.NewArdroneAdaptor()
 	ardroneAdaptor.Name = "Drone"
 
-	drone := gobotArdrone.NewArdrone(ardroneAdaptor)
+	drone := ardrone.NewArdroneDriver(ardroneAdaptor)
 	drone.Name = "Drone"
 
 	work := func() {
@@ -49,7 +46,7 @@ func main() {
 				gobot.Every("0.3s", func() {
 					drone.Hover()
 					i := image
-					faces := gobotOpencv.DetectFaces(cascade, i)
+					faces := opencv.DetectFaces(cascade, i)
 					biggest := 0
 					var face *cv.Rect
 					for _, f := range faces {
@@ -59,7 +56,7 @@ func main() {
 						}
 					}
 					if face != nil {
-						gobotOpencv.DrawRectangles(i, []*cv.Rect{face})
+						opencv.DrawRectangles(i, []*cv.Rect{face})
 						center_x := float64(image.Width()) * 0.5
 						turn := -(float64(face.X()) - center_x) / center_x
 						fmt.Println("turning:", turn)
@@ -77,7 +74,7 @@ func main() {
 	}
 
 	robot := gobot.Robot{
-		Connections: []gobot.Connection{opencv, ardroneAdaptor},
+		Connections: []gobot.Connection{ardroneAdaptor},
 		Devices:     []gobot.Device{window, camera, drone},
 		Work:        work,
 	}

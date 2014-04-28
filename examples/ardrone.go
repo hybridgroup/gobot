@@ -2,15 +2,14 @@ package main
 
 import (
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot-ardrone"
+	"github.com/hybridgroup/gobot/ardrone"
 )
 
 func main() {
-
-	ardroneAdaptor := new(gobotArdrone.ArdroneAdaptor)
+	ardroneAdaptor := ardrone.NewArdroneAdaptor()
 	ardroneAdaptor.Name = "Drone"
 
-	drone := gobotArdrone.NewArdrone(ardroneAdaptor)
+	drone := ardrone.NewArdroneDriver(ardroneAdaptor)
 	drone.Name = "Drone"
 
 	work := func() {
