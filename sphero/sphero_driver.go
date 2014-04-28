@@ -12,7 +12,7 @@ type packet struct {
 	checksum uint8
 }
 
-type Sphero struct {
+type SpheroDriver struct {
 	gobot.Driver
 	Adaptor          *SpheroAdaptor
 	seq              uint8
@@ -22,8 +22,8 @@ type Sphero struct {
 	response_channel chan []uint8
 }
 
-func NewSphero(a *SpheroAdaptor) *Sphero {
-	return &Sphero{
+func NewSpheroDriver(a *SpheroAdaptor) *SpheroDriver {
+	return &SpheroDriver{
 		Driver: gobot.Driver{
 			Events: make(map[string]chan interface{}),
 			Commands: []string{
@@ -41,11 +41,11 @@ func NewSphero(a *SpheroAdaptor) *Sphero {
 		response_channel: make(chan []uint8, 1024),
 	}
 }
-func (s *Sphero) Init() bool {
+func (s *SpheroDriver) Init() bool {
 	return true
 }
 
-func (s *Sphero) Start() bool {
+func (s *SpheroDriver) Start() bool {
 	go func() {
 		for {
 			packet := <-s.packet_channel
@@ -93,7 +93,7 @@ func (s *Sphero) Start() bool {
 	return true
 }
 
-func (s *Sphero) Halt() bool {
+func (s *SpheroDriver) Halt() bool {
 	go func() {
 		for {
 			s.Stop()
@@ -103,23 +103,23 @@ func (s *Sphero) Halt() bool {
 	return true
 }
 
-func (s *Sphero) SetRGB(r uint8, g uint8, b uint8) {
+func (s *SpheroDriver) SetRGB(r uint8, g uint8, b uint8) {
 	s.packet_channel <- s.craftPacket([]uint8{r, g, b, 0x01}, 0x20)
 }
 
-func (s *Sphero) GetRGB() []uint8 {
+func (s *SpheroDriver) GetRGB() []uint8 {
 	return s.syncResponse(s.craftPacket([]uint8{}, 0x22))
 }
 
-func (s *Sphero) SetBackLED(level uint8) {
+func (s *SpheroDriver) SetBackLED(level uint8) {
 	s.packet_channel <- s.craftPacket([]uint8{level}, 0x21)
 }
 
-func (s *Sphero) SetHeading(heading uint16) {
+func (s *SpheroDriver) SetHeading(heading uint16) {
 	s.packet_channel <- s.craftPacket([]uint8{uint8(heading >> 8), uint8(heading & 0xFF)}, 0x01)
 }
 
-func (s *Sphero) SetStabilization(on bool) {
+func (s *SpheroDriver) SetStabilization(on bool) {
 	b := uint8(0x01)
 	if on == false {
 		b = 0x00
@@ -127,24 +127,24 @@ func (s *Sphero) SetStabilization(on bool) {
 	s.packet_channel <- s.craftPacket([]uint8{b}, 0x02)
 }
 
-func (s *Sphero) Roll(speed uint8, heading uint16) {
+func (s *SpheroDriver) Roll(speed uint8, heading uint16) {
 	s.packet_channel <- s.craftPacket([]uint8{speed, uint8(heading >> 8), uint8(heading & 0xFF), 0x01}, 0x30)
 }
 
-func (s *Sphero) Stop() {
+func (s *SpheroDriver) Stop() {
 	s.Roll(0, 0)
 }
 
-func (s *Sphero) configureCollisionDetection() {
+func (s *SpheroDriver) configureCollisionDetection() {
 	s.Events["Collision"] = make(chan interface{})
 	s.packet_channel <- s.craftPacket([]uint8{0x01, 0x40, 0x40, 0x50, 0x50, 0x60}, 0x12)
 }
 
-func (s *Sphero) handleCollisionDetected(data []uint8) {
+func (s *SpheroDriver) handleCollisionDetected(data []uint8) {
 	gobot.Publish(s.Events["Collision"], data)
 }
 
-func (s *Sphero) syncResponse(packet *packet) []byte {
+func (s *SpheroDriver) syncResponse(packet *packet) []byte {
 	s.packet_channel <- packet
 	for i := 0; i < 500; i++ {
 		for key := range s.sync_response {
@@ -160,7 +160,7 @@ func (s *Sphero) syncResponse(packet *packet) []byte {
 	return make([]byte, 0)
 }
 
-func (s *Sphero) craftPacket(body []uint8, cid byte) *packet {
+func (s *SpheroDriver) craftPacket(body []uint8, cid byte) *packet {
 	packet := new(packet)
 	packet.body = body
 	dlen := len(packet.body) + 1
@@ -169,14 +169,14 @@ func (s *Sphero) craftPacket(body []uint8, cid byte) *packet {
 	return packet
 }
 
-func (s *Sphero) write(packet *packet) {
+func (s *SpheroDriver) write(packet *packet) {
 	buf := append(packet.header, packet.body...)
 	buf = append(buf, packet.checksum)
 	length, err := s.Adaptor.sp.Write(buf)
 	if err != nil {
 		fmt.Println(s.Name, err)
 		s.Adaptor.Disconnect()
-		fmt.Println("Reconnecting to sphero...")
+		fmt.Println("Reconnecting to SpheroDriver...")
 		s.Adaptor.Connect()
 		return
 	} else if length != len(buf) {
@@ -185,7 +185,7 @@ func (s *Sphero) write(packet *packet) {
 	s.seq += 1
 }
 
-func (s *Sphero) calculateChecksum(packet *packet) uint8 {
+func (s *SpheroDriver) calculateChecksum(packet *packet) uint8 {
 	buf := append(packet.header, packet.body...)
 	buf = buf[2:]
 	var calculatedChecksum uint16
@@ -195,7 +195,7 @@ func (s *Sphero) calculateChecksum(packet *packet) uint8 {
 	return uint8(^(calculatedChecksum % 256))
 }
 
-func (s *Sphero) readHeader() []uint8 {
+func (s *SpheroDriver) readHeader() []uint8 {
 	data := s.readNextChunk(5)
 	if data == nil {
 		return nil
@@ -204,7 +204,7 @@ func (s *Sphero) readHeader() []uint8 {
 	}
 }
 
-func (s *Sphero) readBody(length uint8) []uint8 {
+func (s *SpheroDriver) readBody(length uint8) []uint8 {
 	data := s.readNextChunk(length)
 	if data == nil {
 		return nil
@@ -213,7 +213,7 @@ func (s *Sphero) readBody(length uint8) []uint8 {
 	}
 }
 
-func (s *Sphero) readNextChunk(length uint8) []uint8 {
+func (s *SpheroDriver) readNextChunk(length uint8) []uint8 {
 	time.Sleep(1000 * time.Microsecond)
 	var read = make([]uint8, int(length))
 	l, err := s.Adaptor.sp.Read(read[:])

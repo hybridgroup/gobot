@@ -7,14 +7,14 @@ import (
 
 var _ = Describe("SpheroDriver", func() {
 	var (
-		s *Sphero
+		s *SpheroDriver
 		a *SpheroAdaptor
 	)
 
 	BeforeEach(func() {
 		a = NewSpheroAdaptor()
 		a.sp = sp{}
-		s = NewSphero(a)
+		s = NewSpheroDriver(a)
 	})
 
 	It("Must be able to Start", func() {
