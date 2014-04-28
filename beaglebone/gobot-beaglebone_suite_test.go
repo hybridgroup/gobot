@@ -1,4 +1,4 @@
-package gobotBeaglebone
+package beaglebone
 
 import (
 	. "github.com/onsi/ginkgo"

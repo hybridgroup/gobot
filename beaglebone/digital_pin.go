@@ -1,4 +1,4 @@
-package gobotBeaglebone
+package beaglebone
 
 import (
 	"os"
