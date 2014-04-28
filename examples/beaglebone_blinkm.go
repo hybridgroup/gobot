@@ -3,15 +3,15 @@ package main
 import (
 	"fmt"
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot-beaglebone"
-	"github.com/hybridgroup/gobot-i2c"
+	"github.com/hybridgroup/gobot/beaglebone"
+	"github.com/hybridgroup/gobot/i2c"
 )
 
 func main() {
-	beaglebone := new(gobotBeaglebone.Beaglebone)
-	beaglebone.Name = "beaglebone"
+	beagleboneAdaptor := beaglebone.NewBeagleboneAdaptor()
+	beagleboneAdaptor.Name = "beaglebone"
 
-	blinkm := gobotI2C.NewBlinkM(beaglebone)
+	blinkm := i2c.NewBlinkMDriver(beagleboneAdaptor)
 	blinkm.Name = "blinkm"
 
 	work := func() {
@@ -25,7 +25,7 @@ func main() {
 	}
 
 	robot := gobot.Robot{
-		Connections: []gobot.Connection{beaglebone},
+		Connections: []gobot.Connection{beagleboneAdaptor},
 		Devices:     []gobot.Device{blinkm},
 		Work:        work,
 	}

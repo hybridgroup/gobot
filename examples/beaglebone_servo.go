@@ -3,15 +3,15 @@ package main
 import (
 	"fmt"
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot-beaglebone"
-	"github.com/hybridgroup/gobot-gpio"
+	"github.com/hybridgroup/gobot/beaglebone"
+	"github.com/hybridgroup/gobot/gpio"
 )
 
 func main() {
-	beaglebone := new(gobotBeaglebone.Beaglebone)
-	beaglebone.Name = "beaglebone"
+	beagleboneAdaptor := beaglebone.NewBeagleboneAdaptor()
+	beagleboneAdaptor.Name = "beaglebone"
 
-	servo := gobotGPIO.NewServo(beaglebone)
+	servo := gpio.NewServoDriver(beagleboneAdaptor)
 	servo.Name = "servo"
 	servo.Pin = "P9_14"
 
@@ -24,7 +24,7 @@ func main() {
 	}
 
 	robot := gobot.Robot{
-		Connections: []gobot.Connection{beaglebone},
+		Connections: []gobot.Connection{beagleboneAdaptor},
 		Devices:     []gobot.Device{servo},
 		Work:        work,
 	}

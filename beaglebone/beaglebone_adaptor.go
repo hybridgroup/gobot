@@ -1,4 +1,4 @@
-package gobotBeaglebone
+package beaglebone
 
 import (
 	"github.com/hybridgroup/gobot"
@@ -97,7 +97,7 @@ var analogPins = map[string]string{
 	"P8_35": "AIN6",
 }
 
-type Beaglebone struct {
+type BeagleboneAdaptor struct {
 	gobot.Adaptor
 	digitalPins []*digitalPin
 	pwmPins     map[string]*pwmPin
@@ -105,14 +105,18 @@ type Beaglebone struct {
 	i2cDevice   *i2cDevice
 }
 
-func (b *Beaglebone) Connect() bool {
+func NewBeagleboneAdaptor() *BeagleboneAdaptor {
+	return &BeagleboneAdaptor{}
+}
+
+func (b *BeagleboneAdaptor) Connect() bool {
 	b.digitalPins = make([]*digitalPin, 120)
 	b.pwmPins = make(map[string]*pwmPin)
 	b.analogPins = make(map[string]*analogPin)
 	return true
 }
 
-func (b *Beaglebone) Finalize() bool {
+func (b *BeagleboneAdaptor) Finalize() bool {
 	for _, pin := range b.pwmPins {
 		if pin != nil {
 			pin.release()
@@ -128,48 +132,48 @@ func (b *Beaglebone) Finalize() bool {
 	}
 	return true
 }
-func (b *Beaglebone) Reconnect() bool  { return true }
-func (b *Beaglebone) Disconnect() bool { return true }
+func (b *BeagleboneAdaptor) Reconnect() bool  { return true }
+func (b *BeagleboneAdaptor) Disconnect() bool { return true }
 
-func (b *Beaglebone) PwmWrite(pin string, val byte) {
+func (b *BeagleboneAdaptor) PwmWrite(pin string, val byte) {
 	i := b.pwmPin(pin)
 	period := 500000.0
 	duty := gobot.FromScale(float64(^val), 0, 255.0)
 	b.pwmPins[i].pwmWrite(strconv.Itoa(int(period)), strconv.Itoa(int(period*duty)))
 }
 
-func (b *Beaglebone) InitServo() {}
-func (b *Beaglebone) ServoWrite(pin string, val byte) {
+func (b *BeagleboneAdaptor) InitServo() {}
+func (b *BeagleboneAdaptor) ServoWrite(pin string, val byte) {
 	i := b.pwmPin(pin)
 	period := 20000000.0
 	duty := gobot.FromScale(float64(^val), 0, 180.0)
 	b.pwmPins[i].pwmWrite(strconv.Itoa(int(period)), strconv.Itoa(int(period*duty)))
 }
 
-func (b *Beaglebone) DigitalWrite(pin string, val byte) {
+func (b *BeagleboneAdaptor) DigitalWrite(pin string, val byte) {
 	i := b.digitalPin(pin, "w")
 	b.digitalPins[i].digitalWrite(strconv.Itoa(int(val)))
 }
 
-func (b *Beaglebone) AnalogRead(pin string) int {
+func (b *BeagleboneAdaptor) AnalogRead(pin string) int {
 	i := b.analogPin(pin)
 	return b.analogPins[i].analogRead()
 }
 
-func (b *Beaglebone) I2cStart(address byte) {
+func (b *BeagleboneAdaptor) I2cStart(address byte) {
 	b.i2cDevice = newI2cDevice(I2C_LOCATION, address)
 	b.i2cDevice.start()
 }
 
-func (b *Beaglebone) I2cWrite(data []byte) {
+func (b *BeagleboneAdaptor) I2cWrite(data []byte) {
 	b.i2cDevice.write(data)
 }
 
-func (b *Beaglebone) I2cRead(size byte) []byte {
+func (b *BeagleboneAdaptor) I2cRead(size byte) []byte {
 	return b.i2cDevice.read(size)
 }
 
-func (b *Beaglebone) translatePin(pin string) int {
+func (b *BeagleboneAdaptor) translatePin(pin string) int {
 	for key, value := range pins {
 		if key == pin {
 			return value
@@ -178,7 +182,7 @@ func (b *Beaglebone) translatePin(pin string) int {
 	panic("Not a valid pin")
 }
 
-func (b *Beaglebone) translatePwmPin(pin string) string {
+func (b *BeagleboneAdaptor) translatePwmPin(pin string) string {
 	for key, value := range pwmPins {
 		if key == pin {
 			return value
@@ -187,7 +191,7 @@ func (b *Beaglebone) translatePwmPin(pin string) string {
 	panic("Not a valid pin")
 }
 
-func (b *Beaglebone) translateAnalogPin(pin string) string {
+func (b *BeagleboneAdaptor) translateAnalogPin(pin string) string {
 	for key, value := range analogPins {
 		if key == pin {
 			return value
@@ -196,7 +200,7 @@ func (b *Beaglebone) translateAnalogPin(pin string) string {
 	panic("Not a valid pin")
 }
 
-func (b *Beaglebone) analogPin(pin string) string {
+func (b *BeagleboneAdaptor) analogPin(pin string) string {
 	i := b.translateAnalogPin(pin)
 	if b.analogPins[i] == nil {
 		b.analogPins[i] = newAnalogPin(i)
@@ -204,7 +208,7 @@ func (b *Beaglebone) analogPin(pin string) string {
 	return i
 }
 
-func (b *Beaglebone) digitalPin(pin string, mode string) int {
+func (b *BeagleboneAdaptor) digitalPin(pin string, mode string) int {
 	i := b.translatePin(pin)
 	if b.digitalPins[i] == nil || b.digitalPins[i].Mode != mode {
 		b.digitalPins[i] = newDigitalPin(i, mode)
@@ -212,7 +216,7 @@ func (b *Beaglebone) digitalPin(pin string, mode string) int {
 	return i
 }
 
-func (b *Beaglebone) pwmPin(pin string) string {
+func (b *BeagleboneAdaptor) pwmPin(pin string) string {
 	i := b.translatePwmPin(pin)
 	if b.pwmPins[i] == nil {
 		b.pwmPins[i] = newPwmPin(i)
