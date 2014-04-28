@@ -1,4 +1,4 @@
-package gobotNeurosky
+package neurosky
 
 import (
 	. "github.com/onsi/ginkgo"

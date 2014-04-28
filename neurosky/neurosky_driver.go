@@ -1,4 +1,4 @@
-package gobotNeurosky
+package neurosky
 
 import (
 	"bytes"
@@ -19,9 +19,6 @@ type NeuroskyDriver struct {
 	Adaptor *NeuroskyAdaptor
 }
 
-type NeuroskyInterface interface {
-}
-
 type EEG struct {
 	Delta    int
 	Theta    int
@@ -33,39 +30,41 @@ type EEG struct {
 	MidGamma int
 }
 
-func NewNeurosky(adaptor *NeuroskyAdaptor) *NeuroskyDriver {
-	d := new(NeuroskyDriver)
-	d.Events = make(map[string]chan interface{})
-	d.Events["Extended"] = make(chan interface{})
-	d.Events["Signal"] = make(chan interface{})
-	d.Events["Attention"] = make(chan interface{})
-	d.Events["Meditation"] = make(chan interface{})
-	d.Events["Blink"] = make(chan interface{})
-	d.Events["Wave"] = make(chan interface{})
-	d.Events["EEG"] = make(chan interface{})
-	d.Adaptor = adaptor
-	d.Commands = []string{}
-	return d
+func NewNeuroskyDriver(a *NeuroskyAdaptor) *NeuroskyDriver {
+	return &NeuroskyDriver{
+		Driver: gobot.Driver{
+			Events: map[string]chan interface{}{
+				"Extended":   make(chan interface{}),
+				"Signal":     make(chan interface{}),
+				"Attention":  make(chan interface{}),
+				"Meditation": make(chan interface{}),
+				"Blink":      make(chan interface{}),
+				"Wave":       make(chan interface{}),
+				"EEG":        make(chan interface{}),
+			},
+		},
+		Adaptor: a,
+	}
 }
 
-func (me *NeuroskyDriver) Init() bool { return true }
-func (me *NeuroskyDriver) Start() bool {
+func (n *NeuroskyDriver) Init() bool { return true }
+func (n *NeuroskyDriver) Start() bool {
 	go func() {
 		for {
 			var buff = make([]byte, int(2048))
-			_, err := me.Adaptor.sp.Read(buff[:])
+			_, err := n.Adaptor.sp.Read(buff[:])
 			if err != nil {
 				panic(err)
 			} else {
-				me.parse(bytes.NewBuffer(buff))
+				n.parse(bytes.NewBuffer(buff))
 			}
 		}
 	}()
 	return true
 }
-func (me *NeuroskyDriver) Halt() bool { return true }
+func (n *NeuroskyDriver) Halt() bool { return true }
 
-func (me *NeuroskyDriver) parse(buf *bytes.Buffer) {
+func (n *NeuroskyDriver) parse(buf *bytes.Buffer) {
 	for buf.Len() > 2 {
 		b1, _ := buf.ReadByte()
 		b2, _ := buf.ReadByte()
@@ -75,7 +74,7 @@ func (me *NeuroskyDriver) parse(buf *bytes.Buffer) {
 			buf.Read(payload)
 			//checksum, _ := buf.ReadByte()
 			buf.Next(1)
-			me.parsePacket(payload)
+			n.parsePacket(payload)
 		}
 	}
 }
@@ -87,29 +86,23 @@ func (me *NeuroskyDriver) parsePacket(data []byte) {
 		switch b {
 		case CODE_EX:
 			gobot.Publish(me.Events["Extended"], nil)
-
 		case CODE_SIGNAL_QUALITY:
 			ret, _ := buf.ReadByte()
 			gobot.Publish(me.Events["Signal"], ret)
-
 		case CODE_ATTENTION:
 			ret, _ := buf.ReadByte()
 			gobot.Publish(me.Events["Attention"], ret)
-
 		case CODE_MEDITATION:
 			ret, _ := buf.ReadByte()
 			gobot.Publish(me.Events["Meditation"], ret)
-
 		case CODE_BLINK:
 			ret, _ := buf.ReadByte()
 			gobot.Publish(me.Events["Blink"], ret)
-
 		case CODE_WAVE:
 			buf.Next(1)
 			var ret = make([]byte, 2)
 			buf.Read(ret)
 			gobot.Publish(me.Events["Wave"], ret)
-
 		case CODE_ASIC_EEG:
 			var ret = make([]byte, 25)
 			n, _ := buf.Read(ret)
@@ -121,22 +114,18 @@ func (me *NeuroskyDriver) parsePacket(data []byte) {
 }
 
 func (me *NeuroskyDriver) parseEEG(data []byte) EEG {
-	eeg := EEG{}
-	eeg.Delta = me.parse3ByteInteger(data[0:3])
-	eeg.Theta = me.parse3ByteInteger(data[3:6])
-	eeg.LoAlpha = me.parse3ByteInteger(data[6:9])
-	eeg.HiAlpha = me.parse3ByteInteger(data[9:12])
-	eeg.LoBeta = me.parse3ByteInteger(data[12:15])
-	eeg.HiBeta = me.parse3ByteInteger(data[15:18])
-	eeg.LoGamma = me.parse3ByteInteger(data[18:21])
-	eeg.MidGamma = me.parse3ByteInteger(data[21:25])
-	return eeg
+	return EEG{
+		Delta:    me.parse3ByteInteger(data[0:3]),
+		Theta:    me.parse3ByteInteger(data[3:6]),
+		LoAlpha:  me.parse3ByteInteger(data[6:9]),
+		HiAlpha:  me.parse3ByteInteger(data[9:12]),
+		LoBeta:   me.parse3ByteInteger(data[12:15]),
+		HiBeta:   me.parse3ByteInteger(data[15:18]),
+		LoGamma:  me.parse3ByteInteger(data[18:21]),
+		MidGamma: me.parse3ByteInteger(data[21:25]),
+	}
 }
 
 func (me *NeuroskyDriver) parse3ByteInteger(data []byte) int {
-	b1 := int(data[0])
-	b2 := int(data[1])
-	b3 := int(data[2])
-	bigEndianInteger := ((b1 << 16) | (((1 << 16) - 1) & (b2 << 8)) | ((1<<8)-1)&b3)
-	return bigEndianInteger
+	return ((int(data[0]) << 16) | (((1 << 16) - 1) & (int(data[1]) << 8)) | (((1 << 8) - 1) & int(data[2])))
 }

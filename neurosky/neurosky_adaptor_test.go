@@ -1,4 +1,4 @@
-package gobotNeurosky
+package neurosky
 
 import (
 	. "github.com/onsi/ginkgo"
@@ -7,23 +7,17 @@ import (
 
 var _ = Describe("NeuroskyAdaptor", func() {
 	var (
-		adaptor *NeuroskyAdaptor
+		n *NeuroskyAdaptor
 	)
 
 	BeforeEach(func() {
-		adaptor = new(NeuroskyAdaptor)
+		n = NewNeuroskyAdaptor()
 	})
 
 	PIt("Must be able to Finalize", func() {
-		Expect(adaptor.Finalize()).To(Equal(true))
+		Expect(n.Finalize()).To(Equal(true))
 	})
 	PIt("Must be able to Connect", func() {
-		Expect(adaptor.Connect()).To(Equal(true))
-	})
-	PIt("Must be able to Disconnect", func() {
-		Expect(adaptor.Disconnect()).To(Equal(true))
-	})
-	PIt("Must be able to Reconnect", func() {
-		Expect(adaptor.Reconnect()).To(Equal(true))
+		Expect(n.Connect()).To(Equal(true))
 	})
 })

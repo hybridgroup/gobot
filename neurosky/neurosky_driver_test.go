@@ -1,4 +1,4 @@
-package gobotNeurosky
+package neurosky
 
 import (
 	. "github.com/onsi/ginkgo"
@@ -7,20 +7,20 @@ import (
 
 var _ = Describe("NeuroskyDriver", func() {
 	var (
-		driver *NeuroskyDriver
+		n *NeuroskyDriver
 	)
 
 	BeforeEach(func() {
-		driver = NewNeurosky(new(NeuroskyAdaptor))
+		n = NewNeuroskyDriver(NewNeuroskyAdaptor())
 	})
 
 	PIt("Must be able to Start", func() {
-		Expect(driver.Start()).To(Equal(true))
+		Expect(n.Start()).To(Equal(true))
 	})
 	PIt("Must be able to Init", func() {
-		Expect(driver.Init()).To(Equal(true))
+		Expect(n.Init()).To(Equal(true))
 	})
 	PIt("Must be able to Halt", func() {
-		Expect(driver.Halt()).To(Equal(true))
+		Expect(n.Halt()).To(Equal(true))
 	})
 })
