@@ -1,4 +1,4 @@
-package gobotLeap
+package leap
 
 import (
 	. "github.com/onsi/ginkgo"
@@ -7,21 +7,21 @@ import (
 )
 
 var _ = Describe("Parser", func() {
-	leapAdaptor := new(LeapAdaptor)
-	leap := NewLeap(leapAdaptor)
+	a := NewLeapMotionAdaptor()
+	d := NewLeapMotionDriver(a)
 
 	Describe("#ParseLeapFrame", func() {
-		It("Takes an array of bytes and extracts Leap Frames", func() {
+		It("Takes an array of bytes and extracts Frames", func() {
 			file, err := ioutil.ReadFile("./test/support/example_frame.json")
 			Expect(err != nil)
-			parsedFrame := leap.ParseLeapFrame(file)
+			parsedFrame := d.ParseFrame(file)
 			Expect(parsedFrame.Hands != nil)
 			Expect(parsedFrame.Pointables != nil)
 			Expect(parsedFrame.Gestures != nil)
 		})
 
-		It("Returns an empty Leap Frame if passed non-Leap bytes", func() {
-			parsedFrame := leap.ParseLeapFrame([]byte{})
+		It("Returns an empty Frame if passed non-Leap bytes", func() {
+			parsedFrame := d.ParseFrame([]byte{})
 			Expect(parsedFrame.Timestamp == 0)
 		})
 	})
