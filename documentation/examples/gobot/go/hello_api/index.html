@@ -46,7 +46,7 @@
             </span>
           </div>
           <span class="menu">
-            <a href="/documentation" class="item">Docs</a>
+            <a class="active" href="/documentation">Docs</a>
             <a href="/documentation/platforms" class="item">Platforms</a>
             
             <a href="/blog" class="item">Blog</a>
@@ -78,7 +78,8 @@
 
 <span class="keyword">func</span> main() {
         master := gobot.GobotMaster()
-        gobot.Api(master)
+        api := gobot.Api(master)
+        api.Port = <span class="string"><span class="delimiter">"</span><span class="content">4000</span><span class="delimiter">"</span></span>
 
         hello := <span class="predefined">new</span>(gobot.Robot)
         hello.Name = <span class="string"><span class="delimiter">"</span><span class="content">hello</span><span class="delimiter">"</span></span>

@@ -46,7 +46,7 @@
             </span>
           </div>
           <span class="menu">
-            <a href="/documentation" class="item">Docs</a>
+            <a class="active" href="/documentation">Docs</a>
             <a href="/documentation/platforms" class="item">Platforms</a>
             
             <a href="/blog" class="item">Blog</a>
@@ -88,10 +88,21 @@
         camera.Name = <span class="string"><span class="delimiter">"</span><span class="content">camera</span><span class="delimiter">"</span></span>
 
         work := <span class="keyword">func</span>() {
+                <span class="keyword">var</span> image *cv.IplImage
                 gobot.On(camera.Events[<span class="string"><span class="delimiter">"</span><span class="content">Frame</span><span class="delimiter">"</span></span>], <span class="keyword">func</span>(data <span class="keyword">interface</span>{}) {
-                        i := data.(*cv.IplImage)
-                        window.ShowImage(gobotOpencv.DrawRectangles(i, gobotOpencv.DetectFaces(cascade, i)))
+                        image = data.(*cv.IplImage)
                 })
+
+                <span class="keyword">go</span> <span class="keyword">func</span>() {
+                        <span class="keyword">for</span> {
+                                <span class="keyword">if</span> image != <span class="predefined-constant">nil</span> {
+                                        i := image.Clone()
+                                        faces := gobotOpencv.DetectFaces(cascade, i)
+                                        i = gobotOpencv.DrawRectangles(i, faces, <span class="integer">0</span>, <span class="integer">255</span>, <span class="integer">0</span>, <span class="integer">5</span>)
+                                        window.ShowImage(i)
+                                }
+                        }
+                }()
         }
 
         robot := gobot.Robot{

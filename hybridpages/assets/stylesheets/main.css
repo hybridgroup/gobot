@@ -1459,17 +1459,21 @@
               margin-right: 0; }
             /* line 68, ../hybridpages/assets/stylesheets/shared/_headers.scss */
             .app-header .menu .active {
-              color: #fc4c1d; }
-            /* line 73, ../hybridpages/assets/stylesheets/shared/_headers.scss */
+              color: #fc4c1d;
+              font-size: 15px;
+              font-weight: bold;
+              margin: 10px;
+              padding: 8px 4px; }
+            /* line 77, ../hybridpages/assets/stylesheets/shared/_headers.scss */
             .app-header .menu .item {
               font-size: 15px;
               font-weight: bold;
               margin: 10px;
               padding: 8px 4px; }
-              /* line 80, ../hybridpages/assets/stylesheets/shared/_headers.scss */
+              /* line 84, ../hybridpages/assets/stylesheets/shared/_headers.scss */
               .app-header .menu .item, .app-header .menu .item:visited, .app-header .menu .item:active {
                 color: #505252; }
-              /* line 85, ../hybridpages/assets/stylesheets/shared/_headers.scss */
+              /* line 89, ../hybridpages/assets/stylesheets/shared/_headers.scss */
               .app-header .menu .item:hover, .app-header .menu .item:focus {
                 color: #fc4c1d; }
             @media only screen and (min-width: 767px) and (max-width: 964px) {
@@ -1483,12 +1487,12 @@
                 /* line 40, ../../../../../.rvm/gems/ruby-2.0.0-p247@gobot.io/gems/neat-1.5.0/app/assets/stylesheets/grid/_span-columns.scss */
                 .app-header .menu:last-child {
                   margin-right: 0; }
-                /* line 96, ../hybridpages/assets/stylesheets/shared/_headers.scss */
+                /* line 100, ../hybridpages/assets/stylesheets/shared/_headers.scss */
                 .app-header .menu .item {
                   margin: 0;
                   padding: 0 5px; } }
           @media only screen and (min-width: 767px) and (max-width: 964px) {
-            /* line 106, ../hybridpages/assets/stylesheets/shared/_headers.scss */
+            /* line 110, ../hybridpages/assets/stylesheets/shared/_headers.scss */
             .app-header .display {
               float: left;
               display: block;
@@ -1498,17 +1502,17 @@
               .app-header .display:last-child {
                 margin-right: 0; } }
           @media only screen and (max-width: 767px) {
-            /* line 114, ../hybridpages/assets/stylesheets/shared/_headers.scss */
+            /* line 118, ../hybridpages/assets/stylesheets/shared/_headers.scss */
             .app-header .subtitle, .app-header .menu {
               width: auto;
               display: block; }
-            /* line 120, ../hybridpages/assets/stylesheets/shared/_headers.scss */
+            /* line 124, ../hybridpages/assets/stylesheets/shared/_headers.scss */
             .app-header .display, .app-header .app-logo {
               display: inline-block; }
-            /* line 125, ../hybridpages/assets/stylesheets/shared/_headers.scss */
+            /* line 129, ../hybridpages/assets/stylesheets/shared/_headers.scss */
             .app-header .app-logo, .app-header .subtitle, .app-header .menu {
               margin: 0 0 5px 0; }
-            /* line 130, ../hybridpages/assets/stylesheets/shared/_headers.scss */
+            /* line 134, ../hybridpages/assets/stylesheets/shared/_headers.scss */
             .app-header .display {
               float: left;
               display: block;
@@ -1519,15 +1523,15 @@
               /* line 40, ../../../../../.rvm/gems/ruby-2.0.0-p247@gobot.io/gems/neat-1.5.0/app/assets/stylesheets/grid/_span-columns.scss */
               .app-header .display:last-child {
                 margin-right: 0; }
-            /* line 137, ../hybridpages/assets/stylesheets/shared/_headers.scss */
+            /* line 141, ../hybridpages/assets/stylesheets/shared/_headers.scss */
             .app-header .app-logo a {
               background-position: center center; }
-            /* line 142, ../hybridpages/assets/stylesheets/shared/_headers.scss */
+            /* line 146, ../hybridpages/assets/stylesheets/shared/_headers.scss */
             .app-header .subtitle {
               font-size: 19px;
               line-height: 15px;
               padding: 0; }
-            /* line 149, ../hybridpages/assets/stylesheets/shared/_headers.scss */
+            /* line 153, ../hybridpages/assets/stylesheets/shared/_headers.scss */
             .app-header .menu {
               margin: 5px 0 0 0;
               text-align: center;
@@ -1538,7 +1542,7 @@
               /* line 40, ../../../../../.rvm/gems/ruby-2.0.0-p247@gobot.io/gems/neat-1.5.0/app/assets/stylesheets/grid/_span-columns.scss */
               .app-header .menu:last-child {
                 margin-right: 0; }
-              /* line 155, ../hybridpages/assets/stylesheets/shared/_headers.scss */
+              /* line 159, ../hybridpages/assets/stylesheets/shared/_headers.scss */
               .app-header .menu .item {
                 margin: 0;
                 padding: 0 2px; } }
