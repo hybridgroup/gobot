@@ -1,4 +1,4 @@
-package gobot
+package api
 
 type jsonRobot struct {
 	Name        string            `json:"name"`

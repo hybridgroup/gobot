@@ -1,4 +1,4 @@
-package gobot
+package api
 
 import (
 	"encoding/json"
@@ -8,77 +8,65 @@ import (
 	"reflect"
 
 	"github.com/go-martini/martini"
+	"github.com/hybridgroup/gobot"
 	"github.com/martini-contrib/auth"
 	"github.com/martini-contrib/cors"
 )
 
-type startFuncAlias func(*api)
-
-// Optional restful API through the master to access
+// Optional restful API through Gobot has access
 // all the robots.
 type api struct {
-	master    *Master
-	server    *martini.ClassicMartini
-	Host      string
-	Port      string
-	Username  string
-	Password  string
-	Cert      string
-	Key       string
-	startFunc startFuncAlias
+	gobot    *gobot.Gobot
+	server   *martini.ClassicMartini
+	Host     string
+	Port     string
+	Username string
+	Password string
+	Cert     string
+	Key      string
+	start    func(*api)
 }
 
-func NewApi() *api {
-	return &api{startFunc: defaultStartFunc}
-}
+func NewApi(g gobot.Gobot) *api {
+	return &api{
+		Gobot: g,
+		startFunc: func(a *api) {
+			if a == nil {
+				return
+			}
 
-var defaultStartFunc = func(a *api) {
-	if a == nil {
-		return
+			username := a.Username
+			if username != "" {
+				password := a.Password
+				a.server.Use(auth.Basic(username, password))
+			}
+
+			port := a.Port
+			if port == "" {
+				port = "3000"
+			}
+
+			host := a.Host
+			cert := a.Cert
+			key := a.Key
+
+			log.Println("Initializing API on " + host + ":" + port + "...")
+			go func() {
+				if cert != "" && key != "" {
+					http.ListenAndServeTLS(host+":"+port, cert, key, a.server)
+				} else {
+					log.Println("WARNING: API using insecure connection. We recommend using an SSL certificate with Gobot.")
+					http.ListenAndServe(host+":"+port, a.server)
+				}
+			}()
+		},
 	}
-
-	username := a.Username
-	if username != "" {
-		password := a.Password
-		a.server.Use(auth.Basic(username, password))
-	}
-
-	port := a.Port
-	if port == "" {
-		port = "3000"
-	}
-
-	host := a.Host
-	cert := a.Cert
-	key := a.Key
-
-	log.Println("Initializing API on " + host + ":" + port + "...")
-	go func() {
-		if cert != "" && key != "" {
-			http.ListenAndServeTLS(host+":"+port, cert, key, a.server)
-		} else {
-			log.Println("WARNING: API using insecure connection. We recommend using an SSL certificate with Gobot.")
-			http.ListenAndServe(host+":"+port, a.server)
-		}
-	}()
 }
 
 // start starts the api using the start function
 // sets on the API on initialization.
-func (a *api) start() {
-	if a == nil {
-		return
-	}
-	a.startFunc(a)
-}
-
-func Api(bot *Master) *api {
-	a := new(api)
-	a.master = bot
-	bot.Api = a
-
-	m := martini.Classic()
-	a.server = m
+func (a *api) Start() {
+	a.server = martini.Classic()
 
 	m.Use(martini.Static("robeaux"))
 	m.Use(cors.Allow(&cors.Options{
@@ -135,7 +123,7 @@ func Api(bot *Master) *api {
 		a.robot_connection(params["robotname"], params["connectionname"], res, req)
 	})
 
-	return a
+	a.start(a)
 }
 
 func (me *api) robots(res http.ResponseWriter, req *http.Request) {

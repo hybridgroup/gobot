@@ -1,6 +1,11 @@
 package gobot
 
-import "fmt"
+import (
+	"fmt"
+	. "github.com/hybridgroup/gobot/core/adaptor"
+	. "github.com/hybridgroup/gobot/core/driver"
+	. "github.com/hybridgroup/gobot/core/robot"
+)
 
 type testStruct struct {
 	i int

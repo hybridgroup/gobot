@@ -1,4 +1,4 @@
-package gobot
+package utils
 
 import (
 	"math"

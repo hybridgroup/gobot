@@ -1,4 +1,4 @@
-package gobot
+package api
 
 import (
 	"bytes"

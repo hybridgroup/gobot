@@ -1,4 +1,4 @@
-package gobot
+package robot
 
 import (
 	. "github.com/onsi/ginkgo"

@@ -1,7 +1,8 @@
-package gobot
+package robot
 
 import (
 	"fmt"
+	"github.com/hybridgroup/gobot/core/utils"
 	"log"
 	"math/rand"
 	"time"
@@ -14,31 +15,44 @@ type Robot struct {
 	Commands      map[string]interface{} `json:"-"`
 	RobotCommands []string               `json:"commands"`
 	Work          func()                 `json:"-"`
-	connections   []*connection          `json:"-"`
-	devices       []*device              `json:"-"`
-	master        *Master                `json:"-"`
+	connections   connections            `json:"-"`
+	devices       devices                `json:"-"`
 }
 
-func (r *Robot) Start() {
-	if r.master == nil {
-		r.master = NewMaster()
+type Robots []*Robot
+
+func (r Robots) Start() {
+	for _, robot := range r {
+		robot.Start()
 	}
-
-	r.master.Robots = []*Robot{r}
-	r.master.Start()
 }
 
-func (r *Robot) startRobot() {
+func (r Robots) Each(f func(*Robot)) {
+	for _, robot := range r {
+		f(robot)
+	}
+}
+
+func NewRobot(name string, c []Connection, d []Device, work func()) *Robot {
+	r := &Robot{
+		Name:        name,
+		Connections: c,
+		Devices:     d,
+		Work:        work,
+	}
 	r.initName()
 	r.initCommands()
 	r.initConnections()
-	if r.startConnections() != true {
+	r.initDevices()
+	return r
+}
+
+func (r *Robot) Start() {
+	//	if !r.startConnections() {
+	if err := r.GetConnections().Start(); err != nil {
 		panic("Could not start connections")
 	}
-	if r.initDevices() != true {
-		panic("Could not initialize devices")
-	}
-	if r.startDevices() != true {
+	if err := r.GetDevices().Start(); err != nil {
 		panic("Could not start devices")
 	}
 	if r.Work != nil {
@@ -62,10 +76,10 @@ func (r *Robot) initCommands() {
 }
 
 func (r *Robot) initConnections() {
-	r.connections = make([]*connection, len(r.Connections))
+	r.connections = make(connections, len(r.Connections))
 	log.Println("Initializing connections...")
 	for i, connection := range r.Connections {
-		log.Println("Initializing connection ", FieldByNamePtr(connection, "Name"), "...")
+		log.Println("Initializing connection ", utils.FieldByNamePtr(connection, "Name"), "...")
 		r.connections[i] = NewConnection(connection, r)
 	}
 }
@@ -87,43 +101,11 @@ func (r *Robot) initDevices() bool {
 	return success
 }
 
-func (r *Robot) startConnections() bool {
-	log.Println("Starting connections...")
-	success := true
-	for _, connection := range r.connections {
-		log.Println("Starting connection " + connection.Name + "...")
-		if connection.Connect() == false {
-			success = false
-			break
-		}
-	}
-	return success
-}
-
-func (r *Robot) startDevices() bool {
-	log.Println("Starting devices...")
-	success := true
-	for _, device := range r.devices {
-		log.Println("Starting device " + device.Name + "...")
-		if device.Start() == false {
-			success = false
-			break
-		}
-	}
-	return success
-}
-
-func (r *Robot) finalizeConnections() {
-	for _, connection := range r.connections {
-		connection.Finalize()
-	}
-}
-
 func (r *Robot) GetDevices() devices {
 	return devices(r.devices)
 }
 
-func (r *Robot) GetDevice(name string) *device {
+func (r *Robot) Device(name string) *device {
 	if r == nil {
 		return nil
 	}
@@ -135,11 +117,11 @@ func (r *Robot) GetDevice(name string) *device {
 	return nil
 }
 
-func (r *Robot) GetConnections() []*connection {
-	return r.connections
+func (r *Robot) GetConnections() connections {
+	return connections(r.connections)
 }
 
-func (r *Robot) GetConnection(name string) *connection {
+func (r *Robot) Connection(name string) *connection {
 	if r == nil {
 		return nil
 	}

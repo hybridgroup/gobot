@@ -1,4 +1,4 @@
-package gobot
+package driver
 
 type Driver struct {
 	Interval string                      `json:"interval"`
