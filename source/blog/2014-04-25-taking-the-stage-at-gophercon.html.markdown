@@ -2,12 +2,14 @@
 page_title_show: true
 title: Taking The Stage At Gophercon
 page_title: Blog
-date: 2014-04-26
+date: 2014-04-29
 tags: events
 author: Ron Evans
 ---
 
 We just left the amazing [Gophercon]() in Denver, the first conference dedicated to [the Go programming language](http://golang.org/). A remarkable array of speakers and attendees were present, including [Rob Pike]() and many members of the Golang core team.
+
+<img src="/images/blog/2014-04-29/gophercon-rob-pike-gobot.png" alt="" style="margin: 10px 0;">
 
 It was a great honor for Team Gobot to be invited to speak to such an illustrious crowd, and we worked hard to prepare some demos worthy of the event. When you do live coding of flying objects, there is of course, always some element of aerial risk. However, the talk went off without a hitch!
 
