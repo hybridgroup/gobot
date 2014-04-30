@@ -1,25 +1,23 @@
-package robot
+package gobot
 
 import (
 	"errors"
-	"github.com/hybridgroup/gobot/core/adaptor"
-	"github.com/hybridgroup/gobot/core/utils"
 	"log"
 	"reflect"
 )
 
-type connection struct {
-	Name    string                   `json:"name"`
-	Type    string                   `json:"adaptor"`
-	Adaptor adaptor.AdaptorInterface `json:"-"`
-	Port    string                   `json:"-"`
-	Robot   *Robot                   `json:"-"`
-	Params  map[string]interface{}   `json:"-"`
-}
-
 type Connection interface {
 	Connect() bool
 	Finalize() bool
+}
+
+type connection struct {
+	Name    string                 `json:"name"`
+	Type    string                 `json:"adaptor"`
+	Adaptor AdaptorInterface       `json:"-"`
+	Port    string                 `json:"-"`
+	Robot   *Robot                 `json:"-"`
+	Params  map[string]interface{} `json:"-"`
 }
 
 type connections []*connection
@@ -45,16 +43,16 @@ func (c connections) Finalize() {
 	}
 }
 
-func NewConnection(adaptor adaptor.AdaptorInterface, r *Robot) *connection {
+func NewConnection(adaptor AdaptorInterface, r *Robot) *connection {
 	c := new(connection)
 	s := reflect.ValueOf(adaptor).Type().String()
 	c.Type = s[1:len(s)]
-	c.Name = utils.FieldByNamePtr(adaptor, "Name").String()
-	c.Port = utils.FieldByNamePtr(adaptor, "Port").String()
+	c.Name = FieldByNamePtr(adaptor, "Name").String()
+	c.Port = FieldByNamePtr(adaptor, "Port").String()
 	c.Params = make(map[string]interface{})
-	keys := utils.FieldByNamePtr(adaptor, "Params").MapKeys()
+	keys := FieldByNamePtr(adaptor, "Params").MapKeys()
 	for k := range keys {
-		c.Params[keys[k].String()] = utils.FieldByNamePtr(adaptor, "Params").MapIndex(keys[k])
+		c.Params[keys[k].String()] = FieldByNamePtr(adaptor, "Params").MapIndex(keys[k])
 	}
 	c.Robot = r
 	c.Adaptor = adaptor

@@ -1,13 +1,13 @@
 package gobot
 
 import (
-	"github.com/hybridgroup/gobot/core/robot"
+	"log"
 	"os"
 	"os/signal"
 )
 
 type Gobot struct {
-	Robots robot.Robots
+	Robots []*Robot
 	trap   func(chan os.Signal)
 }
 
@@ -20,20 +20,21 @@ func NewGobot() *Gobot {
 }
 
 func (g *Gobot) Start() {
-	g.Robots.Start()
+	Robots(g.Robots).Start()
 
 	c := make(chan os.Signal, 1)
 	g.trap(c)
 
 	// waiting for interrupt coming on the channel
 	_ = <-c
-	g.Robots.Each(func(r *robot.Robot) {
-		r.GetDevices().Halt()
-		r.GetConnections().Finalize()
+	Robots(g.Robots).Each(func(r *Robot) {
+		log.Println("Stopping Robot", r.Name, "...")
+		r.Devices().Halt()
+		r.Connections().Finalize()
 	})
 }
 
-func (g *Gobot) Robot(name string) *robot.Robot {
+func (g *Gobot) Robot(name string) *Robot {
 	for _, r := range g.Robots {
 		if r.Name == name {
 			return r

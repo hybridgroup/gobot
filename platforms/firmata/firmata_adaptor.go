@@ -14,8 +14,12 @@ type FirmataAdaptor struct {
 	connect    func(*FirmataAdaptor)
 }
 
-func NewFirmataAdaptor() *FirmataAdaptor {
+func NewFirmataAdaptor(name, port string) *FirmataAdaptor {
 	return &FirmataAdaptor{
+		Adaptor: gobot.Adaptor{
+			Name: name,
+			Port: port,
+		},
 		connect: func(f *FirmataAdaptor) {
 			sp, err := serial.OpenPort(&serial.Config{Name: f.Port, Baud: 57600})
 			if err != nil {

@@ -1,4 +1,4 @@
-package driver
+package gobot
 
 type Driver struct {
 	Interval string                      `json:"interval"`
@@ -9,7 +9,7 @@ type Driver struct {
 }
 
 type DriverInterface interface {
-	Init() bool
+	//Init() bool
 	Start() bool
 	Halt() bool
 }

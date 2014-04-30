@@ -1,25 +1,22 @@
-package robot
+package gobot
 
 import (
 	"errors"
-	"github.com/hybridgroup/gobot/core/driver"
-	"github.com/hybridgroup/gobot/core/utils"
 	"log"
 	"reflect"
 )
 
 type Device interface {
-	Init() bool
 	Start() bool
 	Halt() bool
 }
 
 type device struct {
-	Name     string                 `json:"name"`
-	Type     string                 `json:"driver"`
-	Interval string                 `json:"-"`
-	Robot    *Robot                 `json:"-"`
-	Driver   driver.DriverInterface `json:"-"`
+	Name     string          `json:"name"`
+	Type     string          `json:"driver"`
+	Interval string          `json:"-"`
+	Robot    *Robot          `json:"-"`
+	Driver   DriverInterface `json:"-"`
 }
 
 type devices []*device
@@ -31,7 +28,7 @@ func (d devices) Start() error {
 	for _, device := range d {
 		log.Println("Starting device " + device.Name + "...")
 		if device.Start() == false {
-			err = errors.New("Could not start connection")
+			err = errors.New("Could not start device")
 			break
 		}
 	}
@@ -45,22 +42,17 @@ func (d devices) Halt() {
 	}
 }
 
-func NewDevice(driver driver.DriverInterface, r *Robot) *device {
+func NewDevice(driver DriverInterface, r *Robot) *device {
 	d := new(device)
 	s := reflect.ValueOf(driver).Type().String()
 	d.Type = s[1:len(s)]
-	d.Name = utils.FieldByNamePtr(driver, "Name").String()
+	d.Name = FieldByNamePtr(driver, "Name").String()
 	d.Robot = r
-	if utils.FieldByNamePtr(driver, "Interval").String() == "" {
-		utils.FieldByNamePtr(driver, "Interval").SetString("0.1s")
+	if FieldByNamePtr(driver, "Interval").String() == "" {
+		FieldByNamePtr(driver, "Interval").SetString("0.1s")
 	}
 	d.Driver = driver
 	return d
-}
-
-func (d *device) Init() bool {
-	log.Println("Device " + d.Name + " initialized")
-	return d.Driver.Init()
 }
 
 func (d *device) Start() bool {
@@ -74,5 +66,5 @@ func (d *device) Halt() bool {
 }
 
 func (d *device) Commands() interface{} {
-	return utils.FieldByNamePtr(d.Driver, "Commands").Interface()
+	return FieldByNamePtr(d.Driver, "Commands").Interface()
 }

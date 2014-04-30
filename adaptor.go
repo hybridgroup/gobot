@@ -1,4 +1,4 @@
-package adaptor
+package gobot
 
 type Adaptor struct {
 	Name      string                 `json:"name"`
