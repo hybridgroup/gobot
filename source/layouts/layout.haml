@@ -39,4 +39,8 @@
     %footer.app-footer
       = yield_content :footer
 
+  - if is_blog_article?
+    %script{:src => "/hybridpages/assets/javascript/disqus.js"}
+    %script{src: "//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-53632dea5fd71564", type: "text/javascript"}
+
 
