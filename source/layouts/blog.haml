@@ -8,6 +8,8 @@
           = yield
         - else 
           = yield
+      - if is_blog_article?
+        = partial "blog/disqus"
     .side-column
       .categories
         %h4 Tags
