@@ -8,8 +8,8 @@ import (
 )
 
 // Every triggers f every `t` time until the end of days.
-func Every(t string, f func()) {
-	c := time.Tick(parseDuration(t))
+func Every(t time.Duration, f func()) {
+	c := time.Tick(t)
 	// start a go routine to not bloc the function
 	go func() {
 		for {
@@ -23,8 +23,8 @@ func Every(t string, f func()) {
 }
 
 // After triggers the passed function after `t` duration.
-func After(t string, f func()) {
-	time.AfterFunc(parseDuration(t), f)
+func After(t time.Duration, f func()) {
+	time.AfterFunc(t, f)
 }
 
 func Publish(c chan interface{}, val interface{}) {
@@ -75,12 +75,4 @@ func ToScale(input, min, max float64) float64 {
 	} else {
 		return i
 	}
-}
-
-func parseDuration(t string) time.Duration {
-	dur, err := time.ParseDuration(t)
-	if err != nil {
-		panic(err)
-	}
-	return dur
 }
