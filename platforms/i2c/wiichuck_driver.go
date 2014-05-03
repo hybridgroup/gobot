@@ -3,6 +3,7 @@ package i2c
 import (
 	"fmt"
 	"github.com/hybridgroup/gobot"
+	"time"
 )
 
 type WiichuckDriver struct {
@@ -36,7 +37,7 @@ func NewWiichuckDriver(a I2cInterface) *WiichuckDriver {
 
 func (w *WiichuckDriver) Start() bool {
 	w.Adaptor.I2cStart(byte(0x52))
-	gobot.Every("100ms", func() {
+	gobot.Every(100*time.Millisecond, func() {
 		w.Adaptor.I2cWrite([]uint16{uint16(0x40), uint16(0x00)})
 		w.Adaptor.I2cWrite([]uint16{uint16(0x00)})
 		new_value := w.Adaptor.I2cRead(uint16(6))

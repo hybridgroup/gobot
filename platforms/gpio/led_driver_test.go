@@ -12,8 +12,7 @@ var _ = Describe("Led", func() {
 	)
 
 	BeforeEach(func() {
-		l = NewLedDriver(t)
-		l.Pin = "1"
+		l = NewLedDriver(t, "myLed", "1")
 	})
 
 	It("Must be able to tell if IsOn", func() {
