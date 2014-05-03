@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"reflect"
+	"time"
 )
 
 type Device interface {
@@ -14,7 +15,7 @@ type Device interface {
 type device struct {
 	Name     string          `json:"name"`
 	Type     string          `json:"driver"`
-	Interval string          `json:"-"`
+	Interval time.Duration   `json:"-"`
 	Robot    *Robot          `json:"-"`
 	Driver   DriverInterface `json:"-"`
 }
