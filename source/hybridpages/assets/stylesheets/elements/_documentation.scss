@@ -27,7 +27,8 @@
         padding-right: 20px;
         border-top-right-radius: 10px; 
         border-bottom-right-radius: 10px;
-        background: $hero-color;
+        background: $hero-subtitle-color;
+        color: $hero-color;
         
       }
 
@@ -44,17 +45,19 @@
         padding: 5px 20px 0 25px;
         position: relative;
         margin: 0 5px 0 0; 
-        background: $lesser-title-color;     
+        background: $color-background-subnav-drivers;     
         text-decoration: none;
         font-size: 10pt;
         color: #fff;
 
         &:hover {
-          background: $hero-color;
+          background: $hero-subtitle-color;
+          color: $hero-color;
         }
 
         &:hover:after {
-          border-left-color: $hero-color;
+          border-left-color: $hero-subtitle-color;
+          color: $hero-color;
         }
 
         &:after {
@@ -62,7 +65,7 @@
           content: "";  
           border-top: 15px solid transparent;
           border-bottom: 15px solid transparent;
-            border-left: 15px solid $lesser-title-color;
+            border-left: 15px solid $color-background-subnav-drivers;
           position: absolute; right: -15px; top: 0;
           z-index: 1;
         }
@@ -72,7 +75,7 @@
           content: "";  
           border-top: 15px solid transparent;
             border-bottom: 15px solid transparent;
-            border-left: 15px solid $body-bg-color;
+            border-left: 15px solid $hero-color;
           position: absolute; left: 0; top: 0;
         }
       }

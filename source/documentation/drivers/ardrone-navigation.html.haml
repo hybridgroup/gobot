@@ -12,7 +12,8 @@ breadcrumbs: "<li><a href='/documentation/drivers/ardrone-navigation'>Ardrone Na
 
 ardrone_platform: true
 ---
-= partial "/documentation/drivers/breadcrumbs"
+-content_for :bredcrumbs do
+  = partial "/documentation/drivers/breadcrumbs"
 
 %section.intro
   =image_tag "/images/devices/ardrone-navigation.jpg", class: "display"

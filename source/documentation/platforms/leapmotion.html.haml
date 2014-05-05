@@ -11,7 +11,8 @@ breadcrumbs: "<li><a href='/documentation/platforms/leapmotion'>Leap Motion</a><
 
 leapmotion_driver: true
 ---
-= partial "/documentation/platforms/breadcrumbs"
+-content_for :bredcrumbs do
+  = partial "/documentation/platforms/breadcrumbs"
 
 %section.intro
   = image_tag "/images/devices/leap_motion.jpg", class: "display"

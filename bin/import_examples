@@ -102,7 +102,8 @@ page_subtitle: "<a href='https://github.com/hybridgroup/#{@repo}/tree/master/exa
 active_menu_docs: true
 breadcrumbs: "<li><a href='#'>#{title}</a></li>"
 ---
-= partial "/documentation/examples/breadcrumbs"
+-content_for :bredcrumbs do
+  = partial "/documentation/examples/breadcrumbs"
 
 :markdown
 #{body}
@@ -131,7 +132,8 @@ active_menu_docs: true
 breadcrumbs: "<li><a href='#'>#{title}</a></li>"
 
 ---
-= partial "/documentation/examples/breadcrumbs"
+-content_for :bredcrumbs do
+  = partial "/documentation/examples/breadcrumbs"
 
 .example
   :markdown

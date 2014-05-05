@@ -12,7 +12,8 @@ breadcrumbs: "<li><a href='/documentation/platforms/beaglebone'>Beaglebone</a></
 button_driver: true
 led_driver: true
 ---
-= partial "/documentation/platforms/breadcrumbs"
+-content_for :bredcrumbs do
+  = partial "/documentation/platforms/breadcrumbs"
 
 %section.intro
   = image_tag "/images/devices/beaglebone.jpg", class: "display"

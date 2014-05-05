@@ -9,7 +9,8 @@ active_menu_docs: true
 breadcrumbs: "<li><a href='/documentation/cli'>CLI</a></li>"
 
 ---
-= partial "/documentation/getting-started/breadcrumbs"
+-content_for :bredcrumbs do
+  = partial "/documentation/getting-started/breadcrumbs"
 
 .cli
   %h2 What is it?

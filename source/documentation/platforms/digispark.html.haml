@@ -13,7 +13,8 @@ button_driver: true
 led_driver: true
 servo_driver: true
 ---
-= partial "/documentation/platforms/breadcrumbs"
+-content_for :bredcrumbs do
+  = partial "/documentation/platforms/breadcrumbs"
 
 %section.intro
   = image_tag "/images/devices/digispark.jpg", class: "display"

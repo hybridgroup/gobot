@@ -10,7 +10,8 @@ page_title_show: true
 subnav_platform: true
 breadcrumbs: "<li><a href='/documentation/platforms/opencv'>OpenCV</a></li>"
 ---
-= partial "/documentation/platforms/breadcrumbs"
+-content_for :bredcrumbs do
+  = partial "/documentation/platforms/breadcrumbs"
 
 %section.intro
   = image_tag "/images/devices/opencv.jpg", class: "display"

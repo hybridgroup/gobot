@@ -10,7 +10,8 @@ active_menu_docs: true
 breadcrumbs: "<li><a href='#'>hello</a></li>"
 
 ---
-= partial "/documentation/examples/breadcrumbs"
+-content_for :bredcrumbs do
+  = partial "/documentation/examples/breadcrumbs"
 
 .example
   :markdown
