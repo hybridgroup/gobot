@@ -8,15 +8,15 @@
    ul {
     list-style: none;
     display: inline-table;
-    margin: 10px 0;
+    margin: 10px 0 -5px 0;
 
     li {
 
       display: inline;
 
       &:first-child a {
-        border-top-left-radius: 10px; 
-        border-bottom-left-radius: 10px;
+        border-top-left-radius: 2px; 
+        border-bottom-left-radius: 2px;
       }
 
       &:first-child a:before {
@@ -25,8 +25,8 @@
 
       &:last-child a {
         padding-right: 20px;
-        border-top-right-radius: 10px; 
-        border-bottom-right-radius: 10px;
+        border-top-right-radius: 2px; 
+        border-bottom-right-radius: 2px;
         background: $hero-subtitle-color;
         color: $hero-color;
         
