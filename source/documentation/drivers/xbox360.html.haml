@@ -7,9 +7,14 @@ page_subtitle: Driver
 layout: documentation
 subnav_driver: true
 active_menu_docs: true
+breadcrumbs: "<li><a href='/documentation/drivers/xbox360'>XBox360 Controller</a></li>"
 
 joystick_platform: true
 ---
+
+-content_for :bredcrumbs do
+  = partial "/documentation/drivers/breadcrumbs"
+
 
 %section.intro
   =image_tag "/images/devices/xbox360.jpg", class: "display"

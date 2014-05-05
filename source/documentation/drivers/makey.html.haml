@@ -8,6 +8,7 @@ layout: documentation
 subnav_driver: true
 subnav_circuit_driver: true
 active_menu_docs: true
+breadcrumbs: "<li><a href='/documentation/drivers/makey'>Makey Button</a></li>"
 
 arduino_platform: true
 beaglebone_platform: true
@@ -15,6 +16,10 @@ digispark_platform: true
 spark_platform: true
 
 ---
+-content_for :bredcrumbs do
+  = partial "/documentation/drivers/breadcrumbs"
+
+
 %section.intro
   = image_tag "/images/devices/makey.jpg", class: "display"
   .info-intro

@@ -7,9 +7,14 @@ page_subtitle: Driver
 layout: documentation
 subnav_driver: true
 active_menu_docs: true
+breadcrumbs: "<li><a href='/documentation/drivers/dualshock3'>Dualshock 3 Controller</a></li>"
 
 joystick_platform: true
 ---
+-content_for :bredcrumbs do
+  = partial "/documentation/drivers/breadcrumbs"
+
+
 %section.intro
   =image_tag "/images/devices/dualshock3.jpg", class: "display"
   .info-intro

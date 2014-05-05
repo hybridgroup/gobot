@@ -6,9 +6,14 @@ page_subtitle: Driver
 page_title_show: true
 layout: documentation
 active_menu_docs: true
+breadcrumbs: "<li><a href='/documentation/drivers/joystick'>Generic Joystick</a></li>"
 
 joystick_platform: true
 ---
+-content_for :bredcrumbs do
+  = partial "/documentation/drivers/breadcrumbs"
+
+
 %section.intro
   =image_tag "/images/devices/joystick.jpg", class: "display"
   .info-intro

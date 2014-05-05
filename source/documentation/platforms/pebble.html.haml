@@ -6,7 +6,10 @@ page_subtitle: "<a href='https://github.com/hybridgroup/gobot-pebble' class='rep
 page_title_show: true
 layout: documentation
 active_menu_platforms: true
+breadcrumbs: "<li><a href='/documentation/platforms/pebble'>Pebble</a></li>"
 ---
+-content_for :bredcrumbs do
+  = partial "/documentation/platforms/breadcrumbs"
 
 %section.intro
   = image_tag "/images/devices/pebble.jpg", class: "display"

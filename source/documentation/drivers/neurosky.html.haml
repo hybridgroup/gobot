@@ -7,9 +7,14 @@ layout: documentation
 page_title_show: true
 subnav_driver: true
 active_menu_docs: true
+breadcrumbs: "<li><a href='/documentation/drivers/neurosky'>Neurosky Mindwave</a></li>"
 
 neurosky_platform: true
 ---
+-content_for :bredcrumbs do
+  = partial "/documentation/drivers/breadcrumbs"
+
+
 %section.intro
   = image_tag "/images/devices/neurosky.jpg", class: "display"
   .info-intro
