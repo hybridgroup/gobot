@@ -11,9 +11,15 @@ type Connection interface {
 	Finalize() bool
 }
 
+type JsonConnection struct {
+	Name    string `json:"name"`
+	Port    string `json:"port"`
+	Adaptor string `json:"adaptor"`
+}
+
 type connection struct {
-	Name    string                 `json:"name"`
-	Type    string                 `json:"adaptor"`
+	Name    string                 `json:"-"`
+	Type    string                 `json:"-"`
 	Adaptor AdaptorInterface       `json:"-"`
 	Port    string                 `json:"-"`
 	Robot   *Robot                 `json:"-"`
@@ -67,4 +73,12 @@ func (c *connection) Connect() bool {
 func (c *connection) Finalize() bool {
 	log.Println("Finalizing " + c.Name + "...")
 	return c.Adaptor.Finalize()
+}
+
+func (c *connection) ToJson() *JsonConnection {
+	jsonConnection := new(JsonConnection)
+	jsonConnection.Name = c.Name
+	jsonConnection.Port = c.Port
+	jsonConnection.Adaptor = c.Type
+	return jsonConnection
 }

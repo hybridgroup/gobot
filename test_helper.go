@@ -66,6 +66,9 @@ func robotTestFunction(params map[string]interface{}) string {
 	return fmt.Sprintf("hey %v, %v", robotname, message)
 }
 
+func NewTestRobot(name string) *Robot {
+	return newTestRobot(name)
+}
 func newTestRobot(name string) *Robot {
 	adaptor1 := newTestAdaptor("Connection 1")
 	adaptor2 := newTestAdaptor("Connection 2")

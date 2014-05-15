@@ -7,10 +7,17 @@ import (
 	"time"
 )
 
+type JsonRobot struct {
+	Name        string            `json:"name"`
+	Commands    []string          `json:"commands"`
+	Connections []*JsonConnection `json:"connections"`
+	Devices     []*JsonDevice     `json:"devices"`
+}
+
 type Robot struct {
-	Name          string                 `json:"name"`
+	Name          string                 `json:"-"`
 	Commands      map[string]interface{} `json:"-"`
-	RobotCommands []string               `json:"commands"`
+	RobotCommands []string               `json:"-"`
 	Work          func()                 `json:"-"`
 	connections   connections            `json:"-"`
 	devices       devices                `json:"-"`
@@ -120,4 +127,17 @@ func (r *Robot) Connection(name string) *connection {
 		}
 	}
 	return nil
+}
+
+func (r *Robot) ToJson() *JsonRobot {
+	jsonRobot := new(JsonRobot)
+	jsonRobot.Name = r.Name
+	jsonRobot.Commands = r.RobotCommands
+	jsonRobot.Connections = make([]*JsonConnection, 0)
+	for _, device := range r.Devices() {
+		jsonDevice := device.ToJson()
+		jsonRobot.Connections = append(jsonRobot.Connections, jsonDevice.Connection)
+		jsonRobot.Devices = append(jsonRobot.Devices, jsonDevice)
+	}
+	return jsonRobot
 }
