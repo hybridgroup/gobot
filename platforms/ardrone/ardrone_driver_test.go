@@ -11,11 +11,11 @@ var _ = Describe("ArdroneDriver", func() {
 	)
 
 	BeforeEach(func() {
-		adaptor := NewArdroneAdaptor()
+		adaptor := NewArdroneAdaptor("drone")
 		adaptor.connect = func(a *ArdroneAdaptor) {
 			a.drone = &testDrone{}
 		}
-		driver = NewArdroneDriver(adaptor)
+		driver = NewArdroneDriver(adaptor, "drone")
 		adaptor.Connect()
 	})
 
