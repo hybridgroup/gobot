@@ -2,26 +2,19 @@ package main
 
 import (
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/digispark"
-	"github.com/hybridgroup/gobot/gpio"
+	"github.com/hybridgroup/gobot/api"
+	"github.com/hybridgroup/gobot/platforms/digispark"
+	"github.com/hybridgroup/gobot/platforms/gpio"
 )
 
 func main() {
-	master := gobot.NewMaster()
-	gobot.StartApi(master)
+	master := gobot.NewGobot()
+	api.NewApi(master).Start()
 
-	digisparkAdaptor := digispark.NewDigisparkAdaptor()
-	digisparkAdaptor.Name = "Digispark"
+	digisparkAdaptor := digispark.NewDigisparkAdaptor("Digispark")
+	led := gpio.NewLed(digisparkAdaptor, "led", "0")
 
-	led := gpio.NewLed(digisparkAdaptor)
-	led.Name = "led"
-	led.Pin = "0"
-
-	master.Robots = append(master.Robots, &gobot.Robot{
-		Name:        "digispark",
-		Connections: []gobot.Connection{digisparkAdaptor},
-		Devices:     []gobot.Device{led},
-	})
-
-	master.Start()
+	gbot.Robots = append(gbot.Robots,
+		gobot.NewRobot("digispark", []gobot.Connection{digisparkAdaptor}, []gobot.Device{led}, nil))
+	gbot.Start()
 }

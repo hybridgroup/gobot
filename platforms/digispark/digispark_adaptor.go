@@ -13,8 +13,11 @@ type DigisparkAdaptor struct {
 	connect    func(*DigisparkAdaptor)
 }
 
-func NewDigisparkAdaptor() *DigisparkAdaptor {
+func NewDigisparkAdaptor(name string) *DigisparkAdaptor {
 	return &DigisparkAdaptor{
+		Adaptor: gobot.Adaptor{
+			Name: name,
+		},
 		connect: func(d *DigisparkAdaptor) {
 			d.littleWire = LittleWireConnect()
 		},

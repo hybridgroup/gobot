@@ -11,7 +11,7 @@ var _ = Describe("Digispark", func() {
 	)
 
 	BeforeEach(func() {
-		d = NewDigisparkAdaptor()
+		d = NewDigisparkAdaptor("bot")
 		d.connect = func(d *DigisparkAdaptor) {}
 	})
 
