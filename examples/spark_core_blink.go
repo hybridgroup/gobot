@@ -2,33 +2,25 @@ package main
 
 import (
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/gpio"
-	"github.com/hybridgroup/gobot/spark"
+	"github.com/hybridgroup/gobot/platforms/gpio"
+	"github.com/hybridgroup/gobot/platforms/spark"
+	"time"
 )
 
 func main() {
-	sparkCore := spark.NewSparkCoreAdaptor()
-	sparkCore.Name = "spark"
-	sparkCore.Params = map[string]interface{}{
-		"device_id":    "",
-		"access_token": "",
-	}
+	master := gobot.NewGobot()
 
-	led := gpio.NewLed(sparkCore)
-	led.Name = "led"
-	led.Pin = "D7"
+	sparkCore := spark.NewSparkCoreAdaptor("spark", "device_id", "access_token")
+	led := gpio.NewLed(sparkCore, "led", "D7")
 
 	work := func() {
-		gobot.Every("2s", func() {
+		gobot.Every(1*time.Second, func() {
 			led.Toggle()
 		})
 	}
 
-	robot := gobot.Robot{
-		Connections: []gobot.Connection{sparkCore},
-		Devices:     []gobot.Device{led},
-		Work:        work,
-	}
+	master.Robots = append(master.Robots,
+		gobot.NewRobot("spark", []gobot.Connection{sparkCore}, []gobot.Device{led}, work))
 
-	robot.Start()
+	master.Start()
 }

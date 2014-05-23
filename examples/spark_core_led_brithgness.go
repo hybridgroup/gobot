@@ -2,27 +2,22 @@ package main
 
 import (
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/gpio"
-	"github.com/hybridgroup/gobot/spark"
+	"github.com/hybridgroup/gobot/platforms/gpio"
+	"github.com/hybridgroup/gobot/platforms/spark"
+	"time"
 )
 
 func main() {
-	sparkCore := spark.NewSparkCoreAdaptor()
-	sparkCore.Name = "spark"
-	sparkCore.Params = map[string]interface{}{
-		"device_id":    "",
-		"access_token": "",
-	}
+	master := gobot.NewGobot()
 
-	led := gpio.NewLed(sparkCore)
-	led.Name = "led"
-	led.Pin = "A1"
+	sparkCore := spark.NewSparkCoreAdaptor("spark", "device_id", "access_token")
+	led := gpio.NewLed(sparkCore, "led", "A1")
 
 	work := func() {
 		brightness := uint8(0)
 		fade_amount := uint8(15)
 
-		gobot.Every("0.5s", func() {
+		gobot.Every(0.5*time.Second, func() {
 			led.Brightness(brightness)
 			brightness = brightness + fade_amount
 			if brightness == 0 || brightness == 255 {
@@ -30,12 +25,8 @@ func main() {
 			}
 		})
 	}
+	master.Robots = append(master.Robots,
+		gobot.NewRobot("spark", []gobot.Connection{sparkCore}, []gobot.Device{led}, work))
 
-	robot := gobot.Robot{
-		Connections: []Connection{sparkCore},
-		Devices:     []Device{led},
-		Work:        work,
-	}
-
-	robot.Start()
+	master.Start()
 }
