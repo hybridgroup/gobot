@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/api"
 )
 
 func Hello(params map[string]interface{}) string {
@@ -12,11 +13,9 @@ func Hello(params map[string]interface{}) string {
 
 func main() {
 	master := gobot.GobotMaster()
-	api := gobot.Api(master)
-	api.Port = "4000"
+	api.NewApi(master).Start()
 
-	hello := new(gobot.Robot)
-	hello.Name = "hello"
+	hello := gobot.NewRobot("hello", nil, nil, nil)
 	hello.Commands = map[string]interface{}{"Hello": Hello}
 
 	master.Robots = append(master.Robots, hello)

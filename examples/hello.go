@@ -3,14 +3,21 @@ package main
 import (
 	"fmt"
 	"github.com/hybridgroup/gobot"
+	"time"
 )
 
 func main() {
-	robot := gobot.Robot{
-		Work: func() {
-			gobot.Every("0.5s", func() { fmt.Println("Greetings human") })
-		},
-	}
+	gbot := gobot.NewGobot()
 
-	robot.Start()
+	robot := gobot.NewRobot(
+		"hello",
+		nil,
+		nil,
+		func() {
+			gobot.Every(0.5*time.Second, func() { fmt.Println("Greetings human") })
+		},
+	)
+
+	gbot.Robots = append(gbot.Robots, robot)
+	gbot.Start()
 }
