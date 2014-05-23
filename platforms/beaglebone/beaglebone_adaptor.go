@@ -105,8 +105,12 @@ type BeagleboneAdaptor struct {
 	i2cDevice   *i2cDevice
 }
 
-func NewBeagleboneAdaptor() *BeagleboneAdaptor {
-	return &BeagleboneAdaptor{}
+func NewBeagleboneAdaptor(name string) *BeagleboneAdaptor {
+	return &BeagleboneAdaptor{
+		Adaptor: gobot.Adaptor{
+			Name: name,
+		},
+	}
 }
 
 func (b *BeagleboneAdaptor) Connect() bool {

@@ -3,19 +3,18 @@ package main
 import (
 	"fmt"
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/beaglebone"
-	"github.com/hybridgroup/gobot/i2c"
+	"github.com/hybridgroup/gobot/platforms/beaglebone"
+	"github.com/hybridgroup/gobot/platforms/i2c"
+	"time"
 )
 
 func main() {
-	beagleboneAdaptor := beaglebone.NewBeagleboneAdaptor()
-	beagleboneAdaptor.Name = "beaglebone"
-
-	blinkm := i2c.NewBlinkMDriver(beagleboneAdaptor)
-	blinkm.Name = "blinkm"
+	gbot := gobot.NewGobot()
+	beagleboneAdaptor := beaglebone.NewBeagleboneAdaptor("beaglebone")
+	blinkm := i2c.NewBlinkMDriver(beagleboneAdaptor, "blinkm")
 
 	work := func() {
-		gobot.Every("3s", func() {
+		gobot.Every(3*time.Second, func() {
 			r := byte(gobot.Rand(255))
 			g := byte(gobot.Rand(255))
 			b := byte(gobot.Rand(255))
@@ -24,11 +23,7 @@ func main() {
 		})
 	}
 
-	robot := gobot.Robot{
-		Connections: []gobot.Connection{beagleboneAdaptor},
-		Devices:     []gobot.Device{blinkm},
-		Work:        work,
-	}
-
-	robot.Start()
+	gbot.Robots = append(gbot.Robots,
+		gobot.NewRobot("blinkmBot", []gobot.Connection{beagleboneAdaptor}, []gobot.Device{blinkm}, work))
+	gbot.Start()
 }

@@ -3,24 +3,20 @@ package main
 import (
 	"fmt"
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/beaglebone"
-	"github.com/hybridgroup/gobot/gpio"
+	"github.com/hybridgroup/gobot/platforms/beaglebone"
+	"github.com/hybridgroup/gobot/platforms/gpio"
+	"time"
 )
 
 func main() {
-	beagleboneAdaptor := beaglebone.NewBeagleboneAdaptor()
-	beagleboneAdaptor.Name = "beaglebone"
+	gbot := gobot.NewGobot()
+	beagleboneAdaptor := beaglebone.NewBeagleboneAdaptor("beaglebone")
 
-	sensor := gpio.NewAnalogSensorDriver(beagleboneAdaptor)
-	sensor.Name = "sensor"
-	sensor.Pin = "P9_33"
-
-	led := gpio.NewLedDriver(beagleboneAdaptor)
-	led.Name = "led"
-	led.Pin = "P9_14"
+	sensor := gpio.NewAnalogSensorDriver(beagleboneAdaptor, "sensor", "P9_33")
+	led := gpio.NewLedDriver(beagleboneAdaptor, "led", "P9_14")
 
 	work := func() {
-		gobot.Every("0.1s", func() {
+		gobot.Every(0.1*time.Second, func() {
 			val := sensor.Read()
 			brightness := uint8(gpio.ToPwm(val))
 			fmt.Println("sensor", val)
@@ -29,11 +25,7 @@ func main() {
 		})
 	}
 
-	robot := gobot.Robot{
-		Connections: []gobot.Connection{beagleboneAdaptor},
-		Devices:     []gobot.Device{sensor, led},
-		Work:        work,
-	}
-
-	robot.Start()
+	gbot.Robots = append(gbot.Robots,
+		gobot.NewRobot("sensorBot", []gobot.Connection{beagleboneAdaptor}, []gobot.Device{sensor, led}, work))
+	gbot.Start()
 }
