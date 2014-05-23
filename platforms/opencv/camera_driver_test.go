@@ -11,7 +11,7 @@ var _ = Describe("Camera", func() {
 	)
 
 	BeforeEach(func() {
-		c = NewCameraDriver()
+		c = NewCameraDriver("bot", 0)
 	})
 
 	PIt("Must be able to Start", func() {

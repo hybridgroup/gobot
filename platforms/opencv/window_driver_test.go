@@ -11,7 +11,7 @@ var _ = Describe("Window", func() {
 	)
 
 	BeforeEach(func() {
-		w = NewWindowDriver()
+		w = NewWindowDriver("bot")
 	})
 
 	PIt("Must be able to Start", func() {

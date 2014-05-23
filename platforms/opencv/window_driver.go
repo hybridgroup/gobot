@@ -10,8 +10,12 @@ type WindowDriver struct {
 	window *cv.Window
 }
 
-func NewWindowDriver() *WindowDriver {
-	return &WindowDriver{}
+func NewWindowDriver(name string) *WindowDriver {
+	return &WindowDriver{
+		Driver: gobot.Driver{
+			Name: name,
+		},
+	}
 }
 
 func (w *WindowDriver) Start() bool {
