@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/digispark"
-	"github.com/hybridgroup/gobot/gpio"
+	"github.com/hybridgroup/gobot/platforms/digispark"
+	"github.com/hybridgroup/gobot/platforms/gpio"
 	"time"
 )
 
