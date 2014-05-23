@@ -18,9 +18,11 @@ type MotorDriver struct {
 	CurrentDirection string
 }
 
-func NewMotorDriver(a PwmDigitalWriter) *MotorDriver {
+func NewMotorDriver(a PwmDigitalWriter, name string, pin string) *MotorDriver {
 	return &MotorDriver{
 		Driver: gobot.Driver{
+			Name: name,
+			Pin:  pin,
 			Commands: []string{
 				"OffC",
 				"OnC",

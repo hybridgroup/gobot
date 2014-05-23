@@ -12,8 +12,7 @@ var _ = Describe("Servo", func() {
 	)
 
 	BeforeEach(func() {
-		s = NewServoDriver(t)
-		s.Pin = "1"
+		s = NewServoDriver(t, "bot", "1")
 	})
 
 	It("Should be able to Move", func() {

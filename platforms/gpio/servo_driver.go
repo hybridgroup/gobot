@@ -10,9 +10,11 @@ type ServoDriver struct {
 	CurrentAngle byte
 }
 
-func NewServoDriver(a Servo) *ServoDriver {
+func NewServoDriver(a Servo, name string, pin string) *ServoDriver {
 	return &ServoDriver{
 		Driver: gobot.Driver{
+			Name: name,
+			Pin:  pin,
 			Commands: []string{
 				"MoveC",
 				"MinC",

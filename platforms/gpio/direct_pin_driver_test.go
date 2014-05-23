@@ -12,8 +12,7 @@ var _ = Describe("DirectPin", func() {
 	)
 
 	BeforeEach(func() {
-		d = NewDirectPinDriver(t)
-		d.Pin = "1"
+		d = NewDirectPinDriver(t, "bot", "1")
 	})
 
 	It("Should be able to DigitalRead", func() {

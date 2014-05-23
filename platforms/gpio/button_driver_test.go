@@ -12,8 +12,7 @@ var _ = Describe("Button", func() {
 	)
 
 	BeforeEach(func() {
-		b = NewButtonDriver(t)
-		b.Pin = "1"
+		b = NewButtonDriver(t, "bot", "1")
 	})
 
 	It("Must be able to readState", func() {

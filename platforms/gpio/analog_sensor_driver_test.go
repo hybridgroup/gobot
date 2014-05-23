@@ -12,8 +12,7 @@ var _ = Describe("Analog-Sensor", func() {
 	)
 
 	BeforeEach(func() {
-		a = NewAnalogSensor(t)
-		a.Pin = "1"
+		a = NewAnalogSensor(t, "bot", "1")
 	})
 
 	It("Must be able to Read", func() {
