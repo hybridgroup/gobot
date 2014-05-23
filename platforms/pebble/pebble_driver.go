@@ -1,7 +1,6 @@
 package pebble
 
 import (
-  "fmt"
 	"github.com/hybridgroup/gobot"
 )
 
@@ -17,7 +16,9 @@ func NewPebbleDriver(adaptor *PebbleAdaptor, name string) *PebbleDriver {
   return &PebbleDriver{
     Driver: gobot.Driver{
       Name: name,
-      Events: make(map[string]chan interface{}),
+      Events: map[string]chan interface{}{
+        "button": make(chan interface{}),
+      },
       Commands: []string{
         "PublishEventC",
       },
@@ -26,17 +27,10 @@ func NewPebbleDriver(adaptor *PebbleAdaptor, name string) *PebbleDriver {
   }
 }
 
-func (d *PebbleDriver) Init() bool {
-  d.Events["button"] = make(chan interface{})
-
-  return true
-}
-
 func (d *PebbleDriver) Start() bool { return true }
 
 func (d *PebbleDriver) Halt() bool { return true }
 
 func (d *PebbleDriver) PublishEvent(name string, data string) {
-  fmt.Println("hola");
   gobot.Publish(d.Events[name], data)
 }
