@@ -2,36 +2,32 @@ package main
 
 import (
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/ardrone"
+	"github.com/hybridgroup/gobot/platforms/ardrone"
+	"time"
 )
 
 func main() {
-	ardroneAdaptor := ardrone.NewArdroneAdaptor()
-	ardroneAdaptor.Name = "Drone"
-
-	drone := ardrone.NewArdroneDriver(ardroneAdaptor)
-	drone.Name = "Drone"
+	gbot := gobot.NewGobot()
+	ardroneAdaptor := ardrone.NewArdroneAdaptor("Drone")
+	drone := ardrone.NewArdroneDriver(ardroneAdaptor, "Drone")
 
 	work := func() {
 		drone.TakeOff()
 		gobot.On(drone.Events["Flying"], func(data interface{}) {
-			gobot.After("1s", func() {
+			gobot.After(1*time.Second, func() {
 				drone.Right(0.1)
 			})
-			gobot.After("2s", func() {
+			gobot.After(2*time.Second, func() {
 				drone.Left(0.1)
 			})
-			gobot.After("3s", func() {
+			gobot.After(3*time.Second, func() {
 				drone.Land()
 			})
 		})
 	}
 
-	robot := gobot.Robot{
-		Connections: []gobot.Connection{ardroneAdaptor},
-		Devices:     []gobot.Device{drone},
-		Work:        work,
-	}
+	gbot.Robots = append(gbot.Robots,
+		gobot.NewRobot("drone", []gobot.Connection{ardroneAdaptor}, []gobot.Device{drone}, work))
 
-	robot.Start()
+	gbot.Start()
 }

@@ -7,41 +7,59 @@ import (
 	"time"
 )
 
+type JsonRobot struct {
+	Name        string            `json:"name"`
+	Commands    []string          `json:"commands"`
+	Connections []*JsonConnection `json:"connections"`
+	Devices     []*JsonDevice     `json:"devices"`
+}
+
 type Robot struct {
-	Connections   []Connection           `json:"connections"`
-	Devices       []Device               `json:"devices"`
-	Name          string                 `json:"name"`
+	Name          string                 `json:"-"`
 	Commands      map[string]interface{} `json:"-"`
-	RobotCommands []string               `json:"commands"`
+	RobotCommands []string               `json:"-"`
 	Work          func()                 `json:"-"`
-	connections   []*connection          `json:"-"`
-	devices       []*device              `json:"-"`
-	master        *Master                `json:"-"`
+	connections   connections            `json:"-"`
+	devices       devices                `json:"-"`
+}
+
+type Robots []*Robot
+
+func (r Robots) Start() {
+	for _, robot := range r {
+		robot.Start()
+	}
+}
+
+func (r Robots) Each(f func(*Robot)) {
+	for _, robot := range r {
+		f(robot)
+	}
+}
+
+func NewRobot(name string, c []Connection, d []Device, work func()) *Robot {
+	r := &Robot{
+		Name: name,
+		Work: work,
+	}
+	r.initName()
+	log.Println("Initializing Robot", r.Name, "...")
+	r.initCommands()
+	r.initConnections(c)
+	r.initDevices(d)
+	return r
 }
 
 func (r *Robot) Start() {
-	if r.master == nil {
-		r.master = NewMaster()
-	}
-
-	r.master.Robots = []*Robot{r}
-	r.master.Start()
-}
-
-func (r *Robot) startRobot() {
-	r.initName()
-	r.initCommands()
-	r.initConnections()
-	if r.startConnections() != true {
+	log.Println("Starting Robot", r.Name, "...")
+	if err := r.Connections().Start(); err != nil {
 		panic("Could not start connections")
 	}
-	if r.initDevices() != true {
-		panic("Could not initialize devices")
-	}
-	if r.startDevices() != true {
+	if err := r.Devices().Start(); err != nil {
 		panic("Could not start devices")
 	}
 	if r.Work != nil {
+		log.Println("Starting work...")
 		r.Work()
 	}
 }
@@ -61,69 +79,29 @@ func (r *Robot) initCommands() {
 	}
 }
 
-func (r *Robot) initConnections() {
-	r.connections = make([]*connection, len(r.Connections))
+func (r *Robot) initConnections(c []Connection) {
+	r.connections = make(connections, len(c))
 	log.Println("Initializing connections...")
-	for i, connection := range r.Connections {
-		log.Println("Initializing connection ", FieldByNamePtr(connection, "Name"), "...")
+	for i, connection := range c {
+		log.Println("Initializing connection", FieldByNamePtr(connection, "Name"), "...")
 		r.connections[i] = NewConnection(connection, r)
 	}
 }
 
-func (r *Robot) initDevices() bool {
-	r.devices = make([]*device, len(r.Devices))
+func (r *Robot) initDevices(d []Device) {
+	r.devices = make([]*device, len(d))
 	log.Println("Initializing devices...")
-	for i, device := range r.Devices {
+	for i, device := range d {
+		log.Println("Initializing device", FieldByNamePtr(device, "Name"), "...")
 		r.devices[i] = NewDevice(device, r)
 	}
-	success := true
-	for _, device := range r.devices {
-		log.Println("Initializing device " + device.Name + "...")
-		if device.Init() == false {
-			success = false
-			break
-		}
-	}
-	return success
 }
 
-func (r *Robot) startConnections() bool {
-	log.Println("Starting connections...")
-	success := true
-	for _, connection := range r.connections {
-		log.Println("Starting connection " + connection.Name + "...")
-		if connection.Connect() == false {
-			success = false
-			break
-		}
-	}
-	return success
-}
-
-func (r *Robot) startDevices() bool {
-	log.Println("Starting devices...")
-	success := true
-	for _, device := range r.devices {
-		log.Println("Starting device " + device.Name + "...")
-		if device.Start() == false {
-			success = false
-			break
-		}
-	}
-	return success
-}
-
-func (r *Robot) finalizeConnections() {
-	for _, connection := range r.connections {
-		connection.Finalize()
-	}
-}
-
-func (r *Robot) GetDevices() devices {
+func (r *Robot) Devices() devices {
 	return devices(r.devices)
 }
 
-func (r *Robot) GetDevice(name string) *device {
+func (r *Robot) Device(name string) *device {
 	if r == nil {
 		return nil
 	}
@@ -135,11 +113,11 @@ func (r *Robot) GetDevice(name string) *device {
 	return nil
 }
 
-func (r *Robot) GetConnections() []*connection {
-	return r.connections
+func (r *Robot) Connections() connections {
+	return connections(r.connections)
 }
 
-func (r *Robot) GetConnection(name string) *connection {
+func (r *Robot) Connection(name string) *connection {
 	if r == nil {
 		return nil
 	}
@@ -149,4 +127,17 @@ func (r *Robot) GetConnection(name string) *connection {
 		}
 	}
 	return nil
+}
+
+func (r *Robot) ToJson() *JsonRobot {
+	jsonRobot := new(JsonRobot)
+	jsonRobot.Name = r.Name
+	jsonRobot.Commands = r.RobotCommands
+	jsonRobot.Connections = make([]*JsonConnection, 0)
+	for _, device := range r.Devices() {
+		jsonDevice := device.ToJson()
+		jsonRobot.Connections = append(jsonRobot.Connections, jsonDevice.Connection)
+		jsonRobot.Devices = append(jsonRobot.Devices, jsonDevice)
+	}
+	return jsonRobot
 }

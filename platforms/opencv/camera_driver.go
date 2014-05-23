@@ -1,0 +1,51 @@
+package opencv
+
+import (
+	cv "github.com/hybridgroup/go-opencv/opencv"
+	"github.com/hybridgroup/gobot"
+)
+
+type CameraDriver struct {
+	gobot.Driver
+	camera *cv.Capture
+	Source interface{}
+}
+
+func NewCameraDriver(name string, source interface{}) *CameraDriver {
+	return &CameraDriver{
+		Driver: gobot.Driver{
+			Name:     name,
+			Commands: []string{},
+			Events: map[string]chan interface{}{
+				"Frame": make(chan interface{}, 0),
+			},
+		},
+		Source: source,
+	}
+}
+
+func (c *CameraDriver) Start() bool {
+	switch v := c.Source.(type) {
+	case string:
+		c.camera = cv.NewFileCapture(v)
+	case int:
+		c.camera = cv.NewCameraCapture(v)
+	default:
+		panic("unknown camera source")
+	}
+
+	go func() {
+		for {
+			if c.camera.GrabFrame() {
+				image := c.camera.RetrieveFrame(1)
+				if image != nil {
+					gobot.Publish(c.Events["Frame"], image)
+				}
+			}
+		}
+	}()
+	return true
+}
+
+func (c *CameraDriver) Halt() bool { return true }
+func (c *CameraDriver) Init() bool { return true }

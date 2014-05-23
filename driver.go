@@ -1,7 +1,9 @@
 package gobot
 
+import "time"
+
 type Driver struct {
-	Interval string                      `json:"interval"`
+	Interval time.Duration               `json:"interval"`
 	Pin      string                      `json:"pin"`
 	Name     string                      `json:"name"`
 	Commands []string                    `json:"commands"`
@@ -9,7 +11,6 @@ type Driver struct {
 }
 
 type DriverInterface interface {
-	Init() bool
 	Start() bool
 	Halt() bool
 }

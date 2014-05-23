@@ -2,29 +2,24 @@ package main
 
 import (
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/beaglebone"
-	"github.com/hybridgroup/gobot/gpio"
+	"github.com/hybridgroup/gobot/platforms/beaglebone"
+	"github.com/hybridgroup/gobot/platforms/gpio"
+	"time"
 )
 
 func main() {
-	beagleboneAdaptor := beaglebone.NewBeagleboneAdaptor()
-	beagleboneAdaptor.Name = "beaglebone"
+	gbot := gobot.NewGobot()
 
-	led := gpio.NewLedDriver(beagleboneAdaptor)
-	led.Name = "led"
-	led.Pin = "P9_12"
+	beagleboneAdaptor := beaglebone.NewBeagleboneAdaptor("beaglebone")
+	led := gpio.NewLedDriver(beagleboneAdaptor, "led", "P9_12")
 
 	work := func() {
-		gobot.Every("1s", func() {
+		gobot.Every(1*time.Second, func() {
 			led.Toggle()
 		})
 	}
 
-	robot := gobot.Robot{
-		Connections: []gobot.Connection{beagleboneAdaptor},
-		Devices:     []gobot.Device{led},
-		Work:        work,
-	}
-
-	robot.Start()
+	gbot.Robots = append(gbot.Robots,
+		gobot.NewRobot("blinkBot", []gobot.Connection{beagleboneAdaptor}, []gobot.Device{led}, work))
+	gbot.Start()
 }
