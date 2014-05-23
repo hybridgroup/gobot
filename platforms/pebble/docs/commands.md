@@ -12,3 +12,23 @@ It publishes an event.
 #### API Command
 
 **PublishEventC**
+
+## PendingMessage()
+
+It returns messages to be sent as notifications to pebble (Not recommended to be used directly)
+
+#### API Command
+
+**PendingMessageC**
+
+## SendNotification(message string)
+
+Sends notification to watch.
+
+#### Params
+
+- **message** - **string** - notification text
+
+#### API Command
+
+**SendNotification**

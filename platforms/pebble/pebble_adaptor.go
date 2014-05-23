@@ -8,18 +8,26 @@ type PebbleAdaptor struct {
 	gobot.Adaptor
 }
 
-func (me *PebbleAdaptor) Connect() bool {
-  return true
+func NewPebbleAdaptor(name string) *PebbleAdaptor {
+	return &PebbleAdaptor{
+		Adaptor: gobot.Adaptor{
+			Name: name,
+		},
+	}
 }
 
-func (me *PebbleAdaptor) Reconnect() bool {
-  return true
+func (a *PebbleAdaptor) Connect() bool {
+	return true
 }
 
-func (me *PebbleAdaptor) Disconnect() bool {
-  return true
+func (a *PebbleAdaptor) Reconnect() bool {
+	return true
 }
 
-func (me *PebbleAdaptor) Finalize() bool {
-  return true
+func (a *PebbleAdaptor) Disconnect() bool {
+	return true
+}
+
+func (a *PebbleAdaptor) Finalize() bool {
+	return true
 }
