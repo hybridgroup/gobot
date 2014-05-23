@@ -11,7 +11,7 @@ var _ = Describe("PebbleAdaptor", func() {
   )
 
   BeforeEach(func() {
-    adaptor = new(PebbleAdaptor)
+    adaptor = NewPebbleAdaptor("pebble")
   })
 
   It("Must be able to Finalize", func() {

@@ -7,11 +7,13 @@ import (
 
 var _ = Describe("PebbleDriver", func() {
   var (
-    driver *PebbleDriver
+    driver  *PebbleDriver
+    adaptor *PebbleAdaptor
   )
 
   BeforeEach(func() {
-    driver = NewPebble(new(PebbleAdaptor))
+    adaptor = NewPebbleAdaptor("pebble")
+    driver  = NewPebbleDriver(adaptor, "pebble")
   })
 
   It("Must be able to Start", func() {

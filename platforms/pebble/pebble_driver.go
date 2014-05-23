@@ -1,6 +1,7 @@
 package pebble
 
 import (
+  "fmt"
 	"github.com/hybridgroup/gobot"
 )
 
@@ -12,26 +13,30 @@ type PebbleDriver struct {
 type PebbleInterface interface {
 }
 
-func NewPebble(adaptor *PebbleAdaptor) *PebbleDriver {
-	d := new(PebbleDriver)
-	d.Events = make(map[string]chan interface{})
-	d.Adaptor = adaptor
-	d.Commands = []string{
-      "PublishEventC",
+func NewPebbleDriver(adaptor *PebbleAdaptor, name string) *PebbleDriver {
+  return &PebbleDriver{
+    Driver: gobot.Driver{
+      Name: name,
+      Events: make(map[string]chan interface{}),
+      Commands: []string{
+        "PublishEventC",
+      },
+    },
+    Adaptor: adaptor,
   }
-	return d
 }
 
-func (me *PebbleDriver) Init() bool {
-  me.Events["button"] = make(chan interface{})
+func (d *PebbleDriver) Init() bool {
+  d.Events["button"] = make(chan interface{})
 
   return true
 }
 
-func (me *PebbleDriver) Start() bool { return true }
+func (d *PebbleDriver) Start() bool { return true }
 
-func (me *PebbleDriver) Halt() bool { return true }
+func (d *PebbleDriver) Halt() bool { return true }
 
-func (sd *PebbleDriver) PublishEvent(name string, data string) {
-  gobot.Publish(sd.Events[name], data)
+func (d *PebbleDriver) PublishEvent(name string, data string) {
+  fmt.Println("hola");
+  gobot.Publish(d.Events[name], data)
 }
