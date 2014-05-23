@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/firmata"
-	"github.com/hybridgroup/gobot/gpio"
+	"github.com/hybridgroup/gobot/platforms/firmata"
+	"github.com/hybridgroup/gobot/platforms/gpio"
 	"io/ioutil"
 	"net/http"
+	"time"
 )
 
 type TravisResponse struct {
@@ -58,37 +59,21 @@ func checkTravis(robot *gobot.Robot) {
 }
 
 func main() {
-	master := gobot.NewMaster()
-
-	firmataAdaptor := firmata.NewFirmataAdaptor()
-	firmataAdaptor.Name = "firmata"
-	firmataAdaptor.Port = "/dev/ttyACM0"
-
-	red := gpio.NewLedDriver(firmata)
-	red.Name = "red"
-	red.Pin = "7"
-
-	green := gpio.NewLedDriver(firmata)
-	green.Name = "green"
-	green.Pin = "6"
-
-	blue := gpio.NewLedDriver(firmata)
-	blue.Name = "blue"
-	blue.Pin = "5"
+	master := gobot.NewGobot()
+	firmataAdaptor := firmata.NewFirmataAdaptor("firmata", "/dev/ttyACM0")
+	red := gpio.NewLedDriver(firmata, "red", "7")
+	green := gpio.NewLedDriver(firmata, "green", "6")
+	blue := gpio.NewLedDriver(firmata, "blue", "5")
 
 	work := func() {
 		checkTravis(master.FindRobot("travis"))
-		gobot.Every("10s", func() {
+		gobot.Every(10*time.Second, func() {
 			checkTravis(master.FindRobot("travis"))
 		})
 	}
 
-	master.Robots = append(master.Robots, &gobot.Robot{
-		Name:        "travis",
-		Connections: []gobot.Connection{firmataAdaptor},
-		Devices:     []gobot.Device{red, green, blue},
-		Work:        work,
-	})
+	master.Robots = append(master.Robots,
+		gobot.NewRobot("travis", []gobot.Connection{firmataAdaptor}, []gobot.Device{red, green, blue}, work))
 
 	master.Start()
 }

@@ -3,32 +3,26 @@ package main
 import (
 	"fmt"
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/firmata"
-	"github.com/hybridgroup/gobot/gpio"
+	"github.com/hybridgroup/gobot/platforms/firmata"
+	"github.com/hybridgroup/gobot/platforms/gpio"
+	"time"
 )
 
 func main() {
-	firmataAdaptor := firmata.NewFirmataAdaptor()
-	firmataAdaptor.Name = "firmata"
-	firmataAdaptor.Port = "/dev/ttyACM0"
-
-	servo := gpio.NewServoDriver(firmataAdaptor)
-	servo.Name = "servo"
-	servo.Pin = "3"
+	gbot := gobot.NewGobot()
+	firmataAdaptor := firmata.NewFirmataAdaptor("firmata", "/dev/ttyACM0")
+	servo := gpio.NewServoDriver(firmataAdaptor, "servo", "3")
 
 	work := func() {
-		gobot.Every("1s", func() {
+		gobot.Every(1*time.Second, func() {
 			i := uint8(gobot.Rand(180))
 			fmt.Println("Turning", i)
 			servo.Move(i)
 		})
 	}
 
-	robot := gobot.Robot{
-		Connections: []gobot.Connection{firmataAdaptor},
-		Devices:     []gobot.Device{servo},
-		Work:        work,
-	}
+	gbot.Robot = append(gbot.Robot,
+		gobot.NewRobot("servoBot", []gobot.Connection{firmataAdaptor}, []gobot.Device{servo}, work))
 
-	robot.Start()
+	gbott.Start()
 }

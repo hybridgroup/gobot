@@ -3,25 +3,19 @@ package main
 import (
 	"fmt"
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/firmata"
-	"github.com/hybridgroup/gobot/gpio"
+	"github.com/hybridgroup/gobot/platforms/firmata"
+	"github.com/hybridgroup/gobot/platforms/gpio"
+	"time"
 )
 
 func main() {
-	firmataAdaptor := firmata.NewFirmataAdaptor()
-	firmataAdaptor.Name = "firmata"
-	firmataAdaptor.Port = "/dev/ttyACM0"
-
-	sensor := gpio.NewAnalogSensor(firmataAdaptor)
-	sensor.Name = "sensor"
-	sensor.Pin = "0"
-
-	led := gpio.NewLed(firmataAdaptor)
-	led.Name = "led"
-	led.Pin = "3"
+	gbot := gobot.NewGobot()
+	firmataAdaptor := firmata.NewFirmataAdaptor("firmata", "/dev/ttyACM0")
+	sensor := gpio.NewAnalogSensor(firmataAdaptor, "sensor", "0")
+	led := gpio.NewLed(firmataAdaptor, "led", "3")
 
 	work := func() {
-		gobot.Every("0.1s", func() {
+		gobot.Every(0.1*time.Second, func() {
 			val := sensor.Read()
 			brightness := uint8(gpio.ToPwm(val))
 			fmt.Println("sensor", val)
@@ -30,11 +24,8 @@ func main() {
 		})
 	}
 
-	robot := gobot.Robot{
-		Connections: []gobot.Connection{firmataAdaptor},
-		Devices:     []gobot.Device{sensor, led},
-		Work:        work,
-	}
+	gbot.Robots = append(gbot.Robots,
+		gobot.NewRobot("sensorBot", []gobot.Connection{firmataAdaptor}, []gobot.Device{sensor, led}, work))
 
-	robot.Start()
+	gbot.Start()
 }

@@ -3,30 +3,24 @@ package main
 import (
 	"fmt"
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/firmata"
-	"github.com/hybridgroup/gobot/i2c"
+	"github.com/hybridgroup/gobot/platforms/firmata"
+	"github.com/hybridgroup/gobot/platforms/i2c"
+	"time"
 )
 
 func main() {
-	firmataAdaptor := firmata.NewFirmataAdaptor()
-	firmataAdaptor.Name = "firmata"
-	firmataAdaptor.Port = "/dev/ttyACM0"
-
-	blinkm := i2c.NewBlinkMDriver(firmataAdaptor)
-	blinkm.Name = "blinkm"
+	gbot := gobot.NewGobot()
+	firmataAdaptor := firmata.NewFirmataAdaptor("firmata", "/dev/ttyACM0")
+	blinkm := i2c.NewBlinkMDriver(firmataAdaptor, "blinkm")
 
 	work := func() {
-		gobot.Every("3s", func() {
+		gobot.Every(3*time.Second, func() {
 			blinkm.Rgb(byte(gobot.Rand(255)), byte(gobot.Rand(255)), byte(gobot.Rand(255)))
 			fmt.Println("color", blinkm.Color())
 		})
 	}
 
-	robot := gobot.Robot{
-		Connections: []gobot.Connection{firmataAdaptor},
-		Devices:     []gobot.Device{blinkm},
-		Work:        work,
-	}
-
-	robot.Start()
+	gbot.Robots = append(gbot.Robots,
+		gobot.NewRobot("blinkmBot", []gobot.Connection{firmataAdaptor}, []gobot.Device{blinkm}, work))
+	gbot.Start()
 }
