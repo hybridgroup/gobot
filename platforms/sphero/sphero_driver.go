@@ -22,9 +22,10 @@ type SpheroDriver struct {
 	response_channel chan []uint8
 }
 
-func NewSpheroDriver(a *SpheroAdaptor) *SpheroDriver {
+func NewSpheroDriver(a *SpheroAdaptor, name string) *SpheroDriver {
 	return &SpheroDriver{
 		Driver: gobot.Driver{
+			Name:   name,
 			Events: make(map[string]chan interface{}),
 			Commands: []string{
 				"SetRGBC",

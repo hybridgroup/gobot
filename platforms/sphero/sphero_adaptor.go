@@ -12,8 +12,12 @@ type SpheroAdaptor struct {
 	connect func(*SpheroAdaptor)
 }
 
-func NewSpheroAdaptor() *SpheroAdaptor {
+func NewSpheroAdaptor(name string, port string) *SpheroAdaptor {
 	return &SpheroAdaptor{
+		Adaptor: gobot.Adaptor{
+			Name: name,
+			Port: port,
+		},
 		connect: func(a *SpheroAdaptor) {
 			c := &serial.Config{Name: a.Port, Baud: 115200}
 			s, err := serial.OpenPort(c)

@@ -11,7 +11,7 @@ var _ = Describe("SpheroAdaptor", func() {
 	)
 
 	BeforeEach(func() {
-		a = NewSpheroAdaptor()
+		a = NewSpheroAdaptor("bot", "/dev/null")
 		a.sp = sp{}
 		a.connect = func(a *SpheroAdaptor) {}
 	})

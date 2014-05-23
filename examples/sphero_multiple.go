@@ -3,11 +3,12 @@ package main
 import (
 	"fmt"
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/sphero"
+	"github.com/hybridgroup/gobot/platforms/sphero"
+	"time"
 )
 
 func main() {
-	master := gobot.NewMaster()
+	master := gobot.NewGobot()
 
 	spheros := []string{
 		"/dev/rfcomm0",
@@ -17,13 +18,9 @@ func main() {
 	}
 
 	for s := range spheros {
-		spheroAdaptor := sphero.NewSpheroAdaptor()
-		spheroAdaptor.Name = "Sphero"
-		spheroAdaptor.Port = spheros[s]
+		spheroAdaptor := sphero.NewSpheroAdaptor("Sphero", spheros[s])
 
-		spheroDriver := sphero.NewSpheroDriver(spheroAdaptor)
-		spheroDriver.Name = "Sphero" + spheros[s]
-		spheroDriver.Interval = "0.5s"
+		spheroDriver := sphero.NewSpheroDriver(spheroAdaptor, "Sphero"+spheros[s])
 
 		work := func() {
 			spheroDriver.Stop()
@@ -32,19 +29,16 @@ func main() {
 				fmt.Println("Collision Detected!")
 			})
 
-			gobot.Every("1s", func() {
+			gobot.Every(1*time.Second, func() {
 				spheroDriver.Roll(100, uint16(gobot.Rand(360)))
 			})
-			gobot.Every("3s", func() {
+			gobot.Every(3*time.Second, func() {
 				spheroDriver.SetRGB(uint8(gobot.Rand(255)), uint8(gobot.Rand(255)), uint8(gobot.Rand(255)))
 			})
 		}
 
-		master.Robots = append(master.Robots, &gobot.Robot{
-			Connections: []gobot.Connection{spheroAdaptor},
-			Devices:     []gobot.Device{spheroDriver},
-			Work:        work,
-		})
+		master.Robots = append(master.Robots,
+			gobot.NewRobot("sphero", []gobot.Connection{spheroAdaptor}, []gobot.Device{spheroDriver}, work))
 	}
 
 	master.Start()
