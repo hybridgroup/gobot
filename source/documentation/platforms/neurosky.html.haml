@@ -1,15 +1,23 @@
 ---
 title: Neurosky with Gobot
 author: The Hybrid Group
-page_title: Neurosky
-page_subtitle: "<a href='https://github.com/hybridgroup/gobot-neurosky' target='_blank' class='repository'>Repository</a> <a class+'issues' href='https://github.com/hybridgroup/gobot-neurosky/issues' target='_blank'>Issues</a>"
+page_title: Platforms
+page_subtitle: Gobot has a extensible system for connecting to hardware devices. The following robotics and physical computing platforms are currently supported.
+page_title_docs: Neurosky
+page_subtitle_docs: "<a href='https://github.com/hybridgroup/gobot-neurosky' target='_blank' class='repository'>Repository</a> <a class+'issues' href='https://github.com/hybridgroup/gobot-neurosky/issues' target='_blank'>Issues</a>"
 layout: documentation
 page_title_show: true
 subnav_platform: true
 active_menu_platforms: true
+subnavjs: true
 
 neurosky_driver: true
 ---
+-content_for :js_accordeon do
+  :javascript
+    $("#platform-panel").addClass("active-panel");
+    $("#platform-panel ul li:nth-child(7)").addClass("active-link");
+    $(".accordion-docs dt:nth-child(7) a:nth-child(2) img").addClass("rotate");
 
 %section.intro
   = image_tag "/images/devices/neurosky.jpg", class: "display"

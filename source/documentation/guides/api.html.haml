@@ -1,13 +1,20 @@
 ---
-title: Gobot API
+title: Gobot Guides
 author: The Hybrid Group
-page_title: API
-page_subtitle: "The Gobot API provides an interface for retrieving information and communicating with the currently running robots."
+page_title: Guides
+page_subtitle: Visit the Guides for more information about Gobot and it's amazing features.
 layout: documentation
 page_title_show: true
 active_menu_docs: true
 ---
+-content_for :js_accordeon do
+  :javascript
+    $("#guides-panel").addClass("active-panel");
+    $("#guides-panel ul li:nth-child(2)").addClass("active-link");
+    $(".accordion-docs dt:nth-child(5) a:nth-child(2) img").addClass("rotate");
+    
 .api
+  %h1 API
   %h2  How To Connect
   %p Now you're ready to write code that will let you access your robots on a Gobot API server.
   %p Gobot includes a RESTful API to query the status of any robot running within a group, including the connection and device status, and execute device commands.

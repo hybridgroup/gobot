@@ -2,14 +2,22 @@
 page_title_show: true
 title: Gobot - XBox360 Controller Driver
 author: The Hybrid Group
-page_title: XBox360 Controller
-page_subtitle: Driver
+page_title: Drivers
+page_subtitle: Cylon has a extensible system for connecting to hardware devices.
+page_title_docs: XBox360 Controller
+page_subtitle_docs: Driver
 layout: documentation
 subnav_driver: true
 active_menu_docs: true
+subnavjs: true
 
 joystick_platform: true
 ---
+-content_for :js_accordeon do
+  :javascript
+    $("#driver-panel").addClass("active-panel");
+    $("#joystick li:nth-child(2)").addClass("active-link");
+    $(".accordion-docs dt:nth-child(9) a:nth-child(2) img").addClass("rotate");
 
 %section.intro
   =image_tag "/images/devices/xbox360.jpg", class: "display"

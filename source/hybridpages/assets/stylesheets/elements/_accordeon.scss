@@ -1,0 +1,218 @@
+.side-documentation {
+
+  @include span-columns(3);
+  background: darken($body-bg-color,2); 
+
+  @media only screen and (max-width: $medium-screen) {
+
+    @include span-columns(12);
+    height: auto !important;
+    position: absolute;
+    left: 0;
+  }
+
+  .mobile-menu {
+
+    background: $title-color;
+    text-align: right;
+    display: none;
+
+    @media only screen and (max-width: $medium-screen) {
+
+      display: block;
+    }
+
+    .active {
+
+      background: white;
+
+      .line {
+
+        background: $title-color;
+      }
+    }
+
+    a {
+
+      border: solid 2px white;
+      padding: 10px;
+      width: 55px;
+      display: inline-block;
+
+      &:hover {
+
+        background: white;
+
+        .line {
+
+          background: $title-color;
+        }
+      }
+
+      .line {
+
+        height: 2px;
+        width: 30px;
+        margin: 5px 0;
+        background: white;
+      }
+    }
+    
+  }
+
+  @media only screen and (max-width: $medium-screen) {
+    .hide {
+
+      display: none;
+    }
+  }
+
+  .accordion-docs { 
+
+    
+    @media only screen and (max-width: $medium-screen) {
+
+      margin: 0;
+    }
+
+    
+
+    ul {
+
+      list-style: none;
+
+      .active-link {
+
+        list-style: square;
+        font-weight: bold;
+
+        a {
+
+          color: darken($hero-color,30);
+        }
+      }
+    }
+
+    .arrowDown {
+
+      float: right;
+
+      .rotate {
+
+        transform:rotate(180deg);
+        -ms-transform:rotate(180deg); /* IE 9 */
+        -webkit-transform:rotate(180deg); /* Opera, Chrome, and Safari */
+      }
+    }
+
+    .doc-button {
+
+      padding: 10px;
+      margin: 0;
+      font-size: 1em; 
+
+      @media only screen and (max-width: $medium-screen) {
+
+          border-bottom: 2px solid $title-color;   
+          padding-bottom: 10px;
+      }   
+
+      a {
+
+          display: block;
+          color: $title-color;
+
+          @media only screen and (max-width: $medium-screen) {
+
+            font-size: 1.3em;      
+          }
+        }
+    }
+
+
+    dt, dd {
+
+        padding: 10px;
+        border-bottom: 0; 
+
+        @media only screen and (max-width: $medium-screen) {
+
+          border-bottom: 2px solid $title-color;   
+        }
+         
+
+        a {
+
+          display: block;
+          color: $hero-color;
+        }
+    }
+
+    dt {
+
+      a {
+
+        color: $title-color;
+        float: left;
+
+        &:hover {
+          cursor: pointer;
+        }
+
+        @media only screen and (max-width: $medium-screen) {
+
+          font-size: 1.3em;      
+        }
+      }
+    }
+
+    dd {
+       border-top: 0; 
+       margin-left: 0;
+
+       a {
+
+        color: $hero-color;
+       }
+       
+
+       &:last-of-type {
+         position: relative;
+         top: -1px;
+       }
+
+       ul {
+
+        li {
+
+          margin: 5px 0;
+
+          a {
+
+            font-size: 10pt;
+            @media only screen and (max-width: $medium-screen) {
+
+              font-size: 1em;      
+            }
+
+            span {
+
+              color: darken($hero-color,30);
+            }
+          }
+        }
+       }
+    }
+  }
+}
+
+.container-documentation {
+  @include span-columns(9);
+  padding-top: 20px;
+  
+  @media only screen and (max-width: $medium-screen) {
+
+    @include span-columns(12);
+    margin-top: 50px;
+  }
+}

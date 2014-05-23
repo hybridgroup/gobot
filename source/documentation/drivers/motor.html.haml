@@ -1,17 +1,25 @@
 ---
 title: Gobot - Motor Driver
 author: The Hybrid Group
-page_title: Motor
-page_subtitle: Driver
+page_title: Drivers
+page_subtitle: Cylon has a extensible system for connecting to hardware devices.
+page_title_docs: Motor
+page_subtitle_docs: Driver
 page_title_show: true
 layout: documentation
 subnav_driver: true
 subnav_circuit_driver: true
 active_menu_docs: true
+subnavjs: true
 
 arduino_platform: true
 spark_platform: true
 ---
+-content_for :js_accordeon do
+  :javascript
+    $("#driver-panel").addClass("active-panel");
+    $("#gpio li:nth-child(6)").addClass("active-link");
+    $(".accordion-docs dt:nth-child(9) a:nth-child(2) img").addClass("rotate");
 
 %section.intro
   =image_tag "/images/devices/motor.jpg", class: "display"

@@ -1,16 +1,22 @@
 ---
 page_title_show: true
-title: Helpers
+title: Gobot Guides
 author: The Hybrid Group
 description: Gobot Helpers
-page_title: Helpers
-page_subtitle: Some helpful utility functions
+page_title: Guides
+page_subtitle: Visit the Guides for more information about Gobot and it's amazing features.
 layout: documentation
 active_menu_docs: true
 ---
+-content_for :js_accordeon do
+  :javascript
+    $("#guides-panel").addClass("active-panel");
+    $("#guides-panel ul li:nth-child(4)").addClass("active-link");
+    $(".accordion-docs dt:nth-child(5) a:nth-child(2) img").addClass("rotate");
 
 :markdown
-
+  # Helpers
+  
   ## Every(interval string, action func())
 
   Function to start a goroutine that repeatedly executes at a specific interval of time.

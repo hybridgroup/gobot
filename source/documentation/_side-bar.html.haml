@@ -1,0 +1,141 @@
+.mobile-menu
+  %a#menu-docs{:href => "#"} 
+    .line 
+    .line
+    .line
+
+%dl.accordion-docs.hide
+  %h5.doc-button
+    %a{:href => "/documentation"}  Docs 
+  %span
+  %dt
+    %a{:href => ""} Getting Started
+    %a.arrowDown 
+      %img{:src => "/images/elements/arrowSide.png", :alt => "Arrow", width: "20px"}/ 
+    .clear
+  %dd#getting-panel
+    %ul
+      %li
+        %a{:href => "/documentation/getting-started"} Setup your environment
+  %dt
+    %a{:href => ""} Guides
+    %a.arrowDown 
+      %img{:src => "/images/elements/arrowSide.png", :alt => "Arrow", width: "20px"}/ 
+    .clear
+  %dd#guides-panel
+    %ul
+      %li
+        %a{:href => "/documentation/guides/what_is_gobot"}
+          About Gobot
+      %li
+        %a{:href => "/documentation/guides/api"}
+          API
+      %li
+        %a{:href => "/documentation/guides/cli"}
+          CLI
+      %li
+        %a{:href => "/documentation/guides/helpers"} Helper Methods
+
+  %dt
+    %a{:href => ""} Platforms
+    %a.arrowDown 
+      %img{:src => "/images/elements/arrowSide.png", :alt => "Arrow", width: "20px"}/ 
+    .clear
+  %dd#platform-panel
+    %ul
+      %li
+        %a{:href => "/documentation/platforms/ardrone"} Ardrone
+      %li
+        %a{:href => "/documentation/platforms/arduino"} Arduino
+      %li
+        %a{:href => "/documentation/platforms/beaglebone"} Beaglebone
+      %li
+        %a{:href => "/documentation/platforms/digispark"} Digispark
+      %li
+        %a{:href => "/documentation/platforms/joystick"} Joystick
+      %li
+        %a{:href => "/documentation/platforms/leapmotion"} Leap Motion
+      %li
+        %a{:href => "/documentation/platforms/neurosky"} Neurosky Mindware
+      %li
+        %a{:href => "/documentation/platforms/opencv"} OpenCV
+      %li
+        %a{:href => "/documentation/platforms/spark"} Spark
+      %li
+        %a{:href => "/documentation/platforms/sphero"} Sphero
+  %dt
+    %a{:href => ""} Drivers
+    %a.arrowDown 
+      %img{:src => "/images/elements/arrowSide.png", :alt => "Arrow", width: "20px"}/ 
+    .clear
+  %dd#driver-panel 
+    GPIO
+    %ul#gpio
+      %li
+        %a{:href => "/documentation/drivers/analog-sensor"} Analog Sensor
+      %li
+        %a{:href => "/documentation/drivers/button"} Button
+      %li
+        %a{:href => "/documentation/drivers/direct-pin"} Direct Pin 
+      %li
+        %a{:href => "/documentation/drivers/led"} LED 
+      %li
+        %a{:href => "/documentation/drivers/makey"} Makey Button 
+      %li
+        %a{:href => "/documentation/drivers/motor"} Motor 
+      %li
+        %a{:href => "/documentation/drivers/servo"} Servo
+    I2C
+    %ul#i2c
+      %li
+        %a{:href => "/documentation/drivers/blinkm"} Blinkm
+      %li
+        %a{:href => "/documentation/drivers/hmc6352-compass"} HMC6352 Compass
+      %li
+        %a{:href => "/documentation/drivers/wiichuck"} Wiichuck
+    ARDrone
+    %ul#ardrone
+      %li
+        %a{:href => "/documentation/drivers/ardrone"} Ardrone Flight
+    Joystick
+    %ul#joystick
+      %li
+        %a{:href => "/documentation/drivers/dualshock3"} Dualshock3 Controller 
+      %li
+        %a{:href => "/documentation/drivers/xbox360"} XBox360 Controller
+    Other Drivers
+    %ul#others
+      %li
+        %a{:href => "/documentation/drivers/leapmotion"} Leap Motion
+      %li
+        %a{:href => "/documentation/drivers/neurosky"} Neurosky Mindware
+      %li
+        %a{:href => "/documentation/drivers/sphero"} Sphero
+  %dt
+    %a{:href => ""} Contribute
+    %a.arrowDown 
+      %img{:src => "/images/elements/arrowSide.png", :alt => "Arrow", width: "20px"}/ 
+    .clear
+  %dd#contribute-panel
+    %ul
+      %li
+        %a{:href => "/documentation/contribute/guidelines"} Guidelines
+      %li
+        %a{:href => "/documentation/contribute/contact-us"} Contact us
+  %dt
+    %a{:href => ""} Examples
+    %a.arrowDown 
+      %img{:src => "/images/elements/arrowSide.png", :alt => "Arrow", width: "20px"}/ 
+    .clear
+  %dd#example-panel 
+    %ul
+      %li
+        %a{:href => "/documentation/examples"} All examples
+
+:javascript
+    $(document).ready(function(){
+      $("#menu-docs").click(function(){
+        $(".accordion-docs").removeClass("hide");
+        $(this).addClass("active");
+      });
+    });

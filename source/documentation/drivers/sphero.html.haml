@@ -1,16 +1,25 @@
 ---
 title: Gobot - Sphero Driver
 author: The Hybrid Group
-page_title: Sphero
-page_subtitle: Driver
+page_title: Drivers
+page_subtitle: Cylon has a extensible system for connecting to hardware devices.
+page_title_docs: Sphero
+page_subtitle_docs: Driver
 page_title_show: true
 layout: documentation
 subnav_driver: true
 sphero_colors_driver: true
 active_menu_docs: true
+subnavjs: true
 
 sphero_platform: true
 ---
+-content_for :js_accordeon do
+  :javascript
+    $("#driver-panel").addClass("active-panel");
+    $("#others li:nth-child(3)").addClass("active-link");
+    $(".accordion-docs dt:nth-child(9) a:nth-child(2) img").addClass("rotate");
+
 %section.intro
   =image_tag "/images/devices/sphero.jpg", class: "display"
   .info-intro
