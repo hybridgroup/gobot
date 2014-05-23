@@ -12,7 +12,7 @@ var _ = Describe("BlinkM", func() {
 	)
 
 	BeforeEach(func() {
-		b = NewBlinkMDriver(t)
+		b = NewBlinkMDriver(t, "bot")
 	})
 
 	It("Must be able to Start", func() {

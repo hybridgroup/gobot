@@ -13,9 +13,10 @@ type WiichuckDriver struct {
 	data     map[string]float64
 }
 
-func NewWiichuckDriver(a I2cInterface) *WiichuckDriver {
+func NewWiichuckDriver(a I2cInterface, name string) *WiichuckDriver {
 	return &WiichuckDriver{
 		Driver: gobot.Driver{
+			Name: name,
 			Events: map[string]chan interface{}{
 				"z_button": make(chan interface{}),
 				"c_button": make(chan interface{}),

@@ -11,8 +11,11 @@ type HMC6352Driver struct {
 	Heading uint16
 }
 
-func NewHMC6352Driver(a I2cInterface) *HMC6352Driver {
+func NewHMC6352Driver(a I2cInterface, name string) *HMC6352Driver {
 	return &HMC6352Driver{
+		Driver: gobot.Driver{
+			Name: name,
+		},
 		Adaptor: a,
 	}
 }

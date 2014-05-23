@@ -12,7 +12,7 @@ var _ = Describe("HMC6352", func() {
 	)
 
 	BeforeEach(func() {
-		h = NewHMC6352Driver(t)
+		h = NewHMC6352Driver(t, "bot")
 	})
 
 	It("Must be able to Start", func() {

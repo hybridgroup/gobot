@@ -10,9 +10,10 @@ type BlinkMDriver struct {
 	Adaptor I2cInterface
 }
 
-func NewBlinkMDriver(a I2cInterface) *BlinkMDriver {
+func NewBlinkMDriver(a I2cInterface, name string) *BlinkMDriver {
 	return &BlinkMDriver{
 		Driver: gobot.Driver{
+			Name: name,
 			Commands: []string{
 				"RgbC",
 				"FadeC",
