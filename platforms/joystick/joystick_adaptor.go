@@ -11,7 +11,7 @@ type JoystickAdaptor struct {
 	connect  func(*JoystickAdaptor)
 }
 
-func NewJoystickAdaptor() *JoystickAdaptor {
+func NewJoystickAdaptor(name string) *JoystickAdaptor {
 	return &JoystickAdaptor{
 		connect: func(j *JoystickAdaptor) {
 			sdl.Init(sdl.INIT_JOYSTICK)

@@ -11,7 +11,7 @@ var _ = Describe("JoystickAdaptor", func() {
 	)
 
 	BeforeEach(func() {
-		j = NewJoystickAdaptor()
+		j = NewJoystickAdaptor("bot")
 	})
 
 	PIt("Must be able to Finalize", func() {
