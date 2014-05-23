@@ -1,9 +1,9 @@
 package gobot
 
 import (
-	"time"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"time"
 )
 
 var _ = Describe("Utils", func() {

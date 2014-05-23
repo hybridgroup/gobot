@@ -6,32 +6,52 @@ import (
 
 type PebbleDriver struct {
 	gobot.Driver
-	Adaptor *PebbleAdaptor
+	Messages []string
+	Adaptor  *PebbleAdaptor
 }
 
 type PebbleInterface interface {
 }
 
-func NewPebble(adaptor *PebbleAdaptor) *PebbleDriver {
-	d := new(PebbleDriver)
-	d.Events = make(map[string]chan interface{})
-	d.Adaptor = adaptor
-	d.Commands = []string{
-      "PublishEventC",
-  }
-	return d
+func NewPebbleDriver(adaptor *PebbleAdaptor, name string) *PebbleDriver {
+	return &PebbleDriver{
+		Driver: gobot.Driver{
+			Name: name,
+			Events: map[string]chan interface{}{
+				"button": make(chan interface{}),
+				"accel":  make(chan interface{}),
+				"tap":    make(chan interface{}),
+			},
+			Commands: []string{
+				"PublishEventC",
+				"SendNotificationC",
+				"PendingMessageC",
+			},
+		},
+		Messages: []string{},
+		Adaptor:  adaptor,
+	}
 }
 
-func (me *PebbleDriver) Init() bool {
-  me.Events["button"] = make(chan interface{})
+func (d *PebbleDriver) Start() bool { return true }
 
-  return true
+func (d *PebbleDriver) Halt() bool { return true }
+
+func (d *PebbleDriver) PublishEvent(name string, data string) {
+	gobot.Publish(d.Events[name], data)
 }
 
-func (me *PebbleDriver) Start() bool { return true }
+func (d *PebbleDriver) SendNotification(message string) string {
+	d.Messages = append(d.Messages, message)
+	return message
+}
 
-func (me *PebbleDriver) Halt() bool { return true }
+func (d *PebbleDriver) PendingMessage() string {
+	if len(d.Messages) < 1 {
+		return ""
+	}
+	m := d.Messages[0]
+	d.Messages = d.Messages[1:]
 
-func (sd *PebbleDriver) PublishEvent(name string, data string) {
-  gobot.Publish(sd.Events[name], data)
+	return m
 }
