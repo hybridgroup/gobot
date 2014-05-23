@@ -2,10 +2,11 @@ package main
 
 import (
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/sphero"
+	"github.com/hybridgroup/gobot/api"
+	"github.com/hybridgroup/gobot/platforms/sphero"
 )
 
-var Master *gobot.Master = gobot.NewMaster()
+Master := gobot.NewGobot()
 
 func TurnBlue(params map[string]interface{}) bool {
 	spheroDriver := Master.FindRobotDevice(params["robotname"].(string), "sphero")
@@ -14,32 +15,25 @@ func TurnBlue(params map[string]interface{}) bool {
 }
 
 func main() {
-	gobot.Api(Master)
+	api.Api(Master).Start()
 
 	spheros := map[string]string{
 		"Sphero-BPO": "/dev/rfcomm0",
 	}
 
 	for name, port := range spheros {
-		spheroAdaptor := sphero.NewSpheroAdaptor()
-		spheroAdaptor.Name = "sphero"
-		spheroAdaptor.Port = port
+		spheroAdaptor := sphero.NewSpheroAdaptor("sphero", port)
 
-		spheroDriver := sphero.NewSpheroDriver(spheroAdaptor)
-		spheroDriver.Name = "sphero"
-		spheroDriver.Interval = "0.5s"
+		spheroDriver := sphero.NewSpheroDriver(spheroAdaptor, "sphero")
 
 		work := func() {
 			spheroDriver.SetRGB(uint8(255), uint8(0), uint8(0))
 		}
 
-		Master.Robots = append(Master.Robots, &gobot.Robot{
-			Name:        name,
-			Connections: []gobot.Connection{spheroAdaptor},
-			Devices:     []gobot.Device{spheroDriver},
-			Work:        work,
-			Commands:    map[string]interface{}{"TurnBlue": TurnBlue},
-		})
+		robot := gobot.NewRobot(name, []gobot.Connection{spheroAdaptor}, []gobot.Device{spheroDriver}, work)
+		robot.Commands = map[string]interface{}{"TurnBlue": TurnBlue}
+
+		Master.Robots = append(Master.Robots, robot)
 	}
 
 	Master.Start()

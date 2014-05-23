@@ -2,24 +2,21 @@ package main
 
 import (
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/firmata"
-	"github.com/hybridgroup/gobot/gpio"
+	"github.com/hybridgroup/gobot/platforms/firmata"
+	"github.com/hybridgroup/gobot/platforms/gpio"
+	"time"
 )
 
 func main() {
-	firmataAdaptor := firmata.NewFirmataAdaptor()
-	firmataAdaptor.Name = "firmata"
-	firmataAdaptor.Port = "/dev/ttyACM0"
-
-	motor := gpio.NewMotorDriver(firmataAdaptor)
-	motor.Name = "motor"
-	motor.SpeedPin = "3"
+	gbot := gobot.NewGobot()
+	firmataAdaptor := firmata.NewFirmataAdaptor("firmata", "/dev/ttyACM0")
+	motor := gpio.NewMotorDriver(firmataAdaptor, "motor", "3")
 
 	work := func() {
 		speed := byte(0)
 		fade_amount := byte(15)
 
-		gobot.Every("0.1s", func() {
+		gobot.Every(0.1*time.Second, func() {
 			motor.Speed(speed)
 			speed = speed + fade_amount
 			if speed == 0 || speed == 255 {
@@ -28,11 +25,8 @@ func main() {
 		})
 	}
 
-	robot := gobot.Robot{
-		Connections: []gobot.Connection{firmataAdaptor},
-		Devices:     []gobot.Device{motor},
-		Work:        work,
-	}
+	gbot.Robots = append(gbot.Robots,
+		gobot.NewRobot("motorBot", []gobot.Connection{firmataAdaptor}, []gobot.Device{motor}, work))
 
-	robot.Start()
+	gbot.Start()
 }

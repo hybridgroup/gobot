@@ -1,9 +1,9 @@
 package gobot
 
 import (
+	"time"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"time"
 )
 
 var _ = Describe("Utils", func() {
@@ -15,7 +15,7 @@ var _ = Describe("Utils", func() {
 	Context("when valid", func() {
 		It("should execute function at every interval", func() {
 			var i = 0
-			Every("2ms", func() {
+			Every(2*time.Millisecond, func() {
 				i++
 			})
 			time.Sleep(5 * time.Millisecond)
@@ -23,7 +23,7 @@ var _ = Describe("Utils", func() {
 		})
 		It("should execute function after specific interval", func() {
 			var i = 0
-			After("1ms", func() {
+			After(1*time.Millisecond, func() {
 				i = i + 1
 			})
 			time.Sleep(2 * time.Millisecond)

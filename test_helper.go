@@ -1,11 +1,7 @@
 package gobot
 
-/*
-
 import (
 	"fmt"
-	. "github.com/hybridgroup/gobot/adaptor"
-	. "github.com/hybridgroup/gobot/driver"
 )
 
 type testStruct struct {
@@ -70,6 +66,9 @@ func robotTestFunction(params map[string]interface{}) string {
 	return fmt.Sprintf("hey %v, %v", robotname, message)
 }
 
+func NewTestRobot(name string) *Robot {
+	return newTestRobot(name)
+}
 func newTestRobot(name string) *Robot {
 	adaptor1 := newTestAdaptor("Connection 1")
 	adaptor2 := newTestAdaptor("Connection 2")
@@ -77,15 +76,11 @@ func newTestRobot(name string) *Robot {
 	driver1 := newTestDriver("Device 1", adaptor1)
 	driver2 := newTestDriver("Device 2", adaptor2)
 	driver3 := newTestDriver("Device 3", adaptor3)
-	return &Robot{
-		Name: name,
-		//Connections: []Connection{adaptor1, adaptor2, adaptor3},
-		//Devices:     []Device{driver1, driver2, driver3},
-		Work: func() {},
-		Commands: map[string]interface{}{
-			"robotTestFunction": robotTestFunction,
-		},
-	}
+	work := func() {}
+	//Commands := map[string]interface{}{
+	//	"robotTestFunction": robotTestFunction,
+	//}
+	return NewRobot(name, []Connection{adaptor1, adaptor2, adaptor3}, []Device{driver1, driver2, driver3}, work)
 }
 
 func newTestStruct() *testStruct {
@@ -94,5 +89,3 @@ func newTestStruct() *testStruct {
 	s.f = 0.2
 	return s
 }
-
-*/

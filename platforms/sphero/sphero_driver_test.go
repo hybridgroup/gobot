@@ -12,9 +12,9 @@ var _ = Describe("SpheroDriver", func() {
 	)
 
 	BeforeEach(func() {
-		a = NewSpheroAdaptor()
+		a = NewSpheroAdaptor("bot", "/dev/null")
 		a.sp = sp{}
-		s = NewSpheroDriver(a)
+		s = NewSpheroDriver(a, "bot")
 	})
 
 	It("Must be able to Start", func() {

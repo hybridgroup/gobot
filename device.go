@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"reflect"
+	"time"
 )
 
 type Device interface {
@@ -11,10 +12,17 @@ type Device interface {
 	Halt() bool
 }
 
+type JsonDevice struct {
+	Name       string          `json:"name"`
+	Driver     string          `json:"driver"`
+	Connection *JsonConnection `json:"connection"`
+	Commands   []string        `json:"commands"`
+}
+
 type device struct {
-	Name     string          `json:"name"`
-	Type     string          `json:"driver"`
-	Interval string          `json:"-"`
+	Name     string          `json:"-"`
+	Type     string          `json:"-"`
+	Interval time.Duration   `json:"-"`
 	Robot    *Robot          `json:"-"`
 	Driver   DriverInterface `json:"-"`
 }
@@ -67,4 +75,15 @@ func (d *device) Halt() bool {
 
 func (d *device) Commands() interface{} {
 	return FieldByNamePtr(d.Driver, "Commands").Interface()
+}
+
+func (d *device) ToJson() *JsonDevice {
+	jsonDevice := new(JsonDevice)
+	jsonDevice.Name = d.Name
+	jsonDevice.Driver = d.Type
+	jsonDevice.Connection = d.Robot.Connection(FieldByNamePtr(FieldByNamePtr(d.Driver, "Adaptor").
+		Interface().(AdaptorInterface), "Name").
+		Interface().(string)).ToJson()
+	jsonDevice.Commands = FieldByNamePtr(d.Driver, "Commands").Interface().([]string)
+	return jsonDevice
 }

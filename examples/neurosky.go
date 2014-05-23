@@ -3,17 +3,14 @@ package main
 import (
 	"fmt"
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/neurosky"
+	"github.com/hybridgroup/gobot/platforms/neurosky"
 )
 
 func main() {
+	gbot := gobot.NewGobot()
 
-	adaptor := neurosky.NewNeuroskyAdaptor()
-	adaptor.Name = "neurosky"
-	adaptor.Port = "/dev/rfcomm0"
-
-	neuro := neurosky.NewNeuroskyDriver(adaptor)
-	neuro.Name = "neuro"
+	adaptor := neurosky.NewNeuroskyAdaptor("neurosky", "/dev/rfcomm0")
+	neuro := neurosky.NewNeuroskyDriver(adaptor, "neuro")
 
 	work := func() {
 		gobot.On(neuro.Events["Extended"], func(data interface{}) {
@@ -48,11 +45,8 @@ func main() {
 		})
 	}
 
-	robot := gobot.Robot{
-		Connections: []gobot.Connection{adaptor},
-		Devices:     []gobot.Device{neuro},
-		Work:        work,
-	}
+	gbot.Robots := append(gbot.Robots, 
+		gobot.NewRobot("brainBot",[]gobot.Connection{adaptor},[]gobot.Device{neuro},work))
 
-	robot.Start()
+	gbot.Start()
 }

@@ -13,7 +13,7 @@ var _ = Describe("ArdroneAdaptor", func() {
 
 	BeforeEach(func() {
 		drone = &testDrone{}
-		adaptor = NewArdroneAdaptor()
+		adaptor = NewArdroneAdaptor("drone")
 		adaptor.connect = func(a *ArdroneAdaptor) {
 			a.drone = drone
 		}

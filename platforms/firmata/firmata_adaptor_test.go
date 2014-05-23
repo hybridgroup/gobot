@@ -12,7 +12,7 @@ var _ = Describe("FirmataAdaptor", func() {
 	)
 
 	BeforeEach(func() {
-		adaptor = NewFirmataAdaptor()
+		adaptor = NewFirmataAdaptor("tom", "/dev/null")
 		adaptor.connect = func(f *FirmataAdaptor) {
 			f.Board = newBoard(sp{})
 			f.Board.Events = append(f.Board.Events, event{Name: "firmware_query"})

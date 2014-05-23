@@ -11,10 +11,18 @@ import (
 
 type SparkCoreAdaptor struct {
 	gobot.Adaptor
+	DeviceId    string
+	AccessToken string
 }
 
-func NewSparkCoreAdaptor() *SparkCoreAdaptor {
-	return &SparkCoreAdaptor{}
+func NewSparkCoreAdaptor(name string, deviceId string, accessToken string) *SparkCoreAdaptor {
+	return &SparkCoreAdaptor{
+		Adaptor: gobot.Adaptor{
+			Name: name,
+		},
+		DeviceId:    deviceId,
+		AccessToken: accessToken,
+	}
 }
 
 func (s *SparkCoreAdaptor) Connect() bool {
@@ -30,7 +38,7 @@ func (s *SparkCoreAdaptor) Finalize() bool {
 func (s *SparkCoreAdaptor) AnalogRead(pin string) float64 {
 	params := url.Values{
 		"params":       {pin},
-		"access_token": {s.Params["access_token"].(string)},
+		"access_token": {s.AccessToken},
 	}
 	url := fmt.Sprintf("%v/analogread", s.deviceUrl())
 	resp := s.postToSpark(url, params)
@@ -47,7 +55,7 @@ func (s *SparkCoreAdaptor) PwmWrite(pin string, level byte) {
 func (s *SparkCoreAdaptor) AnalogWrite(pin string, level byte) {
 	params := url.Values{
 		"params":       {fmt.Sprintf("%v,%v", pin, level)},
-		"access_token": {s.Params["access_token"].(string)},
+		"access_token": {s.AccessToken},
 	}
 	url := fmt.Sprintf("%v/analogwrite", s.deviceUrl())
 	s.postToSpark(url, params)
@@ -56,7 +64,7 @@ func (s *SparkCoreAdaptor) AnalogWrite(pin string, level byte) {
 func (s *SparkCoreAdaptor) DigitalWrite(pin string, level byte) {
 	params := url.Values{
 		"params":       {fmt.Sprintf("%v,%v", pin, s.pinLevel(level))},
-		"access_token": {s.Params["access_token"].(string)},
+		"access_token": {s.AccessToken},
 	}
 	url := fmt.Sprintf("%v/digitalwrite", s.deviceUrl())
 	s.postToSpark(url, params)
@@ -65,7 +73,7 @@ func (s *SparkCoreAdaptor) DigitalWrite(pin string, level byte) {
 func (s *SparkCoreAdaptor) DigitalRead(pin string) int {
 	params := url.Values{
 		"params":       {pin},
-		"access_token": {s.Params["access_token"].(string)},
+		"access_token": {s.AccessToken},
 	}
 	url := fmt.Sprintf("%v/digitalread", s.deviceUrl())
 	resp := s.postToSpark(url, params)
@@ -76,7 +84,7 @@ func (s *SparkCoreAdaptor) DigitalRead(pin string) int {
 }
 
 func (s *SparkCoreAdaptor) deviceUrl() string {
-	return fmt.Sprintf("https://api.spark.io/v1/devices/%v", s.Params["device_id"])
+	return fmt.Sprintf("https://api.spark.io/v1/devices/%v", s.DeviceId)
 }
 
 func (s *SparkCoreAdaptor) pinLevel(level byte) string {

@@ -2,23 +2,22 @@ package main
 
 import (
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/digispark"
-	"github.com/hybridgroup/gobot/gpio"
+	"github.com/hybridgroup/gobot/platforms/digispark"
+	"github.com/hybridgroup/gobot/platforms/gpio"
+	"time"
 )
 
 func main() {
-	digisparkAdaptor := digispark.NewDigisparkAdaptor()
-	digisparkAdaptor.Name = "digispark"
+	gbot := gobot.NewGobot()
 
-	led := gpio.NewLedDriver(digisparkAdaptor)
-	led.Name = "led"
-	led.Pin = "0"
+	digisparkAdaptor := digispark.NewDigisparkAdaptor("digispark")
+	led := gpio.NewLedDriver(digisparkAdaptor, "led", "0")
 
 	work := func() {
 		brightness := uint8(0)
 		fade_amount := uint8(15)
 
-		gobot.Every("0.1s", func() {
+		gobot.Every(0.1*time.Second, func() {
 			led.Brightness(brightness)
 			brightness = brightness + fade_amount
 			if brightness == 0 || brightness == 255 {
@@ -27,11 +26,7 @@ func main() {
 		})
 	}
 
-	robot := gobot.Robot{
-		Connections: []gobot.Connection{digisparkAdaptor},
-		Devices:     []gobot.Device{led},
-		Work:        work,
-	}
-
-	robot.Start()
+	gbot.Robots = append(gbot.Robots,
+		gobot.NewRobot("pwmBot", []gobot.Connection{digisparkAdaptor}, []gobot.Device{led}, work))
+	gbot.Start()
 }

@@ -3,31 +3,26 @@ package main
 import (
 	"fmt"
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/digispark"
-	"github.com/hybridgroup/gobot/gpio"
+	"github.com/hybridgroup/gobot/platforms/digispark"
+	"github.com/hybridgroup/gobot/platforms/gpio"
+	"time"
 )
 
 func main() {
-	digisparkAdaptor := digispark.NewDigisparkAdaptor()
-	digisparkAdaptor.Name = "digispark"
+	gbot := gobot.NewGobot()
+	digisparkAdaptor := digispark.NewDigisparkAdaptor("digispark")
 
-	servo := gpio.NewServoDriver(digisparkAdaptor)
-	servo.Name = "servo"
-	servo.Pin = "0"
+	servo := gpio.NewServoDriver(digisparkAdaptor, "servo", "0")
 
 	work := func() {
-		gobot.Every("1s", func() {
+		gobot.Every(1*time.Second, func() {
 			i := uint8(gobot.Rand(180))
 			fmt.Println("Turning", i)
 			servo.Move(i)
 		})
 	}
 
-	robot := gobot.Robot{
-		Connections: []gobot.Connection{digisparkAdaptor},
-		Devices:     []gobot.Device{servo},
-		Work:        work,
-	}
-
-	robot.Start()
+	gbot.Robots = append(gbot.Robots,
+		gobot.NewRobot("servoBot", []gobot.Connection{digisparkAdaptor}, []gobot.Device{servo}, work))
+	gbot.Start()
 }

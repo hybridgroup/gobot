@@ -8,26 +8,32 @@ import (
 type CameraDriver struct {
 	gobot.Driver
 	camera *cv.Capture
-	Source string
+	Source interface{}
 }
 
-func NewCameraDriver() *CameraDriver {
+func NewCameraDriver(name string, source interface{}) *CameraDriver {
 	return &CameraDriver{
 		Driver: gobot.Driver{
+			Name:     name,
 			Commands: []string{},
 			Events: map[string]chan interface{}{
 				"Frame": make(chan interface{}, 0),
 			},
 		},
+		Source: source,
 	}
 }
 
 func (c *CameraDriver) Start() bool {
-	if c.Source != "" {
-		c.camera = cv.NewFileCapture(c.Source)
-	} else {
-		c.camera = cv.NewCameraCapture(0)
+	switch v := c.Source.(type) {
+	case string:
+		c.camera = cv.NewFileCapture(v)
+	case int:
+		c.camera = cv.NewCameraCapture(v)
+	default:
+		panic("unknown camera source")
 	}
+
 	go func() {
 		for {
 			if c.camera.GrabFrame() {

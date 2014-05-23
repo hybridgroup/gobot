@@ -3,18 +3,13 @@ package main
 import (
 	"fmt"
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/joystick"
+	"github.com/hybridgroup/gobot/platforms/joystick"
 )
 
 func main() {
-	joystickAdaptor := joystick.NewJoystickAdaptor()
-	joystickAdaptor.Name = "xbox360"
-	joystickAdaptor.Params = map[string]interface{}{
-		"config": "../joystick/configs/xbox360_power_a_mini_proex.json",
-	}
-
-	joystickDriver := joystick.NewJoystickDriver(joystickAdaptor)
-	joystickDriver.Name = "xbox360"
+	gbot := gobot.NewGobot()
+	joystickAdaptor := joystick.NewJoystickAdaptor("xbox360")
+	joystickDriver := joystick.NewJoystickDriver(joystickAdaptor, "xbox360", "../joystick/configs/xbox360_power_a_mini_proex.json")
 
 	work := func() {
 		gobot.On(joystickDriver.Events["a_press"], func(data interface{}) {
@@ -55,11 +50,8 @@ func main() {
 		})
 	}
 
-	robot := gobot.Robot{
-		Connections: []gobot.Connection{joystickAdaptor},
-		Devices:     []gobot.Device{joystickDriver},
-		Work:        work,
-	}
+	gbot.Robots = append(gbot.Robots,
+		gobot.NewRobot("joystickBot", []gobot.Connection{joystickAdaptor}, []gobot.Device{joystickDriver}, work))
 
-	robot.Start()
+	gbot.Start()
 }

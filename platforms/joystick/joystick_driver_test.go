@@ -11,7 +11,7 @@ var _ = Describe("JoystickDriver", func() {
 	)
 
 	BeforeEach(func() {
-		d = NewJoystickDriver(NewJoystickAdaptor())
+		d = NewJoystickDriver(NewJoystickAdaptor("bot"), "bot", "/dev/null")
 	})
 
 	PIt("Must be able to Start", func() {

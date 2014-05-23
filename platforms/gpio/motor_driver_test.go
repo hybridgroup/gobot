@@ -12,8 +12,7 @@ var _ = Describe("Motor", func() {
 	)
 
 	BeforeEach(func() {
-		m = NewMotorDriver(t)
-		m.Pin = "1"
+		m = NewMotorDriver(t, "bot", "1")
 	})
 
 	It("Must be able to Start", func() {

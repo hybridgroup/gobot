@@ -13,8 +13,11 @@ type ArdroneAdaptor struct {
 	connect func(*ArdroneAdaptor)
 }
 
-func NewArdroneAdaptor() *ArdroneAdaptor {
+func NewArdroneAdaptor(name string) *ArdroneAdaptor {
 	return &ArdroneAdaptor{
+		Adaptor: gobot.Adaptor{
+			Name: name,
+		},
 		connect: func(a *ArdroneAdaptor) {
 			d, err := client.Connect(client.DefaultConfig())
 			if err != nil {

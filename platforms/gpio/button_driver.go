@@ -10,9 +10,11 @@ type ButtonDriver struct {
 	Active  bool
 }
 
-func NewButtonDriver(a DigitalReader) *ButtonDriver {
+func NewButtonDriver(a DigitalReader, name string, pin string) *ButtonDriver {
 	return &ButtonDriver{
 		Driver: gobot.Driver{
+			Name: name,
+			Pin:  pin,
 			Events: map[string]chan interface{}{
 				"push":    make(chan interface{}),
 				"release": make(chan interface{}),

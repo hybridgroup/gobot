@@ -11,9 +11,10 @@ type LeapMotionDriver struct {
 	Adaptor *LeapMotionAdaptor
 }
 
-func NewLeapMotionDriver(a *LeapMotionAdaptor) *LeapMotionDriver {
+func NewLeapMotionDriver(a *LeapMotionAdaptor, name string) *LeapMotionDriver {
 	return &LeapMotionDriver{
 		Driver: gobot.Driver{
+			Name: name,
 			Events: map[string]chan interface{}{
 				"Message": make(chan interface{}),
 			},

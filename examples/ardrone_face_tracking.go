@@ -4,29 +4,23 @@ import (
 	"fmt"
 	cv "github.com/hybridgroup/go-opencv/opencv"
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/ardrone"
-	"github.com/hybridgroup/gobot/opencv"
+	"github.com/hybridgroup/gobot/platforms/ardrone"
+	"github.com/hybridgroup/gobot/platforms/opencv"
 	"math"
 	"path"
 	"runtime"
+	"time"
 )
 
 func main() {
+	gbot := gobot.NewGobot()
+
 	_, currentfile, _, _ := runtime.Caller(0)
 	cascade := path.Join(path.Dir(currentfile), "haarcascade_frontalface_alt.xml")
-
-	window := opencv.NewWindowDriver()
-	window.Name = "window"
-
-	camera := opencv.NewCamera()
-	camera.Name = "camera"
-	camera.Source = "tcp://192.168.1.1:5555"
-
-	ardroneAdaptor := ardrone.NewArdroneAdaptor()
-	ardroneAdaptor.Name = "Drone"
-
-	drone := ardrone.NewArdroneDriver(ardroneAdaptor)
-	drone.Name = "Drone"
+	window := opencv.NewWindowDriver("window")
+	camera := opencv.NewCamera("camera", "tcp://192.168.1.1:5555")
+	ardroneAdaptor := ardrone.NewArdroneAdaptor("Drone")
+	drone := ardrone.NewArdroneDriver(ardroneAdaptor, "drone")
 
 	work := func() {
 		detect := false
@@ -39,11 +33,11 @@ func main() {
 			}
 		})
 		gobot.On(drone.Events["Flying"], func(data interface{}) {
-			gobot.After("1s", func() { drone.Up(0.2) })
-			gobot.After("2s", func() { drone.Hover() })
-			gobot.After("5s", func() {
+			gobot.After(1*time.Second, func() { drone.Up(0.2) })
+			gobot.After(2*time.Second, func() { drone.Hover() })
+			gobot.After(5*time.Second, func() {
 				detect = true
-				gobot.Every("0.3s", func() {
+				gobot.Every(0.3*time.Second, func() {
 					drone.Hover()
 					i := image
 					faces := opencv.DetectFaces(cascade, i)
@@ -68,16 +62,13 @@ func main() {
 					}
 					window.ShowImage(i)
 				})
-				gobot.After("20s", func() { drone.Land() })
+				gobot.After(20*time.Second, func() { drone.Land() })
 			})
 		})
 	}
 
-	robot := gobot.Robot{
-		Connections: []gobot.Connection{ardroneAdaptor},
-		Devices:     []gobot.Device{window, camera, drone},
-		Work:        work,
-	}
+	gbot.Robots = append(gbot.Robots,
+		gobot.NewRobot("face", []gobot.Connection{ardroneAdaptor}, []gobot.Device{window, camera, drone}, work))
 
 	robot.Start()
 }

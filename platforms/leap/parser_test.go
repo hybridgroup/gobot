@@ -7,8 +7,8 @@ import (
 )
 
 var _ = Describe("Parser", func() {
-	a := NewLeapMotionAdaptor()
-	d := NewLeapMotionDriver(a)
+	a := NewLeapMotionAdaptor("bot", "")
+	d := NewLeapMotionDriver(a, "bot")
 
 	Describe("#ParseLeapFrame", func() {
 		It("Takes an array of bytes and extracts Frames", func() {

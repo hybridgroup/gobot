@@ -2,23 +2,21 @@ package main
 
 import (
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/beaglebone"
-	"github.com/hybridgroup/gobot/gpio"
+	"github.com/hybridgroup/gobot/platforms/beaglebone"
+	"github.com/hybridgroup/gobot/platforms/gpio"
+	"time"
 )
 
 func main() {
-	beagleboneAdaptor := beaglebone.NewBeagleboneAdaptor()
-	beagleboneAdaptor.Name = "beaglebone"
-
-	led := gpio.NewLedDriver(beagleboneAdaptor)
-	led.Name = "led"
-	led.Pin = "P9_14"
+	gbot := gobot.NewGobot()
+	beagleboneAdaptor := beaglebone.NewBeagleboneAdaptor("beaglebone")
+	led := gpio.NewLedDriver(beagleboneAdaptor, "led", "P9_14")
 
 	work := func() {
 		brightness := uint8(0)
 		fade_amount := uint8(5)
 
-		gobot.Every("0.1s", func() {
+		gobot.Every(0.1*time.Second, func() {
 			led.Brightness(brightness)
 			brightness = brightness + fade_amount
 			if brightness == 0 || brightness == 255 {
@@ -27,11 +25,7 @@ func main() {
 		})
 	}
 
-	robot := gobot.Robot{
-		Connections: []gobot.Connection{beagleboneAdaptor},
-		Devices:     []gobot.Device{led},
-		Work:        work,
-	}
-
-	robot.Start()
+	gbot.Robots = append(gbot.Robots,
+		gobot.NewRobot("pwmBot", []gobot.Connection{beagleboneAdaptor}, []gobot.Device{led}, work))
+	gbot.Start()
 }

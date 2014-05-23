@@ -9,9 +9,11 @@ type DirectPinDriver struct {
 	Adaptor DirectPin
 }
 
-func NewDirectPinDriver(a DirectPin) *DirectPinDriver {
+func NewDirectPinDriver(a DirectPin, name string, pin string) *DirectPinDriver {
 	return &DirectPinDriver{
 		Driver: gobot.Driver{
+			Name: name,
+			Pin:  pin,
 			Commands: []string{
 				"DigitalReadC",
 				"DigitalWriteC",

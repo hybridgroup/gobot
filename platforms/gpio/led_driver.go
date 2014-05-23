@@ -10,7 +10,7 @@ type LedDriver struct {
 	High    bool
 }
 
-func NewLedDriver(a PwmDigitalWriter, name, pin string) *LedDriver {
+func NewLedDriver(a PwmDigitalWriter, name string, pin string) *LedDriver {
 	return &LedDriver{
 		Driver: gobot.Driver{
 			Name: name,

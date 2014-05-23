@@ -3,18 +3,13 @@ package main
 import (
 	"fmt"
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/joystick"
+	"github.com/hybridgroup/gobot/platforms/joystick"
 )
 
 func main() {
-	joystickAdaptor := joystick.NewJoystickAdaptor()
-	joystickAdaptor.Name = "ps3"
-	joystickAdaptor.Params = map[string]interface{}{
-		"config": "../joystick/configs/dualshock3.json",
-	}
-
-	joystickDriver := joystick.NewJoystickDriver(joystickAdaptor)
-	joystickDriver.Name = "ps3"
+	gbot := gobot.NewGobot()
+	joystickAdaptor := joystick.NewJoystickAdaptor("ps3")
+	joystickDriver := joystick.NewJoystickDriver(joystickAdaptor, "ps3", "../joystick/configs/dualshock3.json")
 
 	work := func() {
 		gobot.On(joystickDriver.Events["square_press"], func(data interface{}) {
@@ -43,11 +38,8 @@ func main() {
 		})
 	}
 
-	robot := gobot.Robot{
-		Connections: []gobot.Connection{joystickAdaptor},
-		Devices:     []gobot.Device{joystickDriver},
-		Work:        work,
-	}
+	gbot.Robots = append(gbot.Robots,
+		gobot.NewRobot("joystickBot", []gobot.Connection{joystickAdaptor}, []gobot.Device{joystickDriver}, work))
 
-	robot.Start()
+	gbot.Start()
 }

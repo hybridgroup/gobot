@@ -34,7 +34,7 @@ type joystickConfig struct {
 	Hats    []hat  `json:"Hats"`
 }
 
-func NewJoystickDriver(a *JoystickAdaptor) *JoystickDriver {
+func NewJoystickDriver(a *JoystickAdaptor, name string, config string) *JoystickDriver {
 	d := &JoystickDriver{
 		Driver: gobot.Driver{
 			Events: make(map[string]chan interface{}),
@@ -42,14 +42,7 @@ func NewJoystickDriver(a *JoystickAdaptor) *JoystickDriver {
 		Adaptor: a,
 	}
 
-	var configFile string
-	if value, ok := d.Adaptor.Params["config"]; ok {
-		configFile = value.(string)
-	} else {
-		panic("No joystick config specified")
-	}
-
-	file, e := ioutil.ReadFile(configFile)
+	file, e := ioutil.ReadFile(config)
 	if e != nil {
 		panic(fmt.Sprintf("File error: %v\n", e))
 	}

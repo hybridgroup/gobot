@@ -11,7 +11,7 @@ var _ = Describe("Beaglebone", func() {
 	)
 
 	BeforeEach(func() {
-		b = NewBeagleboneAdaptor()
+		b = NewBeagleboneAdaptor("bot")
 	})
 
 	It("Must be able to Finalize", func() {

@@ -12,7 +12,7 @@ var _ = Describe("Wiichuck", func() {
 	)
 
 	BeforeEach(func() {
-		w = NewWiichuckDriver(t)
+		w = NewWiichuckDriver(t, "bot")
 	})
 
 	PIt("Must be able to Start", func() {

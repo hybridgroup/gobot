@@ -2,9 +2,10 @@ package main
 
 import (
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/ardrone"
-	"github.com/hybridgroup/gobot/joystick"
+	"github.com/hybridgroup/gobot/platforms/ardrone"
+	"github.com/hybridgroup/gobot/platforms/joystick"
 	"math"
+	"time"
 )
 
 type pair struct {
@@ -13,23 +14,15 @@ type pair struct {
 }
 
 func main() {
-	joystickAdaptor := joystick.NewJoystickAdaptor()
-	joystickAdaptor.Name = "ps3"
-	joystickAdaptor.Params = map[string]interface{}{
-		"config": "../joytsitkc/configs/dualshock3.json",
-	}
+	gbot := gobot.NewGobot()
 
-	joystick := joystick.NewJoystickDriver(joystickAdaptor)
-	joystick.Name = "ps3"
+	joystickAdaptor := joystick.NewJoystickAdaptor("ps3", "../joystick/configs/dualshock3.json")
+	joystick := joystick.NewJoystickDriver(joystickAdaptor, "ps3")
 
-	ardroneAdaptor := ardrone.NewArdroneAdaptor()
-	ardroneAdaptor.Name = "Drone"
-
-	drone := ardrone.NewArdroneDriver(ardroneAdaptor)
-	drone.Name = "Drone"
+	ardroneAdaptor := ardrone.NewArdroneAdaptor("Drone")
+	drone := ardrone.NewArdroneDriver(ardroneAdaptor, "Drone")
 
 	work := func() {
-
 		offset := 32767.0
 		right_stick := pair{x: 0, y: 0}
 		left_stick := pair{x: 0, y: 0}
@@ -68,7 +61,7 @@ func main() {
 			}
 		})
 
-		gobot.Every("0.01s", func() {
+		gobot.Every(0.01*time.Second, func() {
 			pair := left_stick
 			if pair.y < -10 {
 				drone.Forward(validatePitch(pair.y, offset))
@@ -87,7 +80,7 @@ func main() {
 			}
 		})
 
-		gobot.Every("0.01s", func() {
+		gobot.Every(0.01*time.Second, func() {
 			pair := right_stick
 			if pair.y < -10 {
 				drone.Up(validatePitch(pair.y, offset))
@@ -107,13 +100,10 @@ func main() {
 		})
 	}
 
-	robot := gobot.Robot{
-		Connections: []gobot.Connection{joystickAdaptor, ardroneAdaptor},
-		Devices:     []gobot.Device{joystick, drone},
-		Work:        work,
-	}
+	gbot.Robot = append(gbot.Robots,
+		gobot.NewRobot("ardrone", []gobot.Connection{joystickAdaptor, ardroneAdaptor}, []gobot.Device{joystick, drone}, work))
 
-	robot.Start()
+	gbot.Start()
 }
 
 func validatePitch(data float64, offset float64) float64 {

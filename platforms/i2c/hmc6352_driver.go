@@ -2,6 +2,7 @@ package i2c
 
 import (
 	"github.com/hybridgroup/gobot"
+	"time"
 )
 
 type HMC6352Driver struct {
@@ -10,8 +11,11 @@ type HMC6352Driver struct {
 	Heading uint16
 }
 
-func NewHMC6352Driver(a I2cInterface) *HMC6352Driver {
+func NewHMC6352Driver(a I2cInterface, name string) *HMC6352Driver {
 	return &HMC6352Driver{
+		Driver: gobot.Driver{
+			Name: name,
+		},
 		Adaptor: a,
 	}
 }
@@ -20,7 +24,7 @@ func (h *HMC6352Driver) Start() bool {
 	h.Adaptor.I2cStart(0x21)
 	h.Adaptor.I2cWrite([]uint16{uint16([]byte("A")[0])})
 
-	gobot.Every("1s", func() {
+	gobot.Every(1*time.Second, func() {
 		h.Adaptor.I2cWrite([]uint16{uint16([]byte("A")[0])})
 		ret := h.Adaptor.I2cRead(2)
 		if len(ret) == 2 {
