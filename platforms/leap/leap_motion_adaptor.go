@@ -12,8 +12,12 @@ type LeapMotionAdaptor struct {
 	connect func(*LeapMotionAdaptor)
 }
 
-func NewLeapMotionAdaptor() *LeapMotionAdaptor {
+func NewLeapMotionAdaptor(name string, port string) *LeapMotionAdaptor {
 	return &LeapMotionAdaptor{
+		Adaptor: gobot.Adaptor{
+			Name: name,
+			Port: port,
+		},
 		connect: func(l *LeapMotionAdaptor) {
 			origin := fmt.Sprintf("http://%v", l.Port)
 			url := fmt.Sprintf("ws://%v/v3.json", l.Port)
