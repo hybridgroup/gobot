@@ -30,9 +30,10 @@ type EEG struct {
 	MidGamma int
 }
 
-func NewNeuroskyDriver(a *NeuroskyAdaptor) *NeuroskyDriver {
+func NewNeuroskyDriver(a *NeuroskyAdaptor, name string) *NeuroskyDriver {
 	return &NeuroskyDriver{
 		Driver: gobot.Driver{
+			Name: name,
 			Events: map[string]chan interface{}{
 				"Extended":   make(chan interface{}),
 				"Signal":     make(chan interface{}),

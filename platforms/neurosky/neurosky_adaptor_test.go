@@ -11,7 +11,7 @@ var _ = Describe("NeuroskyAdaptor", func() {
 	)
 
 	BeforeEach(func() {
-		n = NewNeuroskyAdaptor()
+		n = NewNeuroskyAdaptor("bot", "/dev/null")
 	})
 
 	PIt("Must be able to Finalize", func() {

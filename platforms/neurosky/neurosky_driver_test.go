@@ -11,7 +11,7 @@ var _ = Describe("NeuroskyDriver", func() {
 	)
 
 	BeforeEach(func() {
-		n = NewNeuroskyDriver(NewNeuroskyAdaptor())
+		n = NewNeuroskyDriver(NewNeuroskyAdaptor("bot", "/dev/null"), "bot")
 	})
 
 	PIt("Must be able to Start", func() {
