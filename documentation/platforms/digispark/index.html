@@ -9,7 +9,7 @@
 <meta content="The Hybrid Group" name="author">
 <title>Digispark with Gobot</title>
 <link href="/stylesheets/style.css" rel="stylesheet">
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><script src="/javascripts/script.js"></script><script src="/hybridpages/assets/javascript/subnav.js"></script><link href="//fonts.googleapis.com/css?family=Inconsolata:400,700%7CMontserrat:700" rel="stylesheet">
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><script src="/javascripts/script.js"></script><script src="/hybridpages/assets/javascript/accordeon.js"></script><script src="/hybridpages/assets/javascript/subnav.js"></script><link href="//fonts.googleapis.com/css?family=Inconsolata:400,700%7CMontserrat:700" rel="stylesheet">
 <link href="/favicon.ico" rel="shortcut icon" type="image/gif">
 <script type="text/javascript">
 
@@ -56,54 +56,61 @@
 </div>
       <div class="page-title">
         <div class="w">
-          <h1 class="title">Digispark</h1>
-          <h2 class="subtitle">
-<a href="https://github.com/hybridgroup/gobot-digispark" target="_blank" class="repository">Repository</a> <a class target="_blank" href="https://github.com/hybridgroup/gobot-digispark/issues">Issues</a>
-</h2>
+          <h1 class="title">Platforms</h1>
+          <h2 class="subtitle">Gobot has a extensible system for connecting to hardware devices. The following robotics and physical computing platforms are currently supported.</h2>
         </div>
       </div>
-      <section class="subnav-drivers" id="mainsubnav"><div class="container">
-          <nav><a href="#HowToInstall">How To Install</a>
-            <a href="#HowToUse">How To Use</a>
-            <a href="#HowToConnect">How To Connect</a>
-            <a href="#Drivers">Drivers</a>
-            <a href="#top">Top</a>
-          </nav>
-</div>
-      </section><div class="container">
+      <div class="container">
         <div class="main" role="main">
           <section class="content full"><div class="documentation">
-              <section class="intro"><img class="display" src="/images/devices/digispark.jpg"><div class="info-intro">
-                  <p>
-                    The Digispark is an Attiny85 based microcontroller development board similar to the Arduino line, only cheaper, smaller,
-                    and a bit less powerful. With a whole host of shields to extend its functionality and the ability to
-                    use the familiar Arduino IDE the Digispark is a great way to jump into electronics, or perfect for when
-                    an Arduino is too big or too much.
-                  </p>
-                  <p>
-                    For more info about the Digispark platform click
-                    <a target="blank" href="http://digistump.com/category/1">here</a>.
-                  </p>
+              <div class="container-documentation">
+                <div class="page-title-docs">
+                  <div class="w">
+                    <h1 class="title">Digispark</h1>
+                    <h2 class="subtitle">
+<a href="https://github.com/hybridgroup/gobot-digispark" target="_blank" class="repository">Repository</a> <a class target="_blank" href="https://github.com/hybridgroup/gobot-digispark/issues">Issues</a>
+</h2>
+                  </div>
                 </div>
-                <div class="clear"></div>
-              </section><section class="how-to" id="HowToInstall"><h2>How To Install</h2>
-                <p>Installing gobot-digispark requires the libusb package already be installed.</p>
-                <h3>OSX</h3>
-                <p>To install libusb on OSX using Homebrew:</p>
-                <pre class="CodeRay">brew install libusb
+                <section class="subnav-drivers" id="mainsubnav"><div class="container">
+                    <nav><a href="#HowToInstall">How To Install</a>
+                      <a href="#HowToUse">How To Use</a>
+                      <a href="#HowToConnect">How To Connect</a>
+                      <a href="#Drivers">Drivers</a>
+                      <a href="#top">Top</a>
+                    </nav>
+</div>
+                </section><br><section class="intro"><img class="display" src="/images/devices/digispark.jpg"><div class="info-intro">
+                    <p>
+                      The Digispark is an Attiny85 based microcontroller development board similar to the Arduino line, only cheaper, smaller,
+                      and a bit less powerful. With a whole host of shields to extend its functionality and the ability to
+                      use the familiar Arduino IDE the Digispark is a great way to jump into electronics, or perfect for when
+                      an Arduino is too big or too much.
+                    </p>
+                    <p>
+                      For more info about the Digispark platform click
+                      <a target="blank" href="http://digistump.com/category/1">here</a>.
+                    </p>
+                  </div>
+                  <div class="clear"></div>
+                </section><section class="how-to" id="HowToInstall"><h2>How To Install</h2>
+                  <p>Installing gobot-digispark requires the libusb package already be installed.</p>
+                  <h3>OSX</h3>
+                  <p>To install libusb on OSX using Homebrew:</p>
+                  <pre class="CodeRay">brew install libusb-compat
 </pre>
-                <h3>Ubuntu</h3>
-                <p>To install libusb on linux:</p>
-                <pre class="CodeRay">sudo apt-get install libusb-dev
+                  <h3>Ubuntu</h3>
+                  <p>To install libusb on linux:</p>
+                  <pre class="CodeRay">sudo apt-get install libusb-dev
 </pre>
-                <p>Now you can install the library with:</p>
-                <pre class="CodeRay">go get -u github.com/hybridgroup/gobot-digispark
+                  <p>Now you can install the library with:</p>
+                  <pre class="CodeRay">go get -u github.com/hybridgroup/gobot-digispark
 </pre>
-              </section><section class="how-to" id="HowToUse"><h2>How To Use</h2>
-                <p>
-                  This small program lets you toggle an LED on and off.
-                </p>
-                <pre class="CodeRay"><span class="keyword">package</span> main
+                </section><section class="how-to" id="HowToUse"><h2>How To Use</h2>
+                  <p>
+                    This small program lets you toggle an LED on and off.
+                  </p>
+                  <pre class="CodeRay"><span class="keyword">package</span> main
 
 <span class="keyword">import</span> (
         <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
@@ -135,35 +142,35 @@
         robot.Start()
 }
 </pre>
-              </section><section class="how-to" id="HowToConnect"><h2>How To Connect</h2>
-                <p>
-                  If your Digispark (
-                  <a href="http://www.kickstarter.com/projects/digistump/digispark-the-tiny-arduino-enabled-usb-dev-board">http://www.kickstarter.com/projects/digistump/digispark-the-tiny-arduino-enabled-usb-dev-board</a>
-                  ) ATTiny-based USB development board already has the Little Wire (
-                  <a href="http://littlewire.cc/">http://littlewire.cc/</a>
-                  ) protocol firmware installed, you can connect right away with Gobot.
-                </p>
-                <p>
-                  Otherwise, for instructions on how to install Little Wire on a Digispark check out
-                  <a href="http://digistump.com/board/index.php/topic,160.0.html%20">http://digistump.com/board/index.php/topic,160.0.html</a>
-                </p>
-                <h3>OSX</h3>
-                <pre class="CodeRay">Important: 2012 MBP The USB ports on the 2012 MBPs (Retina and non) cause issues due to their USB3 controllers,currently the best work around is to use a cheap USB hub (non USB3) - we are working on future solutions. The hub on a Cinema display will work as well.
+                </section><section class="how-to" id="HowToConnect"><h2>How To Connect</h2>
+                  <p>
+                    If your Digispark (
+                    <a href="http://www.kickstarter.com/projects/digistump/digispark-the-tiny-arduino-enabled-usb-dev-board">http://www.kickstarter.com/projects/digistump/digispark-the-tiny-arduino-enabled-usb-dev-board</a>
+                    ) ATTiny-based USB development board already has the Little Wire (
+                    <a href="http://littlewire.cc/">http://littlewire.cc/</a>
+                    ) protocol firmware installed, you can connect right away with Gobot.
+                  </p>
+                  <p>
+                    Otherwise, for instructions on how to install Little Wire on a Digispark check out
+                    <a href="http://digistump.com/board/index.php/topic,160.0.html%20">http://digistump.com/board/index.php/topic,160.0.html</a>
+                  </p>
+                  <h3>OSX</h3>
+                  <pre class="CodeRay">Important: 2012 MBP The USB ports on the 2012 MBPs (Retina and non) cause issues due to their USB3 controllers,currently the best work around is to use a cheap USB hub (non USB3) - we are working on future solutions. The hub on a Cinema display will work as well.
 </pre>
-                <p>The main steps are:</p>
-                <ul>
+                  <p>The main steps are:</p>
+                  <ul>
 <li>Plug in the Digispark to the USB port</li>
-                  <li>Connect to the device via Gobot</li>
-                </ul>
+                    <li>Connect to the device via Gobot</li>
+                  </ul>
 <h3>Ubuntu</h3>
-                <p>The main steps are:</p>
-                <ul>
+                  <p>The main steps are:</p>
+                  <ul>
 <li>Add a udev rule to allow access to the Digispark device</li>
-                  <li>Plug in the Digispark to the USB port</li>
-                  <li>Connect to the device via Gobot</li>
-                </ul>
+                    <li>Plug in the Digispark to the USB port</li>
+                    <li>Connect to the device via Gobot</li>
+                  </ul>
 <p>First, you must add a udev rule, so that Gobot can communicate with the USB device. Ubuntu and other modern Linux distibutions use udev to manage device files when USB devices are added and removed. By default, udev will create a device with read-only permission which will not allow to you download code. You must place the udev rules below into a file named /etc/udev/rules.d/49-micronucleus.rules.</p>
-                <pre class="CodeRay"># UDEV Rules for Micronucleus boards including the Digispark.
+                  <pre class="CodeRay"># UDEV Rules for Micronucleus boards including the Digispark.
 # This file must be placed at:
 #
 # /etc/udev/rules.d/49-micronucleus.rules    (preferred location)
@@ -183,49 +190,258 @@ KERNEL=="ttyACM*", ATTRS{idVendor}=="16d0", ATTRS{idProduct}=="0753", MODE:="066
 # OWNER:="yourusername" to create the device owned by you, or with
 # GROUP:="somegroupname" and mange access using standard unix groups.
 </pre>
-                <p>
-                  Thanks to
-                  <a href="https://github.com/Bluebie">@bluebie</a>
-                  for these instructions!
-                  <a href="https://github.com/Bluebie/micronucleus-t85/wiki/Ubuntu-Linux">(https://github.com/Bluebie/micronucleus-t85/wiki/Ubuntu-Linux)</a>
-                </p>
-                <p>Now plug the Digispark into your computer via the USB port.</p>
-              </section><section class="drivers" id="Drivers"><h2>Drivers</h2>
-                <p>
-                  Thanks to
-                  <b>Gobot</b>
-                  and
-                  <b>go</b>
-                  it is possible to interact with several I/O hardware devices and interfaces connected to the digispark
-                  using a set of already defined and easy to use drivers, all of this thanks to the Gobot architecture,
-                  in conjuction with gobot-digispark adaptor (using the littlewire communication protocol),
-                  which makes it even possible to swap the entire platform for something else like arduino,
-                  and keep using the same code you just wrote for digispark, this just by swapping a couple
-                  of lines in your program.
-                </p>
-                <p>
-                  Available drivers for the digispark platform are listed below, the drivers contain detailed documentation and examples of what kind
-                  physical computing (using Gobot and Go) you could be doing:
-                </p>
-                <div class="hardware">
-                  <h2>GPIO Drivers</h2>
-                  <div class="devices">
-                    <!-- // Button -->
-                    <a class="device" href="/documentation/drivers/button" title="Button">
-                      <img src="/images/devices/button.jpg"></a>
-                    <!-- // LED -->
-                    <a class="device" href="/documentation/drivers/led" title="LED">
-                      <img src="/images/devices/LED.jpg"></a>
-                    <!-- // Servo -->
-                    <a class="device" href="/documentation/drivers/servo" title="Servo">
-                      <img src="/images/devices/servo.jpg"></a>
+                  <p>
+                    Thanks to
+                    <a href="https://github.com/Bluebie">@bluebie</a>
+                    for these instructions!
+                    <a href="https://github.com/Bluebie/micronucleus-t85/wiki/Ubuntu-Linux">(https://github.com/Bluebie/micronucleus-t85/wiki/Ubuntu-Linux)</a>
+                  </p>
+                  <p>Now plug the Digispark into your computer via the USB port.</p>
+                </section><section class="drivers" id="Drivers"><h2>Drivers</h2>
+                  <p>
+                    Thanks to
+                    <b>Gobot</b>
+                    and
+                    <b>go</b>
+                    it is possible to interact with several I/O hardware devices and interfaces connected to the digispark
+                    using a set of already defined and easy to use drivers, all of this thanks to the Gobot architecture,
+                    in conjuction with gobot-digispark adaptor (using the littlewire communication protocol),
+                    which makes it even possible to swap the entire platform for something else like arduino,
+                    and keep using the same code you just wrote for digispark, this just by swapping a couple
+                    of lines in your program.
+                  </p>
+                  <p>
+                    Available drivers for the digispark platform are listed below, the drivers contain detailed documentation and examples of what kind
+                    physical computing (using Gobot and Go) you could be doing:
+                  </p>
+                  <div class="hardware">
+                    <h2>GPIO Drivers</h2>
+                    <div class="devices">
+                      <!-- // Button -->
+                      <a class="device" href="/documentation/drivers/button" title="Button">
+                        <img src="/images/devices/button.jpg"></a>
+                      <!-- // LED -->
+                      <a class="device" href="/documentation/drivers/led" title="LED">
+                        <img src="/images/devices/LED.jpg"></a>
+                      <!-- // Servo -->
+                      <a class="device" href="/documentation/drivers/servo" title="Servo">
+                        <img src="/images/devices/servo.jpg"></a>
+                    </div>
+                    <div class="devices">
+                      
+                    </div>
                   </div>
-                  <div class="devices">
-                    
-                  </div>
-                </div>
-              </section>
+                </section>
 </div>
+              <div class="side-documentation">
+                <div class="mobile-menu">
+                  <a href="#" id="menu-docs">
+                    <div class="line"></div>
+                    <div class="line"></div>
+                    <div class="line"></div>
+                  </a>
+                </div>
+                <dl class="accordion-docs hide">
+<h5 class="doc-button">
+                    <a href="/documentation">Docs</a>
+                  </h5>
+                  <span></span>
+                  <dt>
+                    <a href="">Getting Started</a>
+                    <a class="arrowDown">
+                      <img alt="Arrow" src="/images/elements/arrowSide.png" width="20px"></a>
+                    <div class="clear"></div>
+                  </dt>
+                  <dd id="getting-panel">
+                    <ul>
+<li>
+                        <a href="/documentation/getting-started">Setup your environment</a>
+                      </li>
+                    </ul>
+</dd>
+                  <dt>
+                    <a href="">Guides</a>
+                    <a class="arrowDown">
+                      <img alt="Arrow" src="/images/elements/arrowSide.png" width="20px"></a>
+                    <div class="clear"></div>
+                  </dt>
+                  <dd id="guides-panel">
+                    <ul>
+<li>
+                        <a href="/documentation/guides/what_is_gobot">
+                          About Gobot
+                        </a>
+                      </li>
+                      <li>
+                        <a href="/documentation/guides/api">
+                          API
+                        </a>
+                      </li>
+                      <li>
+                        <a href="/documentation/guides/cli">
+                          CLI
+                        </a>
+                      </li>
+                      <li>
+                        <a href="/documentation/guides/helpers">Helper Methods</a>
+                      </li>
+                    </ul>
+</dd>
+                  <dt>
+                    <a href="">Platforms</a>
+                    <a class="arrowDown">
+                      <img alt="Arrow" src="/images/elements/arrowSide.png" width="20px"></a>
+                    <div class="clear"></div>
+                  </dt>
+                  <dd id="platform-panel">
+                    <ul>
+<li>
+                        <a href="/documentation/platforms/ardrone">Ardrone</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/arduino">Arduino</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/beaglebone">Beaglebone</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/digispark">Digispark</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/joystick">Joystick</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/leapmotion">Leap Motion</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/neurosky">Neurosky Mindware</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/opencv">OpenCV</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/spark">Spark</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/sphero">Sphero</a>
+                      </li>
+                    </ul>
+</dd>
+                  <dt>
+                    <a href="">Drivers</a>
+                    <a class="arrowDown">
+                      <img alt="Arrow" src="/images/elements/arrowSide.png" width="20px"></a>
+                    <div class="clear"></div>
+                  </dt>
+                  <dd id="driver-panel">
+                    GPIO
+                    <ul id="gpio">
+<li>
+                        <a href="/documentation/drivers/analog-sensor">Analog Sensor</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/button">Button</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/direct-pin">Direct Pin</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/led">LED</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/makey">Makey Button</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/motor">Motor</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/servo">Servo</a>
+                      </li>
+                    </ul>
+                    I2C
+                    <ul id="i2c">
+<li>
+                        <a href="/documentation/drivers/blinkm">Blinkm</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/hmc6352-compass">HMC6352 Compass</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/wiichuck">Wiichuck</a>
+                      </li>
+                    </ul>
+                    ARDrone
+                    <ul id="ardrone">
+<li>
+                        <a href="/documentation/drivers/ardrone">Ardrone Flight</a>
+                      </li>
+                    </ul>
+                    Joystick
+                    <ul id="joystick">
+<li>
+                        <a href="/documentation/drivers/dualshock3">Dualshock3 Controller</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/xbox360">XBox360 Controller</a>
+                      </li>
+                    </ul>
+                    Other Drivers
+                    <ul id="others">
+<li>
+                        <a href="/documentation/drivers/leapmotion">Leap Motion</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/neurosky">Neurosky Mindware</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/sphero">Sphero</a>
+                      </li>
+                    </ul>
+</dd>
+                  <dt>
+                    <a href="">Contribute</a>
+                    <a class="arrowDown">
+                      <img alt="Arrow" src="/images/elements/arrowSide.png" width="20px"></a>
+                    <div class="clear"></div>
+                  </dt>
+                  <dd id="contribute-panel">
+                    <ul>
+<li>
+                        <a href="/documentation/contribute/guidelines">Guidelines</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/contribute/contact-us">Contact us</a>
+                      </li>
+                    </ul>
+</dd>
+                  <dt>
+                    <a href="">Examples</a>
+                    <a class="arrowDown">
+                      <img alt="Arrow" src="/images/elements/arrowSide.png" width="20px"></a>
+                    <div class="clear"></div>
+                  </dt>
+                  <dd id="example-panel">
+                    <ul>
+<li>
+                        <a href="/documentation/examples">All examples</a>
+                      </li>
+                    </ul>
+</dd>
+                </dl>
+<script>
+                    $(document).ready(function(){
+                      $("#menu-docs").click(function(){
+                        $(".accordion-docs").removeClass("hide");
+                        $(this).addClass("active");
+                      });
+                    });
+                </script><script>
+                  $("#platform-panel").addClass("active-panel");
+                  $("#platform-panel ul li:nth-child(4)").addClass("active-link");
+                  $(".accordion-docs dt:nth-child(7) a:nth-child(2) img").addClass("rotate");
+                </script>
+</div>
+            </div>
           </section>
 </div>
       </div>

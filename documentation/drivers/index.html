@@ -9,7 +9,7 @@
 <meta content="The Hybrid Group" name="author">
 <title>Gobot Drivers</title>
 <link href="/stylesheets/style.css" rel="stylesheet">
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><script src="/javascripts/script.js"></script><script src="/hybridpages/assets/javascript/subnav.js"></script><link href="//fonts.googleapis.com/css?family=Inconsolata:400,700%7CMontserrat:700" rel="stylesheet">
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><script src="/javascripts/script.js"></script><script src="/hybridpages/assets/javascript/accordeon.js"></script><link href="//fonts.googleapis.com/css?family=Inconsolata:400,700%7CMontserrat:700" rel="stylesheet">
 <link href="/favicon.ico" rel="shortcut icon" type="image/gif">
 <script type="text/javascript">
 
@@ -63,73 +63,289 @@
       <div class="container">
         <div class="main" role="main">
           <section class="content full"><div class="documentation">
-              <section class="hardware"><h2>General Purpose Input/Output (GPIO) Drivers</h2>
-                Gobot's GPIO drivers work with several different platforms that support the required GPIO interfaces. For example, the Digispark.
-                <div class="devices">
-                  <!-- // Analog Sensor -->
-                  <a class="device" href="/documentation/drivers/analog-sensor" title="Analog Sensor">
-                    <img src="/images/devices/analog-sensor.jpg"></a>
-                  <!-- // Button -->
-                  <a class="device" href="/documentation/drivers/button" title="Button">
-                    <img src="/images/devices/button.jpg"></a>
-                  <!-- // direct-pin -->
-                  <a class="device" href="/documentation/drivers/direct-pin" title="Direct Pin">
-                    <img src="/images/devices/direct-pin.jpg"></a>
-                  <!-- // LED -->
-                  <a class="device" href="/documentation/drivers/led" title="LED">
-                    <img src="/images/devices/LED.jpg"></a>
-                  <!-- // Makey Button -->
-                  <a class="device" href="/documentation/drivers/makey" title="Makey Button">
-                    <img src="/images/devices/makey.jpg"></a>
-                  <!-- // Motor -->
-                  <a class="device" href="/documentation/drivers/motor" title="Motor">
-                    <img src="/images/devices/motor.jpg"></a>
-                  <!-- // Servo -->
-                  <a class="device" href="/documentation/drivers/servo" title="Servo">
-                    <img src="/images/devices/servo.jpg"></a>
-                </div>
-                <h2>i2c Drivers</h2>
-                Gobot's i2c drivers work with several different platforms that support the required interfaces. For example, the Arduino.
-                <div class="devices">
-                  <!-- // Blinkm -->
-                  <a class="device" href="/documentation/drivers/blinkm" title="Blinkm">
-                    <img src="/images/devices/blinkm.jpg"></a>
-                  <!-- // Hmc6352 Compass -->
-                  <a class="device" href="/documentation/drivers/hmc6352-compass" title="Wii Nunchuck">
-                    <img src="/images/devices/hmc6352-compass.jpg"></a>
-                  <!-- // Wiichuck -->
-                  <a class="device" href="/documentation/drivers/wiichuck" title="Wii Nunchuck">
-                    <img src="/images/devices/wii-chuck.jpg"></a>
-                </div>
-                <h2>ARDrone Drivers</h2>
-                <div class="devices">
-                  <!-- // Ardrone Flight -->
-                  <a class="device" href="/documentation/drivers/ardrone" title="ARDrone Flight Control">
-                    <img src="/images/devices/ardrone-flight.jpg"></a>
-                </div>
-                <h2>Joystick Drivers</h2>
-                <div class="devices">
-                  <!-- // PS3 -->
-                  <a class="device" href="/documentation/drivers/dualshock3" title="Dualshock3 Controller">
-                    <img src="/images/devices/dualshock3.jpg"></a>
-                  <!-- // Xbox 360 -->
-                  <a class="device" href="/documentation/drivers/xbox360" title="XBox360 Controller">
-                    <img src="/images/devices/xbox360.jpg"></a>
-                </div>
-                <h2>Leap Motion Driver</h2>
-                <div class="devices">
-                  <!-- // Leap Motion -->
-                  <a class="device" href="/documentation/drivers/leapmotion" title="Leap Motion">
-                    <img src="/images/devices/leap_motion.jpg"></a>
-                </div>
-                <h2>Sphero Driver</h2>
-                <div class="devices">
-                  <!-- // Sphero -->
-                  <a class="device" href="/documentation/drivers/sphero" title="Sphero">
-                    <img src="/images/devices/sphero.jpg"></a>
-                </div>
-              </section>
+              <div class="container-documentation">
+                
+                <section class="hardware"><h2>General Purpose Input/Output (GPIO) Drivers</h2>
+                  Gobot's GPIO drivers work with several different platforms that support the required GPIO interfaces. For example, the Digispark.
+                  <div class="devices">
+                    <!-- // Analog Sensor -->
+                    <a class="device" href="/documentation/drivers/analog-sensor" title="Analog Sensor">
+                      <img src="/images/devices/analog-sensor.jpg"></a>
+                    <!-- // Button -->
+                    <a class="device" href="/documentation/drivers/button" title="Button">
+                      <img src="/images/devices/button.jpg"></a>
+                    <!-- // direct-pin -->
+                    <a class="device" href="/documentation/drivers/direct-pin" title="Direct Pin">
+                      <img src="/images/devices/direct-pin.jpg"></a>
+                    <!-- // LED -->
+                    <a class="device" href="/documentation/drivers/led" title="LED">
+                      <img src="/images/devices/LED.jpg"></a>
+                    <!-- // Makey Button -->
+                    <a class="device" href="/documentation/drivers/makey" title="Makey Button">
+                      <img src="/images/devices/makey.jpg"></a>
+                    <!-- // Motor -->
+                    <a class="device" href="/documentation/drivers/motor" title="Motor">
+                      <img src="/images/devices/motor.jpg"></a>
+                    <!-- // Servo -->
+                    <a class="device" href="/documentation/drivers/servo" title="Servo">
+                      <img src="/images/devices/servo.jpg"></a>
+                  </div>
+                  <h2>i2c Drivers</h2>
+                  Gobot's i2c drivers work with several different platforms that support the required interfaces. For example, the Arduino.
+                  <div class="devices">
+                    <!-- // Blinkm -->
+                    <a class="device" href="/documentation/drivers/blinkm" title="Blinkm">
+                      <img src="/images/devices/blinkm.jpg"></a>
+                    <!-- // Hmc6352 Compass -->
+                    <a class="device" href="/documentation/drivers/hmc6352-compass" title="Wii Nunchuck">
+                      <img src="/images/devices/hmc6352-compass.jpg"></a>
+                    <!-- // Wiichuck -->
+                    <a class="device" href="/documentation/drivers/wiichuck" title="Wii Nunchuck">
+                      <img src="/images/devices/wii-chuck.jpg"></a>
+                  </div>
+                  <h2>ARDrone Drivers</h2>
+                  <div class="devices">
+                    <!-- // Ardrone Flight -->
+                    <a class="device" href="/documentation/drivers/ardrone" title="ARDrone Flight Control">
+                      <img src="/images/devices/ardrone-flight.jpg"></a>
+                  </div>
+                  <h2>Joystick Drivers</h2>
+                  <div class="devices">
+                    <!-- // PS3 -->
+                    <a class="device" href="/documentation/drivers/dualshock3" title="Dualshock3 Controller">
+                      <img src="/images/devices/dualshock3.jpg"></a>
+                    <!-- // Xbox 360 -->
+                    <a class="device" href="/documentation/drivers/xbox360" title="XBox360 Controller">
+                      <img src="/images/devices/xbox360.jpg"></a>
+                  </div>
+                  <h2>Leap Motion Driver</h2>
+                  <div class="devices">
+                    <!-- // Leap Motion -->
+                    <a class="device" href="/documentation/drivers/leapmotion" title="Leap Motion">
+                      <img src="/images/devices/leap_motion.jpg"></a>
+                  </div>
+                  <h2>Neurosky Mindware Driver</h2>
+                  <div class="devices">
+                    <!-- // neurosky -->
+                    <a class="device" href="/documentation/drivers/neurosky" title="Neurosky">
+                      <img src="/images/devices/neurosky.jpg"></a>
+                  </div>
+                  <h2>Sphero Driver</h2>
+                  <div class="devices">
+                    <!-- // Sphero -->
+                    <a class="device" href="/documentation/drivers/sphero" title="Sphero">
+                      <img src="/images/devices/sphero.jpg"></a>
+                  </div>
+                </section>
 </div>
+              <div class="side-documentation">
+                <div class="mobile-menu">
+                  <a href="#" id="menu-docs">
+                    <div class="line"></div>
+                    <div class="line"></div>
+                    <div class="line"></div>
+                  </a>
+                </div>
+                <dl class="accordion-docs hide">
+<h5 class="doc-button">
+                    <a href="/documentation">Docs</a>
+                  </h5>
+                  <span></span>
+                  <dt>
+                    <a href="">Getting Started</a>
+                    <a class="arrowDown">
+                      <img alt="Arrow" src="/images/elements/arrowSide.png" width="20px"></a>
+                    <div class="clear"></div>
+                  </dt>
+                  <dd id="getting-panel">
+                    <ul>
+<li>
+                        <a href="/documentation/getting-started">Setup your environment</a>
+                      </li>
+                    </ul>
+</dd>
+                  <dt>
+                    <a href="">Guides</a>
+                    <a class="arrowDown">
+                      <img alt="Arrow" src="/images/elements/arrowSide.png" width="20px"></a>
+                    <div class="clear"></div>
+                  </dt>
+                  <dd id="guides-panel">
+                    <ul>
+<li>
+                        <a href="/documentation/guides/what_is_gobot">
+                          About Gobot
+                        </a>
+                      </li>
+                      <li>
+                        <a href="/documentation/guides/api">
+                          API
+                        </a>
+                      </li>
+                      <li>
+                        <a href="/documentation/guides/cli">
+                          CLI
+                        </a>
+                      </li>
+                      <li>
+                        <a href="/documentation/guides/helpers">Helper Methods</a>
+                      </li>
+                    </ul>
+</dd>
+                  <dt>
+                    <a href="">Platforms</a>
+                    <a class="arrowDown">
+                      <img alt="Arrow" src="/images/elements/arrowSide.png" width="20px"></a>
+                    <div class="clear"></div>
+                  </dt>
+                  <dd id="platform-panel">
+                    <ul>
+<li>
+                        <a href="/documentation/platforms/ardrone">Ardrone</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/arduino">Arduino</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/beaglebone">Beaglebone</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/digispark">Digispark</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/joystick">Joystick</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/leapmotion">Leap Motion</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/neurosky">Neurosky Mindware</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/opencv">OpenCV</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/spark">Spark</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/sphero">Sphero</a>
+                      </li>
+                    </ul>
+</dd>
+                  <dt>
+                    <a href="">Drivers</a>
+                    <a class="arrowDown">
+                      <img alt="Arrow" src="/images/elements/arrowSide.png" width="20px"></a>
+                    <div class="clear"></div>
+                  </dt>
+                  <dd id="driver-panel">
+                    GPIO
+                    <ul id="gpio">
+<li>
+                        <a href="/documentation/drivers/analog-sensor">Analog Sensor</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/button">Button</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/direct-pin">Direct Pin</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/led">LED</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/makey">Makey Button</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/motor">Motor</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/servo">Servo</a>
+                      </li>
+                    </ul>
+                    I2C
+                    <ul id="i2c">
+<li>
+                        <a href="/documentation/drivers/blinkm">Blinkm</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/hmc6352-compass">HMC6352 Compass</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/wiichuck">Wiichuck</a>
+                      </li>
+                    </ul>
+                    ARDrone
+                    <ul id="ardrone">
+<li>
+                        <a href="/documentation/drivers/ardrone">Ardrone Flight</a>
+                      </li>
+                    </ul>
+                    Joystick
+                    <ul id="joystick">
+<li>
+                        <a href="/documentation/drivers/dualshock3">Dualshock3 Controller</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/xbox360">XBox360 Controller</a>
+                      </li>
+                    </ul>
+                    Other Drivers
+                    <ul id="others">
+<li>
+                        <a href="/documentation/drivers/leapmotion">Leap Motion</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/neurosky">Neurosky Mindware</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/sphero">Sphero</a>
+                      </li>
+                    </ul>
+</dd>
+                  <dt>
+                    <a href="">Contribute</a>
+                    <a class="arrowDown">
+                      <img alt="Arrow" src="/images/elements/arrowSide.png" width="20px"></a>
+                    <div class="clear"></div>
+                  </dt>
+                  <dd id="contribute-panel">
+                    <ul>
+<li>
+                        <a href="/documentation/contribute/guidelines">Guidelines</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/contribute/contact-us">Contact us</a>
+                      </li>
+                    </ul>
+</dd>
+                  <dt>
+                    <a href="">Examples</a>
+                    <a class="arrowDown">
+                      <img alt="Arrow" src="/images/elements/arrowSide.png" width="20px"></a>
+                    <div class="clear"></div>
+                  </dt>
+                  <dd id="example-panel">
+                    <ul>
+<li>
+                        <a href="/documentation/examples">All examples</a>
+                      </li>
+                    </ul>
+</dd>
+                </dl>
+<script>
+                    $(document).ready(function(){
+                      $("#menu-docs").click(function(){
+                        $(".accordion-docs").removeClass("hide");
+                        $(this).addClass("active");
+                      });
+                    });
+                </script><script>
+                  $("#driver-panel").addClass("active-panel");
+                  $(".accordion-docs dt:nth-child(9) a:nth-child(2) img").addClass("rotate");
+                </script>
+</div>
+            </div>
           </section>
 </div>
       </div>

@@ -9,7 +9,7 @@
 <meta content="The Hybrid Group" name="author">
 <title>Getting Started - Gobot - Golang framework for robotics, physical computing, and the Internet of Things</title>
 <link href="/stylesheets/style.css" rel="stylesheet">
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><script src="/javascripts/script.js"></script><script src="/hybridpages/assets/javascript/subnav.js"></script><link href="//fonts.googleapis.com/css?family=Inconsolata:400,700%7CMontserrat:700" rel="stylesheet">
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><script src="/javascripts/script.js"></script><script src="/hybridpages/assets/javascript/accordeon.js"></script><link href="//fonts.googleapis.com/css?family=Inconsolata:400,700%7CMontserrat:700" rel="stylesheet">
 <link href="/favicon.ico" rel="shortcut icon" type="image/gif">
 <script type="text/javascript">
 
@@ -63,62 +63,53 @@
       <div class="container">
         <div class="main" role="main">
           <section class="content full"><div class="documentation">
-              <section class="intro"><h2>What is Gobot?</h2>
-                <p>Gobot is a set of Go libraries for robotics and physical computing.</p>
-                <p>It provides a simple, yet powerful way to create solutions that incorporate multiple, different hardware devices at the same time.</p>
-                <p>
-                  Want to use Node.js on robots? Check out our sister project CylonJS
-                  <a target="_blank" href="http://cylonjs.com">(http://cylonjs.com)</a>
-                </p>
-                <p>
-                  Want to use Ruby on robots? Check out our sister project Artoo
-                  <a target="_blank" href="http://artoo.io">(http://artoo.io)</a>
-                </p>
-              </section><section class="how-to"><h2>How to Install Go</h2>
-                <p></p>
-                Go is an open source programming environment that makes it easy to build simple, reliable, and efficient software.
-                <a target="blank" href="http://golang.org/doc/install">http://golang.org/doc/install</a>
-                <h3>OSX</h3>
-                <p></p>
-                Go to the Go downloads page at
-                <a target="blank" href="https://code.google.com/p/go/downloads/list">https://code.google.com/p/go/downloads/list</a>
-                download the installer file and run it.
-                <h3>Ubuntu</h3>
-                <p></p>
-                Go to the Go downloads page at
-                <a target="blank" href="https://code.google.com/p/go/downloads/list">https://code.google.com/p/go/downloads/list</a>
-                download the installer file and run it.
-                <h3>Windows</h3>
-                <p></p>
-                Go to the Go downloads page at
-                <a target="blank" href="https://code.google.com/p/go/downloads/list">https://code.google.com/p/go/downloads/list</a>
-                download the installer file and run it.
-              </section><section><h2>How to Install Gobot</h2>
-                <p>Install the library with: <code>go get -u github.com/hybridgroup/gobot</code></p>
+              <div class="container-documentation">
                 
-                <p>In order to use Gobot, you must install the libraries needed to control your particular hardware setup. For example, to use Gobot with an Beaglebone, you will need to install the <code>go get -u github.com/hybridgroup/gobot-beaglebone</code> library. Check out these examples:</p>
-                <h3>OSX</h3>
-                <pre class="CodeRay">go get -u github.com/hybridgroup/gobot
+                <section class="how-to"><h1>How to Install Go</h1>
+                  <p></p>
+                  Go is an open source programming environment that makes it easy to build simple, reliable, and efficient software.
+                  <a target="blank" href="http://golang.org/doc/install">http://golang.org/doc/install</a>
+                  <h3>OSX</h3>
+                  <p></p>
+                  Go to the Go downloads page at
+                  <a target="blank" href="https://code.google.com/p/go/downloads/list">https://code.google.com/p/go/downloads/list</a>
+                  download the installer file and run it.
+                  <h3>Ubuntu</h3>
+                  <p></p>
+                  Go to the Go downloads page at
+                  <a target="blank" href="https://code.google.com/p/go/downloads/list">https://code.google.com/p/go/downloads/list</a>
+                  download the installer file and run it.
+                  <h3>Windows</h3>
+                  <p></p>
+                  Go to the Go downloads page at
+                  <a target="blank" href="https://code.google.com/p/go/downloads/list">https://code.google.com/p/go/downloads/list</a>
+                  download the installer file and run it.
+                </section><section><h2>How to Install Gobot</h2>
+                  <p>Install the library with: <code>go get -u github.com/hybridgroup/gobot</code></p>
+                  
+                  <p>In order to use Gobot, you must install the libraries needed to control your particular hardware setup. For example, to use Gobot with an Beaglebone, you will need to install the <code>go get -u github.com/hybridgroup/gobot-beaglebone</code> library. Check out these examples:</p>
+                  <h3>OSX</h3>
+                  <pre class="CodeRay">go get -u github.com/hybridgroup/gobot
 go get -u github.com/hybridgroup/gobot-beaglebone
 </pre>
-                <h3>Ubuntu</h3>
-                <pre class="CodeRay">go get -u github.com/hybridgroup/gobot
+                  <h3>Ubuntu</h3>
+                  <pre class="CodeRay">go get -u github.com/hybridgroup/gobot
 go get -u github.com/hybridgroup/gobot-beaglebone
 </pre>
-                <h3>Windows</h3>
-                <p>
-                  Windows setup for gobot.
-                </p>
-                <section></section><h2>Gobot Robots</h2>
-                <h3>Writing your robot code:</h3>
-                <p></p>
-                Now you are ready to write your own code. Take a look at the examples below, or go to the
-                <a target="blank" href="https://github.com/hybridgroup/gobot/tree/master/examples">examples</a>
-                directory for a whole bunch of code you can use to help get started. We recommend using Test-Driven Robotics (TDR) with your preferred test frameworks.
-              </section><section><h2>Gobot Code Examples</h2>
-                <h3>Example: Arduino with LED.</h3>
-                <p>To use this example, you must first run <code>go get -u github.com/hybridgroup/gobot-firmata</code></p>
-                <pre class="CodeRay"><span class="keyword">package</span> main
+                  <h3>Windows</h3>
+                  <p>
+                    Windows setup for gobot.
+                  </p>
+                  <section></section><h2>Gobot Robots</h2>
+                  <h3>Writing your robot code:</h3>
+                  <p></p>
+                  Now you are ready to write your own code. Take a look at the examples below, or go to the
+                  <a target="blank" href="https://github.com/hybridgroup/gobot/tree/master/examples">examples</a>
+                  directory for a whole bunch of code you can use to help get started. We recommend using Test-Driven Robotics (TDR) with your preferred test frameworks.
+                </section><section><h2>Gobot Code Examples</h2>
+                  <h3>Example: Arduino with LED.</h3>
+                  <p>To use this example, you must first run <code>go get -u github.com/hybridgroup/gobot-firmata</code></p>
+                  <pre class="CodeRay"><span class="keyword">package</span> main
 
 <span class="keyword">import</span> (
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
@@ -151,9 +142,9 @@ go get -u github.com/hybridgroup/gobot-beaglebone
   robot.Start()
 }
 </pre>
-                <h3>Sphero 2.0</h3>
-                <p>To use this example, you must first run <code>go get -u github.com/hybridgroup/gobot-sphero</code></p>
-                <pre class="CodeRay"><span class="keyword">package</span> main
+                  <h3>Sphero 2.0</h3>
+                  <p>To use this example, you must first run <code>go get -u github.com/hybridgroup/gobot-sphero</code></p>
+                  <pre class="CodeRay"><span class="keyword">package</span> main
 
 <span class="keyword">import</span> (
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
@@ -184,43 +175,252 @@ go get -u github.com/hybridgroup/gobot-beaglebone
   robot.Start()
 }
 </pre>
-              </section><h2>API</h2>
-              <p>Gobot includes a RESTful API to query the status of any robot running within a group, including the connection and device status, and execute device commands.</p>
-              <p>To activate the API, use the <code>Api</code> command like this:</p>
-              
-              <pre class="CodeRay">master := gobot.GobotMaster()
+                </section><h2>API</h2>
+                <p>Gobot includes a RESTful API to query the status of any robot running within a group, including the connection and device status, and execute device commands.</p>
+                <p>To activate the API, use the <code>Api</code> command like this:</p>
+                
+                <pre class="CodeRay">master := gobot.GobotMaster()
 gobot.Api(master)
 </pre>
-              
-              <p>To specify the api port run your Gobot program with the <code>PORT</code> environment variable</p>
-              
-              <pre class="CodeRay">$ PORT=8080 go run gobotProgram.go 
+                
+                <p>To specify the api port run your Gobot program with the <code>PORT</code> environment variable</p>
+                
+                <pre class="CodeRay">$ PORT=8080 go run gobotProgram.go 
 </pre>
-              <section class="contributing"><h2>Contributing</h2>
-                <p>
-                  You can help gobot grow by contributing your code, new drivers or platforms to the project, check the Github page
-                  <a href="https://github.com/hybridgroup/gobot">gobot on github.</a>
-                </p>
-                <ul>
-<li>All patches must be provided under the Apache 2.0 License</li>
-                  <li>Please use the -s option in git to "sign off" that the commit is your work and you are providing it under the Apache 2.0 License</li>
-                  <li>Submit a Github Pull Request to the appropriate branch and ideally discuss the changes with us in IRC.</li>
-                  <li>We will look at the patch, test it out, and give you feedback.</li>
-                  <li>Avoid doing minor whitespace changes, renamings, etc. along with merged content. These will be done by the maintainers from time to time but they can complicate merges and should be done seperately.</li>
-                  <li>Take care to maintain the existing coding style.</li>
-                  <li>Add unit tests for any new or changed functionality.</li>
-                  <li>All pull requests should be "fast forward".</li>
+                <section class="contributing"><h2>Contributing</h2>
+                  <p>
+                    You can help gobot grow by contributing your code, new drivers or platforms to the project, check the Github page
+                    <a href="https://github.com/hybridgroup/gobot">gobot on github.</a>
+                  </p>
                   <ul>
+<li>All patches must be provided under the Apache 2.0 License</li>
+                    <li>Please use the -s option in git to "sign off" that the commit is your work and you are providing it under the Apache 2.0 License</li>
+                    <li>Submit a Github Pull Request to the appropriate branch and ideally discuss the changes with us in IRC.</li>
+                    <li>We will look at the patch, test it out, and give you feedback.</li>
+                    <li>Avoid doing minor whitespace changes, renamings, etc. along with merged content. These will be done by the maintainers from time to time but they can complicate merges and should be done seperately.</li>
+                    <li>Take care to maintain the existing coding style.</li>
+                    <li>Add unit tests for any new or changed functionality.</li>
+                    <li>All pull requests should be "fast forward".</li>
+                    <ul>
 <li>If there are commits after yours use “git rebase -i ”</li>
-                    <li>If you have local changes you may need to use “git stash”</li>
-                    <li>
-                      For git help see
-                      <a target="_blank" href="http://git-scm.com/book">progit</a>
-                      which is an awesome (and free) book on git
-                    </li>
-                  </ul>
+                      <li>If you have local changes you may need to use “git stash”</li>
+                      <li>
+                        For git help see
+                        <a target="_blank" href="http://git-scm.com/book">progit</a>
+                        which is an awesome (and free) book on git
+                      </li>
+                    </ul>
 </ul></section><section class="footer"></section>
 </div>
+              <div class="side-documentation">
+                <div class="mobile-menu">
+                  <a href="#" id="menu-docs">
+                    <div class="line"></div>
+                    <div class="line"></div>
+                    <div class="line"></div>
+                  </a>
+                </div>
+                <dl class="accordion-docs hide">
+<h5 class="doc-button">
+                    <a href="/documentation">Docs</a>
+                  </h5>
+                  <span></span>
+                  <dt>
+                    <a href="">Getting Started</a>
+                    <a class="arrowDown">
+                      <img alt="Arrow" src="/images/elements/arrowSide.png" width="20px"></a>
+                    <div class="clear"></div>
+                  </dt>
+                  <dd id="getting-panel">
+                    <ul>
+<li>
+                        <a href="/documentation/getting-started">Setup your environment</a>
+                      </li>
+                    </ul>
+</dd>
+                  <dt>
+                    <a href="">Guides</a>
+                    <a class="arrowDown">
+                      <img alt="Arrow" src="/images/elements/arrowSide.png" width="20px"></a>
+                    <div class="clear"></div>
+                  </dt>
+                  <dd id="guides-panel">
+                    <ul>
+<li>
+                        <a href="/documentation/guides/what_is_gobot">
+                          About Gobot
+                        </a>
+                      </li>
+                      <li>
+                        <a href="/documentation/guides/api">
+                          API
+                        </a>
+                      </li>
+                      <li>
+                        <a href="/documentation/guides/cli">
+                          CLI
+                        </a>
+                      </li>
+                      <li>
+                        <a href="/documentation/guides/helpers">Helper Methods</a>
+                      </li>
+                    </ul>
+</dd>
+                  <dt>
+                    <a href="">Platforms</a>
+                    <a class="arrowDown">
+                      <img alt="Arrow" src="/images/elements/arrowSide.png" width="20px"></a>
+                    <div class="clear"></div>
+                  </dt>
+                  <dd id="platform-panel">
+                    <ul>
+<li>
+                        <a href="/documentation/platforms/ardrone">Ardrone</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/arduino">Arduino</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/beaglebone">Beaglebone</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/digispark">Digispark</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/joystick">Joystick</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/leapmotion">Leap Motion</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/neurosky">Neurosky Mindware</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/opencv">OpenCV</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/spark">Spark</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/sphero">Sphero</a>
+                      </li>
+                    </ul>
+</dd>
+                  <dt>
+                    <a href="">Drivers</a>
+                    <a class="arrowDown">
+                      <img alt="Arrow" src="/images/elements/arrowSide.png" width="20px"></a>
+                    <div class="clear"></div>
+                  </dt>
+                  <dd id="driver-panel">
+                    GPIO
+                    <ul id="gpio">
+<li>
+                        <a href="/documentation/drivers/analog-sensor">Analog Sensor</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/button">Button</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/direct-pin">Direct Pin</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/led">LED</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/makey">Makey Button</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/motor">Motor</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/servo">Servo</a>
+                      </li>
+                    </ul>
+                    I2C
+                    <ul id="i2c">
+<li>
+                        <a href="/documentation/drivers/blinkm">Blinkm</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/hmc6352-compass">HMC6352 Compass</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/wiichuck">Wiichuck</a>
+                      </li>
+                    </ul>
+                    ARDrone
+                    <ul id="ardrone">
+<li>
+                        <a href="/documentation/drivers/ardrone">Ardrone Flight</a>
+                      </li>
+                    </ul>
+                    Joystick
+                    <ul id="joystick">
+<li>
+                        <a href="/documentation/drivers/dualshock3">Dualshock3 Controller</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/xbox360">XBox360 Controller</a>
+                      </li>
+                    </ul>
+                    Other Drivers
+                    <ul id="others">
+<li>
+                        <a href="/documentation/drivers/leapmotion">Leap Motion</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/neurosky">Neurosky Mindware</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/sphero">Sphero</a>
+                      </li>
+                    </ul>
+</dd>
+                  <dt>
+                    <a href="">Contribute</a>
+                    <a class="arrowDown">
+                      <img alt="Arrow" src="/images/elements/arrowSide.png" width="20px"></a>
+                    <div class="clear"></div>
+                  </dt>
+                  <dd id="contribute-panel">
+                    <ul>
+<li>
+                        <a href="/documentation/contribute/guidelines">Guidelines</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/contribute/contact-us">Contact us</a>
+                      </li>
+                    </ul>
+</dd>
+                  <dt>
+                    <a href="">Examples</a>
+                    <a class="arrowDown">
+                      <img alt="Arrow" src="/images/elements/arrowSide.png" width="20px"></a>
+                    <div class="clear"></div>
+                  </dt>
+                  <dd id="example-panel">
+                    <ul>
+<li>
+                        <a href="/documentation/examples">All examples</a>
+                      </li>
+                    </ul>
+</dd>
+                </dl>
+<script>
+                    $(document).ready(function(){
+                      $("#menu-docs").click(function(){
+                        $(".accordion-docs").removeClass("hide");
+                        $(this).addClass("active");
+                      });
+                    });
+                </script><script>
+                  $("#getting-panel").addClass("active-panel");
+                  $("#getting-panel ul li:nth-child(1)").addClass("active-link");
+                  $(".accordion-docs dt:nth-child(3) a:nth-child(2) img").addClass("rotate");
+                </script>
+</div>
+            </div>
           </section>
 </div>
       </div>

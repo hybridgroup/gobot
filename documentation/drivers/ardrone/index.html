@@ -9,7 +9,7 @@
 <meta content="The Hybrid Group" name="author">
 <title>Gobot - ARDrone Driver</title>
 <link href="/stylesheets/style.css" rel="stylesheet">
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><script src="/javascripts/script.js"></script><script src="/hybridpages/assets/javascript/subnav.js"></script><link href="//fonts.googleapis.com/css?family=Inconsolata:400,700%7CMontserrat:700" rel="stylesheet">
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><script src="/javascripts/script.js"></script><script src="/hybridpages/assets/javascript/accordeon.js"></script><script src="/hybridpages/assets/javascript/subnav.js"></script><link href="//fonts.googleapis.com/css?family=Inconsolata:400,700%7CMontserrat:700" rel="stylesheet">
 <link href="/favicon.ico" rel="shortcut icon" type="image/gif">
 <script type="text/javascript">
 
@@ -56,33 +56,40 @@
 </div>
       <div class="page-title">
         <div class="w">
-          <h1 class="title">ARDrone</h1>
-          <h2 class="subtitle">Driver</h2>
+          <h1 class="title">Drivers</h1>
+          <h2 class="subtitle">Cylon has a extensible system for connecting to hardware devices.</h2>
         </div>
       </div>
-      <section class="subnav-drivers" id="mainsubnav"><div class="container">
-          <nav><a href="#HowToConnect">How to Connect</a>
-            <a href="#HowToUse">How To Use</a>
-            <a href="#Commands">Commands</a>
-            <a href="#Events">Events</a>
-            <a href="#Compatability">Compatibility</a>
-            <a href="#top">Top</a>
-          </nav>
-</div>
-      </section><div class="container">
+      <div class="container">
         <div class="main" role="main">
           <section class="content full"><div class="documentation">
-              <section class="intro"><img class="display" src="/images/devices/ardrone-flight.jpg"><div class="info-intro">
-                  <p>
-                    Allows user to send flight control commands to an ARDrone. Flight control commands are those used to tell the ARDrone to take off, land, and or any number of other autonomous flight manuvers.
-                  </p>
+              <div class="container-documentation">
+                <div class="page-title-docs">
+                  <div class="w">
+                    <h1 class="title">ARDrone</h1>
+                    <h2 class="subtitle">Driver</h2>
+                  </div>
                 </div>
-                <div class="clear"></div>
-              </section><section class="how-to" id="HowToConnect"><h2>How To Connect</h2>
-                <p>
-                  Communication with the ARDrone's flight control interface takes place using a WiFi connection. The ARDrone is a WiFi access point, so it normally can be the only device you connect to, without some additional effort to reconfigure the drone itself to put it into infrastructure mode.
-                </p>
-                <pre class="CodeRay"><span class="keyword">package</span> main
+                <section class="subnav-drivers" id="mainsubnav"><div class="container">
+                    <nav><a href="#HowToConnect">How to Connect</a>
+                      <a href="#HowToUse">How To Use</a>
+                      <a href="#Commands">Commands</a>
+                      <a href="#Events">Events</a>
+                      <a href="#Compatability">Compatibility</a>
+                      <a href="#top">Top</a>
+                    </nav>
+</div>
+                </section><br><section class="intro"><img class="display" src="/images/devices/ardrone-flight.jpg"><div class="info-intro">
+                    <p>
+                      Allows user to send flight control commands to an ARDrone. Flight control commands are those used to tell the ARDrone to take off, land, and or any number of other autonomous flight manuvers.
+                    </p>
+                  </div>
+                  <div class="clear"></div>
+                </section><section class="how-to" id="HowToConnect"><h2>How To Connect</h2>
+                  <p>
+                    Communication with the ARDrone's flight control interface takes place using a WiFi connection. The ARDrone is a WiFi access point, so it normally can be the only device you connect to, without some additional effort to reconfigure the drone itself to put it into infrastructure mode.
+                  </p>
+                  <pre class="CodeRay"><span class="keyword">package</span> main
 
 <span class="keyword">import</span> (
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
@@ -98,11 +105,11 @@
   drone.Name = <span class="string"><span class="delimiter">"</span><span class="content">Drone</span><span class="delimiter">"</span></span>
 ...
 </pre>
-              </section><section class="how-to" id="HowToUse"><h2>How To Use</h2>
-                <p>
-                  This example controls an ARDrone to take off, and then land.
-                </p>
-                <pre class="CodeRay"><span class="keyword">package</span> main
+                </section><section class="how-to" id="HowToUse"><h2>How To Use</h2>
+                  <p>
+                    This example controls an ARDrone to take off, and then land.
+                  </p>
+                  <pre class="CodeRay"><span class="keyword">package</span> main
 
 <span class="keyword">import</span> (
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
@@ -135,126 +142,335 @@
   robot.Start()
 }
 </pre>
-              </section><section class="public-methods"><div class="commands-api" id="Commands">
-                  <h1 id="commands">Commands</h1>
-                  
-                  <h2 id="takeoff">TakeOff</h2>
-                  
-                  <p>Sets the internal <code>fly</code> state to <code>true</code>.</p>
-                  
-                  <h2 id="land">Land</h2>
-                  
-                  <p>Sets the internal <code>fly</code> state to <code>false</code>.</p>
-                  
-                  <h2 id="upspeed-float64">Up(speed float64)</h2>
-                  
-                  <p>Makes the drone gain altitude. 
-                  speed can be a value from <code>0.0</code> to <code>1.0</code>.</p>
-                  
-                  <h5 id="params">Params</h5>
-                  
-                  <ul>
+                </section><section class="public-methods"><div class="commands-api" id="Commands">
+                    <h1 id="commands">Commands</h1>
+                    
+                    <h2 id="takeoff">TakeOff</h2>
+                    
+                    <p>Sets the internal <code>fly</code> state to <code>true</code>.</p>
+                    
+                    <h2 id="land">Land</h2>
+                    
+                    <p>Sets the internal <code>fly</code> state to <code>false</code>.</p>
+                    
+                    <h2 id="upspeed-float64">Up(speed float64)</h2>
+                    
+                    <p>Makes the drone gain altitude. 
+                    speed can be a value from <code>0.0</code> to <code>1.0</code>.</p>
+                    
+                    <h5 id="params">Params</h5>
+                    
+                    <ul>
 <li>
 <strong>speed</strong> - <strong>float64</strong> - The speed at which the drone moves</li>
-                  </ul>
+                    </ul>
 <h2 id="downspeed-float64">Down(speed float64)</h2>
-                  
-                  <p>Makes the drone reduce altitude. 
-                  speed can be a value from <code>0.0</code> to <code>1.0</code>.</p>
-                  
-                  <h5 id="params-1">Params</h5>
-                  
-                  <ul>
+                    
+                    <p>Makes the drone reduce altitude. 
+                    speed can be a value from <code>0.0</code> to <code>1.0</code>.</p>
+                    
+                    <h5 id="params-1">Params</h5>
+                    
+                    <ul>
 <li>
 <strong>speed</strong> - <strong>float64</strong> - The speed at which the drone moves</li>
-                  </ul>
+                    </ul>
 <h2 id="leftspeed-float64">Left(speed float64)</h2>
-                  
-                  <p>Causes the drone to bank to the left, controls the roll, which is 
-                  a horizontal movement using the camera as a reference point.
-                  speed can be a value from <code>0.0</code> to <code>1.0</code>.</p>
-                  
-                  <h5 id="params-2">Params</h5>
-                  
-                  <ul>
+                    
+                    <p>Causes the drone to bank to the left, controls the roll, which is 
+                    a horizontal movement using the camera as a reference point.
+                    speed can be a value from <code>0.0</code> to <code>1.0</code>.</p>
+                    
+                    <h5 id="params-2">Params</h5>
+                    
+                    <ul>
 <li>
 <strong>speed</strong> - <strong>float64</strong> - The speed at which the drone moves</li>
-                  </ul>
+                    </ul>
 <h2 id="rightspeed-float64">Right(speed float64)</h2>
-                  
-                  <p>Causes the drone to bank to the right, controls the roll, which is 
-                  a horizontal movement using the camera as a reference point.
-                  speed can be a value from <code>0.0</code> to <code>1.0</code>.</p>
-                  
-                  <h5 id="params-3">Params</h5>
-                  
-                  <ul>
+                    
+                    <p>Causes the drone to bank to the right, controls the roll, which is 
+                    a horizontal movement using the camera as a reference point.
+                    speed can be a value from <code>0.0</code> to <code>1.0</code>.</p>
+                    
+                    <h5 id="params-3">Params</h5>
+                    
+                    <ul>
 <li>
 <strong>speed</strong> - <strong>float64</strong> - The speed at which the drone moves</li>
-                  </ul>
+                    </ul>
 <h2 id="forwardspeed-float64">Forward(speed float64)</h2>
-                  
-                  <p>Causes the drone go forward, controls the pitch.
-                  speed can be a value from <code>0.0</code> to <code>1.0</code>.</p>
-                  
-                  <h5 id="params-4">Params</h5>
-                  
-                  <ul>
+                    
+                    <p>Causes the drone go forward, controls the pitch.
+                    speed can be a value from <code>0.0</code> to <code>1.0</code>.</p>
+                    
+                    <h5 id="params-4">Params</h5>
+                    
+                    <ul>
 <li>
 <strong>speed</strong> - <strong>float64</strong> - The speed at which the drone moves</li>
-                  </ul>
+                    </ul>
 <h2 id="backwardspeed-float64">Backward(speed float64)</h2>
-                  
-                  <p>Causes the drone go backward, controls the pitch.
-                  speed can be a value from <code>0.0</code> to <code>1.0</code>.</p>
-                  
-                  <h5 id="params-5">Params</h5>
-                  
-                  <ul>
+                    
+                    <p>Causes the drone go backward, controls the pitch.
+                    speed can be a value from <code>0.0</code> to <code>1.0</code>.</p>
+                    
+                    <h5 id="params-5">Params</h5>
+                    
+                    <ul>
 <li>
 <strong>speed</strong> - <strong>float64</strong> - The speed at which the drone moves</li>
-                  </ul>
+                    </ul>
 <h2 id="clockwisespeed-float64">Clockwise(speed float64)</h2>
-                  
-                  <p>Causes the drone to spin.
-                  speed can be a value from <code>0.0</code> to <code>1.0</code>.</p>
-                  
-                  <h5 id="params-6">Params</h5>
-                  
-                  <ul>
+                    
+                    <p>Causes the drone to spin.
+                    speed can be a value from <code>0.0</code> to <code>1.0</code>.</p>
+                    
+                    <h5 id="params-6">Params</h5>
+                    
+                    <ul>
 <li>
 <strong>speed</strong> - <strong>float64</strong> - The speed at which the drone moves</li>
-                  </ul>
+                    </ul>
 <h2 id="counterclockwisespeed-float64">CounterClockwise(speed float64)</h2>
-                  
-                  <p>Causes the drone to spin.
-                  speed can be a value from <code>0.0</code> to <code>1.0</code>.</p>
-                  
-                  <h5 id="params-7">Params</h5>
-                  
-                  <ul>
+                    
+                    <p>Causes the drone to spin.
+                    speed can be a value from <code>0.0</code> to <code>1.0</code>.</p>
+                    
+                    <h5 id="params-7">Params</h5>
+                    
+                    <ul>
 <li>
 <strong>speed</strong> - <strong>float64</strong> - The speed at which the drone moves</li>
-                  </ul>
+                    </ul>
 <h2 id="hover">Hover</h2>
-                  
-                  <p>Causes the drone to hover in place.</p>
-                </div>
-                <div class="commands-api" id="Events">
-                  <h1 id="events">Events</h1>
-                  
-                  <h2 id="flying">Flying</h2>
-                  
-                  <p>Sent when the device has taken off.</p>
-                </div>
-              </section><section class="compatability hardware" id="Compatability"><h2>Compatibility</h2>
-                <div class="devices">
-                  <!-- //Ardrone -->
-                  <a class="device" href="/documentation/platforms/ardrone" title="AR Drone">
-                    <img src="/images/devices/ardrone.jpg"></a>
-                </div>
-              </section>
+                    
+                    <p>Causes the drone to hover in place.</p>
+                  </div>
+                  <div class="commands-api" id="Events">
+                    <h1 id="events">Events</h1>
+                    
+                    <h2 id="flying">Flying</h2>
+                    
+                    <p>Sent when the device has taken off.</p>
+                  </div>
+                </section><section class="compatability hardware" id="Compatability"><h2>Compatibility</h2>
+                  <div class="devices">
+                    <!-- //Ardrone -->
+                    <a class="device" href="/documentation/platforms/ardrone" title="AR Drone">
+                      <img src="/images/devices/ardrone.jpg"></a>
+                  </div>
+                </section>
 </div>
+              <div class="side-documentation">
+                <div class="mobile-menu">
+                  <a href="#" id="menu-docs">
+                    <div class="line"></div>
+                    <div class="line"></div>
+                    <div class="line"></div>
+                  </a>
+                </div>
+                <dl class="accordion-docs hide">
+<h5 class="doc-button">
+                    <a href="/documentation">Docs</a>
+                  </h5>
+                  <span></span>
+                  <dt>
+                    <a href="">Getting Started</a>
+                    <a class="arrowDown">
+                      <img alt="Arrow" src="/images/elements/arrowSide.png" width="20px"></a>
+                    <div class="clear"></div>
+                  </dt>
+                  <dd id="getting-panel">
+                    <ul>
+<li>
+                        <a href="/documentation/getting-started">Setup your environment</a>
+                      </li>
+                    </ul>
+</dd>
+                  <dt>
+                    <a href="">Guides</a>
+                    <a class="arrowDown">
+                      <img alt="Arrow" src="/images/elements/arrowSide.png" width="20px"></a>
+                    <div class="clear"></div>
+                  </dt>
+                  <dd id="guides-panel">
+                    <ul>
+<li>
+                        <a href="/documentation/guides/what_is_gobot">
+                          About Gobot
+                        </a>
+                      </li>
+                      <li>
+                        <a href="/documentation/guides/api">
+                          API
+                        </a>
+                      </li>
+                      <li>
+                        <a href="/documentation/guides/cli">
+                          CLI
+                        </a>
+                      </li>
+                      <li>
+                        <a href="/documentation/guides/helpers">Helper Methods</a>
+                      </li>
+                    </ul>
+</dd>
+                  <dt>
+                    <a href="">Platforms</a>
+                    <a class="arrowDown">
+                      <img alt="Arrow" src="/images/elements/arrowSide.png" width="20px"></a>
+                    <div class="clear"></div>
+                  </dt>
+                  <dd id="platform-panel">
+                    <ul>
+<li>
+                        <a href="/documentation/platforms/ardrone">Ardrone</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/arduino">Arduino</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/beaglebone">Beaglebone</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/digispark">Digispark</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/joystick">Joystick</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/leapmotion">Leap Motion</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/neurosky">Neurosky Mindware</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/opencv">OpenCV</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/spark">Spark</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/sphero">Sphero</a>
+                      </li>
+                    </ul>
+</dd>
+                  <dt>
+                    <a href="">Drivers</a>
+                    <a class="arrowDown">
+                      <img alt="Arrow" src="/images/elements/arrowSide.png" width="20px"></a>
+                    <div class="clear"></div>
+                  </dt>
+                  <dd id="driver-panel">
+                    GPIO
+                    <ul id="gpio">
+<li>
+                        <a href="/documentation/drivers/analog-sensor">Analog Sensor</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/button">Button</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/direct-pin">Direct Pin</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/led">LED</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/makey">Makey Button</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/motor">Motor</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/servo">Servo</a>
+                      </li>
+                    </ul>
+                    I2C
+                    <ul id="i2c">
+<li>
+                        <a href="/documentation/drivers/blinkm">Blinkm</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/hmc6352-compass">HMC6352 Compass</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/wiichuck">Wiichuck</a>
+                      </li>
+                    </ul>
+                    ARDrone
+                    <ul id="ardrone">
+<li>
+                        <a href="/documentation/drivers/ardrone">Ardrone Flight</a>
+                      </li>
+                    </ul>
+                    Joystick
+                    <ul id="joystick">
+<li>
+                        <a href="/documentation/drivers/dualshock3">Dualshock3 Controller</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/xbox360">XBox360 Controller</a>
+                      </li>
+                    </ul>
+                    Other Drivers
+                    <ul id="others">
+<li>
+                        <a href="/documentation/drivers/leapmotion">Leap Motion</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/neurosky">Neurosky Mindware</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/sphero">Sphero</a>
+                      </li>
+                    </ul>
+</dd>
+                  <dt>
+                    <a href="">Contribute</a>
+                    <a class="arrowDown">
+                      <img alt="Arrow" src="/images/elements/arrowSide.png" width="20px"></a>
+                    <div class="clear"></div>
+                  </dt>
+                  <dd id="contribute-panel">
+                    <ul>
+<li>
+                        <a href="/documentation/contribute/guidelines">Guidelines</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/contribute/contact-us">Contact us</a>
+                      </li>
+                    </ul>
+</dd>
+                  <dt>
+                    <a href="">Examples</a>
+                    <a class="arrowDown">
+                      <img alt="Arrow" src="/images/elements/arrowSide.png" width="20px"></a>
+                    <div class="clear"></div>
+                  </dt>
+                  <dd id="example-panel">
+                    <ul>
+<li>
+                        <a href="/documentation/examples">All examples</a>
+                      </li>
+                    </ul>
+</dd>
+                </dl>
+<script>
+                    $(document).ready(function(){
+                      $("#menu-docs").click(function(){
+                        $(".accordion-docs").removeClass("hide");
+                        $(this).addClass("active");
+                      });
+                    });
+                </script><script>
+                  $("#driver-panel").addClass("active-panel");
+                  $("#ardrone li:nth-child(1)").addClass("active-link");
+                  $(".accordion-docs dt:nth-child(9) a:nth-child(2) img").addClass("rotate");
+                </script>
+</div>
+            </div>
           </section>
 </div>
       </div>

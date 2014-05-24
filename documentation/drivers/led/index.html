@@ -9,7 +9,7 @@
 <meta content="The Hybrid Group" name="author">
 <title>Gobot - LED Driver</title>
 <link href="/stylesheets/style.css" rel="stylesheet">
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><script src="/javascripts/script.js"></script><script src="/hybridpages/assets/javascript/subnav.js"></script><link href="//fonts.googleapis.com/css?family=Inconsolata:400,700%7CMontserrat:700" rel="stylesheet">
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><script src="/javascripts/script.js"></script><script src="/hybridpages/assets/javascript/accordeon.js"></script><script src="/hybridpages/assets/javascript/subnav.js"></script><link href="//fonts.googleapis.com/css?family=Inconsolata:400,700%7CMontserrat:700" rel="stylesheet">
 <link href="/favicon.ico" rel="shortcut icon" type="image/gif">
 <script type="text/javascript">
 
@@ -56,31 +56,38 @@
 </div>
       <div class="page-title">
         <div class="w">
-          <h1 class="title">LED</h1>
-          <h2 class="subtitle">Driver</h2>
+          <h1 class="title">Drivers</h1>
+          <h2 class="subtitle">Cylon has a extensible system for connecting to hardware devices.</h2>
         </div>
       </div>
-      <section class="subnav-drivers" id="mainsubnav"><div class="container">
-          <nav><a href="#HowToConnect">How to Connect</a>
-            <a href="#HowToUse">How To Use</a>
-            <a href="#Commands">Commands</a>
-            <a href="#Events">Events</a>
-            <a href="#Circuit">Circuit</a>
-            <a href="#Compatability">Compatibility</a>
-            <a href="#top">Top</a>
-          </nav>
-</div>
-      </section><div class="container">
+      <div class="container">
         <div class="main" role="main">
           <section class="content full"><div class="documentation">
-              <section class="intro"><img class="display" src="/images/devices/LED.jpg"><div class="info-intro">
-                  <p>Allows user to interact with LEDs through digital output and PWM (Pulse Width Modulation)</p>
+              <div class="container-documentation">
+                <div class="page-title-docs">
+                  <div class="w">
+                    <h1 class="title">LED</h1>
+                    <h2 class="subtitle">Driver</h2>
+                  </div>
                 </div>
-                <div class="clear"></div>
-              </section><section class="how-to" id="HowToConnect"><h2>How To Connect</h2>
-                <p>Install the library with: <code>go get -u github.com/hybridgroup/gobot-gpio</code></p>
-                <h3>For Firmata:</h3>
-                <pre class="CodeRay"><span class="keyword">package</span> main
+                <section class="subnav-drivers" id="mainsubnav"><div class="container">
+                    <nav><a href="#HowToConnect">How to Connect</a>
+                      <a href="#HowToUse">How To Use</a>
+                      <a href="#Commands">Commands</a>
+                      <a href="#Events">Events</a>
+                      <a href="#Circuit">Circuit</a>
+                      <a href="#Compatability">Compatibility</a>
+                      <a href="#top">Top</a>
+                    </nav>
+</div>
+                </section><br><section class="intro"><img class="display" src="/images/devices/LED.jpg"><div class="info-intro">
+                    <p>Allows user to interact with LEDs through digital output and PWM (Pulse Width Modulation)</p>
+                  </div>
+                  <div class="clear"></div>
+                </section><section class="how-to" id="HowToConnect"><h2>How To Connect</h2>
+                  <p>Install the library with: <code>go get -u github.com/hybridgroup/gobot-gpio</code></p>
+                  <h3>For Firmata:</h3>
+                  <pre class="CodeRay"><span class="keyword">package</span> main
 
 <span class="keyword">import</span> (
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
@@ -99,11 +106,11 @@
   led.Pin = <span class="string"><span class="delimiter">"</span><span class="content">13</span><span class="delimiter">"</span></span>
 ...
 </pre>
-              </section><section class="how-to" id="HowToUse"><h2>How To Use</h2>
-                <p>
-                  This example turns an LED on and off every 1s.
-                </p>
-                <pre class="CodeRay"><span class="keyword">package</span> main
+                </section><section class="how-to" id="HowToUse"><h2>How To Use</h2>
+                  <p>
+                    This example turns an LED on and off every 1s.
+                  </p>
+                  <pre class="CodeRay"><span class="keyword">package</span> main
 
 <span class="keyword">import</span> (
   <span class="string"><span class="delimiter">"</span><span class="content">github.com/hybridgroup/gobot</span><span class="delimiter">"</span></span>
@@ -136,85 +143,294 @@
   robot.Start()
 }
 </pre>
-              </section><section class="public-methods"><div class="commands-api" id="Commands">
-                  <h1 id="functions">Functions</h1>
-                  
-                  <h2 id="toggle">Toggle</h2>
-                  
-                  <p>Turns the LED on, or off, depending on if it is already off, or on, respectively.</p>
-                  
-                  <h4 id="api-command">API Command</h4>
-                  
-                  <p><strong>ToggleC</strong></p>
-                  
-                  <h2 id="on">On</h2>
-                  
-                  <p>Turns LED on.</p>
-                  
-                  <h4 id="api-command-1">API Command</h4>
-                  
-                  <p><strong>OnC</strong></p>
-                  
-                  <h2 id="off">Off</h2>
-                  
-                  <p>Turns LED off.</p>
-                  
-                  <h4 id="api-command-2">API Command</h4>
-                  
-                  <p><strong>OffC</strong></p>
-                  
-                  <h2 id="brightnesslevel-byte">Brightness(level byte)</h2>
-                  
-                  <p>Sets brightness of the led to the specified brightness value passed to brightness(level byte).</p>
-                  
-                  <h4 id="params">Params</h4>
-                  
-                  <ul>
+                </section><section class="public-methods"><div class="commands-api" id="Commands">
+                    <h1 id="functions">Functions</h1>
+                    
+                    <h2 id="toggle">Toggle</h2>
+                    
+                    <p>Turns the LED on, or off, depending on if it is already off, or on, respectively.</p>
+                    
+                    <h4 id="api-command">API Command</h4>
+                    
+                    <p><strong>ToggleC</strong></p>
+                    
+                    <h2 id="on">On</h2>
+                    
+                    <p>Turns LED on.</p>
+                    
+                    <h4 id="api-command-1">API Command</h4>
+                    
+                    <p><strong>OnC</strong></p>
+                    
+                    <h2 id="off">Off</h2>
+                    
+                    <p>Turns LED off.</p>
+                    
+                    <h4 id="api-command-2">API Command</h4>
+                    
+                    <p><strong>OffC</strong></p>
+                    
+                    <h2 id="brightnesslevel-byte">Brightness(level byte)</h2>
+                    
+                    <p>Sets brightness of the led to the specified brightness value passed to brightness(level byte).</p>
+                    
+                    <h4 id="params">Params</h4>
+                    
+                    <ul>
 <li>
 <strong>level</strong> - <strong>byte</strong>
 </li>
-                  </ul>
+                    </ul>
 <h4 id="returns">Returns</h4>
-                  
-                  <ul>
+                    
+                    <ul>
 <li>
 <strong>level</strong> - brightness value</li>
-                  </ul>
+                    </ul>
 <h4 id="api-command-3">API Command</h4>
-                  
-                  <p><strong>BrightnessC</strong></p>
-                </div>
-                <div class="commands-api" id="Events">
-                  <h1 id="events">Events</h1>
-                  
-                  <p>no events</p>
-                </div>
-              </section><section class="circuit" id="Circuit"><h2>Circuit</h2>
-                <div class="description-circuit">
-                  <p></p>
-                </div>
-                <div class="image-circuit">
-                  <img alt="" src="/documentation/drivers/breadboards/gpio/led_bb.png">
+                    
+                    <p><strong>BrightnessC</strong></p>
+                  </div>
+                  <div class="commands-api" id="Events">
+                    <h1 id="events">Events</h1>
+                    
+                    <p>no events</p>
+                  </div>
+                </section><section class="circuit" id="Circuit"><h2>Circuit</h2>
+                  <div class="description-circuit">
+                    <p></p>
+                  </div>
+                  <div class="image-circuit">
+                    <img alt="" src="/documentation/drivers/breadboards/gpio/led_bb.png">
 </div>
-                <div class="clear"></div>
-              </section><section class="compatability hardware" id="Compatability"><h2>Compatability</h2>
-                
-                <div class="devices">
-                  <!-- // Arduino -->
-                  <a class="device" href="/documentation/platforms/arduino" title="Arduino">
-                    <img src="/images/devices/arduino.jpg"></a>
-                  <!-- // Beaglebone -->
-                  <a class="device" href="/documentation/platforms/beaglebone" title="BeagleBone">
-                    <img src="/images/devices/beaglebone.jpg"></a>
-                  <!-- // Analog Sensor -->
-                  <a class="device" href="/documentation/platforms/digispark" title="Digispark">
-                    <img src="/images/devices/digispark.jpg"></a>
-                  <!-- // Spark -->
-                  <a class="device" href="/documentation/platforms/spark" title="Spark">
-                    <img src="/images/devices/spark.jpg"></a>
-                </div>
-              </section>
+                  <div class="clear"></div>
+                </section><section class="compatability hardware" id="Compatability"><h2>Compatability</h2>
+                  
+                  <div class="devices">
+                    <!-- // Arduino -->
+                    <a class="device" href="/documentation/platforms/arduino" title="Arduino">
+                      <img src="/images/devices/arduino.jpg"></a>
+                    <!-- // Beaglebone -->
+                    <a class="device" href="/documentation/platforms/beaglebone" title="BeagleBone">
+                      <img src="/images/devices/beaglebone.jpg"></a>
+                    <!-- // Analog Sensor -->
+                    <a class="device" href="/documentation/platforms/digispark" title="Digispark">
+                      <img src="/images/devices/digispark.jpg"></a>
+                    <!-- // Spark -->
+                    <a class="device" href="/documentation/platforms/spark" title="Spark">
+                      <img src="/images/devices/spark.jpg"></a>
+                  </div>
+                </section>
 </div>
+              <div class="side-documentation">
+                <div class="mobile-menu">
+                  <a href="#" id="menu-docs">
+                    <div class="line"></div>
+                    <div class="line"></div>
+                    <div class="line"></div>
+                  </a>
+                </div>
+                <dl class="accordion-docs hide">
+<h5 class="doc-button">
+                    <a href="/documentation">Docs</a>
+                  </h5>
+                  <span></span>
+                  <dt>
+                    <a href="">Getting Started</a>
+                    <a class="arrowDown">
+                      <img alt="Arrow" src="/images/elements/arrowSide.png" width="20px"></a>
+                    <div class="clear"></div>
+                  </dt>
+                  <dd id="getting-panel">
+                    <ul>
+<li>
+                        <a href="/documentation/getting-started">Setup your environment</a>
+                      </li>
+                    </ul>
+</dd>
+                  <dt>
+                    <a href="">Guides</a>
+                    <a class="arrowDown">
+                      <img alt="Arrow" src="/images/elements/arrowSide.png" width="20px"></a>
+                    <div class="clear"></div>
+                  </dt>
+                  <dd id="guides-panel">
+                    <ul>
+<li>
+                        <a href="/documentation/guides/what_is_gobot">
+                          About Gobot
+                        </a>
+                      </li>
+                      <li>
+                        <a href="/documentation/guides/api">
+                          API
+                        </a>
+                      </li>
+                      <li>
+                        <a href="/documentation/guides/cli">
+                          CLI
+                        </a>
+                      </li>
+                      <li>
+                        <a href="/documentation/guides/helpers">Helper Methods</a>
+                      </li>
+                    </ul>
+</dd>
+                  <dt>
+                    <a href="">Platforms</a>
+                    <a class="arrowDown">
+                      <img alt="Arrow" src="/images/elements/arrowSide.png" width="20px"></a>
+                    <div class="clear"></div>
+                  </dt>
+                  <dd id="platform-panel">
+                    <ul>
+<li>
+                        <a href="/documentation/platforms/ardrone">Ardrone</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/arduino">Arduino</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/beaglebone">Beaglebone</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/digispark">Digispark</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/joystick">Joystick</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/leapmotion">Leap Motion</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/neurosky">Neurosky Mindware</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/opencv">OpenCV</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/spark">Spark</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/platforms/sphero">Sphero</a>
+                      </li>
+                    </ul>
+</dd>
+                  <dt>
+                    <a href="">Drivers</a>
+                    <a class="arrowDown">
+                      <img alt="Arrow" src="/images/elements/arrowSide.png" width="20px"></a>
+                    <div class="clear"></div>
+                  </dt>
+                  <dd id="driver-panel">
+                    GPIO
+                    <ul id="gpio">
+<li>
+                        <a href="/documentation/drivers/analog-sensor">Analog Sensor</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/button">Button</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/direct-pin">Direct Pin</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/led">LED</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/makey">Makey Button</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/motor">Motor</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/servo">Servo</a>
+                      </li>
+                    </ul>
+                    I2C
+                    <ul id="i2c">
+<li>
+                        <a href="/documentation/drivers/blinkm">Blinkm</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/hmc6352-compass">HMC6352 Compass</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/wiichuck">Wiichuck</a>
+                      </li>
+                    </ul>
+                    ARDrone
+                    <ul id="ardrone">
+<li>
+                        <a href="/documentation/drivers/ardrone">Ardrone Flight</a>
+                      </li>
+                    </ul>
+                    Joystick
+                    <ul id="joystick">
+<li>
+                        <a href="/documentation/drivers/dualshock3">Dualshock3 Controller</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/xbox360">XBox360 Controller</a>
+                      </li>
+                    </ul>
+                    Other Drivers
+                    <ul id="others">
+<li>
+                        <a href="/documentation/drivers/leapmotion">Leap Motion</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/neurosky">Neurosky Mindware</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/drivers/sphero">Sphero</a>
+                      </li>
+                    </ul>
+</dd>
+                  <dt>
+                    <a href="">Contribute</a>
+                    <a class="arrowDown">
+                      <img alt="Arrow" src="/images/elements/arrowSide.png" width="20px"></a>
+                    <div class="clear"></div>
+                  </dt>
+                  <dd id="contribute-panel">
+                    <ul>
+<li>
+                        <a href="/documentation/contribute/guidelines">Guidelines</a>
+                      </li>
+                      <li>
+                        <a href="/documentation/contribute/contact-us">Contact us</a>
+                      </li>
+                    </ul>
+</dd>
+                  <dt>
+                    <a href="">Examples</a>
+                    <a class="arrowDown">
+                      <img alt="Arrow" src="/images/elements/arrowSide.png" width="20px"></a>
+                    <div class="clear"></div>
+                  </dt>
+                  <dd id="example-panel">
+                    <ul>
+<li>
+                        <a href="/documentation/examples">All examples</a>
+                      </li>
+                    </ul>
+</dd>
+                </dl>
+<script>
+                    $(document).ready(function(){
+                      $("#menu-docs").click(function(){
+                        $(".accordion-docs").removeClass("hide");
+                        $(this).addClass("active");
+                      });
+                    });
+                </script><script>
+                  $("#driver-panel").addClass("active-panel");
+                  $("#gpio li:nth-child(4)").addClass("active-link");
+                  $(".accordion-docs dt:nth-child(9) a:nth-child(2) img").addClass("rotate");
+                </script>
+</div>
+            </div>
           </section>
 </div>
       </div>
