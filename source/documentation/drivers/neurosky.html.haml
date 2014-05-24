@@ -1,15 +1,24 @@
 ---
 title: Gobot - Neurosky Mindwave Driver
 author: The Hybrid Group
-page_title: Neurosky Mindwave
-page_subtitle: Driver
+page_title: Drivers
+page_subtitle: Cylon has a extensible system for connecting to hardware devices.
+page_title_docs: Neurosky Mindwave
+page_subtitle_docs: Driver
 layout: documentation
 page_title_show: true
 subnav_driver: true
 active_menu_docs: true
+subnavjs: true
 
 neurosky_platform: true
 ---
+-content_for :js_accordeon do
+  :javascript
+    $("#driver-panel").addClass("active-panel");
+    $("#others li:nth-child(2)").addClass("active-link");
+    $(".accordion-docs dt:nth-child(9) a:nth-child(2) img").addClass("rotate");
+
 %section.intro
   = image_tag "/images/devices/neurosky.jpg", class: "display"
   .info-intro

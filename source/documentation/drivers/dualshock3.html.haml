@@ -2,14 +2,23 @@
 page_title_show: true
 title: Gobot - Dualshock3 Controller Driver
 author: The Hybrid Group
-page_title: Dualshock3 Controller
-page_subtitle: Driver
+page_title: Drivers
+page_subtitle: Cylon has a extensible system for connecting to hardware devices.
+page_title_docs: Dualshock3 Controller
+page_subtitle_docs: Driver
 layout: documentation
 subnav_driver: true
 active_menu_docs: true
+subnavjs: true
 
 joystick_platform: true
 ---
+-content_for :js_accordeon do
+  :javascript
+    $("#driver-panel").addClass("active-panel");
+    $("#joystick li:nth-child(1)").addClass("active-link");
+    $(".accordion-docs dt:nth-child(9) a:nth-child(2) img").addClass("rotate");
+
 %section.intro
   =image_tag "/images/devices/dualshock3.jpg", class: "display"
   .info-intro

@@ -1,15 +1,24 @@
 ---
 title: Gobot - ARDrone Driver
 author: The Hybrid Group
-page_title: ARDrone
-page_subtitle: Driver
+page_title: Drivers
+page_subtitle: Cylon has a extensible system for connecting to hardware devices.
+page_title_docs: ARDrone
+page_subtitle_docs: Driver
 layout: documentation
 page_title_show: true
 subnav_driver: true
 active_menu_docs: true
+subnavjs: true
 
 ardrone_platform: true
 ---
+-content_for :js_accordeon do
+  :javascript
+    $("#driver-panel").addClass("active-panel");
+    $("#ardrone li:nth-child(1)").addClass("active-link");
+    $(".accordion-docs dt:nth-child(9) a:nth-child(2) img").addClass("rotate");
+
 %section.intro
   =image_tag "/images/devices/ardrone-flight.jpg", class: "display"
   .info-intro

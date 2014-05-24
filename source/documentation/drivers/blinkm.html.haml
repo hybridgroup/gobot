@@ -1,18 +1,26 @@
 ---
 title: Gobot - BlinkM Driver
 author: The Hybrid Group
-page_title: BlinkM
-page_subtitle: Driver
+page_title: Drivers
+page_subtitle: Cylon has a extensible system for connecting to hardware devices.
+page_title_docs: BlinkM
+page_subtitle_docs: Driver
 page_title_show: true
 layout: documentation
 subnav_driver: true
 subnav_circuit_driver: true
 active_menu_docs: true
+subnavjs: true
 
 beaglebone_platform: true
 arduino_platform: true
 digispark_platform: true
 ---
+-content_for :js_accordeon do
+  :javascript
+    $("#driver-panel").addClass("active-panel");
+    $("#i2c li:nth-child(1)").addClass("active-link");
+    $(".accordion-docs dt:nth-child(9) a:nth-child(2) img").addClass("rotate");
 
 %section.intro
   =image_tag "/images/devices/blinkm.jpg", class: "display"

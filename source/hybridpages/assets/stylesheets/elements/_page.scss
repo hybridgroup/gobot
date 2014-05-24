@@ -42,6 +42,39 @@
   position: fixed;
   top: 0;
   z-index: 99;
+  padding: 0 !important;
+
+  .app-logo {
+
+    display: inline-block !important;
+  }
+
+  .container-subnav {
+
+    width: $big-screen;
+    margin: 0 auto;
+
+    @include medium-screen($medium-screen, "") {
+
+      padding: 0 15px;
+    }
+
+    @include small-screen(100%, "") {
+
+      padding: 0 15px;
+    }
+  }
+
+  nav {
+  
+    float: left;
+    margin: 20px 0;
+  }
+
+  a {
+
+    margin: 20px 10px !important;
+  }
 }
 
 .marginTopSubnav {
@@ -60,25 +93,50 @@
      display: none;
   }
 
+  .app-logo {
+
+      color: $color-text-subnav-drivers;
+      font-size: 2em;
+      float: left;
+      font-family: "Russo One", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      margin-top: 5px;
+      display: none;
+  }
+
   nav {
+
 
     a {
 
       padding: 5px 10px;
-      margin: 20px 10px;
-      color: $title-color;
+      margin: 20px 2px;
+      color: $hero-color;
+      font-size: .9em;
+
+      @media only screen and (min-width: $medium-screen) and (max-width: $big-screen) {
+
+        font-size: .7em;
+      }
 
       &:hover {
 
         color: white;
-        background: $color-text-subnav-drivers;
+        background: darken($color-background-subnav-drivers,5);
       }
     }
 
     .active {
     
       color: white;
-      background: $color-text-subnav-drivers;
+      background: darken($color-background-subnav-drivers,5);
+    }
+
+    a:last-child {
+
+      &:hover {
+
+        background: none;
+      }
     }
   }
 }

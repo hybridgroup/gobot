@@ -1,15 +1,24 @@
 ---
 title: Leapmotion with Gobot
 author: The Hybrid Group
-page_title: Leapmotion
-page_subtitle: "<a href='https://github.com/hybridgroup/gobot-leapmotion' target='_blank' class='repository'>Repository</a> <a class+'issues' target='_blank' href='https://github.com/hybridgroup/gobot-leapmotion/issues'>Issues</a>"
+page_title: Platforms
+page_subtitle: Gobot has a extensible system for connecting to hardware devices. The following robotics and physical computing platforms are currently supported.
+page_title_docs: Leapmotion
+page_subtitle_docs: "<a href='https://github.com/hybridgroup/gobot-leapmotion' target='_blank' class='repository'>Repository</a> <a class+'issues' target='_blank' href='https://github.com/hybridgroup/gobot-leapmotion/issues'>Issues</a>"
 page_title_show: true
 layout: documentation
 subnav_platform: true
 active_menu_platforms: true
+subnavjs: true
 
 leapmotion_driver: true
 ---
+-content_for :js_accordeon do
+  :javascript
+    $("#platform-panel").addClass("active-panel");
+    $("#platform-panel ul li:nth-child(6)").addClass("active-link");
+    $(".accordion-docs dt:nth-child(7) a:nth-child(2) img").addClass("rotate");
+
 %section.intro
   = image_tag "/images/devices/leap_motion.jpg", class: "display"
   .info-intro

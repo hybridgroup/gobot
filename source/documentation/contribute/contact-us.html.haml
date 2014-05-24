@@ -1,0 +1,29 @@
+---
+page_title_show: true
+title: Gobot Contribute
+author: The Hybrid Group
+page_title: Contribute
+page_subtitle: "Anyone can contribute to Gobot."
+layout: documentation
+active_menu_docs: true
+---
+-content_for :js_accordeon do
+	:javascript
+		$("#contribute-panel").addClass("active-panel");
+		$("#contribute-panel li:nth-child(2)").addClass("active-link");
+		$(".accordion-docs dt:nth-child(11) a:nth-child(2) img").addClass("rotate");
+
+%h1 Contact Us
+
+%p 
+	To subscribe for announcements of releases, important changes and so on, please follow 
+	= link_to "@gobotio", "https://twitter.com/gobotio", target: :blank 
+	on Twitter.
+
+%h3 Open a new issue
+%p 
+	If you need help or you feel we can improve something, let us know! Open a 
+	= link_to "new issue.", "https://github.com/hybridgroup/gobot/issues/new", target: :blank
+
+	
+

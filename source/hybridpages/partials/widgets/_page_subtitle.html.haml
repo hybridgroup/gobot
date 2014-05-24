@@ -1,0 +1,17 @@
+- unless current_page.data.page_title_docs.nil?
+  .page-title-docs
+    .w
+      %h1.title= current_page.data.page_title_docs
+      - unless current_page.data.page_subtitle_docs.nil?
+        %h2.subtitle= current_page.data.page_subtitle_docs
+      - if content_for? :subtitle
+        %h2.subtitle= yield_content(:subtitle)
+
+- if current_page.data.subnav_driver == true
+  = partial "/hybridpages/partials/widgets/subnav_drivers" 
+
+- if current_page.data.subnav_platform == true
+  = partial "/hybridpages/partials/widgets/subnav_platforms" 
+
+- if current_page.data.subnav_nodriver_platform == true
+  = partial "/hybridpages/partials/widgets/subnav_nodriver_platform" 

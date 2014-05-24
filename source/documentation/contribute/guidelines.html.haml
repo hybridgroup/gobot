@@ -1,0 +1,44 @@
+---
+title: Contribute - Gobot - Golang framework for robotics, physical computing, and the Internet of Things
+author: The Hybrid Group
+description: Gobot Contribute
+page_title: Contribute
+page_subtitle: Anyone can contribute to Gobot
+active_menu_docs: true
+
+page_title_show: true
+layout: documentation
+---
+-content_for :js_accordeon do
+  :javascript
+    $("#contribute-panel").addClass("active-panel");
+    $("#contribute-panel li:nth-child(1)").addClass("active-link");
+    $(".accordion-docs dt:nth-child(11) a:nth-child(2) img").addClass("rotate");
+
+%h1 Guidelines
+
+%ul
+  %li 
+    All active development is in the dev branch. New or updated features must be added to the dev branch. Hotfixes will be considered on the master branch in situations where it does not alter behaviour or features, only fixes a bug.
+  %li 
+    All patches must be provided under the Apache 2.0 License
+  %li 
+    Please use the -s option in git to "sign off" that the commit is your work and you are providing it under the Apache 2.0 License
+  %li 
+    Submit a Github Pull Request to the appropriate branch and ideally discuss the changes with us in IRC.
+  %li 
+    We will look at the patch, test it out, and give you feedback.
+  %li 
+    Avoid doing minor whitespace changes, renamings, etc. along with merged content. These will be done by the maintainers from time to time but they can complicate merges and should be done seperately.
+  %li 
+    Take care to maintain the existing coding style.
+  %li 
+    go fmt your code.
+  %li 
+    Add unit tests for any new or changed functionality.
+  %li 
+    All pull requests should be "fast forward"
+    %ul 
+      %li If there are commits after yours use “git rebase -i ”
+      %li If you have local changes you may need to use “git stash”
+      %li For git help see progit which is an awesome (and free) book on git
