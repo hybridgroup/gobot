@@ -18,6 +18,10 @@ func main() {
     gobot.On(pebbleDriver.Events["button"], func(data interface{}) {
       fmt.Println("Button pushed: " + data.(string))
     })
+
+    gobot.On(pebbleDriver.Events["tap"], func(data interface{}) {
+      fmt.Println("Tap event detected")
+    })
   }
 
   robot := gobot.NewRobot("pebble", []gobot.Connection{pebbleAdaptor}, []gobot.Device{pebbleDriver}, work)

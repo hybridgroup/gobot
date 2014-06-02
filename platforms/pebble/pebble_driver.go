@@ -19,6 +19,7 @@ func NewPebbleDriver(adaptor *PebbleAdaptor, name string) *PebbleDriver {
       Events: map[string]chan interface{}{
         "button": make(chan interface{}),
         "accel":  make(chan interface{}),
+        "tap":    make(chan interface{}),
       },
       Commands: []string{
         "PublishEventC",
