@@ -16,19 +16,18 @@ func NewPebbleAdaptor(name string) *PebbleAdaptor {
 	}
 }
 
-
 func (a *PebbleAdaptor) Connect() bool {
-  return true
+	return true
 }
 
 func (a *PebbleAdaptor) Reconnect() bool {
-  return true
+	return true
 }
 
 func (a *PebbleAdaptor) Disconnect() bool {
-  return true
+	return true
 }
 
 func (a *PebbleAdaptor) Finalize() bool {
-  return true
+	return true
 }

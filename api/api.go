@@ -28,10 +28,9 @@ type api struct {
 }
 
 type server struct {
-  *martini.Martini
-  martini.Router
+	*martini.Martini
+	martini.Router
 }
-
 
 func NewApi(g *gobot.Gobot) *api {
 	return &api{
@@ -70,13 +69,13 @@ func NewApi(g *gobot.Gobot) *api {
 }
 
 func newServer() *server {
-  r := martini.NewRouter()
-  m := martini.New()
-  m.Use(martini.Recovery())
-  m.Use(martini.Static("public"))
-  m.MapTo(r, (*martini.Routes)(nil))
-  m.Action(r.Handle)
-  return &server{m, r}
+	r := martini.NewRouter()
+	m := martini.New()
+	m.Use(martini.Recovery())
+	m.Use(martini.Static("public"))
+	m.MapTo(r, (*martini.Routes)(nil))
+	m.Action(r.Handle)
+	return &server{m, r}
 }
 
 // start starts the api using the start function
