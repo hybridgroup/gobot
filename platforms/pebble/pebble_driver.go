@@ -47,12 +47,11 @@ func (d *PebbleDriver) SendNotification(message string) string {
 }
 
 func (d *PebbleDriver) PendingMessage() string {
-	i := len(d.Messages) - 1
-	if i < 0 {
+	if len(d.Messages) < 1 {
 		return ""
 	}
-	m := d.Messages[i]
-	d.Messages = append(d.Messages[i+1:], d.Messages[:i]...)
+	m := d.Messages[0]
+	d.Messages = d.Messages[1:]
 
 	return m
 }
