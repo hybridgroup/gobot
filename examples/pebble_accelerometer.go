@@ -1,27 +1,27 @@
 package main
 
 import (
-  "github.com/hybridgroup/gobot"
+	"fmt"
+	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/api"
-  "github.com/hybridgroup/gobot/platforms/pebble"
-  "fmt"
+	"github.com/hybridgroup/gobot/platforms/pebble"
 )
 
 func main() {
-  master := gobot.NewGobot()
-  api.NewApi(master).Start()
+	master := gobot.NewGobot()
+	api.NewApi(master).Start()
 
-  pebbleAdaptor := pebble.NewPebbleAdaptor("pebble")
-  pebbleDriver  := pebble.NewPebbleDriver(pebbleAdaptor, "pebble")
+	pebbleAdaptor := pebble.NewPebbleAdaptor("pebble")
+	pebbleDriver := pebble.NewPebbleDriver(pebbleAdaptor, "pebble")
 
-  work := func() {
-    gobot.On(pebbleDriver.Events["accel"], func(data interface{}) {
-      fmt.Println(data.(string))
-    })
-  }
+	work := func() {
+		gobot.On(pebbleDriver.Events["accel"], func(data interface{}) {
+			fmt.Println(data.(string))
+		})
+	}
 
-  robot := gobot.NewRobot("pebble", []gobot.Connection{pebbleAdaptor}, []gobot.Device{pebbleDriver}, work)
+	robot := gobot.NewRobot("pebble", []gobot.Connection{pebbleAdaptor}, []gobot.Device{pebbleDriver}, work)
 
-  master.Robots = append(master.Robots, robot)
-  master.Start()
+	master.Robots = append(master.Robots, robot)
+	master.Start()
 }
