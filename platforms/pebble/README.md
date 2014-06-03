@@ -5,7 +5,7 @@ Gobot (http://gobot.io/) is a library for robotics and physical computing using 
 This repository contains the Gobot adaptor for Pebble smart watch (http://getpebble.com/).
 
 It uses the Pebble 2.0 SDK, and requires the 2.0 iOS or Android app,
-and that the "Chomps" app (https://github.com/hybridgroup/chomps)
+and that the "watchbot" app (https://github.com/hybridgroup/watchbot)
 has been installed on the Pebble watch.
 
 For more information about Gobot, check out the github repo at
@@ -17,21 +17,53 @@ https://github.com/hybridgroup/gobot
 
 * Install running: ```go get github.com/hybridgroup/gobot-pebble``
 * Install Pebble 2.0 iOS or Android app. (If you haven't already)
-* Follow README to install and configure "Chomps" on your watch: https://github.com/hybridgroup/chomps
+* Follow README to install and configure "watchbot" on your watch: https://github.com/hybridgroup/watchbot
 
 ## Using
 
 * Before running the example, make sure configuration settings match with your program,
-in example, api host is your computer IP, robot name is 'pebble', robot api port is 8080 and command is PublishEventC
+in example, api host is your computer IP, robot name is 'pebble', robot api port is 8080 and publish command is PublishEventC and
+message command is PendingMessageC
 
-    your example code here...
+```
+package main
+
+import (
+	"fmt"
+	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/api"
+	"github.com/hybridgroup/gobot/platforms/pebble"
+)
+
+func main() {
+	master := gobot.NewGobot()
+	api.NewApi(master).Start()
+
+	pebbleAdaptor := pebble.NewPebbleAdaptor("pebble")
+	pebbleDriver := pebble.NewPebbleDriver(pebbleAdaptor, "pebble")
+
+	work := func() {
+		pebbleDriver.SendNotification("Hello Pebble!")
+		gobot.On(pebbleDriver.Events["button"], func(data interface{}) {
+			fmt.Println("Button pushed: " + data.(string))
+		})
+
+		gobot.On(pebbleDriver.Events["tap"], func(data interface{}) {
+			fmt.Println("Tap event detected")
+		})
+	}
+
+	robot := gobot.NewRobot("pebble", []gobot.Connection{pebbleAdaptor}, []gobot.Device{pebbleDriver}, work)
+
+	master.Robots = append(master.Robots, robot)
+	master.Start()
+}
+```
+
 ## Supported Features
 
-    * We support event detection of 3 main pebble buttons.
-
-## Upcoming Features
-
-* Accelerometer support
+* We support event detection of 3 main pebble buttons.
+* Accelerometer events
 * Pushing data to pebble watch
 
 ## Documentation
