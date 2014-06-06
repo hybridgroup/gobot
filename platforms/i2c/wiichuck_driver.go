@@ -3,7 +3,6 @@ package i2c
 import (
 	"fmt"
 	"github.com/hybridgroup/gobot"
-	"time"
 )
 
 type WiichuckDriver struct {
@@ -37,11 +36,11 @@ func NewWiichuckDriver(a I2cInterface, name string) *WiichuckDriver {
 }
 
 func (w *WiichuckDriver) Start() bool {
-	w.Adaptor.I2cStart(byte(0x52))
-	gobot.Every(100*time.Millisecond, func() {
-		w.Adaptor.I2cWrite([]uint16{uint16(0x40), uint16(0x00)})
-		w.Adaptor.I2cWrite([]uint16{uint16(0x00)})
-		new_value := w.Adaptor.I2cRead(uint16(6))
+	w.Adaptor.I2cStart(0x52)
+	gobot.Every(w.Interval, func() {
+		w.Adaptor.I2cWrite([]byte{0x40, 0x00})
+		w.Adaptor.I2cWrite([]byte{0x00})
+		new_value := w.Adaptor.I2cRead(6)
 		if len(new_value) == 6 {
 			w.update(new_value)
 		}
@@ -51,7 +50,7 @@ func (w *WiichuckDriver) Start() bool {
 func (w *WiichuckDriver) Init() bool { return true }
 func (w *WiichuckDriver) Halt() bool { return true }
 
-func (w *WiichuckDriver) update(value []uint16) {
+func (w *WiichuckDriver) update(value []byte) {
 	if w.isEncrypted(value) {
 		fmt.Println("Encrypted bytes from wii device!")
 	} else {
@@ -72,7 +71,7 @@ func (w *WiichuckDriver) calculateJoystickValue(axis float64, origin float64) fl
 	return float64(axis - origin)
 }
 
-func (w *WiichuckDriver) isEncrypted(value []uint16) bool {
+func (w *WiichuckDriver) isEncrypted(value []byte) bool {
 	if value[0] == value[1] && value[2] == value[3] && value[4] == value[5] {
 		return true
 	} else {
@@ -80,7 +79,7 @@ func (w *WiichuckDriver) isEncrypted(value []uint16) bool {
 	}
 }
 
-func (w *WiichuckDriver) decode(x uint16) float64 {
+func (w *WiichuckDriver) decode(x byte) float64 {
 	return float64((x ^ 0x17) + 0x17)
 }
 
@@ -105,7 +104,7 @@ func (w *WiichuckDriver) updateJoystick() {
 	})
 }
 
-func (w *WiichuckDriver) parse(value []uint16) {
+func (w *WiichuckDriver) parse(value []byte) {
 	w.data["sx"] = w.decode(value[0])
 	w.data["sy"] = w.decode(value[1])
 	w.data["z"] = float64(uint8(w.decode(value[5])) & 0x01)

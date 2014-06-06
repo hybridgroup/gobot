@@ -7,10 +7,10 @@ func (t TestAdaptor) I2cStart(byte) {
 	return
 }
 
-func (t TestAdaptor) I2cRead(uint16) []uint16 {
-	return []uint16{99, 1}
+func (t TestAdaptor) I2cRead(uint) []byte {
+	return []byte{99, 1}
 }
 
-func (t TestAdaptor) I2cWrite([]uint16) {
+func (t TestAdaptor) I2cWrite([]byte) {
 	return
 }
