@@ -10,6 +10,10 @@ import (
 type Device interface {
 	Start() bool
 	Halt() bool
+	setInterval(time.Duration)
+	getInterval() time.Duration
+	setName(string)
+	getName() string
 }
 
 type JsonDevice struct {
@@ -54,13 +58,29 @@ func NewDevice(driver DriverInterface, r *Robot) *device {
 	d := new(device)
 	s := reflect.ValueOf(driver).Type().String()
 	d.Type = s[1:len(s)]
-	d.Name = FieldByNamePtr(driver, "Name").String()
+	d.Name = driver.getName()
 	d.Robot = r
-	if FieldByNamePtr(driver, "Interval").String() == "" {
-		FieldByNamePtr(driver, "Interval").SetString("0.1s")
+	if driver.getInterval() == 0 {
+		driver.setInterval(10 * time.Millisecond)
 	}
 	d.Driver = driver
 	return d
+}
+
+func (d *device) setInterval(t time.Duration) {
+	d.Interval = t
+}
+
+func (d *device) getInterval() time.Duration {
+	return d.Interval
+}
+
+func (d *device) setName(s string) {
+	d.Name = s
+}
+
+func (d *device) getName() string {
+	return d.Name
 }
 
 func (d *device) Start() bool {

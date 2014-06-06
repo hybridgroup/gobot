@@ -13,4 +13,24 @@ type Driver struct {
 type DriverInterface interface {
 	Start() bool
 	Halt() bool
+	setInterval(time.Duration)
+	getInterval() time.Duration
+	setName(string)
+	getName() string
+}
+
+func (d *Driver) setInterval(t time.Duration) {
+	d.Interval = t
+}
+
+func (d *Driver) getInterval() time.Duration {
+	return d.Interval
+}
+
+func (d *Driver) setName(s string) {
+	d.Name = s
+}
+
+func (d *Driver) getName() string {
+	return d.Name
 }
