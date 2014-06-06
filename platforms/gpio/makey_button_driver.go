@@ -11,9 +11,11 @@ type MakeyButtonDriver struct {
 	data    []int
 }
 
-func NewMakeyButton(a DigitalReader) *MakeyButtonDriver {
+func NewMakeyButtonDriver(a DigitalReader, name string, pin string) *MakeyButtonDriver {
 	return &MakeyButtonDriver{
 		Driver: gobot.Driver{
+			Name: name,
+			Pin:  pin,
 			Events: map[string]chan interface{}{
 				"push":    make(chan interface{}),
 				"release": make(chan interface{}),
@@ -26,15 +28,13 @@ func NewMakeyButton(a DigitalReader) *MakeyButtonDriver {
 
 func (m *MakeyButtonDriver) Start() bool {
 	state := 0
-	go func() {
-		for {
-			new_value := m.readState()
-			if new_value != state && new_value != -1 {
-				state = new_value
-				m.update(new_value)
-			}
+	gobot.Every(m.Interval, func() {
+		new_value := m.readState()
+		if new_value != state && new_value != -1 {
+			state = new_value
+			m.update(new_value)
 		}
-	}()
+	})
 	return true
 }
 func (m *MakeyButtonDriver) Halt() bool { return true }
