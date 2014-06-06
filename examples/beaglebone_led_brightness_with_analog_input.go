@@ -16,9 +16,9 @@ func main() {
 	led := gpio.NewLedDriver(beagleboneAdaptor, "led", "P9_14")
 
 	work := func() {
-		gobot.Every(0.1*time.Second, func() {
+		gobot.Every(100*time.Millisecond, func() {
 			val := sensor.Read()
-			brightness := uint8(gpio.ToPwm(val))
+			brightness := uint8(gobot.ToScale(gobot.FromScale(float64(val), 0, 1024), 0, 255))
 			fmt.Println("sensor", val)
 			fmt.Println("brightness", brightness)
 			led.Brightness(brightness)

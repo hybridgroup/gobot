@@ -9,7 +9,7 @@ type AnalogSensorDriver struct {
 	Adaptor AnalogReader
 }
 
-func NewAnalogSensor(a AnalogReader, name string, pin string) *AnalogSensorDriver {
+func NewAnalogSensorDriver(a AnalogReader, name string, pin string) *AnalogSensorDriver {
 	return &AnalogSensorDriver{
 		Driver: gobot.Driver{
 			Name: name,

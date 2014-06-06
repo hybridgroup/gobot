@@ -173,7 +173,7 @@ func (b *BeagleboneAdaptor) I2cWrite(data []byte) {
 	b.i2cDevice.write(data)
 }
 
-func (b *BeagleboneAdaptor) I2cRead(size byte) []byte {
+func (b *BeagleboneAdaptor) I2cRead(size uint) []byte {
 	return b.i2cDevice.read(size)
 }
 

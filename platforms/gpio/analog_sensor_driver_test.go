@@ -12,7 +12,7 @@ var _ = Describe("Analog-Sensor", func() {
 	)
 
 	BeforeEach(func() {
-		a = NewAnalogSensor(t, "bot", "1")
+		a = NewAnalogSensorDriver(t, "bot", "1")
 	})
 
 	It("Must be able to Read", func() {

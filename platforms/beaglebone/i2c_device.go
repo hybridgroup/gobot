@@ -38,7 +38,7 @@ func (me *i2cDevice) write(data []byte) {
 	me.i2cDevice.Write(data)
 }
 
-func (me *i2cDevice) read(len byte) []byte {
+func (me *i2cDevice) read(len uint) []byte {
 	buf := make([]byte, len)
 	me.i2cDevice.Read(buf)
 	return buf
