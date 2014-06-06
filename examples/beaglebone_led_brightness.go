@@ -16,7 +16,7 @@ func main() {
 		brightness := uint8(0)
 		fade_amount := uint8(5)
 
-		gobot.Every(0.1*time.Second, func() {
+		gobot.Every(100*time.Millisecond, func() {
 			led.Brightness(brightness)
 			brightness = brightness + fade_amount
 			if brightness == 0 || brightness == 255 {

@@ -27,7 +27,7 @@ func main() {
 	}
 
 	master.Robots = append(master.Robots, gobot.NewRobot(
-		""
+		"",
 		nil,
 		nil,
 		func() {

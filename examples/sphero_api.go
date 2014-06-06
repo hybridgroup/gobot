@@ -6,7 +6,7 @@ import (
 	"github.com/hybridgroup/gobot/platforms/sphero"
 )
 
-Master := gobot.NewGobot()
+var Master gobot.Gobot
 
 func TurnBlue(params map[string]interface{}) bool {
 	spheroDriver := Master.FindRobotDevice(params["robotname"].(string), "sphero")
@@ -15,6 +15,7 @@ func TurnBlue(params map[string]interface{}) bool {
 }
 
 func main() {
+	Master = gobot.NewGobot()
 	api.Api(Master).Start()
 
 	spheros := map[string]string{

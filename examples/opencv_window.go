@@ -21,5 +21,5 @@ func main() {
 	gbot.Robots = append(gbot.Robots,
 		gobot.NewRobot("cameraBot", []gobot.Connection{}, []gobot.Device{window, camera}, work))
 
-	gbot.Start()}
+	gbot.Start()
 }

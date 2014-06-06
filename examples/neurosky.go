@@ -45,8 +45,8 @@ func main() {
 		})
 	}
 
-	gbot.Robots := append(gbot.Robots, 
-		gobot.NewRobot("brainBot",[]gobot.Connection{adaptor},[]gobot.Device{neuro},work))
+	gbot.Robots = append(gbot.Robots,
+		gobot.NewRobot("brainBot", []gobot.Connection{adaptor}, []gobot.Device{neuro}, work))
 
 	gbot.Start()
 }
