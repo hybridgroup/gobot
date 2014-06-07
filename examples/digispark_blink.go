@@ -13,7 +13,7 @@ func main() {
 	led := gpio.NewLedDriver(digisparkAdaptor, "led", "0")
 
 	work := func() {
-		gobot.Every(0.5*time.Second, func() {
+		gobot.Every(1*time.Second, func() {
 			led.Toggle()
 		})
 	}

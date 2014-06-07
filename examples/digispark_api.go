@@ -8,11 +8,11 @@ import (
 )
 
 func main() {
-	master := gobot.NewGobot()
-	api.NewApi(master).Start()
+	gbot := gobot.NewGobot()
+	api.NewApi(gbot).Start()
 
 	digisparkAdaptor := digispark.NewDigisparkAdaptor("Digispark")
-	led := gpio.NewLed(digisparkAdaptor, "led", "0")
+	led := gpio.NewLedDriver(digisparkAdaptor, "led", "0")
 
 	gbot.Robots = append(gbot.Robots,
 		gobot.NewRobot("digispark", []gobot.Connection{digisparkAdaptor}, []gobot.Device{led}, nil))
