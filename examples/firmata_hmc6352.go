@@ -15,7 +15,7 @@ func main() {
 	hmc6352 := i2c.NewHMC6352Driver(firmataAdaptor, "hmc6352")
 
 	work := func() {
-		gobot.Every(0.1*time.Second, func() {
+		gobot.Every(100*time.Millisecond, func() {
 			fmt.Println("Heading", hmc6352.Heading)
 		})
 	}

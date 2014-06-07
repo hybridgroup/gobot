@@ -69,7 +69,7 @@ type pin struct {
 type event struct {
 	Name     string
 	Data     []byte
-	I2cReply map[string][]uint16
+	I2cReply map[string][]byte
 }
 
 func newBoard(sp io.ReadWriteCloser) *board {
@@ -208,11 +208,11 @@ func (b *board) togglePinReporting(pin byte, state byte, mode byte) {
 	b.write([]byte{mode | pin, state})
 }
 
-func (b *board) i2cReadRequest(slave_address byte, num_bytes uint16) {
+func (b *board) i2cReadRequest(slave_address byte, num_bytes uint) {
 	b.write([]byte{START_SYSEX, I2C_REQUEST, slave_address, (I2C_MODE_READ << 3), byte(num_bytes & 0x7F), byte(((num_bytes >> 7) & 0x7F)), END_SYSEX})
 }
 
-func (b *board) i2cWriteRequest(slave_address byte, data []uint16) {
+func (b *board) i2cWriteRequest(slave_address byte, data []byte) {
 	ret := []byte{START_SYSEX, I2C_REQUEST, slave_address, (I2C_MODE_WRITE << 3)}
 	for _, val := range data {
 		ret = append(ret, byte(val&0x7F))
@@ -222,7 +222,7 @@ func (b *board) i2cWriteRequest(slave_address byte, data []uint16) {
 	b.write(ret)
 }
 
-func (b *board) i2cConfig(data []uint16) {
+func (b *board) i2cConfig(data []byte) {
 	ret := []byte{START_SYSEX, I2C_CONFIG}
 	for _, val := range data {
 		ret = append(ret, byte(val&0xFF))
@@ -348,10 +348,10 @@ func (me *board) process(data []byte) {
 
 				me.Events = append(me.Events, event{Name: fmt.Sprintf("pin_%v_state", current_buffer[2]), Data: []byte{byte(pin.Value & 0xff)}})
 			case I2C_REPLY:
-				i2c_reply := map[string][]uint16{
-					"slave_address": []uint16{uint16(current_buffer[2]) | uint16(current_buffer[3])<<7},
-					"register":      []uint16{uint16(current_buffer[4]) | uint16(current_buffer[5])<<7},
-					"data":          []uint16{uint16(current_buffer[6]) | uint16(current_buffer[7])<<7},
+				i2c_reply := map[string][]byte{
+					"slave_address": []byte{byte(current_buffer[2]) | byte(current_buffer[3])<<7},
+					"register":      []byte{byte(current_buffer[4]) | byte(current_buffer[5])<<7},
+					"data":          []byte{byte(current_buffer[6]) | byte(current_buffer[7])<<7},
 				}
 				for i := 8; i < len(current_buffer); i = i + 2 {
 					if current_buffer[i] == byte(0xF7) {
@@ -360,7 +360,7 @@ func (me *board) process(data []byte) {
 					if i+2 > len(current_buffer) {
 						break
 					}
-					i2c_reply["data"] = append(i2c_reply["data"], uint16(current_buffer[i])|uint16(current_buffer[i+1])<<7)
+					i2c_reply["data"] = append(i2c_reply["data"], byte(current_buffer[i])|byte(current_buffer[i+1])<<7)
 				}
 				me.Events = append(me.Events, event{Name: "i2c_reply", I2cReply: i2c_reply})
 

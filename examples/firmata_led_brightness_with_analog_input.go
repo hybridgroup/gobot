@@ -11,13 +11,13 @@ import (
 func main() {
 	gbot := gobot.NewGobot()
 	firmataAdaptor := firmata.NewFirmataAdaptor("firmata", "/dev/ttyACM0")
-	sensor := gpio.NewAnalogSensor(firmataAdaptor, "sensor", "0")
-	led := gpio.NewLed(firmataAdaptor, "led", "3")
+	sensor := gpio.NewAnalogSensorDriver(firmataAdaptor, "sensor", "0")
+	led := gpio.NewLedDriver(firmataAdaptor, "led", "3")
 
 	work := func() {
-		gobot.Every(0.1*time.Second, func() {
+		gobot.Every(100*time.Millisecond, func() {
 			val := sensor.Read()
-			brightness := uint8(gpio.ToPwm(val))
+			brightness := uint8(gobot.ToScale(gobot.FromScale(float64(val), 0, 1024), 0, 255))
 			fmt.Println("sensor", val)
 			fmt.Println("brightness", brightness)
 			led.Brightness(brightness)

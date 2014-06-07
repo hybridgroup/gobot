@@ -29,7 +29,7 @@ func main() {
 				z = gobot.ToScale(gobot.FromScale(hand.Z(), -300, 300), 30, 150)
 			}
 		})
-		gobot.Every(0.01*time.Second, func() {
+		gobot.Every(10*time.Millisecond, func() {
 			servo1.Move(uint8(x))
 			servo2.Move(uint8(z))
 			fmt.Println("Current Angle: ", servo1.CurrentAngle, ",", servo2.CurrentAngle)

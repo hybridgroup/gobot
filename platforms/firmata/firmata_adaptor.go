@@ -99,19 +99,19 @@ func (f *FirmataAdaptor) digitalPin(pin int) int {
 
 func (f *FirmataAdaptor) I2cStart(address byte) {
 	f.i2cAddress = address
-	f.Board.i2cConfig([]uint16{0})
+	f.Board.i2cConfig([]byte{0})
 }
 
-func (f *FirmataAdaptor) I2cRead(size uint16) []uint16 {
+func (f *FirmataAdaptor) I2cRead(size uint) []byte {
 	f.Board.i2cReadRequest(f.i2cAddress, size)
 
 	events := f.Board.findEvents("i2c_reply")
 	if len(events) > 0 {
 		return events[len(events)-1].I2cReply["data"]
 	}
-	return make([]uint16, 0)
+	return make([]byte, 0)
 }
 
-func (f *FirmataAdaptor) I2cWrite(data []uint16) {
+func (f *FirmataAdaptor) I2cWrite(data []byte) {
 	f.Board.i2cWriteRequest(f.i2cAddress, data)
 }

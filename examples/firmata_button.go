@@ -4,7 +4,6 @@ import (
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/firmata"
 	"github.com/hybridgroup/gobot/platforms/gpio"
-	"time"
 )
 
 func main() {
@@ -16,9 +15,6 @@ func main() {
 	led := gpio.NewLedDriver(firmataAdaptor, "myLed", "13")
 
 	work := func() {
-		gobot.Every(1*time.Second, func() {
-			led.Toggle()
-		})
 		gobot.On(button.Events["push"], func(data interface{}) {
 			led.On()
 		})
@@ -28,7 +24,7 @@ func main() {
 	}
 
 	gbot.Robots = append(gbot.Robots,
-		gobot.NewRobot("buttonBot", []robot.Connection{firmataAdaptor}, []robot.Device{button, led}, work),
+		gobot.NewRobot("buttonBot", []gobot.Connection{firmataAdaptor}, []gobot.Device{button, led}, work),
 	)
 
 	gbot.Start()

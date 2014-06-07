@@ -61,16 +61,16 @@ var _ = Describe("FirmataAdaptor", func() {
 		adaptor.I2cStart(0x00)
 	})
 	It("I2cRead should return [] on no data", func() {
-		Expect(adaptor.I2cRead(1)).To(Equal(make([]uint16, 0)))
+		Expect(adaptor.I2cRead(1)).To(Equal(make([]byte, 0)))
 	})
 	It("I2cRead should return data", func() {
-		i := []uint16{100}
-		i2c_reply := map[string][]uint16{}
+		i := []byte{100}
+		i2c_reply := map[string][]byte{}
 		i2c_reply["data"] = i
 		adaptor.Board.Events = append(adaptor.Board.Events, event{Name: "i2c_reply", I2cReply: i2c_reply})
 		Expect(adaptor.I2cRead(1)).To(Equal(i))
 	})
 	It("Must be able to I2cWrite", func() {
-		adaptor.I2cWrite([]uint16{0x00, 0x01})
+		adaptor.I2cWrite([]byte{0x00, 0x01})
 	})
 })

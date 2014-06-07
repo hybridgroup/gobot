@@ -15,7 +15,10 @@ func main() {
 
 	work := func() {
 		gobot.Every(3*time.Second, func() {
-			blinkm.Rgb(byte(gobot.Rand(255)), byte(gobot.Rand(255)), byte(gobot.Rand(255)))
+			r := byte(gobot.Rand(255))
+			g := byte(gobot.Rand(255))
+			b := byte(gobot.Rand(255))
+			blinkm.Rgb(r, g, b)
 			fmt.Println("color", blinkm.Color())
 		})
 	}

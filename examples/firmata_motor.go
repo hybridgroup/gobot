@@ -16,7 +16,7 @@ func main() {
 		speed := byte(0)
 		fade_amount := byte(15)
 
-		gobot.Every(0.1*time.Second, func() {
+		gobot.Every(100*time.Millisecond, func() {
 			motor.Speed(speed)
 			speed = speed + fade_amount
 			if speed == 0 || speed == 255 {

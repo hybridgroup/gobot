@@ -27,15 +27,13 @@ func NewButtonDriver(a DigitalReader, name string, pin string) *ButtonDriver {
 
 func (b *ButtonDriver) Start() bool {
 	state := 0
-	go func() {
-		for {
-			new_value := b.readState()
-			if new_value != state && new_value != -1 {
-				state = new_value
-				b.update(new_value)
-			}
+	gobot.Every(b.Interval, func() {
+		new_value := b.readState()
+		if new_value != state && new_value != -1 {
+			state = new_value
+			b.update(new_value)
 		}
-	}()
+	})
 	return true
 }
 func (b *ButtonDriver) Halt() bool { return true }
