@@ -14,7 +14,7 @@ func main() {
 
 	work := func() {
 		gobot.On(wiichuck.Events["joystick"], func(data interface{}) {
-			fmt.Println("joystick")
+			fmt.Println("joystick", data)
 		})
 
 		gobot.On(wiichuck.Events["c_button"], func(data interface{}) {

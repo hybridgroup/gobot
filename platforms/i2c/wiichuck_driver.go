@@ -32,6 +32,7 @@ func NewWiichuckDriver(a I2cInterface, name string) *WiichuckDriver {
 			"z":  0,
 			"c":  0,
 		},
+		Adaptor: a,
 	}
 }
 
