@@ -12,7 +12,7 @@ func Hello(params map[string]interface{}) string {
 }
 
 func main() {
-	master := gobot.GobotMaster()
+	master := gobot.NewGobot()
 
 	server := api.NewApi(master)
 	server.Username = "gort"

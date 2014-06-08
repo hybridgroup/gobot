@@ -14,7 +14,7 @@ func main() {
 		nil,
 		nil,
 		func() {
-			gobot.Every(0.5*time.Second, func() { fmt.Println("Greetings human") })
+			gobot.Every(500*time.Millisecond, func() { fmt.Println("Greetings human") })
 		},
 	)
 

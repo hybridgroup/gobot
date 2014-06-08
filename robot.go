@@ -44,7 +44,6 @@ func NewRobot(name string, c []Connection, d []Device, work func()) *Robot {
 	}
 	r.initName()
 	log.Println("Initializing Robot", r.Name, "...")
-	r.initCommands()
 	r.initConnections(c)
 	r.initDevices(d)
 	return r
@@ -52,6 +51,7 @@ func NewRobot(name string, c []Connection, d []Device, work func()) *Robot {
 
 func (r *Robot) Start() {
 	log.Println("Starting Robot", r.Name, "...")
+	r.initCommands()
 	if err := r.Connections().Start(); err != nil {
 		panic("Could not start connections")
 	}
