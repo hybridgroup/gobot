@@ -6,17 +6,17 @@ import (
 	"github.com/hybridgroup/gobot/platforms/sphero"
 )
 
-var Master gobot.Gobot
+var Master *gobot.Gobot
 
 func TurnBlue(params map[string]interface{}) bool {
-	spheroDriver := Master.FindRobotDevice(params["robotname"].(string), "sphero")
-	gobot.Call(sphero.Driver, "SetRGB", uint8(0), uint8(0), uint8(255))
+	s := Master.Robot(params["robotname"].(string)).Device("sphero")
+	gobot.Call(s.Driver, "SetRGB", uint8(0), uint8(0), uint8(255))
 	return true
 }
 
 func main() {
 	Master = gobot.NewGobot()
-	api.Api(Master).Start()
+	api.NewApi(Master).Start()
 
 	spheros := map[string]string{
 		"Sphero-BPO": "/dev/rfcomm0",

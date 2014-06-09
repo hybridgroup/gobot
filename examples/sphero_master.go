@@ -32,7 +32,7 @@ func main() {
 		nil,
 		func() {
 			gobot.Every(1*time.Second, func() {
-				gobot.Call(master.FindRobot("Sphero-BPO").GetDevice("spheroDriver").Driver, "SetRGB", uint8(gobot.Rand(255)), uint8(gobot.Rand(255)), uint8(gobot.Rand(255)))
+				gobot.Call(master.Robot("Sphero-BPO").Device("sphero").Driver, "SetRGB", uint8(gobot.Rand(255)), uint8(gobot.Rand(255)), uint8(gobot.Rand(255)))
 			})
 		},
 	))

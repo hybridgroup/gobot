@@ -35,7 +35,7 @@ func main() {
 
 			conway.birth()
 
-			gobot.On(sphero.Events["Collision"], func(data interface{}) {
+			gobot.On(cell.Events["Collision"], func(data interface{}) {
 				conway.contact()
 			})
 
