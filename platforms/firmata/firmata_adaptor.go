@@ -93,6 +93,10 @@ func (f *FirmataAdaptor) AnalogRead(pin string) int {
 	return -1
 }
 
+func (f *FirmataAdaptor) AnalogWrite(pin string, level byte) {
+	f.PwmWrite(pin, level)
+}
+
 func (f *FirmataAdaptor) digitalPin(pin int) int {
 	return pin + 14
 }
