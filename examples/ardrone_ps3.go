@@ -16,8 +16,8 @@ type pair struct {
 func main() {
 	gbot := gobot.NewGobot()
 
-	joystickAdaptor := joystick.NewJoystickAdaptor("ps3", "../joystick/configs/dualshock3.json")
-	joystick := joystick.NewJoystickDriver(joystickAdaptor, "ps3")
+	joystickAdaptor := joystick.NewJoystickAdaptor("ps3")
+	joystick := joystick.NewJoystickDriver(joystickAdaptor, "ps3", "./platforms/joystick/configs/dualshock3.json")
 
 	ardroneAdaptor := ardrone.NewArdroneAdaptor("Drone")
 	drone := ardrone.NewArdroneDriver(ardroneAdaptor, "Drone")
@@ -61,7 +61,7 @@ func main() {
 			}
 		})
 
-		gobot.Every(0.01*time.Second, func() {
+		gobot.Every(10*time.Millisecond, func() {
 			pair := left_stick
 			if pair.y < -10 {
 				drone.Forward(validatePitch(pair.y, offset))
@@ -80,7 +80,7 @@ func main() {
 			}
 		})
 
-		gobot.Every(0.01*time.Second, func() {
+		gobot.Every(10*time.Millisecond, func() {
 			pair := right_stick
 			if pair.y < -10 {
 				drone.Up(validatePitch(pair.y, offset))
@@ -100,7 +100,7 @@ func main() {
 		})
 	}
 
-	gbot.Robot = append(gbot.Robots,
+	gbot.Robots = append(gbot.Robots,
 		gobot.NewRobot("ardrone", []gobot.Connection{joystickAdaptor, ardroneAdaptor}, []gobot.Device{joystick, drone}, work))
 
 	gbot.Start()

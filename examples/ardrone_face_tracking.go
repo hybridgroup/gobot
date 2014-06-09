@@ -13,12 +13,14 @@ import (
 )
 
 func main() {
+	runtime.GOMAXPROCS(runtime.NumCPU())
+
 	gbot := gobot.NewGobot()
 
 	_, currentfile, _, _ := runtime.Caller(0)
 	cascade := path.Join(path.Dir(currentfile), "haarcascade_frontalface_alt.xml")
 	window := opencv.NewWindowDriver("window")
-	camera := opencv.NewCamera("camera", "tcp://192.168.1.1:5555")
+	camera := opencv.NewCameraDriver("camera", "tcp://192.168.1.1:5555")
 	ardroneAdaptor := ardrone.NewArdroneAdaptor("Drone")
 	drone := ardrone.NewArdroneDriver(ardroneAdaptor, "drone")
 
@@ -37,7 +39,7 @@ func main() {
 			gobot.After(2*time.Second, func() { drone.Hover() })
 			gobot.After(5*time.Second, func() {
 				detect = true
-				gobot.Every(0.3*time.Second, func() {
+				gobot.Every(300*time.Millisecond, func() {
 					drone.Hover()
 					i := image
 					faces := opencv.DetectFaces(cascade, i)
@@ -50,7 +52,7 @@ func main() {
 						}
 					}
 					if face != nil {
-						opencv.DrawRectangles(i, []*cv.Rect{face})
+						opencv.DrawRectangles(i, []*cv.Rect{face}, 0, 255, 0, 5)
 						center_x := float64(image.Width()) * 0.5
 						turn := -(float64(face.X()) - center_x) / center_x
 						fmt.Println("turning:", turn)
@@ -70,5 +72,5 @@ func main() {
 	gbot.Robots = append(gbot.Robots,
 		gobot.NewRobot("face", []gobot.Connection{ardroneAdaptor}, []gobot.Device{window, camera, drone}, work))
 
-	robot.Start()
+	gbot.Start()
 }
