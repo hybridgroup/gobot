@@ -12,99 +12,87 @@ Want to use Ruby or Javascript on robots? Check out our sister projects Artoo (h
 
 ## Examples
 
-### Basic
-
-#### Gobot on Sphero
+#### Gobot with Arduino
 
 ```go
 package main
 
 import (
   "github.com/hybridgroup/gobot"
-  "github.com/hybridgroup/gobot-sphero"
+  "github.com/hybridgroup/gobot/platforms/firmata"
+  "github.com/hybridgroup/gobot/platforms/gpio"
+  "time"
 )
 
 func main() {
+  gbot := gobot.NewGobot()
 
-  spheroAdaptor := new(gobotSphero.SpheroAdaptor)
-  spheroAdaptor.Name = "Sphero"
-  spheroAdaptor.Port = "/dev/rfcomm0"
-
-  sphero := gobotSphero.NewSphero(spheroAdaptor)
-  sphero.Name = "Sphero"
+  firmataAdaptor := firmata.NewFirmataAdaptor("myFirmata", "/dev/ttyACM0")
+  led := gpio.NewLedDriver(firmataAdaptor, "myLed", "13")
 
   work := func() {
-    gobot.Every("2s", func() {
-      sphero.Roll(100, uint16(gobot.Rand(360)))
-    })
-  }
-
-  robot := gobot.Robot{
-    Connections: []gobot.Connection{spheroAdaptor},
-    Devices:     []gobot.Device{sphero},
-    Work:        work,
-  }
-
-  robot.Start()
-}
-```
-#### Gobot on Arduino
-
-```go
-package main
-
-import (
-  "github.com/hybridgroup/gobot"
-  "github.com/hybridgroup/gobot-firmata"
-  "github.com/hybridgroup/gobot-gpio"
-)
-
-func main() {
-
-  firmata := new(gobotFirmata.FirmataAdaptor)
-  firmata.Name = "firmata"
-  firmata.Port = "/dev/ttyACM0"
-
-  led := gobotGPIO.NewLed(firmata)
-  led.Name = "led"
-  led.Pin = "13"
-
-  work := func() {
-    gobot.Every("1s", func() {
+    gobot.Every(1*time.Second, func() {
       led.Toggle()
     })
   }
 
-  robot := gobot.Robot{
-    Connections: []gobot.Connection{firmata},
-    Devices:     []gobot.Device{led},
-    Work:        work,
+  gbot.Robots = append(gbot.Robots,
+    gobot.NewRobot("blinkBot", []gobot.Connection{firmataAdaptor}, []gobot.Device{led}, work))
+
+  gbot.Start()
+}
+```
+
+#### Gobot with Sphero
+
+```go
+package main
+
+import (
+  "github.com/hybridgroup/gobot"
+  "github.com/hybridgroup/gobot/platforms/sphero"
+  "time"
+)
+
+func main() {
+  gbot := gobot.NewGobot()
+
+  adaptor := sphero.NewSpheroAdaptor("Sphero", "/dev/rfcomm0")
+  ball := sphero.NewSpheroDriver(adaptor, "sphero")
+
+  work := func() {
+    gobot.Every(3*time.Second, func() {
+      ball.Roll(30, uint16(gobot.Rand(360)))
+    })
   }
 
-  robot.Start()
+  gbot.Robots = append(gbot.Robots,
+    gobot.NewRobot("sphero", []gobot.Connection{adaptor}, []gobot.Device{ball}, work))
+
+  gbot.Start()
 }
 ```
 
 ## Hardware Support
 Gobot has a extensible system for connecting to hardware devices. The following robotics and physical computing platforms are currently supported:
   
-  - [Ardrone](http://ardrone2.parrot.com/) <==> [Library](https://github.com/hybridgroup/gobot-ardrone)
-  - [Arduino](http://www.arduino.cc/) <==> [Library](https://github.com/hybridgroup/gobot-firmata)
-  - [Beaglebone Black](http://beagleboard.org/Products/BeagleBone+Black/) <=> [Library](https://github.com/hybridgroup/gobot-beaglebone)
-  - [Joystick](http://en.wikipedia.org/wiki/Joystick) <=> [Library](https://github.com/hybridgroup/gobot-joystick)
-  - [Digispark](http://digistump.com/products/1) <=> [Library](https://github.com/hybridgroup/gobot-digispark)
-  - [Joystick](http://en.wikipedia.org/wiki/Joystick) <=> [Library](https://github.com/hybridgroup/gobot-joystick)
-  - [Leap Motion](https://www.leapmotion.com/) <=> [Library](https://github.com/hybridgroup/gobot-leapmotion)
-  - [Neurosky](http://neurosky.com/products-markets/eeg-biosensors/hardware/) <=> [Library](https://github.com/hybridgroup/gobot-neurosky)
-  - [OpenCV](http://opencv.org/) <=> [Library](https://github.com/hybridgroup/gobot-opencv)
-  - [Spark](https://www.spark.io/) <=> [Library](https://github.com/hybridgroup/gobot-spark)
-  - [Sphero](http://www.gosphero.com/) <=> [Library](https://github.com/hybridgroup/gobot-sphero)
+  - [Ardrone](http://ardrone2.parrot.com/) <=> [Library](https://github.com/hybridgroup/tree/master/platforms/ardrone)
+  - [Arduino](http://www.arduino.cc/) <=> [Library](https://github.com/hybridgroup/tree/master/platforms/firmata)
+  - [Beaglebone Black](http://beagleboard.org/Products/BeagleBone+Black/) <=> [Library](https://github.com/hybridgroup/tree/dev/platforms/beaglebone)
+  - [Joystick](http://en.wikipedia.org/wiki/Joystick) <=> [Library](https://github.com/hybridgroup/tree/dev/platforms/joystick)
+  - [Digispark](http://digistump.com/products/1) <=> [Library](https://github.com/hybridgroup/tree/dev/platforms/digispark)
+  - [Joystick](http://en.wikipedia.org/wiki/Joystick) <=> [Library](https://github.com/hybridgroup/tree/dev/platforms/joystick)
+  - [Leap Motion](https://www.leapmotion.com/) <=> [Library](https://github.com/hybridgroup/tree/dev/platforms/leapmotion)
+  - [Neurosky](http://neurosky.com/products-markets/eeg-biosensors/hardware/) <=> [Library](https://github.com/hybridgroup/tree/dev/platforms/neurosky)
+  - [OpenCV](http://opencv.org/) <=> [Library](https://github.com/hybridgroup/tree/dev/platforms/opencv)
+  - [Spark](https://www.spark.io/) <=> [Library](https://github.com/hybridgroup/tree/dev/platforms/spark)
+  - [Sphero](http://www.gosphero.com/) <=> [Library](https://github.com/hybridgroup/tree/dev/platforms/sphero)
   
 
 Support for many devices that use General Purpose Input/Output (GPIO) have
 a shared set of drivers provded using the cylon-gpio module:
 
-  - [GPIO](https://en.wikipedia.org/wiki/General_Purpose_Input/Output) <=> [Drivers](https://github.com/hybridgroup/gobot-gpio)
+  - [GPIO](https://en.wikipedia.org/wiki/General_Purpose_Input/Output) <=> [Drivers](https://github.com/hybridgroup/tree/dev/platforms/gpio)
     - Analog Sensor
     - Button
     - Digital Sensor
@@ -115,7 +103,7 @@ a shared set of drivers provded using the cylon-gpio module:
 Support for devices that use Inter-Integrated Circuit (I2C) have a shared set of
 drivers provded using the gobot-i2c module:
 
-  - [I2C](https://en.wikipedia.org/wiki/I%C2%B2C) <=> [Drivers](https://github.com/hybridgroup/gobot-i2c)
+  - [I2C](https://en.wikipedia.org/wiki/I%C2%B2C) <=> [Drivers](https://github.com/hybridgroup/tree/dev/platforms/i2c)
     - BlinkM
     - HMC6352
     - Wii Nunchuck Controller
@@ -124,28 +112,27 @@ More platforms and drivers are coming soon...
 
 ## Getting Started
 
-Install the library with: `go get -u github.com/hybridgroup/gobot`
-
-Then install additional libraries for whatever hardware support you want to use from your robot. For example, `go get -u github.com/hybridgroup/gobot-sphero` to use Gobot with a Sphero.
+Install Gobot with: `go get -u github.com/hybridgroup/gobot`
 
 ## API:
 
 Gobot includes a RESTful API to query the status of any robot running within a group, including the connection and device status, and execute device commands.
 
-To activate the API, use the `Api` command like this:
+To activate the API, require the `github.com/hybridgroup/gobot/api` package and instantiate the `Api` like this:
 
 ```go 
-  master := gobot.GobotMaster()
-  gobot.Api(master)
+  master := gobot.NewGobot()
+  api.NewApi(master).Start()
 ```
 
 You can also specify the api host and port, and turn on authentication:
 ```go 
-  master := gobot.GobotMaster()
-  api := gobot.Api(master)
-  api.Port = "4000"
-  api.Username = "Gort"
-  api.Password = "klaatu"
+  master := gobot.NewGobot()
+  server := api.NewApi(master)
+  server.Port = "4000"
+  server.Username = "Gort"
+  server.Password = "klaatu"
+  server.Start()
 ```
 
 In order to use the [robeaux](https://github.com/hybridgroup/robeaux) AngularJS interface with Gobot you simply clone the robeaux repo and place it in the directory of your Gobot program. The robeaux assets must be in a folder called `robeaux`.
