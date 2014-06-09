@@ -9,7 +9,7 @@ import (
 func main() {
 	gbot := gobot.NewGobot()
 	joystickAdaptor := joystick.NewJoystickAdaptor("ps3")
-	joystickDriver := joystick.NewJoystickDriver(joystickAdaptor, "ps3", "../joystick/configs/dualshock3.json")
+	joystickDriver := joystick.NewJoystickDriver(joystickAdaptor, "ps3", "./platforms/joystick/configs/dualshock3.json")
 
 	work := func() {
 		gobot.On(joystickDriver.Events["square_press"], func(data interface{}) {
