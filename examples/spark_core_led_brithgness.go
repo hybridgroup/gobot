@@ -11,13 +11,13 @@ func main() {
 	master := gobot.NewGobot()
 
 	sparkCore := spark.NewSparkCoreAdaptor("spark", "device_id", "access_token")
-	led := gpio.NewLed(sparkCore, "led", "A1")
+	led := gpio.NewLedDriver(sparkCore, "led", "A1")
 
 	work := func() {
 		brightness := uint8(0)
-		fade_amount := uint8(15)
+		fade_amount := uint8(25)
 
-		gobot.Every(0.5*time.Second, func() {
+		gobot.Every(500*time.Millisecond, func() {
 			led.Brightness(brightness)
 			brightness = brightness + fade_amount
 			if brightness == 0 || brightness == 255 {

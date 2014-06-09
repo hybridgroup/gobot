@@ -11,7 +11,7 @@ func main() {
 	master := gobot.NewGobot()
 
 	sparkCore := spark.NewSparkCoreAdaptor("spark", "device_id", "access_token")
-	led := gpio.NewLed(sparkCore, "led", "D7")
+	led := gpio.NewLedDriver(sparkCore, "led", "D7")
 
 	work := func() {
 		gobot.Every(1*time.Second, func() {
