@@ -6,6 +6,7 @@ import (
 	"github.com/hybridgroup/gobot/platforms/opencv"
 	"path"
 	"runtime"
+	"time"
 )
 
 func main() {
@@ -19,20 +20,20 @@ func main() {
 
 	work := func() {
 		var image *cv.IplImage
+
 		gobot.On(camera.Events["Frame"], func(data interface{}) {
 			image = data.(*cv.IplImage)
 		})
 
-		go func() {
-			for {
-				if image != nil {
-					i := image.Clone()
-					faces := opencv.DetectFaces(cascade, i)
-					i = opencv.DrawRectangles(i, faces, 0, 255, 0, 5)
-					window.ShowImage(i)
-				}
+		gobot.Every(500*time.Millisecond, func() {
+			if image != nil {
+				i := image.Clone()
+				faces := opencv.DetectFaces(cascade, i)
+				i = opencv.DrawRectangles(i, faces, 0, 255, 0, 5)
+				window.ShowImage(i)
 			}
-		}()
+
+		})
 	}
 
 	gbot.Robots = append(gbot.Robots,
