@@ -9,16 +9,16 @@ import (
 func main() {
 	gbot := gobot.NewGobot()
 	leapMotionAdaptor := leap.NewLeapMotionAdaptor("leap", "127.0.0.1:6437")
-	leapMotionDriver := leap.NewLeapMotionDriver(leapMotionAdaptor, "leap")
+	l := leap.NewLeapMotionDriver(leapMotionAdaptor, "leap")
 
 	work := func() {
-		gobot.On(leap.Events["Message"], func(data interface{}) {
+		gobot.On(l.Events["Message"], func(data interface{}) {
 			printHands(data.(leap.Frame))
 		})
 	}
 
 	gbot.Robots = append(gbot.Robots, gobot.NewRobot(
-		"leapBot", []gobot.Connection{leapMotionAdaptor}, []gobot.Device{leapMotionDriver}, work))
+		"leapBot", []gobot.Connection{leapMotionAdaptor}, []gobot.Device{l}, work))
 
 	gbot.Start()
 }
