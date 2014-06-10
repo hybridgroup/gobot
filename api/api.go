@@ -17,7 +17,7 @@ import (
 // all the robots.
 type api struct {
 	gobot    *gobot.Gobot
-	server   *server
+	server   *martini.ClassicMartini
 	Host     string
 	Port     string
 	Username string
@@ -25,11 +25,6 @@ type api struct {
 	Cert     string
 	Key      string
 	start    func(*api)
-}
-
-type server struct {
-	*martini.Martini
-	martini.Router
 }
 
 func NewApi(g *gobot.Gobot) *api {
@@ -68,20 +63,10 @@ func NewApi(g *gobot.Gobot) *api {
 	}
 }
 
-func newServer() *server {
-	r := martini.NewRouter()
-	m := martini.New()
-	m.Use(martini.Recovery())
-	m.Use(martini.Static("public"))
-	m.MapTo(r, (*martini.Routes)(nil))
-	m.Action(r.Handle)
-	return &server{m, r}
-}
-
 // start starts the api using the start function
 // sets on the API on initialization.
 func (a *api) Start() {
-	a.server = newServer()
+	a.server = martini.Classic()
 
 	a.server.Use(martini.Static("robeaux"))
 	a.server.Use(cors.Allow(&cors.Options{
