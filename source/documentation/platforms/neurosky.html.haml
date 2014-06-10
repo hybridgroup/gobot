@@ -24,10 +24,10 @@ neurosky_driver: true
   .info-intro
     %p NeuroSky delivers fully integrated, single chip EEG biosensors. NeuroSky enables its partners and developers to bring their brainwave application ideas to market with the shortest amount of time, and lowest end consumer price.
 
-    %p
-      For more info about the Neurosky platform click
-      = succeed "." do
-        = link_to "here", "http://neurosky.com/products-markets/eeg-biosensors/hardware/", target: :blank
+    %p 
+      This package contains the Gobot adaptor and driver for the 
+      = link_to "Neurosky Mindwave Mobile EEG.", "http://store.neurosky.com/products/mindwave-mobile", tagert: :blank
+
   .clear
   
 %section.how-to#HowToInstall
@@ -35,7 +35,7 @@ neurosky_driver: true
   %p Installing Gobot with Neurosky support is pretty easy.
   :markdown
         :::bash
-        go get github.com/hybridgroup/gobot-neurosky
+        go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/platforms/neurosky
 
 %section.how-to#HowToUse
   %h2 How To Use
@@ -46,19 +46,16 @@ neurosky_driver: true
         package main
 
         import (
-          "github.com/hybridgroup/gobot"
-          "github.com/hybridgroup/gobot-neurosky"
           "fmt"
+          "github.com/hybridgroup/gobot"
+          "github.com/hybridgroup/gobot/platforms/neurosky"
         )
 
         func main() {
+          gbot := gobot.NewGobot()
 
-          adaptor := new(gobotNeurosky.NeuroskyAdaptor)
-          adaptor.Name = "neurosky"
-          adaptor.Port = "/dev/rfcomm0"
-
-          neuro := gobotNeurosky.NewNeurosky(adaptor)
-          neuro.Name = "neuro"
+          adaptor := neurosky.NewNeuroskyAdaptor("neurosky", "/dev/rfcomm0")
+          neuro := neurosky.NewNeuroskyDriver(adaptor, "neuro")
 
           work := func() {
             gobot.On(neuro.Events["Extended"], func(data interface{}) {
@@ -80,7 +77,7 @@ neurosky_driver: true
               fmt.Println("Wave", data)
             })
             gobot.On(neuro.Events["EEG"], func(data interface{}) {
-              eeg := data.(gobotNeurosky.EEG)
+              eeg := data.(gobotNeurosky.EEG)kj
               fmt.Println("Delta", eeg.Delta)
               fmt.Println("Theta", eeg.Theta)
               fmt.Println("LoAlpha", eeg.LoAlpha)
@@ -93,13 +90,10 @@ neurosky_driver: true
             })
           }
 
-          robot := gobot.Robot{
-            Connections: []gobot.Connection{adaptor},
-            Devices:     []gobot.Device{neuro},
-            Work:        work,
-          }
+          gbot.Robots = append(gbot.Robots,
+            gobot.NewRobot("brainBot", []gobot.Connection{adaptor}, []gobot.Device{neuro}, work))
 
-          robot.Start()
+          gbot.Start()
         }
   
 
@@ -108,32 +102,31 @@ neurosky_driver: true
   %h3 OSX
 
   %p In order to allow Gobot running on your Mac to access the Mindwave, go to "Bluetooth > Open Bluetooth Preferences > Sharing Setup" and make sure that "Bluetooth Sharing" is checked.
-
-  -#%h3  Ubuntu
-
-  -#%p Connecting to the Mindwave from Ubuntu or any other Linux-based OS can be done entirely from the command line using Gobot CLI commands. Here are the steps.
-
-  -#%p Find the address of the Mindwave, by using:
-  -#:markdown
-        -#:::bash
-        -#gobot scan bluetooth
-
-  -#%p Pair to Mindwave using this command (substituting the actual address of your Mindwave):
-  -#:markdown
-        -#:::bash
-        -#gobot bluetooth pair <address>
-
-  -#%p Connect to the Mindwave using this command (substituting the actual address of your Mindwave):
-  -#:markdown
-        -#:::bash
-        -#gobot bluetooth connect <address>
   
+  :markdown
+    Now you must pair with the Mindwave. Open System Preferences > Bluetooth. Now with the Bluetooth devices windows open, hold the On/Pair button on the Mindwave towards the On/Pair text until you see "Mindwave" pop up as available devices. Pair with that device. Once paired your Mindwave will be accessable through the serial device similarly named as `/dev/tty.MindWaveMobile-DevA`
+
+  %h3 Ubuntu
+  %p Connecting to the Mindwave from Ubuntu or any other Linux-based OS can be done entirely from the command line using Gort CLI commands. Here are the steps.
+  %p Find the address of the Mindwave, by using:
+  :markdown
+        :::bash
+        gort scan bluetooth
+
+    Pair to Mindwave using this command (substituting the actual address of your Mindwave):
+
+        :::bash
+        gort bluetooth pair <address>
+
+    Connect to the Mindwave using this command (substituting the actual address of your Mindwave):
+
+        :::bash
+        gort bluetooth connect <address>  
 
   %h3  Windows
 
-  %p 
-    :markdown
-      You should be able to pair your Mindwave using your normal system tray applet for Bluetooth, and then connect to the COM port that is bound to the device, such as `COM3`.
+  :markdown
+    You should be able to pair your Mindwave using your normal system tray applet for Bluetooth, and then connect to the COM port that is bound to the device, such as `COM3`.
 
 
 %section.drivers#Drivers

@@ -34,56 +34,31 @@ subnavjs: true
   
 %section.how-to#HowToInstall
   %h2 How To Install
-  %p Installing Gobot with Opencv support is pretty easy.
   :markdown
+    This package requires `opencv` to be installed on your system
+
+  %h3 OSX
+  :markdown
+    To install `opencv` on OSX using Homebrew:
+
         :::bash
-        go get github.com/hybridgroup/gobot-opencv
+        $ brew tap homebrew/science && brew install opencv 
 
-
-  %p If you don't already have OpenCV installed
   %h3 Ubuntu
+  %p 
+    Follow the official 
+    = link_to "OpenCV installation guide", "http://docs.opencv.org/doc/tutorials/introduction/linux_install/linux_install.html", taget: :blank
+  
+  %h3 Windows
+  %p 
+    Follow the official 
+    = link_to "OpenCV installation guide", "http://docs.opencv.org/doc/tutorials/introduction/windows_install/windows_install.html#windows-installation", taget: :blank
+
+  %p Now you can install the package with
   :markdown
         :::bash
-        #!/bin/bash
-        sudo apt-get -y install autoconf automake build-essential git libass-dev libgpac-dev \
-          libsdl1.2-dev libtheora-dev libtool libva-dev libvdpau-dev libvorbis-dev libx11-dev \
-          libxext-dev libxfixes-dev pkg-config texi2html zlib1g-dev yasm libmp3lame-dev \
-          libopus-dev libvpx-dev cmake libgtk2.0-dev pkg-config libjpeg8 libjpeg8-dev \
-          libgstreamer0.10-0 libgstreamer0.10-dev gstreamer0.10-tools gstreamer0.10-plugins-base \
-          libgstreamer-plugins-base0.10-dev gstreamer0.10-plugins-good gstreamer0.10-plugins-ugly \
-          gstreamer0.10-plugins-bad gstreamer0.10-ffmpeg
-        mkdir ~/ffmpeg_sources
-        cd ~/ffmpeg_sources
-        git clone --depth 1 git://git.videolan.org/x264.git
-        cd x264
-        ./configure --prefix="/usr/local" --bindir="/usr/local/bin" --enable-shared --enable-pic
-        make
-        sudo make install
-        cd ~/ffmpeg_sources
-        git clone --depth 1 git://git.code.sf.net/p/opencore-amr/fdk-aac
-        cd fdk-aac
-        autoreconf -fiv
-        ./configure --prefix="/usr/local" --bindir="/usr/local/bin" --enable-shared --with-pic
-        make
-        sudo make install
-        cd ~/ffmpeg_sources
-        git clone --depth 1 git://source.ffmpeg.org/ffmpeg
-        cd ffmpeg
-        export PKG_CONFIG_PATH="/usr/local/lib/pkgconfig"
-        ./configure --prefix="/usr/local"   --extra-cflags="-I/usr/local/include" --extra-ldflags="-L/usr/local/lib"   --bindir="/usr/local/bin" \
-          --extra-libs="-ldl" --enable-gpl --enable-libass --enable-libfdk-aac   --enable-libmp3lame --enable-libopus --enable-libtheora \
-          --enable-libvorbis --enable-libvpx   --enable-libx264 --enable-nonfree --enable-x11grab --enable-shared --enable-pic
-        make
-        sudo make install
-        hash -r
-        cd ~
-        git clone --depth 1 -b 2.4.6.2 https://github.com/Itseez/opencv.git
-        cd opencv
-        mkdir release
-        cd release
-        cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local ..
-        make
-        sudo make install
+        go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/platforms/opencv
+
 
 %section.how-to#HowToUse
   %h2 How To Use
@@ -93,34 +68,26 @@ subnavjs: true
         package main
 
         import (
-          cv "github.com/hybridgroup/go-opencv/opencv"
-          "github.com/hybridgroup/gobot"
-          "github.com/hybridgroup/gobot-opencv"
+            cv "github.com/hybridgroup/go-opencv/opencv"
+            "github.com/hybridgroup/gobot"
+            "github.com/hybridgroup/gobot/platforms/opencv"
         )
 
         func main() {
+            gbot := gobot.NewGobot()
 
-          opencv := new(gobotOpencv.Opencv)
-          opencv.Name = "opencv"
+            window := opencv.NewWindowDriver("window")
+            camera := opencv.NewCameraDriver("camera", 0)
 
-          window := gobotOpencv.NewWindow(opencv)
-          window.Name = "window"
+            work := func() {
+                gobot.On(camera.Events["Frame"], func(data interface{}) {
+                    window.ShowImage(data.(*cv.IplImage))
+                })
+            }
 
-          camera := gobotOpencv.NewCamera(opencv)
-          camera.Name = "camera"
+            gbot.Robots = append(gbot.Robots,
+                gobot.NewRobot("cameraBot", []gobot.Connection{}, []gobot.Device{window, camera}, work))
 
-          work := func() {
-            gobot.On(camera.Events["Frame"], func(data interface{}) {
-              window.ShowImage(data.(*cv.IplImage))
-            })
-          }
-
-          robot := gobot.Robot{
-            Connections: []gobot.Connection{opencv},
-            Devices:     []gobot.Device{window, camera},
-            Work:        work,
-          }
-
-          robot.Start()
+            gbot.Start()
         }
 

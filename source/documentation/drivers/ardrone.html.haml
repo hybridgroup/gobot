@@ -36,17 +36,15 @@ ardrone_platform: true
         package main
 
         import (
-          "github.com/hybridgroup/gobot"
-          "github.com/hybridgroup/gobot-ardrone"
+            "github.com/hybridgroup/gobot"
+            "github.com/hybridgroup/gobot/platforms/ardrone"
+            "time"
         )
 
         func main() {
-
-          ardroneAdaptor := new(gobotArdrone.ArdroneAdaptor)
-          ardroneAdaptor.Name = "Drone"
-
-          drone := gobotArdrone.NewArdrone(ardroneAdaptor)
-          drone.Name = "Drone"
+            gbot := gobot.NewGobot()
+            adaptor := ardrone.NewArdroneAdaptor("Drone")
+            drone := ardrone.NewArdroneDriver(adaptor, "Drone")
         ...
 
 %section.how-to#HowToUse
@@ -56,36 +54,31 @@ ardrone_platform: true
   :markdown
         :::go
         package main
-
+        
         import (
-          "github.com/hybridgroup/gobot"
-          "github.com/hybridgroup/gobot-ardrone"
+            "github.com/hybridgroup/gobot"
+            "github.com/hybridgroup/gobot/platforms/ardrone"
+            "time"
         )
 
         func main() {
+            gbot := gobot.NewGobot()
+            adaptor := ardrone.NewArdroneAdaptor("Drone")
+            drone := ardrone.NewArdroneDriver(adaptor, "Drone")
 
-          ardroneAdaptor := new(gobotArdrone.ArdroneAdaptor)
-          ardroneAdaptor.Name = "Drone"
+            work := func() {
+                drone.TakeOff()
+                gobot.On(drone.Events["Flying"], func(data interface{}) {
+                    gobot.After(3*time.Second, func() {
+                        drone.Land()
+                    })
+                })
+            }
 
-          drone := gobotArdrone.NewArdrone(ardroneAdaptor)
-          drone.Name = "Drone"
+            gbot.Robots = append(gbot.Robots,
+                gobot.NewRobot("drone", []gobot.Connection{adaptor}, []gobot.Device{drone}, work))
 
-          work := func() {
-            drone.TakeOff()
-            gobot.On(drone.Events["Flying"], func(data interface{}) {
-              gobot.After("15s", func() {
-                drone.Land()
-              })
-            })
-          }
-
-          robot := gobot.Robot{
-            Connections: []gobot.Connection{ardroneAdaptor},
-            Devices:     []gobot.Device{drone},
-            Work:        work,
-          }
-
-          robot.Start()
+            gbot.Start()
         }
 
 %section.public-methods

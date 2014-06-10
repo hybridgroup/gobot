@@ -34,19 +34,16 @@ neurosky_platform: true
         package main
 
         import (
-          "github.com/hybridgroup/gobot"
-          "github.com/hybridgroup/gobot-neurosky"
           "fmt"
+          "github.com/hybridgroup/gobot"
+          "github.com/hybridgroup/gobot/platforms/neurosky"
         )
 
         func main() {
+          gbot := gobot.NewGobot()
 
-          adaptor := new(gobotNeurosky.NeuroskyAdaptor)
-          adaptor.Name = "neurosky"
-          adaptor.Port = "/dev/rfcomm0"
-
-          neuro := gobotNeurosky.NewNeurosky(adaptor)
-          neuro.Name = "neuro"
+          adaptor := neurosky.NewNeuroskyAdaptor("neurosky", "/dev/rfcomm0")
+          neuro := neurosky.NewNeuroskyDriver(adaptor, "neuro")
         ...
 
           
@@ -58,19 +55,16 @@ neurosky_platform: true
         package main
 
         import (
-          "github.com/hybridgroup/gobot"
-          "github.com/hybridgroup/gobot-neurosky"
           "fmt"
+          "github.com/hybridgroup/gobot"
+          "github.com/hybridgroup/gobot/platforms/neurosky"
         )
 
         func main() {
+          gbot := gobot.NewGobot()
 
-          adaptor := new(gobotNeurosky.NeuroskyAdaptor)
-          adaptor.Name = "neurosky"
-          adaptor.Port = "/dev/rfcomm0"
-
-          neuro := gobotNeurosky.NewNeurosky(adaptor)
-          neuro.Name = "neuro"
+          adaptor := neurosky.NewNeuroskyAdaptor("neurosky", "/dev/rfcomm0")
+          neuro := neurosky.NewNeuroskyDriver(adaptor, "neuro")
 
           work := func() {
             gobot.On(neuro.Events["Extended"], func(data interface{}) {
@@ -92,7 +86,7 @@ neurosky_platform: true
               fmt.Println("Wave", data)
             })
             gobot.On(neuro.Events["EEG"], func(data interface{}) {
-              eeg := data.(gobotNeurosky.EEG)
+              eeg := data.(gobotNeurosky.EEG)kj
               fmt.Println("Delta", eeg.Delta)
               fmt.Println("Theta", eeg.Theta)
               fmt.Println("LoAlpha", eeg.LoAlpha)
@@ -105,13 +99,10 @@ neurosky_platform: true
             })
           }
 
-          robot := gobot.Robot{
-            Connections: []gobot.Connection{adaptor},
-            Devices:     []gobot.Device{neuro},
-            Work:        work,
-          }
+          gbot.Robots = append(gbot.Robots,
+            gobot.NewRobot("brainBot", []gobot.Connection{adaptor}, []gobot.Device{neuro}, work))
 
-          robot.Start()
+          gbot.Start()
         }
 
 

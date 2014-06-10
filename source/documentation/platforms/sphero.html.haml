@@ -16,7 +16,7 @@ sphero_driver: true
 -content_for :js_accordeon do
   :javascript
     $("#platform-panel").addClass("active-panel");
-    $("#platform-panel ul li:nth-child(10)").addClass("active-link");
+    $("#platform-panel ul li:nth-child(11)").addClass("active-link");
     $(".accordion-docs dt:nth-child(7) a:nth-child(2) img").addClass("rotate");
 
 %section.intro
@@ -42,7 +42,7 @@ sphero_driver: true
     Installing Gobot with sphero support is pretty easy.
   :markdown
         :::bash
-        go get -u github.com/hybridgroup/gobot-sphero
+        go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/platforms/sphero
 
 %section.how-to#HowToUse
   %h2 How To Use
@@ -54,33 +54,53 @@ sphero_driver: true
 
         import (
           "github.com/hybridgroup/gobot"
-          "github.com/hybridgroup/gobot-sphero"
+          "github.com/hybridgroup/gobot/platforms/sphero"
+          "time"
         )
 
         func main() {
+          gbot := gobot.NewGobot()
 
-          spheroAdaptor := new(gobotSphero.SpheroAdaptor)
-          spheroAdaptor.Name = "Sphero"
-          spheroAdaptor.Port = "/dev/rfcomm0"
-
-          sphero := gobotSphero.NewSphero(spheroAdaptor)
-          sphero.Name = "Sphero"
+          adaptor := sphero.NewSpheroAdaptor("Sphero", "/dev/rfcomm0")
+          ball := sphero.NewSpheroDriver(adaptor, "sphero")
 
           work := func() {
-            gobot.Every("2s", func() {
-              sphero.Roll(100, uint16(gobot.Rand(360)))
+            gobot.Every(3*time.Second, func() {
+              ball.Roll(30, uint16(gobot.Rand(360)))
             })
           }
 
-          robot := gobot.Robot{
-            Connections: []gobot.Connection{spheroAdaptor},
-            Devices:     []gobot.Device{sphero},
-            Work:        work,
-          }
+          gbot.Robots = append(gbot.Robots,
+            gobot.NewRobot("sphero", []gobot.Connection{adaptor}, []gobot.Device{ball}, work))
 
-          robot.Start()
+          gbot.Start()
         }
 
+%section.how-to#HowToConnect
+  %h2 How To Connect
+  %h3 OSX
+  %p In order to allow Gobot running on your Mac to access the Sphero, go to "Bluetooth > Open Bluetooth Preferences > Sharing Setup" and make sure that "Bluetooth Sharing" is checked.
+  :markdown
+    Now you must pair with the Sphero. Open System Preferences > Bluetooth. Now with the Bluetooth devices windows open, smack the Sphero until it starts flashing three colors. You should see "Sphero-XXX" pop up as available devices where "XXX" is the first letter of the three colors the sphero is flashing. Pair with that device. Once paired your Sphero will be accessable through the serial device similarly named as `/dev/tty.Sphero-XXX-RN-SPP`
+
+  %h3 Ubuntu
+  %p Connecting to the Sphero from Ubuntu or any other Linux-based OS can be done entirely from the command line using Gort CLI commands. Here are the steps.
+  %p Find the address of the Sphero, by using:
+  :markdown
+        :::bash
+        gort scan bluetooth
+  %p Pair to Sphero using this command (substituting the actual address of your Sphero):
+  :markdown
+        :::bash
+        gort bluetooth pair <address>
+  %p Connect to the Sphero using this command (substituting the actual address of your Sphero):
+  :markdown
+        :::bash
+        gort bluetooth connect <address>
+  %h3 Windows
+  :markdown
+    You should be able to pair your Sphero using your normal system tray applet for Bluetooth, and then connect to the COM port that is bound to the device, such as `COM3.`
+  
 %section.drivers#Drivers
   %h2 Drivers
   %p

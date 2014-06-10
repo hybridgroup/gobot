@@ -37,7 +37,23 @@ led_driver: true
     Installing Gobot for beaglebone is pretty easy.
   :markdown
         :::bash
-        go get -u github.com/hybridgroup/gobot-beaglebone
+        go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/platforms/beaglebone
+
+  %h2 Cross compiling for the Beaglebone Black
+  %p You must first configure your Go environment for arm linux cross compiling
+  :markdown
+        :::bash
+        $ cd $GOROOT/src
+        $ GOOS=linux GOARCH=arm ./make.bash --no-clean
+  %p Then compile your Gobot program with
+  :markdown
+        :::bash
+        $ GOARM=7 GOARCH=arm GOOS=linux go build examples/beaglebone_blink.go
+  %p If you are running the official Angstrom or Debian linux through the usb->ethernet connection, you can simply upload your program and execute it with
+  :markdown
+        :::bash
+        $ scp beaglebone_blink root@192.168.7.2:/home/root/
+        $ ssh -t root@192.168.7.2 "./beaglebone_blink"
 
 %section.how-to#HowToUse
   %h2 How To Use
@@ -48,30 +64,27 @@ led_driver: true
         package main
 
         import (
-          "github.com/hybridgroup/gobot"
-          "github.com/hybridgroup/gobot-beaglebone"
-          "github.com/hybridgroup/gobot-gpio"
+                "github.com/hybridgroup/gobot"
+                "github.com/hybridgroup/gobot/platforms/beaglebone"
+                "github.com/hybridgroup/gobot/platforms/gpio"
+                "time"
         )
 
         func main() {
-          beaglebone := new(gobotBeaglebone.Beaglebone)
-          beaglebone.Name = "beaglebone"
+                gbot := gobot.NewGobot()
 
-          led := gobotGPIO.NewLed(beaglebone)
-          led.Name = "led"
-          led.Pin = "P9_12"
+                adaptor := beaglebone.NewBeagleboneAdaptor("beaglebone")
+                led := gpio.NewLedDriver(adaptor, "led", "P9_12")
 
-          work := func() {
-            gobot.Every("1s", func() { led.Toggle() })
-          }
+                work := func() {
+                        gobot.Every(1*time.Second, func() {
+                                led.Toggle()
+                        })
+                }
 
-          robot := gobot.Robot{
-            Connections: []gobot.Connection{beaglebone},
-            Devices:     []gobot.Device{led},
-            Work:        work,
-          }
-
-          robot.Start()
+                gbot.Robots = append(gbot.Robots,
+                        gobot.NewRobot("blinkBot", []gobot.Connection{adaptor}, []gobot.Device{led}, work))
+                gbot.Start()
         }
 
 %section.drivers#Drivers

@@ -18,7 +18,7 @@ servo_driver: true
 -content_for :js_accordeon do
   :javascript
     $("#platform-panel").addClass("active-panel");
-    $("#platform-panel ul li:nth-child(9)").addClass("active-link");
+    $("#platform-panel ul li:nth-child(10)").addClass("active-link");
     $(".accordion-docs dt:nth-child(7) a:nth-child(2) img").addClass("rotate");
 
 %section.intro
@@ -39,7 +39,7 @@ servo_driver: true
   %p Installing Gobot with Spark support is pretty easy.
   :markdown
         :::ruby
-        go get -u github.com/hybridgroup/gobot-spark
+        go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/platforms/spark
 %section.how-to#HowToUse
   %h2 How To Use
   %p This small program lets you turn on or off a LED for every 2 sec.
@@ -48,40 +48,29 @@ servo_driver: true
         package main
 
         import (
-          "github.com/hybridgroup/gobot"
-          "github.com/hybridgroup/gobot-gpio"
-          "github.com/hybridgroup/gobot-spark"
+                "github.com/hybridgroup/gobot"
+                "github.com/hybridgroup/gobot/platforms/gpio"
+                "github.com/hybridgroup/gobot/platforms/spark"
+                "time"
         )
 
         func main() {
+                master := gobot.NewGobot()
 
-          spark := new(gobotSpark.SparkAdaptor)
-          spark.Name = "spark"
-          spark.Params = map[string]interface{}{
-            "device_id":    "",
-            "access_token": "",
-          }
+                sparkCore := spark.NewSparkCoreAdaptor("spark", "device_id", "access_token")
+                led := gpio.NewLedDriver(sparkCore, "led", "D7")
 
-          led := gobotGPIO.NewLed(spark)
-          led.Name = "led"
-          led.Pin = "D7"
+                work := func() {
+                        gobot.Every(1*time.Second, func() {
+                                led.Toggle()
+                        })
+                }
 
-          work := func() {
-            gobot.Every("2s", func() {
-              led.Toggle()
-            })
-          }
+                master.Robots = append(master.Robots,
+                        gobot.NewRobot("spark", []gobot.Connection{sparkCore}, []gobot.Device{led}, work))
 
-          robot := gobot.Robot{
-            Connections: []gobot.Connection{spark},
-            Devices:     []gobot.Device{led},
-            Work:        work,
-          }
-
-          robot.Start()
+                master.Start()
         }
-
-
 
 %section.drivers#Drivers
   %h2 Drivers

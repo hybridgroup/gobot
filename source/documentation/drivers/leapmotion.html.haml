@@ -33,18 +33,15 @@ leapmotion_platform: true
         package main
 
         import (
-          "fmt"
-          "github.com/hybridgroup/gobot"
-          "github.com/hybridgroup/gobot-leapmotion"
+            "fmt"
+            "github.com/hybridgroup/gobot"
+            "github.com/hybridgroup/gobot/platforms/leap"
         )
 
         func main() {
-          leapAdaptor := new(gobotLeap.LeapAdaptor)
-          leapAdaptor.Name = "leap"
-          leapAdaptor.Port = "127.0.0.1:6437"
-
-          leap := gobotLeap.NewLeap(leapAdaptor)
-          leap.Name = "leap"
+            gbot := gobot.NewGobot()
+            adaptor := leap.NewLeapMotionAdaptor("leap", "127.0.0.1:6437")
+            l := leap.NewLeapMotionDriver(adaptor, "leap")
         ...
 
 %section.how-to#HowToUse
@@ -55,38 +52,26 @@ leapmotion_platform: true
         package main
 
         import (
-          "fmt"
-          "github.com/hybridgroup/gobot"
-          "github.com/hybridgroup/gobot-leapmotion"
+            "fmt"
+            "github.com/hybridgroup/gobot"
+            "github.com/hybridgroup/gobot/platforms/leap"
         )
 
         func main() {
-          leapAdaptor := new(gobotLeap.LeapAdaptor)
-          leapAdaptor.Name = "leap"
-          leapAdaptor.Port = "127.0.0.1:6437"
+            gbot := gobot.NewGobot()
+            adaptor := leap.NewLeapMotionAdaptor("leap", "127.0.0.1:6437")
+            l := leap.NewLeapMotionDriver(adaptor, "leap")
 
-          leap := gobotLeap.NewLeap(leapAdaptor)
-          leap.Name = "leap"
+            work := func() {
+                gobot.On(l.Events["Message"], func(data interface{}) {
+                    fmt.Println(data.(leap.Frame))
+                })
+            }
 
-          work := func() {
-            gobot.On(leap.Events["Message"], func(data interface{}) {
-              printHands(data.(gobotLeap.LeapFrame))
-            })
-          }
+            gbot.Robots = append(gbot.Robots, gobot.NewRobot(
+                "leapBot", []gobot.Connection{adaptor}, []gobot.Device{l}, work))
 
-          robot := gobot.Robot{
-            Connections: []gobot.Connection{leapAdaptor},
-            Devices:     []gobot.Device{leap},
-            Work:        work,
-          }
-
-          robot.Start()
-        }
-
-        func printHands(frame gobotLeap.LeapFrame) {
-          for key, hand := range frame.Hands {
-            fmt.Println("Hand", key, hand)
-          }
+            gbot.Start()
         }
 
 %section.public-methods

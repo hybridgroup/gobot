@@ -17,7 +17,7 @@ sphero_platform: true
 -content_for :js_accordeon do
   :javascript
     $("#driver-panel").addClass("active-panel");
-    $("#others li:nth-child(3)").addClass("active-link");
+    $("#others li:nth-child(4)").addClass("active-link");
     $(".accordion-docs dt:nth-child(9) a:nth-child(2) img").addClass("rotate");
 
 %section.intro
@@ -34,24 +34,22 @@ sphero_platform: true
 
     :markdown
       Install the library with: 
-      `go get -u github.com/hybridgroup/gobot-sphero`
+      `go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/platforms/sphero`
 
           :::go
           package main
 
           import (
             "github.com/hybridgroup/gobot"
-            "github.com/hybridgroup/gobot-sphero"
+            "github.com/hybridgroup/gobot/platforms/sphero"
+            "time"
           )
 
           func main() {
+            gbot := gobot.NewGobot()
 
-            spheroAdaptor := new(gobotSphero.SpheroAdaptor)
-            spheroAdaptor.Name = "Sphero"
-            spheroAdaptor.Port = "/dev/rfcomm0"
-
-            sphero := gobotSphero.NewSphero(spheroAdaptor)
-            sphero.Name = "Sphero"
+            adaptor := sphero.NewSpheroAdaptor("Sphero", "/dev/rfcomm0")
+            ball := sphero.NewSpheroDriver(adaptor, "sphero")
           ...
 
 
@@ -66,33 +64,28 @@ sphero_platform: true
 
           import (
             "github.com/hybridgroup/gobot"
-            "github.com/hybridgroup/gobot-sphero"
+            "github.com/hybridgroup/gobot/platforms/sphero"
+            "time"
           )
 
           func main() {
+            gbot := gobot.NewGobot()
 
-            spheroAdaptor := new(gobotSphero.SpheroAdaptor)
-            spheroAdaptor.Name = "Sphero"
-            spheroAdaptor.Port = "/dev/rfcomm0"
-
-            sphero := gobotSphero.NewSphero(spheroAdaptor)
-            sphero.Name = "Sphero"
+            adaptor := sphero.NewSpheroAdaptor("Sphero", "/dev/rfcomm0")
+            ball := sphero.NewSpheroDriver(adaptor, "sphero")
 
             work := func() {
-              gobot.Every("2s", func() {
-                sphero.Roll(100, uint16(gobot.Rand(360)))
+              gobot.Every(3*time.Second, func() {
+                ball.Roll(30, uint16(gobot.Rand(360)))
               })
             }
 
-            robot := gobot.Robot{
-              Connections: []gobot.Connection{spheroAdaptor},
-              Devices:     []gobot.Device{sphero},
-              Work:        work,
-            }
+            gbot.Robots = append(gbot.Robots,
+              gobot.NewRobot("sphero", []gobot.Connection{adaptor}, []gobot.Device{ball}, work))
 
-            robot.Start()
+            gbot.Start()
           }
-          
+                    
 
 %section.public-methods
   .commands-api#Commands

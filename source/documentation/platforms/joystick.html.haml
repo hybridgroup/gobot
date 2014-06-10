@@ -24,24 +24,128 @@ xbox360_driver: true
   = image_tag "/images/devices/joystick.jpg", class: "display"
   .info-intro
     %p
-      You can use Gobot with a Dualshock3 game controller, an XBox360 game controller, or any other USB joystick or game controller that is compatible with Simple DirectMedia Layer (SDL).
-
-    %p
-      For more info about Simple DirectMedia Layer (SDL) go to
-      = succeed "." do
-        = link_to "http://www.libsdl.org/", "http://www.libsdl.org/", target: :blank
+      You can use Gobot with a Dualshock3 game controller, an XBox360 game controller, or any other USB joystick or game controller that is compatible with 
+      = link_to "Simple DirectMedia Layer (SDL).", "http://www.libsdl.org/", taget: :blank
   .clear
   
 %section.how-to#HowToInstall
   %h2 How to install
-  %p
-    Installing Gobot with joystick support is pretty easy.
+  :markdown
+    This package requires `sdl2` to be installed on your system
+  %h3 OSX
+  :markdown
+    To install `sdl2` on OSX using Homebrew:
+        
+        :::bash
+        $ brew install sdl2
+  %h3 Ubuntu
   :markdown
         :::bash
-        go get github.com/hybridgroup/gobot-joystick
+        $ sudo apt-get install libsdl2-2.0-0
+
+  %p Now you can install the package with
+  :markdown
+        :::bash
+        go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/platforms/joystick
 
 %section.how-to#HowToUse
   %h2 How to use
+  %p Controller configurations are stored in JSON format. Here's an example configuration file for the Dualshock 3 controller.
+  :markdown
+        :::bash
+        {
+          "name": "Sony PLAYSTATION(R)3 Controller",
+          "guid": "030000004c0500006802000011010000",
+          "axis": [
+              {
+                  "name": "left_x",
+                  "id": 0
+              },
+              {
+                  "name": "left_y",
+                  "id": 1
+              },
+              {
+                  "name": "right_x",
+                  "id": 2
+              },
+              {
+                  "name": "right_y",
+                  "id": 3
+              }
+          ],
+          "buttons": [
+              {
+                  "name": "square",
+                  "id": 15
+              },
+              {
+                  "name": "triangle",
+                  "id": 12
+              },
+              {
+                  "name": "circle",
+                  "id": 13
+              },
+              {
+                  "name": "x",
+                  "id": 14
+              },
+              {
+                  "name": "up",
+                  "id": 4
+              },
+              {
+                  "name": "down",
+                  "id": 6
+              },
+              {
+                  "name": "left",
+                  "id": 7
+              },
+              {
+                  "name": "right",
+                  "id": 5
+              },
+              {
+                  "name": "left_stick",
+                  "id": 1
+              },
+              {
+                  "name": "right_stick",
+                  "id": 2
+              },
+              {
+                  "name": "l1",
+                  "id": 10
+              },
+              {
+                  "name": "l2",
+                  "id": 8
+              },
+              {
+                  "name": "r1",
+                  "id": 11
+              },
+              {
+                  "name": "r2",
+                  "id": 9
+              },
+              {
+                  "name": "start",
+                  "id": 3
+              },
+              {
+                  "name": "select",
+                  "id": 0
+              },
+              {
+                  "name": "home",
+                  "id": 16
+              }
+          ]
+      }
+  %h3 Example
   %p This small program receives joystick and button press events from an XBox 360 game controller.
 
   :markdown
@@ -49,68 +153,49 @@ xbox360_driver: true
         package main
 
         import (
-          "fmt"
-          "github.com/hybridgroup/gobot"
-          "github.com/hybridgroup/gobot-joystick"
+            "fmt"
+            "github.com/hybridgroup/gobot"
+            "github.com/hybridgroup/gobot/platforms/joystick"
         )
 
         func main() {
-          joystickAdaptor := new(gobotJoystick.JoystickAdaptor)
-          joystickAdaptor.Name = "xbox360"
-          joystickAdaptor.Params = map[string]interface{}{
-            "config": "./configs/xbox360_power_a_mini_proex.json",
-          }
+            gbot := gobot.NewGobot()
+            joystickAdaptor := joystick.NewJoystickAdaptor("ps3")
+            joystickDriver := joystick.NewJoystickDriver(joystickAdaptor, "ps3", "./platforms/joystick/configs/dualshock3.json")
 
-          joystick := gobotJoystick.NewJoystick(joystickAdaptor)
-          joystick.Name = "xbox360"
+            work := func() {
+                gobot.On(joystickDriver.Events["square_press"], func(data interface{}) {
+                    fmt.Println("square_press")
+                })
+                gobot.On(joystickDriver.Events["square_release"], func(data interface{}) {
+                    fmt.Println("square_release")
+                })
+                gobot.On(joystickDriver.Events["triangle_press"], func(data interface{}) {
+                    fmt.Println("triangle_press")
+                })
+                gobot.On(joystickDriver.Events["triangle_release"], func(data interface{}) {
+                    fmt.Println("triangle_release")
+                })
+                gobot.On(joystickDriver.Events["left_x"], func(data interface{}) {
+                    fmt.Println("left_x", data)
+                })
+                gobot.On(joystickDriver.Events["left_y"], func(data interface{}) {
+                    fmt.Println("left_y", data)
+                })
+                gobot.On(joystickDriver.Events["right_x"], func(data interface{}) {
+                    fmt.Println("right_x", data)
+                })
+                gobot.On(joystickDriver.Events["right_y"], func(data interface{}) {
+                    fmt.Println("right_y", data)
+                })
+            }
 
-          work := func() {
-            gobot.On(joystick.Events["a_press"], func(data interface{}) {
-              fmt.Println("a_press")
-            })
-            gobot.On(joystick.Events["a_release"], func(data interface{}) {
-              fmt.Println("a_release")
-            })
-            gobot.On(joystick.Events["b_press"], func(data interface{}) {
-              fmt.Println("b_press")
-            })
-            gobot.On(joystick.Events["b_release"], func(data interface{}) {
-              fmt.Println("b_release")
-            })
-            gobot.On(joystick.Events["up"], func(data interface{}) {
-              fmt.Println("up", data)
-            })
-            gobot.On(joystick.Events["down"], func(data interface{}) {
-              fmt.Println("down", data)
-            })
-            gobot.On(joystick.Events["left"], func(data interface{}) {
-              fmt.Println("left", data)
-            })
-            gobot.On(joystick.Events["right"], func(data interface{}) {
-              fmt.Println("right", data)
-            })
-            gobot.On(joystick.Events["left_x"], func(data interface{}) {
-              fmt.Println("left_x", data)
-            })
-            gobot.On(joystick.Events["left_y"], func(data interface{}) {
-              fmt.Println("left_y", data)
-            })
-            gobot.On(joystick.Events["right_x"], func(data interface{}) {
-              fmt.Println("right_x", data)
-            })
-            gobot.On(joystick.Events["right_y"], func(data interface{}) {
-              fmt.Println("right_y", data)
-            })
-          }
+            gbot.Robots = append(gbot.Robots,
+                gobot.NewRobot("joystickBot", []gobot.Connection{joystickAdaptor}, []gobot.Device{joystickDriver}, work))
 
-          robot := gobot.Robot{
-            Connections: []gobot.Connection{joystickAdaptor},
-            Devices:     []gobot.Device{joystick},
-            Work:        work,
-          }
-
-          robot.Start()
+            gbot.Start()
         }
+
         
 %section.how-to#HowToConnect
   %h2 How to Connect

@@ -30,6 +30,11 @@ servo_driver: true
       easy-to-use hardware and software. It's intended for artists, designers, hobbyists and
       anyone interested in creating interactive objects or environments.
 
+    %p 
+      This package provides the adaptor for microcontrollers such as Arduino that support the 
+      = link_to "Firmata", "http://firmata.org/wiki/Main_Page" , target: :blank
+      protocol
+
     %p
       For more info about the arduino platform click
       = succeed "." do
@@ -39,11 +44,10 @@ servo_driver: true
 
 %section.how-to#HowToInstall
   %h2 How To Install
-  %p
-    Installing Gobot with Arduino support is pretty easy.
+  %p Installing Gobot with Arduino support is pretty easy.
   :markdown
         :::bash
-        go get -u github.com/hybridgroup/gobot-firmata
+        go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/platforms/firmata
 
   %p 
     %b Note:
@@ -58,45 +62,33 @@ servo_driver: true
 
         import (
             "github.com/hybridgroup/gobot"
-            "github.com/hybridgroup/gobot-firmata"
-            "github.com/hybridgroup/gobot-gpio"
+            "github.com/hybridgroup/gobot/platforms/firmata"
+            "github.com/hybridgroup/gobot/platforms/gpio"
+            "time"
         )
 
         func main() {
-
-            firmata := new(gobotFirmata.FirmataAdaptor)
-            firmata.Name = "firmata"
-            firmata.Port = "/dev/ttyACM0"
-
-            led := gobotGPIO.NewLed(firmata)
-            led.Name = "led"
-            led.Pin = "13"
-
+            gbot := gobot.NewGobot()
+            adaptor := firmata.NewFirmataAdaptor("myFirmata", "/dev/ttyACM0")
+            led := gpio.NewLedDriver(adaptor, "myLed", "13")
             work := func() {
-                gobot.Every("1s", func() {
+                gobot.Every(1*time.Second, func() {
                     led.Toggle()
                 })
             }
-
-            robot := gobot.Robot{
-                Connections: []gobot.Connection{firmata},
-                Devices:     []gobot.Device{led},
-                Work:        work,
-            }
-
-            robot.Start()
+            gbot.Robots = append(gbot.Robots,
+                gobot.NewRobot("blinkBot", []gobot.Connection{adaptor}, []gobot.Device{led}, work))
+            gbot.Start()
         }
-
-
-%section.how-to#HowToConnect
-  %h2 How To Connect
   
-  %h3 OSX
-  %p Coming soon.
-
-  %h3 Ubuntu
-
-  %p Coming soon.
+  %h3 Hardware Support
+  %p The following firmata devices have been tested and are currently supported:
+  %ul 
+    %li 
+      = link_to "Arduino uno r3", "http://arduino.cc/en/Main/arduinoBoardUno", target: :blank  
+    %li 
+      = link_to "Teensy 3.0", "http://www.pjrc.com/store/teensy3.html", target: :blank  
+  %p More devices are coming soon...
 
  
 %section.drivers#Drivers

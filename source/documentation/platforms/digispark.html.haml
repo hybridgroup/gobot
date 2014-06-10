@@ -30,21 +30,25 @@ servo_driver: true
       use the familiar Arduino IDE the Digispark is a great way to jump into electronics, or perfect for when
       an Arduino is too big or too much.
 
-    %p
-      For more info about the Digispark platform click
-      = succeed "." do
-        = link_to "here", "http://digistump.com/category/1", target: :blank
+    %p 
+      This package provides the Gobot adaptor for the 
+      = link_to "Digispark", "http://digistump.com/category/1", target: :blank  
+      ATTiny-based USB development board with the 
+      = link_to "Little Wire ", "http://littlewire.cc/", target: :blank  
+      protocol firmware installed.
+
   .clear
   
 %section.how-to#HowToInstall
   %h2 How To Install
-  %p Installing gobot-digispark requires the libusb package already be installed.
+  :markdown
+    This package requires `libusb.`
 
   %h3 OSX
   %p To install libusb on OSX using Homebrew:
   :markdown
         :::bash
-        brew install libusb-compat
+        brew install libusb
 
   %h3 Ubuntu
   %p To install libusb on linux:
@@ -56,7 +60,7 @@ servo_driver: true
 
   :markdown
         :::bash
-        go get -u github.com/hybridgroup/gobot-digispark
+        go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/platforms/digispark
 
 %section.how-to#HowToUse
   %h2 How To Use
@@ -67,43 +71,31 @@ servo_driver: true
         package main
 
         import (
-                "github.com/hybridgroup/gobot"
-                "github.com/hybridgroup/gobot-digispark"
-                "github.com/hybridgroup/gobot-gpio"
+            "github.com/hybridgroup/gobot"
+            "github.com/hybridgroup/gobot/platforms/digispark"
+            "github.com/hybridgroup/gobot/platforms/gpio"
+            "time"
         )
 
         func main() {
+            gbot := gobot.NewGobot()
+            adaptor := digispark.NewDigisparkAdaptor("Digispark")
+            led := gpio.NewLedDriver(adaptor, "led", "0")
 
-                digispark := new(gobotDigispark.DigisparkAdaptor)
-                digispark.Name = "Digispark"
+            work := func() {
+                gobot.Every(1*time.Second, func() {
+                    led.Toggle()
+                })
+            }
 
-                led := gobotGPIO.NewLed(digispark)
-                led.Name = "led"
-                led.Pin = "0"
-
-                work := func() {
-                        gobot.Every("0.5s", func() {
-                                led.Toggle()
-                        })
-                }
-
-                robot := gobot.Robot{
-                        Connections: []gobot.Connection{digispark},
-                        Devices:     []gobot.Device{led},
-                        Work:        work,
-                }
-
-                robot.Start()
+            gbot.Robots = append(gbot.Robots,
+                gobot.NewRobot("blinkBot", []gobot.Connection{adaptor}, []gobot.Device{led}, work))
+            gbot.Start()
         }
         
 %section.how-to#HowToConnect
   %h2 How To Connect
-  %p
-    If your Digispark (
-    %a{ href:"http://www.kickstarter.com/projects/digistump/digispark-the-tiny-arduino-enabled-usb-dev-board"} http://www.kickstarter.com/projects/digistump/digispark-the-tiny-arduino-enabled-usb-dev-board
-    ) ATTiny-based USB development board already has the Little Wire (
-    %a{ href:"http://littlewire.cc/"} http://littlewire.cc/
-    ) protocol firmware installed, you can connect right away with Gobot.
+  %p If your Digispark already has the Little Wire protocol firmware installed, you can connect right away with Gobot.
 
   %p
     Otherwise, for instructions on how to install Little Wire on a Digispark check out 
@@ -113,18 +105,16 @@ servo_driver: true
   :markdown
         :::bash
         Important: 2012 MBP The USB ports on the 2012 MBPs (Retina and non) cause issues due to their USB3 controllers,currently the best work around is to use a cheap USB hub (non USB3) - we are working on future solutions. The hub on a Cinema display will work as well.
-  %p The main steps are:
-  %ul 
-    %li Plug in the Digispark to the USB port
-    %li Connect to the device via Gobot
+  %p Plug the Digispark into your computer via the USB port and you're ready to go!
 
   %h3 Ubuntu
-  %p The main steps are:
+  %p Ubuntu requires a few extra steps to set up the digispark for communication with Gobot:
   %ul 
     %li Add a udev rule to allow access to the Digispark device
     %li Plug in the Digispark to the USB port
     %li Connect to the device via Gobot
   %p First, you must add a udev rule, so that Gobot can communicate with the USB device. Ubuntu and other modern Linux distibutions use udev to manage device files when USB devices are added and removed. By default, udev will create a device with read-only permission which will not allow to you download code. You must place the udev rules below into a file named /etc/udev/rules.d/49-micronucleus.rules.
+
   :markdown
         :::bash
         # UDEV Rules for Micronucleus boards including the Digispark.
@@ -146,6 +136,7 @@ servo_driver: true
         # idea of write permission for everybody, you can replace MODE:="0666" with
         # OWNER:="yourusername" to create the device owned by you, or with
         # GROUP:="somegroupname" and mange access using standard unix groups.
+        
   %p 
     Thanks to 
     = link_to "@bluebie", "https://github.com/Bluebie" 

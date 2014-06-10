@@ -8,46 +8,96 @@ page_subtitle_docs: "<a href='https://github.com/hybridgroup/gobot-pebble' class
 page_title_show: true
 layout: documentation
 active_menu_platforms: true
+page_title_show: true
+subnav_platform: true
 subnavjs: true
 
+pebble_driver: true
+
 ---
+-content_for :js_accordeon do
+  :javascript
+    $("#platform-panel").addClass("active-panel");
+    $("#platform-panel ul li:nth-child(9)").addClass("active-link");
+    $(".accordion-docs dt:nth-child(7) a:nth-child(2) img").addClass("rotate");
+
 
 %section.intro
   = image_tag "/images/devices/pebble.jpg", class: "display"
   .info-intro
     %p
-      The Pebble is a smart watch, that connects via bluetooth.
+      This repository contains the Gobot adaptor for Pebble smart watch 
+      = link_to "(http://getpebble.com/).", "http://getpebble.com/", target: :blank
 
-    %p
-      For more info about the Pebble platform click
-      = succeed "." do
-        = link_to "here", "http://getpebble.com/", target: :blank
+    %p 
+      It uses the Pebble 2.0 SDK, and requires the 2.0 iOS or Android app, and that the "watchbot" app 
+      = link_to "(https://github.com/hybridgroup/watchbot) ", "ttps://github.com/hybridgroup/watchbot", target: :blank
+      has been installed on the Pebble watch
+
+    %p 
+      For more information about Gobot, check out the github repo at 
+      = link_to "https://github.com/hybridgroup/gobot", "https://github.com/hybridgroup/gobot", target: :blank
   .clear
   
 %section.how-to
   %h2 How to install
-  %p
-    Installing gobot with pebble support is pretty easy using ruby gems.
-  :markdown
-        :::bash
-        gem install gobot-pebble
+  %ul 
+    %li
+      Installing gobot with pebble support is pretty easy using ruby gems.
+    :markdown
+          :::bash
+          go get github.com/hybridgroup/gobot-pebble
+    %li Install Pebble 2.0 iOS or Android app. (If you haven't already)
+    %li
+      Follow README to install and configure "watchbot" on your watch: 
+      = link_to "https://github.com/hybridgroup/watchbot", "https://github.com/hybridgroup/watchbot", target: :blank
+
   %h2 How to use
+  %p Before running the example, make sure configuration settings match with your program, in example, api host is your computer IP, robot name is 'pebble', robot api port is 8080 and publish command is PublishEventC and message command is PendingMessageC
+
   %p
     This small program receives button press events from a Pebble smart watch.
   :markdown
         :::go
-        require 'gobot'
+        package main
 
-        connection :pebble, :adaptor => :pebble, :port => "/dev/rfcomm0", :id => "378B"
-        device :watch, :driver => :pebble
+        import (
+            "fmt"
+            "github.com/hybridgroup/gobot"
+            "github.com/hybridgroup/gobot/api"
+            "github.com/hybridgroup/gobot/platforms/pebble"
+        )
 
-        work do
-          on watch, :media_control => :button_push
-        end
+        func main() {
+            master := gobot.NewGobot()
+            api.NewApi(master).Start()
 
-        def button_push(caller, data)
-          puts data.button unless data.nil?
-        end
+            pebbleAdaptor := pebble.NewPebbleAdaptor("pebble")
+            pebbleDriver := pebble.NewPebbleDriver(pebbleAdaptor, "pebble")
+
+            work := func() {
+                pebbleDriver.SendNotification("Hello Pebble!")
+                gobot.On(pebbleDriver.Events["button"], func(data interface{}) {
+                    fmt.Println("Button pushed: " + data.(string))
+                })
+
+                gobot.On(pebbleDriver.Events["tap"], func(data interface{}) {
+                    fmt.Println("Tap event detected")
+                })
+            }
+
+            robot := gobot.NewRobot("pebble", []gobot.Connection{pebbleAdaptor}, []gobot.Device{pebbleDriver}, work)
+
+            master.Robots = append(master.Robots, robot)
+            master.Start()
+        }
+
+  %h3 Supported Features
+  %ul 
+    %li We support event detection of 3 main pebble buttons.
+    %li Accelerometer events
+    %li Pushing data to pebble watch
+
   %h2 How to connect
   %p This software requires version 1.12.0 of the Pebble watch firmware.
 

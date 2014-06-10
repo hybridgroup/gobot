@@ -7,50 +7,91 @@ page_title_docs: Pebble
 page_subtitle_docs: Driver
 page_title_show: true
 layout: documentation
+page_title_show: true
+subnav_driver: true
 active_menu_docs: true
 subnavjs: true
 
+
 pebble_platform: true
 ---
+-content_for :js_accordeon do
+  :javascript
+    $("#driver-panel").addClass("active-panel");
+    $("#others li:nth-child(3)").addClass("active-link");
+    $(".accordion-docs dt:nth-child(9) a:nth-child(2) img").addClass("rotate");
+    
 %section.intro
   =image_tag "/images/devices/pebble.jpg", class: "display"
   .info-intro
     %p Allows user to interact with gobot devices using a Pebble smart watch.
   .clear
   
-%section.how-to
-  %h2 How to establish a connection and setup the driver
+%section.how-to#HowToConnect
+  %h2 How to Connect
   :markdown
         :::go
-        require 'gobot'
-        connection :pebble, :adaptor => :pebble, :port => "/dev/rfcomm0", :id => "378B"
-        device :watch, :driver => :pebble
+        package main
+
+        import (
+            "fmt"
+            "github.com/hybridgroup/gobot"
+            "github.com/hybridgroup/gobot/api"
+            "github.com/hybridgroup/gobot/platforms/pebble"
+        )
+
+        func main() {
+            master := gobot.NewGobot()
+            api.NewAPI(master).Start()
+
+            pebbleAdaptor := pebble.NewPebbleAdaptor("pebble")
+            pebbleDriver := pebble.NewPebbleDriver(pebbleAdaptor, "pebble")
+        ...
 
 %section.public-methods
-  %h2 Public instance methods
-  %p
-    We're working on the documentation for the events for the Pebble smart watch. Thanks for your patience.
-  %h2 Public driver events
-  %p
-    We're working on the documentation for the events for the Pebble smart watch. Thanks for your patience.
+  .commands-api#Commands
+    %h1 Functions
+    %p no commands
+  .commands-api#Events
+    = #partial "/documentation/drivers/partials/neurosky/events"
 
-%section.how-to
+%section.how-to#HowToUse
   %h2 How to use
   %h3 Example receiving button events from a Pebble smart watch.
   :markdown
         :::go
-        require 'gobot'
+        package main
 
-        connection :pebble, :adaptor => :pebble, :port => "/dev/rfcomm0", :id => "378B"
-        device :watch, :driver => :pebble
+        import (
+            "fmt"
+            "github.com/hybridgroup/gobot"
+            "github.com/hybridgroup/gobot/api"
+            "github.com/hybridgroup/gobot/platforms/pebble"
+        )
 
-        work do
-          on watch, :media_control => :button_push
-        end
+        func main() {
+            master := gobot.NewGobot()
+            api.NewAPI(master).Start()
 
-        def button_push(caller, data)
-          puts data.button unless data.nil?
-        end
+            pebbleAdaptor := pebble.NewPebbleAdaptor("pebble")
+            pebbleDriver := pebble.NewPebbleDriver(pebbleAdaptor, "pebble")
+
+            work := func() {
+                pebbleDriver.SendNotification("Hello Pebble!")
+                gobot.On(pebbleDriver.Events["button"], func(data interface{}) {
+                    fmt.Println("Button pushed: " + data.(string))
+                })
+
+                gobot.On(pebbleDriver.Events["tap"], func(data interface{}) {
+                    fmt.Println("Tap event detected")
+                })
+            }
+
+            robot := gobot.NewRobot("pebble", []gobot.Connection{pebbleAdaptor}, []gobot.Device{pebbleDriver}, work)
+
+            master.Robots = append(master.Robots, robot)
+            master.Start()
+        }
 
 %section.compatability.hardware
   %h2 Works with:
