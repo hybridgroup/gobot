@@ -200,12 +200,7 @@ func (a *api) executeCommand(robotname string, devicename string, commandname st
 			for _, v := range gobot.Call(robot.Driver, commandname, body) {
 				ret = append(ret, v.Interface())
 			}
-			//Temp fix to return reponse without an wrapping array
-			if len(ret) > 0 {
-				data, _ = json.Marshal(ret[0])
-			} else {
-				data, _ = json.Marshal(ret)
-			}
+			data, _ = json.Marshal(ret)
 
 			res.Header().Set("Content-Type", "application/json; charset=utf-8")
 			res.Write(data)
