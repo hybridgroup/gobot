@@ -201,7 +201,6 @@ func (a *api) executeCommand(robotname string, devicename string, commandname st
 				ret = append(ret, v.Interface())
 			}
 			data, _ = json.Marshal(ret)
-
 			res.Header().Set("Content-Type", "application/json; charset=utf-8")
 			res.Write(data)
 			return
