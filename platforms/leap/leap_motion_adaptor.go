@@ -35,4 +35,4 @@ func (l *LeapMotionAdaptor) Connect() bool {
 	l.Connected = true
 	return true
 }
-func (me *LeapMotionAdaptor) Finalize() bool { return true }
+func (l *LeapMotionAdaptor) Finalize() bool { return true }

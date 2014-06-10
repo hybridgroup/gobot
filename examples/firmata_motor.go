@@ -14,13 +14,13 @@ func main() {
 
 	work := func() {
 		speed := byte(0)
-		fade_amount := byte(15)
+		fadeAmount := byte(15)
 
 		gobot.Every(100*time.Millisecond, func() {
 			motor.Speed(speed)
-			speed = speed + fade_amount
+			speed = speed + fadeAmount
 			if speed == 0 || speed == 255 {
-				fade_amount = -fade_amount
+				fadeAmount = -fadeAmount
 			}
 		})
 	}

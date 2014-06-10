@@ -64,7 +64,7 @@ func (c *conway) resetContacts() {
 }
 
 func (c *conway) contact() {
-	c.contacts += 1
+	c.contacts++
 }
 
 func (c *conway) rebirth() {
@@ -94,13 +94,12 @@ func (c *conway) death() {
 func (c *conway) enoughContacts() bool {
 	if c.contacts >= 2 && c.contacts < 7 {
 		return true
-	} else {
-		return false
 	}
+	return false
 }
 
 func (c *conway) birthday() {
-	c.age += 1
+	c.age++
 
 	fmt.Println("Happy birthday", c.cell.Name, "you are", c.age, "and had", c.contacts, "contacts.")
 

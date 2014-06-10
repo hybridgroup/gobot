@@ -118,17 +118,17 @@ Install Gobot with: `go get -u github.com/hybridgroup/gobot`
 
 Gobot includes a RESTful API to query the status of any robot running within a group, including the connection and device status, and execute device commands.
 
-To activate the API, require the `github.com/hybridgroup/gobot/api` package and instantiate the `Api` like this:
+To activate the API, require the `github.com/hybridgroup/gobot/api` package and instantiate the `API` like this:
 
 ```go 
   master := gobot.NewGobot()
-  api.NewApi(master).Start()
+  api.NewAPI(master).Start()
 ```
 
 You can also specify the api host and port, and turn on authentication:
 ```go 
   master := gobot.NewGobot()
-  server := api.NewApi(master)
+  server := api.NewAPI(master)
   server.Port = "4000"
   server.Username = "Gort"
   server.Password = "klaatu"
@@ -150,7 +150,7 @@ Thank you!
 * We will look at the patch, test it out, and give you feedback.
 * Avoid doing minor whitespace changes, renamings, etc. along with merged content. These will be done by the maintainers from time to time but they can complicate merges and should be done seperately.
 * Take care to maintain the existing coding style.
-* `go fmt` your code.
+* `golint` and `go fmt` your code.
 * Add unit tests for any new or changed functionality.
 * All pull requests should be "fast forward"
   * If there are commits after yours use “git rebase -i <new_head_branch>”

@@ -37,7 +37,7 @@ import (
 
 func main() {
 	master := gobot.NewGobot()
-	api.NewApi(master).Start()
+	api.NewAPI(master).Start()
 
 	pebbleAdaptor := pebble.NewPebbleAdaptor("pebble")
 	pebbleDriver := pebble.NewPebbleDriver(pebbleAdaptor, "pebble")

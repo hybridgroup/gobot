@@ -15,13 +15,13 @@ func main() {
 
 	work := func() {
 		brightness := uint8(0)
-		fade_amount := uint8(15)
+		fadeAmount := uint8(15)
 
 		gobot.Every(100*time.Millisecond, func() {
 			led.Brightness(brightness)
-			brightness = brightness + fade_amount
+			brightness = brightness + fadeAmount
 			if brightness == 0 || brightness == 255 {
-				fade_amount = -fade_amount
+				fadeAmount = -fadeAmount
 			}
 		})
 	}

@@ -41,5 +41,5 @@ func (l *LeapMotionDriver) Start() bool {
 
 	return true
 }
-func (me *LeapMotionDriver) Init() bool { return true }
-func (me *LeapMotionDriver) Halt() bool { return true }
+func (l *LeapMotionDriver) Init() bool { return true }
+func (l *LeapMotionDriver) Halt() bool { return true }

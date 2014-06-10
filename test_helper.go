@@ -9,7 +9,7 @@ type testStruct struct {
 	f float64
 }
 
-func (me *testStruct) Hello(name string, message string) string {
+func (t *testStruct) Hello(name string, message string) string {
 	return fmt.Sprintf("Hello %v! %v", name, message)
 }
 
@@ -24,10 +24,10 @@ type testDriver struct {
 	Adaptor *testAdaptor
 }
 
-func (me *testDriver) Init() bool  { return true }
-func (me *testDriver) Start() bool { return true }
-func (me *testDriver) Halt() bool  { return true }
-func (me *testDriver) TestDriverCommand(params map[string]interface{}) string {
+func (t *testDriver) Init() bool  { return true }
+func (t *testDriver) Start() bool { return true }
+func (t *testDriver) Halt() bool  { return true }
+func (t *testDriver) TestDriverCommand(params map[string]interface{}) string {
 	name := params["name"].(string)
 	return fmt.Sprintf("hello %v", name)
 }
@@ -36,28 +36,32 @@ type testAdaptor struct {
 	Adaptor
 }
 
-func (me *testAdaptor) Finalize() bool { return true }
-func (me *testAdaptor) Connect() bool  { return true }
+func (t *testAdaptor) Finalize() bool { return true }
+func (t *testAdaptor) Connect() bool  { return true }
 
 func newTestDriver(name string, adaptor *testAdaptor) *testDriver {
-	d := new(testDriver)
-	d.Name = name
-	d.Adaptor = adaptor
-	d.Commands = []string{
-		"TestDriverCommand",
-		"DriverCommand",
+	return &testDriver{
+		Driver: Driver{
+			Commands: []string{
+				"TestDriverCommand",
+				"DriverCommand",
+			},
+			Name: name,
+		},
+		Adaptor: adaptor,
 	}
-	return d
 }
 
 func newTestAdaptor(name string) *testAdaptor {
-	a := new(testAdaptor)
-	a.Name = name
-	a.Params = map[string]interface{}{
-		"param1": "1",
-		"param2": 2,
+	return &testAdaptor{
+		Adaptor: Adaptor{
+			Name: name,
+			Params: map[string]interface{}{
+				"param1": "1",
+				"param2": 2,
+			},
+		},
 	}
-	return a
 }
 
 func robotTestFunction(params map[string]interface{}) string {

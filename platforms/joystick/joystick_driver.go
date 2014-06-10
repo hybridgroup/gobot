@@ -17,13 +17,13 @@ type JoystickDriver struct {
 
 type pair struct {
 	Name string `json:"name"`
-	Id   int    `json:"id"`
+	ID   int    `json:"id"`
 }
 
 type hat struct {
 	Hat  int    `json:"hat"`
 	Name string `json:"name"`
-	Id   int    `json:"id"`
+	ID   int    `json:"id"`
 }
 
 type joystickConfig struct {
@@ -111,7 +111,7 @@ func (j *JoystickDriver) Halt() bool { return true }
 
 func (j *JoystickDriver) findName(id uint8, list []pair) string {
 	for _, value := range list {
-		if int(id) == value.Id {
+		if int(id) == value.ID {
 			return value.Name
 		}
 	}
@@ -120,7 +120,7 @@ func (j *JoystickDriver) findName(id uint8, list []pair) string {
 
 func (j *JoystickDriver) findHatName(id uint8, hat uint8, list []hat) string {
 	for _, value := range list {
-		if int(id) == value.Id && int(hat) == value.Hat {
+		if int(id) == value.ID && int(hat) == value.Hat {
 			return value.Name
 		}
 	}

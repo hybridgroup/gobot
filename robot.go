@@ -7,11 +7,11 @@ import (
 	"time"
 )
 
-type JsonRobot struct {
+type JSONRobot struct {
 	Name        string            `json:"name"`
 	Commands    []string          `json:"commands"`
-	Connections []*JsonConnection `json:"connections"`
-	Devices     []*JsonDevice     `json:"devices"`
+	Connections []*JSONConnection `json:"connections"`
+	Devices     []*JSONDevice     `json:"devices"`
 }
 
 type Robot struct {
@@ -74,7 +74,7 @@ func (r *Robot) initName() {
 
 func (r *Robot) initCommands() {
 	r.RobotCommands = make([]string, 0)
-	for k, _ := range r.Commands {
+	for k := range r.Commands {
 		r.RobotCommands = append(r.RobotCommands, k)
 	}
 }
@@ -129,13 +129,15 @@ func (r *Robot) Connection(name string) *connection {
 	return nil
 }
 
-func (r *Robot) ToJson() *JsonRobot {
-	jsonRobot := new(JsonRobot)
-	jsonRobot.Name = r.Name
-	jsonRobot.Commands = r.RobotCommands
-	jsonRobot.Connections = make([]*JsonConnection, 0)
+func (r *Robot) ToJSON() *JSONRobot {
+	jsonRobot := &JSONRobot{
+		Name:        r.Name,
+		Commands:    r.RobotCommands,
+		Connections: []*JSONConnection{},
+		Devices:     []*JSONDevice{},
+	}
 	for _, device := range r.Devices() {
-		jsonDevice := device.ToJson()
+		jsonDevice := device.ToJSON()
 		jsonRobot.Connections = append(jsonRobot.Connections, jsonDevice.Connection)
 		jsonRobot.Devices = append(jsonRobot.Devices, jsonDevice)
 	}

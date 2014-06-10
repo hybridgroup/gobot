@@ -79,9 +79,8 @@ func (m *MotorDriver) Max() {
 func (m *MotorDriver) IsOn() bool {
 	if m.isDigital() {
 		return m.CurrentState == 1
-	} else {
-		return m.CurrentSpeed > 0
 	}
+	return m.CurrentSpeed > 0
 }
 
 func (m *MotorDriver) IsOff() bool {

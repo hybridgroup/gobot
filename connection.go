@@ -11,7 +11,7 @@ type Connection interface {
 	Finalize() bool
 }
 
-type JsonConnection struct {
+type JSONConnection struct {
 	Name    string `json:"name"`
 	Port    string `json:"port"`
 	Adaptor string `json:"adaptor"`
@@ -75,10 +75,10 @@ func (c *connection) Finalize() bool {
 	return c.Adaptor.Finalize()
 }
 
-func (c *connection) ToJson() *JsonConnection {
-	jsonConnection := new(JsonConnection)
-	jsonConnection.Name = c.Name
-	jsonConnection.Port = c.Port
-	jsonConnection.Adaptor = c.Type
-	return jsonConnection
+func (c *connection) ToJSON() *JSONConnection {
+	return &JSONConnection{
+		Name:    c.Name,
+		Port:    c.Port,
+		Adaptor: c.Type,
+	}
 }

@@ -38,9 +38,9 @@ func Generate() cli.Command {
 			name := generate{UpperName: upperName, Name: string(args[0]), FirstLetter: string(args[0][0])}
 
 			adaptor, _ := template.New("").Parse(adaptor())
-			file_location := fmt.Sprintf("%s/%s_adaptor.go", dir, args[0])
-			fmt.Println("Creating", file_location)
-			f, err := os.Create(file_location)
+			fileLocation := fmt.Sprintf("%s/%s_adaptor.go", dir, args[0])
+			fmt.Println("Creating", fileLocation)
+			f, err := os.Create(fileLocation)
 			if err != nil {
 				fmt.Println(err)
 				err = nil
@@ -49,9 +49,9 @@ func Generate() cli.Command {
 			f.Close()
 
 			driver, _ := template.New("").Parse(driver())
-			file_location = fmt.Sprintf("%s/%s_driver.go", dir, args[0])
-			fmt.Println("Creating", file_location)
-			f, err = os.Create(file_location)
+			fileLocation = fmt.Sprintf("%s/%s_driver.go", dir, args[0])
+			fmt.Println("Creating", fileLocation)
+			f, err = os.Create(fileLocation)
 			if err != nil {
 				fmt.Println(err)
 				err = nil
@@ -60,9 +60,9 @@ func Generate() cli.Command {
 			f.Close()
 
 			readme, _ := template.New("").Parse(readme())
-			file_location = fmt.Sprintf("%s/README.md", dir)
-			fmt.Println("Creating", file_location)
-			f, err = os.Create(file_location)
+			fileLocation = fmt.Sprintf("%s/README.md", dir)
+			fmt.Println("Creating", fileLocation)
+			f, err = os.Create(fileLocation)
 			if err != nil {
 				fmt.Println(err)
 				err = nil
@@ -70,9 +70,9 @@ func Generate() cli.Command {
 			readme.Execute(f, name)
 			f.Close()
 
-			file_location = fmt.Sprintf("%s/LICENSE", dir)
-			fmt.Println("Creating", file_location)
-			f, err = os.Create(file_location)
+			fileLocation = fmt.Sprintf("%s/LICENSE", dir)
+			fmt.Println("Creating", fileLocation)
+			f, err = os.Create(fileLocation)
 			if err != nil {
 				fmt.Println(err)
 				err = nil
@@ -80,9 +80,9 @@ func Generate() cli.Command {
 			f.Close()
 
 			driverTest, _ := template.New("").Parse(driverTest())
-			file_location = fmt.Sprintf("%s/%s_driver_test.go", dir, args[0])
-			fmt.Println("Creating", file_location)
-			f, err = os.Create(file_location)
+			fileLocation = fmt.Sprintf("%s/%s_driver_test.go", dir, args[0])
+			fmt.Println("Creating", fileLocation)
+			f, err = os.Create(fileLocation)
 			if err != nil {
 				fmt.Println(err)
 				err = nil
@@ -91,9 +91,9 @@ func Generate() cli.Command {
 			f.Close()
 
 			adaptorTest, _ := template.New("").Parse(adaptorTest())
-			file_location = fmt.Sprintf("%s/%s_adaptor_test.go", dir, args[0])
-			fmt.Println("Creating", file_location)
-			f, err = os.Create(file_location)
+			fileLocation = fmt.Sprintf("%s/%s_adaptor_test.go", dir, args[0])
+			fmt.Println("Creating", fileLocation)
+			f, err = os.Create(fileLocation)
 			if err != nil {
 				fmt.Println(err)
 				err = nil
@@ -102,9 +102,9 @@ func Generate() cli.Command {
 			f.Close()
 
 			testSuite, _ := template.New("").Parse(testSuite())
-			file_location = fmt.Sprintf("%s/%s_suite_test.go", dir, args[0])
-			fmt.Println("Creating", file_location)
-			f, err = os.Create(file_location)
+			fileLocation = fmt.Sprintf("%s/%s_suite_test.go", dir, args[0])
+			fmt.Println("Creating", fileLocation)
+			f, err = os.Create(fileLocation)
 			if err != nil {
 				fmt.Println(err)
 				err = nil

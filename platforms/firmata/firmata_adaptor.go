@@ -50,7 +50,7 @@ func (f *FirmataAdaptor) InitServo() {}
 func (f *FirmataAdaptor) ServoWrite(pin string, angle byte) {
 	p, _ := strconv.Atoi(pin)
 
-	f.Board.setPinMode(byte(p), SERVO)
+	f.Board.setPinMode(byte(p), Servo)
 	f.Board.analogWrite(byte(p), angle)
 }
 
@@ -64,14 +64,14 @@ func (f *FirmataAdaptor) PwmWrite(pin string, level byte) {
 func (f *FirmataAdaptor) DigitalWrite(pin string, level byte) {
 	p, _ := strconv.Atoi(pin)
 
-	f.Board.setPinMode(byte(p), OUTPUT)
+	f.Board.setPinMode(byte(p), Output)
 	f.Board.digitalWrite(byte(p), level)
 }
 
 func (f *FirmataAdaptor) DigitalRead(pin string) int {
 	p, _ := strconv.Atoi(pin)
-	f.Board.setPinMode(byte(p), INPUT)
-	f.Board.togglePinReporting(byte(p), HIGH, REPORT_DIGITAL)
+	f.Board.setPinMode(byte(p), Input)
+	f.Board.togglePinReporting(byte(p), High, ReportDigital)
 	events := f.Board.findEvents(fmt.Sprintf("digital_read_%v", pin))
 	if len(events) > 0 {
 		return int(events[len(events)-1].Data[0])
@@ -83,8 +83,8 @@ func (f *FirmataAdaptor) DigitalRead(pin string) int {
 func (f *FirmataAdaptor) AnalogRead(pin string) int {
 	p, _ := strconv.Atoi(pin)
 	p = f.digitalPin(p)
-	f.Board.setPinMode(byte(p), ANALOG)
-	f.Board.togglePinReporting(byte(p), HIGH, REPORT_ANALOG)
+	f.Board.setPinMode(byte(p), Analog)
+	f.Board.togglePinReporting(byte(p), High, ReportAnalog)
 	events := f.Board.findEvents(fmt.Sprintf("analog_read_%v", pin))
 	if len(events) > 0 {
 		event := events[len(events)-1]

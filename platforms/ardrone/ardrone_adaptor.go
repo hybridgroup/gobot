@@ -45,6 +45,6 @@ func (a *ArdroneAdaptor) Finalize() bool {
 	return true
 }
 
-func (me *ArdroneAdaptor) Drone() drone {
-	return me.drone
+func (a *ArdroneAdaptor) Drone() drone {
+	return a.drone
 }

@@ -9,7 +9,7 @@ import (
 
 func main() {
 	gbot := gobot.NewGobot()
-	api.NewApi(gbot).Start()
+	api.NewAPI(gbot).Start()
 
 	digisparkAdaptor := digispark.NewDigisparkAdaptor("Digispark")
 	led := gpio.NewLedDriver(digisparkAdaptor, "led", "0")

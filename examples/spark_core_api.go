@@ -10,7 +10,7 @@ import (
 
 func main() {
 	master := gobot.NewGobot()
-	api.NewApi(master).Start()
+	api.NewAPI(master).Start()
 
 	sparkCore := spark.NewSparkCoreAdaptor("spark", "device_id", "access_token")
 	led := gpio.NewLedDriver(sparkCore, "led", "D7")

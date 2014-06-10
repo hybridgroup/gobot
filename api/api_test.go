@@ -19,7 +19,7 @@ var _ = Describe("API", func() {
 
 	BeforeEach(func() {
 		m = gobot.NewGobot()
-		a = NewApi(m)
+		a = NewAPI(m)
 		a.start = func(m *api) {}
 
 		m.Robots = []*gobot.Robot{
@@ -51,7 +51,7 @@ var _ = Describe("API", func() {
 		It("should return all robot devices", func() {
 			request, _ := http.NewRequest("GET", "/robots/Robot%201/devices", nil)
 			response := httptest.NewRecorder()
-			a.robot_devices("Robot 1", response, request)
+			a.robotDevices("Robot 1", response, request)
 			body, _ := ioutil.ReadAll(response.Body)
 			var i []map[string]interface{}
 			json.Unmarshal(body, &i)
@@ -60,7 +60,7 @@ var _ = Describe("API", func() {
 		PIt("should return robot commands", func() {
 			request, _ := http.NewRequest("GET", "/robots/Robot%201/commands", nil)
 			response := httptest.NewRecorder()
-			a.robot_commands("Robot 1", response, request)
+			a.robotCommands("Robot 1", response, request)
 			body, _ := ioutil.ReadAll(response.Body)
 			var i []string
 			json.Unmarshal(body, &i)
@@ -89,7 +89,7 @@ var _ = Describe("API", func() {
 		It("should return robot device", func() {
 			request, _ := http.NewRequest("GET", "/robots/Robot%201/devices/Device%201", nil)
 			response := httptest.NewRecorder()
-			a.robot_device("Robot 1", "Device 1", response, request)
+			a.robotDevice("Robot 1", "Device 1", response, request)
 			body, _ := ioutil.ReadAll(response.Body)
 			var i map[string]interface{}
 			json.Unmarshal(body, &i)
@@ -98,7 +98,7 @@ var _ = Describe("API", func() {
 		It("should return device commands", func() {
 			request, _ := http.NewRequest("GET", "/robots/Robot%201/devices/Device%201/commands", nil)
 			response := httptest.NewRecorder()
-			a.robot_device_commands("Robot 1", "Device 1", response, request)
+			a.robotDeviceCommands("Robot 1", "Device 1", response, request)
 			body, _ := ioutil.ReadAll(response.Body)
 			var i []string
 			json.Unmarshal(body, &i)

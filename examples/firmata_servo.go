@@ -21,8 +21,8 @@ func main() {
 		})
 	}
 
-	gbot.Robot = append(gbot.Robot,
+	gbot.Robots = append(gbot.Robots,
 		gobot.NewRobot("servoBot", []gobot.Connection{firmataAdaptor}, []gobot.Device{servo}, work))
 
-	gbott.Start()
+	gbot.Start()
 }

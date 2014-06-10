@@ -16,10 +16,10 @@ type Device interface {
 	getName() string
 }
 
-type JsonDevice struct {
+type JSONDevice struct {
 	Name       string          `json:"name"`
 	Driver     string          `json:"driver"`
-	Connection *JsonConnection `json:"connection"`
+	Connection *JSONConnection `json:"connection"`
 	Commands   []string        `json:"commands"`
 }
 
@@ -97,13 +97,13 @@ func (d *device) Commands() interface{} {
 	return FieldByNamePtr(d.Driver, "Commands").Interface()
 }
 
-func (d *device) ToJson() *JsonDevice {
-	jsonDevice := new(JsonDevice)
-	jsonDevice.Name = d.Name
-	jsonDevice.Driver = d.Type
-	jsonDevice.Connection = d.Robot.Connection(FieldByNamePtr(FieldByNamePtr(d.Driver, "Adaptor").
-		Interface().(AdaptorInterface), "Name").
-		Interface().(string)).ToJson()
-	jsonDevice.Commands = FieldByNamePtr(d.Driver, "Commands").Interface().([]string)
-	return jsonDevice
+func (d *device) ToJSON() *JSONDevice {
+	return &JSONDevice{
+		Name:   d.Name,
+		Driver: d.Type,
+		Connection: d.Robot.Connection(FieldByNamePtr(FieldByNamePtr(d.Driver, "Adaptor").
+			Interface().(AdaptorInterface), "Name").
+			Interface().(string)).ToJSON(),
+		Commands: FieldByNamePtr(d.Driver, "Commands").Interface().([]string),
+	}
 }

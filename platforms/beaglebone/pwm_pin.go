@@ -19,7 +19,7 @@ func newPwmPin(pinNum string) *pwmPin {
 
 	d := new(pwmPin)
 	d.pinNum = strings.ToUpper(pinNum)
-	slots, err := filepath.Glob(SLOTS)
+	slots, err := filepath.Glob(Slots)
 	if err != nil {
 		panic(err)
 	}
@@ -33,7 +33,7 @@ func newPwmPin(pinNum string) *pwmPin {
 	fi.Sync()
 	fi.Close()
 
-	ocp, err := filepath.Glob(OCP)
+	ocp, err := filepath.Glob(Ocp)
 	if err != nil {
 		panic(err)
 	}
@@ -57,18 +57,18 @@ func newPwmPin(pinNum string) *pwmPin {
 	return d
 }
 
-func (me *pwmPin) pwmWrite(period string, duty string) {
+func (p *pwmPin) pwmWrite(period string, duty string) {
 	var err error
 	var fi *os.File
 
-	fi, err = os.OpenFile(fmt.Sprintf("%v/period", me.pwmDevice), os.O_WRONLY|os.O_APPEND, 0666)
+	fi, err = os.OpenFile(fmt.Sprintf("%v/period", p.pwmDevice), os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
 		panic(err)
 	}
 	fi.WriteString(period)
 	fi.Close()
 
-	fi, err = os.OpenFile(fmt.Sprintf("%v/duty", me.pwmDevice), os.O_WRONLY|os.O_APPEND, 0666)
+	fi, err = os.OpenFile(fmt.Sprintf("%v/duty", p.pwmDevice), os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
 		panic(err)
 	}
@@ -76,8 +76,8 @@ func (me *pwmPin) pwmWrite(period string, duty string) {
 	fi.Close()
 }
 
-func (me *pwmPin) release() {
-	fi, err := os.OpenFile(fmt.Sprintf("%v/run", me.pwmDevice), os.O_WRONLY|os.O_APPEND, 0666)
+func (p *pwmPin) release() {
+	fi, err := os.OpenFile(fmt.Sprintf("%v/run", p.pwmDevice), os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
 		panic(err)
 	}

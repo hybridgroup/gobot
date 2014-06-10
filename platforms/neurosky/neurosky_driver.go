@@ -5,14 +5,14 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
-const BT_SYNC byte = 0xAA
-const CODE_EX byte = 0x55             // Extended code
-const CODE_SIGNAL_QUALITY byte = 0x02 // POOR_SIGNAL quality 0-255
-const CODE_ATTENTION byte = 0x04      // ATTENTION eSense 0-100
-const CODE_MEDITATION byte = 0x05     // MEDITATION eSense 0-100
-const CODE_BLINK byte = 0x16          // BLINK strength 0-255
-const CODE_WAVE byte = 0x80           // RAW wave value: 2-byte big-endian 2s-complement
-const CODE_ASIC_EEG byte = 0x83       // ASIC EEG POWER 8 3-byte big-endian integers
+const BTSync byte = 0xAA
+const CodeEx byte = 0x55            // Extended code
+const CodeSignalQuality byte = 0x02 // POOR_SIGNAL quality 0-255
+const CodeAttention byte = 0x04     // ATTENTION eSense 0-100
+const CodeMeditation byte = 0x05    // MEDITATION eSense 0-100
+const CodeBlink byte = 0x16         // BLINK strength 0-255
+const CodeWave byte = 0x80          // RAW wave value: 2-byte big-endian 2s-complement
+const CodeAsicEEG byte = 0x83       // ASIC EEG POWER 8 3-byte big-endian integers
 
 type NeuroskyDriver struct {
 	gobot.Driver
@@ -69,7 +69,7 @@ func (n *NeuroskyDriver) parse(buf *bytes.Buffer) {
 	for buf.Len() > 2 {
 		b1, _ := buf.ReadByte()
 		b2, _ := buf.ReadByte()
-		if b1 == BT_SYNC && b2 == BT_SYNC {
+		if b1 == BTSync && b2 == BTSync {
 			length, _ := buf.ReadByte()
 			var payload = make([]byte, int(length))
 			buf.Read(payload)
@@ -80,53 +80,53 @@ func (n *NeuroskyDriver) parse(buf *bytes.Buffer) {
 	}
 }
 
-func (me *NeuroskyDriver) parsePacket(data []byte) {
+func (n *NeuroskyDriver) parsePacket(data []byte) {
 	buf := bytes.NewBuffer(data)
 	for buf.Len() > 0 {
 		b, _ := buf.ReadByte()
 		switch b {
-		case CODE_EX:
-			gobot.Publish(me.Events["Extended"], nil)
-		case CODE_SIGNAL_QUALITY:
+		case CodeEx:
+			gobot.Publish(n.Events["Extended"], nil)
+		case CodeSignalQuality:
 			ret, _ := buf.ReadByte()
-			gobot.Publish(me.Events["Signal"], ret)
-		case CODE_ATTENTION:
+			gobot.Publish(n.Events["Signal"], ret)
+		case CodeAttention:
 			ret, _ := buf.ReadByte()
-			gobot.Publish(me.Events["Attention"], ret)
-		case CODE_MEDITATION:
+			gobot.Publish(n.Events["Attention"], ret)
+		case CodeMeditation:
 			ret, _ := buf.ReadByte()
-			gobot.Publish(me.Events["Meditation"], ret)
-		case CODE_BLINK:
+			gobot.Publish(n.Events["Meditation"], ret)
+		case CodeBlink:
 			ret, _ := buf.ReadByte()
-			gobot.Publish(me.Events["Blink"], ret)
-		case CODE_WAVE:
+			gobot.Publish(n.Events["Blink"], ret)
+		case CodeWave:
 			buf.Next(1)
 			var ret = make([]byte, 2)
 			buf.Read(ret)
-			gobot.Publish(me.Events["Wave"], ret)
-		case CODE_ASIC_EEG:
+			gobot.Publish(n.Events["Wave"], ret)
+		case CodeAsicEEG:
 			var ret = make([]byte, 25)
-			n, _ := buf.Read(ret)
-			if n == 25 {
-				gobot.Publish(me.Events["EEG"], me.parseEEG(ret))
+			i, _ := buf.Read(ret)
+			if i == 25 {
+				gobot.Publish(n.Events["EEG"], n.parseEEG(ret))
 			}
 		}
 	}
 }
 
-func (me *NeuroskyDriver) parseEEG(data []byte) EEG {
+func (n *NeuroskyDriver) parseEEG(data []byte) EEG {
 	return EEG{
-		Delta:    me.parse3ByteInteger(data[0:3]),
-		Theta:    me.parse3ByteInteger(data[3:6]),
-		LoAlpha:  me.parse3ByteInteger(data[6:9]),
-		HiAlpha:  me.parse3ByteInteger(data[9:12]),
-		LoBeta:   me.parse3ByteInteger(data[12:15]),
-		HiBeta:   me.parse3ByteInteger(data[15:18]),
-		LoGamma:  me.parse3ByteInteger(data[18:21]),
-		MidGamma: me.parse3ByteInteger(data[21:25]),
+		Delta:    n.parse3ByteInteger(data[0:3]),
+		Theta:    n.parse3ByteInteger(data[3:6]),
+		LoAlpha:  n.parse3ByteInteger(data[6:9]),
+		HiAlpha:  n.parse3ByteInteger(data[9:12]),
+		LoBeta:   n.parse3ByteInteger(data[12:15]),
+		HiBeta:   n.parse3ByteInteger(data[15:18]),
+		LoGamma:  n.parse3ByteInteger(data[18:21]),
+		MidGamma: n.parse3ByteInteger(data[21:25]),
 	}
 }
 
-func (me *NeuroskyDriver) parse3ByteInteger(data []byte) int {
+func (n *NeuroskyDriver) parse3ByteInteger(data []byte) int {
 	return ((int(data[0]) << 16) | (((1 << 16) - 1) & (int(data[1]) << 8)) | (((1 << 8) - 1) & int(data[2])))
 }

@@ -5,7 +5,7 @@ import (
 	"syscall"
 )
 
-const I2C_SLAVE = 0x0703
+const I2CSlave = 0x0703
 
 type i2cDevice struct {
 	i2cDevice   *os.File
@@ -20,26 +20,26 @@ func newI2cDevice(i2cLocation string, address byte) *i2cDevice {
 	return d
 }
 
-func (me *i2cDevice) start() {
+func (i *i2cDevice) start() {
 	var err error
-	me.i2cDevice, err = os.OpenFile(me.i2cLocation, os.O_RDWR, os.ModeExclusive)
+	i.i2cDevice, err = os.OpenFile(i.i2cLocation, os.O_RDWR, os.ModeExclusive)
 	if err != nil {
 		panic(err)
 	}
-	_, _, errCode := syscall.Syscall(syscall.SYS_IOCTL, me.i2cDevice.Fd(), I2C_SLAVE, uintptr(me.address))
+	_, _, errCode := syscall.Syscall(syscall.SYS_IOCTL, i.i2cDevice.Fd(), I2CSlave, uintptr(i.address))
 	if errCode != 0 {
 		panic(err)
 	}
 
-	me.write([]byte{0})
+	i.write([]byte{0})
 }
 
-func (me *i2cDevice) write(data []byte) {
-	me.i2cDevice.Write(data)
+func (i *i2cDevice) write(data []byte) {
+	i.i2cDevice.Write(data)
 }
 
-func (me *i2cDevice) read(len uint) []byte {
+func (i *i2cDevice) read(len uint) []byte {
 	buf := make([]byte, len)
-	me.i2cDevice.Read(buf)
+	i.i2cDevice.Read(buf)
 	return buf
 }

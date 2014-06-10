@@ -12,9 +12,9 @@ type digitalPin struct {
 	Status  string
 }
 
-const GPIO_PATH = "/sys/class/gpio"
-const GPIO_DIRECTION_READ = "in"
-const GPIO_DIRECTION_WRITE = "out"
+const GPIOPath = "/sys/class/gpio"
+const GPIODirectionRead = "in"
+const GPIODirectionWrite = "out"
 const HIGH = 1
 const LOW = 0
 
@@ -22,7 +22,7 @@ func newDigitalPin(pinNum int, mode string) *digitalPin {
 	d := new(digitalPin)
 	d.PinNum = strconv.Itoa(pinNum)
 
-	fi, err := os.OpenFile(GPIO_PATH+"/export", os.O_WRONLY|os.O_APPEND, 0666)
+	fi, err := os.OpenFile(GPIOPath+"/export", os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
 		panic(err)
 	}
@@ -38,24 +38,24 @@ func (d *digitalPin) setMode(mode string) {
 	d.Mode = mode
 
 	if mode == "w" {
-		fi, err := os.OpenFile(GPIO_PATH+"/gpio"+d.PinNum+"/direction", os.O_WRONLY, 0666)
+		fi, err := os.OpenFile(GPIOPath+"/gpio"+d.PinNum+"/direction", os.O_WRONLY, 0666)
 		if err != nil {
 			panic(err)
 		}
-		fi.WriteString(GPIO_DIRECTION_WRITE)
+		fi.WriteString(GPIODirectionWrite)
 		fi.Close()
-		d.PinFile, err = os.OpenFile(GPIO_PATH+"/gpio"+d.PinNum+"/value", os.O_WRONLY, 0666)
+		d.PinFile, err = os.OpenFile(GPIOPath+"/gpio"+d.PinNum+"/value", os.O_WRONLY, 0666)
 		if err != nil {
 			panic(err)
 		}
 	} else if mode == "r" {
-		fi, err := os.OpenFile(GPIO_PATH+"/gpio"+d.PinNum+"/direction", os.O_WRONLY, 0666)
+		fi, err := os.OpenFile(GPIOPath+"/gpio"+d.PinNum+"/direction", os.O_WRONLY, 0666)
 		if err != nil {
 			panic(err)
 		}
-		fi.WriteString(GPIO_DIRECTION_READ)
+		fi.WriteString(GPIODirectionRead)
 		fi.Close()
-		d.PinFile, err = os.OpenFile(GPIO_PATH+"/gpio"+d.PinNum+"/value", os.O_RDONLY, 0666)
+		d.PinFile, err = os.OpenFile(GPIOPath+"/gpio"+d.PinNum+"/value", os.O_RDONLY, 0666)
 		if err != nil {
 			panic(err)
 		}
@@ -72,7 +72,7 @@ func (d *digitalPin) digitalWrite(value string) {
 }
 
 func (d *digitalPin) close() {
-	fi, err := os.OpenFile(GPIO_PATH+"/unexport", os.O_WRONLY|os.O_APPEND, 0666)
+	fi, err := os.OpenFile(GPIOPath+"/unexport", os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
 		panic(err)
 	}

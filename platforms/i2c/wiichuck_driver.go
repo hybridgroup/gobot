@@ -41,9 +41,9 @@ func (w *WiichuckDriver) Start() bool {
 	gobot.Every(w.Interval, func() {
 		w.Adaptor.I2cWrite([]byte{0x40, 0x00})
 		w.Adaptor.I2cWrite([]byte{0x00})
-		new_value := w.Adaptor.I2cRead(6)
-		if len(new_value) == 6 {
-			w.update(new_value)
+		newValue := w.Adaptor.I2cRead(6)
+		if len(newValue) == 6 {
+			w.update(newValue)
 		}
 	})
 	return true
@@ -62,9 +62,9 @@ func (w *WiichuckDriver) update(value []byte) {
 	}
 }
 
-func (w *WiichuckDriver) setJoystickDefaultValue(joystick_axis string, default_value float64) {
-	if w.joystick[joystick_axis] == -1 {
-		w.joystick[joystick_axis] = default_value
+func (w *WiichuckDriver) setJoystickDefaultValue(joystickAxis string, defaultValue float64) {
+	if w.joystick[joystickAxis] == -1 {
+		w.joystick[joystickAxis] = defaultValue
 	}
 }
 
@@ -75,9 +75,8 @@ func (w *WiichuckDriver) calculateJoystickValue(axis float64, origin float64) fl
 func (w *WiichuckDriver) isEncrypted(value []byte) bool {
 	if value[0] == value[1] && value[2] == value[3] && value[4] == value[5] {
 		return true
-	} else {
-		return false
 	}
+	return false
 }
 
 func (w *WiichuckDriver) decode(x byte) float64 {

@@ -25,46 +25,46 @@ func NewArdroneDriver(adaptor DroneInterface, name string) *ArdroneDriver {
 	}
 }
 
-func (me *ArdroneDriver) Start() bool {
+func (a *ArdroneDriver) Start() bool {
 	return true
 }
-func (me *ArdroneDriver) Halt() bool {
+func (a *ArdroneDriver) Halt() bool {
 	return true
 }
-func (me *ArdroneDriver) Init() bool {
+func (a *ArdroneDriver) Init() bool {
 	return true
 }
 
-func (me *ArdroneDriver) TakeOff() {
-	gobot.Publish(me.Events["Flying"], gobot.Call(me.Adaptor.Drone(), "Takeoff"))
+func (a *ArdroneDriver) TakeOff() {
+	gobot.Publish(a.Events["Flying"], gobot.Call(a.Adaptor.Drone(), "Takeoff"))
 }
-func (me *ArdroneDriver) Land() {
-	gobot.Call(me.Adaptor.Drone(), "Land")
+func (a *ArdroneDriver) Land() {
+	gobot.Call(a.Adaptor.Drone(), "Land")
 }
-func (me *ArdroneDriver) Up(a float64) {
-	gobot.Call(me.Adaptor.Drone(), "Up", a)
+func (a *ArdroneDriver) Up(n float64) {
+	gobot.Call(a.Adaptor.Drone(), "Up", n)
 }
-func (me *ArdroneDriver) Down(a float64) {
-	gobot.Call(me.Adaptor.Drone(), "Down", a)
+func (a *ArdroneDriver) Down(n float64) {
+	gobot.Call(a.Adaptor.Drone(), "Down", n)
 }
-func (me *ArdroneDriver) Left(a float64) {
-	gobot.Call(me.Adaptor.Drone(), "Left", a)
+func (a *ArdroneDriver) Left(n float64) {
+	gobot.Call(a.Adaptor.Drone(), "Left", n)
 }
-func (me *ArdroneDriver) Right(a float64) {
-	gobot.Call(me.Adaptor.Drone(), "Right", a)
+func (a *ArdroneDriver) Right(n float64) {
+	gobot.Call(a.Adaptor.Drone(), "Right", n)
 }
-func (me *ArdroneDriver) Forward(a float64) {
-	gobot.Call(me.Adaptor.Drone(), "Forward", a)
+func (a *ArdroneDriver) Forward(n float64) {
+	gobot.Call(a.Adaptor.Drone(), "Forward", n)
 }
-func (me *ArdroneDriver) Backward(a float64) {
-	gobot.Call(me.Adaptor.Drone(), "Backward", a)
+func (a *ArdroneDriver) Backward(n float64) {
+	gobot.Call(a.Adaptor.Drone(), "Backward", n)
 }
-func (me *ArdroneDriver) Clockwise(a float64) {
-	gobot.Call(me.Adaptor.Drone(), "Clockwise", a)
+func (a *ArdroneDriver) Clockwise(n float64) {
+	gobot.Call(a.Adaptor.Drone(), "Clockwise", n)
 }
-func (me *ArdroneDriver) CounterClockwise(a float64) {
-	gobot.Call(me.Adaptor.Drone(), "Counterclockwise", a)
+func (a *ArdroneDriver) CounterClockwise(n float64) {
+	gobot.Call(a.Adaptor.Drone(), "Counterclockwise", n)
 }
-func (me *ArdroneDriver) Hover() {
-	gobot.Call(me.Adaptor.Drone(), "Hover")
+func (a *ArdroneDriver) Hover() {
+	gobot.Call(a.Adaptor.Drone(), "Hover")
 }

@@ -24,8 +24,8 @@ func main() {
 
 	work := func() {
 		offset := 32767.0
-		right_stick := pair{x: 0, y: 0}
-		left_stick := pair{x: 0, y: 0}
+		rightStick := pair{x: 0, y: 0}
+		leftStick := pair{x: 0, y: 0}
 
 		gobot.On(joystick.Events["square_press"], func(data interface{}) {
 			drone.TakeOff()
@@ -38,31 +38,31 @@ func main() {
 		})
 		gobot.On(joystick.Events["left_x"], func(data interface{}) {
 			val := float64(data.(int16))
-			if left_stick.x != val {
-				left_stick.x = val
+			if leftStick.x != val {
+				leftStick.x = val
 			}
 		})
 		gobot.On(joystick.Events["left_y"], func(data interface{}) {
 			val := float64(data.(int16))
-			if left_stick.y != val {
-				left_stick.y = val
+			if leftStick.y != val {
+				leftStick.y = val
 			}
 		})
 		gobot.On(joystick.Events["right_x"], func(data interface{}) {
 			val := float64(data.(int16))
-			if right_stick.x != val {
-				right_stick.x = val
+			if rightStick.x != val {
+				rightStick.x = val
 			}
 		})
 		gobot.On(joystick.Events["right_y"], func(data interface{}) {
 			val := float64(data.(int16))
-			if right_stick.y != val {
-				right_stick.y = val
+			if rightStick.y != val {
+				rightStick.y = val
 			}
 		})
 
 		gobot.Every(10*time.Millisecond, func() {
-			pair := left_stick
+			pair := leftStick
 			if pair.y < -10 {
 				drone.Forward(validatePitch(pair.y, offset))
 			} else if pair.y > 10 {
@@ -81,7 +81,7 @@ func main() {
 		})
 
 		gobot.Every(10*time.Millisecond, func() {
-			pair := right_stick
+			pair := rightStick
 			if pair.y < -10 {
 				drone.Up(validatePitch(pair.y, offset))
 			} else if pair.y > 10 {
@@ -111,10 +111,8 @@ func validatePitch(data float64, offset float64) float64 {
 	if value >= 0.1 {
 		if value <= 1.0 {
 			return float64(int(value*100)) / 100
-		} else {
-			return 1.0
 		}
-	} else {
-		return 0.0
+		return 1.0
 	}
+	return 0.0
 }

@@ -19,7 +19,7 @@ func newAnalogPin(pinNum string) *analogPin {
 	d := new(analogPin)
 	d.pinNum = pinNum
 
-	slot, err := filepath.Glob(SLOTS)
+	slot, err := filepath.Glob(Slots)
 	if err != nil {
 		panic(err)
 	}
@@ -32,11 +32,11 @@ func newAnalogPin(pinNum string) *analogPin {
 	return d
 }
 
-func (me *analogPin) analogRead() int {
+func (a *analogPin) analogRead() int {
 	var err error
 	var fi *os.File
 
-	ocp, err := filepath.Glob(OCP)
+	ocp, err := filepath.Glob(Ocp)
 	if err != nil {
 		panic(err)
 	}
@@ -46,12 +46,12 @@ func (me *analogPin) analogRead() int {
 		panic(err)
 	}
 
-	fi, err = os.Open(fmt.Sprintf("%v/%v", helper[0], me.pinNum))
+	fi, err = os.Open(fmt.Sprintf("%v/%v", helper[0], a.pinNum))
 	if err != nil {
 		panic(err)
 	}
 
-	var buf []byte = make([]byte, 1024)
+	var buf = make([]byte, 1024)
 	fi.Read(buf)
 	fi.Close()
 

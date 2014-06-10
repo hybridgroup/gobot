@@ -27,7 +27,7 @@ type api struct {
 	start    func(*api)
 }
 
-func NewApi(g *gobot.Gobot) *api {
+func NewAPI(g *gobot.Gobot) *api {
 	return &api{
 		gobot: g,
 		start: func(a *api) {
@@ -82,54 +82,54 @@ func (a *api) Start() {
 	})
 
 	a.server.Get("/robots/:robotname/commands", func(params martini.Params, res http.ResponseWriter, req *http.Request) {
-		a.robot_commands(params["robotname"], res, req)
+		a.robotCommands(params["robotname"], res, req)
 	})
 
-	robot_command_route := "/robots/:robotname/commands/:command"
+	robotCommandRoute := "/robots/:robotname/commands/:command"
 
-	a.server.Get(robot_command_route, func(params martini.Params, res http.ResponseWriter, req *http.Request) {
+	a.server.Get(robotCommandRoute, func(params martini.Params, res http.ResponseWriter, req *http.Request) {
 		a.executeRobotCommand(params["robotname"], params["command"], res, req)
 	})
-	a.server.Post(robot_command_route, func(params martini.Params, res http.ResponseWriter, req *http.Request) {
+	a.server.Post(robotCommandRoute, func(params martini.Params, res http.ResponseWriter, req *http.Request) {
 		a.executeRobotCommand(params["robotname"], params["command"], res, req)
 	})
 
 	a.server.Get("/robots/:robotname/devices", func(params martini.Params, res http.ResponseWriter, req *http.Request) {
-		a.robot_devices(params["robotname"], res, req)
+		a.robotDevices(params["robotname"], res, req)
 	})
 
 	a.server.Get("/robots/:robotname/devices/:devicename", func(params martini.Params, res http.ResponseWriter, req *http.Request) {
-		a.robot_device(params["robotname"], params["devicename"], res, req)
+		a.robotDevice(params["robotname"], params["devicename"], res, req)
 	})
 
 	a.server.Get("/robots/:robotname/devices/:devicename/commands", func(params martini.Params, res http.ResponseWriter, req *http.Request) {
-		a.robot_device_commands(params["robotname"], params["devicename"], res, req)
+		a.robotDeviceCommands(params["robotname"], params["devicename"], res, req)
 	})
 
-	command_route := "/robots/:robotname/devices/:devicename/commands/:command"
+	commandRoute := "/robots/:robotname/devices/:devicename/commands/:command"
 
-	a.server.Get(command_route, func(params martini.Params, res http.ResponseWriter, req *http.Request) {
+	a.server.Get(commandRoute, func(params martini.Params, res http.ResponseWriter, req *http.Request) {
 		a.executeCommand(params["robotname"], params["devicename"], params["command"], res, req)
 	})
-	a.server.Post(command_route, func(params martini.Params, res http.ResponseWriter, req *http.Request) {
+	a.server.Post(commandRoute, func(params martini.Params, res http.ResponseWriter, req *http.Request) {
 		a.executeCommand(params["robotname"], params["devicename"], params["command"], res, req)
 	})
 
 	a.server.Get("/robots/:robotname/connections", func(params martini.Params, res http.ResponseWriter, req *http.Request) {
-		a.robot_connections(params["robotname"], res, req)
+		a.robotConnections(params["robotname"], res, req)
 	})
 
 	a.server.Get("/robots/:robotname/connections/:connectionname", func(params martini.Params, res http.ResponseWriter, req *http.Request) {
-		a.robot_connection(params["robotname"], params["connectionname"], res, req)
+		a.robotConnection(params["robotname"], params["connectionname"], res, req)
 	})
 
 	a.start(a)
 }
 
 func (a *api) robots(res http.ResponseWriter, req *http.Request) {
-	jsonRobots := make([]*gobot.JsonRobot, 0)
+	jsonRobots := []*gobot.JSONRobot{}
 	for _, robot := range a.gobot.Robots {
-		jsonRobots = append(jsonRobots, robot.ToJson())
+		jsonRobots = append(jsonRobots, robot.ToJSON())
 	}
 	data, _ := json.Marshal(jsonRobots)
 	res.Header().Set("Content-Type", "application/json; charset=utf-8")
@@ -137,53 +137,53 @@ func (a *api) robots(res http.ResponseWriter, req *http.Request) {
 }
 
 func (a *api) robot(name string, res http.ResponseWriter, req *http.Request) {
-	data, _ := json.Marshal(a.gobot.Robot(name).ToJson())
+	data, _ := json.Marshal(a.gobot.Robot(name).ToJSON())
 	res.Header().Set("Content-Type", "application/json; charset=utf-8")
 	res.Write(data)
 }
 
-func (a *api) robot_commands(name string, res http.ResponseWriter, req *http.Request) {
+func (a *api) robotCommands(name string, res http.ResponseWriter, req *http.Request) {
 	data, _ := json.Marshal(a.gobot.Robot(name).RobotCommands)
 	res.Header().Set("Content-Type", "application/json; charset=utf-8")
 	res.Write(data)
 }
 
-func (a *api) robot_devices(name string, res http.ResponseWriter, req *http.Request) {
+func (a *api) robotDevices(name string, res http.ResponseWriter, req *http.Request) {
 	devices := a.gobot.Robot(name).Devices()
-	jsonDevices := make([]*gobot.JsonDevice, 0)
+	jsonDevices := []*gobot.JSONDevice{}
 	for _, device := range devices {
-		jsonDevices = append(jsonDevices, device.ToJson())
+		jsonDevices = append(jsonDevices, device.ToJSON())
 	}
 	data, _ := json.Marshal(jsonDevices)
 	res.Header().Set("Content-Type", "application/json; charset=utf-8")
 	res.Write(data)
 }
 
-func (a *api) robot_device(robot string, device string, res http.ResponseWriter, req *http.Request) {
-	data, _ := json.Marshal(a.gobot.Robot(robot).Device(device).ToJson())
+func (a *api) robotDevice(robot string, device string, res http.ResponseWriter, req *http.Request) {
+	data, _ := json.Marshal(a.gobot.Robot(robot).Device(device).ToJSON())
 	res.Header().Set("Content-Type", "application/json; charset=utf-8")
 	res.Write(data)
 }
 
-func (a *api) robot_device_commands(robot string, device string, res http.ResponseWriter, req *http.Request) {
+func (a *api) robotDeviceCommands(robot string, device string, res http.ResponseWriter, req *http.Request) {
 	data, _ := json.Marshal(a.gobot.Robot(robot).Device(device).Commands())
 	res.Header().Set("Content-Type", "application/json; charset=utf-8")
 	res.Write(data)
 }
 
-func (a *api) robot_connections(name string, res http.ResponseWriter, req *http.Request) {
+func (a *api) robotConnections(name string, res http.ResponseWriter, req *http.Request) {
 	connections := a.gobot.Robot(name).Connections()
-	jsonConnections := make([]*gobot.JsonConnection, 0)
+	jsonConnections := []*gobot.JSONConnection{}
 	for _, connection := range connections {
-		jsonConnections = append(jsonConnections, connection.ToJson())
+		jsonConnections = append(jsonConnections, connection.ToJSON())
 	}
 	data, _ := json.Marshal(jsonConnections)
 	res.Header().Set("Content-Type", "application/json; charset=utf-8")
 	res.Write(data)
 }
 
-func (a *api) robot_connection(robot string, connection string, res http.ResponseWriter, req *http.Request) {
-	data, _ := json.Marshal(a.gobot.Robot(robot).Connection(connection).ToJson())
+func (a *api) robotConnection(robot string, connection string, res http.ResponseWriter, req *http.Request) {
+	data, _ := json.Marshal(a.gobot.Robot(robot).Connection(connection).ToJSON())
 	res.Header().Set("Content-Type", "application/json; charset=utf-8")
 	res.Write(data)
 }
@@ -196,7 +196,7 @@ func (a *api) executeCommand(robotname string, devicename string, commandname st
 	commands := robot.Commands().([]string)
 	for command := range commands {
 		if commands[command] == commandname {
-			ret := make([]interface{}, 0)
+			ret := []interface{}{}
 			for _, v := range gobot.Call(robot.Driver, commandname, body) {
 				ret = append(ret, v.Interface())
 			}
@@ -221,7 +221,7 @@ func (a *api) executeRobotCommand(robotname string, commandname string, res http
 	in[0] = reflect.ValueOf(body)
 	command := robot.Commands[commandname]
 	if command != nil {
-		ret := make([]interface{}, 0)
+		ret := []interface{}{}
 		for _, v := range reflect.ValueOf(robot.Commands[commandname]).Call(in) {
 			ret = append(ret, v.Interface())
 		}

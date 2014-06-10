@@ -29,10 +29,10 @@ func NewMakeyButtonDriver(a DigitalReader, name string, pin string) *MakeyButton
 func (m *MakeyButtonDriver) Start() bool {
 	state := 0
 	gobot.Every(m.Interval, func() {
-		new_value := m.readState()
-		if new_value != state && new_value != -1 {
-			state = new_value
-			m.update(new_value)
+		newValue := m.readState()
+		if newValue != state && newValue != -1 {
+			state = newValue
+			m.update(newValue)
 		}
 	})
 	return true
@@ -44,12 +44,12 @@ func (m *MakeyButtonDriver) readState() int {
 	return m.Adaptor.DigitalRead(m.Pin)
 }
 
-func (m *MakeyButtonDriver) update(new_val int) {
-	if new_val == 0 {
+func (m *MakeyButtonDriver) update(newVal int) {
+	if newVal == 0 {
 		m.Active = true
-		gobot.Publish(m.Events["push"], new_val)
+		gobot.Publish(m.Events["push"], newVal)
 	} else {
 		m.Active = false
-		gobot.Publish(m.Events["release"], new_val)
+		gobot.Publish(m.Events["release"], newVal)
 	}
 }

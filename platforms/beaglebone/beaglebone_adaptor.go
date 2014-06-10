@@ -5,9 +5,9 @@ import (
 	"strconv"
 )
 
-const SLOTS = "/sys/devices/bone_capemgr.*"
-const OCP = "/sys/devices/ocp.*"
-const I2C_LOCATION = "/dev/i2c-1"
+const Slots = "/sys/devices/bone_capemgr.*"
+const Ocp = "/sys/devices/ocp.*"
+const I2CLocation = "/dev/i2c-1"
 
 var pins = map[string]int{
 	"P8_3":  38,
@@ -165,7 +165,7 @@ func (b *BeagleboneAdaptor) AnalogRead(pin string) int {
 }
 
 func (b *BeagleboneAdaptor) I2cStart(address byte) {
-	b.i2cDevice = newI2cDevice(I2C_LOCATION, address)
+	b.i2cDevice = newI2cDevice(I2CLocation, address)
 	b.i2cDevice.start()
 }
 

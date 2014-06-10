@@ -32,7 +32,7 @@ func main() {
 			fmt.Println("Wave", data)
 		})
 		gobot.On(neuro.Events["EEG"], func(data interface{}) {
-			eeg := data.(gobotNeurosky.EEG)
+			eeg := data.(neurosky.EEG)
 			fmt.Println("Delta", eeg.Delta)
 			fmt.Println("Theta", eeg.Theta)
 			fmt.Println("LoAlpha", eeg.LoAlpha)

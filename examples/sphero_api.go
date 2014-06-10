@@ -16,7 +16,7 @@ func TurnBlue(params map[string]interface{}) bool {
 
 func main() {
 	Master = gobot.NewGobot()
-	api.NewApi(Master).Start()
+	api.NewAPI(Master).Start()
 
 	spheros := map[string]string{
 		"Sphero-BPO": "/dev/rfcomm0",

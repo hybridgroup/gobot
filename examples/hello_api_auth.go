@@ -14,7 +14,7 @@ func Hello(params map[string]interface{}) string {
 func main() {
 	master := gobot.NewGobot()
 
-	server := api.NewApi(master)
+	server := api.NewAPI(master)
 	server.Username = "gort"
 	server.Password = "klatuu"
 	server.Start()
