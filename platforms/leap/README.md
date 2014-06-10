@@ -1,12 +1,15 @@
-# gobot-leapmotion
+# Leap 
 
-Gobot (http://gobot.io/) is a library for robotics and physical computing using Go
-
-This library provides an adaptor and driver for the Leap Motion (https://www.leapmotion.com/)
+This package provides the Gobot adaptor and driver for the [Leap Motion](https://www.leapmotion.com/)
 
 ## Getting Started
 
-Install the library with: `go get -u github.com/hybridgroup/gobot-leapmotion`
+First install the [Leap Motion Software](https://www.leapmotion.com/setup)
+
+Now you can install the package with
+```
+go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/platforms/leap
+```
 
 ## Example
 
@@ -16,41 +19,23 @@ package main
 import (
 	"fmt"
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot-leapmotion"
+	"github.com/hybridgroup/gobot/platforms/leap"
 )
 
 func main() {
-	leapAdaptor := new(gobotLeap.LeapAdaptor)
-	leapAdaptor.Name = "leap"
-	leapAdaptor.Port = "127.0.0.1:6437"
-
-	leap := gobotLeap.NewLeap(leapAdaptor)
-	leap.Name = "leap"
+	gbot := gobot.NewGobot()
+	adaptor := leap.NewLeapMotionAdaptor("leap", "127.0.0.1:6437")
+	l := leap.NewLeapMotionDriver(adaptor, "leap")
 
 	work := func() {
-		gobot.On(leap.Events["Message"], func(data interface{}) {
-			fmt.Println(data)
+		gobot.On(l.Events["Message"], func(data interface{}) {
+			fmt.Println(data.(leap.Frame))
 		})
 	}
 
-	robot := gobot.Robot{
-		Connections: []gobot.Connection{leapAdaptor},
-		Devices:     []gobot.Device{leap},
-		Work:        work,
-	}
+	gbot.Robots = append(gbot.Robots, gobot.NewRobot(
+		"leapBot", []gobot.Connection{adaptor}, []gobot.Device{l}, work))
 
-	robot.Start()
+	gbot.Start()
 }
 ```
-
-## Documentation
-We're busy adding documentation to our web site at http://gobot.io/ please check there as we continue to work on Gobot
-
-Thank you!
-
-## Contributing
-In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality.
-
-## License
-Copyright (c) 2013 The Hybrid Group. Licensed under the Apache 2.0 license.
-

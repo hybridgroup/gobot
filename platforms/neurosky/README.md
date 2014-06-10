@@ -1,50 +1,96 @@
-# Gobot Adaptor For Neurosky Mindwave
+# Neurosky 
 
-This repository contains the Gobot (http://gobot.io/) adaptor for the Neurosky Mindwave Mobile EEG (http://store.neurosky.com/products/mindwave-mobile).
-
-Gobot is a open source framework for robotics using Go.
-
-For more information abut Gobot, check out our repo at https://github.com/hybridgroup/gobot
-
-[![Code Climate](https://codeclimate.com/github/hybridgroup/gobot-neurosky.png)](https://codeclimate.com/github/hybridgroup/gobot-neurosky) [![Build Status](https://travis-ci.org/hybridgroup/gobot-neurosky.png?branch=master)](https://travis-ci.org/hybridgroup/gobot-neurosky)
+This package contains the Gobot adaptor and driver for the [Neurosky Mindwave Mobile EEG](http://store.neurosky.com/products/mindwave-mobile).
 
 ## Installing
+```
+go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/platforms/neurosky
+```
 
-here how to install ...
+## How To Connect
 
-## Using
+### OSX
 
-here how to use ...
+In order to allow Gobot running on your Mac to access the Mindwave, go to "Bluetooth > Open Bluetooth Preferences > Sharing Setup" and make sure that "Bluetooth Sharing" is checked.
 
-## Connecting to Mindwave
+Now you must pair with the Mindwave. Open System Preferences > Bluetooth. Now with the Bluetooth devices windows open, hold the On/Pair button on the Mindwave towards the On/Pair text until you see "Mindwave" pop up as available devices. Pair with that device. Once paired your Mindwave will be accessable through the serial device similarly named as `/dev/tty.MindWaveMobile-DevA`
 
-here how to connect ...
+### Ubuntu
+
+Connecting to the Mindwave from Ubuntu or any other Linux-based OS can be done entirely from the command line using [Gort](https://github.com/hybridgroup/gort) CLI commands. Here are the steps.
+
+Find the address of the Mindwave, by using:
+```
+gort scan bluetooth
+```
+
+Pair to Mindwave using this command (substituting the actual address of your Mindwave):
+```
+gort bluetooth pair <address>
+```
+
+Connect to the Mindwave using this command (substituting the actual address of your Mindwave):
+```
+gort bluetooth connect <address>
+```
+
+### Windows
+
+You should be able to pair your Mindwave using your normal system tray applet for Bluetooth, and then connect to the COM port that is bound to the device, such as `COM3`.
 
 ## Examples
 
-here examples ...
-=======
-# Gobot for neurosky
+```go
+package main
 
-Gobot (http://gobot.io/) is a library for robotics and physical computing using Go
+import (
+  "fmt"
+  "github.com/hybridgroup/gobot"
+  "github.com/hybridgroup/gobot/platforms/neurosky"
+)
 
-This repository contains the Gobot adaptor for neurosky.
+func main() {
+  gbot := gobot.NewGobot()
 
-For more information about Gobot, check out the github repo at
-https://github.com/hybridgroup/gobot
+  adaptor := neurosky.NewNeuroskyAdaptor("neurosky", "/dev/rfcomm0")
+  neuro := neurosky.NewNeuroskyDriver(adaptor, "neuro")
 
-## Installing
+  work := func() {
+    gobot.On(neuro.Events["Extended"], func(data interface{}) {
+      fmt.Println("Extended", data)
+    })
+    gobot.On(neuro.Events["Signal"], func(data interface{}) {
+      fmt.Println("Signal", data)
+    })
+    gobot.On(neuro.Events["Attention"], func(data interface{}) {
+      fmt.Println("Attention", data)
+    })
+    gobot.On(neuro.Events["Meditation"], func(data interface{}) {
+      fmt.Println("Meditation", data)
+    })
+    gobot.On(neuro.Events["Blink"], func(data interface{}) {
+      fmt.Println("Blink", data)
+    })
+    gobot.On(neuro.Events["Wave"], func(data interface{}) {
+      fmt.Println("Wave", data)
+    })
+    gobot.On(neuro.Events["EEG"], func(data interface{}) {
+      eeg := data.(gobotNeurosky.EEG)kj
+      fmt.Println("Delta", eeg.Delta)
+      fmt.Println("Theta", eeg.Theta)
+      fmt.Println("LoAlpha", eeg.LoAlpha)
+      fmt.Println("HiAlpha", eeg.HiAlpha)
+      fmt.Println("LoBeta", eeg.LoBeta)
+      fmt.Println("HiBeta", eeg.HiBeta)
+      fmt.Println("LoGamma", eeg.LoGamma)
+      fmt.Println("MidGamma", eeg.MidGamma)
+      fmt.Println("\n")
+    })
+  }
 
-    go get path/to/repo/gobot-neurosky
+  gbot.Robots = append(gbot.Robots,
+    gobot.NewRobot("brainBot", []gobot.Connection{adaptor}, []gobot.Device{neuro}, work))
 
-## Using
-
-    your example code here...
-
-## Connecting
-
-Explain how to connect from the computer to the device here...
-
-## License
-
-Copyright (c) 2014 Your Name Here. See LICENSE for more details
+  gbot.Start()
+}
+```

@@ -1,15 +1,18 @@
-# Gobot Adaptor for Joysticks and Game Controllers
+# Joystick
 
-Gobot (http://gobot.io/) is a library for robotics and physical computing using Go
-
-This repository contains the Gobot adaptor for the PS3 controller, Xbox 360 controller, or any other joysticks and game controllers that are compatible with Simple DirectMedia Layer (SDL) (http://www.libsdl.org/).
-
-For more information about Gobot, check out the github repo at
-https://github.com/hybridgroup/gobot
+This package provides the Gobot adaptor and drivers for the PS3 controller, Xbox 360 controller, or any other joysticks and game controllers that are compatible with [Simple DirectMedia Layer](http://www.libsdl.org/).
 
 ## Getting Started
 
-Installing gobot-joystick requires `sdl2` to be installed on your system
+This package requires `sdl2` to be installed on your system
+
+### OSX
+
+To install `sdl2` on OSX using Homebrew:
+
+```
+$ brew install sdl2
+```
 
 ### Ubuntu
 
@@ -17,10 +20,11 @@ Installing gobot-joystick requires `sdl2` to be installed on your system
 $ sudo apt-get install libsdl2-2.0-0
 ```
 
-Now you can install `gobot-joystick` with
+Now you can install the package with 
 ```
-$ go get github.com/hybridgroup/gobot-joystick
+go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/platforms/joystick
 ```
+
 ## Usage
 
 Controller configurations are stored in JSON format. Here's an example configuration file for the Dualshock 3 controller
@@ -124,77 +128,46 @@ Controller configurations are stored in JSON format. Here's an example configura
 package main
 
 import (
-	"fmt"
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot-joystick"
+    "fmt"
+    "github.com/hybridgroup/gobot"
+    "github.com/hybridgroup/gobot/platforms/joystick"
 )
 
 func main() {
-	joystickAdaptor := new(gobotJoystick.JoystickAdaptor)
-	joystickAdaptor.Name = "ps3"
-	joystickAdaptor.Params = map[string]interface{}{
-		"config": "./configs/dualshock3.json",
-	}
+    gbot := gobot.NewGobot()
+    joystickAdaptor := joystick.NewJoystickAdaptor("ps3")
+    joystickDriver := joystick.NewJoystickDriver(joystickAdaptor, "ps3", "./platforms/joystick/configs/dualshock3.json")
 
-	joystick := gobotJoystick.NewJoystick(joystickAdaptor)
-	joystick.Name = "ps3"
+    work := func() {
+        gobot.On(joystickDriver.Events["square_press"], func(data interface{}) {
+            fmt.Println("square_press")
+        })
+        gobot.On(joystickDriver.Events["square_release"], func(data interface{}) {
+            fmt.Println("square_release")
+        })
+        gobot.On(joystickDriver.Events["triangle_press"], func(data interface{}) {
+            fmt.Println("triangle_press")
+        })
+        gobot.On(joystickDriver.Events["triangle_release"], func(data interface{}) {
+            fmt.Println("triangle_release")
+        })
+        gobot.On(joystickDriver.Events["left_x"], func(data interface{}) {
+            fmt.Println("left_x", data)
+        })
+        gobot.On(joystickDriver.Events["left_y"], func(data interface{}) {
+            fmt.Println("left_y", data)
+        })
+        gobot.On(joystickDriver.Events["right_x"], func(data interface{}) {
+            fmt.Println("right_x", data)
+        })
+        gobot.On(joystickDriver.Events["right_y"], func(data interface{}) {
+            fmt.Println("right_y", data)
+        })
+    }
 
-	work := func() {
-		gobot.On(joystick.Events["square_press"], func(data interface{}) {
-			fmt.Println("square_press")
-		})
-		gobot.On(joystick.Events["square_release"], func(data interface{}) {
-			fmt.Println("square_release")
-		})
-		gobot.On(joystick.Events["triangle_press"], func(data interface{}) {
-			fmt.Println("triangle_press")
-		})
-		gobot.On(joystick.Events["triangle_release"], func(data interface{}) {
-			fmt.Println("triangle_release")
-		})
-		gobot.On(joystick.Events["left_x"], func(data interface{}) {
-			fmt.Println("left_x", data)
-		})
-		gobot.On(joystick.Events["left_y"], func(data interface{}) {
-			fmt.Println("left_y", data)
-		})
-		gobot.On(joystick.Events["right_x"], func(data interface{}) {
-			fmt.Println("right_x", data)
-		})
-		gobot.On(joystick.Events["right_y"], func(data interface{}) {
-			fmt.Println("right_y", data)
-		})
-	}
+    gbot.Robots = append(gbot.Robots,
+        gobot.NewRobot("joystickBot", []gobot.Connection{joystickAdaptor}, []gobot.Device{joystickDriver}, work))
 
-	robot := gobot.Robot{
-		Connections: []gobot.Connection{joystickAdaptor},
-		Devices:     []gobot.Device{joystick},
-		Work:        work,
-	}
-
-	robot.Start()
+    gbot.Start()
 }
 ```
-
-## Documentation
-We're busy adding documentation to our web site at http://gobot.io/ please check there as we continue to work on Gobot
-
-Thank you!
-
-## Contributing
-
-* All patches must be provided under the Apache 2.0 License
-* Please use the -s option in git to "sign off" that the commit is your work and you are providing it under the Apache 2.0 License
-* Submit a Github Pull Request to the appropriate branch and ideally discuss the changes with us in IRC.
-* We will look at the patch, test it out, and give you feedback.
-* Avoid doing minor whitespace changes, renamings, etc. along with merged content. These will be done by the maintainers from time to time but they can complicate merges and should be done seperately.
-* Take care to maintain the existing coding style.
-* Add unit tests for any new or changed functionality.
-* All pull requests should be "fast forward"
-  * If there are commits after yours use “git rebase -i <new_head_branch>”
-  * If you have local changes you may need to use “git stash”
-  * For git help see [progit](http://git-scm.com/book) which is an awesome (and free) book on git
-
-
-## License
-Copyright (c) 2013-2014 The Hybrid Group. Licensed under the Apache 2.0 license.

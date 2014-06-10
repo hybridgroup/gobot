@@ -1,17 +1,15 @@
-# Gobot for ardrone
+# Ardrone
 
-Gobot (http://gobot.io/) is a library for robotics and physical computing using Go
-
-This repository contains the Gobot adaptor for ardrone.
+This package  provides the Gobot adaptor and driver for the [Parrot Ardrone](http://ardrone2.parrot.com).
 
 For more information about Gobot, check out the github repo at
 https://github.com/hybridgroup/gobot
 
-[![Build Status](https://travis-ci.org/hybridgroup/gobot-ardrone.svg?branch=master)](https://travis-ci.org/hybridgroup/gobot-ardrone) [![Coverage Status](https://coveralls.io/repos/hybridgroup/gobot-ardrone/badge.png)](https://coveralls.io/r/hybridgroup/gobot-ardrone)
+## Getting Started
 
 ## Installing
 ```
-go get github.com/hybridgroup/gobot-ardrone
+go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/platforms/ardrone
 ```
 ## Using
 ```go
@@ -19,42 +17,27 @@ package main
 
 import (
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot-ardrone"
+	"github.com/hybridgroup/gobot/platforms/ardrone"
+	"time"
 )
 
 func main() {
-
-	ardroneAdaptor := new(gobotArdrone.ArdroneAdaptor)
-	ardroneAdaptor.Name = "Drone"
-
-	drone := gobotArdrone.NewArdrone(ardroneAdaptor)
-	drone.Name = "Drone"
+	gbot := gobot.NewGobot()
+	adaptor := ardrone.NewArdroneAdaptor("Drone")
+	drone := ardrone.NewArdroneDriver(adaptor, "Drone")
 
 	work := func() {
 		drone.TakeOff()
 		gobot.On(drone.Events["Flying"], func(data interface{}) {
-			gobot.After("1s", func() {
-				drone.Right(0.1)
-			})
-			gobot.After("2s", func() {
-				drone.Left(0.1)
-			})
-			gobot.After("3s", func() {
+			gobot.After(3*time.Second, func() {
 				drone.Land()
 			})
 		})
 	}
 
-	robot := gobot.Robot{
-		Connections: []gobot.Connection{ardroneAdaptor},
-		Devices:     []gobot.Device{drone},
-		Work:        work,
-	}
+	gbot.Robots = append(gbot.Robots,
+		gobot.NewRobot("drone", []gobot.Connection{adaptor}, []gobot.Device{drone}, work))
 
-	robot.Start()
+	gbot.Start()
 }
 ```
-
-## License
-
-Copyright (c) 2013-2014 The Hybrid Group. Licensed under the Apache 2.0 license.
