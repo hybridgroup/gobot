@@ -1,29 +1,17 @@
 package main
 
 import (
-	"fmt"
-	"github.com/gonuts/commander"
-	"github.com/gonuts/flag"
+	"github.com/codegangsta/cli"
 	"os"
 )
 
-var g_cmd *commander.Command
-
-func init() {
-	g_cmd = &commander.Command{
-		UsageLine: "gobot <command>",
-		Subcommands: []*commander.Command{
-			generate(),
-		},
-		Flag: *flag.NewFlagSet("gobot", flag.ExitOnError),
-	}
-}
-
 func main() {
-	err := g_cmd.Dispatch(os.Args[1:])
-	if err != nil {
-		fmt.Printf("**err**: %v\n", err)
-		os.Exit(1)
+	app := cli.NewApp()
+	app.Name = "gobot"
+	app.Version = "0.0.1"
+	app.Usage = "Command Line Utility for Gobot"
+	app.Commands = []cli.Command{
+		Generate(),
 	}
-	return
+	app.Run(os.Args)
 }

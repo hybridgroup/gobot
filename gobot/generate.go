@@ -2,191 +2,181 @@ package main
 
 import (
 	"fmt"
-	"github.com/gonuts/commander"
-	"github.com/gonuts/flag"
+	"github.com/codegangsta/cli"
 	"os"
+	"strings"
 	"text/template"
-	"unicode"
 )
 
-func generate() *commander.Command {
-	cmd := &commander.Command{
-		Run:       doGenerate,
-		UsageLine: "generate [options]",
-		Short:     "Generates a Gobot library skeleton",
-		Long: `
-Generates a Gobot library skeleton.
-
-ex:
- $ gobot generate myProject
-`,
-		Flag: *flag.NewFlagSet("gobot-generate", flag.ExitOnError),
-	}
-	return cmd
+type generate struct {
+	Name        string
+	UpperName   string
+	FirstLetter string
 }
 
-type Generate struct {
-	Name      string
-	UpperName string
-}
+func Generate() cli.Command {
+	return cli.Command{
+		Name:  "generate",
+		Usage: "Generate new Gobot skeleton project",
+		Action: func(c *cli.Context) {
+			args := c.Args()
+			if len(args) == 0 || len(args) > 1 {
+				fmt.Println("Please provide a one word package name.")
+				return
+			}
+			pwd, _ := os.Getwd()
+			dir := fmt.Sprintf("%s/%s", pwd, args[0])
+			fmt.Println("Creating", dir)
+			err := os.MkdirAll(dir, 0700)
+			if err != nil {
+				fmt.Println(err)
+				err = nil
+			}
 
-func doGenerate(cmd *commander.Command, args []string) error {
-	if len(args) == 0 {
-		fmt.Println(cmd.Long)
-		return nil
+			upperName := fmt.Sprintf("%s%s", strings.ToUpper(string(args[0][0])), string(args[0][1:]))
+
+			name := generate{UpperName: upperName, Name: string(args[0]), FirstLetter: string(args[0][0])}
+
+			adaptor, _ := template.New("").Parse(adaptor())
+			file_location := fmt.Sprintf("%s/%s_adaptor.go", dir, args[0])
+			fmt.Println("Creating", file_location)
+			f, err := os.Create(file_location)
+			if err != nil {
+				fmt.Println(err)
+				err = nil
+			}
+			adaptor.Execute(f, name)
+			f.Close()
+
+			driver, _ := template.New("").Parse(driver())
+			file_location = fmt.Sprintf("%s/%s_driver.go", dir, args[0])
+			fmt.Println("Creating", file_location)
+			f, err = os.Create(file_location)
+			if err != nil {
+				fmt.Println(err)
+				err = nil
+			}
+			driver.Execute(f, name)
+			f.Close()
+
+			readme, _ := template.New("").Parse(readme())
+			file_location = fmt.Sprintf("%s/README.md", dir)
+			fmt.Println("Creating", file_location)
+			f, err = os.Create(file_location)
+			if err != nil {
+				fmt.Println(err)
+				err = nil
+			}
+			readme.Execute(f, name)
+			f.Close()
+
+			file_location = fmt.Sprintf("%s/LICENSE", dir)
+			fmt.Println("Creating", file_location)
+			f, err = os.Create(file_location)
+			if err != nil {
+				fmt.Println(err)
+				err = nil
+			}
+			f.Close()
+
+			driverTest, _ := template.New("").Parse(driverTest())
+			file_location = fmt.Sprintf("%s/%s_driver_test.go", dir, args[0])
+			fmt.Println("Creating", file_location)
+			f, err = os.Create(file_location)
+			if err != nil {
+				fmt.Println(err)
+				err = nil
+			}
+			driverTest.Execute(f, name)
+			f.Close()
+
+			adaptorTest, _ := template.New("").Parse(adaptorTest())
+			file_location = fmt.Sprintf("%s/%s_adaptor_test.go", dir, args[0])
+			fmt.Println("Creating", file_location)
+			f, err = os.Create(file_location)
+			if err != nil {
+				fmt.Println(err)
+				err = nil
+			}
+			adaptorTest.Execute(f, name)
+			f.Close()
+
+			testSuite, _ := template.New("").Parse(testSuite())
+			file_location = fmt.Sprintf("%s/%s_suite_test.go", dir, args[0])
+			fmt.Println("Creating", file_location)
+			f, err = os.Create(file_location)
+			if err != nil {
+				fmt.Println(err)
+				err = nil
+			}
+			testSuite.Execute(f, name)
+			f.Close()
+		},
 	}
-	pwd, _ := os.Getwd()
-	dir := fmt.Sprintf("%s/gobot-%s", pwd, args[0])
-	fmt.Println("Creating", dir)
-	err := os.MkdirAll(dir, 0700)
-	if err != nil {
-		fmt.Println(err)
-		err = nil
-	}
-
-	a := []rune(args[0])
-	a[0] = unicode.ToUpper(a[0])
-	s := string(a)
-
-	name := Generate{UpperName: s, Name: string(args[0])}
-
-	adaptor, _ := template.New("").Parse(adaptor())
-	file_location := fmt.Sprintf("%s/%s_adaptor.go", dir, args[0])
-	fmt.Println("Creating", file_location)
-	f, err := os.Create(file_location)
-	if err != nil {
-		fmt.Println(err)
-		err = nil
-	}
-	adaptor.Execute(f, name)
-	f.Close()
-
-	driver, _ := template.New("").Parse(driver())
-	file_location = fmt.Sprintf("%s/%s_driver.go", dir, args[0])
-	fmt.Println("Creating", file_location)
-	f, err = os.Create(file_location)
-	if err != nil {
-		fmt.Println(err)
-		err = nil
-	}
-	driver.Execute(f, name)
-	f.Close()
-
-	readme, _ := template.New("").Parse(readme())
-	file_location = fmt.Sprintf("%s/README.md", dir)
-	fmt.Println("Creating", file_location)
-	f, err = os.Create(file_location)
-	if err != nil {
-		fmt.Println(err)
-		err = nil
-	}
-	readme.Execute(f, name)
-	f.Close()
-
-	file_location = fmt.Sprintf("%s/LICENSE", dir)
-	fmt.Println("Creating", file_location)
-	f, err = os.Create(file_location)
-	if err != nil {
-		fmt.Println(err)
-		err = nil
-	}
-	f.Close()
-
-	driverTest, _ := template.New("").Parse(driverTest())
-	file_location = fmt.Sprintf("%s/%s_driver_test.go", dir, args[0])
-	fmt.Println("Creating", file_location)
-	f, err = os.Create(file_location)
-	if err != nil {
-		fmt.Println(err)
-		err = nil
-	}
-	driverTest.Execute(f, name)
-	f.Close()
-
-	adaptorTest, _ := template.New("").Parse(adaptorTest())
-	file_location = fmt.Sprintf("%s/%s_adaptor_test.go", dir, args[0])
-	fmt.Println("Creating", file_location)
-	f, err = os.Create(file_location)
-	if err != nil {
-		fmt.Println(err)
-		err = nil
-	}
-	adaptorTest.Execute(f, name)
-	f.Close()
-
-	testSuite, _ := template.New("").Parse(testSuite())
-	file_location = fmt.Sprintf("%s/gobot-%s_suite_test.go", dir, args[0])
-	fmt.Println("Creating", file_location)
-	f, err = os.Create(file_location)
-	if err != nil {
-		fmt.Println(err)
-		err = nil
-	}
-	testSuite.Execute(f, name)
-	f.Close()
-	return nil
 }
 
 func adaptor() string {
-	return `package gobot{{ .UpperName }}
+	return `package {{ .Name }}
 
 import (
-	"github.com/hybridgroup/gobot"
+  "github.com/hybridgroup/gobot"
 )
 
 type {{ .UpperName }}Adaptor struct {
-	gobot.Adaptor
+  gobot.Adaptor
 }
 
-func (me *{{ .UpperName }}Adaptor) Connect() bool {
+func New{{.UpperName}}Adaptor(name string) *{{.UpperName}}Adaptor {
+  return &{{.UpperName}}Adaptor{
+    Adaptor: gobot.Adaptor{
+      Name: name,
+    },
+  }
+}
+
+func ({{.FirstLetter}} *{{ .UpperName }}Adaptor) Connect() bool {
   return true
 }
 
-func (me *{{ .UpperName }}Adaptor) Reconnect() bool {
-  return true
-}
-
-func (me *{{ .UpperName }}Adaptor) Disconnect() bool {
-  return true
-}
-
-func (me *{{ .UpperName }}Adaptor) Finalize() bool {
+func ({{.FirstLetter}} *{{ .UpperName }}Adaptor) Finalize() bool {
   return true
 }
 `
 }
 
 func driver() string {
-	return `package gobot{{ .UpperName }}
+	return `package {{ .Name }}
 
 import (
-	"github.com/hybridgroup/gobot"
+  "github.com/hybridgroup/gobot"
 )
 
 type {{ .UpperName }}Driver struct {
-	gobot.Driver
-	Adaptor *{{ .UpperName }}Adaptor
+  gobot.Driver
+  Adaptor *{{ .UpperName }}Adaptor
 }
 
 type {{ .UpperName }}Interface interface {
 }
 
-func New{{ .UpperName }}(adaptor *{{ .UpperName }}Adaptor) *{{ .UpperName }}Driver {
-	d := new({{ .UpperName }}Driver)
-	d.Events = make(map[string]chan interface{})
-	d.Adaptor = adaptor
-	d.Commands = []string{}
-	return d
+func New{{.UpperName}}Driver(a *{{.UpperName}}Adaptor, name string) *{{.UpperName}}Driver {
+  return &{{.UpperName}}Driver{
+    Driver: gobot.Driver{
+      Name: name,
+      Events: make(map[string]chan interface{}),
+      Commands: []string{},
+    },
+    Adaptor: a,
+  }
 }
 
-func (me *{{ .UpperName }}Driver) Init() bool { return true }
-func (me *{{ .UpperName }}Driver) Start() bool { return true }
-func (me *{{ .UpperName }}Driver) Halt() bool { return true }
+func ({{.FirstLetter}} *{{ .UpperName }}Driver) Start() bool { return true }
+func ({{.FirstLetter}} *{{ .UpperName }}Driver) Halt() bool { return true }
 `
 }
 
 func driverTest() string {
-	return `package gobot{{ .UpperName }}
+	return `package {{ .Name }}
 
 import (
   . "github.com/onsi/ginkgo"
@@ -199,14 +189,11 @@ var _ = Describe("{{ .UpperName }}Driver", func() {
   )
 
   BeforeEach(func() {
-    driver = New{{ .UpperName }}(new({{ .UpperName }}Adaptor))
+    driver = New{{ .UpperName }}Driver(New{{ .UpperName }}Adaptor("adaptor"), "driver")
   })
 
   It("Must be able to Start", func() {
     Expect(driver.Start()).To(Equal(true))
-  })
-  It("Must be able to Init", func() {
-    Expect(driver.Init()).To(Equal(true))
   })
   It("Must be able to Halt", func() {
     Expect(driver.Halt()).To(Equal(true))
@@ -216,7 +203,7 @@ var _ = Describe("{{ .UpperName }}Driver", func() {
 }
 
 func adaptorTest() string {
-	return `package gobot{{ .UpperName }}
+	return `package {{ .Name }}
 
 import (
   . "github.com/onsi/ginkgo"
@@ -229,7 +216,7 @@ var _ = Describe("{{ .UpperName }}Adaptor", func() {
   )
 
   BeforeEach(func() {
-    adaptor = new({{ .UpperName }}Adaptor)
+    adaptor = New{{ .UpperName }}Adaptor("adaptor")
   })
 
   It("Must be able to Finalize", func() {
@@ -238,18 +225,12 @@ var _ = Describe("{{ .UpperName }}Adaptor", func() {
   It("Must be able to Connect", func() {
     Expect(adaptor.Connect()).To(Equal(true))
   })
-  It("Must be able to Disconnect", func() {
-    Expect(adaptor.Disconnect()).To(Equal(true))
-  })
-  It("Must be able to Reconnect", func() {
-    Expect(adaptor.Reconnect()).To(Equal(true))
-  })
 })
 `
 }
 
 func testSuite() string {
-	return `package gobot{{ .UpperName }}
+	return `package {{ .Name }}
 
 import (
   . "github.com/onsi/ginkgo"
@@ -260,24 +241,24 @@ import (
 
 func TestGobot{{ .UpperName }}(t *testing.T) {
   RegisterFailHandler(Fail)
-  RunSpecs(t, "Gobot-{{ .UpperName }} Suite")
+  RunSpecs(t, "{{ .UpperName }} Suite")
 }
 `
 }
 
 func readme() string {
-	return `# Gobot for {{ .Name }}
+	return `# {{ .Name }}
 
-Gobot (http://gobot.io/) is a library for robotics and physical computing using Go
+Gobot (http://gobot.io/) is a framework for robotics and physical computing using Go
 
-This repository contains the Gobot adaptor for {{ .Name }}.
+This repository contains the Gobot adaptor and driver for {{ .Name }}.
 
 For more information about Gobot, check out the github repo at
 https://github.com/hybridgroup/gobot
 
 ## Installing
 
-    go get path/to/repo/gobot-{{ .Name }}
+    go get path/to/repo/{{ .Name }}
 
 ## Using
 
