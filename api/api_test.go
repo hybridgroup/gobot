@@ -89,9 +89,9 @@ var _ = Describe("API", func() {
 			a.server.ServeHTTP(response, request)
 
 			body, _ := ioutil.ReadAll(response.Body)
-			var i []interface{}
+			var i interface{}
 			json.Unmarshal(body, &i)
-			Expect(i[0]).To(Equal("Unknown Command"))
+			Expect(i).To(Equal("Unknown Command"))
 		})
 		It("should return robot device", func() {
 			request, _ := http.NewRequest("GET", "/robots/Robot%201/devices/Device%201", nil)

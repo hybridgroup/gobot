@@ -9,7 +9,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"reflect"
 )
 
 // Optional restful API through Gobot has access
@@ -138,7 +137,7 @@ func (a *api) robot(res http.ResponseWriter, req *http.Request) {
 func (a *api) robotCommands(res http.ResponseWriter, req *http.Request) {
 	robot := req.URL.Query().Get(":robot")
 
-	data, _ := json.Marshal(a.gobot.Robot(robot).RobotCommands)
+	data, _ := json.Marshal(a.gobot.Robot(robot).ToJSON().Commands)
 	res.Header().Set("Content-Type", "application/json; charset=utf-8")
 	res.Write(data)
 }
@@ -231,19 +230,15 @@ func (a *api) executeRobotCommand(res http.ResponseWriter, req *http.Request) {
 	body := make(map[string]interface{})
 	json.Unmarshal(data, &body)
 	r := a.gobot.Robot(robot)
-	in := make([]reflect.Value, 1)
 	body["robot"] = robot
-	in[0] = reflect.ValueOf(body)
-	c := r.Commands[command]
-	if c != nil {
-		ret := []interface{}{}
-		for _, v := range reflect.ValueOf(c).Call(in) {
-			ret = append(ret, v.Interface())
-		}
-		data, _ = json.Marshal(ret)
+	f := r.Commands[command]
+
+	if f != nil {
+		data, _ = json.Marshal(f(body))
 	} else {
-		data, _ = json.Marshal([]interface{}{"Unknown Command"})
+		data, _ = json.Marshal("Unknown Command")
 	}
+
 	res.Header().Set("Content-Type", "application/json; charset=utf-8")
 	res.Write(data)
 }
