@@ -21,6 +21,7 @@ var _ = Describe("API", func() {
 		m = gobot.NewGobot()
 		a = NewAPI(m)
 		a.start = func(m *api) {}
+		a.Start()
 
 		m.Robots = []*gobot.Robot{
 			gobot.NewTestRobot("Robot 1"),
@@ -33,7 +34,8 @@ var _ = Describe("API", func() {
 		It("should return all robots", func() {
 			request, _ := http.NewRequest("GET", "/robots", nil)
 			response := httptest.NewRecorder()
-			a.robots(response, request)
+			a.server.ServeHTTP(response, request)
+
 			body, _ := ioutil.ReadAll(response.Body)
 			var i []map[string]interface{}
 			json.Unmarshal(body, &i)
@@ -42,7 +44,8 @@ var _ = Describe("API", func() {
 		It("should return robot", func() {
 			request, _ := http.NewRequest("GET", "/robots/Robot%201", nil)
 			response := httptest.NewRecorder()
-			a.robot("Robot 1", response, request)
+			a.server.ServeHTTP(response, request)
+
 			body, _ := ioutil.ReadAll(response.Body)
 			var i map[string]interface{}
 			json.Unmarshal(body, &i)
@@ -51,7 +54,8 @@ var _ = Describe("API", func() {
 		It("should return all robot devices", func() {
 			request, _ := http.NewRequest("GET", "/robots/Robot%201/devices", nil)
 			response := httptest.NewRecorder()
-			a.robotDevices("Robot 1", response, request)
+			a.server.ServeHTTP(response, request)
+
 			body, _ := ioutil.ReadAll(response.Body)
 			var i []map[string]interface{}
 			json.Unmarshal(body, &i)
@@ -60,7 +64,8 @@ var _ = Describe("API", func() {
 		PIt("should return robot commands", func() {
 			request, _ := http.NewRequest("GET", "/robots/Robot%201/commands", nil)
 			response := httptest.NewRecorder()
-			a.robotCommands("Robot 1", response, request)
+			a.server.ServeHTTP(response, request)
+
 			body, _ := ioutil.ReadAll(response.Body)
 			var i []string
 			json.Unmarshal(body, &i)
@@ -70,7 +75,8 @@ var _ = Describe("API", func() {
 			request, _ := http.NewRequest("GET", "/robots/Robot%201/commands/robotTestFuntion", bytes.NewBufferString(`{"message":"Beep Boop"}`))
 			request.Header.Add("Content-Type", "application/json")
 			response := httptest.NewRecorder()
-			a.executeRobotCommand("Robot 1", "robotTestFunction", response, request)
+			a.server.ServeHTTP(response, request)
+
 			body, _ := ioutil.ReadAll(response.Body)
 			var i []interface{}
 			json.Unmarshal(body, &i)
@@ -80,7 +86,8 @@ var _ = Describe("API", func() {
 			request, _ := http.NewRequest("GET", "/robots/Robot%201/commands/robotTestFuntion1", bytes.NewBufferString(`{"message":"Beep Boop"}`))
 			request.Header.Add("Content-Type", "application/json")
 			response := httptest.NewRecorder()
-			a.executeRobotCommand("Robot 1", "robotTestFunction1", response, request)
+			a.server.ServeHTTP(response, request)
+
 			body, _ := ioutil.ReadAll(response.Body)
 			var i []interface{}
 			json.Unmarshal(body, &i)
@@ -89,7 +96,8 @@ var _ = Describe("API", func() {
 		It("should return robot device", func() {
 			request, _ := http.NewRequest("GET", "/robots/Robot%201/devices/Device%201", nil)
 			response := httptest.NewRecorder()
-			a.robotDevice("Robot 1", "Device 1", response, request)
+			a.server.ServeHTTP(response, request)
+
 			body, _ := ioutil.ReadAll(response.Body)
 			var i map[string]interface{}
 			json.Unmarshal(body, &i)
@@ -98,7 +106,8 @@ var _ = Describe("API", func() {
 		It("should return device commands", func() {
 			request, _ := http.NewRequest("GET", "/robots/Robot%201/devices/Device%201/commands", nil)
 			response := httptest.NewRecorder()
-			a.robotDeviceCommands("Robot 1", "Device 1", response, request)
+			a.server.ServeHTTP(response, request)
+
 			body, _ := ioutil.ReadAll(response.Body)
 			var i []string
 			json.Unmarshal(body, &i)
@@ -108,7 +117,8 @@ var _ = Describe("API", func() {
 			request, _ := http.NewRequest("GET", "/robots/Robot%201/devices/Device%201/commands/TestDriverCommand", bytes.NewBufferString(`{"name":"human"}`))
 			request.Header.Add("Content-Type", "application/json")
 			response := httptest.NewRecorder()
-			a.executeCommand("Robot 1", "Device 1", "TestDriverCommand", response, request)
+			a.server.ServeHTTP(response, request)
+
 			body, _ := ioutil.ReadAll(response.Body)
 			var i []interface{}
 			json.Unmarshal(body, &i)
@@ -118,7 +128,8 @@ var _ = Describe("API", func() {
 			request, _ := http.NewRequest("GET", "/robots/Robot%201/devices/Device%201/commands/DriverCommand1", bytes.NewBufferString(`{"name":"human"}`))
 			request.Header.Add("Content-Type", "application/json")
 			response := httptest.NewRecorder()
-			a.executeCommand("Robot 1", "Device 1", "DriverCommand4", response, request)
+			a.server.ServeHTTP(response, request)
+
 			body, _ := ioutil.ReadAll(response.Body)
 			var i []interface{}
 			json.Unmarshal(body, &i)
