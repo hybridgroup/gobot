@@ -1,8 +1,15 @@
 package beaglebone
 
 import (
-	"github.com/hybridgroup/gobot"
+	"bufio"
+	"fmt"
+	"os"
+	"path/filepath"
 	"strconv"
+	"strings"
+	"time"
+
+	"github.com/hybridgroup/gobot"
 )
 
 const Slots = "/sys/devices/bone_capemgr.*"
@@ -239,4 +246,34 @@ func (b *BeagleboneAdaptor) pwmWrite(pin string, val byte) {
 	period := 500000.0
 	duty := gobot.FromScale(float64(^val), 0, 255.0)
 	b.pwmPins[i].pwmWrite(strconv.Itoa(int(period)), strconv.Itoa(int(period*duty)))
+}
+
+func ensureSlot(item string) {
+	var err error
+	var fi *os.File
+
+	slot, err := filepath.Glob(Slots)
+	if err != nil {
+		panic(err)
+	}
+	fi, err = os.OpenFile(fmt.Sprintf("%v/slots", slot[0]), os.O_WRONLY|os.O_APPEND, 0666)
+	if err != nil {
+		panic(err)
+	}
+
+	//ensure the slot is not already written into the capemanager (from: https://github.com/mrmorphic/hwio/blob/master/module_bb_pwm.go#L190)
+	scanner := bufio.NewScanner(fi)
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.Index(line, item) > 0 {
+			return
+		}
+	}
+
+	fi.WriteString(item)
+	fi.Sync()
+	fi.Close()
+
+	// delay a little as it seems to take a bit of time set enable the slot (from: https://github.com/mrmorphic/hwio/blob/master/module_bb_pwm.go#L201)
+	time.Sleep(100 * time.Millisecond)
 }
