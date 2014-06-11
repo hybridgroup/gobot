@@ -22,14 +22,6 @@ func main() {
 		gobot.On(button.Events["release"], func(data interface{}) {
 			led.Off()
 		})
-
-		gobot.On(button.Events["push"], func(data interface{}) {
-			fmt.Println("IVE BEEN PUSHED")
-		})
-
-		gobot.On(button.Events["release"], func(data interface{}) {
-			fmt.Println("IVE BEEN RELEASED")
-		})
 	}
 
 	gbot.Robots = append(gbot.Robots,
