@@ -15,8 +15,8 @@ func NewLeapMotionDriver(a *LeapMotionAdaptor, name string) *LeapMotionDriver {
 	return &LeapMotionDriver{
 		Driver: gobot.Driver{
 			Name: name,
-			Events: map[string]chan interface{}{
-				"Message": make(chan interface{}),
+			Events: map[string]*gobot.Event{
+				"Message": gobot.NewEvent(),
 			},
 		},
 		Adaptor: a,

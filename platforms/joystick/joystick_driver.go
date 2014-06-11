@@ -37,7 +37,7 @@ type joystickConfig struct {
 func NewJoystickDriver(a *JoystickAdaptor, name string, config string) *JoystickDriver {
 	d := &JoystickDriver{
 		Driver: gobot.Driver{
-			Events: make(map[string]chan interface{}),
+			Events: make(map[string]*gobot.Event),
 		},
 		Adaptor: a,
 	}
@@ -50,14 +50,14 @@ func NewJoystickDriver(a *JoystickAdaptor, name string, config string) *Joystick
 	json.Unmarshal(file, &jsontype)
 	d.config = jsontype
 	for _, value := range d.config.Buttons {
-		d.Events[fmt.Sprintf("%s_press", value.Name)] = make(chan interface{}, 0)
-		d.Events[fmt.Sprintf("%s_release", value.Name)] = make(chan interface{}, 0)
+		d.Events[fmt.Sprintf("%s_press", value.Name)] = gobot.NewEvent()
+		d.Events[fmt.Sprintf("%s_release", value.Name)] = gobot.NewEvent()
 	}
 	for _, value := range d.config.Axis {
-		d.Events[value.Name] = make(chan interface{}, 0)
+		d.Events[value.Name] = gobot.NewEvent()
 	}
 	for _, value := range d.config.Hats {
-		d.Events[value.Name] = make(chan interface{}, 0)
+		d.Events[value.Name] = gobot.NewEvent()
 	}
 	return d
 }

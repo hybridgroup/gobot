@@ -17,8 +17,8 @@ func NewArdroneDriver(adaptor DroneInterface, name string) *ArdroneDriver {
 	return &ArdroneDriver{
 		Driver: gobot.Driver{
 			Name: name,
-			Events: map[string]chan interface{}{
-				"Flying": make(chan interface{}, 1),
+			Events: map[string]*gobot.Event{
+				"Flying": gobot.NewEvent(),
 			},
 		},
 		Adaptor: adaptor,

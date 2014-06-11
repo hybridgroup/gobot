@@ -3,11 +3,11 @@ package gobot
 import "time"
 
 type Driver struct {
-	Interval time.Duration               `json:"interval"`
-	Pin      string                      `json:"pin"`
-	Name     string                      `json:"name"`
-	Commands []string                    `json:"commands"`
-	Events   map[string]chan interface{} `json:"-"`
+	Interval time.Duration     `json:"interval"`
+	Pin      string            `json:"pin"`
+	Name     string            `json:"name"`
+	Commands []string          `json:"commands"`
+	Events   map[string]*Event `json:"-"`
 }
 
 type DriverInterface interface {

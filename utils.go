@@ -27,19 +27,12 @@ func After(t time.Duration, f func()) {
 	time.AfterFunc(t, f)
 }
 
-func Publish(c chan interface{}, val interface{}) {
-	select {
-	case c <- val:
-	default:
-	}
+func Publish(e *Event, val interface{}) {
+	e.Write(val)
 }
 
-func On(c chan interface{}, f func(s interface{})) {
-	go func() {
-		for s := range c {
-			f(s)
-		}
-	}()
+func On(e *Event, f func(s interface{})) {
+	e.Callbacks = append(e.Callbacks, f)
 }
 
 func Rand(max int) int {

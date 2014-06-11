@@ -16,10 +16,10 @@ func NewWiichuckDriver(a I2cInterface, name string) *WiichuckDriver {
 	return &WiichuckDriver{
 		Driver: gobot.Driver{
 			Name: name,
-			Events: map[string]chan interface{}{
-				"z_button": make(chan interface{}),
-				"c_button": make(chan interface{}),
-				"joystick": make(chan interface{}),
+			Events: map[string]*gobot.Event{
+				"z_button": gobot.NewEvent(),
+				"c_button": gobot.NewEvent(),
+				"joystick": gobot.NewEvent(),
 			},
 		},
 		joystick: map[string]float64{

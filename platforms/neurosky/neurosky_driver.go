@@ -34,14 +34,14 @@ func NewNeuroskyDriver(a *NeuroskyAdaptor, name string) *NeuroskyDriver {
 	return &NeuroskyDriver{
 		Driver: gobot.Driver{
 			Name: name,
-			Events: map[string]chan interface{}{
-				"Extended":   make(chan interface{}),
-				"Signal":     make(chan interface{}),
-				"Attention":  make(chan interface{}),
-				"Meditation": make(chan interface{}),
-				"Blink":      make(chan interface{}),
-				"Wave":       make(chan interface{}),
-				"EEG":        make(chan interface{}),
+			Events: map[string]*gobot.Event{
+				"Extended":   gobot.NewEvent(),
+				"Signal":     gobot.NewEvent(),
+				"Attention":  gobot.NewEvent(),
+				"Meditation": gobot.NewEvent(),
+				"Blink":      gobot.NewEvent(),
+				"Wave":       gobot.NewEvent(),
+				"EEG":        gobot.NewEvent(),
 			},
 		},
 		Adaptor: a,

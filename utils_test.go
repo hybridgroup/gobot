@@ -30,19 +30,20 @@ var _ = Describe("Utils", func() {
 			Expect(i).To(Equal(1))
 		})
 		It("should Publish message to channel without blocking", func() {
-			c := make(chan interface{}, 1)
-			Publish(c, 1)
-			Publish(c, 2)
-			i := <-c
+			e := &Event{Chan: make(chan interface{}, 1)}
+			Publish(e, 1)
+			Publish(e, 2)
+			i := <-e.Chan
 			Expect(i.(int)).To(Equal(1))
 		})
 		It("should execution function on event", func() {
-			c := make(chan interface{})
 			var i int
-			On(c, func(data interface{}) {
+			e := NewEvent()
+			On(e, func(data interface{}) {
 				i = data.(int)
 			})
-			c <- 10
+			Publish(e, 10)
+			time.Sleep(1 * time.Millisecond)
 			Expect(i).To(Equal(10))
 		})
 		It("should scale the value between 0...1", func() {

@@ -16,8 +16,8 @@ func NewCameraDriver(name string, source interface{}) *CameraDriver {
 		Driver: gobot.Driver{
 			Name:     name,
 			Commands: []string{},
-			Events: map[string]chan interface{}{
-				"Frame": make(chan interface{}, 0),
+			Events: map[string]*gobot.Event{
+				"Frame": gobot.NewEvent(),
 			},
 		},
 		Source: source,

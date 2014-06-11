@@ -25,8 +25,10 @@ type SpheroDriver struct {
 func NewSpheroDriver(a *SpheroAdaptor, name string) *SpheroDriver {
 	return &SpheroDriver{
 		Driver: gobot.Driver{
-			Name:   name,
-			Events: make(map[string]chan interface{}),
+			Name: name,
+			Events: map[string]*gobot.Event{
+				"Collision": gobot.NewEvent(),
+			},
 			Commands: []string{
 				"SetRGBC",
 				"RollC",
@@ -137,7 +139,6 @@ func (s *SpheroDriver) Stop() {
 }
 
 func (s *SpheroDriver) configureCollisionDetection() {
-	s.Events["Collision"] = make(chan interface{})
 	s.packetChannel <- s.craftPacket([]uint8{0x01, 0x40, 0x40, 0x50, 0x50, 0x60}, 0x12)
 }
 

@@ -15,9 +15,9 @@ func NewButtonDriver(a DigitalReader, name string, pin string) *ButtonDriver {
 		Driver: gobot.Driver{
 			Name: name,
 			Pin:  pin,
-			Events: map[string]chan interface{}{
-				"push":    make(chan interface{}),
-				"release": make(chan interface{}),
+			Events: map[string]*gobot.Event{
+				"push":    gobot.NewEvent(),
+				"release": gobot.NewEvent(),
 			},
 		},
 		Active:  false,

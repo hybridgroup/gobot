@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/firmata"
 	"github.com/hybridgroup/gobot/platforms/gpio"
@@ -20,6 +21,14 @@ func main() {
 		})
 		gobot.On(button.Events["release"], func(data interface{}) {
 			led.Off()
+		})
+
+		gobot.On(button.Events["push"], func(data interface{}) {
+			fmt.Println("IVE BEEN PUSHED")
+		})
+
+		gobot.On(button.Events["release"], func(data interface{}) {
+			fmt.Println("IVE BEEN RELEASED")
 		})
 	}
 

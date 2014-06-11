@@ -17,10 +17,10 @@ func NewPebbleDriver(adaptor *PebbleAdaptor, name string) *PebbleDriver {
 	return &PebbleDriver{
 		Driver: gobot.Driver{
 			Name: name,
-			Events: map[string]chan interface{}{
-				"button": make(chan interface{}),
-				"accel":  make(chan interface{}),
-				"tap":    make(chan interface{}),
+			Events: map[string]*gobot.Event{
+				"button": gobot.NewEvent(),
+				"accel":  gobot.NewEvent(),
+				"tap":    gobot.NewEvent(),
 			},
 			Commands: []string{
 				"PublishEventC",
