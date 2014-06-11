@@ -33,10 +33,12 @@ var _ = Describe("Utils", func() {
 			e := &Event{Chan: make(chan interface{}, 1)}
 			Publish(e, 1)
 			Publish(e, 2)
+			Publish(e, 3)
+			Publish(e, 4)
 			i := <-e.Chan
 			Expect(i.(int)).To(Equal(1))
 		})
-		It("should execution function on event", func() {
+		It("should execute function on event", func() {
 			var i int
 			e := NewEvent()
 			On(e, func(data interface{}) {
