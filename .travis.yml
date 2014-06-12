@@ -15,7 +15,7 @@ install:
  - go get github.com/martini-contrib/cors  
  - go get github.com/hybridgroup/go-ardrone/client
  - go get github.com/tarm/goserial
- - go get github.com/hybridgroup/go-sdl2/sdl
+ #- go get github.com/hybridgroup/go-sdl2/sdl
  - go get code.google.com/p/go.net/websocket
  - go get github.com/hybridgroup/go-opencv/opencv
 script:
