@@ -1,29 +1,26 @@
 package beaglebone
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"github.com/hybridgroup/gobot"
+	"testing"
 )
 
-var _ = Describe("Beaglebone", func() {
-	var (
-		b *BeagleboneAdaptor
-	)
+var b *BeagleboneAdaptor
 
-	BeforeEach(func() {
-		b = NewBeagleboneAdaptor("bot")
-	})
+func init() {
+	b = NewBeagleboneAdaptor("bot")
+}
 
-	It("Must be able to Finalize", func() {
-		Expect(b.Finalize()).To(Equal(true))
-	})
-	It("Must be able to Connect", func() {
-		Expect(b.Connect()).To(Equal(true))
-	})
-	It("Must be able to Disconnect", func() {
-		Expect(b.Disconnect()).To(Equal(true))
-	})
-	It("Must be able to Reconnect", func() {
-		Expect(b.Reconnect()).To(Equal(true))
-	})
-})
+func TestFinalize(t *testing.T) {
+	gobot.Expect(t, b.Finalize(), true)
+}
+
+func TestConnect(t *testing.T) {
+	gobot.Expect(t, b.Connect(), true)
+}
+func TestDisconnect(t *testing.T) {
+	gobot.Expect(t, b.Disconnect(), true)
+}
+func TestReconnect(t *testing.T) {
+	gobot.Expect(t, b.Reconnect(), true)
+}
