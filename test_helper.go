@@ -27,10 +27,6 @@ type testDriver struct {
 func (t *testDriver) Init() bool  { return true }
 func (t *testDriver) Start() bool { return true }
 func (t *testDriver) Halt() bool  { return true }
-func (t *testDriver) TestDriverCommand(params map[string]interface{}) string {
-	name := params["name"].(string)
-	return fmt.Sprintf("hello %v", name)
-}
 
 type testAdaptor struct {
 	Adaptor
@@ -40,16 +36,25 @@ func (t *testAdaptor) Finalize() bool { return true }
 func (t *testAdaptor) Connect() bool  { return true }
 
 func newTestDriver(name string, adaptor *testAdaptor) *testDriver {
-	return &testDriver{
+	t := &testDriver{
 		Driver: Driver{
-			Commands: []string{
-				"TestDriverCommand",
-				"DriverCommand",
-			},
-			Name: name,
+			Commands: make(map[string]func(map[string]interface{}) interface{}),
+			Name:     name,
 		},
 		Adaptor: adaptor,
 	}
+
+	t.Driver.AddCommand("TestDriverCommand", func(params map[string]interface{}) interface{} {
+		name := params["name"].(string)
+		return fmt.Sprintf("hello %v", name)
+	})
+
+	t.Driver.AddCommand("DriverCommand", func(params map[string]interface{}) interface{} {
+		name := params["name"].(string)
+		return fmt.Sprintf("hello %v", name)
+	})
+
+	return t
 }
 
 func newTestAdaptor(name string) *testAdaptor {
@@ -64,12 +69,6 @@ func newTestAdaptor(name string) *testAdaptor {
 	}
 }
 
-func robotTestFunction(params map[string]interface{}) string {
-	message := params["message"].(string)
-	robotname := params["robotname"].(string)
-	return fmt.Sprintf("hey %v, %v", robotname, message)
-}
-
 func NewTestRobot(name string) *Robot {
 	return newTestRobot(name)
 }
@@ -81,10 +80,14 @@ func newTestRobot(name string) *Robot {
 	driver2 := newTestDriver("Device 2", adaptor2)
 	driver3 := newTestDriver("Device 3", adaptor3)
 	work := func() {}
-	//Commands := map[string]interface{}{
-	//	"robotTestFunction": robotTestFunction,
-	//}
-	return NewRobot(name, []Connection{adaptor1, adaptor2, adaptor3}, []Device{driver1, driver2, driver3}, work)
+	r := NewRobot(name, []Connection{adaptor1, adaptor2, adaptor3}, []Device{driver1, driver2, driver3}, work)
+	r.AddCommand("robotTestFunction", func(params map[string]interface{}) interface{} {
+		message := params["message"].(string)
+		robot := params["robot"].(string)
+		fmt.Println(params)
+		return fmt.Sprintf("hey %v, %v", robot, message)
+	})
+	return r
 }
 
 func newTestStruct() *testStruct {

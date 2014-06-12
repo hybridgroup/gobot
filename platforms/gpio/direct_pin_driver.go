@@ -2,6 +2,7 @@ package gpio
 
 import (
 	"github.com/hybridgroup/gobot"
+	"strconv"
 )
 
 type DirectPinDriver struct {
@@ -10,21 +11,43 @@ type DirectPinDriver struct {
 }
 
 func NewDirectPinDriver(a DirectPin, name string, pin string) *DirectPinDriver {
-	return &DirectPinDriver{
+	d := &DirectPinDriver{
 		Driver: gobot.Driver{
-			Name: name,
-			Pin:  pin,
-			Commands: []string{
-				"DigitalReadC",
-				"DigitalWriteC",
-				"AnalogReadC",
-				"AnalogWriteC",
-				"PwmWriteC",
-				"ServoWriteC",
-			},
+			Name:     name,
+			Pin:      pin,
+			Commands: make(map[string]func(map[string]interface{}) interface{}),
 		},
 		Adaptor: a,
 	}
+
+	d.Driver.AddCommand("DigitalRead", func(params map[string]interface{}) interface{} {
+		return d.DigitalRead()
+	})
+	d.Driver.AddCommand("DigitalWrite", func(params map[string]interface{}) interface{} {
+		level, _ := strconv.Atoi(params["level"].(string))
+		d.DigitalWrite(byte(level))
+		return nil
+	})
+	d.Driver.AddCommand("AnalogRead", func(params map[string]interface{}) interface{} {
+		return d.AnalogRead()
+	})
+	d.Driver.AddCommand("AnalogWrite", func(params map[string]interface{}) interface{} {
+		level, _ := strconv.Atoi(params["level"].(string))
+		d.AnalogWrite(byte(level))
+		return nil
+	})
+	d.Driver.AddCommand("PwmWrite", func(params map[string]interface{}) interface{} {
+		level, _ := strconv.Atoi(params["level"].(string))
+		d.PwmWrite(byte(level))
+		return nil
+	})
+	d.Driver.AddCommand("ServoWrite", func(params map[string]interface{}) interface{} {
+		level, _ := strconv.Atoi(params["level"].(string))
+		d.ServoWrite(byte(level))
+		return nil
+	})
+
+	return d
 }
 
 func (d *DirectPinDriver) Start() bool { return true }

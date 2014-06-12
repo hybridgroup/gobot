@@ -76,8 +76,8 @@ func (a *api) Start() {
 	a.server.Get("/robots/:robot/devices", a.setHeaders(a.robotDevices))
 	a.server.Get("/robots/:robot/devices/:device", a.setHeaders(a.robotDevice))
 	a.server.Get("/robots/:robot/devices/:device/commands", a.setHeaders(a.robotDeviceCommands))
-	a.server.Get(commandRoute, a.setHeaders(a.executeCommand))
-	a.server.Post(commandRoute, a.setHeaders(a.executeCommand))
+	a.server.Get(commandRoute, a.setHeaders(a.executeDeviceCommand))
+	a.server.Post(commandRoute, a.setHeaders(a.executeDeviceCommand))
 	a.server.Get("/robots/:robot/connections", a.setHeaders(a.robotConnections))
 	a.server.Get("/robots/:robot/connections/:connection", a.setHeaders(a.robotConnection))
 
@@ -168,7 +168,7 @@ func (a *api) robotDeviceCommands(res http.ResponseWriter, req *http.Request) {
 	robot := req.URL.Query().Get(":robot")
 	device := req.URL.Query().Get(":device")
 
-	data, _ := json.Marshal(a.gobot.Robot(robot).Device(device).Commands())
+	data, _ := json.Marshal(a.gobot.Robot(robot).Device(device).ToJSON().Commands)
 	res.Header().Set("Content-Type", "application/json; charset=utf-8")
 	res.Write(data)
 }
@@ -195,29 +195,24 @@ func (a *api) robotConnection(res http.ResponseWriter, req *http.Request) {
 	res.Write(data)
 }
 
-func (a *api) executeCommand(res http.ResponseWriter, req *http.Request) {
+func (a *api) executeDeviceCommand(res http.ResponseWriter, req *http.Request) {
 	robot := req.URL.Query().Get(":robot")
 	device := req.URL.Query().Get(":device")
 	command := req.URL.Query().Get(":command")
 
 	data, _ := ioutil.ReadAll(req.Body)
-	var body map[string]interface{}
+	body := make(map[string]interface{})
 	json.Unmarshal(data, &body)
 	d := a.gobot.Robot(robot).Device(device)
-	commands := d.Commands().([]string)
-	for c := range commands {
-		if commands[c] == command {
-			ret := []interface{}{}
-			for _, v := range gobot.Call(d.Driver, command, body) {
-				ret = append(ret, v.Interface())
-			}
-			data, _ = json.Marshal(ret)
-			res.Header().Set("Content-Type", "application/json; charset=utf-8")
-			res.Write(data)
-			return
-		}
+	body["robot"] = robot
+	f := d.Commands()[command]
+
+	if f != nil {
+		data, _ = json.Marshal(f(body))
+	} else {
+		data, _ = json.Marshal("Unknown Command")
 	}
-	data, _ = json.Marshal([]interface{}{"Unknown Command"})
+
 	res.Header().Set("Content-Type", "application/json; charset=utf-8")
 	res.Write(data)
 }

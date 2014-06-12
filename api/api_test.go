@@ -61,7 +61,7 @@ var _ = Describe("API", func() {
 			json.Unmarshal(body, &i)
 			Expect(len(i)).To(Equal(3))
 		})
-		PIt("should return robot commands", func() {
+		It("should return robot commands", func() {
 			request, _ := http.NewRequest("GET", "/robots/Robot%201/commands", nil)
 			response := httptest.NewRecorder()
 			a.server.ServeHTTP(response, request)
@@ -71,16 +71,16 @@ var _ = Describe("API", func() {
 			json.Unmarshal(body, &i)
 			Expect(i).To(Equal([]string{"robotTestFunction"}))
 		})
-		PIt("should execute robot command", func() {
-			request, _ := http.NewRequest("GET", "/robots/Robot%201/commands/robotTestFuntion", bytes.NewBufferString(`{"message":"Beep Boop"}`))
+		It("should execute robot command", func() {
+			request, _ := http.NewRequest("GET", "/robots/Robot%201/commands/robotTestFunction", bytes.NewBufferString(`{"message":"Beep Boop"}`))
 			request.Header.Add("Content-Type", "application/json")
 			response := httptest.NewRecorder()
 			a.server.ServeHTTP(response, request)
 
 			body, _ := ioutil.ReadAll(response.Body)
-			var i []interface{}
+			var i interface{}
 			json.Unmarshal(body, &i)
-			Expect(i[0]).To(Equal("hey Robot 1, Beep Boop"))
+			Expect(i).To(Equal("hey Robot 1, Beep Boop"))
 		})
 		It("should not execute unknown robot command", func() {
 			request, _ := http.NewRequest("GET", "/robots/Robot%201/commands/robotTestFuntion1", bytes.NewBufferString(`{"message":"Beep Boop"}`))
@@ -120,9 +120,9 @@ var _ = Describe("API", func() {
 			a.server.ServeHTTP(response, request)
 
 			body, _ := ioutil.ReadAll(response.Body)
-			var i []interface{}
+			var i interface{}
 			json.Unmarshal(body, &i)
-			Expect(i[0]).To(Equal("hello human"))
+			Expect(i).To(Equal("hello human"))
 		})
 		It("should not execute unknown device command", func() {
 			request, _ := http.NewRequest("GET", "/robots/Robot%201/devices/Device%201/commands/DriverCommand1", bytes.NewBufferString(`{"name":"human"}`))
@@ -131,9 +131,9 @@ var _ = Describe("API", func() {
 			a.server.ServeHTTP(response, request)
 
 			body, _ := ioutil.ReadAll(response.Body)
-			var i []interface{}
+			var i interface{}
 			json.Unmarshal(body, &i)
-			Expect(i[0]).To(Equal("Unknown Command"))
+			Expect(i).To(Equal("Unknown Command"))
 		})
 	})
 })

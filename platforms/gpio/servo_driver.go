@@ -11,20 +11,36 @@ type ServoDriver struct {
 }
 
 func NewServoDriver(a Servo, name string, pin string) *ServoDriver {
-	return &ServoDriver{
+	s := &ServoDriver{
 		Driver: gobot.Driver{
-			Name: name,
-			Pin:  pin,
-			Commands: []string{
-				"MoveC",
-				"MinC",
-				"CenterC",
-				"MaxC",
-			},
+			Name:     name,
+			Pin:      pin,
+			Commands: make(map[string]func(map[string]interface{}) interface{}),
 		},
 		CurrentAngle: 0,
 		Adaptor:      a,
 	}
+
+	s.Driver.AddCommand("Move", func(params map[string]interface{}) interface{} {
+		angle := byte(params["angle"].(float64))
+		s.Move(angle)
+		return nil
+	})
+	s.Driver.AddCommand("Min", func(params map[string]interface{}) interface{} {
+		s.Min()
+		return nil
+	})
+	s.Driver.AddCommand("Center", func(params map[string]interface{}) interface{} {
+		s.Center()
+		return nil
+	})
+	s.Driver.AddCommand("Max", func(params map[string]interface{}) interface{} {
+		s.Max()
+		return nil
+	})
+
+	return s
+
 }
 
 func (s *ServoDriver) Start() bool { return true }
