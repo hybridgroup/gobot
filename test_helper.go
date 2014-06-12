@@ -2,11 +2,19 @@ package gobot
 
 import (
 	"fmt"
+	"reflect"
+	"testing"
 )
 
 type testStruct struct {
 	i int
 	f float64
+}
+
+func Expect(t *testing.T, a interface{}, b interface{}) {
+	if !reflect.DeepEqual(a, b) {
+		t.Errorf("Got %v - type %v, Expected %v - type %v", a, reflect.TypeOf(a), b, reflect.TypeOf(b))
+	}
 }
 
 func (t *testStruct) Hello(name string, message string) string {
@@ -84,15 +92,14 @@ func newTestRobot(name string) *Robot {
 	r.AddCommand("robotTestFunction", func(params map[string]interface{}) interface{} {
 		message := params["message"].(string)
 		robot := params["robot"].(string)
-		fmt.Println(params)
 		return fmt.Sprintf("hey %v, %v", robot, message)
 	})
 	return r
 }
 
 func newTestStruct() *testStruct {
-	s := new(testStruct)
-	s.i = 10
-	s.f = 0.2
-	return s
+	return &testStruct{
+		i: 10,
+		f: 0.2,
+	}
 }

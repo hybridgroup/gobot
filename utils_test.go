@@ -1,77 +1,79 @@
 package gobot
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"fmt"
+	"testing"
 	"time"
 )
 
-var _ = Describe("Utils", func() {
-
-	var (
-		testInterface interface{}
-	)
-
-	Context("when valid", func() {
-		It("should execute function at every interval", func() {
-			var i = 0
-			Every(2*time.Millisecond, func() {
-				i++
-			})
-			time.Sleep(5 * time.Millisecond)
-			Expect(2).To(Equal(i))
-		})
-		It("should execute function after specific interval", func() {
-			var i = 0
-			After(1*time.Millisecond, func() {
-				i = i + 1
-			})
-			time.Sleep(2 * time.Millisecond)
-			Expect(i).To(Equal(1))
-		})
-		It("should Publish message to channel without blocking", func() {
-			e := &Event{Chan: make(chan interface{}, 1)}
-			Publish(e, 1)
-			Publish(e, 2)
-			Publish(e, 3)
-			Publish(e, 4)
-			i := <-e.Chan
-			Expect(i.(int)).To(Equal(1))
-		})
-		It("should execute function on event", func() {
-			var i int
-			e := NewEvent()
-			On(e, func(data interface{}) {
-				i = data.(int)
-			})
-			Publish(e, 10)
-			time.Sleep(1 * time.Millisecond)
-			Expect(i).To(Equal(10))
-		})
-		It("should scale the value between 0...1", func() {
-			Expect(FromScale(5, 0, 10)).To(Equal(0.5))
-		})
-		It("should scale the 0...1 to scale ", func() {
-			Expect(ToScale(500, 0, 10)).To(Equal(float64(10)))
-			Expect(ToScale(-1, 0, 10)).To(Equal(float64(0)))
-			Expect(ToScale(0.5, 0, 10)).To(Equal(float64(5)))
-		})
-		It("should return random int", func() {
-			a := Rand(100)
-			b := Rand(100)
-			Expect(a).NotTo(Equal(b))
-		})
-		It("should return the Field", func() {
-			testInterface = *newTestStruct()
-			Expect(FieldByName(testInterface, "i").Int()).To(Equal(int64(10)))
-		})
-		It("should return the Field from ptr", func() {
-			testInterface = newTestStruct()
-			Expect(FieldByNamePtr(testInterface, "f").Float()).To(Equal(0.2))
-		})
-		It("should call function on interface", func() {
-			testInterface = newTestStruct()
-			Expect(Call(testInterface, "Hello", "Human", "How are you?")[0].String()).To(Equal("Hello Human! How are you?"))
-		})
+func TestEvery(t *testing.T) {
+	i := 0
+	Every(2*time.Millisecond, func() {
+		i++
 	})
-})
+	time.Sleep(5 * time.Millisecond)
+	Expect(t, i, 2)
+}
+
+func TestAfter(t *testing.T) {
+	i := 0
+	After(1*time.Millisecond, func() {
+		i++
+	})
+	time.Sleep(2 * time.Millisecond)
+	Expect(t, i, 1)
+}
+
+func TestPublish(t *testing.T) {
+	e := &Event{Chan: make(chan interface{}, 1)}
+	Publish(e, 1)
+	Publish(e, 2)
+	Publish(e, 3)
+	Publish(e, 4)
+	i := <-e.Chan
+	Expect(t, i, 1)
+}
+
+func TestOn(t *testing.T) {
+	var i int
+	e := NewEvent()
+	On(e, func(data interface{}) {
+		i = data.(int)
+	})
+	Publish(e, 10)
+	time.Sleep(1 * time.Millisecond)
+	Expect(t, i, 10)
+}
+
+func TestFromScale(t *testing.T) {
+	Expect(t, FromScale(5, 0, 10), 0.5)
+}
+
+func TestToScale(t *testing.T) {
+	Expect(t, ToScale(500, 0, 10), 10.0)
+	Expect(t, ToScale(-1, 0, 10), 0.0)
+	Expect(t, ToScale(0.5, 0, 10), 5.0)
+}
+
+func TestRand(t *testing.T) {
+	a := Rand(1000)
+	b := Rand(1000)
+	if a == b {
+		t.Error(fmt.Sprintf("%v should not equal %v", a, b))
+	}
+}
+
+func TestFieldByName(t *testing.T) {
+	testInterface := *newTestStruct()
+	Expect(t, FieldByName(testInterface, "i").Int(), int64(10))
+}
+
+func TestFieldByNamePtr(t *testing.T) {
+	testInterface := newTestStruct()
+	Expect(t, FieldByNamePtr(testInterface, "f").Float(), 0.2)
+}
+
+func TestCall(t *testing.T) {
+	testInterface := newTestStruct()
+	Expect(t, Call(testInterface, "Hello", "Human", "How are you?")[0].String(), "Hello Human! How are you?")
+}

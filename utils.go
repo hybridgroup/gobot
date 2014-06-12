@@ -36,8 +36,8 @@ func On(e *Event, f func(s interface{})) {
 }
 
 func Rand(max int) int {
-	rand.Seed(time.Now().UTC().UnixNano())
-	return rand.Intn(max)
+	r := rand.New(rand.NewSource(time.Now().UTC().UnixNano()))
+	return r.Intn(max)
 }
 
 func Call(thing interface{}, method string, params ...interface{}) []reflect.Value {
