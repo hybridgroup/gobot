@@ -1,4 +1,4 @@
-[![Gobot](https://cdn.rawgit.com/hybridgroup/gobot/gobot.io/source/images/elements/gophy.png)](http://gobot.io/)
+[![Gobot](https://cdn.rawgit.com/hybridgroup/gobot-site/master/source/images/elements/gophy.png)](http://gobot.io/)
 
 http://gobot.io/
 
