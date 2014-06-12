@@ -15,12 +15,11 @@ type JSONRobot struct {
 }
 
 type Robot struct {
-	Name          string                 `json:"-"`
-	Commands      map[string]interface{} `json:"-"`
-	RobotCommands []string               `json:"-"`
-	Work          func()                 `json:"-"`
-	connections   connections            `json:"-"`
-	devices       devices                `json:"-"`
+	Name        string                                              `json:"-"`
+	Commands    map[string]func(map[string]interface{}) interface{} `json:"-"`
+	Work        func()                                              `json:"-"`
+	connections connections                                         `json:"-"`
+	devices     devices                                             `json:"-"`
 }
 
 type Robots []*Robot
@@ -39,8 +38,9 @@ func (r Robots) Each(f func(*Robot)) {
 
 func NewRobot(name string, c []Connection, d []Device, work func()) *Robot {
 	r := &Robot{
-		Name: name,
-		Work: work,
+		Name:     name,
+		Work:     work,
+		Commands: make(map[string]func(map[string]interface{}) interface{}),
 	}
 	r.initName()
 	log.Println("Initializing Robot", r.Name, "...")
@@ -49,9 +49,12 @@ func NewRobot(name string, c []Connection, d []Device, work func()) *Robot {
 	return r
 }
 
+func (r *Robot) AddCommand(name string, f func(map[string]interface{}) interface{}) {
+	r.Commands[name] = f
+}
+
 func (r *Robot) Start() {
 	log.Println("Starting Robot", r.Name, "...")
-	r.initCommands()
 	if err := r.Connections().Start(); err != nil {
 		panic("Could not start connections")
 	}
@@ -69,13 +72,6 @@ func (r *Robot) initName() {
 		rand.Seed(time.Now().UTC().UnixNano())
 		i := rand.Int()
 		r.Name = fmt.Sprintf("Robot%v", i)
-	}
-}
-
-func (r *Robot) initCommands() {
-	r.RobotCommands = make([]string, 0)
-	for k := range r.Commands {
-		r.RobotCommands = append(r.RobotCommands, k)
 	}
 }
 
@@ -132,9 +128,12 @@ func (r *Robot) Connection(name string) *connection {
 func (r *Robot) ToJSON() *JSONRobot {
 	jsonRobot := &JSONRobot{
 		Name:        r.Name,
-		Commands:    r.RobotCommands,
+		Commands:    []string{},
 		Connections: []*JSONConnection{},
 		Devices:     []*JSONDevice{},
+	}
+	for command := range r.Commands {
+		jsonRobot.Commands = append(jsonRobot.Commands, command)
 	}
 	for _, device := range r.Devices() {
 		jsonDevice := device.ToJSON()

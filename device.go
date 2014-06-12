@@ -14,6 +14,7 @@ type Device interface {
 	getInterval() time.Duration
 	setName(string)
 	getName() string
+	getCommands() map[string]func(map[string]interface{}) interface{}
 }
 
 type JSONDevice struct {
@@ -93,17 +94,27 @@ func (d *device) Halt() bool {
 	return d.Driver.Halt()
 }
 
-func (d *device) Commands() interface{} {
-	return FieldByNamePtr(d.Driver, "Commands").Interface()
+func (d *device) getCommands() map[string]func(map[string]interface{}) interface{} {
+	return d.Driver.getCommands()
+}
+func (d *device) Commands() map[string]func(map[string]interface{}) interface{} {
+	return d.getCommands()
 }
 
 func (d *device) ToJSON() *JSONDevice {
-	return &JSONDevice{
+	jsonDevice := &JSONDevice{
 		Name:   d.Name,
 		Driver: d.Type,
 		Connection: d.Robot.Connection(FieldByNamePtr(FieldByNamePtr(d.Driver, "Adaptor").
 			Interface().(AdaptorInterface), "Name").
 			Interface().(string)).ToJSON(),
-		Commands: FieldByNamePtr(d.Driver, "Commands").Interface().([]string),
+		Commands: []string{},
 	}
+
+	commands := d.getCommands()
+	for command := range commands {
+		jsonDevice.Commands = append(jsonDevice.Commands, command)
+	}
+
+	return jsonDevice
 }

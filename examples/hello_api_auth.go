@@ -6,11 +6,6 @@ import (
 	"github.com/hybridgroup/gobot/api"
 )
 
-func Hello(params map[string]interface{}) string {
-	name := params["name"].(string)
-	return fmt.Sprintf("hi %v", name)
-}
-
 func main() {
 	master := gobot.NewGobot()
 
@@ -20,7 +15,10 @@ func main() {
 	server.Start()
 
 	hello := gobot.NewRobot("hello", nil, nil, nil)
-	hello.Commands = map[string]interface{}{"Hello": Hello}
+
+	hello.AddCommand("HiThere", func(params map[string]interface{}) interface{} {
+		return []string{fmt.Sprintf("Hey"), fmt.Sprintf("dude!")}
+	})
 
 	master.Robots = append(master.Robots, hello)
 

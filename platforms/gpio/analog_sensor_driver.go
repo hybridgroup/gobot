@@ -10,16 +10,18 @@ type AnalogSensorDriver struct {
 }
 
 func NewAnalogSensorDriver(a AnalogReader, name string, pin string) *AnalogSensorDriver {
-	return &AnalogSensorDriver{
+	d := &AnalogSensorDriver{
 		Driver: gobot.Driver{
-			Name: name,
-			Pin:  pin,
-			Commands: []string{
-				"ReadC",
-			},
+			Name:     name,
+			Pin:      pin,
+			Commands: make(map[string]func(map[string]interface{}) interface{}),
 		},
 		Adaptor: a,
 	}
+	d.Driver.AddCommand("Read", func(params map[string]interface{}) interface{} {
+		return d.Read()
+	})
+	return d
 }
 
 func (a *AnalogSensorDriver) Start() bool { return true }
