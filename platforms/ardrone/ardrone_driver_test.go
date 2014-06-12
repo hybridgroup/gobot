@@ -1,64 +1,67 @@
 package ardrone
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"github.com/hybridgroup/gobot"
+	"testing"
 )
 
-var _ = Describe("ArdroneDriver", func() {
-	var (
-		driver *ArdroneDriver
-	)
+var driver *ArdroneDriver
 
-	BeforeEach(func() {
-		adaptor := NewArdroneAdaptor("drone")
-		adaptor.connect = func(a *ArdroneAdaptor) {
-			a.drone = &testDrone{}
-		}
-		driver = NewArdroneDriver(adaptor, "drone")
-		adaptor.Connect()
-	})
+func init() {
+	adaptor := NewArdroneAdaptor("drone")
+	adaptor.connect = func(a *ArdroneAdaptor) {
+		a.drone = &testDrone{}
+	}
+	driver = NewArdroneDriver(adaptor, "drone")
+	adaptor.Connect()
+}
 
-	It("Must be able to Start", func() {
-		Expect(driver.Start()).To(Equal(true))
-	})
-	It("Must be able to Init", func() {
-		Expect(driver.Init()).To(Equal(true))
-	})
-	It("Must be able to Halt", func() {
-		Expect(driver.Halt()).To(Equal(true))
-	})
-	It("Must be able to TakeOff", func() {
-		driver.TakeOff()
-	})
-	It("Must be able to Land", func() {
-		driver.Land()
-	})
-	It("Must be able to go Up", func() {
-		driver.Up(1)
-	})
-	It("Must be able to go Down", func() {
-		driver.Down(1)
-	})
-	It("Must be able to go Left", func() {
-		driver.Left(1)
-	})
-	It("Must be able to go Right", func() {
-		driver.Right(1)
-	})
-	It("Must be able to go Forward", func() {
-		driver.Forward(1)
-	})
-	It("Must be able to go Backward", func() {
-		driver.Backward(1)
-	})
-	It("Must be able to go Clockwise", func() {
-		driver.Clockwise(1)
-	})
-	It("Must be able to go CounterClockwise", func() {
-		driver.CounterClockwise(1)
-	})
-	It("Must be able to Hover", func() {
-		driver.Hover()
-	})
-})
+func TestStart(t *testing.T) {
+	gobot.Expect(t, driver.Start(), true)
+}
+
+func TestHalt(t *testing.T) {
+	gobot.Expect(t, driver.Halt(), true)
+}
+func TestTakeOff(t *testing.T) {
+	driver.TakeOff()
+}
+
+func TestLand(t *testing.T) {
+	driver.Land()
+}
+func TestUp(t *testing.T) {
+	driver.Up(1)
+}
+
+func TestDown(t *testing.T) {
+	driver.Down(1)
+}
+
+func TestLeft(t *testing.T) {
+	driver.Left(1)
+}
+
+func TestRight(t *testing.T) {
+	driver.Right(1)
+}
+
+func TestForward(t *testing.T) {
+	driver.Forward(1)
+}
+
+func TestBackward(t *testing.T) {
+	driver.Backward(1)
+}
+
+func TestClockwise(t *testing.T) {
+	driver.Clockwise(1)
+}
+
+func TestCounterClockwise(t *testing.T) {
+	driver.CounterClockwise(1)
+}
+
+func TestHover(t *testing.T) {
+	driver.Hover()
+}

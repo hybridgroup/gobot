@@ -31,9 +31,6 @@ func (a *ArdroneDriver) Start() bool {
 func (a *ArdroneDriver) Halt() bool {
 	return true
 }
-func (a *ArdroneDriver) Init() bool {
-	return true
-}
 
 func (a *ArdroneDriver) TakeOff() {
 	gobot.Publish(a.Events["Flying"], gobot.Call(a.Adaptor.Drone(), "Takeoff"))

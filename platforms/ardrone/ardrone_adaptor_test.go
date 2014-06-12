@@ -1,38 +1,36 @@
 package ardrone
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"github.com/hybridgroup/gobot"
+	"testing"
 )
 
-var _ = Describe("ArdroneAdaptor", func() {
-	var (
-		adaptor *ArdroneAdaptor
-		drone   *testDrone
-	)
+var adaptor *ArdroneAdaptor
+var d *testDrone
 
-	BeforeEach(func() {
-		drone = &testDrone{}
-		adaptor = NewArdroneAdaptor("drone")
-		adaptor.connect = func(a *ArdroneAdaptor) {
-			a.drone = drone
-		}
-	})
+func init() {
+	d = &testDrone{}
+	adaptor = NewArdroneAdaptor("drone")
+	adaptor.connect = func(a *ArdroneAdaptor) {
+		a.drone = d
+	}
+}
 
-	It("Must be able to Finalize", func() {
-		Expect(adaptor.Finalize()).To(Equal(true))
-	})
-	It("Must be able to Connect", func() {
-		Expect(adaptor.Connect()).To(Equal(true))
-	})
-	It("Must be able to Disconnect", func() {
-		Expect(adaptor.Disconnect()).To(Equal(true))
-	})
-	It("Must be able to Reconnect", func() {
-		Expect(adaptor.Reconnect()).To(Equal(true))
-	})
-	It("Must be able to return a Drone", func() {
-		adaptor.Connect()
-		Expect(adaptor.Drone()).To(Equal(drone))
-	})
-})
+func TestFinalize(t *testing.T) {
+	gobot.Expect(t, adaptor.Finalize(), true)
+}
+func TestConnect(t *testing.T) {
+	gobot.Expect(t, adaptor.Connect(), true)
+}
+func TestDisconnect(t *testing.T) {
+	gobot.Expect(t, adaptor.Disconnect(), true)
+}
+
+func TestReconnect(t *testing.T) {
+	gobot.Expect(t, adaptor.Reconnect(), true)
+}
+
+func TestDrone(t *testing.T) {
+	adaptor.Connect()
+	gobot.Expect(t, adaptor.Drone(), d)
+}
