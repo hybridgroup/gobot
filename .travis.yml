@@ -4,7 +4,7 @@ go:
  - release
  - tip
 install:
- - sudo apt-get install libusb-dev libopencv-dev
+ - sudo apt-get install libusb-dev libopencv-dev libsdl2-2.0-0
  - go get -v . && go build -v .
  - go get github.com/onsi/ginkgo
  - go get github.com/onsi/gomega
