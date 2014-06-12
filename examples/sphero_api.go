@@ -8,12 +8,6 @@ import (
 
 var Master *gobot.Gobot
 
-func TurnBlue(params map[string]interface{}) bool {
-	s := Master.Robot(params["robotname"].(string)).Device("sphero")
-	gobot.Call(s.Driver, "SetRGB", uint8(0), uint8(0), uint8(255))
-	return true
-}
-
 func main() {
 	Master = gobot.NewGobot()
 	api.NewAPI(Master).Start()
@@ -32,7 +26,10 @@ func main() {
 		}
 
 		robot := gobot.NewRobot(name, []gobot.Connection{spheroAdaptor}, []gobot.Device{spheroDriver}, work)
-		robot.Commands = map[string]interface{}{"TurnBlue": TurnBlue}
+		robot.AddCommand("TurnBlue", func(params map[string]interface{}) interface{} {
+			spheroDriver.SetRGB(uint8(0), uint8(0), uint8(255))
+			return nil
+		})
 
 		Master.Robots = append(Master.Robots, robot)
 	}

@@ -14,8 +14,7 @@ type CameraDriver struct {
 func NewCameraDriver(name string, source interface{}) *CameraDriver {
 	return &CameraDriver{
 		Driver: gobot.Driver{
-			Name:     name,
-			Commands: []string{},
+			Name: name,
 			Events: map[string]*gobot.Event{
 				"Frame": gobot.NewEvent(),
 			},

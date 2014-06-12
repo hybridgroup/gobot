@@ -23,26 +23,61 @@ type SpheroDriver struct {
 }
 
 func NewSpheroDriver(a *SpheroAdaptor, name string) *SpheroDriver {
-	return &SpheroDriver{
+	s := &SpheroDriver{
 		Driver: gobot.Driver{
 			Name: name,
 			Events: map[string]*gobot.Event{
 				"Collision": gobot.NewEvent(),
 			},
-			Commands: []string{
-				"SetRGBC",
-				"RollC",
-				"StopC",
-				"GetRGBC",
-				"SetBackLEDC",
-				"SetHeadingC",
-				"SetStabilizationC",
-			},
+			Commands: make(map[string]func(map[string]interface{}) interface{}),
 		},
 		Adaptor:         a,
 		packetChannel:   make(chan *packet, 1024),
 		responseChannel: make(chan []uint8, 1024),
 	}
+
+	s.Driver.AddCommand("SetRGB", func(params map[string]interface{}) interface{} {
+		r := uint8(params["r"].(float64))
+		g := uint8(params["g"].(float64))
+		b := uint8(params["b"].(float64))
+		s.SetRGB(r, g, b)
+		return nil
+	})
+
+	s.Driver.AddCommand("Roll", func(params map[string]interface{}) interface{} {
+		speed := uint8(params["speed"].(float64))
+		heading := uint16(params["heading"].(float64))
+		s.Roll(speed, heading)
+		return nil
+	})
+
+	s.Driver.AddCommand("Stop", func(params map[string]interface{}) interface{} {
+		s.Stop()
+		return nil
+	})
+
+	s.Driver.AddCommand("GetRGB", func(params map[string]interface{}) interface{} {
+		return s.GetRGB()
+	})
+
+	s.Driver.AddCommand("SetBackLED", func(params map[string]interface{}) interface{} {
+		level := uint8(params["level"].(float64))
+		s.SetBackLED(level)
+		return nil
+	})
+
+	s.Driver.AddCommand("SetHeading", func(params map[string]interface{}) interface{} {
+		heading := uint16(params["heading"].(float64))
+		s.SetHeading(heading)
+		return nil
+	})
+	s.Driver.AddCommand("SetStabilization", func(params map[string]interface{}) interface{} {
+		on := params["heading"].(bool)
+		s.SetStabilization(on)
+		return nil
+	})
+
+	return s
 }
 func (s *SpheroDriver) Init() bool {
 	return true
