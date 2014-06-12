@@ -14,7 +14,6 @@ func init() {
 func TestFinalize(t *testing.T) {
 	gobot.Expect(t, b.Finalize(), true)
 }
-
 func TestConnect(t *testing.T) {
 	gobot.Expect(t, b.Connect(), true)
 }
