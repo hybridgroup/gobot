@@ -26,10 +26,13 @@ type TravisResponse struct {
 	LastBuildFinishedAt string `json:"last_build_finished_at"`
 }
 
+func turnOn(robot *gobot.Robot, device string) {
+	robot.Device(device).Driver.(*gpio.LedDriver).On()
+}
 func resetLeds(robot *gobot.Robot) {
-	gobot.Call(robot.Device("red").Driver, "Off")
-	gobot.Call(robot.Device("green").Driver, "Off")
-	gobot.Call(robot.Device("blue").Driver, "Off")
+	robot.Device("red").Driver.(*gpio.LedDriver).Off()
+	robot.Device("green").Driver.(*gpio.LedDriver).Off()
+	robot.Device("blue").Driver.(*gpio.LedDriver).Off()
 }
 
 func checkTravis(robot *gobot.Robot) {
@@ -38,7 +41,7 @@ func checkTravis(robot *gobot.Robot) {
 	name := "gobot"
 	//name := "broken-arrow"
 	fmt.Printf("Checking repo %s/%s\n", user, name)
-	gobot.Call(robot.Device("blue").Driver, "On")
+	turnOn(robot, "blue")
 	resp, err := http.Get(fmt.Sprintf("https://api.travis-ci.org/repos/%s/%s.json", user, name))
 	defer resp.Body.Close()
 	if err != nil {
@@ -52,9 +55,9 @@ func checkTravis(robot *gobot.Robot) {
 	json.Unmarshal(body, &travis)
 	resetLeds(robot)
 	if travis.LastBuildStatus == 0 {
-		gobot.Call(robot.Device("green").Driver, "On")
+		turnOn(robot, "green")
 	} else {
-		gobot.Call(robot.Device("red").Driver, "On")
+		turnOn(robot, "red")
 	}
 }
 
@@ -72,8 +75,9 @@ func main() {
 		})
 	}
 
-	master.Robots = append(master.Robots,
-		gobot.NewRobot("travis", []gobot.Connection{firmataAdaptor}, []gobot.Device{red, green, blue}, work))
+	master.AddRobot(
+		gobot.NewRobot("travis", []gobot.Connection{firmataAdaptor}, []gobot.Device{red, green, blue}, work),
+	)
 
 	master.Start()
 }
