@@ -9,15 +9,15 @@ import (
 var g *Gobot
 
 func init() {
-	log.SetOutput(new(null))
+	log.SetOutput(new(Null))
 	g = NewGobot()
 	g.trap = func(c chan os.Signal) {
 		c <- os.Interrupt
 	}
 	g.Robots = []*Robot{
-		newTestRobot("Robot 1"),
-		newTestRobot("Robot 2"),
-		newTestRobot("Robot 3"),
+		NewTestRobot("Robot 1"),
+		NewTestRobot("Robot 2"),
+		NewTestRobot("Robot 3"),
 	}
 }
 

@@ -8,11 +8,6 @@ import (
 	"testing"
 )
 
-type testStruct struct {
-	i int
-	f float64
-}
-
 func Expect(t *testing.T, a interface{}, b interface{}) {
 	if !reflect.DeepEqual(a, b) {
 		_, file, line, _ := runtime.Caller(1)
@@ -21,13 +16,25 @@ func Expect(t *testing.T, a interface{}, b interface{}) {
 	}
 }
 
+type testStruct struct {
+	i int
+	f float64
+}
+
+func NewTestStruct() *testStruct {
+	return &testStruct{
+		i: 10,
+		f: 0.2,
+	}
+}
+
 func (t *testStruct) Hello(name string, message string) string {
 	return fmt.Sprintf("Hello %v! %v", name, message)
 }
 
-type null struct{}
+type Null struct{}
 
-func (null) Write(p []byte) (int, error) {
+func (Null) Write(p []byte) (int, error) {
 	return len(p), nil
 }
 
@@ -40,14 +47,7 @@ func (t *testDriver) Init() bool  { return true }
 func (t *testDriver) Start() bool { return true }
 func (t *testDriver) Halt() bool  { return true }
 
-type testAdaptor struct {
-	Adaptor
-}
-
-func (t *testAdaptor) Finalize() bool { return true }
-func (t *testAdaptor) Connect() bool  { return true }
-
-func newTestDriver(name string, adaptor *testAdaptor) *testDriver {
+func NewTestDriver(name string, adaptor *testAdaptor) *testDriver {
 	t := &testDriver{
 		Driver: Driver{
 			Commands: make(map[string]func(map[string]interface{}) interface{}),
@@ -69,7 +69,14 @@ func newTestDriver(name string, adaptor *testAdaptor) *testDriver {
 	return t
 }
 
-func newTestAdaptor(name string) *testAdaptor {
+type testAdaptor struct {
+	Adaptor
+}
+
+func (t *testAdaptor) Finalize() bool { return true }
+func (t *testAdaptor) Connect() bool  { return true }
+
+func NewTestAdaptor(name string) *testAdaptor {
 	return &testAdaptor{
 		Adaptor: Adaptor{
 			Name: name,
@@ -82,15 +89,12 @@ func newTestAdaptor(name string) *testAdaptor {
 }
 
 func NewTestRobot(name string) *Robot {
-	return newTestRobot(name)
-}
-func newTestRobot(name string) *Robot {
-	adaptor1 := newTestAdaptor("Connection 1")
-	adaptor2 := newTestAdaptor("Connection 2")
-	adaptor3 := newTestAdaptor("Connection 3")
-	driver1 := newTestDriver("Device 1", adaptor1)
-	driver2 := newTestDriver("Device 2", adaptor2)
-	driver3 := newTestDriver("Device 3", adaptor3)
+	adaptor1 := NewTestAdaptor("Connection 1")
+	adaptor2 := NewTestAdaptor("Connection 2")
+	adaptor3 := NewTestAdaptor("Connection 3")
+	driver1 := NewTestDriver("Device 1", adaptor1)
+	driver2 := NewTestDriver("Device 2", adaptor2)
+	driver3 := NewTestDriver("Device 3", adaptor3)
 	work := func() {}
 	r := NewRobot(name, []Connection{adaptor1, adaptor2, adaptor3}, []Device{driver1, driver2, driver3}, work)
 	r.AddCommand("robotTestFunction", func(params map[string]interface{}) interface{} {
@@ -99,11 +103,4 @@ func newTestRobot(name string) *Robot {
 		return fmt.Sprintf("hey %v, %v", robot, message)
 	})
 	return r
-}
-
-func newTestStruct() *testStruct {
-	return &testStruct{
-		i: 10,
-		f: 0.2,
-	}
 }
