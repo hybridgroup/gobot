@@ -14,11 +14,10 @@ func main() {
 		return "This command is attached to the master!"
 	})
 
-	hello := gobot.NewRobot("hello", nil, nil, nil)
+	hello := gbot.AddRobot(gobot.NewRobot("hello"))
 	hello.AddCommand("HiThere", func(params map[string]interface{}) interface{} {
 		return fmt.Sprintf("This command is attached to the robot %v", hello.Name)
 	})
 
-	gbot.Robots = append(gbot.Robots, hello)
 	gbot.Start()
 }
