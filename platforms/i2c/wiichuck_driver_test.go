@@ -1,21 +1,17 @@
 package i2c
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"github.com/hybridgroup/gobot"
+	"testing"
 )
 
-var _ = Describe("Wiichuck", func() {
-	var (
-		t TestAdaptor
-		w *WiichuckDriver
-	)
+var w *WiichuckDriver
 
-	BeforeEach(func() {
-		w = NewWiichuckDriver(t, "bot")
-	})
+func init() {
+	w = NewWiichuckDriver(TestAdaptor{}, "bot")
+}
 
-	PIt("Must be able to Start", func() {
-		Expect(w.Start()).To(Equal(true))
-	})
-})
+func TestWiichuckStart(t *testing.T) {
+	t.SkipNow()
+	gobot.Expect(t, w.Start(), true)
+}

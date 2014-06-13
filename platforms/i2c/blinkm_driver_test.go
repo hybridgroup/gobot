@@ -1,37 +1,16 @@
 package i2c
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"github.com/hybridgroup/gobot"
+	"testing"
 )
 
-var _ = Describe("BlinkM", func() {
-	var (
-		t TestAdaptor
-		b *BlinkMDriver
-	)
+var b *BlinkMDriver
 
-	BeforeEach(func() {
-		b = NewBlinkMDriver(t, "bot")
-	})
+func init() {
+	b = NewBlinkMDriver(TestAdaptor{}, "bot")
+}
 
-	It("Must be able to Start", func() {
-		Expect(b.Start()).To(Equal(true))
-	})
-
-	PIt("Should be able to set Rgb", func() {
-		Expect(true)
-	})
-
-	PIt("Should be able to Fade", func() {
-		Expect(true)
-	})
-
-	PIt("Should be able to get FirmwareVersion", func() {
-		Expect(true)
-	})
-
-	PIt("Should be able to set Color", func() {
-		Expect(true)
-	})
-})
+func TestBlinkMStart(t *testing.T) {
+	gobot.Expect(t, b.Start(), true)
+}
