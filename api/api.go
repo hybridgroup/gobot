@@ -62,12 +62,14 @@ func NewAPI(g *gobot.Gobot) *api {
 func (a *api) Start() {
 	a.server = pat.New()
 
-	commandRoute := "/robots/:robot/devices/:device/commands/:command"
+	commandRoute := "/commands/:command"
+	deviceCommandRoute := "/robots/:robot/devices/:device/commands/:command"
 	robotCommandRoute := "/robots/:robot/commands/:command"
 
-	a.server.Get("/", http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
-		http.Redirect(res, req, "/robots", 301)
-	}))
+	a.server.Get("/", a.setHeaders(a.root))
+	a.server.Get("/commands", a.setHeaders(a.commands))
+	a.server.Get(commandRoute, a.setHeaders(a.executeCommand))
+	a.server.Post(commandRoute, a.setHeaders(a.executeCommand))
 	a.server.Get("/robots", a.setHeaders(a.robots))
 	a.server.Get("/robots/:robot", a.setHeaders(a.robot))
 	a.server.Get("/robots/:robot/commands", a.setHeaders(a.robotCommands))
@@ -76,8 +78,8 @@ func (a *api) Start() {
 	a.server.Get("/robots/:robot/devices", a.setHeaders(a.robotDevices))
 	a.server.Get("/robots/:robot/devices/:device", a.setHeaders(a.robotDevice))
 	a.server.Get("/robots/:robot/devices/:device/commands", a.setHeaders(a.robotDeviceCommands))
-	a.server.Get(commandRoute, a.setHeaders(a.executeDeviceCommand))
-	a.server.Post(commandRoute, a.setHeaders(a.executeDeviceCommand))
+	a.server.Get(deviceCommandRoute, a.setHeaders(a.executeDeviceCommand))
+	a.server.Post(deviceCommandRoute, a.setHeaders(a.executeDeviceCommand))
 	a.server.Get("/robots/:robot/connections", a.setHeaders(a.robotConnections))
 	a.server.Get("/robots/:robot/connections/:connection", a.setHeaders(a.robotConnection))
 
@@ -114,6 +116,18 @@ func (a *api) setHeaders(f func(http.ResponseWriter, *http.Request)) http.Handle
 		}
 		f(res, req)
 	}
+}
+
+func (a *api) root(res http.ResponseWriter, req *http.Request) {
+	data, _ := json.Marshal(a.gobot.ToJSON())
+	res.Header().Set("Content-Type", "application/json; charset=utf-8")
+	res.Write(data)
+}
+
+func (a *api) commands(res http.ResponseWriter, req *http.Request) {
+	data, _ := json.Marshal(a.gobot.ToJSON().Commands)
+	res.Header().Set("Content-Type", "application/json; charset=utf-8")
+	res.Write(data)
 }
 
 func (a *api) robots(res http.ResponseWriter, req *http.Request) {
@@ -191,6 +205,24 @@ func (a *api) robotConnection(res http.ResponseWriter, req *http.Request) {
 	connection := req.URL.Query().Get(":connection")
 
 	data, _ := json.Marshal(a.gobot.Robot(robot).Connection(connection).ToJSON())
+	res.Header().Set("Content-Type", "application/json; charset=utf-8")
+	res.Write(data)
+}
+
+func (a *api) executeCommand(res http.ResponseWriter, req *http.Request) {
+	command := req.URL.Query().Get(":command")
+
+	data, _ := ioutil.ReadAll(req.Body)
+	body := make(map[string]interface{})
+	json.Unmarshal(data, &body)
+	f := a.gobot.Commands[command]
+
+	if f != nil {
+		data, _ = json.Marshal(f(body))
+	} else {
+		data, _ = json.Marshal("Unknown Command")
+	}
+
 	res.Header().Set("Content-Type", "application/json; charset=utf-8")
 	res.Write(data)
 }

@@ -7,17 +7,18 @@ import (
 )
 
 func main() {
-	master := gobot.NewGobot()
-	a := api.NewAPI(master)
-	a.Start()
+	gbot := gobot.NewGobot()
+	api.NewAPI(gbot).Start()
 
-	hello := gobot.NewRobot("hello", nil, nil, nil)
-
-	hello.AddCommand("HiThere", func(params map[string]interface{}) interface{} {
-		return []string{fmt.Sprintf("Hey"), fmt.Sprintf("dude!")}
+	gbot.AddCommand("CustomGobotCommand", func(params map[string]interface{}) interface{} {
+		return "This command is attached to the master!"
 	})
 
-	master.Robots = append(master.Robots, hello)
+	hello := gobot.NewRobot("hello", nil, nil, nil)
+	hello.AddCommand("HiThere", func(params map[string]interface{}) interface{} {
+		return fmt.Sprintf("This command is attached to the robot %v", hello.Name)
+	})
 
-	master.Start()
+	gbot.Robots = append(gbot.Robots, hello)
+	gbot.Start()
 }

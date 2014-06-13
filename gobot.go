@@ -6,17 +6,28 @@ import (
 	"os/signal"
 )
 
+type JSONGobot struct {
+	Robots   []*JSONRobot `json:"robots"`
+	Commands []string     `json:"commands"`
+}
+
 type Gobot struct {
-	Robots []*Robot
-	trap   func(chan os.Signal)
+	Robots   []*Robot
+	Commands map[string]func(map[string]interface{}) interface{}
+	trap     func(chan os.Signal)
 }
 
 func NewGobot() *Gobot {
 	return &Gobot{
+		Commands: make(map[string]func(map[string]interface{}) interface{}),
 		trap: func(c chan os.Signal) {
 			signal.Notify(c, os.Interrupt)
 		},
 	}
+}
+
+func (g *Gobot) AddCommand(name string, f func(map[string]interface{}) interface{}) {
+	g.Commands[name] = f
 }
 
 func (g *Gobot) Start() {
@@ -41,4 +52,18 @@ func (g *Gobot) Robot(name string) *Robot {
 		}
 	}
 	return nil
+}
+
+func (g *Gobot) ToJSON() *JSONGobot {
+	jsonGobot := &JSONGobot{
+		Robots:   []*JSONRobot{},
+		Commands: []string{},
+	}
+	for command := range g.Commands {
+		jsonGobot.Commands = append(jsonGobot.Commands, command)
+	}
+	for _, robot := range g.Robots {
+		jsonGobot.Robots = append(jsonGobot.Robots, robot.ToJSON())
+	}
+	return jsonGobot
 }
