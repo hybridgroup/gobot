@@ -11,15 +11,18 @@ func init() {
 	a = NewAnalogSensorDriver(TestAdaptor{}, "bot", "1")
 }
 
-func TestStart(t *testing.T) {
+func TestAnalogSensorStart(t *testing.T) {
 	gobot.Expect(t, a.Start(), true)
 }
-func TestHalt(t *testing.T) {
+
+func TestAnalogSensorHalt(t *testing.T) {
 	gobot.Expect(t, a.Halt(), true)
 }
-func TestInit(t *testing.T) {
+
+func TestAnalogSensorInit(t *testing.T) {
 	gobot.Expect(t, a.Init(), true)
 }
-func TestRead(t *testing.T) {
+
+func TestAnalogSensorRead(t *testing.T) {
 	gobot.Expect(t, a.Read(), 99)
 }

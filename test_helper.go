@@ -3,6 +3,8 @@ package gobot
 import (
 	"fmt"
 	"reflect"
+	"runtime"
+	"strings"
 	"testing"
 )
 
@@ -13,7 +15,9 @@ type testStruct struct {
 
 func Expect(t *testing.T, a interface{}, b interface{}) {
 	if !reflect.DeepEqual(a, b) {
-		t.Errorf("Got %v - type %v, Expected %v - type %v", a, reflect.TypeOf(a), b, reflect.TypeOf(b))
+		_, file, line, _ := runtime.Caller(1)
+		s := strings.Split(file, "/")
+		t.Errorf("%v:%v Got %v - type %v, Expected %v - type %v", s[len(s)-1], line, a, reflect.TypeOf(a), b, reflect.TypeOf(b))
 	}
 }
 

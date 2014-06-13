@@ -1,51 +1,48 @@
 package gpio
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"github.com/hybridgroup/gobot"
+	"testing"
 )
 
-var _ = Describe("Servo", func() {
-	var (
-		t TestAdaptor
-		s *ServoDriver
-	)
+var s *ServoDriver
 
-	BeforeEach(func() {
-		s = NewServoDriver(t, "bot", "1")
-	})
+func init() {
+	s = NewServoDriver(TestAdaptor{}, "bot", "1")
+}
 
-	It("Should be able to Move", func() {
-		s.Move(100)
-		Expect(s.CurrentAngle).To(Equal(uint8(100)))
-	})
+func TestServoStart(t *testing.T) {
+	gobot.Expect(t, l.Start(), true)
+}
 
-	It("Should be able to move to Min", func() {
-		s.Min()
-		Expect(s.CurrentAngle).To(Equal(uint8(0)))
-	})
+func TestServoHalt(t *testing.T) {
+	gobot.Expect(t, l.Halt(), true)
+}
 
-	It("Should be able to move to Max", func() {
-		s.Max()
-		Expect(s.CurrentAngle).To(Equal(uint8(180)))
-	})
+func TestServoInit(t *testing.T) {
+	gobot.Expect(t, l.Init(), true)
+}
 
-	It("Should be able to move to Center", func() {
-		s.Center()
-		Expect(s.CurrentAngle).To(Equal(uint8(90)))
-	})
+func TestServoMove(t *testing.T) {
+	s.Move(100)
+	gobot.Expect(t, s.CurrentAngle, uint8(100))
+}
 
-	It("Should be able to move to init servo", func() {
-		s.InitServo()
-	})
+func TestServoMin(t *testing.T) {
+	s.Min()
+	gobot.Expect(t, s.CurrentAngle, uint8(0))
+}
 
-	It("Must be able to Start", func() {
-		Expect(s.Start()).To(Equal(true))
-	})
-	It("Must be able to Init", func() {
-		Expect(s.Init()).To(Equal(true))
-	})
-	It("Must be able to Halt", func() {
-		Expect(s.Halt()).To(Equal(true))
-	})
-})
+func TestServoMax(t *testing.T) {
+	s.Max()
+	gobot.Expect(t, s.CurrentAngle, uint8(180))
+}
+
+func TestServoCenter(t *testing.T) {
+	s.Center()
+	gobot.Expect(t, s.CurrentAngle, uint8(90))
+}
+
+func TestServoInitServo(t *testing.T) {
+	s.InitServo()
+}

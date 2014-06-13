@@ -5,32 +5,32 @@ import (
 	"testing"
 )
 
-var a *AnalogSensorDriver
+var b *ButtonDriver
 
 func init() {
 	b = NewButtonDriver(TestAdaptor{}, "bot", "1")
 }
 
-func TestStart(t *testing.T) {
+func TestButtonStart(t *testing.T) {
 	gobot.Expect(t, a.Start(), true)
 }
 
-func TestHalt(t *testing.T) {
+func TestButtonHalt(t *testing.T) {
 	gobot.Expect(t, a.Halt(), true)
 }
 
-func TestInit(t *testing.T) {
+func TestButtonInit(t *testing.T) {
 	gobot.Expect(t, a.Init(), true)
 }
 
-func TestReadState(t *testing.T) {
+func TestButtonReadState(t *testing.T) {
 	gobot.Expect(t, b.readState(), 1)
 }
 
-func TestActive(t *testing.T) {
+func TestButtonActive(t *testing.T) {
 	b.update(1)
 	gobot.Expect(t, b.Active, true)
 
 	b.update(0)
-	gobot.Expect(b.Active, false)
+	gobot.Expect(t, b.Active, false)
 }

@@ -11,36 +11,36 @@ func init() {
 	l = NewLedDriver(TestAdaptor{}, "myLed", "1")
 }
 
-func TestStart(t *testing.T) {
+func TestLedStart(t *testing.T) {
 	gobot.Expect(t, l.Start(), true)
 }
 
-func TestHalt(t *testing.T) {
+func TestLedHalt(t *testing.T) {
 	gobot.Expect(t, l.Halt(), true)
 }
 
-func TestInit(t *testing.T) {
+func TestLedInit(t *testing.T) {
 	gobot.Expect(t, l.Init(), true)
 }
 
-func TestOn(t *testing.T) {
+func TestLedOn(t *testing.T) {
 	gobot.Expect(t, l.On(), true)
 	gobot.Expect(t, l.IsOn(), true)
 }
 
-func TestOff(t *testing.T) {
+func TestLedOff(t *testing.T) {
 	gobot.Expect(t, l.Off(), true)
 	gobot.Expect(t, l.IsOff(), true)
 }
 
-func TestToggle(t *testing.T) {
+func TestLedToggle(t *testing.T) {
 	l.Off()
 	l.Toggle()
 	gobot.Expect(t, l.IsOn(), true)
 	l.Toggle()
-	gobot.Expect(l.IsOff(), true)
+	gobot.Expect(t, l.IsOff(), true)
 }
 
-func TestBrightness(t *testing.T) {
+func TestLedBrightness(t *testing.T) {
 	l.Brightness(150)
 }
