@@ -1,26 +1,27 @@
 package opencv
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"github.com/hybridgroup/gobot"
+	"testing"
 )
 
-var _ = Describe("Camera", func() {
-	var (
-		c *CameraDriver
-	)
+var c *CameraDriver
 
-	BeforeEach(func() {
-		c = NewCameraDriver("bot", 0)
-	})
+func init() {
+	c = NewCameraDriver("bot", 0)
+}
 
-	PIt("Must be able to Start", func() {
-		Expect(c.Start()).To(Equal(true))
-	})
-	PIt("Must be able to Init", func() {
-		Expect(c.Init()).To(Equal(true))
-	})
-	PIt("Must be able to Halt", func() {
-		Expect(c.Halt()).To(Equal(true))
-	})
-})
+func TestCameraStart(t *testing.T) {
+	t.SkipNow()
+	gobot.Expect(t, c.Start(), true)
+}
+
+func TestCameraHalt(t *testing.T) {
+	t.SkipNow()
+	gobot.Expect(t, c.Halt(), true)
+}
+
+func TestCameraInit(t *testing.T) {
+	t.SkipNow()
+	gobot.Expect(t, c.Init(), true)
+}
