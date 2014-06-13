@@ -10,4 +10,19 @@ type Adaptor struct {
 type AdaptorInterface interface {
 	Finalize() bool
 	Connect() bool
+	port() string
+	name() string
+	params() map[string]interface{}
+}
+
+func (a *Adaptor) port() string {
+	return a.Port
+}
+
+func (a *Adaptor) name() string {
+	return a.Name
+}
+
+func (a *Adaptor) params() map[string]interface{} {
+	return a.Params
 }
