@@ -1,30 +1,25 @@
 package gpio
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"github.com/hybridgroup/gobot"
+	"testing"
 )
 
-var _ = Describe("Analog-Sensor", func() {
-	var (
-		t TestAdaptor
-		a *AnalogSensorDriver
-	)
+var a *AnalogSensorDriver
 
-	BeforeEach(func() {
-		a = NewAnalogSensorDriver(t, "bot", "1")
-	})
+func init() {
+	a = NewAnalogSensorDriver(TestAdaptor{}, "bot", "1")
+}
 
-	It("Must be able to Read", func() {
-		Expect(a.Read()).To(Equal(99))
-	})
-	It("Must be able to Start", func() {
-		Expect(a.Start()).To(Equal(true))
-	})
-	It("Must be able to Halt", func() {
-		Expect(a.Halt()).To(Equal(true))
-	})
-	It("Must be able to Init", func() {
-		Expect(a.Init()).To(Equal(true))
-	})
-})
+func TestStart(t *testing.T) {
+	gobot.Expect(t, a.Start(), true)
+}
+func TestHalt(t *testing.T) {
+	gobot.Expect(t, a.Halt(), true)
+}
+func TestInit(t *testing.T) {
+	gobot.Expect(t, a.Init(), true)
+}
+func TestRead(t *testing.T) {
+	gobot.Expect(t, a.Read(), 99)
+}

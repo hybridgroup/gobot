@@ -1,51 +1,48 @@
 package gpio
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"github.com/hybridgroup/gobot"
+	"testing"
 )
 
-var _ = Describe("DirectPin", func() {
-	var (
-		t TestAdaptor
-		d *DirectPinDriver
-	)
+var d *DirectPinDriver
 
-	BeforeEach(func() {
-		d = NewDirectPinDriver(t, "bot", "1")
-	})
+func init() {
+	d = NewDirectPinDriver(TestAdaptor{}, "bot", "1")
+}
 
-	It("Should be able to DigitalRead", func() {
-		Expect(d.DigitalRead()).To(Equal(1))
-	})
+func TestStart(t *testing.T) {
+	gobot.Expect(t, a.Start(), true)
+}
 
-	It("Should be able to DigitalWrite", func() {
-		d.DigitalWrite(1)
-	})
+func TestHalt(t *testing.T) {
+	gobot.Expect(t, a.Halt(), true)
+}
 
-	It("Should be able to AnalogRead", func() {
-		Expect(d.AnalogRead()).To(Equal(99))
-	})
+func TestInit(t *testing.T) {
+	gobot.Expect(t, a.Init(), true)
+}
 
-	It("Should be able to AnalogWrite", func() {
-		d.AnalogWrite(100)
-	})
+func TestDigitalRead(t *testing.T) {
+	gobot.Expect(t, d.DigitalRead(), 1)
+}
 
-	It("Should be able to PwmWrite", func() {
-		d.PwmWrite(100)
-	})
+func TestDigitalWrite(t *testing.T) {
+	d.DigitalWrite(1)
+}
 
-	It("Should be able to ServoWrite", func() {
-		d.ServoWrite(100)
-	})
+func TestAnalogRead(t *testing.T) {
+	gobot.Expect(t, d.AnalogRead(), 99)
+}
 
-	It("Should be able to Start", func() {
-		Expect(d.Start()).To(BeTrue())
-	})
-	It("Should be able to Halt", func() {
-		Expect(d.Halt()).To(BeTrue())
-	})
-	It("Should be able to Init", func() {
-		Expect(d.Init()).To(BeTrue())
-	})
-})
+func TestAnalogWrite(t *testing.T) {
+	d.AnalogWrite(100)
+}
+
+func TestPwmWrite(t *testing.T) {
+	d.PwmWrite(100)
+}
+
+func TestServoWrite(t *testing.T) {
+	d.ServoWrite(100)
+}

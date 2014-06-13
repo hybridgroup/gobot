@@ -1,57 +1,46 @@
 package gpio
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"github.com/hybridgroup/gobot"
+	"testing"
 )
 
-var _ = Describe("Led", func() {
-	var (
-		t TestAdaptor
-		l *LedDriver
-	)
+var l *LedDriver
 
-	BeforeEach(func() {
-		l = NewLedDriver(t, "myLed", "1")
-	})
+func init() {
+	l = NewLedDriver(TestAdaptor{}, "myLed", "1")
+}
 
-	It("Must be able to tell if IsOn", func() {
-		Expect(l.IsOn()).NotTo(BeTrue())
-	})
+func TestStart(t *testing.T) {
+	gobot.Expect(t, l.Start(), true)
+}
 
-	It("Must be able to tell if IsOff", func() {
-		Expect(l.IsOff()).To(BeTrue())
-	})
+func TestHalt(t *testing.T) {
+	gobot.Expect(t, l.Halt(), true)
+}
 
-	It("Should be able to turn On", func() {
-		Expect(l.On()).To(BeTrue())
-		Expect(l.IsOn()).To(BeTrue())
-	})
+func TestInit(t *testing.T) {
+	gobot.Expect(t, l.Init(), true)
+}
 
-	It("Should be able to turn Off", func() {
-		Expect(l.Off()).To(BeTrue())
-		Expect(l.IsOff()).To(BeTrue())
-	})
+func TestOn(t *testing.T) {
+	gobot.Expect(t, l.On(), true)
+	gobot.Expect(t, l.IsOn(), true)
+}
 
-	It("Should be able to Toggle", func() {
-		l.Off()
-		l.Toggle()
-		Expect(l.IsOn()).To(BeTrue())
-		l.Toggle()
-		Expect(l.IsOff()).To(BeTrue())
-	})
+func TestOff(t *testing.T) {
+	gobot.Expect(t, l.Off(), true)
+	gobot.Expect(t, l.IsOff(), true)
+}
 
-	It("Should be able to set Brightness", func() {
-		l.Brightness(150)
-	})
+func TestToggle(t *testing.T) {
+	l.Off()
+	l.Toggle()
+	gobot.Expect(t, l.IsOn(), true)
+	l.Toggle()
+	gobot.Expect(l.IsOff(), true)
+}
 
-	It("Must be able to Start", func() {
-		Expect(l.Start()).To(Equal(true))
-	})
-	It("Must be able to Init", func() {
-		Expect(l.Init()).To(Equal(true))
-	})
-	It("Must be able to Halt", func() {
-		Expect(l.Halt()).To(Equal(true))
-	})
-})
+func TestBrightness(t *testing.T) {
+	l.Brightness(150)
+}
