@@ -14,17 +14,17 @@ type DriverInterface interface {
 	Start() bool
 	Halt() bool
 	setInterval(time.Duration)
-	getInterval() time.Duration
+	interval() time.Duration
 	setName(string)
-	getName() string
-	getCommands() map[string]func(map[string]interface{}) interface{}
+	name() string
+	commands() map[string]func(map[string]interface{}) interface{}
 }
 
 func (d *Driver) setInterval(t time.Duration) {
 	d.Interval = t
 }
 
-func (d *Driver) getInterval() time.Duration {
+func (d *Driver) interval() time.Duration {
 	return d.Interval
 }
 
@@ -32,14 +32,14 @@ func (d *Driver) setName(s string) {
 	d.Name = s
 }
 
-func (d *Driver) getName() string {
+func (d *Driver) name() string {
 	return d.Name
+}
+
+func (d *Driver) commands() map[string]func(map[string]interface{}) interface{} {
+	return d.Commands
 }
 
 func (d *Driver) AddCommand(name string, f func(map[string]interface{}) interface{}) {
 	d.Commands[name] = f
-}
-
-func (d *Driver) getCommands() map[string]func(map[string]interface{}) interface{} {
-	return d.Commands
 }

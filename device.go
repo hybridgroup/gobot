@@ -11,10 +11,10 @@ type Device interface {
 	Start() bool
 	Halt() bool
 	setInterval(time.Duration)
-	getInterval() time.Duration
+	interval() time.Duration
 	setName(string)
-	getName() string
-	getCommands() map[string]func(map[string]interface{}) interface{}
+	name() string
+	commands() map[string]func(map[string]interface{}) interface{}
 }
 
 type JSONDevice struct {
@@ -56,23 +56,23 @@ func (d devices) Halt() {
 }
 
 func NewDevice(driver DriverInterface, r *Robot) *device {
-	d := new(device)
-	s := reflect.ValueOf(driver).Type().String()
-	d.Type = s[1:len(s)]
-	d.Name = driver.getName()
-	d.Robot = r
-	if driver.getInterval() == 0 {
+	t := reflect.ValueOf(driver).Type().String()
+	if driver.interval() == 0 {
 		driver.setInterval(10 * time.Millisecond)
 	}
-	d.Driver = driver
-	return d
+	return &device{
+		Type:   t[1:len(t)],
+		Name:   driver.name(),
+		Robot:  r,
+		Driver: driver,
+	}
 }
 
 func (d *device) setInterval(t time.Duration) {
 	d.Interval = t
 }
 
-func (d *device) getInterval() time.Duration {
+func (d *device) interval() time.Duration {
 	return d.Interval
 }
 
@@ -80,8 +80,16 @@ func (d *device) setName(s string) {
 	d.Name = s
 }
 
-func (d *device) getName() string {
+func (d *device) name() string {
 	return d.Name
+}
+
+func (d *device) commands() map[string]func(map[string]interface{}) interface{} {
+	return d.Driver.commands()
+}
+
+func (d *device) Commands() map[string]func(map[string]interface{}) interface{} {
+	return d.commands()
 }
 
 func (d *device) Start() bool {
@@ -94,13 +102,6 @@ func (d *device) Halt() bool {
 	return d.Driver.Halt()
 }
 
-func (d *device) getCommands() map[string]func(map[string]interface{}) interface{} {
-	return d.Driver.getCommands()
-}
-func (d *device) Commands() map[string]func(map[string]interface{}) interface{} {
-	return d.getCommands()
-}
-
 func (d *device) ToJSON() *JSONDevice {
 	jsonDevice := &JSONDevice{
 		Name:   d.Name,
@@ -111,7 +112,7 @@ func (d *device) ToJSON() *JSONDevice {
 		Commands: []string{},
 	}
 
-	commands := d.getCommands()
+	commands := d.commands()
 	for command := range commands {
 		jsonDevice.Commands = append(jsonDevice.Commands, command)
 	}
