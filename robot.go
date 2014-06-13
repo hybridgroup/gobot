@@ -38,8 +38,10 @@ func (r Robots) Each(f func(*Robot)) {
 
 func NewRobot(name string, v ...interface{}) *Robot {
 	r := &Robot{
-		Name:     name,
-		Commands: make(map[string]func(map[string]interface{}) interface{}),
+		Name:        name,
+		Commands:    make(map[string]func(map[string]interface{}) interface{}),
+		connections: connections{},
+		devices:     devices{},
 	}
 	r.initName()
 	log.Println("Initializing Robot", r.Name, "...")
@@ -62,6 +64,18 @@ func NewRobot(name string, v ...interface{}) *Robot {
 		r.Work = v[2].(func())
 	}
 	return r
+}
+
+func (r *Robot) AddDevice(d Device) *device {
+	device := NewDevice(d, r)
+	r.devices = append(r.devices, device)
+	return device
+}
+
+func (r *Robot) AddConnection(c Connection) *connection {
+	connection := NewConnection(c, r)
+	r.connections = append(r.connections, connection)
+	return connection
 }
 
 func (r *Robot) AddCommand(name string, f func(map[string]interface{}) interface{}) {
@@ -91,20 +105,18 @@ func (r *Robot) initName() {
 }
 
 func (r *Robot) initConnections(c []Connection) {
-	r.connections = make(connections, len(c))
 	log.Println("Initializing connections...")
-	for i, connection := range c {
+	for _, connection := range c {
 		log.Println("Initializing connection", FieldByNamePtr(connection, "Name"), "...")
-		r.connections[i] = NewConnection(connection, r)
+		r.AddConnection(connection)
 	}
 }
 
 func (r *Robot) initDevices(d []Device) {
-	r.devices = make([]*device, len(d))
 	log.Println("Initializing devices...")
-	for i, device := range d {
+	for _, device := range d {
 		log.Println("Initializing device", FieldByNamePtr(device, "Name"), "...")
-		r.devices[i] = NewDevice(device, r)
+		r.AddDevice(device)
 	}
 }
 
