@@ -26,6 +26,11 @@ func NewGobot() *Gobot {
 	}
 }
 
+func (g *Gobot) AddRobot(r *Robot) *Robot {
+	g.Robots = append(g.Robots, r)
+	return r
+}
+
 func (g *Gobot) AddCommand(name string, f func(map[string]interface{}) interface{}) {
 	g.Commands[name] = f
 }
