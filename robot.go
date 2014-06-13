@@ -36,16 +36,31 @@ func (r Robots) Each(f func(*Robot)) {
 	}
 }
 
-func NewRobot(name string, c []Connection, d []Device, work func()) *Robot {
+func NewRobot(name string, v ...interface{}) *Robot {
 	r := &Robot{
 		Name:     name,
-		Work:     work,
 		Commands: make(map[string]func(map[string]interface{}) interface{}),
 	}
 	r.initName()
 	log.Println("Initializing Robot", r.Name, "...")
-	r.initConnections(c)
-	r.initDevices(d)
+	if len(v) > 0 {
+		if v[0] == nil {
+			v[0] = []Connection{}
+		}
+		r.initConnections(v[0].([]Connection))
+	}
+	if len(v) > 1 {
+		if v[1] == nil {
+			v[1] = []Device{}
+		}
+		r.initDevices(v[1].([]Device))
+	}
+	if len(v) > 2 {
+		if v[2] == nil {
+			v[2] = func() {}
+		}
+		r.Work = v[2].(func())
+	}
 	return r
 }
 
