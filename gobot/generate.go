@@ -100,17 +100,6 @@ func Generate() cli.Command {
 			}
 			adaptorTest.Execute(f, name)
 			f.Close()
-
-			testSuite, _ := template.New("").Parse(testSuite())
-			fileLocation = fmt.Sprintf("%s/%s_suite_test.go", dir, args[0])
-			fmt.Println("Creating", fileLocation)
-			f, err = os.Create(fileLocation)
-			if err != nil {
-				fmt.Println(err)
-				err = nil
-			}
-			testSuite.Execute(f, name)
-			f.Close()
 		},
 	}
 }
@@ -163,8 +152,8 @@ func New{{.UpperName}}Driver(a *{{.UpperName}}Adaptor, name string) *{{.UpperNam
   return &{{.UpperName}}Driver{
     Driver: gobot.Driver{
       Name: name,
-      Events: make(map[string]chan interface{}),
-      Commands: []string{},
+      Events: make(map[string]*gobot.Event),
+      Commands: make(map[string]func(map[string]interface{}) interface{}),
     },
     Adaptor: a,
   }
@@ -179,26 +168,23 @@ func driverTest() string {
 	return `package {{ .Name }}
 
 import (
-  . "github.com/onsi/ginkgo"
-  . "github.com/onsi/gomega"
+  "github.com/hybridgroup/gobot"
+  "testing"
 )
 
-var _ = Describe("{{ .UpperName }}Driver", func() {
-  var (
-    driver *{{ .UpperName }}Driver
-  )
+func initTest{{ .UpperName }}Driver() *{{ .UpperName }}Driver {
+  return New{{ .UpperName}}Driver(New{{ .UpperName }}Adaptor("myAdaptor"), "myDriver")
+}
 
-  BeforeEach(func() {
-    driver = New{{ .UpperName }}Driver(New{{ .UpperName }}Adaptor("adaptor"), "driver")
-  })
+func Test{{ .UpperName }}DriverStart(t *testing.T) {
+  d := initTest{{.UpperName }}Driver()
+  gobot.Expect(t, d.Start(), true)
+}
 
-  It("Must be able to Start", func() {
-    Expect(driver.Start()).To(Equal(true))
-  })
-  It("Must be able to Halt", func() {
-    Expect(driver.Halt()).To(Equal(true))
-  })
-})
+func Test{{ .UpperName }}DriverHalt(t *testing.T) {
+  d := initTest{{.UpperName }}Driver()
+  gobot.Expect(t, d.Halt(), true)
+}
 `
 }
 
@@ -206,42 +192,22 @@ func adaptorTest() string {
 	return `package {{ .Name }}
 
 import (
-  . "github.com/onsi/ginkgo"
-  . "github.com/onsi/gomega"
-)
-
-var _ = Describe("{{ .UpperName }}Adaptor", func() {
-  var (
-    adaptor *{{ .UpperName }}Adaptor
-  )
-
-  BeforeEach(func() {
-    adaptor = New{{ .UpperName }}Adaptor("adaptor")
-  })
-
-  It("Must be able to Finalize", func() {
-    Expect(adaptor.Finalize()).To(Equal(true))
-  })
-  It("Must be able to Connect", func() {
-    Expect(adaptor.Connect()).To(Equal(true))
-  })
-})
-`
-}
-
-func testSuite() string {
-	return `package {{ .Name }}
-
-import (
-  . "github.com/onsi/ginkgo"
-  . "github.com/onsi/gomega"
-
+  "github.com/hybridgroup/gobot"
   "testing"
 )
 
-func TestGobot{{ .UpperName }}(t *testing.T) {
-  RegisterFailHandler(Fail)
-  RunSpecs(t, "{{ .UpperName }} Suite")
+func initTest{{ .UpperName }}Adaptor() *{{ .UpperName }}Adaptor {
+  return New{{ .UpperName }}Adaptor("myAdaptor")
+}
+
+func Test{{ .UpperName }}AdaptorConnect(t *testing.T) {
+  a := initTest{{.UpperName }}Adaptor()
+  gobot.Expect(t, a.Connect(), true)
+}
+
+func Test{{ .UpperName }}AdaptorFinalize(t *testing.T) {
+  a := initTest{{.UpperName }}Adaptor()
+  gobot.Expect(t, a.Finalize(), true)
 }
 `
 }
