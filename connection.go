@@ -9,6 +9,9 @@ import (
 type Connection interface {
 	Connect() bool
 	Finalize() bool
+	port() string
+	name() string
+	params() map[string]interface{}
 }
 
 type JSONConnection struct {
@@ -50,19 +53,15 @@ func (c connections) Finalize() {
 }
 
 func NewConnection(adaptor AdaptorInterface, r *Robot) *connection {
-	c := new(connection)
-	s := reflect.ValueOf(adaptor).Type().String()
-	c.Type = s[1:len(s)]
-	c.Name = FieldByNamePtr(adaptor, "Name").String()
-	c.Port = FieldByNamePtr(adaptor, "Port").String()
-	c.Params = make(map[string]interface{})
-	keys := FieldByNamePtr(adaptor, "Params").MapKeys()
-	for k := range keys {
-		c.Params[keys[k].String()] = FieldByNamePtr(adaptor, "Params").MapIndex(keys[k])
+	t := reflect.ValueOf(adaptor).Type().String()
+	return &connection{
+		Type:    t[1:len(t)],
+		Name:    adaptor.name(),
+		Port:    adaptor.port(),
+		Params:  adaptor.params(),
+		Robot:   r,
+		Adaptor: adaptor,
 	}
-	c.Robot = r
-	c.Adaptor = adaptor
-	return c
 }
 
 func (c *connection) Connect() bool {
@@ -81,4 +80,16 @@ func (c *connection) ToJSON() *JSONConnection {
 		Port:    c.Port,
 		Adaptor: c.Type,
 	}
+}
+
+func (c *connection) port() string {
+	return c.Port
+}
+
+func (c *connection) name() string {
+	return c.Name
+}
+
+func (c *connection) params() map[string]interface{} {
+	return c.Adaptor.params()
 }
