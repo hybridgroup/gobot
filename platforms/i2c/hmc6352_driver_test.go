@@ -5,13 +5,12 @@ import (
 	"testing"
 )
 
-var h *HMC6352Driver
-
-func init() {
-	h = NewHMC6352Driver(TestAdaptor{}, "bot")
+func initTestHMC6352Driver() *HMC6352Driver {
+	return NewHMC6352Driver(TestAdaptor{}, "bot")
 }
 
-func TestHMC6352Start(t *testing.T) {
+func TestHMC6352DriverStart(t *testing.T) {
 	t.SkipNow()
-	gobot.Expect(t, h.Start(), true)
+	d := initTestHMC6352Driver()
+	gobot.Expect(t, d.Start(), true)
 }

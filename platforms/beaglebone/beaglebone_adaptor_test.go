@@ -5,21 +5,23 @@ import (
 	"testing"
 )
 
-var b *BeagleboneAdaptor
-
-func init() {
-	b = NewBeagleboneAdaptor("bot")
+func initTestBeagleboneAdaptor() *BeagleboneAdaptor {
+	return NewBeagleboneAdaptor("bot")
 }
 
-func TestFinalize(t *testing.T) {
-	gobot.Expect(t, b.Finalize(), true)
+func TestBeagleboneAdaptorFinalize(t *testing.T) {
+	a := initTestBeagleboneAdaptor()
+	gobot.Expect(t, a.Finalize(), true)
 }
-func TestConnect(t *testing.T) {
-	gobot.Expect(t, b.Connect(), true)
+func TestBeagleboneAdaptorConnect(t *testing.T) {
+	a := initTestBeagleboneAdaptor()
+	gobot.Expect(t, a.Connect(), true)
 }
-func TestDisconnect(t *testing.T) {
-	gobot.Expect(t, b.Disconnect(), true)
+func TestBeagleboneAdaptorDisconnect(t *testing.T) {
+	a := initTestBeagleboneAdaptor()
+	gobot.Expect(t, a.Disconnect(), true)
 }
-func TestReconnect(t *testing.T) {
-	gobot.Expect(t, b.Reconnect(), true)
+func TestBeagleboneAdaptorReconnect(t *testing.T) {
+	a := initTestBeagleboneAdaptor()
+	gobot.Expect(t, a.Reconnect(), true)
 }

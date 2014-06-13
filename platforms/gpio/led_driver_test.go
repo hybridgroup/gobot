@@ -5,42 +5,47 @@ import (
 	"testing"
 )
 
-var l *LedDriver
-
-func init() {
-	l = NewLedDriver(TestAdaptor{}, "myLed", "1")
+func initTestLedDriver() *LedDriver {
+	return NewLedDriver(TestAdaptor{}, "myLed", "1")
 }
 
-func TestLedStart(t *testing.T) {
-	gobot.Expect(t, l.Start(), true)
+func TestLedDriverStart(t *testing.T) {
+	d := initTestLedDriver()
+	gobot.Expect(t, d.Start(), true)
 }
 
-func TestLedHalt(t *testing.T) {
-	gobot.Expect(t, l.Halt(), true)
+func TestLedDriverHalt(t *testing.T) {
+	d := initTestLedDriver()
+	gobot.Expect(t, d.Halt(), true)
 }
 
-func TestLedInit(t *testing.T) {
-	gobot.Expect(t, l.Init(), true)
+func TestLedDriverInit(t *testing.T) {
+	d := initTestLedDriver()
+	gobot.Expect(t, d.Init(), true)
 }
 
-func TestLedOn(t *testing.T) {
-	gobot.Expect(t, l.On(), true)
-	gobot.Expect(t, l.IsOn(), true)
+func TestLedDriverOn(t *testing.T) {
+	d := initTestLedDriver()
+	gobot.Expect(t, d.On(), true)
+	gobot.Expect(t, d.IsOn(), true)
 }
 
-func TestLedOff(t *testing.T) {
-	gobot.Expect(t, l.Off(), true)
-	gobot.Expect(t, l.IsOff(), true)
+func TestLedDriverOff(t *testing.T) {
+	d := initTestLedDriver()
+	gobot.Expect(t, d.Off(), true)
+	gobot.Expect(t, d.IsOff(), true)
 }
 
-func TestLedToggle(t *testing.T) {
-	l.Off()
-	l.Toggle()
-	gobot.Expect(t, l.IsOn(), true)
-	l.Toggle()
-	gobot.Expect(t, l.IsOff(), true)
+func TestLedDriverToggle(t *testing.T) {
+	d := initTestLedDriver()
+	d.Off()
+	d.Toggle()
+	gobot.Expect(t, d.IsOn(), true)
+	d.Toggle()
+	gobot.Expect(t, d.IsOff(), true)
 }
 
-func TestLedBrightness(t *testing.T) {
-	l.Brightness(150)
+func TestLedDriverBrightness(t *testing.T) {
+	d := initTestLedDriver()
+	d.Brightness(150)
 }

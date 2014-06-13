@@ -5,17 +5,17 @@ import (
 	"testing"
 )
 
-var adaptor *NeuroskyAdaptor
-
-func init() {
-	adaptor = NewNeuroskyAdaptor("bot", "/dev/null")
+func initTestNeuroskyAdaptor() *NeuroskyAdaptor {
+	return NewNeuroskyAdaptor("bot", "/dev/null")
 }
 
-func TestFinalize(t *testing.T) {
+func TestNeuroskyAdaptorFinalize(t *testing.T) {
 	t.SkipNow()
-	gobot.Expect(t, adaptor.Finalize(), true)
+	a := initTestNeuroskyAdaptor()
+	gobot.Expect(t, a.Finalize(), true)
 }
-func TestConnect(t *testing.T) {
+func TestNeuroskyAdaptorConnect(t *testing.T) {
 	t.SkipNow()
-	gobot.Expect(t, adaptor.Connect(), true)
+	a := initTestNeuroskyAdaptor()
+	gobot.Expect(t, a.Connect(), true)
 }

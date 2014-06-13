@@ -5,17 +5,18 @@ import (
 	"testing"
 )
 
-var a *SpheroAdaptor
-
-func init() {
-	a = NewSpheroAdaptor("bot", "/dev/null")
-	a.sp = sp{}
+func initTestSpheroAdaptor() *SpheroAdaptor {
+	a := NewSpheroAdaptor("bot", "/dev/null")
+	a.sp = gobot.NullReadWriteCloser{}
 	a.connect = func(a *SpheroAdaptor) {}
+	return a
 }
 
-func TestFinalize(t *testing.T) {
+func TestSpheroAdaptorFinalize(t *testing.T) {
+	a := initTestSpheroAdaptor()
 	gobot.Expect(t, a.Finalize(), true)
 }
-func TestConnect(t *testing.T) {
+func TestSpheroAdaptorConnect(t *testing.T) {
+	a := initTestSpheroAdaptor()
 	gobot.Expect(t, a.Connect(), true)
 }

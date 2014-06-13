@@ -5,92 +5,104 @@ import (
 	"testing"
 )
 
-var m *MotorDriver
-
-func init() {
-	m = NewMotorDriver(TestAdaptor{}, "bot", "1")
+func initTestMotorDriver() *MotorDriver {
+	return NewMotorDriver(TestAdaptor{}, "bot", "1")
 }
 
-func TestMotorStart(t *testing.T) {
-	gobot.Expect(t, m.Start(), true)
+func TestMotorDriverStart(t *testing.T) {
+	d := initTestMotorDriver()
+	gobot.Expect(t, d.Start(), true)
 }
 
-func TestMotorHalt(t *testing.T) {
-	gobot.Expect(t, m.Halt(), true)
+func TestMotorDriverHalt(t *testing.T) {
+	d := initTestMotorDriver()
+	gobot.Expect(t, d.Halt(), true)
 }
 
-func TestMotorInit(t *testing.T) {
-	gobot.Expect(t, m.Init(), true)
+func TestMotorDriverInit(t *testing.T) {
+	d := initTestMotorDriver()
+	gobot.Expect(t, d.Init(), true)
 }
 
-func TestMotorIsOn(t *testing.T) {
-	m.CurrentMode = "digital"
-	m.CurrentState = 1
-	gobot.Expect(t, m.IsOn(), true)
-	m.CurrentMode = "analog"
-	m.CurrentSpeed = 100
-	gobot.Expect(t, m.IsOn(), true)
+func TestMotorDriverIsOn(t *testing.T) {
+	d := initTestMotorDriver()
+	d.CurrentMode = "digital"
+	d.CurrentState = 1
+	gobot.Expect(t, d.IsOn(), true)
+	d.CurrentMode = "analog"
+	d.CurrentSpeed = 100
+	gobot.Expect(t, d.IsOn(), true)
 }
 
-func TestMotorIsOff(t *testing.T) {
-	m.Off()
-	gobot.Expect(t, m.IsOff(), true)
+func TestMotorDriverIsOff(t *testing.T) {
+	d := initTestMotorDriver()
+	d.Off()
+	gobot.Expect(t, d.IsOff(), true)
 }
 
-func TestMotorOn(t *testing.T) {
-	m.CurrentMode = "digital"
-	m.On()
-	gobot.Expect(t, m.CurrentState, uint8(1))
-	m.CurrentMode = "analog"
-	m.CurrentSpeed = 0
-	m.On()
-	gobot.Expect(t, m.CurrentSpeed, uint8(255))
+func TestMotorDriverOn(t *testing.T) {
+	d := initTestMotorDriver()
+	d.CurrentMode = "digital"
+	d.On()
+	gobot.Expect(t, d.CurrentState, uint8(1))
+	d.CurrentMode = "analog"
+	d.CurrentSpeed = 0
+	d.On()
+	gobot.Expect(t, d.CurrentSpeed, uint8(255))
 }
 
-func TestMotorOff(t *testing.T) {
-	m.CurrentMode = "digital"
-	m.Off()
-	gobot.Expect(t, m.CurrentState, uint8(0))
-	m.CurrentMode = "analog"
-	m.CurrentSpeed = 100
-	m.Off()
-	gobot.Expect(t, m.CurrentSpeed, uint8(0))
+func TestMotorDriverOff(t *testing.T) {
+	d := initTestMotorDriver()
+	d.CurrentMode = "digital"
+	d.Off()
+	gobot.Expect(t, d.CurrentState, uint8(0))
+	d.CurrentMode = "analog"
+	d.CurrentSpeed = 100
+	d.Off()
+	gobot.Expect(t, d.CurrentSpeed, uint8(0))
 }
 
-func TestMotorToggle(t *testing.T) {
-	m.Off()
-	m.Toggle()
-	gobot.Expect(t, m.IsOn(), true)
-	m.Toggle()
-	gobot.Expect(t, m.IsOn(), false)
+func TestMotorDriverToggle(t *testing.T) {
+	d := initTestMotorDriver()
+	d.Off()
+	d.Toggle()
+	gobot.Expect(t, d.IsOn(), true)
+	d.Toggle()
+	gobot.Expect(t, d.IsOn(), false)
 }
 
-func TestMotorMin(t *testing.T) {
-	m.Min()
+func TestMotorDriverMin(t *testing.T) {
+	d := initTestMotorDriver()
+	d.Min()
 }
 
-func TestMotorMax(t *testing.T) {
-	m.Max()
+func TestMotorDriverMax(t *testing.T) {
+	d := initTestMotorDriver()
+	d.Max()
 }
 
-func TestMotorSpeed(t *testing.T) {
-	m.Speed(100)
+func TestMotorDriverSpeed(t *testing.T) {
+	d := initTestMotorDriver()
+	d.Speed(100)
 }
 
-func TestMotorForward(t *testing.T) {
-	m.Forward(100)
-	gobot.Expect(t, m.CurrentSpeed, uint8(100))
-	gobot.Expect(t, m.CurrentDirection, "forward")
+func TestMotorDriverForward(t *testing.T) {
+	d := initTestMotorDriver()
+	d.Forward(100)
+	gobot.Expect(t, d.CurrentSpeed, uint8(100))
+	gobot.Expect(t, d.CurrentDirection, "forward")
 }
-func TestMotorBackward(t *testing.T) {
-	m.Backward(100)
-	gobot.Expect(t, m.CurrentSpeed, uint8(100))
-	gobot.Expect(t, m.CurrentDirection, "backward")
+func TestMotorDriverBackward(t *testing.T) {
+	d := initTestMotorDriver()
+	d.Backward(100)
+	gobot.Expect(t, d.CurrentSpeed, uint8(100))
+	gobot.Expect(t, d.CurrentDirection, "backward")
 }
 
-func TestMotorDirection(t *testing.T) {
-	m.Direction("none")
-	m.DirectionPin = "2"
-	m.Direction("forward")
-	m.Direction("backward")
+func TestMotorDriverDirection(t *testing.T) {
+	d := initTestMotorDriver()
+	d.Direction("none")
+	d.DirectionPin = "2"
+	d.Direction("forward")
+	d.Direction("backward")
 }

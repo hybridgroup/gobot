@@ -6,28 +6,30 @@ import (
 	"testing"
 )
 
-var d *LeapMotionDriver
-
-func init() {
-	d = NewLeapMotionDriver(NewLeapMotionAdaptor("bot", "/dev/null"), "bot")
+func initTestLeapMotionDriver() *LeapMotionDriver {
+	return NewLeapMotionDriver(NewLeapMotionAdaptor("bot", "/dev/null"), "bot")
 }
 
-func TestStart(t *testing.T) {
+func TestLeapMotionDriverStart(t *testing.T) {
 	t.SkipNow()
+	d := initTestLeapMotionDriver()
 	gobot.Expect(t, d.Start(), true)
 }
 
-func TestHalt(t *testing.T) {
+func TestLeapMotionDriverHalt(t *testing.T) {
 	t.SkipNow()
+	d := initTestLeapMotionDriver()
 	gobot.Expect(t, d.Halt(), true)
 }
 
-func TestInit(t *testing.T) {
+func TestLeapMotionDriverInit(t *testing.T) {
 	t.SkipNow()
+	d := initTestLeapMotionDriver()
 	gobot.Expect(t, d.Init(), true)
 }
 
-func TestParser(t *testing.T) {
+func TestLeapMotionDriverParser(t *testing.T) {
+	d := initTestLeapMotionDriver()
 	file, _ := ioutil.ReadFile("./test/support/example_frame.json")
 	parsedFrame := d.ParseFrame(file)
 

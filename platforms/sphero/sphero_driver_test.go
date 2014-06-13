@@ -5,18 +5,18 @@ import (
 	"testing"
 )
 
-var s *SpheroDriver
-
-func init() {
+func initTestSpheroDriver() *SpheroDriver {
 	a := NewSpheroAdaptor("bot", "/dev/null")
-	a.sp = sp{}
-	s = NewSpheroDriver(a, "bot")
+	a.sp = gobot.NullReadWriteCloser{}
+	return NewSpheroDriver(a, "bot")
 }
 
-func TestStart(t *testing.T) {
-	gobot.Expect(t, s.Start(), true)
+func TestSpheroDriverStart(t *testing.T) {
+	d := initTestSpheroDriver()
+	gobot.Expect(t, d.Start(), true)
 }
 
-func TestHalt(t *testing.T) {
-	gobot.Expect(t, s.Halt(), true)
+func TestSpheroDriverHalt(t *testing.T) {
+	d := initTestSpheroDriver()
+	gobot.Expect(t, d.Halt(), true)
 }

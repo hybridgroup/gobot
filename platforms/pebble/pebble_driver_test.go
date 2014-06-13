@@ -5,26 +5,27 @@ import (
 	"testing"
 )
 
-var driver *PebbleDriver
-
-func init() {
-	driver = NewPebbleDriver(NewPebbleAdaptor("adaptor"), "pebble")
+func initTestPebbleDriver() *PebbleDriver {
+	return NewPebbleDriver(NewPebbleAdaptor("adaptor"), "pebble")
 }
 
-func TestStart(t *testing.T) {
-	gobot.Expect(t, driver.Start(), true)
+func TestPebbleDriverStart(t *testing.T) {
+	d := initTestPebbleDriver()
+	gobot.Expect(t, d.Start(), true)
 }
 
-func TestHalt(t *testing.T) {
-	gobot.Expect(t, driver.Halt(), true)
+func TestPebbleDriverHalt(t *testing.T) {
+	d := initTestPebbleDriver()
+	gobot.Expect(t, d.Halt(), true)
 }
 
-func TestNotification(t *testing.T) {
-	driver.SendNotification("Hello")
-	driver.SendNotification("World")
+func TestPebbleDriverNotification(t *testing.T) {
+	d := initTestPebbleDriver()
+	d.SendNotification("Hello")
+	d.SendNotification("World")
 
-	gobot.Expect(t, driver.Messages[0], "Hello")
-	gobot.Expect(t, driver.PendingMessage(), "Hello")
-	gobot.Expect(t, driver.PendingMessage(), "World")
-	gobot.Expect(t, driver.PendingMessage(), "")
+	gobot.Expect(t, d.Messages[0], "Hello")
+	gobot.Expect(t, d.PendingMessage(), "Hello")
+	gobot.Expect(t, d.PendingMessage(), "World")
+	gobot.Expect(t, d.PendingMessage(), "")
 }

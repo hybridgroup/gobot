@@ -11,30 +11,24 @@ import (
 	"testing"
 )
 
-type null struct{}
-
-func (null) Write(p []byte) (int, error) {
-	return len(p), nil
-}
-
-var m *gobot.Gobot
-var a *api
-
-func init() {
-	log.SetOutput(new(null))
-	m = gobot.NewGobot()
-	a = NewAPI(m)
+func initTestAPI() *api {
+	log.SetOutput(gobot.NullReadWriteCloser{})
+	g := gobot.NewGobot()
+	a := NewAPI(g)
 	a.start = func(m *api) {}
 	a.Start()
 
-	m.Robots = []*gobot.Robot{
+	g.Robots = []*gobot.Robot{
 		gobot.NewTestRobot("Robot 1"),
 		gobot.NewTestRobot("Robot 2"),
 		gobot.NewTestRobot("Robot 3"),
 	}
+
+	return a
 }
 
 func TestRobots(t *testing.T) {
+	a := initTestAPI()
 	request, _ := http.NewRequest("GET", "/robots", nil)
 	response := httptest.NewRecorder()
 	a.server.ServeHTTP(response, request)
@@ -46,6 +40,7 @@ func TestRobots(t *testing.T) {
 }
 
 func TestRobot(t *testing.T) {
+	a := initTestAPI()
 	request, _ := http.NewRequest("GET", "/robots/Robot%201", nil)
 	response := httptest.NewRecorder()
 	a.server.ServeHTTP(response, request)
@@ -57,6 +52,7 @@ func TestRobot(t *testing.T) {
 }
 
 func TestRobotDevices(t *testing.T) {
+	a := initTestAPI()
 	request, _ := http.NewRequest("GET", "/robots/Robot%201/devices", nil)
 	response := httptest.NewRecorder()
 	a.server.ServeHTTP(response, request)
@@ -68,6 +64,7 @@ func TestRobotDevices(t *testing.T) {
 }
 
 func TestRobotCommands(t *testing.T) {
+	a := initTestAPI()
 	request, _ := http.NewRequest("GET", "/robots/Robot%201/commands", nil)
 	response := httptest.NewRecorder()
 	a.server.ServeHTTP(response, request)
@@ -77,7 +74,9 @@ func TestRobotCommands(t *testing.T) {
 	json.Unmarshal(body, &i)
 	gobot.Expect(t, i, []string{"robotTestFunction"})
 }
+
 func TestExecuteRobotCommand(t *testing.T) {
+	a := initTestAPI()
 	request, _ := http.NewRequest("GET", "/robots/Robot%201/commands/robotTestFunction", bytes.NewBufferString(`{"message":"Beep Boop"}`))
 	request.Header.Add("Content-Type", "application/json")
 	response := httptest.NewRecorder()
@@ -90,6 +89,7 @@ func TestExecuteRobotCommand(t *testing.T) {
 }
 
 func TestUnknownRobotCommand(t *testing.T) {
+	a := initTestAPI()
 	request, _ := http.NewRequest("GET", "/robots/Robot%201/commands/robotTestFuntion1", bytes.NewBufferString(`{"message":"Beep Boop"}`))
 	request.Header.Add("Content-Type", "application/json")
 	response := httptest.NewRecorder()
@@ -102,6 +102,7 @@ func TestUnknownRobotCommand(t *testing.T) {
 }
 
 func TestRobotDevice(t *testing.T) {
+	a := initTestAPI()
 	request, _ := http.NewRequest("GET", "/robots/Robot%201/devices/Device%201", nil)
 	response := httptest.NewRecorder()
 	a.server.ServeHTTP(response, request)
@@ -113,6 +114,7 @@ func TestRobotDevice(t *testing.T) {
 }
 
 func TestRobotDeviceCommands(t *testing.T) {
+	a := initTestAPI()
 	request, _ := http.NewRequest("GET", "/robots/Robot%201/devices/Device%201/commands", nil)
 	response := httptest.NewRecorder()
 	a.server.ServeHTTP(response, request)
@@ -124,6 +126,7 @@ func TestRobotDeviceCommands(t *testing.T) {
 }
 
 func TestExecuteRobotDeviceCommand(t *testing.T) {
+	a := initTestAPI()
 	request, _ := http.NewRequest("GET", "/robots/Robot%201/devices/Device%201/commands/TestDriverCommand", bytes.NewBufferString(`{"name":"human"}`))
 	request.Header.Add("Content-Type", "application/json")
 	response := httptest.NewRecorder()
@@ -136,6 +139,7 @@ func TestExecuteRobotDeviceCommand(t *testing.T) {
 }
 
 func TestUnknownRobotDeviceCommand(t *testing.T) {
+	a := initTestAPI()
 	request, _ := http.NewRequest("GET", "/robots/Robot%201/devices/Device%201/commands/DriverCommand1", bytes.NewBufferString(`{"name":"human"}`))
 	request.Header.Add("Content-Type", "application/json")
 	response := httptest.NewRecorder()

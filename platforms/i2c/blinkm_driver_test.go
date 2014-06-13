@@ -5,12 +5,11 @@ import (
 	"testing"
 )
 
-var b *BlinkMDriver
-
-func init() {
-	b = NewBlinkMDriver(TestAdaptor{}, "bot")
+func initTestBlinkMDriver() *BlinkMDriver {
+	return NewBlinkMDriver(TestAdaptor{}, "bot")
 }
 
-func TestBlinkMStart(t *testing.T) {
-	gobot.Expect(t, b.Start(), true)
+func TestBlinkMDriverStart(t *testing.T) {
+	d := initTestBlinkMDriver()
+	gobot.Expect(t, d.Start(), true)
 }

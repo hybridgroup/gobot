@@ -5,23 +5,24 @@ import (
 	"testing"
 )
 
-var n *NeuroskyDriver
-
-func init() {
-	n = NewNeuroskyDriver(NewNeuroskyAdaptor("bot", "/dev/null"), "bot")
+func initTestNeuroskyDriver() *NeuroskyDriver {
+	return NewNeuroskyDriver(NewNeuroskyAdaptor("bot", "/dev/null"), "bot")
 }
 
-func TestStart(t *testing.T) {
+func TestNeuroskyDriverStart(t *testing.T) {
 	t.SkipNow()
-	gobot.Expect(t, n.Start(), true)
+	d := initTestNeuroskyDriver()
+	gobot.Expect(t, d.Start(), true)
 }
 
-func TestHalt(t *testing.T) {
+func TestNeuroskyDriverHalt(t *testing.T) {
 	t.SkipNow()
-	gobot.Expect(t, n.Halt(), true)
+	d := initTestNeuroskyDriver()
+	gobot.Expect(t, d.Halt(), true)
 }
 
-func TestInit(t *testing.T) {
+func TestNeuroskyDriverInit(t *testing.T) {
 	t.SkipNow()
-	gobot.Expect(t, n.Init(), true)
+	d := initTestNeuroskyDriver()
+	gobot.Expect(t, d.Init(), true)
 }

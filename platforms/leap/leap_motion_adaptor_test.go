@@ -5,17 +5,18 @@ import (
 	"testing"
 )
 
-var l *LeapMotionAdaptor
-
-func init() {
-	l = NewLeapMotionAdaptor("bot", "/dev/null")
+func initTestLeapMotionAdaptor() *LeapMotionAdaptor {
+	return NewLeapMotionAdaptor("bot", "/dev/null")
 }
 
-func TestFinalize(t *testing.T) {
+func TestLeapMotionAdaptorConnect(t *testing.T) {
 	t.SkipNow()
-	gobot.Expect(t, l.Finalize(), true)
+	a := initTestLeapMotionAdaptor()
+	gobot.Expect(t, a.Connect(), true)
 }
-func TestConnect(t *testing.T) {
+
+func TestLeapMotionAdaptorFinalize(t *testing.T) {
 	t.SkipNow()
-	gobot.Expect(t, l.Connect(), true)
+	a := initTestLeapMotionAdaptor()
+	gobot.Expect(t, a.Finalize(), true)
 }

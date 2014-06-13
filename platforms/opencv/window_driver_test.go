@@ -5,23 +5,24 @@ import (
 	"testing"
 )
 
-var w *WindowDriver
-
-func init() {
-	w = NewWindowDriver("bot")
+func initTestWindowDriver() *WindowDriver {
+	return NewWindowDriver("bot")
 }
 
-func TestWindowStart(t *testing.T) {
+func TestWindowDriverStart(t *testing.T) {
 	t.SkipNow()
-	gobot.Expect(t, w.Start(), true)
+	d := initTestWindowDriver()
+	gobot.Expect(t, d.Start(), true)
 }
 
-func TestWindowHalt(t *testing.T) {
+func TestWindowDriverHalt(t *testing.T) {
 	t.SkipNow()
-	gobot.Expect(t, w.Halt(), true)
+	d := initTestWindowDriver()
+	gobot.Expect(t, d.Halt(), true)
 }
 
-func TestWindowInit(t *testing.T) {
+func TestWindowDriverInit(t *testing.T) {
 	t.SkipNow()
-	gobot.Expect(t, w.Init(), true)
+	d := initTestWindowDriver()
+	gobot.Expect(t, d.Init(), true)
 }

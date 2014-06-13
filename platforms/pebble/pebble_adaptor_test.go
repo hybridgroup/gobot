@@ -5,15 +5,16 @@ import (
 	"testing"
 )
 
-var adaptor *PebbleAdaptor
-
-func init() {
-	adaptor = NewPebbleAdaptor("pebble")
+func initTestPebbleAdaptor() *PebbleAdaptor {
+	return NewPebbleAdaptor("pebble")
 }
 
-func TestFinalize(t *testing.T) {
-	gobot.Expect(t, adaptor.Finalize(), true)
+func TestPebbleAdaptorConnect(t *testing.T) {
+	a := initTestPebbleAdaptor()
+	gobot.Expect(t, a.Connect(), true)
 }
-func TestConnect(t *testing.T) {
-	gobot.Expect(t, adaptor.Connect(), true)
+
+func TestPebbleAdaptorFinalize(t *testing.T) {
+	a := initTestPebbleAdaptor()
+	gobot.Expect(t, a.Finalize(), true)
 }

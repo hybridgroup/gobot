@@ -5,44 +5,51 @@ import (
 	"testing"
 )
 
-var d *DirectPinDriver
-
-func init() {
-	d = NewDirectPinDriver(TestAdaptor{}, "bot", "1")
+func initTestDirectPinDriver() *DirectPinDriver {
+	return NewDirectPinDriver(TestAdaptor{}, "bot", "1")
 }
 
-func TestDirectPinStart(t *testing.T) {
-	gobot.Expect(t, a.Start(), true)
+func TestDirectPinDriverStart(t *testing.T) {
+	d := initTestDirectPinDriver()
+	gobot.Expect(t, d.Start(), true)
 }
 
-func TestDirectPinHalt(t *testing.T) {
-	gobot.Expect(t, a.Halt(), true)
+func TestDirectPinDriverHalt(t *testing.T) {
+	d := initTestDirectPinDriver()
+	gobot.Expect(t, d.Halt(), true)
 }
 
-func TestDirectPinInit(t *testing.T) {
-	gobot.Expect(t, a.Init(), true)
+func TestDirectPinDriverInit(t *testing.T) {
+	d := initTestDirectPinDriver()
+	gobot.Expect(t, d.Init(), true)
 }
 
-func TestDirectPinDigitalRead(t *testing.T) {
+func TestDirectPinDriverDigitalRead(t *testing.T) {
+	d := initTestDirectPinDriver()
 	gobot.Expect(t, d.DigitalRead(), 1)
 }
 
-func TestDirectPinDigitalWrite(t *testing.T) {
+func TestDirectPinDriverDigitalWrite(t *testing.T) {
+	d := initTestDirectPinDriver()
 	d.DigitalWrite(1)
 }
 
-func TestDirectPinAnalogRead(t *testing.T) {
+func TestDirectPinDriverAnalogRead(t *testing.T) {
+	d := initTestDirectPinDriver()
 	gobot.Expect(t, d.AnalogRead(), 99)
 }
 
-func TestDirectPinAnalogWrite(t *testing.T) {
+func TestDirectPinDriverAnalogWrite(t *testing.T) {
+	d := initTestDirectPinDriver()
 	d.AnalogWrite(100)
 }
 
-func TestDirectPinPwmWrite(t *testing.T) {
+func TestDirectPinDriverPwmWrite(t *testing.T) {
+	d := initTestDirectPinDriver()
 	d.PwmWrite(100)
 }
 
-func TestDirectPinServoWrite(t *testing.T) {
+func TestDirectPinDriverServoWrite(t *testing.T) {
+	d := initTestDirectPinDriver()
 	d.ServoWrite(100)
 }

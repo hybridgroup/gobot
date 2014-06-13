@@ -5,13 +5,12 @@ import (
 	"testing"
 )
 
-var w *WiichuckDriver
-
-func init() {
-	w = NewWiichuckDriver(TestAdaptor{}, "bot")
+func initTestWiichuckDriver() *WiichuckDriver {
+	return NewWiichuckDriver(TestAdaptor{}, "bot")
 }
 
-func TestWiichuckStart(t *testing.T) {
+func TestWiichuckDriverStart(t *testing.T) {
 	t.SkipNow()
-	gobot.Expect(t, w.Start(), true)
+	d := initTestWiichuckDriver()
+	gobot.Expect(t, d.Start(), true)
 }

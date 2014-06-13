@@ -6,11 +6,9 @@ import (
 	"testing"
 )
 
-var g *Gobot
-
-func init() {
-	log.SetOutput(new(Null))
-	g = NewGobot()
+func initTestGobot() *Gobot {
+	log.SetOutput(&NullReadWriteCloser{})
+	g := NewGobot()
 	g.trap = func(c chan os.Signal) {
 		c <- os.Interrupt
 	}
@@ -19,13 +17,16 @@ func init() {
 		NewTestRobot("Robot 2"),
 		NewTestRobot("Robot 3"),
 	}
+	return g
 }
 
-func TestStart(t *testing.T) {
+func TestGobotStart(t *testing.T) {
+	g := initTestGobot()
 	g.Start()
 }
 
-func TestRobot(t *testing.T) {
+func TestGobotRobot(t *testing.T) {
+	g := initTestGobot()
 	Expect(t, g.Robot("Robot 1").Name, "Robot 1")
 	Expect(t, g.Robot("Robot 4"), (*Robot)(nil))
 	Expect(t, g.Robot("Robot 1").Device("Device 4"), (*device)(nil))

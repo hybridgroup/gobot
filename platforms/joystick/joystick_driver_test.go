@@ -5,23 +5,24 @@ import (
 	"testing"
 )
 
-var d *JoystickDriver
-
-func init() {
-	d = NewJoystickDriver(NewJoystickAdaptor("bot"), "bot", "/dev/null")
+func initTestJoystickDriver() *JoystickDriver {
+	return NewJoystickDriver(NewJoystickAdaptor("bot"), "bot", "/dev/null")
 }
 
-func TestStart(t *testing.T) {
+func TestJoystickDriverStart(t *testing.T) {
 	t.SkipNow()
+	d := initTestJoystickDriver()
 	gobot.Expect(t, d.Start(), true)
 }
 
-func TestHalt(t *testing.T) {
+func TestJoystickDriverHalt(t *testing.T) {
 	t.SkipNow()
+	d := initTestJoystickDriver()
 	gobot.Expect(t, d.Halt(), true)
 }
 
-func TestInit(t *testing.T) {
+func TestJoystickDriverInit(t *testing.T) {
 	t.SkipNow()
+	d := initTestJoystickDriver()
 	gobot.Expect(t, d.Init(), true)
 }

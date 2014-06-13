@@ -5,17 +5,18 @@ import (
 	"testing"
 )
 
-var j *JoystickAdaptor
-
-func init() {
-	j = NewJoystickAdaptor("bot")
+func initTestJoystickAdaptor() *JoystickAdaptor {
+	return NewJoystickAdaptor("bot")
 }
 
-func TestFinalize(t *testing.T) {
+func TestJoystickAdaptorConnect(t *testing.T) {
 	t.SkipNow()
-	gobot.Expect(t, j.Finalize(), true)
+	a := initTestJoystickAdaptor()
+	gobot.Expect(t, a.Connect(), true)
 }
-func TestConnect(t *testing.T) {
+
+func TestJoystickAdaptorFinalize(t *testing.T) {
 	t.SkipNow()
-	gobot.Expect(t, j.Connect(), true)
+	a := initTestJoystickAdaptor()
+	gobot.Expect(t, a.Finalize(), true)
 }

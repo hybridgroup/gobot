@@ -32,10 +32,17 @@ func (t *testStruct) Hello(name string, message string) string {
 	return fmt.Sprintf("Hello %v! %v", name, message)
 }
 
-type Null struct{}
+type NullReadWriteCloser struct{}
 
-func (Null) Write(p []byte) (int, error) {
+func (NullReadWriteCloser) Write(p []byte) (int, error) {
 	return len(p), nil
+}
+
+func (NullReadWriteCloser) Read(b []byte) (int, error) {
+	return len(b), nil
+}
+func (NullReadWriteCloser) Close() error {
+	return nil
 }
 
 type testDriver struct {

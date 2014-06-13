@@ -5,32 +5,35 @@ import (
 	"testing"
 )
 
-var b *ButtonDriver
-
-func init() {
-	b = NewButtonDriver(TestAdaptor{}, "bot", "1")
+func initTestButtonDriver() *ButtonDriver {
+	return NewButtonDriver(TestAdaptor{}, "bot", "1")
 }
 
-func TestButtonStart(t *testing.T) {
-	gobot.Expect(t, a.Start(), true)
+func TestButtonDriverStart(t *testing.T) {
+	d := initTestButtonDriver()
+	gobot.Expect(t, d.Start(), true)
 }
 
-func TestButtonHalt(t *testing.T) {
-	gobot.Expect(t, a.Halt(), true)
+func TestButtonDriverHalt(t *testing.T) {
+	d := initTestButtonDriver()
+	gobot.Expect(t, d.Halt(), true)
 }
 
-func TestButtonInit(t *testing.T) {
-	gobot.Expect(t, a.Init(), true)
+func TestButtonDriverInit(t *testing.T) {
+	d := initTestButtonDriver()
+	gobot.Expect(t, d.Init(), true)
 }
 
-func TestButtonReadState(t *testing.T) {
-	gobot.Expect(t, b.readState(), 1)
+func TestButtonDriverReadState(t *testing.T) {
+	d := initTestButtonDriver()
+	gobot.Expect(t, d.readState(), 1)
 }
 
-func TestButtonActive(t *testing.T) {
-	b.update(1)
-	gobot.Expect(t, b.Active, true)
+func TestButtonDriverActive(t *testing.T) {
+	d := initTestButtonDriver()
+	d.update(1)
+	gobot.Expect(t, d.Active, true)
 
-	b.update(0)
-	gobot.Expect(t, b.Active, false)
+	d.update(0)
+	gobot.Expect(t, d.Active, false)
 }

@@ -5,44 +5,50 @@ import (
 	"testing"
 )
 
-var s *ServoDriver
-
-func init() {
-	s = NewServoDriver(TestAdaptor{}, "bot", "1")
+func initTestServoDriver() *ServoDriver {
+	return NewServoDriver(TestAdaptor{}, "bot", "1")
 }
 
-func TestServoStart(t *testing.T) {
-	gobot.Expect(t, l.Start(), true)
+func TestServoDriverStart(t *testing.T) {
+	d := initTestServoDriver()
+	gobot.Expect(t, d.Start(), true)
 }
 
-func TestServoHalt(t *testing.T) {
-	gobot.Expect(t, l.Halt(), true)
+func TestServoDriverHalt(t *testing.T) {
+	d := initTestServoDriver()
+	gobot.Expect(t, d.Halt(), true)
 }
 
-func TestServoInit(t *testing.T) {
-	gobot.Expect(t, l.Init(), true)
+func TestServoDriverInit(t *testing.T) {
+	d := initTestServoDriver()
+	gobot.Expect(t, d.Init(), true)
 }
 
-func TestServoMove(t *testing.T) {
-	s.Move(100)
-	gobot.Expect(t, s.CurrentAngle, uint8(100))
+func TestServoDriverMove(t *testing.T) {
+	d := initTestServoDriver()
+	d.Move(100)
+	gobot.Expect(t, d.CurrentAngle, uint8(100))
 }
 
-func TestServoMin(t *testing.T) {
-	s.Min()
-	gobot.Expect(t, s.CurrentAngle, uint8(0))
+func TestServoDriverMin(t *testing.T) {
+	d := initTestServoDriver()
+	d.Min()
+	gobot.Expect(t, d.CurrentAngle, uint8(0))
 }
 
-func TestServoMax(t *testing.T) {
-	s.Max()
-	gobot.Expect(t, s.CurrentAngle, uint8(180))
+func TestServoDriverMax(t *testing.T) {
+	d := initTestServoDriver()
+	d.Max()
+	gobot.Expect(t, d.CurrentAngle, uint8(180))
 }
 
-func TestServoCenter(t *testing.T) {
-	s.Center()
-	gobot.Expect(t, s.CurrentAngle, uint8(90))
+func TestServoDriverCenter(t *testing.T) {
+	d := initTestServoDriver()
+	d.Center()
+	gobot.Expect(t, d.CurrentAngle, uint8(90))
 }
 
-func TestServoInitServo(t *testing.T) {
-	s.InitServo()
+func TestServoDriverInitServo(t *testing.T) {
+	d := initTestServoDriver()
+	d.InitServo()
 }

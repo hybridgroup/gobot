@@ -5,32 +5,35 @@ import (
 	"testing"
 )
 
-var adaptor *ArdroneAdaptor
-var d *testDrone
-
-func init() {
-	d = &testDrone{}
-	adaptor = NewArdroneAdaptor("drone")
-	adaptor.connect = func(a *ArdroneAdaptor) {
+func initTestArdroneAdaptor() (*ArdroneAdaptor, *testDrone) {
+	d := &testDrone{}
+	a := NewArdroneAdaptor("drone")
+	a.connect = func(a *ArdroneAdaptor) {
 		a.drone = d
 	}
+	return a, d
 }
 
 func TestFinalize(t *testing.T) {
-	gobot.Expect(t, adaptor.Finalize(), true)
+	a, _ := initTestArdroneAdaptor()
+	gobot.Expect(t, a.Finalize(), true)
 }
 func TestConnect(t *testing.T) {
-	gobot.Expect(t, adaptor.Connect(), true)
+	a, _ := initTestArdroneAdaptor()
+	gobot.Expect(t, a.Connect(), true)
 }
 func TestDisconnect(t *testing.T) {
-	gobot.Expect(t, adaptor.Disconnect(), true)
+	a, _ := initTestArdroneAdaptor()
+	gobot.Expect(t, a.Disconnect(), true)
 }
 
 func TestReconnect(t *testing.T) {
-	gobot.Expect(t, adaptor.Reconnect(), true)
+	a, _ := initTestArdroneAdaptor()
+	gobot.Expect(t, a.Reconnect(), true)
 }
 
 func TestDrone(t *testing.T) {
-	adaptor.Connect()
-	gobot.Expect(t, adaptor.Drone(), d)
+	a, d := initTestArdroneAdaptor()
+	a.Connect()
+	gobot.Expect(t, a.Drone(), d)
 }

@@ -5,22 +5,28 @@ import (
 	"testing"
 )
 
-var d *DigisparkAdaptor
-
-func init() {
-	d = NewDigisparkAdaptor("bot")
-	d.connect = func(d *DigisparkAdaptor) {}
+func initTestDigisparkAdaptor() *DigisparkAdaptor {
+	a := NewDigisparkAdaptor("bot")
+	a.connect = func(a *DigisparkAdaptor) {}
+	return a
 }
 
-func TestFinalize(t *testing.T) {
-	gobot.Expect(t, d.Finalize(), true)
+func TestDigisparkAdaptorFinalize(t *testing.T) {
+	a := initTestDigisparkAdaptor()
+	gobot.Expect(t, a.Finalize(), true)
 }
-func TestConnect(t *testing.T) {
-	gobot.Expect(t, d.Connect(), true)
+
+func TestDigisparkAdaptorConnect(t *testing.T) {
+	a := initTestDigisparkAdaptor()
+	gobot.Expect(t, a.Connect(), true)
 }
-func TestDisconnect(t *testing.T) {
-	gobot.Expect(t, d.Disconnect(), true)
+
+func TestDigisparkAdaptorDisconnect(t *testing.T) {
+	a := initTestDigisparkAdaptor()
+	gobot.Expect(t, a.Disconnect(), true)
 }
-func TestReconnect(t *testing.T) {
-	gobot.Expect(t, d.Reconnect(), true)
+
+func TestDigisparkAdaptorReconnect(t *testing.T) {
+	a := initTestDigisparkAdaptor()
+	gobot.Expect(t, a.Reconnect(), true)
 }

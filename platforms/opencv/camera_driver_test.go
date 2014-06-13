@@ -5,23 +5,24 @@ import (
 	"testing"
 )
 
-var c *CameraDriver
-
-func init() {
-	c = NewCameraDriver("bot", 0)
+func initTestCameraDriver() *CameraDriver {
+	return NewCameraDriver("bot", 0)
 }
 
-func TestCameraStart(t *testing.T) {
+func TestCameraDriverStart(t *testing.T) {
 	t.SkipNow()
-	gobot.Expect(t, c.Start(), true)
+	d := initTestCameraDriver()
+	gobot.Expect(t, d.Start(), true)
 }
 
-func TestCameraHalt(t *testing.T) {
+func TestCameraDriverHalt(t *testing.T) {
 	t.SkipNow()
-	gobot.Expect(t, c.Halt(), true)
+	d := initTestCameraDriver()
+	gobot.Expect(t, d.Halt(), true)
 }
 
-func TestCameraInit(t *testing.T) {
+func TestCameraDriverInit(t *testing.T) {
 	t.SkipNow()
-	gobot.Expect(t, c.Init(), true)
+	d := initTestCameraDriver()
+	gobot.Expect(t, d.Init(), true)
 }

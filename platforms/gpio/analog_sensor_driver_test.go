@@ -5,24 +5,26 @@ import (
 	"testing"
 )
 
-var a *AnalogSensorDriver
-
-func init() {
-	a = NewAnalogSensorDriver(TestAdaptor{}, "bot", "1")
+func initTestAnalogSensorDriver() *AnalogSensorDriver {
+	return NewAnalogSensorDriver(TestAdaptor{}, "bot", "1")
 }
 
-func TestAnalogSensorStart(t *testing.T) {
-	gobot.Expect(t, a.Start(), true)
+func TestAnalogSensorDriverStart(t *testing.T) {
+	d := initTestAnalogSensorDriver()
+	gobot.Expect(t, d.Start(), true)
 }
 
-func TestAnalogSensorHalt(t *testing.T) {
-	gobot.Expect(t, a.Halt(), true)
+func TestAnalogSensorDriverHalt(t *testing.T) {
+	d := initTestAnalogSensorDriver()
+	gobot.Expect(t, d.Halt(), true)
 }
 
-func TestAnalogSensorInit(t *testing.T) {
-	gobot.Expect(t, a.Init(), true)
+func TestAnalogSensorDriverInit(t *testing.T) {
+	d := initTestAnalogSensorDriver()
+	gobot.Expect(t, d.Init(), true)
 }
 
-func TestAnalogSensorRead(t *testing.T) {
-	gobot.Expect(t, a.Read(), 99)
+func TestAnalogSensorDriverRead(t *testing.T) {
+	d := initTestAnalogSensorDriver()
+	gobot.Expect(t, d.Read(), 99)
 }
