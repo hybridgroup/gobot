@@ -4,19 +4,12 @@ go:
  - release
  - tip
 before_install:
+ - sudo add-apt-repository -y ppa:kubuntu-ppa/backports
+ - sudo add-apt-repository -y ppa:zoogie/sdl2-snapshots
  - sudo apt-get update
- - sudo apt-get -y install autoconf automake build-essential git libass-dev libgpac-dev libsdl1.2-dev libtheora-dev libtool libva-dev libvdpau-dev libvorbis-dev libx11-dev libxext-dev libxfixes-dev pkg-config texi2html zlib1g-dev yasm libmp3lame-dev libvpx-dev cmake libgtk2.0-dev pkg-config libjpeg8 libjpeg8-dev libgstreamer0.10-0 libgstreamer0.10-dev gstreamer0.10-tools gstreamer0.10-plugins-base libgstreamer-plugins-base0.10-dev gstreamer0.10-plugins-good gstreamer0.10-plugins-ugly gstreamer0.10-plugins-bad gstreamer0.10-ffmpeg
- - wget https://github.com/Itseez/opencv/archive/2.4.8.2.tar.gz
- - tar xvf 2.4.8.2.tar.gz
- - cd opencv-2.4.8.2
- - mkdir release
- - cd release
- - cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local ..
- - make
- - sudo make install
- - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
+ - sudo apt-get install libcv-dev libcvaux-dev libhighgui-dev libopencv-dev libsdl2-dev libsdl2-image-dev libsdl2
 install:
- - sudo apt-get install libusb-dev #libsdl2-2.0-0
+ - sudo apt-get install libusb-dev
  - go get -v . && go build -v .
  - go get github.com/onsi/ginkgo
  - go get github.com/onsi/gomega
@@ -27,7 +20,7 @@ install:
  - go get github.com/martini-contrib/cors  
  - go get github.com/hybridgroup/go-ardrone/client
  - go get github.com/tarm/goserial
- #- go get github.com/hybridgroup/go-sdl2/sdl
+ - go get github.com/hybridgroup/go-sdl2/sdl
  - go get code.google.com/p/go.net/websocket
  - go get github.com/hybridgroup/go-opencv/opencv
 script:
