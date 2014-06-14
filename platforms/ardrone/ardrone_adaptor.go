@@ -5,7 +5,19 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
-type drone interface{}
+type drone interface {
+	Takeoff() bool
+	Land()
+	Up(n float64)
+	Down(n float64)
+	Left(n float64)
+	Right(n float64)
+	Forward(n float64)
+	Backward(n float64)
+	Clockwise(n float64)
+	Counterclockwise(n float64)
+	Hover()
+}
 
 type ArdroneAdaptor struct {
 	gobot.Adaptor
@@ -33,18 +45,6 @@ func (a *ArdroneAdaptor) Connect() bool {
 	return true
 }
 
-func (a *ArdroneAdaptor) Reconnect() bool {
-	return true
-}
-
-func (a *ArdroneAdaptor) Disconnect() bool {
-	return true
-}
-
 func (a *ArdroneAdaptor) Finalize() bool {
 	return true
-}
-
-func (a *ArdroneAdaptor) Drone() drone {
-	return a.drone
 }
