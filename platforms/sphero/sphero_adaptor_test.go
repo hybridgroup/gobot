@@ -1,31 +1,22 @@
 package sphero
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"github.com/hybridgroup/gobot"
+	"testing"
 )
 
-var _ = Describe("SpheroAdaptor", func() {
-	var (
-		a *SpheroAdaptor
-	)
+func initTestSpheroAdaptor() *SpheroAdaptor {
+	a := NewSpheroAdaptor("bot", "/dev/null")
+	a.sp = gobot.NullReadWriteCloser{}
+	a.connect = func(a *SpheroAdaptor) {}
+	return a
+}
 
-	BeforeEach(func() {
-		a = NewSpheroAdaptor("bot", "/dev/null")
-		a.sp = sp{}
-		a.connect = func(a *SpheroAdaptor) {}
-	})
-
-	It("Must be able to Finalize", func() {
-		Expect(a.Finalize()).To(Equal(true))
-	})
-	It("Must be able to Connect", func() {
-		Expect(a.Connect()).To(Equal(true))
-	})
-	It("Must be able to Disconnect", func() {
-		Expect(a.Disconnect()).To(Equal(true))
-	})
-	It("Must be able to Reconnect", func() {
-		Expect(a.Reconnect()).To(Equal(true))
-	})
-})
+func TestSpheroAdaptorFinalize(t *testing.T) {
+	a := initTestSpheroAdaptor()
+	gobot.Expect(t, a.Finalize(), true)
+}
+func TestSpheroAdaptorConnect(t *testing.T) {
+	a := initTestSpheroAdaptor()
+	gobot.Expect(t, a.Connect(), true)
+}

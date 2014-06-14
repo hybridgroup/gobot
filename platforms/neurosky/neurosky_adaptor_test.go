@@ -1,23 +1,21 @@
 package neurosky
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"github.com/hybridgroup/gobot"
+	"testing"
 )
 
-var _ = Describe("NeuroskyAdaptor", func() {
-	var (
-		n *NeuroskyAdaptor
-	)
+func initTestNeuroskyAdaptor() *NeuroskyAdaptor {
+	return NewNeuroskyAdaptor("bot", "/dev/null")
+}
 
-	BeforeEach(func() {
-		n = NewNeuroskyAdaptor("bot", "/dev/null")
-	})
-
-	PIt("Must be able to Finalize", func() {
-		Expect(n.Finalize()).To(Equal(true))
-	})
-	PIt("Must be able to Connect", func() {
-		Expect(n.Connect()).To(Equal(true))
-	})
-})
+func TestNeuroskyAdaptorFinalize(t *testing.T) {
+	t.SkipNow()
+	a := initTestNeuroskyAdaptor()
+	gobot.Expect(t, a.Finalize(), true)
+}
+func TestNeuroskyAdaptorConnect(t *testing.T) {
+	t.SkipNow()
+	a := initTestNeuroskyAdaptor()
+	gobot.Expect(t, a.Connect(), true)
+}

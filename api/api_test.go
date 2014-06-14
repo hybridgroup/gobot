@@ -4,136 +4,149 @@ import (
 	"bytes"
 	"encoding/json"
 	"github.com/hybridgroup/gobot"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/http/httptest"
+	"testing"
 )
 
-var _ = Describe("API", func() {
-	var (
-		m *gobot.Gobot
-		a *api
-	)
+func initTestAPI() *api {
+	log.SetOutput(gobot.NullReadWriteCloser{})
+	g := gobot.NewGobot()
+	a := NewAPI(g)
+	a.start = func(m *api) {}
+	a.Start()
 
-	BeforeEach(func() {
-		m = gobot.NewGobot()
-		a = NewAPI(m)
-		a.start = func(m *api) {}
-		a.Start()
+	g.Robots = []*gobot.Robot{
+		gobot.NewTestRobot("Robot 1"),
+		gobot.NewTestRobot("Robot 2"),
+		gobot.NewTestRobot("Robot 3"),
+	}
 
-		m.Robots = []*gobot.Robot{
-			gobot.NewTestRobot("Robot 1"),
-			gobot.NewTestRobot("Robot 2"),
-			gobot.NewTestRobot("Robot 3"),
-		}
-	})
+	return a
+}
 
-	Context("when valid", func() {
-		It("should return all robots", func() {
-			request, _ := http.NewRequest("GET", "/robots", nil)
-			response := httptest.NewRecorder()
-			a.server.ServeHTTP(response, request)
+func TestRobots(t *testing.T) {
+	a := initTestAPI()
+	request, _ := http.NewRequest("GET", "/robots", nil)
+	response := httptest.NewRecorder()
+	a.server.ServeHTTP(response, request)
 
-			body, _ := ioutil.ReadAll(response.Body)
-			var i []map[string]interface{}
-			json.Unmarshal(body, &i)
-			Expect(len(i)).To(Equal(3))
-		})
-		It("should return robot", func() {
-			request, _ := http.NewRequest("GET", "/robots/Robot%201", nil)
-			response := httptest.NewRecorder()
-			a.server.ServeHTTP(response, request)
+	body, _ := ioutil.ReadAll(response.Body)
+	var i []map[string]interface{}
+	json.Unmarshal(body, &i)
+	gobot.Expect(t, len(i), 3)
+}
 
-			body, _ := ioutil.ReadAll(response.Body)
-			var i map[string]interface{}
-			json.Unmarshal(body, &i)
-			Expect(i["name"].(string)).To(Equal("Robot 1"))
-		})
-		It("should return all robot devices", func() {
-			request, _ := http.NewRequest("GET", "/robots/Robot%201/devices", nil)
-			response := httptest.NewRecorder()
-			a.server.ServeHTTP(response, request)
+func TestRobot(t *testing.T) {
+	a := initTestAPI()
+	request, _ := http.NewRequest("GET", "/robots/Robot%201", nil)
+	response := httptest.NewRecorder()
+	a.server.ServeHTTP(response, request)
 
-			body, _ := ioutil.ReadAll(response.Body)
-			var i []map[string]interface{}
-			json.Unmarshal(body, &i)
-			Expect(len(i)).To(Equal(3))
-		})
-		It("should return robot commands", func() {
-			request, _ := http.NewRequest("GET", "/robots/Robot%201/commands", nil)
-			response := httptest.NewRecorder()
-			a.server.ServeHTTP(response, request)
+	body, _ := ioutil.ReadAll(response.Body)
+	var i map[string]interface{}
+	json.Unmarshal(body, &i)
+	gobot.Expect(t, i["name"].(string), "Robot 1")
+}
 
-			body, _ := ioutil.ReadAll(response.Body)
-			var i []string
-			json.Unmarshal(body, &i)
-			Expect(i).To(Equal([]string{"robotTestFunction"}))
-		})
-		It("should execute robot command", func() {
-			request, _ := http.NewRequest("GET", "/robots/Robot%201/commands/robotTestFunction", bytes.NewBufferString(`{"message":"Beep Boop"}`))
-			request.Header.Add("Content-Type", "application/json")
-			response := httptest.NewRecorder()
-			a.server.ServeHTTP(response, request)
+func TestRobotDevices(t *testing.T) {
+	a := initTestAPI()
+	request, _ := http.NewRequest("GET", "/robots/Robot%201/devices", nil)
+	response := httptest.NewRecorder()
+	a.server.ServeHTTP(response, request)
 
-			body, _ := ioutil.ReadAll(response.Body)
-			var i interface{}
-			json.Unmarshal(body, &i)
-			Expect(i).To(Equal("hey Robot 1, Beep Boop"))
-		})
-		It("should not execute unknown robot command", func() {
-			request, _ := http.NewRequest("GET", "/robots/Robot%201/commands/robotTestFuntion1", bytes.NewBufferString(`{"message":"Beep Boop"}`))
-			request.Header.Add("Content-Type", "application/json")
-			response := httptest.NewRecorder()
-			a.server.ServeHTTP(response, request)
+	body, _ := ioutil.ReadAll(response.Body)
+	var i []map[string]interface{}
+	json.Unmarshal(body, &i)
+	gobot.Expect(t, len(i), 3)
+}
 
-			body, _ := ioutil.ReadAll(response.Body)
-			var i interface{}
-			json.Unmarshal(body, &i)
-			Expect(i).To(Equal("Unknown Command"))
-		})
-		It("should return robot device", func() {
-			request, _ := http.NewRequest("GET", "/robots/Robot%201/devices/Device%201", nil)
-			response := httptest.NewRecorder()
-			a.server.ServeHTTP(response, request)
+func TestRobotCommands(t *testing.T) {
+	a := initTestAPI()
+	request, _ := http.NewRequest("GET", "/robots/Robot%201/commands", nil)
+	response := httptest.NewRecorder()
+	a.server.ServeHTTP(response, request)
 
-			body, _ := ioutil.ReadAll(response.Body)
-			var i map[string]interface{}
-			json.Unmarshal(body, &i)
-			Expect(i["name"].(string)).To(Equal("Device 1"))
-		})
-		It("should return device commands", func() {
-			request, _ := http.NewRequest("GET", "/robots/Robot%201/devices/Device%201/commands", nil)
-			response := httptest.NewRecorder()
-			a.server.ServeHTTP(response, request)
+	body, _ := ioutil.ReadAll(response.Body)
+	var i []string
+	json.Unmarshal(body, &i)
+	gobot.Expect(t, i, []string{"robotTestFunction"})
+}
 
-			body, _ := ioutil.ReadAll(response.Body)
-			var i []string
-			json.Unmarshal(body, &i)
-			Expect(i).To(Equal([]string{"TestDriverCommand", "DriverCommand"}))
-		})
-		It("should execute device command", func() {
-			request, _ := http.NewRequest("GET", "/robots/Robot%201/devices/Device%201/commands/TestDriverCommand", bytes.NewBufferString(`{"name":"human"}`))
-			request.Header.Add("Content-Type", "application/json")
-			response := httptest.NewRecorder()
-			a.server.ServeHTTP(response, request)
+func TestExecuteRobotCommand(t *testing.T) {
+	a := initTestAPI()
+	request, _ := http.NewRequest("GET", "/robots/Robot%201/commands/robotTestFunction", bytes.NewBufferString(`{"message":"Beep Boop"}`))
+	request.Header.Add("Content-Type", "application/json")
+	response := httptest.NewRecorder()
+	a.server.ServeHTTP(response, request)
 
-			body, _ := ioutil.ReadAll(response.Body)
-			var i interface{}
-			json.Unmarshal(body, &i)
-			Expect(i).To(Equal("hello human"))
-		})
-		It("should not execute unknown device command", func() {
-			request, _ := http.NewRequest("GET", "/robots/Robot%201/devices/Device%201/commands/DriverCommand1", bytes.NewBufferString(`{"name":"human"}`))
-			request.Header.Add("Content-Type", "application/json")
-			response := httptest.NewRecorder()
-			a.server.ServeHTTP(response, request)
+	body, _ := ioutil.ReadAll(response.Body)
+	var i interface{}
+	json.Unmarshal(body, &i)
+	gobot.Expect(t, i, "hey Robot 1, Beep Boop")
+}
 
-			body, _ := ioutil.ReadAll(response.Body)
-			var i interface{}
-			json.Unmarshal(body, &i)
-			Expect(i).To(Equal("Unknown Command"))
-		})
-	})
-})
+func TestUnknownRobotCommand(t *testing.T) {
+	a := initTestAPI()
+	request, _ := http.NewRequest("GET", "/robots/Robot%201/commands/robotTestFuntion1", bytes.NewBufferString(`{"message":"Beep Boop"}`))
+	request.Header.Add("Content-Type", "application/json")
+	response := httptest.NewRecorder()
+	a.server.ServeHTTP(response, request)
+
+	body, _ := ioutil.ReadAll(response.Body)
+	var i interface{}
+	json.Unmarshal(body, &i)
+	gobot.Expect(t, i, "Unknown Command")
+}
+
+func TestRobotDevice(t *testing.T) {
+	a := initTestAPI()
+	request, _ := http.NewRequest("GET", "/robots/Robot%201/devices/Device%201", nil)
+	response := httptest.NewRecorder()
+	a.server.ServeHTTP(response, request)
+
+	body, _ := ioutil.ReadAll(response.Body)
+	var i map[string]interface{}
+	json.Unmarshal(body, &i)
+	gobot.Expect(t, i["name"].(string), "Device 1")
+}
+
+func TestRobotDeviceCommands(t *testing.T) {
+	a := initTestAPI()
+	request, _ := http.NewRequest("GET", "/robots/Robot%201/devices/Device%201/commands", nil)
+	response := httptest.NewRecorder()
+	a.server.ServeHTTP(response, request)
+
+	body, _ := ioutil.ReadAll(response.Body)
+	var i []string
+	json.Unmarshal(body, &i)
+	gobot.Expect(t, i, []string{"TestDriverCommand", "DriverCommand"})
+}
+
+func TestExecuteRobotDeviceCommand(t *testing.T) {
+	a := initTestAPI()
+	request, _ := http.NewRequest("GET", "/robots/Robot%201/devices/Device%201/commands/TestDriverCommand", bytes.NewBufferString(`{"name":"human"}`))
+	request.Header.Add("Content-Type", "application/json")
+	response := httptest.NewRecorder()
+	a.server.ServeHTTP(response, request)
+
+	body, _ := ioutil.ReadAll(response.Body)
+	var i interface{}
+	json.Unmarshal(body, &i)
+	gobot.Expect(t, i, "hello human")
+}
+
+func TestUnknownRobotDeviceCommand(t *testing.T) {
+	a := initTestAPI()
+	request, _ := http.NewRequest("GET", "/robots/Robot%201/devices/Device%201/commands/DriverCommand1", bytes.NewBufferString(`{"name":"human"}`))
+	request.Header.Add("Content-Type", "application/json")
+	response := httptest.NewRecorder()
+	a.server.ServeHTTP(response, request)
+
+	body, _ := ioutil.ReadAll(response.Body)
+	var i interface{}
+	json.Unmarshal(body, &i)
+	gobot.Expect(t, i, "Unknown Command")
+}

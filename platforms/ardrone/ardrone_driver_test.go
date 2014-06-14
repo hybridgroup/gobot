@@ -1,64 +1,80 @@
 package ardrone
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"github.com/hybridgroup/gobot"
+	"testing"
 )
 
-var _ = Describe("ArdroneDriver", func() {
-	var (
-		driver *ArdroneDriver
-	)
+func initTestArdroneDriver() *ArdroneDriver {
+	a := NewArdroneAdaptor("drone")
+	a.connect = func(a *ArdroneAdaptor) {
+		a.drone = &testDrone{}
+	}
+	d := NewArdroneDriver(a, "drone")
+	a.Connect()
+	return d
+}
 
-	BeforeEach(func() {
-		adaptor := NewArdroneAdaptor("drone")
-		adaptor.connect = func(a *ArdroneAdaptor) {
-			a.drone = &testDrone{}
-		}
-		driver = NewArdroneDriver(adaptor, "drone")
-		adaptor.Connect()
-	})
+func TestArdroneDriverStart(t *testing.T) {
+	d := initTestArdroneDriver()
+	gobot.Expect(t, d.Start(), true)
+}
 
-	It("Must be able to Start", func() {
-		Expect(driver.Start()).To(Equal(true))
-	})
-	It("Must be able to Init", func() {
-		Expect(driver.Init()).To(Equal(true))
-	})
-	It("Must be able to Halt", func() {
-		Expect(driver.Halt()).To(Equal(true))
-	})
-	It("Must be able to TakeOff", func() {
-		driver.TakeOff()
-	})
-	It("Must be able to Land", func() {
-		driver.Land()
-	})
-	It("Must be able to go Up", func() {
-		driver.Up(1)
-	})
-	It("Must be able to go Down", func() {
-		driver.Down(1)
-	})
-	It("Must be able to go Left", func() {
-		driver.Left(1)
-	})
-	It("Must be able to go Right", func() {
-		driver.Right(1)
-	})
-	It("Must be able to go Forward", func() {
-		driver.Forward(1)
-	})
-	It("Must be able to go Backward", func() {
-		driver.Backward(1)
-	})
-	It("Must be able to go Clockwise", func() {
-		driver.Clockwise(1)
-	})
-	It("Must be able to go CounterClockwise", func() {
-		driver.CounterClockwise(1)
-	})
-	It("Must be able to Hover", func() {
-		driver.Hover()
-	})
-})
+func TestArdroneDriverHalt(t *testing.T) {
+	d := initTestArdroneDriver()
+	gobot.Expect(t, d.Halt(), true)
+}
+func TestArdroneDriverTakeOff(t *testing.T) {
+	d := initTestArdroneDriver()
+	d.TakeOff()
+}
+
+func TestArdroneDriverand(t *testing.T) {
+	d := initTestArdroneDriver()
+	d.Land()
+}
+
+func TestArdroneDriverUp(t *testing.T) {
+	d := initTestArdroneDriver()
+	d.Up(1)
+}
+
+func TestArdroneDriverDown(t *testing.T) {
+	d := initTestArdroneDriver()
+	d.Down(1)
+}
+
+func TestArdroneDriverLeft(t *testing.T) {
+	d := initTestArdroneDriver()
+	d.Left(1)
+}
+
+func TestArdroneDriverRight(t *testing.T) {
+	d := initTestArdroneDriver()
+	d.Right(1)
+}
+
+func TestArdroneDriverForward(t *testing.T) {
+	d := initTestArdroneDriver()
+	d.Forward(1)
+}
+
+func TestArdroneDriverackward(t *testing.T) {
+	d := initTestArdroneDriver()
+	d.Backward(1)
+}
+
+func TestArdroneDriverClockwise(t *testing.T) {
+	d := initTestArdroneDriver()
+	d.Clockwise(1)
+}
+
+func TestArdroneDriverCounterClockwise(t *testing.T) {
+	d := initTestArdroneDriver()
+	d.CounterClockwise(1)
+}
+
+func TestArdroneDriverHover(t *testing.T) {
+	d := initTestArdroneDriver()
+	d.Hover()
+}

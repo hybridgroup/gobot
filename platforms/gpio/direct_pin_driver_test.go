@@ -1,51 +1,55 @@
 package gpio
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"github.com/hybridgroup/gobot"
+	"testing"
 )
 
-var _ = Describe("DirectPin", func() {
-	var (
-		t TestAdaptor
-		d *DirectPinDriver
-	)
+func initTestDirectPinDriver() *DirectPinDriver {
+	return NewDirectPinDriver(TestAdaptor{}, "bot", "1")
+}
 
-	BeforeEach(func() {
-		d = NewDirectPinDriver(t, "bot", "1")
-	})
+func TestDirectPinDriverStart(t *testing.T) {
+	d := initTestDirectPinDriver()
+	gobot.Expect(t, d.Start(), true)
+}
 
-	It("Should be able to DigitalRead", func() {
-		Expect(d.DigitalRead()).To(Equal(1))
-	})
+func TestDirectPinDriverHalt(t *testing.T) {
+	d := initTestDirectPinDriver()
+	gobot.Expect(t, d.Halt(), true)
+}
 
-	It("Should be able to DigitalWrite", func() {
-		d.DigitalWrite(1)
-	})
+func TestDirectPinDriverInit(t *testing.T) {
+	d := initTestDirectPinDriver()
+	gobot.Expect(t, d.Init(), true)
+}
 
-	It("Should be able to AnalogRead", func() {
-		Expect(d.AnalogRead()).To(Equal(99))
-	})
+func TestDirectPinDriverDigitalRead(t *testing.T) {
+	d := initTestDirectPinDriver()
+	gobot.Expect(t, d.DigitalRead(), 1)
+}
 
-	It("Should be able to AnalogWrite", func() {
-		d.AnalogWrite(100)
-	})
+func TestDirectPinDriverDigitalWrite(t *testing.T) {
+	d := initTestDirectPinDriver()
+	d.DigitalWrite(1)
+}
 
-	It("Should be able to PwmWrite", func() {
-		d.PwmWrite(100)
-	})
+func TestDirectPinDriverAnalogRead(t *testing.T) {
+	d := initTestDirectPinDriver()
+	gobot.Expect(t, d.AnalogRead(), 99)
+}
 
-	It("Should be able to ServoWrite", func() {
-		d.ServoWrite(100)
-	})
+func TestDirectPinDriverAnalogWrite(t *testing.T) {
+	d := initTestDirectPinDriver()
+	d.AnalogWrite(100)
+}
 
-	It("Should be able to Start", func() {
-		Expect(d.Start()).To(BeTrue())
-	})
-	It("Should be able to Halt", func() {
-		Expect(d.Halt()).To(BeTrue())
-	})
-	It("Should be able to Init", func() {
-		Expect(d.Init()).To(BeTrue())
-	})
-})
+func TestDirectPinDriverPwmWrite(t *testing.T) {
+	d := initTestDirectPinDriver()
+	d.PwmWrite(100)
+}
+
+func TestDirectPinDriverServoWrite(t *testing.T) {
+	d := initTestDirectPinDriver()
+	d.ServoWrite(100)
+}

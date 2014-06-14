@@ -1,29 +1,20 @@
 package pebble
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"github.com/hybridgroup/gobot"
+	"testing"
 )
 
-var _ = Describe("PebbleAdaptor", func() {
-	var (
-		adaptor *PebbleAdaptor
-	)
+func initTestPebbleAdaptor() *PebbleAdaptor {
+	return NewPebbleAdaptor("pebble")
+}
 
-	BeforeEach(func() {
-		adaptor = NewPebbleAdaptor("pebble")
-	})
+func TestPebbleAdaptorConnect(t *testing.T) {
+	a := initTestPebbleAdaptor()
+	gobot.Expect(t, a.Connect(), true)
+}
 
-	It("Must be able to Finalize", func() {
-		Expect(adaptor.Finalize()).To(Equal(true))
-	})
-	It("Must be able to Connect", func() {
-		Expect(adaptor.Connect()).To(Equal(true))
-	})
-	It("Must be able to Disconnect", func() {
-		Expect(adaptor.Disconnect()).To(Equal(true))
-	})
-	It("Must be able to Reconnect", func() {
-		Expect(adaptor.Reconnect()).To(Equal(true))
-	})
-})
+func TestPebbleAdaptorFinalize(t *testing.T) {
+	a := initTestPebbleAdaptor()
+	gobot.Expect(t, a.Finalize(), true)
+}

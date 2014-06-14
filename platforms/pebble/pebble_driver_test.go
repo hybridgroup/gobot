@@ -1,40 +1,31 @@
 package pebble
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"github.com/hybridgroup/gobot"
+	"testing"
 )
 
-var _ = Describe("PebbleDriver", func() {
-	var (
-		driver  *PebbleDriver
-		adaptor *PebbleAdaptor
-	)
+func initTestPebbleDriver() *PebbleDriver {
+	return NewPebbleDriver(NewPebbleAdaptor("adaptor"), "pebble")
+}
 
-	BeforeEach(func() {
-		adaptor = NewPebbleAdaptor("pebble")
-		driver = NewPebbleDriver(adaptor, "pebble")
-	})
+func TestPebbleDriverStart(t *testing.T) {
+	d := initTestPebbleDriver()
+	gobot.Expect(t, d.Start(), true)
+}
 
-	It("Must be able to Start", func() {
-		Expect(driver.Start()).To(Equal(true))
-	})
+func TestPebbleDriverHalt(t *testing.T) {
+	d := initTestPebbleDriver()
+	gobot.Expect(t, d.Halt(), true)
+}
 
-	It("Must be able to Halt", func() {
-		Expect(driver.Halt()).To(Equal(true))
-	})
+func TestPebbleDriverNotification(t *testing.T) {
+	d := initTestPebbleDriver()
+	d.SendNotification("Hello")
+	d.SendNotification("World")
 
-	It("Adds message when sending notification", func() {
-		driver.SendNotification("Hello")
-		Expect(driver.Messages[0]).To(Equal("Hello"))
-	})
-
-	It("Retrieves pending messages", func() {
-		driver.SendNotification("Hello")
-		driver.SendNotification("World")
-
-		Expect(driver.PendingMessage()).To(Equal("Hello"))
-		Expect(driver.PendingMessage()).To(Equal("World"))
-		Expect(driver.PendingMessage()).To(Equal(""))
-	})
-})
+	gobot.Expect(t, d.Messages[0], "Hello")
+	gobot.Expect(t, d.PendingMessage(), "Hello")
+	gobot.Expect(t, d.PendingMessage(), "World")
+	gobot.Expect(t, d.PendingMessage(), "")
+}

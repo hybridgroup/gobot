@@ -1,54 +1,37 @@
 package gobot
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"log"
 	"os"
+	"testing"
 )
 
-var _ = Describe("Gobot", func() {
-	var (
-		g *Gobot
-	)
+func initTestGobot() *Gobot {
+	log.SetOutput(&NullReadWriteCloser{})
+	g := NewGobot()
+	g.trap = func(c chan os.Signal) {
+		c <- os.Interrupt
+	}
+	g.Robots = []*Robot{
+		NewTestRobot("Robot 1"),
+		NewTestRobot("Robot 2"),
+		NewTestRobot("Robot 3"),
+	}
+	return g
+}
 
-	BeforeEach(func() {
-		g = NewGobot()
-		g.trap = func(c chan os.Signal) {
-			c <- os.Interrupt
-		}
-		g.Robots = []*Robot{
-			newTestRobot("Robot 1"),
-			newTestRobot("Robot 2"),
-			newTestRobot("Robot 3"),
-		}
-		g.Start()
-	})
+func TestGobotStart(t *testing.T) {
+	g := initTestGobot()
+	g.Start()
+}
 
-	Context("when valid", func() {
-		It("should Find the specific robot", func() {
-			Expect(g.Robot("Robot 1").Name).To(Equal("Robot 1"))
-		})
-		It("should return nil if Robot doesn't exist", func() {
-			Expect(g.Robot("Robot 4")).To(BeNil())
-		})
-		It("Device should return nil if device doesn't exist", func() {
-			Expect(g.Robot("Robot 1").Device("Device 4")).To(BeNil())
-		})
-		It("Device should return device", func() {
-			Expect(g.Robot("Robot 1").Device("Device 1").Name).To(Equal("Device 1"))
-		})
-		It("Devices should return devices", func() {
-			Expect(len(g.Robot("Robot 1").Devices())).To(Equal(3))
-		})
-		It("Connection should return nil if connection doesn't exist", func() {
-			Expect(g.Robot("Robot 1").Connection("Connection 4")).To(BeNil())
-		})
-		It("Connection should return connection", func() {
-			Expect(g.Robot("Robot 1").Connection("Connection 1").Name).To(Equal("Connection 1"))
-		})
-		It("Connections should return connections", func() {
-			Expect(len(g.Robot("Robot 1").Connections())).To(Equal(3))
-		})
-
-	})
-})
+func TestGobotRobot(t *testing.T) {
+	g := initTestGobot()
+	Expect(t, g.Robot("Robot 1").Name, "Robot 1")
+	Expect(t, g.Robot("Robot 4"), (*Robot)(nil))
+	Expect(t, g.Robot("Robot 1").Device("Device 4"), (*device)(nil))
+	Expect(t, g.Robot("Robot 1").Device("Device 1").Name, "Device 1")
+	Expect(t, len(g.Robot("Robot 1").Devices()), 3)
+	Expect(t, g.Robot("Robot 1").Connection("Connection 4"), (*connection)(nil))
+	Expect(t, len(g.Robot("Robot 1").Connections()), 3)
+}

@@ -1,23 +1,19 @@
 package spark
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"github.com/hybridgroup/gobot"
+	"testing"
 )
 
-var _ = Describe("Spark", func() {
-	var (
-		s *SparkCoreAdaptor
-	)
+func initTestSparkCoreAdaptor() *SparkCoreAdaptor {
+	return NewSparkCoreAdaptor("bot", "", "")
+}
 
-	BeforeEach(func() {
-		s = NewSparkCoreAdaptor("bot", "", "")
-	})
-
-	It("Must be able to Finalize", func() {
-		Expect(s.Finalize()).To(Equal(true))
-	})
-	It("Must be able to Connect", func() {
-		Expect(s.Connect()).To(Equal(true))
-	})
-})
+func TestSparkCoreAdaptorConnect(t *testing.T) {
+	a := initTestSparkCoreAdaptor()
+	gobot.Expect(t, a.Connect(), true)
+}
+func TestSparkCoreAdaptorFinalize(t *testing.T) {
+	a := initTestSparkCoreAdaptor()
+	gobot.Expect(t, a.Finalize(), true)
+}

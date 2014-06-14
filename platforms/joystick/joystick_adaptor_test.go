@@ -1,23 +1,22 @@
 package joystick
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"github.com/hybridgroup/gobot"
+	"testing"
 )
 
-var _ = Describe("JoystickAdaptor", func() {
-	var (
-		j *JoystickAdaptor
-	)
+func initTestJoystickAdaptor() *JoystickAdaptor {
+	return NewJoystickAdaptor("bot")
+}
 
-	BeforeEach(func() {
-		j = NewJoystickAdaptor("bot")
-	})
+func TestJoystickAdaptorConnect(t *testing.T) {
+	t.SkipNow()
+	a := initTestJoystickAdaptor()
+	gobot.Expect(t, a.Connect(), true)
+}
 
-	PIt("Must be able to Finalize", func() {
-		Expect(j.Finalize()).To(Equal(true))
-	})
-	PIt("Must be able to Connect", func() {
-		Expect(j.Connect()).To(Equal(true))
-	})
-})
+func TestJoystickAdaptorFinalize(t *testing.T) {
+	t.SkipNow()
+	a := initTestJoystickAdaptor()
+	gobot.Expect(t, a.Finalize(), true)
+}

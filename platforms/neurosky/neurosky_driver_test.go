@@ -1,26 +1,28 @@
 package neurosky
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"github.com/hybridgroup/gobot"
+	"testing"
 )
 
-var _ = Describe("NeuroskyDriver", func() {
-	var (
-		n *NeuroskyDriver
-	)
+func initTestNeuroskyDriver() *NeuroskyDriver {
+	return NewNeuroskyDriver(NewNeuroskyAdaptor("bot", "/dev/null"), "bot")
+}
 
-	BeforeEach(func() {
-		n = NewNeuroskyDriver(NewNeuroskyAdaptor("bot", "/dev/null"), "bot")
-	})
+func TestNeuroskyDriverStart(t *testing.T) {
+	t.SkipNow()
+	d := initTestNeuroskyDriver()
+	gobot.Expect(t, d.Start(), true)
+}
 
-	PIt("Must be able to Start", func() {
-		Expect(n.Start()).To(Equal(true))
-	})
-	PIt("Must be able to Init", func() {
-		Expect(n.Init()).To(Equal(true))
-	})
-	PIt("Must be able to Halt", func() {
-		Expect(n.Halt()).To(Equal(true))
-	})
-})
+func TestNeuroskyDriverHalt(t *testing.T) {
+	t.SkipNow()
+	d := initTestNeuroskyDriver()
+	gobot.Expect(t, d.Halt(), true)
+}
+
+func TestNeuroskyDriverInit(t *testing.T) {
+	t.SkipNow()
+	d := initTestNeuroskyDriver()
+	gobot.Expect(t, d.Init(), true)
+}

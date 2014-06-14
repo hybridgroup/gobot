@@ -1,57 +1,51 @@
 package gpio
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"github.com/hybridgroup/gobot"
+	"testing"
 )
 
-var _ = Describe("Led", func() {
-	var (
-		t TestAdaptor
-		l *LedDriver
-	)
+func initTestLedDriver() *LedDriver {
+	return NewLedDriver(TestAdaptor{}, "myLed", "1")
+}
 
-	BeforeEach(func() {
-		l = NewLedDriver(t, "myLed", "1")
-	})
+func TestLedDriverStart(t *testing.T) {
+	d := initTestLedDriver()
+	gobot.Expect(t, d.Start(), true)
+}
 
-	It("Must be able to tell if IsOn", func() {
-		Expect(l.IsOn()).NotTo(BeTrue())
-	})
+func TestLedDriverHalt(t *testing.T) {
+	d := initTestLedDriver()
+	gobot.Expect(t, d.Halt(), true)
+}
 
-	It("Must be able to tell if IsOff", func() {
-		Expect(l.IsOff()).To(BeTrue())
-	})
+func TestLedDriverInit(t *testing.T) {
+	d := initTestLedDriver()
+	gobot.Expect(t, d.Init(), true)
+}
 
-	It("Should be able to turn On", func() {
-		Expect(l.On()).To(BeTrue())
-		Expect(l.IsOn()).To(BeTrue())
-	})
+func TestLedDriverOn(t *testing.T) {
+	d := initTestLedDriver()
+	gobot.Expect(t, d.On(), true)
+	gobot.Expect(t, d.IsOn(), true)
+}
 
-	It("Should be able to turn Off", func() {
-		Expect(l.Off()).To(BeTrue())
-		Expect(l.IsOff()).To(BeTrue())
-	})
+func TestLedDriverOff(t *testing.T) {
+	d := initTestLedDriver()
+	gobot.Expect(t, d.Off(), true)
+	gobot.Expect(t, d.IsOff(), true)
+}
 
-	It("Should be able to Toggle", func() {
-		l.Off()
-		l.Toggle()
-		Expect(l.IsOn()).To(BeTrue())
-		l.Toggle()
-		Expect(l.IsOff()).To(BeTrue())
-	})
+func TestLedDriverToggle(t *testing.T) {
+	d := initTestLedDriver()
+	d.Off()
+	d.Toggle()
+	gobot.Expect(t, d.IsOn(), true)
+	d.Toggle()
+	gobot.Expect(t, d.IsOff(), true)
+}
 
-	It("Should be able to set Brightness", func() {
-		l.Brightness(150)
-	})
-
-	It("Must be able to Start", func() {
-		Expect(l.Start()).To(Equal(true))
-	})
-	It("Must be able to Init", func() {
-		Expect(l.Init()).To(Equal(true))
-	})
-	It("Must be able to Halt", func() {
-		Expect(l.Halt()).To(Equal(true))
-	})
-})
+func TestLedDriverBrightness(t *testing.T) {
+	d := initTestLedDriver()
+	d.Brightness(150)
+}

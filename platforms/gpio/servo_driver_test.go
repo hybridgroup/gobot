@@ -1,51 +1,54 @@
 package gpio
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"github.com/hybridgroup/gobot"
+	"testing"
 )
 
-var _ = Describe("Servo", func() {
-	var (
-		t TestAdaptor
-		s *ServoDriver
-	)
+func initTestServoDriver() *ServoDriver {
+	return NewServoDriver(TestAdaptor{}, "bot", "1")
+}
 
-	BeforeEach(func() {
-		s = NewServoDriver(t, "bot", "1")
-	})
+func TestServoDriverStart(t *testing.T) {
+	d := initTestServoDriver()
+	gobot.Expect(t, d.Start(), true)
+}
 
-	It("Should be able to Move", func() {
-		s.Move(100)
-		Expect(s.CurrentAngle).To(Equal(uint8(100)))
-	})
+func TestServoDriverHalt(t *testing.T) {
+	d := initTestServoDriver()
+	gobot.Expect(t, d.Halt(), true)
+}
 
-	It("Should be able to move to Min", func() {
-		s.Min()
-		Expect(s.CurrentAngle).To(Equal(uint8(0)))
-	})
+func TestServoDriverInit(t *testing.T) {
+	d := initTestServoDriver()
+	gobot.Expect(t, d.Init(), true)
+}
 
-	It("Should be able to move to Max", func() {
-		s.Max()
-		Expect(s.CurrentAngle).To(Equal(uint8(180)))
-	})
+func TestServoDriverMove(t *testing.T) {
+	d := initTestServoDriver()
+	d.Move(100)
+	gobot.Expect(t, d.CurrentAngle, uint8(100))
+}
 
-	It("Should be able to move to Center", func() {
-		s.Center()
-		Expect(s.CurrentAngle).To(Equal(uint8(90)))
-	})
+func TestServoDriverMin(t *testing.T) {
+	d := initTestServoDriver()
+	d.Min()
+	gobot.Expect(t, d.CurrentAngle, uint8(0))
+}
 
-	It("Should be able to move to init servo", func() {
-		s.InitServo()
-	})
+func TestServoDriverMax(t *testing.T) {
+	d := initTestServoDriver()
+	d.Max()
+	gobot.Expect(t, d.CurrentAngle, uint8(180))
+}
 
-	It("Must be able to Start", func() {
-		Expect(s.Start()).To(Equal(true))
-	})
-	It("Must be able to Init", func() {
-		Expect(s.Init()).To(Equal(true))
-	})
-	It("Must be able to Halt", func() {
-		Expect(s.Halt()).To(Equal(true))
-	})
-})
+func TestServoDriverCenter(t *testing.T) {
+	d := initTestServoDriver()
+	d.Center()
+	gobot.Expect(t, d.CurrentAngle, uint8(90))
+}
+
+func TestServoDriverInitServo(t *testing.T) {
+	d := initTestServoDriver()
+	d.InitServo()
+}
