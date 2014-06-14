@@ -3,16 +3,22 @@ go:
  - 1.2
  - release
  - tip
+before_install:
+ - sudo add-apt-repository -y ppa:kubuntu-ppa/backports
+ - sudo add-apt-repository -y ppa:zoogie/sdl2-snapshots
+ - sudo apt-get update
+ - sudo apt-get install libcv-dev libcvaux-dev libhighgui-dev libopencv-dev libsdl2-dev libsdl2-image-dev libsdl2
 install:
- - sudo apt-get install libusb-dev #libopencv-dev #libsdl2-2.0-0
+ - sudo apt-get install libusb-dev
  - go get -v . && go build -v .
  - go get code.google.com/p/go.tools/cmd/cover
  - go get github.com/mattn/goveralls
+ - go get github.com/bmizerany/pat
  - go get github.com/hybridgroup/go-ardrone/client
  - go get github.com/tarm/goserial
- #- go get github.com/hybridgroup/go-sdl2/sdl
+ - go get github.com/hybridgroup/go-sdl2/sdl
  - go get code.google.com/p/go.net/websocket
- #- go get github.com/hybridgroup/go-opencv/opencv
+ - go get github.com/hybridgroup/go-opencv/opencv
 script:
  - make cover
  - export PATH=$PATH:$HOME/gopath/bin/
