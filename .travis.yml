@@ -15,9 +15,7 @@ install:
  - go get github.com/onsi/gomega
  - go get code.google.com/p/go.tools/cmd/cover
  - go get github.com/mattn/goveralls
- - go get github.com/go-martini/martini
- - go get github.com/martini-contrib/auth
- - go get github.com/martini-contrib/cors  
+ - go get github.com/bmizerany/pat
  - go get github.com/hybridgroup/go-ardrone/client
  - go get github.com/tarm/goserial
  - go get github.com/hybridgroup/go-sdl2/sdl
