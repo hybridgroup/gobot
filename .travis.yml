@@ -4,7 +4,7 @@ go:
  - release
  - tip
 before_install:
- - apt-get -y install autoconf automake build-essential git libass-dev libgpac-dev \
+ - sudo apt-get -y install autoconf automake build-essential git libass-dev libgpac-dev \
   libsdl1.2-dev libtheora-dev libtool libva-dev libvdpau-dev libvorbis-dev libx11-dev \
   libxext-dev libxfixes-dev pkg-config texi2html zlib1g-dev yasm libmp3lame-dev \
   libvpx-dev cmake libgtk2.0-dev pkg-config libjpeg8 libjpeg8-dev \
@@ -18,7 +18,7 @@ before_install:
  - cd release
  - cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local ..
  - make
- - make install
+ - sudo make install
  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 install:
  - sudo apt-get install libusb-dev #libsdl2-2.0-0
