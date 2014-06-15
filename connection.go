@@ -2,6 +2,7 @@ package gobot
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"reflect"
 )
@@ -11,6 +12,7 @@ type Connection interface {
 	Finalize() bool
 	port() string
 	name() string
+	setName(string)
 	params() map[string]interface{}
 }
 
@@ -53,6 +55,9 @@ func (c connections) Finalize() {
 }
 
 func NewConnection(adaptor AdaptorInterface, r *Robot) *connection {
+	if adaptor.name() == "" {
+		adaptor.setName(fmt.Sprintf("%X", Rand(int(^uint(0)>>1))))
+	}
 	t := reflect.ValueOf(adaptor).Type().String()
 	return &connection{
 		Type:    t[1:len(t)],
@@ -88,6 +93,10 @@ func (c *connection) port() string {
 
 func (c *connection) name() string {
 	return c.Name
+}
+
+func (c *connection) setName(s string) {
+	c.Name = s
 }
 
 func (c *connection) params() map[string]interface{} {

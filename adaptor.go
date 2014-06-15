@@ -12,6 +12,7 @@ type AdaptorInterface interface {
 	Connect() bool
 	port() string
 	name() string
+	setName(string)
 	params() map[string]interface{}
 }
 
@@ -21,6 +22,10 @@ func (a *Adaptor) port() string {
 
 func (a *Adaptor) name() string {
 	return a.Name
+}
+
+func (a *Adaptor) setName(s string) {
+	a.Name = s
 }
 
 func (a *Adaptor) params() map[string]interface{} {

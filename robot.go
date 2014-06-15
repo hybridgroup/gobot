@@ -3,8 +3,6 @@ package gobot
 import (
 	"fmt"
 	"log"
-	"math/rand"
-	"time"
 )
 
 type JSONRobot struct {
@@ -37,25 +35,36 @@ func (r Robots) Each(f func(*Robot)) {
 }
 
 func NewRobot(name string, v ...interface{}) *Robot {
+	if name == "" {
+		name = fmt.Sprintf("%X", Rand(int(^uint(0)>>1)))
+	}
 	r := &Robot{
 		Name:        name,
 		Commands:    make(map[string]func(map[string]interface{}) interface{}),
 		connections: connections{},
 		devices:     devices{},
 	}
-	r.initName()
+
 	log.Println("Initializing Robot", r.Name, "...")
 	if len(v) > 0 {
 		if v[0] == nil {
 			v[0] = []Connection{}
 		}
-		r.initConnections(v[0].([]Connection))
+		log.Println("Initializing connections...")
+		for _, connection := range v[0].([]Connection) {
+			c := r.AddConnection(connection)
+			log.Println("Initializing connection", c.name(), "...")
+		}
 	}
 	if len(v) > 1 {
 		if v[1] == nil {
 			v[1] = []Device{}
 		}
-		r.initDevices(v[1].([]Device))
+		log.Println("Initializing devices...")
+		for _, device := range v[1].([]Device) {
+			d := r.AddDevice(device)
+			log.Println("Initializing device", d.name(), "...")
+		}
 	}
 	if len(v) > 2 {
 		if v[2] == nil {
@@ -93,30 +102,6 @@ func (r *Robot) Start() {
 	if r.Work != nil {
 		log.Println("Starting work...")
 		r.Work()
-	}
-}
-
-func (r *Robot) initName() {
-	if r.Name == "" {
-		rand.Seed(time.Now().UTC().UnixNano())
-		i := rand.Int()
-		r.Name = fmt.Sprintf("Robot%v", i)
-	}
-}
-
-func (r *Robot) initConnections(c []Connection) {
-	log.Println("Initializing connections...")
-	for _, connection := range c {
-		log.Println("Initializing connection", FieldByNamePtr(connection, "Name"), "...")
-		r.AddConnection(connection)
-	}
-}
-
-func (r *Robot) initDevices(d []Device) {
-	log.Println("Initializing devices...")
-	for _, device := range d {
-		log.Println("Initializing device", FieldByNamePtr(device, "Name"), "...")
-		r.AddDevice(device)
 	}
 }
 

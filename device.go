@@ -2,6 +2,7 @@ package gobot
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"reflect"
 	"time"
@@ -25,11 +26,10 @@ type JSONDevice struct {
 }
 
 type device struct {
-	Name     string          `json:"-"`
-	Type     string          `json:"-"`
-	Interval time.Duration   `json:"-"`
-	Robot    *Robot          `json:"-"`
-	Driver   DriverInterface `json:"-"`
+	Name   string          `json:"-"`
+	Type   string          `json:"-"`
+	Robot  *Robot          `json:"-"`
+	Driver DriverInterface `json:"-"`
 }
 
 type devices []*device
@@ -56,6 +56,9 @@ func (d devices) Halt() {
 }
 
 func NewDevice(driver DriverInterface, r *Robot) *device {
+	if driver.name() == "" {
+		driver.setName(fmt.Sprintf("%X", Rand(int(^uint(0)>>1))))
+	}
 	t := reflect.ValueOf(driver).Type().String()
 	if driver.interval() == 0 {
 		driver.setInterval(10 * time.Millisecond)
@@ -69,11 +72,11 @@ func NewDevice(driver DriverInterface, r *Robot) *device {
 }
 
 func (d *device) setInterval(t time.Duration) {
-	d.Interval = t
+	d.Driver.setInterval(t)
 }
 
 func (d *device) interval() time.Duration {
-	return d.Interval
+	return d.Driver.interval()
 }
 
 func (d *device) setName(s string) {
