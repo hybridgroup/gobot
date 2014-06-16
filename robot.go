@@ -13,11 +13,11 @@ type JSONRobot struct {
 }
 
 type Robot struct {
-	Name        string                                              `json:"-"`
-	Commands    map[string]func(map[string]interface{}) interface{} `json:"-"`
-	Work        func()                                              `json:"-"`
-	connections connections                                         `json:"-"`
-	devices     devices                                             `json:"-"`
+	Name        string
+	Commands    map[string]func(map[string]interface{}) interface{}
+	Work        func()
+	connections connections
+	devices     devices
 }
 
 type Robots []*Robot

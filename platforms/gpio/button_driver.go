@@ -6,8 +6,7 @@ import (
 
 type ButtonDriver struct {
 	gobot.Driver
-	Adaptor DigitalReader
-	Active  bool
+	Active bool
 }
 
 func NewButtonDriver(a DigitalReader, name string, pin string) *ButtonDriver {
@@ -19,10 +18,14 @@ func NewButtonDriver(a DigitalReader, name string, pin string) *ButtonDriver {
 				"push":    gobot.NewEvent(),
 				"release": gobot.NewEvent(),
 			},
+			Adaptor: a.(gobot.AdaptorInterface),
 		},
-		Active:  false,
-		Adaptor: a,
+		Active: false,
 	}
+}
+
+func (b *ButtonDriver) adaptor() DigitalReader {
+	return b.Driver.Adaptor.(DigitalReader)
 }
 
 func (b *ButtonDriver) Start() bool {
@@ -40,7 +43,7 @@ func (b *ButtonDriver) Halt() bool { return true }
 func (b *ButtonDriver) Init() bool { return true }
 
 func (b *ButtonDriver) readState() int {
-	return b.Adaptor.DigitalRead(b.Pin)
+	return b.adaptor().DigitalRead(b.Pin)
 }
 
 func (b *ButtonDriver) update(newVal int) {

@@ -6,7 +6,7 @@ import (
 )
 
 func initTestAnalogSensorDriver() *AnalogSensorDriver {
-	return NewAnalogSensorDriver(TestAdaptor{}, "bot", "1")
+	return NewAnalogSensorDriver(newGpioTestAdaptor("adaptor"), "bot", "1")
 }
 
 func TestAnalogSensorDriverStart(t *testing.T) {

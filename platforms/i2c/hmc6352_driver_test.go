@@ -6,7 +6,7 @@ import (
 )
 
 func initTestHMC6352Driver() *HMC6352Driver {
-	return NewHMC6352Driver(TestAdaptor{}, "bot")
+	return NewHMC6352Driver(newI2cTestAdaptor("adaptor"), "bot")
 }
 
 func TestHMC6352DriverStart(t *testing.T) {

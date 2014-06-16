@@ -14,7 +14,6 @@ type packet struct {
 
 type SpheroDriver struct {
 	gobot.Driver
-	Adaptor         *SpheroAdaptor
 	seq             uint8
 	asyncResponse   [][]uint8
 	syncResponse    [][]uint8
@@ -30,8 +29,8 @@ func NewSpheroDriver(a *SpheroAdaptor, name string) *SpheroDriver {
 				"Collision": gobot.NewEvent(),
 			},
 			Commands: make(map[string]func(map[string]interface{}) interface{}),
+			Adaptor:  a,
 		},
-		Adaptor:         a,
 		packetChannel:   make(chan *packet, 1024),
 		responseChannel: make(chan []uint8, 1024),
 	}
@@ -79,6 +78,11 @@ func NewSpheroDriver(a *SpheroAdaptor, name string) *SpheroDriver {
 
 	return s
 }
+
+func (s *SpheroDriver) adaptor() *SpheroAdaptor {
+	return s.Driver.Adaptor.(*SpheroAdaptor)
+}
+
 func (s *SpheroDriver) Init() bool {
 	return true
 }
@@ -209,12 +213,12 @@ func (s *SpheroDriver) craftPacket(body []uint8, cid byte) *packet {
 func (s *SpheroDriver) write(packet *packet) {
 	buf := append(packet.header, packet.body...)
 	buf = append(buf, packet.checksum)
-	length, err := s.Adaptor.sp.Write(buf)
+	length, err := s.adaptor().sp.Write(buf)
 	if err != nil {
 		fmt.Println(s.Name, err)
-		s.Adaptor.Disconnect()
+		s.adaptor().Disconnect()
 		fmt.Println("Reconnecting to SpheroDriver...")
-		s.Adaptor.Connect()
+		s.adaptor().Connect()
 		return
 	} else if length != len(buf) {
 		fmt.Println("Not enough bytes written", s.Name)
@@ -251,7 +255,7 @@ func (s *SpheroDriver) readBody(length uint8) []uint8 {
 func (s *SpheroDriver) readNextChunk(length uint8) []uint8 {
 	time.Sleep(1000 * time.Microsecond)
 	var read = make([]uint8, int(length))
-	l, err := s.Adaptor.sp.Read(read[:])
+	l, err := s.adaptor().sp.Read(read[:])
 	if err != nil || length != uint8(l) {
 		return nil
 	}

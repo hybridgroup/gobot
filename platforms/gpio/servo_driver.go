@@ -6,7 +6,6 @@ import (
 
 type ServoDriver struct {
 	gobot.Driver
-	Adaptor      Servo
 	CurrentAngle byte
 }
 
@@ -16,9 +15,9 @@ func NewServoDriver(a Servo, name string, pin string) *ServoDriver {
 			Name:     name,
 			Pin:      pin,
 			Commands: make(map[string]func(map[string]interface{}) interface{}),
+			Adaptor:  a.(gobot.AdaptorInterface),
 		},
 		CurrentAngle: 0,
-		Adaptor:      a,
 	}
 
 	s.Driver.AddCommand("Move", func(params map[string]interface{}) interface{} {
@@ -43,12 +42,16 @@ func NewServoDriver(a Servo, name string, pin string) *ServoDriver {
 
 }
 
+func (s *ServoDriver) adaptor() Servo {
+	return s.Driver.Adaptor.(Servo)
+}
+
 func (s *ServoDriver) Start() bool { return true }
 func (s *ServoDriver) Halt() bool  { return true }
 func (s *ServoDriver) Init() bool  { return true }
 
 func (s *ServoDriver) InitServo() {
-	s.Adaptor.InitServo()
+	s.adaptor().InitServo()
 }
 
 func (s *ServoDriver) Move(angle uint8) {
@@ -56,7 +59,7 @@ func (s *ServoDriver) Move(angle uint8) {
 		panic("Servo angle must be an integer between 0-180")
 	}
 	s.CurrentAngle = angle
-	s.Adaptor.ServoWrite(s.Pin, s.angleToSpan(angle))
+	s.adaptor().ServoWrite(s.Pin, s.angleToSpan(angle))
 }
 
 func (s *ServoDriver) Min() {

@@ -3,21 +3,27 @@ package gobot
 import "time"
 
 type Driver struct {
-	Interval time.Duration                                       `json:"interval"`
-	Pin      string                                              `json:"pin"`
-	Name     string                                              `json:"name"`
-	Commands map[string]func(map[string]interface{}) interface{} `json:"commands"`
-	Events   map[string]*Event                                   `json:"-"`
+	Adaptor  AdaptorInterface
+	Interval time.Duration
+	Pin      string
+	Name     string
+	Commands map[string]func(map[string]interface{}) interface{}
+	Events   map[string]*Event
 }
 
 type DriverInterface interface {
 	Start() bool
 	Halt() bool
+	adaptor() AdaptorInterface
 	setInterval(time.Duration)
 	interval() time.Duration
 	setName(string)
 	name() string
 	commands() map[string]func(map[string]interface{}) interface{}
+}
+
+func (d *Driver) adaptor() AdaptorInterface {
+	return d.Adaptor
 }
 
 func (d *Driver) setInterval(t time.Duration) {

@@ -8,7 +8,6 @@ import (
 
 type LeapMotionDriver struct {
 	gobot.Driver
-	Adaptor *LeapMotionAdaptor
 }
 
 func NewLeapMotionDriver(a *LeapMotionAdaptor, name string) *LeapMotionDriver {
@@ -18,15 +17,18 @@ func NewLeapMotionDriver(a *LeapMotionAdaptor, name string) *LeapMotionDriver {
 			Events: map[string]*gobot.Event{
 				"Message": gobot.NewEvent(),
 			},
+			Adaptor: a,
 		},
-		Adaptor: a,
 	}
 }
 
+func (l *LeapMotionDriver) adaptor() *LeapMotionAdaptor {
+	return l.Driver.Adaptor.(*LeapMotionAdaptor)
+}
 func (l *LeapMotionDriver) Start() bool {
 	enableGestures := map[string]bool{"enableGestures": true}
 	b, _ := json.Marshal(enableGestures)
-	_, err := l.Adaptor.ws.Write(b)
+	_, err := l.adaptor().ws.Write(b)
 	if err != nil {
 		panic(err)
 	}
@@ -34,7 +36,7 @@ func (l *LeapMotionDriver) Start() bool {
 	go func() {
 		for {
 			var msg []byte
-			websocket.Message.Receive(l.Adaptor.ws, &msg)
+			websocket.Message.Receive(l.adaptor().ws, &msg)
 			gobot.Publish(l.Events["Message"], l.ParseFrame(msg))
 		}
 	}()

@@ -6,7 +6,6 @@ import (
 
 type ArdroneDriver struct {
 	gobot.Driver
-	Adaptor *ArdroneAdaptor
 }
 
 func NewArdroneDriver(adaptor *ArdroneAdaptor, name string) *ArdroneDriver {
@@ -16,9 +15,12 @@ func NewArdroneDriver(adaptor *ArdroneAdaptor, name string) *ArdroneDriver {
 			Events: map[string]*gobot.Event{
 				"Flying": gobot.NewEvent(),
 			},
+			Adaptor: adaptor,
 		},
-		Adaptor: adaptor,
 	}
+}
+func (a *ArdroneDriver) adaptor() *ArdroneAdaptor {
+	return a.Driver.Adaptor.(*ArdroneAdaptor)
 }
 
 func (a *ArdroneDriver) Start() bool {
@@ -30,45 +32,45 @@ func (a *ArdroneDriver) Halt() bool {
 }
 
 func (a *ArdroneDriver) TakeOff() {
-	gobot.Publish(a.Events["Flying"], a.Adaptor.drone.Takeoff())
+	gobot.Publish(a.Events["Flying"], a.adaptor().drone.Takeoff())
 }
 
 func (a *ArdroneDriver) Land() {
-	a.Adaptor.drone.Land()
+	a.adaptor().drone.Land()
 }
 
 func (a *ArdroneDriver) Up(n float64) {
-	a.Adaptor.drone.Up(n)
+	a.adaptor().drone.Up(n)
 }
 
 func (a *ArdroneDriver) Down(n float64) {
-	a.Adaptor.drone.Down(n)
+	a.adaptor().drone.Down(n)
 }
 
 func (a *ArdroneDriver) Left(n float64) {
-	a.Adaptor.drone.Left(n)
+	a.adaptor().drone.Left(n)
 }
 
 func (a *ArdroneDriver) Right(n float64) {
-	a.Adaptor.drone.Right(n)
+	a.adaptor().drone.Right(n)
 }
 
 func (a *ArdroneDriver) Forward(n float64) {
-	a.Adaptor.drone.Forward(n)
+	a.adaptor().drone.Forward(n)
 }
 
 func (a *ArdroneDriver) Backward(n float64) {
-	a.Adaptor.drone.Backward(n)
+	a.adaptor().drone.Backward(n)
 }
 
 func (a *ArdroneDriver) Clockwise(n float64) {
-	a.Adaptor.drone.Clockwise(n)
+	a.adaptor().drone.Clockwise(n)
 }
 
 func (a *ArdroneDriver) CounterClockwise(n float64) {
-	a.Adaptor.drone.Counterclockwise(n)
+	a.adaptor().drone.Counterclockwise(n)
 }
 
 func (a *ArdroneDriver) Hover() {
-	a.Adaptor.drone.Hover()
+	a.adaptor().drone.Hover()
 }

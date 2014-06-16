@@ -6,7 +6,6 @@ import (
 
 type MotorDriver struct {
 	gobot.Driver
-	Adaptor          PwmDigitalWriter
 	SpeedPin         string
 	SwitchPin        string
 	DirectionPin     string
@@ -21,15 +20,19 @@ type MotorDriver struct {
 func NewMotorDriver(a PwmDigitalWriter, name string, pin string) *MotorDriver {
 	return &MotorDriver{
 		Driver: gobot.Driver{
-			Name: name,
-			Pin:  pin,
+			Name:    name,
+			Pin:     pin,
+			Adaptor: a.(gobot.AdaptorInterface),
 		},
 		CurrentState:     0,
 		CurrentSpeed:     0,
 		CurrentMode:      "digital",
 		CurrentDirection: "forward",
-		Adaptor:          a,
 	}
+}
+
+func (m *MotorDriver) adaptor() PwmDigitalWriter {
+	return m.Driver.Adaptor.(PwmDigitalWriter)
 }
 
 func (m *MotorDriver) Start() bool { return true }
@@ -85,7 +88,7 @@ func (m *MotorDriver) Toggle() {
 func (m *MotorDriver) Speed(value byte) {
 	m.CurrentMode = "analog"
 	m.CurrentSpeed = value
-	m.Adaptor.PwmWrite(m.SpeedPin, value)
+	m.adaptor().PwmWrite(m.SpeedPin, value)
 }
 
 func (m *MotorDriver) Forward(speed byte) {
@@ -107,7 +110,7 @@ func (m *MotorDriver) Direction(direction string) {
 		} else {
 			level = 0
 		}
-		m.Adaptor.DigitalWrite(m.DirectionPin, level)
+		m.adaptor().DigitalWrite(m.DirectionPin, level)
 	} else {
 		var forwardLevel, backwardLevel byte
 		switch direction {
@@ -121,8 +124,8 @@ func (m *MotorDriver) Direction(direction string) {
 			forwardLevel = 0
 			backwardLevel = 0
 		}
-		m.Adaptor.DigitalWrite(m.ForwardPin, forwardLevel)
-		m.Adaptor.DigitalWrite(m.BackwardPin, backwardLevel)
+		m.adaptor().DigitalWrite(m.ForwardPin, forwardLevel)
+		m.adaptor().DigitalWrite(m.BackwardPin, backwardLevel)
 	}
 }
 
@@ -150,6 +153,6 @@ func (m *MotorDriver) changeState(state byte) {
 			m.Direction("none")
 		}
 	} else {
-		m.Adaptor.DigitalWrite(m.SpeedPin, state)
+		m.adaptor().DigitalWrite(m.SpeedPin, state)
 	}
 }

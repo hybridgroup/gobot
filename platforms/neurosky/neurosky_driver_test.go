@@ -20,9 +20,3 @@ func TestNeuroskyDriverHalt(t *testing.T) {
 	d := initTestNeuroskyDriver()
 	gobot.Expect(t, d.Halt(), true)
 }
-
-func TestNeuroskyDriverInit(t *testing.T) {
-	t.SkipNow()
-	d := initTestNeuroskyDriver()
-	gobot.Expect(t, d.Init(), true)
-}

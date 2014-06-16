@@ -7,7 +7,6 @@ import (
 
 type WiichuckDriver struct {
 	gobot.Driver
-	Adaptor  I2cInterface
 	joystick map[string]float64
 	data     map[string]float64
 }
@@ -21,6 +20,7 @@ func NewWiichuckDriver(a I2cInterface, name string) *WiichuckDriver {
 				"c_button": gobot.NewEvent(),
 				"joystick": gobot.NewEvent(),
 			},
+			Adaptor: a.(gobot.AdaptorInterface),
 		},
 		joystick: map[string]float64{
 			"sy_origin": -1,
@@ -32,16 +32,19 @@ func NewWiichuckDriver(a I2cInterface, name string) *WiichuckDriver {
 			"z":  0,
 			"c":  0,
 		},
-		Adaptor: a,
 	}
 }
 
+func (w *WiichuckDriver) adaptor() I2cInterface {
+	return w.Driver.Adaptor.(I2cInterface)
+}
+
 func (w *WiichuckDriver) Start() bool {
-	w.Adaptor.I2cStart(0x52)
+	w.adaptor().I2cStart(0x52)
 	gobot.Every(w.Interval, func() {
-		w.Adaptor.I2cWrite([]byte{0x40, 0x00})
-		w.Adaptor.I2cWrite([]byte{0x00})
-		newValue := w.Adaptor.I2cRead(6)
+		w.adaptor().I2cWrite([]byte{0x40, 0x00})
+		w.adaptor().I2cWrite([]byte{0x00})
+		newValue := w.adaptor().I2cRead(6)
 		if len(newValue) == 6 {
 			w.update(newValue)
 		}

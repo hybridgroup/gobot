@@ -6,7 +6,7 @@ import (
 )
 
 func initTestLedDriver() *LedDriver {
-	return NewLedDriver(TestAdaptor{}, "myLed", "1")
+	return NewLedDriver(newGpioTestAdaptor("adaptor"), "myLed", "1")
 }
 
 func TestLedDriverStart(t *testing.T) {

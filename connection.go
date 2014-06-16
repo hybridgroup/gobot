@@ -23,12 +23,10 @@ type JSONConnection struct {
 }
 
 type connection struct {
-	Name    string                 `json:"-"`
-	Type    string                 `json:"-"`
-	Adaptor AdaptorInterface       `json:"-"`
-	Port    string                 `json:"-"`
-	Robot   *Robot                 `json:"-"`
-	Params  map[string]interface{} `json:"-"`
+	Name    string           `json:"-"`
+	Type    string           `json:"-"`
+	Adaptor AdaptorInterface `json:"-"`
+	Robot   *Robot           `json:"-"`
 }
 
 type connections []*connection
@@ -62,15 +60,13 @@ func NewConnection(adaptor AdaptorInterface, r *Robot) *connection {
 	return &connection{
 		Type:    t[1:len(t)],
 		Name:    adaptor.name(),
-		Port:    adaptor.port(),
-		Params:  adaptor.params(),
 		Robot:   r,
 		Adaptor: adaptor,
 	}
 }
 
 func (c *connection) Connect() bool {
-	log.Println("Connecting to " + c.Name + " on port " + c.Port + "...")
+	log.Println("Connecting to " + c.Name + " on port " + c.port() + "...")
 	return c.Adaptor.Connect()
 }
 
@@ -82,13 +78,13 @@ func (c *connection) Finalize() bool {
 func (c *connection) ToJSON() *JSONConnection {
 	return &JSONConnection{
 		Name:    c.Name,
-		Port:    c.Port,
+		Port:    c.port(),
 		Adaptor: c.Type,
 	}
 }
 
 func (c *connection) port() string {
-	return c.Port
+	return c.Adaptor.port()
 }
 
 func (c *connection) name() string {

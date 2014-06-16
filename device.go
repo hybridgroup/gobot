@@ -15,6 +15,7 @@ type Device interface {
 	interval() time.Duration
 	setName(string)
 	name() string
+	adaptor() AdaptorInterface
 	commands() map[string]func(map[string]interface{}) interface{}
 }
 
@@ -26,10 +27,10 @@ type JSONDevice struct {
 }
 
 type device struct {
-	Name   string          `json:"-"`
-	Type   string          `json:"-"`
-	Robot  *Robot          `json:"-"`
-	Driver DriverInterface `json:"-"`
+	Name   string
+	Type   string
+	Robot  *Robot
+	Driver DriverInterface
 }
 
 type devices []*device
@@ -71,6 +72,10 @@ func NewDevice(driver DriverInterface, r *Robot) *device {
 	}
 }
 
+func (d *device) adaptor() AdaptorInterface {
+	return d.Driver.adaptor()
+}
+
 func (d *device) setInterval(t time.Duration) {
 	d.Driver.setInterval(t)
 }
@@ -107,12 +112,14 @@ func (d *device) Halt() bool {
 
 func (d *device) ToJSON() *JSONDevice {
 	jsonDevice := &JSONDevice{
-		Name:   d.Name,
-		Driver: d.Type,
-		Connection: d.Robot.Connection(FieldByNamePtr(FieldByNamePtr(d.Driver, "Adaptor").
-			Interface().(AdaptorInterface), "Name").
-			Interface().(string)).ToJSON(),
-		Commands: []string{},
+		Name:       d.Name,
+		Driver:     d.Type,
+		Commands:   []string{},
+		Connection: nil,
+	}
+
+	if d.adaptor() != nil {
+		jsonDevice.Connection = d.Robot.Connection(d.adaptor().name()).ToJSON()
 	}
 
 	commands := d.commands()

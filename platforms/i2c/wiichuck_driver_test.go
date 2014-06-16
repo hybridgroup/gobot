@@ -6,7 +6,7 @@ import (
 )
 
 func initTestWiichuckDriver() *WiichuckDriver {
-	return NewWiichuckDriver(TestAdaptor{}, "bot")
+	return NewWiichuckDriver(newI2cTestAdaptor("adaptor"), "bot")
 }
 
 func TestWiichuckDriverStart(t *testing.T) {

@@ -1,15 +1,29 @@
 package gpio
 
-type TestAdaptor struct{}
+import "github.com/hybridgroup/gobot"
 
-func (t TestAdaptor) AnalogWrite(string, byte)  {}
-func (t TestAdaptor) DigitalWrite(string, byte) {}
-func (t TestAdaptor) ServoWrite(string, byte)   {}
-func (t TestAdaptor) PwmWrite(string, byte)     {}
-func (t TestAdaptor) InitServo()                {}
-func (t TestAdaptor) AnalogRead(string) int {
+type gpioTestAdaptor struct {
+	gobot.Adaptor
+}
+
+func (t *gpioTestAdaptor) AnalogWrite(string, byte)  {}
+func (t *gpioTestAdaptor) DigitalWrite(string, byte) {}
+func (t *gpioTestAdaptor) ServoWrite(string, byte)   {}
+func (t *gpioTestAdaptor) PwmWrite(string, byte)     {}
+func (t *gpioTestAdaptor) InitServo()                {}
+func (t *gpioTestAdaptor) AnalogRead(string) int {
 	return 99
 }
-func (t TestAdaptor) DigitalRead(string) int {
+func (t *gpioTestAdaptor) DigitalRead(string) int {
 	return 1
+}
+func (t *gpioTestAdaptor) Connect() bool  { return true }
+func (t *gpioTestAdaptor) Finalize() bool { return true }
+
+func newGpioTestAdaptor(name string) *gpioTestAdaptor {
+	return &gpioTestAdaptor{
+		Adaptor: gobot.Adaptor{
+			Name: name,
+		},
+	}
 }

@@ -7,7 +7,6 @@ import (
 type PebbleDriver struct {
 	gobot.Driver
 	Messages []string
-	Adaptor  *PebbleAdaptor
 }
 
 type PebbleInterface interface {
@@ -23,9 +22,9 @@ func NewPebbleDriver(adaptor *PebbleAdaptor, name string) *PebbleDriver {
 				"tap":    gobot.NewEvent(),
 			},
 			Commands: make(map[string]func(map[string]interface{}) interface{}),
+			Adaptor:  adaptor,
 		},
 		Messages: []string{},
-		Adaptor:  adaptor,
 	}
 
 	p.Driver.AddCommand("PublishEvent", func(params map[string]interface{}) interface{} {
@@ -45,6 +44,9 @@ func NewPebbleDriver(adaptor *PebbleAdaptor, name string) *PebbleDriver {
 	})
 
 	return p
+}
+func (d *PebbleDriver) adaptor() *PebbleAdaptor {
+	return d.Driver.Adaptor.(*PebbleAdaptor)
 }
 
 func (d *PebbleDriver) Start() bool { return true }

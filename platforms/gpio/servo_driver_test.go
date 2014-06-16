@@ -6,7 +6,7 @@ import (
 )
 
 func initTestServoDriver() *ServoDriver {
-	return NewServoDriver(TestAdaptor{}, "bot", "1")
+	return NewServoDriver(newGpioTestAdaptor("adaptor"), "bot", "1")
 }
 
 func TestServoDriverStart(t *testing.T) {

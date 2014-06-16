@@ -6,7 +6,7 @@ import (
 )
 
 func initTestBlinkMDriver() *BlinkMDriver {
-	return NewBlinkMDriver(TestAdaptor{}, "bot")
+	return NewBlinkMDriver(newI2cTestAdaptor("adaptor"), "bot")
 }
 
 func TestBlinkMDriverStart(t *testing.T) {

@@ -6,7 +6,7 @@ import (
 )
 
 func initTestButtonDriver() *ButtonDriver {
-	return NewButtonDriver(TestAdaptor{}, "bot", "1")
+	return NewButtonDriver(newGpioTestAdaptor("adaptor"), "bot", "1")
 }
 
 func TestButtonDriverStart(t *testing.T) {

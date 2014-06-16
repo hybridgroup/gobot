@@ -6,7 +6,6 @@ import (
 
 type AnalogSensorDriver struct {
 	gobot.Driver
-	Adaptor AnalogReader
 }
 
 func NewAnalogSensorDriver(a AnalogReader, name string, pin string) *AnalogSensorDriver {
@@ -15,8 +14,8 @@ func NewAnalogSensorDriver(a AnalogReader, name string, pin string) *AnalogSenso
 			Name:     name,
 			Pin:      pin,
 			Commands: make(map[string]func(map[string]interface{}) interface{}),
+			Adaptor:  a.(gobot.AdaptorInterface),
 		},
-		Adaptor: a,
 	}
 	d.Driver.AddCommand("Read", func(params map[string]interface{}) interface{} {
 		return d.Read()
@@ -24,10 +23,14 @@ func NewAnalogSensorDriver(a AnalogReader, name string, pin string) *AnalogSenso
 	return d
 }
 
+func (a *AnalogSensorDriver) adaptor() AnalogReader {
+	return a.Driver.Adaptor.(AnalogReader)
+}
+
 func (a *AnalogSensorDriver) Start() bool { return true }
 func (a *AnalogSensorDriver) Init() bool  { return true }
 func (a *AnalogSensorDriver) Halt() bool  { return true }
 
 func (a *AnalogSensorDriver) Read() int {
-	return a.Adaptor.AnalogRead(a.Pin)
+	return a.adaptor().AnalogRead(a.Pin)
 }

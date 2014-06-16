@@ -47,7 +47,6 @@ func (NullReadWriteCloser) Close() error {
 
 type testDriver struct {
 	Driver
-	Adaptor *testAdaptor
 }
 
 func (t *testDriver) Init() bool  { return true }
@@ -59,8 +58,8 @@ func NewTestDriver(name string, adaptor *testAdaptor) *testDriver {
 		Driver: Driver{
 			Commands: make(map[string]func(map[string]interface{}) interface{}),
 			Name:     name,
+			Adaptor:  adaptor,
 		},
-		Adaptor: adaptor,
 	}
 
 	t.Driver.AddCommand("TestDriverCommand", func(params map[string]interface{}) interface{} {

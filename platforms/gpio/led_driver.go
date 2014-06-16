@@ -6,8 +6,7 @@ import (
 
 type LedDriver struct {
 	gobot.Driver
-	Adaptor PwmDigitalWriter
-	High    bool
+	High bool
 }
 
 func NewLedDriver(a PwmDigitalWriter, name string, pin string) *LedDriver {
@@ -16,9 +15,9 @@ func NewLedDriver(a PwmDigitalWriter, name string, pin string) *LedDriver {
 			Name:     name,
 			Pin:      pin,
 			Commands: make(map[string]func(map[string]interface{}) interface{}),
+			Adaptor:  a.(gobot.AdaptorInterface),
 		},
-		High:    false,
-		Adaptor: a,
+		High: false,
 	}
 
 	l.Driver.AddCommand("Brightness", func(params map[string]interface{}) interface{} {
@@ -43,6 +42,10 @@ func NewLedDriver(a PwmDigitalWriter, name string, pin string) *LedDriver {
 	})
 
 	return l
+}
+
+func (l *LedDriver) adaptor() PwmDigitalWriter {
+	return l.Driver.Adaptor.(PwmDigitalWriter)
 }
 
 func (l *LedDriver) Start() bool { return true }
@@ -78,9 +81,9 @@ func (l *LedDriver) Toggle() {
 }
 
 func (l *LedDriver) Brightness(level byte) {
-	l.Adaptor.PwmWrite(l.Pin, level)
+	l.adaptor().PwmWrite(l.Pin, level)
 }
 
 func (l *LedDriver) changeState(level byte) {
-	l.Adaptor.DigitalWrite(l.Pin, level)
+	l.adaptor().DigitalWrite(l.Pin, level)
 }

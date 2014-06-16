@@ -6,7 +6,7 @@ import (
 )
 
 func initTestDirectPinDriver() *DirectPinDriver {
-	return NewDirectPinDriver(TestAdaptor{}, "bot", "1")
+	return NewDirectPinDriver(newGpioTestAdaptor("adaptor"), "bot", "1")
 }
 
 func TestDirectPinDriverStart(t *testing.T) {
