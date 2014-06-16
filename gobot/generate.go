@@ -142,7 +142,6 @@ import (
 
 type {{ .UpperName }}Driver struct {
   gobot.Driver
-  Adaptor *{{ .UpperName }}Adaptor
 }
 
 type {{ .UpperName }}Interface interface {
@@ -154,9 +153,13 @@ func New{{.UpperName}}Driver(a *{{.UpperName}}Adaptor, name string) *{{.UpperNam
       Name: name,
       Events: make(map[string]*gobot.Event),
       Commands: make(map[string]func(map[string]interface{}) interface{}),
+      Adaptor: a,
     },
-    Adaptor: a,
   }
+}
+
+func ({{.FirstLetter}} *{{ .UpperName }}Driver) adaptor() *{{ .UpperName }}Adaptor {
+  return {{ .FirstLetter }}.Driver.Adaptor.(*{{ .UpperName }}Adaptor)
 }
 
 func ({{.FirstLetter}} *{{ .UpperName }}Driver) Start() bool { return true }
