@@ -45,14 +45,13 @@ func NewAPI(g *gobot.Gobot) *api {
 
 			log.Println("Initializing API on " + host + ":" + port + "...")
 			http.Handle("/", a.server)
-			go func() {
-				if cert != "" && key != "" {
-					http.ListenAndServeTLS(host+":"+port, cert, key, nil)
-				} else {
-					log.Println("WARNING: API using insecure connection. We recommend using an SSL certificate with Gobot.")
-					http.ListenAndServe(host+":"+port, nil)
-				}
-			}()
+			
+			if cert != "" && key != "" {
+				http.ListenAndServeTLS(host+":"+port, cert, key, nil)
+			} else {
+				log.Println("WARNING: API using insecure connection. We recommend using an SSL certificate with Gobot.")
+				http.ListenAndServe(host+":"+port, nil)
+			}
 		},
 	}
 }
