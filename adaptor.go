@@ -1,10 +1,10 @@
 package gobot
 
 type Adaptor struct {
-	Name      string                 `json:"name"`
-	Port      string                 `json:"port"`
-	Connected bool                   `json:"Connected"`
-	Params    map[string]interface{} `json:"params"`
+	Name      string
+	Port      string
+	Connected bool
+	Params    map[string]interface{}
 }
 
 type AdaptorInterface interface {

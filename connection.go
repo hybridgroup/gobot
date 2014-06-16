@@ -23,10 +23,10 @@ type JSONConnection struct {
 }
 
 type connection struct {
-	Name    string           `json:"-"`
-	Type    string           `json:"-"`
-	Adaptor AdaptorInterface `json:"-"`
-	Robot   *Robot           `json:"-"`
+	Name    string
+	Type    string
+	Adaptor AdaptorInterface
+	Robot   *Robot
 }
 
 type connections []*connection
