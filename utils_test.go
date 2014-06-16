@@ -62,18 +62,3 @@ func TestRand(t *testing.T) {
 		t.Error(fmt.Sprintf("%v should not equal %v", a, b))
 	}
 }
-
-func TestFieldByName(t *testing.T) {
-	testInterface := *NewTestStruct()
-	Expect(t, FieldByName(testInterface, "i").Int(), int64(10))
-}
-
-func TestFieldByNamePtr(t *testing.T) {
-	testInterface := NewTestStruct()
-	Expect(t, FieldByNamePtr(testInterface, "f").Float(), 0.2)
-}
-
-func TestCall(t *testing.T) {
-	testInterface := NewTestStruct()
-	Expect(t, Call(testInterface, "Hello", "Human", "How are you?")[0].String(), "Hello Human! How are you?")
-}

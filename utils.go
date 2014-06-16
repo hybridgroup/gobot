@@ -3,7 +3,6 @@ package gobot
 import (
 	"math"
 	"math/rand"
-	"reflect"
 	"time"
 )
 
@@ -38,21 +37,6 @@ func On(e *Event, f func(s interface{})) {
 func Rand(max int) int {
 	r := rand.New(rand.NewSource(time.Now().UTC().UnixNano()))
 	return r.Intn(max)
-}
-
-func Call(thing interface{}, method string, params ...interface{}) []reflect.Value {
-	in := make([]reflect.Value, len(params))
-	for k, param := range params {
-		in[k] = reflect.ValueOf(param)
-	}
-	return reflect.ValueOf(thing).MethodByName(method).Call(in)
-}
-
-func FieldByName(thing interface{}, field string) reflect.Value {
-	return reflect.ValueOf(thing).FieldByName(field)
-}
-func FieldByNamePtr(thing interface{}, field string) reflect.Value {
-	return reflect.ValueOf(thing).Elem().FieldByName(field)
 }
 
 func FromScale(input, min, max float64) float64 {
