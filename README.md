@@ -76,23 +76,23 @@ func main() {
 ## Hardware Support
 Gobot has a extensible system for connecting to hardware devices. The following robotics and physical computing platforms are currently supported:
   
-  - [Ardrone](http://ardrone2.parrot.com/) <=> [Library](https://github.com/hybridgroup/gobot/tree/dev/platforms/ardrone)
-  - [Arduino](http://www.arduino.cc/) <=> [Library](https://github.com/hybridgroup/gobot/tree/dev/platforms/firmata)
-  - [Beaglebone Black](http://beagleboard.org/Products/BeagleBone+Black/) <=> [Library](https://github.com/hybridgroup/gobot/tree/dev/platforms/beaglebone)
-  - [Joystick](http://en.wikipedia.org/wiki/Joystick) <=> [Library](https://github.com/hybridgroup/gobot/tree/dev/platforms/joystick)
-  - [Digispark](http://digistump.com/products/1) <=> [Library](https://github.com/hybridgroup/gobot/tree/dev/platforms/digispark)
-  - [Joystick](http://en.wikipedia.org/wiki/Joystick) <=> [Library](https://github.com/hybridgroup/gobot/tree/dev/platforms/joystick)
-  - [Leap Motion](https://www.leapmotion.com/) <=> [Library](https://github.com/hybridgroup/gobot/tree/dev/platforms/leapmotion)
-  - [Neurosky](http://neurosky.com/products-markets/eeg-biosensors/hardware/) <=> [Library](https://github.com/hybridgroup/gobot/tree/dev/platforms/neurosky)
-  - [OpenCV](http://opencv.org/) <=> [Library](https://github.com/hybridgroup/gobot/tree/dev/platforms/opencv)
-  - [Spark](https://www.spark.io/) <=> [Library](https://github.com/hybridgroup/gobot/tree/dev/platforms/spark)
-  - [Sphero](http://www.gosphero.com/) <=> [Library](https://github.com/hybridgroup/gobot/tree/dev/platforms/sphero)
+  - [Ardrone](http://ardrone2.parrot.com/) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/ardrone)
+  - [Arduino](http://www.arduino.cc/) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/firmata)
+  - [Beaglebone Black](http://beagleboard.org/Products/BeagleBone+Black/) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/beaglebone)
+  - [Joystick](http://en.wikipedia.org/wiki/Joystick) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/joystick)
+  - [Digispark](http://digistump.com/products/1) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/digispark)
+  - [Joystick](http://en.wikipedia.org/wiki/Joystick) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/joystick)
+  - [Leap Motion](https://www.leapmotion.com/) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/leapmotion)
+  - [Neurosky](http://neurosky.com/products-markets/eeg-biosensors/hardware/) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/neurosky)
+  - [OpenCV](http://opencv.org/) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/opencv)
+  - [Spark](https://www.spark.io/) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/spark)
+  - [Sphero](http://www.gosphero.com/) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/sphero)
   
 
 Support for many devices that use General Purpose Input/Output (GPIO) have
 a shared set of drivers provided using the cylon-gpio module:
 
-  - [GPIO](https://en.wikipedia.org/wiki/General_Purpose_Input/Output) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/dev/platforms/gpio)
+  - [GPIO](https://en.wikipedia.org/wiki/General_Purpose_Input/Output) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/platforms/gpio)
     - Analog Sensor
     - Button
     - Digital Sensor
@@ -103,7 +103,7 @@ a shared set of drivers provided using the cylon-gpio module:
 Support for devices that use Inter-Integrated Circuit (I2C) have a shared set of
 drivers provided using the gobot-i2c module:
 
-  - [I2C](https://en.wikipedia.org/wiki/I%C2%B2C) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/dev/platforms/i2c)
+  - [I2C](https://en.wikipedia.org/wiki/I%C2%B2C) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/platforms/i2c)
     - BlinkM
     - HMC6352
     - Wii Nunchuck Controller
