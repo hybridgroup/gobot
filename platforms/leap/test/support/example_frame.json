@@ -1,0 +1,277 @@
+{
+  "currentFrameRate": 115.473,
+  "gestures": [
+    {
+      "direction": [
+        -0.647384,
+        0.750476,
+        -0.132964
+      ],
+      "duration": 0,
+      "handIds": [
+        57
+      ],
+      "id": 72,
+      "pointableIds": [
+        14
+      ],
+      "position": [
+        117.665,
+        313.471,
+        27.2095
+      ],
+      "speed": 1050.66,
+      "startPosition": [
+        195.438,
+        223.313,
+        43.183
+      ],
+      "state": "start",
+      "type": "swipe"
+    }
+  ],
+  "hands": [
+    {
+      "direction": [
+        0.772435,
+        0.520335,
+        -0.364136
+      ],
+      "id": 57,
+      "palmNormal": [
+        -0.0100593,
+        -0.563263,
+        -0.826217
+      ],
+      "palmPosition": [
+        117.546,
+        236.007,
+        76.3394
+      ],
+      "palmVelocity": [
+        -866.196,
+        -100.749,
+        275.692
+      ],
+      "r": [
+        [
+          0.999844,
+          0.0142022,
+          0.0105289
+        ],
+        [
+          -0.0141201,
+          0.99987,
+          -0.00783186
+        ],
+        [
+          -0.0106388,
+          0.00768197,
+          0.999914
+        ]
+      ],
+      "s": 0.992511,
+      "sphereCenter": [
+        156.775,
+        227.378,
+        48.3453
+      ],
+      "sphereRadius": 75.3216,
+      "stabilizedPalmPosition": [
+        119.009,
+        236.071,
+        75.951
+      ],
+      "t": [
+        -38.0468,
+        28.2341,
+        -21.3291
+      ],
+      "timeVisible": 0.051952
+    }
+  ],
+  "id": 99943,
+  "interactionBox": {
+    "center": [
+      0,
+      200,
+      0
+    ],
+    "size": [
+      221.418,
+      221.418,
+      154.742
+    ]
+  },
+  "pointables": [
+    {
+      "direction": [
+        0.54044,
+        0.174084,
+        -0.823176
+      ],
+      "handId": 57,
+      "id": 1,
+      "length": 48.393,
+      "stabilizedTipPosition": [
+        194.714,
+        291.812,
+        20.6219
+      ],
+      "timeVisible": 0.13873,
+      "tipPosition": [
+        194.714,
+        291.812,
+        20.6219
+      ],
+      "tipVelocity": [
+        -716.414,
+        686.468,
+        -427.914
+      ],
+      "tool": false,
+      "touchDistance": 0.333333,
+      "touchZone": "hovering"
+    },
+    {
+      "direction": [
+        0.655715,
+        0.423222,
+        -0.625237
+      ],
+      "handId": 57,
+      "id": 69,
+      "length": 43.4594,
+      "stabilizedTipPosition": [
+        166.231,
+        308.631,
+        21.1697
+      ],
+      "timeVisible": 0.156012,
+      "tipPosition": [
+        166.231,
+        308.631,
+        21.1697
+      ],
+      "tipVelocity": [
+        -817.678,
+        511.988,
+        -496.456
+      ],
+      "tool": false,
+      "touchDistance": 0.333333,
+      "touchZone": "hovering"
+    },
+    {
+      "direction": [
+        0.593251,
+        0.566682,
+        -0.571773
+      ],
+      "handId": 57,
+      "id": 14,
+      "length": 47.3576,
+      "stabilizedTipPosition": [
+        119.328,
+        312.537,
+        27.7416
+      ],
+      "timeVisible": 0.164757,
+      "tipPosition": [
+        117.665,
+        313.471,
+        27.2095
+      ],
+      "tipVelocity": [
+        -779.297,
+        651.055,
+        -269.665
+      ],
+      "tool": false,
+      "touchDistance": 0.333333,
+      "touchZone": "hovering"
+    },
+    {
+      "direction": [
+        0.292649,
+        -0.45091,
+        -0.84323
+      ],
+      "handId": 57,
+      "id": 29,
+      "length": 57.4251,
+      "stabilizedTipPosition": [
+        223.535,
+        239.849,
+        37.7847
+      ],
+      "timeVisible": 0.086657,
+      "tipPosition": [
+        223.535,
+        239.849,
+        37.7847
+      ],
+      "tipVelocity": [
+        -929.251,
+        390.064,
+        -506.855
+      ],
+      "tool": false,
+      "touchDistance": 0.333333,
+      "touchZone": "hovering"
+    },
+    {
+      "direction": [
+        0.887561,
+        0.160925,
+        0.43167
+      ],
+      "handId": -1,
+      "id": 83,
+      "length": 64.4149,
+      "stabilizedTipPosition": [
+        1.8725087977383e-321,
+        2.1433800000305e-314,
+        2.1681499999593e-314
+      ],
+      "timeVisible": 0.034634,
+      "tipPosition": [
+        196.31,
+        166.58,
+        102.577
+      ],
+      "tipVelocity": [
+        -478.099,
+        493.551,
+        -417.63
+      ],
+      "tool": false,
+      "touchDistance": 0.0166667,
+      "touchZone": "none"
+    }
+  ],
+  "r": [
+    [
+      -0.973344,
+      0.0737047,
+      0.217182
+    ],
+    [
+      -0.0241526,
+      0.908749,
+      -0.416645
+    ],
+    [
+      -0.228073,
+      -0.410784,
+      -0.882745
+    ]
+  ],
+  "s": -34.3848,
+  "t": [
+    -10091.8,
+    -24629.7,
+    1011.04
+  ],
+  "timestamp": 4729292670
+}

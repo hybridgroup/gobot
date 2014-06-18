@@ -1,90 +1,112 @@
 package gobot
 
-import "fmt"
+import (
+	"fmt"
+	"reflect"
+	"runtime"
+	"strings"
+	"testing"
+)
+
+func Expect(t *testing.T, a interface{}, b interface{}) {
+	if !reflect.DeepEqual(a, b) {
+		_, file, line, _ := runtime.Caller(1)
+		s := strings.Split(file, "/")
+		t.Errorf("%v:%v Got %v - type %v, Expected %v - type %v", s[len(s)-1], line, a, reflect.TypeOf(a), b, reflect.TypeOf(b))
+	}
+}
 
 type testStruct struct {
 	i int
 	f float64
 }
 
-func (me *testStruct) Hello(name string, message string) string {
+func NewTestStruct() *testStruct {
+	return &testStruct{
+		i: 10,
+		f: 0.2,
+	}
+}
+
+func (t *testStruct) Hello(name string, message string) string {
 	return fmt.Sprintf("Hello %v! %v", name, message)
 }
 
-type null struct{}
+type NullReadWriteCloser struct{}
 
-func (null) Write(p []byte) (int, error) {
+func (NullReadWriteCloser) Write(p []byte) (int, error) {
 	return len(p), nil
+}
+
+func (NullReadWriteCloser) Read(b []byte) (int, error) {
+	return len(b), nil
+}
+func (NullReadWriteCloser) Close() error {
+	return nil
 }
 
 type testDriver struct {
 	Driver
-	Adaptor *testAdaptor
 }
 
-func (me *testDriver) Init() bool  { return true }
-func (me *testDriver) Start() bool { return true }
-func (me *testDriver) Halt() bool  { return true }
-func (me *testDriver) TestDriverCommand(params map[string]interface{}) string {
-	name := params["name"].(string)
-	return fmt.Sprintf("hello %v", name)
+func (t *testDriver) Init() bool  { return true }
+func (t *testDriver) Start() bool { return true }
+func (t *testDriver) Halt() bool  { return true }
+
+func NewTestDriver(name string, adaptor *testAdaptor) *testDriver {
+	t := &testDriver{
+		Driver: Driver{
+			Commands: make(map[string]func(map[string]interface{}) interface{}),
+			Name:     name,
+			Adaptor:  adaptor,
+		},
+	}
+
+	t.Driver.AddCommand("TestDriverCommand", func(params map[string]interface{}) interface{} {
+		name := params["name"].(string)
+		return fmt.Sprintf("hello %v", name)
+	})
+
+	t.Driver.AddCommand("DriverCommand", func(params map[string]interface{}) interface{} {
+		name := params["name"].(string)
+		return fmt.Sprintf("hello %v", name)
+	})
+
+	return t
 }
 
 type testAdaptor struct {
 	Adaptor
 }
 
-func (me *testAdaptor) Finalize() bool { return true }
-func (me *testAdaptor) Connect() bool  { return true }
+func (t *testAdaptor) Finalize() bool { return true }
+func (t *testAdaptor) Connect() bool  { return true }
 
-func newTestDriver(name string, adaptor *testAdaptor) *testDriver {
-	d := new(testDriver)
-	d.Name = name
-	d.Adaptor = adaptor
-	d.Commands = []string{
-		"TestDriverCommand",
-		"DriverCommand",
-	}
-	return d
-}
-
-func newTestAdaptor(name string) *testAdaptor {
-	a := new(testAdaptor)
-	a.Name = name
-	a.Params = map[string]interface{}{
-		"param1": "1",
-		"param2": 2,
-	}
-	return a
-}
-
-func robotTestFunction(params map[string]interface{}) string {
-	message := params["message"].(string)
-	robotname := params["robotname"].(string)
-	return fmt.Sprintf("hey %v, %v", robotname, message)
-}
-
-func newTestRobot(name string) *Robot {
-	adaptor1 := newTestAdaptor("Connection 1")
-	adaptor2 := newTestAdaptor("Connection 2")
-	adaptor3 := newTestAdaptor("Connection 3")
-	driver1 := newTestDriver("Device 1", adaptor1)
-	driver2 := newTestDriver("Device 2", adaptor2)
-	driver3 := newTestDriver("Device 3", adaptor3)
-	return &Robot{
-		Name:        name,
-		Connections: []Connection{adaptor1, adaptor2, adaptor3},
-		Devices:     []Device{driver1, driver2, driver3},
-		Work:        func() {},
-		Commands: map[string]interface{}{
-			"robotTestFunction": robotTestFunction,
+func NewTestAdaptor(name string) *testAdaptor {
+	return &testAdaptor{
+		Adaptor: Adaptor{
+			Name: name,
+			Params: map[string]interface{}{
+				"param1": "1",
+				"param2": 2,
+			},
 		},
 	}
 }
 
-func newTestStruct() *testStruct {
-	s := new(testStruct)
-	s.i = 10
-	s.f = 0.2
-	return s
+func NewTestRobot(name string) *Robot {
+	adaptor1 := NewTestAdaptor("Connection 1")
+	adaptor2 := NewTestAdaptor("Connection 2")
+	adaptor3 := NewTestAdaptor("Connection 3")
+	driver1 := NewTestDriver("Device 1", adaptor1)
+	driver2 := NewTestDriver("Device 2", adaptor2)
+	driver3 := NewTestDriver("Device 3", adaptor3)
+	work := func() {}
+	r := NewRobot(name, []Connection{adaptor1, adaptor2, adaptor3}, []Device{driver1, driver2, driver3}, work)
+	r.AddCommand("robotTestFunction", func(params map[string]interface{}) interface{} {
+		message := params["message"].(string)
+		robot := params["robot"].(string)
+		return fmt.Sprintf("hey %v, %v", robot, message)
+	})
+	return r
 }

@@ -3,22 +3,22 @@ package main
 import (
 	"fmt"
 	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/api"
 )
 
-func Hello(params map[string]interface{}) string {
-	name := params["name"].(string)
-	return fmt.Sprintf("hi %v", name)
-}
-
 func main() {
-	master := gobot.GobotMaster()
-	api := gobot.Api(master)
-	api.Username = "gort"
-	api.Password = "klatuu"
+	master := gobot.NewGobot()
 
-	hello := new(gobot.Robot)
-	hello.Name = "hello"
-	hello.Commands = map[string]interface{}{"Hello": Hello}
+	server := api.NewAPI(master)
+	server.Username = "gort"
+	server.Password = "klatuu"
+	server.Start()
+
+	hello := gobot.NewRobot("hello", nil, nil, nil)
+
+	hello.AddCommand("HiThere", func(params map[string]interface{}) interface{} {
+		return []string{fmt.Sprintf("Hey"), fmt.Sprintf("dude!")}
+	})
 
 	master.Robots = append(master.Robots, hello)
 

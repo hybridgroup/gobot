@@ -1,0 +1,103 @@
+{
+    "name": "PowerA MINI PROEX Controller",
+    "guid": "30001983600083000100",
+    "hats": [
+        {
+            "hat": 0,
+            "name": "down",
+            "id": 4
+        },
+        {
+            "hat": 0,
+            "name": "up",
+            "id": 1
+        },
+        {
+            "hat": 0,
+            "name": "left",
+            "id": 8
+        },
+        {
+            "hat": 0,
+            "name": "right",
+            "id": 2
+        },
+        {
+            "hat": 0,
+            "name": "released",
+            "id": 0
+        }
+    ],
+    "axis": [
+        {
+            "name": "left_x",
+            "id": 0
+        },
+        {
+            "name": "left_y",
+            "id": 1
+        },
+        {
+            "name": "right_x",
+            "id": 3
+        },
+        {
+            "name": "right_y",
+            "id": 4
+        },
+        {
+            "name": "rt",
+            "id": 5
+        },
+        {
+            "name": "lt",
+            "id": 2
+        }
+    ],
+    "buttons": [
+        {
+            "name": "x",
+            "id": 2
+        },
+        {
+            "name": "a",
+            "id": 0
+        },
+        {
+            "name": "b",
+            "id": 1
+        },
+        {
+            "name": "y",
+            "id": 3
+        },
+        {
+            "name": "lb",
+            "id": 4
+        },
+        {
+            "name": "rb",
+            "id": 5
+        },
+        {
+            "name": "back",
+            "id": 6
+        },
+        {
+            "name": "start",
+            "id": 7
+        },
+        {
+            "name": "home",
+            "id": 8
+        },
+        {
+            "name": "right_stick",
+            "id": 10
+        },
+        {
+            "name": "left_stick",
+            "id": 9
+        }
+    ]
+}

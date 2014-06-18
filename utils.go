@@ -3,61 +3,40 @@ package gobot
 import (
 	"math"
 	"math/rand"
-	"reflect"
 	"time"
 )
 
-func Every(t string, f func()) {
-	dur := parseDuration(t)
+// Every triggers f every `t` time until the end of days.
+func Every(t time.Duration, f func()) {
+	c := time.Tick(t)
+	// start a go routine to not bloc the function
 	go func() {
 		for {
-			time.Sleep(dur)
+			// wait for the ticker to tell us to run
+			<-c
+			// run the passed function in another go routine
+			// so we don't slow down the loop.
 			go f()
 		}
 	}()
 }
 
-func After(t string, f func()) {
-	dur := parseDuration(t)
-	go func() {
-		time.Sleep(dur)
-		f()
-	}()
+// After triggers the passed function after `t` duration.
+func After(t time.Duration, f func()) {
+	time.AfterFunc(t, f)
 }
 
-func Publish(c chan interface{}, val interface{}) {
-	select {
-	case c <- val:
-	default:
-	}
+func Publish(e *Event, val interface{}) {
+	e.Write(val)
 }
 
-func On(c chan interface{}, f func(s interface{})) {
-	go func() {
-		for s := range c {
-			f(s)
-		}
-	}()
+func On(e *Event, f func(s interface{})) {
+	e.Callbacks = append(e.Callbacks, f)
 }
 
 func Rand(max int) int {
-	rand.Seed(time.Now().UTC().UnixNano())
-	return rand.Intn(max)
-}
-
-func Call(thing interface{}, method string, params ...interface{}) []reflect.Value {
-	in := make([]reflect.Value, len(params))
-	for k, param := range params {
-		in[k] = reflect.ValueOf(param)
-	}
-	return reflect.ValueOf(thing).MethodByName(method).Call(in)
-}
-
-func FieldByName(thing interface{}, field string) reflect.Value {
-	return reflect.ValueOf(thing).FieldByName(field)
-}
-func FieldByNamePtr(thing interface{}, field string) reflect.Value {
-	return reflect.ValueOf(thing).Elem().FieldByName(field)
+	r := rand.New(rand.NewSource(time.Now().UTC().UnixNano()))
+	return r.Intn(max)
 }
 
 func FromScale(input, min, max float64) float64 {
@@ -73,12 +52,4 @@ func ToScale(input, min, max float64) float64 {
 	} else {
 		return i
 	}
-}
-
-func parseDuration(t string) time.Duration {
-	dur, err := time.ParseDuration(t)
-	if err != nil {
-		panic(err)
-	}
-	return dur
 }

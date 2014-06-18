@@ -3,23 +3,21 @@ package main
 import (
 	"fmt"
 	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/api"
 )
 
-func Hello(params map[string]interface{}) string {
-	name := params["name"].(string)
-	return fmt.Sprintf("hi %v", name)
-}
-
 func main() {
-	master := gobot.GobotMaster()
-	api := gobot.Api(master)
-	api.Port = "4000"
+	gbot := gobot.NewGobot()
+	api.NewAPI(gbot).Start()
 
-	hello := new(gobot.Robot)
-	hello.Name = "hello"
-	hello.Commands = map[string]interface{}{"Hello": Hello}
+	gbot.AddCommand("CustomGobotCommand", func(params map[string]interface{}) interface{} {
+		return "This command is attached to the master!"
+	})
 
-	master.Robots = append(master.Robots, hello)
+	hello := gbot.AddRobot(gobot.NewRobot("hello"))
+	hello.AddCommand("HiThere", func(params map[string]interface{}) interface{} {
+		return fmt.Sprintf("This command is attached to the robot %v", hello.Name)
+	})
 
-	master.Start()
+	gbot.Start()
 }

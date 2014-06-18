@@ -2,45 +2,40 @@ package main
 
 import (
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot-sphero"
+	"github.com/hybridgroup/gobot/platforms/sphero"
+	"time"
 )
 
 func main() {
-	master := gobot.GobotMaster()
+	master := gobot.NewGobot()
 
 	spheros := map[string]string{
 		"Sphero-BPO": "/dev/rfcomm0",
 	}
 
 	for name, port := range spheros {
-		spheroAdaptor := new(gobotSphero.SpheroAdaptor)
-		spheroAdaptor.Name = "sphero"
-		spheroAdaptor.Port = port
+		spheroAdaptor := sphero.NewSpheroAdaptor("sphero", port)
 
-		sphero := gobotSphero.NewSphero(spheroAdaptor)
-		sphero.Name = "sphero"
-		sphero.Interval = "0.5s"
+		spheroDriver := sphero.NewSpheroDriver(spheroAdaptor, "sphero")
 
 		work := func() {
-			sphero.SetRGB(uint8(255), uint8(0), uint8(0))
+			spheroDriver.SetRGB(uint8(255), uint8(0), uint8(0))
 		}
 
-		master.Robots = append(master.Robots, &gobot.Robot{
-			Name:        name,
-			Connections: []gobot.Connection{spheroAdaptor},
-			Devices:     []gobot.Device{sphero},
-			Work:        work,
-		})
+		master.Robots = append(master.Robots,
+			gobot.NewRobot(name, []gobot.Connection{spheroAdaptor}, []gobot.Device{spheroDriver}, work))
 	}
 
-	master.Robots = append(master.Robots, &gobot.Robot{
-		Work: func() {
-			sphero := master.FindRobot("Sphero-BPO")
-			gobot.Every("1s", func() {
-				gobot.Call(sphero.GetDevice("sphero").Driver, "SetRGB", uint8(gobot.Rand(255)), uint8(gobot.Rand(255)), uint8(gobot.Rand(255)))
+	master.Robots = append(master.Robots, gobot.NewRobot(
+		"",
+		nil,
+		nil,
+		func() {
+			gobot.Every(1*time.Second, func() {
+				gobot.Call(master.Robot("Sphero-BPO").Device("sphero").Driver, "SetRGB", uint8(gobot.Rand(255)), uint8(gobot.Rand(255)), uint8(gobot.Rand(255)))
 			})
 		},
-	})
+	))
 
 	master.Start()
 }
