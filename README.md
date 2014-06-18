@@ -1,4 +1,4 @@
-[![Gobot](https://raw.github.com/hybridgroup/gobot/gh-pages/images/elements/logo.png)](http://gobot.io/)
+[![Gobot](https://cdn.rawgit.com/hybridgroup/gobot-site/master/source/images/elements/gophy.png)](http://gobot.io/)
 
 http://gobot.io/
 
@@ -90,7 +90,7 @@ Gobot has a extensible system for connecting to hardware devices. The following 
   
 
 Support for many devices that use General Purpose Input/Output (GPIO) have
-a shared set of drivers provded using the cylon-gpio module:
+a shared set of drivers provided using the cylon-gpio module:
 
   - [GPIO](https://en.wikipedia.org/wiki/General_Purpose_Input/Output) <=> [Drivers](https://github.com/hybridgroup/tree/dev/platforms/gpio)
     - Analog Sensor
@@ -101,7 +101,7 @@ a shared set of drivers provded using the cylon-gpio module:
     - Servo
 
 Support for devices that use Inter-Integrated Circuit (I2C) have a shared set of
-drivers provded using the gobot-i2c module:
+drivers provided using the gobot-i2c module:
 
   - [I2C](https://en.wikipedia.org/wiki/I%C2%B2C) <=> [Drivers](https://github.com/hybridgroup/tree/dev/platforms/i2c)
     - BlinkM
