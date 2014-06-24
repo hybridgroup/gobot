@@ -16,20 +16,30 @@ type Robot struct {
 	Name        string
 	Commands    map[string]func(map[string]interface{}) interface{}
 	Work        func()
-	connections connections
-	devices     devices
+	connections *connections
+	devices     *devices
 }
 
-type Robots []*Robot
+type robots struct {
+	robots []*Robot
+}
 
-func (r Robots) Start() {
-	for _, robot := range r {
+func (r *robots) Len() int {
+	return len(r.robots)
+}
+func (r *robots) Add(robot *Robot) *Robot {
+	r.robots = append(r.robots, robot)
+	return robot
+}
+
+func (r *robots) Start() {
+	for _, robot := range r.robots {
 		robot.Start()
 	}
 }
 
-func (r Robots) Each(f func(*Robot)) {
-	for _, robot := range r {
+func (r *robots) Each(f func(*Robot)) {
+	for _, robot := range r.robots {
 		f(robot)
 	}
 }
@@ -41,28 +51,28 @@ func NewRobot(name string, v ...interface{}) *Robot {
 	r := &Robot{
 		Name:        name,
 		Commands:    make(map[string]func(map[string]interface{}) interface{}),
-		connections: connections{},
-		devices:     devices{},
+		connections: &connections{},
+		devices:     &devices{},
 	}
 
 	log.Println("Initializing Robot", r.Name, "...")
 	if len(v) > 0 {
 		if v[0] == nil {
-			v[0] = []Connection{}
+			v[0] = connections{}
 		}
 		log.Println("Initializing connections...")
-		for _, connection := range v[0].([]Connection) {
-			c := r.AddConnection(connection)
+		for _, connection := range v[0].([]AdaptorInterface) {
+			c := r.Connections().Add(connection)
 			log.Println("Initializing connection", c.name(), "...")
 		}
 	}
 	if len(v) > 1 {
 		if v[1] == nil {
-			v[1] = []Device{}
+			v[1] = devices{}
 		}
 		log.Println("Initializing devices...")
-		for _, device := range v[1].([]Device) {
-			d := r.AddDevice(device)
+		for _, device := range v[1].([]DriverInterface) {
+			d := r.Devices().Add(device)
 			log.Println("Initializing device", d.name(), "...")
 		}
 	}
@@ -73,18 +83,6 @@ func NewRobot(name string, v ...interface{}) *Robot {
 		r.Work = v[2].(func())
 	}
 	return r
-}
-
-func (r *Robot) AddDevice(d Device) *device {
-	device := NewDevice(d, r)
-	r.devices = append(r.devices, device)
-	return device
-}
-
-func (r *Robot) AddConnection(c Connection) *connection {
-	connection := NewConnection(c, r)
-	r.connections = append(r.connections, connection)
-	return connection
 }
 
 func (r *Robot) AddCommand(name string, f func(map[string]interface{}) interface{}) {
@@ -105,32 +103,32 @@ func (r *Robot) Start() {
 	}
 }
 
-func (r *Robot) Devices() devices {
-	return devices(r.devices)
+func (r *Robot) Devices() *devices {
+	return r.devices
 }
 
-func (r *Robot) Device(name string) *device {
+func (r *Robot) Device(name string) DriverInterface {
 	if r == nil {
 		return nil
 	}
-	for _, device := range r.devices {
-		if device.Name == name {
+	for _, device := range r.devices.devices {
+		if device.name() == name {
 			return device
 		}
 	}
 	return nil
 }
 
-func (r *Robot) Connections() connections {
-	return connections(r.connections)
+func (r *Robot) Connections() *connections {
+	return r.connections
 }
 
-func (r *Robot) Connection(name string) *connection {
+func (r *Robot) Connection(name string) AdaptorInterface {
 	if r == nil {
 		return nil
 	}
-	for _, connection := range r.connections {
-		if connection.Name == name {
+	for _, connection := range r.connections.connections {
+		if connection.name() == name {
 			return connection
 		}
 	}
@@ -144,13 +142,15 @@ func (r *Robot) ToJSON() *JSONRobot {
 		Connections: []*JSONConnection{},
 		Devices:     []*JSONDevice{},
 	}
+
 	for command := range r.Commands {
 		jsonRobot.Commands = append(jsonRobot.Commands, command)
 	}
-	for _, device := range r.Devices() {
+
+	r.Devices().Each(func(device DriverInterface) {
 		jsonDevice := device.ToJSON()
 		jsonRobot.Connections = append(jsonRobot.Connections, jsonDevice.Connection)
 		jsonRobot.Devices = append(jsonRobot.Devices, jsonDevice)
-	}
+	})
 	return jsonRobot
 }

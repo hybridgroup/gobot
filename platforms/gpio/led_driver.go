@@ -7,36 +7,38 @@ import (
 type LedDriver struct {
 	gobot.Driver
 	High bool
+	Pin  string
 }
 
-func NewLedDriver(a PwmDigitalWriter, name string, pin string) *LedDriver {
+func NewLedDriver(name string, a PwmDigitalWriter, pin string) *LedDriver {
 	l := &LedDriver{
-		Driver: gobot.Driver{
-			Name:     name,
-			Pin:      pin,
-			Commands: make(map[string]func(map[string]interface{}) interface{}),
-			Adaptor:  a.(gobot.AdaptorInterface),
-		},
+		Driver: *gobot.NewDriver(
+			name,
+			"LedDriver",
+			gobot.Commands{},
+			a.(gobot.AdaptorInterface),
+		),
+		Pin:  pin,
 		High: false,
 	}
 
-	l.Driver.AddCommand("Brightness", func(params map[string]interface{}) interface{} {
+	l.Driver.Commands().Add("Brightness", func(params map[string]interface{}) interface{} {
 		level := byte(params["level"].(float64))
 		l.Brightness(level)
 		return nil
 	})
 
-	l.Driver.AddCommand("Toggle", func(params map[string]interface{}) interface{} {
+	l.Driver.Commands().Add("Toggle", func(params map[string]interface{}) interface{} {
 		l.Toggle()
 		return nil
 	})
 
-	l.Driver.AddCommand("On", func(params map[string]interface{}) interface{} {
+	l.Driver.Commands().Add("On", func(params map[string]interface{}) interface{} {
 		l.On()
 		return nil
 	})
 
-	l.Driver.AddCommand("Off", func(params map[string]interface{}) interface{} {
+	l.Driver.Commands().Add("Off", func(params map[string]interface{}) interface{} {
 		l.Off()
 		return nil
 	})
