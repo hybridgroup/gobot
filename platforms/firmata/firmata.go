@@ -249,12 +249,12 @@ func (b *board) process(data []byte) {
 		if err != nil {
 			break
 		}
-		switch messageType {
-		case ReportVersion:
+		switch {
+		case ReportVersion == messageType:
 			b.MajorVersion, _ = buf.ReadByte()
 			b.MinorVersion, _ = buf.ReadByte()
 			b.Events = append(b.Events, event{Name: "report_version"})
-		case AnalogMessage:
+		case AnalogMessageRangeStart <= messageType && AnalogMessageRangeEnd >= messageType:
 			leastSignificantByte, _ := buf.ReadByte()
 			mostSignificantByte, _ := buf.ReadByte()
 
@@ -264,7 +264,7 @@ func (b *board) process(data []byte) {
 			b.Pins[b.AnalogPins[pin]].Value = int(value)
 			b.Events = append(b.Events, event{Name: fmt.Sprintf("analog_read_%v", pin), Data: []byte{byte(value >> 24), byte(value >> 16), byte(value >> 8), byte(value & 0xff)}})
 
-		case DigitalMessage:
+		case DigitalMessageRangeStart <= messageType && DigitalMessageRangeEnd >= messageType:
 			port := messageType & 0x0F
 			firstBitmask, _ := buf.ReadByte()
 			secondBitmask, _ := buf.ReadByte()
@@ -279,7 +279,7 @@ func (b *board) process(data []byte) {
 				}
 			}
 
-		case StartSysex:
+		case StartSysex == messageType:
 			currentBuffer := []byte{messageType}
 			for {
 				b, err := buf.ReadByte()
