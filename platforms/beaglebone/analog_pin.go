@@ -13,22 +13,11 @@ type analogPin struct {
 }
 
 func newAnalogPin(pinNum string) *analogPin {
-	var err error
-	var fi *os.File
+	ensureSlot("cape-bone-iio")
 
 	d := new(analogPin)
 	d.pinNum = pinNum
 
-	slot, err := filepath.Glob(Slots)
-	if err != nil {
-		panic(err)
-	}
-	fi, err = os.OpenFile(fmt.Sprintf("%v/slots", slot[0]), os.O_WRONLY|os.O_APPEND, 0666)
-	if err != nil {
-		panic(err)
-	}
-	fi.WriteString("cape-bone-iio")
-	fi.Close()
 	return d
 }
 

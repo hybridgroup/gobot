@@ -19,19 +19,9 @@ func newPwmPin(pinNum string) *pwmPin {
 
 	d := new(pwmPin)
 	d.pinNum = strings.ToUpper(pinNum)
-	slots, err := filepath.Glob(Slots)
-	if err != nil {
-		panic(err)
-	}
-	fi, err = os.OpenFile(fmt.Sprintf("%v/slots", slots[0]), os.O_WRONLY|os.O_APPEND, 0666)
-	if err != nil {
-		panic(err)
-	}
-	fi.WriteString("am33xx_pwm")
-	fi.Sync()
-	fi.WriteString(fmt.Sprintf("bone_pwm_%v", d.pinNum))
-	fi.Sync()
-	fi.Close()
+
+	ensureSlot("am33xx_pwm")
+	ensureSlot(fmt.Sprintf("bone_pwm_%v", d.pinNum))
 
 	ocp, err := filepath.Glob(Ocp)
 	if err != nil {
