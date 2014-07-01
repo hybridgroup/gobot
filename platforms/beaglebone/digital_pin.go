@@ -71,6 +71,18 @@ func (d *digitalPin) digitalWrite(value string) {
 	d.PinFile.Sync()
 }
 
+func (d *digitalPin) digitalRead() int {
+	if d.Mode != "r" {
+		d.setMode("r")
+	}
+
+	var buf []byte = make([]byte, 1)
+	d.PinFile.ReadAt(buf, 0)
+
+	i, _ := strconv.Atoi(string(buf[0]))
+	return i
+}
+
 func (d *digitalPin) close() {
 	fi, err := os.OpenFile(GPIOPath+"/unexport", os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
