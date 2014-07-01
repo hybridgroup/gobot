@@ -13,8 +13,6 @@ type analogPin struct {
 }
 
 func newAnalogPin(pinNum string) *analogPin {
-	ensureSlot("cape-bone-iio")
-
 	d := new(analogPin)
 	d.pinNum = pinNum
 

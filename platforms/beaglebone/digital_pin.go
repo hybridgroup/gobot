@@ -26,8 +26,9 @@ func newDigitalPin(pinNum int, mode string) *digitalPin {
 	if err != nil {
 		panic(err)
 	}
+	defer fi.Close()
+
 	fi.WriteString(d.PinNum)
-	fi.Close()
 
 	d.setMode(mode)
 

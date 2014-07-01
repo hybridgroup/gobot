@@ -5,7 +5,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 )
 
 type pwmPin struct {
@@ -17,10 +16,10 @@ func newPwmPin(pinNum string) *pwmPin {
 	var err error
 	var fi *os.File
 
-	d := new(pwmPin)
-	d.pinNum = strings.ToUpper(pinNum)
+	d := &pwmPin{
+		pinNum: strings.ToUpper(pinNum),
+	}
 
-	ensureSlot("am33xx_pwm")
 	ensureSlot(fmt.Sprintf("bone_pwm_%v", d.pinNum))
 
 	ocp, err := filepath.Glob(Ocp)
@@ -32,18 +31,32 @@ func newPwmPin(pinNum string) *pwmPin {
 	if err != nil {
 		panic(err)
 	}
+
 	d.pwmDevice = pwmDevice[0]
 
 	for i := 0; i < 10; i++ {
-		fi, err = os.OpenFile(fmt.Sprintf("%v/run", d.pwmDevice), os.O_WRONLY|os.O_APPEND, 0666)
+		fi, err = os.OpenFile(fmt.Sprintf("%v/run", d.pwmDevice), os.O_RDWR|os.O_APPEND, 0666)
 		if err != nil && i == 9 {
 			panic(err)
+		} else {
+			break
 		}
-		time.Sleep(10 * time.Millisecond)
 	}
+
 	fi.WriteString("1")
+	fi.Sync()
 	fi.Close()
 
+	for {
+		if _, err := os.Stat(fmt.Sprintf("%v/period", d.pwmDevice)); err == nil {
+			break
+		}
+	}
+	for {
+		if _, err := os.Stat(fmt.Sprintf("%v/duty", d.pwmDevice)); err == nil {
+			break
+		}
+	}
 	return d
 }
 

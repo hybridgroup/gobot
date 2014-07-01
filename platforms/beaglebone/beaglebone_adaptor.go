@@ -3,13 +3,11 @@ package beaglebone
 import (
 	"bufio"
 	"fmt"
+	"github.com/hybridgroup/gobot"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
-	"time"
-
-	"github.com/hybridgroup/gobot"
 )
 
 const Slots = "/sys/devices/bone_capemgr.*"
@@ -110,12 +108,17 @@ type BeagleboneAdaptor struct {
 	pwmPins     map[string]*pwmPin
 	analogPins  map[string]*analogPin
 	i2cDevice   *i2cDevice
+	connect     func()
 }
 
 func NewBeagleboneAdaptor(name string) *BeagleboneAdaptor {
 	return &BeagleboneAdaptor{
 		Adaptor: gobot.Adaptor{
 			Name: name,
+		},
+		connect: func() {
+			ensureSlot("cape-bone-iio")
+			ensureSlot("am33xx_pwm")
 		},
 	}
 }
@@ -124,6 +127,7 @@ func (b *BeagleboneAdaptor) Connect() bool {
 	b.digitalPins = make([]*digitalPin, 120)
 	b.pwmPins = make(map[string]*pwmPin)
 	b.analogPins = make(map[string]*analogPin)
+	b.connect()
 	return true
 }
 
@@ -256,10 +260,11 @@ func ensureSlot(item string) {
 	if err != nil {
 		panic(err)
 	}
-	fi, err = os.OpenFile(fmt.Sprintf("%v/slots", slot[0]), os.O_WRONLY|os.O_APPEND, 0666)
+	fi, err = os.OpenFile(fmt.Sprintf("%v/slots", slot[0]), os.O_RDWR|os.O_APPEND, 0666)
 	if err != nil {
 		panic(err)
 	}
+	defer fi.Close()
 
 	//ensure the slot is not already written into the capemanager (from: https://github.com/mrmorphic/hwio/blob/master/module_bb_pwm.go#L190)
 	scanner := bufio.NewScanner(fi)
@@ -272,8 +277,12 @@ func ensureSlot(item string) {
 
 	fi.WriteString(item)
 	fi.Sync()
-	fi.Close()
 
-	// delay a little as it seems to take a bit of time set enable the slot (from: https://github.com/mrmorphic/hwio/blob/master/module_bb_pwm.go#L201)
-	time.Sleep(100 * time.Millisecond)
+	scanner = bufio.NewScanner(fi)
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.Index(line, item) > 0 {
+			return
+		}
+	}
 }
