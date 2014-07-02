@@ -12,3 +12,18 @@ cover:
 		cat tmp.cov | grep -v "mode: count" >> profile.cov ; \
 	done ; \
 	rm tmp.cov ; \
+
+robeaux:
+ifeq (,$(shell which go-bindata))
+	$(error robeaux not built! https://github.com/jteeuwen/go-bindata is required to build robeaux assets )
+endif
+	cd api ; \
+	git clone --depth 1 git://github.com/hybridgroup/robeaux.git ; \
+	cd robeaux ; \
+	echo "Updating robeaux to $(shell git rev-parse HEAD)" ; \
+	go-bindata -pkg="api" -o robeaux.go -ignore=\\.git ./... ; \
+	mv robeaux.go .. ; \
+	cd .. ; \
+	rm -rf robeaux/ ; \
+	go fmt ./robeaux.go ; \
+	

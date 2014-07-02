@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 )
 
 // Optional restful API through Gobot has access
@@ -45,6 +46,7 @@ func NewAPI(g *gobot.Gobot) *api {
 
 			log.Println("Initializing API on " + host + ":" + port + "...")
 			http.Handle("/", a.server)
+
 			go func() {
 				if cert != "" && key != "" {
 					http.ListenAndServeTLS(host+":"+port, cert, key, nil)
@@ -82,6 +84,12 @@ func (a *api) Start() {
 	a.server.Post(deviceCommandRoute, a.setHeaders(a.executeDeviceCommand))
 	a.server.Get("/robots/:robot/connections", a.setHeaders(a.robotConnections))
 	a.server.Get("/robots/:robot/connections/:connection", a.setHeaders(a.robotConnection))
+	a.server.Get("/:a", a.setHeaders(a.robeaux))
+	a.server.Get("/:a/", a.setHeaders(a.robeaux))
+	a.server.Get("/:a/:b", a.setHeaders(a.robeaux))
+	a.server.Get("/:a/:b/", a.setHeaders(a.robeaux))
+	a.server.Get("/:a/:b/:c", a.setHeaders(a.robeaux))
+	a.server.Get("/:a/:b/:c/", a.setHeaders(a.robeaux))
 
 	a.start(a)
 }
@@ -116,6 +124,23 @@ func (a *api) setHeaders(f func(http.ResponseWriter, *http.Request)) http.Handle
 		}
 		f(res, req)
 	}
+}
+
+func (a *api) robeaux(res http.ResponseWriter, req *http.Request) {
+	path := req.URL.Path
+	buf, err := Asset(path[1:])
+	if err != nil {
+		log.Println("Error serving static file:", err.Error())
+		res.Write([]byte(err.Error()))
+		return
+	}
+	t := strings.Split(path, ".")
+	if t[len(t)-1] == "js" {
+		res.Header().Set("Content-Type", "text/javascript; charset=utf-8")
+	} else if t[len(t)-1] == "css" {
+		res.Header().Set("Content-Type", "text/css; charset=utf-8")
+	}
+	res.Write(buf)
 }
 
 func (a *api) root(res http.ResponseWriter, req *http.Request) {
