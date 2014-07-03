@@ -11,20 +11,22 @@ type JSONConnection struct {
 	Adaptor string `json:"adaptor"`
 }
 
+type Connection AdaptorInterface
+
 type connections struct {
-	connections []AdaptorInterface
+	connections []Connection
 }
 
 func (c *connections) Len() int {
 	return len(c.connections)
 }
 
-func (c *connections) Add(a AdaptorInterface) AdaptorInterface {
+func (c *connections) Add(a Connection) Connection {
 	c.connections = append(c.connections, a)
 	return a
 }
 
-func (c *connections) Each(f func(AdaptorInterface)) {
+func (c *connections) Each(f func(Connection)) {
 	for _, connection := range c.connections {
 		f(connection)
 	}

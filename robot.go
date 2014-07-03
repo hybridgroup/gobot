@@ -61,7 +61,7 @@ func NewRobot(name string, v ...interface{}) *Robot {
 			v[0] = connections{}
 		}
 		log.Println("Initializing connections...")
-		for _, connection := range v[0].([]AdaptorInterface) {
+		for _, connection := range v[0].([]Connection) {
 			c := r.Connections().Add(connection)
 			log.Println("Initializing connection", c.name(), "...")
 		}
@@ -71,7 +71,7 @@ func NewRobot(name string, v ...interface{}) *Robot {
 			v[1] = devices{}
 		}
 		log.Println("Initializing devices...")
-		for _, device := range v[1].([]DriverInterface) {
+		for _, device := range v[1].([]Device) {
 			d := r.Devices().Add(device)
 			log.Println("Initializing device", d.name(), "...")
 		}
@@ -147,7 +147,7 @@ func (r *Robot) ToJSON() *JSONRobot {
 		jsonRobot.Commands = append(jsonRobot.Commands, command)
 	}
 
-	r.Devices().Each(func(device DriverInterface) {
+	r.Devices().Each(func(device Device) {
 		jsonDevice := device.ToJSON()
 		jsonRobot.Connections = append(jsonRobot.Connections, jsonDevice.Connection)
 		jsonRobot.Devices = append(jsonRobot.Devices, jsonDevice)

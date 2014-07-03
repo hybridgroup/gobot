@@ -12,20 +12,22 @@ type JSONDevice struct {
 	Commands   []string        `json:"commands"`
 }
 
+type Device DriverInterface
+
 type devices struct {
-	devices []DriverInterface
+	devices []Device
 }
 
 func (d *devices) Len() int {
 	return len(d.devices)
 }
 
-func (d *devices) Add(dev DriverInterface) DriverInterface {
+func (d *devices) Add(dev Device) Device {
 	d.devices = append(d.devices, dev)
 	return dev
 }
 
-func (d *devices) Each(f func(DriverInterface)) {
+func (d *devices) Each(f func(Device)) {
 	for _, device := range d.devices {
 		f(device)
 	}
