@@ -56,7 +56,7 @@ func (t *testDriver) Halt() bool  { return true }
 func NewTestDriver(name string, adaptor *testAdaptor) *testDriver {
 	t := &testDriver{
 		Driver: Driver{
-			Commands: make(map[string]func(map[string]interface{}) interface{}),
+			commands: make(map[string]func(map[string]interface{}) interface{}),
 			Name:     name,
 			Adaptor:  adaptor,
 		},
@@ -102,7 +102,7 @@ func NewTestRobot(name string) *Robot {
 	driver2 := NewTestDriver("Device 2", adaptor2)
 	driver3 := NewTestDriver("Device 3", adaptor3)
 	work := func() {}
-	r := NewRobot(name, []AdaptorInterface{adaptor1, adaptor2, adaptor3}, []DriverInterface{driver1, driver2, driver3}, work)
+	r := NewRobot(name, []Connection{adaptor1, adaptor2, adaptor3}, []Device{driver1, driver2, driver3}, work)
 	r.AddCommand("robotTestFunction", func(params map[string]interface{}) interface{} {
 		message := params["message"].(string)
 		robot := params["robot"].(string)

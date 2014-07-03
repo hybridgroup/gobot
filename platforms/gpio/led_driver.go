@@ -15,30 +15,29 @@ func NewLedDriver(name string, a PwmDigitalWriter, pin string) *LedDriver {
 		Driver: *gobot.NewDriver(
 			name,
 			"LedDriver",
-			gobot.Commands{},
 			a.(gobot.AdaptorInterface),
 		),
 		Pin:  pin,
 		High: false,
 	}
 
-	l.Driver.Commands().Add("Brightness", func(params map[string]interface{}) interface{} {
+	l.Driver.AddCommand("Brightness", func(params map[string]interface{}) interface{} {
 		level := byte(params["level"].(float64))
 		l.Brightness(level)
 		return nil
 	})
 
-	l.Driver.Commands().Add("Toggle", func(params map[string]interface{}) interface{} {
+	l.Driver.AddCommand("Toggle", func(params map[string]interface{}) interface{} {
 		l.Toggle()
 		return nil
 	})
 
-	l.Driver.Commands().Add("On", func(params map[string]interface{}) interface{} {
+	l.Driver.AddCommand("On", func(params map[string]interface{}) interface{} {
 		l.On()
 		return nil
 	})
 
-	l.Driver.Commands().Add("Off", func(params map[string]interface{}) interface{} {
+	l.Driver.AddCommand("Off", func(params map[string]interface{}) interface{} {
 		l.Off()
 		return nil
 	})

@@ -17,6 +17,7 @@ type AdaptorInterface interface {
 	name() string
 	setName(string)
 	params() map[string]interface{}
+	ToJSON() *JSONConnection
 }
 
 func (a *Adaptor) port() string {

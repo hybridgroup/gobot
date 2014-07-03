@@ -18,11 +18,9 @@ func initTestAPI() *api {
 	a.start = func(m *api) {}
 	a.Start()
 
-	g.Robots = []*gobot.Robot{
-		gobot.NewTestRobot("Robot 1"),
-		gobot.NewTestRobot("Robot 2"),
-		gobot.NewTestRobot("Robot 3"),
-	}
+	g.Robots().Add(gobot.NewTestRobot("Robot 1"))
+	g.Robots().Add(gobot.NewTestRobot("Robot 2"))
+	g.Robots().Add(gobot.NewTestRobot("Robot 3"))
 
 	return a
 }

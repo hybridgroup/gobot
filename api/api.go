@@ -132,9 +132,9 @@ func (a *api) commands(res http.ResponseWriter, req *http.Request) {
 
 func (a *api) robots(res http.ResponseWriter, req *http.Request) {
 	jsonRobots := []*gobot.JSONRobot{}
-	for _, robot := range a.gobot.Robots {
-		jsonRobots = append(jsonRobots, robot.ToJSON())
-	}
+	a.gobot.Robots().Each(func(r *gobot.Robot) {
+		jsonRobots = append(jsonRobots, r.ToJSON())
+	})
 	data, _ := json.Marshal(jsonRobots)
 	res.Header().Set("Content-Type", "application/json; charset=utf-8")
 	res.Write(data)
@@ -159,11 +159,10 @@ func (a *api) robotCommands(res http.ResponseWriter, req *http.Request) {
 func (a *api) robotDevices(res http.ResponseWriter, req *http.Request) {
 	robot := req.URL.Query().Get(":robot")
 
-	devices := a.gobot.Robot(robot).Devices()
 	jsonDevices := []*gobot.JSONDevice{}
-	for _, device := range devices {
-		jsonDevices = append(jsonDevices, device.ToJSON())
-	}
+	a.gobot.Robot(robot).Devices().Each(func(d gobot.Device) {
+		jsonDevices = append(jsonDevices, d.ToJSON())
+	})
 	data, _ := json.Marshal(jsonDevices)
 	res.Header().Set("Content-Type", "application/json; charset=utf-8")
 	res.Write(data)
@@ -190,11 +189,10 @@ func (a *api) robotDeviceCommands(res http.ResponseWriter, req *http.Request) {
 func (a *api) robotConnections(res http.ResponseWriter, req *http.Request) {
 	robot := req.URL.Query().Get(":robot")
 
-	connections := a.gobot.Robot(robot).Connections()
 	jsonConnections := []*gobot.JSONConnection{}
-	for _, connection := range connections {
-		jsonConnections = append(jsonConnections, connection.ToJSON())
-	}
+	a.gobot.Robot(robot).Connections().Each(func(c gobot.Connection) {
+		jsonConnections = append(jsonConnections, c.ToJSON())
+	})
 	data, _ := json.Marshal(jsonConnections)
 	res.Header().Set("Content-Type", "application/json; charset=utf-8")
 	res.Write(data)
@@ -215,7 +213,7 @@ func (a *api) executeCommand(res http.ResponseWriter, req *http.Request) {
 	data, _ := ioutil.ReadAll(req.Body)
 	body := make(map[string]interface{})
 	json.Unmarshal(data, &body)
-	f := a.gobot.Commands[command]
+	f := a.gobot.Commands()[command]
 
 	if f != nil {
 		data, _ = json.Marshal(f(body))

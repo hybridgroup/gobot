@@ -13,21 +13,21 @@ type JSONGobot struct {
 
 type Gobot struct {
 	robots   *robots
-	commands commands
+	commands map[string]func(map[string]interface{}) interface{}
 	trap     func(chan os.Signal)
 }
 
 func NewGobot() *Gobot {
 	return &Gobot{
 		robots:   &robots{},
-		commands: make(commands),
+		commands: make(map[string]func(map[string]interface{}) interface{}),
 		trap: func(c chan os.Signal) {
 			signal.Notify(c, os.Interrupt)
 		},
 	}
 }
 
-func (g *Gobot) Commands() commands {
+func (g *Gobot) Commands() map[string]func(map[string]interface{}) interface{} {
 	return g.commands
 }
 
@@ -65,9 +65,9 @@ func (g *Gobot) ToJSON() *JSONGobot {
 		Commands: []string{},
 	}
 
-	g.commands.Each(func(c Command) {
-		jsonGobot.Commands = append(jsonGobot.Commands, c.Name)
-	})
+	for command := range g.Commands() {
+		jsonGobot.Commands = append(jsonGobot.Commands, command)
+	}
 
 	g.robots.Each(func(r *Robot) {
 		jsonGobot.Robots = append(jsonGobot.Robots, r.ToJSON())

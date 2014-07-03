@@ -107,7 +107,7 @@ func (r *Robot) Devices() *devices {
 	return r.devices
 }
 
-func (r *Robot) Device(name string) DriverInterface {
+func (r *Robot) Device(name string) Device {
 	if r == nil {
 		return nil
 	}
@@ -123,7 +123,7 @@ func (r *Robot) Connections() *connections {
 	return r.connections
 }
 
-func (r *Robot) Connection(name string) AdaptorInterface {
+func (r *Robot) Connection(name string) Connection {
 	if r == nil {
 		return nil
 	}

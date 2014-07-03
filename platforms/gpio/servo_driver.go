@@ -12,10 +12,9 @@ type ServoDriver struct {
 func NewServoDriver(a Servo, name string, pin string) *ServoDriver {
 	s := &ServoDriver{
 		Driver: gobot.Driver{
-			Name:     name,
-			Pin:      pin,
-			Commands: make(map[string]func(map[string]interface{}) interface{}),
-			Adaptor:  a.(gobot.AdaptorInterface),
+			Name:    name,
+			Pin:     pin,
+			Adaptor: a.(gobot.AdaptorInterface),
 		},
 		CurrentAngle: 0,
 	}

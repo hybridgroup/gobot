@@ -10,7 +10,7 @@ type Driver struct {
 	Interval time.Duration
 	Pin      string
 	Name     string
-	Commands map[string]func(map[string]interface{}) interface{}
+	commands map[string]func(map[string]interface{}) interface{}
 	Events   map[string]*Event
 	Type     string
 }
@@ -23,7 +23,7 @@ type DriverInterface interface {
 	interval() time.Duration
 	setName(string)
 	name() string
-	commands() map[string]func(map[string]interface{}) interface{}
+	Commands() map[string]func(map[string]interface{}) interface{}
 	ToJSON() *JSONDevice
 }
 
@@ -47,15 +47,15 @@ func (d *Driver) name() string {
 	return d.Name
 }
 
-func (d *Driver) commands() map[string]func(map[string]interface{}) interface{} {
-	return d.Commands
+func (d *Driver) Commands() map[string]func(map[string]interface{}) interface{} {
+	return d.commands
 }
 
 func (d *Driver) AddCommand(name string, f func(map[string]interface{}) interface{}) {
-	d.Commands[name] = f
+	d.Commands()[name] = f
 }
 
-func NewDriver(name string, t string, commands Commands, a AdaptorInterface) *Driver {
+func NewDriver(name string, t string, a AdaptorInterface) *Driver {
 	if name == "" {
 		name = fmt.Sprintf("%X", Rand(int(^uint(0)>>1)))
 	}
@@ -63,7 +63,7 @@ func NewDriver(name string, t string, commands Commands, a AdaptorInterface) *Dr
 		Type:     t,
 		Name:     name,
 		Interval: 10 * time.Millisecond,
-		Commands: commands,
+		commands: make(map[string]func(map[string]interface{}) interface{}),
 		Adaptor:  a,
 	}
 }
@@ -77,10 +77,10 @@ func (d *Driver) ToJSON() *JSONDevice {
 	}
 
 	if d.adaptor() != nil {
-		//jsonDevice.Connection = d.Robot.Connection(d.adaptor().name()).ToJSON()
+		jsonDevice.Connection = d.adaptor().ToJSON()
 	}
 
-	commands := d.commands()
+	commands := d.Commands()
 	for command := range commands {
 		jsonDevice.Commands = append(jsonDevice.Commands, command)
 	}
