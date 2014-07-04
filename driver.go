@@ -36,36 +36,34 @@ type Driver struct {
 }
 
 func NewDriver(name string, driverType string, v ...interface{}) *Driver {
-	interval := 10 * time.Millisecond
-	pin := ""
-	var adaptor AdaptorInterface
-
 	if name == "" {
 		name = fmt.Sprintf("%X", Rand(int(^uint(0)>>1)))
+	}
+
+	d := &Driver{
+		driverType: driverType,
+		name:       name,
+		interval:   10 * time.Millisecond,
+		commands:   make(map[string]func(map[string]interface{}) interface{}),
+		events:     make(map[string]*Event),
+		adaptor:    nil,
+		pin:        "",
 	}
 
 	for i := range v {
 		switch v[i].(type) {
 		case string:
-			pin = v[i].(string)
+			d.pin = v[i].(string)
 		case AdaptorInterface:
-			adaptor = v[i].(AdaptorInterface)
+			d.adaptor = v[i].(AdaptorInterface)
 		case time.Duration:
-			interval = v[i].(time.Duration)
+			d.interval = v[i].(time.Duration)
 		default:
 			fmt.Println("Unknown argument passed to NewDriver")
 		}
 	}
 
-	return &Driver{
-		driverType: driverType,
-		name:       name,
-		interval:   interval,
-		commands:   make(map[string]func(map[string]interface{}) interface{}),
-		events:     make(map[string]*Event),
-		adaptor:    adaptor,
-		pin:        pin,
-	}
+	return d
 }
 
 func (d *Driver) Adaptor() AdaptorInterface {

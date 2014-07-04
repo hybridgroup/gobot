@@ -85,8 +85,8 @@ func (t *testAdaptor) Connect() bool  { return true }
 func NewTestAdaptor(name string) *testAdaptor {
 	return &testAdaptor{
 		Adaptor: Adaptor{
-			Name: name,
-			Params: map[string]interface{}{
+			name: name,
+			params: map[string]interface{}{
 				"param1": "1",
 				"param2": 2,
 			},

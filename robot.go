@@ -48,40 +48,38 @@ func NewRobot(name string, v ...interface{}) *Robot {
 	if name == "" {
 		name = fmt.Sprintf("%X", Rand(int(^uint(0)>>1)))
 	}
+
 	r := &Robot{
 		Name:        name,
 		commands:    make(map[string]func(map[string]interface{}) interface{}),
 		connections: &connections{},
 		devices:     &devices{},
+		Work:        nil,
 	}
 
 	log.Println("Initializing Robot", r.Name, "...")
-	if len(v) > 0 {
-		if v[0] == nil {
-			v[0] = connections{}
-		}
-		log.Println("Initializing connections...")
-		for _, connection := range v[0].([]Connection) {
-			c := r.Connections().Add(connection)
-			log.Println("Initializing connection", c.name(), "...")
+
+	for i := range v {
+		switch v[i].(type) {
+		case []Connection:
+			log.Println("Initializing connections...")
+			for _, connection := range v[i].([]Connection) {
+				c := r.Connections().Add(connection)
+				log.Println("Initializing connection", c.Name(), "...")
+			}
+		case []Device:
+			log.Println("Initializing devices...")
+			for _, device := range v[i].([]Device) {
+				d := r.Devices().Add(device)
+				log.Println("Initializing device", d.Name(), "...")
+			}
+		case func():
+			r.Work = v[i].(func())
+		default:
+			fmt.Println("Unknown argument passed to NewRobot")
 		}
 	}
-	if len(v) > 1 {
-		if v[1] == nil {
-			v[1] = devices{}
-		}
-		log.Println("Initializing devices...")
-		for _, device := range v[1].([]Device) {
-			d := r.Devices().Add(device)
-			log.Println("Initializing device", d.Name(), "...")
-		}
-	}
-	if len(v) > 2 {
-		if v[2] == nil {
-			v[2] = func() {}
-		}
-		r.Work = v[2].(func())
-	}
+
 	return r
 }
 
@@ -136,7 +134,7 @@ func (r *Robot) Connection(name string) Connection {
 		return nil
 	}
 	for _, connection := range r.connections.connections {
-		if connection.name() == name {
+		if connection.Name() == name {
 			return connection
 		}
 	}

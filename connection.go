@@ -37,7 +37,11 @@ func (c connections) Start() error {
 	var err error
 	log.Println("Starting connections...")
 	for _, connection := range c.connections {
-		log.Println("Starting connection " + connection.name() + "...")
+		info := "Starting connection " + connection.Name()
+		if connection.Port() != "" {
+			info = info + " on Port " + connection.Port()
+		}
+		log.Println(info + "...")
 		if connection.Connect() == false {
 			err = errors.New("Could not start connection")
 			break
