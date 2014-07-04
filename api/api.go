@@ -213,7 +213,7 @@ func (a *api) executeCommand(res http.ResponseWriter, req *http.Request) {
 	data, _ := ioutil.ReadAll(req.Body)
 	body := make(map[string]interface{})
 	json.Unmarshal(data, &body)
-	f := a.gobot.Commands()[command]
+	f := a.gobot.Command(command)
 
 	if f != nil {
 		data, _ = json.Marshal(f(body))
@@ -235,7 +235,7 @@ func (a *api) executeDeviceCommand(res http.ResponseWriter, req *http.Request) {
 	json.Unmarshal(data, &body)
 	d := a.gobot.Robot(robot).Device(device)
 	body["robot"] = robot
-	f := d.Commands()[command]
+	f := d.Command(command)
 
 	if f != nil {
 		data, _ = json.Marshal(f(body))
@@ -256,7 +256,7 @@ func (a *api) executeRobotCommand(res http.ResponseWriter, req *http.Request) {
 	json.Unmarshal(data, &body)
 	r := a.gobot.Robot(robot)
 	body["robot"] = robot
-	f := r.Commands[command]
+	f := r.Command(command)
 
 	if f != nil {
 		data, _ = json.Marshal(f(body))

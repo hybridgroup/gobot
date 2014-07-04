@@ -57,8 +57,8 @@ func NewTestDriver(name string, adaptor *testAdaptor) *testDriver {
 	t := &testDriver{
 		Driver: Driver{
 			commands: make(map[string]func(map[string]interface{}) interface{}),
-			Name:     name,
-			Adaptor:  adaptor,
+			name:     name,
+			adaptor:  adaptor,
 		},
 	}
 

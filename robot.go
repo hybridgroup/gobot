@@ -14,7 +14,7 @@ type JSONRobot struct {
 
 type Robot struct {
 	Name        string
-	Commands    map[string]func(map[string]interface{}) interface{}
+	commands    map[string]func(map[string]interface{}) interface{}
 	Work        func()
 	connections *connections
 	devices     *devices
@@ -50,7 +50,7 @@ func NewRobot(name string, v ...interface{}) *Robot {
 	}
 	r := &Robot{
 		Name:        name,
-		Commands:    make(map[string]func(map[string]interface{}) interface{}),
+		commands:    make(map[string]func(map[string]interface{}) interface{}),
 		connections: &connections{},
 		devices:     &devices{},
 	}
@@ -73,7 +73,7 @@ func NewRobot(name string, v ...interface{}) *Robot {
 		log.Println("Initializing devices...")
 		for _, device := range v[1].([]Device) {
 			d := r.Devices().Add(device)
-			log.Println("Initializing device", d.name(), "...")
+			log.Println("Initializing device", d.Name(), "...")
 		}
 	}
 	if len(v) > 2 {
@@ -86,7 +86,15 @@ func NewRobot(name string, v ...interface{}) *Robot {
 }
 
 func (r *Robot) AddCommand(name string, f func(map[string]interface{}) interface{}) {
-	r.Commands[name] = f
+	r.commands[name] = f
+}
+
+func (r *Robot) Commands() map[string]func(map[string]interface{}) interface{} {
+	return r.commands
+}
+
+func (r *Robot) Command(name string) func(map[string]interface{}) interface{} {
+	return r.commands[name]
 }
 
 func (r *Robot) Start() {
@@ -112,7 +120,7 @@ func (r *Robot) Device(name string) Device {
 		return nil
 	}
 	for _, device := range r.devices.devices {
-		if device.name() == name {
+		if device.Name() == name {
 			return device
 		}
 	}
@@ -143,7 +151,7 @@ func (r *Robot) ToJSON() *JSONRobot {
 		Devices:     []*JSONDevice{},
 	}
 
-	for command := range r.Commands {
+	for command := range r.Commands() {
 		jsonRobot.Commands = append(jsonRobot.Commands, command)
 	}
 

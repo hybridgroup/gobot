@@ -27,8 +27,16 @@ func NewGobot() *Gobot {
 	}
 }
 
+func (g *Gobot) AddCommand(name string, f func(map[string]interface{}) interface{}) {
+	g.commands[name] = f
+}
+
 func (g *Gobot) Commands() map[string]func(map[string]interface{}) interface{} {
 	return g.commands
+}
+
+func (g *Gobot) Command(name string) func(map[string]interface{}) interface{} {
+	return g.commands[name]
 }
 
 func (g *Gobot) Start() {

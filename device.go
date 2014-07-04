@@ -38,7 +38,7 @@ func (d devices) Start() error {
 	var err error
 	log.Println("Starting devices...")
 	for _, device := range d.devices {
-		log.Println("Starting device " + device.name() + "...")
+		log.Println("Starting device " + device.Name() + "...")
 		if device.Start() == false {
 			err = errors.New("Could not start device")
 			break
