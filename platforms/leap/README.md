@@ -1,4 +1,4 @@
-# Leap 
+# Leap
 
 This package provides the Gobot adaptor and driver for the [Leap Motion](https://www.leapmotion.com/)
 
@@ -8,7 +8,7 @@ First install the [Leap Motion Software](https://www.leapmotion.com/setup)
 
 Now you can install the package with
 ```
-go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/platforms/leap
+go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/leap
 ```
 
 ## Example
