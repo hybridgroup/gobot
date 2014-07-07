@@ -12,11 +12,11 @@ type BlinkMDriver struct {
 
 func NewBlinkMDriver(a I2cInterface, name string) *BlinkMDriver {
 	b := &BlinkMDriver{
-		Driver: gobot.Driver{
-			Name:     name,
-			Commands: make(map[string]func(map[string]interface{}) interface{}),
-			Adaptor:  a.(gobot.AdaptorInterface),
-		},
+		Driver: *gobot.NewDriver(
+			name,
+			"BlinkMDriver",
+			a.(gobot.AdaptorInterface),
+		),
 	}
 
 	b.Driver.AddCommand("FirmwareVersion", func(params map[string]interface{}) interface{} {
@@ -44,7 +44,7 @@ func NewBlinkMDriver(a I2cInterface, name string) *BlinkMDriver {
 }
 
 func (b *BlinkMDriver) adaptor() I2cInterface {
-	return b.Driver.Adaptor.(I2cInterface)
+	return b.Driver.Adaptor().(I2cInterface)
 }
 
 func (b *BlinkMDriver) Start() bool {
