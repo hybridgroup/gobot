@@ -107,9 +107,10 @@ type BeagleboneAdaptor struct {
 
 func NewBeagleboneAdaptor(name string) *BeagleboneAdaptor {
 	return &BeagleboneAdaptor{
-		Adaptor: gobot.Adaptor{
-			Name: name,
-		},
+		Adaptor: *gobot.NewAdaptor(
+			name,
+			"BeagleboneAdaptor",
+		),
 	}
 }
 
