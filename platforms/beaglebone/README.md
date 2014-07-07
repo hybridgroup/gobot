@@ -6,7 +6,7 @@ This package provides the Gobot adaptor for the [Beaglebone Black](http://beagle
 
 ## Installing
 ```
-go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/platforms/beaglebone
+go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/platforms/gobot/beaglebone
 ```
 
 ## Cross compiling for the Beaglebone Black

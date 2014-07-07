@@ -20,9 +20,9 @@ $ brew install sdl2
 $ sudo apt-get install libsdl2-2.0-0
 ```
 
-Now you can install the package with 
+Now you can install the package with
 ```
-go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/platforms/joystick
+go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/joystick
 ```
 
 ## Usage

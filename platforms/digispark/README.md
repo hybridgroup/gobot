@@ -22,9 +22,9 @@ To install libusb on linux:
 $ sudo apt-get install libusb-dev
 ```
 
-Now you can install the package with 
+Now you can install the package with
 ```
-go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/platforms/digispark
+go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/digispark
 ```
 
 ## Examples
@@ -57,7 +57,7 @@ func main() {
 ```
 ## Connecting to Digispark
 
-If your Digispark already has the Little Wire protocol firmware installed, you can connect right away with Gobot. 
+If your Digispark already has the Little Wire protocol firmware installed, you can connect right away with Gobot.
 
 Otherwise, for instructions on how to install Little Wire on a Digispark check out http://digistump.com/board/index.php/topic,160.0.html
 

@@ -1,11 +1,11 @@
 # Firmata
 
-This package provides the adaptor for microcontrollers such as Arduino that support the [Firmata](http://firmata.org/wiki/Main_Page) protocol 
+This package provides the adaptor for microcontrollers such as Arduino that support the [Firmata](http://firmata.org/wiki/Main_Page) protocol
 
 ## Getting Started
 
 ```
-go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/platforms/firmata
+go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/firmata
 ```
 
 ## Example
