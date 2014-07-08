@@ -58,6 +58,10 @@ func (g *Gobot) Robots() *robots {
 	return g.robots
 }
 
+func (g *Gobot) AddRobot(r *Robot) *Robot {
+	return g.Robots().Add(r)
+}
+
 func (g *Gobot) Robot(name string) *Robot {
 	for _, robot := range g.Robots().robots {
 		if robot.Name == name {

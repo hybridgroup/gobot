@@ -113,6 +113,10 @@ func (r *Robot) Devices() *devices {
 	return r.devices
 }
 
+func (r *Robot) AddDevice(d Device) Device {
+	return r.Devices().Add(d)
+}
+
 func (r *Robot) Device(name string) Device {
 	if r == nil {
 		return nil
@@ -127,6 +131,10 @@ func (r *Robot) Device(name string) Device {
 
 func (r *Robot) Connections() *connections {
 	return r.connections
+}
+
+func (r *Robot) AddConnection(c Connection) Connection {
+	return r.Connections().Add(c)
 }
 
 func (r *Robot) Connection(name string) Connection {
