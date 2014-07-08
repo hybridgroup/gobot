@@ -18,6 +18,7 @@ func NewAnalogSensorDriver(a AnalogReader, name string, pin string) *AnalogSenso
 		),
 	}
 
+	d.AddEvent("data")
 	d.Driver.AddCommand("Read", func(params map[string]interface{}) interface{} {
 		return d.Read()
 	})
@@ -29,9 +30,19 @@ func (a *AnalogSensorDriver) adaptor() AnalogReader {
 	return a.Driver.Adaptor().(AnalogReader)
 }
 
-func (a *AnalogSensorDriver) Start() bool { return true }
-func (a *AnalogSensorDriver) Init() bool  { return true }
-func (a *AnalogSensorDriver) Halt() bool  { return true }
+func (a *AnalogSensorDriver) Start() bool {
+	value := 0
+	gobot.Every(a.Interval(), func() {
+		newValue := a.Read()
+		if newValue != value && newValue != -1 {
+			value = newValue
+			gobot.Publish(a.Event("data"), value)
+		}
+	})
+	return true
+}
+func (a *AnalogSensorDriver) Init() bool { return true }
+func (a *AnalogSensorDriver) Halt() bool { return true }
 
 func (a *AnalogSensorDriver) Read() int {
 	return a.adaptor().AnalogRead(a.Pin())

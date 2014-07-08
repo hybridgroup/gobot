@@ -5,7 +5,6 @@ import (
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/firmata"
 	"github.com/hybridgroup/gobot/platforms/gpio"
-	"time"
 )
 
 func main() {
@@ -15,10 +14,9 @@ func main() {
 	led := gpio.NewLedDriver(firmataAdaptor, "led", "3")
 
 	work := func() {
-		gobot.Every(100*time.Millisecond, func() {
-			val := sensor.Read()
-			brightness := uint8(gobot.ToScale(gobot.FromScale(float64(val), 0, 1024), 0, 255))
-			fmt.Println("sensor", val)
+		gobot.On(sensor.Events["data"], func(data interface{}) {
+			brightness := uint8(gobot.ToScale(gobot.FromScale(float64(data.(int)), 0, 1024), 0, 255))
+			fmt.Println("sensor", data)
 			fmt.Println("brightness", brightness)
 			led.Brightness(brightness)
 		})

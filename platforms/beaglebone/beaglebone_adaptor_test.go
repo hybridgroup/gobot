@@ -6,7 +6,9 @@ import (
 )
 
 func initTestBeagleboneAdaptor() *BeagleboneAdaptor {
-	return NewBeagleboneAdaptor("bot")
+	b := NewBeagleboneAdaptor("bot")
+	b.connect = func() {}
+	return b
 }
 
 func TestBeagleboneAdaptorFinalize(t *testing.T) {
