@@ -9,8 +9,9 @@ import (
 
 func main() {
 	gbot := gobot.NewGobot()
+
 	firmataAdaptor := firmata.NewFirmataAdaptor("firmata", "/dev/ttyACM0")
-	led := gpio.NewLedDriver(firmataAdaptor, "led", "3")
+	led := gpio.NewLedDriver("led", firmataAdaptor, "3")
 
 	work := func() {
 		brightness := uint8(0)
@@ -25,8 +26,13 @@ func main() {
 		})
 	}
 
-	gbot.Robots = append(gbot.Robots,
-		gobot.NewRobot("pwmBot", []gobot.Connection{firmataAdaptor}, []gobot.Device{led}, work))
-	gbot.Start()
+	robot := gobot.NewRobot("pwmBot",
+		[]gobot.Connection{firmataAdaptor},
+		[]gobot.Device{led},
+		work,
+	)
 
+	gbot.AddRobot(robot)
+
+	gbot.Start()
 }

@@ -21,7 +21,7 @@ func main() {
 	work := func() {
 		var image *cv.IplImage
 
-		gobot.On(camera.Events["Frame"], func(data interface{}) {
+		gobot.On(camera.Event("frame"), func(data interface{}) {
 			image = data.(*cv.IplImage)
 		})
 
@@ -36,8 +36,13 @@ func main() {
 		})
 	}
 
-	gbot.Robots = append(gbot.Robots,
-		gobot.NewRobot("faceBot", []gobot.Connection{}, []gobot.Device{window, camera}, work))
+	robot := gobot.NewRobot("faceBot",
+		[]gobot.Connection{},
+		[]gobot.Device{window, camera},
+		work,
+	)
+
+	gbot.AddRobot(robot)
 
 	gbot.Start()
 }

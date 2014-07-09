@@ -14,16 +14,22 @@ func main() {
 	button := gpio.NewMakeyButtonDriver(beagleboneAdaptor, "button", "P8_9")
 
 	work := func() {
-		gobot.On(button.Events["push"], func(data interface{}) {
+		gobot.On(button.Event("push"), func(data interface{}) {
 			fmt.Println("button pressed")
 		})
 
-		gobot.On(button.Events["release"], func(data interface{}) {
+		gobot.On(button.Event("release"), func(data interface{}) {
 			fmt.Println("button released")
 		})
 	}
 
-	gbot.Robots = append(gbot.Robots,
-		gobot.NewRobot("makeyBot", []gobot.Connection{beagleboneAdaptor}, []gobot.Device{button}, work))
+	robot := gobot.NewRobot("makeyBot",
+		[]gobot.Connection{beagleboneAdaptor},
+		[]gobot.Device{button},
+		work,
+	)
+
+	gbot.AddRobot(robot)
+
 	gbot.Start()
 }

@@ -10,7 +10,7 @@ import (
 func main() {
 	gbot := gobot.NewGobot()
 	digisparkAdaptor := digispark.NewDigisparkAdaptor("Digispark")
-	led := gpio.NewLedDriver(digisparkAdaptor, "led", "0")
+	led := gpio.NewLedDriver("led", digisparkAdaptor, "0")
 
 	work := func() {
 		gobot.Every(1*time.Second, func() {
@@ -18,7 +18,13 @@ func main() {
 		})
 	}
 
-	gbot.Robots = append(gbot.Robots,
-		gobot.NewRobot("blinkBot", []gobot.Connection{digisparkAdaptor}, []gobot.Device{led}, work))
+	robot := gobot.NewRobot("blinkBot",
+		[]gobot.Connection{digisparkAdaptor},
+		[]gobot.Device{led},
+		work,
+	)
+
+	gbot.AddRobot(robot)
+
 	gbot.Start()
 }

@@ -11,7 +11,7 @@ func main() {
 	gbot := gobot.NewGobot()
 
 	digisparkAdaptor := digispark.NewDigisparkAdaptor("digispark")
-	led := gpio.NewLedDriver(digisparkAdaptor, "led", "0")
+	led := gpio.NewLedDriver("led", digisparkAdaptor, "0")
 
 	work := func() {
 		brightness := uint8(0)
@@ -26,7 +26,13 @@ func main() {
 		})
 	}
 
-	gbot.Robots = append(gbot.Robots,
-		gobot.NewRobot("pwmBot", []gobot.Connection{digisparkAdaptor}, []gobot.Device{led}, work))
+	robot := gobot.NewRobot("pwmBot",
+		[]gobot.Connection{digisparkAdaptor},
+		[]gobot.Device{led},
+		work,
+	)
+
+	gbot.AddRobot(robot)
+
 	gbot.Start()
 }

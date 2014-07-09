@@ -28,13 +28,13 @@ func main() {
 		detect := false
 		drone.TakeOff()
 		var image *cv.IplImage
-		gobot.On(camera.Events["Frame"], func(data interface{}) {
+		gobot.On(camera.Event("frame"), func(data interface{}) {
 			image = data.(*cv.IplImage)
 			if detect == false {
 				window.ShowImage(image)
 			}
 		})
-		gobot.On(drone.Events["Flying"], func(data interface{}) {
+		gobot.On(drone.Event("flying"), func(data interface{}) {
 			gobot.After(1*time.Second, func() { drone.Up(0.2) })
 			gobot.After(2*time.Second, func() { drone.Hover() })
 			gobot.After(5*time.Second, func() {
@@ -69,8 +69,13 @@ func main() {
 		})
 	}
 
-	gbot.Robots = append(gbot.Robots,
-		gobot.NewRobot("face", []gobot.Connection{ardroneAdaptor}, []gobot.Device{window, camera, drone}, work))
+	robot := gobot.NewRobot("face",
+		[]gobot.Connection{ardroneAdaptor},
+		[]gobot.Device{window, camera, drone},
+		work,
+	)
+
+	gbot.AddRobot(robot)
 
 	gbot.Start()
 }

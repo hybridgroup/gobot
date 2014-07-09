@@ -11,7 +11,7 @@ func main() {
 	gbot := gobot.NewGobot()
 
 	beagleboneAdaptor := beaglebone.NewBeagleboneAdaptor("beaglebone")
-	led := gpio.NewLedDriver(beagleboneAdaptor, "led", "P9_12")
+	led := gpio.NewLedDriver("led", beagleboneAdaptor, "P9_12")
 
 	work := func() {
 		gobot.Every(1*time.Second, func() {
@@ -19,7 +19,13 @@ func main() {
 		})
 	}
 
-	gbot.Robots = append(gbot.Robots,
-		gobot.NewRobot("blinkBot", []gobot.Connection{beagleboneAdaptor}, []gobot.Device{led}, work))
+	robot := gobot.NewRobot("blinkBot",
+		[]gobot.Connection{beagleboneAdaptor},
+		[]gobot.Device{led},
+		work,
+	)
+
+	gbot.AddRobot(robot)
+
 	gbot.Start()
 }

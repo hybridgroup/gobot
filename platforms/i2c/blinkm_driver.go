@@ -7,7 +7,6 @@ import (
 
 type BlinkMDriver struct {
 	gobot.Driver
-	Adaptor I2cInterface
 }
 
 func NewBlinkMDriver(a I2cInterface, name string) *BlinkMDriver {

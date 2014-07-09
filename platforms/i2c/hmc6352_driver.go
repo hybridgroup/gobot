@@ -6,7 +6,6 @@ import (
 
 type HMC6352Driver struct {
 	gobot.Driver
-	Adaptor I2cInterface
 	Heading uint16
 }
 

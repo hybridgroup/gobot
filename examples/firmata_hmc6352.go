@@ -10,8 +10,8 @@ import (
 
 func main() {
 	gbot := gobot.NewGobot()
-	firmataAdaptor := firmata.NewFirmataAdaptor("firmata", "/dev/ttyACM0")
 
+	firmataAdaptor := firmata.NewFirmataAdaptor("firmata", "/dev/ttyACM0")
 	hmc6352 := i2c.NewHMC6352Driver(firmataAdaptor, "hmc6352")
 
 	work := func() {
@@ -20,7 +20,13 @@ func main() {
 		})
 	}
 
-	gbot.Robots = append(gbot.Robots,
-		gobot.NewRobot("hmc6352Bot", []gobot.Connection{firmataAdaptor}, []gobot.Device{hmc6352}, work))
+	robot := gobot.NewRobot("hmc6352Bot",
+		[]gobot.Connection{firmataAdaptor},
+		[]gobot.Device{hmc6352},
+		work,
+	)
+
+	gbot.AddRobot(robot)
+
 	gbot.Start()
 }

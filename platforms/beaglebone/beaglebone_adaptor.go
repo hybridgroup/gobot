@@ -267,7 +267,8 @@ func ensureSlot(item string) {
 	}
 	defer fi.Close()
 
-	//ensure the slot is not already written into the capemanager (from: https://github.com/mrmorphic/hwio/blob/master/module_bb_pwm.go#L190)
+	// ensure the slot is not already written into the capemanager
+	// (from: https://github.com/mrmorphic/hwio/blob/master/module_bb_pwm.go#L190)
 	scanner := bufio.NewScanner(fi)
 	for scanner.Scan() {
 		line := scanner.Text()
