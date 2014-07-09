@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/firmata"
 	"github.com/hybridgroup/gobot/platforms/gpio"
@@ -12,7 +13,7 @@ func main() {
 
 	firmataAdaptor := firmata.NewFirmataAdaptor("firmata", "/dev/ttyACM0")
 	sensor := gpio.NewAnalogSensorDriver(firmataAdaptor, "sensor", "0")
-	led := gpio.NewLedDriver("led", firmataAdaptor, "3")
+	led := gpio.NewLedDriver(firmataAdaptor, "led", "3")
 
 	work := func() {
 		gobot.On(sensor.Event("data"), func(data interface{}) {

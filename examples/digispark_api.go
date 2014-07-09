@@ -13,7 +13,7 @@ func main() {
 	api.NewAPI(gbot).Start()
 
 	digisparkAdaptor := digispark.NewDigisparkAdaptor("Digispark")
-	led := gpio.NewLedDriver("led", digisparkAdaptor, "0")
+	led := gpio.NewLedDriver(digisparkAdaptor, "led", "0")
 
 	robot := gobot.NewRobot("digispark",
 		[]gobot.Connection{digisparkAdaptor},

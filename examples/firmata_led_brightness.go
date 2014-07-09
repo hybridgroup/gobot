@@ -1,17 +1,18 @@
 package main
 
 import (
+	"time"
+
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/firmata"
 	"github.com/hybridgroup/gobot/platforms/gpio"
-	"time"
 )
 
 func main() {
 	gbot := gobot.NewGobot()
 
 	firmataAdaptor := firmata.NewFirmataAdaptor("firmata", "/dev/ttyACM0")
-	led := gpio.NewLedDriver("led", firmataAdaptor, "3")
+	led := gpio.NewLedDriver(firmataAdaptor, "led", "3")
 
 	work := func() {
 		brightness := uint8(0)

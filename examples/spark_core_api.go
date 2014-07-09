@@ -1,11 +1,12 @@
 package main
 
 import (
+	"time"
+
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/api"
 	"github.com/hybridgroup/gobot/platforms/gpio"
 	"github.com/hybridgroup/gobot/platforms/spark"
-	"time"
 )
 
 func main() {
@@ -13,7 +14,7 @@ func main() {
 	api.NewAPI(gbot).Start()
 
 	sparkCore := spark.NewSparkCoreAdaptor("spark", "device_id", "access_token")
-	led := gpio.NewLedDriver("led", sparkCore, "D7")
+	led := gpio.NewLedDriver(sparkCore, "led", "D7")
 
 	work := func() {
 		gobot.Every(1*time.Second, func() {

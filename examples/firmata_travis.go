@@ -3,12 +3,13 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/firmata"
-	"github.com/hybridgroup/gobot/platforms/gpio"
 	"io/ioutil"
 	"net/http"
 	"time"
+
+	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/platforms/firmata"
+	"github.com/hybridgroup/gobot/platforms/gpio"
 )
 
 type TravisResponse struct {
@@ -66,9 +67,9 @@ func main() {
 	gbot := gobot.NewGobot()
 
 	firmataAdaptor := firmata.NewFirmataAdaptor("firmata", "/dev/ttyACM0")
-	red := gpio.NewLedDriver("red", firmataAdaptor, "7")
-	green := gpio.NewLedDriver("green", firmataAdaptor, "6")
-	blue := gpio.NewLedDriver("blue", firmataAdaptor, "5")
+	red := gpio.NewLedDriver(firmataAdaptor, "red", "7")
+	green := gpio.NewLedDriver(firmataAdaptor, "green", "6")
+	blue := gpio.NewLedDriver(firmataAdaptor, "blue", "5")
 
 	work := func() {
 		checkTravis(gbot.Robot("travis"))

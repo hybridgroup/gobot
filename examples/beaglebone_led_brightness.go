@@ -1,16 +1,17 @@
 package main
 
 import (
+	"time"
+
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/beaglebone"
 	"github.com/hybridgroup/gobot/platforms/gpio"
-	"time"
 )
 
 func main() {
 	gbot := gobot.NewGobot()
 	beagleboneAdaptor := beaglebone.NewBeagleboneAdaptor("beaglebone")
-	led := gpio.NewLedDriver("led", beagleboneAdaptor, "P9_14")
+	led := gpio.NewLedDriver(beagleboneAdaptor, "led", "P9_14")
 
 	work := func() {
 		brightness := uint8(0)

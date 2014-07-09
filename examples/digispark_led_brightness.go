@@ -1,17 +1,18 @@
 package main
 
 import (
+	"time"
+
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/digispark"
 	"github.com/hybridgroup/gobot/platforms/gpio"
-	"time"
 )
 
 func main() {
 	gbot := gobot.NewGobot()
 
 	digisparkAdaptor := digispark.NewDigisparkAdaptor("digispark")
-	led := gpio.NewLedDriver("led", digisparkAdaptor, "0")
+	led := gpio.NewLedDriver(digisparkAdaptor, "led", "0")
 
 	work := func() {
 		brightness := uint8(0)

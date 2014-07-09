@@ -12,7 +12,7 @@ func main() {
 	firmataAdaptor := firmata.NewFirmataAdaptor("myFirmata", "/dev/ttyACM0")
 
 	button := gpio.NewButtonDriver(firmataAdaptor, "myButton", "2")
-	led := gpio.NewLedDriver("myLed", firmataAdaptor, "13")
+	led := gpio.NewLedDriver(firmataAdaptor, "myLed", "13")
 
 	work := func() {
 		gobot.On(button.Event("push"), func(data interface{}) {

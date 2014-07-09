@@ -1,17 +1,18 @@
 package main
 
 import (
+	"time"
+
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/gpio"
 	"github.com/hybridgroup/gobot/platforms/spark"
-	"time"
 )
 
 func main() {
 	gbot := gobot.NewGobot()
 
 	sparkCore := spark.NewSparkCoreAdaptor("spark", "device_id", "access_token")
-	led := gpio.NewLedDriver("led", sparkCore, "A1")
+	led := gpio.NewLedDriver(sparkCore, "led", "A1")
 
 	work := func() {
 		brightness := uint8(0)
