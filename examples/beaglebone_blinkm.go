@@ -23,7 +23,13 @@ func main() {
 		})
 	}
 
-	gbot.Robots = append(gbot.Robots,
-		gobot.NewRobot("blinkmBot", []gobot.Connection{beagleboneAdaptor}, []gobot.Device{blinkm}, work))
+	robot := gobot.NewRobot("blinkmBot",
+		[]gobot.Connection{beagleboneAdaptor},
+		[]gobot.Device{blinkm},
+		work,
+	)
+
+	gbot.AddRobot(robot)
+
 	gbot.Start()
 }

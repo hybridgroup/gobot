@@ -23,18 +23,16 @@ type SpheroDriver struct {
 
 func NewSpheroDriver(a *SpheroAdaptor, name string) *SpheroDriver {
 	s := &SpheroDriver{
-		Driver: gobot.Driver{
-			Name: name,
-			Events: map[string]*gobot.Event{
-				"Collision": gobot.NewEvent(),
-			},
-			Commands: make(map[string]func(map[string]interface{}) interface{}),
-			Adaptor:  a,
-		},
+		Driver: *gobot.NewDriver(
+			name,
+			"SpheroDriver",
+			a,
+		),
 		packetChannel:   make(chan *packet, 1024),
 		responseChannel: make(chan []uint8, 1024),
 	}
 
+	s.AddEvent("collision")
 	s.Driver.AddCommand("SetRGB", func(params map[string]interface{}) interface{} {
 		r := uint8(params["r"].(float64))
 		g := uint8(params["g"].(float64))
@@ -80,7 +78,7 @@ func NewSpheroDriver(a *SpheroAdaptor, name string) *SpheroDriver {
 }
 
 func (s *SpheroDriver) adaptor() *SpheroAdaptor {
-	return s.Driver.Adaptor.(*SpheroAdaptor)
+	return s.Driver.Adaptor().(*SpheroAdaptor)
 }
 
 func (s *SpheroDriver) Init() bool {
@@ -182,7 +180,7 @@ func (s *SpheroDriver) configureCollisionDetection() {
 }
 
 func (s *SpheroDriver) handleCollisionDetected(data []uint8) {
-	gobot.Publish(s.Events["Collision"], data)
+	gobot.Publish(s.Event("collision"), data)
 }
 
 func (s *SpheroDriver) getSyncResponse(packet *packet) []byte {

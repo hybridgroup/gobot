@@ -14,10 +14,11 @@ type LeapMotionAdaptor struct {
 
 func NewLeapMotionAdaptor(name string, port string) *LeapMotionAdaptor {
 	return &LeapMotionAdaptor{
-		Adaptor: gobot.Adaptor{
-			Name: name,
-			Port: port,
-		},
+		Adaptor: *gobot.NewAdaptor(
+			name,
+			"LeapMotionAdaptor",
+			port,
+		),
 		connect: func(l *LeapMotionAdaptor) {
 			origin := fmt.Sprintf("http://%v", l.Port)
 			url := fmt.Sprintf("ws://%v/v3.json", l.Port)
@@ -32,7 +33,7 @@ func NewLeapMotionAdaptor(name string, port string) *LeapMotionAdaptor {
 
 func (l *LeapMotionAdaptor) Connect() bool {
 	l.connect(l)
-	l.Connected = true
+	l.SetConnected(true)
 	return true
 }
 func (l *LeapMotionAdaptor) Finalize() bool { return true }

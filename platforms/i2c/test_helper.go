@@ -16,8 +16,9 @@ func (t *i2cTestAdaptor) Finalize() bool  { return true }
 
 func newI2cTestAdaptor(name string) *i2cTestAdaptor {
 	return &i2cTestAdaptor{
-		Adaptor: gobot.Adaptor{
-			Name: name,
-		},
+		Adaptor: *gobot.NewAdaptor(
+			name,
+			"I2cTestAdaptor",
+		),
 	}
 }

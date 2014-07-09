@@ -9,6 +9,7 @@ import (
 
 func main() {
 	gbot := gobot.NewGobot()
+
 	firmataAdaptor := firmata.NewFirmataAdaptor("firmata", "/dev/ttyACM0")
 	motor := gpio.NewMotorDriver(firmataAdaptor, "motor", "3")
 
@@ -25,8 +26,13 @@ func main() {
 		})
 	}
 
-	gbot.Robots = append(gbot.Robots,
-		gobot.NewRobot("motorBot", []gobot.Connection{firmataAdaptor}, []gobot.Device{motor}, work))
+	robot := gobot.NewRobot("motorBot",
+		[]gobot.Connection{firmataAdaptor},
+		[]gobot.Device{motor},
+		work,
+	)
+
+	gbot.AddRobot(robot)
 
 	gbot.Start()
 }

@@ -10,8 +10,8 @@ import (
 
 func main() {
 	gbot := gobot.NewGobot()
-	digisparkAdaptor := digispark.NewDigisparkAdaptor("digispark")
 
+	digisparkAdaptor := digispark.NewDigisparkAdaptor("digispark")
 	servo := gpio.NewServoDriver(digisparkAdaptor, "servo", "0")
 
 	work := func() {
@@ -22,7 +22,13 @@ func main() {
 		})
 	}
 
-	gbot.Robots = append(gbot.Robots,
-		gobot.NewRobot("servoBot", []gobot.Connection{digisparkAdaptor}, []gobot.Device{servo}, work))
+	robot := gobot.NewRobot("servoBot",
+		[]gobot.Connection{digisparkAdaptor},
+		[]gobot.Device{servo},
+		work,
+	)
+
+	gbot.AddRobot(robot)
+
 	gbot.Start()
 }

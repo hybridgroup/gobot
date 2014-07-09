@@ -19,11 +19,11 @@ type MotorDriver struct {
 
 func NewMotorDriver(a PwmDigitalWriter, name string, pin string) *MotorDriver {
 	return &MotorDriver{
-		Driver: gobot.Driver{
-			Name:    name,
-			Pin:     pin,
-			Adaptor: a.(gobot.AdaptorInterface),
-		},
+		Driver: *gobot.NewDriver(
+			name,
+			"MotorDriver",
+			a.(gobot.AdaptorInterface),
+		),
 		CurrentState:     0,
 		CurrentSpeed:     0,
 		CurrentMode:      "digital",
@@ -32,7 +32,7 @@ func NewMotorDriver(a PwmDigitalWriter, name string, pin string) *MotorDriver {
 }
 
 func (m *MotorDriver) adaptor() PwmDigitalWriter {
-	return m.Driver.Adaptor.(PwmDigitalWriter)
+	return m.Driver.Adaptor().(PwmDigitalWriter)
 }
 
 func (m *MotorDriver) Start() bool { return true }

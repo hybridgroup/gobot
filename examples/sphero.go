@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/sphero"
-	"time"
 )
 
 func main() {
@@ -14,7 +15,7 @@ func main() {
 	spheroDriver := sphero.NewSpheroDriver(adaptor, "sphero")
 
 	work := func() {
-		gobot.On(spheroDriver.Events["Collision"], func(data interface{}) {
+		gobot.On(spheroDriver.Event("collision"), func(data interface{}) {
 			fmt.Println("Collision Detected!")
 		})
 
@@ -30,8 +31,13 @@ func main() {
 		})
 	}
 
-	gbot.Robots = append(gbot.Robots,
-		gobot.NewRobot("sphero", []gobot.Connection{adaptor}, []gobot.Device{spheroDriver}, work))
+	robot := gobot.NewRobot("sphero",
+		[]gobot.Connection{adaptor},
+		[]gobot.Device{spheroDriver},
+		work,
+	)
+
+	gbot.AddRobot(robot)
 
 	gbot.Start()
 }

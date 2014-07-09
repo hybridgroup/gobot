@@ -12,16 +12,12 @@ type WiichuckDriver struct {
 }
 
 func NewWiichuckDriver(a I2cInterface, name string) *WiichuckDriver {
-	return &WiichuckDriver{
-		Driver: gobot.Driver{
-			Name: name,
-			Events: map[string]*gobot.Event{
-				"z_button": gobot.NewEvent(),
-				"c_button": gobot.NewEvent(),
-				"joystick": gobot.NewEvent(),
-			},
-			Adaptor: a.(gobot.AdaptorInterface),
-		},
+	w := &WiichuckDriver{
+		Driver: *gobot.NewDriver(
+			name,
+			"WiichuckDriver",
+			a.(gobot.AdaptorInterface),
+		),
 		joystick: map[string]float64{
 			"sy_origin": -1,
 			"sx_origin": -1,
@@ -33,15 +29,20 @@ func NewWiichuckDriver(a I2cInterface, name string) *WiichuckDriver {
 			"c":  0,
 		},
 	}
+
+	w.AddEvent("z")
+	w.AddEvent("c")
+	w.AddEvent("joystick")
+	return w
 }
 
 func (w *WiichuckDriver) adaptor() I2cInterface {
-	return w.Driver.Adaptor.(I2cInterface)
+	return w.Driver.Adaptor().(I2cInterface)
 }
 
 func (w *WiichuckDriver) Start() bool {
 	w.adaptor().I2cStart(0x52)
-	gobot.Every(w.Interval, func() {
+	gobot.Every(w.Interval(), func() {
 		w.adaptor().I2cWrite([]byte{0x40, 0x00})
 		w.adaptor().I2cWrite([]byte{0x00})
 		newValue := w.adaptor().I2cRead(6)
@@ -93,15 +94,15 @@ func (w *WiichuckDriver) adjustOrigins() {
 
 func (w *WiichuckDriver) updateButtons() {
 	if w.data["c"] == 0 {
-		gobot.Publish(w.Events["c_button"], true)
+		gobot.Publish(w.Event("c"), true)
 	}
 	if w.data["z"] == 0 {
-		gobot.Publish(w.Events["z_button"], true)
+		gobot.Publish(w.Event("z"), true)
 	}
 }
 
 func (w *WiichuckDriver) updateJoystick() {
-	gobot.Publish(w.Events["joystick"], map[string]float64{
+	gobot.Publish(w.Event("joystick"), map[string]float64{
 		"x": w.calculateJoystickValue(w.data["sx"], w.joystick["sx_origin"]),
 		"y": w.calculateJoystickValue(w.data["sy"], w.joystick["sy_origin"]),
 	})

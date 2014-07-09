@@ -11,12 +11,12 @@ type ServoDriver struct {
 
 func NewServoDriver(a Servo, name string, pin string) *ServoDriver {
 	s := &ServoDriver{
-		Driver: gobot.Driver{
-			Name:     name,
-			Pin:      pin,
-			Commands: make(map[string]func(map[string]interface{}) interface{}),
-			Adaptor:  a.(gobot.AdaptorInterface),
-		},
+		Driver: *gobot.NewDriver(
+			name,
+			"ServoDriver",
+			a.(gobot.AdaptorInterface),
+			pin,
+		),
 		CurrentAngle: 0,
 	}
 
@@ -43,7 +43,7 @@ func NewServoDriver(a Servo, name string, pin string) *ServoDriver {
 }
 
 func (s *ServoDriver) adaptor() Servo {
-	return s.Driver.Adaptor.(Servo)
+	return s.Driver.Adaptor().(Servo)
 }
 
 func (s *ServoDriver) Start() bool { return true }
@@ -59,7 +59,7 @@ func (s *ServoDriver) Move(angle uint8) {
 		panic("Servo angle must be an integer between 0-180")
 	}
 	s.CurrentAngle = angle
-	s.adaptor().ServoWrite(s.Pin, s.angleToSpan(angle))
+	s.adaptor().ServoWrite(s.Pin(), s.angleToSpan(angle))
 }
 
 func (s *ServoDriver) Min() {

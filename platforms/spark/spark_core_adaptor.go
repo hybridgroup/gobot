@@ -17,21 +17,22 @@ type SparkCoreAdaptor struct {
 
 func NewSparkCoreAdaptor(name string, deviceID string, accessToken string) *SparkCoreAdaptor {
 	return &SparkCoreAdaptor{
-		Adaptor: gobot.Adaptor{
-			Name: name,
-		},
+		Adaptor: *gobot.NewAdaptor(
+			name,
+			"SparkCoreAdaptor",
+		),
 		DeviceID:    deviceID,
 		AccessToken: accessToken,
 	}
 }
 
 func (s *SparkCoreAdaptor) Connect() bool {
-	s.Connected = true
+	s.SetConnected(true)
 	return true
 }
 
 func (s *SparkCoreAdaptor) Finalize() bool {
-	s.Connected = false
+	s.SetConnected(false)
 	return true
 }
 

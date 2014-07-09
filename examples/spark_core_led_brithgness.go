@@ -8,10 +8,10 @@ import (
 )
 
 func main() {
-	master := gobot.NewGobot()
+	gbot := gobot.NewGobot()
 
 	sparkCore := spark.NewSparkCoreAdaptor("spark", "device_id", "access_token")
-	led := gpio.NewLedDriver(sparkCore, "led", "A1")
+	led := gpio.NewLedDriver("led", sparkCore, "A1")
 
 	work := func() {
 		brightness := uint8(0)
@@ -25,8 +25,14 @@ func main() {
 			}
 		})
 	}
-	master.Robots = append(master.Robots,
-		gobot.NewRobot("spark", []gobot.Connection{sparkCore}, []gobot.Device{led}, work))
 
-	master.Start()
+	robot := gobot.NewRobot("spark",
+		[]gobot.Connection{sparkCore},
+		[]gobot.Device{led},
+		work,
+	)
+
+	gbot.AddRobot(robot)
+
+	gbot.Start()
 }

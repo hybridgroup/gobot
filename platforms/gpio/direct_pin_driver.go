@@ -11,12 +11,12 @@ type DirectPinDriver struct {
 
 func NewDirectPinDriver(a DirectPin, name string, pin string) *DirectPinDriver {
 	d := &DirectPinDriver{
-		Driver: gobot.Driver{
-			Name:     name,
-			Pin:      pin,
-			Commands: make(map[string]func(map[string]interface{}) interface{}),
-			Adaptor:  a.(gobot.AdaptorInterface),
-		},
+		Driver: *gobot.NewDriver(
+			name,
+			"DirectPinDriver",
+			a.(gobot.AdaptorInterface),
+			pin,
+		),
 	}
 
 	d.Driver.AddCommand("DigitalRead", func(params map[string]interface{}) interface{} {
@@ -50,32 +50,32 @@ func NewDirectPinDriver(a DirectPin, name string, pin string) *DirectPinDriver {
 }
 
 func (d *DirectPinDriver) adaptor() DirectPin {
-	return d.Driver.Adaptor.(DirectPin)
+	return d.Driver.Adaptor().(DirectPin)
 }
 func (d *DirectPinDriver) Start() bool { return true }
 func (d *DirectPinDriver) Halt() bool  { return true }
 func (d *DirectPinDriver) Init() bool  { return true }
 
 func (d *DirectPinDriver) DigitalRead() int {
-	return d.adaptor().DigitalRead(d.Pin)
+	return d.adaptor().DigitalRead(d.Pin())
 }
 
 func (d *DirectPinDriver) DigitalWrite(level byte) {
-	d.adaptor().DigitalWrite(d.Pin, level)
+	d.adaptor().DigitalWrite(d.Pin(), level)
 }
 
 func (d *DirectPinDriver) AnalogRead() int {
-	return d.adaptor().AnalogRead(d.Pin)
+	return d.adaptor().AnalogRead(d.Pin())
 }
 
 func (d *DirectPinDriver) AnalogWrite(level byte) {
-	d.adaptor().AnalogWrite(d.Pin, level)
+	d.adaptor().AnalogWrite(d.Pin(), level)
 }
 
 func (d *DirectPinDriver) PwmWrite(level byte) {
-	d.adaptor().PwmWrite(d.Pin, level)
+	d.adaptor().PwmWrite(d.Pin(), level)
 }
 
 func (d *DirectPinDriver) ServoWrite(level byte) {
-	d.adaptor().ServoWrite(d.Pin, level)
+	d.adaptor().ServoWrite(d.Pin(), level)
 }

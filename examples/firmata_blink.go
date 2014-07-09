@@ -9,14 +9,23 @@ import (
 
 func main() {
 	gbot := gobot.NewGobot()
-	firmataAdaptor := firmata.NewFirmataAdaptor("myFirmata", "/dev/ttyACM0")
-	led := gpio.NewLedDriver(firmataAdaptor, "myLed", "13")
+
+	firmataAdaptor := firmata.NewFirmataAdaptor("arduino", "/dev/ttyACM0")
+	led := gpio.NewLedDriver("led", firmataAdaptor, "13")
+
 	work := func() {
 		gobot.Every(1*time.Second, func() {
 			led.Toggle()
 		})
 	}
-	gbot.Robots = append(gbot.Robots,
-		gobot.NewRobot("blinkBot", []gobot.Connection{firmataAdaptor}, []gobot.Device{led}, work))
+
+	robot := gobot.NewRobot("bot",
+		[]gobot.Connection{firmataAdaptor},
+		[]gobot.Device{led},
+		work,
+	)
+
+	gbot.AddRobot(robot)
+
 	gbot.Start()
 }

@@ -41,6 +41,7 @@ func (NullReadWriteCloser) Write(p []byte) (int, error) {
 func (NullReadWriteCloser) Read(b []byte) (int, error) {
 	return len(b), nil
 }
+
 func (NullReadWriteCloser) Close() error {
 	return nil
 }
@@ -56,9 +57,9 @@ func (t *testDriver) Halt() bool  { return true }
 func NewTestDriver(name string, adaptor *testAdaptor) *testDriver {
 	t := &testDriver{
 		Driver: Driver{
-			Commands: make(map[string]func(map[string]interface{}) interface{}),
-			Name:     name,
-			Adaptor:  adaptor,
+			commands: make(map[string]func(map[string]interface{}) interface{}),
+			name:     name,
+			adaptor:  adaptor,
 		},
 	}
 
@@ -85,8 +86,8 @@ func (t *testAdaptor) Connect() bool  { return true }
 func NewTestAdaptor(name string) *testAdaptor {
 	return &testAdaptor{
 		Adaptor: Adaptor{
-			Name: name,
-			Params: map[string]interface{}{
+			name: name,
+			params: map[string]interface{}{
 				"param1": "1",
 				"param2": 2,
 			},

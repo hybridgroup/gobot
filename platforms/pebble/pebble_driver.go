@@ -14,18 +14,17 @@ type PebbleInterface interface {
 
 func NewPebbleDriver(adaptor *PebbleAdaptor, name string) *PebbleDriver {
 	p := &PebbleDriver{
-		Driver: gobot.Driver{
-			Name: name,
-			Events: map[string]*gobot.Event{
-				"button": gobot.NewEvent(),
-				"accel":  gobot.NewEvent(),
-				"tap":    gobot.NewEvent(),
-			},
-			Commands: make(map[string]func(map[string]interface{}) interface{}),
-			Adaptor:  adaptor,
-		},
+		Driver: *gobot.NewDriver(
+			name,
+			"PebbleDriver",
+			adaptor,
+		),
 		Messages: []string{},
 	}
+
+	p.AddEvent("button")
+	p.AddEvent("accel")
+	p.AddEvent("tap")
 
 	p.Driver.AddCommand("PublishEvent", func(params map[string]interface{}) interface{} {
 		p.PublishEvent(params["name"].(string), params["data"].(string))
@@ -46,7 +45,7 @@ func NewPebbleDriver(adaptor *PebbleAdaptor, name string) *PebbleDriver {
 	return p
 }
 func (d *PebbleDriver) adaptor() *PebbleAdaptor {
-	return d.Driver.Adaptor.(*PebbleAdaptor)
+	return d.Driver.Adaptor().(*PebbleAdaptor)
 }
 
 func (d *PebbleDriver) Start() bool { return true }
@@ -54,7 +53,7 @@ func (d *PebbleDriver) Start() bool { return true }
 func (d *PebbleDriver) Halt() bool { return true }
 
 func (d *PebbleDriver) PublishEvent(name string, data string) {
-	gobot.Publish(d.Events[name], data)
+	gobot.Publish(d.Event(name), data)
 }
 
 func (d *PebbleDriver) SendNotification(message string) string {

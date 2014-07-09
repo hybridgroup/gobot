@@ -21,7 +21,13 @@ func main() {
 		})
 	}
 
-	gbot.Robots = append(gbot.Robots,
-		gobot.NewRobot("servoBot", []gobot.Connection{beagleboneAdaptor}, []gobot.Device{servo}, work))
+	robot := gobot.NewRobot("servoBot",
+		[]gobot.Connection{beagleboneAdaptor},
+		[]gobot.Device{servo},
+		work,
+	)
+
+	gbot.AddRobot(robot)
+
 	gbot.Start()
 }

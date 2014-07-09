@@ -27,12 +27,13 @@ type TravisResponse struct {
 }
 
 func turnOn(robot *gobot.Robot, device string) {
-	robot.Device(device).Driver.(*gpio.LedDriver).On()
+	robot.Device(device).(*gpio.LedDriver).On()
 }
+
 func resetLeds(robot *gobot.Robot) {
-	robot.Device("red").Driver.(*gpio.LedDriver).Off()
-	robot.Device("green").Driver.(*gpio.LedDriver).Off()
-	robot.Device("blue").Driver.(*gpio.LedDriver).Off()
+	robot.Device("red").(*gpio.LedDriver).Off()
+	robot.Device("green").(*gpio.LedDriver).Off()
+	robot.Device("blue").(*gpio.LedDriver).Off()
 }
 
 func checkTravis(robot *gobot.Robot) {
@@ -62,22 +63,27 @@ func checkTravis(robot *gobot.Robot) {
 }
 
 func main() {
-	master := gobot.NewGobot()
+	gbot := gobot.NewGobot()
+
 	firmataAdaptor := firmata.NewFirmataAdaptor("firmata", "/dev/ttyACM0")
-	red := gpio.NewLedDriver(firmataAdaptor, "red", "7")
-	green := gpio.NewLedDriver(firmataAdaptor, "green", "6")
-	blue := gpio.NewLedDriver(firmataAdaptor, "blue", "5")
+	red := gpio.NewLedDriver("red", firmataAdaptor, "7")
+	green := gpio.NewLedDriver("green", firmataAdaptor, "6")
+	blue := gpio.NewLedDriver("blue", firmataAdaptor, "5")
 
 	work := func() {
-		checkTravis(master.Robot("travis"))
+		checkTravis(gbot.Robot("travis"))
 		gobot.Every(10*time.Second, func() {
-			checkTravis(master.Robot("travis"))
+			checkTravis(gbot.Robot("travis"))
 		})
 	}
 
-	master.AddRobot(
-		gobot.NewRobot("travis", []gobot.Connection{firmataAdaptor}, []gobot.Device{red, green, blue}, work),
+	robot := gobot.NewRobot("travis",
+		[]gobot.Connection{firmataAdaptor},
+		[]gobot.Device{red, green, blue},
+		work,
 	)
 
-	master.Start()
+	gbot.AddRobot(robot)
+
+	gbot.Start()
 }

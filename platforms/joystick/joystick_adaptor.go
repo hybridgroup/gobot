@@ -13,6 +13,10 @@ type JoystickAdaptor struct {
 
 func NewJoystickAdaptor(name string) *JoystickAdaptor {
 	return &JoystickAdaptor{
+		Adaptor: *gobot.NewAdaptor(
+			name,
+			"JoystickAdaptor",
+		),
 		connect: func(j *JoystickAdaptor) {
 			sdl.Init(sdl.INIT_JOYSTICK)
 			if sdl.NumJoysticks() > 0 {

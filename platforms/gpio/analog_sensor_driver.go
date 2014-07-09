@@ -10,33 +10,33 @@ type AnalogSensorDriver struct {
 
 func NewAnalogSensorDriver(a AnalogReader, name string, pin string) *AnalogSensorDriver {
 	d := &AnalogSensorDriver{
-		Driver: gobot.Driver{
-			Name: name,
-			Pin:  pin,
-			Events: map[string]*gobot.Event{
-				"data": gobot.NewEvent(),
-			},
-			Commands: make(map[string]func(map[string]interface{}) interface{}),
-			Adaptor:  a.(gobot.AdaptorInterface),
-		},
+		Driver: *gobot.NewDriver(
+			name,
+			"AnalogSensorDriver",
+			a.(gobot.AdaptorInterface),
+			pin,
+		),
 	}
+
+	d.AddEvent("data")
 	d.Driver.AddCommand("Read", func(params map[string]interface{}) interface{} {
 		return d.Read()
 	})
+
 	return d
 }
 
 func (a *AnalogSensorDriver) adaptor() AnalogReader {
-	return a.Driver.Adaptor.(AnalogReader)
+	return a.Driver.Adaptor().(AnalogReader)
 }
 
 func (a *AnalogSensorDriver) Start() bool {
 	value := 0
-	gobot.Every(a.Interval, func() {
+	gobot.Every(a.Interval(), func() {
 		newValue := a.Read()
 		if newValue != value && newValue != -1 {
 			value = newValue
-			gobot.Publish(a.Events["data"], value)
+			gobot.Publish(a.Event("data"), value)
 		}
 	})
 	return true
@@ -45,5 +45,5 @@ func (a *AnalogSensorDriver) Init() bool { return true }
 func (a *AnalogSensorDriver) Halt() bool { return true }
 
 func (a *AnalogSensorDriver) Read() int {
-	return a.adaptor().AnalogRead(a.Pin)
+	return a.adaptor().AnalogRead(a.Pin())
 }

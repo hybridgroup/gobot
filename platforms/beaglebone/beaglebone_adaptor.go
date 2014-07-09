@@ -113,9 +113,10 @@ type BeagleboneAdaptor struct {
 
 func NewBeagleboneAdaptor(name string) *BeagleboneAdaptor {
 	return &BeagleboneAdaptor{
-		Adaptor: gobot.Adaptor{
-			Name: name,
-		},
+		Adaptor: *gobot.NewAdaptor(
+			name,
+			"BeagleboneAdaptor",
+		),
 		connect: func() {
 			ensureSlot("cape-bone-iio")
 			ensureSlot("am33xx_pwm")
@@ -266,7 +267,8 @@ func ensureSlot(item string) {
 	}
 	defer fi.Close()
 
-	//ensure the slot is not already written into the capemanager (from: https://github.com/mrmorphic/hwio/blob/master/module_bb_pwm.go#L190)
+	// ensure the slot is not already written into the capemanager
+	// (from: https://github.com/mrmorphic/hwio/blob/master/module_bb_pwm.go#L190)
 	scanner := bufio.NewScanner(fi)
 	for scanner.Scan() {
 		line := scanner.Text()

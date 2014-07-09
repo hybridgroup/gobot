@@ -10,7 +10,7 @@ import (
 func main() {
 	gbot := gobot.NewGobot()
 	beagleboneAdaptor := beaglebone.NewBeagleboneAdaptor("beaglebone")
-	led := gpio.NewLedDriver(beagleboneAdaptor, "led", "P9_14")
+	led := gpio.NewLedDriver("led", beagleboneAdaptor, "P9_14")
 
 	work := func() {
 		brightness := uint8(0)
@@ -25,7 +25,13 @@ func main() {
 		})
 	}
 
-	gbot.Robots = append(gbot.Robots,
-		gobot.NewRobot("pwmBot", []gobot.Connection{beagleboneAdaptor}, []gobot.Device{led}, work))
+	robot := gobot.NewRobot("pwmBot",
+		[]gobot.Connection{beagleboneAdaptor},
+		[]gobot.Device{led},
+		work,
+	)
+
+	gbot.AddRobot(robot)
+
 	gbot.Start()
 }

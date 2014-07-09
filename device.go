@@ -2,22 +2,8 @@ package gobot
 
 import (
 	"errors"
-	"fmt"
 	"log"
-	"reflect"
-	"time"
 )
-
-type Device interface {
-	Start() bool
-	Halt() bool
-	setInterval(time.Duration)
-	interval() time.Duration
-	setName(string)
-	name() string
-	adaptor() AdaptorInterface
-	commands() map[string]func(map[string]interface{}) interface{}
-}
 
 type JSONDevice struct {
 	Name       string          `json:"name"`
@@ -26,21 +12,30 @@ type JSONDevice struct {
 	Commands   []string        `json:"commands"`
 }
 
-type device struct {
-	Name   string
-	Type   string
-	Robot  *Robot
-	Driver DriverInterface
+type Device DriverInterface
+
+type devices []Device
+
+func (d *devices) Len() int {
+	return len(*d)
 }
 
-type devices []*device
+func (d *devices) Each(f func(Device)) {
+	for _, device := range *d {
+		f(device)
+	}
+}
 
 // Start() starts all the devices.
-func (d devices) Start() error {
+func (d *devices) Start() error {
 	var err error
 	log.Println("Starting devices...")
-	for _, device := range d {
-		log.Println("Starting device " + device.Name + "...")
+	for _, device := range *d {
+		info := "Starting device " + device.Name()
+		if device.Pin() != "" {
+			info = info + " on pin " + device.Pin()
+		}
+		log.Println(info + "...")
 		if device.Start() == false {
 			err = errors.New("Could not start device")
 			break
@@ -50,82 +45,8 @@ func (d devices) Start() error {
 }
 
 // Halt() stop all the devices.
-func (d devices) Halt() {
-	for _, device := range d {
+func (d *devices) Halt() {
+	for _, device := range *d {
 		device.Halt()
 	}
-}
-
-func NewDevice(driver DriverInterface, r *Robot) *device {
-	if driver.name() == "" {
-		driver.setName(fmt.Sprintf("%X", Rand(int(^uint(0)>>1))))
-	}
-	t := reflect.ValueOf(driver).Type().String()
-	if driver.interval() == 0 {
-		driver.setInterval(10 * time.Millisecond)
-	}
-	return &device{
-		Type:   t[1:len(t)],
-		Name:   driver.name(),
-		Robot:  r,
-		Driver: driver,
-	}
-}
-
-func (d *device) adaptor() AdaptorInterface {
-	return d.Driver.adaptor()
-}
-
-func (d *device) setInterval(t time.Duration) {
-	d.Driver.setInterval(t)
-}
-
-func (d *device) interval() time.Duration {
-	return d.Driver.interval()
-}
-
-func (d *device) setName(s string) {
-	d.Name = s
-}
-
-func (d *device) name() string {
-	return d.Name
-}
-
-func (d *device) commands() map[string]func(map[string]interface{}) interface{} {
-	return d.Driver.commands()
-}
-
-func (d *device) Commands() map[string]func(map[string]interface{}) interface{} {
-	return d.commands()
-}
-
-func (d *device) Start() bool {
-	log.Println("Device " + d.Name + " started")
-	return d.Driver.Start()
-}
-
-func (d *device) Halt() bool {
-	log.Println("Device " + d.Name + " halted")
-	return d.Driver.Halt()
-}
-
-func (d *device) ToJSON() *JSONDevice {
-	jsonDevice := &JSONDevice{
-		Name:       d.Name,
-		Driver:     d.Type,
-		Commands:   []string{},
-		Connection: nil,
-	}
-
-	if d.adaptor() != nil {
-		jsonDevice.Connection = d.Robot.Connection(d.adaptor().name()).ToJSON()
-	}
-
-	commands := d.commands()
-	for command := range commands {
-		jsonDevice.Commands = append(jsonDevice.Commands, command)
-	}
-
-	return jsonDevice
 }
