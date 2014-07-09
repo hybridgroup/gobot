@@ -41,6 +41,7 @@ func (NullReadWriteCloser) Write(p []byte) (int, error) {
 func (NullReadWriteCloser) Read(b []byte) (int, error) {
 	return len(b), nil
 }
+
 func (NullReadWriteCloser) Close() error {
 	return nil
 }

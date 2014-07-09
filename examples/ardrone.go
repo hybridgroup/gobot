@@ -13,7 +13,7 @@ func main() {
 
 	work := func() {
 		drone.TakeOff()
-		gobot.On(drone.Event("Flying"), func(data interface{}) {
+		gobot.On(drone.Event("flying"), func(data interface{}) {
 			gobot.After(3*time.Second, func() {
 				drone.Land()
 			})

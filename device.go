@@ -14,31 +14,28 @@ type JSONDevice struct {
 
 type Device DriverInterface
 
-type devices struct {
-	devices []Device
-}
+type devices []Device
 
 func (d *devices) Len() int {
-	return len(d.devices)
-}
-
-func (d *devices) Add(dev Device) Device {
-	d.devices = append(d.devices, dev)
-	return dev
+	return len(*d)
 }
 
 func (d *devices) Each(f func(Device)) {
-	for _, device := range d.devices {
+	for _, device := range *d {
 		f(device)
 	}
 }
 
 // Start() starts all the devices.
-func (d devices) Start() error {
+func (d *devices) Start() error {
 	var err error
 	log.Println("Starting devices...")
-	for _, device := range d.devices {
-		log.Println("Starting device " + device.Name() + "...")
+	for _, device := range *d {
+		info := "Starting device " + device.Name()
+		if device.Pin() != "" {
+			info = info + " on pin " + device.Pin()
+		}
+		log.Println(info + "...")
 		if device.Start() == false {
 			err = errors.New("Could not start device")
 			break
@@ -48,8 +45,8 @@ func (d devices) Start() error {
 }
 
 // Halt() stop all the devices.
-func (d devices) Halt() {
-	for _, device := range d.devices {
+func (d *devices) Halt() {
+	for _, device := range *d {
 		device.Halt()
 	}
 }

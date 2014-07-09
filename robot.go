@@ -20,26 +20,20 @@ type Robot struct {
 	devices     *devices
 }
 
-type robots struct {
-	robots []*Robot
-}
+type robots []*Robot
 
 func (r *robots) Len() int {
-	return len(r.robots)
-}
-func (r *robots) Add(robot *Robot) *Robot {
-	r.robots = append(r.robots, robot)
-	return robot
+	return len(*r)
 }
 
 func (r *robots) Start() {
-	for _, robot := range r.robots {
+	for _, robot := range *r {
 		robot.Start()
 	}
 }
 
 func (r *robots) Each(f func(*Robot)) {
-	for _, robot := range r.robots {
+	for _, robot := range *r {
 		f(robot)
 	}
 }
@@ -64,13 +58,13 @@ func NewRobot(name string, v ...interface{}) *Robot {
 		case []Connection:
 			log.Println("Initializing connections...")
 			for _, connection := range v[i].([]Connection) {
-				c := r.Connections().Add(connection)
+				c := r.AddConnection(connection)
 				log.Println("Initializing connection", c.Name(), "...")
 			}
 		case []Device:
 			log.Println("Initializing devices...")
 			for _, device := range v[i].([]Device) {
-				d := r.Devices().Add(device)
+				d := r.AddDevice(device)
 				log.Println("Initializing device", d.Name(), "...")
 			}
 		case func():
@@ -114,14 +108,15 @@ func (r *Robot) Devices() *devices {
 }
 
 func (r *Robot) AddDevice(d Device) Device {
-	return r.Devices().Add(d)
+	*r.devices = append(*r.Devices(), d)
+	return d
 }
 
 func (r *Robot) Device(name string) Device {
 	if r == nil {
 		return nil
 	}
-	for _, device := range r.devices.devices {
+	for _, device := range *r.devices {
 		if device.Name() == name {
 			return device
 		}
@@ -134,14 +129,15 @@ func (r *Robot) Connections() *connections {
 }
 
 func (r *Robot) AddConnection(c Connection) Connection {
-	return r.Connections().Add(c)
+	*r.connections = append(*r.Connections(), c)
+	return c
 }
 
 func (r *Robot) Connection(name string) Connection {
 	if r == nil {
 		return nil
 	}
-	for _, connection := range r.connections.connections {
+	for _, connection := range *r.connections {
 		if connection.Name() == name {
 			return connection
 		}

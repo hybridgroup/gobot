@@ -59,11 +59,12 @@ func (g *Gobot) Robots() *robots {
 }
 
 func (g *Gobot) AddRobot(r *Robot) *Robot {
-	return g.Robots().Add(r)
+	*g.robots = append(*g.robots, r)
+	return r
 }
 
 func (g *Gobot) Robot(name string) *Robot {
-	for _, robot := range g.Robots().robots {
+	for _, robot := range *g.Robots() {
 		if robot.Name == name {
 			return robot
 		}
