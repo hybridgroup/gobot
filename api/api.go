@@ -4,12 +4,14 @@ import (
 	"crypto/subtle"
 	"encoding/base64"
 	"encoding/json"
-	"github.com/bmizerany/pat"
-	"github.com/hybridgroup/gobot"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"strings"
+
+	"github.com/bmizerany/pat"
+	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/api/robeaux"
 )
 
 // Optional restful API through Gobot has access
@@ -128,7 +130,7 @@ func (a *api) setHeaders(f func(http.ResponseWriter, *http.Request)) http.Handle
 
 func (a *api) robeaux(res http.ResponseWriter, req *http.Request) {
 	path := req.URL.Path
-	buf, err := Asset(path[1:])
+	buf, err := robeaux.Asset(path[1:])
 	if err != nil {
 		log.Println("Error serving static file:", err.Error())
 		res.Write([]byte(err.Error()))
