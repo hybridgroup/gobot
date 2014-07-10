@@ -33,3 +33,13 @@ func TestGobotRobot(t *testing.T) {
 	Expect(t, g.Robot("Robot 1").Connection("Connection 4"), (Connection)(nil))
 	Expect(t, g.Robot("Robot 1").Connections().Len(), 3)
 }
+
+func TestGobotToJSON(t *testing.T) {
+	g := initTestGobot()
+	g.AddCommand("test_function", func(params map[string]interface{}) interface{} {
+		return nil
+	})
+	json := g.ToJSON()
+	Expect(t, len(json.Robots), g.Robots().Len())
+	Expect(t, len(json.Commands), len(g.Commands()))
+}
