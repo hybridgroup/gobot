@@ -321,7 +321,7 @@ func (b *board) process(data []byte) {
 			case AnalogMappingResponse:
 				pinIndex := byte(0)
 
-				for _, val := range currentBuffer[2 : len(currentBuffer)-1] {
+				for _, val := range currentBuffer[2 : len(b.Pins)-1] {
 
 					b.Pins[pinIndex].AnalogChannel = val
 
