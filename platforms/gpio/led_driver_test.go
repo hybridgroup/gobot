@@ -1,12 +1,13 @@
 package gpio
 
 import (
-	"github.com/hybridgroup/gobot"
 	"testing"
+
+	"github.com/hybridgroup/gobot"
 )
 
 func initTestLedDriver() *LedDriver {
-	return NewLedDriver("myLed", newGpioTestAdaptor("adaptor"), "1")
+	return NewLedDriver(newGpioTestAdaptor("adaptor"), "myLed", "1")
 }
 
 func TestLedDriverStart(t *testing.T) {
