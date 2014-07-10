@@ -2,9 +2,10 @@ package firmata
 
 import (
 	"fmt"
+	"strconv"
+
 	"github.com/hybridgroup/gobot"
 	"github.com/tarm/goserial"
-	"strconv"
 )
 
 type FirmataAdaptor struct {
@@ -89,7 +90,10 @@ func (f *FirmataAdaptor) AnalogRead(pin string) int {
 	events := f.Board.findEvents(fmt.Sprintf("analog_read_%v", pin))
 	if len(events) > 0 {
 		event := events[len(events)-1]
-		return int(uint(event.Data[0])<<24 | uint(event.Data[1])<<16 | uint(event.Data[2])<<8 | uint(event.Data[3]))
+		return int(uint(event.Data[0])<<24 |
+			uint(event.Data[1])<<16 |
+			uint(event.Data[2])<<8 |
+			uint(event.Data[3]))
 	}
 	return -1
 }
