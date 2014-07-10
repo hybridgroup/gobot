@@ -20,7 +20,7 @@ func NewHMC6352Driver(a I2cInterface, name string) *HMC6352Driver {
 }
 
 func (h *HMC6352Driver) adaptor() I2cInterface {
-	return h.Driver.Adaptor().(I2cInterface)
+	return h.Adaptor().(I2cInterface)
 }
 
 func (h *HMC6352Driver) Start() bool {

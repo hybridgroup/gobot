@@ -32,7 +32,7 @@ func NewMotorDriver(a PwmDigitalWriter, name string, pin string) *MotorDriver {
 }
 
 func (m *MotorDriver) adaptor() PwmDigitalWriter {
-	return m.Driver.Adaptor().(PwmDigitalWriter)
+	return m.Adaptor().(PwmDigitalWriter)
 }
 
 func (m *MotorDriver) Start() bool { return true }

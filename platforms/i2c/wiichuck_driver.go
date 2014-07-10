@@ -2,6 +2,7 @@ package i2c
 
 import (
 	"fmt"
+
 	"github.com/hybridgroup/gobot"
 )
 
@@ -37,7 +38,7 @@ func NewWiichuckDriver(a I2cInterface, name string) *WiichuckDriver {
 }
 
 func (w *WiichuckDriver) adaptor() I2cInterface {
-	return w.Driver.Adaptor().(I2cInterface)
+	return w.Adaptor().(I2cInterface)
 }
 
 func (w *WiichuckDriver) Start() bool {

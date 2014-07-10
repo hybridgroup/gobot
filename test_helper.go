@@ -63,12 +63,12 @@ func NewTestDriver(name string, adaptor *testAdaptor) *testDriver {
 		},
 	}
 
-	t.Driver.AddCommand("TestDriverCommand", func(params map[string]interface{}) interface{} {
+	t.AddCommand("TestDriverCommand", func(params map[string]interface{}) interface{} {
 		name := params["name"].(string)
 		return fmt.Sprintf("hello %v", name)
 	})
 
-	t.Driver.AddCommand("DriverCommand", func(params map[string]interface{}) interface{} {
+	t.AddCommand("DriverCommand", func(params map[string]interface{}) interface{} {
 		name := params["name"].(string)
 		return fmt.Sprintf("hello %v", name)
 	})

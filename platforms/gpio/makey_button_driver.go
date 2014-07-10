@@ -21,14 +21,14 @@ func NewMakeyButtonDriver(a DigitalReader, name string, pin string) *MakeyButton
 		Active: false,
 	}
 
-	m.Driver.AddEvent("push")
-	m.Driver.AddEvent("release")
+	m.AddEvent("push")
+	m.AddEvent("release")
 
 	return m
 }
 
 func (b *MakeyButtonDriver) adaptor() DigitalReader {
-	return b.Driver.Adaptor().(DigitalReader)
+	return b.Adaptor().(DigitalReader)
 }
 
 func (m *MakeyButtonDriver) Start() bool {

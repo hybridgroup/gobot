@@ -2,6 +2,7 @@ package neurosky
 
 import (
 	"bytes"
+
 	"github.com/hybridgroup/gobot"
 )
 
@@ -38,19 +39,19 @@ func NewNeuroskyDriver(a *NeuroskyAdaptor, name string) *NeuroskyDriver {
 		),
 	}
 
-	n.AddEvent("Extended")
-	n.AddEvent("Signal")
-	n.AddEvent("Attention")
-	n.AddEvent("Meditation")
-	n.AddEvent("Blink")
-	n.AddEvent("Wave")
-	n.AddEvent("EEG")
+	n.AddEvent("extended")
+	n.AddEvent("signal")
+	n.AddEvent("attention")
+	n.AddEvent("meditation")
+	n.AddEvent("blink")
+	n.AddEvent("wave")
+	n.AddEvent("eeg")
 
 	return n
 }
 
 func (n *NeuroskyDriver) adaptor() *NeuroskyAdaptor {
-	return n.Driver.Adaptor().(*NeuroskyAdaptor)
+	return n.Adaptor().(*NeuroskyAdaptor)
 }
 func (n *NeuroskyDriver) Start() bool {
 	go func() {

@@ -19,7 +19,7 @@ func NewAnalogSensorDriver(a AnalogReader, name string, pin string) *AnalogSenso
 	}
 
 	d.AddEvent("data")
-	d.Driver.AddCommand("Read", func(params map[string]interface{}) interface{} {
+	d.AddCommand("Read", func(params map[string]interface{}) interface{} {
 		return d.Read()
 	})
 
@@ -27,7 +27,7 @@ func NewAnalogSensorDriver(a AnalogReader, name string, pin string) *AnalogSenso
 }
 
 func (a *AnalogSensorDriver) adaptor() AnalogReader {
-	return a.Driver.Adaptor().(AnalogReader)
+	return a.Adaptor().(AnalogReader)
 }
 
 func (a *AnalogSensorDriver) Start() bool {

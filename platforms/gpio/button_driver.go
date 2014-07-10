@@ -20,14 +20,14 @@ func NewButtonDriver(a DigitalReader, name string, pin string) *ButtonDriver {
 		Active: false,
 	}
 
-	b.Driver.AddEvent("push")
-	b.Driver.AddEvent("release")
+	b.AddEvent("push")
+	b.AddEvent("release")
 
 	return b
 }
 
 func (b *ButtonDriver) adaptor() DigitalReader {
-	return b.Driver.Adaptor().(DigitalReader)
+	return b.Adaptor().(DigitalReader)
 }
 
 func (b *ButtonDriver) Start() bool {

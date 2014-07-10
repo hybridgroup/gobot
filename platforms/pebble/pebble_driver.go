@@ -26,17 +26,17 @@ func NewPebbleDriver(adaptor *PebbleAdaptor, name string) *PebbleDriver {
 	p.AddEvent("accel")
 	p.AddEvent("tap")
 
-	p.Driver.AddCommand("PublishEvent", func(params map[string]interface{}) interface{} {
+	p.AddCommand("PublishEvent", func(params map[string]interface{}) interface{} {
 		p.PublishEvent(params["name"].(string), params["data"].(string))
 		return nil
 	})
 
-	p.Driver.AddCommand("SendNotification", func(params map[string]interface{}) interface{} {
+	p.AddCommand("SendNotification", func(params map[string]interface{}) interface{} {
 		p.SendNotification(params["message"].(string))
 		return nil
 	})
 
-	p.Driver.AddCommand("PendingMessage", func(params map[string]interface{}) interface{} {
+	p.AddCommand("PendingMessage", func(params map[string]interface{}) interface{} {
 		m := make(map[string]string)
 		m["result"] = p.PendingMessage()
 		return m
@@ -45,7 +45,7 @@ func NewPebbleDriver(adaptor *PebbleAdaptor, name string) *PebbleDriver {
 	return p
 }
 func (d *PebbleDriver) adaptor() *PebbleAdaptor {
-	return d.Driver.Adaptor().(*PebbleAdaptor)
+	return d.Adaptor().(*PebbleAdaptor)
 }
 
 func (d *PebbleDriver) Start() bool { return true }

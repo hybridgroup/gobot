@@ -3,10 +3,11 @@ package joystick
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/hybridgroup/go-sdl2/sdl"
-	"github.com/hybridgroup/gobot"
 	"io/ioutil"
 	"time"
+
+	"github.com/hybridgroup/go-sdl2/sdl"
+	"github.com/hybridgroup/gobot"
 )
 
 type JoystickDriver struct {
@@ -63,7 +64,7 @@ func NewJoystickDriver(a *JoystickAdaptor, name string, config string) *Joystick
 }
 
 func (j *JoystickDriver) adaptor() *JoystickAdaptor {
-	return j.Driver.Adaptor().(*JoystickAdaptor)
+	return j.Adaptor().(*JoystickAdaptor)
 }
 
 func (j *JoystickDriver) Start() bool {

@@ -1,8 +1,9 @@
 package leap
 
 import (
-	"code.google.com/p/go.net/websocket"
 	"encoding/json"
+
+	"code.google.com/p/go.net/websocket"
 	"github.com/hybridgroup/gobot"
 )
 
@@ -24,7 +25,7 @@ func NewLeapMotionDriver(a *LeapMotionAdaptor, name string) *LeapMotionDriver {
 }
 
 func (l *LeapMotionDriver) adaptor() *LeapMotionAdaptor {
-	return l.Driver.Adaptor().(*LeapMotionAdaptor)
+	return l.Adaptor().(*LeapMotionAdaptor)
 }
 func (l *LeapMotionDriver) Start() bool {
 	enableGestures := map[string]bool{"enableGestures": true}

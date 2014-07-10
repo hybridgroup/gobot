@@ -2,8 +2,9 @@ package sphero
 
 import (
 	"fmt"
-	"github.com/hybridgroup/gobot"
 	"time"
+
+	"github.com/hybridgroup/gobot"
 )
 
 type packet struct {
@@ -33,7 +34,7 @@ func NewSpheroDriver(a *SpheroAdaptor, name string) *SpheroDriver {
 	}
 
 	s.AddEvent("collision")
-	s.Driver.AddCommand("SetRGB", func(params map[string]interface{}) interface{} {
+	s.AddCommand("SetRGB", func(params map[string]interface{}) interface{} {
 		r := uint8(params["r"].(float64))
 		g := uint8(params["g"].(float64))
 		b := uint8(params["b"].(float64))
@@ -41,34 +42,34 @@ func NewSpheroDriver(a *SpheroAdaptor, name string) *SpheroDriver {
 		return nil
 	})
 
-	s.Driver.AddCommand("Roll", func(params map[string]interface{}) interface{} {
+	s.AddCommand("Roll", func(params map[string]interface{}) interface{} {
 		speed := uint8(params["speed"].(float64))
 		heading := uint16(params["heading"].(float64))
 		s.Roll(speed, heading)
 		return nil
 	})
 
-	s.Driver.AddCommand("Stop", func(params map[string]interface{}) interface{} {
+	s.AddCommand("Stop", func(params map[string]interface{}) interface{} {
 		s.Stop()
 		return nil
 	})
 
-	s.Driver.AddCommand("GetRGB", func(params map[string]interface{}) interface{} {
+	s.AddCommand("GetRGB", func(params map[string]interface{}) interface{} {
 		return s.GetRGB()
 	})
 
-	s.Driver.AddCommand("SetBackLED", func(params map[string]interface{}) interface{} {
+	s.AddCommand("SetBackLED", func(params map[string]interface{}) interface{} {
 		level := uint8(params["level"].(float64))
 		s.SetBackLED(level)
 		return nil
 	})
 
-	s.Driver.AddCommand("SetHeading", func(params map[string]interface{}) interface{} {
+	s.AddCommand("SetHeading", func(params map[string]interface{}) interface{} {
 		heading := uint16(params["heading"].(float64))
 		s.SetHeading(heading)
 		return nil
 	})
-	s.Driver.AddCommand("SetStabilization", func(params map[string]interface{}) interface{} {
+	s.AddCommand("SetStabilization", func(params map[string]interface{}) interface{} {
 		on := params["heading"].(bool)
 		s.SetStabilization(on)
 		return nil
@@ -78,7 +79,7 @@ func NewSpheroDriver(a *SpheroAdaptor, name string) *SpheroDriver {
 }
 
 func (s *SpheroDriver) adaptor() *SpheroAdaptor {
-	return s.Driver.Adaptor().(*SpheroAdaptor)
+	return s.Adaptor().(*SpheroAdaptor)
 }
 
 func (s *SpheroDriver) Init() bool {

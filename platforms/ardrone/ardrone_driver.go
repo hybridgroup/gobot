@@ -16,11 +16,11 @@ func NewArdroneDriver(adaptor *ArdroneAdaptor, name string) *ArdroneDriver {
 			adaptor,
 		),
 	}
-	d.Driver.AddEvent("flying")
+	d.AddEvent("flying")
 	return d
 }
 func (a *ArdroneDriver) adaptor() *ArdroneAdaptor {
-	return a.Driver.Adaptor().(*ArdroneAdaptor)
+	return a.Adaptor().(*ArdroneAdaptor)
 }
 
 func (a *ArdroneDriver) Start() bool {
