@@ -2,8 +2,9 @@ package firmata
 
 import (
 	"fmt"
-	"github.com/hybridgroup/gobot"
 	"testing"
+
+	"github.com/hybridgroup/gobot"
 )
 
 func initTestFirmataAdaptor() *FirmataAdaptor {
@@ -15,6 +16,7 @@ func initTestFirmataAdaptor() *FirmataAdaptor {
 		f.Board.Events = append(f.Board.Events, event{Name: "analog_mapping_query"})
 	}
 	a.Connect()
+	a.Board.Pins = make([]pin, 100)
 	return a
 }
 
