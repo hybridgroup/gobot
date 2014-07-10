@@ -9,7 +9,7 @@ https://github.com/hybridgroup/gobot
 
 ## Installing
 ```
-go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/platforms/ardrone
+go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/ardrone
 ```
 ## Using
 ```go

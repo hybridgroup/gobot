@@ -11,21 +11,21 @@ This package requires `opencv` to be installed on your system
 To install `opencv` on OSX using Homebrew:
 
 ```
-$ brew tap homebrew/science && brew install opencv 
+$ brew tap homebrew/science && brew install opencv
 ```
 
 ### Ubuntu
 
 Follow the official [OpenCV installation guide](http://docs.opencv.org/doc/tutorials/introduction/linux_install/linux_install.html)
 
-### Windows 
+### Windows
 
 Follow the official [OpenCV installation guide](http://docs.opencv.org/doc/tutorials/introduction/windows_install/windows_install.html#windows-installation)
 
 
-Now you can install the package with 
+Now you can install the package with
 ```
-go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/platforms/opencv
+go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/opencv
 ```
 
 ## Using

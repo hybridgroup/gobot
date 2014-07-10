@@ -4,7 +4,7 @@ This package provides the Gobot adaptor for the [Spark Core](https://www.spark.i
 
 ## Installing
 ```
-go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/platforms/spark
+go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/spark
 ```
 
 ## Example

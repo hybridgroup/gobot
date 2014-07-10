@@ -4,7 +4,7 @@ This package provides the Gobot adaptor and driver for the [Sphero](http://www.g
 
 ## Installing
 ```
-go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/platforms/sphero
+go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/sphero
 ```
 
 ## How To Connect
