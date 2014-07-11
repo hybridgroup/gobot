@@ -1,12 +1,13 @@
 package main
 
 import (
-	cv "github.com/hybridgroup/go-opencv/opencv"
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/opencv"
 	"path"
 	"runtime"
 	"time"
+
+	cv "github.com/hybridgroup/go-opencv/opencv"
+	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/platforms/opencv"
 )
 
 func main() {

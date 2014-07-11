@@ -17,7 +17,9 @@ func main() {
 
 	work := func() {
 		gobot.On(sensor.Event("data"), func(data interface{}) {
-			brightness := uint8(gobot.ToScale(gobot.FromScale(float64(data.(int)), 0, 1024), 0, 255))
+			brightness := uint8(
+				gobot.ToScale(gobot.FromScale(float64(data.(int)), 0, 1024), 0, 255),
+			)
 			fmt.Println("sensor", data)
 			fmt.Println("brightness", brightness)
 			led.Brightness(brightness)

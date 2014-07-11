@@ -2,14 +2,15 @@ package main
 
 import (
 	"fmt"
-	cv "github.com/hybridgroup/go-opencv/opencv"
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/ardrone"
-	"github.com/hybridgroup/gobot/platforms/opencv"
 	"math"
 	"path"
 	"runtime"
 	"time"
+
+	cv "github.com/hybridgroup/go-opencv/opencv"
+	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/platforms/ardrone"
+	"github.com/hybridgroup/gobot/platforms/opencv"
 )
 
 func main() {

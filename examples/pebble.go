@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/api"
 	"github.com/hybridgroup/gobot/platforms/pebble"
@@ -32,5 +33,6 @@ func main() {
 	)
 
 	gbot.AddRobot(robot)
+
 	gbot.Start()
 }

@@ -1,11 +1,12 @@
 package main
 
 import (
+	"math"
+	"time"
+
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/ardrone"
 	"github.com/hybridgroup/gobot/platforms/joystick"
-	"math"
-	"time"
 )
 
 type pair struct {
@@ -17,7 +18,10 @@ func main() {
 	gbot := gobot.NewGobot()
 
 	joystickAdaptor := joystick.NewJoystickAdaptor("ps3")
-	joystick := joystick.NewJoystickDriver(joystickAdaptor, "ps3", "./platforms/joystick/configs/dualshock3.json")
+	joystick := joystick.NewJoystickDriver(joystickAdaptor,
+		"ps3",
+		"./platforms/joystick/configs/dualshock3.json",
+	)
 
 	ardroneAdaptor := ardrone.NewArdroneAdaptor("Drone")
 	drone := ardrone.NewArdroneDriver(ardroneAdaptor, "Drone")

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/api"
 )
@@ -17,7 +18,7 @@ func main() {
 	hello := gbot.AddRobot(gobot.NewRobot("hello"))
 
 	hello.AddCommand("hi_there", func(params map[string]interface{}) interface{} {
-		return fmt.Sprintf("This command is attached to the robot %v", hello.Name)
+		return fmt.Sprintf("This command is attached to the robot %v", hello.Name())
 	})
 
 	gbot.Start()

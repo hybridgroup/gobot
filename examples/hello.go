@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/hybridgroup/gobot"
 	"time"
+
+	"github.com/hybridgroup/gobot"
 )
 
 func main() {
