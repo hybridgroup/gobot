@@ -135,11 +135,9 @@ func (s *SpheroDriver) Start() bool {
 }
 
 func (s *SpheroDriver) Halt() bool {
-	go func() {
-		for {
-			s.Stop()
-		}
-	}()
+	gobot.Every(10*time.Millisecond, func() {
+		s.Stop()
+	})
 	time.Sleep(1 * time.Second)
 	return true
 }
