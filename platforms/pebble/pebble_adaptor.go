@@ -10,9 +10,10 @@ type PebbleAdaptor struct {
 
 func NewPebbleAdaptor(name string) *PebbleAdaptor {
 	return &PebbleAdaptor{
-		Adaptor: gobot.Adaptor{
-			Name: name,
-		},
+		Adaptor: *gobot.NewAdaptor(
+			name,
+			"PebbleAdaptor",
+		),
 	}
 }
 

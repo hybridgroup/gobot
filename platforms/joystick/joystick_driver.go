@@ -3,10 +3,11 @@ package joystick
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/hybridgroup/go-sdl2/sdl"
-	"github.com/hybridgroup/gobot"
 	"io/ioutil"
 	"time"
+
+	"github.com/hybridgroup/go-sdl2/sdl"
+	"github.com/hybridgroup/gobot"
 )
 
 type JoystickDriver struct {
@@ -35,10 +36,11 @@ type joystickConfig struct {
 
 func NewJoystickDriver(a *JoystickAdaptor, name string, config string) *JoystickDriver {
 	d := &JoystickDriver{
-		Driver: gobot.Driver{
-			Events:  make(map[string]*gobot.Event),
-			Adaptor: a,
-		},
+		Driver: *gobot.NewDriver(
+			name,
+			"JoystickDriver",
+			a,
+		),
 	}
 
 	file, e := ioutil.ReadFile(config)
@@ -49,20 +51,20 @@ func NewJoystickDriver(a *JoystickAdaptor, name string, config string) *Joystick
 	json.Unmarshal(file, &jsontype)
 	d.config = jsontype
 	for _, value := range d.config.Buttons {
-		d.Events[fmt.Sprintf("%s_press", value.Name)] = gobot.NewEvent()
-		d.Events[fmt.Sprintf("%s_release", value.Name)] = gobot.NewEvent()
+		d.AddEvent(fmt.Sprintf("%s_press", value.Name))
+		d.AddEvent(fmt.Sprintf("%s_release", value.Name))
 	}
 	for _, value := range d.config.Axis {
-		d.Events[value.Name] = gobot.NewEvent()
+		d.AddEvent(value.Name)
 	}
 	for _, value := range d.config.Hats {
-		d.Events[value.Name] = gobot.NewEvent()
+		d.AddEvent(value.Name)
 	}
 	return d
 }
 
 func (j *JoystickDriver) adaptor() *JoystickAdaptor {
-	return j.Driver.Adaptor.(*JoystickAdaptor)
+	return j.Adaptor().(*JoystickAdaptor)
 }
 
 func (j *JoystickDriver) Start() bool {
@@ -77,7 +79,7 @@ func (j *JoystickDriver) Start() bool {
 						if axis == "" {
 							fmt.Println("Unknown Axis:", data.Axis)
 						} else {
-							gobot.Publish(j.Events[axis], data.Value)
+							gobot.Publish(j.Event(axis), data.Value)
 						}
 					}
 				case *sdl.JoyButtonEvent:
@@ -87,9 +89,9 @@ func (j *JoystickDriver) Start() bool {
 							fmt.Println("Unknown Button:", data.Button)
 						} else {
 							if data.State == 1 {
-								gobot.Publish(j.Events[fmt.Sprintf("%s_press", button)], nil)
+								gobot.Publish(j.Event(fmt.Sprintf("%s_press", button)), nil)
 							} else {
-								gobot.Publish(j.Events[fmt.Sprintf("%s_release", button)], nil)
+								gobot.Publish(j.Event(fmt.Sprintf("%s_release", button)), nil)
 							}
 						}
 					}
@@ -99,7 +101,7 @@ func (j *JoystickDriver) Start() bool {
 						if hat == "" {
 							fmt.Println("Unknown Hat:", data.Hat, data.Value)
 						} else {
-							gobot.Publish(j.Events[hat], true)
+							gobot.Publish(j.Event(hat), true)
 						}
 					}
 				}

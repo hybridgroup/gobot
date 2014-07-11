@@ -2,9 +2,10 @@ package firmata
 
 import (
 	"fmt"
+	"strconv"
+
 	"github.com/hybridgroup/gobot"
 	"github.com/tarm/goserial"
-	"strconv"
 )
 
 type FirmataAdaptor struct {
@@ -16,12 +17,13 @@ type FirmataAdaptor struct {
 
 func NewFirmataAdaptor(name, port string) *FirmataAdaptor {
 	return &FirmataAdaptor{
-		Adaptor: gobot.Adaptor{
-			Name: name,
-			Port: port,
-		},
+		Adaptor: *gobot.NewAdaptor(
+			name,
+			"FirmataAdaptor",
+			port,
+		),
 		connect: func(f *FirmataAdaptor) {
-			sp, err := serial.OpenPort(&serial.Config{Name: f.Port, Baud: 57600})
+			sp, err := serial.OpenPort(&serial.Config{Name: f.Port(), Baud: 57600})
 			if err != nil {
 				panic(err)
 			}
@@ -33,7 +35,7 @@ func NewFirmataAdaptor(name, port string) *FirmataAdaptor {
 func (f *FirmataAdaptor) Connect() bool {
 	f.connect(f)
 	f.Board.connect()
-	f.Connected = true
+	f.SetConnected(true)
 	return true
 }
 
@@ -88,7 +90,10 @@ func (f *FirmataAdaptor) AnalogRead(pin string) int {
 	events := f.Board.findEvents(fmt.Sprintf("analog_read_%v", pin))
 	if len(events) > 0 {
 		event := events[len(events)-1]
-		return int(uint(event.Data[0])<<24 | uint(event.Data[1])<<16 | uint(event.Data[2])<<8 | uint(event.Data[3]))
+		return int(uint(event.Data[0])<<24 |
+			uint(event.Data[1])<<16 |
+			uint(event.Data[2])<<8 |
+			uint(event.Data[3]))
 	}
 	return -1
 }

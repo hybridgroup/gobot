@@ -1,10 +1,11 @@
 package main
 
 import (
+	"time"
+
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/digispark"
 	"github.com/hybridgroup/gobot/platforms/gpio"
-	"time"
 )
 
 func main() {
@@ -26,7 +27,13 @@ func main() {
 		})
 	}
 
-	gbot.Robots = append(gbot.Robots,
-		gobot.NewRobot("pwmBot", []gobot.Connection{digisparkAdaptor}, []gobot.Device{led}, work))
+	robot := gobot.NewRobot("pwmBot",
+		[]gobot.Connection{digisparkAdaptor},
+		[]gobot.Device{led},
+		work,
+	)
+
+	gbot.AddRobot(robot)
+
 	gbot.Start()
 }

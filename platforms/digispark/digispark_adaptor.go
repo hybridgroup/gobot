@@ -15,9 +15,10 @@ type DigisparkAdaptor struct {
 
 func NewDigisparkAdaptor(name string) *DigisparkAdaptor {
 	return &DigisparkAdaptor{
-		Adaptor: gobot.Adaptor{
-			Name: name,
-		},
+		Adaptor: *gobot.NewAdaptor(
+			name,
+			"DigisparkAdaptor",
+		),
 		connect: func(d *DigisparkAdaptor) {
 			d.littleWire = LittleWireConnect()
 		},
@@ -26,7 +27,7 @@ func NewDigisparkAdaptor(name string) *DigisparkAdaptor {
 
 func (d *DigisparkAdaptor) Connect() bool {
 	d.connect(d)
-	d.Connected = true
+	d.SetConnected(true)
 	return true
 }
 

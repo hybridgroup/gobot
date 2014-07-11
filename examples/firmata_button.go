@@ -15,17 +15,21 @@ func main() {
 	led := gpio.NewLedDriver(firmataAdaptor, "myLed", "13")
 
 	work := func() {
-		gobot.On(button.Events["push"], func(data interface{}) {
+		gobot.On(button.Event("push"), func(data interface{}) {
 			led.On()
 		})
-		gobot.On(button.Events["release"], func(data interface{}) {
+		gobot.On(button.Event("release"), func(data interface{}) {
 			led.Off()
 		})
 	}
 
-	gbot.Robots = append(gbot.Robots,
-		gobot.NewRobot("buttonBot", []gobot.Connection{firmataAdaptor}, []gobot.Device{button, led}, work),
+	robot := gobot.NewRobot("buttonBot",
+		[]gobot.Connection{firmataAdaptor},
+		[]gobot.Device{button, led},
+		work,
 	)
+
+	gbot.AddRobot(robot)
 
 	gbot.Start()
 }

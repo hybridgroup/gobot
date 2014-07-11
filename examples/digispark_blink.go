@@ -1,14 +1,16 @@
 package main
 
 import (
+	"time"
+
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/digispark"
 	"github.com/hybridgroup/gobot/platforms/gpio"
-	"time"
 )
 
 func main() {
 	gbot := gobot.NewGobot()
+
 	digisparkAdaptor := digispark.NewDigisparkAdaptor("Digispark")
 	led := gpio.NewLedDriver(digisparkAdaptor, "led", "0")
 
@@ -18,7 +20,13 @@ func main() {
 		})
 	}
 
-	gbot.Robots = append(gbot.Robots,
-		gobot.NewRobot("blinkBot", []gobot.Connection{digisparkAdaptor}, []gobot.Device{led}, work))
+	robot := gobot.NewRobot("blinkBot",
+		[]gobot.Connection{digisparkAdaptor},
+		[]gobot.Device{led},
+		work,
+	)
+
+	gbot.AddRobot(robot)
+
 	gbot.Start()
 }

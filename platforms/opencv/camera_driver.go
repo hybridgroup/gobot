@@ -12,15 +12,17 @@ type CameraDriver struct {
 }
 
 func NewCameraDriver(name string, source interface{}) *CameraDriver {
-	return &CameraDriver{
-		Driver: gobot.Driver{
-			Name: name,
-			Events: map[string]*gobot.Event{
-				"Frame": gobot.NewEvent(),
-			},
-		},
+	c := &CameraDriver{
+		Driver: *gobot.NewDriver(
+			name,
+			"CameraDriver",
+		),
 		Source: source,
 	}
+
+	c.AddEvent("frame")
+
+	return c
 }
 
 func (c *CameraDriver) Start() bool {
@@ -38,7 +40,7 @@ func (c *CameraDriver) Start() bool {
 			if c.camera.GrabFrame() {
 				image := c.camera.RetrieveFrame(1)
 				if image != nil {
-					gobot.Publish(c.Events["Frame"], image)
+					gobot.Publish(c.Event("frame"), image)
 				}
 			}
 		}

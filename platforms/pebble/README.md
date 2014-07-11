@@ -11,7 +11,6 @@ has been installed on the Pebble watch.
 For more information about Gobot, check out the github repo at
 https://github.com/hybridgroup/gobot
 
-[![Build Status](https://secure.travis-ci.org/hybridgroup/gobot-pebble.png?branch=master)](http://travis-ci.org/hybridgroup/gobot-pebble)
 
 ## Installing
 
@@ -25,39 +24,46 @@ https://github.com/hybridgroup/gobot
 in example, api host is your computer IP, robot name is 'pebble', robot api port is 8080 and publish command is PublishEventC and
 message command is PendingMessageC
 
-```
+```go
 package main
 
 import (
 	"fmt"
+
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/api"
 	"github.com/hybridgroup/gobot/platforms/pebble"
 )
 
 func main() {
-	master := gobot.NewGobot()
-	api.NewAPI(master).Start()
+	gbot := gobot.NewGobot()
+	api.NewAPI(gbot).Start()
 
 	pebbleAdaptor := pebble.NewPebbleAdaptor("pebble")
 	pebbleDriver := pebble.NewPebbleDriver(pebbleAdaptor, "pebble")
 
 	work := func() {
 		pebbleDriver.SendNotification("Hello Pebble!")
-		gobot.On(pebbleDriver.Events["button"], func(data interface{}) {
+		gobot.On(pebbleDriver.Event("button"), func(data interface{}) {
 			fmt.Println("Button pushed: " + data.(string))
 		})
 
-		gobot.On(pebbleDriver.Events["tap"], func(data interface{}) {
+		gobot.On(pebbleDriver.Event("tap"), func(data interface{}) {
 			fmt.Println("Tap event detected")
 		})
 	}
 
-	robot := gobot.NewRobot("pebble", []gobot.Connection{pebbleAdaptor}, []gobot.Device{pebbleDriver}, work)
+	robot := gobot.NewRobot("pebble",
+		[]gobot.Connection{pebbleAdaptor},
+		[]gobot.Device{pebbleDriver},
+		work,
+	)
 
-	master.Robots = append(master.Robots, robot)
-	master.Start()
+	gbot.AddRobot(robot)
+
+	gbot.Start()
 }
+
 ```
 
 ## Supported Features

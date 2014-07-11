@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/beaglebone"
 	"github.com/hybridgroup/gobot/platforms/i2c"
-	"time"
 )
 
 func main() {
@@ -23,7 +24,13 @@ func main() {
 		})
 	}
 
-	gbot.Robots = append(gbot.Robots,
-		gobot.NewRobot("blinkmBot", []gobot.Connection{beagleboneAdaptor}, []gobot.Device{blinkm}, work))
+	robot := gobot.NewRobot("blinkmBot",
+		[]gobot.Connection{beagleboneAdaptor},
+		[]gobot.Device{blinkm},
+		work,
+	)
+
+	gbot.AddRobot(robot)
+
 	gbot.Start()
 }

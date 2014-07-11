@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/neurosky"
 )
@@ -13,25 +14,25 @@ func main() {
 	neuro := neurosky.NewNeuroskyDriver(adaptor, "neuro")
 
 	work := func() {
-		gobot.On(neuro.Events["Extended"], func(data interface{}) {
+		gobot.On(neuro.Event("extended"), func(data interface{}) {
 			fmt.Println("Extended", data)
 		})
-		gobot.On(neuro.Events["Signal"], func(data interface{}) {
+		gobot.On(neuro.Event("signal"), func(data interface{}) {
 			fmt.Println("Signal", data)
 		})
-		gobot.On(neuro.Events["Attention"], func(data interface{}) {
+		gobot.On(neuro.Event("attention"), func(data interface{}) {
 			fmt.Println("Attention", data)
 		})
-		gobot.On(neuro.Events["Meditation"], func(data interface{}) {
+		gobot.On(neuro.Event("meditation"), func(data interface{}) {
 			fmt.Println("Meditation", data)
 		})
-		gobot.On(neuro.Events["Blink"], func(data interface{}) {
+		gobot.On(neuro.Event("blink"), func(data interface{}) {
 			fmt.Println("Blink", data)
 		})
-		gobot.On(neuro.Events["Wave"], func(data interface{}) {
+		gobot.On(neuro.Event("wave"), func(data interface{}) {
 			fmt.Println("Wave", data)
 		})
-		gobot.On(neuro.Events["EEG"], func(data interface{}) {
+		gobot.On(neuro.Event("eeg"), func(data interface{}) {
 			eeg := data.(neurosky.EEG)
 			fmt.Println("Delta", eeg.Delta)
 			fmt.Println("Theta", eeg.Theta)
@@ -45,8 +46,12 @@ func main() {
 		})
 	}
 
-	gbot.Robots = append(gbot.Robots,
-		gobot.NewRobot("brainBot", []gobot.Connection{adaptor}, []gobot.Device{neuro}, work))
+	robot := gobot.NewRobot("brainBot",
+		[]gobot.Connection{adaptor},
+		[]gobot.Device{neuro},
+		work,
+	)
 
+	gbot.AddRobot(robot)
 	gbot.Start()
 }

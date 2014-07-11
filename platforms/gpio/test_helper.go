@@ -22,8 +22,9 @@ func (t *gpioTestAdaptor) Finalize() bool { return true }
 
 func newGpioTestAdaptor(name string) *gpioTestAdaptor {
 	return &gpioTestAdaptor{
-		Adaptor: gobot.Adaptor{
-			Name: name,
-		},
+		Adaptor: *gobot.NewAdaptor(
+			name,
+			"/dev/null",
+		),
 	}
 }

@@ -12,15 +12,16 @@ type WindowDriver struct {
 
 func NewWindowDriver(name string) *WindowDriver {
 	return &WindowDriver{
-		Driver: gobot.Driver{
-			Name: name,
-		},
+		Driver: *gobot.NewDriver(
+			name,
+			"WindowDriver",
+		),
 	}
 }
 
 func (w *WindowDriver) Start() bool {
 	cv.StartWindowThread()
-	w.window = cv.NewWindow(w.Name, cv.CV_WINDOW_NORMAL)
+	w.window = cv.NewWindow(w.Name(), cv.CV_WINDOW_NORMAL)
 	return true
 }
 

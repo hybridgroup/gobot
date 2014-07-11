@@ -13,27 +13,33 @@ go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/p
 package main
 
 import (
-        "github.com/hybridgroup/gobot"
-        "github.com/hybridgroup/gobot/platforms/gpio"
-        "github.com/hybridgroup/gobot/platforms/spark"
-        "time"
+	"time"
+
+	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/platforms/gpio"
+	"github.com/hybridgroup/gobot/platforms/spark"
 )
 
 func main() {
-        master := gobot.NewGobot()
+	gbot := gobot.NewGobot()
 
-        sparkCore := spark.NewSparkCoreAdaptor("spark", "device_id", "access_token")
-        led := gpio.NewLedDriver(sparkCore, "led", "D7")
+	sparkCore := spark.NewSparkCoreAdaptor("spark", "device_id", "access_token")
+	led := gpio.NewLedDriver(sparkCore, "led", "D7")
 
-        work := func() {
-                gobot.Every(1*time.Second, func() {
-                        led.Toggle()
-                })
-        }
+	work := func() {
+		gobot.Every(1*time.Second, func() {
+			led.Toggle()
+		})
+	}
 
-        master.Robots = append(master.Robots,
-                gobot.NewRobot("spark", []gobot.Connection{sparkCore}, []gobot.Device{led}, work))
+	robot := gobot.NewRobot("spark",
+		[]gobot.Connection{sparkCore},
+		[]gobot.Device{led},
+		work,
+	)
 
-        master.Start()
+	gbot.AddRobot(robot)
+
+	gbot.Start()
 }
 ```

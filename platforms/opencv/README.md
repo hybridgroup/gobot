@@ -45,13 +45,17 @@ func main() {
 	camera := opencv.NewCameraDriver("camera", 0)
 
 	work := func() {
-		gobot.On(camera.Events["Frame"], func(data interface{}) {
+		gobot.On(camera.Event("frame"), func(data interface{}) {
 			window.ShowImage(data.(*cv.IplImage))
 		})
 	}
 
-	gbot.Robots = append(gbot.Robots,
-		gobot.NewRobot("cameraBot", []gobot.Connection{}, []gobot.Device{window, camera}, work))
+	robot := gobot.NewRobot("cameraBot",
+		[]gobot.Device{window, camera},
+		work,
+	)
+
+	gbot.AddRobot(robot)
 
 	gbot.Start()
 }

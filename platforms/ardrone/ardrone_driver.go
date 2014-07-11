@@ -9,18 +9,18 @@ type ArdroneDriver struct {
 }
 
 func NewArdroneDriver(adaptor *ArdroneAdaptor, name string) *ArdroneDriver {
-	return &ArdroneDriver{
-		Driver: gobot.Driver{
-			Name: name,
-			Events: map[string]*gobot.Event{
-				"Flying": gobot.NewEvent(),
-			},
-			Adaptor: adaptor,
-		},
+	d := &ArdroneDriver{
+		Driver: *gobot.NewDriver(
+			name,
+			"ArdroneDriver",
+			adaptor,
+		),
 	}
+	d.AddEvent("flying")
+	return d
 }
 func (a *ArdroneDriver) adaptor() *ArdroneAdaptor {
-	return a.Driver.Adaptor.(*ArdroneAdaptor)
+	return a.Adaptor().(*ArdroneAdaptor)
 }
 
 func (a *ArdroneDriver) Start() bool {
@@ -32,7 +32,7 @@ func (a *ArdroneDriver) Halt() bool {
 }
 
 func (a *ArdroneDriver) TakeOff() {
-	gobot.Publish(a.Events["Flying"], a.adaptor().drone.Takeoff())
+	gobot.Publish(a.Event("flying"), a.adaptor().drone.Takeoff())
 }
 
 func (a *ArdroneDriver) Land() {

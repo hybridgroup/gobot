@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/sphero"
-	"time"
 )
 
 type conway struct {
@@ -15,7 +16,7 @@ type conway struct {
 }
 
 func main() {
-	master := gobot.NewGobot()
+	gbot := gobot.NewGobot()
 
 	spheros := []string{
 		"/dev/rfcomm0",
@@ -23,19 +24,18 @@ func main() {
 		"/dev/rfcomm2",
 	}
 
-	for s := range spheros {
-		spheroAdaptor := sphero.NewSpheroAdaptor("Sphero", spheros[s])
+	for _, port := range spheros {
+		spheroAdaptor := sphero.NewSpheroAdaptor("Sphero", port)
 
-		cell := sphero.NewSpheroDriver(spheroAdaptor, "Sphero"+spheros[s])
+		cell := sphero.NewSpheroDriver(spheroAdaptor, "Sphero"+port)
 
 		work := func() {
-
 			conway := new(conway)
 			conway.cell = cell
 
 			conway.birth()
 
-			gobot.On(cell.Events["Collision"], func(data interface{}) {
+			gobot.On(cell.Event("collision"), func(data interface{}) {
 				conway.contact()
 			})
 
@@ -52,11 +52,15 @@ func main() {
 			})
 		}
 
-		master.Robots = append(master.Robots,
-			gobot.NewRobot("conway", []gobot.Connection{spheroAdaptor}, []gobot.Device{cell}, work))
+		robot := gobot.NewRobot("conway",
+			[]gobot.Connection{spheroAdaptor},
+			[]gobot.Device{cell},
+			work,
+		)
+		gbot.AddRobot(robot)
 	}
 
-	master.Start()
+	gbot.Start()
 }
 
 func (c *conway) resetContacts() {

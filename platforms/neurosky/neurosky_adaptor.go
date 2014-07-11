@@ -14,10 +14,11 @@ type NeuroskyAdaptor struct {
 
 func NewNeuroskyAdaptor(name string, port string) *NeuroskyAdaptor {
 	return &NeuroskyAdaptor{
-		Adaptor: gobot.Adaptor{
-			Name: name,
-			Port: port,
-		},
+		Adaptor: *gobot.NewAdaptor(
+			name,
+			"NeuroskyAdaptor",
+			port,
+		),
 		connect: func(port string) io.ReadWriteCloser {
 			sp, err := serial.OpenPort(&serial.Config{Name: port, Baud: 57600})
 			if err != nil {
@@ -29,13 +30,13 @@ func NewNeuroskyAdaptor(name string, port string) *NeuroskyAdaptor {
 }
 
 func (n *NeuroskyAdaptor) Connect() bool {
-	n.sp = n.connect(n.Adaptor.Port)
-	n.Connected = true
+	n.sp = n.connect(n.Adaptor.Port())
+	n.SetConnected(true)
 	return true
 }
 
 func (n *NeuroskyAdaptor) Finalize() bool {
 	n.sp.Close()
-	n.Connected = false
+	n.SetConnected(false)
 	return true
 }

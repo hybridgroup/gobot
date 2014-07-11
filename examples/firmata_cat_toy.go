@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/firmata"
 	"github.com/hybridgroup/gobot/platforms/gpio"
 	"github.com/hybridgroup/gobot/platforms/leap"
-	"time"
 )
 
 func main() {
@@ -22,7 +23,7 @@ func main() {
 	work := func() {
 		x := 90.0
 		z := 90.0
-		gobot.On(leapDriver.Events["Message"], func(data interface{}) {
+		gobot.On(leapDriver.Event("message"), func(data interface{}) {
 			if len(data.(leap.Frame).Hands) > 0 {
 				hand := data.(leap.Frame).Hands[0]
 				x = gobot.ToScale(gobot.FromScale(hand.X(), -300, 300), 30, 150)
@@ -36,7 +37,13 @@ func main() {
 		})
 	}
 
-	gbot.Robots = append(gbot.Robots,
-		gobot.NewRobot("pwmBot", []gobot.Connection{firmataAdaptor, leapAdaptor}, []gobot.Device{servo1, servo2, leapDriver}, work))
+	robot := gobot.NewRobot("pwmBot",
+		[]gobot.Connection{firmataAdaptor, leapAdaptor},
+		[]gobot.Device{servo1, servo2, leapDriver},
+		work,
+	)
+
+	gbot.AddRobot(robot)
+
 	gbot.Start()
 }

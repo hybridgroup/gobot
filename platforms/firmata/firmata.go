@@ -78,10 +78,10 @@ func newBoard(sp io.ReadWriteCloser) *board {
 	board.MinorVersion = 0
 	board.Serial = sp
 	board.FirmwareName = ""
-	board.Pins = make([]pin, 100)
-	board.AnalogPins = make([]byte, 0)
+	board.Pins = []pin{}
+	board.AnalogPins = []byte{}
 	board.Connected = false
-	board.Events = make([]event, 0)
+	board.Events = []event{}
 	return board
 }
 
@@ -209,7 +209,8 @@ func (b *board) togglePinReporting(pin byte, state byte, mode byte) {
 }
 
 func (b *board) i2cReadRequest(slaveAddress byte, numBytes uint) {
-	b.write([]byte{StartSysex, I2CRequest, slaveAddress, (I2CModeRead << 3), byte(numBytes & 0x7F), byte(((numBytes >> 7) & 0x7F)), EndSysex})
+	b.write([]byte{StartSysex, I2CRequest, slaveAddress, (I2CModeRead << 3),
+		byte(numBytes & 0x7F), byte(((numBytes >> 7) & 0x7F)), EndSysex})
 }
 
 func (b *board) i2cWriteRequest(slaveAddress byte, data []byte) {
@@ -262,7 +263,13 @@ func (b *board) process(data []byte) {
 			pin := (messageType & 0x0F)
 
 			b.Pins[b.AnalogPins[pin]].Value = int(value)
-			b.Events = append(b.Events, event{Name: fmt.Sprintf("analog_read_%v", pin), Data: []byte{byte(value >> 24), byte(value >> 16), byte(value >> 8), byte(value & 0xff)}})
+			b.Events = append(b.Events,
+				event{Name: fmt.Sprintf("analog_read_%v", pin),
+					Data: []byte{
+						byte(value >> 24), byte(value >> 16), byte(value >> 8), byte(value & 0xff),
+					},
+				},
+			)
 
 		case DigitalMessageRangeStart <= messageType && DigitalMessageRangeEnd >= messageType:
 			port := messageType & 0x0F
@@ -275,7 +282,11 @@ func (b *board) process(data []byte) {
 				pin := b.Pins[pinNumber]
 				if byte(pin.Mode) == Input {
 					pin.Value = int((portValue >> (byte(i) & 0x07)) & 0x01)
-					b.Events = append(b.Events, event{Name: fmt.Sprintf("digital_read_%v", pinNumber), Data: []byte{byte(pin.Value & 0xff)}})
+					b.Events = append(b.Events,
+						event{Name: fmt.Sprintf("digital_read_%v", pinNumber),
+							Data: []byte{byte(pin.Value & 0xff)},
+						},
+					)
 				}
 			}
 
@@ -321,7 +332,7 @@ func (b *board) process(data []byte) {
 			case AnalogMappingResponse:
 				pinIndex := byte(0)
 
-				for _, val := range currentBuffer[2 : len(currentBuffer)-1] {
+				for _, val := range currentBuffer[2 : len(b.Pins)-1] {
 
 					b.Pins[pinIndex].AnalogChannel = val
 
@@ -346,7 +357,11 @@ func (b *board) process(data []byte) {
 					pin.Value = int(uint(pin.Value) | uint(currentBuffer[6])<<14)
 				}
 
-				b.Events = append(b.Events, event{Name: fmt.Sprintf("pin_%v_state", currentBuffer[2]), Data: []byte{byte(pin.Value & 0xff)}})
+				b.Events = append(b.Events,
+					event{Name: fmt.Sprintf("pin_%v_state", currentBuffer[2]),
+						Data: []byte{byte(pin.Value & 0xff)},
+					},
+				)
 			case I2CReply:
 				i2cReply := map[string][]byte{
 					"slave_address": []byte{byte(currentBuffer[2]) | byte(currentBuffer[3])<<7},
@@ -360,7 +375,9 @@ func (b *board) process(data []byte) {
 					if i+2 > len(currentBuffer) {
 						break
 					}
-					i2cReply["data"] = append(i2cReply["data"], byte(currentBuffer[i])|byte(currentBuffer[i+1])<<7)
+					i2cReply["data"] = append(i2cReply["data"],
+						byte(currentBuffer[i])|byte(currentBuffer[i+1])<<7,
+					)
 				}
 				b.Events = append(b.Events, event{Name: "i2c_reply", I2cReply: i2cReply})
 

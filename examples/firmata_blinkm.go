@@ -2,14 +2,16 @@ package main
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/firmata"
 	"github.com/hybridgroup/gobot/platforms/i2c"
-	"time"
 )
 
 func main() {
 	gbot := gobot.NewGobot()
+
 	firmataAdaptor := firmata.NewFirmataAdaptor("firmata", "/dev/ttyACM0")
 	blinkm := i2c.NewBlinkMDriver(firmataAdaptor, "blinkm")
 
@@ -23,7 +25,12 @@ func main() {
 		})
 	}
 
-	gbot.Robots = append(gbot.Robots,
-		gobot.NewRobot("blinkmBot", []gobot.Connection{firmataAdaptor}, []gobot.Device{blinkm}, work))
+	robot := gobot.NewRobot("blinkmBot",
+		[]gobot.Connection{firmataAdaptor},
+		[]gobot.Device{blinkm},
+		work,
+	)
+
+	gbot.AddRobot(robot)
 	gbot.Start()
 }

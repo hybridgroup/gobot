@@ -2,14 +2,16 @@ package main
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/firmata"
 	"github.com/hybridgroup/gobot/platforms/gpio"
-	"time"
 )
 
 func main() {
 	gbot := gobot.NewGobot()
+
 	firmataAdaptor := firmata.NewFirmataAdaptor("firmata", "/dev/ttyACM0")
 	servo := gpio.NewServoDriver(firmataAdaptor, "servo", "3")
 
@@ -21,8 +23,12 @@ func main() {
 		})
 	}
 
-	gbot.Robots = append(gbot.Robots,
-		gobot.NewRobot("servoBot", []gobot.Connection{firmataAdaptor}, []gobot.Device{servo}, work))
+	robot := gobot.NewRobot("servoBot",
+		[]gobot.Connection{firmataAdaptor},
+		[]gobot.Device{servo},
+		work,
+	)
 
+	gbot.AddRobot(robot)
 	gbot.Start()
 }

@@ -3,12 +3,13 @@ package api
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/hybridgroup/gobot"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/hybridgroup/gobot"
 )
 
 func initTestAPI() *api {
@@ -18,11 +19,9 @@ func initTestAPI() *api {
 	a.start = func(m *api) {}
 	a.Start()
 
-	g.Robots = []*gobot.Robot{
-		gobot.NewTestRobot("Robot 1"),
-		gobot.NewTestRobot("Robot 2"),
-		gobot.NewTestRobot("Robot 3"),
-	}
+	g.AddRobot(gobot.NewTestRobot("Robot 1"))
+	g.AddRobot(gobot.NewTestRobot("Robot 2"))
+	g.AddRobot(gobot.NewTestRobot("Robot 3"))
 
 	return a
 }

@@ -1,13 +1,14 @@
 package main
 
 import (
+	"time"
+
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/sphero"
-	"time"
 )
 
 func main() {
-	master := gobot.NewGobot()
+	gbot := gobot.NewGobot()
 
 	spheros := map[string]string{
 		"Sphero-BPO": "/dev/rfcomm0",
@@ -22,20 +23,28 @@ func main() {
 			spheroDriver.SetRGB(uint8(255), uint8(0), uint8(0))
 		}
 
-		master.Robots = append(master.Robots,
-			gobot.NewRobot(name, []gobot.Connection{spheroAdaptor}, []gobot.Device{spheroDriver}, work))
+		robot := gobot.NewRobot(name,
+			[]gobot.Connection{spheroAdaptor},
+			[]gobot.Device{spheroDriver},
+			work,
+		)
+
+		gbot.AddRobot(robot)
 	}
 
-	master.Robots = append(master.Robots, gobot.NewRobot(
-		"",
-		nil,
-		nil,
+	robot := gobot.NewRobot("",
 		func() {
 			gobot.Every(1*time.Second, func() {
-				gobot.Call(master.Robot("Sphero-BPO").Device("sphero").Driver, "SetRGB", uint8(gobot.Rand(255)), uint8(gobot.Rand(255)), uint8(gobot.Rand(255)))
+				sphero := gbot.Robot("Sphero-BPO").Device("sphero").(*sphero.SpheroDriver)
+				sphero.SetRGB(uint8(gobot.Rand(255)),
+					uint8(gobot.Rand(255)),
+					uint8(gobot.Rand(255)),
+				)
 			})
 		},
-	))
+	)
 
-	master.Start()
+	gbot.AddRobot(robot)
+
+	gbot.Start()
 }

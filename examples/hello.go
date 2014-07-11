@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/hybridgroup/gobot"
 	"time"
+
+	"github.com/hybridgroup/gobot"
 )
 
 func main() {
@@ -11,13 +12,12 @@ func main() {
 
 	robot := gobot.NewRobot(
 		"hello",
-		nil,
-		nil,
 		func() {
 			gobot.Every(500*time.Millisecond, func() { fmt.Println("Greetings human") })
 		},
 	)
 
-	gbot.Robots = append(gbot.Robots, robot)
+	gbot.AddRobot(robot)
+
 	gbot.Start()
 }

@@ -2,6 +2,7 @@ package neurosky
 
 import (
 	"bytes"
+
 	"github.com/hybridgroup/gobot"
 )
 
@@ -30,25 +31,27 @@ type EEG struct {
 }
 
 func NewNeuroskyDriver(a *NeuroskyAdaptor, name string) *NeuroskyDriver {
-	return &NeuroskyDriver{
-		Driver: gobot.Driver{
-			Name: name,
-			Events: map[string]*gobot.Event{
-				"Extended":   gobot.NewEvent(),
-				"Signal":     gobot.NewEvent(),
-				"Attention":  gobot.NewEvent(),
-				"Meditation": gobot.NewEvent(),
-				"Blink":      gobot.NewEvent(),
-				"Wave":       gobot.NewEvent(),
-				"EEG":        gobot.NewEvent(),
-			},
-			Adaptor: a,
-		},
+	n := &NeuroskyDriver{
+		Driver: *gobot.NewDriver(
+			name,
+			"NeuroskyDriver",
+			a,
+		),
 	}
+
+	n.AddEvent("extended")
+	n.AddEvent("signal")
+	n.AddEvent("attention")
+	n.AddEvent("meditation")
+	n.AddEvent("blink")
+	n.AddEvent("wave")
+	n.AddEvent("eeg")
+
+	return n
 }
 
 func (n *NeuroskyDriver) adaptor() *NeuroskyAdaptor {
-	return n.Driver.Adaptor.(*NeuroskyAdaptor)
+	return n.Adaptor().(*NeuroskyAdaptor)
 }
 func (n *NeuroskyDriver) Start() bool {
 	go func() {
@@ -87,29 +90,29 @@ func (n *NeuroskyDriver) parsePacket(data []byte) {
 		b, _ := buf.ReadByte()
 		switch b {
 		case CodeEx:
-			gobot.Publish(n.Events["Extended"], nil)
+			gobot.Publish(n.Event("Extended"), nil)
 		case CodeSignalQuality:
 			ret, _ := buf.ReadByte()
-			gobot.Publish(n.Events["Signal"], ret)
+			gobot.Publish(n.Event("Signal"), ret)
 		case CodeAttention:
 			ret, _ := buf.ReadByte()
-			gobot.Publish(n.Events["Attention"], ret)
+			gobot.Publish(n.Event("Attention"), ret)
 		case CodeMeditation:
 			ret, _ := buf.ReadByte()
-			gobot.Publish(n.Events["Meditation"], ret)
+			gobot.Publish(n.Event("Meditation"), ret)
 		case CodeBlink:
 			ret, _ := buf.ReadByte()
-			gobot.Publish(n.Events["Blink"], ret)
+			gobot.Publish(n.Event("Blink"), ret)
 		case CodeWave:
 			buf.Next(1)
 			var ret = make([]byte, 2)
 			buf.Read(ret)
-			gobot.Publish(n.Events["Wave"], ret)
+			gobot.Publish(n.Event("Wave"), ret)
 		case CodeAsicEEG:
 			var ret = make([]byte, 25)
 			i, _ := buf.Read(ret)
 			if i == 25 {
-				gobot.Publish(n.Events["EEG"], n.parseEEG(ret))
+				gobot.Publish(n.Event("EEG"), n.parseEEG(ret))
 			}
 		}
 	}

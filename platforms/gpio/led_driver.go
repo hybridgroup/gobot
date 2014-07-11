@@ -10,33 +10,34 @@ type LedDriver struct {
 }
 
 func NewLedDriver(a PwmDigitalWriter, name string, pin string) *LedDriver {
+
 	l := &LedDriver{
-		Driver: gobot.Driver{
-			Name:     name,
-			Pin:      pin,
-			Commands: make(map[string]func(map[string]interface{}) interface{}),
-			Adaptor:  a.(gobot.AdaptorInterface),
-		},
+		Driver: *gobot.NewDriver(
+			name,
+			"LedDriver",
+			pin,
+			a.(gobot.AdaptorInterface),
+		),
 		High: false,
 	}
 
-	l.Driver.AddCommand("Brightness", func(params map[string]interface{}) interface{} {
+	l.AddCommand("Brightness", func(params map[string]interface{}) interface{} {
 		level := byte(params["level"].(float64))
 		l.Brightness(level)
 		return nil
 	})
 
-	l.Driver.AddCommand("Toggle", func(params map[string]interface{}) interface{} {
+	l.AddCommand("Toggle", func(params map[string]interface{}) interface{} {
 		l.Toggle()
 		return nil
 	})
 
-	l.Driver.AddCommand("On", func(params map[string]interface{}) interface{} {
+	l.AddCommand("On", func(params map[string]interface{}) interface{} {
 		l.On()
 		return nil
 	})
 
-	l.Driver.AddCommand("Off", func(params map[string]interface{}) interface{} {
+	l.AddCommand("Off", func(params map[string]interface{}) interface{} {
 		l.Off()
 		return nil
 	})
@@ -45,7 +46,7 @@ func NewLedDriver(a PwmDigitalWriter, name string, pin string) *LedDriver {
 }
 
 func (l *LedDriver) adaptor() PwmDigitalWriter {
-	return l.Driver.Adaptor.(PwmDigitalWriter)
+	return l.Adaptor().(PwmDigitalWriter)
 }
 
 func (l *LedDriver) Start() bool { return true }
@@ -81,9 +82,9 @@ func (l *LedDriver) Toggle() {
 }
 
 func (l *LedDriver) Brightness(level byte) {
-	l.adaptor().PwmWrite(l.Pin, level)
+	l.adaptor().PwmWrite(l.Pin(), level)
 }
 
 func (l *LedDriver) changeState(level byte) {
-	l.adaptor().DigitalWrite(l.Pin, level)
+	l.adaptor().DigitalWrite(l.Pin(), level)
 }

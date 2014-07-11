@@ -4,11 +4,14 @@ import (
 	"crypto/subtle"
 	"encoding/base64"
 	"encoding/json"
-	"github.com/bmizerany/pat"
-	"github.com/hybridgroup/gobot"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
+
+	"github.com/bmizerany/pat"
+	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/api/robeaux"
 )
 
 // Optional restful API through Gobot has access
@@ -45,6 +48,7 @@ func NewAPI(g *gobot.Gobot) *api {
 
 			log.Println("Initializing API on " + host + ":" + port + "...")
 			http.Handle("/", a.server)
+
 			go func() {
 				if cert != "" && key != "" {
 					http.ListenAndServeTLS(host+":"+port, cert, key, nil)
@@ -82,6 +86,12 @@ func (a *api) Start() {
 	a.server.Post(deviceCommandRoute, a.setHeaders(a.executeDeviceCommand))
 	a.server.Get("/robots/:robot/connections", a.setHeaders(a.robotConnections))
 	a.server.Get("/robots/:robot/connections/:connection", a.setHeaders(a.robotConnection))
+	a.server.Get("/:a", a.setHeaders(a.robeaux))
+	a.server.Get("/:a/", a.setHeaders(a.robeaux))
+	a.server.Get("/:a/:b", a.setHeaders(a.robeaux))
+	a.server.Get("/:a/:b/", a.setHeaders(a.robeaux))
+	a.server.Get("/:a/:b/:c", a.setHeaders(a.robeaux))
+	a.server.Get("/:a/:b/:c/", a.setHeaders(a.robeaux))
 
 	a.start(a)
 }
@@ -118,6 +128,23 @@ func (a *api) setHeaders(f func(http.ResponseWriter, *http.Request)) http.Handle
 	}
 }
 
+func (a *api) robeaux(res http.ResponseWriter, req *http.Request) {
+	path := req.URL.Path
+	buf, err := robeaux.Asset(path[1:])
+	if err != nil {
+		log.Println("Error serving static file:", err.Error())
+		res.Write([]byte(err.Error()))
+		return
+	}
+	t := strings.Split(path, ".")
+	if t[len(t)-1] == "js" {
+		res.Header().Set("Content-Type", "text/javascript; charset=utf-8")
+	} else if t[len(t)-1] == "css" {
+		res.Header().Set("Content-Type", "text/css; charset=utf-8")
+	}
+	res.Write(buf)
+}
+
 func (a *api) root(res http.ResponseWriter, req *http.Request) {
 	data, _ := json.Marshal(a.gobot.ToJSON())
 	res.Header().Set("Content-Type", "application/json; charset=utf-8")
@@ -132,9 +159,9 @@ func (a *api) commands(res http.ResponseWriter, req *http.Request) {
 
 func (a *api) robots(res http.ResponseWriter, req *http.Request) {
 	jsonRobots := []*gobot.JSONRobot{}
-	for _, robot := range a.gobot.Robots {
-		jsonRobots = append(jsonRobots, robot.ToJSON())
-	}
+	a.gobot.Robots().Each(func(r *gobot.Robot) {
+		jsonRobots = append(jsonRobots, r.ToJSON())
+	})
 	data, _ := json.Marshal(jsonRobots)
 	res.Header().Set("Content-Type", "application/json; charset=utf-8")
 	res.Write(data)
@@ -159,11 +186,10 @@ func (a *api) robotCommands(res http.ResponseWriter, req *http.Request) {
 func (a *api) robotDevices(res http.ResponseWriter, req *http.Request) {
 	robot := req.URL.Query().Get(":robot")
 
-	devices := a.gobot.Robot(robot).Devices()
 	jsonDevices := []*gobot.JSONDevice{}
-	for _, device := range devices {
-		jsonDevices = append(jsonDevices, device.ToJSON())
-	}
+	a.gobot.Robot(robot).Devices().Each(func(d gobot.Device) {
+		jsonDevices = append(jsonDevices, d.ToJSON())
+	})
 	data, _ := json.Marshal(jsonDevices)
 	res.Header().Set("Content-Type", "application/json; charset=utf-8")
 	res.Write(data)
@@ -190,11 +216,10 @@ func (a *api) robotDeviceCommands(res http.ResponseWriter, req *http.Request) {
 func (a *api) robotConnections(res http.ResponseWriter, req *http.Request) {
 	robot := req.URL.Query().Get(":robot")
 
-	connections := a.gobot.Robot(robot).Connections()
 	jsonConnections := []*gobot.JSONConnection{}
-	for _, connection := range connections {
-		jsonConnections = append(jsonConnections, connection.ToJSON())
-	}
+	a.gobot.Robot(robot).Connections().Each(func(c gobot.Connection) {
+		jsonConnections = append(jsonConnections, c.ToJSON())
+	})
 	data, _ := json.Marshal(jsonConnections)
 	res.Header().Set("Content-Type", "application/json; charset=utf-8")
 	res.Write(data)
@@ -215,7 +240,7 @@ func (a *api) executeCommand(res http.ResponseWriter, req *http.Request) {
 	data, _ := ioutil.ReadAll(req.Body)
 	body := make(map[string]interface{})
 	json.Unmarshal(data, &body)
-	f := a.gobot.Commands[command]
+	f := a.gobot.Command(command)
 
 	if f != nil {
 		data, _ = json.Marshal(f(body))
@@ -237,7 +262,7 @@ func (a *api) executeDeviceCommand(res http.ResponseWriter, req *http.Request) {
 	json.Unmarshal(data, &body)
 	d := a.gobot.Robot(robot).Device(device)
 	body["robot"] = robot
-	f := d.Commands()[command]
+	f := d.Command(command)
 
 	if f != nil {
 		data, _ = json.Marshal(f(body))
@@ -258,7 +283,7 @@ func (a *api) executeRobotCommand(res http.ResponseWriter, req *http.Request) {
 	json.Unmarshal(data, &body)
 	r := a.gobot.Robot(robot)
 	body["robot"] = robot
-	f := r.Commands[command]
+	f := r.Command(command)
 
 	if f != nil {
 		data, _ = json.Marshal(f(body))
