@@ -8,6 +8,10 @@
   - Devices are now a collection of Drivers
   - Add `Event(string)` function instead of `Events[string]` for retrieving Driver event
   - Add `AddEvent(string)` function to register an event on a Driver
+- firmata
+  - Fix slice bounds out of range error
+- sphero
+  - Fix issue where the driver would not halt correctly on OSX
 
 0.5.2  
 ---  
