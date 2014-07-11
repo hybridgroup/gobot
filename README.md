@@ -18,28 +18,34 @@ Want to use Ruby or Javascript on robots? Check out our sister projects Artoo (h
 package main
 
 import (
-  "github.com/hybridgroup/gobot"
-  "github.com/hybridgroup/gobot/platforms/firmata"
-  "github.com/hybridgroup/gobot/platforms/gpio"
-  "time"
+	"time"
+
+	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/platforms/firmata"
+	"github.com/hybridgroup/gobot/platforms/gpio"
 )
 
 func main() {
-  gbot := gobot.NewGobot()
+	gbot := gobot.NewGobot()
 
-  adaptor := firmata.NewFirmataAdaptor("myFirmata", "/dev/ttyACM0")
-  led := gpio.NewLedDriver(adaptor, "myLed", "13")
+	firmataAdaptor := firmata.NewFirmataAdaptor("arduino", "/dev/ttyACM0")
+	led := gpio.NewLedDriver(firmataAdaptor, "led", "13")
 
-  work := func() {
-    gobot.Every(1*time.Second, func() {
-      led.Toggle()
-    })
-  }
+	work := func() {
+		gobot.Every(1*time.Second, func() {
+			led.Toggle()
+		})
+	}
 
-  gbot.Robots = append(gbot.Robots,
-    gobot.NewRobot("blink", []gobot.Connection{adaptor}, []gobot.Device{led}, work))
+	robot := gobot.NewRobot("bot",
+		[]gobot.Connection{firmataAdaptor},
+		[]gobot.Device{led},
+		work,
+	)
 
-  gbot.Start()
+	gbot.AddRobot(robot)
+
+	gbot.Start()
 }
 ```
 
@@ -49,27 +55,34 @@ func main() {
 package main
 
 import (
-  "github.com/hybridgroup/gobot"
-  "github.com/hybridgroup/gobot/platforms/sphero"
-  "time"
+	"fmt"
+	"time"
+
+	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/platforms/sphero"
 )
 
 func main() {
-  gbot := gobot.NewGobot()
+	gbot := gobot.NewGobot()
 
-  adaptor := sphero.NewSpheroAdaptor("Sphero", "/dev/rfcomm0")
-  ball := sphero.NewSpheroDriver(adaptor, "sphero")
+	adaptor := sphero.NewSpheroAdaptor("sphero", "/dev/rfcomm0")
+	driver := sphero.NewSpheroDriver(adaptor, "sphero")
 
-  work := func() {
-    gobot.Every(3*time.Second, func() {
-      ball.Roll(30, uint16(gobot.Rand(360)))
-    })
-  }
+	work := func() {
+		gobot.Every(3*time.Second, func() {
+			driver.Roll(30, uint16(gobot.Rand(360)))
+		})
+	}
 
-  gbot.Robots = append(gbot.Robots,
-    gobot.NewRobot("sphero", []gobot.Connection{adaptor}, []gobot.Device{ball}, work))
+	robot := gobot.NewRobot("sphero",
+		[]gobot.Connection{adaptor},
+		[]gobot.Device{driver},
+		work,
+	)
 
-  gbot.Start()
+	gbot.AddRobot(robot)
+
+	gbot.Start()
 }
 ```
 
@@ -121,14 +134,14 @@ Gobot includes a RESTful API to query the status of any robot running within a g
 To activate the API, require the `github.com/hybridgroup/gobot/api` package and instantiate the `API` like this:
 
 ```go 
-  master := gobot.NewGobot()
-  api.NewAPI(master).Start()
+  gbot := gobot.NewGobot()
+  api.NewAPI(gbot).Start()
 ```
 
 You can also specify the api host and port, and turn on authentication:
 ```go 
-  master := gobot.NewGobot()
-  server := api.NewAPI(master)
+  gbot := gobot.NewGobot()
+  server := api.NewAPI(gbot)
   server.Port = "4000"
   server.Username = "Gort"
   server.Password = "klaatu"

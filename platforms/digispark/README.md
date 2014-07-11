@@ -32,28 +32,35 @@ go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/p
 package main
 
 import (
-    "github.com/hybridgroup/gobot"
-    "github.com/hybridgroup/gobot/platforms/digispark"
-    "github.com/hybridgroup/gobot/platforms/gpio"
-    "time"
+	"time"
+
+	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/platforms/digispark"
+	"github.com/hybridgroup/gobot/platforms/gpio"
 )
 
 func main() {
-    gbot := gobot.NewGobot()
-    adaptor := digispark.NewDigisparkAdaptor("Digispark")
-    led := gpio.NewLedDriver(adaptor, "led", "0")
+	gbot := gobot.NewGobot()
 
-    work := func() {
-        gobot.Every(1*time.Second, func() {
-            led.Toggle()
-        })
-    }
+	digisparkAdaptor := digispark.NewDigisparkAdaptor("Digispark")
+	led := gpio.NewLedDriver(digisparkAdaptor, "led", "0")
 
-    gbot.Robots = append(gbot.Robots,
-        gobot.NewRobot("blinkBot", []gobot.Connection{adaptor}, []gobot.Device{led}, work))
-    gbot.Start()
+	work := func() {
+		gobot.Every(1*time.Second, func() {
+			led.Toggle()
+		})
+	}
+
+	robot := gobot.NewRobot("blinkBot",
+		[]gobot.Connection{digisparkAdaptor},
+		[]gobot.Device{led},
+		work,
+	)
+
+	gbot.AddRobot(robot)
+
+	gbot.Start()
 }
-
 ```
 ## Connecting to Digispark
 
