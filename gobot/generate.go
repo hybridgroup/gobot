@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/codegangsta/cli"
 	"os"
 	"strings"
 	"text/template"
+
+	"github.com/codegangsta/cli"
 )
 
 type generate struct {
@@ -33,9 +34,15 @@ func Generate() cli.Command {
 				err = nil
 			}
 
-			upperName := fmt.Sprintf("%s%s", strings.ToUpper(string(args[0][0])), string(args[0][1:]))
+			upperName := fmt.Sprintf("%s%s",
+				strings.ToUpper(string(args[0][0])),
+				string(args[0][1:]))
 
-			name := generate{UpperName: upperName, Name: string(args[0]), FirstLetter: string(args[0][0])}
+			name := generate{
+				UpperName:   upperName,
+				Name:        string(args[0]),
+				FirstLetter: string(args[0][0]),
+			}
 
 			adaptor, _ := template.New("").Parse(adaptor())
 			fileLocation := fmt.Sprintf("%s/%s_adaptor.go", dir, args[0])
@@ -117,9 +124,10 @@ type {{ .UpperName }}Adaptor struct {
 
 func New{{.UpperName}}Adaptor(name string) *{{.UpperName}}Adaptor {
   return &{{.UpperName}}Adaptor{
-    Adaptor: gobot.Adaptor{
-      Name: name,
-    },
+    Adaptor: *gobot.NewAdaptor(
+      name,
+      "{{.Name}}.{{.UpperName}}Adaptor",
+    ),
   }
 }
 
@@ -149,17 +157,16 @@ type {{ .UpperName }}Interface interface {
 
 func New{{.UpperName}}Driver(a *{{.UpperName}}Adaptor, name string) *{{.UpperName}}Driver {
   return &{{.UpperName}}Driver{
-    Driver: gobot.Driver{
-      Name: name,
-      Events: make(map[string]*gobot.Event),
-      Commands: make(map[string]func(map[string]interface{}) interface{}),
-      Adaptor: a,
-    },
+    Driver: *gobot.NewDriver(
+      name,
+      "{{.Name}}.{{.UpperName}}Driver}}",
+      a,
+    ),
   }
 }
 
 func ({{.FirstLetter}} *{{ .UpperName }}Driver) adaptor() *{{ .UpperName }}Adaptor {
-  return {{ .FirstLetter }}.Driver.Adaptor.(*{{ .UpperName }}Adaptor)
+  return {{ .FirstLetter }}.Driver.Adaptor().(*{{ .UpperName }}Adaptor)
 }
 
 func ({{.FirstLetter}} *{{ .UpperName }}Driver) Start() bool { return true }
