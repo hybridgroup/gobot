@@ -1,3 +1,9 @@
+0.6.1
+---
+- cli
+  - Fix template error in generator
+
+
 0.6  
 ---  
 - api
