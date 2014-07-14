@@ -31,7 +31,14 @@ func Publish(e *Event, val interface{}) {
 }
 
 func On(e *Event, f func(s interface{})) {
-	e.Callbacks = append(e.Callbacks, f)
+	e.Callbacks = append(e.Callbacks, callback{f, false})
+	//e.Callbacks[f] = false
+}
+
+func Once(e *Event, f func(s interface{})) {
+	//e.Callbacks = append(e.Callbacks, f)
+	e.Callbacks = append(e.Callbacks, callback{f, true})
+	//e.Callbacks[f] = true
 }
 
 func Rand(max int) int {

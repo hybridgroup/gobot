@@ -1,14 +1,19 @@
 package gobot
 
+type callback struct {
+	f    func(interface{})
+	once bool
+}
+
 type Event struct {
 	Chan      chan interface{}
-	Callbacks []func(interface{})
+	Callbacks []callback
 }
 
 func NewEvent() *Event {
 	e := &Event{
 		Chan:      make(chan interface{}, 1),
-		Callbacks: []func(interface{}){},
+		Callbacks: []callback{},
 	}
 	go func() {
 		for {
@@ -26,9 +31,14 @@ func (e *Event) Write(data interface{}) {
 }
 
 func (e *Event) Read() {
+	tmp := []callback{}
 	for s := range e.Chan {
-		for _, f := range e.Callbacks {
-			go f(s)
+		for i := range e.Callbacks {
+			go e.Callbacks[i].f(s)
+			if !e.Callbacks[i].once {
+				tmp = append(tmp, e.Callbacks[i])
+			}
 		}
+		e.Callbacks = tmp
 	}
 }
