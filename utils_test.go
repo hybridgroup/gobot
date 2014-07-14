@@ -11,7 +11,7 @@ func TestEvery(t *testing.T) {
 	Every(2*time.Millisecond, func() {
 		i++
 	})
-	time.Sleep(5 * time.Millisecond)
+	<-time.After(5 * time.Millisecond)
 	Expect(t, i, 2)
 }
 
@@ -20,7 +20,7 @@ func TestAfter(t *testing.T) {
 	After(1*time.Millisecond, func() {
 		i++
 	})
-	time.Sleep(2 * time.Millisecond)
+	<-time.After(2 * time.Millisecond)
 	Expect(t, i, 1)
 }
 
@@ -41,8 +41,23 @@ func TestOn(t *testing.T) {
 		i = data.(int)
 	})
 	Publish(e, 10)
-	time.Sleep(1 * time.Millisecond)
+	<-time.After(1 * time.Millisecond)
 	Expect(t, i, 10)
+}
+func TestOnce(t *testing.T) {
+	i := 0
+	e := NewEvent()
+	Once(e, func(data interface{}) {
+		i += data.(int)
+	})
+	On(e, func(data interface{}) {
+		i += data.(int)
+	})
+	Publish(e, 10)
+	<-time.After(1 * time.Millisecond)
+	Publish(e, 10)
+	<-time.After(1 * time.Millisecond)
+	Expect(t, i, 30)
 }
 
 func TestFromScale(t *testing.T) {
