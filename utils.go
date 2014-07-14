@@ -32,18 +32,14 @@ func Publish(e *Event, val interface{}) {
 
 func On(e *Event, f func(s interface{})) {
 	e.Callbacks = append(e.Callbacks, callback{f, false})
-	//e.Callbacks[f] = false
 }
 
 func Once(e *Event, f func(s interface{})) {
-	//e.Callbacks = append(e.Callbacks, f)
 	e.Callbacks = append(e.Callbacks, callback{f, true})
-	//e.Callbacks[f] = true
 }
 
 func Rand(max int) int {
-	r := rand.New(rand.NewSource(time.Now().UTC().UnixNano()))
-	return r.Intn(max)
+	return rand.New(rand.NewSource(time.Now().UTC().UnixNano())).Intn(max)
 }
 
 func FromScale(input, min, max float64) float64 {

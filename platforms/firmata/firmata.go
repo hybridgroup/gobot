@@ -51,14 +51,15 @@ const (
 )
 
 type board struct {
-	serial       io.ReadWriteCloser
-	pins         []pin
-	analogPins   []byte
-	firmwareName string
-	majorVersion byte
-	minorVersion byte
-	connected    bool
-	events       map[string]*gobot.Event
+	serial           io.ReadWriteCloser
+	pins             []pin
+	analogPins       []byte
+	firmwareName     string
+	majorVersion     byte
+	minorVersion     byte
+	connected        bool
+	events           map[string]*gobot.Event
+	initTimeInterval time.Duration
 }
 
 type pin struct {
@@ -70,14 +71,15 @@ type pin struct {
 
 func newBoard(sp io.ReadWriteCloser) *board {
 	board := &board{
-		majorVersion: 0,
-		minorVersion: 0,
-		serial:       sp,
-		firmwareName: "",
-		pins:         []pin{},
-		analogPins:   []byte{},
-		connected:    false,
-		events:       make(map[string]*gobot.Event),
+		majorVersion:     0,
+		minorVersion:     0,
+		serial:           sp,
+		firmwareName:     "",
+		pins:             []pin{},
+		analogPins:       []byte{},
+		connected:        false,
+		events:           make(map[string]*gobot.Event),
+		initTimeInterval: 1 * time.Second,
 	}
 
 	for _, s := range []string{
@@ -102,7 +104,7 @@ func (b *board) connect() {
 
 		for {
 			b.queryReportVersion()
-			<-time.After(1 * time.Second)
+			<-time.After(b.initTimeInterval)
 			b.readAndProcess()
 			if b.connected == true {
 				break
@@ -122,9 +124,7 @@ func (b *board) initBoard() {
 
 	gobot.Once(b.events["analog_mapping_query"], func(data interface{}) {
 		b.togglePinReporting(0, high, reportDigital)
-		<-time.After(50 * time.Millisecond)
 		b.togglePinReporting(1, high, reportDigital)
-		<-time.After(50 * time.Millisecond)
 		b.connected = true
 	})
 }
