@@ -159,7 +159,7 @@ func New{{.UpperName}}Driver(a *{{.UpperName}}Adaptor, name string) *{{.UpperNam
   return &{{.UpperName}}Driver{
     Driver: *gobot.NewDriver(
       name,
-      "{{.Name}}.{{.UpperName}}Driver}}",
+      "{{.Name}}.{{.UpperName}}Driver",
       a,
     ),
   }
