@@ -112,18 +112,15 @@ func (b *board) connect() {
 }
 
 func (b *board) initBoard() {
-	gobot.On(b.events["firmware_query"], func(data interface{}) {
-		b.events["firmware_query"] = gobot.NewEvent()
+	gobot.Once(b.events["firmware_query"], func(data interface{}) {
 		b.queryCapabilities()
 	})
 
-	gobot.On(b.events["capability_query"], func(data interface{}) {
-		b.events["capability_query"] = gobot.NewEvent()
+	gobot.Once(b.events["capability_query"], func(data interface{}) {
 		b.queryAnalogMapping()
 	})
 
-	gobot.On(b.events["analog_mapping_query"], func(data interface{}) {
-		b.events["analog_mapping_query"] = gobot.NewEvent()
+	gobot.Once(b.events["analog_mapping_query"], func(data interface{}) {
 		b.togglePinReporting(0, high, reportDigital)
 		<-time.After(50 * time.Millisecond)
 		b.togglePinReporting(1, high, reportDigital)
@@ -270,7 +267,7 @@ func (b *board) process(data []byte) {
 				pin := b.pins[pinNumber]
 				if byte(pin.mode) == input {
 					pin.value = int((portValue >> (byte(i) & 0x07)) & 0x01)
-					gobot.Publish(fmt.Sprintf("digital_read_%v", pinNumber),
+					gobot.Publish(b.events[fmt.Sprintf("digital_read_%v", pinNumber)],
 						[]byte{byte(pin.value & 0xff)})
 				}
 			}
@@ -301,7 +298,7 @@ func (b *board) process(data []byte) {
 							}
 						}
 						b.pins = append(b.pins, pin{modes, output, 0, 0})
-						b.Events[fmt.Sprintf("digital_read_%v", len(b.pins)-1)] = gobot.NewEvent()
+						b.events[fmt.Sprintf("digital_read_%v", len(b.pins)-1)] = gobot.NewEvent()
 						supportedModes = 0
 						n = 0
 						continue
@@ -360,7 +357,7 @@ func (b *board) process(data []byte) {
 						byte(currentBuffer[i])|byte(currentBuffer[i+1])<<7,
 					)
 				}
-				gobo.Publish(b.events["i2c_reply"], i2cReply)
+				gobot.Publish(b.events["i2c_reply"], i2cReply)
 			case firmwareQuery:
 				name := []byte{}
 				for _, val := range currentBuffer[4:(len(currentBuffer) - 1)] {

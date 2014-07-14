@@ -77,7 +77,7 @@ func (f *FirmataAdaptor) DigitalRead(pin string) int {
 	f.board.togglePinReporting(byte(p), high, reportDigital)
 	f.board.readAndProcess()
 
-	gobot.On(f.board.events[fmt.Sprintf("digital_read_%v", pin)], func(data interface{}) {
+	gobot.Once(f.board.events[fmt.Sprintf("digital_read_%v", pin)], func(data interface{}) {
 		ret <- int(data.([]byte)[0])
 	})
 
@@ -94,7 +94,7 @@ func (f *FirmataAdaptor) AnalogRead(pin string) int {
 	f.board.togglePinReporting(byte(p), high, reportAnalog)
 	f.board.readAndProcess()
 
-	gobot.On(f.board.events[fmt.Sprintf("analog_read_%v", pin)], func(data interface{}) {
+	gobot.Once(f.board.events[fmt.Sprintf("analog_read_%v", pin)], func(data interface{}) {
 		b := data.([]byte)
 		ret <- int(uint(b[0])<<24 | uint(b[1])<<16 | uint(b[2])<<8 | uint(b[3]))
 	})
@@ -121,8 +121,8 @@ func (f *FirmataAdaptor) I2cRead(size uint) []byte {
 
 	f.board.readAndProcess()
 
-	gobot.On(f.board.events["i2c_reply"], func(data interface{}) {
-		ret <- data.(i2CReply)["data"]
+	gobot.Once(f.board.events["i2c_reply"], func(data interface{}) {
+		ret <- data.(map[string][]byte)["data"]
 	})
 
 	return <-ret
