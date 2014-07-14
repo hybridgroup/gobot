@@ -3,6 +3,7 @@ package firmata
 import (
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/hybridgroup/gobot"
 	"github.com/tarm/goserial"
@@ -72,6 +73,7 @@ func (f *FirmataAdaptor) DigitalWrite(pin string, level byte) {
 
 func (f *FirmataAdaptor) DigitalRead(pin string) int {
 	ret := make(chan int)
+
 	p, _ := strconv.Atoi(pin)
 	f.board.setPinMode(byte(p), input)
 	f.board.togglePinReporting(byte(p), high, reportDigital)
@@ -81,7 +83,12 @@ func (f *FirmataAdaptor) DigitalRead(pin string) int {
 		ret <- int(data.([]byte)[0])
 	})
 
-	return <-ret
+	select {
+	case data := <-ret:
+		return data
+	case <-time.After(10 * time.Millisecond):
+	}
+	return -1
 }
 
 // NOTE pins are numbered A0-A5, which translate to digital pins 14-19
@@ -99,7 +106,12 @@ func (f *FirmataAdaptor) AnalogRead(pin string) int {
 		ret <- int(uint(b[0])<<24 | uint(b[1])<<16 | uint(b[2])<<8 | uint(b[3]))
 	})
 
-	return <-ret
+	select {
+	case data := <-ret:
+		return data
+	case <-time.After(10 * time.Millisecond):
+	}
+	return -1
 }
 
 func (f *FirmataAdaptor) AnalogWrite(pin string, level byte) {
@@ -125,7 +137,12 @@ func (f *FirmataAdaptor) I2cRead(size uint) []byte {
 		ret <- data.(map[string][]byte)["data"]
 	})
 
-	return <-ret
+	select {
+	case data := <-ret:
+		return data
+	case <-time.After(10 * time.Millisecond):
+	}
+	return []byte{}
 }
 
 func (f *FirmataAdaptor) I2cWrite(data []byte) {

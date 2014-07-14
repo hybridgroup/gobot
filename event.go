@@ -31,8 +31,8 @@ func (e *Event) Write(data interface{}) {
 }
 
 func (e *Event) Read() {
-	tmp := []callback{}
 	for s := range e.Chan {
+		tmp := []callback{}
 		for i := range e.Callbacks {
 			go e.Callbacks[i].f(s)
 			if !e.Callbacks[i].once {
