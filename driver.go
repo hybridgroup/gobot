@@ -103,7 +103,12 @@ func (d *Driver) Events() map[string]*Event {
 }
 
 func (d *Driver) Event(name string) *Event {
-	return d.events[name]
+	e, ok := d.events[name]
+	if ok {
+		return e
+	} else {
+		panic(fmt.Sprintf("Unknown Driver Event: %v", name))
+	}
 }
 
 func (d *Driver) AddEvent(name string) {
