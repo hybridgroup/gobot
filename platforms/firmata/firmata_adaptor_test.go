@@ -59,8 +59,11 @@ func TestFirmataAdaptorDigitalRead(t *testing.T) {
 	gobot.Expect(t, a.DigitalRead("1"), -1)
 
 	pinNumber := "1"
-	gobot.Publish(a.board.events[fmt.Sprintf("digital_read_%v", pinNumber)],
-		[]byte{0x01})
+	go func() {
+		<-time.After(5 * time.Millisecond)
+		gobot.Publish(a.board.events[fmt.Sprintf("digital_read_%v", pinNumber)],
+			[]byte{0x01})
+	}()
 	gobot.Expect(t, a.DigitalRead(pinNumber), 0x01)
 }
 
@@ -71,14 +74,17 @@ func TestFirmataAdaptorAnalogRead(t *testing.T) {
 
 	pinNumber := "1"
 	value := 133
-	gobot.Publish(a.board.events[fmt.Sprintf("analog_read_%v", pinNumber)],
-		[]byte{
-			byte(value >> 24),
-			byte(value >> 16),
-			byte(value >> 8),
-			byte(value & 0xff),
-		},
-	)
+	go func() {
+		<-time.After(5 * time.Millisecond)
+		gobot.Publish(a.board.events[fmt.Sprintf("analog_read_%v", pinNumber)],
+			[]byte{
+				byte(value >> 24),
+				byte(value >> 16),
+				byte(value >> 8),
+				byte(value & 0xff),
+			},
+		)
+	}()
 	gobot.Expect(t, a.AnalogRead(pinNumber), 133)
 }
 func TestFirmataAdaptorAnalogWrite(t *testing.T) {
@@ -97,7 +103,10 @@ func TestFirmataAdaptorI2cRead(t *testing.T) {
 	i := []byte{100}
 	i2cReply := map[string][]byte{}
 	i2cReply["data"] = i
-	gobot.Publish(a.board.events["i2c_reply"], i2cReply)
+	go func() {
+		<-time.After(5 * time.Millisecond)
+		gobot.Publish(a.board.events["i2c_reply"], i2cReply)
+	}()
 	gobot.Expect(t, a.I2cRead(1), i)
 }
 func TestFirmataAdaptorI2cWrite(t *testing.T) {
