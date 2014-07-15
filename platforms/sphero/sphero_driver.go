@@ -130,6 +130,7 @@ func (s *SpheroDriver) Start() bool {
 	}()
 
 	s.configureCollisionDetection()
+	s.enableStopOnDisconnect()
 
 	return true
 }
@@ -176,6 +177,10 @@ func (s *SpheroDriver) Stop() {
 
 func (s *SpheroDriver) configureCollisionDetection() {
 	s.packetChannel <- s.craftPacket([]uint8{0x01, 0x40, 0x40, 0x50, 0x50, 0x60}, 0x12)
+}
+
+func (s *SpheroDriver) enableStopOnDisconnect() {
+	s.packetChannel <- s.craftPacket([]uint8{0x00, 0x00, 0x00, 0x01}, 0x37)
 }
 
 func (s *SpheroDriver) handleCollisionDetected(data []uint8) {
