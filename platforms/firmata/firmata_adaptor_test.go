@@ -13,12 +13,22 @@ func initTestFirmataAdaptor() *FirmataAdaptor {
 	a.connect = func(f *FirmataAdaptor) {
 		f.board = newBoard(gobot.NullReadWriteCloser{})
 		f.board.initTimeInterval = 0 * time.Second
-		f.board.pins = make([]pin, 100)
-		f.board.events["digital_read_1"] = gobot.NewEvent()
-		f.board.events["analog_read_1"] = gobot.NewEvent()
-		gobot.Publish(f.board.events["firmware_query"], nil)
-		gobot.Publish(f.board.events["capability_query"], nil)
-		gobot.Publish(f.board.events["analog_mapping_query"], nil)
+		// arduino uno r3 firmware response "StandardFirmata.ino"
+		f.board.process([]byte{240, 121, 2, 3, 83, 0, 116, 0, 97, 0, 110, 0, 100,
+			0, 97, 0, 114, 0, 100, 0, 70, 0, 105, 0, 114, 0, 109, 0, 97, 0, 116, 0,
+			97, 0, 46, 0, 105, 0, 110, 0, 111, 0, 247})
+		// arduino uno r3 capabilities response
+		f.board.process([]byte{240, 108, 127, 127, 0, 1, 1, 1, 4, 14, 127, 0, 1,
+			1, 1, 3, 8, 4, 14, 127, 0, 1, 1, 1, 4, 14, 127, 0, 1, 1, 1, 3, 8, 4, 14,
+			127, 0, 1, 1, 1, 3, 8, 4, 14, 127, 0, 1, 1, 1, 4, 14, 127, 0, 1, 1, 1,
+			4, 14, 127, 0, 1, 1, 1, 3, 8, 4, 14, 127, 0, 1, 1, 1, 3, 8, 4, 14, 127,
+			0, 1, 1, 1, 3, 8, 4, 14, 127, 0, 1, 1, 1, 4, 14, 127, 0, 1, 1, 1, 4, 14,
+			127, 0, 1, 1, 1, 2, 10, 127, 0, 1, 1, 1, 2, 10, 127, 0, 1, 1, 1, 2, 10,
+			127, 0, 1, 1, 1, 2, 10, 127, 0, 1, 1, 1, 2, 10, 6, 1, 127, 0, 1, 1, 1,
+			2, 10, 6, 1, 127, 247})
+		// arduino uno r3 analog mapping response
+		f.board.process([]byte{240, 106, 127, 127, 127, 127, 127, 127, 127, 127,
+			127, 127, 127, 127, 127, 127, 0, 1, 2, 3, 4, 5, 247})
 	}
 	a.Connect()
 	return a
@@ -55,10 +65,10 @@ func TestFirmataAdaptorDigitalWrite(t *testing.T) {
 
 func TestFirmataAdaptorDigitalRead(t *testing.T) {
 	a := initTestFirmataAdaptor()
-	// -1 on no data
-	gobot.Expect(t, a.DigitalRead("1"), -1)
-
 	pinNumber := "1"
+	// -1 on no data
+	gobot.Expect(t, a.DigitalRead(pinNumber), -1)
+
 	go func() {
 		<-time.After(5 * time.Millisecond)
 		gobot.Publish(a.board.events[fmt.Sprintf("digital_read_%v", pinNumber)],
@@ -69,10 +79,10 @@ func TestFirmataAdaptorDigitalRead(t *testing.T) {
 
 func TestFirmataAdaptorAnalogRead(t *testing.T) {
 	a := initTestFirmataAdaptor()
-	// -1 on no data
-	gobot.Expect(t, a.AnalogRead("1"), -1)
-
 	pinNumber := "1"
+	// -1 on no data
+	gobot.Expect(t, a.AnalogRead(pinNumber), -1)
+
 	value := 133
 	go func() {
 		<-time.After(5 * time.Millisecond)

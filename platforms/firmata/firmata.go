@@ -368,9 +368,8 @@ func (b *board) process(data []byte) {
 				b.firmwareName = string(name[:])
 				gobot.Publish(b.events["firmware_query"], b.firmwareName)
 			case stringData:
-				str := currentBuffer[2 : len(currentBuffer)-1]
-				fmt.Println(string(str[:len(str)]))
-				gobot.Publish(b.events["string_data"], str)
+				str := currentBuffer[2:len(currentBuffer)]
+				gobot.Publish(b.events["string_data"], string(str[:len(str)]))
 			default:
 				fmt.Println("bad byte", fmt.Sprintf("0x%x", command))
 			}
