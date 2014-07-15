@@ -20,7 +20,7 @@ func NewLeapMotionDriver(a *LeapMotionAdaptor, name string) *LeapMotionDriver {
 		),
 	}
 
-	l.AddEvent("Message")
+	l.AddEvent("message")
 	return l
 }
 
@@ -39,7 +39,7 @@ func (l *LeapMotionDriver) Start() bool {
 		for {
 			var msg []byte
 			websocket.Message.Receive(l.adaptor().ws, &msg)
-			gobot.Publish(l.Event("Message"), l.ParseFrame(msg))
+			gobot.Publish(l.Event("message"), l.ParseFrame(msg))
 		}
 	}()
 

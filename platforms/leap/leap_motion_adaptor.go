@@ -20,8 +20,8 @@ func NewLeapMotionAdaptor(name string, port string) *LeapMotionAdaptor {
 			port,
 		),
 		connect: func(l *LeapMotionAdaptor) {
-			origin := fmt.Sprintf("http://%v", l.Port)
-			url := fmt.Sprintf("ws://%v/v3.json", l.Port)
+			origin := fmt.Sprintf("http://%v", l.Port())
+			url := fmt.Sprintf("ws://%v/v3.json", l.Port())
 			ws, err := websocket.Dial(url, "", origin)
 			if err != nil {
 				panic(err)
