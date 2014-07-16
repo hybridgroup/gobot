@@ -6,23 +6,33 @@ import (
 )
 
 func initTestCameraDriver() *CameraDriver {
-	return NewCameraDriver("bot", 0)
+	return NewCameraDriver("bot", "")
 }
 
 func TestCameraDriverStart(t *testing.T) {
-	t.SkipNow()
+  t.SkipNow()
 	d := initTestCameraDriver()
 	gobot.Assert(t, d.Start(), true)
 }
 
+func TestCameraDriverStartPanic(t *testing.T) {
+  recovered := false
+  defer func() {
+    if r := recover(); r != nil {
+      recovered = true
+    }
+  }()
+
+  NewCameraDriver("bot", false).Start()
+	gobot.Expect(t, recovered, true)
+}
+
 func TestCameraDriverHalt(t *testing.T) {
-	t.SkipNow()
 	d := initTestCameraDriver()
 	gobot.Assert(t, d.Halt(), true)
 }
 
 func TestCameraDriverInit(t *testing.T) {
-	t.SkipNow()
 	d := initTestCameraDriver()
 	gobot.Assert(t, d.Init(), true)
 }
