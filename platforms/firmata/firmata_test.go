@@ -28,6 +28,24 @@ func initTestFirmata() *board {
 	return b
 }
 
+func TestReportVersion(t *testing.T) {
+	b := initTestFirmata()
+	//test if functions executes
+	b.reportVersion()
+}
+
+func TestQueryFirmware(t *testing.T) {
+	b := initTestFirmata()
+	//test if functions executes
+	b.queryFirmware()
+}
+
+func TestQueryPinState(t *testing.T) {
+	b := initTestFirmata()
+	//test if functions executes
+	b.queryPinState(byte(1))
+}
+
 func TestProcess(t *testing.T) {
 	b := initTestFirmata()
 	sem := make(chan bool)
@@ -72,14 +90,17 @@ func TestProcess(t *testing.T) {
 	})
 	b.process([]byte{0x90, 0x16, 0x00})
 	<-sem
-	//TODO we need a test here
 	//pinStateResponse
-	//gobot.Once(b.events["pin_0_state"], func(data interface{}) {
-	//	gobot.Expect(t, data, "")
-	//	sem <- true
-	//})
-	//b.process([]byte{240, 0x6E})
-	//<-sem
+	gobot.Once(b.events["pin_13_state"], func(data interface{}) {
+		gobot.Expect(t, data, map[string]int{
+			"pin":   13,
+			"mode":  1,
+			"value": 1,
+		})
+		sem <- true
+	})
+	b.process([]byte{240, 110, 13, 1, 1, 247})
+	<-sem
 	//i2cReply
 	gobot.Once(b.events["i2c_reply"], func(data interface{}) {
 		i2c_reply := map[string][]byte{

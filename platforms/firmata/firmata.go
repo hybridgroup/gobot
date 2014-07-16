@@ -100,6 +100,7 @@ func newBoard(sp io.ReadWriteCloser) *board {
 
 func (b *board) connect() {
 	if b.connected == false {
+		b.reset()
 		b.initBoard()
 
 		for {
@@ -240,7 +241,9 @@ func (b *board) process(data []byte) {
 			b.majorVersion, _ = buf.ReadByte()
 			b.minorVersion, _ = buf.ReadByte()
 			gobot.Publish(b.events["report_version"], b.version())
-		case analogMessageRangeStart <= messageType && analogMessageRangeEnd >= messageType:
+		case analogMessageRangeStart <= messageType &&
+			analogMessageRangeEnd >= messageType:
+
 			leastSignificantByte, _ := buf.ReadByte()
 			mostSignificantByte, _ := buf.ReadByte()
 
@@ -256,7 +259,9 @@ func (b *board) process(data []byte) {
 					byte(value & 0xff),
 				},
 			)
-		case digitalMessageRangeStart <= messageType && digitalMessageRangeEnd >= messageType:
+		case digitalMessageRangeStart <= messageType &&
+			digitalMessageRangeEnd >= messageType:
+
 			port := messageType & 0x0F
 			firstBitmask, _ := buf.ReadByte()
 			secondBitmask, _ := buf.ReadByte()
@@ -299,6 +304,7 @@ func (b *board) process(data []byte) {
 						}
 						b.pins = append(b.pins, pin{modes, output, 0, 0})
 						b.events[fmt.Sprintf("digital_read_%v", len(b.pins)-1)] = gobot.NewEvent()
+						b.events[fmt.Sprintf("pin_%v_state", len(b.pins)-1)] = gobot.NewEvent()
 						supportedModes = 0
 						n = 0
 						continue
@@ -338,7 +344,11 @@ func (b *board) process(data []byte) {
 				}
 
 				gobot.Publish(b.events[fmt.Sprintf("pin_%v_state", currentBuffer[2])],
-					[]byte{byte(pin.value & 0xff)},
+					map[string]int{
+						"pin":   int(currentBuffer[2]),
+						"mode":  int(pin.mode),
+						"value": int(pin.value),
+					},
 				)
 			case i2CReply:
 				i2cReply := map[string][]byte{
