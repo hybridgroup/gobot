@@ -14,6 +14,18 @@ func TestCameraDriverStart(t *testing.T) {
 	gobot.Expect(t, d.Start(), true)
 }
 
+func TestCameraDriverStartPanic(t *testing.T) {
+  recovered := false
+  defer func() {
+    if r := recover(); r != nil {
+      recovered = true
+    }
+  }()
+
+  NewCameraDriver("bot", false).Start()
+	gobot.Expect(t, recovered, true)
+}
+
 func TestCameraDriverHalt(t *testing.T) {
 	d := initTestCameraDriver()
 	gobot.Expect(t, d.Halt(), true)
