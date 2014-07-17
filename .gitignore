@@ -1,3 +1,4 @@
 .sass-cache
 *.test
 profile.cov
+count.out
