@@ -13,6 +13,7 @@ func initTestWindowDriver() *WindowDriver {
 }
 
 func TestWindowDriverStart(t *testing.T) {
+  t.SkipNow()
 	d := initTestWindowDriver()
 	gobot.Expect(t, d.Start(), true)
 }
