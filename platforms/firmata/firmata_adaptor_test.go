@@ -36,11 +36,11 @@ func initTestFirmataAdaptor() *FirmataAdaptor {
 
 func TestFirmataAdaptorFinalize(t *testing.T) {
 	a := initTestFirmataAdaptor()
-	gobot.Expect(t, a.Finalize(), true)
+	gobot.Assert(t, a.Finalize(), true)
 }
 func TestFirmataAdaptorConnect(t *testing.T) {
 	a := initTestFirmataAdaptor()
-	gobot.Expect(t, a.Connect(), true)
+	gobot.Assert(t, a.Connect(), true)
 }
 
 func TestFirmataAdaptorInitServo(t *testing.T) {
@@ -67,21 +67,21 @@ func TestFirmataAdaptorDigitalRead(t *testing.T) {
 	a := initTestFirmataAdaptor()
 	pinNumber := "1"
 	// -1 on no data
-	gobot.Expect(t, a.DigitalRead(pinNumber), -1)
+	gobot.Assert(t, a.DigitalRead(pinNumber), -1)
 
 	go func() {
 		<-time.After(5 * time.Millisecond)
 		gobot.Publish(a.board.events[fmt.Sprintf("digital_read_%v", pinNumber)],
 			[]byte{0x01})
 	}()
-	gobot.Expect(t, a.DigitalRead(pinNumber), 0x01)
+	gobot.Assert(t, a.DigitalRead(pinNumber), 0x01)
 }
 
 func TestFirmataAdaptorAnalogRead(t *testing.T) {
 	a := initTestFirmataAdaptor()
 	pinNumber := "1"
 	// -1 on no data
-	gobot.Expect(t, a.AnalogRead(pinNumber), -1)
+	gobot.Assert(t, a.AnalogRead(pinNumber), -1)
 
 	value := 133
 	go func() {
@@ -95,7 +95,7 @@ func TestFirmataAdaptorAnalogRead(t *testing.T) {
 			},
 		)
 	}()
-	gobot.Expect(t, a.AnalogRead(pinNumber), 133)
+	gobot.Assert(t, a.AnalogRead(pinNumber), 133)
 }
 func TestFirmataAdaptorAnalogWrite(t *testing.T) {
 	a := initTestFirmataAdaptor()
@@ -108,7 +108,7 @@ func TestFirmataAdaptorI2cStart(t *testing.T) {
 func TestFirmataAdaptorI2cRead(t *testing.T) {
 	a := initTestFirmataAdaptor()
 	// [] on no data
-	gobot.Expect(t, a.I2cRead(1), []byte{})
+	gobot.Assert(t, a.I2cRead(1), []byte{})
 
 	i := []byte{100}
 	i2cReply := map[string][]byte{}
@@ -117,7 +117,7 @@ func TestFirmataAdaptorI2cRead(t *testing.T) {
 		<-time.After(5 * time.Millisecond)
 		gobot.Publish(a.board.events["i2c_reply"], i2cReply)
 	}()
-	gobot.Expect(t, a.I2cRead(1), i)
+	gobot.Assert(t, a.I2cRead(1), i)
 }
 func TestFirmataAdaptorI2cWrite(t *testing.T) {
 	a := initTestFirmataAdaptor()

@@ -13,19 +13,19 @@ func initTestLeapMotionDriver() *LeapMotionDriver {
 func TestLeapMotionDriverStart(t *testing.T) {
 	t.SkipNow()
 	d := initTestLeapMotionDriver()
-	gobot.Expect(t, d.Start(), true)
+	gobot.Assert(t, d.Start(), true)
 }
 
 func TestLeapMotionDriverHalt(t *testing.T) {
 	t.SkipNow()
 	d := initTestLeapMotionDriver()
-	gobot.Expect(t, d.Halt(), true)
+	gobot.Assert(t, d.Halt(), true)
 }
 
 func TestLeapMotionDriverInit(t *testing.T) {
 	t.SkipNow()
 	d := initTestLeapMotionDriver()
-	gobot.Expect(t, d.Init(), true)
+	gobot.Assert(t, d.Init(), true)
 }
 
 func TestLeapMotionDriverParser(t *testing.T) {
@@ -38,5 +38,5 @@ func TestLeapMotionDriverParser(t *testing.T) {
 	}
 
 	parsedFrame = d.ParseFrame([]byte{})
-	gobot.Expect(t, parsedFrame.Timestamp, 0)
+	gobot.Assert(t, parsedFrame.Timestamp, 0)
 }

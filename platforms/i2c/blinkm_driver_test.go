@@ -11,5 +11,5 @@ func initTestBlinkMDriver() *BlinkMDriver {
 
 func TestBlinkMDriverStart(t *testing.T) {
 	d := initTestBlinkMDriver()
-	gobot.Expect(t, d.Start(), true)
+	gobot.Assert(t, d.Start(), true)
 }

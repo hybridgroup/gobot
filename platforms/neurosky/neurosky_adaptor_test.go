@@ -12,10 +12,10 @@ func initTestNeuroskyAdaptor() *NeuroskyAdaptor {
 func TestNeuroskyAdaptorFinalize(t *testing.T) {
 	t.SkipNow()
 	a := initTestNeuroskyAdaptor()
-	gobot.Expect(t, a.Finalize(), true)
+	gobot.Assert(t, a.Finalize(), true)
 }
 func TestNeuroskyAdaptorConnect(t *testing.T) {
 	t.SkipNow()
 	a := initTestNeuroskyAdaptor()
-	gobot.Expect(t, a.Connect(), true)
+	gobot.Assert(t, a.Connect(), true)
 }

@@ -9,12 +9,21 @@ import (
 	"time"
 )
 
-func Expect(t *testing.T, a interface{}, b interface{}) {
+func logFailure(t *testing.T, a interface{}, b interface{}) {
+	_, file, line, _ := runtime.Caller(2)
+	s := strings.Split(file, "/")
+	t.Errorf("%v:%v Got %v - type %v, Asserted %v - type %v",
+		s[len(s)-1], line, a, reflect.TypeOf(a), b, reflect.TypeOf(b))
+}
+func Assert(t *testing.T, a interface{}, b interface{}) {
 	if !reflect.DeepEqual(a, b) {
-		_, file, line, _ := runtime.Caller(1)
-		s := strings.Split(file, "/")
-		t.Errorf("%v:%v Got %v - type %v, Expected %v - type %v",
-			s[len(s)-1], line, a, reflect.TypeOf(a), b, reflect.TypeOf(b))
+		logFailure(t, a, b)
+	}
+}
+
+func Refute(t *testing.T, a interface{}, b interface{}) {
+	if reflect.DeepEqual(a, b) {
+		logFailure(t, a, b)
 	}
 }
 

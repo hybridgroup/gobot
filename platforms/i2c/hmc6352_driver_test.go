@@ -12,5 +12,5 @@ func initTestHMC6352Driver() *HMC6352Driver {
 func TestHMC6352DriverStart(t *testing.T) {
 	t.SkipNow()
 	d := initTestHMC6352Driver()
-	gobot.Expect(t, d.Start(), true)
+	gobot.Assert(t, d.Start(), true)
 }

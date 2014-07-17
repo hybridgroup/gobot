@@ -15,10 +15,10 @@ func initTestArdroneAdaptor() *ArdroneAdaptor {
 
 func TestConnect(t *testing.T) {
 	a := initTestArdroneAdaptor()
-	gobot.Expect(t, a.Connect(), true)
+	gobot.Assert(t, a.Connect(), true)
 }
 
 func TestFinalize(t *testing.T) {
 	a := initTestArdroneAdaptor()
-	gobot.Expect(t, a.Finalize(), true)
+	gobot.Assert(t, a.Finalize(), true)
 }

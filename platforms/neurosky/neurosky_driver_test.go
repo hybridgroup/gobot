@@ -12,11 +12,11 @@ func initTestNeuroskyDriver() *NeuroskyDriver {
 func TestNeuroskyDriverStart(t *testing.T) {
 	t.SkipNow()
 	d := initTestNeuroskyDriver()
-	gobot.Expect(t, d.Start(), true)
+	gobot.Assert(t, d.Start(), true)
 }
 
 func TestNeuroskyDriverHalt(t *testing.T) {
 	t.SkipNow()
 	d := initTestNeuroskyDriver()
-	gobot.Expect(t, d.Halt(), true)
+	gobot.Assert(t, d.Halt(), true)
 }

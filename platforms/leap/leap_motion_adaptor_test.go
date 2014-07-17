@@ -12,11 +12,11 @@ func initTestLeapMotionAdaptor() *LeapMotionAdaptor {
 func TestLeapMotionAdaptorConnect(t *testing.T) {
 	t.SkipNow()
 	a := initTestLeapMotionAdaptor()
-	gobot.Expect(t, a.Connect(), true)
+	gobot.Assert(t, a.Connect(), true)
 }
 
 func TestLeapMotionAdaptorFinalize(t *testing.T) {
 	t.SkipNow()
 	a := initTestLeapMotionAdaptor()
-	gobot.Expect(t, a.Finalize(), true)
+	gobot.Assert(t, a.Finalize(), true)
 }

@@ -13,10 +13,10 @@ func initTestSpheroDriver() *SpheroDriver {
 
 func TestSpheroDriverStart(t *testing.T) {
 	d := initTestSpheroDriver()
-	gobot.Expect(t, d.Start(), true)
+	gobot.Assert(t, d.Start(), true)
 }
 
 func TestSpheroDriverHalt(t *testing.T) {
 	d := initTestSpheroDriver()
-	gobot.Expect(t, d.Halt(), true)
+	gobot.Assert(t, d.Halt(), true)
 }

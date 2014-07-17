@@ -6,7 +6,6 @@ type Adaptor struct {
 	name        string
 	port        string
 	connected   bool
-	params      map[string]interface{}
 	adaptorType string
 }
 
@@ -19,7 +18,7 @@ type AdaptorInterface interface {
 	Connected() bool
 	SetConnected(bool)
 	SetName(string)
-	Params() map[string]interface{}
+	SetPort(string)
 	ToJSON() *JSONConnection
 }
 
@@ -32,17 +31,13 @@ func NewAdaptor(name string, adaptorType string, v ...interface{}) *Adaptor {
 		adaptorType: adaptorType,
 		name:        name,
 		port:        "",
-		params:      make(map[string]interface{}),
 	}
 
 	for i := range v {
 		switch v[i].(type) {
 		case string:
 			a.port = v[i].(string)
-		case map[string]interface{}:
-			a.params = v[i].(map[string]interface{})
 		default:
-			fmt.Println("Unknown argument passed to NewAdaptor")
 		}
 	}
 
@@ -51,6 +46,10 @@ func NewAdaptor(name string, adaptorType string, v ...interface{}) *Adaptor {
 
 func (a *Adaptor) Port() string {
 	return a.port
+}
+
+func (a *Adaptor) SetPort(s string) {
+	a.port = s
 }
 
 func (a *Adaptor) Name() string {
@@ -71,10 +70,6 @@ func (a *Adaptor) Connected() bool {
 
 func (a *Adaptor) SetConnected(b bool) {
 	a.connected = b
-}
-
-func (a *Adaptor) Params() map[string]interface{} {
-	return a.params
 }
 
 func (a *Adaptor) ToJSON() *JSONConnection {

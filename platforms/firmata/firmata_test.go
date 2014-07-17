@@ -51,7 +51,7 @@ func TestProcess(t *testing.T) {
 	sem := make(chan bool)
 	//reportVersion
 	gobot.Once(b.events["report_version"], func(data interface{}) {
-		gobot.Expect(t, data.(string), "1.17")
+		gobot.Assert(t, data.(string), "1.17")
 		sem <- true
 	})
 	b.process([]byte{0xF9, 0x01, 0x11})
@@ -59,7 +59,7 @@ func TestProcess(t *testing.T) {
 	//analogMessageRangeStart
 	gobot.Once(b.events["analog_read_0"], func(data interface{}) {
 		b := data.([]byte)
-		gobot.Expect(t,
+		gobot.Assert(t,
 			int(uint(b[0])<<24|uint(b[1])<<16|uint(b[2])<<8|uint(b[3])),
 			675)
 		sem <- true
@@ -68,7 +68,7 @@ func TestProcess(t *testing.T) {
 	<-sem
 	gobot.Once(b.events["analog_read_1"], func(data interface{}) {
 		b := data.([]byte)
-		gobot.Expect(t,
+		gobot.Assert(t,
 			int(uint(b[0])<<24|uint(b[1])<<16|uint(b[2])<<8|uint(b[3])),
 			803)
 		sem <- true
@@ -78,21 +78,21 @@ func TestProcess(t *testing.T) {
 	//digitalMessageRangeStart
 	b.pins[2].mode = input
 	gobot.Once(b.events["digital_read_2"], func(data interface{}) {
-		gobot.Expect(t, int(data.([]byte)[0]), 1)
+		gobot.Assert(t, int(data.([]byte)[0]), 1)
 		sem <- true
 	})
 	b.process([]byte{0x90, 0x04, 0x00})
 	<-sem
 	b.pins[4].mode = input
 	gobot.Once(b.events["digital_read_4"], func(data interface{}) {
-		gobot.Expect(t, int(data.([]byte)[0]), 1)
+		gobot.Assert(t, int(data.([]byte)[0]), 1)
 		sem <- true
 	})
 	b.process([]byte{0x90, 0x16, 0x00})
 	<-sem
 	//pinStateResponse
 	gobot.Once(b.events["pin_13_state"], func(data interface{}) {
-		gobot.Expect(t, data, map[string]int{
+		gobot.Assert(t, data, map[string]int{
 			"pin":   13,
 			"mode":  1,
 			"value": 1,
@@ -107,14 +107,14 @@ func TestProcess(t *testing.T) {
 			"slave_address": []byte{9},
 			"register":      []byte{0},
 			"data":          []byte{152, 1, 154}}
-		gobot.Expect(t, data.(map[string][]byte), i2c_reply)
+		gobot.Assert(t, data.(map[string][]byte), i2c_reply)
 		sem <- true
 	})
 	b.process([]byte{240, 119, 9, 0, 0, 0, 24, 1, 1, 0, 26, 1, 247})
 	<-sem
 	//firmwareName
 	gobot.Once(b.events["firmware_query"], func(data interface{}) {
-		gobot.Expect(t, data.(string), "StandardFirmata.ino")
+		gobot.Assert(t, data.(string), "StandardFirmata.ino")
 		sem <- true
 	})
 	b.process([]byte{240, 121, 2, 3, 83, 0, 116, 0, 97, 0, 110, 0, 100, 0, 97,
@@ -123,7 +123,7 @@ func TestProcess(t *testing.T) {
 	<-sem
 	//stringData
 	gobot.Once(b.events["string_data"], func(data interface{}) {
-		gobot.Expect(t, data.(string), "Hello Firmata!")
+		gobot.Assert(t, data.(string), "Hello Firmata!")
 		sem <- true
 	})
 	b.process(append([]byte{240, 0x71}, []byte("Hello Firmata!")...))

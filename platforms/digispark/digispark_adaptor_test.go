@@ -13,20 +13,20 @@ func initTestDigisparkAdaptor() *DigisparkAdaptor {
 
 func TestDigisparkAdaptorFinalize(t *testing.T) {
 	a := initTestDigisparkAdaptor()
-	gobot.Expect(t, a.Finalize(), true)
+	gobot.Assert(t, a.Finalize(), true)
 }
 
 func TestDigisparkAdaptorConnect(t *testing.T) {
 	a := initTestDigisparkAdaptor()
-	gobot.Expect(t, a.Connect(), true)
+	gobot.Assert(t, a.Connect(), true)
 }
 
 func TestDigisparkAdaptorDisconnect(t *testing.T) {
 	a := initTestDigisparkAdaptor()
-	gobot.Expect(t, a.Disconnect(), true)
+	gobot.Assert(t, a.Disconnect(), true)
 }
 
 func TestDigisparkAdaptorReconnect(t *testing.T) {
 	a := initTestDigisparkAdaptor()
-	gobot.Expect(t, a.Reconnect(), true)
+	gobot.Assert(t, a.Reconnect(), true)
 }

@@ -35,7 +35,7 @@ func TestRobots(t *testing.T) {
 	body, _ := ioutil.ReadAll(response.Body)
 	var i []map[string]interface{}
 	json.Unmarshal(body, &i)
-	gobot.Expect(t, len(i), 3)
+	gobot.Assert(t, len(i), 3)
 }
 
 func TestRobot(t *testing.T) {
@@ -47,7 +47,7 @@ func TestRobot(t *testing.T) {
 	body, _ := ioutil.ReadAll(response.Body)
 	var i map[string]interface{}
 	json.Unmarshal(body, &i)
-	gobot.Expect(t, i["name"].(string), "Robot 1")
+	gobot.Assert(t, i["name"].(string), "Robot 1")
 }
 
 func TestRobotDevices(t *testing.T) {
@@ -59,7 +59,7 @@ func TestRobotDevices(t *testing.T) {
 	body, _ := ioutil.ReadAll(response.Body)
 	var i []map[string]interface{}
 	json.Unmarshal(body, &i)
-	gobot.Expect(t, len(i), 3)
+	gobot.Assert(t, len(i), 3)
 }
 
 func TestRobotCommands(t *testing.T) {
@@ -71,7 +71,7 @@ func TestRobotCommands(t *testing.T) {
 	body, _ := ioutil.ReadAll(response.Body)
 	var i []string
 	json.Unmarshal(body, &i)
-	gobot.Expect(t, i, []string{"robotTestFunction"})
+	gobot.Assert(t, i, []string{"robotTestFunction"})
 }
 
 func TestExecuteRobotCommand(t *testing.T) {
@@ -84,7 +84,7 @@ func TestExecuteRobotCommand(t *testing.T) {
 	body, _ := ioutil.ReadAll(response.Body)
 	var i interface{}
 	json.Unmarshal(body, &i)
-	gobot.Expect(t, i, "hey Robot 1, Beep Boop")
+	gobot.Assert(t, i, "hey Robot 1, Beep Boop")
 }
 
 func TestUnknownRobotCommand(t *testing.T) {
@@ -97,7 +97,7 @@ func TestUnknownRobotCommand(t *testing.T) {
 	body, _ := ioutil.ReadAll(response.Body)
 	var i interface{}
 	json.Unmarshal(body, &i)
-	gobot.Expect(t, i, "Unknown Command")
+	gobot.Assert(t, i, "Unknown Command")
 }
 
 func TestRobotDevice(t *testing.T) {
@@ -109,7 +109,7 @@ func TestRobotDevice(t *testing.T) {
 	body, _ := ioutil.ReadAll(response.Body)
 	var i map[string]interface{}
 	json.Unmarshal(body, &i)
-	gobot.Expect(t, i["name"].(string), "Device 1")
+	gobot.Assert(t, i["name"].(string), "Device 1")
 }
 
 func TestRobotDeviceCommands(t *testing.T) {
@@ -121,7 +121,7 @@ func TestRobotDeviceCommands(t *testing.T) {
 	body, _ := ioutil.ReadAll(response.Body)
 	var i []string
 	json.Unmarshal(body, &i)
-	gobot.Expect(t, i, []string{"TestDriverCommand", "DriverCommand"})
+	gobot.Assert(t, i, []string{"TestDriverCommand", "DriverCommand"})
 }
 
 func TestExecuteRobotDeviceCommand(t *testing.T) {
@@ -134,7 +134,7 @@ func TestExecuteRobotDeviceCommand(t *testing.T) {
 	body, _ := ioutil.ReadAll(response.Body)
 	var i interface{}
 	json.Unmarshal(body, &i)
-	gobot.Expect(t, i, "hello human")
+	gobot.Assert(t, i, "hello human")
 }
 
 func TestUnknownRobotDeviceCommand(t *testing.T) {
@@ -147,5 +147,5 @@ func TestUnknownRobotDeviceCommand(t *testing.T) {
 	body, _ := ioutil.ReadAll(response.Body)
 	var i interface{}
 	json.Unmarshal(body, &i)
-	gobot.Expect(t, i, "Unknown Command")
+	gobot.Assert(t, i, "Unknown Command")
 }

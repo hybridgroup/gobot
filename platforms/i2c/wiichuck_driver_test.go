@@ -12,5 +12,5 @@ func initTestWiichuckDriver() *WiichuckDriver {
 func TestWiichuckDriverStart(t *testing.T) {
 	t.SkipNow()
 	d := initTestWiichuckDriver()
-	gobot.Expect(t, d.Start(), true)
+	gobot.Assert(t, d.Start(), true)
 }

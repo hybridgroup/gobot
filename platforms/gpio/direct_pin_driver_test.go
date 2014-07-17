@@ -11,22 +11,22 @@ func initTestDirectPinDriver() *DirectPinDriver {
 
 func TestDirectPinDriverStart(t *testing.T) {
 	d := initTestDirectPinDriver()
-	gobot.Expect(t, d.Start(), true)
+	gobot.Assert(t, d.Start(), true)
 }
 
 func TestDirectPinDriverHalt(t *testing.T) {
 	d := initTestDirectPinDriver()
-	gobot.Expect(t, d.Halt(), true)
+	gobot.Assert(t, d.Halt(), true)
 }
 
 func TestDirectPinDriverInit(t *testing.T) {
 	d := initTestDirectPinDriver()
-	gobot.Expect(t, d.Init(), true)
+	gobot.Assert(t, d.Init(), true)
 }
 
 func TestDirectPinDriverDigitalRead(t *testing.T) {
 	d := initTestDirectPinDriver()
-	gobot.Expect(t, d.DigitalRead(), 1)
+	gobot.Assert(t, d.DigitalRead(), 1)
 }
 
 func TestDirectPinDriverDigitalWrite(t *testing.T) {
@@ -36,7 +36,7 @@ func TestDirectPinDriverDigitalWrite(t *testing.T) {
 
 func TestDirectPinDriverAnalogRead(t *testing.T) {
 	d := initTestDirectPinDriver()
-	gobot.Expect(t, d.AnalogRead(), 99)
+	gobot.Assert(t, d.AnalogRead(), 99)
 }
 
 func TestDirectPinDriverAnalogWrite(t *testing.T) {

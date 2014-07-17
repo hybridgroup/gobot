@@ -188,12 +188,12 @@ func initTest{{ .UpperName }}Driver() *{{ .UpperName }}Driver {
 
 func Test{{ .UpperName }}DriverStart(t *testing.T) {
   d := initTest{{.UpperName }}Driver()
-  gobot.Expect(t, d.Start(), true)
+  gobot.Assert(t, d.Start(), true)
 }
 
 func Test{{ .UpperName }}DriverHalt(t *testing.T) {
   d := initTest{{.UpperName }}Driver()
-  gobot.Expect(t, d.Halt(), true)
+  gobot.Assert(t, d.Halt(), true)
 }
 `
 }
@@ -212,12 +212,12 @@ func initTest{{ .UpperName }}Adaptor() *{{ .UpperName }}Adaptor {
 
 func Test{{ .UpperName }}AdaptorConnect(t *testing.T) {
   a := initTest{{.UpperName }}Adaptor()
-  gobot.Expect(t, a.Connect(), true)
+  gobot.Assert(t, a.Connect(), true)
 }
 
 func Test{{ .UpperName }}AdaptorFinalize(t *testing.T) {
   a := initTest{{.UpperName }}Adaptor()
-  gobot.Expect(t, a.Finalize(), true)
+  gobot.Assert(t, a.Finalize(), true)
 }
 `
 }

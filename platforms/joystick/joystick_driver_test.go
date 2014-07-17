@@ -12,17 +12,17 @@ func initTestJoystickDriver() *JoystickDriver {
 func TestJoystickDriverStart(t *testing.T) {
 	t.SkipNow()
 	d := initTestJoystickDriver()
-	gobot.Expect(t, d.Start(), true)
+	gobot.Assert(t, d.Start(), true)
 }
 
 func TestJoystickDriverHalt(t *testing.T) {
 	t.SkipNow()
 	d := initTestJoystickDriver()
-	gobot.Expect(t, d.Halt(), true)
+	gobot.Assert(t, d.Halt(), true)
 }
 
 func TestJoystickDriverInit(t *testing.T) {
 	t.SkipNow()
 	d := initTestJoystickDriver()
-	gobot.Expect(t, d.Init(), true)
+	gobot.Assert(t, d.Init(), true)
 }

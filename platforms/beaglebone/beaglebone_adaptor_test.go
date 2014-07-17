@@ -13,17 +13,17 @@ func initTestBeagleboneAdaptor() *BeagleboneAdaptor {
 
 func TestBeagleboneAdaptorFinalize(t *testing.T) {
 	a := initTestBeagleboneAdaptor()
-	gobot.Expect(t, a.Finalize(), true)
+	gobot.Assert(t, a.Finalize(), true)
 }
 func TestBeagleboneAdaptorConnect(t *testing.T) {
 	a := initTestBeagleboneAdaptor()
-	gobot.Expect(t, a.Connect(), true)
+	gobot.Assert(t, a.Connect(), true)
 }
 func TestBeagleboneAdaptorDisconnect(t *testing.T) {
 	a := initTestBeagleboneAdaptor()
-	gobot.Expect(t, a.Disconnect(), true)
+	gobot.Assert(t, a.Disconnect(), true)
 }
 func TestBeagleboneAdaptorReconnect(t *testing.T) {
 	a := initTestBeagleboneAdaptor()
-	gobot.Expect(t, a.Reconnect(), true)
+	gobot.Assert(t, a.Reconnect(), true)
 }

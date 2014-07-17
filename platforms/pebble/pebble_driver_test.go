@@ -11,12 +11,12 @@ func initTestPebbleDriver() *PebbleDriver {
 
 func TestPebbleDriverStart(t *testing.T) {
 	d := initTestPebbleDriver()
-	gobot.Expect(t, d.Start(), true)
+	gobot.Assert(t, d.Start(), true)
 }
 
 func TestPebbleDriverHalt(t *testing.T) {
 	d := initTestPebbleDriver()
-	gobot.Expect(t, d.Halt(), true)
+	gobot.Assert(t, d.Halt(), true)
 }
 
 func TestPebbleDriverNotification(t *testing.T) {
@@ -24,8 +24,8 @@ func TestPebbleDriverNotification(t *testing.T) {
 	d.SendNotification("Hello")
 	d.SendNotification("World")
 
-	gobot.Expect(t, d.Messages[0], "Hello")
-	gobot.Expect(t, d.PendingMessage(), "Hello")
-	gobot.Expect(t, d.PendingMessage(), "World")
-	gobot.Expect(t, d.PendingMessage(), "")
+	gobot.Assert(t, d.Messages[0], "Hello")
+	gobot.Assert(t, d.PendingMessage(), "Hello")
+	gobot.Assert(t, d.PendingMessage(), "World")
+	gobot.Assert(t, d.PendingMessage(), "")
 }

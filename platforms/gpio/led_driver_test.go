@@ -12,38 +12,38 @@ func initTestLedDriver() *LedDriver {
 
 func TestLedDriverStart(t *testing.T) {
 	d := initTestLedDriver()
-	gobot.Expect(t, d.Start(), true)
+	gobot.Assert(t, d.Start(), true)
 }
 
 func TestLedDriverHalt(t *testing.T) {
 	d := initTestLedDriver()
-	gobot.Expect(t, d.Halt(), true)
+	gobot.Assert(t, d.Halt(), true)
 }
 
 func TestLedDriverInit(t *testing.T) {
 	d := initTestLedDriver()
-	gobot.Expect(t, d.Init(), true)
+	gobot.Assert(t, d.Init(), true)
 }
 
 func TestLedDriverOn(t *testing.T) {
 	d := initTestLedDriver()
-	gobot.Expect(t, d.On(), true)
-	gobot.Expect(t, d.IsOn(), true)
+	gobot.Assert(t, d.On(), true)
+	gobot.Assert(t, d.IsOn(), true)
 }
 
 func TestLedDriverOff(t *testing.T) {
 	d := initTestLedDriver()
-	gobot.Expect(t, d.Off(), true)
-	gobot.Expect(t, d.IsOff(), true)
+	gobot.Assert(t, d.Off(), true)
+	gobot.Assert(t, d.IsOff(), true)
 }
 
 func TestLedDriverToggle(t *testing.T) {
 	d := initTestLedDriver()
 	d.Off()
 	d.Toggle()
-	gobot.Expect(t, d.IsOn(), true)
+	gobot.Assert(t, d.IsOn(), true)
 	d.Toggle()
-	gobot.Expect(t, d.IsOff(), true)
+	gobot.Assert(t, d.IsOff(), true)
 }
 
 func TestLedDriverBrightness(t *testing.T) {

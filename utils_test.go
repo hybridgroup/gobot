@@ -12,7 +12,7 @@ func TestEvery(t *testing.T) {
 		i++
 	})
 	<-time.After(5 * time.Millisecond)
-	Expect(t, i, 2)
+	Assert(t, i, 2)
 }
 
 func TestAfter(t *testing.T) {
@@ -21,7 +21,7 @@ func TestAfter(t *testing.T) {
 		i++
 	})
 	<-time.After(2 * time.Millisecond)
-	Expect(t, i, 1)
+	Assert(t, i, 1)
 }
 
 func TestPublish(t *testing.T) {
@@ -31,7 +31,7 @@ func TestPublish(t *testing.T) {
 	Publish(e, 3)
 	Publish(e, 4)
 	i := <-e.Chan
-	Expect(t, i, 1)
+	Assert(t, i, 1)
 }
 
 func TestOn(t *testing.T) {
@@ -42,7 +42,7 @@ func TestOn(t *testing.T) {
 	})
 	Publish(e, 10)
 	<-time.After(1 * time.Millisecond)
-	Expect(t, i, 10)
+	Assert(t, i, 10)
 }
 func TestOnce(t *testing.T) {
 	i := 0
@@ -57,17 +57,17 @@ func TestOnce(t *testing.T) {
 	<-time.After(1 * time.Millisecond)
 	Publish(e, 10)
 	<-time.After(1 * time.Millisecond)
-	Expect(t, i, 30)
+	Assert(t, i, 30)
 }
 
 func TestFromScale(t *testing.T) {
-	Expect(t, FromScale(5, 0, 10), 0.5)
+	Assert(t, FromScale(5, 0, 10), 0.5)
 }
 
 func TestToScale(t *testing.T) {
-	Expect(t, ToScale(500, 0, 10), 10.0)
-	Expect(t, ToScale(-1, 0, 10), 0.0)
-	Expect(t, ToScale(0.5, 0, 10), 5.0)
+	Assert(t, ToScale(500, 0, 10), 10.0)
+	Assert(t, ToScale(-1, 0, 10), 0.0)
+	Assert(t, ToScale(0.5, 0, 10), 5.0)
 }
 
 func TestRand(t *testing.T) {
