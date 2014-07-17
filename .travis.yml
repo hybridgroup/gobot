@@ -7,7 +7,7 @@ before_install:
  - sudo add-apt-repository -y ppa:kubuntu-ppa/backports
  - sudo add-apt-repository -y ppa:zoogie/sdl2-snapshots
  - sudo apt-get update
- - sudo apt-get install --force-yes libcv-dev libcvaux-dev libhighgui-dev libopencv-dev libsdl2-dev libsdl2-image-dev libsdl2
+ - sudo apt-get install --force-yes libcv-dev libcvaux-dev libhighgui-dev libopencv-dev libsdl2-dev libsdl2-image-dev libsdl2 libdc1394-22-dev
 install:
  - sudo apt-get install libusb-dev
  - go get -v . && go build -v .
