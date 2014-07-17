@@ -37,7 +37,6 @@ func NewAdaptor(name string, adaptorType string, v ...interface{}) *Adaptor {
 		switch v[i].(type) {
 		case string:
 			a.port = v[i].(string)
-		default:
 		}
 	}
 

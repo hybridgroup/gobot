@@ -58,8 +58,6 @@ func NewDriver(name string, driverType string, v ...interface{}) *Driver {
 			d.adaptor = v[i].(AdaptorInterface)
 		case time.Duration:
 			d.interval = v[i].(time.Duration)
-		default:
-			fmt.Println("Unknown argument passed to NewDriver")
 		}
 	}
 

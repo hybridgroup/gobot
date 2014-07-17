@@ -9,21 +9,22 @@ import (
 	"time"
 )
 
-func logFailure(t *testing.T, a interface{}, b interface{}) {
+func logFailure(t *testing.T, message string) {
 	_, file, line, _ := runtime.Caller(2)
 	s := strings.Split(file, "/")
-	t.Errorf("%v:%v Got %v - type %v, Asserted %v - type %v",
-		s[len(s)-1], line, a, reflect.TypeOf(a), b, reflect.TypeOf(b))
+	t.Errorf("%v:%v: %v", s[len(s)-1], line, message)
 }
 func Assert(t *testing.T, a interface{}, b interface{}) {
 	if !reflect.DeepEqual(a, b) {
-		logFailure(t, a, b)
+		logFailure(t, fmt.Sprintf("%v - \"%v\", should equal,  %v - \"%v\"",
+			a, reflect.TypeOf(a), b, reflect.TypeOf(b)))
 	}
 }
 
 func Refute(t *testing.T, a interface{}, b interface{}) {
 	if reflect.DeepEqual(a, b) {
-		logFailure(t, a, b)
+		logFailure(t, fmt.Sprintf("%v - \"%v\", should not equal,  %v - \"%v\"",
+			a, reflect.TypeOf(a), b, reflect.TypeOf(b)))
 	}
 }
 
@@ -102,10 +103,6 @@ func NewTestAdaptor(name string) *testAdaptor {
 			name,
 			"TestAdaptor",
 			"/dev/null",
-			map[string]interface{}{
-				"param1": "1",
-				"param2": 2,
-			},
 		),
 	}
 }
