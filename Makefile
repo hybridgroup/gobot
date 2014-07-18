@@ -1,12 +1,12 @@
 PACKAGES := gobot gobot/api $(shell ls ./platforms | sed -e 's/^/gobot\/platforms\//')
 
-.PHONY: test cover robeaux 
+.PHONY: test cover robeaux
 
 test:
 	for package in $(PACKAGES) ; do \
 		go test github.com/hybridgroup/$$package ; \
 	done ; \
- 
+
 cover:
 	echo "mode: count" > profile.cov ; \
 	for package in $(PACKAGES) ; do \
@@ -32,4 +32,4 @@ endif
 	cd .. ; \
 	rm -rf robeaux-tmp/ ; \
 	go fmt ./robeaux/robeaux.go ; \
-	
+
