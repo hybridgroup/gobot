@@ -16,9 +16,9 @@ func initTestAPI() *api {
 	log.SetOutput(gobot.NullReadWriteCloser{})
 	g := gobot.NewGobot()
 	a := NewAPI(g)
-	a.Debug = true
 	a.start = func(m *api) {}
 	a.Start()
+	a.SetDebug()
 
 	g.AddRobot(gobot.NewTestRobot("Robot1"))
 	g.AddRobot(gobot.NewTestRobot("Robot2"))
@@ -33,8 +33,7 @@ func initTestAPI() *api {
 func TestBasicAuth(t *testing.T) {
 	a := initTestAPI()
 
-	a.Username = "admin"
-	a.Password = "password"
+	a.SetBasicAuth("admin", "password")
 
 	request, _ := http.NewRequest("GET", "/", nil)
 	request.SetBasicAuth("admin", "password")

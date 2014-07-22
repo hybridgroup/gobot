@@ -24,7 +24,7 @@ type api struct {
 	Password string
 	Cert     string
 	Key      string
-	Debug    bool
+	handlers []func(http.ResponseWriter, *http.Request)
 	start    func(*api)
 }
 
@@ -49,6 +49,10 @@ func NewAPI(g *gobot.Gobot) *api {
 	}
 }
 
+func (a *api) AddHandler(f func(http.ResponseWriter, *http.Request)) {
+	a.handlers = append(a.handlers, f)
+}
+
 // start starts the api using the start function
 // sets on the API on initialization.
 func (a *api) Start() {
@@ -58,45 +62,40 @@ func (a *api) Start() {
 	deviceCommandRoute := "/robots/:robot/devices/:device/commands/:command"
 	robotCommandRoute := "/robots/:robot/commands/:command"
 
-	a.server.Get("/", a.setHeaders(a.mcp))
-	a.server.Get("/commands", a.setHeaders(a.mcpCommands))
-	a.server.Get(mcpCommandRoute, a.setHeaders(a.executeMcpCommand))
-	a.server.Post(mcpCommandRoute, a.setHeaders(a.executeMcpCommand))
-	a.server.Get("/robots", a.setHeaders(a.robots))
-	a.server.Get("/robots/:robot", a.setHeaders(a.robot))
-	a.server.Get("/robots/:robot/commands", a.setHeaders(a.robotCommands))
-	a.server.Get(robotCommandRoute, a.setHeaders(a.executeRobotCommand))
-	a.server.Post(robotCommandRoute, a.setHeaders(a.executeRobotCommand))
-	a.server.Get("/robots/:robot/devices", a.setHeaders(a.robotDevices))
-	a.server.Get("/robots/:robot/devices/:device", a.setHeaders(a.robotDevice))
+	a.server.Get("/", a.run(a.mcp))
+	a.server.Get("/commands", a.run(a.mcpCommands))
+	a.server.Get(mcpCommandRoute, a.run(a.executeMcpCommand))
+	a.server.Post(mcpCommandRoute, a.run(a.executeMcpCommand))
+	a.server.Get("/robots", a.run(a.robots))
+	a.server.Get("/robots/:robot", a.run(a.robot))
+	a.server.Get("/robots/:robot/commands", a.run(a.robotCommands))
+	a.server.Get(robotCommandRoute, a.run(a.executeRobotCommand))
+	a.server.Post(robotCommandRoute, a.run(a.executeRobotCommand))
+	a.server.Get("/robots/:robot/devices", a.run(a.robotDevices))
+	a.server.Get("/robots/:robot/devices/:device", a.run(a.robotDevice))
 	a.server.Get("/robots/:robot/devices/:device/commands",
-		a.setHeaders(a.robotDeviceCommands),
+		a.run(a.robotDeviceCommands),
 	)
-	a.server.Get(deviceCommandRoute, a.setHeaders(a.executeDeviceCommand))
-	a.server.Post(deviceCommandRoute, a.setHeaders(a.executeDeviceCommand))
-	a.server.Get("/robots/:robot/connections", a.setHeaders(a.robotConnections))
+	a.server.Get(deviceCommandRoute, a.run(a.executeDeviceCommand))
+	a.server.Post(deviceCommandRoute, a.run(a.executeDeviceCommand))
+	a.server.Get("/robots/:robot/connections", a.run(a.robotConnections))
 	a.server.Get("/robots/:robot/connections/:connection",
-		a.setHeaders(a.robotConnection),
+		a.run(a.robotConnection),
 	)
-	a.server.Get("/:a", a.setHeaders(a.robeaux))
-	a.server.Get("/:a/", a.setHeaders(a.robeaux))
-	a.server.Get("/:a/:b", a.setHeaders(a.robeaux))
-	a.server.Get("/:a/:b/", a.setHeaders(a.robeaux))
-	a.server.Get("/:a/:b/:c", a.setHeaders(a.robeaux))
-	a.server.Get("/:a/:b/:c/", a.setHeaders(a.robeaux))
+	a.server.Get("/:a", a.run(a.robeaux))
+	a.server.Get("/:a/", a.run(a.robeaux))
+	a.server.Get("/:a/:b", a.run(a.robeaux))
+	a.server.Get("/:a/:b/", a.run(a.robeaux))
+	a.server.Get("/:a/:b/:c", a.run(a.robeaux))
+	a.server.Get("/:a/:b/:c/", a.run(a.robeaux))
 
 	a.start(a)
 }
 
-func (a *api) setHeaders(f func(http.ResponseWriter, *http.Request)) http.HandlerFunc {
+func (a *api) run(f func(http.ResponseWriter, *http.Request)) http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
-		if a.Debug {
-			log.Println(req)
-		}
-		if a.Username != "" {
-			if !a.basicAuth(res, req) {
-				return
-			}
+		for _, handler := range a.handlers {
+			handler(res, req)
 		}
 		f(res, req)
 	}
@@ -209,7 +208,7 @@ func (a *api) robotConnection(res http.ResponseWriter, req *http.Request) {
 
 func (a *api) executeMcpCommand(res http.ResponseWriter, req *http.Request) {
 	var data []byte
-	var body map[string]interface{}
+	body := make(map[string]interface{})
 	command := req.URL.Query().Get(":command")
 
 	json.NewDecoder(req.Body).Decode(&body)
@@ -226,11 +225,11 @@ func (a *api) executeMcpCommand(res http.ResponseWriter, req *http.Request) {
 }
 
 func (a *api) executeDeviceCommand(res http.ResponseWriter, req *http.Request) {
-	var body map[string]interface{}
 	var data []byte
 	robot := req.URL.Query().Get(":robot")
 	device := req.URL.Query().Get(":device")
 	command := req.URL.Query().Get(":command")
+	body := make(map[string]interface{})
 
 	json.NewDecoder(req.Body).Decode(&body)
 	d := a.gobot.Robot(robot).Device(device)
@@ -249,11 +248,11 @@ func (a *api) executeDeviceCommand(res http.ResponseWriter, req *http.Request) {
 
 func (a *api) executeRobotCommand(res http.ResponseWriter, req *http.Request) {
 	var data []byte
-	var body map[string]interface{}
 
 	robot := req.URL.Query().Get(":robot")
 	command := req.URL.Query().Get(":command")
 
+	body := make(map[string]interface{})
 	json.NewDecoder(req.Body).Decode(&body)
 	r := a.gobot.Robot(robot)
 	body["robot"] = robot
@@ -269,9 +268,21 @@ func (a *api) executeRobotCommand(res http.ResponseWriter, req *http.Request) {
 	res.Write(data)
 }
 
+func (a *api) SetBasicAuth(user, password string) {
+	a.Username = user
+	a.Password = password
+	a.AddHandler(a.basicAuth)
+}
+
+func (a *api) SetDebug() {
+	a.AddHandler(func(res http.ResponseWriter, req *http.Request) {
+		log.Println(req)
+	})
+}
+
 // basic auth inspired by
 // https://github.com/codegangsta/martini-contrib/blob/master/auth/
-func (a *api) basicAuth(res http.ResponseWriter, req *http.Request) bool {
+func (a *api) basicAuth(res http.ResponseWriter, req *http.Request) {
 	auth := req.Header.Get("Authorization")
 	if !a.secureCompare(auth,
 		"Basic "+base64.StdEncoding.EncodeToString([]byte(a.Username+":"+a.Password)),
@@ -280,9 +291,7 @@ func (a *api) basicAuth(res http.ResponseWriter, req *http.Request) bool {
 			"Basic realm=\"Authorization Required\"",
 		)
 		http.Error(res, "Not Authorized", http.StatusUnauthorized)
-		return false
 	}
-	return true
 }
 
 func (a *api) secureCompare(given string, actual string) bool {
