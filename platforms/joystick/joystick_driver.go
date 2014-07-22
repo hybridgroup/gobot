@@ -2,9 +2,9 @@ package joystick
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
-	"time"
 
 	"github.com/hybridgroup/go-sdl2/sdl"
 	"github.com/hybridgroup/gobot"
@@ -13,6 +13,7 @@ import (
 type JoystickDriver struct {
 	gobot.Driver
 	config joystickConfig
+	poll   func() sdl.Event
 }
 
 type pair struct {
@@ -41,6 +42,9 @@ func NewJoystickDriver(a *JoystickAdaptor, name string, config string) *Joystick
 			"JoystickDriver",
 			a,
 		),
+		poll: func() sdl.Event {
+			return sdl.PollEvent()
+		},
 	}
 
 	file, e := ioutil.ReadFile(config)
@@ -68,50 +72,58 @@ func (j *JoystickDriver) adaptor() *JoystickAdaptor {
 }
 
 func (j *JoystickDriver) Start() bool {
-	go func() {
-		var event sdl.Event
-		for {
-			for event = sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
-				switch data := event.(type) {
-				case *sdl.JoyAxisEvent:
-					if data.Which == j.adaptor().joystick.InstanceID() {
-						axis := j.findName(data.Axis, j.config.Axis)
-						if axis == "" {
-							fmt.Println("Unknown Axis:", data.Axis)
-						} else {
-							gobot.Publish(j.Event(axis), data.Value)
-						}
-					}
-				case *sdl.JoyButtonEvent:
-					if data.Which == j.adaptor().joystick.InstanceID() {
-						button := j.findName(data.Button, j.config.Buttons)
-						if button == "" {
-							fmt.Println("Unknown Button:", data.Button)
-						} else {
-							if data.State == 1 {
-								gobot.Publish(j.Event(fmt.Sprintf("%s_press", button)), nil)
-							} else {
-								gobot.Publish(j.Event(fmt.Sprintf("%s_release", button)), nil)
-							}
-						}
-					}
-				case *sdl.JoyHatEvent:
-					if data.Which == j.adaptor().joystick.InstanceID() {
-						hat := j.findHatName(data.Value, data.Hat, j.config.Hats)
-						if hat == "" {
-							fmt.Println("Unknown Hat:", data.Hat, data.Value)
-						} else {
-							gobot.Publish(j.Event(hat), true)
-						}
-					}
-				}
-			}
-			time.Sleep(10 * time.Millisecond)
+	gobot.Every(j.Interval(), func() {
+		event := j.poll()
+		if event != nil {
+			j.handleEvent(event)
 		}
-	}()
+	})
 	return true
 }
-func (j *JoystickDriver) Init() bool { return true }
+
+func (j *JoystickDriver) handleEvent(event sdl.Event) error {
+	switch data := event.(type) {
+	case *sdl.JoyAxisEvent:
+		if data.Which == j.adaptor().joystick.InstanceID() {
+			axis := j.findName(data.Axis, j.config.Axis)
+			if axis == "" {
+				e := errors.New(fmt.Sprintf("Unknown Axis: %v", data.Axis))
+				fmt.Println(e.Error())
+				return e
+			} else {
+				gobot.Publish(j.Event(axis), data.Value)
+			}
+		}
+	case *sdl.JoyButtonEvent:
+		if data.Which == j.adaptor().joystick.InstanceID() {
+			button := j.findName(data.Button, j.config.Buttons)
+			if button == "" {
+				e := errors.New(fmt.Sprintf("Unknown Button: %v", data.Button))
+				fmt.Println(e.Error())
+				return e
+			} else {
+				if data.State == 1 {
+					gobot.Publish(j.Event(fmt.Sprintf("%s_press", button)), nil)
+				} else {
+					gobot.Publish(j.Event(fmt.Sprintf("%s_release", button)), nil)
+				}
+			}
+		}
+	case *sdl.JoyHatEvent:
+		if data.Which == j.adaptor().joystick.InstanceID() {
+			hat := j.findHatName(data.Value, data.Hat, j.config.Hats)
+			if hat == "" {
+				e := errors.New(fmt.Sprintf("Unknown Hat: %v %v", data.Hat, data.Value))
+				fmt.Println(e.Error())
+				return e
+			} else {
+				gobot.Publish(j.Event(hat), true)
+			}
+		}
+	}
+	return nil
+}
+
 func (j *JoystickDriver) Halt() bool { return true }
 
 func (j *JoystickDriver) findName(id uint8, list []pair) string {

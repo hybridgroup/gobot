@@ -5,9 +5,14 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
+type joystick interface {
+	Close()
+	InstanceID() sdl.JoystickID
+}
+
 type JoystickAdaptor struct {
 	gobot.Adaptor
-	joystick *sdl.Joystick
+	joystick joystick
 	connect  func(*JoystickAdaptor)
 }
 
