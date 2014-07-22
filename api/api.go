@@ -4,7 +4,6 @@ import (
 	"crypto/subtle"
 	"encoding/base64"
 	"encoding/json"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"strings"
@@ -32,29 +31,18 @@ type api struct {
 func NewAPI(g *gobot.Gobot) *api {
 	return &api{
 		gobot: g,
+		Port:  "3000",
 		start: func(a *api) {
-			if a == nil {
-				return
-			}
-
-			port := a.Port
-			if port == "" {
-				port = "3000"
-			}
-
-			host := a.Host
-			cert := a.Cert
-			key := a.Key
-
-			log.Println("Initializing API on " + host + ":" + port + "...")
+			log.Println("Initializing API on " + a.Host + ":" + a.Port + "...")
 			http.Handle("/", a.server)
 
 			go func() {
-				if cert != "" && key != "" {
-					http.ListenAndServeTLS(host+":"+port, cert, key, nil)
+				if a.Cert != "" && a.Key != "" {
+					http.ListenAndServeTLS(a.Host+":"+a.Port, a.Cert, a.Key, nil)
 				} else {
-					log.Println("WARNING: API using insecure connection. We recommend using an SSL certificate with Gobot.")
-					http.ListenAndServe(host+":"+port, nil)
+					log.Println("WARNING: API using insecure connection. " +
+						"We recommend using an SSL certificate with Gobot.")
+					http.ListenAndServe(a.Host+":"+a.Port, nil)
 				}
 			}()
 		},
@@ -66,14 +54,14 @@ func NewAPI(g *gobot.Gobot) *api {
 func (a *api) Start() {
 	a.server = pat.New()
 
-	commandRoute := "/commands/:command"
+	mcpCommandRoute := "/commands/:command"
 	deviceCommandRoute := "/robots/:robot/devices/:device/commands/:command"
 	robotCommandRoute := "/robots/:robot/commands/:command"
 
-	a.server.Get("/", a.setHeaders(a.root))
-	a.server.Get("/commands", a.setHeaders(a.commands))
-	a.server.Get(commandRoute, a.setHeaders(a.executeCommand))
-	a.server.Post(commandRoute, a.setHeaders(a.executeCommand))
+	a.server.Get("/", a.setHeaders(a.mcp))
+	a.server.Get("/commands", a.setHeaders(a.mcpCommands))
+	a.server.Get(mcpCommandRoute, a.setHeaders(a.executeMcpCommand))
+	a.server.Post(mcpCommandRoute, a.setHeaders(a.executeMcpCommand))
 	a.server.Get("/robots", a.setHeaders(a.robots))
 	a.server.Get("/robots/:robot", a.setHeaders(a.robot))
 	a.server.Get("/robots/:robot/commands", a.setHeaders(a.robotCommands))
@@ -81,11 +69,15 @@ func (a *api) Start() {
 	a.server.Post(robotCommandRoute, a.setHeaders(a.executeRobotCommand))
 	a.server.Get("/robots/:robot/devices", a.setHeaders(a.robotDevices))
 	a.server.Get("/robots/:robot/devices/:device", a.setHeaders(a.robotDevice))
-	a.server.Get("/robots/:robot/devices/:device/commands", a.setHeaders(a.robotDeviceCommands))
+	a.server.Get("/robots/:robot/devices/:device/commands",
+		a.setHeaders(a.robotDeviceCommands),
+	)
 	a.server.Get(deviceCommandRoute, a.setHeaders(a.executeDeviceCommand))
 	a.server.Post(deviceCommandRoute, a.setHeaders(a.executeDeviceCommand))
 	a.server.Get("/robots/:robot/connections", a.setHeaders(a.robotConnections))
-	a.server.Get("/robots/:robot/connections/:connection", a.setHeaders(a.robotConnection))
+	a.server.Get("/robots/:robot/connections/:connection",
+		a.setHeaders(a.robotConnection),
+	)
 	a.server.Get("/:a", a.setHeaders(a.robeaux))
 	a.server.Get("/:a/", a.setHeaders(a.robeaux))
 	a.server.Get("/:a/:b", a.setHeaders(a.robeaux))
@@ -94,24 +86,6 @@ func (a *api) Start() {
 	a.server.Get("/:a/:b/:c/", a.setHeaders(a.robeaux))
 
 	a.start(a)
-}
-
-// basic auth inspired by https://github.com/codegangsta/martini-contrib/blob/master/auth/
-func (a *api) basicAuth(res http.ResponseWriter, req *http.Request) bool {
-	auth := req.Header.Get("Authorization")
-	if !a.secureCompare(auth, "Basic "+base64.StdEncoding.EncodeToString([]byte(a.Username+":"+a.Password))) {
-		res.Header().Set("WWW-Authenticate", "Basic realm=\"Authorization Required\"")
-		http.Error(res, "Not Authorized", http.StatusUnauthorized)
-		return false
-	}
-	return true
-}
-func (a *api) secureCompare(given string, actual string) bool {
-	if subtle.ConstantTimeEq(int32(len(given)), int32(len(actual))) == 1 {
-		return subtle.ConstantTimeCompare([]byte(given), []byte(actual)) == 1
-	}
-	/* Securely compare actual to itself to keep constant time, but always return false */
-	return subtle.ConstantTimeCompare([]byte(actual), []byte(actual)) == 1 && false
 }
 
 func (a *api) setHeaders(f func(http.ResponseWriter, *http.Request)) http.HandlerFunc {
@@ -132,8 +106,7 @@ func (a *api) robeaux(res http.ResponseWriter, req *http.Request) {
 	path := req.URL.Path
 	buf, err := robeaux.Asset(path[1:])
 	if err != nil {
-		log.Println("Error serving static file:", err.Error())
-		res.Write([]byte(err.Error()))
+		http.Error(res, err.Error(), http.StatusNotFound)
 		return
 	}
 	t := strings.Split(path, ".")
@@ -145,13 +118,13 @@ func (a *api) robeaux(res http.ResponseWriter, req *http.Request) {
 	res.Write(buf)
 }
 
-func (a *api) root(res http.ResponseWriter, req *http.Request) {
+func (a *api) mcp(res http.ResponseWriter, req *http.Request) {
 	data, _ := json.Marshal(a.gobot.ToJSON())
 	res.Header().Set("Content-Type", "application/json; charset=utf-8")
 	res.Write(data)
 }
 
-func (a *api) commands(res http.ResponseWriter, req *http.Request) {
+func (a *api) mcpCommands(res http.ResponseWriter, req *http.Request) {
 	data, _ := json.Marshal(a.gobot.ToJSON().Commands)
 	res.Header().Set("Content-Type", "application/json; charset=utf-8")
 	res.Write(data)
@@ -234,12 +207,12 @@ func (a *api) robotConnection(res http.ResponseWriter, req *http.Request) {
 	res.Write(data)
 }
 
-func (a *api) executeCommand(res http.ResponseWriter, req *http.Request) {
+func (a *api) executeMcpCommand(res http.ResponseWriter, req *http.Request) {
+	var data []byte
+	var body map[string]interface{}
 	command := req.URL.Query().Get(":command")
 
-	data, _ := ioutil.ReadAll(req.Body)
-	body := make(map[string]interface{})
-	json.Unmarshal(data, &body)
+	json.NewDecoder(req.Body).Decode(&body)
 	f := a.gobot.Command(command)
 
 	if f != nil {
@@ -253,13 +226,13 @@ func (a *api) executeCommand(res http.ResponseWriter, req *http.Request) {
 }
 
 func (a *api) executeDeviceCommand(res http.ResponseWriter, req *http.Request) {
+	var body map[string]interface{}
+	var data []byte
 	robot := req.URL.Query().Get(":robot")
 	device := req.URL.Query().Get(":device")
 	command := req.URL.Query().Get(":command")
 
-	data, _ := ioutil.ReadAll(req.Body)
-	body := make(map[string]interface{})
-	json.Unmarshal(data, &body)
+	json.NewDecoder(req.Body).Decode(&body)
 	d := a.gobot.Robot(robot).Device(device)
 	body["robot"] = robot
 	f := d.Command(command)
@@ -275,12 +248,13 @@ func (a *api) executeDeviceCommand(res http.ResponseWriter, req *http.Request) {
 }
 
 func (a *api) executeRobotCommand(res http.ResponseWriter, req *http.Request) {
+	var data []byte
+	var body map[string]interface{}
+
 	robot := req.URL.Query().Get(":robot")
 	command := req.URL.Query().Get(":command")
 
-	data, _ := ioutil.ReadAll(req.Body)
-	body := make(map[string]interface{})
-	json.Unmarshal(data, &body)
+	json.NewDecoder(req.Body).Decode(&body)
 	r := a.gobot.Robot(robot)
 	body["robot"] = robot
 	f := r.Command(command)
@@ -293,4 +267,29 @@ func (a *api) executeRobotCommand(res http.ResponseWriter, req *http.Request) {
 
 	res.Header().Set("Content-Type", "application/json; charset=utf-8")
 	res.Write(data)
+}
+
+// basic auth inspired by
+// https://github.com/codegangsta/martini-contrib/blob/master/auth/
+func (a *api) basicAuth(res http.ResponseWriter, req *http.Request) bool {
+	auth := req.Header.Get("Authorization")
+	if !a.secureCompare(auth,
+		"Basic "+base64.StdEncoding.EncodeToString([]byte(a.Username+":"+a.Password)),
+	) {
+		res.Header().Set("WWW-Authenticate",
+			"Basic realm=\"Authorization Required\"",
+		)
+		http.Error(res, "Not Authorized", http.StatusUnauthorized)
+		return false
+	}
+	return true
+}
+
+func (a *api) secureCompare(given string, actual string) bool {
+	if subtle.ConstantTimeEq(int32(len(given)), int32(len(actual))) == 1 {
+		return subtle.ConstantTimeCompare([]byte(given), []byte(actual)) == 1
+	}
+	// Securely compare actual to itself to keep constant time,
+	// but always return false
+	return subtle.ConstantTimeCompare([]byte(actual), []byte(actual)) == 1 && false
 }

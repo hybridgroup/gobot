@@ -108,11 +108,11 @@ func NewTestAdaptor(name string) *testAdaptor {
 }
 
 func NewTestRobot(name string) *Robot {
-	adaptor1 := NewTestAdaptor("Connection 1")
-	adaptor2 := NewTestAdaptor("Connection 2")
+	adaptor1 := NewTestAdaptor("Connection1")
+	adaptor2 := NewTestAdaptor("Connection2")
 	adaptor3 := NewTestAdaptor("")
-	driver1 := NewTestDriver("Device 1", adaptor1)
-	driver2 := NewTestDriver("Device 2", adaptor2)
+	driver1 := NewTestDriver("Device1", adaptor1)
+	driver2 := NewTestDriver("Device2", adaptor2)
 	driver3 := NewTestDriver("", adaptor3)
 	work := func() {}
 	r := NewRobot(name,
