@@ -173,7 +173,7 @@ func TestExecuteRobotCommand(t *testing.T) {
 	// known command
 	request, _ := http.NewRequest("GET",
 		"/robots/Robot1/commands/robotTestFunction",
-		bytes.NewBufferString(`{"message":"Beep Boop"}`),
+		bytes.NewBufferString(`{"message":"Beep Boop", "robot":"Robot1"}`),
 	)
 	request.Header.Add("Content-Type", "application/json")
 	response := httptest.NewRecorder()

@@ -118,15 +118,11 @@ func (a *api) robeaux(res http.ResponseWriter, req *http.Request) {
 }
 
 func (a *api) mcp(res http.ResponseWriter, req *http.Request) {
-	data, _ := json.Marshal(a.gobot.ToJSON())
-	res.Header().Set("Content-Type", "application/json; charset=utf-8")
-	res.Write(data)
+	a.writeJSON(a.gobot.ToJSON(), res)
 }
 
 func (a *api) mcpCommands(res http.ResponseWriter, req *http.Request) {
-	data, _ := json.Marshal(a.gobot.ToJSON().Commands)
-	res.Header().Set("Content-Type", "application/json; charset=utf-8")
-	res.Write(data)
+	a.writeJSON(a.gobot.ToJSON().Commands, res)
 }
 
 func (a *api) robots(res http.ResponseWriter, req *http.Request) {
@@ -134,138 +130,95 @@ func (a *api) robots(res http.ResponseWriter, req *http.Request) {
 	a.gobot.Robots().Each(func(r *gobot.Robot) {
 		jsonRobots = append(jsonRobots, r.ToJSON())
 	})
-	data, _ := json.Marshal(jsonRobots)
-	res.Header().Set("Content-Type", "application/json; charset=utf-8")
-	res.Write(data)
+	a.writeJSON(jsonRobots, res)
 }
 
 func (a *api) robot(res http.ResponseWriter, req *http.Request) {
-	robot := req.URL.Query().Get(":robot")
-
-	data, _ := json.Marshal(a.gobot.Robot(robot).ToJSON())
-	res.Header().Set("Content-Type", "application/json; charset=utf-8")
-	res.Write(data)
+	a.writeJSON(a.gobot.Robot(req.URL.Query().Get(":robot")).ToJSON(), res)
 }
 
 func (a *api) robotCommands(res http.ResponseWriter, req *http.Request) {
-	robot := req.URL.Query().Get(":robot")
-
-	data, _ := json.Marshal(a.gobot.Robot(robot).ToJSON().Commands)
-	res.Header().Set("Content-Type", "application/json; charset=utf-8")
-	res.Write(data)
+	a.writeJSON(a.gobot.Robot(req.URL.Query().Get(":robot")).ToJSON().Commands, res)
 }
 
 func (a *api) robotDevices(res http.ResponseWriter, req *http.Request) {
-	robot := req.URL.Query().Get(":robot")
-
 	jsonDevices := []*gobot.JSONDevice{}
-	a.gobot.Robot(robot).Devices().Each(func(d gobot.Device) {
+	a.gobot.Robot(req.URL.Query().Get(":robot")).Devices().Each(func(d gobot.Device) {
 		jsonDevices = append(jsonDevices, d.ToJSON())
 	})
-	data, _ := json.Marshal(jsonDevices)
-	res.Header().Set("Content-Type", "application/json; charset=utf-8")
-	res.Write(data)
+	a.writeJSON(jsonDevices, res)
 }
 
 func (a *api) robotDevice(res http.ResponseWriter, req *http.Request) {
-	robot := req.URL.Query().Get(":robot")
-	device := req.URL.Query().Get(":device")
-
-	data, _ := json.Marshal(a.gobot.Robot(robot).Device(device).ToJSON())
-	res.Header().Set("Content-Type", "application/json; charset=utf-8")
-	res.Write(data)
+	a.writeJSON(
+		a.gobot.Robot(req.URL.Query().Get(":robot")).
+			Device(req.URL.Query().Get(":device")).ToJSON(), res,
+	)
 }
 
 func (a *api) robotDeviceCommands(res http.ResponseWriter, req *http.Request) {
-	robot := req.URL.Query().Get(":robot")
-	device := req.URL.Query().Get(":device")
-
-	data, _ := json.Marshal(a.gobot.Robot(robot).Device(device).ToJSON().Commands)
-	res.Header().Set("Content-Type", "application/json; charset=utf-8")
-	res.Write(data)
+	a.writeJSON(
+		a.gobot.Robot(req.URL.Query().Get(":robot")).
+			Device(req.URL.Query().Get(":device")).ToJSON().Commands, res,
+	)
 }
 
 func (a *api) robotConnections(res http.ResponseWriter, req *http.Request) {
-	robot := req.URL.Query().Get(":robot")
-
 	jsonConnections := []*gobot.JSONConnection{}
-	a.gobot.Robot(robot).Connections().Each(func(c gobot.Connection) {
+	a.gobot.Robot(req.URL.Query().Get(":robot")).Connections().Each(func(c gobot.Connection) {
 		jsonConnections = append(jsonConnections, c.ToJSON())
 	})
-	data, _ := json.Marshal(jsonConnections)
-	res.Header().Set("Content-Type", "application/json; charset=utf-8")
-	res.Write(data)
+	a.writeJSON(jsonConnections, res)
 }
 
 func (a *api) robotConnection(res http.ResponseWriter, req *http.Request) {
-	robot := req.URL.Query().Get(":robot")
-	connection := req.URL.Query().Get(":connection")
-
-	data, _ := json.Marshal(a.gobot.Robot(robot).Connection(connection).ToJSON())
-	res.Header().Set("Content-Type", "application/json; charset=utf-8")
-	res.Write(data)
+	a.writeJSON(
+		a.gobot.Robot(req.URL.Query().Get(":robot")).
+			Connection(req.URL.Query().Get(":connection")).ToJSON(),
+		res,
+	)
 }
 
 func (a *api) executeMcpCommand(res http.ResponseWriter, req *http.Request) {
-	var data []byte
-	body := make(map[string]interface{})
-	command := req.URL.Query().Get(":command")
-
-	json.NewDecoder(req.Body).Decode(&body)
-	f := a.gobot.Command(command)
-
-	if f != nil {
-		data, _ = json.Marshal(f(body))
-	} else {
-		data, _ = json.Marshal("Unknown Command")
-	}
-
-	res.Header().Set("Content-Type", "application/json; charset=utf-8")
-	res.Write(data)
+	a.executeCommand(a.gobot.Command(req.URL.Query().Get(":command")),
+		res,
+		req,
+	)
 }
 
 func (a *api) executeDeviceCommand(res http.ResponseWriter, req *http.Request) {
-	var data []byte
-	robot := req.URL.Query().Get(":robot")
-	device := req.URL.Query().Get(":device")
-	command := req.URL.Query().Get(":command")
-	body := make(map[string]interface{})
-
-	json.NewDecoder(req.Body).Decode(&body)
-	d := a.gobot.Robot(robot).Device(device)
-	body["robot"] = robot
-	f := d.Command(command)
-
-	if f != nil {
-		data, _ = json.Marshal(f(body))
-	} else {
-		data, _ = json.Marshal("Unknown Command")
-	}
-
-	res.Header().Set("Content-Type", "application/json; charset=utf-8")
-	res.Write(data)
+	a.executeCommand(
+		a.gobot.Robot(req.URL.Query().Get(":robot")).
+			Device(req.URL.Query().Get(":device")).
+			Command(req.URL.Query().Get(":command")),
+		res,
+		req,
+	)
 }
 
 func (a *api) executeRobotCommand(res http.ResponseWriter, req *http.Request) {
-	var data []byte
+	a.executeCommand(
+		a.gobot.Robot(req.URL.Query().Get(":robot")).
+			Command(req.URL.Query().Get(":command")),
+		res,
+		req,
+	)
+}
 
-	robot := req.URL.Query().Get(":robot")
-	command := req.URL.Query().Get(":command")
+func (a *api) executeCommand(f func(map[string]interface{}) interface{},
+	res http.ResponseWriter,
+	req *http.Request,
+) {
 
 	body := make(map[string]interface{})
 	json.NewDecoder(req.Body).Decode(&body)
-	r := a.gobot.Robot(robot)
-	body["robot"] = robot
-	f := r.Command(command)
 
 	if f != nil {
-		data, _ = json.Marshal(f(body))
+		a.writeJSON(f(body), res)
 	} else {
-		data, _ = json.Marshal("Unknown Command")
+		a.writeJSON("Unknown Command", res)
 	}
 
-	res.Header().Set("Content-Type", "application/json; charset=utf-8")
-	res.Write(data)
 }
 
 func (a *api) SetBasicAuth(user, password string) {
@@ -301,4 +254,10 @@ func (a *api) secureCompare(given string, actual string) bool {
 	// Securely compare actual to itself to keep constant time,
 	// but always return false
 	return subtle.ConstantTimeCompare([]byte(actual), []byte(actual)) == 1 && false
+}
+
+func (a *api) writeJSON(j interface{}, res http.ResponseWriter) {
+	data, _ := json.Marshal(j)
+	res.Header().Set("Content-Type", "application/json; charset=utf-8")
+	res.Write(data)
 }
