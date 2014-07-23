@@ -17,7 +17,7 @@ import (
 // all the robots.
 type api struct {
 	gobot    *gobot.Gobot
-	server   *pat.PatternServeMux
+	router   *pat.PatternServeMux
 	Host     string
 	Port     string
 	Username string
@@ -34,7 +34,7 @@ func NewAPI(g *gobot.Gobot) *api {
 		Port:  "3000",
 		start: func(a *api) {
 			log.Println("Initializing API on " + a.Host + ":" + a.Port + "...")
-			http.Handle("/", a.server)
+			http.Handle("/", a)
 
 			go func() {
 				if a.Cert != "" && a.Key != "" {
@@ -49,56 +49,91 @@ func NewAPI(g *gobot.Gobot) *api {
 	}
 }
 
+func (a *api) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+	for _, handler := range a.handlers {
+		handler(res, req)
+	}
+	a.router.ServeHTTP(res, req)
+}
+
+func (a *api) Post(path string, f func(http.ResponseWriter, *http.Request)) {
+	a.router.Post(path, http.HandlerFunc(f))
+}
+
+func (a *api) Put(path string, f func(http.ResponseWriter, *http.Request)) {
+	a.router.Put(path, http.HandlerFunc(f))
+}
+
+func (a *api) Delete(path string, f func(http.ResponseWriter, *http.Request)) {
+	a.router.Del(path, http.HandlerFunc(f))
+}
+
+func (a *api) Options(path string, f func(http.ResponseWriter, *http.Request)) {
+	a.router.Options(path, http.HandlerFunc(f))
+}
+
+func (a *api) Get(path string, f func(http.ResponseWriter, *http.Request)) {
+	a.router.Get(path, http.HandlerFunc(f))
+}
+
+func (a *api) Head(path string, f func(http.ResponseWriter, *http.Request)) {
+	a.router.Head(path, http.HandlerFunc(f))
+}
+
 func (a *api) AddHandler(f func(http.ResponseWriter, *http.Request)) {
 	a.handlers = append(a.handlers, f)
+}
+
+func (a *api) SetBasicAuth(user, password string) {
+	a.Username = user
+	a.Password = password
+	a.AddHandler(a.basicAuth)
+}
+
+func (a *api) SetDebug() {
+	a.AddHandler(func(res http.ResponseWriter, req *http.Request) {
+		log.Println(req)
+	})
 }
 
 // start starts the api using the start function
 // sets on the API on initialization.
 func (a *api) Start() {
-	a.server = pat.New()
+	a.router = pat.New()
 
 	mcpCommandRoute := "/commands/:command"
 	deviceCommandRoute := "/robots/:robot/devices/:device/commands/:command"
 	robotCommandRoute := "/robots/:robot/commands/:command"
 
-	a.server.Get("/", a.run(a.mcp))
-	a.server.Get("/commands", a.run(a.mcpCommands))
-	a.server.Get(mcpCommandRoute, a.run(a.executeMcpCommand))
-	a.server.Post(mcpCommandRoute, a.run(a.executeMcpCommand))
-	a.server.Get("/robots", a.run(a.robots))
-	a.server.Get("/robots/:robot", a.run(a.robot))
-	a.server.Get("/robots/:robot/commands", a.run(a.robotCommands))
-	a.server.Get(robotCommandRoute, a.run(a.executeRobotCommand))
-	a.server.Post(robotCommandRoute, a.run(a.executeRobotCommand))
-	a.server.Get("/robots/:robot/devices", a.run(a.robotDevices))
-	a.server.Get("/robots/:robot/devices/:device", a.run(a.robotDevice))
-	a.server.Get("/robots/:robot/devices/:device/commands",
-		a.run(a.robotDeviceCommands),
-	)
-	a.server.Get(deviceCommandRoute, a.run(a.executeDeviceCommand))
-	a.server.Post(deviceCommandRoute, a.run(a.executeDeviceCommand))
-	a.server.Get("/robots/:robot/connections", a.run(a.robotConnections))
-	a.server.Get("/robots/:robot/connections/:connection",
-		a.run(a.robotConnection),
-	)
-	a.server.Get("/:a", a.run(a.robeaux))
-	a.server.Get("/:a/", a.run(a.robeaux))
-	a.server.Get("/:a/:b", a.run(a.robeaux))
-	a.server.Get("/:a/:b/", a.run(a.robeaux))
-	a.server.Get("/:a/:b/:c", a.run(a.robeaux))
-	a.server.Get("/:a/:b/:c/", a.run(a.robeaux))
+	// api
+	a.Get("/", a.mcp)
+	a.Get("/commands", a.mcpCommands)
+	a.Get(mcpCommandRoute, a.executeMcpCommand)
+	a.Post(mcpCommandRoute, a.executeMcpCommand)
+	a.Get("/robots", a.robots)
+	a.Get("/robots/:robot", a.robot)
+	a.Get("/robots/:robot/commands", a.robotCommands)
+	a.Get(robotCommandRoute, a.executeRobotCommand)
+	a.Post(robotCommandRoute, a.executeRobotCommand)
+	a.Get("/robots/:robot/devices", a.robotDevices)
+	a.Get("/robots/:robot/devices/:device", a.robotDevice)
+	a.Get("/robots/:robot/devices/:device/commands", a.robotDeviceCommands)
+	a.Get(deviceCommandRoute, a.executeDeviceCommand)
+	a.Post(deviceCommandRoute, a.executeDeviceCommand)
+	a.Get("/robots/:robot/connections", a.robotConnections)
+	a.Get("/robots/:robot/connections/:connection", a.robotConnection)
+	// robeaux
+	a.Get("/index.html", a.robeaux)
+	a.Get("/images/:a", a.robeaux)
+	a.Get("/js/:a", a.robeaux)
+	a.Get("/js/:a/", a.robeaux)
+	a.Get("/js/:a/:b", a.robeaux)
+	a.Get("/css/:a", a.robeaux)
+	a.Get("/css/:a/", a.robeaux)
+	a.Get("/css/:a/:b", a.robeaux)
+	a.Get("/partials/:a", a.robeaux)
 
 	a.start(a)
-}
-
-func (a *api) run(f func(http.ResponseWriter, *http.Request)) http.HandlerFunc {
-	return func(res http.ResponseWriter, req *http.Request) {
-		for _, handler := range a.handlers {
-			handler(res, req)
-		}
-		f(res, req)
-	}
 }
 
 func (a *api) robeaux(res http.ResponseWriter, req *http.Request) {
@@ -219,18 +254,6 @@ func (a *api) executeCommand(f func(map[string]interface{}) interface{},
 		a.writeJSON("Unknown Command", res)
 	}
 
-}
-
-func (a *api) SetBasicAuth(user, password string) {
-	a.Username = user
-	a.Password = password
-	a.AddHandler(a.basicAuth)
-}
-
-func (a *api) SetDebug() {
-	a.AddHandler(func(res http.ResponseWriter, req *http.Request) {
-		log.Println(req)
-	})
 }
 
 // basic auth inspired by
