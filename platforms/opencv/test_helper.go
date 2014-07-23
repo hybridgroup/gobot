@@ -16,3 +16,11 @@ func (c *testCapture) RetrieveFrame(i int) *cv.IplImage {
 func (c *testCapture) GrabFrame() bool {
 	return true
 }
+
+type window interface {
+	ShowImage(*cv.IplImage)
+}
+
+type testWindow struct{}
+
+func (w *testWindow) ShowImage(i *cv.IplImage) { return }

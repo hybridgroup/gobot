@@ -7,7 +7,8 @@ import (
 
 type WindowDriver struct {
 	gobot.Driver
-	window *cv.Window
+	window window
+	start  func(*WindowDriver)
 }
 
 func NewWindowDriver(name string) *WindowDriver {
@@ -16,12 +17,15 @@ func NewWindowDriver(name string) *WindowDriver {
 			name,
 			"WindowDriver",
 		),
+		start: func(w *WindowDriver) {
+			w.window = cv.NewWindow(w.Name(), cv.CV_WINDOW_NORMAL)
+		},
 	}
 }
 
 func (w *WindowDriver) Start() bool {
 	cv.StartWindowThread()
-	w.window = cv.NewWindow(w.Name(), cv.CV_WINDOW_NORMAL)
+	w.start(w)
 	return true
 }
 

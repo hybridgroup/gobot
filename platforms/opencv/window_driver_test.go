@@ -10,7 +10,11 @@ import (
 )
 
 func initTestWindowDriver() *WindowDriver {
-	return NewWindowDriver("bot")
+	d := NewWindowDriver("bot")
+	d.start = func(w *WindowDriver) {
+		w.window = &testWindow{}
+	}
+	return d
 }
 
 func TestWindowDriverStart(t *testing.T) {
