@@ -1,8 +1,9 @@
 package gobot
 
 import (
+	"crypto/rand"
 	"math"
-	"math/rand"
+	"math/big"
 	"time"
 )
 
@@ -39,7 +40,8 @@ func Once(e *Event, f func(s interface{})) {
 }
 
 func Rand(max int) int {
-	return rand.New(rand.NewSource(time.Now().UTC().UnixNano())).Intn(max)
+	i, _ := rand.Int(rand.Reader, big.NewInt(int64(max)))
+	return int(i.Int64())
 }
 
 func FromScale(input, min, max float64) float64 {
