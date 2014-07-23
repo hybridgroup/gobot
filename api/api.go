@@ -30,8 +30,9 @@ type api struct {
 
 func NewAPI(g *gobot.Gobot) *api {
 	return &api{
-		gobot: g,
-		Port:  "3000",
+		gobot:  g,
+		router: pat.New(),
+		Port:   "3000",
 		start: func(a *api) {
 			log.Println("Initializing API on " + a.Host + ":" + a.Port + "...")
 			http.Handle("/", a)
@@ -99,8 +100,6 @@ func (a *api) SetDebug() {
 // start starts the api using the start function
 // sets on the API on initialization.
 func (a *api) Start() {
-	a.router = pat.New()
-
 	mcpCommandRoute := "/commands/:command"
 	deviceCommandRoute := "/robots/:robot/devices/:device/commands/:command"
 	robotCommandRoute := "/robots/:robot/commands/:command"
