@@ -1,15 +1,16 @@
 package neurosky
 
 import (
+	"io"
+
 	"github.com/hybridgroup/gobot"
 	"github.com/tarm/goserial"
-	"io"
 )
 
 type NeuroskyAdaptor struct {
 	gobot.Adaptor
 	sp      io.ReadWriteCloser
-	connect func(string) io.ReadWriteCloser
+	connect func(*NeuroskyAdaptor)
 }
 
 func NewNeuroskyAdaptor(name string, port string) *NeuroskyAdaptor {
@@ -19,18 +20,18 @@ func NewNeuroskyAdaptor(name string, port string) *NeuroskyAdaptor {
 			"NeuroskyAdaptor",
 			port,
 		),
-		connect: func(port string) io.ReadWriteCloser {
-			sp, err := serial.OpenPort(&serial.Config{Name: port, Baud: 57600})
+		connect: func(n *NeuroskyAdaptor) {
+			sp, err := serial.OpenPort(&serial.Config{Name: n.Port(), Baud: 57600})
 			if err != nil {
 				panic(err)
 			}
-			return sp
+			n.sp = sp
 		},
 	}
 }
 
 func (n *NeuroskyAdaptor) Connect() bool {
-	n.sp = n.connect(n.Adaptor.Port())
+	n.connect(n)
 	n.SetConnected(true)
 	return true
 }

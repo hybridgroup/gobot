@@ -1,21 +1,26 @@
 package neurosky
 
 import (
-	"github.com/hybridgroup/gobot"
 	"testing"
+
+	"github.com/hybridgroup/gobot"
 )
 
 func initTestNeuroskyAdaptor() *NeuroskyAdaptor {
-	return NewNeuroskyAdaptor("bot", "/dev/null")
+	a := NewNeuroskyAdaptor("bot", "/dev/null")
+	a.connect = func(n *NeuroskyAdaptor) {
+		n.sp = gobot.NullReadWriteCloser{}
+	}
+	return a
+}
+
+func TestNeuroskyAdaptorConnect(t *testing.T) {
+	a := initTestNeuroskyAdaptor()
+	gobot.Assert(t, a.Connect(), true)
 }
 
 func TestNeuroskyAdaptorFinalize(t *testing.T) {
-	t.SkipNow()
 	a := initTestNeuroskyAdaptor()
+	a.Connect()
 	gobot.Assert(t, a.Finalize(), true)
-}
-func TestNeuroskyAdaptorConnect(t *testing.T) {
-	t.SkipNow()
-	a := initTestNeuroskyAdaptor()
-	gobot.Assert(t, a.Connect(), true)
 }

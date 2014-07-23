@@ -56,7 +56,7 @@ func (n *NeuroskyDriver) adaptor() *NeuroskyAdaptor {
 func (n *NeuroskyDriver) Start() bool {
 	go func() {
 		for {
-			var buff = make([]byte, int(2048))
+			buff := make([]byte, 1024)
 			_, err := n.adaptor().sp.Read(buff[:])
 			if err != nil {
 				panic(err)
@@ -75,17 +75,16 @@ func (n *NeuroskyDriver) parse(buf *bytes.Buffer) {
 		b2, _ := buf.ReadByte()
 		if b1 == BTSync && b2 == BTSync {
 			length, _ := buf.ReadByte()
-			var payload = make([]byte, int(length))
+			payload := make([]byte, length)
 			buf.Read(payload)
 			//checksum, _ := buf.ReadByte()
 			buf.Next(1)
-			n.parsePacket(payload)
+			n.parsePacket(bytes.NewBuffer(payload))
 		}
 	}
 }
 
-func (n *NeuroskyDriver) parsePacket(data []byte) {
-	buf := bytes.NewBuffer(data)
+func (n *NeuroskyDriver) parsePacket(buf *bytes.Buffer) {
 	for buf.Len() > 0 {
 		b, _ := buf.ReadByte()
 		switch b {
@@ -107,9 +106,9 @@ func (n *NeuroskyDriver) parsePacket(data []byte) {
 			buf.Next(1)
 			var ret = make([]byte, 2)
 			buf.Read(ret)
-			gobot.Publish(n.Event("wave"), ret)
+			gobot.Publish(n.Event("wave"), int16(ret[0])<<8|int16(ret[1]))
 		case CodeAsicEEG:
-			var ret = make([]byte, 25)
+			ret := make([]byte, 25)
 			i, _ := buf.Read(ret)
 			if i == 25 {
 				gobot.Publish(n.Event("eeg"), n.parseEEG(ret))
@@ -132,5 +131,7 @@ func (n *NeuroskyDriver) parseEEG(data []byte) EEG {
 }
 
 func (n *NeuroskyDriver) parse3ByteInteger(data []byte) int {
-	return ((int(data[0]) << 16) | (((1 << 16) - 1) & (int(data[1]) << 8)) | (((1 << 8) - 1) & int(data[2])))
+	return ((int(data[0]) << 16) |
+		(((1 << 16) - 1) & (int(data[1]) << 8)) |
+		(((1 << 8) - 1) & int(data[2])))
 }
