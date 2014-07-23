@@ -1,38 +1,52 @@
 package opencv
 
 import (
-	"github.com/hybridgroup/gobot"
 	"testing"
+	"time"
+
+	"github.com/hybridgroup/gobot"
 )
 
 func initTestCameraDriver() *CameraDriver {
-	return NewCameraDriver("bot", "")
+	d := NewCameraDriver("bot", "")
+	d.start = func(c *CameraDriver) {
+		d.camera = &testCapture{}
+	}
+	return d
 }
 
 func TestCameraDriverStart(t *testing.T) {
-  t.SkipNow()
+	sem := make(chan bool)
 	d := initTestCameraDriver()
 	gobot.Assert(t, d.Start(), true)
+	gobot.On(d.Event("frame"), func(data interface{}) {
+		sem <- true
+	})
+	select {
+	case <-sem:
+	case <-time.After(100 * time.Millisecond):
+		t.Errorf("Event \"frame\" was not published")
+	}
+
 }
+func TestCameraDriver(t *testing.T) {
+	d := NewCameraDriver("bot", "")
+	d.Start()
+	gobot.Refute(t, d.camera, nil)
 
-func TestCameraDriverStartPanic(t *testing.T) {
-  recovered := false
-  defer func() {
-    if r := recover(); r != nil {
-      recovered = true
-    }
-  }()
-
-  NewCameraDriver("bot", false).Start()
-	gobot.Expect(t, recovered, true)
+	defer func() {
+		r := recover()
+		if r != nil {
+			gobot.Assert(t, "unknown camera source", r)
+		} else {
+			t.Errorf("Did not return Unknown camera error")
+		}
+	}()
+	d = NewCameraDriver("bot", true)
+	d.Start()
 }
 
 func TestCameraDriverHalt(t *testing.T) {
 	d := initTestCameraDriver()
 	gobot.Assert(t, d.Halt(), true)
-}
-
-func TestCameraDriverInit(t *testing.T) {
-	d := initTestCameraDriver()
-	gobot.Assert(t, d.Init(), true)
 }

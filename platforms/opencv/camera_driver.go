@@ -7,8 +7,9 @@ import (
 
 type CameraDriver struct {
 	gobot.Driver
-	camera *cv.Capture
+	camera capture
 	Source interface{}
+	start  func(*CameraDriver)
 }
 
 func NewCameraDriver(name string, source interface{}) *CameraDriver {
@@ -18,6 +19,16 @@ func NewCameraDriver(name string, source interface{}) *CameraDriver {
 			"CameraDriver",
 		),
 		Source: source,
+		start: func(c *CameraDriver) {
+			switch v := c.Source.(type) {
+			case string:
+				c.camera = cv.NewFileCapture(v)
+			case int:
+				c.camera = cv.NewCameraCapture(v)
+			default:
+				panic("unknown camera source")
+			}
+		},
 	}
 
 	c.AddEvent("frame")
@@ -26,27 +37,16 @@ func NewCameraDriver(name string, source interface{}) *CameraDriver {
 }
 
 func (c *CameraDriver) Start() bool {
-	switch v := c.Source.(type) {
-	case string:
-		c.camera = cv.NewFileCapture(v)
-	case int:
-		c.camera = cv.NewCameraCapture(v)
-	default:
-		panic("unknown camera source")
-	}
-
-	go func() {
-		for {
-			if c.camera.GrabFrame() {
-				image := c.camera.RetrieveFrame(1)
-				if image != nil {
-					gobot.Publish(c.Event("frame"), image)
-				}
+	c.start(c)
+	gobot.Every(c.Interval(), func() {
+		if c.camera.GrabFrame() {
+			image := c.camera.RetrieveFrame(1)
+			if image != nil {
+				gobot.Publish(c.Event("frame"), image)
 			}
 		}
-	}()
+	})
 	return true
 }
 
 func (c *CameraDriver) Halt() bool { return true }
-func (c *CameraDriver) Init() bool { return true }

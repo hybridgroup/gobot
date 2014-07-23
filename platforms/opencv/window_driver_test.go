@@ -1,11 +1,12 @@
 package opencv
 
 import (
+	"path"
+	"runtime"
+	"testing"
+
 	cv "github.com/hybridgroup/go-opencv/opencv"
 	"github.com/hybridgroup/gobot"
-	"testing"
-  "path"
-  "runtime"
 )
 
 func initTestWindowDriver() *WindowDriver {
@@ -13,7 +14,6 @@ func initTestWindowDriver() *WindowDriver {
 }
 
 func TestWindowDriverStart(t *testing.T) {
-  t.SkipNow()
 	d := initTestWindowDriver()
 	gobot.Assert(t, d.Start(), true)
 }
@@ -29,11 +29,9 @@ func TestWindowDriverInit(t *testing.T) {
 }
 
 func TestWindowDriverShowImage(t *testing.T) {
-  t.SkipNow()
 	d := initTestWindowDriver()
-  _, currentfile, _, _ := runtime.Caller(0)
-  image := cv.LoadImage(path.Join(path.Dir(currentfile), "test.png"))
-
-  d.Start()
-  d.ShowImage(image)
+	_, currentfile, _, _ := runtime.Caller(0)
+	image := cv.LoadImage(path.Join(path.Dir(currentfile), "lena-256x256.jpg"))
+	d.Start()
+	d.ShowImage(image)
 }
