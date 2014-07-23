@@ -1,3 +1,4 @@
 .sass-cache
 *.test
+*.swp
 profile.cov
