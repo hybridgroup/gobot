@@ -7,7 +7,6 @@ import (
 
 type JSONConnection struct {
 	Name    string `json:"name"`
-	Port    string `json:"port"`
 	Adaptor string `json:"adaptor"`
 }
 

@@ -130,11 +130,11 @@ func (d *Driver) ToJSON() *JSONDevice {
 		Name:       d.Name(),
 		Driver:     d.Type(),
 		Commands:   []string{},
-		Connection: nil,
+		Connection: "",
 	}
 
 	if d.Adaptor() != nil {
-		jsonDevice.Connection = d.Adaptor().ToJSON()
+		jsonDevice.Connection = d.Adaptor().ToJSON().Name
 	}
 
 	for command := range d.Commands() {

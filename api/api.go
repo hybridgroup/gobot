@@ -100,28 +100,32 @@ func (a *api) SetDebug() {
 // start starts the api using the start function
 // sets on the API on initialization.
 func (a *api) Start() {
-	mcpCommandRoute := "/commands/:command"
-	deviceCommandRoute := "/robots/:robot/devices/:device/commands/:command"
-	robotCommandRoute := "/robots/:robot/commands/:command"
-
 	// api
-	a.Get("/", a.mcp)
-	a.Get("/commands", a.mcpCommands)
+	mcpCommandRoute := "/api/commands/:command"
+	deviceCommandRoute := "/api/robots/:robot/devices/:device/commands/:command"
+	robotCommandRoute := "/api/robots/:robot/commands/:command"
+
+	a.Get("/api/commands", a.mcpCommands)
 	a.Get(mcpCommandRoute, a.executeMcpCommand)
 	a.Post(mcpCommandRoute, a.executeMcpCommand)
-	a.Get("/robots", a.robots)
-	a.Get("/robots/:robot", a.robot)
-	a.Get("/robots/:robot/commands", a.robotCommands)
+	a.Get("/api/robots", a.robots)
+	a.Get("/api/robots/:robot", a.robot)
+	a.Get("/api/robots/:robot/commands", a.robotCommands)
 	a.Get(robotCommandRoute, a.executeRobotCommand)
 	a.Post(robotCommandRoute, a.executeRobotCommand)
-	a.Get("/robots/:robot/devices", a.robotDevices)
-	a.Get("/robots/:robot/devices/:device", a.robotDevice)
-	a.Get("/robots/:robot/devices/:device/commands", a.robotDeviceCommands)
+	a.Get("/api/robots/:robot/devices", a.robotDevices)
+	a.Get("/api/robots/:robot/devices/:device", a.robotDevice)
+	a.Get("/api/robots/:robot/devices/:device/commands", a.robotDeviceCommands)
 	a.Get(deviceCommandRoute, a.executeDeviceCommand)
 	a.Post(deviceCommandRoute, a.executeDeviceCommand)
-	a.Get("/robots/:robot/connections", a.robotConnections)
-	a.Get("/robots/:robot/connections/:connection", a.robotConnection)
+	a.Get("/api/robots/:robot/connections", a.robotConnections)
+	a.Get("/api/robots/:robot/connections/:connection", a.robotConnection)
+	a.Get("/api/", a.mcp)
+
 	// robeaux
+	a.Get("/", func(res http.ResponseWriter, req *http.Request) {
+		http.Redirect(res, req, "/index.html", http.StatusMovedPermanently)
+	})
 	a.Get("/index.html", a.robeaux)
 	a.Get("/images/:a", a.robeaux)
 	a.Get("/js/:a", a.robeaux)
@@ -152,11 +156,11 @@ func (a *api) robeaux(res http.ResponseWriter, req *http.Request) {
 }
 
 func (a *api) mcp(res http.ResponseWriter, req *http.Request) {
-	a.writeJSON(a.gobot.ToJSON(), res)
+	a.writeJSON(map[string]interface{}{"MCP": a.gobot.ToJSON()}, res)
 }
 
 func (a *api) mcpCommands(res http.ResponseWriter, req *http.Request) {
-	a.writeJSON(a.gobot.ToJSON().Commands, res)
+	a.writeJSON(map[string]interface{}{"commands": a.gobot.ToJSON().Commands}, res)
 }
 
 func (a *api) robots(res http.ResponseWriter, req *http.Request) {
@@ -164,15 +168,15 @@ func (a *api) robots(res http.ResponseWriter, req *http.Request) {
 	a.gobot.Robots().Each(func(r *gobot.Robot) {
 		jsonRobots = append(jsonRobots, r.ToJSON())
 	})
-	a.writeJSON(jsonRobots, res)
+	a.writeJSON(map[string]interface{}{"robots": jsonRobots}, res)
 }
 
 func (a *api) robot(res http.ResponseWriter, req *http.Request) {
-	a.writeJSON(a.gobot.Robot(req.URL.Query().Get(":robot")).ToJSON(), res)
+	a.writeJSON(map[string]interface{}{"robot": a.gobot.Robot(req.URL.Query().Get(":robot")).ToJSON()}, res)
 }
 
 func (a *api) robotCommands(res http.ResponseWriter, req *http.Request) {
-	a.writeJSON(a.gobot.Robot(req.URL.Query().Get(":robot")).ToJSON().Commands, res)
+	a.writeJSON(map[string]interface{}{"commands": a.gobot.Robot(req.URL.Query().Get(":robot")).ToJSON().Commands}, res)
 }
 
 func (a *api) robotDevices(res http.ResponseWriter, req *http.Request) {
@@ -180,20 +184,20 @@ func (a *api) robotDevices(res http.ResponseWriter, req *http.Request) {
 	a.gobot.Robot(req.URL.Query().Get(":robot")).Devices().Each(func(d gobot.Device) {
 		jsonDevices = append(jsonDevices, d.ToJSON())
 	})
-	a.writeJSON(jsonDevices, res)
+	a.writeJSON(map[string]interface{}{"devices": jsonDevices}, res)
 }
 
 func (a *api) robotDevice(res http.ResponseWriter, req *http.Request) {
 	a.writeJSON(
-		a.gobot.Robot(req.URL.Query().Get(":robot")).
-			Device(req.URL.Query().Get(":device")).ToJSON(), res,
+		map[string]interface{}{"device": a.gobot.Robot(req.URL.Query().Get(":robot")).
+			Device(req.URL.Query().Get(":device")).ToJSON()}, res,
 	)
 }
 
 func (a *api) robotDeviceCommands(res http.ResponseWriter, req *http.Request) {
 	a.writeJSON(
-		a.gobot.Robot(req.URL.Query().Get(":robot")).
-			Device(req.URL.Query().Get(":device")).ToJSON().Commands, res,
+		map[string]interface{}{"commands": a.gobot.Robot(req.URL.Query().Get(":robot")).
+			Device(req.URL.Query().Get(":device")).ToJSON().Commands}, res,
 	)
 }
 
@@ -202,13 +206,13 @@ func (a *api) robotConnections(res http.ResponseWriter, req *http.Request) {
 	a.gobot.Robot(req.URL.Query().Get(":robot")).Connections().Each(func(c gobot.Connection) {
 		jsonConnections = append(jsonConnections, c.ToJSON())
 	})
-	a.writeJSON(jsonConnections, res)
+	a.writeJSON(map[string]interface{}{"connections": jsonConnections}, res)
 }
 
 func (a *api) robotConnection(res http.ResponseWriter, req *http.Request) {
 	a.writeJSON(
-		a.gobot.Robot(req.URL.Query().Get(":robot")).
-			Connection(req.URL.Query().Get(":connection")).ToJSON(),
+		map[string]interface{}{"connection": a.gobot.Robot(req.URL.Query().Get(":robot")).
+			Connection(req.URL.Query().Get(":connection")).ToJSON()},
 		res,
 	)
 }
@@ -248,7 +252,7 @@ func (a *api) executeCommand(f func(map[string]interface{}) interface{},
 	json.NewDecoder(req.Body).Decode(&body)
 
 	if f != nil {
-		a.writeJSON(f(body), res)
+		a.writeJSON(map[string]interface{}{"result": f(body)}, res)
 	} else {
 		a.writeJSON("Unknown Command", res)
 	}

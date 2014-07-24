@@ -159,7 +159,7 @@ func (r *Robot) ToJSON() *JSONRobot {
 
 	r.Devices().Each(func(device Device) {
 		jsonDevice := device.ToJSON()
-		jsonRobot.Connections = append(jsonRobot.Connections, jsonDevice.Connection)
+		jsonRobot.Connections = append(jsonRobot.Connections, r.Connection(jsonDevice.Connection).ToJSON())
 		jsonRobot.Devices = append(jsonRobot.Devices, jsonDevice)
 	})
 	return jsonRobot

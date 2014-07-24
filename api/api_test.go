@@ -35,13 +35,13 @@ func TestBasicAuth(t *testing.T) {
 
 	a.SetBasicAuth("admin", "password")
 
-	request, _ := http.NewRequest("GET", "/", nil)
+	request, _ := http.NewRequest("GET", "/api/", nil)
 	request.SetBasicAuth("admin", "password")
 	response := httptest.NewRecorder()
 	a.ServeHTTP(response, request)
 	gobot.Assert(t, response.Code, 200)
 
-	request, _ = http.NewRequest("GET", "/", nil)
+	request, _ = http.NewRequest("GET", "/api/", nil)
 	request.SetBasicAuth("admin", "wrongPassword")
 	response = httptest.NewRecorder()
 	a.ServeHTTP(response, request)
@@ -74,24 +74,25 @@ func TestRobeaux(t *testing.T) {
 
 func TestMcp(t *testing.T) {
 	a := initTestAPI()
-	request, _ := http.NewRequest("GET", "/", nil)
+	request, _ := http.NewRequest("GET", "/api/", nil)
 	response := httptest.NewRecorder()
 	a.ServeHTTP(response, request)
 
 	var body map[string]interface{}
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, len(body), 2)
+	gobot.Refute(t, body["MCP"].(map[string]interface{})["robots"], nil)
+	gobot.Refute(t, body["MCP"].(map[string]interface{})["commands"], nil)
 }
 
 func TestMcpCommands(t *testing.T) {
 	a := initTestAPI()
-	request, _ := http.NewRequest("GET", "/commands", nil)
+	request, _ := http.NewRequest("GET", "/api/commands", nil)
 	response := httptest.NewRecorder()
 	a.ServeHTTP(response, request)
 
-	var body []string
+	var body map[string]interface{}
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, body, []string{"TestFunction"})
+	gobot.Assert(t, body["commands"], []interface{}{"TestFunction"})
 }
 
 func TestExecuteMcpCommand(t *testing.T) {
@@ -100,7 +101,7 @@ func TestExecuteMcpCommand(t *testing.T) {
 
 	// known command
 	request, _ := http.NewRequest("GET",
-		"/commands/TestFunction",
+		"/api/commands/TestFunction",
 		bytes.NewBufferString(`{"message":"Beep Boop"}`),
 	)
 	request.Header.Add("Content-Type", "application/json")
@@ -108,11 +109,11 @@ func TestExecuteMcpCommand(t *testing.T) {
 	a.ServeHTTP(response, request)
 
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, body, "hey Beep Boop")
+	gobot.Assert(t, body.(map[string]interface{})["result"], "hey Beep Boop")
 
 	// unknown command
 	request, _ = http.NewRequest("GET",
-		"/commands/TestFuntion1",
+		"/api/commands/TestFuntion1",
 		bytes.NewBufferString(`{"message":"Beep Boop"}`),
 	)
 	request.Header.Add("Content-Type", "application/json")
@@ -125,46 +126,46 @@ func TestExecuteMcpCommand(t *testing.T) {
 
 func TestRobots(t *testing.T) {
 	a := initTestAPI()
-	request, _ := http.NewRequest("GET", "/robots", nil)
-	response := httptest.NewRecorder()
-	a.ServeHTTP(response, request)
-
-	var body []map[string]interface{}
-	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, len(body), 3)
-}
-
-func TestRobot(t *testing.T) {
-	a := initTestAPI()
-	request, _ := http.NewRequest("GET", "/robots/Robot1", nil)
+	request, _ := http.NewRequest("GET", "/api/robots", nil)
 	response := httptest.NewRecorder()
 	a.ServeHTTP(response, request)
 
 	var body map[string]interface{}
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, body["name"].(string), "Robot1")
+	gobot.Assert(t, len(body["robots"].([]interface{})), 3)
+}
+
+func TestRobot(t *testing.T) {
+	a := initTestAPI()
+	request, _ := http.NewRequest("GET", "/api/robots/Robot1", nil)
+	response := httptest.NewRecorder()
+	a.ServeHTTP(response, request)
+
+	var body map[string]interface{}
+	json.NewDecoder(response.Body).Decode(&body)
+	gobot.Assert(t, body["robot"].(map[string]interface{})["name"].(string), "Robot1")
 }
 
 func TestRobotDevices(t *testing.T) {
 	a := initTestAPI()
-	request, _ := http.NewRequest("GET", "/robots/Robot1/devices", nil)
+	request, _ := http.NewRequest("GET", "/api/robots/Robot1/devices", nil)
 	response := httptest.NewRecorder()
 	a.ServeHTTP(response, request)
 
-	var body []map[string]interface{}
+	var body map[string]interface{}
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, len(body), 3)
+	gobot.Assert(t, len(body["devices"].([]interface{})), 3)
 }
 
 func TestRobotCommands(t *testing.T) {
 	a := initTestAPI()
-	request, _ := http.NewRequest("GET", "/robots/Robot1/commands", nil)
+	request, _ := http.NewRequest("GET", "/api/robots/Robot1/commands", nil)
 	response := httptest.NewRecorder()
 	a.ServeHTTP(response, request)
 
-	var body []string
+	var body map[string]interface{}
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, body, []string{"robotTestFunction"})
+	gobot.Assert(t, body["commands"], []interface{}{"robotTestFunction"})
 }
 
 func TestExecuteRobotCommand(t *testing.T) {
@@ -172,7 +173,7 @@ func TestExecuteRobotCommand(t *testing.T) {
 	a := initTestAPI()
 	// known command
 	request, _ := http.NewRequest("GET",
-		"/robots/Robot1/commands/robotTestFunction",
+		"/api/robots/Robot1/commands/robotTestFunction",
 		bytes.NewBufferString(`{"message":"Beep Boop", "robot":"Robot1"}`),
 	)
 	request.Header.Add("Content-Type", "application/json")
@@ -180,11 +181,11 @@ func TestExecuteRobotCommand(t *testing.T) {
 	a.ServeHTTP(response, request)
 
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, body, "hey Robot1, Beep Boop")
+	gobot.Assert(t, body.(map[string]interface{})["result"], "hey Robot1, Beep Boop")
 
 	// unknown command
 	request, _ = http.NewRequest("GET",
-		"/robots/Robot1/commands/robotTestFuntion1",
+		"/api/robots/Robot1/commands/robotTestFuntion1",
 		bytes.NewBufferString(`{"message":"Beep Boop"}`),
 	)
 	request.Header.Add("Content-Type", "application/json")
@@ -198,7 +199,7 @@ func TestExecuteRobotCommand(t *testing.T) {
 func TestRobotDevice(t *testing.T) {
 	a := initTestAPI()
 	request, _ := http.NewRequest("GET",
-		"/robots/Robot1/devices/Device1",
+		"/api/robots/Robot1/devices/Device1",
 		nil,
 	)
 	response := httptest.NewRecorder()
@@ -206,21 +207,21 @@ func TestRobotDevice(t *testing.T) {
 
 	var body map[string]interface{}
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, body["name"].(string), "Device1")
+	gobot.Assert(t, body["device"].(map[string]interface{})["name"].(string), "Device1")
 }
 
 func TestRobotDeviceCommands(t *testing.T) {
 	a := initTestAPI()
 	request, _ := http.NewRequest("GET",
-		"/robots/Robot1/devices/Device1/commands",
+		"/api/robots/Robot1/devices/Device1/commands",
 		nil,
 	)
 	response := httptest.NewRecorder()
 	a.ServeHTTP(response, request)
 
-	var body []string
+	var body map[string]interface{}
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, len(body), 2)
+	gobot.Assert(t, len(body["commands"].([]interface{})), 2)
 }
 
 func TestExecuteRobotDeviceCommand(t *testing.T) {
@@ -229,7 +230,7 @@ func TestExecuteRobotDeviceCommand(t *testing.T) {
 
 	// known command
 	request, _ := http.NewRequest("GET",
-		"/robots/Robot1/devices/Device1/commands/TestDriverCommand",
+		"/api/robots/Robot1/devices/Device1/commands/TestDriverCommand",
 		bytes.NewBufferString(`{"name":"human"}`),
 	)
 	request.Header.Add("Content-Type", "application/json")
@@ -237,11 +238,11 @@ func TestExecuteRobotDeviceCommand(t *testing.T) {
 	a.ServeHTTP(response, request)
 
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, body, "hello human")
+	gobot.Assert(t, body.(map[string]interface{})["result"].(string), "hello human")
 
 	// unknown command
 	request, _ = http.NewRequest("GET",
-		"/robots/Robot1/devices/Device1/commands/DriverCommand1",
+		"/api/robots/Robot1/devices/Device1/commands/DriverCommand1",
 		bytes.NewBufferString(`{"name":"human"}`),
 	)
 	request.Header.Add("Content-Type", "application/json")
@@ -254,19 +255,19 @@ func TestExecuteRobotDeviceCommand(t *testing.T) {
 
 func TestRobotConnections(t *testing.T) {
 	a := initTestAPI()
-	request, _ := http.NewRequest("GET", "/robots/Robot1/connections", nil)
+	request, _ := http.NewRequest("GET", "/api/robots/Robot1/connections", nil)
 	response := httptest.NewRecorder()
 	a.ServeHTTP(response, request)
 
-	var body []map[string]interface{}
+	var body map[string]interface{}
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, len(body), 3)
+	gobot.Assert(t, len(body["connections"].([]interface{})), 3)
 }
 
 func TestRobotConnection(t *testing.T) {
 	a := initTestAPI()
 	request, _ := http.NewRequest("GET",
-		"/robots/Robot1/connections/Connection1",
+		"/api/robots/Robot1/connections/Connection1",
 		nil,
 	)
 	response := httptest.NewRecorder()
@@ -274,7 +275,7 @@ func TestRobotConnection(t *testing.T) {
 
 	var body map[string]interface{}
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, body["name"].(string), "Connection1")
+	gobot.Assert(t, body["connection"].(map[string]interface{})["name"].(string), "Connection1")
 }
 
 func TestAPIRouter(t *testing.T) {

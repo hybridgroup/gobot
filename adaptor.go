@@ -74,7 +74,6 @@ func (a *Adaptor) SetConnected(b bool) {
 func (a *Adaptor) ToJSON() *JSONConnection {
 	return &JSONConnection{
 		Name:    a.Name(),
-		Port:    a.Port(),
 		Adaptor: a.Type(),
 	}
 }

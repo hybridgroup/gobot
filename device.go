@@ -6,10 +6,10 @@ import (
 )
 
 type JSONDevice struct {
-	Name       string          `json:"name"`
-	Driver     string          `json:"driver"`
-	Connection *JSONConnection `json:"connection"`
-	Commands   []string        `json:"commands"`
+	Name       string   `json:"name"`
+	Driver     string   `json:"driver"`
+	Connection string   `json:"connection"`
+	Commands   []string `json:"commands"`
 }
 
 type Device DriverInterface

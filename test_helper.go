@@ -127,3 +127,42 @@ func NewTestRobot(name string) *Robot {
 	})
 	return r
 }
+
+type loopbackAdaptor struct {
+	Adaptor
+}
+
+func (t *loopbackAdaptor) Finalize() bool { return true }
+func (t *loopbackAdaptor) Connect() bool  { return true }
+
+func NewLoopbackAdaptor(name string) *loopbackAdaptor {
+	return &loopbackAdaptor{
+		Adaptor: *NewAdaptor(
+			name,
+			"Loopback",
+		),
+	}
+}
+
+type pingDriver struct {
+	Driver
+}
+
+func (t *pingDriver) Start() bool { return true }
+func (t *pingDriver) Halt() bool  { return true }
+
+func NewPingDriver(adaptor *loopbackAdaptor, name string) *pingDriver {
+	t := &pingDriver{
+		Driver: *NewDriver(
+			name,
+			"Ping",
+			adaptor,
+		),
+	}
+
+	t.AddCommand("ping", func(params map[string]interface{}) interface{} {
+		return fmt.Sprintf("pong")
+	})
+
+	return t
+}
