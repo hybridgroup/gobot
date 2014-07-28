@@ -147,7 +147,11 @@ func (s *SpheroDriver) SetRGB(r uint8, g uint8, b uint8) {
 }
 
 func (s *SpheroDriver) GetRGB() []uint8 {
-	return s.getSyncResponse(s.craftPacket([]uint8{}, 0x22))
+	buf := s.getSyncResponse(s.craftPacket([]uint8{}, 0x22))
+	if len(buf) == 9 {
+		return []uint8{buf[5], buf[6], buf[7]}
+	}
+	return []uint8{}
 }
 
 func (s *SpheroDriver) SetBackLED(level uint8) {
@@ -192,7 +196,7 @@ func (s *SpheroDriver) getSyncResponse(packet *packet) []byte {
 				return response
 			}
 		}
-		time.Sleep(10 * time.Microsecond)
+		time.Sleep(100 * time.Microsecond)
 	}
 
 	return []byte{}
