@@ -10,7 +10,9 @@ import (
 
 func main() {
 	gbot := gobot.NewGobot()
-	api.NewAPI(gbot).Start()
+	a := api.NewAPI(gbot)
+	a.Port = "8080"
+	a.Start()
 
 	pebbleAdaptor := pebble.NewPebbleAdaptor("pebble")
 	pebbleDriver := pebble.NewPebbleDriver(pebbleAdaptor, "pebble")
