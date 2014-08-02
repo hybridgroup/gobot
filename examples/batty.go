@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/api"
@@ -18,9 +19,16 @@ func main() {
 
 	loopback := gobot.NewLoopbackAdaptor("loopback")
 	ping := gobot.NewPingDriver(loopback, "ping")
+
+	work := func() {
+		gobot.Every(5*time.Second, func() {
+			fmt.Println(ping.Ping())
+		})
+	}
 	r := gobot.NewRobot("TestBot",
 		[]gobot.Connection{loopback},
 		[]gobot.Device{ping},
+		work,
 	)
 
 	r.AddCommand("hello", func(params map[string]interface{}) interface{} {
