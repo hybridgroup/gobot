@@ -4,6 +4,7 @@ import (
 	"crypto/subtle"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -115,6 +116,7 @@ func (a *api) Start() {
 	a.Post(robotCommandRoute, a.executeRobotCommand)
 	a.Get("/api/robots/:robot/devices", a.robotDevices)
 	a.Get("/api/robots/:robot/devices/:device", a.robotDevice)
+	a.Get("/api/robots/:robot/devices/:device/events/:event", a.robotDeviceEvent)
 	a.Get("/api/robots/:robot/devices/:device/commands", a.robotDeviceCommands)
 	a.Get(deviceCommandRoute, a.executeDeviceCommand)
 	a.Post(deviceCommandRoute, a.executeDeviceCommand)
@@ -192,6 +194,36 @@ func (a *api) robotDevice(res http.ResponseWriter, req *http.Request) {
 		map[string]interface{}{"device": a.gobot.Robot(req.URL.Query().Get(":robot")).
 			Device(req.URL.Query().Get(":device")).ToJSON()}, res,
 	)
+}
+
+func (a *api) robotDeviceEvent(res http.ResponseWriter, req *http.Request) {
+	f, _ := res.(http.Flusher)
+	c, _ := res.(http.CloseNotifier)
+
+	closer := c.CloseNotify()
+	msg := make(chan string)
+
+	res.Header().Set("Content-Type", "text/event-stream")
+	res.Header().Set("Cache-Control", "no-cache")
+	res.Header().Set("Connection", "keep-alive")
+
+	gobot.On(a.gobot.Robot(req.URL.Query().Get(":robot")).
+		Device(req.URL.Query().Get(":device")).Event(req.URL.Query().Get(":event")),
+		func(data interface{}) {
+			d, _ := json.Marshal(data)
+			msg <- string(d)
+		})
+
+	for {
+		select {
+		case data := <-msg:
+			fmt.Fprintf(res, "data: %v\n\n", data)
+			f.Flush()
+		case <-closer:
+			log.Println("Closing connection")
+			return
+		}
+	}
 }
 
 func (a *api) robotDeviceCommands(res http.ResponseWriter, req *http.Request) {
