@@ -7,17 +7,18 @@ import (
 )
 
 func initTestMavlinkDriver() *MavlinkDriver {
-	return NewMavlinkDriver(NewMavlinkAdaptor("myAdaptor", "/dev/null"), "myDriver")
+	m := NewMavlinkAdaptor("myAdaptor", "/dev/null")
+	m.sp = gobot.NullReadWriteCloser{}
+	m.connect = func(a *MavlinkAdaptor) {}
+	return NewMavlinkDriver(m, "myDriver")
 }
 
 func TestMavlinkDriverStart(t *testing.T) {
-	t.SkipNow()
 	d := initTestMavlinkDriver()
 	gobot.Assert(t, d.Start(), true)
 }
 
 func TestMavlinkDriverHalt(t *testing.T) {
-	t.SkipNow()
 	d := initTestMavlinkDriver()
 	gobot.Assert(t, d.Halt(), true)
 }
