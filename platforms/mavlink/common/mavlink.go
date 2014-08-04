@@ -8,8 +8,8 @@ package mavlink
 import (
 	"bytes"
 	"encoding/binary"
-	"errors"
 	"io"
+	"time"
 )
 
 const MAVLINK_BIG_ENDIAN = 0
@@ -128,12 +128,21 @@ func (m *MAVLinkPacket) Decode(buf []byte) {
 }
 
 func read(r io.Reader, length int) ([]byte, error) {
-	buf := make([]byte, length)
-	i, err := r.Read(buf[:])
-	if err != nil {
-		return nil, err
-	} else if i != length {
-		return nil, errors.New("Not Enough Bytes Read!")
+	buf := []byte{}
+	for length > 0 {
+		tmp := make([]byte, length)
+		i, err := r.Read(tmp[:])
+		if err != nil {
+			return nil, err
+		} else {
+			length -= i
+			buf = append(buf, tmp...)
+			if length != i {
+				<-time.After(1 * time.Millisecond)
+			} else {
+				break
+			}
+		}
 	}
 	return buf, nil
 }

@@ -2,6 +2,7 @@ package mavlink
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/hybridgroup/gobot"
 	common "github.com/hybridgroup/gobot/platforms/mavlink/common"
@@ -34,20 +35,23 @@ func (m *MavlinkDriver) adaptor() *MavlinkAdaptor {
 }
 
 func (m *MavlinkDriver) Start() bool {
-	gobot.Every(m.Interval(), func() {
-		packet, err := common.ReadMAVLinkPacket(m.adaptor().sp)
-		if err != nil {
-			fmt.Println(err)
-			return
+	go func() {
+		for {
+			packet, err := common.ReadMAVLinkPacket(m.adaptor().sp)
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+			gobot.Publish(m.Event("packet"), packet)
+			message, err := packet.MAVLinkMessage()
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+			gobot.Publish(m.Event("message"), message)
+			<-time.After(m.Interval())
 		}
-		gobot.Publish(m.Event("packet"), packet)
-		message, err := packet.MAVLinkMessage()
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		gobot.Publish(m.Event("message"), message)
-	})
+	}()
 	return true
 }
 
