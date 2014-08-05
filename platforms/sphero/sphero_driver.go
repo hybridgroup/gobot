@@ -144,19 +144,19 @@ func (s *SpheroDriver) Halt() bool {
 }
 
 func (s *SpheroDriver) SetRGB(r uint8, g uint8, b uint8) {
-	s.packetChannel <- s.craftPacket([]uint8{r, g, b, 0x01}, 0x20)
+	s.packetChannel <- s.craftPacket([]uint8{r, g, b, 0x01}, 0x02, 0x20)
 }
 
 func (s *SpheroDriver) GetRGB() []uint8 {
-	return s.getSyncResponse(s.craftPacket([]uint8{}, 0x22))
+	return s.getSyncResponse(s.craftPacket([]uint8{}, 0x02, 0x22))
 }
 
 func (s *SpheroDriver) SetBackLED(level uint8) {
-	s.packetChannel <- s.craftPacket([]uint8{level}, 0x21)
+	s.packetChannel <- s.craftPacket([]uint8{level}, 0x02, 0x21)
 }
 
 func (s *SpheroDriver) SetHeading(heading uint16) {
-	s.packetChannel <- s.craftPacket([]uint8{uint8(heading >> 8), uint8(heading & 0xFF)}, 0x01)
+	s.packetChannel <- s.craftPacket([]uint8{uint8(heading >> 8), uint8(heading & 0xFF)}, 0x02, 0x01)
 }
 
 func (s *SpheroDriver) SetStabilization(on bool) {
@@ -164,11 +164,11 @@ func (s *SpheroDriver) SetStabilization(on bool) {
 	if on == false {
 		b = 0x00
 	}
-	s.packetChannel <- s.craftPacket([]uint8{b}, 0x02)
+	s.packetChannel <- s.craftPacket([]uint8{b}, 0x02, 0x02)
 }
 
 func (s *SpheroDriver) Roll(speed uint8, heading uint16) {
-	s.packetChannel <- s.craftPacket([]uint8{speed, uint8(heading >> 8), uint8(heading & 0xFF), 0x01}, 0x30)
+	s.packetChannel <- s.craftPacket([]uint8{speed, uint8(heading >> 8), uint8(heading & 0xFF), 0x01}, 0x02, 0x30)
 }
 
 func (s *SpheroDriver) Stop() {
@@ -176,11 +176,11 @@ func (s *SpheroDriver) Stop() {
 }
 
 func (s *SpheroDriver) configureCollisionDetection() {
-	s.packetChannel <- s.craftPacket([]uint8{0x01, 0x40, 0x40, 0x50, 0x50, 0x60}, 0x12)
+	s.packetChannel <- s.craftPacket([]uint8{0x01, 0x40, 0x40, 0x50, 0x50, 0x60}, 0x02, 0x12)
 }
 
 func (s *SpheroDriver) enableStopOnDisconnect() {
-	s.packetChannel <- s.craftPacket([]uint8{0x00, 0x00, 0x00, 0x01}, 0x37)
+	s.packetChannel <- s.craftPacket([]uint8{0x00, 0x00, 0x00, 0x01}, 0x02, 0x37)
 }
 
 func (s *SpheroDriver) handleCollisionDetected(data []uint8) {
@@ -203,11 +203,11 @@ func (s *SpheroDriver) getSyncResponse(packet *packet) []byte {
 	return []byte{}
 }
 
-func (s *SpheroDriver) craftPacket(body []uint8, cid byte) *packet {
+func (s *SpheroDriver) craftPacket(body []uint8, did byte, cid byte) *packet {
 	packet := new(packet)
 	packet.body = body
 	dlen := len(packet.body) + 1
-	packet.header = []uint8{0xFF, 0xFF, 0x02, cid, s.seq, uint8(dlen)}
+	packet.header = []uint8{0xFF, 0xFF, did, cid, s.seq, uint8(dlen)}
 	packet.checksum = s.calculateChecksum(packet)
 	return packet
 }
