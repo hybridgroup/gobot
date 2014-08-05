@@ -26,7 +26,7 @@ func NewPebbleDriver(adaptor *PebbleAdaptor, name string) *PebbleDriver {
 	p.AddEvent("accel")
 	p.AddEvent("tap")
 
-	p.AddCommand("PublishEvent", func(params map[string]interface{}) interface{} {
+	p.AddCommand("publish_event", func(params map[string]interface{}) interface{} {
 		p.PublishEvent(params["name"].(string), params["data"].(string))
 		return nil
 	})
@@ -36,10 +36,8 @@ func NewPebbleDriver(adaptor *PebbleAdaptor, name string) *PebbleDriver {
 		return nil
 	})
 
-	p.AddCommand("PendingMessage", func(params map[string]interface{}) interface{} {
-		m := make(map[string]string)
-		m["result"] = p.PendingMessage()
-		return m
+	p.AddCommand("pending_message", func(params map[string]interface{}) interface{} {
+		return p.PendingMessage()
 	})
 
 	return p

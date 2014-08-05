@@ -160,9 +160,16 @@ func NewPingDriver(adaptor *loopbackAdaptor, name string) *pingDriver {
 		),
 	}
 
+	t.AddEvent("ping")
+
 	t.AddCommand("ping", func(params map[string]interface{}) interface{} {
-		return fmt.Sprintf("pong")
+		return t.Ping()
 	})
 
 	return t
+}
+
+func (t *pingDriver) Ping() string {
+	Publish(t.Event("ping"), "ping")
+	return "pong"
 }
