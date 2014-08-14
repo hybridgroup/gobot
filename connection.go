@@ -42,7 +42,7 @@ func (c *connections) Start() error {
 	return err
 }
 
-// Filanize() finalizes all the connections.
+// Finalize() finalizes all the connections.
 func (c *connections) Finalize() {
 	for _, connection := range *c {
 		connection.Finalize()
