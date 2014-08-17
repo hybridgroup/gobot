@@ -1,6 +1,8 @@
 package sphero
 
 import (
+	"bytes"
+	"encoding/binary"
 	"fmt"
 	"time"
 
@@ -20,6 +22,19 @@ type SpheroDriver struct {
 	syncResponse    [][]uint8
 	packetChannel   chan *packet
 	responseChannel chan []uint8
+}
+
+type Collision struct {
+	// Normalized impact components (direction of the collision event):
+	X, Y, Z int16
+	// Thresholds exceeded by X (1h) and/or Y (2h) axis (bitmask):
+	Axis byte
+	// Power that cross threshold Xt + Xs:
+	XMagnitude, YMagnitude int16
+	// Sphero's speed when impact detected:
+	Speed uint8
+	// Millisecond timer
+	Timestamp uint32
 }
 
 func NewSpheroDriver(a *SpheroAdaptor, name string) *SpheroDriver {
@@ -176,6 +191,9 @@ func (s *SpheroDriver) Stop() {
 }
 
 func (s *SpheroDriver) configureCollisionDetection() {
+	// Meth 0x01 to enable, 0x00 to disable
+	// Xt, XSpd, Yt, YSpd
+	// Dead - post-collision dead time in 10ms increments
 	s.packetChannel <- s.craftPacket([]uint8{0x01, 0x40, 0x40, 0x50, 0x50, 0x60}, 0x02, 0x12)
 }
 
@@ -184,6 +202,18 @@ func (s *SpheroDriver) enableStopOnDisconnect() {
 }
 
 func (s *SpheroDriver) handleCollisionDetected(data []uint8) {
+	// 22 = 5 byte async header + 16 bytes of data + 1 byte checksum
+	if len(data) == 22 && data[4] == 17 {
+		checksum := data[len(data)-1]
+		if checksum == calculateChecksum(data[2:len(data)-1]) {
+			buffer := bytes.NewBuffer(data[5:])
+
+			var collision Collision
+			binary.Read(buffer, binary.BigEndian, &collision)
+			gobot.Publish(s.Event("collision"), collision)
+			return
+		}
+	}
 	gobot.Publish(s.Event("collision"), data)
 }
 
@@ -230,7 +260,10 @@ func (s *SpheroDriver) write(packet *packet) {
 
 func (s *SpheroDriver) calculateChecksum(packet *packet) uint8 {
 	buf := append(packet.header, packet.body...)
-	buf = buf[2:]
+	return calculateChecksum(buf[2:])
+}
+
+func calculateChecksum(buf []byte) uint8 {
 	var calculatedChecksum uint16
 	for i := range buf {
 		calculatedChecksum += uint16(buf[i])
