@@ -144,7 +144,7 @@ func (s *SpheroDriver) Start() bool {
 		}
 	}()
 
-	s.configureCollisionDetection()
+	s.configureDefaultCollisionDetection()
 	s.enableStopOnDisconnect()
 
 	return true
@@ -190,11 +190,16 @@ func (s *SpheroDriver) Stop() {
 	s.Roll(0, 0)
 }
 
-func (s *SpheroDriver) configureCollisionDetection() {
+// ConfigureCollisionDetectionRaw allows custom collision detection sensitivity.
+// see: http://orbotixinc.github.io/Sphero-Docs/docs/collision-detection/index.html
+// deadTime - post-collision dead time in 10ms increments
+func (s *SpheroDriver) ConfigureCollisionDetectionRaw(xThreshold, xSpeed, yThreshold, ySpeed, deadTime uint8) {
 	// Meth 0x01 to enable, 0x00 to disable
-	// Xt, XSpd, Yt, YSpd
-	// Dead - post-collision dead time in 10ms increments
-	s.packetChannel <- s.craftPacket([]uint8{0x01, 0x40, 0x40, 0x50, 0x50, 0x60}, 0x02, 0x12)
+	s.packetChannel <- s.craftPacket([]uint8{0x01, xThreshold, xSpeed, yThreshold, ySpeed, deadTime}, 0x02, 0x12)
+}
+
+func (s *SpheroDriver) configureDefaultCollisionDetection() {
+	s.ConfigureCollisionDetectionRaw(0x40, 0x40, 0x50, 0x50, 0x60)
 }
 
 func (s *SpheroDriver) enableStopOnDisconnect() {
