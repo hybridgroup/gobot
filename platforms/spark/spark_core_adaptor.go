@@ -13,6 +13,7 @@ type SparkCoreAdaptor struct {
 	gobot.Adaptor
 	DeviceID    string
 	AccessToken string
+  APIServer   string
 }
 
 func NewSparkCoreAdaptor(name string, deviceID string, accessToken string) *SparkCoreAdaptor {
@@ -23,6 +24,7 @@ func NewSparkCoreAdaptor(name string, deviceID string, accessToken string) *Spar
 		),
 		DeviceID:    deviceID,
 		AccessToken: accessToken,
+    APIServer:   "https://api.spark.io",
 	}
 }
 
@@ -84,8 +86,15 @@ func (s *SparkCoreAdaptor) DigitalRead(pin string) int {
 	return -1
 }
 
+func (s *SparkCoreAdaptor) setAPIServer(server string) {
+  s.APIServer = server
+}
+
 func (s *SparkCoreAdaptor) deviceURL() string {
-	return fmt.Sprintf("https://api.spark.io/v1/devices/%v", s.DeviceID)
+  if len(s.APIServer) <= 0 {
+    s.setAPIServer("https://api.spark.io")
+  }
+	return fmt.Sprintf("%v/v1/devices/%v", s.APIServer, s.DeviceID)
 }
 
 func (s *SparkCoreAdaptor) pinLevel(level byte) string {
