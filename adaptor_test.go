@@ -13,6 +13,6 @@ func TestAdaptor(t *testing.T) {
 	a.SetConnected(true)
 	Assert(t, a.Connected(), true)
 
-  a.SetConnected(false)
+	a.SetConnected(false)
 	Assert(t, a.Connected(), false)
 }

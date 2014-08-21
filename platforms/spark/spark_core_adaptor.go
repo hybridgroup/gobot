@@ -43,11 +43,14 @@ func (s *SparkCoreAdaptor) AnalogRead(pin string) float64 {
 		"params":       {pin},
 		"access_token": {s.AccessToken},
 	}
+
 	url := fmt.Sprintf("%v/analogread", s.deviceURL())
-	resp := s.postToSpark(url, params)
-	if resp != nil {
+
+	resp, err := s.postToSpark(url, params)
+	if err == nil {
 		return resp["return_value"].(float64)
-	}
+  }
+
 	return 0
 }
 
@@ -79,8 +82,8 @@ func (s *SparkCoreAdaptor) DigitalRead(pin string) int {
 		"access_token": {s.AccessToken},
 	}
 	url := fmt.Sprintf("%v/digitalread", s.deviceURL())
-	resp := s.postToSpark(url, params)
-	if resp != nil {
+	resp, err := s.postToSpark(url, params)
+	if err == nil {
 		return int(resp["return_value"].(float64))
 	}
 	return -1
@@ -104,22 +107,27 @@ func (s *SparkCoreAdaptor) pinLevel(level byte) string {
 	return "LOW"
 }
 
-func (s *SparkCoreAdaptor) postToSpark(url string, params url.Values) map[string]interface{} {
+func (s *SparkCoreAdaptor) postToSpark(url string, params url.Values) (m map[string]interface{}, err error) {
 	resp, err := http.PostForm(url, params)
 	if err != nil {
 		fmt.Println(s.Name, "Error writing to spark device", err)
-		return nil
+		return
 	}
-	m := make(map[string]interface{})
+
 	buf, err := ioutil.ReadAll(resp.Body)
+
 	if err != nil {
 		fmt.Println(s.Name, "Error reading response body", err)
-		return nil
+		return
 	}
+
 	json.Unmarshal(buf, &m)
+
 	if resp.Status != "200 OK" {
 		fmt.Println(s.Name, "Error: ", m["error"])
-		return nil
+    err = fmt.Errorf("%q was not found", url)
+		return
 	}
-	return m
+
+	return
 }
