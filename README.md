@@ -108,6 +108,7 @@ a shared set of drivers provided using the cylon-gpio module:
     - Analog Sensor
     - Button
     - Digital Sensor
+    - Direct Pin
     - LED
     - Motor
     - Servo
