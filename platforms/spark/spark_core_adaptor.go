@@ -13,7 +13,7 @@ type SparkCoreAdaptor struct {
 	gobot.Adaptor
 	DeviceID    string
 	AccessToken string
-  APIServer   string
+	APIServer   string
 }
 
 func NewSparkCoreAdaptor(name string, deviceID string, accessToken string) *SparkCoreAdaptor {
@@ -24,7 +24,7 @@ func NewSparkCoreAdaptor(name string, deviceID string, accessToken string) *Spar
 		),
 		DeviceID:    deviceID,
 		AccessToken: accessToken,
-    APIServer:   "https://api.spark.io",
+		APIServer:   "https://api.spark.io",
 	}
 }
 
@@ -49,7 +49,7 @@ func (s *SparkCoreAdaptor) AnalogRead(pin string) float64 {
 	resp, err := s.postToSpark(url, params)
 	if err == nil {
 		return resp["return_value"].(float64)
-  }
+	}
 
 	return 0
 }
@@ -90,13 +90,13 @@ func (s *SparkCoreAdaptor) DigitalRead(pin string) int {
 }
 
 func (s *SparkCoreAdaptor) setAPIServer(server string) {
-  s.APIServer = server
+	s.APIServer = server
 }
 
 func (s *SparkCoreAdaptor) deviceURL() string {
-  if len(s.APIServer) <= 0 {
-    s.setAPIServer("https://api.spark.io")
-  }
+	if len(s.APIServer) <= 0 {
+		s.setAPIServer("https://api.spark.io")
+	}
 	return fmt.Sprintf("%v/v1/devices/%v", s.APIServer, s.DeviceID)
 }
 
@@ -125,7 +125,7 @@ func (s *SparkCoreAdaptor) postToSpark(url string, params url.Values) (m map[str
 
 	if resp.Status != "200 OK" {
 		fmt.Println(s.Name, "Error: ", m["error"])
-    err = fmt.Errorf("%q was not found", url)
+		err = fmt.Errorf("%q was not found", url)
 		return
 	}
 
