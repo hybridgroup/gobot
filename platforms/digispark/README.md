@@ -11,7 +11,7 @@ This package requires `libusb`.
 To install `libusb` on OSX using Homebrew:
 
 ```
-$ brew install libusb
+$ brew install libusb && brew install libusb-compat
 ```
 
 ### Ubuntu
