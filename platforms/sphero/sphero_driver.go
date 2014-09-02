@@ -239,27 +239,24 @@ func (s *SpheroDriver) calculateChecksum(packet *packet) uint8 {
 }
 
 func (s *SpheroDriver) readHeader() []uint8 {
-	data := s.readNextChunk(5)
-	if data == nil {
-		return nil
-	}
-	return data
+	return s.readNextChunk(5)
 }
 
 func (s *SpheroDriver) readBody(length uint8) []uint8 {
-	data := s.readNextChunk(length)
-	if data == nil {
-		return nil
-	}
-	return data
+	return s.readNextChunk(int(length))
 }
 
-func (s *SpheroDriver) readNextChunk(length uint8) []uint8 {
-	time.Sleep(1000 * time.Microsecond)
-	var read = make([]uint8, int(length))
-	l, err := s.adaptor().sp.Read(read[:])
-	if err != nil || length != uint8(l) {
-		return nil
+func (s *SpheroDriver) readNextChunk(length int) []uint8 {
+	read := make([]uint8, length)
+	bytesRead := 0
+
+	for bytesRead < length {
+		time.Sleep(1 * time.Millisecond)
+		n, err := s.adaptor().sp.Read(read[bytesRead:])
+		if err != nil {
+			return nil
+		}
+		bytesRead += n
 	}
 	return read
 }
