@@ -9,6 +9,10 @@ func TestAdaptor(t *testing.T) {
 	Assert(t, a.Port(), "/dev/null1")
 	a.SetName("myAdaptor")
 	Assert(t, a.Name(), "myAdaptor")
+
 	a.SetConnected(true)
 	Assert(t, a.Connected(), true)
+
+	a.SetConnected(false)
+	Assert(t, a.Connected(), false)
 }
