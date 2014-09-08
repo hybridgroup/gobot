@@ -106,11 +106,16 @@ func (s *SpheroDriver) Start() bool {
 			header := s.readHeader()
 			if header != nil && len(header) != 0 {
 				body := s.readBody(header[4])
-				if header[1] == 0xFE {
-					async := append(header, body...)
-					s.asyncResponse = append(s.asyncResponse, async)
-				} else {
-					s.responseChannel <- append(header, body...)
+				data := append(header, body...)
+				checksum := data[len(data)-1]
+				if checksum != calculateChecksum(data[2:len(data)-1]) {
+					continue
+				}
+				switch header[1] {
+				case 0xFE:
+					s.asyncResponse = append(s.asyncResponse, data)
+				case 0xFF:
+					s.responseChannel <- data
 				}
 			}
 		}
@@ -230,7 +235,10 @@ func (s *SpheroDriver) write(packet *packet) {
 
 func (s *SpheroDriver) calculateChecksum(packet *packet) uint8 {
 	buf := append(packet.header, packet.body...)
-	buf = buf[2:]
+	return calculateChecksum(buf[2:])
+}
+
+func calculateChecksum(buf []byte) byte {
 	var calculatedChecksum uint16
 	for i := range buf {
 		calculatedChecksum += uint16(buf[i])

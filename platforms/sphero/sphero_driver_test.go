@@ -1,8 +1,9 @@
 package sphero
 
 import (
-	"github.com/hybridgroup/gobot"
 	"testing"
+
+	"github.com/hybridgroup/gobot"
 )
 
 func initTestSpheroDriver() *SpheroDriver {
@@ -19,4 +20,21 @@ func TestSpheroDriverStart(t *testing.T) {
 func TestSpheroDriverHalt(t *testing.T) {
 	d := initTestSpheroDriver()
 	gobot.Assert(t, d.Halt(), true)
+}
+
+func TestCalculateChecksum(t *testing.T) {
+	tests := []struct {
+		data     []byte
+		checksum byte
+	}{
+		{[]byte{0x00}, 0xff},
+		{[]byte{0xf0, 0x0f}, 0x00},
+	}
+
+	for _, tt := range tests {
+		actual := calculateChecksum(tt.data)
+		if actual != tt.checksum {
+			t.Errorf("Expected %x, got %x for data %x.", tt.checksum, actual, tt.data)
+		}
+	}
 }
