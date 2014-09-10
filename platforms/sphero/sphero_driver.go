@@ -1,6 +1,8 @@
 package sphero
 
 import (
+	"bytes"
+	"encoding/binary"
 	"fmt"
 	"time"
 
@@ -20,6 +22,19 @@ type SpheroDriver struct {
 	syncResponse    [][]uint8
 	packetChannel   chan *packet
 	responseChannel chan []uint8
+}
+
+type Collision struct {
+	// Normalized impact components (direction of the collision event):
+	X, Y, Z int16
+	// Thresholds exceeded by X (1h) and/or Y (2h) axis (bitmask):
+	Axis byte
+	// Power that cross threshold Xt + Xs:
+	XMagnitude, YMagnitude int16
+	// Sphero's speed when impact detected:
+	Speed uint8
+	// Millisecond timer
+	Timestamp uint32
 }
 
 func NewSpheroDriver(a *SpheroAdaptor, name string) *SpheroDriver {
@@ -189,7 +204,14 @@ func (s *SpheroDriver) enableStopOnDisconnect() {
 }
 
 func (s *SpheroDriver) handleCollisionDetected(data []uint8) {
-	gobot.Publish(s.Event("collision"), data)
+	// ensure data is the right length:
+	if len(data) != 22 || data[4] != 17 {
+		return
+	}
+	var collision Collision
+	buffer := bytes.NewBuffer(data[5:]) // skip header
+	binary.Read(buffer, binary.BigEndian, &collision)
+	gobot.Publish(s.Event("collision"), collision)
 }
 
 func (s *SpheroDriver) getSyncResponse(packet *packet) []byte {
