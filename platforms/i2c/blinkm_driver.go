@@ -19,12 +19,6 @@ func NewBlinkMDriver(a I2cInterface, name string) *BlinkMDriver {
 		),
 	}
 
-	b.AddCommand("FirmwareVersion", func(params map[string]interface{}) interface{} {
-		return b.FirmwareVersion()
-	})
-	b.AddCommand("Color", func(params map[string]interface{}) interface{} {
-		return b.Color()
-	})
 	b.AddCommand("Rgb", func(params map[string]interface{}) interface{} {
 		red := byte(params["red"].(float64))
 		green := byte(params["green"].(float64))
@@ -38,6 +32,12 @@ func NewBlinkMDriver(a I2cInterface, name string) *BlinkMDriver {
 		blue := byte(params["blue"].(float64))
 		b.Fade(red, green, blue)
 		return nil
+	})
+	b.AddCommand("FirmwareVersion", func(params map[string]interface{}) interface{} {
+		return b.FirmwareVersion()
+	})
+	b.AddCommand("Color", func(params map[string]interface{}) interface{} {
+		return b.Color()
 	})
 
 	return b

@@ -36,5 +36,6 @@ func (h *HMC6352Driver) Start() bool {
 	})
 	return true
 }
+
 func (h *HMC6352Driver) Init() bool { return true }
 func (h *HMC6352Driver) Halt() bool { return true }
