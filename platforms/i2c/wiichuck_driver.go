@@ -53,6 +53,7 @@ func (w *WiichuckDriver) Start() bool {
 	})
 	return true
 }
+
 func (w *WiichuckDriver) Init() bool { return true }
 func (w *WiichuckDriver) Halt() bool { return true }
 
