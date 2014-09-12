@@ -53,6 +53,7 @@ func NewAPI(g *gobot.Gobot) *api {
 
 func (a *api) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	for _, handler := range a.handlers {
+		res.Header().Set("Access-Control-Allow-Origin", "*")
 		handler(res, req)
 	}
 	a.router.ServeHTTP(res, req)
