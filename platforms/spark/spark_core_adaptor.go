@@ -3,10 +3,11 @@ package spark
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/hybridgroup/gobot"
 	"io/ioutil"
 	"net/http"
 	"net/url"
+
+	"github.com/hybridgroup/gobot"
 )
 
 type SparkCoreAdaptor struct {
@@ -38,7 +39,7 @@ func (s *SparkCoreAdaptor) Finalize() bool {
 	return true
 }
 
-func (s *SparkCoreAdaptor) AnalogRead(pin string) float64 {
+func (s *SparkCoreAdaptor) AnalogRead(pin string) int {
 	params := url.Values{
 		"params":       {pin},
 		"access_token": {s.AccessToken},
@@ -48,7 +49,7 @@ func (s *SparkCoreAdaptor) AnalogRead(pin string) float64 {
 
 	resp, err := s.postToSpark(url, params)
 	if err == nil {
-		return resp["return_value"].(float64)
+		return int(resp["return_value"].(float64))
 	}
 
 	return 0
