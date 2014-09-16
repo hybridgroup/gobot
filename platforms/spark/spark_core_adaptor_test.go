@@ -1,11 +1,12 @@
 package spark
 
 import (
-	"github.com/hybridgroup/gobot"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"testing"
+
+	"github.com/hybridgroup/gobot"
 )
 
 // HELPERS
@@ -104,7 +105,7 @@ func TestSparkCoreAdaptorAnalogRead(t *testing.T) {
 
 	a.setAPIServer(testServer.URL)
 
-	gobot.Assert(t, a.AnalogRead("A1"), 5.2)
+	gobot.Assert(t, a.AnalogRead("A1"), 5)
 
 	testServer.Close()
 
@@ -114,7 +115,7 @@ func TestSparkCoreAdaptorAnalogRead(t *testing.T) {
 	})
 	defer testServer.Close()
 
-	gobot.Assert(t, a.AnalogRead("A1"), float64(0))
+	gobot.Assert(t, a.AnalogRead("A1"), 0)
 
 }
 
