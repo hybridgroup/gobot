@@ -11,9 +11,9 @@ func initTestWiichuckDriver() *WiichuckDriver {
 	return NewWiichuckDriver(newI2cTestAdaptor("adaptor"), "bot")
 }
 
-func initTestMockedWiichuckDriver() (*WiichuckDriver, *I2cInterfaceClient) {
-	inter := NewI2cInterfaceClient()
-	return NewWiichuckDriver(inter, "bot"), inter
+func initTestWiichuckDriverWithStubbedAdaptor() (*WiichuckDriver, *i2cTestAdaptor) {
+	adaptor := newI2cTestAdaptor("adaptor")
+	return NewWiichuckDriver(adaptor, "bot"), adaptor
 }
 
 // --------- TESTS
@@ -60,22 +60,20 @@ func TestWiichuckDriverAdaptor(t *testing.T) {
 }
 
 func TestWiichuckDriverStart(t *testing.T) {
-	wii, inter := initTestMockedWiichuckDriver()
+	wii, adaptor := initTestWiichuckDriverWithStubbedAdaptor()
+
+	adaptor.i2cReadImpl = func() []byte {
+		return []byte{1, 2, 3, 4, 5, 6}
+	}
 
 	numberOfCyclesForEvery := 3
-
-	inter.When("I2cStart", uint8(0x52)).Times(1)
-	inter.When("I2cWrite", []byte{0x40, 0x00}).Times(numberOfCyclesForEvery - 1)
-	inter.When("I2cWrite", []byte{0x00}).Times(numberOfCyclesForEvery - 1)
-	inter.When("I2cRead", uint(0x6)).Return([]byte{1, 2, 3, 4, 5, 6}).Times(numberOfCyclesForEvery - 1)
 
 	wii.SetInterval(1 * time.Millisecond)
 	gobot.Assert(t, wii.Start(), true)
 	<-time.After(time.Duration(numberOfCyclesForEvery) * time.Millisecond)
 
-	if ok, err := inter.Verify(); !ok {
-		t.Errorf("Error:", err)
-	}
+	gobot.Assert(t, wii.joystick["sy_origin"], float64(44))
+	gobot.Assert(t, wii.joystick["sx_origin"], float64(45))
 }
 
 func TestWiichuckDriverInit(t *testing.T) {

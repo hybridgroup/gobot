@@ -11,9 +11,9 @@ func initTestHMC6352Driver() *HMC6352Driver {
 	return NewHMC6352Driver(newI2cTestAdaptor("adaptor"), "bot")
 }
 
-func initTestMockedHMC6352Driver() (*HMC6352Driver, *I2cInterfaceClient) {
-	inter := NewI2cInterfaceClient()
-	return NewHMC6352Driver(inter, "bot"), inter
+func initTestHMC6352DriverWithStubbedAdaptor() (*HMC6352Driver, *i2cTestAdaptor) {
+	adaptor := newI2cTestAdaptor("adaptor")
+	return NewHMC6352Driver(adaptor, "bot"), adaptor
 }
 
 // --------- TESTS
@@ -44,14 +44,14 @@ func TestHMC6352DriverAdaptor(t *testing.T) {
 }
 
 func TestHMC6352DriverStart(t *testing.T) {
-	// when length of data returned by I2cRead is 2
-	hmc, inter := initTestMockedHMC6352Driver()
+	// when len(data) is 2
+	hmc, adaptor := initTestHMC6352DriverWithStubbedAdaptor()
+
+	adaptor.i2cReadImpl = func() []byte {
+		return []byte{99, 1}
+	}
 
 	numberOfCyclesForEvery := 3
-
-	inter.When("I2cStart", uint8(0x21))
-	inter.When("I2cWrite", []byte("A")).Times(numberOfCyclesForEvery)
-	inter.When("I2cRead", uint(2)).Return([]byte{99, 1}).Times(numberOfCyclesForEvery - 1)
 
 	// Make sure "Heading" is set to 0 so that we assert
 	// its new value after executing "Start()"
@@ -61,28 +61,18 @@ func TestHMC6352DriverStart(t *testing.T) {
 	gobot.Assert(t, hmc.Start(), true)
 	<-time.After(time.Duration(numberOfCyclesForEvery) * time.Millisecond)
 
-	if ok, err := inter.Verify(); !ok {
-		t.Errorf("Error:", err)
-	}
-
 	gobot.Assert(t, hmc.Heading, uint16(2534))
 
-	// when length of data returned by I2cRead is not 2
-	hmc, inter = initTestMockedHMC6352Driver()
+	// when len(data) is not 2
+	hmc, adaptor = initTestHMC6352DriverWithStubbedAdaptor()
 
-	inter.When("I2cStart", uint8(0x21))
-	inter.When("I2cWrite", []byte("A")).Times(numberOfCyclesForEvery)
-	inter.When("I2cRead", uint(2)).Return([]byte{99}).Times(numberOfCyclesForEvery - 1)
-
-	gobot.Assert(t, hmc.Heading, uint16(0))
+	adaptor.i2cReadImpl = func() []byte {
+		return []byte{99}
+	}
 
 	hmc.SetInterval(1 * time.Millisecond)
 	gobot.Assert(t, hmc.Start(), true)
 	<-time.After(time.Duration(numberOfCyclesForEvery) * time.Millisecond)
-
-	if ok, err := inter.Verify(); !ok {
-		t.Errorf("Error:", err)
-	}
 
 	gobot.Assert(t, hmc.Heading, uint16(0))
 }
