@@ -25,6 +25,7 @@ type api struct {
 	Password string
 	Cert     string
 	Key      string
+	cors     *CORS
 	handlers []func(http.ResponseWriter, *http.Request)
 	start    func(*api)
 }
@@ -53,7 +54,6 @@ func NewAPI(g *gobot.Gobot) *api {
 
 func (a *api) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	for _, handler := range a.handlers {
-		res.Header().Set("Access-Control-Allow-Origin", "*")
 		handler(res, req)
 	}
 	a.router.ServeHTTP(res, req)
@@ -91,6 +91,23 @@ func (a *api) SetBasicAuth(user, password string) {
 	a.Username = user
 	a.Password = password
 	a.AddHandler(a.basicAuth)
+}
+
+func (a *api) AllowRequestsFrom(allowedOrigins ...string) {
+	a.SetCORS(NewCORS(allowedOrigins))
+}
+
+func (a *api) SetCORS(cors *CORS) {
+	a.cors = cors
+	a.AddHandler(a.CORSHandler)
+}
+
+func (a *api) CORSHandler(w http.ResponseWriter, req *http.Request) {
+	origin := req.Header.Get("Origin")
+	if a.cors.isOriginAllowed(origin) {
+		w.Header().Set("Access-Control-Allow-Origin", origin)
+	}
+
 }
 
 func (a *api) SetDebug() {
