@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/hybridgroup/gobot"
+	"log"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -13,7 +14,8 @@ import (
 const (
 	Slots       = "/sys/devices/bone_capemgr.*"
 	Ocp         = "/sys/devices/ocp.*"
- 	I2CLocation = "/dev/i2c-1"
+	I2CLocation = "/dev/i2c-1"
+	UsrLed      = "/sys/devices/ocp.3/gpio-leds.8/leds/beaglebone:green:"
 )
 
 var pins = map[string]int{
@@ -171,8 +173,17 @@ func (b *BeagleboneAdaptor) DigitalRead(pin string) int {
 }
 
 func (b *BeagleboneAdaptor) DigitalWrite(pin string, val byte) {
-	i := b.digitalPin(pin, "w")
-	b.digitalPins[i].digitalWrite(strconv.Itoa(int(val)))
+	if strings.Contains(pin, "usr") {
+		fi, err := os.OpenFile(UsrLed+pin+"/brightness", os.O_WRONLY|os.O_APPEND, 0666)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer fi.Close()
+		fi.WriteString(strconv.Itoa(int(val)))
+	} else {
+		i := b.digitalPin(pin, "w")
+		b.digitalPins[i].digitalWrite(strconv.Itoa(int(val)))
+	}
 }
 
 func (b *BeagleboneAdaptor) AnalogRead(pin string) int {
