@@ -25,6 +25,7 @@ type api struct {
 	Password string
 	Cert     string
 	Key      string
+	cors     *CORS
 	handlers []func(http.ResponseWriter, *http.Request)
 	start    func(*api)
 }
@@ -90,6 +91,25 @@ func (a *api) SetBasicAuth(user, password string) {
 	a.Username = user
 	a.Password = password
 	a.AddHandler(a.basicAuth)
+}
+
+func (a *api) AllowRequestsFrom(allowedOrigins ...string) {
+	a.SetCORS(NewCORS(allowedOrigins))
+}
+
+func (a *api) SetCORS(cors *CORS) {
+	a.cors = cors
+	a.AddHandler(a.CORSHandler)
+}
+
+func (a *api) CORSHandler(w http.ResponseWriter, req *http.Request) {
+	origin := req.Header.Get("Origin")
+	if a.cors.isOriginAllowed(origin) {
+		w.Header().Set("Access-Control-Allow-Origin", origin)
+		w.Header().Set("Access-Control-Allow-Headers", a.cors.AllowedHeaders())
+		w.Header().Set("Access-Control-Allow-Methods", a.cors.AllowedMethods())
+		w.Header().Set("Content-Type", a.cors.ContentType)
+	}
 }
 
 func (a *api) SetDebug() {
