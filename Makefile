@@ -1,4 +1,4 @@
-PACKAGES := gobot gobot/api $(shell ls ./platforms | sed -e 's/^/gobot\/platforms\//')
+PACKAGES := gobot gobot/api gobot/platforms/intel-iot/edison $(shell ls ./platforms | sed -e 's/^/gobot\/platforms\//')
 
 .PHONY: test cover robeaux
 
