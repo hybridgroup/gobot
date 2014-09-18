@@ -106,8 +106,10 @@ func (a *api) CORSHandler(w http.ResponseWriter, req *http.Request) {
 	origin := req.Header.Get("Origin")
 	if a.cors.isOriginAllowed(origin) {
 		w.Header().Set("Access-Control-Allow-Origin", origin)
+		w.Header().Set("Access-Control-Allow-Headers", a.cors.AllowedHeaders())
+		w.Header().Set("Access-Control-Allow-Methods", a.cors.AllowedMethods())
+		w.Header().Set("Content-Type", a.cors.ContentType)
 	}
-
 }
 
 func (a *api) SetDebug() {
