@@ -1,8 +1,9 @@
 package api
 
 import (
-	"github.com/hybridgroup/gobot"
 	"testing"
+
+	"github.com/hybridgroup/gobot"
 )
 
 func TestNewCORS(t *testing.T) {

@@ -13,8 +13,8 @@ func main() {
 	gbot := gobot.NewGobot()
 
 	a := api.NewAPI(gbot)
-	a.SetBasicAuth("gort", "klatuu")
-	a.SetDebug()
+	a.AddHandler(api.BasicAuth("gort", "klatuu"))
+	a.Debug()
 
 	a.AddHandler(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Hello, %q \n", html.EscapeString(r.URL.Path))
