@@ -13,11 +13,10 @@ func main() {
 	gbot := gobot.NewGobot()
 
 	a := api.NewAPI(gbot)
-	a.SetDebug()
-
 	a.AddHandler(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Hello, %q \n", html.EscapeString(r.URL.Path))
 	})
+	a.Debug()
 	a.Start()
 
 	gbot.AddCommand("custom_gobot_command",

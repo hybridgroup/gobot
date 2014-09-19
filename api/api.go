@@ -1,8 +1,6 @@
 package api
 
 import (
-	"crypto/subtle"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -21,11 +19,8 @@ type api struct {
 	router   *pat.PatternServeMux
 	Host     string
 	Port     string
-	Username string
-	Password string
 	Cert     string
 	Key      string
-	cors     *CORS
 	handlers []func(http.ResponseWriter, *http.Request)
 	start    func(*api)
 }
@@ -85,37 +80,6 @@ func (a *api) Head(path string, f func(http.ResponseWriter, *http.Request)) {
 
 func (a *api) AddHandler(f func(http.ResponseWriter, *http.Request)) {
 	a.handlers = append(a.handlers, f)
-}
-
-func (a *api) SetBasicAuth(user, password string) {
-	a.Username = user
-	a.Password = password
-	a.AddHandler(a.basicAuth)
-}
-
-func (a *api) AllowRequestsFrom(allowedOrigins ...string) {
-	a.SetCORS(NewCORS(allowedOrigins))
-}
-
-func (a *api) SetCORS(cors *CORS) {
-	a.cors = cors
-	a.AddHandler(a.CORSHandler)
-}
-
-func (a *api) CORSHandler(w http.ResponseWriter, req *http.Request) {
-	origin := req.Header.Get("Origin")
-	if a.cors.isOriginAllowed(origin) {
-		w.Header().Set("Access-Control-Allow-Origin", origin)
-		w.Header().Set("Access-Control-Allow-Headers", a.cors.AllowedHeaders())
-		w.Header().Set("Access-Control-Allow-Methods", a.cors.AllowedMethods())
-		w.Header().Set("Content-Type", a.cors.ContentType)
-	}
-}
-
-func (a *api) SetDebug() {
-	a.AddHandler(func(res http.ResponseWriter, req *http.Request) {
-		log.Println(req)
-	})
 }
 
 // start starts the api using the start function
@@ -308,34 +272,16 @@ func (a *api) executeCommand(f func(map[string]interface{}) interface{},
 	} else {
 		a.writeJSON("Unknown Command", res)
 	}
-
-}
-
-// basic auth inspired by
-// https://github.com/codegangsta/martini-contrib/blob/master/auth/
-func (a *api) basicAuth(res http.ResponseWriter, req *http.Request) {
-	auth := req.Header.Get("Authorization")
-	if !a.secureCompare(auth,
-		"Basic "+base64.StdEncoding.EncodeToString([]byte(a.Username+":"+a.Password)),
-	) {
-		res.Header().Set("WWW-Authenticate",
-			"Basic realm=\"Authorization Required\"",
-		)
-		http.Error(res, "Not Authorized", http.StatusUnauthorized)
-	}
-}
-
-func (a *api) secureCompare(given string, actual string) bool {
-	if subtle.ConstantTimeEq(int32(len(given)), int32(len(actual))) == 1 {
-		return subtle.ConstantTimeCompare([]byte(given), []byte(actual)) == 1
-	}
-	// Securely compare actual to itself to keep constant time,
-	// but always return false
-	return subtle.ConstantTimeCompare([]byte(actual), []byte(actual)) == 1 && false
 }
 
 func (a *api) writeJSON(j interface{}, res http.ResponseWriter) {
 	data, _ := json.Marshal(j)
 	res.Header().Set("Content-Type", "application/json; charset=utf-8")
 	res.Write(data)
+}
+
+func (a *api) Debug() {
+	a.AddHandler(func(res http.ResponseWriter, req *http.Request) {
+		log.Println(req)
+	})
 }

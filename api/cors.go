@@ -1,6 +1,7 @@
 package api
 
 import (
+	"net/http"
 	"regexp"
 	"strings"
 )
@@ -13,17 +14,25 @@ type CORS struct {
 	allowOriginPatterns []string
 }
 
-func NewCORS(allowedOrigins []string) *CORS {
-	cors := &CORS{
+func AllowRequestsFrom(allowedOrigins ...string) http.HandlerFunc {
+	c := &CORS{
 		AllowOrigins: allowedOrigins,
 		AllowMethods: []string{"GET", "POST"},
 		AllowHeaders: []string{"Origin", "Content-Type"},
 		ContentType:  "application/json; charset=utf-8",
 	}
 
-	cors.generatePatterns()
+	c.generatePatterns()
 
-	return cors
+	return func(w http.ResponseWriter, req *http.Request) {
+		origin := req.Header.Get("Origin")
+		if c.isOriginAllowed(origin) {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+			w.Header().Set("Access-Control-Allow-Headers", c.AllowedHeaders())
+			w.Header().Set("Access-Control-Allow-Methods", c.AllowedMethods())
+			w.Header().Set("Content-Type", c.ContentType)
+		}
+	}
 }
 
 func (c *CORS) isOriginAllowed(origin string) (allowed bool) {
