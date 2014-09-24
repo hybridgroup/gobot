@@ -1,5 +1,5 @@
 #!/bin/bash
-PACKAGES=('gobot' 'gobot/api' $(ls ./platforms | sed -e 's/^/gobot\/platforms\//'))
+PACKAGES=('gobot' 'gobot/api' 'gobot/platforms/intel-iot/edison' $(ls ./platforms | sed -e 's/^/gobot\/platforms\//'))
 EXITCODE=0
 
 echo "mode: count" > profile.cov
