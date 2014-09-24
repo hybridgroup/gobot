@@ -1,3 +1,7 @@
+0.6.3
+---
+- Add support for the Intel Edison
+
 0.6.2
 ---
 - cli
