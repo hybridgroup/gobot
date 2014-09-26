@@ -18,7 +18,7 @@ func initTestAPI() *api {
 	a := NewAPI(g)
 	a.start = func(m *api) {}
 	a.Start()
-	a.SetDebug()
+	a.Debug()
 
 	g.AddRobot(gobot.NewTestRobot("Robot1"))
 	g.AddRobot(gobot.NewTestRobot("Robot2"))
@@ -29,53 +29,6 @@ func initTestAPI() *api {
 	})
 
 	return a
-}
-
-func TestBasicAuth(t *testing.T) {
-	a := initTestAPI()
-
-	a.SetBasicAuth("admin", "password")
-
-	request, _ := http.NewRequest("GET", "/api/", nil)
-	request.SetBasicAuth("admin", "password")
-	response := httptest.NewRecorder()
-	a.ServeHTTP(response, request)
-	gobot.Assert(t, response.Code, 200)
-
-	request, _ = http.NewRequest("GET", "/api/", nil)
-	request.SetBasicAuth("admin", "wrongPassword")
-	response = httptest.NewRecorder()
-	a.ServeHTTP(response, request)
-	gobot.Assert(t, response.Code, 401)
-}
-
-func TestAPIAllowRequestsFrom(t *testing.T) {
-	api := initTestAPI()
-	api.AllowRequestsFrom("http://server.com")
-	gobot.Assert(t, api.cors.AllowOrigins, []string{"http://server.com"})
-}
-
-func TestCORS(t *testing.T) {
-	api := initTestAPI()
-
-	// Accepted origin
-	allowedOrigin := []string{"http://server.com"}
-	api.AllowRequestsFrom(allowedOrigin[0])
-
-	request, _ := http.NewRequest("GET", "/api/", nil)
-	request.Header.Set("Origin", allowedOrigin[0])
-	response := httptest.NewRecorder()
-	api.ServeHTTP(response, request)
-	gobot.Assert(t, response.Header()["Access-Control-Allow-Origin"], allowedOrigin)
-
-	// Not accepted Origin
-	disallowedOrigin := []string{"http://disallowed.com"}
-	request, _ = http.NewRequest("GET", "/api/", nil)
-	request.Header.Set("Origin", disallowedOrigin[0])
-	response = httptest.NewRecorder()
-	api.ServeHTTP(response, request)
-	gobot.Refute(t, response.Header()["Access-Control-Allow-Origin"], disallowedOrigin)
-	gobot.Refute(t, response.Header()["Access-Control-Allow-Origin"], allowedOrigin)
 }
 
 func TestRobeaux(t *testing.T) {
