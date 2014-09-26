@@ -2,7 +2,7 @@
 
 Gobot (http://gobot.io/) is a framework for robotics and physical computing using Go
 
-This repository contains the Gobot adaptor and driver for mavlink.
+This repository contains the Gobot adaptor and driver for the [MAVlink Communication Protocol](http://qgroundcontrol.org/mavlink/start).
 
 For more information about Gobot, check out the github repo at
 https://github.com/hybridgroup/gobot
