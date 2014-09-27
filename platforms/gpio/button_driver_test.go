@@ -1,8 +1,9 @@
 package gpio
 
 import (
-	"github.com/hybridgroup/gobot"
 	"testing"
+
+	"github.com/hybridgroup/gobot"
 )
 
 func initTestButtonDriver() *ButtonDriver {
@@ -17,11 +18,6 @@ func TestButtonDriverStart(t *testing.T) {
 func TestButtonDriverHalt(t *testing.T) {
 	d := initTestButtonDriver()
 	gobot.Assert(t, d.Halt(), true)
-}
-
-func TestButtonDriverInit(t *testing.T) {
-	d := initTestButtonDriver()
-	gobot.Assert(t, d.Init(), true)
 }
 
 func TestButtonDriverReadState(t *testing.T) {
