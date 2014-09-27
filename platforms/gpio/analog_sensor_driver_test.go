@@ -1,8 +1,9 @@
 package gpio
 
 import (
-	"github.com/hybridgroup/gobot"
 	"testing"
+
+	"github.com/hybridgroup/gobot"
 )
 
 func initTestAnalogSensorDriver() *AnalogSensorDriver {
@@ -17,11 +18,6 @@ func TestAnalogSensorDriverStart(t *testing.T) {
 func TestAnalogSensorDriverHalt(t *testing.T) {
 	d := initTestAnalogSensorDriver()
 	gobot.Assert(t, d.Halt(), true)
-}
-
-func TestAnalogSensorDriverInit(t *testing.T) {
-	d := initTestAnalogSensorDriver()
-	gobot.Assert(t, d.Init(), true)
 }
 
 func TestAnalogSensorDriverRead(t *testing.T) {
