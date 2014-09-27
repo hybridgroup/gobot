@@ -1,8 +1,9 @@
 package gpio
 
 import (
-	"github.com/hybridgroup/gobot"
 	"testing"
+
+	"github.com/hybridgroup/gobot"
 )
 
 func initTestDirectPinDriver() *DirectPinDriver {
@@ -17,11 +18,6 @@ func TestDirectPinDriverStart(t *testing.T) {
 func TestDirectPinDriverHalt(t *testing.T) {
 	d := initTestDirectPinDriver()
 	gobot.Assert(t, d.Halt(), true)
-}
-
-func TestDirectPinDriverInit(t *testing.T) {
-	d := initTestDirectPinDriver()
-	gobot.Assert(t, d.Init(), true)
 }
 
 func TestDirectPinDriverDigitalRead(t *testing.T) {

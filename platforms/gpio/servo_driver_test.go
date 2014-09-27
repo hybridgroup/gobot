@@ -1,8 +1,9 @@
 package gpio
 
 import (
-	"github.com/hybridgroup/gobot"
 	"testing"
+
+	"github.com/hybridgroup/gobot"
 )
 
 func initTestServoDriver() *ServoDriver {
@@ -17,11 +18,6 @@ func TestServoDriverStart(t *testing.T) {
 func TestServoDriverHalt(t *testing.T) {
 	d := initTestServoDriver()
 	gobot.Assert(t, d.Halt(), true)
-}
-
-func TestServoDriverInit(t *testing.T) {
-	d := initTestServoDriver()
-	gobot.Assert(t, d.Init(), true)
 }
 
 func TestServoDriverMove(t *testing.T) {
