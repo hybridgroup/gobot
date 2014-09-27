@@ -4,6 +4,7 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
+// Represents a Motor
 type MotorDriver struct {
 	gobot.Driver
 	SpeedPin         string
@@ -17,6 +18,7 @@ type MotorDriver struct {
 	CurrentDirection string
 }
 
+// NewMotorDriver return a new MotorDriver given a PwmDigitalWriter, name and pin
 func NewMotorDriver(a PwmDigitalWriter, name string, pin string) *MotorDriver {
 	return &MotorDriver{
 		Driver: *gobot.NewDriver(
@@ -35,10 +37,13 @@ func (m *MotorDriver) adaptor() PwmDigitalWriter {
 	return m.Adaptor().(PwmDigitalWriter)
 }
 
+// Start starts the MotorDriver. Returns true on successful start of the driver
 func (m *MotorDriver) Start() bool { return true }
-func (m *MotorDriver) Halt() bool  { return true }
-func (m *MotorDriver) Init() bool  { return true }
 
+// Halt halts the MotorDriver. Returns true on successful halt of the driver
+func (m *MotorDriver) Halt() bool { return true }
+
+// Off turns the motor off or sets the motor to a 0 speed
 func (m *MotorDriver) Off() {
 	if m.isDigital() {
 		m.changeState(0)
@@ -47,6 +52,7 @@ func (m *MotorDriver) Off() {
 	}
 }
 
+// On turns the motor on or sets the motor to a maximum speed
 func (m *MotorDriver) On() {
 	if m.isDigital() {
 		m.changeState(1)
@@ -58,14 +64,17 @@ func (m *MotorDriver) On() {
 	}
 }
 
+// Min sets the motor to the minimum speed
 func (m *MotorDriver) Min() {
 	m.Off()
 }
 
+// Max sets the motor to the maximum speed
 func (m *MotorDriver) Max() {
 	m.Speed(255)
 }
 
+// InOn returns true if the motor is on
 func (m *MotorDriver) IsOn() bool {
 	if m.isDigital() {
 		return m.CurrentState == 1
@@ -73,10 +82,12 @@ func (m *MotorDriver) IsOn() bool {
 	return m.CurrentSpeed > 0
 }
 
+// InOff returns true if the motor is off
 func (m *MotorDriver) IsOff() bool {
 	return !m.IsOn()
 }
 
+// Toggle sets the motor to the opposite of it's current state
 func (m *MotorDriver) Toggle() {
 	if m.IsOn() {
 		m.Off()
@@ -85,22 +96,26 @@ func (m *MotorDriver) Toggle() {
 	}
 }
 
+// Speed sets the speed of the motor
 func (m *MotorDriver) Speed(value byte) {
 	m.CurrentMode = "analog"
 	m.CurrentSpeed = value
 	m.adaptor().PwmWrite(m.SpeedPin, value)
 }
 
+// Forward sets the forward pin to the specified speed
 func (m *MotorDriver) Forward(speed byte) {
 	m.Direction("forward")
 	m.Speed(speed)
 }
 
+// Backward sets the backward pin to the specified speed
 func (m *MotorDriver) Backward(speed byte) {
 	m.Direction("backward")
 	m.Speed(speed)
 }
 
+// Direction sets the direction pin to the specified speed
 func (m *MotorDriver) Direction(direction string) {
 	m.CurrentDirection = direction
 	if m.DirectionPin != "" {

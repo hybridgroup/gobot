@@ -4,10 +4,15 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
+// Represents an Analog Sensor
 type AnalogSensorDriver struct {
 	gobot.Driver
 }
 
+// NewAnalogSensorDriver returns a new AnalogSensorDriver given an AnalogReader, name and pin.
+//
+// Adds the following API Commands:
+// 	"Read" - See AnalogSensor.Read
 func NewAnalogSensorDriver(a AnalogReader, name string, pin string) *AnalogSensorDriver {
 	d := &AnalogSensorDriver{
 		Driver: *gobot.NewDriver(
@@ -30,6 +35,10 @@ func (a *AnalogSensorDriver) adaptor() AnalogReader {
 	return a.Adaptor().(AnalogReader)
 }
 
+// Starts the AnalogSensorDriver and reads the Analog Sensor at the given Driver.Interval().
+// Returns true on successful start of the driver.
+// Emits the Events:
+//	"data" int - Event is emitted on change and represents the current reading from the sensor.
 func (a *AnalogSensorDriver) Start() bool {
 	value := 0
 	gobot.Every(a.Interval(), func() {
@@ -41,9 +50,11 @@ func (a *AnalogSensorDriver) Start() bool {
 	})
 	return true
 }
-func (a *AnalogSensorDriver) Init() bool { return true }
+
+// Halt returns true on a successful halt of the driver
 func (a *AnalogSensorDriver) Halt() bool { return true }
 
+// Read returns the current reading from the Analog Sensor
 func (a *AnalogSensorDriver) Read() int {
 	return a.adaptor().AnalogRead(a.Pin())
 }
