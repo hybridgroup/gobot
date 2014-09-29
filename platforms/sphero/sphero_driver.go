@@ -15,6 +15,7 @@ type packet struct {
 	checksum uint8
 }
 
+// Represents a Sphero
 type SpheroDriver struct {
 	gobot.Driver
 	seq             uint8
@@ -37,6 +38,15 @@ type Collision struct {
 	Timestamp uint32
 }
 
+// NewSpheroDriver returns a new SpheroDriver given a SpheroAdaptor and name.
+//
+// Adds the following API Commands:
+// 	"Roll" - See SpheroDriver.Roll
+// 	"Stop" - See SpheroDriver.Stop
+// 	"GetRGB" - See SpheroDriver.GetRGB
+// 	"SetBackLED" - See SpheroDriver.SetBackLED
+// 	"SetHeading" - See SpheroDriver.SetHeading
+// 	"SetStabilization" - See SpheroDriver.SetStabilization
 func NewSpheroDriver(a *SpheroAdaptor, name string) *SpheroDriver {
 	s := &SpheroDriver{
 		Driver: *gobot.NewDriver(
@@ -97,10 +107,11 @@ func (s *SpheroDriver) adaptor() *SpheroAdaptor {
 	return s.Adaptor().(*SpheroAdaptor)
 }
 
-func (s *SpheroDriver) Init() bool {
-	return true
-}
-
+// Start starts the SpheroDriver and enables Collision Detection.
+// Returns true on successful start.
+//
+// Emits the Events:
+// 	"collision" SpheroDriver.Collision - On Collision Detected
 func (s *SpheroDriver) Start() bool {
 	go func() {
 		for {
@@ -155,6 +166,8 @@ func (s *SpheroDriver) Start() bool {
 	return true
 }
 
+// Halt halts the SpheroDriver and sends a SpheroDriver.Stop command to the Sphero.
+// Returns true on successful halt.
 func (s *SpheroDriver) Halt() bool {
 	gobot.Every(10*time.Millisecond, func() {
 		s.Stop()
@@ -163,22 +176,27 @@ func (s *SpheroDriver) Halt() bool {
 	return true
 }
 
+// SetRGB sets the Sphero to the given r, g, and b values
 func (s *SpheroDriver) SetRGB(r uint8, g uint8, b uint8) {
 	s.packetChannel <- s.craftPacket([]uint8{r, g, b, 0x01}, 0x02, 0x20)
 }
 
+// GetRGB returns the current r, g, b value of the Sphero
 func (s *SpheroDriver) GetRGB() []uint8 {
 	return s.getSyncResponse(s.craftPacket([]uint8{}, 0x02, 0x22))
 }
 
+// SetBackLED sets the Sphero Back LED to the specified brightness
 func (s *SpheroDriver) SetBackLED(level uint8) {
 	s.packetChannel <- s.craftPacket([]uint8{level}, 0x02, 0x21)
 }
 
+// SetHeading sets the heading of the Sphero
 func (s *SpheroDriver) SetHeading(heading uint16) {
 	s.packetChannel <- s.craftPacket([]uint8{uint8(heading >> 8), uint8(heading & 0xFF)}, 0x02, 0x01)
 }
 
+// SetStabilization enables or disables the built-in auto stabilizing features of the Sphero
 func (s *SpheroDriver) SetStabilization(on bool) {
 	b := uint8(0x01)
 	if on == false {
@@ -187,10 +205,12 @@ func (s *SpheroDriver) SetStabilization(on bool) {
 	s.packetChannel <- s.craftPacket([]uint8{b}, 0x02, 0x02)
 }
 
+// Roll sends a roll command to the Sphero gives a speed and heading
 func (s *SpheroDriver) Roll(speed uint8, heading uint16) {
 	s.packetChannel <- s.craftPacket([]uint8{speed, uint8(heading >> 8), uint8(heading & 0xFF), 0x01}, 0x02, 0x30)
 }
 
+// Stop sets the Sphero to a roll speed of 0
 func (s *SpheroDriver) Stop() {
 	s.Roll(0, 0)
 }
