@@ -5,6 +5,7 @@ import (
 	"log"
 )
 
+// JSONDevice is a JSON representation of a Gobot Device.
 type JSONDevice struct {
 	Name       string   `json:"name"`
 	Driver     string   `json:"driver"`
@@ -16,17 +17,19 @@ type Device DriverInterface
 
 type devices []Device
 
+// Len returns devices length
 func (d *devices) Len() int {
 	return len(*d)
 }
 
+// Each calls `f` function each device
 func (d *devices) Each(f func(Device)) {
 	for _, device := range *d {
 		f(device)
 	}
 }
 
-// Start() starts all the devices.
+// Start starts all the devices.
 func (d *devices) Start() error {
 	var err error
 	log.Println("Starting devices...")
@@ -44,7 +47,7 @@ func (d *devices) Start() error {
 	return err
 }
 
-// Halt() stop all the devices.
+// Halt stop all the devices.
 func (d *devices) Halt() {
 	for _, device := range *d {
 		device.Halt()
