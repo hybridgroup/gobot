@@ -18,6 +18,8 @@ const GPIODirectionWrite = "out"
 const HIGH = 1
 const LOW = 0
 
+// newDigitalPin creates a Digital Pin in specified position
+// and selected mode. Valid values for mode are "w" and "r"
 func newDigitalPin(pinNum int, mode string) *digitalPin {
 	d := new(digitalPin)
 	d.PinNum = strconv.Itoa(pinNum)
@@ -35,6 +37,9 @@ func newDigitalPin(pinNum int, mode string) *digitalPin {
 	return d
 }
 
+// setMode sets mode for digital pin
+// Valid values for mode are "w" and "r"
+// Panics on error
 func (d *digitalPin) setMode(mode string) {
 	d.Mode = mode
 
@@ -63,6 +68,8 @@ func (d *digitalPin) setMode(mode string) {
 	}
 }
 
+// digitalWrite writes value to a digial pin, if mode is not "w" it is set automatically
+// before writing value.
 func (d *digitalPin) digitalWrite(value string) {
 	if d.Mode != "w" {
 		d.setMode("w")
@@ -72,6 +79,8 @@ func (d *digitalPin) digitalWrite(value string) {
 	d.PinFile.Sync()
 }
 
+// digitalRead reads value from a digial pin, if mode is not "r" it is set automatically
+// before reading value.
 func (d *digitalPin) digitalRead() int {
 	if d.Mode != "r" {
 		d.setMode("r")
@@ -84,6 +93,7 @@ func (d *digitalPin) digitalRead() int {
 	return i
 }
 
+// close ends connection to digital pin
 func (d *digitalPin) close() {
 	fi, err := os.OpenFile(GPIOPath+"/unexport", os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {

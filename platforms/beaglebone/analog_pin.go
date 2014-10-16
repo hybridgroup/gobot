@@ -12,6 +12,7 @@ type analogPin struct {
 	pinNum string
 }
 
+// newAnalogPing returns a new analog pin with specified pin number
 func newAnalogPin(pinNum string) *analogPin {
 	d := new(analogPin)
 	d.pinNum = pinNum
@@ -19,6 +20,8 @@ func newAnalogPin(pinNum string) *analogPin {
 	return d
 }
 
+// analogRead returns the value from the specified analog pin.
+// returns an int value between 0 and 1023.
 func (a *analogPin) analogRead() int {
 	var err error
 	var fi *os.File
