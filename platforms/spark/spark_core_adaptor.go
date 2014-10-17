@@ -17,6 +17,8 @@ type SparkCoreAdaptor struct {
 	APIServer   string
 }
 
+// NewSparkCoreAdaptor creates new spark core adaptor with deviceId and accessToken
+// using api.spark.io server as default
 func NewSparkCoreAdaptor(name string, deviceID string, accessToken string) *SparkCoreAdaptor {
 	return &SparkCoreAdaptor{
 		Adaptor: *gobot.NewAdaptor(
@@ -29,16 +31,19 @@ func NewSparkCoreAdaptor(name string, deviceID string, accessToken string) *Spar
 	}
 }
 
+// Connect returns true if connection to spark core is succesfull
 func (s *SparkCoreAdaptor) Connect() bool {
 	s.SetConnected(true)
 	return true
 }
 
+// Finalize returns true if connection to spark core is finalized successfully
 func (s *SparkCoreAdaptor) Finalize() bool {
 	s.SetConnected(false)
 	return true
 }
 
+// AnalogRead reads analog ping value using spark cloud api
 func (s *SparkCoreAdaptor) AnalogRead(pin string) int {
 	params := url.Values{
 		"params":       {pin},
@@ -55,10 +60,12 @@ func (s *SparkCoreAdaptor) AnalogRead(pin string) int {
 	return 0
 }
 
+// PwmWrite writes in pin using analog write api
 func (s *SparkCoreAdaptor) PwmWrite(pin string, level byte) {
 	s.AnalogWrite(pin, level)
 }
 
+// AnalogWrite writes analog pin with specified level using spark cloud api
 func (s *SparkCoreAdaptor) AnalogWrite(pin string, level byte) {
 	params := url.Values{
 		"params":       {fmt.Sprintf("%v,%v", pin, level)},
@@ -68,6 +75,7 @@ func (s *SparkCoreAdaptor) AnalogWrite(pin string, level byte) {
 	s.postToSpark(url, params)
 }
 
+// DigitalWrite writes to a digital pin using spark cloud api
 func (s *SparkCoreAdaptor) DigitalWrite(pin string, level byte) {
 	params := url.Values{
 		"params":       {fmt.Sprintf("%v,%v", pin, s.pinLevel(level))},
@@ -77,6 +85,7 @@ func (s *SparkCoreAdaptor) DigitalWrite(pin string, level byte) {
 	s.postToSpark(url, params)
 }
 
+// DigitalRead reads from digital pin using spark cloud api
 func (s *SparkCoreAdaptor) DigitalRead(pin string) int {
 	params := url.Values{
 		"params":       {pin},
@@ -90,10 +99,12 @@ func (s *SparkCoreAdaptor) DigitalRead(pin string) int {
 	return -1
 }
 
+// setAPIServer sets spark cloud api server, this can be used to change from default api.spark.io
 func (s *SparkCoreAdaptor) setAPIServer(server string) {
 	s.APIServer = server
 }
 
+// deviceURL constructs device url to make requests from spark cloud api
 func (s *SparkCoreAdaptor) deviceURL() string {
 	if len(s.APIServer) <= 0 {
 		s.setAPIServer("https://api.spark.io")
@@ -101,6 +112,7 @@ func (s *SparkCoreAdaptor) deviceURL() string {
 	return fmt.Sprintf("%v/v1/devices/%v", s.APIServer, s.DeviceID)
 }
 
+// pinLevel converts byte level to string expected in api
 func (s *SparkCoreAdaptor) pinLevel(level byte) string {
 	if level == 1 {
 		return "HIGH"
@@ -108,6 +120,8 @@ func (s *SparkCoreAdaptor) pinLevel(level byte) string {
 	return "LOW"
 }
 
+// postToSpark makes POST request to spark cloud server, return err != nil if there is
+// any issue with the request.
 func (s *SparkCoreAdaptor) postToSpark(url string, params url.Values) (m map[string]interface{}, err error) {
 	resp, err := http.PostForm(url, params)
 	if err != nil {
