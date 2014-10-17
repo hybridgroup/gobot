@@ -16,6 +16,8 @@ type FirmataAdaptor struct {
 	connect    func(*FirmataAdaptor)
 }
 
+// NewFirmataAdaptor returns a new firmata adaptor with specified name
+// Generates a connect function that opens serial communication in specified port
 func NewFirmataAdaptor(name, port string) *FirmataAdaptor {
 	return &FirmataAdaptor{
 		Adaptor: *gobot.NewAdaptor(
@@ -33,6 +35,7 @@ func NewFirmataAdaptor(name, port string) *FirmataAdaptor {
 	}
 }
 
+// Connect returns true if connection to board is succesfull
 func (f *FirmataAdaptor) Connect() bool {
 	f.connect(f)
 	f.board.connect()
@@ -40,6 +43,8 @@ func (f *FirmataAdaptor) Connect() bool {
 	return true
 }
 
+// close finishes connection to serial port
+// Prints error message on error
 func (f *FirmataAdaptor) Disconnect() bool {
 	err := f.board.serial.Close()
 	if err != nil {
@@ -47,9 +52,14 @@ func (f *FirmataAdaptor) Disconnect() bool {
 	}
 	return true
 }
+
+// Finalize disconnects firmata adaptor
 func (f *FirmataAdaptor) Finalize() bool { return f.Disconnect() }
 
+// InitServo (not yet implemented)
 func (f *FirmataAdaptor) InitServo() {}
+
+// ServoWrite sets angle form 0 to 360 to specified servo pin
 func (f *FirmataAdaptor) ServoWrite(pin string, angle byte) {
 	p, _ := strconv.Atoi(pin)
 
@@ -57,6 +67,7 @@ func (f *FirmataAdaptor) ServoWrite(pin string, angle byte) {
 	f.board.analogWrite(byte(p), angle)
 }
 
+// PwmWrite writes analog value to specified pin
 func (f *FirmataAdaptor) PwmWrite(pin string, level byte) {
 	p, _ := strconv.Atoi(pin)
 
@@ -64,6 +75,7 @@ func (f *FirmataAdaptor) PwmWrite(pin string, level byte) {
 	f.board.analogWrite(byte(p), level)
 }
 
+// DigitalWrite writes digital values to specified pin
 func (f *FirmataAdaptor) DigitalWrite(pin string, level byte) {
 	p, _ := strconv.Atoi(pin)
 
@@ -71,6 +83,8 @@ func (f *FirmataAdaptor) DigitalWrite(pin string, level byte) {
 	f.board.digitalWrite(byte(p), level)
 }
 
+// DigitalRead retrieves digital value from specified pin
+// Returns -1 if response from board is timed out
 func (f *FirmataAdaptor) DigitalRead(pin string) int {
 	ret := make(chan int)
 
@@ -91,6 +105,7 @@ func (f *FirmataAdaptor) DigitalRead(pin string) int {
 	return -1
 }
 
+// AnalogRead retrieves value from analog pin.
 // NOTE pins are numbered A0-A5, which translate to digital pins 14-19
 func (f *FirmataAdaptor) AnalogRead(pin string) int {
 	ret := make(chan int)
@@ -114,19 +129,24 @@ func (f *FirmataAdaptor) AnalogRead(pin string) int {
 	return -1
 }
 
+// AnalogWrite writes value to ananlog pin
 func (f *FirmataAdaptor) AnalogWrite(pin string, level byte) {
 	f.PwmWrite(pin, level)
 }
 
+// digitalPin converts pin number to digital mapping
 func (f *FirmataAdaptor) digitalPin(pin int) int {
 	return pin + 14
 }
 
+// I2cStart initializes board with i2c configuration
 func (f *FirmataAdaptor) I2cStart(address byte) {
 	f.i2cAddress = address
 	f.board.i2cConfig([]byte{0})
 }
 
+// I2cRead reads from I2c specified size
+// Returns empty byte array if response is timed out
 func (f *FirmataAdaptor) I2cRead(size uint) []byte {
 	ret := make(chan []byte)
 	f.board.i2cReadRequest(f.i2cAddress, size)
@@ -145,6 +165,7 @@ func (f *FirmataAdaptor) I2cRead(size uint) []byte {
 	return []byte{}
 }
 
+// I2cWrite retrieves i2c data
 func (f *FirmataAdaptor) I2cWrite(data []byte) {
 	f.board.i2cWriteRequest(f.i2cAddress, data)
 }
