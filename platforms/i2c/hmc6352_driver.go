@@ -9,6 +9,7 @@ type HMC6352Driver struct {
 	Heading uint16
 }
 
+// NewHMC6352Driver creates a new driver with specified name and i2c interface
 func NewHMC6352Driver(a I2cInterface, name string) *HMC6352Driver {
 	return &HMC6352Driver{
 		Driver: *gobot.NewDriver(
@@ -19,10 +20,13 @@ func NewHMC6352Driver(a I2cInterface, name string) *HMC6352Driver {
 	}
 }
 
+// adaptor returns HMC6352 adaptor
 func (h *HMC6352Driver) adaptor() I2cInterface {
 	return h.Adaptor().(I2cInterface)
 }
 
+// Start writes initialization bytes and reads from adaptor
+// using specified interval to update Heading
 func (h *HMC6352Driver) Start() bool {
 	h.adaptor().I2cStart(0x21)
 	h.adaptor().I2cWrite([]byte("A"))
@@ -37,5 +41,8 @@ func (h *HMC6352Driver) Start() bool {
 	return true
 }
 
+// Init returns true if device is initialized correctly
 func (h *HMC6352Driver) Init() bool { return true }
+
+// Halt returns true if devices is halted successfully
 func (h *HMC6352Driver) Halt() bool { return true }
