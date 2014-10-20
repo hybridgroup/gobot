@@ -16,6 +16,9 @@ type JoystickAdaptor struct {
 	connect  func(*JoystickAdaptor)
 }
 
+// NewJoysctickAdaptor creates a new adaptor with specified name.
+// It creates a connect function to joystick in position 0
+// or panics if no joystick can be found
 func NewJoystickAdaptor(name string) *JoystickAdaptor {
 	return &JoystickAdaptor{
 		Adaptor: *gobot.NewAdaptor(
@@ -33,11 +36,13 @@ func NewJoystickAdaptor(name string) *JoystickAdaptor {
 	}
 }
 
+// Connect returns true if connection to device is succesfull
 func (j *JoystickAdaptor) Connect() bool {
 	j.connect(j)
 	return true
 }
 
+// Finalize closes connection to device
 func (j *JoystickAdaptor) Finalize() bool {
 	j.joystick.Close()
 	return true

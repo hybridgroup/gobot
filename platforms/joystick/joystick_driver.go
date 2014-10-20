@@ -16,17 +16,20 @@ type JoystickDriver struct {
 	poll   func() sdl.Event
 }
 
+// pair is a JSON representation of name and id
 type pair struct {
 	Name string `json:"name"`
 	ID   int    `json:"id"`
 }
 
+// hat is a JSON representation of hat, name and id
 type hat struct {
 	Hat  int    `json:"hat"`
 	Name string `json:"name"`
 	ID   int    `json:"id"`
 }
 
+// joystickConfig is a JSON representation of configuration values
 type joystickConfig struct {
 	Name    string `json:"name"`
 	Guid    string `json:"guid"`
@@ -35,6 +38,11 @@ type joystickConfig struct {
 	Hats    []hat  `json:"Hats"`
 }
 
+// NewJoystickDriver creates a joyscript driver by name.
+//
+// It adds the following events:
+//     (button)_press - triggered when (button) is pressed
+//     (button)_release - triggered when (button) is released
 func NewJoystickDriver(a *JoystickAdaptor, name string, config string) *JoystickDriver {
 	d := &JoystickDriver{
 		Driver: *gobot.NewDriver(
@@ -67,10 +75,12 @@ func NewJoystickDriver(a *JoystickAdaptor, name string, config string) *Joystick
 	return d
 }
 
+// adaptor returns joystick adaptor
 func (j *JoystickDriver) adaptor() *JoystickAdaptor {
 	return j.Adaptor().(*JoystickAdaptor)
 }
 
+// Start initiallizes event polling with defined interval
 func (j *JoystickDriver) Start() bool {
 	gobot.Every(j.Interval(), func() {
 		event := j.poll()
@@ -81,6 +91,7 @@ func (j *JoystickDriver) Start() bool {
 	return true
 }
 
+// HandleEvent publishes an specific event according to data received
 func (j *JoystickDriver) handleEvent(event sdl.Event) error {
 	switch data := event.(type) {
 	case *sdl.JoyAxisEvent:
@@ -124,6 +135,7 @@ func (j *JoystickDriver) handleEvent(event sdl.Event) error {
 	return nil
 }
 
+// Halt stops joystick driver
 func (j *JoystickDriver) Halt() bool { return true }
 
 func (j *JoystickDriver) findName(id uint8, list []pair) string {
@@ -135,10 +147,11 @@ func (j *JoystickDriver) findName(id uint8, list []pair) string {
 	return ""
 }
 
+// findHatName returns name from hat found by id in provided list
 func (j *JoystickDriver) findHatName(id uint8, hat uint8, list []hat) string {
-	for _, value := range list {
-		if int(id) == value.ID && int(hat) == value.Hat {
-			return value.Name
+	for _, lHat := range list {
+		if int(id) == lHat.ID && int(hat) == lHat.Hat {
+			return lHat.Name
 		}
 	}
 	return ""
