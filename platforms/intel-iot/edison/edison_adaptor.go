@@ -143,6 +143,7 @@ var sysfsPinMap = map[string]sysfsPin{
 	},
 }
 
+// writeFile validates file existence and writes data into it
 func writeFile(name, data string) error {
 	if _, err := os.Stat(name); err == nil {
 		err := ioutil.WriteFile(
@@ -159,6 +160,7 @@ func writeFile(name, data string) error {
 	return nil
 }
 
+// changePinMode writes pin mode to current_pinmux file
 func changePinMode(pin, mode string) {
 	err := writeFile(
 		"/sys/kernel/debug/gpio_debug/gpio"+pin+"/current_pinmux",
@@ -169,6 +171,8 @@ func changePinMode(pin, mode string) {
 	}
 }
 
+// NewEditionAdaptor creates a EdisonAdaptor with specified name and
+// creates connect function
 func NewEdisonAdaptor(name string) *EdisonAdaptor {
 	return &EdisonAdaptor{
 		Adaptor: *gobot.NewAdaptor(
@@ -207,6 +211,8 @@ func NewEdisonAdaptor(name string) *EdisonAdaptor {
 	}
 }
 
+// Connect starts conection with board and creates
+// digitalPins and pwmPins adaptor maps
 func (e *EdisonAdaptor) Connect() bool {
 	e.digitalPins = make(map[int]*digitalPin)
 	e.pwmPins = make(map[int]*pwmPin)
@@ -214,6 +220,7 @@ func (e *EdisonAdaptor) Connect() bool {
 	return true
 }
 
+// Finalize closes connection to board and pins
 func (e *EdisonAdaptor) Finalize() bool {
 	e.tristate.close()
 	for _, pin := range e.digitalPins {
@@ -231,9 +238,14 @@ func (e *EdisonAdaptor) Finalize() bool {
 	}
 	return true
 }
-func (e *EdisonAdaptor) Reconnect() bool  { return true }
+
+// Reconnect retries connection to edison board
+func (e *EdisonAdaptor) Reconnect() bool { return true }
+
+// Disconnect returns true if connection to edison board is finished successfully
 func (e *EdisonAdaptor) Disconnect() bool { return true }
 
+// digitalPin returns matched digitalPin for specified values
 func (e *EdisonAdaptor) digitalPin(pin string, dir string) *digitalPin {
 	i := sysfsPinMap[pin]
 	if e.digitalPins[i.pin] == nil {
@@ -264,14 +276,17 @@ func (e *EdisonAdaptor) digitalPin(pin string, dir string) *digitalPin {
 	return e.digitalPins[i.pin]
 }
 
+// DigitalRead reads digital value from pin
 func (e *EdisonAdaptor) DigitalRead(pin string) int {
 	return e.digitalPin(pin, "in").digitalRead()
 }
 
+// DigitalWrite writes digital value to specified pin
 func (e *EdisonAdaptor) DigitalWrite(pin string, val byte) {
 	e.digitalPin(pin, "out").digitalWrite(strconv.Itoa(int(val)))
 }
 
+// PwmWrite writes scaled pwm value to specified pin
 func (e *EdisonAdaptor) PwmWrite(pin string, val byte) {
 	sysPin := sysfsPinMap[pin]
 	if sysPin.pwmPin != -1 {
@@ -291,6 +306,7 @@ func (e *EdisonAdaptor) PwmWrite(pin string, val byte) {
 	}
 }
 
+// AnalogRead returns value from analog reading of specified pin
 func (e *EdisonAdaptor) AnalogRead(pin string) int {
 	buf, err := ioutil.ReadFile(
 		"/sys/bus/iio/devices/iio:device1/in_voltage" + pin + "_raw",
@@ -305,6 +321,7 @@ func (e *EdisonAdaptor) AnalogRead(pin string) int {
 	return val
 }
 
+// I2cStart initializes i2c device for addresss
 func (e *EdisonAdaptor) I2cStart(address byte) {
 	e.tristate.digitalWrite("0")
 
@@ -331,10 +348,12 @@ func (e *EdisonAdaptor) I2cStart(address byte) {
 	e.i2cDevice.start()
 }
 
+// I2cWrite writes data to i2cDevice
 func (e *EdisonAdaptor) I2cWrite(data []byte) {
 	e.i2cDevice.write(data)
 }
 
+// I2cRead reads data from i2cDevice
 func (e *EdisonAdaptor) I2cRead(size uint) []byte {
 	return e.i2cDevice.read(size)
 }

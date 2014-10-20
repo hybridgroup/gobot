@@ -14,6 +14,7 @@ type i2cDevice struct {
 	i2cLocation string
 }
 
+/// newI2cDevice creates a new i2c device for address
 func newI2cDevice(address byte) *i2cDevice {
 	return &i2cDevice{
 		i2cLocation: I2CLocation,
@@ -21,6 +22,8 @@ func newI2cDevice(address byte) *i2cDevice {
 	}
 }
 
+// start initializes i2c device.
+// Panics on error.
 func (i *i2cDevice) start() {
 	var err error
 	i.file, err = os.OpenFile(i.i2cLocation, os.O_RDWR, os.ModeExclusive)
@@ -39,10 +42,12 @@ func (i *i2cDevice) start() {
 	i.write([]byte{0})
 }
 
+// write writes data to i2c file
 func (i *i2cDevice) write(data []byte) {
 	i.file.Write(data)
 }
 
+// read gets data from i2c file
 func (i *i2cDevice) read(len uint) []byte {
 	buf := make([]byte, len)
 	i.file.Read(buf)
