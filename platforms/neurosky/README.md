@@ -41,7 +41,7 @@ You should be able to pair your Mindwave using your normal system tray applet fo
 ## Examples
 
 ```go
-
+package main
 
 import (
 	"fmt"
