@@ -10,6 +10,8 @@ type Event struct {
 	Callbacks []callback
 }
 
+// NewEvent generates a new event by making a channel
+// and start reading from it
 func NewEvent() *Event {
 	e := &Event{
 		Chan:      make(chan interface{}, 1),
@@ -23,6 +25,7 @@ func NewEvent() *Event {
 	return e
 }
 
+// Writes sends event data to channel
 func (e *Event) Write(data interface{}) {
 	select {
 	case e.Chan <- data:
@@ -30,6 +33,8 @@ func (e *Event) Write(data interface{}) {
 	}
 }
 
+// Read waits data from channel and execute callbacks
+// for each event when received
 func (e *Event) Read() {
 	for s := range e.Chan {
 		tmp := []callback{}
