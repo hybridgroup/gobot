@@ -5,6 +5,7 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
+// drone defines expected drone behaviour
 type drone interface {
 	Takeoff() bool
 	Land()
@@ -25,6 +26,7 @@ type ArdroneAdaptor struct {
 	connect func(*ArdroneAdaptor)
 }
 
+// NewArdroneAdaptor creates a new ardrone and connects with default configuration
 func NewArdroneAdaptor(name string) *ArdroneAdaptor {
 	return &ArdroneAdaptor{
 		Adaptor: *gobot.NewAdaptor(
@@ -41,11 +43,13 @@ func NewArdroneAdaptor(name string) *ArdroneAdaptor {
 	}
 }
 
+// Connect returns true when connection to ardrone is established correclty
 func (a *ArdroneAdaptor) Connect() bool {
 	a.connect(a)
 	return true
 }
 
+// Finalize returns true when connection is finalized correctly
 func (a *ArdroneAdaptor) Finalize() bool {
 	return true
 }
