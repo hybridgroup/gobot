@@ -52,6 +52,7 @@ type InteractionBox struct {
 	Size   []float64 `json:"size"`
 }
 
+// Base representation returned that holds every other objects
 type Frame struct {
 	CurrentFrameRate float64        `json:"currentFrameRate"`
 	Gestures         []Gesture      `json:"gestures"`
@@ -65,22 +66,29 @@ type Frame struct {
 	Timestamp        int            `json:"timestamp"`
 }
 
+// X returns hand x value
 func (h *Hand) X() float64 {
 	return h.PalmPosition[0]
 }
+
+// Y returns hand y value
 func (h *Hand) Y() float64 {
 	return h.PalmPosition[1]
 }
+
+// Z returns hand z value
 func (h *Hand) Z() float64 {
 	return h.PalmPosition[2]
 }
 
+// ParseFrame converts json data to a Frame
 func (l *LeapMotionDriver) ParseFrame(data []byte) Frame {
 	var frame Frame
 	json.Unmarshal(data, &frame)
 	return frame
 }
 
+// isAFrame returns true if data contains a frame representation
 func (l *LeapMotionDriver) isAFrame(data []byte) bool {
 	match, _ := regexp.Match("currentFrameRate", data)
 	return match
