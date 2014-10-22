@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// DriverInterface defines Driver expected behaviour
 type DriverInterface interface {
 	Start() bool
 	Halt() bool
@@ -35,6 +36,8 @@ type Driver struct {
 	driverType string
 }
 
+// NewDriver returns a Driver with specified parameters
+// and sets driver pin, adaptor and interval
 func NewDriver(name string, driverType string, v ...interface{}) *Driver {
 	if name == "" {
 		name = fmt.Sprintf("%X", Rand(int(^uint(0)>>1)))
@@ -64,42 +67,52 @@ func NewDriver(name string, driverType string, v ...interface{}) *Driver {
 	return d
 }
 
+// Adaptor returns driver adaptor
 func (d *Driver) Adaptor() AdaptorInterface {
 	return d.adaptor
 }
 
+// SetInterval defines driver interval duration.
 func (d *Driver) SetInterval(t time.Duration) {
 	d.interval = t
 }
 
+// Interval current driver interval duration
 func (d *Driver) Interval() time.Duration {
 	return d.interval
 }
 
+// SetName sets driver name.
 func (d *Driver) SetName(s string) {
 	d.name = s
 }
 
+// Name returns driver name.
 func (d *Driver) Name() string {
 	return d.name
 }
 
+// Pin returns driver pin
 func (d *Driver) Pin() string {
 	return d.pin
 }
 
+// SetPin defines driver pin
 func (d *Driver) SetPin(pin string) {
 	d.pin = pin
 }
 
+// Type returns driver type
 func (d *Driver) Type() string {
 	return d.driverType
 }
 
+// Events returns driver events map
 func (d *Driver) Events() map[string]*Event {
 	return d.events
 }
 
+// Event returns an event by name if exists
 func (d *Driver) Event(name string) *Event {
 	e, ok := d.events[name]
 	if ok {
@@ -109,22 +122,27 @@ func (d *Driver) Event(name string) *Event {
 	}
 }
 
+// AddEvents adds a new event by name
 func (d *Driver) AddEvent(name string) {
 	d.events[name] = NewEvent()
 }
 
+// Command retrieves a command by name
 func (d *Driver) Command(name string) func(map[string]interface{}) interface{} {
 	return d.commands[name]
 }
 
+// Commands returns a map of driver commands
 func (d *Driver) Commands() map[string]func(map[string]interface{}) interface{} {
 	return d.commands
 }
 
+// AddCommand links specified command name to `f`
 func (d *Driver) AddCommand(name string, f func(map[string]interface{}) interface{}) {
 	d.commands[name] = f
 }
 
+// ToJSON returns JSON Driver represnentation including adaptor and commands
 func (d *Driver) ToJSON() *JSONDevice {
 	jsonDevice := &JSONDevice{
 		Name:       d.Name(),
