@@ -69,6 +69,10 @@ type pin struct {
 	analogChannel  byte
 }
 
+// newBoard creates a new board connected in specified serial port.
+// Adds following events: "firmware_query", "capability_query",
+// "analog_mapping_query", "report_version", "i2c_reply",
+// "string_data", "firmware_query"
 func newBoard(sp io.ReadWriteCloser) *board {
 	board := &board{
 		majorVersion:     0,
@@ -88,7 +92,6 @@ func newBoard(sp io.ReadWriteCloser) *board {
 		"analog_mapping_query",
 		"report_version",
 		"i2c_reply",
-		"analog_mapping_query",
 		"string_data",
 		"firmware_query",
 	} {
@@ -98,6 +101,8 @@ func newBoard(sp io.ReadWriteCloser) *board {
 	return board
 }
 
+// connect starts connection to board.
+// Queries report version until connected
 func (b *board) connect() {
 	if b.connected == false {
 		b.reset()
@@ -114,6 +119,8 @@ func (b *board) connect() {
 	}
 }
 
+// initBoard initializes board by listening for "firware_query", "capability_query"
+// and "analog_mapping_query" events
 func (b *board) initBoard() {
 	gobot.Once(b.events["firmware_query"], func(data interface{}) {
 		b.queryCapabilities()
@@ -130,19 +137,23 @@ func (b *board) initBoard() {
 	})
 }
 
+// readAndProcess reads from serial port and parses data.
 func (b *board) readAndProcess() {
 	b.process(b.read())
 }
 
+// reset writes system reset bytes.
 func (b *board) reset() {
 	b.write([]byte{systemReset})
 }
 
+// setPinMode writes pin mode bytes for specified pin.
 func (b *board) setPinMode(pin byte, mode byte) {
 	b.pins[pin].mode = mode
 	b.write([]byte{pinMode, pin, mode})
 }
 
+// digitalWrite is used to send a digital value to a specified pin.
 func (b *board) digitalWrite(pin byte, value byte) {
 	port := byte(math.Floor(float64(pin) / 8))
 	portValue := byte(0)
@@ -157,48 +168,54 @@ func (b *board) digitalWrite(pin byte, value byte) {
 	b.write([]byte{digitalMessage | port, portValue & 0x7F, (portValue >> 7) & 0x7F})
 }
 
+// analogWrite writes value to specified pin
 func (b *board) analogWrite(pin byte, value byte) {
 	b.pins[pin].value = int(value)
 	b.write([]byte{analogMessage | pin, value & 0x7F, (value >> 7) & 0x7F})
 }
 
+// version returns board version following MAYOR.minor convention.
 func (b *board) version() string {
 	return fmt.Sprintf("%v.%v", b.majorVersion, b.minorVersion)
 }
 
-func (b *board) reportVersion() {
-	b.write([]byte{reportVersion})
-}
-
+// queryFirmware writes bytes to query firmware from board.
 func (b *board) queryFirmware() {
 	b.write([]byte{startSysex, firmwareQuery, endSysex})
 }
 
+// queryPinState writes bytes to retrieve pin state
 func (b *board) queryPinState(pin byte) {
 	b.write([]byte{startSysex, pinStateQuery, pin, endSysex})
 }
 
+// queryReportVersion sends query for report version
 func (b *board) queryReportVersion() {
 	b.write([]byte{reportVersion})
 }
 
+// queryCapabilities is used to retrieve board capabilities.
 func (b *board) queryCapabilities() {
 	b.write([]byte{startSysex, capabilityQuery, endSysex})
 }
 
+// queryAnalogMapping returns analog mapping for board.
 func (b *board) queryAnalogMapping() {
 	b.write([]byte{startSysex, analogMappingQuery, endSysex})
 }
 
+// togglePinReporting is used to change pin reporting mode.
 func (b *board) togglePinReporting(pin byte, state byte, mode byte) {
 	b.write([]byte{mode | pin, state})
 }
 
+// i2cReadRequest reads from slaveAddress.
 func (b *board) i2cReadRequest(slaveAddress byte, numBytes uint) {
 	b.write([]byte{startSysex, i2CRequest, slaveAddress, (i2CModeRead << 3),
 		byte(numBytes & 0x7F), byte(((numBytes >> 7) & 0x7F)), endSysex})
 }
 
+// i2cWriteRequest writes to slaveAddress.
 func (b *board) i2cWriteRequest(slaveAddress byte, data []byte) {
 	ret := []byte{startSysex, i2CRequest, slaveAddress, (i2CModeWrite << 3)}
 	for _, val := range data {
@@ -209,6 +226,7 @@ func (b *board) i2cWriteRequest(slaveAddress byte, data []byte) {
 	b.write(ret)
 }
 
+// i2xConfig returns i2c configuration.
 func (b *board) i2cConfig(data []byte) {
 	ret := []byte{startSysex, i2CConfig}
 	for _, val := range data {
@@ -219,16 +237,24 @@ func (b *board) i2cConfig(data []byte) {
 	b.write(ret)
 }
 
+// write is used to send commands to serial port
 func (b *board) write(commands []byte) {
 	b.serial.Write(commands[:])
 }
 
+// read returns buffer reading from serial port (1024 bytes)
 func (b *board) read() []byte {
 	buf := make([]byte, 1024)
 	b.serial.Read(buf)
 	return buf
 }
 
+// process uses incoming data and executes actions depending on what is received.
+// The following messages are processed: reportVersion, AnalogMessageRangeStart,
+// digitalMessageRangeStart.
+// And the following responses: capability, analog mapping, pin state,
+// i2c, firmwareQuery, string data.
+// If neither of those messages is received, then data is treated as "bad_byte"
 func (b *board) process(data []byte) {
 	buf := bytes.NewBuffer(data)
 	for {

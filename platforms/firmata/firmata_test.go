@@ -31,7 +31,7 @@ func initTestFirmata() *board {
 func TestReportVersion(t *testing.T) {
 	b := initTestFirmata()
 	//test if functions executes
-	b.reportVersion()
+	b.queryReportVersion()
 }
 
 func TestQueryFirmware(t *testing.T) {
