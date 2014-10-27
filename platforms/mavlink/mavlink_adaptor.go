@@ -13,6 +13,7 @@ type MavlinkAdaptor struct {
 	connect func(*MavlinkAdaptor)
 }
 
+// NewMavLinkAdaptor creates a new mavlink adaptor with specified name and port
 func NewMavlinkAdaptor(name string, port string) *MavlinkAdaptor {
 	return &MavlinkAdaptor{
 		Adaptor: *gobot.NewAdaptor(
@@ -30,11 +31,13 @@ func NewMavlinkAdaptor(name string, port string) *MavlinkAdaptor {
 	}
 }
 
+// Connect returns true if connection to device is successful
 func (m *MavlinkAdaptor) Connect() bool {
 	m.connect(m)
 	return true
 }
 
+// Finalize returns true if connection to devices is closed successfully
 func (m *MavlinkAdaptor) Finalize() bool {
 	m.sp.Close()
 	return true

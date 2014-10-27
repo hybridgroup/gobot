@@ -15,6 +15,11 @@ type MavlinkDriver struct {
 type MavlinkInterface interface {
 }
 
+// NewMavlinkDriver creates a new mavlink driver with specified name.
+//
+// It add the following events:
+//	"packet" - triggered when a new packet is read
+//	"message" - triggered when a new valid message is processed
 func NewMavlinkDriver(a *MavlinkAdaptor, name string) *MavlinkDriver {
 	m := &MavlinkDriver{
 		Driver: *gobot.NewDriver(
@@ -30,10 +35,13 @@ func NewMavlinkDriver(a *MavlinkAdaptor, name string) *MavlinkDriver {
 	return m
 }
 
+// adaptor returns driver associated adaptor
 func (m *MavlinkDriver) adaptor() *MavlinkAdaptor {
 	return m.Driver.Adaptor().(*MavlinkAdaptor)
 }
 
+// Start begins process to read mavlink packets every m.Interval
+// and process them
 func (m *MavlinkDriver) Start() bool {
 	go func() {
 		for {
@@ -55,8 +63,10 @@ func (m *MavlinkDriver) Start() bool {
 	return true
 }
 
+// SendPacket sends a packet to mavlink device
 func (m *MavlinkDriver) SendPacket(packet *common.MAVLinkPacket) {
 	m.adaptor().sp.Write(packet.Pack())
 }
 
+// Halt returns true if device is halted successfully
 func (m *MavlinkDriver) Halt() bool { return true }
