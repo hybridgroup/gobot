@@ -10,6 +10,13 @@ type BlinkMDriver struct {
 	gobot.Driver
 }
 
+// NewBlinkMDriver creates a new BlinkMDriver with specified name.
+//
+// Adds the following API commands:
+//	Rgb - sets RGB color
+//	Fade - fades the RGB color
+//	FirmwareVersion - returns the version of the current Frimware
+//	Color - returns the color of the LED.
 func NewBlinkMDriver(a I2cInterface, name string) *BlinkMDriver {
 	b := &BlinkMDriver{
 		Driver: *gobot.NewDriver(
@@ -43,29 +50,38 @@ func NewBlinkMDriver(a I2cInterface, name string) *BlinkMDriver {
 	return b
 }
 
+// adaptor returns I2C adaptor
 func (b *BlinkMDriver) adaptor() I2cInterface {
 	return b.Adaptor().(I2cInterface)
 }
 
+// Start writes start bytes and resets color
 func (b *BlinkMDriver) Start() bool {
 	b.adaptor().I2cStart(0x09)
 	b.adaptor().I2cWrite([]byte("o"))
 	b.Rgb(0, 0, 0)
 	return true
 }
+
+// Init returns true if device is initialized correctly
 func (b *BlinkMDriver) Init() bool { return true }
+
+// Halt returns true if device is halted successfully
 func (b *BlinkMDriver) Halt() bool { return true }
 
+// Rgb sets color using r,g,b params
 func (b *BlinkMDriver) Rgb(red byte, green byte, blue byte) {
 	b.adaptor().I2cWrite([]byte("n"))
 	b.adaptor().I2cWrite([]byte{red, green, blue})
 }
 
+// Fade removes color using r,g,b params
 func (b *BlinkMDriver) Fade(red byte, green byte, blue byte) {
 	b.adaptor().I2cWrite([]byte("c"))
 	b.adaptor().I2cWrite([]byte{red, green, blue})
 }
 
+// FirmwareVersion returns version with MAYOR.minor format
 func (b *BlinkMDriver) FirmwareVersion() string {
 	b.adaptor().I2cWrite([]byte("Z"))
 	data := b.adaptor().I2cRead(2)
@@ -75,6 +91,7 @@ func (b *BlinkMDriver) FirmwareVersion() string {
 	return fmt.Sprintf("%v.%v", data[0], data[1])
 }
 
+// Color returns an array with current rgb color
 func (b *BlinkMDriver) Color() []byte {
 	b.adaptor().I2cWrite([]byte("g"))
 	data := b.adaptor().I2cRead(3)
