@@ -12,6 +12,8 @@ type CameraDriver struct {
 	start  func(*CameraDriver)
 }
 
+// NewCameraDriver creates a new driver with specified name and source.
+// It also creates a start function to either set camera as a File or Camera capture.
 func NewCameraDriver(name string, source interface{}) *CameraDriver {
 	c := &CameraDriver{
 		Driver: *gobot.NewDriver(
@@ -36,6 +38,8 @@ func NewCameraDriver(name string, source interface{}) *CameraDriver {
 	return c
 }
 
+// Start initializes camera by grabbing a frame
+// every `interval` and publishing an frame event
 func (c *CameraDriver) Start() bool {
 	c.start(c)
 	gobot.Every(c.Interval(), func() {
@@ -49,4 +53,5 @@ func (c *CameraDriver) Start() bool {
 	return true
 }
 
+// Halt stops camera driver
 func (c *CameraDriver) Halt() bool { return true }
