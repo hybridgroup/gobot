@@ -11,15 +11,15 @@ It publishes an event.
 
 #### API Command
 
-**PublishEventC**
+**publish_event**
 
 ## PendingMessage()
 
-It returns messages to be sent as notifications to pebble (Not recommended to be used directly)
+It returns messages to be sent as notifications to pebble (Not intented to be used directly)
 
 #### API Command
 
-**PendingMessageC**
+**pending_message**
 
 ## SendNotification(message string)
 
@@ -31,4 +31,4 @@ Sends notification to watch.
 
 #### API Command
 
-**SendNotification**
+**send_notification**

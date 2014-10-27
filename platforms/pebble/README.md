@@ -4,25 +4,21 @@ Gobot (http://gobot.io/) is a library for robotics and physical computing using 
 
 This repository contains the Gobot adaptor for Pebble smart watch (http://getpebble.com/).
 
-It uses the Pebble 2.0 SDK, and requires the 2.0 iOS or Android app,
-and that the "watchbot" app (https://github.com/hybridgroup/watchbot)
-has been installed on the Pebble watch.
 
-For more information about Gobot, check out the github repo at
-https://github.com/hybridgroup/gobot
-
+It requires the 2.x iOS or Android app, and "watchbot" app (https://github.com/hybridgroup/watchbot)
 
 ## Installing
 
-* Install running: ```go get github.com/hybridgroup/gobot-pebble``
+* Install running:
+```
+go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/pebble
+```
 * Install Pebble 2.0 iOS or Android app. (If you haven't already)
 * Follow README to install and configure "watchbot" on your watch: https://github.com/hybridgroup/watchbot
 
 ## Using
 
-* Before running the example, make sure configuration settings match with your program,
-in example, api host is your computer IP, robot name is 'pebble', robot api port is 8080 and publish command is PublishEventC and
-message command is PendingMessageC
+* Before running the example, make sure configuration settings match with your program. In the example, api host is your computer IP, robot name is 'pebble' and robot api port is 8080
 
 ```go
 package main
