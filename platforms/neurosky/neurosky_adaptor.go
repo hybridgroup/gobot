@@ -13,6 +13,7 @@ type NeuroskyAdaptor struct {
 	connect func(*NeuroskyAdaptor)
 }
 
+// NewNeuroskyAdaptor creates a neurosky adaptor with specified name
 func NewNeuroskyAdaptor(name string, port string) *NeuroskyAdaptor {
 	return &NeuroskyAdaptor{
 		Adaptor: *gobot.NewAdaptor(
@@ -30,12 +31,14 @@ func NewNeuroskyAdaptor(name string, port string) *NeuroskyAdaptor {
 	}
 }
 
+// Connect returns true if connection to device is successful
 func (n *NeuroskyAdaptor) Connect() bool {
 	n.connect(n)
 	n.SetConnected(true)
 	return true
 }
 
+// Finalize returns true if device finalization is successful
 func (n *NeuroskyAdaptor) Finalize() bool {
 	n.sp.Close()
 	n.SetConnected(false)
