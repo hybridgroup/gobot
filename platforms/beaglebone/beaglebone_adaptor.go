@@ -3,12 +3,13 @@ package beaglebone
 import (
 	"bufio"
 	"fmt"
-	"github.com/hybridgroup/gobot"
 	"log"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
+
+	"github.com/hybridgroup/gobot"
 )
 
 const (
@@ -85,6 +86,7 @@ var pins = map[string]int{
 	"P9_30": 112,
 	"P9_31": 110,
 }
+
 var pwmPins = map[string]string{
 	"P9_14": "P9_14",
 	"P9_21": "P9_21",
@@ -96,6 +98,7 @@ var pwmPins = map[string]string{
 	"P8_45": "P8_45",
 	"P8_46": "P8_46",
 }
+
 var analogPins = map[string]string{
 	"P9_39": "AIN0",
 	"P9_40": "AIN1",
@@ -115,6 +118,7 @@ type BeagleboneAdaptor struct {
 	connect     func()
 }
 
+// NewBeagleboneAdaptor returns a new beaglebone adaptor with specified name
 func NewBeagleboneAdaptor(name string) *BeagleboneAdaptor {
 	return &BeagleboneAdaptor{
 		Adaptor: *gobot.NewAdaptor(
@@ -128,6 +132,8 @@ func NewBeagleboneAdaptor(name string) *BeagleboneAdaptor {
 	}
 }
 
+// Connect returns true on a succesful connection to beaglebone board.
+// It initializes digital, pwm and analog pins
 func (b *BeagleboneAdaptor) Connect() bool {
 	b.digitalPins = make([]*digitalPin, 120)
 	b.pwmPins = make(map[string]*pwmPin)
@@ -136,6 +142,7 @@ func (b *BeagleboneAdaptor) Connect() bool {
 	return true
 }
 
+// Finalize returns true when board connection is finalized correctly.
 func (b *BeagleboneAdaptor) Finalize() bool {
 	for _, pin := range b.pwmPins {
 		if pin != nil {
@@ -152,14 +159,22 @@ func (b *BeagleboneAdaptor) Finalize() bool {
 	}
 	return true
 }
-func (b *BeagleboneAdaptor) Reconnect() bool  { return true }
+
+// Reconnect returns true if connection is stablished succesfully
+func (b *BeagleboneAdaptor) Reconnect() bool { return true }
+
+// Disconnect returns true if connection is closed succesfully
 func (b *BeagleboneAdaptor) Disconnect() bool { return true }
 
+// PwmWrite writes value in specified pin
 func (b *BeagleboneAdaptor) PwmWrite(pin string, val byte) {
 	b.pwmWrite(pin, val)
 }
 
+// InitServo starts servo (not yet implemented)
 func (b *BeagleboneAdaptor) InitServo() {}
+
+// ServoWrite writes scaled value to servo in specified pin
 func (b *BeagleboneAdaptor) ServoWrite(pin string, val byte) {
 	i := b.pwmPin(pin)
 	period := 20000000.0
@@ -167,11 +182,14 @@ func (b *BeagleboneAdaptor) ServoWrite(pin string, val byte) {
 	b.pwmPins[i].pwmWrite(strconv.Itoa(int(period)), strconv.Itoa(int(period*duty)))
 }
 
+// DigitalRead returns a digital value from specified pin
 func (b *BeagleboneAdaptor) DigitalRead(pin string) int {
 	i := b.digitalPin(pin, "r")
 	return b.digitalPins[i].digitalRead()
 }
 
+// DigitalWrite writes a digital value to specified pin.
+// valid usr pin values are usr0, usr1, usr2 and usr3
 func (b *BeagleboneAdaptor) DigitalWrite(pin string, val byte) {
 	if strings.Contains(pin, "usr") {
 		fi, err := os.OpenFile(UsrLed+pin+"/brightness", os.O_WRONLY|os.O_APPEND, 0666)
@@ -186,28 +204,34 @@ func (b *BeagleboneAdaptor) DigitalWrite(pin string, val byte) {
 	}
 }
 
+// AnalogRead returns an analog value from specified pin
 func (b *BeagleboneAdaptor) AnalogRead(pin string) int {
 	i := b.analogPin(pin)
 	return b.analogPins[i].analogRead()
 }
 
+// AnalogWrite writes an analog value to specified pin
 func (b *BeagleboneAdaptor) AnalogWrite(pin string, val byte) {
 	b.pwmWrite(pin, val)
 }
 
+// I2cStart starts a i2c device in specified address
 func (b *BeagleboneAdaptor) I2cStart(address byte) {
 	b.i2cDevice = newI2cDevice(I2CLocation, address)
 	b.i2cDevice.start()
 }
 
+// I2CWrite writes data to i2c device
 func (b *BeagleboneAdaptor) I2cWrite(data []byte) {
 	b.i2cDevice.write(data)
 }
 
+// I2cRead returns value from i2c device using specified size
 func (b *BeagleboneAdaptor) I2cRead(size uint) []byte {
 	return b.i2cDevice.read(size)
 }
 
+// translatePin converts digital pin name to pin position
 func (b *BeagleboneAdaptor) translatePin(pin string) int {
 	for key, value := range pins {
 		if key == pin {
@@ -217,6 +241,7 @@ func (b *BeagleboneAdaptor) translatePin(pin string) int {
 	panic("Not a valid pin")
 }
 
+// translatePwmPin converts pwm pin name to pin position
 func (b *BeagleboneAdaptor) translatePwmPin(pin string) string {
 	for key, value := range pwmPins {
 		if key == pin {
@@ -226,6 +251,7 @@ func (b *BeagleboneAdaptor) translatePwmPin(pin string) string {
 	panic("Not a valid pin")
 }
 
+// translateAnalogPin converts analog pin name to pin position
 func (b *BeagleboneAdaptor) translateAnalogPin(pin string) string {
 	for key, value := range analogPins {
 		if key == pin {
@@ -235,6 +261,7 @@ func (b *BeagleboneAdaptor) translateAnalogPin(pin string) string {
 	panic("Not a valid pin")
 }
 
+// analogPin retrieves analog pin value by name
 func (b *BeagleboneAdaptor) analogPin(pin string) string {
 	i := b.translateAnalogPin(pin)
 	if b.analogPins[i] == nil {
@@ -243,6 +270,7 @@ func (b *BeagleboneAdaptor) analogPin(pin string) string {
 	return i
 }
 
+// digitalPin retrieves digital pin value by name
 func (b *BeagleboneAdaptor) digitalPin(pin string, mode string) int {
 	i := b.translatePin(pin)
 	if b.digitalPins[i] == nil || b.digitalPins[i].Mode != mode {
@@ -251,6 +279,7 @@ func (b *BeagleboneAdaptor) digitalPin(pin string, mode string) int {
 	return i
 }
 
+// pwPin retrieves pwm pin value by name
 func (b *BeagleboneAdaptor) pwmPin(pin string) string {
 	i := b.translatePwmPin(pin)
 	if b.pwmPins[i] == nil {
@@ -259,6 +288,7 @@ func (b *BeagleboneAdaptor) pwmPin(pin string) string {
 	return i
 }
 
+// pwmWrite writes pwm value to specified pin
 func (b *BeagleboneAdaptor) pwmWrite(pin string, val byte) {
 	i := b.pwmPin(pin)
 	period := 500000.0
