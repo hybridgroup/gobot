@@ -171,74 +171,74 @@ func NewAriettaAdaptor(name string) *AriettaAdaptor {
 	}
 }
 
-func (b *AriettaAdaptor) Connect() bool {
+func (a *AriettaAdaptor) Connect() bool {
 	return true
 }
 
-func (b *AriettaAdaptor) Finalize() bool {
-	for _, pin := range b.digitalPins {
+func (a *AriettaAdaptor) Finalize() bool {
+	for _, pin := range a.digitalPins {
 		pin.Finalize()
 	}
-	for _, pwm := range b.pwms {
+	for _, pwm := range a.pwms {
 		pwm.Finalize()
 	}
-	if b.i2cDevice != nil {
-		b.i2cDevice.finalize()
+	if a.i2cDevice != nil {
+		a.i2cDevice.finalize()
 	}
 	return true
 }
 
-func (b *AriettaAdaptor) Reconnect() bool  { return true }
-func (b *AriettaAdaptor) Disconnect() bool { return true }
+func (a *AriettaAdaptor) Reconnect() bool  { return true }
+func (a *AriettaAdaptor) Disconnect() bool { return true }
 
-func (b *AriettaAdaptor) PwmWrite(pin string, val byte) {
-	b.findPwm(pin).PwmWrite(val)
+func (a *AriettaAdaptor) PwmWrite(pin string, val byte) {
+	a.findPwm(pin).PwmWrite(val)
 }
 
-func (b *AriettaAdaptor) DigitalRead(pin string) int {
-	return b.findDigitalPin(pin).DigitalRead()
+func (a *AriettaAdaptor) DigitalRead(pin string) int {
+	return a.findDigitalPin(pin).DigitalRead()
 }
 
-func (b *AriettaAdaptor) DigitalWrite(pin string, val byte) {
-	b.findDigitalPin(pin).DigitalWrite(val)
+func (a *AriettaAdaptor) DigitalWrite(pin string, val byte) {
+	a.findDigitalPin(pin).DigitalWrite(val)
 }
 
 // TODO(michaelh): implement.  Stubbed out so the adapter implements
 // gpio.DigitalPin.
-func (b *AriettaAdaptor) AnalogRead(pin string) int {
+func (a *AriettaAdaptor) AnalogRead(pin string) int {
 	panic("Not implemented.")
 }
 
-func (b *AriettaAdaptor) AnalogWrite(pin string, val byte) {
+func (a *AriettaAdaptor) AnalogWrite(pin string, val byte) {
 	panic("Not implemented.")
 }
 
-func (b *AriettaAdaptor) InitServo() {
+func (a *AriettaAdaptor) InitServo() {
 	panic("Not implemented.")
 }
 
-func (b *AriettaAdaptor) ServoWrite(pin string, val byte) {
+func (a *AriettaAdaptor) ServoWrite(pin string, val byte) {
 	panic("Not implemented.")
 }
 
-func (b *AriettaAdaptor) I2cStart(address byte) {
-	if b.i2cDevice == nil {
-		b.i2cDevice = newI2cDevice(i2cLocation, address)
+func (a *AriettaAdaptor) I2cStart(address byte) {
+	if a.i2cDevice == nil {
+		a.i2cDevice = newI2cDevice(i2cLocation, address)
 	}
-	b.i2cDevice.start()
+	a.i2cDevice.start()
 }
 
-func (b *AriettaAdaptor) I2cWrite(data []byte) {
-	b.i2cDevice.write(data)
+func (a *AriettaAdaptor) I2cWrite(data []byte) {
+	a.i2cDevice.write(data)
 }
 
-func (b *AriettaAdaptor) I2cRead(size uint) []byte {
-	return b.i2cDevice.read(size)
+func (a *AriettaAdaptor) I2cRead(size uint) []byte {
+	return a.i2cDevice.read(size)
 }
 
 // TODO(michaelh): make multithread safe.  Pins are created lazily.
-func (b *AriettaAdaptor) findDigitalPin(pin string) *sysfsDigitalPin {
-	d, ok := b.digitalPins[pin]
+func (a *AriettaAdaptor) findDigitalPin(pin string) *sysfsDigitalPin {
+	d, ok := a.digitalPins[pin]
 
 	if ok {
 		return d
@@ -247,7 +247,7 @@ func (b *AriettaAdaptor) findDigitalPin(pin string) *sysfsDigitalPin {
 	for _, m := range digitalPins {
 		if m.name == pin {
 			d := newSysfsDigitalPin(&m)
-			b.digitalPins[pin] = d
+			a.digitalPins[pin] = d
 			return d
 		}
 	}
@@ -255,8 +255,8 @@ func (b *AriettaAdaptor) findDigitalPin(pin string) *sysfsDigitalPin {
 	panic(fmt.Sprintf("No such digital pin %v.", pin))
 }
 
-func (b *AriettaAdaptor) findPwm(pin string) *Pwm {
-	d, ok := b.pwms[pin]
+func (a *AriettaAdaptor) findPwm(pin string) *Pwm {
+	d, ok := a.pwms[pin]
 
 	if ok {
 		return d
@@ -265,7 +265,7 @@ func (b *AriettaAdaptor) findPwm(pin string) *Pwm {
 	for _, m := range pwms {
 		if m.name == pin {
 			d := newPwm(&m)
-			b.pwms[pin] = d
+			a.pwms[pin] = d
 			return d
 		}
 	}
