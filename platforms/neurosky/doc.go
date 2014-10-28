@@ -1,9 +1,9 @@
 /*
-This package contains the Gobot adaptor and driver for the Neurosky Mindwave Mobile EEG (http://store.neurosky.com/products/mindwave-mobile).
+Package neurosky contains the Gobot adaptor and driver for the Neurosky Mindwave Mobile EEG.
 
 Installing:
 
-	go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/neurosky
+	go get github.com/hybridgroup/gobot/platforms/neurosky
 
 Example:
 

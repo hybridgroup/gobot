@@ -1,9 +1,9 @@
 /*
-This package contains the Gobot adaptor and driver for the MAVlink Communication Protocol (http://qgroundcontrol.org/mavlink/start).
+Package mavlink contains the Gobot adaptor and driver for the MAVlink Communication Protocol.
 
 Installing:
 
-	go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/mavlink
+	go get github.com/hybridgroup/gobot/platforms/mavlink
 
 Example:
 

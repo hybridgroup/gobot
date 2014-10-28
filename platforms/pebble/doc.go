@@ -1,12 +1,12 @@
 /*
-This package contains the Gobot adaptor for Pebble smart watch (http://getpebble.com/).
+Package pebble contains the Gobot adaptor and driver for Pebble smart watch.
 
 Installing:
 
 It requires the 2.x iOS or Android app, and "watchbot" app (https://github.com/hybridgroup/watchbot)
 installed on Pebble watch. Then install running:
 
-	go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/pebble
+	go get github.com/hybridgroup/gobot/platforms/pebble
 
 Example:
 

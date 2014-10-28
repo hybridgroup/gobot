@@ -1,7 +1,8 @@
 // Copyright 2014 The Gobot Authors, HybridGroup. All rights reserved.
 
 /*
-Package gobot is the main point of entry in your Gobot application. A Gobot
+Package gobot provides a framework for robotics, physical computing and the internet of things.
+It is the main point of entry in your Gobot application. A Gobot
 is typically composed of one or more robots that makes up a project.
 
 Commands are a way to expose your robots functionality with the external world.

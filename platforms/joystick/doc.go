@@ -1,12 +1,12 @@
 /*
-This package provides the Gobot adaptor and drivers for the PS3 controller, Xbox 360 controller, or any other joysticks and game controllers that are compatible with Simple DirectMedia Layer (http://www.libsdl.org/).
+Package joystick provides the Gobot adaptor and drivers for game controllers that are compatible with SDL.
 
 Installing:
 
 This package requires `sdl2` to be installed on your system
 Then install package with:
 
-	go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/joystick
+	go get github.com/hybridgroup/gobot/platforms/joystick
 
 Example:
 

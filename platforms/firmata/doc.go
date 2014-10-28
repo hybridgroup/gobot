@@ -1,10 +1,9 @@
 /*
-
-This package provides the adaptor for microcontrollers such as Arduino that support the [Firmata](http://firmata.org/wiki/Main_Page) protocol
+Package firmata provides the Gobot adaptor for microcontrollers that support the Firmata protocol.
 
 Installing:
 
-	go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/firmata
+	go get github.com/hybridgroup/gobot/platforms/firmata
 
 ## Example
 

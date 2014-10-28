@@ -1,9 +1,9 @@
 /*
-This package provides the Gobot adaptor for the Beaglebone Black (http://beagleboard.org/Products/BeagleBone+Black/)
+Package beaglebone provides the Gobot adaptor for the Beaglebone Black.
 
 Installing:
 
-	go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/platforms/gobot/beaglebone
+	go get github.com/hybridgroup/platforms/gobot/beaglebone
 
 Example:
 

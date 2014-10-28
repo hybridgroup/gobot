@@ -1,10 +1,9 @@
 /*
-
-This package provides the Gobot adaptor and driver for the Sphero (http://www.gosphero.com/) robot from Orbotix .
+Package sphero provides the Gobot adaptor and driver for the Sphero.
 
 Installing:
 
-	go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/sphero
+	go get github.com/hybridgroup/gobot/platforms/sphero
 
 Example:
 

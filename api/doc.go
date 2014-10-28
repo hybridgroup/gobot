@@ -1,6 +1,5 @@
 /*
-Package api provides functionally to expose your gobot programs
-to other by using starting a web server and adding commands.
+Package api provides a webserver to interact with your Gobot program over the network.
 
 Example:
 

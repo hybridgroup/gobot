@@ -1,12 +1,12 @@
 /*
-This package provides the Gobot adaptor for the [Digispark](http://digistump.com/products/1) ATTiny-based USB development board with the [Little Wire](http://littlewire.cc/) protocol firmware installed.
+Package digispark provides the Gobot adaptor for the Digispark ATTiny-based USB development board.
 
 Installing:
 
 This package requires installing `libusb`.
 Then you can install the package with:
 
-	go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/digispark
+	go get github.com/hybridgroup/gobot/platforms/digispark
 
 Example:
 

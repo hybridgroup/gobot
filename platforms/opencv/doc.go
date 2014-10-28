@@ -1,5 +1,5 @@
 /*
-This repository contains the Gobot drivers for opencv.
+Packge opencv contains the Gobot drivers for opencv.
 
 Installing:
 

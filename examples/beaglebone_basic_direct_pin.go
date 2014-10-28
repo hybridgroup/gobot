@@ -1,4 +1,3 @@
-// Use Gobot to control BeagleBone's digital pins directly
 package main
 
 import (
@@ -8,8 +7,10 @@ import (
 
 func main() {
 
+	// Use Gobot to control BeagleBone's digital pins directly
+
 	beagleboneAdaptor := beaglebone.NewBeagleboneAdaptor("beaglebone")
-	gpioPin           := gpio.NewDirectPinDriver(beagleboneAdaptor, "myDevice", "P9_12")
+	gpioPin := gpio.NewDirectPinDriver(beagleboneAdaptor, "myDevice", "P9_12")
 
 	// Initialize the internal representation of the pinout
 	beagleboneAdaptor.Connect()

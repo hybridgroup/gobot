@@ -1,5 +1,5 @@
 /*
-This package provides the Gobot adaptor for the Spark Core (https://www.spark.io/)
+Package spark provides the Gobot adaptor for the Spark Core.
 
 Installing:
 
