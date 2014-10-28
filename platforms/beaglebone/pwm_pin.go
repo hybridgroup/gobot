@@ -12,6 +12,7 @@ type pwmPin struct {
 	pwmDevice string
 }
 
+// newPwmPin creates a new pwm pin with specified pin number
 func newPwmPin(pinNum string) *pwmPin {
 	var err error
 	var fi *os.File
@@ -60,6 +61,7 @@ func newPwmPin(pinNum string) *pwmPin {
 	return d
 }
 
+// pwmWrite writes to a pwm pin with specified period and duty
 func (p *pwmPin) pwmWrite(period string, duty string) {
 	var err error
 	var fi *os.File
@@ -79,6 +81,7 @@ func (p *pwmPin) pwmWrite(period string, duty string) {
 	fi.Close()
 }
 
+// releae writes string to close a pwm pin
 func (p *pwmPin) release() {
 	fi, err := os.OpenFile(fmt.Sprintf("%v/run", p.pwmDevice), os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
