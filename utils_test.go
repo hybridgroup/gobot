@@ -8,11 +8,18 @@ import (
 
 func TestEvery(t *testing.T) {
 	i := 0
+	begin := time.Now().UnixNano()
+	sem := make(chan int64, 1)
 	Every(2*time.Millisecond, func() {
 		i++
+		if i == 2 {
+			sem <- time.Now().UnixNano()
+		}
 	})
-	<-time.After(5 * time.Millisecond)
-	Assert(t, i, 2)
+	end := <-sem
+	if end-begin < 4000000 {
+		t.Error("Test should have taken at least 4 milliseconds")
+	}
 }
 
 func TestAfter(t *testing.T) {
