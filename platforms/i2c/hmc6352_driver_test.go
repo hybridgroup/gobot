@@ -1,9 +1,10 @@
 package i2c
 
 import (
-	"github.com/hybridgroup/gobot"
 	"testing"
 	"time"
+
+	"github.com/hybridgroup/gobot"
 )
 
 // --------- HELPERS
@@ -39,6 +40,7 @@ func TestNewHMC6352Driver(t *testing.T) {
 
 // Methods
 func TestHMC6352DriverStart(t *testing.T) {
+	sem := make(chan bool)
 	// when len(data) is 2
 	hmc, adaptor := initTestHMC6352DriverWithStubbedAdaptor()
 
@@ -54,9 +56,20 @@ func TestHMC6352DriverStart(t *testing.T) {
 
 	hmc.SetInterval(1 * time.Millisecond)
 	gobot.Assert(t, hmc.Start(), true)
-	<-time.After(time.Duration(numberOfCyclesForEvery) * time.Millisecond)
+	go func() {
+		for {
+			<-time.After(time.Duration(numberOfCyclesForEvery) * time.Millisecond)
+			if hmc.Heading == uint16(2534) {
+				sem <- true
+			}
+		}
+	}()
 
-	gobot.Assert(t, hmc.Heading, uint16(2534))
+	select {
+	case <-sem:
+	case <-time.After(100 * time.Millisecond):
+		t.Errorf("Heading not read correctly")
+	}
 
 	// when len(data) is not 2
 	hmc, adaptor = initTestHMC6352DriverWithStubbedAdaptor()
@@ -67,9 +80,20 @@ func TestHMC6352DriverStart(t *testing.T) {
 
 	hmc.SetInterval(1 * time.Millisecond)
 	gobot.Assert(t, hmc.Start(), true)
-	<-time.After(time.Duration(numberOfCyclesForEvery) * time.Millisecond)
+	go func() {
+		for {
+			<-time.After(time.Duration(numberOfCyclesForEvery) * time.Millisecond)
+			if hmc.Heading == uint16(0) {
+				sem <- true
+			}
+		}
+	}()
 
-	gobot.Assert(t, hmc.Heading, uint16(0))
+	select {
+	case <-sem:
+	case <-time.After(100 * time.Millisecond):
+		t.Errorf("Heading not read correctly")
+	}
 }
 
 func TestHMC6352DriverInit(t *testing.T) {

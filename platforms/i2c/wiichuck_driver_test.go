@@ -1,9 +1,10 @@
 package i2c
 
 import (
-	"github.com/hybridgroup/gobot"
 	"testing"
 	"time"
+
+	"github.com/hybridgroup/gobot"
 )
 
 // --------- HELPERS
@@ -37,6 +38,7 @@ func TestNewWiichuckDriver(t *testing.T) {
 }
 
 func TestWiichuckDriverStart(t *testing.T) {
+	sem := make(chan bool)
 	wii, adaptor := initTestWiichuckDriverWithStubbedAdaptor()
 
 	adaptor.i2cReadImpl = func() []byte {
@@ -47,10 +49,23 @@ func TestWiichuckDriverStart(t *testing.T) {
 
 	wii.SetInterval(1 * time.Millisecond)
 	gobot.Assert(t, wii.Start(), true)
-	<-time.After(time.Duration(numberOfCyclesForEvery) * time.Millisecond)
 
-	gobot.Assert(t, wii.joystick["sy_origin"], float64(44))
-	gobot.Assert(t, wii.joystick["sx_origin"], float64(45))
+	go func() {
+		for {
+			<-time.After(time.Duration(numberOfCyclesForEvery) * time.Millisecond)
+			if (wii.joystick["sy_origin"] == float64(44)) &&
+				(wii.joystick["sx_origin"] == float64(45)) {
+				sem <- true
+			}
+		}
+	}()
+
+	select {
+	case <-sem:
+	case <-time.After(100 * time.Millisecond):
+		t.Errorf("origin not read correctly")
+	}
+
 }
 
 func TestWiichuckDriverInit(t *testing.T) {
