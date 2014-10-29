@@ -7,8 +7,8 @@ import (
 )
 
 // BasicAuth returns basic auth handler.
-// Inspired by https://github.com/codegangsta/martini-contrib/blob/master/auth/
 func BasicAuth(username, password string) http.HandlerFunc {
+	// Inspired by https://github.com/codegangsta/martini-contrib/blob/master/auth/
 	return func(res http.ResponseWriter, req *http.Request) {
 		if !secureCompare(req.Header.Get("Authorization"),
 			"Basic "+base64.StdEncoding.EncodeToString([]byte(username+":"+password)),

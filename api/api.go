@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/http/httptest"
 	"strings"
 
 	"github.com/bmizerany/pat"
@@ -50,7 +51,15 @@ func NewAPI(g *gobot.Gobot) *api {
 // ServeHTTP calls api handlers and then serves request using api router
 func (a *api) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	for _, handler := range a.handlers {
-		handler(res, req)
+		rec := httptest.NewRecorder()
+		handler(rec, req)
+		for k, v := range rec.Header() {
+			res.Header()[k] = v
+		}
+		if rec.Code == http.StatusUnauthorized {
+			http.Error(res, "Not Authorized", http.StatusUnauthorized)
+			return
+		}
 	}
 	a.router.ServeHTTP(res, req)
 }
