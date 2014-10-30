@@ -22,8 +22,15 @@ type DigitalPin struct {
 }
 
 // NewDigitalPin returns a DigitalPin given the pin number and sysfs pin label
-func NewDigitalPin(pin int, label string) *DigitalPin {
-	return &DigitalPin{pin: strconv.Itoa(pin), label: label}
+func NewDigitalPin(pin int, v ...string) *DigitalPin {
+	d := &DigitalPin{pin: strconv.Itoa(pin)}
+	if len(v) > 0 {
+		d.label = v[0]
+	} else {
+		d.label = "gpio" + d.pin
+	}
+
+	return d
 }
 
 // Direction returns the current direction of the pin
