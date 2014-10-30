@@ -14,7 +14,7 @@ import (
 
 type mux struct {
 	pin   int
-	value []byte
+	value int
 }
 type sysfsPin struct {
 	pin          int
@@ -182,19 +182,22 @@ func NewEdisonAdaptor(name string) *EdisonAdaptor {
 			"EdisonAdaptor",
 		),
 		connect: func(e *EdisonAdaptor) {
-			e.tristate = sysfs.NewDigitalPin(214)
+			e.tristate = sysfs.NewDigitalPin(214, "gpio214")
+			e.tristate.Export()
 			e.tristate.SetDirection(sysfs.OUT)
 			e.tristate.Write(sysfs.LOW)
 
 			for _, i := range []int{263, 262} {
-				io := sysfs.NewDigitalPin(i)
+				io := sysfs.NewDigitalPin(i, fmt.Sprintf("gpio%v", i))
+				io.Export()
 				io.SetDirection(sysfs.OUT)
 				io.Write(sysfs.HIGH)
 				io.Unexport()
 			}
 
 			for _, i := range []int{240, 241, 242, 243} {
-				io := sysfs.NewDigitalPin(i)
+				io := sysfs.NewDigitalPin(i, fmt.Sprintf("gpio%v", i))
+				io.Export()
 				io.SetDirection(sysfs.OUT)
 				io.Write(sysfs.LOW)
 				io.Unexport()
@@ -251,12 +254,16 @@ func (e *EdisonAdaptor) Disconnect() bool { return true }
 func (e *EdisonAdaptor) digitalPin(pin string, dir string) *sysfs.DigitalPin {
 	i := sysfsPinMap[pin]
 	if e.digitalPins[i.pin] == nil {
-		e.digitalPins[i.pin] = sysfs.NewDigitalPin(i.pin)
-		e.digitalPins[i.resistor] = sysfs.NewDigitalPin(i.resistor)
-		e.digitalPins[i.levelShifter] = sysfs.NewDigitalPin(i.levelShifter)
+		e.digitalPins[i.pin] = sysfs.NewDigitalPin(i.pin, fmt.Sprintf("gpio%v", i.pin))
+		e.digitalPins[i.pin].Export()
+		e.digitalPins[i.resistor] = sysfs.NewDigitalPin(i.resistor, fmt.Sprintf("gpio%v", i.resistor))
+		e.digitalPins[i.resistor].Export()
+		e.digitalPins[i.levelShifter] = sysfs.NewDigitalPin(i.levelShifter, fmt.Sprintf("gpio%v", i.levelShifter))
+		e.digitalPins[i.levelShifter].Export()
 		if len(i.mux) > 0 {
 			for _, mux := range i.mux {
-				e.digitalPins[mux.pin] = sysfs.NewDigitalPin(mux.pin)
+				e.digitalPins[mux.pin] = sysfs.NewDigitalPin(mux.pin, fmt.Sprintf("gpio%v", mux.pin))
+				e.digitalPins[mux.pin].Export()
 				e.digitalPins[mux.pin].SetDirection(sysfs.OUT)
 				e.digitalPins[mux.pin].Write(mux.value)
 			}
@@ -279,15 +286,14 @@ func (e *EdisonAdaptor) digitalPin(pin string, dir string) *sysfs.DigitalPin {
 }
 
 // DigitalRead reads digital value from pin
-func (e *EdisonAdaptor) DigitalRead(pin string) int {
-	b := []byte{}
-	e.digitalPin(pin, "in").Read(b)
-	return int(b[0])
+func (e *EdisonAdaptor) DigitalRead(pin string) (i int) {
+	i, _ = e.digitalPin(pin, "in").Read()
+	return
 }
 
 // DigitalWrite writes digital value to specified pin
 func (e *EdisonAdaptor) DigitalWrite(pin string, val byte) {
-	e.digitalPin(pin, "out").Write([]byte(strconv.Itoa(int(val))))
+	e.digitalPin(pin, "out").Write(int(val))
 }
 
 // PwmWrite writes scaled pwm value to specified pin
@@ -330,13 +336,15 @@ func (e *EdisonAdaptor) I2cStart(address byte) {
 	e.tristate.Write(sysfs.LOW)
 
 	for _, i := range []int{14, 165, 212, 213} {
-		io := sysfs.NewDigitalPin(i)
+		io := sysfs.NewDigitalPin(i, fmt.Sprintf("gpio%v", i))
+		io.Export()
 		io.SetDirection(sysfs.IN)
 		io.Unexport()
 	}
 
 	for _, i := range []int{236, 237, 204, 205} {
-		io := sysfs.NewDigitalPin(i)
+		io := sysfs.NewDigitalPin(i, fmt.Sprintf("gpio%v", i))
+		io.Export()
 		io.SetDirection(sysfs.OUT)
 		io.Write(sysfs.LOW)
 		io.Unexport()
