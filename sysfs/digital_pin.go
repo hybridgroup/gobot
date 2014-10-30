@@ -53,7 +53,7 @@ func (d *DigitalPin) Write(b int) error {
 
 // Read reads the current value of the pin
 func (d *DigitalPin) Read() (n int, err error) {
-	buf, err := ioutil.ReadFile(fmt.Sprintf("%v/%v/value", GPIOPATH, d.label))
+	buf, err := readFile(fmt.Sprintf("%v/%v/value", GPIOPATH, d.label))
 	if err != nil {
 		return
 	}
@@ -72,13 +72,16 @@ func (d *DigitalPin) Unexport() error {
 	return err
 }
 
-// writeFile validates file existence and writes data into it
-func writeFile(name string, data []byte) (i int, err error) {
-	file, err := os.OpenFile(name, os.O_WRONLY, 0644)
+var writeFile = func(path string, data []byte) (i int, err error) {
+	file, err := os.OpenFile(path, os.O_WRONLY, 0644)
 	defer file.Close()
 	if err != nil {
 		return
 	}
 
 	return file.Write(data)
+}
+
+var readFile = func(path string) (b []byte, err error) {
+	return ioutil.ReadFile(path)
 }
