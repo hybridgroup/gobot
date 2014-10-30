@@ -1,6 +1,7 @@
 package arietta
 
 import (
+	"github.com/hybridgroup/gobot/internal"
 	"os"
 )
 
@@ -23,7 +24,7 @@ type sysfsDigitalPinDesc struct {
 // API.
 type sysfsDigitalPin struct {
 	desc *sysfsDigitalPinDesc
-	file *os.File
+	file internal.File
 	// mode is the current mode if any.  Used to lazily set the
 	// mode.
 	mode string
@@ -33,7 +34,6 @@ func newSysfsDigitalPin(desc *sysfsDigitalPinDesc) *sysfsDigitalPin {
 	d := &sysfsDigitalPin{
 		desc: desc,
 	}
-
 	writeInt(desc.hwnum, gpioPath, "export")
 	return d
 }

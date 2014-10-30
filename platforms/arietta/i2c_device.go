@@ -2,6 +2,7 @@ package arietta
 
 import (
 	"fmt"
+	"github.com/hybridgroup/gobot/internal"
 	"os"
 	"syscall"
 )
@@ -16,7 +17,7 @@ const (
 type i2cDevice struct {
 	path    string
 	address byte
-	file    *os.File
+	file    internal.File
 }
 
 func wrapErr(method string, err error) error {

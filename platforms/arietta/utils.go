@@ -1,6 +1,7 @@
 package arietta
 
 import (
+	"github.com/hybridgroup/gobot/internal"
 	"os"
 	"strconv"
 	"strings"
@@ -11,9 +12,9 @@ func joinPath(path ...string) string {
 }
 
 // openOrDie opens the path or aborts the program.
-func openOrDie(mode int, path ...string) *os.File {
+func openOrDie(mode int, path ...string) internal.File {
 	full := joinPath(path...)
-	fi, err := os.OpenFile(full, mode, 0666)
+	fi, err := internal.OpenFile(full, mode, 0666)
 	if err != nil {
 		panic(err)
 	}

@@ -2,6 +2,7 @@ package arietta
 
 import (
 	"fmt"
+	"github.com/hybridgroup/gobot/internal"
 	"os"
 )
 
@@ -20,7 +21,7 @@ type PwmDesc struct {
 type Pwm struct {
 	desc   *PwmDesc
 	path   string
-	file   *os.File
+	file   internal.File
 	period int
 }
 
