@@ -40,10 +40,6 @@ func TestDigitalPin(t *testing.T) {
 	gobot.Assert(t, lastPath, "/sys/class/gpio/gpio10/value")
 	gobot.Assert(t, string(lastData), "1")
 
-	pin.Write(1)
-	gobot.Assert(t, lastPath, "/sys/class/gpio/gpio10/value")
-	gobot.Assert(t, string(lastData), "1")
-
 	pin.SetDirection(IN)
 	gobot.Assert(t, lastPath, "/sys/class/gpio/gpio10/direction")
 	gobot.Assert(t, string(lastData), "in")

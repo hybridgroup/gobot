@@ -21,7 +21,9 @@ type DigitalPin struct {
 	direction string
 }
 
-// NewDigitalPin returns a DigitalPin given the pin number and sysfs pin label
+// NewDigitalPin returns a DigitalPin given the pin number and an optional sysfs pin label.
+// If no label is supplied the default label will prepend "gpio" to the pin number,
+// eg. a pin number of 10 will have a label of "gpio10"
 func NewDigitalPin(pin int, v ...string) *DigitalPin {
 	d := &DigitalPin{pin: strconv.Itoa(pin)}
 	if len(v) > 0 {
@@ -38,14 +40,14 @@ func (d *DigitalPin) Direction() string {
 	return d.direction
 }
 
-// SetDirection sets the current direction for specified pin
+// SetDirection sets the current direction for the pin
 func (d *DigitalPin) SetDirection(dir string) error {
 	d.direction = dir
 	_, err := writeFile(fmt.Sprintf("%v/%v/direction", GPIOPATH, d.label), []byte(d.direction))
 	return err
 }
 
-// Write writes specified value to the pin
+// Write writes to the pin
 func (d *DigitalPin) Write(b int) error {
 	_, err := writeFile(fmt.Sprintf("%v/%v/value", GPIOPATH, d.label), []byte(strconv.Itoa(b)))
 	return err

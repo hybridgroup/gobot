@@ -10,7 +10,7 @@ import (
 
 const I2CSlave = 0x0703
 
-/// NewI2cDevice creates a new i2c device given a device location and address
+// NewI2cDevice creates a new io.ReadWriteCloser with the proper ioctrl given an i2c bus location and device address
 func NewI2cDevice(location string, address byte) (io.ReadWriteCloser, error) {
 	file, err := os.OpenFile(location, os.O_RDWR, os.ModeExclusive)
 
