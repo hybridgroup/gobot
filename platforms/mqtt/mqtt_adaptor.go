@@ -10,7 +10,7 @@ import (
 type MqttAdaptor struct {
 	gobot.Adaptor
 	Host   string
-	Client *mqtt.MqttClient
+	client *mqtt.MqttClient
 }
 
 // NewMqttAdaptor creates a new mqtt adaptor with specified name
@@ -24,23 +24,23 @@ func NewMqttAdaptor(name string, host string) *MqttAdaptor {
 	}
 }
 
-// Connect returns true if connection to mqtt is established succesfully
+// Connect returns true if connection to mqtt is established
 func (a *MqttAdaptor) Connect() bool {
 	opts := createClientOptions("sub", a.Host)
-	a.Client = mqtt.NewClient(opts)
-	a.Client.Start()
+	a.client = mqtt.NewClient(opts)
+	a.client.Start()
 	return true
 }
 
-// Reconnect retries connection to mqtt. Returns true if succesfull
+// Reconnect retries connection to mqtt. Returns true if successful
 func (a *MqttAdaptor) Reconnect() bool {
 	return true
 }
 
-// Disconnect returns true if connection to mqtt is closed succesfully
+// Disconnect returns true if connection to mqtt is closed
 func (a *MqttAdaptor) Disconnect() bool {
-	if a.Client != nil {
-		a.Client.Disconnect(500)
+	if a.client != nil {
+		a.client.Disconnect(500)
 	}
 	return true
 }
@@ -52,11 +52,14 @@ func (a *MqttAdaptor) Finalize() bool {
 }
 
 func (a *MqttAdaptor) Publish(topic string, message []byte) int {
-	a.Client.Publish(0, topic, message)
+	m := mqtt.NewMessage(message)
+	a.client.PublishMessage(topic, m)
 	return 0
 }
 
-func (a *MqttAdaptor) Subscribe(topic string) int {
+func (a *MqttAdaptor) Subscribe(topic string, handler mqtt.MessageHandler) int {
+	t, _ := mqtt.NewTopicFilter(topic, 0)
+	a.client.StartSubscription(handler, t)
 	return 0
 }
 
