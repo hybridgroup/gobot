@@ -3,6 +3,7 @@ package beaglebone
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -10,14 +11,16 @@ import (
 	"strings"
 
 	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/sysfs"
 )
 
 const (
-	Slots       = "/sys/devices/bone_capemgr.*"
-	Ocp         = "/sys/devices/ocp.*"
-	I2CLocation = "/dev/i2c-1"
-	UsrLed      = "/sys/devices/ocp.3/gpio-leds.8/leds/beaglebone:green:"
+	Slots  = "/sys/devices/bone_capemgr.*"
+	Ocp    = "/sys/devices/ocp.*"
+	UsrLed = "/sys/devices/ocp.3/gpio-leds.8/leds/beaglebone:green:"
 )
+
+var i2cLocation = "/dev/i2c-1"
 
 var pins = map[string]int{
 	"P8_3":  38,
@@ -111,10 +114,10 @@ var analogPins = map[string]string{
 
 type BeagleboneAdaptor struct {
 	gobot.Adaptor
-	digitalPins []*digitalPin
+	digitalPins []sysfs.DigitalPin
 	pwmPins     map[string]*pwmPin
 	analogPins  map[string]*analogPin
-	i2cDevice   *i2cDevice
+	i2cDevice   io.ReadWriteCloser
 	connect     func()
 }
 
@@ -135,7 +138,7 @@ func NewBeagleboneAdaptor(name string) *BeagleboneAdaptor {
 // Connect returns true on a succesful connection to beaglebone board.
 // It initializes digital, pwm and analog pins
 func (b *BeagleboneAdaptor) Connect() bool {
-	b.digitalPins = make([]*digitalPin, 120)
+	b.digitalPins = make([]sysfs.DigitalPin, 120)
 	b.pwmPins = make(map[string]*pwmPin)
 	b.analogPins = make(map[string]*analogPin)
 	b.connect()
@@ -151,20 +154,14 @@ func (b *BeagleboneAdaptor) Finalize() bool {
 	}
 	for _, pin := range b.digitalPins {
 		if pin != nil {
-			pin.close()
+			pin.Unexport()
 		}
 	}
 	if b.i2cDevice != nil {
-		b.i2cDevice.i2cDevice.Close()
+		b.i2cDevice.Close()
 	}
 	return true
 }
-
-// Reconnect returns true if connection is stablished succesfully
-func (b *BeagleboneAdaptor) Reconnect() bool { return true }
-
-// Disconnect returns true if connection is closed succesfully
-func (b *BeagleboneAdaptor) Disconnect() bool { return true }
 
 // PwmWrite writes value in specified pin
 func (b *BeagleboneAdaptor) PwmWrite(pin string, val byte) {
@@ -183,9 +180,9 @@ func (b *BeagleboneAdaptor) ServoWrite(pin string, val byte) {
 }
 
 // DigitalRead returns a digital value from specified pin
-func (b *BeagleboneAdaptor) DigitalRead(pin string) int {
-	i := b.digitalPin(pin, "r")
-	return b.digitalPins[i].digitalRead()
+func (b *BeagleboneAdaptor) DigitalRead(pin string) (i int) {
+	i, _ = b.digitalPin(pin, sysfs.IN).Read()
+	return
 }
 
 // DigitalWrite writes a digital value to specified pin.
@@ -193,14 +190,13 @@ func (b *BeagleboneAdaptor) DigitalRead(pin string) int {
 func (b *BeagleboneAdaptor) DigitalWrite(pin string, val byte) {
 	if strings.Contains(pin, "usr") {
 		fi, err := os.OpenFile(UsrLed+pin+"/brightness", os.O_WRONLY|os.O_APPEND, 0666)
+		defer fi.Close()
 		if err != nil {
 			log.Fatal(err)
 		}
-		defer fi.Close()
 		fi.WriteString(strconv.Itoa(int(val)))
 	} else {
-		i := b.digitalPin(pin, "w")
-		b.digitalPins[i].digitalWrite(strconv.Itoa(int(val)))
+		b.digitalPin(pin, sysfs.OUT).Write(int(val))
 	}
 }
 
@@ -217,18 +213,19 @@ func (b *BeagleboneAdaptor) AnalogWrite(pin string, val byte) {
 
 // I2cStart starts a i2c device in specified address
 func (b *BeagleboneAdaptor) I2cStart(address byte) {
-	b.i2cDevice = newI2cDevice(I2CLocation, address)
-	b.i2cDevice.start()
+	b.i2cDevice, _ = sysfs.NewI2cDevice(i2cLocation, address)
 }
 
 // I2CWrite writes data to i2c device
 func (b *BeagleboneAdaptor) I2cWrite(data []byte) {
-	b.i2cDevice.write(data)
+	b.i2cDevice.Write(data)
 }
 
 // I2cRead returns value from i2c device using specified size
 func (b *BeagleboneAdaptor) I2cRead(size uint) []byte {
-	return b.i2cDevice.read(size)
+	buf := make([]byte, size)
+	b.i2cDevice.Read(buf)
+	return buf
 }
 
 // translatePin converts digital pin name to pin position
@@ -271,12 +268,17 @@ func (b *BeagleboneAdaptor) analogPin(pin string) string {
 }
 
 // digitalPin retrieves digital pin value by name
-func (b *BeagleboneAdaptor) digitalPin(pin string, mode string) int {
+func (b *BeagleboneAdaptor) digitalPin(pin string, dir string) sysfs.DigitalPin {
 	i := b.translatePin(pin)
-	if b.digitalPins[i] == nil || b.digitalPins[i].Mode != mode {
-		b.digitalPins[i] = newDigitalPin(i, mode)
+	if b.digitalPins[i] == nil {
+		b.digitalPins[i] = sysfs.NewDigitalPin(i)
+		err := b.digitalPins[i].Export()
+		if err != nil {
+			fmt.Println(err)
+		}
 	}
-	return i
+	b.digitalPins[i].Direction(dir)
+	return b.digitalPins[i]
 }
 
 // pwPin retrieves pwm pin value by name
