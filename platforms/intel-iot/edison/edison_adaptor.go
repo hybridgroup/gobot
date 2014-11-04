@@ -12,6 +12,8 @@ import (
 	"github.com/hybridgroup/gobot/sysfs"
 )
 
+var i2cLocation = "/dev/i2c-6"
+
 type mux struct {
 	pin   int
 	value int
@@ -26,8 +28,8 @@ type sysfsPin struct {
 
 type EdisonAdaptor struct {
 	gobot.Adaptor
-	tristate    *sysfs.DigitalPin
-	digitalPins map[int]*sysfs.DigitalPin
+	tristate    sysfs.DigitalPin
+	digitalPins map[int]sysfs.DigitalPin
 	pwmPins     map[int]*pwmPin
 	i2cDevice   io.ReadWriteCloser
 	connect     func(e *EdisonAdaptor)
@@ -146,7 +148,7 @@ var sysfsPinMap = map[string]sysfsPin{
 }
 
 // writeFile validates file existence and writes data into it
-func writeFile(name, data string) error {
+var writeFile = func(name, data string) error {
 	if _, err := os.Stat(name); err == nil {
 		err := ioutil.WriteFile(
 			name,
@@ -184,13 +186,13 @@ func NewEdisonAdaptor(name string) *EdisonAdaptor {
 		connect: func(e *EdisonAdaptor) {
 			e.tristate = sysfs.NewDigitalPin(214)
 			e.tristate.Export()
-			e.tristate.SetDirection(sysfs.OUT)
+			e.tristate.Direction(sysfs.OUT)
 			e.tristate.Write(sysfs.LOW)
 
 			for _, i := range []int{263, 262} {
 				io := sysfs.NewDigitalPin(i)
 				io.Export()
-				io.SetDirection(sysfs.OUT)
+				io.Direction(sysfs.OUT)
 				io.Write(sysfs.HIGH)
 				io.Unexport()
 			}
@@ -198,7 +200,7 @@ func NewEdisonAdaptor(name string) *EdisonAdaptor {
 			for _, i := range []int{240, 241, 242, 243} {
 				io := sysfs.NewDigitalPin(i)
 				io.Export()
-				io.SetDirection(sysfs.OUT)
+				io.Direction(sysfs.OUT)
 				io.Write(sysfs.LOW)
 				io.Unexport()
 			}
@@ -219,7 +221,7 @@ func NewEdisonAdaptor(name string) *EdisonAdaptor {
 // Connect starts conection with board and creates
 // digitalPins and pwmPins adaptor maps
 func (e *EdisonAdaptor) Connect() bool {
-	e.digitalPins = make(map[int]*sysfs.DigitalPin)
+	e.digitalPins = make(map[int]sysfs.DigitalPin)
 	e.pwmPins = make(map[int]*pwmPin)
 	e.connect(e)
 	return true
@@ -244,14 +246,8 @@ func (e *EdisonAdaptor) Finalize() bool {
 	return true
 }
 
-// Reconnect retries connection to edison board
-func (e *EdisonAdaptor) Reconnect() bool { return true }
-
-// Disconnect returns true if connection to edison board is finished successfully
-func (e *EdisonAdaptor) Disconnect() bool { return true }
-
 // digitalPin returns matched digitalPin for specified values
-func (e *EdisonAdaptor) digitalPin(pin string, dir string) *sysfs.DigitalPin {
+func (e *EdisonAdaptor) digitalPin(pin string, dir string) sysfs.DigitalPin {
 	i := sysfsPinMap[pin]
 	if e.digitalPins[i.pin] == nil {
 		e.digitalPins[i.pin] = sysfs.NewDigitalPin(i.pin)
@@ -264,22 +260,22 @@ func (e *EdisonAdaptor) digitalPin(pin string, dir string) *sysfs.DigitalPin {
 			for _, mux := range i.mux {
 				e.digitalPins[mux.pin] = sysfs.NewDigitalPin(mux.pin)
 				e.digitalPins[mux.pin].Export()
-				e.digitalPins[mux.pin].SetDirection(sysfs.OUT)
+				e.digitalPins[mux.pin].Direction(sysfs.OUT)
 				e.digitalPins[mux.pin].Write(mux.value)
 			}
 		}
 	}
 
-	if dir == "in" && e.digitalPins[i.pin].Direction() != "in" {
-		e.digitalPins[i.pin].SetDirection(sysfs.IN)
-		e.digitalPins[i.resistor].SetDirection(sysfs.OUT)
+	if dir == "in" {
+		e.digitalPins[i.pin].Direction(sysfs.IN)
+		e.digitalPins[i.resistor].Direction(sysfs.OUT)
 		e.digitalPins[i.resistor].Write(sysfs.LOW)
-		e.digitalPins[i.levelShifter].SetDirection(sysfs.OUT)
+		e.digitalPins[i.levelShifter].Direction(sysfs.OUT)
 		e.digitalPins[i.levelShifter].Write(sysfs.LOW)
-	} else if dir == "out" && e.digitalPins[i.pin].Direction() != "out" {
-		e.digitalPins[i.pin].SetDirection(sysfs.OUT)
-		e.digitalPins[i.resistor].SetDirection(sysfs.IN)
-		e.digitalPins[i.levelShifter].SetDirection(sysfs.OUT)
+	} else if dir == "out" {
+		e.digitalPins[i.pin].Direction(sysfs.OUT)
+		e.digitalPins[i.resistor].Direction(sysfs.IN)
+		e.digitalPins[i.levelShifter].Direction(sysfs.OUT)
 		e.digitalPins[i.levelShifter].Write(sysfs.HIGH)
 	}
 	return e.digitalPins[i.pin]
@@ -338,14 +334,14 @@ func (e *EdisonAdaptor) I2cStart(address byte) {
 	for _, i := range []int{14, 165, 212, 213} {
 		io := sysfs.NewDigitalPin(i)
 		io.Export()
-		io.SetDirection(sysfs.IN)
+		io.Direction(sysfs.IN)
 		io.Unexport()
 	}
 
 	for _, i := range []int{236, 237, 204, 205} {
 		io := sysfs.NewDigitalPin(i)
 		io.Export()
-		io.SetDirection(sysfs.OUT)
+		io.Direction(sysfs.OUT)
 		io.Write(sysfs.LOW)
 		io.Unexport()
 	}
@@ -356,7 +352,7 @@ func (e *EdisonAdaptor) I2cStart(address byte) {
 
 	e.tristate.Write(sysfs.HIGH)
 
-	e.i2cDevice, _ = sysfs.NewI2cDevice("/dev/i2c-6", address)
+	e.i2cDevice, _ = sysfs.NewI2cDevice(i2cLocation, address)
 }
 
 // I2cWrite writes data to i2cDevice
