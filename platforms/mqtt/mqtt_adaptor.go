@@ -49,16 +49,24 @@ func (a *MqttAdaptor) Finalize() bool {
 	return true
 }
 
-func (a *MqttAdaptor) Publish(topic string, message []byte) {
+func (a *MqttAdaptor) Publish(topic string, message []byte) bool {
+	if a.client == nil {
+		return false
+	}
 	m := mqtt.NewMessage(message)
 	a.client.PublishMessage(topic, m)
+	return true
 }
 
-func (a *MqttAdaptor) On(event string, f func(s interface{})) {
+func (a *MqttAdaptor) On(event string, f func(s interface{})) bool {
+	if a.client == nil {
+		return false
+	}
 	t, _ := mqtt.NewTopicFilter(event, 0)
 	a.client.StartSubscription(func(client *mqtt.MqttClient, msg mqtt.Message) {
 		f(msg.Payload())
 	}, t)
+	return true
 }
 
 func createClientOptions(clientId, raw string) *mqtt.ClientOptions {
