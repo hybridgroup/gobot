@@ -49,6 +49,7 @@ func (a *MqttAdaptor) Finalize() bool {
 	return true
 }
 
+// Publish a message under a specific topic
 func (a *MqttAdaptor) Publish(topic string, message []byte) bool {
 	if a.client == nil {
 		return false
@@ -58,6 +59,7 @@ func (a *MqttAdaptor) Publish(topic string, message []byte) bool {
 	return true
 }
 
+// Subscribe to a topic, and then call the message handler function when data is received
 func (a *MqttAdaptor) On(event string, f func(s interface{})) bool {
 	if a.client == nil {
 		return false
