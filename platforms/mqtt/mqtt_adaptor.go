@@ -39,12 +39,15 @@ func (a *MqttAdaptor) Reconnect() bool {
 
 // Disconnect returns true if connection to mqtt is closed succesfully
 func (a *MqttAdaptor) Disconnect() bool {
-	a.Client.Disconnect(500)
+	if a.Client != nil {
+		a.Client.Disconnect(500)
+	}
 	return true
 }
 
 // Finalize returns true if connection to mqtt is finalized succesfully
 func (a *MqttAdaptor) Finalize() bool {
+	a.Disconnect()
 	return true
 }
 
