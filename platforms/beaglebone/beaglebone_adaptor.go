@@ -15,11 +15,12 @@ import (
 )
 
 const (
-	Slots       = "/sys/devices/bone_capemgr.*"
-	Ocp         = "/sys/devices/ocp.*"
-	I2CLocation = "/dev/i2c-1"
-	UsrLed      = "/sys/devices/ocp.3/gpio-leds.8/leds/beaglebone:green:"
+	Slots  = "/sys/devices/bone_capemgr.*"
+	Ocp    = "/sys/devices/ocp.*"
+	UsrLed = "/sys/devices/ocp.3/gpio-leds.8/leds/beaglebone:green:"
 )
+
+var i2cLocation = "/dev/i2c-1"
 
 var pins = map[string]int{
 	"P8_3":  38,
@@ -113,7 +114,7 @@ var analogPins = map[string]string{
 
 type BeagleboneAdaptor struct {
 	gobot.Adaptor
-	digitalPins []*sysfs.DigitalPin
+	digitalPins []sysfs.DigitalPin
 	pwmPins     map[string]*pwmPin
 	analogPins  map[string]*analogPin
 	i2cDevice   io.ReadWriteCloser
@@ -137,7 +138,7 @@ func NewBeagleboneAdaptor(name string) *BeagleboneAdaptor {
 // Connect returns true on a succesful connection to beaglebone board.
 // It initializes digital, pwm and analog pins
 func (b *BeagleboneAdaptor) Connect() bool {
-	b.digitalPins = make([]*sysfs.DigitalPin, 120)
+	b.digitalPins = make([]sysfs.DigitalPin, 120)
 	b.pwmPins = make(map[string]*pwmPin)
 	b.analogPins = make(map[string]*analogPin)
 	b.connect()
@@ -161,12 +162,6 @@ func (b *BeagleboneAdaptor) Finalize() bool {
 	}
 	return true
 }
-
-// Reconnect returns true if connection is stablished succesfully
-func (b *BeagleboneAdaptor) Reconnect() bool { return true }
-
-// Disconnect returns true if connection is closed succesfully
-func (b *BeagleboneAdaptor) Disconnect() bool { return true }
 
 // PwmWrite writes value in specified pin
 func (b *BeagleboneAdaptor) PwmWrite(pin string, val byte) {
@@ -218,7 +213,7 @@ func (b *BeagleboneAdaptor) AnalogWrite(pin string, val byte) {
 
 // I2cStart starts a i2c device in specified address
 func (b *BeagleboneAdaptor) I2cStart(address byte) {
-	b.i2cDevice, _ = sysfs.NewI2cDevice(I2CLocation, address)
+	b.i2cDevice, _ = sysfs.NewI2cDevice(i2cLocation, address)
 }
 
 // I2CWrite writes data to i2c device
@@ -273,7 +268,7 @@ func (b *BeagleboneAdaptor) analogPin(pin string) string {
 }
 
 // digitalPin retrieves digital pin value by name
-func (b *BeagleboneAdaptor) digitalPin(pin string, dir string) *sysfs.DigitalPin {
+func (b *BeagleboneAdaptor) digitalPin(pin string, dir string) sysfs.DigitalPin {
 	i := b.translatePin(pin)
 	if b.digitalPins[i] == nil {
 		b.digitalPins[i] = sysfs.NewDigitalPin(i)
@@ -281,10 +276,8 @@ func (b *BeagleboneAdaptor) digitalPin(pin string, dir string) *sysfs.DigitalPin
 		if err != nil {
 			fmt.Println(err)
 		}
-		b.digitalPins[i].SetDirection(dir)
-	} else if b.digitalPins[i].Direction() != dir {
-		b.digitalPins[i].SetDirection(dir)
 	}
+	b.digitalPins[i].Direction(dir)
 	return b.digitalPins[i]
 }
 
