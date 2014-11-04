@@ -9,15 +9,9 @@ before_install:
  - sudo apt-get update
  - sudo apt-get install --force-yes libcv-dev libcvaux-dev libhighgui-dev libopencv-dev libsdl2-dev libsdl2-image-dev libsdl2 libusb-dev xvfb libgtk2.0-0
 install:
- - go get -v . && go build -v .
+ - go get -d -v ./...
  - go get code.google.com/p/go.tools/cmd/cover
  - go get github.com/mattn/goveralls
- - go get github.com/bmizerany/pat
- - go get github.com/hybridgroup/go-ardrone/client
- - go get github.com/tarm/goserial
- - go get github.com/hybridgroup/go-sdl2/sdl
- - go get code.google.com/p/go.net/websocket
- - go get github.com/hybridgroup/go-opencv/opencv
 before_script:
  - export DISPLAY=:99.0
  - sh -e /etc/init.d/xvfb start
