@@ -17,15 +17,20 @@ func initTestEdisonAdaptor() *EdisonAdaptor {
 	writeFile = func(name, data string) error {
 		return nil
 	}
+	readFile = func(name string) ([]byte, error) {
+		return []byte("11"), nil
+	}
 	a := NewEdisonAdaptor("myAdaptor")
 	a.Connect()
-	a.DigitalWrite("3", 1)
-	a.i2cDevice = new(gobot.NullReadWriteCloser)
 	return a
 }
 
 func TestEdisonAdaptorFinalize(t *testing.T) {
-	gobot.Assert(t, initTestEdisonAdaptor().Finalize(), true)
+	a := initTestEdisonAdaptor()
+	a.DigitalWrite("3", 1)
+	a.PwmWrite("5", 100)
+	a.i2cDevice = new(gobot.NullReadWriteCloser)
+	gobot.Assert(t, a.Finalize(), true)
 }
 
 func TestEdisonAdaptorDigitalIO(t *testing.T) {
@@ -61,4 +66,36 @@ func TestEdisonAdaptorI2c(t *testing.T) {
 	a.i2cDevice = new(gobot.NullReadWriteCloser)
 	a.I2cWrite([]byte{0x00, 0x01})
 	gobot.Assert(t, a.I2cRead(2), make([]byte, 2))
+}
+
+func TestEdisonAdaptorPwm(t *testing.T) {
+	a := initTestEdisonAdaptor()
+	lastWritePath := ""
+	lastReadPath := ""
+	lastWriteData := ""
+
+	writeFile = func(path, data string) (err error) {
+		lastWritePath = path
+		lastWriteData = data
+		return
+	}
+
+	readFile = func(path string) (b []byte, err error) {
+		lastReadPath = path
+		return []byte("100\n"), nil
+	}
+	a.PwmWrite("5", 100)
+	gobot.Assert(t, lastWritePath, "/sys/class/pwm/pwmchip0/pwm1/duty_cycle")
+}
+
+func TestEdisonAdaptorAnalog(t *testing.T) {
+	a := initTestEdisonAdaptor()
+	lastReadPath := ""
+	readFile = func(path string) (b []byte, err error) {
+		lastReadPath = path
+		return []byte("100\n"), nil
+	}
+	i := a.AnalogRead("0")
+	gobot.Assert(t, lastReadPath, "/sys/bus/iio/devices/iio:device1/in_voltage0_raw")
+	gobot.Assert(t, i, 100)
 }

@@ -14,6 +14,26 @@ import (
 
 var i2cLocation = "/dev/i2c-6"
 
+// writeFile validates file existence and writes data into it
+var writeFile = func(name, data string) error {
+	if _, err := os.Stat(name); err == nil {
+		err := ioutil.WriteFile(
+			name,
+			[]byte(data),
+			0644,
+		)
+		if err != nil {
+			return err
+		}
+	} else {
+		return errors.New("File doesn't exist: " + name)
+	}
+	return nil
+}
+var readFile = func(path string) ([]byte, error) {
+	return ioutil.ReadFile(path)
+}
+
 type mux struct {
 	pin   int
 	value int
@@ -145,23 +165,6 @@ var sysfsPinMap = map[string]sysfsPin{
 			mux{243, sysfs.LOW},
 		},
 	},
-}
-
-// writeFile validates file existence and writes data into it
-var writeFile = func(name, data string) error {
-	if _, err := os.Stat(name); err == nil {
-		err := ioutil.WriteFile(
-			name,
-			[]byte(data),
-			0644,
-		)
-		if err != nil {
-			return err
-		}
-	} else {
-		return errors.New("File doesn't exist: " + name)
-	}
-	return nil
 }
 
 // changePinMode writes pin mode to current_pinmux file
@@ -314,7 +317,7 @@ func (e *EdisonAdaptor) PwmWrite(pin string, val byte) {
 
 // AnalogRead returns value from analog reading of specified pin
 func (e *EdisonAdaptor) AnalogRead(pin string) int {
-	buf, err := ioutil.ReadFile(
+	buf, err := readFile(
 		"/sys/bus/iio/devices/iio:device1/in_voltage" + pin + "_raw",
 	)
 	if err != nil {

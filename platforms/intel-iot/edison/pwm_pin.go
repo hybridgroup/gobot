@@ -1,9 +1,6 @@
 package edison
 
-import (
-	"io/ioutil"
-	"strconv"
-)
+import "strconv"
 
 // pwmPath returns pwm base path
 func pwmPath() string {
@@ -57,7 +54,7 @@ func (p *pwmPin) enable(val string) {
 
 // period reads from pwm period path and returns value
 func (p *pwmPin) period() string {
-	buf, err := ioutil.ReadFile(pwmPeriodPath(p.pin))
+	buf, err := readFile(pwmPeriodPath(p.pin))
 	if err != nil {
 		panic(err)
 	}
