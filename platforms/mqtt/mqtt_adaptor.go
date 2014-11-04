@@ -11,6 +11,7 @@ type MqttAdaptor struct {
 	gobot.Adaptor
 	Host   string
 	client *mqtt.MqttClient
+	events map[string]*gobot.Event
 }
 
 // NewMqttAdaptor creates a new mqtt adaptor with specified name
@@ -57,10 +58,11 @@ func (a *MqttAdaptor) Publish(topic string, message []byte) int {
 	return 0
 }
 
-func (a *MqttAdaptor) Subscribe(topic string, handler mqtt.MessageHandler) int {
-	t, _ := mqtt.NewTopicFilter(topic, 0)
-	a.client.StartSubscription(handler, t)
-	return 0
+func (a *MqttAdaptor) On(event string, f func(s interface{})) {
+	t, _ := mqtt.NewTopicFilter(event, 0)
+	a.client.StartSubscription(func(client *mqtt.MqttClient, msg mqtt.Message) {
+		f(msg.Payload())
+	}, t)
 }
 
 func createClientOptions(clientId, raw string) *mqtt.ClientOptions {
