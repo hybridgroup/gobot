@@ -10,22 +10,22 @@ func TestDigitalPin(t *testing.T) {
 	lastPath := ""
 	lastData := []byte{}
 
-	writeFile = func(path string, data []byte) (i int, err error) {
+	WriteFile = func(path string, data []byte) (i int, err error) {
 		lastPath = path
 		lastData = data
 		return
 	}
 
-	readFile = func(path string) (b []byte, err error) {
+	ReadFile = func(path string) (b []byte, err error) {
 		lastPath = path
 		return []byte("0"), nil
 	}
 
-	pin := NewDigitalPin(10, "custom")
+	pin := NewDigitalPin(10, "custom").(*digitalPin)
 	gobot.Assert(t, pin.pin, "10")
 	gobot.Assert(t, pin.label, "custom")
 
-	pin = NewDigitalPin(10)
+	pin = NewDigitalPin(10).(*digitalPin)
 	gobot.Assert(t, pin.label, "gpio10")
 
 	pin.Unexport()
@@ -40,14 +40,9 @@ func TestDigitalPin(t *testing.T) {
 	gobot.Assert(t, lastPath, "/sys/class/gpio/gpio10/value")
 	gobot.Assert(t, string(lastData), "1")
 
-	pin.SetDirection(IN)
+	pin.Direction(IN)
 	gobot.Assert(t, lastPath, "/sys/class/gpio/gpio10/direction")
 	gobot.Assert(t, string(lastData), "in")
-
-	pin.Direction()
-	gobot.Assert(t, pin.direction, "in")
-	pin.SetDirection(OUT)
-	gobot.Assert(t, pin.direction, "out")
 
 	data, _ := pin.Read()
 	gobot.Assert(t, data, 0)

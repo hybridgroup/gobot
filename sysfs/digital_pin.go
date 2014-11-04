@@ -15,17 +15,24 @@ const (
 	GPIOPATH = "/sys/class/gpio"
 )
 
-type DigitalPin struct {
-	pin       string
-	label     string
-	direction string
+type DigitalPin interface {
+	Unexport() error
+	Export() error
+	Read() (int, error)
+	Direction(string) error
+	Write(int) error
+}
+
+type digitalPin struct {
+	pin   string
+	label string
 }
 
 // NewDigitalPin returns a DigitalPin given the pin number and an optional sysfs pin label.
 // If no label is supplied the default label will prepend "gpio" to the pin number,
 // eg. a pin number of 10 will have a label of "gpio10"
-func NewDigitalPin(pin int, v ...string) *DigitalPin {
-	d := &DigitalPin{pin: strconv.Itoa(pin)}
+func NewDigitalPin(pin int, v ...string) DigitalPin {
+	d := &digitalPin{pin: strconv.Itoa(pin)}
 	if len(v) > 0 {
 		d.label = v[0]
 	} else {
@@ -35,27 +42,21 @@ func NewDigitalPin(pin int, v ...string) *DigitalPin {
 	return d
 }
 
-// Direction returns the current direction of the pin
-func (d *DigitalPin) Direction() string {
-	return d.direction
-}
-
-// SetDirection sets the current direction for the pin
-func (d *DigitalPin) SetDirection(dir string) error {
-	d.direction = dir
-	_, err := writeFile(fmt.Sprintf("%v/%v/direction", GPIOPATH, d.label), []byte(d.direction))
+// Direction sets the direction for the pin
+func (d *digitalPin) Direction(dir string) error {
+	_, err := WriteFile(fmt.Sprintf("%v/%v/direction", GPIOPATH, d.label), []byte(dir))
 	return err
 }
 
 // Write writes to the pin
-func (d *DigitalPin) Write(b int) error {
-	_, err := writeFile(fmt.Sprintf("%v/%v/value", GPIOPATH, d.label), []byte(strconv.Itoa(b)))
+func (d *digitalPin) Write(b int) error {
+	_, err := WriteFile(fmt.Sprintf("%v/%v/value", GPIOPATH, d.label), []byte(strconv.Itoa(b)))
 	return err
 }
 
 // Read reads the current value of the pin
-func (d *DigitalPin) Read() (n int, err error) {
-	buf, err := readFile(fmt.Sprintf("%v/%v/value", GPIOPATH, d.label))
+func (d *digitalPin) Read() (n int, err error) {
+	buf, err := ReadFile(fmt.Sprintf("%v/%v/value", GPIOPATH, d.label))
 	if err != nil {
 		return
 	}
@@ -63,18 +64,19 @@ func (d *DigitalPin) Read() (n int, err error) {
 }
 
 // Export exports the pin for use by the operating system
-func (d *DigitalPin) Export() error {
-	_, err := writeFile(GPIOPATH+"/export", []byte(d.pin))
+func (d *digitalPin) Export() error {
+	_, err := WriteFile(GPIOPATH+"/export", []byte(d.pin))
 	return err
 }
 
 // Unexport unexports the pin and releases the pin from the operating system
-func (d *DigitalPin) Unexport() error {
-	_, err := writeFile(GPIOPATH+"/unexport", []byte(d.pin))
+func (d *digitalPin) Unexport() error {
+	_, err := WriteFile(GPIOPATH+"/unexport", []byte(d.pin))
 	return err
 }
 
-var writeFile = func(path string, data []byte) (i int, err error) {
+//var writeFile = func(path string, data []byte) (i int, err error) {
+var WriteFile = func(path string, data []byte) (i int, err error) {
 	file, err := os.OpenFile(path, os.O_WRONLY, 0644)
 	defer file.Close()
 	if err != nil {
@@ -84,6 +86,7 @@ var writeFile = func(path string, data []byte) (i int, err error) {
 	return file.Write(data)
 }
 
-var readFile = func(path string) (b []byte, err error) {
+//var readFile = func(path string) (b []byte, err error) {
+var ReadFile = func(path string) (b []byte, err error) {
 	return ioutil.ReadFile(path)
 }
