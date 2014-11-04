@@ -2,7 +2,7 @@
 
 http://gobot.io/
 
-Gobot is a framework using the Go programming language (http://golang.org/) for robotics, physical computing, and the Internet of Things. 
+Gobot is a framework using the Go programming language (http://golang.org/) for robotics, physical computing, and the Internet of Things.
 
 It provides a simple, yet powerful way to create solutions that incorporate multiple, different hardware devices at the same time.
 
@@ -88,7 +88,7 @@ func main() {
 
 ## Hardware Support
 Gobot has a extensible system for connecting to hardware devices. The following robotics and physical computing platforms are currently supported:
-  
+
   - [Ardrone](http://ardrone2.parrot.com/) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/ardrone)
   - [Arduino](http://www.arduino.cc/) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/firmata)
   - [Beaglebone Black](http://beagleboard.org/Products/BeagleBone+Black/) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/beaglebone)
@@ -98,9 +98,10 @@ Gobot has a extensible system for connecting to hardware devices. The following 
   - [Leap Motion](https://www.leapmotion.com/) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/leapmotion)
   - [Neurosky](http://neurosky.com/products-markets/eeg-biosensors/hardware/) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/neurosky)
   - [OpenCV](http://opencv.org/) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/opencv)
+  - [Pebble](https://www.getpebble.com/) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/pebble)
   - [Spark](https://www.spark.io/) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/spark)
   - [Sphero](http://www.gosphero.com/) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/sphero)
-  
+
 
 Support for many devices that use General Purpose Input/Output (GPIO) have
 a shared set of drivers provided using the cylon-gpio module:
@@ -108,8 +109,10 @@ a shared set of drivers provided using the cylon-gpio module:
   - [GPIO](https://en.wikipedia.org/wiki/General_Purpose_Input/Output) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/platforms/gpio)
     - Analog Sensor
     - Button
+    - Direct Pin
     - Digital Sensor
     - LED
+    - MakeyButton
     - Motor
     - Servo
 
@@ -133,13 +136,13 @@ Gobot includes a RESTful API to query the status of any robot running within a g
 
 To activate the API, require the `github.com/hybridgroup/gobot/api` package and instantiate the `API` like this:
 
-```go 
+```go
   gbot := gobot.NewGobot()
   api.NewAPI(gbot).Start()
 ```
 
 You can also specify the api host and port, and turn on authentication:
-```go 
+```go
   gbot := gobot.NewGobot()
   server := api.NewAPI(gbot)
   server.Port = "4000"
