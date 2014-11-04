@@ -1,10 +1,8 @@
 package mqtt
 
 import (
-	"fmt"
 	"git.eclipse.org/gitroot/paho/org.eclipse.paho.mqtt.golang.git"
 	"github.com/hybridgroup/gobot"
-	"net/url"
 )
 
 type MqttAdaptor struct {
@@ -51,10 +49,9 @@ func (a *MqttAdaptor) Finalize() bool {
 	return true
 }
 
-func (a *MqttAdaptor) Publish(topic string, message []byte) int {
+func (a *MqttAdaptor) Publish(topic string, message []byte) {
 	m := mqtt.NewMessage(message)
 	a.client.PublishMessage(topic, m)
-	return 0
 }
 
 func (a *MqttAdaptor) On(event string, f func(s interface{})) {
@@ -65,9 +62,8 @@ func (a *MqttAdaptor) On(event string, f func(s interface{})) {
 }
 
 func createClientOptions(clientId, raw string) *mqtt.ClientOptions {
-	uri, _ := url.Parse(raw)
 	opts := mqtt.NewClientOptions()
-	opts.AddBroker(fmt.Sprintf("tcp://%s", uri.Host))
+	opts.AddBroker(raw)
 	opts.SetClientId(clientId)
 
 	return opts
