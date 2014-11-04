@@ -11,7 +11,6 @@ type MqttAdaptor struct {
 	gobot.Adaptor
 	Host   string
 	client *mqtt.MqttClient
-	events map[string]*gobot.Event
 }
 
 // NewMqttAdaptor creates a new mqtt adaptor with specified name
