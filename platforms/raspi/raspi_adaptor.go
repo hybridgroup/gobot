@@ -183,7 +183,6 @@ func (r *RaspiAdaptor) digitalPin(pin string, dir string) sysfs.DigitalPin {
 	}
 
 	if r.digitalPins[i] == nil {
-		fmt.Println(i)
 		r.digitalPins[i] = sysfs.NewDigitalPin(i)
 		r.digitalPins[i].Export()
 	}
