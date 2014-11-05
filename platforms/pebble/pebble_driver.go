@@ -49,11 +49,6 @@ func NewPebbleDriver(adaptor *PebbleAdaptor, name string) *PebbleDriver {
 	return p
 }
 
-// adaptor returns asociated adaptor
-func (d *PebbleDriver) adaptor() *PebbleAdaptor {
-	return d.Adaptor().(*PebbleAdaptor)
-}
-
 // Start returns true if driver is initialized correctly
 func (d *PebbleDriver) Start() bool { return true }
 
