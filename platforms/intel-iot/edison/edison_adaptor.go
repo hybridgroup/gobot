@@ -315,6 +315,15 @@ func (e *EdisonAdaptor) PwmWrite(pin string, val byte) {
 	}
 }
 
+// AnalogWrite Not Implemented
+func (e *EdisonAdaptor) AnalogWrite(string, byte) {}
+
+// InitServo Not Implemented
+func (e *EdisonAdaptor) InitServo() {}
+
+// ServoWrite Not Implemented
+func (e *EdisonAdaptor) ServoWrite(string, byte) {}
+
 // AnalogRead returns value from analog reading of specified pin
 func (e *EdisonAdaptor) AnalogRead(pin string) int {
 	buf, err := readFile(
