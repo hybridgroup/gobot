@@ -27,14 +27,18 @@ type ArdroneAdaptor struct {
 }
 
 // NewArdroneAdaptor creates a new ardrone and connects with default configuration
-func NewArdroneAdaptor(name string) *ArdroneAdaptor {
+func NewArdroneAdaptor(name string, v ...string) *ArdroneAdaptor {
 	return &ArdroneAdaptor{
 		Adaptor: *gobot.NewAdaptor(
 			name,
 			"ArdroneAdaptor",
 		),
 		connect: func(a *ArdroneAdaptor) {
-			d, err := client.Connect(client.DefaultConfig())
+			config := client.DefaultConfig()
+			if len(v) > 0 {
+				config.Ip = v[0]
+			}
+			d, err := client.Connect(config)
 			if err != nil {
 				panic(err)
 			}
