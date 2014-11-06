@@ -2,7 +2,7 @@
 
 Gobot (http://gobot.io/) is a library for robotics and physical computing using Go
 
-This repository contains the Gobot adaptor for the MQTT machine to machine message broker (http://getpebble.com/).
+This repository contains the Gobot adaptor for the MQTT machine to machine message broker (http://mqtt.org/).
 
 ## Installing
 
@@ -28,13 +28,13 @@ import (
 func main() {
   gbot := gobot.NewGobot()
 
-  mqttAdaptor := mqtt.NewMqttAdaptor("server", "tcp://0.0.0.0:1883")
+  mqttAdaptor := mqtt.NewMqttAdaptor("server", "tcp://0.0.0.0:1883", "pinger")
 
   work := func() {
-    mqttAdaptor.On("hello", func(data interface{}) {
+    mqttAdaptor.On("hello", func(data []byte) {
       fmt.Println("hello")
     })
-    mqttAdaptor.On("hola", func(data interface{}) {
+    mqttAdaptor.On("hola", func(data []byte) {
       fmt.Println("hola")
     })
     data := []byte("o")

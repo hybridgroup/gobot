@@ -2,21 +2,22 @@ package main
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/mqtt"
-	"time"
 )
 
 func main() {
 	gbot := gobot.NewGobot()
 
-	mqttAdaptor := mqtt.NewMqttAdaptor("server", "tcp://0.0.0.0:1883")
+	mqttAdaptor := mqtt.NewMqttAdaptor("server", "tcp://0.0.0.0:1883", "pinger")
 
 	work := func() {
-		mqttAdaptor.On("hello", func(data interface{}) {
+		mqttAdaptor.On("hello", func(data []byte) {
 			fmt.Println("hello")
 		})
-		mqttAdaptor.On("hola", func(data interface{}) {
+		mqttAdaptor.On("hola", func(data []byte) {
 			fmt.Println("hola")
 		})
 		data := []byte("o")

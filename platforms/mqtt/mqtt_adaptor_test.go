@@ -2,12 +2,13 @@ package mqtt
 
 import (
 	"fmt"
-	"github.com/hybridgroup/gobot"
 	"testing"
+
+	"github.com/hybridgroup/gobot"
 )
 
 func initTestMqttAdaptor() *MqttAdaptor {
-	return NewMqttAdaptor("mqtt", "localhost:1883")
+	return NewMqttAdaptor("mqtt", "localhost:1883", "client")
 }
 
 func TestMqttAdaptorConnect(t *testing.T) {
@@ -35,7 +36,7 @@ func TestMqttAdaptorPublishWhenConnected(t *testing.T) {
 
 func TestMqttAdaptorCannotOnUnlessConnected(t *testing.T) {
 	a := initTestMqttAdaptor()
-	gobot.Assert(t, a.On("hola", func(data interface{}) {
+	gobot.Assert(t, a.On("hola", func(data []byte) {
 		fmt.Println("hola")
 	}), false)
 }
@@ -43,7 +44,7 @@ func TestMqttAdaptorCannotOnUnlessConnected(t *testing.T) {
 func TestMqttAdaptorOnWhenConnected(t *testing.T) {
 	a := initTestMqttAdaptor()
 	a.Connect()
-	gobot.Assert(t, a.On("hola", func(data interface{}) {
+	gobot.Assert(t, a.On("hola", func(data []byte) {
 		fmt.Println("hola")
 	}), true)
 }

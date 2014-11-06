@@ -7,24 +7,26 @@ import (
 
 type MqttAdaptor struct {
 	gobot.Adaptor
-	Host   string
-	client *mqtt.MqttClient
+	Host     string
+	clientID string
+	client   *mqtt.MqttClient
 }
 
-// NewMqttAdaptor creates a new mqtt adaptor with specified name
-func NewMqttAdaptor(name string, host string) *MqttAdaptor {
+// NewMqttAdaptor creates a new mqtt adaptor with specified name, host and client id
+func NewMqttAdaptor(name string, host string, clientID string) *MqttAdaptor {
 	return &MqttAdaptor{
 		Adaptor: *gobot.NewAdaptor(
 			name,
 			"MqttAdaptor",
 		),
-		Host: host,
+		Host:     host,
+		clientID: clientID,
 	}
 }
 
 // Connect returns true if connection to mqtt is established
 func (a *MqttAdaptor) Connect() bool {
-	opts := createClientOptions("sub", a.Host)
+	opts := createClientOptions(a.clientID, a.Host)
 	a.client = mqtt.NewClient(opts)
 	a.client.Start()
 	return true
@@ -60,7 +62,7 @@ func (a *MqttAdaptor) Publish(topic string, message []byte) bool {
 }
 
 // Subscribe to a topic, and then call the message handler function when data is received
-func (a *MqttAdaptor) On(event string, f func(s interface{})) bool {
+func (a *MqttAdaptor) On(event string, f func(s []byte)) bool {
 	if a.client == nil {
 		return false
 	}
