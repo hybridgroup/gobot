@@ -2,7 +2,6 @@ package leap
 
 import (
 	"encoding/json"
-	"regexp"
 )
 
 type Gesture struct {
@@ -86,10 +85,4 @@ func (l *LeapMotionDriver) ParseFrame(data []byte) Frame {
 	var frame Frame
 	json.Unmarshal(data, &frame)
 	return frame
-}
-
-// isAFrame returns true if data contains a frame representation
-func (l *LeapMotionDriver) isAFrame(data []byte) bool {
-	match, _ := regexp.Match("currentFrameRate", data)
-	return match
 }

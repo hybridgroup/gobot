@@ -6,17 +6,17 @@ import (
 )
 
 func initTestLeapMotionAdaptor() *LeapMotionAdaptor {
-	return NewLeapMotionAdaptor("bot", "/dev/null")
+	a := NewLeapMotionAdaptor("bot", "")
+	a.connect = func(l *LeapMotionAdaptor) {}
+	return a
 }
 
 func TestLeapMotionAdaptorConnect(t *testing.T) {
-	t.SkipNow()
 	a := initTestLeapMotionAdaptor()
 	gobot.Assert(t, a.Connect(), true)
 }
 
 func TestLeapMotionAdaptorFinalize(t *testing.T) {
-	t.SkipNow()
 	a := initTestLeapMotionAdaptor()
 	gobot.Assert(t, a.Finalize(), true)
 }

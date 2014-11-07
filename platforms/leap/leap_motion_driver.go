@@ -2,6 +2,7 @@ package leap
 
 import (
 	"encoding/json"
+	"io"
 
 	"code.google.com/p/go.net/websocket"
 	"github.com/hybridgroup/gobot"
@@ -9,6 +10,12 @@ import (
 
 type LeapMotionDriver struct {
 	gobot.Driver
+}
+
+var receive = func(ws io.ReadWriteCloser) []byte {
+	var msg []byte
+	websocket.Message.Receive(ws.(*websocket.Conn), &msg)
+	return msg
 }
 
 // NewLeapMotionDriver creates a new leap motion driver with specified name
@@ -37,7 +44,7 @@ func (l *LeapMotionDriver) adaptor() *LeapMotionAdaptor {
 // and listening from incoming messages.
 //
 // Publishes the following events:
-//		"message" - Sends parsed data of received frames.
+//		"message" - Emits Frame on new message received from Leap.
 func (l *LeapMotionDriver) Start() bool {
 	enableGestures := map[string]bool{"enableGestures": true}
 	b, _ := json.Marshal(enableGestures)
@@ -48,17 +55,12 @@ func (l *LeapMotionDriver) Start() bool {
 
 	go func() {
 		for {
-			var msg []byte
-			websocket.Message.Receive(l.adaptor().ws, &msg)
-			gobot.Publish(l.Event("message"), l.ParseFrame(msg))
+			gobot.Publish(l.Event("message"), l.ParseFrame(receive(l.adaptor().ws)))
 		}
 	}()
 
 	return true
 }
-
-// Init returns true if driver is initialized correctly
-func (l *LeapMotionDriver) Init() bool { return true }
 
 // Halt returns true if driver is halted succesfully
 func (l *LeapMotionDriver) Halt() bool { return true }

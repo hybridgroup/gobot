@@ -4,11 +4,12 @@ import (
 	"code.google.com/p/go.net/websocket"
 	"fmt"
 	"github.com/hybridgroup/gobot"
+	"io"
 )
 
 type LeapMotionAdaptor struct {
 	gobot.Adaptor
-	ws      *websocket.Conn
+	ws      io.ReadWriteCloser
 	connect func(*LeapMotionAdaptor)
 }
 
@@ -21,9 +22,11 @@ func NewLeapMotionAdaptor(name string, port string) *LeapMotionAdaptor {
 			port,
 		),
 		connect: func(l *LeapMotionAdaptor) {
-			origin := fmt.Sprintf("http://%v", l.Port())
-			url := fmt.Sprintf("ws://%v/v3.json", l.Port())
-			ws, err := websocket.Dial(url, "", origin)
+			ws, err := websocket.Dial(
+				fmt.Sprintf("ws://%v/v3.json", l.Port()),
+				"",
+				fmt.Sprintf("http://%v", l.Port()),
+			)
 			if err != nil {
 				panic(err)
 			}

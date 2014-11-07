@@ -1,0 +1,21 @@
+mode: set
+github.com/hybridgroup/gobot/platforms/leap/leap_motion_driver.go:15.50,19.2 3 0
+github.com/hybridgroup/gobot/platforms/leap/leap_motion_driver.go:25.79,36.2 3 1
+github.com/hybridgroup/gobot/platforms/leap/leap_motion_driver.go:39.57,41.2 1 1
+github.com/hybridgroup/gobot/platforms/leap/leap_motion_driver.go:48.41,52.16 4 1
+github.com/hybridgroup/gobot/platforms/leap/leap_motion_driver.go:56.2,56.12 1 1
+github.com/hybridgroup/gobot/platforms/leap/leap_motion_driver.go:62.2,62.13 1 1
+github.com/hybridgroup/gobot/platforms/leap/leap_motion_driver.go:52.16,54.3 1 0
+github.com/hybridgroup/gobot/platforms/leap/leap_motion_driver.go:56.12,57.7 1 1
+github.com/hybridgroup/gobot/platforms/leap/leap_motion_driver.go:57.7,59.4 1 1
+github.com/hybridgroup/gobot/platforms/leap/leap_motion_driver.go:66.40,66.55 1 1
+github.com/hybridgroup/gobot/platforms/leap/parser.go:69.28,71.2 1 1
+github.com/hybridgroup/gobot/platforms/leap/parser.go:74.28,76.2 1 1
+github.com/hybridgroup/gobot/platforms/leap/parser.go:79.28,81.2 1 1
+github.com/hybridgroup/gobot/platforms/leap/parser.go:84.58,88.2 3 1
+github.com/hybridgroup/gobot/platforms/leap/leap_motion_adaptor.go:17.72,24.39 1 1
+github.com/hybridgroup/gobot/platforms/leap/leap_motion_adaptor.go:24.39,30.18 2 0
+github.com/hybridgroup/gobot/platforms/leap/leap_motion_adaptor.go:33.4,33.13 1 0
+github.com/hybridgroup/gobot/platforms/leap/leap_motion_adaptor.go:30.18,32.5 1 0
+github.com/hybridgroup/gobot/platforms/leap/leap_motion_adaptor.go:39.44,43.2 3 1
+github.com/hybridgroup/gobot/platforms/leap/leap_motion_adaptor.go:46.45,46.60 1 1
