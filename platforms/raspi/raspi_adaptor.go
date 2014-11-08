@@ -12,14 +12,7 @@ import (
 	"github.com/hybridgroup/gobot/sysfs"
 )
 
-var i2cLocationFor = func(rev string) string {
-	if rev == "1" {
-		return "/dev/i2c-0"
-	}
-	return "/dev/i2c-1"
-}
-
-var boardRevision = func() string {
+var boardRevision = func() (string, string) {
 	cat, _ := exec.Command("cat", "/proc/cpuinfo").Output()
 	grep := exec.Command("grep", "Revision")
 	in, _ := grep.StdinPipe()
@@ -42,12 +35,17 @@ var boardRevision = func() string {
 	} else {
 		rev = "3"
 	}
-	return rev
+
+	if rev == "1" {
+		return rev, "/dev/i2c-0"
+	}
+	return rev, "/dev/i2c-1"
 }
 
 type RaspiAdaptor struct {
 	gobot.Adaptor
 	revision    string
+	i2cLocation string
 	digitalPins map[int]sysfs.DigitalPin
 	i2cDevice   io.ReadWriteCloser
 }
@@ -141,14 +139,17 @@ var pins = map[string]map[string]int{
 
 // NewRaspiAdaptor creates a RaspiAdaptor with specified name and
 func NewRaspiAdaptor(name string) *RaspiAdaptor {
-	return &RaspiAdaptor{
+	r := &RaspiAdaptor{
 		Adaptor: *gobot.NewAdaptor(
 			name,
 			"RaspiAdaptor",
 		),
-		revision:    boardRevision(),
 		digitalPins: make(map[int]sysfs.DigitalPin),
 	}
+	rev, i2cLoc := boardRevision()
+	r.revision = rev
+	r.i2cLocation = i2cLoc
+	return r
 }
 
 // Connect starts conection with board and creates
@@ -210,7 +211,7 @@ func (r *RaspiAdaptor) PwmWrite(pin string, val byte) {
 
 // I2cStart starts a i2c device in specified address
 func (r *RaspiAdaptor) I2cStart(address byte) {
-	r.i2cDevice, _ = sysfs.NewI2cDevice(i2cLocationFor(r.revision), address)
+	r.i2cDevice, _ = sysfs.NewI2cDevice(r.i2cLocation, address)
 }
 
 // I2CWrite writes data to i2c device

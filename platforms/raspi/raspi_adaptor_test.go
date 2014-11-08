@@ -1,8 +1,6 @@
 package raspi
 
 import (
-	"io"
-	"os"
 	"testing"
 
 	"github.com/hybridgroup/gobot"
@@ -10,14 +8,8 @@ import (
 )
 
 func initTestRaspiAdaptor() *RaspiAdaptor {
-	i2cLocationFor = func(rev string) string {
-		return os.DevNull
-	}
-	boardRevision = func() string {
-		return "3"
-	}
-	sysfs.WriteFile = func(path string, data []byte) (i int, err error) {
-		return
+	boardRevision = func() (string, string) {
+		return "3", "/dev/i2c-1"
 	}
 	a := NewRaspiAdaptor("myAdaptor")
 	a.Connect()
@@ -33,35 +25,34 @@ func TestRaspiAdaptorFinalize(t *testing.T) {
 
 func TestRaspiAdaptorDigitalIO(t *testing.T) {
 	a := initTestRaspiAdaptor()
-	lastWritePath := ""
-	lastReadPath := ""
-	lastWriteData := []byte{}
+	fs := sysfs.NewMockFilesystem([]string{
+		"/sys/class/gpio/export",
+		"/sys/class/gpio/unexport",
+		"/sys/class/gpio/gpio4/value",
+		"/sys/class/gpio/gpio4/direction",
+		"/sys/class/gpio/gpio27/value",
+		"/sys/class/gpio/gpio27/direction",
+	})
 
-	sysfs.WriteFile = func(path string, data []byte) (i int, err error) {
-		lastWritePath = path
-		lastWriteData = data
-		return
-	}
-	sysfs.ReadFile = func(path string) (b []byte, err error) {
-		lastReadPath = path
-		return []byte("1"), nil
-	}
+	sysfs.SetFilesystem(fs)
 
 	a.DigitalWrite("7", 1)
-	gobot.Assert(t, lastWritePath, "/sys/class/gpio/gpio4/value")
-	gobot.Assert(t, lastWriteData, []byte{49})
+	gobot.Assert(t, fs.Files["/sys/class/gpio/gpio4/value"].Contents, "1")
 
+	a.DigitalWrite("13", 1)
 	i := a.DigitalRead("13")
-	gobot.Assert(t, lastReadPath, "/sys/class/gpio/gpio27/value")
 	gobot.Assert(t, i, 1)
 }
 
 func TestRaspiAdaptorI2c(t *testing.T) {
 	a := initTestRaspiAdaptor()
+	fs := sysfs.NewMockFilesystem([]string{
+		"/dev/i2c-1",
+	})
+	sysfs.SetFilesystem(fs)
+	sysfs.SetSyscall(&sysfs.MockSyscall{})
 	a.I2cStart(0xff)
-	var _ io.ReadWriteCloser = a.i2cDevice
 
-	a.i2cDevice = new(gobot.NullReadWriteCloser)
 	a.I2cWrite([]byte{0x00, 0x01})
-	gobot.Assert(t, a.I2cRead(2), make([]byte, 2))
+	gobot.Assert(t, a.I2cRead(2), []byte{0x00, 0x01})
 }
