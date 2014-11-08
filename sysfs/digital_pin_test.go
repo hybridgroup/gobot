@@ -7,19 +7,14 @@ import (
 )
 
 func TestDigitalPin(t *testing.T) {
-	lastPath := ""
-	lastData := []byte{}
+	fs := NewMockFilesystem([]string{
+		"/sys/class/gpio/export",
+		"/sys/class/gpio/unexport",
+		"/sys/class/gpio/gpio10/value",
+		"/sys/class/gpio/gpio10/direction",
+	})
 
-	WriteFile = func(path string, data []byte) (i int, err error) {
-		lastPath = path
-		lastData = data
-		return
-	}
-
-	ReadFile = func(path string) (b []byte, err error) {
-		lastPath = path
-		return []byte("0"), nil
-	}
+	SetFilesystem(fs)
 
 	pin := NewDigitalPin(10, "custom").(*digitalPin)
 	gobot.Assert(t, pin.pin, "10")
@@ -29,22 +24,25 @@ func TestDigitalPin(t *testing.T) {
 	gobot.Assert(t, pin.label, "gpio10")
 
 	pin.Unexport()
-	gobot.Assert(t, lastPath, "/sys/class/gpio/unexport")
-	gobot.Assert(t, string(lastData), "10")
+	gobot.Assert(t, fs.Files["/sys/class/gpio/unexport"].Contents, "10")
 
 	pin.Export()
-	gobot.Assert(t, lastPath, "/sys/class/gpio/export")
-	gobot.Assert(t, string(lastData), "10")
+	gobot.Assert(t, fs.Files["/sys/class/gpio/unexport"].Contents, "10")
 
 	pin.Write(1)
-	gobot.Assert(t, lastPath, "/sys/class/gpio/gpio10/value")
-	gobot.Assert(t, string(lastData), "1")
+	gobot.Assert(t, fs.Files["/sys/class/gpio/gpio10/value"].Contents, "1")
 
 	pin.Direction(IN)
-	gobot.Assert(t, lastPath, "/sys/class/gpio/gpio10/direction")
-	gobot.Assert(t, string(lastData), "in")
+	gobot.Assert(t, fs.Files["/sys/class/gpio/gpio10/direction"].Contents, "in")
 
 	data, _ := pin.Read()
+	gobot.Assert(t, 1, data)
+
+	pin2 := NewDigitalPin(30, "custom")
+	err := pin2.Write(1)
+	gobot.Refute(t, err, nil)
+
+	data, err = pin2.Read()
+	gobot.Refute(t, err, nil)
 	gobot.Assert(t, data, 0)
-	gobot.Assert(t, lastPath, "/sys/class/gpio/gpio10/value")
 }

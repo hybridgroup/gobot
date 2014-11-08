@@ -1,4 +1,4 @@
-package internal
+package sysfs
 
 import (
 	"os"
@@ -11,7 +11,6 @@ type File interface {
 	Read(b []byte) (n int, err error)
 	ReadAt(b []byte, off int64) (n int, err error)
 	Fd() uintptr
-
 	Close() error
 }
 
@@ -20,8 +19,7 @@ type Filesystem interface {
 }
 
 // Filesystem that opens real files on the host.
-type NativeFilesystem struct {
-}
+type NativeFilesystem struct{}
 
 // Default to the host filesystem.
 var fs Filesystem = &NativeFilesystem{}

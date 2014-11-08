@@ -1,12 +1,34 @@
 package sysfs
 
 import (
+	"github.com/hybridgroup/gobot"
 	"io"
 	"os"
+	"syscall"
 	"testing"
 )
 
 func TestNewI2cDevice(t *testing.T) {
-	i, _ := NewI2cDevice(os.DevNull, 0xff)
+	fs := NewMockFilesystem([]string{})
+	SetFilesystem(fs)
+
+	i, err := NewI2cDevice(os.DevNull, 0xff)
+	gobot.Refute(t, err, nil)
+
+	fs = NewMockFilesystem([]string{
+		"/dev/i2c-1",
+	})
+
+	SetFilesystem(fs)
+
+	i, err = NewI2cDevice("/dev/i2c-1", 0xff)
+	gobot.Refute(t, err, nil)
+
+	ioctrl = func(file File, address byte) syscall.Errno {
+		return 0
+	}
+
+	i, err = NewI2cDevice("/dev/i2c-1", 0xff)
+	gobot.Assert(t, err, nil)
 	var _ io.ReadWriteCloser = i
 }
