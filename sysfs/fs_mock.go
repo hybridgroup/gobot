@@ -2,6 +2,7 @@ package sysfs
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"time"
 )
@@ -83,7 +84,7 @@ func (fs *MockFilesystem) OpenFile(name string, flag int, perm os.FileMode) (fil
 		f.Closed = false
 		return f, nil
 	} else {
-		return (*MockFile)(nil), errors.New("No such file.")
+		return (*MockFile)(nil), errors.New(fmt.Sprintf("%v: No such file.", name))
 	}
 }
 
