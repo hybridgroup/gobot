@@ -4,7 +4,6 @@ import (
 	"github.com/hybridgroup/gobot"
 	"io"
 	"os"
-	"syscall"
 	"testing"
 )
 
@@ -24,9 +23,7 @@ func TestNewI2cDevice(t *testing.T) {
 	i, err = NewI2cDevice("/dev/i2c-1", 0xff)
 	gobot.Refute(t, err, nil)
 
-	ioctrl = func(file File, address byte) syscall.Errno {
-		return 0
-	}
+	SetSyscall(&MockSyscall{})
 
 	i, err = NewI2cDevice("/dev/i2c-1", 0xff)
 	gobot.Assert(t, err, nil)

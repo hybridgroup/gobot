@@ -18,21 +18,16 @@ func NewI2cDevice(location string, address byte) (io.ReadWriteCloser, error) {
 		return nil, err
 	}
 
-	errno := ioctrl(file, address)
+	_, _, errno := Syscall(
+		syscall.SYS_IOCTL,
+		file.Fd(),
+		I2CSlave,
+		uintptr(address),
+	)
 
 	if errno != 0 {
 		return nil, errors.New(fmt.Sprintf("Failed with syscall.Errno %v", errno))
 	}
 
 	return file, nil
-}
-
-var ioctrl = func(file File, address byte) syscall.Errno {
-	_, _, errno := syscall.Syscall(
-		syscall.SYS_IOCTL,
-		file.Fd(),
-		I2CSlave, uintptr(address),
-	)
-
-	return errno
 }
