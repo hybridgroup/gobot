@@ -1,32 +1,47 @@
 package edison
 
 import (
-	"io"
-	"os"
 	"testing"
 
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/sysfs"
 )
 
-func initTestEdisonAdaptor() *EdisonAdaptor {
-	i2cLocation = os.DevNull
-	sysfs.WriteFile = func(path string, data []byte) (i int, err error) {
-		return
-	}
-	writeFile = func(name, data string) error {
-		return nil
-	}
-	readFile = func(name string) ([]byte, error) {
-		return []byte("11"), nil
-	}
+func initTestEdisonAdaptor() (*EdisonAdaptor, *sysfs.MockFilesystem) {
 	a := NewEdisonAdaptor("myAdaptor")
+	fs := sysfs.NewMockFilesystem([]string{
+		"/sys/bus/iio/devices/iio:device1/in_voltage0_raw",
+		"/sys/kernel/debug/gpio_debug/gpio111/current_pinmux",
+		"/sys/kernel/debug/gpio_debug/gpio115/current_pinmux",
+		"/sys/kernel/debug/gpio_debug/gpio114/current_pinmux",
+		"/sys/kernel/debug/gpio_debug/gpio109/current_pinmux",
+		"/sys/kernel/debug/gpio_debug/gpio131/current_pinmux",
+		"/sys/kernel/debug/gpio_debug/gpio129/current_pinmux",
+		"/sys/kernel/debug/gpio_debug/gpio40/current_pinmux",
+		"/sys/kernel/debug/gpio_debug/gpio13/current_pinmux",
+		"/sys/kernel/debug/gpio_debug/gpio28/current_pinmux",
+		"/sys/kernel/debug/gpio_debug/gpio27/current_pinmux",
+		"/sys/class/pwm/pwmchip0/export",
+		"/sys/class/pwm/pwmchip0/unexport",
+		"/sys/class/pwm/pwmchip0/pwm1/duty_cycle",
+		"/sys/class/pwm/pwmchip0/pwm1/period",
+		"/sys/class/pwm/pwmchip0/pwm1/enable",
+		"/sys/class/gpio/export",
+		"/sys/class/gpio/unexport",
+		"/sys/class/gpio/gpio40/value",
+		"/sys/class/gpio/gpio40/direction",
+		"/sys/class/gpio/gpio128/value",
+		"/sys/class/gpio/gpio128/direction",
+		"/dev/i2c-6",
+	})
+	sysfs.SetFilesystem(fs)
+	fs.Files["/sys/class/pwm/pwmchip0/pwm1/period"].Contents = "5000\n"
 	a.Connect()
-	return a
+	return a, fs
 }
 
 func TestEdisonAdaptorFinalize(t *testing.T) {
-	a := initTestEdisonAdaptor()
+	a, _ := initTestEdisonAdaptor()
 	a.DigitalWrite("3", 1)
 	a.PwmWrite("5", 100)
 	a.i2cDevice = new(gobot.NullReadWriteCloser)
@@ -34,68 +49,37 @@ func TestEdisonAdaptorFinalize(t *testing.T) {
 }
 
 func TestEdisonAdaptorDigitalIO(t *testing.T) {
-	a := initTestEdisonAdaptor()
-	lastWritePath := ""
-	lastReadPath := ""
-	lastWriteData := []byte{}
-
-	sysfs.WriteFile = func(path string, data []byte) (i int, err error) {
-		lastWritePath = path
-		lastWriteData = data
-		return
-	}
-	sysfs.ReadFile = func(path string) (b []byte, err error) {
-		lastReadPath = path
-		return []byte("1"), nil
-	}
+	a, fs := initTestEdisonAdaptor()
 
 	a.DigitalWrite("13", 1)
-	gobot.Assert(t, lastWritePath, "/sys/class/gpio/gpio40/value")
-	gobot.Assert(t, lastWriteData, []byte{49})
+	gobot.Assert(t, fs.Files["/sys/class/gpio/gpio40/value"].Contents, "1")
 
+	a.DigitalWrite("2", 0)
 	i := a.DigitalRead("2")
-	gobot.Assert(t, lastReadPath, "/sys/class/gpio/gpio128/value")
-	gobot.Assert(t, i, 1)
+	gobot.Assert(t, i, 0)
 }
 
 func TestEdisonAdaptorI2c(t *testing.T) {
-	a := initTestEdisonAdaptor()
-	a.I2cStart(0xff)
-	var _ io.ReadWriteCloser = a.i2cDevice
+	a, _ := initTestEdisonAdaptor()
 
-	a.i2cDevice = new(gobot.NullReadWriteCloser)
+	sysfs.SetSyscall(&sysfs.MockSyscall{})
+	a.I2cStart(0xff)
+
 	a.I2cWrite([]byte{0x00, 0x01})
-	gobot.Assert(t, a.I2cRead(2), make([]byte, 2))
+	gobot.Assert(t, a.I2cRead(2), []byte{0x00, 0x01})
 }
 
 func TestEdisonAdaptorPwm(t *testing.T) {
-	a := initTestEdisonAdaptor()
-	lastWritePath := ""
-	lastReadPath := ""
-	lastWriteData := ""
+	a, fs := initTestEdisonAdaptor()
 
-	writeFile = func(path, data string) (err error) {
-		lastWritePath = path
-		lastWriteData = data
-		return
-	}
-
-	readFile = func(path string) (b []byte, err error) {
-		lastReadPath = path
-		return []byte("100\n"), nil
-	}
 	a.PwmWrite("5", 100)
-	gobot.Assert(t, lastWritePath, "/sys/class/pwm/pwmchip0/pwm1/duty_cycle")
+	gobot.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/pwm1/duty_cycle"].Contents, "1960")
 }
 
 func TestEdisonAdaptorAnalog(t *testing.T) {
-	a := initTestEdisonAdaptor()
-	lastReadPath := ""
-	readFile = func(path string) (b []byte, err error) {
-		lastReadPath = path
-		return []byte("100\n"), nil
-	}
+	a, fs := initTestEdisonAdaptor()
+
+	fs.Files["/sys/bus/iio/devices/iio:device1/in_voltage0_raw"].Contents = "1000\n"
 	i := a.AnalogRead("0")
-	gobot.Assert(t, lastReadPath, "/sys/bus/iio/devices/iio:device1/in_voltage0_raw")
-	gobot.Assert(t, i, 100)
+	gobot.Assert(t, i, 1000)
 }

@@ -1,10 +1,8 @@
 package edison
 
 import (
-	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"strconv"
 
@@ -12,26 +10,30 @@ import (
 	"github.com/hybridgroup/gobot/sysfs"
 )
 
-var i2cLocation = "/dev/i2c-6"
-
-// writeFile validates file existence and writes data into it
-var writeFile = func(name, data string) error {
-	if _, err := os.Stat(name); err == nil {
-		err := ioutil.WriteFile(
-			name,
-			[]byte(data),
-			0644,
-		)
-		if err != nil {
-			return err
-		}
-	} else {
-		return errors.New("File doesn't exist: " + name)
+func writeFile(path string, data []byte) (i int, err error) {
+	file, err := sysfs.OpenFile(path, os.O_WRONLY, 0644)
+	defer file.Close()
+	if err != nil {
+		return
 	}
-	return nil
+
+	return file.Write(data)
 }
-var readFile = func(path string) ([]byte, error) {
-	return ioutil.ReadFile(path)
+
+func readFile(path string) ([]byte, error) {
+	file, err := sysfs.OpenFile(path, os.O_RDONLY, 0644)
+	defer file.Close()
+	if err != nil {
+		return make([]byte, 0), err
+	}
+
+	buf := make([]byte, 200)
+	var i = 0
+	i, err = file.Read(buf)
+	if i == 0 {
+		return buf, err
+	}
+	return buf[:i], err
 }
 
 type mux struct {
@@ -169,9 +171,9 @@ var sysfsPinMap = map[string]sysfsPin{
 
 // changePinMode writes pin mode to current_pinmux file
 func changePinMode(pin, mode string) {
-	err := writeFile(
+	_, err := writeFile(
 		"/sys/kernel/debug/gpio_debug/gpio"+pin+"/current_pinmux",
-		"mode"+mode,
+		[]byte("mode"+mode),
 	)
 	if err != nil {
 		panic(err)
@@ -364,7 +366,7 @@ func (e *EdisonAdaptor) I2cStart(address byte) {
 
 	e.tristate.Write(sysfs.HIGH)
 
-	e.i2cDevice, _ = sysfs.NewI2cDevice(i2cLocation, address)
+	e.i2cDevice, _ = sysfs.NewI2cDevice("/dev/i2c-6", address)
 }
 
 // I2cWrite writes data to i2cDevice
