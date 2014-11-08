@@ -20,8 +20,6 @@ const (
 	UsrLed = "/sys/devices/ocp.3/gpio-leds.8/leds/beaglebone:green:"
 )
 
-var i2cLocation = "/dev/i2c-1"
-
 var pins = map[string]int{
 	"P8_3":  38,
 	"P8_4":  39,
@@ -213,7 +211,7 @@ func (b *BeagleboneAdaptor) AnalogWrite(pin string, val byte) {
 
 // I2cStart starts a i2c device in specified address
 func (b *BeagleboneAdaptor) I2cStart(address byte) {
-	b.i2cDevice, _ = sysfs.NewI2cDevice(i2cLocation, address)
+	b.i2cDevice, _ = sysfs.NewI2cDevice("/dev/i2c-1", address)
 }
 
 // I2CWrite writes data to i2c device
