@@ -4,7 +4,7 @@ EXITCODE=0
 
 if [ "$(go version | cut -d' ' -f3)" = "devel" ]
 then
-   get golang.org/x/tools/cmd/cover
+  go get golang.org/x/tools/cmd/cover
 else
   go get code.google.com/p/go.tools/cmd/cover
 fi
