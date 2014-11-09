@@ -2,8 +2,8 @@ package beaglebone
 
 import (
 	"fmt"
+	"github.com/hybridgroup/gobot/sysfs"
 	"os"
-	"path/filepath"
 	"strings"
 )
 
@@ -13,22 +13,14 @@ type pwmPin struct {
 }
 
 // newPwmPin creates a new pwm pin with specified pin number
-func newPwmPin(pinNum string) *pwmPin {
-	var err error
-	var fi *os.File
+func newPwmPin(pinNum string, ocp string) *pwmPin {
+	var fi sysfs.File
 
 	d := &pwmPin{
 		pinNum: strings.ToUpper(pinNum),
 	}
 
-	ensureSlot(fmt.Sprintf("bone_pwm_%v", d.pinNum))
-
-	ocp, err := filepath.Glob(Ocp)
-	if err != nil {
-		panic(err)
-	}
-
-	pwmDevice, err := filepath.Glob(fmt.Sprintf("%v/pwm_test_%v.*", ocp[0], d.pinNum))
+	pwmDevice, err := glob(fmt.Sprintf("%v/pwm_test_%v.*", ocp, d.pinNum))
 	if err != nil {
 		panic(err)
 	}
@@ -36,7 +28,8 @@ func newPwmPin(pinNum string) *pwmPin {
 	d.pwmDevice = pwmDevice[0]
 
 	for i := 0; i < 10; i++ {
-		fi, err = os.OpenFile(fmt.Sprintf("%v/run", d.pwmDevice), os.O_RDWR|os.O_APPEND, 0666)
+		fi, err = sysfs.OpenFile(fmt.Sprintf("%v/run", d.pwmDevice), os.O_RDWR|os.O_APPEND, 0666)
+		defer fi.Close()
 		if err != nil && i == 9 {
 			panic(err)
 		} else {
@@ -46,15 +39,14 @@ func newPwmPin(pinNum string) *pwmPin {
 
 	fi.WriteString("1")
 	fi.Sync()
-	fi.Close()
 
 	for {
-		if _, err := os.Stat(fmt.Sprintf("%v/period", d.pwmDevice)); err == nil {
+		if _, err := sysfs.OpenFile(fmt.Sprintf("%v/period", d.pwmDevice), os.O_RDONLY, 0644); err == nil {
 			break
 		}
 	}
 	for {
-		if _, err := os.Stat(fmt.Sprintf("%v/duty", d.pwmDevice)); err == nil {
+		if _, err := sysfs.OpenFile(fmt.Sprintf("%v/duty", d.pwmDevice), os.O_RDONLY, 0644); err == nil {
 			break
 		}
 	}
@@ -63,30 +55,27 @@ func newPwmPin(pinNum string) *pwmPin {
 
 // pwmWrite writes to a pwm pin with specified period and duty
 func (p *pwmPin) pwmWrite(period string, duty string) {
-	var err error
-	var fi *os.File
-
-	fi, err = os.OpenFile(fmt.Sprintf("%v/period", p.pwmDevice), os.O_WRONLY|os.O_APPEND, 0666)
+	f1, err := sysfs.OpenFile(fmt.Sprintf("%v/period", p.pwmDevice), os.O_WRONLY|os.O_APPEND, 0666)
+	defer f1.Close()
 	if err != nil {
 		panic(err)
 	}
-	fi.WriteString(period)
-	fi.Close()
+	f1.WriteString(period)
 
-	fi, err = os.OpenFile(fmt.Sprintf("%v/duty", p.pwmDevice), os.O_WRONLY|os.O_APPEND, 0666)
+	f2, err := sysfs.OpenFile(fmt.Sprintf("%v/duty", p.pwmDevice), os.O_WRONLY|os.O_APPEND, 0666)
+	defer f2.Close()
 	if err != nil {
 		panic(err)
 	}
-	fi.WriteString(duty)
-	fi.Close()
+	f2.WriteString(duty)
 }
 
 // releae writes string to close a pwm pin
 func (p *pwmPin) release() {
-	fi, err := os.OpenFile(fmt.Sprintf("%v/run", p.pwmDevice), os.O_WRONLY|os.O_APPEND, 0666)
+	fi, err := sysfs.OpenFile(fmt.Sprintf("%v/run", p.pwmDevice), os.O_WRONLY|os.O_APPEND, 0666)
+	defer fi.Close()
 	if err != nil {
 		panic(err)
 	}
 	fi.WriteString("0")
-	fi.Close()
 }
