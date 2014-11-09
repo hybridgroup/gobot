@@ -2,6 +2,13 @@
 PACKAGES=('gobot' 'gobot/api' 'gobot/platforms/intel-iot/edison' 'gobot/sysfs' $(ls ./platforms | sed -e 's/^/gobot\/platforms\//'))
 EXITCODE=0
 
+if [ "$(go version | cut -d' ' -f3)" = "devel" ]
+then
+   get golang.org/x/tools/cmd/cover
+else
+  go get code.google.com/p/go.tools/cmd/cover
+fi
+
 echo "mode: count" > profile.cov
 touch tmp.cov
 for package in "${PACKAGES[@]}"
