@@ -14,13 +14,13 @@ import (
 	"github.com/hybridgroup/gobot/sysfs"
 )
 
-const (
-	Slots  = "/sys/devices/bone_capemgr.*"
-	Ocp    = "/sys/devices/ocp.*"
-	UsrLed = "/sys/devices/ocp.3/gpio-leds.8/leds/beaglebone:green:"
-)
+var slots = "/sys/devices/bone_capemgr.*"
+var ocp = "/sys/devices/ocp.*"
+var usrLed = "/sys/devices/ocp.3/gpio-leds.8/leds/beaglebone:green:"
 
-var i2cLocation = "/dev/i2c-1"
+var glob = func(pattern string) (matches []string, err error) {
+	return filepath.Glob(pattern)
+}
 
 var pins = map[string]int{
 	"P8_3":  38,
@@ -116,32 +116,38 @@ type BeagleboneAdaptor struct {
 	gobot.Adaptor
 	digitalPins []sysfs.DigitalPin
 	pwmPins     map[string]*pwmPin
-	analogPins  map[string]*analogPin
 	i2cDevice   io.ReadWriteCloser
-	connect     func()
+	ocp         string
+	helper      string
+	slots       string
 }
 
 // NewBeagleboneAdaptor returns a new beaglebone adaptor with specified name
 func NewBeagleboneAdaptor(name string) *BeagleboneAdaptor {
-	return &BeagleboneAdaptor{
+	b := &BeagleboneAdaptor{
 		Adaptor: *gobot.NewAdaptor(
 			name,
 			"BeagleboneAdaptor",
 		),
-		connect: func() {
-			ensureSlot("cape-bone-iio")
-			ensureSlot("am33xx_pwm")
-		},
+		digitalPins: make([]sysfs.DigitalPin, 120),
+		pwmPins:     make(map[string]*pwmPin),
 	}
+
+	g, _ := glob(ocp)
+	b.ocp = g[0]
+	g, _ = glob(fmt.Sprintf("%v/helper.*", b.ocp))
+	b.helper = g[0]
+	g, _ = glob(slots)
+	b.slots = fmt.Sprintf("%v/slots", g[0])
+
+	return b
 }
 
 // Connect returns true on a succesful connection to beaglebone board.
 // It initializes digital, pwm and analog pins
 func (b *BeagleboneAdaptor) Connect() bool {
-	b.digitalPins = make([]sysfs.DigitalPin, 120)
-	b.pwmPins = make(map[string]*pwmPin)
-	b.analogPins = make(map[string]*analogPin)
-	b.connect()
+	ensureSlot(b.slots, "cape-bone-iio")
+	ensureSlot(b.slots, "am33xx_pwm")
 	return true
 }
 
@@ -189,7 +195,7 @@ func (b *BeagleboneAdaptor) DigitalRead(pin string) (i int) {
 // valid usr pin values are usr0, usr1, usr2 and usr3
 func (b *BeagleboneAdaptor) DigitalWrite(pin string, val byte) {
 	if strings.Contains(pin, "usr") {
-		fi, err := os.OpenFile(UsrLed+pin+"/brightness", os.O_WRONLY|os.O_APPEND, 0666)
+		fi, err := sysfs.OpenFile(usrLed+pin+"/brightness", os.O_WRONLY|os.O_APPEND, 0666)
 		defer fi.Close()
 		if err != nil {
 			log.Fatal(err)
@@ -202,8 +208,17 @@ func (b *BeagleboneAdaptor) DigitalWrite(pin string, val byte) {
 
 // AnalogRead returns an analog value from specified pin
 func (b *BeagleboneAdaptor) AnalogRead(pin string) int {
-	i := b.analogPin(pin)
-	return b.analogPins[i].analogRead()
+	fi, err := sysfs.OpenFile(fmt.Sprintf("%v/%v", b.helper, b.translateAnalogPin(pin)), os.O_RDONLY, 0644)
+	defer fi.Close()
+	if err != nil {
+		panic(err)
+	}
+
+	var buf = make([]byte, 1024)
+	fi.Read(buf)
+
+	i, _ := strconv.Atoi(strings.Split(string(buf), "\n")[0])
+	return i
 }
 
 // AnalogWrite writes an analog value to specified pin
@@ -213,7 +228,7 @@ func (b *BeagleboneAdaptor) AnalogWrite(pin string, val byte) {
 
 // I2cStart starts a i2c device in specified address
 func (b *BeagleboneAdaptor) I2cStart(address byte) {
-	b.i2cDevice, _ = sysfs.NewI2cDevice(i2cLocation, address)
+	b.i2cDevice, _ = sysfs.NewI2cDevice("/dev/i2c-1", address)
 }
 
 // I2CWrite writes data to i2c device
@@ -258,15 +273,6 @@ func (b *BeagleboneAdaptor) translateAnalogPin(pin string) string {
 	panic("Not a valid pin")
 }
 
-// analogPin retrieves analog pin value by name
-func (b *BeagleboneAdaptor) analogPin(pin string) string {
-	i := b.translateAnalogPin(pin)
-	if b.analogPins[i] == nil {
-		b.analogPins[i] = newAnalogPin(i)
-	}
-	return i
-}
-
 // digitalPin retrieves digital pin value by name
 func (b *BeagleboneAdaptor) digitalPin(pin string, dir string) sysfs.DigitalPin {
 	i := b.translatePin(pin)
@@ -285,7 +291,8 @@ func (b *BeagleboneAdaptor) digitalPin(pin string, dir string) sysfs.DigitalPin 
 func (b *BeagleboneAdaptor) pwmPin(pin string) string {
 	i := b.translatePwmPin(pin)
 	if b.pwmPins[i] == nil {
-		b.pwmPins[i] = newPwmPin(i)
+		ensureSlot(b.slots, fmt.Sprintf("bone_pwm_%v", pin))
+		b.pwmPins[i] = newPwmPin(i, b.ocp)
 	}
 	return i
 }
@@ -298,15 +305,8 @@ func (b *BeagleboneAdaptor) pwmWrite(pin string, val byte) {
 	b.pwmPins[i].pwmWrite(strconv.Itoa(int(period)), strconv.Itoa(int(period*duty)))
 }
 
-func ensureSlot(item string) {
-	var err error
-	var fi *os.File
-
-	slot, err := filepath.Glob(Slots)
-	if err != nil {
-		panic(err)
-	}
-	fi, err = os.OpenFile(fmt.Sprintf("%v/slots", slot[0]), os.O_RDWR|os.O_APPEND, 0666)
+func ensureSlot(slots, item string) {
+	fi, err := sysfs.OpenFile(slots, os.O_RDWR|os.O_APPEND, 0666)
 	if err != nil {
 		panic(err)
 	}
