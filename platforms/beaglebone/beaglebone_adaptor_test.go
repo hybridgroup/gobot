@@ -35,9 +35,10 @@ func TestBeagleboneAdaptor(t *testing.T) {
 	a := NewBeagleboneAdaptor("myAdaptor")
 	a.slots = "/sys/devices/bone_capemgr.4"
 	a.ocp = "/sys/devices/ocp.3"
-	a.helper = "/sys/devices/ocp.3/helper.5"
 
 	a.Connect()
+
+	a.helper = "/sys/devices/ocp.3/helper.5"
 
 	// PWM
 	glob = func(pattern string) (matches []string, err error) {

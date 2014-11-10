@@ -135,8 +135,6 @@ func NewBeagleboneAdaptor(name string) *BeagleboneAdaptor {
 
 	g, _ := glob(ocp)
 	b.ocp = g[0]
-	g, _ = glob(fmt.Sprintf("%v/helper.*", b.ocp))
-	b.helper = g[0]
 	g, _ = glob(slots)
 	b.slots = fmt.Sprintf("%v/slots", g[0])
 
@@ -148,6 +146,10 @@ func NewBeagleboneAdaptor(name string) *BeagleboneAdaptor {
 func (b *BeagleboneAdaptor) Connect() bool {
 	ensureSlot(b.slots, "cape-bone-iio")
 	ensureSlot(b.slots, "am33xx_pwm")
+
+	g, _ := glob(fmt.Sprintf("%v/helper.*", b.ocp))
+	b.helper = g[0]
+
 	return true
 }
 
