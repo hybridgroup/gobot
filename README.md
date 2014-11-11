@@ -98,9 +98,12 @@ Gobot has a extensible system for connecting to hardware devices. The following 
   - [Intel Edison](http://www.intel.com/content/www/us/en/do-it-yourself/edison.html) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/intel-iot/edison)
   - [Joystick](http://en.wikipedia.org/wiki/Joystick) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/joystick)
   - [Leap Motion](https://www.leapmotion.com/) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/leapmotion)
+  - [MavLink](http://qgroundcontrol.org/mavlink/start) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/mavlinky)
+  - [MQTT](http://mqtt.org/) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/mqtt)
   - [Neurosky](http://neurosky.com/products-markets/eeg-biosensors/hardware/) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/neurosky)
   - [OpenCV](http://opencv.org/) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/opencv)
   - [Pebble](https://www.getpebble.com/) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/pebble)
+  - [Raspberry Pi](http://www.raspberrypi.org/) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/raspi)
   - [Spark](https://www.spark.io/) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/spark)
   - [Sphero](http://www.gosphero.com/) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/sphero)
 
@@ -125,13 +128,15 @@ drivers provided using the gobot-i2c module:
   - [I2C](https://en.wikipedia.org/wiki/I%C2%B2C) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/platforms/i2c)
     - BlinkM
     - HMC6352
+    - MPL1150A2
+    - MPU6050
     - Wii Nunchuck Controller
 
 More platforms and drivers are coming soon...
 
 ## Getting Started
 
-Install Gobot with: `go get -u github.com/hybridgroup/gobot`
+Install Gobot with: `go get -d -u github.com/hybridgroup/gobot/...`
 
 ## API:
 
