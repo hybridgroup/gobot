@@ -1,3 +1,31 @@
+0.7
+---
+  - Dramatically increased test coverage and documentation
+  - api
+    - Conform to the [cppp.io](https://github.com/hybridgroup/cppp-io) spec
+    - Add support for basic middleware
+    - Add support for custom routes
+    - Add SSE support
+  - ardrone
+    - Add optional parameter to specify the drones network address
+  - core
+    - Add `Once(e *Event, f func(s interface{})` Event function
+    - Rename `Expect` to `Assert` and add `Refute` test helper function
+  - i2c
+    - Add support for MPL115A2
+    - Add support for MPU6050
+  - mavlink
+    - Add support for `common` mavlink messages
+  - mqtt
+    - Add support for mqtt
+  - raspi
+    - Add support for the Raspberry Pi
+  - sphero
+    - Enable stop on sphero disconnect
+    - Add `Collision` data struct  
+  - sysfs
+    - Add generic linux filesystem gpio implementation
+
 0.6.1
 ---
 - cli
