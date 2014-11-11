@@ -26,11 +26,27 @@
   - sysfs
     - Add generic linux filesystem gpio implementation
 
+0.6.3
+---
+- Add support for the Intel Edison
+
+0.6.2
+---
+- cli
+  - Fix typo in generator
+- leap
+  - Fix incorrect Port reference
+  - Fix incorrect Event name
+- neurosky
+  - Fix incorrect Event names
+- sphero
+  - Correctly format output of GetRGB 
+>>>>>>> master
+
 0.6.1
 ---
 - cli
   - Fix template error in generator
-
 
 0.6  
 ---  

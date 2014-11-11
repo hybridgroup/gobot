@@ -1,5 +1,4 @@
 PACKAGES := gobot gobot/api gobot/platforms/intel-iot/edison gobot/sysfs $(shell ls ./platforms | sed -e 's/^/gobot\/platforms\//')
-
 .PHONY: test cover robeaux
 
 test:
