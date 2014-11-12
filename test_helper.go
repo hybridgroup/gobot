@@ -14,6 +14,9 @@ func logFailure(t *testing.T, message string) {
 	s := strings.Split(file, "/")
 	t.Errorf("%v:%v: %v", s[len(s)-1], line, message)
 }
+
+// Assert ensures a and b are equal and of the same type, or else it
+// causes a t.Error
 func Assert(t *testing.T, a interface{}, b interface{}) {
 	if !reflect.DeepEqual(a, b) {
 		logFailure(t, fmt.Sprintf("%v - \"%v\", should equal,  %v - \"%v\"",
@@ -21,6 +24,7 @@ func Assert(t *testing.T, a interface{}, b interface{}) {
 	}
 }
 
+// Refute ensures a and b are not equal, causes a t.Error if they are equal
 func Refute(t *testing.T, a interface{}, b interface{}) {
 	if reflect.DeepEqual(a, b) {
 		logFailure(t, fmt.Sprintf("%v - \"%v\", should not equal,  %v - \"%v\"",
