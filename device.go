@@ -2,6 +2,7 @@ package gobot
 
 import (
 	"errors"
+	"fmt"
 	"log"
 )
 
@@ -39,8 +40,9 @@ func (d *devices) Start() error {
 			info = info + " on pin " + device.Pin()
 		}
 		log.Println(info + "...")
-		if device.Start() == false {
-			err = errors.New("Could not start device")
+		err = device.Start()
+		if err != nil {
+			err = errors.New(fmt.Sprintf("Could not start device: %v", err))
 			break
 		}
 	}

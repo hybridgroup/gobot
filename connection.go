@@ -2,6 +2,7 @@ package gobot
 
 import (
 	"errors"
+	"fmt"
 	"log"
 )
 
@@ -37,8 +38,9 @@ func (c *connections) Start() error {
 			info = info + " on port " + connection.Port()
 		}
 		log.Println(info + "...")
-		if connection.Connect() == false {
-			err = errors.New("Could not start connection")
+		err = connection.Connect()
+		if err != nil {
+			err = errors.New(fmt.Sprintf("Could not start connection: %v", err))
 			break
 		}
 	}

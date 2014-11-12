@@ -56,8 +56,11 @@ func (g *Gobot) Command(name string) func(map[string]interface{}) interface{} {
 }
 
 // Start runs the main Gobot event loop
-func (g *Gobot) Start() {
-	g.robots.Start()
+func (g *Gobot) Start() error {
+	err := g.robots.Start()
+	if err != nil {
+		return err
+	}
 
 	c := make(chan os.Signal, 1)
 	g.trap(c)
@@ -69,6 +72,7 @@ func (g *Gobot) Start() {
 		r.Devices().Halt()
 		r.Connections().Finalize()
 	})
+	return nil
 }
 
 // Robots fetch all robots associated with this Gobot instance.

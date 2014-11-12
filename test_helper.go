@@ -62,9 +62,8 @@ type testDriver struct {
 	Driver
 }
 
-func (t *testDriver) Init() bool  { return true }
-func (t *testDriver) Start() bool { return true }
-func (t *testDriver) Halt() bool  { return true }
+func (t *testDriver) Start() error { return nil }
+func (t *testDriver) Halt() error  { return nil }
 
 func NewTestDriver(name string, adaptor *testAdaptor) *testDriver {
 	t := &testDriver{
@@ -94,8 +93,8 @@ type testAdaptor struct {
 	Adaptor
 }
 
-func (t *testAdaptor) Finalize() bool { return true }
-func (t *testAdaptor) Connect() bool  { return true }
+func (t *testAdaptor) Finalize() error { return nil }
+func (t *testAdaptor) Connect() error  { return nil }
 
 func NewTestAdaptor(name string) *testAdaptor {
 	return &testAdaptor{
