@@ -36,8 +36,13 @@ type Driver struct {
 	driverType string
 }
 
-// NewDriver returns a Driver with specified parameters
-// and sets driver pin, adaptor and interval
+// NewDriver returns a new Driver given a name, driverType and optionally accepts:
+//
+//	string: Pin the driver connects to
+//	AdaptorInterface: Adaptor the driver connects to
+//	time.Duration: Interval used internally for polling where applicable
+//
+// driverType is a label used for identification in the api
 func NewDriver(name string, driverType string, v ...interface{}) *Driver {
 	if name == "" {
 		name = fmt.Sprintf("%X", Rand(int(^uint(0)>>1)))

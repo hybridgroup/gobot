@@ -23,7 +23,11 @@ type AdaptorInterface interface {
 	ToJSON() *JSONConnection
 }
 
-// NewAdaptor returns a new Gobot Adaptor
+// NewAdaptor returns a new Adaptor given a name, adaptorType and optionally accepts:
+//
+//	string: Port the adaptor connects to
+//
+// adaptorType is a label used for identification in the api
 func NewAdaptor(name string, adaptorType string, v ...interface{}) *Adaptor {
 	if name == "" {
 		name = fmt.Sprintf("%X", Rand(int(^uint(0)>>1)))
@@ -70,7 +74,7 @@ func (a *Adaptor) Type() string {
 	return a.adaptorType
 }
 
-// Connected returns true if adaptor is connected
+// Connected returns true if the adaptor is connected
 func (a *Adaptor) Connected() bool {
 	return a.connected
 }
@@ -80,7 +84,7 @@ func (a *Adaptor) SetConnected(b bool) {
 	a.connected = b
 }
 
-// ToJSON returns a json representation of adaptor
+// ToJSON returns a json representation of an adaptor
 func (a *Adaptor) ToJSON() *JSONConnection {
 	return &JSONConnection{
 		Name:    a.Name(),

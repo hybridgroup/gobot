@@ -2,13 +2,8 @@
 
 /*
 Package gobot provides a framework for robotics, physical computing and the internet of things.
-It is the main point of entry in your Gobot application. A Gobot
+It is the main point of entry for your Gobot application. A Gobot program
 is typically composed of one or more robots that makes up a project.
-
-Commands are a way to expose your robots functionality with the external world.
-A Gobot can be configured to expose a restful HTTP interface using the api
-package. You can define custom commands on your Gobot and interact with your
-application as a web service.
 
 Basic Setup
 
@@ -35,39 +30,7 @@ Basic Setup
       gbot.Start()
     }
 
-Web Enabled? You bet!
-
-    package main
-
-    import (
-    	"fmt"
-
-    	"github.com/hybridgroup/gobot"
-    	"github.com/hybridgroup/gobot/api"
-    )
-
-    func main() {
-    	gbot := gobot.NewGobot()
-
-      // Starts the API server on default port 3000
-    	api.NewAPI(gbot).Start()
-
-      // Accessible via http://localhost:3000/api/commands/say_hello
-    	gbot.AddCommand("say_hello", func(params map[string]interface{}) interface{} {
-    		return "Master says hello!"
-    	})
-
-    	hello := gbot.AddRobot(gobot.NewRobot("Eve"))
-
-      // Accessible via http://localhost:3000/robots/Eve/commands/say_hello
-    	hello.AddCommand("say_hello", func(params map[string]interface{}) interface{} {
-    		return fmt.Sprintf("%v says hello!", hello.Name)
-    	})
-
-    	gbot.Start()
-    }
-
-Blinking teh LED (Hello Eve!)
+Blinking an LED (Hello Eve!)
 
     package main
 
@@ -101,5 +64,42 @@ Blinking teh LED (Hello Eve!)
 
     	gbot.Start()
     }
+
+Web Enabled? You bet! Gobot can be configured to expose a restful HTTP interface
+using the api package. You can define custom commands on your robots, in addition
+to the built-in device driver commands, and interact with your application as a
+web service.
+
+
+    package main
+
+    import (
+    	"fmt"
+
+    	"github.com/hybridgroup/gobot"
+    	"github.com/hybridgroup/gobot/api"
+    )
+
+    func main() {
+    	gbot := gobot.NewGobot()
+
+      // Starts the API server on default port 3000
+    	api.NewAPI(gbot).Start()
+
+      // Accessible via http://localhost:3000/api/commands/say_hello
+    	gbot.AddCommand("say_hello", func(params map[string]interface{}) interface{} {
+    		return "Master says hello!"
+    	})
+
+    	hello := gbot.AddRobot(gobot.NewRobot("Eve"))
+
+      // Accessible via http://localhost:3000/robots/Eve/commands/say_hello
+    	hello.AddCommand("say_hello", func(params map[string]interface{}) interface{} {
+    		return fmt.Sprintf("%v says hello!", hello.Name)
+    	})
+
+    	gbot.Start()
+    }
+
 */
 package gobot
