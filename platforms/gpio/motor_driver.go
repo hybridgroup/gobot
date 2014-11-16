@@ -46,34 +46,36 @@ func (m *MotorDriver) Start() error { return nil }
 func (m *MotorDriver) Halt() error { return nil }
 
 // Off turns the motor off or sets the motor to a 0 speed
-func (m *MotorDriver) Off() {
+func (m *MotorDriver) Off() (err error) {
 	if m.isDigital() {
-		m.changeState(0)
+		err = m.changeState(0)
 	} else {
-		m.Speed(0)
+		err = m.Speed(0)
 	}
+	return
 }
 
 // On turns the motor on or sets the motor to a maximum speed
-func (m *MotorDriver) On() {
+func (m *MotorDriver) On() (err error) {
 	if m.isDigital() {
-		m.changeState(1)
+		err = m.changeState(1)
 	} else {
 		if m.CurrentSpeed == 0 {
 			m.CurrentSpeed = 255
 		}
-		m.Speed(m.CurrentSpeed)
+		err = m.Speed(m.CurrentSpeed)
 	}
+	return
 }
 
 // Min sets the motor to the minimum speed
-func (m *MotorDriver) Min() {
-	m.Off()
+func (m *MotorDriver) Min() (err error) {
+	return m.Off()
 }
 
 // Max sets the motor to the maximum speed
-func (m *MotorDriver) Max() {
-	m.Speed(255)
+func (m *MotorDriver) Max() (err error) {
+	return m.Speed(255)
 }
 
 // InOn returns true if the motor is on
@@ -90,35 +92,50 @@ func (m *MotorDriver) IsOff() bool {
 }
 
 // Toggle sets the motor to the opposite of it's current state
-func (m *MotorDriver) Toggle() {
+func (m *MotorDriver) Toggle() (err error) {
 	if m.IsOn() {
-		m.Off()
+		err = m.Off()
 	} else {
-		m.On()
+		err = m.On()
 	}
+	return
 }
 
 // Speed sets the speed of the motor
-func (m *MotorDriver) Speed(value byte) {
+func (m *MotorDriver) Speed(value byte) (err error) {
 	m.CurrentMode = "analog"
 	m.CurrentSpeed = value
-	m.adaptor().PwmWrite(m.SpeedPin, value)
+	return m.adaptor().PwmWrite(m.SpeedPin, value)
 }
 
 // Forward sets the forward pin to the specified speed
-func (m *MotorDriver) Forward(speed byte) {
-	m.Direction("forward")
-	m.Speed(speed)
+func (m *MotorDriver) Forward(speed byte) (err error) {
+	err = m.Direction("forward")
+	if err != nil {
+		return
+	}
+	err = m.Speed(speed)
+	if err != nil {
+		return
+	}
+	return
 }
 
 // Backward sets the backward pin to the specified speed
-func (m *MotorDriver) Backward(speed byte) {
-	m.Direction("backward")
-	m.Speed(speed)
+func (m *MotorDriver) Backward(speed byte) (err error) {
+	err = m.Direction("backward")
+	if err != nil {
+		return
+	}
+	err = m.Speed(speed)
+	if err != nil {
+		return
+	}
+	return
 }
 
 // Direction sets the direction pin to the specified speed
-func (m *MotorDriver) Direction(direction string) {
+func (m *MotorDriver) Direction(direction string) (err error) {
 	m.CurrentDirection = direction
 	if m.DirectionPin != "" {
 		var level byte
@@ -127,7 +144,7 @@ func (m *MotorDriver) Direction(direction string) {
 		} else {
 			level = 0
 		}
-		m.adaptor().DigitalWrite(m.DirectionPin, level)
+		err = m.adaptor().DigitalWrite(m.DirectionPin, level)
 	} else {
 		var forwardLevel, backwardLevel byte
 		switch direction {
@@ -141,9 +158,16 @@ func (m *MotorDriver) Direction(direction string) {
 			forwardLevel = 0
 			backwardLevel = 0
 		}
-		m.adaptor().DigitalWrite(m.ForwardPin, forwardLevel)
-		m.adaptor().DigitalWrite(m.BackwardPin, backwardLevel)
+		err = m.adaptor().DigitalWrite(m.ForwardPin, forwardLevel)
+		if err != nil {
+			return
+		}
+		err = m.adaptor().DigitalWrite(m.BackwardPin, backwardLevel)
+		if err != nil {
+			return
+		}
 	}
+	return
 }
 
 func (m *MotorDriver) isDigital() bool {
@@ -153,7 +177,7 @@ func (m *MotorDriver) isDigital() bool {
 	return false
 }
 
-func (m *MotorDriver) changeState(state byte) {
+func (m *MotorDriver) changeState(state byte) (err error) {
 	m.CurrentState = state
 	if state == 1 {
 		m.CurrentSpeed = 0
@@ -162,14 +186,22 @@ func (m *MotorDriver) changeState(state byte) {
 	}
 	if m.ForwardPin != "" {
 		if state == 0 {
-			m.Direction(m.CurrentDirection)
+			err = m.Direction(m.CurrentDirection)
+			if err != nil {
+				return
+			}
 			if m.SpeedPin != "" {
-				m.Speed(m.CurrentSpeed)
+				err = m.Speed(m.CurrentSpeed)
+				if err != nil {
+					return
+				}
 			}
 		} else {
-			m.Direction("none")
+			err = m.Direction("none")
 		}
 	} else {
-		m.adaptor().DigitalWrite(m.SpeedPin, state)
+		err = m.adaptor().DigitalWrite(m.SpeedPin, state)
 	}
+
+	return
 }

@@ -6,16 +6,16 @@ type gpioTestAdaptor struct {
 	gobot.Adaptor
 }
 
-func (t *gpioTestAdaptor) AnalogWrite(string, byte)  {}
-func (t *gpioTestAdaptor) DigitalWrite(string, byte) {}
-func (t *gpioTestAdaptor) ServoWrite(string, byte)   {}
-func (t *gpioTestAdaptor) PwmWrite(string, byte)     {}
-func (t *gpioTestAdaptor) InitServo()                {}
-func (t *gpioTestAdaptor) AnalogRead(string) int {
-	return 99
+func (t *gpioTestAdaptor) AnalogWrite(string, byte) (err error)  { return nil }
+func (t *gpioTestAdaptor) DigitalWrite(string, byte) (err error) { return nil }
+func (t *gpioTestAdaptor) ServoWrite(string, byte) (err error)   { return nil }
+func (t *gpioTestAdaptor) PwmWrite(string, byte) (err error)     { return nil }
+func (t *gpioTestAdaptor) InitServo() (err error)                { return nil }
+func (t *gpioTestAdaptor) AnalogRead(string) (val int, err error) {
+	return 99, nil
 }
-func (t *gpioTestAdaptor) DigitalRead(string) int {
-	return 1
+func (t *gpioTestAdaptor) DigitalRead(string) (val int, err error) {
+	return 1, nil
 }
 func (t *gpioTestAdaptor) Connect() error  { return nil }
 func (t *gpioTestAdaptor) Finalize() error { return nil }

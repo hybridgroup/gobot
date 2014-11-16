@@ -22,7 +22,8 @@ func TestButtonDriverHalt(t *testing.T) {
 
 func TestButtonDriverReadState(t *testing.T) {
 	d := initTestButtonDriver()
-	gobot.Assert(t, d.readState(), 1)
+	val, _ := d.readState()
+	gobot.Assert(t, val, 1)
 }
 
 func TestButtonDriverActive(t *testing.T) {

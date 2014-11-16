@@ -22,5 +22,6 @@ func TestAnalogSensorDriverHalt(t *testing.T) {
 
 func TestAnalogSensorDriverRead(t *testing.T) {
 	d := initTestAnalogSensorDriver()
-	gobot.Assert(t, d.Read(), 99)
+	val, _ := d.Read()
+	gobot.Assert(t, val, 99)
 }
