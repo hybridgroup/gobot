@@ -25,7 +25,7 @@ type drone interface {
 type ArdroneAdaptor struct {
 	gobot.Adaptor
 	drone   drone
-	connect func(*ArdroneAdaptor)
+	connect func(*ArdroneAdaptor) (err error)
 }
 
 // NewArdroneAdaptor creates a new ardrone and connects with default configuration
@@ -35,24 +35,24 @@ func NewArdroneAdaptor(name string, v ...string) *ArdroneAdaptor {
 			name,
 			"ArdroneAdaptor",
 		),
-		connect: func(a *ArdroneAdaptor) {
+		connect: func(a *ArdroneAdaptor) (err error) {
 			config := client.DefaultConfig()
 			if len(v) > 0 {
 				config.Ip = v[0]
 			}
 			d, err := client.Connect(config)
 			if err != nil {
-				panic(err)
+				return
 			}
 			a.drone = d
+			return
 		},
 	}
 }
 
 // Connect returns true when connection to ardrone is established correclty
 func (a *ArdroneAdaptor) Connect() error {
-	a.connect(a)
-	return nil
+	return a.connect(a)
 }
 
 // Finalize returns true when connection is finalized correctly

@@ -7,8 +7,9 @@ import (
 
 func initTestArdroneAdaptor() *ArdroneAdaptor {
 	a := NewArdroneAdaptor("drone")
-	a.connect = func(a *ArdroneAdaptor) {
+	a.connect = func(a *ArdroneAdaptor) error {
 		a.drone = &testDrone{}
+		return nil
 	}
 	return a
 }

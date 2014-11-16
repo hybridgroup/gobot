@@ -7,8 +7,9 @@ import (
 
 func initTestArdroneDriver() *ArdroneDriver {
 	a := NewArdroneAdaptor("drone")
-	a.connect = func(a *ArdroneAdaptor) {
+	a.connect = func(a *ArdroneAdaptor) (err error) {
 		a.drone = &testDrone{}
+		return
 	}
 	d := NewArdroneDriver(a, "drone")
 	a.Connect()
