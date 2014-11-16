@@ -8,6 +8,8 @@ import (
 	"time"
 )
 
+var _ gobot.DriverInterface = (*MPL115A2Driver)(nil)
+
 const MPL115A2_REGISTER_PRESSURE_MSB = 0x00
 const MPL115A2_REGISTER_PRESSURE_LSB = 0x01
 const MPL115A2_REGISTER_TEMP_MSB = 0x02
@@ -50,7 +52,7 @@ func (h *MPL115A2Driver) adaptor() I2cInterface {
 
 // Start writes initialization bytes and reads from adaptor
 // using specified interval to accelerometer andtemperature data
-func (h *MPL115A2Driver) Start() bool {
+func (h *MPL115A2Driver) Start() error {
 	var temperature uint16
 	var pressure uint16
 	var pressureComp float32
@@ -76,14 +78,11 @@ func (h *MPL115A2Driver) Start() bool {
 			h.Temperature = ((float32(temperature) - 498.0) / -5.35) + 25.0
 		}
 	})
-	return true
+	return nil
 }
 
-// Init returns true if device is initialized correctly
-func (h *MPL115A2Driver) Init() bool { return true }
-
 // Halt returns true if devices is halted successfully
-func (h *MPL115A2Driver) Halt() bool { return true }
+func (h *MPL115A2Driver) Halt() error { return nil }
 
 func (h *MPL115A2Driver) initialization() bool {
 	var coA0 int16

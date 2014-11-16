@@ -3,13 +3,13 @@ PACKAGES := gobot gobot/api gobot/platforms/intel-iot/edison gobot/sysfs $(shell
 
 test:
 	for package in $(PACKAGES) ; do \
-		go test github.com/hybridgroup/$$package ; \
+		go test -a github.com/hybridgroup/$$package ; \
 	done ; \
 
 cover:
 	echo "mode: count" > profile.cov ; \
 	for package in $(PACKAGES) ; do \
-		go test -covermode=count -coverprofile=tmp.cov github.com/hybridgroup/$$package ; \
+		go test -a -covermode=count -coverprofile=tmp.cov github.com/hybridgroup/$$package ; \
 		cat tmp.cov | grep -v "mode: count" >> profile.cov ; \
 	done ; \
 	rm tmp.cov ; \

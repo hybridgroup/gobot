@@ -6,6 +6,8 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
+var _ gobot.AdaptorInterface = (*DigisparkAdaptor)(nil)
+
 type DigisparkAdaptor struct {
 	gobot.Adaptor
 	littleWire lw
@@ -28,13 +30,13 @@ func NewDigisparkAdaptor(name string) *DigisparkAdaptor {
 }
 
 // Connect starts connection to digispark, returns true if successful
-func (d *DigisparkAdaptor) Connect() bool {
+func (d *DigisparkAdaptor) Connect() error {
 	d.connect(d)
-	return true
+	return nil
 }
 
 // Finalize returns true if finalization is successful
-func (d *DigisparkAdaptor) Finalize() bool { return true }
+func (d *DigisparkAdaptor) Finalize() error { return nil }
 
 // DigitalWrite writes level to specified pin using littlewire
 func (d *DigisparkAdaptor) DigitalWrite(pin string, level byte) {

@@ -88,17 +88,12 @@ func TestNewBlinkMDriverCommands_Color(t *testing.T) {
 func TestBlinkMDriverStart(t *testing.T) {
 	blinkM := initTestBlinkMDriver()
 
-	gobot.Assert(t, blinkM.Start(), true)
-}
-
-func TestBlinkMDriverInit(t *testing.T) {
-	blinkM := initTestBlinkMDriver()
-	gobot.Assert(t, blinkM.Init(), true)
+	gobot.Assert(t, blinkM.Start(), nil)
 }
 
 func TestBlinkMDriverHalt(t *testing.T) {
 	blinkM := initTestBlinkMDriver()
-	gobot.Assert(t, blinkM.Halt(), true)
+	gobot.Assert(t, blinkM.Halt(), nil)
 }
 
 func TestBlinkMDriverFirmwareVersion(t *testing.T) {

@@ -11,10 +11,10 @@ func initTestPebbleAdaptor() *PebbleAdaptor {
 
 func TestPebbleAdaptorConnect(t *testing.T) {
 	a := initTestPebbleAdaptor()
-	gobot.Assert(t, a.Connect(), true)
+	gobot.Assert(t, a.Connect(), nil)
 }
 
 func TestPebbleAdaptorFinalize(t *testing.T) {
 	a := initTestPebbleAdaptor()
-	gobot.Assert(t, a.Finalize(), true)
+	gobot.Assert(t, a.Finalize(), nil)
 }

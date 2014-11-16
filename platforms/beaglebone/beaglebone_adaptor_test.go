@@ -108,5 +108,5 @@ func TestBeagleboneAdaptor(t *testing.T) {
 	a.I2cWrite([]byte{0x00, 0x01})
 	gobot.Assert(t, a.I2cRead(2), []byte{0x00, 0x01})
 
-	gobot.Assert(t, a.Finalize(), true)
+	gobot.Assert(t, a.Finalize(), nil)
 }

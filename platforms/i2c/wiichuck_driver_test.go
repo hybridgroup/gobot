@@ -48,7 +48,7 @@ func TestWiichuckDriverStart(t *testing.T) {
 	numberOfCyclesForEvery := 3
 
 	wii.SetInterval(1 * time.Millisecond)
-	gobot.Assert(t, wii.Start(), true)
+	gobot.Assert(t, wii.Start(), nil)
 
 	go func() {
 		for {
@@ -68,16 +68,10 @@ func TestWiichuckDriverStart(t *testing.T) {
 
 }
 
-func TestWiichuckDriverInit(t *testing.T) {
-	wii := initTestWiichuckDriver()
-
-	gobot.Assert(t, wii.Init(), true)
-}
-
 func TestWiichuckDriverHalt(t *testing.T) {
 	wii := initTestWiichuckDriver()
 
-	gobot.Assert(t, wii.Halt(), true)
+	gobot.Assert(t, wii.Halt(), nil)
 }
 
 func TestWiichuckDriverUpdate(t *testing.T) {

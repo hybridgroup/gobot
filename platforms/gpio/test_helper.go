@@ -17,8 +17,8 @@ func (t *gpioTestAdaptor) AnalogRead(string) int {
 func (t *gpioTestAdaptor) DigitalRead(string) int {
 	return 1
 }
-func (t *gpioTestAdaptor) Connect() bool  { return true }
-func (t *gpioTestAdaptor) Finalize() bool { return true }
+func (t *gpioTestAdaptor) Connect() error  { return nil }
+func (t *gpioTestAdaptor) Finalize() error { return nil }
 
 func newGpioTestAdaptor(name string) *gpioTestAdaptor {
 	return &gpioTestAdaptor{

@@ -4,6 +4,8 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
+var _ gobot.AdaptorInterface = (*PebbleAdaptor)(nil)
+
 type PebbleAdaptor struct {
 	gobot.Adaptor
 }
@@ -19,11 +21,11 @@ func NewPebbleAdaptor(name string) *PebbleAdaptor {
 }
 
 // Connect returns true if connection to pebble is established succesfully
-func (a *PebbleAdaptor) Connect() bool {
-	return true
+func (a *PebbleAdaptor) Connect() error {
+	return nil
 }
 
 // Finalize returns true if connection to pebble is finalized succesfully
-func (a *PebbleAdaptor) Finalize() bool {
-	return true
+func (a *PebbleAdaptor) Finalize() error {
+	return nil
 }

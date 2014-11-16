@@ -24,12 +24,12 @@ func initTestLeapMotionDriver() *LeapMotionDriver {
 func TestLeapMotionDriverStart(t *testing.T) {
 	//t.SkipNow()
 	d := initTestLeapMotionDriver()
-	gobot.Assert(t, d.Start(), true)
+	gobot.Assert(t, d.Start(), nil)
 }
 
 func TestLeapMotionDriverHalt(t *testing.T) {
 	d := initTestLeapMotionDriver()
-	gobot.Assert(t, d.Halt(), true)
+	gobot.Assert(t, d.Halt(), nil)
 }
 
 func TestLeapMotionDriverParser(t *testing.T) {

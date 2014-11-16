@@ -4,6 +4,8 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
+var _ gobot.DriverInterface = (*MotorDriver)(nil)
+
 // Represents a Motor
 type MotorDriver struct {
 	gobot.Driver
@@ -38,10 +40,10 @@ func (m *MotorDriver) adaptor() PwmDigitalWriter {
 }
 
 // Start starts the MotorDriver. Returns true on successful start of the driver
-func (m *MotorDriver) Start() bool { return true }
+func (m *MotorDriver) Start() error { return nil }
 
 // Halt halts the MotorDriver. Returns true on successful halt of the driver
-func (m *MotorDriver) Halt() bool { return true }
+func (m *MotorDriver) Halt() error { return nil }
 
 // Off turns the motor off or sets the motor to a 0 speed
 func (m *MotorDriver) Off() {

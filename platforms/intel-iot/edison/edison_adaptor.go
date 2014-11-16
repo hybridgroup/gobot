@@ -10,6 +10,8 @@ import (
 	"github.com/hybridgroup/gobot/sysfs"
 )
 
+var _ gobot.AdaptorInterface = (*EdisonAdaptor)(nil)
+
 func writeFile(path string, data []byte) (i int, err error) {
 	file, err := sysfs.OpenFile(path, os.O_WRONLY, 0644)
 	defer file.Close()
@@ -225,15 +227,15 @@ func NewEdisonAdaptor(name string) *EdisonAdaptor {
 
 // Connect starts conection with board and creates
 // digitalPins and pwmPins adaptor maps
-func (e *EdisonAdaptor) Connect() bool {
+func (e *EdisonAdaptor) Connect() error {
 	e.digitalPins = make(map[int]sysfs.DigitalPin)
 	e.pwmPins = make(map[int]*pwmPin)
 	e.connect(e)
-	return true
+	return nil
 }
 
 // Finalize closes connection to board and pins
-func (e *EdisonAdaptor) Finalize() bool {
+func (e *EdisonAdaptor) Finalize() error {
 	e.tristate.Unexport()
 	for _, pin := range e.digitalPins {
 		if pin != nil {
@@ -248,7 +250,7 @@ func (e *EdisonAdaptor) Finalize() bool {
 	if e.i2cDevice != nil {
 		e.i2cDevice.Close()
 	}
-	return true
+	return nil
 }
 
 // digitalPin returns matched digitalPin for specified values

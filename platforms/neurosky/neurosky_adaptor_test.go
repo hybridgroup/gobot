@@ -16,11 +16,11 @@ func initTestNeuroskyAdaptor() *NeuroskyAdaptor {
 
 func TestNeuroskyAdaptorConnect(t *testing.T) {
 	a := initTestNeuroskyAdaptor()
-	gobot.Assert(t, a.Connect(), true)
+	gobot.Assert(t, a.Connect(), nil)
 }
 
 func TestNeuroskyAdaptorFinalize(t *testing.T) {
 	a := initTestNeuroskyAdaptor()
 	a.Connect()
-	gobot.Assert(t, a.Finalize(), true)
+	gobot.Assert(t, a.Finalize(), nil)
 }

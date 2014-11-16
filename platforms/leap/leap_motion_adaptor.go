@@ -7,6 +7,8 @@ import (
 	"io"
 )
 
+var _ gobot.AdaptorInterface = (*LeapMotionAdaptor)(nil)
+
 type LeapMotionAdaptor struct {
 	gobot.Adaptor
 	ws      io.ReadWriteCloser
@@ -36,11 +38,11 @@ func NewLeapMotionAdaptor(name string, port string) *LeapMotionAdaptor {
 }
 
 // Connect returns true if connection to leap motion is established succesfully
-func (l *LeapMotionAdaptor) Connect() bool {
+func (l *LeapMotionAdaptor) Connect() error {
 	l.connect(l)
 	l.SetConnected(true)
-	return true
+	return nil
 }
 
 // Finalize ends connection to leap motion
-func (l *LeapMotionAdaptor) Finalize() bool { return true }
+func (l *LeapMotionAdaptor) Finalize() error { return nil }

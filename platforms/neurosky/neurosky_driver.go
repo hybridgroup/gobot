@@ -6,6 +6,8 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
+var _ gobot.DriverInterface = (*NeuroskyDriver)(nil)
+
 const BTSync byte = 0xAA
 
 // Extended code
@@ -81,7 +83,7 @@ func (n *NeuroskyDriver) adaptor() *NeuroskyAdaptor {
 
 // Start creates a go routine to listen from serial port
 // and parse buffer readings
-func (n *NeuroskyDriver) Start() bool {
+func (n *NeuroskyDriver) Start() error {
 	go func() {
 		for {
 			buff := make([]byte, 1024)
@@ -93,11 +95,11 @@ func (n *NeuroskyDriver) Start() bool {
 			}
 		}
 	}()
-	return true
+	return nil
 }
 
 // Halt stops neurosky driver (void)
-func (n *NeuroskyDriver) Halt() bool { return true }
+func (n *NeuroskyDriver) Halt() error { return nil }
 
 // parse converts bytes buffer into packets until no more data is present
 func (n *NeuroskyDriver) parse(buf *bytes.Buffer) {

@@ -16,11 +16,11 @@ func initTestJoystickAdaptor() *JoystickAdaptor {
 
 func TestJoystickAdaptorConnect(t *testing.T) {
 	a := initTestJoystickAdaptor()
-	gobot.Assert(t, a.Connect(), true)
+	gobot.Assert(t, a.Connect(), nil)
 }
 
 func TestJoystickAdaptorFinalize(t *testing.T) {
 	a := initTestJoystickAdaptor()
 	a.Connect()
-	gobot.Assert(t, a.Finalize(), true)
+	gobot.Assert(t, a.Finalize(), nil)
 }

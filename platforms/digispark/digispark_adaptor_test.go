@@ -49,12 +49,12 @@ func initTestDigisparkAdaptor() *DigisparkAdaptor {
 
 func TestDigisparkAdaptorFinalize(t *testing.T) {
 	a := initTestDigisparkAdaptor()
-	gobot.Assert(t, a.Finalize(), true)
+	gobot.Assert(t, a.Finalize(), nil)
 }
 
 func TestDigisparkAdaptorConnect(t *testing.T) {
 	a := initTestDigisparkAdaptor()
-	gobot.Assert(t, a.Connect(), true)
+	gobot.Assert(t, a.Connect(), nil)
 }
 
 func TestDigisparkAdaptorIO(t *testing.T) {

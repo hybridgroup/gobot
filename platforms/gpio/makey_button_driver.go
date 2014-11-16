@@ -4,6 +4,8 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
+var _ gobot.DriverInterface = (*MakeyButtonDriver)(nil)
+
 // Represents a Makey Button
 type MakeyButtonDriver struct {
 	gobot.Driver
@@ -39,7 +41,7 @@ func (b *MakeyButtonDriver) adaptor() DigitalReader {
 // Emits the Events:
 // 	"push"    int - On button push
 //	"release" int - On button release
-func (m *MakeyButtonDriver) Start() bool {
+func (m *MakeyButtonDriver) Start() error {
 	state := 0
 	gobot.Every(m.Interval(), func() {
 		newValue := m.readState()
@@ -48,11 +50,11 @@ func (m *MakeyButtonDriver) Start() bool {
 			m.update(newValue)
 		}
 	})
-	return true
+	return nil
 }
 
 // Halt returns true on a successful halt of the driver
-func (m *MakeyButtonDriver) Halt() bool { return true }
+func (m *MakeyButtonDriver) Halt() error { return nil }
 
 func (m *MakeyButtonDriver) readState() int {
 	return m.adaptor().DigitalRead(m.Pin())

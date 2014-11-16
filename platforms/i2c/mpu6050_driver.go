@@ -6,6 +6,8 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
+var _ gobot.DriverInterface = (*MPU6050Driver)(nil)
+
 const MPU6050_RA_ACCEL_XOUT_H = 0x3B
 const MPU6050_RA_PWR_MGMT_1 = 0x6B
 const MPU6050_PWR1_CLKSEL_BIT = 2
@@ -52,7 +54,7 @@ func (h *MPU6050Driver) adaptor() I2cInterface {
 
 // Start writes initialization bytes and reads from adaptor
 // using specified interval to accelerometer andtemperature data
-func (h *MPU6050Driver) Start() bool {
+func (h *MPU6050Driver) Start() error {
 	h.initialize()
 
 	gobot.Every(h.Interval(), func() {
@@ -64,14 +66,11 @@ func (h *MPU6050Driver) Start() bool {
 		binary.Read(buf, binary.BigEndian, &h.Gyroscope)
 		binary.Read(buf, binary.BigEndian, &h.Temperature)
 	})
-	return true
+	return nil
 }
 
-// Init returns true if device is initialized correctly
-func (h *MPU6050Driver) Init() bool { return true }
-
 // Halt returns true if devices is halted successfully
-func (h *MPU6050Driver) Halt() bool { return true }
+func (h *MPU6050Driver) Halt() error { return nil }
 
 func (h *MPU6050Driver) initialize() bool {
 	h.adaptor().I2cStart(0x68)

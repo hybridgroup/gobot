@@ -19,12 +19,12 @@ func initTestNeuroskyDriver() *NeuroskyDriver {
 
 func TestNeuroskyDriverStart(t *testing.T) {
 	d := initTestNeuroskyDriver()
-	gobot.Assert(t, d.Start(), true)
+	gobot.Assert(t, d.Start(), nil)
 }
 
 func TestNeuroskyDriverHalt(t *testing.T) {
 	d := initTestNeuroskyDriver()
-	gobot.Assert(t, d.Halt(), true)
+	gobot.Assert(t, d.Halt(), nil)
 }
 
 func TestNeuroskyDriverParse(t *testing.T) {

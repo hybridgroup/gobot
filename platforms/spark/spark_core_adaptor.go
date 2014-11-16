@@ -10,6 +10,8 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
+var _ gobot.AdaptorInterface = (*SparkCoreAdaptor)(nil)
+
 type SparkCoreAdaptor struct {
 	gobot.Adaptor
 	DeviceID    string
@@ -32,15 +34,15 @@ func NewSparkCoreAdaptor(name string, deviceID string, accessToken string) *Spar
 }
 
 // Connect returns true if connection to spark core is succesfull
-func (s *SparkCoreAdaptor) Connect() bool {
+func (s *SparkCoreAdaptor) Connect() error {
 	s.SetConnected(true)
-	return true
+	return nil
 }
 
 // Finalize returns true if connection to spark core is finalized successfully
-func (s *SparkCoreAdaptor) Finalize() bool {
+func (s *SparkCoreAdaptor) Finalize() error {
 	s.SetConnected(false)
-	return true
+	return nil
 }
 
 // AnalogRead reads analog ping value using spark cloud api

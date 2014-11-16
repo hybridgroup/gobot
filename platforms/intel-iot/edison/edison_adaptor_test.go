@@ -45,7 +45,7 @@ func TestEdisonAdaptorFinalize(t *testing.T) {
 	a.DigitalWrite("3", 1)
 	a.PwmWrite("5", 100)
 	a.i2cDevice = new(gobot.NullReadWriteCloser)
-	gobot.Assert(t, a.Finalize(), true)
+	gobot.Assert(t, a.Finalize(), nil)
 }
 
 func TestEdisonAdaptorDigitalIO(t *testing.T) {

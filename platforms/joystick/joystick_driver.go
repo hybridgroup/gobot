@@ -10,6 +10,8 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
+var _ gobot.DriverInterface = (*JoystickDriver)(nil)
+
 type JoystickDriver struct {
 	gobot.Driver
 	config joystickConfig
@@ -81,14 +83,14 @@ func (j *JoystickDriver) adaptor() *JoystickAdaptor {
 }
 
 // Start initiallizes event polling with defined interval
-func (j *JoystickDriver) Start() bool {
+func (j *JoystickDriver) Start() error {
 	gobot.Every(j.Interval(), func() {
 		event := j.poll()
 		if event != nil {
 			j.handleEvent(event)
 		}
 	})
-	return true
+	return nil
 }
 
 // HandleEvent publishes an specific event according to data received
@@ -136,7 +138,7 @@ func (j *JoystickDriver) handleEvent(event sdl.Event) error {
 }
 
 // Halt stops joystick driver
-func (j *JoystickDriver) Halt() bool { return true }
+func (j *JoystickDriver) Halt() error { return nil }
 
 func (j *JoystickDriver) findName(id uint8, list []pair) string {
 	for _, value := range list {

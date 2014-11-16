@@ -4,6 +4,8 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
+var _ gobot.DriverInterface = (*ButtonDriver)(nil)
+
 // Represents a digital Button
 type ButtonDriver struct {
 	gobot.Driver
@@ -38,7 +40,7 @@ func (b *ButtonDriver) adaptor() DigitalReader {
 // Emits the Events:
 // 	"push"    int - On button push
 //	"release" int - On button release
-func (b *ButtonDriver) Start() bool {
+func (b *ButtonDriver) Start() error {
 	state := 0
 	gobot.Every(b.Interval(), func() {
 		newValue := b.readState()
@@ -47,11 +49,11 @@ func (b *ButtonDriver) Start() bool {
 			b.update(newValue)
 		}
 	})
-	return true
+	return nil
 }
 
 // Halt returns true on a successful halt of the driver
-func (b *ButtonDriver) Halt() bool { return true }
+func (b *ButtonDriver) Halt() error { return nil }
 
 func (b *ButtonDriver) readState() int {
 	return b.adaptor().DigitalRead(b.Pin())

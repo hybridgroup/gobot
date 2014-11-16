@@ -13,12 +13,12 @@ func initTestMqttAdaptor() *MqttAdaptor {
 
 func TestMqttAdaptorConnect(t *testing.T) {
 	a := initTestMqttAdaptor()
-	gobot.Assert(t, a.Connect(), true)
+	gobot.Assert(t, a.Connect(), nil)
 }
 
 func TestMqttAdaptorFinalize(t *testing.T) {
 	a := initTestMqttAdaptor()
-	gobot.Assert(t, a.Finalize(), true)
+	gobot.Assert(t, a.Finalize(), nil)
 }
 
 func TestMqttAdaptorCannotPublishUnlessConnected(t *testing.T) {

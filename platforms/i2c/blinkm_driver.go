@@ -6,6 +6,8 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
+var _ gobot.DriverInterface = (*BlinkMDriver)(nil)
+
 type BlinkMDriver struct {
 	gobot.Driver
 }
@@ -56,18 +58,15 @@ func (b *BlinkMDriver) adaptor() I2cInterface {
 }
 
 // Start writes start bytes and resets color
-func (b *BlinkMDriver) Start() bool {
+func (b *BlinkMDriver) Start() error {
 	b.adaptor().I2cStart(0x09)
 	b.adaptor().I2cWrite([]byte("o"))
 	b.Rgb(0, 0, 0)
-	return true
+	return nil
 }
 
-// Init returns true if device is initialized correctly
-func (b *BlinkMDriver) Init() bool { return true }
-
 // Halt returns true if device is halted successfully
-func (b *BlinkMDriver) Halt() bool { return true }
+func (b *BlinkMDriver) Halt() error { return nil }
 
 // Rgb sets color using r,g,b params
 func (b *BlinkMDriver) Rgb(red byte, green byte, blue byte) {

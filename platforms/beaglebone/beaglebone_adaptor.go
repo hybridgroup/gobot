@@ -14,6 +14,7 @@ import (
 	"github.com/hybridgroup/gobot/sysfs"
 )
 
+var _ gobot.AdaptorInterface = (*BeagleboneAdaptor)(nil)
 var slots = "/sys/devices/bone_capemgr.*"
 var ocp = "/sys/devices/ocp.*"
 var usrLed = "/sys/devices/ocp.3/gpio-leds.8/leds/beaglebone:green:"
@@ -143,18 +144,18 @@ func NewBeagleboneAdaptor(name string) *BeagleboneAdaptor {
 
 // Connect returns true on a succesful connection to beaglebone board.
 // It initializes digital, pwm and analog pins
-func (b *BeagleboneAdaptor) Connect() bool {
+func (b *BeagleboneAdaptor) Connect() error {
 	ensureSlot(b.slots, "cape-bone-iio")
 	ensureSlot(b.slots, "am33xx_pwm")
 
 	g, _ := glob(fmt.Sprintf("%v/helper.*", b.ocp))
 	b.helper = g[0]
 
-	return true
+	return nil
 }
 
 // Finalize returns true when board connection is finalized correctly.
-func (b *BeagleboneAdaptor) Finalize() bool {
+func (b *BeagleboneAdaptor) Finalize() error {
 	for _, pin := range b.pwmPins {
 		if pin != nil {
 			pin.release()
@@ -168,7 +169,7 @@ func (b *BeagleboneAdaptor) Finalize() bool {
 	if b.i2cDevice != nil {
 		b.i2cDevice.Close()
 	}
-	return true
+	return nil
 }
 
 // PwmWrite writes value in specified pin

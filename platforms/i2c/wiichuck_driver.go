@@ -6,6 +6,8 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
+var _ gobot.DriverInterface = (*WiichuckDriver)(nil)
+
 type WiichuckDriver struct {
 	gobot.Driver
 	joystick map[string]float64
@@ -50,7 +52,7 @@ func (w *WiichuckDriver) adaptor() I2cInterface {
 
 // Start initilizes i2c and reads from adaptor
 // using specified interval to update with new value
-func (w *WiichuckDriver) Start() bool {
+func (w *WiichuckDriver) Start() error {
 	w.adaptor().I2cStart(0x52)
 	gobot.Every(w.Interval(), func() {
 		w.adaptor().I2cWrite([]byte{0x40, 0x00})
@@ -60,14 +62,11 @@ func (w *WiichuckDriver) Start() bool {
 			w.update(newValue)
 		}
 	})
-	return true
+	return nil
 }
 
-// Init returns true if driver is initialized correctly
-func (w *WiichuckDriver) Init() bool { return true }
-
 // Halt returns true if driver is halted successfully
-func (w *WiichuckDriver) Halt() bool { return true }
+func (w *WiichuckDriver) Halt() error { return nil }
 
 // update parses value to update buttons and joystick.
 // If value is encrypted, warning message is printed

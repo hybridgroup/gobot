@@ -4,6 +4,8 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
+var _ gobot.DriverInterface = (*HMC6352Driver)(nil)
+
 type HMC6352Driver struct {
 	gobot.Driver
 	Heading uint16
@@ -27,7 +29,7 @@ func (h *HMC6352Driver) adaptor() I2cInterface {
 
 // Start writes initialization bytes and reads from adaptor
 // using specified interval to update Heading
-func (h *HMC6352Driver) Start() bool {
+func (h *HMC6352Driver) Start() error {
 	h.adaptor().I2cStart(0x21)
 	h.adaptor().I2cWrite([]byte("A"))
 
@@ -38,11 +40,8 @@ func (h *HMC6352Driver) Start() bool {
 			h.Heading = (uint16(ret[1]) + uint16(ret[0])*256) / 10
 		}
 	})
-	return true
+	return nil
 }
 
-// Init returns true if device is initialized correctly
-func (h *HMC6352Driver) Init() bool { return true }
-
 // Halt returns true if devices is halted successfully
-func (h *HMC6352Driver) Halt() bool { return true }
+func (h *HMC6352Driver) Halt() error { return nil }

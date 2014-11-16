@@ -4,6 +4,8 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
+var _ gobot.DriverInterface = (*LedDriver)(nil)
+
 // Represents a digital Led
 type LedDriver struct {
 	gobot.Driver
@@ -57,10 +59,10 @@ func (l *LedDriver) adaptor() PwmDigitalWriter {
 }
 
 // Start starts the LedDriver. Returns true on successful start of the driver
-func (l *LedDriver) Start() bool { return true }
+func (l *LedDriver) Start() error { return nil }
 
 // Halt halts the LedDriver. Returns true on successful halt of the driver
-func (l *LedDriver) Halt() bool { return true }
+func (l *LedDriver) Halt() error { return nil }
 
 // State return true if the led is On and false if the led is Off
 func (l *LedDriver) State() bool {

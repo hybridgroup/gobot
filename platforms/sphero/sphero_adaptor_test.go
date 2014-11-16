@@ -14,9 +14,9 @@ func initTestSpheroAdaptor() *SpheroAdaptor {
 
 func TestSpheroAdaptorFinalize(t *testing.T) {
 	a := initTestSpheroAdaptor()
-	gobot.Assert(t, a.Finalize(), true)
+	gobot.Assert(t, a.Finalize(), nil)
 }
 func TestSpheroAdaptorConnect(t *testing.T) {
 	a := initTestSpheroAdaptor()
-	gobot.Assert(t, a.Connect(), true)
+	gobot.Assert(t, a.Connect(), nil)
 }

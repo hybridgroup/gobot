@@ -9,6 +9,8 @@ import (
 	"github.com/tarm/goserial"
 )
 
+var _ gobot.AdaptorInterface = (*FirmataAdaptor)(nil)
+
 type FirmataAdaptor struct {
 	gobot.Adaptor
 	board      *board
@@ -36,25 +38,25 @@ func NewFirmataAdaptor(name, port string) *FirmataAdaptor {
 }
 
 // Connect returns true if connection to board is succesfull
-func (f *FirmataAdaptor) Connect() bool {
+func (f *FirmataAdaptor) Connect() error {
 	f.connect(f)
 	f.board.connect()
 	f.SetConnected(true)
-	return true
+	return nil
 }
 
 // close finishes connection to serial port
 // Prints error message on error
-func (f *FirmataAdaptor) Disconnect() bool {
+func (f *FirmataAdaptor) Disconnect() error {
 	err := f.board.serial.Close()
 	if err != nil {
 		fmt.Println(err)
 	}
-	return true
+	return nil
 }
 
 // Finalize disconnects firmata adaptor
-func (f *FirmataAdaptor) Finalize() bool { return f.Disconnect() }
+func (f *FirmataAdaptor) Finalize() error { return f.Disconnect() }
 
 // InitServo (not yet implemented)
 func (f *FirmataAdaptor) InitServo() {}

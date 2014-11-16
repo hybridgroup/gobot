@@ -5,6 +5,8 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
+var _ gobot.AdaptorInterface = (*JoystickAdaptor)(nil)
+
 type joystick interface {
 	Close()
 	InstanceID() sdl.JoystickID
@@ -37,13 +39,13 @@ func NewJoystickAdaptor(name string) *JoystickAdaptor {
 }
 
 // Connect returns true if connection to device is succesfull
-func (j *JoystickAdaptor) Connect() bool {
+func (j *JoystickAdaptor) Connect() error {
 	j.connect(j)
-	return true
+	return nil
 }
 
 // Finalize closes connection to device
-func (j *JoystickAdaptor) Finalize() bool {
+func (j *JoystickAdaptor) Finalize() error {
 	j.joystick.Close()
-	return true
+	return nil
 }

@@ -13,12 +13,12 @@ func initTestPebbleDriver() *PebbleDriver {
 
 func TestPebbleDriverStart(t *testing.T) {
 	d := initTestPebbleDriver()
-	gobot.Assert(t, d.Start(), true)
+	gobot.Assert(t, d.Start(), nil)
 }
 
 func TestPebbleDriverHalt(t *testing.T) {
 	d := initTestPebbleDriver()
-	gobot.Assert(t, d.Halt(), true)
+	gobot.Assert(t, d.Halt(), nil)
 }
 
 func TestPebbleDriver(t *testing.T) {

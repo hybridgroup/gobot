@@ -4,6 +4,8 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
+var _ gobot.DriverInterface = (*ServoDriver)(nil)
+
 // Represents a Servo
 type ServoDriver struct {
 	gobot.Driver
@@ -55,10 +57,10 @@ func (s *ServoDriver) adaptor() Servo {
 }
 
 // Start starts the ServoDriver. Returns true on successful start of the driver.
-func (s *ServoDriver) Start() bool { return true }
+func (s *ServoDriver) Start() error { return nil }
 
 // Halt halts the ServoDriver. Returns true on successful halt of the driver.
-func (s *ServoDriver) Halt() bool { return true }
+func (s *ServoDriver) Halt() error { return nil }
 
 // InitServo initializes the ServoDriver on platforms which require an explicit initialization.
 func (s *ServoDriver) InitServo() {

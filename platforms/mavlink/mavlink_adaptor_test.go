@@ -15,10 +15,10 @@ func initTestMavlinkAdaptor() *MavlinkAdaptor {
 
 func TestMavlinkAdaptorConnect(t *testing.T) {
 	a := initTestMavlinkAdaptor()
-	gobot.Assert(t, a.Connect(), true)
+	gobot.Assert(t, a.Connect(), nil)
 }
 
 func TestMavlinkAdaptorFinalize(t *testing.T) {
 	a := initTestMavlinkAdaptor()
-	gobot.Assert(t, a.Finalize(), true)
+	gobot.Assert(t, a.Finalize(), nil)
 }

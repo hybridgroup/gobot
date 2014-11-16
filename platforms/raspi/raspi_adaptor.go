@@ -12,6 +12,8 @@ import (
 	"github.com/hybridgroup/gobot/sysfs"
 )
 
+var _ gobot.AdaptorInterface = (*RaspiAdaptor)(nil)
+
 var boardRevision = func() (string, string) {
 	cat, _ := exec.Command("cat", "/proc/cpuinfo").Output()
 	grep := exec.Command("grep", "Revision")
@@ -154,12 +156,12 @@ func NewRaspiAdaptor(name string) *RaspiAdaptor {
 
 // Connect starts conection with board and creates
 // digitalPins and pwmPins adaptor maps
-func (r *RaspiAdaptor) Connect() bool {
-	return true
+func (r *RaspiAdaptor) Connect() error {
+	return nil
 }
 
 // Finalize closes connection to board and pins
-func (r *RaspiAdaptor) Finalize() bool {
+func (r *RaspiAdaptor) Finalize() error {
 	for _, pin := range r.digitalPins {
 		if pin != nil {
 			pin.Unexport()
@@ -168,7 +170,7 @@ func (r *RaspiAdaptor) Finalize() bool {
 	if r.i2cDevice != nil {
 		r.i2cDevice.Close()
 	}
-	return true
+	return nil
 }
 
 // digitalPin returns matched digitalPin for specified values

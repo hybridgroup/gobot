@@ -8,6 +8,8 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
+var _ gobot.DriverInterface = (*LeapMotionDriver)(nil)
+
 type LeapMotionDriver struct {
 	gobot.Driver
 }
@@ -45,7 +47,7 @@ func (l *LeapMotionDriver) adaptor() *LeapMotionAdaptor {
 //
 // Publishes the following events:
 //		"message" - Emits Frame on new message received from Leap.
-func (l *LeapMotionDriver) Start() bool {
+func (l *LeapMotionDriver) Start() error {
 	enableGestures := map[string]bool{"enableGestures": true}
 	b, _ := json.Marshal(enableGestures)
 	_, err := l.adaptor().ws.Write(b)
@@ -59,8 +61,8 @@ func (l *LeapMotionDriver) Start() bool {
 		}
 	}()
 
-	return true
+	return nil
 }
 
 // Halt returns true if driver is halted succesfully
-func (l *LeapMotionDriver) Halt() bool { return true }
+func (l *LeapMotionDriver) Halt() error { return nil }

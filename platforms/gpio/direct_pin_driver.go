@@ -6,6 +6,8 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
+var _ gobot.DriverInterface = (*DirectPinDriver)(nil)
+
 // Represents a raw GPIO pin
 type DirectPinDriver struct {
 	gobot.Driver
@@ -65,10 +67,10 @@ func (d *DirectPinDriver) adaptor() DirectPin {
 }
 
 // Starts the DirectPinDriver. Returns true on successful start of the driver
-func (d *DirectPinDriver) Start() bool { return true }
+func (d *DirectPinDriver) Start() error { return nil }
 
 // Halts the DirectPinDriver. Returns true on successful halt of the driver
-func (d *DirectPinDriver) Halt() bool { return true }
+func (d *DirectPinDriver) Halt() error { return nil }
 
 // DigitalRead returns the current digital state of the pin
 func (d *DirectPinDriver) DigitalRead() int {

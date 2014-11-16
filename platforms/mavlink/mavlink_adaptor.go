@@ -7,6 +7,8 @@ import (
 	"github.com/tarm/goserial"
 )
 
+var _ gobot.AdaptorInterface = (*MavlinkAdaptor)(nil)
+
 type MavlinkAdaptor struct {
 	gobot.Adaptor
 	sp      io.ReadWriteCloser
@@ -32,13 +34,13 @@ func NewMavlinkAdaptor(name string, port string) *MavlinkAdaptor {
 }
 
 // Connect returns true if connection to device is successful
-func (m *MavlinkAdaptor) Connect() bool {
+func (m *MavlinkAdaptor) Connect() error {
 	m.connect(m)
-	return true
+	return nil
 }
 
 // Finalize returns true if connection to devices is closed successfully
-func (m *MavlinkAdaptor) Finalize() bool {
+func (m *MavlinkAdaptor) Finalize() error {
 	m.sp.Close()
-	return true
+	return nil
 }

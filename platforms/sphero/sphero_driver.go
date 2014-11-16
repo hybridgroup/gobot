@@ -9,6 +9,8 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
+var _ gobot.DriverInterface = (*SpheroDriver)(nil)
+
 type packet struct {
 	header   []uint8
 	body     []uint8
@@ -112,7 +114,7 @@ func (s *SpheroDriver) adaptor() *SpheroAdaptor {
 //
 // Emits the Events:
 // 	"collision" SpheroDriver.Collision - On Collision Detected
-func (s *SpheroDriver) Start() bool {
+func (s *SpheroDriver) Start() error {
 	go func() {
 		for {
 			packet := <-s.packetChannel
@@ -163,17 +165,17 @@ func (s *SpheroDriver) Start() bool {
 	s.configureCollisionDetection()
 	s.enableStopOnDisconnect()
 
-	return true
+	return nil
 }
 
 // Halt halts the SpheroDriver and sends a SpheroDriver.Stop command to the Sphero.
 // Returns true on successful halt.
-func (s *SpheroDriver) Halt() bool {
+func (s *SpheroDriver) Halt() error {
 	gobot.Every(10*time.Millisecond, func() {
 		s.Stop()
 	})
 	time.Sleep(1 * time.Second)
-	return true
+	return nil
 }
 
 // SetRGB sets the Sphero to the given r, g, and b values

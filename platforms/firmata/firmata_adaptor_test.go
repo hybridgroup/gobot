@@ -36,11 +36,11 @@ func initTestFirmataAdaptor() *FirmataAdaptor {
 
 func TestFirmataAdaptorFinalize(t *testing.T) {
 	a := initTestFirmataAdaptor()
-	gobot.Assert(t, a.Finalize(), true)
+	gobot.Assert(t, a.Finalize(), nil)
 }
 func TestFirmataAdaptorConnect(t *testing.T) {
 	a := initTestFirmataAdaptor()
-	gobot.Assert(t, a.Connect(), true)
+	gobot.Assert(t, a.Connect(), nil)
 }
 
 func TestFirmataAdaptorInitServo(t *testing.T) {

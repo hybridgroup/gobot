@@ -12,12 +12,12 @@ func initTestDirectPinDriver() *DirectPinDriver {
 
 func TestDirectPinDriverStart(t *testing.T) {
 	d := initTestDirectPinDriver()
-	gobot.Assert(t, d.Start(), true)
+	gobot.Assert(t, d.Start(), nil)
 }
 
 func TestDirectPinDriverHalt(t *testing.T) {
 	d := initTestDirectPinDriver()
-	gobot.Assert(t, d.Halt(), true)
+	gobot.Assert(t, d.Halt(), nil)
 }
 
 func TestDirectPinDriverDigitalRead(t *testing.T) {

@@ -5,6 +5,8 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
+var _ gobot.DriverInterface = (*CameraDriver)(nil)
+
 type CameraDriver struct {
 	gobot.Driver
 	camera capture
@@ -40,7 +42,7 @@ func NewCameraDriver(name string, source interface{}) *CameraDriver {
 
 // Start initializes camera by grabbing a frame
 // every `interval` and publishing an frame event
-func (c *CameraDriver) Start() bool {
+func (c *CameraDriver) Start() error {
 	c.start(c)
 	gobot.Every(c.Interval(), func() {
 		if c.camera.GrabFrame() {
@@ -50,8 +52,8 @@ func (c *CameraDriver) Start() bool {
 			}
 		}
 	})
-	return true
+	return nil
 }
 
 // Halt stops camera driver
-func (c *CameraDriver) Halt() bool { return true }
+func (c *CameraDriver) Halt() error { return nil }

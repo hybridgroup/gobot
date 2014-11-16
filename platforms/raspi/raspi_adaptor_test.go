@@ -20,7 +20,7 @@ func TestRaspiAdaptorFinalize(t *testing.T) {
 	a := initTestRaspiAdaptor()
 	a.DigitalWrite("3", 1)
 	a.i2cDevice = new(gobot.NullReadWriteCloser)
-	gobot.Assert(t, a.Finalize(), true)
+	gobot.Assert(t, a.Finalize(), nil)
 }
 
 func TestRaspiAdaptorDigitalIO(t *testing.T) {
