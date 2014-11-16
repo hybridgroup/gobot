@@ -17,7 +17,8 @@ func main() {
 
 	work := func() {
 		gobot.Every(500*time.Millisecond, func() {
-			if button.DigitalRead() == 1 {
+			val, _ := button.DigitalRead()
+			if val == 1 {
 				led.DigitalWrite(1)
 			} else {
 				led.DigitalWrite(0)

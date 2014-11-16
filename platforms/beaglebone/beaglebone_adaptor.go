@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -144,18 +143,28 @@ func NewBeagleboneAdaptor(name string) *BeagleboneAdaptor {
 
 // Connect returns true on a succesful connection to beaglebone board.
 // It initializes digital, pwm and analog pins
-func (b *BeagleboneAdaptor) Connect() error {
-	ensureSlot(b.slots, "cape-bone-iio")
-	ensureSlot(b.slots, "am33xx_pwm")
+func (b *BeagleboneAdaptor) Connect() (err error) {
+	err = ensureSlot(b.slots, "cape-bone-iio")
+	if err != nil {
+		return
+	}
 
-	g, _ := glob(fmt.Sprintf("%v/helper.*", b.ocp))
+	err = ensureSlot(b.slots, "am33xx_pwm")
+	if err != nil {
+		return
+	}
+
+	g, err := glob(fmt.Sprintf("%v/helper.*", b.ocp))
+	if err != nil {
+		return
+	}
 	b.helper = g[0]
 
-	return nil
+	return
 }
 
 // Finalize returns true when board connection is finalized correctly.
-func (b *BeagleboneAdaptor) Finalize() error {
+func (b *BeagleboneAdaptor) Finalize() (err error) {
 	for _, pin := range b.pwmPins {
 		if pin != nil {
 			pin.release()
@@ -173,60 +182,66 @@ func (b *BeagleboneAdaptor) Finalize() error {
 }
 
 // PwmWrite writes value in specified pin
-func (b *BeagleboneAdaptor) PwmWrite(pin string, val byte) {
-	b.pwmWrite(pin, val)
+func (b *BeagleboneAdaptor) PwmWrite(pin string, val byte) (err error) {
+	return b.pwmWrite(pin, val)
 }
 
 // InitServo starts servo (not yet implemented)
-func (b *BeagleboneAdaptor) InitServo() {}
+func (b *BeagleboneAdaptor) InitServo() (err error) { return nil }
 
 // ServoWrite writes scaled value to servo in specified pin
-func (b *BeagleboneAdaptor) ServoWrite(pin string, val byte) {
-	i := b.pwmPin(pin)
+func (b *BeagleboneAdaptor) ServoWrite(pin string, val byte) (err error) {
+	i, err := b.pwmPin(pin)
+	if err != nil {
+		return err
+	}
 	period := 20000000.0
 	duty := gobot.FromScale(float64(^val), 0, 180.0)
-	b.pwmPins[i].pwmWrite(strconv.Itoa(int(period)), strconv.Itoa(int(period*duty)))
+	return b.pwmPins[i].pwmWrite(strconv.Itoa(int(period)), strconv.Itoa(int(period*duty)))
 }
 
 // DigitalRead returns a digital value from specified pin
-func (b *BeagleboneAdaptor) DigitalRead(pin string) (i int) {
-	i, _ = b.digitalPin(pin, sysfs.IN).Read()
-	return
+func (b *BeagleboneAdaptor) DigitalRead(pin string) (val int, err error) {
+	return b.digitalPin(pin, sysfs.IN).Read()
 }
 
 // DigitalWrite writes a digital value to specified pin.
 // valid usr pin values are usr0, usr1, usr2 and usr3
-func (b *BeagleboneAdaptor) DigitalWrite(pin string, val byte) {
+func (b *BeagleboneAdaptor) DigitalWrite(pin string, val byte) (err error) {
 	if strings.Contains(pin, "usr") {
 		fi, err := sysfs.OpenFile(usrLed+pin+"/brightness", os.O_WRONLY|os.O_APPEND, 0666)
 		defer fi.Close()
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
-		fi.WriteString(strconv.Itoa(int(val)))
-	} else {
-		b.digitalPin(pin, sysfs.OUT).Write(int(val))
+		_, err = fi.WriteString(strconv.Itoa(int(val)))
+		return err
 	}
+	return b.digitalPin(pin, sysfs.OUT).Write(int(val))
 }
 
 // AnalogRead returns an analog value from specified pin
-func (b *BeagleboneAdaptor) AnalogRead(pin string) int {
+func (b *BeagleboneAdaptor) AnalogRead(pin string) (val int, err error) {
 	fi, err := sysfs.OpenFile(fmt.Sprintf("%v/%v", b.helper, b.translateAnalogPin(pin)), os.O_RDONLY, 0644)
 	defer fi.Close()
+
 	if err != nil {
-		panic(err)
+		return
 	}
 
 	var buf = make([]byte, 1024)
-	fi.Read(buf)
+	_, err = fi.Read(buf)
+	if err != nil {
+		return
+	}
 
-	i, _ := strconv.Atoi(strings.Split(string(buf), "\n")[0])
-	return i
+	val, _ = strconv.Atoi(strings.Split(string(buf), "\n")[0])
+	return
 }
 
 // AnalogWrite writes an analog value to specified pin
-func (b *BeagleboneAdaptor) AnalogWrite(pin string, val byte) {
-	b.pwmWrite(pin, val)
+func (b *BeagleboneAdaptor) AnalogWrite(pin string, val byte) (err error) {
+	return b.pwmWrite(pin, val)
 }
 
 // I2cStart starts a i2c device in specified address
@@ -291,29 +306,35 @@ func (b *BeagleboneAdaptor) digitalPin(pin string, dir string) sysfs.DigitalPin 
 }
 
 // pwPin retrieves pwm pin value by name
-func (b *BeagleboneAdaptor) pwmPin(pin string) string {
-	i := b.translatePwmPin(pin)
+func (b *BeagleboneAdaptor) pwmPin(pin string) (i string, err error) {
+	i = b.translatePwmPin(pin)
 	if b.pwmPins[i] == nil {
-		ensureSlot(b.slots, fmt.Sprintf("bone_pwm_%v", pin))
-		b.pwmPins[i] = newPwmPin(i, b.ocp)
+		err = ensureSlot(b.slots, fmt.Sprintf("bone_pwm_%v", pin))
+		if err != nil {
+			return
+		}
+		b.pwmPins[i], err = newPwmPin(i, b.ocp)
 	}
-	return i
+	return
 }
 
 // pwmWrite writes pwm value to specified pin
-func (b *BeagleboneAdaptor) pwmWrite(pin string, val byte) {
-	i := b.pwmPin(pin)
+func (b *BeagleboneAdaptor) pwmWrite(pin string, val byte) (err error) {
+	i, err := b.pwmPin(pin)
+	if err != nil {
+		return
+	}
 	period := 500000.0
 	duty := gobot.FromScale(float64(^val), 0, 255.0)
-	b.pwmPins[i].pwmWrite(strconv.Itoa(int(period)), strconv.Itoa(int(period*duty)))
+	return b.pwmPins[i].pwmWrite(strconv.Itoa(int(period)), strconv.Itoa(int(period*duty)))
 }
 
-func ensureSlot(slots, item string) {
+func ensureSlot(slots, item string) (err error) {
 	fi, err := sysfs.OpenFile(slots, os.O_RDWR|os.O_APPEND, 0666)
-	if err != nil {
-		panic(err)
-	}
 	defer fi.Close()
+	if err != nil {
+		return
+	}
 
 	// ensure the slot is not already written into the capemanager
 	// (from: https://github.com/mrmorphic/hwio/blob/master/module_bb_pwm.go#L190)
@@ -325,8 +346,14 @@ func ensureSlot(slots, item string) {
 		}
 	}
 
-	fi.WriteString(item)
-	fi.Sync()
+	_, err = fi.WriteString(item)
+	if err != nil {
+		return err
+	}
+	err = fi.Sync()
+	if err != nil {
+		return nil
+	}
 
 	scanner = bufio.NewScanner(fi)
 	for scanner.Scan() {
@@ -335,4 +362,5 @@ func ensureSlot(slots, item string) {
 			return
 		}
 	}
+	return
 }

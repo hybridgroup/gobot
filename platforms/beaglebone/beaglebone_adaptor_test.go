@@ -84,7 +84,7 @@ func TestBeagleboneAdaptor(t *testing.T) {
 
 	// Analog
 	fs.Files["/sys/devices/ocp.3/helper.5/AIN1"].Contents = "567\n"
-	i := a.AnalogRead("P9_40")
+	i, _ := a.AnalogRead("P9_40")
 	gobot.Assert(t, i, 567)
 
 	// DigitalIO
@@ -98,7 +98,7 @@ func TestBeagleboneAdaptor(t *testing.T) {
 	gobot.Assert(t, fs.Files["/sys/class/gpio/gpio60/value"].Contents, "1")
 
 	fs.Files["/sys/class/gpio/gpio10/value"].Contents = "1"
-	i = a.DigitalRead("P8_31")
+	i, _ = a.DigitalRead("P8_31")
 	gobot.Assert(t, i, 1)
 
 	// I2c
