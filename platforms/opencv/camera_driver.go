@@ -3,6 +3,7 @@ package opencv
 import (
 	cv "github.com/hybridgroup/go-opencv/opencv"
 	"github.com/hybridgroup/gobot"
+	"time"
 )
 
 type CameraDriver struct {
@@ -42,14 +43,17 @@ func NewCameraDriver(name string, source interface{}) *CameraDriver {
 // every `interval` and publishing an frame event
 func (c *CameraDriver) Start() bool {
 	c.start(c)
-	gobot.Every(c.Interval(), func() {
-		if c.camera.GrabFrame() {
-			image := c.camera.RetrieveFrame(1)
-			if image != nil {
-				gobot.Publish(c.Event("frame"), image)
+	go func() {
+		for {
+			if c.camera.GrabFrame() {
+				image := c.camera.RetrieveFrame(1)
+				if image != nil {
+					gobot.Publish(c.Event("frame"), image)
+				}
 			}
+			<-time.After(c.Interval())
 		}
-	})
+	}()
 	return true
 }
 
