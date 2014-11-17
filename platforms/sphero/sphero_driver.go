@@ -9,6 +9,13 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
+const (
+	SensorFrequencyDefault = 10
+	SensorFrequencyMax     = 420
+	ChannelSensordata      = "sensordata"
+	ChannelCollisions      = "collision"
+)
+
 type packet struct {
 	header   []uint8
 	body     []uint8
@@ -25,19 +32,6 @@ type SpheroDriver struct {
 	responseChannel chan []uint8
 }
 
-type Collision struct {
-	// Normalized impact components (direction of the collision event):
-	X, Y, Z int16
-	// Thresholds exceeded by X (1h) and/or Y (2h) axis (bitmask):
-	Axis byte
-	// Power that cross threshold Xt + Xs:
-	XMagnitude, YMagnitude int16
-	// Sphero's speed when impact detected:
-	Speed uint8
-	// Millisecond timer
-	Timestamp uint32
-}
-
 // NewSpheroDriver returns a new SpheroDriver given a SpheroAdaptor and name.
 //
 // Adds the following API Commands:
@@ -47,6 +41,7 @@ type Collision struct {
 // 	"SetBackLED" - See SpheroDriver.SetBackLED
 // 	"SetHeading" - See SpheroDriver.SetHeading
 // 	"SetStabilization" - See SpheroDriver.SetStabilization
+//  "SetDataStreaming" - See SpheroDriver.SetDataStreaming
 func NewSpheroDriver(a *SpheroAdaptor, name string) *SpheroDriver {
 	s := &SpheroDriver{
 		Driver: *gobot.NewDriver(
@@ -58,7 +53,8 @@ func NewSpheroDriver(a *SpheroAdaptor, name string) *SpheroDriver {
 		responseChannel: make(chan []uint8, 1024),
 	}
 
-	s.AddEvent("collision")
+	s.AddEvent(ChannelCollisions)
+	s.AddEvent(ChannelSensordata)
 	s.AddCommand("SetRGB", func(params map[string]interface{}) interface{} {
 		r := uint8(params["r"].(float64))
 		g := uint8(params["g"].(float64))
@@ -94,9 +90,21 @@ func NewSpheroDriver(a *SpheroAdaptor, name string) *SpheroDriver {
 		s.SetHeading(heading)
 		return nil
 	})
+
 	s.AddCommand("SetStabilization", func(params map[string]interface{}) interface{} {
 		on := params["heading"].(bool)
 		s.SetStabilization(on)
+		return nil
+	})
+
+	s.AddCommand("SetDataStreaming", func(params map[string]interface{}) interface{} {
+		freq := params["freq"].(uint16)
+		frames := params["frames"].(uint16)
+		mask := params["mask"].(uint32)
+		count := params["count"].(uint8)
+		mask2 := params["mask2"].(uint32)
+
+		s.SetDataStreaming(freq, frames, mask, count, mask2)
 		return nil
 	})
 
@@ -154,6 +162,8 @@ func (s *SpheroDriver) Start() bool {
 				evt, s.asyncResponse = s.asyncResponse[len(s.asyncResponse)-1], s.asyncResponse[:len(s.asyncResponse)-1]
 				if evt[2] == 0x07 {
 					s.handleCollisionDetected(evt)
+				} else if evt[2] == 0x03 {
+					s.handleDataStreaming(evt)
 				}
 			}
 			time.Sleep(100 * time.Millisecond)
@@ -214,8 +224,37 @@ func (s *SpheroDriver) Roll(speed uint8, heading uint16) {
 	s.packetChannel <- s.craftPacket([]uint8{speed, uint8(heading >> 8), uint8(heading & 0xFF), 0x01}, 0x02, 0x30)
 }
 
-// Stop sets the Sphero to a roll speed of 0
+// Enables sensor data streaming
+func (s *SpheroDriver) SetDataStreaming(freq uint16, frames uint16, mask uint32, count uint8, mask2 uint32) {
+	var n uint16
+
+	if freq == 0 || freq >= SensorFrequencyMax {
+		fmt.Printf("Invalid data streaming frequency. Setting to default (%v Hz)\n", SensorFrequencyDefault)
+		n = SensorFrequencyMax / SensorFrequencyDefault
+	} else {
+		n = SensorFrequencyMax / freq
+	}
+	if frames == 0 {
+		frames = 1
+	}
+
+	cmd := DataStreamingSetting{
+		N:     n,
+		M:     frames,
+		Pcnt:  count,
+		Mask:  mask,
+		Mask2: mask2,
+	}
+
+	buf := new(bytes.Buffer)
+	binary.Write(buf, binary.BigEndian, cmd)
+
+	s.packetChannel <- s.craftPacket(buf.Bytes(), 0x02, 0x11)
+}
+
+// Stop sets the Sphero to a roll speed of 0 and disables data streaming
 func (s *SpheroDriver) Stop() {
+	s.SetDataStreaming(SensorFrequencyDefault, 0, 0, 0, 0)
 	s.Roll(0, 0)
 }
 
@@ -232,10 +271,21 @@ func (s *SpheroDriver) handleCollisionDetected(data []uint8) {
 	if len(data) != 22 || data[4] != 17 {
 		return
 	}
-	var collision Collision
+	var collision CollisionPacket
 	buffer := bytes.NewBuffer(data[5:]) // skip header
 	binary.Read(buffer, binary.BigEndian, &collision)
-	gobot.Publish(s.Event("collision"), collision)
+	gobot.Publish(s.Event(ChannelCollisions), collision)
+}
+
+func (s *SpheroDriver) handleDataStreaming(data []uint8) {
+	// ensure data is the right length:
+	if len(data) != 90 {
+		return
+	}
+	var dataPacket DataStreamingPacket
+	buffer := bytes.NewBuffer(data[5:]) // skip header
+	binary.Read(buffer, binary.BigEndian, &dataPacket)
+	gobot.Publish(s.Event(ChannelSensordata), dataPacket)
 }
 
 func (s *SpheroDriver) getSyncResponse(packet *packet) []byte {
