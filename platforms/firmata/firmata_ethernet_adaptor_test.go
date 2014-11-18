@@ -38,32 +38,32 @@ func TestFirmataEthernetAdaptorFinalize(t *testing.T) {
   a := initTestFirmataEthernetAdaptor()
   gobot.Assert(t, a.Finalize(), true)
 }
-func TestFirmataAdaptorConnect(t *testing.T) {
+func TestFirmataEthernetAdaptorConnect(t *testing.T) {
   a := initTestFirmataEthernetAdaptor()
   gobot.Assert(t, a.Connect(), true)
 }
 
-func TestFirmataAdaptorInitServo(t *testing.T) {
+func TestFirmataEthernetAdaptorInitServo(t *testing.T) {
   a := initTestFirmataEthernetAdaptor()
   a.InitServo()
 }
 
-func TestFirmataAdaptorServoWrite(t *testing.T) {
+func TestFirmataEthernetAdaptorServoWrite(t *testing.T) {
   a := initTestFirmataEthernetAdaptor()
   a.ServoWrite("1", 50)
 }
 
-func TestFirmataAdaptorPwmWrite(t *testing.T) {
+func TestFirmataEthernetAdaptorPwmWrite(t *testing.T) {
   a := initTestFirmataEthernetAdaptor()
   a.PwmWrite("1", 50)
 }
 
-func TestFirmataAdaptorDigitalWrite(t *testing.T) {
+func TestFirmataEthernetAdaptorDigitalWrite(t *testing.T) {
   a := initTestFirmataEthernetAdaptor()
   a.DigitalWrite("1", 1)
 }
 
-func TestFirmataAdaptorDigitalRead(t *testing.T) {
+func TestFirmataEthernetAdaptorDigitalRead(t *testing.T) {
   a := initTestFirmataEthernetAdaptor()
   pinNumber := "1"
   // -1 on no data
