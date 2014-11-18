@@ -1,8 +1,6 @@
 package gobot
 
 import (
-	"errors"
-	"fmt"
 	"log"
 )
 
@@ -29,8 +27,7 @@ func (c *connections) Each(f func(Connection)) {
 }
 
 // Start initializes all the connections.
-func (c *connections) Start() error {
-	var err error
+func (c *connections) Start() (err error) {
 	log.Println("Starting connections...")
 	for _, connection := range *c {
 		info := "Starting connection " + connection.Name()
@@ -40,11 +37,10 @@ func (c *connections) Start() error {
 		log.Println(info + "...")
 		err = connection.Connect()
 		if err != nil {
-			err = errors.New(fmt.Sprintf("Could not start connection: %v", err))
-			break
+			return
 		}
 	}
-	return err
+	return
 }
 
 // Finalize finishes all the connections.

@@ -56,14 +56,17 @@ func (g *Gobot) Command(name string) func(map[string]interface{}) interface{} {
 }
 
 // Start runs the main Gobot event loop
-func (g *Gobot) Start() error {
-	err := g.robots.Start()
+func (g *Gobot) Start() (err error) {
+	err = g.robots.Start()
 	if err != nil {
-		return err
+		log.Println(err)
 	}
 
 	c := make(chan os.Signal, 1)
 	g.trap(c)
+	if err != nil {
+		c <- os.Interrupt
+	}
 
 	// waiting for interrupt coming on the channel
 	_ = <-c
@@ -72,7 +75,7 @@ func (g *Gobot) Start() error {
 		r.Devices().Halt()
 		r.Connections().Finalize()
 	})
-	return nil
+	return err
 }
 
 // Robots fetch all robots associated with this Gobot instance.
