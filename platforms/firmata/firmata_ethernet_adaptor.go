@@ -26,14 +26,11 @@ func NewFirmataEthernetAdaptor(name, sockAddress string) *FirmataEthernetAdaptor
       sockAddress,
     ),
     connect: func(f *FirmataEthernetAdaptor) {
-      fmt.Printf("****** %s *******\n", f.Port())
       conn, err := net.Dial("tcp", f.Port())
       if err != nil {
         panic(err)
       }
-      fmt.Printf("connected, creating board %s\n", conn)
       f.board = newBoard(conn)
-      fmt.Printf("board crated\n")
     },
   }
 }
