@@ -72,6 +72,7 @@ func NewNeuroskyDriver(a *NeuroskyAdaptor, name string) *NeuroskyDriver {
 	n.AddEvent("blink")
 	n.AddEvent("wave")
 	n.AddEvent("eeg")
+	n.AddEvent("error")
 
 	return n
 }
@@ -83,13 +84,13 @@ func (n *NeuroskyDriver) adaptor() *NeuroskyAdaptor {
 
 // Start creates a go routine to listen from serial port
 // and parse buffer readings
-func (n *NeuroskyDriver) Start() error {
+func (n *NeuroskyDriver) Start() (err error) {
 	go func() {
 		for {
 			buff := make([]byte, 1024)
 			_, err := n.adaptor().sp.Read(buff[:])
 			if err != nil {
-				panic(err)
+				gobot.Publish(n.Event("error"), err)
 			} else {
 				n.parse(bytes.NewBuffer(buff))
 			}
