@@ -28,10 +28,21 @@ func initTestEdisonAdaptor() (*EdisonAdaptor, *sysfs.MockFilesystem) {
 		"/sys/class/pwm/pwmchip0/pwm1/enable",
 		"/sys/class/gpio/export",
 		"/sys/class/gpio/unexport",
+		"/sys/class/gpio/gpio13/value",
+		"/sys/class/gpio/gpio13/direction",
 		"/sys/class/gpio/gpio40/value",
 		"/sys/class/gpio/gpio40/direction",
 		"/sys/class/gpio/gpio128/value",
 		"/sys/class/gpio/gpio128/direction",
+		"/sys/class/gpio/gpio221/value",
+		"/sys/class/gpio/gpio221/direction",
+		"/sys/class/gpio/gpio243/value",
+		"/sys/class/gpio/gpio243/direction",
+		"/sys/class/gpio/gpio229/direction",
+		"/sys/class/gpio/gpio253/value",
+		"/sys/class/gpio/gpio253/direction",
+		"/sys/class/gpio/gpio261/value",
+		"/sys/class/gpio/gpio261/direction",
 		"/dev/i2c-6",
 	})
 	sysfs.SetFilesystem(fs)
@@ -55,7 +66,7 @@ func TestEdisonAdaptorDigitalIO(t *testing.T) {
 	gobot.Assert(t, fs.Files["/sys/class/gpio/gpio40/value"].Contents, "1")
 
 	a.DigitalWrite("2", 0)
-	i := a.DigitalRead("2")
+	i, _ := a.DigitalRead("2")
 	gobot.Assert(t, i, 0)
 }
 
@@ -80,6 +91,6 @@ func TestEdisonAdaptorAnalog(t *testing.T) {
 	a, fs := initTestEdisonAdaptor()
 
 	fs.Files["/sys/bus/iio/devices/iio:device1/in_voltage0_raw"].Contents = "1000\n"
-	i := a.AnalogRead("0")
+	i, _ := a.AnalogRead("0")
 	gobot.Assert(t, i, 1000)
 }
