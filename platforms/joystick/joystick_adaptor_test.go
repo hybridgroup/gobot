@@ -8,8 +8,9 @@ import (
 
 func initTestJoystickAdaptor() *JoystickAdaptor {
 	a := NewJoystickAdaptor("bot")
-	a.connect = func(j *JoystickAdaptor) {
+	a.connect = func(j *JoystickAdaptor) (err error) {
 		j.joystick = &testJoystick{}
+		return nil
 	}
 	return a
 }

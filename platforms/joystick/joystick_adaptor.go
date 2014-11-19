@@ -1,6 +1,7 @@
 package joystick
 
 import (
+	"errors"
 	"github.com/hybridgroup/go-sdl2/sdl"
 	"github.com/hybridgroup/gobot"
 )
@@ -15,7 +16,7 @@ type joystick interface {
 type JoystickAdaptor struct {
 	gobot.Adaptor
 	joystick joystick
-	connect  func(*JoystickAdaptor)
+	connect  func(*JoystickAdaptor) (err error)
 }
 
 // NewJoysctickAdaptor creates a new adaptor with specified name.
@@ -27,21 +28,20 @@ func NewJoystickAdaptor(name string) *JoystickAdaptor {
 			name,
 			"JoystickAdaptor",
 		),
-		connect: func(j *JoystickAdaptor) {
+		connect: func(j *JoystickAdaptor) (err error) {
 			sdl.Init(sdl.INIT_JOYSTICK)
 			if sdl.NumJoysticks() > 0 {
 				j.joystick = sdl.JoystickOpen(0)
-			} else {
-				panic("No joystick available")
+				return
 			}
+			return errors.New("No joystick available")
 		},
 	}
 }
 
 // Connect returns true if connection to device is succesfull
 func (j *JoystickAdaptor) Connect() error {
-	j.connect(j)
-	return nil
+	return j.connect(j)
 }
 
 // Finalize closes connection to device
