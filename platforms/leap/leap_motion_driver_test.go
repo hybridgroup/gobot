@@ -10,8 +10,9 @@ import (
 
 func initTestLeapMotionDriver() *LeapMotionDriver {
 	a := NewLeapMotionAdaptor("bot", "")
-	a.connect = func(l *LeapMotionAdaptor) {
+	a.connect = func(l *LeapMotionAdaptor) (err error) {
 		l.ws = new(gobot.NullReadWriteCloser)
+		return nil
 	}
 	a.Connect()
 	receive = func(ws io.ReadWriteCloser) []byte {

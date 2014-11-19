@@ -7,7 +7,7 @@ import (
 
 func initTestLeapMotionAdaptor() *LeapMotionAdaptor {
 	a := NewLeapMotionAdaptor("bot", "")
-	a.connect = func(l *LeapMotionAdaptor) {}
+	a.connect = func(l *LeapMotionAdaptor) (err error) { return nil }
 	return a
 }
 

@@ -49,10 +49,13 @@ func (l *LeapMotionDriver) adaptor() *LeapMotionAdaptor {
 //		"message" - Emits Frame on new message received from Leap.
 func (l *LeapMotionDriver) Start() error {
 	enableGestures := map[string]bool{"enableGestures": true}
-	b, _ := json.Marshal(enableGestures)
-	_, err := l.adaptor().ws.Write(b)
+	b, err := json.Marshal(enableGestures)
 	if err != nil {
-		panic(err)
+		return err
+	}
+	_, err = l.adaptor().ws.Write(b)
+	if err != nil {
+		return err
 	}
 
 	go func() {
