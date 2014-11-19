@@ -9,8 +9,9 @@ import (
 
 func initTestCameraDriver() *CameraDriver {
 	d := NewCameraDriver("bot", "")
-	d.start = func(c *CameraDriver) {
+	d.start = func(c *CameraDriver) (err error) {
 		d.camera = &testCapture{}
+		return nil
 	}
 	return d
 }
@@ -31,19 +32,12 @@ func TestCameraDriverStart(t *testing.T) {
 }
 func TestCameraDriver(t *testing.T) {
 	d := NewCameraDriver("bot", "")
-	d.Start()
-	gobot.Refute(t, d.camera, nil)
+	err := d.Start()
+	gobot.Assert(t, err, nil)
 
-	defer func() {
-		r := recover()
-		if r != nil {
-			gobot.Assert(t, "unknown camera source", r)
-		} else {
-			t.Errorf("Did not return Unknown camera error")
-		}
-	}()
 	d = NewCameraDriver("bot", true)
-	d.Start()
+	err = d.Start()
+	gobot.Refute(t, err, nil)
 }
 
 func TestCameraDriverHalt(t *testing.T) {
