@@ -2,6 +2,7 @@ package firmata
 
 import (
 	"fmt"
+	"io"
 	"strconv"
 	"time"
 
@@ -16,9 +17,28 @@ type FirmataAdaptor struct {
 	connect    func(*FirmataAdaptor)
 }
 
-// NewFirmataAdaptor returns a new firmata adaptor with specified name
-// Generates a connect function that opens serial communication in specified port
-func NewFirmataAdaptor(name, port string) *FirmataAdaptor {
+// NewFirmataAdaptor returns a new firmata adaptor with specified name and optionally accepts:
+//
+//	string: port the FirmataAdaptor uses to connect to a serial port with a baude rate of 57600
+//	io.ReadWriteCloser: connection the FirmataAdaptor uses to communication with the hardware
+//
+// If an io.ReadWriteCloser is not supplied, the FirmataAdaptor will open a connection
+// to a serial port with a baude rate of 57600. If an io.ReadWriteCloser
+// is supplied, then the FirmataAdaptor will use the provided io.ReadWriteCloser and use the
+// string port as a label to be displayed in the log and api.
+func NewFirmataAdaptor(name string, args ...interface{}) *FirmataAdaptor {
+	var conn io.ReadWriteCloser
+	var port string = ""
+
+	for _, arg := range args {
+		switch arg.(type) {
+		case string:
+			port = arg.(string)
+		case io.ReadWriteCloser:
+			conn = arg.(io.ReadWriteCloser)
+		}
+	}
+
 	return &FirmataAdaptor{
 		Adaptor: *gobot.NewAdaptor(
 			name,
@@ -26,11 +46,14 @@ func NewFirmataAdaptor(name, port string) *FirmataAdaptor {
 			port,
 		),
 		connect: func(f *FirmataAdaptor) {
-			sp, err := serial.OpenPort(&serial.Config{Name: f.Port(), Baud: 57600})
-			if err != nil {
-				panic(err)
+			if conn == nil {
+				var err error
+				conn, err = serial.OpenPort(&serial.Config{Name: f.Port(), Baud: 57600})
+				if err != nil {
+					panic(err)
+				}
 			}
-			f.board = newBoard(sp)
+			f.board = newBoard(conn)
 		},
 	}
 }
