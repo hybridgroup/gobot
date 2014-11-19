@@ -40,7 +40,7 @@ func TestRaspiAdaptorDigitalIO(t *testing.T) {
 	gobot.Assert(t, fs.Files["/sys/class/gpio/gpio4/value"].Contents, "1")
 
 	a.DigitalWrite("13", 1)
-	i := a.DigitalRead("13")
+	i, _ := a.DigitalRead("13")
 	gobot.Assert(t, i, 1)
 }
 
