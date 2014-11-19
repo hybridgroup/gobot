@@ -2,6 +2,7 @@ package spark
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -46,7 +47,7 @@ func (s *SparkCoreAdaptor) Finalize() error {
 }
 
 // AnalogRead reads analog ping value using spark cloud api
-func (s *SparkCoreAdaptor) AnalogRead(pin string) int {
+func (s *SparkCoreAdaptor) AnalogRead(pin string) (val int, err error) {
 	params := url.Values{
 		"params":       {pin},
 		"access_token": {s.AccessToken},
@@ -56,39 +57,42 @@ func (s *SparkCoreAdaptor) AnalogRead(pin string) int {
 
 	resp, err := s.postToSpark(url, params)
 	if err == nil {
-		return int(resp["return_value"].(float64))
+		val = int(resp["return_value"].(float64))
+		return
 	}
 
-	return 0
+	return 0, err
 }
 
 // PwmWrite writes in pin using analog write api
-func (s *SparkCoreAdaptor) PwmWrite(pin string, level byte) {
-	s.AnalogWrite(pin, level)
+func (s *SparkCoreAdaptor) PwmWrite(pin string, level byte) (err error) {
+	return s.AnalogWrite(pin, level)
 }
 
 // AnalogWrite writes analog pin with specified level using spark cloud api
-func (s *SparkCoreAdaptor) AnalogWrite(pin string, level byte) {
+func (s *SparkCoreAdaptor) AnalogWrite(pin string, level byte) (err error) {
 	params := url.Values{
 		"params":       {fmt.Sprintf("%v,%v", pin, level)},
 		"access_token": {s.AccessToken},
 	}
 	url := fmt.Sprintf("%v/analogwrite", s.deviceURL())
-	s.postToSpark(url, params)
+	_, err = s.postToSpark(url, params)
+	return
 }
 
 // DigitalWrite writes to a digital pin using spark cloud api
-func (s *SparkCoreAdaptor) DigitalWrite(pin string, level byte) {
+func (s *SparkCoreAdaptor) DigitalWrite(pin string, level byte) (err error) {
 	params := url.Values{
 		"params":       {fmt.Sprintf("%v,%v", pin, s.pinLevel(level))},
 		"access_token": {s.AccessToken},
 	}
 	url := fmt.Sprintf("%v/digitalwrite", s.deviceURL())
-	s.postToSpark(url, params)
+	_, err = s.postToSpark(url, params)
+	return err
 }
 
 // DigitalRead reads from digital pin using spark cloud api
-func (s *SparkCoreAdaptor) DigitalRead(pin string) int {
+func (s *SparkCoreAdaptor) DigitalRead(pin string) (val int, err error) {
 	params := url.Values{
 		"params":       {pin},
 		"access_token": {s.AccessToken},
@@ -96,9 +100,10 @@ func (s *SparkCoreAdaptor) DigitalRead(pin string) int {
 	url := fmt.Sprintf("%v/digitalread", s.deviceURL())
 	resp, err := s.postToSpark(url, params)
 	if err == nil {
-		return int(resp["return_value"].(float64))
+		val = int(resp["return_value"].(float64))
+		return
 	}
-	return -1
+	return -1, err
 }
 
 // setAPIServer sets spark cloud api server, this can be used to change from default api.spark.io
@@ -127,22 +132,23 @@ func (s *SparkCoreAdaptor) pinLevel(level byte) string {
 func (s *SparkCoreAdaptor) postToSpark(url string, params url.Values) (m map[string]interface{}, err error) {
 	resp, err := http.PostForm(url, params)
 	if err != nil {
-		fmt.Println(s.Name, "Error writing to spark device", err)
 		return
 	}
 
 	buf, err := ioutil.ReadAll(resp.Body)
 
 	if err != nil {
-		fmt.Println(s.Name, "Error reading response body", err)
 		return
 	}
 
 	json.Unmarshal(buf, &m)
 
 	if resp.Status != "200 OK" {
-		fmt.Println(s.Name, "Error: ", m["error"])
-		err = fmt.Errorf("%q was not found", url)
+		if _, ok := m["error"]; ok {
+			err = errors.New(m["error"].(string))
+		} else {
+			err = errors.New(fmt.Sprintf("&v: error communicating to the spark cloud", resp.Status))
+		}
 		return
 	}
 
