@@ -225,18 +225,20 @@ func (r *RaspiAdaptor) PwmWrite(pin string, val byte) (err error) {
 }
 
 // I2cStart starts a i2c device in specified address
-func (r *RaspiAdaptor) I2cStart(address byte) {
-	r.i2cDevice, _ = sysfs.NewI2cDevice(r.i2cLocation, address)
+func (r *RaspiAdaptor) I2cStart(address byte) (err error) {
+	r.i2cDevice, err = sysfs.NewI2cDevice(r.i2cLocation, address)
+	return err
 }
 
 // I2CWrite writes data to i2c device
-func (r *RaspiAdaptor) I2cWrite(data []byte) {
-	r.i2cDevice.Write(data)
+func (r *RaspiAdaptor) I2cWrite(data []byte) (err error) {
+	_, err = r.i2cDevice.Write(data)
+	return
 }
 
 // I2cRead returns value from i2c device using specified size
-func (r *RaspiAdaptor) I2cRead(size uint) []byte {
-	buf := make([]byte, size)
-	r.i2cDevice.Read(buf)
-	return buf
+func (r *RaspiAdaptor) I2cRead(size uint) (data []byte, err error) {
+	data = make([]byte, size)
+	_, err = r.i2cDevice.Read(data)
+	return
 }

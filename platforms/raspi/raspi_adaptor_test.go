@@ -54,5 +54,6 @@ func TestRaspiAdaptorI2c(t *testing.T) {
 	a.I2cStart(0xff)
 
 	a.I2cWrite([]byte{0x00, 0x01})
-	gobot.Assert(t, a.I2cRead(2), []byte{0x00, 0x01})
+	data, _ := a.I2cRead(2)
+	gobot.Assert(t, data, []byte{0x00, 0x01})
 }
