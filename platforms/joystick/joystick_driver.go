@@ -5,15 +5,19 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"time"
 
 	"github.com/hybridgroup/go-sdl2/sdl"
 	"github.com/hybridgroup/gobot"
 )
 
+var _ gobot.DriverInterface = (*JoystickDriver)(nil)
+
 type JoystickDriver struct {
 	gobot.Driver
-	config joystickConfig
-	poll   func() sdl.Event
+	configPath string
+	config     joystickConfig
+	poll       func() sdl.Event
 }
 
 // pair is a JSON representation of name and id
@@ -50,28 +54,13 @@ func NewJoystickDriver(a *JoystickAdaptor, name string, config string) *Joystick
 			"JoystickDriver",
 			a,
 		),
+		configPath: config,
 		poll: func() sdl.Event {
 			return sdl.PollEvent()
 		},
 	}
 
-	file, e := ioutil.ReadFile(config)
-	if e != nil {
-		panic(fmt.Sprintf("File error: %v\n", e))
-	}
-	var jsontype joystickConfig
-	json.Unmarshal(file, &jsontype)
-	d.config = jsontype
-	for _, value := range d.config.Buttons {
-		d.AddEvent(fmt.Sprintf("%s_press", value.Name))
-		d.AddEvent(fmt.Sprintf("%s_release", value.Name))
-	}
-	for _, value := range d.config.Axis {
-		d.AddEvent(value.Name)
-	}
-	for _, value := range d.config.Hats {
-		d.AddEvent(value.Name)
-	}
+	d.AddEvent("error")
 	return d
 }
 
@@ -81,15 +70,43 @@ func (j *JoystickDriver) adaptor() *JoystickAdaptor {
 }
 
 // Start initiallizes event polling with defined interval
-func (j *JoystickDriver) Start() bool {
-	gobot.Every(j.Interval(), func() {
-		event := j.poll()
-		if event != nil {
-			j.handleEvent(event)
+func (j *JoystickDriver) Start() (errs []error) {
+	file, err := ioutil.ReadFile(j.configPath)
+	if err != nil {
+		return []error{err}
+	}
+
+	var jsontype joystickConfig
+	json.Unmarshal(file, &jsontype)
+	j.config = jsontype
+
+	for _, value := range j.config.Buttons {
+		j.AddEvent(fmt.Sprintf("%s_press", value.Name))
+		j.AddEvent(fmt.Sprintf("%s_release", value.Name))
+	}
+	for _, value := range j.config.Axis {
+		j.AddEvent(value.Name)
+	}
+	for _, value := range j.config.Hats {
+		j.AddEvent(value.Name)
+	}
+
+	go func() {
+		for {
+			event := j.poll()
+			if event != nil {
+				if err = j.handleEvent(event); err != nil {
+					gobot.Publish(j.Event("error"), err)
+				}
+			}
+			<-time.After(j.Interval())
 		}
-	})
-	return true
+	}()
+	return
 }
+
+// Halt stops joystick driver
+func (j *JoystickDriver) Halt() (errs []error) { return }
 
 // HandleEvent publishes an specific event according to data received
 func (j *JoystickDriver) handleEvent(event sdl.Event) error {
@@ -98,9 +115,7 @@ func (j *JoystickDriver) handleEvent(event sdl.Event) error {
 		if data.Which == j.adaptor().joystick.InstanceID() {
 			axis := j.findName(data.Axis, j.config.Axis)
 			if axis == "" {
-				e := errors.New(fmt.Sprintf("Unknown Axis: %v", data.Axis))
-				fmt.Println(e.Error())
-				return e
+				return errors.New(fmt.Sprintf("Unknown Axis: %v", data.Axis))
 			} else {
 				gobot.Publish(j.Event(axis), data.Value)
 			}
@@ -109,9 +124,7 @@ func (j *JoystickDriver) handleEvent(event sdl.Event) error {
 		if data.Which == j.adaptor().joystick.InstanceID() {
 			button := j.findName(data.Button, j.config.Buttons)
 			if button == "" {
-				e := errors.New(fmt.Sprintf("Unknown Button: %v", data.Button))
-				fmt.Println(e.Error())
-				return e
+				return errors.New(fmt.Sprintf("Unknown Button: %v", data.Button))
 			} else {
 				if data.State == 1 {
 					gobot.Publish(j.Event(fmt.Sprintf("%s_press", button)), nil)
@@ -124,9 +137,7 @@ func (j *JoystickDriver) handleEvent(event sdl.Event) error {
 		if data.Which == j.adaptor().joystick.InstanceID() {
 			hat := j.findHatName(data.Value, data.Hat, j.config.Hats)
 			if hat == "" {
-				e := errors.New(fmt.Sprintf("Unknown Hat: %v %v", data.Hat, data.Value))
-				fmt.Println(e.Error())
-				return e
+				return errors.New(fmt.Sprintf("Unknown Hat: %v %v", data.Hat, data.Value))
 			} else {
 				gobot.Publish(j.Event(hat), true)
 			}
@@ -134,9 +145,6 @@ func (j *JoystickDriver) handleEvent(event sdl.Event) error {
 	}
 	return nil
 }
-
-// Halt stops joystick driver
-func (j *JoystickDriver) Halt() bool { return true }
 
 func (j *JoystickDriver) findName(id uint8, list []pair) string {
 	for _, value := range list {

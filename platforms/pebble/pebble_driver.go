@@ -4,6 +4,8 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
+var _ gobot.DriverInterface = (*PebbleDriver)(nil)
+
 type PebbleDriver struct {
 	gobot.Driver
 	Messages []string
@@ -50,10 +52,10 @@ func NewPebbleDriver(adaptor *PebbleAdaptor, name string) *PebbleDriver {
 }
 
 // Start returns true if driver is initialized correctly
-func (d *PebbleDriver) Start() bool { return true }
+func (d *PebbleDriver) Start() (errs []error) { return }
 
 // Halt returns true if driver is halted succesfully
-func (d *PebbleDriver) Halt() bool { return true }
+func (d *PebbleDriver) Halt() (errs []error) { return }
 
 // PublishEvent publishes event with specified name and data in gobot
 func (d *PebbleDriver) PublishEvent(name string, data string) {

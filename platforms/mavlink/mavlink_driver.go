@@ -1,12 +1,13 @@
 package mavlink
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/hybridgroup/gobot"
 	common "github.com/hybridgroup/gobot/platforms/mavlink/common"
 )
+
+var _ gobot.DriverInterface = (*MavlinkDriver)(nil)
 
 type MavlinkDriver struct {
 	gobot.Driver
@@ -31,6 +32,7 @@ func NewMavlinkDriver(a *MavlinkAdaptor, name string) *MavlinkDriver {
 
 	m.AddEvent("packet")
 	m.AddEvent("message")
+	m.AddEvent("error")
 
 	return m
 }
@@ -42,31 +44,32 @@ func (m *MavlinkDriver) adaptor() *MavlinkAdaptor {
 
 // Start begins process to read mavlink packets every m.Interval
 // and process them
-func (m *MavlinkDriver) Start() bool {
+func (m *MavlinkDriver) Start() (errs []error) {
 	go func() {
 		for {
 			packet, err := common.ReadMAVLinkPacket(m.adaptor().sp)
 			if err != nil {
-				fmt.Println(err)
+				gobot.Publish(m.Event("error"), err)
 				continue
 			}
 			gobot.Publish(m.Event("packet"), packet)
 			message, err := packet.MAVLinkMessage()
 			if err != nil {
-				fmt.Println(err)
+				gobot.Publish(m.Event("error"), err)
 				continue
 			}
 			gobot.Publish(m.Event("message"), message)
 			<-time.After(m.Interval())
 		}
 	}()
-	return true
-}
-
-// SendPacket sends a packet to mavlink device
-func (m *MavlinkDriver) SendPacket(packet *common.MAVLinkPacket) {
-	m.adaptor().sp.Write(packet.Pack())
+	return
 }
 
 // Halt returns true if device is halted successfully
-func (m *MavlinkDriver) Halt() bool { return true }
+func (m *MavlinkDriver) Halt() (errs []error) { return }
+
+// SendPacket sends a packet to mavlink device
+func (m *MavlinkDriver) SendPacket(packet *common.MAVLinkPacket) (err error) {
+	_, err = m.adaptor().sp.Write(packet.Pack())
+	return err
+}

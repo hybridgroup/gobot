@@ -4,6 +4,8 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
+var _ gobot.DriverInterface = (*ArdroneDriver)(nil)
+
 type ArdroneDriver struct {
 	gobot.Driver
 }
@@ -30,13 +32,13 @@ func (a *ArdroneDriver) adaptor() *ArdroneAdaptor {
 }
 
 // Start returns true if driver is started succesfully
-func (a *ArdroneDriver) Start() bool {
-	return true
+func (a *ArdroneDriver) Start() (errs []error) {
+	return
 }
 
 // Halt returns true if driver is halted succesfully
-func (a *ArdroneDriver) Halt() bool {
-	return true
+func (a *ArdroneDriver) Halt() (errs []error) {
+	return
 }
 
 // TakeOff makes the drone start flying

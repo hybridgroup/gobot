@@ -2,7 +2,10 @@ package gpio
 
 import (
 	"github.com/hybridgroup/gobot"
+	"time"
 )
+
+var _ gobot.DriverInterface = (*AnalogSensorDriver)(nil)
 
 // Represents an Analog Sensor
 type AnalogSensorDriver struct {
@@ -24,8 +27,10 @@ func NewAnalogSensorDriver(a AnalogReader, name string, pin string) *AnalogSenso
 	}
 
 	d.AddEvent("data")
+	d.AddEvent("error")
 	d.AddCommand("Read", func(params map[string]interface{}) interface{} {
-		return d.Read()
+		val, err := d.Read()
+		return map[string]interface{}{"val": val, "err": err}
 	})
 
 	return d
@@ -39,22 +44,27 @@ func (a *AnalogSensorDriver) adaptor() AnalogReader {
 // Returns true on successful start of the driver.
 // Emits the Events:
 //	"data" int - Event is emitted on change and represents the current reading from the sensor.
-func (a *AnalogSensorDriver) Start() bool {
+func (a *AnalogSensorDriver) Start() (errs []error) {
 	value := 0
-	gobot.Every(a.Interval(), func() {
-		newValue := a.Read()
-		if newValue != value && newValue != -1 {
-			value = newValue
-			gobot.Publish(a.Event("data"), value)
+	go func() {
+		for {
+			newValue, err := a.Read()
+			if err != nil {
+				gobot.Publish(a.Event("error"), err)
+			} else if newValue != value && newValue != -1 {
+				value = newValue
+				gobot.Publish(a.Event("data"), value)
+			}
+			<-time.After(a.Interval())
 		}
-	})
-	return true
+	}()
+	return
 }
 
 // Halt returns true on a successful halt of the driver
-func (a *AnalogSensorDriver) Halt() bool { return true }
+func (a *AnalogSensorDriver) Halt() (errs []error) { return }
 
 // Read returns the current reading from the Analog Sensor
-func (a *AnalogSensorDriver) Read() int {
+func (a *AnalogSensorDriver) Read() (val int, err error) {
 	return a.adaptor().AnalogRead(a.Pin())
 }

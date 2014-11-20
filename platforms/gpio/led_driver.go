@@ -1,8 +1,8 @@
 package gpio
 
-import (
-	"github.com/hybridgroup/gobot"
-)
+import "github.com/hybridgroup/gobot"
+
+var _ gobot.DriverInterface = (*LedDriver)(nil)
 
 // Represents a digital Led
 type LedDriver struct {
@@ -30,23 +30,19 @@ func NewLedDriver(a PwmDigitalWriter, name string, pin string) *LedDriver {
 
 	l.AddCommand("Brightness", func(params map[string]interface{}) interface{} {
 		level := byte(params["level"].(float64))
-		l.Brightness(level)
-		return nil
+		return l.Brightness(level)
 	})
 
 	l.AddCommand("Toggle", func(params map[string]interface{}) interface{} {
-		l.Toggle()
-		return nil
+		return l.Toggle()
 	})
 
 	l.AddCommand("On", func(params map[string]interface{}) interface{} {
-		l.On()
-		return nil
+		return l.On()
 	})
 
 	l.AddCommand("Off", func(params map[string]interface{}) interface{} {
-		l.Off()
-		return nil
+		return l.Off()
 	})
 
 	return l
@@ -57,10 +53,10 @@ func (l *LedDriver) adaptor() PwmDigitalWriter {
 }
 
 // Start starts the LedDriver. Returns true on successful start of the driver
-func (l *LedDriver) Start() bool { return true }
+func (l *LedDriver) Start() (errs []error) { return }
 
 // Halt halts the LedDriver. Returns true on successful halt of the driver
-func (l *LedDriver) Halt() bool { return true }
+func (l *LedDriver) Halt() (errs []error) { return }
 
 // State return true if the led is On and false if the led is Off
 func (l *LedDriver) State() bool {
@@ -68,33 +64,40 @@ func (l *LedDriver) State() bool {
 }
 
 // On sets the led to a high state. Returns true on success
-func (l *LedDriver) On() bool {
-	l.changeState(1)
+func (l *LedDriver) On() (err error) {
+	err = l.changeState(1)
+	if err != nil {
+		return
+	}
 	l.high = true
-	return true
+	return
 }
 
 // Off sets the led to a low state. Returns true on success
-func (l *LedDriver) Off() bool {
-	l.changeState(0)
+func (l *LedDriver) Off() (err error) {
+	err = l.changeState(0)
+	if err != nil {
+		return
+	}
 	l.high = false
-	return true
+	return
 }
 
 // Toggle sets the led to the opposite of it's current state
-func (l *LedDriver) Toggle() {
+func (l *LedDriver) Toggle() (err error) {
 	if l.State() {
-		l.Off()
+		err = l.Off()
 	} else {
-		l.On()
+		err = l.On()
 	}
+	return
 }
 
 // Brightness sets the led to the specified level of brightness
-func (l *LedDriver) Brightness(level byte) {
-	l.adaptor().PwmWrite(l.Pin(), level)
+func (l *LedDriver) Brightness(level byte) (err error) {
+	return l.adaptor().PwmWrite(l.Pin(), level)
 }
 
-func (l *LedDriver) changeState(level byte) {
-	l.adaptor().DigitalWrite(l.Pin(), level)
+func (l *LedDriver) changeState(level byte) (err error) {
+	return l.adaptor().DigitalWrite(l.Pin(), level)
 }

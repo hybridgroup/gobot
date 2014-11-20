@@ -78,11 +78,11 @@ func TestNewSparkCoreAdaptor(t *testing.T) {
 
 func TestSparkCoreAdaptorConnect(t *testing.T) {
 	a := initTestSparkCoreAdaptor()
-	gobot.Assert(t, a.Connect(), true)
+	gobot.Assert(t, len(a.Connect()), 0)
 
 	a.SetConnected(false)
 
-	gobot.Assert(t, a.Connect(), true)
+	gobot.Assert(t, len(a.Connect()), 0)
 	gobot.Assert(t, a.Connected(), true)
 }
 
@@ -91,7 +91,7 @@ func TestSparkCoreAdaptorFinalize(t *testing.T) {
 
 	a.Connect()
 
-	gobot.Assert(t, a.Finalize(), true)
+	gobot.Assert(t, len(a.Finalize()), 0)
 	gobot.Assert(t, a.Connected(), false)
 }
 
@@ -105,7 +105,8 @@ func TestSparkCoreAdaptorAnalogRead(t *testing.T) {
 
 	a.setAPIServer(testServer.URL)
 
-	gobot.Assert(t, a.AnalogRead("A1"), 5)
+	val, _ := a.AnalogRead("A1")
+	gobot.Assert(t, val, 5)
 
 	testServer.Close()
 
@@ -115,7 +116,8 @@ func TestSparkCoreAdaptorAnalogRead(t *testing.T) {
 	})
 	defer testServer.Close()
 
-	gobot.Assert(t, a.AnalogRead("A1"), 0)
+	val, _ = a.AnalogRead("A1")
+	gobot.Assert(t, val, 0)
 
 }
 
@@ -175,7 +177,8 @@ func TestSparkCoreAdaptorDigitalRead(t *testing.T) {
 
 	a.setAPIServer(testServer.URL)
 
-	gobot.Assert(t, a.DigitalRead("D7"), 1)
+	val, _ := a.DigitalRead("D7")
+	gobot.Assert(t, val, 1)
 	testServer.Close()
 
 	// When LOW
@@ -185,7 +188,8 @@ func TestSparkCoreAdaptorDigitalRead(t *testing.T) {
 
 	a.setAPIServer(testServer.URL)
 
-	gobot.Assert(t, a.DigitalRead("D7"), 0)
+	val, _ = a.DigitalRead("D7")
+	gobot.Assert(t, val, 0)
 
 	testServer.Close()
 
@@ -195,7 +199,8 @@ func TestSparkCoreAdaptorDigitalRead(t *testing.T) {
 	})
 	defer testServer.Close()
 
-	gobot.Assert(t, a.DigitalRead("D7"), -1)
+	val, _ = a.DigitalRead("D7")
+	gobot.Assert(t, val, -1)
 }
 
 func TestSparkCoreAdaptorSetAPIServer(t *testing.T) {
@@ -235,7 +240,9 @@ func TestSparkCoreAdaptorPostToSpark(t *testing.T) {
 	a := initTestSparkCoreAdaptor()
 
 	// When error on request
-	resp, err := a.postToSpark("http://invalid%20host.com", url.Values{})
+	vals := url.Values{}
+	vals.Add("error", "error")
+	resp, err := a.postToSpark("http://invalid%20host.com", vals)
 	if err == nil {
 		t.Errorf("postToSpark() should return an error when request was unsuccessful but returned", resp)
 	}
@@ -249,7 +256,7 @@ func TestSparkCoreAdaptorPostToSpark(t *testing.T) {
 	})
 	defer testServer.Close()
 
-	resp, err = a.postToSpark(testServer.URL+"/existent", url.Values{})
+	resp, err = a.postToSpark(testServer.URL+"/existent", vals)
 	if err == nil {
 		t.Errorf("postToSpark() should return an error when status is not 200 but returned", resp)
 	}

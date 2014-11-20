@@ -19,17 +19,12 @@ func initTestWindowDriver() *WindowDriver {
 
 func TestWindowDriverStart(t *testing.T) {
 	d := initTestWindowDriver()
-	gobot.Assert(t, d.Start(), true)
+	gobot.Assert(t, len(d.Start()), 0)
 }
 
 func TestWindowDriverHalt(t *testing.T) {
 	d := initTestWindowDriver()
-	gobot.Assert(t, d.Halt(), true)
-}
-
-func TestWindowDriverInit(t *testing.T) {
-	d := initTestWindowDriver()
-	gobot.Assert(t, d.Init(), true)
+	gobot.Assert(t, len(d.Halt()), 0)
 }
 
 func TestWindowDriverShowImage(t *testing.T) {

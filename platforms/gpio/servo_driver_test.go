@@ -12,12 +12,12 @@ func initTestServoDriver() *ServoDriver {
 
 func TestServoDriverStart(t *testing.T) {
 	d := initTestServoDriver()
-	gobot.Assert(t, d.Start(), true)
+	gobot.Assert(t, len(d.Start()), 0)
 }
 
 func TestServoDriverHalt(t *testing.T) {
 	d := initTestServoDriver()
-	gobot.Assert(t, d.Halt(), true)
+	gobot.Assert(t, len(d.Halt()), 0)
 }
 
 func TestServoDriverMove(t *testing.T) {

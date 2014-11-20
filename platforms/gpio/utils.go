@@ -13,21 +13,21 @@ type DirectPin interface {
 	AnalogReader
 }
 type Pwm interface {
-	PwmWrite(string, byte)
+	PwmWrite(string, byte) (err error)
 }
 type Servo interface {
-	InitServo()
-	ServoWrite(string, byte)
+	InitServo() (err error)
+	ServoWrite(string, byte) (err error)
 }
 type AnalogWriter interface {
-	AnalogWrite(string, byte)
+	AnalogWrite(string, byte) (err error)
 }
 type AnalogReader interface {
-	AnalogRead(string) int
+	AnalogRead(string) (val int, err error)
 }
 type DigitalWriter interface {
-	DigitalWrite(string, byte)
+	DigitalWrite(string, byte) (err error)
 }
 type DigitalReader interface {
-	DigitalRead(string) int
+	DigitalRead(string) (val int, err error)
 }

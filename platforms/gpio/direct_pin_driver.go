@@ -6,6 +6,8 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
+var _ gobot.DriverInterface = (*DirectPinDriver)(nil)
+
 // Represents a raw GPIO pin
 type DirectPinDriver struct {
 	gobot.Driver
@@ -31,30 +33,28 @@ func NewDirectPinDriver(a DirectPin, name string, pin string) *DirectPinDriver {
 	}
 
 	d.AddCommand("DigitalRead", func(params map[string]interface{}) interface{} {
-		return d.DigitalRead()
+		val, err := d.DigitalRead()
+		return map[string]interface{}{"val": val, "err": err}
 	})
 	d.AddCommand("DigitalWrite", func(params map[string]interface{}) interface{} {
 		level, _ := strconv.Atoi(params["level"].(string))
-		d.DigitalWrite(byte(level))
-		return nil
+		return d.DigitalWrite(byte(level))
 	})
 	d.AddCommand("AnalogRead", func(params map[string]interface{}) interface{} {
-		return d.AnalogRead()
+		val, err := d.AnalogRead()
+		return map[string]interface{}{"val": val, "err": err}
 	})
 	d.AddCommand("AnalogWrite", func(params map[string]interface{}) interface{} {
 		level, _ := strconv.Atoi(params["level"].(string))
-		d.AnalogWrite(byte(level))
-		return nil
+		return d.AnalogWrite(byte(level))
 	})
 	d.AddCommand("PwmWrite", func(params map[string]interface{}) interface{} {
 		level, _ := strconv.Atoi(params["level"].(string))
-		d.PwmWrite(byte(level))
-		return nil
+		return d.PwmWrite(byte(level))
 	})
 	d.AddCommand("ServoWrite", func(params map[string]interface{}) interface{} {
 		level, _ := strconv.Atoi(params["level"].(string))
-		d.ServoWrite(byte(level))
-		return nil
+		return d.ServoWrite(byte(level))
 	})
 
 	return d
@@ -65,37 +65,37 @@ func (d *DirectPinDriver) adaptor() DirectPin {
 }
 
 // Starts the DirectPinDriver. Returns true on successful start of the driver
-func (d *DirectPinDriver) Start() bool { return true }
+func (d *DirectPinDriver) Start() (errs []error) { return }
 
 // Halts the DirectPinDriver. Returns true on successful halt of the driver
-func (d *DirectPinDriver) Halt() bool { return true }
+func (d *DirectPinDriver) Halt() (errs []error) { return }
 
 // DigitalRead returns the current digital state of the pin
-func (d *DirectPinDriver) DigitalRead() int {
+func (d *DirectPinDriver) DigitalRead() (val int, err error) {
 	return d.adaptor().DigitalRead(d.Pin())
 }
 
 // DigitalWrite writes to the pin
-func (d *DirectPinDriver) DigitalWrite(level byte) {
-	d.adaptor().DigitalWrite(d.Pin(), level)
+func (d *DirectPinDriver) DigitalWrite(level byte) (err error) {
+	return d.adaptor().DigitalWrite(d.Pin(), level)
 }
 
 // AnalogRead reads the current analog reading of the pin
-func (d *DirectPinDriver) AnalogRead() int {
+func (d *DirectPinDriver) AnalogRead() (val int, err error) {
 	return d.adaptor().AnalogRead(d.Pin())
 }
 
 // AnalogWrite writes to the pin
-func (d *DirectPinDriver) AnalogWrite(level byte) {
-	d.adaptor().AnalogWrite(d.Pin(), level)
+func (d *DirectPinDriver) AnalogWrite(level byte) (err error) {
+	return d.adaptor().AnalogWrite(d.Pin(), level)
 }
 
 // PwmWrite writes to the pin
-func (d *DirectPinDriver) PwmWrite(level byte) {
-	d.adaptor().PwmWrite(d.Pin(), level)
+func (d *DirectPinDriver) PwmWrite(level byte) (err error) {
+	return d.adaptor().PwmWrite(d.Pin(), level)
 }
 
 // ServoWrite writes to the pin
-func (d *DirectPinDriver) ServoWrite(level byte) {
-	d.adaptor().ServoWrite(d.Pin(), level)
+func (d *DirectPinDriver) ServoWrite(level byte) (err error) {
+	return d.adaptor().ServoWrite(d.Pin(), level)
 }

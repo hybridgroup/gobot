@@ -10,8 +10,9 @@ import (
 
 func initTestNeuroskyDriver() *NeuroskyDriver {
 	a := NewNeuroskyAdaptor("bot", "/dev/null")
-	a.connect = func(n *NeuroskyAdaptor) {
+	a.connect = func(n *NeuroskyAdaptor) (err error) {
 		n.sp = gobot.NullReadWriteCloser{}
+		return nil
 	}
 	a.connect(a)
 	return NewNeuroskyDriver(a, "bot")
@@ -19,12 +20,12 @@ func initTestNeuroskyDriver() *NeuroskyDriver {
 
 func TestNeuroskyDriverStart(t *testing.T) {
 	d := initTestNeuroskyDriver()
-	gobot.Assert(t, d.Start(), true)
+	gobot.Assert(t, len(d.Start()), 0)
 }
 
 func TestNeuroskyDriverHalt(t *testing.T) {
 	d := initTestNeuroskyDriver()
-	gobot.Assert(t, d.Halt(), true)
+	gobot.Assert(t, len(d.Halt()), 0)
 }
 
 func TestNeuroskyDriverParse(t *testing.T) {

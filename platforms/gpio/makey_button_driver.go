@@ -2,7 +2,10 @@ package gpio
 
 import (
 	"github.com/hybridgroup/gobot"
+	"time"
 )
+
+var _ gobot.DriverInterface = (*MakeyButtonDriver)(nil)
 
 // Represents a Makey Button
 type MakeyButtonDriver struct {
@@ -23,6 +26,7 @@ func NewMakeyButtonDriver(a DigitalReader, name string, pin string) *MakeyButton
 		Active: false,
 	}
 
+	m.AddEvent("error")
 	m.AddEvent("push")
 	m.AddEvent("release")
 
@@ -39,31 +43,32 @@ func (b *MakeyButtonDriver) adaptor() DigitalReader {
 // Emits the Events:
 // 	"push"    int - On button push
 //	"release" int - On button release
-func (m *MakeyButtonDriver) Start() bool {
+func (m *MakeyButtonDriver) Start() (errs []error) {
 	state := 0
-	gobot.Every(m.Interval(), func() {
-		newValue := m.readState()
-		if newValue != state && newValue != -1 {
-			state = newValue
-			m.update(newValue)
+	go func() {
+		for {
+			newValue, err := m.readState()
+			if err != nil {
+				gobot.Publish(m.Event("error"), err)
+			} else if newValue != state && newValue != -1 {
+				state = newValue
+				if newValue == 0 {
+					m.Active = true
+					gobot.Publish(m.Event("push"), newValue)
+				} else {
+					m.Active = false
+					gobot.Publish(m.Event("release"), newValue)
+				}
+			}
 		}
-	})
-	return true
+		<-time.After(m.Interval())
+	}()
+	return
 }
 
 // Halt returns true on a successful halt of the driver
-func (m *MakeyButtonDriver) Halt() bool { return true }
+func (m *MakeyButtonDriver) Halt() (errs []error) { return }
 
-func (m *MakeyButtonDriver) readState() int {
+func (m *MakeyButtonDriver) readState() (val int, err error) {
 	return m.adaptor().DigitalRead(m.Pin())
-}
-
-func (m *MakeyButtonDriver) update(newVal int) {
-	if newVal == 0 {
-		m.Active = true
-		gobot.Publish(m.Event("push"), newVal)
-	} else {
-		m.Active = false
-		gobot.Publish(m.Event("release"), newVal)
-	}
 }

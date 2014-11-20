@@ -3,11 +3,13 @@ package sphero
 import (
 	"bytes"
 	"encoding/binary"
-	"fmt"
+	"errors"
 	"time"
 
 	"github.com/hybridgroup/gobot"
 )
+
+var _ gobot.DriverInterface = (*SpheroDriver)(nil)
 
 type packet struct {
 	header   []uint8
@@ -58,6 +60,7 @@ func NewSpheroDriver(a *SpheroAdaptor, name string) *SpheroDriver {
 		responseChannel: make(chan []uint8, 1024),
 	}
 
+	s.AddEvent("error")
 	s.AddEvent("collision")
 	s.AddCommand("SetRGB", func(params map[string]interface{}) interface{} {
 		r := uint8(params["r"].(float64))
@@ -112,11 +115,14 @@ func (s *SpheroDriver) adaptor() *SpheroAdaptor {
 //
 // Emits the Events:
 // 	"collision" SpheroDriver.Collision - On Collision Detected
-func (s *SpheroDriver) Start() bool {
+func (s *SpheroDriver) Start() (errs []error) {
 	go func() {
 		for {
 			packet := <-s.packetChannel
-			s.write(packet)
+			err := s.write(packet)
+			if err != nil {
+				gobot.Publish(s.Event("error"), err)
+			}
 		}
 	}()
 
@@ -163,17 +169,17 @@ func (s *SpheroDriver) Start() bool {
 	s.configureCollisionDetection()
 	s.enableStopOnDisconnect()
 
-	return true
+	return
 }
 
 // Halt halts the SpheroDriver and sends a SpheroDriver.Stop command to the Sphero.
 // Returns true on successful halt.
-func (s *SpheroDriver) Halt() bool {
+func (s *SpheroDriver) Halt() (errs []error) {
 	gobot.Every(10*time.Millisecond, func() {
 		s.Stop()
 	})
 	time.Sleep(1 * time.Second)
-	return true
+	return
 }
 
 // SetRGB sets the Sphero to the given r, g, and b values
@@ -263,20 +269,17 @@ func (s *SpheroDriver) craftPacket(body []uint8, did byte, cid byte) *packet {
 	return packet
 }
 
-func (s *SpheroDriver) write(packet *packet) {
+func (s *SpheroDriver) write(packet *packet) (err error) {
 	buf := append(packet.header, packet.body...)
 	buf = append(buf, packet.checksum)
 	length, err := s.adaptor().sp.Write(buf)
 	if err != nil {
-		fmt.Println(s.Name, err)
-		s.adaptor().Disconnect()
-		fmt.Println("Reconnecting to SpheroDriver...")
-		s.adaptor().Connect()
-		return
+		return err
 	} else if length != len(buf) {
-		fmt.Println("Not enough bytes written", s.Name)
+		return errors.New("Not enough bytes written")
 	}
 	s.seq++
+	return
 }
 
 func (s *SpheroDriver) calculateChecksum(packet *packet) uint8 {

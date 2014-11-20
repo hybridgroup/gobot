@@ -7,10 +7,12 @@ import (
 	"io"
 )
 
+var _ gobot.AdaptorInterface = (*LeapMotionAdaptor)(nil)
+
 type LeapMotionAdaptor struct {
 	gobot.Adaptor
 	ws      io.ReadWriteCloser
-	connect func(*LeapMotionAdaptor)
+	connect func(*LeapMotionAdaptor) (err error)
 }
 
 // NewLeapMotionAdaptor creates a new leap motion adaptor using specified name and port
@@ -21,26 +23,28 @@ func NewLeapMotionAdaptor(name string, port string) *LeapMotionAdaptor {
 			"LeapMotionAdaptor",
 			port,
 		),
-		connect: func(l *LeapMotionAdaptor) {
+		connect: func(l *LeapMotionAdaptor) (err error) {
 			ws, err := websocket.Dial(
 				fmt.Sprintf("ws://%v/v3.json", l.Port()),
 				"",
 				fmt.Sprintf("http://%v", l.Port()),
 			)
 			if err != nil {
-				panic(err)
+				return err
 			}
 			l.ws = ws
+			return
 		},
 	}
 }
 
 // Connect returns true if connection to leap motion is established succesfully
-func (l *LeapMotionAdaptor) Connect() bool {
-	l.connect(l)
-	l.SetConnected(true)
-	return true
+func (l *LeapMotionAdaptor) Connect() (errs []error) {
+	if err := l.connect(l); err != nil {
+		return []error{err}
+	}
+	return
 }
 
 // Finalize ends connection to leap motion
-func (l *LeapMotionAdaptor) Finalize() bool { return true }
+func (l *LeapMotionAdaptor) Finalize() (errs []error) { return }

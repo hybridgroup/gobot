@@ -1,6 +1,7 @@
 package beaglebone
 
 import (
+	"errors"
 	"strings"
 	"testing"
 
@@ -46,6 +47,7 @@ func TestBeagleboneAdaptor(t *testing.T) {
 		return []string{pattern + "5"}, nil
 	}
 
+	gobot.Assert(t, a.PwmWrite("P9_99", 175), errors.New("Not a valid pin"))
 	a.PwmWrite("P9_14", 175)
 	gobot.Assert(
 		t,
@@ -84,8 +86,11 @@ func TestBeagleboneAdaptor(t *testing.T) {
 
 	// Analog
 	fs.Files["/sys/devices/ocp.3/helper.5/AIN1"].Contents = "567\n"
-	i := a.AnalogRead("P9_40")
+	i, _ := a.AnalogRead("P9_40")
 	gobot.Assert(t, i, 567)
+
+	i, err := a.AnalogRead("P9_99")
+	gobot.Assert(t, err, errors.New("Not a valid pin"))
 
 	// DigitalIO
 	a.DigitalWrite("usr1", 1)
@@ -97,8 +102,10 @@ func TestBeagleboneAdaptor(t *testing.T) {
 	a.DigitalWrite("P9_12", 1)
 	gobot.Assert(t, fs.Files["/sys/class/gpio/gpio60/value"].Contents, "1")
 
+	gobot.Assert(t, a.DigitalWrite("P9_99", 1), errors.New("Not a valid pin"))
+
 	fs.Files["/sys/class/gpio/gpio10/value"].Contents = "1"
-	i = a.DigitalRead("P8_31")
+	i, _ = a.DigitalRead("P8_31")
 	gobot.Assert(t, i, 1)
 
 	// I2c
@@ -106,7 +113,11 @@ func TestBeagleboneAdaptor(t *testing.T) {
 	a.I2cStart(0xff)
 
 	a.I2cWrite([]byte{0x00, 0x01})
-	gobot.Assert(t, a.I2cRead(2), []byte{0x00, 0x01})
+	data, _ := a.I2cRead(2)
+	gobot.Assert(t, data, []byte{0x00, 0x01})
 
-	gobot.Assert(t, a.Finalize(), true)
+	gobot.Assert(t, len(a.Finalize()), 0)
+
+	gobot.Assert(t, a.InitServo(), errors.New("InitServo is not yet implemented"))
+
 }

@@ -5,6 +5,8 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
+var _ gobot.DriverInterface = (*WindowDriver)(nil)
+
 type WindowDriver struct {
 	gobot.Driver
 	window window
@@ -26,17 +28,14 @@ func NewWindowDriver(name string) *WindowDriver {
 }
 
 // Start starts window thread and driver
-func (w *WindowDriver) Start() bool {
+func (w *WindowDriver) Start() (errs []error) {
 	cv.StartWindowThread()
 	w.start(w)
-	return true
+	return
 }
 
 // Halt returns true if camera is halted successfully
-func (w *WindowDriver) Halt() bool { return true }
-
-// Init returns true if driver is initialized correctly
-func (w *WindowDriver) Init() bool { return true }
+func (w *WindowDriver) Halt() (errs []error) { return }
 
 // ShowImage displays image in window
 func (w *WindowDriver) ShowImage(image *cv.IplImage) {

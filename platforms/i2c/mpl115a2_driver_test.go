@@ -41,17 +41,11 @@ func TestNewMPL115A2Driver(t *testing.T) {
 func TestMPL115A2DriverStart(t *testing.T) {
 	mpl := initTestMPL115A2Driver()
 
-	gobot.Assert(t, mpl.Start(), true)
-}
-
-func TestMPL115A2DriverInit(t *testing.T) {
-	mpl := initTestMPL115A2Driver()
-
-	gobot.Assert(t, mpl.Init(), true)
+	gobot.Assert(t, len(mpl.Start()), 0)
 }
 
 func TestMPL115A2DriverHalt(t *testing.T) {
 	mpl := initTestMPL115A2Driver()
 
-	gobot.Assert(t, mpl.Halt(), true)
+	gobot.Assert(t, len(mpl.Halt()), 0)
 }

@@ -20,7 +20,8 @@ func main() {
 			g := byte(gobot.Rand(255))
 			b := byte(gobot.Rand(255))
 			blinkm.Rgb(r, g, b)
-			fmt.Println("color", blinkm.Color())
+			color, _ := blinkm.Color()
+			fmt.Println("color", color)
 		})
 	}
 

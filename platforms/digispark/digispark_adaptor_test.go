@@ -1,6 +1,7 @@
 package digispark
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/hybridgroup/gobot"
@@ -17,44 +18,50 @@ type mock struct {
 	state             uint8
 }
 
-func (l *mock) digitalWrite(pin uint8, state uint8) {
+func (l *mock) digitalWrite(pin uint8, state uint8) error {
 	l.pin = pin
 	l.state = state
+	return l.error()
 }
-func (l *mock) pinMode(pin uint8, mode uint8) {
+func (l *mock) pinMode(pin uint8, mode uint8) error {
 	l.pin = pin
 	l.mode = mode
+	return l.error()
 }
-func (l *mock) pwmInit() {}
-func (l *mock) pwmStop() {}
-func (l *mock) pwmUpdateCompare(channelA uint8, channelB uint8) {
+func (l *mock) pwmInit() error { return l.error() }
+func (l *mock) pwmStop() error { return l.error() }
+func (l *mock) pwmUpdateCompare(channelA uint8, channelB uint8) error {
 	l.pwmChannelA = channelA
 	l.pwmChannelB = channelB
+	return l.error()
 }
-func (l *mock) pwmUpdatePrescaler(value uint) {
+func (l *mock) pwmUpdatePrescaler(value uint) error {
 	l.pwmPrescalerValue = value
+	return l.error()
 }
-func (l *mock) servoInit() {}
-func (l *mock) servoUpdateLocation(locationA uint8, locationB uint8) {
+func (l *mock) servoInit() error { return l.error() }
+func (l *mock) servoUpdateLocation(locationA uint8, locationB uint8) error {
 	l.locationA = locationA
 	l.locationB = locationB
+	return l.error()
 }
+func (l *mock) error() error { return nil }
 
 func initTestDigisparkAdaptor() *DigisparkAdaptor {
 	a := NewDigisparkAdaptor("bot")
-	a.connect = func(a *DigisparkAdaptor) {}
+	a.connect = func(a *DigisparkAdaptor) (err error) { return nil }
 	a.littleWire = new(mock)
 	return a
 }
 
-func TestDigisparkAdaptorFinalize(t *testing.T) {
-	a := initTestDigisparkAdaptor()
-	gobot.Assert(t, a.Finalize(), true)
+func TestDigisparkAdaptorConnect(t *testing.T) {
+	a := NewDigisparkAdaptor("bot")
+	gobot.Assert(t, a.Connect()[0], errors.New("Error connecting to bot"))
 }
 
-func TestDigisparkAdaptorConnect(t *testing.T) {
+func TestDigisparkAdaptorFinalize(t *testing.T) {
 	a := initTestDigisparkAdaptor()
-	gobot.Assert(t, a.Connect(), true)
+	gobot.Assert(t, len(a.Finalize()), 0)
 }
 
 func TestDigisparkAdaptorIO(t *testing.T) {

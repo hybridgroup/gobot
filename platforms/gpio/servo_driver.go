@@ -1,8 +1,12 @@
 package gpio
 
 import (
+	"errors"
+
 	"github.com/hybridgroup/gobot"
 )
+
+var _ gobot.DriverInterface = (*ServoDriver)(nil)
 
 // Represents a Servo
 type ServoDriver struct {
@@ -30,20 +34,16 @@ func NewServoDriver(a Servo, name string, pin string) *ServoDriver {
 
 	s.AddCommand("Move", func(params map[string]interface{}) interface{} {
 		angle := byte(params["angle"].(float64))
-		s.Move(angle)
-		return nil
+		return s.Move(angle)
 	})
 	s.AddCommand("Min", func(params map[string]interface{}) interface{} {
-		s.Min()
-		return nil
+		return s.Min()
 	})
 	s.AddCommand("Center", func(params map[string]interface{}) interface{} {
-		s.Center()
-		return nil
+		return s.Center()
 	})
 	s.AddCommand("Max", func(params map[string]interface{}) interface{} {
-		s.Max()
-		return nil
+		return s.Max()
 	})
 
 	return s
@@ -55,38 +55,38 @@ func (s *ServoDriver) adaptor() Servo {
 }
 
 // Start starts the ServoDriver. Returns true on successful start of the driver.
-func (s *ServoDriver) Start() bool { return true }
+func (s *ServoDriver) Start() (errs []error) { return }
 
 // Halt halts the ServoDriver. Returns true on successful halt of the driver.
-func (s *ServoDriver) Halt() bool { return true }
+func (s *ServoDriver) Halt() (errs []error) { return }
 
 // InitServo initializes the ServoDriver on platforms which require an explicit initialization.
-func (s *ServoDriver) InitServo() {
-	s.adaptor().InitServo()
+func (s *ServoDriver) InitServo() (err error) {
+	return s.adaptor().InitServo()
 }
 
 // Move sets the servo to the specified angle
-func (s *ServoDriver) Move(angle uint8) {
+func (s *ServoDriver) Move(angle uint8) (err error) {
 	if !(angle >= 0 && angle <= 180) {
-		panic("Servo angle must be an integer between 0-180")
+		return errors.New("Servo angle must be an integer between 0-180")
 	}
 	s.CurrentAngle = angle
-	s.adaptor().ServoWrite(s.Pin(), s.angleToSpan(angle))
+	return s.adaptor().ServoWrite(s.Pin(), s.angleToSpan(angle))
 }
 
 // Min sets the servo to it's minimum position
-func (s *ServoDriver) Min() {
-	s.Move(0)
+func (s *ServoDriver) Min() (err error) {
+	return s.Move(0)
 }
 
 // Center sets the servo to it's center position
-func (s *ServoDriver) Center() {
-	s.Move(90)
+func (s *ServoDriver) Center() (err error) {
+	return s.Move(90)
 }
 
 // Max sets the servo to its maximum position
-func (s *ServoDriver) Max() {
-	s.Move(180)
+func (s *ServoDriver) Max() (err error) {
+	return s.Move(180)
 }
 
 func (s *ServoDriver) angleToSpan(angle byte) byte {
