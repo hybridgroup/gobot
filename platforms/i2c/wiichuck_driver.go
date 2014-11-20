@@ -1,7 +1,7 @@
 package i2c
 
 import (
-	"fmt"
+	"errors"
 
 	"github.com/hybridgroup/gobot"
 )
@@ -52,14 +52,29 @@ func (w *WiichuckDriver) adaptor() I2cInterface {
 
 // Start initilizes i2c and reads from adaptor
 // using specified interval to update with new value
-func (w *WiichuckDriver) Start() error {
-	w.adaptor().I2cStart(0x52)
+func (w *WiichuckDriver) Start() (err error) {
+	if err = w.adaptor().I2cStart(0x52); err != nil {
+		return
+	}
 	gobot.Every(w.Interval(), func() {
-		w.adaptor().I2cWrite([]byte{0x40, 0x00})
-		w.adaptor().I2cWrite([]byte{0x00})
-		newValue := w.adaptor().I2cRead(6)
+		if err := w.adaptor().I2cWrite([]byte{0x40, 0x00}); err != nil {
+			gobot.Publish(w.Event("error"), err)
+			return
+		}
+		if err = w.adaptor().I2cWrite([]byte{0x00}); err != nil {
+			gobot.Publish(w.Event("error"), err)
+			return
+		}
+		newValue, err := w.adaptor().I2cRead(6)
+		if err != nil {
+			gobot.Publish(w.Event("error"), err)
+			return
+		}
 		if len(newValue) == 6 {
-			w.update(newValue)
+			if err = w.update(newValue); err != nil {
+				gobot.Publish(w.Event("error"), err)
+				return
+			}
 		}
 	})
 	return nil
@@ -70,15 +85,16 @@ func (w *WiichuckDriver) Halt() error { return nil }
 
 // update parses value to update buttons and joystick.
 // If value is encrypted, warning message is printed
-func (w *WiichuckDriver) update(value []byte) {
+func (w *WiichuckDriver) update(value []byte) (err error) {
 	if w.isEncrypted(value) {
-		fmt.Println("Encrypted bytes from wii device!")
+		return errors.New("Encrypted bytes from wii device!")
 	} else {
 		w.parse(value)
 		w.adjustOrigins()
 		w.updateButtons()
 		w.updateJoystick()
 	}
+	return
 }
 
 // setJoystickDefaultValue sets default value if value is -1

@@ -50,16 +50,13 @@ func TestHMC6352DriverStart(t *testing.T) {
 
 	numberOfCyclesForEvery := 3
 
-	// Make sure "Heading" is set to 0 so that we assert
-	// its new value after executing "Start()"
-	gobot.Assert(t, hmc.Heading, uint16(0))
-
 	hmc.SetInterval(1 * time.Millisecond)
 	gobot.Assert(t, hmc.Start(), nil)
 	go func() {
 		for {
 			<-time.After(time.Duration(numberOfCyclesForEvery) * time.Millisecond)
-			if hmc.Heading == uint16(2534) {
+			heading, _ := hmc.Heading()
+			if heading == uint16(2534) {
 				sem <- true
 			}
 		}
@@ -83,7 +80,8 @@ func TestHMC6352DriverStart(t *testing.T) {
 	go func() {
 		for {
 			<-time.After(time.Duration(numberOfCyclesForEvery) * time.Millisecond)
-			if hmc.Heading == uint16(0) {
+			heading, _ := hmc.Heading()
+			if heading == uint16(0) {
 				sem <- true
 			}
 		}
