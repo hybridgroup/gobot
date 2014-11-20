@@ -188,7 +188,9 @@ func (b *BeagleboneAdaptor) PwmWrite(pin string, val byte) (err error) {
 }
 
 // InitServo starts servo (not yet implemented)
-func (b *BeagleboneAdaptor) InitServo() (err error) { return nil }
+func (b *BeagleboneAdaptor) InitServo() (err error) {
+	return errors.New("InitServo is not yet implemented")
+}
 
 // ServoWrite writes scaled value to servo in specified pin
 func (b *BeagleboneAdaptor) ServoWrite(pin string, val byte) (err error) {
@@ -223,6 +225,9 @@ func (b *BeagleboneAdaptor) DigitalWrite(pin string, val byte) (err error) {
 		return err
 	}
 	sysfsPin, err := b.digitalPin(pin, sysfs.OUT)
+	if err != nil {
+		return err
+	}
 	return sysfsPin.Write(int(val))
 }
 
