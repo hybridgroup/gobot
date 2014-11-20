@@ -1,7 +1,6 @@
 package mavlink
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/hybridgroup/gobot"
@@ -33,6 +32,7 @@ func NewMavlinkDriver(a *MavlinkAdaptor, name string) *MavlinkDriver {
 
 	m.AddEvent("packet")
 	m.AddEvent("message")
+	m.AddEvent("error")
 
 	return m
 }
@@ -49,13 +49,13 @@ func (m *MavlinkDriver) Start() error {
 		for {
 			packet, err := common.ReadMAVLinkPacket(m.adaptor().sp)
 			if err != nil {
-				fmt.Println(err)
+				gobot.Publish(m.Event("error"), err)
 				continue
 			}
 			gobot.Publish(m.Event("packet"), packet)
 			message, err := packet.MAVLinkMessage()
 			if err != nil {
-				fmt.Println(err)
+				gobot.Publish(m.Event("error"), err)
 				continue
 			}
 			gobot.Publish(m.Event("message"), message)
@@ -66,8 +66,9 @@ func (m *MavlinkDriver) Start() error {
 }
 
 // SendPacket sends a packet to mavlink device
-func (m *MavlinkDriver) SendPacket(packet *common.MAVLinkPacket) {
-	m.adaptor().sp.Write(packet.Pack())
+func (m *MavlinkDriver) SendPacket(packet *common.MAVLinkPacket) (err error) {
+	_, err = m.adaptor().sp.Write(packet.Pack())
+	return err
 }
 
 // Halt returns true if device is halted successfully

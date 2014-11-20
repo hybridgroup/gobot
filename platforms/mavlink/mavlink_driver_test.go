@@ -9,7 +9,7 @@ import (
 func initTestMavlinkDriver() *MavlinkDriver {
 	m := NewMavlinkAdaptor("myAdaptor", "/dev/null")
 	m.sp = gobot.NullReadWriteCloser{}
-	m.connect = func(a *MavlinkAdaptor) {}
+	m.connect = func(a *MavlinkAdaptor) (err error) { return nil }
 	return NewMavlinkDriver(m, "myDriver")
 }
 
