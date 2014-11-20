@@ -1,6 +1,7 @@
 package edison
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/hybridgroup/gobot"
@@ -61,12 +62,31 @@ func initTestEdisonAdaptor() (*EdisonAdaptor, *sysfs.MockFilesystem) {
 		"/sys/class/gpio/gpio204/value",
 		"/sys/class/gpio/gpio205/direction",
 		"/sys/class/gpio/gpio205/value",
+		"/sys/class/gpio/gpio263/direction",
+		"/sys/class/gpio/gpio263/value",
+		"/sys/class/gpio/gpio262/direction",
+		"/sys/class/gpio/gpio262/value",
+		"/sys/class/gpio/gpio240/direction",
+		"/sys/class/gpio/gpio240/value",
+		"/sys/class/gpio/gpio241/direction",
+		"/sys/class/gpio/gpio241/value",
+		"/sys/class/gpio/gpio242/direction",
+		"/sys/class/gpio/gpio242/value",
+		"/sys/class/gpio/gpio218/direction",
+		"/sys/class/gpio/gpio218/value",
+		"/sys/class/gpio/gpio250/direction",
+		"/sys/class/gpio/gpio250/value",
 		"/dev/i2c-6",
 	})
 	sysfs.SetFilesystem(fs)
 	fs.Files["/sys/class/pwm/pwmchip0/pwm1/period"].Contents = "5000\n"
 	a.Connect()
 	return a, fs
+}
+
+func TestEdisonAdaptorConnect(t *testing.T) {
+	a, _ := initTestEdisonAdaptor()
+	gobot.Assert(t, a.Connect(), nil)
 }
 
 func TestEdisonAdaptorFinalize(t *testing.T) {
@@ -84,7 +104,8 @@ func TestEdisonAdaptorDigitalIO(t *testing.T) {
 	gobot.Assert(t, fs.Files["/sys/class/gpio/gpio40/value"].Contents, "1")
 
 	a.DigitalWrite("2", 0)
-	i, _ := a.DigitalRead("2")
+	i, err := a.DigitalRead("2")
+	gobot.Assert(t, err, nil)
 	gobot.Assert(t, i, 0)
 }
 
@@ -103,8 +124,12 @@ func TestEdisonAdaptorI2c(t *testing.T) {
 func TestEdisonAdaptorPwm(t *testing.T) {
 	a, fs := initTestEdisonAdaptor()
 
-	a.PwmWrite("5", 100)
+	err := a.PwmWrite("5", 100)
+	gobot.Assert(t, err, nil)
 	gobot.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/pwm1/duty_cycle"].Contents, "1960")
+
+	err = a.PwmWrite("7", 100)
+	gobot.Assert(t, err, errors.New("Not a PWM pin"))
 }
 
 func TestEdisonAdaptorAnalog(t *testing.T) {
@@ -113,4 +138,11 @@ func TestEdisonAdaptorAnalog(t *testing.T) {
 	fs.Files["/sys/bus/iio/devices/iio:device1/in_voltage0_raw"].Contents = "1000\n"
 	i, _ := a.AnalogRead("0")
 	gobot.Assert(t, i, 1000)
+}
+
+func TestEdisonAdaptorNotImplemented(t *testing.T) {
+	a, _ := initTestEdisonAdaptor()
+	gobot.Assert(t, a.AnalogWrite("", 100), errors.New("AnalogWrite is not yet implemented"))
+	gobot.Assert(t, a.InitServo(), errors.New("InitServo is not yet implemented"))
+	gobot.Assert(t, a.ServoWrite("", 100), errors.New("ServoWrite is not yet implemented"))
 }
