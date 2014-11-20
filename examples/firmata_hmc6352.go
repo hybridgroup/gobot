@@ -17,7 +17,8 @@ func main() {
 
 	work := func() {
 		gobot.Every(100*time.Millisecond, func() {
-			fmt.Println("Heading", hmc6352.Heading)
+			heading, _ := hmc6352.Heading()
+			fmt.Println("Heading", heading)
 		})
 	}
 

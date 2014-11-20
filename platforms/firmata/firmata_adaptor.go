@@ -212,18 +212,22 @@ func (f *FirmataAdaptor) digitalPin(pin int) int {
 }
 
 // I2cStart initializes board with i2c configuration
-func (f *FirmataAdaptor) I2cStart(address byte) {
+func (f *FirmataAdaptor) I2cStart(address byte) (err error) {
 	f.i2cAddress = address
-	f.board.i2cConfig([]byte{0})
+	return f.board.i2cConfig([]byte{0})
 }
 
 // I2cRead reads from I2c specified size
 // Returns empty byte array if response is timed out
-func (f *FirmataAdaptor) I2cRead(size uint) []byte {
+func (f *FirmataAdaptor) I2cRead(size uint) (data []byte, err error) {
 	ret := make(chan []byte)
-	f.board.i2cReadRequest(f.i2cAddress, size)
+	if err = f.board.i2cReadRequest(f.i2cAddress, size); err != nil {
+		return
+	}
 
-	f.board.readAndProcess()
+	if err = f.board.readAndProcess(); err != nil {
+		return
+	}
 
 	gobot.Once(f.board.events["i2c_reply"], func(data interface{}) {
 		ret <- data.(map[string][]byte)["data"]
@@ -231,13 +235,13 @@ func (f *FirmataAdaptor) I2cRead(size uint) []byte {
 
 	select {
 	case data := <-ret:
-		return data
+		return data, nil
 	case <-time.After(10 * time.Millisecond):
 	}
-	return []byte{}
+	return []byte{}, nil
 }
 
 // I2cWrite retrieves i2c data
-func (f *FirmataAdaptor) I2cWrite(data []byte) {
-	f.board.i2cWriteRequest(f.i2cAddress, data)
+func (f *FirmataAdaptor) I2cWrite(data []byte) (err error) {
+	return f.board.i2cWriteRequest(f.i2cAddress, data)
 }

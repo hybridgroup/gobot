@@ -114,7 +114,8 @@ func TestFirmataAdaptorI2cStart(t *testing.T) {
 func TestFirmataAdaptorI2cRead(t *testing.T) {
 	a := initTestFirmataAdaptor()
 	// [] on no data
-	gobot.Assert(t, a.I2cRead(1), []byte{})
+	data, _ := a.I2cRead(1)
+	gobot.Assert(t, data, []byte{})
 
 	i := []byte{100}
 	i2cReply := map[string][]byte{}
@@ -123,7 +124,8 @@ func TestFirmataAdaptorI2cRead(t *testing.T) {
 		<-time.After(5 * time.Millisecond)
 		gobot.Publish(a.board.events["i2c_reply"], i2cReply)
 	}()
-	gobot.Assert(t, a.I2cRead(1), i)
+	data, _ = a.I2cRead(1)
+	gobot.Assert(t, data, i)
 }
 func TestFirmataAdaptorI2cWrite(t *testing.T) {
 	a := initTestFirmataAdaptor()
