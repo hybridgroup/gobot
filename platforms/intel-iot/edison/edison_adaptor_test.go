@@ -43,6 +43,24 @@ func initTestEdisonAdaptor() (*EdisonAdaptor, *sysfs.MockFilesystem) {
 		"/sys/class/gpio/gpio253/direction",
 		"/sys/class/gpio/gpio261/value",
 		"/sys/class/gpio/gpio261/direction",
+		"/sys/class/gpio/gpio214/value",
+		"/sys/class/gpio/gpio214/direction",
+		"/sys/class/gpio/gpio14/direction",
+		"/sys/class/gpio/gpio14/value",
+		"/sys/class/gpio/gpio165/direction",
+		"/sys/class/gpio/gpio165/value",
+		"/sys/class/gpio/gpio212/direction",
+		"/sys/class/gpio/gpio212/value",
+		"/sys/class/gpio/gpio213/direction",
+		"/sys/class/gpio/gpio213/value",
+		"/sys/class/gpio/gpio236/direction",
+		"/sys/class/gpio/gpio236/value",
+		"/sys/class/gpio/gpio237/direction",
+		"/sys/class/gpio/gpio237/value",
+		"/sys/class/gpio/gpio204/direction",
+		"/sys/class/gpio/gpio204/value",
+		"/sys/class/gpio/gpio205/direction",
+		"/sys/class/gpio/gpio205/value",
 		"/dev/i2c-6",
 	})
 	sysfs.SetFilesystem(fs)
@@ -77,7 +95,9 @@ func TestEdisonAdaptorI2c(t *testing.T) {
 	a.I2cStart(0xff)
 
 	a.I2cWrite([]byte{0x00, 0x01})
-	gobot.Assert(t, a.I2cRead(2), []byte{0x00, 0x01})
+
+	data, _ := a.I2cRead(2)
+	gobot.Assert(t, data, []byte{0x00, 0x01})
 }
 
 func TestEdisonAdaptorPwm(t *testing.T) {

@@ -437,41 +437,63 @@ func (e *EdisonAdaptor) AnalogRead(pin string) (val int, err error) {
 }
 
 // I2cStart initializes i2c device for addresss
-func (e *EdisonAdaptor) I2cStart(address byte) {
-	e.tristate.Write(sysfs.LOW)
+func (e *EdisonAdaptor) I2cStart(address byte) (err error) {
+	if err = e.tristate.Write(sysfs.LOW); err != nil {
+		return
+	}
 
 	for _, i := range []int{14, 165, 212, 213} {
 		io := sysfs.NewDigitalPin(i)
-		io.Export()
-		io.Direction(sysfs.IN)
-		io.Unexport()
+		if err = io.Export(); err != nil {
+			return
+		}
+		if err = io.Direction(sysfs.IN); err != nil {
+			return
+		}
+		if err = io.Unexport(); err != nil {
+			return
+		}
 	}
 
 	for _, i := range []int{236, 237, 204, 205} {
 		io := sysfs.NewDigitalPin(i)
-		io.Export()
-		io.Direction(sysfs.OUT)
-		io.Write(sysfs.LOW)
-		io.Unexport()
+		if err = io.Export(); err != nil {
+			return
+		}
+		if err = io.Direction(sysfs.OUT); err != nil {
+			return
+		}
+		if err = io.Write(sysfs.LOW); err != nil {
+			return
+		}
+		if err = io.Unexport(); err != nil {
+			return
+		}
 	}
 
 	for _, i := range []string{"28", "27"} {
-		changePinMode(i, "1")
+		if err = changePinMode(i, "1"); err != nil {
+			return
+		}
 	}
 
-	e.tristate.Write(sysfs.HIGH)
+	if err = e.tristate.Write(sysfs.HIGH); err != nil {
+		return
+	}
 
-	e.i2cDevice, _ = sysfs.NewI2cDevice("/dev/i2c-6", address)
+	e.i2cDevice, err = sysfs.NewI2cDevice("/dev/i2c-6", address)
+	return
 }
 
 // I2cWrite writes data to i2cDevice
-func (e *EdisonAdaptor) I2cWrite(data []byte) {
-	e.i2cDevice.Write(data)
+func (e *EdisonAdaptor) I2cWrite(data []byte) (err error) {
+	_, err = e.i2cDevice.Write(data)
+	return
 }
 
 // I2cRead reads data from i2cDevice
-func (e *EdisonAdaptor) I2cRead(size uint) []byte {
-	b := make([]byte, size)
-	e.i2cDevice.Read(b)
-	return b
+func (e *EdisonAdaptor) I2cRead(size uint) (data []byte, err error) {
+	data = make([]byte, size)
+	_, err = e.i2cDevice.Read(data)
+	return
 }
