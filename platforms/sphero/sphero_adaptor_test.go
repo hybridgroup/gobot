@@ -8,7 +8,7 @@ import (
 func initTestSpheroAdaptor() *SpheroAdaptor {
 	a := NewSpheroAdaptor("bot", "/dev/null")
 	a.sp = gobot.NullReadWriteCloser{}
-	a.connect = func(a *SpheroAdaptor) {}
+	a.connect = func(a *SpheroAdaptor) (err error) { return nil }
 	return a
 }
 

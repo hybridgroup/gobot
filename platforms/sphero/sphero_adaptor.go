@@ -13,7 +13,7 @@ var _ gobot.AdaptorInterface = (*SpheroAdaptor)(nil)
 type SpheroAdaptor struct {
 	gobot.Adaptor
 	sp      io.ReadWriteCloser
-	connect func(*SpheroAdaptor)
+	connect func(*SpheroAdaptor) (err error)
 }
 
 // NewSpheroAdaptor returns a new SpheroAdaptor given a name and port
@@ -24,28 +24,31 @@ func NewSpheroAdaptor(name string, port string) *SpheroAdaptor {
 			"SpheroAdaptor",
 			port,
 		),
-		connect: func(a *SpheroAdaptor) {
+		connect: func(a *SpheroAdaptor) (err error) {
 			c := &serial.Config{Name: a.Port(), Baud: 115200}
 			s, err := serial.OpenPort(c)
 			if err != nil {
-				panic(err)
+				return err
 			}
 			a.sp = s
+			return
 		},
 	}
 }
 
 // Connect initiates a connection to the Sphero. Returns true on successful connection.
-func (a *SpheroAdaptor) Connect() error {
-	a.connect(a)
+func (a *SpheroAdaptor) Connect() (err error) {
+	if err = a.connect(a); err != nil {
+		return
+	}
 	a.SetConnected(true)
-	return nil
+	return
 }
 
 // Reconnect attempts to reconnect to the Sphero. If the Sphero has an active connection
 // it will first close that connection and then establish a new connection.
 // Returns true on Successful reconnection
-func (a *SpheroAdaptor) Reconnect() error {
+func (a *SpheroAdaptor) Reconnect() (err error) {
 	if a.Connected() == true {
 		a.Disconnect()
 	}
@@ -53,8 +56,10 @@ func (a *SpheroAdaptor) Reconnect() error {
 }
 
 // Disconnect terminates the connection to the Sphero. Returns true on successful disconnect.
-func (a *SpheroAdaptor) Disconnect() error {
-	a.sp.Close()
+func (a *SpheroAdaptor) Disconnect() (err error) {
+	if err = a.sp.Close(); err != nil {
+		return
+	}
 	a.SetConnected(false)
 	return nil
 }
