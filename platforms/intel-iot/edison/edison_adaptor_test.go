@@ -86,7 +86,7 @@ func initTestEdisonAdaptor() (*EdisonAdaptor, *sysfs.MockFilesystem) {
 
 func TestEdisonAdaptorConnect(t *testing.T) {
 	a, _ := initTestEdisonAdaptor()
-	gobot.Assert(t, a.Connect(), nil)
+	gobot.Assert(t, len(a.Connect()), 0)
 }
 
 func TestEdisonAdaptorFinalize(t *testing.T) {
@@ -94,7 +94,7 @@ func TestEdisonAdaptorFinalize(t *testing.T) {
 	a.DigitalWrite("3", 1)
 	a.PwmWrite("5", 100)
 	a.i2cDevice = new(gobot.NullReadWriteCloser)
-	gobot.Assert(t, a.Finalize(), nil)
+	gobot.Assert(t, len(a.Finalize()), 0)
 }
 
 func TestEdisonAdaptorDigitalIO(t *testing.T) {

@@ -51,11 +51,14 @@ func NewArdroneAdaptor(name string, v ...string) *ArdroneAdaptor {
 }
 
 // Connect returns true when connection to ardrone is established correclty
-func (a *ArdroneAdaptor) Connect() error {
-	return a.connect(a)
+func (a *ArdroneAdaptor) Connect() (errs []error) {
+	if err := a.connect(a); err != nil {
+		return []error{err}
+	}
+	return
 }
 
 // Finalize returns true when connection is finalized correctly
-func (a *ArdroneAdaptor) Finalize() error {
-	return nil
+func (a *ArdroneAdaptor) Finalize() (errs []error) {
+	return
 }

@@ -55,10 +55,10 @@ func (s *ServoDriver) adaptor() Servo {
 }
 
 // Start starts the ServoDriver. Returns true on successful start of the driver.
-func (s *ServoDriver) Start() error { return nil }
+func (s *ServoDriver) Start() (errs []error) { return }
 
 // Halt halts the ServoDriver. Returns true on successful halt of the driver.
-func (s *ServoDriver) Halt() error { return nil }
+func (s *ServoDriver) Halt() (errs []error) { return }
 
 // InitServo initializes the ServoDriver on platforms which require an explicit initialization.
 func (s *ServoDriver) InitServo() (err error) {

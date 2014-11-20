@@ -56,9 +56,9 @@ func (h *MPU6050Driver) adaptor() I2cInterface {
 
 // Start writes initialization bytes and reads from adaptor
 // using specified interval to accelerometer andtemperature data
-func (h *MPU6050Driver) Start() (err error) {
-	if err = h.initialize(); err != nil {
-		return
+func (h *MPU6050Driver) Start() (errs []error) {
+	if err := h.initialize(); err != nil {
+		return []error{err}
 	}
 
 	gobot.Every(h.Interval(), func() {
@@ -77,11 +77,11 @@ func (h *MPU6050Driver) Start() (err error) {
 		binary.Read(buf, binary.BigEndian, &h.Gyroscope)
 		binary.Read(buf, binary.BigEndian, &h.Temperature)
 	})
-	return nil
+	return
 }
 
 // Halt returns true if devices is halted successfully
-func (h *MPU6050Driver) Halt() error { return nil }
+func (h *MPU6050Driver) Halt() (errs []error) { return }
 
 func (h *MPU6050Driver) initialize() (err error) {
 	if err = h.adaptor().I2cStart(0x68); err != nil {

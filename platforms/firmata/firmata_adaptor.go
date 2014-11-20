@@ -62,27 +62,30 @@ func NewFirmataAdaptor(name string, args ...interface{}) *FirmataAdaptor {
 }
 
 // Connect returns true if connection to board is succesfull
-func (f *FirmataAdaptor) Connect() (err error) {
-	err = f.connect(f)
-	if err != nil {
-		return err
-	}
-	err = f.board.connect()
-	if err != nil {
-		return err
+func (f *FirmataAdaptor) Connect() (errs []error) {
+	if err := f.connect(f); err != nil {
+		return []error{err}
 	}
 	f.SetConnected(true)
-	return nil
+	return
 }
 
 // close finishes connection to serial port
 // Prints error message on error
 func (f *FirmataAdaptor) Disconnect() (err error) {
-	return f.board.serial.Close()
+	if f.board != nil {
+		return f.board.serial.Close()
+	}
+	return
 }
 
 // Finalize disconnects firmata adaptor
-func (f *FirmataAdaptor) Finalize() error { return f.Disconnect() }
+func (f *FirmataAdaptor) Finalize() (errs []error) {
+	if err := f.Disconnect(); err != nil {
+		return []error{err}
+	}
+	return
+}
 
 // InitServo (not yet implemented)
 func (f *FirmataAdaptor) InitServo() (err error) {

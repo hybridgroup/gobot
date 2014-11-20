@@ -78,11 +78,11 @@ func TestNewSparkCoreAdaptor(t *testing.T) {
 
 func TestSparkCoreAdaptorConnect(t *testing.T) {
 	a := initTestSparkCoreAdaptor()
-	gobot.Assert(t, a.Connect(), nil)
+	gobot.Assert(t, len(a.Connect()), 0)
 
 	a.SetConnected(false)
 
-	gobot.Assert(t, a.Connect(), nil)
+	gobot.Assert(t, len(a.Connect()), 0)
 	gobot.Assert(t, a.Connected(), true)
 }
 
@@ -91,7 +91,7 @@ func TestSparkCoreAdaptorFinalize(t *testing.T) {
 
 	a.Connect()
 
-	gobot.Assert(t, a.Finalize(), nil)
+	gobot.Assert(t, len(a.Finalize()), 0)
 	gobot.Assert(t, a.Connected(), false)
 }
 

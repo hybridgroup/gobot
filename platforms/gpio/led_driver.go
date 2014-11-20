@@ -1,8 +1,6 @@
 package gpio
 
-import (
-	"github.com/hybridgroup/gobot"
-)
+import "github.com/hybridgroup/gobot"
 
 var _ gobot.DriverInterface = (*LedDriver)(nil)
 
@@ -55,10 +53,10 @@ func (l *LedDriver) adaptor() PwmDigitalWriter {
 }
 
 // Start starts the LedDriver. Returns true on successful start of the driver
-func (l *LedDriver) Start() error { return nil }
+func (l *LedDriver) Start() (errs []error) { return }
 
 // Halt halts the LedDriver. Returns true on successful halt of the driver
-func (l *LedDriver) Halt() error { return nil }
+func (l *LedDriver) Halt() (errs []error) { return }
 
 // State return true if the led is On and false if the led is Off
 func (l *LedDriver) State() bool {

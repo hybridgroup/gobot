@@ -18,12 +18,12 @@ func initTestArdroneDriver() *ArdroneDriver {
 
 func TestArdroneDriverStart(t *testing.T) {
 	d := initTestArdroneDriver()
-	gobot.Assert(t, d.Start(), nil)
+	gobot.Assert(t, len(d.Start()), 0)
 }
 
 func TestArdroneDriverHalt(t *testing.T) {
 	d := initTestArdroneDriver()
-	gobot.Assert(t, d.Halt(), nil)
+	gobot.Assert(t, len(d.Halt()), 0)
 }
 func TestArdroneDriverTakeOff(t *testing.T) {
 	d := initTestArdroneDriver()

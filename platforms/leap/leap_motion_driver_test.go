@@ -23,14 +23,13 @@ func initTestLeapMotionDriver() *LeapMotionDriver {
 }
 
 func TestLeapMotionDriverStart(t *testing.T) {
-	//t.SkipNow()
 	d := initTestLeapMotionDriver()
-	gobot.Assert(t, d.Start(), nil)
+	gobot.Assert(t, len(d.Start()), 0)
 }
 
 func TestLeapMotionDriverHalt(t *testing.T) {
 	d := initTestLeapMotionDriver()
-	gobot.Assert(t, d.Halt(), nil)
+	gobot.Assert(t, len(d.Halt()), 0)
 }
 
 func TestLeapMotionDriverParser(t *testing.T) {

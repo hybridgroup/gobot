@@ -36,12 +36,15 @@ func NewDigisparkAdaptor(name string) *DigisparkAdaptor {
 }
 
 // Connect starts connection to digispark, returns true if successful
-func (d *DigisparkAdaptor) Connect() error {
-	return d.connect(d)
+func (d *DigisparkAdaptor) Connect() (errs []error) {
+	if err := d.connect(d); err != nil {
+		return []error{err}
+	}
+	return
 }
 
 // Finalize returns true if finalization is successful
-func (d *DigisparkAdaptor) Finalize() error { return nil }
+func (d *DigisparkAdaptor) Finalize() (errs []error) { return }
 
 // DigitalWrite writes level to specified pin using littlewire
 func (d *DigisparkAdaptor) DigitalWrite(pin string, level byte) (err error) {

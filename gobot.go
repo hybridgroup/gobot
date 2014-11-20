@@ -56,15 +56,19 @@ func (g *Gobot) Command(name string) func(map[string]interface{}) interface{} {
 }
 
 // Start runs the main Gobot event loop
-func (g *Gobot) Start() (err error) {
-	err = g.robots.Start()
-	if err != nil {
-		log.Println(err)
+func (g *Gobot) Start() (errs []error) {
+	if rerrs := g.robots.Start(); len(rerrs) > 0 {
+		for _, err := range rerrs {
+			log.Println("Error:", err)
+			errs = append(errs, err)
+		}
 	}
 
 	c := make(chan os.Signal, 1)
 	g.trap(c)
-	if err != nil {
+	if len(errs) > 0 {
+		// there was an error during start, so we immediatly pass the interrupt
+		// in order to disconnect the initialized robots, connections and devices
 		c <- os.Interrupt
 	}
 
@@ -72,10 +76,20 @@ func (g *Gobot) Start() (err error) {
 	_ = <-c
 	g.robots.Each(func(r *Robot) {
 		log.Println("Stopping Robot", r.Name, "...")
-		r.Devices().Halt()
-		r.Connections().Finalize()
+		if herrs := r.Devices().Halt(); len(herrs) > 0 {
+			for _, err := range herrs {
+				log.Println("Error:", err)
+				errs = append(errs, err)
+			}
+		}
+		if cerrs := r.Connections().Finalize(); len(cerrs) > 0 {
+			for _, err := range cerrs {
+				log.Println("Error:", err)
+				errs = append(errs, err)
+			}
+		}
 	})
-	return err
+	return errs
 }
 
 // Robots fetch all robots associated with this Gobot instance.

@@ -54,12 +54,12 @@ func (h *MPL115A2Driver) adaptor() I2cInterface {
 
 // Start writes initialization bytes and reads from adaptor
 // using specified interval to accelerometer andtemperature data
-func (h *MPL115A2Driver) Start() (err error) {
+func (h *MPL115A2Driver) Start() (errs []error) {
 	var temperature uint16
 	var pressure uint16
 	var pressureComp float32
 
-	if err = h.initialization(); err != nil {
+	if err := h.initialization(); err != nil {
 		return
 	}
 
@@ -70,7 +70,7 @@ func (h *MPL115A2Driver) Start() (err error) {
 		}
 		<-time.After(5 * time.Millisecond)
 
-		if err = h.adaptor().I2cWrite([]byte{MPL115A2_REGISTER_PRESSURE_MSB}); err != nil {
+		if err := h.adaptor().I2cWrite([]byte{MPL115A2_REGISTER_PRESSURE_MSB}); err != nil {
 			gobot.Publish(h.Event("error"), err)
 			return
 		}
@@ -93,11 +93,11 @@ func (h *MPL115A2Driver) Start() (err error) {
 			h.Temperature = ((float32(temperature) - 498.0) / -5.35) + 25.0
 		}
 	})
-	return nil
+	return
 }
 
 // Halt returns true if devices is halted successfully
-func (h *MPL115A2Driver) Halt() error { return nil }
+func (h *MPL115A2Driver) Halt() (err []error) { return }
 
 func (h *MPL115A2Driver) initialization() (err error) {
 	var coA0 int16

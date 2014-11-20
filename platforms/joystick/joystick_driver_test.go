@@ -25,13 +25,13 @@ func initTestJoystickDriver() *JoystickDriver {
 func TestJoystickDriverStart(t *testing.T) {
 	d := initTestJoystickDriver()
 	d.SetInterval(1 * time.Millisecond)
-	gobot.Assert(t, d.Start(), nil)
+	gobot.Assert(t, len(d.Start()), 0)
 	<-time.After(2 * time.Millisecond)
 }
 
 func TestJoystickDriverHalt(t *testing.T) {
 	d := initTestJoystickDriver()
-	gobot.Assert(t, d.Halt(), nil)
+	gobot.Assert(t, len(d.Halt()), 0)
 }
 
 func TestJoystickDriverHandleEvent(t *testing.T) {

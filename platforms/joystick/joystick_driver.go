@@ -70,10 +70,10 @@ func (j *JoystickDriver) adaptor() *JoystickAdaptor {
 }
 
 // Start initiallizes event polling with defined interval
-func (j *JoystickDriver) Start() (err error) {
+func (j *JoystickDriver) Start() (errs []error) {
 	file, err := ioutil.ReadFile(j.configPath)
 	if err != nil {
-		return err
+		return []error{err}
 	}
 
 	var jsontype joystickConfig
@@ -102,8 +102,11 @@ func (j *JoystickDriver) Start() (err error) {
 			<-time.After(j.Interval())
 		}
 	}()
-	return nil
+	return
 }
+
+// Halt stops joystick driver
+func (j *JoystickDriver) Halt() (errs []error) { return }
 
 // HandleEvent publishes an specific event according to data received
 func (j *JoystickDriver) handleEvent(event sdl.Event) error {
@@ -142,9 +145,6 @@ func (j *JoystickDriver) handleEvent(event sdl.Event) error {
 	}
 	return nil
 }
-
-// Halt stops joystick driver
-func (j *JoystickDriver) Halt() error { return nil }
 
 func (j *JoystickDriver) findName(id uint8, list []pair) string {
 	for _, value := range list {

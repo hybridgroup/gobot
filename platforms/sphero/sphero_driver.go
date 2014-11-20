@@ -115,11 +115,11 @@ func (s *SpheroDriver) adaptor() *SpheroAdaptor {
 //
 // Emits the Events:
 // 	"collision" SpheroDriver.Collision - On Collision Detected
-func (s *SpheroDriver) Start() (err error) {
+func (s *SpheroDriver) Start() (errs []error) {
 	go func() {
 		for {
 			packet := <-s.packetChannel
-			err = s.write(packet)
+			err := s.write(packet)
 			if err != nil {
 				gobot.Publish(s.Event("error"), err)
 			}
@@ -169,17 +169,17 @@ func (s *SpheroDriver) Start() (err error) {
 	s.configureCollisionDetection()
 	s.enableStopOnDisconnect()
 
-	return nil
+	return
 }
 
 // Halt halts the SpheroDriver and sends a SpheroDriver.Stop command to the Sphero.
 // Returns true on successful halt.
-func (s *SpheroDriver) Halt() error {
+func (s *SpheroDriver) Halt() (errs []error) {
 	gobot.Every(10*time.Millisecond, func() {
 		s.Stop()
 	})
 	time.Sleep(1 * time.Second)
-	return nil
+	return
 }
 
 // SetRGB sets the Sphero to the given r, g, and b values

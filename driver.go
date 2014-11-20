@@ -7,8 +7,8 @@ import (
 
 // DriverInterface defines Driver expected behaviour
 type DriverInterface interface {
-	Start() error
-	Halt() error
+	Start() []error
+	Halt() []error
 	Adaptor() AdaptorInterface
 	SetInterval(time.Duration)
 	Interval() time.Duration

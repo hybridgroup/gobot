@@ -18,9 +18,15 @@ func initTestRaspiAdaptor() *RaspiAdaptor {
 
 func TestRaspiAdaptorFinalize(t *testing.T) {
 	a := initTestRaspiAdaptor()
+	fs := sysfs.NewMockFilesystem([]string{
+		"/sys/class/gpio/export",
+		"/sys/class/gpio/unexport",
+	})
+
+	sysfs.SetFilesystem(fs)
 	a.DigitalWrite("3", 1)
 	a.i2cDevice = new(gobot.NullReadWriteCloser)
-	gobot.Assert(t, a.Finalize(), nil)
+	gobot.Assert(t, len(a.Finalize()), 0)
 }
 
 func TestRaspiAdaptorDigitalIO(t *testing.T) {

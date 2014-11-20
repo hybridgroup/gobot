@@ -12,12 +12,12 @@ func initTestButtonDriver() *ButtonDriver {
 
 func TestButtonDriverStart(t *testing.T) {
 	d := initTestButtonDriver()
-	gobot.Assert(t, d.Start(), nil)
+	gobot.Assert(t, len(d.Start()), 0)
 }
 
 func TestButtonDriverHalt(t *testing.T) {
 	d := initTestButtonDriver()
-	gobot.Assert(t, d.Halt(), nil)
+	gobot.Assert(t, len(d.Halt()), 0)
 }
 
 func TestButtonDriverReadState(t *testing.T) {

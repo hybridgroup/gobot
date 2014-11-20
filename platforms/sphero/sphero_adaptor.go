@@ -37,9 +37,9 @@ func NewSpheroAdaptor(name string, port string) *SpheroAdaptor {
 }
 
 // Connect initiates a connection to the Sphero. Returns true on successful connection.
-func (a *SpheroAdaptor) Connect() (err error) {
-	if err = a.connect(a); err != nil {
-		return
+func (a *SpheroAdaptor) Connect() (errs []error) {
+	if err := a.connect(a); err != nil {
+		return []error{err}
 	}
 	a.SetConnected(true)
 	return
@@ -48,7 +48,7 @@ func (a *SpheroAdaptor) Connect() (err error) {
 // Reconnect attempts to reconnect to the Sphero. If the Sphero has an active connection
 // it will first close that connection and then establish a new connection.
 // Returns true on Successful reconnection
-func (a *SpheroAdaptor) Reconnect() (err error) {
+func (a *SpheroAdaptor) Reconnect() (errs []error) {
 	if a.Connected() == true {
 		a.Disconnect()
 	}
@@ -56,15 +56,15 @@ func (a *SpheroAdaptor) Reconnect() (err error) {
 }
 
 // Disconnect terminates the connection to the Sphero. Returns true on successful disconnect.
-func (a *SpheroAdaptor) Disconnect() (err error) {
-	if err = a.sp.Close(); err != nil {
-		return
+func (a *SpheroAdaptor) Disconnect() (errs []error) {
+	if err := a.sp.Close(); err != nil {
+		return []error{err}
 	}
 	a.SetConnected(false)
-	return nil
+	return
 }
 
 // Finalize finalizes the SpheroAdaptor
-func (a *SpheroAdaptor) Finalize() error {
-	return nil
+func (a *SpheroAdaptor) Finalize() (errs []error) {
+	return
 }

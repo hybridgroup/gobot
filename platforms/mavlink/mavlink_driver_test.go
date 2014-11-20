@@ -15,10 +15,10 @@ func initTestMavlinkDriver() *MavlinkDriver {
 
 func TestMavlinkDriverStart(t *testing.T) {
 	d := initTestMavlinkDriver()
-	gobot.Assert(t, d.Start(), nil)
+	gobot.Assert(t, len(d.Start()), 0)
 }
 
 func TestMavlinkDriverHalt(t *testing.T) {
 	d := initTestMavlinkDriver()
-	gobot.Assert(t, d.Halt(), nil)
+	gobot.Assert(t, len(d.Halt()), 0)
 }

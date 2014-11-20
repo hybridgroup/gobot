@@ -40,10 +40,10 @@ func (m *MotorDriver) adaptor() PwmDigitalWriter {
 }
 
 // Start starts the MotorDriver. Returns true on successful start of the driver
-func (m *MotorDriver) Start() error { return nil }
+func (m *MotorDriver) Start() (errs []error) { return }
 
 // Halt halts the MotorDriver. Returns true on successful halt of the driver
-func (m *MotorDriver) Halt() error { return nil }
+func (m *MotorDriver) Halt() (errs []error) { return }
 
 // Off turns the motor off or sets the motor to a 0 speed
 func (m *MotorDriver) Off() (err error) {

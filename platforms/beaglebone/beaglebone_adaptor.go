@@ -144,20 +144,18 @@ func NewBeagleboneAdaptor(name string) *BeagleboneAdaptor {
 
 // Connect returns true on a succesful connection to beaglebone board.
 // It initializes digital, pwm and analog pins
-func (b *BeagleboneAdaptor) Connect() (err error) {
-	err = ensureSlot(b.slots, "cape-bone-iio")
-	if err != nil {
-		return
+func (b *BeagleboneAdaptor) Connect() (errs []error) {
+	if err := ensureSlot(b.slots, "cape-bone-iio"); err != nil {
+		return []error{err}
 	}
 
-	err = ensureSlot(b.slots, "am33xx_pwm")
-	if err != nil {
-		return
+	if err := ensureSlot(b.slots, "am33xx_pwm"); err != nil {
+		return []error{err}
 	}
 
 	g, err := glob(fmt.Sprintf("%v/helper.*", b.ocp))
 	if err != nil {
-		return
+		return []error{err}
 	}
 	b.helper = g[0]
 
@@ -165,21 +163,27 @@ func (b *BeagleboneAdaptor) Connect() (err error) {
 }
 
 // Finalize returns true when board connection is finalized correctly.
-func (b *BeagleboneAdaptor) Finalize() (err error) {
+func (b *BeagleboneAdaptor) Finalize() (errs []error) {
 	for _, pin := range b.pwmPins {
 		if pin != nil {
-			pin.release()
+			if err := pin.release(); err != nil {
+				errs = append(errs, err)
+			}
 		}
 	}
 	for _, pin := range b.digitalPins {
 		if pin != nil {
-			pin.Unexport()
+			if err := pin.Unexport(); err != nil {
+				errs = append(errs, err)
+			}
 		}
 	}
 	if b.i2cDevice != nil {
-		b.i2cDevice.Close()
+		if err := b.i2cDevice.Close(); err != nil {
+			errs = append(errs, err)
+		}
 	}
-	return nil
+	return
 }
 
 // PwmWrite writes value in specified pin

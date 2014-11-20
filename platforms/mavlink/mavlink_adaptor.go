@@ -35,11 +35,17 @@ func NewMavlinkAdaptor(name string, port string) *MavlinkAdaptor {
 }
 
 // Connect returns true if connection to device is successful
-func (m *MavlinkAdaptor) Connect() error {
-	return m.connect(m)
+func (m *MavlinkAdaptor) Connect() (errs []error) {
+	if err := m.connect(m); err != nil {
+		return []error{err}
+	}
+	return
 }
 
 // Finalize returns true if connection to devices is closed successfully
-func (m *MavlinkAdaptor) Finalize() error {
-	return m.sp.Close()
+func (m *MavlinkAdaptor) Finalize() (errs []error) {
+	if err := m.sp.Close(); err != nil {
+		return []error{err}
+	}
+	return
 }

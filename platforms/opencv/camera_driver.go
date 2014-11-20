@@ -45,9 +45,9 @@ func NewCameraDriver(name string, source interface{}) *CameraDriver {
 
 // Start initializes camera by grabbing a frame
 // every `interval` and publishing an frame event
-func (c *CameraDriver) Start() (err error) {
-	if err = c.start(c); err != nil {
-		return err
+func (c *CameraDriver) Start() (errs []error) {
+	if err := c.start(c); err != nil {
+		return []error{err}
 	}
 	gobot.Every(c.Interval(), func() {
 		if c.camera.GrabFrame() {
@@ -57,8 +57,8 @@ func (c *CameraDriver) Start() (err error) {
 			}
 		}
 	})
-	return nil
+	return
 }
 
 // Halt stops camera driver
-func (c *CameraDriver) Halt() error { return nil }
+func (c *CameraDriver) Halt() (errs []error) { return }

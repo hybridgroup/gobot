@@ -1,6 +1,7 @@
 package gobot
 
 import (
+	"errors"
 	"fmt"
 	"log"
 )
@@ -33,10 +34,12 @@ func (r *robots) Len() int {
 
 // Start initialises the event loop. All robots that were added will
 // be automtically started as a result of this call.
-func (r *robots) Start() (err error) {
+func (r *robots) Start() (errs []error) {
 	for _, robot := range *r {
-		err = robot.Start()
-		if err != nil {
+		if errs = robot.Start(); len(errs) > 0 {
+			for i, err := range errs {
+				errs[i] = errors.New(fmt.Sprintf("Robot %q: %v", robot.Name, err))
+			}
 			return
 		}
 	}
@@ -109,19 +112,21 @@ func (r *Robot) Command(name string) func(map[string]interface{}) interface{} {
 // Start a robot instance and runs it's work function if any. You should not
 // need to manually start a robot if already part of a Gobot application as the
 // robot will be automatically started for you.
-func (r *Robot) Start() (err error) {
+func (r *Robot) Start() (errs []error) {
 	log.Println("Starting Robot", r.Name, "...")
-	if err = r.Connections().Start(); err != nil {
+	if cerrs := r.Connections().Start(); len(cerrs) > 0 {
+		errs = append(errs, cerrs...)
 		return
 	}
-	if err = r.Devices().Start(); err != nil {
-		return err
+	if derrs := r.Devices().Start(); len(derrs) > 0 {
+		errs = append(errs, derrs...)
+		return
 	}
 	if r.Work != nil {
 		log.Println("Starting work...")
 		r.Work()
 	}
-	return nil
+	return
 }
 
 // Devices retrieves all devices associated with this robot.

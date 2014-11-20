@@ -18,14 +18,14 @@ func initTestJoystickAdaptor() *JoystickAdaptor {
 
 func TestJoystickAdaptorConnect(t *testing.T) {
 	a := initTestJoystickAdaptor()
-	gobot.Assert(t, a.Connect(), nil)
+	gobot.Assert(t, len(a.Connect()), 0)
 
 	a = NewJoystickAdaptor("bot")
-	gobot.Assert(t, a.Connect(), errors.New("No joystick available"))
+	gobot.Assert(t, a.Connect()[0], errors.New("No joystick available"))
 }
 
 func TestJoystickAdaptorFinalize(t *testing.T) {
 	a := initTestJoystickAdaptor()
 	a.Connect()
-	gobot.Assert(t, a.Finalize(), nil)
+	gobot.Assert(t, len(a.Finalize()), 0)
 }

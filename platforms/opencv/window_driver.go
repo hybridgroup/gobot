@@ -28,14 +28,14 @@ func NewWindowDriver(name string) *WindowDriver {
 }
 
 // Start starts window thread and driver
-func (w *WindowDriver) Start() error {
+func (w *WindowDriver) Start() (errs []error) {
 	cv.StartWindowThread()
 	w.start(w)
-	return nil
+	return
 }
 
 // Halt returns true if camera is halted successfully
-func (w *WindowDriver) Halt() error { return nil }
+func (w *WindowDriver) Halt() (errs []error) { return }
 
 // ShowImage displays image in window
 func (w *WindowDriver) ShowImage(image *cv.IplImage) {

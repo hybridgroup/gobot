@@ -62,8 +62,8 @@ type testDriver struct {
 	Driver
 }
 
-func (t *testDriver) Start() error { return nil }
-func (t *testDriver) Halt() error  { return nil }
+func (t *testDriver) Start() (errs []error) { return }
+func (t *testDriver) Halt() (errs []error)  { return }
 
 func NewTestDriver(name string, adaptor *testAdaptor) *testDriver {
 	t := &testDriver{
@@ -93,8 +93,8 @@ type testAdaptor struct {
 	Adaptor
 }
 
-func (t *testAdaptor) Finalize() error { return nil }
-func (t *testAdaptor) Connect() error  { return nil }
+func (t *testAdaptor) Finalize() (errs []error) { return }
+func (t *testAdaptor) Connect() (errs []error)  { return }
 
 func NewTestAdaptor(name string) *testAdaptor {
 	return &testAdaptor{
@@ -131,8 +131,8 @@ type loopbackAdaptor struct {
 	Adaptor
 }
 
-func (t *loopbackAdaptor) Finalize() error { return nil }
-func (t *loopbackAdaptor) Connect() error  { return nil }
+func (t *loopbackAdaptor) Finalize() (errs []error) { return }
+func (t *loopbackAdaptor) Connect() (errs []error)  { return }
 
 func NewLoopbackAdaptor(name string) *loopbackAdaptor {
 	return &loopbackAdaptor{
@@ -147,8 +147,8 @@ type pingDriver struct {
 	Driver
 }
 
-func (t *pingDriver) Start() error { return nil }
-func (t *pingDriver) Halt() error  { return nil }
+func (t *pingDriver) Start() (errs []error) { return }
+func (t *pingDriver) Halt() (errs []error)  { return }
 
 func NewPingDriver(adaptor *loopbackAdaptor, name string) *pingDriver {
 	t := &pingDriver{

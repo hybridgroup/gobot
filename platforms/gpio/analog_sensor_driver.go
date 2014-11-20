@@ -44,7 +44,7 @@ func (a *AnalogSensorDriver) adaptor() AnalogReader {
 // Returns true on successful start of the driver.
 // Emits the Events:
 //	"data" int - Event is emitted on change and represents the current reading from the sensor.
-func (a *AnalogSensorDriver) Start() error {
+func (a *AnalogSensorDriver) Start() (errs []error) {
 	value := 0
 	go func() {
 		for {
@@ -58,11 +58,11 @@ func (a *AnalogSensorDriver) Start() error {
 			<-time.After(a.Interval())
 		}
 	}()
-	return nil
+	return
 }
 
 // Halt returns true on a successful halt of the driver
-func (a *AnalogSensorDriver) Halt() error { return nil }
+func (a *AnalogSensorDriver) Halt() (errs []error) { return }
 
 // Read returns the current reading from the Analog Sensor
 func (a *AnalogSensorDriver) Read() (val int, err error) {

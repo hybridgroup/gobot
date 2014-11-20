@@ -27,25 +27,25 @@ func NewMqttAdaptor(name string, host string, clientID string) *MqttAdaptor {
 }
 
 // Connect returns true if connection to mqtt is established
-func (a *MqttAdaptor) Connect() error {
+func (a *MqttAdaptor) Connect() (errs []error) {
 	opts := createClientOptions(a.clientID, a.Host)
 	a.client = mqtt.NewClient(opts)
 	a.client.Start()
-	return nil
+	return
 }
 
 // Disconnect returns true if connection to mqtt is closed
-func (a *MqttAdaptor) Disconnect() error {
+func (a *MqttAdaptor) Disconnect() (err error) {
 	if a.client != nil {
 		a.client.Disconnect(500)
 	}
-	return nil
+	return
 }
 
 // Finalize returns true if connection to mqtt is finalized succesfully
-func (a *MqttAdaptor) Finalize() error {
+func (a *MqttAdaptor) Finalize() (errs []error) {
 	a.Disconnect()
-	return nil
+	return
 }
 
 // Publish a message under a specific topic

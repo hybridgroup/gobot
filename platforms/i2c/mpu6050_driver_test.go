@@ -41,11 +41,11 @@ func TestNewMPU6050Driver(t *testing.T) {
 func TestMPU6050DriverStart(t *testing.T) {
 	mpu := initTestMPU6050Driver()
 
-	gobot.Assert(t, mpu.Start(), nil)
+	gobot.Assert(t, len(mpu.Start()), 0)
 }
 
 func TestMPU6050DriverHalt(t *testing.T) {
 	mpu := initTestMPU6050Driver()
 
-	gobot.Assert(t, mpu.Halt(), nil)
+	gobot.Assert(t, len(mpu.Halt()), 0)
 }

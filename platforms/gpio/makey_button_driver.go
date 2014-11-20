@@ -43,7 +43,7 @@ func (b *MakeyButtonDriver) adaptor() DigitalReader {
 // Emits the Events:
 // 	"push"    int - On button push
 //	"release" int - On button release
-func (m *MakeyButtonDriver) Start() error {
+func (m *MakeyButtonDriver) Start() (errs []error) {
 	state := 0
 	go func() {
 		for {
@@ -63,11 +63,11 @@ func (m *MakeyButtonDriver) Start() error {
 		}
 		<-time.After(m.Interval())
 	}()
-	return nil
+	return
 }
 
 // Halt returns true on a successful halt of the driver
-func (m *MakeyButtonDriver) Halt() error { return nil }
+func (m *MakeyButtonDriver) Halt() (errs []error) { return }
 
 func (m *MakeyButtonDriver) readState() (val int, err error) {
 	return m.adaptor().DigitalRead(m.Pin())

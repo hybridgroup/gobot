@@ -39,9 +39,12 @@ func NewLeapMotionAdaptor(name string, port string) *LeapMotionAdaptor {
 }
 
 // Connect returns true if connection to leap motion is established succesfully
-func (l *LeapMotionAdaptor) Connect() error {
-	return l.connect(l)
+func (l *LeapMotionAdaptor) Connect() (errs []error) {
+	if err := l.connect(l); err != nil {
+		return []error{err}
+	}
+	return
 }
 
 // Finalize ends connection to leap motion
-func (l *LeapMotionAdaptor) Finalize() error { return nil }
+func (l *LeapMotionAdaptor) Finalize() (errs []error) { return }

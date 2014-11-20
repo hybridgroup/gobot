@@ -253,30 +253,43 @@ func NewEdisonAdaptor(name string) *EdisonAdaptor {
 
 // Connect starts conection with board and creates
 // digitalPins and pwmPins adaptor maps
-func (e *EdisonAdaptor) Connect() error {
+func (e *EdisonAdaptor) Connect() (errs []error) {
 	e.digitalPins = make(map[int]sysfs.DigitalPin)
 	e.pwmPins = make(map[int]*pwmPin)
-	return e.connect(e)
+	if err := e.connect(e); err != nil {
+		return []error{err}
+	}
+	return
 }
 
 // Finalize closes connection to board and pins
-func (e *EdisonAdaptor) Finalize() error {
-	e.tristate.Unexport()
+func (e *EdisonAdaptor) Finalize() (errs []error) {
+	if err := e.tristate.Unexport(); err != nil {
+		errs = append(errs, err)
+	}
 	for _, pin := range e.digitalPins {
 		if pin != nil {
-			pin.Unexport()
+			if err := pin.Unexport(); err != nil {
+				errs = append(errs, err)
+			}
 		}
 	}
 	for _, pin := range e.pwmPins {
 		if pin != nil {
-			pin.enable("0")
-			pin.unexport()
+			if err := pin.enable("0"); err != nil {
+				errs = append(errs, err)
+			}
+			if err := pin.unexport(); err != nil {
+				errs = append(errs, err)
+			}
 		}
 	}
 	if e.i2cDevice != nil {
-		e.i2cDevice.Close()
+		if err := e.i2cDevice.Close(); errs != nil {
+			errs = append(errs, err)
+		}
 	}
-	return nil
+	return errs
 }
 
 // digitalPin returns matched digitalPin for specified values

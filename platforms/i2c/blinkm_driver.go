@@ -58,18 +58,18 @@ func (b *BlinkMDriver) adaptor() I2cInterface {
 }
 
 // Start writes start bytes
-func (b *BlinkMDriver) Start() (err error) {
-	if err = b.adaptor().I2cStart(0x09); err != nil {
-		return
+func (b *BlinkMDriver) Start() (errs []error) {
+	if err := b.adaptor().I2cStart(0x09); err != nil {
+		return []error{err}
 	}
-	if err = b.adaptor().I2cWrite([]byte("o")); err != nil {
-		return
+	if err := b.adaptor().I2cWrite([]byte("o")); err != nil {
+		return []error{err}
 	}
-	return nil
+	return
 }
 
 // Halt returns true if device is halted successfully
-func (b *BlinkMDriver) Halt() error { return nil }
+func (b *BlinkMDriver) Halt() (errs []error) { return }
 
 // Rgb sets color using r,g,b params
 func (b *BlinkMDriver) Rgb(red byte, green byte, blue byte) (err error) {

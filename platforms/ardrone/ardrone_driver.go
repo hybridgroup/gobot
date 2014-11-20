@@ -32,13 +32,13 @@ func (a *ArdroneDriver) adaptor() *ArdroneAdaptor {
 }
 
 // Start returns true if driver is started succesfully
-func (a *ArdroneDriver) Start() error {
-	return nil
+func (a *ArdroneDriver) Start() (errs []error) {
+	return
 }
 
 // Halt returns true if driver is halted succesfully
-func (a *ArdroneDriver) Halt() error {
-	return nil
+func (a *ArdroneDriver) Halt() (errs []error) {
+	return
 }
 
 // TakeOff makes the drone start flying

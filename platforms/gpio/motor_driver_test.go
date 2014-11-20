@@ -12,12 +12,12 @@ func initTestMotorDriver() *MotorDriver {
 
 func TestMotorDriverStart(t *testing.T) {
 	d := initTestMotorDriver()
-	gobot.Assert(t, d.Start(), nil)
+	gobot.Assert(t, len(d.Start()), 0)
 }
 
 func TestMotorDriverHalt(t *testing.T) {
 	d := initTestMotorDriver()
-	gobot.Assert(t, d.Halt(), nil)
+	gobot.Assert(t, len(d.Halt()), 0)
 }
 
 func TestMotorDriverIsOn(t *testing.T) {

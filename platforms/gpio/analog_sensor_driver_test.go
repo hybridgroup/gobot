@@ -12,12 +12,12 @@ func initTestAnalogSensorDriver() *AnalogSensorDriver {
 
 func TestAnalogSensorDriverStart(t *testing.T) {
 	d := initTestAnalogSensorDriver()
-	gobot.Assert(t, d.Start(), nil)
+	gobot.Assert(t, len(d.Start()), 0)
 }
 
 func TestAnalogSensorDriverHalt(t *testing.T) {
 	d := initTestAnalogSensorDriver()
-	gobot.Assert(t, d.Halt(), nil)
+	gobot.Assert(t, len(d.Halt()), 0)
 }
 
 func TestAnalogSensorDriverRead(t *testing.T) {

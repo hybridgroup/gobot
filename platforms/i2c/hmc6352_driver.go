@@ -30,12 +30,18 @@ func (h *HMC6352Driver) adaptor() I2cInterface {
 
 // Start writes initialization bytes and reads from adaptor
 // using specified interval to update Heading
-func (h *HMC6352Driver) Start() (err error) {
-	if err = h.adaptor().I2cStart(0x21); err != nil {
-		return
+func (h *HMC6352Driver) Start() (errs []error) {
+	if err := h.adaptor().I2cStart(0x21); err != nil {
+		return []error{err}
 	}
-	return h.adaptor().I2cWrite([]byte("A"))
+	if err := h.adaptor().I2cWrite([]byte("A")); err != nil {
+		return []error{err}
+	}
+	return
 }
+
+// Halt returns true if devices is halted successfully
+func (h *HMC6352Driver) Halt() (errs []error) { return }
 
 // Heading returns the current heading
 func (h *HMC6352Driver) Heading() (heading uint16, err error) {
@@ -54,6 +60,3 @@ func (h *HMC6352Driver) Heading() (heading uint16, err error) {
 	}
 	return
 }
-
-// Halt returns true if devices is halted successfully
-func (h *HMC6352Driver) Halt() error { return nil }

@@ -43,7 +43,7 @@ func (b *ButtonDriver) adaptor() DigitalReader {
 // 	"push"    int - On button push
 //	"release" int - On button release
 //	"error" error - On button error
-func (b *ButtonDriver) Start() error {
+func (b *ButtonDriver) Start() (errs []error) {
 	state := 0
 	go func() {
 		for {
@@ -57,11 +57,11 @@ func (b *ButtonDriver) Start() error {
 			<-time.After(b.Interval())
 		}
 	}()
-	return nil
+	return
 }
 
 // Halt returns true on a successful halt of the driver
-func (b *ButtonDriver) Halt() error { return nil }
+func (b *ButtonDriver) Halt() (errs []error) { return }
 
 func (b *ButtonDriver) readState() (val int, err error) {
 	return b.adaptor().DigitalRead(b.Pin())

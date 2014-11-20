@@ -52,16 +52,16 @@ func (w *WiichuckDriver) adaptor() I2cInterface {
 
 // Start initilizes i2c and reads from adaptor
 // using specified interval to update with new value
-func (w *WiichuckDriver) Start() (err error) {
-	if err = w.adaptor().I2cStart(0x52); err != nil {
-		return
+func (w *WiichuckDriver) Start() (errs []error) {
+	if err := w.adaptor().I2cStart(0x52); err != nil {
+		return []error{err}
 	}
 	gobot.Every(w.Interval(), func() {
 		if err := w.adaptor().I2cWrite([]byte{0x40, 0x00}); err != nil {
 			gobot.Publish(w.Event("error"), err)
 			return
 		}
-		if err = w.adaptor().I2cWrite([]byte{0x00}); err != nil {
+		if err := w.adaptor().I2cWrite([]byte{0x00}); err != nil {
 			gobot.Publish(w.Event("error"), err)
 			return
 		}
@@ -77,11 +77,11 @@ func (w *WiichuckDriver) Start() (err error) {
 			}
 		}
 	})
-	return nil
+	return
 }
 
 // Halt returns true if driver is halted successfully
-func (w *WiichuckDriver) Halt() error { return nil }
+func (w *WiichuckDriver) Halt() (errs []error) { return }
 
 // update parses value to update buttons and joystick.
 // If value is encrypted, warning message is printed

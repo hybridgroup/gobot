@@ -44,7 +44,7 @@ func (m *MavlinkDriver) adaptor() *MavlinkAdaptor {
 
 // Start begins process to read mavlink packets every m.Interval
 // and process them
-func (m *MavlinkDriver) Start() error {
+func (m *MavlinkDriver) Start() (errs []error) {
 	go func() {
 		for {
 			packet, err := common.ReadMAVLinkPacket(m.adaptor().sp)
@@ -62,14 +62,14 @@ func (m *MavlinkDriver) Start() error {
 			<-time.After(m.Interval())
 		}
 	}()
-	return nil
+	return
 }
+
+// Halt returns true if device is halted successfully
+func (m *MavlinkDriver) Halt() (errs []error) { return }
 
 // SendPacket sends a packet to mavlink device
 func (m *MavlinkDriver) SendPacket(packet *common.MAVLinkPacket) (err error) {
 	_, err = m.adaptor().sp.Write(packet.Pack())
 	return err
 }
-
-// Halt returns true if device is halted successfully
-func (m *MavlinkDriver) Halt() error { return nil }

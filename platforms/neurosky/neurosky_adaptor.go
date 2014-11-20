@@ -35,11 +35,17 @@ func NewNeuroskyAdaptor(name string, port string) *NeuroskyAdaptor {
 }
 
 // Connect returns true if connection to device is successful
-func (n *NeuroskyAdaptor) Connect() error {
-	return n.connect(n)
+func (n *NeuroskyAdaptor) Connect() (errs []error) {
+	if err := n.connect(n); err != nil {
+		return []error{err}
+	}
+	return
 }
 
 // Finalize returns true if device finalization is successful
-func (n *NeuroskyAdaptor) Finalize() error {
-	return n.sp.Close()
+func (n *NeuroskyAdaptor) Finalize() (errs []error) {
+	if err := n.sp.Close(); err != nil {
+		return []error{err}
+	}
+	return
 }

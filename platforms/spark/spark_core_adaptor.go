@@ -35,15 +35,15 @@ func NewSparkCoreAdaptor(name string, deviceID string, accessToken string) *Spar
 }
 
 // Connect returns true if connection to spark core is succesfull
-func (s *SparkCoreAdaptor) Connect() error {
+func (s *SparkCoreAdaptor) Connect() (errs []error) {
 	s.SetConnected(true)
-	return nil
+	return
 }
 
 // Finalize returns true if connection to spark core is finalized successfully
-func (s *SparkCoreAdaptor) Finalize() error {
+func (s *SparkCoreAdaptor) Finalize() (errs []error) {
 	s.SetConnected(false)
-	return nil
+	return
 }
 
 // AnalogRead reads analog ping value using spark cloud api

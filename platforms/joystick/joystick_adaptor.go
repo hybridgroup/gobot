@@ -40,12 +40,15 @@ func NewJoystickAdaptor(name string) *JoystickAdaptor {
 }
 
 // Connect returns true if connection to device is succesfull
-func (j *JoystickAdaptor) Connect() error {
-	return j.connect(j)
+func (j *JoystickAdaptor) Connect() (errs []error) {
+	if err := j.connect(j); err != nil {
+		return []error{err}
+	}
+	return
 }
 
 // Finalize closes connection to device
-func (j *JoystickAdaptor) Finalize() error {
+func (j *JoystickAdaptor) Finalize() (errs []error) {
 	j.joystick.Close()
-	return nil
+	return
 }

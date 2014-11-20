@@ -21,11 +21,11 @@ func NewPebbleAdaptor(name string) *PebbleAdaptor {
 }
 
 // Connect returns true if connection to pebble is established succesfully
-func (a *PebbleAdaptor) Connect() error {
-	return nil
+func (a *PebbleAdaptor) Connect() (errs []error) {
+	return
 }
 
 // Finalize returns true if connection to pebble is finalized succesfully
-func (a *PebbleAdaptor) Finalize() error {
-	return nil
+func (a *PebbleAdaptor) Finalize() (errs []error) {
+	return
 }

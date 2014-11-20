@@ -11,8 +11,8 @@ type Adaptor struct {
 
 // AdaptorInterface defines behaviour expected for a Gobot Adaptor
 type AdaptorInterface interface {
-	Finalize() error
-	Connect() error
+	Finalize() []error
+	Connect() []error
 	Port() string
 	Name() string
 	Type() string

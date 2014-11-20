@@ -157,21 +157,25 @@ func NewRaspiAdaptor(name string) *RaspiAdaptor {
 
 // Connect starts conection with board and creates
 // digitalPins and pwmPins adaptor maps
-func (r *RaspiAdaptor) Connect() error {
-	return nil
+func (r *RaspiAdaptor) Connect() (errs []error) {
+	return
 }
 
 // Finalize closes connection to board and pins
-func (r *RaspiAdaptor) Finalize() error {
+func (r *RaspiAdaptor) Finalize() (errs []error) {
 	for _, pin := range r.digitalPins {
 		if pin != nil {
-			pin.Unexport()
+			if err := pin.Unexport(); err != nil {
+				errs = append(errs, err)
+			}
 		}
 	}
 	if r.i2cDevice != nil {
-		r.i2cDevice.Close()
+		if err := r.i2cDevice.Close(); err != nil {
+			errs = append(errs, err)
+		}
 	}
-	return nil
+	return errs
 }
 
 // digitalPin returns matched digitalPin for specified values

@@ -51,7 +51,7 @@ func TestHMC6352DriverStart(t *testing.T) {
 	numberOfCyclesForEvery := 3
 
 	hmc.SetInterval(1 * time.Millisecond)
-	gobot.Assert(t, hmc.Start(), nil)
+	gobot.Assert(t, len(hmc.Start()), 0)
 	go func() {
 		for {
 			<-time.After(time.Duration(numberOfCyclesForEvery) * time.Millisecond)
@@ -76,7 +76,7 @@ func TestHMC6352DriverStart(t *testing.T) {
 	}
 
 	hmc.SetInterval(1 * time.Millisecond)
-	gobot.Assert(t, hmc.Start(), nil)
+	gobot.Assert(t, len(hmc.Start()), 0)
 	go func() {
 		for {
 			<-time.After(time.Duration(numberOfCyclesForEvery) * time.Millisecond)
@@ -97,5 +97,5 @@ func TestHMC6352DriverStart(t *testing.T) {
 func TestHMC6352DriverHalt(t *testing.T) {
 	hmc := initTestHMC6352Driver()
 
-	gobot.Assert(t, hmc.Halt(), nil)
+	gobot.Assert(t, len(hmc.Halt()), 0)
 }

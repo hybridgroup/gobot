@@ -12,12 +12,12 @@ func initTestLedDriver() *LedDriver {
 
 func TestLedDriverStart(t *testing.T) {
 	d := initTestLedDriver()
-	gobot.Assert(t, d.Start(), nil)
+	gobot.Assert(t, len(d.Start()), 0)
 }
 
 func TestLedDriverHalt(t *testing.T) {
 	d := initTestLedDriver()
-	gobot.Assert(t, d.Halt(), nil)
+	gobot.Assert(t, len(d.Halt()), 0)
 }
 
 func TestLedDriverOn(t *testing.T) {

@@ -31,8 +31,7 @@ func (d *devices) Each(f func(Device)) {
 }
 
 // Start starts all the devices.
-func (d *devices) Start() error {
-	var err error
+func (d *devices) Start() (errs []error) {
 	log.Println("Starting devices...")
 	for _, device := range *d {
 		info := "Starting device " + device.Name()
@@ -40,18 +39,25 @@ func (d *devices) Start() error {
 			info = info + " on pin " + device.Pin()
 		}
 		log.Println(info + "...")
-		err = device.Start()
-		if err != nil {
-			err = errors.New(fmt.Sprintf("Could not start device: %v", err))
-			break
+		if errs = device.Start(); len(errs) > 0 {
+			for i, err := range errs {
+				errs[i] = errors.New(fmt.Sprintf("Device %q: %v", device.Name(), err))
+			}
+			return
 		}
 	}
-	return err
+	return
 }
 
 // Halt stop all the devices.
-func (d *devices) Halt() {
+func (d *devices) Halt() (errs []error) {
 	for _, device := range *d {
-		device.Halt()
+		if derrs := device.Halt(); len(derrs) > 0 {
+			for i, err := range derrs {
+				derrs[i] = errors.New(fmt.Sprintf("Device %q: %v", device.Name(), err))
+			}
+			errs = append(errs, derrs...)
+		}
 	}
+	return
 }

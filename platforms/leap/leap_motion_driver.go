@@ -47,15 +47,15 @@ func (l *LeapMotionDriver) adaptor() *LeapMotionAdaptor {
 //
 // Publishes the following events:
 //		"message" - Emits Frame on new message received from Leap.
-func (l *LeapMotionDriver) Start() error {
+func (l *LeapMotionDriver) Start() (errs []error) {
 	enableGestures := map[string]bool{"enableGestures": true}
 	b, err := json.Marshal(enableGestures)
 	if err != nil {
-		return err
+		return []error{err}
 	}
 	_, err = l.adaptor().ws.Write(b)
 	if err != nil {
-		return err
+		return []error{err}
 	}
 
 	go func() {
@@ -64,8 +64,8 @@ func (l *LeapMotionDriver) Start() error {
 		}
 	}()
 
-	return nil
+	return
 }
 
 // Halt returns true if driver is halted succesfully
-func (l *LeapMotionDriver) Halt() error { return nil }
+func (l *LeapMotionDriver) Halt() (errs []error) { return }

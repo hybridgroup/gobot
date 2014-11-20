@@ -28,8 +28,8 @@ func (t *i2cTestAdaptor) I2cRead(uint) (data []byte, err error) {
 	return t.i2cReadImpl(), nil
 }
 func (t *i2cTestAdaptor) I2cWrite([]byte) (err error) { return nil }
-func (t *i2cTestAdaptor) Connect() error              { return nil }
-func (t *i2cTestAdaptor) Finalize() error             { return nil }
+func (t *i2cTestAdaptor) Connect() (errs []error)     { return }
+func (t *i2cTestAdaptor) Finalize() (errs []error)    { return }
 
 func newI2cTestAdaptor(name string) *i2cTestAdaptor {
 	return &i2cTestAdaptor{

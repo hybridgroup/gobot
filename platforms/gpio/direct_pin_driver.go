@@ -65,10 +65,10 @@ func (d *DirectPinDriver) adaptor() DirectPin {
 }
 
 // Starts the DirectPinDriver. Returns true on successful start of the driver
-func (d *DirectPinDriver) Start() error { return nil }
+func (d *DirectPinDriver) Start() (errs []error) { return }
 
 // Halts the DirectPinDriver. Returns true on successful halt of the driver
-func (d *DirectPinDriver) Halt() error { return nil }
+func (d *DirectPinDriver) Halt() (errs []error) { return }
 
 // DigitalRead returns the current digital state of the pin
 func (d *DirectPinDriver) DigitalRead() (val int, err error) {

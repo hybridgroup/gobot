@@ -116,7 +116,7 @@ func TestBeagleboneAdaptor(t *testing.T) {
 	data, _ := a.I2cRead(2)
 	gobot.Assert(t, data, []byte{0x00, 0x01})
 
-	gobot.Assert(t, a.Finalize(), nil)
+	gobot.Assert(t, len(a.Finalize()), 0)
 
 	gobot.Assert(t, a.InitServo(), errors.New("InitServo is not yet implemented"))
 
