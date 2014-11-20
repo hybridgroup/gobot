@@ -43,6 +43,9 @@ func TestFirmataAdaptorFinalize(t *testing.T) {
 func TestFirmataAdaptorConnect(t *testing.T) {
 	a := initTestFirmataAdaptor()
 	gobot.Assert(t, a.Connect(), nil)
+
+	a = NewFirmataAdaptor("board", gobot.NullReadWriteCloser{})
+	gobot.Assert(t, a.connect(a), nil)
 }
 
 func TestFirmataAdaptorInitServo(t *testing.T) {
