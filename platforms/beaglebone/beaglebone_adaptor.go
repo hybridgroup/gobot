@@ -2,6 +2,7 @@ package beaglebone
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -202,7 +203,11 @@ func (b *BeagleboneAdaptor) ServoWrite(pin string, val byte) (err error) {
 
 // DigitalRead returns a digital value from specified pin
 func (b *BeagleboneAdaptor) DigitalRead(pin string) (val int, err error) {
-	return b.digitalPin(pin, sysfs.IN).Read()
+	sysfsPin, err := b.digitalPin(pin, sysfs.IN)
+	if err != nil {
+		return
+	}
+	return sysfsPin.Read()
 }
 
 // DigitalWrite writes a digital value to specified pin.
@@ -217,12 +222,17 @@ func (b *BeagleboneAdaptor) DigitalWrite(pin string, val byte) (err error) {
 		_, err = fi.WriteString(strconv.Itoa(int(val)))
 		return err
 	}
-	return b.digitalPin(pin, sysfs.OUT).Write(int(val))
+	sysfsPin, err := b.digitalPin(pin, sysfs.OUT)
+	return sysfsPin.Write(int(val))
 }
 
 // AnalogRead returns an analog value from specified pin
 func (b *BeagleboneAdaptor) AnalogRead(pin string) (val int, err error) {
-	fi, err := sysfs.OpenFile(fmt.Sprintf("%v/%v", b.helper, b.translateAnalogPin(pin)), os.O_RDONLY, 0644)
+	analogPin, err := b.translateAnalogPin(pin)
+	if err != nil {
+		return
+	}
+	fi, err := sysfs.OpenFile(fmt.Sprintf("%v/%v", b.helper, analogPin), os.O_RDONLY, 0644)
 	defer fi.Close()
 
 	if err != nil {
@@ -245,75 +255,91 @@ func (b *BeagleboneAdaptor) AnalogWrite(pin string, val byte) (err error) {
 }
 
 // I2cStart starts a i2c device in specified address
-func (b *BeagleboneAdaptor) I2cStart(address byte) {
-	b.i2cDevice, _ = sysfs.NewI2cDevice("/dev/i2c-1", address)
+func (b *BeagleboneAdaptor) I2cStart(address byte) (err error) {
+	b.i2cDevice, err = sysfs.NewI2cDevice("/dev/i2c-1", address)
+	return
 }
 
 // I2CWrite writes data to i2c device
-func (b *BeagleboneAdaptor) I2cWrite(data []byte) {
-	b.i2cDevice.Write(data)
+func (b *BeagleboneAdaptor) I2cWrite(data []byte) (err error) {
+	_, err = b.i2cDevice.Write(data)
+	return err
 }
 
 // I2cRead returns value from i2c device using specified size
-func (b *BeagleboneAdaptor) I2cRead(size uint) []byte {
-	buf := make([]byte, size)
-	b.i2cDevice.Read(buf)
-	return buf
+func (b *BeagleboneAdaptor) I2cRead(size uint) (data []byte, err error) {
+	data = make([]byte, size)
+	_, err = b.i2cDevice.Read(data)
+	return
 }
 
 // translatePin converts digital pin name to pin position
-func (b *BeagleboneAdaptor) translatePin(pin string) int {
+func (b *BeagleboneAdaptor) translatePin(pin string) (value int, err error) {
 	for key, value := range pins {
 		if key == pin {
-			return value
+			return value, nil
 		}
 	}
-	panic("Not a valid pin")
+	err = errors.New("Not a valid pin")
+	return
 }
 
 // translatePwmPin converts pwm pin name to pin position
-func (b *BeagleboneAdaptor) translatePwmPin(pin string) string {
+func (b *BeagleboneAdaptor) translatePwmPin(pin string) (value string, err error) {
 	for key, value := range pwmPins {
 		if key == pin {
-			return value
+			return value, nil
 		}
 	}
-	panic("Not a valid pin")
+	err = errors.New("Not a valid pin")
+	return
 }
 
 // translateAnalogPin converts analog pin name to pin position
-func (b *BeagleboneAdaptor) translateAnalogPin(pin string) string {
+func (b *BeagleboneAdaptor) translateAnalogPin(pin string) (value string, err error) {
 	for key, value := range analogPins {
 		if key == pin {
-			return value
+			return value, nil
 		}
 	}
-	panic("Not a valid pin")
+	err = errors.New("Not a valid pin")
+	return
 }
 
 // digitalPin retrieves digital pin value by name
-func (b *BeagleboneAdaptor) digitalPin(pin string, dir string) sysfs.DigitalPin {
-	i := b.translatePin(pin)
+func (b *BeagleboneAdaptor) digitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPin, err error) {
+	i, err := b.translatePin(pin)
+	if err != nil {
+		return
+	}
 	if b.digitalPins[i] == nil {
 		b.digitalPins[i] = sysfs.NewDigitalPin(i)
 		err := b.digitalPins[i].Export()
 		if err != nil {
-			fmt.Println(err)
+			return nil, err
 		}
 	}
-	b.digitalPins[i].Direction(dir)
-	return b.digitalPins[i]
+	if err = b.digitalPins[i].Direction(dir); err != nil {
+		return
+	}
+	return b.digitalPins[i], nil
 }
 
 // pwPin retrieves pwm pin value by name
 func (b *BeagleboneAdaptor) pwmPin(pin string) (i string, err error) {
-	i = b.translatePwmPin(pin)
+	i, err = b.translatePwmPin(pin)
+	if err != nil {
+		return
+	}
 	if b.pwmPins[i] == nil {
 		err = ensureSlot(b.slots, fmt.Sprintf("bone_pwm_%v", pin))
 		if err != nil {
 			return
 		}
 		b.pwmPins[i], err = newPwmPin(i, b.ocp)
+		if err != nil {
+			return
+		}
 	}
 	return
 }
@@ -352,7 +378,7 @@ func ensureSlot(slots, item string) (err error) {
 	}
 	err = fi.Sync()
 	if err != nil {
-		return nil
+		return err
 	}
 
 	scanner = bufio.NewScanner(fi)
