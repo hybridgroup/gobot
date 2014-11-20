@@ -1,6 +1,7 @@
 package joystick
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/hybridgroup/gobot"
@@ -18,6 +19,9 @@ func initTestJoystickAdaptor() *JoystickAdaptor {
 func TestJoystickAdaptorConnect(t *testing.T) {
 	a := initTestJoystickAdaptor()
 	gobot.Assert(t, a.Connect(), nil)
+
+	a = NewJoystickAdaptor("bot")
+	gobot.Assert(t, a.Connect(), errors.New("No joystick available"))
 }
 
 func TestJoystickAdaptorFinalize(t *testing.T) {
