@@ -1,6 +1,7 @@
 package digispark
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/hybridgroup/gobot"
@@ -53,14 +54,14 @@ func initTestDigisparkAdaptor() *DigisparkAdaptor {
 	return a
 }
 
+func TestDigisparkAdaptorConnect(t *testing.T) {
+	a := NewDigisparkAdaptor("bot")
+	gobot.Assert(t, a.Connect(), errors.New("Error connecting to bot"))
+}
+
 func TestDigisparkAdaptorFinalize(t *testing.T) {
 	a := initTestDigisparkAdaptor()
 	gobot.Assert(t, a.Finalize(), nil)
-}
-
-func TestDigisparkAdaptorConnect(t *testing.T) {
-	a := initTestDigisparkAdaptor()
-	gobot.Assert(t, a.Connect(), nil)
 }
 
 func TestDigisparkAdaptorIO(t *testing.T) {
