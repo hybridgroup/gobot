@@ -66,6 +66,7 @@ func (f *FirmataAdaptor) Connect() (errs []error) {
 	if err := f.connect(f); err != nil {
 		return []error{err}
 	}
+	f.board.connect()
 	f.SetConnected(true)
 	return
 }

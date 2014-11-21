@@ -14,9 +14,9 @@ type JSONRobot struct {
 	Devices     []*JSONDevice     `json:"devices"`
 }
 
-// Robot software representation of a physical board. A robot is a named
-// entitity that manages multiple IO devices using a set of adaptors. Additionally
-// a user can specificy custom commands to control a robot remotely.
+// Robot is a named entitity that manages a collection of connections and devices.
+// It containes it's own work routine and a collection of
+// custom commands to control a robot remotely via the Gobot api.
 type Robot struct {
 	Name        string
 	Work        func()
@@ -54,8 +54,11 @@ func (r *robots) Each(f func(*Robot)) {
 	}
 }
 
-// NewRobot constructs a new named robot. Though a robot's name will be generated,
-// we recommend that user take care of naming a robot for later access.
+// NewRobot returns a new Robot given a name and optionally accepts:
+//
+// 	[]Connection: Connections which are automatically started and stopped with the robot
+//	[]Device: Devices which are automatically started and stopped with the robot
+//	func(): The work routine the robot will execute once all devices and connections have been initialized and started
 func NewRobot(name string, v ...interface{}) *Robot {
 	if name == "" {
 		name = fmt.Sprintf("%X", Rand(int(^uint(0)>>1)))
@@ -116,18 +119,19 @@ func (r *Robot) Start() (errs []error) {
 	return
 }
 
-// Devices retrieves all devices associated with this robot.
+// Devices returns all devices associated with this robot.
 func (r *Robot) Devices() *devices {
 	return r.devices
 }
 
-// AddDevice adds a new device on this robot.
+// AddDevice adds a new device to the robots collection of devices. Returns the
+// added device.
 func (r *Robot) AddDevice(d Device) Device {
 	*r.devices = append(*r.Devices(), d)
 	return d
 }
 
-// Device finds a device by name.
+// Device returns a device given a name. Returns nil on no device.
 func (r *Robot) Device(name string) Device {
 	if r == nil {
 		return nil
@@ -140,18 +144,19 @@ func (r *Robot) Device(name string) Device {
 	return nil
 }
 
-// Connections retrieves all connections on this robot.
+// Connections returns all connections associated with this robot.
 func (r *Robot) Connections() *connections {
 	return r.connections
 }
 
-// AddConnection add a new connection on this robot.
+// AddConnection adds a new connection to the robots collection of connections.
+// Returns the added connection.
 func (r *Robot) AddConnection(c Connection) Connection {
 	*r.connections = append(*r.Connections(), c)
 	return c
 }
 
-// Connection finds a connection by name.
+// Connection returns a connection given a name. Returns nil on no connection.
 func (r *Robot) Connection(name string) Connection {
 	if r == nil {
 		return nil
@@ -164,7 +169,7 @@ func (r *Robot) Connection(name string) Connection {
 	return nil
 }
 
-// ToJSON returns a JSON representation of the master robot.
+// ToJSON returns a JSON representation of the robot.
 func (r *Robot) ToJSON() *JSONRobot {
 	jsonRobot := &JSONRobot{
 		Name:        r.Name,

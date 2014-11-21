@@ -1,3 +1,8 @@
+0.7.1
+---
+  - opencv
+    - Fix pthread_create issue on Mac OS
+
 0.7
 ---
   - Dramatically increased test coverage and documentation

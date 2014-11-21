@@ -20,7 +20,7 @@ type Gobot struct {
 	Eventer
 }
 
-// NewGobot instantiates a new Gobot
+// NewGobot returns a new Gobot
 func NewGobot() *Gobot {
 	return &Gobot{
 		robots: &robots{},
@@ -32,7 +32,9 @@ func NewGobot() *Gobot {
 	}
 }
 
-// Start runs the main Gobot event loop
+// Start calls the Start method on each robot in it's collection of robots, and
+// stops all robots on reception of a SIGINT. Start will block the execution of
+// your main function until it receives the SIGINT.
 func (g *Gobot) Start() (errs []error) {
 	if rerrs := g.robots.Start(); len(rerrs) > 0 {
 		for _, err := range rerrs {
@@ -69,18 +71,19 @@ func (g *Gobot) Start() (errs []error) {
 	return errs
 }
 
-// Robots fetch all robots associated with this Gobot instance.
+// Robots returns all robots associated with this Gobot instance.
 func (g *Gobot) Robots() *robots {
 	return g.robots
 }
 
-// AddRobot adds a new robot to our Gobot instance.
+// AddRobot adds a new robot to the internal collection of robots. Returns the
+// added robot
 func (g *Gobot) AddRobot(r *Robot) *Robot {
 	*g.robots = append(*g.robots, r)
 	return r
 }
 
-// Robot find a robot with a given name.
+// Robot returns a robot given name. Returns nil on no robot.
 func (g *Gobot) Robot(name string) *Robot {
 	for _, robot := range *g.Robots() {
 		if robot.Name == name {
@@ -90,7 +93,7 @@ func (g *Gobot) Robot(name string) *Robot {
 	return nil
 }
 
-// ToJSON retrieves a JSON representation of this Gobot.
+// ToJSON returns a JSON representation of this Gobot.
 func (g *Gobot) ToJSON() *JSONGobot {
 	jsonGobot := &JSONGobot{
 		Robots:   []*JSONRobot{},

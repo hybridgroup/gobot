@@ -5,6 +5,7 @@ import (
 
 	cv "github.com/hybridgroup/go-opencv/opencv"
 	"github.com/hybridgroup/gobot"
+	"time"
 )
 
 var _ gobot.DriverInterface = (*CameraDriver)(nil)
@@ -49,14 +50,17 @@ func (c *CameraDriver) Start() (errs []error) {
 	if err := c.start(c); err != nil {
 		return []error{err}
 	}
-	gobot.Every(c.Interval(), func() {
-		if c.camera.GrabFrame() {
-			image := c.camera.RetrieveFrame(1)
-			if image != nil {
-				gobot.Publish(c.Event("frame"), image)
+	go func() {
+		for {
+			if c.camera.GrabFrame() {
+				image := c.camera.RetrieveFrame(1)
+				if image != nil {
+					gobot.Publish(c.Event("frame"), image)
+				}
 			}
+			<-time.After(c.Interval())
 		}
-	})
+	}()
 	return
 }
 
