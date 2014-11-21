@@ -12,6 +12,23 @@ type JSONGobot struct {
 	Commands []string     `json:"commands"`
 }
 
+// ToJSON returns a JSON representation of this Gobot.
+func NewJSONGobot(gobot *Gobot) *JSONGobot {
+	jsonGobot := &JSONGobot{
+		Robots:   []*JSONRobot{},
+		Commands: []string{},
+	}
+
+	for command := range gobot.Commands() {
+		jsonGobot.Commands = append(jsonGobot.Commands, command)
+	}
+
+	gobot.robots.Each(func(r *Robot) {
+		jsonGobot.Robots = append(jsonGobot.Robots, NewJSONRobot(r))
+	})
+	return jsonGobot
+}
+
 // Gobot is a container composed of one or more robots
 type Gobot struct {
 	robots *robots
@@ -91,21 +108,4 @@ func (g *Gobot) Robot(name string) *Robot {
 		}
 	}
 	return nil
-}
-
-// ToJSON returns a JSON representation of this Gobot.
-func (g *Gobot) ToJSON() *JSONGobot {
-	jsonGobot := &JSONGobot{
-		Robots:   []*JSONRobot{},
-		Commands: []string{},
-	}
-
-	for command := range g.Commands() {
-		jsonGobot.Commands = append(jsonGobot.Commands, command)
-	}
-
-	g.robots.Each(func(r *Robot) {
-		jsonGobot.Robots = append(jsonGobot.Robots, r.ToJSON())
-	})
-	return jsonGobot
 }

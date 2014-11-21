@@ -6,5 +6,4 @@ type Adaptor interface {
 	Name() string
 	Port() string
 	String() string
-	ToJSON() *JSONConnection
 }

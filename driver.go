@@ -7,5 +7,4 @@ type Driver interface {
 	Pin() string
 	String() string
 	Connection() Connection
-	ToJSON() *JSONDevice
 }

@@ -4,12 +4,21 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"reflect"
 )
 
 // JSONConnection holds a JSON representation of a connection.
 type JSONConnection struct {
 	Name    string `json:"name"`
 	Adaptor string `json:"adaptor"`
+}
+
+// ToJSON returns a json representation of an adaptor
+func NewJSONConnection(connection Connection) *JSONConnection {
+	return &JSONConnection{
+		Name:    connection.Name(),
+		Adaptor: reflect.TypeOf(connection).String(),
+	}
 }
 
 type Connection Adaptor

@@ -1,13 +1,11 @@
 package gobot
 
-import "errors"
-
 type commander struct {
 	commands map[string]func(map[string]interface{}) interface{}
 }
 
 type Commander interface {
-	Command(string) (command func(map[string]interface{}) interface{}, err error)
+	Command(string) (command func(map[string]interface{}) interface{})
 	Commands() (commands map[string]func(map[string]interface{}) interface{})
 	AddCommand(name string, command func(map[string]interface{}) interface{})
 }
@@ -19,12 +17,8 @@ func NewCommander() Commander {
 }
 
 // Command retrieves a command by name
-func (c *commander) Command(name string) (command func(map[string]interface{}) interface{}, err error) {
-	command, ok := c.commands[name]
-	if ok {
-		return
-	}
-	err = errors.New("Unknown Command")
+func (c *commander) Command(name string) (command func(map[string]interface{}) interface{}) {
+	command, _ = c.commands[name]
 	return
 }
 

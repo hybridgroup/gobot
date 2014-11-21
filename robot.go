@@ -14,6 +14,27 @@ type JSONRobot struct {
 	Devices     []*JSONDevice     `json:"devices"`
 }
 
+// NewJSONRobot returns a JSON representation of the robot.
+func NewJSONRobot(robot *Robot) *JSONRobot {
+	jsonRobot := &JSONRobot{
+		Name:        robot.Name,
+		Commands:    []string{},
+		Connections: []*JSONConnection{},
+		Devices:     []*JSONDevice{},
+	}
+
+	for command := range robot.Commands() {
+		jsonRobot.Commands = append(jsonRobot.Commands, command)
+	}
+
+	robot.Devices().Each(func(device Device) {
+		jsonDevice := NewJSONDevice(device)
+		jsonRobot.Connections = append(jsonRobot.Connections, NewJSONConnection(robot.Connection(jsonDevice.Connection)))
+		jsonRobot.Devices = append(jsonRobot.Devices, jsonDevice)
+	})
+	return jsonRobot
+}
+
 // Robot is a named entitity that manages a collection of connections and devices.
 // It containes it's own work routine and a collection of
 // custom commands to control a robot remotely via the Gobot api.
@@ -167,25 +188,4 @@ func (r *Robot) Connection(name string) Connection {
 		}
 	}
 	return nil
-}
-
-// ToJSON returns a JSON representation of the robot.
-func (r *Robot) ToJSON() *JSONRobot {
-	jsonRobot := &JSONRobot{
-		Name:        r.Name,
-		Commands:    []string{},
-		Connections: []*JSONConnection{},
-		Devices:     []*JSONDevice{},
-	}
-
-	for command := range r.Commands() {
-		jsonRobot.Commands = append(jsonRobot.Commands, command)
-	}
-
-	r.Devices().Each(func(device Device) {
-		jsonDevice := device.ToJSON()
-		jsonRobot.Connections = append(jsonRobot.Connections, r.Connection(jsonDevice.Connection).ToJSON())
-		jsonRobot.Devices = append(jsonRobot.Devices, jsonDevice)
-	})
-	return jsonRobot
 }
