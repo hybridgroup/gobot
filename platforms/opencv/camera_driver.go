@@ -61,7 +61,7 @@ func (c *CameraDriver) Start() (errs []error) {
 			<-time.After(c.Interval())
 		}
 	}()
-	return true
+	return
 }
 
 // Halt stops camera driver
