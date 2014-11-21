@@ -12,7 +12,7 @@ type JSONConnection struct {
 	Adaptor string `json:"adaptor"`
 }
 
-type Connection AdaptorInterface
+type Connection Adaptor
 
 type connections []Connection
 

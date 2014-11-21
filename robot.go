@@ -19,10 +19,11 @@ type JSONRobot struct {
 // a user can specificy custom commands to control a robot remotely.
 type Robot struct {
 	Name        string
-	commands    map[string]func(map[string]interface{}) interface{}
 	Work        func()
 	connections *connections
 	devices     *devices
+	Commander
+	Eventer
 }
 
 type robots []*Robot
@@ -62,10 +63,11 @@ func NewRobot(name string, v ...interface{}) *Robot {
 
 	r := &Robot{
 		Name:        name,
-		commands:    make(map[string]func(map[string]interface{}) interface{}),
 		connections: &connections{},
 		devices:     &devices{},
 		Work:        nil,
+		Eventer:     NewEventer(),
+		Commander:   NewCommander(),
 	}
 
 	log.Println("Initializing Robot", r.Name, "...")
@@ -92,21 +94,6 @@ func NewRobot(name string, v ...interface{}) *Robot {
 	}
 
 	return r
-}
-
-// AddCommand setup a new command that we be made available via the REST api.
-func (r *Robot) AddCommand(name string, f func(map[string]interface{}) interface{}) {
-	r.commands[name] = f
-}
-
-// Commands lists out all available commands on this robot.
-func (r *Robot) Commands() map[string]func(map[string]interface{}) interface{} {
-	return r.commands
-}
-
-// Command fetch a named command on this robot.
-func (r *Robot) Command(name string) func(map[string]interface{}) interface{} {
-	return r.commands[name]
 }
 
 // Start a robot instance and runs it's work function if any. You should not

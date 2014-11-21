@@ -14,45 +14,22 @@ type JSONGobot struct {
 
 // Gobot is a container composed of one or more robots
 type Gobot struct {
-	robots   *robots
-	commands map[string]func(map[string]interface{}) interface{}
-	trap     func(chan os.Signal)
+	robots *robots
+	trap   func(chan os.Signal)
+	Commander
+	Eventer
 }
 
 // NewGobot instantiates a new Gobot
 func NewGobot() *Gobot {
 	return &Gobot{
-		robots:   &robots{},
-		commands: make(map[string]func(map[string]interface{}) interface{}),
+		robots: &robots{},
 		trap: func(c chan os.Signal) {
 			signal.Notify(c, os.Interrupt)
 		},
+		Commander: NewCommander(),
+		Eventer:   NewEventer(),
 	}
-}
-
-/*
-AddCommand creates a new command and adds it to the Gobot. This command
-will be available via HTTP using '/commands/name'
-
-Example:
-	gbot.AddCommand( 'rollover', func( params map[string]interface{}) interface{} {
-		fmt.Println( "Rolling over - Stand by...")
-	})
-
-	With the api package setup, you can now get your Gobot to rollover using: http://localhost:3000/commands/rollover
-*/
-func (g *Gobot) AddCommand(name string, f func(map[string]interface{}) interface{}) {
-	g.commands[name] = f
-}
-
-// Commands lists all available commands on this Gobot instance.
-func (g *Gobot) Commands() map[string]func(map[string]interface{}) interface{} {
-	return g.commands
-}
-
-// Command fetch the associated command using the given command name
-func (g *Gobot) Command(name string) func(map[string]interface{}) interface{} {
-	return g.commands[name]
 }
 
 // Start runs the main Gobot event loop

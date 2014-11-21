@@ -14,7 +14,7 @@ type JSONDevice struct {
 	Commands   []string `json:"commands"`
 }
 
-type Device DriverInterface
+type Device Driver
 
 type devices []Device
 

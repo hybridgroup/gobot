@@ -1,32 +1,6 @@
 package gobot
 
-import (
-	"fmt"
-	"reflect"
-	"runtime"
-	"strings"
-	"testing"
-	"time"
-)
-
-func logFailure(t *testing.T, message string) {
-	_, file, line, _ := runtime.Caller(2)
-	s := strings.Split(file, "/")
-	t.Errorf("%v:%v: %v", s[len(s)-1], line, message)
-}
-func Assert(t *testing.T, a interface{}, b interface{}) {
-	if !reflect.DeepEqual(a, b) {
-		logFailure(t, fmt.Sprintf("%v - \"%v\", should equal,  %v - \"%v\"",
-			a, reflect.TypeOf(a), b, reflect.TypeOf(b)))
-	}
-}
-
-func Refute(t *testing.T, a interface{}, b interface{}) {
-	if reflect.DeepEqual(a, b) {
-		logFailure(t, fmt.Sprintf("%v - \"%v\", should not equal,  %v - \"%v\"",
-			a, reflect.TypeOf(a), b, reflect.TypeOf(b)))
-	}
-}
+import "fmt"
 
 type testStruct struct {
 	i int
@@ -59,21 +33,26 @@ func (NullReadWriteCloser) Close() error {
 }
 
 type testDriver struct {
-	Driver
+	name       string
+	pin        string
+	connection Connection
+	Commander
 }
 
-func (t *testDriver) Start() (errs []error) { return }
-func (t *testDriver) Halt() (errs []error)  { return }
+func (t *testDriver) Start() (errs []error)  { return }
+func (t *testDriver) Halt() (errs []error)   { return }
+func (t *testDriver) Name() string           { return t.name }
+func (t *testDriver) Pin() string            { return t.pin }
+func (t *testDriver) String() string         { return "testDriver" }
+func (t *testDriver) Connection() Connection { return t.connection }
+func (t *testDriver) ToJSON() *JSONDevice    { return &JSONDevice{} }
 
 func NewTestDriver(name string, adaptor *testAdaptor) *testDriver {
 	t := &testDriver{
-		Driver: *NewDriver(
-			name,
-			"TestDriver",
-			adaptor,
-			"1",
-			100*time.Millisecond,
-		),
+		name:       name,
+		connection: adaptor,
+		pin:        "1",
+		Commander:  NewCommander(),
 	}
 
 	t.AddCommand("TestDriverCommand", func(params map[string]interface{}) interface{} {
@@ -90,19 +69,21 @@ func NewTestDriver(name string, adaptor *testAdaptor) *testDriver {
 }
 
 type testAdaptor struct {
-	Adaptor
+	name string
+	port string
 }
 
 func (t *testAdaptor) Finalize() (errs []error) { return }
 func (t *testAdaptor) Connect() (errs []error)  { return }
+func (t *testAdaptor) Name() string             { return t.name }
+func (t *testAdaptor) Port() string             { return t.port }
+func (t *testAdaptor) String() string           { return "testAdaptor" }
+func (t *testAdaptor) ToJSON() *JSONConnection  { return &JSONConnection{} }
 
 func NewTestAdaptor(name string) *testAdaptor {
 	return &testAdaptor{
-		Adaptor: *NewAdaptor(
-			name,
-			"TestAdaptor",
-			"/dev/null",
-		),
+		name: name,
+		port: "/dev/null",
 	}
 }
 
@@ -125,50 +106,4 @@ func NewTestRobot(name string) *Robot {
 		return fmt.Sprintf("hey %v, %v", robot, message)
 	})
 	return r
-}
-
-type loopbackAdaptor struct {
-	Adaptor
-}
-
-func (t *loopbackAdaptor) Finalize() (errs []error) { return }
-func (t *loopbackAdaptor) Connect() (errs []error)  { return }
-
-func NewLoopbackAdaptor(name string) *loopbackAdaptor {
-	return &loopbackAdaptor{
-		Adaptor: *NewAdaptor(
-			name,
-			"Loopback",
-		),
-	}
-}
-
-type pingDriver struct {
-	Driver
-}
-
-func (t *pingDriver) Start() (errs []error) { return }
-func (t *pingDriver) Halt() (errs []error)  { return }
-
-func NewPingDriver(adaptor *loopbackAdaptor, name string) *pingDriver {
-	t := &pingDriver{
-		Driver: *NewDriver(
-			name,
-			"Ping",
-			adaptor,
-		),
-	}
-
-	t.AddEvent("ping")
-
-	t.AddCommand("ping", func(params map[string]interface{}) interface{} {
-		return t.Ping()
-	})
-
-	return t
-}
-
-func (t *pingDriver) Ping() string {
-	Publish(t.Event("ping"), "ping")
-	return "pong"
 }
