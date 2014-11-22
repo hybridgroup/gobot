@@ -1,28 +1,30 @@
 package gpio
 
 import (
-	"github.com/hybridgroup/gobot"
 	"time"
+
+	"github.com/hybridgroup/gobot"
 )
 
-var _ gobot.DriverInterface = (*ButtonDriver)(nil)
+var _ gobot.Driver = (*ButtonDriver)(nil)
 
 // Represents a digital Button
 type ButtonDriver struct {
-	gobot.Driver
-	Active bool
+	Active     bool
+	pin        string
+	name       string
+	connection gobot.Connection
+	gobot.Eventer
 }
 
 // NewButtonDriver return a new ButtonDriver given a DigitalReader, name and pin
 func NewButtonDriver(a DigitalReader, name string, pin string) *ButtonDriver {
 	b := &ButtonDriver{
-		Driver: *gobot.NewDriver(
-			name,
-			"ButtonDriver",
-			a.(gobot.AdaptorInterface),
-			pin,
-		),
-		Active: false,
+		name:       name,
+		connection: a.(gobot.Adaptor),
+		pin:        pin,
+		Active:     false,
+		Eventer:    gobot.NewEventer(),
 	}
 
 	b.AddEvent("push")
@@ -33,7 +35,7 @@ func NewButtonDriver(a DigitalReader, name string, pin string) *ButtonDriver {
 }
 
 func (b *ButtonDriver) adaptor() DigitalReader {
-	return b.Adaptor().(DigitalReader)
+	return b.Connection().(DigitalReader)
 }
 
 // Starts the ButtonDriver and reads the state of the button at the given Driver.Interval().
@@ -54,7 +56,8 @@ func (b *ButtonDriver) Start() (errs []error) {
 				state = newValue
 				b.update(newValue)
 			}
-			<-time.After(b.Interval())
+			//<-time.After(b.Interval())
+			<-time.After(100 * time.Millisecond)
 		}
 	}()
 	return
@@ -62,6 +65,21 @@ func (b *ButtonDriver) Start() (errs []error) {
 
 // Halt returns true on a successful halt of the driver
 func (b *ButtonDriver) Halt() (errs []error) { return }
+
+func (b *ButtonDriver) Name() string                 { return b.name }
+func (b *ButtonDriver) Pin() string                  { return b.pin }
+func (b *ButtonDriver) Connection() gobot.Connection { return b.connection }
+func (b *ButtonDriver) String() string               { return "ButtonDriver" }
+func (b *ButtonDriver) ToJSON() *gobot.JSONDevice {
+	return &gobot.JSONDevice{
+		Name:       b.Name(),
+		Driver:     b.String(),
+		Connection: b.Connection().Name(),
+		//Commands:   l.Commands(),
+		//Commands:   l.Commands(),
+	}
+
+}
 
 func (b *ButtonDriver) readState() (val int, err error) {
 	return b.adaptor().DigitalRead(b.Pin())

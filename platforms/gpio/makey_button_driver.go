@@ -1,29 +1,33 @@
 package gpio
 
 import (
-	"github.com/hybridgroup/gobot"
 	"time"
+
+	"github.com/hybridgroup/gobot"
 )
 
-var _ gobot.DriverInterface = (*MakeyButtonDriver)(nil)
+var _ gobot.Driver = (*MakeyButtonDriver)(nil)
 
 // Represents a Makey Button
 type MakeyButtonDriver struct {
-	gobot.Driver
-	Active bool
-	data   []int
+	name       string
+	pin        string
+	connection gobot.Connection
+	Active     bool
+	data       []int
+	interval   time.Duration
+	gobot.Eventer
 }
 
 // NewMakeyButtonDriver returns a new MakeyButtonDriver given a DigitalRead, name and pin.
 func NewMakeyButtonDriver(a DigitalReader, name string, pin string) *MakeyButtonDriver {
 	m := &MakeyButtonDriver{
-		Driver: *gobot.NewDriver(
-			name,
-			"MakeyButtonDriver",
-			a.(gobot.AdaptorInterface),
-			pin,
-		),
-		Active: false,
+		name:       name,
+		connection: a.(gobot.Connection),
+		pin:        pin,
+		Active:     false,
+		Eventer:    gobot.NewEventer(),
+		interval:   10 * time.Millisecond,
 	}
 
 	m.AddEvent("error")
@@ -33,8 +37,12 @@ func NewMakeyButtonDriver(a DigitalReader, name string, pin string) *MakeyButton
 	return m
 }
 
+func (b *MakeyButtonDriver) Name() string                 { return b.name }
+func (b *MakeyButtonDriver) Pin() string                  { return b.pin }
+func (b *MakeyButtonDriver) Connection() gobot.Connection { return b.connection }
+
 func (b *MakeyButtonDriver) adaptor() DigitalReader {
-	return b.Adaptor().(DigitalReader)
+	return b.Connection().(DigitalReader)
 }
 
 // Starts the MakeyButtonDriver and reads the state of the button at the given Driver.Interval().
@@ -61,7 +69,7 @@ func (m *MakeyButtonDriver) Start() (errs []error) {
 				}
 			}
 		}
-		<-time.After(m.Interval())
+		<-time.After(m.interval)
 	}()
 	return
 }

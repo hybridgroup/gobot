@@ -2,12 +2,15 @@ package gpio
 
 import "github.com/hybridgroup/gobot"
 
-var _ gobot.DriverInterface = (*LedDriver)(nil)
+var _ gobot.Driver = (*LedDriver)(nil)
 
 // Represents a digital Led
 type LedDriver struct {
-	gobot.Driver
-	high bool
+	pin        string
+	name       string
+	connection gobot.Connection
+	high       bool
+	gobot.Commander
 }
 
 // NewLedDriver return a new LedDriver  given a PwmDigitalWriter, name and pin.
@@ -19,13 +22,11 @@ type LedDriver struct {
 //	"Off" - See LedDriver.Off
 func NewLedDriver(a PwmDigitalWriter, name string, pin string) *LedDriver {
 	l := &LedDriver{
-		Driver: *gobot.NewDriver(
-			name,
-			"LedDriver",
-			pin,
-			a.(gobot.AdaptorInterface),
-		),
-		high: false,
+		name:       name,
+		pin:        pin,
+		connection: a.(gobot.Connection),
+		high:       false,
+		Commander:  gobot.NewCommander(),
 	}
 
 	l.AddCommand("Brightness", func(params map[string]interface{}) interface{} {
@@ -49,7 +50,7 @@ func NewLedDriver(a PwmDigitalWriter, name string, pin string) *LedDriver {
 }
 
 func (l *LedDriver) adaptor() PwmDigitalWriter {
-	return l.Adaptor().(PwmDigitalWriter)
+	return l.Connection().(PwmDigitalWriter)
 }
 
 // Start starts the LedDriver. Returns true on successful start of the driver
@@ -57,6 +58,10 @@ func (l *LedDriver) Start() (errs []error) { return }
 
 // Halt halts the LedDriver. Returns true on successful halt of the driver
 func (l *LedDriver) Halt() (errs []error) { return }
+
+func (l *LedDriver) Name() string                 { return l.name }
+func (l *LedDriver) Pin() string                  { return l.pin }
+func (l *LedDriver) Connection() gobot.Connection { return l.connection }
 
 // State return true if the led is On and false if the led is Off
 func (l *LedDriver) State() bool {

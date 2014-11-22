@@ -1,15 +1,21 @@
 package gpio
 
 import (
-	"github.com/hybridgroup/gobot"
 	"time"
+
+	"github.com/hybridgroup/gobot"
 )
 
-var _ gobot.DriverInterface = (*AnalogSensorDriver)(nil)
+var _ gobot.Driver = (*AnalogSensorDriver)(nil)
 
 // Represents an Analog Sensor
 type AnalogSensorDriver struct {
-	gobot.Driver
+	name       string
+	pin        string
+	interval   time.Duration
+	connection gobot.Connection
+	gobot.Eventer
+	gobot.Commander
 }
 
 // NewAnalogSensorDriver returns a new AnalogSensorDriver given an AnalogReader, name and pin.
@@ -18,12 +24,12 @@ type AnalogSensorDriver struct {
 // 	"Read" - See AnalogSensor.Read
 func NewAnalogSensorDriver(a AnalogReader, name string, pin string) *AnalogSensorDriver {
 	d := &AnalogSensorDriver{
-		Driver: *gobot.NewDriver(
-			name,
-			"AnalogSensorDriver",
-			a.(gobot.AdaptorInterface),
-			pin,
-		),
+		name:       name,
+		connection: a.(gobot.Connection),
+		pin:        pin,
+		Eventer:    gobot.NewEventer(),
+		Commander:  gobot.NewCommander(),
+		interval:   10 * time.Millisecond,
 	}
 
 	d.AddEvent("data")
@@ -36,8 +42,8 @@ func NewAnalogSensorDriver(a AnalogReader, name string, pin string) *AnalogSenso
 	return d
 }
 
-func (a *AnalogSensorDriver) adaptor() AnalogReader {
-	return a.Adaptor().(AnalogReader)
+func (a *AnalogSensorDriver) conn() AnalogReader {
+	return a.Connection().(AnalogReader)
 }
 
 // Starts the AnalogSensorDriver and reads the Analog Sensor at the given Driver.Interval().
@@ -55,16 +61,19 @@ func (a *AnalogSensorDriver) Start() (errs []error) {
 				value = newValue
 				gobot.Publish(a.Event("data"), value)
 			}
-			<-time.After(a.Interval())
+			<-time.After(a.interval)
 		}
 	}()
 	return
 }
 
 // Halt returns true on a successful halt of the driver
-func (a *AnalogSensorDriver) Halt() (errs []error) { return }
+func (a *AnalogSensorDriver) Halt() (errs []error)         { return }
+func (a *AnalogSensorDriver) Name() string                 { return a.name }
+func (a *AnalogSensorDriver) Pin() string                  { return a.pin }
+func (a *AnalogSensorDriver) Connection() gobot.Connection { return a.connection }
 
 // Read returns the current reading from the Analog Sensor
 func (a *AnalogSensorDriver) Read() (val int, err error) {
-	return a.adaptor().AnalogRead(a.Pin())
+	return a.conn().AnalogRead(a.Pin())
 }
