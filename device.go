@@ -52,9 +52,11 @@ func (d *devices) Start() (errs []error) {
 	log.Println("Starting devices...")
 	for _, device := range *d {
 		info := "Starting device " + device.Name()
-		if device.Pin() != "" {
-			info = info + " on pin " + device.Pin()
+
+		if piner, ok := device.(Piner); ok {
+			info = info + " on pin " + piner.Pin()
 		}
+
 		log.Println(info + "...")
 		if errs = device.Start(); len(errs) > 0 {
 			for i, err := range errs {
