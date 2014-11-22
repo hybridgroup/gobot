@@ -11,10 +11,11 @@ import (
 	"github.com/tarm/goserial"
 )
 
-var _ gobot.AdaptorInterface = (*FirmataAdaptor)(nil)
+var _ gobot.Adaptor = (*FirmataAdaptor)(nil)
 
 type FirmataAdaptor struct {
-	gobot.Adaptor
+	name       string
+	port       string
 	board      *board
 	i2cAddress byte
 	connect    func(*FirmataAdaptor) (err error)
@@ -43,11 +44,8 @@ func NewFirmataAdaptor(name string, args ...interface{}) *FirmataAdaptor {
 	}
 
 	return &FirmataAdaptor{
-		Adaptor: *gobot.NewAdaptor(
-			name,
-			"FirmataAdaptor",
-			port,
-		),
+		name: name,
+		port: port,
 		connect: func(f *FirmataAdaptor) (err error) {
 			if conn == nil {
 				conn, err = serial.OpenPort(&serial.Config{Name: f.Port(), Baud: 57600})
@@ -67,7 +65,6 @@ func (f *FirmataAdaptor) Connect() (errs []error) {
 		return []error{err}
 	}
 	f.board.connect()
-	f.SetConnected(true)
 	return
 }
 
@@ -87,6 +84,9 @@ func (f *FirmataAdaptor) Finalize() (errs []error) {
 	}
 	return
 }
+
+func (f *FirmataAdaptor) Port() string { return f.port }
+func (f *FirmataAdaptor) Name() string { return f.name }
 
 // InitServo (not yet implemented)
 func (f *FirmataAdaptor) InitServo() (err error) {
