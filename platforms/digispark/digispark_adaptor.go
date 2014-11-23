@@ -8,10 +8,10 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
-var _ gobot.AdaptorInterface = (*DigisparkAdaptor)(nil)
+var _ gobot.Adaptor = (*DigisparkAdaptor)(nil)
 
 type DigisparkAdaptor struct {
-	gobot.Adaptor
+	name       string
 	littleWire lw
 	servo      bool
 	pwm        bool
@@ -21,10 +21,7 @@ type DigisparkAdaptor struct {
 // NewDigisparkAdaptor create a Digispark adaptor with specified name
 func NewDigisparkAdaptor(name string) *DigisparkAdaptor {
 	return &DigisparkAdaptor{
-		Adaptor: *gobot.NewAdaptor(
-			name,
-			"DigisparkAdaptor",
-		),
+		name: name,
 		connect: func(d *DigisparkAdaptor) (err error) {
 			d.littleWire = littleWireConnect()
 			if d.littleWire.(*littleWire).lwHandle == nil {
@@ -34,6 +31,8 @@ func NewDigisparkAdaptor(name string) *DigisparkAdaptor {
 		},
 	}
 }
+
+func (d *DigisparkAdaptor) Name() string { return d.name }
 
 // Connect starts connection to digispark, returns true if successful
 func (d *DigisparkAdaptor) Connect() (errs []error) {
