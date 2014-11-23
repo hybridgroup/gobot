@@ -11,10 +11,13 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
-var _ gobot.DriverInterface = (*JoystickDriver)(nil)
+var _ gobot.Driver = (*JoystickDriver)(nil)
 
 type JoystickDriver struct {
-	gobot.Driver
+	name       string
+	interval   time.Duration
+	connection gobot.Connection
+	gobot.Eventer
 	configPath string
 	config     joystickConfig
 	poll       func() sdl.Event
@@ -49,11 +52,9 @@ type joystickConfig struct {
 //     (button)_release - triggered when (button) is released
 func NewJoystickDriver(a *JoystickAdaptor, name string, config string) *JoystickDriver {
 	d := &JoystickDriver{
-		Driver: *gobot.NewDriver(
-			name,
-			"JoystickDriver",
-			a,
-		),
+		name:       name,
+		connection: a,
+		Eventer:    gobot.NewEventer(),
 		configPath: config,
 		poll: func() sdl.Event {
 			return sdl.PollEvent()
@@ -63,10 +64,12 @@ func NewJoystickDriver(a *JoystickAdaptor, name string, config string) *Joystick
 	d.AddEvent("error")
 	return d
 }
+func (j *JoystickDriver) Name() string                 { return j.name }
+func (j *JoystickDriver) Connection() gobot.Connection { return j.connection }
 
 // adaptor returns joystick adaptor
 func (j *JoystickDriver) adaptor() *JoystickAdaptor {
-	return j.Adaptor().(*JoystickAdaptor)
+	return j.Connection().(*JoystickAdaptor)
 }
 
 // Start initiallizes event polling with defined interval
@@ -99,7 +102,7 @@ func (j *JoystickDriver) Start() (errs []error) {
 					gobot.Publish(j.Event("error"), err)
 				}
 			}
-			<-time.After(j.Interval())
+			<-time.After(j.interval)
 		}
 	}()
 	return
