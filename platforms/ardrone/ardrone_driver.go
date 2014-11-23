@@ -4,31 +4,34 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
-var _ gobot.DriverInterface = (*ArdroneDriver)(nil)
+var _ gobot.Driver = (*ArdroneDriver)(nil)
 
 type ArdroneDriver struct {
-	gobot.Driver
+	name       string
+	connection gobot.Connection
+	gobot.Eventer
 }
 
 // NewArdroneDriver creates an ArdroneDriver with specified name.
 //
 // It add the following events:
 //     'flying' - Sent when the device has taken off.
-func NewArdroneDriver(adaptor *ArdroneAdaptor, name string) *ArdroneDriver {
+func NewArdroneDriver(connection *ArdroneAdaptor, name string) *ArdroneDriver {
 	d := &ArdroneDriver{
-		Driver: *gobot.NewDriver(
-			name,
-			"ArdroneDriver",
-			adaptor,
-		),
+		name:       name,
+		connection: connection,
+		Eventer:    gobot.NewEventer(),
 	}
 	d.AddEvent("flying")
 	return d
 }
 
+func (a *ArdroneDriver) Name() string                 { return a.name }
+func (a *ArdroneDriver) Connection() gobot.Connection { return a.connection }
+
 // adaptor returns ardrone adaptor
 func (a *ArdroneDriver) adaptor() *ArdroneAdaptor {
-	return a.Adaptor().(*ArdroneAdaptor)
+	return a.Connection().(*ArdroneAdaptor)
 }
 
 // Start returns true if driver is started succesfully

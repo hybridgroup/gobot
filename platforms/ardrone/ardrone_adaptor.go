@@ -5,7 +5,7 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
-var _ gobot.AdaptorInterface = (*ArdroneAdaptor)(nil)
+var _ gobot.Adaptor = (*ArdroneAdaptor)(nil)
 
 // drone defines expected drone behaviour
 type drone interface {
@@ -23,7 +23,7 @@ type drone interface {
 }
 
 type ArdroneAdaptor struct {
-	gobot.Adaptor
+	name    string
 	drone   drone
 	connect func(*ArdroneAdaptor) (err error)
 }
@@ -31,10 +31,7 @@ type ArdroneAdaptor struct {
 // NewArdroneAdaptor creates a new ardrone and connects with default configuration
 func NewArdroneAdaptor(name string, v ...string) *ArdroneAdaptor {
 	return &ArdroneAdaptor{
-		Adaptor: *gobot.NewAdaptor(
-			name,
-			"ArdroneAdaptor",
-		),
+		name: name,
 		connect: func(a *ArdroneAdaptor) (err error) {
 			config := client.DefaultConfig()
 			if len(v) > 0 {
@@ -50,6 +47,8 @@ func NewArdroneAdaptor(name string, v ...string) *ArdroneAdaptor {
 	}
 }
 
+func (a *ArdroneAdaptor) Name() string { return a.name }
+
 // Connect returns true when connection to ardrone is established correclty
 func (a *ArdroneAdaptor) Connect() (errs []error) {
 	if err := a.connect(a); err != nil {
@@ -59,6 +58,4 @@ func (a *ArdroneAdaptor) Connect() (errs []error) {
 }
 
 // Finalize returns true when connection is finalized correctly
-func (a *ArdroneAdaptor) Finalize() (errs []error) {
-	return
-}
+func (a *ArdroneAdaptor) Finalize() (errs []error) { return }
