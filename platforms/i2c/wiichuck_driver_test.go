@@ -21,7 +21,7 @@ func initTestWiichuckDriverWithStubbedAdaptor() (*WiichuckDriver, *i2cTestAdapto
 // --------- TESTS
 func TestWiichuckDriver(t *testing.T) {
 	// Does it implement gobot.DriverInterface?
-	var _ gobot.DriverInterface = (*WiichuckDriver)(nil)
+	var _ gobot.Driver = (*WiichuckDriver)(nil)
 
 	// Does its adaptor implements the I2cInterface?
 	driver := initTestWiichuckDriver()
@@ -47,7 +47,7 @@ func TestWiichuckDriverStart(t *testing.T) {
 
 	numberOfCyclesForEvery := 3
 
-	wii.SetInterval(1 * time.Millisecond)
+	wii.interval = 1 * time.Millisecond
 	gobot.Assert(t, len(wii.Start()), 0)
 
 	go func() {

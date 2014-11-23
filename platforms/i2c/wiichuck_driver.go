@@ -2,14 +2,18 @@ package i2c
 
 import (
 	"errors"
+	"time"
 
 	"github.com/hybridgroup/gobot"
 )
 
-var _ gobot.DriverInterface = (*WiichuckDriver)(nil)
+var _ gobot.Driver = (*WiichuckDriver)(nil)
 
 type WiichuckDriver struct {
-	gobot.Driver
+	name       string
+	connection gobot.Connection
+	interval   time.Duration
+	gobot.Eventer
 	joystick map[string]float64
 	data     map[string]float64
 }
@@ -22,11 +26,10 @@ type WiichuckDriver struct {
 //	"joystick" - Get's triggered every "interval" amount of time if a joystick event occured, you can access values x, y
 func NewWiichuckDriver(a I2cInterface, name string) *WiichuckDriver {
 	w := &WiichuckDriver{
-		Driver: *gobot.NewDriver(
-			name,
-			"WiichuckDriver",
-			a.(gobot.AdaptorInterface),
-		),
+		name:       name,
+		connection: a.(gobot.Connection),
+		interval:   10 * time.Millisecond,
+		Eventer:    gobot.NewEventer(),
 		joystick: map[string]float64{
 			"sy_origin": -1,
 			"sx_origin": -1,
@@ -44,10 +47,12 @@ func NewWiichuckDriver(a I2cInterface, name string) *WiichuckDriver {
 	w.AddEvent("joystick")
 	return w
 }
+func (w *WiichuckDriver) Name() string                 { return w.name }
+func (w *WiichuckDriver) Connection() gobot.Connection { return w.connection }
 
 // adaptor returns i2c interface adaptor
 func (w *WiichuckDriver) adaptor() I2cInterface {
-	return w.Adaptor().(I2cInterface)
+	return w.Connection().(I2cInterface)
 }
 
 // Start initilizes i2c and reads from adaptor
@@ -56,7 +61,7 @@ func (w *WiichuckDriver) Start() (errs []error) {
 	if err := w.adaptor().I2cStart(0x52); err != nil {
 		return []error{err}
 	}
-	gobot.Every(w.Interval(), func() {
+	gobot.Every(w.interval, func() {
 		if err := w.adaptor().I2cWrite([]byte{0x40, 0x00}); err != nil {
 			gobot.Publish(w.Event("error"), err)
 			return

@@ -6,10 +6,12 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
-var _ gobot.DriverInterface = (*BlinkMDriver)(nil)
+var _ gobot.Driver = (*BlinkMDriver)(nil)
 
 type BlinkMDriver struct {
-	gobot.Driver
+	name       string
+	connection gobot.Connection
+	gobot.Commander
 }
 
 // NewBlinkMDriver creates a new BlinkMDriver with specified name.
@@ -21,11 +23,9 @@ type BlinkMDriver struct {
 //	Color - returns the color of the LED.
 func NewBlinkMDriver(a I2cInterface, name string) *BlinkMDriver {
 	b := &BlinkMDriver{
-		Driver: *gobot.NewDriver(
-			name,
-			"BlinkMDriver",
-			a.(gobot.AdaptorInterface),
-		),
+		name:       name,
+		connection: a.(gobot.Connection),
+		Commander:  gobot.NewCommander(),
 	}
 
 	b.AddCommand("Rgb", func(params map[string]interface{}) interface{} {
@@ -51,10 +51,12 @@ func NewBlinkMDriver(a I2cInterface, name string) *BlinkMDriver {
 
 	return b
 }
+func (b *BlinkMDriver) Name() string                 { return b.name }
+func (b *BlinkMDriver) Connection() gobot.Connection { return b.connection }
 
 // adaptor returns I2C adaptor
 func (b *BlinkMDriver) adaptor() I2cInterface {
-	return b.Adaptor().(I2cInterface)
+	return b.Connection().(I2cInterface)
 }
 
 // Start writes start bytes

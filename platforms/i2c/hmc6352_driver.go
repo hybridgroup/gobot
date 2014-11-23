@@ -6,26 +6,27 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
-var _ gobot.DriverInterface = (*HMC6352Driver)(nil)
+var _ gobot.Driver = (*HMC6352Driver)(nil)
 
 type HMC6352Driver struct {
-	gobot.Driver
+	name       string
+	connection gobot.Connection
 }
 
 // NewHMC6352Driver creates a new driver with specified name and i2c interface
 func NewHMC6352Driver(a I2cInterface, name string) *HMC6352Driver {
 	return &HMC6352Driver{
-		Driver: *gobot.NewDriver(
-			name,
-			"HMC6352Driver",
-			a.(gobot.AdaptorInterface),
-		),
+		name:       name,
+		connection: a.(gobot.Connection),
 	}
 }
 
+func (h *HMC6352Driver) Name() string                 { return h.name }
+func (h *HMC6352Driver) Connection() gobot.Connection { return h.connection }
+
 // adaptor returns HMC6352 adaptor
 func (h *HMC6352Driver) adaptor() I2cInterface {
-	return h.Adaptor().(I2cInterface)
+	return h.Connection().(I2cInterface)
 }
 
 // Start writes initialization bytes and reads from adaptor

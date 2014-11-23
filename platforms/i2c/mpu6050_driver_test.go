@@ -21,7 +21,7 @@ func initTestMPU6050DriverWithStubbedAdaptor() (*MPU6050Driver, *i2cTestAdaptor)
 
 func TestMPU6050Driver(t *testing.T) {
 	// Does it implement gobot.DriverInterface?
-	var _ gobot.DriverInterface = (*MPU6050Driver)(nil)
+	var _ gobot.Driver = (*MPU6050Driver)(nil)
 
 	// Does its adaptor implements the I2cInterface?
 	driver := initTestMPU6050Driver()

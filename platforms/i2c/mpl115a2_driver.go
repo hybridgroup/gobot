@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-var _ gobot.DriverInterface = (*MPL115A2Driver)(nil)
+var _ gobot.Driver = (*MPL115A2Driver)(nil)
 
 const MPL115A2_REGISTER_PRESSURE_MSB = 0x00
 const MPL115A2_REGISTER_PRESSURE_LSB = 0x01
@@ -25,7 +25,10 @@ const MPL115A2_REGISTER_C12_COEFF_LSB = 0x0B
 const MPL115A2_REGISTER_STARTCONVERSION = 0x12
 
 type MPL115A2Driver struct {
-	gobot.Driver
+	name       string
+	connection gobot.Connection
+	interval   time.Duration
+	gobot.Eventer
 	A0          float32
 	B1          float32
 	B2          float32
@@ -37,19 +40,21 @@ type MPL115A2Driver struct {
 // NewMPL115A2Driver creates a new driver with specified name and i2c interface
 func NewMPL115A2Driver(a I2cInterface, name string) *MPL115A2Driver {
 	m := &MPL115A2Driver{
-		Driver: *gobot.NewDriver(
-			name,
-			"MPL115A2Driver",
-			a.(gobot.AdaptorInterface),
-		),
+		name:       name,
+		connection: a.(gobot.Connection),
+		Eventer:    gobot.NewEventer(),
+		interval:   10 * time.Millisecond,
 	}
 	m.AddEvent("error")
 	return m
 }
 
+func (h *MPL115A2Driver) Name() string                 { return h.name }
+func (h *MPL115A2Driver) Connection() gobot.Connection { return h.connection }
+
 // adaptor returns MPL115A2 adaptor
 func (h *MPL115A2Driver) adaptor() I2cInterface {
-	return h.Adaptor().(I2cInterface)
+	return h.Connection().(I2cInterface)
 }
 
 // Start writes initialization bytes and reads from adaptor
@@ -63,7 +68,7 @@ func (h *MPL115A2Driver) Start() (errs []error) {
 		return
 	}
 
-	gobot.Every(h.Interval(), func() {
+	gobot.Every(h.interval, func() {
 		if err := h.adaptor().I2cWrite([]byte{MPL115A2_REGISTER_STARTCONVERSION, 0}); err != nil {
 			gobot.Publish(h.Event("error"), err)
 			return

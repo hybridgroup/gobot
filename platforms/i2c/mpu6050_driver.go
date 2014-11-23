@@ -3,10 +3,12 @@ package i2c
 import (
 	"bytes"
 	"encoding/binary"
+	"time"
+
 	"github.com/hybridgroup/gobot"
 )
 
-var _ gobot.DriverInterface = (*MPU6050Driver)(nil)
+var _ gobot.Driver = (*MPU6050Driver)(nil)
 
 const MPU6050_RA_ACCEL_XOUT_H = 0x3B
 const MPU6050_RA_PWR_MGMT_1 = 0x6B
@@ -30,7 +32,10 @@ type ThreeDData struct {
 }
 
 type MPU6050Driver struct {
-	gobot.Driver
+	name       string
+	connection gobot.Connection
+	interval   time.Duration
+	gobot.Eventer
 	Accelerometer ThreeDData
 	Gyroscope     ThreeDData
 	Temperature   int16
@@ -39,19 +44,21 @@ type MPU6050Driver struct {
 // NewMPU6050Driver creates a new driver with specified name and i2c interface
 func NewMPU6050Driver(a I2cInterface, name string) *MPU6050Driver {
 	m := &MPU6050Driver{
-		Driver: *gobot.NewDriver(
-			name,
-			"MPU6050Driver",
-			a.(gobot.AdaptorInterface),
-		),
+		name:       name,
+		connection: a.(gobot.Connection),
+		interval:   10 * time.Millisecond,
+		Eventer:    gobot.NewEventer(),
 	}
 	m.AddEvent("error")
 	return m
 }
 
+func (h *MPU6050Driver) Name() string                 { return h.name }
+func (h *MPU6050Driver) Connection() gobot.Connection { return h.connection }
+
 // adaptor returns MPU6050 adaptor
 func (h *MPU6050Driver) adaptor() I2cInterface {
-	return h.Adaptor().(I2cInterface)
+	return h.Connection().(I2cInterface)
 }
 
 // Start writes initialization bytes and reads from adaptor
@@ -61,7 +68,7 @@ func (h *MPU6050Driver) Start() (errs []error) {
 		return []error{err}
 	}
 
-	gobot.Every(h.Interval(), func() {
+	gobot.Every(h.interval, func() {
 		if err := h.adaptor().I2cWrite([]byte{MPU6050_RA_ACCEL_XOUT_H}); err != nil {
 			gobot.Publish(h.Event("error"), err)
 			return
