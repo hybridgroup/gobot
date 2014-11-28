@@ -1,14 +1,18 @@
 # Firmata
 
+Arduino is an open-source electronics prototyping platform based on flexible, easy-to-use hardware and software. It's intended for artists, designers, hobbyists and anyone interested in creating interactive objects or environments.
+
 This package provides the adaptor for microcontrollers such as Arduino that support the [Firmata](http://firmata.org/wiki/Main_Page) protocol
 
-## Getting Started
+For more info about the arduino platform click [here](http://arduino.cc/).
+
+## How to Install
 
 ```
 go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/firmata
 ```
 
-## Example
+## How to Use
 
 ```go
 package main

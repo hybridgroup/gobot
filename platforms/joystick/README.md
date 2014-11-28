@@ -1,8 +1,8 @@
 # Joystick
 
-This package provides the Gobot adaptor and drivers for the PS3 controller, Xbox 360 controller, or any other joysticks and game controllers that are compatible with [Simple DirectMedia Layer](http://www.libsdl.org/).
+You can use Gobot with a Dualshock3 game controller, an XBox360 game controller, or any other USB joystick or game controller that is compatible with [Simple DirectMedia Layer](http://www.libsdl.org/).
 
-## Getting Started
+## How to Install
 
 This package requires `sdl2` to be installed on your system
 
@@ -21,13 +21,15 @@ $ sudo apt-get install libsdl2-2.0-0
 ```
 
 Now you can install the package with
+
 ```
 go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/joystick
 ```
 
-## Usage
+## How to Use
 
 Controller configurations are stored in JSON format. Here's an example configuration file for the Dualshock 3 controller
+
 ```json
 {
     "name": "Sony PLAYSTATION(R)3 Controller",
@@ -123,7 +125,14 @@ Controller configurations are stored in JSON format. Here's an example configura
 }
 ```
 
+## How to Connect
+
+Plug your USB joystick or game controller into your USB port. If your device is supported by SDL, you are now ready.
+
 ## Examples
+
+This small program receives joystick and button press events from an PlayStation 3 game controller.
+
 ```go
 package main
 

@@ -1,8 +1,12 @@
 # Sphero
 
-This package provides the Gobot adaptor and driver for the [Sphero](http://www.gosphero.com/) robot from Orbotix .
+Sphero is a sophisticated and programmable robot housed in a polycarbonate sphere shell.
 
-## Installing
+The gobot-sphero adaptor makes it easy to interact with Sphero using Go, once you have your Sphero setup and connected to your computer you can start writing code to make Sphero move, change direction, speed and colors, or detect Sphero events and execute some code when they occur.
+
+Learn more about the Sphero robot from Orbotix [here](http://www.gosphero.com/).
+
+## How to Install
 ```
 go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/sphero
 ```
@@ -38,7 +42,9 @@ gort bluetooth connect <address>
 
 You should be able to pair your Sphero using your normal system tray applet for Bluetooth, and then connect to the COM port that is bound to the device, such as `COM3`.
 
-## Example
+## How to Use
+
+Example of a simple program that makes the Sphero roll.
 
 ```go
 package main
