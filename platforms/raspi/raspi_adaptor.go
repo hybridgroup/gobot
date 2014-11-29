@@ -13,7 +13,7 @@ import (
 	"github.com/hybridgroup/gobot/sysfs"
 )
 
-var _ gobot.AdaptorInterface = (*RaspiAdaptor)(nil)
+var _ gobot.Adaptor = (*RaspiAdaptor)(nil)
 
 var boardRevision = func() (string, string) {
 	cat, _ := exec.Command("cat", "/proc/cpuinfo").Output()
@@ -46,7 +46,7 @@ var boardRevision = func() (string, string) {
 }
 
 type RaspiAdaptor struct {
-	gobot.Adaptor
+	name        string
 	revision    string
 	i2cLocation string
 	digitalPins map[int]sysfs.DigitalPin
@@ -143,10 +143,7 @@ var pins = map[string]map[string]int{
 // NewRaspiAdaptor creates a RaspiAdaptor with specified name and
 func NewRaspiAdaptor(name string) *RaspiAdaptor {
 	r := &RaspiAdaptor{
-		Adaptor: *gobot.NewAdaptor(
-			name,
-			"RaspiAdaptor",
-		),
+		name:        name,
 		digitalPins: make(map[int]sysfs.DigitalPin),
 	}
 	rev, i2cLoc := boardRevision()
@@ -154,6 +151,7 @@ func NewRaspiAdaptor(name string) *RaspiAdaptor {
 	r.i2cLocation = i2cLoc
 	return r
 }
+func (r *RaspiAdaptor) Name() string { return r.name }
 
 // Connect starts conection with board and creates
 // digitalPins and pwmPins adaptor maps
