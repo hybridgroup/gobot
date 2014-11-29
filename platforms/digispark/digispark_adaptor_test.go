@@ -66,8 +66,6 @@ func TestDigisparkAdaptorFinalize(t *testing.T) {
 
 func TestDigisparkAdaptorIO(t *testing.T) {
 	a := initTestDigisparkAdaptor()
-	a.InitServo()
-	a.DigitalRead("1")
 	a.DigitalWrite("0", uint8(1))
 	gobot.Assert(t, a.littleWire.(*mock).pin, uint8(0))
 	gobot.Assert(t, a.littleWire.(*mock).state, uint8(1))

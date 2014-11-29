@@ -60,18 +60,6 @@ func TestBeagleboneAdaptor(t *testing.T) {
 		"156862",
 	)
 
-	a.AnalogWrite("P9_14", 175)
-	gobot.Assert(
-		t,
-		fs.Files["/sys/devices/ocp.3/pwm_test_P9_14.5/period"].Contents,
-		"500000",
-	)
-	gobot.Assert(
-		t,
-		fs.Files["/sys/devices/ocp.3/pwm_test_P9_14.5/duty"].Contents,
-		"156862",
-	)
-
 	a.ServoWrite("P9_14", 100)
 	gobot.Assert(
 		t,
@@ -117,7 +105,4 @@ func TestBeagleboneAdaptor(t *testing.T) {
 	gobot.Assert(t, data, []byte{0x00, 0x01})
 
 	gobot.Assert(t, len(a.Finalize()), 0)
-
-	gobot.Assert(t, a.InitServo(), errors.New("InitServo is not yet implemented"))
-
 }
