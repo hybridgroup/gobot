@@ -24,7 +24,7 @@ type WiichuckDriver struct {
 //	"z"- Get's triggered every interval amount of time if the z button is pressed
 //	"c" - Get's triggered every interval amount of time if the c button is pressed
 //	"joystick" - Get's triggered every "interval" amount of time if a joystick event occured, you can access values x, y
-func NewWiichuckDriver(a I2cInterface, name string) *WiichuckDriver {
+func NewWiichuckDriver(a I2cInterface, name string, v ...time.Duration) *WiichuckDriver {
 	w := &WiichuckDriver{
 		name:       name,
 		connection: a.(gobot.Connection),
@@ -40,6 +40,10 @@ func NewWiichuckDriver(a I2cInterface, name string) *WiichuckDriver {
 			"z":  0,
 			"c":  0,
 		},
+	}
+
+	if len(v) > 0 {
+		w.interval = v[0]
 	}
 
 	w.AddEvent("z")

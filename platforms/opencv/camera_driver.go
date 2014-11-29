@@ -22,7 +22,7 @@ type CameraDriver struct {
 
 // NewCameraDriver creates a new driver with specified name and source.
 // It also creates a start function to either set camera as a File or Camera capture.
-func NewCameraDriver(name string, source interface{}) *CameraDriver {
+func NewCameraDriver(name string, source interface{}, v ...time.Duration) *CameraDriver {
 	c := &CameraDriver{
 		name:     name,
 		Eventer:  gobot.NewEventer(),
@@ -39,6 +39,10 @@ func NewCameraDriver(name string, source interface{}) *CameraDriver {
 			}
 			return
 		},
+	}
+
+	if len(v) > 0 {
+		c.interval = v[0]
 	}
 
 	c.AddEvent("frame")

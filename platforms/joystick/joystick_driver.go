@@ -17,10 +17,10 @@ type JoystickDriver struct {
 	name       string
 	interval   time.Duration
 	connection gobot.Connection
-	gobot.Eventer
 	configPath string
 	config     joystickConfig
 	poll       func() sdl.Event
+	gobot.Eventer
 }
 
 // pair is a JSON representation of name and id
@@ -50,7 +50,7 @@ type joystickConfig struct {
 // It adds the following events:
 //     (button)_press - triggered when (button) is pressed
 //     (button)_release - triggered when (button) is released
-func NewJoystickDriver(a *JoystickAdaptor, name string, config string) *JoystickDriver {
+func NewJoystickDriver(a *JoystickAdaptor, name string, config string, v ...time.Duration) *JoystickDriver {
 	d := &JoystickDriver{
 		name:       name,
 		connection: a,
@@ -59,6 +59,11 @@ func NewJoystickDriver(a *JoystickAdaptor, name string, config string) *Joystick
 		poll: func() sdl.Event {
 			return sdl.PollEvent()
 		},
+		interval: 10 * time.Millisecond,
+	}
+
+	if len(v) > 0 {
+		d.interval = v[0]
 	}
 
 	d.AddEvent("error")

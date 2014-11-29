@@ -29,8 +29,7 @@ func (h *HMC6352Driver) adaptor() I2cInterface {
 	return h.Connection().(I2cInterface)
 }
 
-// Start writes initialization bytes and reads from adaptor
-// using specified interval to update Heading
+// Start initialized the hmc6352
 func (h *HMC6352Driver) Start() (errs []error) {
 	if err := h.adaptor().I2cStart(0x21); err != nil {
 		return []error{err}

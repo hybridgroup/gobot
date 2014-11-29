@@ -32,23 +32,28 @@ type ThreeDData struct {
 }
 
 type MPU6050Driver struct {
-	name       string
-	connection gobot.Connection
-	interval   time.Duration
-	gobot.Eventer
+	name          string
+	connection    gobot.Connection
+	interval      time.Duration
 	Accelerometer ThreeDData
 	Gyroscope     ThreeDData
 	Temperature   int16
+	gobot.Eventer
 }
 
 // NewMPU6050Driver creates a new driver with specified name and i2c interface
-func NewMPU6050Driver(a I2cInterface, name string) *MPU6050Driver {
+func NewMPU6050Driver(a I2cInterface, name string, v ...time.Duration) *MPU6050Driver {
 	m := &MPU6050Driver{
 		name:       name,
 		connection: a.(gobot.Connection),
 		interval:   10 * time.Millisecond,
 		Eventer:    gobot.NewEventer(),
 	}
+
+	if len(v) > 0 {
+		m.interval = v[0]
+	}
+
 	m.AddEvent("error")
 	return m
 }

@@ -22,7 +22,7 @@ type AnalogSensorDriver struct {
 //
 // Adds the following API Commands:
 // 	"Read" - See AnalogSensor.Read
-func NewAnalogSensorDriver(a AnalogReader, name string, pin string) *AnalogSensorDriver {
+func NewAnalogSensorDriver(a AnalogReader, name string, pin string, v ...time.Duration) *AnalogSensorDriver {
 	d := &AnalogSensorDriver{
 		name:       name,
 		connection: a.(gobot.Connection),
@@ -30,6 +30,10 @@ func NewAnalogSensorDriver(a AnalogReader, name string, pin string) *AnalogSenso
 		Eventer:    gobot.NewEventer(),
 		Commander:  gobot.NewCommander(),
 		interval:   10 * time.Millisecond,
+	}
+
+	if len(v) > 0 {
+		d.interval = v[0]
 	}
 
 	d.AddEvent("data")

@@ -24,12 +24,16 @@ type MavlinkInterface interface {
 // It add the following events:
 //	"packet" - triggered when a new packet is read
 //	"message" - triggered when a new valid message is processed
-func NewMavlinkDriver(a *MavlinkAdaptor, name string) *MavlinkDriver {
+func NewMavlinkDriver(a *MavlinkAdaptor, name string, v ...time.Duration) *MavlinkDriver {
 	m := &MavlinkDriver{
 		name:       name,
 		connection: a,
 		Eventer:    gobot.NewEventer(),
 		interval:   10 * time.Millisecond,
+	}
+
+	if len(v) > 0 {
+		m.interval = v[0]
 	}
 
 	m.AddEvent("packet")

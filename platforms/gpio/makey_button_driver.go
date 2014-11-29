@@ -20,7 +20,7 @@ type MakeyButtonDriver struct {
 }
 
 // NewMakeyButtonDriver returns a new MakeyButtonDriver given a DigitalRead, name and pin.
-func NewMakeyButtonDriver(a DigitalReader, name string, pin string) *MakeyButtonDriver {
+func NewMakeyButtonDriver(a DigitalReader, name string, pin string, v ...time.Duration) *MakeyButtonDriver {
 	m := &MakeyButtonDriver{
 		name:       name,
 		connection: a.(gobot.Connection),
@@ -28,6 +28,10 @@ func NewMakeyButtonDriver(a DigitalReader, name string, pin string) *MakeyButton
 		Active:     false,
 		Eventer:    gobot.NewEventer(),
 		interval:   10 * time.Millisecond,
+	}
+
+	if len(v) > 0 {
+		m.interval = v[0]
 	}
 
 	m.AddEvent("error")
