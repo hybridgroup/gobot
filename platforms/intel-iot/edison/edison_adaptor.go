@@ -7,10 +7,19 @@ import (
 	"strconv"
 
 	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/platforms/gpio"
+	"github.com/hybridgroup/gobot/platforms/i2c"
 	"github.com/hybridgroup/gobot/sysfs"
 )
 
 var _ gobot.Adaptor = (*EdisonAdaptor)(nil)
+
+var _ gpio.DigitalReader = (*EdisonAdaptor)(nil)
+var _ gpio.DigitalWriter = (*EdisonAdaptor)(nil)
+var _ gpio.AnalogReader = (*EdisonAdaptor)(nil)
+var _ gpio.PwmWriter = (*EdisonAdaptor)(nil)
+
+var _ i2c.I2c = (*EdisonAdaptor)(nil)
 
 func writeFile(path string, data []byte) (i int, err error) {
 	file, err := sysfs.OpenFile(path, os.O_WRONLY, 0644)
@@ -420,21 +429,6 @@ func (e *EdisonAdaptor) PwmWrite(pin string, val byte) (err error) {
 		return e.pwmPins[sysPin.pwmPin].writeDuty(strconv.Itoa(int(float64(period) * duty)))
 	}
 	return errors.New("Not a PWM pin")
-}
-
-// AnalogWrite Not Implemented
-func (e *EdisonAdaptor) AnalogWrite(string, byte) (err error) {
-	return errors.New("AnalogWrite is not yet implemented")
-}
-
-// InitServo Not Implemented
-func (e *EdisonAdaptor) InitServo() (err error) {
-	return errors.New("InitServo is not yet implemented")
-}
-
-// ServoWrite Not Implemented
-func (e *EdisonAdaptor) ServoWrite(string, byte) (err error) {
-	return errors.New("ServoWrite is not yet implemented")
 }
 
 // AnalogRead returns value from analog reading of specified pin

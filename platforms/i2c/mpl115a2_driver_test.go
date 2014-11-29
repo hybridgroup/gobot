@@ -19,15 +19,6 @@ func initTestMPL115A2DriverWithStubbedAdaptor() (*MPL115A2Driver, *i2cTestAdapto
 
 // --------- TESTS
 
-func TestMPL115A2DriverDriver(t *testing.T) {
-	// Does it implement gobot.DriverInterface?
-	var _ gobot.Driver = (*MPL115A2Driver)(nil)
-
-	// Does its adaptor implements the I2cInterface?
-	driver := initTestMPL115A2Driver()
-	var _ I2cInterface = driver.adaptor()
-}
-
 func TestNewMPL115A2Driver(t *testing.T) {
 	// Does it return a pointer to an instance of MPL115A2Driver?
 	var mpl interface{} = NewMPL115A2Driver(newI2cTestAdaptor("adaptor"), "bot")

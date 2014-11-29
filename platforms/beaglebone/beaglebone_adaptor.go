@@ -11,10 +11,20 @@ import (
 	"strings"
 
 	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/platforms/gpio"
+	"github.com/hybridgroup/gobot/platforms/i2c"
 	"github.com/hybridgroup/gobot/sysfs"
 )
 
 var _ gobot.Adaptor = (*BeagleboneAdaptor)(nil)
+
+var _ gpio.DigitalReader = (*BeagleboneAdaptor)(nil)
+var _ gpio.DigitalWriter = (*BeagleboneAdaptor)(nil)
+var _ gpio.AnalogReader = (*BeagleboneAdaptor)(nil)
+var _ gpio.PwmWriter = (*BeagleboneAdaptor)(nil)
+var _ gpio.ServoWriter = (*BeagleboneAdaptor)(nil)
+
+var _ i2c.I2c = (*BeagleboneAdaptor)(nil)
 
 var slots = "/sys/devices/bone_capemgr.*"
 var ocp = "/sys/devices/ocp.*"
@@ -190,11 +200,6 @@ func (b *BeagleboneAdaptor) PwmWrite(pin string, val byte) (err error) {
 	return b.pwmWrite(pin, val)
 }
 
-// InitServo starts servo (not yet implemented)
-func (b *BeagleboneAdaptor) InitServo() (err error) {
-	return errors.New("InitServo is not yet implemented")
-}
-
 // ServoWrite writes scaled value to servo in specified pin
 func (b *BeagleboneAdaptor) ServoWrite(pin string, val byte) (err error) {
 	i, err := b.pwmPin(pin)
@@ -255,11 +260,6 @@ func (b *BeagleboneAdaptor) AnalogRead(pin string) (val int, err error) {
 
 	val, _ = strconv.Atoi(strings.Split(string(buf), "\n")[0])
 	return
-}
-
-// AnalogWrite writes an analog value to specified pin
-func (b *BeagleboneAdaptor) AnalogWrite(pin string, val byte) (err error) {
-	return b.pwmWrite(pin, val)
 }
 
 // I2cStart starts a i2c device in specified address

@@ -48,11 +48,6 @@ func TestFirmataAdaptorConnect(t *testing.T) {
 	gobot.Assert(t, a.connect(a), nil)
 }
 
-func TestFirmataAdaptorInitServo(t *testing.T) {
-	a := initTestFirmataAdaptor()
-	a.InitServo()
-}
-
 func TestFirmataAdaptorServoWrite(t *testing.T) {
 	a := initTestFirmataAdaptor()
 	a.ServoWrite("1", 50)
@@ -106,10 +101,7 @@ func TestFirmataAdaptorAnalogRead(t *testing.T) {
 	val, _ = a.AnalogRead(pinNumber)
 	gobot.Assert(t, val, 133)
 }
-func TestFirmataAdaptorAnalogWrite(t *testing.T) {
-	a := initTestFirmataAdaptor()
-	a.AnalogWrite("1", 50)
-}
+
 func TestFirmataAdaptorI2cStart(t *testing.T) {
 	a := initTestFirmataAdaptor()
 	a.I2cStart(0x00)

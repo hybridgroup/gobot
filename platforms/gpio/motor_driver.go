@@ -9,7 +9,7 @@ var _ gobot.Driver = (*MotorDriver)(nil)
 // Represents a Motor
 type MotorDriver struct {
 	name             string
-	connection       gobot.Connection
+	connection       DigitalWriter
 	SpeedPin         string
 	SwitchPin        string
 	DirectionPin     string
@@ -21,11 +21,11 @@ type MotorDriver struct {
 	CurrentDirection string
 }
 
-// NewMotorDriver return a new MotorDriver given a PwmDigitalWriter, name and pin
-func NewMotorDriver(a PwmDigitalWriter, name string) *MotorDriver {
+// NewMotorDriver return a new MotorDriver given a DigitalWriter, name and pin
+func NewMotorDriver(a DigitalWriter, name string) *MotorDriver {
 	return &MotorDriver{
 		name:             name,
-		connection:       a.(gobot.Adaptor),
+		connection:       a,
 		CurrentState:     0,
 		CurrentSpeed:     0,
 		CurrentMode:      "digital",
@@ -34,11 +34,7 @@ func NewMotorDriver(a PwmDigitalWriter, name string) *MotorDriver {
 }
 
 func (m *MotorDriver) Name() string                 { return m.name }
-func (m *MotorDriver) Connection() gobot.Connection { return m.connection }
-
-func (m *MotorDriver) adaptor() PwmDigitalWriter {
-	return m.Connection().(PwmDigitalWriter)
-}
+func (m *MotorDriver) Connection() gobot.Connection { return m.connection.(gobot.Connection) }
 
 // Start starts the MotorDriver. Returns true on successful start of the driver
 func (m *MotorDriver) Start() (errs []error) { return }
@@ -104,9 +100,12 @@ func (m *MotorDriver) Toggle() (err error) {
 
 // Speed sets the speed of the motor
 func (m *MotorDriver) Speed(value byte) (err error) {
-	m.CurrentMode = "analog"
-	m.CurrentSpeed = value
-	return m.adaptor().PwmWrite(m.SpeedPin, value)
+	if writer, ok := m.connection.(PwmWriter); ok {
+		m.CurrentMode = "analog"
+		m.CurrentSpeed = value
+		return writer.PwmWrite(m.SpeedPin, value)
+	}
+	return ErrPwmWriteUnsupported
 }
 
 // Forward sets the forward pin to the specified speed
@@ -145,7 +144,7 @@ func (m *MotorDriver) Direction(direction string) (err error) {
 		} else {
 			level = 0
 		}
-		err = m.adaptor().DigitalWrite(m.DirectionPin, level)
+		err = m.connection.DigitalWrite(m.DirectionPin, level)
 	} else {
 		var forwardLevel, backwardLevel byte
 		switch direction {
@@ -159,11 +158,11 @@ func (m *MotorDriver) Direction(direction string) (err error) {
 			forwardLevel = 0
 			backwardLevel = 0
 		}
-		err = m.adaptor().DigitalWrite(m.ForwardPin, forwardLevel)
+		err = m.connection.DigitalWrite(m.ForwardPin, forwardLevel)
 		if err != nil {
 			return
 		}
-		err = m.adaptor().DigitalWrite(m.BackwardPin, backwardLevel)
+		err = m.connection.DigitalWrite(m.BackwardPin, backwardLevel)
 		if err != nil {
 			return
 		}
@@ -201,7 +200,7 @@ func (m *MotorDriver) changeState(state byte) (err error) {
 			err = m.Direction("none")
 		}
 	} else {
-		err = m.adaptor().DigitalWrite(m.SpeedPin, state)
+		err = m.connection.DigitalWrite(m.SpeedPin, state)
 	}
 
 	return

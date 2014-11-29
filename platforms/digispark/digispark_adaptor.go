@@ -6,9 +6,14 @@ import (
 	"strconv"
 
 	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/platforms/gpio"
 )
 
 var _ gobot.Adaptor = (*DigisparkAdaptor)(nil)
+
+var _ gpio.DigitalWriter = (*DigisparkAdaptor)(nil)
+var _ gpio.PwmWriter = (*DigisparkAdaptor)(nil)
+var _ gpio.ServoWriter = (*DigisparkAdaptor)(nil)
 
 type DigisparkAdaptor struct {
 	name       string
@@ -61,12 +66,6 @@ func (d *DigisparkAdaptor) DigitalWrite(pin string, level byte) (err error) {
 	return
 }
 
-// DigitalRead (not yet implemented)
-func (d *DigisparkAdaptor) DigitalRead(pin string) (val int, err error) {
-	err = errors.New("DigitalRead is not yet implemented")
-	return
-}
-
 // PwmWrite updates pwm pin with sent value
 func (d *DigisparkAdaptor) PwmWrite(pin string, value byte) (err error) {
 	if d.pwm == false {
@@ -82,11 +81,6 @@ func (d *DigisparkAdaptor) PwmWrite(pin string, value byte) (err error) {
 	}
 	err = d.littleWire.pwmUpdateCompare(value, value)
 	return
-}
-
-// InitServo (not yet implemented)
-func (d *DigisparkAdaptor) InitServo() (err error) {
-	return errors.New("InitServo is not yet implemented")
 }
 
 // ServoWrite updates servo location with specified angle

@@ -139,10 +139,3 @@ func TestEdisonAdaptorAnalog(t *testing.T) {
 	i, _ := a.AnalogRead("0")
 	gobot.Assert(t, i, 1000)
 }
-
-func TestEdisonAdaptorNotImplemented(t *testing.T) {
-	a, _ := initTestEdisonAdaptor()
-	gobot.Assert(t, a.AnalogWrite("", 100), errors.New("AnalogWrite is not yet implemented"))
-	gobot.Assert(t, a.InitServo(), errors.New("InitServo is not yet implemented"))
-	gobot.Assert(t, a.ServoWrite("", 100), errors.New("ServoWrite is not yet implemented"))
-}

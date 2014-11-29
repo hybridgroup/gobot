@@ -33,7 +33,7 @@ type ThreeDData struct {
 
 type MPU6050Driver struct {
 	name          string
-	connection    gobot.Connection
+	connection    I2c
 	interval      time.Duration
 	Accelerometer ThreeDData
 	Gyroscope     ThreeDData
@@ -42,10 +42,10 @@ type MPU6050Driver struct {
 }
 
 // NewMPU6050Driver creates a new driver with specified name and i2c interface
-func NewMPU6050Driver(a I2cInterface, name string, v ...time.Duration) *MPU6050Driver {
+func NewMPU6050Driver(a I2c, name string, v ...time.Duration) *MPU6050Driver {
 	m := &MPU6050Driver{
 		name:       name,
-		connection: a.(gobot.Connection),
+		connection: a,
 		interval:   10 * time.Millisecond,
 		Eventer:    gobot.NewEventer(),
 	}
@@ -54,17 +54,12 @@ func NewMPU6050Driver(a I2cInterface, name string, v ...time.Duration) *MPU6050D
 		m.interval = v[0]
 	}
 
-	m.AddEvent("error")
+	m.AddEvent(Error)
 	return m
 }
 
 func (h *MPU6050Driver) Name() string                 { return h.name }
-func (h *MPU6050Driver) Connection() gobot.Connection { return h.connection }
-
-// adaptor returns MPU6050 adaptor
-func (h *MPU6050Driver) adaptor() I2cInterface {
-	return h.Connection().(I2cInterface)
-}
+func (h *MPU6050Driver) Connection() gobot.Connection { return h.connection.(gobot.Connection) }
 
 // Start writes initialization bytes and reads from adaptor
 // using specified interval to accelerometer andtemperature data
@@ -74,14 +69,14 @@ func (h *MPU6050Driver) Start() (errs []error) {
 	}
 
 	gobot.Every(h.interval, func() {
-		if err := h.adaptor().I2cWrite([]byte{MPU6050_RA_ACCEL_XOUT_H}); err != nil {
-			gobot.Publish(h.Event("error"), err)
+		if err := h.connection.I2cWrite([]byte{MPU6050_RA_ACCEL_XOUT_H}); err != nil {
+			gobot.Publish(h.Event(Error), err)
 			return
 		}
 
-		ret, err := h.adaptor().I2cRead(14)
+		ret, err := h.connection.I2cRead(14)
 		if err != nil {
-			gobot.Publish(h.Event("error"), err)
+			gobot.Publish(h.Event(Error), err)
 			return
 		}
 		buf := bytes.NewBuffer(ret)
@@ -96,12 +91,12 @@ func (h *MPU6050Driver) Start() (errs []error) {
 func (h *MPU6050Driver) Halt() (errs []error) { return }
 
 func (h *MPU6050Driver) initialize() (err error) {
-	if err = h.adaptor().I2cStart(0x68); err != nil {
+	if err = h.connection.I2cStart(0x68); err != nil {
 		return
 	}
 
 	// setClockSource
-	if err = h.adaptor().I2cWrite([]byte{MPU6050_RA_PWR_MGMT_1,
+	if err = h.connection.I2cWrite([]byte{MPU6050_RA_PWR_MGMT_1,
 		MPU6050_PWR1_CLKSEL_BIT,
 		MPU6050_PWR1_CLKSEL_LENGTH,
 		MPU6050_CLOCK_PLL_XGYRO}); err != nil {
@@ -109,7 +104,7 @@ func (h *MPU6050Driver) initialize() (err error) {
 	}
 
 	// setFullScaleGyroRange
-	if err = h.adaptor().I2cWrite([]byte{MPU6050_GYRO_FS_250,
+	if err = h.connection.I2cWrite([]byte{MPU6050_GYRO_FS_250,
 		MPU6050_RA_GYRO_CONFIG,
 		MPU6050_GCONFIG_FS_SEL_LENGTH,
 		MPU6050_GCONFIG_FS_SEL_BIT}); err != nil {
@@ -117,7 +112,7 @@ func (h *MPU6050Driver) initialize() (err error) {
 	}
 
 	// setFullScaleAccelRange
-	if err = h.adaptor().I2cWrite([]byte{MPU6050_RA_ACCEL_CONFIG,
+	if err = h.connection.I2cWrite([]byte{MPU6050_RA_ACCEL_CONFIG,
 		MPU6050_ACONFIG_AFS_SEL_BIT,
 		MPU6050_ACONFIG_AFS_SEL_LENGTH,
 		MPU6050_ACCEL_FS_2}); err != nil {
@@ -125,7 +120,7 @@ func (h *MPU6050Driver) initialize() (err error) {
 	}
 
 	// setSleepEnabled
-	if err = h.adaptor().I2cWrite([]byte{MPU6050_RA_PWR_MGMT_1,
+	if err = h.connection.I2cWrite([]byte{MPU6050_RA_PWR_MGMT_1,
 		MPU6050_PWR1_SLEEP_BIT,
 		0}); err != nil {
 		return

@@ -1,17 +1,26 @@
 package firmata
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"strconv"
 	"time"
 
 	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/platforms/gpio"
+	"github.com/hybridgroup/gobot/platforms/i2c"
 	"github.com/tarm/goserial"
 )
 
 var _ gobot.Adaptor = (*FirmataAdaptor)(nil)
+
+var _ gpio.DigitalReader = (*FirmataAdaptor)(nil)
+var _ gpio.DigitalWriter = (*FirmataAdaptor)(nil)
+var _ gpio.AnalogReader = (*FirmataAdaptor)(nil)
+var _ gpio.PwmWriter = (*FirmataAdaptor)(nil)
+var _ gpio.ServoWriter = (*FirmataAdaptor)(nil)
+
+var _ i2c.I2c = (*FirmataAdaptor)(nil)
 
 type FirmataAdaptor struct {
 	name       string
@@ -87,11 +96,6 @@ func (f *FirmataAdaptor) Finalize() (errs []error) {
 
 func (f *FirmataAdaptor) Port() string { return f.port }
 func (f *FirmataAdaptor) Name() string { return f.name }
-
-// InitServo (not yet implemented)
-func (f *FirmataAdaptor) InitServo() (err error) {
-	return errors.New("InitServo is not yet implemented")
-}
 
 // ServoWrite sets angle form 0 to 360 to specified servo pin
 func (f *FirmataAdaptor) ServoWrite(pin string, angle byte) (err error) {
@@ -203,11 +207,6 @@ func (f *FirmataAdaptor) AnalogRead(pin string) (val int, err error) {
 	case <-time.After(10 * time.Millisecond):
 	}
 	return -1, nil
-}
-
-// AnalogWrite writes value to ananlog pin
-func (f *FirmataAdaptor) AnalogWrite(pin string, level byte) (err error) {
-	return f.PwmWrite(pin, level)
 }
 
 // digitalPin converts pin number to digital mapping

@@ -20,15 +20,6 @@ func initTestHMC6352DriverWithStubbedAdaptor() (*HMC6352Driver, *i2cTestAdaptor)
 
 // --------- TESTS
 
-func TestHMC6352Driver(t *testing.T) {
-	// Does it implement gobot.DriverInterface?
-	var _ gobot.Driver = (*HMC6352Driver)(nil)
-
-	// Does its adaptor implements the I2cInterface?
-	driver := initTestHMC6352Driver()
-	var _ I2cInterface = driver.adaptor()
-}
-
 func TestNewHMC6352Driver(t *testing.T) {
 	// Does it return a pointer to an instance of HMC6352Driver?
 	var bm interface{} = NewHMC6352Driver(newI2cTestAdaptor("adaptor"), "bot")

@@ -37,11 +37,6 @@ func TestDirectPinDriverAnalogRead(t *testing.T) {
 	gobot.Assert(t, val, 99)
 }
 
-func TestDirectPinDriverAnalogWrite(t *testing.T) {
-	d := initTestDirectPinDriver()
-	d.AnalogWrite(100)
-}
-
 func TestDirectPinDriverPwmWrite(t *testing.T) {
 	d := initTestDirectPinDriver()
 	d.PwmWrite(100)

@@ -10,10 +10,17 @@ import (
 	"strings"
 
 	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/platforms/gpio"
+	"github.com/hybridgroup/gobot/platforms/i2c"
 	"github.com/hybridgroup/gobot/sysfs"
 )
 
 var _ gobot.Adaptor = (*RaspiAdaptor)(nil)
+
+var _ gpio.DigitalReader = (*RaspiAdaptor)(nil)
+var _ gpio.DigitalWriter = (*RaspiAdaptor)(nil)
+
+var _ i2c.I2c = (*RaspiAdaptor)(nil)
 
 var boardRevision = func() (string, string) {
 	cat, _ := exec.Command("cat", "/proc/cpuinfo").Output()
@@ -219,11 +226,6 @@ func (r *RaspiAdaptor) DigitalWrite(pin string, val byte) (err error) {
 		return err
 	}
 	return sysfsPin.Write(int(val))
-}
-
-// PwmWrite Not Implemented
-func (r *RaspiAdaptor) PwmWrite(pin string, val byte) (err error) {
-	return errors.New("PwmWrite is not yet implemented.")
 }
 
 // I2cStart starts a i2c device in specified address

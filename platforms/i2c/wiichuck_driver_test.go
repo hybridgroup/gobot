@@ -19,14 +19,6 @@ func initTestWiichuckDriverWithStubbedAdaptor() (*WiichuckDriver, *i2cTestAdapto
 }
 
 // --------- TESTS
-func TestWiichuckDriver(t *testing.T) {
-	// Does it implement gobot.DriverInterface?
-	var _ gobot.Driver = (*WiichuckDriver)(nil)
-
-	// Does its adaptor implements the I2cInterface?
-	driver := initTestWiichuckDriver()
-	var _ I2cInterface = driver.adaptor()
-}
 
 func TestNewWiichuckDriver(t *testing.T) {
 	// Does it return a pointer to an instance of WiichuckDriver?
@@ -94,7 +86,7 @@ func TestWiichuckDriverUpdate(t *testing.T) {
 	// - This should be done by WiichuckDriver.updateButtons
 	chann := make(chan bool)
 
-	gobot.On(wii.Event("c"), func(data interface{}) {
+	gobot.On(wii.Event(C), func(data interface{}) {
 		gobot.Assert(t, data, true)
 		chann <- true
 	})
@@ -103,7 +95,7 @@ func TestWiichuckDriverUpdate(t *testing.T) {
 	chann = make(chan bool)
 	wii.update(decryptedValue)
 
-	gobot.On(wii.Event("z"), func(data interface{}) {
+	gobot.On(wii.Event(Z), func(data interface{}) {
 		gobot.Assert(t, data, true)
 		chann <- true
 	})
@@ -118,7 +110,7 @@ func TestWiichuckDriverUpdate(t *testing.T) {
 		"y": float64(0),
 	}
 
-	gobot.On(wii.Event("joystick"), func(data interface{}) {
+	gobot.On(wii.Event(Joystick), func(data interface{}) {
 		gobot.Assert(t, data, expectedData)
 		chann <- true
 	})
@@ -250,7 +242,7 @@ func TestWiichuckDriverUpdateButtons(t *testing.T) {
 
 	wii.updateButtons()
 
-	gobot.On(wii.Event("c"), func(data interface{}) {
+	gobot.On(wii.Event(C), func(data interface{}) {
 		gobot.Assert(t, true, data)
 		chann <- true
 	})
@@ -264,7 +256,7 @@ func TestWiichuckDriverUpdateButtons(t *testing.T) {
 
 	wii.updateButtons()
 
-	gobot.On(wii.Event("z"), func(data interface{}) {
+	gobot.On(wii.Event(Z), func(data interface{}) {
 		gobot.Assert(t, true, data)
 		chann <- true
 	})
@@ -288,7 +280,7 @@ func TestWiichuckDriverUpdateJoystick(t *testing.T) {
 		"y": float64(50),
 	}
 
-	gobot.On(wii.Event("joystick"), func(data interface{}) {
+	gobot.On(wii.Event(Joystick), func(data interface{}) {
 		gobot.Assert(t, data, expectedData)
 		chann <- true
 	})
@@ -310,7 +302,7 @@ func TestWiichuckDriverUpdateJoystick(t *testing.T) {
 		"y": float64(7),
 	}
 
-	gobot.On(wii.Event("joystick"), func(data interface{}) {
+	gobot.On(wii.Event(Joystick), func(data interface{}) {
 		gobot.Assert(t, data, expectedData)
 		chann <- true
 	})
