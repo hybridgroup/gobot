@@ -10,7 +10,7 @@ import (
 	"github.com/hybridgroup/gobot/sysfs"
 )
 
-var _ gobot.AdaptorInterface = (*EdisonAdaptor)(nil)
+var _ gobot.Adaptor = (*EdisonAdaptor)(nil)
 
 func writeFile(path string, data []byte) (i int, err error) {
 	file, err := sysfs.OpenFile(path, os.O_WRONLY, 0644)
@@ -51,7 +51,7 @@ type sysfsPin struct {
 }
 
 type EdisonAdaptor struct {
-	gobot.Adaptor
+	name        string
 	tristate    sysfs.DigitalPin
 	digitalPins map[int]sysfs.DigitalPin
 	pwmPins     map[int]*pwmPin
@@ -184,10 +184,7 @@ func changePinMode(pin, mode string) (err error) {
 // creates connect function
 func NewEdisonAdaptor(name string) *EdisonAdaptor {
 	return &EdisonAdaptor{
-		Adaptor: *gobot.NewAdaptor(
-			name,
-			"EdisonAdaptor",
-		),
+		name: name,
 		connect: func(e *EdisonAdaptor) (err error) {
 			e.tristate = sysfs.NewDigitalPin(214)
 			if err = e.tristate.Export(); err != nil {
@@ -250,6 +247,8 @@ func NewEdisonAdaptor(name string) *EdisonAdaptor {
 		},
 	}
 }
+
+func (e *EdisonAdaptor) Name() string { return e.name }
 
 // Connect starts conection with board and creates
 // digitalPins and pwmPins adaptor maps

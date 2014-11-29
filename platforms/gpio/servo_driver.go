@@ -6,11 +6,14 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
-var _ gobot.DriverInterface = (*ServoDriver)(nil)
+var _ gobot.Driver = (*ServoDriver)(nil)
 
 // Represents a Servo
 type ServoDriver struct {
-	gobot.Driver
+	name       string
+	pin        string
+	connection gobot.Connection
+	gobot.Commander
 	CurrentAngle byte
 }
 
@@ -23,12 +26,10 @@ type ServoDriver struct {
 //	"Max" - See ServoDriver.Max
 func NewServoDriver(a Servo, name string, pin string) *ServoDriver {
 	s := &ServoDriver{
-		Driver: *gobot.NewDriver(
-			name,
-			"ServoDriver",
-			a.(gobot.AdaptorInterface),
-			pin,
-		),
+		name:         name,
+		connection:   a.(gobot.Connection),
+		pin:          pin,
+		Commander:    gobot.NewCommander(),
 		CurrentAngle: 0,
 	}
 
@@ -50,8 +51,11 @@ func NewServoDriver(a Servo, name string, pin string) *ServoDriver {
 
 }
 
+func (s *ServoDriver) Name() string                 { return s.name }
+func (s *ServoDriver) Pin() string                  { return s.pin }
+func (s *ServoDriver) Connection() gobot.Connection { return s.connection }
 func (s *ServoDriver) adaptor() Servo {
-	return s.Adaptor().(Servo)
+	return s.Connection().(Servo)
 }
 
 // Start starts the ServoDriver. Returns true on successful start of the driver.

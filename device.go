@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"reflect"
 )
 
 // JSONDevice is a JSON representation of a Gobot Device.
@@ -14,7 +15,23 @@ type JSONDevice struct {
 	Commands   []string `json:"commands"`
 }
 
-type Device DriverInterface
+func NewJSONDevice(device Device) *JSONDevice {
+	jsonDevice := &JSONDevice{
+		Name:       device.Name(),
+		Driver:     reflect.TypeOf(device).String(),
+		Commands:   []string{},
+		Connection: "",
+	}
+	if device.Connection() != nil {
+		jsonDevice.Connection = device.Connection().Name()
+	}
+	for command := range device.(Commander).Commands() {
+		jsonDevice.Commands = append(jsonDevice.Commands, command)
+	}
+	return jsonDevice
+}
+
+type Device Driver
 
 type devices []Device
 
@@ -35,9 +52,11 @@ func (d *devices) Start() (errs []error) {
 	log.Println("Starting devices...")
 	for _, device := range *d {
 		info := "Starting device " + device.Name()
-		if device.Pin() != "" {
-			info = info + " on pin " + device.Pin()
+
+		if pinner, ok := device.(Pinner); ok {
+			info = info + " on pin " + pinner.Pin()
 		}
+
 		log.Println(info + "...")
 		if errs = device.Start(); len(errs) > 0 {
 			for i, err := range errs {

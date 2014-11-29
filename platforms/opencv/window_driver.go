@@ -5,10 +5,10 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
-var _ gobot.DriverInterface = (*WindowDriver)(nil)
+var _ gobot.Driver = (*WindowDriver)(nil)
 
 type WindowDriver struct {
-	gobot.Driver
+	name   string
 	window window
 	start  func(*WindowDriver)
 }
@@ -17,15 +17,15 @@ type WindowDriver struct {
 // It adds an start function to initialize window
 func NewWindowDriver(name string) *WindowDriver {
 	return &WindowDriver{
-		Driver: *gobot.NewDriver(
-			name,
-			"WindowDriver",
-		),
+		name: name,
 		start: func(w *WindowDriver) {
 			w.window = cv.NewWindow(w.Name(), cv.CV_WINDOW_NORMAL)
 		},
 	}
 }
+
+func (w *WindowDriver) Name() string                 { return w.name }
+func (w *WindowDriver) Connection() gobot.Connection { return nil }
 
 // Start starts window thread and driver
 func (w *WindowDriver) Start() (errs []error) {

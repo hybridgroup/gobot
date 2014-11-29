@@ -14,15 +14,37 @@ type JSONRobot struct {
 	Devices     []*JSONDevice     `json:"devices"`
 }
 
+// NewJSONRobot returns a JSON representation of the robot.
+func NewJSONRobot(robot *Robot) *JSONRobot {
+	jsonRobot := &JSONRobot{
+		Name:        robot.Name,
+		Commands:    []string{},
+		Connections: []*JSONConnection{},
+		Devices:     []*JSONDevice{},
+	}
+
+	for command := range robot.Commands() {
+		jsonRobot.Commands = append(jsonRobot.Commands, command)
+	}
+
+	robot.Devices().Each(func(device Device) {
+		jsonDevice := NewJSONDevice(device)
+		jsonRobot.Connections = append(jsonRobot.Connections, NewJSONConnection(robot.Connection(jsonDevice.Connection)))
+		jsonRobot.Devices = append(jsonRobot.Devices, jsonDevice)
+	})
+	return jsonRobot
+}
+
 // Robot is a named entitity that manages a collection of connections and devices.
 // It containes it's own work routine and a collection of
 // custom commands to control a robot remotely via the Gobot api.
 type Robot struct {
 	Name        string
-	commands    map[string]func(map[string]interface{}) interface{}
 	Work        func()
 	connections *connections
 	devices     *devices
+	Commander
+	Eventer
 }
 
 type robots []*Robot
@@ -65,10 +87,11 @@ func NewRobot(name string, v ...interface{}) *Robot {
 
 	r := &Robot{
 		Name:        name,
-		commands:    make(map[string]func(map[string]interface{}) interface{}),
 		connections: &connections{},
 		devices:     &devices{},
 		Work:        nil,
+		Eventer:     NewEventer(),
+		Commander:   NewCommander(),
 	}
 
 	log.Println("Initializing Robot", r.Name, "...")
@@ -97,22 +120,9 @@ func NewRobot(name string, v ...interface{}) *Robot {
 	return r
 }
 
-// AddCommand adds a new command to the robot's collection of commands
-func (r *Robot) AddCommand(name string, f func(map[string]interface{}) interface{}) {
-	r.commands[name] = f
-}
-
-// Commands returns all available commands on the robot.
-func (r *Robot) Commands() map[string]func(map[string]interface{}) interface{} {
-	return r.commands
-}
-
-// Command returns the command given a name.
-func (r *Robot) Command(name string) func(map[string]interface{}) interface{} {
-	return r.commands[name]
-}
-
-// Start starts all the robot's connections and drivers and runs it's work function.
+// Start a robot instance and runs it's work function if any. You should not
+// need to manually start a robot if already part of a Gobot application as the
+// robot will be automatically started for you.
 func (r *Robot) Start() (errs []error) {
 	log.Println("Starting Robot", r.Name, "...")
 	if cerrs := r.Connections().Start(); len(cerrs) > 0 {
@@ -178,25 +188,4 @@ func (r *Robot) Connection(name string) Connection {
 		}
 	}
 	return nil
-}
-
-// ToJSON returns a JSON representation of the robot.
-func (r *Robot) ToJSON() *JSONRobot {
-	jsonRobot := &JSONRobot{
-		Name:        r.Name,
-		Commands:    []string{},
-		Connections: []*JSONConnection{},
-		Devices:     []*JSONDevice{},
-	}
-
-	for command := range r.Commands() {
-		jsonRobot.Commands = append(jsonRobot.Commands, command)
-	}
-
-	r.Devices().Each(func(device Device) {
-		jsonDevice := device.ToJSON()
-		jsonRobot.Connections = append(jsonRobot.Connections, r.Connection(jsonDevice.Connection).ToJSON())
-		jsonRobot.Devices = append(jsonRobot.Devices, jsonDevice)
-	})
-	return jsonRobot
 }

@@ -6,11 +6,14 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
-var _ gobot.DriverInterface = (*DirectPinDriver)(nil)
+var _ gobot.Driver = (*DirectPinDriver)(nil)
 
 // Represents a raw GPIO pin
 type DirectPinDriver struct {
-	gobot.Driver
+	name       string
+	pin        string
+	connection gobot.Connection
+	gobot.Commander
 }
 
 // NewDirectPinDriver return a new DirectPinDriver given a DirectPin, name and pin.
@@ -24,12 +27,10 @@ type DirectPinDriver struct {
 // 	"ServoWrite" - See DirectPinDriver.ServoWrite
 func NewDirectPinDriver(a DirectPin, name string, pin string) *DirectPinDriver {
 	d := &DirectPinDriver{
-		Driver: *gobot.NewDriver(
-			name,
-			"DirectPinDriver",
-			a.(gobot.AdaptorInterface),
-			pin,
-		),
+		name:       name,
+		connection: a.(gobot.Connection),
+		pin:        pin,
+		Commander:  gobot.NewCommander(),
 	}
 
 	d.AddCommand("DigitalRead", func(params map[string]interface{}) interface{} {
@@ -61,8 +62,12 @@ func NewDirectPinDriver(a DirectPin, name string, pin string) *DirectPinDriver {
 }
 
 func (d *DirectPinDriver) adaptor() DirectPin {
-	return d.Adaptor().(DirectPin)
+	return d.Connection().(DirectPin)
 }
+
+func (d *DirectPinDriver) Name() string                 { return d.name }
+func (d *DirectPinDriver) Pin() string                  { return d.pin }
+func (d *DirectPinDriver) Connection() gobot.Connection { return d.connection }
 
 // Starts the DirectPinDriver. Returns true on successful start of the driver
 func (d *DirectPinDriver) Start() (errs []error) { return }

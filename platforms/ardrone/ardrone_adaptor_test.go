@@ -1,8 +1,9 @@
 package ardrone
 
 import (
-	"github.com/hybridgroup/gobot"
 	"testing"
+
+	"github.com/hybridgroup/gobot"
 )
 
 func initTestArdroneAdaptor() *ArdroneAdaptor {

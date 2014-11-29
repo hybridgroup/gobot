@@ -54,14 +54,12 @@ func initTestSparkCoreAdaptor() *SparkCoreAdaptor {
 // TESTS
 
 func TestSparkCoreAdaptor(t *testing.T) {
-	// does it implements AdaptorInterface?
-	var _ gobot.AdaptorInterface = (*SparkCoreAdaptor)(nil)
+	var _ gobot.Adaptor = (*SparkCoreAdaptor)(nil)
 
-	//does it embed gobot.Adaptor?
-	var a interface{} = initTestSparkCoreAdaptor().Adaptor
+	var a interface{} = initTestSparkCoreAdaptor()
 	_, ok := a.(gobot.Adaptor)
 	if !ok {
-		t.Errorf("SparkCoreAdaptor{}.Adaptor should be a gobot.Adaptor")
+		t.Errorf("SparkCoreAdaptor{} should be a gobot.Adaptor")
 	}
 }
 
@@ -79,11 +77,6 @@ func TestNewSparkCoreAdaptor(t *testing.T) {
 func TestSparkCoreAdaptorConnect(t *testing.T) {
 	a := initTestSparkCoreAdaptor()
 	gobot.Assert(t, len(a.Connect()), 0)
-
-	a.SetConnected(false)
-
-	gobot.Assert(t, len(a.Connect()), 0)
-	gobot.Assert(t, a.Connected(), true)
 }
 
 func TestSparkCoreAdaptorFinalize(t *testing.T) {
@@ -92,7 +85,6 @@ func TestSparkCoreAdaptorFinalize(t *testing.T) {
 	a.Connect()
 
 	gobot.Assert(t, len(a.Finalize()), 0)
-	gobot.Assert(t, a.Connected(), false)
 }
 
 func TestSparkCoreAdaptorAnalogRead(t *testing.T) {
@@ -221,7 +213,7 @@ func TestSparkCoreAdaptorDeviceURL(t *testing.T) {
 	gobot.Assert(t, a.deviceURL(), "http://server/v1/devices/devID")
 
 	//When APIServer is not set
-	a = &SparkCoreAdaptor{Adaptor: gobot.Adaptor{}, DeviceID: "myDevice", AccessToken: "token"}
+	a = &SparkCoreAdaptor{name: "sparkie", DeviceID: "myDevice", AccessToken: "token"}
 
 	gobot.Assert(t, a.deviceURL(), "https://api.spark.io/v1/devices/myDevice")
 }

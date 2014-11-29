@@ -4,11 +4,12 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
-var _ gobot.DriverInterface = (*MotorDriver)(nil)
+var _ gobot.Driver = (*MotorDriver)(nil)
 
 // Represents a Motor
 type MotorDriver struct {
-	gobot.Driver
+	name             string
+	connection       gobot.Connection
 	SpeedPin         string
 	SwitchPin        string
 	DirectionPin     string
@@ -21,13 +22,10 @@ type MotorDriver struct {
 }
 
 // NewMotorDriver return a new MotorDriver given a PwmDigitalWriter, name and pin
-func NewMotorDriver(a PwmDigitalWriter, name string, pin string) *MotorDriver {
+func NewMotorDriver(a PwmDigitalWriter, name string) *MotorDriver {
 	return &MotorDriver{
-		Driver: *gobot.NewDriver(
-			name,
-			"MotorDriver",
-			a.(gobot.AdaptorInterface),
-		),
+		name:             name,
+		connection:       a.(gobot.Adaptor),
 		CurrentState:     0,
 		CurrentSpeed:     0,
 		CurrentMode:      "digital",
@@ -35,8 +33,11 @@ func NewMotorDriver(a PwmDigitalWriter, name string, pin string) *MotorDriver {
 	}
 }
 
+func (m *MotorDriver) Name() string                 { return m.name }
+func (m *MotorDriver) Connection() gobot.Connection { return m.connection }
+
 func (m *MotorDriver) adaptor() PwmDigitalWriter {
-	return m.Adaptor().(PwmDigitalWriter)
+	return m.Connection().(PwmDigitalWriter)
 }
 
 // Start starts the MotorDriver. Returns true on successful start of the driver

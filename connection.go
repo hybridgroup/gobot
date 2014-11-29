@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"reflect"
 )
 
 // JSONConnection holds a JSON representation of a connection.
@@ -12,7 +13,15 @@ type JSONConnection struct {
 	Adaptor string `json:"adaptor"`
 }
 
-type Connection AdaptorInterface
+// ToJSON returns a json representation of an adaptor
+func NewJSONConnection(connection Connection) *JSONConnection {
+	return &JSONConnection{
+		Name:    connection.Name(),
+		Adaptor: reflect.TypeOf(connection).String(),
+	}
+}
+
+type Connection Adaptor
 
 type connections []Connection
 
@@ -33,10 +42,13 @@ func (c *connections) Start() (errs []error) {
 	log.Println("Starting connections...")
 	for _, connection := range *c {
 		info := "Starting connection " + connection.Name()
-		if connection.Port() != "" {
-			info = info + " on port " + connection.Port()
+
+		if porter, ok := connection.(Porter); ok {
+			info = info + " on port " + porter.Port()
 		}
+
 		log.Println(info + "...")
+
 		if errs = connection.Connect(); len(errs) > 0 {
 			for i, err := range errs {
 				errs[i] = errors.New(fmt.Sprintf("Connection %q: %v", connection.Name(), err))

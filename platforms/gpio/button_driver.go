@@ -1,28 +1,36 @@
 package gpio
 
 import (
-	"github.com/hybridgroup/gobot"
 	"time"
+
+	"github.com/hybridgroup/gobot"
 )
 
-var _ gobot.DriverInterface = (*ButtonDriver)(nil)
+var _ gobot.Driver = (*ButtonDriver)(nil)
 
 // Represents a digital Button
 type ButtonDriver struct {
-	gobot.Driver
-	Active bool
+	Active     bool
+	pin        string
+	name       string
+	interval   time.Duration
+	connection gobot.Connection
+	gobot.Eventer
 }
 
 // NewButtonDriver return a new ButtonDriver given a DigitalReader, name and pin
-func NewButtonDriver(a DigitalReader, name string, pin string) *ButtonDriver {
+func NewButtonDriver(a DigitalReader, name string, pin string, v ...time.Duration) *ButtonDriver {
 	b := &ButtonDriver{
-		Driver: *gobot.NewDriver(
-			name,
-			"ButtonDriver",
-			a.(gobot.AdaptorInterface),
-			pin,
-		),
-		Active: false,
+		name:       name,
+		connection: a.(gobot.Connection),
+		pin:        pin,
+		Active:     false,
+		Eventer:    gobot.NewEventer(),
+		interval:   10 * time.Millisecond,
+	}
+
+	if len(v) > 0 {
+		b.interval = v[0]
 	}
 
 	b.AddEvent("push")
@@ -33,7 +41,7 @@ func NewButtonDriver(a DigitalReader, name string, pin string) *ButtonDriver {
 }
 
 func (b *ButtonDriver) adaptor() DigitalReader {
-	return b.Adaptor().(DigitalReader)
+	return b.Connection().(DigitalReader)
 }
 
 // Starts the ButtonDriver and reads the state of the button at the given Driver.Interval().
@@ -54,7 +62,7 @@ func (b *ButtonDriver) Start() (errs []error) {
 				state = newValue
 				b.update(newValue)
 			}
-			<-time.After(b.Interval())
+			<-time.After(b.interval)
 		}
 	}()
 	return
@@ -62,6 +70,10 @@ func (b *ButtonDriver) Start() (errs []error) {
 
 // Halt returns true on a successful halt of the driver
 func (b *ButtonDriver) Halt() (errs []error) { return }
+
+func (b *ButtonDriver) Name() string                 { return b.name }
+func (b *ButtonDriver) Pin() string                  { return b.pin }
+func (b *ButtonDriver) Connection() gobot.Connection { return b.connection }
 
 func (b *ButtonDriver) readState() (val int, err error) {
 	return b.adaptor().DigitalRead(b.Pin())

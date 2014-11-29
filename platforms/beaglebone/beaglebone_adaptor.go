@@ -14,7 +14,8 @@ import (
 	"github.com/hybridgroup/gobot/sysfs"
 )
 
-var _ gobot.AdaptorInterface = (*BeagleboneAdaptor)(nil)
+var _ gobot.Adaptor = (*BeagleboneAdaptor)(nil)
+
 var slots = "/sys/devices/bone_capemgr.*"
 var ocp = "/sys/devices/ocp.*"
 var usrLed = "/sys/devices/ocp.3/gpio-leds.8/leds/beaglebone:green:"
@@ -114,7 +115,7 @@ var analogPins = map[string]string{
 }
 
 type BeagleboneAdaptor struct {
-	gobot.Adaptor
+	name        string
 	digitalPins []sysfs.DigitalPin
 	pwmPins     map[string]*pwmPin
 	i2cDevice   io.ReadWriteCloser
@@ -126,10 +127,7 @@ type BeagleboneAdaptor struct {
 // NewBeagleboneAdaptor returns a new beaglebone adaptor with specified name
 func NewBeagleboneAdaptor(name string) *BeagleboneAdaptor {
 	b := &BeagleboneAdaptor{
-		Adaptor: *gobot.NewAdaptor(
-			name,
-			"BeagleboneAdaptor",
-		),
+		name:        name,
 		digitalPins: make([]sysfs.DigitalPin, 120),
 		pwmPins:     make(map[string]*pwmPin),
 	}
@@ -141,6 +139,7 @@ func NewBeagleboneAdaptor(name string) *BeagleboneAdaptor {
 
 	return b
 }
+func (b *BeagleboneAdaptor) Name() string { return b.name }
 
 // Connect returns true on a succesful connection to beaglebone board.
 // It initializes digital, pwm and analog pins

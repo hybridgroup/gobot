@@ -39,7 +39,7 @@ func TestGobotToJSON(t *testing.T) {
 	g.AddCommand("test_function", func(params map[string]interface{}) interface{} {
 		return nil
 	})
-	json := g.ToJSON()
+	json := NewJSONGobot(g)
 	Assert(t, len(json.Robots), g.Robots().Len())
 	Assert(t, len(json.Commands), len(g.Commands()))
 }

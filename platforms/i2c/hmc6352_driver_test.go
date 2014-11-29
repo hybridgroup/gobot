@@ -22,7 +22,7 @@ func initTestHMC6352DriverWithStubbedAdaptor() (*HMC6352Driver, *i2cTestAdaptor)
 
 func TestHMC6352Driver(t *testing.T) {
 	// Does it implement gobot.DriverInterface?
-	var _ gobot.DriverInterface = (*HMC6352Driver)(nil)
+	var _ gobot.Driver = (*HMC6352Driver)(nil)
 
 	// Does its adaptor implements the I2cInterface?
 	driver := initTestHMC6352Driver()
@@ -50,7 +50,6 @@ func TestHMC6352DriverStart(t *testing.T) {
 
 	numberOfCyclesForEvery := 3
 
-	hmc.SetInterval(1 * time.Millisecond)
 	gobot.Assert(t, len(hmc.Start()), 0)
 	go func() {
 		for {
@@ -75,7 +74,6 @@ func TestHMC6352DriverStart(t *testing.T) {
 		return []byte{99}
 	}
 
-	hmc.SetInterval(1 * time.Millisecond)
 	gobot.Assert(t, len(hmc.Start()), 0)
 	go func() {
 		for {

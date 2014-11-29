@@ -4,10 +4,13 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
-var _ gobot.DriverInterface = (*PebbleDriver)(nil)
+var _ gobot.Driver = (*PebbleDriver)(nil)
 
 type PebbleDriver struct {
-	gobot.Driver
+	name       string
+	connection gobot.Connection
+	gobot.Commander
+	gobot.Eventer
 	Messages []string
 }
 
@@ -22,12 +25,11 @@ type PebbleDriver struct {
 //		"pending_message"
 func NewPebbleDriver(adaptor *PebbleAdaptor, name string) *PebbleDriver {
 	p := &PebbleDriver{
-		Driver: *gobot.NewDriver(
-			name,
-			"PebbleDriver",
-			adaptor,
-		),
-		Messages: []string{},
+		name:       name,
+		connection: adaptor,
+		Messages:   []string{},
+		Eventer:    gobot.NewEventer(),
+		Commander:  gobot.NewCommander(),
 	}
 
 	p.AddEvent("button")
@@ -50,6 +52,8 @@ func NewPebbleDriver(adaptor *PebbleAdaptor, name string) *PebbleDriver {
 
 	return p
 }
+func (d *PebbleDriver) Name() string                 { return d.name }
+func (d *PebbleDriver) Connection() gobot.Connection { return d.connection }
 
 // Start returns true if driver is initialized correctly
 func (d *PebbleDriver) Start() (errs []error) { return }

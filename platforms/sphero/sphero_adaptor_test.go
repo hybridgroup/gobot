@@ -1,8 +1,9 @@
 package sphero
 
 import (
-	"github.com/hybridgroup/gobot"
 	"testing"
+
+	"github.com/hybridgroup/gobot"
 )
 
 func initTestSpheroAdaptor() *SpheroAdaptor {

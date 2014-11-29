@@ -2,9 +2,10 @@ package beaglebone
 
 import (
 	"fmt"
-	"github.com/hybridgroup/gobot/sysfs"
 	"os"
 	"strings"
+
+	"github.com/hybridgroup/gobot/sysfs"
 )
 
 type pwmPin struct {

@@ -1,8 +1,9 @@
 package i2c
 
 import (
-	"github.com/hybridgroup/gobot"
 	"testing"
+
+	"github.com/hybridgroup/gobot"
 )
 
 // --------- HELPERS
@@ -20,7 +21,7 @@ func initTestBlinkDriverWithStubbedAdaptor() (*BlinkMDriver, *i2cTestAdaptor) {
 
 func TestBlinkMDriver(t *testing.T) {
 	// Does it implement gobot.DriverInterface?
-	var _ gobot.DriverInterface = (*BlinkMDriver)(nil)
+	var _ gobot.Driver = (*BlinkMDriver)(nil)
 
 	// Does its adaptor implements the I2cInterface?
 	driver := initTestBlinkMDriver()
@@ -40,14 +41,14 @@ func TestNewBlinkMDriver(t *testing.T) {
 func TestNewBlinkMDriverCommands_Rgb(t *testing.T) {
 	blinkM := initTestBlinkMDriver()
 
-	result := blinkM.Driver.Command("Rgb")(rgb)
+	result := blinkM.Command("Rgb")(rgb)
 	gobot.Assert(t, result, nil)
 }
 
 func TestNewBlinkMDriverCommands_Fade(t *testing.T) {
 	blinkM := initTestBlinkMDriver()
 
-	result := blinkM.Driver.Command("Fade")(rgb)
+	result := blinkM.Command("Fade")(rgb)
 	gobot.Assert(t, result, nil)
 }
 
@@ -61,7 +62,7 @@ func TestNewBlinkMDriverCommands_FirmwareVersion(t *testing.T) {
 		return []byte{99, 1}
 	}
 
-	result := blinkM.Driver.Command("FirmwareVersion")(param)
+	result := blinkM.Command("FirmwareVersion")(param)
 
 	version, _ := blinkM.FirmwareVersion()
 	gobot.Assert(t, result.(map[string]interface{})["version"].(string), version)
@@ -70,7 +71,7 @@ func TestNewBlinkMDriverCommands_FirmwareVersion(t *testing.T) {
 	adaptor.i2cReadImpl = func() []byte {
 		return []byte{99}
 	}
-	result = blinkM.Driver.Command("FirmwareVersion")(param)
+	result = blinkM.Command("FirmwareVersion")(param)
 
 	version, _ = blinkM.FirmwareVersion()
 	gobot.Assert(t, result.(map[string]interface{})["version"].(string), version)
@@ -81,7 +82,7 @@ func TestNewBlinkMDriverCommands_Color(t *testing.T) {
 
 	param := make(map[string]interface{})
 
-	result := blinkM.Driver.Command("Color")(param)
+	result := blinkM.Command("Color")(param)
 
 	color, _ := blinkM.Color()
 	gobot.Assert(t, result.(map[string]interface{})["color"].([]byte), color)

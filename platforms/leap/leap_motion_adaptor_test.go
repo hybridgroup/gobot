@@ -1,8 +1,9 @@
 package leap
 
 import (
-	"github.com/hybridgroup/gobot"
 	"testing"
+
+	"github.com/hybridgroup/gobot"
 )
 
 func initTestLeapMotionAdaptor() *LeapMotionAdaptor {

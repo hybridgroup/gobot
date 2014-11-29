@@ -9,7 +9,7 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
-var _ gobot.DriverInterface = (*SpheroDriver)(nil)
+var _ gobot.Driver = (*SpheroDriver)(nil)
 
 type packet struct {
 	header   []uint8
@@ -19,12 +19,15 @@ type packet struct {
 
 // Represents a Sphero
 type SpheroDriver struct {
-	gobot.Driver
+	name            string
+	connection      gobot.Connection
 	seq             uint8
 	asyncResponse   [][]uint8
 	syncResponse    [][]uint8
 	packetChannel   chan *packet
 	responseChannel chan []uint8
+	gobot.Eventer
+	gobot.Commander
 }
 
 type Collision struct {
@@ -51,11 +54,10 @@ type Collision struct {
 // 	"SetStabilization" - See SpheroDriver.SetStabilization
 func NewSpheroDriver(a *SpheroAdaptor, name string) *SpheroDriver {
 	s := &SpheroDriver{
-		Driver: *gobot.NewDriver(
-			name,
-			"SpheroDriver",
-			a,
-		),
+		name:            name,
+		connection:      a,
+		Eventer:         gobot.NewEventer(),
+		Commander:       gobot.NewCommander(),
 		packetChannel:   make(chan *packet, 1024),
 		responseChannel: make(chan []uint8, 1024),
 	}
@@ -106,8 +108,11 @@ func NewSpheroDriver(a *SpheroAdaptor, name string) *SpheroDriver {
 	return s
 }
 
+func (s *SpheroDriver) Name() string                 { return s.name }
+func (s *SpheroDriver) Connection() gobot.Connection { return s.connection }
+
 func (s *SpheroDriver) adaptor() *SpheroAdaptor {
-	return s.Adaptor().(*SpheroAdaptor)
+	return s.Connection().(*SpheroAdaptor)
 }
 
 // Start starts the SpheroDriver and enables Collision Detection.

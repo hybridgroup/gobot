@@ -2,10 +2,45 @@ package gobot
 
 import (
 	"crypto/rand"
+	"errors"
+	"fmt"
+	"log"
 	"math"
 	"math/big"
+	"reflect"
+	"runtime"
+	"strings"
+	"testing"
 	"time"
 )
+
+var eventError = func(e *Event) (err error) {
+	if e == nil {
+		err = errors.New("Event does not exist")
+		log.Println(err.Error())
+		return
+	}
+	return
+}
+
+func logFailure(t *testing.T, message string) {
+	_, file, line, _ := runtime.Caller(2)
+	s := strings.Split(file, "/")
+	t.Errorf("%v:%v: %v", s[len(s)-1], line, message)
+}
+func Assert(t *testing.T, a interface{}, b interface{}) {
+	if !reflect.DeepEqual(a, b) {
+		logFailure(t, fmt.Sprintf("%v - \"%v\", should equal,  %v - \"%v\"",
+			a, reflect.TypeOf(a), b, reflect.TypeOf(b)))
+	}
+}
+
+func Refute(t *testing.T, a interface{}, b interface{}) {
+	if reflect.DeepEqual(a, b) {
+		logFailure(t, fmt.Sprintf("%v - \"%v\", should not equal,  %v - \"%v\"",
+			a, reflect.TypeOf(a), b, reflect.TypeOf(b)))
+	}
+}
 
 // Every triggers f every t time until the end of days. It does not wait for the
 // previous execution of f to finish before it fires the next f.
@@ -26,18 +61,27 @@ func After(t time.Duration, f func()) {
 }
 
 // Publish emits val to all subscribers of e.
-func Publish(e *Event, val interface{}) {
-	e.Write(val)
+func Publish(e *Event, val interface{}) (err error) {
+	if err = eventError(e); err == nil {
+		e.Write(val)
+	}
+	return
 }
 
 // On executes f when e is Published to.
-func On(e *Event, f func(s interface{})) {
-	e.Callbacks = append(e.Callbacks, callback{f, false})
+func On(e *Event, f func(s interface{})) (err error) {
+	if err = eventError(e); err == nil {
+		e.Callbacks = append(e.Callbacks, callback{f, false})
+	}
+	return
 }
 
 // Once is similar to On except that it only executes f one time.
-func Once(e *Event, f func(s interface{})) {
-	e.Callbacks = append(e.Callbacks, callback{f, true})
+func Once(e *Event, f func(s interface{})) (err error) {
+	if err = eventError(e); err == nil {
+		e.Callbacks = append(e.Callbacks, callback{f, true})
+	}
+	return
 }
 
 // Rand returns a positive random int up to max

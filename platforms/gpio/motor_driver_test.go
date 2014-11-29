@@ -7,7 +7,7 @@ import (
 )
 
 func initTestMotorDriver() *MotorDriver {
-	return NewMotorDriver(newGpioTestAdaptor("adaptor"), "bot", "1")
+	return NewMotorDriver(newGpioTestAdaptor("adaptor"), "bot")
 }
 
 func TestMotorDriverStart(t *testing.T) {

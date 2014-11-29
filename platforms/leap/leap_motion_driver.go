@@ -8,10 +8,12 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
-var _ gobot.DriverInterface = (*LeapMotionDriver)(nil)
+var _ gobot.Driver = (*LeapMotionDriver)(nil)
 
 type LeapMotionDriver struct {
-	gobot.Driver
+	name       string
+	connection gobot.Connection
+	gobot.Eventer
 }
 
 var receive = func(ws io.ReadWriteCloser) []byte {
@@ -26,20 +28,20 @@ var receive = func(ws io.ReadWriteCloser) []byte {
 //		"message" - Gets triggered when receiving a message from leap motion
 func NewLeapMotionDriver(a *LeapMotionAdaptor, name string) *LeapMotionDriver {
 	l := &LeapMotionDriver{
-		Driver: *gobot.NewDriver(
-			name,
-			"LeapMotionDriver",
-			a,
-		),
+		name:       name,
+		connection: a,
+		Eventer:    gobot.NewEventer(),
 	}
 
 	l.AddEvent("message")
 	return l
 }
+func (l *LeapMotionDriver) Name() string                 { return l.name }
+func (l *LeapMotionDriver) Connection() gobot.Connection { return l.connection }
 
 // adaptor returns leap motion adaptor
 func (l *LeapMotionDriver) adaptor() *LeapMotionAdaptor {
-	return l.Adaptor().(*LeapMotionAdaptor)
+	return l.Connection().(*LeapMotionAdaptor)
 }
 
 // Start inits leap motion driver by enabling gestures

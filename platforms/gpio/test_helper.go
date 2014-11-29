@@ -1,9 +1,8 @@
 package gpio
 
-import "github.com/hybridgroup/gobot"
-
 type gpioTestAdaptor struct {
-	gobot.Adaptor
+	name string
+	port string
 }
 
 func (t *gpioTestAdaptor) AnalogWrite(string, byte) (err error)  { return nil }
@@ -19,12 +18,12 @@ func (t *gpioTestAdaptor) DigitalRead(string) (val int, err error) {
 }
 func (t *gpioTestAdaptor) Connect() (errs []error)  { return }
 func (t *gpioTestAdaptor) Finalize() (errs []error) { return }
+func (t *gpioTestAdaptor) Name() string             { return t.name }
+func (t *gpioTestAdaptor) Port() string             { return t.port }
 
 func newGpioTestAdaptor(name string) *gpioTestAdaptor {
 	return &gpioTestAdaptor{
-		Adaptor: *gobot.NewAdaptor(
-			name,
-			"/dev/null",
-		),
+		name: name,
+		port: "/dev/null",
 	}
 }
