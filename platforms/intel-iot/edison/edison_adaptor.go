@@ -8,6 +8,7 @@ import (
 
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/gpio"
+	"github.com/hybridgroup/gobot/platforms/i2c"
 	"github.com/hybridgroup/gobot/sysfs"
 )
 
@@ -17,6 +18,8 @@ var _ gpio.DigitalReader = (*EdisonAdaptor)(nil)
 var _ gpio.DigitalWriter = (*EdisonAdaptor)(nil)
 var _ gpio.AnalogReader = (*EdisonAdaptor)(nil)
 var _ gpio.PwmWriter = (*EdisonAdaptor)(nil)
+
+var _ i2c.I2c = (*EdisonAdaptor)(nil)
 
 func writeFile(path string, data []byte) (i int, err error) {
 	file, err := sysfs.OpenFile(path, os.O_WRONLY, 0644)

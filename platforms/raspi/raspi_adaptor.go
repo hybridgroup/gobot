@@ -11,6 +11,7 @@ import (
 
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/gpio"
+	"github.com/hybridgroup/gobot/platforms/i2c"
 	"github.com/hybridgroup/gobot/sysfs"
 )
 
@@ -18,6 +19,8 @@ var _ gobot.Adaptor = (*RaspiAdaptor)(nil)
 
 var _ gpio.DigitalReader = (*RaspiAdaptor)(nil)
 var _ gpio.DigitalWriter = (*RaspiAdaptor)(nil)
+
+var _ i2c.I2c = (*RaspiAdaptor)(nil)
 
 var boardRevision = func() (string, string) {
 	cat, _ := exec.Command("cat", "/proc/cpuinfo").Output()
