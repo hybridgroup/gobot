@@ -10,7 +10,7 @@ var _ gobot.Driver = (*BlinkMDriver)(nil)
 
 type BlinkMDriver struct {
 	name       string
-	connection gobot.Connection
+	connection I2c
 	gobot.Commander
 }
 
@@ -21,10 +21,10 @@ type BlinkMDriver struct {
 //	Fade - fades the RGB color
 //	FirmwareVersion - returns the version of the current Frimware
 //	Color - returns the color of the LED.
-func NewBlinkMDriver(a I2cInterface, name string) *BlinkMDriver {
+func NewBlinkMDriver(a I2c, name string) *BlinkMDriver {
 	b := &BlinkMDriver{
 		name:       name,
-		connection: a.(gobot.Connection),
+		connection: a,
 		Commander:  gobot.NewCommander(),
 	}
 
@@ -52,19 +52,16 @@ func NewBlinkMDriver(a I2cInterface, name string) *BlinkMDriver {
 	return b
 }
 func (b *BlinkMDriver) Name() string                 { return b.name }
-func (b *BlinkMDriver) Connection() gobot.Connection { return b.connection }
+func (b *BlinkMDriver) Connection() gobot.Connection { return b.connection.(gobot.Connection) }
 
 // adaptor returns I2C adaptor
-func (b *BlinkMDriver) adaptor() I2cInterface {
-	return b.Connection().(I2cInterface)
-}
 
 // Start writes start bytes
 func (b *BlinkMDriver) Start() (errs []error) {
-	if err := b.adaptor().I2cStart(0x09); err != nil {
+	if err := b.connection.I2cStart(0x09); err != nil {
 		return []error{err}
 	}
-	if err := b.adaptor().I2cWrite([]byte("o")); err != nil {
+	if err := b.connection.I2cWrite([]byte("o")); err != nil {
 		return []error{err}
 	}
 	return
@@ -75,28 +72,28 @@ func (b *BlinkMDriver) Halt() (errs []error) { return }
 
 // Rgb sets color using r,g,b params
 func (b *BlinkMDriver) Rgb(red byte, green byte, blue byte) (err error) {
-	if err = b.adaptor().I2cWrite([]byte("n")); err != nil {
+	if err = b.connection.I2cWrite([]byte("n")); err != nil {
 		return
 	}
-	err = b.adaptor().I2cWrite([]byte{red, green, blue})
+	err = b.connection.I2cWrite([]byte{red, green, blue})
 	return
 }
 
 // Fade removes color using r,g,b params
 func (b *BlinkMDriver) Fade(red byte, green byte, blue byte) (err error) {
-	if err = b.adaptor().I2cWrite([]byte("c")); err != nil {
+	if err = b.connection.I2cWrite([]byte("c")); err != nil {
 		return
 	}
-	err = b.adaptor().I2cWrite([]byte{red, green, blue})
+	err = b.connection.I2cWrite([]byte{red, green, blue})
 	return
 }
 
 // FirmwareVersion returns version with MAYOR.minor format
 func (b *BlinkMDriver) FirmwareVersion() (version string, err error) {
-	if err = b.adaptor().I2cWrite([]byte("Z")); err != nil {
+	if err = b.connection.I2cWrite([]byte("Z")); err != nil {
 		return
 	}
-	data, err := b.adaptor().I2cRead(2)
+	data, err := b.connection.I2cRead(2)
 	if len(data) != 2 || err != nil {
 		return
 	}
@@ -105,10 +102,10 @@ func (b *BlinkMDriver) FirmwareVersion() (version string, err error) {
 
 // Color returns an array with current rgb color
 func (b *BlinkMDriver) Color() (color []byte, err error) {
-	if err = b.adaptor().I2cWrite([]byte("g")); err != nil {
+	if err = b.connection.I2cWrite([]byte("g")); err != nil {
 		return
 	}
-	data, err := b.adaptor().I2cRead(3)
+	data, err := b.connection.I2cRead(3)
 	if len(data) != 3 || err != nil {
 		return []byte{}, err
 	}

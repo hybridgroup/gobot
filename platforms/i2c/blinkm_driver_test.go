@@ -19,15 +19,6 @@ func initTestBlinkDriverWithStubbedAdaptor() (*BlinkMDriver, *i2cTestAdaptor) {
 
 // --------- TESTS
 
-func TestBlinkMDriver(t *testing.T) {
-	// Does it implement gobot.DriverInterface?
-	var _ gobot.Driver = (*BlinkMDriver)(nil)
-
-	// Does its adaptor implements the I2cInterface?
-	driver := initTestBlinkMDriver()
-	var _ I2cInterface = driver.adaptor()
-}
-
 func TestNewBlinkMDriver(t *testing.T) {
 	// Does it return a pointer to an instance of BlinkMDriver?
 	var bm interface{} = NewBlinkMDriver(newI2cTestAdaptor("adaptor"), "bot")
