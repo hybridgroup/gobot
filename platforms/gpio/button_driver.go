@@ -13,18 +13,24 @@ type ButtonDriver struct {
 	Active     bool
 	pin        string
 	name       string
+	interval   time.Duration
 	connection gobot.Connection
 	gobot.Eventer
 }
 
 // NewButtonDriver return a new ButtonDriver given a DigitalReader, name and pin
-func NewButtonDriver(a DigitalReader, name string, pin string) *ButtonDriver {
+func NewButtonDriver(a DigitalReader, name string, pin string, v ...time.Duration) *ButtonDriver {
 	b := &ButtonDriver{
 		name:       name,
-		connection: a.(gobot.Adaptor),
+		connection: a,
 		pin:        pin,
 		Active:     false,
 		Eventer:    gobot.NewEventer(),
+		interval:   10 * time.Millisecond,
+	}
+
+	if len(v) > 0 {
+		b.interval = v[0]
 	}
 
 	b.AddEvent("push")
@@ -56,8 +62,7 @@ func (b *ButtonDriver) Start() (errs []error) {
 				state = newValue
 				b.update(newValue)
 			}
-			//<-time.After(b.Interval())
-			<-time.After(100 * time.Millisecond)
+			<-time.After(b.interval)
 		}
 	}()
 	return
@@ -69,17 +74,6 @@ func (b *ButtonDriver) Halt() (errs []error) { return }
 func (b *ButtonDriver) Name() string                 { return b.name }
 func (b *ButtonDriver) Pin() string                  { return b.pin }
 func (b *ButtonDriver) Connection() gobot.Connection { return b.connection }
-func (b *ButtonDriver) String() string               { return "ButtonDriver" }
-func (b *ButtonDriver) ToJSON() *gobot.JSONDevice {
-	return &gobot.JSONDevice{
-		Name:       b.Name(),
-		Driver:     b.String(),
-		Connection: b.Connection().Name(),
-		//Commands:   l.Commands(),
-		//Commands:   l.Commands(),
-	}
-
-}
 
 func (b *ButtonDriver) readState() (val int, err error) {
 	return b.adaptor().DigitalRead(b.Pin())
