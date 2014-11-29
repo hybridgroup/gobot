@@ -7,10 +7,13 @@ import (
 	common "github.com/hybridgroup/gobot/platforms/mavlink/common"
 )
 
-var _ gobot.DriverInterface = (*MavlinkDriver)(nil)
+var _ gobot.Driver = (*MavlinkDriver)(nil)
 
 type MavlinkDriver struct {
-	gobot.Driver
+	name       string
+	connection gobot.Connection
+	interval   time.Duration
+	gobot.Eventer
 }
 
 type MavlinkInterface interface {
@@ -23,11 +26,10 @@ type MavlinkInterface interface {
 //	"message" - triggered when a new valid message is processed
 func NewMavlinkDriver(a *MavlinkAdaptor, name string) *MavlinkDriver {
 	m := &MavlinkDriver{
-		Driver: *gobot.NewDriver(
-			name,
-			"mavlink.MavlinkDriver",
-			a,
-		),
+		name:       name,
+		connection: a,
+		Eventer:    gobot.NewEventer(),
+		interval:   10 * time.Millisecond,
 	}
 
 	m.AddEvent("packet")
@@ -37,9 +39,12 @@ func NewMavlinkDriver(a *MavlinkAdaptor, name string) *MavlinkDriver {
 	return m
 }
 
+func (m *MavlinkDriver) Connection() gobot.Connection { return m.connection }
+func (m *MavlinkDriver) Name() string                 { return m.name }
+
 // adaptor returns driver associated adaptor
 func (m *MavlinkDriver) adaptor() *MavlinkAdaptor {
-	return m.Driver.Adaptor().(*MavlinkAdaptor)
+	return m.Connection().(*MavlinkAdaptor)
 }
 
 // Start begins process to read mavlink packets every m.Interval
@@ -59,7 +64,7 @@ func (m *MavlinkDriver) Start() (errs []error) {
 				continue
 			}
 			gobot.Publish(m.Event("message"), message)
-			<-time.After(m.Interval())
+			<-time.After(m.interval)
 		}
 	}()
 	return
