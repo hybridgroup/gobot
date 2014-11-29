@@ -11,10 +11,10 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
-var _ gobot.AdaptorInterface = (*SparkCoreAdaptor)(nil)
+var _ gobot.Adaptor = (*SparkCoreAdaptor)(nil)
 
 type SparkCoreAdaptor struct {
-	gobot.Adaptor
+	name        string
 	DeviceID    string
 	AccessToken string
 	APIServer   string
@@ -24,25 +24,21 @@ type SparkCoreAdaptor struct {
 // using api.spark.io server as default
 func NewSparkCoreAdaptor(name string, deviceID string, accessToken string) *SparkCoreAdaptor {
 	return &SparkCoreAdaptor{
-		Adaptor: *gobot.NewAdaptor(
-			name,
-			"SparkCoreAdaptor",
-		),
+		name:        name,
 		DeviceID:    deviceID,
 		AccessToken: accessToken,
 		APIServer:   "https://api.spark.io",
 	}
 }
+func (s *SparkCoreAdaptor) Name() string { return s.name }
 
 // Connect returns true if connection to spark core is succesfull
 func (s *SparkCoreAdaptor) Connect() (errs []error) {
-	s.SetConnected(true)
 	return
 }
 
 // Finalize returns true if connection to spark core is finalized successfully
 func (s *SparkCoreAdaptor) Finalize() (errs []error) {
-	s.SetConnected(false)
 	return
 }
 
