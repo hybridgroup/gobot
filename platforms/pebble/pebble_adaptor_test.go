@@ -1,8 +1,9 @@
 package pebble
 
 import (
-	"github.com/hybridgroup/gobot"
 	"testing"
+
+	"github.com/hybridgroup/gobot"
 )
 
 func initTestPebbleAdaptor() *PebbleAdaptor {
