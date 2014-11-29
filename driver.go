@@ -7,6 +7,6 @@ type Driver interface {
 	Connection() Connection
 }
 
-type Piner interface {
+type Pinner interface {
 	Pin() string
 }
