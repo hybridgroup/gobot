@@ -12,7 +12,7 @@ var _ gobot.Driver = (*ServoDriver)(nil)
 type ServoDriver struct {
 	name       string
 	pin        string
-	connection gobot.Connection
+	connection ServoWriter
 	gobot.Commander
 	CurrentAngle byte
 }
@@ -24,10 +24,10 @@ type ServoDriver struct {
 //	"Min" - See ServoDriver.Min
 //	"Center" - See ServoDriver.Center
 //	"Max" - See ServoDriver.Max
-func NewServoDriver(a Servo, name string, pin string) *ServoDriver {
+func NewServoDriver(a ServoWriter, name string, pin string) *ServoDriver {
 	s := &ServoDriver{
 		name:         name,
-		connection:   a.(gobot.Connection),
+		connection:   a,
 		pin:          pin,
 		Commander:    gobot.NewCommander(),
 		CurrentAngle: 0,
@@ -53,10 +53,7 @@ func NewServoDriver(a Servo, name string, pin string) *ServoDriver {
 
 func (s *ServoDriver) Name() string                 { return s.name }
 func (s *ServoDriver) Pin() string                  { return s.pin }
-func (s *ServoDriver) Connection() gobot.Connection { return s.connection }
-func (s *ServoDriver) adaptor() Servo {
-	return s.Connection().(Servo)
-}
+func (s *ServoDriver) Connection() gobot.Connection { return s.connection.(gobot.Connection) }
 
 // Start starts the ServoDriver. Returns true on successful start of the driver.
 func (s *ServoDriver) Start() (errs []error) { return }
@@ -64,18 +61,13 @@ func (s *ServoDriver) Start() (errs []error) { return }
 // Halt halts the ServoDriver. Returns true on successful halt of the driver.
 func (s *ServoDriver) Halt() (errs []error) { return }
 
-// InitServo initializes the ServoDriver on platforms which require an explicit initialization.
-func (s *ServoDriver) InitServo() (err error) {
-	return s.adaptor().InitServo()
-}
-
 // Move sets the servo to the specified angle
 func (s *ServoDriver) Move(angle uint8) (err error) {
 	if !(angle >= 0 && angle <= 180) {
 		return errors.New("Servo angle must be an integer between 0-180")
 	}
 	s.CurrentAngle = angle
-	return s.adaptor().ServoWrite(s.Pin(), s.angleToSpan(angle))
+	return s.connection.ServoWrite(s.Pin(), s.angleToSpan(angle))
 }
 
 // Min sets the servo to it's minimum position

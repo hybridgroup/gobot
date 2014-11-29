@@ -8,7 +8,7 @@ var _ gobot.Driver = (*LedDriver)(nil)
 type LedDriver struct {
 	pin        string
 	name       string
-	connection gobot.Connection
+	connection DigitalWriter
 	high       bool
 	gobot.Commander
 }
@@ -20,11 +20,11 @@ type LedDriver struct {
 //	"Toggle" - See LedDriver.Toggle
 //	"On" - See LedDriver.On
 //	"Off" - See LedDriver.Off
-func NewLedDriver(a PwmDigitalWriter, name string, pin string) *LedDriver {
+func NewLedDriver(a DigitalWriter, name string, pin string) *LedDriver {
 	l := &LedDriver{
 		name:       name,
 		pin:        pin,
-		connection: a.(gobot.Connection),
+		connection: a,
 		high:       false,
 		Commander:  gobot.NewCommander(),
 	}
@@ -49,10 +49,6 @@ func NewLedDriver(a PwmDigitalWriter, name string, pin string) *LedDriver {
 	return l
 }
 
-func (l *LedDriver) adaptor() PwmDigitalWriter {
-	return l.Connection().(PwmDigitalWriter)
-}
-
 // Start starts the LedDriver. Returns true on successful start of the driver
 func (l *LedDriver) Start() (errs []error) { return }
 
@@ -61,7 +57,7 @@ func (l *LedDriver) Halt() (errs []error) { return }
 
 func (l *LedDriver) Name() string                 { return l.name }
 func (l *LedDriver) Pin() string                  { return l.pin }
-func (l *LedDriver) Connection() gobot.Connection { return l.connection }
+func (l *LedDriver) Connection() gobot.Connection { return l.connection.(gobot.Connection) }
 
 // State return true if the led is On and false if the led is Off
 func (l *LedDriver) State() bool {
@@ -100,9 +96,12 @@ func (l *LedDriver) Toggle() (err error) {
 
 // Brightness sets the led to the specified level of brightness
 func (l *LedDriver) Brightness(level byte) (err error) {
-	return l.adaptor().PwmWrite(l.Pin(), level)
+	if writer, ok := l.connection.(PwmWriter); ok {
+		return writer.PwmWrite(l.Pin(), level)
+	}
+	return ErrPwmWriteUnsupported
 }
 
 func (l *LedDriver) changeState(level byte) (err error) {
-	return l.adaptor().DigitalWrite(l.Pin(), level)
+	return l.connection.DigitalWrite(l.Pin(), level)
 }

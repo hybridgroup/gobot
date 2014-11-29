@@ -12,7 +12,7 @@ var _ gobot.Driver = (*MakeyButtonDriver)(nil)
 type MakeyButtonDriver struct {
 	name       string
 	pin        string
-	connection gobot.Connection
+	connection DigitalReader
 	Active     bool
 	data       []int
 	interval   time.Duration
@@ -23,7 +23,7 @@ type MakeyButtonDriver struct {
 func NewMakeyButtonDriver(a DigitalReader, name string, pin string, v ...time.Duration) *MakeyButtonDriver {
 	m := &MakeyButtonDriver{
 		name:       name,
-		connection: a.(gobot.Connection),
+		connection: a,
 		pin:        pin,
 		Active:     false,
 		Eventer:    gobot.NewEventer(),
@@ -34,20 +34,16 @@ func NewMakeyButtonDriver(a DigitalReader, name string, pin string, v ...time.Du
 		m.interval = v[0]
 	}
 
-	m.AddEvent("error")
-	m.AddEvent("push")
-	m.AddEvent("release")
+	m.AddEvent(Error)
+	m.AddEvent(Push)
+	m.AddEvent(Release)
 
 	return m
 }
 
 func (b *MakeyButtonDriver) Name() string                 { return b.name }
 func (b *MakeyButtonDriver) Pin() string                  { return b.pin }
-func (b *MakeyButtonDriver) Connection() gobot.Connection { return b.connection }
-
-func (b *MakeyButtonDriver) adaptor() DigitalReader {
-	return b.Connection().(DigitalReader)
-}
+func (b *MakeyButtonDriver) Connection() gobot.Connection { return b.connection.(gobot.Connection) }
 
 // Starts the MakeyButtonDriver and reads the state of the button at the given Driver.Interval().
 // Returns true on successful start of the driver.
@@ -59,17 +55,17 @@ func (m *MakeyButtonDriver) Start() (errs []error) {
 	state := 0
 	go func() {
 		for {
-			newValue, err := m.readState()
+			newValue, err := m.connection.DigitalRead(m.Pin())
 			if err != nil {
-				gobot.Publish(m.Event("error"), err)
+				gobot.Publish(m.Event(Error), err)
 			} else if newValue != state && newValue != -1 {
 				state = newValue
 				if newValue == 0 {
 					m.Active = true
-					gobot.Publish(m.Event("push"), newValue)
+					gobot.Publish(m.Event(Push), newValue)
 				} else {
 					m.Active = false
-					gobot.Publish(m.Event("release"), newValue)
+					gobot.Publish(m.Event(Release), newValue)
 				}
 			}
 		}
@@ -80,7 +76,3 @@ func (m *MakeyButtonDriver) Start() (errs []error) {
 
 // Halt returns true on a successful halt of the driver
 func (m *MakeyButtonDriver) Halt() (errs []error) { return }
-
-func (m *MakeyButtonDriver) readState() (val int, err error) {
-	return m.adaptor().DigitalRead(m.Pin())
-}

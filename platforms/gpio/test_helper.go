@@ -5,11 +5,9 @@ type gpioTestAdaptor struct {
 	port string
 }
 
-func (t *gpioTestAdaptor) AnalogWrite(string, byte) (err error)  { return nil }
 func (t *gpioTestAdaptor) DigitalWrite(string, byte) (err error) { return nil }
 func (t *gpioTestAdaptor) ServoWrite(string, byte) (err error)   { return nil }
 func (t *gpioTestAdaptor) PwmWrite(string, byte) (err error)     { return nil }
-func (t *gpioTestAdaptor) InitServo() (err error)                { return nil }
 func (t *gpioTestAdaptor) AnalogRead(string) (val int, err error) {
 	return 99, nil
 }

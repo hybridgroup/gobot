@@ -25,10 +25,10 @@ type DirectPinDriver struct {
 // 	"AnalogWrite" - See DirectPinDriver.AnalogWrite
 // 	"PwmWrite" - See DirectPinDriver.PwmWrite
 // 	"ServoWrite" - See DirectPinDriver.ServoWrite
-func NewDirectPinDriver(a DirectPin, name string, pin string) *DirectPinDriver {
+func NewDirectPinDriver(a gobot.Connection, name string, pin string) *DirectPinDriver {
 	d := &DirectPinDriver{
 		name:       name,
-		connection: a.(gobot.Connection),
+		connection: a,
 		pin:        pin,
 		Commander:  gobot.NewCommander(),
 	}
@@ -45,10 +45,6 @@ func NewDirectPinDriver(a DirectPin, name string, pin string) *DirectPinDriver {
 		val, err := d.AnalogRead()
 		return map[string]interface{}{"val": val, "err": err}
 	})
-	d.AddCommand("AnalogWrite", func(params map[string]interface{}) interface{} {
-		level, _ := strconv.Atoi(params["level"].(string))
-		return d.AnalogWrite(byte(level))
-	})
 	d.AddCommand("PwmWrite", func(params map[string]interface{}) interface{} {
 		level, _ := strconv.Atoi(params["level"].(string))
 		return d.PwmWrite(byte(level))
@@ -59,10 +55,6 @@ func NewDirectPinDriver(a DirectPin, name string, pin string) *DirectPinDriver {
 	})
 
 	return d
-}
-
-func (d *DirectPinDriver) adaptor() DirectPin {
-	return d.Connection().(DirectPin)
 }
 
 func (d *DirectPinDriver) Name() string                 { return d.name }
@@ -77,30 +69,45 @@ func (d *DirectPinDriver) Halt() (errs []error) { return }
 
 // DigitalRead returns the current digital state of the pin
 func (d *DirectPinDriver) DigitalRead() (val int, err error) {
-	return d.adaptor().DigitalRead(d.Pin())
+	if reader, ok := d.Connection().(DigitalReader); ok {
+		return reader.DigitalRead(d.Pin())
+	}
+	err = ErrDigitalReadUnsupported
+	return
 }
 
 // DigitalWrite writes to the pin
 func (d *DirectPinDriver) DigitalWrite(level byte) (err error) {
-	return d.adaptor().DigitalWrite(d.Pin(), level)
+	if writer, ok := d.Connection().(DigitalWriter); ok {
+		return writer.DigitalWrite(d.Pin(), level)
+	}
+	err = ErrDigitalWriteUnsupported
+	return
 }
 
 // AnalogRead reads the current analog reading of the pin
 func (d *DirectPinDriver) AnalogRead() (val int, err error) {
-	return d.adaptor().AnalogRead(d.Pin())
-}
-
-// AnalogWrite writes to the pin
-func (d *DirectPinDriver) AnalogWrite(level byte) (err error) {
-	return d.adaptor().AnalogWrite(d.Pin(), level)
+	if reader, ok := d.Connection().(AnalogReader); ok {
+		return reader.AnalogRead(d.Pin())
+	}
+	err = ErrAnalogReadUnsupported
+	return
 }
 
 // PwmWrite writes to the pin
 func (d *DirectPinDriver) PwmWrite(level byte) (err error) {
-	return d.adaptor().PwmWrite(d.Pin(), level)
+	if writer, ok := d.Connection().(PwmWriter); ok {
+		return writer.PwmWrite(d.Pin(), level)
+	}
+	err = ErrPwmWriteUnsupported
+	return
 }
 
 // ServoWrite writes to the pin
 func (d *DirectPinDriver) ServoWrite(level byte) (err error) {
-	return d.adaptor().ServoWrite(d.Pin(), level)
+	if writer, ok := d.Connection().(ServoWriter); ok {
+		return writer.ServoWrite(d.Pin(), level)
+	}
+	err = ErrServoWriteUnsupported
+	return
 }

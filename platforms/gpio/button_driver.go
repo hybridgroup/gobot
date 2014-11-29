@@ -14,7 +14,7 @@ type ButtonDriver struct {
 	pin        string
 	name       string
 	interval   time.Duration
-	connection gobot.Connection
+	connection DigitalReader
 	gobot.Eventer
 }
 
@@ -22,7 +22,7 @@ type ButtonDriver struct {
 func NewButtonDriver(a DigitalReader, name string, pin string, v ...time.Duration) *ButtonDriver {
 	b := &ButtonDriver{
 		name:       name,
-		connection: a.(gobot.Connection),
+		connection: a,
 		pin:        pin,
 		Active:     false,
 		Eventer:    gobot.NewEventer(),
@@ -33,15 +33,11 @@ func NewButtonDriver(a DigitalReader, name string, pin string, v ...time.Duratio
 		b.interval = v[0]
 	}
 
-	b.AddEvent("push")
-	b.AddEvent("release")
-	b.AddEvent("error")
+	b.AddEvent(Push)
+	b.AddEvent(Release)
+	b.AddEvent(Error)
 
 	return b
-}
-
-func (b *ButtonDriver) adaptor() DigitalReader {
-	return b.Connection().(DigitalReader)
 }
 
 // Starts the ButtonDriver and reads the state of the button at the given Driver.Interval().
@@ -55,9 +51,9 @@ func (b *ButtonDriver) Start() (errs []error) {
 	state := 0
 	go func() {
 		for {
-			newValue, err := b.readState()
+			newValue, err := b.connection.DigitalRead(b.Pin())
 			if err != nil {
-				gobot.Publish(b.Event("error"), err)
+				gobot.Publish(b.Event(Error), err)
 			} else if newValue != state && newValue != -1 {
 				state = newValue
 				b.update(newValue)
@@ -73,18 +69,14 @@ func (b *ButtonDriver) Halt() (errs []error) { return }
 
 func (b *ButtonDriver) Name() string                 { return b.name }
 func (b *ButtonDriver) Pin() string                  { return b.pin }
-func (b *ButtonDriver) Connection() gobot.Connection { return b.connection }
-
-func (b *ButtonDriver) readState() (val int, err error) {
-	return b.adaptor().DigitalRead(b.Pin())
-}
+func (b *ButtonDriver) Connection() gobot.Connection { return b.connection.(gobot.Connection) }
 
 func (b *ButtonDriver) update(newValue int) {
 	if newValue == 1 {
 		b.Active = true
-		gobot.Publish(b.Event("push"), newValue)
+		gobot.Publish(b.Event(Push), newValue)
 	} else {
 		b.Active = false
-		gobot.Publish(b.Event("release"), newValue)
+		gobot.Publish(b.Event(Release), newValue)
 	}
 }

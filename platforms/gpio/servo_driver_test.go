@@ -43,8 +43,3 @@ func TestServoDriverCenter(t *testing.T) {
 	d.Center()
 	gobot.Assert(t, d.CurrentAngle, uint8(90))
 }
-
-func TestServoDriverInitServo(t *testing.T) {
-	d := initTestServoDriver()
-	d.InitServo()
-}

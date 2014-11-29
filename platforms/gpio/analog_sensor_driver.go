@@ -13,7 +13,7 @@ type AnalogSensorDriver struct {
 	name       string
 	pin        string
 	interval   time.Duration
-	connection gobot.Connection
+	connection AnalogReader
 	gobot.Eventer
 	gobot.Commander
 }
@@ -25,7 +25,7 @@ type AnalogSensorDriver struct {
 func NewAnalogSensorDriver(a AnalogReader, name string, pin string, v ...time.Duration) *AnalogSensorDriver {
 	d := &AnalogSensorDriver{
 		name:       name,
-		connection: a.(gobot.Connection),
+		connection: a,
 		pin:        pin,
 		Eventer:    gobot.NewEventer(),
 		Commander:  gobot.NewCommander(),
@@ -36,18 +36,15 @@ func NewAnalogSensorDriver(a AnalogReader, name string, pin string, v ...time.Du
 		d.interval = v[0]
 	}
 
-	d.AddEvent("data")
-	d.AddEvent("error")
+	d.AddEvent(Data)
+	d.AddEvent(Error)
+
 	d.AddCommand("Read", func(params map[string]interface{}) interface{} {
 		val, err := d.Read()
 		return map[string]interface{}{"val": val, "err": err}
 	})
 
 	return d
-}
-
-func (a *AnalogSensorDriver) conn() AnalogReader {
-	return a.Connection().(AnalogReader)
 }
 
 // Starts the AnalogSensorDriver and reads the Analog Sensor at the given Driver.Interval().
@@ -60,10 +57,10 @@ func (a *AnalogSensorDriver) Start() (errs []error) {
 		for {
 			newValue, err := a.Read()
 			if err != nil {
-				gobot.Publish(a.Event("error"), err)
+				gobot.Publish(a.Event(Error), err)
 			} else if newValue != value && newValue != -1 {
 				value = newValue
-				gobot.Publish(a.Event("data"), value)
+				gobot.Publish(a.Event(Data), value)
 			}
 			<-time.After(a.interval)
 		}
@@ -75,9 +72,9 @@ func (a *AnalogSensorDriver) Start() (errs []error) {
 func (a *AnalogSensorDriver) Halt() (errs []error)         { return }
 func (a *AnalogSensorDriver) Name() string                 { return a.name }
 func (a *AnalogSensorDriver) Pin() string                  { return a.pin }
-func (a *AnalogSensorDriver) Connection() gobot.Connection { return a.connection }
+func (a *AnalogSensorDriver) Connection() gobot.Connection { return a.connection.(gobot.Connection) }
 
 // Read returns the current reading from the Analog Sensor
 func (a *AnalogSensorDriver) Read() (val int, err error) {
-	return a.conn().AnalogRead(a.Pin())
+	return a.connection.AnalogRead(a.Pin())
 }
