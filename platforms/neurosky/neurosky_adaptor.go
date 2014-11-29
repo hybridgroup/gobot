@@ -7,10 +7,11 @@ import (
 	"github.com/tarm/goserial"
 )
 
-var _ gobot.AdaptorInterface = (*NeuroskyAdaptor)(nil)
+var _ gobot.Adaptor = (*NeuroskyAdaptor)(nil)
 
 type NeuroskyAdaptor struct {
-	gobot.Adaptor
+	name    string
+	port    string
 	sp      io.ReadWriteCloser
 	connect func(*NeuroskyAdaptor) (err error)
 }
@@ -18,11 +19,8 @@ type NeuroskyAdaptor struct {
 // NewNeuroskyAdaptor creates a neurosky adaptor with specified name
 func NewNeuroskyAdaptor(name string, port string) *NeuroskyAdaptor {
 	return &NeuroskyAdaptor{
-		Adaptor: *gobot.NewAdaptor(
-			name,
-			"NeuroskyAdaptor",
-			port,
-		),
+		name: name,
+		port: port,
 		connect: func(n *NeuroskyAdaptor) (err error) {
 			sp, err := serial.OpenPort(&serial.Config{Name: n.Port(), Baud: 57600})
 			if err != nil {
@@ -33,6 +31,8 @@ func NewNeuroskyAdaptor(name string, port string) *NeuroskyAdaptor {
 		},
 	}
 }
+func (n *NeuroskyAdaptor) Name() string { return n.name }
+func (n *NeuroskyAdaptor) Port() string { return n.port }
 
 // Connect returns true if connection to device is successful
 func (n *NeuroskyAdaptor) Connect() (errs []error) {

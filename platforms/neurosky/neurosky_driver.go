@@ -6,7 +6,7 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
-var _ gobot.DriverInterface = (*NeuroskyDriver)(nil)
+var _ gobot.Driver = (*NeuroskyDriver)(nil)
 
 const BTSync byte = 0xAA
 
@@ -32,7 +32,9 @@ const CodeWave byte = 0x80
 const CodeAsicEEG byte = 0x83
 
 type NeuroskyDriver struct {
-	gobot.Driver
+	name       string
+	connection gobot.Connection
+	gobot.Eventer
 }
 
 type EEG struct {
@@ -58,11 +60,9 @@ type EEG struct {
 //   eeg - showing eeg data
 func NewNeuroskyDriver(a *NeuroskyAdaptor, name string) *NeuroskyDriver {
 	n := &NeuroskyDriver{
-		Driver: *gobot.NewDriver(
-			name,
-			"NeuroskyDriver",
-			a,
-		),
+		name:       name,
+		connection: a,
+		Eventer:    gobot.NewEventer(),
 	}
 
 	n.AddEvent("extended")
@@ -76,10 +76,12 @@ func NewNeuroskyDriver(a *NeuroskyAdaptor, name string) *NeuroskyDriver {
 
 	return n
 }
+func (n *NeuroskyDriver) Connection() gobot.Connection { return n.connection }
+func (n *NeuroskyDriver) Name() string                 { return n.name }
 
 // adaptor returns neurosky adaptor
 func (n *NeuroskyDriver) adaptor() *NeuroskyAdaptor {
-	return n.Adaptor().(*NeuroskyAdaptor)
+	return n.Connection().(*NeuroskyAdaptor)
 }
 
 // Start creates a go routine to listen from serial port
