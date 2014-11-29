@@ -22,7 +22,7 @@ type ButtonDriver struct {
 func NewButtonDriver(a DigitalReader, name string, pin string, v ...time.Duration) *ButtonDriver {
 	b := &ButtonDriver{
 		name:       name,
-		connection: a,
+		connection: a.(gobot.Connection),
 		pin:        pin,
 		Active:     false,
 		Eventer:    gobot.NewEventer(),
