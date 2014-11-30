@@ -20,9 +20,9 @@ func initTestAPI() *api {
 	a.Start()
 	a.Debug()
 
-	g.AddRobot(gobot.NewTestRobot("Robot1"))
-	g.AddRobot(gobot.NewTestRobot("Robot2"))
-	g.AddRobot(gobot.NewTestRobot("Robot3"))
+	g.AddRobot(newTestRobot("Robot1"))
+	g.AddRobot(newTestRobot("Robot2"))
+	g.AddRobot(newTestRobot("Robot3"))
 	g.AddCommand("TestFunction", func(params map[string]interface{}) interface{} {
 		message := params["message"].(string)
 		return fmt.Sprintf("hey %v", message)

@@ -14,20 +14,29 @@ import (
 	"time"
 )
 
+var (
+	ErrUnknownEvent = errors.New("Event does not exist")
+)
+
 var eventError = func(e *Event) (err error) {
 	if e == nil {
-		err = errors.New("Event does not exist")
+		err = ErrUnknownEvent
 		log.Println(err.Error())
 		return
 	}
 	return
 }
 
+var errFunc = func(t *testing.T, message string) {
+	t.Errorf(message)
+}
+
 func logFailure(t *testing.T, message string) {
 	_, file, line, _ := runtime.Caller(2)
 	s := strings.Split(file, "/")
-	t.Errorf("%v:%v: %v", s[len(s)-1], line, message)
+	errFunc(t, fmt.Sprintf("%v:%v: %v", s[len(s)-1], line, message))
 }
+
 func Assert(t *testing.T, a interface{}, b interface{}) {
 	if !reflect.DeepEqual(a, b) {
 		logFailure(t, fmt.Sprintf("%v - \"%v\", should equal,  %v - \"%v\"",

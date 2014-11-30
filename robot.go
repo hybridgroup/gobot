@@ -112,8 +112,6 @@ func NewRobot(name string, v ...interface{}) *Robot {
 			}
 		case func():
 			r.Work = v[i].(func())
-		default:
-			log.Println("Unknown argument passed to NewRobot")
 		}
 	}
 

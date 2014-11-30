@@ -1,23 +1,5 @@
 package gobot
 
-import "fmt"
-
-type testStruct struct {
-	i int
-	f float64
-}
-
-func NewTestStruct() *testStruct {
-	return &testStruct{
-		i: 10,
-		f: 0.2,
-	}
-}
-
-func (t *testStruct) Hello(name string, message string) string {
-	return fmt.Sprintf("Hello %v! %v", name, message)
-}
-
 type NullReadWriteCloser struct{}
 
 func (NullReadWriteCloser) Write(p []byte) (int, error) {
@@ -39,31 +21,24 @@ type testDriver struct {
 	Commander
 }
 
-func (t *testDriver) Start() (errs []error)  { return }
-func (t *testDriver) Halt() (errs []error)   { return }
+var testDriverStart = func() (errs []error) { return }
+var testDriverHalt = func() (errs []error) { return }
+
+func (t *testDriver) Start() (errs []error)  { return testDriverStart() }
+func (t *testDriver) Halt() (errs []error)   { return testDriverHalt() }
 func (t *testDriver) Name() string           { return t.name }
 func (t *testDriver) Pin() string            { return t.pin }
-func (t *testDriver) String() string         { return "testDriver" }
 func (t *testDriver) Connection() Connection { return t.connection }
-func (t *testDriver) ToJSON() *JSONDevice    { return &JSONDevice{} }
 
-func NewTestDriver(name string, adaptor *testAdaptor) *testDriver {
+func newTestDriver(adaptor *testAdaptor, name string, pin string) *testDriver {
 	t := &testDriver{
 		name:       name,
 		connection: adaptor,
-		pin:        "1",
+		pin:        pin,
 		Commander:  NewCommander(),
 	}
 
-	t.AddCommand("TestDriverCommand", func(params map[string]interface{}) interface{} {
-		name := params["name"].(string)
-		return fmt.Sprintf("hello %v", name)
-	})
-
-	t.AddCommand("DriverCommand", func(params map[string]interface{}) interface{} {
-		name := params["name"].(string)
-		return fmt.Sprintf("hello %v", name)
-	})
+	t.AddCommand("DriverCommand", func(params map[string]interface{}) interface{} { return nil })
 
 	return t
 }
@@ -73,37 +48,35 @@ type testAdaptor struct {
 	port string
 }
 
-func (t *testAdaptor) Finalize() (errs []error) { return }
-func (t *testAdaptor) Connect() (errs []error)  { return }
+var testAdaptorConnect = func() (errs []error) { return }
+var testAdaptorFinalize = func() (errs []error) { return }
+
+func (t *testAdaptor) Finalize() (errs []error) { return testAdaptorFinalize() }
+func (t *testAdaptor) Connect() (errs []error)  { return testAdaptorConnect() }
 func (t *testAdaptor) Name() string             { return t.name }
 func (t *testAdaptor) Port() string             { return t.port }
-func (t *testAdaptor) String() string           { return "testAdaptor" }
-func (t *testAdaptor) ToJSON() *JSONConnection  { return &JSONConnection{} }
 
-func NewTestAdaptor(name string) *testAdaptor {
+func newTestAdaptor(name string, port string) *testAdaptor {
 	return &testAdaptor{
 		name: name,
-		port: "/dev/null",
+		port: port,
 	}
 }
 
-func NewTestRobot(name string) *Robot {
-	adaptor1 := NewTestAdaptor("Connection1")
-	adaptor2 := NewTestAdaptor("Connection2")
-	adaptor3 := NewTestAdaptor("")
-	driver1 := NewTestDriver("Device1", adaptor1)
-	driver2 := NewTestDriver("Device2", adaptor2)
-	driver3 := NewTestDriver("", adaptor3)
+func newTestRobot(name string) *Robot {
+	adaptor1 := newTestAdaptor("Connection1", "/dev/null")
+	adaptor2 := newTestAdaptor("Connection2", "/dev/null")
+	adaptor3 := newTestAdaptor("", "/dev/null")
+	driver1 := newTestDriver(adaptor1, "Device1", "0")
+	driver2 := newTestDriver(adaptor2, "Device2", "2")
+	driver3 := newTestDriver(adaptor3, "", "1")
 	work := func() {}
 	r := NewRobot(name,
 		[]Connection{adaptor1, adaptor2, adaptor3},
 		[]Device{driver1, driver2, driver3},
 		work,
 	)
-	r.AddCommand("robotTestFunction", func(params map[string]interface{}) interface{} {
-		message := params["message"].(string)
-		robot := params["robot"].(string)
-		return fmt.Sprintf("hey %v, %v", robot, message)
-	})
+	r.AddCommand("RobotCommand", func(params map[string]interface{}) interface{} { return nil })
+
 	return r
 }
