@@ -71,5 +71,9 @@ func (l *littleWire) servoUpdateLocation(locationA uint8, locationB uint8) error
 }
 
 func (l *littleWire) error() error {
-	return errors.New(C.GoString(C.littleWire_errorName()))
+	str := C.GoString(C.littleWire_errorName())
+	if str != "" {
+		return errors.New(str)
+	}
+	return nil
 }
