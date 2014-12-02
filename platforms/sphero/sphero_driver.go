@@ -15,6 +15,28 @@ type packet struct {
 	checksum uint8
 }
 
+// CollisionConfig provides configuration for the collision detection alogorithm.
+type CollisionConfig struct {
+	// Detection method type to use. Methods 01h and 02h are supported as
+	// of FW ver 1.42. Use 00h to completely disable this service.
+	Method uint8
+	// An 8-bit settable threshold for the X (left/right) axes of Sphero.
+	// A value of 00h disables the contribution of that axis.
+	Xt uint8
+	// An 8-bit settable threshold for the Y (front/back) axes of Sphero.
+	// A value of 00h disables the contribution of that axis.
+	Yt uint8
+	// An 8-bit settable speed value for the X axes. This setting is ranged
+	// by the speed, then added to Xt to generate the final threshold value.
+	Xs uint8
+	// An 8-bit settable speed value for the Y axes. This setting is ranged
+	// by the speed, then added to Yt to generate the final threshold value.
+	Ys uint8
+	// An 8-bit post-collision dead time to prevent retriggering; specified
+	// in 10ms increments.
+	Dead uint8
+}
+
 // Represents a Sphero
 type SpheroDriver struct {
 	gobot.Driver
@@ -23,6 +45,7 @@ type SpheroDriver struct {
 	syncResponse    [][]uint8
 	packetChannel   chan *packet
 	responseChannel chan []uint8
+	cdConfigured    bool // Indicates if collision detection is configured.
 }
 
 type Collision struct {
@@ -160,7 +183,17 @@ func (s *SpheroDriver) Start() bool {
 		}
 	}()
 
-	s.configureCollisionDetection()
+	if !s.cdConfigured {
+		fmt.Println("Using default collision detection parameters...")
+		s.ConfigureCollisionDetection(CollisionConfig{
+			Method: 0x01,
+			Xt:     0x80,
+			Yt:     0x80,
+			Xs:     0x80,
+			Ys:     0x80,
+			Dead:   0x60,
+		})
+	}
 	s.enableStopOnDisconnect()
 
 	return true
@@ -219,8 +252,11 @@ func (s *SpheroDriver) Stop() {
 	s.Roll(0, 0)
 }
 
-func (s *SpheroDriver) configureCollisionDetection() {
-	s.packetChannel <- s.craftPacket([]uint8{0x01, 0x40, 0x40, 0x50, 0x50, 0x60}, 0x02, 0x12)
+// ConfigureCollisionDetection configures the sensitivity of the detection.
+// https://github.com/orbotix/DeveloperResources/blob/master/docs/Collision%20detection%201.2.pdf.
+func (s *SpheroDriver) ConfigureCollisionDetection(cc CollisionConfig) {
+	s.cdConfigured = true
+	s.packetChannel <- s.craftPacket([]uint8{cc.Method, cc.Xt, cc.Yt, cc.Xs, cc.Ys, cc.Dead}, 0x02, 0x12)
 }
 
 func (s *SpheroDriver) enableStopOnDisconnect() {
