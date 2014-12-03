@@ -25,8 +25,10 @@ func NewJSONDevice(device Device) *JSONDevice {
 	if device.Connection() != nil {
 		jsonDevice.Connection = device.Connection().Name()
 	}
-	for command := range device.(Commander).Commands() {
-		jsonDevice.Commands = append(jsonDevice.Commands, command)
+	if commander, ok := device.(Commander); ok {
+		for command := range commander.Commands() {
+			jsonDevice.Commands = append(jsonDevice.Commands, command)
+		}
 	}
 	return jsonDevice
 }
