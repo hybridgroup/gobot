@@ -104,7 +104,7 @@ func TestExecuteMcpCommand(t *testing.T) {
 	a.ServeHTTP(response, request)
 
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, body, "Unknown Command")
+	gobot.Assert(t, body.(map[string]interface{})["error"], "Unknown Command")
 }
 
 func TestRobots(t *testing.T) {
@@ -176,7 +176,7 @@ func TestExecuteRobotCommand(t *testing.T) {
 	a.ServeHTTP(response, request)
 
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, body, "Unknown Command")
+	gobot.Assert(t, body.(map[string]interface{})["error"], "Unknown Command")
 }
 
 func TestRobotDevice(t *testing.T) {
@@ -233,7 +233,7 @@ func TestExecuteRobotDeviceCommand(t *testing.T) {
 	a.ServeHTTP(response, request)
 
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, body, "Unknown Command")
+	gobot.Assert(t, body.(map[string]interface{})["error"], "Unknown Command")
 }
 
 func TestRobotConnections(t *testing.T) {
