@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/donovanhide/eventsource"
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/gpio"
 )
@@ -106,6 +107,44 @@ func (s *SparkCoreAdaptor) DigitalRead(pin string) (val int, err error) {
 		return
 	}
 	return -1, err
+}
+
+// EventStream returns an event stream based on the following params:
+//
+// * source - "all"/"devices"/"device" (More info at: http://docs.spark.io/api/#reading-data-from-a-core-events)
+// * name  - Event name to subscribe for, leave blank to subscribe to all events.
+//
+// A stream returned contains an Event chan that can be used to process received
+// information. Each event has Id(), Data() and Event() methods.
+//
+// Example:
+//
+//  stream, err := sparkCore.EventStream("all", "")
+//  if err != nil {
+//      fmt.Println(err.Error())
+//  } else {
+//      for {
+//          ev := <-stream.Events
+//          fmt.Println(ev.Event(), ev.Data())
+//      }
+//  }
+func (s *SparkCoreAdaptor) EventStream(source string, name string) (stream *eventsource.Stream, err error) {
+	var url string
+
+	switch source {
+	case "all":
+		url = fmt.Sprintf("%s/v1/events/%s?access_token=%s", s.APIServer, name, s.AccessToken)
+	case "devices":
+		url = fmt.Sprintf("%s/v1/devices/events/%s?access_token=%s", s.APIServer, name, s.AccessToken)
+	case "device":
+		url = fmt.Sprintf("%s/events/%s?access_token=%s", s.deviceURL(), name, s.AccessToken)
+	default:
+		err = errors.New("source param should be: all, devices or device")
+		return
+	}
+
+	stream, err = eventsource.Subscribe(url, "")
+	return
 }
 
 // setAPIServer sets spark cloud api server, this can be used to change from default api.spark.io
