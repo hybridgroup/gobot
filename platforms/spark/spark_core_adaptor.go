@@ -57,7 +57,7 @@ func (s *SparkCoreAdaptor) AnalogRead(pin string) (val int, err error) {
 
 	url := fmt.Sprintf("%v/analogread", s.deviceURL())
 
-	resp, err := s.postToSpark(url, params)
+	resp, err := s.requestToSpark("POST", url, params)
 	if err == nil {
 		val = int(resp["return_value"].(float64))
 		return
@@ -78,7 +78,7 @@ func (s *SparkCoreAdaptor) AnalogWrite(pin string, level byte) (err error) {
 		"access_token": {s.AccessToken},
 	}
 	url := fmt.Sprintf("%v/analogwrite", s.deviceURL())
-	_, err = s.postToSpark(url, params)
+	_, err = s.requestToSpark("POST", url, params)
 	return
 }
 
@@ -89,7 +89,7 @@ func (s *SparkCoreAdaptor) DigitalWrite(pin string, level byte) (err error) {
 		"access_token": {s.AccessToken},
 	}
 	url := fmt.Sprintf("%v/digitalwrite", s.deviceURL())
-	_, err = s.postToSpark(url, params)
+	_, err = s.requestToSpark("POST", url, params)
 	return err
 }
 
@@ -100,12 +100,22 @@ func (s *SparkCoreAdaptor) DigitalRead(pin string) (val int, err error) {
 		"access_token": {s.AccessToken},
 	}
 	url := fmt.Sprintf("%v/digitalread", s.deviceURL())
-	resp, err := s.postToSpark(url, params)
+	resp, err := s.requestToSpark("POST", url, params)
 	if err == nil {
 		val = int(resp["return_value"].(float64))
 		return
 	}
 	return -1, err
+}
+
+// Variable returns a core variable value,
+// returned value can be a float64 or a string
+func (s *SparkCoreAdaptor) Variable(name string) (val interface{}, err error) {
+	url := fmt.Sprintf("%v/%s?access_token=%s", s.deviceURL(), name, s.AccessToken)
+	resp, err := s.requestToSpark("GET", url, nil)
+	val = resp["result"]
+
+	return
 }
 
 // setAPIServer sets spark cloud api server, this can be used to change from default api.spark.io
@@ -129,10 +139,17 @@ func (s *SparkCoreAdaptor) pinLevel(level byte) string {
 	return "LOW"
 }
 
-// postToSpark makes POST request to spark cloud server, return err != nil if there is
+// requestToSpark makes request to spark cloud server, return err != nil if there is
 // any issue with the request.
-func (s *SparkCoreAdaptor) postToSpark(url string, params url.Values) (m map[string]interface{}, err error) {
-	resp, err := http.PostForm(url, params)
+func (s *SparkCoreAdaptor) requestToSpark(method string, url string, params url.Values) (m map[string]interface{}, err error) {
+	var resp *http.Response
+
+	if method == "POST" {
+		resp, err = http.PostForm(url, params)
+	} else if method == "GET" {
+		resp, err = http.Get(url)
+	}
+
 	if err != nil {
 		return
 	}

@@ -110,7 +110,6 @@ func TestSparkCoreAdaptorAnalogRead(t *testing.T) {
 
 	val, _ = a.AnalogRead("A1")
 	gobot.Assert(t, val, 0)
-
 }
 
 func TestSparkCoreAdaptorPwmWrite(t *testing.T) {
@@ -195,8 +194,52 @@ func TestSparkCoreAdaptorDigitalRead(t *testing.T) {
 	gobot.Assert(t, val, -1)
 }
 
-func TestSparkCoreAdaptorSetAPIServer(t *testing.T) {
+func TestSparkCoreAdaptorVariable(t *testing.T) {
+	// When String
+	response := `{"result": "1"}`
 
+	a := initTestSparkCoreAdaptor()
+	testServer := getDummyResponseForPath("/"+a.DeviceID+"/variable_name", response, t)
+
+	a.setAPIServer(testServer.URL)
+
+	val, _ := a.Variable("variable_name")
+	gobot.Assert(t, val.(string), "1")
+	testServer.Close()
+
+	// When float
+	response = `{"result": 1.1}`
+	testServer = getDummyResponseForPath("/"+a.DeviceID+"/variable_name", response, t)
+
+	a.setAPIServer(testServer.URL)
+
+	val, _ = a.Variable("variable_name")
+	gobot.Assert(t, val.(float64), 1.1)
+	testServer.Close()
+
+	// When int
+	response = `{"result": 1}`
+	testServer = getDummyResponseForPath("/"+a.DeviceID+"/variable_name", response, t)
+
+	a.setAPIServer(testServer.URL)
+
+	val, _ = a.Variable("variable_name")
+	gobot.Assert(t, val.(float64), 1.0)
+	testServer.Close()
+
+	// When not existent
+	response = `{"ok": false, "error": "Variable not found"}`
+	testServer = getDummyResponseForPath("/"+a.DeviceID+"/not_existent", response, t)
+
+	a.setAPIServer(testServer.URL)
+
+	_, err := a.Variable("not_existent")
+	gobot.Assert(t, err.Error(), "Variable not found")
+
+	testServer.Close()
+}
+
+func TestSparkCoreAdaptorSetAPIServer(t *testing.T) {
 	a := initTestSparkCoreAdaptor()
 	apiServer := "new_api_server"
 	gobot.Refute(t, a.APIServer, apiServer)
