@@ -13,12 +13,12 @@ func main() {
 	sparkCore := spark.NewSparkCoreAdaptor("spark", "DEVICE_ID", "ACCESS_TOKEN")
 
 	work := func() {
-		temp, err := sparkCore.Variable("temperature")
+		result, err := sparkCore.Function("brew", "hello")
 
 		if err != nil {
 			fmt.Println(err.Error())
 		} else {
-			fmt.Printf("temp from variable is: %v", temp)
+			fmt.Printf("result from executing function is: %v", result)
 		}
 	}
 

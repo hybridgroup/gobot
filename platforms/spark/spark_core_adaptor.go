@@ -118,6 +118,27 @@ func (s *SparkCoreAdaptor) Variable(name string) (val interface{}, err error) {
 	return
 }
 
+// Function executes a core function and
+// returns value from request.
+// Takes a String as the only argument and returns an Int.
+// If function is not defined in core, it will time out
+func (s *SparkCoreAdaptor) Function(name string, paramString string) (val int, err error) {
+	params := url.Values{
+		"args":         {paramString},
+		"access_token": {s.AccessToken},
+	}
+
+	url := fmt.Sprintf("%s/%s", s.deviceURL(), name)
+	resp, err := s.requestToSpark("POST", url, params)
+
+	if err == nil {
+		val = int(resp["return_value"].(float64))
+		return
+	}
+
+	return -1, err
+}
+
 // setAPIServer sets spark cloud api server, this can be used to change from default api.spark.io
 func (s *SparkCoreAdaptor) setAPIServer(server string) {
 	s.APIServer = server
@@ -163,12 +184,9 @@ func (s *SparkCoreAdaptor) requestToSpark(method string, url string, params url.
 	json.Unmarshal(buf, &m)
 
 	if resp.Status != "200 OK" {
-		if _, ok := m["error"]; ok {
-			err = errors.New(m["error"].(string))
-		} else {
-			err = errors.New(fmt.Sprintf("&v: error communicating to the spark cloud", resp.Status))
-		}
-		return
+		err = errors.New(fmt.Sprintf("&v: error communicating to the spark cloud", resp.Status))
+	} else if _, ok := m["error"]; ok {
+		err = errors.New(m["error"].(string))
 	}
 
 	return

@@ -277,9 +277,9 @@ func TestSparkCoreAdaptorPostToSpark(t *testing.T) {
 	// When error on request
 	vals := url.Values{}
 	vals.Add("error", "error")
-	resp, err := a.postToSpark("http://invalid%20host.com", vals)
+	resp, err := a.requestToSpark("POST", "http://invalid%20host.com", vals)
 	if err == nil {
-		t.Errorf("postToSpark() should return an error when request was unsuccessful but returned", resp)
+		t.Errorf("requestToSpark() should return an error when request was unsuccessful but returned", resp)
 	}
 
 	// When error reading body
@@ -291,9 +291,9 @@ func TestSparkCoreAdaptorPostToSpark(t *testing.T) {
 	})
 	defer testServer.Close()
 
-	resp, err = a.postToSpark(testServer.URL+"/existent", vals)
+	resp, err = a.requestToSpark("POST", testServer.URL+"/existent", vals)
 	if err == nil {
-		t.Errorf("postToSpark() should return an error when status is not 200 but returned", resp)
+		t.Errorf("requestToSpark() should return an error when status is not 200 but returned", resp)
 	}
 
 }
