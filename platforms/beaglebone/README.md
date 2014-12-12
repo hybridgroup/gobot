@@ -1,10 +1,10 @@
 # Beaglebone
 
-This package provides the Gobot adaptor for the [Beaglebone Black](http://beagleboard.org/Products/BeagleBone+Black/)
+The BeagleBone is an ARM based single board computer, with many different GPIO interfaces built in.
 
-## Getting Started
+For more info about the BeagleBone platform click [here](http://beagleboard.org/Products/BeagleBone+Black).
 
-## Installing
+## How to Install
 ```
 go get -d -u github.com/hybridgroup/gobot/... && go install github.com/hybridgroup/gobot/platforms/beaglebone
 ```
@@ -18,17 +18,19 @@ $ GOOS=linux GOARCH=arm ./make.bash --no-clean
 ```
 
 Then compile your Gobot program with
+
 ```bash
 $ GOARM=7 GOARCH=arm GOOS=linux go build examples/beaglebone_blink.go
 ```
 
 If you are running the official Angstrom or Debian linux through the usb->ethernet connection, you can simply upload your program and execute it with
-``` bash
+
+```bash
 $ scp beaglebone_blink root@192.168.7.2:/home/root/
 $ ssh -t root@192.168.7.2 "./beaglebone_blink"
 ```
 
-## Example
+## How to Use
 
 ```go
 package main
