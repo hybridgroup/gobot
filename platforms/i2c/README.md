@@ -14,6 +14,8 @@ Gobot has a extensible system for connecting to hardware devices. The following 
 
 - BlinkM
 - HMC6352 Digital Compass
+- MPL115A2 Barometer/Temperature Sensor
+- MPU6050 Accelerometer/Gyroscope
 - Wii Nunchuck Controller
 
 More drivers are coming soon...
