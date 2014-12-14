@@ -1,8 +1,10 @@
 # Digispark
 
+The Digispark is an Attiny85 based microcontroller development board similar to the Arduino line, only cheaper, smaller, and a bit less powerful. With a whole host of shields to extend its functionality and the ability to use the familiar Arduino IDE the Digispark is a great way to jump into electronics, or perfect for when an Arduino is too big or too much.
+
 This package provides the Gobot adaptor for the [Digispark](http://digistump.com/products/1) ATTiny-based USB development board with the [Little Wire](http://littlewire.cc/) protocol firmware installed.
 
-## Getting Started
+## How to Install
 
 This package requires `libusb`.
 
@@ -23,11 +25,13 @@ $ sudo apt-get install libusb-dev
 ```
 
 Now you can install the package with
+
 ```
 go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/digispark
 ```
 
-## Examples
+## How to Use
+
 ```go
 package main
 
@@ -62,7 +66,7 @@ func main() {
 	gbot.Start()
 }
 ```
-## Connecting to Digispark
+## How to Connect
 
 If your Digispark already has the Little Wire protocol firmware installed, you can connect right away with Gobot.
 

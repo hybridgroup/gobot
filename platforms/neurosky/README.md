@@ -1,8 +1,12 @@
 # Neurosky
 
+NeuroSky delivers fully integrated, single chip EEG biosensors. NeuroSky enables its partners and developers to bring their brainwave application ideas to market with the shortest amount of time, and lowest end consumer price.
+
 This package contains the Gobot adaptor and driver for the [Neurosky Mindwave Mobile EEG](http://store.neurosky.com/products/mindwave-mobile).
 
-## Installing
+## How to Install
+Installing Gobot with Neurosky support is pretty easy.
+
 ```
 go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/neurosky
 ```
@@ -38,7 +42,9 @@ gort bluetooth connect <address>
 
 You should be able to pair your Mindwave using your normal system tray applet for Bluetooth, and then connect to the COM port that is bound to the device, such as `COM3`.
 
-## Examples
+## How to Use
+
+This small program lets you connect the Neurosky an load data.
 
 ```go
 package main
@@ -98,5 +104,4 @@ func main() {
 	gbot.AddRobot(robot)
 	gbot.Start()
 }
-
 ```

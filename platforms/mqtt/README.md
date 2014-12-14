@@ -1,19 +1,20 @@
-# Gobot for MQTT
+# MQTT
 
-Gobot (http://gobot.io/) is a library for robotics and physical computing using Go
+MQTT is an Internet of Things connectivity protocol featuring a lightweight publish/subscribe messaging transport. It is useful for it's small code footprint and minimal network bandwidth usage.
 
-This repository contains the Gobot adaptor for the MQTT machine to machine message broker (http://mqtt.org/).
+For more info about the MQTT machine to machine message broker click [here](http://mqtt.org/).
 
-## Installing
+## How to Install
 
-* Install running:
+Install running:
+
 ```
 go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/mqtt
 ```
 
-## Using
+## How to Use
 
-* Before running the example, make sure you have an MQTT message broker running somewhere you can connect to
+Before running the example, make sure you have an MQTT message broker running somewhere you can connect to
 
 ```go
 package main
@@ -62,11 +63,7 @@ func main() {
 * Publish messages
 * Respond to incoming message events
 
-## Documentation
 
-We're busy adding documentation to our web site at http://gobot.io/ please check there as we continue to work on Gobot
-
-Thank you!
 
 ## Contributing
 

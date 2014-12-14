@@ -1,11 +1,10 @@
-# Edison 
+# Edison
 
-This package contains the Gobot adaptor for the [Intel Edison](http://www.intel.com/content/www/us/en/do-it-yourself/edison.html) IoT platform.
+The Intel Edison is a wifi and Bluetooth® enabled devolopment platform for the Internet of Things. It packs a robust set of features into its small size and supports a broad spectrum of I/O and software support.
 
-This package currently supports the following Intel IoT hardware:
-- Intel Edison with the Arduino breakout board
+For more info about the Edison platform click [here](http://www.intel.com/content/www/us/en/do-it-yourself/edison.html).
 
-## Getting Started
+## How to Install
 
 First you must install the appropriate Go packages
 
@@ -29,21 +28,24 @@ $ GOOS=linux GOARCH=386 ./make.bash --no-clean
 ```
 
 Then compile your Gobot program with
+
 ```bash
 $ GOARCH=386 GOOS=linux go build examples/edison_blink.go
 ```
 
-Then you can simply upload your program over the network from your host computer to the Edison 
-``` bash
+Then you can simply upload your program over the network from your host computer to the Edison
+
+```bash
 $ scp edison_blink root@192.168.1.xxx:/home/root/
 ```
 
 and execute it on your Edison with
+
 ```bash
 $ ./edison_blink
 ```
 
-## Example
+## How to Use
 
 ```go
 package main
@@ -79,3 +81,6 @@ func main() {
 	gbot.Start()
 }
 ```
+## How to Connect
+
+The [Intel Edison Getting Started Guide](https://communities.intel.com/docs/DOC-23147) details connection instructions for Windows, Mac and Linux.

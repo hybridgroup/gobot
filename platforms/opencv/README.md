@@ -1,8 +1,10 @@
 # OpenCV
 
-This repository contains the Gobot drivers for opencv.
+OpenCV (Open Source Computer Vision Library) is an open source computer vision and machine learning software library. OpenCV was built to provide a common infrastructure for computer vision applications and to accelerate the use of machine perception in the commercial products. Being a BSD-licensed product, OpenCV makes it easy for businesses to utilize and modify the code.
 
-## Getting Started
+For more info about OpenCV click [here](http://opencv.org/)
+
+## How to Install
 
 This package requires `opencv` to be installed on your system
 
@@ -28,7 +30,10 @@ Now you can install the package with
 go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/opencv
 ```
 
-## Using
+## How to Use
+
+Example using the camera.
+
 ```go
 package main
 

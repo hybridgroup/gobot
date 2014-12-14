@@ -1,8 +1,12 @@
 # Raspi
 
-This package contains the Gobot adaptor for the [Raspberry Pi](http://www.raspberrypi.org/).
+The Raspberry Pi is an inexpensive and popular ARM based single board computer with digital & PWM GPIO, and i2c interfaces built in.
 
-## Getting Started
+The Raspberry Pi is a credit-card-sized single-board computer developed in the UK by the Raspberry Pi Foundation with the intention of promoting the teaching of basic computer science in schools
+
+For more info about the Raspberry Pi platform, click [here](http://www.raspberrypi.org/).
+
+## How to Install
 
 First you must install the appropriate Go packages
 
@@ -20,21 +24,24 @@ $ GOOS=linux GOARCH=arm ./make.bash --no-clean
 ```
 
 Then compile your Gobot program with
+
 ```bash
 $ GOARM=6 GOARCH=arm GOOS=linux examples/raspi_blink.go
 ```
 
 Then you can simply upload your program over the network from your host computer to the Raspi
-``` bash
+
+```bash
 $ scp raspi_blink pi@192.168.1.xxx:/home/pi/
 ```
 
 and execute it on your Raspberry Pi with
+
 ```bash
 $ ./raspi_blink
 ```
 
-## Example
+## How to Use
 
 ```go
 package main

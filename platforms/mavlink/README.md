@@ -1,16 +1,16 @@
-# mavlink
+# Mavlink
 
-Gobot (http://gobot.io/) is a framework for robotics and physical computing using Go
+For information on the MAVlink communication protocol click [here](http://qgroundcontrol.org/mavlink/start).
 
-This repository contains the Gobot adaptor and driver for the [MAVlink Communication Protocol](http://qgroundcontrol.org/mavlink/start).
+## How to Install
 
-For more information about Gobot, check out the github repo at
-https://github.com/hybridgroup/gobot
+```
+go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/mavlink
 
-## Installing
-`go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/mavlink`
+```
 
-## Using
+## How to Use
+
 ```go
 package main
 
