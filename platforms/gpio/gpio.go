@@ -12,6 +12,7 @@ var (
 	ErrAnalogReadUnsupported   = errors.New("AnalogRead is not supported by this platform")
 	ErrDigitalWriteUnsupported = errors.New("DigitalWrite is not supported by this platform")
 	ErrDigitalReadUnsupported  = errors.New("DigitalRead is not supported by this platform")
+	ErrServoOutOfRange         = errors.New("servo angle must be between 0-180")
 )
 
 const (

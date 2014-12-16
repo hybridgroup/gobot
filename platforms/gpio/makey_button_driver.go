@@ -52,7 +52,7 @@ func (b *MakeyButtonDriver) Connection() gobot.Connection { return b.connection.
 // 	"push"    int - On button push
 //	"release" int - On button release
 func (m *MakeyButtonDriver) Start() (errs []error) {
-	state := 0
+	state := 1
 	go func() {
 		for {
 			newValue, err := m.connection.DigitalRead(m.Pin())
@@ -68,8 +68,8 @@ func (m *MakeyButtonDriver) Start() (errs []error) {
 					gobot.Publish(m.Event(Release), newValue)
 				}
 			}
+			<-time.After(m.interval)
 		}
-		<-time.After(m.interval)
 	}()
 	return
 }

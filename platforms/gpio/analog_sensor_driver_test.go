@@ -1,27 +1,72 @@
 package gpio
 
 import (
+	"errors"
 	"testing"
+	"time"
 
 	"github.com/hybridgroup/gobot"
 )
 
-func initTestAnalogSensorDriver() *AnalogSensorDriver {
-	return NewAnalogSensorDriver(newGpioTestAdaptor("adaptor"), "bot", "1")
+func TestAnalogSensorDriver(t *testing.T) {
+	d := NewAnalogSensorDriver(newGpioTestAdaptor("adaptor"), "bot", "1")
+	gobot.Assert(t, d.Name(), "bot")
+	gobot.Assert(t, d.Connection().Name(), "adaptor")
+
+	d = NewAnalogSensorDriver(newGpioTestAdaptor("adaptor"), "bot", "1", 30*time.Second)
+	gobot.Assert(t, d.interval, 30*time.Second)
+
+	testAdaptorAnalogRead = func() (val int, err error) {
+		val = 100
+		return
+	}
+	ret := d.Command("Read")(nil).(map[string]interface{})
+
+	gobot.Assert(t, ret["val"].(int), 100)
+	gobot.Assert(t, ret["err"], nil)
 }
 
 func TestAnalogSensorDriverStart(t *testing.T) {
-	d := initTestAnalogSensorDriver()
+	sem := make(chan bool, 1)
+
+	d := NewAnalogSensorDriver(newGpioTestAdaptor("adaptor"), "bot", "1")
+
 	gobot.Assert(t, len(d.Start()), 0)
+
+	gobot.On(d.Event(Data), func(data interface{}) {
+		gobot.Assert(t, data.(int), 100)
+		sem <- true
+	})
+
+	testAdaptorAnalogRead = func() (val int, err error) {
+		val = 100
+		return
+	}
+
+	select {
+	case <-sem:
+	case <-time.After(15 * time.Millisecond):
+		t.Errorf("AnalogSensor Event \"Data\" was not published")
+	}
+
+	gobot.On(d.Event(Error), func(data interface{}) {
+		gobot.Assert(t, data.(error).Error(), "read error")
+		sem <- true
+	})
+
+	testAdaptorAnalogRead = func() (val int, err error) {
+		err = errors.New("read error")
+		return
+	}
+
+	select {
+	case <-sem:
+	case <-time.After(15 * time.Millisecond):
+		t.Errorf("AnalogSensor Event \"Error\" was not published")
+	}
 }
 
 func TestAnalogSensorDriverHalt(t *testing.T) {
-	d := initTestAnalogSensorDriver()
+	d := NewAnalogSensorDriver(newGpioTestAdaptor("adaptor"), "bot", "1")
 	gobot.Assert(t, len(d.Halt()), 0)
-}
-
-func TestAnalogSensorDriverRead(t *testing.T) {
-	d := initTestAnalogSensorDriver()
-	val, _ := d.Read()
-	gobot.Assert(t, val, 99)
 }
