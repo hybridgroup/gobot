@@ -8,14 +8,54 @@ import (
 )
 
 func initTestRaspiAdaptor() *RaspiAdaptor {
-	boardRevision = func() (string, string) {
-		return "3", "/dev/i2c-1"
+	readFile = func() ([]byte, error) {
+		return []byte(`
+Hardware        : BCM2708
+Revision        : 0010
+Serial          : 000000003bc748ea
+`), nil
 	}
 	a := NewRaspiAdaptor("myAdaptor")
 	a.Connect()
 	return a
 }
 
+func TestRaspiAdaptor(t *testing.T) {
+	readFile = func() ([]byte, error) {
+		return []byte(`
+Hardware        : BCM2708
+Revision        : 0010
+Serial          : 000000003bc748ea
+`), nil
+	}
+	a := NewRaspiAdaptor("myAdaptor")
+	gobot.Assert(t, a.Name(), "myAdaptor")
+	gobot.Assert(t, a.i2cLocation, "/dev/i2c-1")
+	gobot.Assert(t, a.revision, "3")
+
+	readFile = func() ([]byte, error) {
+		return []byte(`
+Hardware        : BCM2708
+Revision        : 000D
+Serial          : 000000003bc748ea
+`), nil
+	}
+	a = NewRaspiAdaptor("myAdaptor")
+	gobot.Assert(t, a.i2cLocation, "/dev/i2c-1")
+	gobot.Assert(t, a.revision, "2")
+
+	readFile = func() ([]byte, error) {
+		return []byte(`
+Hardware        : BCM2708
+Revision        : 0002
+Serial          : 000000003bc748ea
+`), nil
+	}
+	a = NewRaspiAdaptor("myAdaptor")
+	gobot.Assert(t, a.i2cLocation, "/dev/i2c-0")
+	gobot.Assert(t, a.revision, "1")
+
+}
 func TestRaspiAdaptorFinalize(t *testing.T) {
 	a := initTestRaspiAdaptor()
 	fs := sysfs.NewMockFilesystem([]string{
