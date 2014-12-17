@@ -29,7 +29,6 @@ func NewSpheroAdaptor(name string, port string) *SpheroAdaptor {
 			if err != nil {
 				return err
 			}
-			a.connected = true
 			a.sp = s
 			return
 		},
@@ -43,6 +42,7 @@ func (a *SpheroAdaptor) Connect() (errs []error) {
 	if err := a.connect(a); err != nil {
 		return []error{err}
 	}
+	a.connected = true
 	return
 }
 

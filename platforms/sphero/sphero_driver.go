@@ -100,7 +100,7 @@ func NewSpheroDriver(a *SpheroAdaptor, name string) *SpheroDriver {
 		return nil
 	})
 	s.AddCommand("SetStabilization", func(params map[string]interface{}) interface{} {
-		on := params["heading"].(bool)
+		on := params["enable"].(bool)
 		s.SetStabilization(on)
 		return nil
 	})
