@@ -2,6 +2,7 @@ package mavlink
 
 import (
 	"errors"
+	"io"
 	"testing"
 
 	"github.com/hybridgroup/gobot"
@@ -43,7 +44,7 @@ func (nullReadWriteCloser) Close() error {
 func initTestMavlinkAdaptor() *MavlinkAdaptor {
 	m := NewMavlinkAdaptor("myAdaptor", "/dev/null")
 	m.sp = nullReadWriteCloser{}
-	m.connect = func(a *MavlinkAdaptor) (err error) { return nil }
+	m.connect = func(port string) (io.ReadWriteCloser, error) { return nil, nil }
 	return m
 }
 
@@ -56,7 +57,7 @@ func TestMavlinkAdaptorConnect(t *testing.T) {
 	a := initTestMavlinkAdaptor()
 	gobot.Assert(t, len(a.Connect()), 0)
 
-	a.connect = func(a *MavlinkAdaptor) (err error) { return errors.New("connect error") }
+	a.connect = func(port string) (io.ReadWriteCloser, error) { return nil, errors.New("connect error") }
 	gobot.Assert(t, a.Connect()[0], errors.New("connect error"))
 }
 

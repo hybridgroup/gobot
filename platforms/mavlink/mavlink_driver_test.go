@@ -2,6 +2,7 @@ package mavlink
 
 import (
 	"errors"
+	"io"
 	"testing"
 	"time"
 
@@ -11,7 +12,7 @@ import (
 
 func initTestMavlinkDriver() *MavlinkDriver {
 	m := NewMavlinkAdaptor("myAdaptor", "/dev/null")
-	m.connect = func(a *MavlinkAdaptor) (err error) { return nil }
+	m.connect = func(port string) (io.ReadWriteCloser, error) { return nil, nil }
 	m.sp = nullReadWriteCloser{}
 	return NewMavlinkDriver(m, "myDriver")
 }
@@ -19,7 +20,7 @@ func initTestMavlinkDriver() *MavlinkDriver {
 func TestMavlinkDriver(t *testing.T) {
 	m := NewMavlinkAdaptor("myAdaptor", "/dev/null")
 	m.sp = nullReadWriteCloser{}
-	m.connect = func(a *MavlinkAdaptor) (err error) { return nil }
+	m.connect = func(port string) (io.ReadWriteCloser, error) { return nil, nil }
 
 	d := NewMavlinkDriver(m, "myDriver")
 	gobot.Assert(t, d.Name(), "myDriver")
