@@ -2,7 +2,6 @@ package digispark
 
 import (
 	"errors"
-	"fmt"
 	"strconv"
 
 	"github.com/hybridgroup/gobot"
@@ -14,6 +13,8 @@ var _ gobot.Adaptor = (*DigisparkAdaptor)(nil)
 var _ gpio.DigitalWriter = (*DigisparkAdaptor)(nil)
 var _ gpio.PwmWriter = (*DigisparkAdaptor)(nil)
 var _ gpio.ServoWriter = (*DigisparkAdaptor)(nil)
+
+var ErrConnection = errors.New("connection error")
 
 type DigisparkAdaptor struct {
 	name       string
@@ -30,7 +31,7 @@ func NewDigisparkAdaptor(name string) *DigisparkAdaptor {
 		connect: func(d *DigisparkAdaptor) (err error) {
 			d.littleWire = littleWireConnect()
 			if d.littleWire.(*littleWire).lwHandle == nil {
-				return errors.New(fmt.Sprintf("Error connecting to %s", d.Name()))
+				return ErrConnection
 			}
 			return
 		},
@@ -58,40 +59,36 @@ func (d *DigisparkAdaptor) DigitalWrite(pin string, level byte) (err error) {
 		return
 	}
 
-	err = d.littleWire.pinMode(uint8(p), 0)
-	if err != nil {
+	if err = d.littleWire.pinMode(uint8(p), 0); err != nil {
 		return
 	}
-	err = d.littleWire.digitalWrite(uint8(p), level)
-	return
+
+	return d.littleWire.digitalWrite(uint8(p), level)
 }
 
 // PwmWrite updates pwm pin with sent value
 func (d *DigisparkAdaptor) PwmWrite(pin string, value byte) (err error) {
 	if d.pwm == false {
-		err = d.littleWire.pwmInit()
-		if err != nil {
-			return err
+		if err = d.littleWire.pwmInit(); err != nil {
+			return
 		}
-		err = d.littleWire.pwmUpdatePrescaler(1)
-		if err != nil {
-			return err
+
+		if err = d.littleWire.pwmUpdatePrescaler(1); err != nil {
+			return
 		}
 		d.pwm = true
 	}
-	err = d.littleWire.pwmUpdateCompare(value, value)
-	return
+
+	return d.littleWire.pwmUpdateCompare(value, value)
 }
 
 // ServoWrite updates servo location with specified angle
 func (d *DigisparkAdaptor) ServoWrite(pin string, angle uint8) (err error) {
 	if d.servo == false {
-		err = d.littleWire.servoInit()
-		if err != nil {
-			return err
+		if err = d.littleWire.servoInit(); err != nil {
+			return
 		}
 		d.servo = true
 	}
-	err = d.littleWire.servoUpdateLocation(angle, angle)
-	return
+	return d.littleWire.servoUpdateLocation(angle, angle)
 }
