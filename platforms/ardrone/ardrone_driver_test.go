@@ -16,10 +16,15 @@ func initTestArdroneDriver() *ArdroneDriver {
 	return d
 }
 
-func TestArdroneDriverStart(t *testing.T) {
+func TestArdroneDriver(t *testing.T) {
 	d := initTestArdroneDriver()
 	gobot.Assert(t, d.Name(), "drone")
 	gobot.Assert(t, d.Connection().Name(), "drone")
+}
+
+func TestArdroneDriverStart(t *testing.T) {
+	d := initTestArdroneDriver()
+	gobot.Assert(t, len(d.Start()), 0)
 }
 
 func TestArdroneDriverHalt(t *testing.T) {
