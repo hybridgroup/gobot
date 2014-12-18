@@ -7,6 +7,18 @@ import (
 	"github.com/hybridgroup/gobot/sysfs"
 )
 
+type NullReadWriteCloser struct{}
+
+func (NullReadWriteCloser) Write(p []byte) (int, error) {
+	return len(p), nil
+}
+func (NullReadWriteCloser) Read(b []byte) (int, error) {
+	return len(b), nil
+}
+func (NullReadWriteCloser) Close() error {
+	return nil
+}
+
 func initTestRaspiAdaptor() *RaspiAdaptor {
 	readFile = func() ([]byte, error) {
 		return []byte(`
@@ -65,7 +77,7 @@ func TestRaspiAdaptorFinalize(t *testing.T) {
 
 	sysfs.SetFilesystem(fs)
 	a.DigitalWrite("3", 1)
-	a.i2cDevice = new(gobot.NullReadWriteCloser)
+	a.i2cDevice = new(NullReadWriteCloser)
 	gobot.Assert(t, len(a.Finalize()), 0)
 }
 

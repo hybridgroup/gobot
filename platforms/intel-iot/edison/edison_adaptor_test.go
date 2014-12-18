@@ -8,6 +8,20 @@ import (
 	"github.com/hybridgroup/gobot/sysfs"
 )
 
+type NullReadWriteCloser struct{}
+
+func (NullReadWriteCloser) Write(p []byte) (int, error) {
+	return len(p), nil
+}
+
+func (NullReadWriteCloser) Read(b []byte) (int, error) {
+	return len(b), nil
+}
+
+func (NullReadWriteCloser) Close() error {
+	return nil
+}
+
 func initTestEdisonAdaptor() (*EdisonAdaptor, *sysfs.MockFilesystem) {
 	a := NewEdisonAdaptor("myAdaptor")
 	fs := sysfs.NewMockFilesystem([]string{
@@ -93,7 +107,7 @@ func TestEdisonAdaptorFinalize(t *testing.T) {
 	a, _ := initTestEdisonAdaptor()
 	a.DigitalWrite("3", 1)
 	a.PwmWrite("5", 100)
-	a.i2cDevice = new(gobot.NullReadWriteCloser)
+	a.i2cDevice = new(NullReadWriteCloser)
 	gobot.Assert(t, len(a.Finalize()), 0)
 }
 

@@ -11,7 +11,7 @@ import (
 func initTestFirmataAdaptor() *FirmataAdaptor {
 	a := NewFirmataAdaptor("board", "/dev/null")
 	a.connect = func(f *FirmataAdaptor) (err error) {
-		f.board = newBoard(gobot.NullReadWriteCloser{})
+		f.board = newBoard(NullReadWriteCloser{})
 		f.board.initTimeInterval = 0 * time.Second
 		// arduino uno r3 firmware response "StandardFirmata.ino"
 		f.board.process([]byte{240, 121, 2, 3, 83, 0, 116, 0, 97, 0, 110, 0, 100,
@@ -44,7 +44,7 @@ func TestFirmataAdaptorConnect(t *testing.T) {
 	a := initTestFirmataAdaptor()
 	gobot.Assert(t, len(a.Connect()), 0)
 
-	a = NewFirmataAdaptor("board", gobot.NullReadWriteCloser{})
+	a = NewFirmataAdaptor("board", NullReadWriteCloser{})
 	gobot.Assert(t, a.connect(a), nil)
 }
 
