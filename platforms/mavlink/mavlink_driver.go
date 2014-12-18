@@ -38,7 +38,8 @@ func NewMavlinkDriver(a *MavlinkAdaptor, name string, v ...time.Duration) *Mavli
 
 	m.AddEvent("packet")
 	m.AddEvent("message")
-	m.AddEvent("error")
+	m.AddEvent("errorIO")
+	m.AddEvent("errorMAVLink")
 
 	return m
 }
@@ -58,13 +59,13 @@ func (m *MavlinkDriver) Start() (errs []error) {
 		for {
 			packet, err := common.ReadMAVLinkPacket(m.adaptor().sp)
 			if err != nil {
-				gobot.Publish(m.Event("error"), err)
+				gobot.Publish(m.Event("errorIO"), err)
 				continue
 			}
 			gobot.Publish(m.Event("packet"), packet)
 			message, err := packet.MAVLinkMessage()
 			if err != nil {
-				gobot.Publish(m.Event("error"), err)
+				gobot.Publish(m.Event("errorMAVLink"), err)
 				continue
 			}
 			gobot.Publish(m.Event("message"), message)
