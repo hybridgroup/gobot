@@ -15,7 +15,7 @@ echo "mode: count" > profile.cov
 touch tmp.cov
 for package in "${PACKAGES[@]}"
 do
-  go test -covermode=count -coverprofile=tmp.cov github.com/hybridgroup/$package
+  go test -a -coverprofile=tmp.cov github.com/hybridgroup/$package
   if [ $? -ne 0 ]
   then
     EXITCODE=1
