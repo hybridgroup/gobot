@@ -18,8 +18,10 @@ func (NullReadWriteCloser) Read(b []byte) (int, error) {
 	return len(b), nil
 }
 
+var closeErr error = nil
+
 func (NullReadWriteCloser) Close() error {
-	return nil
+	return closeErr
 }
 
 func initTestEdisonAdaptor() (*EdisonAdaptor, *sysfs.MockFilesystem) {
@@ -98,17 +100,29 @@ func initTestEdisonAdaptor() (*EdisonAdaptor, *sysfs.MockFilesystem) {
 	return a, fs
 }
 
+func TestEdisonAdaptor(t *testing.T) {
+	a, _ := initTestEdisonAdaptor()
+	gobot.Assert(t, a.Name(), "myAdaptor")
+}
 func TestEdisonAdaptorConnect(t *testing.T) {
 	a, _ := initTestEdisonAdaptor()
 	gobot.Assert(t, len(a.Connect()), 0)
+
+	a = NewEdisonAdaptor("myAdaptor")
+	sysfs.SetFilesystem(sysfs.NewMockFilesystem([]string{}))
+	gobot.Refute(t, len(a.Connect()), 0)
 }
 
 func TestEdisonAdaptorFinalize(t *testing.T) {
 	a, _ := initTestEdisonAdaptor()
 	a.DigitalWrite("3", 1)
 	a.PwmWrite("5", 100)
-	a.i2cDevice = new(NullReadWriteCloser)
+	a.i2cDevice = &NullReadWriteCloser{}
 	gobot.Assert(t, len(a.Finalize()), 0)
+
+	closeErr = errors.New("close error")
+	sysfs.SetFilesystem(sysfs.NewMockFilesystem([]string{}))
+	gobot.Refute(t, len(a.Finalize()), 0)
 }
 
 func TestEdisonAdaptorDigitalIO(t *testing.T) {
