@@ -17,8 +17,10 @@ func (NullReadWriteCloser) Read(b []byte) (int, error) {
 	return len(b), nil
 }
 
+var closeErr error = nil
+
 func (NullReadWriteCloser) Close() error {
-	return nil
+	return closeErr
 }
 
 func initTestFirmata() *board {
