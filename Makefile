@@ -7,10 +7,10 @@ test:
 	done ; \
 
 cover:
-	echo "mode: count" > profile.cov ; \
+	echo "mode: set" > profile.cov ; \
 	for package in $(PACKAGES) ; do \
 		go test -a -coverprofile=tmp.cov github.com/hybridgroup/$$package ; \
-		cat tmp.cov | grep -v "mode: count" >> profile.cov ; \
+		cat tmp.cov | grep -v "mode: set" >> profile.cov ; \
 	done ; \
 	rm tmp.cov ; \
 

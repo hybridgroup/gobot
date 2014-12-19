@@ -11,7 +11,7 @@ then
   go get golang.org/x/tools/cmd/cover
 fi
 
-echo "mode: count" > profile.cov
+echo "mode: set" > profile.cov
 touch tmp.cov
 for package in "${PACKAGES[@]}"
 do
@@ -20,7 +20,7 @@ do
   then
     EXITCODE=1
   fi
-  cat tmp.cov | grep -v "mode: count" >> profile.cov
+  cat tmp.cov | grep -v "mode: set" >> profile.cov
 done
 
 if [ $EXITCODE -ne 0 ]
