@@ -16,6 +16,11 @@ func initTestCameraDriver() *CameraDriver {
 	return d
 }
 
+func TestCameraDriver(t *testing.T) {
+	d := initTestCameraDriver()
+	gobot.Assert(t, d.Name(), "bot")
+	gobot.Assert(t, d.Connection(), (gobot.Connection)(nil))
+}
 func TestCameraDriverStart(t *testing.T) {
 	sem := make(chan bool)
 	d := initTestCameraDriver()
@@ -29,13 +34,12 @@ func TestCameraDriverStart(t *testing.T) {
 		t.Errorf("Event \"frame\" was not published")
 	}
 
-}
-func TestCameraDriver(t *testing.T) {
-	d := NewCameraDriver("bot", "")
+	d = NewCameraDriver("bot", "")
 	gobot.Assert(t, len(d.Start()), 0)
 
 	d = NewCameraDriver("bot", true)
 	gobot.Refute(t, len(d.Start()), 0)
+
 }
 
 func TestCameraDriverHalt(t *testing.T) {
