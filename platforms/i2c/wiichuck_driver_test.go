@@ -29,12 +29,21 @@ func TestNewWiichuckDriver(t *testing.T) {
 	}
 }
 
+func TestWiichuckDriver(t *testing.T) {
+	wii := initTestWiichuckDriver()
+	gobot.Assert(t, wii.Name(), "bot")
+	gobot.Assert(t, wii.Connection().Name(), "adaptor")
+	gobot.Assert(t, wii.interval, 10*time.Millisecond)
+
+	wii = NewWiichuckDriver(newI2cTestAdaptor("adaptor"), "bot", 100*time.Millisecond)
+	gobot.Assert(t, wii.interval, 100*time.Millisecond)
+}
 func TestWiichuckDriverStart(t *testing.T) {
 	sem := make(chan bool)
 	wii, adaptor := initTestWiichuckDriverWithStubbedAdaptor()
 
-	adaptor.i2cReadImpl = func() []byte {
-		return []byte{1, 2, 3, 4, 5, 6}
+	adaptor.i2cReadImpl = func() ([]byte, error) {
+		return []byte{1, 2, 3, 4, 5, 6}, nil
 	}
 
 	numberOfCyclesForEvery := 3

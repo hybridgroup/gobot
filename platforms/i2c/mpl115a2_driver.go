@@ -64,39 +64,43 @@ func (h *MPL115A2Driver) Start() (errs []error) {
 	var pressureComp float32
 
 	if err := h.initialization(); err != nil {
-		return
+		return []error{err}
 	}
 
-	gobot.Every(h.interval, func() {
-		if err := h.connection.I2cWrite([]byte{MPL115A2_REGISTER_STARTCONVERSION, 0}); err != nil {
-			gobot.Publish(h.Event(Error), err)
-			return
-		}
-		<-time.After(5 * time.Millisecond)
+	go func() {
+		for {
+			if err := h.connection.I2cWrite([]byte{MPL115A2_REGISTER_STARTCONVERSION, 0}); err != nil {
+				gobot.Publish(h.Event(Error), err)
+				continue
 
-		if err := h.connection.I2cWrite([]byte{MPL115A2_REGISTER_PRESSURE_MSB}); err != nil {
-			gobot.Publish(h.Event(Error), err)
-			return
-		}
+			}
+			<-time.After(5 * time.Millisecond)
 
-		ret, err := h.connection.I2cRead(4)
-		if err != nil {
-			gobot.Publish(h.Event(Error), err)
-			return
-		}
-		if len(ret) == 4 {
-			buf := bytes.NewBuffer(ret)
-			binary.Read(buf, binary.BigEndian, &pressure)
-			binary.Read(buf, binary.BigEndian, &temperature)
+			if err := h.connection.I2cWrite([]byte{MPL115A2_REGISTER_PRESSURE_MSB}); err != nil {
+				gobot.Publish(h.Event(Error), err)
+				continue
+			}
 
-			temperature = temperature >> 6
-			pressure = pressure >> 6
+			ret, err := h.connection.I2cRead(4)
+			if err != nil {
+				gobot.Publish(h.Event(Error), err)
+				continue
+			}
+			if len(ret) == 4 {
+				buf := bytes.NewBuffer(ret)
+				binary.Read(buf, binary.BigEndian, &pressure)
+				binary.Read(buf, binary.BigEndian, &temperature)
 
-			pressureComp = float32(h.A0) + (float32(h.B1)+float32(h.C12)*float32(temperature))*float32(pressure) + float32(h.B2)*float32(temperature)
-			h.Pressure = (65.0/1023.0)*pressureComp + 50.0
-			h.Temperature = ((float32(temperature) - 498.0) / -5.35) + 25.0
+				temperature = temperature >> 6
+				pressure = pressure >> 6
+
+				pressureComp = float32(h.A0) + (float32(h.B1)+float32(h.C12)*float32(temperature))*float32(pressure) + float32(h.B2)*float32(temperature)
+				h.Pressure = (65.0/1023.0)*pressureComp + 50.0
+				h.Temperature = ((float32(temperature) - 498.0) / -5.35) + 25.0
+			}
+			<-time.After(h.interval)
 		}
-	})
+	}()
 	return
 }
 

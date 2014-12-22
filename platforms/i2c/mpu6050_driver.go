@@ -68,22 +68,25 @@ func (h *MPU6050Driver) Start() (errs []error) {
 		return []error{err}
 	}
 
-	gobot.Every(h.interval, func() {
-		if err := h.connection.I2cWrite([]byte{MPU6050_RA_ACCEL_XOUT_H}); err != nil {
-			gobot.Publish(h.Event(Error), err)
-			return
-		}
+	go func() {
+		for {
+			if err := h.connection.I2cWrite([]byte{MPU6050_RA_ACCEL_XOUT_H}); err != nil {
+				gobot.Publish(h.Event(Error), err)
+				continue
+			}
 
-		ret, err := h.connection.I2cRead(14)
-		if err != nil {
-			gobot.Publish(h.Event(Error), err)
-			return
+			ret, err := h.connection.I2cRead(14)
+			if err != nil {
+				gobot.Publish(h.Event(Error), err)
+				continue
+			}
+			buf := bytes.NewBuffer(ret)
+			binary.Read(buf, binary.BigEndian, &h.Accelerometer)
+			binary.Read(buf, binary.BigEndian, &h.Gyroscope)
+			binary.Read(buf, binary.BigEndian, &h.Temperature)
+			<-time.After(h.interval)
 		}
-		buf := bytes.NewBuffer(ret)
-		binary.Read(buf, binary.BigEndian, &h.Accelerometer)
-		binary.Read(buf, binary.BigEndian, &h.Gyroscope)
-		binary.Read(buf, binary.BigEndian, &h.Temperature)
-	})
+	}()
 	return
 }
 
