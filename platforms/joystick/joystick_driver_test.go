@@ -31,6 +31,9 @@ func TestJoystickDriverStart(t *testing.T) {
 
 func TestJoystickDriverHalt(t *testing.T) {
 	d := initTestJoystickDriver()
+	go func() {
+		<-d.halt
+	}()
 	gobot.Assert(t, len(d.Halt()), 0)
 }
 
