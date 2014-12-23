@@ -58,6 +58,7 @@ func TestSpheroDriverStart(t *testing.T) {
 
 func TestSpheroDriverHalt(t *testing.T) {
 	d := initTestSpheroDriver()
+	d.adaptor().connected = true
 	gobot.Assert(t, len(d.Halt()), 0)
 }
 

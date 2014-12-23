@@ -180,10 +180,12 @@ func (s *SpheroDriver) Start() (errs []error) {
 // Halt halts the SpheroDriver and sends a SpheroDriver.Stop command to the Sphero.
 // Returns true on successful halt.
 func (s *SpheroDriver) Halt() (errs []error) {
-	gobot.Every(10*time.Millisecond, func() {
-		s.Stop()
-	})
-	time.Sleep(1 * time.Second)
+	if s.adaptor().connected {
+		gobot.Every(10*time.Millisecond, func() {
+			s.Stop()
+		})
+		time.Sleep(1 * time.Second)
+	}
 	return
 }
 

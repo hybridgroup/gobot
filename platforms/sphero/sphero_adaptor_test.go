@@ -2,6 +2,7 @@ package sphero
 
 import (
 	"errors"
+	"io"
 	"testing"
 
 	"github.com/hybridgroup/gobot"
@@ -35,8 +36,9 @@ func (nullReadWriteCloser) Close() error {
 
 func initTestSpheroAdaptor() *SpheroAdaptor {
 	a := NewSpheroAdaptor("bot", "/dev/null")
-	a.sp = nullReadWriteCloser{}
-	a.connect = func(a *SpheroAdaptor) (err error) { return nil }
+	a.connect = func(string) (io.ReadWriteCloser, error) {
+		return &nullReadWriteCloser{}, nil
+	}
 	return a
 }
 
@@ -60,12 +62,14 @@ func TestSpheroAdaptorReconnect(t *testing.T) {
 
 func TestSpheroAdaptorFinalize(t *testing.T) {
 	a := initTestSpheroAdaptor()
+	a.Connect()
 	gobot.Assert(t, len(a.Finalize()), 0)
 
 	testAdaptorClose = func() error {
 		return errors.New("close error")
 	}
 
+	a.connected = true
 	gobot.Assert(t, a.Finalize()[0], errors.New("close error"))
 }
 
@@ -73,8 +77,8 @@ func TestSpheroAdaptorConnect(t *testing.T) {
 	a := initTestSpheroAdaptor()
 	gobot.Assert(t, len(a.Connect()), 0)
 
-	a.connect = func(a *SpheroAdaptor) (err error) {
-		return errors.New("connect error")
+	a.connect = func(string) (io.ReadWriteCloser, error) {
+		return nil, errors.New("connect error")
 	}
 
 	gobot.Assert(t, a.Connect()[0], errors.New("connect error"))
