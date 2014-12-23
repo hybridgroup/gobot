@@ -1,6 +1,9 @@
 package sysfs
 
 import (
+	"errors"
+	"os"
+	"syscall"
 	"testing"
 
 	"github.com/hybridgroup/gobot"
@@ -45,4 +48,32 @@ func TestDigitalPin(t *testing.T) {
 	data, err = pin2.Read()
 	gobot.Refute(t, err, nil)
 	gobot.Assert(t, data, 0)
+
+	writeFile = func(string, []byte) (int, error) {
+		return 0, &os.PathError{Err: syscall.EINVAL}
+	}
+
+	err = pin.Unexport()
+	gobot.Assert(t, err, nil)
+
+	writeFile = func(string, []byte) (int, error) {
+		return 0, &os.PathError{Err: errors.New("write error")}
+	}
+
+	err = pin.Unexport()
+	gobot.Assert(t, err.(*os.PathError).Err, errors.New("write error"))
+
+	writeFile = func(string, []byte) (int, error) {
+		return 0, &os.PathError{Err: syscall.EBUSY}
+	}
+
+	err = pin.Export()
+	gobot.Assert(t, err, nil)
+
+	writeFile = func(string, []byte) (int, error) {
+		return 0, &os.PathError{Err: errors.New("write error")}
+	}
+
+	err = pin.Export()
+	gobot.Assert(t, err.(*os.PathError).Err, errors.New("write error"))
 }
