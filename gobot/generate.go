@@ -10,134 +10,144 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-type generate struct {
+type config struct {
 	Name        string
 	UpperName   string
 	FirstLetter string
+	Example     string
+	dir         string
 }
 
 func Generate() cli.Command {
 	return cli.Command{
 		Name:  "generate",
-		Usage: "Generate new Gobot skeleton project",
+		Usage: "Generate new Gobot adaptors, drivers, and projects",
 		Action: func(c *cli.Context) {
-			args := c.Args()
-			if len(args) == 0 || len(args) > 1 {
-				fmt.Println("Please provide a one word package name.")
+			valid := false
+			for _, s := range []string{"adaptor", "driver", "project"} {
+				if s == c.Args().First() {
+					valid = true
+				}
+			}
+			if valid == false {
+				fmt.Println("Invalid/no subcommand supplied.\n")
+				fmt.Println("Usage:")
+				fmt.Println(" gobot generate adaptor [package name] # generate a new Gobot adaptor")
+				fmt.Println(" gobot generate driver  [package name] # generate a new Gobot driver")
+				fmt.Println(" gobot generate project [package name] # generate a new Gobot project")
 				return
 			}
-			pwd, _ := os.Getwd()
-			dir := fmt.Sprintf("%s/%s", pwd, "gobot-"+args[0])
-			fmt.Println("Creating", dir)
-			err := os.MkdirAll(dir, 0700)
-			if err != nil {
-				fmt.Println(err)
-				err = nil
+
+			if len(c.Args()) != 2 {
+				fmt.Println("Please provide a one word name.")
+				return
 			}
 
-			examplesDir := dir + "/examples"
-			fmt.Println("Creating", examplesDir)
-			err = os.MkdirAll(examplesDir, 0700)
-			if err != nil {
-				fmt.Println(err)
-				err = nil
-			}
+			name := strings.ToLower(c.Args()[1])
+			upperName := strings.ToUpper(string(name[0])) + string(name[1:])
 
-			upperName := fmt.Sprintf("%s%s",
-				strings.ToUpper(string(args[0][0])),
-				string(args[0][1:]))
-
-			name := generate{
+			cfg := config{
 				UpperName:   upperName,
-				Name:        string(args[0]),
-				FirstLetter: string(args[0][0]),
+				Name:        name,
+				FirstLetter: string(name[0]),
+				dir:         ".",
 			}
 
-			adaptor, _ := template.New("").Parse(adaptor())
-			fileLocation := fmt.Sprintf("%s/%s_adaptor.go", dir, args[0])
-			fmt.Println("Creating", fileLocation)
-			f, err := os.Create(fileLocation)
-			if err != nil {
-				fmt.Println(err)
-				err = nil
-			}
-			adaptor.Execute(f, name)
-			f.Close()
+			switch c.Args().First() {
+			case "adaptor":
+				if err := generateAdaptor(cfg); err != nil {
+					fmt.Println(err)
+				}
+			case "driver":
+				if err := generateDriver(cfg); err != nil {
+					fmt.Println(err)
+				}
+			case "project":
+				pwd, err := os.Getwd()
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
+				dir := pwd + "/gobot-" + cfg.Name
+				fmt.Println("Creating", dir)
+				if err := os.MkdirAll(dir, 0700); err != nil {
+					fmt.Println(err)
+					return
+				}
+				cfg.dir = dir
 
-			driver, _ := template.New("").Parse(driver())
-			fileLocation = fmt.Sprintf("%s/%s_driver.go", dir, args[0])
-			fmt.Println("Creating", fileLocation)
-			f, err = os.Create(fileLocation)
-			if err != nil {
-				fmt.Println(err)
-				err = nil
-			}
-			driver.Execute(f, name)
-			f.Close()
+				examplesDir := dir + "/examples"
+				fmt.Println("Creating", examplesDir)
+				if err := os.MkdirAll(examplesDir, 0700); err != nil {
+					fmt.Println(err)
+					return
+				}
 
-			fileLocation = fmt.Sprintf("%s/LICENSE", dir)
-			fmt.Println("Creating", fileLocation)
-			f, err = os.Create(fileLocation)
-			if err != nil {
-				fmt.Println(err)
-				err = nil
+				if err := generateProject(cfg); err != nil {
+					fmt.Println(err)
+				}
 			}
-			f.Close()
-
-			driverTest, _ := template.New("").Parse(driverTest())
-			fileLocation = fmt.Sprintf("%s/%s_driver_test.go", dir, args[0])
-			fmt.Println("Creating", fileLocation)
-			f, err = os.Create(fileLocation)
-			if err != nil {
-				fmt.Println(err)
-				err = nil
-			}
-			driverTest.Execute(f, name)
-			f.Close()
-
-			adaptorTest, _ := template.New("").Parse(adaptorTest())
-			fileLocation = fmt.Sprintf("%s/%s_adaptor_test.go", dir, args[0])
-			fmt.Println("Creating", fileLocation)
-			f, err = os.Create(fileLocation)
-			if err != nil {
-				fmt.Println(err)
-				err = nil
-			}
-			adaptorTest.Execute(f, name)
-			f.Close()
-
-			example, _ := template.New("").Parse(example())
-			fileLocation = fmt.Sprintf("%s/main.go", examplesDir)
-			fmt.Println("Creating", fileLocation)
-			f, err = os.Create(fileLocation)
-			if err != nil {
-				fmt.Println(err)
-				err = nil
-			}
-			example.Execute(f, name)
-			f.Close()
-
-			readme, _ := template.New("").Parse(readme())
-			fileLocation = fmt.Sprintf("%s/README.md", dir)
-			fmt.Println("Creating", fileLocation)
-			f, err = os.Create(fileLocation)
-			if err != nil {
-				fmt.Println(err)
-				err = nil
-			}
-
-			ex, _ := ioutil.ReadFile(examplesDir + "/main.go")
-			data := struct {
-				Name    string
-				Example string
-			}{
-				name.Name,
-				string(ex),
-			}
-			readme.Execute(f, data)
-			f.Close()
 		},
 	}
+}
+
+func generate(c config, file string, tmpl string) error {
+	fileLocation := c.dir + "/" + file
+	fmt.Println("Creating", fileLocation)
+
+	f, err := os.Create(fileLocation)
+	defer f.Close()
+	if err != nil {
+		return err
+	}
+
+	t, err := template.New("").Parse(tmpl)
+	if err != nil {
+		return err
+	}
+
+	return t.Execute(f, c)
+}
+
+func generateDriver(c config) error {
+	if err := generate(c, c.Name+"_driver.go", driver()); err != nil {
+		return err
+	}
+
+	return generate(c, c.Name+"_dirver_test.go", driverTest())
+}
+
+func generateAdaptor(c config) error {
+	if err := generate(c, c.Name+"_adaptor.go", adaptor()); err != nil {
+		return err
+	}
+
+	return generate(c, c.Name+"_adaptor_test.go", adaptorTest())
+}
+
+func generateProject(c config) error {
+	if err := generateDriver(c); err != nil {
+		return err
+	}
+	if err := generateAdaptor(c); err != nil {
+		return err
+	}
+
+	dir := c.dir
+	exampleDir := dir + "/examples"
+	c.dir = exampleDir
+
+	generate(c, "main.go", example())
+
+	c.dir = dir
+
+	if ex, err := ioutil.ReadFile(exampleDir + "/main.go"); err != nil {
+		return err
+	} else {
+		c.Example = string(ex)
+	}
+
+	return generate(c, "README.md", readme())
 }
 
 func adaptor() string {
@@ -392,6 +402,6 @@ Explain how to connect to the device here...
 
 ## License
 
-Copyright (c) 2014 Your Name Here. See LICENSE for more details
+Copyright (c) 2015 <Your Name Here>. Licensed under the <Insert license here> license.
 `
 }
