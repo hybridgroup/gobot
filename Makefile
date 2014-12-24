@@ -23,7 +23,8 @@ endif
 	cd robeaux-tmp ; \
 	rm fonts/* ; \
 	rm -r test/* ; \
-	rm Makefile package.json README.markdown robeaux.gemspec css/fonts.css ; \
+	rm -r less/* ; \
+	rm Makefile Gruntfile.js package.json README.markdown robeaux.gemspec css/fonts.css ; \
 	touch css/fonts.css ; \
 	echo "Updating robeaux to $(shell git rev-parse HEAD)" ; \
 	go-bindata -pkg="robeaux" -o robeaux.go -ignore=\\.git ./... ; \
