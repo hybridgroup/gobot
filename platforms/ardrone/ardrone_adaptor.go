@@ -5,6 +5,8 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
+var _ gobot.Adaptor = (*ArdroneAdaptor)(nil)
+
 // drone defines expected drone behaviour
 type drone interface {
 	Takeoff() bool
@@ -21,39 +23,40 @@ type drone interface {
 }
 
 type ArdroneAdaptor struct {
-	gobot.Adaptor
+	name    string
 	drone   drone
-	connect func(*ArdroneAdaptor)
+	config  client.Config
+	connect func(*ArdroneAdaptor) (drone, error)
 }
 
 // NewArdroneAdaptor creates a new ardrone and connects with default configuration
 func NewArdroneAdaptor(name string, v ...string) *ArdroneAdaptor {
-	return &ArdroneAdaptor{
-		Adaptor: *gobot.NewAdaptor(
-			name,
-			"ArdroneAdaptor",
-		),
-		connect: func(a *ArdroneAdaptor) {
-			config := client.DefaultConfig()
-			if len(v) > 0 {
-				config.Ip = v[0]
-			}
-			d, err := client.Connect(config)
-			if err != nil {
-				panic(err)
-			}
-			a.drone = d
+	a := &ArdroneAdaptor{
+		name: name,
+		connect: func(a *ArdroneAdaptor) (drone, error) {
+			return client.Connect(a.config)
 		},
 	}
+
+	a.config = client.DefaultConfig()
+	if len(v) > 0 {
+		a.config.Ip = v[0]
+	}
+
+	return a
 }
 
+func (a *ArdroneAdaptor) Name() string { return a.name }
+
 // Connect returns true when connection to ardrone is established correclty
-func (a *ArdroneAdaptor) Connect() bool {
-	a.connect(a)
-	return true
+func (a *ArdroneAdaptor) Connect() (errs []error) {
+	if d, err := a.connect(a); err != nil {
+		return []error{err}
+	} else {
+		a.drone = d
+	}
+	return
 }
 
 // Finalize returns true when connection is finalized correctly
-func (a *ArdroneAdaptor) Finalize() bool {
-	return true
-}
+func (a *ArdroneAdaptor) Finalize() (errs []error) { return }

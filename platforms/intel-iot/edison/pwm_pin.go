@@ -38,49 +38,38 @@ type pwmPin struct {
 
 // newPwmPin returns an exported and enabled pwmPin
 func newPwmPin(pin int) *pwmPin {
-	p := &pwmPin{pin: strconv.Itoa(pin)}
-	p.export()
-	p.enable("1")
-	return p
+	return &pwmPin{pin: strconv.Itoa(pin)}
 }
 
 // enable writes value to pwm enable path
-func (p *pwmPin) enable(val string) {
-	_, err := writeFile(pwmEnablePath(p.pin), []byte(val))
-	if err != nil {
-		panic(err)
-	}
+func (p *pwmPin) enable(val string) (err error) {
+	_, err = writeFile(pwmEnablePath(p.pin), []byte(val))
+	return
 }
 
 // period reads from pwm period path and returns value
-func (p *pwmPin) period() string {
+func (p *pwmPin) period() (period string, err error) {
 	buf, err := readFile(pwmPeriodPath(p.pin))
 	if err != nil {
-		panic(err)
+		return
 	}
-	return string(buf[0 : len(buf)-1])
+	return string(buf[0 : len(buf)-1]), nil
 }
 
 // writeDuty writes value to pwm duty cycle path
-func (p *pwmPin) writeDuty(duty string) {
-	_, err := writeFile(pwmDutyCyclePath(p.pin), []byte(duty))
-	if err != nil {
-		panic(err)
-	}
+func (p *pwmPin) writeDuty(duty string) (err error) {
+	_, err = writeFile(pwmDutyCyclePath(p.pin), []byte(duty))
+	return
 }
 
 // export writes pin to pwm export path
-func (p *pwmPin) export() {
-	writeFile(pwmExportPath(), []byte(p.pin))
+func (p *pwmPin) export() (err error) {
+	_, err = writeFile(pwmExportPath(), []byte(p.pin))
+	return
 }
 
 // export writes pin to pwm unexport path
-func (p *pwmPin) unexport() {
-	writeFile(pwmUnExportPath(), []byte(p.pin))
-}
-
-// close disables and unexports pin
-func (p *pwmPin) close() {
-	p.enable("0")
-	p.unexport()
+func (p *pwmPin) unexport() (err error) {
+	_, err = writeFile(pwmUnExportPath(), []byte(p.pin))
+	return
 }

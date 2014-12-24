@@ -12,65 +12,80 @@ type JSONGobot struct {
 	Commands []string     `json:"commands"`
 }
 
+// ToJSON returns a JSON representation of this Gobot.
+func NewJSONGobot(gobot *Gobot) *JSONGobot {
+	jsonGobot := &JSONGobot{
+		Robots:   []*JSONRobot{},
+		Commands: []string{},
+	}
+
+	for command := range gobot.Commands() {
+		jsonGobot.Commands = append(jsonGobot.Commands, command)
+	}
+
+	gobot.robots.Each(func(r *Robot) {
+		jsonGobot.Robots = append(jsonGobot.Robots, NewJSONRobot(r))
+	})
+	return jsonGobot
+}
+
 // Gobot is a container composed of one or more robots
 type Gobot struct {
-	robots   *robots
-	commands map[string]func(map[string]interface{}) interface{}
-	trap     func(chan os.Signal)
+	robots *robots
+	trap   func(chan os.Signal)
+	Commander
+	Eventer
 }
 
 // NewGobot returns a new Gobot
 func NewGobot() *Gobot {
 	return &Gobot{
-		robots:   &robots{},
-		commands: make(map[string]func(map[string]interface{}) interface{}),
+		robots: &robots{},
 		trap: func(c chan os.Signal) {
 			signal.Notify(c, os.Interrupt)
 		},
+		Commander: NewCommander(),
+		Eventer:   NewEventer(),
 	}
-}
-
-/*
-AddCommand creates a new command and adds it to the Gobot. This command
-will be available via HTTP using '/commands/name'
-
-Example:
-	gbot.AddCommand( 'rollover', func( params map[string]interface{}) interface{} {
-		fmt.Println( "Rolling over - Stand by...")
-	})
-
-	With the api package setup, you can now get your Gobot to rollover using: http://localhost:3000/commands/rollover
-*/
-func (g *Gobot) AddCommand(name string, f func(map[string]interface{}) interface{}) {
-	g.commands[name] = f
-}
-
-// Commands returns all available commands on this Gobot.
-func (g *Gobot) Commands() map[string]func(map[string]interface{}) interface{} {
-	return g.commands
-}
-
-// Command reutnrs a command given a name.
-func (g *Gobot) Command(name string) func(map[string]interface{}) interface{} {
-	return g.commands[name]
 }
 
 // Start calls the Start method on each robot in it's collection of robots, and
 // stops all robots on reception of a SIGINT. Start will block the execution of
 // your main function until it receives the SIGINT.
-func (g *Gobot) Start() {
-	g.robots.Start()
+func (g *Gobot) Start() (errs []error) {
+	if rerrs := g.robots.Start(); len(rerrs) > 0 {
+		for _, err := range rerrs {
+			log.Println("Error:", err)
+			errs = append(errs, err)
+		}
+	}
 
 	c := make(chan os.Signal, 1)
 	g.trap(c)
+	if len(errs) > 0 {
+		// there was an error during start, so we immediatly pass the interrupt
+		// in order to disconnect the initialized robots, connections and devices
+		c <- os.Interrupt
+	}
 
 	// waiting for interrupt coming on the channel
 	_ = <-c
 	g.robots.Each(func(r *Robot) {
 		log.Println("Stopping Robot", r.Name, "...")
-		r.Devices().Halt()
-		r.Connections().Finalize()
+		if herrs := r.Devices().Halt(); len(herrs) > 0 {
+			for _, err := range herrs {
+				log.Println("Error:", err)
+				errs = append(errs, err)
+			}
+		}
+		if cerrs := r.Connections().Finalize(); len(cerrs) > 0 {
+			for _, err := range cerrs {
+				log.Println("Error:", err)
+				errs = append(errs, err)
+			}
+		}
 	})
+	return errs
 }
 
 // Robots returns all robots associated with this Gobot instance.
@@ -93,21 +108,4 @@ func (g *Gobot) Robot(name string) *Robot {
 		}
 	}
 	return nil
-}
-
-// ToJSON returns a JSON representation of this Gobot.
-func (g *Gobot) ToJSON() *JSONGobot {
-	jsonGobot := &JSONGobot{
-		Robots:   []*JSONRobot{},
-		Commands: []string{},
-	}
-
-	for command := range g.Commands() {
-		jsonGobot.Commands = append(jsonGobot.Commands, command)
-	}
-
-	g.robots.Each(func(r *Robot) {
-		jsonGobot.Robots = append(jsonGobot.Robots, r.ToJSON())
-	})
-	return jsonGobot
 }

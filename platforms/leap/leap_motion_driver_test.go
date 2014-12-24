@@ -1,6 +1,7 @@
 package leap
 
 import (
+	"errors"
 	"io"
 	"io/ioutil"
 	"testing"
@@ -8,28 +9,51 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
+type NullReadWriteCloser struct{}
+
+var writeError error = nil
+
+func (NullReadWriteCloser) Write(p []byte) (int, error) {
+	return len(p), writeError
+}
+func (NullReadWriteCloser) Read(b []byte) (int, error) {
+	return len(b), nil
+}
+func (NullReadWriteCloser) Close() error {
+	return nil
+}
+
 func initTestLeapMotionDriver() *LeapMotionDriver {
 	a := NewLeapMotionAdaptor("bot", "")
-	a.connect = func(l *LeapMotionAdaptor) {
-		l.ws = new(gobot.NullReadWriteCloser)
+	a.connect = func(port string) (io.ReadWriteCloser, error) {
+		return &NullReadWriteCloser{}, nil
 	}
 	a.Connect()
-	receive = func(ws io.ReadWriteCloser) []byte {
+	receive = func(ws io.ReadWriteCloser, buf *[]byte) {
 		file, _ := ioutil.ReadFile("./test/support/example_frame.json")
-		return file
+		copy(*buf, file)
 	}
 	return NewLeapMotionDriver(a, "bot")
 }
 
-func TestLeapMotionDriverStart(t *testing.T) {
-	//t.SkipNow()
+func TestLeapMotionDriver(t *testing.T) {
 	d := initTestLeapMotionDriver()
-	gobot.Assert(t, d.Start(), true)
+	gobot.Assert(t, d.Name(), "bot")
+	gobot.Assert(t, d.Connection().Name(), "bot")
+}
+func TestLeapMotionDriverStart(t *testing.T) {
+	d := initTestLeapMotionDriver()
+	gobot.Assert(t, len(d.Start()), 0)
+
+	d = initTestLeapMotionDriver()
+	writeError = errors.New("write error")
+	gobot.Assert(t, d.Start()[0], errors.New("write error"))
+
 }
 
 func TestLeapMotionDriverHalt(t *testing.T) {
 	d := initTestLeapMotionDriver()
-	gobot.Assert(t, d.Halt(), true)
+	gobot.Assert(t, len(d.Halt()), 0)
 }
 
 func TestLeapMotionDriverParser(t *testing.T) {

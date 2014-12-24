@@ -11,16 +11,16 @@ then
   go get golang.org/x/tools/cmd/cover
 fi
 
-echo "mode: count" > profile.cov
+echo "mode: set" > profile.cov
 touch tmp.cov
 for package in "${PACKAGES[@]}"
 do
-  go test -covermode=count -coverprofile=tmp.cov github.com/hybridgroup/$package
+  go test -a -coverprofile=tmp.cov github.com/hybridgroup/$package
   if [ $? -ne 0 ]
   then
     EXITCODE=1
   fi
-  cat tmp.cov | grep -v "mode: count" >> profile.cov
+  cat tmp.cov | grep -v "mode: set" >> profile.cov
 done
 
 if [ $EXITCODE -ne 0 ]

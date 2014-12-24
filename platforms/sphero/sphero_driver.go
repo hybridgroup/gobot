@@ -3,11 +3,13 @@ package sphero
 import (
 	"bytes"
 	"encoding/binary"
-	"fmt"
+	"errors"
 	"time"
 
 	"github.com/hybridgroup/gobot"
 )
+
+var _ gobot.Driver = (*SpheroDriver)(nil)
 
 type packet struct {
 	header   []uint8
@@ -17,12 +19,15 @@ type packet struct {
 
 // Represents a Sphero
 type SpheroDriver struct {
-	gobot.Driver
+	name            string
+	connection      gobot.Connection
 	seq             uint8
 	asyncResponse   [][]uint8
 	syncResponse    [][]uint8
 	packetChannel   chan *packet
 	responseChannel chan []uint8
+	gobot.Eventer
+	gobot.Commander
 }
 
 type Collision struct {
@@ -49,15 +54,15 @@ type Collision struct {
 // 	"SetStabilization" - See SpheroDriver.SetStabilization
 func NewSpheroDriver(a *SpheroAdaptor, name string) *SpheroDriver {
 	s := &SpheroDriver{
-		Driver: *gobot.NewDriver(
-			name,
-			"SpheroDriver",
-			a,
-		),
+		name:            name,
+		connection:      a,
+		Eventer:         gobot.NewEventer(),
+		Commander:       gobot.NewCommander(),
 		packetChannel:   make(chan *packet, 1024),
 		responseChannel: make(chan []uint8, 1024),
 	}
 
+	s.AddEvent("error")
 	s.AddEvent("collision")
 	s.AddCommand("SetRGB", func(params map[string]interface{}) interface{} {
 		r := uint8(params["r"].(float64))
@@ -95,7 +100,7 @@ func NewSpheroDriver(a *SpheroAdaptor, name string) *SpheroDriver {
 		return nil
 	})
 	s.AddCommand("SetStabilization", func(params map[string]interface{}) interface{} {
-		on := params["heading"].(bool)
+		on := params["enable"].(bool)
 		s.SetStabilization(on)
 		return nil
 	})
@@ -103,8 +108,11 @@ func NewSpheroDriver(a *SpheroAdaptor, name string) *SpheroDriver {
 	return s
 }
 
+func (s *SpheroDriver) Name() string                 { return s.name }
+func (s *SpheroDriver) Connection() gobot.Connection { return s.connection }
+
 func (s *SpheroDriver) adaptor() *SpheroAdaptor {
-	return s.Adaptor().(*SpheroAdaptor)
+	return s.Connection().(*SpheroAdaptor)
 }
 
 // Start starts the SpheroDriver and enables Collision Detection.
@@ -112,11 +120,14 @@ func (s *SpheroDriver) adaptor() *SpheroAdaptor {
 //
 // Emits the Events:
 // 	"collision" SpheroDriver.Collision - On Collision Detected
-func (s *SpheroDriver) Start() bool {
+func (s *SpheroDriver) Start() (errs []error) {
 	go func() {
 		for {
 			packet := <-s.packetChannel
-			s.write(packet)
+			err := s.write(packet)
+			if err != nil {
+				gobot.Publish(s.Event("error"), err)
+			}
 		}
 	}()
 
@@ -163,17 +174,19 @@ func (s *SpheroDriver) Start() bool {
 	s.configureCollisionDetection()
 	s.enableStopOnDisconnect()
 
-	return true
+	return
 }
 
 // Halt halts the SpheroDriver and sends a SpheroDriver.Stop command to the Sphero.
 // Returns true on successful halt.
-func (s *SpheroDriver) Halt() bool {
-	gobot.Every(10*time.Millisecond, func() {
-		s.Stop()
-	})
-	time.Sleep(1 * time.Second)
-	return true
+func (s *SpheroDriver) Halt() (errs []error) {
+	if s.adaptor().connected {
+		gobot.Every(10*time.Millisecond, func() {
+			s.Stop()
+		})
+		time.Sleep(1 * time.Second)
+	}
+	return
 }
 
 // SetRGB sets the Sphero to the given r, g, and b values
@@ -263,20 +276,17 @@ func (s *SpheroDriver) craftPacket(body []uint8, did byte, cid byte) *packet {
 	return packet
 }
 
-func (s *SpheroDriver) write(packet *packet) {
+func (s *SpheroDriver) write(packet *packet) (err error) {
 	buf := append(packet.header, packet.body...)
 	buf = append(buf, packet.checksum)
 	length, err := s.adaptor().sp.Write(buf)
 	if err != nil {
-		fmt.Println(s.Name, err)
-		s.adaptor().Disconnect()
-		fmt.Println("Reconnecting to SpheroDriver...")
-		s.adaptor().Connect()
-		return
+		return err
 	} else if length != len(buf) {
-		fmt.Println("Not enough bytes written", s.Name)
+		return errors.New("Not enough bytes written")
 	}
 	s.seq++
+	return
 }
 
 func (s *SpheroDriver) calculateChecksum(packet *packet) uint8 {

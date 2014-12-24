@@ -5,15 +5,23 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"time"
 
 	"github.com/hybridgroup/go-sdl2/sdl"
 	"github.com/hybridgroup/gobot"
 )
 
+var _ gobot.Driver = (*JoystickDriver)(nil)
+
 type JoystickDriver struct {
-	gobot.Driver
-	config joystickConfig
-	poll   func() sdl.Event
+	name       string
+	interval   time.Duration
+	connection gobot.Connection
+	configPath string
+	config     joystickConfig
+	poll       func() sdl.Event
+	halt       chan bool
+	gobot.Eventer
 }
 
 // pair is a JSON representation of name and id
@@ -43,52 +51,78 @@ type joystickConfig struct {
 // It adds the following events:
 //     (button)_press - triggered when (button) is pressed
 //     (button)_release - triggered when (button) is released
-func NewJoystickDriver(a *JoystickAdaptor, name string, config string) *JoystickDriver {
+func NewJoystickDriver(a *JoystickAdaptor, name string, config string, v ...time.Duration) *JoystickDriver {
 	d := &JoystickDriver{
-		Driver: *gobot.NewDriver(
-			name,
-			"JoystickDriver",
-			a,
-		),
+		name:       name,
+		connection: a,
+		Eventer:    gobot.NewEventer(),
+		configPath: config,
 		poll: func() sdl.Event {
 			return sdl.PollEvent()
 		},
+		interval: 10 * time.Millisecond,
+		halt:     make(chan bool, 0),
 	}
 
-	file, e := ioutil.ReadFile(config)
-	if e != nil {
-		panic(fmt.Sprintf("File error: %v\n", e))
+	if len(v) > 0 {
+		d.interval = v[0]
 	}
-	var jsontype joystickConfig
-	json.Unmarshal(file, &jsontype)
-	d.config = jsontype
-	for _, value := range d.config.Buttons {
-		d.AddEvent(fmt.Sprintf("%s_press", value.Name))
-		d.AddEvent(fmt.Sprintf("%s_release", value.Name))
-	}
-	for _, value := range d.config.Axis {
-		d.AddEvent(value.Name)
-	}
-	for _, value := range d.config.Hats {
-		d.AddEvent(value.Name)
-	}
+
+	d.AddEvent("error")
 	return d
 }
+func (j *JoystickDriver) Name() string                 { return j.name }
+func (j *JoystickDriver) Connection() gobot.Connection { return j.connection }
 
 // adaptor returns joystick adaptor
 func (j *JoystickDriver) adaptor() *JoystickAdaptor {
-	return j.Adaptor().(*JoystickAdaptor)
+	return j.Connection().(*JoystickAdaptor)
 }
 
 // Start initiallizes event polling with defined interval
-func (j *JoystickDriver) Start() bool {
-	gobot.Every(j.Interval(), func() {
-		event := j.poll()
-		if event != nil {
-			j.handleEvent(event)
+func (j *JoystickDriver) Start() (errs []error) {
+	file, err := ioutil.ReadFile(j.configPath)
+	if err != nil {
+		return []error{err}
+	}
+
+	var jsontype joystickConfig
+	json.Unmarshal(file, &jsontype)
+	j.config = jsontype
+
+	for _, value := range j.config.Buttons {
+		j.AddEvent(fmt.Sprintf("%s_press", value.Name))
+		j.AddEvent(fmt.Sprintf("%s_release", value.Name))
+	}
+	for _, value := range j.config.Axis {
+		j.AddEvent(value.Name)
+	}
+	for _, value := range j.config.Hats {
+		j.AddEvent(value.Name)
+	}
+
+	go func() {
+		for {
+			event := j.poll()
+			if event != nil {
+				if err = j.handleEvent(event); err != nil {
+					gobot.Publish(j.Event("error"), err)
+				}
+			}
+			select {
+			case <-time.After(j.interval):
+			case <-j.halt:
+				return
+			}
 		}
-	})
-	return true
+	}()
+	return
+}
+
+// Halt stops joystick driver
+func (j *JoystickDriver) Halt() (errs []error) {
+	j.halt <- true
+	return
 }
 
 // HandleEvent publishes an specific event according to data received
@@ -98,9 +132,7 @@ func (j *JoystickDriver) handleEvent(event sdl.Event) error {
 		if data.Which == j.adaptor().joystick.InstanceID() {
 			axis := j.findName(data.Axis, j.config.Axis)
 			if axis == "" {
-				e := errors.New(fmt.Sprintf("Unknown Axis: %v", data.Axis))
-				fmt.Println(e.Error())
-				return e
+				return errors.New(fmt.Sprintf("Unknown Axis: %v", data.Axis))
 			} else {
 				gobot.Publish(j.Event(axis), data.Value)
 			}
@@ -109,9 +141,7 @@ func (j *JoystickDriver) handleEvent(event sdl.Event) error {
 		if data.Which == j.adaptor().joystick.InstanceID() {
 			button := j.findName(data.Button, j.config.Buttons)
 			if button == "" {
-				e := errors.New(fmt.Sprintf("Unknown Button: %v", data.Button))
-				fmt.Println(e.Error())
-				return e
+				return errors.New(fmt.Sprintf("Unknown Button: %v", data.Button))
 			} else {
 				if data.State == 1 {
 					gobot.Publish(j.Event(fmt.Sprintf("%s_press", button)), nil)
@@ -124,9 +154,7 @@ func (j *JoystickDriver) handleEvent(event sdl.Event) error {
 		if data.Which == j.adaptor().joystick.InstanceID() {
 			hat := j.findHatName(data.Value, data.Hat, j.config.Hats)
 			if hat == "" {
-				e := errors.New(fmt.Sprintf("Unknown Hat: %v %v", data.Hat, data.Value))
-				fmt.Println(e.Error())
-				return e
+				return errors.New(fmt.Sprintf("Unknown Hat: %v %v", data.Hat, data.Value))
 			} else {
 				gobot.Publish(j.Event(hat), true)
 			}
@@ -134,9 +162,6 @@ func (j *JoystickDriver) handleEvent(event sdl.Event) error {
 	}
 	return nil
 }
-
-// Halt stops joystick driver
-func (j *JoystickDriver) Halt() bool { return true }
 
 func (j *JoystickDriver) findName(id uint8, list []pair) string {
 	for _, value := range list {

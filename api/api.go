@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -160,13 +161,13 @@ func (a *api) robeaux(res http.ResponseWriter, req *http.Request) {
 // mcp returns MCP route handler.
 // Writes JSON with gobot representation
 func (a *api) mcp(res http.ResponseWriter, req *http.Request) {
-	a.writeJSON(map[string]interface{}{"MCP": a.gobot.ToJSON()}, res)
+	a.writeJSON(map[string]interface{}{"MCP": gobot.NewJSONGobot(a.gobot)}, res)
 }
 
 // mcpCommands returns commands route handler.
 // Writes JSON with global commands representation
 func (a *api) mcpCommands(res http.ResponseWriter, req *http.Request) {
-	a.writeJSON(map[string]interface{}{"commands": a.gobot.ToJSON().Commands}, res)
+	a.writeJSON(map[string]interface{}{"commands": gobot.NewJSONGobot(a.gobot).Commands}, res)
 }
 
 // robots returns route handler.
@@ -174,7 +175,7 @@ func (a *api) mcpCommands(res http.ResponseWriter, req *http.Request) {
 func (a *api) robots(res http.ResponseWriter, req *http.Request) {
 	jsonRobots := []*gobot.JSONRobot{}
 	a.gobot.Robots().Each(func(r *gobot.Robot) {
-		jsonRobots = append(jsonRobots, r.ToJSON())
+		jsonRobots = append(jsonRobots, gobot.NewJSONRobot(r))
 	})
 	a.writeJSON(map[string]interface{}{"robots": jsonRobots}, res)
 }
@@ -182,32 +183,45 @@ func (a *api) robots(res http.ResponseWriter, req *http.Request) {
 // robot returns route handler.
 // Writes JSON with robot representation
 func (a *api) robot(res http.ResponseWriter, req *http.Request) {
-	a.writeJSON(map[string]interface{}{"robot": a.gobot.Robot(req.URL.Query().Get(":robot")).ToJSON()}, res)
+	if robot, err := a.jsonRobotFor(req.URL.Query().Get(":robot")); err != nil {
+		a.writeJSON(map[string]interface{}{"error": err.Error()}, res)
+	} else {
+		a.writeJSON(map[string]interface{}{"robot": robot}, res)
+	}
 }
 
 // robotCommands returns commands route handler
 // Writes JSON with robot commands representation
 func (a *api) robotCommands(res http.ResponseWriter, req *http.Request) {
-	a.writeJSON(map[string]interface{}{"commands": a.gobot.Robot(req.URL.Query().Get(":robot")).ToJSON().Commands}, res)
+	if robot, err := a.jsonRobotFor(req.URL.Query().Get(":robot")); err != nil {
+		a.writeJSON(map[string]interface{}{"error": err.Error()}, res)
+	} else {
+		a.writeJSON(map[string]interface{}{"commands": robot.Commands}, res)
+	}
 }
 
 // robotDevices returns devices route handler.
 // Writes JSON with robot devices representation
 func (a *api) robotDevices(res http.ResponseWriter, req *http.Request) {
-	jsonDevices := []*gobot.JSONDevice{}
-	a.gobot.Robot(req.URL.Query().Get(":robot")).Devices().Each(func(d gobot.Device) {
-		jsonDevices = append(jsonDevices, d.ToJSON())
-	})
-	a.writeJSON(map[string]interface{}{"devices": jsonDevices}, res)
+	if robot := a.gobot.Robot(req.URL.Query().Get(":robot")); robot != nil {
+		jsonDevices := []*gobot.JSONDevice{}
+		robot.Devices().Each(func(d gobot.Device) {
+			jsonDevices = append(jsonDevices, gobot.NewJSONDevice(d))
+		})
+		a.writeJSON(map[string]interface{}{"devices": jsonDevices}, res)
+	} else {
+		a.writeJSON(map[string]interface{}{"error": "No Robot found with the name " + req.URL.Query().Get(":robot")}, res)
+	}
 }
 
 // robotDevice returns device route handler.
 // Writes JSON with robot device representation
 func (a *api) robotDevice(res http.ResponseWriter, req *http.Request) {
-	a.writeJSON(
-		map[string]interface{}{"device": a.gobot.Robot(req.URL.Query().Get(":robot")).
-			Device(req.URL.Query().Get(":device")).ToJSON()}, res,
-	)
+	if device, err := a.jsonDeviceFor(req.URL.Query().Get(":robot"), req.URL.Query().Get(":device")); err != nil {
+		a.writeJSON(map[string]interface{}{"error": err.Error()}, res)
+	} else {
+		a.writeJSON(map[string]interface{}{"device": device}, res)
+	}
 }
 
 // robotDeviceEvent returns device event route handler.
@@ -224,52 +238,64 @@ func (a *api) robotDeviceEvent(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Cache-Control", "no-cache")
 	res.Header().Set("Connection", "keep-alive")
 
-	gobot.On(a.gobot.Robot(req.URL.Query().Get(":robot")).
-		Device(req.URL.Query().Get(":device")).Event(req.URL.Query().Get(":event")),
-		func(data interface{}) {
+	if event := a.gobot.Robot(req.URL.Query().Get(":robot")).
+		Device(req.URL.Query().Get(":device")).(gobot.Eventer).
+		Event(req.URL.Query().Get(":event")); event != nil {
+		gobot.On(event, func(data interface{}) {
 			d, _ := json.Marshal(data)
 			msg <- string(d)
 		})
 
-	for {
-		select {
-		case data := <-msg:
-			fmt.Fprintf(res, "data: %v\n\n", data)
-			f.Flush()
-		case <-closer:
-			log.Println("Closing connection")
-			return
+		for {
+			select {
+			case data := <-msg:
+				fmt.Fprintf(res, "data: %v\n\n", data)
+				f.Flush()
+			case <-closer:
+				log.Println("Closing connection")
+				return
+			}
 		}
+	} else {
+		a.writeJSON(map[string]interface{}{
+			"error": errors.New("No Event found with the name " + req.URL.Query().Get(":event")),
+		}, res)
 	}
 }
 
 // robotDeviceCommands returns device commands route handler
 // writes JSON with robot device commands representation
 func (a *api) robotDeviceCommands(res http.ResponseWriter, req *http.Request) {
-	a.writeJSON(
-		map[string]interface{}{"commands": a.gobot.Robot(req.URL.Query().Get(":robot")).
-			Device(req.URL.Query().Get(":device")).ToJSON().Commands}, res,
-	)
+	if device, err := a.jsonDeviceFor(req.URL.Query().Get(":robot"), req.URL.Query().Get(":device")); err != nil {
+		a.writeJSON(map[string]interface{}{"error": err.Error()}, res)
+	} else {
+		a.writeJSON(map[string]interface{}{"commands": device.Commands}, res)
+	}
 }
 
 // robotConnections returns connections route handler
 // writes JSON with robot connections representation
 func (a *api) robotConnections(res http.ResponseWriter, req *http.Request) {
 	jsonConnections := []*gobot.JSONConnection{}
-	a.gobot.Robot(req.URL.Query().Get(":robot")).Connections().Each(func(c gobot.Connection) {
-		jsonConnections = append(jsonConnections, c.ToJSON())
-	})
-	a.writeJSON(map[string]interface{}{"connections": jsonConnections}, res)
+	if robot := a.gobot.Robot(req.URL.Query().Get(":robot")); robot != nil {
+		robot.Connections().Each(func(c gobot.Connection) {
+			jsonConnections = append(jsonConnections, gobot.NewJSONConnection(c))
+		})
+		a.writeJSON(map[string]interface{}{"connections": jsonConnections}, res)
+	} else {
+		a.writeJSON(map[string]interface{}{"error": "No Robot found with the name " + req.URL.Query().Get(":robot")}, res)
+	}
+
 }
 
 // robotConnection returns connection route handler
 // writes JSON with robot connection representation
 func (a *api) robotConnection(res http.ResponseWriter, req *http.Request) {
-	a.writeJSON(
-		map[string]interface{}{"connection": a.gobot.Robot(req.URL.Query().Get(":robot")).
-			Connection(req.URL.Query().Get(":connection")).ToJSON()},
-		res,
-	)
+	if conn, err := a.jsonConnectionFor(req.URL.Query().Get(":robot"), req.URL.Query().Get(":connection")); err != nil {
+		a.writeJSON(map[string]interface{}{"error": err.Error()}, res)
+	} else {
+		a.writeJSON(map[string]interface{}{"connection": conn}, res)
+	}
 }
 
 // executeMcpCommand calls a global command asociated to requested route
@@ -282,23 +308,32 @@ func (a *api) executeMcpCommand(res http.ResponseWriter, req *http.Request) {
 
 // executeDeviceCommand calls a device command asociated to requested route
 func (a *api) executeDeviceCommand(res http.ResponseWriter, req *http.Request) {
-	a.executeCommand(
-		a.gobot.Robot(req.URL.Query().Get(":robot")).
-			Device(req.URL.Query().Get(":device")).
-			Command(req.URL.Query().Get(":command")),
-		res,
-		req,
-	)
+	if _, err := a.jsonDeviceFor(req.URL.Query().Get(":robot"),
+		req.URL.Query().Get(":device")); err != nil {
+		a.writeJSON(map[string]interface{}{"error": err.Error()}, res)
+	} else {
+		a.executeCommand(
+			a.gobot.Robot(req.URL.Query().Get(":robot")).
+				Device(req.URL.Query().Get(":device")).(gobot.Commander).
+				Command(req.URL.Query().Get(":command")),
+			res,
+			req,
+		)
+	}
 }
 
 // executeRobotCommand calls a robot command asociated to requested route
 func (a *api) executeRobotCommand(res http.ResponseWriter, req *http.Request) {
-	a.executeCommand(
-		a.gobot.Robot(req.URL.Query().Get(":robot")).
-			Command(req.URL.Query().Get(":command")),
-		res,
-		req,
-	)
+	if _, err := a.jsonRobotFor(req.URL.Query().Get(":robot")); err != nil {
+		a.writeJSON(map[string]interface{}{"error": err.Error()}, res)
+	} else {
+		a.executeCommand(
+			a.gobot.Robot(req.URL.Query().Get(":robot")).
+				Command(req.URL.Query().Get(":command")),
+			res,
+			req,
+		)
+	}
 }
 
 // executeCommand writes JSON response with `f` returned value.
@@ -313,7 +348,7 @@ func (a *api) executeCommand(f func(map[string]interface{}) interface{},
 	if f != nil {
 		a.writeJSON(map[string]interface{}{"result": f(body)}, res)
 	} else {
-		a.writeJSON("Unknown Command", res)
+		a.writeJSON(map[string]interface{}{"error": "Unknown Command"}, res)
 	}
 }
 
@@ -329,4 +364,31 @@ func (a *api) Debug() {
 	a.AddHandler(func(res http.ResponseWriter, req *http.Request) {
 		log.Println(req)
 	})
+}
+
+func (a *api) jsonRobotFor(name string) (jrobot *gobot.JSONRobot, err error) {
+	if robot := a.gobot.Robot(name); robot != nil {
+		jrobot = gobot.NewJSONRobot(robot)
+	} else {
+		err = errors.New("No Robot found with the name " + name)
+	}
+	return
+}
+
+func (a *api) jsonDeviceFor(robot string, name string) (jdevice *gobot.JSONDevice, err error) {
+	if device := a.gobot.Robot(robot).Device(name); device != nil {
+		jdevice = gobot.NewJSONDevice(device)
+	} else {
+		err = errors.New("No Device found with the name " + name)
+	}
+	return
+}
+
+func (a *api) jsonConnectionFor(robot string, name string) (jconnection *gobot.JSONConnection, err error) {
+	if connection := a.gobot.Robot(robot).Connection(name); connection != nil {
+		jconnection = gobot.NewJSONConnection(connection)
+	} else {
+		err = errors.New("No Connection found with the name " + name)
+	}
+	return
 }

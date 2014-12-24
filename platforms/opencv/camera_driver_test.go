@@ -9,16 +9,22 @@ import (
 
 func initTestCameraDriver() *CameraDriver {
 	d := NewCameraDriver("bot", "")
-	d.start = func(c *CameraDriver) {
+	d.start = func(c *CameraDriver) (err error) {
 		d.camera = &testCapture{}
+		return nil
 	}
 	return d
 }
 
+func TestCameraDriver(t *testing.T) {
+	d := initTestCameraDriver()
+	gobot.Assert(t, d.Name(), "bot")
+	gobot.Assert(t, d.Connection(), (gobot.Connection)(nil))
+}
 func TestCameraDriverStart(t *testing.T) {
 	sem := make(chan bool)
 	d := initTestCameraDriver()
-	gobot.Assert(t, d.Start(), true)
+	gobot.Assert(t, len(d.Start()), 0)
 	gobot.On(d.Event("frame"), func(data interface{}) {
 		sem <- true
 	})
@@ -28,25 +34,15 @@ func TestCameraDriverStart(t *testing.T) {
 		t.Errorf("Event \"frame\" was not published")
 	}
 
-}
-func TestCameraDriver(t *testing.T) {
-	d := NewCameraDriver("bot", "")
-	d.Start()
-	gobot.Refute(t, d.camera, nil)
+	d = NewCameraDriver("bot", "")
+	gobot.Assert(t, len(d.Start()), 0)
 
-	defer func() {
-		r := recover()
-		if r != nil {
-			gobot.Assert(t, "unknown camera source", r)
-		} else {
-			t.Errorf("Did not return Unknown camera error")
-		}
-	}()
 	d = NewCameraDriver("bot", true)
-	d.Start()
+	gobot.Refute(t, len(d.Start()), 0)
+
 }
 
 func TestCameraDriverHalt(t *testing.T) {
 	d := initTestCameraDriver()
-	gobot.Assert(t, d.Halt(), true)
+	gobot.Assert(t, len(d.Halt()), 0)
 }

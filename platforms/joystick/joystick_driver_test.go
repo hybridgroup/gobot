@@ -10,8 +10,9 @@ import (
 
 func initTestJoystickDriver() *JoystickDriver {
 	a := NewJoystickAdaptor("bot")
-	a.connect = func(j *JoystickAdaptor) {
+	a.connect = func(j *JoystickAdaptor) (err error) {
 		j.joystick = &testJoystick{}
+		return nil
 	}
 	a.Connect()
 	d := NewJoystickDriver(a, "bot", "./configs/xbox360_power_a_mini_proex.json")
@@ -21,32 +22,25 @@ func initTestJoystickDriver() *JoystickDriver {
 	return d
 }
 
-func TestJoystickDriver(t *testing.T) {
-	defer func() {
-		r := recover()
-		if r != nil {
-			gobot.Assert(t, "File error: open ./fake_config.json: no such file or directory\n", r)
-		} else {
-			t.Errorf("Did not return Unknown Event error")
-		}
-	}()
-	NewJoystickDriver(NewJoystickAdaptor("bot"), "bot", "./fake_config.json")
-}
 func TestJoystickDriverStart(t *testing.T) {
 	d := initTestJoystickDriver()
-	d.SetInterval(1 * time.Millisecond)
-	gobot.Assert(t, d.Start(), true)
+	d.interval = 1 * time.Millisecond
+	gobot.Assert(t, len(d.Start()), 0)
 	<-time.After(2 * time.Millisecond)
 }
 
 func TestJoystickDriverHalt(t *testing.T) {
 	d := initTestJoystickDriver()
-	gobot.Assert(t, d.Halt(), true)
+	go func() {
+		<-d.halt
+	}()
+	gobot.Assert(t, len(d.Halt()), 0)
 }
 
 func TestJoystickDriverHandleEvent(t *testing.T) {
 	sem := make(chan bool)
 	d := initTestJoystickDriver()
+	d.Start()
 	d.handleEvent(&sdl.JoyAxisEvent{
 		Which: 0,
 		Axis:  0,

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"syscall"
 )
 
 const (
@@ -64,17 +65,27 @@ func (d *digitalPin) Read() (n int, err error) {
 
 // Export exports the pin for use by the operating system
 func (d *digitalPin) Export() error {
-	_, err := writeFile(GPIOPATH+"/export", []byte(d.pin))
-	return err
+	if _, err := writeFile(GPIOPATH+"/export", []byte(d.pin)); err != nil {
+		// If EBUSY then the pin has already been exported
+		if err.(*os.PathError).Err != syscall.EBUSY {
+			return err
+		}
+	}
+	return nil
 }
 
 // Unexport unexports the pin and releases the pin from the operating system
 func (d *digitalPin) Unexport() error {
-	_, err := writeFile(GPIOPATH+"/unexport", []byte(d.pin))
-	return err
+	if _, err := writeFile(GPIOPATH+"/unexport", []byte(d.pin)); err != nil {
+		// If EINVAL then the pin is reserved in the system and can't be unexported
+		if err.(*os.PathError).Err != syscall.EINVAL {
+			return err
+		}
+	}
+	return nil
 }
 
-func writeFile(path string, data []byte) (i int, err error) {
+var writeFile = func(path string, data []byte) (i int, err error) {
 	file, err := OpenFile(path, os.O_WRONLY, 0644)
 	defer file.Close()
 	if err != nil {
@@ -84,7 +95,7 @@ func writeFile(path string, data []byte) (i int, err error) {
 	return file.Write(data)
 }
 
-func readFile(path string) ([]byte, error) {
+var readFile = func(path string) ([]byte, error) {
 	file, err := OpenFile(path, os.O_RDONLY, 0644)
 	defer file.Close()
 	if err != nil {

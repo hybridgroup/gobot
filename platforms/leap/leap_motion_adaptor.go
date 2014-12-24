@@ -1,46 +1,43 @@
 package leap
 
 import (
-	"code.google.com/p/go.net/websocket"
-	"fmt"
-	"github.com/hybridgroup/gobot"
 	"io"
+
+	"code.google.com/p/go.net/websocket"
+	"github.com/hybridgroup/gobot"
 )
 
+var _ gobot.Adaptor = (*LeapMotionAdaptor)(nil)
+
 type LeapMotionAdaptor struct {
-	gobot.Adaptor
+	name    string
+	port    string
 	ws      io.ReadWriteCloser
-	connect func(*LeapMotionAdaptor)
+	connect func(string) (io.ReadWriteCloser, error)
 }
 
 // NewLeapMotionAdaptor creates a new leap motion adaptor using specified name and port
 func NewLeapMotionAdaptor(name string, port string) *LeapMotionAdaptor {
 	return &LeapMotionAdaptor{
-		Adaptor: *gobot.NewAdaptor(
-			name,
-			"LeapMotionAdaptor",
-			port,
-		),
-		connect: func(l *LeapMotionAdaptor) {
-			ws, err := websocket.Dial(
-				fmt.Sprintf("ws://%v/v3.json", l.Port()),
-				"",
-				fmt.Sprintf("http://%v", l.Port()),
-			)
-			if err != nil {
-				panic(err)
-			}
-			l.ws = ws
+		name: name,
+		port: port,
+		connect: func(port string) (io.ReadWriteCloser, error) {
+			return websocket.Dial("ws://"+port+"/v3.json", "", "http://"+port)
 		},
 	}
 }
+func (l *LeapMotionAdaptor) Name() string { return l.name }
+func (l *LeapMotionAdaptor) Port() string { return l.port }
 
 // Connect returns true if connection to leap motion is established succesfully
-func (l *LeapMotionAdaptor) Connect() bool {
-	l.connect(l)
-	l.SetConnected(true)
-	return true
+func (l *LeapMotionAdaptor) Connect() (errs []error) {
+	if ws, err := l.connect(l.Port()); err != nil {
+		return []error{err}
+	} else {
+		l.ws = ws
+	}
+	return
 }
 
 // Finalize ends connection to leap motion
-func (l *LeapMotionAdaptor) Finalize() bool { return true }
+func (l *LeapMotionAdaptor) Finalize() (errs []error) { return }

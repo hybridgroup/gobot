@@ -5,8 +5,10 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
+var _ gobot.Adaptor = (*MqttAdaptor)(nil)
+
 type MqttAdaptor struct {
-	gobot.Adaptor
+	name     string
 	Host     string
 	clientID string
 	client   *mqtt.MqttClient
@@ -15,40 +17,33 @@ type MqttAdaptor struct {
 // NewMqttAdaptor creates a new mqtt adaptor with specified name, host and client id
 func NewMqttAdaptor(name string, host string, clientID string) *MqttAdaptor {
 	return &MqttAdaptor{
-		Adaptor: *gobot.NewAdaptor(
-			name,
-			"MqttAdaptor",
-		),
+		name:     name,
 		Host:     host,
 		clientID: clientID,
 	}
 }
+func (a *MqttAdaptor) Name() string { return a.name }
 
 // Connect returns true if connection to mqtt is established
-func (a *MqttAdaptor) Connect() bool {
+func (a *MqttAdaptor) Connect() (errs []error) {
 	opts := createClientOptions(a.clientID, a.Host)
 	a.client = mqtt.NewClient(opts)
 	a.client.Start()
-	return true
-}
-
-// Reconnect retries connection to mqtt. Returns true if successful
-func (a *MqttAdaptor) Reconnect() bool {
-	return true
+	return
 }
 
 // Disconnect returns true if connection to mqtt is closed
-func (a *MqttAdaptor) Disconnect() bool {
+func (a *MqttAdaptor) Disconnect() (err error) {
 	if a.client != nil {
 		a.client.Disconnect(500)
 	}
-	return true
+	return
 }
 
 // Finalize returns true if connection to mqtt is finalized succesfully
-func (a *MqttAdaptor) Finalize() bool {
+func (a *MqttAdaptor) Finalize() (errs []error) {
 	a.Disconnect()
-	return true
+	return
 }
 
 // Publish a message under a specific topic

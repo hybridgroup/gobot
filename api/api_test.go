@@ -13,16 +13,16 @@ import (
 )
 
 func initTestAPI() *api {
-	log.SetOutput(gobot.NullReadWriteCloser{})
+	log.SetOutput(NullReadWriteCloser{})
 	g := gobot.NewGobot()
 	a := NewAPI(g)
 	a.start = func(m *api) {}
 	a.Start()
 	a.Debug()
 
-	g.AddRobot(gobot.NewTestRobot("Robot1"))
-	g.AddRobot(gobot.NewTestRobot("Robot2"))
-	g.AddRobot(gobot.NewTestRobot("Robot3"))
+	g.AddRobot(newTestRobot("Robot1"))
+	g.AddRobot(newTestRobot("Robot2"))
+	g.AddRobot(newTestRobot("Robot3"))
 	g.AddCommand("TestFunction", func(params map[string]interface{}) interface{} {
 		message := params["message"].(string)
 		return fmt.Sprintf("hey %v", message)
@@ -104,7 +104,7 @@ func TestExecuteMcpCommand(t *testing.T) {
 	a.ServeHTTP(response, request)
 
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, body, "Unknown Command")
+	gobot.Assert(t, body.(map[string]interface{})["error"], "Unknown Command")
 }
 
 func TestRobots(t *testing.T) {
@@ -176,7 +176,7 @@ func TestExecuteRobotCommand(t *testing.T) {
 	a.ServeHTTP(response, request)
 
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, body, "Unknown Command")
+	gobot.Assert(t, body.(map[string]interface{})["error"], "Unknown Command")
 }
 
 func TestRobotDevice(t *testing.T) {
@@ -233,7 +233,7 @@ func TestExecuteRobotDeviceCommand(t *testing.T) {
 	a.ServeHTTP(response, request)
 
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, body, "Unknown Command")
+	gobot.Assert(t, body.(map[string]interface{})["error"], "Unknown Command")
 }
 
 func TestRobotConnections(t *testing.T) {

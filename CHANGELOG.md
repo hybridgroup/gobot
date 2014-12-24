@@ -1,3 +1,19 @@
+0.8
+---
+  - Refactor core, gpio, and i2c interfaces
+  - Correctly pass errors throughout packages and remove all panics
+  - Numerous bug fixes and performance improvements
+  - api
+    - Update robeaux to v0.3.0
+  - firmata
+    - Add optional io.ReadWriteCloser parameter to FirmataAdaptor
+    - Fix `thread exhaustion` error
+  - cli 
+    - generator
+      - Update generator for new adaptor and driver interfaces
+      - Add driver, adaptor and project generators
+      - Add optional package name parameter
+
 0.7.1
 ---
   - opencv
@@ -46,7 +62,6 @@
   - Fix incorrect Event names
 - sphero
   - Correctly format output of GetRGB 
->>>>>>> master
 
 0.6.1
 ---

@@ -4,8 +4,13 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
+var _ gobot.Driver = (*PebbleDriver)(nil)
+
 type PebbleDriver struct {
-	gobot.Driver
+	name       string
+	connection gobot.Connection
+	gobot.Commander
+	gobot.Eventer
 	Messages []string
 }
 
@@ -20,12 +25,11 @@ type PebbleDriver struct {
 //		"pending_message"
 func NewPebbleDriver(adaptor *PebbleAdaptor, name string) *PebbleDriver {
 	p := &PebbleDriver{
-		Driver: *gobot.NewDriver(
-			name,
-			"PebbleDriver",
-			adaptor,
-		),
-		Messages: []string{},
+		name:       name,
+		connection: adaptor,
+		Messages:   []string{},
+		Eventer:    gobot.NewEventer(),
+		Commander:  gobot.NewCommander(),
 	}
 
 	p.AddEvent("button")
@@ -48,12 +52,14 @@ func NewPebbleDriver(adaptor *PebbleAdaptor, name string) *PebbleDriver {
 
 	return p
 }
+func (d *PebbleDriver) Name() string                 { return d.name }
+func (d *PebbleDriver) Connection() gobot.Connection { return d.connection }
 
 // Start returns true if driver is initialized correctly
-func (d *PebbleDriver) Start() bool { return true }
+func (d *PebbleDriver) Start() (errs []error) { return }
 
 // Halt returns true if driver is halted succesfully
-func (d *PebbleDriver) Halt() bool { return true }
+func (d *PebbleDriver) Halt() (errs []error) { return }
 
 // PublishEvent publishes event with specified name and data in gobot
 func (d *PebbleDriver) PublishEvent(name string, data string) {

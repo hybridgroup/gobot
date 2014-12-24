@@ -1,28 +1,35 @@
 package ardrone
 
 import (
-	"github.com/hybridgroup/gobot"
 	"testing"
+
+	"github.com/hybridgroup/gobot"
 )
 
 func initTestArdroneDriver() *ArdroneDriver {
 	a := NewArdroneAdaptor("drone")
-	a.connect = func(a *ArdroneAdaptor) {
-		a.drone = &testDrone{}
+	a.connect = func(a *ArdroneAdaptor) (drone, error) {
+		return &testDrone{}, nil
 	}
 	d := NewArdroneDriver(a, "drone")
 	a.Connect()
 	return d
 }
 
+func TestArdroneDriver(t *testing.T) {
+	d := initTestArdroneDriver()
+	gobot.Assert(t, d.Name(), "drone")
+	gobot.Assert(t, d.Connection().Name(), "drone")
+}
+
 func TestArdroneDriverStart(t *testing.T) {
 	d := initTestArdroneDriver()
-	gobot.Assert(t, d.Start(), true)
+	gobot.Assert(t, len(d.Start()), 0)
 }
 
 func TestArdroneDriverHalt(t *testing.T) {
 	d := initTestArdroneDriver()
-	gobot.Assert(t, d.Halt(), true)
+	gobot.Assert(t, len(d.Halt()), 0)
 }
 func TestArdroneDriverTakeOff(t *testing.T) {
 	d := initTestArdroneDriver()

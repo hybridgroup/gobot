@@ -19,14 +19,6 @@ func initTestWiichuckDriverWithStubbedAdaptor() (*WiichuckDriver, *i2cTestAdapto
 }
 
 // --------- TESTS
-func TestWiichuckDriver(t *testing.T) {
-	// Does it implement gobot.DriverInterface?
-	var _ gobot.DriverInterface = (*WiichuckDriver)(nil)
-
-	// Does its adaptor implements the I2cInterface?
-	driver := initTestWiichuckDriver()
-	var _ I2cInterface = driver.adaptor()
-}
 
 func TestNewWiichuckDriver(t *testing.T) {
 	// Does it return a pointer to an instance of WiichuckDriver?
@@ -37,18 +29,27 @@ func TestNewWiichuckDriver(t *testing.T) {
 	}
 }
 
+func TestWiichuckDriver(t *testing.T) {
+	wii := initTestWiichuckDriver()
+	gobot.Assert(t, wii.Name(), "bot")
+	gobot.Assert(t, wii.Connection().Name(), "adaptor")
+	gobot.Assert(t, wii.interval, 10*time.Millisecond)
+
+	wii = NewWiichuckDriver(newI2cTestAdaptor("adaptor"), "bot", 100*time.Millisecond)
+	gobot.Assert(t, wii.interval, 100*time.Millisecond)
+}
 func TestWiichuckDriverStart(t *testing.T) {
 	sem := make(chan bool)
 	wii, adaptor := initTestWiichuckDriverWithStubbedAdaptor()
 
-	adaptor.i2cReadImpl = func() []byte {
-		return []byte{1, 2, 3, 4, 5, 6}
+	adaptor.i2cReadImpl = func() ([]byte, error) {
+		return []byte{1, 2, 3, 4, 5, 6}, nil
 	}
 
 	numberOfCyclesForEvery := 3
 
-	wii.SetInterval(1 * time.Millisecond)
-	gobot.Assert(t, wii.Start(), true)
+	wii.interval = 1 * time.Millisecond
+	gobot.Assert(t, len(wii.Start()), 0)
 
 	go func() {
 		for {
@@ -68,16 +69,10 @@ func TestWiichuckDriverStart(t *testing.T) {
 
 }
 
-func TestWiichuckDriverInit(t *testing.T) {
-	wii := initTestWiichuckDriver()
-
-	gobot.Assert(t, wii.Init(), true)
-}
-
 func TestWiichuckDriverHalt(t *testing.T) {
 	wii := initTestWiichuckDriver()
 
-	gobot.Assert(t, wii.Halt(), true)
+	gobot.Assert(t, len(wii.Halt()), 0)
 }
 
 func TestWiichuckDriverUpdate(t *testing.T) {
@@ -100,7 +95,7 @@ func TestWiichuckDriverUpdate(t *testing.T) {
 	// - This should be done by WiichuckDriver.updateButtons
 	chann := make(chan bool)
 
-	gobot.On(wii.Event("c"), func(data interface{}) {
+	gobot.On(wii.Event(C), func(data interface{}) {
 		gobot.Assert(t, data, true)
 		chann <- true
 	})
@@ -109,7 +104,7 @@ func TestWiichuckDriverUpdate(t *testing.T) {
 	chann = make(chan bool)
 	wii.update(decryptedValue)
 
-	gobot.On(wii.Event("z"), func(data interface{}) {
+	gobot.On(wii.Event(Z), func(data interface{}) {
 		gobot.Assert(t, data, true)
 		chann <- true
 	})
@@ -124,7 +119,7 @@ func TestWiichuckDriverUpdate(t *testing.T) {
 		"y": float64(0),
 	}
 
-	gobot.On(wii.Event("joystick"), func(data interface{}) {
+	gobot.On(wii.Event(Joystick), func(data interface{}) {
 		gobot.Assert(t, data, expectedData)
 		chann <- true
 	})
@@ -256,7 +251,7 @@ func TestWiichuckDriverUpdateButtons(t *testing.T) {
 
 	wii.updateButtons()
 
-	gobot.On(wii.Event("c"), func(data interface{}) {
+	gobot.On(wii.Event(C), func(data interface{}) {
 		gobot.Assert(t, true, data)
 		chann <- true
 	})
@@ -270,7 +265,7 @@ func TestWiichuckDriverUpdateButtons(t *testing.T) {
 
 	wii.updateButtons()
 
-	gobot.On(wii.Event("z"), func(data interface{}) {
+	gobot.On(wii.Event(Z), func(data interface{}) {
 		gobot.Assert(t, true, data)
 		chann <- true
 	})
@@ -294,7 +289,7 @@ func TestWiichuckDriverUpdateJoystick(t *testing.T) {
 		"y": float64(50),
 	}
 
-	gobot.On(wii.Event("joystick"), func(data interface{}) {
+	gobot.On(wii.Event(Joystick), func(data interface{}) {
 		gobot.Assert(t, data, expectedData)
 		chann <- true
 	})
@@ -316,7 +311,7 @@ func TestWiichuckDriverUpdateJoystick(t *testing.T) {
 		"y": float64(7),
 	}
 
-	gobot.On(wii.Event("joystick"), func(data interface{}) {
+	gobot.On(wii.Event(Joystick), func(data interface{}) {
 		gobot.Assert(t, data, expectedData)
 		chann <- true
 	})

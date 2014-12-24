@@ -6,6 +6,8 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
+var _ gobot.Driver = (*NeuroskyDriver)(nil)
+
 const BTSync byte = 0xAA
 
 // Extended code
@@ -30,7 +32,9 @@ const CodeWave byte = 0x80
 const CodeAsicEEG byte = 0x83
 
 type NeuroskyDriver struct {
-	gobot.Driver
+	name       string
+	connection gobot.Connection
+	gobot.Eventer
 }
 
 type EEG struct {
@@ -56,11 +60,9 @@ type EEG struct {
 //   eeg - showing eeg data
 func NewNeuroskyDriver(a *NeuroskyAdaptor, name string) *NeuroskyDriver {
 	n := &NeuroskyDriver{
-		Driver: *gobot.NewDriver(
-			name,
-			"NeuroskyDriver",
-			a,
-		),
+		name:       name,
+		connection: a,
+		Eventer:    gobot.NewEventer(),
 	}
 
 	n.AddEvent("extended")
@@ -70,34 +72,37 @@ func NewNeuroskyDriver(a *NeuroskyAdaptor, name string) *NeuroskyDriver {
 	n.AddEvent("blink")
 	n.AddEvent("wave")
 	n.AddEvent("eeg")
+	n.AddEvent("error")
 
 	return n
 }
+func (n *NeuroskyDriver) Connection() gobot.Connection { return n.connection }
+func (n *NeuroskyDriver) Name() string                 { return n.name }
 
 // adaptor returns neurosky adaptor
 func (n *NeuroskyDriver) adaptor() *NeuroskyAdaptor {
-	return n.Adaptor().(*NeuroskyAdaptor)
+	return n.Connection().(*NeuroskyAdaptor)
 }
 
 // Start creates a go routine to listen from serial port
 // and parse buffer readings
-func (n *NeuroskyDriver) Start() bool {
+func (n *NeuroskyDriver) Start() (errs []error) {
 	go func() {
 		for {
 			buff := make([]byte, 1024)
 			_, err := n.adaptor().sp.Read(buff[:])
 			if err != nil {
-				panic(err)
+				gobot.Publish(n.Event("error"), err)
 			} else {
 				n.parse(bytes.NewBuffer(buff))
 			}
 		}
 	}()
-	return true
+	return
 }
 
 // Halt stops neurosky driver (void)
-func (n *NeuroskyDriver) Halt() bool { return true }
+func (n *NeuroskyDriver) Halt() (errs []error) { return }
 
 // parse converts bytes buffer into packets until no more data is present
 func (n *NeuroskyDriver) parse(buf *bytes.Buffer) {

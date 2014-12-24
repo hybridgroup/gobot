@@ -3,14 +3,14 @@ PACKAGES := gobot gobot/api gobot/platforms/intel-iot/edison gobot/sysfs $(shell
 
 test:
 	for package in $(PACKAGES) ; do \
-		go test github.com/hybridgroup/$$package ; \
+		go test -a github.com/hybridgroup/$$package ; \
 	done ; \
 
 cover:
-	echo "mode: count" > profile.cov ; \
+	echo "mode: set" > profile.cov ; \
 	for package in $(PACKAGES) ; do \
-		go test -covermode=count -coverprofile=tmp.cov github.com/hybridgroup/$$package ; \
-		cat tmp.cov | grep -v "mode: count" >> profile.cov ; \
+		go test -a -coverprofile=tmp.cov github.com/hybridgroup/$$package ; \
+		cat tmp.cov | grep -v "mode: set" >> profile.cov ; \
 	done ; \
 	rm tmp.cov ; \
 
@@ -23,7 +23,8 @@ endif
 	cd robeaux-tmp ; \
 	rm fonts/* ; \
 	rm -r test/* ; \
-	rm Makefile package.json README.markdown robeaux.gemspec css/fonts.css ; \
+	rm -r less/* ; \
+	rm Makefile Gruntfile.js package.json README.markdown robeaux.gemspec css/fonts.css ; \
 	touch css/fonts.css ; \
 	echo "Updating robeaux to $(shell git rev-parse HEAD)" ; \
 	go-bindata -pkg="robeaux" -o robeaux.go -ignore=\\.git ./... ; \

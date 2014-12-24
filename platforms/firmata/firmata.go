@@ -2,6 +2,7 @@ package firmata
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"math"
@@ -50,6 +51,8 @@ const (
 	i2CModeStopReading       byte = 0x03
 )
 
+var defaultInitTimeInterval time.Duration = 1 * time.Second
+
 type board struct {
 	serial           io.ReadWriteCloser
 	pins             []pin
@@ -83,7 +86,7 @@ func newBoard(sp io.ReadWriteCloser) *board {
 		analogPins:       []byte{},
 		connected:        false,
 		events:           make(map[string]*gobot.Event),
-		initTimeInterval: 1 * time.Second,
+		initTimeInterval: defaultInitTimeInterval,
 	}
 
 	for _, s := range []string{
@@ -103,20 +106,26 @@ func newBoard(sp io.ReadWriteCloser) *board {
 
 // connect starts connection to board.
 // Queries report version until connected
-func (b *board) connect() {
+func (b *board) connect() (err error) {
 	if b.connected == false {
-		b.reset()
+		if err = b.reset(); err != nil {
+			return err
+		}
 		b.initBoard()
-
 		for {
-			b.queryReportVersion()
+			if err = b.queryReportVersion(); err != nil {
+				return err
+			}
 			<-time.After(b.initTimeInterval)
-			b.readAndProcess()
+			if err = b.readAndProcess(); err != nil {
+				return err
+			}
 			if b.connected == true {
 				break
 			}
 		}
 	}
+	return
 }
 
 // initBoard initializes board by listening for "firware_query", "capability_query"
@@ -138,23 +147,27 @@ func (b *board) initBoard() {
 }
 
 // readAndProcess reads from serial port and parses data.
-func (b *board) readAndProcess() {
-	b.process(b.read())
+func (b *board) readAndProcess() error {
+	buf, err := b.read()
+	if err != nil {
+		return err
+	}
+	return b.process(buf)
 }
 
 // reset writes system reset bytes.
-func (b *board) reset() {
-	b.write([]byte{systemReset})
+func (b *board) reset() error {
+	return b.write([]byte{systemReset})
 }
 
 // setPinMode writes pin mode bytes for specified pin.
-func (b *board) setPinMode(pin byte, mode byte) {
+func (b *board) setPinMode(pin byte, mode byte) error {
 	b.pins[pin].mode = mode
-	b.write([]byte{pinMode, pin, mode})
+	return b.write([]byte{pinMode, pin, mode})
 }
 
 // digitalWrite is used to send a digital value to a specified pin.
-func (b *board) digitalWrite(pin byte, value byte) {
+func (b *board) digitalWrite(pin byte, value byte) error {
 	port := byte(math.Floor(float64(pin) / 8))
 	portValue := byte(0)
 
@@ -165,13 +178,13 @@ func (b *board) digitalWrite(pin byte, value byte) {
 			portValue = portValue | (1 << i)
 		}
 	}
-	b.write([]byte{digitalMessage | port, portValue & 0x7F, (portValue >> 7) & 0x7F})
+	return b.write([]byte{digitalMessage | port, portValue & 0x7F, (portValue >> 7) & 0x7F})
 }
 
 // analogWrite writes value to specified pin
-func (b *board) analogWrite(pin byte, value byte) {
+func (b *board) analogWrite(pin byte, value byte) error {
 	b.pins[pin].value = int(value)
-	b.write([]byte{analogMessage | pin, value & 0x7F, (value >> 7) & 0x7F})
+	return b.write([]byte{analogMessage | pin, value & 0x7F, (value >> 7) & 0x7F})
 }
 
 // version returns board version following MAYOR.minor convention.
@@ -180,73 +193,74 @@ func (b *board) version() string {
 }
 
 // queryFirmware writes bytes to query firmware from board.
-func (b *board) queryFirmware() {
-	b.write([]byte{startSysex, firmwareQuery, endSysex})
+func (b *board) queryFirmware() error {
+	return b.write([]byte{startSysex, firmwareQuery, endSysex})
 }
 
 // queryPinState writes bytes to retrieve pin state
-func (b *board) queryPinState(pin byte) {
-	b.write([]byte{startSysex, pinStateQuery, pin, endSysex})
+func (b *board) queryPinState(pin byte) error {
+	return b.write([]byte{startSysex, pinStateQuery, pin, endSysex})
 }
 
 // queryReportVersion sends query for report version
-func (b *board) queryReportVersion() {
-	b.write([]byte{reportVersion})
+func (b *board) queryReportVersion() error {
+	return b.write([]byte{reportVersion})
 }
 
 // queryCapabilities is used to retrieve board capabilities.
-func (b *board) queryCapabilities() {
-	b.write([]byte{startSysex, capabilityQuery, endSysex})
+func (b *board) queryCapabilities() error {
+	return b.write([]byte{startSysex, capabilityQuery, endSysex})
 }
 
 // queryAnalogMapping returns analog mapping for board.
-func (b *board) queryAnalogMapping() {
-	b.write([]byte{startSysex, analogMappingQuery, endSysex})
+func (b *board) queryAnalogMapping() error {
+	return b.write([]byte{startSysex, analogMappingQuery, endSysex})
 }
 
 // togglePinReporting is used to change pin reporting mode.
-func (b *board) togglePinReporting(pin byte, state byte, mode byte) {
-	b.write([]byte{mode | pin, state})
+func (b *board) togglePinReporting(pin byte, state byte, mode byte) error {
+	return b.write([]byte{mode | pin, state})
 }
 
 // i2cReadRequest reads from slaveAddress.
-func (b *board) i2cReadRequest(slaveAddress byte, numBytes uint) {
-	b.write([]byte{startSysex, i2CRequest, slaveAddress, (i2CModeRead << 3),
+func (b *board) i2cReadRequest(slaveAddress byte, numBytes uint) error {
+	return b.write([]byte{startSysex, i2CRequest, slaveAddress, (i2CModeRead << 3),
 		byte(numBytes & 0x7F), byte(((numBytes >> 7) & 0x7F)), endSysex})
 }
 
 // i2cWriteRequest writes to slaveAddress.
-func (b *board) i2cWriteRequest(slaveAddress byte, data []byte) {
+func (b *board) i2cWriteRequest(slaveAddress byte, data []byte) error {
 	ret := []byte{startSysex, i2CRequest, slaveAddress, (i2CModeWrite << 3)}
 	for _, val := range data {
 		ret = append(ret, byte(val&0x7F))
 		ret = append(ret, byte((val>>7)&0x7F))
 	}
 	ret = append(ret, endSysex)
-	b.write(ret)
+	return b.write(ret)
 }
 
 // i2xConfig returns i2c configuration.
-func (b *board) i2cConfig(data []byte) {
+func (b *board) i2cConfig(data []byte) error {
 	ret := []byte{startSysex, i2CConfig}
 	for _, val := range data {
 		ret = append(ret, byte(val&0xFF))
 		ret = append(ret, byte((val>>8)&0xFF))
 	}
 	ret = append(ret, endSysex)
-	b.write(ret)
+	return b.write(ret)
 }
 
 // write is used to send commands to serial port
-func (b *board) write(commands []byte) {
-	b.serial.Write(commands[:])
+func (b *board) write(commands []byte) (err error) {
+	_, err = b.serial.Write(commands[:])
+	return
 }
 
 // read returns buffer reading from serial port (1024 bytes)
-func (b *board) read() []byte {
-	buf := make([]byte, 1024)
-	b.serial.Read(buf)
-	return buf
+func (b *board) read() (buf []byte, err error) {
+	buf = make([]byte, 1024)
+	_, err = b.serial.Read(buf)
+	return
 }
 
 // process uses incoming data and executes actions depending on what is received.
@@ -255,23 +269,34 @@ func (b *board) read() []byte {
 // And the following responses: capability, analog mapping, pin state,
 // i2c, firmwareQuery, string data.
 // If neither of those messages is received, then data is treated as "bad_byte"
-func (b *board) process(data []byte) {
+func (b *board) process(data []byte) (err error) {
 	buf := bytes.NewBuffer(data)
 	for {
 		messageType, err := buf.ReadByte()
 		if err != nil {
+			// we ran out of bytes so we break out of the process loop
 			break
 		}
 		switch {
 		case reportVersion == messageType:
-			b.majorVersion, _ = buf.ReadByte()
-			b.minorVersion, _ = buf.ReadByte()
+			if b.majorVersion, err = buf.ReadByte(); err != nil {
+				return err
+			}
+			if b.minorVersion, err = buf.ReadByte(); err != nil {
+				return err
+			}
 			gobot.Publish(b.events["report_version"], b.version())
 		case analogMessageRangeStart <= messageType &&
 			analogMessageRangeEnd >= messageType:
 
-			leastSignificantByte, _ := buf.ReadByte()
-			mostSignificantByte, _ := buf.ReadByte()
+			leastSignificantByte, err := buf.ReadByte()
+			if err != nil {
+				return err
+			}
+			mostSignificantByte, err := buf.ReadByte()
+			if err != nil {
+				return err
+			}
 
 			value := uint(leastSignificantByte) | uint(mostSignificantByte)<<7
 			pin := (messageType & 0x0F)
@@ -289,8 +314,14 @@ func (b *board) process(data []byte) {
 			digitalMessageRangeEnd >= messageType:
 
 			port := messageType & 0x0F
-			firstBitmask, _ := buf.ReadByte()
-			secondBitmask, _ := buf.ReadByte()
+			firstBitmask, err := buf.ReadByte()
+			if err != nil {
+				return err
+			}
+			secondBitmask, err := buf.ReadByte()
+			if err != nil {
+				return err
+			}
 			portValue := firstBitmask | (secondBitmask << 7)
 
 			for i := 0; i < 8; i++ {
@@ -307,6 +338,7 @@ func (b *board) process(data []byte) {
 			for {
 				b, err := buf.ReadByte()
 				if err != nil {
+					// we ran out of bytes before we reached the endSysex so we break
 					break
 				}
 				currentBuffer = append(currentBuffer, b)
@@ -407,8 +439,9 @@ func (b *board) process(data []byte) {
 				str := currentBuffer[2:len(currentBuffer)]
 				gobot.Publish(b.events["string_data"], string(str[:len(str)]))
 			default:
-				fmt.Println("bad byte", fmt.Sprintf("0x%x", command))
+				return errors.New(fmt.Sprintf("bad byte: 0x%x", command))
 			}
 		}
 	}
+	return
 }
