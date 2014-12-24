@@ -11,6 +11,7 @@ import (
 )
 
 type config struct {
+	Package     string
 	Name        string
 	UpperName   string
 	FirstLetter string
@@ -32,21 +33,26 @@ func Generate() cli.Command {
 			if valid == false {
 				fmt.Println("Invalid/no subcommand supplied.\n")
 				fmt.Println("Usage:")
-				fmt.Println(" gobot generate adaptor [package name] # generate a new Gobot adaptor")
-				fmt.Println(" gobot generate driver  [package name] # generate a new Gobot driver")
-				fmt.Println(" gobot generate project [package name] # generate a new Gobot project")
+				fmt.Println(" gobot generate adaptor <name> [package] # generate a new Gobot adaptor")
+				fmt.Println(" gobot generate driver  <name> [package] # generate a new Gobot driver")
+				fmt.Println(" gobot generate project <name> [package] # generate a new Gobot project")
 				return
 			}
 
-			if len(c.Args()) != 2 {
+			if len(c.Args()) < 2 {
 				fmt.Println("Please provide a one word name.")
 				return
 			}
 
 			name := strings.ToLower(c.Args()[1])
+			packageName := name
+			if len(c.Args()) > 2 {
+				packageName = strings.ToLower(c.Args()[2])
+			}
 			upperName := strings.ToUpper(string(name[0])) + string(name[1:])
 
 			cfg := config{
+				Package:     packageName,
 				UpperName:   upperName,
 				Name:        name,
 				FirstLetter: string(name[0]),
@@ -114,7 +120,7 @@ func generateDriver(c config) error {
 		return err
 	}
 
-	return generate(c, c.Name+"_dirver_test.go", driverTest())
+	return generate(c, c.Name+"_driver_test.go", driverTest())
 }
 
 func generateAdaptor(c config) error {
@@ -137,7 +143,9 @@ func generateProject(c config) error {
 	exampleDir := dir + "/examples"
 	c.dir = exampleDir
 
-	generate(c, "main.go", example())
+	if err := generate(c, "main.go", example()); err != nil {
+		return err
+	}
 
 	c.dir = dir
 
@@ -151,7 +159,7 @@ func generateProject(c config) error {
 }
 
 func adaptor() string {
-	return `package {{.Name}}
+	return `package {{.Package}}
 
 import (
 	"github.com/hybridgroup/gobot"
@@ -180,7 +188,7 @@ func ({{.FirstLetter}} *{{.UpperName}}Adaptor) Ping() string { return "pong" }
 }
 
 func driver() string {
-	return `package {{.Name }}
+	return `package {{.Package}}
 
 import (
 	"time"
@@ -276,11 +284,11 @@ import (
 func main() {
   gbot := gobot.NewGobot()
 
-  conn := {{.Name}}.New{{.UpperName}}Adaptor("conn")
-  dev := {{.Name}}.New{{.UpperName}}Driver(conn, "dev")
+  conn := {{.Package}}.New{{.UpperName}}Adaptor("conn")
+  dev := {{.Package}}.New{{.UpperName}}Driver(conn, "dev")
 
   work := func() {
-    gobot.On(dev.Event({{.Name}}.Hello), func(data interface{}) {
+    gobot.On(dev.Event({{.Package}}.Hello), func(data interface{}) {
       fmt.Println(data)
     })
 
@@ -303,7 +311,7 @@ func main() {
 }
 
 func driverTest() string {
-	return `package {{.Name}}
+	return `package {{.Package}}
 
 import (
 	"testing"
@@ -356,7 +364,7 @@ func Test{{.UpperName}}Driver(t *testing.T) {
 }
 
 func adaptorTest() string {
-	return `package {{.Name}}
+	return `package {{.Package}}
 
 import (
 	"testing"
@@ -381,17 +389,17 @@ func Test{{.UpperName}}Adaptor(t *testing.T) {
 }
 
 func readme() string {
-	return `# {{.Name}}
+	return `# {{.Package}}
 
 Gobot (http://gobot.io/) is a framework for robotics and physical computing using Go
 
-This repository contains the Gobot adaptor and driver for {{.Name}}.
+This repository contains the Gobot adaptor and driver for {{.Package}}.
 
 For more information about Gobot, check out the github repo at
 https://github.com/hybridgroup/gobot
 
 ## Installing
-` + "```bash\ngo get path/to/repo/{{.Name}}\n```" + `
+` + "```bash\ngo get path/to/repo/{{.Package}}\n```" + `
 
 ## Using
 ` + "```go{{.Example}}\n```" + `
