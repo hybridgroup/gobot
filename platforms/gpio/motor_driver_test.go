@@ -7,11 +7,11 @@ import (
 )
 
 func initTestMotorDriver() *MotorDriver {
-	return NewMotorDriver(newGpioTestAdaptor("adaptor"), "bot")
+	return NewMotorDriver(newGpioTestAdaptor("adaptor"), "bot", "1")
 }
 
 func TestMotorDriver(t *testing.T) {
-	d := NewMotorDriver(newGpioTestAdaptor("adaptor"), "bot")
+	d := NewMotorDriver(newGpioTestAdaptor("adaptor"), "bot", "1")
 	gobot.Assert(t, d.Name(), "bot")
 	gobot.Assert(t, d.Connection().Name(), "adaptor")
 
