@@ -110,3 +110,25 @@ type DataStreamingPacket struct {
 	// 0080 0000h	Velocity Y	-32768 to 32767	mm/s
 	VeloY int16
 }
+
+// CollisionConfig provides configuration for the collision detection alogorithm.
+type CollisionConfig struct {
+	// Detection method type to use. Methods 01h and 02h are supported as
+	// of FW ver 1.42. Use 00h to completely disable this service.
+	Method uint8
+	// An 8-bit settable threshold for the X (left/right) axes of Sphero.
+	// A value of 00h disables the contribution of that axis.
+	Xt uint8
+	// An 8-bit settable threshold for the Y (front/back) axes of Sphero.
+	// A value of 00h disables the contribution of that axis.
+	Yt uint8
+	// An 8-bit settable speed value for the X axes. This setting is ranged
+	// by the speed, then added to Xt to generate the final threshold value.
+	Xs uint8
+	// An 8-bit settable speed value for the Y axes. This setting is ranged
+	// by the speed, then added to Yt to generate the final threshold value.
+	Ys uint8
+	// An 8-bit post-collision dead time to prevent retriggering; specified
+	// in 10ms increments.
+	Dead uint8
+}

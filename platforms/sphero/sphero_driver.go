@@ -36,6 +36,7 @@ type SpheroDriver struct {
 	responseChannel chan []uint8
 	gobot.Eventer
 	gobot.Commander
+	cdConfigured bool // Indicates if collision detection is configured.
 }
 
 // NewSpheroDriver returns a new SpheroDriver given a SpheroAdaptor and name.
@@ -61,6 +62,7 @@ func NewSpheroDriver(a *SpheroAdaptor, name string) *SpheroDriver {
 	s.AddEvent(Error)
 	s.AddEvent(ChannelCollisions)
 	s.AddEvent(ChannelSensordata)
+
 	s.AddCommand("SetRGB", func(params map[string]interface{}) interface{} {
 		r := uint8(params["r"].(float64))
 		g := uint8(params["g"].(float64))
@@ -182,7 +184,17 @@ func (s *SpheroDriver) Start() (errs []error) {
 		}
 	}()
 
-	s.configureCollisionDetection()
+	if !s.cdConfigured {
+		fmt.Println("Using default collision detection parameters...")
+		s.ConfigureCollisionDetection(CollisionConfig{
+			Method: 0x01,
+			Xt:     0x80,
+			Yt:     0x80,
+			Xs:     0x80,
+			Ys:     0x80,
+			Dead:   0x60,
+		})
+	}
 	s.enableStopOnDisconnect()
 
 	return
@@ -272,8 +284,11 @@ func (s *SpheroDriver) Stop() {
 	s.Roll(0, 0)
 }
 
-func (s *SpheroDriver) configureCollisionDetection() {
-	s.packetChannel <- s.craftPacket([]uint8{0x01, 0x40, 0x40, 0x50, 0x50, 0x60}, 0x02, 0x12)
+// ConfigureCollisionDetection configures the sensitivity of the detection.
+// https://github.com/orbotix/DeveloperResources/blob/master/docs/Collision%20detection%201.2.pdf.
+func (s *SpheroDriver) ConfigureCollisionDetection(cc CollisionConfig) {
+	s.cdConfigured = true
+	s.packetChannel <- s.craftPacket([]uint8{cc.Method, cc.Xt, cc.Yt, cc.Xs, cc.Ys, cc.Dead}, 0x02, 0x12)
 }
 
 func (s *SpheroDriver) enableStopOnDisconnect() {
