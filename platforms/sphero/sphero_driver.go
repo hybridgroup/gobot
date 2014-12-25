@@ -103,11 +103,11 @@ func NewSpheroDriver(a *SpheroAdaptor, name string) *SpheroDriver {
 	})
 
 	s.AddCommand("SetDataStreaming", func(params map[string]interface{}) interface{} {
-		N := params["N"].(uint16)
-		M := params["M"].(uint16)
-		Mask := params["Mask"].(uint32)
-		Pcnt := params["Pcnt"].(uint8)
-		Mask2 := params["Mask2"].(uint32)
+		N := uint16(params["N"].(float64))
+		M := uint16(params["M"].(float64))
+		Mask := uint32(params["Mask"].(float64))
+		Pcnt := uint8(params["Pcnt"].(float64))
+		Mask2 := uint32(params["Mask2"].(float64))
 
 		s.SetDataStreaming(DataStreamingConfig{N: N, M: M, Mask2: Mask2, Pcnt: Pcnt, Mask: Mask})
 		return nil
