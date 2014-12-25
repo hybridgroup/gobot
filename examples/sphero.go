@@ -15,8 +15,14 @@ func main() {
 	spheroDriver := sphero.NewSpheroDriver(adaptor, "sphero")
 
 	work := func() {
-		gobot.On(spheroDriver.Event("collision"), func(data interface{}) {
-			fmt.Printf("Collision Detected! %+v\n", data)
+		spheroDriver.SetDataStreaming(sphero.DefaultDataStreamingConfig())
+
+		gobot.On(spheroDriver.Event(sphero.Collision), func(data interface{}) {
+			fmt.Printf("Collision! %+v\n", data)
+		})
+
+		gobot.On(spheroDriver.Event(sphero.SensorData), func(data interface{}) {
+			fmt.Printf("Streaming Data! %+v\n", data)
 		})
 
 		gobot.Every(3*time.Second, func() {

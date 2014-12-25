@@ -1,5 +1,41 @@
 package sphero
 
+// DefaultCollisionConfig returns a CollisionConfig with sensible collision defaults
+func DefaultCollisionConfig() CollisionConfig {
+	return CollisionConfig{
+		Method: 0x01,
+		Xt:     0x80,
+		Yt:     0x80,
+		Xs:     0x80,
+		Ys:     0x80,
+		Dead:   0x60,
+	}
+}
+
+// CollisionConfig provides configuration for the collision detection alogorithm.
+// For more information refer to the offical api specification https://github.com/orbotix/DeveloperResources/blob/master/docs/Collision%20detection%201.2.pdf.
+type CollisionConfig struct {
+	// Detection method type to use. Methods 01h and 02h are supported as
+	// of FW ver 1.42. Use 00h to completely disable this service.
+	Method uint8
+	// An 8-bit settable threshold for the X (left/right) axes of Sphero.
+	// A value of 00h disables the contribution of that axis.
+	Xt uint8
+	// An 8-bit settable threshold for the Y (front/back) axes of Sphero.
+	// A value of 00h disables the contribution of that axis.
+	Yt uint8
+	// An 8-bit settable speed value for the X axes. This setting is ranged
+	// by the speed, then added to Xt to generate the final threshold value.
+	Xs uint8
+	// An 8-bit settable speed value for the Y axes. This setting is ranged
+	// by the speed, then added to Yt to generate the final threshold value.
+	Ys uint8
+	// An 8-bit post-collision dead time to prevent retriggering; specified
+	// in 10ms increments.
+	Dead uint8
+}
+
+// CollisionPacket represents the response from a Collision event
 type CollisionPacket struct {
 	// Normalized impact components (direction of the collision event):
 	X, Y, Z int16
@@ -13,7 +49,20 @@ type CollisionPacket struct {
 	Timestamp uint32
 }
 
-type DataStreamingSetting struct {
+// DefaultDataStreamingConfig returns a DataStreamingConfig with a sampling rate of 40hz, 1 sample frame per package, unlimited streaming, and will stream all available sensor information
+func DefaultDataStreamingConfig() DataStreamingConfig {
+	return DataStreamingConfig{
+		N:     10,
+		M:     1,
+		Mask:  4294967295,
+		Pcnt:  0,
+		Mask2: 4294967295,
+	}
+}
+
+// DataStreamingConfig provides configuration for Sensor Data Streaming.
+// For more information refer to the offical api specification https://github.com/orbotix/DeveloperResources/blob/master/docs/Sphero_API_1.50.pdf page 28
+type DataStreamingConfig struct {
 	// Divisor of the maximum sensor sampling rate
 	N uint16
 	// Number of sample frames emitted per packet
@@ -26,6 +75,7 @@ type DataStreamingSetting struct {
 	Mask2 uint32
 }
 
+// DataStreamingPacket represents the response from a Data Streaming event
 type DataStreamingPacket struct {
 	// 8000 0000h	accelerometer axis X, raw	-2048 to 2047	4mG
 	RawAccX int16
@@ -109,26 +159,4 @@ type DataStreamingPacket struct {
 	VeloX int16
 	// 0080 0000h	Velocity Y	-32768 to 32767	mm/s
 	VeloY int16
-}
-
-// CollisionConfig provides configuration for the collision detection alogorithm.
-type CollisionConfig struct {
-	// Detection method type to use. Methods 01h and 02h are supported as
-	// of FW ver 1.42. Use 00h to completely disable this service.
-	Method uint8
-	// An 8-bit settable threshold for the X (left/right) axes of Sphero.
-	// A value of 00h disables the contribution of that axis.
-	Xt uint8
-	// An 8-bit settable threshold for the Y (front/back) axes of Sphero.
-	// A value of 00h disables the contribution of that axis.
-	Yt uint8
-	// An 8-bit settable speed value for the X axes. This setting is ranged
-	// by the speed, then added to Xt to generate the final threshold value.
-	Xs uint8
-	// An 8-bit settable speed value for the Y axes. This setting is ranged
-	// by the speed, then added to Yt to generate the final threshold value.
-	Ys uint8
-	// An 8-bit post-collision dead time to prevent retriggering; specified
-	// in 10ms increments.
-	Dead uint8
 }
