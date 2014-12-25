@@ -1,6 +1,8 @@
 package sphero
 
 import (
+	"bytes"
+	"encoding/binary"
 	"testing"
 
 	"github.com/hybridgroup/gobot"
@@ -60,6 +62,36 @@ func TestSpheroDriverHalt(t *testing.T) {
 	d := initTestSpheroDriver()
 	d.adaptor().connected = true
 	gobot.Assert(t, len(d.Halt()), 0)
+}
+
+func TestSpheroDriverSetDataStreaming(t *testing.T) {
+	d := initTestSpheroDriver()
+	d.SetDataStreaming(DefaultDataStreamingConfig())
+
+	data := <-d.packetChannel
+
+	buf := new(bytes.Buffer)
+	binary.Write(buf, binary.BigEndian, DefaultDataStreamingConfig())
+
+	gobot.Assert(t, data.body, buf.Bytes())
+
+	ret := d.Command("SetDataStreaming")(
+		map[string]interface{}{
+			"N":     100.0,
+			"M":     200.0,
+			"Mask":  300.0,
+			"Pcnt":  255.0,
+			"Mask2": 400.0,
+		},
+	)
+	gobot.Assert(t, ret, nil)
+	data = <-d.packetChannel
+
+	dconfig := DataStreamingConfig{N: 100, M: 200, Mask: 300, Pcnt: 255, Mask2: 400}
+	buf = new(bytes.Buffer)
+	binary.Write(buf, binary.BigEndian, dconfig)
+
+	gobot.Assert(t, data.body, buf.Bytes())
 }
 
 func TestCalculateChecksum(t *testing.T) {
