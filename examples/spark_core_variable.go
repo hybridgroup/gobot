@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/spark"
@@ -13,18 +14,17 @@ func main() {
 	sparkCore := spark.NewSparkCoreAdaptor("spark", "DEVICE_ID", "ACCESS_TOKEN")
 
 	work := func() {
-		temp, err := sparkCore.Variable("temperature")
-
-		if err != nil {
-			fmt.Println(err.Error())
-		} else {
-			fmt.Printf("temp from variable is: %v", temp)
-		}
+		gobot.Every(1*time.Second, func() {
+			if temp, err := sparkCore.Variable("temperature"); err != nil {
+				fmt.Println(err)
+			} else {
+				fmt.Println("result from \"temperature\" is:", temp)
+			}
+		})
 	}
 
 	robot := gobot.NewRobot("spark",
 		[]gobot.Connection{sparkCore},
-		[]gobot.Device{},
 		work,
 	)
 

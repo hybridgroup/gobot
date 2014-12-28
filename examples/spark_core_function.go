@@ -13,18 +13,15 @@ func main() {
 	sparkCore := spark.NewSparkCoreAdaptor("spark", "DEVICE_ID", "ACCESS_TOKEN")
 
 	work := func() {
-		result, err := sparkCore.Function("brew", "hello")
-
-		if err != nil {
-			fmt.Println(err.Error())
+		if result, err := sparkCore.Function("brew", "202,230"); err != nil {
+			fmt.Println(err)
 		} else {
-			fmt.Printf("result from executing function is: %v", result)
+			fmt.Println("result from \"brew\":", result)
 		}
 	}
 
 	robot := gobot.NewRobot("spark",
 		[]gobot.Connection{sparkCore},
-		[]gobot.Device{},
 		work,
 	)
 

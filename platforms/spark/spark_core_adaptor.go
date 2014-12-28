@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strconv"
 
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/gpio"
@@ -108,12 +109,24 @@ func (s *SparkCoreAdaptor) DigitalRead(pin string) (val int, err error) {
 	return -1, err
 }
 
-// Variable returns a core variable value,
-// returned value can be a float64 or a string
-func (s *SparkCoreAdaptor) Variable(name string) (val interface{}, err error) {
+// Variable returns a core variable value as a string
+func (s *SparkCoreAdaptor) Variable(name string) (result string, err error) {
 	url := fmt.Sprintf("%v/%s?access_token=%s", s.deviceURL(), name, s.AccessToken)
 	resp, err := s.requestToSpark("GET", url, nil)
-	val = resp["result"]
+
+	if err != nil {
+		return
+	}
+
+	val := resp["result"]
+	switch val.(type) {
+	case bool:
+		result = strconv.FormatBool(val.(bool))
+	case float64:
+		result = strconv.FormatFloat(val.(float64), 'f', -1, 64)
+	case string:
+		result = val.(string)
+	}
 
 	return
 }
@@ -122,21 +135,21 @@ func (s *SparkCoreAdaptor) Variable(name string) (val interface{}, err error) {
 // returns value from request.
 // Takes a String as the only argument and returns an Int.
 // If function is not defined in core, it will time out
-func (s *SparkCoreAdaptor) Function(name string, paramString string) (val int, err error) {
+func (s *SparkCoreAdaptor) Function(name string, args string) (val int, err error) {
 	params := url.Values{
-		"args":         {paramString},
+		"args":         {args},
 		"access_token": {s.AccessToken},
 	}
 
 	url := fmt.Sprintf("%s/%s", s.deviceURL(), name)
 	resp, err := s.requestToSpark("POST", url, params)
 
-	if err == nil {
-		val = int(resp["return_value"].(float64))
-		return
+	if err != nil {
+		return -1, err
 	}
 
-	return -1, err
+	val = int(resp["return_value"].(float64))
+	return
 }
 
 // setAPIServer sets spark cloud api server, this can be used to change from default api.spark.io

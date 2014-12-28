@@ -72,6 +72,7 @@ func TestNewSparkCoreAdaptor(t *testing.T) {
 	}
 
 	gobot.Assert(t, spark.APIServer, "https://api.spark.io")
+	gobot.Assert(t, spark.Name(), "bot")
 }
 
 func TestSparkCoreAdaptorConnect(t *testing.T) {
@@ -194,6 +195,30 @@ func TestSparkCoreAdaptorDigitalRead(t *testing.T) {
 	gobot.Assert(t, val, -1)
 }
 
+func TestSparkCoreAdaptorFunction(t *testing.T) {
+	response := `{"return_value": 1}`
+
+	a := initTestSparkCoreAdaptor()
+	testServer := getDummyResponseForPath("/"+a.DeviceID+"/hello", response, t)
+
+	a.setAPIServer(testServer.URL)
+
+	val, _ := a.Function("hello", "100,200")
+	gobot.Assert(t, val, 1)
+	testServer.Close()
+
+	// When not existent
+	response = `{"ok": false, "error": "timeout"}`
+	testServer = getDummyResponseForPath("/"+a.DeviceID+"/hello", response, t)
+
+	a.setAPIServer(testServer.URL)
+
+	_, err := a.Function("hello", "")
+	gobot.Assert(t, err.Error(), "timeout")
+
+	testServer.Close()
+}
+
 func TestSparkCoreAdaptorVariable(t *testing.T) {
 	// When String
 	response := `{"result": "1"}`
@@ -204,7 +229,7 @@ func TestSparkCoreAdaptorVariable(t *testing.T) {
 	a.setAPIServer(testServer.URL)
 
 	val, _ := a.Variable("variable_name")
-	gobot.Assert(t, val.(string), "1")
+	gobot.Assert(t, val, "1")
 	testServer.Close()
 
 	// When float
@@ -214,7 +239,7 @@ func TestSparkCoreAdaptorVariable(t *testing.T) {
 	a.setAPIServer(testServer.URL)
 
 	val, _ = a.Variable("variable_name")
-	gobot.Assert(t, val.(float64), 1.1)
+	gobot.Assert(t, val, "1.1")
 	testServer.Close()
 
 	// When int
@@ -224,7 +249,17 @@ func TestSparkCoreAdaptorVariable(t *testing.T) {
 	a.setAPIServer(testServer.URL)
 
 	val, _ = a.Variable("variable_name")
-	gobot.Assert(t, val.(float64), 1.0)
+	gobot.Assert(t, val, "1")
+	testServer.Close()
+
+	// When bool
+	response = `{"result": true}`
+	testServer = getDummyResponseForPath("/"+a.DeviceID+"/variable_name", response, t)
+
+	a.setAPIServer(testServer.URL)
+
+	val, _ = a.Variable("variable_name")
+	gobot.Assert(t, val, "true")
 	testServer.Close()
 
 	// When not existent
