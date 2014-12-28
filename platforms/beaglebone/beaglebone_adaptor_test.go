@@ -23,6 +23,7 @@ func TestBeagleboneAdaptor(t *testing.T) {
 		"/sys/devices/ocp.3/pwm_test_P9_14.5",
 		"/sys/devices/ocp.3/pwm_test_P9_14.5/run",
 		"/sys/devices/ocp.3/pwm_test_P9_14.5/period",
+		"/sys/devices/ocp.3/pwm_test_P9_14.5/polarity",
 		"/sys/devices/ocp.3/pwm_test_P9_14.5/duty",
 		"/sys/class/gpio/export",
 		"/sys/class/gpio/unexport",
@@ -57,19 +58,19 @@ func TestBeagleboneAdaptor(t *testing.T) {
 	gobot.Assert(
 		t,
 		fs.Files["/sys/devices/ocp.3/pwm_test_P9_14.5/duty"].Contents,
-		"156862",
+		"343137",
 	)
 
 	a.ServoWrite("P9_14", 100)
 	gobot.Assert(
 		t,
 		fs.Files["/sys/devices/ocp.3/pwm_test_P9_14.5/period"].Contents,
-		"20000000",
+		"16666666",
 	)
 	gobot.Assert(
 		t,
 		fs.Files["/sys/devices/ocp.3/pwm_test_P9_14.5/duty"].Contents,
-		"17222222",
+		"1898148",
 	)
 
 	// Analog

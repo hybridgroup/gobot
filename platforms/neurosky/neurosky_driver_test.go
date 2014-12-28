@@ -2,6 +2,8 @@ package neurosky
 
 import (
 	"bytes"
+	"errors"
+	"io"
 	"testing"
 	"time"
 
@@ -10,17 +12,39 @@ import (
 
 func initTestNeuroskyDriver() *NeuroskyDriver {
 	a := NewNeuroskyAdaptor("bot", "/dev/null")
-	a.connect = func(n *NeuroskyAdaptor) (err error) {
-		n.sp = gobot.NullReadWriteCloser{}
-		return nil
+	a.connect = func(n *NeuroskyAdaptor) (io.ReadWriteCloser, error) {
+		return &NullReadWriteCloser{}, nil
 	}
-	a.connect(a)
+	a.Connect()
 	return NewNeuroskyDriver(a, "bot")
 }
 
-func TestNeuroskyDriverStart(t *testing.T) {
+func TestNeuroskyDriver(t *testing.T) {
 	d := initTestNeuroskyDriver()
+	gobot.Assert(t, d.Name(), "bot")
+	gobot.Assert(t, d.Connection().Name(), "bot")
+}
+func TestNeuroskyDriverStart(t *testing.T) {
+	sem := make(chan bool, 0)
+	d := initTestNeuroskyDriver()
+	gobot.Once(d.Event("error"), func(data interface{}) {
+		gobot.Assert(t, data.(error), errors.New("read error"))
+		sem <- true
+	})
+
 	gobot.Assert(t, len(d.Start()), 0)
+
+	<-time.After(50 * time.Millisecond)
+	readError = errors.New("read error")
+
+	select {
+	case <-sem:
+	case <-time.After(100 * time.Millisecond):
+		{
+			t.Errorf("error was not emitted")
+		}
+
+	}
 }
 
 func TestNeuroskyDriverHalt(t *testing.T) {

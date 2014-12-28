@@ -1,17 +1,14 @@
 # Ardrone
 
-This package  provides the Gobot adaptor and driver for the [Parrot Ardrone](http://ardrone2.parrot.com).
+The ARDrone from Parrot is an inexpensive quadcopter that is controlled using WiFi. It includes a built-in front-facing HD video camera, as well as a second lower resolution bottom facing video camera.
 
-For more information about Gobot, check out the github repo at
-https://github.com/hybridgroup/gobot
+For more info about the ARDrone platform click [here](http://ardrone2.parrot.com/).
 
-## Getting Started
-
-## Installing
+## How to Install
 ```
 go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/ardrone
 ```
-## Using
+## How to Use
 ```go
 package main
 
@@ -47,3 +44,6 @@ func main() {
 	gbot.Start()
 }
 ```
+## How to Connect
+
+The ARDrone is a WiFi device, so there is no additional work to establish a connection to a single drone. However, in order to connect to multiple drones, you need to perform some configuration steps on each drone via SSH.

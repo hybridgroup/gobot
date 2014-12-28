@@ -1,10 +1,6 @@
 package gpio
 
-import (
-	"errors"
-
-	"github.com/hybridgroup/gobot"
-)
+import "github.com/hybridgroup/gobot"
 
 var _ gobot.Driver = (*ServoDriver)(nil)
 
@@ -64,7 +60,7 @@ func (s *ServoDriver) Halt() (errs []error) { return }
 // Move sets the servo to the specified angle
 func (s *ServoDriver) Move(angle uint8) (err error) {
 	if !(angle >= 0 && angle <= 180) {
-		return errors.New("Servo angle must be an integer between 0-180")
+		return ErrServoOutOfRange
 	}
 	s.CurrentAngle = angle
 	return s.connection.ServoWrite(s.Pin(), s.angleToSpan(angle))

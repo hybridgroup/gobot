@@ -2,6 +2,7 @@ package i2c
 
 import (
 	"testing"
+	"time"
 
 	"github.com/hybridgroup/gobot"
 )
@@ -26,6 +27,16 @@ func TestNewMPU6050Driver(t *testing.T) {
 	if !ok {
 		t.Errorf("NewMPU6050Driver() should have returned a *MPU6050Driver")
 	}
+}
+
+func TestMPU6050Driver(t *testing.T) {
+	mpu := initTestMPU6050Driver()
+	gobot.Assert(t, mpu.Name(), "bot")
+	gobot.Assert(t, mpu.Connection().Name(), "adaptor")
+	gobot.Assert(t, mpu.interval, 10*time.Millisecond)
+
+	mpu = NewMPU6050Driver(newI2cTestAdaptor("adaptor"), "bot", 100*time.Millisecond)
+	gobot.Assert(t, mpu.interval, 100*time.Millisecond)
 }
 
 // Methods

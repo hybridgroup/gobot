@@ -11,6 +11,11 @@ import (
 
 var _ gobot.Driver = (*CameraDriver)(nil)
 
+type capture interface {
+	RetrieveFrame(int) *cv.IplImage
+	GrabFrame() bool
+}
+
 type CameraDriver struct {
 	name     string
 	camera   capture

@@ -59,27 +59,31 @@ func (w *WiichuckDriver) Start() (errs []error) {
 	if err := w.connection.I2cStart(0x52); err != nil {
 		return []error{err}
 	}
-	gobot.Every(w.interval, func() {
-		if err := w.connection.I2cWrite([]byte{0x40, 0x00}); err != nil {
-			gobot.Publish(w.Event(Error), err)
-			return
-		}
-		if err := w.connection.I2cWrite([]byte{0x00}); err != nil {
-			gobot.Publish(w.Event(Error), err)
-			return
-		}
-		newValue, err := w.connection.I2cRead(6)
-		if err != nil {
-			gobot.Publish(w.Event(Error), err)
-			return
-		}
-		if len(newValue) == 6 {
-			if err = w.update(newValue); err != nil {
+
+	go func() {
+		for {
+			if err := w.connection.I2cWrite([]byte{0x40, 0x00}); err != nil {
 				gobot.Publish(w.Event(Error), err)
-				return
+				continue
 			}
+			if err := w.connection.I2cWrite([]byte{0x00}); err != nil {
+				gobot.Publish(w.Event(Error), err)
+				continue
+			}
+			newValue, err := w.connection.I2cRead(6)
+			if err != nil {
+				gobot.Publish(w.Event(Error), err)
+				continue
+			}
+			if len(newValue) == 6 {
+				if err = w.update(newValue); err != nil {
+					gobot.Publish(w.Event(Error), err)
+					continue
+				}
+			}
+			<-time.After(w.interval)
 		}
-	})
+	}()
 	return
 }
 

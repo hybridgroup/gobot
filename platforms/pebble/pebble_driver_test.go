@@ -23,6 +23,10 @@ func TestPebbleDriverHalt(t *testing.T) {
 
 func TestPebbleDriver(t *testing.T) {
 	d := initTestPebbleDriver()
+
+	gobot.Assert(t, d.Name(), "pebble")
+	gobot.Assert(t, d.Connection().Name(), "adaptor")
+
 	sem := make(chan bool)
 	d.SendNotification("Hello")
 	d.SendNotification("World")

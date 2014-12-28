@@ -8,13 +8,18 @@ import (
 
 func initTestArdroneDriver() *ArdroneDriver {
 	a := NewArdroneAdaptor("drone")
-	a.connect = func(a *ArdroneAdaptor) (err error) {
-		a.drone = &testDrone{}
-		return
+	a.connect = func(a *ArdroneAdaptor) (drone, error) {
+		return &testDrone{}, nil
 	}
 	d := NewArdroneDriver(a, "drone")
 	a.Connect()
 	return d
+}
+
+func TestArdroneDriver(t *testing.T) {
+	d := initTestArdroneDriver()
+	gobot.Assert(t, d.Name(), "drone")
+	gobot.Assert(t, d.Connection().Name(), "drone")
 }
 
 func TestArdroneDriverStart(t *testing.T) {

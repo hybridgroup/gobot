@@ -16,10 +16,8 @@ type LeapMotionDriver struct {
 	gobot.Eventer
 }
 
-var receive = func(ws io.ReadWriteCloser) []byte {
-	var msg []byte
-	websocket.Message.Receive(ws.(*websocket.Conn), &msg)
-	return msg
+var receive = func(ws io.ReadWriteCloser, msg *[]byte) {
+	websocket.Message.Receive(ws.(*websocket.Conn), msg)
 }
 
 // NewLeapMotionDriver creates a new leap motion driver with specified name
@@ -61,8 +59,10 @@ func (l *LeapMotionDriver) Start() (errs []error) {
 	}
 
 	go func() {
+		var msg []byte
 		for {
-			gobot.Publish(l.Event("message"), l.ParseFrame(receive(l.adaptor().ws)))
+			receive(l.adaptor().ws, &msg)
+			gobot.Publish(l.Event("message"), l.ParseFrame(msg))
 		}
 	}()
 

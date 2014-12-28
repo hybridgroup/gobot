@@ -20,6 +20,7 @@ type JoystickDriver struct {
 	configPath string
 	config     joystickConfig
 	poll       func() sdl.Event
+	halt       chan bool
 	gobot.Eventer
 }
 
@@ -60,6 +61,7 @@ func NewJoystickDriver(a *JoystickAdaptor, name string, config string, v ...time
 			return sdl.PollEvent()
 		},
 		interval: 10 * time.Millisecond,
+		halt:     make(chan bool, 0),
 	}
 
 	if len(v) > 0 {
@@ -107,14 +109,21 @@ func (j *JoystickDriver) Start() (errs []error) {
 					gobot.Publish(j.Event("error"), err)
 				}
 			}
-			<-time.After(j.interval)
+			select {
+			case <-time.After(j.interval):
+			case <-j.halt:
+				return
+			}
 		}
 	}()
 	return
 }
 
 // Halt stops joystick driver
-func (j *JoystickDriver) Halt() (errs []error) { return }
+func (j *JoystickDriver) Halt() (errs []error) {
+	j.halt <- true
+	return
+}
 
 // HandleEvent publishes an specific event according to data received
 func (j *JoystickDriver) handleEvent(event sdl.Event) error {

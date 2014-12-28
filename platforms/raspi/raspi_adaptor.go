@@ -2,10 +2,8 @@ package raspi
 
 import (
 	"errors"
-	"fmt"
 	"io"
 	"io/ioutil"
-	"os/exec"
 	"strconv"
 	"strings"
 
@@ -22,34 +20,8 @@ var _ gpio.DigitalWriter = (*RaspiAdaptor)(nil)
 
 var _ i2c.I2c = (*RaspiAdaptor)(nil)
 
-var boardRevision = func() (string, string) {
-	cat, _ := exec.Command("cat", "/proc/cpuinfo").Output()
-	grep := exec.Command("grep", "Revision")
-	in, _ := grep.StdinPipe()
-	out, _ := grep.StdoutPipe()
-	grep.Start()
-	in.Write([]byte(string(cat)))
-	in.Close()
-	buf, _ := ioutil.ReadAll(out)
-	grep.Wait()
-
-	s := strings.Split(string(buf), " ")
-	a := fmt.Sprintf("0x%v", strings.TrimSuffix(s[len(s)-1], "\n"))
-	d, _ := strconv.ParseInt(a, 0, 64)
-
-	rev := ""
-	if d <= 3 {
-		rev = "1"
-	} else if d <= 15 {
-		rev = "2"
-	} else {
-		rev = "3"
-	}
-
-	if rev == "1" {
-		return rev, "/dev/i2c-0"
-	}
-	return rev, "/dev/i2c-1"
+var readFile = func() ([]byte, error) {
+	return ioutil.ReadFile("/proc/cpuinfo")
 }
 
 type RaspiAdaptor struct {
@@ -153,9 +125,23 @@ func NewRaspiAdaptor(name string) *RaspiAdaptor {
 		name:        name,
 		digitalPins: make(map[int]sysfs.DigitalPin),
 	}
-	rev, i2cLoc := boardRevision()
-	r.revision = rev
-	r.i2cLocation = i2cLoc
+	content, _ := readFile()
+	for _, v := range strings.Split(string(content), "\n") {
+		if strings.Contains(v, "Revision") {
+			s := strings.Split(string(v), " ")
+			version, _ := strconv.ParseInt("0x"+s[len(s)-1], 0, 64)
+			r.i2cLocation = "/dev/i2c-1"
+			if version <= 3 {
+				r.revision = "1"
+				r.i2cLocation = "/dev/i2c-0"
+			} else if version <= 15 {
+				r.revision = "2"
+			} else {
+				r.revision = "3"
+			}
+		}
+	}
+
 	return r
 }
 func (r *RaspiAdaptor) Name() string { return r.name }

@@ -55,9 +55,11 @@ func (l *LedDriver) Start() (errs []error) { return }
 // Halt halts the LedDriver. Returns true on successful halt of the driver
 func (l *LedDriver) Halt() (errs []error) { return }
 
-func (l *LedDriver) Name() string                 { return l.name }
-func (l *LedDriver) Pin() string                  { return l.pin }
-func (l *LedDriver) Connection() gobot.Connection { return l.connection.(gobot.Connection) }
+func (l *LedDriver) Name() string { return l.name }
+func (l *LedDriver) Pin() string  { return l.pin }
+func (l *LedDriver) Connection() gobot.Connection {
+	return l.connection.(gobot.Connection)
+}
 
 // State return true if the led is On and false if the led is Off
 func (l *LedDriver) State() bool {
@@ -66,8 +68,7 @@ func (l *LedDriver) State() bool {
 
 // On sets the led to a high state. Returns true on success
 func (l *LedDriver) On() (err error) {
-	err = l.changeState(1)
-	if err != nil {
+	if err = l.connection.DigitalWrite(l.Pin(), 1); err != nil {
 		return
 	}
 	l.high = true
@@ -76,8 +77,7 @@ func (l *LedDriver) On() (err error) {
 
 // Off sets the led to a low state. Returns true on success
 func (l *LedDriver) Off() (err error) {
-	err = l.changeState(0)
-	if err != nil {
+	if err = l.connection.DigitalWrite(l.Pin(), 0); err != nil {
 		return
 	}
 	l.high = false
@@ -100,8 +100,4 @@ func (l *LedDriver) Brightness(level byte) (err error) {
 		return writer.PwmWrite(l.Pin(), level)
 	}
 	return ErrPwmWriteUnsupported
-}
-
-func (l *LedDriver) changeState(level byte) (err error) {
-	return l.connection.DigitalWrite(l.Pin(), level)
 }

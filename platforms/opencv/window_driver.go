@@ -7,6 +7,10 @@ import (
 
 var _ gobot.Driver = (*WindowDriver)(nil)
 
+type window interface {
+	ShowImage(*cv.IplImage)
+}
+
 type WindowDriver struct {
 	name   string
 	window window

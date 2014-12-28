@@ -206,8 +206,8 @@ func (b *BeagleboneAdaptor) ServoWrite(pin string, val byte) (err error) {
 	if err != nil {
 		return err
 	}
-	period := 20000000.0
-	duty := gobot.FromScale(float64(^val), 0, 180.0)
+	period := 16666666.0
+	duty := (gobot.FromScale(float64(val), 0, 180.0) * 0.115) + 0.05
 	return b.pwmPins[i].pwmWrite(strconv.Itoa(int(period)), strconv.Itoa(int(period*duty)))
 }
 
@@ -359,7 +359,7 @@ func (b *BeagleboneAdaptor) pwmWrite(pin string, val byte) (err error) {
 		return
 	}
 	period := 500000.0
-	duty := gobot.FromScale(float64(^val), 0, 255.0)
+	duty := gobot.FromScale(float64(val), 0, 255.0)
 	return b.pwmPins[i].pwmWrite(strconv.Itoa(int(period)), strconv.Itoa(int(period*duty)))
 }
 
@@ -384,10 +384,7 @@ func ensureSlot(slots, item string) (err error) {
 	if err != nil {
 		return err
 	}
-	err = fi.Sync()
-	if err != nil {
-		return err
-	}
+	fi.Sync()
 
 	scanner = bufio.NewScanner(fi)
 	for scanner.Scan() {

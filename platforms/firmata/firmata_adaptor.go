@@ -1,6 +1,7 @@
 package firmata
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"strconv"
@@ -27,7 +28,8 @@ type FirmataAdaptor struct {
 	port       string
 	board      *board
 	i2cAddress byte
-	connect    func(*FirmataAdaptor) (err error)
+	conn       io.ReadWriteCloser
+	connect    func(string) (io.ReadWriteCloser, error)
 }
 
 // NewFirmataAdaptor returns a new firmata adaptor with specified name and optionally accepts:
@@ -40,39 +42,37 @@ type FirmataAdaptor struct {
 // is supplied, then the FirmataAdaptor will use the provided io.ReadWriteCloser and use the
 // string port as a label to be displayed in the log and api.
 func NewFirmataAdaptor(name string, args ...interface{}) *FirmataAdaptor {
-	var conn io.ReadWriteCloser
-	var port string = ""
+	f := &FirmataAdaptor{
+		name: name,
+		port: "",
+		conn: nil,
+		connect: func(port string) (io.ReadWriteCloser, error) {
+			return serial.OpenPort(&serial.Config{Name: port, Baud: 57600})
+		},
+	}
 
 	for _, arg := range args {
 		switch arg.(type) {
 		case string:
-			port = arg.(string)
+			f.port = arg.(string)
 		case io.ReadWriteCloser:
-			conn = arg.(io.ReadWriteCloser)
+			f.conn = arg.(io.ReadWriteCloser)
 		}
 	}
 
-	return &FirmataAdaptor{
-		name: name,
-		port: port,
-		connect: func(f *FirmataAdaptor) (err error) {
-			if conn == nil {
-				conn, err = serial.OpenPort(&serial.Config{Name: f.Port(), Baud: 57600})
-				if err != nil {
-					return err
-				}
-			}
-			f.board = newBoard(conn)
-			return
-		},
-	}
+	return f
 }
 
 // Connect returns true if connection to board is succesfull
 func (f *FirmataAdaptor) Connect() (errs []error) {
-	if err := f.connect(f); err != nil {
-		return []error{err}
+	if f.conn == nil {
+		if sp, err := f.connect(f.Port()); err != nil {
+			return []error{err}
+		} else {
+			f.conn = sp
+		}
 	}
+	f.board = newBoard(f.conn)
 	f.board.connect()
 	return
 }
@@ -83,7 +83,7 @@ func (f *FirmataAdaptor) Disconnect() (err error) {
 	if f.board != nil {
 		return f.board.serial.Close()
 	}
-	return
+	return errors.New("no board connected")
 }
 
 // Finalize disconnects firmata adaptor

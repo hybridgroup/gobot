@@ -13,7 +13,7 @@ import (
 )
 
 func initTestAPI() *api {
-	log.SetOutput(gobot.NullReadWriteCloser{})
+	log.SetOutput(NullReadWriteCloser{})
 	g := gobot.NewGobot()
 	a := NewAPI(g)
 	a.start = func(m *api) {}

@@ -51,6 +51,8 @@ const (
 	i2CModeStopReading       byte = 0x03
 )
 
+var defaultInitTimeInterval time.Duration = 1 * time.Second
+
 type board struct {
 	serial           io.ReadWriteCloser
 	pins             []pin
@@ -84,7 +86,7 @@ func newBoard(sp io.ReadWriteCloser) *board {
 		analogPins:       []byte{},
 		connected:        false,
 		events:           make(map[string]*gobot.Event),
-		initTimeInterval: 1 * time.Second,
+		initTimeInterval: defaultInitTimeInterval,
 	}
 
 	for _, s := range []string{
