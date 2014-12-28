@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"strconv"
 
+	"github.com/donovanhide/eventsource"
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/gpio"
 )
@@ -25,6 +26,20 @@ type SparkCoreAdaptor struct {
 	DeviceID    string
 	AccessToken string
 	APIServer   string
+}
+
+type Event struct {
+	Name  string
+	Data  string
+	Error error
+}
+
+var eventSource = func(url string) (chan eventsource.Event, chan error, error) {
+	stream, err := eventsource.Subscribe(url, "")
+	if err != nil {
+		return nil, nil, err
+	}
+	return stream.Events, stream.Errors, nil
 }
 
 // NewSparkCoreAdaptor creates new spark core adaptor with deviceId and accessToken
@@ -107,6 +122,49 @@ func (s *SparkCoreAdaptor) DigitalRead(pin string) (val int, err error) {
 		return
 	}
 	return -1, err
+}
+
+// EventStream returns a gobot.Event based on the following params:
+//
+// * source - "all"/"devices"/"device" (More info at: http://docs.spark.io/api/#reading-data-from-a-core-events)
+// * name  - Event name to subscribe for, leave blank to subscribe to all events.
+//
+// A new event is emitted as a spark.Event struct
+func (s *SparkCoreAdaptor) EventStream(source string, name string) (event *gobot.Event, err error) {
+	var url string
+
+	switch source {
+	case "all":
+		url = fmt.Sprintf("%s/v1/events/%s?access_token=%s", s.APIServer, name, s.AccessToken)
+	case "devices":
+		url = fmt.Sprintf("%s/v1/devices/events/%s?access_token=%s", s.APIServer, name, s.AccessToken)
+	case "device":
+		url = fmt.Sprintf("%s/events/%s?access_token=%s", s.deviceURL(), name, s.AccessToken)
+	default:
+		err = errors.New("source param should be: all, devices or device")
+		return
+	}
+
+	events, errors, err := eventSource(url)
+	if err != nil {
+		return
+	}
+
+	event = gobot.NewEvent()
+
+	go func() {
+		for {
+			select {
+			case ev := <-events:
+				if ev.Event() != "" && ev.Data() != "" {
+					gobot.Publish(event, Event{Name: ev.Event(), Data: ev.Data()})
+				}
+			case ev := <-errors:
+				gobot.Publish(event, Event{Error: ev})
+			}
+		}
+	}()
+	return
 }
 
 // Variable returns a core variable value as a string
