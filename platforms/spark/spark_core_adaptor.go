@@ -7,7 +7,9 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strconv"
 
+	"github.com/donovanhide/eventsource"
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/gpio"
 )
@@ -24,6 +26,20 @@ type SparkCoreAdaptor struct {
 	DeviceID    string
 	AccessToken string
 	APIServer   string
+}
+
+type Event struct {
+	Name  string
+	Data  string
+	Error error
+}
+
+var eventSource = func(url string) (chan eventsource.Event, chan error, error) {
+	stream, err := eventsource.Subscribe(url, "")
+	if err != nil {
+		return nil, nil, err
+	}
+	return stream.Events, stream.Errors, nil
 }
 
 // NewSparkCoreAdaptor creates new spark core adaptor with deviceId and accessToken
@@ -57,7 +73,7 @@ func (s *SparkCoreAdaptor) AnalogRead(pin string) (val int, err error) {
 
 	url := fmt.Sprintf("%v/analogread", s.deviceURL())
 
-	resp, err := s.postToSpark(url, params)
+	resp, err := s.requestToSpark("POST", url, params)
 	if err == nil {
 		val = int(resp["return_value"].(float64))
 		return
@@ -78,7 +94,7 @@ func (s *SparkCoreAdaptor) AnalogWrite(pin string, level byte) (err error) {
 		"access_token": {s.AccessToken},
 	}
 	url := fmt.Sprintf("%v/analogwrite", s.deviceURL())
-	_, err = s.postToSpark(url, params)
+	_, err = s.requestToSpark("POST", url, params)
 	return
 }
 
@@ -89,7 +105,7 @@ func (s *SparkCoreAdaptor) DigitalWrite(pin string, level byte) (err error) {
 		"access_token": {s.AccessToken},
 	}
 	url := fmt.Sprintf("%v/digitalwrite", s.deviceURL())
-	_, err = s.postToSpark(url, params)
+	_, err = s.requestToSpark("POST", url, params)
 	return err
 }
 
@@ -100,12 +116,98 @@ func (s *SparkCoreAdaptor) DigitalRead(pin string) (val int, err error) {
 		"access_token": {s.AccessToken},
 	}
 	url := fmt.Sprintf("%v/digitalread", s.deviceURL())
-	resp, err := s.postToSpark(url, params)
+	resp, err := s.requestToSpark("POST", url, params)
 	if err == nil {
 		val = int(resp["return_value"].(float64))
 		return
 	}
 	return -1, err
+}
+
+// EventStream returns a gobot.Event based on the following params:
+//
+// * source - "all"/"devices"/"device" (More info at: http://docs.spark.io/api/#reading-data-from-a-core-events)
+// * name  - Event name to subscribe for, leave blank to subscribe to all events.
+//
+// A new event is emitted as a spark.Event struct
+func (s *SparkCoreAdaptor) EventStream(source string, name string) (event *gobot.Event, err error) {
+	var url string
+
+	switch source {
+	case "all":
+		url = fmt.Sprintf("%s/v1/events/%s?access_token=%s", s.APIServer, name, s.AccessToken)
+	case "devices":
+		url = fmt.Sprintf("%s/v1/devices/events/%s?access_token=%s", s.APIServer, name, s.AccessToken)
+	case "device":
+		url = fmt.Sprintf("%s/events/%s?access_token=%s", s.deviceURL(), name, s.AccessToken)
+	default:
+		err = errors.New("source param should be: all, devices or device")
+		return
+	}
+
+	events, errors, err := eventSource(url)
+	if err != nil {
+		return
+	}
+
+	event = gobot.NewEvent()
+
+	go func() {
+		for {
+			select {
+			case ev := <-events:
+				if ev.Event() != "" && ev.Data() != "" {
+					gobot.Publish(event, Event{Name: ev.Event(), Data: ev.Data()})
+				}
+			case ev := <-errors:
+				gobot.Publish(event, Event{Error: ev})
+			}
+		}
+	}()
+	return
+}
+
+// Variable returns a core variable value as a string
+func (s *SparkCoreAdaptor) Variable(name string) (result string, err error) {
+	url := fmt.Sprintf("%v/%s?access_token=%s", s.deviceURL(), name, s.AccessToken)
+	resp, err := s.requestToSpark("GET", url, nil)
+
+	if err != nil {
+		return
+	}
+
+	val := resp["result"]
+	switch val.(type) {
+	case bool:
+		result = strconv.FormatBool(val.(bool))
+	case float64:
+		result = strconv.FormatFloat(val.(float64), 'f', -1, 64)
+	case string:
+		result = val.(string)
+	}
+
+	return
+}
+
+// Function executes a core function and
+// returns value from request.
+// Takes a String as the only argument and returns an Int.
+// If function is not defined in core, it will time out
+func (s *SparkCoreAdaptor) Function(name string, args string) (val int, err error) {
+	params := url.Values{
+		"args":         {args},
+		"access_token": {s.AccessToken},
+	}
+
+	url := fmt.Sprintf("%s/%s", s.deviceURL(), name)
+	resp, err := s.requestToSpark("POST", url, params)
+
+	if err != nil {
+		return -1, err
+	}
+
+	val = int(resp["return_value"].(float64))
+	return
 }
 
 // setAPIServer sets spark cloud api server, this can be used to change from default api.spark.io
@@ -129,10 +231,17 @@ func (s *SparkCoreAdaptor) pinLevel(level byte) string {
 	return "LOW"
 }
 
-// postToSpark makes POST request to spark cloud server, return err != nil if there is
+// requestToSpark makes request to spark cloud server, return err != nil if there is
 // any issue with the request.
-func (s *SparkCoreAdaptor) postToSpark(url string, params url.Values) (m map[string]interface{}, err error) {
-	resp, err := http.PostForm(url, params)
+func (s *SparkCoreAdaptor) requestToSpark(method string, url string, params url.Values) (m map[string]interface{}, err error) {
+	var resp *http.Response
+
+	if method == "POST" {
+		resp, err = http.PostForm(url, params)
+	} else if method == "GET" {
+		resp, err = http.Get(url)
+	}
+
 	if err != nil {
 		return
 	}
@@ -146,12 +255,9 @@ func (s *SparkCoreAdaptor) postToSpark(url string, params url.Values) (m map[str
 	json.Unmarshal(buf, &m)
 
 	if resp.Status != "200 OK" {
-		if _, ok := m["error"]; ok {
-			err = errors.New(m["error"].(string))
-		} else {
-			err = errors.New(fmt.Sprintf("&v: error communicating to the spark cloud", resp.Status))
-		}
-		return
+		err = errors.New(fmt.Sprintf("&v: error communicating to the spark cloud", resp.Status))
+	} else if _, ok := m["error"]; ok {
+		err = errors.New(m["error"].(string))
 	}
 
 	return
