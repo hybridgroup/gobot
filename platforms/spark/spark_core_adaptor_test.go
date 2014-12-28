@@ -1,11 +1,13 @@
 package spark
 
 import (
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"testing"
 
+	"github.com/donovanhide/eventsource"
 	"github.com/hybridgroup/gobot"
 )
 
@@ -330,5 +332,74 @@ func TestSparkCoreAdaptorPostToSpark(t *testing.T) {
 	if err == nil {
 		t.Errorf("requestToSpark() should return an error when status is not 200 but returned", resp)
 	}
+
+}
+
+type testEventSource struct {
+	event string
+	data  string
+}
+
+func (testEventSource) Id() string      { return "" }
+func (t testEventSource) Event() string { return t.event }
+func (t testEventSource) Data() string  { return t.data }
+
+func TestSparkCoreAdaptorEventStream(t *testing.T) {
+	a := initTestSparkCoreAdaptor()
+	var url string
+	eventSource = func(u string) (chan eventsource.Event, chan error, error) {
+		url = u
+		return nil, nil, nil
+	}
+	a.EventStream("all", "ping")
+	gobot.Assert(t, url, "https://api.spark.io/v1/events/ping?access_token=token")
+	a.EventStream("devices", "ping")
+	gobot.Assert(t, url, "https://api.spark.io/v1/devices/events/ping?access_token=token")
+	a.EventStream("device", "ping")
+	gobot.Assert(t, url, "https://api.spark.io/v1/devices/myDevice/events/ping?access_token=token")
+	_, err := a.EventStream("nothing", "ping")
+	gobot.Assert(t, err.Error(), "source param should be: all, devices or device")
+
+	eventSource = func(u string) (chan eventsource.Event, chan error, error) {
+		return nil, nil, errors.New("error connecting sse")
+	}
+
+	_, err = a.EventStream("devices", "")
+	gobot.Assert(t, err.Error(), "error connecting sse")
+
+	eventChan := make(chan eventsource.Event, 0)
+	errorChan := make(chan error, 0)
+
+	eventSource = func(u string) (chan eventsource.Event, chan error, error) {
+		return eventChan, errorChan, nil
+	}
+
+	sem := make(chan bool, 0)
+	stream, err := a.EventStream("devices", "")
+	gobot.Assert(t, err, nil)
+
+	eventChan <- testEventSource{event: "event", data: "sse event"}
+
+	gobot.Once(stream, func(data interface{}) {
+		e := data.(Event)
+		gobot.Assert(t, e.Name, "event")
+		gobot.Assert(t, e.Data, "sse event")
+		gobot.Assert(t, e.Error, nil)
+		sem <- true
+	})
+
+	<-sem
+
+	errorChan <- errors.New("stream error")
+
+	gobot.Once(stream, func(data interface{}) {
+		e := data.(Event)
+		gobot.Assert(t, e.Name, "")
+		gobot.Assert(t, e.Data, "")
+		gobot.Assert(t, e.Error.Error(), "stream error")
+		sem <- true
+	})
+
+	<-sem
 
 }

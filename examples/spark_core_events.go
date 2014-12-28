@@ -9,24 +9,21 @@ import (
 
 func main() {
 	gbot := gobot.NewGobot()
+
 	sparkCore := spark.NewSparkCoreAdaptor("spark", "DEVICE_ID", "ACCESS_TOKEN")
 
 	work := func() {
-		stream, err := sparkCore.EventStream("all", "")
-
-		if err != nil {
-			fmt.Println(err.Error())
+		if stream, err := sparkCore.EventStream("all", ""); err != nil {
+			fmt.Println(err)
 		} else {
-			for {
-				ev := <-stream.Events
-				fmt.Println(ev.Event(), ev.Data())
-			}
+			gobot.On(stream, func(data interface{}) {
+				fmt.Println(data.(spark.Event))
+			})
 		}
 	}
 
 	robot := gobot.NewRobot("spark",
 		[]gobot.Connection{sparkCore},
-		[]gobot.Device{},
 		work,
 	)
 
