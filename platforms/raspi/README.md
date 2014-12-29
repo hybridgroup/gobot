@@ -6,6 +6,17 @@ The Raspberry Pi is a credit-card-sized single-board computer developed in the U
 
 For more info about the Raspberry Pi platform, click [here](http://www.raspberrypi.org/).
 
+__Special note for Raspian Wheezy users__
+
+The go vesion installed from the default package repositories is very old and will not compile gobot. You can install go 1.4 as follows:
+
+     wget -O - http://dave.cheney.net/paste/go1.4.linux-arm~multiarch-armv6-1.tar.gz|sudo tar -xzC /usr/local -f -
+
+     echo '# Setup for golang' |sudo tee /etc/profile.d/golang.sh
+     echo 'PATH=$PATH:/usr/local/go/bin'|sudo tee -a /etc/profile.d/golang.sh
+
+     source /etc/profile.d/golang.sh
+
 ## How to Install
 
 First you must install the appropriate Go packages
