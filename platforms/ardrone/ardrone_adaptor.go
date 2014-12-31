@@ -22,6 +22,7 @@ type drone interface {
 	Hover()
 }
 
+// ArdroneAdaptor is gobot.Adaptor representation for the Ardrone
 type ArdroneAdaptor struct {
 	name    string
 	drone   drone
@@ -29,7 +30,10 @@ type ArdroneAdaptor struct {
 	connect func(*ArdroneAdaptor) (drone, error)
 }
 
-// NewArdroneAdaptor creates a new ardrone and connects with default configuration
+// NewArdroneAdaptor returns a new ArdroneAdaptor and optionally accepts:
+//
+//  string: The ardrones IP Address
+//
 func NewArdroneAdaptor(name string, v ...string) *ArdroneAdaptor {
 	a := &ArdroneAdaptor{
 		name: name,
@@ -46,17 +50,18 @@ func NewArdroneAdaptor(name string, v ...string) *ArdroneAdaptor {
 	return a
 }
 
+// Name returns the ArdroneAdaptors Name
 func (a *ArdroneAdaptor) Name() string { return a.name }
 
-// Connect returns true when connection to ardrone is established correclty
+// Connect establishes a connection to the ardrone
 func (a *ArdroneAdaptor) Connect() (errs []error) {
-	if d, err := a.connect(a); err != nil {
+	d, err := a.connect(a)
+	if err != nil {
 		return []error{err}
-	} else {
-		a.drone = d
 	}
+	a.drone = d
 	return
 }
 
-// Finalize returns true when connection is finalized correctly
+// Finalize terminates the connection to the ardrone
 func (a *ArdroneAdaptor) Finalize() (errs []error) { return }
