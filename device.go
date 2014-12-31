@@ -1,13 +1,12 @@
 package gobot
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"reflect"
 )
 
-// JSONDevice is a JSON representation of a Gobot Device.
+// JSONDevice is a JSON representation of a Device.
 type JSONDevice struct {
 	Name       string   `json:"name"`
 	Driver     string   `json:"driver"`
@@ -15,6 +14,7 @@ type JSONDevice struct {
 	Commands   []string `json:"commands"`
 }
 
+// NewJSONDevice returns a JSONDevice given a Device.
 func NewJSONDevice(device Device) *JSONDevice {
 	jsonDevice := &JSONDevice{
 		Name:       device.Name(),
@@ -33,24 +33,26 @@ func NewJSONDevice(device Device) *JSONDevice {
 	return jsonDevice
 }
 
+// A Device is an instnace of a Driver
 type Device Driver
 
-type devices []Device
+// Devices represents a collection of Device
+type Devices []Device
 
 // Len returns devices length
-func (d *devices) Len() int {
+func (d *Devices) Len() int {
 	return len(*d)
 }
 
-// Each calls `f` function each device
-func (d *devices) Each(f func(Device)) {
+// Each enumerates through the Devices and calls specified callback function.
+func (d *Devices) Each(f func(Device)) {
 	for _, device := range *d {
 		f(device)
 	}
 }
 
-// Start starts all the devices.
-func (d *devices) Start() (errs []error) {
+// Start calls Start on each Device in d
+func (d *Devices) Start() (errs []error) {
 	log.Println("Starting devices...")
 	for _, device := range *d {
 		info := "Starting device " + device.Name()
@@ -62,7 +64,7 @@ func (d *devices) Start() (errs []error) {
 		log.Println(info + "...")
 		if errs = device.Start(); len(errs) > 0 {
 			for i, err := range errs {
-				errs[i] = errors.New(fmt.Sprintf("Device %q: %v", device.Name(), err))
+				errs[i] = fmt.Errorf("Device %q: %v", device.Name(), err)
 			}
 			return
 		}
@@ -70,12 +72,12 @@ func (d *devices) Start() (errs []error) {
 	return
 }
 
-// Halt stop all the devices.
-func (d *devices) Halt() (errs []error) {
+// Halt calls Halt on each Device in d
+func (d *Devices) Halt() (errs []error) {
 	for _, device := range *d {
 		if derrs := device.Halt(); len(derrs) > 0 {
 			for i, err := range derrs {
-				derrs[i] = errors.New(fmt.Sprintf("Device %q: %v", device.Name(), err))
+				derrs[i] = fmt.Errorf("Device %q: %v", device.Name(), err)
 			}
 			errs = append(errs, derrs...)
 		}

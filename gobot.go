@@ -6,13 +6,13 @@ import (
 	"os/signal"
 )
 
-// JSONGobot holds a JSON representation of a Gobot.
+// JSONGobot is a JSON representation of a Gobot.
 type JSONGobot struct {
 	Robots   []*JSONRobot `json:"robots"`
 	Commands []string     `json:"commands"`
 }
 
-// ToJSON returns a JSON representation of this Gobot.
+// NewJSONGobot returns a JSONGobt given a Gobot.
 func NewJSONGobot(gobot *Gobot) *JSONGobot {
 	jsonGobot := &JSONGobot{
 		Robots:   []*JSONRobot{},
@@ -29,9 +29,10 @@ func NewJSONGobot(gobot *Gobot) *JSONGobot {
 	return jsonGobot
 }
 
-// Gobot is a container composed of one or more robots
+// Gobot is the main type of your Gobot application and contains a collection of
+// Robots, API commands and Events.
 type Gobot struct {
-	robots *robots
+	robots *Robots
 	trap   func(chan os.Signal)
 	Commander
 	Eventer
@@ -40,7 +41,7 @@ type Gobot struct {
 // NewGobot returns a new Gobot
 func NewGobot() *Gobot {
 	return &Gobot{
-		robots: &robots{},
+		robots: &Robots{},
 		trap: func(c chan os.Signal) {
 			signal.Notify(c, os.Interrupt)
 		},
@@ -88,8 +89,8 @@ func (g *Gobot) Start() (errs []error) {
 	return errs
 }
 
-// Robots returns all robots associated with this Gobot instance.
-func (g *Gobot) Robots() *robots {
+// Robots returns all robots associated with this Gobot.
+func (g *Gobot) Robots() *Robots {
 	return g.robots
 }
 
@@ -100,7 +101,7 @@ func (g *Gobot) AddRobot(r *Robot) *Robot {
 	return r
 }
 
-// Robot returns a robot given name. Returns nil on no robot.
+// Robot returns a robot given name. Returns nil if the Robot does not exist.
 func (g *Gobot) Robot(name string) *Robot {
 	for _, robot := range *g.Robots() {
 		if robot.Name == name {
