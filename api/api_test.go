@@ -12,11 +12,11 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
-func initTestAPI() *api {
+func initTestAPI() *API {
 	log.SetOutput(NullReadWriteCloser{})
 	g := gobot.NewGobot()
 	a := NewAPI(g)
-	a.start = func(m *api) {}
+	a.start = func(m *API) {}
 	a.Start()
 	a.Debug()
 

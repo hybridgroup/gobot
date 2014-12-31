@@ -14,7 +14,8 @@ import (
 	"github.com/hybridgroup/gobot/api/robeaux"
 )
 
-type api struct {
+// API represents an API server
+type API struct {
 	gobot    *gobot.Gobot
 	router   *pat.PatternServeMux
 	Host     string
@@ -22,17 +23,16 @@ type api struct {
 	Cert     string
 	Key      string
 	handlers []func(http.ResponseWriter, *http.Request)
-	start    func(*api)
+	start    func(*API)
 }
 
-// newAPI returns a gobot api instance
-// and starts a http server using configuration options
-func NewAPI(g *gobot.Gobot) *api {
-	return &api{
+// NewAPI returns a new api instance
+func NewAPI(g *gobot.Gobot) *API {
+	return &API{
 		gobot:  g,
 		router: pat.New(),
 		Port:   "3000",
-		start: func(a *api) {
+		start: func(a *API) {
 			log.Println("Initializing API on " + a.Host + ":" + a.Port + "...")
 			http.Handle("/", a)
 
@@ -50,7 +50,7 @@ func NewAPI(g *gobot.Gobot) *api {
 }
 
 // ServeHTTP calls api handlers and then serves request using api router
-func (a *api) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+func (a *API) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	for _, handler := range a.handlers {
 		rec := httptest.NewRecorder()
 		handler(rec, req)
@@ -66,42 +66,42 @@ func (a *api) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 }
 
 // Post wraps api router Post call
-func (a *api) Post(path string, f func(http.ResponseWriter, *http.Request)) {
+func (a *API) Post(path string, f func(http.ResponseWriter, *http.Request)) {
 	a.router.Post(path, http.HandlerFunc(f))
 }
 
 // Put wraps api router Put call
-func (a *api) Put(path string, f func(http.ResponseWriter, *http.Request)) {
+func (a *API) Put(path string, f func(http.ResponseWriter, *http.Request)) {
 	a.router.Put(path, http.HandlerFunc(f))
 }
 
 // Delete wraps api router Delete call
-func (a *api) Delete(path string, f func(http.ResponseWriter, *http.Request)) {
+func (a *API) Delete(path string, f func(http.ResponseWriter, *http.Request)) {
 	a.router.Del(path, http.HandlerFunc(f))
 }
 
 // Options wraps api router Options call
-func (a *api) Options(path string, f func(http.ResponseWriter, *http.Request)) {
+func (a *API) Options(path string, f func(http.ResponseWriter, *http.Request)) {
 	a.router.Options(path, http.HandlerFunc(f))
 }
 
 // Get wraps api router Get call
-func (a *api) Get(path string, f func(http.ResponseWriter, *http.Request)) {
+func (a *API) Get(path string, f func(http.ResponseWriter, *http.Request)) {
 	a.router.Get(path, http.HandlerFunc(f))
 }
 
 // Head wraps api router Head call
-func (a *api) Head(path string, f func(http.ResponseWriter, *http.Request)) {
+func (a *API) Head(path string, f func(http.ResponseWriter, *http.Request)) {
 	a.router.Head(path, http.HandlerFunc(f))
 }
 
 // AddHandler appends handler to api handlers
-func (a *api) AddHandler(f func(http.ResponseWriter, *http.Request)) {
+func (a *API) AddHandler(f func(http.ResponseWriter, *http.Request)) {
 	a.handlers = append(a.handlers, f)
 }
 
 // Start initializes the api by setting up c3pio routes and robeaux
-func (a *api) Start() {
+func (a *API) Start() {
 	mcpCommandRoute := "/api/commands/:command"
 	deviceCommandRoute := "/api/robots/:robot/devices/:device/commands/:command"
 	robotCommandRoute := "/api/robots/:robot/commands/:command"
@@ -142,7 +142,7 @@ func (a *api) Start() {
 
 // robeaux returns handler for robeaux routes.
 // Writes asset in response and sets correct header
-func (a *api) robeaux(res http.ResponseWriter, req *http.Request) {
+func (a *API) robeaux(res http.ResponseWriter, req *http.Request) {
 	path := req.URL.Path
 	buf, err := robeaux.Asset(path[1:])
 	if err != nil {
@@ -160,19 +160,19 @@ func (a *api) robeaux(res http.ResponseWriter, req *http.Request) {
 
 // mcp returns MCP route handler.
 // Writes JSON with gobot representation
-func (a *api) mcp(res http.ResponseWriter, req *http.Request) {
+func (a *API) mcp(res http.ResponseWriter, req *http.Request) {
 	a.writeJSON(map[string]interface{}{"MCP": gobot.NewJSONGobot(a.gobot)}, res)
 }
 
 // mcpCommands returns commands route handler.
 // Writes JSON with global commands representation
-func (a *api) mcpCommands(res http.ResponseWriter, req *http.Request) {
+func (a *API) mcpCommands(res http.ResponseWriter, req *http.Request) {
 	a.writeJSON(map[string]interface{}{"commands": gobot.NewJSONGobot(a.gobot).Commands}, res)
 }
 
 // robots returns route handler.
 // Writes JSON with robots representation
-func (a *api) robots(res http.ResponseWriter, req *http.Request) {
+func (a *API) robots(res http.ResponseWriter, req *http.Request) {
 	jsonRobots := []*gobot.JSONRobot{}
 	a.gobot.Robots().Each(func(r *gobot.Robot) {
 		jsonRobots = append(jsonRobots, gobot.NewJSONRobot(r))
@@ -182,7 +182,7 @@ func (a *api) robots(res http.ResponseWriter, req *http.Request) {
 
 // robot returns route handler.
 // Writes JSON with robot representation
-func (a *api) robot(res http.ResponseWriter, req *http.Request) {
+func (a *API) robot(res http.ResponseWriter, req *http.Request) {
 	if robot, err := a.jsonRobotFor(req.URL.Query().Get(":robot")); err != nil {
 		a.writeJSON(map[string]interface{}{"error": err.Error()}, res)
 	} else {
@@ -192,7 +192,7 @@ func (a *api) robot(res http.ResponseWriter, req *http.Request) {
 
 // robotCommands returns commands route handler
 // Writes JSON with robot commands representation
-func (a *api) robotCommands(res http.ResponseWriter, req *http.Request) {
+func (a *API) robotCommands(res http.ResponseWriter, req *http.Request) {
 	if robot, err := a.jsonRobotFor(req.URL.Query().Get(":robot")); err != nil {
 		a.writeJSON(map[string]interface{}{"error": err.Error()}, res)
 	} else {
@@ -202,7 +202,7 @@ func (a *api) robotCommands(res http.ResponseWriter, req *http.Request) {
 
 // robotDevices returns devices route handler.
 // Writes JSON with robot devices representation
-func (a *api) robotDevices(res http.ResponseWriter, req *http.Request) {
+func (a *API) robotDevices(res http.ResponseWriter, req *http.Request) {
 	if robot := a.gobot.Robot(req.URL.Query().Get(":robot")); robot != nil {
 		jsonDevices := []*gobot.JSONDevice{}
 		robot.Devices().Each(func(d gobot.Device) {
@@ -216,7 +216,7 @@ func (a *api) robotDevices(res http.ResponseWriter, req *http.Request) {
 
 // robotDevice returns device route handler.
 // Writes JSON with robot device representation
-func (a *api) robotDevice(res http.ResponseWriter, req *http.Request) {
+func (a *API) robotDevice(res http.ResponseWriter, req *http.Request) {
 	if device, err := a.jsonDeviceFor(req.URL.Query().Get(":robot"), req.URL.Query().Get(":device")); err != nil {
 		a.writeJSON(map[string]interface{}{"error": err.Error()}, res)
 	} else {
@@ -227,7 +227,7 @@ func (a *api) robotDevice(res http.ResponseWriter, req *http.Request) {
 // robotDeviceEvent returns device event route handler.
 // Creates an event stream connection
 // and queries event data to be written when received
-func (a *api) robotDeviceEvent(res http.ResponseWriter, req *http.Request) {
+func (a *API) robotDeviceEvent(res http.ResponseWriter, req *http.Request) {
 	f, _ := res.(http.Flusher)
 	c, _ := res.(http.CloseNotifier)
 
@@ -265,7 +265,7 @@ func (a *api) robotDeviceEvent(res http.ResponseWriter, req *http.Request) {
 
 // robotDeviceCommands returns device commands route handler
 // writes JSON with robot device commands representation
-func (a *api) robotDeviceCommands(res http.ResponseWriter, req *http.Request) {
+func (a *API) robotDeviceCommands(res http.ResponseWriter, req *http.Request) {
 	if device, err := a.jsonDeviceFor(req.URL.Query().Get(":robot"), req.URL.Query().Get(":device")); err != nil {
 		a.writeJSON(map[string]interface{}{"error": err.Error()}, res)
 	} else {
@@ -275,7 +275,7 @@ func (a *api) robotDeviceCommands(res http.ResponseWriter, req *http.Request) {
 
 // robotConnections returns connections route handler
 // writes JSON with robot connections representation
-func (a *api) robotConnections(res http.ResponseWriter, req *http.Request) {
+func (a *API) robotConnections(res http.ResponseWriter, req *http.Request) {
 	jsonConnections := []*gobot.JSONConnection{}
 	if robot := a.gobot.Robot(req.URL.Query().Get(":robot")); robot != nil {
 		robot.Connections().Each(func(c gobot.Connection) {
@@ -290,7 +290,7 @@ func (a *api) robotConnections(res http.ResponseWriter, req *http.Request) {
 
 // robotConnection returns connection route handler
 // writes JSON with robot connection representation
-func (a *api) robotConnection(res http.ResponseWriter, req *http.Request) {
+func (a *API) robotConnection(res http.ResponseWriter, req *http.Request) {
 	if conn, err := a.jsonConnectionFor(req.URL.Query().Get(":robot"), req.URL.Query().Get(":connection")); err != nil {
 		a.writeJSON(map[string]interface{}{"error": err.Error()}, res)
 	} else {
@@ -299,7 +299,7 @@ func (a *api) robotConnection(res http.ResponseWriter, req *http.Request) {
 }
 
 // executeMcpCommand calls a global command asociated to requested route
-func (a *api) executeMcpCommand(res http.ResponseWriter, req *http.Request) {
+func (a *API) executeMcpCommand(res http.ResponseWriter, req *http.Request) {
 	a.executeCommand(a.gobot.Command(req.URL.Query().Get(":command")),
 		res,
 		req,
@@ -307,7 +307,7 @@ func (a *api) executeMcpCommand(res http.ResponseWriter, req *http.Request) {
 }
 
 // executeDeviceCommand calls a device command asociated to requested route
-func (a *api) executeDeviceCommand(res http.ResponseWriter, req *http.Request) {
+func (a *API) executeDeviceCommand(res http.ResponseWriter, req *http.Request) {
 	if _, err := a.jsonDeviceFor(req.URL.Query().Get(":robot"),
 		req.URL.Query().Get(":device")); err != nil {
 		a.writeJSON(map[string]interface{}{"error": err.Error()}, res)
@@ -323,7 +323,7 @@ func (a *api) executeDeviceCommand(res http.ResponseWriter, req *http.Request) {
 }
 
 // executeRobotCommand calls a robot command asociated to requested route
-func (a *api) executeRobotCommand(res http.ResponseWriter, req *http.Request) {
+func (a *API) executeRobotCommand(res http.ResponseWriter, req *http.Request) {
 	if _, err := a.jsonRobotFor(req.URL.Query().Get(":robot")); err != nil {
 		a.writeJSON(map[string]interface{}{"error": err.Error()}, res)
 	} else {
@@ -337,7 +337,7 @@ func (a *api) executeRobotCommand(res http.ResponseWriter, req *http.Request) {
 }
 
 // executeCommand writes JSON response with `f` returned value.
-func (a *api) executeCommand(f func(map[string]interface{}) interface{},
+func (a *API) executeCommand(f func(map[string]interface{}) interface{},
 	res http.ResponseWriter,
 	req *http.Request,
 ) {
@@ -353,20 +353,20 @@ func (a *api) executeCommand(f func(map[string]interface{}) interface{},
 }
 
 // writeJSON writes `j` as JSON in response
-func (a *api) writeJSON(j interface{}, res http.ResponseWriter) {
+func (a *API) writeJSON(j interface{}, res http.ResponseWriter) {
 	data, _ := json.Marshal(j)
 	res.Header().Set("Content-Type", "application/json; charset=utf-8")
 	res.Write(data)
 }
 
 // Debug add handler to api that prints each request
-func (a *api) Debug() {
+func (a *API) Debug() {
 	a.AddHandler(func(res http.ResponseWriter, req *http.Request) {
 		log.Println(req)
 	})
 }
 
-func (a *api) jsonRobotFor(name string) (jrobot *gobot.JSONRobot, err error) {
+func (a *API) jsonRobotFor(name string) (jrobot *gobot.JSONRobot, err error) {
 	if robot := a.gobot.Robot(name); robot != nil {
 		jrobot = gobot.NewJSONRobot(robot)
 	} else {
@@ -375,7 +375,7 @@ func (a *api) jsonRobotFor(name string) (jrobot *gobot.JSONRobot, err error) {
 	return
 }
 
-func (a *api) jsonDeviceFor(robot string, name string) (jdevice *gobot.JSONDevice, err error) {
+func (a *API) jsonDeviceFor(robot string, name string) (jdevice *gobot.JSONDevice, err error) {
 	if device := a.gobot.Robot(robot).Device(name); device != nil {
 		jdevice = gobot.NewJSONDevice(device)
 	} else {
@@ -384,7 +384,7 @@ func (a *api) jsonDeviceFor(robot string, name string) (jdevice *gobot.JSONDevic
 	return
 }
 
-func (a *api) jsonConnectionFor(robot string, name string) (jconnection *gobot.JSONConnection, err error) {
+func (a *API) jsonConnectionFor(robot string, name string) (jconnection *gobot.JSONConnection, err error) {
 	if connection := a.gobot.Robot(robot).Connection(name); connection != nil {
 		jconnection = gobot.NewJSONConnection(connection)
 	} else {
