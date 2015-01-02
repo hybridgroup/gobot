@@ -8,17 +8,22 @@ import (
 
 var _ gobot.Driver = (*AnalogSensorDriver)(nil)
 
-// Represents an Analog Sensor
+// AnalogSensorDriver represents an Analog Sensor
 type AnalogSensorDriver struct {
 	name       string
 	pin        string
+	halt       chan bool
 	interval   time.Duration
 	connection AnalogReader
 	gobot.Eventer
 	gobot.Commander
 }
 
-// NewAnalogSensorDriver returns a new AnalogSensorDriver given an AnalogReader, name and pin.
+// NewAnalogSensorDriver returns a new AnalogSensorDriver with a polling interval of
+// 10 Milliseconds given an AnalogReader, name and pin.
+//
+// Optinally accepts:
+// 	time.Duration: Interval at which the AnalogSensor is polled for new information
 //
 // Adds the following API Commands:
 // 	"Read" - See AnalogSensor.Read
@@ -30,6 +35,7 @@ func NewAnalogSensorDriver(a AnalogReader, name string, pin string, v ...time.Du
 		Eventer:    gobot.NewEventer(),
 		Commander:  gobot.NewCommander(),
 		interval:   10 * time.Millisecond,
+		halt:       make(chan bool),
 	}
 
 	if len(v) > 0 {
@@ -47,10 +53,10 @@ func NewAnalogSensorDriver(a AnalogReader, name string, pin string, v ...time.Du
 	return d
 }
 
-// Starts the AnalogSensorDriver and reads the Analog Sensor at the given Driver.Interval().
-// Returns true on successful start of the driver.
+// Start starts the AnalogSensorDriver and reads the Analog Sensor at the given interval.
 // Emits the Events:
-//	"data" int - Event is emitted on change and represents the current reading from the sensor.
+//	Data int - Event is emitted on change and represents the current reading from the sensor.
+//	Error error - Event is emitted on error reading from the sensor.
 func (a *AnalogSensorDriver) Start() (errs []error) {
 	value := 0
 	go func() {
@@ -62,16 +68,29 @@ func (a *AnalogSensorDriver) Start() (errs []error) {
 				value = newValue
 				gobot.Publish(a.Event(Data), value)
 			}
-			<-time.After(a.interval)
+			select {
+			case <-time.After(a.interval):
+			case <-a.halt:
+				return
+			}
 		}
 	}()
 	return
 }
 
-// Halt returns true on a successful halt of the driver
-func (a *AnalogSensorDriver) Halt() (errs []error)         { return }
-func (a *AnalogSensorDriver) Name() string                 { return a.name }
-func (a *AnalogSensorDriver) Pin() string                  { return a.pin }
+// Halt stops polling the analog sensor for new information
+func (a *AnalogSensorDriver) Halt() (errs []error) {
+	a.halt <- true
+	return
+}
+
+// Name returns the AnalogSensorDrivers name
+func (a *AnalogSensorDriver) Name() string { return a.name }
+
+// Pin returns the AnalogSensorDrivers pin
+func (a *AnalogSensorDriver) Pin() string { return a.pin }
+
+// Connection returns the AnalogSensorDrivers Connection
 func (a *AnalogSensorDriver) Connection() gobot.Connection { return a.connection.(gobot.Connection) }
 
 // Read returns the current reading from the Analog Sensor

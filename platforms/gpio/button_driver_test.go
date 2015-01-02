@@ -14,6 +14,9 @@ func initTestButtonDriver() *ButtonDriver {
 
 func TestButtonDriverHalt(t *testing.T) {
 	d := initTestButtonDriver()
+	go func() {
+		<-d.halt
+	}()
 	gobot.Assert(t, len(d.Halt()), 0)
 }
 
@@ -36,7 +39,7 @@ func TestButtonDriverStart(t *testing.T) {
 		return
 	}
 
-	gobot.On(d.Event(Push), func(data interface{}) {
+	gobot.Once(d.Event(Push), func(data interface{}) {
 		gobot.Assert(t, d.Active, true)
 		sem <- true
 	})
@@ -52,7 +55,7 @@ func TestButtonDriverStart(t *testing.T) {
 		return
 	}
 
-	gobot.On(d.Event(Release), func(data interface{}) {
+	gobot.Once(d.Event(Release), func(data interface{}) {
 		gobot.Assert(t, d.Active, false)
 		sem <- true
 	})
@@ -68,7 +71,7 @@ func TestButtonDriverStart(t *testing.T) {
 		return
 	}
 
-	gobot.On(d.Event(Error), func(data interface{}) {
+	gobot.Once(d.Event(Error), func(data interface{}) {
 		sem <- true
 	})
 
@@ -77,4 +80,22 @@ func TestButtonDriverStart(t *testing.T) {
 	case <-time.After(15 * time.Millisecond):
 		t.Errorf("Button Event \"Error\" was not published")
 	}
+
+	testAdaptorDigitalRead = func() (val int, err error) {
+		val = 1
+		return
+	}
+
+	gobot.Once(d.Event(Push), func(data interface{}) {
+		sem <- true
+	})
+
+	d.halt <- true
+
+	select {
+	case <-sem:
+		t.Errorf("Button Event \"Press\" should not published")
+	case <-time.After(15 * time.Millisecond):
+	}
+
 }

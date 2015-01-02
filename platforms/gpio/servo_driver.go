@@ -4,7 +4,7 @@ import "github.com/hybridgroup/gobot"
 
 var _ gobot.Driver = (*ServoDriver)(nil)
 
-// Represents a Servo
+// ServoDriver Represents a Servo
 type ServoDriver struct {
 	name       string
 	pin        string
@@ -13,7 +13,7 @@ type ServoDriver struct {
 	CurrentAngle byte
 }
 
-// NewSerovDriver return a new ServoDriver  given a Servo, name and pin.
+// NewServoDriver returns a new ServoDriver given a ServoWriter, name and pin.
 //
 // Adds the following API Commands:
 // 	"Move" - See ServoDriver.Move
@@ -47,17 +47,22 @@ func NewServoDriver(a ServoWriter, name string, pin string) *ServoDriver {
 
 }
 
-func (s *ServoDriver) Name() string                 { return s.name }
-func (s *ServoDriver) Pin() string                  { return s.pin }
+// Name returns the ServoDrivers name
+func (s *ServoDriver) Name() string { return s.name }
+
+// Pin returns the ServoDrivers pin
+func (s *ServoDriver) Pin() string { return s.pin }
+
+// Connection returns the ServoDrivers connection
 func (s *ServoDriver) Connection() gobot.Connection { return s.connection.(gobot.Connection) }
 
-// Start starts the ServoDriver. Returns true on successful start of the driver.
+// Start implements the Driver interface
 func (s *ServoDriver) Start() (errs []error) { return }
 
-// Halt halts the ServoDriver. Returns true on successful halt of the driver.
+// Halt implements the Driver interface
 func (s *ServoDriver) Halt() (errs []error) { return }
 
-// Move sets the servo to the specified angle
+// Move sets the servo to the specified angle. Acceptable angles are 0-180
 func (s *ServoDriver) Move(angle uint8) (err error) {
 	if !(angle >= 0 && angle <= 180) {
 		return ErrServoOutOfRange

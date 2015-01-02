@@ -6,7 +6,7 @@ import (
 
 var _ gobot.Driver = (*MotorDriver)(nil)
 
-// Represents a Motor
+// MotorDriver Represents a Motor
 type MotorDriver struct {
 	name             string
 	connection       DigitalWriter
@@ -34,13 +34,16 @@ func NewMotorDriver(a DigitalWriter, name string, speedPin string) *MotorDriver 
 	}
 }
 
-func (m *MotorDriver) Name() string                 { return m.name }
+// Name returns the MotorDrivers name
+func (m *MotorDriver) Name() string { return m.name }
+
+// Connection returns the MotorDrivers Connection
 func (m *MotorDriver) Connection() gobot.Connection { return m.connection.(gobot.Connection) }
 
-// Start starts the MotorDriver. Returns true on successful start of the driver
+// Start implements the Driver interface
 func (m *MotorDriver) Start() (errs []error) { return }
 
-// Halt halts the MotorDriver. Returns true on successful halt of the driver
+// Halt implements the Driver interface
 func (m *MotorDriver) Halt() (errs []error) { return }
 
 // Off turns the motor off or sets the motor to a 0 speed
@@ -76,7 +79,7 @@ func (m *MotorDriver) Max() (err error) {
 	return m.Speed(255)
 }
 
-// InOn returns true if the motor is on
+// IsOn returns true if the motor is on
 func (m *MotorDriver) IsOn() bool {
 	if m.isDigital() {
 		return m.CurrentState == 1
@@ -84,7 +87,7 @@ func (m *MotorDriver) IsOn() bool {
 	return m.CurrentSpeed > 0
 }
 
-// InOff returns true if the motor is off
+// IsOff returns true if the motor is off
 func (m *MotorDriver) IsOff() bool {
 	return !m.IsOn()
 }
