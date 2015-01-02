@@ -2,7 +2,6 @@ package firmata
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"io"
 	"math"
@@ -51,7 +50,7 @@ const (
 	i2CModeStopReading       byte = 0x03
 )
 
-var defaultInitTimeInterval time.Duration = 1 * time.Second
+var defaultInitTimeInterval = 1 * time.Second
 
 type board struct {
 	serial           io.ReadWriteCloser
@@ -439,7 +438,7 @@ func (b *board) process(data []byte) (err error) {
 				str := currentBuffer[2:len(currentBuffer)]
 				gobot.Publish(b.events["string_data"], string(str[:len(str)]))
 			default:
-				return errors.New(fmt.Sprintf("bad byte: 0x%x", command))
+				return fmt.Errorf("bad byte: 0x%x", command)
 			}
 		}
 	}

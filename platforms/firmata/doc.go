@@ -3,9 +3,9 @@ Package firmata provides the Gobot adaptor for microcontrollers that support the
 
 Installing:
 
-	go get github.com/hybridgroup/gobot/platforms/firmata
+	go get -d -u github.com/hybridgroup/gobot/... && go get github.com/hybridgroup/gobot/platforms/firmata
 
-## Example
+Example:
 
 	package main
 
