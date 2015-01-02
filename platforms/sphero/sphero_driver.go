@@ -39,13 +39,16 @@ type SpheroDriver struct {
 // NewSpheroDriver returns a new SpheroDriver given a SpheroAdaptor and name.
 //
 // Adds the following API Commands:
+// 	"ConfigureLocator" - See SpheroDriver.ConfigureLocator
 // 	"Roll" - See SpheroDriver.Roll
 // 	"Stop" - See SpheroDriver.Stop
 // 	"GetRGB" - See SpheroDriver.GetRGB
+//	"ReadLocator" - See SpheroDriver.ReadLocator
 // 	"SetBackLED" - See SpheroDriver.SetBackLED
 // 	"SetHeading" - See SpheroDriver.SetHeading
 // 	"SetStabilization" - See SpheroDriver.SetStabilization
 //  "SetDataStreaming" - See SpheroDriver.SetDataStreaming
+//  "SetRotationRate" - See SpheroDriver.SetRotationRate
 func NewSpheroDriver(a *SpheroAdaptor, name string) *SpheroDriver {
 	s := &SpheroDriver{
 		name:            name,
@@ -84,9 +87,19 @@ func NewSpheroDriver(a *SpheroAdaptor, name string) *SpheroDriver {
 		return s.GetRGB()
 	})
 
+	s.AddCommand("ReadLocator", func(params map[string]interface{}) interface{} {
+		return s.ReadLocator()
+	})
+
 	s.AddCommand("SetBackLED", func(params map[string]interface{}) interface{} {
 		level := uint8(params["level"].(float64))
 		s.SetBackLED(level)
+		return nil
+	})
+
+	s.AddCommand("SetRotationRate", func(params map[string]interface{}) interface{} {
+		level := uint8(params["level"].(float64))
+		s.SetRotationRate(level)
 		return nil
 	})
 
@@ -110,6 +123,16 @@ func NewSpheroDriver(a *SpheroAdaptor, name string) *SpheroDriver {
 		Mask2 := uint32(params["Mask2"].(float64))
 
 		s.SetDataStreaming(DataStreamingConfig{N: N, M: M, Mask2: Mask2, Pcnt: Pcnt, Mask: Mask})
+		return nil
+	})
+
+	s.AddCommand("ConfigureLocator", func(params map[string]interface{}) interface{} {
+		Flags := uint8(params["Flags"].(float64))
+		X := int16(params["X"].(float64))
+		Y := int16(params["Y"].(float64))
+		YawTare := int16(params["YawTare"].(float64))
+
+		s.ConfigureLocator(LocatorConfig{Flags: Flags, X: X, Y: Y, YawTare: YawTare})
 		return nil
 	})
 
@@ -215,9 +238,26 @@ func (s *SpheroDriver) GetRGB() []uint8 {
 	return []uint8{}
 }
 
+// ReadLocator reads Sphero's current position (X,Y), component velocities and SOG (speed over ground).
+func (s *SpheroDriver) ReadLocator() []int16 {
+	buf := s.getSyncResponse(s.craftPacket([]uint8{}, 0x02, 0x15))
+	if len(buf) == 16 {
+		vals := make([]int16, 5)
+		_ = binary.Read(bytes.NewReader(buf[5:15]), binary.BigEndian, &vals)
+		return vals
+	}
+	return []int16{}
+}
+
 // SetBackLED sets the Sphero Back LED to the specified brightness
 func (s *SpheroDriver) SetBackLED(level uint8) {
 	s.packetChannel <- s.craftPacket([]uint8{level}, 0x02, 0x21)
+}
+
+// SetRotationRate sets the Sphero rotation rate
+// A value of 255 jumps to the maximum (currently 400 degrees/sec).
+func (s *SpheroDriver) SetRotationRate(level uint8) {
+	s.packetChannel <- s.craftPacket([]uint8{level}, 0x02, 0x03)
 }
 
 // SetHeading sets the heading of the Sphero
@@ -237,6 +277,14 @@ func (s *SpheroDriver) SetStabilization(on bool) {
 // Roll sends a roll command to the Sphero gives a speed and heading
 func (s *SpheroDriver) Roll(speed uint8, heading uint16) {
 	s.packetChannel <- s.craftPacket([]uint8{speed, uint8(heading >> 8), uint8(heading & 0xFF), 0x01}, 0x02, 0x30)
+}
+
+// Configures and enables the Locator
+func (s *SpheroDriver) ConfigureLocator(d LocatorConfig) {
+	buf := new(bytes.Buffer)
+	binary.Write(buf, binary.BigEndian, d)
+
+	s.packetChannel <- s.craftPacket(buf.Bytes(), 0x02, 0x13)
 }
 
 // Enables sensor data streaming

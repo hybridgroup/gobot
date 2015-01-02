@@ -14,6 +14,19 @@ First you must install the appropriate Go packages
 go get -d -u github.com/hybridgroup/gobot/... && go install github.com/hybridgroup/gobot/platforms/raspi
 ```
 
+### Special note for Raspian Wheezy users
+
+The go vesion installed from the default package repositories is very old and will not compile gobot. You can install go 1.4 as follows:
+
+```bash
+$ wget -O - http://dave.cheney.net/paste/go1.4.linux-arm~multiarch-armv6-1.tar.gz|sudo tar -xzC /usr/local -f -
+
+$ echo '# Setup for golang' |sudo tee /etc/profile.d/golang.sh
+$ echo 'PATH=$PATH:/usr/local/go/bin'|sudo tee -a /etc/profile.d/golang.sh
+
+$ source /etc/profile.d/golang.sh
+```
+
 #### Cross compiling for the Raspberry Pi
 You must first configure your Go environment for linux cross compiling
 
