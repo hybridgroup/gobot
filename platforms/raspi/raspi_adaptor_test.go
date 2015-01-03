@@ -1,6 +1,7 @@
 package raspi
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/hybridgroup/gobot"
@@ -73,12 +74,33 @@ func TestRaspiAdaptorFinalize(t *testing.T) {
 	fs := sysfs.NewMockFilesystem([]string{
 		"/sys/class/gpio/export",
 		"/sys/class/gpio/unexport",
+		"/dev/pi-blaster",
 	})
 
 	sysfs.SetFilesystem(fs)
 	a.DigitalWrite("3", 1)
+	a.PwmWrite("7", 255)
 	a.i2cDevice = new(NullReadWriteCloser)
 	gobot.Assert(t, len(a.Finalize()), 0)
+}
+
+func TestRaspiAdaptorDigitalPWM(t *testing.T) {
+	a := initTestRaspiAdaptor()
+
+	gobot.Assert(t, a.PwmWrite("7", 4), nil)
+
+	fs := sysfs.NewMockFilesystem([]string{
+		"/dev/pi-blaster",
+	})
+	sysfs.SetFilesystem(fs)
+
+	gobot.Assert(t, a.PwmWrite("7", 255), nil)
+
+	gobot.Assert(t, strings.Split(fs.Files["/dev/pi-blaster"].Contents, "\n")[0], "4=1")
+
+	gobot.Assert(t, a.ServoWrite("11", 255), nil)
+
+	gobot.Assert(t, strings.Split(fs.Files["/dev/pi-blaster"].Contents, "\n")[0], "17=0.25")
 }
 
 func TestRaspiAdaptorDigitalIO(t *testing.T) {

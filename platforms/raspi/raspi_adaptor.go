@@ -2,8 +2,10 @@ package raspi
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
+	"os"
 	"strconv"
 	"strings"
 
@@ -29,6 +31,7 @@ type RaspiAdaptor struct {
 	revision    string
 	i2cLocation string
 	digitalPins map[int]sysfs.DigitalPin
+	pwmPins     []int
 	i2cDevice   io.ReadWriteCloser
 }
 
@@ -124,6 +127,7 @@ func NewRaspiAdaptor(name string) *RaspiAdaptor {
 	r := &RaspiAdaptor{
 		name:        name,
 		digitalPins: make(map[int]sysfs.DigitalPin),
+		pwmPins:     []int{},
 	}
 	content, _ := readFile()
 	for _, v := range strings.Split(string(content), "\n") {
@@ -161,6 +165,11 @@ func (r *RaspiAdaptor) Finalize() (errs []error) {
 			}
 		}
 	}
+	for _, pin := range r.pwmPins {
+		if err := r.piBlaster(fmt.Sprintf("%v=release\n", pin)); err != nil {
+			errs = append(errs, err)
+		}
+	}
 	if r.i2cDevice != nil {
 		if err := r.i2cDevice.Close(); err != nil {
 			errs = append(errs, err)
@@ -169,16 +178,44 @@ func (r *RaspiAdaptor) Finalize() (errs []error) {
 	return errs
 }
 
-// digitalPin returns matched digitalPin for specified values
-func (r *RaspiAdaptor) digitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPin, err error) {
-	var i int
-
+func (r *RaspiAdaptor) translatePin(pin string) (i int, err error) {
 	if val, ok := pins[pin][r.revision]; ok {
 		i = val
 	} else if val, ok := pins[pin]["*"]; ok {
 		i = val
 	} else {
 		err = errors.New("Not a valid pin")
+		return
+	}
+	return
+}
+
+func (r *RaspiAdaptor) pwmPin(pin string) (i int, err error) {
+	i, err = r.translatePin(pin)
+	if err != nil {
+		return
+	}
+
+	newPin := true
+	for _, pin := range r.pwmPins {
+		if i == pin {
+			newPin = false
+			return
+		}
+	}
+
+	if newPin {
+		r.pwmPins = append(r.pwmPins, i)
+	}
+
+	return
+}
+
+// digitalPin returns matched digitalPin for specified values
+func (r *RaspiAdaptor) digitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPin, err error) {
+	i, err := r.translatePin(pin)
+
+	if err != nil {
 		return
 	}
 
@@ -230,5 +267,36 @@ func (r *RaspiAdaptor) I2cWrite(data []byte) (err error) {
 func (r *RaspiAdaptor) I2cRead(size uint) (data []byte, err error) {
 	data = make([]byte, size)
 	_, err = r.i2cDevice.Read(data)
+	return
+}
+
+func (r *RaspiAdaptor) PwmWrite(pin string, val byte) (err error) {
+	sysfsPin, err := r.pwmPin(pin)
+	if err != nil {
+		return err
+	}
+	return r.piBlaster(fmt.Sprintf("%v=%v\n", sysfsPin, gobot.FromScale(float64(val), 0, 255)))
+}
+
+func (r *RaspiAdaptor) ServoWrite(pin string, angle byte) (err error) {
+	sysfsPin, err := r.pwmPin(pin)
+	if err != nil {
+		return err
+	}
+
+	val := (gobot.ToScale(gobot.FromScale(float64(angle), 0, 180), 0, 200) / 1000.0) + 0.05
+
+	return r.piBlaster(fmt.Sprintf("%v=%v\n", sysfsPin, val))
+}
+
+func (r *RaspiAdaptor) piBlaster(data string) (err error) {
+	fi, err := sysfs.OpenFile("/dev/pi-blaster", os.O_WRONLY|os.O_APPEND, 0644)
+	defer fi.Close()
+
+	if err != nil {
+		return err
+	}
+
+	_, err = fi.WriteString(data)
 	return
 }
