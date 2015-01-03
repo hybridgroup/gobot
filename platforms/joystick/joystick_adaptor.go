@@ -14,15 +14,14 @@ type joystick interface {
 	InstanceID() sdl.JoystickID
 }
 
+// JoystickAdaptor represents a connection to a joystick
 type JoystickAdaptor struct {
 	name     string
 	joystick joystick
 	connect  func(*JoystickAdaptor) (err error)
 }
 
-// NewJoysctickAdaptor creates a new adaptor with specified name.
-// It creates a connect function to joystick in position 0
-// or panics if no joystick can be found
+// NewJoystickAdaptor returns a new JoystickAdaptor with specified name.
 func NewJoystickAdaptor(name string) *JoystickAdaptor {
 	return &JoystickAdaptor{
 		name: name,
@@ -37,9 +36,10 @@ func NewJoystickAdaptor(name string) *JoystickAdaptor {
 	}
 }
 
+// Name returns the JoystickAdaptors name
 func (j *JoystickAdaptor) Name() string { return j.name }
 
-// Connect returns true if connection to device is succesfull
+// Connect connects to the joystick
 func (j *JoystickAdaptor) Connect() (errs []error) {
 	if err := j.connect(j); err != nil {
 		return []error{err}
@@ -47,7 +47,7 @@ func (j *JoystickAdaptor) Connect() (errs []error) {
 	return
 }
 
-// Finalize closes connection to device
+// Finalize closes connection to joystick
 func (j *JoystickAdaptor) Finalize() (errs []error) {
 	j.joystick.Close()
 	return
