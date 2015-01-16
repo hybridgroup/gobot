@@ -169,6 +169,7 @@ Thank you!
 * Join our mailing list: https://groups.google.com/forum/#!forum/gobotio
 * IRC: `#gobotio @ irc.freenode.net`
 * Issues: https://github.com/hybridgroup/gobot/issues
+* twitter: [@gobotio](https://twitter.com/gobotio)
 
 ## Contributing
 * All active development is in the `dev` branch. New or updated features must be added to the `dev` branch. Hotfixes will be considered on the `master` branch in situations where it does not alter behaviour or features, only fixes a bug.
