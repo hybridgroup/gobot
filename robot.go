@@ -1,12 +1,11 @@
 package gobot
 
 import (
-	"errors"
 	"fmt"
 	"log"
 )
 
-// JSONRobot a JSON representation of a robot.
+// JSONRobot a JSON representation of a Robot.
 type JSONRobot struct {
 	Name        string            `json:"name"`
 	Commands    []string          `json:"commands"`
@@ -14,7 +13,7 @@ type JSONRobot struct {
 	Devices     []*JSONDevice     `json:"devices"`
 }
 
-// NewJSONRobot returns a JSON representation of the robot.
+// NewJSONRobot returns a JSONRobot given a Robot.
 func NewJSONRobot(robot *Robot) *JSONRobot {
 	jsonRobot := &JSONRobot{
 		Name:        robot.Name,
@@ -41,26 +40,26 @@ func NewJSONRobot(robot *Robot) *JSONRobot {
 type Robot struct {
 	Name        string
 	Work        func()
-	connections *connections
-	devices     *devices
+	connections *Connections
+	devices     *Devices
 	Commander
 	Eventer
 }
 
-type robots []*Robot
+// Robots is a collection of Robot
+type Robots []*Robot
 
-// Len counts the robots associated with this instance.
-func (r *robots) Len() int {
+// Len returns the amount of Robots in the collection.
+func (r *Robots) Len() int {
 	return len(*r)
 }
 
-// Start initialises the event loop. All robots that were added will
-// be automtically started as a result of this call.
-func (r *robots) Start() (errs []error) {
+// Start calls the Start method of each Robot in the collection
+func (r *Robots) Start() (errs []error) {
 	for _, robot := range *r {
 		if errs = robot.Start(); len(errs) > 0 {
 			for i, err := range errs {
-				errs[i] = errors.New(fmt.Sprintf("Robot %q: %v", robot.Name, err))
+				errs[i] = fmt.Errorf("Robot %q: %v", robot.Name, err)
 			}
 			return
 		}
@@ -68,8 +67,8 @@ func (r *robots) Start() (errs []error) {
 	return
 }
 
-// Each enumerates thru the robots and calls specified function
-func (r *robots) Each(f func(*Robot)) {
+// Each enumerates through the Robots and calls specified callback function.
+func (r *Robots) Each(f func(*Robot)) {
 	for _, robot := range *r {
 		f(robot)
 	}
@@ -80,6 +79,7 @@ func (r *robots) Each(f func(*Robot)) {
 // 	[]Connection: Connections which are automatically started and stopped with the robot
 //	[]Device: Devices which are automatically started and stopped with the robot
 //	func(): The work routine the robot will execute once all devices and connections have been initialized and started
+// A name will be automaically generated if no name is supplied.
 func NewRobot(name string, v ...interface{}) *Robot {
 	if name == "" {
 		name = fmt.Sprintf("%X", Rand(int(^uint(0)>>1)))
@@ -87,8 +87,8 @@ func NewRobot(name string, v ...interface{}) *Robot {
 
 	r := &Robot{
 		Name:        name,
-		connections: &connections{},
-		devices:     &devices{},
+		connections: &Connections{},
+		devices:     &Devices{},
 		Work:        nil,
 		Eventer:     NewEventer(),
 		Commander:   NewCommander(),
@@ -118,9 +118,7 @@ func NewRobot(name string, v ...interface{}) *Robot {
 	return r
 }
 
-// Start a robot instance and runs it's work function if any. You should not
-// need to manually start a robot if already part of a Gobot application as the
-// robot will be automatically started for you.
+// Start a Robot's Connections, Devices, and work.
 func (r *Robot) Start() (errs []error) {
 	log.Println("Starting Robot", r.Name, "...")
 	if cerrs := r.Connections().Start(); len(cerrs) > 0 {
@@ -138,19 +136,19 @@ func (r *Robot) Start() (errs []error) {
 	return
 }
 
-// Devices returns all devices associated with this robot.
-func (r *Robot) Devices() *devices {
+// Devices returns all devices associated with this Robot.
+func (r *Robot) Devices() *Devices {
 	return r.devices
 }
 
-// AddDevice adds a new device to the robots collection of devices. Returns the
+// AddDevice adds a new Device to the robots collection of devices. Returns the
 // added device.
 func (r *Robot) AddDevice(d Device) Device {
 	*r.devices = append(*r.Devices(), d)
 	return d
 }
 
-// Device returns a device given a name. Returns nil on no device.
+// Device returns a device given a name. Returns nil if the Device does not exist.
 func (r *Robot) Device(name string) Device {
 	if r == nil {
 		return nil
@@ -164,7 +162,7 @@ func (r *Robot) Device(name string) Device {
 }
 
 // Connections returns all connections associated with this robot.
-func (r *Robot) Connections() *connections {
+func (r *Robot) Connections() *Connections {
 	return r.connections
 }
 
@@ -175,7 +173,8 @@ func (r *Robot) AddConnection(c Connection) Connection {
 	return c
 }
 
-// Connection returns a connection given a name. Returns nil on no connection.
+// Connection returns a connection given a name. Returns nil if the Connection
+// does not exist.
 func (r *Robot) Connection(name string) Connection {
 	if r == nil {
 		return nil

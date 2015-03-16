@@ -1,3 +1,10 @@
+0.8.1
+---
+  - spark
+    - Add support for spark Events, Functions and Variables
+  - sphero
+    - Add `SetDataStreaming` and `ConfigureCollisionDetection` methods
+
 0.8
 ---
   - Refactor core, gpio, and i2c interfaces

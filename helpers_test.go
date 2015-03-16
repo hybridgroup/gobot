@@ -18,6 +18,7 @@ type testDriver struct {
 	name       string
 	pin        string
 	connection Connection
+	Eventer
 	Commander
 }
 
@@ -35,12 +36,22 @@ func newTestDriver(adaptor *testAdaptor, name string, pin string) *testDriver {
 		name:       name,
 		connection: adaptor,
 		pin:        pin,
+		Eventer:    NewEventer(),
 		Commander:  NewCommander(),
 	}
 
-	t.AddCommand("DriverCommand", func(params map[string]interface{}) interface{} { return nil })
+	t.AddEvent("DriverCommand")
+
+	t.AddCommand("DriverCommand", func(params map[string]interface{}) interface{} {
+		return t.DriverCommand()
+	})
 
 	return t
+}
+
+func (t *testDriver) DriverCommand() string {
+	Publish(t.Event("DriverCommand"), "DriverCommand")
+	return "DriverCommand"
 }
 
 type testAdaptor struct {

@@ -17,7 +17,7 @@ func (NullReadWriteCloser) Read(b []byte) (int, error) {
 	return len(b), nil
 }
 
-var closeErr error = nil
+var closeErr error
 
 func (NullReadWriteCloser) Close() error {
 	return closeErr
@@ -150,11 +150,11 @@ func TestProcess(t *testing.T) {
 	}
 	//i2cReply
 	gobot.Once(b.events["i2c_reply"], func(data interface{}) {
-		i2c_reply := map[string][]byte{
+		i2cReply := map[string][]byte{
 			"slave_address": []byte{9},
 			"register":      []byte{0},
 			"data":          []byte{152, 1, 154}}
-		gobot.Assert(t, data.(map[string][]byte), i2c_reply)
+		gobot.Assert(t, data.(map[string][]byte), i2cReply)
 		sem <- true
 	})
 	b.process([]byte{240, 119, 9, 0, 0, 0, 24, 1, 1, 0, 26, 1, 247})

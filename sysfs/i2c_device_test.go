@@ -1,10 +1,11 @@
 package sysfs
 
 import (
-	"github.com/hybridgroup/gobot"
 	"io"
 	"os"
 	"testing"
+
+	"github.com/hybridgroup/gobot"
 )
 
 func TestNewI2cDevice(t *testing.T) {

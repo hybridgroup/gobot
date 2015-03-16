@@ -33,7 +33,7 @@ func TestAnalogSensorDriverStart(t *testing.T) {
 
 	gobot.Assert(t, len(d.Start()), 0)
 
-	gobot.On(d.Event(Data), func(data interface{}) {
+	gobot.Once(d.Event(Data), func(data interface{}) {
 		gobot.Assert(t, data.(int), 100)
 		sem <- true
 	})
@@ -49,7 +49,7 @@ func TestAnalogSensorDriverStart(t *testing.T) {
 		t.Errorf("AnalogSensor Event \"Data\" was not published")
 	}
 
-	gobot.On(d.Event(Error), func(data interface{}) {
+	gobot.Once(d.Event(Error), func(data interface{}) {
 		gobot.Assert(t, data.(error).Error(), "read error")
 		sem <- true
 	})
@@ -64,9 +64,29 @@ func TestAnalogSensorDriverStart(t *testing.T) {
 	case <-time.After(15 * time.Millisecond):
 		t.Errorf("AnalogSensor Event \"Error\" was not published")
 	}
+
+	gobot.Once(d.Event(Data), func(data interface{}) {
+		sem <- true
+	})
+
+	testAdaptorAnalogRead = func() (val int, err error) {
+		val = 200
+		return
+	}
+
+	d.halt <- true
+
+	select {
+	case <-sem:
+		t.Errorf("AnalogSensor Event should not published")
+	case <-time.After(30 * time.Millisecond):
+	}
 }
 
 func TestAnalogSensorDriverHalt(t *testing.T) {
 	d := NewAnalogSensorDriver(newGpioTestAdaptor("adaptor"), "bot", "1")
+	go func() {
+		<-d.halt
+	}()
 	gobot.Assert(t, len(d.Halt()), 0)
 }

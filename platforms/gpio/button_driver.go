@@ -8,17 +8,22 @@ import (
 
 var _ gobot.Driver = (*ButtonDriver)(nil)
 
-// Represents a digital Button
+// ButtonDriver Represents a digital Button
 type ButtonDriver struct {
 	Active     bool
 	pin        string
 	name       string
+	halt       chan bool
 	interval   time.Duration
 	connection DigitalReader
 	gobot.Eventer
 }
 
-// NewButtonDriver return a new ButtonDriver given a DigitalReader, name and pin
+// NewButtonDriver returns a new ButtonDriver with a polling interval of
+// 10 Milliseconds given a DigitalReader, name and pin.
+//
+// Optinally accepts:
+//  time.Duration: Interval at which the ButtonDriver is polled for new information
 func NewButtonDriver(a DigitalReader, name string, pin string, v ...time.Duration) *ButtonDriver {
 	b := &ButtonDriver{
 		name:       name,
@@ -27,6 +32,7 @@ func NewButtonDriver(a DigitalReader, name string, pin string, v ...time.Duratio
 		Active:     false,
 		Eventer:    gobot.NewEventer(),
 		interval:   10 * time.Millisecond,
+		halt:       make(chan bool),
 	}
 
 	if len(v) > 0 {
@@ -40,13 +46,12 @@ func NewButtonDriver(a DigitalReader, name string, pin string, v ...time.Duratio
 	return b
 }
 
-// Starts the ButtonDriver and reads the state of the button at the given Driver.Interval().
-// Returns true on successful start of the driver.
+// Start starts the ButtonDriver and polls the state of the button at the given interval.
 //
 // Emits the Events:
-// 	"push"    int - On button push
-//	"release" int - On button release
-//	"error" error - On button error
+// 	Push int - On button push
+//	Release int - On button release
+//	Error error - On button error
 func (b *ButtonDriver) Start() (errs []error) {
 	state := 0
 	go func() {
@@ -58,17 +63,29 @@ func (b *ButtonDriver) Start() (errs []error) {
 				state = newValue
 				b.update(newValue)
 			}
-			<-time.After(b.interval)
+			select {
+			case <-time.After(b.interval):
+			case <-b.halt:
+				return
+			}
 		}
 	}()
 	return
 }
 
-// Halt returns true on a successful halt of the driver
-func (b *ButtonDriver) Halt() (errs []error) { return }
+// Halt stops polling the button for new information
+func (b *ButtonDriver) Halt() (errs []error) {
+	b.halt <- true
+	return
+}
 
-func (b *ButtonDriver) Name() string                 { return b.name }
-func (b *ButtonDriver) Pin() string                  { return b.pin }
+// Name returns the ButtonDrivers name
+func (b *ButtonDriver) Name() string { return b.name }
+
+// Pin returns the ButtonDrivers pin
+func (b *ButtonDriver) Pin() string { return b.pin }
+
+// Connection returns the ButtonDrivers Connection
 func (b *ButtonDriver) Connection() gobot.Connection { return b.connection.(gobot.Connection) }
 
 func (b *ButtonDriver) update(newValue int) {

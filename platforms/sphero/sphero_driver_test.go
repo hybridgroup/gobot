@@ -33,8 +33,18 @@ func TestSpheroDriver(t *testing.T) {
 	)
 	gobot.Assert(t, ret, nil)
 
+	ret = d.Command("ConfigureLocator")(
+		map[string]interface{}{"Flags": 1.0, "X": 100.0, "Y": 100.0, "YawTare": 100.0},
+	)
+	gobot.Assert(t, ret, nil)
+
 	ret = d.Command("SetHeading")(
 		map[string]interface{}{"heading": 100.0},
+	)
+	gobot.Assert(t, ret, nil)
+
+	ret = d.Command("SetRotationRate")(
+		map[string]interface{}{"level": 100.0},
 	)
 	gobot.Assert(t, ret, nil)
 
@@ -43,11 +53,19 @@ func TestSpheroDriver(t *testing.T) {
 	)
 	gobot.Assert(t, ret, nil)
 
+	ret = d.Command("SetStabilization")(
+		map[string]interface{}{"enable": false},
+	)
+	gobot.Assert(t, ret, nil)
+
 	ret = d.Command("Stop")(nil)
 	gobot.Assert(t, ret, nil)
 
 	ret = d.Command("GetRGB")(nil)
 	gobot.Assert(t, ret.([]byte), []byte{})
+
+	ret = d.Command("ReadLocator")(nil)
+	gobot.Assert(t, ret, []int16{})
 
 	gobot.Assert(t, d.Name(), "bot")
 	gobot.Assert(t, d.Connection().Name(), "bot")
@@ -90,6 +108,34 @@ func TestSpheroDriverSetDataStreaming(t *testing.T) {
 	dconfig := DataStreamingConfig{N: 100, M: 200, Mask: 300, Pcnt: 255, Mask2: 400}
 	buf = new(bytes.Buffer)
 	binary.Write(buf, binary.BigEndian, dconfig)
+
+	gobot.Assert(t, data.body, buf.Bytes())
+}
+
+func TestConfigureLocator(t *testing.T) {
+	d := initTestSpheroDriver()
+	d.ConfigureLocator(DefaultLocatorConfig())
+	data := <-d.packetChannel
+
+	buf := new(bytes.Buffer)
+	binary.Write(buf, binary.BigEndian, DefaultLocatorConfig())
+
+	gobot.Assert(t, data.body, buf.Bytes())
+
+	ret := d.Command("ConfigureLocator")(
+		map[string]interface{}{
+			"Flags":   1.0,
+			"X":       100.0,
+			"Y":       100.0,
+			"YawTare": 0.0,
+		},
+	)
+	gobot.Assert(t, ret, nil)
+	data = <-d.packetChannel
+
+	lconfig := LocatorConfig{Flags: 1, X: 100, Y: 100, YawTare: 0}
+	buf = new(bytes.Buffer)
+	binary.Write(buf, binary.BigEndian, lconfig)
 
 	gobot.Assert(t, data.body, buf.Bytes())
 }

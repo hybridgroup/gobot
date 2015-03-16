@@ -5,12 +5,13 @@ type callback struct {
 	once bool
 }
 
+// Event executes the list of Callbacks when Chan is written to.
 type Event struct {
 	Chan      chan interface{}
 	Callbacks []callback
 }
 
-// NewEvent returns a new event which is then ready for publishing and subscribing.
+// NewEvent returns a new Event which is now listening for data.
 func NewEvent() *Event {
 	e := &Event{
 		Chan:      make(chan interface{}, 1),
@@ -24,7 +25,8 @@ func NewEvent() *Event {
 	return e
 }
 
-// Write writes data to the Event
+// Write writes data to the Event, it will not block and will not buffer if there
+// are no active subscribers to the Event.
 func (e *Event) Write(data interface{}) {
 	select {
 	case e.Chan <- data:
@@ -32,7 +34,7 @@ func (e *Event) Write(data interface{}) {
 	}
 }
 
-// Read publishes to all subscribers of e if there is any new data
+// Read executes all Callbacks when new data is available.
 func (e *Event) Read() {
 	for s := range e.Chan {
 		tmp := []callback{}

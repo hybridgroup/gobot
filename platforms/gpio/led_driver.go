@@ -4,7 +4,7 @@ import "github.com/hybridgroup/gobot"
 
 var _ gobot.Driver = (*LedDriver)(nil)
 
-// Represents a digital Led
+// LedDriver represents a digital Led
 type LedDriver struct {
 	pin        string
 	name       string
@@ -13,7 +13,7 @@ type LedDriver struct {
 	gobot.Commander
 }
 
-// NewLedDriver return a new LedDriver  given a PwmDigitalWriter, name and pin.
+// NewLedDriver return a new LedDriver given a DigitalWriter, name and pin.
 //
 // Adds the following API Commands:
 //	"Brightness" - See LedDriver.Brightness
@@ -49,14 +49,19 @@ func NewLedDriver(a DigitalWriter, name string, pin string) *LedDriver {
 	return l
 }
 
-// Start starts the LedDriver. Returns true on successful start of the driver
+// Start implements the Driver interface
 func (l *LedDriver) Start() (errs []error) { return }
 
-// Halt halts the LedDriver. Returns true on successful halt of the driver
+// Halt implements the Driver interface
 func (l *LedDriver) Halt() (errs []error) { return }
 
+// Name returns the LedDrivers name
 func (l *LedDriver) Name() string { return l.name }
-func (l *LedDriver) Pin() string  { return l.pin }
+
+// Pin returns the LedDrivers name
+func (l *LedDriver) Pin() string { return l.pin }
+
+// Connection returns the LedDrivers Connection
 func (l *LedDriver) Connection() gobot.Connection {
 	return l.connection.(gobot.Connection)
 }
@@ -66,7 +71,7 @@ func (l *LedDriver) State() bool {
 	return l.high
 }
 
-// On sets the led to a high state. Returns true on success
+// On sets the led to a high state.
 func (l *LedDriver) On() (err error) {
 	if err = l.connection.DigitalWrite(l.Pin(), 1); err != nil {
 		return
@@ -75,7 +80,7 @@ func (l *LedDriver) On() (err error) {
 	return
 }
 
-// Off sets the led to a low state. Returns true on success
+// Off sets the led to a low state.
 func (l *LedDriver) Off() (err error) {
 	if err = l.connection.DigitalWrite(l.Pin(), 0); err != nil {
 		return

@@ -124,6 +124,7 @@ var analogPins = map[string]string{
 	"P8_35": "AIN6",
 }
 
+// BeagleboneAdaptor is the gobot.Adaptor representation for the Beaglebone
 type BeagleboneAdaptor struct {
 	name        string
 	digitalPins []sysfs.DigitalPin
@@ -134,7 +135,7 @@ type BeagleboneAdaptor struct {
 	slots       string
 }
 
-// NewBeagleboneAdaptor returns a new beaglebone adaptor with specified name
+// NewBeagleboneAdaptor returns a new BeagleboneAdaptor with specified name
 func NewBeagleboneAdaptor(name string) *BeagleboneAdaptor {
 	b := &BeagleboneAdaptor{
 		name:        name,
@@ -149,10 +150,11 @@ func NewBeagleboneAdaptor(name string) *BeagleboneAdaptor {
 
 	return b
 }
+
+// Name returns the BeagleboneAdaptors name
 func (b *BeagleboneAdaptor) Name() string { return b.name }
 
-// Connect returns true on a succesful connection to beaglebone board.
-// It initializes digital, pwm and analog pins
+// Connect initializes the pwm and analog dts.
 func (b *BeagleboneAdaptor) Connect() (errs []error) {
 	if err := ensureSlot(b.slots, "cape-bone-iio"); err != nil {
 		return []error{err}
@@ -171,7 +173,7 @@ func (b *BeagleboneAdaptor) Connect() (errs []error) {
 	return
 }
 
-// Finalize returns true when board connection is finalized correctly.
+// Finalize releases all i2c devices and exported analog, digital, pwm pins.
 func (b *BeagleboneAdaptor) Finalize() (errs []error) {
 	for _, pin := range b.pwmPins {
 		if pin != nil {
@@ -195,12 +197,12 @@ func (b *BeagleboneAdaptor) Finalize() (errs []error) {
 	return
 }
 
-// PwmWrite writes value in specified pin
+// PwmWrite writes the 0-254 value to the specified pin
 func (b *BeagleboneAdaptor) PwmWrite(pin string, val byte) (err error) {
 	return b.pwmWrite(pin, val)
 }
 
-// ServoWrite writes scaled value to servo in specified pin
+// ServoWrite writes the 0-180 degree val to the specified pin.
 func (b *BeagleboneAdaptor) ServoWrite(pin string, val byte) (err error) {
 	i, err := b.pwmPin(pin)
 	if err != nil {
@@ -262,19 +264,19 @@ func (b *BeagleboneAdaptor) AnalogRead(pin string) (val int, err error) {
 	return
 }
 
-// I2cStart starts a i2c device in specified address
+// I2cStart starts a i2c device in specified address on i2c bus /dev/i2c-1
 func (b *BeagleboneAdaptor) I2cStart(address byte) (err error) {
 	b.i2cDevice, err = sysfs.NewI2cDevice("/dev/i2c-1", address)
 	return
 }
 
-// I2CWrite writes data to i2c device
+// I2cWrite writes data to i2c device
 func (b *BeagleboneAdaptor) I2cWrite(data []byte) (err error) {
 	_, err = b.i2cDevice.Write(data)
 	return err
 }
 
-// I2cRead returns value from i2c device using specified size
+// I2cRead returns size bytes from the i2c device
 func (b *BeagleboneAdaptor) I2cRead(size uint) (data []byte, err error) {
 	data = make([]byte, size)
 	_, err = b.i2cDevice.Read(data)
