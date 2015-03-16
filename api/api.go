@@ -103,7 +103,7 @@ func (a *API) AddHandler(f func(http.ResponseWriter, *http.Request)) {
 // Start initializes the api by setting up c3pio routes and robeaux
 func (a *API) Start() {
 	mcpCommandRoute := "/api/commands/:command"
-	deviceCommandRoute := "/api/robots/:robot/devices/:device/commands/:command"
+	robotDeviceCommandRoute := "/api/robots/:robot/devices/:device/commands/:command"
 	robotCommandRoute := "/api/robots/:robot/commands/:command"
 
 	a.Get("/api/commands", a.mcpCommands)
@@ -118,8 +118,8 @@ func (a *API) Start() {
 	a.Get("/api/robots/:robot/devices/:device", a.robotDevice)
 	a.Get("/api/robots/:robot/devices/:device/events/:event", a.robotDeviceEvent)
 	a.Get("/api/robots/:robot/devices/:device/commands", a.robotDeviceCommands)
-	a.Get(deviceCommandRoute, a.executeDeviceCommand)
-	a.Post(deviceCommandRoute, a.executeDeviceCommand)
+	a.Get(robotDeviceCommandRoute, a.executeRobotDeviceCommand)
+	a.Post(robotDeviceCommandRoute, a.executeRobotDeviceCommand)
 	a.Get("/api/robots/:robot/connections", a.robotConnections)
 	a.Get("/api/robots/:robot/connections/:connection", a.robotConnection)
 	a.Get("/api/", a.mcp)
@@ -306,8 +306,8 @@ func (a *API) executeMcpCommand(res http.ResponseWriter, req *http.Request) {
 	)
 }
 
-// executeDeviceCommand calls a device command asociated to requested route
-func (a *API) executeDeviceCommand(res http.ResponseWriter, req *http.Request) {
+// executeRobotDeviceCommand calls a device command asociated to requested route
+func (a *API) executeRobotDeviceCommand(res http.ResponseWriter, req *http.Request) {
 	if _, err := a.jsonDeviceFor(req.URL.Query().Get(":robot"),
 		req.URL.Query().Get(":device")); err != nil {
 		a.writeJSON(map[string]interface{}{"error": err.Error()}, res)
