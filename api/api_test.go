@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -8,6 +9,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/hybridgroup/gobot"
 )
@@ -361,6 +363,55 @@ func TestRobotConnection(t *testing.T) {
 	a.ServeHTTP(response, request)
 	json.NewDecoder(response.Body).Decode(&body)
 	gobot.Assert(t, body["error"], "No Connection found with the name UnknownConnection1")
+}
+
+func TestRobotDeviceEvent(t *testing.T) {
+	a := initTestAPI()
+	server := httptest.NewServer(a)
+	defer server.Close()
+
+	eventsUrl := "/api/robots/Robot1/devices/Device1/events/"
+
+	// known event
+	respc := make(chan *http.Response, 1)
+	go func() {
+		resp, _ := http.Get(server.URL + eventsUrl + "TestEvent")
+		respc <- resp
+	}()
+
+	event := a.gobot.Robot("Robot1").
+		Device("Device1").(gobot.Eventer).
+		Event("TestEvent")
+
+	go func() {
+		time.Sleep(time.Millisecond * 5)
+		gobot.Publish(event, "event-data")
+	}()
+
+	done := false
+	timer := time.NewTimer(time.Millisecond * 10)
+
+	for !done {
+		select {
+		case resp := <-respc:
+			reader := bufio.NewReader(resp.Body)
+			data, _ := reader.ReadString('\n')
+			gobot.Assert(t, data, "data: \"event-data\"\n")
+			done = true
+		case <-timer.C:
+			t.Error("Not receiving data")
+			done = true
+		}
+	}
+
+	server.CloseClientConnections()
+
+	// unknown event
+	response, _ := http.Get(server.URL + eventsUrl + "UnknownEvent")
+
+	var body map[string]interface{}
+	json.NewDecoder(response.Body).Decode(&body)
+	gobot.Assert(t, body["error"], "No Event found with the name UnknownEvent")
 }
 
 func TestAPIRouter(t *testing.T) {
