@@ -111,6 +111,7 @@ func (b *board) connect() (err error) {
 			return err
 		}
 		b.initBoard()
+		b.queryFirmware()
 		for {
 			if err = b.queryReportVersion(); err != nil {
 				return err
