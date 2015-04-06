@@ -11,7 +11,7 @@ type MqttAdaptor struct {
 	name     string
 	Host     string
 	clientID string
-	client   *mqtt.MqttClient
+	client   *mqtt.Client
 }
 
 // NewMqttAdaptor creates a new mqtt adaptor with specified name, host and client id
@@ -26,9 +26,10 @@ func (a *MqttAdaptor) Name() string { return a.name }
 
 // Connect returns true if connection to mqtt is established
 func (a *MqttAdaptor) Connect() (errs []error) {
-	opts := createClientOptions(a.clientID, a.Host)
-	a.client = mqtt.NewClient(opts)
-	a.client.Start()
+	a.client = mqtt.NewClient(createClientOptions(a.clientID, a.Host))
+	if token := a.client.Connect(); token.Wait() && token.Error() != nil {
+		errs = append(errs, token.Error())
+	}
 	return
 }
 
@@ -51,8 +52,7 @@ func (a *MqttAdaptor) Publish(topic string, message []byte) bool {
 	if a.client == nil {
 		return false
 	}
-	m := mqtt.NewMessage(message)
-	a.client.PublishMessage(topic, m)
+	a.client.Publish(topic, 0, false, message)
 	return true
 }
 
@@ -61,17 +61,16 @@ func (a *MqttAdaptor) On(event string, f func(s []byte)) bool {
 	if a.client == nil {
 		return false
 	}
-	t, _ := mqtt.NewTopicFilter(event, 0)
-	a.client.StartSubscription(func(client *mqtt.MqttClient, msg mqtt.Message) {
+	a.client.Subscribe(event, 0, func(client *mqtt.Client, msg mqtt.Message) {
 		f(msg.Payload())
-	}, t)
+	})
 	return true
 }
 
 func createClientOptions(clientId, raw string) *mqtt.ClientOptions {
 	opts := mqtt.NewClientOptions()
 	opts.AddBroker(raw)
-	opts.SetClientId(clientId)
+	opts.SetClientID(clientId)
 
 	return opts
 }

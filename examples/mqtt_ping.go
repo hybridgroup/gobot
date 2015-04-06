@@ -11,7 +11,7 @@ import (
 func main() {
 	gbot := gobot.NewGobot()
 
-	mqttAdaptor := mqtt.NewMqttAdaptor("server", "tcp://0.0.0.0:1883", "pinger")
+	mqttAdaptor := mqtt.NewMqttAdaptor("server", "tcp://test.mosquitto.org:1883", "pinger")
 
 	work := func() {
 		mqttAdaptor.On("hello", func(data []byte) {

@@ -12,7 +12,7 @@ import (
 func main() {
 	gbot := gobot.NewGobot()
 
-	mqttAdaptor := mqtt.NewMqttAdaptor("server", "tcp://localhost:1883", "blinker")
+	mqttAdaptor := mqtt.NewMqttAdaptor("server", "tcp://test.mosquitto.org:1883", "blinker")
 	firmataAdaptor := firmata.NewFirmataAdaptor("arduino", "/dev/ttyACM0")
 	led := gpio.NewLedDriver(firmataAdaptor, "led", "13")
 
