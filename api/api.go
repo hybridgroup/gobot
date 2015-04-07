@@ -224,15 +224,12 @@ func (a *API) robotDevice(res http.ResponseWriter, req *http.Request) {
 	}
 }
 
-// robotDeviceEvent returns device event route handler.
-// Creates an event stream connection
-// and queries event data to be written when received
 func (a *API) robotDeviceEvent(res http.ResponseWriter, req *http.Request) {
 	f, _ := res.(http.Flusher)
 	c, _ := res.(http.CloseNotifier)
 
+	dataChan := make(chan string)
 	closer := c.CloseNotify()
-	msg := make(chan string)
 
 	res.Header().Set("Content-Type", "text/event-stream")
 	res.Header().Set("Cache-Control", "no-cache")
@@ -243,12 +240,12 @@ func (a *API) robotDeviceEvent(res http.ResponseWriter, req *http.Request) {
 		Event(req.URL.Query().Get(":event")); event != nil {
 		gobot.On(event, func(data interface{}) {
 			d, _ := json.Marshal(data)
-			msg <- string(d)
+			dataChan <- string(d)
 		})
 
 		for {
 			select {
-			case data := <-msg:
+			case data := <-dataChan:
 				fmt.Fprintf(res, "data: %v\n\n", data)
 				f.Flush()
 			case <-closer:
@@ -258,7 +255,7 @@ func (a *API) robotDeviceEvent(res http.ResponseWriter, req *http.Request) {
 		}
 	} else {
 		a.writeJSON(map[string]interface{}{
-			"error": errors.New("No Event found with the name " + req.URL.Query().Get(":event")),
+			"error": "No Event found with the name " + req.URL.Query().Get(":event"),
 		}, res)
 	}
 }
