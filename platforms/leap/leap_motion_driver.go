@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"io"
 
-	"code.google.com/p/go.net/websocket"
 	"github.com/hybridgroup/gobot"
+	"golang.org/x/net/websocket"
 )
 
 var _ gobot.Driver = (*LeapMotionDriver)(nil)
