@@ -121,7 +121,7 @@ a shared set of drivers provided using the cylon-gpio module:
     - Digital Sensor
     - Direct Pin
     - LED
-    - MakeyButton
+    - Makey Button
     - Motor
     - Servo
 
@@ -131,6 +131,7 @@ drivers provided using the gobot-i2c module:
   - [I2C](https://en.wikipedia.org/wiki/I%C2%B2C) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/platforms/i2c)
     - BlinkM
     - HMC6352
+    - LIDAR-Lite
     - MPL1150A2
     - MPU6050
     - Wii Nunchuck Controller
