@@ -6,6 +6,7 @@ import (
 	"strings"
 )
 
+// CORS represents CORS configuration
 type CORS struct {
 	AllowOrigins        []string
 	AllowHeaders        []string
@@ -14,7 +15,7 @@ type CORS struct {
 	allowOriginPatterns []string
 }
 
-// AllowRequestFrom returns handler to verify that requests come from allowedOrigins
+// AllowRequestsFrom returns handler to verify that requests come from allowedOrigins
 func AllowRequestsFrom(allowedOrigins ...string) http.HandlerFunc {
 	c := &CORS{
 		AllowOrigins: allowedOrigins,

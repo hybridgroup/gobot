@@ -4,6 +4,7 @@ import (
 	"os"
 )
 
+// A File represents basic IO interactions with the underlying file system
 type File interface {
 	Write(b []byte) (n int, err error)
 	WriteString(s string) (ret int, err error)
@@ -14,26 +15,28 @@ type File interface {
 	Close() error
 }
 
+// Filesystem opens files and returns either a native file system or user defined
 type Filesystem interface {
 	OpenFile(name string, flag int, perm os.FileMode) (file File, err error)
 }
 
-// Filesystem that opens real files on the host.
+// NativeFilesystem represents the native file system implementation
 type NativeFilesystem struct{}
 
 // Default to the host filesystem.
 var fs Filesystem = &NativeFilesystem{}
 
-// Override the default filesystem.
+// SetFilesystem sets the filesystem implementation.
 func SetFilesystem(f Filesystem) {
 	fs = f
 }
 
+// OpenFile calls os.OpenFile().
 func (fs *NativeFilesystem) OpenFile(name string, flag int, perm os.FileMode) (file File, err error) {
 	return os.OpenFile(name, flag, perm)
 }
 
-// Open a file the same as os.OpenFile().
+// OpenFile calls either the NativeFilesystem or user defined OpenFile
 func OpenFile(name string, flag int, perm os.FileMode) (file File, err error) {
 	return fs.OpenFile(name, flag, perm)
 }

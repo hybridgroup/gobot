@@ -1,19 +1,18 @@
 package gobot
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"reflect"
 )
 
-// JSONConnection holds a JSON representation of a connection.
+// JSONConnection is a JSON representation of a Connection.
 type JSONConnection struct {
 	Name    string `json:"name"`
 	Adaptor string `json:"adaptor"`
 }
 
-// ToJSON returns a json representation of an adaptor
+// NewJSONConnection returns a JSONConnection given a Connection.
 func NewJSONConnection(connection Connection) *JSONConnection {
 	return &JSONConnection{
 		Name:    connection.Name(),
@@ -21,24 +20,26 @@ func NewJSONConnection(connection Connection) *JSONConnection {
 	}
 }
 
+// A Connection is an instance of an Adaptor
 type Connection Adaptor
 
-type connections []Connection
+// Connections represents a collection of Connection
+type Connections []Connection
 
 // Len returns connections length
-func (c *connections) Len() int {
+func (c *Connections) Len() int {
 	return len(*c)
 }
 
-// Each calls function for each connection
-func (c *connections) Each(f func(Connection)) {
+// Each enumerates through the Connections and calls specified callback function.
+func (c *Connections) Each(f func(Connection)) {
 	for _, connection := range *c {
 		f(connection)
 	}
 }
 
-// Start initializes all the connections.
-func (c *connections) Start() (errs []error) {
+// Start calls Connect on each Connection in c
+func (c *Connections) Start() (errs []error) {
 	log.Println("Starting connections...")
 	for _, connection := range *c {
 		info := "Starting connection " + connection.Name()
@@ -51,7 +52,7 @@ func (c *connections) Start() (errs []error) {
 
 		if errs = connection.Connect(); len(errs) > 0 {
 			for i, err := range errs {
-				errs[i] = errors.New(fmt.Sprintf("Connection %q: %v", connection.Name(), err))
+				errs[i] = fmt.Errorf("Connection %q: %v", connection.Name(), err)
 			}
 			return
 		}
@@ -59,12 +60,12 @@ func (c *connections) Start() (errs []error) {
 	return
 }
 
-// Finalize finishes all the connections.
-func (c *connections) Finalize() (errs []error) {
+// Finalize calls Finalize on each Connection in c
+func (c *Connections) Finalize() (errs []error) {
 	for _, connection := range *c {
 		if cerrs := connection.Finalize(); cerrs != nil {
 			for i, err := range cerrs {
-				cerrs[i] = errors.New(fmt.Sprintf("Connection %q: %v", connection.Name(), err))
+				cerrs[i] = fmt.Errorf("Connection %q: %v", connection.Name(), err)
 			}
 			errs = append(errs, cerrs...)
 		}

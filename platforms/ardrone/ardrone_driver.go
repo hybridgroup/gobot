@@ -6,6 +6,7 @@ import (
 
 var _ gobot.Driver = (*ArdroneDriver)(nil)
 
+// ArdroneDriver is gobot.Driver representation for the Ardrone
 type ArdroneDriver struct {
 	name       string
 	connection gobot.Connection
@@ -26,7 +27,10 @@ func NewArdroneDriver(connection *ArdroneAdaptor, name string) *ArdroneDriver {
 	return d
 }
 
-func (a *ArdroneDriver) Name() string                 { return a.name }
+// Name returns the ArdroneDrivers Name
+func (a *ArdroneDriver) Name() string { return a.name }
+
+// Connection returns the ArdroneDrivers Connection
 func (a *ArdroneDriver) Connection() gobot.Connection { return a.connection }
 
 // adaptor returns ardrone adaptor
@@ -34,23 +38,22 @@ func (a *ArdroneDriver) adaptor() *ArdroneAdaptor {
 	return a.Connection().(*ArdroneAdaptor)
 }
 
-// Start returns true if driver is started succesfully
+// Start starts the ArdroneDriver
 func (a *ArdroneDriver) Start() (errs []error) {
 	return
 }
 
-// Halt returns true if driver is halted succesfully
+// Halt halts the ArdroneDriver
 func (a *ArdroneDriver) Halt() (errs []error) {
 	return
 }
 
-// TakeOff makes the drone start flying
-// and publishes `flying` event
+// TakeOff makes the drone start flying, and publishes `flying` event
 func (a *ArdroneDriver) TakeOff() {
 	gobot.Publish(a.Event("flying"), a.adaptor().drone.Takeoff())
 }
 
-// Land makes the drone stop flying
+// Land causes the drone to land
 func (a *ArdroneDriver) Land() {
 	a.adaptor().drone.Land()
 }

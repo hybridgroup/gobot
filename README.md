@@ -11,6 +11,9 @@ Want to use Ruby or Javascript on robots? Check out our sister projects Artoo (h
 [![GoDoc](https://godoc.org/github.com/hybridgroup/gobot?status.svg)](https://godoc.org/github.com/hybridgroup/gobot)
 [![Build Status](https://travis-ci.org/hybridgroup/gobot.png?branch=master)](https://travis-ci.org/hybridgroup/gobot) [![Coverage Status](https://coveralls.io/repos/hybridgroup/gobot/badge.png?branch=master)](https://coveralls.io/r/hybridgroup/gobot?branch=master)
 
+## Getting Started
+
+Get the Gobot source with: `go get -d -u github.com/hybridgroup/gobot/...`
 
 ## Examples
 
@@ -118,7 +121,7 @@ a shared set of drivers provided using the cylon-gpio module:
     - Digital Sensor
     - Direct Pin
     - LED
-    - MakeyButton
+    - Makey Button
     - Motor
     - Servo
 
@@ -128,15 +131,12 @@ drivers provided using the gobot-i2c module:
   - [I2C](https://en.wikipedia.org/wiki/I%C2%B2C) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/platforms/i2c)
     - BlinkM
     - HMC6352
+    - LIDAR-Lite
     - MPL1150A2
     - MPU6050
     - Wii Nunchuck Controller
 
 More platforms and drivers are coming soon...
-
-## Getting Started
-
-Install Gobot with: `go get -d -u github.com/hybridgroup/gobot/...`
 
 ## API:
 
@@ -166,6 +166,12 @@ We're busy adding documentation to our web site at http://gobot.io/ please check
 
 Thank you!
 
+## Need help?
+* Join our mailing list: https://groups.google.com/forum/#!forum/gobotio
+* IRC: `#gobotio @ irc.freenode.net`
+* Issues: https://github.com/hybridgroup/gobot/issues
+* twitter: [@gobotio](https://twitter.com/gobotio)
+
 ## Contributing
 * All active development is in the `dev` branch. New or updated features must be added to the `dev` branch. Hotfixes will be considered on the `master` branch in situations where it does not alter behaviour or features, only fixes a bug.
 * All patches must be provided under the Apache 2.0 License
@@ -183,4 +189,4 @@ Thank you!
 
 
 ## License
-Copyright (c) 2013-2014 The Hybrid Group. Licensed under the Apache 2.0 license.
+Copyright (c) 2013-2015 The Hybrid Group. Licensed under the Apache 2.0 license.

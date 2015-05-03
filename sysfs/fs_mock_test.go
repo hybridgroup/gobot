@@ -1,8 +1,9 @@
 package sysfs
 
 import (
-	"github.com/hybridgroup/gobot"
 	"testing"
+
+	"github.com/hybridgroup/gobot"
 )
 
 func TestMockFilesystemOpen(t *testing.T) {

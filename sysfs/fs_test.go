@@ -1,9 +1,10 @@
 package sysfs
 
 import (
-	"github.com/hybridgroup/gobot"
 	"os"
 	"testing"
+
+	"github.com/hybridgroup/gobot"
 )
 
 func TestFilesystemOpen(t *testing.T) {

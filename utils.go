@@ -15,6 +15,7 @@ import (
 )
 
 var (
+	// ErrUnknownEvent is the error resulting if the specified Event does not exist
 	ErrUnknownEvent = errors.New("Event does not exist")
 )
 
@@ -37,6 +38,7 @@ func logFailure(t *testing.T, message string) {
 	errFunc(t, fmt.Sprintf("%v:%v: %v", s[len(s)-1], line, message))
 }
 
+// Assert checks if a and b are equal, emis a t.Errorf if they are not equal.
 func Assert(t *testing.T, a interface{}, b interface{}) {
 	if !reflect.DeepEqual(a, b) {
 		logFailure(t, fmt.Sprintf("%v - \"%v\", should equal,  %v - \"%v\"",
@@ -44,6 +46,7 @@ func Assert(t *testing.T, a interface{}, b interface{}) {
 	}
 }
 
+// Refute checks if a and b are equal, emis a t.Errorf if they are equal.
 func Refute(t *testing.T, a interface{}, b interface{}) {
 	if reflect.DeepEqual(a, b) {
 		logFailure(t, fmt.Sprintf("%v - \"%v\", should not equal,  %v - \"%v\"",
@@ -69,7 +72,8 @@ func After(t time.Duration, f func()) {
 	time.AfterFunc(t, f)
 }
 
-// Publish emits val to all subscribers of e.
+// Publish emits val to all subscribers of e. Returns ErrUnknownEvent if Event
+// does not exist.
 func Publish(e *Event, val interface{}) (err error) {
 	if err = eventError(e); err == nil {
 		e.Write(val)
@@ -77,7 +81,8 @@ func Publish(e *Event, val interface{}) (err error) {
 	return
 }
 
-// On executes f when e is Published to.
+// On executes f when e is Published to. Returns ErrUnknownEvent if Event
+// does not exist.
 func On(e *Event, f func(s interface{})) (err error) {
 	if err = eventError(e); err == nil {
 		e.Callbacks = append(e.Callbacks, callback{f, false})
@@ -85,7 +90,8 @@ func On(e *Event, f func(s interface{})) (err error) {
 	return
 }
 
-// Once is similar to On except that it only executes f one time.
+// Once is similar to On except that it only executes f one time. Returns
+//ErrUnknownEvent if Event does not exist.
 func Once(e *Event, f func(s interface{})) (err error) {
 	if err = eventError(e); err == nil {
 		e.Callbacks = append(e.Callbacks, callback{f, true})

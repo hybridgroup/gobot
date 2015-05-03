@@ -25,6 +25,7 @@ type testDriver struct {
 	pin        string
 	connection gobot.Connection
 	gobot.Commander
+	gobot.Eventer
 }
 
 func (t *testDriver) Start() (errs []error)        { return }
@@ -38,8 +39,11 @@ func newTestDriver(adaptor *testAdaptor, name string, pin string) *testDriver {
 		name:       name,
 		connection: adaptor,
 		pin:        pin,
+		Eventer:    gobot.NewEventer(),
 		Commander:  gobot.NewCommander(),
 	}
+
+	t.AddEvent("TestEvent")
 
 	t.AddCommand("TestDriverCommand", func(params map[string]interface{}) interface{} {
 		name := params["name"].(string)

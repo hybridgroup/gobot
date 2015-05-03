@@ -3,8 +3,8 @@ package leap
 import (
 	"io"
 
-	"code.google.com/p/go.net/websocket"
 	"github.com/hybridgroup/gobot"
+	"golang.org/x/net/websocket"
 )
 
 var _ gobot.Adaptor = (*LeapMotionAdaptor)(nil)

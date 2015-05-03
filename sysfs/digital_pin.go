@@ -8,18 +8,29 @@ import (
 )
 
 const (
-	IN       = "in"
-	OUT      = "out"
-	HIGH     = 1
-	LOW      = 0
+	// IN gpio direction
+	IN = "in"
+	// OUT gpio direction
+	OUT = "out"
+	// HIGH gpio level
+	HIGH = 1
+	// LOW gpio level
+	LOW = 0
+	// GPIOPATH default linux gpio path
 	GPIOPATH = "/sys/class/gpio"
 )
 
+// DigitalPin is the interface for sysfs gpio interactions
 type DigitalPin interface {
+	// Unexport unexports the pin and releases the pin from the operating system
 	Unexport() error
+	// Export exports the pin for use by the operating system
 	Export() error
+	// Read reads the current value of the pin
 	Read() (int, error)
+	// Direction sets the direction for the pin
 	Direction(string) error
+	// Write writes to the pin
 	Write(int) error
 }
 
@@ -42,19 +53,16 @@ func NewDigitalPin(pin int, v ...string) DigitalPin {
 	return d
 }
 
-// Direction sets the direction for the pin
 func (d *digitalPin) Direction(dir string) error {
 	_, err := writeFile(fmt.Sprintf("%v/%v/direction", GPIOPATH, d.label), []byte(dir))
 	return err
 }
 
-// Write writes to the pin
 func (d *digitalPin) Write(b int) error {
 	_, err := writeFile(fmt.Sprintf("%v/%v/value", GPIOPATH, d.label), []byte(strconv.Itoa(b)))
 	return err
 }
 
-// Read reads the current value of the pin
 func (d *digitalPin) Read() (n int, err error) {
 	buf, err := readFile(fmt.Sprintf("%v/%v/value", GPIOPATH, d.label))
 	if err != nil {
@@ -63,7 +71,6 @@ func (d *digitalPin) Read() (n int, err error) {
 	return strconv.Atoi(string(buf[0]))
 }
 
-// Export exports the pin for use by the operating system
 func (d *digitalPin) Export() error {
 	if _, err := writeFile(GPIOPATH+"/export", []byte(d.pin)); err != nil {
 		// If EBUSY then the pin has already been exported
@@ -74,7 +81,6 @@ func (d *digitalPin) Export() error {
 	return nil
 }
 
-// Unexport unexports the pin and releases the pin from the operating system
 func (d *digitalPin) Unexport() error {
 	if _, err := writeFile(GPIOPATH+"/unexport", []byte(d.pin)); err != nil {
 		// If EINVAL then the pin is reserved in the system and can't be unexported

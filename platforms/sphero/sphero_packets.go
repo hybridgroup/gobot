@@ -1,5 +1,29 @@
 package sphero
 
+// DefaultLocatorConfig returns a LocatorConfig with defaults
+func DefaultLocatorConfig() LocatorConfig {
+	return LocatorConfig{
+		Flags:   0x01,
+		X:       0x00,
+		Y:       0x00,
+		YawTare: 0x00,
+	}
+}
+
+// LocatorConfig provides configuration for the Location api.
+// https://github.com/orbotix/DeveloperResources/blob/master/docs/Sphero_API_1.50.pdf
+// The current (X,Y) coordinates of Sphero on the ground plane in centimeters.
+type LocatorConfig struct {
+	// Determines whether calibrate commands automatically correct the yaw tare value
+	Flags uint8
+	// Controls how the X-plane is aligned with Sphero’s heading coordinate system.
+	X int16
+	// Controls how the Y-plane is aligned with Sphero’s heading coordinate system.
+	Y int16
+	// Controls how the X,Y-plane is aligned with Sphero’s heading coordinate system.
+	YawTare int16
+}
+
 // DefaultCollisionConfig returns a CollisionConfig with sensible collision defaults
 func DefaultCollisionConfig() CollisionConfig {
 	return CollisionConfig{

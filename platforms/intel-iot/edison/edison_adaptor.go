@@ -59,6 +59,7 @@ type sysfsPin struct {
 	mux          []mux
 }
 
+// EdisonAdaptor represents an Intel Edison
 type EdisonAdaptor struct {
 	name        string
 	tristate    sysfs.DigitalPin
@@ -189,8 +190,7 @@ func changePinMode(pin, mode string) (err error) {
 	return
 }
 
-// NewEditionAdaptor creates a EdisonAdaptor with specified name and
-// creates connect function
+// NewEdisonAdaptor returns a new EdisonAdaptor with specified name
 func NewEdisonAdaptor(name string) *EdisonAdaptor {
 	return &EdisonAdaptor{
 		name: name,
@@ -257,10 +257,10 @@ func NewEdisonAdaptor(name string) *EdisonAdaptor {
 	}
 }
 
+// Name returns the EdisonAdaptors name
 func (e *EdisonAdaptor) Name() string { return e.name }
 
-// Connect starts conection with board and creates
-// digitalPins and pwmPins adaptor maps
+// Connect initializes the Edison for use with the Arduino beakout board
 func (e *EdisonAdaptor) Connect() (errs []error) {
 	e.digitalPins = make(map[int]sysfs.DigitalPin)
 	e.pwmPins = make(map[int]*pwmPin)
@@ -270,7 +270,7 @@ func (e *EdisonAdaptor) Connect() (errs []error) {
 	return
 }
 
-// Finalize closes connection to board and pins
+// Finalize releases all i2c devices and exported analog, digital, pwm pins.
 func (e *EdisonAdaptor) Finalize() (errs []error) {
 	if err := e.tristate.Unexport(); err != nil {
 		errs = append(errs, err)
@@ -389,7 +389,7 @@ func (e *EdisonAdaptor) DigitalRead(pin string) (i int, err error) {
 	return sysfsPin.Read()
 }
 
-// DigitalWrite writes digital value to specified pin
+// DigitalWrite writes a value to the pin. Acceptable values are 1 or 0.
 func (e *EdisonAdaptor) DigitalWrite(pin string, val byte) (err error) {
 	sysfsPin, err := e.digitalPin(pin, "out")
 	if err != nil {
@@ -398,7 +398,7 @@ func (e *EdisonAdaptor) DigitalWrite(pin string, val byte) (err error) {
 	return sysfsPin.Write(int(val))
 }
 
-// PwmWrite writes scaled pwm value to specified pin
+// PwmWrite writes the 0-254 value to the specified pin
 func (e *EdisonAdaptor) PwmWrite(pin string, val byte) (err error) {
 	sysPin := sysfsPinMap[pin]
 	if sysPin.pwmPin != -1 {
@@ -491,13 +491,13 @@ func (e *EdisonAdaptor) I2cStart(address byte) (err error) {
 	return
 }
 
-// I2cWrite writes data to i2cDevice
+// I2cWrite writes data to i2c device
 func (e *EdisonAdaptor) I2cWrite(data []byte) (err error) {
 	_, err = e.i2cDevice.Write(data)
 	return
 }
 
-// I2cRead reads data from i2cDevice
+// I2cRead returns size bytes from the i2c device
 func (e *EdisonAdaptor) I2cRead(size uint) (data []byte, err error) {
 	data = make([]byte, size)
 	_, err = e.i2cDevice.Read(data)

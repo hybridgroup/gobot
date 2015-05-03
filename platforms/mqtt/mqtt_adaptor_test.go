@@ -13,7 +13,7 @@ func initTestMqttAdaptor() *MqttAdaptor {
 
 func TestMqttAdaptorConnect(t *testing.T) {
 	a := initTestMqttAdaptor()
-	gobot.Assert(t, len(a.Connect()), 0)
+	gobot.Assert(t, a.Connect()[0].Error(), "Network Error : Unknown protocol")
 }
 
 func TestMqttAdaptorFinalize(t *testing.T) {
