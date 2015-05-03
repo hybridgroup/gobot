@@ -1,10 +1,10 @@
 /*
-Package inteliot contains Gobot adaptors for the Intel IoT platforms.
+Package odroid contains Gobot adaptors for the ODroid platforms.
 
-This package currently supports the following Intel IoT hardware:
-- Intel Edison with the Arduino breakout board
+This package currently supports the following ODroid hardware:
+- ODroid C1
 
-For further information refer to intel-iot README:
-https://github.com/hybridgroup/gobot/blob/master/platforms/intel-iot/README.md
+For further information refer to ODroid README:
+https://github.com/hybridgroup/gobot/blob/master/platforms/odroid/README.md
 */
 package odroid
