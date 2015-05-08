@@ -44,6 +44,10 @@ func (f *MockFile) Sync() (err error) {
 	return nil
 }
 
+func (f *MockFile) Seek(int64, int) (int64, error) {
+	return 0, nil
+}
+
 // Read copies b bytes from f.Contents
 func (f *MockFile) Read(b []byte) (n int, err error) {
 	count := len(b)
