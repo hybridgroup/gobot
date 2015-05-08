@@ -9,6 +9,23 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
+func BenchmarkDigitalRead(b *testing.B) {
+	fs := NewMockFilesystem([]string{
+		"/sys/class/gpio/export",
+		"/sys/class/gpio/unexport",
+		"/sys/class/gpio/gpio10/value",
+		"/sys/class/gpio/gpio10/direction",
+	})
+
+	SetFilesystem(fs)
+	pin := NewDigitalPin(10, "custom")
+
+	for i := 0; i < b.N; i++ {
+		pin.Read()
+	}
+
+}
+
 func TestDigitalPin(t *testing.T) {
 	fs := NewMockFilesystem([]string{
 		"/sys/class/gpio/export",
@@ -26,10 +43,17 @@ func TestDigitalPin(t *testing.T) {
 	pin = NewDigitalPin(10).(*digitalPin)
 	gobot.Assert(t, pin.label, "gpio10")
 
-	pin.Unexport()
+	err := pin.Unexport()
+	if err != nil {
+		t.Error("Err during unexport:", err)
+	}
+
 	gobot.Assert(t, fs.Files["/sys/class/gpio/unexport"].Contents, "10")
 
-	pin.Export()
+	err = pin.Export()
+	if err != nil {
+		t.Error("Err during export:", err)
+	}
 	gobot.Assert(t, fs.Files["/sys/class/gpio/unexport"].Contents, "10")
 
 	pin.Write(1)
@@ -42,7 +66,7 @@ func TestDigitalPin(t *testing.T) {
 	gobot.Assert(t, 1, data)
 
 	pin2 := NewDigitalPin(30, "custom")
-	err := pin2.Write(1)
+	err = pin2.Write(1)
 	gobot.Refute(t, err, nil)
 
 	data, err = pin2.Read()
