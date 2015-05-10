@@ -55,6 +55,7 @@ func initTestEdisonAdaptor() (*EdisonAdaptor, *sysfs.MockFilesystem) {
 		"/sys/class/gpio/gpio221/direction",
 		"/sys/class/gpio/gpio243/value",
 		"/sys/class/gpio/gpio243/direction",
+		"/sys/class/gpio/gpio229/value",
 		"/sys/class/gpio/gpio229/direction",
 		"/sys/class/gpio/gpio253/value",
 		"/sys/class/gpio/gpio253/direction",
@@ -128,7 +129,8 @@ func TestEdisonAdaptorFinalize(t *testing.T) {
 func TestEdisonAdaptorDigitalIO(t *testing.T) {
 	a, fs := initTestEdisonAdaptor()
 
-	a.DigitalWrite("13", 1)
+	err := a.DigitalWrite("13", 1)
+	gobot.Assert(t, err, nil)
 	gobot.Assert(t, fs.Files["/sys/class/gpio/gpio40/value"].Contents, "1")
 
 	a.DigitalWrite("2", 0)
