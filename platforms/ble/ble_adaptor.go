@@ -21,6 +21,7 @@ type BLEAdaptor struct {
 	name      string
 	uuid      string
 	device    gatt.Device
+	peripheral 				gatt.Peripheral
 	//sp        io.ReadWriteCloser
 	connected bool
 	//connect   func(string) (io.ReadWriteCloser, error)
@@ -31,6 +32,7 @@ func NewBLEAdaptor(name string, uuid string) *BLEAdaptor {
 	return &BLEAdaptor{
 		name: name,
 		uuid: uuid,
+		connected: false,
 		// connect: func(port string) (io.ReadWriteCloser, error) {
 		// 	return serial.OpenPort(&serial.Config{Name: port, Baud: 115200})
 		// },
@@ -92,24 +94,64 @@ func (b *BLEAdaptor) Finalize() (errs []error) {
 // ReadCharacteristic returns bytes from the BLE device for the 
 // requested service and characteristic
 func (b *BLEAdaptor) ReadCharacteristic(sUUID string, cUUID string) (data []byte, err error) {
-	// TODO: get the peripheral p 
-	// TODO: get the service s that matches sUUID
-	// TODO: get characteristic c matches cUUID for service sUUID
-	// b, err := p.ReadCharacteristic(c)
-	// if err != nil {
-	// 	fmt.Printf("Failed to read characteristic, err: %s\n", err)
-	// 	return []byte{}, err
-	// }
+	defer b.peripheral.Device().CancelConnection(b.peripheral)
 
-	return nil, nil
+	if !b.connected {
+		log.Fatalf("Cannot read from BLE device until connected")
+		return
+	}
+	
+	c := make(chan []byte)
+	f := func(gatt.Peripheral, error) {
+		b.performRead(c, sUUID, cUUID)
+	}
+
+	b.device.Handle(
+		gatt.PeripheralConnected(f),
+	)
+
+	b.peripheral.Device().Connect(b.peripheral)
+
+	return <-c, nil
+}
+
+func (b *BLEAdaptor) performRead(c chan []byte, sUUID string, cUUID string) {
+	s := b.getService(sUUID)
+	characteristic := b.getCharacteristic(s, cUUID)
+
+	val, err := b.peripheral.ReadCharacteristic(characteristic)
+	if err != nil {
+		fmt.Printf("Failed to read characteristic, err: %s\n", err)
+		c <- []byte{}
+	}
+
+	c <- val
 }
 
 func (b *BLEAdaptor) getPeripheral() {
 
 }
 
-func (b *BLEAdaptor) getService() {
-	
+func (b *BLEAdaptor) getService(sUUID string) (s *gatt.Service) {
+	// TODO: get the service that matches sUUID
+	ss, err := b.peripheral.DiscoverServices(nil)
+	if err != nil {
+		fmt.Printf("Failed to discover services, err: %s\n", err)
+		return
+	}
+
+	return ss[0] // TODO: return real one
+}
+
+func (b *BLEAdaptor) getCharacteristic(s *gatt.Service, cUUID string) (c *gatt.Characteristic) {
+	// TODO: get the characteristic that matches cUUID
+	cs, err := b.peripheral.DiscoverCharacteristics(nil, s)
+	if err != nil {
+		fmt.Printf("Failed to discover characteristics, err: %s\n", err)
+		return
+	}
+
+	return cs[0] // TODO: return real one
 }
 
 func (b *BLEAdaptor) onStateChanged(d gatt.Device, s gatt.State) {
@@ -132,6 +174,7 @@ func (b *BLEAdaptor) onDiscovered(p gatt.Peripheral, a *gatt.Advertisement, rssi
 	}
 
 	b.connected = true
+	b.peripheral = p
 
 	// Stop scanning once we've got the peripheral we're looking for.
 	p.Device().StopScanning()
@@ -142,8 +185,6 @@ func (b *BLEAdaptor) onDiscovered(p gatt.Peripheral, a *gatt.Advertisement, rssi
 	fmt.Println("  Manufacturer Data =", a.ManufacturerData)
 	fmt.Println("  Service Data      =", a.ServiceData)
 	fmt.Println("")
-
-	p.Device().Connect(p)
 }
 
 func (b *BLEAdaptor) onConnected(p gatt.Peripheral, err error) {
