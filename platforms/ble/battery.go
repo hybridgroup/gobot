@@ -1,7 +1,7 @@
 package ble
 
 import (
-//	"bytes"
+	"bytes"
 
 	"github.com/hybridgroup/gobot"
 )
@@ -43,8 +43,7 @@ func (b *BLEBatteryDriver) adaptor() *BLEAdaptor {
 	return b.Connection().(*BLEAdaptor)
 }
 
-// Start creates a go routine to listen from serial port
-// and parse buffer readings
+// Start tells driver to get ready to do work
 func (b *BLEBatteryDriver) Start() (errs []error) {
 	return
 }
@@ -52,3 +51,11 @@ func (b *BLEBatteryDriver) Start() (errs []error) {
 // Halt stops battery driver (void)
 func (b *BLEBatteryDriver) Halt() (errs []error) { return }
 
+func (b *BLEBatteryDriver) GetBatteryLevel() (level uint8) {
+	var l uint8
+	c, _ := b.adaptor().ReadCharacteristic("180f", "2a19")
+	buf := bytes.NewBuffer(<-c)
+	val, _ := buf.ReadByte()
+	l = uint8(val)
+	return l
+}

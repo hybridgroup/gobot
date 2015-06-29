@@ -41,6 +41,7 @@ func NewBLEAdaptor(name string, uuid string) *BLEAdaptor {
 
 func (b *BLEAdaptor) Name() string { return b.name }
 func (b *BLEAdaptor) UUID() string { return b.uuid }
+func (b *BLEAdaptor) Peripheral() gatt.Peripheral { return b.peripheral }
 
 // Connect initiates a connection to the BLE peripheral. Returns true on successful connection.
 func (b *BLEAdaptor) Connect() (errs []error) {
@@ -55,7 +56,7 @@ func (b *BLEAdaptor) Connect() (errs []error) {
 	// Register handlers.
 	device.Handle(
 		gatt.PeripheralDiscovered(b.onDiscovered),
-		gatt.PeripheralConnected(b.onConnected),
+		//gatt.PeripheralConnected(b.onConnected),
 		gatt.PeripheralDisconnected(b.onDisconnected),
 	)
 
@@ -93,16 +94,16 @@ func (b *BLEAdaptor) Finalize() (errs []error) {
 
 // ReadCharacteristic returns bytes from the BLE device for the 
 // requested service and characteristic
-func (b *BLEAdaptor) ReadCharacteristic(sUUID string, cUUID string) (data []byte, err error) {
-	defer b.peripheral.Device().CancelConnection(b.peripheral)
-
+func (b *BLEAdaptor) ReadCharacteristic(sUUID string, cUUID string) (data chan []byte, err error) {
+	//defer b.peripheral.Device().CancelConnection(b.peripheral)
+	fmt.Println("ReadCharacteristic")
 	if !b.connected {
 		log.Fatalf("Cannot read from BLE device until connected")
 		return
 	}
 	
 	c := make(chan []byte)
-	f := func(gatt.Peripheral, error) {
+	f := func(p gatt.Peripheral, e error) {
 		b.performRead(c, sUUID, cUUID)
 	}
 
@@ -112,10 +113,12 @@ func (b *BLEAdaptor) ReadCharacteristic(sUUID string, cUUID string) (data []byte
 
 	b.peripheral.Device().Connect(b.peripheral)
 
-	return <-c, nil
+	return c, nil
 }
 
 func (b *BLEAdaptor) performRead(c chan []byte, sUUID string, cUUID string) {
+	fmt.Println("performRead")
+	fmt.Printf("%x", b.Peripheral())
 	s := b.getService(sUUID)
 	characteristic := b.getCharacteristic(s, cUUID)
 
@@ -132,26 +135,67 @@ func (b *BLEAdaptor) getPeripheral() {
 
 }
 
-func (b *BLEAdaptor) getService(sUUID string) (s *gatt.Service) {
-	// TODO: get the service that matches sUUID
-	ss, err := b.peripheral.DiscoverServices(nil)
+func (b *BLEAdaptor) getService(sUUID string) (service *gatt.Service) {
+	fmt.Println("getService")
+	ss, err := b.Peripheral().DiscoverServices(nil)
+	fmt.Println(ss)
+	fmt.Println("yo")
+	fmt.Println(err)
 	if err != nil {
 		fmt.Printf("Failed to discover services, err: %s\n", err)
 		return
 	}
 
-	return ss[0] // TODO: return real one
+	fmt.Println("service")
+
+	for _, s := range ss {
+		msg := "Service: " + s.UUID().String()
+		if len(s.Name()) > 0 {
+			msg += " (" + s.Name() + ")"
+		}
+		fmt.Println(msg)
+
+		id := strings.ToUpper(s.UUID().String())
+		if strings.ToUpper(sUUID) != id {
+			continue
+		}
+
+		msg = "Found Service: " + s.UUID().String()
+		if len(s.Name()) > 0 {
+			msg += " (" + s.Name() + ")"
+		}
+		fmt.Println(msg)
+		return s
+	}
+
+	fmt.Println("getService: none found")
+	return
 }
 
 func (b *BLEAdaptor) getCharacteristic(s *gatt.Service, cUUID string) (c *gatt.Characteristic) {
-	// TODO: get the characteristic that matches cUUID
-	cs, err := b.peripheral.DiscoverCharacteristics(nil, s)
+	fmt.Println("getCharacteristic")
+	cs, err := b.Peripheral().DiscoverCharacteristics(nil, s)
 	if err != nil {
 		fmt.Printf("Failed to discover characteristics, err: %s\n", err)
 		return
 	}
 
-	return cs[0] // TODO: return real one
+	for _, char := range cs {
+		id := strings.ToUpper(char.UUID().String())
+		if strings.ToUpper(cUUID) != id {
+			continue
+		}
+
+		msg := "  Found Characteristic  " + char.UUID().String()
+		if len(char.Name()) > 0 {
+			msg += " (" + char.Name() + ")"
+		}
+		msg += "\n    properties    " + char.Properties().String()
+		fmt.Println(msg)
+		return char
+	}
+
+	return nil
 }
 
 func (b *BLEAdaptor) onStateChanged(d gatt.Device, s gatt.State) {
@@ -167,7 +211,7 @@ func (b *BLEAdaptor) onStateChanged(d gatt.Device, s gatt.State) {
 }
 
 func (b *BLEAdaptor) onDiscovered(p gatt.Peripheral, a *gatt.Advertisement, rssi int) {
-	fmt.Println("Discovered")
+	fmt.Printf("\nPeripheral ID:%s, NAME:(%s)\n", p.ID(), p.Name())
 	id := strings.ToUpper(b.UUID())
 	if strings.ToUpper(p.ID()) != id {
 		return
