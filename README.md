@@ -1,4 +1,4 @@
-[![Gobot](https://raw.githubusercontent.com/hybridgroup/gobot-site/master/source/images/elements/gobot-logo.png)](http://gobot.io/)
+[![Gobot](https://raw.githubusercontent.com/hybridgroup/gobot-site/master/source/images/elements/gobot-logo-small.png)](http://gobot.io/)
 
 Gobot is a framework using the Go programming language (http://golang.org/) for robotics, physical computing, and the Internet of Things.
 
