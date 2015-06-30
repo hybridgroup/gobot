@@ -1,12 +1,12 @@
-[![Gobot](https://cdn.rawgit.com/hybridgroup/gobot-site/master/source/images/elements/gophy.png)](http://gobot.io/)
-
-http://gobot.io/
+[![Gobot](https://raw.githubusercontent.com/hybridgroup/gobot-site/master/source/images/elements/gobot-logo.png)](http://gobot.io/)
 
 Gobot is a framework using the Go programming language (http://golang.org/) for robotics, physical computing, and the Internet of Things.
 
 It provides a simple, yet powerful way to create solutions that incorporate multiple, different hardware devices at the same time.
 
-Want to use Ruby or Javascript on robots? Check out our sister projects Artoo (http://artoo.io) and Cylon.js (http://cylonjs.com/)
+Want to use Javascript robotics? Check out our sister project Cylon.js (http://cylonjs.com/)
+
+Want to use Ruby on robots? Check out our sister project Artoo (http://artoo.io)
 
 [![GoDoc](https://godoc.org/github.com/hybridgroup/gobot?status.svg)](https://godoc.org/github.com/hybridgroup/gobot)
 [![Build Status](https://travis-ci.org/hybridgroup/gobot.png?branch=master)](https://travis-ci.org/hybridgroup/gobot) [![Coverage Status](https://coveralls.io/repos/hybridgroup/gobot/badge.png?branch=master)](https://coveralls.io/r/hybridgroup/gobot?branch=master)
