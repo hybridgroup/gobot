@@ -1,5 +1,5 @@
 #!/bin/bash
-PACKAGES=('gobot' 'gobot/api' 'gobot/platforms/intel-iot/edison' 'gobot/sysfs' $(ls ./platforms | sed -e 's/^/gobot\/platforms\//'))
+PACKAGES=('gobot' 'gobot/api' 'gobot/platforms/firmata/client' 'gobot/platforms/intel-iot/edison' 'gobot/sysfs' $(ls ./platforms | sed -e 's/^/gobot\/platforms\//'))
 EXITCODE=0
 
 go get code.google.com/p/go.tools/cmd/cover
