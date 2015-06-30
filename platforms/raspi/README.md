@@ -14,6 +14,12 @@ First you must install the appropriate Go packages
 go get -d -u github.com/hybridgroup/gobot/... && go install github.com/hybridgroup/gobot/platforms/raspi
 ```
 
+### Enabling PWM output on GPIO pins.
+
+You need to install and have pi-blaster running in the raspberry-pi, you can follow the instructions for pi-blaster install in the pi-blaster repo here:
+
+[https://github.com/sarfata/pi-blaster](https://github.com/sarfata/pi-blaster)
+
 ### Special note for Raspian Wheezy users
 
 The go vesion installed from the default package repositories is very old and will not compile gobot. You can install go 1.4 as follows:
