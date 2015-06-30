@@ -159,7 +159,7 @@ You can also specify the api host and port, and turn on authentication:
   server.Start()
 ```
 
-You may access the [robeaux](https://github.com/hybridgroup/robeaux) AngularJS interface with Gobot by navigating to `http://localhost:3000/index.html`.
+You may access the [robeaux](https://github.com/hybridgroup/robeaux) React.js interface with Gobot by navigating to `http://localhost:3000/index.html`.
 
 ## Documentation
 We're busy adding documentation to our web site at http://gobot.io/ please check there as we continue to work on Gobot
