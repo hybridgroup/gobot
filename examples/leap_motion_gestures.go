@@ -14,8 +14,8 @@ func main() {
 	l := leap.NewLeapMotionDriver(leapMotionAdaptor, "leap")
 
 	work := func() {
-		gobot.On(l.Event("hand"), func(data interface{}) {
-			printHand(data.(leap.Hand))
+		gobot.On(l.Event("gesture"), func(data interface{}) {
+			printGesture(data.(leap.Gesture))
 		})
 	}
 
@@ -30,6 +30,6 @@ func main() {
 	gbot.Start()
 }
 
-func printHand(hand leap.Hand) {
-	fmt.Println("Hand", hand)
+func printGesture(gesture leap.Gesture) {
+	fmt.Println("Gesture", gesture)
 }
