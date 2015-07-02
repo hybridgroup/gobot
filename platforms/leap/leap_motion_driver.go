@@ -24,6 +24,8 @@ var receive = func(ws io.ReadWriteCloser, msg *[]byte) {
 //
 // Adds the following events:
 //		"message" - Gets triggered when receiving a message from leap motion
+//		"hand" - Gets triggered per-message when leap motion detects a hand
+//		"gesture" - Gets triggered per-message when leap motion detects a hand
 func NewLeapMotionDriver(a *LeapMotionAdaptor, name string) *LeapMotionDriver {
 	l := &LeapMotionDriver{
 		name:       name,
@@ -32,6 +34,8 @@ func NewLeapMotionDriver(a *LeapMotionAdaptor, name string) *LeapMotionDriver {
 	}
 
 	l.AddEvent("message")
+	l.AddEvent("hand")
+	l.AddEvent("gesture")
 	return l
 }
 func (l *LeapMotionDriver) Name() string                 { return l.name }
@@ -47,6 +51,8 @@ func (l *LeapMotionDriver) adaptor() *LeapMotionAdaptor {
 //
 // Publishes the following events:
 //		"message" - Emits Frame on new message received from Leap.
+//		"hand" - Emits Hand when detected in message from Leap.
+//		"gesture" - Emits Gesture when detected in message from Leap.
 func (l *LeapMotionDriver) Start() (errs []error) {
 	enableGestures := map[string]bool{"enableGestures": true}
 	b, err := json.Marshal(enableGestures)
@@ -60,9 +66,19 @@ func (l *LeapMotionDriver) Start() (errs []error) {
 
 	go func() {
 		var msg []byte
+		var frame Frame
 		for {
 			receive(l.adaptor().ws, &msg)
-			gobot.Publish(l.Event("message"), l.ParseFrame(msg))
+			frame = l.ParseFrame(msg)
+			gobot.Publish(l.Event("message"), frame)
+
+			for _, hand := range frame.Hands {
+				gobot.Publish(l.Event("hand"), hand)
+			}
+
+			for _, gesture := range frame.Gestures {
+				gobot.Publish(l.Event("gesture"), gesture)
+			}
 		}
 	}()
 
