@@ -48,6 +48,63 @@ func main() {
 	gbot.Start()
 }
 ```
+
+## How to Connect
+
+### Upload the Firmata Firmware to the Arduino
+
+This section assumes you're using an Arduino Uno or another compatible board, and a UNIX operating system (OS X or Linux). If you already have the Firmata sketch installed, you can skip straight to the examples.
+
+### OS X
+
+First plug the Arduino into your computer via the USB/serial port.
+A dialog box will appear telling you that a new network interface has been detected.
+Click "Network Preferences...", and when it opens, simply click "Apply".
+
+Once plugged in, use [Gort](http://gort.io)'s `gort scan serial` command to find out your connection info and serial port address:
+
+```
+$ gort scan serial
+```
+
+Use the `gort arduino install` command to install `avrdude`, this will allow you to upload firmata to the arduino:
+
+```
+$ gort arduino install
+```
+
+Once the avrdude uploader is installed we upload the firmata protocol to the arduino, use the arduino serial port address found when you ran `gort scan serial`:
+
+```
+$ gort arduino upload firmata /dev/tty.usbmodem1421
+```
+
+Now you are ready to connect and communicate with the Arduino using serial port connection
+
+### Ubuntu
+
+First plug the Arduino into your computer via the USB/serial port.
+
+Once plugged in, use [Gort](http://gort.io)'s `gort scan serial` command to find out your connection info and serial port address:
+
+```
+$ gort scan serial
+```
+
+Use the `gort arduino install` command to install `avrdude`, this will allow you to upload firmata to the arduino:
+
+```
+$ gort arduino install
+```
+
+Once the avrdude uploader is installed we upload the firmata protocol to the arduino, use the arduino serial port address found when you ran `gort scan serial`, or leave it blank to use the default address `ttyACM0`:
+
+```
+$ gort arduino upload firmata /dev/ttyACM0
+```
+
+Now you are ready to connect and communicate with the Arduino using serial port connection
+
 ## Hardware Support
 The following firmata devices have been tested and are currently supported:
 
