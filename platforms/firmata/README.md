@@ -53,7 +53,7 @@ func main() {
 
 ### Upload the Firmata Firmware to the Arduino
 
-This section assumes you're using an Arduino Uno or another compatible board, and a UNIX operating system (OS X or Linux). If you already have the Firmata sketch installed, you can skip straight to the examples.
+This section assumes you're using an Arduino Uno or another compatible board. If you already have the Firmata sketch installed, you can skip straight to the examples.
 
 ### OS X
 
@@ -104,6 +104,40 @@ $ gort arduino upload firmata /dev/ttyACM0
 ```
 
 Now you are ready to connect and communicate with the Arduino using serial port connection
+
+### Windows
+
+First download and install gort for your OS from the [gort.io](gort.io) [downloads page](http://gort.io/documentation/getting_started/downloads/) and install it.
+
+Open a command prompt window by right clicking on the start button and choose `Command Prompt (Admin)` (on windows 8.1). Then navigate to the folder where you uncompressed gort (uncomress to a folder first if you haven't done this yet).
+
+Once inside the gort folder, first install avrdude which we'll use to upload firmata to the arduino.
+
+```
+$ gort arduino install
+```
+
+When the installation is complete, close the command prompt window and open a new one. We need to do this for the env variables to reload.
+
+```
+$ gort scan serial
+```
+
+Take note of your arduinos serialport address (COM1 | COM2 | COM3| etc). You need to already have installed the arduino drivers from [arduino.cc/en/Main/Software](https://www.arduino.cc/en/Main/Software). Finally upload the firmata protocol sketch to the arduino.
+
+```
+$ gort arduino upload firmata <COMX>
+```
+
+Make sure to substitute `<COMX>` with the apropiate serialport address.
+
+Now you are ready to connect and communicate with the Arduino using serial port connection.
+
+### Using arduino IDE
+
+Open arduino IDE and go to File > Examples > Firmata > StandardFirmata and open it. Select the appriate port
+for your arduino and click upload. Wait for the upload to finish and you should be ready to start using Gobot
+with your arduino.
 
 ## Hardware Support
 The following firmata devices have been tested and are currently supported:
