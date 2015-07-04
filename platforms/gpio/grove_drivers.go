@@ -47,7 +47,7 @@ type GroveTouchDriver struct {
 	*ButtonDriver
 }
 
-func NewGroveTouchDriver(a DigitalReader, name string, pin string, v ...time.Duration) *GroveButtonDriver {
+func NewGroveTouchDriver(a DigitalReader, name string, pin string, v ...time.Duration) *GroveTouchDriver {
 	return &GroveTouchDriver{
 		ButtonDriver: NewButtonDriver(a, name, pin, v...),
 	}
