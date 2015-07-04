@@ -2,7 +2,6 @@ package edison
 
 import (
 	"errors"
-	"io"
 	"os"
 	"strconv"
 
@@ -65,7 +64,7 @@ type EdisonAdaptor struct {
 	tristate    sysfs.DigitalPin
 	digitalPins map[int]sysfs.DigitalPin
 	pwmPins     map[int]*pwmPin
-	i2cDevice   io.ReadWriteCloser
+	i2cDevice   sysfs.I2cDevice
 	connect     func(e *EdisonAdaptor) (err error)
 }
 
@@ -194,6 +193,8 @@ func changePinMode(pin, mode string) (err error) {
 func NewEdisonAdaptor(name string) *EdisonAdaptor {
 	return &EdisonAdaptor{
 		name: name,
+		//i2cDevices: make(map[int]io.ReadWriteCloser),
+		//i2cDevices: make(map[int]io.ReadWriteCloser),
 		connect: func(e *EdisonAdaptor) (err error) {
 			e.tristate = sysfs.NewDigitalPin(214)
 			if err = e.tristate.Export(); err != nil {
@@ -292,11 +293,13 @@ func (e *EdisonAdaptor) Finalize() (errs []error) {
 			}
 		}
 	}
-	if e.i2cDevice != nil {
-		if err := e.i2cDevice.Close(); errs != nil {
-			errs = append(errs, err)
-		}
+	//if e.i2cDevice != nil {
+	//for _, i2cDevice := range e.i2cDevices {
+	if err := e.i2cDevice.Close(); errs != nil {
+		errs = append(errs, err)
 	}
+	//}
+	//	}
 	return errs
 }
 
@@ -443,7 +446,11 @@ func (e *EdisonAdaptor) AnalogRead(pin string) (val int, err error) {
 }
 
 // I2cStart initializes i2c device for addresss
-func (e *EdisonAdaptor) I2cStart(address byte) (err error) {
+func (e *EdisonAdaptor) I2cStart(address int) (err error) {
+	if e.i2cDevice != nil {
+		return
+	}
+
 	if err = e.tristate.Write(sysfs.LOW); err != nil {
 		return
 	}
@@ -492,14 +499,20 @@ func (e *EdisonAdaptor) I2cStart(address byte) (err error) {
 }
 
 // I2cWrite writes data to i2c device
-func (e *EdisonAdaptor) I2cWrite(data []byte) (err error) {
+func (e *EdisonAdaptor) I2cWrite(address int, data []byte) (err error) {
+	if err = e.i2cDevice.SetAddress(address); err != nil {
+		return err
+	}
 	_, err = e.i2cDevice.Write(data)
 	return
 }
 
 // I2cRead returns size bytes from the i2c device
-func (e *EdisonAdaptor) I2cRead(size uint) (data []byte, err error) {
+func (e *EdisonAdaptor) I2cRead(address int, size int) (data []byte, err error) {
 	data = make([]byte, size)
+	if err = e.i2cDevice.SetAddress(address); err != nil {
+		return
+	}
 	_, err = e.i2cDevice.Read(data)
 	return
 }

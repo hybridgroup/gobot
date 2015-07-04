@@ -1,7 +1,6 @@
 package sysfs
 
 import (
-	"io"
 	"os"
 	"testing"
 
@@ -27,6 +26,24 @@ func TestNewI2cDevice(t *testing.T) {
 	SetSyscall(&MockSyscall{})
 
 	i, err = NewI2cDevice("/dev/i2c-1", 0xff)
+	var _ I2cDevice = i
+
 	gobot.Assert(t, err, nil)
-	var _ io.ReadWriteCloser = i
+
+	gobot.Assert(t, i.SetAddress(0xff), nil)
+
+	buf := []byte{0x01, 0x02, 0x03}
+
+	n, err := i.Write(buf)
+
+	gobot.Assert(t, n, len(buf))
+	gobot.Assert(t, err, nil)
+
+	buf = make([]byte, 4)
+
+	n, err = i.Read(buf)
+
+	gobot.Assert(t, n, 4)
+	gobot.Assert(t, err, nil)
+
 }

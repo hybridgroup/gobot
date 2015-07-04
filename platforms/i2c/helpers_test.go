@@ -21,13 +21,13 @@ type i2cTestAdaptor struct {
 	i2cStartImpl func() error
 }
 
-func (t *i2cTestAdaptor) I2cStart(byte) (err error) {
+func (t *i2cTestAdaptor) I2cStart(int) (err error) {
 	return t.i2cStartImpl()
 }
-func (t *i2cTestAdaptor) I2cRead(uint) (data []byte, err error) {
+func (t *i2cTestAdaptor) I2cRead(int, int) (data []byte, err error) {
 	return t.i2cReadImpl()
 }
-func (t *i2cTestAdaptor) I2cWrite([]byte) (err error) {
+func (t *i2cTestAdaptor) I2cWrite(int, []byte) (err error) {
 	return t.i2cWriteImpl()
 }
 func (t *i2cTestAdaptor) Name() string             { return t.name }

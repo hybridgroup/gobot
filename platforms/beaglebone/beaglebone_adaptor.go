@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -129,7 +128,7 @@ type BeagleboneAdaptor struct {
 	name        string
 	digitalPins []sysfs.DigitalPin
 	pwmPins     map[string]*pwmPin
-	i2cDevice   io.ReadWriteCloser
+	i2cDevice   sysfs.I2cDevice
 	ocp         string
 	helper      string
 	slots       string
@@ -265,19 +264,27 @@ func (b *BeagleboneAdaptor) AnalogRead(pin string) (val int, err error) {
 }
 
 // I2cStart starts a i2c device in specified address on i2c bus /dev/i2c-1
-func (b *BeagleboneAdaptor) I2cStart(address byte) (err error) {
-	b.i2cDevice, err = sysfs.NewI2cDevice("/dev/i2c-1", address)
+func (b *BeagleboneAdaptor) I2cStart(address int) (err error) {
+	if b.i2cDevice == nil {
+		b.i2cDevice, err = sysfs.NewI2cDevice("/dev/i2c-1", address)
+	}
 	return
 }
 
 // I2cWrite writes data to i2c device
-func (b *BeagleboneAdaptor) I2cWrite(data []byte) (err error) {
+func (b *BeagleboneAdaptor) I2cWrite(address int, data []byte) (err error) {
+	if err = b.i2cDevice.SetAddress(address); err != nil {
+		return
+	}
 	_, err = b.i2cDevice.Write(data)
-	return err
+	return
 }
 
 // I2cRead returns size bytes from the i2c device
-func (b *BeagleboneAdaptor) I2cRead(size uint) (data []byte, err error) {
+func (b *BeagleboneAdaptor) I2cRead(address int, size int) (data []byte, err error) {
+	if err = b.i2cDevice.SetAddress(address); err != nil {
+		return
+	}
 	data = make([]byte, size)
 	_, err = b.i2cDevice.Read(data)
 	return

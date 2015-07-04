@@ -8,6 +8,8 @@ import (
 	"time"
 )
 
+const mpl115a2Address = 0x60
+
 var _ gobot.Driver = (*MPL115A2Driver)(nil)
 
 const MPL115A2_REGISTER_PRESSURE_MSB = 0x00
@@ -69,19 +71,19 @@ func (h *MPL115A2Driver) Start() (errs []error) {
 
 	go func() {
 		for {
-			if err := h.connection.I2cWrite([]byte{MPL115A2_REGISTER_STARTCONVERSION, 0}); err != nil {
+			if err := h.connection.I2cWrite(mpl115a2Address, []byte{MPL115A2_REGISTER_STARTCONVERSION, 0}); err != nil {
 				gobot.Publish(h.Event(Error), err)
 				continue
 
 			}
 			<-time.After(5 * time.Millisecond)
 
-			if err := h.connection.I2cWrite([]byte{MPL115A2_REGISTER_PRESSURE_MSB}); err != nil {
+			if err := h.connection.I2cWrite(mpl115a2Address, []byte{MPL115A2_REGISTER_PRESSURE_MSB}); err != nil {
 				gobot.Publish(h.Event(Error), err)
 				continue
 			}
 
-			ret, err := h.connection.I2cRead(4)
+			ret, err := h.connection.I2cRead(mpl115a2Address, 4)
 			if err != nil {
 				gobot.Publish(h.Event(Error), err)
 				continue
@@ -113,13 +115,13 @@ func (h *MPL115A2Driver) initialization() (err error) {
 	var coB2 int16
 	var coC12 int16
 
-	if err = h.connection.I2cStart(0x60); err != nil {
+	if err = h.connection.I2cStart(mpl115a2Address); err != nil {
 		return
 	}
-	if err = h.connection.I2cWrite([]byte{MPL115A2_REGISTER_A0_COEFF_MSB}); err != nil {
+	if err = h.connection.I2cWrite(mpl115a2Address, []byte{MPL115A2_REGISTER_A0_COEFF_MSB}); err != nil {
 		return
 	}
-	ret, err := h.connection.I2cRead(8)
+	ret, err := h.connection.I2cRead(mpl115a2Address, 8)
 	if err != nil {
 		return
 	}

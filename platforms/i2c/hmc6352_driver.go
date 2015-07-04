@@ -4,6 +4,8 @@ import "github.com/hybridgroup/gobot"
 
 var _ gobot.Driver = (*HMC6352Driver)(nil)
 
+const hmc6352Address = 0x21
+
 type HMC6352Driver struct {
 	name       string
 	connection I2c
@@ -22,10 +24,10 @@ func (h *HMC6352Driver) Connection() gobot.Connection { return h.connection.(gob
 
 // Start initialized the hmc6352
 func (h *HMC6352Driver) Start() (errs []error) {
-	if err := h.connection.I2cStart(0x21); err != nil {
+	if err := h.connection.I2cStart(hmc6352Address); err != nil {
 		return []error{err}
 	}
-	if err := h.connection.I2cWrite([]byte("A")); err != nil {
+	if err := h.connection.I2cWrite(hmc6352Address, []byte("A")); err != nil {
 		return []error{err}
 	}
 	return
@@ -36,10 +38,10 @@ func (h *HMC6352Driver) Halt() (errs []error) { return }
 
 // Heading returns the current heading
 func (h *HMC6352Driver) Heading() (heading uint16, err error) {
-	if err = h.connection.I2cWrite([]byte("A")); err != nil {
+	if err = h.connection.I2cWrite(hmc6352Address, []byte("A")); err != nil {
 		return
 	}
-	ret, err := h.connection.I2cRead(2)
+	ret, err := h.connection.I2cRead(hmc6352Address, 2)
 	if err != nil {
 		return
 	}

@@ -8,16 +8,30 @@ import (
 	"github.com/hybridgroup/gobot/sysfs"
 )
 
-type NullReadWriteCloser struct{}
-
-func (NullReadWriteCloser) Write(p []byte) (int, error) {
-	return len(p), nil
+type NullReadWriteCloser struct {
+	contents []byte
 }
-func (NullReadWriteCloser) Read(b []byte) (int, error) {
+
+func (n *NullReadWriteCloser) SetAddress(int) error {
+	return nil
+}
+
+func (n *NullReadWriteCloser) Write(b []byte) (int, error) {
+	n.contents = make([]byte, len(b))
+	copy(n.contents[:], b[:])
+
 	return len(b), nil
 }
-func (NullReadWriteCloser) Close() error {
-	return nil
+
+func (n *NullReadWriteCloser) Read(b []byte) (int, error) {
+	copy(b, n.contents)
+	return len(b), nil
+}
+
+var closeErr error = nil
+
+func (n *NullReadWriteCloser) Close() error {
+	return closeErr
 }
 
 func initTestRaspiAdaptor() *RaspiAdaptor {
@@ -71,16 +85,22 @@ Serial          : 000000003bc748ea
 }
 func TestRaspiAdaptorFinalize(t *testing.T) {
 	a := initTestRaspiAdaptor()
+
 	fs := sysfs.NewMockFilesystem([]string{
 		"/sys/class/gpio/export",
 		"/sys/class/gpio/unexport",
 		"/dev/pi-blaster",
+		"/dev/i2c-1",
+		"/dev/i2c-0",
 	})
 
 	sysfs.SetFilesystem(fs)
+	sysfs.SetSyscall(&sysfs.MockSyscall{})
+
 	a.DigitalWrite("3", 1)
 	a.PwmWrite("7", 255)
-	a.i2cDevice = new(NullReadWriteCloser)
+
+	a.I2cStart(0xff)
 	gobot.Assert(t, len(a.Finalize()), 0)
 }
 
@@ -132,8 +152,9 @@ func TestRaspiAdaptorI2c(t *testing.T) {
 	sysfs.SetFilesystem(fs)
 	sysfs.SetSyscall(&sysfs.MockSyscall{})
 	a.I2cStart(0xff)
+	a.i2cDevice = &NullReadWriteCloser{}
 
-	a.I2cWrite([]byte{0x00, 0x01})
-	data, _ := a.I2cRead(2)
+	a.I2cWrite(0xff, []byte{0x00, 0x01})
+	data, _ := a.I2cRead(0xff, 2)
 	gobot.Assert(t, data, []byte{0x00, 0x01})
 }

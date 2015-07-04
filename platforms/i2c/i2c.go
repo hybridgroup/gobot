@@ -18,9 +18,21 @@ const (
 	Z        = "z"
 )
 
+type I2cStarter interface {
+	I2cStart(address int) (err error)
+}
+
+type I2cReader interface {
+	I2cRead(address int, len int) (data []byte, err error)
+}
+
+type I2cWriter interface {
+	I2cWrite(address int, buf []byte) (err error)
+}
+
 type I2c interface {
 	gobot.Adaptor
-	I2cStart(address byte) (err error)
-	I2cRead(len uint) (data []byte, err error)
-	I2cWrite(buf []byte) (err error)
+	I2cStarter
+	I2cReader
+	I2cWriter
 }
