@@ -11,7 +11,7 @@ First install the [Leap Motion Software](https://www.leapmotion.com/setup)
 Now you can install the package with:
 
 ```
-go get golang.org/x/net/websocket && go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/leap
+go get -d -u github.com/hybridgroup/gobot/... && go install github.com/hybridgroup/gobot/platforms/leap
 ```
 
 ## How to Use
