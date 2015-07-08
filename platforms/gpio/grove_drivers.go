@@ -11,6 +11,7 @@ var _ gobot.Driver = (*GroveSoundSensorDriver)(nil)
 var _ gobot.Driver = (*GroveButtonDriver)(nil)
 var _ gobot.Driver = (*GroveBuzzerDriver)(nil)
 var _ gobot.Driver = (*GroveLightSensorDriver)(nil)
+var _ gobot.Driver = (*GrovePiezoVibrationSensorDriver)(nil)
 var _ gobot.Driver = (*GroveLedDriver)(nil)
 var _ gobot.Driver = (*GroveRotaryDriver)(nil)
 var _ gobot.Driver = (*GroveRelayDriver)(nil)
@@ -28,6 +29,10 @@ type GroveLedDriver struct {
 }
 
 type GroveLightSensorDriver struct {
+	*AnalogSensorDriver
+}
+
+type GrovePiezoVibrationSensorDriver struct {
 	*AnalogSensorDriver
 }
 
@@ -87,6 +92,22 @@ func NewGroveLightSensorDriver(a AnalogReader, name string, pin string, v ...tim
 	return &GroveLightSensorDriver{
 		AnalogSensorDriver: NewAnalogSensorDriver(a, name, pin, v...),
 	}
+}
+
+func NewGrovePiezoVibrationSensorDriver(a AnalogReader, name string, pin string, v ...time.Duration) *GrovePiezoVibrationSensorDriver {
+	sensor := &GrovePiezoVibrationSensorDriver{
+		AnalogSensorDriver: NewAnalogSensorDriver(a, name, pin, v...),
+	}
+
+	sensor.AddEvent(Vibration)
+
+	gobot.On(sensor.Event(Data), func(data interface{}) {
+		if data.(int) == 1023 {
+			gobot.Publish(sensor.Event(Vibration), data)
+		}
+	})
+
+	return sensor
 }
 
 func NewGroveSoundSensorDriver(a AnalogReader, name string, pin string, v ...time.Duration) *GroveSoundSensorDriver {

@@ -36,6 +36,8 @@ const (
 	Error = "error"
 	// Data event
 	Data = "data"
+	// Vibration event
+	Vibration = "vibration"
 )
 
 // PwmWriter interface represents an Adaptor which has Pwm capabilities
