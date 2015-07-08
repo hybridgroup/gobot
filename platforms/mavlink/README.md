@@ -5,7 +5,7 @@ For information on the MAVlink communication protocol click [here](http://qgroun
 ## How to Install
 
 ```
-go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/mavlink
+go get -d -u github.com/hybridgroup/gobot/... && go install github.com/hybridgroup/gobot/platforms/mavlink
 
 ```
 

@@ -9,7 +9,7 @@ For more info about the arduino platform click [here](http://arduino.cc/).
 ## How to Install
 
 ```
-go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/firmata
+go get -d -u github.com/hybridgroup/gobot/... && go install github.com/hybridgroup/gobot/platforms/firmata
 ```
 
 ## How to Use

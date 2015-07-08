@@ -8,7 +8,7 @@ Learn more about the Sphero robot from Orbotix [here](http://www.gosphero.com/).
 
 ## How to Install
 ```
-go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/sphero
+go get -d -u github.com/hybridgroup/gobot/... && go install github.com/hybridgroup/gobot/platforms/sphero
 ```
 
 ## How To Connect

@@ -27,7 +27,7 @@ Follow the official [OpenCV installation guide](http://docs.opencv.org/doc/tutor
 
 Now you can install the package with
 ```
-go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/opencv
+go get -d -u github.com/hybridgroup/gobot/... && go install github.com/hybridgroup/gobot/platforms/opencv
 ```
 
 ## How to Use
