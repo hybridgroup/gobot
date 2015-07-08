@@ -23,7 +23,7 @@ $ sudo apt-get install libsdl2-2.0-0
 Now you can install the package with
 
 ```
-go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/joystick
+go get -d -u github.com/hybridgroup/gobot/... && go install github.com/hybridgroup/gobot/platforms/joystick
 ```
 
 ## How to Use

@@ -6,7 +6,7 @@ This package provides drivers for [i2c](https://en.wikipedia.org/wiki/I%C2%B2C)d
 
 ## Installing
 ```
-go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/i2c
+go get -d -u github.com/hybridgroup/gobot/... && go install github.com/hybridgroup/gobot/platforms/i2c
 ```
 
 ## Hardware Support

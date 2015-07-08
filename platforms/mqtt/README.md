@@ -9,7 +9,7 @@ For more info about the MQTT machine to machine message broker click [here](http
 Install running:
 
 ```
-go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/mqtt
+go get -d -u github.com/hybridgroup/gobot/... && go install github.com/hybridgroup/gobot/platforms/mqtt
 ```
 
 ## How to Use

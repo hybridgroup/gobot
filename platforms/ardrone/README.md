@@ -6,7 +6,7 @@ For more info about the ARDrone platform click [here](http://ardrone2.parrot.com
 
 ## How to Install
 ```
-go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/ardrone
+go get -d -u github.com/hybridgroup/gobot/... && go install github.com/hybridgroup/gobot/platforms/ardrone
 ```
 ## How to Use
 ```go

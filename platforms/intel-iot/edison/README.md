@@ -9,7 +9,7 @@ For more info about the Edison platform click [here](http://www.intel.com/conten
 First you must install the appropriate Go packages
 
 ```
-go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/intel-iot/edison
+go get -d -u github.com/hybridgroup/gobot/... && go install github.com/hybridgroup/gobot/platforms/intel-iot/edison
 ```
 
 #### Setting up your Intel Edison

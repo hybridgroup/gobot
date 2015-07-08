@@ -27,7 +27,7 @@ $ sudo apt-get install libusb-dev
 Now you can install the package with
 
 ```
-go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/digispark
+go get -d -u github.com/hybridgroup/gobot/... && go install github.com/hybridgroup/gobot/platforms/digispark
 ```
 
 ## How to Use
