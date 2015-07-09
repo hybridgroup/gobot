@@ -440,7 +440,10 @@ func (e *EdisonAdaptor) AnalogRead(pin string) (val int, err error) {
 	if err != nil {
 		return
 	}
-	return strconv.Atoi(string(buf[0 : len(buf)-1]))
+
+	val, err = strconv.Atoi(string(buf[0 : len(buf)-1]))
+
+	return val / 4, err
 }
 
 // I2cStart initializes i2c device for addresss

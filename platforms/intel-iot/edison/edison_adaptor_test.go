@@ -179,5 +179,5 @@ func TestEdisonAdaptorAnalog(t *testing.T) {
 
 	fs.Files["/sys/bus/iio/devices/iio:device1/in_voltage0_raw"].Contents = "1000\n"
 	i, _ := a.AnalogRead("0")
-	gobot.Assert(t, i, 1000)
+	gobot.Assert(t, i, 250)
 }
