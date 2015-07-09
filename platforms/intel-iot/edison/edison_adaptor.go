@@ -293,13 +293,11 @@ func (e *EdisonAdaptor) Finalize() (errs []error) {
 			}
 		}
 	}
-	//if e.i2cDevice != nil {
-	//for _, i2cDevice := range e.i2cDevices {
-	if err := e.i2cDevice.Close(); errs != nil {
-		errs = append(errs, err)
+	if e.i2cDevice != nil {
+		if err := e.i2cDevice.Close(); errs != nil {
+			errs = append(errs, err)
+		}
 	}
-	//}
-	//	}
 	return errs
 }
 
