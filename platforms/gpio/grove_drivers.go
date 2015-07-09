@@ -102,7 +102,7 @@ func NewGrovePiezoVibrationSensorDriver(a AnalogReader, name string, pin string,
 	sensor.AddEvent(Vibration)
 
 	gobot.On(sensor.Event(Data), func(data interface{}) {
-		if data.(int) == 1023 {
+		if data.(int) > 1000 {
 			gobot.Publish(sensor.Event(Vibration), data)
 		}
 	})
