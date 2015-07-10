@@ -3,7 +3,6 @@ package raspi
 import (
 	"errors"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
 	"strconv"
@@ -32,7 +31,7 @@ type RaspiAdaptor struct {
 	i2cLocation string
 	digitalPins map[int]sysfs.DigitalPin
 	pwmPins     []int
-	i2cDevice   io.ReadWriteCloser
+	i2cDevice   sysfs.I2cDevice
 }
 
 var pins = map[string]map[string]int{
@@ -252,19 +251,27 @@ func (r *RaspiAdaptor) DigitalWrite(pin string, val byte) (err error) {
 }
 
 // I2cStart starts a i2c device in specified address
-func (r *RaspiAdaptor) I2cStart(address byte) (err error) {
-	r.i2cDevice, err = sysfs.NewI2cDevice(r.i2cLocation, address)
+func (r *RaspiAdaptor) I2cStart(address int) (err error) {
+	if r.i2cDevice == nil {
+		r.i2cDevice, err = sysfs.NewI2cDevice(r.i2cLocation, address)
+	}
 	return err
 }
 
 // I2CWrite writes data to i2c device
-func (r *RaspiAdaptor) I2cWrite(data []byte) (err error) {
+func (r *RaspiAdaptor) I2cWrite(address int, data []byte) (err error) {
+	if err = r.i2cDevice.SetAddress(address); err != nil {
+		return
+	}
 	_, err = r.i2cDevice.Write(data)
 	return
 }
 
 // I2cRead returns value from i2c device using specified size
-func (r *RaspiAdaptor) I2cRead(size uint) (data []byte, err error) {
+func (r *RaspiAdaptor) I2cRead(address int, size int) (data []byte, err error) {
+	if err = r.i2cDevice.SetAddress(address); err != nil {
+		return
+	}
 	data = make([]byte, size)
 	_, err = r.i2cDevice.Read(data)
 	return

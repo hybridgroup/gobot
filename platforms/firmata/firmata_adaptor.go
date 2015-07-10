@@ -39,12 +39,11 @@ type firmataBoard interface {
 
 // FirmataAdaptor is the Gobot Adaptor for Firmata based boards
 type FirmataAdaptor struct {
-	name       string
-	port       string
-	board      firmataBoard
-	i2cAddress int
-	conn       io.ReadWriteCloser
-	openSP     func(port string) (io.ReadWriteCloser, error)
+	name   string
+	port   string
+	board  firmataBoard
+	conn   io.ReadWriteCloser
+	openSP func(port string) (io.ReadWriteCloser, error)
 }
 
 // NewFirmataAdaptor returns a new FirmataAdaptor with specified name and optionally accepts:
@@ -219,17 +218,16 @@ func (f *FirmataAdaptor) digitalPin(pin int) int {
 }
 
 // I2cStart starts an i2c device at specified address
-func (f *FirmataAdaptor) I2cStart(address byte) (err error) {
-	f.i2cAddress = int(address)
+func (f *FirmataAdaptor) I2cStart(address int) (err error) {
 	return f.board.I2cConfig(0)
 }
 
 // I2cRead returns size bytes from the i2c device
 // Returns an empty array if the response from the board has timed out
-func (f *FirmataAdaptor) I2cRead(size uint) (data []byte, err error) {
+func (f *FirmataAdaptor) I2cRead(address int, size int) (data []byte, err error) {
 	ret := make(chan []byte)
 
-	if err = f.board.I2cRead(f.i2cAddress, int(size)); err != nil {
+	if err = f.board.I2cRead(address, size); err != nil {
 		return
 	}
 
@@ -243,6 +241,6 @@ func (f *FirmataAdaptor) I2cRead(size uint) (data []byte, err error) {
 }
 
 // I2cWrite writes data to i2c device
-func (f *FirmataAdaptor) I2cWrite(data []byte) (err error) {
-	return f.board.I2cWrite(f.i2cAddress, data)
+func (f *FirmataAdaptor) I2cWrite(address int, data []byte) (err error) {
+	return f.board.I2cWrite(address, data)
 }
