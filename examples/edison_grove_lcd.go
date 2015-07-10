@@ -23,7 +23,7 @@ func main() {
 			screen.Clear()
 			screen.Home()
 			screen.SetRGB(0, 255, 0)
-			screen.Write("goodbye")
+			screen.Write("goodbye\nhave a nice day")
 		})
 
 		screen.Home()
