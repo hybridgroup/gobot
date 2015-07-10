@@ -34,6 +34,8 @@ const (
 	LCD_MOVERIGHT           = 0x04
 	LCD_MOVELEFT            = 0x00
 	LCD_2LINE               = 0x08
+
+	LCD_2NDLINEOFFSET = 0x40
 )
 
 var _ gobot.Driver = (*JHD1313M1Driver)(nil)
@@ -145,10 +147,33 @@ func (h *JHD1313M1Driver) Home() (err error) {
 
 func (h *JHD1313M1Driver) Write(message string) (err error) {
 	for _, val := range message {
+		if val == '\n' {
+			if err = h.SetPosition(16); err != nil {
+				return
+			}
+			continue
+		}
 		if err = h.connection.I2cWrite(h.lcdAddress, []byte{0x40, byte(val)}); err != nil {
 			break
 		}
 	}
+	return
+}
+
+// SetPosition sets the cursor and the data display to pos.
+// 0..15 are the positions in the first display line.
+// 16..32 are the positions in the second display line.
+func (h *JHD1313M1Driver) SetPosition(pos int) (err error) {
+	if pos < 0 || pos > 31 {
+		err = ErrInvalidPosition
+		return
+	}
+	offset := byte(pos)
+	if pos >= 16 {
+		offset -= 16
+		offset |= LCD_2NDLINEOFFSET
+	}
+	err = h.command([]byte{LCD_SETDDRAMADDR | offset})
 	return
 }
 
