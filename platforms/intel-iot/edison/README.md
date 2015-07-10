@@ -15,7 +15,7 @@ go get -d -u github.com/hybridgroup/gobot/... && go install github.com/hybridgro
 #### Setting up your Intel Edison
 
 Everything you need to get started with the Edison is in the Intel Getting Started Guide
-located [here](https://communities.intel.com/docs/DOC-23147). Don't forget to
+located [here](https://software.intel.com/en-us/iot/library/edison-getting-started). Don't forget to
 configure your Edison's wifi connection and [flash](https://communities.intel.com/docs/DOC-23192)
 your Edison with the latest firmware image!
 
