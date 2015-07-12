@@ -8,10 +8,10 @@ For more info about the Leap Motion platform click [Leap Motion](https://www.lea
 
 First install the [Leap Motion Software](https://www.leapmotion.com/setup)
 
-Now you can install the package with
+Now you can install the package with:
 
 ```
-go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/leap
+go get -d -u github.com/hybridgroup/gobot/... && go install github.com/hybridgroup/gobot/platforms/leap
 ```
 
 ## How to Use
@@ -52,7 +52,7 @@ func main() {
 
 ## How To Connect
 
-###OSX
+### OSX
 
 This driver works out of the box with the vanilla installation of the Leap Motion Software that you get in their [Setup Guide](https://www.leapmotion.com/setup).
 

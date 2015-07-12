@@ -1,12 +1,12 @@
-[![Gobot](https://cdn.rawgit.com/hybridgroup/gobot-site/master/source/images/elements/gophy.png)](http://gobot.io/)
+[![Gobot](https://raw.githubusercontent.com/hybridgroup/gobot-site/master/source/images/elements/gobot-logo-small.png)](http://gobot.io/)
 
-http://gobot.io/
-
-Gobot is a framework using the Go programming language (http://golang.org/) for robotics, physical computing, and the Internet of Things.
+Gobot (http://gobot.io/) is a framework using the Go programming language (http://golang.org/) for robotics, physical computing, and the Internet of Things.
 
 It provides a simple, yet powerful way to create solutions that incorporate multiple, different hardware devices at the same time.
 
-Want to use Ruby or Javascript on robots? Check out our sister projects Artoo (http://artoo.io) and Cylon.js (http://cylonjs.com/)
+Want to use Javascript robotics? Check out our sister project Cylon.js (http://cylonjs.com/)
+
+Want to use Ruby on robots? Check out our sister project Artoo (http://artoo.io)
 
 [![GoDoc](https://godoc.org/github.com/hybridgroup/gobot?status.svg)](https://godoc.org/github.com/hybridgroup/gobot)
 [![Build Status](https://travis-ci.org/hybridgroup/gobot.png?branch=master)](https://travis-ci.org/hybridgroup/gobot) [![Coverage Status](https://coveralls.io/repos/hybridgroup/gobot/badge.png?branch=master)](https://coveralls.io/r/hybridgroup/gobot?branch=master)
@@ -159,7 +159,7 @@ You can also specify the api host and port, and turn on authentication:
   server.Start()
 ```
 
-You may access the [robeaux](https://github.com/hybridgroup/robeaux) AngularJS interface with Gobot by navigating to `http://localhost:3000/index.html`.
+You may access the [robeaux](https://github.com/hybridgroup/robeaux) React.js interface with Gobot by navigating to `http://localhost:3000/index.html`.
 
 ## Documentation
 We're busy adding documentation to our web site at http://gobot.io/ please check there as we continue to work on Gobot
@@ -173,20 +173,9 @@ Thank you!
 * twitter: [@gobotio](https://twitter.com/gobotio)
 
 ## Contributing
-* All active development is in the `dev` branch. New or updated features must be added to the `dev` branch. Hotfixes will be considered on the `master` branch in situations where it does not alter behaviour or features, only fixes a bug.
-* All patches must be provided under the Apache 2.0 License
-* Please use the -s option in git to "sign off" that the commit is your work and you are providing it under the Apache 2.0 License
-* Submit a Github Pull Request to the appropriate branch and ideally discuss the changes with us in IRC.
-* We will look at the patch, test it out, and give you feedback.
-* Avoid doing minor whitespace changes, renamings, etc. along with merged content. These will be done by the maintainers from time to time but they can complicate merges and should be done seperately.
-* Take care to maintain the existing coding style.
-* `golint` and `go fmt` your code.
-* Add unit tests for any new or changed functionality.
-* All pull requests should be "fast forward"
-  * If there are commits after yours use “git rebase -i <new_head_branch>”
-  * If you have local changes you may need to use “git stash”
-  * For git help see [progit](http://git-scm.com/book) which is an awesome (and free) book on git
-
+For our contribution guidelines, please go to [https://github.com/hybridgroup/gobot/blob/master/CONTRIBUTING.md
+](https://github.com/hybridgroup/gobot/blob/master/CONTRIBUTING.md
+).
 
 ## License
 Copyright (c) 2013-2015 The Hybrid Group. Licensed under the Apache 2.0 license.

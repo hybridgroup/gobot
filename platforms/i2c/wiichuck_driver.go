@@ -8,6 +8,8 @@ import (
 
 var _ gobot.Driver = (*WiichuckDriver)(nil)
 
+const wiichuckAddress = 0x52
+
 type WiichuckDriver struct {
 	name       string
 	connection I2c
@@ -56,21 +58,21 @@ func (w *WiichuckDriver) Connection() gobot.Connection { return w.connection.(go
 // Start initilizes i2c and reads from adaptor
 // using specified interval to update with new value
 func (w *WiichuckDriver) Start() (errs []error) {
-	if err := w.connection.I2cStart(0x52); err != nil {
+	if err := w.connection.I2cStart(wiichuckAddress); err != nil {
 		return []error{err}
 	}
 
 	go func() {
 		for {
-			if err := w.connection.I2cWrite([]byte{0x40, 0x00}); err != nil {
+			if err := w.connection.I2cWrite(wiichuckAddress, []byte{0x40, 0x00}); err != nil {
 				gobot.Publish(w.Event(Error), err)
 				continue
 			}
-			if err := w.connection.I2cWrite([]byte{0x00}); err != nil {
+			if err := w.connection.I2cWrite(wiichuckAddress, []byte{0x00}); err != nil {
 				gobot.Publish(w.Event(Error), err)
 				continue
 			}
-			newValue, err := w.connection.I2cRead(6)
+			newValue, err := w.connection.I2cRead(wiichuckAddress, 6)
 			if err != nil {
 				gobot.Publish(w.Event(Error), err)
 				continue

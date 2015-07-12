@@ -6,7 +6,7 @@ This package provides drivers for [General Purpose Input/Output (GPIO)](https://
 
 ## Installing
 ```
-go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/gpio
+go get -d -u github.com/hybridgroup/gobot/... && go install github.com/hybridgroup/gobot/platforms/gpio
 ```
 
 ## Hardware Support

@@ -1,13 +1,12 @@
 package firmata
 
 import (
-	"errors"
-	"fmt"
 	"io"
 	"strconv"
 	"time"
 
 	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/platforms/firmata/client"
 	"github.com/hybridgroup/gobot/platforms/gpio"
 	"github.com/hybridgroup/gobot/platforms/i2c"
 	"github.com/tarm/goserial"
@@ -23,14 +22,28 @@ var _ gpio.ServoWriter = (*FirmataAdaptor)(nil)
 
 var _ i2c.I2c = (*FirmataAdaptor)(nil)
 
+type firmataBoard interface {
+	Connect(io.ReadWriteCloser) error
+	Disconnect() error
+	Pins() []client.Pin
+	AnalogWrite(int, int) error
+	SetPinMode(int, int) error
+	ReportAnalog(int, int) error
+	ReportDigital(int, int) error
+	DigitalWrite(int, int) error
+	I2cRead(int, int) error
+	I2cWrite(int, []byte) error
+	I2cConfig(int) error
+	Event(string) *gobot.Event
+}
+
 // FirmataAdaptor is the Gobot Adaptor for Firmata based boards
 type FirmataAdaptor struct {
-	name       string
-	port       string
-	board      *board
-	i2cAddress byte
-	conn       io.ReadWriteCloser
-	connect    func(string) (io.ReadWriteCloser, error)
+	name   string
+	port   string
+	board  firmataBoard
+	conn   io.ReadWriteCloser
+	openSP func(port string) (io.ReadWriteCloser, error)
 }
 
 // NewFirmataAdaptor returns a new FirmataAdaptor with specified name and optionally accepts:
@@ -44,10 +57,11 @@ type FirmataAdaptor struct {
 // string port as a label to be displayed in the log and api.
 func NewFirmataAdaptor(name string, args ...interface{}) *FirmataAdaptor {
 	f := &FirmataAdaptor{
-		name: name,
-		port: "",
-		conn: nil,
-		connect: func(port string) (io.ReadWriteCloser, error) {
+		name:  name,
+		port:  "",
+		conn:  nil,
+		board: client.New(),
+		openSP: func(port string) (io.ReadWriteCloser, error) {
 			return serial.OpenPort(&serial.Config{Name: port, Baud: 57600})
 		},
 	}
@@ -67,23 +81,24 @@ func NewFirmataAdaptor(name string, args ...interface{}) *FirmataAdaptor {
 // Connect starts a connection to the board.
 func (f *FirmataAdaptor) Connect() (errs []error) {
 	if f.conn == nil {
-		sp, err := f.connect(f.Port())
+		sp, err := f.openSP(f.Port())
 		if err != nil {
 			return []error{err}
 		}
 		f.conn = sp
 	}
-	f.board = newBoard(f.conn)
-	f.board.connect()
+	if err := f.board.Connect(f.conn); err != nil {
+		return []error{err}
+	}
 	return
 }
 
 // Disconnect closes the io connection to the board
 func (f *FirmataAdaptor) Disconnect() (err error) {
 	if f.board != nil {
-		return f.board.serial.Close()
+		return f.board.Disconnect()
 	}
-	return errors.New("no board connected")
+	return nil
 }
 
 // Finalize terminates the firmata connection
@@ -107,11 +122,13 @@ func (f *FirmataAdaptor) ServoWrite(pin string, angle byte) (err error) {
 		return err
 	}
 
-	err = f.board.setPinMode(byte(p), servo)
-	if err != nil {
-		return err
+	if f.board.Pins()[p].Mode != client.Servo {
+		err = f.board.SetPinMode(p, client.Servo)
+		if err != nil {
+			return err
+		}
 	}
-	err = f.board.analogWrite(byte(p), angle)
+	err = f.board.AnalogWrite(p, int(angle))
 	return
 }
 
@@ -122,11 +139,13 @@ func (f *FirmataAdaptor) PwmWrite(pin string, level byte) (err error) {
 		return err
 	}
 
-	err = f.board.setPinMode(byte(p), pwm)
-	if err != nil {
-		return err
+	if f.board.Pins()[p].Mode != client.Pwm {
+		err = f.board.SetPinMode(p, client.Pwm)
+		if err != nil {
+			return err
+		}
 	}
-	err = f.board.analogWrite(byte(p), level)
+	err = f.board.AnalogWrite(p, int(level))
 	return
 }
 
@@ -137,80 +156,60 @@ func (f *FirmataAdaptor) DigitalWrite(pin string, level byte) (err error) {
 		return
 	}
 
-	err = f.board.setPinMode(byte(p), output)
-	if err != nil {
-		return
+	if f.board.Pins()[p].Mode != client.Output {
+		err = f.board.SetPinMode(p, client.Output)
+		if err != nil {
+			return
+		}
 	}
 
-	err = f.board.digitalWrite(byte(p), level)
+	err = f.board.DigitalWrite(p, int(level))
 	return
 }
 
 // DigitalRead retrieves digital value from specified pin.
 // Returns -1 if the response from the board has timed out
 func (f *FirmataAdaptor) DigitalRead(pin string) (val int, err error) {
-	ret := make(chan int)
-
 	p, err := strconv.Atoi(pin)
 	if err != nil {
 		return
 	}
-	if err = f.board.setPinMode(byte(p), input); err != nil {
-		return
-	}
-	if err = f.board.togglePinReporting(byte(p), high, reportDigital); err != nil {
-		return
-	}
-	if err = f.board.readAndProcess(); err != nil {
-		return
+
+	if f.board.Pins()[p].Mode != client.Input {
+		if err = f.board.SetPinMode(p, client.Input); err != nil {
+			return
+		}
+		if err = f.board.ReportDigital(p, 1); err != nil {
+			return
+		}
+		<-time.After(10 * time.Millisecond)
 	}
 
-	gobot.Once(f.board.events[fmt.Sprintf("digital_read_%v", pin)], func(data interface{}) {
-		ret <- int(data.([]byte)[0])
-	})
-
-	select {
-	case data := <-ret:
-		return data, nil
-	case <-time.After(10 * time.Millisecond):
-	}
-	return -1, nil
+	return f.board.Pins()[p].Value, nil
 }
 
 // AnalogRead retrieves value from analog pin.
 // Returns -1 if the response from the board has timed out
 func (f *FirmataAdaptor) AnalogRead(pin string) (val int, err error) {
-	ret := make(chan int)
-
 	p, err := strconv.Atoi(pin)
 	if err != nil {
 		return
 	}
-	// NOTE pins are numbered A0-A5, which translate to digital pins 14-19
+
 	p = f.digitalPin(p)
-	if err = f.board.setPinMode(byte(p), analog); err != nil {
-		return
+
+	if f.board.Pins()[p].Mode != client.Analog {
+		if err = f.board.SetPinMode(p, client.Analog); err != nil {
+			return
+		}
+
+		if err = f.board.ReportAnalog(p, 1); err != nil {
+			return
+		}
+		<-time.After(10 * time.Millisecond)
 	}
 
-	if err = f.board.togglePinReporting(byte(p), high, reportAnalog); err != nil {
-		return
-	}
-
-	if err = f.board.readAndProcess(); err != nil {
-		return
-	}
-
-	gobot.Once(f.board.events[fmt.Sprintf("analog_read_%v", pin)], func(data interface{}) {
-		b := data.([]byte)
-		ret <- int(uint(b[0])<<24 | uint(b[1])<<16 | uint(b[2])<<8 | uint(b[3]))
-	})
-
-	select {
-	case data := <-ret:
-		return data, nil
-	case <-time.After(10 * time.Millisecond):
-	}
-	return -1, nil
+	return f.board.Pins()[p].Value, nil
 }
 
 // digitalPin converts pin number to digital mapping
@@ -219,36 +218,29 @@ func (f *FirmataAdaptor) digitalPin(pin int) int {
 }
 
 // I2cStart starts an i2c device at specified address
-func (f *FirmataAdaptor) I2cStart(address byte) (err error) {
-	f.i2cAddress = address
-	return f.board.i2cConfig([]byte{0})
+func (f *FirmataAdaptor) I2cStart(address int) (err error) {
+	return f.board.I2cConfig(0)
 }
 
 // I2cRead returns size bytes from the i2c device
 // Returns an empty array if the response from the board has timed out
-func (f *FirmataAdaptor) I2cRead(size uint) (data []byte, err error) {
+func (f *FirmataAdaptor) I2cRead(address int, size int) (data []byte, err error) {
 	ret := make(chan []byte)
-	if err = f.board.i2cReadRequest(f.i2cAddress, size); err != nil {
+
+	if err = f.board.I2cRead(address, size); err != nil {
 		return
 	}
 
-	if err = f.board.readAndProcess(); err != nil {
-		return
-	}
-
-	gobot.Once(f.board.events["i2c_reply"], func(data interface{}) {
-		ret <- data.(map[string][]byte)["data"]
+	gobot.Once(f.board.Event("I2cReply"), func(data interface{}) {
+		ret <- data.(client.I2cReply).Data
 	})
 
-	select {
-	case data := <-ret:
-		return data, nil
-	case <-time.After(10 * time.Millisecond):
-	}
-	return []byte{}, nil
+	data = <-ret
+
+	return
 }
 
 // I2cWrite writes data to i2c device
-func (f *FirmataAdaptor) I2cWrite(data []byte) (err error) {
-	return f.board.i2cWriteRequest(f.i2cAddress, data)
+func (f *FirmataAdaptor) I2cWrite(address int, data []byte) (err error) {
+	return f.board.I2cWrite(address, data)
 }

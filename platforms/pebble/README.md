@@ -7,7 +7,7 @@ It uses the Pebble 2.0 SDK, and requires the 2.0 iOS or Android app, and that th
 ## How to Install
 
 ```
-go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/pebble
+go get -d -u github.com/hybridgroup/gobot/... && go install github.com/hybridgroup/gobot/platforms/pebble
 ```
 
 * Install Pebble 2.0 iOS or Android app. (If you haven't already)

@@ -9,6 +9,32 @@ import (
 	"github.com/hybridgroup/gobot/sysfs"
 )
 
+type NullReadWriteCloser struct {
+	contents []byte
+}
+
+func (n *NullReadWriteCloser) SetAddress(int) error {
+	return nil
+}
+
+func (n *NullReadWriteCloser) Write(b []byte) (int, error) {
+	n.contents = make([]byte, len(b))
+	copy(n.contents[:], b[:])
+
+	return len(b), nil
+}
+
+func (n *NullReadWriteCloser) Read(b []byte) (int, error) {
+	copy(b, n.contents)
+	return len(b), nil
+}
+
+var closeErr error = nil
+
+func (n *NullReadWriteCloser) Close() error {
+	return closeErr
+}
+
 func TestBeagleboneAdaptor(t *testing.T) {
 	glob = func(pattern string) (matches []string, err error) {
 		return make([]string, 2), nil
@@ -101,8 +127,10 @@ func TestBeagleboneAdaptor(t *testing.T) {
 	sysfs.SetSyscall(&sysfs.MockSyscall{})
 	a.I2cStart(0xff)
 
-	a.I2cWrite([]byte{0x00, 0x01})
-	data, _ := a.I2cRead(2)
+	a.i2cDevice = &NullReadWriteCloser{}
+
+	a.I2cWrite(0xff, []byte{0x00, 0x01})
+	data, _ := a.I2cRead(0xff, 2)
 	gobot.Assert(t, data, []byte{0x00, 0x01})
 
 	gobot.Assert(t, len(a.Finalize()), 0)

@@ -1,3 +1,14 @@
+0.8.2
+---
+  - firmata
+    - Refactor firmata adaptor and split firmata protocol implementation into sub `client` package
+  - gpio
+    - Add support for LIDAR-Lite
+  - raspi
+    - Add PWM support via pi-blaster
+  - sphero
+    - Add `ConfigureLocator`, `ReadLocator` and `SetRotationRate`  
+
 0.8.1
 ---
   - spark

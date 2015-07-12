@@ -10,6 +10,8 @@ import (
 
 var _ gobot.Driver = (*MPU6050Driver)(nil)
 
+const mpu6050Address = 0x68
+
 const MPU6050_RA_ACCEL_XOUT_H = 0x3B
 const MPU6050_RA_PWR_MGMT_1 = 0x6B
 const MPU6050_PWR1_CLKSEL_BIT = 2
@@ -70,12 +72,12 @@ func (h *MPU6050Driver) Start() (errs []error) {
 
 	go func() {
 		for {
-			if err := h.connection.I2cWrite([]byte{MPU6050_RA_ACCEL_XOUT_H}); err != nil {
+			if err := h.connection.I2cWrite(mpu6050Address, []byte{MPU6050_RA_ACCEL_XOUT_H}); err != nil {
 				gobot.Publish(h.Event(Error), err)
 				continue
 			}
 
-			ret, err := h.connection.I2cRead(14)
+			ret, err := h.connection.I2cRead(mpu6050Address, 14)
 			if err != nil {
 				gobot.Publish(h.Event(Error), err)
 				continue
@@ -94,12 +96,12 @@ func (h *MPU6050Driver) Start() (errs []error) {
 func (h *MPU6050Driver) Halt() (errs []error) { return }
 
 func (h *MPU6050Driver) initialize() (err error) {
-	if err = h.connection.I2cStart(0x68); err != nil {
+	if err = h.connection.I2cStart(mpu6050Address); err != nil {
 		return
 	}
 
 	// setClockSource
-	if err = h.connection.I2cWrite([]byte{MPU6050_RA_PWR_MGMT_1,
+	if err = h.connection.I2cWrite(mpu6050Address, []byte{MPU6050_RA_PWR_MGMT_1,
 		MPU6050_PWR1_CLKSEL_BIT,
 		MPU6050_PWR1_CLKSEL_LENGTH,
 		MPU6050_CLOCK_PLL_XGYRO}); err != nil {
@@ -107,7 +109,7 @@ func (h *MPU6050Driver) initialize() (err error) {
 	}
 
 	// setFullScaleGyroRange
-	if err = h.connection.I2cWrite([]byte{MPU6050_GYRO_FS_250,
+	if err = h.connection.I2cWrite(mpu6050Address, []byte{MPU6050_GYRO_FS_250,
 		MPU6050_RA_GYRO_CONFIG,
 		MPU6050_GCONFIG_FS_SEL_LENGTH,
 		MPU6050_GCONFIG_FS_SEL_BIT}); err != nil {
@@ -115,7 +117,7 @@ func (h *MPU6050Driver) initialize() (err error) {
 	}
 
 	// setFullScaleAccelRange
-	if err = h.connection.I2cWrite([]byte{MPU6050_RA_ACCEL_CONFIG,
+	if err = h.connection.I2cWrite(mpu6050Address, []byte{MPU6050_RA_ACCEL_CONFIG,
 		MPU6050_ACONFIG_AFS_SEL_BIT,
 		MPU6050_ACONFIG_AFS_SEL_LENGTH,
 		MPU6050_ACCEL_FS_2}); err != nil {
@@ -123,7 +125,7 @@ func (h *MPU6050Driver) initialize() (err error) {
 	}
 
 	// setSleepEnabled
-	if err = h.connection.I2cWrite([]byte{MPU6050_RA_PWR_MGMT_1,
+	if err = h.connection.I2cWrite(mpu6050Address, []byte{MPU6050_RA_PWR_MGMT_1,
 		MPU6050_PWR1_SLEEP_BIT,
 		0}); err != nil {
 		return
