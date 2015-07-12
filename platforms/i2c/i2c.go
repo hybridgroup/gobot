@@ -7,9 +7,10 @@ import (
 )
 
 var (
-	ErrEncryptedBytes = errors.New("Encrypted bytes")
-	ErrNotEnoughBytes = errors.New("Not enough bytes read")
-	ErrNotReady       = errors.New("Device is not ready")
+	ErrEncryptedBytes  = errors.New("Encrypted bytes")
+	ErrNotEnoughBytes  = errors.New("Not enough bytes read")
+	ErrNotReady        = errors.New("Device is not ready")
+	ErrInvalidPosition = errors.New("Invalid position value")
 )
 
 const (

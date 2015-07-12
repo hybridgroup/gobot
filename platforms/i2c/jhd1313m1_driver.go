@@ -36,6 +36,8 @@ const (
 	LCD_2LINE               = 0x08
 	LCD_CMD                 = 0x80
 	LCD_DATA                = 0x40
+
+	LCD_2NDLINEOFFSET = 0x40
 )
 
 var _ gobot.Driver = (*JHD1313M1Driver)(nil)
@@ -148,16 +150,36 @@ func (h *JHD1313M1Driver) Write(message string) error {
 	// This wait fixes an odd bug where the clear function doesn't always work properly.
 	<-time.After(1 * time.Millisecond)
 	for _, val := range message {
-		if err := h.connection.I2cWrite(h.lcdAddress, []byte{LCD_DATA, byte(val)}); err != nil {
-			return err
+		if val == '\n' {
+			if err := h.SetPosition(16); err != nil {
+				return err
+			}
+		}
+		if err = h.connection.I2cWrite(h.lcdAddress, []byte{LCD_DATA, byte(val)}); err != nil {
+			break
 		}
 	}
 	return nil
 }
 
-// Scroll scrolls the dispay to the right or the left based on the passed
-// param.
-func (h *JHD1313M1Driver) Scroll(leftToRight bool) error {
+// SetPosition sets the cursor and the data display to pos.
+// 0..15 are the positions in the first display line.
+// 16..32 are the positions in the second display line.
+func (h *JHD1313M1Driver) SetPosition(pos int) (err error) {
+	if pos < 0 || pos > 31 {
+		err = ErrInvalidPosition
+		return
+	}
+	offset := byte(pos)
+	if pos >= 16 {
+		offset -= 16
+		offset |= LCD_2NDLINEOFFSET
+	}
+	err = h.command([]byte{LCD_SETDDRAMADDR | offset})
+	return
+}
+
+func (h *JHD1313M1Driver) Halt() (errs []error) { return }
 
 	if leftToRight {
 		return h.connection.I2cWrite(h.rgbAddress, []byte{LCD_CMD, LCD_CURSORSHIFT | LCD_DISPLAYMOVE | LCD_MOVELEFT})
