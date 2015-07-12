@@ -38,6 +38,10 @@ const (
 
 var _ gobot.Driver = (*JHD1313M1Driver)(nil)
 
+// JHD1313M1Driver is a driver for the Jhd1313m1 LCD display which has two i2c addreses,
+// one belongs to a controller and the other controls solely the backlight.
+// This module was tested with the Seed Grove LCD RGB Backlight v2.0 display which requires 5V to operate.
+// http://www.seeedstudio.com/wiki/Grove_-_LCD_RGB_Backlight
 type JHD1313M1Driver struct {
 	name       string
 	connection I2c
@@ -45,7 +49,7 @@ type JHD1313M1Driver struct {
 	rgbAddress int
 }
 
-// NewJHD1313M1Driver creates a new driver with specified name and i2c interface
+// NewJHD1313M1Driver creates a new driver with specified name and i2c interface.
 func NewJHD1313M1Driver(a I2c, name string) *JHD1313M1Driver {
 	return &JHD1313M1Driver{
 		name:       name,
@@ -55,10 +59,16 @@ func NewJHD1313M1Driver(a I2c, name string) *JHD1313M1Driver {
 	}
 }
 
-func (h *JHD1313M1Driver) Name() string                 { return h.name }
-func (h *JHD1313M1Driver) Connection() gobot.Connection { return h.connection.(gobot.Connection) }
+// Name returns the name the JHD1313M1 Driver was given when created.
+func (h *JHD1313M1Driver) Name() string { return h.name }
 
-func (h *JHD1313M1Driver) Start() (errs []error) {
+// Connection returns the driver connection to the device.
+func (h *JHD1313M1Driver) Connection() gobot.Connection {
+	return h.connection.(gobot.Connection)
+}
+
+// Start starts the backlit and the screen and initializes the states.
+func (h *JHD1313M1Driver) Start() []error {
 	cmd := uint8(0)
 	if err := h.connection.I2cStart(h.lcdAddress); err != nil {
 		return []error{err}
@@ -115,45 +125,54 @@ func (h *JHD1313M1Driver) Start() (errs []error) {
 		return []error{err}
 	}
 
-	return
+	return nil
 }
 
-func (h *JHD1313M1Driver) SetRGB(r, g, b int) (err error) {
-	if err = h.setReg(REG_RED, r); err != nil {
-		return
+// SetRGB sets the Red Green Blue value of backlit.
+func (h *JHD1313M1Driver) SetRGB(r, g, b int) error {
+	if err := h.setReg(REG_RED, r); err != nil {
+		return err
 	}
-	if err = h.setReg(REG_GREEN, g); err != nil {
-		return
+	if err := h.setReg(REG_GREEN, g); err != nil {
+		return err
 	}
 	return h.setReg(REG_BLUE, b)
 }
 
-func (h *JHD1313M1Driver) setReg(command int, data int) (err error) {
-	if err = h.connection.I2cWrite(h.rgbAddress, []byte{byte(command), byte(data)}); err != nil {
-		return
-	}
-	return
+// Clear clears the text on the lCD display.
+func (h *JHD1313M1Driver) Clear() error {
+	err := h.command([]byte{LCD_CLEARDISPLAY})
+	<-time.After(2 * time.Millisecond)
+	return err
 }
 
-func (h *JHD1313M1Driver) Clear() (err error) {
-	return h.command([]byte{LCD_CLEARDISPLAY})
+// Home sets the cursor to the origin position on the display.
+func (h *JHD1313M1Driver) Home() error {
+	err := h.command([]byte{LCD_RETURNHOME})
+	<-time.After(2 * time.Millisecond)
+	return err
 }
 
-func (h *JHD1313M1Driver) Home() (err error) {
-	return h.command([]byte{LCD_RETURNHOME})
-}
-
-func (h *JHD1313M1Driver) Write(message string) (err error) {
+// Write displays the passed message on the screen.
+func (h *JHD1313M1Driver) Write(message string) error {
 	for _, val := range message {
-		if err = h.connection.I2cWrite(h.lcdAddress, []byte{0x40, byte(val)}); err != nil {
-			break
+		if err := h.connection.I2cWrite(h.lcdAddress, []byte{0x40, byte(val)}); err != nil {
+			return err
 		}
 	}
-	return
+	return nil
 }
 
-func (h *JHD1313M1Driver) Halt() (errs []error) { return }
+// Halt is a noop function.
+func (h *JHD1313M1Driver) Halt() []error { return nil }
 
-func (h *JHD1313M1Driver) command(buf []byte) (err error) {
+func (h *JHD1313M1Driver) setReg(command int, data int) error {
+	if err := h.connection.I2cWrite(h.rgbAddress, []byte{byte(command), byte(data)}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (h *JHD1313M1Driver) command(buf []byte) error {
 	return h.connection.I2cWrite(h.lcdAddress, append([]byte{0x80}, buf...))
 }
