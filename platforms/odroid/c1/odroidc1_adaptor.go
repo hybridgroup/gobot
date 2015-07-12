@@ -14,19 +14,11 @@ import (
 	"github.com/hybridgroup/gobot/sysfs"
 )
 
-const pwmBase string = "/sys/devices/platform/pwm-ctrl"
-const analogBase string = "/sys/class/saradc"
-const i2cBase string = "/sys/bus/i2c"
-
-var _ gobot.Adaptor = (*ODroidC1Adaptor)(nil)
-
-var _ gpio.DigitalReader = (*ODroidC1Adaptor)(nil)
-var _ gpio.DigitalWriter = (*ODroidC1Adaptor)(nil)
-var _ gpio.AnalogReader = (*ODroidC1Adaptor)(nil)
-var _ gpio.PwmWriter = (*ODroidC1Adaptor)(nil)
-var _ gpio.ServoWriter = (*ODroidC1Adaptor)(nil)
-
-var _ i2c.I2c = (*ODroidC1Adaptor)(nil)
+const (
+	pwmBase    string = "/sys/devices/platform/pwm-ctrl"
+	analogBase string = "/sys/class/saradc"
+	i2cBase    string = "/sys/bus/i2c"
+)
 
 type ODroidC1Adaptor struct {
 	name        string
@@ -37,10 +29,10 @@ type ODroidC1Adaptor struct {
 }
 
 var pins = map[string]int{
-	"3": 74,
-	"5": 75,
-	"7": 83,
-	"8": 113,
+	"3":  74,
+	"5":  75,
+	"7":  83,
+	"8":  113,
 	"10": 114,
 	"11": 88,
 	"12": 87,
@@ -62,7 +54,7 @@ var pins = map[string]int{
 	"36": 98,
 }
 
-var pwmPins = map[string]map[int]int{ 
+var pwmPins = map[string]map[int]int{
 	"19": map[int]int{
 		107: 1,
 	},
@@ -86,6 +78,19 @@ func NewODroidC1Adaptor(name string) *ODroidC1Adaptor {
 	}
 
 	return o
+}
+
+// Configure the gobot dependencies
+func init() {
+	gobot.Adaptor = (*ODroidC1Adaptor)(nil)
+
+	gpio.DigitalReader = (*ODroidC1Adaptor)(nil)
+	gpio.DigitalWriter = (*ODroidC1Adaptor)(nil)
+	gpio.AnalogReader = (*ODroidC1Adaptor)(nil)
+	gpio.PwmWriter = (*ODroidC1Adaptor)(nil)
+	gpio.ServoWriter = (*ODroidC1Adaptor)(nil)
+
+	i2c.I2c = (*ODroidC1Adaptor)(nil)
 }
 
 func (o *ODroidC1Adaptor) Name() string { return o.name }
@@ -189,9 +194,9 @@ func (o *ODroidC1Adaptor) translatePwmPin(pin string) (gpioNum int, pwmNum int, 
 		err = errors.New("Not a valid pwm pin")
 		return
 	}
-	
+
 	return pwm[0], pwm[1], nil
-	
+
 }
 
 // pwmPin retrieves pwm pin value by name

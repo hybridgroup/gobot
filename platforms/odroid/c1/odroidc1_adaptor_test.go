@@ -37,7 +37,7 @@ func TestODroidC1AdaptorFinalize(t *testing.T) {
 	fs := sysfs.NewMockFilesystem([]string{
 		"/sys/class/gpio/export",
 		"/sys/class/gpio/unexport",
-		
+
 		"/sys/class/gpio/gpio74/value",
 		"/sys/class/gpio/gpio74/direction",
 	})
@@ -50,7 +50,7 @@ func TestODroidC1AdaptorFinalize(t *testing.T) {
 
 func TestODroidC1AdaptorDigitalIO(t *testing.T) {
 	a := initTestODroidC1Adaptor()
-	fs := sysfs.NewMockFilesystem([]string{		
+	fs := sysfs.NewMockFilesystem([]string{
 		"/sys/class/gpio/export",
 		"/sys/class/gpio/unexport",
 		"/sys/class/gpio/gpio83/value",
@@ -118,7 +118,7 @@ func TestODroidC1AdaptorAnalog(t *testing.T) {
 	fs.Files["/sys/class/saradc/saradc_ch0"].Contents = "567\n"
 	i, _ := a.AnalogRead("40")
 	gobot.Assert(t, i, 567)
-	
+
 	fs.Files["/sys/class/saradc/saradc_ch1"].Contents = "123\n"
 	i, _ = a.AnalogRead("37")
 	gobot.Assert(t, i, 123)
