@@ -154,9 +154,10 @@ func (h *JHD1313M1Driver) Write(message string) error {
 			if err := h.SetPosition(16); err != nil {
 				return err
 			}
+			continue
 		}
-		if err = h.connection.I2cWrite(h.lcdAddress, []byte{LCD_DATA, byte(val)}); err != nil {
-			break
+		if err := h.connection.I2cWrite(h.lcdAddress, []byte{LCD_DATA, byte(val)}); err != nil {
+			return err
 		}
 	}
 	return nil
@@ -179,8 +180,7 @@ func (h *JHD1313M1Driver) SetPosition(pos int) (err error) {
 	return
 }
 
-func (h *JHD1313M1Driver) Halt() (errs []error) { return }
-
+func (h *JHD1313M1Driver) Scroll(leftToRight bool) error {
 	if leftToRight {
 		return h.connection.I2cWrite(h.rgbAddress, []byte{LCD_CMD, LCD_CURSORSHIFT | LCD_DISPLAYMOVE | LCD_MOVELEFT})
 	}
