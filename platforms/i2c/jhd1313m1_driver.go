@@ -35,6 +35,7 @@ const (
 	LCD_MOVELEFT            = 0x00
 	LCD_2LINE               = 0x08
 	LCD_CMD                 = 0x80
+	LCD_DATA                = 0x40
 )
 
 var _ gobot.Driver = (*JHD1313M1Driver)(nil)
@@ -131,25 +132,38 @@ func (h *JHD1313M1Driver) SetRGB(r, g, b int) error {
 // Clear clears the text on the lCD display.
 func (h *JHD1313M1Driver) Clear() error {
 	err := h.command([]byte{LCD_CLEARDISPLAY})
-	<-time.After(2 * time.Millisecond)
 	return err
 }
 
 // Home sets the cursor to the origin position on the display.
 func (h *JHD1313M1Driver) Home() error {
 	err := h.command([]byte{LCD_RETURNHOME})
+	// This wait fixes a race condition when calling home and clear back to back.
 	<-time.After(2 * time.Millisecond)
 	return err
 }
 
 // Write displays the passed message on the screen.
 func (h *JHD1313M1Driver) Write(message string) error {
+	// This wait fixes an odd bug where the clear function doesn't always work properly.
+	<-time.After(1 * time.Millisecond)
 	for _, val := range message {
-		if err := h.connection.I2cWrite(h.lcdAddress, []byte{0x40, byte(val)}); err != nil {
+		if err := h.connection.I2cWrite(h.lcdAddress, []byte{LCD_DATA, byte(val)}); err != nil {
 			return err
 		}
 	}
 	return nil
+}
+
+// Scroll scrolls the dispay to the right or the left based on the passed
+// param.
+func (h *JHD1313M1Driver) Scroll(leftToRight bool) error {
+
+	if leftToRight {
+		return h.connection.I2cWrite(h.rgbAddress, []byte{LCD_CMD, LCD_CURSORSHIFT | LCD_DISPLAYMOVE | LCD_MOVELEFT})
+	}
+
+	return h.connection.I2cWrite(h.rgbAddress, []byte{LCD_CMD, LCD_CURSORSHIFT | LCD_DISPLAYMOVE | LCD_MOVERIGHT})
 }
 
 // Halt is a noop function.
@@ -163,5 +177,5 @@ func (h *JHD1313M1Driver) setReg(command int, data int) error {
 }
 
 func (h *JHD1313M1Driver) command(buf []byte) error {
-	return h.connection.I2cWrite(h.lcdAddress, append([]byte{0x80}, buf...))
+	return h.connection.I2cWrite(h.lcdAddress, append([]byte{LCD_CMD}, buf...))
 }
