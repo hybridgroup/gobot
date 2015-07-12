@@ -34,6 +34,7 @@ const (
 	LCD_MOVERIGHT           = 0x04
 	LCD_MOVELEFT            = 0x00
 	LCD_2LINE               = 0x08
+	LCD_CMD                 = 0x80
 )
 
 var _ gobot.Driver = (*JHD1313M1Driver)(nil)
@@ -69,7 +70,6 @@ func (h *JHD1313M1Driver) Connection() gobot.Connection {
 
 // Start starts the backlit and the screen and initializes the states.
 func (h *JHD1313M1Driver) Start() []error {
-	cmd := uint8(0)
 	if err := h.connection.I2cStart(h.lcdAddress); err != nil {
 		return []error{err}
 	}
@@ -78,40 +78,29 @@ func (h *JHD1313M1Driver) Start() []error {
 		return []error{err}
 	}
 
-	cmd |= LCD_2LINE
-
-	<-time.After(30 * time.Millisecond)
-
-	if err := h.connection.I2cWrite(h.lcdAddress, []byte{0x80, LCD_FUNCTIONSET | cmd}); err != nil {
-		return []error{err}
+	<-time.After(50000 * time.Microsecond)
+	payload := []byte{LCD_CMD, LCD_FUNCTIONSET | LCD_2LINE}
+	if err := h.connection.I2cWrite(h.lcdAddress, payload); err != nil {
+		if err := h.connection.I2cWrite(h.lcdAddress, payload); err != nil {
+			return []error{err}
+		}
 	}
-	<-time.After(40 * time.Nanosecond)
 
-	if err := h.connection.I2cWrite(h.lcdAddress, []byte{0x80, LCD_FUNCTIONSET | cmd}); err != nil {
-		return []error{err}
-	}
-	<-time.After(150 * time.Microsecond)
-	if err := h.connection.I2cWrite(h.lcdAddress, []byte{0x80, LCD_FUNCTIONSET | cmd}); err != nil {
-		return []error{err}
-	}
-	if err := h.connection.I2cWrite(h.lcdAddress, []byte{0x80, LCD_FUNCTIONSET | cmd}); err != nil {
-		return []error{err}
-	}
-	cmd |= LCD_DISPLAYON
-
-	if err := h.connection.I2cWrite(h.lcdAddress, []byte{0x80, LCD_DISPLAYCONTROL | cmd}); err != nil {
+	<-time.After(100 * time.Microsecond)
+	if err := h.connection.I2cWrite(h.lcdAddress, []byte{LCD_CMD, LCD_DISPLAYCONTROL | LCD_DISPLAYON}); err != nil {
 		return []error{err}
 	}
 
-	h.Clear()
-
-	cmd |= LCD_ENTRYLEFT | LCD_ENTRYSHIFTDECREMENT
-
-	if err := h.connection.I2cWrite(h.lcdAddress, []byte{0x80, LCD_ENTRYMODESET | cmd}); err != nil {
+	<-time.After(100 * time.Microsecond)
+	if err := h.Clear(); err != nil {
 		return []error{err}
 	}
 
-	if err := h.setReg(0, 1); err != nil {
+	if err := h.connection.I2cWrite(h.lcdAddress, []byte{LCD_CMD, LCD_ENTRYMODESET | LCD_ENTRYLEFT | LCD_ENTRYSHIFTDECREMENT}); err != nil {
+		return []error{err}
+	}
+
+	if err := h.setReg(0, 0); err != nil {
 		return []error{err}
 	}
 	if err := h.setReg(1, 0); err != nil {
