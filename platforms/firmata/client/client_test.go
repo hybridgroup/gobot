@@ -190,27 +190,29 @@ func TestProcess(t *testing.T) {
 func TestConnect(t *testing.T) {
 	b := New()
 
-	testReadData = testProtocolResponse()
+	response := testProtocolResponse()
+
+	go func() {
+		for {
+			testReadData = append(testReadData, response...)
+			<-time.After(100 * time.Millisecond)
+		}
+	}()
 
 	gobot.Once(b.Event("ProtocolVersion"), func(data interface{}) {
-		<-time.After(1 * time.Millisecond)
-		testReadData = testFirmwareResponse()
+		response = testFirmwareResponse()
 	})
 
 	gobot.Once(b.Event("FirmwareQuery"), func(data interface{}) {
-		<-time.After(1 * time.Millisecond)
-		testReadData = testCapabilitiesResponse()
+		response = testCapabilitiesResponse()
 	})
 
 	gobot.Once(b.Event("CapabilityQuery"), func(data interface{}) {
-		<-time.After(1 * time.Millisecond)
-		testReadData = testAnalogMappingResponse()
+		response = testAnalogMappingResponse()
 	})
 
 	gobot.Once(b.Event("AnalogMappingQuery"), func(data interface{}) {
-
-		<-time.After(1 * time.Millisecond)
-		testReadData = testProtocolResponse()
+		response = testProtocolResponse()
 	})
 
 	gobot.Assert(t, b.Connect(readWriteCloser{}), nil)
