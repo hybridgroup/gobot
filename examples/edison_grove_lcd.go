@@ -24,6 +24,9 @@ func main() {
 			screen.Home()
 			screen.SetRGB(0, 255, 0)
 			screen.Write("goodbye\nhave a nice day")
+			gobot.Every(500*time.Millisecond, func() {
+				screen.Scroll(false)
+			})
 		})
 
 		screen.Home()

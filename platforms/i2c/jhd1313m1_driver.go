@@ -182,10 +182,10 @@ func (h *JHD1313M1Driver) SetPosition(pos int) (err error) {
 
 func (h *JHD1313M1Driver) Scroll(leftToRight bool) error {
 	if leftToRight {
-		return h.connection.I2cWrite(h.rgbAddress, []byte{LCD_CMD, LCD_CURSORSHIFT | LCD_DISPLAYMOVE | LCD_MOVELEFT})
+		return h.connection.I2cWrite(h.lcdAddress, []byte{LCD_CMD, LCD_CURSORSHIFT | LCD_DISPLAYMOVE | LCD_MOVELEFT})
 	}
 
-	return h.connection.I2cWrite(h.rgbAddress, []byte{LCD_CMD, LCD_CURSORSHIFT | LCD_DISPLAYMOVE | LCD_MOVERIGHT})
+	return h.connection.I2cWrite(h.lcdAddress, []byte{LCD_CMD, LCD_CURSORSHIFT | LCD_DISPLAYMOVE | LCD_MOVERIGHT})
 }
 
 // Halt is a noop function.
