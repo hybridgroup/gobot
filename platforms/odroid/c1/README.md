@@ -32,7 +32,7 @@ $ GOARM=7 GOARCH=arm GOOS=linux go build examples/odroidc1_blink.go
 Then you can simply upload your program over the network from your host computer to the ODroid
 
 ```bash
-$ scp odroidc1_blink pi@192.168.1.xxx:/home/odroid/
+$ scp odroidc1_blink odroid@192.168.1.xxx:/home/odroid/
 ```
 
 and execute it on your ODroidC1 with

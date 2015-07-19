@@ -3,7 +3,6 @@ package c1
 import (
 	"errors"
 	"fmt"
-	"io"
 	"os"
 	"strconv"
 	"strings"
@@ -25,8 +24,18 @@ type ODroidC1Adaptor struct {
 	i2cLocation string
 	digitalPins map[int]sysfs.DigitalPin
 	pwmPins     map[int]*pwmPin
-	i2cDevice   io.ReadWriteCloser
+	i2cDevice   sysfs.I2cDevice
 }
+
+var _ gobot.Adaptor = (*ODroidC1Adaptor)(nil)
+
+var _ gpio.DigitalReader = (*ODroidC1Adaptor)(nil)
+var _ gpio.DigitalWriter = (*ODroidC1Adaptor)(nil)
+var _ gpio.AnalogReader = (*ODroidC1Adaptor)(nil)
+var _ gpio.PwmWriter = (*ODroidC1Adaptor)(nil)
+var _ gpio.ServoWriter = (*ODroidC1Adaptor)(nil)
+
+var _ i2c.I2c = (*ODroidC1Adaptor)(nil)
 
 var pins = map[string]int{
 	"3":  74,
@@ -78,19 +87,6 @@ func NewODroidC1Adaptor(name string) *ODroidC1Adaptor {
 	}
 
 	return o
-}
-
-// Configure the gobot dependencies
-func init() {
-	gobot.Adaptor = (*ODroidC1Adaptor)(nil)
-
-	gpio.DigitalReader = (*ODroidC1Adaptor)(nil)
-	gpio.DigitalWriter = (*ODroidC1Adaptor)(nil)
-	gpio.AnalogReader = (*ODroidC1Adaptor)(nil)
-	gpio.PwmWriter = (*ODroidC1Adaptor)(nil)
-	gpio.ServoWriter = (*ODroidC1Adaptor)(nil)
-
-	i2c.I2c = (*ODroidC1Adaptor)(nil)
 }
 
 func (o *ODroidC1Adaptor) Name() string { return o.name }
@@ -169,19 +165,27 @@ func (o *ODroidC1Adaptor) DigitalWrite(pin string, val byte) (err error) {
 }
 
 // I2cStart starts a i2c device in specified address
-func (o *ODroidC1Adaptor) I2cStart(address byte) (err error) {
-	o.i2cDevice, err = sysfs.NewI2cDevice(o.i2cLocation, address)
+func (o *ODroidC1Adaptor) I2cStart(address int) (err error) {
+	if o.i2cDevice == nil {
+		o.i2cDevice, err = sysfs.NewI2cDevice(o.i2cLocation, address)
+	}
 	return err
 }
 
 // I2CWrite writes data to i2c device
-func (o *ODroidC1Adaptor) I2cWrite(data []byte) (err error) {
+func (o *ODroidC1Adaptor) I2cWrite(address int, data []byte) (err error) {
+	if err = o.i2cDevice.SetAddress(address); err != nil {
+		return
+	}
 	_, err = o.i2cDevice.Write(data)
 	return
 }
 
 // I2cRead returns value from i2c device using specified size
-func (o *ODroidC1Adaptor) I2cRead(size uint) (data []byte, err error) {
+func (o *ODroidC1Adaptor) I2cRead(address int, size int) (data []byte, err error) {
+	if err = o.i2cDevice.SetAddress(address); err != nil {
+		return
+	}
 	data = make([]byte, size)
 	_, err = o.i2cDevice.Read(data)
 	return
