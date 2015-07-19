@@ -84,24 +84,24 @@ func TestODroidC1AdaptorPWM(t *testing.T) {
 	gobot.Assert(
 		t,
 		fs.Files["/sys/devices/platform/pwm-ctrl/freq0"].Contents,
-		"500000",
+		"100000",
 	)
 	gobot.Assert(
 		t,
 		fs.Files["/sys/devices/platform/pwm-ctrl/duty0"].Contents,
-		"343137",
+		"702",
 	)
 
 	a.ServoWrite("33", 100)
 	gobot.Assert(
 		t,
 		fs.Files["/sys/devices/platform/pwm-ctrl/freq0"].Contents,
-		"16666666",
+		"100000",
 	)
 	gobot.Assert(
 		t,
 		fs.Files["/sys/devices/platform/pwm-ctrl/duty0"].Contents,
-		"1898148",
+		"401",
 	)
 }
 

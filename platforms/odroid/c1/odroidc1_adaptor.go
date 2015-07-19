@@ -3,6 +3,7 @@ package c1
 import (
 	"errors"
 	"fmt"
+	//"log"
 	"os"
 	"strconv"
 	"strings"
@@ -63,12 +64,15 @@ var pins = map[string]int{
 	"36": 98,
 }
 
-var pwmPins = map[string]map[int]int{
-	"19": map[int]int{
-		107: 1,
+// pwm 0 (pin 33) is enabled by default.  pwm 1 (19) can be enabled, but will disable spi as it shares a port
+var pwmPins = map[string]map[string]int{
+	"33": map[string]int{
+		"gpioNum": 108,
+		"pwmNum": 0,
 	},
-	"33": map[int]int{
-		108: 0,
+	"19": map[string]int{
+		"gpioNum": 107,
+		"pwmNum": 1,
 	},
 }
 
@@ -193,47 +197,68 @@ func (o *ODroidC1Adaptor) I2cRead(address int, size int) (data []byte, err error
 
 // translatePwmPin converts pwm pin name to pin position
 func (o *ODroidC1Adaptor) translatePwmPin(pin string) (gpioNum int, pwmNum int, err error) {
+	//log.Printf("[translatePwmPin] pin: %s", pin)
 	pwm := pwmPins[pin]
 	if pwm == nil {
 		err = errors.New("Not a valid pwm pin")
 		return
 	}
 
-	return pwm[0], pwm[1], nil
+	//log.Printf("   pwm: %s", pwm)
+	return pwm["gpioNum"], pwm["pwmNum"], nil
 
 }
 
 // pwmPin retrieves pwm pin value by name
 func (o *ODroidC1Adaptor) pwmPin(pin string) (gpioNum int, pwmNum int, err error) {
-	gpioNum, pwmNum, err = o.translatePwmPin(pin)
+	//log.Printf("[pwmPin] pin: %s", pin)
+	
+	gpioNum, pwmNum, err = o.translatePwmPin(pin)	
 	if err != nil {
+		//log.Printf("   err: %s", err)
 		return
 	}
+	//log.Printf("   translated pin: %s to gpioNum: %v, pwmNum: %v", pin, gpioNum, pwmNum)
 
 	if o.pwmPins[gpioNum] == nil {
+		//log.Printf("   creating new pwmPin for gpioNum: %v", gpioNum)
 		o.pwmPins[gpioNum], err = newPwmPin(pin, gpioNum, pwmNum, pwmBase)
 		if err != nil {
+			//log.Printf("   err: %s", err)
 			return
 		}
 	}
 	return
 }
 
-// pwmWrite writes pwm value to specified pin
-func (o *ODroidC1Adaptor) pwmWrite(pin string, val byte) (err error) {
-	gpioNum, _, err := o.pwmPin(pin)
-	if err != nil {
-		return
-	}
-	freq := 500000.0
-	duty := gobot.FromScale(float64(val), 0, 255.0)
-	return o.pwmPins[gpioNum].pwmWrite(strconv.Itoa(int(freq)), strconv.Itoa(int(freq*duty)))
-}
 
-// PwmWrite writes the 0-254 value to the specified pin
+
+// PwmWrite writes the 0-255 value to the specified pin
 func (o *ODroidC1Adaptor) PwmWrite(pin string, val byte) (err error) {
 	return o.pwmWrite(pin, val)
 }
+
+// pwmWrite writes pwm value to specified pin
+func (o *ODroidC1Adaptor) pwmWrite(pin string, val byte) (err error) {
+	//log.Printf("[pwmWrite] pin: %s, val: %v", pin, val)
+	
+	gpioNum, _, err := o.pwmPin(pin)
+	//log.Printf("[pwmWrite]   gpioNum: %s", strconv.Itoa(gpioNum));
+	
+	if err != nil {
+		//log.Printf("[pwmWrite]   err: %s", err);
+		return
+	}
+	freq := 100000.0
+	duty := int( (1023.0 / 255.0) * float64(val))
+	//log.Printf("[pwmWrite]   duty: %v", duty);
+	return o.pwmPins[gpioNum].pwmWrite(strconv.Itoa(int(freq)), strconv.Itoa(duty))
+}
+
+// PwmWrite writes the 0-254 value to the specified pin
+//func (o *ODroidC1Adaptor) PwmWrite(pin string, val byte) (err error) {
+//	return o.pwmWrite(pin, val)
+//}
 
 // ServoWrite writes the 0-180 degree val to the specified pin.
 func (o *ODroidC1Adaptor) ServoWrite(pin string, val byte) (err error) {
