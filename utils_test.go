@@ -66,12 +66,20 @@ func TestAfter(t *testing.T) {
 }
 
 func TestPublish(t *testing.T) {
-	e := &Event{Chan: make(chan interface{}, 1)}
+	c := make(chan interface{}, 1)
+
+	cb := callback{
+		f: func(val interface{}) {
+			c <- val
+		},
+	}
+
+	e := &Event{Callbacks: []callback{cb}}
 	Publish(e, 1)
 	Publish(e, 2)
 	Publish(e, 3)
 	Publish(e, 4)
-	i := <-e.Chan
+	i := <-c
 	Assert(t, i, 1)
 
 	var e1 = (*Event)(nil)
