@@ -54,24 +54,31 @@ func TestLIDARLiteDriverHalt(t *testing.T) {
 }
 
 func TestLIDARLiteDriverDistance(t *testing.T) {
-	// when len(data) is 2
+	// when everything is happy
 	hmc, adaptor := initTestLIDARLiteDriverWithStubbedAdaptor()
 
+	first := true
 	adaptor.i2cReadImpl = func() ([]byte, error) {
-		return []byte{99, 1}, nil
-	}
-
-	distance, _ := hmc.Distance()
-	gobot.Assert(t, distance, int(25345))
-
-	// when len(data) is not 2
-	hmc, adaptor = initTestLIDARLiteDriverWithStubbedAdaptor()
-
-	adaptor.i2cReadImpl = func() ([]byte, error) {
-		return []byte{99}, nil
+		if first {
+			first = false
+			return []byte{99}, nil
+		}
+		return []byte{1}, nil
 	}
 
 	distance, err := hmc.Distance()
+
+	gobot.Assert(t, err, nil)
+	gobot.Assert(t, distance, int(25345))
+
+	// when insufficient bytes have been read
+	hmc, adaptor = initTestLIDARLiteDriverWithStubbedAdaptor()
+
+	adaptor.i2cReadImpl = func() ([]byte, error) {
+		return []byte{}, nil
+	}
+
+	distance, err = hmc.Distance()
 	gobot.Assert(t, distance, int(0))
 	gobot.Assert(t, err, ErrNotEnoughBytes)
 
