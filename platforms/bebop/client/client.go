@@ -545,6 +545,48 @@ func (b *Bebop) packetReceiver(buf []byte) {
 	}
 }
 
+func (b *Bebop) StartRecording() error {
+	buf := b.videoRecord(ARCOMMANDS_ARDRONE3_MEDIARECORD_VIDEO_RECORD_START)
+
+	b.write(b.networkFrameGenerator(buf, ARNETWORKAL_FRAME_TYPE_DATA, BD_NET_CD_NONACK_ID).Bytes())
+	return nil
+}
+
+func (b *Bebop) StopRecording() error {
+	buf := b.videoRecord(ARCOMMANDS_ARDRONE3_MEDIARECORD_VIDEO_RECORD_STOP)
+
+	b.write(b.networkFrameGenerator(buf, ARNETWORKAL_FRAME_TYPE_DATA, BD_NET_CD_NONACK_ID).Bytes())
+	return nil
+}
+
+func (b *Bebop) videoRecord(state byte) *bytes.Buffer {
+	//
+	// ARCOMMANDS_Generator_GenerateARDrone3MediaRecordVideo
+	//
+
+	cmd := &bytes.Buffer{}
+
+	cmd.WriteByte(ARCOMMANDS_ID_PROJECT_ARDRONE3)
+	cmd.WriteByte(ARCOMMANDS_ID_ARDRONE3_CLASS_MEDIARECORD)
+
+	tmp := &bytes.Buffer{}
+	binary.Write(tmp,
+		binary.LittleEndian,
+		uint16(ARCOMMANDS_ID_ARDRONE3_MEDIARECORD_CMD_VIDEO),
+	)
+
+	cmd.Write(tmp.Bytes())
+
+	tmp = &bytes.Buffer{}
+	binary.Write(tmp, binary.LittleEndian, uint32(state))
+
+	cmd.Write(tmp.Bytes())
+
+	cmd.WriteByte(0)
+
+	return cmd
+}
+
 func (b *Bebop) Video() chan []byte {
 	return b.video
 }

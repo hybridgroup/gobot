@@ -22,6 +22,8 @@ type drone interface {
 	Stop() error
 	Connect() error
 	Video() chan []byte
+	StartRecording() error
+	StopRecording() error
 }
 
 // BebopAdaptor is gobot.Adaptor representation for the Bebop

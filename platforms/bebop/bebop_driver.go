@@ -113,3 +113,13 @@ func (a *BebopDriver) Stop() {
 func (a *BebopDriver) Video() chan []byte {
 	return a.adaptor().drone.Video()
 }
+
+// StartRecording starts the recording video to the drones interal storage
+func (a *BebopDriver) StartRecording() error {
+	return a.adaptor().drone.StartRecording()
+}
+
+// StopRecording stops a previously started recording
+func (a *BebopDriver) StopRecording() error {
+	return a.adaptor().drone.StopRecording()
+}
