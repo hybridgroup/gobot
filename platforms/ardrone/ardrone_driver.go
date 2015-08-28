@@ -90,7 +90,7 @@ func (a *ArdroneDriver) Forward(speed float64) {
 	a.adaptor().drone.Forward(speed)
 }
 
-// Backward causes the drone go forward, controls the pitch.
+// Backward causes the drone go backward, controls the pitch.
 // speed can be a value from `0.0` to `1.0`.
 func (a *ArdroneDriver) Backward(speed float64) {
 	a.adaptor().drone.Backward(speed)
