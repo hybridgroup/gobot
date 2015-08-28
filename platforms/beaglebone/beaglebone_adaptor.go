@@ -119,8 +119,8 @@ var analogPins = map[string]string{
 	"P9_37": "AIN2",
 	"P9_38": "AIN3",
 	"P9_33": "AIN4",
-	"P8_36": "AIN5",
-	"P8_35": "AIN6",
+	"P9_36": "AIN5",
+	"P9_35": "AIN6",
 }
 
 // BeagleboneAdaptor is the gobot.Adaptor representation for the Beaglebone
