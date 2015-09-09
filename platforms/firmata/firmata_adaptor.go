@@ -1,6 +1,7 @@
 package firmata
 
 import (
+	"fmt"
 	"io"
 	"strconv"
 	"time"
@@ -25,6 +26,7 @@ var _ i2c.I2c = (*FirmataAdaptor)(nil)
 type firmataBoard interface {
 	Connect(io.ReadWriteCloser) error
 	Disconnect() error
+	Reset() error
 	Pins() []client.Pin
 	AnalogWrite(int, int) error
 	SetPinMode(int, int) error
@@ -99,6 +101,12 @@ func (f *FirmataAdaptor) Disconnect() (err error) {
 		return f.board.Disconnect()
 	}
 	return nil
+}
+
+// Reset board firmware
+func (f *FirmataAdaptor) Reset() (err error) {
+	fmt.Println("Send rest")
+	return f.board.Reset()
 }
 
 // Finalize terminates the firmata connection
