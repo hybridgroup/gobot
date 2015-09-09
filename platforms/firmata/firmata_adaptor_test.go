@@ -57,6 +57,7 @@ func (mockFirmataBoard) Connect(io.ReadWriteCloser) error { return nil }
 func (m mockFirmataBoard) Disconnect() error {
 	return m.disconnectError
 }
+func (mockFirmataBoard) Reset() error { return nil }
 func (m mockFirmataBoard) Pins() []client.Pin {
 	return m.pins
 }
@@ -114,6 +115,11 @@ func TestFirmataAdaptorConnect(t *testing.T) {
 	a.board = newMockFirmataBoard()
 	gobot.Assert(t, len(a.Connect()), 0)
 
+}
+
+func TestFirmataAdaptorReset(t *testing.T) {
+	a := initTestFirmataAdaptor()
+	a.Reset()
 }
 
 func TestFirmataAdaptorServoWrite(t *testing.T) {
