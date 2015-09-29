@@ -39,6 +39,45 @@ Descriptions for each of these will eventually be provided below.
   * If you have local changes you may need to use “git stash”
   * For git help see [progit](http://git-scm.com/book) which is an awesome (and free) book on git
 
+## Creating Pull Requests
+Because Gobot makes use of self-referencing import paths, you will want
+to implement the local copy of your fork as a remote on your copy of the
+original Gobot repo. Katrina Owen has [an excellent post on this workflow](https://splice.com/blog/contributing-open-source-git-repositories-go/).
+
+The basics are as follows:
+
+1. Fork the project via the GitHub UI
+
+2. `go get` the upstream repo and set it up as the `upstream` remote and your own repo as the `origin` remote:
+
+`go get github.com/hybridgroup/gobot`
+`cd $GOPATH/src/github.com/hybridgroup/gobot`
+`git remote rename origin upstream`
+`git remote add origin git@github.com/YOUR_GITHUB_NAME/gobot`
+
+All import paths should now work fine assuming that you've got the
+proper branch checked out.
+
+
+## Landing Pull Requests
+(This is for committers only. If you are unsure whether you are a committer, you are not.)
+
+1. Set the contributor's fork as an upstream on your checkout
+
+`git remote add contrib1 https://github.com/contrib1/gobot`
+
+2. Fetch the contributor's repo
+
+`git fetch contrib1`
+
+3. Checkout a copy of the PR branch
+
+`git checkout pr-1234 --track contrib1/branch-for-pr-1234`
+
+4. Review the PR as normal
+
+5. Land when you're ready via the GitHub UI
+
 ## Developer's Certificate of Origin 1.0
 
 By making a contribution to this project, I certify that:
