@@ -100,19 +100,22 @@ func TestSparkCoreAdaptorAnalogRead(t *testing.T) {
 	testServer := getDummyResponseForPathWithParams("/"+a.DeviceID+"/analogread", params, response, t)
 
 	a.setAPIServer(testServer.URL)
+	defer testServer.Close()
 
 	val, _ := a.AnalogRead("A1")
 	gobot.Assert(t, val, 5)
+}
 
-	testServer.Close()
-
+func TestSparkCoreAdaptorAnalogReadError(t *testing.T) {
+	a := initTestSparkCoreAdaptor()
 	// When error
-	testServer = createTestServer(func(w http.ResponseWriter, r *http.Request) {
+	testServer := createTestServer(func(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 	})
 	defer testServer.Close()
+	a.setAPIServer(testServer.URL)
 
-	val, _ = a.AnalogRead("A1")
+	val, _ := a.AnalogRead("A1")
 	gobot.Assert(t, val, 0)
 }
 
@@ -182,19 +185,23 @@ func TestSparkCoreAdaptorDigitalRead(t *testing.T) {
 	testServer = getDummyResponseForPathWithParams("/"+a.DeviceID+"/digitalread", params, response, t)
 
 	a.setAPIServer(testServer.URL)
+	defer testServer.Close()
 
 	val, _ = a.DigitalRead("D7")
 	gobot.Assert(t, val, 0)
+}
 
-	testServer.Close()
-
+func TestSparkCoreAdaptorDigitalReadError(t *testing.T) {
+	a := initTestSparkCoreAdaptor()
 	// When error
-	testServer = createTestServer(func(w http.ResponseWriter, r *http.Request) {
+	testServer := createTestServer(func(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 	})
 	defer testServer.Close()
 
-	val, _ = a.DigitalRead("D7")
+	a.setAPIServer(testServer.URL)
+
+	val, _ := a.DigitalRead("D7")
 	gobot.Assert(t, val, -1)
 }
 
