@@ -67,7 +67,7 @@ func main() {
 
 	go func() {
 		for {
-			if _, err := ffmpegIn.Write(<-bebop.Video); err != nil {
+			if _, err := ffmpegIn.Write(<-bebop.Video()); err != nil {
 				fmt.Println(err)
 			}
 		}
