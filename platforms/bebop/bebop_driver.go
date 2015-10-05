@@ -20,6 +20,7 @@ func NewBebopDriver(connection *BebopAdaptor, name string) *BebopDriver {
 		connection: connection,
 		Eventer:    gobot.NewEventer(),
 	}
+	d.AddEvent("flying")
 	return d
 }
 
@@ -46,7 +47,7 @@ func (a *BebopDriver) Halt() (errs []error) {
 
 // TakeOff makes the drone start flying
 func (a *BebopDriver) TakeOff() {
-	a.adaptor().drone.TakeOff()
+	gobot.Publish(a.Event("flying"), a.adaptor().drone.TakeOff())
 }
 
 // Land causes the drone to land
@@ -122,4 +123,9 @@ func (a *BebopDriver) StartRecording() error {
 // StopRecording stops a previously started recording
 func (a *BebopDriver) StopRecording() error {
 	return a.adaptor().drone.StopRecording()
+}
+
+// HullProtection tells the drone if the hull/prop protectors are attached. This is needed to adjust flight characteristics of the Bebop.
+func (a *BebopDriver) HullProtection(protect bool) error {
+	return a.adaptor().drone.HullProtection(protect)
 }

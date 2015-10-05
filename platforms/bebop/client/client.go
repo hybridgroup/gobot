@@ -591,6 +591,58 @@ func (b *Bebop) Video() chan []byte {
 	return b.video
 }
 
+func (b *Bebop) HullProtection(protect bool) error {
+	//
+	// ARCOMMANDS_Generator_GenerateARDrone3SpeedSettingsHullProtection
+	//
+
+	cmd := &bytes.Buffer{}
+
+	cmd.WriteByte(ARCOMMANDS_ID_PROJECT_ARDRONE3)
+	cmd.WriteByte(ARCOMMANDS_ID_ARDRONE3_CLASS_SPEEDSETTINGS)
+
+	tmp := &bytes.Buffer{}
+	binary.Write(tmp,
+		binary.LittleEndian,
+		uint16(ARCOMMANDS_ID_ARDRONE3_SPEEDSETTINGS_CMD_HULLPROTECTION),
+	)
+
+	cmd.Write(tmp.Bytes())
+
+	tmp = &bytes.Buffer{}
+	binary.Write(tmp, binary.LittleEndian, bool(protect))
+	cmd.Write(tmp.Bytes())
+
+	_, err := b.write(b.networkFrameGenerator(cmd, ARNETWORKAL_FRAME_TYPE_DATA, BD_NET_CD_NONACK_ID).Bytes())
+	return err
+}
+
+func (b *Bebop) Outdoor(outdoor bool) error {
+	//
+	// ARCOMMANDS_Generator_GenerateARDrone3SpeedSettingsOutdoor
+	//
+
+	cmd := &bytes.Buffer{}
+
+	cmd.WriteByte(ARCOMMANDS_ID_PROJECT_ARDRONE3)
+	cmd.WriteByte(ARCOMMANDS_ID_ARDRONE3_CLASS_SPEEDSETTINGS)
+
+	tmp := &bytes.Buffer{}
+	binary.Write(tmp,
+		binary.LittleEndian,
+		uint16(ARCOMMANDS_ID_ARDRONE3_SPEEDSETTINGS_CMD_OUTDOOR),
+	)
+
+	cmd.Write(tmp.Bytes())
+
+	tmp = &bytes.Buffer{}
+	binary.Write(tmp, binary.LittleEndian, bool(outdoor))
+	cmd.Write(tmp.Bytes())
+
+	_, err := b.write(b.networkFrameGenerator(cmd, ARNETWORKAL_FRAME_TYPE_DATA, BD_NET_CD_NONACK_ID).Bytes())
+	return err
+}
+
 func (b *Bebop) createARStreamACK(frame ARStreamFrame) *bytes.Buffer {
 	//
 	// ARSTREAM_NetworkHeaders_AckPacket_t;
