@@ -14,10 +14,10 @@ func main() {
 		panic(err)
 	}
 
-	board := client.New(sp)
+	board := client.New()
 
 	fmt.Println("connecting.....")
-	err = board.Connect()
+	err = board.Connect(sp)
 	defer board.Disconnect()
 
 	if err != nil {
