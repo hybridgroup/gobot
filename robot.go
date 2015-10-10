@@ -67,6 +67,19 @@ func (r *Robots) Start() (errs []error) {
 	return
 }
 
+// Stop calls the Stop method of each Robot in the collection
+func (r *Robots) Stop() (errs []error) {
+	for _, robot := range *r {
+		if errs = robot.Stop(); len(errs) > 0 {
+			for i, err := range errs {
+				errs[i] = fmt.Errorf("Robot %q: %v", robot.Name, err)
+			}
+			return
+		}
+	}
+	return
+}
+
 // Each enumerates through the Robots and calls specified callback function.
 func (r *Robots) Each(f func(*Robot)) {
 	for _, robot := range *r {
@@ -134,6 +147,24 @@ func (r *Robot) Start() (errs []error) {
 		r.Work()
 	}
 	return
+}
+
+// Stop stops a Robot's connections and Devices
+func (r *Robot) Stop() (errs []error) {
+	log.Println("Stopping Robot", r.Name, "...")
+	if heers := r.Devices().Halt(); len(heers) > 0 {
+		for _, err := range heers {
+			errs = append(errs, err)
+		}
+	}
+
+	if ceers := r.Connections().Finalize(); len(ceers) > 0 {
+		for _, err := range ceers {
+			errs = append(errs, err)
+		}
+	}
+
+	return errs
 }
 
 // Devices returns all devices associated with this Robot.
