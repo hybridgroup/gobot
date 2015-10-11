@@ -1,6 +1,7 @@
 package i2c
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/hybridgroup/gobot"
@@ -41,6 +42,31 @@ const (
 )
 
 var _ gobot.Driver = (*JHD1313M1Driver)(nil)
+
+// CustomLCDChars is a map of CGRAM characters that can be loaded
+// into a LCD screen to display custom characters. Some LCD screens such
+// as the Grove screen (jhd1313m1) isn't loaded with latin 1 characters.
+// It's up to the developer to load the set up to 8 custom characters and
+// update the input text so the character is swapped by a byte reflecting
+// the position of the custom character to use.
+// See SetCustomChar
+var CustomLCDChars = map[string][8]byte{
+	"é":       [8]byte{130, 132, 142, 145, 159, 144, 142, 128},
+	"è":       [8]byte{136, 132, 142, 145, 159, 144, 142, 128},
+	"ê":       [8]byte{132, 138, 142, 145, 159, 144, 142, 128},
+	"à":       [8]byte{136, 134, 128, 142, 145, 147, 141, 128},
+	"â":       [8]byte{132, 138, 128, 142, 145, 147, 141, 128},
+	"á":       [8]byte{2, 4, 14, 1, 15, 17, 15, 0},
+	"î":       [8]byte{132, 138, 128, 140, 132, 132, 142, 128},
+	"í":       [8]byte{2, 4, 12, 4, 4, 4, 14, 0},
+	"û":       [8]byte{132, 138, 128, 145, 145, 147, 141, 128},
+	"ù":       [8]byte{136, 134, 128, 145, 145, 147, 141, 128},
+	"ñ":       [8]byte{14, 0, 22, 25, 17, 17, 17, 0},
+	"ó":       [8]byte{2, 4, 14, 17, 17, 17, 14, 0},
+	"heart":   [8]byte{0, 10, 31, 31, 31, 14, 4, 0},
+	"smiley":  [8]byte{0, 0, 10, 0, 0, 17, 14, 0},
+	"frowney": [8]byte{0, 0, 10, 0, 0, 0, 14, 17},
+}
 
 // JHD1313M1Driver is a driver for the Jhd1313m1 LCD display which has two i2c addreses,
 // one belongs to a controller and the other controls solely the backlight.
@@ -200,4 +226,24 @@ func (h *JHD1313M1Driver) setReg(command int, data int) error {
 
 func (h *JHD1313M1Driver) command(buf []byte) error {
 	return h.connection.I2cWrite(h.lcdAddress, append([]byte{LCD_CMD}, buf...))
+}
+
+// CustomChar sets one of the 8 CGRAM locations with a custom character.
+// The custom character can be used by writing a byte of value 0 to 7.
+// When you are using LCD as 5x8 dots in function set then you can define a total of 8 user defined patterns
+// (1 Byte for each row and 8 rows for each pattern).
+// Use http://www.8051projects.net/lcd-interfacing/lcd-custom-character.php to create your own
+// characters.
+// To use a custom character, write byte value of the custom character position as a string after
+// having setup the custom character.
+func (h *JHD1313M1Driver) SetCustomChar(pos int, charMap [8]byte) error {
+	if pos > 7 {
+		return fmt.Errorf("can't set a custom character at a position greater than 7")
+	}
+	location := uint8(pos)
+	if err := h.command([]byte{LCD_SETCGRAMADDR | (location << 3)}); err != nil {
+		return err
+	}
+
+	return h.connection.I2cWrite(h.lcdAddress, append([]byte{LCD_DATA}, charMap[:]...))
 }
