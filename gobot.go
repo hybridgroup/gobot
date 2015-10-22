@@ -2,6 +2,8 @@ package gobot
 
 import (
 	"log"
+	"os"
+	"os/signal"
 )
 
 // JSONGobot is a JSON representation of a Gobot.
@@ -30,7 +32,9 @@ func NewJSONGobot(gobot *Gobot) *JSONGobot {
 // Gobot is the main type of your Gobot application and contains a collection of
 // Robots, API commands and Events.
 type Gobot struct {
-	robots *Robots
+	robots   *Robots
+	trap     func(chan os.Signal)
+	AutoStop bool
 	Commander
 	Eventer
 }
@@ -38,7 +42,11 @@ type Gobot struct {
 // NewGobot returns a new Gobot
 func NewGobot() *Gobot {
 	return &Gobot{
-		robots:    &Robots{},
+		robots: &Robots{},
+		trap: func(c chan os.Signal) {
+			signal.Notify(c, os.Interrupt)
+		},
+		AutoStop:  true,
 		Commander: NewCommander(),
 		Eventer:   NewEventer(),
 	}
@@ -53,6 +61,22 @@ func (g *Gobot) Start() (errs []error) {
 			log.Println("Error:", err)
 			errs = append(errs, err)
 		}
+	}
+
+	if g.AutoStop {
+		c := make(chan os.Signal, 1)
+		g.trap(c)
+		if len(errs) > 0 {
+			// there was an error during start, so we immediatly pass the interrupt
+			// in order to disconnect the initialized robots, connections and devices
+			c <- os.Interrupt
+		}
+
+		// waiting for interrupt coming on the channel
+		_ = <-c
+
+		// Stop calls the Stop method on each robot in its collection of robots.
+		g.Stop()
 	}
 
 	return errs

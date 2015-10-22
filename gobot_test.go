@@ -3,6 +3,7 @@ package gobot
 import (
 	"errors"
 	"log"
+	"os"
 	"testing"
 )
 
@@ -19,6 +20,9 @@ func TestConnectionEach(t *testing.T) {
 func initTestGobot() *Gobot {
 	log.SetOutput(&NullReadWriteCloser{})
 	g := NewGobot()
+	g.trap = func(c chan os.Signal) {
+		c <- os.Interrupt
+	}
 	g.AddRobot(newTestRobot("Robot1"))
 	g.AddRobot(newTestRobot("Robot2"))
 	g.AddRobot(newTestRobot(""))
@@ -101,6 +105,10 @@ func TestGobotStartErrors(t *testing.T) {
 
 	testDriverStart = func() (errs []error) { return }
 	testAdaptorConnect = func() (errs []error) { return }
+
+	g.trap = func(c chan os.Signal) {
+		c <- os.Interrupt
+	}
 
 	testDriverHalt = func() (errs []error) {
 		return []error{
