@@ -94,25 +94,26 @@ func main() {
 ## Hardware Support
 Gobot has a extensible system for connecting to hardware devices. The following robotics and physical computing platforms are currently supported:
 
-  - [Ardrone](http://ardrone2.parrot.com/) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/ardrone)
-  - [Arduino](http://www.arduino.cc/) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/firmata)
-  - [Beaglebone Black](http://beagleboard.org/Products/BeagleBone+Black/) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/beaglebone)
-  - [Digispark](http://digistump.com/products/1) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/digispark)
-  - [Intel Edison](http://www.intel.com/content/www/us/en/do-it-yourself/edison.html) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/intel-iot/edison)
-  - [Joystick](http://en.wikipedia.org/wiki/Joystick) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/joystick)
-  - [Leap Motion](https://www.leapmotion.com/) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/leapmotion)
-  - [MavLink](http://qgroundcontrol.org/mavlink/start) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/mavlinky)
-  - [MQTT](http://mqtt.org/) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/mqtt)
-  - [Neurosky](http://neurosky.com/products-markets/eeg-biosensors/hardware/) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/neurosky)
-  - [OpenCV](http://opencv.org/) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/opencv)
-  - [Pebble](https://www.getpebble.com/) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/pebble)
-  - [Raspberry Pi](http://www.raspberrypi.org/) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/raspi)
-  - [Spark](https://www.spark.io/) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/spark)
-  - [Sphero](http://www.gosphero.com/) <=> [Library](https://github.com/hybridgroup/gobot/tree/master/platforms/sphero)
-
+  - [Ardrone](http://ardrone2.parrot.com/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/ardrone)
+  - [Arduino](http://www.arduino.cc/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/firmata)
+  - [Beaglebone Black](http://beagleboard.org/Products/BeagleBone+Black/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/beaglebone)
+	- [Bebop](http://www.parrot.com/usa/products/bebop-drone/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/bebop)
+  - [Digispark](http://digistump.com/products/1) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/digispark)
+  - [Intel Edison](http://www.intel.com/content/www/us/en/do-it-yourself/edison.html) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/intel-iot/edison)
+  - [Joystick](http://en.wikipedia.org/wiki/Joystick) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/joystick)
+	- [Keyboard](https://en.wikipedia.org/wiki/Computer_keyboard) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/keyboard)
+  - [Leap Motion](https://www.leapmotion.com/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/leapmotion)
+  - [MavLink](http://qgroundcontrol.org/mavlink/start) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/mavlinky)
+  - [MQTT](http://mqtt.org/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/mqtt)
+  - [Neurosky](http://neurosky.com/products-markets/eeg-biosensors/hardware/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/neurosky)
+  - [OpenCV](http://opencv.org/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/opencv)
+  - [Pebble](https://www.getpebble.com/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/pebble)
+  - [Raspberry Pi](http://www.raspberrypi.org/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/raspi)
+  - [Spark](https://www.spark.io/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/spark)
+  - [Sphero](http://www.gosphero.com/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/sphero)
 
 Support for many devices that use General Purpose Input/Output (GPIO) have
-a shared set of drivers provided using the cylon-gpio module:
+a shared set of drivers provided using the `gobot/platforms/gpio` package:
 
   - [GPIO](https://en.wikipedia.org/wiki/General_Purpose_Input/Output) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/platforms/gpio)
     - Analog Sensor
@@ -120,21 +121,34 @@ a shared set of drivers provided using the cylon-gpio module:
     - Direct Pin
     - Digital Sensor
     - Direct Pin
+		- Grove Button
+		- Grove Buzzer
+		- Grove LED
+		- Grove Light Sensor
+		- Grove Piezo Vibration Sensor
+		- Grove Relay
+		- Grove Rotary Dial
+		- Grove Sound Sensor
+		- Grove Touch Sensor
     - LED
     - Makey Button
     - Motor
     - Servo
 
 Support for devices that use Inter-Integrated Circuit (I2C) have a shared set of
-drivers provided using the gobot-i2c module:
+drivers provided using the `gobot/platforms/i2c` package:
 
   - [I2C](https://en.wikipedia.org/wiki/I%C2%B2C) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/platforms/i2c)
     - BlinkM
-    - HMC6352
-    - LIDAR-Lite
-    - MPL1150A2
-    - MPU6050
-    - Wii Nunchuck Controller
+		- Grove Digital Accelerometer
+		- Grove RGB LCD
+		- HMC6352
+		- JHD1313M1
+		- LIDAR-Lite
+		- MMA7660
+		- MPL1150A2
+		- MPU6050
+		- Wii Nunchuck Controller
 
 More platforms and drivers are coming soon...
 
