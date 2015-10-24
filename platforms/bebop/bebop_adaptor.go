@@ -25,6 +25,7 @@ type drone interface {
 	StartRecording() error
 	StopRecording() error
 	HullProtection(protect bool) error
+	Outdoor(outdoor bool) error
 }
 
 // BebopAdaptor is gobot.Adaptor representation for the Bebop

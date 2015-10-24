@@ -129,3 +129,8 @@ func (a *BebopDriver) StopRecording() error {
 func (a *BebopDriver) HullProtection(protect bool) error {
 	return a.adaptor().drone.HullProtection(protect)
 }
+
+// Outdoor tells the drone if flying Outdoor or not. This is needed to adjust flight characteristics of the Bebop.
+func (a *BebopDriver) Outdoor(outdoor bool) error {
+	return a.adaptor().drone.Outdoor(outdoor)
+}

@@ -1,7 +1,11 @@
 package main
 
 import (
+	"fmt"
+	"io"
+	"io/ioutil"
 	"math"
+	"os/exec"
 	"time"
 
 	"github.com/hybridgroup/gobot"
@@ -12,6 +16,40 @@ import (
 type pair struct {
 	x float64
 	y float64
+}
+
+func ffmpeg() (stdin io.WriteCloser, stderr io.ReadCloser, err error) {
+	ffmpeg := exec.Command("ffmpeg", "-i", "pipe:0", "http://localhost:8090/bebop.ffm")
+
+	stderr, err = ffmpeg.StderrPipe()
+
+	if err != nil {
+		return
+	}
+
+	stdin, err = ffmpeg.StdinPipe()
+
+	if err != nil {
+		return
+	}
+
+	if err = ffmpeg.Start(); err != nil {
+		return
+	}
+
+	go func() {
+		for {
+			buf, err := ioutil.ReadAll(stderr)
+			if err != nil {
+				fmt.Println(err)
+			}
+			if len(buf) > 0 {
+				fmt.Println(string(buf))
+			}
+		}
+	}()
+
+	return stdin, stderr, nil
 }
 
 func main() {
@@ -27,6 +65,16 @@ func main() {
 	drone := bebop.NewBebopDriver(bebopAdaptor, "Drone")
 
 	work := func() {
+		video, _, _ := ffmpeg()
+
+		go func() {
+			for {
+				if _, err := video.Write(<-drone.Video()); err != nil {
+					fmt.Println(err)
+          return
+				}
+			}
+		}()
 
 		offset := 32767.0
 		rightStick := pair{x: 0, y: 0}

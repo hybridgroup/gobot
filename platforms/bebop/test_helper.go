@@ -19,3 +19,4 @@ func (t testDrone) Video() chan []byte { return nil }
 func (t testDrone) StartRecording() error { return nil }
 func (t testDrone) StopRecording() error { return nil }
 func (t testDrone) HullProtection(protect bool) error { return nil }
+func (t testDrone) Outdoor(outdoor bool) error { return nil }
