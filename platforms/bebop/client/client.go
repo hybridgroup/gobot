@@ -220,7 +220,7 @@ func (b *Bebop) Discover() error {
 		),
 	)
 
-	data := make([]byte, 2048)
+	data := make([]byte, 10240)
 
 	_, err = b.discoveryClient.Read(data)
 
@@ -272,7 +272,7 @@ func (b *Bebop) Connect() error {
 
 	go func() {
 		for {
-			data := make([]byte, 1024)
+			data := make([]byte, 40960)
 			i, _, err := b.d2cClient.ReadFromUDP(data)
 			if err != nil {
 				fmt.Println("d2cClient error:", err)
