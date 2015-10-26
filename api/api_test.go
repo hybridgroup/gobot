@@ -41,12 +41,12 @@ func TestRobeaux(t *testing.T) {
 	a.ServeHTTP(response, request)
 	gobot.Assert(t, response.Code, 200)
 	// js assets
-	request, _ = http.NewRequest("GET", "/js/app.js", nil)
+	request, _ = http.NewRequest("GET", "/js/script.js", nil)
 	response = httptest.NewRecorder()
 	a.ServeHTTP(response, request)
 	gobot.Assert(t, response.Code, 200)
 	// css assets
-	request, _ = http.NewRequest("GET", "/css/style.css", nil)
+	request, _ = http.NewRequest("GET", "/css/application.css", nil)
 	response = httptest.NewRecorder()
 	a.ServeHTTP(response, request)
 	gobot.Assert(t, response.Code, 200)
