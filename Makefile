@@ -19,17 +19,15 @@ ifeq (,$(shell which go-bindata))
 	$(error robeaux not built! https://github.com/jteeuwen/go-bindata is required to build robeaux assets )
 endif
 	cd api ; \
-	git clone --depth 1 git://github.com/hybridgroup/robeaux.git robeaux-tmp; \
+	npm install robeaux ; \
+	cp -r node_modules/robeaux robeaux-tmp ; \
 	cd robeaux-tmp ; \
-	rm fonts/* ; \
-	rm -r test/* ; \
-	rm -r less/* ; \
-	rm Makefile Gruntfile.js package.json README.markdown robeaux.gemspec css/fonts.css ; \
+	rm Makefile package.json README.markdown ; \
 	touch css/fonts.css ; \
-	echo "Updating robeaux to $(shell git rev-parse HEAD)" ; \
+	echo "Updating robeaux..." ; \
 	go-bindata -pkg="robeaux" -o robeaux.go -ignore=\\.git ./... ; \
 	mv robeaux.go ../robeaux ; \
 	cd .. ; \
 	rm -rf robeaux-tmp/ ; \
+	rm -rf node_modules/ ; \
 	go fmt ./robeaux/robeaux.go ; \
-
