@@ -13,10 +13,8 @@ Then you must install the appropriate Go packages
 
 ## Setting up your Intel Edison
 
-Everything you need to get started with the Edison is in the Intel Getting Started Guide
-located [here](https://github.com/hybridgroup/gobot/tree/master/platforms). Don't forget to
-configure your Edison's wifi connection and [flash](https://github.com/hybridgroup/gobot/tree/master/platforms)
-your Edison with the latest firmware image!
+Everything you need to get started with the Edison is in the Intel Getting Started Guide located [here](https://software.intel.com/en-us/iot/library/edison-getting-started).
+Don't forget to configure your Edison's wifi connection and flash your Edison with the latest firmware image!
 
 If you followed the Edison setup steps you should be all set to access
 your device using its wifi IP. Just in case you were too eager to get
