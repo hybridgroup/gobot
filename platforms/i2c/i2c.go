@@ -18,6 +18,7 @@ const (
 	Joystick = "joystick"
 	C        = "c"
 	Z        = "z"
+	Touch    = "touch"
 )
 
 type I2cStarter interface {
