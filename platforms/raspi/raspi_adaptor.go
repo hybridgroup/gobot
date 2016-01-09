@@ -165,7 +165,7 @@ func (r *RaspiAdaptor) Finalize() (errs []error) {
 		}
 	}
 	for _, pin := range r.pwmPins {
-		if err := r.piBlaster(fmt.Sprintf("%v=release\n", pin)); err != nil {
+		if err := r.piBlaster(fmt.Sprintf("release %v\n", pin)); err != nil {
 			errs = append(errs, err)
 		}
 	}
