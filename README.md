@@ -146,6 +146,7 @@ drivers provided using the `gobot/platforms/i2c` package:
 	- HMC6352
 	- JHD1313M1
 	- LIDAR-Lite
+	- MCP23017
 	- MMA7660
 	- MPL1150A2
 	- MPU6050
