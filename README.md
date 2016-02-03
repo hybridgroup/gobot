@@ -168,8 +168,7 @@ You can also specify the api host and port, and turn on authentication:
   gbot := gobot.NewGobot()
   server := api.NewAPI(gbot)
   server.Port = "4000"
-  server.Username = "Gort"
-  server.Password = "klaatu"
+  server.AddHandler(api.BasicAuth("gort", "klatuu"))
   server.Start()
 ```
 
