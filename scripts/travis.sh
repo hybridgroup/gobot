@@ -2,13 +2,11 @@
 PACKAGES=('gobot' 'gobot/api' 'gobot/platforms/firmata/client' 'gobot/platforms/intel-iot/edison' 'gobot/sysfs' $(ls ./platforms | sed -e 's/^/gobot\/platforms\//'))
 EXITCODE=0
 
-go test -cover github.com/hybridgroup/gobot
-
 echo "mode: set" > profile.cov
 touch tmp.cov
 for package in "${PACKAGES[@]}"
 do
-  go test -a -covermode=count -coverprofile=tmp.cov github.com/hybridgroup/$package
+  go test -a -coverprofile=tmp.cov github.com/hybridgroup/$package
   if [ $? -ne 0 ]
   then
     EXITCODE=1
