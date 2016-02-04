@@ -8,7 +8,7 @@ echo "mode: set" > profile.cov
 touch tmp.cov
 for package in "${PACKAGES[@]}"
 do
-  go test -a -coverprofile=tmp.cov github.com/hybridgroup/$package
+  go test -a -covermode=count -coverprofile=tmp.cov github.com/hybridgroup/$package
   if [ $? -ne 0 ]
   then
     EXITCODE=1
