@@ -18,6 +18,3 @@ if [ $EXITCODE -ne 0 ]
 then
   exit $EXITCODE
 fi
-
-export PATH=$PATH:$HOME/gopath/bin/
-goveralls -v -coverprofile=profile.cov -service=travis-ci -repotoken=sFrR9ZmLP5FLc34lOaqir67RPzYOvFPUB
