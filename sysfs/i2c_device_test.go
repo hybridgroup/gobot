@@ -43,7 +43,7 @@ func TestNewI2cDevice(t *testing.T) {
 
 	n, err = i.Read(buf)
 
-	gobot.Assert(t, n, 4)
+	gobot.Assert(t, n, 3)
 	gobot.Assert(t, err, nil)
 
 }

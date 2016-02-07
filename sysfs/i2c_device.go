@@ -14,6 +14,11 @@ const (
 	I2C_SMBUS_WRITE          = 0
 	I2C_SMBUS_READ           = 1
 	I2C_SMBUS_I2C_BLOCK_DATA = 8
+
+	// Adapter functionality
+	I2C_FUNCS                       = 0x0705
+	I2C_FUNC_SMBUS_READ_BLOCK_DATA  = 0x01000000
+	I2C_FUNC_SMBUS_WRITE_BLOCK_DATA = 0x02000000
 )
 
 type i2cSmbusIoctlData struct {
@@ -29,7 +34,8 @@ type I2cDevice interface {
 }
 
 type i2cDevice struct {
-	file File
+	file  File
+	funcs uint64 // adapter functionality mask
 }
 
 // NewI2cDevice returns an io.ReadWriteCloser with the proper ioctrl given
@@ -40,9 +46,27 @@ func NewI2cDevice(location string, address int) (d *i2cDevice, err error) {
 	if d.file, err = OpenFile(location, os.O_RDWR, os.ModeExclusive); err != nil {
 		return
 	}
+	if err = d.queryFunctionality(); err != nil {
+		return
+	}
 
 	err = d.SetAddress(address)
 
+	return
+}
+
+func (d *i2cDevice) queryFunctionality() (err error) {
+	_, _, errno := Syscall(
+		syscall.SYS_IOCTL,
+		d.file.Fd(),
+		I2C_FUNCS,
+		uintptr(unsafe.Pointer(&d.funcs)),
+	)
+
+	if errno != 0 {
+		err = fmt.Errorf("Querying functionality failed with syscall.Errno %v", errno)
+	}
+	fmt.Printf("Functionality: 0x%x\n", d.funcs)
 	return
 }
 
@@ -55,7 +79,7 @@ func (d *i2cDevice) SetAddress(address int) (err error) {
 	)
 
 	if errno != 0 {
-		err = fmt.Errorf("Failed with syscall.Errno %v", errno)
+		err = fmt.Errorf("Setting address failed with syscall.Errno %v", errno)
 	}
 
 	return
@@ -66,6 +90,11 @@ func (d *i2cDevice) Close() (err error) {
 }
 
 func (d *i2cDevice) Read(b []byte) (n int, err error) {
+	if d.funcs&I2C_FUNC_SMBUS_READ_BLOCK_DATA == 0 {
+		// Adapter doesn't support SMBus block read
+		return d.file.Read(b)
+	}
+
 	data := make([]byte, len(b)+1)
 	data[0] = byte(len(b))
 
@@ -83,7 +112,7 @@ func (d *i2cDevice) Read(b []byte) (n int, err error) {
 	)
 
 	if errno != 0 {
-		return n, fmt.Errorf("Failed with syscall.Errno %v", errno)
+		return n, fmt.Errorf("Read failed with syscall.Errno %v", errno)
 	}
 
 	copy(b, data[1:])
@@ -92,7 +121,8 @@ func (d *i2cDevice) Read(b []byte) (n int, err error) {
 }
 
 func (d *i2cDevice) Write(b []byte) (n int, err error) {
-	if len(b) <= 2 {
+	if d.funcs&I2C_FUNC_SMBUS_WRITE_BLOCK_DATA == 0 {
+		// Adapter doesn't support SMBus block write
 		return d.file.Write(b)
 	}
 
@@ -119,7 +149,7 @@ func (d *i2cDevice) Write(b []byte) (n int, err error) {
 	)
 
 	if errno != 0 {
-		err = fmt.Errorf("Failed with syscall.Errno %v", errno)
+		err = fmt.Errorf("Write failed with syscall.Errno %v", errno)
 	}
 
 	return len(b), err
