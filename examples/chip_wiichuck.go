@@ -26,6 +26,9 @@ func main() {
 		gobot.On(wiichuck.Event("z"), func(data interface{}) {
 			fmt.Println("z")
 		})
+		gobot.On(wiichuck.Event("error"), func(data interface{}) {
+			fmt.Println("Wiichuck error:", data)
+		})
 	}
 
 	robot := gobot.NewRobot("chuck",
