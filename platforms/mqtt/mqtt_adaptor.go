@@ -30,6 +30,7 @@ func (a *MqttAdaptor) Connect() (errs []error) {
 	if token := a.client.Connect(); token.Wait() && token.Error() != nil {
 		errs = append(errs, token.Error())
 	}
+
 	return
 }
 
@@ -71,6 +72,6 @@ func createClientOptions(clientId, raw string) *mqtt.ClientOptions {
 	opts := mqtt.NewClientOptions()
 	opts.AddBroker(raw)
 	opts.SetClientID(clientId)
-
+	opts.AutoReconnect = false
 	return opts
 }
