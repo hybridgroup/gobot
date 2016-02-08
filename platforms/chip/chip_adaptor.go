@@ -23,14 +23,14 @@ type ChipAdaptor struct {
 }
 
 var pins = map[string]int{
-	"U14_13": 408,
-	"U14_14": 409,
-	"U14_15": 410,
-	"U14_16": 411,
-	"U14_17": 412,
-	"U14_18": 413,
-	"U14_19": 414,
-	"U14_20": 415,
+	"XIO-P0": 408,
+	"XIO-P1": 409,
+	"XIO-P2": 410,
+	"XIO-P3": 411,
+	"XIO-P4": 412,
+	"XIO-P5": 413,
+	"XIO-P6": 414,
+	"XIO-P7": 415,
 }
 
 // NewChipAdaptor creates a ChipAdaptor with the specified name
@@ -99,7 +99,7 @@ func (c *ChipAdaptor) digitalPin(pin string, dir string) (sysfsPin sysfs.Digital
 }
 
 // DigitalRead reads digital value from the specified pin.
-// Valids pins are XIO-P0 through XIO-P1 (pins 13-20 on header 14).
+// Valids pins are XIO-P0 through XIO-P7 (pins 13-20 on header 14).
 func (c *ChipAdaptor) DigitalRead(pin string) (val int, err error) {
 	sysfsPin, err := c.digitalPin(pin, sysfs.IN)
 	if err != nil {
@@ -109,7 +109,7 @@ func (c *ChipAdaptor) DigitalRead(pin string) (val int, err error) {
 }
 
 // DigitalWrite writes digital value to the specified pin.
-// Valids pins are XIO-P0 through XIO-P1 (pins 13-20 on header 14).
+// Valids pins are XIO-P0 through XIO-P7 (pins 13-20 on header 14).
 func (c *ChipAdaptor) DigitalWrite(pin string, val byte) (err error) {
 	sysfsPin, err := c.digitalPin(pin, sysfs.OUT)
 	if err != nil {
@@ -120,7 +120,7 @@ func (c *ChipAdaptor) DigitalWrite(pin string, val byte) (err error) {
 
 // I2cStart starts an i2c device in specified address.
 // This assumes that the bus used is /dev/i2c-1, which corresponds to
-// pins labeled TWI1 (pins 9 and 11 on header 13).
+// pins labeled TWI1-SDA and TW1-SCK (pins 9 and 11 on header 13).
 func (c *ChipAdaptor) I2cStart(address int) (err error) {
 	if c.i2cDevice == nil {
 		c.i2cDevice, err = sysfs.NewI2cDevice("/dev/i2c-1", address)

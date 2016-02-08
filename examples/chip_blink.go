@@ -12,7 +12,7 @@ func main() {
 	gbot := gobot.NewGobot()
 
 	chipAdaptor := chip.NewChipAdaptor("chip")
-	led := gpio.NewLedDriver(chipAdaptor, "led", "U14_13")
+	led := gpio.NewLedDriver(chipAdaptor, "led", "XIO-P0")
 
 	work := func() {
 		gobot.Every(1*time.Second, func() {

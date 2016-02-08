@@ -10,8 +10,8 @@ func main() {
 	gbot := gobot.NewGobot()
 
 	chipAdaptor := chip.NewChipAdaptor("chip")
-	button := gpio.NewButtonDriver(chipAdaptor, "button", "U14_19")
-	led := gpio.NewLedDriver(chipAdaptor, "led", "U14_20")
+	button := gpio.NewButtonDriver(chipAdaptor, "button", "XIO-P6")
+	led := gpio.NewLedDriver(chipAdaptor, "led", "XIO-P7")
 
 	work := func() {
 		gobot.On(button.Event("push"), func(data interface{}) {
