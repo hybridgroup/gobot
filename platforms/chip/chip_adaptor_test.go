@@ -53,14 +53,14 @@ func TestChipAdaptorDigitalIO(t *testing.T) {
 
 	sysfs.SetFilesystem(fs)
 
-	a.DigitalWrite("U14_13", 1)
+	a.DigitalWrite("XIO-P0", 1)
 	gobot.Assert(t, fs.Files["/sys/class/gpio/gpio408/value"].Contents, "1")
 
 	fs.Files["/sys/class/gpio/gpio415/value"].Contents = "1"
-	i, _ := a.DigitalRead("U14_20")
+	i, _ := a.DigitalRead("XIO-P7")
 	gobot.Assert(t, i, 1)
 
-	gobot.Assert(t, a.DigitalWrite("U13_99", 1), errors.New("Not a valid pin"))
+	gobot.Assert(t, a.DigitalWrite("XIO-P10", 1), errors.New("Not a valid pin"))
 }
 
 func TestChipAdaptorI2c(t *testing.T) {
