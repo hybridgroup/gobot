@@ -8,6 +8,8 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
+const BUTTON_TEST_DELAY = 30
+
 func initTestButtonDriver() *ButtonDriver {
 	return NewButtonDriver(newGpioTestAdaptor("adaptor"), "bot", "1")
 }
@@ -26,7 +28,7 @@ func TestButtonDriver(t *testing.T) {
 	gobot.Assert(t, d.Connection().Name(), "adaptor")
 
 	d = NewButtonDriver(newGpioTestAdaptor("adaptor"), "bot", "1", 30*time.Second)
-	gobot.Assert(t, d.interval, 30*time.Second)
+	gobot.Assert(t, d.interval, BUTTON_TEST_DELAY * time.Second)
 }
 
 func TestButtonDriverStart(t *testing.T) {
@@ -46,7 +48,7 @@ func TestButtonDriverStart(t *testing.T) {
 
 	select {
 	case <-sem:
-	case <-time.After(15 * time.Millisecond):
+	case <-time.After(BUTTON_TEST_DELAY * time.Millisecond):
 		t.Errorf("Button Event \"Push\" was not published")
 	}
 
@@ -62,7 +64,7 @@ func TestButtonDriverStart(t *testing.T) {
 
 	select {
 	case <-sem:
-	case <-time.After(15 * time.Millisecond):
+	case <-time.After(BUTTON_TEST_DELAY * time.Millisecond):
 		t.Errorf("Button Event \"Release\" was not published")
 	}
 
@@ -77,7 +79,7 @@ func TestButtonDriverStart(t *testing.T) {
 
 	select {
 	case <-sem:
-	case <-time.After(15 * time.Millisecond):
+	case <-time.After(BUTTON_TEST_DELAY * time.Millisecond):
 		t.Errorf("Button Event \"Error\" was not published")
 	}
 
@@ -95,7 +97,7 @@ func TestButtonDriverStart(t *testing.T) {
 	select {
 	case <-sem:
 		t.Errorf("Button Event \"Press\" should not published")
-	case <-time.After(15 * time.Millisecond):
+	case <-time.After(BUTTON_TEST_DELAY * time.Millisecond):
 	}
 
 }

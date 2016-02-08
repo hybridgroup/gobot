@@ -8,6 +8,8 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
+const MAKEY_TEST_DELAY = 30
+
 func initTestMakeyButtonDriver() *MakeyButtonDriver {
 	return NewMakeyButtonDriver(newGpioTestAdaptor("adaptor"), "bot", "1")
 }
@@ -26,7 +28,7 @@ func TestMakeyButtonDriver(t *testing.T) {
 	gobot.Assert(t, d.Connection().Name(), "adaptor")
 
 	d = NewMakeyButtonDriver(newGpioTestAdaptor("adaptor"), "bot", "1", 30*time.Second)
-	gobot.Assert(t, d.interval, 30*time.Second)
+	gobot.Assert(t, d.interval, MAKEY_TEST_DELAY * time.Second)
 }
 
 func TestMakeyButtonDriverStart(t *testing.T) {
@@ -46,7 +48,7 @@ func TestMakeyButtonDriverStart(t *testing.T) {
 
 	select {
 	case <-sem:
-	case <-time.After(15 * time.Millisecond):
+	case <-time.After(MAKEY_TEST_DELAY * time.Millisecond):
 		t.Errorf("MakeyButton Event \"Push\" was not published")
 	}
 
@@ -62,7 +64,7 @@ func TestMakeyButtonDriverStart(t *testing.T) {
 
 	select {
 	case <-sem:
-	case <-time.After(15 * time.Millisecond):
+	case <-time.After(MAKEY_TEST_DELAY * time.Millisecond):
 		t.Errorf("MakeyButton Event \"Release\" was not published")
 	}
 
@@ -77,7 +79,7 @@ func TestMakeyButtonDriverStart(t *testing.T) {
 
 	select {
 	case <-sem:
-	case <-time.After(15 * time.Millisecond):
+	case <-time.After(MAKEY_TEST_DELAY * time.Millisecond):
 		t.Errorf("MakeyButton Event \"Error\" was not published")
 	}
 
@@ -93,7 +95,7 @@ func TestMakeyButtonDriverStart(t *testing.T) {
 
 	select {
 	case <-sem:
-		t.Errorf("MakeyButton Event should not published")
-	case <-time.After(30 * time.Millisecond):
+		t.Errorf("MakeyButton Event should not have been published")
+	case <-time.After(MAKEY_TEST_DELAY * time.Millisecond):
 	}
 }
