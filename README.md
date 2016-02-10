@@ -145,13 +145,13 @@ drivers provided using the `gobot/platforms/i2c` package:
 	- BlinkM
 	- Grove Digital Accelerometer
 	- Grove RGB LCD
-	- HMC6352
-	- JHD1313M1
+	- HMC6352 Compass
+	- JHD1313M1 RGB LCD Display
 	- LIDAR-Lite
-	- MCP23017
-	- MMA7660
-	- MPL1150A2
-	- MPU6050
+	- MCP23017 Port Expander
+	- MMA7660 3-Axis Accelerometer
+	- MPL115A2 Barometer
+	- MPU6050 Accelerometer/Gyroscope
 	- Wii Nunchuck Controller
 
 More platforms and drivers are coming soon...
