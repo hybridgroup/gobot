@@ -8,7 +8,7 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
-const BUTTON_TEST_DELAY = 30
+const BUTTON_TEST_DELAY = 100
 
 func initTestButtonDriver() *ButtonDriver {
 	return NewButtonDriver(newGpioTestAdaptor("adaptor"), "bot", "1")
