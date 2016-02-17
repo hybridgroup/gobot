@@ -26,6 +26,7 @@ const MPU6050_ACONFIG_AFS_SEL_BIT = 4
 const MPU6050_ACONFIG_AFS_SEL_LENGTH = 2
 const MPU6050_ACCEL_FS_2 = 0x00
 const MPU6050_PWR1_SLEEP_BIT = 6
+const MPU6050_PWR1_ENABLE_BIT = 0
 
 type ThreeDData struct {
 	X int16
@@ -84,8 +85,9 @@ func (h *MPU6050Driver) Start() (errs []error) {
 			}
 			buf := bytes.NewBuffer(ret)
 			binary.Read(buf, binary.BigEndian, &h.Accelerometer)
-			binary.Read(buf, binary.BigEndian, &h.Gyroscope)
 			binary.Read(buf, binary.BigEndian, &h.Temperature)
+			binary.Read(buf, binary.BigEndian, &h.Gyroscope)
+			h.convertToCelsius()
 			<-time.After(h.interval)
 		}
 	}()
@@ -109,12 +111,12 @@ func (h *MPU6050Driver) initialize() (err error) {
 	}
 
 	// setFullScaleGyroRange
-	if err = h.connection.I2cWrite(mpu6050Address, []byte{MPU6050_GYRO_FS_250,
-		MPU6050_RA_GYRO_CONFIG,
-		MPU6050_GCONFIG_FS_SEL_LENGTH,
-		MPU6050_GCONFIG_FS_SEL_BIT}); err != nil {
-		return
-	}
+  if err = h.connection.I2cWrite(mpu6050Address, []byte{MPU6050_RA_GYRO_CONFIG,
+    MPU6050_GCONFIG_FS_SEL_BIT,
+    MPU6050_GCONFIG_FS_SEL_LENGTH,
+    MPU6050_GYRO_FS_250}); err != nil {
+    return
+  }
 
 	// setFullScaleAccelRange
 	if err = h.connection.I2cWrite(mpu6050Address, []byte{MPU6050_RA_ACCEL_CONFIG,
@@ -126,10 +128,19 @@ func (h *MPU6050Driver) initialize() (err error) {
 
 	// setSleepEnabled
 	if err = h.connection.I2cWrite(mpu6050Address, []byte{MPU6050_RA_PWR_MGMT_1,
-		MPU6050_PWR1_SLEEP_BIT,
+		MPU6050_PWR1_ENABLE_BIT,
 		0}); err != nil {
 		return
 	}
 
 	return nil
+}
+
+// The temperature sensor is -40 to +85 degrees Celsius.
+// It is a signed integer.
+// According to the datasheet:
+//   340 per degrees Celsius, -512 at 35 degrees.
+// At 0 degrees: -512 - (340 * 35) = -12412
+func (h *MPU6050Driver) convertToCelsius() {
+	h.Temperature = (h.Temperature + 12412) / 340
 }
