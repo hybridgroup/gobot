@@ -8,7 +8,7 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
-const MAKEY_TEST_DELAY = 100
+const MAKEY_TEST_DELAY = 30
 
 func initTestMakeyButtonDriver() *MakeyButtonDriver {
 	return NewMakeyButtonDriver(newGpioTestAdaptor("adaptor"), "bot", "1")
