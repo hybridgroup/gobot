@@ -154,6 +154,8 @@ func (a *API) robeaux(res http.ResponseWriter, req *http.Request) {
 		res.Header().Set("Content-Type", "text/javascript; charset=utf-8")
 	} else if t[len(t)-1] == "css" {
 		res.Header().Set("Content-Type", "text/css; charset=utf-8")
+	} else if t[len(t)-1] == "html" {
+		res.Header().Set("Content-Type", "text/html; charset=utf-8")
 	}
 	res.Write(buf)
 }
