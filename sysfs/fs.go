@@ -11,6 +11,7 @@ type File interface {
 	Sync() (err error)
 	Read(b []byte) (n int, err error)
 	ReadAt(b []byte, off int64) (n int, err error)
+	Seek(int64, int) (int64, error)
 	Fd() uintptr
 	Close() error
 }
