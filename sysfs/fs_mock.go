@@ -32,6 +32,10 @@ func (f *MockFile) Write(b []byte) (n int, err error) {
 	return f.WriteString(string(b))
 }
 
+func (f *MockFile) Seek(offset int64, whence int) (ret int64, err error) {
+	return offset, nil
+}
+
 // WriteString writes s to f.Contents
 func (f *MockFile) WriteString(s string) (ret int, err error) {
 	f.Contents = s
