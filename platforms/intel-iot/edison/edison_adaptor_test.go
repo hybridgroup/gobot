@@ -65,6 +65,7 @@ func initTestEdisonAdaptor() (*EdisonAdaptor, *sysfs.MockFilesystem) {
 		"/sys/class/gpio/gpio221/direction",
 		"/sys/class/gpio/gpio243/value",
 		"/sys/class/gpio/gpio243/direction",
+		"/sys/class/gpio/gpio229/value",
 		"/sys/class/gpio/gpio229/direction",
 		"/sys/class/gpio/gpio253/value",
 		"/sys/class/gpio/gpio253/direction",
