@@ -1,6 +1,6 @@
 package joystick
 
-import "github.com/hybridgroup/go-sdl2/sdl"
+import "github.com/veandco/go-sdl2/sdl"
 
 type testJoystick struct{}
 
