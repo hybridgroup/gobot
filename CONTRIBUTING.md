@@ -2,6 +2,12 @@
 
 This document is based on the [io.js contribution guidelines](https://github.com/nodejs/io.js/blob/master/CONTRIBUTING.md)
 
+## Target Branch
+**Please open all non-hotfix PRs against the `dev` branch!**
+
+Gobot follows a ["git flow"](http://nvie.com/posts/a-successful-git-branching-model/)-style model for managing development.
+
+
 ## Issue Contributions
 
 When opening new issues or commenting on existing issues on this repository
