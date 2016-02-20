@@ -1,5 +1,5 @@
 PACKAGES := gobot gobot/api gobot/platforms/firmata/client gobot/platforms/intel-iot/edison gobot/sysfs $(shell ls ./platforms | sed -e 's/^/gobot\/platforms\//')
-.PHONY: test cover robeaux
+.PHONY: test cover robeaux examples
 
 test:
 	for package in $(PACKAGES) ; do \
@@ -31,3 +31,10 @@ endif
 	rm -rf robeaux-tmp/ ; \
 	rm -rf node_modules/ ; \
 	go fmt ./robeaux/robeaux.go ; \
+
+EXAMPLES := $(shell ls examples/*.go | sed -e 's/examples\///')
+
+examples:
+	for example in $(EXAMPLES) ; do \
+		go build -o /tmp/$$example examples/$$example ; \
+	done ; \
