@@ -1,6 +1,6 @@
 package opencv
 
-import cv "github.com/hybridgroup/go-opencv/opencv"
+import cv "github.com/lazywei/go-opencv/opencv"
 
 type testCapture struct{}
 

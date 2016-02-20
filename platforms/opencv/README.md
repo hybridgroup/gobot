@@ -6,11 +6,11 @@ For more info about OpenCV click [here](http://opencv.org/)
 
 ## How to Install
 
-This package requires `opencv` to be installed on your system
+This package requires OpenCV version 2.4 to be installed on your system. Please note that it is not compatible with OpenCV 3.x at this time.
 
 ### OSX
 
-To install `opencv` on OSX using Homebrew:
+To install OpenCV on OSX using Homebrew:
 
 ```
 $ brew tap homebrew/science && brew install opencv
@@ -18,7 +18,13 @@ $ brew tap homebrew/science && brew install opencv
 
 ### Ubuntu
 
-Follow the official [OpenCV installation guide](http://docs.opencv.org/doc/tutorials/introduction/linux_install/linux_install.html)
+To install OpenCV on Ubuntu 14.04:
+
+```
+$ sudo apt-get install libopencv-dev
+```
+
+Or, follow the official [OpenCV installation guide](http://docs.opencv.org/doc/tutorials/introduction/linux_install/linux_install.html)
 
 ### Windows
 
@@ -38,7 +44,7 @@ Example using the camera.
 package main
 
 import (
-	cv "github.com/hybridgroup/go-opencv/opencv"
+	cv "github.com/lazywei/go-opencv/opencv"
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/opencv"
 )

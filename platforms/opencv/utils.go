@@ -1,7 +1,7 @@
 package opencv
 
 import (
-	cv "github.com/hybridgroup/go-opencv/opencv"
+	cv "github.com/lazywei/go-opencv/opencv"
 )
 
 // loadHaarClassifierCascade returns open cv HaarCascade loaded
@@ -20,7 +20,7 @@ func DrawRectangles(image *cv.IplImage, rect []*cv.Rect, r int, g int, b int, th
 		cv.Rectangle(image,
 			cv.Point{value.X() + value.Width(), value.Y()},
 			cv.Point{value.X(), value.Y() + value.Height()},
-			cv.NewScalar(b, g, r), thickness, 1, 0)
+			cv.NewScalar(float64(b), float64(g), float64(r), 0), thickness, 1, 0)
 	}
 	return image
 }
