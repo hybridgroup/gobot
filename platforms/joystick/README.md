@@ -1,6 +1,11 @@
 # Joystick
 
-You can use Gobot with a Dualshock3 game controller, an XBox360 game controller, or any other USB joystick or game controller that is compatible with [Simple DirectMedia Layer](http://www.libsdl.org/).
+You can use Gobot with any USB joystick or game controller that is compatible with [Simple DirectMedia Layer](http://www.libsdl.org/).
+
+Current configurations included:
+- Dualshock3 game controller
+- Dualshock4 game controller
+- XBox360 game controller
 
 ## How to Install
 
@@ -128,6 +133,8 @@ Controller configurations are stored in JSON format. Here's an example configura
 ## How to Connect
 
 Plug your USB joystick or game controller into your USB port. If your device is supported by SDL, you are now ready.
+
+For the Dualshock4, you must pair the device with your computers Bluetooth interface first, before running your Gobot program.
 
 ## Examples
 
