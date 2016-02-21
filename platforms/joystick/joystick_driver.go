@@ -116,8 +116,7 @@ func (j *JoystickDriver) Start() (errs []error) {
 
 	go func() {
 		for {
-			event := j.poll()
-			if event != nil {
+			for event := j.poll(); event != nil; event = j.poll() {
 				if err = j.handleEvent(event); err != nil {
 					gobot.Publish(j.Event("error"), err)
 				}
