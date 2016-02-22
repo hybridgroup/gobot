@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/gobottest"
 )
 
 // --------- HELPERS
@@ -33,12 +33,12 @@ func TestNewMPL115A2Driver(t *testing.T) {
 func TestMPL115A2Driver(t *testing.T) {
 	mpl := initTestMPL115A2Driver()
 
-	gobot.Assert(t, mpl.Name(), "bot")
-	gobot.Assert(t, mpl.Connection().Name(), "adaptor")
-	gobot.Assert(t, mpl.interval, 10*time.Millisecond)
+	gobottest.Assert(t, mpl.Name(), "bot")
+	gobottest.Assert(t, mpl.Connection().Name(), "adaptor")
+	gobottest.Assert(t, mpl.interval, 10*time.Millisecond)
 
 	mpl = NewMPL115A2Driver(newI2cTestAdaptor("adaptor"), "bot", 100*time.Millisecond)
-	gobot.Assert(t, mpl.interval, 100*time.Millisecond)
+	gobottest.Assert(t, mpl.interval, 100*time.Millisecond)
 }
 
 func TestMPL115A2DriverStart(t *testing.T) {
@@ -47,14 +47,14 @@ func TestMPL115A2DriverStart(t *testing.T) {
 	adaptor.i2cReadImpl = func() ([]byte, error) {
 		return []byte{0x00, 0x01, 0x02, 0x04}, nil
 	}
-	gobot.Assert(t, len(mpl.Start()), 0)
+	gobottest.Assert(t, len(mpl.Start()), 0)
 	<-time.After(100 * time.Millisecond)
-	gobot.Assert(t, mpl.Pressure, float32(50.007942))
-	gobot.Assert(t, mpl.Temperature, float32(116.58878))
+	gobottest.Assert(t, mpl.Pressure, float32(50.007942))
+	gobottest.Assert(t, mpl.Temperature, float32(116.58878))
 }
 
 func TestMPL115A2DriverHalt(t *testing.T) {
 	mpl := initTestMPL115A2Driver()
 
-	gobot.Assert(t, len(mpl.Halt()), 0)
+	gobottest.Assert(t, len(mpl.Halt()), 0)
 }

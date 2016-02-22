@@ -1,6 +1,10 @@
 package gobot
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/hybridgroup/gobot/gobottest"
+)
 
 func TestEventer(t *testing.T) {
 	e := NewEventer()
@@ -11,8 +15,8 @@ func TestEventer(t *testing.T) {
 	}
 
 	event := e.Event("test")
-	Refute(t, event, nil)
+	gobottest.Refute(t, event, nil)
 
 	event = e.Event("booyeah")
-	Assert(t, event, (*Event)(nil))
+	gobottest.Assert(t, event, (*Event)(nil))
 }

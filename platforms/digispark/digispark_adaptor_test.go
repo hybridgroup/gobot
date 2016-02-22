@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/gobottest"
 )
 
 type mock struct {
@@ -64,64 +64,64 @@ func initTestDigisparkAdaptor() *DigisparkAdaptor {
 
 func TestDigisparkAdaptor(t *testing.T) {
 	a := NewDigisparkAdaptor("bot")
-	gobot.Assert(t, a.Name(), "bot")
+	gobottest.Assert(t, a.Name(), "bot")
 }
 
 func TestDigisparkAdaptorConnect(t *testing.T) {
 	a := NewDigisparkAdaptor("bot")
-	gobot.Assert(t, a.Connect()[0], ErrConnection)
+	gobottest.Assert(t, a.Connect()[0], ErrConnection)
 
 	a = initTestDigisparkAdaptor()
-	gobot.Assert(t, len(a.Connect()), 0)
+	gobottest.Assert(t, len(a.Connect()), 0)
 }
 
 func TestDigisparkAdaptorFinalize(t *testing.T) {
 	a := initTestDigisparkAdaptor()
-	gobot.Assert(t, len(a.Finalize()), 0)
+	gobottest.Assert(t, len(a.Finalize()), 0)
 }
 
 func TestDigisparkAdaptorDigitalWrite(t *testing.T) {
 	a := initTestDigisparkAdaptor()
 	err := a.DigitalWrite("0", uint8(1))
-	gobot.Assert(t, err, nil)
-	gobot.Assert(t, a.littleWire.(*mock).pin, uint8(0))
-	gobot.Assert(t, a.littleWire.(*mock).state, uint8(1))
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, a.littleWire.(*mock).pin, uint8(0))
+	gobottest.Assert(t, a.littleWire.(*mock).state, uint8(1))
 
 	err = a.DigitalWrite("?", uint8(1))
-	gobot.Refute(t, err, nil)
+	gobottest.Refute(t, err, nil)
 
 	errorFunc = func() error { return errors.New("pin mode error") }
 	err = a.DigitalWrite("0", uint8(1))
-	gobot.Assert(t, err, errors.New("pin mode error"))
+	gobottest.Assert(t, err, errors.New("pin mode error"))
 }
 
 func TestDigisparkAdaptorServoWrite(t *testing.T) {
 	a := initTestDigisparkAdaptor()
 	err := a.ServoWrite("2", uint8(80))
-	gobot.Assert(t, err, nil)
-	gobot.Assert(t, a.littleWire.(*mock).locationA, uint8(80))
-	gobot.Assert(t, a.littleWire.(*mock).locationB, uint8(80))
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, a.littleWire.(*mock).locationA, uint8(80))
+	gobottest.Assert(t, a.littleWire.(*mock).locationB, uint8(80))
 
 	a = initTestDigisparkAdaptor()
 	errorFunc = func() error { return errors.New("servo error") }
 	err = a.ServoWrite("2", uint8(80))
-	gobot.Assert(t, err, errors.New("servo error"))
+	gobottest.Assert(t, err, errors.New("servo error"))
 }
 
 func TestDigisparkAdaptorPwmWrite(t *testing.T) {
 	a := initTestDigisparkAdaptor()
 	err := a.PwmWrite("1", uint8(100))
-	gobot.Assert(t, err, nil)
-	gobot.Assert(t, a.littleWire.(*mock).pwmChannelA, uint8(100))
-	gobot.Assert(t, a.littleWire.(*mock).pwmChannelB, uint8(100))
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, a.littleWire.(*mock).pwmChannelA, uint8(100))
+	gobottest.Assert(t, a.littleWire.(*mock).pwmChannelB, uint8(100))
 
 	a = initTestDigisparkAdaptor()
 	pwmInitErrorFunc = func() error { return errors.New("pwminit error") }
 	err = a.PwmWrite("1", uint8(100))
-	gobot.Assert(t, err, errors.New("pwminit error"))
+	gobottest.Assert(t, err, errors.New("pwminit error"))
 
 	a = initTestDigisparkAdaptor()
 	errorFunc = func() error { return errors.New("pwm error") }
 	err = a.PwmWrite("1", uint8(100))
-	gobot.Assert(t, err, errors.New("pwm error"))
+	gobottest.Assert(t, err, errors.New("pwm error"))
 }

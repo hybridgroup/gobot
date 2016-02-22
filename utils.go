@@ -3,14 +3,9 @@ package gobot
 import (
 	"crypto/rand"
 	"errors"
-	"fmt"
 	"log"
 	"math"
 	"math/big"
-	"reflect"
-	"runtime"
-	"strings"
-	"testing"
 	"time"
 )
 
@@ -26,32 +21,6 @@ var eventError = func(e *Event) (err error) {
 		return
 	}
 	return
-}
-
-var errFunc = func(t *testing.T, message string) {
-	t.Errorf(message)
-}
-
-func logFailure(t *testing.T, message string) {
-	_, file, line, _ := runtime.Caller(2)
-	s := strings.Split(file, "/")
-	errFunc(t, fmt.Sprintf("%v:%v: %v", s[len(s)-1], line, message))
-}
-
-// Assert checks if a and b are equal, emis a t.Errorf if they are not equal.
-func Assert(t *testing.T, a interface{}, b interface{}) {
-	if !reflect.DeepEqual(a, b) {
-		logFailure(t, fmt.Sprintf("%v - \"%v\", should equal,  %v - \"%v\"",
-			a, reflect.TypeOf(a), b, reflect.TypeOf(b)))
-	}
-}
-
-// Refute checks if a and b are equal, emis a t.Errorf if they are equal.
-func Refute(t *testing.T, a interface{}, b interface{}) {
-	if reflect.DeepEqual(a, b) {
-		logFailure(t, fmt.Sprintf("%v - \"%v\", should not equal,  %v - \"%v\"",
-			a, reflect.TypeOf(a), b, reflect.TypeOf(b)))
-	}
 }
 
 // Every triggers f every t time until the end of days. It does not wait for the
