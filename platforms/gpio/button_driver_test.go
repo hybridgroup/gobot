@@ -8,7 +8,7 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
-const BUTTON_TEST_DELAY = 30
+const BUTTON_TEST_DELAY = 50
 
 func initTestButtonDriver() *ButtonDriver {
 	return NewButtonDriver(newGpioTestAdaptor("adaptor"), "bot", "1")
@@ -28,7 +28,7 @@ func TestButtonDriver(t *testing.T) {
 	gobot.Assert(t, d.Connection().Name(), "adaptor")
 
 	d = NewButtonDriver(newGpioTestAdaptor("adaptor"), "bot", "1", 30*time.Second)
-	gobot.Assert(t, d.interval, BUTTON_TEST_DELAY * time.Second)
+	gobot.Assert(t, d.interval, 30 * time.Second)
 }
 
 func TestButtonDriverStart(t *testing.T) {
