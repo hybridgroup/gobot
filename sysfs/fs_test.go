@@ -4,12 +4,12 @@ import (
 	"os"
 	"testing"
 
-	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/gobottest"
 )
 
 func TestFilesystemOpen(t *testing.T) {
 	SetFilesystem(&NativeFilesystem{})
 	file, err := OpenFile(os.DevNull, os.O_RDONLY, 666)
-	gobot.Assert(t, err, nil)
+	gobottest.Assert(t, err, nil)
 	var _ File = file
 }

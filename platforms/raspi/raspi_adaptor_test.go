@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/gobottest"
 	"github.com/hybridgroup/gobot/sysfs"
 )
 
@@ -56,9 +56,9 @@ Serial          : 000000003bc748ea
 `), nil
 	}
 	a := NewRaspiAdaptor("myAdaptor")
-	gobot.Assert(t, a.Name(), "myAdaptor")
-	gobot.Assert(t, a.i2cLocation, "/dev/i2c-1")
-	gobot.Assert(t, a.revision, "3")
+	gobottest.Assert(t, a.Name(), "myAdaptor")
+	gobottest.Assert(t, a.i2cLocation, "/dev/i2c-1")
+	gobottest.Assert(t, a.revision, "3")
 
 	readFile = func() ([]byte, error) {
 		return []byte(`
@@ -68,8 +68,8 @@ Serial          : 000000003bc748ea
 `), nil
 	}
 	a = NewRaspiAdaptor("myAdaptor")
-	gobot.Assert(t, a.i2cLocation, "/dev/i2c-1")
-	gobot.Assert(t, a.revision, "2")
+	gobottest.Assert(t, a.i2cLocation, "/dev/i2c-1")
+	gobottest.Assert(t, a.revision, "2")
 
 	readFile = func() ([]byte, error) {
 		return []byte(`
@@ -79,8 +79,8 @@ Serial          : 000000003bc748ea
 `), nil
 	}
 	a = NewRaspiAdaptor("myAdaptor")
-	gobot.Assert(t, a.i2cLocation, "/dev/i2c-0")
-	gobot.Assert(t, a.revision, "1")
+	gobottest.Assert(t, a.i2cLocation, "/dev/i2c-0")
+	gobottest.Assert(t, a.revision, "1")
 
 }
 func TestRaspiAdaptorFinalize(t *testing.T) {
@@ -101,26 +101,26 @@ func TestRaspiAdaptorFinalize(t *testing.T) {
 	a.PwmWrite("7", 255)
 
 	a.I2cStart(0xff)
-	gobot.Assert(t, len(a.Finalize()), 0)
+	gobottest.Assert(t, len(a.Finalize()), 0)
 }
 
 func TestRaspiAdaptorDigitalPWM(t *testing.T) {
 	a := initTestRaspiAdaptor()
 
-	gobot.Assert(t, a.PwmWrite("7", 4), nil)
+	gobottest.Assert(t, a.PwmWrite("7", 4), nil)
 
 	fs := sysfs.NewMockFilesystem([]string{
 		"/dev/pi-blaster",
 	})
 	sysfs.SetFilesystem(fs)
 
-	gobot.Assert(t, a.PwmWrite("7", 255), nil)
+	gobottest.Assert(t, a.PwmWrite("7", 255), nil)
 
-	gobot.Assert(t, strings.Split(fs.Files["/dev/pi-blaster"].Contents, "\n")[0], "4=1")
+	gobottest.Assert(t, strings.Split(fs.Files["/dev/pi-blaster"].Contents, "\n")[0], "4=1")
 
-	gobot.Assert(t, a.ServoWrite("11", 255), nil)
+	gobottest.Assert(t, a.ServoWrite("11", 255), nil)
 
-	gobot.Assert(t, strings.Split(fs.Files["/dev/pi-blaster"].Contents, "\n")[0], "17=0.25")
+	gobottest.Assert(t, strings.Split(fs.Files["/dev/pi-blaster"].Contents, "\n")[0], "17=0.25")
 }
 
 func TestRaspiAdaptorDigitalIO(t *testing.T) {
@@ -137,11 +137,11 @@ func TestRaspiAdaptorDigitalIO(t *testing.T) {
 	sysfs.SetFilesystem(fs)
 
 	a.DigitalWrite("7", 1)
-	gobot.Assert(t, fs.Files["/sys/class/gpio/gpio4/value"].Contents, "1")
+	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio4/value"].Contents, "1")
 
 	a.DigitalWrite("13", 1)
 	i, _ := a.DigitalRead("13")
-	gobot.Assert(t, i, 1)
+	gobottest.Assert(t, i, 1)
 }
 
 func TestRaspiAdaptorI2c(t *testing.T) {
@@ -156,5 +156,5 @@ func TestRaspiAdaptorI2c(t *testing.T) {
 
 	a.I2cWrite(0xff, []byte{0x00, 0x01})
 	data, _ := a.I2cRead(0xff, 2)
-	gobot.Assert(t, data, []byte{0x00, 0x01})
+	gobottest.Assert(t, data, []byte{0x00, 0x01})
 }

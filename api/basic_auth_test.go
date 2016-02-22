@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/gobottest"
 )
 
 func TestBasicAuth(t *testing.T) {
@@ -17,11 +17,11 @@ func TestBasicAuth(t *testing.T) {
 	request.SetBasicAuth("admin", "password")
 	response := httptest.NewRecorder()
 	a.ServeHTTP(response, request)
-	gobot.Assert(t, response.Code, 200)
+	gobottest.Assert(t, response.Code, 200)
 
 	request, _ = http.NewRequest("GET", "/api/", nil)
 	request.SetBasicAuth("admin", "wrongPassword")
 	response = httptest.NewRecorder()
 	a.ServeHTTP(response, request)
-	gobot.Assert(t, response.Code, 401)
+	gobottest.Assert(t, response.Code, 401)
 }

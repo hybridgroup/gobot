@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/gobottest"
 )
 
 // --------- HELPERS
@@ -31,23 +31,23 @@ func TestNewMPU6050Driver(t *testing.T) {
 
 func TestMPU6050Driver(t *testing.T) {
 	mpu := initTestMPU6050Driver()
-	gobot.Assert(t, mpu.Name(), "bot")
-	gobot.Assert(t, mpu.Connection().Name(), "adaptor")
-	gobot.Assert(t, mpu.interval, 10*time.Millisecond)
+	gobottest.Assert(t, mpu.Name(), "bot")
+	gobottest.Assert(t, mpu.Connection().Name(), "adaptor")
+	gobottest.Assert(t, mpu.interval, 10*time.Millisecond)
 
 	mpu = NewMPU6050Driver(newI2cTestAdaptor("adaptor"), "bot", 100*time.Millisecond)
-	gobot.Assert(t, mpu.interval, 100*time.Millisecond)
+	gobottest.Assert(t, mpu.interval, 100*time.Millisecond)
 }
 
 // Methods
 func TestMPU6050DriverStart(t *testing.T) {
 	mpu := initTestMPU6050Driver()
 
-	gobot.Assert(t, len(mpu.Start()), 0)
+	gobottest.Assert(t, len(mpu.Start()), 0)
 }
 
 func TestMPU6050DriverHalt(t *testing.T) {
 	mpu := initTestMPU6050Driver()
 
-	gobot.Assert(t, len(mpu.Halt()), 0)
+	gobottest.Assert(t, len(mpu.Halt()), 0)
 }

@@ -2,9 +2,11 @@ package gobot_test
 
 import (
 	"fmt"
-	"github.com/hybridgroup/gobot"
 	"testing"
 	"time"
+
+	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/gobottest"
 )
 
 func ExampleEvery() {
@@ -64,12 +66,12 @@ func ExampleAssert() {
 	t := &testing.T{}
 	var a int = 100
 	var b int = 100
-	gobot.Assert(t, a, b)
+	gobottest.Assert(t, a, b)
 }
 
 func ExampleRefute() {
 	t := &testing.T{}
 	var a int = 100
 	var b int = 200
-	gobot.Refute(t, a, b)
+	gobottest.Refute(t, a, b)
 }

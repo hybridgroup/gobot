@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/gobottest"
 )
 
 type readWriteCloser struct{}
@@ -172,7 +173,7 @@ func TestProcess(t *testing.T) {
 	for _, test := range tests {
 		test.init()
 		gobot.Once(b.Event(test.event), func(data interface{}) {
-			gobot.Assert(t, data, test.expected)
+			gobottest.Assert(t, data, test.expected)
 			sem <- true
 		})
 
@@ -215,5 +216,5 @@ func TestConnect(t *testing.T) {
 		response = testProtocolResponse()
 	})
 
-	gobot.Assert(t, b.Connect(readWriteCloser{}), nil)
+	gobottest.Assert(t, b.Connect(readWriteCloser{}), nil)
 }
