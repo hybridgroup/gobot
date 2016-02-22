@@ -3,7 +3,7 @@ package ardrone
 import (
 	"testing"
 
-	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/gobottest"
 )
 
 func initTestArdroneDriver() *ArdroneDriver {
@@ -18,18 +18,18 @@ func initTestArdroneDriver() *ArdroneDriver {
 
 func TestArdroneDriver(t *testing.T) {
 	d := initTestArdroneDriver()
-	gobot.Assert(t, d.Name(), "drone")
-	gobot.Assert(t, d.Connection().Name(), "drone")
+	gobottest.Assert(t, d.Name(), "drone")
+	gobottest.Assert(t, d.Connection().Name(), "drone")
 }
 
 func TestArdroneDriverStart(t *testing.T) {
 	d := initTestArdroneDriver()
-	gobot.Assert(t, len(d.Start()), 0)
+	gobottest.Assert(t, len(d.Start()), 0)
 }
 
 func TestArdroneDriverHalt(t *testing.T) {
 	d := initTestArdroneDriver()
-	gobot.Assert(t, len(d.Halt()), 0)
+	gobottest.Assert(t, len(d.Halt()), 0)
 }
 func TestArdroneDriverTakeOff(t *testing.T) {
 	d := initTestArdroneDriver()

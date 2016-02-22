@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/gobottest"
 )
 
 func initTestNeuroskyDriver() *NeuroskyDriver {
@@ -21,18 +22,18 @@ func initTestNeuroskyDriver() *NeuroskyDriver {
 
 func TestNeuroskyDriver(t *testing.T) {
 	d := initTestNeuroskyDriver()
-	gobot.Assert(t, d.Name(), "bot")
-	gobot.Assert(t, d.Connection().Name(), "bot")
+	gobottest.Assert(t, d.Name(), "bot")
+	gobottest.Assert(t, d.Connection().Name(), "bot")
 }
 func TestNeuroskyDriverStart(t *testing.T) {
 	sem := make(chan bool, 0)
 	d := initTestNeuroskyDriver()
 	gobot.Once(d.Event("error"), func(data interface{}) {
-		gobot.Assert(t, data.(error), errors.New("read error"))
+		gobottest.Assert(t, data.(error), errors.New("read error"))
 		sem <- true
 	})
 
-	gobot.Assert(t, len(d.Start()), 0)
+	gobottest.Assert(t, len(d.Start()), 0)
 
 	<-time.After(50 * time.Millisecond)
 	readError = errors.New("read error")
@@ -49,7 +50,7 @@ func TestNeuroskyDriverStart(t *testing.T) {
 
 func TestNeuroskyDriverHalt(t *testing.T) {
 	d := initTestNeuroskyDriver()
-	gobot.Assert(t, len(d.Halt()), 0)
+	gobottest.Assert(t, len(d.Halt()), 0)
 }
 
 func TestNeuroskyDriverParse(t *testing.T) {
@@ -79,7 +80,7 @@ func TestNeuroskyDriverParse(t *testing.T) {
 	}()
 
 	gobot.On(d.Event("signal"), func(data interface{}) {
-		gobot.Assert(t, data.(byte), byte(100))
+		gobottest.Assert(t, data.(byte), byte(100))
 		sem <- true
 	})
 
@@ -92,7 +93,7 @@ func TestNeuroskyDriverParse(t *testing.T) {
 	}()
 
 	gobot.On(d.Event("attention"), func(data interface{}) {
-		gobot.Assert(t, data.(byte), byte(40))
+		gobottest.Assert(t, data.(byte), byte(40))
 		sem <- true
 	})
 
@@ -105,7 +106,7 @@ func TestNeuroskyDriverParse(t *testing.T) {
 	}()
 
 	gobot.On(d.Event("meditation"), func(data interface{}) {
-		gobot.Assert(t, data.(byte), byte(60))
+		gobottest.Assert(t, data.(byte), byte(60))
 		sem <- true
 	})
 
@@ -118,7 +119,7 @@ func TestNeuroskyDriverParse(t *testing.T) {
 	}()
 
 	gobot.On(d.Event("blink"), func(data interface{}) {
-		gobot.Assert(t, data.(byte), byte(150))
+		gobottest.Assert(t, data.(byte), byte(150))
 		sem <- true
 	})
 
@@ -131,7 +132,7 @@ func TestNeuroskyDriverParse(t *testing.T) {
 	}()
 
 	gobot.On(d.Event("wave"), func(data interface{}) {
-		gobot.Assert(t, data.(int16), int16(16401))
+		gobottest.Assert(t, data.(int16), int16(16401))
 		sem <- true
 	})
 
@@ -146,7 +147,7 @@ func TestNeuroskyDriverParse(t *testing.T) {
 	}()
 
 	gobot.On(d.Event("eeg"), func(data interface{}) {
-		gobot.Assert(t,
+		gobottest.Assert(t,
 			data.(EEG),
 			EEG{
 				Delta:    1573241,

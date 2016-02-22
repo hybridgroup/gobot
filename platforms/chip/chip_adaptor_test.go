@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/gobottest"
 	"github.com/hybridgroup/gobot/sysfs"
 )
 
@@ -54,13 +54,13 @@ func TestChipAdaptorDigitalIO(t *testing.T) {
 	sysfs.SetFilesystem(fs)
 
 	a.DigitalWrite("XIO-P0", 1)
-	gobot.Assert(t, fs.Files["/sys/class/gpio/gpio408/value"].Contents, "1")
+	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio408/value"].Contents, "1")
 
 	fs.Files["/sys/class/gpio/gpio415/value"].Contents = "1"
 	i, _ := a.DigitalRead("XIO-P7")
-	gobot.Assert(t, i, 1)
+	gobottest.Assert(t, i, 1)
 
-	gobot.Assert(t, a.DigitalWrite("XIO-P10", 1), errors.New("Not a valid pin"))
+	gobottest.Assert(t, a.DigitalWrite("XIO-P10", 1), errors.New("Not a valid pin"))
 }
 
 func TestChipAdaptorI2c(t *testing.T) {
@@ -75,7 +75,7 @@ func TestChipAdaptorI2c(t *testing.T) {
 
 	a.I2cWrite(0xff, []byte{0x00, 0x01})
 	data, _ := a.I2cRead(0xff, 2)
-	gobot.Assert(t, data, []byte{0x00, 0x01})
+	gobottest.Assert(t, data, []byte{0x00, 0x01})
 
-	gobot.Assert(t, len(a.Finalize()), 0)
+	gobottest.Assert(t, len(a.Finalize()), 0)
 }

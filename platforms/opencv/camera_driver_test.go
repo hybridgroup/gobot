@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/gobottest"
 )
 
 func initTestCameraDriver() *CameraDriver {
@@ -18,13 +19,13 @@ func initTestCameraDriver() *CameraDriver {
 
 func TestCameraDriver(t *testing.T) {
 	d := initTestCameraDriver()
-	gobot.Assert(t, d.Name(), "bot")
-	gobot.Assert(t, d.Connection(), (gobot.Connection)(nil))
+	gobottest.Assert(t, d.Name(), "bot")
+	gobottest.Assert(t, d.Connection(), (gobot.Connection)(nil))
 }
 func TestCameraDriverStart(t *testing.T) {
 	sem := make(chan bool)
 	d := initTestCameraDriver()
-	gobot.Assert(t, len(d.Start()), 0)
+	gobottest.Assert(t, len(d.Start()), 0)
 	gobot.On(d.Event("frame"), func(data interface{}) {
 		sem <- true
 	})
@@ -35,14 +36,14 @@ func TestCameraDriverStart(t *testing.T) {
 	}
 
 	d = NewCameraDriver("bot", "")
-	gobot.Assert(t, len(d.Start()), 0)
+	gobottest.Assert(t, len(d.Start()), 0)
 
 	d = NewCameraDriver("bot", true)
-	gobot.Refute(t, len(d.Start()), 0)
+	gobottest.Refute(t, len(d.Start()), 0)
 
 }
 
 func TestCameraDriverHalt(t *testing.T) {
 	d := initTestCameraDriver()
-	gobot.Assert(t, len(d.Halt()), 0)
+	gobottest.Assert(t, len(d.Halt()), 0)
 }

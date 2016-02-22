@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/gobottest"
 )
 
 // --------- HELPERS
@@ -29,34 +29,34 @@ func TestNewHMC6352Driver(t *testing.T) {
 	}
 
 	b := NewHMC6352Driver(newI2cTestAdaptor("adaptor"), "bot")
-	gobot.Assert(t, b.Name(), "bot")
-	gobot.Assert(t, b.Connection().Name(), "adaptor")
+	gobottest.Assert(t, b.Name(), "bot")
+	gobottest.Assert(t, b.Connection().Name(), "adaptor")
 }
 
 // Methods
 func TestHMC6352DriverStart(t *testing.T) {
 	hmc, adaptor := initTestHMC6352DriverWithStubbedAdaptor()
 
-	gobot.Assert(t, len(hmc.Start()), 0)
+	gobottest.Assert(t, len(hmc.Start()), 0)
 
 	adaptor.i2cWriteImpl = func() error {
 		return errors.New("write error")
 	}
 	err := hmc.Start()
-	gobot.Assert(t, err[0], errors.New("write error"))
+	gobottest.Assert(t, err[0], errors.New("write error"))
 
 	adaptor.i2cStartImpl = func() error {
 		return errors.New("start error")
 	}
 	err = hmc.Start()
-	gobot.Assert(t, err[0], errors.New("start error"))
+	gobottest.Assert(t, err[0], errors.New("start error"))
 
 }
 
 func TestHMC6352DriverHalt(t *testing.T) {
 	hmc := initTestHMC6352Driver()
 
-	gobot.Assert(t, len(hmc.Halt()), 0)
+	gobottest.Assert(t, len(hmc.Halt()), 0)
 }
 
 func TestHMC6352DriverHeading(t *testing.T) {
@@ -68,7 +68,7 @@ func TestHMC6352DriverHeading(t *testing.T) {
 	}
 
 	heading, _ := hmc.Heading()
-	gobot.Assert(t, heading, uint16(2534))
+	gobottest.Assert(t, heading, uint16(2534))
 
 	// when len(data) is not 2
 	hmc, adaptor = initTestHMC6352DriverWithStubbedAdaptor()
@@ -78,8 +78,8 @@ func TestHMC6352DriverHeading(t *testing.T) {
 	}
 
 	heading, err := hmc.Heading()
-	gobot.Assert(t, heading, uint16(0))
-	gobot.Assert(t, err, ErrNotEnoughBytes)
+	gobottest.Assert(t, heading, uint16(0))
+	gobottest.Assert(t, err, ErrNotEnoughBytes)
 
 	// when read error
 	hmc, adaptor = initTestHMC6352DriverWithStubbedAdaptor()
@@ -89,8 +89,8 @@ func TestHMC6352DriverHeading(t *testing.T) {
 	}
 
 	heading, err = hmc.Heading()
-	gobot.Assert(t, heading, uint16(0))
-	gobot.Assert(t, err, errors.New("read error"))
+	gobottest.Assert(t, heading, uint16(0))
+	gobottest.Assert(t, err, errors.New("read error"))
 
 	// when write error
 	hmc, adaptor = initTestHMC6352DriverWithStubbedAdaptor()
@@ -100,6 +100,6 @@ func TestHMC6352DriverHeading(t *testing.T) {
 	}
 
 	heading, err = hmc.Heading()
-	gobot.Assert(t, heading, uint16(0))
-	gobot.Assert(t, err, errors.New("write error"))
+	gobottest.Assert(t, heading, uint16(0))
+	gobottest.Assert(t, err, errors.New("write error"))
 }

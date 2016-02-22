@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/gobottest"
 )
 
 const MAKEY_TEST_DELAY = 30
@@ -19,22 +20,22 @@ func TestMakeyButtonDriverHalt(t *testing.T) {
 	go func() {
 		<-d.halt
 	}()
-	gobot.Assert(t, len(d.Halt()), 0)
+	gobottest.Assert(t, len(d.Halt()), 0)
 }
 
 func TestMakeyButtonDriver(t *testing.T) {
 	d := NewMakeyButtonDriver(newGpioTestAdaptor("adaptor"), "bot", "1")
-	gobot.Assert(t, d.Name(), "bot")
-	gobot.Assert(t, d.Connection().Name(), "adaptor")
+	gobottest.Assert(t, d.Name(), "bot")
+	gobottest.Assert(t, d.Connection().Name(), "adaptor")
 
 	d = NewMakeyButtonDriver(newGpioTestAdaptor("adaptor"), "bot", "1", 30*time.Second)
-	gobot.Assert(t, d.interval, MAKEY_TEST_DELAY * time.Second)
+	gobottest.Assert(t, d.interval, MAKEY_TEST_DELAY*time.Second)
 }
 
 func TestMakeyButtonDriverStart(t *testing.T) {
 	sem := make(chan bool, 0)
 	d := initTestMakeyButtonDriver()
-	gobot.Assert(t, len(d.Start()), 0)
+	gobottest.Assert(t, len(d.Start()), 0)
 
 	testAdaptorDigitalRead = func() (val int, err error) {
 		val = 0
@@ -42,7 +43,7 @@ func TestMakeyButtonDriverStart(t *testing.T) {
 	}
 
 	gobot.Once(d.Event(Push), func(data interface{}) {
-		gobot.Assert(t, d.Active, true)
+		gobottest.Assert(t, d.Active, true)
 		sem <- true
 	})
 
@@ -58,7 +59,7 @@ func TestMakeyButtonDriverStart(t *testing.T) {
 	}
 
 	gobot.Once(d.Event(Release), func(data interface{}) {
-		gobot.Assert(t, d.Active, false)
+		gobottest.Assert(t, d.Active, false)
 		sem <- true
 	})
 

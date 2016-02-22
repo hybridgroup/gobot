@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/gobottest"
 )
 
 func initTestKeyboardDriver() *KeyboardDriver {
@@ -19,16 +20,16 @@ func initTestKeyboardDriver() *KeyboardDriver {
 
 func TestKeyboardDriver(t *testing.T) {
 	d := initTestKeyboardDriver()
-	gobot.Assert(t, d.Name(), "keyboard")
-	gobot.Assert(t, d.Connection(), (gobot.Connection)(nil))
+	gobottest.Assert(t, d.Name(), "keyboard")
+	gobottest.Assert(t, d.Connection(), (gobot.Connection)(nil))
 }
 
 func TestKeyboardDriverStart(t *testing.T) {
 	d := initTestKeyboardDriver()
-	gobot.Assert(t, len(d.Start()), 0)
+	gobottest.Assert(t, len(d.Start()), 0)
 }
 
 func TestKeyboardDriverHalt(t *testing.T) {
 	d := initTestKeyboardDriver()
-	gobot.Assert(t, len(d.Halt()), 0)
+	gobottest.Assert(t, len(d.Halt()), 0)
 }

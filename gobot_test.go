@@ -5,6 +5,8 @@ import (
 	"log"
 	"os"
 	"testing"
+
+	"github.com/hybridgroup/gobot/gobottest"
 )
 
 func TestConnectionEach(t *testing.T) {
@@ -14,7 +16,7 @@ func TestConnectionEach(t *testing.T) {
 	r.Connections().Each(func(conn Connection) {
 		i++
 	})
-	Assert(t, r.Connections().Len(), i)
+	gobottest.Assert(t, r.Connections().Len(), i)
 }
 
 func initTestGobot() *Gobot {
@@ -30,29 +32,29 @@ func initTestGobot() *Gobot {
 }
 
 func TestVersion(t *testing.T) {
-	Assert(t, version, Version())
+	gobottest.Assert(t, version, Version())
 }
 
 func TestNullReadWriteCloser(t *testing.T) {
 	n := &NullReadWriteCloser{}
 	i, _ := n.Write([]byte{1, 2, 3})
-	Assert(t, i, 3)
+	gobottest.Assert(t, i, 3)
 	i, _ = n.Read(make([]byte, 10))
-	Assert(t, i, 10)
-	Assert(t, n.Close(), nil)
+	gobottest.Assert(t, i, 10)
+	gobottest.Assert(t, n.Close(), nil)
 }
 
 func TestGobotRobot(t *testing.T) {
 	g := initTestGobot()
-	Assert(t, g.Robot("Robot1").Name, "Robot1")
-	Assert(t, g.Robot("Robot4"), (*Robot)(nil))
-	Assert(t, g.Robot("Robot4").Device("Device1"), (Device)(nil))
-	Assert(t, g.Robot("Robot4").Connection("Connection1"), (Connection)(nil))
-	Assert(t, g.Robot("Robot1").Device("Device4"), (Device)(nil))
-	Assert(t, g.Robot("Robot1").Device("Device1").Name(), "Device1")
-	Assert(t, g.Robot("Robot1").Devices().Len(), 3)
-	Assert(t, g.Robot("Robot1").Connection("Connection4"), (Connection)(nil))
-	Assert(t, g.Robot("Robot1").Connections().Len(), 3)
+	gobottest.Assert(t, g.Robot("Robot1").Name, "Robot1")
+	gobottest.Assert(t, g.Robot("Robot4"), (*Robot)(nil))
+	gobottest.Assert(t, g.Robot("Robot4").Device("Device1"), (Device)(nil))
+	gobottest.Assert(t, g.Robot("Robot4").Connection("Connection1"), (Connection)(nil))
+	gobottest.Assert(t, g.Robot("Robot1").Device("Device4"), (Device)(nil))
+	gobottest.Assert(t, g.Robot("Robot1").Device("Device1").Name(), "Device1")
+	gobottest.Assert(t, g.Robot("Robot1").Devices().Len(), 3)
+	gobottest.Assert(t, g.Robot("Robot1").Connection("Connection4"), (Connection)(nil))
+	gobottest.Assert(t, g.Robot("Robot1").Connections().Len(), 3)
 }
 
 func TestGobotToJSON(t *testing.T) {
@@ -61,14 +63,14 @@ func TestGobotToJSON(t *testing.T) {
 		return nil
 	})
 	json := NewJSONGobot(g)
-	Assert(t, len(json.Robots), g.Robots().Len())
-	Assert(t, len(json.Commands), len(g.Commands()))
+	gobottest.Assert(t, len(json.Robots), g.Robots().Len())
+	gobottest.Assert(t, len(json.Commands), len(g.Commands()))
 }
 
 func TestGobotStart(t *testing.T) {
 	g := initTestGobot()
-	Assert(t, len(g.Start()), 0)
-	Assert(t, len(g.Stop()), 0)
+	gobottest.Assert(t, len(g.Start()), 0)
+	gobottest.Assert(t, len(g.Stop()), 0)
 }
 
 func TestGobotStartErrors(t *testing.T) {
@@ -90,8 +92,8 @@ func TestGobotStartErrors(t *testing.T) {
 		}
 	}
 
-	Assert(t, len(g.Start()), 1)
-	Assert(t, len(g.Stop()), 0)
+	gobottest.Assert(t, len(g.Start()), 1)
+	gobottest.Assert(t, len(g.Stop()), 0)
 
 	testDriverStart = func() (errs []error) { return }
 	testAdaptorConnect = func() (errs []error) {
@@ -100,8 +102,8 @@ func TestGobotStartErrors(t *testing.T) {
 		}
 	}
 
-	Assert(t, len(g.Start()), 1)
-	Assert(t, len(g.Stop()), 0)
+	gobottest.Assert(t, len(g.Start()), 1)
+	gobottest.Assert(t, len(g.Stop()), 0)
 
 	testDriverStart = func() (errs []error) { return }
 	testAdaptorConnect = func() (errs []error) { return }
@@ -122,6 +124,6 @@ func TestGobotStartErrors(t *testing.T) {
 		}
 	}
 
-	Assert(t, len(g.Start()), 0)
-	Assert(t, len(g.Stop()), 2)
+	gobottest.Assert(t, len(g.Start()), 0)
+	gobottest.Assert(t, len(g.Stop()), 2)
 }
