@@ -14,7 +14,7 @@ func TestAssert(t *testing.T) {
 	}
 
 	Assert(t, 1, 2)
-	if err == "" {
+	if err != `gobottest_test.go:16: 1 - "int", should equal,  2 - "int"` {
 		t.Errorf("Assert failed: 1 should not equal 2")
 	}
 }
@@ -31,7 +31,7 @@ func TestRefute(t *testing.T) {
 	}
 
 	Refute(t, 1, 1)
-	if err == "" {
+	if err != `gobottest_test.go:33: 1 - "int", should not equal,  1 - "int"` {
 		t.Errorf("Refute failed: 1 should not be 1")
 	}
 }
