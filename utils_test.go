@@ -6,36 +6,37 @@ import (
 	"time"
 )
 
-func TestAssert(t *testing.T) {
-	err := ""
-	errFunc = func(t *testing.T, message string) {
-		err = message
-	}
+type nopFailer struct{ msg string }
 
-	Assert(t, 1, 1)
-	if err != "" {
+func (tf *nopFailer) Errorf(format string, args ...interface{}) {
+	tf.msg = fmt.Sprintf(format, args...)
+}
+
+func TestAssert(t *testing.T) {
+	nf := &nopFailer{}
+
+	Assert(nf, 1, 1)
+	if nf.msg != "" {
 		t.Errorf("Assert failed: 1 should equal 1")
 	}
 
-	Assert(t, 1, 2)
-	if err == "" {
+	Assert(nf, 1, 2)
+
+	if nf.msg != `utils_test.go:23: 1 - "int", should equal,  2 - "int"` {
 		t.Errorf("Assert failed: 1 should not equal 2")
 	}
 }
 
 func TestRefute(t *testing.T) {
-	err := ""
-	errFunc = func(t *testing.T, message string) {
-		err = message
-	}
+	nf := &nopFailer{}
 
-	Refute(t, 1, 2)
-	if err != "" {
+	Refute(nf, 1, 2)
+	if nf.msg != "" {
 		t.Errorf("Refute failed: 1 should not be 2")
 	}
 
-	Refute(t, 1, 1)
-	if err == "" {
+	Refute(nf, 1, 1)
+	if nf.msg != `utils_test.go:38: 1 - "int", should not equal,  1 - "int"` {
 		t.Errorf("Refute failed: 1 should not be 1")
 	}
 }
@@ -76,6 +77,8 @@ func TestPublish(t *testing.T) {
 
 	e := &Event{Callbacks: []callback{cb}}
 	Publish(e, 1)
+	// this enforeces Event's callback goroutine to actually start
+	<-time.After(10 * time.Millisecond)
 	Publish(e, 2)
 	Publish(e, 3)
 	Publish(e, 4)

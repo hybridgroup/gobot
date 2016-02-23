@@ -10,7 +10,6 @@ import (
 	"reflect"
 	"runtime"
 	"strings"
-	"testing"
 	"time"
 )
 
@@ -28,30 +27,34 @@ var eventError = func(e *Event) (err error) {
 	return
 }
 
-var errFunc = func(t *testing.T, message string) {
-	t.Errorf(message)
+type TestFailer interface {
+	Errorf(string, ...interface{})
 }
 
-func logFailure(t *testing.T, message string) {
+func logFailure(t TestFailer, message string) {
 	_, file, line, _ := runtime.Caller(2)
 	s := strings.Split(file, "/")
-	errFunc(t, fmt.Sprintf("%v:%v: %v", s[len(s)-1], line, message))
+	t.Errorf("%v:%v: %v", s[len(s)-1], line, message)
 }
 
 // Assert checks if a and b are equal, emis a t.Errorf if they are not equal.
-func Assert(t *testing.T, a interface{}, b interface{}) {
-	if !reflect.DeepEqual(a, b) {
-		logFailure(t, fmt.Sprintf("%v - \"%v\", should equal,  %v - \"%v\"",
-			a, reflect.TypeOf(a), b, reflect.TypeOf(b)))
+func Assert(t TestFailer, a, b interface{}) {
+	if reflect.DeepEqual(a, b) {
+		return
 	}
+
+	logFailure(t, fmt.Sprintf("%v - \"%v\", should equal,  %v - \"%v\"",
+		a, reflect.TypeOf(a), b, reflect.TypeOf(b)))
 }
 
 // Refute checks if a and b are equal, emis a t.Errorf if they are equal.
-func Refute(t *testing.T, a interface{}, b interface{}) {
-	if reflect.DeepEqual(a, b) {
-		logFailure(t, fmt.Sprintf("%v - \"%v\", should not equal,  %v - \"%v\"",
-			a, reflect.TypeOf(a), b, reflect.TypeOf(b)))
+func Refute(t TestFailer, a, b interface{}) {
+	if !reflect.DeepEqual(a, b) {
+		return
 	}
+
+	logFailure(t, fmt.Sprintf("%v - \"%v\", should not equal,  %v - \"%v\"",
+		a, reflect.TypeOf(a), b, reflect.TypeOf(b)))
 }
 
 // Every triggers f every t time until the end of days. It does not wait for the
