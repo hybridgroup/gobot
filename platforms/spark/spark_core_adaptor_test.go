@@ -10,6 +10,7 @@ import (
 
 	"github.com/donovanhide/eventsource"
 	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/gobottest"
 )
 
 // HELPERS
@@ -74,13 +75,13 @@ func TestNewSparkCoreAdaptor(t *testing.T) {
 		t.Errorf("NewSparkCoreAdaptor() should have returned a *SparkCoreAdaptor")
 	}
 
-	gobot.Assert(t, spark.APIServer, "https://api.spark.io")
-	gobot.Assert(t, spark.Name(), "bot")
+	gobottest.Assert(t, spark.APIServer, "https://api.spark.io")
+	gobottest.Assert(t, spark.Name(), "bot")
 }
 
 func TestSparkCoreAdaptorConnect(t *testing.T) {
 	a := initTestSparkCoreAdaptor()
-	gobot.Assert(t, len(a.Connect()), 0)
+	gobottest.Assert(t, len(a.Connect()), 0)
 }
 
 func TestSparkCoreAdaptorFinalize(t *testing.T) {
@@ -88,7 +89,7 @@ func TestSparkCoreAdaptorFinalize(t *testing.T) {
 
 	a.Connect()
 
-	gobot.Assert(t, len(a.Finalize()), 0)
+	gobottest.Assert(t, len(a.Finalize()), 0)
 }
 
 func TestSparkCoreAdaptorAnalogRead(t *testing.T) {
@@ -103,7 +104,7 @@ func TestSparkCoreAdaptorAnalogRead(t *testing.T) {
 	defer testServer.Close()
 
 	val, _ := a.AnalogRead("A1")
-	gobot.Assert(t, val, 5)
+	gobottest.Assert(t, val, 5)
 }
 
 func TestSparkCoreAdaptorAnalogReadError(t *testing.T) {
@@ -116,7 +117,7 @@ func TestSparkCoreAdaptorAnalogReadError(t *testing.T) {
 	a.setAPIServer(testServer.URL)
 
 	val, _ := a.AnalogRead("A1")
-	gobot.Assert(t, val, 0)
+	gobottest.Assert(t, val, 0)
 }
 
 func TestSparkCoreAdaptorPwmWrite(t *testing.T) {
@@ -176,7 +177,7 @@ func TestSparkCoreAdaptorDigitalRead(t *testing.T) {
 	a.setAPIServer(testServer.URL)
 
 	val, _ := a.DigitalRead("D7")
-	gobot.Assert(t, val, 1)
+	gobottest.Assert(t, val, 1)
 	testServer.Close()
 
 	// When LOW
@@ -188,7 +189,7 @@ func TestSparkCoreAdaptorDigitalRead(t *testing.T) {
 	defer testServer.Close()
 
 	val, _ = a.DigitalRead("D7")
-	gobot.Assert(t, val, 0)
+	gobottest.Assert(t, val, 0)
 }
 
 func TestSparkCoreAdaptorDigitalReadError(t *testing.T) {
@@ -202,7 +203,7 @@ func TestSparkCoreAdaptorDigitalReadError(t *testing.T) {
 	a.setAPIServer(testServer.URL)
 
 	val, _ := a.DigitalRead("D7")
-	gobot.Assert(t, val, -1)
+	gobottest.Assert(t, val, -1)
 }
 
 func TestSparkCoreAdaptorFunction(t *testing.T) {
@@ -214,7 +215,7 @@ func TestSparkCoreAdaptorFunction(t *testing.T) {
 	a.setAPIServer(testServer.URL)
 
 	val, _ := a.Function("hello", "100,200")
-	gobot.Assert(t, val, 1)
+	gobottest.Assert(t, val, 1)
 	testServer.Close()
 
 	// When not existent
@@ -224,7 +225,7 @@ func TestSparkCoreAdaptorFunction(t *testing.T) {
 	a.setAPIServer(testServer.URL)
 
 	_, err := a.Function("hello", "")
-	gobot.Assert(t, err.Error(), "timeout")
+	gobottest.Assert(t, err.Error(), "timeout")
 
 	testServer.Close()
 }
@@ -239,7 +240,7 @@ func TestSparkCoreAdaptorVariable(t *testing.T) {
 	a.setAPIServer(testServer.URL)
 
 	val, _ := a.Variable("variable_name")
-	gobot.Assert(t, val, "1")
+	gobottest.Assert(t, val, "1")
 	testServer.Close()
 
 	// When float
@@ -249,7 +250,7 @@ func TestSparkCoreAdaptorVariable(t *testing.T) {
 	a.setAPIServer(testServer.URL)
 
 	val, _ = a.Variable("variable_name")
-	gobot.Assert(t, val, "1.1")
+	gobottest.Assert(t, val, "1.1")
 	testServer.Close()
 
 	// When int
@@ -259,7 +260,7 @@ func TestSparkCoreAdaptorVariable(t *testing.T) {
 	a.setAPIServer(testServer.URL)
 
 	val, _ = a.Variable("variable_name")
-	gobot.Assert(t, val, "1")
+	gobottest.Assert(t, val, "1")
 	testServer.Close()
 
 	// When bool
@@ -269,7 +270,7 @@ func TestSparkCoreAdaptorVariable(t *testing.T) {
 	a.setAPIServer(testServer.URL)
 
 	val, _ = a.Variable("variable_name")
-	gobot.Assert(t, val, "true")
+	gobottest.Assert(t, val, "true")
 	testServer.Close()
 
 	// When not existent
@@ -279,7 +280,7 @@ func TestSparkCoreAdaptorVariable(t *testing.T) {
 	a.setAPIServer(testServer.URL)
 
 	_, err := a.Variable("not_existent")
-	gobot.Assert(t, err.Error(), "Variable not found")
+	gobottest.Assert(t, err.Error(), "Variable not found")
 
 	testServer.Close()
 }
@@ -287,10 +288,10 @@ func TestSparkCoreAdaptorVariable(t *testing.T) {
 func TestSparkCoreAdaptorSetAPIServer(t *testing.T) {
 	a := initTestSparkCoreAdaptor()
 	apiServer := "new_api_server"
-	gobot.Refute(t, a.APIServer, apiServer)
+	gobottest.Refute(t, a.APIServer, apiServer)
 
 	a.setAPIServer(apiServer)
-	gobot.Assert(t, a.APIServer, apiServer)
+	gobottest.Assert(t, a.APIServer, apiServer)
 }
 
 func TestSparkCoreAdaptorDeviceURL(t *testing.T) {
@@ -298,21 +299,21 @@ func TestSparkCoreAdaptorDeviceURL(t *testing.T) {
 	a := initTestSparkCoreAdaptor()
 	a.setAPIServer("http://server")
 	a.DeviceID = "devID"
-	gobot.Assert(t, a.deviceURL(), "http://server/v1/devices/devID")
+	gobottest.Assert(t, a.deviceURL(), "http://server/v1/devices/devID")
 
 	//When APIServer is not set
 	a = &SparkCoreAdaptor{name: "sparkie", DeviceID: "myDevice", AccessToken: "token"}
 
-	gobot.Assert(t, a.deviceURL(), "https://api.spark.io/v1/devices/myDevice")
+	gobottest.Assert(t, a.deviceURL(), "https://api.spark.io/v1/devices/myDevice")
 }
 
 func TestSparkCoreAdaptorPinLevel(t *testing.T) {
 
 	a := initTestSparkCoreAdaptor()
 
-	gobot.Assert(t, a.pinLevel(1), "HIGH")
-	gobot.Assert(t, a.pinLevel(0), "LOW")
-	gobot.Assert(t, a.pinLevel(5), "LOW")
+	gobottest.Assert(t, a.pinLevel(1), "HIGH")
+	gobottest.Assert(t, a.pinLevel(0), "LOW")
+	gobottest.Assert(t, a.pinLevel(5), "LOW")
 }
 
 func TestSparkCoreAdaptorPostToSpark(t *testing.T) {
@@ -360,20 +361,20 @@ func TestSparkCoreAdaptorEventStream(t *testing.T) {
 		return nil, nil, nil
 	}
 	a.EventStream("all", "ping")
-	gobot.Assert(t, url, "https://api.spark.io/v1/events/ping?access_token=token")
+	gobottest.Assert(t, url, "https://api.spark.io/v1/events/ping?access_token=token")
 	a.EventStream("devices", "ping")
-	gobot.Assert(t, url, "https://api.spark.io/v1/devices/events/ping?access_token=token")
+	gobottest.Assert(t, url, "https://api.spark.io/v1/devices/events/ping?access_token=token")
 	a.EventStream("device", "ping")
-	gobot.Assert(t, url, "https://api.spark.io/v1/devices/myDevice/events/ping?access_token=token")
+	gobottest.Assert(t, url, "https://api.spark.io/v1/devices/myDevice/events/ping?access_token=token")
 	_, err := a.EventStream("nothing", "ping")
-	gobot.Assert(t, err.Error(), "source param should be: all, devices or device")
+	gobottest.Assert(t, err.Error(), "source param should be: all, devices or device")
 
 	eventSource = func(u string) (chan eventsource.Event, chan error, error) {
 		return nil, nil, errors.New("error connecting sse")
 	}
 
 	_, err = a.EventStream("devices", "")
-	gobot.Assert(t, err.Error(), "error connecting sse")
+	gobottest.Assert(t, err.Error(), "error connecting sse")
 
 	eventChan := make(chan eventsource.Event, 0)
 	errorChan := make(chan error, 0)
@@ -384,14 +385,14 @@ func TestSparkCoreAdaptorEventStream(t *testing.T) {
 
 	sem := make(chan bool, 0)
 	stream, err := a.EventStream("devices", "")
-	gobot.Assert(t, err, nil)
+	gobottest.Assert(t, err, nil)
 
 	// stream message
 	gobot.Once(stream, func(data interface{}) {
 		e := data.(Event)
-		gobot.Assert(t, e.Name, "event")
-		gobot.Assert(t, e.Data, "sse event")
-		gobot.Assert(t, e.Error, nil)
+		gobottest.Assert(t, e.Name, "event")
+		gobottest.Assert(t, e.Data, "sse event")
+		gobottest.Assert(t, e.Error, nil)
 		sem <- true
 	})
 
@@ -406,9 +407,9 @@ func TestSparkCoreAdaptorEventStream(t *testing.T) {
 	// stream error
 	gobot.Once(stream, func(data interface{}) {
 		e := data.(Event)
-		gobot.Assert(t, e.Name, "")
-		gobot.Assert(t, e.Data, "")
-		gobot.Assert(t, e.Error.Error(), "stream error")
+		gobottest.Assert(t, e.Name, "")
+		gobottest.Assert(t, e.Data, "")
+		gobottest.Assert(t, e.Error.Error(), "stream error")
 		sem <- true
 	})
 

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/gobottest"
 )
 
 // --------- HELPERS
@@ -34,14 +34,14 @@ func TestNewBlinkMDriverCommands_Rgb(t *testing.T) {
 	blinkM := initTestBlinkMDriver()
 
 	result := blinkM.Command("Rgb")(rgb)
-	gobot.Assert(t, result, nil)
+	gobottest.Assert(t, result, nil)
 }
 
 func TestNewBlinkMDriverCommands_Fade(t *testing.T) {
 	blinkM := initTestBlinkMDriver()
 
 	result := blinkM.Command("Fade")(rgb)
-	gobot.Assert(t, result, nil)
+	gobottest.Assert(t, result, nil)
 }
 
 func TestNewBlinkMDriverCommands_FirmwareVersion(t *testing.T) {
@@ -57,7 +57,7 @@ func TestNewBlinkMDriverCommands_FirmwareVersion(t *testing.T) {
 	result := blinkM.Command("FirmwareVersion")(param)
 
 	version, _ := blinkM.FirmwareVersion()
-	gobot.Assert(t, result.(map[string]interface{})["version"].(string), version)
+	gobottest.Assert(t, result.(map[string]interface{})["version"].(string), version)
 
 	// When len(data) is not 2
 	adaptor.i2cReadImpl = func() ([]byte, error) {
@@ -66,7 +66,7 @@ func TestNewBlinkMDriverCommands_FirmwareVersion(t *testing.T) {
 	result = blinkM.Command("FirmwareVersion")(param)
 
 	version, _ = blinkM.FirmwareVersion()
-	gobot.Assert(t, result.(map[string]interface{})["version"].(string), version)
+	gobottest.Assert(t, result.(map[string]interface{})["version"].(string), version)
 }
 
 func TestNewBlinkMDriverCommands_Color(t *testing.T) {
@@ -77,39 +77,39 @@ func TestNewBlinkMDriverCommands_Color(t *testing.T) {
 	result := blinkM.Command("Color")(param)
 
 	color, _ := blinkM.Color()
-	gobot.Assert(t, result.(map[string]interface{})["color"].([]byte), color)
+	gobottest.Assert(t, result.(map[string]interface{})["color"].([]byte), color)
 }
 
 // Methods
 func TestBlinkMDriver(t *testing.T) {
 	blinkM := initTestBlinkMDriver()
 
-	gobot.Assert(t, blinkM.Name(), "bot")
-	gobot.Assert(t, blinkM.Connection().Name(), "adaptor")
+	gobottest.Assert(t, blinkM.Name(), "bot")
+	gobottest.Assert(t, blinkM.Connection().Name(), "adaptor")
 }
 
 func TestBlinkMDriverStart(t *testing.T) {
 	blinkM, adaptor := initTestBlinkDriverWithStubbedAdaptor()
 
-	gobot.Assert(t, len(blinkM.Start()), 0)
+	gobottest.Assert(t, len(blinkM.Start()), 0)
 
 	adaptor.i2cStartImpl = func() error {
 		return errors.New("start error")
 	}
 
-	gobot.Assert(t, blinkM.Start()[0], errors.New("start error"))
+	gobottest.Assert(t, blinkM.Start()[0], errors.New("start error"))
 	adaptor.i2cStartImpl = func() error {
 		return nil
 	}
 	adaptor.i2cWriteImpl = func() error {
 		return errors.New("write error")
 	}
-	gobot.Assert(t, blinkM.Start()[0], errors.New("write error"))
+	gobottest.Assert(t, blinkM.Start()[0], errors.New("write error"))
 }
 
 func TestBlinkMDriverHalt(t *testing.T) {
 	blinkM := initTestBlinkMDriver()
-	gobot.Assert(t, len(blinkM.Halt()), 0)
+	gobottest.Assert(t, len(blinkM.Halt()), 0)
 }
 
 func TestBlinkMDriverFirmwareVersion(t *testing.T) {
@@ -121,7 +121,7 @@ func TestBlinkMDriverFirmwareVersion(t *testing.T) {
 	}
 
 	version, _ := blinkM.FirmwareVersion()
-	gobot.Assert(t, version, "99.1")
+	gobottest.Assert(t, version, "99.1")
 
 	// when len(data) is not 2
 	adaptor.i2cReadImpl = func() ([]byte, error) {
@@ -129,14 +129,14 @@ func TestBlinkMDriverFirmwareVersion(t *testing.T) {
 	}
 
 	version, _ = blinkM.FirmwareVersion()
-	gobot.Assert(t, version, "")
+	gobottest.Assert(t, version, "")
 
 	adaptor.i2cWriteImpl = func() error {
 		return errors.New("write error")
 	}
 
 	version, err := blinkM.FirmwareVersion()
-	gobot.Assert(t, err, errors.New("write error"))
+	gobottest.Assert(t, err, errors.New("write error"))
 }
 
 func TestBlinkMDriverColor(t *testing.T) {
@@ -148,7 +148,7 @@ func TestBlinkMDriverColor(t *testing.T) {
 	}
 
 	color, _ := blinkM.Color()
-	gobot.Assert(t, color, []byte{99, 1, 2})
+	gobottest.Assert(t, color, []byte{99, 1, 2})
 
 	// when len(data) is not 3
 	adaptor.i2cReadImpl = func() ([]byte, error) {
@@ -156,14 +156,14 @@ func TestBlinkMDriverColor(t *testing.T) {
 	}
 
 	color, _ = blinkM.Color()
-	gobot.Assert(t, color, []byte{})
+	gobottest.Assert(t, color, []byte{})
 
 	adaptor.i2cWriteImpl = func() error {
 		return errors.New("write error")
 	}
 
 	color, err := blinkM.Color()
-	gobot.Assert(t, err, errors.New("write error"))
+	gobottest.Assert(t, err, errors.New("write error"))
 
 }
 
@@ -175,7 +175,7 @@ func TestBlinkMDriverFade(t *testing.T) {
 	}
 
 	err := blinkM.Fade(100, 100, 100)
-	gobot.Assert(t, err, errors.New("write error"))
+	gobottest.Assert(t, err, errors.New("write error"))
 
 }
 
@@ -187,6 +187,6 @@ func TestBlinkMDriverRGB(t *testing.T) {
 	}
 
 	err := blinkM.Rgb(100, 100, 100)
-	gobot.Assert(t, err, errors.New("write error"))
+	gobottest.Assert(t, err, errors.New("write error"))
 
 }

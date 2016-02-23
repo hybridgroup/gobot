@@ -4,41 +4,9 @@ import (
 	"fmt"
 	"testing"
 	"time"
+
+	"github.com/hybridgroup/gobot/gobottest"
 )
-
-func TestAssert(t *testing.T) {
-	err := ""
-	errFunc = func(t *testing.T, message string) {
-		err = message
-	}
-
-	Assert(t, 1, 1)
-	if err != "" {
-		t.Errorf("Assert failed: 1 should equal 1")
-	}
-
-	Assert(t, 1, 2)
-	if err == "" {
-		t.Errorf("Assert failed: 1 should not equal 2")
-	}
-}
-
-func TestRefute(t *testing.T) {
-	err := ""
-	errFunc = func(t *testing.T, message string) {
-		err = message
-	}
-
-	Refute(t, 1, 2)
-	if err != "" {
-		t.Errorf("Refute failed: 1 should not be 2")
-	}
-
-	Refute(t, 1, 1)
-	if err == "" {
-		t.Errorf("Refute failed: 1 should not be 1")
-	}
-}
 
 func TestEvery(t *testing.T) {
 	i := 0
@@ -62,7 +30,7 @@ func TestAfter(t *testing.T) {
 		i++
 	})
 	<-time.After(2 * time.Millisecond)
-	Assert(t, i, 1)
+	gobottest.Assert(t, i, 1)
 }
 
 func TestPublish(t *testing.T) {
@@ -76,14 +44,15 @@ func TestPublish(t *testing.T) {
 
 	e := &Event{Callbacks: []callback{cb}}
 	Publish(e, 1)
+	<-time.After(10 * time.Millisecond)
 	Publish(e, 2)
 	Publish(e, 3)
 	Publish(e, 4)
 	i := <-c
-	Assert(t, i, 1)
+	gobottest.Assert(t, i, 1)
 
 	var e1 = (*Event)(nil)
-	Assert(t, Publish(e1, 4), ErrUnknownEvent)
+	gobottest.Assert(t, Publish(e1, 4), ErrUnknownEvent)
 }
 
 func TestOn(t *testing.T) {
@@ -94,13 +63,13 @@ func TestOn(t *testing.T) {
 	})
 	Publish(e, 10)
 	<-time.After(1 * time.Millisecond)
-	Assert(t, i, 10)
+	gobottest.Assert(t, i, 10)
 
 	var e1 = (*Event)(nil)
 	err := On(e1, func(data interface{}) {
 		i = data.(int)
 	})
-	Assert(t, err, ErrUnknownEvent)
+	gobottest.Assert(t, err, ErrUnknownEvent)
 }
 func TestOnce(t *testing.T) {
 	i := 0
@@ -115,23 +84,23 @@ func TestOnce(t *testing.T) {
 	<-time.After(1 * time.Millisecond)
 	Publish(e, 10)
 	<-time.After(1 * time.Millisecond)
-	Assert(t, i, 30)
+	gobottest.Assert(t, i, 30)
 
 	var e1 = (*Event)(nil)
 	err := Once(e1, func(data interface{}) {
 		i = data.(int)
 	})
-	Assert(t, err, ErrUnknownEvent)
+	gobottest.Assert(t, err, ErrUnknownEvent)
 }
 
 func TestFromScale(t *testing.T) {
-	Assert(t, FromScale(5, 0, 10), 0.5)
+	gobottest.Assert(t, FromScale(5, 0, 10), 0.5)
 }
 
 func TestToScale(t *testing.T) {
-	Assert(t, ToScale(500, 0, 10), 10.0)
-	Assert(t, ToScale(-1, 0, 10), 0.0)
-	Assert(t, ToScale(0.5, 0, 10), 5.0)
+	gobottest.Assert(t, ToScale(500, 0, 10), 10.0)
+	gobottest.Assert(t, ToScale(-1, 0, 10), 0.0)
+	gobottest.Assert(t, ToScale(0.5, 0, 10), 5.0)
 }
 
 func TestRand(t *testing.T) {

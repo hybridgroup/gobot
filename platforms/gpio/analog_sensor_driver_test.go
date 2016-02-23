@@ -6,15 +6,16 @@ import (
 	"time"
 
 	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/gobottest"
 )
 
 func TestAnalogSensorDriver(t *testing.T) {
 	d := NewAnalogSensorDriver(newGpioTestAdaptor("adaptor"), "bot", "1")
-	gobot.Assert(t, d.Name(), "bot")
-	gobot.Assert(t, d.Connection().Name(), "adaptor")
+	gobottest.Assert(t, d.Name(), "bot")
+	gobottest.Assert(t, d.Connection().Name(), "adaptor")
 
 	d = NewAnalogSensorDriver(newGpioTestAdaptor("adaptor"), "bot", "1", 30*time.Second)
-	gobot.Assert(t, d.interval, 30*time.Second)
+	gobottest.Assert(t, d.interval, 30*time.Second)
 
 	testAdaptorAnalogRead = func() (val int, err error) {
 		val = 100
@@ -22,8 +23,8 @@ func TestAnalogSensorDriver(t *testing.T) {
 	}
 	ret := d.Command("Read")(nil).(map[string]interface{})
 
-	gobot.Assert(t, ret["val"].(int), 100)
-	gobot.Assert(t, ret["err"], nil)
+	gobottest.Assert(t, ret["val"].(int), 100)
+	gobottest.Assert(t, ret["err"], nil)
 }
 
 func TestAnalogSensorDriverStart(t *testing.T) {
@@ -35,11 +36,11 @@ func TestAnalogSensorDriverStart(t *testing.T) {
 		val = 0
 		return
 	}
-	gobot.Assert(t, len(d.Start()), 0)
+	gobottest.Assert(t, len(d.Start()), 0)
 
 	// data was received
 	gobot.Once(d.Event(Data), func(data interface{}) {
-		gobot.Assert(t, data.(int), 100)
+		gobottest.Assert(t, data.(int), 100)
 		sem <- true
 	})
 
@@ -56,7 +57,7 @@ func TestAnalogSensorDriverStart(t *testing.T) {
 
 	// read error
 	gobot.Once(d.Event(Error), func(data interface{}) {
-		gobot.Assert(t, data.(error).Error(), "read error")
+		gobottest.Assert(t, data.(error).Error(), "read error")
 		sem <- true
 	})
 
@@ -95,5 +96,5 @@ func TestAnalogSensorDriverHalt(t *testing.T) {
 	go func() {
 		<-d.halt
 	}()
-	gobot.Assert(t, len(d.Halt()), 0)
+	gobottest.Assert(t, len(d.Halt()), 0)
 }

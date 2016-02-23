@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/gobottest"
 )
 
 func initTestAPI() *API {
@@ -39,22 +40,22 @@ func TestRobeaux(t *testing.T) {
 	request, _ := http.NewRequest("GET", "/index.html", nil)
 	response := httptest.NewRecorder()
 	a.ServeHTTP(response, request)
-	gobot.Assert(t, response.Code, 200)
+	gobottest.Assert(t, response.Code, 200)
 	// js assets
 	request, _ = http.NewRequest("GET", "/js/script.js", nil)
 	response = httptest.NewRecorder()
 	a.ServeHTTP(response, request)
-	gobot.Assert(t, response.Code, 200)
+	gobottest.Assert(t, response.Code, 200)
 	// css assets
 	request, _ = http.NewRequest("GET", "/css/application.css", nil)
 	response = httptest.NewRecorder()
 	a.ServeHTTP(response, request)
-	gobot.Assert(t, response.Code, 200)
+	gobottest.Assert(t, response.Code, 200)
 	// unknown asset
 	request, _ = http.NewRequest("GET", "/js/fake/file.js", nil)
 	response = httptest.NewRecorder()
 	a.ServeHTTP(response, request)
-	gobot.Assert(t, response.Code, 404)
+	gobottest.Assert(t, response.Code, 404)
 }
 
 func TestIndex(t *testing.T) {
@@ -64,8 +65,8 @@ func TestIndex(t *testing.T) {
 
 	a.ServeHTTP(response, request)
 
-	gobot.Assert(t, http.StatusMovedPermanently, response.Code)
-	gobot.Assert(t, "/index.html", response.HeaderMap["Location"][0])
+	gobottest.Assert(t, http.StatusMovedPermanently, response.Code)
+	gobottest.Assert(t, "/index.html", response.HeaderMap["Location"][0])
 }
 
 func TestMcp(t *testing.T) {
@@ -76,8 +77,8 @@ func TestMcp(t *testing.T) {
 
 	var body map[string]interface{}
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Refute(t, body["MCP"].(map[string]interface{})["robots"], nil)
-	gobot.Refute(t, body["MCP"].(map[string]interface{})["commands"], nil)
+	gobottest.Refute(t, body["MCP"].(map[string]interface{})["robots"], nil)
+	gobottest.Refute(t, body["MCP"].(map[string]interface{})["commands"], nil)
 }
 
 func TestMcpCommands(t *testing.T) {
@@ -88,7 +89,7 @@ func TestMcpCommands(t *testing.T) {
 
 	var body map[string]interface{}
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, body["commands"], []interface{}{"TestFunction"})
+	gobottest.Assert(t, body["commands"], []interface{}{"TestFunction"})
 }
 
 func TestExecuteMcpCommand(t *testing.T) {
@@ -105,7 +106,7 @@ func TestExecuteMcpCommand(t *testing.T) {
 	a.ServeHTTP(response, request)
 
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, body.(map[string]interface{})["result"], "hey Beep Boop")
+	gobottest.Assert(t, body.(map[string]interface{})["result"], "hey Beep Boop")
 
 	// unknown command
 	request, _ = http.NewRequest("GET",
@@ -117,7 +118,7 @@ func TestExecuteMcpCommand(t *testing.T) {
 	a.ServeHTTP(response, request)
 
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, body.(map[string]interface{})["error"], "Unknown Command")
+	gobottest.Assert(t, body.(map[string]interface{})["error"], "Unknown Command")
 }
 
 func TestRobots(t *testing.T) {
@@ -128,7 +129,7 @@ func TestRobots(t *testing.T) {
 
 	var body map[string]interface{}
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, len(body["robots"].([]interface{})), 3)
+	gobottest.Assert(t, len(body["robots"].([]interface{})), 3)
 }
 
 func TestRobot(t *testing.T) {
@@ -141,14 +142,14 @@ func TestRobot(t *testing.T) {
 
 	var body map[string]interface{}
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, body["robot"].(map[string]interface{})["name"].(string), "Robot1")
+	gobottest.Assert(t, body["robot"].(map[string]interface{})["name"].(string), "Robot1")
 
 	// unknown robot
 	request, _ = http.NewRequest("GET", "/api/robots/UnknownRobot1", nil)
 	a.ServeHTTP(response, request)
 
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, body["error"], "No Robot found with the name UnknownRobot1")
+	gobottest.Assert(t, body["error"], "No Robot found with the name UnknownRobot1")
 }
 
 func TestRobotDevices(t *testing.T) {
@@ -161,14 +162,14 @@ func TestRobotDevices(t *testing.T) {
 
 	var body map[string]interface{}
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, len(body["devices"].([]interface{})), 3)
+	gobottest.Assert(t, len(body["devices"].([]interface{})), 3)
 
 	// unknown robot
 	request, _ = http.NewRequest("GET", "/api/robots/UnknownRobot1/devices", nil)
 	a.ServeHTTP(response, request)
 
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, body["error"], "No Robot found with the name UnknownRobot1")
+	gobottest.Assert(t, body["error"], "No Robot found with the name UnknownRobot1")
 }
 
 func TestRobotCommands(t *testing.T) {
@@ -181,14 +182,14 @@ func TestRobotCommands(t *testing.T) {
 
 	var body map[string]interface{}
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, body["commands"], []interface{}{"robotTestFunction"})
+	gobottest.Assert(t, body["commands"], []interface{}{"robotTestFunction"})
 
 	// unknown robot
 	request, _ = http.NewRequest("GET", "/api/robots/UnknownRobot1/commands", nil)
 	a.ServeHTTP(response, request)
 
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, body["error"], "No Robot found with the name UnknownRobot1")
+	gobottest.Assert(t, body["error"], "No Robot found with the name UnknownRobot1")
 }
 
 func TestExecuteRobotCommand(t *testing.T) {
@@ -204,7 +205,7 @@ func TestExecuteRobotCommand(t *testing.T) {
 	a.ServeHTTP(response, request)
 
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, body.(map[string]interface{})["result"], "hey Robot1, Beep Boop")
+	gobottest.Assert(t, body.(map[string]interface{})["result"], "hey Robot1, Beep Boop")
 
 	// unknown command
 	request, _ = http.NewRequest("GET",
@@ -216,7 +217,7 @@ func TestExecuteRobotCommand(t *testing.T) {
 	a.ServeHTTP(response, request)
 
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, body.(map[string]interface{})["error"], "Unknown Command")
+	gobottest.Assert(t, body.(map[string]interface{})["error"], "Unknown Command")
 
 	// uknown robot
 	request, _ = http.NewRequest("GET",
@@ -227,7 +228,7 @@ func TestExecuteRobotCommand(t *testing.T) {
 	a.ServeHTTP(response, request)
 
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, body.(map[string]interface{})["error"], "No Robot found with the name UnknownRobot1")
+	gobottest.Assert(t, body.(map[string]interface{})["error"], "No Robot found with the name UnknownRobot1")
 }
 
 func TestRobotDevice(t *testing.T) {
@@ -243,7 +244,7 @@ func TestRobotDevice(t *testing.T) {
 
 	var body map[string]interface{}
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, body["device"].(map[string]interface{})["name"].(string), "Device1")
+	gobottest.Assert(t, body["device"].(map[string]interface{})["name"].(string), "Device1")
 
 	// unknown device
 	request, _ = http.NewRequest("GET",
@@ -251,7 +252,7 @@ func TestRobotDevice(t *testing.T) {
 	a.ServeHTTP(response, request)
 
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, body["error"], "No Device found with the name UnknownDevice1")
+	gobottest.Assert(t, body["error"], "No Device found with the name UnknownDevice1")
 }
 
 func TestRobotDeviceCommands(t *testing.T) {
@@ -267,7 +268,7 @@ func TestRobotDeviceCommands(t *testing.T) {
 
 	var body map[string]interface{}
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, len(body["commands"].([]interface{})), 2)
+	gobottest.Assert(t, len(body["commands"].([]interface{})), 2)
 
 	// unknown device
 	request, _ = http.NewRequest("GET",
@@ -276,7 +277,7 @@ func TestRobotDeviceCommands(t *testing.T) {
 	)
 	a.ServeHTTP(response, request)
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, body["error"], "No Device found with the name UnknownDevice1")
+	gobottest.Assert(t, body["error"], "No Device found with the name UnknownDevice1")
 }
 
 func TestExecuteRobotDeviceCommand(t *testing.T) {
@@ -293,7 +294,7 @@ func TestExecuteRobotDeviceCommand(t *testing.T) {
 	a.ServeHTTP(response, request)
 
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, body.(map[string]interface{})["result"].(string), "hello human")
+	gobottest.Assert(t, body.(map[string]interface{})["result"].(string), "hello human")
 
 	// unknown command
 	request, _ = http.NewRequest("GET",
@@ -305,7 +306,7 @@ func TestExecuteRobotDeviceCommand(t *testing.T) {
 	a.ServeHTTP(response, request)
 
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, body.(map[string]interface{})["error"], "Unknown Command")
+	gobottest.Assert(t, body.(map[string]interface{})["error"], "Unknown Command")
 
 	// unknown device
 	request, _ = http.NewRequest("GET",
@@ -316,7 +317,7 @@ func TestExecuteRobotDeviceCommand(t *testing.T) {
 	a.ServeHTTP(response, request)
 
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, body.(map[string]interface{})["error"], "No Device found with the name UnknownDevice1")
+	gobottest.Assert(t, body.(map[string]interface{})["error"], "No Device found with the name UnknownDevice1")
 
 }
 
@@ -330,14 +331,14 @@ func TestRobotConnections(t *testing.T) {
 
 	var body map[string]interface{}
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, len(body["connections"].([]interface{})), 3)
+	gobottest.Assert(t, len(body["connections"].([]interface{})), 3)
 
 	// unknown robot
 	request, _ = http.NewRequest("GET", "/api/robots/UnknownRobot1/connections", nil)
 	a.ServeHTTP(response, request)
 
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, body["error"], "No Robot found with the name UnknownRobot1")
+	gobottest.Assert(t, body["error"], "No Robot found with the name UnknownRobot1")
 }
 
 func TestRobotConnection(t *testing.T) {
@@ -353,7 +354,7 @@ func TestRobotConnection(t *testing.T) {
 
 	var body map[string]interface{}
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, body["connection"].(map[string]interface{})["name"].(string), "Connection1")
+	gobottest.Assert(t, body["connection"].(map[string]interface{})["name"].(string), "Connection1")
 
 	// unknown connection
 	request, _ = http.NewRequest("GET",
@@ -362,7 +363,7 @@ func TestRobotConnection(t *testing.T) {
 	)
 	a.ServeHTTP(response, request)
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, body["error"], "No Connection found with the name UnknownConnection1")
+	gobottest.Assert(t, body["error"], "No Connection found with the name UnknownConnection1")
 }
 
 func TestRobotDeviceEvent(t *testing.T) {
@@ -396,7 +397,7 @@ func TestRobotDeviceEvent(t *testing.T) {
 		case resp := <-respc:
 			reader := bufio.NewReader(resp.Body)
 			data, _ := reader.ReadString('\n')
-			gobot.Assert(t, data, "data: \"event-data\"\n")
+			gobottest.Assert(t, data, "data: \"event-data\"\n")
 			done = true
 		case <-timer.C:
 			t.Error("Not receiving data")
@@ -411,7 +412,7 @@ func TestRobotDeviceEvent(t *testing.T) {
 
 	var body map[string]interface{}
 	json.NewDecoder(response.Body).Decode(&body)
-	gobot.Assert(t, body["error"], "No Event found with the name UnknownEvent")
+	gobottest.Assert(t, body["error"], "No Event found with the name UnknownEvent")
 }
 
 func TestAPIRouter(t *testing.T) {
@@ -421,35 +422,35 @@ func TestAPIRouter(t *testing.T) {
 	request, _ := http.NewRequest("HEAD", "/test", nil)
 	response := httptest.NewRecorder()
 	a.ServeHTTP(response, request)
-	gobot.Assert(t, response.Code, 200)
+	gobottest.Assert(t, response.Code, 200)
 
 	a.Get("/test", func(res http.ResponseWriter, req *http.Request) {})
 	request, _ = http.NewRequest("GET", "/test", nil)
 	response = httptest.NewRecorder()
 	a.ServeHTTP(response, request)
-	gobot.Assert(t, response.Code, 200)
+	gobottest.Assert(t, response.Code, 200)
 
 	a.Post("/test", func(res http.ResponseWriter, req *http.Request) {})
 	request, _ = http.NewRequest("POST", "/test", nil)
 	response = httptest.NewRecorder()
 	a.ServeHTTP(response, request)
-	gobot.Assert(t, response.Code, 200)
+	gobottest.Assert(t, response.Code, 200)
 
 	a.Put("/test", func(res http.ResponseWriter, req *http.Request) {})
 	request, _ = http.NewRequest("PUT", "/test", nil)
 	response = httptest.NewRecorder()
 	a.ServeHTTP(response, request)
-	gobot.Assert(t, response.Code, 200)
+	gobottest.Assert(t, response.Code, 200)
 
 	a.Delete("/test", func(res http.ResponseWriter, req *http.Request) {})
 	request, _ = http.NewRequest("DELETE", "/test", nil)
 	response = httptest.NewRecorder()
 	a.ServeHTTP(response, request)
-	gobot.Assert(t, response.Code, 200)
+	gobottest.Assert(t, response.Code, 200)
 
 	a.Options("/test", func(res http.ResponseWriter, req *http.Request) {})
 	request, _ = http.NewRequest("OPTIONS", "/test", nil)
 	response = httptest.NewRecorder()
 	a.ServeHTTP(response, request)
-	gobot.Assert(t, response.Code, 200)
+	gobottest.Assert(t, response.Code, 200)
 }

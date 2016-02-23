@@ -1,6 +1,10 @@
 package gobot
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/hybridgroup/gobot/gobottest"
+)
 
 func TestCommaner(t *testing.T) {
 	c := NewCommander()
@@ -13,8 +17,8 @@ func TestCommaner(t *testing.T) {
 	}
 
 	command := c.Command("test")
-	Refute(t, command, nil)
+	gobottest.Refute(t, command, nil)
 
 	command = c.Command("booyeah")
-	Assert(t, command, (func(map[string]interface{}) interface{})(nil))
+	gobottest.Assert(t, command, (func(map[string]interface{}) interface{})(nil))
 }
