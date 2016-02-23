@@ -77,6 +77,8 @@ func TestPublish(t *testing.T) {
 
 	e := &Event{Callbacks: []callback{cb}}
 	Publish(e, 1)
+	// this enforeces Event's callback goroutine to actually start
+	<-time.After(10 * time.Millisecond)
 	Publish(e, 2)
 	Publish(e, 3)
 	Publish(e, 4)
