@@ -44,6 +44,7 @@ func TestPublish(t *testing.T) {
 
 	e := &Event{Callbacks: []callback{cb}}
 	Publish(e, 1)
+	<-time.After(10 * time.Millisecond)
 	Publish(e, 2)
 	Publish(e, 3)
 	Publish(e, 4)
