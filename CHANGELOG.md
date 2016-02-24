@@ -1,3 +1,53 @@
+0.11.0
+---
+* **Support for Golang 1.6**
+* **Determine I2C adaptor capabilities dynamically to avoid use of block I/O when unavailable**
+* **chip**
+  * Add support for GPIO & I2C interfaces on C.H.I.P. $9 computer
+* **leap motion**
+  * Add support additional "hand" and "gesture" events
+* **mqtt**
+  * Support latest update to Eclipse Paho MQTT client library
+* **raspberry pi**
+  * Proper release of Pi Blaster for PWM pins
+* **bebop**
+  * Prevent event race conditions on takeoff/landing
+* **i2c**
+  * Support added for new i2c device:
+    * MCP23017 Port Expander
+  * Bugfixes:
+    * Correct init and data parsing for MPU-6050
+    * Correct handling of errors and buffering for Wiichuk
+
+0.10.0
+---
+* **Refactor core to cleanup robot initialization and shutdown**
+* **Remove unnecessary goroutines spawned by NewEvent**
+* **api**
+  * Update Robeaux to v0.5.0
+* **bebop**
+  * Add support for the Parrot Bebop drone
+* **keyboard**
+  * Add support for keyboard control
+* **gpio**
+  * Support added for 10 new Grove GPIO devices:
+    * Grove Touch Sensor
+    * Grove Sound Sensor
+    * Grove Button
+    * Grove Buzzer
+    * Grove Led
+    * Grove Light Sensor
+    * Grove Vibration Sensor
+    * Grove Rotary
+    * Grove Relay
+    * Grove Temperature Sensor
+* **i2c**
+  * Support added for 2 new Grove i2c devices:
+    * Grove Accelerometer
+    * Grove LCD with RGB backlit display
+* **docs**
+  * Many useful fixes and updates for docs, mostly contributed by our wonderful community.
+
 0.8.2
 ---
   - firmata
@@ -26,7 +76,7 @@
   - firmata
     - Add optional io.ReadWriteCloser parameter to FirmataAdaptor
     - Fix `thread exhaustion` error
-  - cli 
+  - cli
     - generator
       - Update generator for new adaptor and driver interfaces
       - Add driver, adaptor and project generators
@@ -79,7 +129,7 @@
 - neurosky
   - Fix incorrect Event names
 - sphero
-  - Correctly format output of GetRGB 
+  - Correctly format output of GetRGB
 
 0.6.1
 ---
@@ -91,7 +141,7 @@
 - api
   - Add robeaux support
 - core
-  - Refactor `Connection` and `Device` 
+  - Refactor `Connection` and `Device`
   - Connections are now a collection of Adaptors
   - Devices are now a collection of Drivers
   - Add `Event(string)` function instead of `Events[string]` for retrieving Driver event
@@ -104,8 +154,8 @@
 0.5.2  
 ---  
 - beaglebone
-  - Add `DirectPinDriver` 
-  - Ensure slots are properly loaded 
+  - Add `DirectPinDriver`
+  - Ensure slots are properly loaded
 
 0.5.1  
 ---  
