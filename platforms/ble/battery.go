@@ -52,7 +52,7 @@ func (b *BLEBatteryDriver) Halt() (errs []error) { return }
 func (b *BLEBatteryDriver) GetBatteryLevel() (level uint8) {
 	var l uint8
 	c, _ := b.adaptor().ReadCharacteristic("180f", "2a19")
-	buf := bytes.NewBuffer(<-c)
+	buf := bytes.NewBuffer(c)
 	val, _ := buf.ReadByte()
 	l = uint8(val)
 	return l
