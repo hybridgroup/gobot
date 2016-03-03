@@ -8,13 +8,11 @@ import (
 
 var _ gobot.Driver = (*BLEBatteryDriver)(nil)
 
-
 type BLEBatteryDriver struct {
 	name       string
 	connection gobot.Connection
 	gobot.Eventer
 }
-
 
 // NewBLEBatteryDriver creates a BLEBatteryDriver by name
 func NewBLEBatteryDriver(a *BLEAdaptor, name string) *BLEBatteryDriver {

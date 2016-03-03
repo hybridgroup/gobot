@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/ble"
@@ -11,15 +10,11 @@ import (
 func main() {
 	gbot := gobot.NewGobot()
 
-	bleAdaptor := ble.NewBLEAdaptor("ble", "20:73:77:65:43:21")
+	bleAdaptor := ble.NewBLEAdaptor("ble", "D0:39:72:C9:9E:5A")
 	battery := ble.NewBLEBatteryDriver(bleAdaptor, "battery")
 
 	work := func() {
-		fmt.Println("Working...")
-
-		gobot.After(3*time.Second, func() {
-			fmt.Println(battery.GetBatteryLevel())
-		})
+		fmt.Println("Battery level:", battery.GetBatteryLevel())
 	}
 
 	robot := gobot.NewRobot("bleBot",
