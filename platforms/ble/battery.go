@@ -22,15 +22,6 @@ func NewBLEBatteryDriver(a *BLEAdaptor, name string) *BLEBatteryDriver {
 		Eventer:    gobot.NewEventer(),
 	}
 
-	// n.AddEvent("extended")
-	// n.AddEvent("signal")
-	// n.AddEvent("attention")
-	// n.AddEvent("meditation")
-	// n.AddEvent("blink")
-	// n.AddEvent("wave")
-	// n.AddEvent("eeg")
-	// n.AddEvent("error")
-
 	return n
 }
 func (b *BLEBatteryDriver) Connection() gobot.Connection { return b.connection }
