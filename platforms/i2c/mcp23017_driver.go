@@ -17,8 +17,7 @@ limitations under the License.
 package i2c
 
 import (
-	"bytes"
-	"encoding/binary"
+	"fmt"
 	"log"
 	"strings"
 	"time"
@@ -27,24 +26,24 @@ import (
 )
 
 var (
-	Debug = true // Set this to true to see debugging information
+	debug = false // Set this to true to see debugging information
 	// Register this Driver
 	_ gobot.Driver = (*MCP23017Driver)(nil)
 )
 
 // Port contains all the registers for the device.
 type port struct {
-	IODIR   byte // I/O direction register: 0=output / 1=input
-	IPOL    byte // Input polarity register: 0=normal polarity / 1=inversed
-	GPINTEN byte // Interrupt on change control register: 0=disabled / 1=enabled
-	DEFVAL  byte // Default compare register for interrupt on change
-	INTCON  byte // Interrupt control register: bit set to 0= use defval bit value to compare pin value/ bit set to 1= pin value compared to previous pin value
-	IOCON   byte // Configuration register
-	GPPU    byte // Pull-up resistor configuration register: 0=enabled / 1=disabled
-	INTF    byte // Interrupt flag register: 0=no interrupt / 1=pin caused interrupt
-	INTCAP  byte // Interrupt capture register, captures pin values during interrupt: 0=logic low / 1=logic high
-	GPIO    byte // Port register, reading from this register reads the port
-	OLAT    byte // Output latch register, write modifies the pins: 0=logic low / 1=logic high
+	IODIR   uint8 // I/O direction register: 0=output / 1=input
+	IPOL    uint8 // Input polarity register: 0=normal polarity / 1=inversed
+	GPINTEN uint8 // Interrupt on change control register: 0=disabled / 1=enabled
+	DEFVAL  uint8 // Default compare register for interrupt on change
+	INTCON  uint8 // Interrupt control register: bit set to 0= use defval bit value to compare pin value/ bit set to 1= pin value compared to previous pin value
+	IOCON   uint8 // Configuration register
+	GPPU    uint8 // Pull-up resistor configuration register: 0=enabled / 1=disabled
+	INTF    uint8 // Interrupt flag register: 0=no interrupt / 1=pin caused interrupt
+	INTCAP  uint8 // Interrupt capture register, captures pin values during interrupt: 0=logic low / 1=logic high
+	GPIO    uint8 // Port register, reading from this register reads the port
+	OLAT    uint8 // Output latch register, write modifies the pins: 0=logic low / 1=logic high
 }
 
 // Registers in the MCP23017 have different address based on which bank is used.
@@ -62,7 +61,8 @@ func getBank(bnk uint8) bank {
 	return bank{PortA: port{0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A}, PortB: port{0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A}}
 }
 
-// MCP23017Config contains the device configuration settings to be loaded at startup.
+// MCP23017Config contains the device configuration for the IOCON register.
+// These fields should only be set with values 0 or 1.
 type MCP23017Config struct {
 	Bank   uint8
 	Mirror uint8
@@ -73,12 +73,12 @@ type MCP23017Config struct {
 	Intpol uint8
 }
 
-// getBytes returns the mcp23017 configuration as a slice of bytes.
-func (conf *MCP23017Config) getBytes() []byte {
-	return []byte{conf.Bank, conf.Mirror, conf.Seqop, conf.Disslw, conf.Haen, conf.Odr, conf.Intpol}
+// GetUint8Value returns the configuration data as a packed value.
+func (mc *MCP23017Config) GetUint8Value() uint8 {
+	return mc.Bank<<7 | mc.Mirror<<6 | mc.Seqop<<5 | mc.Disslw<<4 | mc.Haen<<3 | mc.Odr<<2 | mc.Intpol<<1
 }
 
-// MCP23107Driver contains the driver configuration parameters.
+// MCP23017Driver contains the driver configuration parameters.
 type MCP23017Driver struct {
 	name            string
 	connection      I2c
@@ -101,14 +101,15 @@ func NewMCP23017Driver(a I2c, name string, conf MCP23017Config, deviceAddress in
 	}
 
 	m.AddCommand("WriteGPIO", func(params map[string]interface{}) interface{} {
-		pin := params["pin"].(float64)
-		val := params["val"].(float64)
+		pin := params["pin"].(uint8)
+		val := params["val"].(uint8)
 		port := params["port"].(string)
-		return m.WriteGPIO(pin, val, port)
+		err := m.WriteGPIO(pin, val, port)
+		return map[string]interface{}{"err": err}
 	})
 
 	m.AddCommand("ReadGPIO", func(params map[string]interface{}) interface{} {
-		pin := params["pin"].(float64)
+		pin := params["pin"].(uint8)
 		port := params["port"].(string)
 		val, err := m.ReadGPIO(pin, port)
 		return map[string]interface{}{"val": val, "err": err}
@@ -117,34 +118,31 @@ func NewMCP23017Driver(a I2c, name string, conf MCP23017Config, deviceAddress in
 	return m
 }
 
+// Name return the driver name.
 func (m *MCP23017Driver) Name() string { return m.name }
 
+// Connection returns the I2c connection.
 func (m *MCP23017Driver) Connection() gobot.Connection { return m.connection.(gobot.Connection) }
 
+// Halt stops the driver.
 func (m *MCP23017Driver) Halt() (err []error) { return }
 
-// Start writes initialization bytes and reads.
+// Start writes the device configuration.
 func (m *MCP23017Driver) Start() (errs []error) {
 	if err := m.connection.I2cStart(m.mcp23017Address); err != nil {
 		return []error{err}
 	}
-	// Set IOCON register with the given configuration.
-	selectedPort := m.getPort("A") // IOCON address is the same for Port A or B.
-	var ioval uint8
-	buf := bytes.NewReader(m.conf.getBytes())
-	err := binary.Read(buf, binary.LittleEndian, &ioval)
-	if err != nil {
-		return []error{err}
-	}
-	if err := m.connection.I2cWrite(m.mcp23017Address, []byte{selectedPort.IOCON, ioval}); err != nil {
+	// Set IOCON register with MCP23017 configuration.
+	ioconReg := m.getPort("A").IOCON // IOCON address is the same for Port A or B.
+	ioconVal := m.conf.GetUint8Value()
+	if err := m.connection.I2cWrite(m.mcp23017Address, []uint8{ioconReg, ioconVal}); err != nil {
 		return []error{err}
 	}
 	return
 }
 
-// WriteGPIO writes a value to a gpio pin (0-7) and a
-// port (A or B).
-func (m *MCP23017Driver) WriteGPIO(pin float64, val float64, portStr string) (err error) {
+// WriteGPIO writes a value to a gpio pin (0-7) and a port (A or B).
+func (m *MCP23017Driver) WriteGPIO(pin uint8, val uint8, portStr string) (err error) {
 	selectedPort := m.getPort(portStr)
 	// Set IODIR register bit for given pin to an output.
 	if err := m.write(selectedPort.IODIR, uint8(pin), 0); err != nil {
@@ -159,19 +157,19 @@ func (m *MCP23017Driver) WriteGPIO(pin float64, val float64, portStr string) (er
 
 // ReadGPIO reads a value from a given gpio pin (0-7) and a
 // port (A or B).
-func (m *MCP23017Driver) ReadGPIO(pin float64, portStr string) (val bool, err error) {
+func (m *MCP23017Driver) ReadGPIO(pin uint8, portStr string) (val uint8, err error) {
 	selectedPort := m.getPort(portStr)
-	gpio, err := m.read(selectedPort.GPIO)
+	val, err = m.read(selectedPort.GPIO)
 	if err != nil {
-		return false, err
+		return val, err
 	}
-	return ((1 << uint8(pin) & gpio) != 0), nil
+	return (1 << uint8(pin) & val), nil
 }
 
 // SetPullUp sets the pull up state of a given pin based on the value:
 // val = 1 pull up enabled.
 // val = 0 pull up disabled.
-func (m *MCP23017Driver) SetPullUp(pin uint8, val byte, portStr string) error {
+func (m *MCP23017Driver) SetPullUp(pin uint8, val uint8, portStr string) error {
 	selectedPort := m.getPort(portStr)
 	if err := m.write(selectedPort.GPPU, pin, val); err != nil {
 		return err
@@ -182,7 +180,7 @@ func (m *MCP23017Driver) SetPullUp(pin uint8, val byte, portStr string) error {
 // SetGPIOPolarity will change a given pin's polarity based on the value:
 // val = 1 opposite logic state of the input pin.
 // val = 0 same logic state of the input pin.
-func (m *MCP23017Driver) SetGPIOPolarity(pin uint8, val byte, portStr string) (err error) {
+func (m *MCP23017Driver) SetGPIOPolarity(pin uint8, val uint8, portStr string) (err error) {
 	selectedPort := m.getPort(portStr)
 	if err := m.write(selectedPort.IPOL, pin, val); err != nil {
 		return err
@@ -192,7 +190,7 @@ func (m *MCP23017Driver) SetGPIOPolarity(pin uint8, val byte, portStr string) (e
 
 // write gets the value of the passed in register, and then overwrites
 // the bit specified by the pin, with the given value.
-func (m *MCP23017Driver) write(reg byte, pin uint8, val byte) (err error) {
+func (m *MCP23017Driver) write(reg uint8, pin uint8, val uint8) (err error) {
 	var ioval uint8
 	iodir, err := m.read(reg)
 	if err != nil {
@@ -203,23 +201,33 @@ func (m *MCP23017Driver) write(reg byte, pin uint8, val byte) (err error) {
 	} else if val == 1 {
 		ioval = setBit(iodir, uint8(pin))
 	}
-	if err = m.connection.I2cWrite(m.mcp23017Address, []byte{reg, ioval}); err != nil {
+	if debug {
+		log.Printf("Writing: MCP address: 0x%X, register: 0x%X\t, value: 0x%X\n", m.mcp23017Address, reg, ioval)
+	}
+	if err = m.connection.I2cWrite(m.mcp23017Address, []uint8{reg, ioval}); err != nil {
 		return err
 	}
 	return nil
 }
 
-// Read returns the values in the given register.
-func (m *MCP23017Driver) read(reg byte) (val uint8, err error) {
-	bytesToRead := int(reg)
-	v, err := m.connection.I2cRead(m.mcp23017Address, bytesToRead+1)
+// read get the data from a given register. The I2cRead does not read a specific
+// register from the device, rather it will read n bytes starting at the base
+// device address. To read a specific register, read register + 1 bytes, and then index
+// the result with the given register to get the value.
+func (m *MCP23017Driver) read(reg uint8) (val uint8, err error) {
+	register := int(reg)
+	bytesToRead := register + 1
+	v, err := m.connection.I2cRead(m.mcp23017Address, bytesToRead)
 	if err != nil {
 		return val, err
 	}
-	if Debug {
-		log.Printf("Register addr:0x%X val: 0x%X\n", reg, v[bytesToRead])
+	if len(v) != bytesToRead {
+		return val, fmt.Errorf("Read was unable to get %d bytes for register: 0x%X\n", bytesToRead, reg)
 	}
-	return v[bytesToRead], nil
+	if debug {
+		log.Printf("Reading: MCP address: 0x%X, register:0x%X\t,value: 0x%X\n", m.mcp23017Address, reg, v[register])
+	}
+	return v[register], nil
 }
 
 // getPort return the port (A or B) given a string and the bank.
