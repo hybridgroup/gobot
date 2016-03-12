@@ -11,6 +11,7 @@ matrix:
  allow_failures:
    - go: tip
    - go: 1.2
+   - go: 1.3
 before_install:
  - sudo add-apt-repository -y ppa:kubuntu-ppa/backports
  - sudo add-apt-repository -y ppa:zoogie/sdl2-snapshots
