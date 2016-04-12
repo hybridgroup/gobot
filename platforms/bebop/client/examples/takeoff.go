@@ -15,10 +15,7 @@ func main() {
 		return
 	}
 
-	fmt.Println("hull")
 	bebop.HullProtection(true)
-	//fmt.Println("outdoor")
-	//bebop.Outdoor(false)
 
 	fmt.Println("takeoff")
 	if err := bebop.TakeOff(); err != nil {

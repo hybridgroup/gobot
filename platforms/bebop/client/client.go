@@ -179,7 +179,7 @@ func New() *Bebop {
 		DiscoveryPort:         44444,
 		networkFrameGenerator: networkFrameGenerator(),
 		Pcmd: Pcmd{
-			Flag:  1,
+			Flag:  0,
 			Roll:  0,
 			Pitch: 0,
 			Yaw:   0,
@@ -382,48 +382,56 @@ func (b *Bebop) Land() error {
 }
 
 func (b *Bebop) Up(val int) error {
+	b.Pcmd.Flag = 1
 	b.Pcmd.Gaz = validatePitch(val)
 	return nil
 }
 
 func (b *Bebop) Down(val int) error {
+	b.Pcmd.Flag = 1
 	b.Pcmd.Gaz = validatePitch(val) * -1
 	return nil
 }
 
 func (b *Bebop) Forward(val int) error {
+	b.Pcmd.Flag = 1
 	b.Pcmd.Pitch = validatePitch(val)
 	return nil
 }
 
 func (b *Bebop) Backward(val int) error {
+	b.Pcmd.Flag = 1
 	b.Pcmd.Pitch = validatePitch(val) * -1
 	return nil
 }
 
 func (b *Bebop) Right(val int) error {
+	b.Pcmd.Flag = 1
 	b.Pcmd.Roll = validatePitch(val)
 	return nil
 }
 
 func (b *Bebop) Left(val int) error {
+	b.Pcmd.Flag = 1
 	b.Pcmd.Roll = validatePitch(val) * -1
 	return nil
 }
 
 func (b *Bebop) Clockwise(val int) error {
+	b.Pcmd.Flag = 1
 	b.Pcmd.Yaw = validatePitch(val)
 	return nil
 }
 
 func (b *Bebop) CounterClockwise(val int) error {
+	b.Pcmd.Flag = 1
 	b.Pcmd.Yaw = validatePitch(val) * -1
 	return nil
 }
 
 func (b *Bebop) Stop() error {
 	b.Pcmd = Pcmd{
-		Flag:  1,
+		Flag:  0,
 		Roll:  0,
 		Pitch: 0,
 		Yaw:   0,
