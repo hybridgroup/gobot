@@ -1,11 +1,15 @@
 package i2c
 
+// Device documentation at
+// https://ae-bst.resource.bosch.com/media/_tech/media/datasheets/BST-BME280_DS001-11.pdf
+
 import (
 	"github.com/hybridgroup/gobot"
 
 	"bytes"
 	"encoding/binary"
 	"time"
+	"errors"
 )
 
 const bme280Address = 0x76
@@ -26,7 +30,7 @@ const BME280_REGISTER_HUM_LSB = 0xFE
 const BME280_PRESSURE_TEMPERATURE_CALIB_DATA_LENGTH = 26
 const BME280_HUMIDITY_CALIB_DATA_LENGTH = 7
 
-const BME280_DATA_FRAME_LENGTH = 8
+const BME280_DATA_FRAME_LENGTH = 12
 
 const BME280_REGISTER_DIG_T1_LSB = 0x88
 const BME280_REGISTER_DIG_T1_MSB = 0x89
@@ -81,8 +85,9 @@ const BME280_REGISTER_DIG_H6 = 0xE7
 const BME280_REGISTER_STARTCONVERSION = 0x12
 const BME280_REGISTER_CTL_MEAS = 0xF4
 const BME280_REGISTER_CTL_HUMIDITY = 0xF2
-const BME280_REGISTER_CTL_CkNFIG = 0xF5
+const BME280_REGISTER_CTL_CONFIG = 0xF5
 const BME280_REGISTER_STATUS = 0xF3
+const BME280_REGISTER_RESET = 0xE0
 
 type BME280Driver struct {
 	name       string
@@ -168,14 +173,16 @@ func (h *BME280Driver) Start() (errs []error) {
 
 	go func() {
 		for {
+			/*
 			if err := h.connection.I2cWrite(bme280Address, []byte{BME280_REGISTER_STARTCONVERSION, 0}); err != nil {
 				gobot.Publish(h.Event(Error), err)
 				continue
 
 			}
 			<-time.After(5 * time.Millisecond)
+			*/
 
-			if err := h.connection.I2cWrite(bme280Address, []byte{BME280_REGISTER_PRESSURE_MSB}); err != nil {
+			if err := h.connection.I2cWrite(bme280Address, []byte{BME280_REGISTER_STATUS}); err != nil {
 				gobot.Publish(h.Event(Error), err)
 				continue
 			}
@@ -187,6 +194,17 @@ func (h *BME280Driver) Start() (errs []error) {
 			}
 			if len(ret) == BME280_DATA_FRAME_LENGTH {
 				buf := bytes.NewBuffer(ret)
+
+				statusByte := uint8(0)
+				binary.Read(buf, binary.BigEndian, &statusByte)    // F3
+				binary.Read(buf, binary.BigEndian, &presMSB)    // F4
+				binary.Read(buf, binary.BigEndian, &presMSB)    // F5
+				binary.Read(buf, binary.BigEndian, &presMSB)    // F6
+
+				
+				if statusByte != 0x04 {
+					continue
+				}
 
 				binary.Read(buf, binary.BigEndian, &presMSB)    // F7
 				binary.Read(buf, binary.BigEndian, &presLSB)    // F8
@@ -235,11 +253,34 @@ func (h *BME280Driver) Start() (errs []error) {
 				h.Pressure = pressureComp
 				
 				// Humidity compensation
+
+/*
+// Returns humidity in %rH as as double. Output value of "46.332" represents 46.332 %rH
+double bme280_compensate_H_double(BME280_S32_t adc_H);
+{
+double var_H;
+var_H = (((double)t_fine) - 76800.0);
+var_H = (adc_H - (((double)dig_H4) * 64.0 + ((double)dig_H5) / 16384.0 * var_H)) *
+(((double)dig_H2) / 65536.0 * 
+(1.0 + ((double)dig_H6) / 67108864.0 * var_H *
+(1.0 + ((double)dig_H3) / 67108864.0 * var_H)));
+
+var_H = var_H * (1.0 - ((double)dig_H1) * var_H / 524288.0);
+if (var_H > 100.0)
+var_H = 100.0;
+else if (var_H < 0.0)
+var_H = 0.0;
+return var_H;
+}
+*/
+
 				hcvar1 = float32(h.calTFine) - 76800.0
+				hcvar1 = (float32(humidity) - (float32(h.calH4) * 64.0 + 
+						float32(h.calH5) / 16384.0 * float32(humidity))) *
+					(float32(h.calH2)) / 65536.0 *
+					(1.0 + float32(h.calH6) / 67108864.0 * float32(humidity) *
+						(1.0 + float32(h.calH3) / 67108864.0 * float32(humidity)))
 
-// var_H = (adc_H – (((double)dig_H4) * 64.0 + ((double)dig_H5) / 16384.0 * var_H)) * (((double)dig_H2) / 65536.0 * (1.0 + ((double)dig_H6) / 67108864.0 * var_H * (1.0 + ((double)dig_H3) / 67108864.0 * var_H)));
-
-				hcvar1 = (float32(humidity) - (float32(h.calH4) * 64.0 + float32(h.calH5) / 16384.0 * float32(humidity))) * (float32(h.calH2) / 65536.0 * (1.0 + float32(h.calH6) / 67108864.0 * hcvar1 * (1.0 + float32(h.calH3) / 67108864.0 * hcvar1)))
 				hcvar1 = hcvar1 * (1.0 - float32(h.calH1) * hcvar1 / 524288.0)
 				if (hcvar1 > 100.0) {
 					hcvar1 = 100.0
@@ -259,22 +300,81 @@ func (h *BME280Driver) Start() (errs []error) {
 // Halt returns true if devices is halted successfully
 func (h *BME280Driver) Halt() (err []error) { return }
 
+// reset returns true if devices is reset successfully
+func (h *BME280Driver) Reset() (err error) { 
+
+	// Send the RESET instruction
+	if err = h.connection.I2cWrite(bme280Address, []byte{BME280_REGISTER_RESET, 0xB6}); err != nil {
+		return errors.New("bme280 reset failed")
+	}
+	<-time.After(h.interval)
+
+	// put the device to sleep
+	if err = h.connection.I2cWrite(bme280Address, []byte{BME280_REGISTER_CTL_MEAS, 0x00}); err != nil {
+		return errors.New("bme280 sleep failed")
+	}
+	<-time.After(h.interval)
+
+
+	// Configure the device's filtering, sampling, and SPI interface
+	// Sample rate should be 000 - 0.5ms per sample because why not
+	// Filter should be 16 (100)
+	// SPI should be off
+
+	// Therefore the control byte is
+	// 0 1 2 3 4 5 6 7
+	// 0 0 1 0 0 0 0 0
+	// 0x20
+	// of course we are wrong
+	// 0 1 2 3 4 5 6 7
+	// 0 0 0 0 0 1 0 0
+	// 0x04
+	// i give up, set 0x00
+
+	if err = h.connection.I2cWrite(bme280Address, []byte{BME280_REGISTER_CTL_CONFIG, 0x04}); err != nil {
+		return errors.New("bme280 operation reconfig failed")
+	}
+	<-time.After(h.interval)
+
+	// const BME280_REGISTER_CTL_HUMIDITY = 0xF2
+	// following operation cribbed from adafruit
+	// https://github.com/adafruit/Adafruit_BME280_Library
+
+	if err = h.connection.I2cWrite(bme280Address, []byte{BME280_REGISTER_CTL_HUMIDITY, 0x05}); err != nil {
+		return errors.New("bme280 measurement reconfig failed")
+	}
+	<-time.After(h.interval)
+
+	// Configure the device to active with oversampling x16 on all sensors
+	if err = h.connection.I2cWrite(bme280Address, []byte{BME280_REGISTER_CTL_MEAS, 0xFF}); err != nil {
+		return errors.New("bme280 measurement reconfig failed")
+	}
+	<-time.After(h.interval)
+
+	return 
+}
+
+
 func (h *BME280Driver) initialization() (err error) {
 
 	if err = h.connection.I2cStart(bme280Address); err != nil {
 		return
 	}
 
+	/*
 	// Configure the device to active with oversampling x16 on all sensors
 	if err = h.connection.I2cWrite(bme280Address, []byte{BME280_REGISTER_CTL_MEAS, 0xFF}); err != nil {
 		return
 	}
+	*/
+
+	h.Reset()
+
 
 	// Set the first byte to read configuration data from
 	if err = h.connection.I2cWrite(bme280Address, []byte{BME280_REGISTER_DIG_T1_LSB}); err != nil {
 		return
 	}
-
 
 	// slurp 26 bytes of temp and pres calibration from bme280
 	tp_ret, tp_err := h.connection.I2cRead(bme280Address, BME280_PRESSURE_TEMPERATURE_CALIB_DATA_LENGTH)
