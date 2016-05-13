@@ -121,8 +121,7 @@ a shared set of drivers provided using the `gobot/platforms/gpio` package:
 - [GPIO](https://en.wikipedia.org/wiki/General_Purpose_Input/Output) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/platforms/gpio)
 	- Analog Sensor
 	- Button
-	- Direct Pin
-	- Digital Sensor
+	- Buzzer
 	- Direct Pin
 	- Grove Button
 	- Grove Buzzer
@@ -132,10 +131,13 @@ a shared set of drivers provided using the `gobot/platforms/gpio` package:
 	- Grove Relay
 	- Grove Rotary Dial
 	- Grove Sound Sensor
+	- Grove Temperature Sensor
 	- Grove Touch Sensor
 	- LED
 	- Makey Button
 	- Motor
+	- Relay
+	- RGB LED
 	- Servo
 
 Support for devices that use Inter-Integrated Circuit (I2C) have a shared set of
