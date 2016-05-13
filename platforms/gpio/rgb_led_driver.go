@@ -7,11 +7,11 @@ var _ gobot.Driver = (*RgbLedDriver)(nil)
 // RgbLedDriver represents a digital RGB Led
 type RgbLedDriver struct {
 	pinRed     string
-	redColor	 byte
+	redColor   byte
 	pinGreen   string
 	greenColor byte
 	pinBlue    string
-	blueColor	 byte
+	blueColor  byte
 	name       string
 	connection DigitalWriter
 	high       bool
