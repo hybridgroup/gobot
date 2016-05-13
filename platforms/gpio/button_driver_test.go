@@ -29,7 +29,7 @@ func TestButtonDriver(t *testing.T) {
 	gobottest.Assert(t, d.Connection().Name(), "adaptor")
 
 	d = NewButtonDriver(newGpioTestAdaptor("adaptor"), "bot", "1", 30*time.Second)
-	gobottest.Assert(t, d.interval, 30 * time.Second)
+	gobottest.Assert(t, d.interval, 30*time.Second)
 }
 
 func TestButtonDriverStart(t *testing.T) {
