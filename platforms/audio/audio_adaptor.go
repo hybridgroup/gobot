@@ -47,7 +47,7 @@ func (a *AudioAdaptor) Sound(fileName string) []error {
 
 	// command to play a MP3 file
 	cmd := exec.Command("mpg123", fileName)
-	err = cmd.Run()
+	err = cmd.Start()
 
 	if err != nil {
 		log.Println(err)

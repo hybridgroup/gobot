@@ -3,7 +3,6 @@
 package audio
 
 import (
-	"os/exec"
 	"testing"
 
 	"github.com/hybridgroup/gobot/gobottest"
@@ -18,11 +17,4 @@ func TestAudioDriver(t *testing.T) {
 	gobottest.Assert(t, len(d.Start()), 0)
 
 	gobottest.Assert(t, len(d.Halt()), 0)
-
-	_, err := exec.LookPath("mpg123")
-	numErrsForTest := 0
-	if err != nil {
-		numErrsForTest = 1
-	}
-	gobottest.Assert(t, len(d.Sound("../resources/foo.mp3")), numErrsForTest)
 }
