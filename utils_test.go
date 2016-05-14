@@ -24,6 +24,18 @@ func TestEvery(t *testing.T) {
 	}
 }
 
+func TestEveryWhenDone(t *testing.T) {
+	i := 0
+	done := Every(20*time.Millisecond, func() {
+		i++
+	})
+	<-time.After(20 * time.Millisecond)
+	done <- true
+	if i > 1 {
+		t.Error("Test should have stopped after 20ms")
+	}
+}
+
 func TestAfter(t *testing.T) {
 	i := 0
 	After(1*time.Millisecond, func() {
