@@ -31,6 +31,7 @@ func TestEveryWhenDone(t *testing.T) {
 	})
 	<-time.After(20 * time.Millisecond)
 	done <- true
+	<-time.After(50 * time.Millisecond)
 	if i > 1 {
 		t.Error("Test should have stopped after 20ms")
 	}

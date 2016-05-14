@@ -35,7 +35,7 @@ func Every(t time.Duration, f func()) chan bool {
 		for {
 			select {
 			case <-done:
-				break
+				return
 			default:
 				<-c
 				go f()
