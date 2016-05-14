@@ -29,7 +29,7 @@ func TestEveryWhenDone(t *testing.T) {
 	done := Every(20*time.Millisecond, func() {
 		i++
 	})
-	<-time.After(20 * time.Millisecond)
+	<-time.After(10 * time.Millisecond)
 	done <- true
 	<-time.After(50 * time.Millisecond)
 	if i > 1 {
