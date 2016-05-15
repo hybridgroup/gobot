@@ -3,10 +3,12 @@ package audio
 
 import (
 	"errors"
-	"github.com/hybridgroup/gobot"
 	"log"
 	"os"
 	"os/exec"
+	"path"
+
+	"github.com/hybridgroup/gobot"
 )
 
 var _ gobot.Adaptor = (*AudioAdaptor)(nil)
@@ -30,25 +32,35 @@ func (a *AudioAdaptor) Finalize() []error { return nil }
 func (a *AudioAdaptor) Sound(fileName string) []error {
 
 	var errorsList []error
-	var err error
 
 	if fileName == "" {
-		log.Println("Require filename for MP3 file.")
-		errorsList = append(errorsList, errors.New("Requires filename for MP3 file."))
+		log.Println("Require filename for audio file.")
+		errorsList = append(errorsList, errors.New("Requires filename for audio file."))
 		return errorsList
 	}
 
-	_, err = os.Open(fileName)
+	_, err := os.Stat(fileName)
 	if err != nil {
 		log.Println(err)
 		errorsList = append(errorsList, err)
 		return errorsList
 	}
 
-	// command to play a MP3 file
-	cmd := exec.Command("mpg123", fileName)
-	err = cmd.Start()
+	// command to play audio file based on file type
+	fileType := path.Ext(fileName)
+	var commandName string
+	if fileType == ".mp3" {
+			commandName = "mpg123"
+	} else if fileType == ".wav" {
+			commandName = "aplay"
+	} else {
+		log.Println("Unknown filetype for audio file.")
+		errorsList = append(errorsList, errors.New("Unknown filetype for audio file."))
+		return errorsList
+	}
 
+	cmd := exec.Command(commandName, fileName)
+	err = cmd.Start()
 	if err != nil {
 		log.Println(err)
 		errorsList = append(errorsList, err)
