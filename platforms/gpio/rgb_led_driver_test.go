@@ -23,7 +23,7 @@ func TestRgbLedDriver(t *testing.T) {
 	d := initTestRgbLedDriver(newGpioTestAdaptor("adaptor"))
 
 	gobottest.Assert(t, d.Name(), "bot")
-	gobottest.Assert(t, d.Pin(), "1")
+	gobottest.Assert(t, d.Pin(), "r=1, g=2, b=3")
 	gobottest.Assert(t, d.RedPin(), "1")
 	gobottest.Assert(t, d.GreenPin(), "2")
 	gobottest.Assert(t, d.BluePin(), "3")

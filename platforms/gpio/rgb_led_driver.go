@@ -68,8 +68,8 @@ func (l *RgbLedDriver) Halt() (errs []error) { return }
 // Name returns the LedDrivers name
 func (l *RgbLedDriver) Name() string { return l.name }
 
-// Pin returns the RgbLedDrivers redPin
-func (l *RgbLedDriver) Pin() string { return l.pinRed }
+// Pin returns the RgbLedDrivers pins
+func (l *RgbLedDriver) Pin() string { return "r=" + l.pinRed + ", g=" + l.pinGreen + ", b=" + l.pinBlue }
 
 // RedPin returns the RgbLedDrivers redPin
 func (l *RgbLedDriver) RedPin() string { return l.pinRed }
