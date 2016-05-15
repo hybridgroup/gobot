@@ -50,9 +50,9 @@ func (a *AudioAdaptor) Sound(fileName string) []error {
 	fileType := path.Ext(fileName)
 	var commandName string
 	if fileType == ".mp3" {
-			commandName = "mpg123"
+		commandName = "mpg123"
 	} else if fileType == ".wav" {
-			commandName = "aplay"
+		commandName = "aplay"
 	} else {
 		log.Println("Unknown filetype for audio file.")
 		errorsList = append(errorsList, errors.New("Unknown filetype for audio file."))
