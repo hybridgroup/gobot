@@ -5,7 +5,7 @@ This module implements support for keyboard events, wrapping the `stty` utility.
 ## How to Install
 
 ```
-go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/ardrone
+go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/keyboard
 ```
 
 ## How to Use
