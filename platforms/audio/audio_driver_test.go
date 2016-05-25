@@ -3,8 +3,8 @@
 package audio
 
 import (
-	"testing"
 	"os/exec"
+	"testing"
 
 	"github.com/hybridgroup/gobot/gobottest"
 )

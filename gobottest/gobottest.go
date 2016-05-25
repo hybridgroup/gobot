@@ -2,12 +2,12 @@ package gobottest
 
 import (
 	"fmt"
+	"os"
+	"os/exec"
 	"reflect"
 	"runtime"
 	"strings"
 	"testing"
-	"os"
-	"os/exec"
 )
 
 var errFunc = func(t *testing.T, message string) {

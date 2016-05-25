@@ -14,7 +14,7 @@ func main() {
 	laser := audio.NewAudioDriver(e, "laser", "./examples/laser.mp3")
 
 	work := func() {
-		gobot.Every(2 * time.Second, func() {
+		gobot.Every(2*time.Second, func() {
 			laser.Play()
 		})
 	}
