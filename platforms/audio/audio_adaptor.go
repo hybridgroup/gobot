@@ -33,7 +33,7 @@ func (a *AudioAdaptor) Sound(fileName string) []error {
 	var errorsList []error
 
 	if fileName == "" {
-		log.Println("Require filename for audio file.")
+		log.Println("Requires filename for audio file.")
 		errorsList = append(errorsList, errors.New("Requires filename for audio file."))
 		return errorsList
 	}

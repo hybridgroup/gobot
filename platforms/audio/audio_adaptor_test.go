@@ -32,3 +32,17 @@ func TestAudioAdaptorCommandsUnknown(t *testing.T) {
 	gobottest.Refute(t, cmd, "mpg123")
 	gobottest.Assert(t, err.Error(), "Unknown filetype for audio file.")
 }
+
+func TestAudioAdaptorSoundWithNoFilename(t *testing.T) {
+	a := NewAudioAdaptor("tester")
+
+	errors := a.Sound("")
+	gobottest.Assert(t, errors[0].Error(), "Requires filename for audio file.")
+}
+
+func TestAudioAdaptorSoundWithNonexistingFilename(t *testing.T) {
+	a := NewAudioAdaptor("tester")
+
+	errors := a.Sound("doesnotexist.mp3")
+	gobottest.Assert(t, errors[0].Error(), "stat doesnotexist.mp3: no such file or directory")
+}
