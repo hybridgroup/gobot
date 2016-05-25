@@ -18,7 +18,7 @@ func logFailure(t *testing.T, message string) {
 	errFunc(t, fmt.Sprintf("%v:%v: %v", s[len(s)-1], line, message))
 }
 
-// Assert checks if a and b are equal, emis a t.Errorf if they are not equal.
+// Assert checks if a and b are equal, emits a t.Errorf if they are not equal.
 func Assert(t *testing.T, a interface{}, b interface{}) {
 	if !reflect.DeepEqual(a, b) {
 		logFailure(t, fmt.Sprintf("%v - \"%v\", should equal,  %v - \"%v\"",
@@ -26,7 +26,7 @@ func Assert(t *testing.T, a interface{}, b interface{}) {
 	}
 }
 
-// Refute checks if a and b are equal, emis a t.Errorf if they are equal.
+// Refute checks if a and b are equal, emits a t.Errorf if they are equal.
 func Refute(t *testing.T, a interface{}, b interface{}) {
 	if reflect.DeepEqual(a, b) {
 		logFailure(t, fmt.Sprintf("%v - \"%v\", should not equal,  %v - \"%v\"",
