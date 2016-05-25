@@ -18,3 +18,10 @@ func TestAudioDriver(t *testing.T) {
 
 	gobottest.Assert(t, len(d.Halt()), 0)
 }
+
+func TestAudioDriverSoundWithNoFilename(t *testing.T) {
+	d := NewAudioDriver(NewAudioAdaptor("conn"), "dev", nil)
+
+	errors := d.Sound("")
+	gobottest.Assert(t, errors[0].Error(), "Requires filename for audio file.")
+}
