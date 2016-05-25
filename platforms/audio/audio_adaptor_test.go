@@ -16,3 +16,19 @@ func TestAudioAdaptor(t *testing.T) {
 
 	gobottest.Assert(t, len(a.Finalize()), 0)
 }
+
+func TestAudioAdaptorCommandsWav(t *testing.T) {
+	cmd, _ := CommandName("whatever.wav")
+	gobottest.Assert(t, cmd, "aplay")
+}
+
+func TestAudioAdaptorCommandsMp3(t *testing.T) {
+	cmd, _ := CommandName("whatever.mp3")
+	gobottest.Assert(t, cmd, "mpg123")
+}
+
+func TestAudioAdaptorCommandsUnknown(t *testing.T) {
+	cmd, err := CommandName("whatever.unk")
+	gobottest.Refute(t, cmd, "mpg123")
+	gobottest.Assert(t, err.Error(), "Unknown filetype for audio file.")
+}
