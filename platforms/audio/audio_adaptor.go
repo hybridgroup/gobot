@@ -30,7 +30,6 @@ func (a *AudioAdaptor) Connect() []error { return nil }
 func (a *AudioAdaptor) Finalize() []error { return nil }
 
 func (a *AudioAdaptor) Sound(fileName string) []error {
-
 	var errorsList []error
 
 	if fileName == "" {
@@ -47,15 +46,10 @@ func (a *AudioAdaptor) Sound(fileName string) []error {
 	}
 
 	// command to play audio file based on file type
-	fileType := path.Ext(fileName)
-	var commandName string
-	if fileType == ".mp3" {
-		commandName = "mpg123"
-	} else if fileType == ".wav" {
-		commandName = "aplay"
-	} else {
-		log.Println("Unknown filetype for audio file.")
-		errorsList = append(errorsList, errors.New("Unknown filetype for audio file."))
+	commandName, err := CommandName(fileName)
+	if err != nil {
+		log.Println(err)
+		errorsList = append(errorsList, err)
 		return errorsList
 	}
 
@@ -69,4 +63,15 @@ func (a *AudioAdaptor) Sound(fileName string) []error {
 
 	// Need to return to fulfill function sig, even though returning an empty
 	return nil
+}
+
+func CommandName(fileName string) (commandName string, err error) {
+	fileType := path.Ext(fileName)
+	if fileType == ".mp3" {
+		return "mpg123", nil
+	} else if fileType == ".wav" {
+		return "aplay", nil
+	} else {
+		return "", errors.New("Unknown filetype for audio file.")
+	}
 }
