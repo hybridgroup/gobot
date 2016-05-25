@@ -6,6 +6,8 @@ import (
 	"runtime"
 	"strings"
 	"testing"
+	"os"
+	"os/exec"
 )
 
 var errFunc = func(t *testing.T, message string) {
@@ -32,4 +34,12 @@ func Refute(t *testing.T, a interface{}, b interface{}) {
 		logFailure(t, fmt.Sprintf("%v - \"%v\", should not equal,  %v - \"%v\"",
 			a, reflect.TypeOf(a), b, reflect.TypeOf(b)))
 	}
+}
+
+func ExecCommand(command string, args ...string) *exec.Cmd {
+	cs := []string{"-test.run=TestHelperProcess", "--", command}
+	cs = append(cs, args...)
+	cmd := exec.Command(os.Args[0], cs...)
+	cmd.Env = []string{"GO_WANT_HELPER_PROCESS=1"}
+	return cmd
 }
