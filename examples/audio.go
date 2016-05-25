@@ -11,11 +11,11 @@ func main() {
 	gbot := gobot.NewGobot()
 
 	e := audio.NewAudioAdaptor("sound")
-	laser := audio.NewAudioDriver(e, "laser", nil)
+	laser := audio.NewAudioDriver(e, "laser", "./examples/laser.mp3")
 
 	work := func() {
-		gobot.Every(1*time.Second, func() {
-			laser.Sound("./examples/laser.mp3")
+		gobot.Every(2 * time.Second, func() {
+			laser.Play()
 		})
 	}
 
