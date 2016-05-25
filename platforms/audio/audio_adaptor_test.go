@@ -2,6 +2,8 @@
 package audio
 
 import (
+	"os"
+	"os/exec"
 	"testing"
 
 	"github.com/hybridgroup/gobot/gobottest"
@@ -45,4 +47,23 @@ func TestAudioAdaptorSoundWithNonexistingFilename(t *testing.T) {
 
 	errors := a.Sound("doesnotexist.mp3")
 	gobottest.Assert(t, errors[0].Error(), "stat doesnotexist.mp3: no such file or directory")
+}
+
+func fakeExecCommand(command string, args ...string) *exec.Cmd {
+	cs := []string{"-test.run=TestHelperProcess", "--", command}
+	cs = append(cs, args...)
+	cmd := exec.Command(os.Args[0], cs...)
+	cmd.Env = []string{"GO_WANT_HELPER_PROCESS=1"}
+	return cmd
+}
+
+func TestAudioAdaptorSoundWithValidMP3Filename(t *testing.T) {
+	execCommand = fakeExecCommand
+
+	a := NewAudioAdaptor("tester")
+	defer func() { execCommand = exec.Command }()
+
+	errors := a.Sound("../../examples/laser.mp3")
+
+	gobottest.Assert(t, len(errors), 0)
 }

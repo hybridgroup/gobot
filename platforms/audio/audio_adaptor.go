@@ -53,8 +53,7 @@ func (a *AudioAdaptor) Sound(fileName string) []error {
 		return errorsList
 	}
 
-	cmd := exec.Command(commandName, fileName)
-	err = cmd.Start()
+	err = RunCommand(commandName, fileName)
 	if err != nil {
 		log.Println(err)
 		errorsList = append(errorsList, err)
@@ -74,4 +73,12 @@ func CommandName(fileName string) (commandName string, err error) {
 	} else {
 		return "", errors.New("Unknown filetype for audio file.")
 	}
+}
+
+var execCommand = exec.Command
+
+func RunCommand(audioCommand string, filename string) error {
+	cmd := execCommand(audioCommand, filename)
+	err := cmd.Start()
+	return err
 }
