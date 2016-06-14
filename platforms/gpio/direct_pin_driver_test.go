@@ -68,6 +68,22 @@ func TestDirectPinDriverHalt(t *testing.T) {
 	gobottest.Assert(t, len(d.Halt()), 0)
 }
 
+func TestDirectPinDriverOff(t *testing.T) {
+	d := initTestDirectPinDriver(newGpioTestAdaptor("adaptor"))
+	gobot.Refute(t, d.DigitalWrite(0), nil)
+
+	d = initTestDirectPinDriver(&gpioTestBareAdaptor{})
+	gobot.Assert(t, d.DigitalWrite(0), ErrDigitalWriteUnsupported)
+}
+
+func TestDirectPinDriverOn(t *testing.T) {
+	d := initTestDirectPinDriver(newGpioTestAdaptor("adaptor"))
+	gobot.Refute(t, d.DigitalWrite(1), nil)
+
+	d = initTestDirectPinDriver(&gpioTestBareAdaptor{})
+	gobot.Assert(t, d.DigitalWrite(1), ErrDigitalWriteUnsupported)
+}
+
 func TestDirectPinDriverDigitalWrite(t *testing.T) {
 	d := initTestDirectPinDriver(newGpioTestAdaptor("adaptor"))
 	gobottest.Refute(t, d.DigitalWrite(1), nil)
