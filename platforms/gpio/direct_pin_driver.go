@@ -72,6 +72,24 @@ func (d *DirectPinDriver) Start() (errs []error) { return }
 // Halt implements the Driver interface
 func (d *DirectPinDriver) Halt() (errs []error) { return }
 
+// Turn Off pin
+func (d *DirectPinDriver) Off() (err error) {
+	if writer, ok := d.Connection().(DigitalWriter); ok {
+		return writer.DigitalWrite(d.Pin(), byte(0))
+	}
+	err = ErrDigitalWriteUnsupported
+	return
+}
+
+// Turn On pin
+func (d *DirectPinDriver) On() (err error) {
+	if writer, ok := d.Connection().(DigitalWriter); ok {
+		return writer.DigitalWrite(d.Pin(), byte(1))
+	}
+	err = ErrDigitalWriteUnsupported
+	return
+}
+
 // DigitalRead returns the current digital state of the pin
 func (d *DirectPinDriver) DigitalRead() (val int, err error) {
 	if reader, ok := d.Connection().(DigitalReader); ok {
