@@ -47,3 +47,31 @@ func (b *BLEDeviceInformationDriver) GetModelNumber() (model string) {
 	val := buf.String()
 	return val
 }
+
+func (b *BLEDeviceInformationDriver) GetFirmwareRevision() (revision string) {
+	c, _ := b.adaptor().ReadCharacteristic("180a", "2a26")
+	buf := bytes.NewBuffer(c)
+	val := buf.String()
+	return val
+}
+
+func (b *BLEDeviceInformationDriver) GetHardwareRevision() (revision string) {
+	c, _ := b.adaptor().ReadCharacteristic("180a", "2a27")
+	buf := bytes.NewBuffer(c)
+	val := buf.String()
+	return val
+}
+
+func (b *BLEDeviceInformationDriver) GetManufacturerName() (manufacturer string) {
+	c, _ := b.adaptor().ReadCharacteristic("180a", "2a29")
+	buf := bytes.NewBuffer(c)
+	val := buf.String()
+	return val
+}
+
+func (b *BLEDeviceInformationDriver) GetPnPId() (model string) {
+	c, _ := b.adaptor().ReadCharacteristic("180a", "2a50")
+	buf := bytes.NewBuffer(c)
+	val := buf.String()
+	return val
+}
