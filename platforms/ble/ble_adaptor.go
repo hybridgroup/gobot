@@ -3,7 +3,7 @@ package ble
 import (
 	"fmt"
 	"github.com/hybridgroup/gobot"
-	"github.com/paypal/gatt"
+	"github.com/currantlabs/gatt"
 	"log"
 	"strings"
 )
@@ -24,8 +24,7 @@ type BLEAdaptor struct {
 	peripheral      gatt.Peripheral
 	services				map[string]*BLEService
 	connected       bool
-	ready	chan struct{}
-	//connect   func(string) (io.ReadWriteCloser, error)
+	ready						chan struct{}
 }
 
 // NewBLEAdaptor returns a new BLEAdaptor given a name and uuid
@@ -36,9 +35,6 @@ func NewBLEAdaptor(name string, uuid string) *BLEAdaptor {
 		connected: false,
 		ready: make(chan struct{}),
 		services: make(map[string]*BLEService),
-		// connect: func(port string) (io.ReadWriteCloser, error) {
-		// 	return serial.OpenPort(&serial.Config{Name: port, Baud: 115200})
-		// },
 	}
 }
 
@@ -58,12 +54,12 @@ func (b *BLEAdaptor) Connect() (errs []error) {
 
 	// Register handlers.
 	device.Handle(
-		gatt.PeripheralDiscovered(b.onDiscovered),
-		gatt.PeripheralConnected(b.onConnected),
-		gatt.PeripheralDisconnected(b.onDisconnected),
+		gatt.PeripheralDiscovered(b.DiscoveryHandler),
+		gatt.PeripheralConnected(b.ConnectHandler),
+		gatt.PeripheralDisconnected(b.DisconnectHandler),
 	)
 
-	device.Init(b.onStateChanged)
+	device.Init(b.StateChangeHandler)
 	<-b.ready
 	// TODO: make sure peripheral currently exists for this UUID before returning
 	return nil
@@ -109,7 +105,7 @@ func (b *BLEAdaptor) ReadCharacteristic(sUUID string, cUUID string) (data []byte
 	 return val, nil
 }
 
-func (b *BLEAdaptor) onStateChanged(d gatt.Device, s gatt.State) {
+func (b *BLEAdaptor) StateChangeHandler(d gatt.Device, s gatt.State) {
 	fmt.Println("State:", s)
 	switch s {
 	case gatt.StatePoweredOn:
@@ -121,7 +117,7 @@ func (b *BLEAdaptor) onStateChanged(d gatt.Device, s gatt.State) {
 	}
 }
 
-func (b *BLEAdaptor) onDiscovered(p gatt.Peripheral, a *gatt.Advertisement, rssi int) {
+func (b *BLEAdaptor) DiscoveryHandler(p gatt.Peripheral, a *gatt.Advertisement, rssi int) {
 	id := strings.ToUpper(b.UUID())
 	if strings.ToUpper(p.ID()) != id {
 		return
@@ -134,7 +130,7 @@ func (b *BLEAdaptor) onDiscovered(p gatt.Peripheral, a *gatt.Advertisement, rssi
 	p.Device().Connect(p)
 }
 
-func (b *BLEAdaptor) onConnected(p gatt.Peripheral, err error) {
+func (b *BLEAdaptor) ConnectHandler(p gatt.Peripheral, err error) {
 		fmt.Printf("\nConnected Peripheral ID:%s, NAME:(%s)\n", p.ID(), p.Name())
 
 		b.peripheral = p
@@ -168,7 +164,7 @@ func (b *BLEAdaptor) onConnected(p gatt.Peripheral, err error) {
 	//defer p.Device().CancelConnection(p)
 }
 
-func (b *BLEAdaptor) onDisconnected(p gatt.Peripheral, err error) {
+func (b *BLEAdaptor) DisconnectHandler(p gatt.Peripheral, err error) {
 	fmt.Println("Disconnected")
 }
 
