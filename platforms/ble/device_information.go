@@ -42,10 +42,8 @@ func (b *BLEDeviceInformationDriver) Start() (errs []error) {
 func (b *BLEDeviceInformationDriver) Halt() (errs []error) { return }
 
 func (b *BLEDeviceInformationDriver) GetModelNumber() (model string) {
-	var l string
 	c, _ := b.adaptor().ReadCharacteristic("180a", "2a24")
 	buf := bytes.NewBuffer(c)
-	val, _ := buf.ReadByte()
-	l = string(val)
-	return l
+	val := buf.String()
+	return val
 }

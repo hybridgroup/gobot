@@ -2,8 +2,8 @@ package ble
 
 import (
 	"fmt"
-	"github.com/hybridgroup/gobot"
 	"github.com/currantlabs/gatt"
+	"github.com/hybridgroup/gobot"
 	"log"
 	"strings"
 )
@@ -18,13 +18,13 @@ var _ gobot.Adaptor = (*BLEAdaptor)(nil)
 
 // Represents a Connection to a BLE Peripheral
 type BLEAdaptor struct {
-	name            string
-	uuid            string
-	device          gatt.Device
-	peripheral      gatt.Peripheral
-	services				map[string]*BLEService
-	connected       bool
-	ready						chan struct{}
+	name       string
+	uuid       string
+	device     gatt.Device
+	peripheral gatt.Peripheral
+	services   map[string]*BLEService
+	connected  bool
+	ready      chan struct{}
 }
 
 // NewBLEAdaptor returns a new BLEAdaptor given a name and uuid
@@ -33,8 +33,8 @@ func NewBLEAdaptor(name string, uuid string) *BLEAdaptor {
 		name:      name,
 		uuid:      uuid,
 		connected: false,
-		ready: make(chan struct{}),
-		services: make(map[string]*BLEService),
+		ready:     make(chan struct{}),
+		services:  make(map[string]*BLEService),
 	}
 }
 
@@ -99,10 +99,10 @@ func (b *BLEAdaptor) ReadCharacteristic(sUUID string, cUUID string) (data []byte
 	val, err := b.peripheral.ReadCharacteristic(characteristic)
 	if err != nil {
 		fmt.Printf("Failed to read characteristic, err: %s\n", err)
-		return  nil, err
+		return nil, err
 	}
 
-	 return val, nil
+	return val, nil
 }
 
 func (b *BLEAdaptor) StateChangeHandler(d gatt.Device, s gatt.State) {
@@ -131,33 +131,33 @@ func (b *BLEAdaptor) DiscoveryHandler(p gatt.Peripheral, a *gatt.Advertisement, 
 }
 
 func (b *BLEAdaptor) ConnectHandler(p gatt.Peripheral, err error) {
-		fmt.Printf("\nConnected Peripheral ID:%s, NAME:(%s)\n", p.ID(), p.Name())
+	fmt.Printf("\nConnected Peripheral ID:%s, NAME:(%s)\n", p.ID(), p.Name())
 
-		b.peripheral = p
+	b.peripheral = p
 
-		if err := p.SetMTU(500); err != nil {
-			fmt.Printf("Failed to set MTU, err: %s\n", err)
-		}
+	if err := p.SetMTU(500); err != nil {
+		fmt.Printf("Failed to set MTU, err: %s\n", err)
+	}
 
-		ss, err := p.DiscoverServices(nil)
+	ss, err := p.DiscoverServices(nil)
+	if err != nil {
+		fmt.Printf("Failed to discover services, err: %s\n", err)
+		return
+	}
+
+	for _, s := range ss {
+		b.services[s.UUID().String()] = NewBLEService(s.UUID().String(), s)
+
+		cs, err := p.DiscoverCharacteristics(nil, s)
 		if err != nil {
-			fmt.Printf("Failed to discover services, err: %s\n", err)
-			return
+			fmt.Printf("Failed to discover characteristics, err: %s\n", err)
+			continue
 		}
 
-		for _, s := range ss {
-			b.services[s.UUID().String()] = NewBLEService(s.UUID().String(), s)
-
-			cs, err := p.DiscoverCharacteristics(nil, s)
-			if err != nil {
-				fmt.Printf("Failed to discover characteristics, err: %s\n", err)
-				continue
-			}
-
-			for _, c := range cs {
-				b.services[s.UUID().String()].characteristics[c.UUID().String()] = c
-			}
+		for _, c := range cs {
+			b.services[s.UUID().String()].characteristics[c.UUID().String()] = c
 		}
+	}
 
 	b.connected = true
 	close(b.ready)
@@ -170,16 +170,16 @@ func (b *BLEAdaptor) DisconnectHandler(p gatt.Peripheral, err error) {
 
 // Represents a BLE Peripheral's Service
 type BLEService struct {
-	uuid            	string
-	service        		*gatt.Service
-	characteristics 	map[string]*gatt.Characteristic
+	uuid            string
+	service         *gatt.Service
+	characteristics map[string]*gatt.Characteristic
 }
 
 // NewBLEAdaptor returns a new BLEService given a uuid
 func NewBLEService(sUuid string, service *gatt.Service) *BLEService {
 	return &BLEService{
-		uuid:      sUuid,
-		service: 	 service,
+		uuid:            sUuid,
+		service:         service,
 		characteristics: make(map[string]*gatt.Characteristic),
 	}
 }
