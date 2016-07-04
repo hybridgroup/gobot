@@ -26,8 +26,16 @@ func main() {
 			fmt.Printf("status: %d\n", data)
 		})
 
-		gobot.After(10*time.Second, func() {
-			drone.Land()
+		gobot.On(drone.Event("flying"), func(data interface{}) {
+			fmt.Println("flying!")
+			gobot.After(5*time.Second, func() {
+				fmt.Println("landing...")
+				drone.Land()
+			})
+		})
+
+		gobot.On(drone.Event("landed"), func(data interface{}) {
+			fmt.Println("landed.")
 		})
 
 		drone.TakeOff()
