@@ -8,12 +8,6 @@ import (
 	"strings"
 )
 
-// TODO: handle other OS defaults besides Linux
-var DefaultClientOptions = []gatt.Option{
-	gatt.LnxMaxConnections(1),
-	gatt.LnxDeviceID(-1, false),
-}
-
 var _ gobot.Adaptor = (*BLEAdaptor)(nil)
 
 // Represents a Connection to a BLE Peripheral
