@@ -99,6 +99,24 @@ func (b *BLEAdaptor) ReadCharacteristic(sUUID string, cUUID string) (data []byte
 	return val, nil
 }
 
+// WriteCharacteristic writes bytes to the BLE device for the
+// requested service and characteristic
+func (b *BLEAdaptor) WriteCharacteristic(sUUID string, cUUID string, data []byte) (err error) {
+	if !b.connected {
+		log.Fatalf("Cannot write to BLE device until connected")
+		return
+	}
+
+	characteristic := b.services[sUUID].characteristics[cUUID]
+	err = b.peripheral.WriteCharacteristic(characteristic, data, false)
+	if err != nil {
+		fmt.Printf("Failed to write characteristic, err: %s\n", err)
+		return err
+	}
+
+	return
+}
+
 func (b *BLEAdaptor) StateChangeHandler(d gatt.Device, s gatt.State) {
 	fmt.Println("State:", s)
 	switch s {
