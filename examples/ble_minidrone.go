@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"time"
 	"os"
 
 	"github.com/hybridgroup/gobot"
@@ -16,7 +14,7 @@ func main() {
 	drone := ble.NewBLEMinidroneDriver(bleAdaptor, "drone")
 
 	work := func() {
-		battery.Init()
+		drone.Init()
 	}
 
 	robot := gobot.NewRobot("bleBot",

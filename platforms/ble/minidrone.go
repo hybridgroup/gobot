@@ -1,7 +1,7 @@
 package ble
 
 import (
-	//"bytes"
+	"fmt"
 
 	"github.com/hybridgroup/gobot"
 )
@@ -46,6 +46,12 @@ func (b *BLEMinidroneDriver) Halt() (errs []error) { return }
 func (b *BLEMinidroneDriver) Init() (err error) {
 	b.stepsfa0b++
 	buf := []byte{0x04, byte(b.stepsfa0b), 0x00, 0x04, 0x01, 0x00, 0x32, 0x30, 0x31, 0x34, 0x2D, 0x31, 0x30, 0x2D, 0x32, 0x38, 0x00}
-	err = b.adaptor().WriteCharacteristic("fa00", "fa0b", buf)
+	err = b.adaptor().WriteCharacteristic("9a66fa000800919111e4012d1540cb8e", "9a66fa0b0800919111e4012d1540cb8e", buf)
+
+	f := func(b []byte, e error) {
+			fmt.Printf("battery: %d\n", b[len(b)-1])
+	}
+
+	b.adaptor().SubscribeNotify("9a66fb000800919111e4012d1540cb8e", "9a66fb0f0800919111e4012d1540cb8e", f)
 	return err
 }

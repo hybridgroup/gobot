@@ -108,9 +108,33 @@ func (b *BLEAdaptor) WriteCharacteristic(sUUID string, cUUID string, data []byte
 	}
 
 	characteristic := b.services[sUUID].characteristics[cUUID]
-	err = b.peripheral.WriteCharacteristic(characteristic, data, false)
+
+	err = b.peripheral.WriteCharacteristic(characteristic, data, true)
 	if err != nil {
 		fmt.Printf("Failed to write characteristic, err: %s\n", err)
+		return err
+	}
+
+	return
+}
+
+// SubscribeNotify subscribes to the BLE device for the
+// requested service and characteristic
+func (b *BLEAdaptor) SubscribeNotify(sUUID string, cUUID string, f func([]byte, error)) (err error) {
+	if !b.connected {
+		log.Fatalf("Cannot subscribe to BLE device until connected")
+		return
+	}
+
+	characteristic := b.services[sUUID].characteristics[cUUID]
+
+	fn := func(c *gatt.Characteristic, b []byte, err error) {
+		f(b, err)
+	}
+
+	err = b.peripheral.SetNotifyValue(characteristic, fn)
+	if err != nil {
+		fmt.Printf("Failed to subscribe to characteristic, err: %s\n", err)
 		return err
 	}
 
