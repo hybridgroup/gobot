@@ -17,8 +17,10 @@ func main() {
 
 	work := func() {
 		drone.Init()
+		drone.FlatTrim()
 		drone.StartPcmd()
-		
+		drone.FlatTrim()
+
 		gobot.On(drone.Event("battery"), func(data interface{}) {
 			fmt.Printf("battery: %d\n", data)
 		})
@@ -32,6 +34,7 @@ func main() {
 			gobot.After(5*time.Second, func() {
 				fmt.Println("landing...")
 				drone.Land()
+				drone.Land()
 			})
 		})
 
@@ -39,6 +42,7 @@ func main() {
 			fmt.Println("landed.")
 		})
 
+		<-time.After(1000 * time.Millisecond)
 		drone.TakeOff()
 	}
 
