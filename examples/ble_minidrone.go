@@ -17,7 +17,8 @@ func main() {
 
 	work := func() {
 		drone.Init()
-
+		drone.StartPcmd()
+		
 		gobot.On(drone.Event("battery"), func(data interface{}) {
 			fmt.Printf("battery: %d\n", data)
 		})

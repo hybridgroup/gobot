@@ -95,21 +95,15 @@ func (b *BLEMinidroneDriver) Start() (errs []error) {
 func (b *BLEMinidroneDriver) Halt() (errs []error) { return }
 
 func (b *BLEMinidroneDriver) Init() (err error) {
-	b.stepsfa0b++
-	buf := []byte{0x04, byte(b.stepsfa0b), 0x00, 0x04, 0x01, 0x00, 0x32, 0x30, 0x31, 0x34, 0x2D, 0x31, 0x30, 0x2D, 0x32, 0x38, 0x00}
-	err = b.adaptor().WriteCharacteristic("9a66fa000800919111e4012d1540cb8e", "9a66fa0b0800919111e4012d1540cb8e", buf)
-	if err != nil {
-		fmt.Println("init error:", err)
-		return err
-	}
+	b.GenerateAllStates()
 
-	// setup battery notifications
-	b.adaptor().SubscribeNotify("9a66fb000800919111e4012d1540cb8e", "9a66fb0f0800919111e4012d1540cb8e", func(data []byte, e error) {
+	// subscribe to battery notifications
+	b.adaptor().Subscribe("9a66fb000800919111e4012d1540cb8e", "9a66fb0f0800919111e4012d1540cb8e", func(data []byte, e error) {
 			gobot.Publish(b.Event(Battery), data[len(data)-1])
 	})
 
-	// setup flying status notifications
-	b.adaptor().SubscribeNotify("9a66fb000800919111e4012d1540cb8e", "9a66fb0e0800919111e4012d1540cb8e", func(data []byte, e error) {
+	// subscribe to flying status notifications
+	b.adaptor().Subscribe("9a66fb000800919111e4012d1540cb8e", "9a66fb0e0800919111e4012d1540cb8e", func(data []byte, e error) {
 			gobot.Publish(b.Event(Status), data[6])
 			if (data[6] == 1 || data[6] == 2) && !b.flying {
 				b.flying = true
@@ -119,6 +113,18 @@ func (b *BLEMinidroneDriver) Init() (err error) {
 				gobot.Publish(b.Event(Landed), true)
 			}
 	})
+
+	return
+}
+
+func (b *BLEMinidroneDriver) GenerateAllStates() (err error) {
+	b.stepsfa0b++
+	buf := []byte{0x04, byte(b.stepsfa0b), 0x00, 0x04, 0x01, 0x00, 0x32, 0x30, 0x31, 0x34, 0x2D, 0x31, 0x30, 0x2D, 0x32, 0x38, 0x00}
+	err = b.adaptor().WriteCharacteristic("9a66fa000800919111e4012d1540cb8e", "9a66fa0b0800919111e4012d1540cb8e", buf)
+	if err != nil {
+		fmt.Println("GenerateAllStates error:", err)
+		return err
+	}
 
 	return
 }

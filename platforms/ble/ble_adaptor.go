@@ -118,9 +118,9 @@ func (b *BLEAdaptor) WriteCharacteristic(sUUID string, cUUID string, data []byte
 	return
 }
 
-// SubscribeNotify subscribes to the BLE device for the
+// Subscribe subscribes to notifications from the BLE device for the
 // requested service and characteristic
-func (b *BLEAdaptor) SubscribeNotify(sUUID string, cUUID string, f func([]byte, error)) (err error) {
+func (b *BLEAdaptor) Subscribe(sUUID string, cUUID string, f func([]byte, error)) (err error) {
 	if !b.connected {
 		log.Fatalf("Cannot subscribe to BLE device until connected")
 		return
