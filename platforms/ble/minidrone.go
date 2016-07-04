@@ -1,8 +1,6 @@
 package ble
 
 import (
-	"fmt"
-
 	"github.com/hybridgroup/gobot"
 )
 
@@ -17,6 +15,14 @@ type BLEMinidroneDriver struct {
 	gobot.Eventer
 }
 
+const (
+	// Battery event
+	Battery = "battery"
+
+	// flight status event
+	Status = "status"
+)
+
 // NewBLEMinidroneDriver creates a BLEMinidroneDriver by name
 func NewBLEMinidroneDriver(a *BLEAdaptor, name string) *BLEMinidroneDriver {
 	n := &BLEMinidroneDriver{
@@ -24,6 +30,9 @@ func NewBLEMinidroneDriver(a *BLEAdaptor, name string) *BLEMinidroneDriver {
 		connection: a,
 		Eventer:    gobot.NewEventer(),
 	}
+
+	n.AddEvent(Battery)
+	n.AddEvent(Status)
 
 	return n
 }
@@ -48,10 +57,15 @@ func (b *BLEMinidroneDriver) Init() (err error) {
 	buf := []byte{0x04, byte(b.stepsfa0b), 0x00, 0x04, 0x01, 0x00, 0x32, 0x30, 0x31, 0x34, 0x2D, 0x31, 0x30, 0x2D, 0x32, 0x38, 0x00}
 	err = b.adaptor().WriteCharacteristic("9a66fa000800919111e4012d1540cb8e", "9a66fa0b0800919111e4012d1540cb8e", buf)
 
-	f := func(b []byte, e error) {
-			fmt.Printf("battery: %d\n", b[len(b)-1])
-	}
+	// setup battery notifications
+	b.adaptor().SubscribeNotify("9a66fb000800919111e4012d1540cb8e", "9a66fb0f0800919111e4012d1540cb8e", func(data []byte, e error) {
+			gobot.Publish(b.Event(Battery), data[len(data)-1])
+	})
+	return err
 
-	b.adaptor().SubscribeNotify("9a66fb000800919111e4012d1540cb8e", "9a66fb0f0800919111e4012d1540cb8e", f)
+	// setup flying status notifications
+	b.adaptor().SubscribeNotify("9a66fb000800919111e4012d1540cb8e", "9a66fb0e0800919111e4012d1540cb8e", func(data []byte, e error) {
+			gobot.Publish(b.Event(Status), data[6])
+	})
 	return err
 }
