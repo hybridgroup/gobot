@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"fmt"
+	"time"
 
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/ble"
@@ -18,12 +19,18 @@ func main() {
 		drone.Init()
 
 		gobot.On(drone.Event("battery"), func(data interface{}) {
-			fmt.Printf("battery: %d", data)
+			fmt.Printf("battery: %d\n", data)
 		})
 
 		gobot.On(drone.Event("status"), func(data interface{}) {
-			fmt.Printf("status: %d", data)
+			fmt.Printf("status: %d\n", data)
 		})
+
+		gobot.After(10*time.Second, func() {
+			drone.Land()
+		})
+
+		drone.TakeOff()
 	}
 
 	robot := gobot.NewRobot("bleBot",

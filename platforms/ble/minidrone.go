@@ -61,11 +61,26 @@ func (b *BLEMinidroneDriver) Init() (err error) {
 	b.adaptor().SubscribeNotify("9a66fb000800919111e4012d1540cb8e", "9a66fb0f0800919111e4012d1540cb8e", func(data []byte, e error) {
 			gobot.Publish(b.Event(Battery), data[len(data)-1])
 	})
-	return err
 
 	// setup flying status notifications
 	b.adaptor().SubscribeNotify("9a66fb000800919111e4012d1540cb8e", "9a66fb0e0800919111e4012d1540cb8e", func(data []byte, e error) {
 			gobot.Publish(b.Event(Status), data[6])
 	})
+	return err
+}
+
+func (b *BLEMinidroneDriver) TakeOff() (err error) {
+	b.stepsfa0b++
+	buf := []byte{0x02, byte(b.stepsfa0b) & 0xff, 0x02, 0x00, 0x01, 0x00}
+	err = b.adaptor().WriteCharacteristic("9a66fa000800919111e4012d1540cb8e", "9a66fa0b0800919111e4012d1540cb8e", buf)
+
+	return err
+}
+
+func (b *BLEMinidroneDriver) Land() (err error) {
+	b.stepsfa0b++
+	buf := []byte{0x02, byte(b.stepsfa0b) & 0xff, 0x02, 0x00, 0x03, 0x00}
+	err = b.adaptor().WriteCharacteristic("9a66fa000800919111e4012d1540cb8e", "9a66fa0b0800919111e4012d1540cb8e", buf)
+
 	return err
 }
