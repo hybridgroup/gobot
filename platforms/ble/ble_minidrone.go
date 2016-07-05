@@ -98,6 +98,11 @@ func (b *BLEMinidroneDriver) adaptor() *BLEAdaptor {
 
 // Start tells driver to get ready to do work
 func (b *BLEMinidroneDriver) Start() (errs []error) {
+	b.Init()
+	b.FlatTrim()
+	b.StartPcmd()
+	b.FlatTrim()
+
 	return
 }
 
@@ -248,6 +253,26 @@ func (b *BLEMinidroneDriver) Stop() error {
 		Psi:   0,
 	}
 
+	return nil
+}
+
+// StartRecording not supported
+func (b *BLEMinidroneDriver) StartRecording() error {
+	return nil
+}
+
+// StopRecording not supported
+func (b *BLEMinidroneDriver) StopRecording() error {
+	return nil
+}
+
+// HullProtection not supported
+func (b *BLEMinidroneDriver) HullProtection(protect bool) error {
+	return nil
+}
+
+// Outdoor not supported
+func (b *BLEMinidroneDriver) Outdoor(outdoor bool) error {
 	return nil
 }
 

@@ -16,11 +16,6 @@ func main() {
 	drone := ble.NewBLEMinidroneDriver(bleAdaptor, "drone")
 
 	work := func() {
-		drone.Init()
-		drone.FlatTrim()
-		drone.StartPcmd()
-		drone.FlatTrim()
-
 		gobot.On(drone.Event("battery"), func(data interface{}) {
 			fmt.Printf("battery: %d\n", data)
 		})
