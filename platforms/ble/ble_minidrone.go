@@ -277,65 +277,23 @@ func (b *BLEMinidroneDriver) Outdoor(outdoor bool) error {
 }
 
 func (b *BLEMinidroneDriver) generatePcmd() *bytes.Buffer {
-	cmd := &bytes.Buffer{}
-	tmp := &bytes.Buffer{}
-
-	tmp = &bytes.Buffer{}
-	binary.Write(tmp, binary.LittleEndian, int8(2))
-	cmd.Write(tmp.Bytes())
-
 	b.stepsfa0a++
-	tmp = &bytes.Buffer{}
-	binary.Write(tmp, binary.LittleEndian, int8(b.stepsfa0a))
-	cmd.Write(tmp.Bytes())
 
-	tmp = &bytes.Buffer{}
-	binary.Write(tmp, binary.LittleEndian, int8(2))
-	cmd.Write(tmp.Bytes())
-
-	tmp = &bytes.Buffer{}
-	binary.Write(tmp, binary.LittleEndian, int8(0))
-	cmd.Write(tmp.Bytes())
-
-	tmp = &bytes.Buffer{}
-	binary.Write(tmp, binary.LittleEndian, int8(2))
-	cmd.Write(tmp.Bytes())
-
-	tmp = &bytes.Buffer{}
-	binary.Write(tmp, binary.LittleEndian, int8(0))
-	cmd.Write(tmp.Bytes())
-
-	tmp = &bytes.Buffer{}
-	binary.Write(tmp, binary.LittleEndian, int8(b.Pcmd.Flag))
-	cmd.Write(tmp.Bytes())
-
-	tmp = &bytes.Buffer{}
-	binary.Write(tmp, binary.LittleEndian, int8(b.Pcmd.Roll))
-	cmd.Write(tmp.Bytes())
-
-	tmp = &bytes.Buffer{}
-	binary.Write(tmp, binary.LittleEndian, int8(b.Pcmd.Pitch))
-	cmd.Write(tmp.Bytes())
-
-	tmp = &bytes.Buffer{}
-	binary.Write(tmp, binary.LittleEndian, int8(b.Pcmd.Yaw))
-	cmd.Write(tmp.Bytes())
-
-	tmp = &bytes.Buffer{}
-	binary.Write(tmp, binary.LittleEndian, int8(b.Pcmd.Gaz))
-	cmd.Write(tmp.Bytes())
-
-	tmp = &bytes.Buffer{}
-	binary.Write(tmp, binary.LittleEndian, float32(b.Pcmd.Psi))
-	cmd.Write(tmp.Bytes())
-
-	tmp = &bytes.Buffer{}
-	binary.Write(tmp, binary.LittleEndian, int16(0))
-	cmd.Write(tmp.Bytes())
-
-	tmp = &bytes.Buffer{}
-	binary.Write(tmp, binary.LittleEndian, int16(0))
-	cmd.Write(tmp.Bytes())
+	cmd := &bytes.Buffer{}
+	binary.Write(cmd, binary.LittleEndian, int8(2))
+	binary.Write(cmd, binary.LittleEndian, int8(b.stepsfa0a))
+	binary.Write(cmd, binary.LittleEndian, int8(2))
+	binary.Write(cmd, binary.LittleEndian, int8(0))
+	binary.Write(cmd, binary.LittleEndian, int8(2))
+	binary.Write(cmd, binary.LittleEndian, int8(0))
+	binary.Write(cmd, binary.LittleEndian, int8(b.Pcmd.Flag))
+	binary.Write(cmd, binary.LittleEndian, int8(b.Pcmd.Roll))
+	binary.Write(cmd, binary.LittleEndian, int8(b.Pcmd.Pitch))
+	binary.Write(cmd, binary.LittleEndian, int8(b.Pcmd.Yaw))
+	binary.Write(cmd, binary.LittleEndian, int8(b.Pcmd.Gaz))
+	binary.Write(cmd, binary.LittleEndian, float32(b.Pcmd.Psi))
+	binary.Write(cmd, binary.LittleEndian, int16(0))
+	binary.Write(cmd, binary.LittleEndian, int16(0))
 
 	return cmd
 }
