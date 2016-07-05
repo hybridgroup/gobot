@@ -1,10 +1,10 @@
 package ble
 
 import (
-	"time"
 	"bytes"
 	"encoding/binary"
 	"fmt"
+	"time"
 
 	"github.com/hybridgroup/gobot"
 )
@@ -14,24 +14,23 @@ var _ gobot.Driver = (*BLEMinidroneDriver)(nil)
 type BLEMinidroneDriver struct {
 	name       string
 	connection gobot.Connection
-	stepsfa0a uint16
-	stepsfa0b uint16
-	stepsfa0c uint16
-	flying bool
-	Pcmd Pcmd
+	stepsfa0a  uint16
+	stepsfa0b  uint16
+	flying     bool
+	Pcmd       Pcmd
 	gobot.Eventer
 }
 
 const (
 	// service IDs
-	DroneCommandService = "9a66fa000800919111e4012d1540cb8e"
+	DroneCommandService      = "9a66fa000800919111e4012d1540cb8e"
 	DroneNotificationService = "9a66fb000800919111e4012d1540cb8e"
 
 	// characteristic IDs
-	PcmdCharacteristic = "9a66fa0a0800919111e4012d1540cb8e"
-	CommandCharacteristic = "9a66fa0b0800919111e4012d1540cb8e"
+	PcmdCharacteristic         = "9a66fa0a0800919111e4012d1540cb8e"
+	CommandCharacteristic      = "9a66fa0b0800919111e4012d1540cb8e"
 	FlightStatusCharacteristic = "9a66fb0e0800919111e4012d1540cb8e"
-	BatteryCharacteristic = "9a66fb0f0800919111e4012d1540cb8e"
+	BatteryCharacteristic      = "9a66fb0f0800919111e4012d1540cb8e"
 
 	// Battery event
 	Battery = "battery"
@@ -78,7 +77,7 @@ func NewBLEMinidroneDriver(a *BLEAdaptor, name string) *BLEMinidroneDriver {
 			Gaz:   0,
 			Psi:   0,
 		},
-		Eventer:    gobot.NewEventer(),
+		Eventer: gobot.NewEventer(),
 	}
 
 	n.AddEvent(Battery)
@@ -119,23 +118,23 @@ func (b *BLEMinidroneDriver) Init() (err error) {
 
 	// subscribe to battery notifications
 	b.adaptor().Subscribe(DroneNotificationService, BatteryCharacteristic, func(data []byte, e error) {
-			gobot.Publish(b.Event(Battery), data[len(data)-1])
+		gobot.Publish(b.Event(Battery), data[len(data)-1])
 	})
 
 	// subscribe to flying status notifications
 	b.adaptor().Subscribe(DroneNotificationService, FlightStatusCharacteristic, func(data []byte, e error) {
-			if len(data) < 7 || data[2] != 2 {
-				fmt.Println(data)
-				return
-			}
-			gobot.Publish(b.Event(Status), data[6])
-			if (data[6] == 1 || data[6] == 2) && !b.flying {
-				b.flying = true
-				gobot.Publish(b.Event(Flying), true)
-			} else if (data[6] == 0) && b.flying {
-				b.flying = false
-				gobot.Publish(b.Event(Landed), true)
-			}
+		if len(data) < 7 || data[2] != 2 {
+			fmt.Println(data)
+			return
+		}
+		gobot.Publish(b.Event(Status), data[6])
+		if (data[6] == 1 || data[6] == 2) && !b.flying {
+			b.flying = true
+			gobot.Publish(b.Event(Flying), true)
+		} else if (data[6] == 0) && b.flying {
+			b.flying = false
+			gobot.Publish(b.Event(Landed), true)
+		}
 	})
 
 	return
@@ -274,6 +273,28 @@ func (b *BLEMinidroneDriver) HullProtection(protect bool) error {
 // Outdoor not supported
 func (b *BLEMinidroneDriver) Outdoor(outdoor bool) error {
 	return nil
+}
+
+func (b *BLEMinidroneDriver) FrontFlip() (err error) {
+	return b.adaptor().WriteCharacteristic(DroneCommandService, CommandCharacteristic, b.generateAnimation(0).Bytes())
+}
+
+func (b *BLEMinidroneDriver) BackFlip() (err error) {
+	return b.adaptor().WriteCharacteristic(DroneCommandService, CommandCharacteristic, b.generateAnimation(1).Bytes())
+}
+
+func (b *BLEMinidroneDriver) RightFlip() (err error) {
+	return b.adaptor().WriteCharacteristic(DroneCommandService, CommandCharacteristic, b.generateAnimation(2).Bytes())
+}
+
+func (b *BLEMinidroneDriver) LeftFlip() (err error) {
+	return b.adaptor().WriteCharacteristic(DroneCommandService, CommandCharacteristic, b.generateAnimation(3).Bytes())
+}
+
+func (b *BLEMinidroneDriver) generateAnimation(direction int8) *bytes.Buffer {
+	b.stepsfa0b++
+	buf := []byte{0x02, byte(b.stepsfa0b) & 0xff, 0x02, 0x04, 0x00, 0x00, byte(direction), 0x00, 0x00, 0x00}
+	return bytes.NewBuffer(buf)
 }
 
 func (b *BLEMinidroneDriver) generatePcmd() *bytes.Buffer {
