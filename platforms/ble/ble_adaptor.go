@@ -154,9 +154,15 @@ func (b *BLEAdaptor) StateChangeHandler(d gatt.Device, s gatt.State) {
 }
 
 func (b *BLEAdaptor) DiscoveryHandler(p gatt.Peripheral, a *gatt.Advertisement, rssi int) {
-	id := strings.ToUpper(b.UUID())
-	if strings.ToUpper(p.ID()) != id {
-		return
+	// try looking by local name
+	if a.LocalName == b.UUID() {
+		b.uuid = p.ID()
+	} else {
+		// try looking by ID
+		id := strings.ToUpper(b.UUID())
+		if strings.ToUpper(p.ID()) != id {
+			return
+		}
 	}
 
 	// Stop scanning once we've got the peripheral we're looking for.
