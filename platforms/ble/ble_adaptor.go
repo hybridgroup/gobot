@@ -91,7 +91,7 @@ func (b *BLEAdaptor) ReadCharacteristic(sUUID string, cUUID string) (data []byte
 
 	characteristic := b.lookupCharacteristic(sUUID, cUUID)
 	if characteristic == nil {
-		log.Fatalf("Cannot read from unknown characteristic")
+		log.Println("Cannot read from unknown characteristic")
 		return
 	}
 
@@ -114,7 +114,7 @@ func (b *BLEAdaptor) WriteCharacteristic(sUUID string, cUUID string, data []byte
 
 	characteristic := b.lookupCharacteristic(sUUID, cUUID)
 	if characteristic == nil {
-		log.Fatalf("Cannot write to unknown characteristic")
+		log.Println("Cannot write to unknown characteristic")
 		return
 	}
 
@@ -137,7 +137,7 @@ func (b *BLEAdaptor) Subscribe(sUUID string, cUUID string, f func([]byte, error)
 
 	characteristic := b.lookupCharacteristic(sUUID, cUUID)
 	if characteristic == nil {
-		log.Fatalf("Cannot subscribe to unknown characteristic")
+		log.Println("Cannot subscribe to unknown characteristic")
 		return
 	}
 
@@ -226,13 +226,13 @@ func (b *BLEAdaptor) DisconnectHandler(p gatt.Peripheral, err error) {
 func (b *BLEAdaptor) lookupCharacteristic(sUUID string, cUUID string) *gatt.Characteristic {
 	service := b.services[sUUID]
 	if service == nil {
-		log.Fatalf("Unknown service ID: %s", sUUID)
+		log.Printf("Unknown service ID: %s\n", sUUID)
 		return nil
 	}
 
 	characteristic := service.characteristics[cUUID]
 	if characteristic == nil {
-		log.Fatalf("Unknown characteristic ID: %s", cUUID)
+		log.Printf("Unknown characteristic ID: %s\n", cUUID)
 		return nil
 	}
 
