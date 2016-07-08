@@ -89,7 +89,12 @@ func (b *BLEAdaptor) ReadCharacteristic(sUUID string, cUUID string) (data []byte
 		return
 	}
 
-	characteristic := b.services[sUUID].characteristics[cUUID]
+	characteristic := b.lookupCharacteristic(sUUID, cUUID)
+	if characteristic == nil {
+		log.Fatalf("Cannot read from unknown characteristic")
+		return
+	}
+
 	val, err := b.peripheral.ReadCharacteristic(characteristic)
 	if err != nil {
 		fmt.Printf("Failed to read characteristic, err: %s\n", err)
@@ -107,7 +112,11 @@ func (b *BLEAdaptor) WriteCharacteristic(sUUID string, cUUID string, data []byte
 		return
 	}
 
-	characteristic := b.services[sUUID].characteristics[cUUID]
+	characteristic := b.lookupCharacteristic(sUUID, cUUID)
+	if characteristic == nil {
+		log.Fatalf("Cannot write to unknown characteristic")
+		return
+	}
 
 	err = b.peripheral.WriteCharacteristic(characteristic, data, true)
 	if err != nil {
@@ -126,7 +135,11 @@ func (b *BLEAdaptor) Subscribe(sUUID string, cUUID string, f func([]byte, error)
 		return
 	}
 
-	characteristic := b.services[sUUID].characteristics[cUUID]
+	characteristic := b.lookupCharacteristic(sUUID, cUUID)
+	if characteristic == nil {
+		log.Fatalf("Cannot subscribe to unknown characteristic")
+		return
+	}
 
 	fn := func(c *gatt.Characteristic, b []byte, err error) {
 		f(b, err)
@@ -203,11 +216,27 @@ func (b *BLEAdaptor) ConnectHandler(p gatt.Peripheral, err error) {
 
 	b.connected = true
 	close(b.ready)
-	//defer p.Device().CancelConnection(p)
 }
 
 func (b *BLEAdaptor) DisconnectHandler(p gatt.Peripheral, err error) {
 	fmt.Println("Disconnected")
+}
+
+// Finalize finalizes the BLEAdaptor
+func (b *BLEAdaptor) lookupCharacteristic(sUUID string, cUUID string) *gatt.Characteristic {
+	service := b.services[sUUID]
+	if service == nil {
+		log.Fatalf("Unknown service ID: %s", sUUID)
+		return nil
+	}
+
+	characteristic := service.characteristics[cUUID]
+	if characteristic == nil {
+		log.Fatalf("Unknown characteristic ID: %s", cUUID)
+		return nil
+	}
+
+	return characteristic
 }
 
 // Represents a BLE Peripheral's Service
