@@ -16,7 +16,7 @@ type BLEDeviceInformationDriver struct {
 
 // NewBLEDeviceInformationDriver creates a BLEDeviceInformationDriver
 // by name
-func NewBLEDeviceInformationDriver(a *BLEAdaptor, name string) *BLEDeviceInformationDriver {
+func NewBLEDeviceInformationDriver(a *BLEClientAdaptor, name string) *BLEDeviceInformationDriver {
 	n := &BLEDeviceInformationDriver{
 		name:       name,
 		connection: a,
@@ -29,8 +29,8 @@ func (b *BLEDeviceInformationDriver) Connection() gobot.Connection { return b.co
 func (b *BLEDeviceInformationDriver) Name() string                 { return b.name }
 
 // adaptor returns BLE adaptor for this device
-func (b *BLEDeviceInformationDriver) adaptor() *BLEAdaptor {
-	return b.Connection().(*BLEAdaptor)
+func (b *BLEDeviceInformationDriver) adaptor() *BLEClientAdaptor {
+	return b.Connection().(*BLEClientAdaptor)
 }
 
 // Start tells driver to get ready to do work

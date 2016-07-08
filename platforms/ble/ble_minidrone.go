@@ -65,7 +65,7 @@ func validatePitch(val int) int {
 }
 
 // NewBLEMinidroneDriver creates a BLEMinidroneDriver by name
-func NewBLEMinidroneDriver(a *BLEAdaptor, name string) *BLEMinidroneDriver {
+func NewBLEMinidroneDriver(a *BLEClientAdaptor, name string) *BLEMinidroneDriver {
 	n := &BLEMinidroneDriver{
 		name:       name,
 		connection: a,
@@ -91,8 +91,8 @@ func (b *BLEMinidroneDriver) Connection() gobot.Connection { return b.connection
 func (b *BLEMinidroneDriver) Name() string                 { return b.name }
 
 // adaptor returns BLE adaptor
-func (b *BLEMinidroneDriver) adaptor() *BLEAdaptor {
-	return b.Connection().(*BLEAdaptor)
+func (b *BLEMinidroneDriver) adaptor() *BLEClientAdaptor {
+	return b.Connection().(*BLEClientAdaptor)
 }
 
 // Start tells driver to get ready to do work

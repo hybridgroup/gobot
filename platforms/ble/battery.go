@@ -15,7 +15,7 @@ type BLEBatteryDriver struct {
 }
 
 // NewBLEBatteryDriver creates a BLEBatteryDriver by name
-func NewBLEBatteryDriver(a *BLEAdaptor, name string) *BLEBatteryDriver {
+func NewBLEBatteryDriver(a *BLEClientAdaptor, name string) *BLEBatteryDriver {
 	n := &BLEBatteryDriver{
 		name:       name,
 		connection: a,
@@ -28,8 +28,8 @@ func (b *BLEBatteryDriver) Connection() gobot.Connection { return b.connection }
 func (b *BLEBatteryDriver) Name() string                 { return b.name }
 
 // adaptor returns BLE adaptor
-func (b *BLEBatteryDriver) adaptor() *BLEAdaptor {
-	return b.Connection().(*BLEAdaptor)
+func (b *BLEBatteryDriver) adaptor() *BLEClientAdaptor {
+	return b.Connection().(*BLEClientAdaptor)
 }
 
 // Start tells driver to get ready to do work
