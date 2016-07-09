@@ -190,7 +190,7 @@ func (b *BLEClientAdaptor) ConnectHandler(p gatt.Peripheral, err error) {
 
 	b.peripheral = p
 
-	if err := p.SetMTU(500); err != nil {
+	if err := p.SetMTU(250); err != nil {
 		fmt.Printf("Failed to set MTU, err: %s\n", err)
 	}
 

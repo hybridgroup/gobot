@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"time"
 	"os"
 
 	"github.com/hybridgroup/gobot"
@@ -13,17 +11,15 @@ func main() {
 	gbot := gobot.NewGobot()
 
 	bleAdaptor := ble.NewBLEClientAdaptor("ble", os.Args[1])
-	battery := ble.NewBLEBatteryDriver(bleAdaptor, "battery")
+	ollie := ble.NewSpheroOllieDriver(bleAdaptor, "ollie")
 
 	work := func() {
-		gobot.Every(5*time.Second, func() {
-			fmt.Println("Battery level:", battery.GetBatteryLevel())
-		})
+		ollie.SetRGB(0, 255, 0)
 	}
 
-	robot := gobot.NewRobot("bleBot",
+	robot := gobot.NewRobot("ollieBot",
 		[]gobot.Connection{bleAdaptor},
-		[]gobot.Device{battery},
+		[]gobot.Device{ollie},
 		work,
 	)
 

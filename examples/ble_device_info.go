@@ -11,7 +11,7 @@ import (
 func main() {
 	gbot := gobot.NewGobot()
 
-	bleAdaptor := ble.NewBLEAdaptor("ble", os.Args[1])
+	bleAdaptor := ble.NewBLEClientAdaptor("ble", os.Args[1])
 	info := ble.NewBLEDeviceInformationDriver(bleAdaptor, "info")
 
 	work := func() {
