@@ -12,21 +12,36 @@ var _ gobot.Driver = (*SpheroOllieDriver)(nil)
 type SpheroOllieDriver struct {
 	name       string
 	connection gobot.Connection
+	seq             uint8
+	packetChannel   chan *packet
 	gobot.Eventer
 }
 
 const (
 	// service IDs
 	SpheroBLEService = "22bb746f2bb075542d6f726568705327"
+	RobotControlService = "22bb746f2ba075542d6f726568705327"
 
 	// characteristic IDs
 	WakeCharacteristic = "22bb746f2bbf75542d6f726568705327"
 	TXPowerCharacteristic = "22bb746f2bb275542d6f726568705327"
 	AntiDosCharacteristic = "22bb746f2bbd75542d6f726568705327"
-	RobotControlService = "22bb746f2ba075542d6f726568705327"
+
 	CommandsCharacteristic = "22bb746f2ba175542d6f726568705327"
 	ResponseCharacteristic = "22bb746f2ba675542d6f726568705327"
+
+	// gobot events
+	SensorData = "sensordata"
+	Collision  = "collision"
+	Error      = "error"
 )
+
+type packet struct {
+	header   []uint8
+	body     []uint8
+	checksum uint8
+}
+
 
 // NewSpheroOllieDriver creates a SpheroOllieDriver by name
 func NewSpheroOllieDriver(a *BLEClientAdaptor, name string) *SpheroOllieDriver {
@@ -34,6 +49,7 @@ func NewSpheroOllieDriver(a *BLEClientAdaptor, name string) *SpheroOllieDriver {
 		name:       name,
 		connection: a,
 		Eventer: gobot.NewEventer(),
+		packetChannel:   make(chan *packet, 1024),
 	}
 
 	return n
@@ -47,8 +63,19 @@ func (b *SpheroOllieDriver) adaptor() *BLEClientAdaptor {
 }
 
 // Start tells driver to get ready to do work
-func (b *SpheroOllieDriver) Start() (errs []error) {
-	b.Init()
+func (s *SpheroOllieDriver) Start() (errs []error) {
+	s.Init()
+
+	// send commands
+	go func() {
+		for {
+			packet := <-s.packetChannel
+			err := s.write(packet)
+			if err != nil {
+				gobot.Publish(s.Event(Error), err)
+			}
+		}
+	}()
 
 	return
 }
@@ -120,6 +147,7 @@ func (b *SpheroOllieDriver) HandleResponses(data []byte, e error) {
 // SetRGB sets the Ollie to the given r, g, and b values
 func (s *SpheroOllieDriver) SetRGB(r uint8, g uint8, b uint8) {
 	fmt.Println("setrgb")
+	s.packetChannel <- s.craftPacket([]uint8{r, g, b, 0x01}, 0x02, 0x20)
 }
 
 // Tells the Ollie to roll
@@ -130,4 +158,39 @@ func (s *SpheroOllieDriver) Roll(speed uint8, heading uint16) {
 // Tells the Ollie to stop
 func (s *SpheroOllieDriver) Stop() {
 	s.Roll(0, 0)
+}
+
+func (s *SpheroOllieDriver) write(packet *packet) (err error) {
+	buf := append(packet.header, packet.body...)
+	buf = append(buf, packet.checksum)
+	err = s.adaptor().WriteCharacteristic(RobotControlService, CommandsCharacteristic, buf)
+	if err != nil {
+		fmt.Println("send command error:", err)
+		return err
+	}
+
+	s.seq++
+	return
+}
+
+func (s *SpheroOllieDriver) craftPacket(body []uint8, did byte, cid byte) *packet {
+	packet := new(packet)
+	packet.body = body
+	dlen := len(packet.body) + 1
+	packet.header = []uint8{0xFF, 0xFF, did, cid, s.seq, uint8(dlen)}
+	packet.checksum = s.calculateChecksum(packet)
+	return packet
+}
+
+func (s *SpheroOllieDriver) calculateChecksum(packet *packet) uint8 {
+	buf := append(packet.header, packet.body...)
+	return calculateChecksum(buf[2:])
+}
+
+func calculateChecksum(buf []byte) byte {
+	var calculatedChecksum uint16
+	for i := range buf {
+		calculatedChecksum += uint16(buf[i])
+	}
+	return uint8(^(calculatedChecksum % 256))
 }
