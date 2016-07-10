@@ -146,7 +146,6 @@ func (b *SpheroOllieDriver) HandleResponses(data []byte, e error) {
 
 // SetRGB sets the Ollie to the given r, g, and b values
 func (s *SpheroOllieDriver) SetRGB(r uint8, g uint8, b uint8) {
-	fmt.Println("setrgb")
 	s.packetChannel <- s.craftPacket([]uint8{r, g, b, 0x01}, 0x02, 0x20)
 }
 
