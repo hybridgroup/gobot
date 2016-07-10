@@ -91,7 +91,7 @@ func (b *SpheroOllieDriver) Init() (err error) {
 	b.Wake()
 
 	// subscribe to Sphero response notifications
-	b.adaptor().Subscribe(RobotControlService, ResponseCharacteristic, b.HandleResponses)
+	//b.adaptor().Subscribe(RobotControlService, ResponseCharacteristic, b.HandleResponses)
 
 	return
 }
@@ -151,7 +151,7 @@ func (s *SpheroOllieDriver) SetRGB(r uint8, g uint8, b uint8) {
 
 // Tells the Ollie to roll
 func (s *SpheroOllieDriver) Roll(speed uint8, heading uint16) {
-	fmt.Println("roll", speed, heading)
+	s.packetChannel <- s.craftPacket([]uint8{speed, uint8(heading >> 8), uint8(heading & 0xFF), 0x01}, 0x02, 0x30)
 }
 
 // Tells the Ollie to stop
