@@ -3,6 +3,7 @@ package ble
 import (
 	"bytes"
 	"fmt"
+	"time"
 
 	"github.com/hybridgroup/gobot"
 )
@@ -10,20 +11,20 @@ import (
 var _ gobot.Driver = (*SpheroOllieDriver)(nil)
 
 type SpheroOllieDriver struct {
-	name       string
-	connection gobot.Connection
-	seq             uint8
-	packetChannel   chan *packet
+	name          string
+	connection    gobot.Connection
+	seq           uint8
+	packetChannel chan *packet
 	gobot.Eventer
 }
 
 const (
 	// service IDs
-	SpheroBLEService = "22bb746f2bb075542d6f726568705327"
+	SpheroBLEService    = "22bb746f2bb075542d6f726568705327"
 	RobotControlService = "22bb746f2ba075542d6f726568705327"
 
 	// characteristic IDs
-	WakeCharacteristic = "22bb746f2bbf75542d6f726568705327"
+	WakeCharacteristic    = "22bb746f2bbf75542d6f726568705327"
 	TXPowerCharacteristic = "22bb746f2bb275542d6f726568705327"
 	AntiDosCharacteristic = "22bb746f2bbd75542d6f726568705327"
 
@@ -42,14 +43,13 @@ type packet struct {
 	checksum uint8
 }
 
-
 // NewSpheroOllieDriver creates a SpheroOllieDriver by name
 func NewSpheroOllieDriver(a *BLEClientAdaptor, name string) *SpheroOllieDriver {
 	n := &SpheroOllieDriver{
-		name:       name,
-		connection: a,
-		Eventer: gobot.NewEventer(),
-		packetChannel:   make(chan *packet, 1024),
+		name:          name,
+		connection:    a,
+		Eventer:       gobot.NewEventer(),
+		packetChannel: make(chan *packet, 1024),
 	}
 
 	return n
@@ -82,6 +82,8 @@ func (s *SpheroOllieDriver) Start() (errs []error) {
 
 // Halt stops Ollie driver (void)
 func (b *SpheroOllieDriver) Halt() (errs []error) {
+	b.Sleep()
+	time.Sleep(500 * time.Microsecond)
 	return
 }
 
@@ -91,7 +93,7 @@ func (b *SpheroOllieDriver) Init() (err error) {
 	b.Wake()
 
 	// subscribe to Sphero response notifications
-	//b.adaptor().Subscribe(RobotControlService, ResponseCharacteristic, b.HandleResponses)
+	b.adaptor().Subscribe(RobotControlService, ResponseCharacteristic, b.HandleResponses)
 
 	return
 }
@@ -157,6 +159,15 @@ func (s *SpheroOllieDriver) Roll(speed uint8, heading uint16) {
 // Tells the Ollie to stop
 func (s *SpheroOllieDriver) Stop() {
 	s.Roll(0, 0)
+}
+
+// Go to sleep
+func (s *SpheroOllieDriver) Sleep() {
+	s.packetChannel <- s.craftPacket([]uint8{0x00, 0x00, 0x00, 0x00, 0x00}, 0x00, 0x22)
+}
+
+func (s *SpheroOllieDriver) EnableStopOnDisconnect() {
+	s.packetChannel <- s.craftPacket([]uint8{0x00, 0x00, 0x00, 0x01}, 0x02, 0x37)
 }
 
 func (s *SpheroOllieDriver) write(packet *packet) (err error) {
