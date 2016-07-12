@@ -17,7 +17,7 @@ func main() {
 	work := func() {
 		ollie.SetRGB(255, 0, 255)
 		gobot.Every(3*time.Second, func() {
-			ollie.Roll(30, uint16(gobot.Rand(360)))
+			ollie.Roll(40, uint16(gobot.Rand(360)))
 		})
 	}
 
