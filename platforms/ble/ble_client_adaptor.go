@@ -212,7 +212,7 @@ outer:
 		}
 
 		for _, c := range cs {
-			desc, err := p.DiscoverDescriptors(nil, c)
+			_, err := p.DiscoverDescriptors(nil, c)
 			if err != nil {
 				fmt.Printf("Failed to discover descriptors: %v\n", err)
 				continue outer
