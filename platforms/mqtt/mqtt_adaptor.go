@@ -2,10 +2,7 @@ package mqtt
 
 import (
 	"git.eclipse.org/gitroot/paho/org.eclipse.paho.mqtt.golang.git"
-	"github.com/hybridgroup/gobot"
 )
-
-var _ gobot.Adaptor = (*MqttAdaptor)(nil)
 
 type MqttAdaptor struct {
 	name     string

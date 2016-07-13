@@ -4,8 +4,6 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
-var _ gobot.Driver = (*PebbleDriver)(nil)
-
 type PebbleDriver struct {
 	name       string
 	connection gobot.Connection

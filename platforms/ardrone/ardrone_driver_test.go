@@ -3,8 +3,11 @@ package ardrone
 import (
 	"testing"
 
+	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/gobottest"
 )
+
+var _ gobot.Driver = (*ArdroneDriver)(nil)
 
 func initTestArdroneDriver() *ArdroneDriver {
 	a := NewArdroneAdaptor("drone")

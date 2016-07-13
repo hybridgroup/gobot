@@ -4,8 +4,11 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/gobottest"
 )
+
+var _ gobot.Adaptor = (*MqttAdaptor)(nil)
 
 func initTestMqttAdaptor() *MqttAdaptor {
 	return NewMqttAdaptor("mqtt", "localhost:1883", "client")

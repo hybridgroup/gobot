@@ -4,8 +4,11 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/gobottest"
 )
+
+var _ gobot.Adaptor = (*BebopAdaptor)(nil)
 
 func initTestBebopAdaptor() *BebopAdaptor {
 	a := NewBebopAdaptor("bot")

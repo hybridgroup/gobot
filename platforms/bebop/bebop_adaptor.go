@@ -1,11 +1,8 @@
 package bebop
 
 import (
-	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/bebop/client"
 )
-
-var _ gobot.Adaptor = (*BebopAdaptor)(nil)
 
 // drone defines expected drone behaviour
 type drone interface {

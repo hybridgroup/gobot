@@ -4,8 +4,6 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
-var _ gobot.Driver = (*BebopDriver)(nil)
-
 // BebopDriver is gobot.Driver representation for the Bebop
 type BebopDriver struct {
 	name       string

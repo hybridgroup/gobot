@@ -4,8 +4,6 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
-var _ gobot.Driver = (*ArdroneDriver)(nil)
-
 // ArdroneDriver is gobot.Driver representation for the Ardrone
 type ArdroneDriver struct {
 	name       string

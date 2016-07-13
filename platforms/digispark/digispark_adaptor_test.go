@@ -4,8 +4,16 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/gobottest"
+	"github.com/hybridgroup/gobot/platforms/gpio"
 )
+
+var _ gobot.Adaptor = (*DigisparkAdaptor)(nil)
+
+var _ gpio.DigitalWriter = (*DigisparkAdaptor)(nil)
+var _ gpio.PwmWriter = (*DigisparkAdaptor)(nil)
+var _ gpio.ServoWriter = (*DigisparkAdaptor)(nil)
 
 type mock struct {
 	locationA         uint8
