@@ -175,10 +175,7 @@ func (m *MotorDriver) Direction(direction string) (err error) {
 }
 
 func (m *MotorDriver) isDigital() bool {
-	if m.CurrentMode == "digital" {
-		return true
-	}
-	return false
+	return m.CurrentMode == "digital"
 }
 
 func (m *MotorDriver) changeState(state byte) (err error) {

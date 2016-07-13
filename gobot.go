@@ -73,7 +73,7 @@ func (g *Gobot) Start() (errs []error) {
 		}
 
 		// waiting for interrupt coming on the channel
-		_ = <-c
+		<-c
 
 		// Stop calls the Stop method on each robot in its collection of robots.
 		g.Stop()
