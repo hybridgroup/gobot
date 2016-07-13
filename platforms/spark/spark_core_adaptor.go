@@ -255,7 +255,7 @@ func (s *SparkCoreAdaptor) requestToSpark(method string, url string, params url.
 	json.Unmarshal(buf, &m)
 
 	if resp.Status != "200 OK" {
-		err = errors.New(fmt.Sprintf("&v: error communicating to the spark cloud", resp.Status))
+		err = fmt.Errorf("%v: error communicating to the spark cloud", resp.Status)
 	} else if _, ok := m["error"]; ok {
 		err = errors.New(m["error"].(string))
 	}

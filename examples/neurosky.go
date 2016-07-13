@@ -42,7 +42,7 @@ func main() {
 			fmt.Println("HiBeta", eeg.HiBeta)
 			fmt.Println("LoGamma", eeg.LoGamma)
 			fmt.Println("MidGamma", eeg.MidGamma)
-			fmt.Println("\n")
+			fmt.Printf("\n\n")
 		})
 	}
 

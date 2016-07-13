@@ -47,7 +47,7 @@ func ExampleOnce() {
 
 func ExampleRand() {
 	i := gobot.Rand(100)
-	fmt.Sprintln("%v is > 0 && < 100", i)
+	fmt.Printf("%v is > 0 && < 100", i)
 }
 
 func ExampleFromScale() {
