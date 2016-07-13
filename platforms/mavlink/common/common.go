@@ -7,7 +7,6 @@ package mavlink
 import (
 	"bytes"
 	"encoding/binary"
-	"errors"
 	"fmt"
 )
 
@@ -136,7 +135,7 @@ func NewMAVLinkMessage(msgid uint8, data []byte) (MAVLinkMessage, error) {
 		message.Decode(data)
 		return message, nil
 	}
-	return nil, errors.New(fmt.Sprintf("Unknown Message ID: %v", msgid))
+	return nil, fmt.Errorf("Unknown Message ID: %v", msgid)
 }
 
 //
