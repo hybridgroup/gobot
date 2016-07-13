@@ -3,16 +3,7 @@ package digispark
 import (
 	"errors"
 	"strconv"
-
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/gpio"
 )
-
-var _ gobot.Adaptor = (*DigisparkAdaptor)(nil)
-
-var _ gpio.DigitalWriter = (*DigisparkAdaptor)(nil)
-var _ gpio.PwmWriter = (*DigisparkAdaptor)(nil)
-var _ gpio.ServoWriter = (*DigisparkAdaptor)(nil)
 
 // ErrConnection is the error resulting of a connection error with the digispark
 var ErrConnection = errors.New("connection error")

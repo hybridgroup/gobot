@@ -8,6 +8,8 @@ import (
 	"github.com/hybridgroup/gobot/gobottest"
 )
 
+var _ gobot.Driver = (*PebbleDriver)(nil)
+
 func initTestPebbleDriver() *PebbleDriver {
 	return NewPebbleDriver(NewPebbleAdaptor("adaptor"), "pebble")
 }

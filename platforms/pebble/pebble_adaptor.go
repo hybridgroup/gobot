@@ -1,11 +1,5 @@
 package pebble
 
-import (
-	"github.com/hybridgroup/gobot"
-)
-
-var _ gobot.Adaptor = (*PebbleAdaptor)(nil)
-
 type PebbleAdaptor struct {
 	name string
 }

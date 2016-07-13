@@ -4,8 +4,11 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/gobottest"
 )
+
+var _ gobot.Adaptor = (*ArdroneAdaptor)(nil)
 
 func initTestArdroneAdaptor() *ArdroneAdaptor {
 	a := NewArdroneAdaptor("drone")
