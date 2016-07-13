@@ -83,7 +83,7 @@ func (s *SpheroOllieDriver) Start() (errs []error) {
 // Halt stops Ollie driver (void)
 func (b *SpheroOllieDriver) Halt() (errs []error) {
 	b.Sleep()
-	time.Sleep(500 * time.Microsecond)
+	time.Sleep(750 * time.Microsecond)
 	return
 }
 
