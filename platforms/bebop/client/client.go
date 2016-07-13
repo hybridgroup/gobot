@@ -618,7 +618,7 @@ func (b *Bebop) HullProtection(protect bool) error {
 	cmd.Write(tmp.Bytes())
 
 	tmp = &bytes.Buffer{}
-	binary.Write(tmp, binary.LittleEndian, bool(protect))
+	binary.Write(tmp, binary.LittleEndian, bool2int8(protect))
 	cmd.Write(tmp.Bytes())
 
 	_, err := b.write(b.networkFrameGenerator(cmd, ARNETWORKAL_FRAME_TYPE_DATA, BD_NET_CD_NONACK_ID).Bytes())
@@ -644,11 +644,18 @@ func (b *Bebop) Outdoor(outdoor bool) error {
 	cmd.Write(tmp.Bytes())
 
 	tmp = &bytes.Buffer{}
-	binary.Write(tmp, binary.LittleEndian, bool(outdoor))
+	binary.Write(tmp, binary.LittleEndian, bool2int8(outdoor))
 	cmd.Write(tmp.Bytes())
 
 	_, err := b.write(b.networkFrameGenerator(cmd, ARNETWORKAL_FRAME_TYPE_DATA, BD_NET_CD_NONACK_ID).Bytes())
 	return err
+}
+
+func bool2int8(b bool) int8 {
+	if b {
+		return 1
+	}
+	return 0
 }
 
 func (b *Bebop) createARStreamACK(frame ARStreamFrame) *bytes.Buffer {
