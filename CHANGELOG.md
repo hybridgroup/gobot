@@ -1,3 +1,27 @@
+0.12.0
+---
+* **Refactor Gobot test helpers into separate package**
+* **Improve Gobot.Every method to return channel, allowing it to be halted**
+* **Refactor of sysfs adds substantial speed improvements**
+* **ble**
+  * Experimental support for Bluetooth LE.
+  * Initial support for Battery & Device Information services
+  * Initial support for Sphero BLE robots such as Ollie
+  * Initial support for Parrot Minidrone
+* **audio**
+  * Add new platform for Audio playback
+* **gpio**
+  * Support added for new GPIO device:
+    * RGB LED
+  * Bugfixes:
+    * Correct analog to better handle quick changes
+    * Correct handling of errors and buffering for Wiichuk
+* **mqtt**
+  * Add support for MQTT authentication
+* **opencv**
+  * Switching to use main fork of OpenCV
+  * Some minor bugfixes related to face tracking
+
 0.11.0
 ---
 * **Support for Golang 1.6**
@@ -76,7 +100,7 @@
   - firmata
     - Add optional io.ReadWriteCloser parameter to FirmataAdaptor
     - Fix `thread exhaustion` error
-  - cli
+  - cli 
     - generator
       - Update generator for new adaptor and driver interfaces
       - Add driver, adaptor and project generators
@@ -129,7 +153,7 @@
 - neurosky
   - Fix incorrect Event names
 - sphero
-  - Correctly format output of GetRGB
+  - Correctly format output of GetRGB 
 
 0.6.1
 ---
@@ -141,7 +165,7 @@
 - api
   - Add robeaux support
 - core
-  - Refactor `Connection` and `Device`
+  - Refactor `Connection` and `Device` 
   - Connections are now a collection of Adaptors
   - Devices are now a collection of Drivers
   - Add `Event(string)` function instead of `Events[string]` for retrieving Driver event
@@ -154,8 +178,8 @@
 0.5.2  
 ---  
 - beaglebone
-  - Add `DirectPinDriver`
-  - Ensure slots are properly loaded
+  - Add `DirectPinDriver` 
+  - Ensure slots are properly loaded 
 
 0.5.1  
 ---  

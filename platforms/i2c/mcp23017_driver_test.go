@@ -308,6 +308,7 @@ func TestMCP23017DriverReadPort(t *testing.T) {
 	adaptor.i2cMcpReadImpl = func(a int, b int) ([]byte, error) {
 		return make([]byte, b), errors.New("read error")
 	}
+
 	val, err := mcp.read(port.IODIR)
 	gobottest.Assert(t, val, uint8(0))
 	gobottest.Assert(t, err, errors.New("read error"))
@@ -330,6 +331,7 @@ func TestMCP23017DriverReadPort(t *testing.T) {
 	adaptor.i2cMcpReadImpl = func(a int, b int) ([]byte, error) {
 		return []byte{255}, nil
 	}
+
 	val, _ = mcp.read(port.IODIR)
 	gobottest.Assert(t, val, uint8(255))
 	debug = false
