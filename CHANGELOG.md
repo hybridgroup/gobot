@@ -1,3 +1,27 @@
+0.12.0
+---
+* **Refactor Gobot test helpers into separate package**
+* **Improve Gobot.Every method to return channel, allowing it to be halted**
+* **Refactor of sysfs adds substantial speed improvements**
+* **ble**
+  * Experimental support for Bluetooth LE.
+  * Initial support for Battery & Device Information services
+  * Initial support for Sphero BLE robots such as Ollie
+  * Initial support for Parrot Minidrone
+* **audio**
+  * Add new platform for Audio playback
+* **gpio**
+  * Support added for new GPIO device:
+    * RGB LED
+  * Bugfixes:
+    * Correct analog to better handle quick changes
+    * Correct handling of errors and buffering for Wiichuk
+* **mqtt**
+  * Add support for MQTT authentication
+* **opencv**
+  * Switching to use main fork of OpenCV
+  * Some minor bugfixes related to face tracking
+
 0.11.0
 ---
 * **Support for Golang 1.6**
