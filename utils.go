@@ -3,7 +3,6 @@ package gobot
 import (
 	"crypto/rand"
 	"errors"
-	"fmt"
 	"log"
 	"math"
 	"math/big"
