@@ -6,7 +6,7 @@
 	In order to run this example you will first need to  start ffserver with:
 		$ ffserver -f ff.conf
 
-	then in a seperate terminal run this program:
+	then in a separate terminal run this program:
 		$ go run video.go
 
 	You will then be able to view the video feed by navigatin to

@@ -22,7 +22,7 @@ type ButtonDriver struct {
 // NewButtonDriver returns a new ButtonDriver with a polling interval of
 // 10 Milliseconds given a DigitalReader, name and pin.
 //
-// Optinally accepts:
+// Optionally accepts:
 //  time.Duration: Interval at which the ButtonDriver is polled for new information
 func NewButtonDriver(a DigitalReader, name string, pin string, v ...time.Duration) *ButtonDriver {
 	b := &ButtonDriver{

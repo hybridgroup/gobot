@@ -297,7 +297,7 @@ func (a *API) robotConnection(res http.ResponseWriter, req *http.Request) {
 	}
 }
 
-// executeMcpCommand calls a global command asociated to requested route
+// executeMcpCommand calls a global command associated to requested route
 func (a *API) executeMcpCommand(res http.ResponseWriter, req *http.Request) {
 	a.executeCommand(a.gobot.Command(req.URL.Query().Get(":command")),
 		res,
@@ -305,7 +305,7 @@ func (a *API) executeMcpCommand(res http.ResponseWriter, req *http.Request) {
 	)
 }
 
-// executeRobotDeviceCommand calls a device command asociated to requested route
+// executeRobotDeviceCommand calls a device command associated to requested route
 func (a *API) executeRobotDeviceCommand(res http.ResponseWriter, req *http.Request) {
 	if _, err := a.jsonDeviceFor(req.URL.Query().Get(":robot"),
 		req.URL.Query().Get(":device")); err != nil {
@@ -321,7 +321,7 @@ func (a *API) executeRobotDeviceCommand(res http.ResponseWriter, req *http.Reque
 	}
 }
 
-// executeRobotCommand calls a robot command asociated to requested route
+// executeRobotCommand calls a robot command associated to requested route
 func (a *API) executeRobotCommand(res http.ResponseWriter, req *http.Request) {
 	if _, err := a.jsonRobotFor(req.URL.Query().Get(":robot")); err != nil {
 		a.writeJSON(map[string]interface{}{"error": err.Error()}, res)

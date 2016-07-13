@@ -67,7 +67,7 @@ func (g *Gobot) Start() (errs []error) {
 		c := make(chan os.Signal, 1)
 		g.trap(c)
 		if len(errs) > 0 {
-			// there was an error during start, so we immediatly pass the interrupt
+			// there was an error during start, so we immediately pass the interrupt
 			// in order to disconnect the initialized robots, connections and devices
 			c <- os.Interrupt
 		}

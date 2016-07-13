@@ -40,7 +40,7 @@ Example:
 		gbot.Start()
 	}
 
-For futher information refer to sphero readme:
+For further information refer to sphero readme:
 https://github.com/hybridgroup/gobot/blob/master/platforms/sphero/README.md
 */
 package sphero

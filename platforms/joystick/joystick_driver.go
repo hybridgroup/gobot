@@ -50,7 +50,7 @@ type joystickConfig struct {
 // 10 Milliseconds given a JoystickAdaptor, name and json button configuration
 // file location.
 //
-// Optinally accepts:
+// Optionally accepts:
 //  time.Duration: Interval at which the JoystickDriver is polled for new information
 func NewJoystickDriver(a *JoystickAdaptor, name string, config string, v ...time.Duration) *JoystickDriver {
 	d := &JoystickDriver{

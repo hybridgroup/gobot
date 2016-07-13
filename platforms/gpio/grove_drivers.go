@@ -41,7 +41,7 @@ type GroveRotaryDriver struct {
 // NewGroveRotaryDriver returns a new GroveRotaryDriver with a polling interval of
 // 10 Milliseconds given an AnalogReader, name and pin.
 //
-// Optinally accepts:
+// Optionally accepts:
 // 	time.Duration: Interval at which the AnalogSensor is polled for new information
 //
 // Adds the following API Commands:
@@ -79,7 +79,7 @@ type GroveLightSensorDriver struct {
 // NewGroveLightSensorDriver returns a new GroveLightSensorDriver with a polling interval of
 // 10 Milliseconds given an AnalogReader, name and pin.
 //
-// Optinally accepts:
+// Optionally accepts:
 // 	time.Duration: Interval at which the AnalogSensor is polled for new information
 //
 // Adds the following API Commands:
@@ -99,7 +99,7 @@ type GrovePiezoVibrationSensorDriver struct {
 // NewGrovePiezoVibrationSensorDriver returns a new GrovePiezoVibrationSensorDriver with a polling interval of
 // 10 Milliseconds given an AnalogReader, name and pin.
 //
-// Optinally accepts:
+// Optionally accepts:
 // 	time.Duration: Interval at which the AnalogSensor is polled for new information
 //
 // Adds the following API Commands:
@@ -142,7 +142,7 @@ type GroveButtonDriver struct {
 // NewGroveButtonDriver returns a new GroveButtonDriver with a polling interval of
 // 10 Milliseconds given a DigitalReader, name and pin.
 //
-// Optinally accepts:
+// Optionally accepts:
 //  time.Duration: Interval at which the ButtonDriver is polled for new information
 func NewGroveButtonDriver(a DigitalReader, name string, pin string, v ...time.Duration) *GroveButtonDriver {
 	return &GroveButtonDriver{
@@ -159,7 +159,7 @@ type GroveSoundSensorDriver struct {
 // NewGroveSoundSensorDriver returns a new GroveSoundSensorDriver with a polling interval of
 // 10 Milliseconds given an AnalogReader, name and pin.
 //
-// Optinally accepts:
+// Optionally accepts:
 // 	time.Duration: Interval at which the AnalogSensor is polled for new information
 //
 // Adds the following API Commands:
@@ -179,7 +179,7 @@ type GroveTouchDriver struct {
 // NewGroveTouchDriver returns a new GroveTouchDriver with a polling interval of
 // 10 Milliseconds given a DigitalReader, name and pin.
 //
-// Optinally accepts:
+// Optionally accepts:
 //  time.Duration: Interval at which the ButtonDriver is polled for new information
 func NewGroveTouchDriver(a DigitalReader, name string, pin string, v ...time.Duration) *GroveTouchDriver {
 	return &GroveTouchDriver{

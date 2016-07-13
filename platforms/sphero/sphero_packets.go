@@ -37,7 +37,7 @@ func DefaultCollisionConfig() CollisionConfig {
 }
 
 // CollisionConfig provides configuration for the collision detection alogorithm.
-// For more information refer to the offical api specification https://github.com/orbotix/DeveloperResources/blob/master/docs/Collision%20detection%201.2.pdf.
+// For more information refer to the official api specification https://github.com/orbotix/DeveloperResources/blob/master/docs/Collision%20detection%201.2.pdf.
 type CollisionConfig struct {
 	// Detection method type to use. Methods 01h and 02h are supported as
 	// of FW ver 1.42. Use 00h to completely disable this service.
@@ -85,7 +85,7 @@ func DefaultDataStreamingConfig() DataStreamingConfig {
 }
 
 // DataStreamingConfig provides configuration for Sensor Data Streaming.
-// For more information refer to the offical api specification https://github.com/orbotix/DeveloperResources/blob/master/docs/Sphero_API_1.50.pdf page 28
+// For more information refer to the official api specification https://github.com/orbotix/DeveloperResources/blob/master/docs/Sphero_API_1.50.pdf page 28
 type DataStreamingConfig struct {
 	// Divisor of the maximum sensor sampling rate
 	N uint16

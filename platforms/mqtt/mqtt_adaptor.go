@@ -55,7 +55,7 @@ func (a *MqttAdaptor) Disconnect() (err error) {
 	return
 }
 
-// Finalize returns true if connection to mqtt is finalized succesfully
+// Finalize returns true if connection to mqtt is finalized successfully
 func (a *MqttAdaptor) Finalize() (errs []error) {
 	a.Disconnect()
 	return

@@ -149,7 +149,7 @@ func NewRaspiAdaptor(name string) *RaspiAdaptor {
 }
 func (r *RaspiAdaptor) Name() string { return r.name }
 
-// Connect starts conection with board and creates
+// Connect starts connection with board and creates
 // digitalPins and pwmPins adaptor maps
 func (r *RaspiAdaptor) Connect() (errs []error) {
 	return

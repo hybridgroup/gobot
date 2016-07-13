@@ -22,7 +22,7 @@ type AnalogSensorDriver struct {
 // NewAnalogSensorDriver returns a new AnalogSensorDriver with a polling interval of
 // 10 Milliseconds given an AnalogReader, name and pin.
 //
-// Optinally accepts:
+// Optionally accepts:
 // 	time.Duration: Interval at which the AnalogSensor is polled for new information
 //
 // Adds the following API Commands:

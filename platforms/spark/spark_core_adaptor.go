@@ -54,7 +54,7 @@ func NewSparkCoreAdaptor(name string, deviceID string, accessToken string) *Spar
 }
 func (s *SparkCoreAdaptor) Name() string { return s.name }
 
-// Connect returns true if connection to spark core is succesfull
+// Connect returns true if connection to spark core is successfull
 func (s *SparkCoreAdaptor) Connect() (errs []error) {
 	return
 }
