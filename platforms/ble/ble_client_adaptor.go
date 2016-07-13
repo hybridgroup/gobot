@@ -2,10 +2,11 @@ package ble
 
 import (
 	"fmt"
-	"github.com/currantlabs/gatt"
-	"github.com/hybridgroup/gobot"
 	"log"
 	"strings"
+
+	"github.com/currantlabs/gatt"
+	"github.com/hybridgroup/gobot"
 )
 
 var _ gobot.Adaptor = (*BLEClientAdaptor)(nil)
@@ -200,6 +201,7 @@ func (b *BLEClientAdaptor) ConnectHandler(p gatt.Peripheral, err error) {
 		return
 	}
 
+outer:
 	for _, s := range ss {
 		b.services[s.UUID().String()] = NewBLEService(s.UUID().String(), s)
 
@@ -210,6 +212,11 @@ func (b *BLEClientAdaptor) ConnectHandler(p gatt.Peripheral, err error) {
 		}
 
 		for _, c := range cs {
+			_, err := p.DiscoverDescriptors(nil, c)
+			if err != nil {
+				fmt.Printf("Failed to discover descriptors: %v\n", err)
+				continue outer
+			}
 			b.services[s.UUID().String()].characteristics[c.UUID().String()] = c
 		}
 	}
