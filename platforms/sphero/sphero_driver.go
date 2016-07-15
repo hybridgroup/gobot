@@ -174,7 +174,7 @@ func (s *SpheroDriver) Start() (errs []error) {
 	go func() {
 		for {
 			header := s.readHeader()
-			if header != nil && len(header) != 0 {
+			if len(header) > 0 {
 				body := s.readBody(header[4])
 				data := append(header, body...)
 				checksum := data[len(data)-1]
@@ -268,7 +268,7 @@ func (s *SpheroDriver) SetHeading(heading uint16) {
 // SetStabilization enables or disables the built-in auto stabilizing features of the Sphero
 func (s *SpheroDriver) SetStabilization(on bool) {
 	b := uint8(0x01)
-	if on == false {
+	if !on {
 		b = 0x00
 	}
 	s.packetChannel <- s.craftPacket([]uint8{b}, 0x02, 0x02)

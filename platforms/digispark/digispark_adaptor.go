@@ -62,7 +62,7 @@ func (d *DigisparkAdaptor) DigitalWrite(pin string, level byte) (err error) {
 
 // PwmWrite writes the 0-254 value to the specified pin
 func (d *DigisparkAdaptor) PwmWrite(pin string, value byte) (err error) {
-	if d.pwm == false {
+	if !d.pwm {
 		if err = d.littleWire.pwmInit(); err != nil {
 			return
 		}
@@ -78,7 +78,7 @@ func (d *DigisparkAdaptor) PwmWrite(pin string, value byte) (err error) {
 
 // ServoWrite writes the 0-180 degree val to the specified pin.
 func (d *DigisparkAdaptor) ServoWrite(pin string, angle uint8) (err error) {
-	if d.servo == false {
+	if !d.servo {
 		if err = d.littleWire.servoInit(); err != nil {
 			return
 		}

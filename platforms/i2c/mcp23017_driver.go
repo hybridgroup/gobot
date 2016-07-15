@@ -171,10 +171,7 @@ func (m *MCP23017Driver) ReadGPIO(pin uint8, portStr string) (val uint8, err err
 // val = 0 pull up disabled.
 func (m *MCP23017Driver) SetPullUp(pin uint8, val uint8, portStr string) error {
 	selectedPort := m.getPort(portStr)
-	if err := m.write(selectedPort.GPPU, pin, val); err != nil {
-		return err
-	}
-	return nil
+	return m.write(selectedPort.GPPU, pin, val)
 }
 
 // SetGPIOPolarity will change a given pin's polarity based on the value:
@@ -182,10 +179,7 @@ func (m *MCP23017Driver) SetPullUp(pin uint8, val uint8, portStr string) error {
 // val = 0 same logic state of the input pin.
 func (m *MCP23017Driver) SetGPIOPolarity(pin uint8, val uint8, portStr string) (err error) {
 	selectedPort := m.getPort(portStr)
-	if err := m.write(selectedPort.IPOL, pin, val); err != nil {
-		return err
-	}
-	return nil
+	return m.write(selectedPort.IPOL, pin, val)
 }
 
 // write gets the value of the passed in register, and then overwrites

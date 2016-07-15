@@ -31,7 +31,7 @@ func main() {
 		var image *cv.IplImage
 		gobot.On(camera.Event("frame"), func(data interface{}) {
 			image = data.(*cv.IplImage)
-			if detect == false {
+			if !detect {
 				window.ShowImage(image)
 			}
 		})

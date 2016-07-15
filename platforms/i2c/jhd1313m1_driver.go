@@ -218,10 +218,7 @@ func (h *JHD1313M1Driver) Scroll(leftToRight bool) error {
 func (h *JHD1313M1Driver) Halt() []error { return nil }
 
 func (h *JHD1313M1Driver) setReg(command int, data int) error {
-	if err := h.connection.I2cWrite(h.rgbAddress, []byte{byte(command), byte(data)}); err != nil {
-		return err
-	}
-	return nil
+	return h.connection.I2cWrite(h.rgbAddress, []byte{byte(command), byte(data)})
 }
 
 func (h *JHD1313M1Driver) command(buf []byte) error {

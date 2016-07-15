@@ -40,13 +40,13 @@ func main() {
 			})
 
 			gobot.Every(3*time.Second, func() {
-				if conway.alive == true {
+				if conway.alive {
 					conway.movement()
 				}
 			})
 
 			gobot.Every(10*time.Second, func() {
-				if conway.alive == true {
+				if conway.alive {
 					conway.birthday()
 				}
 			})
@@ -107,8 +107,8 @@ func (c *conway) birthday() {
 
 	fmt.Println("Happy birthday", c.cell.Name, "you are", c.age, "and had", c.contacts, "contacts.")
 
-	if c.enoughContacts() == true {
-		if c.alive == false {
+	if c.enoughContacts() {
+		if !c.alive {
 			c.rebirth()
 		}
 	} else {
@@ -119,7 +119,7 @@ func (c *conway) birthday() {
 }
 
 func (c *conway) movement() {
-	if c.alive == true {
+	if c.alive {
 		c.cell.Roll(100, uint16(gobot.Rand(360)))
 	}
 }

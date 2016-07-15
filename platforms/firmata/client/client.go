@@ -469,7 +469,7 @@ func (b *Client) process() (err error) {
 			b.FirmwareName = string(name[:])
 			gobot.Publish(b.Event("FirmwareQuery"), b.FirmwareName)
 		case StringData:
-			str := currentBuffer[2:len(currentBuffer)]
+			str := currentBuffer[2:]
 			gobot.Publish(b.Event("StringData"), string(str[:len(str)-1]))
 		}
 	}

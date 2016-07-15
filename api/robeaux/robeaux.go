@@ -1019,10 +1019,8 @@ func RestoreAsset(dir, name string) error {
 		return err
 	}
 	err = os.Chtimes(_filePath(dir, name), info.ModTime(), info.ModTime())
-	if err != nil {
-		return err
-	}
-	return nil
+
+	return err
 }
 
 // RestoreAssets restores an asset under the given directory recursively

@@ -152,18 +152,8 @@ func (r *Robot) Start() (errs []error) {
 // Stop stops a Robot's connections and Devices
 func (r *Robot) Stop() (errs []error) {
 	log.Println("Stopping Robot", r.Name, "...")
-	if heers := r.Devices().Halt(); len(heers) > 0 {
-		for _, err := range heers {
-			errs = append(errs, err)
-		}
-	}
-
-	if ceers := r.Connections().Finalize(); len(ceers) > 0 {
-		for _, err := range ceers {
-			errs = append(errs, err)
-		}
-	}
-
+	errs = append(errs, r.Devices().Halt()...)
+	errs = append(errs, r.Connections().Finalize()...)
 	return errs
 }
 
