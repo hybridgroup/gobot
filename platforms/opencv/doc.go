@@ -1,5 +1,5 @@
 /*
-Packge opencv contains the Gobot drivers for opencv.
+Package opencv contains the Gobot drivers for opencv.
 
 Installing:
 

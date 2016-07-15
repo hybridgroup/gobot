@@ -25,7 +25,7 @@ type WiichuckDriver struct {
 // It adds the following events:
 //	"z"- Gets triggered every interval amount of time if the z button is pressed
 //	"c" - Gets triggered every interval amount of time if the c button is pressed
-//	"joystick" - Gets triggered every "interval" amount of time if a joystick event occured, you can access values x, y
+//	"joystick" - Gets triggered every "interval" amount of time if a joystick event occurred, you can access values x, y
 //	"error" - Gets triggered whenever the WiichuckDriver encounters an error
 func NewWiichuckDriver(a I2c, name string, v ...time.Duration) *WiichuckDriver {
 	w := &WiichuckDriver{

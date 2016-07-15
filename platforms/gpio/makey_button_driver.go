@@ -22,7 +22,7 @@ type MakeyButtonDriver struct {
 // NewMakeyButtonDriver returns a new MakeyButtonDriver with a polling interval of
 // 10 Milliseconds given a DigitalReader, name and pin.
 //
-// Optinally accepts:
+// Optionally accepts:
 //  time.Duration: Interval at which the ButtonDriver is polled for new information
 func NewMakeyButtonDriver(a DigitalReader, name string, pin string, v ...time.Duration) *MakeyButtonDriver {
 	m := &MakeyButtonDriver{

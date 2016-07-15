@@ -1,5 +1,5 @@
 /*
-Packge keyboard contains the Gobot drivers for keyboard support.
+Package keyboard contains the Gobot drivers for keyboard support.
 
 Installing:
 

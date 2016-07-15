@@ -579,7 +579,7 @@ const (
 	MAV_SEVERITY_CRITICAL  = 2 // Action must be taken immediately. Indicates failure in a primary system. |
 	MAV_SEVERITY_ERROR     = 3 // Indicates an error in secondary/redundant systems. |
 	MAV_SEVERITY_WARNING   = 4 // Indicates about a possible future error if this is not resolved within a given timeframe. Example would be a low battery warning. |
-	MAV_SEVERITY_NOTICE    = 5 // An unusual event has occured, though not an error condition. This should be investigated for the root cause. |
+	MAV_SEVERITY_NOTICE    = 5 // An unusual event has occurred, though not an error condition. This should be investigated for the root cause. |
 	MAV_SEVERITY_INFO      = 6 // Normal operational messages. Useful for logging. No action is required for these messages. |
 	MAV_SEVERITY_DEBUG     = 7 // Useful non-operational messages that can assist in debugging. These should not occur during normal operation. |
 	MAV_SEVERITY_ENUM_END  = 8 //  |
@@ -8111,7 +8111,7 @@ type DataTransmissionHandshake struct {
 	SIZE        uint32 // total data size in bytes (set on ACK only)
 	WIDTH       uint16 // Width of a matrix or image
 	HEIGHT      uint16 // Height of a matrix or image
-	PACKETS     uint16 // number of packets beeing sent (set on ACK only)
+	PACKETS     uint16 // number of packets being sent (set on ACK only)
 	TYPE        uint8  // type of requested/acknowledged data (as defined in ENUM DATA_TYPES in mavlink/include/mavlink_types.h)
 	PAYLOAD     uint8  // payload size per packet (normally 253 byte, see DATA field size in message ENCAPSULATED_DATA) (set on ACK only)
 	JPG_QUALITY uint8  // JPEG quality out of [1,100]
@@ -8582,7 +8582,7 @@ const ()
 //
 type BatteryStatus struct {
 	CURRENT_CONSUMED  int32  // Consumed charge, in milliampere hours (1 = 1 mAh), -1: autopilot does not provide mAh consumption estimate
-	ENERGY_CONSUMED   int32  // Consumed energy, in 100*Joules (intergrated U*I*dt)  (1 = 100 Joule), -1: autopilot does not provide energy consumption estimate
+	ENERGY_CONSUMED   int32  // Consumed energy, in 100*Joules (integrated U*I*dt)  (1 = 100 Joule), -1: autopilot does not provide energy consumption estimate
 	VOLTAGE_CELL_1    uint16 // Battery voltage of cell 1, in millivolts (1 = 1 millivolt)
 	VOLTAGE_CELL_2    uint16 // Battery voltage of cell 2, in millivolts (1 = 1 millivolt), -1: no cell
 	VOLTAGE_CELL_3    uint16 // Battery voltage of cell 3, in millivolts (1 = 1 millivolt), -1: no cell

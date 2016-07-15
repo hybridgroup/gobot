@@ -85,5 +85,5 @@ func (l *LeapMotionDriver) Start() (errs []error) {
 	return
 }
 
-// Halt returns true if driver is halted succesfully
+// Halt returns true if driver is halted successfully
 func (l *LeapMotionDriver) Halt() (errs []error) { return }

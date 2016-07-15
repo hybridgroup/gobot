@@ -29,7 +29,7 @@ func NewLeapMotionAdaptor(name string, port string) *LeapMotionAdaptor {
 func (l *LeapMotionAdaptor) Name() string { return l.name }
 func (l *LeapMotionAdaptor) Port() string { return l.port }
 
-// Connect returns true if connection to leap motion is established succesfully
+// Connect returns true if connection to leap motion is established successfully
 func (l *LeapMotionAdaptor) Connect() (errs []error) {
 	if ws, err := l.connect(l.Port()); err != nil {
 		return []error{err}

@@ -23,7 +23,7 @@ type GroveTemperatureSensorDriver struct {
 // NewGroveTemperatureSensorDriver returns a new GroveTemperatureSensorDriver with a polling interval of
 // 10 Milliseconds given an AnalogReader, name and pin.
 //
-// Optinally accepts:
+// Optionally accepts:
 // 	time.Duration: Interval at which the TemperatureSensor is polled for new information
 //
 // Adds the following API Commands:

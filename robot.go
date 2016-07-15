@@ -34,8 +34,8 @@ func NewJSONRobot(robot *Robot) *JSONRobot {
 	return jsonRobot
 }
 
-// Robot is a named entitity that manages a collection of connections and devices.
-// It containes it's own work routine and a collection of
+// Robot is a named entity that manages a collection of connections and devices.
+// It contains its own work routine and a collection of
 // custom commands to control a robot remotely via the Gobot api.
 type Robot struct {
 	Name        string
