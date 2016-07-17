@@ -10,6 +10,11 @@ import (
 
 var _ gobot.Adaptor = (*NatsAdaptor)(nil)
 
+func TestNatsAdaptorReturnsName(t *testing.T) {
+	a := NewNatsAdaptor("Nats", "localhost:4222", 9999)
+	gobottest.Assert(t, a.Name(), "Nats")
+}
+
 func TestNatsAdaptorPublishWhenConnected(t *testing.T) {
 	a := NewNatsAdaptor("Nats", "localhost:4222", 9999)
 	a.Connect()

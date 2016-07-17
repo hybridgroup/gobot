@@ -88,12 +88,7 @@ func (a *NatsAdaptor) On(event string, f func(s []byte)) bool {
 		return false
 	}
 	a.client.Subscribe(event, func(msg *nats.Msg) {
-		incoming := msg.Data
-		if string(incoming) == "PING" {
-			a.Publish(event, []byte("PONG"))
-		} else {
-			f(msg.Data)
-		}
+		f(msg.Data)
 	})
 	return true
 }
