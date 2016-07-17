@@ -21,6 +21,7 @@ before_install:
  - cd gnatsd
  - "wget https://github.com/nats-io/gnatsd/releases/download/v0.8.1/gnatsd-v0.8.1-linux-amd64.zip"
  - unzip gnatsd-v0.8.1-linux-amd64.zip
+ - ls -la
  - ./gnatsd -p 4222 &
  - ./gnatsd -p 4223 --user test --pass testwd &
  - cd $HOME/gopath/src/github.com/hybridgroup/gobot
