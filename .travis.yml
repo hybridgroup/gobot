@@ -19,6 +19,11 @@ before_install:
  - sudo apt-get install --force-yes libcv-dev libcvaux-dev libhighgui-dev libopencv-dev libsdl2-dev libsdl2-image-dev libsdl2 libusb-dev xvfb libgtk2.0-0
  - go get github.com/axw/gocov/gocov
  - go get github.com/mattn/goveralls
+ - mkdir -p gnatsd
+ - "wget https://github.com/nats-io/gnatsd/releases/download/v0.8.1/gnatsd-v0.8.1-linux-amd64.zip -qO - | tar -zxvC gnatsd/"
+ - export PATH=$PATH:$PWD/gnatsd/
+ - gnatsd -p 4222 &
+ - gnatsd -p 4223 --user test --pass testwd &
  - if ! go get github.com/golang/tools/cmd/cover; then go get golang.org/x/tools/cmd/cover; fi
 install:
  - go get -d -v ./...
