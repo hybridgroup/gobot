@@ -1,8 +1,11 @@
 package firmata
 
 import (
+	"bytes"
 	"errors"
+	"fmt"
 	"io"
+	"strings"
 	"testing"
 	"time"
 
@@ -14,10 +17,11 @@ import (
 type readWriteCloser struct{}
 
 func (readWriteCloser) Write(p []byte) (int, error) {
-	return len(p), nil
+	return testWriteData.Write(p)
 }
 
 var testReadData = []byte{}
+var testWriteData = bytes.Buffer{}
 
 func (readWriteCloser) Read(b []byte) (int, error) {
 	size := len(b)
@@ -61,14 +65,15 @@ func (m mockFirmataBoard) Disconnect() error {
 func (m mockFirmataBoard) Pins() []client.Pin {
 	return m.pins
 }
-func (mockFirmataBoard) AnalogWrite(int, int) error   { return nil }
-func (mockFirmataBoard) SetPinMode(int, int) error    { return nil }
-func (mockFirmataBoard) ReportAnalog(int, int) error  { return nil }
-func (mockFirmataBoard) ReportDigital(int, int) error { return nil }
-func (mockFirmataBoard) DigitalWrite(int, int) error  { return nil }
-func (mockFirmataBoard) I2cRead(int, int) error       { return nil }
-func (mockFirmataBoard) I2cWrite(int, []byte) error   { return nil }
-func (mockFirmataBoard) I2cConfig(int) error          { return nil }
+func (mockFirmataBoard) AnalogWrite(int, int) error      { return nil }
+func (mockFirmataBoard) SetPinMode(int, int) error       { return nil }
+func (mockFirmataBoard) ReportAnalog(int, int) error     { return nil }
+func (mockFirmataBoard) ReportDigital(int, int) error    { return nil }
+func (mockFirmataBoard) DigitalWrite(int, int) error     { return nil }
+func (mockFirmataBoard) I2cRead(int, int) error          { return nil }
+func (mockFirmataBoard) I2cWrite(int, []byte) error      { return nil }
+func (mockFirmataBoard) I2cConfig(int) error             { return nil }
+func (mockFirmataBoard) ServoConfig(int, int, int) error { return nil }
 
 func initTestFirmataAdaptor() *FirmataAdaptor {
 	a := NewFirmataAdaptor("board", "/dev/null")
@@ -165,4 +170,14 @@ func TestFirmataAdaptorI2cRead(t *testing.T) {
 func TestFirmataAdaptorI2cWrite(t *testing.T) {
 	a := initTestFirmataAdaptor()
 	a.I2cWrite(0x00, []byte{0x00, 0x01})
+}
+
+func TestServoConfig(t *testing.T) {
+	a := initTestFirmataAdaptor()
+	err := a.ServoConfig("9", 0, 0)
+	gobottest.Assert(t, err, nil)
+
+	// test atoi error
+	err = a.ServoConfig("a", 0, 0)
+	gobottest.Assert(t, true, strings.Contains(fmt.Sprintf("%v", err), "invalid syntax"))
 }

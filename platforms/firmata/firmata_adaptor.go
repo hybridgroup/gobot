@@ -34,6 +34,7 @@ type firmataBoard interface {
 	I2cRead(int, int) error
 	I2cWrite(int, []byte) error
 	I2cConfig(int) error
+	ServoConfig(int, int, int) error
 	Event(string) *gobot.Event
 }
 
@@ -114,6 +115,16 @@ func (f *FirmataAdaptor) Port() string { return f.port }
 
 // Name returns the  FirmataAdaptors name
 func (f *FirmataAdaptor) Name() string { return f.name }
+
+// ServoConfig sets the PWM minimum and maximum for a pin
+func (f *FirmataAdaptor) ServoConfig(pin string, min, max int) error {
+	p, err := strconv.Atoi(pin)
+	if err != nil {
+		return err
+	}
+
+	return f.board.ServoConfig(p, max, min)
+}
 
 // ServoWrite writes the 0-180 degree angle to the specified pin.
 func (f *FirmataAdaptor) ServoWrite(pin string, angle byte) (err error) {
