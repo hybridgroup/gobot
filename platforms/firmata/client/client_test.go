@@ -1,6 +1,7 @@
 package client
 
 import (
+	"bytes"
 	"testing"
 	"time"
 
@@ -11,10 +12,11 @@ import (
 type readWriteCloser struct{}
 
 func (readWriteCloser) Write(p []byte) (int, error) {
-	return len(p), nil
+	return testWriteData.Write(p)
 }
 
 var testReadData = []byte{}
+var testWriteData = bytes.Buffer{}
 
 func (readWriteCloser) Read(b []byte) (int, error) {
 	size := len(b)
@@ -217,4 +219,39 @@ func TestConnect(t *testing.T) {
 	})
 
 	gobottest.Assert(t, b.Connect(readWriteCloser{}), nil)
+}
+
+func TestServoConfig(t *testing.T) {
+	b := New()
+	b.connection = readWriteCloser{}
+
+	tests := []struct {
+		description string
+		arguments   [3]int
+		expected    []byte
+		result      error
+	}{
+		{
+			description: "Mix values for min & max",
+			arguments:   [3]int{9, 0, 0},
+			expected:    []byte{0xF0, 0x70, 9, 0, 0, 0, 0, 0xF7},
+		},
+		{
+			description: "Max values for min & max",
+			arguments:   [3]int{9, 0x3FFF, 0x3FFF},
+			expected:    []byte{0xF0, 0x70, 9, 0x7F, 0x7F, 0x7F, 0x7F, 0xF7},
+		},
+		{
+			description: "Clipped max values for min & max",
+			arguments:   [3]int{9, 0xFFFF, 0xFFFF},
+			expected:    []byte{0xF0, 0x70, 9, 0x7F, 0x7F, 0x7F, 0x7F, 0xF7},
+		},
+	}
+
+	for _, test := range tests {
+		testWriteData.Reset()
+		err := b.ServoConfig(test.arguments[0], test.arguments[1], test.arguments[2])
+		gobottest.Assert(t, testWriteData.Bytes(), test.expected)
+		gobottest.Assert(t, err, test.result)
+	}
 }
