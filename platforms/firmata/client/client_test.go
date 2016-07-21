@@ -232,7 +232,7 @@ func TestServoConfig(t *testing.T) {
 		result      error
 	}{
 		{
-			description: "Mix values for min & max",
+			description: "Min values for min & max",
 			arguments:   [3]int{9, 0, 0},
 			expected:    []byte{0xF0, 0x70, 9, 0, 0, 0, 0, 0xF7},
 		},

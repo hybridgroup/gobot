@@ -116,7 +116,7 @@ func (f *FirmataAdaptor) Port() string { return f.port }
 // Name returns the  FirmataAdaptors name
 func (f *FirmataAdaptor) Name() string { return f.name }
 
-// ServoConfig sets the PWM minimum and maximum for a pin
+// ServoConfig sets the pulse width in microseconds for a pin attached to a servo
 func (f *FirmataAdaptor) ServoConfig(pin string, min, max int) error {
 	p, err := strconv.Atoi(pin)
 	if err != nil {
