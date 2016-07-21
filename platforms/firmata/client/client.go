@@ -218,10 +218,10 @@ func (b *Client) ServoConfig(pin int, max int, min int) error {
 	ret := []byte{
 		ServoConfig,
 		byte(pin),
-		byte(max & 0x7F),
-		byte((max >> 7) & 0x7F),
 		byte(min & 0x7F),
 		byte((min >> 7) & 0x7F),
+		byte(max & 0x7F),
+		byte((max >> 7) & 0x7F),
 	}
 	return b.writeSysex(ret)
 }
