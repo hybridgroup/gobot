@@ -1,11 +1,6 @@
 package i2c
 
-import (
-	"fmt"
-	"time"
-
-	"github.com/hybridgroup/gobot"
-)
+import "github.com/hybridgroup/gobot"
 
 var _ gobot.Driver = (*AdafruitMotorHatDriver)(nil)
 
@@ -37,27 +32,58 @@ const (
 	_Outdrv  = 0x04
 )
 
+// TODO: package-wide, thus make more descriptive names
+type Direction int
+
+const (
+	Forward  Direction = iota // 0
+	Backward                  // 1
+	Release                   // 2
+)
+
+type adaFruitDCMotor struct {
+	pwmPin, in1Pin, in2Pin byte
+}
+
 // AdafruitMotorHatDriver is a driver for the DC+Stepper Motor HAT from Adafruit.
-// This HAT is a Raspberry Pi add-on that can drive up to 4 DC or 2 Stepper motors
+// The HAT is a Raspberry Pi add-on that can drive up to 4 DC or 2 Stepper motors
 // with full PWM speed control.  It has a dedicated PWM driver chip onboard to
 // control both motor direction and speed over I2C.
 type AdafruitMotorHatDriver struct {
 	name       string
 	connection I2c
 	gobot.Commander
+	dcMotors []adaFruitDCMotor
 }
 
-func (a *AdafruitMotorHatDriver) Name() string                 { return a.name }
+// Name identifies this driver object
+func (a *AdafruitMotorHatDriver) Name() string { return a.name }
+
+// Connection identifies the particular adapter object
 func (a *AdafruitMotorHatDriver) Connection() gobot.Connection { return a.connection.(gobot.Connection) }
 
 // NewAdafruitDriver adds the following API commands: TODO
 func NewAdafruitDriver(a I2c, name string) *AdafruitMotorHatDriver {
+	var dc []adaFruitDCMotor
+	for i := 0; i < 4; i++ {
+		switch {
+		case i == 0:
+			dc = append(dc, adaFruitDCMotor{pwmPin: 8, in1Pin: 10, in2Pin: 9})
+		case i == 1:
+			dc = append(dc, adaFruitDCMotor{pwmPin: 13, in1Pin: 11, in2Pin: 12})
+		case i == 2:
+			dc = append(dc, adaFruitDCMotor{pwmPin: 2, in1Pin: 4, in2Pin: 3})
+		case i == 3:
+			dc = append(dc, adaFruitDCMotor{pwmPin: 7, in1Pin: 5, in2Pin: 6})
+		}
+	}
 	driver := &AdafruitMotorHatDriver{
 		name:       name,
 		connection: a,
 		Commander:  gobot.NewCommander(),
+		dcMotors:   dc,
 	}
-	// TODO: add API funcs
+	// TODO: add API funcs?
 	return driver
 }
 
@@ -91,14 +117,6 @@ func (a *AdafruitMotorHatDriver) Start() (errs []error) {
 func (a *AdafruitMotorHatDriver) Halt() (errs []error) { return }
 
 //
-/*
-  def setPWM(self, channel, on, off):
-    "Sets a single PWM channel"
-    self.i2c.write8(self.__LED0_ON_L+4*channel, on & 0xFF)
-    self.i2c.write8(self.__LED0_ON_H+4*channel, on >> 8)
-    self.i2c.write8(self.__LED0_OFF_L+4*channel, off & 0xFF)
-    self.i2c.write8(self.__LED0_OFF_H+4*channel, off >> 8)
-*/
 func (a *AdafruitMotorHatDriver) setPWM(pin byte, on, off int32) (err error) {
 	reg := _LedZeroOnL + 4*pin
 	val := byte(on & 0xff)
@@ -154,38 +172,39 @@ Test Runner:
             self._pwm.setPWM(pin, 4096, 0)
 
 */
-func (a *AdafruitMotorHatDriver) Run() (err error) {
-	fmt.Printf("NOW: %s\n", time.Now().String())
-	//-------------------------------------------------------------------------
-	// set the speed:
-	//-------------------------------------------------------------------------
-	var speed int32 = 255 // full speed!
-	var in1Pin byte = 4
-	var in2Pin byte = 3
-	var pwmPin byte = 2
+func (a *AdafruitMotorHatDriver) SetDCMotorSpeed(dcMotor int, speed int32) (err error) {
+	if err = a.setPWM(a.dcMotors[dcMotor].pwmPin, 0, speed*16); err != nil {
+		return
+	}
+	return
+}
 
-	if err = a.setPWM(pwmPin, 0, speed*16); err != nil {
-		return
-	}
-	//-------------------------------------------------------------------------
-	// run FORWARD:
-	//-------------------------------------------------------------------------
-	if err = a.setPin(in2Pin, 0); err != nil {
-		return
-	}
-	if err = a.setPin(in1Pin, 1); err != nil {
-		return
-	}
-	//-------------------------------------------------------------------------
-	// Sleep and RELEASE
-	//-------------------------------------------------------------------------
-	<-time.After(2000 * time.Millisecond)
+// RunDCMotor will set the appropriate pins to run the specific DC motor for
+// the given direction
+func (a *AdafruitMotorHatDriver) RunDCMotor(dcMotor int, dir Direction) (err error) {
 
-	if err = a.setPin(in1Pin, 0); err != nil {
-		return
-	}
-	if err = a.setPin(in2Pin, 0); err != nil {
-		return
+	switch {
+	case dir == Forward:
+		if err = a.setPin(a.dcMotors[dcMotor].in2Pin, 0); err != nil {
+			return
+		}
+		if err = a.setPin(a.dcMotors[dcMotor].in1Pin, 1); err != nil {
+			return
+		}
+	case dir == Backward:
+		if err = a.setPin(a.dcMotors[dcMotor].in1Pin, 0); err != nil {
+			return
+		}
+		if err = a.setPin(a.dcMotors[dcMotor].in2Pin, 1); err != nil {
+			return
+		}
+	case dir == Release:
+		if err = a.setPin(a.dcMotors[dcMotor].in1Pin, 0); err != nil {
+			return
+		}
+		if err = a.setPin(a.dcMotors[dcMotor].in2Pin, 0); err != nil {
+			return
+		}
 	}
 	return
 }
