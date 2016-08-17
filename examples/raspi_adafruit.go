@@ -17,22 +17,22 @@ func adafruitDCMotorRunner(a *i2c.AdafruitMotorHatDriver, dcMotor int) (err erro
 	if err = a.SetDCMotorSpeed(dcMotor, speed); err != nil {
 		return
 	}
-	// run FORWARD:
-	if err = a.RunDCMotor(dcMotor, i2c.Forward); err != nil {
+	// run FORWARD
+	if err = a.RunDCMotor(dcMotor, i2c.AdafruitForward); err != nil {
 		return
 	}
 	// Sleep and RELEASE
 	<-time.After(2000 * time.Millisecond)
-	if err = a.RunDCMotor(dcMotor, i2c.Release); err != nil {
+	if err = a.RunDCMotor(dcMotor, i2c.AdafruitRelease); err != nil {
 		return
 	}
-	// run BACKWARD:
-	if err = a.RunDCMotor(dcMotor, i2c.Backward); err != nil {
+	// run BACKWARD
+	if err = a.RunDCMotor(dcMotor, i2c.AdafruitBackward); err != nil {
 		return
 	}
 	// Sleep and RELEASE
 	<-time.After(2000 * time.Millisecond)
-	if err = a.RunDCMotor(dcMotor, i2c.Release); err != nil {
+	if err = a.RunDCMotor(dcMotor, i2c.AdafruitRelease); err != nil {
 		return
 	}
 	return
@@ -40,7 +40,7 @@ func adafruitDCMotorRunner(a *i2c.AdafruitMotorHatDriver, dcMotor int) (err erro
 func main() {
 	gbot := gobot.NewGobot()
 	r := raspi.NewRaspiAdaptor("raspi")
-	adaFruit := i2c.NewAdafruitDriver(r, "adafruit")
+	adaFruit := i2c.NewAdafruitMotorHatDriver(r, "adafruit")
 
 	work := func() {
 		gobot.Every(5*time.Second, func() {

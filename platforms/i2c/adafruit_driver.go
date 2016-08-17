@@ -32,13 +32,13 @@ const (
 	_Outdrv  = 0x04
 )
 
-// TODO: package-wide, thus make more descriptive names
-type Direction int
+// AdafruitDirection declares a type for specification of the motor direction
+type AdafruitDirection int
 
 const (
-	Forward  Direction = iota // 0
-	Backward                  // 1
-	Release                   // 2
+	AdafruitForward  AdafruitDirection = iota // 0
+	AdafruitBackward                          // 1
+	AdafruitRelease                           // 2
 )
 
 type adaFruitDCMotor struct {
@@ -62,8 +62,8 @@ func (a *AdafruitMotorHatDriver) Name() string { return a.name }
 // Connection identifies the particular adapter object
 func (a *AdafruitMotorHatDriver) Connection() gobot.Connection { return a.connection.(gobot.Connection) }
 
-// NewAdafruitDriver adds the following API commands: TODO
-func NewAdafruitDriver(a I2c, name string) *AdafruitMotorHatDriver {
+// NewAdafruitMotorHatDriver initializes the internal DCMotor and StepperMotor types
+func NewAdafruitMotorHatDriver(a I2c, name string) *AdafruitMotorHatDriver {
 	var dc []adaFruitDCMotor
 	for i := 0; i < 4; i++ {
 		switch {
@@ -87,29 +87,11 @@ func NewAdafruitDriver(a I2c, name string) *AdafruitMotorHatDriver {
 	return driver
 }
 
-// Start initializes the Adafruit Motor HAT
+// Start initializes the Adafruit Motor HAT driver
 func (a *AdafruitMotorHatDriver) Start() (errs []error) {
 	if err := a.connection.I2cStart(motorHatAddress); err != nil {
 		return []error{err}
 	}
-	/*
-		  def __init__(self, address=0x40, debug=False):
-			self.i2c = Adafruit_I2C(address)
-			self.i2c.debug = debug
-			self.address = address
-			self.debug = debug
-			if (self.debug):
-			print "Reseting PCA9685 MODE1 (without SLEEP) and MODE2"
-			self.setAllPWM(0, 0)
-			self.i2c.write8(self.__MODE2, self.__OUTDRV)
-			self.i2c.write8(self.__MODE1, self.__ALLCALL)
-			time.sleep(0.005)                                       # wait for oscillator
-
-			mode1 = self.i2c.readU8(self.__MODE1)
-			mode1 = mode1 & ~self.__SLEEP                 # wake up (reset sleep)
-			self.i2c.write8(self.__MODE1, mode1)
-			time.sleep(0.005)                             # wait for oscillator
-	*/
 	return
 }
 
@@ -151,27 +133,8 @@ func (a *AdafruitMotorHatDriver) setPin(pin byte, value int32) (err error) {
 	return nil
 }
 
-/*
-
-Test Runner:
-	For motor 3:
-	        pwm = 2
-            in2 = 3
-            in1 = 4
-
-	1. SetSpeed(setPWM(self.PWMpin, 0, speed*16))
-	2. Run(Adafruit_MotorHAT.FORWARD):
-    	self.MC.setPin(self.IN2pin, 0)
-    	self.MC.setPin(self.IN1pin, 1)
-
-	Run():
-	  Where setPin(pin, value) is:
-		if (value == 0):
-        	self._pwm.setPWM(pin, 0, 4096)
-        if (value == 1):
-            self._pwm.setPWM(pin, 4096, 0)
-
-*/
+// SetDCMotorSpeed will set the appropriate pins to run the specified DC motor
+// for the given speed.
 func (a *AdafruitMotorHatDriver) SetDCMotorSpeed(dcMotor int, speed int32) (err error) {
 	if err = a.setPWM(a.dcMotors[dcMotor].pwmPin, 0, speed*16); err != nil {
 		return
@@ -179,26 +142,26 @@ func (a *AdafruitMotorHatDriver) SetDCMotorSpeed(dcMotor int, speed int32) (err 
 	return
 }
 
-// RunDCMotor will set the appropriate pins to run the specific DC motor for
+// RunDCMotor will set the appropriate pins to run the specified DC motor for
 // the given direction
-func (a *AdafruitMotorHatDriver) RunDCMotor(dcMotor int, dir Direction) (err error) {
+func (a *AdafruitMotorHatDriver) RunDCMotor(dcMotor int, dir AdafruitDirection) (err error) {
 
 	switch {
-	case dir == Forward:
+	case dir == AdafruitForward:
 		if err = a.setPin(a.dcMotors[dcMotor].in2Pin, 0); err != nil {
 			return
 		}
 		if err = a.setPin(a.dcMotors[dcMotor].in1Pin, 1); err != nil {
 			return
 		}
-	case dir == Backward:
+	case dir == AdafruitBackward:
 		if err = a.setPin(a.dcMotors[dcMotor].in1Pin, 0); err != nil {
 			return
 		}
 		if err = a.setPin(a.dcMotors[dcMotor].in2Pin, 1); err != nil {
 			return
 		}
-	case dir == Release:
+	case dir == AdafruitRelease:
 		if err = a.setPin(a.dcMotors[dcMotor].in1Pin, 0); err != nil {
 			return
 		}
