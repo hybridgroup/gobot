@@ -83,5 +83,14 @@ to exit.
 To update the program after you made a change, you will need to scp it
 over once again and start it from the command line (via screen).
 
+## Pin Mapping
+
+The Gobot pin mapping for the Intel Joule uses the same numbering as the MRAA library does, as documented here:
+
+https://software.intel.com/en-us/pin-mapping-for-carrier-board-joule
+
+Of special note are the pins that control the build-in LEDs, which are pins 100 thru 103, as used in the example above.
+
+
 ## License
 Copyright (c) 2014-2016 The Hybrid Group. Licensed under the Apache 2.0 license.
