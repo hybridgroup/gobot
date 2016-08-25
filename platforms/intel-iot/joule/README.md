@@ -1,0 +1,84 @@
+# Edison
+
+The Intel Joule is a wifi and Bluetooth® enabled development platform for the Internet of Things.
+
+For more info about the Intel Joule platform go to:
+
+http://www.intel.com/joule
+
+## Setting up your Intel Joule
+
+Everything you need to get started with the Joule is in the Intel Getting Started Guide located at:
+
+https://intel.com/joule/getstarted
+
+Don't forget to configure your Joule's wifi connection and update your Joule to the latest firmware image!
+
+## Example program
+
+Save the following code into a file called `main.go`.
+
+```go
+package main
+
+import (
+	"time"
+
+	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/platforms/gpio"
+	"github.com/hybridgroup/gobot/platforms/intel-iot/joule"
+)
+
+func main() {
+	gbot := gobot.NewGobot()
+
+	e := joule.NewJouleAdaptor("edison")
+	led := gpio.NewLedDriver(e, "led", "103")
+
+	work := func() {
+		gobot.Every(1*time.Second, func() {
+			led.Toggle()
+		})
+	}
+
+	robot := gobot.NewRobot("blinkBot",
+		[]gobot.Connection{e},
+		[]gobot.Device{led},
+		work,
+	)
+
+	gbot.AddRobot(robot)
+
+	gbot.Start()
+}
+```
+
+You can read the [full API documentation online](http://godoc.org/github.com/hybridgroup/gobot).
+
+#### Cross compiling for the Intel Joule
+
+Compile your Gobot program run the following command using the command
+line from the directory where you have your `main.go` file:
+
+```bash
+$ GOARCH=386 GOOS=linux go build .
+```
+
+Then you can simply upload your program over the network from your host computer to the Joule
+
+```bash
+$ scp main root@<IP of your device>:/home/root/blink
+```
+
+and then execute it on your Joule (use screen to connect, see the Intel
+setup steps if you don't recall how to connect)
+
+```bash
+$ ./blink
+```
+
+At this point you should see one of the onboard LEDs blinking. Press control + c
+to exit.
+
+To update the program after you made a change, you will need to scp it
+over once again and start it from the command line (via screen).
