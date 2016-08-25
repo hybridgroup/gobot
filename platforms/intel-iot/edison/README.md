@@ -13,26 +13,25 @@ Then you must install the appropriate Go packages
 
 ## Setting up your Intel Edison
 
-Everything you need to get started with the Edison is in the Intel Getting Started Guide located [here](https://software.intel.com/en-us/iot/library/edison-getting-started).
+Everything you need to get started with the Edison is in the Intel Getting Started Guide:
+
+https://software.intel.com/en-us/iot/library/edison-getting-started
+
 Don't forget to configure your Edison's wifi connection and flash your Edison with the latest firmware image!
 
-If you followed the Edison setup steps you should be all set to access
-your device using its wifi IP. Just in case you were too eager to get
-started, here are the critical parts you can't skip!
+The recommended way to connect to your device is via wifi, for that follow the directions here:
 
-[Connect to your device via USB](https://software.intel.com/en-us/setting-up-serial-terminal-intel-edison-board
-) so you can setup the network.
+https://software.intel.com/en-us/connecting-your-intel-edison-board-using-wifi
 
-The recommended way to connect to your device is via wifi, for that follow the [Intel directions](https://software.intel.com/en-us/connecting-your-intel-edison-board-using-wifi) so you can get your device to connect to your local wifi network and get its IP. If you don't have a wifi network available, the Intel documentation explains how to use another connection type, but note that this guide assumes you are using wifi connection.
+If you don't have a wifi network available, the Intel documentation explains how to use another connection type, but note that this guide assumes you are using wifi connection.
 
-You should get the ip of your edison as a message looking like that:
+You can obtain the IP address of your Edison, by running the floowing command:
 
 ```
-Please connect your laptop or PC to the same network as this device and go to http://10.35.15.185 or http://edison.local in your browser.
+ip addr show | grep inet
 ```
 
-Don't forget to setup the a password for the device otherwise you won't be able to
-connect. From within the screen session:
+Don't forget to setup the a password for the device otherwise you won't be able to connect using SSH. From within the screen session, run the following command:
 
 ```
 configure_edison --password
@@ -107,8 +106,11 @@ setup steps if you don't recall how to connect)
 $ ./blink
 ```
 
-At this point you should see the onboard led blinking. Press control + c
+At this point you should see the onboard LED blinking. Press control + c
 to exit.
 
 To update the program after you made a change, you will need to scp it
 over once again and start it from the command line (via screen).
+
+## License
+Copyright (c) 2014-2016 The Hybrid Group. Licensed under the Apache 2.0 license.
