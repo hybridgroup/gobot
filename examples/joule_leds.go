@@ -22,7 +22,7 @@ func main() {
 		led1.Off()
 		led2.Off()
 		led3.Off()
-		
+
 		gobot.Every(1*time.Second, func() {
 			led0.Toggle()
 		})
