@@ -14,7 +14,6 @@ var (
 
 const motorHatAddress = 0x60
 
-// TODO: consider moving to other file, etc
 const (
 	// Registers
 	_Mode1       = 0x00
@@ -59,7 +58,20 @@ const (
 )
 
 var stepperMicrosteps = 8
-var stepperMicrostepCurve = []int{0, 50, 98, 142, 180, 212, 236, 250, 255}
+var stepperMicrostepCurve []int
+var step2coils = make(map[int][]int32)
+
+func init() {
+	stepperMicrostepCurve = []int{0, 50, 98, 142, 180, 212, 236, 250, 255}
+	step2coils[0] = []int32{1, 0, 0, 0}
+	step2coils[1] = []int32{1, 1, 0, 0}
+	step2coils[2] = []int32{0, 1, 0, 0}
+	step2coils[3] = []int32{0, 1, 1, 0}
+	step2coils[4] = []int32{0, 0, 1, 0}
+	step2coils[5] = []int32{0, 0, 1, 1}
+	step2coils[6] = []int32{0, 0, 0, 1}
+	step2coils[7] = []int32{1, 0, 0, 1}
+}
 
 type adaFruitDCMotor struct {
 	pwmPin, in1Pin, in2Pin byte
@@ -127,37 +139,68 @@ func (a *AdafruitMotorHatDriver) Start() (errs []error) {
 	if err := a.connection.I2cStart(motorHatAddress); err != nil {
 		return []error{err}
 	}
+	if err := a.setAllPWM(0, 0); err != nil {
+		return
+	}
+	reg := byte(_Mode2)
+	val := byte(_Outdrv)
+	if err := a.connection.I2cWrite(motorHatAddress, []byte{reg, val}); err != nil {
+		return
+	}
+	reg = byte(_Mode1)
+	val = byte(_AllCall)
+	if err := a.connection.I2cWrite(motorHatAddress, []byte{reg, val}); err != nil {
+		return
+	}
+	<-time.After(5 * time.Millisecond)
+
+	// Read a byte from the I2C device.  Note: no ability to read from a specified reg?
+	mode1, err := a.connection.I2cRead(motorHatAddress, 1)
+	if err != nil {
+		return
+	}
+	reg = byte(_Mode1)
+	val = mode1[0] & _Sleep
+	if err := a.connection.I2cWrite(motorHatAddress, []byte{reg, val}); err != nil {
+		return
+	}
+	<-time.After(5 * time.Millisecond)
 	return
 }
 
 // Halt returns true if devices is halted successfully
 func (a *AdafruitMotorHatDriver) Halt() (errs []error) { return }
 
-//
 func (a *AdafruitMotorHatDriver) setPWM(pin byte, on, off int32) (err error) {
-	reg := _LedZeroOnL + 4*pin
-	val := byte(on & 0xff)
-	if err = a.connection.I2cWrite(motorHatAddress, []byte{reg, val}); err != nil {
-		return
-	}
-	reg = _LedZeroOnH + 4*pin
-	val = byte(on >> 8)
-	if err = a.connection.I2cWrite(motorHatAddress, []byte{reg, val}); err != nil {
-		return
-	}
-	reg = _LedZeroOffL + 4*pin
-	val = byte(off & 0xff)
-	if err = a.connection.I2cWrite(motorHatAddress, []byte{reg, val}); err != nil {
-		return
-	}
-	reg = _LedZeroOffH + 4*pin
-	val = byte(off >> 8)
-	if err = a.connection.I2cWrite(motorHatAddress, []byte{reg, val}); err != nil {
-		return
+	// register and values to be written to that register
+	regVals := make(map[int][]byte)
+	regVals[0] = []byte{byte(_LedZeroOnL + 4*pin), byte(on & 0xff)}
+	regVals[1] = []byte{byte(_LedZeroOnH + 4*pin), byte(on >> 8)}
+	regVals[2] = []byte{byte(_LedZeroOffL + 4*pin), byte(off & 0xff)}
+	regVals[3] = []byte{byte(_LedZeroOffH + 4*pin), byte(off >> 8)}
+	for i := 0; i < len(regVals); i++ {
+		if err = a.connection.I2cWrite(motorHatAddress, regVals[i]); err != nil {
+			return
+		}
 	}
 	return
 }
 
+// setAllPWM sets all PWM channels
+func (a *AdafruitMotorHatDriver) setAllPWM(on, off int32) (err error) {
+	// register and values to be written to that register
+	regVals := make(map[int][]byte)
+	regVals[0] = []byte{byte(_AllLedOnL), byte(on & 0xff)}
+	regVals[1] = []byte{byte(_AllLedOnH), byte(on >> 8)}
+	regVals[2] = []byte{byte(_AllLedOffL), byte(off & 0xFF)}
+	regVals[3] = []byte{byte(_AllLedOffH), byte(off >> 8)}
+	for i := 0; i < len(regVals); i++ {
+		if err = a.connection.I2cWrite(motorHatAddress, regVals[i]); err != nil {
+			return
+		}
+	}
+	return
+}
 func (a *AdafruitMotorHatDriver) setPin(pin byte, value int32) (err error) {
 	if value == 0 {
 		return a.setPWM(pin, 0, 4096)
@@ -212,7 +255,6 @@ func (a *AdafruitMotorHatDriver) oneStep(motor int, dir AdafruitDirection, style
 
 	// Determine the stepping procedure
 	switch {
-	// TODO: refactor...
 	case style == AdafruitSingle:
 		if (a.stepperMotors[motor].currentStep / (stepperMicrosteps / 2) % 2) != 0 {
 			// we're at an odd step
@@ -290,7 +332,7 @@ func (a *AdafruitMotorHatDriver) oneStep(motor int, dir AdafruitDirection, style
 	if err = a.setPWM(a.stepperMotors[motor].pwmPinB, 0, int32(pwmB*16)); err != nil {
 		return
 	}
-	var coils = []int32{0, 0, 0, 0}
+	var coils []int32
 	currStep := a.stepperMotors[motor].currentStep
 	if style == AdafruitMicrostep {
 		switch {
@@ -304,15 +346,7 @@ func (a *AdafruitMotorHatDriver) oneStep(motor int, dir AdafruitDirection, style
 			coils = []int32{1, 0, 0, 1}
 		}
 	} else {
-		step2coils := make(map[int][]int32)
-		step2coils[0] = []int32{1, 0, 0, 0}
-		step2coils[1] = []int32{1, 1, 0, 0}
-		step2coils[2] = []int32{0, 1, 0, 0}
-		step2coils[3] = []int32{0, 1, 1, 0}
-		step2coils[4] = []int32{0, 0, 1, 0}
-		step2coils[5] = []int32{0, 0, 1, 1}
-		step2coils[6] = []int32{0, 0, 0, 1}
-		step2coils[7] = []int32{1, 0, 0, 1}
+		// step-2-coils is initialized in init()
 		coils = step2coils[(currStep / (stepperMicrosteps / 2))]
 	}
 	if adafruitDebug {
