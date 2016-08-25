@@ -4,9 +4,20 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/gobottest"
+	"github.com/hybridgroup/gobot/platforms/gpio"
+	"github.com/hybridgroup/gobot/platforms/i2c"
 	"github.com/hybridgroup/gobot/sysfs"
 )
+
+var _ gobot.Adaptor = (*JouleAdaptor)(nil)
+
+var _ gpio.DigitalReader = (*JouleAdaptor)(nil)
+var _ gpio.DigitalWriter = (*JouleAdaptor)(nil)
+var _ gpio.PwmWriter = (*JouleAdaptor)(nil)
+
+var _ i2c.I2c = (*JouleAdaptor)(nil)
 
 type NullReadWriteCloser struct {
 	contents []byte

@@ -4,9 +4,21 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/gobottest"
+	"github.com/hybridgroup/gobot/platforms/gpio"
+	"github.com/hybridgroup/gobot/platforms/i2c"
 	"github.com/hybridgroup/gobot/sysfs"
 )
+
+var _ gobot.Adaptor = (*EdisonAdaptor)(nil)
+
+var _ gpio.DigitalReader = (*EdisonAdaptor)(nil)
+var _ gpio.DigitalWriter = (*EdisonAdaptor)(nil)
+var _ gpio.AnalogReader = (*EdisonAdaptor)(nil)
+var _ gpio.PwmWriter = (*EdisonAdaptor)(nil)
+
+var _ i2c.I2c = (*EdisonAdaptor)(nil)
 
 type NullReadWriteCloser struct {
 	contents []byte
@@ -115,6 +127,7 @@ func TestEdisonAdaptor(t *testing.T) {
 	a, _ := initTestEdisonAdaptor()
 	gobottest.Assert(t, a.Name(), "myAdaptor")
 }
+
 func TestEdisonAdaptorConnect(t *testing.T) {
 	a, _ := initTestEdisonAdaptor()
 	gobottest.Assert(t, len(a.Connect()), 0)
