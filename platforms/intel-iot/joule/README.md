@@ -91,6 +91,7 @@ https://software.intel.com/en-us/pin-mapping-for-carrier-board-joule
 
 Of special note are the pins that control the build-in LEDs, which are pins 100 thru 103, as used in the example above.
 
+The i2c interfaces on the Intel Joule developer kit board require that you terminate the SDA & SCL lines using 2 10K resistors pulled up to the voltage used for the i2c device, for example 5V.
 
 ## License
 Copyright (c) 2014-2016 The Hybrid Group. Licensed under the Apache 2.0 license.
