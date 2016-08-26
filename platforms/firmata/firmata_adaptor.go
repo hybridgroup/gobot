@@ -7,20 +7,8 @@ import (
 
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/firmata/client"
-	"github.com/hybridgroup/gobot/platforms/gpio"
-	"github.com/hybridgroup/gobot/platforms/i2c"
 	"github.com/tarm/goserial"
 )
-
-var _ gobot.Adaptor = (*FirmataAdaptor)(nil)
-
-var _ gpio.DigitalReader = (*FirmataAdaptor)(nil)
-var _ gpio.DigitalWriter = (*FirmataAdaptor)(nil)
-var _ gpio.AnalogReader = (*FirmataAdaptor)(nil)
-var _ gpio.PwmWriter = (*FirmataAdaptor)(nil)
-var _ gpio.ServoWriter = (*FirmataAdaptor)(nil)
-
-var _ i2c.I2c = (*FirmataAdaptor)(nil)
 
 type firmataBoard interface {
 	Connect(io.ReadWriteCloser) error

@@ -8,9 +8,6 @@ import (
 
 func initTestBLEClientAdaptor() *BLEClientAdaptor {
 	a := NewBLEClientAdaptor("bot", "D7:99:5A:26:EC:38")
-	// a.connect = func(n *BLEAdaptor) (io.ReadWriteCloser, error) {
-	// 	return &NullReadWriteCloser{}, nil
-	// }
 	return a
 }
 

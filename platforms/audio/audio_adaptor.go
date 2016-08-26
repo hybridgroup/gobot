@@ -7,11 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
-
-	"github.com/hybridgroup/gobot"
 )
-
-var _ gobot.Adaptor = (*AudioAdaptor)(nil)
 
 type AudioAdaptor struct {
 	name string

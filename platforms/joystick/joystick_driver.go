@@ -6,11 +6,9 @@ import (
 	"io/ioutil"
 	"time"
 
-	"github.com/veandco/go-sdl2/sdl"
 	"github.com/hybridgroup/gobot"
+	"github.com/veandco/go-sdl2/sdl"
 )
-
-var _ gobot.Driver = (*JoystickDriver)(nil)
 
 // JoystickDriver represents a joystick
 type JoystickDriver struct {

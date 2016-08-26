@@ -7,8 +7,6 @@ import (
 	"time"
 )
 
-var _ gobot.Driver = (*AudioDriver)(nil)
-
 type AudioDriver struct {
 	name       string
 	connection gobot.Connection

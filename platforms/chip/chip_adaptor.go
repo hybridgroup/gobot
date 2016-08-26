@@ -3,18 +3,8 @@ package chip
 import (
 	"errors"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/gpio"
-	"github.com/hybridgroup/gobot/platforms/i2c"
 	"github.com/hybridgroup/gobot/sysfs"
 )
-
-var _ gobot.Adaptor = (*ChipAdaptor)(nil)
-
-var _ gpio.DigitalReader = (*ChipAdaptor)(nil)
-var _ gpio.DigitalWriter = (*ChipAdaptor)(nil)
-
-var _ i2c.I2c = (*ChipAdaptor)(nil)
 
 type ChipAdaptor struct {
 	name        string

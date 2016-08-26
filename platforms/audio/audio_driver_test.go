@@ -6,8 +6,11 @@ import (
 	"os/exec"
 	"testing"
 
+	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/gobottest"
 )
+
+var _ gobot.Driver = (*AudioDriver)(nil)
 
 func TestAudioDriver(t *testing.T) {
 	d := NewAudioDriver(NewAudioAdaptor("conn"), "dev", "../../examples/laser.mp3")

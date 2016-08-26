@@ -5,8 +5,11 @@ import (
 	"os/exec"
 	"testing"
 
+	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/gobottest"
 )
+
+var _ gobot.Adaptor = (*AudioAdaptor)(nil)
 
 func TestAudioAdaptor(t *testing.T) {
 	a := NewAudioAdaptor("tester")

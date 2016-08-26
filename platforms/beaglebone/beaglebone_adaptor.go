@@ -10,20 +10,8 @@ import (
 	"strings"
 
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/gpio"
-	"github.com/hybridgroup/gobot/platforms/i2c"
 	"github.com/hybridgroup/gobot/sysfs"
 )
-
-var _ gobot.Adaptor = (*BeagleboneAdaptor)(nil)
-
-var _ gpio.DigitalReader = (*BeagleboneAdaptor)(nil)
-var _ gpio.DigitalWriter = (*BeagleboneAdaptor)(nil)
-var _ gpio.AnalogReader = (*BeagleboneAdaptor)(nil)
-var _ gpio.PwmWriter = (*BeagleboneAdaptor)(nil)
-var _ gpio.ServoWriter = (*BeagleboneAdaptor)(nil)
-
-var _ i2c.I2c = (*BeagleboneAdaptor)(nil)
 
 var slots = "/sys/devices/bone_capemgr.*"
 var ocp = "/sys/devices/ocp.*"

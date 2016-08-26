@@ -9,6 +9,8 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
+var _ gobot.Driver = (*JoystickDriver)(nil)
+
 func initTestJoystickDriver() *JoystickDriver {
 	a := NewJoystickAdaptor("bot")
 	a.connect = func(j *JoystickAdaptor) (err error) {
