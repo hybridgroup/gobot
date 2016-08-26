@@ -13,13 +13,16 @@ func adafruitStepperMotorRunner(a *i2c.AdafruitMotorHatDriver, motor int) (err e
 	log.Printf("Stepper Motor Run Loop...\n")
 	// set the speed state:
 	speed := 30 // rpm
+	style := i2c.AdafruitMicrostep
+	steps := 50
+
 	a.SetStepperMotorSpeed(motor, speed)
 
-	if err = a.Step(motor, 100, i2c.AdafruitForward, i2c.AdafruitSingle); err != nil {
+	if err = a.Step(motor, steps, i2c.AdafruitForward, style); err != nil {
 		log.Printf(err.Error())
 		return
 	}
-	if err = a.Step(motor, 100, i2c.AdafruitBackward, i2c.AdafruitSingle); err != nil {
+	if err = a.Step(motor, steps, i2c.AdafruitBackward, style); err != nil {
 		log.Printf(err.Error())
 		return
 	}
