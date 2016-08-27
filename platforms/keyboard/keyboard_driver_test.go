@@ -8,6 +8,8 @@ import (
 	"github.com/hybridgroup/gobot/gobottest"
 )
 
+var _ gobot.Driver = (*KeyboardDriver)(nil)
+
 func initTestKeyboardDriver() *KeyboardDriver {
 	d := NewKeyboardDriver("keyboard")
 	d.connect = func(k *KeyboardDriver) (err error) {

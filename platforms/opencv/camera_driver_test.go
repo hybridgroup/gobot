@@ -8,6 +8,8 @@ import (
 	"github.com/hybridgroup/gobot/gobottest"
 )
 
+var _ gobot.Driver = (*CameraDriver)(nil)
+
 func initTestCameraDriver() *CameraDriver {
 	d := NewCameraDriver("bot", "")
 	d.start = func(c *CameraDriver) (err error) {

@@ -6,8 +6,6 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
-var _ gobot.Driver = (*NeuroskyDriver)(nil)
-
 const BTSync byte = 0xAA
 
 // Extended code

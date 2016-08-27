@@ -11,6 +11,8 @@ import (
 	common "github.com/hybridgroup/gobot/platforms/mavlink/common"
 )
 
+var _ gobot.Driver = (*MavlinkDriver)(nil)
+
 func initTestMavlinkDriver() *MavlinkDriver {
 	m := NewMavlinkAdaptor("myAdaptor", "/dev/null")
 	m.connect = func(port string) (io.ReadWriteCloser, error) { return nil, nil }

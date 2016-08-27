@@ -7,8 +7,6 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
-var _ gobot.Driver = (*KeyboardDriver)(nil)
-
 type KeyboardDriver struct {
 	name    string
 	connect func(*KeyboardDriver) (err error)

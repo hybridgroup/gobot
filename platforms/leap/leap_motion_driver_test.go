@@ -6,8 +6,11 @@ import (
 	"io/ioutil"
 	"testing"
 
+	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/gobottest"
 )
+
+var _ gobot.Driver = (*LeapMotionDriver)(nil)
 
 type NullReadWriteCloser struct{}
 

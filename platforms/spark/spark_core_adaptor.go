@@ -11,15 +11,7 @@ import (
 
 	"github.com/donovanhide/eventsource"
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/gpio"
 )
-
-var _ gobot.Adaptor = (*SparkCoreAdaptor)(nil)
-
-var _ gpio.DigitalReader = (*SparkCoreAdaptor)(nil)
-var _ gpio.DigitalWriter = (*SparkCoreAdaptor)(nil)
-var _ gpio.AnalogReader = (*SparkCoreAdaptor)(nil)
-var _ gpio.PwmWriter = (*SparkCoreAdaptor)(nil)
 
 type SparkCoreAdaptor struct {
 	name        string

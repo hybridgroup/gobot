@@ -1,11 +1,9 @@
 package opencv
 
 import (
-	cv "github.com/lazywei/go-opencv/opencv"
 	"github.com/hybridgroup/gobot"
+	cv "github.com/lazywei/go-opencv/opencv"
 )
-
-var _ gobot.Driver = (*WindowDriver)(nil)
 
 type window interface {
 	ShowImage(*cv.IplImage)

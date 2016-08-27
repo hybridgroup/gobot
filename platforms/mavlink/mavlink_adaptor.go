@@ -3,11 +3,8 @@ package mavlink
 import (
 	"io"
 
-	"github.com/hybridgroup/gobot"
 	"github.com/tarm/goserial"
 )
-
-var _ gobot.Adaptor = (*MavlinkAdaptor)(nil)
 
 type MavlinkAdaptor struct {
 	name    string

@@ -5,8 +5,11 @@ import (
 	"encoding/binary"
 	"testing"
 
+	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/gobottest"
 )
+
+var _ gobot.Driver = (*SpheroDriver)(nil)
 
 func initTestSpheroDriver() *SpheroDriver {
 	a := NewSpheroAdaptor("bot", "/dev/null")

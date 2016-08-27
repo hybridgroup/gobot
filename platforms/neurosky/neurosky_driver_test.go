@@ -11,6 +11,8 @@ import (
 	"github.com/hybridgroup/gobot/gobottest"
 )
 
+var _ gobot.Driver = (*NeuroskyDriver)(nil)
+
 func initTestNeuroskyDriver() *NeuroskyDriver {
 	a := NewNeuroskyAdaptor("bot", "/dev/null")
 	a.connect = func(n *NeuroskyAdaptor) (io.ReadWriteCloser, error) {

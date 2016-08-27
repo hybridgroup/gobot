@@ -5,8 +5,11 @@ import (
 	"io"
 	"testing"
 
+	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/gobottest"
 )
+
+var _ gobot.Adaptor = (*LeapMotionAdaptor)(nil)
 
 func initTestLeapMotionAdaptor() *LeapMotionAdaptor {
 	a := NewLeapMotionAdaptor("bot", "")

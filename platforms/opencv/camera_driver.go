@@ -5,11 +5,9 @@ import (
 
 	"time"
 
-	cv "github.com/lazywei/go-opencv/opencv"
 	"github.com/hybridgroup/gobot"
+	cv "github.com/lazywei/go-opencv/opencv"
 )
-
-var _ gobot.Driver = (*CameraDriver)(nil)
 
 type capture interface {
 	RetrieveFrame(int) *cv.IplImage

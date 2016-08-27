@@ -5,8 +5,11 @@ import (
 	"io"
 	"testing"
 
+	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/gobottest"
 )
+
+var _ gobot.Adaptor = (*NeuroskyAdaptor)(nil)
 
 type NullReadWriteCloser struct{}
 

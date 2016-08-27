@@ -9,8 +9,6 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
-var _ gobot.Driver = (*SpheroDriver)(nil)
-
 const (
 	SensorData = "sensordata"
 	Collision  = "collision"

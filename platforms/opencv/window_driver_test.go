@@ -10,6 +10,8 @@ import (
 	cv "github.com/lazywei/go-opencv/opencv"
 )
 
+var _ gobot.Driver = (*WindowDriver)(nil)
+
 func initTestWindowDriver() *WindowDriver {
 	d := NewWindowDriver("bot")
 	return d

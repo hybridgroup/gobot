@@ -3,11 +3,8 @@ package sphero
 import (
 	"io"
 
-	"github.com/hybridgroup/gobot"
 	"github.com/tarm/goserial"
 )
-
-var _ gobot.Adaptor = (*SpheroAdaptor)(nil)
 
 // Represents a Connection to a Sphero
 type SpheroAdaptor struct {

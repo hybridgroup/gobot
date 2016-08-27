@@ -8,8 +8,6 @@ import (
 	"golang.org/x/net/websocket"
 )
 
-var _ gobot.Driver = (*LeapMotionDriver)(nil)
-
 type LeapMotionDriver struct {
 	name       string
 	connection gobot.Connection

@@ -3,11 +3,8 @@ package neurosky
 import (
 	"io"
 
-	"github.com/hybridgroup/gobot"
 	"github.com/tarm/goserial"
 )
-
-var _ gobot.Adaptor = (*NeuroskyAdaptor)(nil)
 
 type NeuroskyAdaptor struct {
 	name    string

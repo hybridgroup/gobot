@@ -7,8 +7,6 @@ import (
 	common "github.com/hybridgroup/gobot/platforms/mavlink/common"
 )
 
-var _ gobot.Driver = (*MavlinkDriver)(nil)
-
 type MavlinkDriver struct {
 	name       string
 	connection gobot.Connection
