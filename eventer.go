@@ -26,6 +26,10 @@ type Eventer interface {
 	Publish(name string, data interface{})
 	// Subscribe to any events from this eventer
 	Subscribe() (events eventChannel)
+	// Event handler
+	On(name string, f func(s interface{})) (err error)
+	// Event handler, only exectues one time
+	Once(name string, f func(s interface{})) (err error)
 }
 
 // NewEventer returns a new Eventer.

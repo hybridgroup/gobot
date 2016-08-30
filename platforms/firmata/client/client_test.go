@@ -174,7 +174,7 @@ func TestProcess(t *testing.T) {
 
 	for _, test := range tests {
 		test.init()
-		gobot.Once(b.Event(test.event), func(data interface{}) {
+		b.Once(b.Event(test.event), func(data interface{}) {
 			gobottest.Assert(t, data, test.expected)
 			sem <- true
 		})
@@ -202,19 +202,19 @@ func TestConnect(t *testing.T) {
 		}
 	}()
 
-	gobot.Once(b.Event("ProtocolVersion"), func(data interface{}) {
+	b.Once(b.Event("ProtocolVersion"), func(data interface{}) {
 		response = testFirmwareResponse()
 	})
 
-	gobot.Once(b.Event("FirmwareQuery"), func(data interface{}) {
+	b.Once(b.Event("FirmwareQuery"), func(data interface{}) {
 		response = testCapabilitiesResponse()
 	})
 
-	gobot.Once(b.Event("CapabilityQuery"), func(data interface{}) {
+	b.Once(b.Event("CapabilityQuery"), func(data interface{}) {
 		response = testAnalogMappingResponse()
 	})
 
-	gobot.Once(b.Event("AnalogMappingQuery"), func(data interface{}) {
+	b.Once(b.Event("AnalogMappingQuery"), func(data interface{}) {
 		response = testProtocolResponse()
 	})
 
