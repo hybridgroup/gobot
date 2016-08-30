@@ -72,20 +72,20 @@ func (h *MPL115A2Driver) Start() (errs []error) {
 	go func() {
 		for {
 			if err := h.connection.I2cWrite(mpl115a2Address, []byte{MPL115A2_REGISTER_STARTCONVERSION, 0}); err != nil {
-				gobot.Publish(h.Event(Error), err)
+				h.Publish(h.Event(Error), err)
 				continue
 
 			}
 			<-time.After(5 * time.Millisecond)
 
 			if err := h.connection.I2cWrite(mpl115a2Address, []byte{MPL115A2_REGISTER_PRESSURE_MSB}); err != nil {
-				gobot.Publish(h.Event(Error), err)
+				h.Publish(h.Event(Error), err)
 				continue
 			}
 
 			ret, err := h.connection.I2cRead(mpl115a2Address, 4)
 			if err != nil {
-				gobot.Publish(h.Event(Error), err)
+				h.Publish(h.Event(Error), err)
 				continue
 			}
 			if len(ret) == 4 {

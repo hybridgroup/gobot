@@ -74,13 +74,13 @@ func (h *MPU6050Driver) Start() (errs []error) {
 	go func() {
 		for {
 			if err := h.connection.I2cWrite(mpu6050Address, []byte{MPU6050_RA_ACCEL_XOUT_H}); err != nil {
-				gobot.Publish(h.Event(Error), err)
+				h.Publish(h.Event(Error), err)
 				continue
 			}
 
 			ret, err := h.connection.I2cRead(mpu6050Address, 14)
 			if err != nil {
-				gobot.Publish(h.Event(Error), err)
+				h.Publish(h.Event(Error), err)
 				continue
 			}
 			buf := bytes.NewBuffer(ret)
@@ -111,12 +111,12 @@ func (h *MPU6050Driver) initialize() (err error) {
 	}
 
 	// setFullScaleGyroRange
-  if err = h.connection.I2cWrite(mpu6050Address, []byte{MPU6050_RA_GYRO_CONFIG,
-    MPU6050_GCONFIG_FS_SEL_BIT,
-    MPU6050_GCONFIG_FS_SEL_LENGTH,
-    MPU6050_GYRO_FS_250}); err != nil {
-    return
-  }
+	if err = h.connection.I2cWrite(mpu6050Address, []byte{MPU6050_RA_GYRO_CONFIG,
+		MPU6050_GCONFIG_FS_SEL_BIT,
+		MPU6050_GCONFIG_FS_SEL_LENGTH,
+		MPU6050_GYRO_FS_250}); err != nil {
+		return
+	}
 
 	// setFullScaleAccelRange
 	if err = h.connection.I2cWrite(mpu6050Address, []byte{MPU6050_RA_ACCEL_CONFIG,

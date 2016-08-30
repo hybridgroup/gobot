@@ -143,19 +143,19 @@ func (b *Client) Connect(conn io.ReadWriteCloser) (err error) {
 
 	initFunc := b.ProtocolVersionQuery
 
-	gobot.Once(b.Event("ProtocolVersion"), func(data interface{}) {
+	b.Once(b.Event("ProtocolVersion"), func(data interface{}) {
 		initFunc = b.FirmwareQuery
 	})
 
-	gobot.Once(b.Event("FirmwareQuery"), func(data interface{}) {
+	b.Once(b.Event("FirmwareQuery"), func(data interface{}) {
 		initFunc = b.CapabilitiesQuery
 	})
 
-	gobot.Once(b.Event("CapabilityQuery"), func(data interface{}) {
+	b.Once(b.Event("CapabilityQuery"), func(data interface{}) {
 		initFunc = b.AnalogMappingQuery
 	})
 
-	gobot.Once(b.Event("AnalogMappingQuery"), func(data interface{}) {
+	b.Once(b.Event("AnalogMappingQuery"), func(data interface{}) {
 		initFunc = func() error { return nil }
 		b.ReportDigital(0, 1)
 		b.ReportDigital(1, 1)
@@ -177,7 +177,7 @@ func (b *Client) Connect(conn io.ReadWriteCloser) (err error) {
 					}
 
 					if err := b.process(); err != nil {
-						gobot.Publish(b.Event("Error"), err)
+						b.Publish(b.Event("Error"), err)
 					}
 				}
 			}()
@@ -343,7 +343,7 @@ func (b *Client) process() (err error) {
 	case ProtocolVersion == messageType:
 		b.ProtocolVersion = fmt.Sprintf("%v.%v", buf[1], buf[2])
 
-		gobot.Publish(b.Event("ProtocolVersion"), b.ProtocolVersion)
+		b.Publish(b.Event("ProtocolVersion"), b.ProtocolVersion)
 	case AnalogMessageRangeStart <= messageType &&
 		AnalogMessageRangeEnd >= messageType:
 
@@ -353,7 +353,7 @@ func (b *Client) process() (err error) {
 		if len(b.analogPins) > pin {
 			if len(b.pins) > b.analogPins[pin] {
 				b.pins[b.analogPins[pin]].Value = int(value)
-				gobot.Publish(b.Event(fmt.Sprintf("AnalogRead%v", pin)), b.pins[b.analogPins[pin]].Value)
+				b.Publish(b.Event(fmt.Sprintf("AnalogRead%v", pin)), b.pins[b.analogPins[pin]].Value)
 			}
 		}
 	case DigitalMessageRangeStart <= messageType &&
@@ -367,7 +367,7 @@ func (b *Client) process() (err error) {
 			if len(b.pins) > pinNumber {
 				if b.pins[pinNumber].Mode == Input {
 					b.pins[pinNumber].Value = int((portValue >> (byte(i) & 0x07)) & 0x01)
-					gobot.Publish(b.Event(fmt.Sprintf("DigitalRead%v", pinNumber)), b.pins[pinNumber].Value)
+					b.Publish(b.Event(fmt.Sprintf("DigitalRead%v", pinNumber)), b.pins[pinNumber].Value)
 				}
 			}
 		}
@@ -412,7 +412,7 @@ func (b *Client) process() (err error) {
 				}
 				n ^= 1
 			}
-			gobot.Publish(b.Event("CapabilityQuery"), nil)
+			b.Publish(b.Event("CapabilityQuery"), nil)
 		case AnalogMappingResponse:
 			pinIndex := 0
 			b.analogPins = []int{}
@@ -427,7 +427,7 @@ func (b *Client) process() (err error) {
 				b.AddEvent(fmt.Sprintf("AnalogRead%v", pinIndex))
 				pinIndex++
 			}
-			gobot.Publish(b.Event("AnalogMappingQuery"), nil)
+			b.Publish(b.Event("AnalogMappingQuery"), nil)
 		case PinStateResponse:
 			pin := currentBuffer[2]
 			b.pins[pin].Mode = int(currentBuffer[3])
@@ -440,7 +440,7 @@ func (b *Client) process() (err error) {
 				b.pins[pin].State = int(uint(b.pins[pin].State) | uint(currentBuffer[6])<<14)
 			}
 
-			gobot.Publish(b.Event(fmt.Sprintf("PinState%v", pin)), b.pins[pin])
+			b.Publish(b.Event(fmt.Sprintf("PinState%v", pin)), b.pins[pin])
 		case I2CReply:
 			reply := I2cReply{
 				Address:  int(byte(currentBuffer[2]) | byte(currentBuffer[3])<<7),
@@ -458,7 +458,7 @@ func (b *Client) process() (err error) {
 					byte(currentBuffer[i])|byte(currentBuffer[i+1])<<7,
 				)
 			}
-			gobot.Publish(b.Event("I2cReply"), reply)
+			b.Publish(b.Event("I2cReply"), reply)
 		case FirmwareQuery:
 			name := []byte{}
 			for _, val := range currentBuffer[4:(len(currentBuffer) - 1)] {
@@ -467,10 +467,10 @@ func (b *Client) process() (err error) {
 				}
 			}
 			b.FirmwareName = string(name[:])
-			gobot.Publish(b.Event("FirmwareQuery"), b.FirmwareName)
+			b.Publish(b.Event("FirmwareQuery"), b.FirmwareName)
 		case StringData:
 			str := currentBuffer[2:]
-			gobot.Publish(b.Event("StringData"), string(str[:len(str)-1]))
+			b.Publish(b.Event("StringData"), string(str[:len(str)-1]))
 		}
 	}
 	return
