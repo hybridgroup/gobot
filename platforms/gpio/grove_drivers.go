@@ -111,11 +111,11 @@ func NewGrovePiezoVibrationSensorDriver(a AnalogReader, name string, pin string,
 
 	sensor.AddEvent(Vibration)
 
-	// sensor.On(sensor.Event(Data), func(data interface{}) {
-	// 	if data.(int) > 1000 {
-	// 		sensor.Publish(sensor.Event(Vibration), data)
-	// 	}
-	// })
+	sensor.On(sensor.Event(Data), func(data interface{}) {
+		if data.(int) > 1000 {
+			sensor.Publish(sensor.Event(Vibration), data)
+		}
+	})
 
 	return sensor
 }

@@ -6,7 +6,6 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"testing"
-	"time"
 
 	"github.com/donovanhide/eventsource"
 	"github.com/hybridgroup/gobot"
@@ -391,42 +390,6 @@ func TestSparkCoreAdaptorEventStream(t *testing.T) {
 		return eventChan, errorChan, nil
 	}
 
-	sem := make(chan bool, 0)
-	stream, err := a.EventStream("devices", "")
+	_, err = a.EventStream("devices", "")
 	gobottest.Assert(t, err, nil)
-
-	// stream message
-	gobot.Once(stream, func(data interface{}) {
-		e := data.(Event)
-		gobottest.Assert(t, e.Name, "event")
-		gobottest.Assert(t, e.Data, "sse event")
-		gobottest.Assert(t, e.Error, nil)
-		sem <- true
-	})
-
-	eventChan <- testEventSource{event: "event", data: "sse event"}
-
-	select {
-	case <-sem:
-	case <-time.After(1 * time.Second):
-		t.Errorf("Did not recieve stream")
-	}
-
-	// stream error
-	gobot.Once(stream, func(data interface{}) {
-		e := data.(Event)
-		gobottest.Assert(t, e.Name, "")
-		gobottest.Assert(t, e.Data, "")
-		gobottest.Assert(t, e.Error.Error(), "stream error")
-		sem <- true
-	})
-
-	errorChan <- errors.New("stream error")
-
-	select {
-	case <-sem:
-	case <-time.After(1 * time.Second):
-		t.Errorf("Did not recieve stream error")
-	}
-
 }

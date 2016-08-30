@@ -48,7 +48,7 @@ func (a *ArdroneDriver) Halt() (errs []error) {
 
 // TakeOff makes the drone start flying, and publishes `flying` event
 func (a *ArdroneDriver) TakeOff() {
-	gobot.Publish(a.Event("flying"), a.adaptor().drone.Takeoff())
+	a.Publish(a.Event("flying"), a.adaptor().drone.Takeoff())
 }
 
 // Land causes the drone to land

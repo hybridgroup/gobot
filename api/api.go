@@ -237,10 +237,13 @@ func (a *API) robotDeviceEvent(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Cache-Control", "no-cache")
 	res.Header().Set("Connection", "keep-alive")
 
+	device := a.gobot.Robot(req.URL.Query().Get(":robot")).
+		Device(req.URL.Query().Get(":device"))
+
 	if event := a.gobot.Robot(req.URL.Query().Get(":robot")).
 		Device(req.URL.Query().Get(":device")).(gobot.Eventer).
-		Event(req.URL.Query().Get(":event")); event != nil {
-		gobot.On(event, func(data interface{}) {
+		Event(req.URL.Query().Get(":event")); len(event) > 0 {
+		device.(gobot.Eventer).On(event, func(data interface{}) {
 			d, _ := json.Marshal(data)
 			dataChan <- string(d)
 		})

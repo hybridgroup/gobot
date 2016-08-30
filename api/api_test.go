@@ -386,7 +386,8 @@ func TestRobotDeviceEvent(t *testing.T) {
 
 	go func() {
 		time.Sleep(time.Millisecond * 5)
-		gobot.Publish(event, "event-data")
+		a.gobot.Robot("Robot1").
+			Device("Device1").(gobot.Eventer).Publish(event, "event-data")
 	}()
 
 	done := false

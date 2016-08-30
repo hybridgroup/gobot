@@ -157,7 +157,7 @@ func (s *SpheroDriver) Start() (errs []error) {
 			packet := <-s.packetChannel
 			err := s.write(packet)
 			if err != nil {
-				gobot.Publish(s.Event(Error), err)
+				s.Publish(s.Event(Error), err)
 			}
 		}
 	}()
@@ -315,7 +315,7 @@ func (s *SpheroDriver) handleCollisionDetected(data []uint8) {
 	var collision CollisionPacket
 	buffer := bytes.NewBuffer(data[5:]) // skip header
 	binary.Read(buffer, binary.BigEndian, &collision)
-	gobot.Publish(s.Event(Collision), collision)
+	s.Publish(s.Event(Collision), collision)
 }
 
 func (s *SpheroDriver) handleDataStreaming(data []uint8) {
@@ -326,7 +326,7 @@ func (s *SpheroDriver) handleDataStreaming(data []uint8) {
 	var dataPacket DataStreamingPacket
 	buffer := bytes.NewBuffer(data[5:]) // skip header
 	binary.Read(buffer, binary.BigEndian, &dataPacket)
-	gobot.Publish(s.Event(SensorData), dataPacket)
+	s.Publish(s.Event(SensorData), dataPacket)
 }
 
 func (s *SpheroDriver) getSyncResponse(packet *packet) []byte {

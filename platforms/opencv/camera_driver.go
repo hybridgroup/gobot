@@ -67,7 +67,7 @@ func (c *CameraDriver) Start() (errs []error) {
 			if c.camera.GrabFrame() {
 				image := c.camera.RetrieveFrame(1)
 				if image != nil {
-					gobot.Publish(c.Event("frame"), image)
+					c.Publish(c.Event("frame"), image)
 				}
 			}
 			<-time.After(c.interval)

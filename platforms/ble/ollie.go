@@ -72,7 +72,7 @@ func (s *SpheroOllieDriver) Start() (errs []error) {
 			packet := <-s.packetChannel
 			err := s.write(packet)
 			if err != nil {
-				gobot.Publish(s.Event(Error), err)
+				s.Publish(s.Event(Error), err)
 			}
 		}
 	}()

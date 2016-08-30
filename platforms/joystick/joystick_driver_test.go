@@ -46,7 +46,7 @@ func TestJoystickDriverHandleEvent(t *testing.T) {
 	d.Start()
 
 	// left x stick
-	gobot.On(d.Event("left_x"), func(data interface{}) {
+	d.On(d.Event("left_x"), func(data interface{}) {
 		gobottest.Assert(t, int16(100), data.(int16))
 		sem <- true
 	})
@@ -62,7 +62,7 @@ func TestJoystickDriverHandleEvent(t *testing.T) {
 	}
 
 	// x button press
-	gobot.On(d.Event("x_press"), func(data interface{}) {
+	d.On(d.Event("x_press"), func(data interface{}) {
 		sem <- true
 	})
 	d.handleEvent(&sdl.JoyButtonEvent{
@@ -77,7 +77,7 @@ func TestJoystickDriverHandleEvent(t *testing.T) {
 	}
 
 	// x button  release
-	gobot.On(d.Event("x_release"), func(data interface{}) {
+	d.On(d.Event("x_release"), func(data interface{}) {
 		sem <- true
 	})
 	d.handleEvent(&sdl.JoyButtonEvent{
@@ -92,7 +92,7 @@ func TestJoystickDriverHandleEvent(t *testing.T) {
 	}
 
 	// down button press
-	gobot.On(d.Event("down"), func(data interface{}) {
+	d.On(d.Event("down"), func(data interface{}) {
 		sem <- true
 	})
 	d.handleEvent(&sdl.JoyHatEvent{
