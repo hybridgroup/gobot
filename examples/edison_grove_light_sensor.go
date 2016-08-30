@@ -15,7 +15,7 @@ func main() {
 	sensor := gpio.NewGroveLightSensorDriver(board, "sensor", "0")
 
 	work := func() {
-		gobot.On(sensor.Event("data"), func(data interface{}) {
+		sensor.On(sensor.Event("data"), func(data interface{}) {
 			fmt.Println("sensor", data)
 		})
 	}

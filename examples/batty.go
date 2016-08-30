@@ -93,6 +93,6 @@ func NewPingDriver(adaptor *loopbackAdaptor, name string, pin string) *pingDrive
 }
 
 func (t *pingDriver) Ping() string {
-	gobot.Publish(t.Event("ping"), "ping")
+	t.Publish(t.Event("ping"), "ping")
 	return "pong"
 }

@@ -16,9 +16,10 @@ func main() {
 		if stream, err := sparkCore.EventStream("all", ""); err != nil {
 			fmt.Println(err)
 		} else {
-			gobot.On(stream, func(data interface{}) {
-				fmt.Println(data.(spark.Event))
-			})
+			// TODO: some other way to handle this
+			// gobot.On(stream, func(data interface{}) {
+			// 	fmt.Println(data.(spark.Event))
+			// })
 		}
 	}
 

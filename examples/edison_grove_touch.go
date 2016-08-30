@@ -15,11 +15,11 @@ func main() {
 	touch := gpio.NewGroveTouchDriver(e, "touch", "2")
 
 	work := func() {
-		gobot.On(touch.Event(gpio.Push), func(data interface{}) {
+		touch.On(touch.Event(gpio.Push), func(data interface{}) {
 			fmt.Println("On!")
 		})
 
-		gobot.On(touch.Event(gpio.Release), func(data interface{}) {
+		touch.On(touch.Event(gpio.Release), func(data interface{}) {
 			fmt.Println("Off!")
 		})
 

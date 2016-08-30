@@ -13,7 +13,7 @@ func main() {
 	camera := opencv.NewCameraDriver("camera", 0)
 
 	work := func() {
-		gobot.On(camera.Event("frame"), func(data interface{}) {
+		camera.On(camera.Event("frame"), func(data interface{}) {
 			window.ShowImage(data.(*cv.IplImage))
 		})
 	}

@@ -48,11 +48,11 @@ func main() {
 			}
 		})
 
-		gobot.On(button.Event("push"), func(data interface{}) {
+		button.On(button.Event("push"), func(data interface{}) {
 			flash = true
 		})
 
-		gobot.On(button.Event("release"), func(data interface{}) {
+		button.On(button.Event("release"), func(data interface{}) {
 			flash = false
 			red.Brightness(0x00)
 			green.Brightness(0x00)

@@ -14,25 +14,25 @@ func main() {
 	neuro := neurosky.NewNeuroskyDriver(adaptor, "neuro")
 
 	work := func() {
-		gobot.On(neuro.Event("extended"), func(data interface{}) {
+		neuro.On(neuro.Event("extended"), func(data interface{}) {
 			fmt.Println("Extended", data)
 		})
-		gobot.On(neuro.Event("signal"), func(data interface{}) {
+		neuro.On(neuro.Event("signal"), func(data interface{}) {
 			fmt.Println("Signal", data)
 		})
-		gobot.On(neuro.Event("attention"), func(data interface{}) {
+		neuro.On(neuro.Event("attention"), func(data interface{}) {
 			fmt.Println("Attention", data)
 		})
-		gobot.On(neuro.Event("meditation"), func(data interface{}) {
+		neuro.On(neuro.Event("meditation"), func(data interface{}) {
 			fmt.Println("Meditation", data)
 		})
-		gobot.On(neuro.Event("blink"), func(data interface{}) {
+		neuro.On(neuro.Event("blink"), func(data interface{}) {
 			fmt.Println("Blink", data)
 		})
-		gobot.On(neuro.Event("wave"), func(data interface{}) {
+		neuro.On(neuro.Event("wave"), func(data interface{}) {
 			fmt.Println("Wave", data)
 		})
-		gobot.On(neuro.Event("eeg"), func(data interface{}) {
+		neuro.On(neuro.Event("eeg"), func(data interface{}) {
 			eeg := data.(neurosky.EEG)
 			fmt.Println("Delta", eeg.Delta)
 			fmt.Println("Theta", eeg.Theta)
