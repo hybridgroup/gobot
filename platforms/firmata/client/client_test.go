@@ -99,93 +99,182 @@ func TestQueryPinState(t *testing.T) {
 	b.PinStateQuery(1)
 }
 
-func TestProcess(t *testing.T) {
+func TestProcessProtocolVersion(t *testing.T) {
 	sem := make(chan bool)
 	b := initTestFirmata()
+	testReadData = []byte{249, 2, 3}
 
-	tests := []struct {
-		event    string
-		data     []byte
-		expected interface{}
-		init     func()
-	}{
-		{
-			event:    "ProtocolVersion",
-			data:     []byte{249, 2, 3},
-			expected: "2.3",
-			init:     func() {},
-		},
-		{
-			event:    "AnalogRead0",
-			data:     []byte{0xE0, 0x23, 0x05},
-			expected: 675,
-			init:     func() {},
-		},
-		{
-			event:    "AnalogRead1",
-			data:     []byte{0xE1, 0x23, 0x06},
-			expected: 803,
-			init:     func() {},
-		},
-		{
-			event:    "DigitalRead2",
-			data:     []byte{0x90, 0x04, 0x00},
-			expected: 1,
-			init:     func() { b.pins[2].Mode = Input },
-		},
-		{
-			event:    "DigitalRead4",
-			data:     []byte{0x90, 0x16, 0x00},
-			expected: 1,
-			init:     func() { b.pins[4].Mode = Input },
-		},
-		{
-			event:    "PinState13",
-			data:     []byte{240, 110, 13, 1, 1, 247},
-			expected: Pin{[]int{0, 1, 4}, 1, 0, 1, 127},
-			init:     func() {},
-		},
-		{
-			event: "I2cReply",
-			data:  []byte{240, 119, 9, 0, 0, 0, 24, 1, 1, 0, 26, 1, 247},
-			expected: I2cReply{
-				Address:  9,
-				Register: 0,
-				Data:     []byte{152, 1, 154},
-			},
-			init: func() {},
-		},
-		{
-			event: "FirmwareQuery",
-			data: []byte{240, 121, 2, 3, 83, 0, 116, 0, 97, 0, 110, 0, 100, 0, 97,
-				0, 114, 0, 100, 0, 70, 0, 105, 0, 114, 0, 109, 0, 97, 0, 116, 0, 97, 0, 46,
-				0, 105, 0, 110, 0, 111, 0, 247},
-			expected: "StandardFirmata.ino",
-			init:     func() {},
-		},
-		{
-			event:    "StringData",
-			data:     append([]byte{240, 0x71}, append([]byte("Hello Firmata!"), 247)...),
-			expected: "Hello Firmata!",
-			init:     func() {},
-		},
+	b.Once(b.Event("ProtocolVersion"), func(data interface{}) {
+		gobottest.Assert(t, data, "2.3")
+		sem <- true
+	})
+
+	go b.process()
+
+	select {
+	case <-sem:
+	case <-time.After(10 * time.Millisecond):
+		t.Errorf("ProtocolVersion was not published")
 	}
+}
 
-	for _, test := range tests {
-		test.init()
-		b.Once(b.Event(test.event), func(data interface{}) {
-			gobottest.Assert(t, data, test.expected)
-			sem <- true
-		})
+func TestProcessAnalogRead0(t *testing.T) {
+	sem := make(chan bool)
+	b := initTestFirmata()
+	testReadData = []byte{0xE0, 0x23, 0x05}
 
-		testReadData = test.data
-		go b.process()
+	b.Once(b.Event("AnalogRead0"), func(data interface{}) {
+		gobottest.Assert(t, data, 675)
+		sem <- true
+	})
 
-		select {
-		case <-sem:
-		case <-time.After(10 * time.Millisecond):
-			t.Errorf("%v was not published", test.event)
-		}
+	go b.process()
+
+	select {
+	case <-sem:
+	case <-time.After(10 * time.Millisecond):
+		t.Errorf("AnalogRead0 was not published")
+	}
+}
+
+func TestProcessAnalogRead1(t *testing.T) {
+	sem := make(chan bool)
+	b := initTestFirmata()
+	testReadData = []byte{0xE1, 0x23, 0x06}
+
+	b.Once(b.Event("AnalogRead1"), func(data interface{}) {
+		gobottest.Assert(t, data, 803)
+		sem <- true
+	})
+
+	go b.process()
+
+	select {
+	case <-sem:
+	case <-time.After(10 * time.Millisecond):
+		t.Errorf("AnalogRead1 was not published")
+	}
+}
+
+func TestProcessDigitalRead2(t *testing.T) {
+	sem := make(chan bool)
+	b := initTestFirmata()
+	b.pins[2].Mode = Input
+	testReadData = []byte{0x90, 0x04, 0x00}
+
+	b.Once(b.Event("DigitalRead2"), func(data interface{}) {
+		gobottest.Assert(t, data, 1)
+		sem <- true
+	})
+
+	go b.process()
+
+	select {
+	case <-sem:
+	case <-time.After(10 * time.Millisecond):
+		t.Errorf("DigitalRead2 was not published")
+	}
+}
+
+func TestProcessDigitalRead4(t *testing.T) {
+	sem := make(chan bool)
+	b := initTestFirmata()
+	b.pins[4].Mode = Input
+	testReadData = []byte{0x90, 0x16, 0x00}
+
+	b.Once(b.Event("DigitalRead4"), func(data interface{}) {
+		gobottest.Assert(t, data, 1)
+		sem <- true
+	})
+
+	go b.process()
+
+	select {
+	case <-sem:
+	case <-time.After(10 * time.Millisecond):
+		t.Errorf("DigitalRead4 was not published")
+	}
+}
+
+func TestProcessPinState13(t *testing.T) {
+	sem := make(chan bool)
+	b := initTestFirmata()
+	testReadData = []byte{240, 110, 13, 1, 1, 247}
+
+	b.Once(b.Event("PinState13"), func(data interface{}) {
+		gobottest.Assert(t, data, Pin{[]int{0, 1, 4}, 1, 0, 1, 127})
+		sem <- true
+	})
+
+	go b.process()
+
+	select {
+	case <-sem:
+	case <-time.After(10 * time.Millisecond):
+		t.Errorf("PinState13 was not published")
+	}
+}
+
+func TestProcessI2cReply(t *testing.T) {
+	sem := make(chan bool)
+	b := initTestFirmata()
+	testReadData = []byte{240, 119, 9, 0, 0, 0, 24, 1, 1, 0, 26, 1, 247}
+
+	b.Once(b.Event("I2cReply"), func(data interface{}) {
+		gobottest.Assert(t, data, I2cReply{
+						Address:  9,
+						Register: 0,
+						Data:     []byte{152, 1, 154},
+					})
+		sem <- true
+	})
+
+	go b.process()
+
+	select {
+	case <-sem:
+	case <-time.After(10 * time.Millisecond):
+		t.Errorf("I2cReply was not published")
+	}
+}
+
+func TestProcessFirmwareQuery(t *testing.T) {
+	sem := make(chan bool)
+	b := initTestFirmata()
+	testReadData = []byte{240, 121, 2, 3, 83, 0, 116, 0, 97, 0, 110, 0, 100, 0, 97,
+					0, 114, 0, 100, 0, 70, 0, 105, 0, 114, 0, 109, 0, 97, 0, 116, 0, 97, 0, 46,
+					0, 105, 0, 110, 0, 111, 0, 247}
+
+	b.Once(b.Event("FirmwareQuery"), func(data interface{}) {
+		gobottest.Assert(t, data, "StandardFirmata.ino")
+		sem <- true
+	})
+
+	go b.process()
+
+	select {
+	case <-sem:
+	case <-time.After(10 * time.Millisecond):
+		t.Errorf("FirmwareQuery was not published")
+	}
+}
+
+func TestProcessStringData(t *testing.T) {
+	sem := make(chan bool)
+	b := initTestFirmata()
+	testReadData = append([]byte{240, 0x71}, append([]byte("Hello Firmata!"), 247)...)
+
+	b.Once(b.Event("StringData"), func(data interface{}) {
+		gobottest.Assert(t, data, "Hello Firmata!")
+		sem <- true
+	})
+
+	go b.process()
+
+	select {
+	case <-sem:
+	case <-time.After(10 * time.Millisecond):
+		t.Errorf("StringData was not published")
 	}
 }
 
