@@ -51,33 +51,6 @@ func After(t time.Duration, f func()) {
 	time.AfterFunc(t, f)
 }
 
-// Publish emits val to all subscribers of e. Returns ErrUnknownEvent if Event
-// does not exist.
-func Publish(e *Event, val interface{}) (err error) {
-	if err = eventError(e); err == nil {
-		e.Write(val)
-	}
-	return
-}
-
-// On executes f when e is Published to. Returns ErrUnknownEvent if Event
-// does not exist.
-func On(e *Event, f func(s interface{})) (err error) {
-	if err = eventError(e); err == nil {
-		e.Callbacks = append(e.Callbacks, callback{f, false})
-	}
-	return
-}
-
-// Once is similar to On except that it only executes f one time. Returns
-//ErrUnknownEvent if Event does not exist.
-func Once(e *Event, f func(s interface{})) (err error) {
-	if err = eventError(e); err == nil {
-		e.Callbacks = append(e.Callbacks, callback{f, true})
-	}
-	return
-}
-
 // Rand returns a positive random int up to max
 func Rand(max int) int {
 	i, _ := rand.Int(rand.Reader, big.NewInt(int64(max)))

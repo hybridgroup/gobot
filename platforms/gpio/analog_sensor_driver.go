@@ -63,10 +63,10 @@ func (a *AnalogSensorDriver) Start() (errs []error) {
 		for {
 			newValue, err := a.Read()
 			if err != nil {
-				gobot.Publish(a.Event(Error), err)
+				a.Publish(a.Event(Error), err)
 			} else if newValue != value && newValue != -1 {
 				value = newValue
-				gobot.Publish(a.Event(Data), value)
+				a.Publish(a.Event(Data), value)
 			}
 			select {
 			case <-time.After(a.interval):
