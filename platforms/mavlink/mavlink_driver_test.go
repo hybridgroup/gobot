@@ -1,7 +1,6 @@
 package mavlink
 
 import (
-	"errors"
 	"io"
 	"testing"
 	"time"
@@ -32,25 +31,24 @@ func TestMavlinkDriver(t *testing.T) {
 
 	d = NewMavlinkDriver(m, "myDriver", 100*time.Millisecond)
 	gobottest.Assert(t, d.interval, 100*time.Millisecond)
-
 }
+
 func TestMavlinkDriverStart(t *testing.T) {
 	d := initTestMavlinkDriver()
 	err := make(chan error, 0)
 	packet := make(chan *common.MAVLinkPacket, 0)
 	message := make(chan common.MAVLinkMessage, 0)
 
-	gobot.Once(d.Event("packet"), func(data interface{}) {
+	d.Once(d.Event("packet"), func(data interface{}) {
 		packet <- data.(*common.MAVLinkPacket)
 	})
-
-	gobot.Once(d.Event("message"), func(data interface{}) {
+	d.Once(d.Event("message"), func(data interface{}) {
 		message <- data.(common.MAVLinkMessage)
 	})
-	gobot.Once(d.Event("errorIO"), func(data interface{}) {
+	d.Once(d.Event("errorIO"), func(data interface{}) {
 		err <- data.(error)
 	})
-	gobot.Once(d.Event("errorMAVLink"), func(data interface{}) {
+	d.Once(d.Event("errorMAVLink"), func(data interface{}) {
 		err <- data.(error)
 	})
 
@@ -73,15 +71,6 @@ func TestMavlinkDriverStart(t *testing.T) {
 	case <-time.After(100 * time.Millisecond):
 		t.Errorf("error was not emitted")
 	}
-
-	payload = []byte{0xFE, 0x09, 0x4E, 0x01, 0x01, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x03, 0x51, 0x04, 0x03, 0x1C, 0x7F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
-	select {
-	case e := <-err:
-		gobottest.Assert(t, e, errors.New("Unknown Message ID: 255"))
-	case <-time.After(100 * time.Millisecond):
-		t.Errorf("error was not emitted")
-	}
-
 }
 
 func TestMavlinkDriverHalt(t *testing.T) {

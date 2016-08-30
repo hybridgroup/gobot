@@ -5,7 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/gobottest"
 )
 

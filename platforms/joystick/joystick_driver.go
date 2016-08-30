@@ -116,7 +116,7 @@ func (j *JoystickDriver) Start() (errs []error) {
 		for {
 			for event := j.poll(); event != nil; event = j.poll() {
 				if err = j.handleEvent(event); err != nil {
-					gobot.Publish(j.Event("error"), err)
+					j.Publish(j.Event("error"), err)
 				}
 			}
 			select {
@@ -144,7 +144,7 @@ func (j *JoystickDriver) handleEvent(event sdl.Event) error {
 			if axis == "" {
 				return fmt.Errorf("Unknown Axis: %v", data.Axis)
 			}
-			gobot.Publish(j.Event(axis), data.Value)
+			j.Publish(j.Event(axis), data.Value)
 		}
 	case *sdl.JoyButtonEvent:
 		if data.Which == j.adaptor().joystick.InstanceID() {
@@ -153,9 +153,9 @@ func (j *JoystickDriver) handleEvent(event sdl.Event) error {
 				return fmt.Errorf("Unknown Button: %v", data.Button)
 			}
 			if data.State == 1 {
-				gobot.Publish(j.Event(fmt.Sprintf("%s_press", button)), nil)
+				j.Publish(j.Event(fmt.Sprintf("%s_press", button)), nil)
 			}
-			gobot.Publish(j.Event(fmt.Sprintf("%s_release", button)), nil)
+			j.Publish(j.Event(fmt.Sprintf("%s_release", button)), nil)
 		}
 	case *sdl.JoyHatEvent:
 		if data.Which == j.adaptor().joystick.InstanceID() {
@@ -163,7 +163,7 @@ func (j *JoystickDriver) handleEvent(event sdl.Event) error {
 			if hat == "" {
 				return fmt.Errorf("Unknown Hat: %v %v", data.Hat, data.Value)
 			}
-			gobot.Publish(j.Event(hat), true)
+			j.Publish(j.Event(hat), true)
 		}
 	}
 	return nil

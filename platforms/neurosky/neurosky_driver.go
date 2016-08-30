@@ -90,7 +90,7 @@ func (n *NeuroskyDriver) Start() (errs []error) {
 			buff := make([]byte, 1024)
 			_, err := n.adaptor().sp.Read(buff[:])
 			if err != nil {
-				gobot.Publish(n.Event("error"), err)
+				n.Publish(n.Event("error"), err)
 			} else {
 				n.parse(bytes.NewBuffer(buff))
 			}
@@ -124,29 +124,29 @@ func (n *NeuroskyDriver) parsePacket(buf *bytes.Buffer) {
 		b, _ := buf.ReadByte()
 		switch b {
 		case CodeEx:
-			gobot.Publish(n.Event("extended"), nil)
+			n.Publish(n.Event("extended"), nil)
 		case CodeSignalQuality:
 			ret, _ := buf.ReadByte()
-			gobot.Publish(n.Event("signal"), ret)
+			n.Publish(n.Event("signal"), ret)
 		case CodeAttention:
 			ret, _ := buf.ReadByte()
-			gobot.Publish(n.Event("attention"), ret)
+			n.Publish(n.Event("attention"), ret)
 		case CodeMeditation:
 			ret, _ := buf.ReadByte()
-			gobot.Publish(n.Event("meditation"), ret)
+			n.Publish(n.Event("meditation"), ret)
 		case CodeBlink:
 			ret, _ := buf.ReadByte()
-			gobot.Publish(n.Event("blink"), ret)
+			n.Publish(n.Event("blink"), ret)
 		case CodeWave:
 			buf.Next(1)
 			var ret = make([]byte, 2)
 			buf.Read(ret)
-			gobot.Publish(n.Event("wave"), int16(ret[0])<<8|int16(ret[1]))
+			n.Publish(n.Event("wave"), int16(ret[0])<<8|int16(ret[1]))
 		case CodeAsicEEG:
 			ret := make([]byte, 25)
 			i, _ := buf.Read(ret)
 			if i == 25 {
-				gobot.Publish(n.Event("eeg"), n.parseEEG(ret))
+				n.Publish(n.Event("eeg"), n.parseEEG(ret))
 			}
 		}
 	}

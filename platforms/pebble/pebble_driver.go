@@ -61,7 +61,7 @@ func (d *PebbleDriver) Halt() (errs []error) { return }
 
 // PublishEvent publishes event with specified name and data in gobot
 func (d *PebbleDriver) PublishEvent(name string, data string) {
-	gobot.Publish(d.Event(name), data)
+	d.Publish(d.Event(name), data)
 }
 
 // SendNotification appends message to list of notifications to be sent to watch

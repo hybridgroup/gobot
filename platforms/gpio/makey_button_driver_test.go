@@ -5,7 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/gobottest"
 )
 
@@ -42,7 +41,7 @@ func TestMakeyButtonDriverStart(t *testing.T) {
 		return
 	}
 
-	gobot.Once(d.Event(Push), func(data interface{}) {
+	d.Once(d.Event(Push), func(data interface{}) {
 		gobottest.Assert(t, d.Active, true)
 		sem <- true
 	})
@@ -58,7 +57,7 @@ func TestMakeyButtonDriverStart(t *testing.T) {
 		return
 	}
 
-	gobot.Once(d.Event(Release), func(data interface{}) {
+	d.Once(d.Event(Release), func(data interface{}) {
 		gobottest.Assert(t, d.Active, false)
 		sem <- true
 	})
@@ -74,7 +73,7 @@ func TestMakeyButtonDriverStart(t *testing.T) {
 		return
 	}
 
-	gobot.Once(d.Event(Error), func(data interface{}) {
+	d.Once(d.Event(Error), func(data interface{}) {
 		sem <- true
 	})
 
@@ -84,7 +83,7 @@ func TestMakeyButtonDriverStart(t *testing.T) {
 		t.Errorf("MakeyButton Event \"Error\" was not published")
 	}
 
-	gobot.Once(d.Event(Release), func(data interface{}) {
+	d.Once(d.Event(Release), func(data interface{}) {
 		sem <- true
 	})
 	testAdaptorDigitalRead = func() (val int, err error) {

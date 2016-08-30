@@ -118,7 +118,7 @@ func (b *BLEMinidroneDriver) Init() (err error) {
 
 	// subscribe to battery notifications
 	b.adaptor().Subscribe(DroneNotificationService, BatteryCharacteristic, func(data []byte, e error) {
-		gobot.Publish(b.Event(Battery), data[len(data)-1])
+		b.Publish(b.Event(Battery), data[len(data)-1])
 	})
 
 	// subscribe to flying status notifications
@@ -127,13 +127,13 @@ func (b *BLEMinidroneDriver) Init() (err error) {
 			fmt.Println(data)
 			return
 		}
-		gobot.Publish(b.Event(Status), data[6])
+		b.Publish(b.Event(Status), data[6])
 		if (data[6] == 1 || data[6] == 2) && !b.flying {
 			b.flying = true
-			gobot.Publish(b.Event(Flying), true)
+			b.Publish(b.Event(Flying), true)
 		} else if (data[6] == 0) && b.flying {
 			b.flying = false
-			gobot.Publish(b.Event(Landed), true)
+			b.Publish(b.Event(Landed), true)
 		}
 	})
 

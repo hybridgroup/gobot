@@ -18,6 +18,7 @@ type SparkCoreAdaptor struct {
 	DeviceID    string
 	AccessToken string
 	APIServer   string
+	gobot.Eventer
 }
 
 type Event struct {
@@ -42,6 +43,7 @@ func NewSparkCoreAdaptor(name string, deviceID string, accessToken string) *Spar
 		DeviceID:    deviceID,
 		AccessToken: accessToken,
 		APIServer:   "https://api.spark.io",
+		Eventer:     gobot.NewEventer(),
 	}
 }
 func (s *SparkCoreAdaptor) Name() string { return s.name }
@@ -137,22 +139,18 @@ func (s *SparkCoreAdaptor) EventStream(source string, name string) (event *gobot
 		return
 	}
 
-	events, errors, err := eventSource(url)
+	events, _, err := eventSource(url)
 	if err != nil {
 		return
 	}
-
-	event = gobot.NewEvent()
 
 	go func() {
 		for {
 			select {
 			case ev := <-events:
 				if ev.Event() != "" && ev.Data() != "" {
-					gobot.Publish(event, Event{Name: ev.Event(), Data: ev.Data()})
+					s.Publish(ev.Event(), ev.Data())
 				}
-			case ev := <-errors:
-				gobot.Publish(event, Event{Error: ev})
 			}
 		}
 	}()

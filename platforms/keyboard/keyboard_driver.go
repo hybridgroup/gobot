@@ -43,7 +43,7 @@ func NewKeyboardDriver(name string) *KeyboardDriver {
 					break
 				}
 
-				gobot.Publish(k.Event("key"), Parse(keybuf))
+				k.Publish(k.Event("key"), Parse(keybuf))
 
 			}
 		},

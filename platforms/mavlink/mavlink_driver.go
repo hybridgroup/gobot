@@ -57,16 +57,16 @@ func (m *MavlinkDriver) Start() (errs []error) {
 		for {
 			packet, err := common.ReadMAVLinkPacket(m.adaptor().sp)
 			if err != nil {
-				gobot.Publish(m.Event("errorIO"), err)
+				m.Publish(m.Event("errorIO"), err)
 				continue
 			}
-			gobot.Publish(m.Event("packet"), packet)
+			m.Publish(m.Event("packet"), packet)
 			message, err := packet.MAVLinkMessage()
 			if err != nil {
-				gobot.Publish(m.Event("errorMAVLink"), err)
+				m.Publish(m.Event("errorMAVLink"), err)
 				continue
 			}
-			gobot.Publish(m.Event("message"), message)
+			m.Publish(m.Event("message"), message)
 			<-time.After(m.interval)
 		}
 	}()

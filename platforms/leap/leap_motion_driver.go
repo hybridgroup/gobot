@@ -68,14 +68,14 @@ func (l *LeapMotionDriver) Start() (errs []error) {
 		for {
 			receive(l.adaptor().ws, &msg)
 			frame = l.ParseFrame(msg)
-			gobot.Publish(l.Event("message"), frame)
+			l.Publish(l.Event("message"), frame)
 
 			for _, hand := range frame.Hands {
-				gobot.Publish(l.Event("hand"), hand)
+				l.Publish(l.Event("hand"), hand)
 			}
 
 			for _, gesture := range frame.Gestures {
-				gobot.Publish(l.Event("gesture"), gesture)
+				l.Publish(l.Event("gesture"), gesture)
 			}
 		}
 	}()

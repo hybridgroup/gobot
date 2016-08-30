@@ -39,7 +39,7 @@ func TestPebbleDriver(t *testing.T) {
 	gobottest.Assert(t, d.PendingMessage(), "World")
 	gobottest.Assert(t, d.PendingMessage(), "")
 
-	gobot.On(d.Event("button"), func(data interface{}) {
+	d.On(d.Event("button"), func(data interface{}) {
 		sem <- true
 	})
 
@@ -51,7 +51,7 @@ func TestPebbleDriver(t *testing.T) {
 		t.Errorf("Button Event was not published")
 	}
 
-	gobot.On(d.Event("accel"), func(data interface{}) {
+	d.On(d.Event("accel"), func(data interface{}) {
 		sem <- true
 	})
 

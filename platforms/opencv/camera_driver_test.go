@@ -28,7 +28,7 @@ func TestCameraDriverStart(t *testing.T) {
 	sem := make(chan bool)
 	d := initTestCameraDriver()
 	gobottest.Assert(t, len(d.Start()), 0)
-	gobot.On(d.Event("frame"), func(data interface{}) {
+	d.On(d.Event("frame"), func(data interface{}) {
 		sem <- true
 	})
 	select {
