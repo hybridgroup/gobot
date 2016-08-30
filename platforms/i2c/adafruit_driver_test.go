@@ -50,3 +50,68 @@ func TestAdafruitMotorHatDriverHalt(t *testing.T) {
 
 	gobottest.Assert(t, len(ada.Halt()), 0)
 }
+func TestSetHatAddresses(t *testing.T) {
+	ada, _ := initTestAdafruitMotorHatDriverWithStubbedAdaptor()
+
+	motorHatAddr := 0x61
+	servoHatAddr := 0x41
+	gobottest.Assert(t, len(ada.SetMotorHatAddress(motorHatAddr)), 0)
+	gobottest.Assert(t, len(ada.SetServoHatAddress(servoHatAddr)), 0)
+}
+
+func TestAdafruitMotorHatDriverSetServoMotorFreq(t *testing.T) {
+	ada, _ := initTestAdafruitMotorHatDriverWithStubbedAdaptor()
+
+	freq := 60.0
+	err := ada.SetServoMotorFreq(freq)
+	gobottest.Assert(t, err, nil)
+}
+
+func TestAdafruitMotorHatDriverSetServoMotorPulse(t *testing.T) {
+	ada, _ := initTestAdafruitMotorHatDriverWithStubbedAdaptor()
+
+	var channel byte = 7
+	var on int32 = 1234
+	var off int32 = 4321
+	err := ada.SetServoMotorPulse(channel, on, off)
+	gobottest.Assert(t, err, nil)
+}
+
+func TestAdafruitMotorHatDriverSetDCMotorSpeed(t *testing.T) {
+	ada, _ := initTestAdafruitMotorHatDriverWithStubbedAdaptor()
+
+	dcMotor := 1
+	var speed int32 = 255
+	err := ada.SetDCMotorSpeed(dcMotor, speed)
+	gobottest.Assert(t, err, nil)
+}
+
+func TestAdafruitMotorHatDriverRunDCMotor(t *testing.T) {
+	ada, _ := initTestAdafruitMotorHatDriverWithStubbedAdaptor()
+
+	dcMotor := 1
+	// NOT using this prevents importing the i2c package
+	//dir := i2c.AdafruitForward
+	err := ada.RunDCMotor(dcMotor, 1)
+	gobottest.Assert(t, err, nil)
+}
+
+func TestAdafruitMotorHatDriverSetStepperMotorSpeed(t *testing.T) {
+	ada, _ := initTestAdafruitMotorHatDriverWithStubbedAdaptor()
+
+	stepperMotor := 1
+	rpm := 30
+	gobottest.Assert(t, len(ada.SetStepperMotorSpeed(stepperMotor, rpm)), 0)
+}
+
+func TestAdafruitMotorHatDriverStepperStep(t *testing.T) {
+	ada, _ := initTestAdafruitMotorHatDriverWithStubbedAdaptor()
+
+	// NOT using these prevents importing the i2c package
+	//dir := i2c.AdafruitForward
+	//style := i2c.AdafruitMicrostep
+	stepperMotor := 0
+	steps := 50
+	err := ada.Step(stepperMotor, steps, 1, 3)
+	gobottest.Assert(t, err, nil)
+}
