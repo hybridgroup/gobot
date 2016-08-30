@@ -4,7 +4,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/gobottest"
 )
 
@@ -39,6 +38,7 @@ func TestWiichuckDriver(t *testing.T) {
 	wii = NewWiichuckDriver(newI2cTestAdaptor("adaptor"), "bot", 100*time.Millisecond)
 	gobottest.Assert(t, wii.interval, 100*time.Millisecond)
 }
+
 func TestWiichuckDriverStart(t *testing.T) {
 	sem := make(chan bool)
 	wii, adaptor := initTestWiichuckDriverWithStubbedAdaptor()
@@ -76,7 +76,7 @@ func TestWiichuckDriverHalt(t *testing.T) {
 	gobottest.Assert(t, len(wii.Halt()), 0)
 }
 
-func TestWiichuckDriverUpdate(t *testing.T) {
+func TestWiichuckDriverCanParse(t *testing.T) {
 	wii := initTestWiichuckDriver()
 
 	// ------ When value is not encrypted
@@ -88,39 +88,72 @@ func TestWiichuckDriverUpdate(t *testing.T) {
 	gobottest.Assert(t, wii.data["sy"], float64(44))
 	gobottest.Assert(t, wii.data["z"], float64(0))
 	gobottest.Assert(t, wii.data["c"], float64(0))
+}
+
+func TestWiichuckDriverCanAdjustOrigins(t *testing.T) {
+	wii := initTestWiichuckDriver()
+
+	// ------ When value is not encrypted
+	decryptedValue := []byte{1, 2, 3, 4, 5, 6}
+	wii.update(decryptedValue)
 
 	// - This should be done by WiichuckDriver.adjustOrigins
 	gobottest.Assert(t, wii.joystick["sx_origin"], float64(45))
 	gobottest.Assert(t, wii.joystick["sy_origin"], float64(44))
+}
+
+func TestWiichuckDriverCButton(t *testing.T) {
+	wii := initTestWiichuckDriver()
+
+	// ------ When value is not encrypted
+	decryptedValue := []byte{1, 2, 3, 4, 5, 6}
+	wii.update(decryptedValue)
 
 	// - This should be done by WiichuckDriver.updateButtons
-	chann := make(chan bool)
+	done := make(chan bool)
 
-	gobot.On(wii.Event(C), func(data interface{}) {
+	wii.On(wii.Event(C), func(data interface{}) {
 		gobottest.Assert(t, data, true)
-		chann <- true
+		done <- true
 	})
 
 	wii.update(decryptedValue)
 
 	select {
-	case <-chann:
+	case <-done:
 	case <-time.After(10 * time.Second):
 		t.Errorf("Did not recieve 'C' event")
 	}
+}
 
-	gobot.On(wii.Event(Z), func(data interface{}) {
+func TestWiichuckDriverZButton(t *testing.T) {
+	wii := initTestWiichuckDriver()
+
+	// ------ When value is not encrypted
+	decryptedValue := []byte{1, 2, 3, 4, 5, 6}
+	wii.update(decryptedValue)
+
+	done := make(chan bool)
+
+	wii.On(wii.Event(Z), func(data interface{}) {
 		gobottest.Assert(t, data, true)
-		chann <- true
+		done <- true
 	})
 
 	wii.update(decryptedValue)
 
 	select {
-	case <-chann:
+	case <-done:
 	case <-time.After(10 * time.Second):
 		t.Errorf("Did not recieve 'Z' event")
 	}
+}
+
+func TestWiichuckDriverUpdateJoystick(t *testing.T) {
+	wii := initTestWiichuckDriver()
+
+	// ------ When value is not encrypted
+	decryptedValue := []byte{1, 2, 3, 4, 5, 6}
 
 	// - This should be done by WiichuckDriver.updateJoystick
 	expectedData := map[string]float64{
@@ -128,18 +161,24 @@ func TestWiichuckDriverUpdate(t *testing.T) {
 		"y": float64(0),
 	}
 
-	gobot.On(wii.Event(Joystick), func(data interface{}) {
+	done := make(chan bool)
+
+	wii.On(wii.Event(Joystick), func(data interface{}) {
 		gobottest.Assert(t, data, expectedData)
-		chann <- true
+		done <- true
 	})
 
 	wii.update(decryptedValue)
 
 	select {
-	case <-chann:
+	case <-done:
 	case <-time.After(10 * time.Second):
 		t.Errorf("Did not recieve 'Joystick' event")
 	}
+}
+
+func TestWiichuckDriverEncrypted(t *testing.T) {
+	wii := initTestWiichuckDriver()
 
 	// ------ When value is encrypted
 	wii = initTestWiichuckDriver()
@@ -166,11 +205,9 @@ func TestWiichuckDriverSetJoystickDefaultValue(t *testing.T) {
 	gobottest.Assert(t, wii.joystick["sy_origin"], float64(2))
 
 	// when current default value is not -1 it keeps the current value
-
 	wii.setJoystickDefaultValue("sy_origin", float64(20))
 
 	gobottest.Assert(t, wii.joystick["sy_origin"], float64(2))
-
 }
 
 func TestWiichuckDriverCalculateJoystickValue(t *testing.T) {
@@ -256,98 +293,4 @@ func TestWiichuckDriverAdjustOrigins(t *testing.T) {
 
 	gobottest.Assert(t, wii.joystick["sy_origin"], float64(118))
 	gobottest.Assert(t, wii.joystick["sx_origin"], float64(65))
-}
-
-func TestWiichuckDriverUpdateButtons(t *testing.T) {
-	//when data["c"] is 0
-	chann := make(chan bool)
-	wii := initTestWiichuckDriver()
-
-	wii.data["c"] = 0
-
-	gobot.On(wii.Event(C), func(data interface{}) {
-		gobottest.Assert(t, true, data)
-		chann <- true
-	})
-
-	wii.updateButtons()
-
-	select {
-	case <-chann:
-	case <-time.After(10 * time.Second):
-		t.Errorf("Did not recieve 'C' event")
-	}
-
-	//when data["z"] is 0
-	wii = initTestWiichuckDriver()
-
-	wii.data["z"] = 0
-
-	gobot.On(wii.Event(Z), func(data interface{}) {
-		gobottest.Assert(t, true, data)
-		chann <- true
-	})
-
-	wii.updateButtons()
-
-	select {
-	case <-chann:
-	case <-time.After(10 * time.Second):
-		t.Errorf("Did not recieve 'Z' event")
-	}
-}
-
-func TestWiichuckDriverUpdateJoystick(t *testing.T) {
-	chann := make(chan bool)
-	wii := initTestWiichuckDriver()
-
-	// First pass
-	wii.data["sx"] = 40
-	wii.data["sy"] = 55
-	wii.joystick["sx_origin"] = 1
-	wii.joystick["sy_origin"] = 5
-
-	expectedData := map[string]float64{
-		"x": float64(39),
-		"y": float64(50),
-	}
-
-	gobot.On(wii.Event(Joystick), func(data interface{}) {
-		gobottest.Assert(t, data, expectedData)
-		chann <- true
-	})
-
-	wii.updateJoystick()
-
-	select {
-	case <-chann:
-	case <-time.After(10 * time.Second):
-		t.Errorf("Did not recieve 'Joystick' event")
-	}
-
-	//// Second pass
-	wii = initTestWiichuckDriver()
-
-	wii.data["sx"] = 178
-	wii.data["sy"] = 34
-	wii.joystick["sx_origin"] = 14
-	wii.joystick["sy_origin"] = 27
-
-	expectedData = map[string]float64{
-		"x": float64(164),
-		"y": float64(7),
-	}
-
-	gobot.On(wii.Event(Joystick), func(data interface{}) {
-		gobottest.Assert(t, data, expectedData)
-		chann <- true
-	})
-
-	wii.updateJoystick()
-
-	select {
-	case <-chann:
-	case <-time.After(10 * time.Second):
-		t.Errorf("Did not recieve 'Joystick' event")
-	}
 }

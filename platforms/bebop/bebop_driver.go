@@ -45,7 +45,7 @@ func (a *BebopDriver) Halt() (errs []error) {
 
 // TakeOff makes the drone start flying
 func (a *BebopDriver) TakeOff() {
-	gobot.Publish(a.Event("flying"), a.adaptor().drone.TakeOff())
+	a.Publish(a.Event("flying"), a.adaptor().drone.TakeOff())
 }
 
 // Land causes the drone to land
