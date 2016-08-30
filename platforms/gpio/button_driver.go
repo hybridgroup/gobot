@@ -1,9 +1,8 @@
 package gpio
 
 import (
-	"time"
-
 	"github.com/hybridgroup/gobot"
+	"time"
 )
 
 var _ gobot.Driver = (*ButtonDriver)(nil)
@@ -58,7 +57,7 @@ func (b *ButtonDriver) Start() (errs []error) {
 		for {
 			newValue, err := b.connection.DigitalRead(b.Pin())
 			if err != nil {
-				gobot.Publish(b.Event(Error), err)
+				b.Publish(b.Event(Error), err)
 			} else if newValue != state && newValue != -1 {
 				state = newValue
 				b.update(newValue)
@@ -91,9 +90,9 @@ func (b *ButtonDriver) Connection() gobot.Connection { return b.connection.(gobo
 func (b *ButtonDriver) update(newValue int) {
 	if newValue == 1 {
 		b.Active = true
-		gobot.Publish(b.Event(Push), newValue)
+		b.Publish(b.Event(Push), newValue)
 	} else {
 		b.Active = false
-		gobot.Publish(b.Event(Release), newValue)
+		b.Publish(b.Event(Release), newValue)
 	}
 }

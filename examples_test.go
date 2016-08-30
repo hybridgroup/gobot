@@ -21,30 +21,6 @@ func ExampleAfter() {
 	})
 }
 
-func ExamplePublish() {
-	e := gobot.NewEvent()
-	gobot.Publish(e, 100)
-}
-
-func ExampleOn() {
-	e := gobot.NewEvent()
-	gobot.On(e, func(s interface{}) {
-		fmt.Println(s)
-	})
-	gobot.Publish(e, 100)
-	gobot.Publish(e, 200)
-}
-
-func ExampleOnce() {
-	e := gobot.NewEvent()
-	gobot.Once(e, func(s interface{}) {
-		fmt.Println(s)
-		fmt.Println("I will no longer respond to events")
-	})
-	gobot.Publish(e, 100)
-	gobot.Publish(e, 200)
-}
-
 func ExampleRand() {
 	i := gobot.Rand(100)
 	fmt.Printf("%v is > 0 && < 100", i)

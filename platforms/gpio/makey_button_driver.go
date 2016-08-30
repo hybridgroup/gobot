@@ -67,15 +67,15 @@ func (b *MakeyButtonDriver) Start() (errs []error) {
 		for {
 			newValue, err := b.connection.DigitalRead(b.Pin())
 			if err != nil {
-				gobot.Publish(b.Event(Error), err)
+				b.Publish(b.Event(Error), err)
 			} else if newValue != state && newValue != -1 {
 				state = newValue
 				if newValue == 0 {
 					b.Active = true
-					gobot.Publish(b.Event(Push), newValue)
+					b.Publish(b.Event(Push), newValue)
 				} else {
 					b.Active = false
-					gobot.Publish(b.Event(Release), newValue)
+					b.Publish(b.Event(Release), newValue)
 				}
 			}
 			select {

@@ -1,35 +1,13 @@
 package gobot
 
-import "sync"
-
-type callback struct {
-	f    func(interface{})
-	once bool
-}
-
-// Event executes the list of Callbacks when Chan is written to.
+// Event represents when something asyncronous happens in a Driver
+// or Adaptor
 type Event struct {
-	sync.Mutex
-	Callbacks []callback
+	Name string
+	Data interface{}
 }
 
-// NewEvent returns a new Event which is now listening for data.
-func NewEvent() *Event {
-	return &Event{}
-}
-
-// Write writes data to the Event, it will not block and will not buffer if there
-// are no active subscribers to the Event.
-func (e *Event) Write(data interface{}) {
-	e.Lock()
-	defer e.Unlock()
-
-	tmp := []callback{}
-	for _, cb := range e.Callbacks {
-		go cb.f(data)
-		if !cb.once {
-			tmp = append(tmp, cb)
-		}
-	}
-	e.Callbacks = tmp
+// NewEvent returns a new Event and its associated data.
+func NewEvent(name string, data interface{}) *Event {
+	return &Event{Name: name, Data: data}
 }

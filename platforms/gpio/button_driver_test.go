@@ -42,7 +42,7 @@ func TestButtonDriverStart(t *testing.T) {
 		return
 	}
 
-	gobot.Once(d.Event(Push), func(data interface{}) {
+	d.Once(d.Event(Push), func(data interface{}) {
 		gobottest.Assert(t, d.Active, true)
 		sem <- true
 	})
@@ -58,7 +58,7 @@ func TestButtonDriverStart(t *testing.T) {
 		return
 	}
 
-	gobot.Once(d.Event(Release), func(data interface{}) {
+	d.Once(d.Event(Release), func(data interface{}) {
 		gobottest.Assert(t, d.Active, false)
 		sem <- true
 	})
@@ -74,7 +74,7 @@ func TestButtonDriverStart(t *testing.T) {
 		return
 	}
 
-	gobot.Once(d.Event(Error), func(data interface{}) {
+	d.Once(d.Event(Error), func(data interface{}) {
 		sem <- true
 	})
 
@@ -89,7 +89,7 @@ func TestButtonDriverStart(t *testing.T) {
 		return
 	}
 
-	gobot.Once(d.Event(Push), func(data interface{}) {
+	d.Once(d.Event(Push), func(data interface{}) {
 		sem <- true
 	})
 

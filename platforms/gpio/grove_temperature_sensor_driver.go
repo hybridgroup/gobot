@@ -64,10 +64,10 @@ func (a *GroveTemperatureSensorDriver) Start() (errs []error) {
 			newValue := 1/(math.Log(resistance/10000.0)/thermistor+1/298.15) - 273.15
 
 			if err != nil {
-				gobot.Publish(a.Event(Error), err)
+				a.Publish(a.Event(Error), err)
 			} else if newValue != a.temperature && newValue != -1 {
 				a.temperature = newValue
-				gobot.Publish(a.Event(Data), a.temperature)
+				a.Publish(a.Event(Data), a.temperature)
 			}
 			select {
 			case <-time.After(a.interval):
