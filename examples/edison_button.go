@@ -15,10 +15,10 @@ func main() {
 	led := gpio.NewLedDriver(e, "myLed", "7")
 
 	work := func() {
-		gobot.On(button.Event("push"), func(data interface{}) {
+		button.On(button.Event("push"), func(data interface{}) {
 			led.On()
 		})
-		gobot.On(button.Event("release"), func(data interface{}) {
+		button.On(button.Event("release"), func(data interface{}) {
 			led.Off()
 		})
 	}

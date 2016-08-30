@@ -35,7 +35,7 @@ func main() {
 
 			conway.birth()
 
-			gobot.On(cell.Event("collision"), func(data interface{}) {
+			cell.On(cell.Event("collision"), func(data interface{}) {
 				conway.contact()
 			})
 

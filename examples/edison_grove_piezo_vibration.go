@@ -15,7 +15,7 @@ func main() {
 	sensor := gpio.NewGrovePiezoVibrationSensorDriver(board, "sensor", "0")
 
 	work := func() {
-		gobot.On(sensor.Event(gpio.Vibration), func(data interface{}) {
+		sensor.On(sensor.Event(gpio.Vibration), func(data interface{}) {
 			fmt.Println("got one!")
 		})
 	}

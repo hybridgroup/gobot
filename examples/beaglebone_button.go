@@ -15,11 +15,11 @@ func main() {
 	button := gpio.NewButtonDriver(beagleboneAdaptor, "button", "P8_9")
 
 	work := func() {
-		gobot.On(button.Event("push"), func(data interface{}) {
+		button.On(button.Event("push"), func(data interface{}) {
 			fmt.Println("button pressed")
 		})
 
-		gobot.On(button.Event("release"), func(data interface{}) {
+		button.On(button.Event("release"), func(data interface{}) {
 			fmt.Println("button released")
 		})
 	}

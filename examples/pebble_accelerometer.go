@@ -18,7 +18,7 @@ func main() {
 	pebbleDriver := pebble.NewPebbleDriver(pebbleAdaptor, "pebble")
 
 	work := func() {
-		gobot.On(pebbleDriver.Event("accel"), func(data interface{}) {
+		pebbleDriver.On(pebbleDriver.Event("accel"), func(data interface{}) {
 			fmt.Println(data.(string))
 		})
 	}

@@ -25,7 +25,7 @@ func main() {
 		work := func() {
 			spheroDriver.Stop()
 
-			gobot.On(spheroDriver.Event("collision"), func(data interface{}) {
+			spheroDriver.On(spheroDriver.Event("collision"), func(data interface{}) {
 				fmt.Println("Collision Detected!")
 			})
 

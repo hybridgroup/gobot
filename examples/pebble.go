@@ -19,11 +19,11 @@ func main() {
 
 	work := func() {
 		pebbleDriver.SendNotification("Hello Pebble!")
-		gobot.On(pebbleDriver.Event("button"), func(data interface{}) {
+		pebbleDriver.On(pebbleDriver.Event("button"), func(data interface{}) {
 			fmt.Println("Button pushed: " + data.(string))
 		})
 
-		gobot.On(pebbleDriver.Event("tap"), func(data interface{}) {
+		pebbleDriver.On(pebbleDriver.Event("tap"), func(data interface{}) {
 			fmt.Println("Tap event detected")
 		})
 	}

@@ -25,15 +25,15 @@ func main() {
 		gobot.Every(2*time.Second, func() {
 			led2.Toggle()
 		})
-		gobot.On(button.Event("push"), func(data interface{}) {
+		button.On(button.Event("push"), func(data interface{}) {
 			led2.On()
 		})
-		gobot.On(button.Event("release"), func(data interface{}) {
+		button.On(button.Event("release"), func(data interface{}) {
 			led2.Off()
 		})
-		gobot.On(sensor.Event("data"), func(data interface{}) {
+		sensor.On(sensor.Event("data"), func(data interface{}) {
 			fmt.Println("sensor", data)
-		})		
+		})
 	}
 
 	robot := gobot.NewRobot("bot",

@@ -31,34 +31,34 @@ func main() {
 		rightStick := pair{x: 0, y: 0}
 		leftStick := pair{x: 0, y: 0}
 
-		gobot.On(joystick.Event("square_press"), func(data interface{}) {
+		joystick.On(joystick.Event("square_press"), func(data interface{}) {
 			drone.TakeOff()
 		})
-		gobot.On(joystick.Event("triangle_press"), func(data interface{}) {
+		joystick.On(joystick.Event("triangle_press"), func(data interface{}) {
 			drone.Hover()
 		})
-		gobot.On(joystick.Event("x_press"), func(data interface{}) {
+		joystick.On(joystick.Event("x_press"), func(data interface{}) {
 			drone.Land()
 		})
-		gobot.On(joystick.Event("left_x"), func(data interface{}) {
+		joystick.On(joystick.Event("left_x"), func(data interface{}) {
 			val := float64(data.(int16))
 			if leftStick.x != val {
 				leftStick.x = val
 			}
 		})
-		gobot.On(joystick.Event("left_y"), func(data interface{}) {
+		joystick.On(joystick.Event("left_y"), func(data interface{}) {
 			val := float64(data.(int16))
 			if leftStick.y != val {
 				leftStick.y = val
 			}
 		})
-		gobot.On(joystick.Event("right_x"), func(data interface{}) {
+		joystick.On(joystick.Event("right_x"), func(data interface{}) {
 			val := float64(data.(int16))
 			if rightStick.x != val {
 				rightStick.x = val
 			}
 		})
-		gobot.On(joystick.Event("right_y"), func(data interface{}) {
+		joystick.On(joystick.Event("right_y"), func(data interface{}) {
 			val := float64(data.(int16))
 			if rightStick.y != val {
 				rightStick.y = val
