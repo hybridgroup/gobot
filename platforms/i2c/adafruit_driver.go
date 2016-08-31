@@ -493,11 +493,13 @@ func (a *AdafruitMotorHatDriver) Step(motor, steps int, dir AdafruitDirection, s
 	}
 	// As documented in the Adafruit python driver:
 	// This is an edge case, if we are in between full steps, keep going to end on a full step
-	for latestStep != 0 && latestStep != stepperMicrosteps {
-		if latestStep, err = a.oneStep(motor, dir, style); err != nil {
-			return
+	if style == AdafruitMicrostep {
+		for latestStep != 0 && latestStep != stepperMicrosteps {
+			if latestStep, err = a.oneStep(motor, dir, style); err != nil {
+				return
+			}
+			<-time.After(time.Duration(secPerStep) * time.Second)
 		}
-		<-time.After(time.Duration(secPerStep) * time.Second)
 	}
 	return
 }
