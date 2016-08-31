@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/jfinken/gobot/gobottest"
+	"github.com/hybridgroup/gobot/gobottest"
 )
 
 // --------- HELPERS
