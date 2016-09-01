@@ -8,6 +8,15 @@ import (
 	"golang.org/x/net/websocket"
 )
 
+const (
+	// Message event
+	MessageEvent = "message"
+	// Hand event
+	HandEvent = "hand"
+	// Gesture event
+	GestureEvent = "gesture"
+)
+
 type LeapMotionDriver struct {
 	name       string
 	connection gobot.Connection
@@ -31,9 +40,9 @@ func NewLeapMotionDriver(a *LeapMotionAdaptor, name string) *LeapMotionDriver {
 		Eventer:    gobot.NewEventer(),
 	}
 
-	l.AddEvent("message")
-	l.AddEvent("hand")
-	l.AddEvent("gesture")
+	l.AddEvent(MessageEvent)
+	l.AddEvent(HandEvent)
+	l.AddEvent(GestureEvent)
 	return l
 }
 func (l *LeapMotionDriver) Name() string                 { return l.name }
@@ -68,14 +77,14 @@ func (l *LeapMotionDriver) Start() (errs []error) {
 		for {
 			receive(l.adaptor().ws, &msg)
 			frame = l.ParseFrame(msg)
-			l.Publish(l.Event("message"), frame)
+			l.Publish(MessageEvent, frame)
 
 			for _, hand := range frame.Hands {
-				l.Publish(l.Event("hand"), hand)
+				l.Publish(HandEvent, hand)
 			}
 
 			for _, gesture := range frame.Gestures {
-				l.Publish(l.Event("gesture"), gesture)
+				l.Publish(GestureEvent, gesture)
 			}
 		}
 	}()

@@ -6,8 +6,6 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
-var _ gobot.Driver = (*DirectPinDriver)(nil)
-
 // DirectPinDriver represents a GPIO pin
 type DirectPinDriver struct {
 	name       string

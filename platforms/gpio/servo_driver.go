@@ -2,8 +2,6 @@ package gpio
 
 import "github.com/hybridgroup/gobot"
 
-var _ gobot.Driver = (*ServoDriver)(nil)
-
 // ServoDriver Represents a Servo
 type ServoDriver struct {
 	name       string

@@ -15,7 +15,7 @@ func main() {
 	sensor := gpio.NewGroveSoundSensorDriver(board, "sensor", "0")
 
 	work := func() {
-		sensor.On(sensor.Event("data"), func(data interface{}) {
+		sensor.On(gpio.Data, func(data interface{}) {
 			fmt.Println("sensor", data)
 		})
 	}

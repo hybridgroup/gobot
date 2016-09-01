@@ -14,6 +14,11 @@ type capture interface {
 	GrabFrame() bool
 }
 
+const (
+	// Frame event
+	Frame = "frame"
+)
+
 type CameraDriver struct {
 	name     string
 	camera   capture
@@ -48,7 +53,7 @@ func NewCameraDriver(name string, source interface{}, v ...time.Duration) *Camer
 		c.interval = v[0]
 	}
 
-	c.AddEvent("frame")
+	c.AddEvent(Frame)
 
 	return c
 }
@@ -67,7 +72,7 @@ func (c *CameraDriver) Start() (errs []error) {
 			if c.camera.GrabFrame() {
 				image := c.camera.RetrieveFrame(1)
 				if image != nil {
-					c.Publish(c.Event("frame"), image)
+					c.Publish(Frame, image)
 				}
 			}
 			<-time.After(c.interval)

@@ -14,7 +14,7 @@ func main() {
 	drone := ardrone.NewArdroneDriver(ardroneAdaptor, "Drone")
 
 	work := func() {
-		drone.On(drone.Event("flying"), func(data interface{}) {
+		drone.On(ardrone.Flying, func(data interface{}) {
 			gobot.After(3*time.Second, func() {
 				drone.Land()
 			})

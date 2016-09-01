@@ -3,8 +3,11 @@ package gpio
 import (
 	"testing"
 
+	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/gobottest"
 )
+
+var _ gobot.Driver = (*MotorDriver)(nil)
 
 func initTestMotorDriver() *MotorDriver {
 	return NewMotorDriver(newGpioTestAdaptor("adaptor"), "bot", "1")

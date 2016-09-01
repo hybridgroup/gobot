@@ -16,7 +16,7 @@ func main() {
 	led := gpio.NewLedDriver(firmataAdaptor, "led", "3")
 
 	work := func() {
-		sensor.On(sensor.Event("data"), func(data interface{}) {
+		sensor.On(gpio.Data, func(data interface{}) {
 			brightness := uint8(
 				gobot.ToScale(gobot.FromScale(float64(data.(int)), 0, 1024), 0, 255),
 			)

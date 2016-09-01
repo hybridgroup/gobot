@@ -8,6 +8,8 @@ import (
 	"github.com/hybridgroup/gobot/gobottest"
 )
 
+var _ gobot.Driver = (*DirectPinDriver)(nil)
+
 func initTestDirectPinDriver(conn gobot.Connection) *DirectPinDriver {
 	testAdaptorDigitalRead = func() (val int, err error) {
 		val = 1

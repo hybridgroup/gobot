@@ -5,8 +5,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/gobottest"
 )
+
+var _ gobot.Driver = (*ButtonDriver)(nil)
 
 const BUTTON_TEST_DELAY = 50
 
@@ -41,7 +44,7 @@ func TestButtonDriverStart(t *testing.T) {
 		return
 	}
 
-	d.Once(d.Event(Push), func(data interface{}) {
+	d.Once(ButtonPush, func(data interface{}) {
 		gobottest.Assert(t, d.Active, true)
 		sem <- true
 	})
@@ -57,7 +60,7 @@ func TestButtonDriverStart(t *testing.T) {
 		return
 	}
 
-	d.Once(d.Event(Release), func(data interface{}) {
+	d.Once(ButtonRelease, func(data interface{}) {
 		gobottest.Assert(t, d.Active, false)
 		sem <- true
 	})
@@ -73,7 +76,7 @@ func TestButtonDriverStart(t *testing.T) {
 		return
 	}
 
-	d.Once(d.Event(Error), func(data interface{}) {
+	d.Once(Error, func(data interface{}) {
 		sem <- true
 	})
 
@@ -88,7 +91,7 @@ func TestButtonDriverStart(t *testing.T) {
 		return
 	}
 
-	d.Once(d.Event(Push), func(data interface{}) {
+	d.Once(ButtonPush, func(data interface{}) {
 		sem <- true
 	})
 

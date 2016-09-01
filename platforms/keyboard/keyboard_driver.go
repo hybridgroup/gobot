@@ -7,6 +7,11 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
+const (
+	// Keyboard event
+	Key = "key"
+)
+
 type KeyboardDriver struct {
 	name    string
 	connect func(*KeyboardDriver) (err error)
@@ -43,14 +48,14 @@ func NewKeyboardDriver(name string) *KeyboardDriver {
 					break
 				}
 
-				k.Publish(k.Event("key"), Parse(keybuf))
+				k.Publish(Key, Parse(keybuf))
 
 			}
 		},
 		Eventer: gobot.NewEventer(),
 	}
 
-	k.AddEvent("key")
+	k.AddEvent(Key)
 
 	return k
 }

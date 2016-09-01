@@ -14,7 +14,7 @@ func main() {
 	l := leap.NewLeapMotionDriver(leapMotionAdaptor, "leap")
 
 	work := func() {
-		l.On(l.Event("message"), func(data interface{}) {
+		l.On(leap.MessageEvent, func(data interface{}) {
 			fmt.Println(data.(leap.Frame))
 		})
 	}

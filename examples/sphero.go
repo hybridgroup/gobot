@@ -17,11 +17,11 @@ func main() {
 	work := func() {
 		spheroDriver.SetDataStreaming(sphero.DefaultDataStreamingConfig())
 
-		spheroDriver.On(spheroDriver.Event(sphero.Collision), func(data interface{}) {
+		spheroDriver.On(sphero.Collision, func(data interface{}) {
 			fmt.Printf("Collision! %+v\n", data)
 		})
 
-		spheroDriver.On(spheroDriver.Event(sphero.SensorData), func(data interface{}) {
+		spheroDriver.On(sphero.SensorData, func(data interface{}) {
 			fmt.Printf("Streaming Data! %+v\n", data)
 		})
 

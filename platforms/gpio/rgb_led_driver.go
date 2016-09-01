@@ -2,8 +2,6 @@ package gpio
 
 import "github.com/hybridgroup/gobot"
 
-var _ gobot.Driver = (*RgbLedDriver)(nil)
-
 // RgbLedDriver represents a digital RGB Led
 type RgbLedDriver struct {
 	pinRed     string

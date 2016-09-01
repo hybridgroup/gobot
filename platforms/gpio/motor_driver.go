@@ -4,8 +4,6 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
-var _ gobot.Driver = (*MotorDriver)(nil)
-
 // MotorDriver Represents a Motor
 type MotorDriver struct {
 	name             string

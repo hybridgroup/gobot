@@ -18,7 +18,7 @@ func main() {
 	gbot := gobot.NewGobot()
 
 	joystickAdaptor := joystick.NewJoystickAdaptor("ps3")
-	joystick := joystick.NewJoystickDriver(joystickAdaptor,
+	stick := joystick.NewJoystickDriver(joystickAdaptor,
 		"ps3",
 		"./platforms/joystick/configs/dualshock3.json",
 	)
@@ -31,34 +31,34 @@ func main() {
 		rightStick := pair{x: 0, y: 0}
 		leftStick := pair{x: 0, y: 0}
 
-		joystick.On(joystick.Event("square_press"), func(data interface{}) {
+		stick.On(joystick.SquarePress, func(data interface{}) {
 			drone.TakeOff()
 		})
-		joystick.On(joystick.Event("triangle_press"), func(data interface{}) {
+		stick.On(joystick.TrianglePress, func(data interface{}) {
 			drone.Hover()
 		})
-		joystick.On(joystick.Event("x_press"), func(data interface{}) {
+		stick.On(joystick.XPress, func(data interface{}) {
 			drone.Land()
 		})
-		joystick.On(joystick.Event("left_x"), func(data interface{}) {
+		stick.On(joystick.LeftX, func(data interface{}) {
 			val := float64(data.(int16))
 			if leftStick.x != val {
 				leftStick.x = val
 			}
 		})
-		joystick.On(joystick.Event("left_y"), func(data interface{}) {
+		stick.On(joystick.LeftY, func(data interface{}) {
 			val := float64(data.(int16))
 			if leftStick.y != val {
 				leftStick.y = val
 			}
 		})
-		joystick.On(joystick.Event("right_x"), func(data interface{}) {
+		stick.On(joystick.RightX, func(data interface{}) {
 			val := float64(data.(int16))
 			if rightStick.x != val {
 				rightStick.x = val
 			}
 		})
-		joystick.On(joystick.Event("right_y"), func(data interface{}) {
+		stick.On(joystick.RightY, func(data interface{}) {
 			val := float64(data.(int16))
 			if rightStick.y != val {
 				rightStick.y = val
@@ -106,7 +106,7 @@ func main() {
 
 	robot := gobot.NewRobot("ardrone",
 		[]gobot.Connection{joystickAdaptor, ardroneAdaptor},
-		[]gobot.Device{joystick, drone},
+		[]gobot.Device{stick, drone},
 		work,
 	)
 

@@ -15,10 +15,10 @@ func main() {
 	led := gpio.NewLedDriver(firmataAdaptor, "myLed", "13")
 
 	work := func() {
-		button.On(button.Event("push"), func(data interface{}) {
+		button.On(gpio.ButtonPush, func(data interface{}) {
 			led.On()
 		})
-		button.On(button.Event("release"), func(data interface{}) {
+		button.On(gpio.ButtonRelease, func(data interface{}) {
 			led.Off()
 		})
 	}

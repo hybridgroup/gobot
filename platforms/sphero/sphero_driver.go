@@ -10,9 +10,12 @@ import (
 )
 
 const (
-	SensorData = "sensordata"
-	Collision  = "collision"
+	// event when error encountered
 	Error      = "error"
+	// event when sensor data is received
+	SensorData = "sensordata"
+	// event when collision is detected
+	Collision  = "collision"
 )
 
 type packet struct {
@@ -157,7 +160,7 @@ func (s *SpheroDriver) Start() (errs []error) {
 			packet := <-s.packetChannel
 			err := s.write(packet)
 			if err != nil {
-				s.Publish(s.Event(Error), err)
+				s.Publish(Error, err)
 			}
 		}
 	}()
@@ -315,7 +318,7 @@ func (s *SpheroDriver) handleCollisionDetected(data []uint8) {
 	var collision CollisionPacket
 	buffer := bytes.NewBuffer(data[5:]) // skip header
 	binary.Read(buffer, binary.BigEndian, &collision)
-	s.Publish(s.Event(Collision), collision)
+	s.Publish(Collision, collision)
 }
 
 func (s *SpheroDriver) handleDataStreaming(data []uint8) {
@@ -326,7 +329,7 @@ func (s *SpheroDriver) handleDataStreaming(data []uint8) {
 	var dataPacket DataStreamingPacket
 	buffer := bytes.NewBuffer(data[5:]) // skip header
 	binary.Read(buffer, binary.BigEndian, &dataPacket)
-	s.Publish(s.Event(SensorData), dataPacket)
+	s.Publish(SensorData, dataPacket)
 }
 
 func (s *SpheroDriver) getSyncResponse(packet *packet) []byte {

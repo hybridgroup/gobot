@@ -2,8 +2,6 @@ package gpio
 
 import "github.com/hybridgroup/gobot"
 
-var _ gobot.Driver = (*RelayDriver)(nil)
-
 // RelayDriver represents a digital relay
 type RelayDriver struct {
 	pin        string

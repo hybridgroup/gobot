@@ -22,7 +22,7 @@ func main() {
 	work := func() {
 		var image *cv.IplImage
 
-		camera.On(camera.Event("frame"), func(data interface{}) {
+		camera.On(opencv.Frame, func(data interface{}) {
 			image = data.(*cv.IplImage)
 		})
 

@@ -23,7 +23,7 @@ func main() {
 	work := func() {
 		x := 90.0
 		z := 90.0
-		leapDriver.On(leapDriver.Event("message"), func(data interface{}) {
+		leapDriver.On(leap.MessageEvent, func(data interface{}) {
 			if len(data.(leap.Frame).Hands) > 0 {
 				hand := data.(leap.Frame).Hands[0]
 				x = gobot.ToScale(gobot.FromScale(hand.X(), -300, 300), 30, 150)

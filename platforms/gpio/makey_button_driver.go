@@ -6,8 +6,6 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
-var _ gobot.Driver = (*MakeyButtonDriver)(nil)
-
 // MakeyButtonDriver Represents a Makey Button
 type MakeyButtonDriver struct {
 	name       string
@@ -40,8 +38,8 @@ func NewMakeyButtonDriver(a DigitalReader, name string, pin string, v ...time.Du
 	}
 
 	m.AddEvent(Error)
-	m.AddEvent(Push)
-	m.AddEvent(Release)
+	m.AddEvent(ButtonPush)
+	m.AddEvent(ButtonRelease)
 
 	return m
 }
@@ -67,15 +65,15 @@ func (b *MakeyButtonDriver) Start() (errs []error) {
 		for {
 			newValue, err := b.connection.DigitalRead(b.Pin())
 			if err != nil {
-				b.Publish(b.Event(Error), err)
+				b.Publish(Error, err)
 			} else if newValue != state && newValue != -1 {
 				state = newValue
 				if newValue == 0 {
 					b.Active = true
-					b.Publish(b.Event(Push), newValue)
+					b.Publish(ButtonPush, newValue)
 				} else {
 					b.Active = false
-					b.Publish(b.Event(Release), newValue)
+					b.Publish(ButtonRelease, newValue)
 				}
 			}
 			select {

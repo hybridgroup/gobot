@@ -18,7 +18,7 @@ func main() {
 	spheroDriver := sphero.NewSpheroDriver(spheroAdaptor, "sphero")
 
 	work := func() {
-		leapDriver.On(leapDriver.Event("message"), func(data interface{}) {
+		leapDriver.On(leap.MessageEvent, func(data interface{}) {
 			hands := data.(leap.Frame).Hands
 
 			if len(hands) > 0 {
