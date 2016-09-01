@@ -35,7 +35,7 @@ func main() {
 
 			conway.birth()
 
-			cell.On(cell.Event("collision"), func(data interface{}) {
+			cell.On(sphero.Collision, func(data interface{}) {
 				conway.contact()
 			})
 

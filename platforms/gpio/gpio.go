@@ -28,12 +28,12 @@ var (
 )
 
 const (
-	// Release event
-	Release = "release"
-	// Push event
-	Push = "push"
 	// Error event
 	Error = "error"
+	// Release event
+	ButtonRelease = "release"
+	// Push event
+	ButtonPush = "push"
 	// Data event
 	Data = "data"
 	// Vibration event

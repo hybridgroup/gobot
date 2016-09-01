@@ -7,6 +7,17 @@ import (
 	common "github.com/hybridgroup/gobot/platforms/mavlink/common"
 )
 
+const (
+	// Packet event
+	PacketEvent = "packet"
+	// Message event
+	MessageEvent = "message"
+	// ErrorIO event
+	ErrorIOEvent = "errorIO"
+	// ErrorMAVLink event
+	ErrorMAVLinkEvent = "errorMAVLink"
+)
+
 type MavlinkDriver struct {
 	name       string
 	connection gobot.Connection
@@ -34,10 +45,10 @@ func NewMavlinkDriver(a *MavlinkAdaptor, name string, v ...time.Duration) *Mavli
 		m.interval = v[0]
 	}
 
-	m.AddEvent("packet")
-	m.AddEvent("message")
-	m.AddEvent("errorIO")
-	m.AddEvent("errorMAVLink")
+	m.AddEvent(PacketEvent)
+	m.AddEvent(MessageEvent)
+	m.AddEvent(ErrorIOEvent)
+	m.AddEvent(ErrorMAVLinkEvent)
 
 	return m
 }
@@ -57,16 +68,16 @@ func (m *MavlinkDriver) Start() (errs []error) {
 		for {
 			packet, err := common.ReadMAVLinkPacket(m.adaptor().sp)
 			if err != nil {
-				m.Publish(m.Event("errorIO"), err)
+				m.Publish(ErrorIOEvent, err)
 				continue
 			}
-			m.Publish(m.Event("packet"), packet)
+			m.Publish(PacketEvent, packet)
 			message, err := packet.MAVLinkMessage()
 			if err != nil {
-				m.Publish(m.Event("errorMAVLink"), err)
+				m.Publish(ErrorMAVLinkEvent, err)
 				continue
 			}
-			m.Publish(m.Event("message"), message)
+			m.Publish(MessageEvent, message)
 			<-time.After(m.interval)
 		}
 	}()

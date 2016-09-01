@@ -4,6 +4,11 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
+const (
+	// Flying event
+	Flying = "flying"
+)
+
 // BebopDriver is gobot.Driver representation for the Bebop
 type BebopDriver struct {
 	name       string
@@ -18,7 +23,7 @@ func NewBebopDriver(connection *BebopAdaptor, name string) *BebopDriver {
 		connection: connection,
 		Eventer:    gobot.NewEventer(),
 	}
-	d.AddEvent("flying")
+	d.AddEvent(Flying)
 	return d
 }
 

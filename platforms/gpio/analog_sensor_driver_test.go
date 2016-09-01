@@ -5,8 +5,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/gobottest"
 )
+
+var _ gobot.Driver = (*AnalogSensorDriver)(nil)
 
 func TestAnalogSensorDriver(t *testing.T) {
 	d := NewAnalogSensorDriver(newGpioTestAdaptor("adaptor"), "bot", "1")

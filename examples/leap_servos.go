@@ -23,7 +23,7 @@ func main() {
 
 	work := func() {
 		fist := false
-		l.On(l.Event("message"), func(data interface{}) {
+		l.On(leap.MessageEvent, func(data interface{}) {
 			handIsOpen := len(data.(leap.Frame).Pointables) > 0
 			if handIsOpen && fist {
 				servo1.Move(0)

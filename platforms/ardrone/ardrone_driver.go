@@ -4,6 +4,11 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
+const (
+	// Flying event
+	Flying = "flying"
+)
+
 // ArdroneDriver is gobot.Driver representation for the Ardrone
 type ArdroneDriver struct {
 	name       string
@@ -21,7 +26,7 @@ func NewArdroneDriver(connection *ArdroneAdaptor, name string) *ArdroneDriver {
 		connection: connection,
 		Eventer:    gobot.NewEventer(),
 	}
-	d.AddEvent("flying")
+	d.AddEvent(Flying)
 	return d
 }
 

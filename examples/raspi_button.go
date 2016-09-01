@@ -16,12 +16,12 @@ func main() {
 	led := gpio.NewLedDriver(r, "led", "7")
 
 	work := func() {
-		button.On(button.Event("push"), func(data interface{}) {
+		button.On(gpio.ButtonPush, func(data interface{}) {
 			fmt.Println("button pressed")
 			led.On()
 		})
 
-		button.On(button.Event("release"), func(data interface{}) {
+		button.On(gpio.ButtonRelease, func(data interface{}) {
 			fmt.Println("button released")
 			led.Off()
 		})

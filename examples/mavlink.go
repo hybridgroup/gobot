@@ -15,7 +15,7 @@ func main() {
 	iris := mavlink.NewMavlinkDriver(adaptor, "iris")
 
 	work := func() {
-		iris.Once(iris.Event("packet"), func(data interface{}) {
+		iris.Once(mavlink.PacketEvent, func(data interface{}) {
 			packet := data.(*common.MAVLinkPacket)
 
 			dataStream := common.NewRequestDataStream(100,
@@ -30,7 +30,7 @@ func main() {
 			))
 		})
 
-		iris.On(iris.Event("message"), func(data interface{}) {
+		iris.On(mavlink.MessageEvent, func(data interface{}) {
 			if data.(common.MAVLinkMessage).Id() == 30 {
 				message := data.(*common.Attitude)
 				fmt.Println("Attitude")

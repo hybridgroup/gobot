@@ -4,8 +4,11 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/gobottest"
 )
+
+var _ gobot.Driver = (*RgbLedDriver)(nil)
 
 func initTestRgbLedDriver(conn DigitalWriter) *RgbLedDriver {
 	testAdaptorDigitalWrite = func() (err error) {

@@ -29,13 +29,13 @@ func main() {
 		detect := false
 		drone.TakeOff()
 		var image *cv.IplImage
-		camera.On(camera.Event("frame"), func(data interface{}) {
+		camera.On(opencv.Frame, func(data interface{}) {
 			image = data.(*cv.IplImage)
 			if !detect {
 				window.ShowImage(image)
 			}
 		})
-		drone.On(drone.Event("flying"), func(data interface{}) {
+		drone.On(ardrone.Flying, func(data interface{}) {
 			gobot.After(1*time.Second, func() { drone.Up(0.2) })
 			gobot.After(2*time.Second, func() { drone.Hover() })
 			gobot.After(5*time.Second, func() {

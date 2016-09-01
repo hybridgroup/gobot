@@ -11,53 +11,53 @@ func main() {
 	gbot := gobot.NewGobot()
 
 	joystickAdaptor := joystick.NewJoystickAdaptor("xbox360")
-	joystick := joystick.NewJoystickDriver(joystickAdaptor,
+	stick := joystick.NewJoystickDriver(joystickAdaptor,
 		"xbox360",
 		"./platforms/joystick/configs/joystick/configs/xbox360_power_a_mini_proex.json",
 	)
 
 	work := func() {
-		joystick.On(joystick.Event("a_press"), func(data interface{}) {
+		stick.On(joystick.APress, func(data interface{}) {
 			fmt.Println("a_press")
 		})
-		joystick.On(joystick.Event("a_release"), func(data interface{}) {
+		stick.On(joystick.ARelease, func(data interface{}) {
 			fmt.Println("a_release")
 		})
-		joystick.On(joystick.Event("b_press"), func(data interface{}) {
+		stick.On(joystick.BPress, func(data interface{}) {
 			fmt.Println("b_press")
 		})
-		joystick.On(joystick.Event("b_release"), func(data interface{}) {
+		stick.On(joystick.BRelease, func(data interface{}) {
 			fmt.Println("b_release")
 		})
-		joystick.On(joystick.Event("up"), func(data interface{}) {
+		stick.On(joystick.Up, func(data interface{}) {
 			fmt.Println("up", data)
 		})
-		joystick.On(joystick.Event("down"), func(data interface{}) {
+		stick.On(joystick.Down, func(data interface{}) {
 			fmt.Println("down", data)
 		})
-		joystick.On(joystick.Event("left"), func(data interface{}) {
+		stick.On(joystick.Left, func(data interface{}) {
 			fmt.Println("left", data)
 		})
-		joystick.On(joystick.Event("right"), func(data interface{}) {
+		stick.On(joystick.Right, func(data interface{}) {
 			fmt.Println("right", data)
 		})
-		joystick.On(joystick.Event("left_x"), func(data interface{}) {
+		stick.On(joystick.LeftX, func(data interface{}) {
 			fmt.Println("left_x", data)
 		})
-		joystick.On(joystick.Event("left_y"), func(data interface{}) {
+		stick.On(joystick.LeftY, func(data interface{}) {
 			fmt.Println("left_y", data)
 		})
-		joystick.On(joystick.Event("right_x"), func(data interface{}) {
+		stick.On(joystick.RightX, func(data interface{}) {
 			fmt.Println("right_x", data)
 		})
-		joystick.On(joystick.Event("right_y"), func(data interface{}) {
+		stick.On(joystick.RightY, func(data interface{}) {
 			fmt.Println("right_y", data)
 		})
 	}
 
 	robot := gobot.NewRobot("joystickBot",
 		[]gobot.Connection{joystickAdaptor},
-		[]gobot.Device{joystick},
+		[]gobot.Device{stick},
 		work,
 	)
 

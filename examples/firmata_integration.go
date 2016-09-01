@@ -25,13 +25,13 @@ func main() {
 		gobot.Every(2*time.Second, func() {
 			led2.Toggle()
 		})
-		button.On(button.Event("push"), func(data interface{}) {
+		button.On(gpio.ButtonPush, func(data interface{}) {
 			led2.On()
 		})
-		button.On(button.Event("release"), func(data interface{}) {
+		button.On(gpio.ButtonRelease, func(data interface{}) {
 			led2.Off()
 		})
-		sensor.On(sensor.Event("data"), func(data interface{}) {
+		sensor.On(gpio.Data, func(data interface{}) {
 			fmt.Println("sensor", data)
 		})
 	}

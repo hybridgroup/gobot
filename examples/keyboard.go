@@ -13,7 +13,7 @@ func main() {
 	keys := keyboard.NewKeyboardDriver("keyboard")
 
 	work := func() {
-		keys.On(keys.Event("key"), func(data interface{}) {
+		keys.On(keyboard.Key, func(data interface{}) {
 			key := data.(keyboard.KeyEvent)
 
 			if key.Key == keyboard.A {

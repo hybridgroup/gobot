@@ -14,7 +14,7 @@ func main() {
 	drone := bebop.NewBebopDriver(bebopAdaptor, "Drone")
 
 	work := func() {
-		drone.On(drone.Event("flying"), func(data interface{}) {
+		drone.On(bebop.Flying, func(data interface{}) {
 			gobot.After(10*time.Second, func() {
 				drone.Land()
 			})

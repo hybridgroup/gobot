@@ -4,8 +4,11 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/gobottest"
 )
+
+var _ gobot.Driver = (*ServoDriver)(nil)
 
 func initTestServoDriver() *ServoDriver {
 	return NewServoDriver(newGpioTestAdaptor("adaptor"), "bot", "1")

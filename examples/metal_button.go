@@ -22,7 +22,7 @@ func main() {
 		select {
 		case event := <-buttonEvents:
 			fmt.Println("Event:", event.Name, event.Data)
-			if event.Name == "push" {
+			if event.Name == gpio.ButtonPush {
 				led.Toggle()
 			}
 		}

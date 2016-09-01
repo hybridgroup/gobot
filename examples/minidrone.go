@@ -33,7 +33,7 @@ func main() {
 			})
 		})
 
-		gobot.On(drone.Event("landed"), func(data interface{}) {
+		drone.On(drone.Event("landed"), func(data interface{}) {
 			fmt.Println("landed.")
 		})
 

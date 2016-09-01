@@ -6,8 +6,6 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
-var _ gobot.Driver = (*AnalogSensorDriver)(nil)
-
 // AnalogSensorDriver represents an Analog Sensor
 type AnalogSensorDriver struct {
 	name       string
