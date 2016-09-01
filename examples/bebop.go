@@ -20,7 +20,7 @@ func main() {
 			})
 		})
 
-    drone.HullProtection(true)
+		drone.HullProtection(true)
 		drone.TakeOff()
 	}
 

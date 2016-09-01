@@ -4,8 +4,8 @@ import (
 	"time"
 
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/i2c"
 	"github.com/hybridgroup/gobot/platforms/chip"
+	"github.com/hybridgroup/gobot/platforms/i2c"
 )
 
 func main() {

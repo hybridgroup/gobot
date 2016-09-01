@@ -11,11 +11,11 @@ import (
 
 const (
 	// event when error encountered
-	Error      = "error"
+	Error = "error"
 	// event when sensor data is received
 	SensorData = "sensordata"
 	// event when collision is detected
-	Collision  = "collision"
+	Collision = "collision"
 )
 
 type packet struct {
