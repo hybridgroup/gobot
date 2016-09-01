@@ -1,9 +1,9 @@
 package main
 
 import (
-	cv "github.com/lazywei/go-opencv/opencv"
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/opencv"
+	cv "github.com/lazywei/go-opencv/opencv"
 )
 
 func main() {

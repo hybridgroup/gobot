@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"time"
 	"os"
+	"time"
 
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/ble"

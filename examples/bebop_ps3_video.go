@@ -71,7 +71,7 @@ func main() {
 			for {
 				if _, err := video.Write(<-drone.Video()); err != nil {
 					fmt.Println(err)
-          return
+					return
 				}
 			}
 		}()
