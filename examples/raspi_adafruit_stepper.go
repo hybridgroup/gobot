@@ -13,8 +13,8 @@ func adafruitStepperMotorRunner(a *i2c.AdafruitMotorHatDriver, motor int) (err e
 	log.Printf("Stepper Motor Run Loop...\n")
 	// set the speed state:
 	speed := 30 // rpm
-	style := i2c.AdafruitMicrostep
-	steps := 50
+	style := i2c.AdafruitDouble
+	steps := 20
 
 	a.SetStepperMotorSpeed(motor, speed)
 

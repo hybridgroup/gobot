@@ -90,8 +90,8 @@ func TestAdafruitMotorHatDriverRunDCMotor(t *testing.T) {
 	ada, _ := initTestAdafruitMotorHatDriverWithStubbedAdaptor()
 
 	dcMotor := 1
-	// NOT using this prevents importing the i2c package
-	//dir := i2c.AdafruitForward
+	// NOTE: not using the direction constant to prevent importing
+	// the i2c package
 	err := ada.RunDCMotor(dcMotor, 1)
 	gobottest.Assert(t, err, nil)
 }
@@ -107,9 +107,8 @@ func TestAdafruitMotorHatDriverSetStepperMotorSpeed(t *testing.T) {
 func TestAdafruitMotorHatDriverStepperStep(t *testing.T) {
 	ada, _ := initTestAdafruitMotorHatDriverWithStubbedAdaptor()
 
-	// NOT using these prevents importing the i2c package
-	//dir := i2c.AdafruitForward
-	//style := i2c.AdafruitMicrostep
+	// NOTE: not using the direction and style constants to prevent importing
+	// the i2c package
 	stepperMotor := 0
 	steps := 50
 	err := ada.Step(stepperMotor, steps, 1, 3)
