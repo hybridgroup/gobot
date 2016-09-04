@@ -66,7 +66,6 @@ func (d *i2cDevice) queryFunctionality() (err error) {
 	if errno != 0 {
 		err = fmt.Errorf("Querying functionality failed with syscall.Errno %v", errno)
 	}
-	fmt.Printf("Functionality: 0x%x\n", d.funcs)
 	return
 }
 
