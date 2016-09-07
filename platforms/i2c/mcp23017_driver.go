@@ -155,6 +155,18 @@ func (m *MCP23017Driver) WriteGPIO(pin uint8, val uint8, portStr string) (err er
 	return nil
 }
 
+// PinMode set pin mode
+// val (0 output 1 input)
+// port (A or B).
+func (m *MCP23017Driver) PinMode(pin, val uint8, portStr string) (err error) {
+	selectedPort := m.getPort(portStr)
+	// Set IODIR register bit for given pin to an output/input.
+	if err = m.write(selectedPort.IODIR, uint8(pin), val); err != nil {
+		return
+	}
+	return
+}
+
 // ReadGPIO reads a value from a given gpio pin (0-7) and a
 // port (A or B).
 func (m *MCP23017Driver) ReadGPIO(pin uint8, portStr string) (val uint8, err error) {
