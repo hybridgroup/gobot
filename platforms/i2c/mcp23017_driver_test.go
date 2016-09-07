@@ -187,6 +187,29 @@ func TestMCP23017DriverReadGPIO(t *testing.T) {
 	gobottest.Assert(t, err, errors.New("Read came back with no data"))
 }
 
+func TestMCP23017DriverPinMode(t *testing.T) {
+        mcp, adaptor := initTestMCP23017DriverWithStubbedAdaptor(0)
+        adaptor.i2cMcpReadImpl = func(a int, b int) ([]byte, error) {
+                return make([]byte, b), nil
+        }
+        adaptor.i2cMcpWriteImpl = func() error {
+                return nil
+        }
+        err := mcp.PinMode(7, 0, "A")
+        gobottest.Assert(t, err, nil)
+
+        // write error
+        mcp, adaptor = initTestMCP23017DriverWithStubbedAdaptor(0)
+        adaptor.i2cMcpReadImpl = func(a int, b int) ([]byte, error) {
+                return make([]byte, b), nil
+        }
+        adaptor.i2cMcpWriteImpl = func() error {
+                return errors.New("write error")
+        }
+        err = mcp.PinMode(7, 0, "A")
+        gobottest.Assert(t, err, errors.New("write error"))
+}
+
 func TestMCP23017DriverSetPullUp(t *testing.T) {
 	mcp, adaptor := initTestMCP23017DriverWithStubbedAdaptor(0)
 	adaptor.i2cMcpReadImpl = func(a int, b int) ([]byte, error) {
