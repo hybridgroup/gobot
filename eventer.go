@@ -18,7 +18,7 @@ type eventer struct {
 type Eventer interface {
 	// Events returns the map of valid Event names.
 	Events() (eventnames map[string]string)
-	// Event returns an event string from map of valid Event names.
+	// Event returns an Event string from map of valid Event names.
 	// Mostly used to validate that an Event name is valid.
 	Event(name string) string
 	// AddEvent registers a new Event name.
