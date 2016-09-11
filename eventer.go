@@ -18,10 +18,13 @@ type eventer struct {
 type Eventer interface {
 	// Events returns the map of valid Event names.
 	Events() (eventnames map[string]string)
-	// Event returns the map of valid Event names.
+	// Event returns an event string from map of valid Event names.
+	// Mostly used to validate that an Event name is valid.
 	Event(name string) string
 	// AddEvent registers a new Event name.
 	AddEvent(name string)
+	// DeleteEvent removes a previously registered Event name.
+	DeleteEvent(name string)
 	// Publish new events to anyone listening
 	Publish(name string, data interface{})
 	// Subscribe to any events from this eventer
@@ -65,6 +68,10 @@ func (e *eventer) Event(name string) string {
 
 func (e *eventer) AddEvent(name string) {
 	e.eventnames[name] = name
+}
+
+func (e *eventer) DeleteEvent(name string) {
+	delete(e.eventnames, name)
 }
 
 func (e *eventer) Publish(name string, data interface{}) {
