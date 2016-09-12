@@ -11,7 +11,7 @@ import (
 
 var _ gobot.Driver = (*ButtonDriver)(nil)
 
-const BUTTON_TEST_DELAY = 50
+const BUTTON_TEST_DELAY = 150
 
 func initTestButtonDriver() *ButtonDriver {
 	return NewButtonDriver(newGpioTestAdaptor("adaptor"), "bot", "1")

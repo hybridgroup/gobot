@@ -8,13 +8,13 @@ import (
 )
 
 const (
-	// Packet event
+	// PacketEvent event
 	PacketEvent = "packet"
-	// Message event
+	// MessageEvent event
 	MessageEvent = "message"
-	// ErrorIO event
+	// ErrorIOE event
 	ErrorIOEvent = "errorIO"
-	// ErrorMAVLink event
+	// ErrorMAVLinkEvent event
 	ErrorMAVLinkEvent = "errorMAVLink"
 )
 
