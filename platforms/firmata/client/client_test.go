@@ -222,10 +222,10 @@ func TestProcessI2cReply(t *testing.T) {
 
 	b.Once(b.Event("I2cReply"), func(data interface{}) {
 		gobottest.Assert(t, data, I2cReply{
-						Address:  9,
-						Register: 0,
-						Data:     []byte{152, 1, 154},
-					})
+			Address:  9,
+			Register: 0,
+			Data:     []byte{152, 1, 154},
+		})
 		sem <- true
 	})
 
@@ -242,8 +242,8 @@ func TestProcessFirmwareQuery(t *testing.T) {
 	sem := make(chan bool)
 	b := initTestFirmata()
 	testReadData = []byte{240, 121, 2, 3, 83, 0, 116, 0, 97, 0, 110, 0, 100, 0, 97,
-					0, 114, 0, 100, 0, 70, 0, 105, 0, 114, 0, 109, 0, 97, 0, 116, 0, 97, 0, 46,
-					0, 105, 0, 110, 0, 111, 0, 247}
+		0, 114, 0, 100, 0, 70, 0, 105, 0, 114, 0, 109, 0, 97, 0, 116, 0, 97, 0, 46,
+		0, 105, 0, 110, 0, 111, 0, 247}
 
 	b.Once(b.Event("FirmwareQuery"), func(data interface{}) {
 		gobottest.Assert(t, data, "StandardFirmata.ino")
