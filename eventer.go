@@ -9,8 +9,8 @@ type eventer struct {
 	// new events get put in to the event channel
 	in eventChannel
 
-	// slice of out channels used by subscribers
-	outs []eventChannel
+	// map of out channels used by subscribers
+	outs map[eventChannel]eventChannel
 }
 
 // Eventer is the interface which describes how a Driver or Adaptor
@@ -29,11 +29,14 @@ type Eventer interface {
 	// DeleteEvent removes a previously registered Event name.
 	DeleteEvent(name string)
 
-	// Publish new events to anyone that is subscribed
+	// Publish new events to any subscriber
 	Publish(name string, data interface{})
 
-	// Subscribe to any events from this eventer
+	// Subscribe to events
 	Subscribe() (events eventChannel)
+
+	// Unsubscribe from an event channel
+	Unsubscribe(events eventChannel)
 
 	// Event handler
 	On(name string, f func(s interface{})) (err error)
@@ -47,7 +50,7 @@ func NewEventer() Eventer {
 	evtr := &eventer{
 		eventnames: make(map[string]string),
 		in:         make(eventChannel, 1),
-		outs:       make([]eventChannel, 1),
+		outs:       make(map[eventChannel]eventChannel),
 	}
 
 	// goroutine to cascade "in" events to all "out" event channels
@@ -55,7 +58,7 @@ func NewEventer() Eventer {
 		for {
 			select {
 			case evt := <-evtr.in:
-				for _, out := range evtr.outs[1:] {
+				for _, out := range evtr.outs {
 					out <- evt
 				}
 			}
@@ -95,8 +98,13 @@ func (e *eventer) Publish(name string, data interface{}) {
 // Subscribe to any events from this eventer
 func (e *eventer) Subscribe() eventChannel {
 	out := make(eventChannel)
-	e.outs = append(e.outs, out)
+	e.outs[out] = out
 	return out
+}
+
+// Unsubscribe from the event channel
+func (e *eventer) Unsubscribe(events eventChannel) {
+	delete(e.outs, events)
 }
 
 // On executes the event handler f when e is Published to.
@@ -126,6 +134,7 @@ func (e *eventer) Once(n string, f func(s interface{})) (err error) {
 			case evt := <-out:
 				if evt.Name == n {
 					f(evt.Data)
+					e.Unsubscribe(out)
 					break ProcessEvents
 				}
 			}
