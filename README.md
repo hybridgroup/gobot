@@ -93,6 +93,33 @@ func main() {
 }
 ```
 
+#### "Metal" Gobot
+
+You can use the entire Gobot framework as shown in the examples above ("Classic" Gobot), or you can pick and choose from the various Gobot packages to control hardware with nothing but pure idiomatic Golang code ("Metal" Gobot). For example:
+
+```go
+package main
+
+import (
+	"github.com/hybridgroup/gobot/platforms/gpio"
+	"github.com/hybridgroup/gobot/platforms/intel-iot/edison"
+	"time"
+)
+
+func main() {
+	e := edison.NewEdisonAdaptor("edison")
+	e.Connect()
+
+	led := gpio.NewLedDriver(e, "led", "13")
+	led.Start()
+
+	for {
+		led.Toggle()
+		time.Sleep(1000 * time.Millisecond)
+	}
+}
+```
+
 ## Hardware Support
 Gobot has a extensible system for connecting to hardware devices. The following robotics and physical computing platforms are currently supported:
 
