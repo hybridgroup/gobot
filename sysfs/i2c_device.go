@@ -125,6 +125,8 @@ func (d *i2cDevice) Write(b []byte) (n int, err error) {
 		return d.file.Write(b)
 	}
 
+	// Command byte - a data byte which often selects a register on the device:
+	// 	https://www.kernel.org/doc/Documentation/i2c/smbus-protocol
 	command := byte(b[0])
 	buf := b[1:]
 
