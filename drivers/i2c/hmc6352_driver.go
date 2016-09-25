@@ -11,15 +11,15 @@ type HMC6352Driver struct {
 	connection I2c
 }
 
-// NewHMC6352Driver creates a new driver with specified name and i2c interface
-func NewHMC6352Driver(a I2c, name string) *HMC6352Driver {
+// NewHMC6352Driver creates a new driver with specified i2c interface
+func NewHMC6352Driver(a I2c) *HMC6352Driver {
 	return &HMC6352Driver{
-		name:       name,
 		connection: a,
 	}
 }
 
 func (h *HMC6352Driver) Name() string                 { return h.name }
+func (h *HMC6352Driver) SetName(n string)             { h.name = n }
 func (h *HMC6352Driver) Connection() gobot.Connection { return h.connection.(gobot.Connection) }
 
 // Start initialized the hmc6352

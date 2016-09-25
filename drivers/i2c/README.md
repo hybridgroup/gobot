@@ -1,6 +1,6 @@
 # I2C
 
-This package provides drivers for [i2c](https://en.wikipedia.org/wiki/I%C2%B2C)devices . It is normally not used directly, but instead is registered by an adaptor such as [firmata](https://github.com/hybridgroup/gobot/platforms/firmata) that supports the needed interfaces for i2c devices.
+This package provides drivers for [i2c](https://en.wikipedia.org/wiki/I%C2%B2C)devices. It must be used along with an adaptor such as [firmata](https://github.com/hybridgroup/gobot/platforms/firmata) that supports the needed interfaces for i2c devices.
 
 ## Getting Started
 
@@ -13,8 +13,14 @@ go get -d -u github.com/hybridgroup/gobot/... && go install github.com/hybridgro
 Gobot has a extensible system for connecting to hardware devices. The following i2c devices are currently supported:
 
 - BlinkM
-- HMC6352 Digital Compass
-- MPL115A2 Barometer/Temperature Sensor
+- Grove Digital Accelerometer
+- Grove RGB LCD
+- HMC6352 Compass
+- JHD1313M1 RGB LCD Display
+- LIDAR-Lite
+- MCP23017 Port Expander
+- MMA7660 3-Axis Accelerometer
+- MPL115A2 Barometer
 - MPU6050 Accelerometer/Gyroscope
 - Wii Nunchuck Controller
 

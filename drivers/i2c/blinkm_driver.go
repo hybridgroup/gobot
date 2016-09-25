@@ -16,16 +16,15 @@ type BlinkMDriver struct {
 	gobot.Commander
 }
 
-// NewBlinkMDriver creates a new BlinkMDriver with specified name.
+// NewBlinkMDriver creates a new BlinkMDriver.
 //
 // Adds the following API commands:
 //	Rgb - sets RGB color
 //	Fade - fades the RGB color
 //	FirmwareVersion - returns the version of the current Frimware
 //	Color - returns the color of the LED.
-func NewBlinkMDriver(a I2c, name string) *BlinkMDriver {
+func NewBlinkMDriver(a I2c) *BlinkMDriver {
 	b := &BlinkMDriver{
-		name:       name,
 		connection: a,
 		Commander:  gobot.NewCommander(),
 	}
@@ -54,6 +53,7 @@ func NewBlinkMDriver(a I2c, name string) *BlinkMDriver {
 	return b
 }
 func (b *BlinkMDriver) Name() string                 { return b.name }
+func (b *BlinkMDriver) SetName(n string)             { b.name = n }
 func (b *BlinkMDriver) Connection() gobot.Connection { return b.connection.(gobot.Connection) }
 
 // adaptor returns I2C adaptor

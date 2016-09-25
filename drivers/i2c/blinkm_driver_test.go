@@ -14,15 +14,15 @@ func initTestBlinkMDriver() (driver *BlinkMDriver) {
 }
 
 func initTestBlinkDriverWithStubbedAdaptor() (*BlinkMDriver, *i2cTestAdaptor) {
-	adaptor := newI2cTestAdaptor("adaptor")
-	return NewBlinkMDriver(adaptor, "bot"), adaptor
+	adaptor := newI2cTestAdaptor()
+	return NewBlinkMDriver(adaptor), adaptor
 }
 
 // --------- TESTS
 
 func TestNewBlinkMDriver(t *testing.T) {
 	// Does it return a pointer to an instance of BlinkMDriver?
-	var bm interface{} = NewBlinkMDriver(newI2cTestAdaptor("adaptor"), "bot")
+	var bm interface{} = NewBlinkMDriver(newI2cTestAdaptor())
 	_, ok := bm.(*BlinkMDriver)
 	if !ok {
 		t.Errorf("NewBlinkMDriver() should have returned a *BlinkMDriver")
@@ -84,8 +84,7 @@ func TestNewBlinkMDriverCommands_Color(t *testing.T) {
 func TestBlinkMDriver(t *testing.T) {
 	blinkM := initTestBlinkMDriver()
 
-	gobottest.Assert(t, blinkM.Name(), "bot")
-	gobottest.Assert(t, blinkM.Connection().Name(), "adaptor")
+	gobottest.Refute(t, blinkM.Connection(), nil)
 }
 
 func TestBlinkMDriverStart(t *testing.T) {

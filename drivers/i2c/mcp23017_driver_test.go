@@ -27,12 +27,12 @@ func (t *i2cMcpTestAdaptor) I2cWrite(int, []byte) (err error) {
 	return t.i2cMcpWriteImpl()
 }
 func (t *i2cMcpTestAdaptor) Name() string             { return t.name }
+func (t *i2cMcpTestAdaptor) SetName(n string)         { t.name = n }
 func (t *i2cMcpTestAdaptor) Connect() (errs []error)  { return }
 func (t *i2cMcpTestAdaptor) Finalize() (errs []error) { return }
 
-func newMcpI2cTestAdaptor(name string) *i2cMcpTestAdaptor {
+func newMcpI2cTestAdaptor() *i2cMcpTestAdaptor {
 	return &i2cMcpTestAdaptor{
-		name: name,
 		i2cMcpReadImpl: func(address int, numBytes int) ([]byte, error) {
 			return []byte{}, nil
 		},
@@ -62,20 +62,19 @@ func initTestMCP23017Driver(b uint8) (driver *MCP23017Driver) {
 }
 
 func initTestMCP23017DriverWithStubbedAdaptor(b uint8) (*MCP23017Driver, *i2cMcpTestAdaptor) {
-	adaptor := newMcpI2cTestAdaptor("adaptor")
-	return NewMCP23017Driver(adaptor, "bot", MCP23017Config{Bank: b}, 0x20), adaptor
+	adaptor := newMcpI2cTestAdaptor()
+	return NewMCP23017Driver(adaptor, MCP23017Config{Bank: b}, 0x20), adaptor
 }
 
 func TestNewMCP23017Driver(t *testing.T) {
-	var bm interface{} = NewMCP23017Driver(newMcpI2cTestAdaptor("adaptor"), "bot", MCP23017Config{}, 0x20)
+	var bm interface{} = NewMCP23017Driver(newMcpI2cTestAdaptor(), MCP23017Config{}, 0x20)
 	_, ok := bm.(*MCP23017Driver)
 	if !ok {
 		t.Errorf("NewMCP23017Driver() should have returned a *MCP23017Driver")
 	}
 
-	b := NewMCP23017Driver(newMcpI2cTestAdaptor("adaptor"), "bot", MCP23017Config{}, 0x20)
-	gobottest.Assert(t, b.Name(), "bot")
-	gobottest.Assert(t, b.Connection().Name(), "adaptor")
+	b := NewMCP23017Driver(newMcpI2cTestAdaptor(), MCP23017Config{}, 0x20)
+	gobottest.Refute(t, b.Connection(), nil)
 }
 
 func TestMCP23017DriverStart(t *testing.T) {
@@ -188,26 +187,26 @@ func TestMCP23017DriverReadGPIO(t *testing.T) {
 }
 
 func TestMCP23017DriverPinMode(t *testing.T) {
-        mcp, adaptor := initTestMCP23017DriverWithStubbedAdaptor(0)
-        adaptor.i2cMcpReadImpl = func(a int, b int) ([]byte, error) {
-                return make([]byte, b), nil
-        }
-        adaptor.i2cMcpWriteImpl = func() error {
-                return nil
-        }
-        err := mcp.PinMode(7, 0, "A")
-        gobottest.Assert(t, err, nil)
+	mcp, adaptor := initTestMCP23017DriverWithStubbedAdaptor(0)
+	adaptor.i2cMcpReadImpl = func(a int, b int) ([]byte, error) {
+		return make([]byte, b), nil
+	}
+	adaptor.i2cMcpWriteImpl = func() error {
+		return nil
+	}
+	err := mcp.PinMode(7, 0, "A")
+	gobottest.Assert(t, err, nil)
 
-        // write error
-        mcp, adaptor = initTestMCP23017DriverWithStubbedAdaptor(0)
-        adaptor.i2cMcpReadImpl = func(a int, b int) ([]byte, error) {
-                return make([]byte, b), nil
-        }
-        adaptor.i2cMcpWriteImpl = func() error {
-                return errors.New("write error")
-        }
-        err = mcp.PinMode(7, 0, "A")
-        gobottest.Assert(t, err, errors.New("write error"))
+	// write error
+	mcp, adaptor = initTestMCP23017DriverWithStubbedAdaptor(0)
+	adaptor.i2cMcpReadImpl = func(a int, b int) ([]byte, error) {
+		return make([]byte, b), nil
+	}
+	adaptor.i2cMcpWriteImpl = func() error {
+		return errors.New("write error")
+	}
+	err = mcp.PinMode(7, 0, "A")
+	gobottest.Assert(t, err, errors.New("write error"))
 }
 
 func TestMCP23017DriverSetPullUp(t *testing.T) {

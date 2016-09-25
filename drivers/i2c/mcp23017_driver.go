@@ -89,10 +89,9 @@ type MCP23017Driver struct {
 	gobot.Eventer
 }
 
-// NewMCP23017Driver creates a new driver with specified name and i2c interface.
-func NewMCP23017Driver(a I2c, name string, conf MCP23017Config, deviceAddress int, v ...time.Duration) *MCP23017Driver {
+// NewMCP23017Driver creates a new driver with specified i2c interface.
+func NewMCP23017Driver(a I2c, conf MCP23017Config, deviceAddress int, v ...time.Duration) *MCP23017Driver {
 	m := &MCP23017Driver{
-		name:            name,
 		connection:      a,
 		conf:            conf,
 		mcp23017Address: deviceAddress,
@@ -120,6 +119,9 @@ func NewMCP23017Driver(a I2c, name string, conf MCP23017Config, deviceAddress in
 
 // Name return the driver name.
 func (m *MCP23017Driver) Name() string { return m.name }
+
+// SetName set the driver name.
+func (m *MCP23017Driver) SetName(n string) { m.name = n }
 
 // Connection returns the I2c connection.
 func (m *MCP23017Driver) Connection() gobot.Connection { return m.connection.(gobot.Connection) }

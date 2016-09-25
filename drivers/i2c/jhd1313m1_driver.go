@@ -79,10 +79,9 @@ type JHD1313M1Driver struct {
 	rgbAddress int
 }
 
-// NewJHD1313M1Driver creates a new driver with specified name and i2c interface.
-func NewJHD1313M1Driver(a I2c, name string) *JHD1313M1Driver {
+// NewJHD1313M1Driver creates a new driver with specified i2c interface.
+func NewJHD1313M1Driver(a I2c) *JHD1313M1Driver {
 	return &JHD1313M1Driver{
-		name:       name,
 		connection: a,
 		lcdAddress: 0x3E,
 		rgbAddress: 0x62,
@@ -91,6 +90,9 @@ func NewJHD1313M1Driver(a I2c, name string) *JHD1313M1Driver {
 
 // Name returns the name the JHD1313M1 Driver was given when created.
 func (h *JHD1313M1Driver) Name() string { return h.name }
+
+// SetName sets the name for the JHD1313M1 Driver.
+func (h *JHD1313M1Driver) SetName(n string) { h.name = n }
 
 // Connection returns the driver connection to the device.
 func (h *JHD1313M1Driver) Connection() gobot.Connection {
@@ -225,7 +227,7 @@ func (h *JHD1313M1Driver) command(buf []byte) error {
 	return h.connection.I2cWrite(h.lcdAddress, append([]byte{LCD_CMD}, buf...))
 }
 
-// CustomChar sets one of the 8 CGRAM locations with a custom character.
+// SetCustomChar sets one of the 8 CGRAM locations with a custom character.
 // The custom character can be used by writing a byte of value 0 to 7.
 // When you are using LCD as 5x8 dots in function set then you can define a total of 8 user defined patterns
 // (1 Byte for each row and 8 rows for each pattern).

@@ -14,23 +14,22 @@ func initTestLIDARLiteDriver() (driver *LIDARLiteDriver) {
 }
 
 func initTestLIDARLiteDriverWithStubbedAdaptor() (*LIDARLiteDriver, *i2cTestAdaptor) {
-	adaptor := newI2cTestAdaptor("adaptor")
-	return NewLIDARLiteDriver(adaptor, "bot"), adaptor
+	adaptor := newI2cTestAdaptor()
+	return NewLIDARLiteDriver(adaptor), adaptor
 }
 
 // --------- TESTS
 
 func TestNewLIDARLiteDriver(t *testing.T) {
 	// Does it return a pointer to an instance of LIDARLiteDriver?
-	var bm interface{} = NewLIDARLiteDriver(newI2cTestAdaptor("adaptor"), "bot")
+	var bm interface{} = NewLIDARLiteDriver(newI2cTestAdaptor())
 	_, ok := bm.(*LIDARLiteDriver)
 	if !ok {
 		t.Errorf("NewLIDARLiteDriver() should have returned a *LIDARLiteDriver")
 	}
 
-	b := NewLIDARLiteDriver(newI2cTestAdaptor("adaptor"), "bot")
-	gobottest.Assert(t, b.Name(), "bot")
-	gobottest.Assert(t, b.Connection().Name(), "adaptor")
+	b := NewLIDARLiteDriver(newI2cTestAdaptor())
+	gobottest.Refute(t, b.Connection(), nil)
 }
 
 // Methods

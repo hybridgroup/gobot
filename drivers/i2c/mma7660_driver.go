@@ -35,15 +35,15 @@ type MMA7660Driver struct {
 	connection I2c
 }
 
-// NewMMA7660Driver creates a new driver with specified name and i2c interface
-func NewMMA7660Driver(a I2c, name string) *MMA7660Driver {
+// NewMMA7660Driver creates a new driver with specified i2c interface
+func NewMMA7660Driver(a I2c) *MMA7660Driver {
 	return &MMA7660Driver{
-		name:       name,
 		connection: a,
 	}
 }
 
 func (h *MMA7660Driver) Name() string                 { return h.name }
+func (h *MMA7660Driver) SetName(n string)             { h.name = n }
 func (h *MMA7660Driver) Connection() gobot.Connection { return h.connection.(gobot.Connection) }
 
 // Start initialized the mma7660

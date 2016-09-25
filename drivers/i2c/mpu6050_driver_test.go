@@ -14,15 +14,15 @@ func initTestMPU6050Driver() (driver *MPU6050Driver) {
 }
 
 func initTestMPU6050DriverWithStubbedAdaptor() (*MPU6050Driver, *i2cTestAdaptor) {
-	adaptor := newI2cTestAdaptor("adaptor")
-	return NewMPU6050Driver(adaptor, "bot"), adaptor
+	adaptor := newI2cTestAdaptor()
+	return NewMPU6050Driver(adaptor), adaptor
 }
 
 // --------- TESTS
 
 func TestNewMPU6050Driver(t *testing.T) {
 	// Does it return a pointer to an instance of MPU6050Driver?
-	var bm interface{} = NewMPU6050Driver(newI2cTestAdaptor("adaptor"), "bot")
+	var bm interface{} = NewMPU6050Driver(newI2cTestAdaptor())
 	_, ok := bm.(*MPU6050Driver)
 	if !ok {
 		t.Errorf("NewMPU6050Driver() should have returned a *MPU6050Driver")
@@ -31,11 +31,10 @@ func TestNewMPU6050Driver(t *testing.T) {
 
 func TestMPU6050Driver(t *testing.T) {
 	mpu := initTestMPU6050Driver()
-	gobottest.Assert(t, mpu.Name(), "bot")
-	gobottest.Assert(t, mpu.Connection().Name(), "adaptor")
+	gobottest.Refute(t, mpu.Connection(), nil)
 	gobottest.Assert(t, mpu.interval, 10*time.Millisecond)
 
-	mpu = NewMPU6050Driver(newI2cTestAdaptor("adaptor"), "bot", 100*time.Millisecond)
+	mpu = NewMPU6050Driver(newI2cTestAdaptor(), 100*time.Millisecond)
 	gobottest.Assert(t, mpu.interval, 100*time.Millisecond)
 }
 

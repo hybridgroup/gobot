@@ -44,10 +44,9 @@ type MPU6050Driver struct {
 	gobot.Eventer
 }
 
-// NewMPU6050Driver creates a new driver with specified name and i2c interface
-func NewMPU6050Driver(a I2c, name string, v ...time.Duration) *MPU6050Driver {
+// NewMPU6050Driver creates a new driver with specified i2c interface
+func NewMPU6050Driver(a I2c, v ...time.Duration) *MPU6050Driver {
 	m := &MPU6050Driver{
-		name:       name,
 		connection: a,
 		interval:   10 * time.Millisecond,
 		Eventer:    gobot.NewEventer(),
@@ -62,6 +61,7 @@ func NewMPU6050Driver(a I2c, name string, v ...time.Duration) *MPU6050Driver {
 }
 
 func (h *MPU6050Driver) Name() string                 { return h.name }
+func (h *MPU6050Driver) SetName(n string)             { h.name = n }
 func (h *MPU6050Driver) Connection() gobot.Connection { return h.connection.(gobot.Connection) }
 
 // Start writes initialization bytes and reads from adaptor

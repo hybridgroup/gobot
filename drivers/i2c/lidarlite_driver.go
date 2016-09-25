@@ -15,15 +15,15 @@ type LIDARLiteDriver struct {
 	connection I2c
 }
 
-// NewLIDARLiteDriver creates a new driver with specified name and i2c interface
-func NewLIDARLiteDriver(a I2c, name string) *LIDARLiteDriver {
+// NewLIDARLiteDriver creates a new driver with specified i2c interface
+func NewLIDARLiteDriver(a I2c) *LIDARLiteDriver {
 	return &LIDARLiteDriver{
-		name:       name,
 		connection: a,
 	}
 }
 
 func (h *LIDARLiteDriver) Name() string                 { return h.name }
+func (h *LIDARLiteDriver) SetName(n string)             { h.name = n }
 func (h *LIDARLiteDriver) Connection() gobot.Connection { return h.connection.(gobot.Connection) }
 
 // Start initialized the LIDAR

@@ -31,12 +31,12 @@ func (t *i2cTestAdaptor) I2cWrite(int, []byte) (err error) {
 	return t.i2cWriteImpl()
 }
 func (t *i2cTestAdaptor) Name() string             { return t.name }
+func (t *i2cTestAdaptor) SetName(n string)         { t.name = n }
 func (t *i2cTestAdaptor) Connect() (errs []error)  { return }
 func (t *i2cTestAdaptor) Finalize() (errs []error) { return }
 
-func newI2cTestAdaptor(name string) *i2cTestAdaptor {
+func newI2cTestAdaptor() *i2cTestAdaptor {
 	return &i2cTestAdaptor{
-		name: name,
 		i2cReadImpl: func() ([]byte, error) {
 			return []byte{}, nil
 		},

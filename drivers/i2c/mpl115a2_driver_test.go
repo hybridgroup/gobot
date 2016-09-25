@@ -14,15 +14,15 @@ func initTestMPL115A2Driver() (driver *MPL115A2Driver) {
 }
 
 func initTestMPL115A2DriverWithStubbedAdaptor() (*MPL115A2Driver, *i2cTestAdaptor) {
-	adaptor := newI2cTestAdaptor("adaptor")
-	return NewMPL115A2Driver(adaptor, "bot"), adaptor
+	adaptor := newI2cTestAdaptor()
+	return NewMPL115A2Driver(adaptor), adaptor
 }
 
 // --------- TESTS
 
 func TestNewMPL115A2Driver(t *testing.T) {
 	// Does it return a pointer to an instance of MPL115A2Driver?
-	var mpl interface{} = NewMPL115A2Driver(newI2cTestAdaptor("adaptor"), "bot")
+	var mpl interface{} = NewMPL115A2Driver(newI2cTestAdaptor())
 	_, ok := mpl.(*MPL115A2Driver)
 	if !ok {
 		t.Errorf("NewMPL115A2Driver() should have returned a *MPL115A2Driver")
@@ -33,11 +33,10 @@ func TestNewMPL115A2Driver(t *testing.T) {
 func TestMPL115A2Driver(t *testing.T) {
 	mpl := initTestMPL115A2Driver()
 
-	gobottest.Assert(t, mpl.Name(), "bot")
-	gobottest.Assert(t, mpl.Connection().Name(), "adaptor")
+	gobottest.Refute(t, mpl.Connection(), nil)
 	gobottest.Assert(t, mpl.interval, 10*time.Millisecond)
 
-	mpl = NewMPL115A2Driver(newI2cTestAdaptor("adaptor"), "bot", 100*time.Millisecond)
+	mpl = NewMPL115A2Driver(newI2cTestAdaptor(), 100*time.Millisecond)
 	gobottest.Assert(t, mpl.interval, 100*time.Millisecond)
 }
 

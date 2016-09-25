@@ -20,16 +20,15 @@ type WiichuckDriver struct {
 	data     map[string]float64
 }
 
-// NewWiichuckDriver creates a WiichuckDriver with specified i2c interface and name.
+// NewWiichuckDriver creates a WiichuckDriver with specified i2c interface.
 //
 // It adds the following events:
 //	"z"- Gets triggered every interval amount of time if the z button is pressed
 //	"c" - Gets triggered every interval amount of time if the c button is pressed
 //	"joystick" - Gets triggered every "interval" amount of time if a joystick event occurred, you can access values x, y
 //	"error" - Gets triggered whenever the WiichuckDriver encounters an error
-func NewWiichuckDriver(a I2c, name string, v ...time.Duration) *WiichuckDriver {
+func NewWiichuckDriver(a I2c, v ...time.Duration) *WiichuckDriver {
 	w := &WiichuckDriver{
-		name:       name,
 		connection: a,
 		interval:   10 * time.Millisecond,
 		pauseTime:  1 * time.Millisecond,
@@ -57,6 +56,7 @@ func NewWiichuckDriver(a I2c, name string, v ...time.Duration) *WiichuckDriver {
 	return w
 }
 func (w *WiichuckDriver) Name() string                 { return w.name }
+func (w *WiichuckDriver) SetName(n string)             { w.name = n }
 func (w *WiichuckDriver) Connection() gobot.Connection { return w.connection.(gobot.Connection) }
 
 // Start initilizes i2c and reads from adaptor

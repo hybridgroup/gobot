@@ -14,23 +14,22 @@ func initTestHMC6352Driver() (driver *HMC6352Driver) {
 }
 
 func initTestHMC6352DriverWithStubbedAdaptor() (*HMC6352Driver, *i2cTestAdaptor) {
-	adaptor := newI2cTestAdaptor("adaptor")
-	return NewHMC6352Driver(adaptor, "bot"), adaptor
+	adaptor := newI2cTestAdaptor()
+	return NewHMC6352Driver(adaptor), adaptor
 }
 
 // --------- TESTS
 
 func TestNewHMC6352Driver(t *testing.T) {
 	// Does it return a pointer to an instance of HMC6352Driver?
-	var bm interface{} = NewHMC6352Driver(newI2cTestAdaptor("adaptor"), "bot")
+	var bm interface{} = NewHMC6352Driver(newI2cTestAdaptor())
 	_, ok := bm.(*HMC6352Driver)
 	if !ok {
 		t.Errorf("NewHMC6352Driver() should have returned a *HMC6352Driver")
 	}
 
-	b := NewHMC6352Driver(newI2cTestAdaptor("adaptor"), "bot")
-	gobottest.Assert(t, b.Name(), "bot")
-	gobottest.Assert(t, b.Connection().Name(), "adaptor")
+	b := NewHMC6352Driver(newI2cTestAdaptor())
+	gobottest.Refute(t, b.Connection(), nil)
 }
 
 // Methods

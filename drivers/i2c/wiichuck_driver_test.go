@@ -14,15 +14,15 @@ func initTestWiichuckDriver() (driver *WiichuckDriver) {
 }
 
 func initTestWiichuckDriverWithStubbedAdaptor() (*WiichuckDriver, *i2cTestAdaptor) {
-	adaptor := newI2cTestAdaptor("adaptor")
-	return NewWiichuckDriver(adaptor, "bot"), adaptor
+	adaptor := newI2cTestAdaptor()
+	return NewWiichuckDriver(adaptor), adaptor
 }
 
 // --------- TESTS
 
 func TestNewWiichuckDriver(t *testing.T) {
 	// Does it return a pointer to an instance of WiichuckDriver?
-	var bm interface{} = NewWiichuckDriver(newI2cTestAdaptor("adaptor"), "bot")
+	var bm interface{} = NewWiichuckDriver(newI2cTestAdaptor())
 	_, ok := bm.(*WiichuckDriver)
 	if !ok {
 		t.Errorf("NewWiichuckDriver() should have returned a *WiichuckDriver")
@@ -31,11 +31,10 @@ func TestNewWiichuckDriver(t *testing.T) {
 
 func TestWiichuckDriver(t *testing.T) {
 	wii := initTestWiichuckDriver()
-	gobottest.Assert(t, wii.Name(), "bot")
-	gobottest.Assert(t, wii.Connection().Name(), "adaptor")
+	gobottest.Refute(t, wii.Connection(), nil)
 	gobottest.Assert(t, wii.interval, 10*time.Millisecond)
 
-	wii = NewWiichuckDriver(newI2cTestAdaptor("adaptor"), "bot", 100*time.Millisecond)
+	wii = NewWiichuckDriver(newI2cTestAdaptor(), 100*time.Millisecond)
 	gobottest.Assert(t, wii.interval, 100*time.Millisecond)
 }
 

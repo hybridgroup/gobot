@@ -39,10 +39,9 @@ type MPL115A2Driver struct {
 	Temperature float32
 }
 
-// NewMPL115A2Driver creates a new driver with specified name and i2c interface
-func NewMPL115A2Driver(a I2c, name string, v ...time.Duration) *MPL115A2Driver {
+// NewMPL115A2Driver creates a new driver with specified i2c interface
+func NewMPL115A2Driver(a I2c, v ...time.Duration) *MPL115A2Driver {
 	m := &MPL115A2Driver{
-		name:       name,
 		connection: a,
 		Eventer:    gobot.NewEventer(),
 		interval:   10 * time.Millisecond,
@@ -56,6 +55,7 @@ func NewMPL115A2Driver(a I2c, name string, v ...time.Duration) *MPL115A2Driver {
 }
 
 func (h *MPL115A2Driver) Name() string                 { return h.name }
+func (h *MPL115A2Driver) SetName(n string)             { h.name = n }
 func (h *MPL115A2Driver) Connection() gobot.Connection { return h.connection.(gobot.Connection) }
 
 // Start writes initialization bytes and reads from adaptor
