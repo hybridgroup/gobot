@@ -9,23 +9,23 @@ import (
 	"path"
 )
 
-type AudioAdaptor struct {
+type Adaptor struct {
 	name string
 }
 
-func NewAudioAdaptor(name string) *AudioAdaptor {
-	return &AudioAdaptor{
-		name: name,
-	}
+func NewAdaptor() *Adaptor {
+	return &Adaptor{}
 }
 
-func (a *AudioAdaptor) Name() string { return a.name }
+func (a *Adaptor) Name() string { return a.name }
 
-func (a *AudioAdaptor) Connect() []error { return nil }
+func (a *Adaptor) SetName(n string) { a.name = n }
 
-func (a *AudioAdaptor) Finalize() []error { return nil }
+func (a *Adaptor) Connect() []error { return nil }
 
-func (a *AudioAdaptor) Sound(fileName string) []error {
+func (a *Adaptor) Finalize() []error { return nil }
+
+func (a *Adaptor) Sound(fileName string) []error {
 	var errorsList []error
 
 	if fileName == "" {

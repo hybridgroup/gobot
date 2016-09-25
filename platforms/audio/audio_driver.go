@@ -3,11 +3,12 @@
 package audio
 
 import (
-	"github.com/hybridgroup/gobot"
 	"time"
+
+	"github.com/hybridgroup/gobot"
 )
 
-type AudioDriver struct {
+type Driver struct {
 	name       string
 	connection gobot.Connection
 	interval   time.Duration
@@ -17,9 +18,8 @@ type AudioDriver struct {
 	filename string
 }
 
-func NewAudioDriver(a *AudioAdaptor, name string, filename string) *AudioDriver {
-	d := &AudioDriver{
-		name:       name,
+func NewDriver(a *Adaptor, filename string) *Driver {
+	d := &Driver{
 		connection: a,
 		interval:   500 * time.Millisecond,
 		filename:   filename,
@@ -30,30 +30,32 @@ func NewAudioDriver(a *AudioAdaptor, name string, filename string) *AudioDriver 
 	return d
 }
 
-func (d *AudioDriver) Name() string { return d.name }
+func (d *Driver) Name() string { return d.name }
 
-func (d *AudioDriver) Filename() string { return d.filename }
+func (d *Driver) SetName(n string) { d.name = n }
 
-func (d *AudioDriver) Connection() gobot.Connection {
+func (d *Driver) Filename() string { return d.filename }
+
+func (d *Driver) Connection() gobot.Connection {
 	return d.connection
 }
 
-func (d *AudioDriver) Sound(fileName string) []error {
-	return d.Connection().(*AudioAdaptor).Sound(fileName)
+func (d *Driver) Sound(fileName string) []error {
+	return d.Connection().(*Adaptor).Sound(fileName)
 }
 
-func (d *AudioDriver) Play() []error {
+func (d *Driver) Play() []error {
 	return d.Sound(d.Filename())
 }
 
-func (d *AudioDriver) adaptor() *AudioAdaptor {
-	return d.Connection().(*AudioAdaptor)
+func (d *Driver) adaptor() *Adaptor {
+	return d.Connection().(*Adaptor)
 }
 
-func (d *AudioDriver) Start() (err []error) {
+func (d *Driver) Start() (err []error) {
 	return
 }
 
-func (d *AudioDriver) Halt() (err []error) {
+func (d *Driver) Halt() (err []error) {
 	return
 }
