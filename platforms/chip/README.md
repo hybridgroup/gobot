@@ -42,14 +42,14 @@ import (
 
     "github.com/hybridgroup/gobot"
     "github.com/hybridgroup/gobot/platforms/chip"
-    "github.com/hybridgroup/gobot/platforms/gpio"
+    "github.com/hybridgroup/gobot/drivers/gpio"
 )
 
 func main() {
     gbot := gobot.NewGobot()
 
-    chipAdaptor := chip.NewChipAdaptor("chip")
-    button := gpio.NewButtonDriver(chipAdaptor, "button", "XIO-P0")
+    chipAdaptor := chip.NewAdaptor()
+    button := gpio.NewButtonDriver(chipAdaptor, "XIO-P0")
 
     work := func() {
         gobot.On(button.Event("push"), func(data interface{}) {

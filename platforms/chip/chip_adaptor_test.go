@@ -5,18 +5,18 @@ import (
 	"testing"
 
 	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/drivers/gpio"
+	"github.com/hybridgroup/gobot/drivers/i2c"
 	"github.com/hybridgroup/gobot/gobottest"
-	"github.com/hybridgroup/gobot/platforms/gpio"
-	"github.com/hybridgroup/gobot/platforms/i2c"
 	"github.com/hybridgroup/gobot/sysfs"
 )
 
-var _ gobot.Adaptor = (*ChipAdaptor)(nil)
+var _ gobot.Adaptor = (*Adaptor)(nil)
 
-var _ gpio.DigitalReader = (*ChipAdaptor)(nil)
-var _ gpio.DigitalWriter = (*ChipAdaptor)(nil)
+var _ gpio.DigitalReader = (*Adaptor)(nil)
+var _ gpio.DigitalWriter = (*Adaptor)(nil)
 
-var _ i2c.I2c = (*ChipAdaptor)(nil)
+var _ i2c.I2c = (*Adaptor)(nil)
 
 type NullReadWriteCloser struct {
 	contents []byte
@@ -44,8 +44,8 @@ func (n *NullReadWriteCloser) Close() error {
 	return closeErr
 }
 
-func initTestChipAdaptor() *ChipAdaptor {
-	a := NewChipAdaptor("myAdaptor")
+func initTestChipAdaptor() *Adaptor {
+	a := NewAdaptor()
 	a.Connect()
 	return a
 }
