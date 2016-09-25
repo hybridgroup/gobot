@@ -18,7 +18,7 @@ const (
 	ErrorMAVLinkEvent = "errorMAVLink"
 )
 
-type MavlinkDriver struct {
+type Driver struct {
 	name       string
 	connection gobot.Connection
 	interval   time.Duration
@@ -28,14 +28,13 @@ type MavlinkDriver struct {
 type MavlinkInterface interface {
 }
 
-// NewMavlinkDriver creates a new mavlink driver with specified name.
+// NewDriver creates a new mavlink driver.
 //
 // It add the following events:
 //	"packet" - triggered when a new packet is read
 //	"message" - triggered when a new valid message is processed
-func NewMavlinkDriver(a *MavlinkAdaptor, name string, v ...time.Duration) *MavlinkDriver {
-	m := &MavlinkDriver{
-		name:       name,
+func NewDriver(a *Adaptor, v ...time.Duration) *Driver {
+	m := &Driver{
 		connection: a,
 		Eventer:    gobot.NewEventer(),
 		interval:   10 * time.Millisecond,
@@ -53,17 +52,18 @@ func NewMavlinkDriver(a *MavlinkAdaptor, name string, v ...time.Duration) *Mavli
 	return m
 }
 
-func (m *MavlinkDriver) Connection() gobot.Connection { return m.connection }
-func (m *MavlinkDriver) Name() string                 { return m.name }
+func (m *Driver) Connection() gobot.Connection { return m.connection }
+func (m *Driver) Name() string                 { return m.name }
+func (m *Driver) SetName(n string)             { m.name = n }
 
 // adaptor returns driver associated adaptor
-func (m *MavlinkDriver) adaptor() *MavlinkAdaptor {
-	return m.Connection().(*MavlinkAdaptor)
+func (m *Driver) adaptor() *Adaptor {
+	return m.Connection().(*Adaptor)
 }
 
 // Start begins process to read mavlink packets every m.Interval
 // and process them
-func (m *MavlinkDriver) Start() (errs []error) {
+func (m *Driver) Start() (errs []error) {
 	go func() {
 		for {
 			packet, err := common.ReadMAVLinkPacket(m.adaptor().sp)
@@ -85,10 +85,10 @@ func (m *MavlinkDriver) Start() (errs []error) {
 }
 
 // Halt returns true if device is halted successfully
-func (m *MavlinkDriver) Halt() (errs []error) { return }
+func (m *Driver) Halt() (errs []error) { return }
 
 // SendPacket sends a packet to mavlink device
-func (m *MavlinkDriver) SendPacket(packet *common.MAVLinkPacket) (err error) {
+func (m *Driver) SendPacket(packet *common.MAVLinkPacket) (err error) {
 	_, err = m.adaptor().sp.Write(packet.Pack())
 	return err
 }
