@@ -40,13 +40,13 @@ type sysfsPin struct {
 	pwmPin int
 }
 
-// JouleAdaptor represents an Intel Joule
-type JouleAdaptor struct {
+// Adaptor represents an Intel Joule
+type Adaptor struct {
 	name        string
 	digitalPins map[int]sysfs.DigitalPin
 	pwmPins     map[int]*pwmPin
 	i2cDevice   sysfs.I2cDevice
-	connect     func(e *JouleAdaptor) (err error)
+	connect     func(e *Adaptor) (err error)
 }
 
 var sysfsPinMap = map[string]sysfsPin{
@@ -449,21 +449,23 @@ var sysfsPinMap = map[string]sysfsPin{
 	},
 }
 
-// NewJouleAdaptor returns a new JouleAdaptor with specified name
-func NewJouleAdaptor(name string) *JouleAdaptor {
-	return &JouleAdaptor{
-		name: name,
-		connect: func(e *JouleAdaptor) (err error) {
+// NewAdaptor returns a new Joule Adaptor
+func NewAdaptor() *Adaptor {
+	return &Adaptor{
+		connect: func(e *Adaptor) (err error) {
 			return
 		},
 	}
 }
 
-// Name returns the JouleAdaptors name
-func (e *JouleAdaptor) Name() string { return e.name }
+// Name returns the Adaptors name
+func (e *Adaptor) Name() string { return e.name }
+
+// SetName sets the Adaptors name
+func (e *Adaptor) SetName(n string) { e.name = n }
 
 // Connect initializes the Joule for use with the Arduino beakout board
-func (e *JouleAdaptor) Connect() (errs []error) {
+func (e *Adaptor) Connect() (errs []error) {
 	e.digitalPins = make(map[int]sysfs.DigitalPin)
 	e.pwmPins = make(map[int]*pwmPin)
 	if err := e.connect(e); err != nil {
@@ -473,7 +475,7 @@ func (e *JouleAdaptor) Connect() (errs []error) {
 }
 
 // Finalize releases all i2c devices and exported digital and pwm pins.
-func (e *JouleAdaptor) Finalize() (errs []error) {
+func (e *Adaptor) Finalize() (errs []error) {
 	for _, pin := range e.digitalPins {
 		if pin != nil {
 			if err := pin.Unexport(); err != nil {
@@ -500,7 +502,7 @@ func (e *JouleAdaptor) Finalize() (errs []error) {
 }
 
 // digitalPin returns matched digitalPin for specified values
-func (e *JouleAdaptor) digitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPin, err error) {
+func (e *Adaptor) digitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPin, err error) {
 	i := sysfsPinMap[pin]
 	if e.digitalPins[i.pin] == nil {
 		e.digitalPins[i.pin] = sysfs.NewDigitalPin(i.pin)
@@ -523,7 +525,7 @@ func (e *JouleAdaptor) digitalPin(pin string, dir string) (sysfsPin sysfs.Digita
 }
 
 // DigitalRead reads digital value from pin
-func (e *JouleAdaptor) DigitalRead(pin string) (i int, err error) {
+func (e *Adaptor) DigitalRead(pin string) (i int, err error) {
 	sysfsPin, err := e.digitalPin(pin, "in")
 	if err != nil {
 		return
@@ -532,7 +534,7 @@ func (e *JouleAdaptor) DigitalRead(pin string) (i int, err error) {
 }
 
 // DigitalWrite writes a value to the pin. Acceptable values are 1 or 0.
-func (e *JouleAdaptor) DigitalWrite(pin string, val byte) (err error) {
+func (e *Adaptor) DigitalWrite(pin string, val byte) (err error) {
 	sysfsPin, err := e.digitalPin(pin, "out")
 	if err != nil {
 		return
@@ -541,7 +543,7 @@ func (e *JouleAdaptor) DigitalWrite(pin string, val byte) (err error) {
 }
 
 // PwmWrite writes the 0-254 value to the specified pin
-func (e *JouleAdaptor) PwmWrite(pin string, val byte) (err error) {
+func (e *Adaptor) PwmWrite(pin string, val byte) (err error) {
 	sysPin := sysfsPinMap[pin]
 	if sysPin.pwmPin != -1 {
 		if e.pwmPins[sysPin.pwmPin] == nil {
@@ -571,7 +573,7 @@ func (e *JouleAdaptor) PwmWrite(pin string, val byte) (err error) {
 }
 
 // I2cStart initializes i2c device for addresss
-func (e *JouleAdaptor) I2cStart(address int) (err error) {
+func (e *Adaptor) I2cStart(address int) (err error) {
 	if e.i2cDevice != nil {
 		return
 	}
@@ -582,7 +584,7 @@ func (e *JouleAdaptor) I2cStart(address int) (err error) {
 }
 
 // I2cWrite writes data to i2c device
-func (e *JouleAdaptor) I2cWrite(address int, data []byte) (err error) {
+func (e *Adaptor) I2cWrite(address int, data []byte) (err error) {
 	if err = e.i2cDevice.SetAddress(address); err != nil {
 		return err
 	}
@@ -591,7 +593,7 @@ func (e *JouleAdaptor) I2cWrite(address int, data []byte) (err error) {
 }
 
 // I2cRead returns size bytes from the i2c device
-func (e *JouleAdaptor) I2cRead(address int, size int) (data []byte, err error) {
+func (e *Adaptor) I2cRead(address int, size int) (data []byte, err error) {
 	data = make([]byte, size)
 	if err = e.i2cDevice.SetAddress(address); err != nil {
 		return

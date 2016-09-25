@@ -5,19 +5,19 @@ import (
 	"testing"
 
 	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/drivers/gpio"
+	"github.com/hybridgroup/gobot/drivers/i2c"
 	"github.com/hybridgroup/gobot/gobottest"
-	"github.com/hybridgroup/gobot/platforms/gpio"
-	"github.com/hybridgroup/gobot/platforms/i2c"
 	"github.com/hybridgroup/gobot/sysfs"
 )
 
-var _ gobot.Adaptor = (*JouleAdaptor)(nil)
+var _ gobot.Adaptor = (*Adaptor)(nil)
 
-var _ gpio.DigitalReader = (*JouleAdaptor)(nil)
-var _ gpio.DigitalWriter = (*JouleAdaptor)(nil)
-var _ gpio.PwmWriter = (*JouleAdaptor)(nil)
+var _ gpio.DigitalReader = (*Adaptor)(nil)
+var _ gpio.DigitalWriter = (*Adaptor)(nil)
+var _ gpio.PwmWriter = (*Adaptor)(nil)
 
-var _ i2c.I2c = (*JouleAdaptor)(nil)
+var _ i2c.I2c = (*Adaptor)(nil)
 
 type NullReadWriteCloser struct {
 	contents []byte
@@ -45,8 +45,8 @@ func (n *NullReadWriteCloser) Close() error {
 	return closeErr
 }
 
-func initTestJouleAdaptor() (*JouleAdaptor, *sysfs.MockFilesystem) {
-	a := NewJouleAdaptor("myAdaptor")
+func initTestAdaptor() (*Adaptor, *sysfs.MockFilesystem) {
+	a := NewAdaptor()
 	fs := sysfs.NewMockFilesystem([]string{
 		"/sys/bus/iio/devices/iio:device1/in_voltage0_raw",
 		"/sys/kernel/debug/gpio_debug/gpio111/current_pinmux",
@@ -126,18 +126,13 @@ func initTestJouleAdaptor() (*JouleAdaptor, *sysfs.MockFilesystem) {
 	return a, fs
 }
 
-func TestJouleAdaptor(t *testing.T) {
-	a, _ := initTestJouleAdaptor()
-	gobottest.Assert(t, a.Name(), "myAdaptor")
-}
-
-func TestJouleAdaptorConnect(t *testing.T) {
-	a, _ := initTestJouleAdaptor()
+func TestAdaptorConnect(t *testing.T) {
+	a, _ := initTestAdaptor()
 	gobottest.Assert(t, len(a.Connect()), 0)
 }
 
-func TestJouleAdaptorFinalize(t *testing.T) {
-	a, _ := initTestJouleAdaptor()
+func TestAdaptorFinalize(t *testing.T) {
+	a, _ := initTestAdaptor()
 	a.DigitalWrite("1", 1)
 	a.PwmWrite("25", 100)
 
@@ -151,8 +146,8 @@ func TestJouleAdaptorFinalize(t *testing.T) {
 	gobottest.Refute(t, len(a.Finalize()), 0)
 }
 
-func TestJouleAdaptorDigitalIO(t *testing.T) {
-	a, fs := initTestJouleAdaptor()
+func TestAdaptorDigitalIO(t *testing.T) {
+	a, fs := initTestAdaptor()
 
 	a.DigitalWrite("1", 1)
 	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio446/value"].Contents, "1")
@@ -163,8 +158,8 @@ func TestJouleAdaptorDigitalIO(t *testing.T) {
 	gobottest.Assert(t, i, 0)
 }
 
-func TestJouleAdaptorI2c(t *testing.T) {
-	a, _ := initTestJouleAdaptor()
+func TestAdaptorI2c(t *testing.T) {
+	a, _ := initTestAdaptor()
 
 	sysfs.SetSyscall(&sysfs.MockSyscall{})
 	a.I2cStart(0xff)
@@ -176,8 +171,8 @@ func TestJouleAdaptorI2c(t *testing.T) {
 	gobottest.Assert(t, data, []byte{0x00, 0x01})
 }
 
-func TestJouleAdaptorPwm(t *testing.T) {
-	a, fs := initTestJouleAdaptor()
+func TestAdaptorPwm(t *testing.T) {
+	a, fs := initTestAdaptor()
 
 	err := a.PwmWrite("25", 100)
 	gobottest.Assert(t, err, nil)
