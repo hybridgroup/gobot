@@ -47,14 +47,14 @@ type sysfsPin struct {
 	mux          []mux
 }
 
-// EdisonAdaptor represents an Intel Edison
-type EdisonAdaptor struct {
+// Adaptor represents a Gobot Adaptor for an Intel Edison
+type Adaptor struct {
 	name        string
 	tristate    sysfs.DigitalPin
 	digitalPins map[int]sysfs.DigitalPin
 	pwmPins     map[int]*pwmPin
 	i2cDevice   sysfs.I2cDevice
-	connect     func(e *EdisonAdaptor) (err error)
+	connect     func(e *Adaptor) (err error)
 }
 
 var sysfsPinMap = map[string]sysfsPin{
@@ -178,13 +178,10 @@ func changePinMode(pin, mode string) (err error) {
 	return
 }
 
-// NewEdisonAdaptor returns a new EdisonAdaptor with specified name
-func NewEdisonAdaptor(name string) *EdisonAdaptor {
-	return &EdisonAdaptor{
-		name: name,
-		//i2cDevices: make(map[int]io.ReadWriteCloser),
-		//i2cDevices: make(map[int]io.ReadWriteCloser),
-		connect: func(e *EdisonAdaptor) (err error) {
+// NewAdaptor returns a new Edison Adaptor
+func NewAdaptor() *Adaptor {
+	return &Adaptor{
+		connect: func(e *Adaptor) (err error) {
 			e.tristate = sysfs.NewDigitalPin(214)
 			if err = e.tristate.Export(); err != nil {
 				return err
@@ -247,11 +244,14 @@ func NewEdisonAdaptor(name string) *EdisonAdaptor {
 	}
 }
 
-// Name returns the EdisonAdaptors name
-func (e *EdisonAdaptor) Name() string { return e.name }
+// Name returns the Adaptors name
+func (e *Adaptor) Name() string { return e.name }
+
+// SetName sets the Adaptors name
+func (e *Adaptor) SetName(n string) { e.name = n }
 
 // Connect initializes the Edison for use with the Arduino beakout board
-func (e *EdisonAdaptor) Connect() (errs []error) {
+func (e *Adaptor) Connect() (errs []error) {
 	e.digitalPins = make(map[int]sysfs.DigitalPin)
 	e.pwmPins = make(map[int]*pwmPin)
 	if err := e.connect(e); err != nil {
@@ -261,7 +261,7 @@ func (e *EdisonAdaptor) Connect() (errs []error) {
 }
 
 // Finalize releases all i2c devices and exported analog, digital, pwm pins.
-func (e *EdisonAdaptor) Finalize() (errs []error) {
+func (e *Adaptor) Finalize() (errs []error) {
 	if err := e.tristate.Unexport(); err != nil {
 		errs = append(errs, err)
 	}
@@ -291,7 +291,7 @@ func (e *EdisonAdaptor) Finalize() (errs []error) {
 }
 
 // digitalPin returns matched digitalPin for specified values
-func (e *EdisonAdaptor) digitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPin, err error) {
+func (e *Adaptor) digitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPin, err error) {
 	i := sysfsPinMap[pin]
 	if e.digitalPins[i.pin] == nil {
 		e.digitalPins[i.pin] = sysfs.NewDigitalPin(i.pin)
@@ -371,7 +371,7 @@ func (e *EdisonAdaptor) digitalPin(pin string, dir string) (sysfsPin sysfs.Digit
 }
 
 // DigitalRead reads digital value from pin
-func (e *EdisonAdaptor) DigitalRead(pin string) (i int, err error) {
+func (e *Adaptor) DigitalRead(pin string) (i int, err error) {
 	sysfsPin, err := e.digitalPin(pin, "in")
 	if err != nil {
 		return
@@ -380,7 +380,7 @@ func (e *EdisonAdaptor) DigitalRead(pin string) (i int, err error) {
 }
 
 // DigitalWrite writes a value to the pin. Acceptable values are 1 or 0.
-func (e *EdisonAdaptor) DigitalWrite(pin string, val byte) (err error) {
+func (e *Adaptor) DigitalWrite(pin string, val byte) (err error) {
 	sysfsPin, err := e.digitalPin(pin, "out")
 	if err != nil {
 		return
@@ -389,7 +389,7 @@ func (e *EdisonAdaptor) DigitalWrite(pin string, val byte) (err error) {
 }
 
 // PwmWrite writes the 0-254 value to the specified pin
-func (e *EdisonAdaptor) PwmWrite(pin string, val byte) (err error) {
+func (e *Adaptor) PwmWrite(pin string, val byte) (err error) {
 	sysPin := sysfsPinMap[pin]
 	if sysPin.pwmPin != -1 {
 		if e.pwmPins[sysPin.pwmPin] == nil {
@@ -422,7 +422,7 @@ func (e *EdisonAdaptor) PwmWrite(pin string, val byte) (err error) {
 }
 
 // AnalogRead returns value from analog reading of specified pin
-func (e *EdisonAdaptor) AnalogRead(pin string) (val int, err error) {
+func (e *Adaptor) AnalogRead(pin string) (val int, err error) {
 	buf, err := readFile(
 		"/sys/bus/iio/devices/iio:device1/in_voltage" + pin + "_raw",
 	)
@@ -436,7 +436,7 @@ func (e *EdisonAdaptor) AnalogRead(pin string) (val int, err error) {
 }
 
 // I2cStart initializes i2c device for addresss
-func (e *EdisonAdaptor) I2cStart(address int) (err error) {
+func (e *Adaptor) I2cStart(address int) (err error) {
 	if e.i2cDevice != nil {
 		return
 	}
@@ -489,7 +489,7 @@ func (e *EdisonAdaptor) I2cStart(address int) (err error) {
 }
 
 // I2cWrite writes data to i2c device
-func (e *EdisonAdaptor) I2cWrite(address int, data []byte) (err error) {
+func (e *Adaptor) I2cWrite(address int, data []byte) (err error) {
 	if err = e.i2cDevice.SetAddress(address); err != nil {
 		return err
 	}
@@ -498,7 +498,7 @@ func (e *EdisonAdaptor) I2cWrite(address int, data []byte) (err error) {
 }
 
 // I2cRead returns size bytes from the i2c device
-func (e *EdisonAdaptor) I2cRead(address int, size int) (data []byte, err error) {
+func (e *Adaptor) I2cRead(address int, size int) (data []byte, err error) {
 	data = make([]byte, size)
 	if err = e.i2cDevice.SetAddress(address); err != nil {
 		return
