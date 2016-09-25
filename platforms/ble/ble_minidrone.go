@@ -9,9 +9,9 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
-var _ gobot.Driver = (*BLEMinidroneDriver)(nil)
+var _ gobot.Driver = (*MinidroneDriver)(nil)
 
-type BLEMinidroneDriver struct {
+type MinidroneDriver struct {
 	name       string
 	connection gobot.Connection
 	stepsfa0a  uint16
@@ -64,10 +64,9 @@ func validatePitch(val int) int {
 	return val
 }
 
-// NewBLEMinidroneDriver creates a BLEMinidroneDriver by name
-func NewBLEMinidroneDriver(a *BLEClientAdaptor, name string) *BLEMinidroneDriver {
-	n := &BLEMinidroneDriver{
-		name:       name,
+// NewMinidroneDriver creates a MinidroneDriver
+func NewMinidroneDriver(a *ClientAdaptor) *MinidroneDriver {
+	n := &MinidroneDriver{
 		connection: a,
 		Pcmd: Pcmd{
 			Flag:  0,
@@ -87,16 +86,17 @@ func NewBLEMinidroneDriver(a *BLEClientAdaptor, name string) *BLEMinidroneDriver
 
 	return n
 }
-func (b *BLEMinidroneDriver) Connection() gobot.Connection { return b.connection }
-func (b *BLEMinidroneDriver) Name() string                 { return b.name }
+func (b *MinidroneDriver) Connection() gobot.Connection { return b.connection }
+func (b *MinidroneDriver) Name() string                 { return b.name }
+func (b *MinidroneDriver) SetName(n string)             { b.name = n }
 
 // adaptor returns BLE adaptor
-func (b *BLEMinidroneDriver) adaptor() *BLEClientAdaptor {
-	return b.Connection().(*BLEClientAdaptor)
+func (b *MinidroneDriver) adaptor() *ClientAdaptor {
+	return b.Connection().(*ClientAdaptor)
 }
 
 // Start tells driver to get ready to do work
-func (b *BLEMinidroneDriver) Start() (errs []error) {
+func (b *MinidroneDriver) Start() (errs []error) {
 	b.Init()
 	b.FlatTrim()
 	b.StartPcmd()
@@ -106,14 +106,14 @@ func (b *BLEMinidroneDriver) Start() (errs []error) {
 }
 
 // Halt stops minidrone driver (void)
-func (b *BLEMinidroneDriver) Halt() (errs []error) {
+func (b *MinidroneDriver) Halt() (errs []error) {
 	b.Land()
 
 	<-time.After(500 * time.Millisecond)
 	return
 }
 
-func (b *BLEMinidroneDriver) Init() (err error) {
+func (b *MinidroneDriver) Init() (err error) {
 	b.GenerateAllStates()
 
 	// subscribe to battery notifications
@@ -140,7 +140,7 @@ func (b *BLEMinidroneDriver) Init() (err error) {
 	return
 }
 
-func (b *BLEMinidroneDriver) GenerateAllStates() (err error) {
+func (b *MinidroneDriver) GenerateAllStates() (err error) {
 	b.stepsfa0b++
 	buf := []byte{0x04, byte(b.stepsfa0b), 0x00, 0x04, 0x01, 0x00, 0x32, 0x30, 0x31, 0x34, 0x2D, 0x31, 0x30, 0x2D, 0x32, 0x38, 0x00}
 	err = b.adaptor().WriteCharacteristic(DroneCommandService, CommandCharacteristic, buf)
@@ -152,7 +152,7 @@ func (b *BLEMinidroneDriver) GenerateAllStates() (err error) {
 	return
 }
 
-func (b *BLEMinidroneDriver) TakeOff() (err error) {
+func (b *MinidroneDriver) TakeOff() (err error) {
 	b.stepsfa0b++
 	buf := []byte{0x02, byte(b.stepsfa0b) & 0xff, 0x02, 0x00, 0x01, 0x00}
 	err = b.adaptor().WriteCharacteristic(DroneCommandService, CommandCharacteristic, buf)
@@ -164,7 +164,7 @@ func (b *BLEMinidroneDriver) TakeOff() (err error) {
 	return
 }
 
-func (b *BLEMinidroneDriver) Land() (err error) {
+func (b *MinidroneDriver) Land() (err error) {
 	b.stepsfa0b++
 	buf := []byte{0x02, byte(b.stepsfa0b), 0x02, 0x00, 0x03, 0x00}
 	err = b.adaptor().WriteCharacteristic(DroneCommandService, CommandCharacteristic, buf)
@@ -172,7 +172,7 @@ func (b *BLEMinidroneDriver) Land() (err error) {
 	return err
 }
 
-func (b *BLEMinidroneDriver) FlatTrim() (err error) {
+func (b *MinidroneDriver) FlatTrim() (err error) {
 	b.stepsfa0b++
 	buf := []byte{0x02, byte(b.stepsfa0b) & 0xff, 0x02, 0x00, 0x00, 0x00}
 	err = b.adaptor().WriteCharacteristic(DroneCommandService, CommandCharacteristic, buf)
@@ -180,7 +180,7 @@ func (b *BLEMinidroneDriver) FlatTrim() (err error) {
 	return err
 }
 
-func (b *BLEMinidroneDriver) StartPcmd() {
+func (b *MinidroneDriver) StartPcmd() {
 	go func() {
 		// wait a little bit so that there is enough time to get some ACKs
 		<-time.After(500 * time.Millisecond)
@@ -194,55 +194,55 @@ func (b *BLEMinidroneDriver) StartPcmd() {
 	}()
 }
 
-func (b *BLEMinidroneDriver) Up(val int) error {
+func (b *MinidroneDriver) Up(val int) error {
 	b.Pcmd.Flag = 1
 	b.Pcmd.Gaz = validatePitch(val)
 	return nil
 }
 
-func (b *BLEMinidroneDriver) Down(val int) error {
+func (b *MinidroneDriver) Down(val int) error {
 	b.Pcmd.Flag = 1
 	b.Pcmd.Gaz = validatePitch(val) * -1
 	return nil
 }
 
-func (b *BLEMinidroneDriver) Forward(val int) error {
+func (b *MinidroneDriver) Forward(val int) error {
 	b.Pcmd.Flag = 1
 	b.Pcmd.Pitch = validatePitch(val)
 	return nil
 }
 
-func (b *BLEMinidroneDriver) Backward(val int) error {
+func (b *MinidroneDriver) Backward(val int) error {
 	b.Pcmd.Flag = 1
 	b.Pcmd.Pitch = validatePitch(val) * -1
 	return nil
 }
 
-func (b *BLEMinidroneDriver) Right(val int) error {
+func (b *MinidroneDriver) Right(val int) error {
 	b.Pcmd.Flag = 1
 	b.Pcmd.Roll = validatePitch(val)
 	return nil
 }
 
-func (b *BLEMinidroneDriver) Left(val int) error {
+func (b *MinidroneDriver) Left(val int) error {
 	b.Pcmd.Flag = 1
 	b.Pcmd.Roll = validatePitch(val) * -1
 	return nil
 }
 
-func (b *BLEMinidroneDriver) Clockwise(val int) error {
+func (b *MinidroneDriver) Clockwise(val int) error {
 	b.Pcmd.Flag = 1
 	b.Pcmd.Yaw = validatePitch(val)
 	return nil
 }
 
-func (b *BLEMinidroneDriver) CounterClockwise(val int) error {
+func (b *MinidroneDriver) CounterClockwise(val int) error {
 	b.Pcmd.Flag = 1
 	b.Pcmd.Yaw = validatePitch(val) * -1
 	return nil
 }
 
-func (b *BLEMinidroneDriver) Stop() error {
+func (b *MinidroneDriver) Stop() error {
 	b.Pcmd = Pcmd{
 		Flag:  0,
 		Roll:  0,
@@ -256,48 +256,48 @@ func (b *BLEMinidroneDriver) Stop() error {
 }
 
 // StartRecording not supported
-func (b *BLEMinidroneDriver) StartRecording() error {
+func (b *MinidroneDriver) StartRecording() error {
 	return nil
 }
 
 // StopRecording not supported
-func (b *BLEMinidroneDriver) StopRecording() error {
+func (b *MinidroneDriver) StopRecording() error {
 	return nil
 }
 
 // HullProtection not supported
-func (b *BLEMinidroneDriver) HullProtection(protect bool) error {
+func (b *MinidroneDriver) HullProtection(protect bool) error {
 	return nil
 }
 
 // Outdoor not supported
-func (b *BLEMinidroneDriver) Outdoor(outdoor bool) error {
+func (b *MinidroneDriver) Outdoor(outdoor bool) error {
 	return nil
 }
 
-func (b *BLEMinidroneDriver) FrontFlip() (err error) {
+func (b *MinidroneDriver) FrontFlip() (err error) {
 	return b.adaptor().WriteCharacteristic(DroneCommandService, CommandCharacteristic, b.generateAnimation(0).Bytes())
 }
 
-func (b *BLEMinidroneDriver) BackFlip() (err error) {
+func (b *MinidroneDriver) BackFlip() (err error) {
 	return b.adaptor().WriteCharacteristic(DroneCommandService, CommandCharacteristic, b.generateAnimation(1).Bytes())
 }
 
-func (b *BLEMinidroneDriver) RightFlip() (err error) {
+func (b *MinidroneDriver) RightFlip() (err error) {
 	return b.adaptor().WriteCharacteristic(DroneCommandService, CommandCharacteristic, b.generateAnimation(2).Bytes())
 }
 
-func (b *BLEMinidroneDriver) LeftFlip() (err error) {
+func (b *MinidroneDriver) LeftFlip() (err error) {
 	return b.adaptor().WriteCharacteristic(DroneCommandService, CommandCharacteristic, b.generateAnimation(3).Bytes())
 }
 
-func (b *BLEMinidroneDriver) generateAnimation(direction int8) *bytes.Buffer {
+func (b *MinidroneDriver) generateAnimation(direction int8) *bytes.Buffer {
 	b.stepsfa0b++
 	buf := []byte{0x02, byte(b.stepsfa0b) & 0xff, 0x02, 0x04, 0x00, 0x00, byte(direction), 0x00, 0x00, 0x00}
 	return bytes.NewBuffer(buf)
 }
 
-func (b *BLEMinidroneDriver) generatePcmd() *bytes.Buffer {
+func (b *MinidroneDriver) generatePcmd() *bytes.Buffer {
 	b.stepsfa0a++
 
 	cmd := &bytes.Buffer{}

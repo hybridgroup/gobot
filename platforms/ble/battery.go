@@ -6,41 +6,41 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
-var _ gobot.Driver = (*BLEBatteryDriver)(nil)
+var _ gobot.Driver = (*BatteryDriver)(nil)
 
-type BLEBatteryDriver struct {
+type BatteryDriver struct {
 	name       string
 	connection gobot.Connection
 	gobot.Eventer
 }
 
-// NewBLEBatteryDriver creates a BLEBatteryDriver by name
-func NewBLEBatteryDriver(a *BLEClientAdaptor, name string) *BLEBatteryDriver {
-	n := &BLEBatteryDriver{
-		name:       name,
+// NewBatteryDriver creates a BatteryDriver
+func NewBatteryDriver(a *ClientAdaptor, name string) *BatteryDriver {
+	n := &BatteryDriver{
 		connection: a,
 		Eventer:    gobot.NewEventer(),
 	}
 
 	return n
 }
-func (b *BLEBatteryDriver) Connection() gobot.Connection { return b.connection }
-func (b *BLEBatteryDriver) Name() string                 { return b.name }
+func (b *BatteryDriver) Connection() gobot.Connection { return b.connection }
+func (b *BatteryDriver) Name() string                 { return b.name }
+func (b *BatteryDriver) SetName(n string)             { b.name = n }
 
 // adaptor returns BLE adaptor
-func (b *BLEBatteryDriver) adaptor() *BLEClientAdaptor {
-	return b.Connection().(*BLEClientAdaptor)
+func (b *BatteryDriver) adaptor() *ClientAdaptor {
+	return b.Connection().(*ClientAdaptor)
 }
 
 // Start tells driver to get ready to do work
-func (b *BLEBatteryDriver) Start() (errs []error) {
+func (b *BatteryDriver) Start() (errs []error) {
 	return
 }
 
 // Halt stops battery driver (void)
-func (b *BLEBatteryDriver) Halt() (errs []error) { return }
+func (b *BatteryDriver) Halt() (errs []error) { return }
 
-func (b *BLEBatteryDriver) GetBatteryLevel() (level uint8) {
+func (b *BatteryDriver) GetBatteryLevel() (level uint8) {
 	var l uint8
 	c, _ := b.adaptor().ReadCharacteristic("180f", "2a19")
 	buf := bytes.NewBuffer(c)

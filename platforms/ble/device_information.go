@@ -6,70 +6,69 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
-var _ gobot.Driver = (*BLEDeviceInformationDriver)(nil)
+var _ gobot.Driver = (*DeviceInformationDriver)(nil)
 
-type BLEDeviceInformationDriver struct {
+type DeviceInformationDriver struct {
 	name       string
 	connection gobot.Connection
 	gobot.Eventer
 }
 
-// NewBLEDeviceInformationDriver creates a BLEDeviceInformationDriver
-// by name
-func NewBLEDeviceInformationDriver(a *BLEClientAdaptor, name string) *BLEDeviceInformationDriver {
-	n := &BLEDeviceInformationDriver{
-		name:       name,
+// NewDeviceInformationDriver creates a DeviceInformationDriver
+func NewDeviceInformationDriver(a *ClientAdaptor) *DeviceInformationDriver {
+	n := &DeviceInformationDriver{
 		connection: a,
 		Eventer:    gobot.NewEventer(),
 	}
 
 	return n
 }
-func (b *BLEDeviceInformationDriver) Connection() gobot.Connection { return b.connection }
-func (b *BLEDeviceInformationDriver) Name() string                 { return b.name }
+func (b *DeviceInformationDriver) Connection() gobot.Connection { return b.connection }
+func (b *DeviceInformationDriver) Name() string                 { return b.name }
+func (b *DeviceInformationDriver) SetName(n string)             { b.name = n }
 
 // adaptor returns BLE adaptor for this device
-func (b *BLEDeviceInformationDriver) adaptor() *BLEClientAdaptor {
-	return b.Connection().(*BLEClientAdaptor)
+func (b *DeviceInformationDriver) adaptor() *ClientAdaptor {
+	return b.Connection().(*ClientAdaptor)
 }
 
 // Start tells driver to get ready to do work
-func (b *BLEDeviceInformationDriver) Start() (errs []error) {
+func (b *DeviceInformationDriver) Start() (errs []error) {
 	return
 }
 
 // Halt stops driver (void)
-func (b *BLEDeviceInformationDriver) Halt() (errs []error) { return }
+func (b *DeviceInformationDriver) Halt() (errs []error) { return }
 
-func (b *BLEDeviceInformationDriver) GetModelNumber() (model string) {
+func (b *DeviceInformationDriver) GetModelNumber() (model string) {
 	c, _ := b.adaptor().ReadCharacteristic("180a", "2a24")
 	buf := bytes.NewBuffer(c)
 	val := buf.String()
 	return val
 }
 
-func (b *BLEDeviceInformationDriver) GetFirmwareRevision() (revision string) {
+func (b *DeviceInformationDriver) GetFirmwareRevision() (revision string) {
 	c, _ := b.adaptor().ReadCharacteristic("180a", "2a26")
 	buf := bytes.NewBuffer(c)
 	val := buf.String()
 	return val
 }
 
-func (b *BLEDeviceInformationDriver) GetHardwareRevision() (revision string) {
+func (b *DeviceInformationDriver) GetHardwareRevision() (revision string) {
 	c, _ := b.adaptor().ReadCharacteristic("180a", "2a27")
 	buf := bytes.NewBuffer(c)
 	val := buf.String()
 	return val
 }
 
-func (b *BLEDeviceInformationDriver) GetManufacturerName() (manufacturer string) {
+func (b *DeviceInformationDriver) GetManufacturerName() (manufacturer string) {
 	c, _ := b.adaptor().ReadCharacteristic("180a", "2a29")
 	buf := bytes.NewBuffer(c)
 	val := buf.String()
 	return val
 }
 
-func (b *BLEDeviceInformationDriver) GetPnPId() (model string) {
+func (b *DeviceInformationDriver) GetPnPId() (model string) {
 	c, _ := b.adaptor().ReadCharacteristic("180a", "2a50")
 	buf := bytes.NewBuffer(c)
 	val := buf.String()

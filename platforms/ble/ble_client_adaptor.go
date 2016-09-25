@@ -9,36 +9,36 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
-var _ gobot.Adaptor = (*BLEClientAdaptor)(nil)
+var _ gobot.Adaptor = (*ClientAdaptor)(nil)
 
 // Represents a Client Connection to a BLE Peripheral
-type BLEClientAdaptor struct {
+type ClientAdaptor struct {
 	name       string
 	uuid       string
 	device     gatt.Device
 	peripheral gatt.Peripheral
-	services   map[string]*BLEService
+	services   map[string]*Service
 	connected  bool
 	ready      chan struct{}
 }
 
-// NewBLEClientAdaptor returns a new BLEClientAdaptor given a name and uuid
-func NewBLEClientAdaptor(name string, uuid string) *BLEClientAdaptor {
-	return &BLEClientAdaptor{
-		name:      name,
+// NewClientAdaptor returns a new ClientAdaptor given a uuid
+func NewClientAdaptor(uuid string) *ClientAdaptor {
+	return &ClientAdaptor{
 		uuid:      uuid,
 		connected: false,
 		ready:     make(chan struct{}),
-		services:  make(map[string]*BLEService),
+		services:  make(map[string]*Service),
 	}
 }
 
-func (b *BLEClientAdaptor) Name() string                { return b.name }
-func (b *BLEClientAdaptor) UUID() string                { return b.uuid }
-func (b *BLEClientAdaptor) Peripheral() gatt.Peripheral { return b.peripheral }
+func (b *ClientAdaptor) Name() string                { return b.name }
+func (b *ClientAdaptor) SetName(n string)            { b.name = n }
+func (b *ClientAdaptor) UUID() string                { return b.uuid }
+func (b *ClientAdaptor) Peripheral() gatt.Peripheral { return b.peripheral }
 
 // Connect initiates a connection to the BLE peripheral. Returns true on successful connection.
-func (b *BLEClientAdaptor) Connect() (errs []error) {
+func (b *ClientAdaptor) Connect() (errs []error) {
 	device, err := gatt.NewDevice(DefaultClientOptions...)
 	if err != nil {
 		log.Fatalf("Failed to open BLE device, err: %s\n", err)
@@ -63,7 +63,7 @@ func (b *BLEClientAdaptor) Connect() (errs []error) {
 // Reconnect attempts to reconnect to the BLE peripheral. If it has an active connection
 // it will first close that connection and then establish a new connection.
 // Returns true on Successful reconnection
-func (b *BLEClientAdaptor) Reconnect() (errs []error) {
+func (b *ClientAdaptor) Reconnect() (errs []error) {
 	if b.connected {
 		b.Disconnect()
 	}
@@ -71,20 +71,20 @@ func (b *BLEClientAdaptor) Reconnect() (errs []error) {
 }
 
 // Disconnect terminates the connection to the BLE peripheral. Returns true on successful disconnect.
-func (b *BLEClientAdaptor) Disconnect() (errs []error) {
+func (b *ClientAdaptor) Disconnect() (errs []error) {
 	b.peripheral.Device().CancelConnection(b.peripheral)
 
 	return
 }
 
 // Finalize finalizes the BLEAdaptor
-func (b *BLEClientAdaptor) Finalize() (errs []error) {
+func (b *ClientAdaptor) Finalize() (errs []error) {
 	return b.Disconnect()
 }
 
 // ReadCharacteristic returns bytes from the BLE device for the
 // requested service and characteristic
-func (b *BLEClientAdaptor) ReadCharacteristic(sUUID string, cUUID string) (data []byte, err error) {
+func (b *ClientAdaptor) ReadCharacteristic(sUUID string, cUUID string) (data []byte, err error) {
 	if !b.connected {
 		log.Fatalf("Cannot read from BLE device until connected")
 		return
@@ -107,7 +107,7 @@ func (b *BLEClientAdaptor) ReadCharacteristic(sUUID string, cUUID string) (data 
 
 // WriteCharacteristic writes bytes to the BLE device for the
 // requested service and characteristic
-func (b *BLEClientAdaptor) WriteCharacteristic(sUUID string, cUUID string, data []byte) (err error) {
+func (b *ClientAdaptor) WriteCharacteristic(sUUID string, cUUID string, data []byte) (err error) {
 	if !b.connected {
 		log.Fatalf("Cannot write to BLE device until connected")
 		return
@@ -130,7 +130,7 @@ func (b *BLEClientAdaptor) WriteCharacteristic(sUUID string, cUUID string, data 
 
 // Subscribe subscribes to notifications from the BLE device for the
 // requested service and characteristic
-func (b *BLEClientAdaptor) Subscribe(sUUID string, cUUID string, f func([]byte, error)) (err error) {
+func (b *ClientAdaptor) Subscribe(sUUID string, cUUID string, f func([]byte, error)) (err error) {
 	if !b.connected {
 		log.Fatalf("Cannot subscribe to BLE device until connected")
 		return
@@ -155,7 +155,7 @@ func (b *BLEClientAdaptor) Subscribe(sUUID string, cUUID string, f func([]byte, 
 	return
 }
 
-func (b *BLEClientAdaptor) StateChangeHandler(d gatt.Device, s gatt.State) {
+func (b *ClientAdaptor) StateChangeHandler(d gatt.Device, s gatt.State) {
 	fmt.Println("State:", s)
 	switch s {
 	case gatt.StatePoweredOn:
@@ -167,7 +167,7 @@ func (b *BLEClientAdaptor) StateChangeHandler(d gatt.Device, s gatt.State) {
 	}
 }
 
-func (b *BLEClientAdaptor) DiscoveryHandler(p gatt.Peripheral, a *gatt.Advertisement, rssi int) {
+func (b *ClientAdaptor) DiscoveryHandler(p gatt.Peripheral, a *gatt.Advertisement, rssi int) {
 	// try looking by local name
 	if a.LocalName == b.UUID() {
 		b.uuid = p.ID()
@@ -186,7 +186,7 @@ func (b *BLEClientAdaptor) DiscoveryHandler(p gatt.Peripheral, a *gatt.Advertise
 	p.Device().Connect(p)
 }
 
-func (b *BLEClientAdaptor) ConnectHandler(p gatt.Peripheral, err error) {
+func (b *ClientAdaptor) ConnectHandler(p gatt.Peripheral, err error) {
 	fmt.Printf("\nConnected Peripheral ID:%s, NAME:(%s)\n", p.ID(), p.Name())
 
 	b.peripheral = p
@@ -203,7 +203,7 @@ func (b *BLEClientAdaptor) ConnectHandler(p gatt.Peripheral, err error) {
 
 outer:
 	for _, s := range ss {
-		b.services[s.UUID().String()] = NewBLEService(s.UUID().String(), s)
+		b.services[s.UUID().String()] = NewService(s.UUID().String(), s)
 
 		cs, err := p.DiscoverCharacteristics(nil, s)
 		if err != nil {
@@ -225,12 +225,12 @@ outer:
 	close(b.ready)
 }
 
-func (b *BLEClientAdaptor) DisconnectHandler(p gatt.Peripheral, err error) {
+func (b *ClientAdaptor) DisconnectHandler(p gatt.Peripheral, err error) {
 	fmt.Println("Disconnected")
 }
 
-// Finalize finalizes the BLEAdaptor
-func (b *BLEClientAdaptor) lookupCharacteristic(sUUID string, cUUID string) *gatt.Characteristic {
+// Finalize finalizes the ClientAdaptor
+func (b *ClientAdaptor) lookupCharacteristic(sUUID string, cUUID string) *gatt.Characteristic {
 	service := b.services[sUUID]
 	if service == nil {
 		log.Printf("Unknown service ID: %s\n", sUUID)
@@ -247,15 +247,15 @@ func (b *BLEClientAdaptor) lookupCharacteristic(sUUID string, cUUID string) *gat
 }
 
 // Represents a BLE Peripheral's Service
-type BLEService struct {
+type Service struct {
 	uuid            string
 	service         *gatt.Service
 	characteristics map[string]*gatt.Characteristic
 }
 
-// NewBLEAdaptor returns a new BLEService given a uuid
-func NewBLEService(sUuid string, service *gatt.Service) *BLEService {
-	return &BLEService{
+// NewService returns a new BLE Service given a uuid
+func NewService(sUuid string, service *gatt.Service) *Service {
+	return &Service{
 		uuid:            sUuid,
 		service:         service,
 		characteristics: make(map[string]*gatt.Characteristic),
