@@ -25,30 +25,31 @@ type drone interface {
 	Outdoor(outdoor bool) error
 }
 
-// BebopAdaptor is gobot.Adaptor representation for the Bebop
-type BebopAdaptor struct {
-	name  string
-	drone drone
-	//config  client.Config
-	connect func(*BebopAdaptor) error
+// Adaptor is gobot.Adaptor representation for the Bebop
+type Adaptor struct {
+	name    string
+	drone   drone
+	connect func(*Adaptor) error
 }
 
-// NewBebopAdaptor returns a new BebopAdaptor
-func NewBebopAdaptor(name string) *BebopAdaptor {
-	return &BebopAdaptor{
-		name:  name,
+// NewAdaptor returns a new BebopAdaptor
+func NewAdaptor() *Adaptor {
+	return &Adaptor{
 		drone: client.New(),
-		connect: func(a *BebopAdaptor) error {
+		connect: func(a *Adaptor) error {
 			return a.drone.Connect()
 		},
 	}
 }
 
-// Name returns the BebopAdaptors Name
-func (a *BebopAdaptor) Name() string { return a.name }
+// Name returns the Bebop Adaptors Name
+func (a *Adaptor) Name() string { return a.name }
+
+// SetName sets the Bebop Adaptors Name
+func (a *Adaptor) SetName(n string) { a.name = n }
 
 // Connect establishes a connection to the ardrone
-func (a *BebopAdaptor) Connect() (errs []error) {
+func (a *Adaptor) Connect() (errs []error) {
 	err := a.connect(a)
 	if err != nil {
 		return []error{err}
@@ -57,4 +58,4 @@ func (a *BebopAdaptor) Connect() (errs []error) {
 }
 
 // Finalize terminates the connection to the ardrone
-func (a *BebopAdaptor) Finalize() (errs []error) { return }
+func (a *Adaptor) Finalize() (errs []error) { return }
