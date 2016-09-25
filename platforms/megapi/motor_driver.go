@@ -3,8 +3,9 @@ package megapi
 import (
 	"bytes"
 	"encoding/binary"
-	"github.com/hybridgroup/gobot"
 	"sync"
+
+	"github.com/hybridgroup/gobot"
 )
 
 var _ gobot.Driver = (*MotorDriver)(nil)
@@ -12,16 +13,15 @@ var _ gobot.Driver = (*MotorDriver)(nil)
 // MotorDriver represents a motor
 type MotorDriver struct {
 	name     string
-	megaPi   *MegaPiAdaptor
+	megaPi   *Adaptor
 	port     byte
 	halted   bool
 	syncRoot *sync.Mutex
 }
 
-// NewMotorDriver creates a new MotorDriver using the provided name, and at the given port
-func NewMotorDriver(megaPi *MegaPiAdaptor, name string, port byte) *MotorDriver {
+// NewMotorDriver creates a new MotorDriver at the given port
+func NewMotorDriver(megaPi *Adaptor, port byte) *MotorDriver {
 	return &MotorDriver{
-		name:     name,
 		megaPi:   megaPi,
 		port:     port,
 		halted:   true,
@@ -32,6 +32,11 @@ func NewMotorDriver(megaPi *MegaPiAdaptor, name string, port byte) *MotorDriver 
 // Name returns the name of this motor
 func (m *MotorDriver) Name() string {
 	return m.name
+}
+
+// SetName sets the name of this motor
+func (m *MotorDriver) SetName(n string) {
+	m.name = n
 }
 
 // Start implements the Driver interface
