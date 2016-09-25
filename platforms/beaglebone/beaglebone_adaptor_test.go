@@ -6,21 +6,21 @@ import (
 	"testing"
 
 	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/drivers/gpio"
+	"github.com/hybridgroup/gobot/drivers/i2c"
 	"github.com/hybridgroup/gobot/gobottest"
-	"github.com/hybridgroup/gobot/platforms/gpio"
-	"github.com/hybridgroup/gobot/platforms/i2c"
 	"github.com/hybridgroup/gobot/sysfs"
 )
 
-var _ gobot.Adaptor = (*BeagleboneAdaptor)(nil)
+var _ gobot.Adaptor = (*Adaptor)(nil)
 
-var _ gpio.DigitalReader = (*BeagleboneAdaptor)(nil)
-var _ gpio.DigitalWriter = (*BeagleboneAdaptor)(nil)
-var _ gpio.AnalogReader = (*BeagleboneAdaptor)(nil)
-var _ gpio.PwmWriter = (*BeagleboneAdaptor)(nil)
-var _ gpio.ServoWriter = (*BeagleboneAdaptor)(nil)
+var _ gpio.DigitalReader = (*Adaptor)(nil)
+var _ gpio.DigitalWriter = (*Adaptor)(nil)
+var _ gpio.AnalogReader = (*Adaptor)(nil)
+var _ gpio.PwmWriter = (*Adaptor)(nil)
+var _ gpio.ServoWriter = (*Adaptor)(nil)
 
-var _ i2c.I2c = (*BeagleboneAdaptor)(nil)
+var _ i2c.I2c = (*Adaptor)(nil)
 
 type NullReadWriteCloser struct {
 	contents []byte
@@ -73,7 +73,7 @@ func TestBeagleboneAdaptor(t *testing.T) {
 	})
 
 	sysfs.SetFilesystem(fs)
-	a := NewBeagleboneAdaptor("myAdaptor")
+	a := NewAdaptor()
 	a.slots = "/sys/devices/bone_capemgr.4"
 	a.ocp = "/sys/devices/ocp.3"
 
