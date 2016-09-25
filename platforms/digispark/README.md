@@ -40,14 +40,14 @@ import (
 
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/digispark"
-	"github.com/hybridgroup/gobot/platforms/gpio"
+	"github.com/hybridgroup/gobot/drivers/gpio"
 )
 
 func main() {
 	gbot := gobot.NewGobot()
 
-	digisparkAdaptor := digispark.NewDigisparkAdaptor("Digispark")
-	led := gpio.NewLedDriver(digisparkAdaptor, "led", "0")
+	digisparkAdaptor := digispark.NewAdaptor()
+	led := gpio.NewLedDriver(digisparkAdaptor, "0")
 
 	work := func() {
 		gobot.Every(1*time.Second, func() {
