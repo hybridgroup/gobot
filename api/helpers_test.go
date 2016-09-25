@@ -31,6 +31,7 @@ type testDriver struct {
 func (t *testDriver) Start() (errs []error)        { return }
 func (t *testDriver) Halt() (errs []error)         { return }
 func (t *testDriver) Name() string                 { return t.name }
+func (t *testDriver) SetName(n string)             { t.name = n }
 func (t *testDriver) Pin() string                  { return t.pin }
 func (t *testDriver) Connection() gobot.Connection { return t.connection }
 
@@ -69,6 +70,7 @@ var testAdaptorFinalize = func() (errs []error) { return }
 func (t *testAdaptor) Finalize() (errs []error) { return testAdaptorFinalize() }
 func (t *testAdaptor) Connect() (errs []error)  { return testAdaptorConnect() }
 func (t *testAdaptor) Name() string             { return t.name }
+func (t *testAdaptor) SetName(n string)         { t.name = n }
 func (t *testAdaptor) Port() string             { return t.port }
 
 func newTestAdaptor(name string, port string) *testAdaptor {
