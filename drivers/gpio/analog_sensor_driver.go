@@ -18,16 +18,15 @@ type AnalogSensorDriver struct {
 }
 
 // NewAnalogSensorDriver returns a new AnalogSensorDriver with a polling interval of
-// 10 Milliseconds given an AnalogReader, name and pin.
+// 10 Milliseconds given an AnalogReader and pin.
 //
 // Optionally accepts:
 // 	time.Duration: Interval at which the AnalogSensor is polled for new information
 //
 // Adds the following API Commands:
 // 	"Read" - See AnalogSensor.Read
-func NewAnalogSensorDriver(a AnalogReader, name string, pin string, v ...time.Duration) *AnalogSensorDriver {
+func NewAnalogSensorDriver(a AnalogReader, pin string, v ...time.Duration) *AnalogSensorDriver {
 	d := &AnalogSensorDriver{
-		name:       name,
 		connection: a,
 		pin:        pin,
 		Eventer:    gobot.NewEventer(),
@@ -84,6 +83,9 @@ func (a *AnalogSensorDriver) Halt() (errs []error) {
 
 // Name returns the AnalogSensorDrivers name
 func (a *AnalogSensorDriver) Name() string { return a.name }
+
+// SetName sets the AnalogSensorDrivers name
+func (a *AnalogSensorDriver) SetName(n string) { a.name = n }
 
 // Pin returns the AnalogSensorDrivers pin
 func (a *AnalogSensorDriver) Pin() string { return a.pin }

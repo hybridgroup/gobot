@@ -14,7 +14,7 @@ type DirectPinDriver struct {
 	gobot.Commander
 }
 
-// NewDirectPinDriver return a new DirectPinDriver given a Connection, name and pin.
+// NewDirectPinDriver return a new DirectPinDriver given a Connection and pin.
 //
 // Adds the following API Commands:
 // 	"DigitalRead" - See DirectPinDriver.DigitalRead
@@ -23,9 +23,8 @@ type DirectPinDriver struct {
 // 	"AnalogWrite" - See DirectPinDriver.AnalogWrite
 // 	"PwmWrite" - See DirectPinDriver.PwmWrite
 // 	"ServoWrite" - See DirectPinDriver.ServoWrite
-func NewDirectPinDriver(a gobot.Connection, name string, pin string) *DirectPinDriver {
+func NewDirectPinDriver(a gobot.Connection, pin string) *DirectPinDriver {
 	d := &DirectPinDriver{
-		name:       name,
 		connection: a,
 		pin:        pin,
 		Commander:  gobot.NewCommander(),
@@ -57,6 +56,9 @@ func NewDirectPinDriver(a gobot.Connection, name string, pin string) *DirectPinD
 
 // Name returns the DirectPinDrivers name
 func (d *DirectPinDriver) Name() string { return d.name }
+
+// SetName sets the DirectPinDrivers name
+func (d *DirectPinDriver) SetName(n string) { d.name = n }
 
 // Pin returns the DirectPinDrivers pin
 func (d *DirectPinDriver) Pin() string { return d.pin }

@@ -1,8 +1,9 @@
 package gpio
 
 import (
-	"github.com/hybridgroup/gobot"
 	"time"
+
+	"github.com/hybridgroup/gobot"
 )
 
 // ButtonDriver Represents a digital Button
@@ -17,13 +18,12 @@ type ButtonDriver struct {
 }
 
 // NewButtonDriver returns a new ButtonDriver with a polling interval of
-// 10 Milliseconds given a DigitalReader, name and pin.
+// 10 Milliseconds given a DigitalReader and pin.
 //
 // Optionally accepts:
 //  time.Duration: Interval at which the ButtonDriver is polled for new information
-func NewButtonDriver(a DigitalReader, name string, pin string, v ...time.Duration) *ButtonDriver {
+func NewButtonDriver(a DigitalReader, pin string, v ...time.Duration) *ButtonDriver {
 	b := &ButtonDriver{
-		name:       name,
 		connection: a,
 		pin:        pin,
 		Active:     false,
@@ -78,6 +78,9 @@ func (b *ButtonDriver) Halt() (errs []error) {
 
 // Name returns the ButtonDrivers name
 func (b *ButtonDriver) Name() string { return b.name }
+
+// SetName sets the ButtonDrivers name
+func (b *ButtonDriver) SetName(n string) { b.name = n }
 
 // Pin returns the ButtonDrivers pin
 func (b *ButtonDriver) Pin() string { return b.pin }

@@ -11,7 +11,7 @@ import (
 var _ gobot.Driver = (*ServoDriver)(nil)
 
 func initTestServoDriver() *ServoDriver {
-	return NewServoDriver(newGpioTestAdaptor("adaptor"), "bot", "1")
+	return NewServoDriver(newGpioTestAdaptor(), "1")
 }
 
 func TestServoDriver(t *testing.T) {
@@ -19,9 +19,8 @@ func TestServoDriver(t *testing.T) {
 
 	d := initTestServoDriver()
 
-	gobottest.Assert(t, d.Name(), "bot")
 	gobottest.Assert(t, d.Pin(), "1")
-	gobottest.Assert(t, d.Connection().Name(), "adaptor")
+	gobottest.Refute(t, d.Connection(), nil)
 
 	testAdaptorServoWrite = func() (err error) {
 		return errors.New("pwm error")

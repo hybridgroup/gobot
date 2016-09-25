@@ -19,10 +19,9 @@ type MotorDriver struct {
 	CurrentDirection string
 }
 
-// NewMotorDriver return a new MotorDriver given a DigitalWriter, name and pin
-func NewMotorDriver(a DigitalWriter, name string, speedPin string) *MotorDriver {
+// NewMotorDriver return a new MotorDriver given a DigitalWriter and pin
+func NewMotorDriver(a DigitalWriter, speedPin string) *MotorDriver {
 	return &MotorDriver{
-		name:             name,
 		connection:       a,
 		SpeedPin:         speedPin,
 		CurrentState:     0,
@@ -34,6 +33,9 @@ func NewMotorDriver(a DigitalWriter, name string, speedPin string) *MotorDriver 
 
 // Name returns the MotorDrivers name
 func (m *MotorDriver) Name() string { return m.name }
+
+// SetName sets the MotorDrivers name
+func (m *MotorDriver) SetName(n string) { m.name = n }
 
 // Connection returns the MotorDrivers Connection
 func (m *MotorDriver) Connection() gobot.Connection { return m.connection.(gobot.Connection) }

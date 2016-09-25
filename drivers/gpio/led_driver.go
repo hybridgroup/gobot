@@ -13,16 +13,15 @@ type LedDriver struct {
 	gobot.Commander
 }
 
-// NewLedDriver return a new LedDriver given a DigitalWriter, name and pin.
+// NewLedDriver return a new LedDriver given a DigitalWriter and pin.
 //
 // Adds the following API Commands:
 //	"Brightness" - See LedDriver.Brightness
 //	"Toggle" - See LedDriver.Toggle
 //	"On" - See LedDriver.On
 //	"Off" - See LedDriver.Off
-func NewLedDriver(a DigitalWriter, name string, pin string) *LedDriver {
+func NewLedDriver(a DigitalWriter, pin string) *LedDriver {
 	l := &LedDriver{
-		name:       name,
 		pin:        pin,
 		connection: a,
 		high:       false,
@@ -57,6 +56,9 @@ func (l *LedDriver) Halt() (errs []error) { return }
 
 // Name returns the LedDrivers name
 func (l *LedDriver) Name() string { return l.name }
+
+// SetName sets the LedDrivers name
+func (l *LedDriver) SetName(n string) { l.name = n }
 
 // Pin returns the LedDrivers name
 func (l *LedDriver) Pin() string { return l.pin }

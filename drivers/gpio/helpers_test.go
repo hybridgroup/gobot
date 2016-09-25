@@ -5,6 +5,7 @@ type gpioTestBareAdaptor struct{}
 func (t *gpioTestBareAdaptor) Connect() (errs []error)  { return }
 func (t *gpioTestBareAdaptor) Finalize() (errs []error) { return }
 func (t *gpioTestBareAdaptor) Name() string             { return "" }
+func (t *gpioTestBareAdaptor) SetName(n string)         {}
 
 type gpioTestDigitalWriter struct {
 	gpioTestBareAdaptor
@@ -51,11 +52,11 @@ func (t *gpioTestAdaptor) DigitalRead(string) (val int, err error) {
 func (t *gpioTestAdaptor) Connect() (errs []error)  { return }
 func (t *gpioTestAdaptor) Finalize() (errs []error) { return }
 func (t *gpioTestAdaptor) Name() string             { return t.name }
+func (t *gpioTestAdaptor) SetName(n string)         { t.name = n }
 func (t *gpioTestAdaptor) Port() string             { return t.port }
 
-func newGpioTestAdaptor(name string) *gpioTestAdaptor {
+func newGpioTestAdaptor() *gpioTestAdaptor {
 	return &gpioTestAdaptor{
-		name: name,
 		port: "/dev/null",
 	}
 }

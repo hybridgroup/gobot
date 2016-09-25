@@ -11,15 +11,14 @@ type RelayDriver struct {
 	gobot.Commander
 }
 
-// NewRelayDriver return a new RelayDriver given a DigitalWriter, name and pin.
+// NewRelayDriver return a new RelayDriver given a DigitalWriter and pin.
 //
 // Adds the following API Commands:
 //	"Toggle" - See RelayDriver.Toggle
 //	"On" - See RelayDriver.On
 //	"Off" - See RelayDriver.Off
-func NewRelayDriver(a DigitalWriter, name string, pin string) *RelayDriver {
+func NewRelayDriver(a DigitalWriter, pin string) *RelayDriver {
 	l := &RelayDriver{
-		name:       name,
 		pin:        pin,
 		connection: a,
 		high:       false,
@@ -49,6 +48,9 @@ func (l *RelayDriver) Halt() (errs []error) { return }
 
 // Name returns the RelayDrivers name
 func (l *RelayDriver) Name() string { return l.name }
+
+// SetName sets the RelayDrivers name
+func (l *RelayDriver) SetName(n string) { l.name = n }
 
 // Pin returns the RelayDrivers name
 func (l *RelayDriver) Pin() string { return l.pin }

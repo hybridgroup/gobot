@@ -11,16 +11,15 @@ type ServoDriver struct {
 	CurrentAngle byte
 }
 
-// NewServoDriver returns a new ServoDriver given a ServoWriter, name and pin.
+// NewServoDriver returns a new ServoDriver given a ServoWriter and pin.
 //
 // Adds the following API Commands:
 // 	"Move" - See ServoDriver.Move
 //	"Min" - See ServoDriver.Min
 //	"Center" - See ServoDriver.Center
 //	"Max" - See ServoDriver.Max
-func NewServoDriver(a ServoWriter, name string, pin string) *ServoDriver {
+func NewServoDriver(a ServoWriter, pin string) *ServoDriver {
 	s := &ServoDriver{
-		name:         name,
 		connection:   a,
 		pin:          pin,
 		Commander:    gobot.NewCommander(),
@@ -47,6 +46,9 @@ func NewServoDriver(a ServoWriter, name string, pin string) *ServoDriver {
 
 // Name returns the ServoDrivers name
 func (s *ServoDriver) Name() string { return s.name }
+
+// SetName sets the ServoDrivers name
+func (s *ServoDriver) SetName(n string) { s.name = n }
 
 // Pin returns the ServoDrivers pin
 func (s *ServoDriver) Pin() string { return s.pin }

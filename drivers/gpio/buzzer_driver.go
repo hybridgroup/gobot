@@ -136,10 +136,9 @@ type BuzzerDriver struct {
 	BPM        float64
 }
 
-// NewBuzzerDriver return a new BuzzerDriver given a DigitalWriter, name and pin.
-func NewBuzzerDriver(a DigitalWriter, name string, pin string) *BuzzerDriver {
+// NewBuzzerDriver return a new BuzzerDriver given a DigitalWriter and pin.
+func NewBuzzerDriver(a DigitalWriter, pin string) *BuzzerDriver {
 	l := &BuzzerDriver{
-		name:       name,
 		pin:        pin,
 		connection: a,
 		high:       false,
@@ -157,6 +156,9 @@ func (l *BuzzerDriver) Halt() (errs []error) { return }
 
 // Name returns the BuzzerDrivers name
 func (l *BuzzerDriver) Name() string { return l.name }
+
+// SetName sets the BuzzerDrivers name
+func (l *BuzzerDriver) SetName(n string) { l.name = n }
 
 // Pin returns the BuzzerDrivers name
 func (l *BuzzerDriver) Pin() string { return l.pin }

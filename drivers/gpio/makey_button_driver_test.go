@@ -14,7 +14,7 @@ var _ gobot.Driver = (*MakeyButtonDriver)(nil)
 const MAKEY_TEST_DELAY = 30
 
 func initTestMakeyButtonDriver() *MakeyButtonDriver {
-	return NewMakeyButtonDriver(newGpioTestAdaptor("adaptor"), "bot", "1")
+	return NewMakeyButtonDriver(newGpioTestAdaptor(), "1")
 }
 
 func TestMakeyButtonDriverHalt(t *testing.T) {
@@ -26,11 +26,11 @@ func TestMakeyButtonDriverHalt(t *testing.T) {
 }
 
 func TestMakeyButtonDriver(t *testing.T) {
-	d := NewMakeyButtonDriver(newGpioTestAdaptor("adaptor"), "bot", "1")
-	gobottest.Assert(t, d.Name(), "bot")
-	gobottest.Assert(t, d.Connection().Name(), "adaptor")
+	d := NewMakeyButtonDriver(newGpioTestAdaptor(), "1")
+	gobottest.Assert(t, d.Pin(), "1")
+	gobottest.Refute(t, d.Connection(), nil)
 
-	d = NewMakeyButtonDriver(newGpioTestAdaptor("adaptor"), "bot", "1", 30*time.Second)
+	d = NewMakeyButtonDriver(newGpioTestAdaptor(), "1", 30*time.Second)
 	gobottest.Assert(t, d.interval, MAKEY_TEST_DELAY*time.Second)
 }
 

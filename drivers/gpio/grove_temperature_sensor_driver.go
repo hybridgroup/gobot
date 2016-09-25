@@ -21,16 +21,15 @@ type GroveTemperatureSensorDriver struct {
 }
 
 // NewGroveTemperatureSensorDriver returns a new GroveTemperatureSensorDriver with a polling interval of
-// 10 Milliseconds given an AnalogReader, name and pin.
+// 10 Milliseconds given an AnalogReader and pin.
 //
 // Optionally accepts:
 // 	time.Duration: Interval at which the TemperatureSensor is polled for new information
 //
 // Adds the following API Commands:
 // 	"Read" - See AnalogSensor.Read
-func NewGroveTemperatureSensorDriver(a AnalogReader, name string, pin string, v ...time.Duration) *GroveTemperatureSensorDriver {
+func NewGroveTemperatureSensorDriver(a AnalogReader, pin string, v ...time.Duration) *GroveTemperatureSensorDriver {
 	d := &GroveTemperatureSensorDriver{
-		name:       name,
 		connection: a,
 		pin:        pin,
 		Eventer:    gobot.NewEventer(),
@@ -87,6 +86,9 @@ func (a *GroveTemperatureSensorDriver) Halt() (errs []error) {
 
 // Name returns the GroveTemperatureSensorDrivers name
 func (a *GroveTemperatureSensorDriver) Name() string { return a.name }
+
+// SetName sets the GroveTemperatureSensorDrivers name
+func (a *GroveTemperatureSensorDriver) SetName(n string) { a.name = n }
 
 // Pin returns the GroveTemperatureSensorDrivers pin
 func (a *GroveTemperatureSensorDriver) Pin() string { return a.pin }

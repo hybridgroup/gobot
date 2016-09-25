@@ -10,13 +10,12 @@ import (
 var _ gobot.Driver = (*MotorDriver)(nil)
 
 func initTestMotorDriver() *MotorDriver {
-	return NewMotorDriver(newGpioTestAdaptor("adaptor"), "bot", "1")
+	return NewMotorDriver(newGpioTestAdaptor(), "1")
 }
 
 func TestMotorDriver(t *testing.T) {
-	d := NewMotorDriver(newGpioTestAdaptor("adaptor"), "bot", "1")
-	gobottest.Assert(t, d.Name(), "bot")
-	gobottest.Assert(t, d.Connection().Name(), "adaptor")
+	d := NewMotorDriver(newGpioTestAdaptor(), "1")
+	gobottest.Refute(t, d.Connection(), nil)
 
 }
 func TestMotorDriverStart(t *testing.T) {

@@ -14,7 +14,7 @@ var _ gobot.Driver = (*ButtonDriver)(nil)
 const BUTTON_TEST_DELAY = 150
 
 func initTestButtonDriver() *ButtonDriver {
-	return NewButtonDriver(newGpioTestAdaptor("adaptor"), "bot", "1")
+	return NewButtonDriver(newGpioTestAdaptor(), "1")
 }
 
 func TestButtonDriverHalt(t *testing.T) {
@@ -26,11 +26,10 @@ func TestButtonDriverHalt(t *testing.T) {
 }
 
 func TestButtonDriver(t *testing.T) {
-	d := NewButtonDriver(newGpioTestAdaptor("adaptor"), "bot", "1")
-	gobottest.Assert(t, d.Name(), "bot")
-	gobottest.Assert(t, d.Connection().Name(), "adaptor")
+	d := NewButtonDriver(newGpioTestAdaptor(), "1")
+	gobottest.Refute(t, d.Connection(), nil)
 
-	d = NewButtonDriver(newGpioTestAdaptor("adaptor"), "bot", "1", 30*time.Second)
+	d = NewButtonDriver(newGpioTestAdaptor(), "1", 30*time.Second)
 	gobottest.Assert(t, d.interval, 30*time.Second)
 }
 

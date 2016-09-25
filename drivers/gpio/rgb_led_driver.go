@@ -16,7 +16,7 @@ type RgbLedDriver struct {
 	gobot.Commander
 }
 
-// NewRgbLedDriver return a new RgbLedDriver given a DigitalWriter, name and
+// NewRgbLedDriver return a new RgbLedDriver given a DigitalWriter and
 // 3 pins: redPin, greenPin, and bluePin
 //
 // Adds the following API Commands:
@@ -24,9 +24,8 @@ type RgbLedDriver struct {
 //	"Toggle" - See RgbLedDriver.Toggle
 //	"On" - See RgbLedDriver.On
 //	"Off" - See RgbLedDriver.Off
-func NewRgbLedDriver(a DigitalWriter, name string, redPin string, greenPin string, bluePin string) *RgbLedDriver {
+func NewRgbLedDriver(a DigitalWriter, redPin string, greenPin string, bluePin string) *RgbLedDriver {
 	l := &RgbLedDriver{
-		name:       name,
 		pinRed:     redPin,
 		pinGreen:   greenPin,
 		pinBlue:    bluePin,
@@ -63,8 +62,11 @@ func (l *RgbLedDriver) Start() (errs []error) { return }
 // Halt implements the Driver interface
 func (l *RgbLedDriver) Halt() (errs []error) { return }
 
-// Name returns the LedDrivers name
+// Name returns the RGBLEDDrivers name
 func (l *RgbLedDriver) Name() string { return l.name }
+
+// SetName sets the RGBLEDDrivers name
+func (l *RgbLedDriver) SetName(n string) { l.name = n }
 
 // Pin returns the RgbLedDrivers pins
 func (l *RgbLedDriver) Pin() string { return "r=" + l.pinRed + ", g=" + l.pinGreen + ", b=" + l.pinBlue }

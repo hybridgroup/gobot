@@ -12,11 +12,10 @@ import (
 var _ gobot.Driver = (*AnalogSensorDriver)(nil)
 
 func TestAnalogSensorDriver(t *testing.T) {
-	d := NewAnalogSensorDriver(newGpioTestAdaptor("adaptor"), "bot", "1")
-	gobottest.Assert(t, d.Name(), "bot")
-	gobottest.Assert(t, d.Connection().Name(), "adaptor")
+	d := NewAnalogSensorDriver(newGpioTestAdaptor(), "1")
+	gobottest.Refute(t, d.Connection(), nil)
 
-	d = NewAnalogSensorDriver(newGpioTestAdaptor("adaptor"), "bot", "1", 30*time.Second)
+	d = NewAnalogSensorDriver(newGpioTestAdaptor(), "1", 30*time.Second)
 	gobottest.Assert(t, d.interval, 30*time.Second)
 
 	testAdaptorAnalogRead = func() (val int, err error) {
@@ -32,7 +31,7 @@ func TestAnalogSensorDriver(t *testing.T) {
 func TestAnalogSensorDriverStart(t *testing.T) {
 	sem := make(chan bool, 1)
 
-	d := NewAnalogSensorDriver(newGpioTestAdaptor("adaptor"), "bot", "1")
+	d := NewAnalogSensorDriver(newGpioTestAdaptor(), "1")
 
 	testAdaptorAnalogRead = func() (val int, err error) {
 		val = 0
@@ -94,7 +93,7 @@ func TestAnalogSensorDriverStart(t *testing.T) {
 }
 
 func TestAnalogSensorDriverHalt(t *testing.T) {
-	d := NewAnalogSensorDriver(newGpioTestAdaptor("adaptor"), "bot", "1")
+	d := NewAnalogSensorDriver(newGpioTestAdaptor(), "1")
 	go func() {
 		<-d.halt
 	}()
