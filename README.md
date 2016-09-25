@@ -29,14 +29,14 @@ import (
 
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/firmata"
-	"github.com/hybridgroup/gobot/platforms/gpio"
+	"github.com/hybridgroup/gobot/drivers/gpio"
 )
 
 func main() {
 	gbot := gobot.NewGobot()
 
-	firmataAdaptor := firmata.NewFirmataAdaptor("arduino", "/dev/ttyACM0")
-	led := gpio.NewLedDriver(firmataAdaptor, "led", "13")
+	firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
+	led := gpio.NewLedDriver(firmataAdaptor, "13")
 
 	work := func() {
 		gobot.Every(1*time.Second, func() {
@@ -72,8 +72,8 @@ import (
 func main() {
 	gbot := gobot.NewGobot()
 
-	adaptor := sphero.NewSpheroAdaptor("sphero", "/dev/rfcomm0")
-	driver := sphero.NewSpheroDriver(adaptor, "sphero")
+	adaptor := sphero.NewAdaptor("/dev/rfcomm0")
+	driver := sphero.NewSpheroDriver(adaptor)
 
 	work := func() {
 		gobot.Every(3*time.Second, func() {
@@ -101,16 +101,16 @@ You can use the entire Gobot framework as shown in the examples above ("Classic"
 package main
 
 import (
-	"github.com/hybridgroup/gobot/platforms/gpio"
+	"github.com/hybridgroup/gobot/drivers/gpio"
 	"github.com/hybridgroup/gobot/platforms/intel-iot/edison"
 	"time"
 )
 
 func main() {
-	e := edison.NewEdisonAdaptor("edison")
+	e := edison.NewAdaptor()
 	e.Connect()
 
-	led := gpio.NewLedDriver(e, "led", "13")
+	led := gpio.NewLedDriver(e, "13")
 	led.Start()
 
 	for {
@@ -146,9 +146,9 @@ Gobot has a extensible system for connecting to hardware devices. The following 
 - [Sphero](http://www.gosphero.com/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/sphero)
 
 Support for many devices that use General Purpose Input/Output (GPIO) have
-a shared set of drivers provided using the `gobot/platforms/gpio` package:
+a shared set of drivers provided using the `gobot/drivers/gpio` package:
 
-- [GPIO](https://en.wikipedia.org/wiki/General_Purpose_Input/Output) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/platforms/gpio)
+- [GPIO](https://en.wikipedia.org/wiki/General_Purpose_Input/Output) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/drivers/gpio)
 	- Analog Sensor
 	- Button
 	- Buzzer
@@ -171,9 +171,9 @@ a shared set of drivers provided using the `gobot/platforms/gpio` package:
 	- Servo
 
 Support for devices that use Inter-Integrated Circuit (I2C) have a shared set of
-drivers provided using the `gobot/platforms/i2c` package:
+drivers provided using the `gobot/drivers/i2c` package:
 
-- [I2C](https://en.wikipedia.org/wiki/I%C2%B2C) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/platforms/i2c)
+- [I2C](https://en.wikipedia.org/wiki/I%C2%B2C) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/drivers/i2c)
 	- BlinkM
 	- Grove Digital Accelerometer
 	- Grove RGB LCD
