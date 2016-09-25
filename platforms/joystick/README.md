@@ -153,9 +153,8 @@ import (
 func main() {
 	gbot := gobot.NewGobot()
 
-	joystickAdaptor := joystick.NewJoystickAdaptor("ps3")
-	joystick := joystick.NewJoystickDriver(joystickAdaptor,
-		"ps3",
+	joystickAdaptor := joystick.NewAdaptor()
+	joystick := joystick.NewDriver(joystickAdaptor,
 		"./platforms/joystick/configs/dualshock3.json",
 	)
 

@@ -10,8 +10,8 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-// JoystickDriver represents a joystick
-type JoystickDriver struct {
+// Driver represents a joystick
+type Driver struct {
 	name       string
 	interval   time.Duration
 	connection gobot.Connection
@@ -44,15 +44,14 @@ type joystickConfig struct {
 	Hats    []hat  `json:"Hats"`
 }
 
-// NewJoystickDriver returns a new JoystickDriver with a polling interval of
-// 10 Milliseconds given a JoystickAdaptor, name and json button configuration
+// NewDriver returns a new Driver with a polling interval of
+// 10 Milliseconds given a Joystick Adaptor and json button configuration
 // file location.
 //
 // Optionally accepts:
-//  time.Duration: Interval at which the JoystickDriver is polled for new information
-func NewJoystickDriver(a *JoystickAdaptor, name string, config string, v ...time.Duration) *JoystickDriver {
-	d := &JoystickDriver{
-		name:       name,
+//  time.Duration: Interval at which the Driver is polled for new information
+func NewDriver(a *Adaptor, config string, v ...time.Duration) *Driver {
+	d := &Driver{
 		connection: a,
 		Eventer:    gobot.NewEventer(),
 		configPath: config,
@@ -71,15 +70,18 @@ func NewJoystickDriver(a *JoystickAdaptor, name string, config string, v ...time
 	return d
 }
 
-// Name returns the JoystickDrivers name
-func (j *JoystickDriver) Name() string { return j.name }
+// Name returns the Drivers name
+func (j *Driver) Name() string { return j.name }
 
-// Connection returns the JoystickDrivers connection
-func (j *JoystickDriver) Connection() gobot.Connection { return j.connection }
+// SetName sets the Drivers name
+func (j *Driver) SetName(n string) { j.name = n }
+
+// Connection returns the Drivers connection
+func (j *Driver) Connection() gobot.Connection { return j.connection }
 
 // adaptor returns joystick adaptor
-func (j *JoystickDriver) adaptor() *JoystickAdaptor {
-	return j.Connection().(*JoystickAdaptor)
+func (j *Driver) adaptor() *Adaptor {
+	return j.Connection().(*Adaptor)
 }
 
 // Start and polls the state of the joystick at the given interval.
@@ -91,7 +93,7 @@ func (j *JoystickDriver) adaptor() *JoystickAdaptor {
 //		[button]_press
 //		[button]_release
 //		[axis]
-func (j *JoystickDriver) Start() (errs []error) {
+func (j *Driver) Start() (errs []error) {
 	file, err := ioutil.ReadFile(j.configPath)
 	if err != nil {
 		return []error{err}
@@ -130,13 +132,13 @@ func (j *JoystickDriver) Start() (errs []error) {
 }
 
 // Halt stops joystick driver
-func (j *JoystickDriver) Halt() (errs []error) {
+func (j *Driver) Halt() (errs []error) {
 	j.halt <- true
 	return
 }
 
 // HandleEvent publishes an specific event according to data received
-func (j *JoystickDriver) handleEvent(event sdl.Event) error {
+func (j *Driver) handleEvent(event sdl.Event) error {
 	switch data := event.(type) {
 	case *sdl.JoyAxisEvent:
 		if data.Which == j.adaptor().joystick.InstanceID() {
@@ -169,7 +171,7 @@ func (j *JoystickDriver) handleEvent(event sdl.Event) error {
 	return nil
 }
 
-func (j *JoystickDriver) findName(id uint8, list []pair) string {
+func (j *Driver) findName(id uint8, list []pair) string {
 	for _, value := range list {
 		if int(id) == value.ID {
 			return value.Name
@@ -179,7 +181,7 @@ func (j *JoystickDriver) findName(id uint8, list []pair) string {
 }
 
 // findHatName returns name from hat found by id in provided list
-func (j *JoystickDriver) findHatName(id uint8, hat uint8, list []hat) string {
+func (j *Driver) findHatName(id uint8, hat uint8, list []hat) string {
 	for _, lHat := range list {
 		if int(id) == lHat.ID && int(hat) == lHat.Hat {
 			return lHat.Name
