@@ -81,7 +81,7 @@ func (h *Hand) Z() float64 {
 }
 
 // ParseFrame converts json data to a Frame
-func (l *LeapMotionDriver) ParseFrame(data []byte) Frame {
+func (l *Driver) ParseFrame(data []byte) Frame {
 	var frame Frame
 	json.Unmarshal(data, &frame)
 	return frame

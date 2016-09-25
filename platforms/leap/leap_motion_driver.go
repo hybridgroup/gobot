@@ -17,7 +17,7 @@ const (
 	GestureEvent = "gesture"
 )
 
-type LeapMotionDriver struct {
+type Driver struct {
 	name       string
 	connection gobot.Connection
 	gobot.Eventer
@@ -27,15 +27,14 @@ var receive = func(ws io.ReadWriteCloser, msg *[]byte) {
 	websocket.Message.Receive(ws.(*websocket.Conn), msg)
 }
 
-// NewLeapMotionDriver creates a new leap motion driver with specified name
+// NewLDriver creates a new leap motion driver
 //
 // Adds the following events:
 //		"message" - Gets triggered when receiving a message from leap motion
 //		"hand" - Gets triggered per-message when leap motion detects a hand
 //		"gesture" - Gets triggered per-message when leap motion detects a hand
-func NewLeapMotionDriver(a *LeapMotionAdaptor, name string) *LeapMotionDriver {
-	l := &LeapMotionDriver{
-		name:       name,
+func NewDriver(a *Adaptor) *Driver {
+	l := &Driver{
 		connection: a,
 		Eventer:    gobot.NewEventer(),
 	}
@@ -45,12 +44,13 @@ func NewLeapMotionDriver(a *LeapMotionAdaptor, name string) *LeapMotionDriver {
 	l.AddEvent(GestureEvent)
 	return l
 }
-func (l *LeapMotionDriver) Name() string                 { return l.name }
-func (l *LeapMotionDriver) Connection() gobot.Connection { return l.connection }
+func (l *Driver) Name() string                 { return l.name }
+func (l *Driver) SetName(n string)             { l.name = n }
+func (l *Driver) Connection() gobot.Connection { return l.connection }
 
 // adaptor returns leap motion adaptor
-func (l *LeapMotionDriver) adaptor() *LeapMotionAdaptor {
-	return l.Connection().(*LeapMotionAdaptor)
+func (l *Driver) adaptor() *Adaptor {
+	return l.Connection().(*Adaptor)
 }
 
 // Start inits leap motion driver by enabling gestures
@@ -60,7 +60,7 @@ func (l *LeapMotionDriver) adaptor() *LeapMotionAdaptor {
 //		"message" - Emits Frame on new message received from Leap.
 //		"hand" - Emits Hand when detected in message from Leap.
 //		"gesture" - Emits Gesture when detected in message from Leap.
-func (l *LeapMotionDriver) Start() (errs []error) {
+func (l *Driver) Start() (errs []error) {
 	enableGestures := map[string]bool{"enableGestures": true}
 	b, err := json.Marshal(enableGestures)
 	if err != nil {
@@ -93,4 +93,4 @@ func (l *LeapMotionDriver) Start() (errs []error) {
 }
 
 // Halt returns true if driver is halted successfully
-func (l *LeapMotionDriver) Halt() (errs []error) { return }
+func (l *Driver) Halt() (errs []error) { return }
