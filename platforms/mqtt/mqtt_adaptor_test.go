@@ -8,10 +8,10 @@ import (
 	"github.com/hybridgroup/gobot/gobottest"
 )
 
-var _ gobot.Adaptor = (*MqttAdaptor)(nil)
+var _ gobot.Adaptor = (*Adaptor)(nil)
 
-func initTestMqttAdaptor() *MqttAdaptor {
-	return NewMqttAdaptor("mqtt", "localhost:1883", "client")
+func initTestMqttAdaptor() *Adaptor {
+	return NewAdaptor("localhost:1883", "client")
 }
 
 func TestMqttAdaptorConnect(t *testing.T) {
