@@ -13,15 +13,15 @@ Example:
 		"time"
 
 		"github.com/hybridgroup/gobot"
-		"github.com/hybridgroup/gobot/platforms/gpio"
-		"github.com/hybridgroup/gobot/platforms/spark"
+		"github.com/hybridgroup/gobot/drivers/gpio"
+		"github.com/hybridgroup/gobot/platforms/particle"
 	)
 
 	func main() {
 		gbot := gobot.NewGobot()
 
-		sparkCore := spark.NewSparkCoreAdaptor("spark", "device_id", "access_token")
-		led := gpio.NewLedDriver(sparkCore, "led", "D7")
+		core := paticle.NewAdaptor("device_id", "access_token")
+		led := gpio.NewLedDriver(core, "D7")
 
 		work := func() {
 			gobot.Every(1*time.Second, func() {
@@ -30,7 +30,7 @@ Example:
 		}
 
 		robot := gobot.NewRobot("spark",
-			[]gobot.Connection{sparkCore},
+			[]gobot.Connection{core},
 			[]gobot.Device{led},
 			work,
 		)
@@ -40,7 +40,7 @@ Example:
 		gbot.Start()
 	}
 
-For further information refer to spark readme:
-https://github.com/hybridgroup/gobot/blob/master/platforms/spark/README.md
+For further information refer to Particle readme:
+https://github.com/hybridgroup/gobot/blob/master/platforms/particle/README.md
 */
-package spark
+package particle

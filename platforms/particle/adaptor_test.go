@@ -1,4 +1,4 @@
-package spark
+package particle
 
 import (
 	"errors"
@@ -9,16 +9,16 @@ import (
 
 	"github.com/donovanhide/eventsource"
 	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/drivers/gpio"
 	"github.com/hybridgroup/gobot/gobottest"
-	"github.com/hybridgroup/gobot/platforms/gpio"
 )
 
-var _ gobot.Adaptor = (*SparkCoreAdaptor)(nil)
+var _ gobot.Adaptor = (*Adaptor)(nil)
 
-var _ gpio.DigitalReader = (*SparkCoreAdaptor)(nil)
-var _ gpio.DigitalWriter = (*SparkCoreAdaptor)(nil)
-var _ gpio.AnalogReader = (*SparkCoreAdaptor)(nil)
-var _ gpio.PwmWriter = (*SparkCoreAdaptor)(nil)
+var _ gpio.DigitalReader = (*Adaptor)(nil)
+var _ gpio.DigitalWriter = (*Adaptor)(nil)
+var _ gpio.AnalogReader = (*Adaptor)(nil)
+var _ gpio.PwmWriter = (*Adaptor)(nil)
 
 // HELPERS
 
@@ -58,53 +58,51 @@ func getDummyResponseForPathWithParams(path string, params []string, dummy_respo
 	})
 }
 
-func initTestSparkCoreAdaptor() *SparkCoreAdaptor {
-	return NewSparkCoreAdaptor("bot", "myDevice", "token")
+func initTestAdaptor() *Adaptor {
+	return NewAdaptor("myDevice", "token")
 }
 
 // TESTS
 
-func TestSparkCoreAdaptor(t *testing.T) {
-	var _ gobot.Adaptor = (*SparkCoreAdaptor)(nil)
+func TestAdaptor(t *testing.T) {
+	var _ gobot.Adaptor = (*Adaptor)(nil)
 
-	var a interface{} = initTestSparkCoreAdaptor()
+	var a interface{} = initTestAdaptor()
 	_, ok := a.(gobot.Adaptor)
 	if !ok {
-		t.Errorf("SparkCoreAdaptor{} should be a gobot.Adaptor")
+		t.Errorf("Adaptor{} should be a gobot.Adaptor")
 	}
 }
 
-func TestNewSparkCoreAdaptor(t *testing.T) {
-	// does it return a pointer to an instance of SparkCoreAdaptor?
-	var a interface{} = initTestSparkCoreAdaptor()
-	spark, ok := a.(*SparkCoreAdaptor)
+func TestNewAdaptor(t *testing.T) {
+	// does it return a pointer to an instance of Adaptor?
+	var a interface{} = initTestAdaptor()
+	core, ok := a.(*Adaptor)
 	if !ok {
-		t.Errorf("NewSparkCoreAdaptor() should have returned a *SparkCoreAdaptor")
+		t.Errorf("NewAdaptor() should have returned a *Adaptor")
 	}
 
-	gobottest.Assert(t, spark.APIServer, "https://api.spark.io")
-	gobottest.Assert(t, spark.Name(), "bot")
+	gobottest.Assert(t, core.APIServer, "https://api.particle.io")
+	gobottest.Assert(t, core.Name(), "Particle")
 }
 
-func TestSparkCoreAdaptorConnect(t *testing.T) {
-	a := initTestSparkCoreAdaptor()
+func TestAdaptorConnect(t *testing.T) {
+	a := initTestAdaptor()
 	gobottest.Assert(t, len(a.Connect()), 0)
 }
 
-func TestSparkCoreAdaptorFinalize(t *testing.T) {
-	a := initTestSparkCoreAdaptor()
-
+func TestAdaptorFinalize(t *testing.T) {
+	a := initTestAdaptor()
 	a.Connect()
-
 	gobottest.Assert(t, len(a.Finalize()), 0)
 }
 
-func TestSparkCoreAdaptorAnalogRead(t *testing.T) {
+func TestAdaptorAnalogRead(t *testing.T) {
 	// When no error
 	response := `{"return_value": 5.2}`
 	params := []string{"A1"}
 
-	a := initTestSparkCoreAdaptor()
+	a := initTestAdaptor()
 	testServer := getDummyResponseForPathWithParams("/"+a.DeviceID+"/analogread", params, response, t)
 
 	a.setAPIServer(testServer.URL)
@@ -114,8 +112,8 @@ func TestSparkCoreAdaptorAnalogRead(t *testing.T) {
 	gobottest.Assert(t, val, 5)
 }
 
-func TestSparkCoreAdaptorAnalogReadError(t *testing.T) {
-	a := initTestSparkCoreAdaptor()
+func TestAdaptorAnalogReadError(t *testing.T) {
+	a := initTestAdaptor()
 	// When error
 	testServer := createTestServer(func(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
@@ -127,11 +125,11 @@ func TestSparkCoreAdaptorAnalogReadError(t *testing.T) {
 	gobottest.Assert(t, val, 0)
 }
 
-func TestSparkCoreAdaptorPwmWrite(t *testing.T) {
+func TestAdaptorPwmWrite(t *testing.T) {
 	response := `{}`
 	params := []string{"A1,1"}
 
-	a := initTestSparkCoreAdaptor()
+	a := initTestAdaptor()
 	testServer := getDummyResponseForPathWithParams("/"+a.DeviceID+"/analogwrite", params, response, t)
 	defer testServer.Close()
 
@@ -139,11 +137,11 @@ func TestSparkCoreAdaptorPwmWrite(t *testing.T) {
 	a.PwmWrite("A1", 1)
 }
 
-func TestSparkCoreAdaptorAnalogWrite(t *testing.T) {
+func TestAdaptorAnalogWrite(t *testing.T) {
 	response := `{}`
 	params := []string{"A1,1"}
 
-	a := initTestSparkCoreAdaptor()
+	a := initTestAdaptor()
 	testServer := getDummyResponseForPathWithParams("/"+a.DeviceID+"/analogwrite", params, response, t)
 	defer testServer.Close()
 
@@ -151,12 +149,12 @@ func TestSparkCoreAdaptorAnalogWrite(t *testing.T) {
 	a.AnalogWrite("A1", 1)
 }
 
-func TestSparkCoreAdaptorDigitalWrite(t *testing.T) {
+func TestAdaptorDigitalWrite(t *testing.T) {
 	// When HIGH
 	response := `{}`
 	params := []string{"D7,HIGH"}
 
-	a := initTestSparkCoreAdaptor()
+	a := initTestAdaptor()
 	testServer := getDummyResponseForPathWithParams("/"+a.DeviceID+"/digitalwrite", params, response, t)
 
 	a.setAPIServer(testServer.URL)
@@ -173,12 +171,12 @@ func TestSparkCoreAdaptorDigitalWrite(t *testing.T) {
 	a.DigitalWrite("D7", 0)
 }
 
-func TestSparkCoreAdaptorDigitalRead(t *testing.T) {
+func TestAdaptorDigitalRead(t *testing.T) {
 	// When HIGH
 	response := `{"return_value": 1}`
 	params := []string{"D7"}
 
-	a := initTestSparkCoreAdaptor()
+	a := initTestAdaptor()
 	testServer := getDummyResponseForPathWithParams("/"+a.DeviceID+"/digitalread", params, response, t)
 
 	a.setAPIServer(testServer.URL)
@@ -199,8 +197,8 @@ func TestSparkCoreAdaptorDigitalRead(t *testing.T) {
 	gobottest.Assert(t, val, 0)
 }
 
-func TestSparkCoreAdaptorDigitalReadError(t *testing.T) {
-	a := initTestSparkCoreAdaptor()
+func TestAdaptorDigitalReadError(t *testing.T) {
+	a := initTestAdaptor()
 	// When error
 	testServer := createTestServer(func(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
@@ -213,10 +211,10 @@ func TestSparkCoreAdaptorDigitalReadError(t *testing.T) {
 	gobottest.Assert(t, val, -1)
 }
 
-func TestSparkCoreAdaptorFunction(t *testing.T) {
+func TestAdaptorFunction(t *testing.T) {
 	response := `{"return_value": 1}`
 
-	a := initTestSparkCoreAdaptor()
+	a := initTestAdaptor()
 	testServer := getDummyResponseForPath("/"+a.DeviceID+"/hello", response, t)
 
 	a.setAPIServer(testServer.URL)
@@ -237,11 +235,11 @@ func TestSparkCoreAdaptorFunction(t *testing.T) {
 	testServer.Close()
 }
 
-func TestSparkCoreAdaptorVariable(t *testing.T) {
+func TestAdaptorVariable(t *testing.T) {
 	// When String
 	response := `{"result": "1"}`
 
-	a := initTestSparkCoreAdaptor()
+	a := initTestAdaptor()
 	testServer := getDummyResponseForPath("/"+a.DeviceID+"/variable_name", response, t)
 
 	a.setAPIServer(testServer.URL)
@@ -292,8 +290,8 @@ func TestSparkCoreAdaptorVariable(t *testing.T) {
 	testServer.Close()
 }
 
-func TestSparkCoreAdaptorSetAPIServer(t *testing.T) {
-	a := initTestSparkCoreAdaptor()
+func TestAdaptorSetAPIServer(t *testing.T) {
+	a := initTestAdaptor()
 	apiServer := "new_api_server"
 	gobottest.Refute(t, a.APIServer, apiServer)
 
@@ -301,38 +299,35 @@ func TestSparkCoreAdaptorSetAPIServer(t *testing.T) {
 	gobottest.Assert(t, a.APIServer, apiServer)
 }
 
-func TestSparkCoreAdaptorDeviceURL(t *testing.T) {
+func TestAdaptorDeviceURL(t *testing.T) {
 	// When APIServer is set
-	a := initTestSparkCoreAdaptor()
+	a := initTestAdaptor()
 	a.setAPIServer("http://server")
 	a.DeviceID = "devID"
 	gobottest.Assert(t, a.deviceURL(), "http://server/v1/devices/devID")
 
-	//When APIServer is not set
-	a = &SparkCoreAdaptor{name: "sparkie", DeviceID: "myDevice", AccessToken: "token"}
-
-	gobottest.Assert(t, a.deviceURL(), "https://api.spark.io/v1/devices/myDevice")
+	// When APIServer is not set
+	a = &Adaptor{name: "particleie", DeviceID: "myDevice", AccessToken: "token"}
+	gobottest.Assert(t, a.deviceURL(), "https://api.particle.io/v1/devices/myDevice")
 }
 
-func TestSparkCoreAdaptorPinLevel(t *testing.T) {
-
-	a := initTestSparkCoreAdaptor()
+func TestAdaptorPinLevel(t *testing.T) {
+	a := initTestAdaptor()
 
 	gobottest.Assert(t, a.pinLevel(1), "HIGH")
 	gobottest.Assert(t, a.pinLevel(0), "LOW")
 	gobottest.Assert(t, a.pinLevel(5), "LOW")
 }
 
-func TestSparkCoreAdaptorPostToSpark(t *testing.T) {
-
-	a := initTestSparkCoreAdaptor()
+func TestAdaptorPostToparticle(t *testing.T) {
+	a := initTestAdaptor()
 
 	// When error on request
 	vals := url.Values{}
 	vals.Add("error", "error")
-	resp, err := a.requestToSpark("POST", "http://invalid%20host.com", vals)
+	resp, err := a.request("POST", "http://invalid%20host.com", vals)
 	if err == nil {
-		t.Error("requestToSpark() should return an error when request was unsuccessful but returned", resp)
+		t.Error("request() should return an error when request was unsuccessful but returned", resp)
 	}
 
 	// When error reading body
@@ -344,11 +339,10 @@ func TestSparkCoreAdaptorPostToSpark(t *testing.T) {
 	})
 	defer testServer.Close()
 
-	resp, err = a.requestToSpark("POST", testServer.URL+"/existent", vals)
+	resp, err = a.request("POST", testServer.URL+"/existent", vals)
 	if err == nil {
-		t.Error("requestToSpark() should return an error when status is not 200 but returned", resp)
+		t.Error("request() should return an error when status is not 200 but returned", resp)
 	}
-
 }
 
 type testEventSource struct {
@@ -360,19 +354,22 @@ func (testEventSource) Id() string      { return "" }
 func (t testEventSource) Event() string { return t.event }
 func (t testEventSource) Data() string  { return t.data }
 
-func TestSparkCoreAdaptorEventStream(t *testing.T) {
-	a := initTestSparkCoreAdaptor()
+func TestAdaptorEventStream(t *testing.T) {
+	a := initTestAdaptor()
 	var url string
 	eventSource = func(u string) (chan eventsource.Event, chan error, error) {
 		url = u
 		return nil, nil, nil
 	}
 	a.EventStream("all", "ping")
-	gobottest.Assert(t, url, "https://api.spark.io/v1/events/ping?access_token=token")
+	gobottest.Assert(t, url, "https://api.particle.io/v1/events/ping?access_token=token")
+
 	a.EventStream("devices", "ping")
-	gobottest.Assert(t, url, "https://api.spark.io/v1/devices/events/ping?access_token=token")
+	gobottest.Assert(t, url, "https://api.particle.io/v1/devices/events/ping?access_token=token")
+
 	a.EventStream("device", "ping")
-	gobottest.Assert(t, url, "https://api.spark.io/v1/devices/myDevice/events/ping?access_token=token")
+	gobottest.Assert(t, url, "https://api.particle.io/v1/devices/myDevice/events/ping?access_token=token")
+
 	_, err := a.EventStream("nothing", "ping")
 	gobottest.Assert(t, err.Error(), "source param should be: all, devices or device")
 

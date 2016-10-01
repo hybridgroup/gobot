@@ -1,4 +1,4 @@
-package spark
+package particle
 
 import (
 	"encoding/json"
@@ -13,7 +13,7 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
-type SparkCoreAdaptor struct {
+type Adaptor struct {
 	name        string
 	DeviceID    string
 	AccessToken string
@@ -35,31 +35,33 @@ var eventSource = func(url string) (chan eventsource.Event, chan error, error) {
 	return stream.Events, stream.Errors, nil
 }
 
-// NewSparkCoreAdaptor creates new spark core adaptor with deviceId and accessToken
+// NewAdaptor creates new Photon adaptor with deviceId and accessToken
 // using api.spark.io server as default
-func NewSparkCoreAdaptor(name string, deviceID string, accessToken string) *SparkCoreAdaptor {
-	return &SparkCoreAdaptor{
-		name:        name,
+func NewAdaptor(deviceID string, accessToken string) *Adaptor {
+	return &Adaptor{
+		name:        "Particle",
 		DeviceID:    deviceID,
 		AccessToken: accessToken,
-		APIServer:   "https://api.spark.io",
+		APIServer:   "https://api.particle.io",
 		Eventer:     gobot.NewEventer(),
 	}
 }
-func (s *SparkCoreAdaptor) Name() string { return s.name }
+
+func (s *Adaptor) Name() string     { return s.name }
+func (s *Adaptor) SetName(n string) { s.name = n }
 
 // Connect returns true if connection to spark core is successfull
-func (s *SparkCoreAdaptor) Connect() (errs []error) {
+func (s *Adaptor) Connect() (errs []error) {
 	return
 }
 
 // Finalize returns true if connection to spark core is finalized successfully
-func (s *SparkCoreAdaptor) Finalize() (errs []error) {
+func (s *Adaptor) Finalize() (errs []error) {
 	return
 }
 
 // AnalogRead reads analog ping value using spark cloud api
-func (s *SparkCoreAdaptor) AnalogRead(pin string) (val int, err error) {
+func (s *Adaptor) AnalogRead(pin string) (val int, err error) {
 	params := url.Values{
 		"params":       {pin},
 		"access_token": {s.AccessToken},
@@ -67,7 +69,7 @@ func (s *SparkCoreAdaptor) AnalogRead(pin string) (val int, err error) {
 
 	url := fmt.Sprintf("%v/analogread", s.deviceURL())
 
-	resp, err := s.requestToSpark("POST", url, params)
+	resp, err := s.request("POST", url, params)
 	if err == nil {
 		val = int(resp["return_value"].(float64))
 		return
@@ -77,40 +79,40 @@ func (s *SparkCoreAdaptor) AnalogRead(pin string) (val int, err error) {
 }
 
 // PwmWrite writes in pin using analog write api
-func (s *SparkCoreAdaptor) PwmWrite(pin string, level byte) (err error) {
+func (s *Adaptor) PwmWrite(pin string, level byte) (err error) {
 	return s.AnalogWrite(pin, level)
 }
 
 // AnalogWrite writes analog pin with specified level using spark cloud api
-func (s *SparkCoreAdaptor) AnalogWrite(pin string, level byte) (err error) {
+func (s *Adaptor) AnalogWrite(pin string, level byte) (err error) {
 	params := url.Values{
 		"params":       {fmt.Sprintf("%v,%v", pin, level)},
 		"access_token": {s.AccessToken},
 	}
 	url := fmt.Sprintf("%v/analogwrite", s.deviceURL())
-	_, err = s.requestToSpark("POST", url, params)
+	_, err = s.request("POST", url, params)
 	return
 }
 
 // DigitalWrite writes to a digital pin using spark cloud api
-func (s *SparkCoreAdaptor) DigitalWrite(pin string, level byte) (err error) {
+func (s *Adaptor) DigitalWrite(pin string, level byte) (err error) {
 	params := url.Values{
 		"params":       {fmt.Sprintf("%v,%v", pin, s.pinLevel(level))},
 		"access_token": {s.AccessToken},
 	}
 	url := fmt.Sprintf("%v/digitalwrite", s.deviceURL())
-	_, err = s.requestToSpark("POST", url, params)
+	_, err = s.request("POST", url, params)
 	return err
 }
 
 // DigitalRead reads from digital pin using spark cloud api
-func (s *SparkCoreAdaptor) DigitalRead(pin string) (val int, err error) {
+func (s *Adaptor) DigitalRead(pin string) (val int, err error) {
 	params := url.Values{
 		"params":       {pin},
 		"access_token": {s.AccessToken},
 	}
 	url := fmt.Sprintf("%v/digitalread", s.deviceURL())
-	resp, err := s.requestToSpark("POST", url, params)
+	resp, err := s.request("POST", url, params)
 	if err == nil {
 		val = int(resp["return_value"].(float64))
 		return
@@ -124,7 +126,7 @@ func (s *SparkCoreAdaptor) DigitalRead(pin string) (val int, err error) {
 // * name  - Event name to subscribe for, leave blank to subscribe to all events.
 //
 // A new event is emitted as a spark.Event struct
-func (s *SparkCoreAdaptor) EventStream(source string, name string) (event *gobot.Event, err error) {
+func (s *Adaptor) EventStream(source string, name string) (event *gobot.Event, err error) {
 	var url string
 
 	switch source {
@@ -158,9 +160,9 @@ func (s *SparkCoreAdaptor) EventStream(source string, name string) (event *gobot
 }
 
 // Variable returns a core variable value as a string
-func (s *SparkCoreAdaptor) Variable(name string) (result string, err error) {
+func (s *Adaptor) Variable(name string) (result string, err error) {
 	url := fmt.Sprintf("%v/%s?access_token=%s", s.deviceURL(), name, s.AccessToken)
-	resp, err := s.requestToSpark("GET", url, nil)
+	resp, err := s.request("GET", url, nil)
 
 	if err != nil {
 		return
@@ -183,14 +185,14 @@ func (s *SparkCoreAdaptor) Variable(name string) (result string, err error) {
 // returns value from request.
 // Takes a String as the only argument and returns an Int.
 // If function is not defined in core, it will time out
-func (s *SparkCoreAdaptor) Function(name string, args string) (val int, err error) {
+func (s *Adaptor) Function(name string, args string) (val int, err error) {
 	params := url.Values{
 		"args":         {args},
 		"access_token": {s.AccessToken},
 	}
 
 	url := fmt.Sprintf("%s/%s", s.deviceURL(), name)
-	resp, err := s.requestToSpark("POST", url, params)
+	resp, err := s.request("POST", url, params)
 
 	if err != nil {
 		return -1, err
@@ -201,29 +203,29 @@ func (s *SparkCoreAdaptor) Function(name string, args string) (val int, err erro
 }
 
 // setAPIServer sets spark cloud api server, this can be used to change from default api.spark.io
-func (s *SparkCoreAdaptor) setAPIServer(server string) {
+func (s *Adaptor) setAPIServer(server string) {
 	s.APIServer = server
 }
 
 // deviceURL constructs device url to make requests from spark cloud api
-func (s *SparkCoreAdaptor) deviceURL() string {
+func (s *Adaptor) deviceURL() string {
 	if len(s.APIServer) <= 0 {
-		s.setAPIServer("https://api.spark.io")
+		s.setAPIServer("https://api.particle.io")
 	}
 	return fmt.Sprintf("%v/v1/devices/%v", s.APIServer, s.DeviceID)
 }
 
 // pinLevel converts byte level to string expected in api
-func (s *SparkCoreAdaptor) pinLevel(level byte) string {
+func (s *Adaptor) pinLevel(level byte) string {
 	if level == 1 {
 		return "HIGH"
 	}
 	return "LOW"
 }
 
-// requestToSpark makes request to spark cloud server, return err != nil if there is
+// request makes request to Particle cloud server, return err != nil if there is
 // any issue with the request.
-func (s *SparkCoreAdaptor) requestToSpark(method string, url string, params url.Values) (m map[string]interface{}, err error) {
+func (s *Adaptor) request(method string, url string, params url.Values) (m map[string]interface{}, err error) {
 	var resp *http.Response
 
 	if method == "POST" {
