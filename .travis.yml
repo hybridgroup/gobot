@@ -20,8 +20,8 @@ before_install:
  - sudo apt-get install --force-yes libcv-dev libcvaux-dev libhighgui-dev libopencv-dev libsdl2-dev libsdl2-image-dev libsdl2 libusb-dev xvfb unzip libgtk2.0-0
  - mkdir -p gnatsd
  - cd gnatsd
- - "wget https://github.com/nats-io/gnatsd/releases/download/v0.8.1/gnatsd-v0.8.1-linux-amd64.zip"
- - unzip -j gnatsd-v0.8.1-linux-amd64.zip
+ - "wget https://github.com/nats-io/gnatsd/releases/download/v0.9.4/gnatsd-v0.9.4-linux-amd64.zip"
+ - unzip -j gnatsd-v0.9.4-linux-amd64.zip
  - ./gnatsd -p 4222 &
  - ./gnatsd -p 4223 --user test --pass testwd &
  - cd $HOME/gopath/src/github.com/hybridgroup/gobot
