@@ -6,28 +6,29 @@ import (
 	"github.com/tarm/goserial"
 )
 
-type NeuroskyAdaptor struct {
+type Adaptor struct {
 	name    string
 	port    string
 	sp      io.ReadWriteCloser
-	connect func(*NeuroskyAdaptor) (io.ReadWriteCloser, error)
+	connect func(*Adaptor) (io.ReadWriteCloser, error)
 }
 
-// NewNeuroskyAdaptor creates a neurosky adaptor with specified name
-func NewNeuroskyAdaptor(name string, port string) *NeuroskyAdaptor {
-	return &NeuroskyAdaptor{
-		name: name,
+// NewAdaptor creates a neurosky adaptor with specified port
+func NewAdaptor(port string) *Adaptor {
+	return &Adaptor{
 		port: port,
-		connect: func(n *NeuroskyAdaptor) (io.ReadWriteCloser, error) {
+		connect: func(n *Adaptor) (io.ReadWriteCloser, error) {
 			return serial.OpenPort(&serial.Config{Name: n.Port(), Baud: 57600})
 		},
 	}
 }
-func (n *NeuroskyAdaptor) Name() string { return n.name }
-func (n *NeuroskyAdaptor) Port() string { return n.port }
+
+func (n *Adaptor) Name() string        { return n.name }
+func (n *Adaptor) SetName(name string) { n.name = name }
+func (n *Adaptor) Port() string        { return n.port }
 
 // Connect returns true if connection to device is successful
-func (n *NeuroskyAdaptor) Connect() (errs []error) {
+func (n *Adaptor) Connect() (errs []error) {
 	if sp, err := n.connect(n); err != nil {
 		return []error{err}
 	} else {
@@ -37,7 +38,7 @@ func (n *NeuroskyAdaptor) Connect() (errs []error) {
 }
 
 // Finalize returns true if device finalization is successful
-func (n *NeuroskyAdaptor) Finalize() (errs []error) {
+func (n *Adaptor) Finalize() (errs []error) {
 	if err := n.sp.Close(); err != nil {
 		return []error{err}
 	}

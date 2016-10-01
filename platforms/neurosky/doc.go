@@ -19,8 +19,8 @@ Example:
 	func main() {
 		gbot := gobot.NewGobot()
 
-		adaptor := neurosky.NewNeuroskyAdaptor("neurosky", "/dev/rfcomm0")
-		neuro := neurosky.NewNeuroskyDriver(adaptor, "neuro")
+		adaptor := neurosky.NewAdaptor("/dev/rfcomm0")
+		neuro := neurosky.NewDriver(adaptor)
 
 		work := func() {
 			gobot.On(neuro.Event("extended"), func(data interface{}) {
