@@ -20,8 +20,8 @@ Example:
 	func main() {
 		gbot := gobot.NewGobot()
 
-		adaptor := sphero.NewSpheroAdaptor("sphero", "/dev/rfcomm0")
-		driver := sphero.NewSpheroDriver(adaptor, "sphero")
+		adaptor := sphero.NewAdaptor("/dev/rfcomm0")
+		driver := sphero.NewSpheroDriver(adaptor)
 
 		work := func() {
 			gobot.Every(3*time.Second, func() {

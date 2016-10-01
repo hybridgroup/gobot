@@ -12,9 +12,9 @@ import (
 var _ gobot.Driver = (*SpheroDriver)(nil)
 
 func initTestSpheroDriver() *SpheroDriver {
-	a := NewSpheroAdaptor("bot", "/dev/null")
+	a := NewAdaptor("/dev/null")
 	a.sp = nullReadWriteCloser{}
-	return NewSpheroDriver(a, "bot")
+	return NewSpheroDriver(a)
 }
 
 func TestSpheroDriver(t *testing.T) {
@@ -70,8 +70,8 @@ func TestSpheroDriver(t *testing.T) {
 	ret = d.Command("ReadLocator")(nil)
 	gobottest.Assert(t, ret, []int16{})
 
-	gobottest.Assert(t, d.Name(), "bot")
-	gobottest.Assert(t, d.Connection().Name(), "bot")
+	gobottest.Assert(t, d.Name(), "Sphero")
+	gobottest.Assert(t, d.Connection().Name(), "Sphero")
 }
 
 func TestSpheroDriverStart(t *testing.T) {

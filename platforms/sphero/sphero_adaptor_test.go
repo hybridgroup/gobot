@@ -9,7 +9,7 @@ import (
 	"github.com/hybridgroup/gobot/gobottest"
 )
 
-var _ gobot.Adaptor = (*SpheroAdaptor)(nil)
+var _ gobot.Adaptor = (*Adaptor)(nil)
 
 type nullReadWriteCloser struct{}
 
@@ -37,8 +37,8 @@ func (nullReadWriteCloser) Close() error {
 	return testAdaptorClose()
 }
 
-func initTestSpheroAdaptor() *SpheroAdaptor {
-	a := NewSpheroAdaptor("bot", "/dev/null")
+func initTestSpheroAdaptor() *Adaptor {
+	a := NewAdaptor("/dev/null")
 	a.connect = func(string) (io.ReadWriteCloser, error) {
 		return &nullReadWriteCloser{}, nil
 	}
@@ -47,7 +47,7 @@ func initTestSpheroAdaptor() *SpheroAdaptor {
 
 func TestSpheroAdaptor(t *testing.T) {
 	a := initTestSpheroAdaptor()
-	gobottest.Assert(t, a.Name(), "bot")
+	gobottest.Assert(t, a.Name(), "Sphero")
 	gobottest.Assert(t, a.Port(), "/dev/null")
 }
 
