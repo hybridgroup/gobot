@@ -7,22 +7,22 @@ import (
 	"github.com/hybridgroup/gobot/gobottest"
 )
 
-var _ gobot.Adaptor = (*PebbleAdaptor)(nil)
+var _ gobot.Adaptor = (*Adaptor)(nil)
 
-func initTestPebbleAdaptor() *PebbleAdaptor {
-	return NewPebbleAdaptor("pebble")
+func initTestAdaptor() *Adaptor {
+	return NewAdaptor()
 }
 
-func TestPebbleAdaptor(t *testing.T) {
-	a := initTestPebbleAdaptor()
-	gobottest.Assert(t, a.Name(), "pebble")
+func TestAdaptor(t *testing.T) {
+	a := initTestAdaptor()
+	gobottest.Assert(t, a.Name(), "Pebble")
 }
-func TestPebbleAdaptorConnect(t *testing.T) {
-	a := initTestPebbleAdaptor()
+func TestAdaptorConnect(t *testing.T) {
+	a := initTestAdaptor()
 	gobottest.Assert(t, len(a.Connect()), 0)
 }
 
-func TestPebbleAdaptorFinalize(t *testing.T) {
-	a := initTestPebbleAdaptor()
+func TestAdaptorFinalize(t *testing.T) {
+	a := initTestAdaptor()
 	gobottest.Assert(t, len(a.Finalize()), 0)
 }
