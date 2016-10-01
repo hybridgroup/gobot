@@ -5,18 +5,18 @@ import (
 	"testing"
 
 	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/drivers/gpio"
+	"github.com/hybridgroup/gobot/drivers/i2c"
 	"github.com/hybridgroup/gobot/gobottest"
-	"github.com/hybridgroup/gobot/platforms/gpio"
-	"github.com/hybridgroup/gobot/platforms/i2c"
 	"github.com/hybridgroup/gobot/sysfs"
 )
 
-var _ gobot.Adaptor = (*RaspiAdaptor)(nil)
+var _ gobot.Adaptor = (*Adaptor)(nil)
 
-var _ gpio.DigitalReader = (*RaspiAdaptor)(nil)
-var _ gpio.DigitalWriter = (*RaspiAdaptor)(nil)
+var _ gpio.DigitalReader = (*Adaptor)(nil)
+var _ gpio.DigitalWriter = (*Adaptor)(nil)
 
-var _ i2c.I2c = (*RaspiAdaptor)(nil)
+var _ i2c.I2c = (*Adaptor)(nil)
 
 type NullReadWriteCloser struct {
 	contents []byte
@@ -44,7 +44,7 @@ func (n *NullReadWriteCloser) Close() error {
 	return closeErr
 }
 
-func initTestRaspiAdaptor() *RaspiAdaptor {
+func initTestAdaptor() *Adaptor {
 	readFile = func() ([]byte, error) {
 		return []byte(`
 Hardware        : BCM2708
@@ -52,12 +52,12 @@ Revision        : 0010
 Serial          : 000000003bc748ea
 `), nil
 	}
-	a := NewRaspiAdaptor("myAdaptor")
+	a := NewAdaptor()
 	a.Connect()
 	return a
 }
 
-func TestRaspiAdaptor(t *testing.T) {
+func TestAdaptor(t *testing.T) {
 	readFile = func() ([]byte, error) {
 		return []byte(`
 Hardware        : BCM2708
@@ -65,8 +65,8 @@ Revision        : 0010
 Serial          : 000000003bc748ea
 `), nil
 	}
-	a := NewRaspiAdaptor("myAdaptor")
-	gobottest.Assert(t, a.Name(), "myAdaptor")
+	a := NewAdaptor()
+	gobottest.Assert(t, a.Name(), "RaspberryPi")
 	gobottest.Assert(t, a.i2cLocation, "/dev/i2c-1")
 	gobottest.Assert(t, a.revision, "3")
 
@@ -77,7 +77,7 @@ Revision        : 000D
 Serial          : 000000003bc748ea
 `), nil
 	}
-	a = NewRaspiAdaptor("myAdaptor")
+	a = NewAdaptor()
 	gobottest.Assert(t, a.i2cLocation, "/dev/i2c-1")
 	gobottest.Assert(t, a.revision, "2")
 
@@ -88,13 +88,13 @@ Revision        : 0002
 Serial          : 000000003bc748ea
 `), nil
 	}
-	a = NewRaspiAdaptor("myAdaptor")
+	a = NewAdaptor()
 	gobottest.Assert(t, a.i2cLocation, "/dev/i2c-0")
 	gobottest.Assert(t, a.revision, "1")
 
 }
-func TestRaspiAdaptorFinalize(t *testing.T) {
-	a := initTestRaspiAdaptor()
+func TestAdaptorFinalize(t *testing.T) {
+	a := initTestAdaptor()
 
 	fs := sysfs.NewMockFilesystem([]string{
 		"/sys/class/gpio/export",
@@ -114,8 +114,8 @@ func TestRaspiAdaptorFinalize(t *testing.T) {
 	gobottest.Assert(t, len(a.Finalize()), 0)
 }
 
-func TestRaspiAdaptorDigitalPWM(t *testing.T) {
-	a := initTestRaspiAdaptor()
+func TestAdaptorDigitalPWM(t *testing.T) {
+	a := initTestAdaptor()
 
 	gobottest.Assert(t, a.PwmWrite("7", 4), nil)
 
@@ -133,8 +133,8 @@ func TestRaspiAdaptorDigitalPWM(t *testing.T) {
 	gobottest.Assert(t, strings.Split(fs.Files["/dev/pi-blaster"].Contents, "\n")[0], "17=0.25")
 }
 
-func TestRaspiAdaptorDigitalIO(t *testing.T) {
-	a := initTestRaspiAdaptor()
+func TestAdaptorDigitalIO(t *testing.T) {
+	a := initTestAdaptor()
 	fs := sysfs.NewMockFilesystem([]string{
 		"/sys/class/gpio/export",
 		"/sys/class/gpio/unexport",
@@ -154,8 +154,8 @@ func TestRaspiAdaptorDigitalIO(t *testing.T) {
 	gobottest.Assert(t, i, 1)
 }
 
-func TestRaspiAdaptorI2c(t *testing.T) {
-	a := initTestRaspiAdaptor()
+func TestAdaptorI2c(t *testing.T) {
+	a := initTestAdaptor()
 	fs := sysfs.NewMockFilesystem([]string{
 		"/dev/i2c-1",
 	})

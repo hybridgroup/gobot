@@ -16,7 +16,7 @@ var readFile = func() ([]byte, error) {
 	return ioutil.ReadFile("/proc/cpuinfo")
 }
 
-type RaspiAdaptor struct {
+type Adaptor struct {
 	name        string
 	revision    string
 	i2cLocation string
@@ -112,10 +112,10 @@ var pins = map[string]map[string]int{
 	},
 }
 
-// NewRaspiAdaptor creates a RaspiAdaptor with specified name and
-func NewRaspiAdaptor(name string) *RaspiAdaptor {
-	r := &RaspiAdaptor{
-		name:        name,
+// NewAdaptor creates a Raspi Adaptor
+func NewAdaptor() *Adaptor {
+	r := &Adaptor{
+		name:        "RaspberryPi",
 		digitalPins: make(map[int]sysfs.DigitalPin),
 		pwmPins:     []int{},
 	}
@@ -138,16 +138,18 @@ func NewRaspiAdaptor(name string) *RaspiAdaptor {
 
 	return r
 }
-func (r *RaspiAdaptor) Name() string { return r.name }
+
+func (r *Adaptor) Name() string     { return r.name }
+func (r *Adaptor) SetName(n string) { r.name = n }
 
 // Connect starts connection with board and creates
 // digitalPins and pwmPins adaptor maps
-func (r *RaspiAdaptor) Connect() (errs []error) {
+func (r *Adaptor) Connect() (errs []error) {
 	return
 }
 
 // Finalize closes connection to board and pins
-func (r *RaspiAdaptor) Finalize() (errs []error) {
+func (r *Adaptor) Finalize() (errs []error) {
 	for _, pin := range r.digitalPins {
 		if pin != nil {
 			if err := pin.Unexport(); err != nil {
@@ -168,7 +170,7 @@ func (r *RaspiAdaptor) Finalize() (errs []error) {
 	return errs
 }
 
-func (r *RaspiAdaptor) translatePin(pin string) (i int, err error) {
+func (r *Adaptor) translatePin(pin string) (i int, err error) {
 	if val, ok := pins[pin][r.revision]; ok {
 		i = val
 	} else if val, ok := pins[pin]["*"]; ok {
@@ -180,7 +182,7 @@ func (r *RaspiAdaptor) translatePin(pin string) (i int, err error) {
 	return
 }
 
-func (r *RaspiAdaptor) pwmPin(pin string) (i int, err error) {
+func (r *Adaptor) pwmPin(pin string) (i int, err error) {
 	i, err = r.translatePin(pin)
 	if err != nil {
 		return
@@ -202,7 +204,7 @@ func (r *RaspiAdaptor) pwmPin(pin string) (i int, err error) {
 }
 
 // digitalPin returns matched digitalPin for specified values
-func (r *RaspiAdaptor) digitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPin, err error) {
+func (r *Adaptor) digitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPin, err error) {
 	i, err := r.translatePin(pin)
 
 	if err != nil {
@@ -224,7 +226,7 @@ func (r *RaspiAdaptor) digitalPin(pin string, dir string) (sysfsPin sysfs.Digita
 }
 
 // DigitalRead reads digital value from pin
-func (r *RaspiAdaptor) DigitalRead(pin string) (val int, err error) {
+func (r *Adaptor) DigitalRead(pin string) (val int, err error) {
 	sysfsPin, err := r.digitalPin(pin, sysfs.IN)
 	if err != nil {
 		return
@@ -233,7 +235,7 @@ func (r *RaspiAdaptor) DigitalRead(pin string) (val int, err error) {
 }
 
 // DigitalWrite writes digital value to specified pin
-func (r *RaspiAdaptor) DigitalWrite(pin string, val byte) (err error) {
+func (r *Adaptor) DigitalWrite(pin string, val byte) (err error) {
 	sysfsPin, err := r.digitalPin(pin, sysfs.OUT)
 	if err != nil {
 		return err
@@ -242,7 +244,7 @@ func (r *RaspiAdaptor) DigitalWrite(pin string, val byte) (err error) {
 }
 
 // I2cStart starts a i2c device in specified address
-func (r *RaspiAdaptor) I2cStart(address int) (err error) {
+func (r *Adaptor) I2cStart(address int) (err error) {
 	if r.i2cDevice == nil {
 		r.i2cDevice, err = sysfs.NewI2cDevice(r.i2cLocation, address)
 	}
@@ -250,7 +252,7 @@ func (r *RaspiAdaptor) I2cStart(address int) (err error) {
 }
 
 // I2CWrite writes data to i2c device
-func (r *RaspiAdaptor) I2cWrite(address int, data []byte) (err error) {
+func (r *Adaptor) I2cWrite(address int, data []byte) (err error) {
 	if err = r.i2cDevice.SetAddress(address); err != nil {
 		return
 	}
@@ -259,7 +261,7 @@ func (r *RaspiAdaptor) I2cWrite(address int, data []byte) (err error) {
 }
 
 // I2cRead returns value from i2c device using specified size
-func (r *RaspiAdaptor) I2cRead(address int, size int) (data []byte, err error) {
+func (r *Adaptor) I2cRead(address int, size int) (data []byte, err error) {
 	if err = r.i2cDevice.SetAddress(address); err != nil {
 		return
 	}
@@ -268,7 +270,7 @@ func (r *RaspiAdaptor) I2cRead(address int, size int) (data []byte, err error) {
 	return
 }
 
-func (r *RaspiAdaptor) PwmWrite(pin string, val byte) (err error) {
+func (r *Adaptor) PwmWrite(pin string, val byte) (err error) {
 	sysfsPin, err := r.pwmPin(pin)
 	if err != nil {
 		return err
@@ -276,7 +278,7 @@ func (r *RaspiAdaptor) PwmWrite(pin string, val byte) (err error) {
 	return r.piBlaster(fmt.Sprintf("%v=%v\n", sysfsPin, gobot.FromScale(float64(val), 0, 255)))
 }
 
-func (r *RaspiAdaptor) ServoWrite(pin string, angle byte) (err error) {
+func (r *Adaptor) ServoWrite(pin string, angle byte) (err error) {
 	sysfsPin, err := r.pwmPin(pin)
 	if err != nil {
 		return err
@@ -287,7 +289,7 @@ func (r *RaspiAdaptor) ServoWrite(pin string, angle byte) (err error) {
 	return r.piBlaster(fmt.Sprintf("%v=%v\n", sysfsPin, val))
 }
 
-func (r *RaspiAdaptor) piBlaster(data string) (err error) {
+func (r *Adaptor) piBlaster(data string) (err error) {
 	fi, err := sysfs.OpenFile("/dev/pi-blaster", os.O_WRONLY|os.O_APPEND, 0644)
 	defer fi.Close()
 
