@@ -8,7 +8,7 @@ import (
 	"github.com/tarm/serial"
 )
 
-var _ gobot.Adaptor = (*MegaPiAdaptor)(nil)
+var _ gobot.Adaptor = (*Adaptor)(nil)
 
 // Adaptor is the Gobot adaptor for the MakeBlock MegaPi board
 type Adaptor struct {
