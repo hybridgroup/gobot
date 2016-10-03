@@ -1,4 +1,4 @@
-PACKAGES := gobot gobot/api gobot/platforms/firmata/client gobot/platforms/intel-iot/edison gobot/sysfs $(shell ls ./platforms | sed -e 's/^/gobot\/platforms\//')
+PACKAGES := gobot gobot/api gobot/drivers/gpio gobot/drivers/i2c gobot/platforms/firmata/client gobot/platforms/intel-iot/edison gobot/sysfs $(shell ls ./platforms | sed -e 's/^/gobot\/platforms\//')
 .PHONY: test cover robeaux examples
 
 test:
@@ -38,3 +38,15 @@ examples:
 	for example in $(EXAMPLES) ; do \
 		go build -o /tmp/$$example examples/$$example ; \
 	done ; \
+
+deps:
+	go get -d -v github.com/bmizerany/pat
+	go get -d -v github.com/hybridgroup/go-ardrone/client
+	go get -d -v github.com/currantlabs/gatt
+	go get -d -v github.com/tarm/goserial
+	go get -d -v github.com/veandco/go-sdl2/sdl
+	go get -d -v golang.org/x/net/websocket
+	go get -d -v github.com/eclipse/paho.mqtt.golang
+	go get -d -v github.com/nats-io/nats
+	go get -d -v github.com/lazywei/go-opencv/opencv
+	go get -d -v github.com/donovanhide/eventsource
