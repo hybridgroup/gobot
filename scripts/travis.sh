@@ -1,5 +1,5 @@
 #!/bin/bash
-PACKAGES=('gobot' 'gobot/api' 'gobot/drivers/gpio' 'gobot/drivers/i2c' 'gobot/platforms/firmata/client' 'gobot/platforms/intel-iot/edison' 'gobot/sysfs' $(ls ./platforms | sed -e 's/^/gobot\/platforms\//'))
+PACKAGES=('gobot' 'gobot/api' 'gobot/drivers/gpio' 'gobot/drivers/i2c' 'gobot/platforms/firmata/client' 'gobot/platforms/intel-iot/edison' 'gobot/platforms/intel-iot/joule' 'gobot/sysfs' $(ls ./platforms | sed -e 's/^/gobot\/platforms\//'))
 EXITCODE=0
 
 echo "mode: set" > profile.cov
