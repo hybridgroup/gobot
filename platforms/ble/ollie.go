@@ -46,6 +46,7 @@ type packet struct {
 // NewSpheroOllieDriver creates a SpheroOllieDriver
 func NewSpheroOllieDriver(a *ClientAdaptor) *SpheroOllieDriver {
 	n := &SpheroOllieDriver{
+		name:          "Ollie",
 		connection:    a,
 		Eventer:       gobot.NewEventer(),
 		packetChannel: make(chan *packet, 1024),

@@ -42,6 +42,7 @@ type MPL115A2Driver struct {
 // NewMPL115A2Driver creates a new driver with specified i2c interface
 func NewMPL115A2Driver(a I2c, v ...time.Duration) *MPL115A2Driver {
 	m := &MPL115A2Driver{
+		name:       "MPL115A2",
 		connection: a,
 		Eventer:    gobot.NewEventer(),
 		interval:   10 * time.Millisecond,

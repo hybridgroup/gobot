@@ -25,6 +25,7 @@ type BlinkMDriver struct {
 //	Color - returns the color of the LED.
 func NewBlinkMDriver(a I2c) *BlinkMDriver {
 	b := &BlinkMDriver{
+		name:       "BlinkM",
 		connection: a,
 		Commander:  gobot.NewCommander(),
 	}

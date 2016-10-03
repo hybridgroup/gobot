@@ -22,6 +22,7 @@ type Driver struct {
 
 func NewDriver() *Driver {
 	k := &Driver{
+		name: "Keyboard",
 		connect: func(k *Driver) (err error) {
 			if err := configure(); err != nil {
 				return err

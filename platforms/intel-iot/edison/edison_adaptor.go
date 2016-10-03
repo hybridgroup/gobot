@@ -181,6 +181,7 @@ func changePinMode(pin, mode string) (err error) {
 // NewAdaptor returns a new Edison Adaptor
 func NewAdaptor() *Adaptor {
 	return &Adaptor{
+		name: "Edison",
 		connect: func(e *Adaptor) (err error) {
 			e.tristate = sysfs.NewDigitalPin(214)
 			if err = e.tristate.Export(); err != nil {

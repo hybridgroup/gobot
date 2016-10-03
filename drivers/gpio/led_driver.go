@@ -22,6 +22,7 @@ type LedDriver struct {
 //	"Off" - See LedDriver.Off
 func NewLedDriver(a DigitalWriter, pin string) *LedDriver {
 	l := &LedDriver{
+		name:       "LED",
 		pin:        pin,
 		connection: a,
 		high:       false,

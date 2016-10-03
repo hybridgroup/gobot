@@ -82,6 +82,7 @@ type JHD1313M1Driver struct {
 // NewJHD1313M1Driver creates a new driver with specified i2c interface.
 func NewJHD1313M1Driver(a I2c) *JHD1313M1Driver {
 	return &JHD1313M1Driver{
+		name:       "JHD1313M1",
 		connection: a,
 		lcdAddress: 0x3E,
 		rgbAddress: 0x62,

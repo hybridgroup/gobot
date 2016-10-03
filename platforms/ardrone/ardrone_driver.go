@@ -22,6 +22,7 @@ type Driver struct {
 //     'flying' - Sent when the device has taken off.
 func NewDriver(connection *Adaptor) *Driver {
 	d := &Driver{
+		name:       "ARDrone",
 		connection: connection,
 		Eventer:    gobot.NewEventer(),
 	}

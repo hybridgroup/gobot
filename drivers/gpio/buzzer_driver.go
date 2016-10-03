@@ -139,6 +139,7 @@ type BuzzerDriver struct {
 // NewBuzzerDriver return a new BuzzerDriver given a DigitalWriter and pin.
 func NewBuzzerDriver(a DigitalWriter, pin string) *BuzzerDriver {
 	l := &BuzzerDriver{
+		name:       "Buzzer",
 		pin:        pin,
 		connection: a,
 		high:       false,

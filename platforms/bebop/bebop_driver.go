@@ -19,6 +19,7 @@ type Driver struct {
 // NewDriver creates an Bebop Driver.
 func NewDriver(connection *Adaptor) *Driver {
 	d := &Driver{
+		name:       "Bebop",
 		connection: connection,
 		Eventer:    gobot.NewEventer(),
 	}

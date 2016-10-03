@@ -14,7 +14,7 @@ type Adaptor struct {
 }
 
 func NewAdaptor() *Adaptor {
-	return &Adaptor{}
+	return &Adaptor{name: "Audio"}
 }
 
 func (a *Adaptor) Name() string { return a.name }

@@ -21,6 +21,7 @@ type Adaptor struct {
 // NewAdaptor returns a new Joystick Adaptor.
 func NewAdaptor() *Adaptor {
 	return &Adaptor{
+		name: "Joystick",
 		connect: func(j *Adaptor) (err error) {
 			sdl.Init(sdl.INIT_JOYSTICK)
 			if sdl.NumJoysticks() > 0 {

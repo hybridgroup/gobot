@@ -33,6 +33,7 @@ type Adaptor struct {
 //
 func NewAdaptor(v ...string) *Adaptor {
 	a := &Adaptor{
+		name: "ARDrone",
 		connect: func(a *Adaptor) (drone, error) {
 			return client.Connect(a.config)
 		},

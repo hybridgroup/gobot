@@ -58,6 +58,7 @@ type EEG struct {
 //   eeg - showing eeg data
 func NewDriver(a *Adaptor) *Driver {
 	n := &Driver{
+		name:       "Neurosky",
 		connection: a,
 		Eventer:    gobot.NewEventer(),
 	}

@@ -452,6 +452,7 @@ var sysfsPinMap = map[string]sysfsPin{
 // NewAdaptor returns a new Joule Adaptor
 func NewAdaptor() *Adaptor {
 	return &Adaptor{
+		name: "Joule",
 		connect: func(e *Adaptor) (err error) {
 			return
 		},

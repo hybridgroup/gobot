@@ -20,6 +20,7 @@ type Adaptor struct {
 // NewAdaptor returns a new Digispark Adaptor
 func NewAdaptor() *Adaptor {
 	return &Adaptor{
+		name: "Digispark",
 		connect: func(d *Adaptor) (err error) {
 			d.littleWire = littleWireConnect()
 			if d.littleWire.(*littleWire).lwHandle == nil {

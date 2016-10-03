@@ -22,6 +22,7 @@ type MotorDriver struct {
 // NewMotorDriver return a new MotorDriver given a DigitalWriter and pin
 func NewMotorDriver(a DigitalWriter, speedPin string) *MotorDriver {
 	return &MotorDriver{
+		name:             "Motor",
 		connection:       a,
 		SpeedPin:         speedPin,
 		CurrentState:     0,

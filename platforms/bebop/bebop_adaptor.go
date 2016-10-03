@@ -35,6 +35,7 @@ type Adaptor struct {
 // NewAdaptor returns a new BebopAdaptor
 func NewAdaptor() *Adaptor {
 	return &Adaptor{
+		name:  "Bebop",
 		drone: client.New(),
 		connect: func(a *Adaptor) error {
 			return a.drone.Connect()

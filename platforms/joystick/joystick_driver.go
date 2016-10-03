@@ -52,6 +52,7 @@ type joystickConfig struct {
 //  time.Duration: Interval at which the Driver is polled for new information
 func NewDriver(a *Adaptor, config string, v ...time.Duration) *Driver {
 	d := &Driver{
+		name:       "Joystick",
 		connection: a,
 		Eventer:    gobot.NewEventer(),
 		configPath: config,

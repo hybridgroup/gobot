@@ -20,6 +20,7 @@ type Adaptor struct {
 // NewAdaptor populates a new NATS Adaptor.
 func NewAdaptor(host string, clientID int) *Adaptor {
 	return &Adaptor{
+		name:     "NATS",
 		Host:     host,
 		clientID: clientID,
 	}

@@ -14,6 +14,7 @@ type Adaptor struct {
 // NewAdaptor creates a new mqtt adaptor with specified host and client id
 func NewAdaptor(host string, clientID string) *Adaptor {
 	return &Adaptor{
+		name:     "MQTT",
 		Host:     host,
 		clientID: clientID,
 	}
@@ -21,6 +22,7 @@ func NewAdaptor(host string, clientID string) *Adaptor {
 
 func NewAdaptorWithAuth(host, clientID, username, password string) *Adaptor {
 	return &Adaptor{
+		name:     "MQTT",
 		Host:     host,
 		clientID: clientID,
 		username: username,

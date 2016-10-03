@@ -23,6 +23,7 @@ type Adaptor struct {
 func NewAdaptor(device string) *Adaptor {
 	c := &serial.Config{Name: device, Baud: 115200}
 	return &Adaptor{
+		name:              "MegaPi",
 		connection:        nil,
 		serialConfig:      c,
 		writeBytesChannel: make(chan []byte),

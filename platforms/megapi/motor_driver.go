@@ -22,6 +22,7 @@ type MotorDriver struct {
 // NewMotorDriver creates a new MotorDriver at the given port
 func NewMotorDriver(megaPi *Adaptor, port byte) *MotorDriver {
 	return &MotorDriver{
+		name:     "MegaPi Motor",
 		megaPi:   megaPi,
 		port:     port,
 		halted:   true,

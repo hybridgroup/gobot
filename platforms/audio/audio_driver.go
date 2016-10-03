@@ -20,6 +20,7 @@ type Driver struct {
 
 func NewDriver(a *Adaptor, filename string) *Driver {
 	d := &Driver{
+		name:       "Audio",
 		connection: a,
 		interval:   500 * time.Millisecond,
 		filename:   filename,

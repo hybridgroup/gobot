@@ -14,6 +14,7 @@ type HMC6352Driver struct {
 // NewHMC6352Driver creates a new driver with specified i2c interface
 func NewHMC6352Driver(a I2c) *HMC6352Driver {
 	return &HMC6352Driver{
+		name:       "HMC6352",
 		connection: a,
 	}
 }

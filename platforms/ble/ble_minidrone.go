@@ -67,6 +67,7 @@ func validatePitch(val int) int {
 // NewMinidroneDriver creates a MinidroneDriver
 func NewMinidroneDriver(a *ClientAdaptor) *MinidroneDriver {
 	n := &MinidroneDriver{
+		name:       "Minidrone",
 		connection: a,
 		Pcmd: Pcmd{
 			Flag:  0,

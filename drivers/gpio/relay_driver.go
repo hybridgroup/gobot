@@ -19,6 +19,7 @@ type RelayDriver struct {
 //	"Off" - See RelayDriver.Off
 func NewRelayDriver(a DigitalWriter, pin string) *RelayDriver {
 	l := &RelayDriver{
+		name:       "Relay",
 		pin:        pin,
 		connection: a,
 		high:       false,

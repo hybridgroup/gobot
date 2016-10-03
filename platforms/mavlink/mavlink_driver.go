@@ -35,6 +35,7 @@ type MavlinkInterface interface {
 //	"message" - triggered when a new valid message is processed
 func NewDriver(a *Adaptor, v ...time.Duration) *Driver {
 	m := &Driver{
+		name:       "Mavlink",
 		connection: a,
 		Eventer:    gobot.NewEventer(),
 		interval:   10 * time.Millisecond,

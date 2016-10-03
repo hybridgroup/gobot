@@ -16,6 +16,7 @@ type Adaptor struct {
 // NewAdaptor creates a neurosky adaptor with specified port
 func NewAdaptor(port string) *Adaptor {
 	return &Adaptor{
+		name: "Neurosky",
 		port: port,
 		connect: func(n *Adaptor) (io.ReadWriteCloser, error) {
 			return serial.OpenPort(&serial.Config{Name: n.Port(), Baud: 57600})
