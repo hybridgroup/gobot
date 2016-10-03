@@ -3,7 +3,7 @@ package mavlink
 import (
 	"io"
 
-	"github.com/tarm/goserial"
+	"github.com/tarm/serial"
 )
 
 type Adaptor struct {

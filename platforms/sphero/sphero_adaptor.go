@@ -3,7 +3,7 @@ package sphero
 import (
 	"io"
 
-	"github.com/tarm/goserial"
+	"github.com/tarm/serial"
 )
 
 // Represents a Connection to a Sphero

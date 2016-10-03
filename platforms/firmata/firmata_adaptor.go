@@ -7,7 +7,7 @@ import (
 
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/firmata/client"
-	"github.com/tarm/goserial"
+	"github.com/tarm/serial"
 )
 
 type firmataBoard interface {

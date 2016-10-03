@@ -3,7 +3,7 @@ package neurosky
 import (
 	"io"
 
-	"github.com/tarm/goserial"
+	"github.com/tarm/serial"
 )
 
 type Adaptor struct {
