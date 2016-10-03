@@ -13,8 +13,8 @@ func main() {
 	a := api.NewAPI(gbot)
 	a.Start()
 
-	conn := sphero.NewSpheroAdaptor("Sphero", "/dev/rfcomm0")
-	ball := sphero.NewSpheroDriver(conn, "sphero")
+	conn := sphero.NewAdaptor("/dev/rfcomm0")
+	ball := sphero.NewSpheroDriver(conn)
 
 	robot := gobot.NewRobot("sphero-dpad",
 		[]gobot.Connection{conn},

@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/drivers/gpio"
 	"github.com/hybridgroup/gobot/platforms/firmata"
-	"github.com/hybridgroup/gobot/platforms/gpio"
 )
 
 type TravisResponse struct {
@@ -66,10 +66,13 @@ func checkTravis(robot *gobot.Robot) {
 func main() {
 	gbot := gobot.NewGobot()
 
-	firmataAdaptor := firmata.NewFirmataAdaptor("firmata", "/dev/ttyACM0")
-	red := gpio.NewLedDriver(firmataAdaptor, "red", "7")
-	green := gpio.NewLedDriver(firmataAdaptor, "green", "6")
-	blue := gpio.NewLedDriver(firmataAdaptor, "blue", "5")
+	firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
+	red := gpio.NewLedDriver(firmataAdaptor, "7")
+	red.SetName("red")
+	green := gpio.NewLedDriver(firmataAdaptor, "6")
+	green.SetName("green")
+	blue := gpio.NewLedDriver(firmataAdaptor, "5")
+	blue.SetName("blue")
 
 	work := func() {
 		checkTravis(gbot.Robot("travis"))

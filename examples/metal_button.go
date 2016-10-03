@@ -2,14 +2,15 @@ package main
 
 import (
 	"fmt"
-	"github.com/hybridgroup/gobot/platforms/gpio"
+
+	"github.com/hybridgroup/gobot/drivers/gpio"
 	"github.com/hybridgroup/gobot/platforms/intel-iot/edison"
 )
 
 func main() {
-	e := edison.NewEdisonAdaptor("edison")
-	led := gpio.NewLedDriver(e, "led", "13")
-	button := gpio.NewButtonDriver(e, "button", "5")
+	e := edison.NewAdaptor()
+	led := gpio.NewLedDriver(e, "13")
+	button := gpio.NewButtonDriver(e, "5")
 
 	e.Connect()
 	led.Start()

@@ -5,14 +5,14 @@ import (
 	"time"
 
 	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/drivers/i2c"
 	"github.com/hybridgroup/gobot/platforms/beaglebone"
-	"github.com/hybridgroup/gobot/platforms/i2c"
 )
 
 func main() {
 	gbot := gobot.NewGobot()
-	beagleboneAdaptor := beaglebone.NewBeagleboneAdaptor("beaglebone")
-	blinkm := i2c.NewBlinkMDriver(beagleboneAdaptor, "blinkm")
+	beagleboneAdaptor := beaglebone.NewAdaptor()
+	blinkm := i2c.NewBlinkMDriver(beagleboneAdaptor)
 
 	work := func() {
 		gobot.Every(3*time.Second, func() {

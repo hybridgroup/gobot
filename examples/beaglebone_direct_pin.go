@@ -4,16 +4,16 @@ import (
 	"time"
 
 	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/drivers/gpio"
 	"github.com/hybridgroup/gobot/platforms/beaglebone"
-	"github.com/hybridgroup/gobot/platforms/gpio"
 )
 
 func main() {
 	gbot := gobot.NewGobot()
 
-	beagleboneAdaptor := beaglebone.NewBeagleboneAdaptor("beaglebone")
-	led := gpio.NewDirectPinDriver(beagleboneAdaptor, "led", "P8_10")
-	button := gpio.NewDirectPinDriver(beagleboneAdaptor, "button", "P8_9")
+	beagleboneAdaptor := beaglebone.NewAdaptor()
+	led := gpio.NewDirectPinDriver(beagleboneAdaptor, "P8_10")
+	button := gpio.NewDirectPinDriver(beagleboneAdaptor, "P8_9")
 
 	work := func() {
 		gobot.Every(500*time.Millisecond, func() {

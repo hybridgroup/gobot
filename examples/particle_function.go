@@ -4,16 +4,16 @@ import (
 	"fmt"
 
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/spark"
+	"github.com/hybridgroup/gobot/platforms/particle"
 )
 
 func main() {
 	gbot := gobot.NewGobot()
 
-	sparkCore := spark.NewSparkCoreAdaptor("spark", "DEVICE_ID", "ACCESS_TOKEN")
+	core := particle.NewAdaptor("DEVICE_ID", "ACCESS_TOKEN")
 
 	work := func() {
-		if result, err := sparkCore.Function("brew", "202,230"); err != nil {
+		if result, err := core.Function("brew", "202,230"); err != nil {
 			fmt.Println(err)
 		} else {
 			fmt.Println("result from \"brew\":", result)
@@ -21,7 +21,7 @@ func main() {
 	}
 
 	robot := gobot.NewRobot("spark",
-		[]gobot.Connection{sparkCore},
+		[]gobot.Connection{core},
 		work,
 	)
 

@@ -14,8 +14,8 @@ func main() {
 	a.Port = "8080"
 	a.Start()
 
-	pebbleAdaptor := pebble.NewPebbleAdaptor("pebble")
-	pebbleDriver := pebble.NewPebbleDriver(pebbleAdaptor, "pebble")
+	pebbleAdaptor := pebble.NewAdaptor()
+	pebbleDriver := pebble.NewDriver(pebbleAdaptor)
 
 	work := func() {
 		pebbleDriver.On(pebbleDriver.Event("accel"), func(data interface{}) {

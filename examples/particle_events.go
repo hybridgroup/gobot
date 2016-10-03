@@ -4,27 +4,25 @@ import (
 	"fmt"
 
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/spark"
+	"github.com/hybridgroup/gobot/platforms/particle"
 )
 
 func main() {
 	gbot := gobot.NewGobot()
 
-	sparkCore := spark.NewSparkCoreAdaptor("spark", "DEVICE_ID", "ACCESS_TOKEN")
+	core := particle.NewAdaptor("DEVICE_ID", "ACCESS_TOKEN")
 
 	work := func() {
-		if stream, err := sparkCore.EventStream("all", ""); err != nil {
+		if stream, err := core.EventStream("all", ""); err != nil {
 			fmt.Println(err)
 		} else {
 			// TODO: some other way to handle this
-			// gobot.On(stream, func(data interface{}) {
-			// 	fmt.Println(data.(spark.Event))
-			// })
+			fmt.Println(stream)
 		}
 	}
 
 	robot := gobot.NewRobot("spark",
-		[]gobot.Connection{sparkCore},
+		[]gobot.Connection{core},
 		work,
 	)
 

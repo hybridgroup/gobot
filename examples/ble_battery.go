@@ -12,8 +12,8 @@ import (
 func main() {
 	gbot := gobot.NewGobot()
 
-	bleAdaptor := ble.NewBLEClientAdaptor("ble", os.Args[1])
-	battery := ble.NewBLEBatteryDriver(bleAdaptor, "battery")
+	bleAdaptor := ble.NewClientAdaptor(os.Args[1])
+	battery := ble.NewBatteryDriver(bleAdaptor)
 
 	work := func() {
 		gobot.Every(5*time.Second, func() {

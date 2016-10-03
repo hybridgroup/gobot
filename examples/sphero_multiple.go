@@ -19,8 +19,9 @@ func main() {
 	}
 
 	for _, port := range spheros {
-		spheroAdaptor := sphero.NewSpheroAdaptor("Sphero", port)
-		spheroDriver := sphero.NewSpheroDriver(spheroAdaptor, "Sphero"+port)
+		spheroAdaptor := sphero.NewAdaptor(port)
+		spheroDriver := sphero.NewSpheroDriver(spheroAdaptor)
+		spheroDriver.SetName("Sphero" + port)
 
 		work := func() {
 			spheroDriver.Stop()

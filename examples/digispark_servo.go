@@ -5,15 +5,15 @@ import (
 	"time"
 
 	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/drivers/gpio"
 	"github.com/hybridgroup/gobot/platforms/digispark"
-	"github.com/hybridgroup/gobot/platforms/gpio"
 )
 
 func main() {
 	gbot := gobot.NewGobot()
 
-	digisparkAdaptor := digispark.NewDigisparkAdaptor("digispark")
-	servo := gpio.NewServoDriver(digisparkAdaptor, "servo", "0")
+	digisparkAdaptor := digispark.NewAdaptor()
+	servo := gpio.NewServoDriver(digisparkAdaptor, "0")
 
 	work := func() {
 		gobot.Every(1*time.Second, func() {

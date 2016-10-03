@@ -25,9 +25,10 @@ func main() {
 	}
 
 	for _, port := range spheros {
-		spheroAdaptor := sphero.NewSpheroAdaptor("Sphero", port)
+		spheroAdaptor := sphero.NewAdaptor(port)
 
-		cell := sphero.NewSpheroDriver(spheroAdaptor, "Sphero"+port)
+		cell := sphero.NewSpheroDriver(spheroAdaptor)
+		cell.SetName("Sphero" + port)
 
 		work := func() {
 			conway := new(conway)

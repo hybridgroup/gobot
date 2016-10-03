@@ -5,14 +5,14 @@ import (
 	"time"
 
 	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/drivers/gpio"
 	"github.com/hybridgroup/gobot/platforms/beaglebone"
-	"github.com/hybridgroup/gobot/platforms/gpio"
 )
 
 func main() {
 	gbot := gobot.NewGobot()
-	beagleboneAdaptor := beaglebone.NewBeagleboneAdaptor("beaglebone")
-	servo := gpio.NewServoDriver(beagleboneAdaptor, "servo", "P9_14")
+	beagleboneAdaptor := beaglebone.NewAdaptor()
+	servo := gpio.NewServoDriver(beagleboneAdaptor, "P9_14")
 
 	work := func() {
 		gobot.Every(1*time.Second, func() {

@@ -4,15 +4,15 @@ import (
 	"time"
 
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/i2c"
+	"github.com/hybridgroup/gobot/drivers/i2c"
 	"github.com/hybridgroup/gobot/platforms/intel-iot/joule"
 )
 
 func main() {
 	gbot := gobot.NewGobot()
 
-	board := joule.NewJouleAdaptor("joule")
-	screen := i2c.NewGroveLcdDriver(board, "screen")
+	board := joule.NewAdaptor()
+	screen := i2c.NewGroveLcdDriver(board)
 
 	work := func() {
 		screen.Write("hello")

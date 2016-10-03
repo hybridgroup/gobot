@@ -5,17 +5,17 @@ import (
 	"time"
 
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/spark"
+	"github.com/hybridgroup/gobot/platforms/particle"
 )
 
 func main() {
 	gbot := gobot.NewGobot()
 
-	sparkCore := spark.NewSparkCoreAdaptor("spark", "DEVICE_ID", "ACCESS_TOKEN")
+	core := particle.NewAdaptor("DEVICE_ID", "ACCESS_TOKEN")
 
 	work := func() {
 		gobot.Every(1*time.Second, func() {
-			if temp, err := sparkCore.Variable("temperature"); err != nil {
+			if temp, err := core.Variable("temperature"); err != nil {
 				fmt.Println(err)
 			} else {
 				fmt.Println("result from \"temperature\" is:", temp)
@@ -24,7 +24,7 @@ func main() {
 	}
 
 	robot := gobot.NewRobot("spark",
-		[]gobot.Connection{sparkCore},
+		[]gobot.Connection{core},
 		work,
 	)
 

@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/hybridgroup/gobot/platforms/gpio"
-	"github.com/hybridgroup/gobot/platforms/intel-iot/edison"
 	"time"
+
+	"github.com/hybridgroup/gobot/drivers/gpio"
+	"github.com/hybridgroup/gobot/platforms/intel-iot/edison"
 )
 
 // Example of a simple led toggle without the initialization of
@@ -11,8 +12,8 @@ import (
 // This might be useful if you want to use gobot as another
 // golang library to interact with sensors and other devices.
 func main() {
-	e := edison.NewEdisonAdaptor("edison")
-	led := gpio.NewLedDriver(e, "led", "13")
+	e := edison.NewAdaptor()
+	led := gpio.NewLedDriver(e, "13")
 	e.Connect()
 	led.Start()
 	for {

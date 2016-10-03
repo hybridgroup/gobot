@@ -10,7 +10,7 @@ import (
 func main() {
 	gbot := gobot.NewGobot()
 
-	keys := keyboard.NewKeyboardDriver("keyboard")
+	keys := keyboard.NewDriver()
 
 	work := func() {
 		keys.On(keyboard.Key, func(data interface{}) {

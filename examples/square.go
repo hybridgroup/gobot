@@ -5,7 +5,7 @@ import (
 
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/api"
-	"github.com/hybridgroup/gobot/platforms/gpio"
+	"github.com/hybridgroup/gobot/drivers/gpio"
 	"github.com/hybridgroup/gobot/platforms/intel-iot/edison"
 )
 
@@ -14,12 +14,12 @@ func main() {
 	a := api.NewAPI(gbot)
 	a.Start()
 
-	board := edison.NewEdisonAdaptor("edison")
-	red := gpio.NewLedDriver(board, "red", "3")
-	green := gpio.NewLedDriver(board, "green", "5")
-	blue := gpio.NewLedDriver(board, "blue", "6")
+	board := edison.NewAdaptor()
+	red := gpio.NewLedDriver(board, "3")
+	green := gpio.NewLedDriver(board, "5")
+	blue := gpio.NewLedDriver(board, "6")
 
-	button := gpio.NewButtonDriver(board, "button", "7")
+	button := gpio.NewButtonDriver(board, "7")
 
 	enabled := true
 	work := func() {

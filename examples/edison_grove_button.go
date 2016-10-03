@@ -4,15 +4,15 @@ import (
 	"fmt"
 
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/gpio"
+	"github.com/hybridgroup/gobot/drivers/gpio"
 	"github.com/hybridgroup/gobot/platforms/intel-iot/edison"
 )
 
 func main() {
 	gbot := gobot.NewGobot()
 
-	e := edison.NewEdisonAdaptor("edison")
-	button := gpio.NewGroveButtonDriver(e, "button", "2")
+	e := edison.NewAdaptor()
+	button := gpio.NewGroveButtonDriver(e, "2")
 
 	work := func() {
 		button.On(gpio.ButtonPush, func(data interface{}) {

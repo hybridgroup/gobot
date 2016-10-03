@@ -4,15 +4,15 @@ import (
 	"fmt"
 
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/gpio"
+	"github.com/hybridgroup/gobot/drivers/gpio"
 	"github.com/hybridgroup/gobot/platforms/intel-iot/edison"
 )
 
 func main() {
 	gbot := gobot.NewGobot()
 
-	e := edison.NewEdisonAdaptor("edison")
-	touch := gpio.NewGroveTouchDriver(e, "touch", "2")
+	e := edison.NewAdaptor()
+	touch := gpio.NewGroveTouchDriver(e, "2")
 
 	work := func() {
 		touch.On(gpio.ButtonPush, func(data interface{}) {

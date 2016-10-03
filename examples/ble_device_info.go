@@ -11,8 +11,8 @@ import (
 func main() {
 	gbot := gobot.NewGobot()
 
-	bleAdaptor := ble.NewBLEClientAdaptor("ble", os.Args[1])
-	info := ble.NewBLEDeviceInformationDriver(bleAdaptor, "info")
+	bleAdaptor := ble.NewClientAdaptor(os.Args[1])
+	info := ble.NewDeviceInformationDriver(bleAdaptor)
 
 	work := func() {
 		fmt.Println("Model number:", info.GetModelNumber())

@@ -5,20 +5,20 @@ import (
 	"time"
 
 	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/drivers/gpio"
 	"github.com/hybridgroup/gobot/platforms/firmata"
-	"github.com/hybridgroup/gobot/platforms/gpio"
 	"github.com/hybridgroup/gobot/platforms/leap"
 )
 
 func main() {
 	gbot := gobot.NewGobot()
 
-	firmataAdaptor := firmata.NewFirmataAdaptor("firmata", "/dev/ttyACM0")
-	servo1 := gpio.NewServoDriver(firmataAdaptor, "servo", "5")
-	servo2 := gpio.NewServoDriver(firmataAdaptor, "servo", "3")
+	firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
+	servo1 := gpio.NewServoDriver(firmataAdaptor, "5")
+	servo2 := gpio.NewServoDriver(firmataAdaptor, "3")
 
-	leapAdaptor := leap.NewLeapMotionAdaptor("leap", "127.0.0.1:6437")
-	leapDriver := leap.NewLeapMotionDriver(leapAdaptor, "leap")
+	leapAdaptor := leap.NewAdaptor("127.0.0.1:6437")
+	leapDriver := leap.NewDriver(leapAdaptor)
 
 	work := func() {
 		x := 90.0

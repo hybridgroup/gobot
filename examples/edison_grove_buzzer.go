@@ -4,15 +4,15 @@ import (
 	"time"
 
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/gpio"
+	"github.com/hybridgroup/gobot/drivers/gpio"
 	"github.com/hybridgroup/gobot/platforms/intel-iot/edison"
 )
 
 func main() {
 	gbot := gobot.NewGobot()
 
-	board := edison.NewEdisonAdaptor("edison")
-	buzzer := gpio.NewBuzzerDriver(board, "buzzer", "3")
+	board := edison.NewAdaptor()
+	buzzer := gpio.NewBuzzerDriver(board, "3")
 
 	work := func() {
 		type note struct {

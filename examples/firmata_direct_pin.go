@@ -4,15 +4,15 @@ import (
 	"time"
 
 	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/drivers/gpio"
 	"github.com/hybridgroup/gobot/platforms/firmata"
-	"github.com/hybridgroup/gobot/platforms/gpio"
 )
 
 func main() {
 	gbot := gobot.NewGobot()
 
-	firmataAdaptor := firmata.NewFirmataAdaptor("myFirmata", "/dev/ttyACM0")
-	pin := gpio.NewDirectPinDriver(firmataAdaptor, "pin", "13")
+	firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
+	pin := gpio.NewDirectPinDriver(firmataAdaptor, "13")
 
 	work := func() {
 		level := byte(1)

@@ -11,8 +11,8 @@ import (
 func main() {
 	gbot := gobot.NewGobot()
 
-	adaptor := sphero.NewSpheroAdaptor("Sphero", "/dev/rfcomm0")
-	spheroDriver := sphero.NewSpheroDriver(adaptor, "sphero")
+	adaptor := sphero.NewAdaptor("/dev/rfcomm0")
+	spheroDriver := sphero.NewSpheroDriver(adaptor)
 
 	work := func() {
 		spheroDriver.SetDataStreaming(sphero.DefaultDataStreamingConfig())

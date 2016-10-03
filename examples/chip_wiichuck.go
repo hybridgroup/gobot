@@ -4,15 +4,15 @@ import (
 	"fmt"
 
 	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/drivers/i2c"
 	"github.com/hybridgroup/gobot/platforms/chip"
-	"github.com/hybridgroup/gobot/platforms/i2c"
 )
 
 func main() {
 	gbot := gobot.NewGobot()
 
-	chipAdaptor := chip.NewChipAdaptor("chip")
-	wiichuck := i2c.NewWiichuckDriver(chipAdaptor, "wiichuck")
+	chipAdaptor := chip.NewAdaptor()
+	wiichuck := i2c.NewWiichuckDriver(chipAdaptor)
 
 	work := func() {
 		wiichuck.On(wiichuck.Event("joystick"), func(data interface{}) {
