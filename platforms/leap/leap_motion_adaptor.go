@@ -16,7 +16,7 @@ type Adaptor struct {
 // NewAdaptor creates a new leap motion adaptor using specified port
 func NewAdaptor(port string) *Adaptor {
 	return &Adaptor{
-		name: "Leap Motion",
+		name: "LeapMotion",
 		port: port,
 		connect: func(port string) (io.ReadWriteCloser, error) {
 			return websocket.Dial("ws://"+port+"/v3.json", "", "http://"+port)

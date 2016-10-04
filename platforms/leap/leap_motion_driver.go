@@ -35,7 +35,7 @@ var receive = func(ws io.ReadWriteCloser, msg *[]byte) {
 //		"gesture" - Gets triggered per-message when leap motion detects a hand
 func NewDriver(a *Adaptor) *Driver {
 	l := &Driver{
-		name:       "Leap Motion",
+		name:       "LeapMotion",
 		connection: a,
 		Eventer:    gobot.NewEventer(),
 	}

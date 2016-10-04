@@ -26,7 +26,7 @@ var pins = map[string]int{
 // NewAdaptor creates a C.H.I.P. Adaptor
 func NewAdaptor() *Adaptor {
 	c := &Adaptor{
-		name:        "C.H.I.P.",
+		name:        "CHIP",
 		digitalPins: make(map[int]sysfs.DigitalPin),
 	}
 	return c

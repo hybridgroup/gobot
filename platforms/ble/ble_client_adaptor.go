@@ -25,7 +25,7 @@ type ClientAdaptor struct {
 // NewClientAdaptor returns a new ClientAdaptor given a uuid
 func NewClientAdaptor(uuid string) *ClientAdaptor {
 	return &ClientAdaptor{
-		name:      "BLE CLient",
+		name:      "BLECLient",
 		uuid:      uuid,
 		connected: false,
 		ready:     make(chan struct{}),
