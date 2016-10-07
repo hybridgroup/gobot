@@ -98,6 +98,7 @@ func (e *Adaptor) Connect() (errs []error) {
 		if err := e.miniboardSetup(); err != nil {
 			return []error{err}
 		}
+		return
 	}
 	if err := e.arduinoSetup(); err != nil {
 		return []error{err}
