@@ -22,10 +22,10 @@ type config struct {
 func Generate() cli.Command {
 	return cli.Command{
 		Name:  "generate",
-		Usage: "Generate new Gobot adaptors, drivers, and projects",
+		Usage: "Generate new Gobot adaptors, drivers, and platforms",
 		Action: func(c *cli.Context) {
 			valid := false
-			for _, s := range []string{"adaptor", "driver", "project"} {
+			for _, s := range []string{"adaptor", "driver", "platform"} {
 				if s == c.Args().First() {
 					valid = true
 				}
@@ -35,7 +35,7 @@ func Generate() cli.Command {
 				fmt.Println("Usage:")
 				fmt.Println(" gobot generate adaptor <name> [package] # generate a new Gobot adaptor")
 				fmt.Println(" gobot generate driver  <name> [package] # generate a new Gobot driver")
-				fmt.Println(" gobot generate project <name> [package] # generate a new Gobot project")
+				fmt.Println(" gobot generate platform <name> [package] # generate a new Gobot platform")
 				return
 			}
 
@@ -68,7 +68,7 @@ func Generate() cli.Command {
 				if err := generateDriver(cfg); err != nil {
 					fmt.Println(err)
 				}
-			case "project":
+			case "platform":
 				pwd, err := os.Getwd()
 				if err != nil {
 					fmt.Println(err)
@@ -89,7 +89,7 @@ func Generate() cli.Command {
 					return
 				}
 
-				if err := generateProject(cfg); err != nil {
+				if err := generatePlatform(cfg); err != nil {
 					fmt.Println(err)
 				}
 			}
@@ -131,7 +131,7 @@ func generateAdaptor(c config) error {
 	return generate(c, c.Name+"_adaptor_test.go", adaptorTest())
 }
 
-func generateProject(c config) error {
+func generatePlatform(c config) error {
 	if err := generateDriver(c); err != nil {
 		return err
 	}
