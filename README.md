@@ -212,6 +212,12 @@ You can also specify the api host and port, and turn on authentication:
 
 You may access the [robeaux](https://github.com/hybridgroup/robeaux) React.js interface with Gobot by navigating to `http://localhost:3000/index.html`.
 
+## CLI
+
+Gobot uses the Gort [http://gort.io](http://gort.io) Command Line Interface (CLI) so you can access important features right from the command line. We call it "RobotOps", aka "DevOps For Robotics". You can scan, connect, update device firmware, and more!
+
+Gobot also has its own CLI to generate new projects, adaptors, and drivers. You can check it out at [https://github.com/hybridgroup/gobot/cli](https://github.com/hybridgroup/gobot/cli).
+
 ## Documentation
 We're busy adding documentation to our web site at http://gobot.io/ please check there as we continue to work on Gobot
 
