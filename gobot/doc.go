@@ -11,7 +11,7 @@ CLI tool for generating new Gobot projects.
 		 0.1
 
 	COMMANDS:
-		 generate     Generate new Gobot skeleton project
+		 generate     Generate new Gobot adaptors, drivers, and projects
 		 help, h      Shows a list of commands or help for one command
 
 	GLOBAL OPTIONS:

@@ -74,7 +74,7 @@ func Generate() cli.Command {
 					fmt.Println(err)
 					return
 				}
-				dir := pwd + "/gobot-" + cfg.Name
+				dir := pwd + "/" + cfg.Name
 				fmt.Println("Creating", dir)
 				if err := os.MkdirAll(dir, 0700); err != nil {
 					fmt.Println(err)
@@ -149,10 +149,10 @@ func generateProject(c config) error {
 
 	c.dir = dir
 
-	if ex, err := ioutil.ReadFile(exampleDir + "/main.go"); err != nil {
+	if exp, err := ioutil.ReadFile(exampleDir + "/main.go"); err != nil {
 		return err
 	} else {
-		c.Example = string(ex)
+		c.Example = string(exp)
 	}
 
 	return generate(c, "README.md", readme())
@@ -161,23 +161,19 @@ func generateProject(c config) error {
 func adaptor() string {
 	return `package {{.Package}}
 
-import (
-	"github.com/hybridgroup/gobot"
-)
-
-var _ gobot.Adaptor = (*{{.UpperName}}Adaptor)(nil)
-
 type {{.UpperName}}Adaptor struct {
 	name string
 }
 
-func New{{.UpperName}}Adaptor(name string) *{{.UpperName}}Adaptor {
+func New{{.UpperName}}Adaptor() *{{.UpperName}}Adaptor {
 	return &{{.UpperName}}Adaptor{
-		name: name,
+		name: "{{.UpperName}}",
 	}
 }
 
 func ({{.FirstLetter}} *{{.UpperName}}Adaptor) Name() string { return {{.FirstLetter}}.name }
+
+func ({{.FirstLetter}} *{{.UpperName}}Adaptor) SetName(name string) { {{.FirstLetter}}.name = name }
 
 func ({{.FirstLetter}} *{{.UpperName}}Adaptor) Connect() []error { return nil }
 
@@ -196,8 +192,6 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
-var _ gobot.Driver = (*{{.UpperName}}Driver)(nil)
-
 const Hello string = "hello"
 
 type {{.UpperName}}Driver struct {
@@ -209,9 +203,9 @@ type {{.UpperName}}Driver struct {
 	gobot.Commander
 }
 
-func New{{.UpperName}}Driver(a *{{.UpperName}}Adaptor, name string) *{{.UpperName}}Driver {
+func New{{.UpperName}}Driver(a *{{.UpperName}}Adaptor) *{{.UpperName}}Driver {
 	{{.FirstLetter}} := &{{.UpperName}}Driver{
-		name: name,
+		name: "{{.UpperName}}",
 		connection: a,
 		interval: 500*time.Millisecond,
 		halt: make(chan bool, 0),
@@ -229,6 +223,8 @@ func New{{.UpperName}}Driver(a *{{.UpperName}}Adaptor, name string) *{{.UpperNam
 }
 
 func ({{.FirstLetter}} *{{.UpperName}}Driver) Name() string { return {{.FirstLetter}}.name }
+
+func ({{.FirstLetter}} *{{.UpperName}}Driver) SetName(name string) { {{.FirstLetter}}.name = name }
 
 func ({{.FirstLetter}} *{{.UpperName}}Driver) Connection() gobot.Connection {
 	return {{.FirstLetter}}.connection
@@ -249,7 +245,7 @@ func ({{.FirstLetter}} *{{.UpperName}}Driver) Ping() string {
 func ({{.FirstLetter}} *{{.UpperName}}Driver) Start() []error {
 	go func() {
 		for {
-			gobot.Publish({{.FirstLetter}}.Event(Hello), {{.FirstLetter}}.Hello())
+			{{.FirstLetter}}.Publish({{.FirstLetter}}.Event(Hello), {{.FirstLetter}}.Hello())
 
 			select {
 			case <- time.After({{.FirstLetter}}.interval):
@@ -284,11 +280,11 @@ import (
 func main() {
   gbot := gobot.NewGobot()
 
-  conn := {{.Package}}.New{{.UpperName}}Adaptor("conn")
-  dev := {{.Package}}.New{{.UpperName}}Driver(conn, "dev")
+  conn := {{.Package}}.New{{.UpperName}}Adaptor()
+  dev := {{.Package}}.New{{.UpperName}}Driver(conn)
 
   work := func() {
-    gobot.On(dev.Event({{.Package}}.Hello), func(data interface{}) {
+    dev.On(dev.Event({{.Package}}.Hello), func(data interface{}) {
       fmt.Println(data)
     })
 
@@ -318,26 +314,29 @@ import (
 	"time"
 
 	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/gobottest"
 )
 
-func Test{{.UpperName}}Driver(t *testing.T) {
-	d := New{{.UpperName}}Driver(New{{.UpperName}}Adaptor("conn"), "dev")
+var _ gobot.Driver = (*{{.UpperName}}Driver)(nil)
 
-	gobot.Assert(t, d.Name(), "dev")
-	gobot.Assert(t, d.Connection().Name(), "conn")
+func Test{{.UpperName}}Driver(t *testing.T) {
+	d := New{{.UpperName}}Driver(New{{.UpperName}}Adaptor())
+
+	gobottest.Assert(t, d.Name(), "{{.UpperName}}")
+	gobottest.Assert(t, d.Connection().Name(), "{{.UpperName}}")
 
 	ret := d.Command(Hello)(nil)
-	gobot.Assert(t, ret.(string), "hello from dev!")
+	gobottest.Assert(t, ret.(string), "hello from {{.UpperName}}!")
 
-	gobot.Assert(t, d.Ping(), "pong")
+	gobottest.Assert(t, d.Ping(), "pong")
 
-	gobot.Assert(t, len(d.Start()), 0)
+	gobottest.Assert(t, len(d.Start()), 0)
 
 	<-time.After(d.interval)
 
 	sem := make(chan bool, 0)
 
-	gobot.On(d.Event(Hello), func(data interface{}) {
+	d.On(d.Event(Hello), func(data interface{}) {
 		sem <- true
 	})
 
@@ -347,9 +346,9 @@ func Test{{.UpperName}}Driver(t *testing.T) {
 		t.Errorf("Hello Event was not published")
 	}
 
-	gobot.Assert(t, len(d.Halt()), 0)
+	gobottest.Assert(t, len(d.Halt()), 0)
 
-	gobot.On(d.Event(Hello), func(data interface{}) {
+	d.On(d.Event(Hello), func(data interface{}) {
 		sem <- true
 	})
 
@@ -370,20 +369,23 @@ import (
 	"testing"
 
 	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/gobottest"
 )
 
+var _ gobot.Adaptor = (*{{.UpperName}}Adaptor)(nil)
+
 func Test{{.UpperName}}Adaptor(t *testing.T) {
-	a := New{{.UpperName}}Adaptor("tester")
+	a := New{{.UpperName}}Adaptor()
 
-	gobot.Assert(t, a.Name(), "tester")
+	gobottest.Assert(t, a.Name(), "{{.UpperName}}")
 
-	gobot.Assert(t, len(a.Connect()), 0)
+	gobottest.Assert(t, len(a.Connect()), 0)
 
-	gobot.Assert(t, a.Ping(), "pong")
+	gobottest.Assert(t, a.Ping(), "pong")
 
-	gobot.Assert(t, len(a.Connect()), 0)
+	gobottest.Assert(t, len(a.Connect()), 0)
 
-	gobot.Assert(t, len(a.Finalize()), 0)
+	gobottest.Assert(t, len(a.Finalize()), 0)
 }
 `
 }
