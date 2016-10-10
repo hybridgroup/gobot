@@ -11,11 +11,11 @@ import (
 func main() {
 	gbot := gobot.NewGobot()
 
-	leapAdaptor := leap.NewLeapMotionAdaptor("leap", "127.0.0.1:6437")
-	spheroAdaptor := sphero.NewSpheroAdaptor("Sphero", "/dev/tty.Sphero-YBW-RN-SPP")
+	leapAdaptor := leap.NewAdaptor("127.0.0.1:6437")
+	spheroAdaptor := sphero.NewAdaptor("/dev/tty.Sphero-YBW-RN-SPP")
 
-	leapDriver := leap.NewLeapMotionDriver(leapAdaptor, "leap")
-	spheroDriver := sphero.NewSpheroDriver(spheroAdaptor, "sphero")
+	leapDriver := leap.NewDriver(leapAdaptor)
+	spheroDriver := sphero.NewSpheroDriver(spheroAdaptor)
 
 	work := func() {
 		leapDriver.On(leap.MessageEvent, func(data interface{}) {

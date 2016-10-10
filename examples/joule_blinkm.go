@@ -5,15 +5,15 @@ import (
 	"time"
 
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/i2c"
+	"github.com/hybridgroup/gobot/drivers/i2c"
 	"github.com/hybridgroup/gobot/platforms/intel-iot/joule"
 )
 
 func main() {
 	gbot := gobot.NewGobot()
 
-	e := joule.NewJouleAdaptor("joule")
-	blinkm := i2c.NewBlinkMDriver(e, "blinkm")
+	e := joule.NewAdaptor()
+	blinkm := i2c.NewBlinkMDriver(e)
 
 	work := func() {
 		gobot.Every(3*time.Second, func() {

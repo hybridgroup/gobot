@@ -2,9 +2,9 @@
 
 Sphero is a sophisticated and programmable robot housed in a polycarbonate sphere shell.
 
-The gobot-sphero adaptor makes it easy to interact with Sphero using Go, once you have your Sphero setup and connected to your computer you can start writing code to make Sphero move, change direction, speed and colors, or detect Sphero events and execute some code when they occur.
+The Gobot Sphero Adaptor & Driver makes it easy to interact with Sphero using Go. Once you have your Sphero setup and connected to your computer you can start writing code to make Sphero move, change direction, speed and colors, or detect Sphero events and execute some code when they occur.
 
-Learn more about the Sphero robot from Orbotix [here](http://www.gosphero.com/).
+Learn more about the Sphero robot go here: http://www.gosphero.com/
 
 ## How to Install
 ```
@@ -60,8 +60,8 @@ import (
 func main() {
 	gbot := gobot.NewGobot()
 
-	adaptor := sphero.NewSpheroAdaptor("sphero", "/dev/rfcomm0")
-	driver := sphero.NewSpheroDriver(adaptor, "sphero")
+	adaptor := sphero.NewAdaptor("/dev/rfcomm0")
+	driver := sphero.NewSpheroDriver(adaptor)
 
 	work := func() {
 		gobot.Every(3*time.Second, func() {

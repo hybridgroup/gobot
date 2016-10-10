@@ -7,22 +7,22 @@ import (
 	"github.com/hybridgroup/gobot/gobottest"
 )
 
-var _ gobot.Driver = (*ArdroneDriver)(nil)
+var _ gobot.Driver = (*Driver)(nil)
 
-func initTestArdroneDriver() *ArdroneDriver {
-	a := NewArdroneAdaptor("drone")
-	a.connect = func(a *ArdroneAdaptor) (drone, error) {
+func initTestArdroneDriver() *Driver {
+	a := NewAdaptor()
+	a.connect = func(a *Adaptor) (drone, error) {
 		return &testDrone{}, nil
 	}
-	d := NewArdroneDriver(a, "drone")
+	d := NewDriver(a)
+	d.SetName("mydrone")
 	a.Connect()
 	return d
 }
 
 func TestArdroneDriver(t *testing.T) {
 	d := initTestArdroneDriver()
-	gobottest.Assert(t, d.Name(), "drone")
-	gobottest.Assert(t, d.Connection().Name(), "drone")
+	gobottest.Assert(t, d.Name(), "mydrone")
 }
 
 func TestArdroneDriverStart(t *testing.T) {

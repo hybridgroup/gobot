@@ -4,15 +4,15 @@ import (
 	"time"
 
 	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/drivers/gpio"
 	"github.com/hybridgroup/gobot/platforms/firmata"
-	"github.com/hybridgroup/gobot/platforms/gpio"
 )
 
 func main() {
 	gbot := gobot.NewGobot()
 
-	firmataAdaptor := firmata.NewFirmataAdaptor("arduino", "/dev/ttyACM0")
-	buzzer := gpio.NewBuzzerDriver(firmataAdaptor, "buzzer", "3")
+	firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
+	buzzer := gpio.NewBuzzerDriver(firmataAdaptor, "3")
 
 	work := func() {
 		type note struct {

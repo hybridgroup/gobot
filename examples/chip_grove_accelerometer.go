@@ -5,15 +5,15 @@ import (
 	"time"
 
 	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/drivers/i2c"
 	"github.com/hybridgroup/gobot/platforms/chip"
-	"github.com/hybridgroup/gobot/platforms/i2c"
 )
 
 func main() {
 	gbot := gobot.NewGobot()
 
-	board := chip.NewChipAdaptor("chip")
-	accel := i2c.NewGroveAccelerometerDriver(board, "accel")
+	board := chip.NewAdaptor()
+	accel := i2c.NewGroveAccelerometerDriver(board)
 
 	work := func() {
 		gobot.Every(500*time.Millisecond, func() {

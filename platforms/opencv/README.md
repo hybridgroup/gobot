@@ -52,11 +52,11 @@ import (
 func main() {
 	gbot := gobot.NewGobot()
 
-	window := opencv.NewWindowDriver("window")
-	camera := opencv.NewCameraDriver("camera", 0)
+	window := opencv.NewWindowDriver()
+	camera := opencv.NewCameraDriver(0)
 
 	work := func() {
-		gobot.On(camera.Event("frame"), func(data interface{}) {
+		camera.On(camera.Event("frame"), func(data interface{}) {
 			window.ShowImage(data.(*cv.IplImage))
 		})
 	}

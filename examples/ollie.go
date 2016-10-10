@@ -11,8 +11,8 @@ import (
 func main() {
 	gbot := gobot.NewGobot()
 
-	bleAdaptor := ble.NewBLEClientAdaptor("ble", os.Args[1])
-	ollie := ble.NewSpheroOllieDriver(bleAdaptor, "ollie")
+	bleAdaptor := ble.NewClientAdaptor(os.Args[1])
+	ollie := ble.NewSpheroOllieDriver(bleAdaptor)
 
 	work := func() {
 		gobot.Every(1*time.Second, func() {

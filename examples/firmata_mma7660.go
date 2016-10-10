@@ -5,15 +5,15 @@ import (
 	"time"
 
 	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/drivers/i2c"
 	"github.com/hybridgroup/gobot/platforms/firmata"
-	"github.com/hybridgroup/gobot/platforms/i2c"
 )
 
 func main() {
 	gbot := gobot.NewGobot()
 
-	firmataAdaptor := firmata.NewFirmataAdaptor("firmata", "/dev/ttyACM0")
-	mma7660 := i2c.NewMMA7660Driver(firmataAdaptor, "mma7660")
+	firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
+	mma7660 := i2c.NewMMA7660Driver(firmataAdaptor)
 
 	work := func() {
 		gobot.Every(500*time.Millisecond, func() {

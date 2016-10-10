@@ -22,8 +22,8 @@ Example:
 	func main() {
 		gbot := gobot.NewGobot()
 
-		leapMotionAdaptor := leap.NewLeapMotionAdaptor("leap", "127.0.0.1:6437")
-		l := leap.NewLeapMotionDriver(leapMotionAdaptor, "leap")
+		leapMotionAdaptor := leap.NewAdaptor("127.0.0.1:6437")
+		l := leap.NewDriver(leapMotionAdaptor)
 
 		work := func() {
 			gobot.On(l.Event("message"), func(data interface{}) {

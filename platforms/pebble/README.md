@@ -32,23 +32,23 @@ func main() {
 	gbot := gobot.NewGobot()
 	api.NewAPI(gbot).Start()
 
-	pebbleAdaptor := pebble.NewPebbleAdaptor("pebble")
-	pebbleDriver := pebble.NewPebbleDriver(pebbleAdaptor, "pebble")
+	pebbleAdaptor := pebble.NewAdaptor()
+	watch := pebble.NewDriver(pebbleAdaptor)
 
 	work := func() {
-		pebbleDriver.SendNotification("Hello Pebble!")
-		gobot.On(pebbleDriver.Event("button"), func(data interface{}) {
+		watch.SendNotification("Hello Pebble!")
+		watch.On(watch.Event("button"), func(data interface{}) {
 			fmt.Println("Button pushed: " + data.(string))
 		})
 
-		gobot.On(pebbleDriver.Event("tap"), func(data interface{}) {
+		watch.On(watch.Event("tap"), func(data interface{}) {
 			fmt.Println("Tap event detected")
 		})
 	}
 
 	robot := gobot.NewRobot("pebble",
 		[]gobot.Connection{pebbleAdaptor},
-		[]gobot.Device{pebbleDriver},
+		[]gobot.Device{watch},
 		work,
 	)
 
@@ -87,4 +87,4 @@ Thank you!
 
 ## License
 
-Copyright (c) 2013-2014 The Hybrid Group. Licensed under the Apache 2.0 license.
+Copyright (c) 2013-2016 The Hybrid Group. Licensed under the Apache 2.0 license.

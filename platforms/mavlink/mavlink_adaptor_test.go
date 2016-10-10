@@ -9,7 +9,7 @@ import (
 	"github.com/hybridgroup/gobot/gobottest"
 )
 
-var _ gobot.Adaptor = (*MavlinkAdaptor)(nil)
+var _ gobot.Adaptor = (*Adaptor)(nil)
 
 type nullReadWriteCloser struct{}
 
@@ -44,8 +44,8 @@ func (nullReadWriteCloser) Close() error {
 	return testAdaptorClose()
 }
 
-func initTestMavlinkAdaptor() *MavlinkAdaptor {
-	m := NewMavlinkAdaptor("myAdaptor", "/dev/null")
+func initTestMavlinkAdaptor() *Adaptor {
+	m := NewAdaptor("/dev/null")
 	m.sp = nullReadWriteCloser{}
 	m.connect = func(port string) (io.ReadWriteCloser, error) { return nil, nil }
 	return m
@@ -53,7 +53,6 @@ func initTestMavlinkAdaptor() *MavlinkAdaptor {
 
 func TestMavlinkAdaptor(t *testing.T) {
 	a := initTestMavlinkAdaptor()
-	gobottest.Assert(t, a.Name(), "myAdaptor")
 	gobottest.Assert(t, a.Port(), "/dev/null")
 }
 func TestMavlinkAdaptorConnect(t *testing.T) {

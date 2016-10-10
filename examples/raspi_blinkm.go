@@ -5,14 +5,14 @@ import (
 	"time"
 
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/i2c"
+	"github.com/hybridgroup/gobot/drivers/i2c"
 	"github.com/hybridgroup/gobot/platforms/raspi"
 )
 
 func main() {
 	gbot := gobot.NewGobot()
-	r := raspi.NewRaspiAdaptor("raspi")
-	blinkm := i2c.NewBlinkMDriver(r, "blinkm")
+	r := raspi.NewAdaptor()
+	blinkm := i2c.NewBlinkMDriver(r)
 
 	work := func() {
 		gobot.Every(3*time.Second, func() {

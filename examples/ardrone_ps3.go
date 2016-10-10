@@ -17,14 +17,13 @@ type pair struct {
 func main() {
 	gbot := gobot.NewGobot()
 
-	joystickAdaptor := joystick.NewJoystickAdaptor("ps3")
-	stick := joystick.NewJoystickDriver(joystickAdaptor,
-		"ps3",
+	joystickAdaptor := joystick.NewAdaptor()
+	stick := joystick.NewDriver(joystickAdaptor,
 		"./platforms/joystick/configs/dualshock3.json",
 	)
 
-	ardroneAdaptor := ardrone.NewArdroneAdaptor("Drone")
-	drone := ardrone.NewArdroneDriver(ardroneAdaptor, "Drone")
+	ardroneAdaptor := ardrone.NewAdaptor()
+	drone := ardrone.NewDriver(ardroneAdaptor)
 
 	work := func() {
 		offset := 32767.0

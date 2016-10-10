@@ -6,7 +6,7 @@ import (
 	"github.com/hybridgroup/gobot/sysfs"
 )
 
-type ChipAdaptor struct {
+type Adaptor struct {
 	name        string
 	digitalPins map[int]sysfs.DigitalPin
 	i2cDevice   sysfs.I2cDevice
@@ -23,25 +23,28 @@ var pins = map[string]int{
 	"XIO-P7": 415,
 }
 
-// NewChipAdaptor creates a ChipAdaptor with the specified name
-func NewChipAdaptor(name string) *ChipAdaptor {
-	c := &ChipAdaptor{
-		name:        name,
+// NewAdaptor creates a C.H.I.P. Adaptor
+func NewAdaptor() *Adaptor {
+	c := &Adaptor{
+		name:        "CHIP",
 		digitalPins: make(map[int]sysfs.DigitalPin),
 	}
 	return c
 }
 
-// Name returns the name of the ChipAdaptor
-func (c *ChipAdaptor) Name() string { return c.name }
+// Name returns the name of the Adaptor
+func (c *Adaptor) Name() string { return c.name }
+
+// SetName sets the name of the Adaptor
+func (c *Adaptor) SetName(n string) { c.name = n }
 
 // Connect initializes the board
-func (c *ChipAdaptor) Connect() (errs []error) {
+func (c *Adaptor) Connect() (errs []error) {
 	return
 }
 
 // Finalize closes connection to board and pins
-func (c *ChipAdaptor) Finalize() (errs []error) {
+func (c *Adaptor) Finalize() (errs []error) {
 	for _, pin := range c.digitalPins {
 		if pin != nil {
 			if err := pin.Unexport(); err != nil {
@@ -57,7 +60,7 @@ func (c *ChipAdaptor) Finalize() (errs []error) {
 	return errs
 }
 
-func (c *ChipAdaptor) translatePin(pin string) (i int, err error) {
+func (c *Adaptor) translatePin(pin string) (i int, err error) {
 	if val, ok := pins[pin]; ok {
 		i = val
 	} else {
@@ -67,7 +70,7 @@ func (c *ChipAdaptor) translatePin(pin string) (i int, err error) {
 }
 
 // digitalPin returns matched digitalPin for specified values
-func (c *ChipAdaptor) digitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPin, err error) {
+func (c *Adaptor) digitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPin, err error) {
 	i, err := c.translatePin(pin)
 
 	if err != nil {
@@ -90,7 +93,7 @@ func (c *ChipAdaptor) digitalPin(pin string, dir string) (sysfsPin sysfs.Digital
 
 // DigitalRead reads digital value from the specified pin.
 // Valids pins are XIO-P0 through XIO-P7 (pins 13-20 on header 14).
-func (c *ChipAdaptor) DigitalRead(pin string) (val int, err error) {
+func (c *Adaptor) DigitalRead(pin string) (val int, err error) {
 	sysfsPin, err := c.digitalPin(pin, sysfs.IN)
 	if err != nil {
 		return
@@ -100,7 +103,7 @@ func (c *ChipAdaptor) DigitalRead(pin string) (val int, err error) {
 
 // DigitalWrite writes digital value to the specified pin.
 // Valids pins are XIO-P0 through XIO-P7 (pins 13-20 on header 14).
-func (c *ChipAdaptor) DigitalWrite(pin string, val byte) (err error) {
+func (c *Adaptor) DigitalWrite(pin string, val byte) (err error) {
 	sysfsPin, err := c.digitalPin(pin, sysfs.OUT)
 	if err != nil {
 		return err
@@ -111,7 +114,7 @@ func (c *ChipAdaptor) DigitalWrite(pin string, val byte) (err error) {
 // I2cStart starts an i2c device in specified address.
 // This assumes that the bus used is /dev/i2c-1, which corresponds to
 // pins labeled TWI1-SDA and TW1-SCK (pins 9 and 11 on header 13).
-func (c *ChipAdaptor) I2cStart(address int) (err error) {
+func (c *Adaptor) I2cStart(address int) (err error) {
 	if c.i2cDevice == nil {
 		c.i2cDevice, err = sysfs.NewI2cDevice("/dev/i2c-1", address)
 	}
@@ -119,7 +122,7 @@ func (c *ChipAdaptor) I2cStart(address int) (err error) {
 }
 
 // I2cWrite writes data to i2c device
-func (c *ChipAdaptor) I2cWrite(address int, data []byte) (err error) {
+func (c *Adaptor) I2cWrite(address int, data []byte) (err error) {
 	if err = c.i2cDevice.SetAddress(address); err != nil {
 		return
 	}
@@ -128,7 +131,7 @@ func (c *ChipAdaptor) I2cWrite(address int, data []byte) (err error) {
 }
 
 // I2cRead returns value from i2c device using specified size
-func (c *ChipAdaptor) I2cRead(address int, size int) (data []byte, err error) {
+func (c *Adaptor) I2cRead(address int, size int) (data []byte, err error) {
 	if err = c.i2cDevice.SetAddress(address); err != nil {
 		return
 	}

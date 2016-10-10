@@ -22,8 +22,8 @@ import (
 func main() {
 	gbot := gobot.NewGobot()
 
-	bebopAdaptor := bebop.NewBebopAdaptor("Drone")
-	drone := bebop.NewBebopDriver(bebopAdaptor, "Drone")
+	bebopAdaptor := bebop.NewAdaptor()
+	drone := bebop.NewDriver(bebopAdaptor)
 
 	work := func() {
     drone.HullProtection(true)

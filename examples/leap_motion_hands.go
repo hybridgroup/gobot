@@ -10,8 +10,8 @@ import (
 func main() {
 	gbot := gobot.NewGobot()
 
-	leapMotionAdaptor := leap.NewLeapMotionAdaptor("leap", "127.0.0.1:6437")
-	l := leap.NewLeapMotionDriver(leapMotionAdaptor, "leap")
+	leapMotionAdaptor := leap.NewAdaptor("127.0.0.1:6437")
+	l := leap.NewDriver(leapMotionAdaptor)
 
 	work := func() {
 		l.On(leap.HandEvent, func(data interface{}) {

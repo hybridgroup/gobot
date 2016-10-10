@@ -4,15 +4,15 @@ import (
 	"time"
 
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/i2c"
+	"github.com/hybridgroup/gobot/drivers/i2c"
 	"github.com/hybridgroup/gobot/platforms/intel-iot/edison"
 )
 
 func main() {
 	gbot := gobot.NewGobot()
 
-	board := edison.NewEdisonAdaptor("edison")
-	screen := i2c.NewGroveLcdDriver(board, "screen")
+	board := edison.NewAdaptor()
+	screen := i2c.NewGroveLcdDriver(board)
 
 	work := func() {
 		screen.Write("hello")

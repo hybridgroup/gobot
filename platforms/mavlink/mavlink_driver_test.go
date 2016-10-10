@@ -10,26 +10,25 @@ import (
 	common "github.com/hybridgroup/gobot/platforms/mavlink/common"
 )
 
-var _ gobot.Driver = (*MavlinkDriver)(nil)
+var _ gobot.Driver = (*Driver)(nil)
 
-func initTestMavlinkDriver() *MavlinkDriver {
-	m := NewMavlinkAdaptor("myAdaptor", "/dev/null")
+func initTestMavlinkDriver() *Driver {
+	m := NewAdaptor("/dev/null")
 	m.connect = func(port string) (io.ReadWriteCloser, error) { return nil, nil }
 	m.sp = nullReadWriteCloser{}
-	return NewMavlinkDriver(m, "myDriver")
+	return NewDriver(m)
 }
 
 func TestMavlinkDriver(t *testing.T) {
-	m := NewMavlinkAdaptor("myAdaptor", "/dev/null")
+	m := NewAdaptor("/dev/null")
 	m.sp = nullReadWriteCloser{}
 	m.connect = func(port string) (io.ReadWriteCloser, error) { return nil, nil }
 
-	d := NewMavlinkDriver(m, "myDriver")
-	gobottest.Assert(t, d.Name(), "myDriver")
-	gobottest.Assert(t, d.Connection().Name(), "myAdaptor")
+	d := NewDriver(m)
+	gobottest.Refute(t, d.Connection(), nil)
 	gobottest.Assert(t, d.interval, 10*time.Millisecond)
 
-	d = NewMavlinkDriver(m, "myDriver", 100*time.Millisecond)
+	d = NewDriver(m, 100*time.Millisecond)
 	gobottest.Assert(t, d.interval, 100*time.Millisecond)
 }
 

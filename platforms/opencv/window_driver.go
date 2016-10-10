@@ -15,11 +15,11 @@ type WindowDriver struct {
 	start  func(*WindowDriver)
 }
 
-// NewWindowDriver creates a new window driver with specified name.
+// NewWindowDriver creates a new window driver.
 // It adds an start function to initialize window
-func NewWindowDriver(name string) *WindowDriver {
+func NewWindowDriver() *WindowDriver {
 	return &WindowDriver{
-		name: name,
+		name: "Window",
 		start: func(w *WindowDriver) {
 			w.window = cv.NewWindow(w.Name(), cv.CV_WINDOW_NORMAL)
 		},
@@ -27,6 +27,7 @@ func NewWindowDriver(name string) *WindowDriver {
 }
 
 func (w *WindowDriver) Name() string                 { return w.name }
+func (w *WindowDriver) SetName(n string)             { w.name = n }
 func (w *WindowDriver) Connection() gobot.Connection { return nil }
 
 // Start starts window thread and driver

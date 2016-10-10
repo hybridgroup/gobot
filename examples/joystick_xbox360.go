@@ -10,9 +10,8 @@ import (
 func main() {
 	gbot := gobot.NewGobot()
 
-	joystickAdaptor := joystick.NewJoystickAdaptor("xbox360")
-	stick := joystick.NewJoystickDriver(joystickAdaptor,
-		"xbox360",
+	joystickAdaptor := joystick.NewAdaptor()
+	stick := joystick.NewDriver(joystickAdaptor,
 		"./platforms/joystick/configs/joystick/configs/xbox360_power_a_mini_proex.json",
 	)
 

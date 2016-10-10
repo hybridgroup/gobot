@@ -1,24 +1,25 @@
 package pebble
 
-type PebbleAdaptor struct {
+type Adaptor struct {
 	name string
 }
 
-// NewPebbleAdaptor creates a new pebble adaptor with specified name
-func NewPebbleAdaptor(name string) *PebbleAdaptor {
-	return &PebbleAdaptor{
-		name: name,
+// NewAdaptor creates a new pebble adaptor
+func NewAdaptor() *Adaptor {
+	return &Adaptor{
+		name: "Pebble",
 	}
 }
 
-func (a *PebbleAdaptor) Name() string { return a.name }
+func (a *Adaptor) Name() string     { return a.name }
+func (a *Adaptor) SetName(n string) { a.name = n }
 
 // Connect returns true if connection to pebble is established successfully
-func (a *PebbleAdaptor) Connect() (errs []error) {
+func (a *Adaptor) Connect() (errs []error) {
 	return
 }
 
 // Finalize returns true if connection to pebble is finalized successfully
-func (a *PebbleAdaptor) Finalize() (errs []error) {
+func (a *Adaptor) Finalize() (errs []error) {
 	return
 }

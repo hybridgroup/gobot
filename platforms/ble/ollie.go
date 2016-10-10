@@ -43,10 +43,10 @@ type packet struct {
 	checksum uint8
 }
 
-// NewSpheroOllieDriver creates a SpheroOllieDriver by name
-func NewSpheroOllieDriver(a *BLEClientAdaptor, name string) *SpheroOllieDriver {
+// NewSpheroOllieDriver creates a SpheroOllieDriver
+func NewSpheroOllieDriver(a *ClientAdaptor) *SpheroOllieDriver {
 	n := &SpheroOllieDriver{
-		name:          name,
+		name:          "Ollie",
 		connection:    a,
 		Eventer:       gobot.NewEventer(),
 		packetChannel: make(chan *packet, 1024),
@@ -56,10 +56,11 @@ func NewSpheroOllieDriver(a *BLEClientAdaptor, name string) *SpheroOllieDriver {
 }
 func (b *SpheroOllieDriver) Connection() gobot.Connection { return b.connection }
 func (b *SpheroOllieDriver) Name() string                 { return b.name }
+func (b *SpheroOllieDriver) SetName(n string)             { b.name = n }
 
 // adaptor returns BLE adaptor
-func (b *SpheroOllieDriver) adaptor() *BLEClientAdaptor {
-	return b.Connection().(*BLEClientAdaptor)
+func (b *SpheroOllieDriver) adaptor() *ClientAdaptor {
+	return b.Connection().(*ClientAdaptor)
 }
 
 // Start tells driver to get ready to do work

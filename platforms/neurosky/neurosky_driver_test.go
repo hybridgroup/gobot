@@ -11,21 +11,20 @@ import (
 	"github.com/hybridgroup/gobot/gobottest"
 )
 
-var _ gobot.Driver = (*NeuroskyDriver)(nil)
+var _ gobot.Driver = (*Driver)(nil)
 
-func initTestNeuroskyDriver() *NeuroskyDriver {
-	a := NewNeuroskyAdaptor("bot", "/dev/null")
-	a.connect = func(n *NeuroskyAdaptor) (io.ReadWriteCloser, error) {
+func initTestNeuroskyDriver() *Driver {
+	a := NewAdaptor("/dev/null")
+	a.connect = func(n *Adaptor) (io.ReadWriteCloser, error) {
 		return &NullReadWriteCloser{}, nil
 	}
 	a.Connect()
-	return NewNeuroskyDriver(a, "bot")
+	return NewDriver(a)
 }
 
 func TestNeuroskyDriver(t *testing.T) {
 	d := initTestNeuroskyDriver()
-	gobottest.Assert(t, d.Name(), "bot")
-	gobottest.Assert(t, d.Connection().Name(), "bot")
+	gobottest.Refute(t, d.Connection(), nil)
 }
 func TestNeuroskyDriverStart(t *testing.T) {
 	sem := make(chan bool, 0)

@@ -25,7 +25,7 @@ import (
 func main() {
 	gbot := gobot.NewGobot()
 
-	keys := keyboard.NewKeyboardDriver("keyboard")
+	keys := keyboard.NewDriver("keyboard")
 
 	work := func() {
 		gobot.On(keys.Event("key"), func(data interface{}) {

@@ -12,8 +12,8 @@ import (
 func main() {
 	gbot := gobot.NewGobot()
 
-	bleAdaptor := ble.NewBLEClientAdaptor("ble", os.Args[1])
-	drone := ble.NewBLEMinidroneDriver(bleAdaptor, "drone")
+	bleAdaptor := ble.NewClientAdaptor(os.Args[1])
+	drone := ble.NewMinidroneDriver(bleAdaptor)
 
 	work := func() {
 		drone.On(drone.Event("battery"), func(data interface{}) {

@@ -10,8 +10,8 @@ import (
 func main() {
 	gbot := gobot.NewGobot()
 
-	ardroneAdaptor := ardrone.NewArdroneAdaptor("Drone")
-	drone := ardrone.NewArdroneDriver(ardroneAdaptor, "Drone")
+	ardroneAdaptor := ardrone.NewAdaptor()
+	drone := ardrone.NewDriver(ardroneAdaptor)
 
 	work := func() {
 		drone.On(ardrone.Flying, func(data interface{}) {

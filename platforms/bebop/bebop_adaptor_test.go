@@ -8,11 +8,11 @@ import (
 	"github.com/hybridgroup/gobot/gobottest"
 )
 
-var _ gobot.Adaptor = (*BebopAdaptor)(nil)
+var _ gobot.Adaptor = (*Adaptor)(nil)
 
-func initTestBebopAdaptor() *BebopAdaptor {
-	a := NewBebopAdaptor("bot")
-	a.connect = func(b *BebopAdaptor) (err error) {
+func initTestBebopAdaptor() *Adaptor {
+	a := NewAdaptor()
+	a.connect = func(b *Adaptor) (err error) {
 		b.drone = &testDrone{}
 		return nil
 	}
@@ -23,7 +23,7 @@ func TestBebopAdaptorConnect(t *testing.T) {
 	a := initTestBebopAdaptor()
 	gobottest.Assert(t, len(a.Connect()), 0)
 
-	a.connect = func(a *BebopAdaptor) error {
+	a.connect = func(a *Adaptor) error {
 		return errors.New("connection error")
 	}
 	gobottest.Assert(t, a.Connect()[0], errors.New("connection error"))

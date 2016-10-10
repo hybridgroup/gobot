@@ -4,16 +4,16 @@ import (
 	"fmt"
 
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/gpio"
+	"github.com/hybridgroup/gobot/drivers/gpio"
 	"github.com/hybridgroup/gobot/platforms/raspi"
 )
 
 func main() {
 	gbot := gobot.NewGobot()
 
-	r := raspi.NewRaspiAdaptor("raspi")
-	button := gpio.NewButtonDriver(r, "button", "11")
-	led := gpio.NewLedDriver(r, "led", "7")
+	r := raspi.NewAdaptor()
+	button := gpio.NewButtonDriver(r, "11")
+	led := gpio.NewLedDriver(r, "7")
 
 	work := func() {
 		button.On(gpio.ButtonPush, func(data interface{}) {

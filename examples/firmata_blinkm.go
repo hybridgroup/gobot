@@ -5,15 +5,15 @@ import (
 	"time"
 
 	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/drivers/i2c"
 	"github.com/hybridgroup/gobot/platforms/firmata"
-	"github.com/hybridgroup/gobot/platforms/i2c"
 )
 
 func main() {
 	gbot := gobot.NewGobot()
 
-	firmataAdaptor := firmata.NewFirmataAdaptor("firmata", "/dev/ttyACM0")
-	blinkm := i2c.NewBlinkMDriver(firmataAdaptor, "blinkm")
+	firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
+	blinkm := i2c.NewBlinkMDriver(firmataAdaptor)
 
 	work := func() {
 		gobot.Every(3*time.Second, func() {

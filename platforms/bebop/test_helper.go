@@ -2,7 +2,6 @@ package bebop
 
 type testDrone struct{}
 
-//func (t testDrone) Close() {}
 func (t testDrone) TakeOff() error                    { return nil }
 func (t testDrone) Land() error                       { return nil }
 func (t testDrone) Up(n int) error                    { return nil }

@@ -14,8 +14,8 @@ func main() {
 	api.Port = "8080"
 	api.Start()
 
-	pebbleAdaptor := pebble.NewPebbleAdaptor("pebble")
-	pebbleDriver := pebble.NewPebbleDriver(pebbleAdaptor, "pebble")
+	pebbleAdaptor := pebble.NewAdaptor()
+	pebbleDriver := pebble.NewDriver(pebbleAdaptor)
 
 	work := func() {
 		pebbleDriver.SendNotification("Hello Pebble!")

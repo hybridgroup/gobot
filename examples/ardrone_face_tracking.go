@@ -20,10 +20,10 @@ func main() {
 
 	_, currentfile, _, _ := runtime.Caller(0)
 	cascade := path.Join(path.Dir(currentfile), "haarcascade_frontalface_alt.xml")
-	window := opencv.NewWindowDriver("window")
-	camera := opencv.NewCameraDriver("camera", "tcp://192.168.1.1:5555")
-	ardroneAdaptor := ardrone.NewArdroneAdaptor("Drone")
-	drone := ardrone.NewArdroneDriver(ardroneAdaptor, "drone")
+	window := opencv.NewWindowDriver()
+	camera := opencv.NewCameraDriver("tcp://192.168.1.1:5555")
+	ardroneAdaptor := ardrone.NewAdaptor()
+	drone := ardrone.NewDriver(ardroneAdaptor)
 
 	work := func() {
 		detect := false

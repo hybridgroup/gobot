@@ -4,15 +4,15 @@ import (
 	"time"
 
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/gpio"
+	"github.com/hybridgroup/gobot/drivers/gpio"
 	"github.com/hybridgroup/gobot/platforms/raspi"
 )
 
 func main() {
 	gbot := gobot.NewGobot()
 
-	r := raspi.NewRaspiAdaptor("raspi")
-	led := gpio.NewLedDriver(r, "led", "7")
+	r := raspi.NewAdaptor()
+	led := gpio.NewLedDriver(r, "7")
 
 	work := func() {
 		gobot.Every(1*time.Second, func() {

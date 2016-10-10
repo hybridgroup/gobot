@@ -12,18 +12,18 @@ const (
 	Key = "key"
 )
 
-type KeyboardDriver struct {
+type Driver struct {
 	name    string
-	connect func(*KeyboardDriver) (err error)
-	listen  func(*KeyboardDriver)
+	connect func(*Driver) (err error)
+	listen  func(*Driver)
 	stdin   *os.File
 	gobot.Eventer
 }
 
-func NewKeyboardDriver(name string) *KeyboardDriver {
-	k := &KeyboardDriver{
-		name: name,
-		connect: func(k *KeyboardDriver) (err error) {
+func NewDriver() *Driver {
+	k := &Driver{
+		name: "Keyboard",
+		connect: func(k *Driver) (err error) {
 			if err := configure(); err != nil {
 				return err
 			}
@@ -31,7 +31,7 @@ func NewKeyboardDriver(name string) *KeyboardDriver {
 			k.stdin = os.Stdin
 			return
 		},
-		listen: func(k *KeyboardDriver) {
+		listen: func(k *Driver) {
 			ctrlc := bytes{3}
 
 			for {
@@ -60,12 +60,13 @@ func NewKeyboardDriver(name string) *KeyboardDriver {
 	return k
 }
 
-func (k *KeyboardDriver) Name() string                 { return k.name }
-func (k *KeyboardDriver) Connection() gobot.Connection { return nil }
+func (k *Driver) Name() string                 { return k.name }
+func (k *Driver) SetName(n string)             { k.name = n }
+func (k *Driver) Connection() gobot.Connection { return nil }
 
 // Start initializes keyboard by grabbing key events as they come in and
 // publishing a key event
-func (k *KeyboardDriver) Start() (errs []error) {
+func (k *Driver) Start() (errs []error) {
 	if err := k.connect(k); err != nil {
 		return []error{err}
 	}
@@ -76,7 +77,7 @@ func (k *KeyboardDriver) Start() (errs []error) {
 }
 
 // Halt stops camera driver
-func (k *KeyboardDriver) Halt() (errs []error) {
+func (k *Driver) Halt() (errs []error) {
 	if originalState != "" {
 		return restore()
 	}

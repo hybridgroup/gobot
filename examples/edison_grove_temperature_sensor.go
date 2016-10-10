@@ -5,15 +5,15 @@ import (
 	"time"
 
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/gpio"
+	"github.com/hybridgroup/gobot/drivers/gpio"
 	"github.com/hybridgroup/gobot/platforms/intel-iot/edison"
 )
 
 func main() {
 	gbot := gobot.NewGobot()
 
-	board := edison.NewEdisonAdaptor("board")
-	sensor := gpio.NewGroveTemperatureSensorDriver(board, "sensor", "0")
+	board := edison.NewAdaptor()
+	sensor := gpio.NewGroveTemperatureSensorDriver(board, "0")
 
 	work := func() {
 		gobot.Every(500*time.Millisecond, func() {

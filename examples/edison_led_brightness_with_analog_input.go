@@ -4,16 +4,16 @@ import (
 	"fmt"
 
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/gpio"
+	"github.com/hybridgroup/gobot/drivers/gpio"
 	"github.com/hybridgroup/gobot/platforms/intel-iot/edison"
 )
 
 func main() {
 	gbot := gobot.NewGobot()
 
-	e := edison.NewEdisonAdaptor("edison")
-	sensor := gpio.NewAnalogSensorDriver(e, "sensor", "0")
-	led := gpio.NewLedDriver(e, "led", "3")
+	e := edison.NewAdaptor()
+	sensor := gpio.NewAnalogSensorDriver(e, "0")
+	led := gpio.NewLedDriver(e, "3")
 
 	work := func() {
 		sensor.On(gpio.Data, func(data interface{}) {

@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/hybridgroup/gobot/platforms/firmata/client"
-	"github.com/tarm/goserial"
+	"github.com/tarm/serial"
 )
 
 func main() {

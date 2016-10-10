@@ -12,7 +12,7 @@ import (
 func main() {
 	gbot := gobot.NewGobot()
 
-	firmataAdaptor := firmata.NewFirmataAdaptor("firmata", "/dev/ttyACM0")
+	firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
 
 	work := func() {
 		gobot.Every(1*time.Second, func() {

@@ -25,8 +25,8 @@ import (
 func main() {
 	gbot := gobot.NewGobot()
 
-	adaptor := mavlink.NewMavlinkAdaptor("iris", "/dev/ttyACM0")
-	iris := mavlink.NewMavlinkDriver(adaptor, "iris")
+	adaptor := mavlink.NewAdaptor("/dev/ttyACM0")
+	iris := mavlink.NewDriver(adaptor)
 
 	work := func() {
 		gobot.Once(iris.Event("packet"), func(data interface{}) {

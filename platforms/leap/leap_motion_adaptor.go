@@ -6,28 +6,29 @@ import (
 	"golang.org/x/net/websocket"
 )
 
-type LeapMotionAdaptor struct {
+type Adaptor struct {
 	name    string
 	port    string
 	ws      io.ReadWriteCloser
 	connect func(string) (io.ReadWriteCloser, error)
 }
 
-// NewLeapMotionAdaptor creates a new leap motion adaptor using specified name and port
-func NewLeapMotionAdaptor(name string, port string) *LeapMotionAdaptor {
-	return &LeapMotionAdaptor{
-		name: name,
+// NewAdaptor creates a new leap motion adaptor using specified port
+func NewAdaptor(port string) *Adaptor {
+	return &Adaptor{
+		name: "LeapMotion",
 		port: port,
 		connect: func(port string) (io.ReadWriteCloser, error) {
 			return websocket.Dial("ws://"+port+"/v3.json", "", "http://"+port)
 		},
 	}
 }
-func (l *LeapMotionAdaptor) Name() string { return l.name }
-func (l *LeapMotionAdaptor) Port() string { return l.port }
+func (l *Adaptor) Name() string     { return l.name }
+func (l *Adaptor) SetName(n string) { l.name = n }
+func (l *Adaptor) Port() string     { return l.port }
 
 // Connect returns true if connection to leap motion is established successfully
-func (l *LeapMotionAdaptor) Connect() (errs []error) {
+func (l *Adaptor) Connect() (errs []error) {
 	if ws, err := l.connect(l.Port()); err != nil {
 		return []error{err}
 	} else {
@@ -37,4 +38,4 @@ func (l *LeapMotionAdaptor) Connect() (errs []error) {
 }
 
 // Finalize ends connection to leap motion
-func (l *LeapMotionAdaptor) Finalize() (errs []error) { return }
+func (l *Adaptor) Finalize() (errs []error) { return }

@@ -19,22 +19,22 @@ type drone interface {
 	Hover()
 }
 
-// ArdroneAdaptor is gobot.Adaptor representation for the Ardrone
-type ArdroneAdaptor struct {
+// Adaptor is gobot.Adaptor representation for the Ardrone
+type Adaptor struct {
 	name    string
 	drone   drone
 	config  client.Config
-	connect func(*ArdroneAdaptor) (drone, error)
+	connect func(*Adaptor) (drone, error)
 }
 
-// NewArdroneAdaptor returns a new ArdroneAdaptor and optionally accepts:
+// NewAdaptor returns a new ardrone.Adaptor and optionally accepts:
 //
 //  string: The ardrones IP Address
 //
-func NewArdroneAdaptor(name string, v ...string) *ArdroneAdaptor {
-	a := &ArdroneAdaptor{
-		name: name,
-		connect: func(a *ArdroneAdaptor) (drone, error) {
+func NewAdaptor(v ...string) *Adaptor {
+	a := &Adaptor{
+		name: "ARDrone",
+		connect: func(a *Adaptor) (drone, error) {
 			return client.Connect(a.config)
 		},
 	}
@@ -47,11 +47,14 @@ func NewArdroneAdaptor(name string, v ...string) *ArdroneAdaptor {
 	return a
 }
 
-// Name returns the ArdroneAdaptors Name
-func (a *ArdroneAdaptor) Name() string { return a.name }
+// Name returns the Adaptor Name
+func (a *Adaptor) Name() string { return a.name }
+
+// SetName sets the Adaptor Name
+func (a *Adaptor) SetName(n string) { a.name = n }
 
 // Connect establishes a connection to the ardrone
-func (a *ArdroneAdaptor) Connect() (errs []error) {
+func (a *Adaptor) Connect() (errs []error) {
 	d, err := a.connect(a)
 	if err != nil {
 		return []error{err}
@@ -61,4 +64,4 @@ func (a *ArdroneAdaptor) Connect() (errs []error) {
 }
 
 // Finalize terminates the connection to the ardrone
-func (a *ArdroneAdaptor) Finalize() (errs []error) { return }
+func (a *Adaptor) Finalize() (errs []error) { return }

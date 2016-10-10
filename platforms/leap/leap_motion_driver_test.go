@@ -10,7 +10,7 @@ import (
 	"github.com/hybridgroup/gobot/gobottest"
 )
 
-var _ gobot.Driver = (*LeapMotionDriver)(nil)
+var _ gobot.Driver = (*Driver)(nil)
 
 type NullReadWriteCloser struct{}
 
@@ -26,8 +26,8 @@ func (NullReadWriteCloser) Close() error {
 	return nil
 }
 
-func initTestLeapMotionDriver() *LeapMotionDriver {
-	a := NewLeapMotionAdaptor("bot", "")
+func initTestLeapMotionDriver() *Driver {
+	a := NewAdaptor("")
 	a.connect = func(port string) (io.ReadWriteCloser, error) {
 		return &NullReadWriteCloser{}, nil
 	}
@@ -36,14 +36,14 @@ func initTestLeapMotionDriver() *LeapMotionDriver {
 		file, _ := ioutil.ReadFile("./test/support/example_frame.json")
 		copy(*buf, file)
 	}
-	return NewLeapMotionDriver(a, "bot")
+	return NewDriver(a)
 }
 
 func TestLeapMotionDriver(t *testing.T) {
 	d := initTestLeapMotionDriver()
-	gobottest.Assert(t, d.Name(), "bot")
-	gobottest.Assert(t, d.Connection().Name(), "bot")
+	gobottest.Refute(t, d.Connection(), nil)
 }
+
 func TestLeapMotionDriverStart(t *testing.T) {
 	d := initTestLeapMotionDriver()
 	gobottest.Assert(t, len(d.Start()), 0)
@@ -51,7 +51,6 @@ func TestLeapMotionDriverStart(t *testing.T) {
 	d = initTestLeapMotionDriver()
 	writeError = errors.New("write error")
 	gobottest.Assert(t, d.Start()[0], errors.New("write error"))
-
 }
 
 func TestLeapMotionDriverHalt(t *testing.T) {

@@ -8,27 +8,27 @@ import (
 	"github.com/hybridgroup/gobot/gobottest"
 )
 
-var _ gobot.Driver = (*PebbleDriver)(nil)
+var _ gobot.Driver = (*Driver)(nil)
 
-func initTestPebbleDriver() *PebbleDriver {
-	return NewPebbleDriver(NewPebbleAdaptor("adaptor"), "pebble")
+func initTestDriver() *Driver {
+	return NewDriver(NewAdaptor())
 }
 
-func TestPebbleDriverStart(t *testing.T) {
-	d := initTestPebbleDriver()
+func TestDriverStart(t *testing.T) {
+	d := initTestDriver()
 	gobottest.Assert(t, len(d.Start()), 0)
 }
 
-func TestPebbleDriverHalt(t *testing.T) {
-	d := initTestPebbleDriver()
+func TestDriverHalt(t *testing.T) {
+	d := initTestDriver()
 	gobottest.Assert(t, len(d.Halt()), 0)
 }
 
-func TestPebbleDriver(t *testing.T) {
-	d := initTestPebbleDriver()
+func TestDriver(t *testing.T) {
+	d := initTestDriver()
 
-	gobottest.Assert(t, d.Name(), "pebble")
-	gobottest.Assert(t, d.Connection().Name(), "adaptor")
+	gobottest.Assert(t, d.Name(), "Pebble")
+	gobottest.Assert(t, d.Connection().Name(), "Pebble")
 
 	sem := make(chan bool)
 	d.SendNotification("Hello")
@@ -68,5 +68,4 @@ func TestPebbleDriver(t *testing.T) {
 
 	message := d.Command("pending_message")(map[string]interface{}{})
 	gobottest.Assert(t, message, "Hey buddy!")
-
 }

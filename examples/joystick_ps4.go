@@ -10,9 +10,8 @@ import (
 func main() {
 	gbot := gobot.NewGobot()
 
-	joystickAdaptor := joystick.NewJoystickAdaptor("ps4")
-	stick := joystick.NewJoystickDriver(joystickAdaptor,
-		"ps4",
+	joystickAdaptor := joystick.NewAdaptor()
+	stick := joystick.NewDriver(joystickAdaptor,
 		"./platforms/joystick/configs/dualshock4.json",
 	)
 

@@ -4,17 +4,17 @@ import (
 	"time"
 
 	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/drivers/gpio"
 	"github.com/hybridgroup/gobot/platforms/firmata"
-	"github.com/hybridgroup/gobot/platforms/gpio"
 	"github.com/hybridgroup/gobot/platforms/mqtt"
 )
 
 func main() {
 	gbot := gobot.NewGobot()
 
-	mqttAdaptor := mqtt.NewMqttAdaptor("server", "tcp://test.mosquitto.org:1883", "blinker")
-	firmataAdaptor := firmata.NewFirmataAdaptor("arduino", "/dev/ttyACM0")
-	led := gpio.NewLedDriver(firmataAdaptor, "led", "13")
+	mqttAdaptor := mqtt.NewAdaptor("tcp://test.mosquitto.org:1883", "blinker")
+	firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
+	led := gpio.NewLedDriver(firmataAdaptor, "13")
 
 	work := func() {
 		mqttAdaptor.On("lights/on", func(data []byte) {
