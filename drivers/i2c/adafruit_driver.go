@@ -8,10 +8,7 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
-var (
-	_             gobot.Driver = (*AdafruitMotorHatDriver)(nil)
-	adafruitDebug              = false // Set this to true to see debug output
-)
+var adafruitDebug = false // Set this to true to see debug output
 
 var (
 	// Each Adafruit HAT must have a unique I2C address. The default address for
@@ -121,12 +118,15 @@ func (a *AdafruitMotorHatDriver) SetServoHatAddress(addr int) (errs []error) {
 // Name identifies this driver object
 func (a *AdafruitMotorHatDriver) Name() string { return a.name }
 
+// SetName sets nae for driver
+func (a *AdafruitMotorHatDriver) SetName(n string) { a.name = n }
+
 // Connection identifies the particular adapter object
 func (a *AdafruitMotorHatDriver) Connection() gobot.Connection { return a.connection.(gobot.Connection) }
 
 // NewAdafruitMotorHatDriver initializes the internal DCMotor and StepperMotor types.
 // Again the Adafruit Motor Hat supports up to four DC motors and up to two stepper motors.
-func NewAdafruitMotorHatDriver(a I2c, name string) *AdafruitMotorHatDriver {
+func NewAdafruitMotorHatDriver(a I2c) *AdafruitMotorHatDriver {
 	var dc []adaFruitDCMotor
 	var st []adaFruitStepperMotor
 	for i := 0; i < 4; i++ {
@@ -146,7 +146,7 @@ func NewAdafruitMotorHatDriver(a I2c, name string) *AdafruitMotorHatDriver {
 		}
 	}
 	driver := &AdafruitMotorHatDriver{
-		name:          name,
+		name:          "AdafruitMotorHat",
 		connection:    a,
 		Commander:     gobot.NewCommander(),
 		dcMotors:      dc,
@@ -158,7 +158,6 @@ func NewAdafruitMotorHatDriver(a I2c, name string) *AdafruitMotorHatDriver {
 
 // Start initializes both I2C-addressable Adafruit Motor HAT drivers
 func (a *AdafruitMotorHatDriver) Start() (errs []error) {
-
 	addrs := []int{motorHatAddress, servoHatAddress}
 	for i := range addrs {
 

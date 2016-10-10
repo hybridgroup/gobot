@@ -4,8 +4,11 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/gobottest"
 )
+
+var _ gobot.Driver = (*AdafruitMotorHatDriver)(nil)
 
 // --------- HELPERS
 func initTestAdafruitMotorHatDriver() (driver *AdafruitMotorHatDriver) {
@@ -14,21 +17,20 @@ func initTestAdafruitMotorHatDriver() (driver *AdafruitMotorHatDriver) {
 }
 
 func initTestAdafruitMotorHatDriverWithStubbedAdaptor() (*AdafruitMotorHatDriver, *i2cTestAdaptor) {
-	adaptor := newI2cTestAdaptor("adaptor")
-	return NewAdafruitMotorHatDriver(adaptor, "bot"), adaptor
+	adaptor := newI2cTestAdaptor()
+	return NewAdafruitMotorHatDriver(adaptor), adaptor
 }
 
 // --------- TESTS
 func TestNewAdafruitMotorHatDriver(t *testing.T) {
-	var adafruit interface{} = NewAdafruitMotorHatDriver(newI2cTestAdaptor("adaptor"), "bot")
+	var adafruit interface{} = NewAdafruitMotorHatDriver(newI2cTestAdaptor())
 	_, ok := adafruit.(*AdafruitMotorHatDriver)
 	if !ok {
 		t.Errorf("AdafruitMotorHatDriver() should have returned a *AdafruitMotorHatDriver")
 	}
 
-	a := NewAdafruitMotorHatDriver(newI2cTestAdaptor("adaptor"), "bot")
-	gobottest.Assert(t, a.Name(), "bot")
-	gobottest.Assert(t, a.Connection().Name(), "adaptor")
+	a := NewAdafruitMotorHatDriver(newI2cTestAdaptor())
+	gobottest.Assert(t, a.Name(), "AdafruitMotorHat")
 }
 
 // Methods
