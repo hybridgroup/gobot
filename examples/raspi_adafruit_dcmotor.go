@@ -10,7 +10,6 @@ import (
 )
 
 func adafruitDCMotorRunner(a *i2c.AdafruitMotorHatDriver, dcMotor int) (err error) {
-
 	log.Printf("DC Motor Run Loop...\n")
 	// set the speed:
 	var speed int32 = 255 // 255 = full speed!
@@ -37,10 +36,11 @@ func adafruitDCMotorRunner(a *i2c.AdafruitMotorHatDriver, dcMotor int) (err erro
 	}
 	return
 }
+
 func main() {
 	gbot := gobot.NewGobot()
-	r := raspi.NewRaspiAdaptor("raspi")
-	adaFruit := i2c.NewAdafruitMotorHatDriver(r, "adafruit")
+	r := raspi.NewAdaptor()
+	adaFruit := i2c.NewAdafruitMotorHatDriver(r)
 
 	work := func() {
 		gobot.Every(5*time.Second, func() {

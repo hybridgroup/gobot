@@ -26,6 +26,7 @@ func degree2pulse(deg int) int32 {
 	pulse += ((servoMax - servoMin) / maxDegree) * deg
 	return int32(pulse)
 }
+
 func adafruitServoMotorRunner(a *i2c.AdafruitMotorHatDriver) (err error) {
 	log.Printf("Servo Motor Run Loop...\n")
 	// Changing from the default 0x40 address because this configuration involves
@@ -64,14 +65,14 @@ func adafruitServoMotorRunner(a *i2c.AdafruitMotorHatDriver) (err error) {
 	}
 	return
 }
+
 func main() {
 	gbot := gobot.NewGobot()
-	r := raspi.NewRaspiAdaptor("raspi")
-	adaFruit := i2c.NewAdafruitMotorHatDriver(r, "adafruit")
+	r := raspi.NewAdaptor()
+	adaFruit := i2c.NewAdafruitMotorHatDriver(r)
 
 	work := func() {
 		gobot.Every(5*time.Second, func() {
-
 			adafruitServoMotorRunner(adaFruit)
 		})
 	}

@@ -28,14 +28,14 @@ func adafruitStepperMotorRunner(a *i2c.AdafruitMotorHatDriver, motor int) (err e
 	}
 	return
 }
+
 func main() {
 	gbot := gobot.NewGobot()
-	r := raspi.NewRaspiAdaptor("raspi")
-	adaFruit := i2c.NewAdafruitMotorHatDriver(r, "adafruit")
+	r := raspi.NewAdaptor()
+	adaFruit := i2c.NewAdafruitMotorHatDriver(r)
 
 	work := func() {
 		gobot.Every(5*time.Second, func() {
-
 			motor := 0 // 0-based
 			adafruitStepperMotorRunner(adaFruit, motor)
 		})
