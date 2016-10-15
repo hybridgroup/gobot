@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/i2c"
+	"github.com/hybridgroup/gobot/drivers/i2c"
 	"github.com/hybridgroup/gobot/platforms/raspi"
 )
 
