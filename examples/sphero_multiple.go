@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewGobot()
+	gbot := gobot.NewMaster()
 
 	spheros := []string{
 		"/dev/rfcomm0",

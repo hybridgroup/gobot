@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewGobot()
+	gbot := gobot.NewMaster()
 
 	board := chip.NewAdaptor()
 	mpu6050 := i2c.NewMPU6050Driver(board)

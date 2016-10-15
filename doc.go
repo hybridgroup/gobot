@@ -17,7 +17,7 @@ Basic Setup
     )
 
     func main() {
-      gbot  := gobot.NewGobot()
+      gbot  := gobot.NewMaster()
 
       robot := gobot.NewRobot("Eve", func() {
         gobot.Every(500*time.Millisecond, func() {
@@ -43,7 +43,7 @@ Blinking an LED (Hello Eve!)
     )
 
     func main() {
-    	gbot := gobot.NewGobot()
+    	gbot := gobot.NewMaster()
 
     	firmataAdaptor := firmata.NewFirmataAdaptor("arduino", "/dev/ttyACM0")
     	led := gpio.NewLedDriver(firmataAdaptor, "led", "13")
@@ -81,7 +81,7 @@ web service.
     )
 
     func main() {
-    	gbot := gobot.NewGobot()
+    	gbot := gobot.NewMaster()
 
       // Starts the API server on default port 3000
     	api.NewAPI(gbot).Start()

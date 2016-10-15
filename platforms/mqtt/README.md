@@ -29,7 +29,7 @@ import (
 )
 
 func main() {
-  gbot := gobot.NewGobot()
+  gbot := gobot.NewMaster()
 
   mqttAdaptor := mqtt.NewAdaptor("tcp://0.0.0.0:1883", "pinger")
 

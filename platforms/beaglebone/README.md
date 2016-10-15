@@ -44,7 +44,7 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewGobot()
+	gbot := gobot.NewMaster()
 
 	beagleboneAdaptor := beaglebone.NewAdaptor()
 	led := gpio.NewLedDriver(beagleboneAdaptor, "P9_12")

@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewGobot()
+	gbot := gobot.NewMaster()
 
 	firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
 	wiichuck := i2c.NewWiichuckDriver(firmataAdaptor)

@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewGobot()
+	gbot := gobot.NewMaster()
 
 	digisparkAdaptor := digispark.NewAdaptor()
 	servo := gpio.NewServoDriver(digisparkAdaptor, "0")

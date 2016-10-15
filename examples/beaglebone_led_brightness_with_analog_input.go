@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewGobot()
+	gbot := gobot.NewMaster()
 
 	beagleboneAdaptor := beaglebone.NewAdaptor()
 	sensor := gpio.NewAnalogSensorDriver(beagleboneAdaptor, "P9_33")

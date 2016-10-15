@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewGobot()
+	gbot := gobot.NewMaster()
 
 	board := joule.NewAdaptor()
 	screen := i2c.NewGroveLcdDriver(board)

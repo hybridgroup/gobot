@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewGobot()
+	gbot := gobot.NewMaster()
 
 	spheros := map[string]string{
 		"Sphero-BPO": "/dev/rfcomm0",

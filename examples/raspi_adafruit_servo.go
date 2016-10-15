@@ -67,7 +67,7 @@ func adafruitServoMotorRunner(a *i2c.AdafruitMotorHatDriver) (err error) {
 }
 
 func main() {
-	gbot := gobot.NewGobot()
+	gbot := gobot.NewMaster()
 	r := raspi.NewAdaptor()
 	adaFruit := i2c.NewAdafruitMotorHatDriver(r)
 

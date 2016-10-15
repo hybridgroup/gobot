@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewGobot()
+	gbot := gobot.NewMaster()
 
 	board := chip.NewAdaptor()
 	accel := i2c.NewGroveAccelerometerDriver(board)

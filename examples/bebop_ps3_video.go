@@ -53,7 +53,7 @@ func ffmpeg() (stdin io.WriteCloser, stderr io.ReadCloser, err error) {
 }
 
 func main() {
-	gbot := gobot.NewGobot()
+	gbot := gobot.NewMaster()
 
 	joystickAdaptor := joystick.NewAdaptor()
 	stick := joystick.NewDriver(joystickAdaptor,

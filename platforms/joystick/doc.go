@@ -20,7 +20,7 @@ Example:
 	)
 
 	func main() {
-		gbot := gobot.NewGobot()
+		gbot := gobot.NewMaster()
 
 		joystickAdaptor := joystick.NewAdaptor()
 		joystick := joystick.NewDriver(joystickAdaptor,

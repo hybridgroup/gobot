@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewGobot()
+	gbot := gobot.NewMaster()
 
 	e := edison.NewAdaptor()
 	touch := gpio.NewGroveTouchDriver(e, "2")

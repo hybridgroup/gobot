@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewGobot()
+	gbot := gobot.NewMaster()
 
 	e := edison.NewAdaptor()
 	led := gpio.NewRgbLedDriver(e, "3", "5", "6")

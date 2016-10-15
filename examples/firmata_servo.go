@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewGobot()
+	gbot := gobot.NewMaster()
 
 	firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
 	servo := gpio.NewServoDriver(firmataAdaptor, "3")

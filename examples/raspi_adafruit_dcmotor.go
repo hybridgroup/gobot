@@ -36,9 +36,8 @@ func adafruitDCMotorRunner(a *i2c.AdafruitMotorHatDriver, dcMotor int) (err erro
 	}
 	return
 }
-
 func main() {
-	gbot := gobot.NewGobot()
+	gbot := gobot.NewMaster()
 	r := raspi.NewAdaptor()
 	adaFruit := i2c.NewAdafruitMotorHatDriver(r)
 

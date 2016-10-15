@@ -13,7 +13,7 @@ Example:
     )
 
     func main() {
-    	gbot := gobot.NewGobot()
+    	gbot := gobot.NewMaster()
 
       // Starts the API server on default port 3000
     	api.NewAPI(gbot).Start()

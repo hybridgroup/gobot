@@ -19,9 +19,9 @@ func TestConnectionEach(t *testing.T) {
 	gobottest.Assert(t, r.Connections().Len(), i)
 }
 
-func initTestGobot() *Gobot {
+func initTestGobot() *Master {
 	log.SetOutput(&NullReadWriteCloser{})
-	g := NewGobot()
+	g := NewMaster()
 	g.trap = func(c chan os.Signal) {
 		c <- os.Interrupt
 	}
@@ -62,7 +62,7 @@ func TestGobotToJSON(t *testing.T) {
 	g.AddCommand("test_function", func(params map[string]interface{}) interface{} {
 		return nil
 	})
-	json := NewJSONGobot(g)
+	json := NewJSONMaster(g)
 	gobottest.Assert(t, len(json.Robots), g.Robots().Len())
 	gobottest.Assert(t, len(json.Commands), len(g.Commands()))
 }
@@ -75,7 +75,7 @@ func TestGobotStart(t *testing.T) {
 
 func TestGobotStartErrors(t *testing.T) {
 	log.SetOutput(&NullReadWriteCloser{})
-	g := NewGobot()
+	g := NewMaster()
 
 	adaptor1 := newTestAdaptor("Connection1", "/dev/null")
 	driver1 := newTestDriver(adaptor1, "Device1", "0")

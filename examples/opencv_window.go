@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewGobot()
+	gbot := gobot.NewMaster()
 
 	window := opencv.NewWindowDriver()
 	camera := opencv.NewCameraDriver(0)

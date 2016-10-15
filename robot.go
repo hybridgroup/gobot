@@ -87,19 +87,15 @@ func (r *Robots) Each(f func(*Robot)) {
 	}
 }
 
-// NewRobot returns a new Robot given a name and optionally accepts:
+// NewRobot returns a new Robot given optional accepts:
 //
 // 	[]Connection: Connections which are automatically started and stopped with the robot
 //	[]Device: Devices which are automatically started and stopped with the robot
 //	func(): The work routine the robot will execute once all devices and connections have been initialized and started
 // A name will be automaically generated if no name is supplied.
-func NewRobot(name string, v ...interface{}) *Robot {
-	if name == "" {
-		name = fmt.Sprintf("%X", Rand(int(^uint(0)>>1)))
-	}
-
+func NewRobot(v ...interface{}) *Robot {
 	r := &Robot{
-		Name:        name,
+		Name:        fmt.Sprintf("%X", Rand(int(^uint(0)>>1))),
 		connections: &Connections{},
 		devices:     &Devices{},
 		Work:        nil,
@@ -107,10 +103,10 @@ func NewRobot(name string, v ...interface{}) *Robot {
 		Commander:   NewCommander(),
 	}
 
-	log.Println("Initializing Robot", r.Name, "...")
-
 	for i := range v {
 		switch v[i].(type) {
+		case string:
+			r.Name = v[i].(string)
 		case []Connection:
 			log.Println("Initializing connections...")
 			for _, connection := range v[i].([]Connection) {
@@ -127,6 +123,8 @@ func NewRobot(name string, v ...interface{}) *Robot {
 			r.Work = v[i].(func())
 		}
 	}
+
+	log.Println("Robot", r.Name, "initialized.")
 
 	return r
 }

@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewGobot()
+	gbot := gobot.NewMaster()
 
 	e := edison.NewAdaptor()
 	sensor := gpio.NewAnalogSensorDriver(e, "0")

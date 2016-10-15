@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewGobot()
+	gbot := gobot.NewMaster()
 
 	bebopAdaptor := bebop.NewAdaptor()
 	drone := bebop.NewDriver(bebopAdaptor)

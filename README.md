@@ -33,7 +33,7 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewGobot()
+	master := gobot.NewMaster()
 
 	firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
 	led := gpio.NewLedDriver(firmataAdaptor, "13")
@@ -50,9 +50,9 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
+	master.AddRobot(robot)
 
-	gbot.Start()
+	master.Start()
 }
 ```
 
@@ -70,7 +70,7 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewGobot()
+	master := gobot.NewMaster()
 
 	adaptor := sphero.NewAdaptor("/dev/rfcomm0")
 	driver := sphero.NewSpheroDriver(adaptor)
@@ -87,9 +87,9 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
+	master.AddRobot(robot)
 
-	gbot.Start()
+	master.Start()
 }
 ```
 
@@ -197,14 +197,14 @@ Gobot includes a RESTful API to query the status of any robot running within a g
 To activate the API, require the `github.com/hybridgroup/gobot/api` package and instantiate the `API` like this:
 
 ```go
-  gbot := gobot.NewGobot()
-  api.NewAPI(gbot).Start()
+  master := gobot.NewMaster()
+  api.NewAPI(master).Start()
 ```
 
 You can also specify the api host and port, and turn on authentication:
 ```go
-  gbot := gobot.NewGobot()
-  server := api.NewAPI(gbot)
+  master := gobot.NewMaster()
+  server := api.NewAPI(master)
   server.Port = "4000"
   server.AddHandler(api.BasicAuth("gort", "klatuu"))
   server.Start()

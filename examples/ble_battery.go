@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewGobot()
+	gbot := gobot.NewMaster()
 
 	bleAdaptor := ble.NewClientAdaptor(os.Args[1])
 	battery := ble.NewBatteryDriver(bleAdaptor)

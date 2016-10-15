@@ -23,7 +23,7 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewGobot()
+	gbot := gobot.NewMaster()
 
 	keys := keyboard.NewDriver("keyboard")
 

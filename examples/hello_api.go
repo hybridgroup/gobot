@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewGobot()
+	gbot := gobot.NewMaster()
 
 	a := api.NewAPI(gbot)
 	a.AddHandler(func(w http.ResponseWriter, r *http.Request) {

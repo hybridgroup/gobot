@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewGobot()
+	gbot := gobot.NewMaster()
 
 	// use "/dev/ttyUSB0" if connecting with USB cable
 	// use "/dev/ttyAMA0" on devices older than Raspberry Pi 3 Model B

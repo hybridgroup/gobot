@@ -23,7 +23,7 @@ Before running the example, make sure configuration settings match with your pro
 	)
 
 	func main() {
-		gbot := gobot.NewGobot()
+		gbot := gobot.NewMaster()
 		api.NewAPI(gbot).Start()
 
 		pebbleAdaptor := pebble.NewAdaptor()

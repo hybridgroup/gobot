@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewGobot()
+	gbot := gobot.NewMaster()
 
 	beagleboneAdaptor := beaglebone.NewAdaptor()
 	led := gpio.NewDirectPinDriver(beagleboneAdaptor, "P8_10")

@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewGobot()
+	gbot := gobot.NewMaster()
 	api.NewAPI(gbot).Start()
 
 	core := particle.NewAdaptor("device_id", "access_token")

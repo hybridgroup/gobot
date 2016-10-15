@@ -6,15 +6,15 @@ import (
 	"os/signal"
 )
 
-// JSONGobot is a JSON representation of a Gobot.
-type JSONGobot struct {
+// JSONGobot is a JSON representation of a Gobot Master.
+type JSONMaster struct {
 	Robots   []*JSONRobot `json:"robots"`
 	Commands []string     `json:"commands"`
 }
 
-// NewJSONGobot returns a JSONGobt given a Gobot.
-func NewJSONGobot(gobot *Gobot) *JSONGobot {
-	jsonGobot := &JSONGobot{
+// NewJSONMaster returns a JSONMaster given a Gobot Master.
+func NewJSONMaster(gobot *Master) *JSONMaster {
+	jsonGobot := &JSONMaster{
 		Robots:   []*JSONRobot{},
 		Commands: []string{},
 	}
@@ -29,9 +29,9 @@ func NewJSONGobot(gobot *Gobot) *JSONGobot {
 	return jsonGobot
 }
 
-// Gobot is the main type of your Gobot application and contains a collection of
-// Robots, API commands and Events.
-type Gobot struct {
+// Master is the main type of your Gobot application and contains a collection of
+// Robots, API commands that apply to the Master, and Events that apply to the Master.
+type Master struct {
 	robots   *Robots
 	trap     func(chan os.Signal)
 	AutoStop bool
@@ -39,9 +39,9 @@ type Gobot struct {
 	Eventer
 }
 
-// NewGobot returns a new Gobot
-func NewGobot() *Gobot {
-	return &Gobot{
+// NewMaster returns a new Gobot Master
+func NewMaster() *Master {
+	return &Master{
 		robots: &Robots{},
 		trap: func(c chan os.Signal) {
 			signal.Notify(c, os.Interrupt)
@@ -55,7 +55,7 @@ func NewGobot() *Gobot {
 // Start calls the Start method on each robot in its collection of robots. On
 // error, call Stop to ensure that all robots are returned to a sane, stopped
 // state.
-func (g *Gobot) Start() (errs []error) {
+func (g *Master) Start() (errs []error) {
 	if rerrs := g.robots.Start(); len(rerrs) > 0 {
 		for _, err := range rerrs {
 			log.Println("Error:", err)
@@ -83,7 +83,7 @@ func (g *Gobot) Start() (errs []error) {
 }
 
 // Stop calls the Stop method on each robot in its collection of robots.
-func (g *Gobot) Stop() (errs []error) {
+func (g *Master) Stop() (errs []error) {
 	if rerrs := g.robots.Stop(); len(rerrs) > 0 {
 		for _, err := range rerrs {
 			log.Println("Error:", err)
@@ -94,20 +94,20 @@ func (g *Gobot) Stop() (errs []error) {
 	return errs
 }
 
-// Robots returns all robots associated with this Gobot.
-func (g *Gobot) Robots() *Robots {
+// Robots returns all robots associated with this Gobot Master.
+func (g *Master) Robots() *Robots {
 	return g.robots
 }
 
 // AddRobot adds a new robot to the internal collection of robots. Returns the
 // added robot
-func (g *Gobot) AddRobot(r *Robot) *Robot {
+func (g *Master) AddRobot(r *Robot) *Robot {
 	*g.robots = append(*g.robots, r)
 	return r
 }
 
 // Robot returns a robot given name. Returns nil if the Robot does not exist.
-func (g *Gobot) Robot(name string) *Robot {
+func (g *Master) Robot(name string) *Robot {
 	for _, robot := range *g.Robots() {
 		if robot.Name == name {
 			return robot

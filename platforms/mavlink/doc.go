@@ -18,7 +18,7 @@ Example:
 	)
 
 	func main() {
-		gbot := gobot.NewGobot()
+		gbot := gobot.NewMaster()
 
 		adaptor := mavlink.NewAdaptor("/dev/ttyACM0")
 		iris := mavlink.NewDriver(adaptor)

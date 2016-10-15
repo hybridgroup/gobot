@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewGobot()
+	gbot := gobot.NewMaster()
 
 	board := firmata.NewAdaptor("/dev/ttyACM0")
 	led := gpio.NewRgbLedDriver(board, "3", "5", "6")

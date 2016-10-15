@@ -46,7 +46,7 @@ import (
 )
 
 func main() {
-    gbot := gobot.NewGobot()
+    gbot := gobot.NewMaster()
 
     chipAdaptor := chip.NewAdaptor()
     button := gpio.NewButtonDriver(chipAdaptor, "XIO-P0")

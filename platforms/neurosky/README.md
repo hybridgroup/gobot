@@ -57,7 +57,7 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewGobot()
+	gbot := gobot.NewMaster()
 
 	adaptor := neurosky.NewAdaptor("/dev/rfcomm0")
 	neuro := neurosky.NewDriver(adaptor)

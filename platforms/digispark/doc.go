@@ -21,7 +21,7 @@ Example:
 	)
 
 	func main() {
-		gbot := gobot.NewGobot()
+		gbot := gobot.NewMaster()
 
 		digisparkAdaptor := digispark.NewAdaptor()
 		led := gpio.NewLedDriver(digisparkAdaptor, "0")

@@ -278,7 +278,7 @@ import (
 )
 
 func main() {
-  gbot := gobot.NewGobot()
+  gbot := gobot.NewMaster()
 
   conn := {{.Package}}.New{{.UpperName}}Adaptor()
   dev := {{.Package}}.New{{.UpperName}}Driver(conn)

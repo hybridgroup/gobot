@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewGobot()
+	gbot := gobot.NewMaster()
 
 	firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
 	servo1 := gpio.NewServoDriver(firmataAdaptor, "5")

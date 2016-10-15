@@ -30,7 +30,7 @@ import (
 )
 
 func main() {
-  gbot := gobot.NewGobot()
+  gbot := gobot.NewMaster()
 
   natsAdaptor := nats.NewNatsAdaptor("nats", "localhost:4222", 1234)
 

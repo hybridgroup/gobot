@@ -18,7 +18,7 @@ Example:
 	)
 
 	func main() {
-		gbot := gobot.NewGobot()
+		gbot := gobot.NewMaster()
 
 		firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
 		led := gpio.NewLedDriver(firmataAdaptor, "13")

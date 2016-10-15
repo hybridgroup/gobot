@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewGobot()
+	gbot := gobot.NewMaster()
 
 	r := raspi.NewAdaptor()
 	button := gpio.NewButtonDriver(r, "11")

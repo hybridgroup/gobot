@@ -20,7 +20,7 @@ Example:
 	)
 
 	func main() {
-		gbot := gobot.NewGobot()
+		gbot := gobot.NewMaster()
 
 		leapMotionAdaptor := leap.NewAdaptor("127.0.0.1:6437")
 		l := leap.NewDriver(leapMotionAdaptor)

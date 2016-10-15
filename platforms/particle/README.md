@@ -26,7 +26,7 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewGobot()
+	gbot := gobot.NewMaster()
 
 	core := particle.NewAdaptor("device_id", "access_token")
 	led := gpio.NewLedDriver(core, "D7")

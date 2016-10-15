@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewGobot()
+	gbot := gobot.NewMaster()
 
 	chipAdaptor := chip.NewAdaptor()
 	wiichuck := i2c.NewWiichuckDriver(chipAdaptor)

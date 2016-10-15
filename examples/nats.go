@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewGobot()
+	gbot := gobot.NewMaster()
 
 	natsAdaptor := nats.NewAdaptorWithAuth("localhost:4222", 1234, "user", "pass")
 

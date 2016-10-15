@@ -9,7 +9,7 @@ import (
 
 // Video: https://www.youtube.com/watch?v=ayNMyUfdAqc
 func main() {
-	gbot := gobot.NewGobot()
+	gbot := gobot.NewMaster()
 
 	firmataAdaptor := firmata.NewAdaptor("/dev/tty.usbmodem1451")
 	servo1 := gpio.NewServoDriver(firmataAdaptor, "3")
