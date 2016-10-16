@@ -42,6 +42,7 @@ type Robot struct {
 	Work        func()
 	connections *Connections
 	devices     *Devices
+	done        chan bool
 	Commander
 	Eventer
 }
@@ -98,6 +99,7 @@ func NewRobot(v ...interface{}) *Robot {
 		Name:        fmt.Sprintf("%X", Rand(int(^uint(0)>>1))),
 		connections: &Connections{},
 		devices:     &Devices{},
+		done:        make(chan bool),
 		Work:        nil,
 		Eventer:     NewEventer(),
 		Commander:   NewCommander(),
@@ -142,7 +144,10 @@ func (r *Robot) Start() (errs []error) {
 	}
 	if r.Work != nil {
 		log.Println("Starting work...")
-		r.Work()
+		go func() {
+			r.Work()
+			<-r.done
+		}()
 	}
 	return
 }
@@ -152,6 +157,7 @@ func (r *Robot) Stop() (errs []error) {
 	log.Println("Stopping Robot", r.Name, "...")
 	errs = append(errs, r.Devices().Halt()...)
 	errs = append(errs, r.Connections().Finalize()...)
+	r.done <- true
 	return errs
 }
 
