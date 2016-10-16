@@ -6,7 +6,7 @@ import (
 	"os/signal"
 )
 
-// JSONGobot is a JSON representation of a Gobot Master.
+// JSONMaster is a JSON representation of a Gobot Master.
 type JSONMaster struct {
 	Robots   []*JSONRobot `json:"robots"`
 	Commands []string     `json:"commands"`

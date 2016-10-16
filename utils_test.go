@@ -1,7 +1,6 @@
 package gobot
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
@@ -60,6 +59,6 @@ func TestRand(t *testing.T) {
 	a := Rand(1000)
 	b := Rand(1000)
 	if a == b {
-		t.Error(fmt.Sprintf("%v should not equal %v", a, b))
+		t.Errorf("%v should not equal %v", a, b)
 	}
 }
