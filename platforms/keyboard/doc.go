@@ -24,7 +24,7 @@ Example:
 		keys := keyboard.NewDriver()
 
 		work := func() {
-			gobot.On(keys.Event("key"), func(data interface{}) {
+			keys.On(keys.Event("key"), func(data interface{}) {
 				key := data.(keyboard.KeyEvent)
 
 				if key.Key == keyboard.A {
