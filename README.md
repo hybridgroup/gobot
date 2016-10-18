@@ -128,6 +128,7 @@ import (
 )
 
 func main() {
+	// creates the Master
 	master := gobot.NewMaster()
 
 	spheros := []string{
@@ -170,6 +171,7 @@ func main() {
 		master.AddRobot(robot)
 	}
 
+	// starts all the robots at once
 	master.Start()
 }
 ```
