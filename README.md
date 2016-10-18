@@ -28,13 +28,11 @@ import (
 	"time"
 
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/firmata"
 	"github.com/hybridgroup/gobot/drivers/gpio"
+	"github.com/hybridgroup/gobot/platforms/firmata"
 )
 
 func main() {
-	master := gobot.NewMaster()
-
 	firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
 	led := gpio.NewLedDriver(firmataAdaptor, "13")
 
@@ -50,9 +48,7 @@ func main() {
 		work,
 	)
 
-	master.AddRobot(robot)
-
-	master.Start()
+	robot.Start()
 }
 ```
 
@@ -70,8 +66,6 @@ import (
 )
 
 func main() {
-	master := gobot.NewMaster()
-
 	adaptor := sphero.NewAdaptor("/dev/rfcomm0")
 	driver := sphero.NewSpheroDriver(adaptor)
 
@@ -87,9 +81,7 @@ func main() {
 		work,
 	)
 
-	master.AddRobot(robot)
-
-	master.Start()
+	robot.Start()
 }
 ```
 
@@ -117,6 +109,68 @@ func main() {
 		led.Toggle()
 		time.Sleep(1000 * time.Millisecond)
 	}
+}
+```
+
+#### "Master" Gobot
+
+You can also use the "Master Gobot" to control swarms of robots. For example:
+
+```go
+package main
+
+import (
+	"fmt"
+	"time"
+
+	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/platforms/sphero"
+)
+
+func main() {
+	master := gobot.NewMaster()
+
+	spheros := []string{
+		"/dev/rfcomm0",
+		"/dev/rfcomm1",
+		"/dev/rfcomm2",
+		"/dev/rfcomm3",
+	}
+
+	for _, port := range spheros {
+		spheroAdaptor := sphero.NewAdaptor(port)
+		spheroDriver := sphero.NewSpheroDriver(spheroAdaptor)
+		spheroDriver.SetName("Sphero" + port)
+
+		work := func() {
+			spheroDriver.Stop()
+
+			spheroDriver.On(sphero.Collision, func(data interface{}) {
+				fmt.Println("Collision Detected!")
+			})
+
+			gobot.Every(1*time.Second, func() {
+				spheroDriver.Roll(100, uint16(gobot.Rand(360)))
+			})
+
+			gobot.Every(3*time.Second, func() {
+				spheroDriver.SetRGB(uint8(gobot.Rand(255)),
+					uint8(gobot.Rand(255)),
+					uint8(gobot.Rand(255)),
+				)
+			})
+		}
+
+		robot := gobot.NewRobot("sphero",
+			[]gobot.Connection{spheroAdaptor},
+			[]gobot.Device{spheroDriver},
+			work,
+		)
+
+		master.AddRobot(robot)
+	}
+
+	master.Start()
 }
 ```
 
