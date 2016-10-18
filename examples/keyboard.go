@@ -8,8 +8,6 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
-
 	keys := keyboard.NewDriver()
 
 	work := func() {
@@ -30,7 +28,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

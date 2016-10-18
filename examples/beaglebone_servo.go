@@ -10,7 +10,6 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
 	beagleboneAdaptor := beaglebone.NewAdaptor()
 	servo := gpio.NewServoDriver(beagleboneAdaptor, "P9_14")
 
@@ -28,7 +27,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

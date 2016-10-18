@@ -10,8 +10,6 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
-
 	firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
 	mpu6050 := i2c.NewMPU6050Driver(firmataAdaptor)
 
@@ -29,7 +27,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

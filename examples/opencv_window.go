@@ -7,8 +7,6 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
-
 	window := opencv.NewWindowDriver()
 	camera := opencv.NewCameraDriver(0)
 
@@ -23,7 +21,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

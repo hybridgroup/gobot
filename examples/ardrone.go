@@ -8,8 +8,6 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
-
 	ardroneAdaptor := ardrone.NewAdaptor()
 	drone := ardrone.NewDriver(ardroneAdaptor)
 
@@ -27,7 +25,6 @@ func main() {
 		[]gobot.Device{drone},
 		work,
 	)
-	gbot.AddRobot(robot)
 
-	gbot.Start()
+	robot.Start()
 }

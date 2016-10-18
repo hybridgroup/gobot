@@ -16,7 +16,7 @@ type conway struct {
 }
 
 func main() {
-	gbot := gobot.NewMaster()
+	master := gobot.NewMaster()
 
 	spheros := []string{
 		"/dev/rfcomm0",
@@ -58,10 +58,11 @@ func main() {
 			[]gobot.Device{cell},
 			work,
 		)
-		gbot.AddRobot(robot)
+
+		master.AddRobot(robot)
 	}
 
-	gbot.Start()
+	master.Start()
 }
 
 func (c *conway) resetContacts() {

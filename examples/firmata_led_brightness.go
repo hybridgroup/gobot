@@ -9,8 +9,6 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
-
 	firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
 	led := gpio.NewLedDriver(firmataAdaptor, "3")
 
@@ -33,7 +31,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

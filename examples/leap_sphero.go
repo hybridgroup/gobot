@@ -9,8 +9,6 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
-
 	leapAdaptor := leap.NewAdaptor("127.0.0.1:6437")
 	spheroAdaptor := sphero.NewAdaptor("/dev/tty.Sphero-YBW-RN-SPP")
 
@@ -36,9 +34,7 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }
 
 func scale(position float64) uint8 {

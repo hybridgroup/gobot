@@ -9,8 +9,6 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
-
 	bleAdaptor := ble.NewClientAdaptor(os.Args[1])
 	ollie := ble.NewSpheroOllieDriver(bleAdaptor)
 
@@ -27,7 +25,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

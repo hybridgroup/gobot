@@ -10,8 +10,6 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
-
 	firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
 	lidar := i2c.NewLIDARLiteDriver(firmataAdaptor)
 
@@ -28,7 +26,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

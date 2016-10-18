@@ -10,8 +10,8 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
-	a := api.NewAPI(gbot)
+	master := gobot.NewMaster()
+	a := api.NewAPI(master)
 	a.Start()
 
 	board := edison.NewAdaptor()
@@ -72,7 +72,7 @@ func main() {
 		return enabled
 	})
 
-	gbot.AddRobot(robot)
+	master.AddRobot(robot)
 
-	gbot.Start()
+	master.Start()
 }

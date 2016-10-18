@@ -9,8 +9,6 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
-
 	adaptor := sphero.NewAdaptor("/dev/rfcomm0")
 	spheroDriver := sphero.NewSpheroDriver(adaptor)
 
@@ -43,7 +41,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

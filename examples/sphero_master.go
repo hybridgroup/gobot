@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
+	master := gobot.NewMaster()
 
 	spheros := map[string]string{
 		"Sphero-BPO": "/dev/rfcomm0",
@@ -28,13 +28,13 @@ func main() {
 			work,
 		)
 
-		gbot.AddRobot(robot)
+		master.AddRobot(robot)
 	}
 
 	robot := gobot.NewRobot("",
 		func() {
 			gobot.Every(1*time.Second, func() {
-				sphero := gbot.Robot("Sphero-BPO").Device("sphero").(*sphero.SpheroDriver)
+				sphero := master.Robot("Sphero-BPO").Device("sphero").(*sphero.SpheroDriver)
 				sphero.SetRGB(uint8(gobot.Rand(255)),
 					uint8(gobot.Rand(255)),
 					uint8(gobot.Rand(255)),
@@ -43,7 +43,7 @@ func main() {
 		},
 	)
 
-	gbot.AddRobot(robot)
+	master.AddRobot(robot)
 
-	gbot.Start()
+	master.Start()
 }

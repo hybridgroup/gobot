@@ -9,8 +9,8 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
-	a := api.NewAPI(gbot)
+	master := gobot.NewMaster()
+	a := api.NewAPI(master)
 	a.Port = "8080"
 	a.Start()
 
@@ -29,7 +29,7 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
+	master.AddRobot(robot)
 
-	gbot.Start()
+	master.Start()
 }

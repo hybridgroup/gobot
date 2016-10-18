@@ -9,8 +9,6 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
-
 	natsAdaptor := nats.NewAdaptorWithAuth("localhost:4222", 1234, "user", "pass")
 
 	work := func() {
@@ -34,7 +32,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

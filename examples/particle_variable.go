@@ -9,8 +9,6 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
-
 	core := particle.NewAdaptor("DEVICE_ID", "ACCESS_TOKEN")
 
 	work := func() {
@@ -28,7 +26,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

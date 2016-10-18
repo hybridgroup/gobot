@@ -9,8 +9,6 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
-
 	e := edison.NewAdaptor()
 	touch := gpio.NewGroveTouchDriver(e, "2")
 
@@ -31,7 +29,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

@@ -10,8 +10,6 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
-
 	firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
 	blinkm := i2c.NewBlinkMDriver(firmataAdaptor)
 
@@ -32,6 +30,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-	gbot.Start()
+	robot.Start()
 }

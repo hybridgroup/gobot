@@ -10,8 +10,6 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
-
 	bleAdaptor := ble.NewClientAdaptor(os.Args[1])
 	battery := ble.NewBatteryDriver(bleAdaptor)
 
@@ -27,7 +25,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

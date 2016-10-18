@@ -8,8 +8,6 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
-
 	robot := gobot.NewRobot(
 		"hello",
 		func() {
@@ -24,7 +22,5 @@ func main() {
 		},
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

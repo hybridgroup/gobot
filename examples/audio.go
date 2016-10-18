@@ -8,8 +8,6 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
-
 	e := audio.NewAdaptor()
 	laser := audio.NewDriver(e, "./examples/laser.mp3")
 
@@ -25,7 +23,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

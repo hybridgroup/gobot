@@ -9,8 +9,6 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
-
 	chipAdaptor := chip.NewAdaptor()
 	led := gpio.NewLedDriver(chipAdaptor, "XIO-P0")
 
@@ -26,7 +24,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

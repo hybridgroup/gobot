@@ -9,7 +9,6 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
 	beagleboneAdaptor := beaglebone.NewAdaptor()
 	led := gpio.NewLedDriver(beagleboneAdaptor, "P9_14")
 
@@ -32,7 +31,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

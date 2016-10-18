@@ -6,9 +6,7 @@ import (
 )
 
 func main() {
-
 	// Use Gobot to control BeagleBone's digital pins directly
-
 	beagleboneAdaptor := beaglebone.NewAdaptor()
 	gpioPin := gpio.NewDirectPinDriver(beagleboneAdaptor, "P9_12")
 

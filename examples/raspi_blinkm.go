@@ -10,7 +10,6 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
 	r := raspi.NewAdaptor()
 	blinkm := i2c.NewBlinkMDriver(r)
 
@@ -31,7 +30,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

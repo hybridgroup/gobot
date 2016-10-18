@@ -53,8 +53,6 @@ func ffmpeg() (stdin io.WriteCloser, stderr io.ReadCloser, err error) {
 }
 
 func main() {
-	gbot := gobot.NewMaster()
-
 	joystickAdaptor := joystick.NewAdaptor()
 	stick := joystick.NewDriver(joystickAdaptor,
 		"./platforms/joystick/configs/dualshock3.json",
@@ -170,9 +168,7 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }
 
 func validatePitch(data float64, offset float64) int {

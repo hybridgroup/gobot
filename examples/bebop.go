@@ -8,8 +8,6 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
-
 	bebopAdaptor := bebop.NewAdaptor()
 	drone := bebop.NewDriver(bebopAdaptor)
 
@@ -29,7 +27,6 @@ func main() {
 		[]gobot.Device{drone},
 		work,
 	)
-	gbot.AddRobot(robot)
 
-	gbot.Start()
+	robot.Start()
 }

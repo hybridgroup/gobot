@@ -7,8 +7,8 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
-	api.NewAPI(gbot).Start()
+	master := gobot.NewMaster()
+	api.NewAPI(master).Start()
 
 	spheros := map[string]string{
 		"Sphero-BPO": "/dev/rfcomm0",
@@ -32,8 +32,8 @@ func main() {
 			return nil
 		})
 
-		gbot.AddRobot(robot)
+		master.AddRobot(robot)
 	}
 
-	gbot.Start()
+	master.Start()
 }

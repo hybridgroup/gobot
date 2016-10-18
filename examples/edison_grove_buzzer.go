@@ -9,8 +9,6 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
-
 	board := edison.NewAdaptor()
 	buzzer := gpio.NewBuzzerDriver(board, "3")
 
@@ -49,7 +47,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

@@ -10,7 +10,6 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
 	beagleboneAdaptor := beaglebone.NewAdaptor()
 	blinkm := i2c.NewBlinkMDriver(beagleboneAdaptor)
 
@@ -31,7 +30,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

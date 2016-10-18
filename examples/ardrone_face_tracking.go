@@ -16,8 +16,6 @@ import (
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	gbot := gobot.NewMaster()
-
 	_, currentfile, _, _ := runtime.Caller(0)
 	cascade := path.Join(path.Dir(currentfile), "haarcascade_frontalface_alt.xml")
 	window := opencv.NewWindowDriver()
@@ -76,7 +74,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

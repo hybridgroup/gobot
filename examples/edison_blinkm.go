@@ -10,8 +10,6 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
-
 	e := edison.NewAdaptor()
 	blinkm := i2c.NewBlinkMDriver(e)
 
@@ -32,6 +30,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-	gbot.Start()
+	robot.Start()
 }

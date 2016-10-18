@@ -10,8 +10,6 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
-
 	board := edison.NewAdaptor()
 	accel := i2c.NewGroveAccelerometerDriver(board)
 
@@ -32,7 +30,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

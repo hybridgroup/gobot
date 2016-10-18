@@ -10,9 +10,8 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
-
-	a := api.NewAPI(gbot)
+	master := gobot.NewMaster()
+	a := api.NewAPI(master)
 	a.Start()
 
 	firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
@@ -30,7 +29,7 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
+	master.AddRobot(robot)
 
-	gbot.Start()
+	master.Start()
 }

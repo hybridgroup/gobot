@@ -10,8 +10,6 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
-
 	mqttAdaptor := mqtt.NewAdaptor("tcp://test.mosquitto.org:1883", "blinker")
 	firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
 	led := gpio.NewLedDriver(firmataAdaptor, "13")
@@ -38,7 +36,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

@@ -13,9 +13,11 @@ import (
 // golang library to interact with sensors and other devices.
 func main() {
 	e := edison.NewAdaptor()
-	led := gpio.NewLedDriver(e, "13")
 	e.Connect()
+
+	led := gpio.NewLedDriver(e, "13")
 	led.Start()
+
 	for {
 		led.Toggle()
 		time.Sleep(1000 * time.Millisecond)

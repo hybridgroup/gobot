@@ -9,8 +9,6 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
-
 	beagleboneAdaptor := beaglebone.NewAdaptor()
 	button := gpio.NewButtonDriver(beagleboneAdaptor, "P8_9")
 
@@ -29,6 +27,6 @@ func main() {
 		[]gobot.Device{button},
 		work,
 	)
-	gbot.AddRobot(robot)
-	gbot.Start()
+
+	robot.Start()
 }

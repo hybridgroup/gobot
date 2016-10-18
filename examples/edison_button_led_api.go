@@ -9,8 +9,8 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
-	api.NewAPI(gbot).Start()
+	master := gobot.NewMaster()
+	api.NewAPI(master).Start()
 
 	e := edison.NewAdaptor()
 
@@ -32,7 +32,7 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
+	master.AddRobot(robot)
 
-	gbot.Start()
+	master.Start()
 }

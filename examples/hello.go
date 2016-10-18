@@ -8,16 +8,11 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
-
 	robot := gobot.NewRobot(
-		"hello",
 		func() {
 			gobot.Every(500*time.Millisecond, func() { fmt.Println("Greetings human") })
 		},
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

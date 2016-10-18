@@ -14,8 +14,6 @@ func main() {
 	_, currentfile, _, _ := runtime.Caller(0)
 	cascade := path.Join(path.Dir(currentfile), "haarcascade_frontalface_alt.xml")
 
-	gbot := gobot.NewMaster()
-
 	window := opencv.NewWindowDriver()
 	camera := opencv.NewCameraDriver(0)
 
@@ -43,7 +41,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }
