@@ -114,7 +114,7 @@ func main() {
 
 #### "Master" Gobot
 
-You can also use the "Master Gobot" to control swarms of robots. For example:
+You can also use the full capabilities of the framework aka "Master Gobot" to control swarms of robots or other features such as the built-in API server. For example:
 
 ```go
 package main
@@ -127,8 +127,39 @@ import (
 	"github.com/hybridgroup/gobot/platforms/sphero"
 )
 
+func NewSwarmBot(port string) *gobot.Robot {
+	spheroAdaptor := sphero.NewAdaptor(port)
+	spheroDriver := sphero.NewSpheroDriver(spheroAdaptor)
+	spheroDriver.SetName("Sphero" + port)
+
+	work := func() {
+		spheroDriver.Stop()
+
+		spheroDriver.On(sphero.Collision, func(data interface{}) {
+			fmt.Println("Collision Detected!")
+		})
+
+		gobot.Every(1*time.Second, func() {
+			spheroDriver.Roll(100, uint16(gobot.Rand(360)))
+		})
+		gobot.Every(3*time.Second, func() {
+			spheroDriver.SetRGB(uint8(gobot.Rand(255)),
+				uint8(gobot.Rand(255)),
+				uint8(gobot.Rand(255)),
+			)
+		})
+	}
+
+	robot := gobot.NewRobot("sphero",
+		[]gobot.Connection{spheroAdaptor},
+		[]gobot.Device{spheroDriver},
+		work,
+	)
+
+	return robot
+}
+
 func main() {
-	// creates the Master
 	master := gobot.NewMaster()
 
 	spheros := []string{
@@ -139,39 +170,9 @@ func main() {
 	}
 
 	for _, port := range spheros {
-		spheroAdaptor := sphero.NewAdaptor(port)
-		spheroDriver := sphero.NewSpheroDriver(spheroAdaptor)
-		spheroDriver.SetName("Sphero" + port)
-
-		work := func() {
-			spheroDriver.Stop()
-
-			spheroDriver.On(sphero.Collision, func(data interface{}) {
-				fmt.Println("Collision Detected!")
-			})
-
-			gobot.Every(1*time.Second, func() {
-				spheroDriver.Roll(100, uint16(gobot.Rand(360)))
-			})
-
-			gobot.Every(3*time.Second, func() {
-				spheroDriver.SetRGB(uint8(gobot.Rand(255)),
-					uint8(gobot.Rand(255)),
-					uint8(gobot.Rand(255)),
-				)
-			})
-		}
-
-		robot := gobot.NewRobot("sphero",
-			[]gobot.Connection{spheroAdaptor},
-			[]gobot.Device{spheroDriver},
-			work,
-		)
-
-		master.AddRobot(robot)
+		master.AddRobot(NewSwarmBot(port))
 	}
 
-	// starts all the robots at once
 	master.Start()
 }
 ```
