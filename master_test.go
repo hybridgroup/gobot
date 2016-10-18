@@ -19,7 +19,7 @@ func TestConnectionEach(t *testing.T) {
 	gobottest.Assert(t, r.Connections().Len(), i)
 }
 
-func initTestGobot() *Master {
+func initTestMaster() *Master {
 	log.SetOutput(&NullReadWriteCloser{})
 	g := NewMaster()
 	g.trap = func(c chan os.Signal) {
@@ -28,6 +28,17 @@ func initTestGobot() *Master {
 	g.AddRobot(newTestRobot("Robot1"))
 	g.AddRobot(newTestRobot("Robot2"))
 	g.AddRobot(newTestRobot(""))
+	return g
+}
+
+func initTestMaster1Robot() *Master {
+	log.SetOutput(&NullReadWriteCloser{})
+	g := NewMaster()
+	g.trap = func(c chan os.Signal) {
+		c <- os.Interrupt
+	}
+	g.AddRobot(newTestRobot("Robot99"))
+
 	return g
 }
 
@@ -45,7 +56,7 @@ func TestNullReadWriteCloser(t *testing.T) {
 }
 
 func TestGobotRobot(t *testing.T) {
-	g := initTestGobot()
+	g := initTestMaster()
 	gobottest.Assert(t, g.Robot("Robot1").Name, "Robot1")
 	gobottest.Assert(t, g.Robot("Robot4"), (*Robot)(nil))
 	gobottest.Assert(t, g.Robot("Robot4").Device("Device1"), (Device)(nil))
@@ -58,7 +69,7 @@ func TestGobotRobot(t *testing.T) {
 }
 
 func TestGobotToJSON(t *testing.T) {
-	g := initTestGobot()
+	g := initTestMaster()
 	g.AddCommand("test_function", func(params map[string]interface{}) interface{} {
 		return nil
 	})
@@ -67,24 +78,14 @@ func TestGobotToJSON(t *testing.T) {
 	gobottest.Assert(t, len(json.Commands), len(g.Commands()))
 }
 
-func TestGobotStart(t *testing.T) {
-	g := initTestGobot()
+func TestMasterStart(t *testing.T) {
+	g := initTestMaster()
 	gobottest.Assert(t, len(g.Start()), 0)
 	gobottest.Assert(t, len(g.Stop()), 0)
 }
 
-func TestGobotStartErrors(t *testing.T) {
-	log.SetOutput(&NullReadWriteCloser{})
-	g := NewMaster()
-
-	adaptor1 := newTestAdaptor("Connection1", "/dev/null")
-	driver1 := newTestDriver(adaptor1, "Device1", "0")
-	r := NewRobot("Robot1",
-		[]Connection{adaptor1},
-		[]Device{driver1},
-	)
-
-	g.AddRobot(r)
+func TestMasterStartDriverErrors(t *testing.T) {
+	g := initTestMaster1Robot()
 
 	testDriverStart = func() (errs []error) {
 		return []error{
@@ -96,6 +97,11 @@ func TestGobotStartErrors(t *testing.T) {
 	gobottest.Assert(t, len(g.Stop()), 0)
 
 	testDriverStart = func() (errs []error) { return }
+}
+
+func TestMasterStartAdaptorErrors(t *testing.T) {
+	g := initTestMaster1Robot()
+
 	testAdaptorConnect = func() (errs []error) {
 		return []error{
 			errors.New("adaptor start error 1"),
@@ -105,12 +111,11 @@ func TestGobotStartErrors(t *testing.T) {
 	gobottest.Assert(t, len(g.Start()), 1)
 	gobottest.Assert(t, len(g.Stop()), 0)
 
-	testDriverStart = func() (errs []error) { return }
 	testAdaptorConnect = func() (errs []error) { return }
+}
 
-	g.trap = func(c chan os.Signal) {
-		c <- os.Interrupt
-	}
+func TestMasterHaltErrors(t *testing.T) {
+	g := initTestMaster1Robot()
 
 	testDriverHalt = func() (errs []error) {
 		return []error{
@@ -125,5 +130,5 @@ func TestGobotStartErrors(t *testing.T) {
 	}
 
 	gobottest.Assert(t, len(g.Start()), 0)
-	gobottest.Assert(t, len(g.Stop()), 2)
+	gobottest.Assert(t, len(g.Stop()), 6)
 }

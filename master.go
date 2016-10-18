@@ -61,6 +61,7 @@ func (g *Master) Start() (errs []error) {
 			log.Println("Error:", err)
 			errs = append(errs, err)
 		}
+		return
 	}
 
 	if g.AutoRun {

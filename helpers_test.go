@@ -1,5 +1,7 @@
 package gobot
 
+import "os"
+
 type NullReadWriteCloser struct{}
 
 func (NullReadWriteCloser) Write(p []byte) (int, error) {
@@ -79,6 +81,9 @@ func newTestRobot(name string) *Robot {
 		work,
 	)
 	r.AddCommand("RobotCommand", func(params map[string]interface{}) interface{} { return nil })
+	r.trap = func(c chan os.Signal) {
+		c <- os.Interrupt
+	}
 
 	return r
 }

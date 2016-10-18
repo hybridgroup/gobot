@@ -107,7 +107,7 @@ func NewRobot(v ...interface{}) *Robot {
 		Name:        fmt.Sprintf("%X", Rand(int(^uint(0)>>1))),
 		connections: &Connections{},
 		devices:     &Devices{},
-		done:        make(chan bool),
+		done:        make(chan bool, 1),
 		trap: func(c chan os.Signal) {
 			signal.Notify(c, os.Interrupt)
 		},
@@ -157,13 +157,15 @@ func (r *Robot) Start(args ...interface{}) (errs []error) {
 		errs = append(errs, derrs...)
 		return
 	}
-	if r.Work != nil {
-		log.Println("Starting work...")
-		go func() {
-			r.Work()
-			<-r.done
-		}()
+	if r.Work == nil {
+		r.Work = func() {}
 	}
+
+	log.Println("Starting work...")
+	go func() {
+		r.Work()
+		<-r.done
+	}()
 
 	if r.AutoRun {
 		c := make(chan os.Signal, 1)
@@ -177,7 +179,7 @@ func (r *Robot) Start(args ...interface{}) (errs []error) {
 		// waiting for interrupt coming on the channel
 		<-c
 
-		// Stop calls the Stop method on itself, it we are "auto-running".
+		// Stop calls the Stop method on itself, if we are "auto-running".
 		r.Stop()
 	}
 
