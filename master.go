@@ -32,9 +32,9 @@ func NewJSONMaster(gobot *Master) *JSONMaster {
 // Master is the main type of your Gobot application and contains a collection of
 // Robots, API commands that apply to the Master, and Events that apply to the Master.
 type Master struct {
-	robots   *Robots
-	trap     func(chan os.Signal)
-	AutoStop bool
+	robots  *Robots
+	trap    func(chan os.Signal)
+	AutoRun bool
 	Commander
 	Eventer
 }
@@ -46,7 +46,7 @@ func NewMaster() *Master {
 		trap: func(c chan os.Signal) {
 			signal.Notify(c, os.Interrupt)
 		},
-		AutoStop:  true,
+		AutoRun:   true,
 		Commander: NewCommander(),
 		Eventer:   NewEventer(),
 	}
@@ -56,14 +56,14 @@ func NewMaster() *Master {
 // error, call Stop to ensure that all robots are returned to a sane, stopped
 // state.
 func (g *Master) Start() (errs []error) {
-	if rerrs := g.robots.Start(); len(rerrs) > 0 {
+	if rerrs := g.robots.Start(!g.AutoRun); len(rerrs) > 0 {
 		for _, err := range rerrs {
 			log.Println("Error:", err)
 			errs = append(errs, err)
 		}
 	}
 
-	if g.AutoStop {
+	if g.AutoRun {
 		c := make(chan os.Signal, 1)
 		g.trap(c)
 		if len(errs) > 0 {

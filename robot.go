@@ -3,6 +3,8 @@ package gobot
 import (
 	"fmt"
 	"log"
+	"os"
+	"os/signal"
 )
 
 // JSONRobot a JSON representation of a Robot.
@@ -42,6 +44,8 @@ type Robot struct {
 	Work        func()
 	connections *Connections
 	devices     *Devices
+	trap        func(chan os.Signal)
+	AutoRun     bool
 	done        chan bool
 	Commander
 	Eventer
@@ -56,9 +60,13 @@ func (r *Robots) Len() int {
 }
 
 // Start calls the Start method of each Robot in the collection
-func (r *Robots) Start() (errs []error) {
+func (r *Robots) Start(args ...interface{}) (errs []error) {
+	autoRun := true
+	if args[0] != nil {
+		autoRun = args[0].(bool)
+	}
 	for _, robot := range *r {
-		if errs = robot.Start(); len(errs) > 0 {
+		if errs = robot.Start(autoRun); len(errs) > 0 {
 			for i, err := range errs {
 				errs[i] = fmt.Errorf("Robot %q: %v", robot.Name, err)
 			}
@@ -100,9 +108,13 @@ func NewRobot(v ...interface{}) *Robot {
 		connections: &Connections{},
 		devices:     &Devices{},
 		done:        make(chan bool),
-		Work:        nil,
-		Eventer:     NewEventer(),
-		Commander:   NewCommander(),
+		trap: func(c chan os.Signal) {
+			signal.Notify(c, os.Interrupt)
+		},
+		AutoRun:   true,
+		Work:      nil,
+		Eventer:   NewEventer(),
+		Commander: NewCommander(),
 	}
 
 	for i := range v {
@@ -132,7 +144,10 @@ func NewRobot(v ...interface{}) *Robot {
 }
 
 // Start a Robot's Connections, Devices, and work.
-func (r *Robot) Start() (errs []error) {
+func (r *Robot) Start(args ...interface{}) (errs []error) {
+	if len(args) > 0 && args[0] != nil {
+		r.AutoRun = args[0].(bool)
+	}
 	log.Println("Starting Robot", r.Name, "...")
 	if cerrs := r.Connections().Start(); len(cerrs) > 0 {
 		errs = append(errs, cerrs...)
@@ -149,6 +164,23 @@ func (r *Robot) Start() (errs []error) {
 			<-r.done
 		}()
 	}
+
+	if r.AutoRun {
+		c := make(chan os.Signal, 1)
+		r.trap(c)
+		if len(errs) > 0 {
+			// there was an error during start, so we immediately pass the interrupt
+			// in order to disconnect the initialized robots, connections and devices
+			c <- os.Interrupt
+		}
+
+		// waiting for interrupt coming on the channel
+		<-c
+
+		// Stop calls the Stop method on itself, it we are "auto-running".
+		r.Stop()
+	}
+
 	return
 }
 
