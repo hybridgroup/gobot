@@ -124,6 +124,7 @@ import (
 	"time"
 
 	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/api"
 	"github.com/hybridgroup/gobot/platforms/sphero"
 )
 
@@ -161,6 +162,7 @@ func NewSwarmBot(port string) *gobot.Robot {
 
 func main() {
 	master := gobot.NewMaster()
+	api.NewAPI(master).Start()
 
 	spheros := []string{
 		"/dev/rfcomm0",
