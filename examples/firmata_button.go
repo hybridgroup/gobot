@@ -11,7 +11,7 @@ func main() {
 
 	firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
 
-	button := gpio.NewButtonDriver(firmataAdaptor, "2")
+	button := gpio.NewButtonDriver(firmataAdaptor, "5")
 	led := gpio.NewLedDriver(firmataAdaptor, "13")
 
 	work := func() {
