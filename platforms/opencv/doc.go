@@ -20,8 +20,6 @@ Example:
 	)
 
 	func main() {
-		gbot := gobot.NewMaster()
-
 		window := opencv.NewWindowDriver()
 		camera := opencv.NewCameraDriver(0)
 
@@ -36,9 +34,7 @@ Example:
 			work,
 		)
 
-		gbot.AddRobot(robot)
-
-		gbot.Start()
+		robot.Start()
 	}
 
 For further information refer to opencv README:

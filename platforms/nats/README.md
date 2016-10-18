@@ -1,6 +1,6 @@
 # NATS
 
-NATS is a lightweight messaging protocol perfect for your IoT/Robotics projects. It operates over TCP, offers a great number of features but an incredibly simple Pub Sub style model of communicating broadcast messages. NATS is blazingly fast as it is written in Go. 
+NATS is a lightweight messaging protocol perfect for your IoT/Robotics projects. It operates over TCP, offers a great number of features but an incredibly simple Pub Sub style model of communicating broadcast messages. NATS is blazingly fast as it is written in Go.
 
 This repository contains the Gobot adaptor/drivers to connect to NATS servers. It uses the NATS Go Client available at https://github.com/nats-io/nats. The NATS project is maintained by Nats.io and sponsored by Apcera. Find more information on setting up a NATS server and its capability at http://nats.io/.
 
@@ -30,8 +30,6 @@ import (
 )
 
 func main() {
-  gbot := gobot.NewMaster()
-
   natsAdaptor := nats.NewNatsAdaptor("nats", "localhost:4222", 1234)
 
   work := func() {
@@ -55,9 +53,7 @@ func main() {
     work,
   )
 
-  gbot.AddRobot(robot)
-
-  gbot.Start()
+  robot.Start()
 }
 ```
 

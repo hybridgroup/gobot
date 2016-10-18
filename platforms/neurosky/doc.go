@@ -17,8 +17,6 @@ Example:
 	)
 
 	func main() {
-		gbot := gobot.NewMaster()
-
 		adaptor := neurosky.NewAdaptor("/dev/rfcomm0")
 		neuro := neurosky.NewDriver(adaptor)
 
@@ -61,8 +59,7 @@ Example:
 			work,
 		)
 
-		gbot.AddRobot(robot)
-		gbot.Start()
+		robot.Start()
 	}
 
 For further information refer to neuroky README:

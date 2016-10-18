@@ -151,8 +151,6 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
-
 	joystickAdaptor := joystick.NewAdaptor()
 	joystick := joystick.NewDriver(joystickAdaptor,
 		"./platforms/joystick/configs/dualshock3.json",
@@ -191,8 +189,6 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }
 ```

@@ -20,8 +20,6 @@ Example:
 	)
 
 	func main() {
-		gbot := gobot.NewMaster()
-
 		joystickAdaptor := joystick.NewAdaptor()
 		joystick := joystick.NewDriver(joystickAdaptor,
 			"./platforms/joystick/configs/dualshock3.json",
@@ -60,9 +58,7 @@ Example:
 			work,
 		)
 
-		gbot.AddRobot(robot)
-
-		gbot.Start()
+		robot.Start()
 	}
 
 For further information refer to joystick README:

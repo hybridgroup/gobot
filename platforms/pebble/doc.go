@@ -23,8 +23,8 @@ Before running the example, make sure configuration settings match with your pro
 	)
 
 	func main() {
-		gbot := gobot.NewMaster()
-		api.NewAPI(gbot).Start()
+		master := gobot.NewMaster()
+		api.NewAPI(master).Start()
 
 		pebbleAdaptor := pebble.NewAdaptor()
 		watch := pebble.NewDriver(pebbleAdaptor)
@@ -46,9 +46,9 @@ Before running the example, make sure configuration settings match with your pro
 			work,
 		)
 
-		gbot.AddRobot(robot)
+		master.AddRobot(robot)
 
-		gbot.Start()
+		master.Start()
 	}
 
 For more information refer to the pebble README:

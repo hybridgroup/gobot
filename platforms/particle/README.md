@@ -26,8 +26,6 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
-
 	core := particle.NewAdaptor("device_id", "access_token")
 	led := gpio.NewLedDriver(core, "D7")
 
@@ -43,8 +41,6 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }
 ```

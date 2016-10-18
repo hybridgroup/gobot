@@ -18,8 +18,6 @@ Example:
 	)
 
 	func main() {
-		gbot := gobot.NewMaster()
-
 		adaptor := mavlink.NewAdaptor("/dev/ttyACM0")
 		iris := mavlink.NewDriver(adaptor)
 
@@ -61,9 +59,7 @@ Example:
 			work,
 		)
 
-		gbot.AddRobot(robot)
-
-		gbot.Start()
+		robot.Start()
 	}
 
 For further information refer to mavlink README:

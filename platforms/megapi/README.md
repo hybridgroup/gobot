@@ -22,8 +22,6 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
-
 	// use "/dev/ttyUSB0" if connecting with USB cable
 	// use "/dev/ttyAMA0" on devices older than Raspberry Pi 3 Model B
 	megaPiAdaptor := megapi.NewAdaptor("/dev/ttyS0")
@@ -48,8 +46,6 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }
 ```

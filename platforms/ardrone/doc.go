@@ -17,8 +17,6 @@ Example:
 	)
 
 	func main() {
-		gbot := gobot.NewMaster()
-
 		ardroneAdaptor := ardrone.NewAdaptor()
 		drone := ardrone.NewDriver(ardroneAdaptor)
 
@@ -36,9 +34,8 @@ Example:
 			[]gobot.Device{drone},
 			work,
 		)
-		gbot.AddRobot(robot)
 
-		gbot.Start()
+		robot.Start()
 	}
 
 For more information refer to the ardrone README:

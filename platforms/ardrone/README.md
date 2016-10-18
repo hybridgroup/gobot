@@ -20,8 +20,6 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
-
 	ardroneAdaptor := ardrone.NewArdroneAdaptor("Drone")
 	drone := ardrone.NewArdroneDriver(ardroneAdaptor, "Drone")
 
@@ -39,11 +37,11 @@ func main() {
 		[]gobot.Device{drone},
 		work,
 	)
-	gbot.AddRobot(robot)
 
-	gbot.Start()
+	robot.Start()
 }
 ```
+
 ## How to Connect
 
 The ARDrone is a WiFi device, so there is no additional work to establish a connection to a single drone. However, in order to connect to multiple drones, you need to perform some configuration steps on each drone via SSH.

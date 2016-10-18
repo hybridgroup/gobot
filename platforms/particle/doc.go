@@ -18,8 +18,6 @@ Example:
 	)
 
 	func main() {
-		gbot := gobot.NewMaster()
-
 		core := paticle.NewAdaptor("device_id", "access_token")
 		led := gpio.NewLedDriver(core, "D7")
 
@@ -35,9 +33,7 @@ Example:
 			work,
 		)
 
-		gbot.AddRobot(robot)
-
-		gbot.Start()
+		robot.Start()
 	}
 
 For further information refer to Particle readme:

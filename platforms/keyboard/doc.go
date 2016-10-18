@@ -19,8 +19,6 @@ Example:
 	)
 
 	func main() {
-		gbot := gobot.NewMaster()
-
 		keys := keyboard.NewDriver()
 
 		work := func() {
@@ -40,8 +38,6 @@ Example:
 			[]gobot.Device{keys},
 			work,
 		)
-
-		gbot.AddRobot(robot)
 
 		gbot.Start()
 	}

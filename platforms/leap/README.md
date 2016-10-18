@@ -27,8 +27,6 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
-
 	leapMotionAdaptor := leap.NewAdaptor("127.0.0.1:6437")
 	l := leap.NewDriver(leapMotionAdaptor)
 
@@ -44,9 +42,7 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }
 ```
 

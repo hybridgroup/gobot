@@ -16,13 +16,11 @@ Example:
 		"time"
 
 		"github.com/hybridgroup/gobot"
-		"github.com/hybridgroup/gobot/platforms/digispark"
 		"github.com/hybridgroup/gobot/drivers/gpio"
+		"github.com/hybridgroup/gobot/platforms/digispark"
 	)
 
 	func main() {
-		gbot := gobot.NewMaster()
-
 		digisparkAdaptor := digispark.NewAdaptor()
 		led := gpio.NewLedDriver(digisparkAdaptor, "0")
 
@@ -38,9 +36,7 @@ Example:
 			work,
 		)
 
-		gbot.AddRobot(robot)
-
-		gbot.Start()
+		robot.Start()
 	}
 
 For further information refer to digispark README:

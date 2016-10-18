@@ -59,8 +59,6 @@ import (
 )
 
 func main() {
-	gbot := gobot.NewMaster()
-
 	e := edison.NewAdaptor()
 	led := gpio.NewLedDriver(e, "13")
 
@@ -76,9 +74,7 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }
 ```
 

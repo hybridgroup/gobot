@@ -39,13 +39,11 @@ import (
 	"time"
 
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/beaglebone"
 	"github.com/hybridgroup/gobot/drivers/gpio"
+	"github.com/hybridgroup/gobot/platforms/beaglebone"
 )
 
 func main() {
-	gbot := gobot.NewMaster()
-
 	beagleboneAdaptor := beaglebone.NewAdaptor()
 	led := gpio.NewLedDriver(beagleboneAdaptor, "P9_12")
 
@@ -61,8 +59,6 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }
 ```
