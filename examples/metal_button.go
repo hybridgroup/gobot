@@ -9,14 +9,14 @@ import (
 
 func main() {
 	e := edison.NewAdaptor()
-	led := gpio.NewLedDriver(e, "13")
-	button := gpio.NewButtonDriver(e, "5")
-
 	e.Connect()
-	led.Start()
-	button.Start()
 
+	led := gpio.NewLedDriver(e, "13")
+	led.Start()
 	led.Off()
+
+	button := gpio.NewButtonDriver(e, "5")
+	button.Start()
 
 	buttonEvents := button.Subscribe()
 	for {
