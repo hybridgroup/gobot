@@ -17,17 +17,13 @@ Basic Setup
     )
 
     func main() {
-      gbot  := gobot.NewMaster()
-
       robot := gobot.NewRobot("Eve", func() {
         gobot.Every(500*time.Millisecond, func() {
           fmt.Println("Greeting Human")
         })
       })
 
-      gbot.AddRobot(robot)
-
-      gbot.Start()
+      robot.Start()
     }
 
 Blinking an LED (Hello Eve!)
@@ -38,15 +34,13 @@ Blinking an LED (Hello Eve!)
     	"time"
 
     	"github.com/hybridgroup/gobot"
+      "github.com/hybridgroup/gobot/drivers/gpio"
     	"github.com/hybridgroup/gobot/platforms/firmata"
-    	"github.com/hybridgroup/gobot/platforms/gpio"
     )
 
     func main() {
-    	gbot := gobot.NewMaster()
-
-    	firmataAdaptor := firmata.NewFirmataAdaptor("arduino", "/dev/ttyACM0")
-    	led := gpio.NewLedDriver(firmataAdaptor, "led", "13")
+    	firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
+    	led := gpio.NewLedDriver(firmataAdaptor, "13")
 
     	work := func() {
     		gobot.Every(1*time.Second, func() {
@@ -60,9 +54,7 @@ Blinking an LED (Hello Eve!)
     		work,
     	)
 
-    	gbot.AddRobot(robot)
-
-    	gbot.Start()
+    	robot.Start()
     }
 
 Web Enabled? You bet! Gobot can be configured to expose a restful HTTP interface
@@ -81,24 +73,24 @@ web service.
     )
 
     func main() {
-    	gbot := gobot.NewMaster()
+    	master := gobot.NewMaster()
 
       // Starts the API server on default port 3000
-    	api.NewAPI(gbot).Start()
+    	api.NewAPI(master).Start()
 
       // Accessible via http://localhost:3000/api/commands/say_hello
-    	gbot.AddCommand("say_hello", func(params map[string]interface{}) interface{} {
+    	master.AddCommand("say_hello", func(params map[string]interface{}) interface{} {
     		return "Master says hello!"
     	})
 
-    	hello := gbot.AddRobot(gobot.NewRobot("Eve"))
+    	hello := master.AddRobot(gobot.NewRobot("Eve"))
 
       // Accessible via http://localhost:3000/robots/Eve/commands/say_hello
     	hello.AddCommand("say_hello", func(params map[string]interface{}) interface{} {
     		return fmt.Sprintf("%v says hello!", hello.Name)
     	})
 
-    	gbot.Start()
+    	master.Start()
     }
 
 */
