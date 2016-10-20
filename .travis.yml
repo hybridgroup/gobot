@@ -32,7 +32,7 @@ before_script:
  - export DISPLAY=:99.0
  - sh -e /etc/init.d/xvfb start
 script:
- - ./scripts/travis.sh
+ - ./ci/travis.sh
 branches:
   except:
     - gobot.io
