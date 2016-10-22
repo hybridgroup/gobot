@@ -30,14 +30,18 @@ var (
 const (
 	// Error event
 	Error = "error"
-	// Release event
+	// ButtonRelease event
 	ButtonRelease = "release"
-	// Push event
+	// ButtonPush event
 	ButtonPush = "push"
 	// Data event
 	Data = "data"
 	// Vibration event
 	Vibration = "vibration"
+	// MotionDetected event
+	MotionDetected = "motion-detected"
+	// MotionStopped event
+	MotionStopped = "motion-stopped"
 )
 
 // PwmWriter interface represents an Adaptor which has Pwm capabilities
