@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/hybridgroup/gobot"
-	"github.com/wfernandes/gobot/gobottest"
+	"github.com/hybridgroup/gobot/gobottest"
 )
 
 var _ gobot.Driver = (*GroveTemperatureSensorDriver)(nil)
