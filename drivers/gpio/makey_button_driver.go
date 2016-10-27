@@ -65,6 +65,8 @@ func (b *MakeyButtonDriver) Connection() gobot.Connection { return b.connection.
 func (b *MakeyButtonDriver) Start() (errs []error) {
 	state := 1
 	go func() {
+		timer := time.NewTimer(b.interval)
+		timer.Stop()
 		for {
 			newValue, err := b.connection.DigitalRead(b.Pin())
 			if err != nil {
@@ -79,8 +81,9 @@ func (b *MakeyButtonDriver) Start() (errs []error) {
 					b.Publish(ButtonRelease, newValue)
 				}
 			}
+			timer.Reset(b.interval)
 			select {
-			case <-time.After(b.interval):
+			case <-timer.C:
 			case <-b.halt:
 				return
 			}
