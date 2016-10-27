@@ -14,8 +14,11 @@ var _ gobot.Driver = (*AnalogSensorDriver)(nil)
 func TestAnalogSensorDriver(t *testing.T) {
 	d := NewAnalogSensorDriver(newGpioTestAdaptor(), "1")
 	gobottest.Refute(t, d.Connection(), nil)
+	// default interval
+	gobottest.Assert(t, d.interval, 10*time.Millisecond)
 
-	d = NewAnalogSensorDriver(newGpioTestAdaptor(), "1", 30*time.Second)
+	d = NewAnalogSensorDriver(newGpioTestAdaptor(), "42", 30*time.Second)
+	gobottest.Assert(t, d.Pin(), "42")
 	gobottest.Assert(t, d.interval, 30*time.Second)
 
 	testAdaptorAnalogRead = func() (val int, err error) {
@@ -33,18 +36,15 @@ func TestAnalogSensorDriverStart(t *testing.T) {
 
 	d := NewAnalogSensorDriver(newGpioTestAdaptor(), "1")
 
-	testAdaptorAnalogRead = func() (val int, err error) {
-		val = 0
-		return
-	}
 	gobottest.Assert(t, len(d.Start()), 0)
 
-	// data was received
+	// expect data to be received
 	d.Once(d.Event(Data), func(data interface{}) {
 		gobottest.Assert(t, data.(int), 100)
 		sem <- true
 	})
 
+	// send data
 	testAdaptorAnalogRead = func() (val int, err error) {
 		val = 100
 		return
@@ -56,12 +56,13 @@ func TestAnalogSensorDriverStart(t *testing.T) {
 		t.Errorf("AnalogSensor Event \"Data\" was not published")
 	}
 
-	// read error
+	// expect error to be received
 	d.Once(d.Event(Error), func(data interface{}) {
 		gobottest.Assert(t, data.(error).Error(), "read error")
 		sem <- true
 	})
 
+	// send error
 	testAdaptorAnalogRead = func() (val int, err error) {
 		err = errors.New("read error")
 		return

@@ -58,6 +58,8 @@ func NewAnalogSensorDriver(a AnalogReader, pin string, v ...time.Duration) *Anal
 func (a *AnalogSensorDriver) Start() (errs []error) {
 	value := 0
 	go func() {
+		timer := time.NewTimer(a.interval)
+		timer.Stop()
 		for {
 			newValue, err := a.Read()
 			if err != nil {
@@ -66,9 +68,12 @@ func (a *AnalogSensorDriver) Start() (errs []error) {
 				value = newValue
 				a.Publish(a.Event(Data), value)
 			}
+
+			timer.Reset(a.interval)
 			select {
-			case <-time.After(a.interval):
+			case <-timer.C:
 			case <-a.halt:
+				timer.Stop()
 				return
 			}
 		}
