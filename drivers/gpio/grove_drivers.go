@@ -174,3 +174,20 @@ func NewGroveTouchDriver(a DigitalReader, pin string, v ...time.Duration) *Grove
 		ButtonDriver: NewButtonDriver(a, pin, v...),
 	}
 }
+
+// GroveMagneticSwitchDriver represent a magnetic
+// switch sensor with a Grove connector
+type GroveMagneticSwitchDriver struct {
+	*ButtonDriver
+}
+
+// NewGroveMagneticSwitchDriver returns a new GroveMagneticSwitchDriver with a polling interval of
+// 10 Milliseconds given a DigitalReader, name and pin.
+//
+// Optionally accepts:
+//  time.Duration: Interval at which the ButtonDriver is polled for new information
+func NewGroveMagneticSwitchDriver(a DigitalReader, pin string, v ...time.Duration) *GroveMagneticSwitchDriver {
+	return &GroveMagneticSwitchDriver{
+		ButtonDriver: NewButtonDriver(a, pin, v...),
+	}
+}
