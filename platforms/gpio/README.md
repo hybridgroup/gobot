@@ -26,6 +26,7 @@ Gobot has a extensible system for connecting to hardware devices. The following 
   - Grove Rotary Dial
   - Grove Relay
   - Grove Temperature Sensor
+  - Grove Magnetic Switch Sensor
   - LED
   - Makey Button
   - Motor
