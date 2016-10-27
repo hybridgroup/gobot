@@ -95,8 +95,15 @@ func TestAnalogSensorDriverStart(t *testing.T) {
 
 func TestAnalogSensorDriverHalt(t *testing.T) {
 	d := NewAnalogSensorDriver(newGpioTestAdaptor(), "1")
+	done := make(chan struct{})
 	go func() {
 		<-d.halt
+		close(done)
 	}()
 	gobottest.Assert(t, len(d.Halt()), 0)
+	select {
+	case <-done:
+	case <-time.After(time.Millisecond):
+		t.Errorf("AnalogSensor was not halted")
+	}
 }
