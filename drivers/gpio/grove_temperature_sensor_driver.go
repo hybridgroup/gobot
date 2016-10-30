@@ -10,6 +10,7 @@ import (
 var _ gobot.Driver = (*GroveTemperatureSensorDriver)(nil)
 
 // GroveTemperatureSensorDriver represents a Temperature Sensor
+// The temperature is reported in degree Celsius
 type GroveTemperatureSensorDriver struct {
 	name        string
 	pin         string
