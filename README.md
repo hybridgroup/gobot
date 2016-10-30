@@ -218,6 +218,7 @@ a shared set of drivers provided using the `gobot/drivers/gpio` package:
 	- Grove Buzzer
 	- Grove LED
 	- Grove Light Sensor
+	- Grove Magnetic Switch
 	- Grove Piezo Vibration Sensor
 	- Grove Relay
 	- Grove Rotary Dial
@@ -235,6 +236,7 @@ Support for devices that use Inter-Integrated Circuit (I2C) have a shared set of
 drivers provided using the `gobot/drivers/i2c` package:
 
 - [I2C](https://en.wikipedia.org/wiki/I%C2%B2C) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/drivers/i2c)
+	- Adafruit Motor Hat
 	- BlinkM
 	- Grove Digital Accelerometer
 	- Grove RGB LCD
