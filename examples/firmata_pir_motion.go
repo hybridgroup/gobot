@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/drivers/gpio"
 	"github.com/hybridgroup/gobot/platforms/firmata"
@@ -14,9 +16,11 @@ func main() {
 
 	work := func() {
 		sensor.On(gpio.MotionDetected, func(data interface{}) {
+			fmt.Println(gpio.MotionDetected)
 			led.On()
 		})
 		sensor.On(gpio.MotionStopped, func(data interface{}) {
+			fmt.Println(gpio.MotionStopped)
 			led.Off()
 		})
 	}

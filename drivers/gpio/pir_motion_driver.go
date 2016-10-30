@@ -1,7 +1,6 @@
 package gpio
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/hybridgroup/gobot"
@@ -63,11 +62,12 @@ func (p *PIRMotionDriver) Start() (errs []error) {
 			if err != nil {
 				p.Publish(Error, err)
 			}
-			fmt.Println(newValue)
 			switch newValue {
 			case 1:
-				p.Active = true
-				p.Publish(MotionDetected, newValue)
+				if !p.Active {
+					p.Active = true
+					p.Publish(MotionDetected, newValue)
+				}
 			case 0:
 				if p.Active {
 					p.Active = false
