@@ -228,6 +228,7 @@ a shared set of drivers provided using the `gobot/drivers/gpio` package:
 	- LED
 	- Makey Button
 	- Motor
+	- Proximity Infra Red (PIR) Motion Sensor
 	- Relay
 	- RGB LED
 	- Servo
