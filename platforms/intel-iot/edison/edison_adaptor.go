@@ -93,14 +93,26 @@ func (e *Adaptor) SetBoard(n string) { e.board = n }
 func (e *Adaptor) Connect() (errs []error) {
 	e.digitalPins = make(map[int]sysfs.DigitalPin)
 	e.pwmPins = make(map[int]*pwmPin)
-	if e.board != "arduino" {
-		e.pinmap = miniboardPinMap
-		if err := e.miniboardSetup(); err != nil {
-			return []error{err}
-		}
-	}
-	if err := e.arduinoSetup(); err != nil {
-		return []error{err}
+
+	switch e.Board() {
+		case "sparkfun":
+			e.pinmap = sparkfunPinMap
+			if err := e.sparkfunSetup(); err != nil {
+				errs = append(errs, err)
+			}
+		case "arduino":
+			e.pinmap = arduinoPinMap
+			if err := e.arduinoSetup(); err != nil {
+				errs = append(errs, err)
+			}
+		case "miniboard":
+			e.pinmap = miniboardPinMap
+			if err := e.miniboardSetup(); err != nil {
+				errs = append(errs, err)
+			}
+	  default:
+			err := errors.New("Unknown board type: " + e.Board())
+			errs = append(errs, err)
 	}
 	return
 }
@@ -241,6 +253,10 @@ func (e *Adaptor) arduinoI2CSetup() (err error) {
 		return
 	}
 
+	return
+}
+
+func (e *Adaptor) sparkfunSetup() (err error) {
 	return
 }
 
