@@ -73,5 +73,5 @@ func main() {
 		}
 	}()
 
-	<-time.After(99 * time.Second)
+	time.Sleep(99 * time.Second)
 }

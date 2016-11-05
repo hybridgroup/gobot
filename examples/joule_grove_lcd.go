@@ -31,7 +31,7 @@ func main() {
 		})
 
 		screen.Home()
-		<-time.After(1 * time.Second)
+		time.Sleep(1 * time.Second)
 		screen.SetRGB(0, 0, 255)
 	}
 

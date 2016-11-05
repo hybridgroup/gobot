@@ -35,7 +35,7 @@ func main() {
 			fmt.Println("landed.")
 		})
 
-		<-time.After(1000 * time.Millisecond)
+		time.Sleep(1000 * time.Millisecond)
 		drone.TakeOff()
 	}
 

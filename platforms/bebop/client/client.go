@@ -285,13 +285,13 @@ func (b *Bebop) Connect() error {
 	// send pcmd values at 40hz
 	go func() {
 		// wait a little bit so that there is enough time to get some ACKs
-		<-time.After(500 * time.Millisecond)
+		time.Sleep(500 * time.Millisecond)
 		for {
 			_, err := b.write(b.generatePcmd().Bytes())
 			if err != nil {
 				fmt.Println("pcmd c2dClient.Write", err)
 			}
-			<-time.After(25 * time.Millisecond)
+			time.Sleep(25 * time.Millisecond)
 		}
 	}()
 

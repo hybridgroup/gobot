@@ -40,6 +40,6 @@ func main() {
 			panic(err)
 		}
 		fmt.Println("level:", level)
-		<-time.After(500 * time.Millisecond)
+		time.Sleep(500 * time.Millisecond)
 	}
 }

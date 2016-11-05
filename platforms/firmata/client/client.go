@@ -323,7 +323,7 @@ func (b *Client) read(length int) (buf []byte, err error) {
 			if err.Error() != "EOF" {
 				return
 			}
-			<-time.After(5 * time.Millisecond)
+			time.Sleep(5 * time.Millisecond)
 		}
 		if i > 0 {
 			buf = append(buf, tmp...)

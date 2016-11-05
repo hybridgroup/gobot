@@ -79,7 +79,7 @@ func (m *Driver) Start() (errs []error) {
 				continue
 			}
 			m.Publish(MessageEvent, message)
-			<-time.After(m.interval)
+			time.Sleep(m.interval)
 		}
 	}()
 	return

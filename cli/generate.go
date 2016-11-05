@@ -332,7 +332,7 @@ func Test{{.UpperName}}Driver(t *testing.T) {
 
 	gobottest.Assert(t, len(d.Start()), 0)
 
-	<-time.After(d.interval)
+	time.Sleep(d.interval)
 
 	sem := make(chan bool, 0)
 

@@ -43,7 +43,7 @@ func (h *LIDARLiteDriver) Distance() (distance int, err error) {
 	if err = h.connection.I2cWrite(lidarliteAddress, []byte{0x00, 0x04}); err != nil {
 		return
 	}
-	<-time.After(20 * time.Millisecond)
+	time.Sleep(20 * time.Millisecond)
 
 	if err = h.connection.I2cWrite(lidarliteAddress, []byte{0x0F}); err != nil {
 		return

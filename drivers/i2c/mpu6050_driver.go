@@ -89,7 +89,7 @@ func (h *MPU6050Driver) Start() (errs []error) {
 			binary.Read(buf, binary.BigEndian, &h.Temperature)
 			binary.Read(buf, binary.BigEndian, &h.Gyroscope)
 			h.convertToCelsius()
-			<-time.After(h.interval)
+			time.Sleep(h.interval)
 		}
 	}()
 	return

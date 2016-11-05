@@ -47,7 +47,7 @@ func TestMPL115A2DriverStart(t *testing.T) {
 		return []byte{0x00, 0x01, 0x02, 0x04}, nil
 	}
 	gobottest.Assert(t, len(mpl.Start()), 0)
-	<-time.After(100 * time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
 	gobottest.Assert(t, mpl.Pressure, float32(50.007942))
 	gobottest.Assert(t, mpl.Temperature, float32(116.58878))
 }

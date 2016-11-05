@@ -36,7 +36,7 @@ func TestNeuroskyDriverStart(t *testing.T) {
 
 	gobottest.Assert(t, len(d.Start()), 0)
 
-	<-time.After(50 * time.Millisecond)
+	time.Sleep(50 * time.Millisecond)
 	readError = errors.New("read error")
 
 	select {
@@ -60,7 +60,7 @@ func TestNeuroskyDriverParse(t *testing.T) {
 
 	// CodeEx
 	go func() {
-		<-time.After(5 * time.Millisecond)
+		time.Sleep(5 * time.Millisecond)
 		d.parse(bytes.NewBuffer([]byte{0xAA, 0xAA, 1, 0x55, 0x00}))
 	}()
 
@@ -76,7 +76,7 @@ func TestNeuroskyDriverParse(t *testing.T) {
 
 	// CodeSignalQuality
 	go func() {
-		<-time.After(5 * time.Millisecond)
+		time.Sleep(5 * time.Millisecond)
 		d.parse(bytes.NewBuffer([]byte{0xAA, 0xAA, 2, 0x02, 100, 0x00}))
 	}()
 
@@ -89,7 +89,7 @@ func TestNeuroskyDriverParse(t *testing.T) {
 
 	// CodeAttention
 	go func() {
-		<-time.After(5 * time.Millisecond)
+		time.Sleep(5 * time.Millisecond)
 		d.parse(bytes.NewBuffer([]byte{0xAA, 0xAA, 2, 0x04, 40, 0x00}))
 	}()
 
@@ -102,7 +102,7 @@ func TestNeuroskyDriverParse(t *testing.T) {
 
 	// CodeMeditation
 	go func() {
-		<-time.After(5 * time.Millisecond)
+		time.Sleep(5 * time.Millisecond)
 		d.parse(bytes.NewBuffer([]byte{0xAA, 0xAA, 2, 0x05, 60, 0x00}))
 	}()
 
@@ -115,7 +115,7 @@ func TestNeuroskyDriverParse(t *testing.T) {
 
 	// CodeBlink
 	go func() {
-		<-time.After(5 * time.Millisecond)
+		time.Sleep(5 * time.Millisecond)
 		d.parse(bytes.NewBuffer([]byte{0xAA, 0xAA, 2, 0x16, 150, 0x00}))
 	}()
 
@@ -128,7 +128,7 @@ func TestNeuroskyDriverParse(t *testing.T) {
 
 	// CodeWave
 	go func() {
-		<-time.After(5 * time.Millisecond)
+		time.Sleep(5 * time.Millisecond)
 		d.parse(bytes.NewBuffer([]byte{0xAA, 0xAA, 4, 0x80, 0x00, 0x40, 0x11, 0x00}))
 	}()
 
@@ -141,7 +141,7 @@ func TestNeuroskyDriverParse(t *testing.T) {
 
 	// CodeAsicEEG
 	go func() {
-		<-time.After(5 * time.Millisecond)
+		time.Sleep(5 * time.Millisecond)
 		d.parse(bytes.NewBuffer([]byte{0xAA, 0xAA, 30, 0x83, 24, 1, 121, 89, 0,
 			97, 26, 0, 30, 189, 0, 57, 1, 0, 62, 160, 0, 31, 127, 0, 18, 207, 0, 13,
 			108, 0x00}))

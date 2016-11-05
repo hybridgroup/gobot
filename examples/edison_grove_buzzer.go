@@ -37,7 +37,7 @@ func main() {
 
 		for _, val := range song {
 			buzzer.Tone(val.tone, val.duration)
-			<-time.After(10 * time.Millisecond)
+			time.Sleep(10 * time.Millisecond)
 		}
 	}
 

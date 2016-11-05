@@ -177,7 +177,7 @@ func (a *AdafruitMotorHatDriver) Start() (errs []error) {
 		if err := a.connection.I2cWrite(addrs[i], []byte{reg, val}); err != nil {
 			return
 		}
-		<-time.After(5 * time.Millisecond)
+		time.Sleep(5 * time.Millisecond)
 
 		// Read a byte from the I2C device.  Note: no ability to read from a specified reg?
 		mode1, err := a.connection.I2cRead(addrs[i], 1)
@@ -190,7 +190,7 @@ func (a *AdafruitMotorHatDriver) Start() (errs []error) {
 			if err := a.connection.I2cWrite(addrs[i], []byte{reg, val}); err != nil {
 				return
 			}
-			<-time.After(5 * time.Millisecond)
+			time.Sleep(5 * time.Millisecond)
 		}
 	}
 	return
@@ -271,7 +271,7 @@ func (a *AdafruitMotorHatDriver) setPWMFreq(i2cAddr int, freq float64) (err erro
 		if err = a.connection.I2cWrite(i2cAddr, []byte{reg, oldMode[0]}); err != nil {
 			return
 		}
-		<-time.After(5 * time.Millisecond)
+		time.Sleep(5 * time.Millisecond)
 		if err = a.connection.I2cWrite(i2cAddr, []byte{reg, (oldMode[0] | 0x80)}); err != nil {
 			return
 		}
@@ -488,7 +488,7 @@ func (a *AdafruitMotorHatDriver) Step(motor, steps int, dir AdafruitDirection, s
 		if latestStep, err = a.oneStep(motor, dir, style); err != nil {
 			return
 		}
-		<-time.After(time.Duration(secPerStep) * time.Second)
+		time.Sleep(time.Duration(secPerStep) * time.Second)
 	}
 	// As documented in the Adafruit python driver:
 	// This is an edge case, if we are in between full steps, keep going to end on a full step
@@ -497,7 +497,7 @@ func (a *AdafruitMotorHatDriver) Step(motor, steps int, dir AdafruitDirection, s
 			if latestStep, err = a.oneStep(motor, dir, style); err != nil {
 				return
 			}
-			<-time.After(time.Duration(secPerStep) * time.Second)
+			time.Sleep(time.Duration(secPerStep) * time.Second)
 		}
 	}
 	return

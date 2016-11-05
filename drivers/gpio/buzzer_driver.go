@@ -212,12 +212,12 @@ func (l *BuzzerDriver) Tone(hz, duration float64) (err error) {
 		if err = l.On(); err != nil {
 			return
 		}
-		<-time.After(time.Duration(tone) * time.Microsecond)
+		time.Sleep(time.Duration(tone) * time.Microsecond)
 
 		if err = l.Off(); err != nil {
 			return
 		}
-		<-time.After(time.Duration(tone) * time.Microsecond)
+		time.Sleep(time.Duration(tone) * time.Microsecond)
 	}
 
 	return

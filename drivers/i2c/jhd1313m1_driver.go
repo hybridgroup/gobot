@@ -110,7 +110,7 @@ func (h *JHD1313M1Driver) Start() []error {
 		return []error{err}
 	}
 
-	<-time.After(50000 * time.Microsecond)
+	time.Sleep(50000 * time.Microsecond)
 	payload := []byte{LCD_CMD, LCD_FUNCTIONSET | LCD_2LINE}
 	if err := h.connection.I2cWrite(h.lcdAddress, payload); err != nil {
 		if err := h.connection.I2cWrite(h.lcdAddress, payload); err != nil {
@@ -118,12 +118,12 @@ func (h *JHD1313M1Driver) Start() []error {
 		}
 	}
 
-	<-time.After(100 * time.Microsecond)
+	time.Sleep(100 * time.Microsecond)
 	if err := h.connection.I2cWrite(h.lcdAddress, []byte{LCD_CMD, LCD_DISPLAYCONTROL | LCD_DISPLAYON}); err != nil {
 		return []error{err}
 	}
 
-	<-time.After(100 * time.Microsecond)
+	time.Sleep(100 * time.Microsecond)
 	if err := h.Clear(); err != nil {
 		return []error{err}
 	}
@@ -170,14 +170,14 @@ func (h *JHD1313M1Driver) Clear() error {
 func (h *JHD1313M1Driver) Home() error {
 	err := h.command([]byte{LCD_RETURNHOME})
 	// This wait fixes a race condition when calling home and clear back to back.
-	<-time.After(2 * time.Millisecond)
+	time.Sleep(2 * time.Millisecond)
 	return err
 }
 
 // Write displays the passed message on the screen.
 func (h *JHD1313M1Driver) Write(message string) error {
 	// This wait fixes an odd bug where the clear function doesn't always work properly.
-	<-time.After(1 * time.Millisecond)
+	time.Sleep(1 * time.Millisecond)
 	for _, val := range message {
 		if val == '\n' {
 			if err := h.SetPosition(16); err != nil {

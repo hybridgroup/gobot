@@ -56,7 +56,7 @@ func adafruitServoMotorRunner(a *i2c.AdafruitMotorHatDriver) (err error) {
 		log.Printf(err.Error())
 		return
 	}
-	<-time.After(2000 * time.Millisecond)
+	time.Sleep(2000 * time.Millisecond)
 	// DECR
 	pulse = degree2pulse(deg - degIncrease)
 	if err = a.SetServoMotorPulse(channel, 0, pulse); err != nil {

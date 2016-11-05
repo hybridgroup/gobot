@@ -21,7 +21,7 @@ func adafruitDCMotorRunner(a *i2c.AdafruitMotorHatDriver, dcMotor int) (err erro
 		return
 	}
 	// Sleep and RELEASE
-	<-time.After(2000 * time.Millisecond)
+	time.Sleep(2000 * time.Millisecond)
 	if err = a.RunDCMotor(dcMotor, i2c.AdafruitRelease); err != nil {
 		return
 	}
@@ -30,7 +30,7 @@ func adafruitDCMotorRunner(a *i2c.AdafruitMotorHatDriver, dcMotor int) (err erro
 		return
 	}
 	// Sleep and RELEASE
-	<-time.After(2000 * time.Millisecond)
+	time.Sleep(2000 * time.Millisecond)
 	if err = a.RunDCMotor(dcMotor, i2c.AdafruitRelease); err != nil {
 		return
 	}

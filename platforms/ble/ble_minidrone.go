@@ -110,7 +110,7 @@ func (b *MinidroneDriver) Start() (errs []error) {
 func (b *MinidroneDriver) Halt() (errs []error) {
 	b.Land()
 
-	<-time.After(500 * time.Millisecond)
+	time.Sleep(500 * time.Millisecond)
 	return
 }
 
@@ -184,13 +184,13 @@ func (b *MinidroneDriver) FlatTrim() (err error) {
 func (b *MinidroneDriver) StartPcmd() {
 	go func() {
 		// wait a little bit so that there is enough time to get some ACKs
-		<-time.After(500 * time.Millisecond)
+		time.Sleep(500 * time.Millisecond)
 		for {
 			err := b.adaptor().WriteCharacteristic(DroneCommandService, PcmdCharacteristic, b.generatePcmd().Bytes())
 			if err != nil {
 				fmt.Println("pcmd write error:", err)
 			}
-			<-time.After(50 * time.Millisecond)
+			time.Sleep(50 * time.Millisecond)
 		}
 	}()
 }

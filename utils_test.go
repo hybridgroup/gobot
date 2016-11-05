@@ -28,9 +28,9 @@ func TestEveryWhenDone(t *testing.T) {
 	done := Every(20*time.Millisecond, func() {
 		i++
 	})
-	<-time.After(10 * time.Millisecond)
+	time.Sleep(10 * time.Millisecond)
 	done <- true
-	<-time.After(50 * time.Millisecond)
+	time.Sleep(50 * time.Millisecond)
 	if i > 1 {
 		t.Error("Test should have stopped after 20ms")
 	}
@@ -41,7 +41,7 @@ func TestAfter(t *testing.T) {
 	After(1*time.Millisecond, func() {
 		i++
 	})
-	<-time.After(2 * time.Millisecond)
+	time.Sleep(2 * time.Millisecond)
 	gobottest.Assert(t, i, 1)
 }
 

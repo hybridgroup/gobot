@@ -286,7 +286,7 @@ func TestConnect(t *testing.T) {
 	go func() {
 		for {
 			testReadData = append(testReadData, response...)
-			<-time.After(100 * time.Millisecond)
+			time.Sleep(100 * time.Millisecond)
 		}
 	}()
 

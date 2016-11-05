@@ -53,7 +53,7 @@ func TestWiichuckDriverStart(t *testing.T) {
 
 	go func() {
 		for {
-			<-time.After(time.Duration(numberOfCyclesForEvery) * time.Millisecond)
+			time.Sleep(time.Duration(numberOfCyclesForEvery) * time.Millisecond)
 			if (wii.joystick["sy_origin"] == float64(44)) &&
 				(wii.joystick["sx_origin"] == float64(45)) {
 				sem <- true

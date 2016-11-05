@@ -73,12 +73,12 @@ func (w *WiichuckDriver) Start() (errs []error) {
 				w.Publish(w.Event(Error), err)
 				continue
 			}
-			<-time.After(w.pauseTime)
+			time.Sleep(w.pauseTime)
 			if err := w.connection.I2cWrite(wiichuckAddress, []byte{0x00}); err != nil {
 				w.Publish(w.Event(Error), err)
 				continue
 			}
-			<-time.After(w.pauseTime)
+			time.Sleep(w.pauseTime)
 			newValue, err := w.connection.I2cRead(wiichuckAddress, 6)
 			if err != nil {
 				w.Publish(w.Event(Error), err)
@@ -90,7 +90,7 @@ func (w *WiichuckDriver) Start() (errs []error) {
 					continue
 				}
 			}
-			<-time.After(w.interval)
+			time.Sleep(w.interval)
 		}
 	}()
 	return

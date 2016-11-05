@@ -77,7 +77,7 @@ func (h *MPL115A2Driver) Start() (errs []error) {
 				continue
 
 			}
-			<-time.After(5 * time.Millisecond)
+			time.Sleep(5 * time.Millisecond)
 
 			if err := h.connection.I2cWrite(mpl115a2Address, []byte{MPL115A2_REGISTER_PRESSURE_MSB}); err != nil {
 				h.Publish(h.Event(Error), err)
@@ -101,7 +101,7 @@ func (h *MPL115A2Driver) Start() (errs []error) {
 				h.Pressure = (65.0/1023.0)*pressureComp + 50.0
 				h.Temperature = ((float32(temperature) - 498.0) / -5.35) + 25.0
 			}
-			<-time.After(h.interval)
+			time.Sleep(h.interval)
 		}
 	}()
 	return
