@@ -1,6 +1,6 @@
 # Particle
 
-The Particle Photon is a Wi-Fi connected microcontroller from Particle (http://particle.io), the company formerly known as Spark Devices. Once it connects to a Wi-Fi network, it automatically connects with a central server (the "Particle Cloud") and stays connected so it can be controlled from external systems, such as a Gobot program. To run gobot programs please make sure you are running default tinker firmware on the Photon.
+The Particle Photon and Particle Electron are connected microcontrollers from Particle (http://particle.io), the company formerly known as Spark Devices. The Photon uses a Wi-Fi connection to the Particle cloud, and the Electron uses a 3G wireless connection. Once the Photon or Electron connects to the network, it automatically connects with a central server (the "Particle Cloud") and stays connected so it can be controlled from external systems, such as a Gobot program. To run Gobot programs please make sure you are running default Tinker firmware on the Photon or Electron.
 
 For more info about the Particle platform go to https://www.particle.io/
 
@@ -36,7 +36,7 @@ func main() {
 	}
 
 	robot := gobot.NewRobot("spark",
-		[]gobot.Connection{sparkCore},
+		[]gobot.Connection{core},
 		[]gobot.Device{led},
 		work,
 	)

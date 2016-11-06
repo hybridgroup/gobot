@@ -1,9 +1,9 @@
 /*
-Package spark provides the Gobot adaptor for the Spark Core.
+Package particle provides the Gobot adaptor for the Particle Photon and Electron.
 
 Installing:
 
-	go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/spark
+	go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/particle
 
 Example:
 
@@ -27,7 +27,7 @@ Example:
 			})
 		}
 
-		robot := gobot.NewRobot("spark",
+		robot := gobot.NewRobot("particle",
 			[]gobot.Connection{core},
 			[]gobot.Device{led},
 			work,

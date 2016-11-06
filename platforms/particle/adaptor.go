@@ -36,7 +36,7 @@ var eventSource = func(url string) (chan eventsource.Event, chan error, error) {
 }
 
 // NewAdaptor creates new Photon adaptor with deviceId and accessToken
-// using api.spark.io server as default
+// using api.particle.io server as default
 func NewAdaptor(deviceID string, accessToken string) *Adaptor {
 	return &Adaptor{
 		name:        "Particle",
@@ -50,17 +50,17 @@ func NewAdaptor(deviceID string, accessToken string) *Adaptor {
 func (s *Adaptor) Name() string     { return s.name }
 func (s *Adaptor) SetName(n string) { s.name = n }
 
-// Connect returns true if connection to spark core is successfull
+// Connect returns true if connection to Particle Photon or Electron is successful
 func (s *Adaptor) Connect() (errs []error) {
 	return
 }
 
-// Finalize returns true if connection to spark core is finalized successfully
+// Finalize returns true if connection to Particle Photon or Electron is finalized successfully
 func (s *Adaptor) Finalize() (errs []error) {
 	return
 }
 
-// AnalogRead reads analog ping value using spark cloud api
+// AnalogRead reads analog ping value using Particle cloud api
 func (s *Adaptor) AnalogRead(pin string) (val int, err error) {
 	params := url.Values{
 		"params":       {pin},
@@ -83,7 +83,7 @@ func (s *Adaptor) PwmWrite(pin string, level byte) (err error) {
 	return s.AnalogWrite(pin, level)
 }
 
-// AnalogWrite writes analog pin with specified level using spark cloud api
+// AnalogWrite writes analog pin with specified level using Particle cloud api
 func (s *Adaptor) AnalogWrite(pin string, level byte) (err error) {
 	params := url.Values{
 		"params":       {fmt.Sprintf("%v,%v", pin, level)},
@@ -94,7 +94,7 @@ func (s *Adaptor) AnalogWrite(pin string, level byte) (err error) {
 	return
 }
 
-// DigitalWrite writes to a digital pin using spark cloud api
+// DigitalWrite writes to a digital pin using Particle cloud api
 func (s *Adaptor) DigitalWrite(pin string, level byte) (err error) {
 	params := url.Values{
 		"params":       {fmt.Sprintf("%v,%v", pin, s.pinLevel(level))},
@@ -105,7 +105,7 @@ func (s *Adaptor) DigitalWrite(pin string, level byte) (err error) {
 	return err
 }
 
-// DigitalRead reads from digital pin using spark cloud api
+// DigitalRead reads from digital pin using Particle cloud api
 func (s *Adaptor) DigitalRead(pin string) (val int, err error) {
 	params := url.Values{
 		"params":       {pin},
@@ -122,10 +122,10 @@ func (s *Adaptor) DigitalRead(pin string) (val int, err error) {
 
 // EventStream returns a gobot.Event based on the following params:
 //
-// * source - "all"/"devices"/"device" (More info at: http://docs.spark.io/api/#reading-data-from-a-core-events)
+// * source - "all"/"devices"/"device" (More info at: http://docs.particle.io/api/#reading-data-from-a-core-events)
 // * name  - Event name to subscribe for, leave blank to subscribe to all events.
 //
-// A new event is emitted as a spark.Event struct
+// A new event is emitted as a particle.Event struct
 func (s *Adaptor) EventStream(source string, name string) (event *gobot.Event, err error) {
 	var url string
 
@@ -202,12 +202,12 @@ func (s *Adaptor) Function(name string, args string) (val int, err error) {
 	return
 }
 
-// setAPIServer sets spark cloud api server, this can be used to change from default api.spark.io
+// setAPIServer sets Particle cloud api server, this can be used to change from default api.spark.io
 func (s *Adaptor) setAPIServer(server string) {
 	s.APIServer = server
 }
 
-// deviceURL constructs device url to make requests from spark cloud api
+// deviceURL constructs device url to make requests from Particle cloud api
 func (s *Adaptor) deviceURL() string {
 	if len(s.APIServer) <= 0 {
 		s.setAPIServer("https://api.particle.io")
@@ -247,7 +247,7 @@ func (s *Adaptor) request(method string, url string, params url.Values) (m map[s
 	json.Unmarshal(buf, &m)
 
 	if resp.Status != "200 OK" {
-		err = fmt.Errorf("%v: error communicating to the spark cloud", resp.Status)
+		err = fmt.Errorf("%v: error communicating to the Particle cloud", resp.Status)
 	} else if _, ok := m["error"]; ok {
 		err = errors.New(m["error"].(string))
 	}
