@@ -39,11 +39,8 @@ func TestDriverDefaults(t *testing.T) {
 	}
 
 	for _, driver := range drivers {
-		t.Run(getType(driver), func(t *testing.T) {
-			gobottest.Assert(t, driver.Connection(), testAdaptor)
-			gobottest.Assert(t, driver.Pin(), pin)
-			//gobottest.Assert(t, driver.interval, 10*time.Millisecond)
-		})
+		gobottest.Assert(t, driver.Connection(), testAdaptor)
+		gobottest.Assert(t, driver.Pin(), pin)
 	}
 }
 
@@ -58,26 +55,24 @@ func TestDigitalDriverHalt(t *testing.T) {
 	}
 
 	for _, driver := range drivers {
-		t.Run(getType(driver), func(t *testing.T) {
 
-			var callCount int32
-			testAdaptorDigitalRead = func() (int, error) {
-				atomic.AddInt32(&callCount, 1)
-				return 42, nil
-			}
+		var callCount int32
+		testAdaptorDigitalRead = func() (int, error) {
+			atomic.AddInt32(&callCount, 1)
+			return 42, nil
+		}
 
-			// Start the driver and allow for multiple digital reads
-			driver.Start()
-			time.Sleep(20 * time.Millisecond)
+		// Start the driver and allow for multiple digital reads
+		driver.Start()
+		time.Sleep(20 * time.Millisecond)
 
-			driver.Halt()
-			lastCallCount := atomic.LoadInt32(&callCount)
-			// If driver was not halted, digital reads would still continue
-			time.Sleep(20 * time.Millisecond)
-			if atomic.LoadInt32(&callCount) != lastCallCount {
-				t.Errorf("DigitalRead was called after driver was halted")
-			}
-		})
+		driver.Halt()
+		lastCallCount := atomic.LoadInt32(&callCount)
+		// If driver was not halted, digital reads would still continue
+		time.Sleep(20 * time.Millisecond)
+		if atomic.LoadInt32(&callCount) != lastCallCount {
+			t.Errorf("DigitalRead was called after driver was halted")
+		}
 	}
 }
 
@@ -93,25 +88,22 @@ func TestAnalogDriverHalt(t *testing.T) {
 	}
 
 	for _, driver := range drivers {
-		t.Run(getType(driver), func(t *testing.T) {
+		var callCount int32
+		testAdaptorAnalogRead = func() (int, error) {
+			atomic.AddInt32(&callCount, 1)
+			return 42, nil
+		}
+		// Start the driver and allow for multiple digital reads
+		driver.Start()
+		time.Sleep(20 * time.Millisecond)
 
-			var callCount int32
-			testAdaptorAnalogRead = func() (int, error) {
-				atomic.AddInt32(&callCount, 1)
-				return 42, nil
-			}
-			// Start the driver and allow for multiple digital reads
-			driver.Start()
-			time.Sleep(20 * time.Millisecond)
-
-			driver.Halt()
-			lastCallCount := atomic.LoadInt32(&callCount)
-			// If driver was not halted, digital reads would still continue
-			time.Sleep(20 * time.Millisecond)
-			if atomic.LoadInt32(&callCount) != lastCallCount {
-				t.Errorf("AnalogRead was called after driver was halted")
-			}
-		})
+		driver.Halt()
+		lastCallCount := atomic.LoadInt32(&callCount)
+		// If driver was not halted, digital reads would still continue
+		time.Sleep(20 * time.Millisecond)
+		if atomic.LoadInt32(&callCount) != lastCallCount {
+			t.Errorf("AnalogRead was called after driver was halted")
+		}
 	}
 }
 
@@ -130,32 +122,28 @@ func TestDriverPublishesError(t *testing.T) {
 	}
 
 	for _, driver := range drivers {
-		driverType := getType(driver)
+		sem := make(chan struct{}, 1)
+		// send error
+		returnErr := func() (val int, err error) {
+			err = errors.New("read error")
+			return
+		}
+		testAdaptorAnalogRead = returnErr
+		testAdaptorDigitalRead = returnErr
 
-		t.Run(driverType, func(t *testing.T) {
-			sem := make(chan struct{}, 1)
-			// send error
-			returnErr := func() (val int, err error) {
-				err = errors.New("read error")
-				return
-			}
-			testAdaptorAnalogRead = returnErr
-			testAdaptorDigitalRead = returnErr
+		gobottest.Assert(t, len(driver.Start()), 0)
 
-			gobottest.Assert(t, len(driver.Start()), 0)
-
-			// expect error
-			driver.Once(driver.Event(Error), func(data interface{}) {
-				gobottest.Assert(t, data.(error).Error(), "read error")
-				close(sem)
-			})
-
-			select {
-			case <-sem:
-			case <-time.After(time.Second):
-				t.Errorf("%s Event \"Error\" was not published", driverType)
-			}
+		// expect error
+		driver.Once(driver.Event(Error), func(data interface{}) {
+			gobottest.Assert(t, data.(error).Error(), "read error")
+			close(sem)
 		})
+
+		select {
+		case <-sem:
+		case <-time.After(time.Second):
+			t.Errorf("%s Event \"Error\" was not published", getType(driver))
+		}
 
 		// Cleanup
 		driver.Halt()
