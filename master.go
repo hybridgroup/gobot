@@ -1,9 +1,10 @@
 package gobot
 
 import (
-	"log"
 	"os"
 	"os/signal"
+
+	multierror "github.com/hashicorp/go-multierror"
 )
 
 // JSONMaster is a JSON representation of a Gobot Master.
@@ -55,19 +56,16 @@ func NewMaster() *Master {
 // Start calls the Start method on each robot in its collection of robots. On
 // error, call Stop to ensure that all robots are returned to a sane, stopped
 // state.
-func (g *Master) Start() (errs []error) {
-	if rerrs := g.robots.Start(!g.AutoRun); len(rerrs) > 0 {
-		for _, err := range rerrs {
-			log.Println("Error:", err)
-			errs = append(errs, err)
-		}
+func (g *Master) Start() (err error) {
+	if rerr := g.robots.Start(!g.AutoRun); rerr != nil {
+		err = multierror.Append(err, rerr)
 		return
 	}
 
 	if g.AutoRun {
 		c := make(chan os.Signal, 1)
 		g.trap(c)
-		if len(errs) > 0 {
+		if err != nil {
 			// there was an error during start, so we immediately pass the interrupt
 			// in order to disconnect the initialized robots, connections and devices
 			c <- os.Interrupt
@@ -80,19 +78,16 @@ func (g *Master) Start() (errs []error) {
 		g.Stop()
 	}
 
-	return errs
+	return err
 }
 
 // Stop calls the Stop method on each robot in its collection of robots.
-func (g *Master) Stop() (errs []error) {
-	if rerrs := g.robots.Stop(); len(rerrs) > 0 {
-		for _, err := range rerrs {
-			log.Println("Error:", err)
-			errs = append(errs, err)
-		}
+func (g *Master) Stop() (err error) {
+	if rerr := g.robots.Stop(); rerr != nil {
+		err = multierror.Append(err, rerr)
 	}
 
-	return errs
+	return
 }
 
 // Robots returns all robots associated with this Gobot Master.

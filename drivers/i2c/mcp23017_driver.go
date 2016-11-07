@@ -128,18 +128,18 @@ func (m *MCP23017Driver) SetName(n string) { m.name = n }
 func (m *MCP23017Driver) Connection() gobot.Connection { return m.connection.(gobot.Connection) }
 
 // Halt stops the driver.
-func (m *MCP23017Driver) Halt() (err []error) { return }
+func (m *MCP23017Driver) Halt() (err error) { return }
 
 // Start writes the device configuration.
-func (m *MCP23017Driver) Start() (errs []error) {
+func (m *MCP23017Driver) Start() (errs error) {
 	if err := m.connection.I2cStart(m.mcp23017Address); err != nil {
-		return []error{err}
+		return err
 	}
 	// Set IOCON register with MCP23017 configuration.
 	ioconReg := m.getPort("A").IOCON // IOCON address is the same for Port A or B.
 	ioconVal := m.conf.GetUint8Value()
 	if err := m.connection.I2cWrite(m.mcp23017Address, []uint8{ioconReg, ioconVal}); err != nil {
-		return []error{err}
+		return err
 	}
 	return
 }

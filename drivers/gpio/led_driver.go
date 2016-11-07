@@ -50,10 +50,10 @@ func NewLedDriver(a DigitalWriter, pin string) *LedDriver {
 }
 
 // Start implements the Driver interface
-func (l *LedDriver) Start() (errs []error) { return }
+func (l *LedDriver) Start() (err error) { return }
 
 // Halt implements the Driver interface
-func (l *LedDriver) Halt() (errs []error) { return }
+func (l *LedDriver) Halt() (err error) { return }
 
 // Name returns the LedDrivers name
 func (l *LedDriver) Name() string { return l.name }

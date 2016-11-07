@@ -50,7 +50,7 @@ func NewButtonDriver(a DigitalReader, pin string, v ...time.Duration) *ButtonDri
 // 	Push int - On button push
 //	Release int - On button release
 //	Error error - On button error
-func (b *ButtonDriver) Start() (errs []error) {
+func (b *ButtonDriver) Start() (err error) {
 	state := 0
 	go func() {
 		for {
@@ -72,7 +72,7 @@ func (b *ButtonDriver) Start() (errs []error) {
 }
 
 // Halt stops polling the button for new information
-func (b *ButtonDriver) Halt() (errs []error) {
+func (b *ButtonDriver) Halt() (err error) {
 	b.halt <- true
 	return
 }

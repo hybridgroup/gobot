@@ -85,7 +85,7 @@ func (n *Driver) adaptor() *Adaptor {
 
 // Start creates a go routine to listen from serial port
 // and parse buffer readings
-func (n *Driver) Start() (errs []error) {
+func (n *Driver) Start() (err error) {
 	go func() {
 		for {
 			buff := make([]byte, 1024)
@@ -101,7 +101,7 @@ func (n *Driver) Start() (errs []error) {
 }
 
 // Halt stops neurosky driver (void)
-func (n *Driver) Halt() (errs []error) { return }
+func (n *Driver) Halt() (err error) { return }
 
 // parse converts bytes buffer into packets until no more data is present
 func (n *Driver) parse(buf *bytes.Buffer) {

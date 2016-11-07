@@ -51,12 +51,12 @@ func (s *Adaptor) Name() string     { return s.name }
 func (s *Adaptor) SetName(n string) { s.name = n }
 
 // Connect returns true if connection to Particle Photon or Electron is successful
-func (s *Adaptor) Connect() (errs []error) {
+func (s *Adaptor) Connect() (err error) {
 	return
 }
 
 // Finalize returns true if connection to Particle Photon or Electron is finalized successfully
-func (s *Adaptor) Finalize() (errs []error) {
+func (s *Adaptor) Finalize() (err error) {
 	return
 }
 

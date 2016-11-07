@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 
+	multierror "github.com/hashicorp/go-multierror"
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/sysfs"
 )
@@ -144,30 +145,30 @@ func (r *Adaptor) SetName(n string) { r.name = n }
 
 // Connect starts connection with board and creates
 // digitalPins and pwmPins adaptor maps
-func (r *Adaptor) Connect() (errs []error) {
+func (r *Adaptor) Connect() (err error) {
 	return
 }
 
 // Finalize closes connection to board and pins
-func (r *Adaptor) Finalize() (errs []error) {
+func (r *Adaptor) Finalize() (err error) {
 	for _, pin := range r.digitalPins {
 		if pin != nil {
-			if err := pin.Unexport(); err != nil {
-				errs = append(errs, err)
+			if perr := pin.Unexport(); err != nil {
+				err = multierror.Append(err, perr)
 			}
 		}
 	}
 	for _, pin := range r.pwmPins {
-		if err := r.piBlaster(fmt.Sprintf("release %v\n", pin)); err != nil {
-			errs = append(errs, err)
+		if perr := r.piBlaster(fmt.Sprintf("release %v\n", pin)); err != nil {
+			err = multierror.Append(err, perr)
 		}
 	}
 	if r.i2cDevice != nil {
-		if err := r.i2cDevice.Close(); err != nil {
-			errs = append(errs, err)
+		if perr := r.i2cDevice.Close(); err != nil {
+			err = multierror.Append(err, perr)
 		}
 	}
-	return errs
+	return err
 }
 
 func (r *Adaptor) translatePin(pin string) (i int, err error) {

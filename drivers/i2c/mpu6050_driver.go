@@ -67,9 +67,9 @@ func (h *MPU6050Driver) Connection() gobot.Connection { return h.connection.(gob
 
 // Start writes initialization bytes and reads from adaptor
 // using specified interval to accelerometer andtemperature data
-func (h *MPU6050Driver) Start() (errs []error) {
+func (h *MPU6050Driver) Start() (err error) {
 	if err := h.initialize(); err != nil {
-		return []error{err}
+		return err
 	}
 
 	go func() {
@@ -96,7 +96,7 @@ func (h *MPU6050Driver) Start() (errs []error) {
 }
 
 // Halt returns true if devices is halted successfully
-func (h *MPU6050Driver) Halt() (errs []error) { return }
+func (h *MPU6050Driver) Halt() (err error) { return }
 
 func (h *MPU6050Driver) initialize() (err error) {
 	if err = h.connection.I2cStart(mpu6050Address); err != nil {

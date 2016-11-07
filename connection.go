@@ -1,9 +1,10 @@
 package gobot
 
 import (
-	"fmt"
 	"log"
 	"reflect"
+
+	multierror "github.com/hashicorp/go-multierror"
 )
 
 // JSONConnection is a JSON representation of a Connection.
@@ -39,7 +40,7 @@ func (c *Connections) Each(f func(Connection)) {
 }
 
 // Start calls Connect on each Connection in c
-func (c *Connections) Start() (errs []error) {
+func (c *Connections) Start() (err error) {
 	log.Println("Starting connections...")
 	for _, connection := range *c {
 		info := "Starting connection " + connection.Name()
@@ -50,25 +51,19 @@ func (c *Connections) Start() (errs []error) {
 
 		log.Println(info + "...")
 
-		if errs = connection.Connect(); len(errs) > 0 {
-			for i, err := range errs {
-				errs[i] = fmt.Errorf("Connection %q: %v", connection.Name(), err)
-			}
-			return
+		if cerr := connection.Connect(); cerr != nil {
+			err = multierror.Append(err, cerr)
 		}
 	}
-	return
+	return err
 }
 
 // Finalize calls Finalize on each Connection in c
-func (c *Connections) Finalize() (errs []error) {
+func (c *Connections) Finalize() (err error) {
 	for _, connection := range *c {
-		if cerrs := connection.Finalize(); cerrs != nil {
-			for i, err := range cerrs {
-				cerrs[i] = fmt.Errorf("Connection %q: %v", connection.Name(), err)
-			}
-			errs = append(errs, cerrs...)
+		if cerr := connection.Finalize(); cerr != nil {
+			err = multierror.Append(err, cerr)
 		}
 	}
-	return errs
+	return err
 }

@@ -24,18 +24,18 @@ func (h *HMC6352Driver) SetName(n string)             { h.name = n }
 func (h *HMC6352Driver) Connection() gobot.Connection { return h.connection.(gobot.Connection) }
 
 // Start initialized the hmc6352
-func (h *HMC6352Driver) Start() (errs []error) {
+func (h *HMC6352Driver) Start() (err error) {
 	if err := h.connection.I2cStart(hmc6352Address); err != nil {
-		return []error{err}
+		return err
 	}
 	if err := h.connection.I2cWrite(hmc6352Address, []byte("A")); err != nil {
-		return []error{err}
+		return err
 	}
 	return
 }
 
 // Halt returns true if devices is halted successfully
-func (h *HMC6352Driver) Halt() (errs []error) { return }
+func (h *HMC6352Driver) Halt() (err error) { return }
 
 // Heading returns the current heading
 func (h *HMC6352Driver) Heading() (heading uint16, err error) {

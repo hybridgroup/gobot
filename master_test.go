@@ -80,55 +80,47 @@ func TestGobotToJSON(t *testing.T) {
 
 func TestMasterStart(t *testing.T) {
 	g := initTestMaster()
-	gobottest.Assert(t, len(g.Start()), 0)
-	gobottest.Assert(t, len(g.Stop()), 0)
+	gobottest.Assert(t, g.Start(), nil)
+	gobottest.Assert(t, g.Stop(), nil)
 }
 
 func TestMasterStartDriverErrors(t *testing.T) {
 	g := initTestMaster1Robot()
 
-	testDriverStart = func() (errs []error) {
-		return []error{
-			errors.New("driver start error 1"),
-		}
+	testDriverStart = func() (err error) {
+		return errors.New("driver start error 1")
 	}
 
-	gobottest.Assert(t, len(g.Start()), 1)
-	gobottest.Assert(t, len(g.Stop()), 0)
+	gobottest.Assert(t, g.Start().Error(), "3 error(s) occurred:\n\n* driver start error 1\n* driver start error 1\n* driver start error 1")
+	gobottest.Assert(t, g.Stop(), nil)
 
-	testDriverStart = func() (errs []error) { return }
+	testDriverStart = func() (err error) { return }
 }
 
 func TestMasterStartAdaptorErrors(t *testing.T) {
 	g := initTestMaster1Robot()
 
-	testAdaptorConnect = func() (errs []error) {
-		return []error{
-			errors.New("adaptor start error 1"),
-		}
+	testAdaptorConnect = func() (err error) {
+		return errors.New("adaptor start error 1")
 	}
 
-	gobottest.Assert(t, len(g.Start()), 1)
-	gobottest.Assert(t, len(g.Stop()), 0)
+	gobottest.Assert(t, g.Start().Error(), "3 error(s) occurred:\n\n* adaptor start error 1\n* adaptor start error 1\n* adaptor start error 1")
+	gobottest.Assert(t, g.Stop(), nil)
 
-	testAdaptorConnect = func() (errs []error) { return }
+	testAdaptorConnect = func() (err error) { return }
 }
 
 func TestMasterHaltErrors(t *testing.T) {
 	g := initTestMaster1Robot()
 
-	testDriverHalt = func() (errs []error) {
-		return []error{
-			errors.New("driver halt error 1"),
-		}
+	testDriverHalt = func() (err error) {
+		return errors.New("driver halt error 2")
 	}
 
-	testAdaptorFinalize = func() (errs []error) {
-		return []error{
-			errors.New("adaptor finalize error 1"),
-		}
+	testAdaptorFinalize = func() (err error) {
+		return errors.New("adaptor finalize error 2")
 	}
 
-	gobottest.Assert(t, len(g.Start()), 0)
-	gobottest.Assert(t, len(g.Stop()), 6)
+	gobottest.Assert(t, g.Start(), nil)
+	gobottest.Assert(t, g.Stop().Error(), "3 error(s) occurred:\n\n* adaptor finalize error 2\n* adaptor finalize error 2\n* adaptor finalize error 2")
 }

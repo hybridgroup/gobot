@@ -150,10 +150,10 @@ func NewBuzzerDriver(a DigitalWriter, pin string) *BuzzerDriver {
 }
 
 // Start implements the Driver interface
-func (l *BuzzerDriver) Start() (errs []error) { return }
+func (l *BuzzerDriver) Start() (err error) { return }
 
 // Halt implements the Driver interface
-func (l *BuzzerDriver) Halt() (errs []error) { return }
+func (l *BuzzerDriver) Halt() (err error) { return }
 
 // Name returns the BuzzerDrivers name
 func (l *BuzzerDriver) Name() string { return l.name }

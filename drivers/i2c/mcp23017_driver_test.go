@@ -26,10 +26,10 @@ func (t *i2cMcpTestAdaptor) I2cRead(address int, numBytes int) (data []byte, err
 func (t *i2cMcpTestAdaptor) I2cWrite(int, []byte) (err error) {
 	return t.i2cMcpWriteImpl()
 }
-func (t *i2cMcpTestAdaptor) Name() string             { return t.name }
-func (t *i2cMcpTestAdaptor) SetName(n string)         { t.name = n }
-func (t *i2cMcpTestAdaptor) Connect() (errs []error)  { return }
-func (t *i2cMcpTestAdaptor) Finalize() (errs []error) { return }
+func (t *i2cMcpTestAdaptor) Name() string          { return t.name }
+func (t *i2cMcpTestAdaptor) SetName(n string)      { t.name = n }
+func (t *i2cMcpTestAdaptor) Connect() (err error)  { return }
+func (t *i2cMcpTestAdaptor) Finalize() (err error) { return }
 
 func newMcpI2cTestAdaptor() *i2cMcpTestAdaptor {
 	return &i2cMcpTestAdaptor{

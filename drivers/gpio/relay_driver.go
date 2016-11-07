@@ -42,10 +42,10 @@ func NewRelayDriver(a DigitalWriter, pin string) *RelayDriver {
 }
 
 // Start implements the Driver interface
-func (l *RelayDriver) Start() (errs []error) { return }
+func (l *RelayDriver) Start() (err error) { return }
 
 // Halt implements the Driver interface
-func (l *RelayDriver) Halt() (errs []error) { return }
+func (l *RelayDriver) Halt() (err error) { return }
 
 // Name returns the RelayDrivers name
 func (l *RelayDriver) Name() string { return l.name }

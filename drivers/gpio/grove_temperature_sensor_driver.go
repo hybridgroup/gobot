@@ -52,7 +52,7 @@ func NewGroveTemperatureSensorDriver(a AnalogReader, pin string, v ...time.Durat
 // Emits the Events:
 //	Data int - Event is emitted on change and represents the current temperature in celsius from the sensor.
 //	Error error - Event is emitted on error reading from the sensor.
-func (a *GroveTemperatureSensorDriver) Start() (errs []error) {
+func (a *GroveTemperatureSensorDriver) Start() (err error) {
 	thermistor := 3975.0
 	a.temperature = 0
 
@@ -80,7 +80,7 @@ func (a *GroveTemperatureSensorDriver) Start() (errs []error) {
 }
 
 // Halt stops polling the analog sensor for new information
-func (a *GroveTemperatureSensorDriver) Halt() (errs []error) {
+func (a *GroveTemperatureSensorDriver) Halt() (err error) {
 	a.halt <- true
 	return
 }

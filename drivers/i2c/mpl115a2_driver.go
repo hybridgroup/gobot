@@ -61,13 +61,13 @@ func (h *MPL115A2Driver) Connection() gobot.Connection { return h.connection.(go
 
 // Start writes initialization bytes and reads from adaptor
 // using specified interval to accelerometer andtemperature data
-func (h *MPL115A2Driver) Start() (errs []error) {
+func (h *MPL115A2Driver) Start() (err error) {
 	var temperature uint16
 	var pressure uint16
 	var pressureComp float32
 
 	if err := h.initialization(); err != nil {
-		return []error{err}
+		return err
 	}
 
 	go func() {
@@ -108,7 +108,7 @@ func (h *MPL115A2Driver) Start() (errs []error) {
 }
 
 // Halt returns true if devices is halted successfully
-func (h *MPL115A2Driver) Halt() (err []error) { return }
+func (h *MPL115A2Driver) Halt() (err error) { return }
 
 func (h *MPL115A2Driver) initialization() (err error) {
 	var coA0 int16
