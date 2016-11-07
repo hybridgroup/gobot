@@ -38,15 +38,13 @@ func (d *Adaptor) Name() string { return d.name }
 func (d *Adaptor) SetName(n string) { d.name = n }
 
 // Connect starts a connection to the digispark
-func (d *Adaptor) Connect() (errs []error) {
-	if err := d.connect(d); err != nil {
-		return []error{err}
-	}
+func (d *Adaptor) Connect() (err error) {
+	err = d.connect(d)
 	return
 }
 
 // Finalize implements the Adaptor interface
-func (d *Adaptor) Finalize() (errs []error) { return }
+func (d *Adaptor) Finalize() (err error) { return }
 
 // DigitalWrite writes a value to the pin. Acceptable values are 1 or 0.
 func (d *Adaptor) DigitalWrite(pin string, level byte) (err error) {
