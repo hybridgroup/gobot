@@ -76,13 +76,13 @@ func TestSpheroDriver(t *testing.T) {
 
 func TestSpheroDriverStart(t *testing.T) {
 	d := initTestSpheroDriver()
-	gobottest.Assert(t, len(d.Start()), 0)
+	gobottest.Assert(t, d.Start(), nil)
 }
 
 func TestSpheroDriverHalt(t *testing.T) {
 	d := initTestSpheroDriver()
 	d.adaptor().connected = true
-	gobottest.Assert(t, len(d.Halt()), 0)
+	gobottest.Assert(t, d.Halt(), nil)
 }
 
 func TestSpheroDriverSetDataStreaming(t *testing.T) {
