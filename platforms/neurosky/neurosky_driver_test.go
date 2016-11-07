@@ -34,7 +34,7 @@ func TestNeuroskyDriverStart(t *testing.T) {
 		sem <- true
 	})
 
-	gobottest.Assert(t, len(d.Start()), 0)
+	gobottest.Assert(t, d.Start(), nil)
 
 	time.Sleep(50 * time.Millisecond)
 	readError = errors.New("read error")
@@ -51,7 +51,7 @@ func TestNeuroskyDriverStart(t *testing.T) {
 
 func TestNeuroskyDriverHalt(t *testing.T) {
 	d := initTestNeuroskyDriver()
-	gobottest.Assert(t, len(d.Halt()), 0)
+	gobottest.Assert(t, d.Halt(), nil)
 }
 
 func TestNeuroskyDriverParse(t *testing.T) {

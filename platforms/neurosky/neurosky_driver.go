@@ -8,25 +8,25 @@ import (
 
 const BTSync byte = 0xAA
 
-// Extended code
+// CodeEx Extended code
 const CodeEx byte = 0x55
 
-// POOR_SIGNAL quality 0-255
+// CodeSignalQuality POOR_SIGNAL quality 0-255
 const CodeSignalQuality byte = 0x02
 
-// ATTENTION eSense 0-100
+// CodeAttention ATTENTION eSense 0-100
 const CodeAttention byte = 0x04
 
-// MEDITATION eSense 0-100
+// CodeMeditation MEDITATION eSense 0-100
 const CodeMeditation byte = 0x05
 
-// BLINK strength 0-255
+// CodeBlink BLINK strength 0-255
 const CodeBlink byte = 0x16
 
-// RAW wave value: 2-byte big-endian 2s-complement
+// CodeWave RAW wave value: 2-byte big-endian 2s-complement
 const CodeWave byte = 0x80
 
-// ASIC EEG POWER 8 3-byte big-endian integers
+// CodeAsicEEG ASIC EEG POWER 8 3-byte big-endian integers
 const CodeAsicEEG byte = 0x83
 
 type Driver struct {
