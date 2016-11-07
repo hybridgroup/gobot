@@ -57,18 +57,18 @@ func TestMavlinkAdaptor(t *testing.T) {
 }
 func TestMavlinkAdaptorConnect(t *testing.T) {
 	a := initTestMavlinkAdaptor()
-	gobottest.Assert(t, len(a.Connect()), 0)
+	gobottest.Assert(t, a.Connect(), nil)
 
 	a.connect = func(port string) (io.ReadWriteCloser, error) { return nil, errors.New("connect error") }
-	gobottest.Assert(t, a.Connect()[0], errors.New("connect error"))
+	gobottest.Assert(t, a.Connect(), errors.New("connect error"))
 }
 
 func TestMavlinkAdaptorFinalize(t *testing.T) {
 	a := initTestMavlinkAdaptor()
-	gobottest.Assert(t, len(a.Finalize()), 0)
+	gobottest.Assert(t, a.Finalize(), nil)
 
 	testAdaptorClose = func() error {
 		return errors.New("close error")
 	}
-	gobottest.Assert(t, a.Finalize()[0], errors.New("close error"))
+	gobottest.Assert(t, a.Finalize(), errors.New("close error"))
 }

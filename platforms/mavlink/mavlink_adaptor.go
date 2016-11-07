@@ -29,9 +29,9 @@ func (m *Adaptor) SetName(n string) { m.name = n }
 func (m *Adaptor) Port() string     { return m.port }
 
 // Connect returns true if connection to device is successful
-func (m *Adaptor) Connect() (errs []error) {
-	if sp, err := m.connect(m.Port()); err != nil {
-		return []error{err}
+func (m *Adaptor) Connect() (err error) {
+	if sp, e := m.connect(m.Port()); e != nil {
+		return e
 	} else {
 		m.sp = sp
 	}
@@ -39,9 +39,7 @@ func (m *Adaptor) Connect() (errs []error) {
 }
 
 // Finalize returns true if connection to devices is closed successfully
-func (m *Adaptor) Finalize() (errs []error) {
-	if err := m.sp.Close(); err != nil {
-		return []error{err}
-	}
+func (m *Adaptor) Finalize() (err error) {
+	err = m.sp.Close()
 	return
 }
