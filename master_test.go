@@ -6,6 +6,7 @@ import (
 	"os"
 	"testing"
 
+	multierror "github.com/hashicorp/go-multierror"
 	"github.com/hybridgroup/gobot/gobottest"
 )
 
@@ -86,12 +87,17 @@ func TestMasterStart(t *testing.T) {
 
 func TestMasterStartDriverErrors(t *testing.T) {
 	g := initTestMaster1Robot()
-
+	e := errors.New("driver start error 1")
 	testDriverStart = func() (err error) {
-		return errors.New("driver start error 1")
+		return e
 	}
 
-	gobottest.Assert(t, g.Start().Error(), "3 error(s) occurred:\n\n* driver start error 1\n* driver start error 1\n* driver start error 1")
+	var expected error
+	expected = multierror.Append(expected, e)
+	expected = multierror.Append(expected, e)
+	expected = multierror.Append(expected, e)
+
+	gobottest.Assert(t, g.Start(), expected)
 	gobottest.Assert(t, g.Stop(), nil)
 
 	testDriverStart = func() (err error) { return }
@@ -99,28 +105,36 @@ func TestMasterStartDriverErrors(t *testing.T) {
 
 func TestMasterStartAdaptorErrors(t *testing.T) {
 	g := initTestMaster1Robot()
+	e := errors.New("adaptor start error 1")
 
 	testAdaptorConnect = func() (err error) {
-		return errors.New("adaptor start error 1")
+		return e
 	}
 
-	gobottest.Assert(t, g.Start().Error(), "3 error(s) occurred:\n\n* adaptor start error 1\n* adaptor start error 1\n* adaptor start error 1")
+	var expected error
+	expected = multierror.Append(expected, e)
+	expected = multierror.Append(expected, e)
+	expected = multierror.Append(expected, e)
+
+	gobottest.Assert(t, g.Start(), expected)
 	gobottest.Assert(t, g.Stop(), nil)
 
 	testAdaptorConnect = func() (err error) { return }
 }
 
-func TestMasterHaltErrors(t *testing.T) {
+func TestMasterFinalizeErrors(t *testing.T) {
 	g := initTestMaster1Robot()
-
-	testDriverHalt = func() (err error) {
-		return errors.New("driver halt error 2")
-	}
+	e := errors.New("adaptor finalize error 2")
 
 	testAdaptorFinalize = func() (err error) {
-		return errors.New("adaptor finalize error 2")
+		return e
 	}
 
+	var expected error
+	expected = multierror.Append(expected, e)
+	expected = multierror.Append(expected, e)
+	expected = multierror.Append(expected, e)
+
 	gobottest.Assert(t, g.Start(), nil)
-	gobottest.Assert(t, g.Stop().Error(), "3 error(s) occurred:\n\n* adaptor finalize error 2\n* adaptor finalize error 2\n* adaptor finalize error 2")
+	gobottest.Assert(t, g.Stop(), expected)
 }
