@@ -41,21 +41,21 @@ func (m *MotorDriver) SetName(n string) {
 }
 
 // Start implements the Driver interface
-func (m *MotorDriver) Start() []error {
+func (m *MotorDriver) Start() error {
 	m.syncRoot.Lock()
 	defer m.syncRoot.Unlock()
 	m.halted = false
 	m.speedHelper(0)
-	return []error{}
+	return nil
 }
 
 // Halt terminates the Driver interface
-func (m *MotorDriver) Halt() []error {
+func (m *MotorDriver) Halt() error {
 	m.syncRoot.Lock()
 	defer m.syncRoot.Unlock()
 	m.halted = true
 	m.speedHelper(0)
-	return []error{}
+	return nil
 }
 
 // Connection returns the Connection associated with the Driver
