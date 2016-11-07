@@ -111,7 +111,7 @@ func TestAdaptorFinalize(t *testing.T) {
 	a.PwmWrite("7", 255)
 
 	a.I2cStart(0xff)
-	gobottest.Assert(t, len(a.Finalize()), 0)
+	gobottest.Assert(t, a.Finalize(), nil)
 }
 
 func TestAdaptorDigitalPWM(t *testing.T) {

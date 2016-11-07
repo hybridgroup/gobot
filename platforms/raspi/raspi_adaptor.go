@@ -168,7 +168,7 @@ func (r *Adaptor) Finalize() (err error) {
 			err = multierror.Append(err, perr)
 		}
 	}
-	return err
+	return
 }
 
 func (r *Adaptor) translatePin(pin string) (i int, err error) {
