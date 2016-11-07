@@ -28,8 +28,8 @@ func initTestDriver() *Driver {
 func TestDriverStart(t *testing.T) {
 	d := initTestDriver()
 	d.interval = 1 * time.Millisecond
-	gobottest.Assert(t, len(d.Start()), 0)
-	<-time.After(2 * time.Millisecond)
+	gobottest.Assert(t, d.Start(), nil)
+	time.Sleep(2 * time.Millisecond)
 }
 
 func TestDriverHalt(t *testing.T) {
@@ -37,7 +37,7 @@ func TestDriverHalt(t *testing.T) {
 	go func() {
 		<-d.halt
 	}()
-	gobottest.Assert(t, len(d.Halt()), 0)
+	gobottest.Assert(t, d.Halt(), nil)
 }
 
 func TestDriverHandleEvent(t *testing.T) {

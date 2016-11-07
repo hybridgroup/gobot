@@ -94,10 +94,10 @@ func (j *Driver) adaptor() *Adaptor {
 //		[button]_press
 //		[button]_release
 //		[axis]
-func (j *Driver) Start() (errs []error) {
-	file, err := ioutil.ReadFile(j.configPath)
-	if err != nil {
-		return []error{err}
+func (j *Driver) Start() (err error) {
+	file, e := ioutil.ReadFile(j.configPath)
+	if e != nil {
+		return e
 	}
 
 	var jsontype joystickConfig
@@ -118,8 +118,8 @@ func (j *Driver) Start() (errs []error) {
 	go func() {
 		for {
 			for event := j.poll(); event != nil; event = j.poll() {
-				if err = j.handleEvent(event); err != nil {
-					j.Publish(j.Event("error"), err)
+				if errs := j.handleEvent(event); errs != nil {
+					j.Publish(j.Event("error"), errs)
 				}
 			}
 			select {
@@ -133,7 +133,7 @@ func (j *Driver) Start() (errs []error) {
 }
 
 // Halt stops joystick driver
-func (j *Driver) Halt() (errs []error) {
+func (j *Driver) Halt() (err error) {
 	j.halt <- true
 	return
 }
