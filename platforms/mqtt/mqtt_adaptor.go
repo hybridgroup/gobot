@@ -1,6 +1,9 @@
 package mqtt
 
-import paho "github.com/eclipse/paho.mqtt.golang"
+import (
+	paho "github.com/eclipse/paho.mqtt.golang"
+	multierror "github.com/hashicorp/go-multierror"
+)
 
 type Adaptor struct {
 	name     string
@@ -34,10 +37,10 @@ func (a *Adaptor) Name() string     { return a.name }
 func (a *Adaptor) SetName(n string) { a.name = n }
 
 // Connect returns true if connection to mqtt is established
-func (a *Adaptor) Connect() (errs []error) {
+func (a *Adaptor) Connect() (err error) {
 	a.client = paho.NewClient(createClientOptions(a.clientID, a.Host, a.username, a.password))
 	if token := a.client.Connect(); token.Wait() && token.Error() != nil {
-		errs = append(errs, token.Error())
+		err = multierror.Append(err, token.Error())
 	}
 
 	return
@@ -52,7 +55,7 @@ func (a *Adaptor) Disconnect() (err error) {
 }
 
 // Finalize returns true if connection to mqtt is finalized successfully
-func (a *Adaptor) Finalize() (errs []error) {
+func (a *Adaptor) Finalize() (err error) {
 	a.Disconnect()
 	return
 }

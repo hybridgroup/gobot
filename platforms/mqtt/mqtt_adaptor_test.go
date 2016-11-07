@@ -16,12 +16,12 @@ func initTestMqttAdaptor() *Adaptor {
 
 func TestMqttAdaptorConnect(t *testing.T) {
 	a := initTestMqttAdaptor()
-	gobottest.Assert(t, a.Connect()[0].Error(), "Network Error : Unknown protocol")
+	gobottest.Assert(t, a.Connect().Error(), "1 error(s) occurred:\n\n* Network Error : Unknown protocol")
 }
 
 func TestMqttAdaptorFinalize(t *testing.T) {
 	a := initTestMqttAdaptor()
-	gobottest.Assert(t, len(a.Finalize()), 0)
+	gobottest.Assert(t, a.Finalize(), nil)
 }
 
 func TestMqttAdaptorCannotPublishUnlessConnected(t *testing.T) {
