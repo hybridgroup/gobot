@@ -1,4 +1,5 @@
-// TODO: move this into shared PWM package
+// package joule pwm implementation
+// TODO: move this into shared Intel package
 package joule
 
 import "strconv"
