@@ -104,11 +104,11 @@ func TestAdaptor(t *testing.T) {
 
 func TestAdaptorFinalize(t *testing.T) {
 	a := initTestAdaptor()
-	gobottest.Assert(t, len(a.Finalize()), 0)
+	gobottest.Assert(t, a.Finalize(), nil)
 
 	a = initTestAdaptor()
 	a.board.(*mockFirmataBoard).disconnectError = errors.New("close error")
-	gobottest.Assert(t, a.Finalize()[0], errors.New("close error"))
+	gobottest.Assert(t, a.Finalize(), errors.New("close error"))
 }
 
 func TestAdaptorConnect(t *testing.T) {
@@ -118,18 +118,18 @@ func TestAdaptorConnect(t *testing.T) {
 	a := NewAdaptor("/dev/null")
 	a.openSP = openSP
 	a.board = newMockFirmataBoard()
-	gobottest.Assert(t, len(a.Connect()), 0)
+	gobottest.Assert(t, a.Connect(), nil)
 
 	a = NewAdaptor("/dev/null")
 	a.board = newMockFirmataBoard()
 	a.openSP = func(port string) (io.ReadWriteCloser, error) {
 		return nil, errors.New("connect error")
 	}
-	gobottest.Assert(t, a.Connect()[0], errors.New("connect error"))
+	gobottest.Assert(t, a.Connect(), errors.New("connect error"))
 
 	a = NewAdaptor(&readWriteCloser{})
 	a.board = newMockFirmataBoard()
-	gobottest.Assert(t, len(a.Connect()), 0)
+	gobottest.Assert(t, a.Connect(), nil)
 
 }
 
