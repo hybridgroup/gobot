@@ -28,7 +28,7 @@ func TestCameraDriver(t *testing.T) {
 func TestCameraDriverStart(t *testing.T) {
 	sem := make(chan bool)
 	d := initTestCameraDriver()
-	gobottest.Assert(t, len(d.Start()), 0)
+	gobottest.Assert(t, d.Start(), nil)
 	d.On(d.Event("frame"), func(data interface{}) {
 		sem <- true
 	})
@@ -39,13 +39,13 @@ func TestCameraDriverStart(t *testing.T) {
 	}
 
 	d = NewCameraDriver("")
-	gobottest.Assert(t, len(d.Start()), 0)
+	gobottest.Assert(t, d.Start(), nil)
 
 	d = NewCameraDriver(true)
-	gobottest.Refute(t, len(d.Start()), 0)
+	gobottest.Refute(t, d.Start(), nil)
 }
 
 func TestCameraDriverHalt(t *testing.T) {
 	d := initTestCameraDriver()
-	gobottest.Assert(t, len(d.Halt()), 0)
+	gobottest.Assert(t, d.Halt(), nil)
 }
