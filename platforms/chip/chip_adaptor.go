@@ -3,6 +3,7 @@ package chip
 import (
 	"errors"
 
+	multierror "github.com/hashicorp/go-multierror"
 	"github.com/hybridgroup/gobot/sysfs"
 )
 
@@ -39,25 +40,25 @@ func (c *Adaptor) Name() string { return c.name }
 func (c *Adaptor) SetName(n string) { c.name = n }
 
 // Connect initializes the board
-func (c *Adaptor) Connect() (errs []error) {
+func (c *Adaptor) Connect() (err error) {
 	return
 }
 
 // Finalize closes connection to board and pins
-func (c *Adaptor) Finalize() (errs []error) {
+func (c *Adaptor) Finalize() (err error) {
 	for _, pin := range c.digitalPins {
 		if pin != nil {
-			if err := pin.Unexport(); err != nil {
-				errs = append(errs, err)
+			if e := pin.Unexport(); e != nil {
+				err = multierror.Append(err, e)
 			}
 		}
 	}
 	if c.i2cDevice != nil {
-		if err := c.i2cDevice.Close(); err != nil {
-			errs = append(errs, err)
+		if e := c.i2cDevice.Close(); e != nil {
+			err = multierror.Append(err, e)
 		}
 	}
-	return errs
+	return
 }
 
 func (c *Adaptor) translatePin(pin string) (i int, err error) {
