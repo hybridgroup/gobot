@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"testing"
 
+	multierror "github.com/hashicorp/go-multierror"
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/gobottest"
 )
@@ -48,7 +49,9 @@ func TestNatsAdaptorOnWhenConnectedWithAuth(t *testing.T) {
 
 func TestNatsAdaptorConnect(t *testing.T) {
 	a := NewAdaptor("localhost:9999", 9999)
-	gobottest.Assert(t, a.Connect(), errors.New("nats: no servers available for connection"))
+	var expected error
+	expected = multierror.Append(expected, errors.New("nats: no servers available for connection"))
+	gobottest.Assert(t, a.Connect(), expected)
 }
 
 func TestNatsAdaptorFinalize(t *testing.T) {
