@@ -23,15 +23,15 @@ func TestLeapMotionAdaptor(t *testing.T) {
 }
 func TestLeapMotionAdaptorConnect(t *testing.T) {
 	a := initTestLeapMotionAdaptor()
-	gobottest.Assert(t, len(a.Connect()), 0)
+	gobottest.Assert(t, a.Connect(), nil)
 
 	a.connect = func(port string) (io.ReadWriteCloser, error) {
 		return nil, errors.New("connection error")
 	}
-	gobottest.Assert(t, a.Connect()[0], errors.New("connection error"))
+	gobottest.Assert(t, a.Connect(), errors.New("connection error"))
 }
 
 func TestLeapMotionAdaptorFinalize(t *testing.T) {
 	a := initTestLeapMotionAdaptor()
-	gobottest.Assert(t, len(a.Finalize()), 0)
+	gobottest.Assert(t, a.Finalize(), nil)
 }
