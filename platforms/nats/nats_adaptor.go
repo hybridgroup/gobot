@@ -54,7 +54,7 @@ func (a *Adaptor) Connect() (err error) {
 
 	var e error
 	a.client, e = nats.Connect(defaultURL)
-	if err != nil {
+	if e != nil {
 		err = multierror.Append(err, e)
 	}
 	return
