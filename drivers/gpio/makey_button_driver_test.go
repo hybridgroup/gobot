@@ -24,7 +24,7 @@ func TestMakeyButtonDriverHalt(t *testing.T) {
 		<-d.halt
 		close(done)
 	}()
-	gobottest.Assert(t, len(d.Halt()), 0)
+	gobottest.Assert(t, d.Halt(), nil)
 	select {
 	case <-done:
 	case <-time.After(time.Millisecond):
@@ -45,7 +45,7 @@ func TestMakeyButtonDriver(t *testing.T) {
 func TestMakeyButtonDriverStart(t *testing.T) {
 	sem := make(chan bool)
 	d := initTestMakeyButtonDriver()
-	gobottest.Assert(t, len(d.Start()), 0)
+	gobottest.Assert(t, d.Start(), nil)
 
 	testAdaptorDigitalRead = func() (val int, err error) {
 		val = 0

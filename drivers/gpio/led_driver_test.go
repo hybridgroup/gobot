@@ -48,12 +48,12 @@ func TestLedDriver(t *testing.T) {
 
 func TestLedDriverStart(t *testing.T) {
 	d := initTestLedDriver(newGpioTestAdaptor())
-	gobottest.Assert(t, len(d.Start()), 0)
+	gobottest.Assert(t, d.Start(), nil)
 }
 
 func TestLedDriverHalt(t *testing.T) {
 	d := initTestLedDriver(newGpioTestAdaptor())
-	gobottest.Assert(t, len(d.Halt()), 0)
+	gobottest.Assert(t, d.Halt(), nil)
 }
 
 func TestLedDriverToggle(t *testing.T) {

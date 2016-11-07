@@ -42,12 +42,12 @@ func TestServoDriver(t *testing.T) {
 
 func TestServoDriverStart(t *testing.T) {
 	d := initTestServoDriver()
-	gobottest.Assert(t, len(d.Start()), 0)
+	gobottest.Assert(t, d.Start(), nil)
 }
 
 func TestServoDriverHalt(t *testing.T) {
 	d := initTestServoDriver()
-	gobottest.Assert(t, len(d.Halt()), 0)
+	gobottest.Assert(t, d.Halt(), nil)
 }
 
 func TestServoDriverMove(t *testing.T) {

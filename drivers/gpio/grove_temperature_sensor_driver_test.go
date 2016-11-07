@@ -28,7 +28,7 @@ func TestGroveTempSensorPublishesTemperatureInCelsius(t *testing.T) {
 		val = 585
 		return
 	}
-	gobottest.Assert(t, len(d.Start()), 0)
+	gobottest.Assert(t, d.Start(), nil)
 
 	d.Once(d.Event(Data), func(data interface{}) {
 		gobottest.Assert(t, fmt.Sprintf("%.2f", data.(float64)), "31.62")
@@ -46,7 +46,7 @@ func TestGroveTempSensorPublishesError(t *testing.T) {
 		return
 	}
 
-	gobottest.Assert(t, len(d.Start()), 0)
+	gobottest.Assert(t, d.Start(), nil)
 
 	// expect error
 	d.Once(d.Event(Error), func(data interface{}) {
@@ -68,7 +68,7 @@ func TestGroveTempSensorHalt(t *testing.T) {
 		<-d.halt
 		close(done)
 	}()
-	gobottest.Assert(t, len(d.Halt()), 0)
+	gobottest.Assert(t, d.Halt(), nil)
 	select {
 	case <-done:
 	case <-time.After(time.Millisecond):
