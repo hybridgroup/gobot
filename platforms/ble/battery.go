@@ -34,12 +34,12 @@ func (b *BatteryDriver) adaptor() *ClientAdaptor {
 }
 
 // Start tells driver to get ready to do work
-func (b *BatteryDriver) Start() (errs []error) {
+func (b *BatteryDriver) Start() (err error) {
 	return
 }
 
 // Halt stops battery driver (void)
-func (b *BatteryDriver) Halt() (errs []error) { return }
+func (b *BatteryDriver) Halt() (err error) { return }
 
 func (b *BatteryDriver) GetBatteryLevel() (level uint8) {
 	var l uint8

@@ -34,12 +34,12 @@ func (b *DeviceInformationDriver) adaptor() *ClientAdaptor {
 }
 
 // Start tells driver to get ready to do work
-func (b *DeviceInformationDriver) Start() (errs []error) {
+func (b *DeviceInformationDriver) Start() (err error) {
 	return
 }
 
 // Halt stops driver (void)
-func (b *DeviceInformationDriver) Halt() (errs []error) { return }
+func (b *DeviceInformationDriver) Halt() (err error) { return }
 
 func (b *DeviceInformationDriver) GetModelNumber() (model string) {
 	c, _ := b.adaptor().ReadCharacteristic("180a", "2a24")

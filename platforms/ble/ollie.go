@@ -64,7 +64,7 @@ func (b *SpheroOllieDriver) adaptor() *ClientAdaptor {
 }
 
 // Start tells driver to get ready to do work
-func (s *SpheroOllieDriver) Start() (errs []error) {
+func (s *SpheroOllieDriver) Start() (err error) {
 	s.Init()
 
 	// send commands
@@ -82,7 +82,7 @@ func (s *SpheroOllieDriver) Start() (errs []error) {
 }
 
 // Halt stops Ollie driver (void)
-func (b *SpheroOllieDriver) Halt() (errs []error) {
+func (b *SpheroOllieDriver) Halt() (err error) {
 	b.Sleep()
 	time.Sleep(750 * time.Microsecond)
 	return
