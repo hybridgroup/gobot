@@ -19,9 +19,9 @@ func TestAudioDriver(t *testing.T) {
 
 	gobottest.Refute(t, d.Connection(), nil)
 
-	gobottest.Assert(t, len(d.Start()), 0)
+	gobottest.Assert(t, d.Start(), nil)
 
-	gobottest.Assert(t, len(d.Halt()), 0)
+	gobottest.Assert(t, d.Halt(), nil)
 }
 
 func TestAudioDriverSoundWithNoFilename(t *testing.T) {

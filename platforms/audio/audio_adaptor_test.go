@@ -14,8 +14,8 @@ var _ gobot.Adaptor = (*Adaptor)(nil)
 func TestAudioAdaptor(t *testing.T) {
 	a := NewAdaptor()
 
-	gobottest.Assert(t, len(a.Connect()), 0)
-	gobottest.Assert(t, len(a.Finalize()), 0)
+	gobottest.Assert(t, a.Connect(), nil)
+	gobottest.Assert(t, a.Finalize(), nil)
 }
 
 func TestAudioAdaptorCommandsWav(t *testing.T) {
