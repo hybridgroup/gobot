@@ -90,25 +90,25 @@ func TestBlinkMDriver(t *testing.T) {
 func TestBlinkMDriverStart(t *testing.T) {
 	blinkM, adaptor := initTestBlinkDriverWithStubbedAdaptor()
 
-	gobottest.Assert(t, len(blinkM.Start()), 0)
+	gobottest.Assert(t, blinkM.Start(), nil)
 
 	adaptor.i2cStartImpl = func() error {
 		return errors.New("start error")
 	}
 
-	gobottest.Assert(t, blinkM.Start()[0], errors.New("start error"))
+	gobottest.Assert(t, blinkM.Start(), errors.New("start error"))
 	adaptor.i2cStartImpl = func() error {
 		return nil
 	}
 	adaptor.i2cWriteImpl = func() error {
 		return errors.New("write error")
 	}
-	gobottest.Assert(t, blinkM.Start()[0], errors.New("write error"))
+	gobottest.Assert(t, blinkM.Start(), errors.New("write error"))
 }
 
 func TestBlinkMDriverHalt(t *testing.T) {
 	blinkM := initTestBlinkMDriver()
-	gobottest.Assert(t, len(blinkM.Halt()), 0)
+	gobottest.Assert(t, blinkM.Halt(), nil)
 }
 
 func TestBlinkMDriverFirmwareVersion(t *testing.T) {

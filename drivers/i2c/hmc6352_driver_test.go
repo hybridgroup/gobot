@@ -36,26 +36,26 @@ func TestNewHMC6352Driver(t *testing.T) {
 func TestHMC6352DriverStart(t *testing.T) {
 	hmc, adaptor := initTestHMC6352DriverWithStubbedAdaptor()
 
-	gobottest.Assert(t, len(hmc.Start()), 0)
+	gobottest.Assert(t, hmc.Start(), nil)
 
 	adaptor.i2cWriteImpl = func() error {
 		return errors.New("write error")
 	}
 	err := hmc.Start()
-	gobottest.Assert(t, err[0], errors.New("write error"))
+	gobottest.Assert(t, err, errors.New("write error"))
 
 	adaptor.i2cStartImpl = func() error {
 		return errors.New("start error")
 	}
 	err = hmc.Start()
-	gobottest.Assert(t, err[0], errors.New("start error"))
+	gobottest.Assert(t, err, errors.New("start error"))
 
 }
 
 func TestHMC6352DriverHalt(t *testing.T) {
 	hmc := initTestHMC6352Driver()
 
-	gobottest.Assert(t, len(hmc.Halt()), 0)
+	gobottest.Assert(t, hmc.Halt(), nil)
 }
 
 func TestHMC6352DriverHeading(t *testing.T) {

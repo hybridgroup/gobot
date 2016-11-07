@@ -161,33 +161,33 @@ func (a *AdafruitMotorHatDriver) Start() (err error) {
 	addrs := []int{motorHatAddress, servoHatAddress}
 	for i := range addrs {
 
-		if err := a.connection.I2cStart(addrs[i]); err != nil {
-			return err
+		if err = a.connection.I2cStart(addrs[i]); err != nil {
+			return
 		}
-		if err := a.setAllPWM(addrs[i], 0, 0); err != nil {
+		if err = a.setAllPWM(addrs[i], 0, 0); err != nil {
 			return
 		}
 		reg := byte(_Mode2)
 		val := byte(_Outdrv)
-		if err := a.connection.I2cWrite(addrs[i], []byte{reg, val}); err != nil {
+		if err = a.connection.I2cWrite(addrs[i], []byte{reg, val}); err != nil {
 			return
 		}
 		reg = byte(_Mode1)
 		val = byte(_AllCall)
-		if err := a.connection.I2cWrite(addrs[i], []byte{reg, val}); err != nil {
+		if err = a.connection.I2cWrite(addrs[i], []byte{reg, val}); err != nil {
 			return
 		}
 		time.Sleep(5 * time.Millisecond)
 
 		// Read a byte from the I2C device.  Note: no ability to read from a specified reg?
-		mode1, err := a.connection.I2cRead(addrs[i], 1)
-		if err != nil {
-			return
+		mode1, rerr := a.connection.I2cRead(addrs[i], 1)
+		if rerr != nil {
+			return rerr
 		}
 		if len(mode1) > 0 {
 			reg = byte(_Mode1)
 			val = mode1[0] & _Sleep
-			if err := a.connection.I2cWrite(addrs[i], []byte{reg, val}); err != nil {
+			if err = a.connection.I2cWrite(addrs[i], []byte{reg, val}); err != nil {
 				return
 			}
 			time.Sleep(5 * time.Millisecond)
