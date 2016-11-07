@@ -50,13 +50,10 @@ func (a *Adaptor) Name() string { return a.name }
 func (a *Adaptor) SetName(n string) { a.name = n }
 
 // Connect establishes a connection to the ardrone
-func (a *Adaptor) Connect() (errs []error) {
-	err := a.connect(a)
-	if err != nil {
-		return []error{err}
-	}
+func (a *Adaptor) Connect() (err error) {
+	err = a.connect(a)
 	return
 }
 
 // Finalize terminates the connection to the ardrone
-func (a *Adaptor) Finalize() (errs []error) { return }
+func (a *Adaptor) Finalize() (err error) { return }

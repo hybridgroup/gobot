@@ -42,12 +42,12 @@ func (a *Driver) adaptor() *Adaptor {
 }
 
 // Start starts the Bebop Driver
-func (a *Driver) Start() (errs []error) {
+func (a *Driver) Start() (err error) {
 	return
 }
 
 // Halt halts the Bebop Driver
-func (a *Driver) Halt() (errs []error) {
+func (a *Driver) Halt() (err error) {
 	return
 }
 

@@ -21,16 +21,16 @@ func initTestBebopAdaptor() *Adaptor {
 
 func TestBebopAdaptorConnect(t *testing.T) {
 	a := initTestBebopAdaptor()
-	gobottest.Assert(t, len(a.Connect()), 0)
+	gobottest.Assert(t, a.Connect(), nil)
 
 	a.connect = func(a *Adaptor) error {
 		return errors.New("connection error")
 	}
-	gobottest.Assert(t, a.Connect()[0], errors.New("connection error"))
+	gobottest.Assert(t, a.Connect(), errors.New("connection error"))
 }
 
 func TestBebopAdaptorFinalize(t *testing.T) {
 	a := initTestBebopAdaptor()
 	a.Connect()
-	gobottest.Assert(t, len(a.Finalize()), 0)
+	gobottest.Assert(t, a.Finalize(), nil)
 }
