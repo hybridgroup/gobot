@@ -146,5 +146,5 @@ func TestBeagleboneAdaptor(t *testing.T) {
 	data, _ := a.I2cRead(0xff, 2)
 	gobottest.Assert(t, data, []byte{0x00, 0x01})
 
-	gobottest.Assert(t, len(a.Finalize()), 0)
+	gobottest.Assert(t, a.Finalize(), nil)
 }
