@@ -1,6 +1,7 @@
 package nats
 
 import (
+	multierror "github.com/hashicorp/go-multierror"
 	"github.com/nats-io/nats"
 )
 
@@ -43,8 +44,7 @@ func (a *Adaptor) Name() string { return a.name }
 func (a *Adaptor) SetName(n string) { a.name = n }
 
 // Connect makes a connection to the Nats server.
-func (a *Adaptor) Connect() (errs []error) {
-
+func (a *Adaptor) Connect() (err error) {
 	auth := ""
 	if a.username != "" && a.password != "" {
 		auth = a.username + ":" + a.password + "@"
@@ -52,10 +52,10 @@ func (a *Adaptor) Connect() (errs []error) {
 
 	defaultURL := "nats://" + auth + a.Host
 
-	var err error
-	a.client, err = nats.Connect(defaultURL)
+	var e error
+	a.client, e = nats.Connect(defaultURL)
 	if err != nil {
-		return append(errs, err)
+		err = multierror.Append(err, e)
 	}
 	return
 }
@@ -69,7 +69,7 @@ func (a *Adaptor) Disconnect() (err error) {
 }
 
 // Finalize is simply a helper method for the disconnect.
-func (a *Adaptor) Finalize() (errs []error) {
+func (a *Adaptor) Finalize() (err error) {
 	a.Disconnect()
 	return
 }

@@ -1,6 +1,7 @@
 package nats
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 
@@ -47,12 +48,12 @@ func TestNatsAdaptorOnWhenConnectedWithAuth(t *testing.T) {
 
 func TestNatsAdaptorConnect(t *testing.T) {
 	a := NewAdaptor("localhost:9999", 9999)
-	gobottest.Assert(t, a.Connect()[0].Error(), "nats: no servers available for connection")
+	gobottest.Assert(t, a.Connect(), errors.New("nats: no servers available for connection"))
 }
 
 func TestNatsAdaptorFinalize(t *testing.T) {
 	a := NewAdaptor("localhost:9999", 9999)
-	gobottest.Assert(t, len(a.Finalize()), 0)
+	gobottest.Assert(t, a.Finalize(), nil)
 }
 
 func TestNatsAdaptorCannotPublishUnlessConnected(t *testing.T) {
