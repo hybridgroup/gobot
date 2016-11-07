@@ -50,3 +50,4 @@ deps:
 	go get -d -v github.com/nats-io/nats
 	go get -d -v github.com/lazywei/go-opencv
 	go get -d -v github.com/donovanhide/eventsource
+	go get -d -v github.com/hashicorp/go-multierror
