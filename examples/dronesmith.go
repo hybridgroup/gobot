@@ -5,6 +5,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/dronesmith"
@@ -12,15 +13,24 @@ import (
 
 func main() {
 	a := dronesmith.NewAdaptor(os.Args[1], os.Args[2], os.Args[3])
-	tel := dronesmith.NewTelemetryDriver(a)
+	telemetry := dronesmith.NewTelemetryDriver(a)
+	control := dronesmith.NewControlDriver(a)
 
 	work := func() {
-		fmt.Println(tel.Info())
+		fmt.Println(telemetry.Info())
+		fmt.Println("arming...")
+		control.Arm()
+		fmt.Println("taking off...")
+		control.Takeoff()
+		gobot.After(10*time.Second, func() {
+			fmt.Println("landing...")
+			control.Land()
+		})
 	}
 
 	robot := gobot.NewRobot("mydrone",
 		[]gobot.Connection{a},
-		[]gobot.Device{tel},
+		[]gobot.Device{telemetry, control},
 		work,
 	)
 
