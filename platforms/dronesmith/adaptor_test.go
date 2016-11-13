@@ -53,7 +53,7 @@ func TestNewAdaptor(t *testing.T) {
 		t.Errorf("NewAdaptor() should have returned a *Adaptor")
 	}
 
-	gobottest.Assert(t, drone.APIServer, "https://api.dronesmith.io")
+	gobottest.Assert(t, drone.APIServer, "http://api.dronesmith.io")
 	gobottest.Assert(t, drone.Name(), "Dronesmith")
 }
 
