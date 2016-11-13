@@ -131,7 +131,7 @@ func TestDriverPublishesError(t *testing.T) {
 		testAdaptorAnalogRead = returnErr
 		testAdaptorDigitalRead = returnErr
 
-		gobottest.Assert(t, len(driver.Start()), 0)
+		gobottest.Assert(t, driver.Start(), nil)
 
 		// expect error
 		driver.Once(driver.Event(Error), func(data interface{}) {

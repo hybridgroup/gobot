@@ -135,13 +135,13 @@ func configure() (err error) {
 }
 
 // restores the TTY to the original state
-func restore() (errs []error) {
-	if _, err := stty("echo"); err != nil {
-		return []error{err}
+func restore() (err error) {
+	if _, err = stty("echo"); err != nil {
+		return
 	}
 
-	if _, err := stty(originalState); err != nil {
-		return []error{err}
+	if _, err = stty(originalState); err != nil {
+		return
 	}
 
 	return

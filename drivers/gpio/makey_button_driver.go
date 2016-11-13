@@ -62,7 +62,7 @@ func (b *MakeyButtonDriver) Connection() gobot.Connection { return b.connection.
 // 	Push int - On button push
 //	Release int - On button release
 //	Error error - On button error
-func (b *MakeyButtonDriver) Start() (errs []error) {
+func (b *MakeyButtonDriver) Start() (err error) {
 	state := 1
 	go func() {
 		timer := time.NewTimer(b.interval)
@@ -93,7 +93,7 @@ func (b *MakeyButtonDriver) Start() (errs []error) {
 }
 
 // Halt stops polling the makey button for new information
-func (b *MakeyButtonDriver) Halt() (errs []error) {
+func (b *MakeyButtonDriver) Halt() (err error) {
 	b.halt <- true
 	return
 }

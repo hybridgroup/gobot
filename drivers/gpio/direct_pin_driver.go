@@ -68,10 +68,10 @@ func (d *DirectPinDriver) Pin() string { return d.pin }
 func (d *DirectPinDriver) Connection() gobot.Connection { return d.connection }
 
 // Start implements the Driver interface
-func (d *DirectPinDriver) Start() (errs []error) { return }
+func (d *DirectPinDriver) Start() (err error) { return }
 
 // Halt implements the Driver interface
-func (d *DirectPinDriver) Halt() (errs []error) { return }
+func (d *DirectPinDriver) Halt() (err error) { return }
 
 // Turn Off pin
 func (d *DirectPinDriver) Off() (err error) {

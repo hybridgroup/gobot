@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	multierror "github.com/hashicorp/go-multierror"
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/sysfs"
 )
@@ -145,43 +146,43 @@ func (b *Adaptor) Name() string { return b.name }
 func (b *Adaptor) SetName(n string) { b.name = n }
 
 // Connect initializes the pwm and analog dts.
-func (b *Adaptor) Connect() (errs []error) {
+func (b *Adaptor) Connect() error {
 	if err := ensureSlot(b.slots, "cape-bone-iio"); err != nil {
-		return []error{err}
+		return err
 	}
 
 	if err := ensureSlot(b.slots, "am33xx_pwm"); err != nil {
-		return []error{err}
+		return err
 	}
 
 	g, err := glob(fmt.Sprintf("%v/helper.*", b.ocp))
 	if err != nil {
-		return []error{err}
+		return err
 	}
 	b.helper = g[0]
 
-	return
+	return nil
 }
 
 // Finalize releases all i2c devices and exported analog, digital, pwm pins.
-func (b *Adaptor) Finalize() (errs []error) {
+func (b *Adaptor) Finalize() (err error) {
 	for _, pin := range b.pwmPins {
 		if pin != nil {
-			if err := pin.release(); err != nil {
-				errs = append(errs, err)
+			if e := pin.release(); e != nil {
+				err = multierror.Append(err, e)
 			}
 		}
 	}
 	for _, pin := range b.digitalPins {
 		if pin != nil {
-			if err := pin.Unexport(); err != nil {
-				errs = append(errs, err)
+			if e := pin.Unexport(); e != nil {
+				err = multierror.Append(err, e)
 			}
 		}
 	}
 	if b.i2cDevice != nil {
-		if err := b.i2cDevice.Close(); err != nil {
-			errs = append(errs, err)
+		if e := b.i2cDevice.Close(); e != nil {
+			err = multierror.Append(err, e)
 		}
 	}
 	return

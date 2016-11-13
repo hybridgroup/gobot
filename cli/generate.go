@@ -175,9 +175,9 @@ func ({{.FirstLetter}} *{{.UpperName}}Adaptor) Name() string { return {{.FirstLe
 
 func ({{.FirstLetter}} *{{.UpperName}}Adaptor) SetName(name string) { {{.FirstLetter}}.name = name }
 
-func ({{.FirstLetter}} *{{.UpperName}}Adaptor) Connect() []error { return nil }
+func ({{.FirstLetter}} *{{.UpperName}}Adaptor) Connect() error { return nil }
 
-func ({{.FirstLetter}} *{{.UpperName}}Adaptor) Finalize() []error { return nil }
+func ({{.FirstLetter}} *{{.UpperName}}Adaptor) Finalize() error { return nil }
 
 func ({{.FirstLetter}} *{{.UpperName}}Adaptor) Ping() string { return "pong" }
 `
@@ -242,7 +242,7 @@ func ({{.FirstLetter}} *{{.UpperName}}Driver) Ping() string {
 	return {{.FirstLetter}}.adaptor().Ping()
 }
 
-func ({{.FirstLetter}} *{{.UpperName}}Driver) Start() []error {
+func ({{.FirstLetter}} *{{.UpperName}}Driver) Start() error {
 	go func() {
 		for {
 			{{.FirstLetter}}.Publish({{.FirstLetter}}.Event(Hello), {{.FirstLetter}}.Hello())
@@ -257,7 +257,7 @@ func ({{.FirstLetter}} *{{.UpperName}}Driver) Start() []error {
 	return nil
 }
 
-func ({{.FirstLetter}} *{{.UpperName}}Driver) Halt() []error {
+func ({{.FirstLetter}} *{{.UpperName}}Driver) Halt() error {
 	{{.FirstLetter}}.halt <- true
 	return nil
 }

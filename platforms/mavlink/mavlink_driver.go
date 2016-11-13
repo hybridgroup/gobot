@@ -12,7 +12,7 @@ const (
 	PacketEvent = "packet"
 	// MessageEvent event
 	MessageEvent = "message"
-	// ErrorIOE event
+	// ErrorIOEEvent event
 	ErrorIOEvent = "errorIO"
 	// ErrorMAVLinkEvent event
 	ErrorMAVLinkEvent = "errorMAVLink"
@@ -64,7 +64,7 @@ func (m *Driver) adaptor() *Adaptor {
 
 // Start begins process to read mavlink packets every m.Interval
 // and process them
-func (m *Driver) Start() (errs []error) {
+func (m *Driver) Start() error {
 	go func() {
 		for {
 			packet, err := common.ReadMAVLinkPacket(m.adaptor().sp)
@@ -82,11 +82,11 @@ func (m *Driver) Start() (errs []error) {
 			time.Sleep(m.interval)
 		}
 	}()
-	return
+	return nil
 }
 
 // Halt returns true if device is halted successfully
-func (m *Driver) Halt() (errs []error) { return }
+func (m *Driver) Halt() (err error) { return }
 
 // SendPacket sends a packet to mavlink device
 func (m *Driver) SendPacket(packet *common.MAVLinkPacket) (err error) {

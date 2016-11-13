@@ -28,15 +28,15 @@ func TestArdroneAdaptor(t *testing.T) {
 
 func TestArdroneAdaptorConnect(t *testing.T) {
 	a := initTestArdroneAdaptor()
-	gobottest.Assert(t, len(a.Connect()), 0)
+	gobottest.Assert(t, a.Connect(), nil)
 
 	a.connect = func(a *Adaptor) (drone, error) {
 		return nil, errors.New("connection error")
 	}
-	gobottest.Assert(t, a.Connect()[0], errors.New("connection error"))
+	gobottest.Assert(t, a.Connect(), errors.New("connection error"))
 }
 
 func TestArdroneAdaptorFinalize(t *testing.T) {
 	a := initTestArdroneAdaptor()
-	gobottest.Assert(t, len(a.Finalize()), 0)
+	gobottest.Assert(t, a.Finalize(), nil)
 }

@@ -58,10 +58,10 @@ func NewRgbLedDriver(a DigitalWriter, redPin string, greenPin string, bluePin st
 }
 
 // Start implements the Driver interface
-func (l *RgbLedDriver) Start() (errs []error) { return }
+func (l *RgbLedDriver) Start() (err error) { return }
 
 // Halt implements the Driver interface
-func (l *RgbLedDriver) Halt() (errs []error) { return }
+func (l *RgbLedDriver) Halt() (err error) { return }
 
 // Name returns the RGBLEDDrivers name
 func (l *RgbLedDriver) Name() string { return l.name }

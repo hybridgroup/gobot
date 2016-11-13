@@ -51,7 +51,7 @@ func TestMavlinkDriverStart(t *testing.T) {
 		err <- data.(error)
 	})
 
-	gobottest.Assert(t, len(d.Start()), 0)
+	gobottest.Assert(t, d.Start(), nil)
 
 	select {
 	case p := <-packet:
@@ -74,5 +74,5 @@ func TestMavlinkDriverStart(t *testing.T) {
 
 func TestMavlinkDriverHalt(t *testing.T) {
 	d := initTestMavlinkDriver()
-	gobottest.Assert(t, len(d.Halt()), 0)
+	gobottest.Assert(t, d.Halt(), nil)
 }

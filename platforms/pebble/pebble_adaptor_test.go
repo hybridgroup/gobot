@@ -19,10 +19,10 @@ func TestAdaptor(t *testing.T) {
 }
 func TestAdaptorConnect(t *testing.T) {
 	a := initTestAdaptor()
-	gobottest.Assert(t, len(a.Connect()), 0)
+	gobottest.Assert(t, a.Connect(), nil)
 }
 
 func TestAdaptorFinalize(t *testing.T) {
 	a := initTestAdaptor()
-	gobottest.Assert(t, len(a.Finalize()), 0)
+	gobottest.Assert(t, a.Finalize(), nil)
 }

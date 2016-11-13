@@ -66,9 +66,9 @@ func (k *Driver) Connection() gobot.Connection { return nil }
 
 // Start initializes keyboard by grabbing key events as they come in and
 // publishing a key event
-func (k *Driver) Start() (errs []error) {
-	if err := k.connect(k); err != nil {
-		return []error{err}
+func (k *Driver) Start() (err error) {
+	if err = k.connect(k); err != nil {
+		return err
 	}
 
 	go k.listen(k)
@@ -77,7 +77,7 @@ func (k *Driver) Start() (errs []error) {
 }
 
 // Halt stops camera driver
-func (k *Driver) Halt() (errs []error) {
+func (k *Driver) Halt() (err error) {
 	if originalState != "" {
 		return restore()
 	}

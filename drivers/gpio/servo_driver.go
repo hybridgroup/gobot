@@ -58,10 +58,10 @@ func (s *ServoDriver) Pin() string { return s.pin }
 func (s *ServoDriver) Connection() gobot.Connection { return s.connection.(gobot.Connection) }
 
 // Start implements the Driver interface
-func (s *ServoDriver) Start() (errs []error) { return }
+func (s *ServoDriver) Start() (err error) { return }
 
 // Halt implements the Driver interface
-func (s *ServoDriver) Halt() (errs []error) { return }
+func (s *ServoDriver) Halt() (err error) { return }
 
 // Move sets the servo to the specified angle. Acceptable angles are 0-180
 func (s *ServoDriver) Move(angle uint8) (err error) {

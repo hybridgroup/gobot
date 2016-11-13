@@ -26,10 +26,10 @@ func (t *i2cMcpTestAdaptor) I2cRead(address int, numBytes int) (data []byte, err
 func (t *i2cMcpTestAdaptor) I2cWrite(int, []byte) (err error) {
 	return t.i2cMcpWriteImpl()
 }
-func (t *i2cMcpTestAdaptor) Name() string             { return t.name }
-func (t *i2cMcpTestAdaptor) SetName(n string)         { t.name = n }
-func (t *i2cMcpTestAdaptor) Connect() (errs []error)  { return }
-func (t *i2cMcpTestAdaptor) Finalize() (errs []error) { return }
+func (t *i2cMcpTestAdaptor) Name() string          { return t.name }
+func (t *i2cMcpTestAdaptor) SetName(n string)      { t.name = n }
+func (t *i2cMcpTestAdaptor) Connect() (err error)  { return }
+func (t *i2cMcpTestAdaptor) Finalize() (err error) { return }
 
 func newMcpI2cTestAdaptor() *i2cMcpTestAdaptor {
 	return &i2cMcpTestAdaptor{
@@ -80,24 +80,24 @@ func TestNewMCP23017Driver(t *testing.T) {
 func TestMCP23017DriverStart(t *testing.T) {
 	mcp, adaptor := initTestMCP23017DriverWithStubbedAdaptor(0)
 
-	gobottest.Assert(t, len(mcp.Start()), 0)
+	gobottest.Assert(t, mcp.Start(), nil)
 
 	adaptor.i2cMcpWriteImpl = func() error {
 		return errors.New("write error")
 	}
 	err := mcp.Start()
-	gobottest.Assert(t, err[0], errors.New("write error"))
+	gobottest.Assert(t, err, errors.New("write error"))
 
 	adaptor.i2cMcpStartImpl = func() error {
 		return errors.New("start error")
 	}
 	err = mcp.Start()
-	gobottest.Assert(t, err[0], errors.New("start error"))
+	gobottest.Assert(t, err, errors.New("start error"))
 }
 
 func TestMCP23017DriverHalt(t *testing.T) {
 	mcp := initTestMCP23017Driver(0)
-	gobottest.Assert(t, len(mcp.Halt()), 0)
+	gobottest.Assert(t, mcp.Halt(), nil)
 }
 
 func TestMCP23017DriverCommandsWriteGPIO(t *testing.T) {

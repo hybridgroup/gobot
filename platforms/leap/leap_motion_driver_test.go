@@ -14,7 +14,7 @@ var _ gobot.Driver = (*Driver)(nil)
 
 type NullReadWriteCloser struct{}
 
-var writeError error = nil
+var writeError error
 
 func (NullReadWriteCloser) Write(p []byte) (int, error) {
 	return len(p), writeError
@@ -46,16 +46,16 @@ func TestLeapMotionDriver(t *testing.T) {
 
 func TestLeapMotionDriverStart(t *testing.T) {
 	d := initTestLeapMotionDriver()
-	gobottest.Assert(t, len(d.Start()), 0)
+	gobottest.Assert(t, d.Start(), nil)
 
 	d = initTestLeapMotionDriver()
 	writeError = errors.New("write error")
-	gobottest.Assert(t, d.Start()[0], errors.New("write error"))
+	gobottest.Assert(t, d.Start(), errors.New("write error"))
 }
 
 func TestLeapMotionDriverHalt(t *testing.T) {
 	d := initTestLeapMotionDriver()
-	gobottest.Assert(t, len(d.Halt()), 0)
+	gobottest.Assert(t, d.Halt(), nil)
 }
 
 func TestLeapMotionDriverParser(t *testing.T) {

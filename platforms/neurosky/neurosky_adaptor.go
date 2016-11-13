@@ -29,19 +29,17 @@ func (n *Adaptor) SetName(name string) { n.name = name }
 func (n *Adaptor) Port() string        { return n.port }
 
 // Connect returns true if connection to device is successful
-func (n *Adaptor) Connect() (errs []error) {
+func (n *Adaptor) Connect() error {
 	if sp, err := n.connect(n); err != nil {
-		return []error{err}
+		return err
 	} else {
 		n.sp = sp
 	}
-	return
+	return nil
 }
 
 // Finalize returns true if device finalization is successful
-func (n *Adaptor) Finalize() (errs []error) {
-	if err := n.sp.Close(); err != nil {
-		return []error{err}
-	}
+func (n *Adaptor) Finalize() (err error) {
+	err = n.sp.Close()
 	return
 }

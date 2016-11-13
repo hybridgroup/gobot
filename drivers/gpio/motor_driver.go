@@ -42,10 +42,10 @@ func (m *MotorDriver) SetName(n string) { m.name = n }
 func (m *MotorDriver) Connection() gobot.Connection { return m.connection.(gobot.Connection) }
 
 // Start implements the Driver interface
-func (m *MotorDriver) Start() (errs []error) { return }
+func (m *MotorDriver) Start() (err error) { return }
 
 // Halt implements the Driver interface
-func (m *MotorDriver) Halt() (errs []error) { return }
+func (m *MotorDriver) Halt() (err error) { return }
 
 // Off turns the motor off or sets the motor to a 0 speed
 func (m *MotorDriver) Off() (err error) {

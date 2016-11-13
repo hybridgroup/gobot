@@ -36,20 +36,20 @@ func TestNewLIDARLiteDriver(t *testing.T) {
 func TestLIDARLiteDriverStart(t *testing.T) {
 	hmc, adaptor := initTestLIDARLiteDriverWithStubbedAdaptor()
 
-	gobottest.Assert(t, len(hmc.Start()), 0)
+	gobottest.Assert(t, hmc.Start(), nil)
 
 	adaptor.i2cStartImpl = func() error {
 		return errors.New("start error")
 	}
 	err := hmc.Start()
-	gobottest.Assert(t, err[0], errors.New("start error"))
+	gobottest.Assert(t, err, errors.New("start error"))
 
 }
 
 func TestLIDARLiteDriverHalt(t *testing.T) {
 	hmc := initTestLIDARLiteDriver()
 
-	gobottest.Assert(t, len(hmc.Halt()), 0)
+	gobottest.Assert(t, hmc.Halt(), nil)
 }
 
 func TestLIDARLiteDriverDistance(t *testing.T) {

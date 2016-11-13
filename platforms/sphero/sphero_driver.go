@@ -157,7 +157,7 @@ func (s *SpheroDriver) adaptor() *Adaptor {
 // 	Collision  sphero.CollisionPacket - On Collision Detected
 // 	SensorData sphero.DataStreamingPacket - On Data Streaming event
 // 	Error      error- On error while processing asynchronous response
-func (s *SpheroDriver) Start() (errs []error) {
+func (s *SpheroDriver) Start() (err error) {
 	go func() {
 		for {
 			packet := <-s.packetChannel
@@ -218,7 +218,7 @@ func (s *SpheroDriver) Start() (errs []error) {
 
 // Halt halts the SpheroDriver and sends a SpheroDriver.Stop command to the Sphero.
 // Returns true on successful halt.
-func (s *SpheroDriver) Halt() (errs []error) {
+func (s *SpheroDriver) Halt() (err error) {
 	if s.adaptor().connected {
 		gobot.Every(10*time.Millisecond, func() {
 			s.Stop()

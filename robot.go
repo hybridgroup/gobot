@@ -5,6 +5,8 @@ import (
 	"log"
 	"os"
 	"os/signal"
+
+	multierror "github.com/hashicorp/go-multierror"
 )
 
 // JSONRobot a JSON representation of a Robot.
@@ -60,16 +62,14 @@ func (r *Robots) Len() int {
 }
 
 // Start calls the Start method of each Robot in the collection
-func (r *Robots) Start(args ...interface{}) (errs []error) {
+func (r *Robots) Start(args ...interface{}) (err error) {
 	autoRun := true
 	if args[0] != nil {
 		autoRun = args[0].(bool)
 	}
 	for _, robot := range *r {
-		if errs = robot.Start(autoRun); len(errs) > 0 {
-			for i, err := range errs {
-				errs[i] = fmt.Errorf("Robot %q: %v", robot.Name, err)
-			}
+		if rerr := robot.Start(autoRun); rerr != nil {
+			err = multierror.Append(err, rerr)
 			return
 		}
 	}
@@ -77,12 +77,10 @@ func (r *Robots) Start(args ...interface{}) (errs []error) {
 }
 
 // Stop calls the Stop method of each Robot in the collection
-func (r *Robots) Stop() (errs []error) {
+func (r *Robots) Stop() (err error) {
 	for _, robot := range *r {
-		if errs = robot.Stop(); len(errs) > 0 {
-			for i, err := range errs {
-				errs[i] = fmt.Errorf("Robot %q: %v", robot.Name, err)
-			}
+		if rerr := robot.Stop(); rerr != nil {
+			err = multierror.Append(err, rerr)
 			return
 		}
 	}
@@ -144,17 +142,17 @@ func NewRobot(v ...interface{}) *Robot {
 }
 
 // Start a Robot's Connections, Devices, and work.
-func (r *Robot) Start(args ...interface{}) (errs []error) {
+func (r *Robot) Start(args ...interface{}) (err error) {
 	if len(args) > 0 && args[0] != nil {
 		r.AutoRun = args[0].(bool)
 	}
 	log.Println("Starting Robot", r.Name, "...")
-	if cerrs := r.Connections().Start(); len(cerrs) > 0 {
-		errs = append(errs, cerrs...)
+	if cerr := r.Connections().Start(); cerr != nil {
+		err = multierror.Append(err, cerr)
 		return
 	}
-	if derrs := r.Devices().Start(); len(derrs) > 0 {
-		errs = append(errs, derrs...)
+	if derr := r.Devices().Start(); derr != nil {
+		err = multierror.Append(err, derr)
 		return
 	}
 	if r.Work == nil {
@@ -170,7 +168,7 @@ func (r *Robot) Start(args ...interface{}) (errs []error) {
 	if r.AutoRun {
 		c := make(chan os.Signal, 1)
 		r.trap(c)
-		if len(errs) > 0 {
+		if err != nil {
 			// there was an error during start, so we immediately pass the interrupt
 			// in order to disconnect the initialized robots, connections and devices
 			c <- os.Interrupt
@@ -187,12 +185,12 @@ func (r *Robot) Start(args ...interface{}) (errs []error) {
 }
 
 // Stop stops a Robot's connections and Devices
-func (r *Robot) Stop() (errs []error) {
+func (r *Robot) Stop() (err error) {
 	log.Println("Stopping Robot", r.Name, "...")
-	errs = append(errs, r.Devices().Halt()...)
-	errs = append(errs, r.Connections().Finalize()...)
+	err = r.Devices().Halt()
+	err = r.Connections().Finalize()
 	r.done <- true
-	return errs
+	return err
 }
 
 // Devices returns all devices associated with this Robot.

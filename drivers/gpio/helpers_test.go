@@ -2,10 +2,10 @@ package gpio
 
 type gpioTestBareAdaptor struct{}
 
-func (t *gpioTestBareAdaptor) Connect() (errs []error)  { return }
-func (t *gpioTestBareAdaptor) Finalize() (errs []error) { return }
-func (t *gpioTestBareAdaptor) Name() string             { return "" }
-func (t *gpioTestBareAdaptor) SetName(n string)         {}
+func (t *gpioTestBareAdaptor) Connect() (err error)  { return }
+func (t *gpioTestBareAdaptor) Finalize() (err error) { return }
+func (t *gpioTestBareAdaptor) Name() string          { return "" }
+func (t *gpioTestBareAdaptor) SetName(n string)      {}
 
 type gpioTestDigitalWriter struct {
 	gpioTestBareAdaptor
@@ -49,11 +49,11 @@ func (t *gpioTestAdaptor) AnalogRead(string) (val int, err error) {
 func (t *gpioTestAdaptor) DigitalRead(string) (val int, err error) {
 	return testAdaptorDigitalRead()
 }
-func (t *gpioTestAdaptor) Connect() (errs []error)  { return }
-func (t *gpioTestAdaptor) Finalize() (errs []error) { return }
-func (t *gpioTestAdaptor) Name() string             { return t.name }
-func (t *gpioTestAdaptor) SetName(n string)         { t.name = n }
-func (t *gpioTestAdaptor) Port() string             { return t.port }
+func (t *gpioTestAdaptor) Connect() (err error)  { return }
+func (t *gpioTestAdaptor) Finalize() (err error) { return }
+func (t *gpioTestAdaptor) Name() string          { return t.name }
+func (t *gpioTestAdaptor) SetName(n string)      { t.name = n }
+func (t *gpioTestAdaptor) Port() string          { return t.port }
 
 func newGpioTestAdaptor() *gpioTestAdaptor {
 	return &gpioTestAdaptor{

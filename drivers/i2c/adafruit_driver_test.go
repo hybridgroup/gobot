@@ -37,28 +37,28 @@ func TestNewAdafruitMotorHatDriver(t *testing.T) {
 func TestAdafruitMotorHatDriverStart(t *testing.T) {
 	ada, adaptor := initTestAdafruitMotorHatDriverWithStubbedAdaptor()
 
-	gobottest.Assert(t, len(ada.Start()), 0)
+	gobottest.Assert(t, ada.Start(), nil)
 
 	adaptor.i2cStartImpl = func() error {
 		return errors.New("start error")
 	}
 	err := ada.Start()
-	gobottest.Assert(t, err[0], errors.New("start error"))
+	gobottest.Assert(t, err, errors.New("start error"))
 
 }
 
 func TestAdafruitMotorHatDriverHalt(t *testing.T) {
 	ada, _ := initTestAdafruitMotorHatDriverWithStubbedAdaptor()
 
-	gobottest.Assert(t, len(ada.Halt()), 0)
+	gobottest.Assert(t, ada.Halt(), nil)
 }
 func TestSetHatAddresses(t *testing.T) {
 	ada, _ := initTestAdafruitMotorHatDriverWithStubbedAdaptor()
 
 	motorHatAddr := 0x61
 	servoHatAddr := 0x41
-	gobottest.Assert(t, len(ada.SetMotorHatAddress(motorHatAddr)), 0)
-	gobottest.Assert(t, len(ada.SetServoHatAddress(servoHatAddr)), 0)
+	gobottest.Assert(t, ada.SetMotorHatAddress(motorHatAddr), nil)
+	gobottest.Assert(t, ada.SetServoHatAddress(servoHatAddr), nil)
 }
 
 func TestAdafruitMotorHatDriverSetServoMotorFreq(t *testing.T) {
@@ -103,7 +103,7 @@ func TestAdafruitMotorHatDriverSetStepperMotorSpeed(t *testing.T) {
 
 	stepperMotor := 1
 	rpm := 30
-	gobottest.Assert(t, len(ada.SetStepperMotorSpeed(stepperMotor, rpm)), 0)
+	gobottest.Assert(t, ada.SetStepperMotorSpeed(stepperMotor, rpm), nil)
 }
 
 func TestAdafruitMotorHatDriverStepperStep(t *testing.T) {

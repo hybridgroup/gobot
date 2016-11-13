@@ -70,16 +70,16 @@ func NewAdaptor(args ...interface{}) *Adaptor {
 }
 
 // Connect starts a connection to the board.
-func (f *Adaptor) Connect() (errs []error) {
+func (f *Adaptor) Connect() (err error) {
 	if f.conn == nil {
-		sp, err := f.openSP(f.Port())
-		if err != nil {
-			return []error{err}
+		sp, e := f.openSP(f.Port())
+		if e != nil {
+			return e
 		}
 		f.conn = sp
 	}
-	if err := f.board.Connect(f.conn); err != nil {
-		return []error{err}
+	if err = f.board.Connect(f.conn); err != nil {
+		return err
 	}
 	return
 }
@@ -93,11 +93,9 @@ func (f *Adaptor) Disconnect() (err error) {
 }
 
 // Finalize terminates the firmata connection
-func (f *Adaptor) Finalize() (errs []error) {
-	if err := f.Disconnect(); err != nil {
-		return []error{err}
-	}
-	return
+func (f *Adaptor) Finalize() (err error) {
+	err = f.Disconnect()
+	return err
 }
 
 // Port returns the Firmata Adaptors port

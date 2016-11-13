@@ -64,9 +64,9 @@ func (c *CameraDriver) Connection() gobot.Connection { return nil }
 
 // Start initializes camera by grabbing a frame
 // every `interval` and publishing an frame event
-func (c *CameraDriver) Start() (errs []error) {
+func (c *CameraDriver) Start() (err error) {
 	if err := c.start(c); err != nil {
-		return []error{err}
+		return err
 	}
 	go func() {
 		for {
@@ -76,11 +76,11 @@ func (c *CameraDriver) Start() (errs []error) {
 					c.Publish(Frame, image)
 				}
 			}
-			<-time.After(c.interval)
+			time.Sleep(c.interval)
 		}
 	}()
 	return
 }
 
 // Halt stops camera driver
-func (c *CameraDriver) Halt() (errs []error) { return }
+func (c *CameraDriver) Halt() (err error) { return }

@@ -36,7 +36,7 @@ func TestAnalogSensorDriverStart(t *testing.T) {
 
 	d := NewAnalogSensorDriver(newGpioTestAdaptor(), "1")
 
-	gobottest.Assert(t, len(d.Start()), 0)
+	gobottest.Assert(t, d.Start(), nil)
 
 	// expect data to be received
 	d.Once(d.Event(Data), func(data interface{}) {
@@ -100,7 +100,7 @@ func TestAnalogSensorDriverHalt(t *testing.T) {
 		<-d.halt
 		close(done)
 	}()
-	gobottest.Assert(t, len(d.Halt()), 0)
+	gobottest.Assert(t, d.Halt(), nil)
 	select {
 	case <-done:
 	case <-time.After(time.Millisecond):

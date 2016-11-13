@@ -55,7 +55,7 @@ func NewPIRMotionDriver(a DigitalReader, pin string, v ...time.Duration) *PIRMot
 // just as long as motion is still being detected.
 // It will only send the MotionStopped event once, however, until
 // motion starts being detected again
-func (p *PIRMotionDriver) Start() (errs []error) {
+func (p *PIRMotionDriver) Start() (err error) {
 	go func() {
 		for {
 			newValue, err := p.connection.DigitalRead(p.Pin())
@@ -86,7 +86,7 @@ func (p *PIRMotionDriver) Start() (errs []error) {
 }
 
 // Halt stops polling the button for new information
-func (p *PIRMotionDriver) Halt() (errs []error) {
+func (p *PIRMotionDriver) Halt() (err error) {
 	p.halt <- true
 	return
 }

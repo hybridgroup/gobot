@@ -39,7 +39,7 @@ func (n *NullReadWriteCloser) Read(b []byte) (int, error) {
 	return len(b), nil
 }
 
-var closeErr error = nil
+var closeErr error
 
 func (n *NullReadWriteCloser) Close() error {
 	return closeErr
@@ -128,7 +128,7 @@ func initTestAdaptor() (*Adaptor, *sysfs.MockFilesystem) {
 
 func TestAdaptorConnect(t *testing.T) {
 	a, _ := initTestAdaptor()
-	gobottest.Assert(t, len(a.Connect()), 0)
+	gobottest.Assert(t, a.Connect(), nil)
 }
 
 func TestAdaptorFinalize(t *testing.T) {
@@ -139,11 +139,11 @@ func TestAdaptorFinalize(t *testing.T) {
 	sysfs.SetSyscall(&sysfs.MockSyscall{})
 	a.I2cStart(0xff)
 
-	gobottest.Assert(t, len(a.Finalize()), 0)
+	gobottest.Assert(t, a.Finalize(), nil)
 
 	closeErr = errors.New("close error")
 	sysfs.SetFilesystem(sysfs.NewMockFilesystem([]string{}))
-	gobottest.Refute(t, len(a.Finalize()), 0)
+	gobottest.Refute(t, a.Finalize(), nil)
 }
 
 func TestAdaptorDigitalIO(t *testing.T) {

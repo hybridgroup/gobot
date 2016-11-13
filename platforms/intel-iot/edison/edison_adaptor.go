@@ -5,6 +5,7 @@ import (
 	"os"
 	"strconv"
 
+	multierror "github.com/hashicorp/go-multierror"
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/sysfs"
 )
@@ -90,61 +91,61 @@ func (e *Adaptor) Board() string { return e.board }
 func (e *Adaptor) SetBoard(n string) { e.board = n }
 
 // Connect initializes the Edison for use with the Arduino beakout board
-func (e *Adaptor) Connect() (errs []error) {
+func (e *Adaptor) Connect() (err error) {
 	e.digitalPins = make(map[int]sysfs.DigitalPin)
 	e.pwmPins = make(map[int]*pwmPin)
 
 	switch e.Board() {
-		case "sparkfun":
-			e.pinmap = sparkfunPinMap
-			if err := e.sparkfunSetup(); err != nil {
-				errs = append(errs, err)
-			}
-		case "arduino":
-			e.pinmap = arduinoPinMap
-			if err := e.arduinoSetup(); err != nil {
-				errs = append(errs, err)
-			}
-		case "miniboard":
-			e.pinmap = miniboardPinMap
-			if err := e.miniboardSetup(); err != nil {
-				errs = append(errs, err)
-			}
-	  default:
-			err := errors.New("Unknown board type: " + e.Board())
-			errs = append(errs, err)
+	case "sparkfun":
+		e.pinmap = sparkfunPinMap
+		if errs := e.sparkfunSetup(); errs != nil {
+			err = multierror.Append(err, errs)
+		}
+	case "arduino":
+		e.pinmap = arduinoPinMap
+		if errs := e.arduinoSetup(); errs != nil {
+			err = multierror.Append(err, errs)
+		}
+	case "miniboard":
+		e.pinmap = miniboardPinMap
+		if errs := e.miniboardSetup(); errs != nil {
+			err = multierror.Append(err, errs)
+		}
+	default:
+		errs := errors.New("Unknown board type: " + e.Board())
+		err = multierror.Append(err, errs)
 	}
 	return
 }
 
 // Finalize releases all i2c devices and exported analog, digital, pwm pins.
-func (e *Adaptor) Finalize() (errs []error) {
-	if err := e.tristate.Unexport(); err != nil {
-		errs = append(errs, err)
+func (e *Adaptor) Finalize() (err error) {
+	if errs := e.tristate.Unexport(); errs != nil {
+		err = multierror.Append(err, errs)
 	}
 	for _, pin := range e.digitalPins {
 		if pin != nil {
-			if err := pin.Unexport(); err != nil {
-				errs = append(errs, err)
+			if errs := pin.Unexport(); errs != nil {
+				err = multierror.Append(err, errs)
 			}
 		}
 	}
 	for _, pin := range e.pwmPins {
 		if pin != nil {
-			if err := pin.enable("0"); err != nil {
-				errs = append(errs, err)
+			if errs := pin.enable("0"); errs != nil {
+				err = multierror.Append(err, errs)
 			}
-			if err := pin.unexport(); err != nil {
-				errs = append(errs, err)
+			if errs := pin.unexport(); errs != nil {
+				err = multierror.Append(err, errs)
 			}
 		}
 	}
 	if e.i2cDevice != nil {
-		if err := e.i2cDevice.Close(); errs != nil {
-			errs = append(errs, err)
+		if errs := e.i2cDevice.Close(); errs != nil {
+			err = multierror.Append(err, errs)
 		}
 	}
-	return errs
+	return
 }
 
 // arduinoSetup does needed setup for the Arduino compatible breakout board

@@ -28,15 +28,15 @@ func (h *LIDARLiteDriver) SetName(n string)             { h.name = n }
 func (h *LIDARLiteDriver) Connection() gobot.Connection { return h.connection.(gobot.Connection) }
 
 // Start initialized the LIDAR
-func (h *LIDARLiteDriver) Start() (errs []error) {
+func (h *LIDARLiteDriver) Start() (err error) {
 	if err := h.connection.I2cStart(lidarliteAddress); err != nil {
-		return []error{err}
+		return err
 	}
 	return
 }
 
 // Halt returns true if devices is halted successfully
-func (h *LIDARLiteDriver) Halt() (errs []error) { return }
+func (h *LIDARLiteDriver) Halt() (err error) { return }
 
 // Distance returns the current distance in cm
 func (h *LIDARLiteDriver) Distance() (distance int, err error) {

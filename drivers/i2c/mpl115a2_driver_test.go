@@ -46,7 +46,7 @@ func TestMPL115A2DriverStart(t *testing.T) {
 	adaptor.i2cReadImpl = func() ([]byte, error) {
 		return []byte{0x00, 0x01, 0x02, 0x04}, nil
 	}
-	gobottest.Assert(t, len(mpl.Start()), 0)
+	gobottest.Assert(t, mpl.Start(), nil)
 	time.Sleep(100 * time.Millisecond)
 	gobottest.Assert(t, mpl.Pressure, float32(50.007942))
 	gobottest.Assert(t, mpl.Temperature, float32(116.58878))
@@ -55,5 +55,5 @@ func TestMPL115A2DriverStart(t *testing.T) {
 func TestMPL115A2DriverHalt(t *testing.T) {
 	mpl := initTestMPL115A2Driver()
 
-	gobottest.Assert(t, len(mpl.Halt()), 0)
+	gobottest.Assert(t, mpl.Halt(), nil)
 }

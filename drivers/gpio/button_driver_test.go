@@ -22,7 +22,7 @@ func TestButtonDriverHalt(t *testing.T) {
 	go func() {
 		<-d.halt
 	}()
-	gobottest.Assert(t, len(d.Halt()), 0)
+	gobottest.Assert(t, d.Halt(), nil)
 }
 
 func TestButtonDriver(t *testing.T) {
@@ -36,7 +36,7 @@ func TestButtonDriver(t *testing.T) {
 func TestButtonDriverStart(t *testing.T) {
 	sem := make(chan bool, 0)
 	d := initTestButtonDriver()
-	gobottest.Assert(t, len(d.Start()), 0)
+	gobottest.Assert(t, d.Start(), nil)
 
 	d.Once(ButtonPush, func(data interface{}) {
 		gobottest.Assert(t, d.Active, true)

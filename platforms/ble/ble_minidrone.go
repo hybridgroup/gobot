@@ -97,7 +97,7 @@ func (b *MinidroneDriver) adaptor() *ClientAdaptor {
 }
 
 // Start tells driver to get ready to do work
-func (b *MinidroneDriver) Start() (errs []error) {
+func (b *MinidroneDriver) Start() (err error) {
 	b.Init()
 	b.FlatTrim()
 	b.StartPcmd()
@@ -107,7 +107,7 @@ func (b *MinidroneDriver) Start() (errs []error) {
 }
 
 // Halt stops minidrone driver (void)
-func (b *MinidroneDriver) Halt() (errs []error) {
+func (b *MinidroneDriver) Halt() (err error) {
 	b.Land()
 
 	time.Sleep(500 * time.Millisecond)

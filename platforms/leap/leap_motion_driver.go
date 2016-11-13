@@ -9,11 +9,11 @@ import (
 )
 
 const (
-	// Message event
+	// MessageEvent event
 	MessageEvent = "message"
-	// Hand event
+	// HandEvent event
 	HandEvent = "hand"
-	// Gesture event
+	// GestureEvent event
 	GestureEvent = "gesture"
 )
 
@@ -61,15 +61,15 @@ func (l *Driver) adaptor() *Adaptor {
 //		"message" - Emits Frame on new message received from Leap.
 //		"hand" - Emits Hand when detected in message from Leap.
 //		"gesture" - Emits Gesture when detected in message from Leap.
-func (l *Driver) Start() (errs []error) {
+func (l *Driver) Start() (err error) {
 	enableGestures := map[string]bool{"enableGestures": true}
-	b, err := json.Marshal(enableGestures)
-	if err != nil {
-		return []error{err}
+	b, e := json.Marshal(enableGestures)
+	if e != nil {
+		return e
 	}
-	_, err = l.adaptor().ws.Write(b)
-	if err != nil {
-		return []error{err}
+	_, e = l.adaptor().ws.Write(b)
+	if e != nil {
+		return e
 	}
 
 	go func() {
@@ -93,5 +93,5 @@ func (l *Driver) Start() (errs []error) {
 	return
 }
 
-// Halt returns true if driver is halted successfully
-func (l *Driver) Halt() (errs []error) { return }
+// Halt returns nil if driver is halted successfully
+func (l *Driver) Halt() (errs error) { return }

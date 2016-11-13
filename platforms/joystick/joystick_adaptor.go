@@ -40,15 +40,13 @@ func (j *Adaptor) Name() string { return j.name }
 func (j *Adaptor) SetName(n string) { j.name = n }
 
 // Connect connects to the joystick
-func (j *Adaptor) Connect() (errs []error) {
-	if err := j.connect(j); err != nil {
-		return []error{err}
-	}
+func (j *Adaptor) Connect() (err error) {
+	err = j.connect(j)
 	return
 }
 
 // Finalize closes connection to joystick
-func (j *Adaptor) Finalize() (errs []error) {
+func (j *Adaptor) Finalize() (err error) {
 	j.joystick.Close()
 	return
 }

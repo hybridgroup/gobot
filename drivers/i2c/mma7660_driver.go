@@ -47,28 +47,28 @@ func (h *MMA7660Driver) SetName(n string)             { h.name = n }
 func (h *MMA7660Driver) Connection() gobot.Connection { return h.connection.(gobot.Connection) }
 
 // Start initialized the mma7660
-func (h *MMA7660Driver) Start() (errs []error) {
+func (h *MMA7660Driver) Start() (err error) {
 	if err := h.connection.I2cStart(mma7660Address); err != nil {
-		return []error{err}
+		return err
 	}
 
 	if err := h.connection.I2cWrite(mma7660Address, []byte{MMA7660_MODE, MMA7660_STAND_BY}); err != nil {
-		return []error{err}
+		return err
 	}
 
 	if err := h.connection.I2cWrite(mma7660Address, []byte{MMA7660_SR, MMA7660_AUTO_SLEEP_32}); err != nil {
-		return []error{err}
+		return err
 	}
 
 	if err := h.connection.I2cWrite(mma7660Address, []byte{MMA7660_MODE, MMA7660_ACTIVE}); err != nil {
-		return []error{err}
+		return err
 	}
 
 	return
 }
 
 // Halt returns true if devices is halted successfully
-func (h *MMA7660Driver) Halt() (errs []error) { return }
+func (h *MMA7660Driver) Halt() (err error) { return }
 
 // Acceleration returns the acceleration  of the provided x, y, z
 func (h *MMA7660Driver) Acceleration(x, y, z float64) (ax, ay, az float64) {

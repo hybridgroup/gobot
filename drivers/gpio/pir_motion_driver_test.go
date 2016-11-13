@@ -22,7 +22,7 @@ func TestPIRMotionDriverHalt(t *testing.T) {
 	go func() {
 		<-d.halt
 	}()
-	gobottest.Assert(t, len(d.Halt()), 0)
+	gobottest.Assert(t, d.Halt(), nil)
 }
 
 func TestPIRMotionDriver(t *testing.T) {
@@ -36,7 +36,7 @@ func TestPIRMotionDriver(t *testing.T) {
 func TestPIRMotionDriverStart(t *testing.T) {
 	sem := make(chan bool, 0)
 	d := initTestPIRMotionDriver()
-	gobottest.Assert(t, len(d.Start()), 0)
+	gobottest.Assert(t, d.Start(), nil)
 
 	d.Once(MotionDetected, func(data interface{}) {
 		gobottest.Assert(t, d.Active, true)

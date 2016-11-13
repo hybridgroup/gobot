@@ -6,6 +6,7 @@ import (
 	"os"
 	"testing"
 
+	multierror "github.com/hashicorp/go-multierror"
 	"github.com/hybridgroup/gobot/gobottest"
 )
 
@@ -80,55 +81,60 @@ func TestGobotToJSON(t *testing.T) {
 
 func TestMasterStart(t *testing.T) {
 	g := initTestMaster()
-	gobottest.Assert(t, len(g.Start()), 0)
-	gobottest.Assert(t, len(g.Stop()), 0)
+	gobottest.Assert(t, g.Start(), nil)
+	gobottest.Assert(t, g.Stop(), nil)
 }
 
 func TestMasterStartDriverErrors(t *testing.T) {
 	g := initTestMaster1Robot()
-
-	testDriverStart = func() (errs []error) {
-		return []error{
-			errors.New("driver start error 1"),
-		}
+	e := errors.New("driver start error 1")
+	testDriverStart = func() (err error) {
+		return e
 	}
 
-	gobottest.Assert(t, len(g.Start()), 1)
-	gobottest.Assert(t, len(g.Stop()), 0)
+	var expected error
+	expected = multierror.Append(expected, e)
+	expected = multierror.Append(expected, e)
+	expected = multierror.Append(expected, e)
 
-	testDriverStart = func() (errs []error) { return }
+	gobottest.Assert(t, g.Start(), expected)
+	gobottest.Assert(t, g.Stop(), nil)
+
+	testDriverStart = func() (err error) { return }
 }
 
 func TestMasterStartAdaptorErrors(t *testing.T) {
 	g := initTestMaster1Robot()
+	e := errors.New("adaptor start error 1")
 
-	testAdaptorConnect = func() (errs []error) {
-		return []error{
-			errors.New("adaptor start error 1"),
-		}
+	testAdaptorConnect = func() (err error) {
+		return e
 	}
 
-	gobottest.Assert(t, len(g.Start()), 1)
-	gobottest.Assert(t, len(g.Stop()), 0)
+	var expected error
+	expected = multierror.Append(expected, e)
+	expected = multierror.Append(expected, e)
+	expected = multierror.Append(expected, e)
 
-	testAdaptorConnect = func() (errs []error) { return }
+	gobottest.Assert(t, g.Start(), expected)
+	gobottest.Assert(t, g.Stop(), nil)
+
+	testAdaptorConnect = func() (err error) { return }
 }
 
-func TestMasterHaltErrors(t *testing.T) {
+func TestMasterFinalizeErrors(t *testing.T) {
 	g := initTestMaster1Robot()
+	e := errors.New("adaptor finalize error 2")
 
-	testDriverHalt = func() (errs []error) {
-		return []error{
-			errors.New("driver halt error 1"),
-		}
+	testAdaptorFinalize = func() (err error) {
+		return e
 	}
 
-	testAdaptorFinalize = func() (errs []error) {
-		return []error{
-			errors.New("adaptor finalize error 1"),
-		}
-	}
+	var expected error
+	expected = multierror.Append(expected, e)
+	expected = multierror.Append(expected, e)
+	expected = multierror.Append(expected, e)
 
-	gobottest.Assert(t, len(g.Start()), 0)
-	gobottest.Assert(t, len(g.Stop()), 6)
+	gobottest.Assert(t, g.Start(), nil)
+	gobottest.Assert(t, g.Stop(), expected)
 }

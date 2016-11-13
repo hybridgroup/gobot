@@ -28,8 +28,8 @@ type testDriver struct {
 	gobot.Eventer
 }
 
-func (t *testDriver) Start() (errs []error)        { return }
-func (t *testDriver) Halt() (errs []error)         { return }
+func (t *testDriver) Start() (err error)           { return }
+func (t *testDriver) Halt() (err error)            { return }
 func (t *testDriver) Name() string                 { return t.name }
 func (t *testDriver) SetName(n string)             { t.name = n }
 func (t *testDriver) Pin() string                  { return t.pin }
@@ -64,14 +64,14 @@ type testAdaptor struct {
 	port string
 }
 
-var testAdaptorConnect = func() (errs []error) { return }
-var testAdaptorFinalize = func() (errs []error) { return }
+var testAdaptorConnect = func() (err error) { return }
+var testAdaptorFinalize = func() (err error) { return }
 
-func (t *testAdaptor) Finalize() (errs []error) { return testAdaptorFinalize() }
-func (t *testAdaptor) Connect() (errs []error)  { return testAdaptorConnect() }
-func (t *testAdaptor) Name() string             { return t.name }
-func (t *testAdaptor) SetName(n string)         { t.name = n }
-func (t *testAdaptor) Port() string             { return t.port }
+func (t *testAdaptor) Finalize() (err error) { return testAdaptorFinalize() }
+func (t *testAdaptor) Connect() (err error)  { return testAdaptorConnect() }
+func (t *testAdaptor) Name() string          { return t.name }
+func (t *testAdaptor) SetName(n string)      { t.name = n }
+func (t *testAdaptor) Port() string          { return t.port }
 
 func newTestAdaptor(name string, port string) *testAdaptor {
 	return &testAdaptor{

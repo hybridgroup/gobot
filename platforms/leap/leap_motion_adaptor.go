@@ -28,9 +28,9 @@ func (l *Adaptor) SetName(n string) { l.name = n }
 func (l *Adaptor) Port() string     { return l.port }
 
 // Connect returns true if connection to leap motion is established successfully
-func (l *Adaptor) Connect() (errs []error) {
-	if ws, err := l.connect(l.Port()); err != nil {
-		return []error{err}
+func (l *Adaptor) Connect() (err error) {
+	if ws, e := l.connect(l.Port()); e != nil {
+		return e
 	} else {
 		l.ws = ws
 	}
@@ -38,4 +38,4 @@ func (l *Adaptor) Connect() (errs []error) {
 }
 
 // Finalize ends connection to leap motion
-func (l *Adaptor) Finalize() (errs []error) { return }
+func (l *Adaptor) Finalize() (err error) { return }

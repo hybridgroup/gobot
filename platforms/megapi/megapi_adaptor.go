@@ -42,11 +42,11 @@ func (megaPi *Adaptor) SetName(n string) {
 }
 
 // Connect starts a connection to the board
-func (megaPi *Adaptor) Connect() (errs []error) {
+func (megaPi *Adaptor) Connect() error {
 	if megaPi.connection == nil {
 		sp, err := serial.OpenPort(megaPi.serialConfig)
 		if err != nil {
-			return []error{err}
+			return err
 		}
 
 		// sleeping is required to give the board a chance to reset
@@ -69,15 +69,15 @@ func (megaPi *Adaptor) Connect() (errs []error) {
 			}
 		}
 	}()
-	return
+	return nil
 }
 
 // Finalize terminates the connection to the board
-func (megaPi *Adaptor) Finalize() (errs []error) {
+func (megaPi *Adaptor) Finalize() error {
 	megaPi.finalizeChannel <- struct{}{}
 	<-megaPi.finalizeChannel
 	if err := megaPi.connection.Close(); err != nil {
-		return []error{err}
+		return err
 	}
-	return
+	return nil
 }

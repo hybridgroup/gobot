@@ -1,9 +1,11 @@
 package mqtt
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 
+	multierror "github.com/hashicorp/go-multierror"
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/gobottest"
 )
@@ -16,12 +18,15 @@ func initTestMqttAdaptor() *Adaptor {
 
 func TestMqttAdaptorConnect(t *testing.T) {
 	a := initTestMqttAdaptor()
-	gobottest.Assert(t, a.Connect()[0].Error(), "Network Error : Unknown protocol")
+	var expected error
+	expected = multierror.Append(expected, errors.New("Network Error : Unknown protocol"))
+
+	gobottest.Assert(t, a.Connect(), expected)
 }
 
 func TestMqttAdaptorFinalize(t *testing.T) {
 	a := initTestMqttAdaptor()
-	gobottest.Assert(t, len(a.Finalize()), 0)
+	gobottest.Assert(t, a.Finalize(), nil)
 }
 
 func TestMqttAdaptorCannotPublishUnlessConnected(t *testing.T) {

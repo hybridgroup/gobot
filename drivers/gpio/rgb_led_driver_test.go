@@ -54,12 +54,12 @@ func TestRgbLedDriver(t *testing.T) {
 
 func TestRgbLedDriverStart(t *testing.T) {
 	d := initTestRgbLedDriver(newGpioTestAdaptor())
-	gobottest.Assert(t, len(d.Start()), 0)
+	gobottest.Assert(t, d.Start(), nil)
 }
 
 func TestRgbLedDriverHalt(t *testing.T) {
 	d := initTestRgbLedDriver(newGpioTestAdaptor())
-	gobottest.Assert(t, len(d.Halt()), 0)
+	gobottest.Assert(t, d.Halt(), nil)
 }
 
 func TestRgbLedDriverToggle(t *testing.T) {

@@ -53,10 +53,10 @@ func (d *Driver) adaptor() *Adaptor {
 	return d.Connection().(*Adaptor)
 }
 
-func (d *Driver) Start() (err []error) {
+func (d *Driver) Start() (err error) {
 	return
 }
 
-func (d *Driver) Halt() (err []error) {
+func (d *Driver) Halt() (err error) {
 	return
 }

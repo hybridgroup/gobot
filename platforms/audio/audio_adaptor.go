@@ -21,9 +21,9 @@ func (a *Adaptor) Name() string { return a.name }
 
 func (a *Adaptor) SetName(n string) { a.name = n }
 
-func (a *Adaptor) Connect() []error { return nil }
+func (a *Adaptor) Connect() error { return nil }
 
-func (a *Adaptor) Finalize() []error { return nil }
+func (a *Adaptor) Finalize() error { return nil }
 
 func (a *Adaptor) Sound(fileName string) []error {
 	var errorsList []error

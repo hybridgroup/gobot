@@ -103,14 +103,14 @@ type AdafruitMotorHatDriver struct {
 
 // SetMotorHatAddress sets the I2C address for the DC and Stepper Motor HAT.
 // This addressing flexibility empowers "stacking" the HATs.
-func (a *AdafruitMotorHatDriver) SetMotorHatAddress(addr int) (errs []error) {
+func (a *AdafruitMotorHatDriver) SetMotorHatAddress(addr int) (err error) {
 	motorHatAddress = addr
 	return
 }
 
 // SetServoHatAddress sets the I2C address for the PWM-Servo Motor HAT.
 // This addressing flexibility empowers "stacking" the HATs.
-func (a *AdafruitMotorHatDriver) SetServoHatAddress(addr int) (errs []error) {
+func (a *AdafruitMotorHatDriver) SetServoHatAddress(addr int) (err error) {
 	servoHatAddress = addr
 	return
 }
@@ -157,37 +157,37 @@ func NewAdafruitMotorHatDriver(a I2c) *AdafruitMotorHatDriver {
 }
 
 // Start initializes both I2C-addressable Adafruit Motor HAT drivers
-func (a *AdafruitMotorHatDriver) Start() (errs []error) {
+func (a *AdafruitMotorHatDriver) Start() (err error) {
 	addrs := []int{motorHatAddress, servoHatAddress}
 	for i := range addrs {
 
-		if err := a.connection.I2cStart(addrs[i]); err != nil {
-			return []error{err}
+		if err = a.connection.I2cStart(addrs[i]); err != nil {
+			return
 		}
-		if err := a.setAllPWM(addrs[i], 0, 0); err != nil {
+		if err = a.setAllPWM(addrs[i], 0, 0); err != nil {
 			return
 		}
 		reg := byte(_Mode2)
 		val := byte(_Outdrv)
-		if err := a.connection.I2cWrite(addrs[i], []byte{reg, val}); err != nil {
+		if err = a.connection.I2cWrite(addrs[i], []byte{reg, val}); err != nil {
 			return
 		}
 		reg = byte(_Mode1)
 		val = byte(_AllCall)
-		if err := a.connection.I2cWrite(addrs[i], []byte{reg, val}); err != nil {
+		if err = a.connection.I2cWrite(addrs[i], []byte{reg, val}); err != nil {
 			return
 		}
 		time.Sleep(5 * time.Millisecond)
 
 		// Read a byte from the I2C device.  Note: no ability to read from a specified reg?
-		mode1, err := a.connection.I2cRead(addrs[i], 1)
-		if err != nil {
-			return
+		mode1, rerr := a.connection.I2cRead(addrs[i], 1)
+		if rerr != nil {
+			return rerr
 		}
 		if len(mode1) > 0 {
 			reg = byte(_Mode1)
 			val = mode1[0] & _Sleep
-			if err := a.connection.I2cWrite(addrs[i], []byte{reg, val}); err != nil {
+			if err = a.connection.I2cWrite(addrs[i], []byte{reg, val}); err != nil {
 				return
 			}
 			time.Sleep(5 * time.Millisecond)
@@ -197,7 +197,7 @@ func (a *AdafruitMotorHatDriver) Start() (errs []error) {
 }
 
 // Halt returns true if devices is halted successfully
-func (a *AdafruitMotorHatDriver) Halt() (errs []error) { return }
+func (a *AdafruitMotorHatDriver) Halt() (err error) { return }
 
 // setPWM sets the start (on) and end (off) of the high-segment of the PWM pulse
 // on the specific channel (pin).
@@ -463,7 +463,7 @@ func (a *AdafruitMotorHatDriver) oneStep(motor int, dir AdafruitDirection, style
 }
 
 // SetStepperMotorSpeed sets the seconds-per-step for the given Stepper Motor.
-func (a *AdafruitMotorHatDriver) SetStepperMotorSpeed(stepperMotor int, rpm int) (errs []error) {
+func (a *AdafruitMotorHatDriver) SetStepperMotorSpeed(stepperMotor int, rpm int) (err error) {
 	revSteps := a.stepperMotors[stepperMotor].revSteps
 	a.stepperMotors[stepperMotor].secPerStep = 60.0 / float64(revSteps*rpm)
 	a.stepperMotors[stepperMotor].stepCounter = 0

@@ -27,10 +27,10 @@ func TestKeyboardDriver(t *testing.T) {
 
 func TestKeyboardDriverStart(t *testing.T) {
 	d := initTestKeyboardDriver()
-	gobottest.Assert(t, len(d.Start()), 0)
+	gobottest.Assert(t, d.Start(), nil)
 }
 
 func TestKeyboardDriverHalt(t *testing.T) {
 	d := initTestKeyboardDriver()
-	gobottest.Assert(t, len(d.Halt()), 0)
+	gobottest.Assert(t, d.Halt(), nil)
 }

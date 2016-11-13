@@ -101,49 +101,49 @@ func (h *JHD1313M1Driver) Connection() gobot.Connection {
 }
 
 // Start starts the backlit and the screen and initializes the states.
-func (h *JHD1313M1Driver) Start() []error {
+func (h *JHD1313M1Driver) Start() error {
 	if err := h.connection.I2cStart(h.lcdAddress); err != nil {
-		return []error{err}
+		return err
 	}
 
 	if err := h.connection.I2cStart(h.rgbAddress); err != nil {
-		return []error{err}
+		return err
 	}
 
 	time.Sleep(50000 * time.Microsecond)
 	payload := []byte{LCD_CMD, LCD_FUNCTIONSET | LCD_2LINE}
 	if err := h.connection.I2cWrite(h.lcdAddress, payload); err != nil {
 		if err := h.connection.I2cWrite(h.lcdAddress, payload); err != nil {
-			return []error{err}
+			return err
 		}
 	}
 
 	time.Sleep(100 * time.Microsecond)
 	if err := h.connection.I2cWrite(h.lcdAddress, []byte{LCD_CMD, LCD_DISPLAYCONTROL | LCD_DISPLAYON}); err != nil {
-		return []error{err}
+		return err
 	}
 
 	time.Sleep(100 * time.Microsecond)
 	if err := h.Clear(); err != nil {
-		return []error{err}
+		return err
 	}
 
 	if err := h.connection.I2cWrite(h.lcdAddress, []byte{LCD_CMD, LCD_ENTRYMODESET | LCD_ENTRYLEFT | LCD_ENTRYSHIFTDECREMENT}); err != nil {
-		return []error{err}
+		return err
 	}
 
 	if err := h.setReg(0, 0); err != nil {
-		return []error{err}
+		return err
 	}
 	if err := h.setReg(1, 0); err != nil {
-		return []error{err}
+		return err
 	}
 	if err := h.setReg(0x08, 0xAA); err != nil {
-		return []error{err}
+		return err
 	}
 
 	if err := h.SetRGB(255, 255, 255); err != nil {
-		return []error{err}
+		return err
 	}
 
 	return nil
@@ -218,7 +218,7 @@ func (h *JHD1313M1Driver) Scroll(leftToRight bool) error {
 }
 
 // Halt is a noop function.
-func (h *JHD1313M1Driver) Halt() []error { return nil }
+func (h *JHD1313M1Driver) Halt() error { return nil }
 
 func (h *JHD1313M1Driver) setReg(command int, data int) error {
 	return h.connection.I2cWrite(h.rgbAddress, []byte{byte(command), byte(data)})

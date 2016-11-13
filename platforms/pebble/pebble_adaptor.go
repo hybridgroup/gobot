@@ -15,11 +15,11 @@ func (a *Adaptor) Name() string     { return a.name }
 func (a *Adaptor) SetName(n string) { a.name = n }
 
 // Connect returns true if connection to pebble is established successfully
-func (a *Adaptor) Connect() (errs []error) {
+func (a *Adaptor) Connect() (err error) {
 	return
 }
 
 // Finalize returns true if connection to pebble is finalized successfully
-func (a *Adaptor) Finalize() (errs []error) {
+func (a *Adaptor) Finalize() (err error) {
 	return
 }

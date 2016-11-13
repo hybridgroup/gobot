@@ -61,12 +61,12 @@ func TestDirectPinDriver(t *testing.T) {
 
 func TestDirectPinDriverStart(t *testing.T) {
 	d := initTestDirectPinDriver(newGpioTestAdaptor())
-	gobottest.Assert(t, len(d.Start()), 0)
+	gobottest.Assert(t, d.Start(), nil)
 }
 
 func TestDirectPinDriverHalt(t *testing.T) {
 	d := initTestDirectPinDriver(newGpioTestAdaptor())
-	gobottest.Assert(t, len(d.Halt()), 0)
+	gobottest.Assert(t, d.Halt(), nil)
 }
 
 func TestDirectPinDriverOff(t *testing.T) {

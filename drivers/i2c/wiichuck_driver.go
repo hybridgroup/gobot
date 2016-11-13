@@ -62,9 +62,9 @@ func (w *WiichuckDriver) Connection() gobot.Connection { return w.connection.(go
 
 // Start initilizes i2c and reads from adaptor
 // using specified interval to update with new value
-func (w *WiichuckDriver) Start() (errs []error) {
+func (w *WiichuckDriver) Start() (errs error) {
 	if err := w.connection.I2cStart(wiichuckAddress); err != nil {
-		return []error{err}
+		return err
 	}
 
 	go func() {
@@ -97,7 +97,7 @@ func (w *WiichuckDriver) Start() (errs []error) {
 }
 
 // Halt returns true if driver is halted successfully
-func (w *WiichuckDriver) Halt() (errs []error) { return }
+func (w *WiichuckDriver) Halt() (err error) { return }
 
 // update parses value to update buttons and joystick.
 // If value is encrypted, warning message is printed

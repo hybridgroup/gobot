@@ -55,10 +55,10 @@ func (d *Driver) SetName(n string)             { d.name = n }
 func (d *Driver) Connection() gobot.Connection { return d.connection }
 
 // Start returns true if driver is initialized correctly
-func (d *Driver) Start() (errs []error) { return }
+func (d *Driver) Start() (err error) { return }
 
 // Halt returns true if driver is halted successfully
-func (d *Driver) Halt() (errs []error) { return }
+func (d *Driver) Halt() (err error) { return }
 
 // PublishEvent publishes event with specified name and data in gobot
 func (d *Driver) PublishEvent(name string, data string) {

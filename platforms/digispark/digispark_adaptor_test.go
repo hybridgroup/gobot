@@ -72,15 +72,15 @@ func initTestAdaptor() *Adaptor {
 
 func TestAdaptorConnect(t *testing.T) {
 	a := NewAdaptor()
-	gobottest.Assert(t, a.Connect()[0], ErrConnection)
+	gobottest.Assert(t, a.Connect(), ErrConnection)
 
 	a = initTestAdaptor()
-	gobottest.Assert(t, len(a.Connect()), 0)
+	gobottest.Assert(t, a.Connect(), nil)
 }
 
 func TestAdaptorFinalize(t *testing.T) {
 	a := initTestAdaptor()
-	gobottest.Assert(t, len(a.Finalize()), 0)
+	gobottest.Assert(t, a.Finalize(), nil)
 }
 
 func TestAdaptorDigitalWrite(t *testing.T) {

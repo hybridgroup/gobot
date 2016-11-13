@@ -39,11 +39,11 @@ func (b *ClientAdaptor) UUID() string                { return b.uuid }
 func (b *ClientAdaptor) Peripheral() gatt.Peripheral { return b.peripheral }
 
 // Connect initiates a connection to the BLE peripheral. Returns true on successful connection.
-func (b *ClientAdaptor) Connect() (errs []error) {
-	device, err := gatt.NewDevice(DefaultClientOptions...)
-	if err != nil {
+func (b *ClientAdaptor) Connect() (err error) {
+	device, e := gatt.NewDevice(DefaultClientOptions...)
+	if e != nil {
 		log.Fatalf("Failed to open BLE device, err: %s\n", err)
-		return
+		return e
 	}
 
 	b.device = device
@@ -64,7 +64,7 @@ func (b *ClientAdaptor) Connect() (errs []error) {
 // Reconnect attempts to reconnect to the BLE peripheral. If it has an active connection
 // it will first close that connection and then establish a new connection.
 // Returns true on Successful reconnection
-func (b *ClientAdaptor) Reconnect() (errs []error) {
+func (b *ClientAdaptor) Reconnect() (err error) {
 	if b.connected {
 		b.Disconnect()
 	}
@@ -72,14 +72,14 @@ func (b *ClientAdaptor) Reconnect() (errs []error) {
 }
 
 // Disconnect terminates the connection to the BLE peripheral. Returns true on successful disconnect.
-func (b *ClientAdaptor) Disconnect() (errs []error) {
+func (b *ClientAdaptor) Disconnect() (err error) {
 	b.peripheral.Device().CancelConnection(b.peripheral)
 
 	return
 }
 
 // Finalize finalizes the BLEAdaptor
-func (b *ClientAdaptor) Finalize() (errs []error) {
+func (b *ClientAdaptor) Finalize() (err error) {
 	return b.Disconnect()
 }
 

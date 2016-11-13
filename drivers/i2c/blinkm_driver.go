@@ -60,18 +60,18 @@ func (b *BlinkMDriver) Connection() gobot.Connection { return b.connection.(gobo
 // adaptor returns I2C adaptor
 
 // Start writes start bytes
-func (b *BlinkMDriver) Start() (errs []error) {
+func (b *BlinkMDriver) Start() (err error) {
 	if err := b.connection.I2cStart(blinkmAddress); err != nil {
-		return []error{err}
+		return err
 	}
 	if err := b.connection.I2cWrite(blinkmAddress, []byte("o")); err != nil {
-		return []error{err}
+		return err
 	}
 	return
 }
 
 // Halt returns true if device is halted successfully
-func (b *BlinkMDriver) Halt() (errs []error) { return }
+func (b *BlinkMDriver) Halt() (err error) { return }
 
 // Rgb sets color using r,g,b params
 func (b *BlinkMDriver) Rgb(red byte, green byte, blue byte) (err error) {
