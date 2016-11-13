@@ -2,7 +2,6 @@ package dronesmith
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -40,9 +39,7 @@ func (s *Adaptor) SetName(n string) { s.name = n }
 // Connect returns nil if connection to Dronesmith server is successful,
 // otherwise returns the http error
 func (s *Adaptor) Connect() (err error) {
-	url := fmt.Sprintf("%v/start", s.droneURL())
-	fmt.Println(url)
-	_, err = s.request("POST", url, nil)
+	_, err = s.Request("POST", "/start", nil)
 
 	return
 }
@@ -50,16 +47,8 @@ func (s *Adaptor) Connect() (err error) {
 // Finalize returns nil if connection to Dronesmith server is finalized successfully
 // otherwise returns the error
 func (s *Adaptor) Finalize() (err error) {
-	url := fmt.Sprintf("%v/stop", s.droneURL())
-	_, err = s.request("POST", url, nil)
+	_, err = s.Request("POST", "/stop", nil)
 
-	return
-}
-
-// Info reads general Drone info from Dronesmith cloud api
-func (s *Adaptor) Info() (m map[string]interface{}, err error) {
-	url := fmt.Sprintf("%v/info", s.droneURL())
-	m, err = s.request("GET", url, nil)
 	return
 }
 
@@ -71,9 +60,15 @@ func (s *Adaptor) setAPIServer(server string) {
 // droneURL constructs drone url to make requests from Dronesmith api
 func (s *Adaptor) droneURL() string {
 	if len(s.APIServer) <= 0 {
-		s.setAPIServer("https://api.dronesmith.io")
+		s.setAPIServer("http://api.dronesmith.io")
 	}
 	return fmt.Sprintf("%v/api/drone/%v", s.APIServer, s.DroneID)
+}
+
+func (s *Adaptor) Request(method string, url string, params url.Values) (m map[string]interface{}, err error) {
+	fullURL := fmt.Sprintf("%v%v", s.droneURL(), url)
+	m, err = s.request(method, fullURL, params)
+	return
 }
 
 // request makes request to Dronesmith server, return err != nil if there is
@@ -108,8 +103,6 @@ func (s *Adaptor) request(method string, url string, params url.Values) (m map[s
 
 	if resp.Status != "200 OK" {
 		err = fmt.Errorf("%v: error communicating to the Dronesmith server", resp.Status)
-	} else if _, ok := m["error"]; ok {
-		err = errors.New(m["error"].(string))
 	}
 
 	return

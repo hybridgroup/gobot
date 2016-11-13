@@ -12,13 +12,15 @@ import (
 
 func main() {
 	a := dronesmith.NewAdaptor(os.Args[1], os.Args[2], os.Args[3])
+	tel := dronesmith.NewTelemetryDriver(a)
 
 	work := func() {
-		fmt.Println(a.Info())
+		fmt.Println(tel.Info())
 	}
 
 	robot := gobot.NewRobot("mydrone",
 		[]gobot.Connection{a},
+		[]gobot.Device{tel},
 		work,
 	)
 
