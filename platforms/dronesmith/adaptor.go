@@ -29,7 +29,7 @@ func NewAdaptor(droneID string, userEmail string, userKey string) *Adaptor {
 		DroneID:   droneID,
 		UserEmail: userEmail,
 		UserKey:   userKey,
-		APIServer: "https://api.dronesmith.io",
+		APIServer: "http://api.dronesmith.io",
 		Eventer:   gobot.NewEventer(),
 	}
 }
@@ -41,6 +41,7 @@ func (s *Adaptor) SetName(n string) { s.name = n }
 // otherwise returns the http error
 func (s *Adaptor) Connect() (err error) {
 	url := fmt.Sprintf("%v/start", s.droneURL())
+	fmt.Println(url)
 	_, err = s.request("POST", url, nil)
 
 	return
