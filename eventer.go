@@ -129,14 +129,11 @@ func (e *eventer) Once(n string, f func(s interface{})) (err error) {
 	out := e.Subscribe()
 	go func() {
 	ProcessEvents:
-		for {
-			select {
-			case evt := <-out:
-				if evt.Name == n {
-					f(evt.Data)
-					e.Unsubscribe(out)
-					break ProcessEvents
-				}
+		for evt := range out {
+			if evt.Name == n {
+				f(evt.Data)
+				e.Unsubscribe(out)
+				break ProcessEvents
 			}
 		}
 	}()
