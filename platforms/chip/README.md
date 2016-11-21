@@ -2,6 +2,10 @@
 
 The [CHIP](http://www.getchip.com/) is a small, inexpensive ARM based single board computer, with many different IO interfaces available on the [pin headers](http://docs.getchip.com/#pin-headers).
 
+The current ChipAdaptor will only work with CHIP devices running OS 4.3.
+This is because of the change in the GPIO expander pins between kernel
+versions OS 4.3 vs. OS 4.4. See [here](http://docs.getchip.com/chip.html#gpio) for more details.
+
 For documentation about the CHIP platform click [here](http://docs.getchip.com/).
 
 ## How to Install
