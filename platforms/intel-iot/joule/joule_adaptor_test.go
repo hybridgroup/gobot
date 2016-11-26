@@ -48,17 +48,6 @@ func (n *NullReadWriteCloser) Close() error {
 func initTestAdaptor() (*Adaptor, *sysfs.MockFilesystem) {
 	a := NewAdaptor()
 	fs := sysfs.NewMockFilesystem([]string{
-		"/sys/bus/iio/devices/iio:device1/in_voltage0_raw",
-		"/sys/kernel/debug/gpio_debug/gpio111/current_pinmux",
-		"/sys/kernel/debug/gpio_debug/gpio115/current_pinmux",
-		"/sys/kernel/debug/gpio_debug/gpio114/current_pinmux",
-		"/sys/kernel/debug/gpio_debug/gpio109/current_pinmux",
-		"/sys/kernel/debug/gpio_debug/gpio131/current_pinmux",
-		"/sys/kernel/debug/gpio_debug/gpio129/current_pinmux",
-		"/sys/kernel/debug/gpio_debug/gpio40/current_pinmux",
-		"/sys/kernel/debug/gpio_debug/gpio13/current_pinmux",
-		"/sys/kernel/debug/gpio_debug/gpio28/current_pinmux",
-		"/sys/kernel/debug/gpio_debug/gpio27/current_pinmux",
 		"/sys/class/pwm/pwmchip0/export",
 		"/sys/class/pwm/pwmchip0/unexport",
 		"/sys/class/pwm/pwmchip0/pwm0/duty_cycle",
