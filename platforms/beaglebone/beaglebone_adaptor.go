@@ -47,13 +47,16 @@ func NewAdaptor() *Adaptor {
 
 func (b *Adaptor) setSlots() {
 	ocp := "/sys/devices/ocp.*"
+	slots := "/sys/devices/bone_capemgr.*"
+
+	if b.kernel == "4" {
+		ocp = "/sys/devices/platform/ocp/ocp*"
+		slots = "/sys/devices/platform/bone_capemgr"
+	}
+
 	g, _ := glob(ocp)
 	b.ocp = g[0]
 
-	slots := "/sys/devices/bone_capemgr.*"
-	if b.kernel == "4" {
-		slots = "/sys/devices/platform/bone_capemgr"
-	}
 	g, _ = glob(slots)
 	b.slots = fmt.Sprintf("%v/slots", g[0])
 }
