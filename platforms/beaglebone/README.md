@@ -62,3 +62,15 @@ func main() {
 	robot.Start()
 }
 ```
+
+### Using with older kernel version
+
+The new default for the Gobot Beaglebone adaptor is for the 4.x kernel, such as that used with the Debian Jessie.
+
+If you want to use the older kernel version, such as that on the Angstrom Linux, use the `SetKernel()` function as follows:
+
+```go
+beagleboneAdaptor := beaglebone.NewAdaptor()
+beagleboneAdaptor.SetKernel("3")
+
+```
