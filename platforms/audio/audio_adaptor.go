@@ -1,4 +1,4 @@
-// Based on aplay audio adaptor written by @colemanserious (https://github.com/colemanserious)
+// Package audio is based on aplay audio adaptor written by @colemanserious (https://github.com/colemanserious)
 package audio
 
 import (
@@ -9,22 +9,32 @@ import (
 	"path"
 )
 
+// Adaptor is gobot Adaptor connection to audio playback
 type Adaptor struct {
 	name string
 }
 
+// NewAdaptor returns a new audio Adaptor
+//
 func NewAdaptor() *Adaptor {
 	return &Adaptor{name: "Audio"}
 }
 
+// Name returns the Adaptor Name
 func (a *Adaptor) Name() string { return a.name }
 
+// SetName sets the Adaptor Name
 func (a *Adaptor) SetName(n string) { a.name = n }
 
+// Connect establishes a connection to the Audio adaptor
 func (a *Adaptor) Connect() error { return nil }
 
+// Finalize terminates the connection to the Audio adaptor
 func (a *Adaptor) Finalize() error { return nil }
 
+// Sound plays a sound and accepts:
+//
+//  string: The filename of the audio to start playing
 func (a *Adaptor) Sound(fileName string) []error {
 	var errorsList []error
 
@@ -60,6 +70,9 @@ func (a *Adaptor) Sound(fileName string) []error {
 	return nil
 }
 
+// CommandName defines the playback command for a sound and accepts:
+//
+//  string: The filename of the audio that needs playback
 func CommandName(fileName string) (commandName string, err error) {
 	fileType := path.Ext(fileName)
 	if fileType == ".mp3" {
@@ -73,6 +86,10 @@ func CommandName(fileName string) (commandName string, err error) {
 
 var execCommand = exec.Command
 
+// RunCommand executes the playback command for a sound file and accepts:
+//
+//  string: The audio command to be use for playback
+//  string: The filename of the audio that needs playback
 func RunCommand(audioCommand string, filename string) error {
 	cmd := execCommand(audioCommand, filename)
 	err := cmd.Start()
