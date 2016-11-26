@@ -5,6 +5,7 @@ import (
 	multierror "github.com/hashicorp/go-multierror"
 )
 
+// Adaptor is the Gobot Adaptor for MQTT
 type Adaptor struct {
 	name     string
 	Host     string
@@ -23,6 +24,7 @@ func NewAdaptor(host string, clientID string) *Adaptor {
 	}
 }
 
+// NewAdaptorWithAuth creates a new mqtt adaptor with specified host, client id, username, and password.
 func NewAdaptorWithAuth(host, clientID, username, password string) *Adaptor {
 	return &Adaptor{
 		name:     "MQTT",
@@ -33,7 +35,10 @@ func NewAdaptorWithAuth(host, clientID, username, password string) *Adaptor {
 	}
 }
 
-func (a *Adaptor) Name() string     { return a.name }
+// Name returns the MQTT Adaptor's name
+func (a *Adaptor) Name() string { return a.name }
+
+// SetName sets the MQTT Adaptor's name
 func (a *Adaptor) SetName(n string) { a.name = n }
 
 // Connect returns true if connection to mqtt is established
@@ -69,7 +74,7 @@ func (a *Adaptor) Publish(topic string, message []byte) bool {
 	return true
 }
 
-// Subscribe to a topic, and then call the message handler function when data is received
+// On subscribes to a topic, and then calls the message handler function when data is received
 func (a *Adaptor) On(event string, f func(s []byte)) bool {
 	if a.client == nil {
 		return false
@@ -80,10 +85,10 @@ func (a *Adaptor) On(event string, f func(s []byte)) bool {
 	return true
 }
 
-func createClientOptions(clientId, raw, username, password string) *paho.ClientOptions {
+func createClientOptions(clientID, raw, username, password string) *paho.ClientOptions {
 	opts := paho.NewClientOptions()
 	opts.AddBroker(raw)
-	opts.SetClientID(clientId)
+	opts.SetClientID(clientID)
 	if username != "" && password != "" {
 		opts.SetPassword(password)
 		opts.SetUsername(username)
