@@ -149,7 +149,6 @@ func (b *Adaptor) DigitalRead(pin string) (val int, err error) {
 // valid usr pin values are usr0, usr1, usr2 and usr3
 func (b *Adaptor) DigitalWrite(pin string, val byte) (err error) {
 	if strings.Contains(pin, "usr") {
-		fmt.Println(b.usrLed + pin + "/brightness")
 		fi, err := sysfs.OpenFile(b.usrLed+pin+"/brightness", os.O_WRONLY|os.O_APPEND, 0666)
 		defer fi.Close()
 		if err != nil {
