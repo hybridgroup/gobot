@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -35,7 +36,6 @@ type Adaptor struct {
 func NewAdaptor() *Adaptor {
 	b := &Adaptor{
 		name:        "Beaglebone",
-		kernel:      "4",
 		digitalPins: make([]sysfs.DigitalPin, 120),
 		pwmPins:     make(map[string]*pwmPin),
 	}
@@ -47,12 +47,14 @@ func NewAdaptor() *Adaptor {
 func (b *Adaptor) setSlots() {
 	ocp := "/sys/devices/ocp.*"
 	slots := "/sys/devices/bone_capemgr.*"
-	b.usrLed = "/sys/class/leds/beaglebone:green:"
 
-	if b.kernel == "4" {
+	b.kernel = getKernel()
+	if string(b.kernel[0]) == "4" {
 		ocp = "/sys/devices/platform/ocp/ocp*"
 		slots = "/sys/devices/platform/bone_capemgr"
 	}
+
+	b.usrLed = "/sys/class/leds/beaglebone:green:"
 
 	g, _ := glob(ocp)
 	b.ocp = g[0]
@@ -67,14 +69,8 @@ func (b *Adaptor) Name() string { return b.name }
 // SetName sets the Adaptor name
 func (b *Adaptor) SetName(n string) { b.name = n }
 
-// Kernel returns the kernel major version for the BeagleBone
+// Kernel returns the Linux kernel version for the BeagleBone
 func (b *Adaptor) Kernel() string { return b.kernel }
-
-// SetKernel sets the Adaptor kernel
-func (b *Adaptor) SetKernel(n string) {
-	b.kernel = n
-	b.setSlots()
-}
 
 // Connect initializes the pwm and analog dts.
 func (b *Adaptor) Connect() error {
@@ -326,4 +322,10 @@ func ensureSlot(slots, item string) (err error) {
 		}
 	}
 	return
+}
+
+func getKernel() string {
+	result, _ := exec.Command("uname", "-r").Output()
+
+	return strings.TrimSpace(string(result))
 }
