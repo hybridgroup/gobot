@@ -47,12 +47,11 @@ func NewAdaptor() *Adaptor {
 func (b *Adaptor) setSlots() {
 	ocp := "/sys/devices/ocp.*"
 	slots := "/sys/devices/bone_capemgr.*"
-	b.usrLed = "/sys/devices/ocp.3/gpio-leds.8/leds/beaglebone:green:"
+	b.usrLed = "/sys/class/leds/beaglebone:green:"
 
 	if b.kernel == "4" {
 		ocp = "/sys/devices/platform/ocp/ocp*"
 		slots = "/sys/devices/platform/bone_capemgr"
-		b.usrLed = "/sys/class/leds/beaglebone:green:"
 	}
 
 	g, _ := glob(ocp)
