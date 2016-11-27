@@ -42,7 +42,7 @@ func (n *NullReadWriteCloser) Read(b []byte) (int, error) {
 	return len(b), nil
 }
 
-var closeErr error = nil
+var closeErr error
 
 func (n *NullReadWriteCloser) Close() error {
 	return closeErr
@@ -54,16 +54,16 @@ func TestBeagleboneAdaptor(t *testing.T) {
 	}
 	fs := sysfs.NewMockFilesystem([]string{
 		"/dev/i2c-1",
-		"/sys/devices/bone_capemgr.4",
-		"/sys/devices/ocp.3",
-		"/sys/devices/ocp.3/gpio-leds.8/leds/beaglebone:green:usr1/brightness",
-		"/sys/devices/ocp.3/helper.5",
-		"/sys/devices/ocp.3/helper.5/AIN1",
-		"/sys/devices/ocp.3/pwm_test_P9_14.5",
-		"/sys/devices/ocp.3/pwm_test_P9_14.5/run",
-		"/sys/devices/ocp.3/pwm_test_P9_14.5/period",
-		"/sys/devices/ocp.3/pwm_test_P9_14.5/polarity",
-		"/sys/devices/ocp.3/pwm_test_P9_14.5/duty",
+		"/sys/devices/platform/bone_capemgr",
+		"/sys/devices/platform/ocp/ocp4",
+		"/sys/class/leds/beaglebone:green:usr1/brightness",
+		"/sys/devices/platform/ocp/ocp4/helper.5",
+		"/sys/devices/platform/ocp/ocp4/helper.5/AIN1",
+		"/sys/devices/platform/ocp/ocp4/pwm_test_P9_14.5",
+		"/sys/devices/platform/ocp/ocp4/pwm_test_P9_14.5/run",
+		"/sys/devices/platform/ocp/ocp4/pwm_test_P9_14.5/period",
+		"/sys/devices/platform/ocp/ocp4/pwm_test_P9_14.5/polarity",
+		"/sys/devices/platform/ocp/ocp4/pwm_test_P9_14.5/duty",
 		"/sys/class/gpio/export",
 		"/sys/class/gpio/unexport",
 		"/sys/class/gpio/gpio60/value",
@@ -74,12 +74,12 @@ func TestBeagleboneAdaptor(t *testing.T) {
 
 	sysfs.SetFilesystem(fs)
 	a := NewAdaptor()
-	a.slots = "/sys/devices/bone_capemgr.4"
-	a.ocp = "/sys/devices/ocp.3"
+	a.slots = "/sys/devices/platform/bone_capemgr"
+	a.ocp = "/sys/devices/platform/ocp/ocp4"
 
 	a.Connect()
 
-	a.helper = "/sys/devices/ocp.3/helper.5"
+	a.helper = "/sys/devices/platform/ocp/ocp4/helper.5"
 
 	// PWM
 	glob = func(pattern string) (matches []string, err error) {
@@ -91,29 +91,29 @@ func TestBeagleboneAdaptor(t *testing.T) {
 	a.PwmWrite("P9_14", 175)
 	gobottest.Assert(
 		t,
-		fs.Files["/sys/devices/ocp.3/pwm_test_P9_14.5/period"].Contents,
+		fs.Files["/sys/devices/platform/ocp/ocp4/pwm_test_P9_14.5/period"].Contents,
 		"500000",
 	)
 	gobottest.Assert(
 		t,
-		fs.Files["/sys/devices/ocp.3/pwm_test_P9_14.5/duty"].Contents,
+		fs.Files["/sys/devices/platform/ocp/ocp4/pwm_test_P9_14.5/duty"].Contents,
 		"343137",
 	)
 
 	a.ServoWrite("P9_14", 100)
 	gobottest.Assert(
 		t,
-		fs.Files["/sys/devices/ocp.3/pwm_test_P9_14.5/period"].Contents,
+		fs.Files["/sys/devices/platform/ocp/ocp4/pwm_test_P9_14.5/period"].Contents,
 		"16666666",
 	)
 	gobottest.Assert(
 		t,
-		fs.Files["/sys/devices/ocp.3/pwm_test_P9_14.5/duty"].Contents,
+		fs.Files["/sys/devices/platform/ocp/ocp4/pwm_test_P9_14.5/duty"].Contents,
 		"1898148",
 	)
 
 	// Analog
-	fs.Files["/sys/devices/ocp.3/helper.5/AIN1"].Contents = "567\n"
+	fs.Files["/sys/devices/platform/ocp/ocp4/helper.5/AIN1"].Contents = "567\n"
 	i, _ := a.AnalogRead("P9_40")
 	gobottest.Assert(t, i, 567)
 
@@ -123,7 +123,7 @@ func TestBeagleboneAdaptor(t *testing.T) {
 	// DigitalIO
 	a.DigitalWrite("usr1", 1)
 	gobottest.Assert(t,
-		fs.Files["/sys/devices/ocp.3/gpio-leds.8/leds/beaglebone:green:usr1/brightness"].Contents,
+		fs.Files["/sys/class/leds/beaglebone:green:usr1/brightness"].Contents,
 		"1",
 	)
 

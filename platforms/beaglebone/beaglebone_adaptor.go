@@ -14,8 +14,6 @@ import (
 	"github.com/hybridgroup/gobot/sysfs"
 )
 
-var usrLed = "/sys/devices/ocp.3/gpio-leds.8/leds/beaglebone:green:"
-
 var glob = func(pattern string) (matches []string, err error) {
 	return filepath.Glob(pattern)
 }
@@ -27,6 +25,7 @@ type Adaptor struct {
 	digitalPins []sysfs.DigitalPin
 	pwmPins     map[string]*pwmPin
 	i2cDevice   sysfs.I2cDevice
+	usrLed      string
 	ocp         string
 	helper      string
 	slots       string
@@ -48,10 +47,12 @@ func NewAdaptor() *Adaptor {
 func (b *Adaptor) setSlots() {
 	ocp := "/sys/devices/ocp.*"
 	slots := "/sys/devices/bone_capemgr.*"
+	b.usrLed = "/sys/devices/ocp.3/gpio-leds.8/leds/beaglebone:green:"
 
 	if b.kernel == "4" {
 		ocp = "/sys/devices/platform/ocp/ocp*"
 		slots = "/sys/devices/platform/bone_capemgr"
+		b.usrLed = "/sys/class/leds/beaglebone:green:"
 	}
 
 	g, _ := glob(ocp)
@@ -148,7 +149,8 @@ func (b *Adaptor) DigitalRead(pin string) (val int, err error) {
 // valid usr pin values are usr0, usr1, usr2 and usr3
 func (b *Adaptor) DigitalWrite(pin string, val byte) (err error) {
 	if strings.Contains(pin, "usr") {
-		fi, err := sysfs.OpenFile(usrLed+pin+"/brightness", os.O_WRONLY|os.O_APPEND, 0666)
+		fmt.Println(b.usrLed + pin + "/brightness")
+		fi, err := sysfs.OpenFile(b.usrLed+pin+"/brightness", os.O_WRONLY|os.O_APPEND, 0666)
 		defer fi.Close()
 		if err != nil {
 			return err
