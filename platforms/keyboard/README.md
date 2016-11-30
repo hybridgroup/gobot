@@ -23,10 +23,10 @@ import (
 )
 
 func main() {
-	keys := keyboard.NewDriver("keyboard")
+	keys := keyboard.NewDriver()
 
 	work := func() {
-		gobot.On(keys.Event("key"), func(data interface{}) {
+		keys.On(keyboard.Key, func(data interface{}) {
 			key := data.(keyboard.KeyEvent)
 
 			if key.Key == keyboard.A {

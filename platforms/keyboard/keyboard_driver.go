@@ -8,10 +8,11 @@ import (
 )
 
 const (
-	// Keyboard event
+	// Key board event
 	Key = "key"
 )
 
+// Driver is gobot software device to the keyboard
 type Driver struct {
 	name    string
 	connect func(*Driver) (err error)
@@ -20,6 +21,8 @@ type Driver struct {
 	gobot.Eventer
 }
 
+// NewDriver returns a new keyboard Driver.
+//
 func NewDriver() *Driver {
 	k := &Driver{
 		name: "Keyboard",
@@ -60,12 +63,17 @@ func NewDriver() *Driver {
 	return k
 }
 
-func (k *Driver) Name() string                 { return k.name }
-func (k *Driver) SetName(n string)             { k.name = n }
+// Name returns the Driver Name
+func (k *Driver) Name() string { return k.name }
+
+// SetName sets the Driver Name
+func (k *Driver) SetName(n string) { k.name = n }
+
+// Connection returns the Driver Connection
 func (k *Driver) Connection() gobot.Connection { return nil }
 
 // Start initializes keyboard by grabbing key events as they come in and
-// publishing a key event
+// publishing each as a key event
 func (k *Driver) Start() (err error) {
 	if err = k.connect(k); err != nil {
 		return err
@@ -76,7 +84,7 @@ func (k *Driver) Start() (err error) {
 	return
 }
 
-// Halt stops camera driver
+// Halt stops keyboard driver
 func (k *Driver) Halt() (err error) {
 	if originalState != "" {
 		return restore()
