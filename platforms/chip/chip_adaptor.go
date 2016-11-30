@@ -80,7 +80,7 @@ func (c *Adaptor) Finalize() (err error) {
 
 func (c *Adaptor) setPins() {
 	kernel := getKernel()
-	if string(kernel[0:2]) == "4.3" {
+	if kernel[:3] == "4.3" {
 		c.pinMap = pinsOriginal
 	} else {
 		c.pinMap = pins44
