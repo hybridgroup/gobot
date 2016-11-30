@@ -49,7 +49,7 @@ func (b *Adaptor) setSlots() {
 	slots := "/sys/devices/bone_capemgr.*"
 
 	b.kernel = getKernel()
-	if string(b.kernel[0]) == "4" {
+	if b.kernel[:1] == "4" {
 		ocp = "/sys/devices/platform/ocp/ocp*"
 		slots = "/sys/devices/platform/bone_capemgr"
 	}
