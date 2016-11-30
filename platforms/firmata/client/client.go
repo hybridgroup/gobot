@@ -315,21 +315,9 @@ func (b *Client) write(data []byte) (err error) {
 	return
 }
 
-func (b *Client) read(length int) (buf []byte, err error) {
-	i := 0
-	for length > 0 {
-		tmp := make([]byte, length)
-		if i, err = b.connection.Read(tmp); err != nil {
-			if err.Error() != "EOF" {
-				return
-			}
-			<-time.After(5 * time.Millisecond)
-		}
-		if i > 0 {
-			buf = append(buf, tmp...)
-			length = length - i
-		}
-	}
+func (b *Client) read(n int) (buf []byte, err error) {
+	buf = make([]byte, n)
+	_, err = io.ReadFull(b.connection, buf)
 	return
 }
 
