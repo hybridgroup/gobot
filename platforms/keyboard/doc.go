@@ -22,7 +22,7 @@ Example:
 		keys := keyboard.NewDriver()
 
 		work := func() {
-			keys.On(keys.Event("key"), func(data interface{}) {
+			keys.On(keyboard.Key, func(data interface{}) {
 				key := data.(keyboard.KeyEvent)
 
 				if key.Key == keyboard.A {
@@ -39,8 +39,9 @@ Example:
 			work,
 		)
 
-		gbot.Start()
+		robot.Start()
 	}
+
 
 For further information refer to keyboard README:
 https://github.com/hybridgroup/gobot/blob/master/platforms/keyboard/README.md

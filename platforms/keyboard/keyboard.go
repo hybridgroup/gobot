@@ -7,6 +7,7 @@ import (
 
 type bytes [3]byte
 
+// KeyEvent contains data about a keyboard event
 type KeyEvent struct {
 	Bytes bytes
 	Key   int
