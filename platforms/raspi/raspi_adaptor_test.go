@@ -38,7 +38,7 @@ func (n *NullReadWriteCloser) Read(b []byte) (int, error) {
 	return len(b), nil
 }
 
-var closeErr error = nil
+var closeErr error
 
 func (n *NullReadWriteCloser) Close() error {
 	return closeErr
