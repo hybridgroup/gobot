@@ -13,6 +13,7 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
+// Adaptor is the Gobot Adaptor for Particle
 type Adaptor struct {
 	name        string
 	DeviceID    string
@@ -21,6 +22,7 @@ type Adaptor struct {
 	gobot.Eventer
 }
 
+// Event is an event emitted by the Particle cloud
 type Event struct {
 	Name  string
 	Data  string
@@ -47,7 +49,10 @@ func NewAdaptor(deviceID string, accessToken string) *Adaptor {
 	}
 }
 
-func (s *Adaptor) Name() string     { return s.name }
+// Name returns the Adaptor name
+func (s *Adaptor) Name() string { return s.name }
+
+// SetName sets the Adaptor name
 func (s *Adaptor) SetName(n string) { s.name = n }
 
 // Connect returns true if connection to Particle Photon or Electron is successful
