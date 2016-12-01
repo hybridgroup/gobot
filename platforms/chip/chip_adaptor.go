@@ -2,18 +2,22 @@ package chip
 
 import (
 	"errors"
+	"os/exec"
+	"strings"
 
 	multierror "github.com/hashicorp/go-multierror"
 	"github.com/hybridgroup/gobot/sysfs"
 )
 
+// Adaptor represents a Gobot Adaptor for a C.H.I.P.
 type Adaptor struct {
 	name        string
 	digitalPins map[int]sysfs.DigitalPin
+	pinMap      map[string]int
 	i2cDevice   sysfs.I2cDevice
 }
 
-var pins = map[string]int{
+var pinsOriginal = map[string]int{
 	"XIO-P0": 408,
 	"XIO-P1": 409,
 	"XIO-P2": 410,
@@ -24,12 +28,25 @@ var pins = map[string]int{
 	"XIO-P7": 415,
 }
 
+var pins44 = map[string]int{
+	"XIO-P0": 1013,
+	"XIO-P1": 1014,
+	"XIO-P2": 1015,
+	"XIO-P3": 1016,
+	"XIO-P4": 1017,
+	"XIO-P5": 1018,
+	"XIO-P6": 1019,
+	"XIO-P7": 1020,
+}
+
 // NewAdaptor creates a C.H.I.P. Adaptor
 func NewAdaptor() *Adaptor {
 	c := &Adaptor{
 		name:        "CHIP",
 		digitalPins: make(map[int]sysfs.DigitalPin),
 	}
+
+	c.setPins()
 	return c
 }
 
@@ -61,8 +78,17 @@ func (c *Adaptor) Finalize() (err error) {
 	return
 }
 
+func (c *Adaptor) setPins() {
+	kernel := getKernel()
+	if kernel[:3] == "4.3" {
+		c.pinMap = pinsOriginal
+	} else {
+		c.pinMap = pins44
+	}
+}
+
 func (c *Adaptor) translatePin(pin string) (i int, err error) {
-	if val, ok := pins[pin]; ok {
+	if val, ok := c.pinMap[pin]; ok {
 		i = val
 	} else {
 		err = errors.New("Not a valid pin")
@@ -139,4 +165,10 @@ func (c *Adaptor) I2cRead(address int, size int) (data []byte, err error) {
 	data = make([]byte, size)
 	_, err = c.i2cDevice.Read(data)
 	return
+}
+
+func getKernel() string {
+	result, _ := exec.Command("uname", "-r").Output()
+
+	return strings.TrimSpace(string(result))
 }

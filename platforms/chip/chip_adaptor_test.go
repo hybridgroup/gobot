@@ -38,7 +38,7 @@ func (n *NullReadWriteCloser) Read(b []byte) (int, error) {
 	return len(b), nil
 }
 
-var closeErr error = nil
+var closeErr error
 
 func (n *NullReadWriteCloser) Close() error {
 	return closeErr
@@ -55,18 +55,18 @@ func TestChipAdaptorDigitalIO(t *testing.T) {
 	fs := sysfs.NewMockFilesystem([]string{
 		"/sys/class/gpio/export",
 		"/sys/class/gpio/unexport",
-		"/sys/class/gpio/gpio408/value",
-		"/sys/class/gpio/gpio408/direction",
-		"/sys/class/gpio/gpio415/value",
-		"/sys/class/gpio/gpio415/direction",
+		"/sys/class/gpio/gpio1013/value",
+		"/sys/class/gpio/gpio1013/direction",
+		"/sys/class/gpio/gpio1020/value",
+		"/sys/class/gpio/gpio1020/direction",
 	})
 
 	sysfs.SetFilesystem(fs)
 
 	a.DigitalWrite("XIO-P0", 1)
-	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio408/value"].Contents, "1")
+	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio1013/value"].Contents, "1")
 
-	fs.Files["/sys/class/gpio/gpio415/value"].Contents = "1"
+	fs.Files["/sys/class/gpio/gpio1020/value"].Contents = "1"
 	i, _ := a.DigitalRead("XIO-P7")
 	gobottest.Assert(t, i, 1)
 
