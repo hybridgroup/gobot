@@ -26,7 +26,7 @@ type packet struct {
 	checksum uint8
 }
 
-// Represents a Sphero 2.0
+// SpheroDriver Represents a Sphero 2.0
 type SpheroDriver struct {
 	name            string
 	connection      gobot.Connection
@@ -142,8 +142,13 @@ func NewSpheroDriver(a *Adaptor) *SpheroDriver {
 	return s
 }
 
-func (s *SpheroDriver) Name() string                 { return s.name }
-func (s *SpheroDriver) SetName(n string)             { s.name = n }
+// Name returns the Driver Name
+func (s *SpheroDriver) Name() string { return s.name }
+
+// SetName sets the Driver Name
+func (s *SpheroDriver) SetName(n string) { s.name = n }
+
+// Connection returns the Driver's Connection
 func (s *SpheroDriver) Connection() gobot.Connection { return s.connection }
 
 func (s *SpheroDriver) adaptor() *Adaptor {
@@ -283,7 +288,7 @@ func (s *SpheroDriver) Roll(speed uint8, heading uint16) {
 	s.packetChannel <- s.craftPacket([]uint8{speed, uint8(heading >> 8), uint8(heading & 0xFF), 0x01}, 0x02, 0x30)
 }
 
-// Configures and enables the Locator
+// ConfigureLocator configures and enables the Locator
 func (s *SpheroDriver) ConfigureLocator(d LocatorConfig) {
 	buf := new(bytes.Buffer)
 	binary.Write(buf, binary.BigEndian, d)
@@ -291,7 +296,7 @@ func (s *SpheroDriver) ConfigureLocator(d LocatorConfig) {
 	s.packetChannel <- s.craftPacket(buf.Bytes(), 0x02, 0x13)
 }
 
-// Enables sensor data streaming
+// SetDataStreaming enables sensor data streaming
 func (s *SpheroDriver) SetDataStreaming(d DataStreamingConfig) {
 	buf := new(bytes.Buffer)
 	binary.Write(buf, binary.BigEndian, d)
