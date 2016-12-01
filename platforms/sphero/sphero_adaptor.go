@@ -6,7 +6,7 @@ import (
 	"github.com/tarm/serial"
 )
 
-// Represents a Connection to a Sphero
+// Adaptor represents a Connection to a Sphero
 type Adaptor struct {
 	name      string
 	port      string
@@ -26,19 +26,27 @@ func NewAdaptor(port string) *Adaptor {
 	}
 }
 
-func (a *Adaptor) Name() string     { return a.name }
+// Name returns the Adaptor's name
+func (a *Adaptor) Name() string { return a.name }
+
+// SetName sets the Adaptor's name
 func (a *Adaptor) SetName(n string) { a.name = n }
-func (a *Adaptor) Port() string     { return a.port }
+
+// Port returns the Adaptor's port
+func (a *Adaptor) Port() string { return a.port }
+
+// SetPort sets the Adaptor's port
 func (a *Adaptor) SetPort(p string) { a.port = p }
 
 // Connect initiates a connection to the Sphero. Returns true on successful connection.
 func (a *Adaptor) Connect() (err error) {
-	if sp, e := a.connect(a.Port()); e != nil {
+	sp, e := a.connect(a.Port())
+	if e != nil {
 		return e
-	} else {
-		a.sp = sp
-		a.connected = true
 	}
+
+	a.sp = sp
+	a.connected = true
 	return
 }
 
