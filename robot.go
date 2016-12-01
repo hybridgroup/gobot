@@ -185,12 +185,20 @@ func (r *Robot) Start(args ...interface{}) (err error) {
 }
 
 // Stop stops a Robot's connections and Devices
-func (r *Robot) Stop() (err error) {
+func (r *Robot) Stop() error {
+	var result error
 	log.Println("Stopping Robot", r.Name, "...")
-	err = r.Devices().Halt()
+	err := r.Devices().Halt()
+	if err != nil {
+		result = multierror.Append(result, err)
+	}
 	err = r.Connections().Finalize()
+	if err != nil {
+		result = multierror.Append(result, err)
+	}
+
 	r.done <- true
-	return err
+	return result
 }
 
 // Devices returns all devices associated with this Robot.
