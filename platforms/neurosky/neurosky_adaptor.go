@@ -1,3 +1,4 @@
+// Package neurosky is the Gobot platform for the Neurosky Mindwave EEG
 package neurosky
 
 import (
@@ -6,6 +7,7 @@ import (
 	"github.com/tarm/serial"
 )
 
+// Adaptor is the Gobot Adaptor for the Neurosky Mindwave
 type Adaptor struct {
 	name    string
 	port    string
@@ -24,17 +26,23 @@ func NewAdaptor(port string) *Adaptor {
 	}
 }
 
-func (n *Adaptor) Name() string        { return n.name }
+// Name returns the Adaptor Name
+func (n *Adaptor) Name() string { return n.name }
+
+// SetName sets the Adaptor Name
 func (n *Adaptor) SetName(name string) { n.name = name }
-func (n *Adaptor) Port() string        { return n.port }
+
+// Port returns the Adaptor port
+func (n *Adaptor) Port() string { return n.port }
 
 // Connect returns true if connection to device is successful
 func (n *Adaptor) Connect() error {
-	if sp, err := n.connect(n); err != nil {
+	sp, err := n.connect(n)
+	if err != nil {
 		return err
-	} else {
-		n.sp = sp
 	}
+
+	n.sp = sp
 	return nil
 }
 
