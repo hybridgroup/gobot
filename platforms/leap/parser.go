@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 )
 
+// Gesture is a Leap Motion gesture tht has been detected
 type Gesture struct {
 	Direction     []float64   `json:"direction"`
 	Duration      int         `json:"duration"`
@@ -17,6 +18,7 @@ type Gesture struct {
 	Type          string      `json:"type"`
 }
 
+// Hand is a Leap Motion hand tht has been detected
 type Hand struct {
 	Direction              []float64   `json:"direction"`
 	ID                     int         `json:"id"`
@@ -32,6 +34,7 @@ type Hand struct {
 	TimeVisible            float64     `json:"TimeVisible"`
 }
 
+// Pointable is a Leap Motion pointing motion tht has been detected
 type Pointable struct {
 	Direction             []float64 `json:"direction"`
 	HandID                int       `json:"handId"`
@@ -46,12 +49,13 @@ type Pointable struct {
 	TouchZone             string    `json:"touchZone"`
 }
 
+// InteractionBox is the area within which the gestural interaction has been detected
 type InteractionBox struct {
 	Center []int     `json:"center"`
 	Size   []float64 `json:"size"`
 }
 
-// Base representation returned that holds every other objects
+// Frame is the base representation returned that holds every other objects
 type Frame struct {
 	CurrentFrameRate float64        `json:"currentFrameRate"`
 	Gestures         []Gesture      `json:"gestures"`

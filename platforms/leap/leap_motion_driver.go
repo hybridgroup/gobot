@@ -17,6 +17,7 @@ const (
 	GestureEvent = "gesture"
 )
 
+// Driver the Gobot software device to the Leap Motion
 type Driver struct {
 	name       string
 	connection gobot.Connection
@@ -27,7 +28,7 @@ var receive = func(ws io.ReadWriteCloser, msg *[]byte) {
 	websocket.Message.Receive(ws.(*websocket.Conn), msg)
 }
 
-// NewLDriver creates a new leap motion driver
+// NewDriver creates a new leap motion driver
 //
 // Adds the following events:
 //		"message" - Gets triggered when receiving a message from leap motion
@@ -45,8 +46,14 @@ func NewDriver(a *Adaptor) *Driver {
 	l.AddEvent(GestureEvent)
 	return l
 }
-func (l *Driver) Name() string                 { return l.name }
-func (l *Driver) SetName(n string)             { l.name = n }
+
+// Name returns the Driver Name
+func (l *Driver) Name() string { return l.name }
+
+// SetName sets the Driver Name
+func (l *Driver) SetName(n string) { l.name = n }
+
+// Connection returns the Driver's Connection
 func (l *Driver) Connection() gobot.Connection { return l.connection }
 
 // adaptor returns leap motion adaptor
