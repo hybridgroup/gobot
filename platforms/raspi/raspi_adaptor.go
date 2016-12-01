@@ -17,6 +17,7 @@ var readFile = func() ([]byte, error) {
 	return ioutil.ReadFile("/proc/cpuinfo")
 }
 
+// Adaptor is the Gobot Adaptor for the Raspberry Pi
 type Adaptor struct {
 	name        string
 	revision    string
@@ -24,93 +25,6 @@ type Adaptor struct {
 	digitalPins map[int]sysfs.DigitalPin
 	pwmPins     []int
 	i2cDevice   sysfs.I2cDevice
-}
-
-var pins = map[string]map[string]int{
-	"3": map[string]int{
-		"1": 0,
-		"2": 2,
-		"3": 2,
-	},
-	"5": map[string]int{
-		"1": 1,
-		"2": 3,
-		"3": 3,
-	},
-	"7": map[string]int{
-		"*": 4,
-	},
-	"8": map[string]int{
-		"*": 14,
-	},
-	"10": map[string]int{
-		"*": 15,
-	},
-	"11": map[string]int{
-		"*": 17,
-	},
-	"12": map[string]int{
-		"*": 18,
-	},
-	"13": map[string]int{
-		"1": 21,
-		"2": 27,
-		"3": 27,
-	},
-	"15": map[string]int{
-		"*": 22,
-	},
-	"16": map[string]int{
-		"*": 23,
-	},
-	"18": map[string]int{
-		"*": 24,
-	},
-	"19": map[string]int{
-		"*": 10,
-	},
-	"21": map[string]int{
-		"*": 9,
-	},
-	"22": map[string]int{
-		"*": 25,
-	},
-	"23": map[string]int{
-		"*": 11,
-	},
-	"24": map[string]int{
-		"*": 8,
-	},
-	"26": map[string]int{
-		"*": 7,
-	},
-	"29": map[string]int{
-		"3": 5,
-	},
-	"31": map[string]int{
-		"3": 6,
-	},
-	"32": map[string]int{
-		"3": 12,
-	},
-	"33": map[string]int{
-		"3": 13,
-	},
-	"35": map[string]int{
-		"3": 19,
-	},
-	"36": map[string]int{
-		"3": 16,
-	},
-	"37": map[string]int{
-		"3": 26,
-	},
-	"38": map[string]int{
-		"3": 20,
-	},
-	"40": map[string]int{
-		"3": 21,
-	},
 }
 
 // NewAdaptor creates a Raspi Adaptor
@@ -140,7 +54,10 @@ func NewAdaptor() *Adaptor {
 	return r
 }
 
-func (r *Adaptor) Name() string     { return r.name }
+// Name returns the Adaptor's name
+func (r *Adaptor) Name() string { return r.name }
+
+// SetName sets the Adaptor's name
 func (r *Adaptor) SetName(n string) { r.name = n }
 
 // Connect starts connection with board and creates
@@ -271,6 +188,7 @@ func (r *Adaptor) I2cRead(address int, size int) (data []byte, err error) {
 	return
 }
 
+// PwmWrite writes a PWM signal to the specified pin
 func (r *Adaptor) PwmWrite(pin string, val byte) (err error) {
 	sysfsPin, err := r.pwmPin(pin)
 	if err != nil {
@@ -279,6 +197,7 @@ func (r *Adaptor) PwmWrite(pin string, val byte) (err error) {
 	return r.piBlaster(fmt.Sprintf("%v=%v\n", sysfsPin, gobot.FromScale(float64(val), 0, 255)))
 }
 
+// ServoWrite writes a servo signal to the specified pin
 func (r *Adaptor) ServoWrite(pin string, angle byte) (err error) {
 	sysfsPin, err := r.pwmPin(pin)
 	if err != nil {
