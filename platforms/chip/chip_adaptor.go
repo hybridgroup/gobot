@@ -29,14 +29,14 @@ var pinsOriginal = map[string]int{
 }
 
 var pins44 = map[string]int{
-	"XIO-P0": 1016,
-	"XIO-P1": 1017,
-	"XIO-P2": 1018,
-	"XIO-P3": 1019,
-	"XIO-P4": 1020,
-	"XIO-P5": 1021,
-	"XIO-P6": 1022,
-	"XIO-P7": 1023,
+	"XIO-P0": 1013,
+	"XIO-P1": 1014,
+	"XIO-P2": 1015,
+	"XIO-P3": 1016,
+	"XIO-P4": 1017,
+	"XIO-P5": 1018,
+	"XIO-P6": 1019,
+	"XIO-P7": 1020,
 }
 
 // NewAdaptor creates a C.H.I.P. Adaptor
