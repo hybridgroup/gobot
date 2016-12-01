@@ -6,6 +6,7 @@ import (
 	"golang.org/x/net/websocket"
 )
 
+// Adaptor is the Gobot Adaptor connection to the Leap Motion
 type Adaptor struct {
 	name    string
 	port    string
@@ -13,27 +14,35 @@ type Adaptor struct {
 	connect func(string) (io.ReadWriteCloser, error)
 }
 
-// NewAdaptor creates a new leap motion adaptor using specified port
+// NewAdaptor creates a new leap motion adaptor using specified port,
+// which is this case is the host IP or name of the Leap Motion daemon
 func NewAdaptor(port string) *Adaptor {
 	return &Adaptor{
 		name: "LeapMotion",
 		port: port,
-		connect: func(port string) (io.ReadWriteCloser, error) {
-			return websocket.Dial("ws://"+port+"/v3.json", "", "http://"+port)
+		connect: func(host string) (io.ReadWriteCloser, error) {
+			return websocket.Dial("ws://"+host+"/v3.json", "", "http://"+host)
 		},
 	}
 }
-func (l *Adaptor) Name() string     { return l.name }
+
+// Name returns the Adaptor Name
+func (l *Adaptor) Name() string { return l.name }
+
+// SetName sets the Adaptor Name
 func (l *Adaptor) SetName(n string) { l.name = n }
-func (l *Adaptor) Port() string     { return l.port }
+
+// Port returns the Adaptor Port which is this case is the host IP or name
+func (l *Adaptor) Port() string { return l.port }
 
 // Connect returns true if connection to leap motion is established successfully
 func (l *Adaptor) Connect() (err error) {
-	if ws, e := l.connect(l.Port()); e != nil {
+	ws, e := l.connect(l.Port())
+	if e != nil {
 		return e
-	} else {
-		l.ws = ws
 	}
+
+	l.ws = ws
 	return
 }
 
