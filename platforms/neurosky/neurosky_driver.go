@@ -6,36 +6,65 @@ import (
 	"github.com/hybridgroup/gobot"
 )
 
-const BTSync byte = 0xAA
+const (
+	// BTSync is the sync code
+	BTSync byte = 0xAA
 
-// CodeEx Extended code
-const CodeEx byte = 0x55
+	// CodeEx Extended code
+	CodeEx byte = 0x55
 
-// CodeSignalQuality POOR_SIGNAL quality 0-255
-const CodeSignalQuality byte = 0x02
+	// CodeSignalQuality POOR_SIGNAL quality 0-255
+	CodeSignalQuality byte = 0x02
 
-// CodeAttention ATTENTION eSense 0-100
-const CodeAttention byte = 0x04
+	// CodeAttention ATTENTION eSense 0-100
+	CodeAttention byte = 0x04
 
-// CodeMeditation MEDITATION eSense 0-100
-const CodeMeditation byte = 0x05
+	// CodeMeditation MEDITATION eSense 0-100
+	CodeMeditation byte = 0x05
 
-// CodeBlink BLINK strength 0-255
-const CodeBlink byte = 0x16
+	// CodeBlink BLINK strength 0-255
+	CodeBlink byte = 0x16
 
-// CodeWave RAW wave value: 2-byte big-endian 2s-complement
-const CodeWave byte = 0x80
+	// CodeWave RAW wave value: 2-byte big-endian 2s-complement
+	CodeWave byte = 0x80
 
-// CodeAsicEEG ASIC EEG POWER 8 3-byte big-endian integers
-const CodeAsicEEG byte = 0x83
+	// CodeAsicEEG ASIC EEG POWER 8 3-byte big-endian integers
+	CodeAsicEEG byte = 0x83
 
+	// Extended event
+	Extended = "extended"
+
+	// Signal event
+	Signal = "signal"
+
+	// Attention event
+	Attention = "attention"
+
+	// Meditation event
+	Meditation = "meditation"
+
+	// Blink event
+	Blink = "blink"
+
+	// Wave event
+	Wave = "wave"
+
+	// EEG event
+	EEG = "eeg"
+
+	// Error event
+	Error = "error"
+)
+
+// Driver is the Gobot Driver for the Mindwave
 type Driver struct {
 	name       string
 	connection gobot.Connection
 	gobot.Eventer
 }
 
-type EEG struct {
+// EEGData is the EEG raw data returned from the Mindwave
+type EEGData struct {
 	Delta    int
 	Theta    int
 	LoAlpha  int
@@ -63,20 +92,26 @@ func NewDriver(a *Adaptor) *Driver {
 		Eventer:    gobot.NewEventer(),
 	}
 
-	n.AddEvent("extended")
-	n.AddEvent("signal")
-	n.AddEvent("attention")
-	n.AddEvent("meditation")
-	n.AddEvent("blink")
-	n.AddEvent("wave")
-	n.AddEvent("eeg")
-	n.AddEvent("error")
+	n.AddEvent(Extended)
+	n.AddEvent(Signal)
+	n.AddEvent(Attention)
+	n.AddEvent(Meditation)
+	n.AddEvent(Blink)
+	n.AddEvent(Wave)
+	n.AddEvent(EEG)
+	n.AddEvent(Error)
 
 	return n
 }
+
+// Connection returns the Driver's connection
 func (n *Driver) Connection() gobot.Connection { return n.connection }
-func (n *Driver) Name() string                 { return n.name }
-func (n *Driver) SetName(name string)          { n.name = name }
+
+// Name returns the Driver name
+func (n *Driver) Name() string { return n.name }
+
+// SetName sets the Driver name
+func (n *Driver) SetName(name string) { n.name = name }
 
 // adaptor returns neurosky adaptor
 func (n *Driver) adaptor() *Adaptor {
@@ -154,8 +189,8 @@ func (n *Driver) parsePacket(buf *bytes.Buffer) {
 }
 
 // parseEEG returns data converted into EEG map
-func (n *Driver) parseEEG(data []byte) EEG {
-	return EEG{
+func (n *Driver) parseEEG(data []byte) EEGData {
+	return EEGData{
 		Delta:    n.parse3ByteInteger(data[0:3]),
 		Theta:    n.parse3ByteInteger(data[3:6]),
 		LoAlpha:  n.parse3ByteInteger(data[6:9]),
