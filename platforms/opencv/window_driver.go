@@ -9,6 +9,7 @@ type window interface {
 	ShowImage(*cv.IplImage)
 }
 
+// WindowDriver is the Gobot Driver for the OpenCV window
 type WindowDriver struct {
 	name   string
 	window window
@@ -26,8 +27,13 @@ func NewWindowDriver() *WindowDriver {
 	}
 }
 
-func (w *WindowDriver) Name() string                 { return w.name }
-func (w *WindowDriver) SetName(n string)             { w.name = n }
+// Name returns the Driver name
+func (w *WindowDriver) Name() string { return w.name }
+
+// SetName sets the Driver name
+func (w *WindowDriver) SetName(n string) { w.name = n }
+
+// Connection returns the Driver's connection
 func (w *WindowDriver) Connection() gobot.Connection { return nil }
 
 // Start starts window thread and driver
