@@ -19,6 +19,7 @@ const (
 	Frame = "frame"
 )
 
+// CameraDriver is the Gobot Driver for the OpenCV camera
 type CameraDriver struct {
 	name     string
 	camera   capture
@@ -58,8 +59,13 @@ func NewCameraDriver(source interface{}, v ...time.Duration) *CameraDriver {
 	return c
 }
 
-func (c *CameraDriver) Name() string                 { return c.name }
-func (c *CameraDriver) SetName(n string)             { c.name = n }
+// Name returns the Driver name
+func (c *CameraDriver) Name() string { return c.name }
+
+// SetName sets the Driver name
+func (c *CameraDriver) SetName(n string) { c.name = n }
+
+// Connection returns the Driver's connection
 func (c *CameraDriver) Connection() gobot.Connection { return nil }
 
 // Start initializes camera by grabbing a frame
