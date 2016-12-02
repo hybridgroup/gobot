@@ -1,9 +1,6 @@
 package nats
 
-import (
-	multierror "github.com/hashicorp/go-multierror"
-	"github.com/nats-io/nats"
-)
+import "github.com/nats-io/nats"
 
 // Adaptor is a configuration struct for interacting with a NATS server.
 // Name is a logical name for the adaptor/nats server connection.
@@ -16,6 +13,7 @@ type Adaptor struct {
 	username string
 	password string
 	client   *nats.Conn
+	connect  func() (*nats.Conn, error)
 }
 
 // NewAdaptor populates a new NATS Adaptor.
@@ -24,6 +22,9 @@ func NewAdaptor(host string, clientID int) *Adaptor {
 		name:     "NATS",
 		Host:     host,
 		clientID: clientID,
+		connect: func() (*nats.Conn, error) {
+			return nats.Connect("nats://" + host)
+		},
 	}
 }
 
@@ -34,6 +35,9 @@ func NewAdaptorWithAuth(host string, clientID int, username string, password str
 		clientID: clientID,
 		username: username,
 		password: password,
+		connect: func() (*nats.Conn, error) {
+			return nats.Connect("nats://" + username + ":" + password + "@" + host)
+		},
 	}
 }
 
@@ -45,18 +49,7 @@ func (a *Adaptor) SetName(n string) { a.name = n }
 
 // Connect makes a connection to the Nats server.
 func (a *Adaptor) Connect() (err error) {
-	auth := ""
-	if a.username != "" && a.password != "" {
-		auth = a.username + ":" + a.password + "@"
-	}
-
-	defaultURL := "nats://" + auth + a.Host
-
-	var e error
-	a.client, e = nats.Connect(defaultURL)
-	if e != nil {
-		err = multierror.Append(err, e)
-	}
+	a.client, err = a.connect()
 	return
 }
 
