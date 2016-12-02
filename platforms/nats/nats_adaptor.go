@@ -53,7 +53,7 @@ func (a *Adaptor) Connect() (err error) {
 	return
 }
 
-// Disconnect from the nats server. Returns an error if the client doesn't exist.
+// Disconnect from the nats server.
 func (a *Adaptor) Disconnect() (err error) {
 	if a.client != nil {
 		a.client.Close()
