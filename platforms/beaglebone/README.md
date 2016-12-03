@@ -50,7 +50,7 @@ func main() {
 Simply compile your Gobot program like this:
 
 ```bash
-$ GOARM=7 GOARCH=arm GOOS=linux go build examples/beaglebone_blink.go
+$ GOARCH=arm GOOS=linux go build examples/beaglebone_blink.go
 ```
 
 If you are running the official Debian Linux through the usb->ethernet connection, or are connected to the board using WiFi, you can simply upload your program and execute it with the `scp` command like this:
@@ -72,7 +72,7 @@ Once you have created the SD card, boot your BeagleBone using the new image as f
 
 - Insert SD card into your (powered-down) board, hold down the USER/BOOT button (if using Black) and apply power, either by the USB cable or 5V adapter.
 
-- If using an original BeagleBone, you are done.
+- If all you want to do it boot once from the SD card, it should now be booting.
 
 - If using BeagleBone Black and desire to write the image to your on-board eMMC, you'll need to follow the instructions at http://elinux.org/Beagleboard:BeagleBoneBlack_Debian#Flashing_eMMC. When the flashing is complete, all 4 USRx LEDs will be steady on or off. The latest Debian flasher images automatically power down the board upon completion. This can take up to 45 minutes. Power-down your board, remove the SD card and apply power again to be complete.
 

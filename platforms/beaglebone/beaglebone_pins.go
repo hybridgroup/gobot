@@ -80,7 +80,7 @@ var pwmPins = map[string]string{
 	"P8_46": "P8_46",
 }
 
-var analogPins = map[string]string{
+var analogPins3 = map[string]string{
 	"P9_39": "AIN0",
 	"P9_40": "AIN1",
 	"P9_37": "AIN2",
@@ -88,4 +88,14 @@ var analogPins = map[string]string{
 	"P9_33": "AIN4",
 	"P9_36": "AIN5",
 	"P9_35": "AIN6",
+}
+
+var analogPins44 = map[string]string{
+	"P9_39": "in_voltage0_raw",
+	"P9_40": "in_voltage1_raw",
+	"P9_37": "in_voltage2_raw",
+	"P9_38": "in_voltage3_raw",
+	"P9_33": "in_voltage4_raw",
+	"P9_36": "in_voltage5_raw",
+	"P9_35": "in_voltage6_raw",
 }

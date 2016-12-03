@@ -21,15 +21,16 @@ var glob = func(pattern string) (matches []string, err error) {
 
 // Adaptor is the gobot.Adaptor representation for the Beaglebone
 type Adaptor struct {
-	name        string
-	kernel      string
-	digitalPins []sysfs.DigitalPin
-	pwmPins     map[string]*pwmPin
-	i2cDevice   sysfs.I2cDevice
-	usrLed      string
-	ocp         string
-	helper      string
-	slots       string
+	name         string
+	kernel       string
+	digitalPins  []sysfs.DigitalPin
+	pwmPins      map[string]*pwmPin
+	i2cDevice    sysfs.I2cDevice
+	usrLed       string
+	ocp          string
+	analogPath   string
+	analogPinMap map[string]string
+	slots        string
 }
 
 // NewAdaptor returns a new Beaglebone Adaptor
@@ -74,19 +75,31 @@ func (b *Adaptor) Kernel() string { return b.kernel }
 
 // Connect initializes the pwm and analog dts.
 func (b *Adaptor) Connect() error {
-	if err := ensureSlot(b.slots, "cape-bone-iio"); err != nil {
-		return err
+	// enable analog
+	if b.kernel[:1] == "4" {
+		if err := ensureSlot(b.slots, "BB-ADC"); err != nil {
+			return err
+		}
+
+		b.analogPath = "/sys/bus/iio/devices/iio:device0"
+		b.analogPinMap = analogPins44
+	} else {
+		if err := ensureSlot(b.slots, "cape-bone-iio"); err != nil {
+			return err
+		}
+
+		g, err := glob(fmt.Sprintf("%v/helper.*", b.ocp))
+		if err != nil {
+			return err
+		}
+		b.analogPath = g[0]
+		b.analogPinMap = analogPins3
 	}
 
+	// enable pwm
 	if err := ensureSlot(b.slots, "am33xx_pwm"); err != nil {
 		return err
 	}
-
-	g, err := glob(fmt.Sprintf("%v/helper.*", b.ocp))
-	if err != nil {
-		return err
-	}
-	b.helper = g[0]
 
 	return nil
 }
@@ -165,7 +178,7 @@ func (b *Adaptor) AnalogRead(pin string) (val int, err error) {
 	if err != nil {
 		return
 	}
-	fi, err := sysfs.OpenFile(fmt.Sprintf("%v/%v", b.helper, analogPin), os.O_RDONLY, 0644)
+	fi, err := sysfs.OpenFile(fmt.Sprintf("%v/%v", b.analogPath, analogPin), os.O_RDONLY, 0644)
 	defer fi.Close()
 
 	if err != nil {
@@ -233,7 +246,7 @@ func (b *Adaptor) translatePwmPin(pin string) (value string, err error) {
 
 // translateAnalogPin converts analog pin name to pin position
 func (b *Adaptor) translateAnalogPin(pin string) (value string, err error) {
-	for key, value := range analogPins {
+	for key, value := range b.analogPinMap {
 		if key == pin {
 			return value, nil
 		}

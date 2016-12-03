@@ -57,8 +57,8 @@ func TestBeagleboneAdaptor(t *testing.T) {
 		"/sys/devices/platform/bone_capemgr",
 		"/sys/devices/platform/ocp/ocp4",
 		"/sys/class/leds/beaglebone:green:usr1/brightness",
-		"/sys/devices/platform/ocp/ocp4/helper.5",
-		"/sys/devices/platform/ocp/ocp4/helper.5/AIN1",
+		"/sys/bus/iio/devices/iio:device0",
+		"/sys/bus/iio/devices/iio:device0/in_voltage1_raw",
 		"/sys/devices/platform/ocp/ocp4/pwm_test_P9_14.5",
 		"/sys/devices/platform/ocp/ocp4/pwm_test_P9_14.5/run",
 		"/sys/devices/platform/ocp/ocp4/pwm_test_P9_14.5/period",
@@ -79,7 +79,7 @@ func TestBeagleboneAdaptor(t *testing.T) {
 
 	a.Connect()
 
-	a.helper = "/sys/devices/platform/ocp/ocp4/helper.5"
+	a.analogPath = "/sys/bus/iio/devices/iio:device0"
 
 	// PWM
 	glob = func(pattern string) (matches []string, err error) {
@@ -113,11 +113,11 @@ func TestBeagleboneAdaptor(t *testing.T) {
 	)
 
 	// Analog
-	fs.Files["/sys/devices/platform/ocp/ocp4/helper.5/AIN1"].Contents = "567\n"
+	fs.Files["/sys/bus/iio/devices/iio:device0/in_voltage1_raw"].Contents = "567\n"
 	i, _ := a.AnalogRead("P9_40")
 	gobottest.Assert(t, i, 567)
 
-	i, err := a.AnalogRead("P9_99")
+	_, err := a.AnalogRead("P9_99")
 	gobottest.Assert(t, err, errors.New("Not a valid pin"))
 
 	// DigitalIO
