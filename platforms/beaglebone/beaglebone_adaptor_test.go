@@ -75,6 +75,7 @@ func TestBeagleboneAdaptor(t *testing.T) {
 	a := NewAdaptor()
 	a.slots = "/sys/devices/platform/bone_capemgr"
 	a.ocp = "/sys/devices/platform/ocp/ocp4"
+	a.kernel = "4.4"
 
 	a.Connect()
 
