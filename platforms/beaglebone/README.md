@@ -5,29 +5,9 @@ The BeagleBone is an ARM based single board computer, with many different GPIO i
 For more info about the BeagleBone platform click [here](http://beagleboard.org/Products/BeagleBone+Black).
 
 ## How to Install
+
 ```
 go get -d -u github.com/hybridgroup/gobot/... && go install github.com/hybridgroup/gobot/platforms/beaglebone
-```
-
-## Cross compiling for the Beaglebone Black
-You must first configure your Go environment for arm linux cross compiling
-
-```bash
-$ cd $GOROOT/src
-$ GOOS=linux GOARCH=arm ./make.bash --no-clean
-```
-
-Then compile your Gobot program with
-
-```bash
-$ GOARM=7 GOARCH=arm GOOS=linux go build examples/beaglebone_blink.go
-```
-
-If you are running the official Angstrom or Debian linux through the usb->ethernet connection, you can simply upload your program and execute it with
-
-```bash
-$ scp beaglebone_blink root@192.168.7.2:/home/root/
-$ ssh -t root@192.168.7.2 "./beaglebone_blink"
 ```
 
 ## How to Use
@@ -62,3 +42,40 @@ func main() {
 	robot.Start()
 }
 ```
+
+## How to Connect
+
+### Compiling
+
+Simply compile your Gobot program like this:
+
+```bash
+$ GOARM=7 GOARCH=arm GOOS=linux go build examples/beaglebone_blink.go
+```
+
+If you are running the official Debian Linux through the usb->ethernet connection, or are connected to the board using WiFi, you can simply upload your program and execute it with the `scp` command like this:
+
+```bash
+$ scp beaglebone_blink root@192.168.7.2:/home/root/
+$ ssh -t root@192.168.7.2 "./beaglebone_blink"
+```
+
+### Updating your board to the latest OS
+
+We recommend updating your BeagleBone to the latest Debian OS. It is very easy to do this using the Etcher (https://etcher.io/) utility program.
+
+First, download the latest BeagleBone OS from http://beagleboard.org/latest-images
+
+Now, use Etcher to create an SD card with the OS image you have downloaded.
+
+Once you have created the SD card, boot your BeagleBone using the new image as follows:
+
+- Insert SD card into your (powered-down) board, hold down the USER/BOOT button (if using Black) and apply power, either by the USB cable or 5V adapter.
+
+- If using an original BeagleBone, you are done.
+
+- If using BeagleBone Black and desire to write the image to your on-board eMMC, you'll need to follow the instructions at http://elinux.org/Beagleboard:BeagleBoneBlack_Debian#Flashing_eMMC. When the flashing is complete, all 4 USRx LEDs will be steady on or off. The latest Debian flasher images automatically power down the board upon completion. This can take up to 45 minutes. Power-down your board, remove the SD card and apply power again to be complete.
+
+These instructions come from the Beagleboard web site's "Getting Started" page located here:
+
+http://beagleboard.org/getting-started
