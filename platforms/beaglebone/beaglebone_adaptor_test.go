@@ -57,7 +57,6 @@ func TestBeagleboneAdaptor(t *testing.T) {
 		"/sys/devices/platform/bone_capemgr",
 		"/sys/devices/platform/ocp/ocp4",
 		"/sys/class/leds/beaglebone:green:usr1/brightness",
-		"/sys/bus/iio/devices/iio:device0",
 		"/sys/bus/iio/devices/iio:device0/in_voltage1_raw",
 		"/sys/devices/platform/ocp/ocp4/pwm_test_P9_14.5",
 		"/sys/devices/platform/ocp/ocp4/pwm_test_P9_14.5/run",

@@ -178,6 +178,7 @@ func (b *Adaptor) AnalogRead(pin string) (val int, err error) {
 	if err != nil {
 		return
 	}
+	fmt.Printf("%v/%v", b.analogPath, analogPin)
 	fi, err := sysfs.OpenFile(fmt.Sprintf("%v/%v", b.analogPath, analogPin), os.O_RDONLY, 0644)
 	defer fi.Close()
 
