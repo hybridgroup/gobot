@@ -10,7 +10,7 @@ import (
 
 func main() {
 	beagleboneAdaptor := beaglebone.NewAdaptor()
-	led := gpio.NewLedDriver(beagleboneAdaptor, "usr0")
+	led := gpio.NewLedDriver(beagleboneAdaptor, "usr1")
 
 	work := func() {
 		gobot.Every(1*time.Second, func() {
