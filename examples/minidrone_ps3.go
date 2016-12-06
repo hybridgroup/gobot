@@ -8,6 +8,7 @@ import (
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/ble"
 	"github.com/hybridgroup/gobot/platforms/joystick"
+	"github.com/hybridgroup/gobot/platforms/parrot/minidrone"
 )
 
 type pair struct {
@@ -22,7 +23,7 @@ func main() {
 	)
 
 	droneAdaptor := ble.NewClientAdaptor(os.Args[1])
-	drone := ble.NewMinidroneDriver(droneAdaptor)
+	drone := minidrone.NewDriver(droneAdaptor)
 
 	work := func() {
 		offset := 32767.0
