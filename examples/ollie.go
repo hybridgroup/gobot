@@ -6,11 +6,12 @@ import (
 
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/ble"
+	"github.com/hybridgroup/gobot/platforms/sphero/ollie"
 )
 
 func main() {
 	bleAdaptor := ble.NewClientAdaptor(os.Args[1])
-	ollie := ble.NewSpheroOllieDriver(bleAdaptor)
+	ollie := ollie.NewDriver(bleAdaptor)
 
 	work := func() {
 		gobot.Every(1*time.Second, func() {

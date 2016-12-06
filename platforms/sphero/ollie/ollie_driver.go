@@ -1,4 +1,4 @@
-package ble
+package ollie
 
 import (
 	"bytes"
@@ -6,11 +6,12 @@ import (
 	"time"
 
 	"github.com/hybridgroup/gobot"
+	"github.com/hybridgroup/gobot/platforms/ble"
 )
 
-var _ gobot.Driver = (*SpheroOllieDriver)(nil)
+var _ gobot.Driver = (*Driver)(nil)
 
-type SpheroOllieDriver struct {
+type Driver struct {
 	name          string
 	connection    gobot.Connection
 	seq           uint8
@@ -43,9 +44,9 @@ type packet struct {
 	checksum uint8
 }
 
-// NewSpheroOllieDriver creates a SpheroOllieDriver
-func NewSpheroOllieDriver(a *ClientAdaptor) *SpheroOllieDriver {
-	n := &SpheroOllieDriver{
+// NewDriver creates a Driver for a Sphero Ollie
+func NewDriver(a *ble.ClientAdaptor) *Driver {
+	n := &Driver{
 		name:          "Ollie",
 		connection:    a,
 		Eventer:       gobot.NewEventer(),
@@ -54,17 +55,19 @@ func NewSpheroOllieDriver(a *ClientAdaptor) *SpheroOllieDriver {
 
 	return n
 }
-func (b *SpheroOllieDriver) Connection() gobot.Connection { return b.connection }
-func (b *SpheroOllieDriver) Name() string                 { return b.name }
-func (b *SpheroOllieDriver) SetName(n string)             { b.name = n }
+func (b *Driver) Connection() gobot.Connection { return b.connection }
+
+func (b *Driver) Name() string { return b.name }
+
+func (b *Driver) SetName(n string) { b.name = n }
 
 // adaptor returns BLE adaptor
-func (b *SpheroOllieDriver) adaptor() *ClientAdaptor {
-	return b.Connection().(*ClientAdaptor)
+func (b *Driver) adaptor() *ble.ClientAdaptor {
+	return b.Connection().(*ble.ClientAdaptor)
 }
 
 // Start tells driver to get ready to do work
-func (s *SpheroOllieDriver) Start() (err error) {
+func (s *Driver) Start() (err error) {
 	s.Init()
 
 	// send commands
@@ -82,13 +85,13 @@ func (s *SpheroOllieDriver) Start() (err error) {
 }
 
 // Halt stops Ollie driver (void)
-func (b *SpheroOllieDriver) Halt() (err error) {
+func (b *Driver) Halt() (err error) {
 	b.Sleep()
 	time.Sleep(750 * time.Microsecond)
 	return
 }
 
-func (b *SpheroOllieDriver) Init() (err error) {
+func (b *Driver) Init() (err error) {
 	b.AntiDOSOff()
 	b.SetTXPower(7)
 	b.Wake()
@@ -100,7 +103,7 @@ func (b *SpheroOllieDriver) Init() (err error) {
 }
 
 // Turns off Anti-DOS code so we can control Ollie
-func (b *SpheroOllieDriver) AntiDOSOff() (err error) {
+func (b *Driver) AntiDOSOff() (err error) {
 	str := "011i3"
 	buf := &bytes.Buffer{}
 	buf.WriteString(str)
@@ -115,7 +118,7 @@ func (b *SpheroOllieDriver) AntiDOSOff() (err error) {
 }
 
 // Wakes Ollie up so we can play
-func (b *SpheroOllieDriver) Wake() (err error) {
+func (b *Driver) Wake() (err error) {
 	buf := []byte{0x01}
 
 	err = b.adaptor().WriteCharacteristic(SpheroBLEService, WakeCharacteristic, buf)
@@ -128,7 +131,7 @@ func (b *SpheroOllieDriver) Wake() (err error) {
 }
 
 // Sets transmit level
-func (b *SpheroOllieDriver) SetTXPower(level int) (err error) {
+func (b *Driver) SetTXPower(level int) (err error) {
 	buf := []byte{byte(level)}
 
 	err = b.adaptor().WriteCharacteristic(SpheroBLEService, TXPowerCharacteristic, buf)
@@ -141,37 +144,37 @@ func (b *SpheroOllieDriver) SetTXPower(level int) (err error) {
 }
 
 // Handle responses returned from Ollie
-func (b *SpheroOllieDriver) HandleResponses(data []byte, e error) {
+func (b *Driver) HandleResponses(data []byte, e error) {
 	fmt.Println("response data:", data)
 
 	return
 }
 
 // SetRGB sets the Ollie to the given r, g, and b values
-func (s *SpheroOllieDriver) SetRGB(r uint8, g uint8, b uint8) {
+func (s *Driver) SetRGB(r uint8, g uint8, b uint8) {
 	s.packetChannel <- s.craftPacket([]uint8{r, g, b, 0x01}, 0x02, 0x20)
 }
 
 // Tells the Ollie to roll
-func (s *SpheroOllieDriver) Roll(speed uint8, heading uint16) {
+func (s *Driver) Roll(speed uint8, heading uint16) {
 	s.packetChannel <- s.craftPacket([]uint8{speed, uint8(heading >> 8), uint8(heading & 0xFF), 0x01}, 0x02, 0x30)
 }
 
 // Tells the Ollie to stop
-func (s *SpheroOllieDriver) Stop() {
+func (s *Driver) Stop() {
 	s.Roll(0, 0)
 }
 
 // Go to sleep
-func (s *SpheroOllieDriver) Sleep() {
+func (s *Driver) Sleep() {
 	s.packetChannel <- s.craftPacket([]uint8{0x00, 0x00, 0x00, 0x00, 0x00}, 0x00, 0x22)
 }
 
-func (s *SpheroOllieDriver) EnableStopOnDisconnect() {
+func (s *Driver) EnableStopOnDisconnect() {
 	s.packetChannel <- s.craftPacket([]uint8{0x00, 0x00, 0x00, 0x01}, 0x02, 0x37)
 }
 
-func (s *SpheroOllieDriver) write(packet *packet) (err error) {
+func (s *Driver) write(packet *packet) (err error) {
 	buf := append(packet.header, packet.body...)
 	buf = append(buf, packet.checksum)
 	err = s.adaptor().WriteCharacteristic(RobotControlService, CommandsCharacteristic, buf)
@@ -184,7 +187,7 @@ func (s *SpheroOllieDriver) write(packet *packet) (err error) {
 	return
 }
 
-func (s *SpheroOllieDriver) craftPacket(body []uint8, did byte, cid byte) *packet {
+func (s *Driver) craftPacket(body []uint8, did byte, cid byte) *packet {
 	packet := new(packet)
 	packet.body = body
 	dlen := len(packet.body) + 1
@@ -193,7 +196,7 @@ func (s *SpheroOllieDriver) craftPacket(body []uint8, did byte, cid byte) *packe
 	return packet
 }
 
-func (s *SpheroOllieDriver) calculateChecksum(packet *packet) uint8 {
+func (s *Driver) calculateChecksum(packet *packet) uint8 {
 	buf := append(packet.header, packet.body...)
 	return calculateChecksum(buf[2:])
 }
