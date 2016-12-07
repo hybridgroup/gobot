@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/ardrone"
 	"github.com/hybridgroup/gobot/platforms/opencv"
+	"github.com/hybridgroup/gobot/platforms/parrot/ardrone"
 	cv "github.com/lazywei/go-opencv/opencv"
 )
 

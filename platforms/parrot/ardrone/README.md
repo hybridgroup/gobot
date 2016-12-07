@@ -6,7 +6,7 @@ For more info about the ARDrone platform click [here](http://ardrone2.parrot.com
 
 ## How to Install
 ```
-go get -d -u github.com/hybridgroup/gobot/... && go install github.com/hybridgroup/gobot/platforms/ardrone
+go get -d -u github.com/hybridgroup/gobot/... && go install github.com/hybridgroup/gobot/platforms/parrot/ardrone
 ```
 ## How to Use
 ```go
@@ -16,12 +16,12 @@ import (
 	"time"
 
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/ardrone"
+	"github.com/hybridgroup/gobot/platforms/parrot/ardrone"
 )
 
 func main() {
-	ardroneAdaptor := ardrone.NewArdroneAdaptor("Drone")
-	drone := ardrone.NewArdroneDriver(ardroneAdaptor, "Drone")
+	ardroneAdaptor := ardrone.NewAdaptor("Drone")
+	drone := ardrone.NewDriver(ardroneAdaptor, "Drone")
 
 	work := func() {
 		drone.On(drone.Event("flying"), func(data interface{}) {

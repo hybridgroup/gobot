@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/ardrone"
+	"github.com/hybridgroup/gobot/platforms/parrot/ardrone"
 )
 
 func main() {

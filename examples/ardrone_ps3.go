@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/ardrone"
 	"github.com/hybridgroup/gobot/platforms/joystick"
+	"github.com/hybridgroup/gobot/platforms/parrot/ardrone"
 )
 
 type pair struct {
