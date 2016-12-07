@@ -182,11 +182,9 @@ func main() {
 ## Hardware Support
 Gobot has a extensible system for connecting to hardware devices. The following robotics and physical computing platforms are currently supported:
 
-- [AR Drone 2.0](http://ardrone2.parrot.com/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/ardrone)
 - [Arduino](http://www.arduino.cc/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/firmata)
 - Audio <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/audio)
 - [Beaglebone Black](http://beagleboard.org/Products/BeagleBone+Black/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/beaglebone)
-- [Bebop](http://www.parrot.com/usa/products/bebop-drone/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/bebop)
 - [Bluetooth LE](https://www.bluetooth.com/what-is-bluetooth-technology/bluetooth-technology-basics/low-energy) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/ble)
 - [C.H.I.P](http://www.nextthing.co/pages/chip) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/chip)
 - [Digispark](http://digistump.com/products/1) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/digispark)
@@ -202,6 +200,8 @@ Gobot has a extensible system for connecting to hardware devices. The following 
 - [Neurosky](http://neurosky.com/products-markets/eeg-biosensors/hardware/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/neurosky)
 - [OpenCV](http://opencv.org/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/opencv)
 - [Particle](https://www.particle.io/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/particle)
+- [Parrot ARDrone 2.0](http://ardrone2.parrot.com/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/parrot/ardrone)
+- [Parrot Bebop](http://www.parrot.com/usa/products/bebop-drone/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/parrot/bebop)
 - [Parrot Minidrone](https://www.parrot.com/us/minidrones) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/parrot/minidrone)
 - [Pebble](https://www.getpebble.com/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/pebble)
 - [Raspberry Pi](http://www.raspberrypi.org/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/raspi)
