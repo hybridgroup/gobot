@@ -3,7 +3,7 @@ Package particle provides the Gobot adaptor for the Particle Photon and Electron
 
 Installing:
 
-	go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/particle
+	go get gobot.io/x/gobot && go install gobot.io/x/gobot/platforms/particle
 
 Example:
 
@@ -12,9 +12,9 @@ Example:
 	import (
 		"time"
 
-		"github.com/hybridgroup/gobot"
-		"github.com/hybridgroup/gobot/drivers/gpio"
-		"github.com/hybridgroup/gobot/platforms/particle"
+		"gobot.io/x/gobot"
+		"gobot.io/x/gobot/drivers/gpio"
+		"gobot.io/x/gobot/platforms/particle"
 	)
 
 	func main() {
@@ -37,6 +37,6 @@ Example:
 	}
 
 For further information refer to Particle readme:
-https://github.com/hybridgroup/gobot/blob/master/platforms/particle/README.md
+https://gobot.io/x/gobot/blob/master/platforms/particle/README.md
 */
-package particle
+package particle // import "gobot.io/x/gobot/platforms/particle"

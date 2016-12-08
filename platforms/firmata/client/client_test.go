@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hybridgroup/gobot/gobottest"
+	"gobot.io/x/gobot/gobottest"
 )
 
 type readWriteCloser struct{}

@@ -22,7 +22,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hybridgroup/gobot"
+	"gobot.io/x/gobot"
 )
 
 var (

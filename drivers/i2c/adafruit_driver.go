@@ -5,7 +5,7 @@ import (
 	"math"
 	"time"
 
-	"github.com/hybridgroup/gobot"
+	"gobot.io/x/gobot"
 )
 
 var adafruitDebug = false // Set this to true to see debug output

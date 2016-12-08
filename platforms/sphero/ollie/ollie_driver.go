@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/ble"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/platforms/ble"
 )
 
 var _ gobot.Driver = (*Driver)(nil)

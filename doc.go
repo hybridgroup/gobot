@@ -1,4 +1,4 @@
-// Copyright 2014 The Gobot Authors, HybridGroup. All rights reserved.
+// Copyright 2014-2016 The Hybrid Group. All rights reserved.
 
 /*
 Package gobot provides a framework for robotics, physical computing and the internet of things.
@@ -13,7 +13,7 @@ Basic Setup
       "fmt"
       "time"
 
-      "github.com/hybridgroup/gobot"
+      "gobot.io/x/gobot"
     )
 
     func main() {
@@ -33,9 +33,9 @@ Blinking an LED (Hello Eve!)
     import (
     	"time"
 
-    	"github.com/hybridgroup/gobot"
-      "github.com/hybridgroup/gobot/drivers/gpio"
-    	"github.com/hybridgroup/gobot/platforms/firmata"
+    	"gobot.io/x/gobot"
+      "gobot.io/x/gobot/drivers/gpio"
+    	"gobot.io/x/gobot/platforms/firmata"
     )
 
     func main() {
@@ -68,8 +68,8 @@ web service.
     import (
     	"fmt"
 
-    	"github.com/hybridgroup/gobot"
-    	"github.com/hybridgroup/gobot/api"
+    	"gobot.io/x/gobot"
+    	"gobot.io/x/gobot/api"
     )
 
     func main() {
@@ -94,4 +94,4 @@ web service.
     }
 
 */
-package gobot
+package gobot // import "gobot.io/x/gobot"

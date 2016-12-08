@@ -3,10 +3,10 @@ Package pebble contains the Gobot adaptor and driver for Pebble smart watch.
 
 Installing:
 
-It requires the 2.x iOS or Android app, and "watchbot" app (https://github.com/hybridgroup/watchbot)
+It requires the 2.x iOS or Android app, and "watchbot" app (https://gobot.io/x/watchbot)
 installed on Pebble watch. Then install running:
 
-	go get github.com/hybridgroup/gobot/platforms/pebble
+	go get gobot.io/x/gobot/platforms/pebble
 
 Example:
 
@@ -17,9 +17,9 @@ Before running the example, make sure configuration settings match with your pro
 	import (
 		"fmt"
 
-		"github.com/hybridgroup/gobot"
-		"github.com/hybridgroup/gobot/api"
-		"github.com/hybridgroup/gobot/platforms/pebble"
+		"gobot.io/x/gobot"
+		"gobot.io/x/gobot/api"
+		"gobot.io/x/gobot/platforms/pebble"
 	)
 
 	func main() {
@@ -52,6 +52,6 @@ Before running the example, make sure configuration settings match with your pro
 	}
 
 For more information refer to the pebble README:
-https://github.com/hybridgroup/gobot/blob/master/platforms/pebble/README.md
+https://gobot.io/x/gobot/blob/master/platforms/pebble/README.md
 */
-package pebble
+package pebble // import "gobot.io/x/gobot/platforms/pebble"

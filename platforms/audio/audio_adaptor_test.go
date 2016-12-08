@@ -5,8 +5,8 @@ import (
 	"os/exec"
 	"testing"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/gobottest"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/gobottest"
 )
 
 var _ gobot.Adaptor = (*Adaptor)(nil)

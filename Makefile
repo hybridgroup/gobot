@@ -1,15 +1,15 @@
-PACKAGES := gobot gobot/api gobot/drivers/gpio gobot/drivers/i2c gobot/platforms/firmata/client gobot/platforms/intel-iot/edison gobot/platforms/intel-iot/joule gobot/sysfs $(shell ls ./platforms | sed -e 's/^/gobot\/platforms\//')
+PACKAGES := gobot gobot/api gobot/drivers/gpio gobot/drivers/i2c gobot/platforms/firmata/client gobot/platforms/intel-iot/edison gobot/platforms/intel-iot/joule gobot/platforms/parrot/ardrone gobot/platforms/parrot/bebop gobot/platforms/parrot/minidrone gobot/sysfs $(shell ls ./platforms | sed -e 's/^/gobot\/platforms\//')
 .PHONY: test cover robeaux examples
 
 test:
 	for package in $(PACKAGES) ; do \
-		go test -a github.com/hybridgroup/$$package ; \
+		go test -a gobot.io/x/$$package ; \
 	done ; \
 
 cover:
 	echo "mode: set" > profile.cov ; \
 	for package in $(PACKAGES) ; do \
-		go test -a -coverprofile=tmp.cov github.com/hybridgroup/$$package ; \
+		go test -a -coverprofile=tmp.cov gobot.io/x/$$package ; \
 		cat tmp.cov | grep -v "mode: set" >> profile.cov ; \
 	done ; \
 	rm tmp.cov ; \
@@ -41,7 +41,7 @@ examples:
 
 deps:
 	go get -d -v github.com/bmizerany/pat
-	go get -d -v github.com/hybridgroup/go-ardrone/client
+	go get -d -v gobot.io/x/go-ardrone/client
 	go get -d -v github.com/currantlabs/gatt
 	go get -d -v github.com/tarm/serial
 	go get -d -v github.com/veandco/go-sdl2/sdl

@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	multierror "github.com/hashicorp/go-multierror"
-	"github.com/hybridgroup/gobot/sysfs"
+	"gobot.io/x/gobot/sysfs"
 )
 
 // Adaptor represents a Gobot Adaptor for a C.H.I.P.

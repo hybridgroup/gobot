@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/neurosky"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/platforms/neurosky"
 )
 
 func main() {

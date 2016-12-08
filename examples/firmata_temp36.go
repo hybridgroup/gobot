@@ -5,8 +5,8 @@ import (
 
 	"fmt"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/firmata"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/platforms/firmata"
 )
 
 func main() {

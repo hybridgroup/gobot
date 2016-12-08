@@ -5,10 +5,10 @@ import (
 	"os"
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/ble"
-	"github.com/hybridgroup/gobot/platforms/joystick"
-	"github.com/hybridgroup/gobot/platforms/parrot/minidrone"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/platforms/ble"
+	"gobot.io/x/gobot/platforms/joystick"
+	"gobot.io/x/gobot/platforms/parrot/minidrone"
 )
 
 type pair struct {

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/mqtt"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/platforms/mqtt"
 )
 
 func main() {

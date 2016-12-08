@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hybridgroup/gobot"
+	"gobot.io/x/gobot"
 )
 
 func main() {

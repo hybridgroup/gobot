@@ -115,7 +115,7 @@
 ---
   - Dramatically increased test coverage and documentation
   - api
-    - Conform to the [cppp.io](https://github.com/hybridgroup/cppp-io) spec
+    - Conform to the [cppp.io](https://gobot.io/x/cppp-io) spec
     - Add support for basic middleware
     - Add support for custom routes
     - Add SSE support

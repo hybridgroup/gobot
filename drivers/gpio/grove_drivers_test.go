@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/gobottest"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/gobottest"
 )
 
 type DriverAndPinner interface {

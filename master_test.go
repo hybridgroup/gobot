@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	multierror "github.com/hashicorp/go-multierror"
-	"github.com/hybridgroup/gobot/gobottest"
+	"gobot.io/x/gobot/gobottest"
 )
 
 func TestConnectionEach(t *testing.T) {

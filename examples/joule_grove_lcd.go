@@ -3,9 +3,9 @@ package main
 import (
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/drivers/i2c"
-	"github.com/hybridgroup/gobot/platforms/intel-iot/joule"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/i2c"
+	"gobot.io/x/gobot/platforms/intel-iot/joule"
 )
 
 func main() {

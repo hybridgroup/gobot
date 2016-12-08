@@ -3,8 +3,8 @@ package main
 import (
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/megapi"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/platforms/megapi"
 )
 
 func main() {

@@ -1,6 +1,6 @@
 package i2c
 
-import "github.com/hybridgroup/gobot"
+import "gobot.io/x/gobot"
 
 var _ gobot.Driver = (*MMA7660Driver)(nil)
 

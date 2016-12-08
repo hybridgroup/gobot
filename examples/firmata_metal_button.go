@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/hybridgroup/gobot/drivers/gpio"
-	"github.com/hybridgroup/gobot/platforms/firmata"
+	"gobot.io/x/gobot/drivers/gpio"
+	"gobot.io/x/gobot/platforms/firmata"
 )
 
 func main() {

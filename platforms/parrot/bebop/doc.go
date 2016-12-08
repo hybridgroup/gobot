@@ -3,9 +3,9 @@ Package bebop provides the Gobot adaptor and driver for the Parrot Bebop.
 
 Installing:
 
-	go get -d -u github.com/hybridgroup/gobot/... && go install github.com/hybridgroup/gobot/platforms/parrot/bebop
+	go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/parrot/bebop
 
 For more information refer to the bebop README:
-https://github.com/hybridgroup/gobot/tree/master/platforms/parrot/bebop
+https://gobot.io/x/gobot/tree/master/platforms/parrot/bebop
 */
-package bebop
+package bebop // import "gobot.io/x/gobot/platforms/parrot/bebop"

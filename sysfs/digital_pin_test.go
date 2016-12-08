@@ -6,7 +6,7 @@ import (
 	"syscall"
 	"testing"
 
-	"github.com/hybridgroup/gobot/gobottest"
+	"gobot.io/x/gobot/gobottest"
 )
 
 func TestDigitalPin(t *testing.T) {

@@ -7,9 +7,9 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/opencv"
-	"github.com/hybridgroup/gobot/platforms/parrot/ardrone"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/platforms/opencv"
+	"gobot.io/x/gobot/platforms/parrot/ardrone"
 	cv "github.com/lazywei/go-opencv/opencv"
 )
 

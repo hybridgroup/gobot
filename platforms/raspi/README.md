@@ -11,7 +11,7 @@ For more info about the Raspberry Pi platform, click [here](http://www.raspberry
 First you must install the appropriate Go packages
 
 ```
-go get -d -u github.com/hybridgroup/gobot/... && go install github.com/hybridgroup/gobot/platforms/raspi
+go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/raspi
 ```
 
 ### Enabling PWM output on GPIO pins.
@@ -68,9 +68,9 @@ package main
 import (
         "time"
 
-        "github.com/hybridgroup/gobot"
-        "github.com/hybridgroup/gobot/drivers/gpio"
-        "github.com/hybridgroup/gobot/platforms/raspi"
+        "gobot.io/x/gobot"
+        "gobot.io/x/gobot/drivers/gpio"
+        "gobot.io/x/gobot/platforms/raspi"
 )
 
 func main() {

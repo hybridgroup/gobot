@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/api"
-	"github.com/hybridgroup/gobot/drivers/gpio"
-	"github.com/hybridgroup/gobot/platforms/digispark"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/api"
+	"gobot.io/x/gobot/drivers/gpio"
+	"gobot.io/x/gobot/platforms/digispark"
 )
 
 func main() {

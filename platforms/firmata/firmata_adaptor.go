@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/firmata/client"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/platforms/firmata/client"
 	"github.com/tarm/serial"
 )
 

@@ -7,7 +7,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/hybridgroup/gobot/gobottest"
+	"gobot.io/x/gobot/gobottest"
 )
 
 type i2cMcpTestAdaptor struct {

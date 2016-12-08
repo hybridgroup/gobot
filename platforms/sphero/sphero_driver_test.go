@@ -5,8 +5,8 @@ import (
 	"encoding/binary"
 	"testing"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/gobottest"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/gobottest"
 )
 
 var _ gobot.Driver = (*SpheroDriver)(nil)

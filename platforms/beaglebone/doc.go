@@ -3,7 +3,7 @@ Package beaglebone provides the Gobot adaptor for the Beaglebone Black.
 
 Installing:
 
-	go get github.com/hybridgroup/platforms/gobot/beaglebone
+	go get gobot.io/x/platforms/gobot/beaglebone
 
 Example:
 
@@ -12,9 +12,9 @@ Example:
 	import (
 		"time"
 
-		"github.com/hybridgroup/gobot"
-		"github.com/hybridgroup/gobot/drivers/gpio"
-		"github.com/hybridgroup/gobot/platforms/beaglebone"
+		"gobot.io/x/gobot"
+		"gobot.io/x/gobot/drivers/gpio"
+		"gobot.io/x/gobot/platforms/beaglebone"
 	)
 
 	func main() {
@@ -37,6 +37,6 @@ Example:
 	}
 
 For more information refer to the beaglebone README:
-https://github.com/hybridgroup/gobot/blob/master/platforms/beaglebone/README.md
+https://gobot.io/x/gobot/blob/master/platforms/beaglebone/README.md
 */
-package beaglebone
+package beaglebone // import "gobot.io/x/gobot/platforms/beaglebone"

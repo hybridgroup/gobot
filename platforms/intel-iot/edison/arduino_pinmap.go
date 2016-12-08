@@ -1,6 +1,6 @@
 package edison
 
-import "github.com/hybridgroup/gobot/sysfs"
+import "gobot.io/x/gobot/sysfs"
 
 var arduinoPinMap = map[string]sysfsPin{
 	"0": sysfsPin{

@@ -1,5 +1,5 @@
 package bebop
 
-import "github.com/hybridgroup/gobot"
+import "gobot.io/x/gobot"
 
 var _ gobot.Driver = (*Driver)(nil)

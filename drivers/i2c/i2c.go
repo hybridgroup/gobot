@@ -3,7 +3,7 @@ package i2c
 import (
 	"errors"
 
-	"github.com/hybridgroup/gobot"
+	"gobot.io/x/gobot"
 )
 
 var (

@@ -6,8 +6,8 @@ import (
 	"strconv"
 
 	multierror "github.com/hashicorp/go-multierror"
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/sysfs"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/sysfs"
 )
 
 func writeFile(path string, data []byte) (i int, err error) {

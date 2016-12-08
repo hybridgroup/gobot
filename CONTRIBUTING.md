@@ -56,8 +56,8 @@ The basics are as follows:
 
 2. `go get` the upstream repo and set it up as the `upstream` remote and your own repo as the `origin` remote:
 
-`go get github.com/hybridgroup/gobot`
-`cd $GOPATH/src/github.com/hybridgroup/gobot`
+`go get gobot.io/x/gobot`
+`cd $GOPATH/src/gobot.io/x/gobot`
 `git remote rename origin upstream`
 `git remote add origin git@github.com/YOUR_GITHUB_NAME/gobot`
 

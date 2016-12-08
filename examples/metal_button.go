@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/hybridgroup/gobot/drivers/gpio"
-	"github.com/hybridgroup/gobot/platforms/intel-iot/edison"
+	"gobot.io/x/gobot/drivers/gpio"
+	"gobot.io/x/gobot/platforms/intel-iot/edison"
 )
 
 func main() {

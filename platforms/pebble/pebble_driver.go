@@ -1,7 +1,7 @@
 package pebble
 
 import (
-	"github.com/hybridgroup/gobot"
+	"gobot.io/x/gobot"
 )
 
 type Driver struct {

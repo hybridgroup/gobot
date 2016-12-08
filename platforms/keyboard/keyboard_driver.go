@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/hybridgroup/gobot"
+	"gobot.io/x/gobot"
 )
 
 const (

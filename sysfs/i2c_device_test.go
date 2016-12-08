@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/hybridgroup/gobot/gobottest"
+	"gobot.io/x/gobot/gobottest"
 )
 
 func TestNewI2cDevice(t *testing.T) {

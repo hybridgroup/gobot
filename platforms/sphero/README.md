@@ -8,7 +8,7 @@ Learn more about the Sphero robot go here: http://www.gosphero.com/
 
 ## How to Install
 ```
-go get -d -u github.com/hybridgroup/gobot/... && go install github.com/hybridgroup/gobot/platforms/sphero
+go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/sphero
 ```
 
 ## How To Connect
@@ -21,7 +21,7 @@ Now you must pair with the Sphero. Open System Preferences > Bluetooth. Now with
 
 ### Ubuntu
 
-Connecting to the Sphero from Ubuntu or any other Linux-based OS can be done entirely from the command line using [Gort](https://github.com/hybridgroup/gort) CLI commands. Here are the steps.
+Connecting to the Sphero from Ubuntu or any other Linux-based OS can be done entirely from the command line using [Gort](https://gobot.io/x/gort) CLI commands. Here are the steps.
 
 Find the address of the Sphero, by using:
 ```
@@ -53,8 +53,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/sphero"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/platforms/sphero"
 )
 
 func main() {

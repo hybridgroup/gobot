@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/hybridgroup/gobot/gobottest"
+	"gobot.io/x/gobot/gobottest"
 )
 
 func initTestLedDriver(conn DigitalWriter) *LedDriver {

@@ -3,7 +3,7 @@ Package firmata provides the Gobot adaptor for microcontrollers that support the
 
 Installing:
 
-	go get -d -u github.com/hybridgroup/gobot/... && go get github.com/hybridgroup/gobot/platforms/firmata
+	go get -d -u gobot.io/x/gobot/... && go get gobot.io/x/gobot/platforms/firmata
 
 Example:
 
@@ -12,9 +12,9 @@ Example:
 	import (
 		"time"
 
-		"github.com/hybridgroup/gobot"
-		"github.com/hybridgroup/gobot/drivers/gpio"
-		"github.com/hybridgroup/gobot/platforms/firmata"
+		"gobot.io/x/gobot"
+		"gobot.io/x/gobot/drivers/gpio"
+		"gobot.io/x/gobot/platforms/firmata"
 	)
 
 	func main() {
@@ -37,6 +37,6 @@ Example:
 	}
 
 For further information refer to firmata readme:
-https://github.com/hybridgroup/gobot/blob/master/platforms/firmata/README.md
+https://gobot.io/x/gobot/blob/master/platforms/firmata/README.md
 */
-package firmata
+package firmata // import "gobot.io/x/gobot/platforms/firmata"

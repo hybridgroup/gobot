@@ -4,11 +4,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/drivers/gpio"
-	"github.com/hybridgroup/gobot/drivers/i2c"
-	"github.com/hybridgroup/gobot/gobottest"
-	"github.com/hybridgroup/gobot/sysfs"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/gpio"
+	"gobot.io/x/gobot/drivers/i2c"
+	"gobot.io/x/gobot/gobottest"
+	"gobot.io/x/gobot/sysfs"
 )
 
 var _ gobot.Adaptor = (*Adaptor)(nil)

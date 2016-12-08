@@ -3,7 +3,7 @@ package api
 import (
 	"fmt"
 
-	"github.com/hybridgroup/gobot"
+	"gobot.io/x/gobot"
 )
 
 type NullReadWriteCloser struct{}

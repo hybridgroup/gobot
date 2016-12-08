@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/drivers/i2c"
-	"github.com/hybridgroup/gobot/platforms/raspi"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/i2c"
+	"gobot.io/x/gobot/platforms/raspi"
 )
 
 func main() {

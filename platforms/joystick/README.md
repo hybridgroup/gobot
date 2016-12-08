@@ -28,7 +28,7 @@ $ sudo apt-get install libsdl2-2.0-0
 Now you can install the package with
 
 ```
-go get -d -u github.com/hybridgroup/gobot/... && go install github.com/hybridgroup/gobot/platforms/joystick
+go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/joystick
 ```
 
 ## How to Use
@@ -146,8 +146,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/joystick"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/platforms/joystick"
 )
 
 func main() {

@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/currantlabs/gatt"
-	"github.com/hybridgroup/gobot"
+	"gobot.io/x/gobot"
 )
 
 var _ gobot.Adaptor = (*ClientAdaptor)(nil)

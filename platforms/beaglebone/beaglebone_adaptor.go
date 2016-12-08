@@ -11,8 +11,8 @@ import (
 	"strings"
 
 	multierror "github.com/hashicorp/go-multierror"
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/sysfs"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/sysfs"
 )
 
 var glob = func(pattern string) (matches []string, err error) {

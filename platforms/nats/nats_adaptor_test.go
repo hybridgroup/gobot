@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/gobottest"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/gobottest"
 	"github.com/nats-io/nats"
 )
 

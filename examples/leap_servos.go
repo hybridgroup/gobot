@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/drivers/gpio"
-	"github.com/hybridgroup/gobot/platforms/firmata"
-	"github.com/hybridgroup/gobot/platforms/leap"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/gpio"
+	"gobot.io/x/gobot/platforms/firmata"
+	"gobot.io/x/gobot/platforms/leap"
 )
 
 // Video: https://www.youtube.com/watch?v=ayNMyUfdAqc

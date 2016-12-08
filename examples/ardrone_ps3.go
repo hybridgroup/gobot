@@ -4,9 +4,9 @@ import (
 	"math"
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/joystick"
-	"github.com/hybridgroup/gobot/platforms/parrot/ardrone"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/platforms/joystick"
+	"gobot.io/x/gobot/platforms/parrot/ardrone"
 )
 
 type pair struct {
