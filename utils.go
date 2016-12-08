@@ -23,27 +23,23 @@ var eventError = func(e *Event) (err error) {
 	return
 }
 
-// Every triggers f every t time until the end of days, or when a
-// bool value is sent to the channel returned by the Every function.
+// Every triggers f every t time.Duration until the end of days, or when a Stop()
+// is called on the Ticker that is returned by the Every function.
 // It does not wait for the previous execution of f to finish before
 // it fires the next f.
-func Every(t time.Duration, f func()) chan bool {
-	done := make(chan bool)
-	c := time.Tick(t)
+func Every(t time.Duration, f func()) *time.Ticker {
+	ticker := time.NewTicker(t)
 
 	go func() {
 		for {
 			select {
-			case <-done:
-				return
-			default:
-				<-c
-				go f()
+			case <-ticker.C:
+				f()
 			}
 		}
 	}()
 
-	return done
+	return ticker
 }
 
 // After triggers f after t duration.

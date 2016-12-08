@@ -23,25 +23,42 @@ func TestEvery(t *testing.T) {
 	}
 }
 
-func TestEveryWhenDone(t *testing.T) {
-	i := 0
-	done := Every(20*time.Millisecond, func() {
-		i++
+func TestEveryWhenStopped(t *testing.T) {
+	sem := make(chan bool)
+
+	done := Every(50*time.Millisecond, func() {
+		sem <- true
 	})
-	time.Sleep(10 * time.Millisecond)
-	done <- true
-	time.Sleep(50 * time.Millisecond)
-	if i > 1 {
-		t.Error("Test should have stopped after 20ms")
+
+	select {
+	case <-sem:
+		done.Stop()
+	case <-time.After(60 * time.Millisecond):
+		t.Errorf("Every was not called")
+	}
+
+	select {
+	case <-time.After(60 * time.Millisecond):
+	case <-sem:
+		t.Error("Every should have stopped")
 	}
 }
 
 func TestAfter(t *testing.T) {
 	i := 0
+	sem := make(chan bool)
+
 	After(1*time.Millisecond, func() {
 		i++
+		sem <- true
 	})
-	time.Sleep(2 * time.Millisecond)
+
+	select {
+	case <-sem:
+	case <-time.After(10 * time.Millisecond):
+		t.Errorf("After was not called")
+	}
+
 	gobottest.Assert(t, i, 1)
 }
 
