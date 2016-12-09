@@ -6,8 +6,7 @@ import (
 	"gobot.io/x/gobot"
 )
 
-var _ gobot.Driver = (*BatteryDriver)(nil)
-
+// BatteryDriver represents the Battery Service for a BLE Peripheral
 type BatteryDriver struct {
 	name       string
 	connection gobot.Connection
@@ -24,9 +23,15 @@ func NewBatteryDriver(a *ClientAdaptor) *BatteryDriver {
 
 	return n
 }
+
+// Connection returns the Driver's Connection to the associated Adaptor
 func (b *BatteryDriver) Connection() gobot.Connection { return b.connection }
-func (b *BatteryDriver) Name() string                 { return b.name }
-func (b *BatteryDriver) SetName(n string)             { b.name = n }
+
+// Name returns the Driver name
+func (b *BatteryDriver) Name() string { return b.name }
+
+// SetName sets the Driver name
+func (b *BatteryDriver) SetName(n string) { b.name = n }
 
 // adaptor returns BLE adaptor
 func (b *BatteryDriver) adaptor() *ClientAdaptor {
@@ -41,6 +46,7 @@ func (b *BatteryDriver) Start() (err error) {
 // Halt stops battery driver (void)
 func (b *BatteryDriver) Halt() (err error) { return }
 
+// GetBatteryLevel reads and returns the current battery level
 func (b *BatteryDriver) GetBatteryLevel() (level uint8) {
 	var l uint8
 	c, _ := b.adaptor().ReadCharacteristic("180f", "2a19")
