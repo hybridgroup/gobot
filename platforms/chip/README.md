@@ -1,10 +1,10 @@
-# CHIP
+# C.H.I.P.
 
-The [CHIP](http://www.getchip.com/) is a small, inexpensive ARM based single board computer, with many different IO interfaces available on the [pin headers](http://docs.getchip.com/#pin-headers).
+The [C.H.I.P.](http://www.getchip.com/) is a small, inexpensive ARM based single board computer, with many different IO interfaces available on the [pin headers](http://docs.getchip.com/#pin-headers).
 
 We recommend updating to the latest Debian OS when using the C.H.I.P., however Gobot should also support older versions of the OS, should your application require this.
 
-For documentation about the CHIP platform click [here](http://docs.getchip.com/).
+For documentation about the C.H.I.P. platform click [here](http://docs.getchip.com/).
 
 ## How to Install
 ```
