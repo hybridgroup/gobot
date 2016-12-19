@@ -9,8 +9,7 @@ import (
 	"gobot.io/x/gobot/platforms/ble"
 )
 
-var _ gobot.Driver = (*Driver)(nil)
-
+// Driver is the Gobot driver for the Sphero Ollie robot
 type Driver struct {
 	name          string
 	connection    gobot.Connection
@@ -20,22 +19,35 @@ type Driver struct {
 }
 
 const (
-	// service IDs
-	SpheroBLEService    = "22bb746f2bb075542d6f726568705327"
+	// SpheroBLEService is the primary service ID
+	SpheroBLEService = "22bb746f2bb075542d6f726568705327"
+
+	// RobotControlService is the service ID for the Sphero command API
 	RobotControlService = "22bb746f2ba075542d6f726568705327"
 
-	// characteristic IDs
-	WakeCharacteristic    = "22bb746f2bbf75542d6f726568705327"
+	// WakeCharacteristic characteristic ID
+	WakeCharacteristic = "22bb746f2bbf75542d6f726568705327"
+
+	// TXPowerCharacteristic characteristic ID
 	TXPowerCharacteristic = "22bb746f2bb275542d6f726568705327"
+
+	// AntiDosCharacteristic characteristic ID
 	AntiDosCharacteristic = "22bb746f2bbd75542d6f726568705327"
 
+	// CommandsCharacteristic characteristic ID
 	CommandsCharacteristic = "22bb746f2ba175542d6f726568705327"
+
+	// ResponseCharacteristic characteristic ID
 	ResponseCharacteristic = "22bb746f2ba675542d6f726568705327"
 
-	// gobot events
+	// SensorData event
 	SensorData = "sensordata"
-	Collision  = "collision"
-	Error      = "error"
+
+	// Collision event
+	Collision = "collision"
+
+	// Error event
+	Error = "error"
 )
 
 type packet struct {
@@ -55,10 +67,14 @@ func NewDriver(a *ble.ClientAdaptor) *Driver {
 
 	return n
 }
+
+// Connection returns the connection to this Ollie
 func (b *Driver) Connection() gobot.Connection { return b.connection }
 
+// Name returns the name for the Driver
 func (b *Driver) Name() string { return b.name }
 
+// SetName sets the Name for the Driver
 func (b *Driver) SetName(n string) { b.name = n }
 
 // adaptor returns BLE adaptor
@@ -67,16 +83,16 @@ func (b *Driver) adaptor() *ble.ClientAdaptor {
 }
 
 // Start tells driver to get ready to do work
-func (s *Driver) Start() (err error) {
-	s.Init()
+func (b *Driver) Start() (err error) {
+	b.Init()
 
 	// send commands
 	go func() {
 		for {
-			packet := <-s.packetChannel
-			err := s.write(packet)
+			packet := <-b.packetChannel
+			err := b.write(packet)
 			if err != nil {
-				s.Publish(s.Event(Error), err)
+				b.Publish(b.Event(Error), err)
 			}
 		}
 	}()
@@ -91,6 +107,7 @@ func (b *Driver) Halt() (err error) {
 	return
 }
 
+// Init is used to initialize the Ollie
 func (b *Driver) Init() (err error) {
 	b.AntiDOSOff()
 	b.SetTXPower(7)
@@ -102,7 +119,7 @@ func (b *Driver) Init() (err error) {
 	return
 }
 
-// Turns off Anti-DOS code so we can control Ollie
+// AntiDOSOff turns off Anti-DOS code so we can control Ollie
 func (b *Driver) AntiDOSOff() (err error) {
 	str := "011i3"
 	buf := &bytes.Buffer{}
@@ -117,7 +134,7 @@ func (b *Driver) AntiDOSOff() (err error) {
 	return
 }
 
-// Wakes Ollie up so we can play
+// Wake wakes Ollie up so we can play
 func (b *Driver) Wake() (err error) {
 	buf := []byte{0x01}
 
@@ -130,7 +147,7 @@ func (b *Driver) Wake() (err error) {
 	return
 }
 
-// Sets transmit level
+// SetTXPower sets transmit level
 func (b *Driver) SetTXPower(level int) (err error) {
 	buf := []byte{byte(level)}
 
@@ -143,7 +160,7 @@ func (b *Driver) SetTXPower(level int) (err error) {
 	return
 }
 
-// Handle responses returned from Ollie
+// HandleResponses handles responses returned from Ollie
 func (b *Driver) HandleResponses(data []byte, e error) {
 	fmt.Println("response data:", data)
 
@@ -151,27 +168,28 @@ func (b *Driver) HandleResponses(data []byte, e error) {
 }
 
 // SetRGB sets the Ollie to the given r, g, and b values
-func (s *Driver) SetRGB(r uint8, g uint8, b uint8) {
-	s.packetChannel <- s.craftPacket([]uint8{r, g, b, 0x01}, 0x02, 0x20)
+func (b *Driver) SetRGB(r uint8, g uint8, bl uint8) {
+	b.packetChannel <- b.craftPacket([]uint8{r, g, bl, 0x01}, 0x02, 0x20)
 }
 
-// Tells the Ollie to roll
-func (s *Driver) Roll(speed uint8, heading uint16) {
-	s.packetChannel <- s.craftPacket([]uint8{speed, uint8(heading >> 8), uint8(heading & 0xFF), 0x01}, 0x02, 0x30)
+// Roll tells the Ollie to roll
+func (b *Driver) Roll(speed uint8, heading uint16) {
+	b.packetChannel <- b.craftPacket([]uint8{speed, uint8(heading >> 8), uint8(heading & 0xFF), 0x01}, 0x02, 0x30)
 }
 
-// Tells the Ollie to stop
-func (s *Driver) Stop() {
-	s.Roll(0, 0)
+// Stop tells the Ollie to stop
+func (b *Driver) Stop() {
+	b.Roll(0, 0)
 }
 
-// Go to sleep
-func (s *Driver) Sleep() {
-	s.packetChannel <- s.craftPacket([]uint8{0x00, 0x00, 0x00, 0x00, 0x00}, 0x00, 0x22)
+// Sleep says Go to sleep
+func (b *Driver) Sleep() {
+	b.packetChannel <- b.craftPacket([]uint8{0x00, 0x00, 0x00, 0x00, 0x00}, 0x00, 0x22)
 }
 
-func (s *Driver) EnableStopOnDisconnect() {
-	s.packetChannel <- s.craftPacket([]uint8{0x00, 0x00, 0x00, 0x01}, 0x02, 0x37)
+// EnableStopOnDisconnect auto-sends a Stop command after losing the connection
+func (b *Driver) EnableStopOnDisconnect() {
+	b.packetChannel <- b.craftPacket([]uint8{0x00, 0x00, 0x00, 0x01}, 0x02, 0x37)
 }
 
 func (s *Driver) write(packet *packet) (err error) {
