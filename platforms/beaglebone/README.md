@@ -1,8 +1,10 @@
 # Beaglebone
 
-The BeagleBone is an ARM based single board computer, with many different GPIO interfaces built in.
+The BeagleBone is an ARM based single board computer, with many lots of GPIO, I2C, and analog interfaces built in.
 
-For more info about the BeagleBone platform click [here](http://beagleboard.org/Products/BeagleBone+Black).
+The Gobot adaptor for the BeagleBone should support all of the various BeagleBone boards such as the BeagleBone Black, SeeedStudio BeagleBone Green, SeeedStudio BeagleBone Green Wireless, and others that use the latest Debian and same cape manager interfaces.
+
+For more info about the BeagleBone platform go to  [http://beagleboard.org/getting-started](http://beagleboard.org/getting-started).
 
 ## How to Install
 
@@ -11,6 +13,10 @@ go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/beagl
 ```
 
 ## How to Use
+
+The pin numbering used by your Gobot program should match the way your board is labeled right on the board itself.
+
+Gobot also has support for the four built-in LEDs on the BeagleBone Black, by referring to them as `usr0`, `usr1`, `usr2`, and `usr3`.
 
 ```go
 package main
