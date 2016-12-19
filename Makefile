@@ -1,4 +1,4 @@
-PACKAGES := gobot gobot/api gobot/drivers/gpio gobot/drivers/i2c gobot/platforms/firmata/client gobot/platforms/intel-iot/edison gobot/platforms/intel-iot/joule gobot/platforms/parrot/ardrone gobot/platforms/parrot/bebop gobot/platforms/parrot/minidrone gobot/sysfs $(shell ls ./platforms | sed -e 's/^/gobot\/platforms\//')
+PACKAGES := gobot gobot/api gobot/drivers/gpio gobot/drivers/i2c gobot/platforms/firmata/client gobot/platforms/intel-iot/edison gobot/platforms/intel-iot/joule gobot/platforms/parrot/ardrone gobot/platforms/parrot/bebop gobot/platforms/parrot/minidrone gobot/platforms/sphero/ollie gobot/platforms/sphero/bb8 gobot/sysfs $(shell ls ./platforms | sed -e 's/^/gobot\/platforms\//')
 .PHONY: test cover robeaux examples
 
 test:
