@@ -1,8 +1,8 @@
 # Beaglebone
 
-The BeagleBone is an ARM based single board computer, with many lots of GPIO, I2C, and analog interfaces built in.
+The BeagleBone is an ARM based single board computer, with lots of GPIO, I2C, and analog interfaces built in.
 
-The Gobot adaptor for the BeagleBone should support all of the various BeagleBone boards such as the BeagleBone Black, SeeedStudio BeagleBone Green, SeeedStudio BeagleBone Green Wireless, and others that use the latest Debian and same cape manager interfaces.
+The Gobot adaptor for the BeagleBone should support all of the various BeagleBone boards such as the BeagleBone Black, SeeedStudio BeagleBone Green, SeeedStudio BeagleBone Green Wireless, and others that use the latest Debian and standard "Cape Manager" interfaces.
 
 For more info about the BeagleBone platform go to  [http://beagleboard.org/getting-started](http://beagleboard.org/getting-started).
 
