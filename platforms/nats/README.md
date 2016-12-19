@@ -57,14 +57,14 @@ func main() {
 }
 ```
 
-## Supported Features
+### Supported Features
 
 * Publish messages
 * Respond to incoming message events
+* Support for Username/password authentication
 
-## Upcoming Features
+### Upcoming Features
 
-* Support for Username/password
 * Encoded messages (JSON)
 * Exposing more NATS Features (tls)
 * Simplified tests
