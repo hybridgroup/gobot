@@ -2,7 +2,9 @@
 
 The Raspberry Pi is an inexpensive and popular ARM based single board computer with digital & PWM GPIO, and i2c interfaces built in.
 
-The Raspberry Pi is a credit-card-sized single-board computer developed in the UK by the Raspberry Pi Foundation with the intention of promoting the teaching of basic computer science in schools
+The Gobot adaptor for the Raspberry Pi should support all of the various Raspberry Pi boards such as the Raspberry Pi 3 Model B, Raspberry Pi 2 Model B, Raspberry Pi 1 Model A+, and Raspberry Pi Zero.
+
+We recommend updating to the latest Raspian Jessie OS when using the Raspberry Pi, however Gobot should also support older versions of the OS, should your application require this.
 
 For more info about the Raspberry Pi platform, click [here](http://www.raspberrypi.org/).
 
@@ -74,16 +76,3 @@ $ ./raspi_blink
 For extended PWM support on the Raspberry Pi, you will need to use a program called pi-blaster. You can follow the instructions for pi-blaster install in the pi-blaster repo here:
 
 [https://github.com/sarfata/pi-blaster](https://github.com/sarfata/pi-blaster)
-
-### Special note for Raspian Wheezy users
-
-The Golang version installed from the default package repositories is very old and will not compile Gobot. You can install go 1.4 as follows:
-
-```bash
-$ wget -O - http://dave.cheney.net/paste/go1.4.linux-arm~multiarch-armv6-1.tar.gz|sudo tar -xzC /usr/local -f -
-
-$ echo '# Setup for golang' |sudo tee /etc/profile.d/golang.sh
-$ echo 'PATH=$PATH:/usr/local/go/bin'|sudo tee -a /etc/profile.d/golang.sh
-
-$ source /etc/profile.d/golang.sh
-```
