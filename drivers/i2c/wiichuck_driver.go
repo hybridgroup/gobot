@@ -6,8 +6,6 @@ import (
 	"gobot.io/x/gobot"
 )
 
-var _ gobot.Driver = (*WiichuckDriver)(nil)
-
 const wiichuckAddress = 0x52
 
 type WiichuckDriver struct {

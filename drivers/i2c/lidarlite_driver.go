@@ -6,8 +6,6 @@ import (
 	"time"
 )
 
-var _ gobot.Driver = (*LIDARLiteDriver)(nil)
-
 const lidarliteAddress = 0x62
 
 type LIDARLiteDriver struct {

@@ -4,8 +4,11 @@ import (
 	"testing"
 	"time"
 
+	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/gobottest"
 )
+
+var _ gobot.Driver = (*MPU6050Driver)(nil)
 
 // --------- HELPERS
 func initTestMPU6050Driver() (driver *MPU6050Driver) {

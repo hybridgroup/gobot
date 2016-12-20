@@ -10,8 +10,6 @@ import (
 
 const mpl115a2Address = 0x60
 
-var _ gobot.Driver = (*MPL115A2Driver)(nil)
-
 const MPL115A2_REGISTER_PRESSURE_MSB = 0x00
 const MPL115A2_REGISTER_PRESSURE_LSB = 0x01
 const MPL115A2_REGISTER_TEMP_MSB = 0x02

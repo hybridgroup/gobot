@@ -6,10 +6,9 @@ import (
 	"gobot.io/x/gobot"
 )
 
-var _ gobot.Driver = (*BlinkMDriver)(nil)
-
 const blinkmAddress = 0x09
 
+// BlinkMDriver is a Gobot Driver for a BlinkM LED
 type BlinkMDriver struct {
 	name       string
 	connection I2c
@@ -53,13 +52,17 @@ func NewBlinkMDriver(a I2c) *BlinkMDriver {
 
 	return b
 }
+
+// Name returns the Name for the Driver
 func (b *BlinkMDriver) Name() string                 { return b.name }
+
+// SetName sets the Name for the Driver
 func (b *BlinkMDriver) SetName(n string)             { b.name = n }
+
+// Connection returns the connection for the Driver
 func (b *BlinkMDriver) Connection() gobot.Connection { return b.connection.(gobot.Connection) }
 
-// adaptor returns I2C adaptor
-
-// Start writes start bytes
+// Start starts the Driver up, and writes start command
 func (b *BlinkMDriver) Start() (err error) {
 	if err := b.connection.I2cStart(blinkmAddress); err != nil {
 		return err

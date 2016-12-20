@@ -8,8 +8,6 @@ import (
 	"gobot.io/x/gobot"
 )
 
-var _ gobot.Driver = (*MPU6050Driver)(nil)
-
 const mpu6050Address = 0x68
 
 const MPU6050_RA_ACCEL_XOUT_H = 0x3B

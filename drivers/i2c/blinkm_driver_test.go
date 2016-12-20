@@ -4,8 +4,11 @@ import (
 	"errors"
 	"testing"
 
+	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/gobottest"
 )
+
+var _ gobot.Driver = (*BlinkMDriver)(nil)
 
 // --------- HELPERS
 func initTestBlinkMDriver() (driver *BlinkMDriver) {

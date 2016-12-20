@@ -4,8 +4,11 @@ import (
 	"errors"
 	"testing"
 
+	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/gobottest"
 )
+
+var _ gobot.Driver = (*HMC6352Driver)(nil)
 
 // --------- HELPERS
 func initTestHMC6352Driver() (driver *HMC6352Driver) {

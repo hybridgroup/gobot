@@ -4,8 +4,11 @@ import (
 	"testing"
 	"time"
 
+	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/gobottest"
 )
+
+var _ gobot.Driver = (*WiichuckDriver)(nil)
 
 // --------- HELPERS
 func initTestWiichuckDriver() (driver *WiichuckDriver) {
