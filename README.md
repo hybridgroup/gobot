@@ -213,20 +213,14 @@ Support for many devices that use General Purpose Input/Output (GPIO) have
 a shared set of drivers provided using the `gobot/drivers/gpio` package:
 
 - [GPIO](https://en.wikipedia.org/wiki/General_Purpose_Input/Output) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/drivers/gpio)
-	- Analog Sensor
 	- Button
 	- Buzzer
 	- Direct Pin
 	- Grove Button
 	- Grove Buzzer
 	- Grove LED
-	- Grove Light Sensor
 	- Grove Magnetic Switch
-	- Grove Piezo Vibration Sensor
 	- Grove Relay
-	- Grove Rotary Dial
-	- Grove Sound Sensor
-	- Grove Temperature Sensor
 	- Grove Touch Sensor
 	- LED
 	- Makey Button
@@ -235,6 +229,18 @@ a shared set of drivers provided using the `gobot/drivers/gpio` package:
 	- Relay
 	- RGB LED
 	- Servo
+
+Support for many devices that use Analog Input/Output (AIO) have
+a shared set of drivers provided using the `gobot/drivers/aio` package:
+
+- [AIO]() <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/drivers/aio)
+	- Analog Sensor
+	- Direct Pin
+	- Grove Light Sensor
+	- Grove Piezo Vibration Sensor
+	- Grove Rotary Dial
+	- Grove Sound Sensor
+	- Grove Temperature Sensor
 
 Support for devices that use Inter-Integrated Circuit (I2C) have a shared set of
 drivers provided using the `gobot/drivers/i2c` package:
@@ -290,7 +296,6 @@ Thank you!
 
 ## Need help?
 * Join our mailing list: https://groups.google.com/forum/#!forum/gobotio
-* IRC: `#gobotio @ irc.freenode.net`
 * Issues: https://github.com/hybridgroup/gobot/issues
 * twitter: [@gobotio](https://twitter.com/gobotio)
 
