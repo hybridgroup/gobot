@@ -1,6 +1,6 @@
 # AIO
 
-This package provides drivers for [Analog Input/Output (AIO)]() devices. It is normally used by connecting an adaptor such as [firmata](https://gobot.io/x/gobot/platforms/firmata) that supports the needed interfaces for AIO devices.
+This package provides drivers for [Analog Input/Output (AIO)](https://en.wikipedia.org/wiki/Analog-to-digital_converter) devices. It is normally used by connecting an adaptor such as [firmata](https://gobot.io/x/gobot/platforms/firmata) that supports the needed interfaces for analog devices.
 
 ## Getting Started
 

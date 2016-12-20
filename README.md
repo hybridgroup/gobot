@@ -233,9 +233,8 @@ a shared set of drivers provided using the `gobot/drivers/gpio` package:
 Support for many devices that use Analog Input/Output (AIO) have
 a shared set of drivers provided using the `gobot/drivers/aio` package:
 
-- [AIO]() <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/drivers/aio)
+- [AIO](https://en.wikipedia.org/wiki/Analog-to-digital_converter) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/drivers/aio)
 	- Analog Sensor
-	- Direct Pin
 	- Grove Light Sensor
 	- Grove Piezo Vibration Sensor
 	- Grove Rotary Dial
