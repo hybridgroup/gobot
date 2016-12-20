@@ -58,7 +58,7 @@ func main() {
 Simply compile your Gobot program like this:
 
 ```bash
-$ GOARCH=arm GOOS=linux go build examples/beaglebone_blink.go
+$ GOARM=7 GOARCH=arm GOOS=linux go build examples/beaglebone_blink.go
 ```
 
 If you are running the official Debian Linux through the usb->ethernet connection, or are connected to the board using WiFi, you can simply upload your program and execute it with the `scp` command like this:

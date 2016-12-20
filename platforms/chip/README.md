@@ -57,7 +57,7 @@ func main() {
 Compile your Gobot program like this:
 
 ```bash
-$ GOARCH=arm GOOS=linux go build examples/chip_button.go
+$ GOARM=7 GOARCH=arm GOOS=linux go build examples/chip_button.go
 ```
 
 Then you can simply upload your program to the CHIP and execute it with

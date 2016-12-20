@@ -59,7 +59,12 @@ Simply compile your Gobot program like this:
 $ GOARM=6 GOARCH=arm GOOS=linux examples/raspi_blink.go
 ```
 
-Then you can simply upload your program over the network from your host computer to the Raspi
+Use the following `GOARM` values to compile depending on which model Raspberry Pi you are using:
+
+`GOARM=6` (Raspberry Pi A, A+, B, B+, Zero)
+`GOARM=7` (Raspberry Pi 2, 3)
+
+Once you have compiled your code, you can simply upload your program over the network from your host computer to the Raspi
 
 ```bash
 $ scp raspi_blink pi@192.168.1.xxx:/home/pi/
