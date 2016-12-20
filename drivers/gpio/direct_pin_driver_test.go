@@ -18,10 +18,6 @@ func initTestDirectPinDriver(conn gobot.Connection) *DirectPinDriver {
 	testAdaptorDigitalWrite = func() (err error) {
 		return errors.New("write error")
 	}
-	testAdaptorAnalogRead = func() (val int, err error) {
-		val = 80
-		return
-	}
 	testAdaptorPwmWrite = func() (err error) {
 		return errors.New("write error")
 	}
@@ -46,11 +42,6 @@ func TestDirectPinDriver(t *testing.T) {
 
 	err = d.Command("DigitalWrite")(map[string]interface{}{"level": "1"})
 	gobottest.Assert(t, err.(error), errors.New("write error"))
-
-	ret = d.Command("AnalogRead")(nil).(map[string]interface{})
-
-	gobottest.Assert(t, ret["val"].(int), 80)
-	gobottest.Assert(t, ret["err"], nil)
 
 	err = d.Command("PwmWrite")(map[string]interface{}{"level": "1"})
 	gobottest.Assert(t, err.(error), errors.New("write error"))
@@ -103,16 +94,6 @@ func TestDirectPinDriverDigitalRead(t *testing.T) {
 	gobottest.Assert(t, err, ErrDigitalReadUnsupported)
 }
 
-func TestDirectPinDriverAnalogRead(t *testing.T) {
-	d := initTestDirectPinDriver(newGpioTestAdaptor())
-	ret, err := d.AnalogRead()
-	gobottest.Assert(t, ret, 80)
-
-	d = initTestDirectPinDriver(&gpioTestBareAdaptor{})
-	ret, err = d.AnalogRead()
-	gobottest.Assert(t, err, ErrAnalogReadUnsupported)
-}
-
 func TestDirectPinDriverPwmWrite(t *testing.T) {
 	d := initTestDirectPinDriver(newGpioTestAdaptor())
 	gobottest.Refute(t, d.PwmWrite(1), nil)
@@ -120,6 +101,7 @@ func TestDirectPinDriverPwmWrite(t *testing.T) {
 	d = initTestDirectPinDriver(&gpioTestBareAdaptor{})
 	gobottest.Assert(t, d.PwmWrite(1), ErrPwmWriteUnsupported)
 }
+
 func TestDirectPinDriverDigitalWrie(t *testing.T) {
 	d := initTestDirectPinDriver(newGpioTestAdaptor())
 	gobottest.Refute(t, d.ServoWrite(1), nil)

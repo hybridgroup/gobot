@@ -1,4 +1,4 @@
-package gpio
+package aio
 
 import (
 	"errors"
@@ -13,7 +13,7 @@ import (
 var _ gobot.Driver = (*GroveTemperatureSensorDriver)(nil)
 
 func TestGroveTemperatureSensorDriver(t *testing.T) {
-	testAdaptor := newGpioTestAdaptor()
+	testAdaptor := newAioTestAdaptor()
 	d := NewGroveTemperatureSensorDriver(testAdaptor, "123")
 	gobottest.Assert(t, d.Connection(), testAdaptor)
 	gobottest.Assert(t, d.Pin(), "123")
@@ -22,7 +22,7 @@ func TestGroveTemperatureSensorDriver(t *testing.T) {
 
 func TestGroveTempSensorPublishesTemperatureInCelsius(t *testing.T) {
 	sem := make(chan bool, 1)
-	d := NewGroveTemperatureSensorDriver(newGpioTestAdaptor(), "1")
+	d := NewGroveTemperatureSensorDriver(newAioTestAdaptor(), "1")
 
 	testAdaptorAnalogRead = func() (val int, err error) {
 		val = 585
@@ -38,7 +38,7 @@ func TestGroveTempSensorPublishesTemperatureInCelsius(t *testing.T) {
 
 func TestGroveTempSensorPublishesError(t *testing.T) {
 	sem := make(chan bool, 1)
-	d := NewGroveTemperatureSensorDriver(newGpioTestAdaptor(), "1")
+	d := NewGroveTemperatureSensorDriver(newAioTestAdaptor(), "1")
 
 	// send error
 	testAdaptorAnalogRead = func() (val int, err error) {
@@ -62,7 +62,7 @@ func TestGroveTempSensorPublishesError(t *testing.T) {
 }
 
 func TestGroveTempSensorHalt(t *testing.T) {
-	d := NewGroveTemperatureSensorDriver(newGpioTestAdaptor(), "1")
+	d := NewGroveTemperatureSensorDriver(newAioTestAdaptor(), "1")
 	done := make(chan struct{})
 	go func() {
 		<-d.halt

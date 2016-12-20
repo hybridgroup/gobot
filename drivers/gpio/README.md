@@ -11,20 +11,14 @@ go get -d -u gobot.io/x/gobot/...
 
 ## Hardware Support
 Gobot has a extensible system for connecting to hardware devices. The following GPIO devices are currently supported:
-  - Analog Sensor
   - Button
   - Buzzer
   - Direct Pin
   - Grove Button
   - Grove Buzzer
   - Grove LED
-  - Grove Light Sensor
   - Grove Magnetic Switch
-  - Grove Piezo Vibration Sensor
   - Grove Relay
-  - Grove Rotary Dial
-  - Grove Sound Sensor
-  - Grove Temperature Sensor
   - Grove Touch Sensor
   - LED
   - Makey Button

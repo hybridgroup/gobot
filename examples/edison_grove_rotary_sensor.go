@@ -4,16 +4,16 @@ import (
 	"fmt"
 
 	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/gpio"
+	"gobot.io/x/gobot/drivers/aio"
 	"gobot.io/x/gobot/platforms/intel-iot/edison"
 )
 
 func main() {
 	board := edison.NewAdaptor()
-	sensor := gpio.NewGroveRotaryDriver(board, "0")
+	sensor := aio.NewGroveRotaryDriver(board, "0")
 
 	work := func() {
-		sensor.On(gpio.Data, func(data interface{}) {
+		sensor.On(aio.Data, func(data interface{}) {
 			fmt.Println("sensor", data)
 		})
 	}

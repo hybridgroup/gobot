@@ -19,7 +19,6 @@ type DirectPinDriver struct {
 // Adds the following API Commands:
 // 	"DigitalRead" - See DirectPinDriver.DigitalRead
 // 	"DigitalWrite" - See DirectPinDriver.DigitalWrite
-// 	"AnalogRead" - See DirectPinDriver.AnalogRead
 // 	"AnalogWrite" - See DirectPinDriver.AnalogWrite
 // 	"PwmWrite" - See DirectPinDriver.PwmWrite
 // 	"ServoWrite" - See DirectPinDriver.ServoWrite
@@ -38,10 +37,6 @@ func NewDirectPinDriver(a gobot.Connection, pin string) *DirectPinDriver {
 	d.AddCommand("DigitalWrite", func(params map[string]interface{}) interface{} {
 		level, _ := strconv.Atoi(params["level"].(string))
 		return d.DigitalWrite(byte(level))
-	})
-	d.AddCommand("AnalogRead", func(params map[string]interface{}) interface{} {
-		val, err := d.AnalogRead()
-		return map[string]interface{}{"val": val, "err": err}
 	})
 	d.AddCommand("PwmWrite", func(params map[string]interface{}) interface{} {
 		level, _ := strconv.Atoi(params["level"].(string))
@@ -106,15 +101,6 @@ func (d *DirectPinDriver) DigitalWrite(level byte) (err error) {
 		return writer.DigitalWrite(d.Pin(), level)
 	}
 	err = ErrDigitalWriteUnsupported
-	return
-}
-
-// AnalogRead reads the current analog reading of the pin
-func (d *DirectPinDriver) AnalogRead() (val int, err error) {
-	if reader, ok := d.Connection().(AnalogReader); ok {
-		return reader.AnalogRead(d.Pin())
-	}
-	err = ErrAnalogReadUnsupported
 	return
 }
 

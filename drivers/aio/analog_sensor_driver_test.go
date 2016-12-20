@@ -1,4 +1,4 @@
-package gpio
+package aio
 
 import (
 	"errors"
@@ -12,12 +12,12 @@ import (
 var _ gobot.Driver = (*AnalogSensorDriver)(nil)
 
 func TestAnalogSensorDriver(t *testing.T) {
-	d := NewAnalogSensorDriver(newGpioTestAdaptor(), "1")
+	d := NewAnalogSensorDriver(newAioTestAdaptor(), "1")
 	gobottest.Refute(t, d.Connection(), nil)
 	// default interval
 	gobottest.Assert(t, d.interval, 10*time.Millisecond)
 
-	d = NewAnalogSensorDriver(newGpioTestAdaptor(), "42", 30*time.Second)
+	d = NewAnalogSensorDriver(newAioTestAdaptor(), "42", 30*time.Second)
 	gobottest.Assert(t, d.Pin(), "42")
 	gobottest.Assert(t, d.interval, 30*time.Second)
 
@@ -34,7 +34,7 @@ func TestAnalogSensorDriver(t *testing.T) {
 func TestAnalogSensorDriverStart(t *testing.T) {
 	sem := make(chan bool, 1)
 
-	d := NewAnalogSensorDriver(newGpioTestAdaptor(), "1")
+	d := NewAnalogSensorDriver(newAioTestAdaptor(), "1")
 
 	gobottest.Assert(t, d.Start(), nil)
 
@@ -94,7 +94,7 @@ func TestAnalogSensorDriverStart(t *testing.T) {
 }
 
 func TestAnalogSensorDriverHalt(t *testing.T) {
-	d := NewAnalogSensorDriver(newGpioTestAdaptor(), "1")
+	d := NewAnalogSensorDriver(newAioTestAdaptor(), "1")
 	done := make(chan struct{})
 	go func() {
 		<-d.halt

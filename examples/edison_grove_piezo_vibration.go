@@ -4,16 +4,16 @@ import (
 	"fmt"
 
 	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/gpio"
+	"gobot.io/x/gobot/drivers/aio"
 	"gobot.io/x/gobot/platforms/intel-iot/edison"
 )
 
 func main() {
 	board := edison.NewAdaptor()
-	sensor := gpio.NewGrovePiezoVibrationSensorDriver(board, "0")
+	sensor := aio.NewGrovePiezoVibrationSensorDriver(board, "0")
 
 	work := func() {
-		sensor.On(gpio.Vibration, func(data interface{}) {
+		sensor.On(aio.Vibration, func(data interface{}) {
 			fmt.Println("got one!")
 		})
 	}
