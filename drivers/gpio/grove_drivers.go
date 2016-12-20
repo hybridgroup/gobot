@@ -34,7 +34,7 @@ type GroveRotaryDriver struct {
 //
 // Adds the following API Commands:
 // 	"Read" - See AnalogSensor.Read
-func NewGroveRotaryDriver(a AnalogReader, pin string, v ...time.Duration) *GroveRotaryDriver {
+func NewGroveRotaryDriver(a AnalogReadEventer, pin string, v ...time.Duration) *GroveRotaryDriver {
 	return &GroveRotaryDriver{
 		AnalogSensorDriver: NewAnalogSensorDriver(a, pin, v...),
 	}
@@ -72,7 +72,7 @@ type GroveLightSensorDriver struct {
 //
 // Adds the following API Commands:
 // 	"Read" - See AnalogSensor.Read
-func NewGroveLightSensorDriver(a AnalogReader, pin string, v ...time.Duration) *GroveLightSensorDriver {
+func NewGroveLightSensorDriver(a AnalogReadEventer, pin string, v ...time.Duration) *GroveLightSensorDriver {
 	return &GroveLightSensorDriver{
 		AnalogSensorDriver: NewAnalogSensorDriver(a, pin, v...),
 	}
@@ -92,7 +92,7 @@ type GrovePiezoVibrationSensorDriver struct {
 //
 // Adds the following API Commands:
 // 	"Read" - See AnalogSensor.Read
-func NewGrovePiezoVibrationSensorDriver(a AnalogReader, pin string, v ...time.Duration) *GrovePiezoVibrationSensorDriver {
+func NewGrovePiezoVibrationSensorDriver(a AnalogReadEventer, pin string, v ...time.Duration) *GrovePiezoVibrationSensorDriver {
 	sensor := &GrovePiezoVibrationSensorDriver{
 		AnalogSensorDriver: NewAnalogSensorDriver(a, pin, v...),
 	}
@@ -152,7 +152,7 @@ type GroveSoundSensorDriver struct {
 //
 // Adds the following API Commands:
 // 	"Read" - See AnalogSensor.Read
-func NewGroveSoundSensorDriver(a AnalogReader, pin string, v ...time.Duration) *GroveSoundSensorDriver {
+func NewGroveSoundSensorDriver(a AnalogReadEventer, pin string, v ...time.Duration) *GroveSoundSensorDriver {
 	return &GroveSoundSensorDriver{
 		AnalogSensorDriver: NewAnalogSensorDriver(a, pin, v...),
 	}

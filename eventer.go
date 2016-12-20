@@ -2,17 +2,17 @@ package gobot
 
 import "sync"
 
-type eventChannel chan *Event
+type EventChannel chan *Event
 
 type eventer struct {
 	// map of valid Event names
 	eventnames map[string]string
 
 	// new events get put in to the event channel
-	in eventChannel
+	in EventChannel
 
 	// map of out channels used by subscribers
-	outs map[eventChannel]eventChannel
+	outs map[EventChannel]EventChannel
 
 	// mutex to protect the eventChannel map
 	eventsMutex sync.Mutex
@@ -38,10 +38,10 @@ type Eventer interface {
 	Publish(name string, data interface{})
 
 	// Subscribe to events
-	Subscribe() (events eventChannel)
+	Subscribe() (events EventChannel)
 
 	// Unsubscribe from an event channel
-	Unsubscribe(events eventChannel)
+	Unsubscribe(events EventChannel)
 
 	// Event handler
 	On(name string, f func(s interface{})) (err error)
@@ -54,8 +54,8 @@ type Eventer interface {
 func NewEventer() Eventer {
 	evtr := &eventer{
 		eventnames: make(map[string]string),
-		in:         make(eventChannel, 1),
-		outs:       make(map[eventChannel]eventChannel),
+		in:         make(EventChannel, 1),
+		outs:       make(map[EventChannel]EventChannel),
 	}
 
 	// goroutine to cascade "in" events to all "out" event channels
@@ -103,16 +103,16 @@ func (e *eventer) Publish(name string, data interface{}) {
 }
 
 // Subscribe to any events from this eventer
-func (e *eventer) Subscribe() eventChannel {
+func (e *eventer) Subscribe() EventChannel {
 	e.eventsMutex.Lock()
 	defer e.eventsMutex.Unlock()
-	out := make(eventChannel)
+	out := make(EventChannel)
 	e.outs[out] = out
 	return out
 }
 
 // Unsubscribe from the event channel
-func (e *eventer) Unsubscribe(events eventChannel) {
+func (e *eventer) Unsubscribe(events EventChannel) {
 	e.eventsMutex.Lock()
 	defer e.eventsMutex.Unlock()
 	delete(e.outs, events)

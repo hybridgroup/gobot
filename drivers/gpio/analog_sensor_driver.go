@@ -12,7 +12,7 @@ type AnalogSensorDriver struct {
 	pin        string
 	halt       chan bool
 	interval   time.Duration
-	connection AnalogReader
+	connection AnalogReadEventer
 	gobot.Eventer
 	gobot.Commander
 }
@@ -25,7 +25,7 @@ type AnalogSensorDriver struct {
 //
 // Adds the following API Commands:
 // 	"Read" - See AnalogSensor.Read
-func NewAnalogSensorDriver(a AnalogReader, pin string, v ...time.Duration) *AnalogSensorDriver {
+func NewAnalogSensorDriver(a AnalogReadEventer, pin string, v ...time.Duration) *AnalogSensorDriver {
 	d := &AnalogSensorDriver{
 		name:       "AnalogSensor",
 		connection: a,
@@ -56,25 +56,18 @@ func NewAnalogSensorDriver(a AnalogReader, pin string, v ...time.Duration) *Anal
 //	Data int - Event is emitted on change and represents the current reading from the sensor.
 //	Error error - Event is emitted on error reading from the sensor.
 func (a *AnalogSensorDriver) Start() (err error) {
-	value := 0
-	go func() {
-		timer := time.NewTimer(a.interval)
-		timer.Stop()
-		for {
-			newValue, err := a.Read()
-			if err != nil {
-				a.Publish(a.Event(Error), err)
-			} else if newValue != value && newValue != -1 {
-				value = newValue
-				a.Publish(a.Event(Data), value)
-			}
+	evts := a.connection.SubscribeAnalogRead(a.Pin())
 
-			timer.Reset(a.interval)
+	go func() {
+		analogread := "analogread-" + a.Pin()
+		for {
 			select {
-			case <-timer.C:
 			case <-a.halt:
-				timer.Stop()
 				return
+			case evt := <-evts:
+				if evt.Name == analogread {
+					a.Publish(Data, evt.Data)
+				}
 			}
 		}
 	}()

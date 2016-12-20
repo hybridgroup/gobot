@@ -9,10 +9,12 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
 	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/sysfs"
+	"gobot.io/x/gobot/drivers/gpio"
 )
 
 var glob = func(pattern string) (matches []string, err error) {
@@ -31,6 +33,9 @@ type Adaptor struct {
 	analogPath   string
 	analogPinMap map[string]string
 	slots        string
+	interval   time.Duration
+	halt       chan bool
+	gobot.Eventer
 }
 
 // NewAdaptor returns a new Beaglebone Adaptor
@@ -39,6 +44,8 @@ func NewAdaptor() *Adaptor {
 		name:        "Beaglebone",
 		digitalPins: make([]sysfs.DigitalPin, 120),
 		pwmPins:     make(map[string]*pwmPin),
+		interval:   10 * time.Millisecond,
+		halt:       make(chan bool),
 	}
 
 	b.setSlots()
@@ -193,6 +200,68 @@ func (b *Adaptor) AnalogRead(pin string) (val int, err error) {
 
 	val, _ = strconv.Atoi(strings.Split(string(buf), "\n")[0])
 	return
+}
+
+// SubscribeDigitalRead starts reading from the specified pin,
+// and publishes events on the returned event channel when changes occur
+func (b *Adaptor) SubscribeDigitalRead(pin string) (gobot.EventChannel) {
+	// TODO: replace with epoll based implementation
+	b.AddEvent("digitalread-" + pin)
+	value := 0
+	go func() {
+		timer := time.NewTimer(b.interval)
+		timer.Stop()
+		for {
+			newValue, err := b.DigitalRead(pin)
+			if err != nil {
+				b.Publish(b.Event(gpio.Error), err)
+			} else if newValue != value && newValue != -1 {
+				value = newValue
+				b.Publish(b.Event("digitalread-" + pin), value)
+			}
+
+			timer.Reset(b.interval)
+			select {
+			case <-timer.C:
+			case <-b.halt:
+				timer.Stop()
+				return
+			}
+		}
+	}()
+
+	return b.Subscribe()
+}
+
+// SubscribeAnalogRead starts reading from the specified pin,
+// and publishes events on the returned event channel when changes occur
+func (b *Adaptor) SubscribeAnalogRead(pin string) (gobot.EventChannel) {
+	// TODO: replace with epoll based implementation
+	b.AddEvent("analogread-" + pin)
+	value := 0
+	go func() {
+		timer := time.NewTimer(b.interval)
+		timer.Stop()
+		for {
+			newValue, err := b.AnalogRead(pin)
+			if err != nil {
+				b.Publish(b.Event(gpio.Error), err)
+			} else if newValue != value && newValue != -1 {
+				value = newValue
+				b.Publish(b.Event("analogread-" + pin), value)
+			}
+
+			timer.Reset(b.interval)
+			select {
+			case <-timer.C:
+			case <-b.halt:
+				timer.Stop()
+				return
+			}
+		}
+	}()
+
+	return b.Subscribe()
 }
 
 // I2cStart starts a i2c device in specified address on i2c bus /dev/i2c-1

@@ -73,3 +73,17 @@ type DigitalReader interface {
 	gobot.Adaptor
 	DigitalRead(string) (val int, err error)
 }
+
+// DigitalReadEventer interface represents an Adaptor which has SubscribeDigitalRead capabilities
+type DigitalReadEventer interface {
+	gobot.Eventer
+	DigitalReader
+	SubscribeDigitalRead(string) (gobot.EventChannel)
+}
+
+// AnalogReadEventer interface represents an Adaptor which has SubscribeAnalogRead capabilities
+type AnalogReadEventer interface {
+	gobot.Eventer
+	AnalogReader
+	SubscribeAnalogRead(string) (gobot.EventChannel)
+}
