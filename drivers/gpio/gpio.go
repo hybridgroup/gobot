@@ -56,12 +56,6 @@ type ServoWriter interface {
 	ServoWrite(string, byte) (err error)
 }
 
-// AnalogReader interface represents an Adaptor which has Analog capabilities
-type AnalogReader interface {
-	gobot.Adaptor
-	AnalogRead(string) (val int, err error)
-}
-
 // DigitalWriter interface represents an Adaptor which has DigitalWrite capabilities
 type DigitalWriter interface {
 	gobot.Adaptor
