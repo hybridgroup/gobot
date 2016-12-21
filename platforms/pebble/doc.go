@@ -52,6 +52,6 @@ Before running the example, make sure configuration settings match with your pro
 	}
 
 For more information refer to the pebble README:
-https://gobot.io/x/gobot/blob/master/platforms/pebble/README.md
+https://github.com/hybridgroup/gobot/blob/master/platforms/pebble/README.md
 */
 package pebble // import "gobot.io/x/gobot/platforms/pebble"
