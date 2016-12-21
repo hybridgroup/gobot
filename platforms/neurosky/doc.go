@@ -63,6 +63,6 @@ Example:
 	}
 
 For further information refer to neuroky README:
-https://gobot.io/x/gobot/blob/master/platforms/neurosky/README.md
+https://github.com/hybridgroup/gobot/blob/master/platforms/neurosky/README.md
 */
 package neurosky // import "gobot.io/x/gobot/platforms/neurosky"
