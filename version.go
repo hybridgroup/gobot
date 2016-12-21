@@ -1,6 +1,6 @@
 package gobot
 
-const version = "0.13.0"
+const version = "1.0.0"
 
 // Version returns the current Gobot version
 func Version() string {
