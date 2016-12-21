@@ -44,6 +44,6 @@ Example:
 
 
 For further information refer to keyboard README:
-https://gobot.io/x/gobot/blob/master/platforms/keyboard/README.md
+https://github.com/hybridgroup/gobot/blob/master/platforms/keyboard/README.md
 */
 package keyboard // import "gobot.io/x/gobot/platforms/keyboard"
