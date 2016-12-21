@@ -37,6 +37,6 @@ Example:
 	}
 
 For further information refer to sphero readme:
-https://gobot.io/x/gobot/blob/master/platforms/sphero/README.md
+https://github.com/hybridgroup/gobot/blob/master/platforms/sphero/README.md
 */
 package sphero // import "gobot.io/x/gobot/platforms/sphero"
