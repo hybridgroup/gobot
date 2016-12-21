@@ -45,6 +45,9 @@ func main() {
 }
 ```
 
+Note that analog pins A4 and A5 are normally used by the Firmata I2C interface, so you will not be able to use them as analog inputs without changing the Firmata sketch.
+
+
 ## How to Connect
 
 ### Upload the Firmata Firmware to the Arduino
