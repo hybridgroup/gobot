@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/aio"
 	"gobot.io/x/gobot/drivers/gpio"
 	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/gobottest"
@@ -15,7 +16,7 @@ var _ gobot.Adaptor = (*Adaptor)(nil)
 
 var _ gpio.DigitalReader = (*Adaptor)(nil)
 var _ gpio.DigitalWriter = (*Adaptor)(nil)
-var _ gpio.AnalogReader = (*Adaptor)(nil)
+var _ aio.AnalogReader = (*Adaptor)(nil)
 var _ gpio.PwmWriter = (*Adaptor)(nil)
 
 var _ i2c.I2c = (*Adaptor)(nil)
