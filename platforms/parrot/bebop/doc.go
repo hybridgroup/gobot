@@ -6,6 +6,6 @@ Installing:
 	go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/parrot/bebop
 
 For more information refer to the bebop README:
-https://gobot.io/x/gobot/tree/master/platforms/parrot/bebop
+https://github.com/hybridgroup/gobot/tree/master/platforms/parrot/bebop/README.md
 */
 package bebop // import "gobot.io/x/gobot/platforms/parrot/bebop"
