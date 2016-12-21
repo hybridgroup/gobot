@@ -37,6 +37,6 @@ Example:
 	}
 
 For further information refer to Particle readme:
-https://gobot.io/x/gobot/blob/master/platforms/particle/README.md
+https://github.com/hybridgroup/gobot/blob/master/platforms/particle/README.md
 */
 package particle // import "gobot.io/x/gobot/platforms/particle"
