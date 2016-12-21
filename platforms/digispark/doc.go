@@ -6,7 +6,7 @@ Installing:
 This package requires installing `libusb`.
 Then you can install the package with:
 
-	go get gobot.io/x/gobot/platforms/digispark
+	go get -u -d gobot.io/x/gobot/platforms/digispark
 
 Example:
 
@@ -40,6 +40,6 @@ Example:
 	}
 
 For further information refer to digispark README:
-https://gobot.io/x/gobot/blob/master/platforms/digispark/README.md
+https://github.com/hybridgroup/gobot/blob/master/platforms/digispark/README.md
 */
 package digispark // import "gobot.io/x/gobot/platforms/digispark"
