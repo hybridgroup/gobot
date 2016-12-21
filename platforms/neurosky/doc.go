@@ -3,7 +3,7 @@ Package neurosky contains the Gobot adaptor and driver for the Neurosky Mindwave
 
 Installing:
 
-	go get github.com/hybridgroup/gobot/platforms/neurosky
+	go get gobot.io/x/gobot/platforms/neurosky
 
 Example:
 
@@ -12,36 +12,34 @@ Example:
 	import (
 		"fmt"
 
-		"github.com/hybridgroup/gobot"
-		"github.com/hybridgroup/gobot/platforms/neurosky"
+		"gobot.io/x/gobot"
+		"gobot.io/x/gobot/platforms/neurosky"
 	)
 
 	func main() {
-		gbot := gobot.NewGobot()
-
-		adaptor := neurosky.NewNeuroskyAdaptor("neurosky", "/dev/rfcomm0")
-		neuro := neurosky.NewNeuroskyDriver(adaptor, "neuro")
+		adaptor := neurosky.NewAdaptor("/dev/rfcomm0")
+		neuro := neurosky.NewDriver(adaptor)
 
 		work := func() {
-			gobot.On(neuro.Event("extended"), func(data interface{}) {
+			neuro.On(neuro.Event("extended"), func(data interface{}) {
 				fmt.Println("Extended", data)
 			})
-			gobot.On(neuro.Event("signal"), func(data interface{}) {
+			neuro.On(neuro.Event("signal"), func(data interface{}) {
 				fmt.Println("Signal", data)
 			})
-			gobot.On(neuro.Event("attention"), func(data interface{}) {
+			neuro.On(neuro.Event("attention"), func(data interface{}) {
 				fmt.Println("Attention", data)
 			})
-			gobot.On(neuro.Event("meditation"), func(data interface{}) {
+			neuro.On(neuro.Event("meditation"), func(data interface{}) {
 				fmt.Println("Meditation", data)
 			})
-			gobot.On(neuro.Event("blink"), func(data interface{}) {
+			neuro.On(neuro.Event("blink"), func(data interface{}) {
 				fmt.Println("Blink", data)
 			})
-			gobot.On(neuro.Event("wave"), func(data interface{}) {
+			neuro.On(neuro.Event("wave"), func(data interface{}) {
 				fmt.Println("Wave", data)
 			})
-			gobot.On(neuro.Event("eeg"), func(data interface{}) {
+			neuro.On(neuro.Event("eeg"), func(data interface{}) {
 				eeg := data.(neurosky.EEG)
 				fmt.Println("Delta", eeg.Delta)
 				fmt.Println("Theta", eeg.Theta)
@@ -61,11 +59,10 @@ Example:
 			work,
 		)
 
-		gbot.AddRobot(robot)
-		gbot.Start()
+		robot.Start()
 	}
 
 For further information refer to neuroky README:
-https://github.com/hybridgroup/gobot/blob/master/platforms/neurosky/README.md
+https://gobot.io/x/gobot/blob/master/platforms/neurosky/README.md
 */
-package neurosky
+package neurosky // import "gobot.io/x/gobot/platforms/neurosky"

@@ -1,16 +1,17 @@
 package megapi
 
 import (
-	"github.com/hybridgroup/gobot"
-	"github.com/tarm/serial"
 	"io"
 	"time"
+
+	"gobot.io/x/gobot"
+	"github.com/tarm/serial"
 )
 
-var _ gobot.Adaptor = (*MegaPiAdaptor)(nil)
+var _ gobot.Adaptor = (*Adaptor)(nil)
 
-// MegaPiAdaptor is the Gobot adaptor for the MakeBlock MegaPi board
-type MegaPiAdaptor struct {
+// Adaptor is the Gobot adaptor for the MakeBlock MegaPi board
+type Adaptor struct {
 	name              string
 	connection        io.ReadWriteCloser
 	serialConfig      *serial.Config
@@ -18,11 +19,11 @@ type MegaPiAdaptor struct {
 	finalizeChannel   chan struct{}
 }
 
-// NewMegaPiAdaptor returns a new MegaPiAdaptor with specified name and specified serial port used to talk to the MegaPi with a baud rate of 115200
-func NewMegaPiAdaptor(name string, device string) *MegaPiAdaptor {
+// NewAdaptor returns a new MegaPi Adaptor with specified serial port used to talk to the MegaPi with a baud rate of 115200
+func NewAdaptor(device string) *Adaptor {
 	c := &serial.Config{Name: device, Baud: 115200}
-	return &MegaPiAdaptor{
-		name:              name,
+	return &Adaptor{
+		name:              "MegaPi",
 		connection:        nil,
 		serialConfig:      c,
 		writeBytesChannel: make(chan []byte),
@@ -31,16 +32,21 @@ func NewMegaPiAdaptor(name string, device string) *MegaPiAdaptor {
 }
 
 // Name returns the name of this adaptor
-func (megaPi *MegaPiAdaptor) Name() string {
+func (megaPi *Adaptor) Name() string {
 	return megaPi.name
 }
 
+// SetName sets the name of this adaptor
+func (megaPi *Adaptor) SetName(n string) {
+	megaPi.name = n
+}
+
 // Connect starts a connection to the board
-func (megaPi *MegaPiAdaptor) Connect() (errs []error) {
+func (megaPi *Adaptor) Connect() error {
 	if megaPi.connection == nil {
 		sp, err := serial.OpenPort(megaPi.serialConfig)
 		if err != nil {
-			return []error{err}
+			return err
 		}
 
 		// sleeping is required to give the board a chance to reset
@@ -63,15 +69,15 @@ func (megaPi *MegaPiAdaptor) Connect() (errs []error) {
 			}
 		}
 	}()
-	return
+	return nil
 }
 
 // Finalize terminates the connection to the board
-func (megaPi *MegaPiAdaptor) Finalize() (errs []error) {
+func (megaPi *Adaptor) Finalize() error {
 	megaPi.finalizeChannel <- struct{}{}
 	<-megaPi.finalizeChannel
 	if err := megaPi.connection.Close(); err != nil {
-		return []error{err}
+		return err
 	}
-	return
+	return nil
 }

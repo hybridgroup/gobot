@@ -8,7 +8,7 @@ This package contains the Gobot adaptor and driver for the [Neurosky Mindwave Mo
 Installing Gobot with Neurosky support is pretty easy.
 
 ```
-go get -d -u github.com/hybridgroup/gobot/... && go install github.com/hybridgroup/gobot/platforms/neurosky
+go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/neurosky
 ```
 
 ## How To Connect
@@ -21,7 +21,7 @@ Now you must pair with the Mindwave. Open System Preferences > Bluetooth. Now wi
 
 ### Ubuntu
 
-Connecting to the Mindwave from Ubuntu or any other Linux-based OS can be done entirely from the command line using [Gort](https://github.com/hybridgroup/gort) CLI commands. Here are the steps.
+Connecting to the Mindwave from Ubuntu or any other Linux-based OS can be done entirely from the command line using [Gort](https://gobot.io/x/gort) CLI commands. Here are the steps.
 
 Find the address of the Mindwave, by using:
 ```
@@ -52,15 +52,13 @@ package main
 import (
 	"fmt"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/neurosky"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/platforms/neurosky"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
-
-	adaptor := neurosky.NewNeuroskyAdaptor("neurosky", "/dev/rfcomm0")
-	neuro := neurosky.NewNeuroskyDriver(adaptor, "neuro")
+	adaptor := neurosky.NewAdaptor("/dev/rfcomm0")
+	neuro := neurosky.NewDriver(adaptor)
 
 	work := func() {
 		gobot.On(neuro.Event("extended"), func(data interface{}) {
@@ -101,7 +99,6 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-	gbot.Start()
+	robot.Start()
 }
 ```

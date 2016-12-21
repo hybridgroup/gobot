@@ -5,15 +5,14 @@ import (
 	"os"
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/ble"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/platforms/ble"
+	"gobot.io/x/gobot/platforms/parrot/minidrone"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
-
-	bleAdaptor := ble.NewBLEClientAdaptor("ble", os.Args[1])
-	drone := ble.NewBLEMinidroneDriver(bleAdaptor, "drone")
+	bleAdaptor := ble.NewClientAdaptor(os.Args[1])
+	drone := minidrone.NewDriver(bleAdaptor)
 
 	work := func() {
 		drone.On(drone.Event("battery"), func(data interface{}) {
@@ -37,17 +36,15 @@ func main() {
 			fmt.Println("landed.")
 		})
 
-		<-time.After(1000 * time.Millisecond)
+		time.Sleep(1000 * time.Millisecond)
 		drone.TakeOff()
 	}
 
-	robot := gobot.NewRobot("bleBot",
+	robot := gobot.NewRobot("minidrone",
 		[]gobot.Connection{bleAdaptor},
 		[]gobot.Device{drone},
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

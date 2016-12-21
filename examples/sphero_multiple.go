@@ -4,12 +4,46 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/sphero"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/api"
+	"gobot.io/x/gobot/platforms/sphero"
 )
 
+func NewSwarmBot(port string) *gobot.Robot {
+	spheroAdaptor := sphero.NewAdaptor(port)
+	spheroDriver := sphero.NewSpheroDriver(spheroAdaptor)
+	spheroDriver.SetName("Sphero" + port)
+
+	work := func() {
+		spheroDriver.Stop()
+
+		spheroDriver.On(sphero.Collision, func(data interface{}) {
+			fmt.Println("Collision Detected!")
+		})
+
+		gobot.Every(1*time.Second, func() {
+			spheroDriver.Roll(100, uint16(gobot.Rand(360)))
+		})
+		gobot.Every(3*time.Second, func() {
+			spheroDriver.SetRGB(uint8(gobot.Rand(255)),
+				uint8(gobot.Rand(255)),
+				uint8(gobot.Rand(255)),
+			)
+		})
+	}
+
+	robot := gobot.NewRobot("sphero",
+		[]gobot.Connection{spheroAdaptor},
+		[]gobot.Device{spheroDriver},
+		work,
+	)
+
+	return robot
+}
+
 func main() {
-	gbot := gobot.NewGobot()
+	master := gobot.NewMaster()
+	api.NewAPI(master).Start()
 
 	spheros := []string{
 		"/dev/rfcomm0",
@@ -19,34 +53,8 @@ func main() {
 	}
 
 	for _, port := range spheros {
-		spheroAdaptor := sphero.NewSpheroAdaptor("Sphero", port)
-		spheroDriver := sphero.NewSpheroDriver(spheroAdaptor, "Sphero"+port)
-
-		work := func() {
-			spheroDriver.Stop()
-
-			spheroDriver.On(sphero.Collision, func(data interface{}) {
-				fmt.Println("Collision Detected!")
-			})
-
-			gobot.Every(1*time.Second, func() {
-				spheroDriver.Roll(100, uint16(gobot.Rand(360)))
-			})
-			gobot.Every(3*time.Second, func() {
-				spheroDriver.SetRGB(uint8(gobot.Rand(255)),
-					uint8(gobot.Rand(255)),
-					uint8(gobot.Rand(255)),
-				)
-			})
-		}
-
-		robot := gobot.NewRobot("sphero",
-			[]gobot.Connection{spheroAdaptor},
-			[]gobot.Device{spheroDriver},
-			work,
-		)
-		gbot.AddRobot(robot)
+		master.AddRobot(NewSwarmBot(port))
 	}
 
-	gbot.Start()
+	master.Start()
 }

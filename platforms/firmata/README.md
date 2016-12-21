@@ -9,7 +9,7 @@ For more info about the arduino platform click [here](http://arduino.cc/).
 ## How to Install
 
 ```
-go get -d -u github.com/hybridgroup/gobot/... && go install github.com/hybridgroup/gobot/platforms/firmata
+go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/firmata
 ```
 
 ## How to Use
@@ -20,16 +20,14 @@ package main
 import (
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/firmata"
-	"github.com/hybridgroup/gobot/platforms/gpio"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/gpio"
+	"gobot.io/x/gobot/platforms/firmata"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
-
-	firmataAdaptor := firmata.NewFirmataAdaptor("arduino", "/dev/ttyACM0")
-	led := gpio.NewLedDriver(firmataAdaptor, "led", "13")
+	firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
+	led := gpio.NewLedDriver(firmataAdaptor, "13")
 
 	work := func() {
 		gobot.Every(1*time.Second, func() {
@@ -43,9 +41,7 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }
 ```
 

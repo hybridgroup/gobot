@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hybridgroup/gobot/gobottest"
+	"gobot.io/x/gobot/gobottest"
 )
 
 type readWriteCloser struct{}
@@ -286,7 +286,7 @@ func TestConnect(t *testing.T) {
 	go func() {
 		for {
 			testReadData = append(testReadData, response...)
-			<-time.After(100 * time.Millisecond)
+			time.Sleep(100 * time.Millisecond)
 		}
 	}()
 

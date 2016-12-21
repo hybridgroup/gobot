@@ -3,16 +3,14 @@ package main
 import (
 	"fmt"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/firmata"
-	"github.com/hybridgroup/gobot/platforms/i2c"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/i2c"
+	"gobot.io/x/gobot/platforms/firmata"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
-
-	firmataAdaptor := firmata.NewFirmataAdaptor("firmata", "/dev/ttyACM0")
-	wiichuck := i2c.NewWiichuckDriver(firmataAdaptor, "wiichuck")
+	firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
+	wiichuck := i2c.NewWiichuckDriver(firmataAdaptor)
 
 	work := func() {
 		wiichuck.On(wiichuck.Event("joystick"), func(data interface{}) {
@@ -38,7 +36,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

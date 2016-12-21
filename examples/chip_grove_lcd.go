@@ -3,16 +3,14 @@ package main
 import (
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/chip"
-	"github.com/hybridgroup/gobot/platforms/i2c"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/i2c"
+	"gobot.io/x/gobot/platforms/chip"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
-
-	board := chip.NewChipAdaptor("chip")
-	screen := i2c.NewGroveLcdDriver(board, "screen")
+	board := chip.NewAdaptor()
+	screen := i2c.NewGroveLcdDriver(board)
 
 	work := func() {
 		screen.Write("hello")
@@ -33,7 +31,7 @@ func main() {
 		})
 
 		screen.Home()
-		<-time.After(1 * time.Second)
+		time.Sleep(1 * time.Second)
 		screen.SetRGB(0, 0, 255)
 	}
 
@@ -43,7 +41,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

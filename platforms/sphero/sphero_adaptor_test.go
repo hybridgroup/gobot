@@ -5,11 +5,11 @@ import (
 	"io"
 	"testing"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/gobottest"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/gobottest"
 )
 
-var _ gobot.Adaptor = (*SpheroAdaptor)(nil)
+var _ gobot.Adaptor = (*Adaptor)(nil)
 
 type nullReadWriteCloser struct{}
 
@@ -37,8 +37,8 @@ func (nullReadWriteCloser) Close() error {
 	return testAdaptorClose()
 }
 
-func initTestSpheroAdaptor() *SpheroAdaptor {
-	a := NewSpheroAdaptor("bot", "/dev/null")
+func initTestSpheroAdaptor() *Adaptor {
+	a := NewAdaptor("/dev/null")
 	a.connect = func(string) (io.ReadWriteCloser, error) {
 		return &nullReadWriteCloser{}, nil
 	}
@@ -47,7 +47,7 @@ func initTestSpheroAdaptor() *SpheroAdaptor {
 
 func TestSpheroAdaptor(t *testing.T) {
 	a := initTestSpheroAdaptor()
-	gobottest.Assert(t, a.Name(), "bot")
+	gobottest.Assert(t, a.Name(), "Sphero")
 	gobottest.Assert(t, a.Port(), "/dev/null")
 }
 
@@ -66,23 +66,23 @@ func TestSpheroAdaptorReconnect(t *testing.T) {
 func TestSpheroAdaptorFinalize(t *testing.T) {
 	a := initTestSpheroAdaptor()
 	a.Connect()
-	gobottest.Assert(t, len(a.Finalize()), 0)
+	gobottest.Assert(t, a.Finalize(), nil)
 
 	testAdaptorClose = func() error {
 		return errors.New("close error")
 	}
 
 	a.connected = true
-	gobottest.Assert(t, a.Finalize()[0], errors.New("close error"))
+	gobottest.Assert(t, a.Finalize(), errors.New("close error"))
 }
 
 func TestSpheroAdaptorConnect(t *testing.T) {
 	a := initTestSpheroAdaptor()
-	gobottest.Assert(t, len(a.Connect()), 0)
+	gobottest.Assert(t, a.Connect(), nil)
 
 	a.connect = func(string) (io.ReadWriteCloser, error) {
 		return nil, errors.New("connect error")
 	}
 
-	gobottest.Assert(t, a.Connect()[0], errors.New("connect error"))
+	gobottest.Assert(t, a.Connect(), errors.New("connect error"))
 }

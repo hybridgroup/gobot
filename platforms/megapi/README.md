@@ -7,7 +7,7 @@ The code is based on a python implementation that can be found [here](https://gi
 ## How to Install
 
 ```
-go get -d -u github.com/hybridgroup/gobot/... && go install github.com/hybridgroup/gobot/platforms/megapi
+go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/megapi
 ```
 
 ## How to Use
@@ -16,18 +16,16 @@ go get -d -u github.com/hybridgroup/gobot/... && go install github.com/hybridgro
 package main
 
 import (
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/megapi"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/platforms/megapi"
 	"time"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
-
 	// use "/dev/ttyUSB0" if connecting with USB cable
 	// use "/dev/ttyAMA0" on devices older than Raspberry Pi 3 Model B
-	megaPiAdaptor := megapi.NewMegaPiAdaptor("megapi", "/dev/ttyS0")
-	motor := megapi.NewMotorDriver(megaPiAdaptor, "motor1", 1)
+	megaPiAdaptor := megapi.NewAdaptor("/dev/ttyS0")
+	motor := megapi.NewMotorDriver(megaPiAdaptor, 1)
 
 	work := func() {
 		speed := int16(0)
@@ -48,8 +46,6 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }
 ```

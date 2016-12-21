@@ -1,17 +1,15 @@
 package main
 
 import (
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/firmata"
-	"github.com/hybridgroup/gobot/platforms/gpio"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/gpio"
+	"gobot.io/x/gobot/platforms/firmata"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
-
-	firmataAdaptor := firmata.NewFirmataAdaptor("firmata", "/dev/ttyACM0")
-	button := gpio.NewMakeyButtonDriver(firmataAdaptor, "button", "2")
-	led := gpio.NewLedDriver(firmataAdaptor, "led", "13")
+	firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
+	button := gpio.NewMakeyButtonDriver(firmataAdaptor, "2")
+	led := gpio.NewLedDriver(firmataAdaptor, "13")
 
 	work := func() {
 		button.On(gpio.ButtonPush, func(data interface{}) {
@@ -29,7 +27,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

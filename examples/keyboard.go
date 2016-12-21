@@ -3,14 +3,12 @@ package main
 import (
 	"fmt"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/keyboard"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/platforms/keyboard"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
-
-	keys := keyboard.NewKeyboardDriver("keyboard")
+	keys := keyboard.NewDriver()
 
 	work := func() {
 		keys.On(keyboard.Key, func(data interface{}) {
@@ -30,7 +28,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

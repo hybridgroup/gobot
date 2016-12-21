@@ -3,19 +3,17 @@ package main
 import (
 	"fmt"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/gpio"
-	"github.com/hybridgroup/gobot/platforms/intel-iot/edison"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/aio"
+	"gobot.io/x/gobot/platforms/intel-iot/edison"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
-
-	board := edison.NewEdisonAdaptor("edison")
-	sensor := gpio.NewGrovePiezoVibrationSensorDriver(board, "sensor", "0")
+	board := edison.NewAdaptor()
+	sensor := aio.NewGrovePiezoVibrationSensorDriver(board, "0")
 
 	work := func() {
-		sensor.On(gpio.Vibration, func(data interface{}) {
+		sensor.On(aio.Vibration, func(data interface{}) {
 			fmt.Println("got one!")
 		})
 	}
@@ -26,7 +24,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

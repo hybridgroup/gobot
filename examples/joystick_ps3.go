@@ -3,16 +3,13 @@ package main
 import (
 	"fmt"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/joystick"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/platforms/joystick"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
-
-	joystickAdaptor := joystick.NewJoystickAdaptor("ps3")
-	stick := joystick.NewJoystickDriver(joystickAdaptor,
-		"ps3",
+	joystickAdaptor := joystick.NewAdaptor()
+	stick := joystick.NewDriver(joystickAdaptor,
 		"./platforms/joystick/configs/dualshock3.json",
 	)
 
@@ -49,7 +46,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

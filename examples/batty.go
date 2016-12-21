@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/api"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/api"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
+	gbot := gobot.NewMaster()
 
 	api.NewAPI(gbot).Start()
 
@@ -17,8 +17,8 @@ func main() {
 		return params["a"]
 	})
 
-	loopback := NewLoopbackAdaptor("loopback", "/dev/null")
-	ping := NewPingDriver(loopback, "ping", "1")
+	loopback := NewLoopbackAdaptor("/dev/null")
+	ping := NewPingDriver(loopback, "1")
 
 	work := func() {
 		gobot.Every(5*time.Second, func() {
@@ -46,14 +46,15 @@ type loopbackAdaptor struct {
 	port string
 }
 
-func (t *loopbackAdaptor) Finalize() (errs []error) { return }
-func (t *loopbackAdaptor) Connect() (errs []error)  { return }
-func (t *loopbackAdaptor) Name() string             { return t.name }
-func (t *loopbackAdaptor) Port() string             { return t.port }
+func (t *loopbackAdaptor) Finalize() (err error) { return }
+func (t *loopbackAdaptor) Connect() (err error)  { return }
+func (t *loopbackAdaptor) Name() string          { return t.name }
+func (t *loopbackAdaptor) SetName(n string)      { t.name = n }
+func (t *loopbackAdaptor) Port() string          { return t.port }
 
-func NewLoopbackAdaptor(name, port string) *loopbackAdaptor {
+func NewLoopbackAdaptor(port string) *loopbackAdaptor {
 	return &loopbackAdaptor{
-		name: name,
+		name: "Loopback",
 		port: port,
 	}
 }
@@ -68,15 +69,16 @@ type pingDriver struct {
 	gobot.Commander
 }
 
-func (t *pingDriver) Start() (errs []error)        { return }
-func (t *pingDriver) Halt() (errs []error)         { return }
+func (t *pingDriver) Start() (err error)           { return }
+func (t *pingDriver) Halt() (err error)            { return }
 func (t *pingDriver) Name() string                 { return t.name }
+func (t *pingDriver) SetName(n string)             { t.name = n }
 func (t *pingDriver) Pin() string                  { return t.pin }
 func (t *pingDriver) Connection() gobot.Connection { return t.connection }
 
-func NewPingDriver(adaptor *loopbackAdaptor, name string, pin string) *pingDriver {
+func NewPingDriver(adaptor *loopbackAdaptor, pin string) *pingDriver {
 	t := &pingDriver{
-		name:       name,
+		name:       "Ping",
 		connection: adaptor,
 		pin:        pin,
 		Eventer:    gobot.NewEventer(),

@@ -4,21 +4,21 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/gobottest"
-	"github.com/hybridgroup/gobot/platforms/gpio"
-	"github.com/hybridgroup/gobot/platforms/i2c"
-	"github.com/hybridgroup/gobot/sysfs"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/gpio"
+	"gobot.io/x/gobot/drivers/i2c"
+	"gobot.io/x/gobot/gobottest"
+	"gobot.io/x/gobot/sysfs"
 )
 
-var _ gobot.Adaptor = (*EdisonAdaptor)(nil)
+var _ gobot.Adaptor = (*Adaptor)(nil)
 
-var _ gpio.DigitalReader = (*EdisonAdaptor)(nil)
-var _ gpio.DigitalWriter = (*EdisonAdaptor)(nil)
-var _ gpio.AnalogReader = (*EdisonAdaptor)(nil)
-var _ gpio.PwmWriter = (*EdisonAdaptor)(nil)
+var _ gpio.DigitalReader = (*Adaptor)(nil)
+var _ gpio.DigitalWriter = (*Adaptor)(nil)
+var _ gpio.AnalogReader = (*Adaptor)(nil)
+var _ gpio.PwmWriter = (*Adaptor)(nil)
 
-var _ i2c.I2c = (*EdisonAdaptor)(nil)
+var _ i2c.I2c = (*Adaptor)(nil)
 
 type NullReadWriteCloser struct {
 	contents []byte
@@ -40,14 +40,14 @@ func (n *NullReadWriteCloser) Read(b []byte) (int, error) {
 	return len(b), nil
 }
 
-var closeErr error = nil
+var closeErr error
 
 func (n *NullReadWriteCloser) Close() error {
 	return closeErr
 }
 
-func initTestEdisonAdaptor() (*EdisonAdaptor, *sysfs.MockFilesystem) {
-	a := NewEdisonAdaptor("myAdaptor")
+func initTestAdaptor() (*Adaptor, *sysfs.MockFilesystem) {
+	a := NewAdaptor()
 	fs := sysfs.NewMockFilesystem([]string{
 		"/sys/bus/iio/devices/iio:device1/in_voltage0_raw",
 		"/sys/kernel/debug/gpio_debug/gpio111/current_pinmux",
@@ -123,37 +123,32 @@ func initTestEdisonAdaptor() (*EdisonAdaptor, *sysfs.MockFilesystem) {
 	return a, fs
 }
 
-func TestEdisonAdaptor(t *testing.T) {
-	a, _ := initTestEdisonAdaptor()
-	gobottest.Assert(t, a.Name(), "myAdaptor")
-}
+func TestAdaptorConnect(t *testing.T) {
+	a, _ := initTestAdaptor()
+	gobottest.Assert(t, a.Connect(), nil)
 
-func TestEdisonAdaptorConnect(t *testing.T) {
-	a, _ := initTestEdisonAdaptor()
-	gobottest.Assert(t, len(a.Connect()), 0)
-
-	a = NewEdisonAdaptor("myAdaptor")
+	a = NewAdaptor()
 	sysfs.SetFilesystem(sysfs.NewMockFilesystem([]string{}))
-	gobottest.Refute(t, len(a.Connect()), 0)
+	gobottest.Refute(t, a.Connect(), nil)
 }
 
-func TestEdisonAdaptorFinalize(t *testing.T) {
-	a, _ := initTestEdisonAdaptor()
+func TestAdaptorFinalize(t *testing.T) {
+	a, _ := initTestAdaptor()
 	a.DigitalWrite("3", 1)
 	a.PwmWrite("5", 100)
 
 	sysfs.SetSyscall(&sysfs.MockSyscall{})
 	a.I2cStart(0xff)
 
-	gobottest.Assert(t, len(a.Finalize()), 0)
+	gobottest.Assert(t, a.Finalize(), nil)
 
 	closeErr = errors.New("close error")
 	sysfs.SetFilesystem(sysfs.NewMockFilesystem([]string{}))
-	gobottest.Refute(t, len(a.Finalize()), 0)
+	gobottest.Refute(t, a.Finalize(), nil)
 }
 
-func TestEdisonAdaptorDigitalIO(t *testing.T) {
-	a, fs := initTestEdisonAdaptor()
+func TestAdaptorDigitalIO(t *testing.T) {
+	a, fs := initTestAdaptor()
 
 	a.DigitalWrite("13", 1)
 	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio40/value"].Contents, "1")
@@ -164,8 +159,8 @@ func TestEdisonAdaptorDigitalIO(t *testing.T) {
 	gobottest.Assert(t, i, 0)
 }
 
-func TestEdisonAdaptorI2c(t *testing.T) {
-	a, _ := initTestEdisonAdaptor()
+func TestAdaptorI2c(t *testing.T) {
+	a, _ := initTestAdaptor()
 
 	sysfs.SetSyscall(&sysfs.MockSyscall{})
 	a.I2cStart(0xff)
@@ -177,8 +172,8 @@ func TestEdisonAdaptorI2c(t *testing.T) {
 	gobottest.Assert(t, data, []byte{0x00, 0x01})
 }
 
-func TestEdisonAdaptorPwm(t *testing.T) {
-	a, fs := initTestEdisonAdaptor()
+func TestAdaptorPwm(t *testing.T) {
+	a, fs := initTestAdaptor()
 
 	err := a.PwmWrite("5", 100)
 	gobottest.Assert(t, err, nil)
@@ -188,8 +183,8 @@ func TestEdisonAdaptorPwm(t *testing.T) {
 	gobottest.Assert(t, err, errors.New("Not a PWM pin"))
 }
 
-func TestEdisonAdaptorAnalog(t *testing.T) {
-	a, fs := initTestEdisonAdaptor()
+func TestAdaptorAnalog(t *testing.T) {
+	a, fs := initTestAdaptor()
 
 	fs.Files["/sys/bus/iio/devices/iio:device1/in_voltage0_raw"].Contents = "1000\n"
 	i, _ := a.AnalogRead("0")

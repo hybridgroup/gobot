@@ -1,9 +1,10 @@
 package gobot
 
 import (
-	"fmt"
 	"log"
 	"reflect"
+
+	multierror "github.com/hashicorp/go-multierror"
 )
 
 // JSONDevice is a JSON representation of a Device.
@@ -52,7 +53,7 @@ func (d *Devices) Each(f func(Device)) {
 }
 
 // Start calls Start on each Device in d
-func (d *Devices) Start() (errs []error) {
+func (d *Devices) Start() (err error) {
 	log.Println("Starting devices...")
 	for _, device := range *d {
 		info := "Starting device " + device.Name()
@@ -62,25 +63,19 @@ func (d *Devices) Start() (errs []error) {
 		}
 
 		log.Println(info + "...")
-		if errs = device.Start(); len(errs) > 0 {
-			for i, err := range errs {
-				errs[i] = fmt.Errorf("Device %q: %v", device.Name(), err)
-			}
-			return
+		if derr := device.Start(); derr != nil {
+			err = multierror.Append(err, derr)
 		}
 	}
-	return
+	return err
 }
 
 // Halt calls Halt on each Device in d
-func (d *Devices) Halt() (errs []error) {
+func (d *Devices) Halt() (err error) {
 	for _, device := range *d {
-		if derrs := device.Halt(); len(derrs) > 0 {
-			for i, err := range derrs {
-				derrs[i] = fmt.Errorf("Device %q: %v", device.Name(), err)
-			}
-			errs = append(errs, derrs...)
+		if derr := device.Halt(); derr != nil {
+			err = multierror.Append(err, derr)
 		}
 	}
-	return
+	return err
 }

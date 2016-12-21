@@ -3,16 +3,14 @@ package main
 import (
 	"fmt"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/beaglebone"
-	"github.com/hybridgroup/gobot/platforms/gpio"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/gpio"
+	"gobot.io/x/gobot/platforms/beaglebone"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
-
-	beagleboneAdaptor := beaglebone.NewBeagleboneAdaptor("beaglebone")
-	button := gpio.NewMakeyButtonDriver(beagleboneAdaptor, "button", "P8_9")
+	beagleboneAdaptor := beaglebone.NewAdaptor()
+	button := gpio.NewMakeyButtonDriver(beagleboneAdaptor, "P8_9")
 
 	work := func() {
 		button.On(gpio.ButtonPush, func(data interface{}) {
@@ -30,7 +28,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

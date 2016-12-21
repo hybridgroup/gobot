@@ -4,15 +4,13 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/sphero"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/platforms/sphero"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
-
-	adaptor := sphero.NewSpheroAdaptor("Sphero", "/dev/rfcomm0")
-	spheroDriver := sphero.NewSpheroDriver(adaptor, "sphero")
+	adaptor := sphero.NewAdaptor("/dev/rfcomm0")
+	spheroDriver := sphero.NewSpheroDriver(adaptor)
 
 	work := func() {
 		spheroDriver.SetDataStreaming(sphero.DefaultDataStreamingConfig())
@@ -43,7 +41,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

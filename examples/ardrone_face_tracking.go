@@ -7,23 +7,21 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/ardrone"
-	"github.com/hybridgroup/gobot/platforms/opencv"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/platforms/opencv"
+	"gobot.io/x/gobot/platforms/parrot/ardrone"
 	cv "github.com/lazywei/go-opencv/opencv"
 )
 
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	gbot := gobot.NewGobot()
-
 	_, currentfile, _, _ := runtime.Caller(0)
 	cascade := path.Join(path.Dir(currentfile), "haarcascade_frontalface_alt.xml")
-	window := opencv.NewWindowDriver("window")
-	camera := opencv.NewCameraDriver("camera", "tcp://192.168.1.1:5555")
-	ardroneAdaptor := ardrone.NewArdroneAdaptor("Drone")
-	drone := ardrone.NewArdroneDriver(ardroneAdaptor, "drone")
+	window := opencv.NewWindowDriver()
+	camera := opencv.NewCameraDriver("tcp://192.168.1.1:5555")
+	ardroneAdaptor := ardrone.NewAdaptor()
+	drone := ardrone.NewDriver(ardroneAdaptor)
 
 	work := func() {
 		detect := false
@@ -76,7 +74,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

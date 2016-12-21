@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/sphero"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/platforms/sphero"
 )
 
 type conway struct {
@@ -16,7 +16,7 @@ type conway struct {
 }
 
 func main() {
-	gbot := gobot.NewGobot()
+	master := gobot.NewMaster()
 
 	spheros := []string{
 		"/dev/rfcomm0",
@@ -25,9 +25,10 @@ func main() {
 	}
 
 	for _, port := range spheros {
-		spheroAdaptor := sphero.NewSpheroAdaptor("Sphero", port)
+		spheroAdaptor := sphero.NewAdaptor(port)
 
-		cell := sphero.NewSpheroDriver(spheroAdaptor, "Sphero"+port)
+		cell := sphero.NewSpheroDriver(spheroAdaptor)
+		cell.SetName("Sphero" + port)
 
 		work := func() {
 			conway := new(conway)
@@ -57,10 +58,11 @@ func main() {
 			[]gobot.Device{cell},
 			work,
 		)
-		gbot.AddRobot(robot)
+
+		master.AddRobot(robot)
 	}
 
-	gbot.Start()
+	master.Start()
 }
 
 func (c *conway) resetContacts() {

@@ -1,3 +1,82 @@
+1.0.0
+---
+* **core**
+  * Refactoring to allow 'Metal' development using Gobot packages
+  * Able to run robots without being part of a Master.
+  * Now running all work in separate goroutines
+  * Rename internal name of Master type
+  * Refactor events to use channels all the way down.
+  * Eliminate potential race conditions from Events and Every functions
+  * Add Unsubscribe() to Eventer, now Once() works as expected
+  * DeleteEvent function added to Eventer interface
+  * Ranges over event channels instead of using select
+  * No longer return non-standard slices of errors, instead use hashicorp/go-multierror
+  * Ensure that all drivers have default names
+  * Now both Robot and Master operate using AutoRun as expected
+  * Use canonical import domain of gobot.io for all code
+  * Use time.Sleep unless waiting for a timeout in a select
+  * Uses time.NewTimer() instead of time.After() to be more efficient
+
+* **test**
+  * Add deps tasks to Makefile
+  * Add golang 1.7 to Travis CI tests
+  * Add golang 1.8beta1 to build matrix for Travis
+  * Reduce Travis builds to golang 1.4+ since it is late 2016 already
+  * Complete move of test interfaces into the test files where they belong
+  * Adds Parrot Minidrone and Sphero Ollie to Travis tests
+
+* **Add missing godocs for everything**
+
+* **i2c**
+  * Move I2C drivers into appropriately named 'drivers/i2c' directory
+  * Add support for Adafruit Servo/PWM HAT
+
+* **gpio**
+  * Move GPIO drivers into appropriately named 'drivers/gpio' directory
+  * Add support for PIR motion detector
+
+* **beaglebone**
+  * auto-detect Linux kernel version
+  * map usr LEDs to match all kernels
+
+* **ble**
+  * Rename drivers to make them more obvious
+  * Add test placeholders
+
+* **chip**
+  * Auto-detect OS version to adjust pin mappings
+  * Correct base for new 4.4 GPIO
+
+* **edison**
+  * Support for other breakout boards besides Arduino
+
+* **firmata**
+  * Use io.ReadFull in platforms/firmata/client
+  * Update tarm/goserial to tarm/serial
+
+* **joule**
+  * Add support for Intel Joule
+
+* **megapi**
+  * Adding support for MakeBlock megapi
+
+* **nats**
+  * Add support for NATS server
+
+* **particle**
+  * Complete renaming Spark platform to Particle
+
+* **parrot**
+  * Move Parrot Minidrone into own platform
+  * Move both ARDrone and Bebop under Parrot package
+
+* **raspi**
+  * Add missing godocs and small refactors for platform
+
+* **sphero**
+  * Add initial support for Sphero BB-8 platform
+  * Move Sphero Ollie into own platform
+
 0.12.0
 ---
 * **Refactor Gobot test helpers into separate package**
@@ -100,7 +179,7 @@
   - firmata
     - Add optional io.ReadWriteCloser parameter to FirmataAdaptor
     - Fix `thread exhaustion` error
-  - cli 
+  - cli
     - generator
       - Update generator for new adaptor and driver interfaces
       - Add driver, adaptor and project generators
@@ -115,7 +194,7 @@
 ---
   - Dramatically increased test coverage and documentation
   - api
-    - Conform to the [cppp.io](https://github.com/hybridgroup/cppp-io) spec
+    - Conform to the [cppp.io](https://gobot.io/x/cppp-io) spec
     - Add support for basic middleware
     - Add support for custom routes
     - Add SSE support
@@ -153,7 +232,7 @@
 - neurosky
   - Fix incorrect Event names
 - sphero
-  - Correctly format output of GetRGB 
+  - Correctly format output of GetRGB
 
 0.6.1
 ---
@@ -165,7 +244,7 @@
 - api
   - Add robeaux support
 - core
-  - Refactor `Connection` and `Device` 
+  - Refactor `Connection` and `Device`
   - Connections are now a collection of Adaptors
   - Devices are now a collection of Drivers
   - Add `Event(string)` function instead of `Events[string]` for retrieving Driver event
@@ -178,8 +257,8 @@
 0.5.2  
 ---  
 - beaglebone
-  - Add `DirectPinDriver` 
-  - Ensure slots are properly loaded 
+  - Add `DirectPinDriver`
+  - Ensure slots are properly loaded
 
 0.5.1  
 ---  

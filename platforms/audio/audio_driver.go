@@ -1,13 +1,14 @@
-// Based on aplay audio adaptor written by @colemanserious (https://github.com/colemanserious)
-
+// Package audio is based on aplay audio adaptor written by @colemanserious (https://github.com/colemanserious)
 package audio
 
 import (
-	"github.com/hybridgroup/gobot"
 	"time"
+
+	"gobot.io/x/gobot"
 )
 
-type AudioDriver struct {
+// Driver is gobot software device for audio playback
+type Driver struct {
 	name       string
 	connection gobot.Connection
 	interval   time.Duration
@@ -17,9 +18,14 @@ type AudioDriver struct {
 	filename string
 }
 
-func NewAudioDriver(a *AudioAdaptor, name string, filename string) *AudioDriver {
-	d := &AudioDriver{
-		name:       name,
+// NewDriver returns a new audio Driver. It accepts:
+//
+// *Adaptor: The audio adaptor to use for the driver
+//  string: The filename of the audio to start playing
+//
+func NewDriver(a *Adaptor, filename string) *Driver {
+	return &Driver{
+		name:       "Audio",
 		connection: a,
 		interval:   500 * time.Millisecond,
 		filename:   filename,
@@ -27,33 +33,44 @@ func NewAudioDriver(a *AudioAdaptor, name string, filename string) *AudioDriver 
 		Eventer:    gobot.NewEventer(),
 		Commander:  gobot.NewCommander(),
 	}
-	return d
 }
 
-func (d *AudioDriver) Name() string { return d.name }
+// Name returns the Driver Name
+func (d *Driver) Name() string { return d.name }
 
-func (d *AudioDriver) Filename() string { return d.filename }
+// SetName sets the Driver Name
+func (d *Driver) SetName(n string) { d.name = n }
 
-func (d *AudioDriver) Connection() gobot.Connection {
+// Filename returns the file name for the driver to playback
+func (d *Driver) Filename() string { return d.filename }
+
+// Connection returns the Driver Connection
+func (d *Driver) Connection() gobot.Connection {
 	return d.connection
 }
 
-func (d *AudioDriver) Sound(fileName string) []error {
-	return d.Connection().(*AudioAdaptor).Sound(fileName)
+// Sound plays back a sound file. It accepts:
+//
+//  string: The filename of the audio to start playing
+func (d *Driver) Sound(fileName string) []error {
+	return d.Connection().(*Adaptor).Sound(fileName)
 }
 
-func (d *AudioDriver) Play() []error {
+// Play plays back the current sound file.
+func (d *Driver) Play() []error {
 	return d.Sound(d.Filename())
 }
 
-func (d *AudioDriver) adaptor() *AudioAdaptor {
-	return d.Connection().(*AudioAdaptor)
+func (d *Driver) adaptor() *Adaptor {
+	return d.Connection().(*Adaptor)
 }
 
-func (d *AudioDriver) Start() (err []error) {
+// Start starts the Driver
+func (d *Driver) Start() (err error) {
 	return
 }
 
-func (d *AudioDriver) Halt() (err []error) {
+// Halt halts the Driver
+func (d *Driver) Halt() (err error) {
 	return
 }

@@ -33,7 +33,7 @@ Follow the official [OpenCV installation guide](http://docs.opencv.org/doc/tutor
 
 Now you can install the package with
 ```
-go get -d -u github.com/hybridgroup/gobot/... && go install github.com/hybridgroup/gobot/platforms/opencv
+go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/opencv
 ```
 
 ## How to Use
@@ -45,18 +45,16 @@ package main
 
 import (
 	cv "github.com/lazywei/go-opencv/opencv"
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/opencv"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/platforms/opencv"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
-
-	window := opencv.NewWindowDriver("window")
-	camera := opencv.NewCameraDriver("camera", 0)
+	window := opencv.NewWindowDriver()
+	camera := opencv.NewCameraDriver(0)
 
 	work := func() {
-		gobot.On(camera.Event("frame"), func(data interface{}) {
+		camera.On(camera.Event("frame"), func(data interface{}) {
 			window.ShowImage(data.(*cv.IplImage))
 		})
 	}
@@ -66,8 +64,6 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }
 ```

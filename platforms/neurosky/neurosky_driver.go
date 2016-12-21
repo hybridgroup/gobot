@@ -3,39 +3,68 @@ package neurosky
 import (
 	"bytes"
 
-	"github.com/hybridgroup/gobot"
+	"gobot.io/x/gobot"
 )
 
-const BTSync byte = 0xAA
+const (
+	// BTSync is the sync code
+	BTSync byte = 0xAA
 
-// Extended code
-const CodeEx byte = 0x55
+	// CodeEx Extended code
+	CodeEx byte = 0x55
 
-// POOR_SIGNAL quality 0-255
-const CodeSignalQuality byte = 0x02
+	// CodeSignalQuality POOR_SIGNAL quality 0-255
+	CodeSignalQuality byte = 0x02
 
-// ATTENTION eSense 0-100
-const CodeAttention byte = 0x04
+	// CodeAttention ATTENTION eSense 0-100
+	CodeAttention byte = 0x04
 
-// MEDITATION eSense 0-100
-const CodeMeditation byte = 0x05
+	// CodeMeditation MEDITATION eSense 0-100
+	CodeMeditation byte = 0x05
 
-// BLINK strength 0-255
-const CodeBlink byte = 0x16
+	// CodeBlink BLINK strength 0-255
+	CodeBlink byte = 0x16
 
-// RAW wave value: 2-byte big-endian 2s-complement
-const CodeWave byte = 0x80
+	// CodeWave RAW wave value: 2-byte big-endian 2s-complement
+	CodeWave byte = 0x80
 
-// ASIC EEG POWER 8 3-byte big-endian integers
-const CodeAsicEEG byte = 0x83
+	// CodeAsicEEG ASIC EEG POWER 8 3-byte big-endian integers
+	CodeAsicEEG byte = 0x83
 
-type NeuroskyDriver struct {
+	// Extended event
+	Extended = "extended"
+
+	// Signal event
+	Signal = "signal"
+
+	// Attention event
+	Attention = "attention"
+
+	// Meditation event
+	Meditation = "meditation"
+
+	// Blink event
+	Blink = "blink"
+
+	// Wave event
+	Wave = "wave"
+
+	// EEG event
+	EEG = "eeg"
+
+	// Error event
+	Error = "error"
+)
+
+// Driver is the Gobot Driver for the Mindwave
+type Driver struct {
 	name       string
 	connection gobot.Connection
 	gobot.Eventer
 }
 
-type EEG struct {
+// EEGData is the EEG raw data returned from the Mindwave
+type EEGData struct {
 	Delta    int
 	Theta    int
 	LoAlpha  int
@@ -46,7 +75,7 @@ type EEG struct {
 	MidGamma int
 }
 
-// NewNeuroskyDriver creates a NeuroskyDriver by name
+// NewDriver creates a Neurosky Driver
 // and adds the following events:
 //
 //   extended - user's current extended level
@@ -56,35 +85,42 @@ type EEG struct {
 //   blink - user's current blink level
 //   wave - shows wave data
 //   eeg - showing eeg data
-func NewNeuroskyDriver(a *NeuroskyAdaptor, name string) *NeuroskyDriver {
-	n := &NeuroskyDriver{
-		name:       name,
+func NewDriver(a *Adaptor) *Driver {
+	n := &Driver{
+		name:       "Neurosky",
 		connection: a,
 		Eventer:    gobot.NewEventer(),
 	}
 
-	n.AddEvent("extended")
-	n.AddEvent("signal")
-	n.AddEvent("attention")
-	n.AddEvent("meditation")
-	n.AddEvent("blink")
-	n.AddEvent("wave")
-	n.AddEvent("eeg")
-	n.AddEvent("error")
+	n.AddEvent(Extended)
+	n.AddEvent(Signal)
+	n.AddEvent(Attention)
+	n.AddEvent(Meditation)
+	n.AddEvent(Blink)
+	n.AddEvent(Wave)
+	n.AddEvent(EEG)
+	n.AddEvent(Error)
 
 	return n
 }
-func (n *NeuroskyDriver) Connection() gobot.Connection { return n.connection }
-func (n *NeuroskyDriver) Name() string                 { return n.name }
+
+// Connection returns the Driver's connection
+func (n *Driver) Connection() gobot.Connection { return n.connection }
+
+// Name returns the Driver name
+func (n *Driver) Name() string { return n.name }
+
+// SetName sets the Driver name
+func (n *Driver) SetName(name string) { n.name = name }
 
 // adaptor returns neurosky adaptor
-func (n *NeuroskyDriver) adaptor() *NeuroskyAdaptor {
-	return n.Connection().(*NeuroskyAdaptor)
+func (n *Driver) adaptor() *Adaptor {
+	return n.Connection().(*Adaptor)
 }
 
 // Start creates a go routine to listen from serial port
 // and parse buffer readings
-func (n *NeuroskyDriver) Start() (errs []error) {
+func (n *Driver) Start() (err error) {
 	go func() {
 		for {
 			buff := make([]byte, 1024)
@@ -100,10 +136,10 @@ func (n *NeuroskyDriver) Start() (errs []error) {
 }
 
 // Halt stops neurosky driver (void)
-func (n *NeuroskyDriver) Halt() (errs []error) { return }
+func (n *Driver) Halt() (err error) { return }
 
 // parse converts bytes buffer into packets until no more data is present
-func (n *NeuroskyDriver) parse(buf *bytes.Buffer) {
+func (n *Driver) parse(buf *bytes.Buffer) {
 	for buf.Len() > 2 {
 		b1, _ := buf.ReadByte()
 		b2, _ := buf.ReadByte()
@@ -119,7 +155,7 @@ func (n *NeuroskyDriver) parse(buf *bytes.Buffer) {
 }
 
 // parsePacket publishes event according to data parsed
-func (n *NeuroskyDriver) parsePacket(buf *bytes.Buffer) {
+func (n *Driver) parsePacket(buf *bytes.Buffer) {
 	for buf.Len() > 0 {
 		b, _ := buf.ReadByte()
 		switch b {
@@ -153,8 +189,8 @@ func (n *NeuroskyDriver) parsePacket(buf *bytes.Buffer) {
 }
 
 // parseEEG returns data converted into EEG map
-func (n *NeuroskyDriver) parseEEG(data []byte) EEG {
-	return EEG{
+func (n *Driver) parseEEG(data []byte) EEGData {
+	return EEGData{
 		Delta:    n.parse3ByteInteger(data[0:3]),
 		Theta:    n.parse3ByteInteger(data[3:6]),
 		LoAlpha:  n.parse3ByteInteger(data[6:9]),
@@ -166,7 +202,7 @@ func (n *NeuroskyDriver) parseEEG(data []byte) EEG {
 	}
 }
 
-func (n *NeuroskyDriver) parse3ByteInteger(data []byte) int {
+func (n *Driver) parse3ByteInteger(data []byte) int {
 	return ((int(data[0]) << 16) |
 		(((1 << 16) - 1) & (int(data[1]) << 8)) |
 		(((1 << 8) - 1) & int(data[2])))

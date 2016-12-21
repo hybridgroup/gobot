@@ -3,15 +3,14 @@ package main
 import (
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/beaglebone"
-	"github.com/hybridgroup/gobot/platforms/gpio"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/gpio"
+	"gobot.io/x/gobot/platforms/beaglebone"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
-	beagleboneAdaptor := beaglebone.NewBeagleboneAdaptor("beaglebone")
-	led := gpio.NewLedDriver(beagleboneAdaptor, "led", "P9_14")
+	beagleboneAdaptor := beaglebone.NewAdaptor()
+	led := gpio.NewLedDriver(beagleboneAdaptor, "P9_14")
 
 	work := func() {
 		brightness := uint8(0)
@@ -32,7 +31,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

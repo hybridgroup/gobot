@@ -5,7 +5,7 @@ This module implements support for keyboard events, wrapping the `stty` utility.
 ## How to Install
 
 ```
-go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/keyboard
+go get gobot.io/x/gobot && go install gobot.io/x/gobot/platforms/keyboard
 ```
 
 ## How to Use
@@ -18,17 +18,15 @@ package main
 import (
 	"fmt"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/keyboard"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/platforms/keyboard"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
-
-	keys := keyboard.NewKeyboardDriver("keyboard")
+	keys := keyboard.NewDriver()
 
 	work := func() {
-		gobot.On(keys.Event("key"), func(data interface{}) {
+		keys.On(keyboard.Key, func(data interface{}) {
 			key := data.(keyboard.KeyEvent)
 
 			if key.Key == keyboard.A {
@@ -45,8 +43,6 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }
 ```

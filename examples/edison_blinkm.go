@@ -4,16 +4,14 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/i2c"
-	"github.com/hybridgroup/gobot/platforms/intel-iot/edison"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/i2c"
+	"gobot.io/x/gobot/platforms/intel-iot/edison"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
-
-	e := edison.NewEdisonAdaptor("edison")
-	blinkm := i2c.NewBlinkMDriver(e, "blinkm")
+	e := edison.NewAdaptor()
+	blinkm := i2c.NewBlinkMDriver(e)
 
 	work := func() {
 		gobot.Every(3*time.Second, func() {
@@ -32,6 +30,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-	gbot.Start()
+	robot.Start()
 }

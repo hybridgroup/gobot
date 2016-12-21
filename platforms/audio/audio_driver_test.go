@@ -6,27 +6,26 @@ import (
 	"os/exec"
 	"testing"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/gobottest"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/gobottest"
 )
 
-var _ gobot.Driver = (*AudioDriver)(nil)
+var _ gobot.Driver = (*Driver)(nil)
 
 func TestAudioDriver(t *testing.T) {
-	d := NewAudioDriver(NewAudioAdaptor("conn"), "dev", "../../examples/laser.mp3")
+	d := NewDriver(NewAdaptor(), "../../examples/laser.mp3")
 
-	gobottest.Assert(t, d.Name(), "dev")
 	gobottest.Assert(t, d.Filename(), "../../examples/laser.mp3")
 
-	gobottest.Assert(t, d.Connection().Name(), "conn")
+	gobottest.Refute(t, d.Connection(), nil)
 
-	gobottest.Assert(t, len(d.Start()), 0)
+	gobottest.Assert(t, d.Start(), nil)
 
-	gobottest.Assert(t, len(d.Halt()), 0)
+	gobottest.Assert(t, d.Halt(), nil)
 }
 
 func TestAudioDriverSoundWithNoFilename(t *testing.T) {
-	d := NewAudioDriver(NewAudioAdaptor("conn"), "dev", "")
+	d := NewDriver(NewAdaptor(), "")
 
 	errors := d.Sound("")
 	gobottest.Assert(t, errors[0].Error(), "Requires filename for audio file.")
@@ -36,7 +35,7 @@ func TestAudioDriverSoundWithDefaultFilename(t *testing.T) {
 	execCommand = gobottest.ExecCommand
 	defer func() { execCommand = exec.Command }()
 
-	d := NewAudioDriver(NewAudioAdaptor("conn"), "dev", "../../examples/laser.mp3")
+	d := NewDriver(NewAdaptor(), "../../examples/laser.mp3")
 
 	errors := d.Play()
 	gobottest.Assert(t, len(errors), 0)

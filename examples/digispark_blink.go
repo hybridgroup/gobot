@@ -3,16 +3,14 @@ package main
 import (
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/digispark"
-	"github.com/hybridgroup/gobot/platforms/gpio"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/gpio"
+	"gobot.io/x/gobot/platforms/digispark"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
-
-	digisparkAdaptor := digispark.NewDigisparkAdaptor("Digispark")
-	led := gpio.NewLedDriver(digisparkAdaptor, "led", "0")
+	digisparkAdaptor := digispark.NewAdaptor()
+	led := gpio.NewLedDriver(digisparkAdaptor, "0")
 
 	work := func() {
 		gobot.Every(1*time.Second, func() {
@@ -26,7 +24,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

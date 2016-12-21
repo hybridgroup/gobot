@@ -2,17 +2,22 @@ package chip
 
 import (
 	"errors"
+	"os/exec"
+	"strings"
 
-	"github.com/hybridgroup/gobot/sysfs"
+	multierror "github.com/hashicorp/go-multierror"
+	"gobot.io/x/gobot/sysfs"
 )
 
-type ChipAdaptor struct {
+// Adaptor represents a Gobot Adaptor for a C.H.I.P.
+type Adaptor struct {
 	name        string
 	digitalPins map[int]sysfs.DigitalPin
+	pinMap      map[string]int
 	i2cDevice   sysfs.I2cDevice
 }
 
-var pins = map[string]int{
+var pinsOriginal = map[string]int{
 	"XIO-P0": 408,
 	"XIO-P1": 409,
 	"XIO-P2": 410,
@@ -23,42 +28,67 @@ var pins = map[string]int{
 	"XIO-P7": 415,
 }
 
-// NewChipAdaptor creates a ChipAdaptor with the specified name
-func NewChipAdaptor(name string) *ChipAdaptor {
-	c := &ChipAdaptor{
-		name:        name,
+var pins44 = map[string]int{
+	"XIO-P0": 1013,
+	"XIO-P1": 1014,
+	"XIO-P2": 1015,
+	"XIO-P3": 1016,
+	"XIO-P4": 1017,
+	"XIO-P5": 1018,
+	"XIO-P6": 1019,
+	"XIO-P7": 1020,
+}
+
+// NewAdaptor creates a C.H.I.P. Adaptor
+func NewAdaptor() *Adaptor {
+	c := &Adaptor{
+		name:        "CHIP",
 		digitalPins: make(map[int]sysfs.DigitalPin),
 	}
+
+	c.setPins()
 	return c
 }
 
-// Name returns the name of the ChipAdaptor
-func (c *ChipAdaptor) Name() string { return c.name }
+// Name returns the name of the Adaptor
+func (c *Adaptor) Name() string { return c.name }
+
+// SetName sets the name of the Adaptor
+func (c *Adaptor) SetName(n string) { c.name = n }
 
 // Connect initializes the board
-func (c *ChipAdaptor) Connect() (errs []error) {
+func (c *Adaptor) Connect() (err error) {
 	return
 }
 
 // Finalize closes connection to board and pins
-func (c *ChipAdaptor) Finalize() (errs []error) {
+func (c *Adaptor) Finalize() (err error) {
 	for _, pin := range c.digitalPins {
 		if pin != nil {
-			if err := pin.Unexport(); err != nil {
-				errs = append(errs, err)
+			if e := pin.Unexport(); e != nil {
+				err = multierror.Append(err, e)
 			}
 		}
 	}
 	if c.i2cDevice != nil {
-		if err := c.i2cDevice.Close(); err != nil {
-			errs = append(errs, err)
+		if e := c.i2cDevice.Close(); e != nil {
+			err = multierror.Append(err, e)
 		}
 	}
-	return errs
+	return
 }
 
-func (c *ChipAdaptor) translatePin(pin string) (i int, err error) {
-	if val, ok := pins[pin]; ok {
+func (c *Adaptor) setPins() {
+	kernel := getKernel()
+	if kernel[:3] == "4.3" {
+		c.pinMap = pinsOriginal
+	} else {
+		c.pinMap = pins44
+	}
+}
+
+func (c *Adaptor) translatePin(pin string) (i int, err error) {
+	if val, ok := c.pinMap[pin]; ok {
 		i = val
 	} else {
 		err = errors.New("Not a valid pin")
@@ -67,7 +97,7 @@ func (c *ChipAdaptor) translatePin(pin string) (i int, err error) {
 }
 
 // digitalPin returns matched digitalPin for specified values
-func (c *ChipAdaptor) digitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPin, err error) {
+func (c *Adaptor) digitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPin, err error) {
 	i, err := c.translatePin(pin)
 
 	if err != nil {
@@ -90,7 +120,7 @@ func (c *ChipAdaptor) digitalPin(pin string, dir string) (sysfsPin sysfs.Digital
 
 // DigitalRead reads digital value from the specified pin.
 // Valids pins are XIO-P0 through XIO-P7 (pins 13-20 on header 14).
-func (c *ChipAdaptor) DigitalRead(pin string) (val int, err error) {
+func (c *Adaptor) DigitalRead(pin string) (val int, err error) {
 	sysfsPin, err := c.digitalPin(pin, sysfs.IN)
 	if err != nil {
 		return
@@ -100,7 +130,7 @@ func (c *ChipAdaptor) DigitalRead(pin string) (val int, err error) {
 
 // DigitalWrite writes digital value to the specified pin.
 // Valids pins are XIO-P0 through XIO-P7 (pins 13-20 on header 14).
-func (c *ChipAdaptor) DigitalWrite(pin string, val byte) (err error) {
+func (c *Adaptor) DigitalWrite(pin string, val byte) (err error) {
 	sysfsPin, err := c.digitalPin(pin, sysfs.OUT)
 	if err != nil {
 		return err
@@ -111,7 +141,7 @@ func (c *ChipAdaptor) DigitalWrite(pin string, val byte) (err error) {
 // I2cStart starts an i2c device in specified address.
 // This assumes that the bus used is /dev/i2c-1, which corresponds to
 // pins labeled TWI1-SDA and TW1-SCK (pins 9 and 11 on header 13).
-func (c *ChipAdaptor) I2cStart(address int) (err error) {
+func (c *Adaptor) I2cStart(address int) (err error) {
 	if c.i2cDevice == nil {
 		c.i2cDevice, err = sysfs.NewI2cDevice("/dev/i2c-1", address)
 	}
@@ -119,7 +149,7 @@ func (c *ChipAdaptor) I2cStart(address int) (err error) {
 }
 
 // I2cWrite writes data to i2c device
-func (c *ChipAdaptor) I2cWrite(address int, data []byte) (err error) {
+func (c *Adaptor) I2cWrite(address int, data []byte) (err error) {
 	if err = c.i2cDevice.SetAddress(address); err != nil {
 		return
 	}
@@ -128,11 +158,17 @@ func (c *ChipAdaptor) I2cWrite(address int, data []byte) (err error) {
 }
 
 // I2cRead returns value from i2c device using specified size
-func (c *ChipAdaptor) I2cRead(address int, size int) (data []byte, err error) {
+func (c *Adaptor) I2cRead(address int, size int) (data []byte, err error) {
 	if err = c.i2cDevice.SetAddress(address); err != nil {
 		return
 	}
 	data = make([]byte, size)
 	_, err = c.i2cDevice.Read(data)
 	return
+}
+
+func getKernel() string {
+	result, _ := exec.Command("uname", "-r").Output()
+
+	return strings.TrimSpace(string(result))
 }

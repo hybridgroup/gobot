@@ -4,15 +4,14 @@ import (
 	"os"
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/ble"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/platforms/ble"
+	"gobot.io/x/gobot/platforms/sphero/ollie"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
-
-	bleAdaptor := ble.NewBLEClientAdaptor("ble", os.Args[1])
-	ollie := ble.NewSpheroOllieDriver(bleAdaptor, "ollie")
+	bleAdaptor := ble.NewClientAdaptor(os.Args[1])
+	ollie := ollie.NewDriver(bleAdaptor)
 
 	work := func() {
 		ollie.SetRGB(255, 0, 255)
@@ -27,7 +26,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

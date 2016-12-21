@@ -1,6 +1,6 @@
 # NATS
 
-NATS is a lightweight messaging protocol perfect for your IoT/Robotics projects. It operates over TCP, offers a great number of features but an incredibly simple Pub Sub style model of communicating broadcast messages. NATS is blazingly fast as it is written in Go. 
+NATS is a lightweight messaging protocol perfect for your IoT/Robotics projects. It operates over TCP, offers a great number of features but an incredibly simple Pub Sub style model of communicating broadcast messages. NATS is blazingly fast as it is written in Go.
 
 This repository contains the Gobot adaptor/drivers to connect to NATS servers. It uses the NATS Go Client available at https://github.com/nats-io/nats. The NATS project is maintained by Nats.io and sponsored by Apcera. Find more information on setting up a NATS server and its capability at http://nats.io/.
 
@@ -11,7 +11,7 @@ The NATS messaging protocol (http://www.nats.io/documentation/internals/nats-pro
 Install running:
 
 ```
-go get -d -u github.com/hybridgroup/gobot/... && go install github.com/hybridgroup/gobot/platforms/nats
+go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/nats
 ```
 
 ## How to Use
@@ -25,13 +25,11 @@ import (
   "fmt"
   "time"
 
-  "github.com/hybridgroup/gobot"
-  "github.com/hybridgroup/gobot/platforms/nats"
+  "gobot.io/x/gobot"
+  "gobot.io/x/gobot/platforms/nats"
 )
 
 func main() {
-  gbot := gobot.NewGobot()
-
   natsAdaptor := nats.NewNatsAdaptor("nats", "localhost:4222", 1234)
 
   work := func() {
@@ -55,27 +53,25 @@ func main() {
     work,
   )
 
-  gbot.AddRobot(robot)
-
-  gbot.Start()
+  robot.Start()
 }
 ```
 
-## Supported Features
+### Supported Features
 
 * Publish messages
 * Respond to incoming message events
+* Support for Username/password authentication
 
-## Upcoming Features
+### Upcoming Features
 
-* Support for Username/password
 * Encoded messages (JSON)
 * Exposing more NATS Features (tls)
 * Simplified tests
 
 ## Contributing
 
-For our contribution guidelines, please go to https://github.com/hybridgroup/gobot/blob/master/CONTRIBUTING.md
+For our contribution guidelines, please go to https://gobot.io/x/gobot/blob/master/CONTRIBUTING.md
 
 ## License
 

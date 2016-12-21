@@ -3,15 +3,13 @@ package main
 import (
 	"fmt"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/leap"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/platforms/leap"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
-
-	leapMotionAdaptor := leap.NewLeapMotionAdaptor("leap", "127.0.0.1:6437")
-	l := leap.NewLeapMotionDriver(leapMotionAdaptor, "leap")
+	leapMotionAdaptor := leap.NewAdaptor("127.0.0.1:6437")
+	l := leap.NewDriver(leapMotionAdaptor)
 
 	work := func() {
 		l.On(leap.HandEvent, func(data interface{}) {
@@ -25,9 +23,7 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }
 
 func printHand(hand leap.Hand) {

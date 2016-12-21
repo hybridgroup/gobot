@@ -4,31 +4,31 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/gobottest"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/gobottest"
 )
 
-var _ gobot.Adaptor = (*JoystickAdaptor)(nil)
+var _ gobot.Adaptor = (*Adaptor)(nil)
 
-func initTestJoystickAdaptor() *JoystickAdaptor {
-	a := NewJoystickAdaptor("bot")
-	a.connect = func(j *JoystickAdaptor) (err error) {
+func initTestAdaptor() *Adaptor {
+	a := NewAdaptor()
+	a.connect = func(j *Adaptor) (err error) {
 		j.joystick = &testJoystick{}
 		return nil
 	}
 	return a
 }
 
-func TestJoystickAdaptorConnect(t *testing.T) {
-	a := initTestJoystickAdaptor()
-	gobottest.Assert(t, len(a.Connect()), 0)
+func TestAdaptorConnect(t *testing.T) {
+	a := initTestAdaptor()
+	gobottest.Assert(t, a.Connect(), nil)
 
-	a = NewJoystickAdaptor("bot")
-	gobottest.Assert(t, a.Connect()[0], errors.New("No joystick available"))
+	a = NewAdaptor()
+	gobottest.Assert(t, a.Connect(), errors.New("No joystick available"))
 }
 
-func TestJoystickAdaptorFinalize(t *testing.T) {
-	a := initTestJoystickAdaptor()
+func TestAdaptorFinalize(t *testing.T) {
+	a := initTestAdaptor()
 	a.Connect()
-	gobottest.Assert(t, len(a.Finalize()), 0)
+	gobottest.Assert(t, a.Finalize(), nil)
 }

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hybridgroup/gobot/platforms/firmata/client"
-	"github.com/tarm/goserial"
+	"gobot.io/x/gobot/platforms/firmata/client"
+	"github.com/tarm/serial"
 )
 
 func main() {
@@ -40,6 +40,6 @@ func main() {
 			panic(err)
 		}
 		fmt.Println("level:", level)
-		<-time.After(500 * time.Millisecond)
+		time.Sleep(500 * time.Millisecond)
 	}
 }

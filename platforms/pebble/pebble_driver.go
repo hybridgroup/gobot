@@ -1,10 +1,10 @@
 package pebble
 
 import (
-	"github.com/hybridgroup/gobot"
+	"gobot.io/x/gobot"
 )
 
-type PebbleDriver struct {
+type Driver struct {
 	name       string
 	connection gobot.Connection
 	gobot.Commander
@@ -12,7 +12,7 @@ type PebbleDriver struct {
 	Messages []string
 }
 
-// NewPebbleDriver creates a new pebble driver with specified name
+// NewDriver creates a new pebble driver
 // Adds following events:
 //		button - Sent when a pebble button is pressed
 //		accel - Pebble watch acceleromenter data
@@ -21,9 +21,9 @@ type PebbleDriver struct {
 //		"publish_event"
 //		"send_notification"
 //		"pending_message"
-func NewPebbleDriver(adaptor *PebbleAdaptor, name string) *PebbleDriver {
-	p := &PebbleDriver{
-		name:       name,
+func NewDriver(adaptor *Adaptor) *Driver {
+	p := &Driver{
+		name:       "Pebble",
 		connection: adaptor,
 		Messages:   []string{},
 		Eventer:    gobot.NewEventer(),
@@ -50,29 +50,30 @@ func NewPebbleDriver(adaptor *PebbleAdaptor, name string) *PebbleDriver {
 
 	return p
 }
-func (d *PebbleDriver) Name() string                 { return d.name }
-func (d *PebbleDriver) Connection() gobot.Connection { return d.connection }
+func (d *Driver) Name() string                 { return d.name }
+func (d *Driver) SetName(n string)             { d.name = n }
+func (d *Driver) Connection() gobot.Connection { return d.connection }
 
 // Start returns true if driver is initialized correctly
-func (d *PebbleDriver) Start() (errs []error) { return }
+func (d *Driver) Start() (err error) { return }
 
 // Halt returns true if driver is halted successfully
-func (d *PebbleDriver) Halt() (errs []error) { return }
+func (d *Driver) Halt() (err error) { return }
 
 // PublishEvent publishes event with specified name and data in gobot
-func (d *PebbleDriver) PublishEvent(name string, data string) {
+func (d *Driver) PublishEvent(name string, data string) {
 	d.Publish(d.Event(name), data)
 }
 
 // SendNotification appends message to list of notifications to be sent to watch
-func (d *PebbleDriver) SendNotification(message string) string {
+func (d *Driver) SendNotification(message string) string {
 	d.Messages = append(d.Messages, message)
 	return message
 }
 
 // PendingMessages returns messages to be sent as notifications to pebble
 // (Not intended to be used directly)
-func (d *PebbleDriver) PendingMessage() string {
+func (d *Driver) PendingMessage() string {
 	if len(d.Messages) < 1 {
 		return ""
 	}

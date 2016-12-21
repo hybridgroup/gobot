@@ -5,31 +5,32 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/gobottest"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/gobottest"
 	cv "github.com/lazywei/go-opencv/opencv"
 )
 
 var _ gobot.Driver = (*WindowDriver)(nil)
 
 func initTestWindowDriver() *WindowDriver {
-	d := NewWindowDriver("bot")
+	d := NewWindowDriver()
 	return d
 }
 
 func TestWindowDriver(t *testing.T) {
 	d := initTestWindowDriver()
-	gobottest.Assert(t, d.Name(), "bot")
+	gobottest.Assert(t, d.Name(), "Window")
 	gobottest.Assert(t, d.Connection(), (gobot.Connection)(nil))
 }
+
 func TestWindowDriverStart(t *testing.T) {
 	d := initTestWindowDriver()
-	gobottest.Assert(t, len(d.Start()), 0)
+	gobottest.Assert(t, d.Start(), nil)
 }
 
 func TestWindowDriverHalt(t *testing.T) {
 	d := initTestWindowDriver()
-	gobottest.Assert(t, len(d.Halt()), 0)
+	gobottest.Assert(t, d.Halt(), nil)
 }
 
 func TestWindowDriverShowImage(t *testing.T) {

@@ -1,25 +1,23 @@
 package main
 
 import (
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/firmata"
-	"github.com/hybridgroup/gobot/platforms/gpio"
-	"github.com/hybridgroup/gobot/platforms/leap"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/gpio"
+	"gobot.io/x/gobot/platforms/firmata"
+	"gobot.io/x/gobot/platforms/leap"
 )
 
 // Video: https://www.youtube.com/watch?v=ayNMyUfdAqc
 func main() {
-	gbot := gobot.NewGobot()
+	firmataAdaptor := firmata.NewAdaptor("/dev/tty.usbmodem1451")
+	servo1 := gpio.NewServoDriver(firmataAdaptor, "3")
+	servo2 := gpio.NewServoDriver(firmataAdaptor, "4")
+	servo3 := gpio.NewServoDriver(firmataAdaptor, "5")
+	servo4 := gpio.NewServoDriver(firmataAdaptor, "6")
+	servo5 := gpio.NewServoDriver(firmataAdaptor, "7")
 
-	firmataAdaptor := firmata.NewFirmataAdaptor("firmata", "/dev/tty.usbmodem1451")
-	servo1 := gpio.NewServoDriver(firmataAdaptor, "servo", "3")
-	servo2 := gpio.NewServoDriver(firmataAdaptor, "servo", "4")
-	servo3 := gpio.NewServoDriver(firmataAdaptor, "servo", "5")
-	servo4 := gpio.NewServoDriver(firmataAdaptor, "servo", "6")
-	servo5 := gpio.NewServoDriver(firmataAdaptor, "servo", "7")
-
-	leapMotionAdaptor := leap.NewLeapMotionAdaptor("leap", "127.0.0.1:6437")
-	l := leap.NewLeapMotionDriver(leapMotionAdaptor, "leap")
+	leapMotionAdaptor := leap.NewAdaptor("127.0.0.1:6437")
+	l := leap.NewDriver(leapMotionAdaptor)
 
 	work := func() {
 		fist := false
@@ -49,6 +47,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-	gbot.Start()
+	robot.Start()
 }

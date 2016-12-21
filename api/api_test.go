@@ -11,13 +11,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/gobottest"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/gobottest"
 )
 
 func initTestAPI() *API {
 	log.SetOutput(NullReadWriteCloser{})
-	g := gobot.NewGobot()
+	g := gobot.NewMaster()
 	a := NewAPI(g)
 	a.start = func(m *API) {}
 	a.Start()
@@ -371,22 +371,22 @@ func TestRobotDeviceEvent(t *testing.T) {
 	server := httptest.NewServer(a)
 	defer server.Close()
 
-	eventsUrl := "/api/robots/Robot1/devices/Device1/events/"
+	eventsURL := "/api/robots/Robot1/devices/Device1/events/"
 
 	// known event
 	respc := make(chan *http.Response, 1)
 	go func() {
-		resp, _ := http.Get(server.URL + eventsUrl + "TestEvent")
+		resp, _ := http.Get(server.URL + eventsURL + "TestEvent")
 		respc <- resp
 	}()
 
-	event := a.gobot.Robot("Robot1").
+	event := a.master.Robot("Robot1").
 		Device("Device1").(gobot.Eventer).
 		Event("TestEvent")
 
 	go func() {
 		time.Sleep(time.Millisecond * 5)
-		a.gobot.Robot("Robot1").
+		a.master.Robot("Robot1").
 			Device("Device1").(gobot.Eventer).Publish(event, "event-data")
 	}()
 
@@ -409,7 +409,7 @@ func TestRobotDeviceEvent(t *testing.T) {
 	server.CloseClientConnections()
 
 	// unknown event
-	response, _ := http.Get(server.URL + eventsUrl + "UnknownEvent")
+	response, _ := http.Get(server.URL + eventsURL + "UnknownEvent")
 
 	var body map[string]interface{}
 	json.NewDecoder(response.Body).Decode(&body)

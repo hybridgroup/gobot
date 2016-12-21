@@ -5,11 +5,11 @@ import (
 	"io"
 	"testing"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/gobottest"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/gobottest"
 )
 
-var _ gobot.Adaptor = (*MavlinkAdaptor)(nil)
+var _ gobot.Adaptor = (*Adaptor)(nil)
 
 type nullReadWriteCloser struct{}
 
@@ -44,8 +44,8 @@ func (nullReadWriteCloser) Close() error {
 	return testAdaptorClose()
 }
 
-func initTestMavlinkAdaptor() *MavlinkAdaptor {
-	m := NewMavlinkAdaptor("myAdaptor", "/dev/null")
+func initTestMavlinkAdaptor() *Adaptor {
+	m := NewAdaptor("/dev/null")
 	m.sp = nullReadWriteCloser{}
 	m.connect = func(port string) (io.ReadWriteCloser, error) { return nil, nil }
 	return m
@@ -53,23 +53,22 @@ func initTestMavlinkAdaptor() *MavlinkAdaptor {
 
 func TestMavlinkAdaptor(t *testing.T) {
 	a := initTestMavlinkAdaptor()
-	gobottest.Assert(t, a.Name(), "myAdaptor")
 	gobottest.Assert(t, a.Port(), "/dev/null")
 }
 func TestMavlinkAdaptorConnect(t *testing.T) {
 	a := initTestMavlinkAdaptor()
-	gobottest.Assert(t, len(a.Connect()), 0)
+	gobottest.Assert(t, a.Connect(), nil)
 
 	a.connect = func(port string) (io.ReadWriteCloser, error) { return nil, errors.New("connect error") }
-	gobottest.Assert(t, a.Connect()[0], errors.New("connect error"))
+	gobottest.Assert(t, a.Connect(), errors.New("connect error"))
 }
 
 func TestMavlinkAdaptorFinalize(t *testing.T) {
 	a := initTestMavlinkAdaptor()
-	gobottest.Assert(t, len(a.Finalize()), 0)
+	gobottest.Assert(t, a.Finalize(), nil)
 
 	testAdaptorClose = func() error {
 		return errors.New("close error")
 	}
-	gobottest.Assert(t, a.Finalize()[0], errors.New("close error"))
+	gobottest.Assert(t, a.Finalize(), errors.New("close error"))
 }

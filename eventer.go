@@ -1,5 +1,7 @@
 package gobot
 
+import "sync"
+
 type eventChannel chan *Event
 
 type eventer struct {
@@ -11,6 +13,9 @@ type eventer struct {
 
 	// map of out channels used by subscribers
 	outs map[eventChannel]eventChannel
+
+	// mutex to protect the eventChannel map
+	eventsMutex sync.Mutex
 }
 
 // Eventer is the interface which describes how a Driver or Adaptor
@@ -58,9 +63,11 @@ func NewEventer() Eventer {
 		for {
 			select {
 			case evt := <-evtr.in:
+				evtr.eventsMutex.Lock()
 				for _, out := range evtr.outs {
 					out <- evt
 				}
+				evtr.eventsMutex.Unlock()
 			}
 		}
 	}()
@@ -97,6 +104,8 @@ func (e *eventer) Publish(name string, data interface{}) {
 
 // Subscribe to any events from this eventer
 func (e *eventer) Subscribe() eventChannel {
+	e.eventsMutex.Lock()
+	defer e.eventsMutex.Unlock()
 	out := make(eventChannel)
 	e.outs[out] = out
 	return out
@@ -104,6 +113,8 @@ func (e *eventer) Subscribe() eventChannel {
 
 // Unsubscribe from the event channel
 func (e *eventer) Unsubscribe(events eventChannel) {
+	e.eventsMutex.Lock()
+	defer e.eventsMutex.Unlock()
 	delete(e.outs, events)
 }
 
@@ -129,14 +140,11 @@ func (e *eventer) Once(n string, f func(s interface{})) (err error) {
 	out := e.Subscribe()
 	go func() {
 	ProcessEvents:
-		for {
-			select {
-			case evt := <-out:
-				if evt.Name == n {
-					f(evt.Data)
-					e.Unsubscribe(out)
-					break ProcessEvents
-				}
+		for evt := range out {
+			if evt.Name == n {
+				f(evt.Data)
+				e.Unsubscribe(out)
+				break ProcessEvents
 			}
 		}
 	}()

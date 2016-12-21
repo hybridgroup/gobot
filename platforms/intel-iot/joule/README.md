@@ -24,16 +24,14 @@ package main
 import (
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/gpio"
-	"github.com/hybridgroup/gobot/platforms/intel-iot/joule"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/gpio"
+	"gobot.io/x/gobot/platforms/intel-iot/joule"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
-
-	e := joule.NewJouleAdaptor("joule")
-	led := gpio.NewLedDriver(e, "led", "103")
+	e := joule.NewAdaptor()
+	led := gpio.NewLedDriver(e, "103")
 
 	work := func() {
 		gobot.Every(1*time.Second, func() {
@@ -47,13 +45,11 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }
 ```
 
-You can read the [full API documentation online](http://godoc.org/github.com/hybridgroup/gobot).
+You can read the [full API documentation online](http://godoc.org/gobot.io/x/gobot).
 
 #### Cross compiling for the Intel Joule
 

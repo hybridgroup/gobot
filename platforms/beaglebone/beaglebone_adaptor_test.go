@@ -5,22 +5,22 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/gobottest"
-	"github.com/hybridgroup/gobot/platforms/gpio"
-	"github.com/hybridgroup/gobot/platforms/i2c"
-	"github.com/hybridgroup/gobot/sysfs"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/gpio"
+	"gobot.io/x/gobot/drivers/i2c"
+	"gobot.io/x/gobot/gobottest"
+	"gobot.io/x/gobot/sysfs"
 )
 
-var _ gobot.Adaptor = (*BeagleboneAdaptor)(nil)
+var _ gobot.Adaptor = (*Adaptor)(nil)
 
-var _ gpio.DigitalReader = (*BeagleboneAdaptor)(nil)
-var _ gpio.DigitalWriter = (*BeagleboneAdaptor)(nil)
-var _ gpio.AnalogReader = (*BeagleboneAdaptor)(nil)
-var _ gpio.PwmWriter = (*BeagleboneAdaptor)(nil)
-var _ gpio.ServoWriter = (*BeagleboneAdaptor)(nil)
+var _ gpio.DigitalReader = (*Adaptor)(nil)
+var _ gpio.DigitalWriter = (*Adaptor)(nil)
+var _ gpio.AnalogReader = (*Adaptor)(nil)
+var _ gpio.PwmWriter = (*Adaptor)(nil)
+var _ gpio.ServoWriter = (*Adaptor)(nil)
 
-var _ i2c.I2c = (*BeagleboneAdaptor)(nil)
+var _ i2c.I2c = (*Adaptor)(nil)
 
 type NullReadWriteCloser struct {
 	contents []byte
@@ -42,7 +42,7 @@ func (n *NullReadWriteCloser) Read(b []byte) (int, error) {
 	return len(b), nil
 }
 
-var closeErr error = nil
+var closeErr error
 
 func (n *NullReadWriteCloser) Close() error {
 	return closeErr
@@ -54,16 +54,15 @@ func TestBeagleboneAdaptor(t *testing.T) {
 	}
 	fs := sysfs.NewMockFilesystem([]string{
 		"/dev/i2c-1",
-		"/sys/devices/bone_capemgr.4",
-		"/sys/devices/ocp.3",
-		"/sys/devices/ocp.3/gpio-leds.8/leds/beaglebone:green:usr1/brightness",
-		"/sys/devices/ocp.3/helper.5",
-		"/sys/devices/ocp.3/helper.5/AIN1",
-		"/sys/devices/ocp.3/pwm_test_P9_14.5",
-		"/sys/devices/ocp.3/pwm_test_P9_14.5/run",
-		"/sys/devices/ocp.3/pwm_test_P9_14.5/period",
-		"/sys/devices/ocp.3/pwm_test_P9_14.5/polarity",
-		"/sys/devices/ocp.3/pwm_test_P9_14.5/duty",
+		"/sys/devices/platform/bone_capemgr",
+		"/sys/devices/platform/ocp/ocp4",
+		"/sys/class/leds/beaglebone:green:usr1/brightness",
+		"/sys/bus/iio/devices/iio:device0/in_voltage1_raw",
+		"/sys/devices/platform/ocp/ocp4/pwm_test_P9_14.5",
+		"/sys/devices/platform/ocp/ocp4/pwm_test_P9_14.5/run",
+		"/sys/devices/platform/ocp/ocp4/pwm_test_P9_14.5/period",
+		"/sys/devices/platform/ocp/ocp4/pwm_test_P9_14.5/polarity",
+		"/sys/devices/platform/ocp/ocp4/pwm_test_P9_14.5/duty",
 		"/sys/class/gpio/export",
 		"/sys/class/gpio/unexport",
 		"/sys/class/gpio/gpio60/value",
@@ -73,13 +72,14 @@ func TestBeagleboneAdaptor(t *testing.T) {
 	})
 
 	sysfs.SetFilesystem(fs)
-	a := NewBeagleboneAdaptor("myAdaptor")
-	a.slots = "/sys/devices/bone_capemgr.4"
-	a.ocp = "/sys/devices/ocp.3"
+	a := NewAdaptor()
+	a.slots = "/sys/devices/platform/bone_capemgr"
+	a.ocp = "/sys/devices/platform/ocp/ocp4"
+	a.kernel = "4.4"
 
 	a.Connect()
 
-	a.helper = "/sys/devices/ocp.3/helper.5"
+	a.analogPath = "/sys/bus/iio/devices/iio:device0"
 
 	// PWM
 	glob = func(pattern string) (matches []string, err error) {
@@ -91,39 +91,39 @@ func TestBeagleboneAdaptor(t *testing.T) {
 	a.PwmWrite("P9_14", 175)
 	gobottest.Assert(
 		t,
-		fs.Files["/sys/devices/ocp.3/pwm_test_P9_14.5/period"].Contents,
+		fs.Files["/sys/devices/platform/ocp/ocp4/pwm_test_P9_14.5/period"].Contents,
 		"500000",
 	)
 	gobottest.Assert(
 		t,
-		fs.Files["/sys/devices/ocp.3/pwm_test_P9_14.5/duty"].Contents,
+		fs.Files["/sys/devices/platform/ocp/ocp4/pwm_test_P9_14.5/duty"].Contents,
 		"343137",
 	)
 
 	a.ServoWrite("P9_14", 100)
 	gobottest.Assert(
 		t,
-		fs.Files["/sys/devices/ocp.3/pwm_test_P9_14.5/period"].Contents,
+		fs.Files["/sys/devices/platform/ocp/ocp4/pwm_test_P9_14.5/period"].Contents,
 		"16666666",
 	)
 	gobottest.Assert(
 		t,
-		fs.Files["/sys/devices/ocp.3/pwm_test_P9_14.5/duty"].Contents,
+		fs.Files["/sys/devices/platform/ocp/ocp4/pwm_test_P9_14.5/duty"].Contents,
 		"1898148",
 	)
 
 	// Analog
-	fs.Files["/sys/devices/ocp.3/helper.5/AIN1"].Contents = "567\n"
+	fs.Files["/sys/bus/iio/devices/iio:device0/in_voltage1_raw"].Contents = "567\n"
 	i, _ := a.AnalogRead("P9_40")
 	gobottest.Assert(t, i, 567)
 
-	i, err := a.AnalogRead("P9_99")
+	_, err := a.AnalogRead("P9_99")
 	gobottest.Assert(t, err, errors.New("Not a valid pin"))
 
 	// DigitalIO
 	a.DigitalWrite("usr1", 1)
 	gobottest.Assert(t,
-		fs.Files["/sys/devices/ocp.3/gpio-leds.8/leds/beaglebone:green:usr1/brightness"].Contents,
+		fs.Files["/sys/class/leds/beaglebone:green:usr1/brightness"].Contents,
 		"1",
 	)
 
@@ -146,5 +146,5 @@ func TestBeagleboneAdaptor(t *testing.T) {
 	data, _ := a.I2cRead(0xff, 2)
 	gobottest.Assert(t, data, []byte{0x00, 0x01})
 
-	gobottest.Assert(t, len(a.Finalize()), 0)
+	gobottest.Assert(t, a.Finalize(), nil)
 }

@@ -5,15 +5,13 @@ import (
 	"os"
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/ble"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/platforms/ble"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
-
-	bleAdaptor := ble.NewBLEClientAdaptor("ble", os.Args[1])
-	battery := ble.NewBLEBatteryDriver(bleAdaptor, "battery")
+	bleAdaptor := ble.NewClientAdaptor(os.Args[1])
+	battery := ble.NewBatteryDriver(bleAdaptor)
 
 	work := func() {
 		gobot.Every(5*time.Second, func() {
@@ -27,7 +25,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

@@ -3,6 +3,10 @@ package gobot
 import (
 	"fmt"
 	"log"
+	"os"
+	"os/signal"
+
+	multierror "github.com/hashicorp/go-multierror"
 )
 
 // JSONRobot a JSON representation of a Robot.
@@ -42,6 +46,9 @@ type Robot struct {
 	Work        func()
 	connections *Connections
 	devices     *Devices
+	trap        func(chan os.Signal)
+	AutoRun     bool
+	done        chan bool
 	Commander
 	Eventer
 }
@@ -55,12 +62,14 @@ func (r *Robots) Len() int {
 }
 
 // Start calls the Start method of each Robot in the collection
-func (r *Robots) Start() (errs []error) {
+func (r *Robots) Start(args ...interface{}) (err error) {
+	autoRun := true
+	if args[0] != nil {
+		autoRun = args[0].(bool)
+	}
 	for _, robot := range *r {
-		if errs = robot.Start(); len(errs) > 0 {
-			for i, err := range errs {
-				errs[i] = fmt.Errorf("Robot %q: %v", robot.Name, err)
-			}
+		if rerr := robot.Start(autoRun); rerr != nil {
+			err = multierror.Append(err, rerr)
 			return
 		}
 	}
@@ -68,12 +77,10 @@ func (r *Robots) Start() (errs []error) {
 }
 
 // Stop calls the Stop method of each Robot in the collection
-func (r *Robots) Stop() (errs []error) {
+func (r *Robots) Stop() (err error) {
 	for _, robot := range *r {
-		if errs = robot.Stop(); len(errs) > 0 {
-			for i, err := range errs {
-				errs[i] = fmt.Errorf("Robot %q: %v", robot.Name, err)
-			}
+		if rerr := robot.Stop(); rerr != nil {
+			err = multierror.Append(err, rerr)
 			return
 		}
 	}
@@ -87,30 +94,31 @@ func (r *Robots) Each(f func(*Robot)) {
 	}
 }
 
-// NewRobot returns a new Robot given a name and optionally accepts:
+// NewRobot returns a new Robot given optional accepts:
 //
 // 	[]Connection: Connections which are automatically started and stopped with the robot
 //	[]Device: Devices which are automatically started and stopped with the robot
 //	func(): The work routine the robot will execute once all devices and connections have been initialized and started
 // A name will be automaically generated if no name is supplied.
-func NewRobot(name string, v ...interface{}) *Robot {
-	if name == "" {
-		name = fmt.Sprintf("%X", Rand(int(^uint(0)>>1)))
-	}
-
+func NewRobot(v ...interface{}) *Robot {
 	r := &Robot{
-		Name:        name,
+		Name:        fmt.Sprintf("%X", Rand(int(^uint(0)>>1))),
 		connections: &Connections{},
 		devices:     &Devices{},
-		Work:        nil,
-		Eventer:     NewEventer(),
-		Commander:   NewCommander(),
+		done:        make(chan bool, 1),
+		trap: func(c chan os.Signal) {
+			signal.Notify(c, os.Interrupt)
+		},
+		AutoRun:   true,
+		Work:      nil,
+		Eventer:   NewEventer(),
+		Commander: NewCommander(),
 	}
-
-	log.Println("Initializing Robot", r.Name, "...")
 
 	for i := range v {
 		switch v[i].(type) {
+		case string:
+			r.Name = v[i].(string)
 		case []Connection:
 			log.Println("Initializing connections...")
 			for _, connection := range v[i].([]Connection) {
@@ -128,33 +136,69 @@ func NewRobot(name string, v ...interface{}) *Robot {
 		}
 	}
 
+	log.Println("Robot", r.Name, "initialized.")
+
 	return r
 }
 
 // Start a Robot's Connections, Devices, and work.
-func (r *Robot) Start() (errs []error) {
+func (r *Robot) Start(args ...interface{}) (err error) {
+	if len(args) > 0 && args[0] != nil {
+		r.AutoRun = args[0].(bool)
+	}
 	log.Println("Starting Robot", r.Name, "...")
-	if cerrs := r.Connections().Start(); len(cerrs) > 0 {
-		errs = append(errs, cerrs...)
+	if cerr := r.Connections().Start(); cerr != nil {
+		err = multierror.Append(err, cerr)
 		return
 	}
-	if derrs := r.Devices().Start(); len(derrs) > 0 {
-		errs = append(errs, derrs...)
+	if derr := r.Devices().Start(); derr != nil {
+		err = multierror.Append(err, derr)
 		return
 	}
-	if r.Work != nil {
-		log.Println("Starting work...")
+	if r.Work == nil {
+		r.Work = func() {}
+	}
+
+	log.Println("Starting work...")
+	go func() {
 		r.Work()
+		<-r.done
+	}()
+
+	if r.AutoRun {
+		c := make(chan os.Signal, 1)
+		r.trap(c)
+		if err != nil {
+			// there was an error during start, so we immediately pass the interrupt
+			// in order to disconnect the initialized robots, connections and devices
+			c <- os.Interrupt
+		}
+
+		// waiting for interrupt coming on the channel
+		<-c
+
+		// Stop calls the Stop method on itself, if we are "auto-running".
+		r.Stop()
 	}
+
 	return
 }
 
 // Stop stops a Robot's connections and Devices
-func (r *Robot) Stop() (errs []error) {
+func (r *Robot) Stop() error {
+	var result error
 	log.Println("Stopping Robot", r.Name, "...")
-	errs = append(errs, r.Devices().Halt()...)
-	errs = append(errs, r.Connections().Finalize()...)
-	return errs
+	err := r.Devices().Halt()
+	if err != nil {
+		result = multierror.Append(result, err)
+	}
+	err = r.Connections().Finalize()
+	if err != nil {
+		result = multierror.Append(result, err)
+	}
+
+	r.done <- true
+	return result
 }
 
 // Devices returns all devices associated with this Robot.

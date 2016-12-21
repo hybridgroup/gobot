@@ -3,16 +3,14 @@ package main
 import (
 	"fmt"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/chip"
-	"github.com/hybridgroup/gobot/platforms/gpio"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/gpio"
+	"gobot.io/x/gobot/platforms/chip"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
-
-	chipAdaptor := chip.NewChipAdaptor("chip")
-	button := gpio.NewButtonDriver(chipAdaptor, "button", "XIO-P0")
+	chipAdaptor := chip.NewAdaptor()
+	button := gpio.NewButtonDriver(chipAdaptor, "XIO-P0")
 
 	work := func() {
 		button.On(gpio.ButtonPush, func(data interface{}) {
@@ -29,6 +27,6 @@ func main() {
 		[]gobot.Device{button},
 		work,
 	)
-	gbot.AddRobot(robot)
-	gbot.Start()
+
+	robot.Start()
 }

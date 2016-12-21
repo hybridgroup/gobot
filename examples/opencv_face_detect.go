@@ -5,8 +5,8 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/opencv"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/platforms/opencv"
 	cv "github.com/lazywei/go-opencv/opencv"
 )
 
@@ -14,10 +14,8 @@ func main() {
 	_, currentfile, _, _ := runtime.Caller(0)
 	cascade := path.Join(path.Dir(currentfile), "haarcascade_frontalface_alt.xml")
 
-	gbot := gobot.NewGobot()
-
-	window := opencv.NewWindowDriver("window")
-	camera := opencv.NewCameraDriver("camera", 0)
+	window := opencv.NewWindowDriver()
+	camera := opencv.NewCameraDriver(0)
 
 	work := func() {
 		var image *cv.IplImage
@@ -43,7 +41,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

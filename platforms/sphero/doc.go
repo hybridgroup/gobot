@@ -3,7 +3,7 @@ Package sphero provides the Gobot adaptor and driver for the Sphero.
 
 Installing:
 
-	go get github.com/hybridgroup/gobot/platforms/sphero
+	go get gobot.io/x/gobot/platforms/sphero
 
 Example:
 
@@ -13,15 +13,13 @@ Example:
 		"fmt"
 		"time"
 
-		"github.com/hybridgroup/gobot"
-		"github.com/hybridgroup/gobot/platforms/sphero"
+		"gobot.io/x/gobot"
+		"gobot.io/x/gobot/platforms/sphero"
 	)
 
 	func main() {
-		gbot := gobot.NewGobot()
-
-		adaptor := sphero.NewSpheroAdaptor("sphero", "/dev/rfcomm0")
-		driver := sphero.NewSpheroDriver(adaptor, "sphero")
+		adaptor := sphero.NewAdaptor("/dev/rfcomm0")
+		driver := sphero.NewSpheroDriver(adaptor)
 
 		work := func() {
 			gobot.Every(3*time.Second, func() {
@@ -35,12 +33,10 @@ Example:
 			work,
 		)
 
-		gbot.AddRobot(robot)
-
-		gbot.Start()
+		robot.Start()
 	}
 
 For further information refer to sphero readme:
-https://github.com/hybridgroup/gobot/blob/master/platforms/sphero/README.md
+https://gobot.io/x/gobot/blob/master/platforms/sphero/README.md
 */
-package sphero
+package sphero // import "gobot.io/x/gobot/platforms/sphero"

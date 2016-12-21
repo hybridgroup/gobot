@@ -5,7 +5,7 @@ Installing:
 
 Then you can install the package with:
 
-	go get github.com/hybridgroup/gobot && go install github.com/hybridgroup/gobot/platforms/keyboard
+	go get gobot.io/x/gobot && go install gobot.io/x/gobot/platforms/keyboard
 
 Example:
 
@@ -14,17 +14,15 @@ Example:
 	import (
 		"fmt"
 
-		"github.com/hybridgroup/gobot"
-		"github.com/hybridgroup/gobot/platforms/keyboard"
+		"gobot.io/x/gobot"
+		"gobot.io/x/gobot/platforms/keyboard"
 	)
 
 	func main() {
-		gbot := gobot.NewGobot()
-
-		keys := keyboard.NewKeyboardDriver("keyboard")
+		keys := keyboard.NewDriver()
 
 		work := func() {
-			gobot.On(keys.Event("key"), func(data interface{}) {
+			keys.On(keyboard.Key, func(data interface{}) {
 				key := data.(keyboard.KeyEvent)
 
 				if key.Key == keyboard.A {
@@ -41,12 +39,11 @@ Example:
 			work,
 		)
 
-		gbot.AddRobot(robot)
-
-		gbot.Start()
+		robot.Start()
 	}
 
+
 For further information refer to keyboard README:
-https://github.com/hybridgroup/gobot/blob/master/platforms/keyboard/README.md
+https://gobot.io/x/gobot/blob/master/platforms/keyboard/README.md
 */
-package keyboard
+package keyboard // import "gobot.io/x/gobot/platforms/keyboard"

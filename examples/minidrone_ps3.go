@@ -5,9 +5,10 @@ import (
 	"os"
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/ble"
-	"github.com/hybridgroup/gobot/platforms/joystick"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/platforms/ble"
+	"gobot.io/x/gobot/platforms/joystick"
+	"gobot.io/x/gobot/platforms/parrot/minidrone"
 )
 
 type pair struct {
@@ -16,16 +17,13 @@ type pair struct {
 }
 
 func main() {
-	gbot := gobot.NewGobot()
-
-	joystickAdaptor := joystick.NewJoystickAdaptor("ps3")
-	stick := joystick.NewJoystickDriver(joystickAdaptor,
-		"ps3",
+	joystickAdaptor := joystick.NewAdaptor()
+	stick := joystick.NewDriver(joystickAdaptor,
 		"./platforms/joystick/configs/dualshock3.json",
 	)
 
-	droneAdaptor := ble.NewBLEClientAdaptor("ble", os.Args[1])
-	drone := ble.NewBLEMinidroneDriver(droneAdaptor, "drone")
+	droneAdaptor := ble.NewClientAdaptor(os.Args[1])
+	drone := minidrone.NewDriver(droneAdaptor)
 
 	work := func() {
 		offset := 32767.0
@@ -123,9 +121,7 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }
 
 func validatePitch(data float64, offset float64) int {

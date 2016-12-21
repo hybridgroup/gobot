@@ -3,16 +3,14 @@ package main
 import (
 	"fmt"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/chip"
-	"github.com/hybridgroup/gobot/platforms/i2c"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/i2c"
+	"gobot.io/x/gobot/platforms/chip"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
-
-	chipAdaptor := chip.NewChipAdaptor("chip")
-	wiichuck := i2c.NewWiichuckDriver(chipAdaptor, "wiichuck")
+	chipAdaptor := chip.NewAdaptor()
+	wiichuck := i2c.NewWiichuckDriver(chipAdaptor)
 
 	work := func() {
 		wiichuck.On(wiichuck.Event("joystick"), func(data interface{}) {
@@ -37,7 +35,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

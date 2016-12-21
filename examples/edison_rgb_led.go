@@ -3,16 +3,14 @@ package main
 import (
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/gpio"
-	"github.com/hybridgroup/gobot/platforms/intel-iot/edison"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/gpio"
+	"gobot.io/x/gobot/platforms/intel-iot/edison"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
-
-	e := edison.NewEdisonAdaptor("edison")
-	led := gpio.NewRgbLedDriver(e, "led", "3", "5", "6")
+	e := edison.NewAdaptor()
+	led := gpio.NewRgbLedDriver(e, "3", "5", "6")
 
 	work := func() {
 		gobot.Every(1*time.Second, func() {
@@ -29,7 +27,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

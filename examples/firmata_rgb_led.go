@@ -3,16 +3,14 @@ package main
 import (
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/firmata"
-	"github.com/hybridgroup/gobot/platforms/gpio"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/gpio"
+	"gobot.io/x/gobot/platforms/firmata"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
-
-	board := firmata.NewFirmataAdaptor("arduino", "/dev/ttyACM0")
-	led := gpio.NewRgbLedDriver(board, "led", "3", "5", "6")
+	board := firmata.NewAdaptor("/dev/ttyACM0")
+	led := gpio.NewRgbLedDriver(board, "3", "5", "6")
 
 	work := func() {
 		gobot.Every(1*time.Second, func() {
@@ -29,7 +27,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

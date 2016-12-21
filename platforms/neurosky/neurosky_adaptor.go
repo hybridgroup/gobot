@@ -1,45 +1,53 @@
+// Package neurosky is the Gobot platform for the Neurosky Mindwave EEG
 package neurosky
 
 import (
 	"io"
 
-	"github.com/tarm/goserial"
+	"github.com/tarm/serial"
 )
 
-type NeuroskyAdaptor struct {
+// Adaptor is the Gobot Adaptor for the Neurosky Mindwave
+type Adaptor struct {
 	name    string
 	port    string
 	sp      io.ReadWriteCloser
-	connect func(*NeuroskyAdaptor) (io.ReadWriteCloser, error)
+	connect func(*Adaptor) (io.ReadWriteCloser, error)
 }
 
-// NewNeuroskyAdaptor creates a neurosky adaptor with specified name
-func NewNeuroskyAdaptor(name string, port string) *NeuroskyAdaptor {
-	return &NeuroskyAdaptor{
-		name: name,
+// NewAdaptor creates a neurosky adaptor with specified port
+func NewAdaptor(port string) *Adaptor {
+	return &Adaptor{
+		name: "Neurosky",
 		port: port,
-		connect: func(n *NeuroskyAdaptor) (io.ReadWriteCloser, error) {
+		connect: func(n *Adaptor) (io.ReadWriteCloser, error) {
 			return serial.OpenPort(&serial.Config{Name: n.Port(), Baud: 57600})
 		},
 	}
 }
-func (n *NeuroskyAdaptor) Name() string { return n.name }
-func (n *NeuroskyAdaptor) Port() string { return n.port }
+
+// Name returns the Adaptor Name
+func (n *Adaptor) Name() string { return n.name }
+
+// SetName sets the Adaptor Name
+func (n *Adaptor) SetName(name string) { n.name = name }
+
+// Port returns the Adaptor port
+func (n *Adaptor) Port() string { return n.port }
 
 // Connect returns true if connection to device is successful
-func (n *NeuroskyAdaptor) Connect() (errs []error) {
-	if sp, err := n.connect(n); err != nil {
-		return []error{err}
-	} else {
-		n.sp = sp
+func (n *Adaptor) Connect() error {
+	sp, err := n.connect(n)
+	if err != nil {
+		return err
 	}
-	return
+
+	n.sp = sp
+	return nil
 }
 
 // Finalize returns true if device finalization is successful
-func (n *NeuroskyAdaptor) Finalize() (errs []error) {
-	if err := n.sp.Close(); err != nil {
-		return []error{err}
-	}
+func (n *Adaptor) Finalize() (err error) {
+	err = n.sp.Close()
 	return
 }

@@ -3,26 +3,26 @@ package pebble
 import (
 	"testing"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/gobottest"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/gobottest"
 )
 
-var _ gobot.Adaptor = (*PebbleAdaptor)(nil)
+var _ gobot.Adaptor = (*Adaptor)(nil)
 
-func initTestPebbleAdaptor() *PebbleAdaptor {
-	return NewPebbleAdaptor("pebble")
+func initTestAdaptor() *Adaptor {
+	return NewAdaptor()
 }
 
-func TestPebbleAdaptor(t *testing.T) {
-	a := initTestPebbleAdaptor()
-	gobottest.Assert(t, a.Name(), "pebble")
+func TestAdaptor(t *testing.T) {
+	a := initTestAdaptor()
+	gobottest.Assert(t, a.Name(), "Pebble")
 }
-func TestPebbleAdaptorConnect(t *testing.T) {
-	a := initTestPebbleAdaptor()
-	gobottest.Assert(t, len(a.Connect()), 0)
+func TestAdaptorConnect(t *testing.T) {
+	a := initTestAdaptor()
+	gobottest.Assert(t, a.Connect(), nil)
 }
 
-func TestPebbleAdaptorFinalize(t *testing.T) {
-	a := initTestPebbleAdaptor()
-	gobottest.Assert(t, len(a.Finalize()), 0)
+func TestAdaptorFinalize(t *testing.T) {
+	a := initTestAdaptor()
+	gobottest.Assert(t, a.Finalize(), nil)
 }

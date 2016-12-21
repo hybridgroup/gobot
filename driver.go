@@ -4,10 +4,12 @@ package gobot
 type Driver interface {
 	// Name returns the label for the Driver
 	Name() string
+	// SetName sets the label for the Driver
+	SetName(s string)
 	// Start initiates the Driver
-	Start() []error
+	Start() error
 	// Halt terminates the Driver
-	Halt() []error
+	Halt() error
 	// Connection returns the Connection assiciated with the Driver
 	Connection() Connection
 }

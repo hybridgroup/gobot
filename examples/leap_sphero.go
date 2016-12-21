@@ -3,19 +3,17 @@ package main
 import (
 	"math"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/leap"
-	"github.com/hybridgroup/gobot/platforms/sphero"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/platforms/leap"
+	"gobot.io/x/gobot/platforms/sphero"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
+	leapAdaptor := leap.NewAdaptor("127.0.0.1:6437")
+	spheroAdaptor := sphero.NewAdaptor("/dev/tty.Sphero-YBW-RN-SPP")
 
-	leapAdaptor := leap.NewLeapMotionAdaptor("leap", "127.0.0.1:6437")
-	spheroAdaptor := sphero.NewSpheroAdaptor("Sphero", "/dev/tty.Sphero-YBW-RN-SPP")
-
-	leapDriver := leap.NewLeapMotionDriver(leapAdaptor, "leap")
-	spheroDriver := sphero.NewSpheroDriver(spheroAdaptor, "sphero")
+	leapDriver := leap.NewDriver(leapAdaptor)
+	spheroDriver := sphero.NewSpheroDriver(spheroAdaptor)
 
 	work := func() {
 		leapDriver.On(leap.MessageEvent, func(data interface{}) {
@@ -36,9 +34,7 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }
 
 func scale(position float64) uint8 {

@@ -7,37 +7,36 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/gobottest"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/gobottest"
 )
 
-var _ gobot.Driver = (*NeuroskyDriver)(nil)
+var _ gobot.Driver = (*Driver)(nil)
 
-func initTestNeuroskyDriver() *NeuroskyDriver {
-	a := NewNeuroskyAdaptor("bot", "/dev/null")
-	a.connect = func(n *NeuroskyAdaptor) (io.ReadWriteCloser, error) {
+func initTestNeuroskyDriver() *Driver {
+	a := NewAdaptor("/dev/null")
+	a.connect = func(n *Adaptor) (io.ReadWriteCloser, error) {
 		return &NullReadWriteCloser{}, nil
 	}
 	a.Connect()
-	return NewNeuroskyDriver(a, "bot")
+	return NewDriver(a)
 }
 
 func TestNeuroskyDriver(t *testing.T) {
 	d := initTestNeuroskyDriver()
-	gobottest.Assert(t, d.Name(), "bot")
-	gobottest.Assert(t, d.Connection().Name(), "bot")
+	gobottest.Refute(t, d.Connection(), nil)
 }
 func TestNeuroskyDriverStart(t *testing.T) {
 	sem := make(chan bool, 0)
 	d := initTestNeuroskyDriver()
-	d.Once(d.Event("error"), func(data interface{}) {
+	d.Once(d.Event(Error), func(data interface{}) {
 		gobottest.Assert(t, data.(error), errors.New("read error"))
 		sem <- true
 	})
 
-	gobottest.Assert(t, len(d.Start()), 0)
+	gobottest.Assert(t, d.Start(), nil)
 
-	<-time.After(50 * time.Millisecond)
+	time.Sleep(50 * time.Millisecond)
 	readError = errors.New("read error")
 
 	select {
@@ -52,7 +51,7 @@ func TestNeuroskyDriverStart(t *testing.T) {
 
 func TestNeuroskyDriverHalt(t *testing.T) {
 	d := initTestNeuroskyDriver()
-	gobottest.Assert(t, len(d.Halt()), 0)
+	gobottest.Assert(t, d.Halt(), nil)
 }
 
 func TestNeuroskyDriverParse(t *testing.T) {
@@ -61,11 +60,11 @@ func TestNeuroskyDriverParse(t *testing.T) {
 
 	// CodeEx
 	go func() {
-		<-time.After(5 * time.Millisecond)
+		time.Sleep(5 * time.Millisecond)
 		d.parse(bytes.NewBuffer([]byte{0xAA, 0xAA, 1, 0x55, 0x00}))
 	}()
 
-	d.On(d.Event("extended"), func(data interface{}) {
+	d.On(d.Event(Extended), func(data interface{}) {
 		sem <- true
 	})
 
@@ -77,11 +76,11 @@ func TestNeuroskyDriverParse(t *testing.T) {
 
 	// CodeSignalQuality
 	go func() {
-		<-time.After(5 * time.Millisecond)
+		time.Sleep(5 * time.Millisecond)
 		d.parse(bytes.NewBuffer([]byte{0xAA, 0xAA, 2, 0x02, 100, 0x00}))
 	}()
 
-	d.On(d.Event("signal"), func(data interface{}) {
+	d.On(d.Event(Signal), func(data interface{}) {
 		gobottest.Assert(t, data.(byte), byte(100))
 		sem <- true
 	})
@@ -90,11 +89,11 @@ func TestNeuroskyDriverParse(t *testing.T) {
 
 	// CodeAttention
 	go func() {
-		<-time.After(5 * time.Millisecond)
+		time.Sleep(5 * time.Millisecond)
 		d.parse(bytes.NewBuffer([]byte{0xAA, 0xAA, 2, 0x04, 40, 0x00}))
 	}()
 
-	d.On(d.Event("attention"), func(data interface{}) {
+	d.On(d.Event(Attention), func(data interface{}) {
 		gobottest.Assert(t, data.(byte), byte(40))
 		sem <- true
 	})
@@ -103,11 +102,11 @@ func TestNeuroskyDriverParse(t *testing.T) {
 
 	// CodeMeditation
 	go func() {
-		<-time.After(5 * time.Millisecond)
+		time.Sleep(5 * time.Millisecond)
 		d.parse(bytes.NewBuffer([]byte{0xAA, 0xAA, 2, 0x05, 60, 0x00}))
 	}()
 
-	d.On(d.Event("meditation"), func(data interface{}) {
+	d.On(d.Event(Meditation), func(data interface{}) {
 		gobottest.Assert(t, data.(byte), byte(60))
 		sem <- true
 	})
@@ -116,11 +115,11 @@ func TestNeuroskyDriverParse(t *testing.T) {
 
 	// CodeBlink
 	go func() {
-		<-time.After(5 * time.Millisecond)
+		time.Sleep(5 * time.Millisecond)
 		d.parse(bytes.NewBuffer([]byte{0xAA, 0xAA, 2, 0x16, 150, 0x00}))
 	}()
 
-	d.On(d.Event("blink"), func(data interface{}) {
+	d.On(d.Event(Blink), func(data interface{}) {
 		gobottest.Assert(t, data.(byte), byte(150))
 		sem <- true
 	})
@@ -129,11 +128,11 @@ func TestNeuroskyDriverParse(t *testing.T) {
 
 	// CodeWave
 	go func() {
-		<-time.After(5 * time.Millisecond)
+		time.Sleep(5 * time.Millisecond)
 		d.parse(bytes.NewBuffer([]byte{0xAA, 0xAA, 4, 0x80, 0x00, 0x40, 0x11, 0x00}))
 	}()
 
-	d.On(d.Event("wave"), func(data interface{}) {
+	d.On(d.Event(Wave), func(data interface{}) {
 		gobottest.Assert(t, data.(int16), int16(16401))
 		sem <- true
 	})
@@ -142,16 +141,16 @@ func TestNeuroskyDriverParse(t *testing.T) {
 
 	// CodeAsicEEG
 	go func() {
-		<-time.After(5 * time.Millisecond)
+		time.Sleep(5 * time.Millisecond)
 		d.parse(bytes.NewBuffer([]byte{0xAA, 0xAA, 30, 0x83, 24, 1, 121, 89, 0,
 			97, 26, 0, 30, 189, 0, 57, 1, 0, 62, 160, 0, 31, 127, 0, 18, 207, 0, 13,
 			108, 0x00}))
 	}()
 
-	d.On(d.Event("eeg"), func(data interface{}) {
+	d.On(d.Event(EEG), func(data interface{}) {
 		gobottest.Assert(t,
-			data.(EEG),
-			EEG{
+			data.(EEGData),
+			EEGData{
 				Delta:    1573241,
 				Theta:    5832801,
 				LoAlpha:  1703966,

@@ -6,15 +6,17 @@ import (
 	"errors"
 	"time"
 
-	"github.com/hybridgroup/gobot"
+	"gobot.io/x/gobot"
 )
 
 const (
-	// event when error encountered
+	// Error event when error encountered
 	Error = "error"
-	// event when sensor data is received
+
+	// SensorData event when sensor data is received
 	SensorData = "sensordata"
-	// event when collision is detected
+
+	// Collision event when collision is detected
 	Collision = "collision"
 )
 
@@ -24,7 +26,7 @@ type packet struct {
 	checksum uint8
 }
 
-// Represents a Sphero
+// SpheroDriver Represents a Sphero 2.0
 type SpheroDriver struct {
 	name            string
 	connection      gobot.Connection
@@ -37,7 +39,7 @@ type SpheroDriver struct {
 	gobot.Commander
 }
 
-// NewSpheroDriver returns a new SpheroDriver given a SpheroAdaptor and name.
+// NewSpheroDriver returns a new SpheroDriver given a Sphero Adaptor.
 //
 // Adds the following API Commands:
 // 	"ConfigureLocator" - See SpheroDriver.ConfigureLocator
@@ -50,9 +52,9 @@ type SpheroDriver struct {
 // 	"SetStabilization" - See SpheroDriver.SetStabilization
 //  "SetDataStreaming" - See SpheroDriver.SetDataStreaming
 //  "SetRotationRate" - See SpheroDriver.SetRotationRate
-func NewSpheroDriver(a *SpheroAdaptor, name string) *SpheroDriver {
+func NewSpheroDriver(a *Adaptor) *SpheroDriver {
 	s := &SpheroDriver{
-		name:            name,
+		name:            "Sphero",
 		connection:      a,
 		Eventer:         gobot.NewEventer(),
 		Commander:       gobot.NewCommander(),
@@ -140,11 +142,17 @@ func NewSpheroDriver(a *SpheroAdaptor, name string) *SpheroDriver {
 	return s
 }
 
-func (s *SpheroDriver) Name() string                 { return s.name }
+// Name returns the Driver Name
+func (s *SpheroDriver) Name() string { return s.name }
+
+// SetName sets the Driver Name
+func (s *SpheroDriver) SetName(n string) { s.name = n }
+
+// Connection returns the Driver's Connection
 func (s *SpheroDriver) Connection() gobot.Connection { return s.connection }
 
-func (s *SpheroDriver) adaptor() *SpheroAdaptor {
-	return s.Connection().(*SpheroAdaptor)
+func (s *SpheroDriver) adaptor() *Adaptor {
+	return s.Connection().(*Adaptor)
 }
 
 // Start starts the SpheroDriver and enables Collision Detection.
@@ -154,7 +162,7 @@ func (s *SpheroDriver) adaptor() *SpheroAdaptor {
 // 	Collision  sphero.CollisionPacket - On Collision Detected
 // 	SensorData sphero.DataStreamingPacket - On Data Streaming event
 // 	Error      error- On error while processing asynchronous response
-func (s *SpheroDriver) Start() (errs []error) {
+func (s *SpheroDriver) Start() (err error) {
 	go func() {
 		for {
 			packet := <-s.packetChannel
@@ -215,7 +223,7 @@ func (s *SpheroDriver) Start() (errs []error) {
 
 // Halt halts the SpheroDriver and sends a SpheroDriver.Stop command to the Sphero.
 // Returns true on successful halt.
-func (s *SpheroDriver) Halt() (errs []error) {
+func (s *SpheroDriver) Halt() (err error) {
 	if s.adaptor().connected {
 		gobot.Every(10*time.Millisecond, func() {
 			s.Stop()
@@ -280,7 +288,7 @@ func (s *SpheroDriver) Roll(speed uint8, heading uint16) {
 	s.packetChannel <- s.craftPacket([]uint8{speed, uint8(heading >> 8), uint8(heading & 0xFF), 0x01}, 0x02, 0x30)
 }
 
-// Configures and enables the Locator
+// ConfigureLocator configures and enables the Locator
 func (s *SpheroDriver) ConfigureLocator(d LocatorConfig) {
 	buf := new(bytes.Buffer)
 	binary.Write(buf, binary.BigEndian, d)
@@ -288,7 +296,7 @@ func (s *SpheroDriver) ConfigureLocator(d LocatorConfig) {
 	s.packetChannel <- s.craftPacket(buf.Bytes(), 0x02, 0x13)
 }
 
-// Enables sensor data streaming
+// SetDataStreaming enables sensor data streaming
 func (s *SpheroDriver) SetDataStreaming(d DataStreamingConfig) {
 	buf := new(bytes.Buffer)
 	binary.Write(buf, binary.BigEndian, d)

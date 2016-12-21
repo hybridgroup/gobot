@@ -8,12 +8,12 @@ Example:
     import (
     	"fmt"
 
-    	"github.com/hybridgroup/gobot"
-    	"github.com/hybridgroup/gobot/api"
+    	"gobot.io/x/gobot"
+    	"gobot.io/x/gobot/api"
     )
 
     func main() {
-    	gbot := gobot.NewGobot()
+    	gbot := gobot.NewMaster()
 
       // Starts the API server on default port 3000
     	api.NewAPI(gbot).Start()
@@ -34,6 +34,6 @@ Example:
     }
 
 It follows Common Protocol for Programming Physical Input and Output (CPPP-IO) spec:
-https://github.com/hybridgroup/cppp-io
+https://gobot.io/x/cppp-io
 */
 package api

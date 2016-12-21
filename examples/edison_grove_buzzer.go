@@ -3,16 +3,14 @@ package main
 import (
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/gpio"
-	"github.com/hybridgroup/gobot/platforms/intel-iot/edison"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/gpio"
+	"gobot.io/x/gobot/platforms/intel-iot/edison"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
-
-	board := edison.NewEdisonAdaptor("edison")
-	buzzer := gpio.NewBuzzerDriver(board, "buzzer", "3")
+	board := edison.NewAdaptor()
+	buzzer := gpio.NewBuzzerDriver(board, "3")
 
 	work := func() {
 		type note struct {
@@ -39,7 +37,7 @@ func main() {
 
 		for _, val := range song {
 			buzzer.Tone(val.tone, val.duration)
-			<-time.After(10 * time.Millisecond)
+			time.Sleep(10 * time.Millisecond)
 		}
 	}
 
@@ -49,7 +47,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

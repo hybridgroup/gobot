@@ -4,34 +4,33 @@ import (
 	"os"
 	"testing"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/gobottest"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/gobottest"
 )
 
-var _ gobot.Driver = (*KeyboardDriver)(nil)
+var _ gobot.Driver = (*Driver)(nil)
 
-func initTestKeyboardDriver() *KeyboardDriver {
-	d := NewKeyboardDriver("keyboard")
-	d.connect = func(k *KeyboardDriver) (err error) {
+func initTestKeyboardDriver() *Driver {
+	d := NewDriver()
+	d.connect = func(k *Driver) (err error) {
 		k.stdin = &os.File{}
 		return nil
 	}
-	d.listen = func(k *KeyboardDriver) {}
+	d.listen = func(k *Driver) {}
 	return d
 }
 
 func TestKeyboardDriver(t *testing.T) {
 	d := initTestKeyboardDriver()
-	gobottest.Assert(t, d.Name(), "keyboard")
 	gobottest.Assert(t, d.Connection(), (gobot.Connection)(nil))
 }
 
 func TestKeyboardDriverStart(t *testing.T) {
 	d := initTestKeyboardDriver()
-	gobottest.Assert(t, len(d.Start()), 0)
+	gobottest.Assert(t, d.Start(), nil)
 }
 
 func TestKeyboardDriverHalt(t *testing.T) {
 	d := initTestKeyboardDriver()
-	gobottest.Assert(t, len(d.Halt()), 0)
+	gobottest.Assert(t, d.Halt(), nil)
 }

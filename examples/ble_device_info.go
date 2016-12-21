@@ -4,15 +4,13 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/ble"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/platforms/ble"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
-
-	bleAdaptor := ble.NewBLEClientAdaptor("ble", os.Args[1])
-	info := ble.NewBLEDeviceInformationDriver(bleAdaptor, "info")
+	bleAdaptor := ble.NewClientAdaptor(os.Args[1])
+	info := ble.NewDeviceInformationDriver(bleAdaptor)
 
 	work := func() {
 		fmt.Println("Model number:", info.GetModelNumber())
@@ -28,7 +26,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

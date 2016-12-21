@@ -3,18 +3,18 @@ package main
 import (
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/api"
-	"github.com/hybridgroup/gobot/platforms/sphero"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/api"
+	"gobot.io/x/gobot/platforms/sphero"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
-	a := api.NewAPI(gbot)
+	master := gobot.NewMaster()
+	a := api.NewAPI(master)
 	a.Start()
 
-	conn := sphero.NewSpheroAdaptor("Sphero", "/dev/rfcomm0")
-	ball := sphero.NewSpheroDriver(conn, "sphero")
+	conn := sphero.NewAdaptor("/dev/rfcomm0")
+	ball := sphero.NewSpheroDriver(conn)
 
 	robot := gobot.NewRobot("sphero-dpad",
 		[]gobot.Connection{conn},
@@ -40,7 +40,7 @@ func main() {
 		return "ok"
 	})
 
-	gbot.AddRobot(robot)
+	master.AddRobot(robot)
 
-	gbot.Start()
+	master.Start()
 }

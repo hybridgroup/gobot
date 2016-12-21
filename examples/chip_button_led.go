@@ -1,17 +1,15 @@
 package main
 
 import (
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/chip"
-	"github.com/hybridgroup/gobot/platforms/gpio"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/gpio"
+	"gobot.io/x/gobot/platforms/chip"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
-
-	chipAdaptor := chip.NewChipAdaptor("chip")
-	button := gpio.NewButtonDriver(chipAdaptor, "button", "XIO-P6")
-	led := gpio.NewLedDriver(chipAdaptor, "led", "XIO-P7")
+	chipAdaptor := chip.NewAdaptor()
+	button := gpio.NewButtonDriver(chipAdaptor, "XIO-P6")
+	led := gpio.NewLedDriver(chipAdaptor, "XIO-P7")
 
 	work := func() {
 		button.On(gpio.ButtonPush, func(data interface{}) {
@@ -28,6 +26,6 @@ func main() {
 		[]gobot.Device{button, led},
 		work,
 	)
-	gbot.AddRobot(robot)
-	gbot.Start()
+
+	robot.Start()
 }

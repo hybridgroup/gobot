@@ -1,66 +1,22 @@
-# Raspi
+# Raspberry Pi
 
 The Raspberry Pi is an inexpensive and popular ARM based single board computer with digital & PWM GPIO, and i2c interfaces built in.
 
-The Raspberry Pi is a credit-card-sized single-board computer developed in the UK by the Raspberry Pi Foundation with the intention of promoting the teaching of basic computer science in schools
+The Gobot adaptor for the Raspberry Pi should support all of the various Raspberry Pi boards such as the Raspberry Pi 3 Model B, Raspberry Pi 2 Model B, Raspberry Pi 1 Model A+, and Raspberry Pi Zero.
+
+We recommend updating to the latest Raspian Jessie OS when using the Raspberry Pi, however Gobot should also support older versions of the OS, should your application require this.
 
 For more info about the Raspberry Pi platform, click [here](http://www.raspberrypi.org/).
 
 ## How to Install
 
-First you must install the appropriate Go packages
-
 ```
-go get -d -u github.com/hybridgroup/gobot/... && go install github.com/hybridgroup/gobot/platforms/raspi
-```
-
-### Enabling PWM output on GPIO pins.
-
-You need to install and have pi-blaster running in the raspberry-pi, you can follow the instructions for pi-blaster install in the pi-blaster repo here:
-
-[https://github.com/sarfata/pi-blaster](https://github.com/sarfata/pi-blaster)
-
-### Special note for Raspian Wheezy users
-
-The go vesion installed from the default package repositories is very old and will not compile gobot. You can install go 1.4 as follows:
-
-```bash
-$ wget -O - http://dave.cheney.net/paste/go1.4.linux-arm~multiarch-armv6-1.tar.gz|sudo tar -xzC /usr/local -f -
-
-$ echo '# Setup for golang' |sudo tee /etc/profile.d/golang.sh
-$ echo 'PATH=$PATH:/usr/local/go/bin'|sudo tee -a /etc/profile.d/golang.sh
-
-$ source /etc/profile.d/golang.sh
-```
-
-#### Cross compiling for the Raspberry Pi
-You must first configure your Go environment for linux cross compiling
-
-```bash
-$ cd $GOROOT/src
-$ GOOS=linux GOARCH=arm ./make.bash --no-clean
-
-```
-
-Then compile your Gobot program with
-
-```bash
-$ GOARM=6 GOARCH=arm GOOS=linux examples/raspi_blink.go
-```
-
-Then you can simply upload your program over the network from your host computer to the Raspi
-
-```bash
-$ scp raspi_blink pi@192.168.1.xxx:/home/pi/
-```
-
-and execute it on your Raspberry Pi with
-
-```bash
-$ ./raspi_blink
+go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/raspi
 ```
 
 ## How to Use
+
+The pin numbering used by your Gobot program should match the way your board is labeled right on the board itself.
 
 ```go
 package main
@@ -68,16 +24,14 @@ package main
 import (
         "time"
 
-        "github.com/hybridgroup/gobot"
-        "github.com/hybridgroup/gobot/platforms/gpio"
-        "github.com/hybridgroup/gobot/platforms/raspi"
+        "gobot.io/x/gobot"
+        "gobot.io/x/gobot/drivers/gpio"
+        "gobot.io/x/gobot/platforms/raspi"
 )
 
 func main() {
-        gbot := gobot.NewGobot()
-
-        r := raspi.NewRaspiAdaptor("raspi")
-        led := gpio.NewLedDriver(r, "led", "7")
+        r := raspi.NewAdaptor()
+        led := gpio.NewLedDriver(r, "7")
 
         work := func() {
                 gobot.Every(1*time.Second, func() {
@@ -91,8 +45,39 @@ func main() {
                 work,
         )
 
-        gbot.AddRobot(robot)
-
-        gbot.Start()
+        robot.Start()
 }
 ```
+
+## How to Connect
+
+### Compiling
+
+Simply compile your Gobot program like this:
+
+```bash
+$ GOARM=6 GOARCH=arm GOOS=linux examples/raspi_blink.go
+```
+
+Use the following `GOARM` values to compile depending on which model Raspberry Pi you are using:
+
+`GOARM=6` (Raspberry Pi A, A+, B, B+, Zero)
+`GOARM=7` (Raspberry Pi 2, 3)
+
+Once you have compiled your code, you can simply upload your program over the network from your host computer to the Raspi
+
+```bash
+$ scp raspi_blink pi@192.168.1.xxx:/home/pi/
+```
+
+and execute it on your Raspberry Pi with
+
+```bash
+$ ./raspi_blink
+```
+
+### Enabling PWM output on GPIO pins.
+
+For extended PWM support on the Raspberry Pi, you will need to use a program called pi-blaster. You can follow the instructions for pi-blaster install in the pi-blaster repo here:
+
+[https://github.com/sarfata/pi-blaster](https://github.com/sarfata/pi-blaster)

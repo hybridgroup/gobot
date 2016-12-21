@@ -3,15 +3,13 @@ package main
 import (
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/audio"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/platforms/audio"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
-
-	e := audio.NewAudioAdaptor("sound")
-	laser := audio.NewAudioDriver(e, "laser", "./examples/laser.mp3")
+	e := audio.NewAdaptor()
+	laser := audio.NewDriver(e, "./examples/laser.mp3")
 
 	work := func() {
 		gobot.Every(2*time.Second, func() {
@@ -25,7 +23,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

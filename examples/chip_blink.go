@@ -3,16 +3,14 @@ package main
 import (
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/chip"
-	"github.com/hybridgroup/gobot/platforms/gpio"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/gpio"
+	"gobot.io/x/gobot/platforms/chip"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
-
-	chipAdaptor := chip.NewChipAdaptor("chip")
-	led := gpio.NewLedDriver(chipAdaptor, "led", "XIO-P0")
+	chipAdaptor := chip.NewAdaptor()
+	led := gpio.NewLedDriver(chipAdaptor, "XIO-P6")
 
 	work := func() {
 		gobot.Every(1*time.Second, func() {
@@ -26,7 +24,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

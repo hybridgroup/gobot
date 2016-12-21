@@ -11,7 +11,7 @@ First install the [Leap Motion Software](https://www.leapmotion.com/setup)
 Now you can install the package with:
 
 ```
-go get -d -u github.com/hybridgroup/gobot/... && go install github.com/hybridgroup/gobot/platforms/leap
+go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/leap
 ```
 
 ## How to Use
@@ -22,15 +22,13 @@ package main
 import (
 	"fmt"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/leap"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/platforms/leap"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
-
-	leapMotionAdaptor := leap.NewLeapMotionAdaptor("leap", "127.0.0.1:6437")
-	l := leap.NewLeapMotionDriver(leapMotionAdaptor, "leap")
+	leapMotionAdaptor := leap.NewAdaptor("127.0.0.1:6437")
+	l := leap.NewDriver(leapMotionAdaptor)
 
 	work := func() {
 		gobot.On(l.Event("message"), func(data interface{}) {
@@ -44,9 +42,7 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }
 ```
 

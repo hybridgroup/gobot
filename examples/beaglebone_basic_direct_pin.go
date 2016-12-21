@@ -1,16 +1,14 @@
 package main
 
 import (
-	"github.com/hybridgroup/gobot/platforms/beaglebone"
-	"github.com/hybridgroup/gobot/platforms/gpio"
+	"gobot.io/x/gobot/drivers/gpio"
+	"gobot.io/x/gobot/platforms/beaglebone"
 )
 
 func main() {
-
 	// Use Gobot to control BeagleBone's digital pins directly
-
-	beagleboneAdaptor := beaglebone.NewBeagleboneAdaptor("beaglebone")
-	gpioPin := gpio.NewDirectPinDriver(beagleboneAdaptor, "myDevice", "P9_12")
+	beagleboneAdaptor := beaglebone.NewAdaptor()
+	gpioPin := gpio.NewDirectPinDriver(beagleboneAdaptor, "P9_12")
 
 	// Initialize the internal representation of the pinout
 	beagleboneAdaptor.Connect()

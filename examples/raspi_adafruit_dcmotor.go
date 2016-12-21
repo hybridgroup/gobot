@@ -4,13 +4,12 @@ import (
 	"log"
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/i2c"
-	"github.com/hybridgroup/gobot/platforms/raspi"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/i2c"
+	"gobot.io/x/gobot/platforms/raspi"
 )
 
 func adafruitDCMotorRunner(a *i2c.AdafruitMotorHatDriver, dcMotor int) (err error) {
-
 	log.Printf("DC Motor Run Loop...\n")
 	// set the speed:
 	var speed int32 = 255 // 255 = full speed!
@@ -22,7 +21,7 @@ func adafruitDCMotorRunner(a *i2c.AdafruitMotorHatDriver, dcMotor int) (err erro
 		return
 	}
 	// Sleep and RELEASE
-	<-time.After(2000 * time.Millisecond)
+	time.Sleep(2000 * time.Millisecond)
 	if err = a.RunDCMotor(dcMotor, i2c.AdafruitRelease); err != nil {
 		return
 	}
@@ -31,16 +30,16 @@ func adafruitDCMotorRunner(a *i2c.AdafruitMotorHatDriver, dcMotor int) (err erro
 		return
 	}
 	// Sleep and RELEASE
-	<-time.After(2000 * time.Millisecond)
+	time.Sleep(2000 * time.Millisecond)
 	if err = a.RunDCMotor(dcMotor, i2c.AdafruitRelease); err != nil {
 		return
 	}
 	return
 }
+
 func main() {
-	gbot := gobot.NewGobot()
-	r := raspi.NewRaspiAdaptor("raspi")
-	adaFruit := i2c.NewAdafruitMotorHatDriver(r, "adafruit")
+	r := raspi.NewAdaptor()
+	adaFruit := i2c.NewAdafruitMotorHatDriver(r)
 
 	work := func() {
 		gobot.Every(5*time.Second, func() {
@@ -56,7 +55,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

@@ -1,52 +1,27 @@
-// Copyright 2014 The Gobot Authors, HybridGroup. All rights reserved.
+// Copyright 2014-2016 The Hybrid Group. All rights reserved.
 
 /*
-Package gobot provides a framework for robotics, physical computing and the internet of things.
-It is the main point of entry for your Gobot application. A Gobot program
-is typically composed of one or more robots that makes up a project.
+Package gobot is the primary entrypoint for Gobot (http://gobot.io), a framework for robotics, physical computing, and the Internet of Things written using the Go programming language .
 
-Basic Setup
+It provides a simple, yet powerful way to create solutions that incorporate multiple, different hardware devices at the same time.
 
-    package main
+Classic Gobot
 
-    import (
-      "fmt"
-      "time"
-
-      "github.com/hybridgroup/gobot"
-    )
-
-    func main() {
-      gbot  := gobot.NewGobot()
-
-      robot := gobot.NewRobot("Eve", func() {
-        gobot.Every(500*time.Millisecond, func() {
-          fmt.Println("Greeting Human")
-        })
-      })
-
-      gbot.AddRobot(robot)
-
-      gbot.Start()
-    }
-
-Blinking an LED (Hello Eve!)
+Here is a "Classic Gobot" program that blinks an LED using an Arduino:
 
     package main
 
     import (
     	"time"
 
-    	"github.com/hybridgroup/gobot"
-    	"github.com/hybridgroup/gobot/platforms/firmata"
-    	"github.com/hybridgroup/gobot/platforms/gpio"
+    	"gobot.io/x/gobot"
+    	"gobot.io/x/gobot/drivers/gpio"
+    	"gobot.io/x/gobot/platforms/firmata"
     )
 
     func main() {
-    	gbot := gobot.NewGobot()
-
-    	firmataAdaptor := firmata.NewFirmataAdaptor("arduino", "/dev/ttyACM0")
-    	led := gpio.NewLedDriver(firmataAdaptor, "led", "13")
+    	firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
+    	led := gpio.NewLedDriver(firmataAdaptor, "13")
 
     	work := func() {
     		gobot.Every(1*time.Second, func() {
@@ -54,52 +29,105 @@ Blinking an LED (Hello Eve!)
     		})
     	}
 
-    	robot := gobot.NewRobot("Eve",
+    	robot := gobot.NewRobot("bot",
     		[]gobot.Connection{firmataAdaptor},
     		[]gobot.Device{led},
     		work,
     	)
 
-    	gbot.AddRobot(robot)
-
-    	gbot.Start()
+    	robot.Start()
     }
 
-Web Enabled? You bet! Gobot can be configured to expose a restful HTTP interface
-using the api package. You can define custom commands on your robots, in addition
-to the built-in device driver commands, and interact with your application as a
-web service.
+Metal Gobot
 
+You can also use Metal Gobot and pick and choose from the various Gobot packages to control hardware with nothing but pure idiomatic Golang code. For example:
+
+    package main
+
+    import (
+    	"gobot.io/x/gobot/drivers/gpio"
+    	"gobot.io/x/gobot/platforms/intel-iot/edison"
+    	"time"
+    )
+
+    func main() {
+    	e := edison.NewAdaptor()
+    	e.Connect()
+
+    	led := gpio.NewLedDriver(e, "13")
+    	led.Start()
+
+    	for {
+    		led.Toggle()
+    		time.Sleep(1000 * time.Millisecond)
+    	}
+    }
+
+Master Gobot
+
+Finally, you can use Master Gobot to add the complete Gobot API or control swarms of Robots:
 
     package main
 
     import (
     	"fmt"
+    	"time"
 
-    	"github.com/hybridgroup/gobot"
-    	"github.com/hybridgroup/gobot/api"
+    	"gobot.io/x/gobot"
+    	"gobot.io/x/gobot/api"
+    	"gobot.io/x/gobot/platforms/sphero"
     )
 
-    func main() {
-    	gbot := gobot.NewGobot()
+    func NewSwarmBot(port string) *gobot.Robot {
+    	spheroAdaptor := sphero.NewAdaptor(port)
+    	spheroDriver := sphero.NewSpheroDriver(spheroAdaptor)
+    	spheroDriver.SetName("Sphero" + port)
 
-      // Starts the API server on default port 3000
-    	api.NewAPI(gbot).Start()
+    	work := func() {
+    		spheroDriver.Stop()
 
-      // Accessible via http://localhost:3000/api/commands/say_hello
-    	gbot.AddCommand("say_hello", func(params map[string]interface{}) interface{} {
-    		return "Master says hello!"
-    	})
+    		spheroDriver.On(sphero.Collision, func(data interface{}) {
+    			fmt.Println("Collision Detected!")
+    		})
 
-    	hello := gbot.AddRobot(gobot.NewRobot("Eve"))
+    		gobot.Every(1*time.Second, func() {
+    			spheroDriver.Roll(100, uint16(gobot.Rand(360)))
+    		})
+    		gobot.Every(3*time.Second, func() {
+    			spheroDriver.SetRGB(uint8(gobot.Rand(255)),
+    				uint8(gobot.Rand(255)),
+    				uint8(gobot.Rand(255)),
+    			)
+    		})
+    	}
 
-      // Accessible via http://localhost:3000/robots/Eve/commands/say_hello
-    	hello.AddCommand("say_hello", func(params map[string]interface{}) interface{} {
-    		return fmt.Sprintf("%v says hello!", hello.Name)
-    	})
+    	robot := gobot.NewRobot("sphero",
+    		[]gobot.Connection{spheroAdaptor},
+    		[]gobot.Device{spheroDriver},
+    		work,
+    	)
 
-    	gbot.Start()
+    	return robot
     }
 
+    func main() {
+    	master := gobot.NewMaster()
+    	api.NewAPI(master).Start()
+
+    	spheros := []string{
+    		"/dev/rfcomm0",
+    		"/dev/rfcomm1",
+    		"/dev/rfcomm2",
+    		"/dev/rfcomm3",
+    	}
+
+    	for _, port := range spheros {
+    		master.AddRobot(NewSwarmBot(port))
+    	}
+
+    	master.Start()
+    }
+
+Copyright (c) 2013-2016 The Hybrid Group. Licensed under the Apache 2.0 license.
 */
-package gobot
+package gobot // import "gobot.io/x/gobot"

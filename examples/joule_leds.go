@@ -3,19 +3,17 @@ package main
 import (
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/gpio"
-	"github.com/hybridgroup/gobot/platforms/intel-iot/joule"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/gpio"
+	"gobot.io/x/gobot/platforms/intel-iot/joule"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
-
-	e := joule.NewJouleAdaptor("joule")
-	led0 := gpio.NewLedDriver(e, "led", "100")
-	led1 := gpio.NewLedDriver(e, "led", "101")
-	led2 := gpio.NewLedDriver(e, "led", "102")
-	led3 := gpio.NewLedDriver(e, "led", "103")
+	e := joule.NewAdaptor()
+	led0 := gpio.NewLedDriver(e, "100")
+	led1 := gpio.NewLedDriver(e, "101")
+	led2 := gpio.NewLedDriver(e, "102")
+	led3 := gpio.NewLedDriver(e, "103")
 
 	work := func() {
 		led0.Off()
@@ -29,10 +27,10 @@ func main() {
 		gobot.Every(2*time.Second, func() {
 			led1.Toggle()
 		})
-		gobot.Every(2*time.Second, func() {
+		gobot.Every(4*time.Second, func() {
 			led2.Toggle()
 		})
-		gobot.Every(3*time.Second, func() {
+		gobot.Every(8*time.Second, func() {
 			led3.Toggle()
 		})
 	}
@@ -43,7 +41,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

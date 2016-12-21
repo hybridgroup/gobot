@@ -4,14 +4,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/mqtt"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/platforms/mqtt"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
-
-	mqttAdaptor := mqtt.NewMqttAdaptor("server", "tcp://test.mosquitto.org:1883", "pinger")
+	mqttAdaptor := mqtt.NewAdaptor("tcp://test.mosquitto.org:1883", "pinger")
 
 	work := func() {
 		mqttAdaptor.On("hello", func(data []byte) {
@@ -34,7 +32,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

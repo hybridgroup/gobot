@@ -4,45 +4,45 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/gobottest"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/gobottest"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-var _ gobot.Driver = (*JoystickDriver)(nil)
+var _ gobot.Driver = (*Driver)(nil)
 
-func initTestJoystickDriver() *JoystickDriver {
-	a := NewJoystickAdaptor("bot")
-	a.connect = func(j *JoystickAdaptor) (err error) {
+func initTestDriver() *Driver {
+	a := NewAdaptor()
+	a.connect = func(j *Adaptor) (err error) {
 		j.joystick = &testJoystick{}
 		return nil
 	}
 	a.Connect()
-	d := NewJoystickDriver(a, "bot", "./configs/xbox360_power_a_mini_proex.json")
+	d := NewDriver(a, "./configs/xbox360_power_a_mini_proex.json")
 	d.poll = func() sdl.Event {
 		return new(interface{})
 	}
 	return d
 }
 
-func TestJoystickDriverStart(t *testing.T) {
-	d := initTestJoystickDriver()
+func TestDriverStart(t *testing.T) {
+	d := initTestDriver()
 	d.interval = 1 * time.Millisecond
-	gobottest.Assert(t, len(d.Start()), 0)
-	<-time.After(2 * time.Millisecond)
+	gobottest.Assert(t, d.Start(), nil)
+	time.Sleep(2 * time.Millisecond)
 }
 
-func TestJoystickDriverHalt(t *testing.T) {
-	d := initTestJoystickDriver()
+func TestDriverHalt(t *testing.T) {
+	d := initTestDriver()
 	go func() {
 		<-d.halt
 	}()
-	gobottest.Assert(t, len(d.Halt()), 0)
+	gobottest.Assert(t, d.Halt(), nil)
 }
 
-func TestJoystickDriverHandleEvent(t *testing.T) {
+func TestDriverHandleEvent(t *testing.T) {
 	sem := make(chan bool)
-	d := initTestJoystickDriver()
+	d := initTestDriver()
 	d.Start()
 
 	// left x stick

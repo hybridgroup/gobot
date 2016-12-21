@@ -9,22 +9,22 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/gobottest"
-	"github.com/hybridgroup/gobot/platforms/firmata/client"
-	"github.com/hybridgroup/gobot/platforms/gpio"
-	"github.com/hybridgroup/gobot/platforms/i2c"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/gpio"
+	"gobot.io/x/gobot/drivers/i2c"
+	"gobot.io/x/gobot/gobottest"
+	"gobot.io/x/gobot/platforms/firmata/client"
 )
 
-var _ gobot.Adaptor = (*FirmataAdaptor)(nil)
+var _ gobot.Adaptor = (*Adaptor)(nil)
 
-var _ gpio.DigitalReader = (*FirmataAdaptor)(nil)
-var _ gpio.DigitalWriter = (*FirmataAdaptor)(nil)
-var _ gpio.AnalogReader = (*FirmataAdaptor)(nil)
-var _ gpio.PwmWriter = (*FirmataAdaptor)(nil)
-var _ gpio.ServoWriter = (*FirmataAdaptor)(nil)
+var _ gpio.DigitalReader = (*Adaptor)(nil)
+var _ gpio.DigitalWriter = (*Adaptor)(nil)
+var _ gpio.AnalogReader = (*Adaptor)(nil)
+var _ gpio.PwmWriter = (*Adaptor)(nil)
+var _ gpio.ServoWriter = (*Adaptor)(nil)
 
-var _ i2c.I2c = (*FirmataAdaptor)(nil)
+var _ i2c.I2c = (*Adaptor)(nil)
 
 type readWriteCloser struct{}
 
@@ -87,8 +87,8 @@ func (mockFirmataBoard) I2cWrite(int, []byte) error      { return nil }
 func (mockFirmataBoard) I2cConfig(int) error             { return nil }
 func (mockFirmataBoard) ServoConfig(int, int, int) error { return nil }
 
-func initTestFirmataAdaptor() *FirmataAdaptor {
-	a := NewFirmataAdaptor("board", "/dev/null")
+func initTestAdaptor() *Adaptor {
+	a := NewAdaptor("/dev/null")
 	a.board = newMockFirmataBoard()
 	a.openSP = func(port string) (io.ReadWriteCloser, error) {
 		return &readWriteCloser{}, nil
@@ -97,78 +97,77 @@ func initTestFirmataAdaptor() *FirmataAdaptor {
 	return a
 }
 
-func TestFirmataAdaptor(t *testing.T) {
-	a := initTestFirmataAdaptor()
-	gobottest.Assert(t, a.Name(), "board")
+func TestAdaptor(t *testing.T) {
+	a := initTestAdaptor()
 	gobottest.Assert(t, a.Port(), "/dev/null")
 }
 
-func TestFirmataAdaptorFinalize(t *testing.T) {
-	a := initTestFirmataAdaptor()
-	gobottest.Assert(t, len(a.Finalize()), 0)
+func TestAdaptorFinalize(t *testing.T) {
+	a := initTestAdaptor()
+	gobottest.Assert(t, a.Finalize(), nil)
 
-	a = initTestFirmataAdaptor()
+	a = initTestAdaptor()
 	a.board.(*mockFirmataBoard).disconnectError = errors.New("close error")
-	gobottest.Assert(t, a.Finalize()[0], errors.New("close error"))
+	gobottest.Assert(t, a.Finalize(), errors.New("close error"))
 }
 
-func TestFirmataAdaptorConnect(t *testing.T) {
+func TestAdaptorConnect(t *testing.T) {
 	var openSP = func(port string) (io.ReadWriteCloser, error) {
 		return &readWriteCloser{}, nil
 	}
-	a := NewFirmataAdaptor("board", "/dev/null")
+	a := NewAdaptor("/dev/null")
 	a.openSP = openSP
 	a.board = newMockFirmataBoard()
-	gobottest.Assert(t, len(a.Connect()), 0)
+	gobottest.Assert(t, a.Connect(), nil)
 
-	a = NewFirmataAdaptor("board", "/dev/null")
+	a = NewAdaptor("/dev/null")
 	a.board = newMockFirmataBoard()
 	a.openSP = func(port string) (io.ReadWriteCloser, error) {
 		return nil, errors.New("connect error")
 	}
-	gobottest.Assert(t, a.Connect()[0], errors.New("connect error"))
+	gobottest.Assert(t, a.Connect(), errors.New("connect error"))
 
-	a = NewFirmataAdaptor("board", &readWriteCloser{})
+	a = NewAdaptor(&readWriteCloser{})
 	a.board = newMockFirmataBoard()
-	gobottest.Assert(t, len(a.Connect()), 0)
+	gobottest.Assert(t, a.Connect(), nil)
 
 }
 
-func TestFirmataAdaptorServoWrite(t *testing.T) {
-	a := initTestFirmataAdaptor()
+func TestAdaptorServoWrite(t *testing.T) {
+	a := initTestAdaptor()
 	a.ServoWrite("1", 50)
 }
 
-func TestFirmataAdaptorPwmWrite(t *testing.T) {
-	a := initTestFirmataAdaptor()
+func TestAdaptorPwmWrite(t *testing.T) {
+	a := initTestAdaptor()
 	a.PwmWrite("1", 50)
 }
 
-func TestFirmataAdaptorDigitalWrite(t *testing.T) {
-	a := initTestFirmataAdaptor()
+func TestAdaptorDigitalWrite(t *testing.T) {
+	a := initTestAdaptor()
 	a.DigitalWrite("1", 1)
 }
 
-func TestFirmataAdaptorDigitalRead(t *testing.T) {
-	a := initTestFirmataAdaptor()
+func TestAdaptorDigitalRead(t *testing.T) {
+	a := initTestAdaptor()
 	val, err := a.DigitalRead("1")
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, val, 1)
 }
 
-func TestFirmataAdaptorAnalogRead(t *testing.T) {
-	a := initTestFirmataAdaptor()
+func TestAdaptorAnalogRead(t *testing.T) {
+	a := initTestAdaptor()
 	val, err := a.AnalogRead("1")
 	gobottest.Assert(t, val, 133)
 	gobottest.Assert(t, err, nil)
 }
 
-func TestFirmataAdaptorI2cStart(t *testing.T) {
-	a := initTestFirmataAdaptor()
+func TestAdaptorI2cStart(t *testing.T) {
+	a := initTestAdaptor()
 	a.I2cStart(0x00)
 }
-func TestFirmataAdaptorI2cRead(t *testing.T) {
-	a := initTestFirmataAdaptor()
+func TestAdaptorI2cRead(t *testing.T) {
+	a := initTestAdaptor()
 	i := []byte{100}
 	i2cReply := client.I2cReply{Data: i}
 	go func() {
@@ -179,13 +178,13 @@ func TestFirmataAdaptorI2cRead(t *testing.T) {
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, data, i)
 }
-func TestFirmataAdaptorI2cWrite(t *testing.T) {
-	a := initTestFirmataAdaptor()
+func TestAdaptorI2cWrite(t *testing.T) {
+	a := initTestAdaptor()
 	a.I2cWrite(0x00, []byte{0x00, 0x01})
 }
 
 func TestServoConfig(t *testing.T) {
-	a := initTestFirmataAdaptor()
+	a := initTestAdaptor()
 	err := a.ServoConfig("9", 0, 0)
 	gobottest.Assert(t, err, nil)
 

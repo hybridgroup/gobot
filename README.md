@@ -8,14 +8,14 @@ Want to use Javascript robotics? Check out our sister project Cylon.js (http://c
 
 Want to use Ruby on robots? Check out our sister project Artoo (http://artoo.io)
 
-[![GoDoc](https://godoc.org/github.com/hybridgroup/gobot?status.svg)](https://godoc.org/github.com/hybridgroup/gobot)
+[![GoDoc](https://godoc.org/gobot.io/x/gobot?status.svg)](https://godoc.org/gobot.io/x/gobot)
 [![Build Status](https://travis-ci.org/hybridgroup/gobot.png?branch=dev)](https://travis-ci.org/hybridgroup/gobot)
 [![Coverage Status](https://coveralls.io/repos/github/hybridgroup/gobot/badge.svg?branch=dev)](https://coveralls.io/github/hybridgroup/gobot?branch=dev)
 [![Go Report Card](https://goreportcard.com/badge/hybridgroup/gobot)](https://goreportcard.com/report/hybridgroup/gobot)
 
 ## Getting Started
 
-Get the Gobot source with: `go get -d -u github.com/hybridgroup/gobot/...`
+Get the Gobot source with: `go get -d -u gobot.io/x/gobot/...`
 
 ## Examples
 
@@ -27,16 +27,14 @@ package main
 import (
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/firmata"
-	"github.com/hybridgroup/gobot/platforms/gpio"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/gpio"
+	"gobot.io/x/gobot/platforms/firmata"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
-
-	firmataAdaptor := firmata.NewFirmataAdaptor("arduino", "/dev/ttyACM0")
-	led := gpio.NewLedDriver(firmataAdaptor, "led", "13")
+	firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
+	led := gpio.NewLedDriver(firmataAdaptor, "13")
 
 	work := func() {
 		gobot.Every(1*time.Second, func() {
@@ -50,9 +48,7 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }
 ```
 
@@ -65,15 +61,13 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/sphero"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/platforms/sphero"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
-
-	adaptor := sphero.NewSpheroAdaptor("sphero", "/dev/rfcomm0")
-	driver := sphero.NewSpheroDriver(adaptor, "sphero")
+	adaptor := sphero.NewAdaptor("/dev/rfcomm0")
+	driver := sphero.NewSpheroDriver(adaptor)
 
 	work := func() {
 		gobot.Every(3*time.Second, func() {
@@ -87,9 +81,7 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }
 ```
 
@@ -101,16 +93,16 @@ You can use the entire Gobot framework as shown in the examples above ("Classic"
 package main
 
 import (
-	"github.com/hybridgroup/gobot/platforms/gpio"
-	"github.com/hybridgroup/gobot/platforms/intel-iot/edison"
+	"gobot.io/x/gobot/drivers/gpio"
+	"gobot.io/x/gobot/platforms/intel-iot/edison"
 	"time"
 )
 
 func main() {
-	e := edison.NewEdisonAdaptor("edison")
+	e := edison.NewAdaptor()
 	e.Connect()
 
-	led := gpio.NewLedDriver(e, "led", "13")
+	led := gpio.NewLedDriver(e, "13")
 	led.Start()
 
 	for {
@@ -120,60 +112,140 @@ func main() {
 }
 ```
 
+#### "Master" Gobot
+
+You can also use the full capabilities of the framework aka "Master Gobot" to control swarms of robots or other features such as the built-in API server. For example:
+
+```go
+package main
+
+import (
+	"fmt"
+	"time"
+
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/api"
+	"gobot.io/x/gobot/platforms/sphero"
+)
+
+func NewSwarmBot(port string) *gobot.Robot {
+	spheroAdaptor := sphero.NewAdaptor(port)
+	spheroDriver := sphero.NewSpheroDriver(spheroAdaptor)
+	spheroDriver.SetName("Sphero" + port)
+
+	work := func() {
+		spheroDriver.Stop()
+
+		spheroDriver.On(sphero.Collision, func(data interface{}) {
+			fmt.Println("Collision Detected!")
+		})
+
+		gobot.Every(1*time.Second, func() {
+			spheroDriver.Roll(100, uint16(gobot.Rand(360)))
+		})
+		gobot.Every(3*time.Second, func() {
+			spheroDriver.SetRGB(uint8(gobot.Rand(255)),
+				uint8(gobot.Rand(255)),
+				uint8(gobot.Rand(255)),
+			)
+		})
+	}
+
+	robot := gobot.NewRobot("sphero",
+		[]gobot.Connection{spheroAdaptor},
+		[]gobot.Device{spheroDriver},
+		work,
+	)
+
+	return robot
+}
+
+func main() {
+	master := gobot.NewMaster()
+	api.NewAPI(master).Start()
+
+	spheros := []string{
+		"/dev/rfcomm0",
+		"/dev/rfcomm1",
+		"/dev/rfcomm2",
+		"/dev/rfcomm3",
+	}
+
+	for _, port := range spheros {
+		master.AddRobot(NewSwarmBot(port))
+	}
+
+	master.Start()
+}
+```
+
 ## Hardware Support
 Gobot has a extensible system for connecting to hardware devices. The following robotics and physical computing platforms are currently supported:
 
-- [AR Drone 2.0](http://ardrone2.parrot.com/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/ardrone)
 - [Arduino](http://www.arduino.cc/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/firmata)
 - Audio <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/audio)
 - [Beaglebone Black](http://beagleboard.org/Products/BeagleBone+Black/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/beaglebone)
-- [Bebop](http://www.parrot.com/usa/products/bebop-drone/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/bebop)
 - [Bluetooth LE](https://www.bluetooth.com/what-is-bluetooth-technology/bluetooth-technology-basics/low-energy) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/ble)
 - [C.H.I.P](http://www.nextthing.co/pages/chip) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/chip)
 - [Digispark](http://digistump.com/products/1) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/digispark)
 - [Intel Edison](http://www.intel.com/content/www/us/en/do-it-yourself/edison.html) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/intel-iot/edison)
+- [Intel Joule](http://intel.com/joule/getstarted) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/intel-iot/joule)
 - [Joystick](http://en.wikipedia.org/wiki/Joystick) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/joystick)
 - [Keyboard](https://en.wikipedia.org/wiki/Computer_keyboard) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/keyboard)
 - [Leap Motion](https://www.leapmotion.com/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/leapmotion)
 - [MavLink](http://qgroundcontrol.org/mavlink/start) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/mavlink)
+- [MegaPi](http://www.makeblock.com/megapi) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/megapi)
 - [MQTT](http://mqtt.org/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/mqtt)
-- [Neurosky](http://neurosky.com/products-markets/eeg-biosensors/hardware/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/neurosky)
 - [NATS](http://nats.io/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/nats)
+- [Neurosky](http://neurosky.com/products-markets/eeg-biosensors/hardware/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/neurosky)
 - [OpenCV](http://opencv.org/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/opencv)
+- [Particle](https://www.particle.io/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/particle)
+- [Parrot ARDrone 2.0](http://ardrone2.parrot.com/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/parrot/ardrone)
+- [Parrot Bebop](http://www.parrot.com/usa/products/bebop-drone/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/parrot/bebop)
+- [Parrot Minidrone](https://www.parrot.com/us/minidrones) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/parrot/minidrone)
 - [Pebble](https://www.getpebble.com/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/pebble)
 - [Raspberry Pi](http://www.raspberrypi.org/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/raspi)
-- [Spark](https://www.spark.io/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/spark)
-- [Sphero](http://www.gosphero.com/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/sphero)
+- [Sphero](http://www.sphero.com/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/sphero)
+- [Sphero BB-8](http://www.sphero.com/bb8) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/sphero/bb8)
+- [Sphero Ollie](http://www.sphero.com/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/sphero/ollie)
 
 Support for many devices that use General Purpose Input/Output (GPIO) have
-a shared set of drivers provided using the `gobot/platforms/gpio` package:
+a shared set of drivers provided using the `gobot/drivers/gpio` package:
 
-- [GPIO](https://en.wikipedia.org/wiki/General_Purpose_Input/Output) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/platforms/gpio)
-	- Analog Sensor
+- [GPIO](https://en.wikipedia.org/wiki/General_Purpose_Input/Output) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/drivers/gpio)
 	- Button
 	- Buzzer
 	- Direct Pin
 	- Grove Button
 	- Grove Buzzer
 	- Grove LED
-	- Grove Light Sensor
-	- Grove Piezo Vibration Sensor
+	- Grove Magnetic Switch
 	- Grove Relay
-	- Grove Rotary Dial
-	- Grove Sound Sensor
-	- Grove Temperature Sensor
 	- Grove Touch Sensor
 	- LED
 	- Makey Button
 	- Motor
+	- Proximity Infra Red (PIR) Motion Sensor
 	- Relay
 	- RGB LED
 	- Servo
 
-Support for devices that use Inter-Integrated Circuit (I2C) have a shared set of
-drivers provided using the `gobot/platforms/i2c` package:
+Support for many devices that use Analog Input/Output (AIO) have
+a shared set of drivers provided using the `gobot/drivers/aio` package:
 
-- [I2C](https://en.wikipedia.org/wiki/I%C2%B2C) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/platforms/i2c)
+- [AIO](https://en.wikipedia.org/wiki/Analog-to-digital_converter) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/drivers/aio)
+	- Analog Sensor
+	- Grove Light Sensor
+	- Grove Piezo Vibration Sensor
+	- Grove Rotary Dial
+	- Grove Sound Sensor
+	- Grove Temperature Sensor
+
+Support for devices that use Inter-Integrated Circuit (I2C) have a shared set of
+drivers provided using the `gobot/drivers/i2c` package:
+
+- [I2C](https://en.wikipedia.org/wiki/I%C2%B2C) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/drivers/i2c)
+	- Adafruit Motor Hat
 	- BlinkM
 	- Grove Digital Accelerometer
 	- Grove RGB LCD
@@ -192,23 +264,29 @@ More platforms and drivers are coming soon...
 
 Gobot includes a RESTful API to query the status of any robot running within a group, including the connection and device status, and execute device commands.
 
-To activate the API, require the `github.com/hybridgroup/gobot/api` package and instantiate the `API` like this:
+To activate the API, import the `gobot.io/x/gobot/api` package and instantiate the `API` like this:
 
 ```go
-  gbot := gobot.NewGobot()
-  api.NewAPI(gbot).Start()
+  master := gobot.NewMaster()
+  api.NewAPI(master).Start()
 ```
 
 You can also specify the api host and port, and turn on authentication:
 ```go
-  gbot := gobot.NewGobot()
-  server := api.NewAPI(gbot)
+  master := gobot.NewMaster()
+  server := api.NewAPI(master)
   server.Port = "4000"
   server.AddHandler(api.BasicAuth("gort", "klatuu"))
   server.Start()
 ```
 
 You may access the [robeaux](https://github.com/hybridgroup/robeaux) React.js interface with Gobot by navigating to `http://localhost:3000/index.html`.
+
+## CLI
+
+Gobot uses the Gort [http://gort.io](http://gort.io) Command Line Interface (CLI) so you can access important features right from the command line. We call it "RobotOps", aka "DevOps For Robotics". You can scan, connect, update device firmware, and more!
+
+Gobot also has its own CLI to generate new platforms, adaptors, and drivers. You can check it out in the `/cli` directory.
 
 ## Documentation
 We're busy adding documentation to our web site at http://gobot.io/ please check there as we continue to work on Gobot
@@ -217,7 +295,6 @@ Thank you!
 
 ## Need help?
 * Join our mailing list: https://groups.google.com/forum/#!forum/gobotio
-* IRC: `#gobotio @ irc.freenode.net`
 * Issues: https://github.com/hybridgroup/gobot/issues
 * twitter: [@gobotio](https://twitter.com/gobotio)
 

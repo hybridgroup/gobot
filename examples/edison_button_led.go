@@ -1,18 +1,16 @@
 package main
 
 import (
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/gpio"
-	"github.com/hybridgroup/gobot/platforms/intel-iot/edison"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/gpio"
+	"gobot.io/x/gobot/platforms/intel-iot/edison"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
+	e := edison.NewAdaptor()
 
-	e := edison.NewEdisonAdaptor("edison")
-
-	button := gpio.NewButtonDriver(e, "myButton", "2")
-	led := gpio.NewLedDriver(e, "myLed", "4")
+	button := gpio.NewButtonDriver(e, "2")
+	led := gpio.NewLedDriver(e, "4")
 
 	work := func() {
 		button.On(gpio.ButtonPush, func(data interface{}) {
@@ -29,7 +27,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

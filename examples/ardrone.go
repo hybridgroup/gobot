@@ -3,15 +3,13 @@ package main
 import (
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/ardrone"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/platforms/parrot/ardrone"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
-
-	ardroneAdaptor := ardrone.NewArdroneAdaptor("Drone")
-	drone := ardrone.NewArdroneDriver(ardroneAdaptor, "Drone")
+	ardroneAdaptor := ardrone.NewAdaptor()
+	drone := ardrone.NewDriver(ardroneAdaptor)
 
 	work := func() {
 		drone.On(ardrone.Flying, func(data interface{}) {
@@ -27,7 +25,6 @@ func main() {
 		[]gobot.Device{drone},
 		work,
 	)
-	gbot.AddRobot(robot)
 
-	gbot.Start()
+	robot.Start()
 }

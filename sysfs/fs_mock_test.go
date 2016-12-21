@@ -3,7 +3,7 @@ package sysfs
 import (
 	"testing"
 
-	"github.com/hybridgroup/gobot/gobottest"
+	"gobot.io/x/gobot/gobottest"
 )
 
 func TestMockFilesystemOpen(t *testing.T) {

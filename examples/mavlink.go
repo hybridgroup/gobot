@@ -3,16 +3,14 @@ package main
 import (
 	"fmt"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/mavlink"
-	common "github.com/hybridgroup/gobot/platforms/mavlink/common"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/platforms/mavlink"
+	common "gobot.io/x/gobot/platforms/mavlink/common"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
-
-	adaptor := mavlink.NewMavlinkAdaptor("iris", "/dev/ttyACM0")
-	iris := mavlink.NewMavlinkDriver(adaptor, "iris")
+	adaptor := mavlink.NewAdaptor("/dev/ttyACM0")
+	iris := mavlink.NewDriver(adaptor)
 
 	work := func() {
 		iris.Once(mavlink.PacketEvent, func(data interface{}) {
@@ -52,7 +50,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

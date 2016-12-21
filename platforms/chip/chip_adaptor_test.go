@@ -4,19 +4,19 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/gobottest"
-	"github.com/hybridgroup/gobot/platforms/gpio"
-	"github.com/hybridgroup/gobot/platforms/i2c"
-	"github.com/hybridgroup/gobot/sysfs"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/gpio"
+	"gobot.io/x/gobot/drivers/i2c"
+	"gobot.io/x/gobot/gobottest"
+	"gobot.io/x/gobot/sysfs"
 )
 
-var _ gobot.Adaptor = (*ChipAdaptor)(nil)
+var _ gobot.Adaptor = (*Adaptor)(nil)
 
-var _ gpio.DigitalReader = (*ChipAdaptor)(nil)
-var _ gpio.DigitalWriter = (*ChipAdaptor)(nil)
+var _ gpio.DigitalReader = (*Adaptor)(nil)
+var _ gpio.DigitalWriter = (*Adaptor)(nil)
 
-var _ i2c.I2c = (*ChipAdaptor)(nil)
+var _ i2c.I2c = (*Adaptor)(nil)
 
 type NullReadWriteCloser struct {
 	contents []byte
@@ -38,14 +38,14 @@ func (n *NullReadWriteCloser) Read(b []byte) (int, error) {
 	return len(b), nil
 }
 
-var closeErr error = nil
+var closeErr error
 
 func (n *NullReadWriteCloser) Close() error {
 	return closeErr
 }
 
-func initTestChipAdaptor() *ChipAdaptor {
-	a := NewChipAdaptor("myAdaptor")
+func initTestChipAdaptor() *Adaptor {
+	a := NewAdaptor()
 	a.Connect()
 	return a
 }
@@ -55,18 +55,18 @@ func TestChipAdaptorDigitalIO(t *testing.T) {
 	fs := sysfs.NewMockFilesystem([]string{
 		"/sys/class/gpio/export",
 		"/sys/class/gpio/unexport",
-		"/sys/class/gpio/gpio408/value",
-		"/sys/class/gpio/gpio408/direction",
-		"/sys/class/gpio/gpio415/value",
-		"/sys/class/gpio/gpio415/direction",
+		"/sys/class/gpio/gpio1013/value",
+		"/sys/class/gpio/gpio1013/direction",
+		"/sys/class/gpio/gpio1020/value",
+		"/sys/class/gpio/gpio1020/direction",
 	})
 
 	sysfs.SetFilesystem(fs)
 
 	a.DigitalWrite("XIO-P0", 1)
-	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio408/value"].Contents, "1")
+	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio1013/value"].Contents, "1")
 
-	fs.Files["/sys/class/gpio/gpio415/value"].Contents = "1"
+	fs.Files["/sys/class/gpio/gpio1020/value"].Contents = "1"
 	i, _ := a.DigitalRead("XIO-P7")
 	gobottest.Assert(t, i, 1)
 
@@ -87,5 +87,5 @@ func TestChipAdaptorI2c(t *testing.T) {
 	data, _ := a.I2cRead(0xff, 2)
 	gobottest.Assert(t, data, []byte{0x00, 0x01})
 
-	gobottest.Assert(t, len(a.Finalize()), 0)
+	gobottest.Assert(t, a.Finalize(), nil)
 }

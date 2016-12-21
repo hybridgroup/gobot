@@ -150,7 +150,7 @@ func read(r io.Reader, length int) ([]byte, error) {
 			length -= i
 			buf = append(buf, tmp...)
 			if length != i {
-				<-time.After(1 * time.Millisecond)
+				time.Sleep(1 * time.Millisecond)
 			} else {
 				break
 			}

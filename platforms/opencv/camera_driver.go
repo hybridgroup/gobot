@@ -5,7 +5,7 @@ import (
 
 	"time"
 
-	"github.com/hybridgroup/gobot"
+	"gobot.io/x/gobot"
 	cv "github.com/lazywei/go-opencv/opencv"
 )
 
@@ -19,6 +19,7 @@ const (
 	Frame = "frame"
 )
 
+// CameraDriver is the Gobot Driver for the OpenCV camera
 type CameraDriver struct {
 	name     string
 	camera   capture
@@ -28,11 +29,11 @@ type CameraDriver struct {
 	gobot.Eventer
 }
 
-// NewCameraDriver creates a new driver with specified name and source.
+// NewCameraDriver creates a new driver with specified source.
 // It also creates a start function to either set camera as a File or Camera capture.
-func NewCameraDriver(name string, source interface{}, v ...time.Duration) *CameraDriver {
+func NewCameraDriver(source interface{}, v ...time.Duration) *CameraDriver {
 	c := &CameraDriver{
-		name:     name,
+		name:     "Camera",
 		Eventer:  gobot.NewEventer(),
 		Source:   source,
 		interval: 10 * time.Millisecond,
@@ -58,14 +59,20 @@ func NewCameraDriver(name string, source interface{}, v ...time.Duration) *Camer
 	return c
 }
 
-func (c *CameraDriver) Name() string                 { return c.name }
+// Name returns the Driver name
+func (c *CameraDriver) Name() string { return c.name }
+
+// SetName sets the Driver name
+func (c *CameraDriver) SetName(n string) { c.name = n }
+
+// Connection returns the Driver's connection
 func (c *CameraDriver) Connection() gobot.Connection { return nil }
 
 // Start initializes camera by grabbing a frame
 // every `interval` and publishing an frame event
-func (c *CameraDriver) Start() (errs []error) {
+func (c *CameraDriver) Start() (err error) {
 	if err := c.start(c); err != nil {
-		return []error{err}
+		return err
 	}
 	go func() {
 		for {
@@ -75,11 +82,11 @@ func (c *CameraDriver) Start() (errs []error) {
 					c.Publish(Frame, image)
 				}
 			}
-			<-time.After(c.interval)
+			time.Sleep(c.interval)
 		}
 	}()
 	return
 }
 
 // Halt stops camera driver
-func (c *CameraDriver) Halt() (errs []error) { return }
+func (c *CameraDriver) Halt() (err error) { return }

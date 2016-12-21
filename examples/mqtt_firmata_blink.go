@@ -3,18 +3,16 @@ package main
 import (
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/firmata"
-	"github.com/hybridgroup/gobot/platforms/gpio"
-	"github.com/hybridgroup/gobot/platforms/mqtt"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/gpio"
+	"gobot.io/x/gobot/platforms/firmata"
+	"gobot.io/x/gobot/platforms/mqtt"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
-
-	mqttAdaptor := mqtt.NewMqttAdaptor("server", "tcp://test.mosquitto.org:1883", "blinker")
-	firmataAdaptor := firmata.NewFirmataAdaptor("arduino", "/dev/ttyACM0")
-	led := gpio.NewLedDriver(firmataAdaptor, "led", "13")
+	mqttAdaptor := mqtt.NewAdaptor("tcp://test.mosquitto.org:1883", "blinker")
+	firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
+	led := gpio.NewLedDriver(firmataAdaptor, "13")
 
 	work := func() {
 		mqttAdaptor.On("lights/on", func(data []byte) {
@@ -38,7 +36,5 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }

@@ -3,7 +3,7 @@ Package firmata provides the Gobot adaptor for microcontrollers that support the
 
 Installing:
 
-	go get -d -u github.com/hybridgroup/gobot/... && go get github.com/hybridgroup/gobot/platforms/firmata
+	go get -d -u gobot.io/x/gobot/... && go get gobot.io/x/gobot/platforms/firmata
 
 Example:
 
@@ -12,16 +12,14 @@ Example:
 	import (
 		"time"
 
-		"github.com/hybridgroup/gobot"
-		"github.com/hybridgroup/gobot/platforms/firmata"
-		"github.com/hybridgroup/gobot/platforms/gpio"
+		"gobot.io/x/gobot"
+		"gobot.io/x/gobot/drivers/gpio"
+		"gobot.io/x/gobot/platforms/firmata"
 	)
 
 	func main() {
-		gbot := gobot.NewGobot()
-
-		firmataAdaptor := firmata.NewFirmataAdaptor("arduino", "/dev/ttyACM0")
-		led := gpio.NewLedDriver(firmataAdaptor, "led", "13")
+		firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
+		led := gpio.NewLedDriver(firmataAdaptor, "13")
 
 		work := func() {
 			gobot.Every(1*time.Second, func() {
@@ -35,12 +33,10 @@ Example:
 			work,
 		)
 
-		gbot.AddRobot(robot)
-
-		gbot.Start()
+		robot.Start()
 	}
 
 For further information refer to firmata readme:
-https://github.com/hybridgroup/gobot/blob/master/platforms/firmata/README.md
+https://gobot.io/x/gobot/blob/master/platforms/firmata/README.md
 */
-package firmata
+package firmata // import "gobot.io/x/gobot/platforms/firmata"

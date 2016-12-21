@@ -2,13 +2,13 @@
 
 Sphero is a sophisticated and programmable robot housed in a polycarbonate sphere shell.
 
-The gobot-sphero adaptor makes it easy to interact with Sphero using Go, once you have your Sphero setup and connected to your computer you can start writing code to make Sphero move, change direction, speed and colors, or detect Sphero events and execute some code when they occur.
+The Gobot Sphero Adaptor & Driver makes it easy to interact with Sphero using Go. Once you have your Sphero setup and connected to your computer you can start writing code to make Sphero move, change direction, speed and colors, or detect Sphero events and execute some code when they occur.
 
-Learn more about the Sphero robot from Orbotix [here](http://www.gosphero.com/).
+Learn more about the Sphero robot go here: http://www.gosphero.com/
 
 ## How to Install
 ```
-go get -d -u github.com/hybridgroup/gobot/... && go install github.com/hybridgroup/gobot/platforms/sphero
+go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/sphero
 ```
 
 ## How To Connect
@@ -21,7 +21,7 @@ Now you must pair with the Sphero. Open System Preferences > Bluetooth. Now with
 
 ### Ubuntu
 
-Connecting to the Sphero from Ubuntu or any other Linux-based OS can be done entirely from the command line using [Gort](https://github.com/hybridgroup/gort) CLI commands. Here are the steps.
+Connecting to the Sphero from Ubuntu or any other Linux-based OS can be done entirely from the command line using [Gort](https://gobot.io/x/gort) CLI commands. Here are the steps.
 
 Find the address of the Sphero, by using:
 ```
@@ -53,15 +53,13 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/platforms/sphero"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/platforms/sphero"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
-
-	adaptor := sphero.NewSpheroAdaptor("sphero", "/dev/rfcomm0")
-	driver := sphero.NewSpheroDriver(adaptor, "sphero")
+	adaptor := sphero.NewAdaptor("/dev/rfcomm0")
+	driver := sphero.NewSpheroDriver(adaptor)
 
 	work := func() {
 		gobot.Every(3*time.Second, func() {
@@ -75,8 +73,6 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
-
-	gbot.Start()
+	robot.Start()
 }
 ```

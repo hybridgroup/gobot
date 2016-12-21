@@ -3,19 +3,19 @@ package main
 import (
 	"fmt"
 
-	"github.com/hybridgroup/gobot"
-	"github.com/hybridgroup/gobot/api"
-	"github.com/hybridgroup/gobot/platforms/pebble"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/api"
+	"gobot.io/x/gobot/platforms/pebble"
 )
 
 func main() {
-	gbot := gobot.NewGobot()
-	api := api.NewAPI(gbot)
+	master := gobot.NewMaster()
+	api := api.NewAPI(master)
 	api.Port = "8080"
 	api.Start()
 
-	pebbleAdaptor := pebble.NewPebbleAdaptor("pebble")
-	pebbleDriver := pebble.NewPebbleDriver(pebbleAdaptor, "pebble")
+	pebbleAdaptor := pebble.NewAdaptor()
+	pebbleDriver := pebble.NewDriver(pebbleAdaptor)
 
 	work := func() {
 		pebbleDriver.SendNotification("Hello Pebble!")
@@ -34,7 +34,7 @@ func main() {
 		work,
 	)
 
-	gbot.AddRobot(robot)
+	master.AddRobot(robot)
 
-	gbot.Start()
+	master.Start()
 }

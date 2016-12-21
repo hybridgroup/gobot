@@ -1,30 +1,33 @@
 package mqtt
 
 import (
-	"git.eclipse.org/gitroot/paho/org.eclipse.paho.mqtt.golang.git"
+	paho "github.com/eclipse/paho.mqtt.golang"
+	multierror "github.com/hashicorp/go-multierror"
 )
 
-type MqttAdaptor struct {
+// Adaptor is the Gobot Adaptor for MQTT
+type Adaptor struct {
 	name     string
 	Host     string
 	clientID string
 	username string
 	password string
-	client   *mqtt.Client
+	client   paho.Client
 }
 
-// NewMqttAdaptor creates a new mqtt adaptor with specified name, host and client id
-func NewMqttAdaptor(name string, host string, clientID string) *MqttAdaptor {
-	return &MqttAdaptor{
-		name:     name,
+// NewAdaptor creates a new mqtt adaptor with specified host and client id
+func NewAdaptor(host string, clientID string) *Adaptor {
+	return &Adaptor{
+		name:     "MQTT",
 		Host:     host,
 		clientID: clientID,
 	}
 }
 
-func NewMqttAdaptorWithAuth(name, host, clientID, username, password string) *MqttAdaptor {
-	return &MqttAdaptor{
-		name:     name,
+// NewAdaptorWithAuth creates a new mqtt adaptor with specified host, client id, username, and password.
+func NewAdaptorWithAuth(host, clientID, username, password string) *Adaptor {
+	return &Adaptor{
+		name:     "MQTT",
 		Host:     host,
 		clientID: clientID,
 		username: username,
@@ -32,20 +35,24 @@ func NewMqttAdaptorWithAuth(name, host, clientID, username, password string) *Mq
 	}
 }
 
-func (a *MqttAdaptor) Name() string { return a.name }
+// Name returns the MQTT Adaptor's name
+func (a *Adaptor) Name() string { return a.name }
+
+// SetName sets the MQTT Adaptor's name
+func (a *Adaptor) SetName(n string) { a.name = n }
 
 // Connect returns true if connection to mqtt is established
-func (a *MqttAdaptor) Connect() (errs []error) {
-	a.client = mqtt.NewClient(createClientOptions(a.clientID, a.Host, a.username, a.password))
+func (a *Adaptor) Connect() (err error) {
+	a.client = paho.NewClient(createClientOptions(a.clientID, a.Host, a.username, a.password))
 	if token := a.client.Connect(); token.Wait() && token.Error() != nil {
-		errs = append(errs, token.Error())
+		err = multierror.Append(err, token.Error())
 	}
 
 	return
 }
 
 // Disconnect returns true if connection to mqtt is closed
-func (a *MqttAdaptor) Disconnect() (err error) {
+func (a *Adaptor) Disconnect() (err error) {
 	if a.client != nil {
 		a.client.Disconnect(500)
 	}
@@ -53,13 +60,13 @@ func (a *MqttAdaptor) Disconnect() (err error) {
 }
 
 // Finalize returns true if connection to mqtt is finalized successfully
-func (a *MqttAdaptor) Finalize() (errs []error) {
+func (a *Adaptor) Finalize() (err error) {
 	a.Disconnect()
 	return
 }
 
 // Publish a message under a specific topic
-func (a *MqttAdaptor) Publish(topic string, message []byte) bool {
+func (a *Adaptor) Publish(topic string, message []byte) bool {
 	if a.client == nil {
 		return false
 	}
@@ -67,21 +74,21 @@ func (a *MqttAdaptor) Publish(topic string, message []byte) bool {
 	return true
 }
 
-// Subscribe to a topic, and then call the message handler function when data is received
-func (a *MqttAdaptor) On(event string, f func(s []byte)) bool {
+// On subscribes to a topic, and then calls the message handler function when data is received
+func (a *Adaptor) On(event string, f func(s []byte)) bool {
 	if a.client == nil {
 		return false
 	}
-	a.client.Subscribe(event, 0, func(client *mqtt.Client, msg mqtt.Message) {
+	a.client.Subscribe(event, 0, func(client paho.Client, msg paho.Message) {
 		f(msg.Payload())
 	})
 	return true
 }
 
-func createClientOptions(clientId, raw, username, password string) *mqtt.ClientOptions {
-	opts := mqtt.NewClientOptions()
+func createClientOptions(clientID, raw, username, password string) *paho.ClientOptions {
+	opts := paho.NewClientOptions()
 	opts.AddBroker(raw)
-	opts.SetClientID(clientId)
+	opts.SetClientID(clientID)
 	if username != "" && password != "" {
 		opts.SetPassword(password)
 		opts.SetUsername(username)
