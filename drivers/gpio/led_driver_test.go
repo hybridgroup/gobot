@@ -4,8 +4,11 @@ import (
 	"errors"
 	"testing"
 
+	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/gobottest"
 )
+
+var _ gobot.Driver = (*LedDriver)(nil)
 
 func initTestLedDriver(conn DigitalWriter) *LedDriver {
 	testAdaptorDigitalWrite = func() (err error) {

@@ -2,8 +2,6 @@ package gpio
 
 import "gobot.io/x/gobot"
 
-var _ gobot.Driver = (*LedDriver)(nil)
-
 // LedDriver represents a digital Led
 type LedDriver struct {
 	pin        string
