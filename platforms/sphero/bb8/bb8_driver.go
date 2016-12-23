@@ -12,7 +12,10 @@ type BB8Driver struct {
 
 // NewDriver creates a Driver for a Sphero BB-8
 func NewDriver(a *ble.ClientAdaptor) *BB8Driver {
+	d := ollie.NewDriver(a)
+	d.SetName("BB-8")
+
 	return &BB8Driver{
-		Driver: ollie.NewDriver(a),
+		Driver: d,
 	}
 }
