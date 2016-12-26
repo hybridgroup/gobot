@@ -1,5 +1,5 @@
 /*
-	This example will connect to the Bebop and stream it's video to a webpage
+	This example will connect to the Bebop and stream its video to a webpage
 	via ffserver. This requires you to have both ffmpeg and ffserver installed
 	on your computer.
 
@@ -28,6 +28,16 @@ func main() {
 	bebop := client.New()
 
 	if err := bebop.Connect(); err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	if err := bebop.VideoEnable(true); err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	if err := bebop.VideoStreamMode(0); err != nil {
 		fmt.Println(err)
 		return
 	}

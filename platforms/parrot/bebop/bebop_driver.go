@@ -140,3 +140,13 @@ func (a *Driver) HullProtection(protect bool) error {
 func (a *Driver) Outdoor(outdoor bool) error {
 	return a.adaptor().drone.Outdoor(outdoor)
 }
+
+// VideoEnable tells the drone to start/stop streaming video
+func (a *Driver) VideoEnable(enable bool) error {
+	return a.adaptor().drone.VideoEnable(enable)
+}
+
+// VideoStreamMode tells the drone what mode to use for streaming video
+func (a *Driver) VideoStreamMode(mode int8) error {
+	return a.adaptor().drone.VideoStreamMode(mode)
+}

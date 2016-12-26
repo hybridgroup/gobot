@@ -651,6 +651,50 @@ func (b *Bebop) Outdoor(outdoor bool) error {
 	return err
 }
 
+func (b *Bebop) VideoEnable(enable bool) error {
+	cmd := &bytes.Buffer{}
+
+	cmd.WriteByte(ARCOMMANDS_ID_PROJECT_ARDRONE3)
+	cmd.WriteByte(ARCOMMANDS_ID_ARDRONE3_CLASS_MEDIASTREAMING)
+
+	tmp := &bytes.Buffer{}
+	binary.Write(tmp,
+		binary.LittleEndian,
+		uint16(ARCOMMANDS_ID_ARDRONE3_MEDIASTREAMING_CMD_VIDEOENABLE),
+	)
+
+	cmd.Write(tmp.Bytes())
+
+	tmp = &bytes.Buffer{}
+	binary.Write(tmp, binary.LittleEndian, bool2int8(enable))
+	cmd.Write(tmp.Bytes())
+
+	_, err := b.write(b.networkFrameGenerator(cmd, ARNETWORKAL_FRAME_TYPE_DATA, BD_NET_CD_NONACK_ID).Bytes())
+	return err
+}
+
+func (b *Bebop) VideoStreamMode(mode int8) error {
+	cmd := &bytes.Buffer{}
+
+	cmd.WriteByte(ARCOMMANDS_ID_PROJECT_ARDRONE3)
+	cmd.WriteByte(ARCOMMANDS_ID_ARDRONE3_CLASS_MEDIASTREAMING)
+
+	tmp := &bytes.Buffer{}
+	binary.Write(tmp,
+		binary.LittleEndian,
+		uint16(ARCOMMANDS_ID_ARDRONE3_MEDIASTREAMING_CMD_VIDEOSTREAMMODE),
+	)
+
+	cmd.Write(tmp.Bytes())
+
+	tmp = &bytes.Buffer{}
+	binary.Write(tmp, binary.LittleEndian, mode)
+	cmd.Write(tmp.Bytes())
+
+	_, err := b.write(b.networkFrameGenerator(cmd, ARNETWORKAL_FRAME_TYPE_DATA, BD_NET_CD_NONACK_ID).Bytes())
+	return err
+}
+
 func bool2int8(b bool) int8 {
 	if b {
 		return 1
