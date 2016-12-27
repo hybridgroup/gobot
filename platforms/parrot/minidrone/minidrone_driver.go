@@ -26,9 +26,12 @@ const (
 	droneCommandService      = "9a66fa000800919111e4012d1540cb8e"
 	droneNotificationService = "9a66fb000800919111e4012d1540cb8e"
 
-	// BLE characteristics
-	pcmdCharacteristic         = "9a66fa0a0800919111e4012d1540cb8e"
-	commandCharacteristic      = "9a66fa0b0800919111e4012d1540cb8e"
+	// send characteristics
+	pcmdCharacteristic     = "9a66fa0a0800919111e4012d1540cb8e"
+	commandCharacteristic  = "9a66fa0b0800919111e4012d1540cb8e"
+	priorityCharacteristic = "9a66fa0c0800919111e4012d1540cb8e"
+
+	// receive characteristics
 	flightStatusCharacteristic = "9a66fb0e0800919111e4012d1540cb8e"
 	batteryCharacteristic      = "9a66fb0f0800919111e4012d1540cb8e"
 
@@ -164,7 +167,7 @@ func (b *Driver) Init() (err error) {
 			return
 		}
 
-		b.Publish(b.Event(FlightStatus), data[4])
+		b.Publish(FlightStatus, data[4])
 
 		if data[4] == flatTrimChanged {
 			b.Publish(FlatTrimChange, true)
@@ -230,7 +233,7 @@ func (b *Driver) TakeOff() (err error) {
 // Land tells the Minidrone to land
 func (b *Driver) Land() (err error) {
 	b.stepsfa0b++
-	buf := []byte{0x02, byte(b.stepsfa0b), 0x02, 0x00, 0x03, 0x00}
+	buf := []byte{0x02, byte(b.stepsfa0b) & 0xff, 0x02, 0x00, 0x03, 0x00}
 	err = b.adaptor().WriteCharacteristic(droneCommandService, commandCharacteristic, buf)
 
 	return err
@@ -240,6 +243,24 @@ func (b *Driver) Land() (err error) {
 func (b *Driver) FlatTrim() (err error) {
 	b.stepsfa0b++
 	buf := []byte{0x02, byte(b.stepsfa0b) & 0xff, 0x02, 0x00, 0x00, 0x00}
+	err = b.adaptor().WriteCharacteristic(droneCommandService, commandCharacteristic, buf)
+
+	return err
+}
+
+// Emergency sets the Minidrone into emergency mode
+func (b *Driver) Emergency() (err error) {
+	b.stepsfa0b++
+	buf := []byte{0x02, byte(b.stepsfa0b) & 0xff, 0x02, 0x00, 0x04, 0x00}
+	err = b.adaptor().WriteCharacteristic(droneCommandService, priorityCharacteristic, buf)
+
+	return err
+}
+
+// TakePicture tells the Minidrone to take a picture
+func (b *Driver) TakePicture() (err error) {
+	b.stepsfa0b++
+	buf := []byte{0x02, byte(b.stepsfa0b) & 0xff, 0x02, 0x06, 0x01, 0x00}
 	err = b.adaptor().WriteCharacteristic(droneCommandService, commandCharacteristic, buf)
 
 	return err
