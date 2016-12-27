@@ -110,7 +110,7 @@ On Linux the BLE code will need to run as a root user account. The easiest way t
 For example:
 
     go build examples/minidrone.go
-    sudo ./bb8 RS_1234
+    sudo ./minidrone RS_1234
 
 ### Windows
 
