@@ -1,7 +1,25 @@
 # Parrot Minidrone
 
-The Parrot Minidrone is very inexpensive quadcopter that is controlled using Bluetooth LE.
+The Parrot Minidrones are very inexpensive drones that are controlled using Bluetooth LE aka Bluetooth 4.0.
 
+Models that are known to work with this package include:
+
+	- Parrot Rolling Spider
+	- Parrot Airborne Cargo Mars
+	- Parrot Airborne Cargo Travis
+
+Models that should work now, but have not been tested by us:
+
+	- Parrot Airborne Night Swat
+	- Parrot Airborne Night Maclane
+	- Parrot Airborne Night Blaze
+	- Parrot HYDROFOIL Orak
+	- Parrot HYDROFOIL NewZ
+
+Models that will require additional work for compatibility:
+
+	- Parrot Swing
+	- Parrot Mambo
 
 ## How to Install
 ```
@@ -64,7 +82,7 @@ func main() {
 
 ## How to Connect
 
-The Parrot Minidrone is a Bluetooth LE device.
+The Parrot Minidrones are Bluetooth LE devices.
 
 You need to know the BLE ID of the Minidrone you want to connect to. The Gobot BLE client adaptor also lets you connect by friendly name, aka "RS_1234".
 
