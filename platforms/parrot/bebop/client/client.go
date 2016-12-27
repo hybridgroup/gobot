@@ -161,6 +161,8 @@ type Bebop struct {
 	tmpFrame              tmpFrame
 	C2dPort               int
 	D2cPort               int
+	RTPStreamPort         int
+	RTPControlPort        int
 	DiscoveryPort         int
 	c2dClient             *net.UDPConn
 	d2cClient             *net.UDPConn
@@ -176,6 +178,8 @@ func New() *Bebop {
 		NavData:               make(map[string]string),
 		C2dPort:               54321,
 		D2cPort:               43210,
+		RTPStreamPort:				 55004,
+		RTPControlPort:				 55005,
 		DiscoveryPort:         44444,
 		networkFrameGenerator: networkFrameGenerator(),
 		Pcmd: Pcmd{
@@ -212,11 +216,16 @@ func (b *Bebop) Discover() error {
 
 	b.discoveryClient.Write(
 		[]byte(
-			`{
-			"controller_type": "computer",
-			"controller_name": "go-bebop",
-			"d2c_port": "43210"
-			}`,
+			fmt.Sprintf(`{
+						"controller_type": "computer",
+						"controller_name": "go-bebop",
+						"d2c_port": "%d",
+						"arstream2_client_stream_port": "%d",
+						"arstream2_client_control_port": "%d",
+						}`,
+						b.D2cPort,
+						b.RTPStreamPort,
+						b.RTPControlPort),
 		),
 	)
 

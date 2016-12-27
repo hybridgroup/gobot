@@ -1,0 +1,3 @@
+c=IN IP4 192.168.42.1
+m=video 55004 RTP/AVP 96
+a=rtpmap:96 H264/90000
