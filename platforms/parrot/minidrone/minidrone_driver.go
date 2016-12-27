@@ -10,7 +10,7 @@ import (
 	"gobot.io/x/gobot/platforms/ble"
 )
 
-// Driver is gobot software device to the keyboard
+// Driver is the Gobot interface to the Parrot Minidrone
 type Driver struct {
 	name       string
 	connection gobot.Connection
@@ -22,29 +22,83 @@ type Driver struct {
 }
 
 const (
-	// service IDs
-	DroneCommandService      = "9a66fa000800919111e4012d1540cb8e"
+	// DroneCommandService service ID
+	DroneCommandService = "9a66fa000800919111e4012d1540cb8e"
+
+	// DroneNotificationService service ID
 	DroneNotificationService = "9a66fb000800919111e4012d1540cb8e"
 
-	// characteristic IDs
-	PcmdCharacteristic         = "9a66fa0a0800919111e4012d1540cb8e"
-	CommandCharacteristic      = "9a66fa0b0800919111e4012d1540cb8e"
+	// PcmdCharacteristic characteristic ID
+	PcmdCharacteristic = "9a66fa0a0800919111e4012d1540cb8e"
+
+	// CommandCharacteristic characteristic ID
+	CommandCharacteristic = "9a66fa0b0800919111e4012d1540cb8e"
+
+	// FlightStatusCharacteristic characteristic ID
 	FlightStatusCharacteristic = "9a66fb0e0800919111e4012d1540cb8e"
-	BatteryCharacteristic      = "9a66fb0f0800919111e4012d1540cb8e"
+
+	// BatteryCharacteristic characteristic ID
+	BatteryCharacteristic = "9a66fb0f0800919111e4012d1540cb8e"
+
+	// FlatTrimChanged notification from drone
+	FlatTrimChanged = 0
+
+	// FlyingStateChanged notification from drone
+	FlyingStateChanged = 1
+
+	// FlyingStateLanded when drone is on the ground
+	FlyingStateLanded = 0
+
+	// FlyingStateTakeoff when drone is taking off
+	FlyingStateTakeoff = 1
+
+	// FlyingStateHovering when drone is hovering
+	FlyingStateHovering = 2
+
+	// FlyingStateFlying when drone is flying
+	FlyingStateFlying = 3
+
+	// FlyingStateLanding when drone is landing
+	FlyingStateLanding = 4
+
+	// FlyingStateEmergency when drone is having an emergency
+	FlyingStateEmergency = 5
+
+	// FlyingStateRolling when drone is performing an aerobatic move
+	FlyingStateRolling = 6
 
 	// Battery event
 	Battery = "battery"
 
-	// flight status event
-	Status = "status"
+	// FlightStatus event
+	FlightStatus = "flightstatus"
 
-	// flying event
+	// Takeoff event
+	Takeoff = "takeoff"
+
+	// Hovering event
+	Hovering = "hovering"
+
+	// Flying event
 	Flying = "flying"
 
-	// landed event
+	// Landing event
+	Landing = "landing"
+
+	// Landed event
 	Landed = "landed"
+
+	// Emergency event
+	Emergency = "emergency"
+
+	// Rolling event
+	Rolling = "rolling"
+
+	// FlatTrimChange event
+	FlatTrimChange = "flattrimchange"
 )
 
+// Pcmd is the Parrot Command structure for flight control
 type Pcmd struct {
 	Flag  int
 	Roll  int
@@ -52,16 +106,6 @@ type Pcmd struct {
 	Yaw   int
 	Gaz   int
 	Psi   float32
-}
-
-func validatePitch(val int) int {
-	if val > 100 {
-		return 100
-	} else if val < 0 {
-		return 0
-	}
-
-	return val
 }
 
 // NewDriver creates a Parrot Minidrone Driver
@@ -81,13 +125,20 @@ func NewDriver(a *ble.ClientAdaptor) *Driver {
 	}
 
 	n.AddEvent(Battery)
-	n.AddEvent(Status)
+	n.AddEvent(FlightStatus)
+
+	n.AddEvent(Takeoff)
 	n.AddEvent(Flying)
+	n.AddEvent(Hovering)
+	n.AddEvent(Landing)
 	n.AddEvent(Landed)
+	n.AddEvent(Emergency)
+	n.AddEvent(Rolling)
 
 	return n
 }
 
+// Connection returns the BLE connection
 func (b *Driver) Connection() gobot.Connection { return b.connection }
 
 // Name returns the Driver Name
@@ -119,6 +170,7 @@ func (b *Driver) Halt() (err error) {
 	return
 }
 
+// Init initializes the BLE insterfaces used by the Minidrone
 func (b *Driver) Init() (err error) {
 	b.GenerateAllStates()
 
@@ -129,23 +181,50 @@ func (b *Driver) Init() (err error) {
 
 	// subscribe to flying status notifications
 	b.adaptor().Subscribe(DroneNotificationService, FlightStatusCharacteristic, func(data []byte, e error) {
-		if len(data) < 7 || data[2] != 2 {
-			fmt.Println(data)
+		if len(data) < 5 {
+			// ignore, just a sync
 			return
 		}
-		b.Publish(b.Event(Status), data[6])
-		if (data[6] == 1 || data[6] == 2) && !b.flying {
-			b.flying = true
-			b.Publish(b.Event(Flying), true)
-		} else if (data[6] == 0) && b.flying {
-			b.flying = false
-			b.Publish(b.Event(Landed), true)
+
+		b.Publish(b.Event(FlightStatus), data[4])
+
+		if data[4] == FlatTrimChanged {
+			b.Publish(FlatTrimChange, true)
 		}
+		if data[4] == FlyingStateChanged {
+			switch data[6] {
+			case FlyingStateLanded:
+				if b.flying {
+					b.flying = false
+					b.Publish(Landed, true)
+				}
+			case FlyingStateTakeoff:
+				b.Publish(Takeoff, true)
+			case FlyingStateHovering:
+				if !b.flying {
+					b.flying = true
+					b.Publish(Hovering, true)
+				}
+			case FlyingStateFlying:
+				if !b.flying {
+					b.flying = true
+					b.Publish(Flying, true)
+				}
+			case FlyingStateLanding:
+				b.Publish(Landing, true)
+			case FlyingStateEmergency:
+				b.Publish(Emergency, true)
+			case FlyingStateRolling:
+				b.Publish(Rolling, true)
+			}
+		}
+
 	})
 
 	return
 }
 
+// GenerateAllStates sets up all the default states aka settings on the drone
 func (b *Driver) GenerateAllStates() (err error) {
 	b.stepsfa0b++
 	buf := []byte{0x04, byte(b.stepsfa0b), 0x00, 0x04, 0x01, 0x00, 0x32, 0x30, 0x31, 0x34, 0x2D, 0x31, 0x30, 0x2D, 0x32, 0x38, 0x00}
@@ -158,6 +237,7 @@ func (b *Driver) GenerateAllStates() (err error) {
 	return
 }
 
+// TakeOff tells the Minidrone to takeoff
 func (b *Driver) TakeOff() (err error) {
 	b.stepsfa0b++
 	buf := []byte{0x02, byte(b.stepsfa0b) & 0xff, 0x02, 0x00, 0x01, 0x00}
@@ -170,6 +250,7 @@ func (b *Driver) TakeOff() (err error) {
 	return
 }
 
+// Land tells the Minidrone to land
 func (b *Driver) Land() (err error) {
 	b.stepsfa0b++
 	buf := []byte{0x02, byte(b.stepsfa0b), 0x02, 0x00, 0x03, 0x00}
@@ -178,6 +259,7 @@ func (b *Driver) Land() (err error) {
 	return err
 }
 
+// FlatTrim calibrates the Minidrone to use its current position as being level
 func (b *Driver) FlatTrim() (err error) {
 	b.stepsfa0b++
 	buf := []byte{0x02, byte(b.stepsfa0b) & 0xff, 0x02, 0x00, 0x00, 0x00}
@@ -186,6 +268,7 @@ func (b *Driver) FlatTrim() (err error) {
 	return err
 }
 
+// StartPcmd starts the continuous Pcmd communication with the Minidrone
 func (b *Driver) StartPcmd() {
 	go func() {
 		// wait a little bit so that there is enough time to get some ACKs
@@ -200,54 +283,63 @@ func (b *Driver) StartPcmd() {
 	}()
 }
 
+// Up tells the drone to ascend
 func (b *Driver) Up(val int) error {
 	b.Pcmd.Flag = 1
 	b.Pcmd.Gaz = validatePitch(val)
 	return nil
 }
 
+// Down tells the drone to descend
 func (b *Driver) Down(val int) error {
 	b.Pcmd.Flag = 1
 	b.Pcmd.Gaz = validatePitch(val) * -1
 	return nil
 }
 
+// Forward tells the drone to go forward
 func (b *Driver) Forward(val int) error {
 	b.Pcmd.Flag = 1
 	b.Pcmd.Pitch = validatePitch(val)
 	return nil
 }
 
+// Backward tells drone to go in reverse
 func (b *Driver) Backward(val int) error {
 	b.Pcmd.Flag = 1
 	b.Pcmd.Pitch = validatePitch(val) * -1
 	return nil
 }
 
+// Right tells drone to go right
 func (b *Driver) Right(val int) error {
 	b.Pcmd.Flag = 1
 	b.Pcmd.Roll = validatePitch(val)
 	return nil
 }
 
+// Left tells drone to go left
 func (b *Driver) Left(val int) error {
 	b.Pcmd.Flag = 1
 	b.Pcmd.Roll = validatePitch(val) * -1
 	return nil
 }
 
+// Clockwise tells drone to rotate in a clockwise direction
 func (b *Driver) Clockwise(val int) error {
 	b.Pcmd.Flag = 1
 	b.Pcmd.Yaw = validatePitch(val)
 	return nil
 }
 
+// CounterClockwise tells drone to rotate in a counter-clockwise direction
 func (b *Driver) CounterClockwise(val int) error {
 	b.Pcmd.Flag = 1
 	b.Pcmd.Yaw = validatePitch(val) * -1
 	return nil
 }
 
+// Stop tells the drone to stop moving in any direction and simply hover in place
 func (b *Driver) Stop() error {
 	b.Pcmd = Pcmd{
 		Flag:  0,
@@ -261,38 +353,42 @@ func (b *Driver) Stop() error {
 	return nil
 }
 
-// StartRecording not supported
+// StartRecording is not supported by the Parrot Minidrone
 func (b *Driver) StartRecording() error {
 	return nil
 }
 
-// StopRecording not supported
+// StopRecording is not supported by the Parrot Minidrone
 func (b *Driver) StopRecording() error {
 	return nil
 }
 
-// HullProtection not supported
+// HullProtection is not supported by the Parrot Minidrone
 func (b *Driver) HullProtection(protect bool) error {
 	return nil
 }
 
-// Outdoor not supported
+// Outdoor mdoe is not supported by the Parrot Minidrone
 func (b *Driver) Outdoor(outdoor bool) error {
 	return nil
 }
 
+// FrontFlip tells the drone to perform a front flip
 func (b *Driver) FrontFlip() (err error) {
 	return b.adaptor().WriteCharacteristic(DroneCommandService, CommandCharacteristic, b.generateAnimation(0).Bytes())
 }
 
+// BackFlip tells the drone to perform a backflip
 func (b *Driver) BackFlip() (err error) {
 	return b.adaptor().WriteCharacteristic(DroneCommandService, CommandCharacteristic, b.generateAnimation(1).Bytes())
 }
 
+// RightFlip tells the drone to perform a flip to the right
 func (b *Driver) RightFlip() (err error) {
 	return b.adaptor().WriteCharacteristic(DroneCommandService, CommandCharacteristic, b.generateAnimation(2).Bytes())
 }
 
+// LeftFlip tells the drone to perform a flip to the left
 func (b *Driver) LeftFlip() (err error) {
 	return b.adaptor().WriteCharacteristic(DroneCommandService, CommandCharacteristic, b.generateAnimation(3).Bytes())
 }
@@ -323,4 +419,14 @@ func (b *Driver) generatePcmd() *bytes.Buffer {
 	binary.Write(cmd, binary.LittleEndian, int16(0))
 
 	return cmd
+}
+
+func validatePitch(val int) int {
+	if val > 100 {
+		return 100
+	} else if val < 0 {
+		return 0
+	}
+
+	return val
 }
