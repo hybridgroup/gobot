@@ -19,26 +19,16 @@ type Driver struct {
 }
 
 const (
-	// SpheroBLEService is the primary service ID
-	SpheroBLEService = "22bb746f2bb075542d6f726568705327"
+	// bluetooth service IDs
+	spheroBLEService    = "22bb746f2bb075542d6f726568705327"
+	robotControlService = "22bb746f2ba075542d6f726568705327"
 
-	// RobotControlService is the service ID for the Sphero command API
-	RobotControlService = "22bb746f2ba075542d6f726568705327"
-
-	// WakeCharacteristic characteristic ID
-	WakeCharacteristic = "22bb746f2bbf75542d6f726568705327"
-
-	// TXPowerCharacteristic characteristic ID
-	TXPowerCharacteristic = "22bb746f2bb275542d6f726568705327"
-
-	// AntiDosCharacteristic characteristic ID
-	AntiDosCharacteristic = "22bb746f2bbd75542d6f726568705327"
-
-	// CommandsCharacteristic characteristic ID
-	CommandsCharacteristic = "22bb746f2ba175542d6f726568705327"
-
-	// ResponseCharacteristic characteristic ID
-	ResponseCharacteristic = "22bb746f2ba675542d6f726568705327"
+	// BLE characteristic IDs
+	wakeCharacteristic     = "22bb746f2bbf75542d6f726568705327"
+	txPowerCharacteristic  = "22bb746f2bb275542d6f726568705327"
+	antiDosCharacteristic  = "22bb746f2bbd75542d6f726568705327"
+	commandsCharacteristic = "22bb746f2ba175542d6f726568705327"
+	responseCharacteristic = "22bb746f2ba675542d6f726568705327"
 
 	// SensorData event
 	SensorData = "sensordata"
@@ -114,7 +104,7 @@ func (b *Driver) Init() (err error) {
 	b.Wake()
 
 	// subscribe to Sphero response notifications
-	b.adaptor().Subscribe(RobotControlService, ResponseCharacteristic, b.HandleResponses)
+	b.adaptor().Subscribe(robotControlService, responseCharacteristic, b.HandleResponses)
 
 	return
 }
@@ -125,7 +115,7 @@ func (b *Driver) AntiDOSOff() (err error) {
 	buf := &bytes.Buffer{}
 	buf.WriteString(str)
 
-	err = b.adaptor().WriteCharacteristic(SpheroBLEService, AntiDosCharacteristic, buf.Bytes())
+	err = b.adaptor().WriteCharacteristic(spheroBLEService, antiDosCharacteristic, buf.Bytes())
 	if err != nil {
 		fmt.Println("AntiDOSOff error:", err)
 		return err
@@ -138,7 +128,7 @@ func (b *Driver) AntiDOSOff() (err error) {
 func (b *Driver) Wake() (err error) {
 	buf := []byte{0x01}
 
-	err = b.adaptor().WriteCharacteristic(SpheroBLEService, WakeCharacteristic, buf)
+	err = b.adaptor().WriteCharacteristic(spheroBLEService, wakeCharacteristic, buf)
 	if err != nil {
 		fmt.Println("Wake error:", err)
 		return err
@@ -151,7 +141,7 @@ func (b *Driver) Wake() (err error) {
 func (b *Driver) SetTXPower(level int) (err error) {
 	buf := []byte{byte(level)}
 
-	err = b.adaptor().WriteCharacteristic(SpheroBLEService, TXPowerCharacteristic, buf)
+	err = b.adaptor().WriteCharacteristic(spheroBLEService, txPowerCharacteristic, buf)
 	if err != nil {
 		fmt.Println("SetTXLevel error:", err)
 		return err
@@ -192,29 +182,29 @@ func (b *Driver) EnableStopOnDisconnect() {
 	b.packetChannel <- b.craftPacket([]uint8{0x00, 0x00, 0x00, 0x01}, 0x02, 0x37)
 }
 
-func (s *Driver) write(packet *packet) (err error) {
+func (b *Driver) write(packet *packet) (err error) {
 	buf := append(packet.header, packet.body...)
 	buf = append(buf, packet.checksum)
-	err = s.adaptor().WriteCharacteristic(RobotControlService, CommandsCharacteristic, buf)
+	err = b.adaptor().WriteCharacteristic(robotControlService, commandsCharacteristic, buf)
 	if err != nil {
 		fmt.Println("send command error:", err)
 		return err
 	}
 
-	s.seq++
+	b.seq++
 	return
 }
 
-func (s *Driver) craftPacket(body []uint8, did byte, cid byte) *packet {
+func (b *Driver) craftPacket(body []uint8, did byte, cid byte) *packet {
 	packet := new(packet)
 	packet.body = body
 	dlen := len(packet.body) + 1
-	packet.header = []uint8{0xFF, 0xFF, did, cid, s.seq, uint8(dlen)}
-	packet.checksum = s.calculateChecksum(packet)
+	packet.header = []uint8{0xFF, 0xFF, did, cid, b.seq, uint8(dlen)}
+	packet.checksum = b.calculateChecksum(packet)
 	return packet
 }
 
-func (s *Driver) calculateChecksum(packet *packet) uint8 {
+func (b *Driver) calculateChecksum(packet *packet) uint8 {
 	buf := append(packet.header, packet.body...)
 	return calculateChecksum(buf[2:])
 }
