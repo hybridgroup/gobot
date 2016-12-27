@@ -45,24 +45,31 @@ func main() {
 	drone := minidrone.NewDriver(bleAdaptor)
 
 	work := func() {
-		drone.On(drone.Event("battery"), func(data interface{}) {
+		drone.On(minidrone.Battery, func(data interface{}) {
 			fmt.Printf("battery: %d\n", data)
 		})
 
-		drone.On(drone.Event("status"), func(data interface{}) {
-			fmt.Printf("status: %d\n", data)
+		drone.On(minidrone.FlightStatus, func(data interface{}) {
+			fmt.Printf("flight status: %d\n", data)
 		})
 
-		drone.On(drone.Event("flying"), func(data interface{}) {
-			fmt.Println("flying!")
+		drone.On(minidrone.Takeoff, func(data interface{}) {
+			fmt.Println("taking off...")
+		})
+
+		drone.On(minidrone.Hovering, func(data interface{}) {
+			fmt.Println("hovering!")
 			gobot.After(5*time.Second, func() {
-				fmt.Println("landing...")
 				drone.Land()
 				drone.Land()
 			})
 		})
 
-		drone.On(drone.Event("landed"), func(data interface{}) {
+		drone.On(minidrone.Landing, func(data interface{}) {
+			fmt.Println("landing...")
+		})
+
+		drone.On(minidrone.Landed, func(data interface{}) {
 			fmt.Println("landed.")
 		})
 
