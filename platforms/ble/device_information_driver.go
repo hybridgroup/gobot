@@ -6,8 +6,6 @@ import (
 	"gobot.io/x/gobot"
 )
 
-var _ gobot.Driver = (*DeviceInformationDriver)(nil)
-
 // DeviceInformationDriver represents the Device Information Service for a BLE Peripheral
 type DeviceInformationDriver struct {
 	name       string
