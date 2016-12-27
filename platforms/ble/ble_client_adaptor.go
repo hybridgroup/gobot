@@ -6,10 +6,7 @@ import (
 	"strings"
 
 	"github.com/currantlabs/gatt"
-	"gobot.io/x/gobot"
 )
-
-var _ gobot.Adaptor = (*ClientAdaptor)(nil)
 
 // Represents a Client Connection to a BLE Peripheral
 type ClientAdaptor struct {
