@@ -1,10 +1,16 @@
 # Bluetooth LE
 
-The Gobot BLE adaptor makes it easy to interact with Bluetooth LE using Go.
+The Gobot BLE adaptor makes it easy to interact with Bluetooth LE aka Bluetooth 4.0 using Go.
 
 It is written using the [gatt](https://github.com/currantlabs/gatt) package fork by Currant Labs of the package from [Paypal](https://github.com/paypal). Thank you!
 
-Learn more about Bluetooth LE [here](http://en.wikipedia.org/wiki/Bluetooth_low_energy).
+Learn more about Bluetooth LE at http://en.wikipedia.org/wiki/Bluetooth_low_energy
+
+This package also includes drivers for several well-known BLE Services:
+
+- Battery Service
+- Device Information Service
+- Generic Access Service
 
 ## How to Install
 ```
