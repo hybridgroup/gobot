@@ -5,13 +5,12 @@ go:
  - 1.5
  - 1.6
  - 1.7
- - 1.8beta1
+ - 1.8beta2
  - tip
 matrix:
  allow_failures:
    - go: 1.5
-   - go: 1.8beta1
-   - go: tip   
+   - go: tip
 before_install:
  - sudo add-apt-repository -y ppa:kubuntu-ppa/backports
  - sudo add-apt-repository -y ppa:zoogie/sdl2-snapshots
