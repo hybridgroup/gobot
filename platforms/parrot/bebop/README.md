@@ -1,7 +1,6 @@
 # Bebop
 
-The Bebop from Parrot is an inexpensive quadcopter that is controlled using WiFi. It includes a built-in front-facing HD video camera, as well as a second lower resolution bottom facing video camera.
-
+The Parrot Bebop and Parrot Bebop 2 are inexpensive quadcopters that can be controlled using their built-in API commands via a WiFi connection. They include a built-in front-facing HD video camera, as well as a second lower resolution bottom-facing video camera.
 
 ## How to Install
 ```
@@ -45,4 +44,9 @@ func main() {
 
 ## How to Connect
 
-The Bebop is a WiFi device, so there is no additional work to establish a connection to a single drone. However, in order to connect to multiple drones, you need to perform some configuration steps on each drone via SSH.
+By default, the Parrot Bebop is a WiFi access point, so there is no additional work to establish a connection to a single drone, you just connect to it.
+
+Once connected, if you want to stream drone video you can either:
+
+	- Use the RTP protocol with an external player such as mplayer or VLC.
+	- Grab the video frames from the drone's data frames, and work with them directly.
