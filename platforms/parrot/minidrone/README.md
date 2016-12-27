@@ -61,7 +61,6 @@ func main() {
 			fmt.Println("hovering!")
 			gobot.After(5*time.Second, func() {
 				drone.Land()
-				drone.Land()
 			})
 		})
 
