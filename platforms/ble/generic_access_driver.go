@@ -49,7 +49,7 @@ func (b *GenericAccessDriver) Halt() (err error) { return }
 
 // GetDeviceName returns the device name for the BLE Peripheral
 func (b *GenericAccessDriver) GetDeviceName() string {
-	c, _ := b.adaptor().ReadCharacteristic("1800", "2a00")
+	c, _ := b.adaptor().ReadCharacteristic("2a00")
 	buf := bytes.NewBuffer(c)
 	val := buf.String()
 	return val
@@ -57,7 +57,7 @@ func (b *GenericAccessDriver) GetDeviceName() string {
 
 // GetAppearance returns the appearance string for the BLE Peripheral
 func (b *GenericAccessDriver) GetAppearance() string {
-	c, _ := b.adaptor().ReadCharacteristic("1800", "2a01")
+	c, _ := b.adaptor().ReadCharacteristic("2a01")
 	buf := bytes.NewBuffer(c)
 
 	var val uint16

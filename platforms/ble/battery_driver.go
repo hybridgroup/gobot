@@ -49,7 +49,7 @@ func (b *BatteryDriver) Halt() (err error) { return }
 // GetBatteryLevel reads and returns the current battery level
 func (b *BatteryDriver) GetBatteryLevel() (level uint8) {
 	var l uint8
-	c, _ := b.adaptor().ReadCharacteristic("180f", "2a19")
+	c, _ := b.adaptor().ReadCharacteristic("2a19")
 	buf := bytes.NewBuffer(c)
 	val, _ := buf.ReadByte()
 	l = uint8(val)
