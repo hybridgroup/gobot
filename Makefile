@@ -42,7 +42,7 @@ examples:
 deps:
 	go get -d -v github.com/bmizerany/pat
 	go get -d -v github.com/hybridgroup/go-ardrone/client
-	go get -d -v github.com/currantlabs/gatt
+	go get -d -v github.com/currantlabs/ble
 	go get -d -v github.com/tarm/serial
 	go get -d -v github.com/veandco/go-sdl2/sdl
 	go get -d -v golang.org/x/net/websocket
