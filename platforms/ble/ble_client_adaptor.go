@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	blelib "github.com/currantlabs/ble"
 	"github.com/currantlabs/ble/examples/lib/dev"
@@ -52,11 +53,12 @@ func (b *ClientAdaptor) Connect() (err error) {
 
 	var cln blelib.Client
 
-	ctx := blelib.WithSigHandler(context.WithTimeout(context.Background(), 0))
-	cln, err = blelib.Connect(ctx, filter(b.Name()))
+	ctx := blelib.WithSigHandler(context.WithTimeout(context.Background(), 3*time.Second))
+	cln, err = blelib.Connect(ctx, filter(b.Address()))
 	if err != nil {
 		return errors.Wrap(err, "can't connect")
 	}
+
 	b.addr = cln.Address()
 	b.address = cln.Address().String()
 	b.SetName(cln.Name())
@@ -68,6 +70,7 @@ func (b *ClientAdaptor) Connect() (err error) {
 	}
 
 	b.profile = p
+	b.connected = true
 	return
 }
 
@@ -125,7 +128,7 @@ func (b *ClientAdaptor) WriteCharacteristic(cUUID string, data []byte) (err erro
 	uuid, _ := blelib.Parse(cUUID)
 
 	if u := b.profile.Find(blelib.NewCharacteristic(uuid)); u != nil {
-		err = b.client.WriteCharacteristic(u.(*blelib.Characteristic), data, false)
+		err = b.client.WriteCharacteristic(u.(*blelib.Characteristic), data, true)
 		if err != nil {
 			return err
 		}
