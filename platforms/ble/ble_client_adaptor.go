@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"strings"
-	"time"
 
 	blelib "github.com/currantlabs/ble"
 	"github.com/currantlabs/ble/examples/lib/dev"
@@ -53,18 +52,19 @@ func (b *ClientAdaptor) Connect() (err error) {
 
 	var cln blelib.Client
 
-	ctx := blelib.WithSigHandler(context.WithTimeout(context.Background(), 5*time.Second))
-	if cln, err = blelib.Connect(ctx, filter(b.Name())); err == nil {
-		b.addr = cln.Address()
-		b.address = cln.Address().String()
-		b.SetName(cln.Name())
+	ctx := blelib.WithSigHandler(context.WithTimeout(context.Background(), 0))
+	cln, err = blelib.Connect(ctx, filter(b.Name()))
+	if err != nil {
+		return errors.Wrap(err, "can't connect")
 	}
-
+	b.addr = cln.Address()
+	b.address = cln.Address().String()
+	b.SetName(cln.Name())
 	b.client = cln
 
 	p, err := b.client.DiscoverProfile(true)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "can't discover profile")
 	}
 
 	b.profile = p
