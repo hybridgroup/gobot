@@ -27,7 +27,7 @@ type BMP180Driver struct {
 	gobot.Eventer
 	Pressure                float32
 	Temperature             float32
-	mode BMP180OversamplingMode
+	mode                    BMP180OversamplingMode
 	calibrationCoefficients *calibrationCoefficients
 }
 
@@ -43,7 +43,7 @@ const (
 	BMP180HighResolution
 	// BMP180UltraHighResolution is the highest oversampling mode of the pressure measurement.
 	BMP180UltraHighResolution
-)	
+)
 
 type calibrationCoefficients struct {
 	ac1 int16
@@ -62,11 +62,11 @@ type calibrationCoefficients struct {
 // NewBMP180Driver creates a new driver with the i2c interface for the BMP180 device.
 func NewBMP180Driver(c I2c, mode BMP180OversamplingMode, i ...time.Duration) *BMP180Driver {
 	d := &BMP180Driver{
-		name:                    "BMP180",
-		connection:              c,
-		Eventer:                 gobot.NewEventer(),
-		interval:                10 * time.Millisecond,
-  	mode: mode,
+		name:       "BMP180",
+		connection: c,
+		Eventer:    gobot.NewEventer(),
+		interval:   10 * time.Millisecond,
+		mode:       mode,
 		calibrationCoefficients: &calibrationCoefficients{},
 	}
 
@@ -143,7 +143,7 @@ func (d *BMP180Driver) initialization() (err error) {
 	binary.Read(buf, binary.BigEndian, &d.calibrationCoefficients.ac3)
 	binary.Read(buf, binary.BigEndian, &d.calibrationCoefficients.ac4)
 	binary.Read(buf, binary.BigEndian, &d.calibrationCoefficients.ac5)
-	binary.Read(buf, binary.BigEndian, &d.calibrationCoefficients.ac6)	
+	binary.Read(buf, binary.BigEndian, &d.calibrationCoefficients.ac6)
 	binary.Read(buf, binary.BigEndian, &d.calibrationCoefficients.b1)
 	binary.Read(buf, binary.BigEndian, &d.calibrationCoefficients.b2)
 	binary.Read(buf, binary.BigEndian, &d.calibrationCoefficients.mb)
@@ -185,7 +185,7 @@ func (d *BMP180Driver) calculateTemp(rawTemp int16) float32 {
 }
 
 func (d *BMP180Driver) calculateB5(rawTemp int16) int32 {
-	x1 := (int32(rawTemp) -  int32(d.calibrationCoefficients.ac6)) * int32(d.calibrationCoefficients.ac5) >> 15
+	x1 := (int32(rawTemp) - int32(d.calibrationCoefficients.ac6)) * int32(d.calibrationCoefficients.ac5) >> 15
 	x2 := int32(d.calibrationCoefficients.mc) << 11 / (x1 + int32(d.calibrationCoefficients.md))
 	return x1 + x2
 }
@@ -194,7 +194,7 @@ func (d *BMP180Driver) rawPressure() (rawPressure int32, err error) {
 	if err := d.connection.I2cWrite(bmp180Address, []byte{bmp180RegisterCtl, bmp180CmdPressure + byte(d.mode<<6)}); err != nil {
 		return 0, err
 	}
-	switch(d.mode) {
+	switch d.mode {
 	case BMP180UltraLowPower:
 		time.Sleep(5 * time.Millisecond)
 	case BMP180Standard:
@@ -208,7 +208,7 @@ func (d *BMP180Driver) rawPressure() (rawPressure int32, err error) {
 	if ret, err = d.read(bmp180RegisterPressureMSB, 3); err != nil {
 		return 0, err
 	}
-	rawPressure = (int32(ret[0]) << 16 + int32(ret[1]) << 8 + int32(ret[2])) >> (8 - uint(d.mode))
+	rawPressure = (int32(ret[0])<<16 + int32(ret[1])<<8 + int32(ret[2])) >> (8 - uint(d.mode))
 	return rawPressure, nil
 }
 
@@ -218,22 +218,22 @@ func (d *BMP180Driver) calculatePressure(rawTemp int16, rawPressure int32) float
 	x1 := (int32(d.calibrationCoefficients.b2) * (b6 * b6 >> 12)) >> 11
 	x2 := (int32(d.calibrationCoefficients.ac2) * b6) >> 11
 	x3 := x1 + x2
-	b3 := (((int32(d.calibrationCoefficients.ac1) * 4 + x3) << uint(d.mode)) + 2) >> 2
+	b3 := (((int32(d.calibrationCoefficients.ac1)*4 + x3) << uint(d.mode)) + 2) >> 2
 	x1 = (int32(d.calibrationCoefficients.ac3) * b6) >> 13
-	x2 = (int32(d.calibrationCoefficients.b1) * ((b6 * b6) >> 12)) >> 16 
-  x3 = ((x1 + x2) + 2) >> 2
-	b4 := (uint32(d.calibrationCoefficients.ac4) * uint32(x3 + 32768)) >> 15
-	b7 := (uint32(rawPressure - b3) * (50000 >> uint(d.mode)))
+	x2 = (int32(d.calibrationCoefficients.b1) * ((b6 * b6) >> 12)) >> 16
+	x3 = ((x1 + x2) + 2) >> 2
+	b4 := (uint32(d.calibrationCoefficients.ac4) * uint32(x3+32768)) >> 15
+	b7 := (uint32(rawPressure-b3) * (50000 >> uint(d.mode)))
 	var p int32
-  if (b7 < 0x80000000) {
+	if b7 < 0x80000000 {
 		p = int32((b7 << 1) / b4)
 	} else {
 		p = int32((b7 / b4) << 1)
 	}
 	x1 = (p >> 8) * (p >> 8)
-  x1 = (x1 * 3038) >> 16
-  x2 = (-7357 * p) >> 16
-  return float32(p + ((x1 + x2 + 3791) >> 4))
+	x1 = (x1 * 3038) >> 16
+	x2 = (-7357 * p) >> 16
+	return float32(p + ((x1 + x2 + 3791) >> 4))
 }
 
 // Halt halts the device.

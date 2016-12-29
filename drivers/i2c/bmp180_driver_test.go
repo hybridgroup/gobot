@@ -78,8 +78,8 @@ func TestBMP180DriverStart(t *testing.T) {
 	gobottest.Assert(t, bmp180.Start(), nil)
 	time.Sleep(100 * time.Millisecond)
 	gobottest.Assert(t, bmp180.calibrationCoefficients.ac1, int16(408))
-	gobottest.Assert(t,	bmp180.Pressure, float32(69964))
-	gobottest.Assert(t,	bmp180.Temperature, float32(15.0))
+	gobottest.Assert(t, bmp180.Pressure, float32(69964))
+	gobottest.Assert(t, bmp180.Temperature, float32(15.0))
 }
 
 func TestBMP180DriverHalt(t *testing.T) {
