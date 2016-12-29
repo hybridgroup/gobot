@@ -25,7 +25,7 @@ type i2cTestAdaptor struct {
 func (t *i2cTestAdaptor) I2cStart(int) (err error) {
 	return t.i2cStartImpl()
 }
-func (t *i2cTestAdaptor) I2cRead(address int, n int) (data []byte, err error) {
+func (t *i2cTestAdaptor) I2cRead(int, int) (data []byte, err error) {
 	return t.i2cReadImpl()
 }
 func (t *i2cTestAdaptor) I2cWrite(address int, b []byte) (err error) {
