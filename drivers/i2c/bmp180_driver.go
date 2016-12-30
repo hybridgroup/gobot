@@ -23,8 +23,6 @@ const bmp180RegisterPressureMSB = 0xF6
 type BMP180Driver struct {
 	name       string
 	connection I2c
-	interval   time.Duration
-	gobot.Eventer
 	calibrationCoefficients *calibrationCoefficients
 }
 
