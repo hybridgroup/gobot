@@ -25,9 +25,6 @@ type BMP180Driver struct {
 	connection I2c
 	interval   time.Duration
 	gobot.Eventer
-	Pressure                float32
-	Temperature             float32
-	mode                    BMP180OversamplingMode
 	calibrationCoefficients *calibrationCoefficients
 }
 
@@ -60,21 +57,12 @@ type calibrationCoefficients struct {
 }
 
 // NewBMP180Driver creates a new driver with the i2c interface for the BMP180 device.
-func NewBMP180Driver(c I2c, mode BMP180OversamplingMode, i ...time.Duration) *BMP180Driver {
-	d := &BMP180Driver{
-		name:       "BMP180",
-		connection: c,
-		Eventer:    gobot.NewEventer(),
-		interval:   10 * time.Millisecond,
-		mode:       mode,
+func NewBMP180Driver(c I2c) *BMP180Driver {
+	return &BMP180Driver{
+		name:                    "BMP180",
+		connection:              c,
 		calibrationCoefficients: &calibrationCoefficients{},
 	}
-
-	if len(i) > 0 {
-		d.interval = i[0]
-	}
-	d.AddEvent(Error)
-	return d
 }
 
 // Name returns the name of the device.
@@ -92,40 +80,12 @@ func (d *BMP180Driver) Connection() gobot.Connection {
 	return d.connection.(gobot.Connection)
 }
 
-// Mode resturns the oversampling mode of the device.
-func (d *BMP180Driver) Mode() BMP180OversamplingMode {
-	return d.mode
-}
-
-// SetMode sets the oversampling mode of the device.
-func (d *BMP180Driver) SetMode(mode BMP180OversamplingMode) {
-	d.mode = mode
-}
-
-// Start writes initialization bytes and reads from adaptor
-// using specified interval to load temperature and pressure data.
+// Start initializes the BMP180 and loads the calibration coefficients.
 func (d *BMP180Driver) Start() (err error) {
-	var rawTemp int16
-	var rawPressure int32
 	if err := d.initialization(); err != nil {
 		return err
 	}
-	go func() {
-		for {
-			if rawTemp, err = d.rawTemp(); err != nil {
-				d.Publish(d.Event(Error), err)
-				continue
-			}
-			d.Temperature = d.calculateTemp(rawTemp)
-			if rawPressure, err = d.rawPressure(); err != nil {
-				d.Publish(d.Event(Error), err)
-				continue
-			}
-			d.Pressure = d.calculatePressure(rawTemp, rawPressure)
-			time.Sleep(d.interval)
-		}
-	}()
-	return
+	return nil
 }
 
 func (d *BMP180Driver) initialization() (err error) {
@@ -150,6 +110,33 @@ func (d *BMP180Driver) initialization() (err error) {
 	binary.Read(buf, binary.BigEndian, &d.calibrationCoefficients.mc)
 	binary.Read(buf, binary.BigEndian, &d.calibrationCoefficients.md)
 	return nil
+}
+
+// Halt halts the device.
+func (d *BMP180Driver) Halt() (err error) {
+	return nil
+}
+
+// Temperature returns the current temperature, in celsius degrees.
+func (d *BMP180Driver) Temperature() (temp float32, err error) {
+	var rawTemp int16
+	if rawTemp, err = d.rawTemp(); err != nil {
+		return 0, nil
+	}
+	return d.calculateTemp(rawTemp), nil
+}
+
+// Pressure returns the current pressure, in pascals.
+func (d *BMP180Driver) Pressure(mode BMP180OversamplingMode) (pressure float32, err error) {
+	var rawTemp int16
+	var rawPressure int32
+	if rawTemp, err = d.rawTemp(); err != nil {
+		return 0, err
+	}
+	if rawPressure, err = d.rawPressure(mode); err != nil {
+		return 0, err
+	}
+	return d.calculatePressure(rawTemp, rawPressure, mode), nil
 }
 
 func (d *BMP180Driver) rawTemp() (int16, error) {
@@ -190,11 +177,11 @@ func (d *BMP180Driver) calculateB5(rawTemp int16) int32 {
 	return x1 + x2
 }
 
-func (d *BMP180Driver) rawPressure() (rawPressure int32, err error) {
-	if err := d.connection.I2cWrite(bmp180Address, []byte{bmp180RegisterCtl, bmp180CmdPressure + byte(d.mode<<6)}); err != nil {
+func (d *BMP180Driver) rawPressure(mode BMP180OversamplingMode) (rawPressure int32, err error) {
+	if err := d.connection.I2cWrite(bmp180Address, []byte{bmp180RegisterCtl, bmp180CmdPressure + byte(mode<<6)}); err != nil {
 		return 0, err
 	}
-	switch d.mode {
+	switch mode {
 	case BMP180UltraLowPower:
 		time.Sleep(5 * time.Millisecond)
 	case BMP180Standard:
@@ -208,22 +195,22 @@ func (d *BMP180Driver) rawPressure() (rawPressure int32, err error) {
 	if ret, err = d.read(bmp180RegisterPressureMSB, 3); err != nil {
 		return 0, err
 	}
-	rawPressure = (int32(ret[0])<<16 + int32(ret[1])<<8 + int32(ret[2])) >> (8 - uint(d.mode))
+	rawPressure = (int32(ret[0])<<16 + int32(ret[1])<<8 + int32(ret[2])) >> (8 - uint(mode))
 	return rawPressure, nil
 }
 
-func (d *BMP180Driver) calculatePressure(rawTemp int16, rawPressure int32) float32 {
+func (d *BMP180Driver) calculatePressure(rawTemp int16, rawPressure int32, mode BMP180OversamplingMode) float32 {
 	b5 := d.calculateB5(rawTemp)
 	b6 := b5 - 4000
 	x1 := (int32(d.calibrationCoefficients.b2) * (b6 * b6 >> 12)) >> 11
 	x2 := (int32(d.calibrationCoefficients.ac2) * b6) >> 11
 	x3 := x1 + x2
-	b3 := (((int32(d.calibrationCoefficients.ac1)*4 + x3) << uint(d.mode)) + 2) >> 2
+	b3 := (((int32(d.calibrationCoefficients.ac1)*4 + x3) << uint(mode)) + 2) >> 2
 	x1 = (int32(d.calibrationCoefficients.ac3) * b6) >> 13
 	x2 = (int32(d.calibrationCoefficients.b1) * ((b6 * b6) >> 12)) >> 16
 	x3 = ((x1 + x2) + 2) >> 2
 	b4 := (uint32(d.calibrationCoefficients.ac4) * uint32(x3+32768)) >> 15
-	b7 := (uint32(rawPressure-b3) * (50000 >> uint(d.mode)))
+	b7 := (uint32(rawPressure-b3) * (50000 >> uint(mode)))
 	var p int32
 	if b7 < 0x80000000 {
 		p = int32((b7 << 1) / b4)
@@ -234,9 +221,4 @@ func (d *BMP180Driver) calculatePressure(rawTemp int16, rawPressure int32) float
 	x1 = (x1 * 3038) >> 16
 	x2 = (-7357 * p) >> 16
 	return float32(p + ((x1 + x2 + 3791) >> 4))
-}
-
-// Halt halts the device.
-func (d *BMP180Driver) Halt() (err error) {
-	return nil
 }
