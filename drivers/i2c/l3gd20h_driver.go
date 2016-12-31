@@ -120,17 +120,16 @@ func (d *L3GD20HDriver) XYZ() (x float32, y float32, z float32, err error) {
 	binary.Read(buf, binary.LittleEndian, &rawY)
 	binary.Read(buf, binary.LittleEndian, &rawZ)
 
-	// Values copied from Adafruit's library:
-	// https://github.com/adafruit/Adafruit_L3GD20_U/blob/master/Adafruit_L3GD20_U.h
-	var factor float32
+	// Sensitivity values from the mechanical characteristics in the datasheet.
+	var sensitivity float32
 	switch(d.scale) {
 	case L3GD20HScale250dps:
-		factor = 0.00875
+		sensitivity = 0.00875
 	case L3GD20HScale500dps:
-		factor = 0.0175
+		sensitivity = 0.0175
 	case L3GD20HScale2000dps:
-		factor = 0.07
+		sensitivity = 0.07
 	}
 
-	return float32(rawX) * factor, float32(rawY) * factor, float32(rawZ) * factor, nil
+	return float32(rawX) * sensitivity, float32(rawY) * sensitivity, float32(rawZ) * sensitivity, nil
 }

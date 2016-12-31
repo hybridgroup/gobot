@@ -67,8 +67,8 @@ func TestHMC6352DriverMeasurement(t *testing.T) {
 	d.Start()
 	x, y, z, err := d.XYZ()
 	gobottest.Assert(t, err, nil)
-	var factor float32 = 0.00875
-	gobottest.Assert(t, x, float32(rawX) * factor)
-	gobottest.Assert(t, y, float32(rawY) * factor)
-	gobottest.Assert(t, z, float32(rawZ) * factor)	
+	var sensitivity float32 = 0.00875
+	gobottest.Assert(t, x, float32(rawX) * sensitivity)
+	gobottest.Assert(t, y, float32(rawY) * sensitivity)
+	gobottest.Assert(t, z, float32(rawZ) * sensitivity)	
 }
