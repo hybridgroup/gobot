@@ -16,6 +16,7 @@ var blue = castColor("blue")
 
 type i2cTestAdaptor struct {
 	name         string
+	written      []byte
 	i2cReadImpl  func() ([]byte, error)
 	i2cWriteImpl func() error
 	i2cStartImpl func() error
@@ -27,7 +28,8 @@ func (t *i2cTestAdaptor) I2cStart(int) (err error) {
 func (t *i2cTestAdaptor) I2cRead(int, int) (data []byte, err error) {
 	return t.i2cReadImpl()
 }
-func (t *i2cTestAdaptor) I2cWrite(int, []byte) (err error) {
+func (t *i2cTestAdaptor) I2cWrite(address int, b []byte) (err error) {
+	t.written = append(t.written, b...)
 	return t.i2cWriteImpl()
 }
 func (t *i2cTestAdaptor) Name() string          { return t.name }
