@@ -14,7 +14,7 @@ func initTestTCPAdaptor() *TCPAdaptor {
 	return a
 }
 
-func TestBB8Driver(t *testing.T) {
+func TestFirmataTCPAdaptor(t *testing.T) {
 	a := initTestTCPAdaptor()
 	gobottest.Assert(t, a.Name(), "TCPFirmata")
 }
