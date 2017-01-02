@@ -4,7 +4,9 @@ Arduino is an open-source electronics prototyping platform based on flexible, ea
 
 This package provides the adaptor for microcontrollers such as Arduino that support the [Firmata](http://firmata.org/wiki/Main_Page) protocol
 
-For more info about the arduino platform click [here](http://arduino.cc/).
+You can connect to the microcontroller using either a serial connection, or a TCP connection to a WiFi-connection microcontroller.
+
+For more info about the Arduino platform, go to [http://arduino.cc/](http://arduino.cc/).
 
 ## How to Install
 
@@ -12,7 +14,13 @@ For more info about the arduino platform click [here](http://arduino.cc/).
 go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/firmata
 ```
 
+You must install Firmata on your microcontroller before you can connect to it using Gobot. You can do this in many cases using Gort ([http://gort.io](http://gort.io)).
+
+In order to use a TCP connection with a WiFi-enbaled microcontroller, you must install WifiFirmata on the microcontroller. You can use the Arduino IDE to do this.
+
 ## How to Use
+
+With a serial connection:
 
 ```go
 package main
@@ -45,7 +53,40 @@ func main() {
 }
 ```
 
-Note that analog pins A4 and A5 are normally used by the Firmata I2C interface, so you will not be able to use them as analog inputs without changing the Firmata sketch.
+With a TCP connection, use the `NewTCPAdaptor`:
+
+```go
+package main
+
+import (
+	"time"
+
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/gpio"
+	"gobot.io/x/gobot/platforms/firmata"
+)
+
+func main() {
+	firmataAdaptor := firmata.NewTCPAdaptor("192.168.0.66:3030")
+	led := gpio.NewLedDriver(firmataAdaptor, "2")
+
+	work := func() {
+		gobot.Every(1*time.Second, func() {
+			led.Toggle()
+		})
+	}
+
+	robot := gobot.NewRobot("bot",
+		[]gobot.Connection{firmataAdaptor},
+		[]gobot.Device{led},
+		work,
+	)
+
+	robot.Start()
+}
+```
+
+**Important** note that analog pins A4 and A5 are normally used by the Firmata I2C interface, so you will not be able to use them as analog inputs without changing the Firmata sketch.
 
 
 ## How to Connect
@@ -139,9 +180,13 @@ for your arduino and click upload. Wait for the upload to finish and you should 
 with your arduino.
 
 ## Hardware Support
-The following firmata devices have been tested and are currently supported:
+The following Firmata devices have been tested and are known to work:
 
-  - [Arduino uno r3](http://arduino.cc/en/Main/arduinoBoardUno)
+  - [Arduino Uno R3](http://arduino.cc/en/Main/arduinoBoardUno)
+	- [Arduino/Genuino 101](https://www.arduino.cc/en/Main/ArduinoBoard101)
   - [Teensy 3.0](http://www.pjrc.com/store/teensy3.html)
+
+The following WiFi devices have been tested and are known to work:
+	- [NodeMCU 1.0](http://nodemcu.com/index_en.html)
 
 More devices are coming soon...
