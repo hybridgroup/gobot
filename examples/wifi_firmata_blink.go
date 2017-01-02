@@ -1,7 +1,7 @@
 /*
-	To run this example, pass the IP address/port as first param:
+ To run this example, pass the IP address/port as first param:
 
-		go run examples/wifi_firmata_blink.go 192.168.0.39:3030
+	go run examples/wifi_firmata_blink.go 192.168.0.39:3030
 */
 
 package main
