@@ -29,4 +29,4 @@ CLI tool for generating new Gobot projects.
 ```
 
 ## License
-Copyright (c) 2013-2016 The Hybrid Group. Licensed under the Apache 2.0 license.
+Copyright (c) 2013-2017 The Hybrid Group. Licensed under the Apache 2.0 license.

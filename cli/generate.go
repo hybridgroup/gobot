@@ -412,6 +412,6 @@ Explain how to connect to the device here...
 
 ## License
 
-Copyright (c) 2016 <Your Name Here>. Licensed under the <Insert license here> license.
+Copyright (c) 2017 <Your Name Here>. Licensed under the <Insert license here> license.
 `
 }
