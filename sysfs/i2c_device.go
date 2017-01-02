@@ -94,12 +94,17 @@ func (d *i2cDevice) Read(b []byte) (n int, err error) {
 		return d.file.Read(b)
 	}
 
-	data := make([]byte, len(b)+1)
-	data[0] = byte(len(b))
+	// Command byte - a data byte which often selects a register on the device:
+	// 	https://www.kernel.org/doc/Documentation/i2c/smbus-protocol
+	command := byte(b[0])
+	buf := b[1:]
+	data := make([]byte, len(buf)+1)
+	data[0] = byte(len(buf))
+	copy(data[1:], buf)
 
 	smbus := &i2cSmbusIoctlData{
 		readWrite: I2C_SMBUS_READ,
-		command:   0,
+		command:   command,
 		size:      I2C_SMBUS_I2C_BLOCK_DATA,
 		data:      uintptr(unsafe.Pointer(&data[0])),
 	}
