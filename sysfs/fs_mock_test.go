@@ -22,7 +22,7 @@ func TestMockFilesystemOpen(t *testing.T) {
 	gobottest.Refute(t, err, nil)
 
 	fs.Add("bar")
-	f4, err := fs.OpenFile("bar", 0, 0666)
+	f4, _ := fs.OpenFile("bar", 0, 0666)
 	gobottest.Refute(t, f4.Fd(), f1.Fd())
 }
 
@@ -52,13 +52,13 @@ func TestMockFilesystemRead(t *testing.T) {
 	gobottest.Assert(t, f1.Seq <= 0, true)
 
 	buffer := make([]byte, 20)
-	n, err := f2.Read(buffer)
+	n, _ := f2.Read(buffer)
 
 	// Was read.
 	gobottest.Assert(t, f1.Seq > 0, true)
 	gobottest.Assert(t, n, 3)
 	gobottest.Assert(t, string(buffer[:3]), "Yip")
 
-	n, err = f2.ReadAt(buffer, 10)
+	n, _ = f2.ReadAt(buffer, 10)
 	gobottest.Assert(t, n, 3)
 }

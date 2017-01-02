@@ -57,7 +57,7 @@ func NewDigitalPin(pin int, v ...string) DigitalPin {
 	return d
 }
 
-var notExportedError = errors.New("pin has not been exported")
+var errNotExported = errors.New("pin has not been exported")
 
 func (d *digitalPin) Direction(dir string) error {
 	_, err := writeFile(d.direction, []byte(dir))
@@ -147,7 +147,7 @@ func (d *digitalPin) Unexport() error {
 
 var writeFile = func(f File, data []byte) (i int, err error) {
 	if f == nil {
-		return 0, notExportedError
+		return 0, errNotExported
 	}
 
 	// sysfs docs say:
@@ -162,7 +162,7 @@ var writeFile = func(f File, data []byte) (i int, err error) {
 
 var readFile = func(f File) ([]byte, error) {
 	if f == nil {
-		return nil, notExportedError
+		return nil, errNotExported
 	}
 
 	// sysfs docs say:

@@ -32,6 +32,7 @@ func (f *MockFile) Write(b []byte) (n int, err error) {
 	return f.WriteString(string(b))
 }
 
+// Seek seeks to a specific offset in a file
 func (f *MockFile) Seek(offset int64, whence int) (ret int64, err error) {
 	return offset, nil
 }

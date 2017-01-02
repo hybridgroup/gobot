@@ -28,6 +28,7 @@ type i2cSmbusIoctlData struct {
 	data      uintptr
 }
 
+// I2cDevice is the interface to a specific i2c bus
 type I2cDevice interface {
 	io.ReadWriteCloser
 	SetAddress(int) error
