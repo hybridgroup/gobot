@@ -11,7 +11,7 @@ import (
 
 func main() {
 	firmataAdaptor := firmata.NewTCPAdaptor(os.Args[1])
-	led := gpio.NewLedDriver(firmataAdaptor, "13")
+	led := gpio.NewLedDriver(firmataAdaptor, "2")
 
 	work := func() {
 		gobot.Every(1*time.Second, func() {
