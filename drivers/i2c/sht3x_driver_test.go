@@ -18,20 +18,20 @@ func initTestSHT3xDriver() (driver *SHT3xDriver) {
 
 func initTestSHT3xDriverWithStubbedAdaptor() (*SHT3xDriver, *i2cTestAdaptor) {
 	adaptor := newI2cTestAdaptor()
-	return NewSHT3xDriver(adaptor, SHT3xAddressA), adaptor
+	return NewSHT3xDriver(adaptor), adaptor
 }
 
 // --------- TESTS
 
 func TestNewSHT3xDriver(t *testing.T) {
 	// Does it return a pointer to an instance of SHT3xDriver?
-	var bm interface{} = NewSHT3xDriver(newI2cTestAdaptor(), SHT3xAddressA)
+	var bm interface{} = NewSHT3xDriver(newI2cTestAdaptor())
 	_, ok := bm.(*SHT3xDriver)
 	if !ok {
 		t.Errorf("NewSHT3xDriver() should have returned a *SHT3xDriver")
 	}
 
-	b := NewSHT3xDriver(newI2cTestAdaptor(), SHT3xAddressA)
+	b := NewSHT3xDriver(newI2cTestAdaptor())
 	gobottest.Refute(t, b.Connection(), nil)
 }
 
