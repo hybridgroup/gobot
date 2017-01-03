@@ -25,6 +25,7 @@ Gobot has a extensible system for connecting to hardware devices. The following 
 - MMA7660 3-Axis Accelerometer
 - MPL115A2 Barometer
 - MPU6050 Accelerometer/Gyroscope
+- SHT3x-D Temperature/Humidity
 - Wii Nunchuck Controller
 
 More drivers are coming soon...
