@@ -11,12 +11,13 @@ type TCPAdaptor struct {
 // NewTCPAdaptor opens and uses a TCP connection to a microcontroller running
 // WiFiFirmata
 func NewTCPAdaptor(args ...interface{}) *TCPAdaptor {
-	conn, err := net.Dial("tcp", args[0].(string))
+	address := args[0].(string)
+	conn, err := net.Dial("tcp", address)
 	if err != nil {
 		// TODO: handle error
 	}
 
-	a := NewAdaptor(conn)
+	a := NewAdaptor(conn, address)
 	a.SetName("TCPFirmata")
 
 	return &TCPAdaptor{
