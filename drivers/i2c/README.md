@@ -12,12 +12,15 @@ go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/i2c
 ## Hardware Support
 Gobot has a extensible system for connecting to hardware devices. The following i2c devices are currently supported:
 
-- BlinkM
+- Adafruit Motor Hat
+- BlinkM LED
+- BMP180 Barometric Pressure/Temperature/Altitude Sensor
 - Grove Digital Accelerometer
 - Grove RGB LCD
 - HMC6352 Compass
-- JHD1313M1 RGB LCD Display
+- JHD1313M1 LCD Display w/RGB Backlight
 - LIDAR-Lite
+- L3GD20H 3-Axis Gyroscope
 - MCP23017 Port Expander
 - MMA7660 3-Axis Accelerometer
 - MPL115A2 Barometer

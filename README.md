@@ -246,12 +246,14 @@ drivers provided using the `gobot/drivers/i2c` package:
 
 - [I2C](https://en.wikipedia.org/wiki/I%C2%B2C) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/drivers/i2c)
 	- Adafruit Motor Hat
-	- BlinkM
+	- BlinkM LED
+	- BMP180 Barometric Pressure/Temperature/Altitude Sensor
 	- Grove Digital Accelerometer
 	- Grove RGB LCD
 	- HMC6352 Compass
-	- JHD1313M1 RGB LCD Display
+	- JHD1313M1 LCD Display w/RGB Backlight
 	- LIDAR-Lite
+	- L3GD20H 3-Axis Gyroscope
 	- MCP23017 Port Expander
 	- MMA7660 3-Axis Accelerometer
 	- MPL115A2 Barometer
