@@ -3,7 +3,7 @@ package i2c
 import (
 	"bytes"
 	"encoding/binary"
-	
+
 	"gobot.io/x/gobot"
 )
 
@@ -26,7 +26,7 @@ const l3gd20hRegisterOutXLSB = 0x28 | 0x80 // set auto-increment bit.
 type L3GD20HDriver struct {
 	name       string
 	connection I2c
-	scale L3GD20HScale
+	scale      L3GD20HScale
 }
 
 // L3GD20HScale is the scale sensitivity of degrees-per-second.
@@ -34,19 +34,19 @@ type L3GD20HScale byte
 
 const (
 	// L3GD20HScale250dps is the 250 degress-per-second scale.
-	L3GD20HScale250dps = 0x00
+	L3GD20HScale250dps L3GD20HScale = 0x00
 	// L3GD20HScale500dps is the 500 degress-per-second scale.
-	L3GD20HScale500dps = 0x10
+	L3GD20HScale500dps L3GD20HScale = 0x10
 	// L3GD20HScale2000dps is the 2000 degress-per-second scale.
-	L3GD20HScale2000dps = 0x30
+	L3GD20HScale2000dps L3GD20HScale = 0x30
 )
 
 // NewL3GD20HDriver creates a new driver with the i2c interface for the L3GD20H device.
-func NewL3GD20HDriver(c I2c, s L3GD20HScale) *L3GD20HDriver {
+func NewL3GD20HDriver(c I2c) *L3GD20HDriver {
 	return &L3GD20HDriver{
 		name:       "L3GD20H",
 		connection: c,
-		scale: s,
+		scale:      L3GD20HScale250dps,
 	}
 }
 
@@ -68,6 +68,11 @@ func (d *L3GD20HDriver) Connection() gobot.Connection {
 // Scale returns the scale sensitivity of the device.
 func (d *L3GD20HDriver) Scale() L3GD20HScale {
 	return d.scale
+}
+
+// SetScale sets the scale sensitivity of the device.
+func (d *L3GD20HDriver) SetScale(s L3GD20HScale) {
+	d.scale = s
 }
 
 // Start initializes the device.
@@ -122,7 +127,7 @@ func (d *L3GD20HDriver) XYZ() (x float32, y float32, z float32, err error) {
 
 	// Sensitivity values from the mechanical characteristics in the datasheet.
 	var sensitivity float32
-	switch(d.scale) {
+	switch d.scale {
 	case L3GD20HScale250dps:
 		sensitivity = 0.00875
 	case L3GD20HScale500dps:
