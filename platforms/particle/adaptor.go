@@ -128,6 +128,8 @@ func (s *Adaptor) DigitalRead(pin string) (val int, err error) {
 }
 
 // ServoWrite writes the 0-180 degree angle to the specified pin.
+// To use it requires installing the "tinker-servo" sketch on your
+// Particle device. not just the default "tinker".
 func (s *Adaptor) ServoWrite(pin string, angle byte) (err error) {
 	if _, present := s.servoPins[pin]; !present {
 		params := url.Values{
