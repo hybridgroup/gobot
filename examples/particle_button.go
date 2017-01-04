@@ -1,13 +1,22 @@
+/*
+ To run this example, pass the device ID as first param,
+ and the access token as the second param:
+
+	go run examples/particle_button.go mydevice myaccesstoken
+*/
+
 package main
 
 import (
+	"os"
+
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/drivers/gpio"
 	"gobot.io/x/gobot/platforms/particle"
 )
 
 func main() {
-	core := particle.NewAdaptor("device_id", "access_token")
+	core := particle.NewAdaptor(os.Args[1], os.Args[2])
 	led := gpio.NewLedDriver(core, "D7")
 	button := gpio.NewButtonDriver(core, "D5")
 

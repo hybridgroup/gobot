@@ -1,6 +1,14 @@
+/*
+ To run this example, pass the device ID as first param,
+ and the access token as the second param:
+
+	go run examples/particle_api.go mydevice myaccesstoken
+*/
+
 package main
 
 import (
+	"os"
 	"time"
 
 	"gobot.io/x/gobot"
@@ -13,7 +21,7 @@ func main() {
 	master := gobot.NewMaster()
 	api.NewAPI(master).Start()
 
-	core := particle.NewAdaptor("device_id", "access_token")
+	core := particle.NewAdaptor(os.Args[1], os.Args[2])
 	led := gpio.NewLedDriver(core, "D7")
 
 	work := func() {

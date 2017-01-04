@@ -1,7 +1,15 @@
+/*
+ To run this example, pass the device ID as first param,
+ and the access token as the second param:
+
+	go run examples/particle_variable.go mydevice myaccesstoken
+*/
+
 package main
 
 import (
 	"fmt"
+	"os"
 	"time"
 
 	"gobot.io/x/gobot"
@@ -9,7 +17,7 @@ import (
 )
 
 func main() {
-	core := particle.NewAdaptor("DEVICE_ID", "ACCESS_TOKEN")
+	core := particle.NewAdaptor(os.Args[1], os.Args[2])
 
 	work := func() {
 		gobot.Every(1*time.Second, func() {
