@@ -19,6 +19,7 @@ type Adaptor struct {
 	DeviceID    string
 	AccessToken string
 	APIServer   string
+	servoPins   map[string]bool
 	gobot.Eventer
 }
 
@@ -44,6 +45,7 @@ func NewAdaptor(deviceID string, accessToken string) *Adaptor {
 		name:        "Particle",
 		DeviceID:    deviceID,
 		AccessToken: accessToken,
+		servoPins:   make(map[string]bool),
 		APIServer:   "https://api.particle.io",
 		Eventer:     gobot.NewEventer(),
 	}
@@ -123,6 +125,30 @@ func (s *Adaptor) DigitalRead(pin string) (val int, err error) {
 		return
 	}
 	return -1, err
+}
+
+// ServoWrite writes the 0-180 degree angle to the specified pin.
+func (s *Adaptor) ServoWrite(pin string, angle byte) (err error) {
+	if _, present := s.servoPins[pin]; !present {
+		params := url.Values{
+			"params":       {fmt.Sprintf("%v", pin)},
+			"access_token": {s.AccessToken},
+		}
+		url := fmt.Sprintf("%v/servoOpen", s.deviceURL())
+		_, err = s.request("POST", url, params)
+		if err != nil {
+			return
+		}
+		s.servoPins[pin] = true
+	}
+
+	params := url.Values{
+		"params":       {fmt.Sprintf("%v,%v", pin, angle)},
+		"access_token": {s.AccessToken},
+	}
+	url := fmt.Sprintf("%v/servoSet", s.deviceURL())
+	_, err = s.request("POST", url, params)
+	return err
 }
 
 // EventStream returns a gobot.Event based on the following params:

@@ -9,17 +9,8 @@ import (
 
 	"github.com/donovanhide/eventsource"
 	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/aio"
-	"gobot.io/x/gobot/drivers/gpio"
 	"gobot.io/x/gobot/gobottest"
 )
-
-var _ gobot.Adaptor = (*Adaptor)(nil)
-
-var _ gpio.DigitalReader = (*Adaptor)(nil)
-var _ gpio.DigitalWriter = (*Adaptor)(nil)
-var _ aio.AnalogReader = (*Adaptor)(nil)
-var _ gpio.PwmWriter = (*Adaptor)(nil)
 
 // HELPERS
 
@@ -63,11 +54,15 @@ func initTestAdaptor() *Adaptor {
 	return NewAdaptor("myDevice", "token")
 }
 
+func initTestAdaptorWithServo() *Adaptor {
+	a := NewAdaptor("myDevice", "token")
+	a.servoPins["1"] = true
+	return a
+}
+
 // TESTS
 
 func TestAdaptor(t *testing.T) {
-	var _ gobot.Adaptor = (*Adaptor)(nil)
-
 	var a interface{} = initTestAdaptor()
 	_, ok := a.(gobot.Adaptor)
 	if !ok {
@@ -170,6 +165,18 @@ func TestAdaptorDigitalWrite(t *testing.T) {
 
 	a.setAPIServer(testServer.URL)
 	a.DigitalWrite("D7", 0)
+}
+
+func TestAdaptorServoWrite(t *testing.T) {
+	response := `{}`
+	params := []string{"1,128"}
+
+	a := initTestAdaptorWithServo()
+	testServer := getDummyResponseForPathWithParams("/"+a.DeviceID+"/servoSet", params, response, t)
+	defer testServer.Close()
+
+	a.setAPIServer(testServer.URL)
+	a.ServoWrite("1", 128)
 }
 
 func TestAdaptorDigitalRead(t *testing.T) {
