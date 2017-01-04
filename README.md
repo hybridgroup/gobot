@@ -12,6 +12,8 @@ Want to use Ruby on robots? Check out our sister project Artoo (http://artoo.io)
 [![Build Status](https://travis-ci.org/hybridgroup/gobot.png?branch=dev)](https://travis-ci.org/hybridgroup/gobot)
 [![Coverage Status](https://coveralls.io/repos/github/hybridgroup/gobot/badge.svg?branch=dev)](https://coveralls.io/github/hybridgroup/gobot?branch=dev)
 [![Go Report Card](https://goreportcard.com/badge/hybridgroup/gobot)](https://goreportcard.com/report/hybridgroup/gobot)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/hybridgroup/gobot/blob/master/LICENSE)
+
 
 ## Getting Started
 
