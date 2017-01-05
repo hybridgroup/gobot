@@ -1,0 +1,25 @@
+name: gobot
+version: dev
+summary: Gobot is a framework for robotics, physical computing, and IoT.
+description: |
+  Gobot is a framework using the Go programming language for robotics, physical
+  computing, and the Internet of Things.
+  It provides a simple, yet powerful way to create solutions that incorporate
+  multiple, different hardware devices at the same time.
+
+grade: devel
+confinement: strict
+
+apps:
+  gobot:
+    command: gobot
+    plugs: [home]
+
+parts:
+  gobot:
+    source: .
+    plugin: go
+    go-packages: [gobot.io/x/gobot/cli]
+    go-importpath: gobot.io/x/gobot
+    organize:
+      bin/cli: bin/gobot
