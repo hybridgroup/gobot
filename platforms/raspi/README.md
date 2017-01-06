@@ -56,7 +56,7 @@ func main() {
 Simply compile your Gobot program like this:
 
 ```bash
-$ GOARM=6 GOARCH=arm GOOS=linux examples/raspi_blink.go
+$ GOARM=6 GOARCH=arm GOOS=linux go build examples/raspi_blink.go
 ```
 
 Use the following `GOARM` values to compile depending on which model Raspberry Pi you are using:
