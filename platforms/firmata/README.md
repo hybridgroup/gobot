@@ -4,7 +4,7 @@ Arduino is an open-source electronics prototyping platform based on flexible, ea
 
 This package provides the adaptor for microcontrollers such as Arduino that support the [Firmata](http://firmata.org/wiki/Main_Page) protocol
 
-You can connect to the microcontroller using either a serial connection, or a TCP connection to a WiFi-connection microcontroller.
+You can connect to the microcontroller using either a serial connection, or a TCP connection to a WiFi-connected microcontroller such as the ESP8266.
 
 For more info about the Arduino platform, go to [http://arduino.cc/](http://arduino.cc/).
 
@@ -120,6 +120,8 @@ $ gort arduino upload firmata /dev/tty.usbmodem1421
 ```
 
 Now you are ready to connect and communicate with the Arduino using serial port connection
+
+Note that Gobot works best with the `tty.` version of the serial port as shown above, not the `cu.` version.
 
 ### Ubuntu
 
