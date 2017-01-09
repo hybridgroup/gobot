@@ -1,3 +1,49 @@
+1.1.0
+---
+* **core**
+  * use canonical import path for sysfs package
+* **i2c**
+  * Add a driver for the SHT3X chip
+  * Add a driver for BMP180
+  * Add support for L3GD20H gyroscope
+* **firmata**
+  * Add support for TCPFirmata connections, allowing ESP8266 and other WiFi-connected controllers
+  * Add mention to README to use 'tty.' serial port on OSX
+  * Add mention of A4 and A5 normally unavailable on Firmata
+* **raspi**
+  * Correct README build instructions with missing 'go build' command
+* **snapcraft**
+  * Add the packaging metadata to build the gobot snap for Ubuntu Snappy
+* **particle**
+  * Update examples to take key params via command line
+  * Address #160 by adding support for tinker-servo sketch if installed on Particle device
+* **esp8266** add experimental ESP8266 support to list of supported platforms
+* **sysfs**
+  * Should fix #272 by using first byte of data as command register for I2C reads
+  * Some additional cleanup suggested by golint
+* **ble**
+  * Add generic access service driver
+  * Update docs to include reference to included drivers
+  * Move various test code to test file
+* **ollie**
+  * Refactoring so no need to expose internal implementation details
+* **bebop**
+  * Add support/example of RTP video
+  * Enable video on firmware 3.3+
+  * Update ps3 and video example to enable the video stream
+  * Update README for brief explanation of how to get drone video
+  * Corrected import paths for client examples
+* **bb8**
+  * Correct NewDriver params and set name
+  * Add missing constructor to wrap Ollie implementation
+* **minidrone**
+  * Update README with example and which specific models are currently supported
+  * Add all piloting flying state events
+  * Adds Emergency() and TakePicture() commands
+* **test**
+  * Add Golang 1.8beta2 to Travis builds
+  * Correct aio references for AnalogRead tests
+
 1.0.0
 ---
 * **core**
