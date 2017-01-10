@@ -4,3 +4,6 @@
 profile.cov
 count.out
 *.swp
+/.DS_Store
+/.project
+.project
