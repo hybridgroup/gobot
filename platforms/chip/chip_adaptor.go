@@ -2,7 +2,10 @@ package chip
 
 import (
 	"errors"
-	"os/exec"
+	"fmt"
+	"io/ioutil"
+	"path/filepath"
+	"strconv"
 	"strings"
 
 	multierror "github.com/hashicorp/go-multierror"
@@ -17,26 +20,55 @@ type Adaptor struct {
 	i2cDevice   sysfs.I2cDevice
 }
 
-var pinsOriginal = map[string]int{
-	"XIO-P0": 408,
-	"XIO-P1": 409,
-	"XIO-P2": 410,
-	"XIO-P3": 411,
-	"XIO-P4": 412,
-	"XIO-P5": 413,
-	"XIO-P6": 414,
-	"XIO-P7": 415,
-}
+var fixedPins = map[string]int{
+	"PWM0":     34,
+	"AP-EINT3": 35,
 
-var pins44 = map[string]int{
-	"XIO-P0": 1013,
-	"XIO-P1": 1014,
-	"XIO-P2": 1015,
-	"XIO-P3": 1016,
-	"XIO-P4": 1017,
-	"XIO-P5": 1018,
-	"XIO-P6": 1019,
-	"XIO-P7": 1020,
+	"TWI1-SCK": 47,
+	"TWI1-SDA": 48,
+	"TWI2-SCK": 49,
+	"TWI2-SDA": 50,
+
+	"LCD-D2":    98,
+	"LCD-D3":    99,
+	"LCD-D4":    100,
+	"LCD-D5":    101,
+	"LCD-D6":    102,
+	"LCD-D7":    103,
+	"LCD-D10":   106,
+	"LCD-D11":   107,
+	"LCD-D12":   108,
+	"LCD-D13":   109,
+	"LCD-D14":   110,
+	"LCD-D15":   111,
+	"LCD-D18":   114,
+	"LCD-D19":   115,
+	"LCD-D20":   116,
+	"LCD-D21":   117,
+	"LCD-D22":   118,
+	"LCD-D23":   119,
+	"LCD-CLK":   120,
+	"LCD-DE":    121,
+	"LCD-HSYNC": 122,
+	"LCD-VSYNC": 123,
+
+	"CSIPCK":   128,
+	"CSICK":    129,
+	"CSIHSYNC": 130,
+	"CSIVSYNC": 131,
+	"CSID0":    132,
+	"CSID1":    133,
+	"CSID2":    134,
+	"CSID3":    135,
+	"CSID4":    136,
+	"CSID5":    137,
+	"CSID6":    138,
+	"CSID7":    139,
+
+	"AP-EINT1": 193,
+
+	"UART1-TX": 195,
+	"UART1-RX": 196,
 }
 
 // NewAdaptor creates a C.H.I.P. Adaptor
@@ -79,11 +111,11 @@ func (c *Adaptor) Finalize() (err error) {
 }
 
 func (c *Adaptor) setPins() {
-	kernel := getKernel()
-	if kernel[:3] == "4.3" {
-		c.pinMap = pinsOriginal
-	} else {
-		c.pinMap = pins44
+	c.pinMap = fixedPins
+	baseAddr, _ := getXIOBase()
+	for i := 0; i < 8; i++ {
+		pin := fmt.Sprintf("XIO-P%d", i)
+		c.pinMap[pin] = baseAddr + i
 	}
 }
 
@@ -167,8 +199,32 @@ func (c *Adaptor) I2cRead(address int, size int) (data []byte, err error) {
 	return
 }
 
-func getKernel() string {
-	result, _ := exec.Command("uname", "-r").Output()
+func getXIOBase() (baseAddr int, err error) {
+	// Default to original base from 4.3 kernel
+	baseAddr = 408
+	const expanderID = "pcf8574a"
 
-	return strings.TrimSpace(string(result))
+	labels, err := filepath.Glob("/sys/class/gpio/*/label")
+	if err != nil {
+		return
+	}
+
+	for _, labelPath := range labels {
+		label, err := ioutil.ReadFile(labelPath)
+		if err != nil {
+			return baseAddr, err
+		}
+		if strings.HasPrefix(string(label), expanderID) {
+			expanderPath, _ := filepath.Split(labelPath)
+			basePath := filepath.Join(expanderPath, "base")
+			base, err := ioutil.ReadFile(basePath)
+			if err != nil {
+				return baseAddr, err
+			}
+			baseAddr, _ = strconv.Atoi(strings.TrimSpace(string(base)))
+			break
+		}
+	}
+
+	return baseAddr, nil
 }

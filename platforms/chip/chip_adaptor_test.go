@@ -55,19 +55,19 @@ func TestChipAdaptorDigitalIO(t *testing.T) {
 	fs := sysfs.NewMockFilesystem([]string{
 		"/sys/class/gpio/export",
 		"/sys/class/gpio/unexport",
-		"/sys/class/gpio/gpio1013/value",
-		"/sys/class/gpio/gpio1013/direction",
-		"/sys/class/gpio/gpio1020/value",
-		"/sys/class/gpio/gpio1020/direction",
+		"/sys/class/gpio/gpio50/value",
+		"/sys/class/gpio/gpio50/direction",
+		"/sys/class/gpio/gpio139/value",
+		"/sys/class/gpio/gpio139/direction",
 	})
 
 	sysfs.SetFilesystem(fs)
 
-	a.DigitalWrite("XIO-P0", 1)
-	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio1013/value"].Contents, "1")
+	a.DigitalWrite("CSID7", 1)
+	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio139/value"].Contents, "1")
 
-	fs.Files["/sys/class/gpio/gpio1020/value"].Contents = "1"
-	i, _ := a.DigitalRead("XIO-P7")
+	fs.Files["/sys/class/gpio/gpio50/value"].Contents = "1"
+	i, _ := a.DigitalRead("TWI2-SDA")
 	gobottest.Assert(t, i, 1)
 
 	gobottest.Assert(t, a.DigitalWrite("XIO-P10", 1), errors.New("Not a valid pin"))
