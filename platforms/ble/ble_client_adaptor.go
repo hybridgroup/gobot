@@ -2,7 +2,6 @@ package ble
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"strings"
 	"time"
@@ -40,11 +39,14 @@ func NewClientAdaptor(address string) *ClientAdaptor {
 	}
 }
 
-func (b *ClientAdaptor) Name() string     { return b.name }
-func (b *ClientAdaptor) SetName(n string) { b.name = n }
-func (b *ClientAdaptor) Address() string  { return b.address }
+// Name returns the name for the adaptor
+func (b *ClientAdaptor) Name() string { return b.name }
 
-//func (b *ClientAdaptor) Peripheral() gatt.Peripheral { return b.peripheral }
+// SetName sets the name for the adaptor
+func (b *ClientAdaptor) SetName(n string) { b.name = n }
+
+// Address returns the Bluetooth LE address for the adaptor
+func (b *ClientAdaptor) Address() string { return b.address }
 
 // Connect initiates a connection to the BLE peripheral. Returns true on successful connection.
 func (b *ClientAdaptor) Connect() (err error) {
@@ -114,7 +116,6 @@ func (b *ClientAdaptor) ReadCharacteristic(cUUID string) (data []byte, err error
 		if err != nil {
 			return nil, err
 		}
-		fmt.Printf("    Value         %x | %q\n", data, data)
 		return data, nil
 	}
 
