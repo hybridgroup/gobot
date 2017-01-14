@@ -1,9 +1,10 @@
 package ble
 
-// import (
-// 	"github.com/currantlabs/gatt"
-// )
-//
-// var DefaultClientOptions = []gatt.Option{
-// 	gatt.MacDeviceRole(gatt.CentralManager),
-// }
+import (
+	blelib "github.com/currantlabs/ble"
+	"github.com/currantlabs/ble/darwin"
+)
+
+func defaultDevice(impl string) (d blelib.Device, err error) {
+	return darwin.NewDevice()
+}

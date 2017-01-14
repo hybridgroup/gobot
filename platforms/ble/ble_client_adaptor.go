@@ -8,9 +8,13 @@ import (
 	"time"
 
 	blelib "github.com/currantlabs/ble"
-	"github.com/currantlabs/ble/examples/lib/dev"
 	"github.com/pkg/errors"
 )
+
+// newBLEDevice is constructor about blelib HCI device connection
+func newBLEDevice(impl string) (d blelib.Device, err error) {
+	return defaultDevice(impl)
+}
 
 // ClientAdaptor represents a Client Connection to a BLE Peripheral
 type ClientAdaptor struct {
@@ -44,7 +48,7 @@ func (b *ClientAdaptor) Address() string  { return b.address }
 
 // Connect initiates a connection to the BLE peripheral. Returns true on successful connection.
 func (b *ClientAdaptor) Connect() (err error) {
-	d, err := dev.NewDevice("default")
+	d, err := newBLEDevice("default")
 	if err != nil {
 		return errors.Wrap(err, "can't new device")
 	}
