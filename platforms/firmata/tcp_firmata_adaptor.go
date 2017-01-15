@@ -1,6 +1,9 @@
 package firmata
 
-import "net"
+import (
+	"io"
+	"net"
+)
 
 // TCPAdaptor represents a TCP based connection to a microcontroller running
 // WiFiFirmata
@@ -8,17 +11,20 @@ type TCPAdaptor struct {
 	*Adaptor
 }
 
+func connect(address string) (io.ReadWriteCloser, error) {
+	return net.Dial("tcp", address)
+}
+
 // NewTCPAdaptor opens and uses a TCP connection to a microcontroller running
 // WiFiFirmata
 func NewTCPAdaptor(args ...interface{}) *TCPAdaptor {
 	address := args[0].(string)
-	conn, err := net.Dial("tcp", address)
-	if err != nil {
-		// TODO: handle error
-	}
 
-	a := NewAdaptor(conn, address)
+	a := NewAdaptor(address)
 	a.SetName("TCPFirmata")
+	a.PortOpener = func(port string) (io.ReadWriteCloser, error) {
+		return connect(port)
+	}
 
 	return &TCPAdaptor{
 		Adaptor: a,

@@ -28,11 +28,11 @@ type firmataBoard interface {
 
 // Adaptor is the Gobot Adaptor for Firmata based boards
 type Adaptor struct {
-	name         string
-	port         string
-	board        firmataBoard
-	conn         io.ReadWriteCloser
-	openCommPort func(port string) (io.ReadWriteCloser, error)
+	name       string
+	port       string
+	board      firmataBoard
+	conn       io.ReadWriteCloser
+	PortOpener func(port string) (io.ReadWriteCloser, error)
 	gobot.Eventer
 }
 
@@ -51,7 +51,7 @@ func NewAdaptor(args ...interface{}) *Adaptor {
 		port:  "",
 		conn:  nil,
 		board: client.New(),
-		openCommPort: func(port string) (io.ReadWriteCloser, error) {
+		PortOpener: func(port string) (io.ReadWriteCloser, error) {
 			return serial.OpenPort(&serial.Config{Name: port, Baud: 57600})
 		},
 		Eventer: gobot.NewEventer(),
@@ -72,7 +72,7 @@ func NewAdaptor(args ...interface{}) *Adaptor {
 // Connect starts a connection to the board.
 func (f *Adaptor) Connect() (err error) {
 	if f.conn == nil {
-		sp, e := f.openCommPort(f.Port())
+		sp, e := f.PortOpener(f.Port())
 		if e != nil {
 			return e
 		}

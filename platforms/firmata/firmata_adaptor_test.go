@@ -91,7 +91,7 @@ func (mockFirmataBoard) ServoConfig(int, int, int) error { return nil }
 func initTestAdaptor() *Adaptor {
 	a := NewAdaptor("/dev/null")
 	a.board = newMockFirmataBoard()
-	a.openCommPort = func(port string) (io.ReadWriteCloser, error) {
+	a.PortOpener = func(port string) (io.ReadWriteCloser, error) {
 		return &readWriteCloser{}, nil
 	}
 	a.Connect()
@@ -117,13 +117,13 @@ func TestAdaptorConnect(t *testing.T) {
 		return &readWriteCloser{}, nil
 	}
 	a := NewAdaptor("/dev/null")
-	a.openCommPort = openSP
+	a.PortOpener = openSP
 	a.board = newMockFirmataBoard()
 	gobottest.Assert(t, a.Connect(), nil)
 
 	a = NewAdaptor("/dev/null")
 	a.board = newMockFirmataBoard()
-	a.openCommPort = func(port string) (io.ReadWriteCloser, error) {
+	a.PortOpener = func(port string) (io.ReadWriteCloser, error) {
 		return nil, errors.New("connect error")
 	}
 	gobottest.Assert(t, a.Connect(), errors.New("connect error"))
