@@ -1,0 +1,472 @@
+package i2c
+
+import (
+	"errors"
+	"fmt"
+	"gobot.io/x/gobot"
+	"time"
+)
+
+const (
+	// TSL2561AddressLow - the address of the device when address pin is low
+	TSL2561AddressLow   = 0x29
+	// TSL2561AddressFloat - the address of the device when address pin is floating
+	TSL2561AddressFloat = 0x39
+	// TSL2561AddressHigh - the address of the device when address pin is high
+	TSL2561AddressHigh  = 0x49
+
+	tsl2561CommandBit = 0x80 // Must be 1
+	tsl2561ClearBit   = 0x40 // Clears any pending interrupt (write 1 to clear)
+	tsl2561WordBit    = 0x20 // 1 = read/write word (rather than byte)
+	tsl2561BlockBit   = 0x10 // 1 = using block read/write
+
+	tsl2561ControlPowerOn  = 0x03
+	tsl2561ControlPowerOff = 0x00
+
+	tsl2561LuxLuxScale     = 14     // Scale by 2^14
+	tsl2561LuxRatioScale   = 9      // Scale ratio by 2^9
+	tsl2561LuxChScale      = 10     // Scale channel values by 2^10
+	tsl2561LuxCHScaleTInt0 = 0x7517 // 322/11 * 2^tsl2561LUXCHSCALE
+	tsl2561LuxChScaleTInt1 = 0x0FE7 // 322/81 * 2^tsl2561LUXCHSCALE
+
+	// T, FN and CL package values
+	tsl2561LuxK1T = 0x0040 // 0.125 * 2^RATIO_SCALE
+	tsl2561LuxB1T = 0x01f2 // 0.0304 * 2^LUX_SCALE
+	tsl2561LuxM1T = 0x01be // 0.0272 * 2^LUX_SCALE
+	tsl2561LuxK2T = 0x0080 // 0.250 * 2^RATIO_SCALE
+	tsl2561LuxB2T = 0x0214 // 0.0325 * 2^LUX_SCALE
+	tsl2561LuxM2T = 0x02d1 // 0.0440 * 2^LUX_SCALE
+	tsl2561LuxK3T = 0x00c0 // 0.375 * 2^RATIO_SCALE
+	tsl2561LuxB3T = 0x023f // 0.0351 * 2^LUX_SCALE
+	tsl2561LuxM3T = 0x037b // 0.0544 * 2^LUX_SCALE
+	tsl2561LuxK4T = 0x0100 // 0.50 * 2^RATIO_SCALE
+	tsl2561LuxB4T = 0x0270 // 0.0381 * 2^LUX_SCALE
+	tsl2561LuxM4T = 0x03fe // 0.0624 * 2^LUX_SCALE
+	tsl2561LuxK5T = 0x0138 // 0.61 * 2^RATIO_SCALE
+	tsl2561LuxB5T = 0x016f // 0.0224 * 2^LUX_SCALE
+	tsl2561LuxM5T = 0x01fc // 0.0310 * 2^LUX_SCALE
+	tsl2561LuxK6T = 0x019a // 0.80 * 2^RATIO_SCALE
+	tsl2561LuxB6T = 0x00d2 // 0.0128 * 2^LUX_SCALE
+	tsl2561LuxM6T = 0x00fb // 0.0153 * 2^LUX_SCALE
+	tsl2561LuxK7T = 0x029a // 1.3 * 2^RATIO_SCALE
+	tsl2561LuxB7T = 0x0018 // 0.00146 * 2^LUX_SCALE
+	tsl2561LuxM7T = 0x0012 // 0.00112 * 2^LUX_SCALE
+	tsl2561LuxK8T = 0x029a // 1.3 * 2^RATIO_SCALE
+	tsl2561LuxB8T = 0x0000 // 0.000 * 2^LUX_SCALE
+	tsl2561LuxM8T = 0x0000 // 0.000 * 2^LUX_SCALE
+
+	// Auto-gain thresholds
+	tsl2561AgcTHi13MS  = 4850 // Max value at Ti 13ms = 5047
+	tsl2561AgcTLo13MS  = 100
+	tsl2561AgcTHi101MS = 36000 // Max value at Ti 101ms = 37177
+	tsl2561AgcTLo101MS = 200
+	tsl2561AgcTHi402MS = 63000 // Max value at Ti 402ms = 65535
+	tsl2561AgcTLo402MS = 500
+
+	// Clipping thresholds
+	tsl2561Clipping13MS  = 4900
+	tsl2561Clipping101MS = 37000
+	tsl2561Clipping402MS = 65000
+)
+
+type tsl2561Register int
+
+const (
+	tsl2561RegisterControl          tsl2561Register = 0x00
+	tsl2561RegisterTiming                           = 0x01
+	tsl2561RegisterThreshholdLLow                  = 0x02
+	tsl2561RegisterThreshholdLHigh                 = 0x03
+	tsl2561RegisterThreshholdHLow                  = 0x04
+	tsl2561RegisterThreshholdHHigh                 = 0x05
+	tsl2561RegisterInterrupt                        = 0x06
+	tsl2561RegisterCRC                              = 0x08
+	tsl2561RegisterID                               = 0x0A
+	tsl2561RegisterChan0Low                        = 0x0C
+	tsl2561RegisterChan0High                       = 0x0D
+	tsl2561RegisterChan1Low                        = 0x0E
+	tsl2561RegisterChan1High                       = 0x0F
+)
+
+// TSL2561IntegrationTime is the type of all valid integration time settings
+type TSL2561IntegrationTime int
+
+const (
+	// TSL2561IntegrationTime13MS integration time 13ms
+	TSL2561IntegrationTime13MS  TSL2561IntegrationTime = 0x00 // 13.7ms
+	// TSL2561IntegrationTime101MS integration time 101ms
+	TSL2561IntegrationTime101MS                        = 0x01 // 101ms
+	// TSL2561IntegrationTime402MS integration time 402ms
+	TSL2561IntegrationTime402MS                        = 0x02 // 402ms
+)
+
+// TSL2561Gain is the type of all valid gain settings
+type TSL2561Gain int
+
+const (
+	// TSL2561Gain1X gain == 1x
+	TSL2561Gain1X  TSL2561Gain = 0x00 // No gain
+	// TSL2561Gain16X gain == 16x
+	TSL2561Gain16X             = 0x10 // 16x gain
+)
+
+// TSL2561Driver is the gobot driver for the Adafruit Digital Luminosity/Lux/Light Sensor
+// Datasheet: http://www.adafruit.com/datasheets/TSL2561.pdf
+// Ported from the Adafruit driver at https://github.com/adafruit/Adafruit_TSL2561 by
+// K. Townsend
+type TSL2561Driver struct {
+	name            string
+	connection      I2c
+	deviceAddress   int
+	autoGain        bool
+	gain            TSL2561Gain
+	integrationTime TSL2561IntegrationTime
+}
+
+
+// NewTSL2561Driver creates a new driver with an I2c connector and optional options.
+// Settings are provided with a map like this:
+//  options := map[string]int {address: TSL2561AddressLow}
+//  d := NewTSL2561Driver(i2ccon, settings)
+func NewTSL2561Driver(c I2c, options ...map[string]int) *TSL2561Driver {
+	integrationTime := TSL2561IntegrationTime13MS
+	gain := TSL2561Gain1X
+	autoGain := false
+	address := TSL2561AddressFloat
+
+	if len(options) > 0 {
+		for k, v := range options[0] {
+			switch k {
+			case "address":
+				switch v {
+				case TSL2561AddressLow, TSL2561AddressFloat, TSL2561AddressHigh:
+					address = v
+				default:
+					panic(fmt.Sprintf("Invalid address %v passed to NewTSL2561Driver", v))
+				}
+			case "integrationTime":
+				switch TSL2561IntegrationTime(v) {
+				case TSL2561IntegrationTime13MS, TSL2561IntegrationTime101MS, TSL2561IntegrationTime402MS:
+					integrationTime = TSL2561IntegrationTime(v)
+				default:
+					panic(fmt.Sprintf("Invalid integrationTime %v passed to NewTSL2561Driver", v))
+				}
+			case "gain":
+				switch TSL2561Gain(v) {
+				case TSL2561Gain1X, TSL2561Gain16X:
+					gain = TSL2561Gain(v)
+				default:
+					panic(fmt.Sprintf("Invalid gain value '%v' passed to NewTSL2561Driver", v))
+				}
+			case "autoGain":
+				switch {
+				case v == 0:
+					autoGain = false
+				case v == 1:
+					autoGain = true
+				default:
+					panic(fmt.Sprintf("Invalid autoGain value '%v' passwd to NewTSL2561Driver", v))
+				}
+			default:
+				panic(fmt.Sprintf("Unknown option '%v' passed to NewTSL2561Driver", k))
+			}
+		}
+	}
+
+	return &TSL2561Driver{
+		name:            "TSL2561",
+		connection:      c,
+		deviceAddress:   address,
+		integrationTime: integrationTime,
+		gain:            gain,
+		autoGain:        autoGain,
+	}
+}
+
+// Name returns the name of the device.
+func (d *TSL2561Driver) Name() string {
+	return d.name
+}
+
+// SetName sets the name of the device.
+func (d *TSL2561Driver) SetName(name string) {
+	d.name = name
+}
+
+// Connection returns the connection of the device.
+func (d *TSL2561Driver) Connection() gobot.Connection {
+	return d.connection
+}
+
+// Start initializes the device.
+func (d *TSL2561Driver) Start() error {
+	if initialized, err := d.readByteRegister(tsl2561RegisterID); err != nil {
+		return err
+	} else if (initialized & 0x0A) == 0 {
+		return errors.New("TSL2561 device not found")
+	}
+
+	d.SetIntegrationTime(d.integrationTime)
+	d.SetGain(d.gain)
+	d.disable()
+
+	return nil
+}
+
+// Halt stops the device
+func (d *TSL2561Driver) Halt() error {
+	return nil
+}
+
+// SetIntegrationTime sets integrations time for the TSL2561
+func (d *TSL2561Driver) SetIntegrationTime(time TSL2561IntegrationTime) error {
+	if err := d.enable(); err != nil {
+		return err
+	}
+
+	timeGainVal := uint8(time) | uint8(d.gain)
+	if err := d.writeByteRegister(tsl2561CommandBit|tsl2561RegisterTiming, timeGainVal); err != nil {
+		return err
+	}
+	d.integrationTime = time
+
+	return d.disable()
+}
+
+// SetGain adjusts the TSL2561 gain (sensitivity to light)
+func (d *TSL2561Driver) SetGain(gain TSL2561Gain) error {
+	if err := d.enable(); err != nil {
+		return err
+	}
+
+	timeGainVal := uint8(d.integrationTime) | uint8(gain)
+	if err := d.writeByteRegister(tsl2561CommandBit|tsl2561RegisterTiming, timeGainVal); err != nil {
+		return err
+	}
+	d.gain = gain
+
+	return d.disable()
+}
+
+// GetLuminocity gets the broadband and IR only values from the TSL2561,
+// adjusting gain if auto-gain is enabled
+func (d *TSL2561Driver) GetLuminocity() (broadband uint16, ir uint16, err error) {
+	// if auto gain disabled get a single reading and continue
+	if !d.autoGain {
+		broadband, ir, err = d.getData()
+		return
+	}
+
+	agcCheck := false
+	var hi, lo uint16
+
+	switch d.integrationTime {
+	case TSL2561IntegrationTime13MS:
+		hi = tsl2561AgcTHi13MS
+		lo = tsl2561AgcTLo13MS
+	case TSL2561IntegrationTime101MS:
+		hi = tsl2561AgcTLo101MS
+		lo = tsl2561AgcTHi101MS
+	case TSL2561IntegrationTime402MS:
+		hi = tsl2561AgcTHi402MS
+		lo = tsl2561AgcTLo402MS
+	}
+
+	// Read data until we find a valid range
+	valid := false
+	for {
+		broadband, ir, err = d.getData()
+		if err != nil {
+			return
+		}
+
+		// Run an auto-gain check if we haven't already done so
+		if !agcCheck {
+			if (broadband < lo) && (d.gain == TSL2561Gain1X) {
+				// increase gain and try again
+				err = d.SetGain(TSL2561Gain16X)
+				if err != nil {
+					return
+				}
+				agcCheck = true
+			} else if (broadband > hi) && (d.gain == TSL2561Gain16X) {
+				// drop gain and try again
+				err = d.SetGain(TSL2561Gain1X)
+				if err != nil {
+					return
+				}
+				agcCheck = true
+			} else {
+				// Reading is either valid, or we're already at the chips
+				// limits
+				valid = true
+			}
+		} else {
+			// If we've already adjusted the gain once, just return the new results.
+			// This avoids endless loops where a value is at one extreme pre-gain,
+			// and the the other extreme post-gain
+			valid = true
+		}
+
+		if valid {
+			break
+		}
+	}
+
+	return
+}
+
+// CalculateLux converts raw sensor values to the standard SI Lux equivalent.
+// Returns 65536 if the sensor is saturated.
+func (d *TSL2561Driver) CalculateLux(broadband uint16, ir uint16) (lux uint32) {
+	var chScale uint32
+	var channel1 uint32
+	var channel0 uint32
+	var clipThreshold uint16
+
+	// Set cliplevel and scaling based on integration time
+	switch d.integrationTime {
+	case TSL2561IntegrationTime13MS:
+		clipThreshold = tsl2561Clipping13MS
+		chScale = tsl2561LuxCHScaleTInt0
+	case TSL2561IntegrationTime101MS:
+		clipThreshold = tsl2561Clipping101MS
+		chScale = tsl2561LuxChScaleTInt1
+	case TSL2561IntegrationTime402MS:
+		clipThreshold = tsl2561Clipping402MS
+		chScale = (1 << tsl2561LuxChScale)
+	}
+
+	// Saturated sensor
+	if (broadband > clipThreshold) || (ir > clipThreshold) {
+		return 65536
+	}
+
+	// Adjust scale for gain
+	if d.gain == TSL2561Gain1X {
+		chScale = chScale * 16
+	}
+
+	channel0 = (uint32(broadband) * chScale) >> tsl2561LuxChScale
+	channel1 = (uint32(ir) * chScale) >> tsl2561LuxChScale
+
+	// Find the ratio of the channel values (channel1 / channel0)
+	var ratio1 uint32
+	if channel0 != 0 {
+		ratio1 = (channel1 << (tsl2561LuxRatioScale + 1)) / channel0
+	}
+
+	// Round the ratio value
+	ratio := (ratio1 + 1) / 2
+
+	var b, m uint32
+	switch {
+	case (ratio >= 0) && (ratio <= tsl2561LuxK1T):
+		b = tsl2561LuxB1T
+		m = tsl2561LuxM1T
+	case (ratio <= tsl2561LuxK2T):
+		b = tsl2561LuxB2T
+		m = tsl2561LuxM2T
+	case (ratio <= tsl2561LuxK3T):
+		b = tsl2561LuxB3T
+		m = tsl2561LuxM3T
+	case (ratio <= tsl2561LuxK4T):
+		b = tsl2561LuxB4T
+		m = tsl2561LuxM4T
+	case (ratio <= tsl2561LuxK5T):
+		b = tsl2561LuxB5T
+		m = tsl2561LuxM5T
+	case (ratio <= tsl2561LuxK6T):
+		b = tsl2561LuxB6T
+		m = tsl2561LuxM6T
+	case (ratio <= tsl2561LuxK7T):
+		b = tsl2561LuxB7T
+		m = tsl2561LuxM7T
+	case (ratio > tsl2561LuxK8T):
+		b = tsl2561LuxB8T
+		m = tsl2561LuxM8T
+	}
+
+	temp := (channel0 * b) - (channel1 * m)
+
+	// Negative lux not allowed
+	if temp < 0 {
+		temp = 0
+	}
+
+	// Round lsb (2^(LUX_SCALE+1))
+	temp += (1 << (tsl2561LuxLuxScale - 1))
+
+	// Strip off fractional portion
+	lux = temp >> tsl2561LuxLuxScale
+
+	return lux
+}
+
+func (d *TSL2561Driver) readByteRegister(reg int) (val uint8, err error) {
+	var bytes []uint8
+	if bytes, err = d.connection.I2cRead(d.deviceAddress, reg); err != nil {
+		return 0, err
+	}
+	return bytes[0], nil
+}
+
+func (d *TSL2561Driver) writeByteRegister(reg uint8, val uint8) (err error) {
+	err = d.connection.I2cWrite(d.deviceAddress, []byte{reg, val})
+	return err
+}
+
+func (d *TSL2561Driver) writeByteRegisters(regValPairs [][2]uint8) (err error) {
+	for _, rv := range regValPairs {
+		reg, val := rv[0], rv[1]
+		if err = d.connection.I2cWrite(d.deviceAddress, []uint8{reg, val}); err != nil {
+			break
+		}
+	}
+	return err
+}
+
+func (d *TSL2561Driver) read16bitInteger(reg int) (val uint16, err error) {
+	if low, err := d.readByteRegister(reg); err != nil {
+		return 0, err
+	} else if high, err := d.readByteRegister(reg); err != nil {
+		return 0, err
+	} else {
+		return (uint16(high)<<8 | uint16(low)), nil
+	}
+}
+
+func (d *TSL2561Driver) enable() (err error) {
+	err = d.writeByteRegister(uint8(tsl2561CommandBit|tsl2561RegisterControl), tsl2561ControlPowerOn)
+	return err
+}
+
+func (d *TSL2561Driver) disable() (err error) {
+	err = d.writeByteRegister(uint8(tsl2561CommandBit|tsl2561RegisterControl), tsl2561ControlPowerOff)
+	return err
+}
+
+func (d *TSL2561Driver) getData() (broadband uint16, ir uint16, err error) {
+	if err := d.enable(); err != nil {
+		return 0, 0, err
+	}
+
+	// Wait x ms for ADC to complete
+	switch d.integrationTime {
+	case TSL2561IntegrationTime13MS:
+		time.Sleep(15 * time.Millisecond)
+	case TSL2561IntegrationTime101MS:
+		time.Sleep(120 * time.Millisecond)
+	case TSL2561IntegrationTime402MS:
+		time.Sleep(450 * time.Millisecond)
+	}
+
+	// Reads a two byte value from channel 0 (visible + infrared)
+	broadband, err = d.read16bitInteger(tsl2561CommandBit | tsl2561WordBit | tsl2561RegisterChan0Low)
+
+	// Reads a two byte value from channel 1 (infrared)
+	ir, err = d.read16bitInteger(tsl2561CommandBit | tsl2561WordBit | tsl2561RegisterChan1Low)
+
+	d.disable()
+
+	return
+}
