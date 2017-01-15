@@ -104,7 +104,7 @@ func (b *Driver) Init() (err error) {
 	b.Wake()
 
 	// subscribe to Sphero response notifications
-	b.adaptor().Subscribe(robotControlService, responseCharacteristic, b.HandleResponses)
+	b.adaptor().Subscribe(responseCharacteristic, b.HandleResponses)
 
 	return
 }
@@ -115,7 +115,7 @@ func (b *Driver) AntiDOSOff() (err error) {
 	buf := &bytes.Buffer{}
 	buf.WriteString(str)
 
-	err = b.adaptor().WriteCharacteristic(spheroBLEService, antiDosCharacteristic, buf.Bytes())
+	err = b.adaptor().WriteCharacteristic(antiDosCharacteristic, buf.Bytes())
 	if err != nil {
 		fmt.Println("AntiDOSOff error:", err)
 		return err
@@ -128,7 +128,7 @@ func (b *Driver) AntiDOSOff() (err error) {
 func (b *Driver) Wake() (err error) {
 	buf := []byte{0x01}
 
-	err = b.adaptor().WriteCharacteristic(spheroBLEService, wakeCharacteristic, buf)
+	err = b.adaptor().WriteCharacteristic(wakeCharacteristic, buf)
 	if err != nil {
 		fmt.Println("Wake error:", err)
 		return err
@@ -141,7 +141,7 @@ func (b *Driver) Wake() (err error) {
 func (b *Driver) SetTXPower(level int) (err error) {
 	buf := []byte{byte(level)}
 
-	err = b.adaptor().WriteCharacteristic(spheroBLEService, txPowerCharacteristic, buf)
+	err = b.adaptor().WriteCharacteristic(txPowerCharacteristic, buf)
 	if err != nil {
 		fmt.Println("SetTXLevel error:", err)
 		return err
@@ -185,7 +185,7 @@ func (b *Driver) EnableStopOnDisconnect() {
 func (b *Driver) write(packet *packet) (err error) {
 	buf := append(packet.header, packet.body...)
 	buf = append(buf, packet.checksum)
-	err = b.adaptor().WriteCharacteristic(robotControlService, commandsCharacteristic, buf)
+	err = b.adaptor().WriteCharacteristic(commandsCharacteristic, buf)
 	if err != nil {
 		fmt.Println("send command error:", err)
 		return err

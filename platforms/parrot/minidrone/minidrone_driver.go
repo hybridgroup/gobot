@@ -156,12 +156,12 @@ func (b *Driver) Init() (err error) {
 	b.GenerateAllStates()
 
 	// subscribe to battery notifications
-	b.adaptor().Subscribe(droneNotificationService, batteryCharacteristic, func(data []byte, e error) {
+	b.adaptor().Subscribe(batteryCharacteristic, func(data []byte, e error) {
 		b.Publish(b.Event(Battery), data[len(data)-1])
 	})
 
 	// subscribe to flying status notifications
-	b.adaptor().Subscribe(droneNotificationService, flightStatusCharacteristic, func(data []byte, e error) {
+	b.adaptor().Subscribe(flightStatusCharacteristic, func(data []byte, e error) {
 		if len(data) < 5 {
 			// ignore, just a sync
 			return
@@ -208,7 +208,7 @@ func (b *Driver) Init() (err error) {
 func (b *Driver) GenerateAllStates() (err error) {
 	b.stepsfa0b++
 	buf := []byte{0x04, byte(b.stepsfa0b), 0x00, 0x04, 0x01, 0x00, 0x32, 0x30, 0x31, 0x34, 0x2D, 0x31, 0x30, 0x2D, 0x32, 0x38, 0x00}
-	err = b.adaptor().WriteCharacteristic(droneCommandService, commandCharacteristic, buf)
+	err = b.adaptor().WriteCharacteristic(commandCharacteristic, buf)
 	if err != nil {
 		fmt.Println("GenerateAllStates error:", err)
 		return err
@@ -221,7 +221,7 @@ func (b *Driver) GenerateAllStates() (err error) {
 func (b *Driver) TakeOff() (err error) {
 	b.stepsfa0b++
 	buf := []byte{0x02, byte(b.stepsfa0b) & 0xff, 0x02, 0x00, 0x01, 0x00}
-	err = b.adaptor().WriteCharacteristic(droneCommandService, commandCharacteristic, buf)
+	err = b.adaptor().WriteCharacteristic(commandCharacteristic, buf)
 	if err != nil {
 		fmt.Println("takeoff error:", err)
 		return err
@@ -234,7 +234,7 @@ func (b *Driver) TakeOff() (err error) {
 func (b *Driver) Land() (err error) {
 	b.stepsfa0b++
 	buf := []byte{0x02, byte(b.stepsfa0b) & 0xff, 0x02, 0x00, 0x03, 0x00}
-	err = b.adaptor().WriteCharacteristic(droneCommandService, commandCharacteristic, buf)
+	err = b.adaptor().WriteCharacteristic(commandCharacteristic, buf)
 
 	return err
 }
@@ -243,7 +243,7 @@ func (b *Driver) Land() (err error) {
 func (b *Driver) FlatTrim() (err error) {
 	b.stepsfa0b++
 	buf := []byte{0x02, byte(b.stepsfa0b) & 0xff, 0x02, 0x00, 0x00, 0x00}
-	err = b.adaptor().WriteCharacteristic(droneCommandService, commandCharacteristic, buf)
+	err = b.adaptor().WriteCharacteristic(commandCharacteristic, buf)
 
 	return err
 }
@@ -252,7 +252,7 @@ func (b *Driver) FlatTrim() (err error) {
 func (b *Driver) Emergency() (err error) {
 	b.stepsfa0b++
 	buf := []byte{0x02, byte(b.stepsfa0b) & 0xff, 0x02, 0x00, 0x04, 0x00}
-	err = b.adaptor().WriteCharacteristic(droneCommandService, priorityCharacteristic, buf)
+	err = b.adaptor().WriteCharacteristic(priorityCharacteristic, buf)
 
 	return err
 }
@@ -261,7 +261,7 @@ func (b *Driver) Emergency() (err error) {
 func (b *Driver) TakePicture() (err error) {
 	b.stepsfa0b++
 	buf := []byte{0x02, byte(b.stepsfa0b) & 0xff, 0x02, 0x06, 0x01, 0x00}
-	err = b.adaptor().WriteCharacteristic(droneCommandService, commandCharacteristic, buf)
+	err = b.adaptor().WriteCharacteristic(commandCharacteristic, buf)
 
 	return err
 }
@@ -272,7 +272,7 @@ func (b *Driver) StartPcmd() {
 		// wait a little bit so that there is enough time to get some ACKs
 		time.Sleep(500 * time.Millisecond)
 		for {
-			err := b.adaptor().WriteCharacteristic(droneCommandService, pcmdCharacteristic, b.generatePcmd().Bytes())
+			err := b.adaptor().WriteCharacteristic(pcmdCharacteristic, b.generatePcmd().Bytes())
 			if err != nil {
 				fmt.Println("pcmd write error:", err)
 			}
@@ -373,22 +373,22 @@ func (b *Driver) Outdoor(outdoor bool) error {
 
 // FrontFlip tells the drone to perform a front flip
 func (b *Driver) FrontFlip() (err error) {
-	return b.adaptor().WriteCharacteristic(droneCommandService, commandCharacteristic, b.generateAnimation(0).Bytes())
+	return b.adaptor().WriteCharacteristic(commandCharacteristic, b.generateAnimation(0).Bytes())
 }
 
 // BackFlip tells the drone to perform a backflip
 func (b *Driver) BackFlip() (err error) {
-	return b.adaptor().WriteCharacteristic(droneCommandService, commandCharacteristic, b.generateAnimation(1).Bytes())
+	return b.adaptor().WriteCharacteristic(commandCharacteristic, b.generateAnimation(1).Bytes())
 }
 
 // RightFlip tells the drone to perform a flip to the right
 func (b *Driver) RightFlip() (err error) {
-	return b.adaptor().WriteCharacteristic(droneCommandService, commandCharacteristic, b.generateAnimation(2).Bytes())
+	return b.adaptor().WriteCharacteristic(commandCharacteristic, b.generateAnimation(2).Bytes())
 }
 
 // LeftFlip tells the drone to perform a flip to the left
 func (b *Driver) LeftFlip() (err error) {
-	return b.adaptor().WriteCharacteristic(droneCommandService, commandCharacteristic, b.generateAnimation(3).Bytes())
+	return b.adaptor().WriteCharacteristic(commandCharacteristic, b.generateAnimation(3).Bytes())
 }
 
 func (b *Driver) generateAnimation(direction int8) *bytes.Buffer {

@@ -1,11 +1,10 @@
 package ble
 
 import (
-	"github.com/currantlabs/gatt"
+	blelib "github.com/currantlabs/ble"
+	"github.com/currantlabs/ble/linux"
 )
 
-// TODO: handle other OS defaults besides Linux
-var DefaultClientOptions = []gatt.Option{
-	gatt.LnxMaxConnections(1),
-	gatt.LnxDeviceID(-1, false),
+func defaultDevice(impl string) (d blelib.Device, err error) {
+	return linux.NewDevice()
 }

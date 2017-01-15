@@ -48,7 +48,7 @@ func (b *DeviceInformationDriver) Halt() (err error) { return }
 
 // GetModelNumber returns the model number for the BLE Peripheral
 func (b *DeviceInformationDriver) GetModelNumber() (model string) {
-	c, _ := b.adaptor().ReadCharacteristic("180a", "2a24")
+	c, _ := b.adaptor().ReadCharacteristic("2a24")
 	buf := bytes.NewBuffer(c)
 	val := buf.String()
 	return val
@@ -56,7 +56,7 @@ func (b *DeviceInformationDriver) GetModelNumber() (model string) {
 
 // GetFirmwareRevision returns the firmware revision for the BLE Peripheral
 func (b *DeviceInformationDriver) GetFirmwareRevision() (revision string) {
-	c, _ := b.adaptor().ReadCharacteristic("180a", "2a26")
+	c, _ := b.adaptor().ReadCharacteristic("2a26")
 	buf := bytes.NewBuffer(c)
 	val := buf.String()
 	return val
@@ -64,7 +64,7 @@ func (b *DeviceInformationDriver) GetFirmwareRevision() (revision string) {
 
 // GetHardwareRevision returns the hardware revision for the BLE Peripheral
 func (b *DeviceInformationDriver) GetHardwareRevision() (revision string) {
-	c, _ := b.adaptor().ReadCharacteristic("180a", "2a27")
+	c, _ := b.adaptor().ReadCharacteristic("2a27")
 	buf := bytes.NewBuffer(c)
 	val := buf.String()
 	return val
@@ -72,7 +72,7 @@ func (b *DeviceInformationDriver) GetHardwareRevision() (revision string) {
 
 // GetManufacturerName returns the manufacturer name for the BLE Peripheral
 func (b *DeviceInformationDriver) GetManufacturerName() (manufacturer string) {
-	c, _ := b.adaptor().ReadCharacteristic("180a", "2a29")
+	c, _ := b.adaptor().ReadCharacteristic("2a29")
 	buf := bytes.NewBuffer(c)
 	val := buf.String()
 	return val
@@ -80,7 +80,7 @@ func (b *DeviceInformationDriver) GetManufacturerName() (manufacturer string) {
 
 // GetPnPId returns the PnP ID for the BLE Peripheral
 func (b *DeviceInformationDriver) GetPnPId() (model string) {
-	c, _ := b.adaptor().ReadCharacteristic("180a", "2a50")
+	c, _ := b.adaptor().ReadCharacteristic("2a50")
 	buf := bytes.NewBuffer(c)
 	val := buf.String()
 	return val
