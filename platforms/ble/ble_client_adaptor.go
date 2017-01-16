@@ -20,7 +20,6 @@ type ClientAdaptor struct {
 	name    string
 	address string
 
-	//	uuid    blelib.UUID
 	addr    blelib.Addr
 	device  blelib.Device
 	client  blelib.Client
