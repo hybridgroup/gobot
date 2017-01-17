@@ -1,6 +1,7 @@
 package ble
 
 // SerialPort is a implementation of serial over Bluetooth LE
+// Inspired by https://github.com/monteslu/ble-serial by @monteslu
 type SerialPort struct {
 	address string
 	rid     string
@@ -9,8 +10,8 @@ type SerialPort struct {
 }
 
 // NewSerialPort returns a new serial over Bluetooth LE connection
-func NewSerialPort(address string, rid string, wid string) *SerialPort {
-	return &SerialPort{address: address, rid: rid, tid: wid}
+func NewSerialPort(address string, rid string, tid string) *SerialPort {
+	return &SerialPort{address: address, rid: rid, tid: tid}
 }
 
 // Open opens a connection to a BLE serial device
@@ -27,14 +28,17 @@ func (p *SerialPort) Read(b []byte) (n int, err error) {
 		return
 	}
 	copy(data, b)
-	n = len(b)
+	n = len(data)
+	//log.Println("reading", p.rid, "data:", data)
 	return
 }
 
 // Write writes to the BLE serial port connection
 func (p *SerialPort) Write(b []byte) (n int, err error) {
 	err = p.client.WriteCharacteristic(p.tid, b)
-	return 0, err
+	n = len(b)
+	//log.Println("writing", p.tid, "data:", b)
+	return
 }
 
 // Close closes the BLE serial port connection

@@ -14,15 +14,15 @@ const (
 	TransmitID = "6e400002b5a3f393e0a9e50e24dcca9e"
 )
 
-// BLEAdaptor represents a Bluetooth LE based connection to a microcontroller running
-// FirmataBLE
+// BLEAdaptor represents a Bluetooth LE based connection to a
+// microcontroller running FirmataBLE
 type BLEAdaptor struct {
 	SerialPort *ble.SerialPort
 	*Adaptor
 }
 
-// NewBLEAdaptor opens and uses a BLE connection to a microcontroller running
-// FirmataBLE
+// NewBLEAdaptor opens and uses a BLE connection to a
+// microcontroller running FirmataBLE
 func NewBLEAdaptor(args ...interface{}) *BLEAdaptor {
 	address := args[0].(string)
 	rid := ReceiveID
