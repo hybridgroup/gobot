@@ -112,13 +112,9 @@ func (b *ClientAdaptor) ReadCharacteristic(cUUID string) (data []byte, err error
 
 	if u := b.profile.Find(blelib.NewCharacteristic(uuid)); u != nil {
 		data, err = b.client.ReadCharacteristic(u.(*blelib.Characteristic))
-		if err != nil {
-			return nil, err
-		}
-		return data, nil
 	}
 
-	return data, nil
+	return
 }
 
 // WriteCharacteristic writes bytes to the BLE device for the
@@ -133,10 +129,6 @@ func (b *ClientAdaptor) WriteCharacteristic(cUUID string, data []byte) (err erro
 
 	if u := b.profile.Find(blelib.NewCharacteristic(uuid)); u != nil {
 		err = b.client.WriteCharacteristic(u.(*blelib.Characteristic), data, true)
-		if err != nil {
-			return err
-		}
-		return nil
 	}
 
 	return
