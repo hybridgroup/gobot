@@ -17,7 +17,6 @@ const (
 // BLEAdaptor represents a Bluetooth LE based connection to a
 // microcontroller running FirmataBLE
 type BLEAdaptor struct {
-	SerialPort *ble.SerialPort
 	*Adaptor
 }
 
@@ -33,16 +32,15 @@ func NewBLEAdaptor(args ...interface{}) *BLEAdaptor {
 		wid = args[2].(string)
 	}
 
-	sp := ble.NewSerialPort(address, rid, wid)
 	a := NewAdaptor(address)
 	a.SetName("BLEFirmata")
 	a.PortOpener = func(port string) (io.ReadWriteCloser, error) {
+		sp := ble.NewSerialPort(address, rid, wid)
 		sp.Open()
 		return sp, nil
 	}
 
 	return &BLEAdaptor{
-		Adaptor:    a,
-		SerialPort: sp,
+		Adaptor: a,
 	}
 }
