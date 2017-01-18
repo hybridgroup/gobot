@@ -1,5 +1,7 @@
 package ble
 
+import "sync"
+
 // SerialPort is a implementation of serial over Bluetooth LE
 // Inspired by https://github.com/monteslu/ble-serial by @monteslu
 type SerialPort struct {
@@ -7,6 +9,10 @@ type SerialPort struct {
 	rid     string
 	tid     string
 	client  *ClientAdaptor
+
+	// buffer of responseData and mutex to protect it
+	responseData  []byte
+	responseMutex sync.Mutex
 }
 
 // NewSerialPort returns a new serial over Bluetooth LE connection
@@ -18,18 +24,36 @@ func NewSerialPort(address string, rid string, tid string) *SerialPort {
 func (p *SerialPort) Open() (err error) {
 	p.client = NewClientAdaptor(p.address)
 	err = p.client.Connect()
+
+	// subscribe to response notifications
+	p.client.Subscribe(p.rid, func(data []byte, e error) {
+		p.responseMutex.Lock()
+		p.responseData = append(p.responseData, data...)
+		p.responseMutex.Unlock()
+	})
 	return
 }
 
 // Read reads bytes from BLE serial port connection
 func (p *SerialPort) Read(b []byte) (n int, err error) {
-	data, err := p.client.ReadCharacteristic(p.rid)
-	if err != nil {
+	if len(p.responseData) == 0 {
 		return
 	}
-	copy(data, b)
-	n = len(data)
-	//log.Println("reading", p.rid, "data:", data)
+
+	n = len(b)
+	if len(p.responseData) < n {
+		n = len(p.responseData)
+	}
+	copy(b, p.responseData[:n])
+
+	p.responseMutex.Lock()
+	if len(p.responseData) > n {
+		p.responseData = p.responseData[n:]
+	} else {
+		p.responseData = nil
+	}
+	p.responseMutex.Unlock()
+
 	return
 }
 
@@ -37,7 +61,6 @@ func (p *SerialPort) Read(b []byte) (n int, err error) {
 func (p *SerialPort) Write(b []byte) (n int, err error) {
 	err = p.client.WriteCharacteristic(p.tid, b)
 	n = len(b)
-	//log.Println("writing", p.tid, "data:", b)
 	return
 }
 
