@@ -16,20 +16,46 @@ func initTestTSL2561Driver() (*TSL2561Driver, *i2cTestAdaptor) {
 	return NewTSL2561Driver(adaptor), adaptor
 }
 
+func idReader() ([]byte, error) {
+	buf := new(bytes.Buffer)
+	// Mock device responding at address 0xA with 0xA
+	binary.Write(buf, binary.LittleEndian, make([]byte, 10))
+	binary.Write(buf, binary.LittleEndian, uint8(0x0A))
+	return buf.Bytes(), nil
+}
+
 func TestTSL2561Driver(t *testing.T) {
 	d, adaptor := initTestTSL2561Driver()
 
 	gobottest.Assert(t, d.Name(), "TSL2561")
 
-	adaptor.i2cReadImpl = func() ([]byte, error) {
-		buf := new(bytes.Buffer)
-		// Mock a responding device
-		binary.Write(buf, binary.LittleEndian, int8(0xA))
-		return buf.Bytes(), nil
-	}
+	adaptor.i2cReadImpl = idReader
+
 	gobottest.Assert(t, d.Start(), nil)
 
 	gobottest.Assert(t, d.Halt(), nil)
+}
+
+func TestRead16(t *testing.T) {
+	d, adaptor := initTestTSL2561Driver()
+
+	adaptor.i2cReadImpl = idReader
+
+	gobottest.Assert(t, d.Start(), nil)
+
+	adaptor.i2cReadImpl = func() ([]byte, error) {
+		buf := new(bytes.Buffer)
+		// send pad
+		binary.Write(buf, binary.LittleEndian, uint8(2))
+		// send low
+		binary.Write(buf, binary.LittleEndian, uint8(0xEA))
+		// send high
+		binary.Write(buf, binary.LittleEndian, uint8(0xAE))
+		return buf.Bytes(), nil
+	}
+	val, err := d.read16bitInteger(1)
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, val, uint16(0xAEEA))
 }
 
 func TestBadOption(t *testing.T) {
@@ -67,7 +93,7 @@ func TestBadOptionValue(t *testing.T) {
 func TestValidOptions(t *testing.T) {
 	adaptor := newI2cTestAdaptor()
 	options := map[string]int{
-		"integrationTime": TSL2561IntegrationTime101MS,
+		"integrationTime": int(TSL2561IntegrationTime101MS),
 		"address":         TSL2561AddressLow,
 		"gain":            TSL2561Gain16X,
 		"autoGain":        1,

@@ -1,7 +1,6 @@
 package i2c
 
 import (
-	"errors"
 	"fmt"
 	"gobot.io/x/gobot"
 	"time"
@@ -9,11 +8,11 @@ import (
 
 const (
 	// TSL2561AddressLow - the address of the device when address pin is low
-	TSL2561AddressLow   = 0x29
+	TSL2561AddressLow = 0x29
 	// TSL2561AddressFloat - the address of the device when address pin is floating
 	TSL2561AddressFloat = 0x39
 	// TSL2561AddressHigh - the address of the device when address pin is high
-	TSL2561AddressHigh  = 0x49
+	TSL2561AddressHigh = 0x49
 
 	tsl2561CommandBit = 0x80 // Must be 1
 	tsl2561ClearBit   = 0x40 // Clears any pending interrupt (write 1 to clear)
@@ -69,22 +68,20 @@ const (
 	tsl2561Clipping402MS = 65000
 )
 
-type tsl2561Register int
-
 const (
-	tsl2561RegisterControl          tsl2561Register = 0x00
-	tsl2561RegisterTiming                           = 0x01
-	tsl2561RegisterThreshholdLLow                  = 0x02
-	tsl2561RegisterThreshholdLHigh                 = 0x03
-	tsl2561RegisterThreshholdHLow                  = 0x04
-	tsl2561RegisterThreshholdHHigh                 = 0x05
-	tsl2561RegisterInterrupt                        = 0x06
-	tsl2561RegisterCRC                              = 0x08
-	tsl2561RegisterID                               = 0x0A
-	tsl2561RegisterChan0Low                        = 0x0C
-	tsl2561RegisterChan0High                       = 0x0D
-	tsl2561RegisterChan1Low                        = 0x0E
-	tsl2561RegisterChan1High                       = 0x0F
+	tsl2561RegisterControl         = 0x00
+	tsl2561RegisterTiming          = 0x01
+	tsl2561RegisterThreshholdLLow  = 0x02
+	tsl2561RegisterThreshholdLHigh = 0x03
+	tsl2561RegisterThreshholdHLow  = 0x04
+	tsl2561RegisterThreshholdHHigh = 0x05
+	tsl2561RegisterInterrupt       = 0x06
+	tsl2561RegisterCRC             = 0x08
+	tsl2561RegisterID              = 0x0A
+	tsl2561RegisterChan0Low        = 0x0C
+	tsl2561RegisterChan0High       = 0x0D
+	tsl2561RegisterChan1Low        = 0x0E
+	tsl2561RegisterChan1High       = 0x0F
 )
 
 // TSL2561IntegrationTime is the type of all valid integration time settings
@@ -92,11 +89,11 @@ type TSL2561IntegrationTime int
 
 const (
 	// TSL2561IntegrationTime13MS integration time 13ms
-	TSL2561IntegrationTime13MS  TSL2561IntegrationTime = 0x00 // 13.7ms
+	TSL2561IntegrationTime13MS TSL2561IntegrationTime = iota // 13.7ms
 	// TSL2561IntegrationTime101MS integration time 101ms
-	TSL2561IntegrationTime101MS                        = 0x01 // 101ms
+	TSL2561IntegrationTime101MS // 101ms
 	// TSL2561IntegrationTime402MS integration time 402ms
-	TSL2561IntegrationTime402MS                        = 0x02 // 402ms
+	TSL2561IntegrationTime402MS // 402ms
 )
 
 // TSL2561Gain is the type of all valid gain settings
@@ -104,9 +101,9 @@ type TSL2561Gain int
 
 const (
 	// TSL2561Gain1X gain == 1x
-	TSL2561Gain1X  TSL2561Gain = 0x00 // No gain
+	TSL2561Gain1X TSL2561Gain = 0x00 // No gain
 	// TSL2561Gain16X gain == 16x
-	TSL2561Gain16X             = 0x10 // 16x gain
+	TSL2561Gain16X = 0x10 // 16x gain
 )
 
 // TSL2561Driver is the gobot driver for the Adafruit Digital Luminosity/Lux/Light Sensor
@@ -115,27 +112,31 @@ const (
 // K. Townsend
 type TSL2561Driver struct {
 	name            string
-	connection      I2c
+	connector       I2cConnector
+	connection      I2cConnection
 	deviceAddress   int
+	i2cBus          int
 	autoGain        bool
 	gain            TSL2561Gain
 	integrationTime TSL2561IntegrationTime
 }
 
-
 // NewTSL2561Driver creates a new driver with an I2c connector and optional options.
 // Settings are provided with a map like this:
 //  options := map[string]int {address: TSL2561AddressLow}
 //  d := NewTSL2561Driver(i2ccon, settings)
-func NewTSL2561Driver(c I2c, options ...map[string]int) *TSL2561Driver {
-	integrationTime := TSL2561IntegrationTime13MS
+func NewTSL2561Driver(c I2cConnector, options ...map[string]int) *TSL2561Driver {
+	integrationTime := TSL2561IntegrationTime402MS
 	gain := TSL2561Gain1X
 	autoGain := false
+	bus := 1
 	address := TSL2561AddressFloat
 
 	if len(options) > 0 {
 		for k, v := range options[0] {
 			switch k {
+			case "bus":
+				bus = v
 			case "address":
 				switch v {
 				case TSL2561AddressLow, TSL2561AddressFloat, TSL2561AddressHigh:
@@ -174,8 +175,9 @@ func NewTSL2561Driver(c I2c, options ...map[string]int) *TSL2561Driver {
 
 	return &TSL2561Driver{
 		name:            "TSL2561",
-		connection:      c,
+		connector:       c,
 		deviceAddress:   address,
+		i2cBus:          bus,
 		integrationTime: integrationTime,
 		gain:            gain,
 		autoGain:        autoGain,
@@ -194,20 +196,37 @@ func (d *TSL2561Driver) SetName(name string) {
 
 // Connection returns the connection of the device.
 func (d *TSL2561Driver) Connection() gobot.Connection {
-	return d.connection
+	return d.connector.(gobot.Connection)
 }
 
 // Start initializes the device.
-func (d *TSL2561Driver) Start() error {
-	if initialized, err := d.readByteRegister(tsl2561RegisterID); err != nil {
+func (d *TSL2561Driver) Start() (err error) {
+
+	if d.connection, err = d.connector.I2cGetConnection(d.deviceAddress, d.i2cBus); err != nil {
 		return err
-	} else if (initialized & 0x0A) == 0 {
-		return errors.New("TSL2561 device not found")
 	}
 
-	d.SetIntegrationTime(d.integrationTime)
-	d.SetGain(d.gain)
-	d.disable()
+	if err = d.enable(); err != nil {
+		return err
+	}
+
+	if initialized, err := d.connection.ReadByteData(tsl2561RegisterID); err != nil {
+		return err
+	} else if (initialized & 0x0A) == 0 {
+		return fmt.Errorf("TSL2561 device not found (0x%X)", initialized)
+	}
+
+	if err = d.SetIntegrationTime(d.integrationTime); err != nil {
+		return err
+	}
+
+	if err = d.SetGain(d.gain); err != nil {
+		return err
+	}
+
+	if err = d.disable(); err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -224,7 +243,7 @@ func (d *TSL2561Driver) SetIntegrationTime(time TSL2561IntegrationTime) error {
 	}
 
 	timeGainVal := uint8(time) | uint8(d.gain)
-	if err := d.writeByteRegister(tsl2561CommandBit|tsl2561RegisterTiming, timeGainVal); err != nil {
+	if err := d.connection.WriteByteData(tsl2561CommandBit|tsl2561RegisterTiming, timeGainVal); err != nil {
 		return err
 	}
 	d.integrationTime = time
@@ -239,7 +258,7 @@ func (d *TSL2561Driver) SetGain(gain TSL2561Gain) error {
 	}
 
 	timeGainVal := uint8(d.integrationTime) | uint8(gain)
-	if err := d.writeByteRegister(tsl2561CommandBit|tsl2561RegisterTiming, timeGainVal); err != nil {
+	if err := d.connection.WriteByteData(tsl2561CommandBit|tsl2561RegisterTiming, timeGainVal); err != nil {
 		return err
 	}
 	d.gain = gain
@@ -402,52 +421,46 @@ func (d *TSL2561Driver) CalculateLux(broadband uint16, ir uint16) (lux uint32) {
 	return lux
 }
 
-func (d *TSL2561Driver) readByteRegister(reg int) (val uint8, err error) {
-	var bytes []uint8
-	if bytes, err = d.connection.I2cRead(d.deviceAddress, reg); err != nil {
-		return 0, err
-	}
-	return bytes[0], nil
-}
-
-func (d *TSL2561Driver) writeByteRegister(reg uint8, val uint8) (err error) {
-	err = d.connection.I2cWrite(d.deviceAddress, []byte{reg, val})
-	return err
-}
-
 func (d *TSL2561Driver) writeByteRegisters(regValPairs [][2]uint8) (err error) {
 	for _, rv := range regValPairs {
 		reg, val := rv[0], rv[1]
-		if err = d.connection.I2cWrite(d.deviceAddress, []uint8{reg, val}); err != nil {
+		if err = d.connection.WriteByteData(reg, val); err != nil {
 			break
 		}
 	}
 	return err
 }
 
-func (d *TSL2561Driver) read16bitInteger(reg int) (val uint16, err error) {
-	if low, err := d.readByteRegister(reg); err != nil {
+func (d *TSL2561Driver) read16bitInteger(reg uint8) (val uint16, err error) {
+	err = d.connection.WriteByte(reg)
+	if err != nil {
 		return 0, err
-	} else if high, err := d.readByteRegister(reg); err != nil {
-		return 0, err
-	} else {
-		return (uint16(high)<<8 | uint16(low)), nil
 	}
+	low, err := d.connection.ReadByte()
+	if err != nil {
+		return 0, err
+	}
+	high, err := d.connection.ReadByte()
+	if err != nil {
+		return 0, err
+	}
+	return (uint16(high) << 8) | uint16(low), nil
 }
 
 func (d *TSL2561Driver) enable() (err error) {
-	err = d.writeByteRegister(uint8(tsl2561CommandBit|tsl2561RegisterControl), tsl2561ControlPowerOn)
+
+	err = d.connection.WriteByteData(uint8(tsl2561CommandBit|tsl2561RegisterControl), tsl2561ControlPowerOn)
 	return err
 }
 
 func (d *TSL2561Driver) disable() (err error) {
-	err = d.writeByteRegister(uint8(tsl2561CommandBit|tsl2561RegisterControl), tsl2561ControlPowerOff)
+	err = d.connection.WriteByteData(uint8(tsl2561CommandBit|tsl2561RegisterControl), tsl2561ControlPowerOff)
 	return err
 }
 
 func (d *TSL2561Driver) getData() (broadband uint16, ir uint16, err error) {
-	if err := d.enable(); err != nil {
-		return 0, 0, err
+	if err = d.enable(); err != nil {
+		return
 	}
 
 	// Wait x ms for ADC to complete
@@ -462,11 +475,17 @@ func (d *TSL2561Driver) getData() (broadband uint16, ir uint16, err error) {
 
 	// Reads a two byte value from channel 0 (visible + infrared)
 	broadband, err = d.read16bitInteger(tsl2561CommandBit | tsl2561WordBit | tsl2561RegisterChan0Low)
+	if err != nil {
+		return
+	}
 
 	// Reads a two byte value from channel 1 (infrared)
 	ir, err = d.read16bitInteger(tsl2561CommandBit | tsl2561WordBit | tsl2561RegisterChan1Low)
+	if err != nil {
+		return
+	}
 
-	d.disable()
+	err = d.disable()
 
 	return
 }
