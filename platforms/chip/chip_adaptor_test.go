@@ -81,8 +81,6 @@ func TestChipAdaptorI2c(t *testing.T) {
 	sysfs.SetFilesystem(fs)
 	sysfs.SetSyscall(&sysfs.MockSyscall{})
 	a.I2cStart(0xff)
-	a.i2cDevice = &NullReadWriteCloser{}
-
 	a.I2cWrite(0xff, []byte{0x00, 0x01})
 	data, _ := a.I2cRead(0xff, 2)
 	gobottest.Assert(t, data, []byte{0x00, 0x01})

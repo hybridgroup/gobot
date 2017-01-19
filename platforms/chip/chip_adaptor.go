@@ -10,6 +10,7 @@ import (
 
 	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/sysfs"
 )
 
@@ -18,7 +19,7 @@ type Adaptor struct {
 	name        string
 	digitalPins map[int]sysfs.DigitalPin
 	pinMap      map[string]int
-	i2cDevice   sysfs.I2cDevice
+	i2cBuses    [3]sysfs.I2cDevice
 }
 
 var fixedPins = map[string]int{
@@ -103,9 +104,11 @@ func (c *Adaptor) Finalize() (err error) {
 			}
 		}
 	}
-	if c.i2cDevice != nil {
-		if e := c.i2cDevice.Close(); e != nil {
-			err = multierror.Append(err, e)
+	for _, bus := range c.i2cBuses {
+		if bus != nil {
+			if e := bus.Close(); e != nil {
+				err = multierror.Append(err, e)
+			}
 		}
 	}
 	return
@@ -175,29 +178,41 @@ func (c *Adaptor) DigitalWrite(pin string, val byte) (err error) {
 // This assumes that the bus used is /dev/i2c-1, which corresponds to
 // pins labeled TWI1-SDA and TW1-SCK (pins 9 and 11 on header 13).
 func (c *Adaptor) I2cStart(address int) (err error) {
-	if c.i2cDevice == nil {
-		c.i2cDevice, err = sysfs.NewI2cDevice("/dev/i2c-1", address)
+	if c.i2cBuses[1] == nil {
+		c.i2cBuses[1], err = sysfs.NewI2cDevice("/dev/i2c-1", address)
 	}
 	return err
 }
 
 // I2cWrite writes data to i2c device
 func (c *Adaptor) I2cWrite(address int, data []byte) (err error) {
-	if err = c.i2cDevice.SetAddress(address); err != nil {
+	if err = c.i2cBuses[1].SetAddress(address); err != nil {
 		return
 	}
-	_, err = c.i2cDevice.Write(data)
+	_, err = c.i2cBuses[1].Write(data)
 	return
 }
 
 // I2cRead returns value from i2c device using specified size
 func (c *Adaptor) I2cRead(address int, size int) (data []byte, err error) {
-	if err = c.i2cDevice.SetAddress(address); err != nil {
+	if err = c.i2cBuses[1].SetAddress(address); err != nil {
 		return
 	}
 	data = make([]byte, size)
-	_, err = c.i2cDevice.Read(data)
+	_, err = c.i2cBuses[1].Read(data)
 	return
+}
+
+// I2cGetConnection returns a connection to a device on a specified bus.
+// Valid bus number is [0..2] which corresponds to /dev/i2c-0 through /dev/i2c-2.
+func (c *Adaptor) I2cGetConnection(address int, bus int) (connection i2c.I2cConnection, err error) {
+	if (bus < 0) || (bus > 2) {
+		return nil, fmt.Errorf("Bus number %d out of range", bus)
+	}
+	if c.i2cBuses[bus] == nil {
+		c.i2cBuses[bus], err = sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
+	}
+	return i2c.NewI2cConnection(c.i2cBuses[bus], address), err
 }
 
 func getXIOBase() (baseAddr int, err error) {
