@@ -431,24 +431,7 @@ func (d *TSL2561Driver) writeByteRegisters(regValPairs [][2]uint8) (err error) {
 	return err
 }
 
-func (d *TSL2561Driver) read16bitInteger(reg uint8) (val uint16, err error) {
-	err = d.connection.WriteByte(reg)
-	if err != nil {
-		return 0, err
-	}
-	low, err := d.connection.ReadByte()
-	if err != nil {
-		return 0, err
-	}
-	high, err := d.connection.ReadByte()
-	if err != nil {
-		return 0, err
-	}
-	return (uint16(high) << 8) | uint16(low), nil
-}
-
 func (d *TSL2561Driver) enable() (err error) {
-
 	err = d.connection.WriteByteData(uint8(tsl2561CommandBit|tsl2561RegisterControl), tsl2561ControlPowerOn)
 	return err
 }
@@ -474,13 +457,13 @@ func (d *TSL2561Driver) getData() (broadband uint16, ir uint16, err error) {
 	}
 
 	// Reads a two byte value from channel 0 (visible + infrared)
-	broadband, err = d.read16bitInteger(tsl2561CommandBit | tsl2561WordBit | tsl2561RegisterChan0Low)
+	broadband, err = d.connection.ReadWordData(tsl2561CommandBit | tsl2561WordBit | tsl2561RegisterChan0Low)
 	if err != nil {
 		return
 	}
 
 	// Reads a two byte value from channel 1 (infrared)
-	ir, err = d.read16bitInteger(tsl2561CommandBit | tsl2561WordBit | tsl2561RegisterChan1Low)
+	ir, err = d.connection.ReadWordData(tsl2561CommandBit | tsl2561WordBit | tsl2561RegisterChan1Low)
 	if err != nil {
 		return
 	}
