@@ -5,7 +5,7 @@ go:
  - 1.5
  - 1.6
  - 1.7
- - 1.8rc1
+ - 1.8rc2
  - tip
 matrix:
  allow_failures:
