@@ -20,6 +20,7 @@ type Adaptor struct {
 	digitalPins map[int]sysfs.DigitalPin
 	pinMap      map[string]int
 	i2cBuses    [3]sysfs.I2cDevice
+	pwm         *pwmControl
 }
 
 var fixedPins = map[string]int{
@@ -92,11 +93,32 @@ func (c *Adaptor) SetName(n string) { c.name = n }
 
 // Connect initializes the board
 func (c *Adaptor) Connect() (err error) {
-	return
+	err = c.initPWM()
+	if err != nil {
+		// Let adaptor proceed without PWM, might not be available in the current setup
+		fmt.Printf("Failed to init PWM: %v", err)
+	} else {
+		if err = c.pwm.setPolarityInverted(false); err != nil {
+			return
+		}
+		if err = c.pwm.setEnable(true); err != nil {
+			return
+		}
+		if err = c.pwm.setFrequency(100); err != nil {
+			return
+		}
+		if err = c.pwm.setDutycycle(0); err != nil {
+			return
+		}
+	}
+	return nil
 }
 
 // Finalize closes connection to board and pins
 func (c *Adaptor) Finalize() (err error) {
+	if e := c.closePWM(); e != nil {
+		err = multierror.Append(err, e)
+	}
 	for _, pin := range c.digitalPins {
 		if pin != nil {
 			if e := pin.Unexport(); e != nil {
@@ -193,6 +215,32 @@ func (c *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection
 // GetDefaultBus returns the default i2c bus for this platform
 func (c *Adaptor) GetDefaultBus() int {
 	return 1
+}
+
+// PwmWrite writes a PWM signal to the specified pin
+func (c *Adaptor) PwmWrite(pin string, val byte) (err error) {
+	if pin != "PWM0" {
+		return fmt.Errorf("PWM is only available on pin PWM0")
+	}
+	if c.pwm != nil {
+		val := gobot.ToScale(gobot.FromScale(float64(val), 0, 255), 0, 100)
+		return c.pwm.setDutycycle(val)
+	} else {
+		return fmt.Errorf("PWM is not available, check device tree setup")
+	}
+}
+
+// ServoWrite writes a servo signal to the specified pin
+func (c *Adaptor) ServoWrite(pin string, span byte) (err error) {
+	if pin != "PWM0" {
+		return fmt.Errorf("Servo is only available on pin PWM0")
+	}
+	if c.pwm != nil {
+		val := gobot.ToScale(gobot.FromScale(float64(span), 0, 255), 0, 20) + 1
+		return c.pwm.setDutycycle(val)
+	} else {
+		return fmt.Errorf("PWM is not available, check device tree setup")
+	}
 }
 
 func getXIOBase() (baseAddr int, err error) {
