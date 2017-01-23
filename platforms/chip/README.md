@@ -11,6 +11,9 @@ For documentation about the C.H.I.P. platform click [here](http://docs.getchip.c
 go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/chip
 ```
 
+Note that PWM might not be available in your kernel and you might need to load the right overlays
+to expose PWM on the PWM0 pin.
+
 ## How to Use
 
 The pin numbering used by your Gobot program should match the way your board is labeled right on the board itself.

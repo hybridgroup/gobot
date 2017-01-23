@@ -20,6 +20,7 @@ type Adaptor struct {
 	digitalPins map[int]sysfs.DigitalPin
 	pinMap      map[string]int
 	i2cBuses    [3]sysfs.I2cDevice
+	pwm         *pwmControl
 }
 
 var fixedPins = map[string]int{
@@ -92,11 +93,17 @@ func (c *Adaptor) SetName(n string) { c.name = n }
 
 // Connect initializes the board
 func (c *Adaptor) Connect() (err error) {
-	return
+	return nil
 }
 
 // Finalize closes connection to board and pins
 func (c *Adaptor) Finalize() (err error) {
+	if c.pwm != nil {
+		if e := c.closePWM(); e != nil {
+			err = multierror.Append(err, e)
+		}
+		c.pwm = nil
+	}
 	for _, pin := range c.digitalPins {
 		if pin != nil {
 			if e := pin.Unexport(); e != nil {
@@ -193,6 +200,43 @@ func (c *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection
 // GetDefaultBus returns the default i2c bus for this platform
 func (c *Adaptor) GetDefaultBus() int {
 	return 1
+}
+
+// PwmWrite writes a PWM signal to the specified pin
+func (c *Adaptor) PwmWrite(pin string, val byte) (err error) {
+	if pin != "PWM0" {
+		return fmt.Errorf("PWM is only available on pin PWM0")
+	}
+	if c.pwm == nil {
+		err = c.initPWM(pwmFrequency)
+		if err != nil {
+			return
+		}
+	}
+	duty := gobot.ToScale(gobot.FromScale(float64(val), 0, 255), 0, 100)
+	return c.pwm.setDutycycle(duty)
+}
+
+const pwmFrequency = 100
+
+// ServoWrite writes a servo signal to the specified pin
+func (c *Adaptor) ServoWrite(pin string, angle byte) (err error) {
+	if pin != "PWM0" {
+		return fmt.Errorf("Servo is only available on pin PWM0")
+	}
+	if c.pwm == nil {
+		err = c.initPWM(pwmFrequency)
+		if err != nil {
+			return
+		}
+	}
+	// 0.5 ms => -90
+	// 1.5 ms =>   0
+	// 2.0 ms =>  90
+	const minDuty = 100 * 0.0005 * pwmFrequency
+	const maxDuty = 100 * 0.0020 * pwmFrequency
+	duty := gobot.ToScale(gobot.FromScale(float64(angle), 0, 180), minDuty, maxDuty)
+	return c.pwm.setDutycycle(duty)
 }
 
 func getXIOBase() (baseAddr int, err error) {
