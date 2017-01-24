@@ -2,9 +2,10 @@ package ble
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"strings"
-	"time"
+	"sync"
 
 	"gobot.io/x/gobot"
 
@@ -12,9 +13,29 @@ import (
 	"github.com/pkg/errors"
 )
 
-// newBLEDevice is constructor about blelib HCI device connection
-func newBLEDevice(impl string) (d blelib.Device, err error) {
-	return defaultDevice(impl)
+var currentDevice *blelib.Device
+var bleMutex sync.Mutex
+var bleCtx context.Context
+
+// getBLEDevice is singleton for blelib HCI device connection
+func getBLEDevice(impl string) (d *blelib.Device, err error) {
+	if currentDevice != nil {
+		fmt.Println("getBLEDevice", currentDevice)
+		return currentDevice, nil
+	}
+
+	fmt.Println("getBLEDevice defaultDevice")
+	dev, e := defaultDevice(impl)
+	if e != nil {
+		fmt.Println("can't get device")
+		return nil, errors.Wrap(e, "can't get device")
+	}
+	fmt.Println("getBLEDevice SetDefaultDevice")
+	blelib.SetDefaultDevice(dev)
+
+	currentDevice = &dev
+	d = &dev
+	return
 }
 
 // ClientAdaptor represents a Client Connection to a BLE Peripheral
@@ -23,7 +44,7 @@ type ClientAdaptor struct {
 	address string
 
 	addr    blelib.Addr
-	device  blelib.Device
+	device  *blelib.Device
 	client  blelib.Client
 	profile *blelib.Profile
 
@@ -51,26 +72,35 @@ func (b *ClientAdaptor) Address() string { return b.address }
 
 // Connect initiates a connection to the BLE peripheral. Returns true on successful connection.
 func (b *ClientAdaptor) Connect() (err error) {
-	d, err := newBLEDevice("default")
-	if err != nil {
-		return errors.Wrap(err, "can't new device")
-	}
-	blelib.SetDefaultDevice(d)
-	b.device = d
+	bleMutex.Lock()
+	defer bleMutex.Unlock()
 
-	var cln blelib.Client
-
-	ctx := blelib.WithSigHandler(context.WithTimeout(context.Background(), 3*time.Second))
-	cln, err = blelib.Connect(ctx, filter(b.Address()))
+	b.device, err = getBLEDevice("default")
 	if err != nil {
 		return errors.Wrap(err, "can't connect")
 	}
 
+	var cln blelib.Client
+
+	//ctx := blelib.WithSigHandler(context.WithTimeout(context.Background(), 5*time.Second))
+	if bleCtx == nil {
+		bleCtx = context.Background()
+	}
+
+	fmt.Println("Connect", b.Address())
+	//ctx := blelib.WithSigHandler(context.WithTimeout(bleCtx, 10*time.Second))
+	cln, err = blelib.Connect(context.Background(), filter(b.Address()))
+	if err != nil {
+		return errors.Wrap(err, "can't connect")
+	}
+
+	fmt.Println("Connected", b.Address())
 	b.addr = cln.Address()
 	b.address = cln.Address().String()
 	b.SetName(cln.Name())
 	b.client = cln
 
+	fmt.Println("DiscoverProfile", b.Address())
 	p, err := b.client.DiscoverProfile(true)
 	if err != nil {
 		return errors.Wrap(err, "can't discover profile")
@@ -110,6 +140,9 @@ func (b *ClientAdaptor) ReadCharacteristic(cUUID string) (data []byte, err error
 		return
 	}
 
+	// bleMutex.Lock()
+	// defer bleMutex.Unlock()
+
 	uuid, _ := blelib.Parse(cUUID)
 
 	if u := b.profile.Find(blelib.NewCharacteristic(uuid)); u != nil {
@@ -127,6 +160,9 @@ func (b *ClientAdaptor) WriteCharacteristic(cUUID string, data []byte) (err erro
 		return
 	}
 
+	// bleMutex.Lock()
+	// defer bleMutex.Unlock()
+
 	uuid, _ := blelib.Parse(cUUID)
 
 	if u := b.profile.Find(blelib.NewCharacteristic(uuid)); u != nil {
@@ -143,6 +179,9 @@ func (b *ClientAdaptor) Subscribe(cUUID string, f func([]byte, error)) (err erro
 		log.Fatalf("Cannot subscribe to BLE device until connected")
 		return
 	}
+
+	// bleMutex.Lock()
+	// defer bleMutex.Unlock()
 
 	uuid, _ := blelib.Parse(cUUID)
 
