@@ -2,19 +2,22 @@ package ollie
 
 import (
 	"bytes"
+	"encoding/binary"
 	"fmt"
 	"time"
 
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/platforms/ble"
+	"gobot.io/x/gobot/platforms/sphero"
 )
 
 // Driver is the Gobot driver for the Sphero Ollie robot
 type Driver struct {
-	name          string
-	connection    gobot.Connection
-	seq           uint8
-	packetChannel chan *packet
+	name              string
+	connection        gobot.Connection
+	seq               uint8
+	collisionResponse []uint8
+	packetChannel     chan *packet
 	gobot.Eventer
 }
 
@@ -38,6 +41,18 @@ const (
 
 	// Error event
 	Error = "error"
+
+	// Packet header size
+	PacketHeaderSize = 5
+
+	// Response packet max size
+	ResponsePacketMaxSize = 20
+
+	// Collision Packet data size: The number of bytes following the DLEN field through the end of the packet
+	CollisionDataSize = 17
+
+	// Full size of the collision response
+	CollisionResponseSize = PacketHeaderSize + CollisionDataSize
 )
 
 type packet struct {
@@ -54,6 +69,8 @@ func NewDriver(a *ble.ClientAdaptor) *Driver {
 		Eventer:       gobot.NewEventer(),
 		packetChannel: make(chan *packet, 1024),
 	}
+
+	n.AddEvent(Collision)
 
 	return n
 }
@@ -86,6 +103,15 @@ func (b *Driver) Start() (err error) {
 			}
 		}
 	}()
+
+	go func() {
+		for {
+			b.adaptor().ReadCharacteristic(responseCharacteristic)
+			time.Sleep(100 * time.Millisecond)
+		}
+	}()
+
+	b.ConfigureCollisionDetection(DefaultCollisionConfig())
 
 	return
 }
@@ -152,9 +178,9 @@ func (b *Driver) SetTXPower(level int) (err error) {
 
 // HandleResponses handles responses returned from Ollie
 func (b *Driver) HandleResponses(data []byte, e error) {
-	fmt.Println("response data:", data)
+	//fmt.Println("response data:", data, e)
 
-	return
+	b.handleCollisionDetected(data)
 }
 
 // SetRGB sets the Ollie to the given r, g, and b values
@@ -182,6 +208,11 @@ func (b *Driver) EnableStopOnDisconnect() {
 	b.packetChannel <- b.craftPacket([]uint8{0x00, 0x00, 0x00, 0x01}, 0x02, 0x37)
 }
 
+// ConfigureCollisionDetection configures the sensitivity of the detection.
+func (b *Driver) ConfigureCollisionDetection(cc sphero.CollisionConfig) {
+	b.packetChannel <- b.craftPacket([]uint8{cc.Method, cc.Xt, cc.Yt, cc.Xs, cc.Ys, cc.Dead}, 0x02, 0x12)
+}
+
 func (b *Driver) write(packet *packet) (err error) {
 	buf := append(packet.header, packet.body...)
 	buf = append(buf, packet.checksum)
@@ -202,6 +233,50 @@ func (b *Driver) craftPacket(body []uint8, did byte, cid byte) *packet {
 	packet.header = []uint8{0xFF, 0xFF, did, cid, b.seq, uint8(dlen)}
 	packet.checksum = b.calculateChecksum(packet)
 	return packet
+}
+
+func (b *Driver) handleCollisionDetected(data []uint8) {
+
+	if len(data) == ResponsePacketMaxSize {
+		// Check if this is the header of collision response. (i.e. first part of data)
+		// Collision response is 22 bytes long. (individual packet size is maxed at 20)
+		switch data[1] {
+		case 0xFE:
+			if data[2] == 0x07 {
+				// response code 7 is for a detected collision
+				if len(b.collisionResponse) == 0 {
+					b.collisionResponse = append(b.collisionResponse, data...)
+				}
+			}
+		}
+	} else if len(data) == CollisionResponseSize-ResponsePacketMaxSize {
+		// if this is the remaining part of the collision response,
+		// then make sure the header and first part of data is already received
+		if len(b.collisionResponse) == ResponsePacketMaxSize {
+			b.collisionResponse = append(b.collisionResponse, data...)
+		}
+	} else {
+		return // not collision event
+	}
+
+	// check expected sizes
+	if len(b.collisionResponse) != CollisionResponseSize || b.collisionResponse[4] != CollisionDataSize {
+		return
+	}
+
+	// confirm checksum
+	size := len(b.collisionResponse)
+	chk := b.collisionResponse[size-1] // last byte is checksum
+	if chk != calculateChecksum(b.collisionResponse[2:size-1]) {
+		return
+	}
+
+	var collision sphero.CollisionPacket
+	buffer := bytes.NewBuffer(b.collisionResponse[5:]) // skip header
+	binary.Read(buffer, binary.BigEndian, &collision)
+	b.collisionResponse = nil // clear the current response
+
+	b.Publish(Collision, collision)
 }
 
 func (b *Driver) calculateChecksum(packet *packet) uint8 {
