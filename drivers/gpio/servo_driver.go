@@ -86,7 +86,3 @@ func (s *ServoDriver) Center() (err error) {
 func (s *ServoDriver) Max() (err error) {
 	return s.Move(180)
 }
-
-func (s *ServoDriver) angleToSpan(angle byte) byte {
-	return byte(angle * (255 / 180))
-}
