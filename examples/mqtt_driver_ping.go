@@ -1,0 +1,41 @@
+package main
+
+import (
+	"fmt"
+	"time"
+
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/platforms/mqtt"
+)
+
+func main() {
+	mqttAdaptor := mqtt.NewAdaptor("tcp://test.mosquitto.org:1883", "pinger")
+	holaDriver := mqtt.NewDriver(mqttAdaptor, "hola")
+	helloDriver := mqtt.NewDriver(mqttAdaptor, "hello")
+
+	work := func() {
+		helloDriver.OnData(func(data []byte) {
+			fmt.Println("hello")
+		})
+
+		holaDriver.OnData(func(data []byte) {
+			fmt.Println("hola")
+		})
+
+		data := []byte("o")
+		gobot.Every(1*time.Second, func() {
+			helloDriver.Publish(data)
+		})
+
+		gobot.Every(5*time.Second, func() {
+			holaDriver.Publish(data)
+		})
+	}
+
+	robot := gobot.NewRobot("mqttBot",
+		[]gobot.Connection{mqttAdaptor},
+		work,
+	)
+
+	robot.Start()
+}

@@ -41,6 +41,9 @@ func (a *Adaptor) Name() string { return a.name }
 // SetName sets the MQTT Adaptor's name
 func (a *Adaptor) SetName(n string) { a.name = n }
 
+// Port returns the Host name
+func (a *Adaptor) Port() string { return a.Host }
+
 // Connect returns true if connection to mqtt is established
 func (a *Adaptor) Connect() (err error) {
 	a.client = paho.NewClient(createClientOptions(a.clientID, a.Host, a.username, a.password))
