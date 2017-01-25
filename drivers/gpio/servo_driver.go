@@ -69,7 +69,7 @@ func (s *ServoDriver) Move(angle uint8) (err error) {
 		return ErrServoOutOfRange
 	}
 	s.CurrentAngle = angle
-	return s.connection.ServoWrite(s.Pin(), s.angleToSpan(angle))
+	return s.connection.ServoWrite(s.Pin(), angle)
 }
 
 // Min sets the servo to it's minimum position
