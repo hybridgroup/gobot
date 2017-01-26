@@ -14,11 +14,11 @@ func main() {
 	helloDriver := mqtt.NewDriver(mqttAdaptor, "hello")
 
 	work := func() {
-		helloDriver.On(mqtt.Data, func(data []byte) {
+		helloDriver.On(mqtt.Data, func(data interface{}) {
 			fmt.Println("hello")
 		})
 
-		holaDriver.On(mqtt.Data, func(data []byte) {
+		holaDriver.On(mqtt.Data, func(data interface{}) {
 			fmt.Println("hola")
 		})
 

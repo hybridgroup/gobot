@@ -64,13 +64,18 @@ func (m *Driver) Topic() string { return m.topic }
 func (m *Driver) SetTopic(topic string) { m.topic = topic }
 
 // Publish a message to the current device topic
-func (m *Driver) Publish(message []byte) bool {
+func (m *Driver) Publish(data interface{}) bool {
+	message := data.([]byte)
 	return m.adaptor().Publish(m.topic, message)
 }
 
 // On subscribes to data updates for the current device topic,
 // and then calls the message handler function when data is received
-func (m *Driver) On(n string, f func(s []byte)) bool {
-	// TODO: subscribe to Error updates
-	return m.adaptor().On(m.topic, f)
+func (m *Driver) On(n string, f func(d interface{})) error {
+	// TODO: also be able to subscribe to Error updates
+	f1 := func(s []byte) {
+		f(s)
+	}
+	m.adaptor().On(m.topic, f1)
+	return nil
 }
