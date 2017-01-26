@@ -16,7 +16,7 @@ type Adaptor struct {
 	clientID      string
 	username      string
 	password      string
-	UseSSL        bool
+	useSSL        bool
 	serverCert    string
 	clientCert    string
 	clientKey     string
@@ -30,7 +30,7 @@ func NewAdaptor(host string, clientID string) *Adaptor {
 		name:          "MQTT",
 		Host:          host,
 		autoReconnect: false,
-		UseSSL:        false,
+		useSSL:        false,
 		clientID:      clientID,
 	}
 }
@@ -41,7 +41,7 @@ func NewAdaptorWithAuth(host, clientID, username, password string) *Adaptor {
 		name:          "MQTT",
 		Host:          host,
 		autoReconnect: false,
-		UseSSL:        false,
+		useSSL:        false,
 		clientID:      clientID,
 		username:      username,
 		password:      password,
@@ -62,6 +62,12 @@ func (a *Adaptor) AutoReconnect() bool { return a.autoReconnect }
 
 // SetAutoReconnect sets the MQTT AutoReconnect setting
 func (a *Adaptor) SetAutoReconnect(val bool) { a.autoReconnect = val }
+
+// UseSSL returns the MQTT server SSL preference
+func (a *Adaptor) UseSSL() bool { return a.useSSL }
+
+// SetUseSSL sets the MQTT server SSL preference
+func (a *Adaptor) SetUseSSL(val bool) { a.useSSL = val }
 
 // ServerCert returns the MQTT server SSL cert file
 func (a *Adaptor) ServerCert() string { return a.serverCert }
@@ -135,7 +141,7 @@ func (a *Adaptor) createClientOptions() *paho.ClientOptions {
 	}
 	opts.AutoReconnect = a.autoReconnect
 
-	if a.UseSSL {
+	if a.UseSSL() {
 		opts.SetTLSConfig(a.newTLSConfig())
 	}
 	return opts
