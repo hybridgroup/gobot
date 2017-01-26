@@ -1,6 +1,10 @@
 package mqtt
 
 import (
+	"crypto/tls"
+	"crypto/x509"
+	"io/ioutil"
+
 	paho "github.com/eclipse/paho.mqtt.golang"
 	multierror "github.com/hashicorp/go-multierror"
 )
@@ -12,6 +16,10 @@ type Adaptor struct {
 	clientID      string
 	username      string
 	password      string
+	UseSSL        bool
+	serverCert    string
+	clientCert    string
+	clientKey     string
 	autoReconnect bool
 	client        paho.Client
 }
@@ -22,6 +30,7 @@ func NewAdaptor(host string, clientID string) *Adaptor {
 		name:          "MQTT",
 		Host:          host,
 		autoReconnect: false,
+		UseSSL:        false,
 		clientID:      clientID,
 	}
 }
@@ -32,6 +41,7 @@ func NewAdaptorWithAuth(host, clientID, username, password string) *Adaptor {
 		name:          "MQTT",
 		Host:          host,
 		autoReconnect: false,
+		UseSSL:        false,
 		clientID:      clientID,
 		username:      username,
 		password:      password,
@@ -52,6 +62,24 @@ func (a *Adaptor) AutoReconnect() bool { return a.autoReconnect }
 
 // SetAutoReconnect sets the MQTT AutoReconnect setting
 func (a *Adaptor) SetAutoReconnect(val bool) { a.autoReconnect = val }
+
+// ServerCert returns the MQTT server SSL cert file
+func (a *Adaptor) ServerCert() string { return a.serverCert }
+
+// SetServerCert sets the MQTT server SSL cert file
+func (a *Adaptor) SetServerCert(val string) { a.serverCert = val }
+
+// ClientCert returns the MQTT client SSL cert file
+func (a *Adaptor) ClientCert() string { return a.clientCert }
+
+// SetClientCert sets the MQTT server SSL cert file
+func (a *Adaptor) SetClientCert(val string) { a.clientCert = val }
+
+// ClientKey returns the MQTT client SSL key file
+func (a *Adaptor) ClientKey() string { return a.clientKey }
+
+// SetClientCert sets the MQTT server SSL key file
+func (a *Adaptor) SetClientKey(val string) { a.clientKey = val }
 
 // Connect returns true if connection to mqtt is established
 func (a *Adaptor) Connect() (err error) {
@@ -106,5 +134,51 @@ func (a *Adaptor) createClientOptions() *paho.ClientOptions {
 		opts.SetUsername(a.username)
 	}
 	opts.AutoReconnect = a.autoReconnect
+
+	if a.UseSSL {
+		opts.SetTLSConfig(a.newTLSConfig())
+	}
 	return opts
+}
+
+// newTLSConfig sets the TLS config in the case that we are using
+// an MQTT broker with TLS
+func (a *Adaptor) newTLSConfig() *tls.Config {
+	// Import server certificate
+	var certpool *x509.CertPool
+	if len(a.ServerCert()) > 0 {
+		certpool = x509.NewCertPool()
+		pemCerts, err := ioutil.ReadFile(a.ServerCert())
+		if err == nil {
+			certpool.AppendCertsFromPEM(pemCerts)
+		}
+	}
+
+	// Import client certificate/key pair
+	var certs []tls.Certificate
+	if len(a.ClientCert()) > 0 && len(a.ClientKey()) > 0 {
+		cert, err := tls.LoadX509KeyPair(a.ClientCert(), a.ClientKey())
+		if err != nil {
+			// TODO: proper error handling
+			panic(err)
+		}
+		certs = append(certs, cert)
+	}
+
+	// Create tls.Config with desired tls properties
+	return &tls.Config{
+		// RootCAs = certs used to verify server cert.
+		RootCAs: certpool,
+		// ClientAuth = whether to request cert from server.
+		// Since the server is set up for SSL, this happens
+		// anyways.
+		ClientAuth: tls.NoClientCert,
+		// ClientCAs = certs used to validate client cert.
+		ClientCAs: nil,
+		// InsecureSkipVerify = verify that cert contents
+		// match server. IP matches what is in cert etc.
+		InsecureSkipVerify: true,
+		// Certificates = list of certs client sends to server.
+		Certificates: certs,
+	}
 }

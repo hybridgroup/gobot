@@ -1,7 +1,13 @@
+// TO RUN:
+//  go run ./examples/mqtt_driver_ping.go tcp://test.mosquitto.org:1883
+// OR
+//	go run ./examples/mqtt_driver_ping.go ssl://iot.eclipse.org:8883
+
 package main
 
 import (
 	"fmt"
+	"os"
 	"time"
 
 	"gobot.io/x/gobot"
@@ -9,7 +15,7 @@ import (
 )
 
 func main() {
-	mqttAdaptor := mqtt.NewAdaptor("tcp://test.mosquitto.org:1883", "pinger")
+	mqttAdaptor := mqtt.NewAdaptor(os.Args[1], "pinger")
 	mqttAdaptor.SetAutoReconnect(true)
 
 	holaDriver := mqtt.NewDriver(mqttAdaptor, "hola")
