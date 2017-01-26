@@ -2,6 +2,7 @@ package client
 
 import (
 	"bytes"
+	"sync"
 	"testing"
 	"time"
 
@@ -14,10 +15,14 @@ func (readWriteCloser) Write(p []byte) (int, error) {
 	return testWriteData.Write(p)
 }
 
+var clientMutex sync.Mutex
 var testReadData = []byte{}
 var testWriteData = bytes.Buffer{}
 
 func (readWriteCloser) Read(b []byte) (int, error) {
+	clientMutex.Lock()
+	defer clientMutex.Unlock()
+
 	size := len(b)
 	if len(testReadData) < size {
 		size = len(testReadData)
