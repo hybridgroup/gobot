@@ -2,6 +2,14 @@ package mqtt
 
 import "gobot.io/x/gobot"
 
+const (
+	// Data event when data is available for Driver
+	Data = "data"
+
+	// Error event when error occurs in Driver
+	Error = "error"
+)
+
 // Driver for mqtt
 type Driver struct {
 	name       string
@@ -60,7 +68,9 @@ func (m *Driver) Publish(message []byte) bool {
 	return m.adaptor().Publish(m.topic, message)
 }
 
-// OnData subscribes to the current device topic, and then calls the message handler function when data is received
-func (m *Driver) OnData(f func(s []byte)) bool {
+// On subscribes to data updates for the current device topic,
+// and then calls the message handler function when data is received
+func (m *Driver) On(n string, f func(s []byte)) bool {
+	// TODO: subscribe to Error updates
 	return m.adaptor().On(m.topic, f)
 }
