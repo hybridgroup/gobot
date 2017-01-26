@@ -10,6 +10,8 @@ import (
 
 func main() {
 	mqttAdaptor := mqtt.NewAdaptor("tcp://test.mosquitto.org:1883", "pinger")
+	mqttAdaptor.SetAutoReconnect(true)
+
 	holaDriver := mqtt.NewDriver(mqttAdaptor, "hola")
 	helloDriver := mqtt.NewDriver(mqttAdaptor, "hello")
 

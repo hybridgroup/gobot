@@ -7,31 +7,34 @@ import (
 
 // Adaptor is the Gobot Adaptor for MQTT
 type Adaptor struct {
-	name     string
-	Host     string
-	clientID string
-	username string
-	password string
-	client   paho.Client
+	name          string
+	Host          string
+	clientID      string
+	username      string
+	password      string
+	autoReconnect bool
+	client        paho.Client
 }
 
 // NewAdaptor creates a new mqtt adaptor with specified host and client id
 func NewAdaptor(host string, clientID string) *Adaptor {
 	return &Adaptor{
-		name:     "MQTT",
-		Host:     host,
-		clientID: clientID,
+		name:          "MQTT",
+		Host:          host,
+		autoReconnect: false,
+		clientID:      clientID,
 	}
 }
 
 // NewAdaptorWithAuth creates a new mqtt adaptor with specified host, client id, username, and password.
 func NewAdaptorWithAuth(host, clientID, username, password string) *Adaptor {
 	return &Adaptor{
-		name:     "MQTT",
-		Host:     host,
-		clientID: clientID,
-		username: username,
-		password: password,
+		name:          "MQTT",
+		Host:          host,
+		autoReconnect: false,
+		clientID:      clientID,
+		username:      username,
+		password:      password,
 	}
 }
 
@@ -44,9 +47,15 @@ func (a *Adaptor) SetName(n string) { a.name = n }
 // Port returns the Host name
 func (a *Adaptor) Port() string { return a.Host }
 
+// AutoReconnect returns the MQTT AutoReconnect setting
+func (a *Adaptor) AutoReconnect() bool { return a.autoReconnect }
+
+// SetAutoReconnect sets the MQTT AutoReconnect setting
+func (a *Adaptor) SetAutoReconnect(val bool) { a.autoReconnect = val }
+
 // Connect returns true if connection to mqtt is established
 func (a *Adaptor) Connect() (err error) {
-	a.client = paho.NewClient(createClientOptions(a.clientID, a.Host, a.username, a.password))
+	a.client = paho.NewClient(a.createClientOptions())
 	if token := a.client.Connect(); token.Wait() && token.Error() != nil {
 		err = multierror.Append(err, token.Error())
 	}
@@ -88,14 +97,14 @@ func (a *Adaptor) On(event string, f func(s []byte)) bool {
 	return true
 }
 
-func createClientOptions(clientID, raw, username, password string) *paho.ClientOptions {
+func (a *Adaptor) createClientOptions() *paho.ClientOptions {
 	opts := paho.NewClientOptions()
-	opts.AddBroker(raw)
-	opts.SetClientID(clientID)
-	if username != "" && password != "" {
-		opts.SetPassword(password)
-		opts.SetUsername(username)
+	opts.AddBroker(a.Host)
+	opts.SetClientID(a.clientID)
+	if a.username != "" && a.password != "" {
+		opts.SetPassword(a.password)
+		opts.SetUsername(a.username)
 	}
-	opts.AutoReconnect = false
+	opts.AutoReconnect = a.autoReconnect
 	return opts
 }
