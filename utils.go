@@ -2,26 +2,10 @@ package gobot
 
 import (
 	"crypto/rand"
-	"errors"
-	"log"
 	"math"
 	"math/big"
 	"time"
 )
-
-var (
-	// ErrUnknownEvent is the error resulting if the specified Event does not exist
-	ErrUnknownEvent = errors.New("Event does not exist")
-)
-
-var eventError = func(e *Event) (err error) {
-	if e == nil {
-		err = ErrUnknownEvent
-		log.Println(err.Error())
-		return
-	}
-	return
-}
 
 // Every triggers f every t time.Duration until the end of days, or when a Stop()
 // is called on the Ticker that is returned by the Every function.
