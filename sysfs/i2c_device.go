@@ -40,20 +40,21 @@ type i2cSmbusIoctlData struct {
 	data      uintptr
 }
 
-type SMBusOperations interface {
+type I2cOperations interface {
 	ReadByte() (val uint8, err error)
 	ReadByteData(reg uint8) (val uint8, err error)
 	ReadWordData(reg uint8) (val uint16, err error)
 	ReadBlockData(b []byte) (n int, err error)
 	WriteByte(val uint8) (err error)
 	WriteByteData(reg uint8, val uint8) (err error)
+	WriteWordData(reg uint8, val uint16) (err error)
 	WriteBlockData(b []byte) (err error)
 }
 
 // I2cDevice is the interface to a specific i2c bus
 type I2cDevice interface {
 	io.ReadWriteCloser
-	SMBusOperations
+	I2cOperations
 	SetAddress(int) error
 }
 
@@ -158,6 +159,12 @@ func (d *i2cDevice) WriteByte(val uint8) (err error) {
 func (d *i2cDevice) WriteByteData(reg uint8, val uint8) (err error) {
 	var data uint8 = val
 	err = d.smbusAccess(I2C_SMBUS_WRITE, reg, I2C_SMBUS_BYTE_DATA, uintptr(unsafe.Pointer(&data)))
+	return err
+}
+
+func (d *i2cDevice) WriteWordData(reg uint8, val uint16) (err error) {
+	var data uint16 = val
+	err = d.smbusAccess(I2C_SMBUS_WRITE, reg, I2C_SMBUS_WORD_DATA, uintptr(unsafe.Pointer(&data)))
 	return err
 }
 
