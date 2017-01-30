@@ -1,6 +1,6 @@
 package digispark
 
-//#cgo LDFLAGS: -lusb
+//#cgo pkg-config: libusb
 //#include "littleWire.h"
 //#include "littleWire_servo.h"
 //typedef usb_dev_handle littleWire;
