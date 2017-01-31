@@ -1,8 +1,9 @@
 // TO RUN:
-//  go run ./examples/mqtt_driver_ping.go tcp://test.mosquitto.org:1883
-// OR
+//  go run ./examples/mqtt_driver_ping.go <SERVER>
+//
+// EXAMPLE:
 //	go run ./examples/mqtt_driver_ping.go ssl://iot.eclipse.org:8883
-
+//
 package main
 
 import (
@@ -42,6 +43,7 @@ func main() {
 
 	robot := gobot.NewRobot("mqttBot",
 		[]gobot.Connection{mqttAdaptor},
+		[]gobot.Devices{helloDriver, holaDriver},
 		work,
 	)
 
