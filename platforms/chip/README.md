@@ -11,6 +11,9 @@ For documentation about the C.H.I.P. platform click [here](http://docs.getchip.c
 go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/chip
 ```
 
+To be able to use the built in device tree overlay manager, you need to install the required
+modified device tree compiler "dtc" from https://github.com/atenart/dtc.
+
 ## How to Use
 
 The pin numbering used by your Gobot program should match the way your board is labeled right on the board itself.

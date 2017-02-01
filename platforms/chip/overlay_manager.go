@@ -5,23 +5,25 @@ import (
 	"os"
 	"os/exec"
 	"time"
+	ol "gobot.io/x/gobot/platforms/chip/overlays"
 )
 
-const overlayInstallPath = "/lib/firmware/chip_io"
+const overlayInstallPath = "/lib/firmware/gobot.io"
 const overlayConfigPath = "/sys/kernel/config/device-tree/overlays"
 
 type overlayInfo struct {
 	dtbo   string
 	folder string
 	sysfs  string
+	source string
 }
 
 var overlays = map[string]overlayInfo{
 	"PWM0": {
-		"chip-pwm0.dtbo", "chip-pwm", "/sys/class/pwm/pwmchip0",
+		"chip-pwm0.dtbo", "chip-pwm", "/sys/class/pwm/pwmchip0", ol.PWM0Overlay,
 	},
 	"SPI2": {
-		"chip-spi2.dtbo", "chip-spi", "/sys/class/spi_master/",
+		"chip-spi2.dtbo", "chip-spi", "/sys/class/spi_master/", ol.SPI2Overlay,
 	},
 }
 
@@ -62,6 +64,9 @@ func copyFile(sourcePath string, destPath string) (err error) {
 	return err
 }
 
+// LoadOverlay loads the required device tree overlay for "SPI2" or
+// "PWM0". Note that these have to be built and installed prior to
+// being loaded.
 func LoadOverlay(key string) (err error) {
 	overlay, err := keyToOverlay(key)
 	if err != nil {
@@ -98,6 +103,7 @@ func LoadOverlay(key string) (err error) {
 	return nil
 }
 
+// UnloadOverlay unloads the overlay for "SPI2" or "PWM0"
 func UnloadOverlay(key string) (err error) {
 	overlay, err := keyToOverlay(key)
 	if err != nil {

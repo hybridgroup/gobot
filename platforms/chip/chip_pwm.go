@@ -126,7 +126,7 @@ func (c *Adaptor) closePWM() error {
 }
 
 func (p *pwmControl) setPolarityInverted(invPolarity bool) error {
-	if p.enabled {
+	if !p.enabled {
 		polarityString := "normal"
 		if invPolarity {
 			polarityString = "inverted"
@@ -134,7 +134,7 @@ func (p *pwmControl) setPolarityInverted(invPolarity bool) error {
 		_, err := io.WriteString(p.polarityFile, polarityString)
 		return err
 	} else {
-		return nil
+		return fmt.Errorf("Cannot set PWM polarity when enabled")
 	}
 }
 
@@ -145,7 +145,7 @@ func (p *pwmControl) setDutycycle(duty float64) error {
 		_, err := io.WriteString(p.dutyFile, fmt.Sprintf("%v", p.duty))
 		return err
 	} else {
-		return nil
+		return fmt.Errorf("Cannot set PWM duty cycle when disabled")
 	}
 }
 
@@ -156,7 +156,7 @@ func (p *pwmControl) setFrequency(freq float64) error {
 		_, err := io.WriteString(p.periodFile, fmt.Sprintf("%v", periodNanos))
 		return err
 	} else {
-		return nil
+		return fmt.Errorf("Cannot set PWM frequency when disabled")
 	}
 }
 

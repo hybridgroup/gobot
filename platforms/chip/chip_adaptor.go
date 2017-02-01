@@ -74,6 +74,8 @@ var fixedPins = map[string]int{
 	"UART1-RX": 196,
 }
 
+const pwmFrequency = 100
+
 // NewAdaptor creates a C.H.I.P. Adaptor
 func NewAdaptor() *Adaptor {
 	c := &Adaptor{
@@ -96,15 +98,17 @@ func (c *Adaptor) Connect() (err error) {
 	err = c.initPWM()
 	if err != nil {
 		// Let adaptor proceed without PWM, might not be available in the current setup
-		fmt.Printf("Failed to init PWM: %v", err)
+		fmt.Printf("Failed to init PWM: %v\n", err)
 	} else {
+		// Set up some sane PWM defaults to make servo functions
+		// work out of the box.
 		if err = c.pwm.setPolarityInverted(false); err != nil {
 			return
 		}
 		if err = c.pwm.setEnable(true); err != nil {
 			return
 		}
-		if err = c.pwm.setFrequency(100); err != nil {
+		if err = c.pwm.setFrequency(pwmFrequency); err != nil {
 			return
 		}
 		if err = c.pwm.setDutycycle(0); err != nil {
@@ -231,12 +235,17 @@ func (c *Adaptor) PwmWrite(pin string, val byte) (err error) {
 }
 
 // ServoWrite writes a servo signal to the specified pin
-func (c *Adaptor) ServoWrite(pin string, span byte) (err error) {
+func (c *Adaptor) ServoWrite(pin string, angle byte) (err error) {
 	if pin != "PWM0" {
 		return fmt.Errorf("Servo is only available on pin PWM0")
 	}
 	if c.pwm != nil {
-		val := gobot.ToScale(gobot.FromScale(float64(span), 0, 255), 0, 20) + 1
+		// 0.5 ms => -90
+		// 1.5 ms =>   0
+		// 2.0 ms =>  90
+		const minDuty = 100 * 0.0005 * pwmFrequency
+		const maxDuty = 100 * 0.0020 * pwmFrequency
+		val := gobot.ToScale(gobot.FromScale(float64(angle), 0, 180), minDuty, maxDuty)
 		return c.pwm.setDutycycle(val)
 	} else {
 		return fmt.Errorf("PWM is not available, check device tree setup")
