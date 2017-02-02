@@ -16,7 +16,7 @@ type DeviceInformationDriver struct {
 // NewDeviceInformationDriver creates a DeviceInformationDriver
 func NewDeviceInformationDriver(a *ClientAdaptor) *DeviceInformationDriver {
 	n := &DeviceInformationDriver{
-		name:       "DeviceInformation",
+		name:       gobot.DefaultName("DeviceInformation"),
 		connection: a,
 		Eventer:    gobot.NewEventer(),
 	}

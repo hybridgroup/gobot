@@ -1,6 +1,7 @@
 package ble
 
 import (
+	"strings"
 	"testing"
 
 	"gobot.io/x/gobot"
@@ -16,5 +17,5 @@ func initTestGenericAccessDriver() *GenericAccessDriver {
 
 func TestGenericAccessDriver(t *testing.T) {
 	d := initTestGenericAccessDriver()
-	gobottest.Assert(t, d.Name(), "GenericAccess")
+	gobottest.Assert(t, strings.HasPrefix(d.Name(), "GenericAccess"), true)
 }

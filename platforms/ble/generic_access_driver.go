@@ -17,7 +17,7 @@ type GenericAccessDriver struct {
 // NewGenericAccessDriver creates a GenericAccessDriver
 func NewGenericAccessDriver(a *ClientAdaptor) *GenericAccessDriver {
 	n := &GenericAccessDriver{
-		name:       "GenericAccess",
+		name:       gobot.DefaultName("GenericAccess"),
 		connection: a,
 		Eventer:    gobot.NewEventer(),
 	}

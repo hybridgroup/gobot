@@ -16,7 +16,7 @@ type BatteryDriver struct {
 // NewBatteryDriver creates a BatteryDriver
 func NewBatteryDriver(a *ClientAdaptor) *BatteryDriver {
 	n := &BatteryDriver{
-		name:       "Battery",
+		name:       gobot.DefaultName("Battery"),
 		connection: a,
 		Eventer:    gobot.NewEventer(),
 	}

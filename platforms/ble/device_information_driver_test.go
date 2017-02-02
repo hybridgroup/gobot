@@ -1,6 +1,7 @@
 package ble
 
 import (
+	"strings"
 	"testing"
 
 	"gobot.io/x/gobot"
@@ -16,5 +17,5 @@ func initTestDeviceInformationDriver() *DeviceInformationDriver {
 
 func TestDeviceInformationDriver(t *testing.T) {
 	d := initTestDeviceInformationDriver()
-	gobottest.Assert(t, d.Name(), "DeviceInformation")
+	gobottest.Assert(t, strings.HasPrefix(d.Name(), "DeviceInformation"), true)
 }

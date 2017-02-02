@@ -1,6 +1,7 @@
 package ble
 
 import (
+	"strings"
 	"testing"
 
 	"gobot.io/x/gobot"
@@ -17,7 +18,7 @@ func initTestBLEClientAdaptor() *ClientAdaptor {
 func TestBLEClientAdaptor(t *testing.T) {
 	a := NewClientAdaptor("D7:99:5A:26:EC:38")
 	gobottest.Assert(t, a.Address(), "D7:99:5A:26:EC:38")
-	gobottest.Assert(t, a.Name(), "BLECLient")
+	gobottest.Assert(t, strings.HasPrefix(a.Name(), "BLEClient"), true)
 }
 
 func TestBLEClientAdaptorName(t *testing.T) {

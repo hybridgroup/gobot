@@ -6,6 +6,8 @@ import (
 	"strings"
 	"time"
 
+	"gobot.io/x/gobot"
+
 	blelib "github.com/currantlabs/ble"
 	"github.com/pkg/errors"
 )
@@ -32,7 +34,7 @@ type ClientAdaptor struct {
 // NewClientAdaptor returns a new ClientAdaptor given an address or peripheral name
 func NewClientAdaptor(address string) *ClientAdaptor {
 	return &ClientAdaptor{
-		name:      "BLECLient",
+		name:      gobot.DefaultName("BLEClient"),
 		address:   address,
 		connected: false,
 	}

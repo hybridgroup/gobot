@@ -1,6 +1,7 @@
 package ble
 
 import (
+	"strings"
 	"testing"
 
 	"gobot.io/x/gobot"
@@ -16,5 +17,5 @@ func initTestBatteryDriver() *BatteryDriver {
 
 func TestBatteryDriver(t *testing.T) {
 	d := initTestBatteryDriver()
-	gobottest.Assert(t, d.Name(), "Battery")
+	gobottest.Assert(t, strings.HasPrefix(d.Name(), "Battery"), true)
 }
