@@ -3,6 +3,8 @@ package joystick
 import (
 	"errors"
 
+	"gobot.io/x/gobot"
+
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -21,7 +23,7 @@ type Adaptor struct {
 // NewAdaptor returns a new Joystick Adaptor.
 func NewAdaptor() *Adaptor {
 	return &Adaptor{
-		name: "Joystick",
+		name: gobot.DefaultName("Joystick"),
 		connect: func(j *Adaptor) (err error) {
 			sdl.Init(sdl.INIT_JOYSTICK)
 			if sdl.NumJoysticks() > 0 {

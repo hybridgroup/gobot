@@ -6,8 +6,8 @@ import (
 	"io/ioutil"
 	"time"
 
-	"gobot.io/x/gobot"
 	"github.com/veandco/go-sdl2/sdl"
+	"gobot.io/x/gobot"
 )
 
 // Driver represents a joystick
@@ -52,7 +52,7 @@ type joystickConfig struct {
 //  time.Duration: Interval at which the Driver is polled for new information
 func NewDriver(a *Adaptor, config string, v ...time.Duration) *Driver {
 	d := &Driver{
-		name:       "Joystick",
+		name:       gobot.DefaultName("Joystick"),
 		connection: a,
 		Eventer:    gobot.NewEventer(),
 		configPath: config,
