@@ -1,6 +1,7 @@
 package bebop
 
 import (
+	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/platforms/parrot/bebop/client"
 )
 
@@ -37,7 +38,7 @@ type Adaptor struct {
 // NewAdaptor returns a new BebopAdaptor
 func NewAdaptor() *Adaptor {
 	return &Adaptor{
-		name:  "Bebop",
+		name:  gobot.DefaultName("Bebop"),
 		drone: client.New(),
 		connect: func(a *Adaptor) error {
 			return a.drone.Connect()
