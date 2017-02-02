@@ -36,7 +36,7 @@ type Adaptor struct {
 // NewAdaptor returns a new Beaglebone Adaptor
 func NewAdaptor() *Adaptor {
 	b := &Adaptor{
-		name:        "Beaglebone",
+		name:        gobot.DefaultName("Beaglebone"),
 		digitalPins: make([]sysfs.DigitalPin, 120),
 		pwmPins:     make(map[string]*pwmPin),
 	}
