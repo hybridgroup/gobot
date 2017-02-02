@@ -21,8 +21,8 @@ const bmp180RegisterPressureMSB = 0xF6
 // BMP180Driver is the gobot driver for the Bosch pressure sensor BMP180.
 // Device datasheet: https://cdn-shop.adafruit.com/datasheets/BST-BMP180-DS000-09.pdf
 type BMP180Driver struct {
-	name       string
-	connection I2c
+	name                    string
+	connection              I2c
 	calibrationCoefficients *calibrationCoefficients
 }
 
@@ -57,7 +57,7 @@ type calibrationCoefficients struct {
 // NewBMP180Driver creates a new driver with the i2c interface for the BMP180 device.
 func NewBMP180Driver(c I2c) *BMP180Driver {
 	return &BMP180Driver{
-		name:                    "BMP180",
+		name:                    gobot.DefaultName("BMP180"),
 		connection:              c,
 		calibrationCoefficients: &calibrationCoefficients{},
 	}

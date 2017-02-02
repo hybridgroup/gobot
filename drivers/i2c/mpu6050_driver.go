@@ -45,7 +45,7 @@ type MPU6050Driver struct {
 // NewMPU6050Driver creates a new driver with specified i2c interface
 func NewMPU6050Driver(a I2c, v ...time.Duration) *MPU6050Driver {
 	m := &MPU6050Driver{
-		name:       "MPU6050",
+		name:       gobot.DefaultName("MPM6050"),
 		connection: a,
 		interval:   10 * time.Millisecond,
 		Eventer:    gobot.NewEventer(),

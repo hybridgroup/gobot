@@ -16,7 +16,7 @@ type LIDARLiteDriver struct {
 // NewLIDARLiteDriver creates a new driver with specified i2c interface
 func NewLIDARLiteDriver(a I2c) *LIDARLiteDriver {
 	return &LIDARLiteDriver{
-		name:       "LIDARLite",
+		name:       gobot.DefaultName("LIDARLite"),
 		connection: a,
 	}
 }

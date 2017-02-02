@@ -146,7 +146,7 @@ func NewAdafruitMotorHatDriver(a I2c) *AdafruitMotorHatDriver {
 		}
 	}
 	driver := &AdafruitMotorHatDriver{
-		name:          "AdafruitMotorHat",
+		name:          gobot.DefaultName("AdafruitMotorHat"),
 		connection:    a,
 		Commander:     gobot.NewCommander(),
 		dcMotors:      dc,

@@ -27,7 +27,7 @@ type WiichuckDriver struct {
 //	"error" - Gets triggered whenever the WiichuckDriver encounters an error
 func NewWiichuckDriver(a I2c, v ...time.Duration) *WiichuckDriver {
 	w := &WiichuckDriver{
-		name:       "Wiichuck",
+		name:       gobot.DefaultName("Wiichuck"),
 		connection: a,
 		interval:   10 * time.Millisecond,
 		pauseTime:  1 * time.Millisecond,

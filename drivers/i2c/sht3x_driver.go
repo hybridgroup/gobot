@@ -22,9 +22,10 @@ package i2c
 
 import (
 	"errors"
+	"time"
+
 	"github.com/sigurn/crc8"
 	"gobot.io/x/gobot"
-	"time"
 )
 
 // SHT3xAddressA is the default address of device
@@ -65,7 +66,7 @@ type SHT3xDriver struct {
 func NewSHT3xDriver(a I2c) *SHT3xDriver {
 	s := &SHT3xDriver{
 		Units:        "C",
-		name:         "SHT3x",
+		name:         gobot.DefaultName("SHT3x"),
 		connection:   a,
 		sht3xAddress: SHT3xAddressA,
 		crcTable:     crc8.MakeTable(crc8Params),

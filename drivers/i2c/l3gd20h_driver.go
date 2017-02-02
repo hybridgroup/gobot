@@ -44,7 +44,7 @@ const (
 // NewL3GD20HDriver creates a new driver with the i2c interface for the L3GD20H device.
 func NewL3GD20HDriver(c I2c) *L3GD20HDriver {
 	return &L3GD20HDriver{
-		name:       "L3GD20H",
+		name:       gobot.DefaultName("L3GD20H"),
 		connection: c,
 		scale:      L3GD20HScale250dps,
 	}

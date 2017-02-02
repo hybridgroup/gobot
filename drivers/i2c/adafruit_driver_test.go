@@ -2,6 +2,7 @@ package i2c
 
 import (
 	"errors"
+	"strings"
 	"testing"
 
 	"gobot.io/x/gobot"
@@ -30,7 +31,7 @@ func TestNewAdafruitMotorHatDriver(t *testing.T) {
 	}
 
 	a := NewAdafruitMotorHatDriver(newI2cTestAdaptor())
-	gobottest.Assert(t, a.Name(), "AdafruitMotorHat")
+	gobottest.Assert(t, strings.HasPrefix(a.Name(), "AdafruitMotorHat"), true)
 }
 
 // Methods

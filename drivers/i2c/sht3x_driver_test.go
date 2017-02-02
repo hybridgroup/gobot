@@ -2,6 +2,7 @@ package i2c
 
 import (
 	"errors"
+	"strings"
 	"testing"
 
 	"gobot.io/x/gobot"
@@ -62,7 +63,7 @@ func TestSHT3xDriverHalt(t *testing.T) {
 func TestSHT3xDriverName(t *testing.T) {
 	sht3x := initTestSHT3xDriver()
 
-	gobottest.Assert(t, sht3x.Name(), "SHT3x")
+	gobottest.Assert(t, strings.HasPrefix(sht3x.Name(), "SHT3x"), true)
 	sht3x.SetName("Sensor")
 	gobottest.Assert(t, sht3x.Name(), "Sensor")
 }

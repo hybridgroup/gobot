@@ -24,7 +24,7 @@ type BlinkMDriver struct {
 //	Color - returns the color of the LED.
 func NewBlinkMDriver(a I2c) *BlinkMDriver {
 	b := &BlinkMDriver{
-		name:       "BlinkM",
+		name:       gobot.DefaultName("BlinkM"),
 		connection: a,
 		Commander:  gobot.NewCommander(),
 	}
@@ -54,10 +54,10 @@ func NewBlinkMDriver(a I2c) *BlinkMDriver {
 }
 
 // Name returns the Name for the Driver
-func (b *BlinkMDriver) Name() string                 { return b.name }
+func (b *BlinkMDriver) Name() string { return b.name }
 
 // SetName sets the Name for the Driver
-func (b *BlinkMDriver) SetName(n string)             { b.name = n }
+func (b *BlinkMDriver) SetName(n string) { b.name = n }
 
 // Connection returns the connection for the Driver
 func (b *BlinkMDriver) Connection() gobot.Connection { return b.connection.(gobot.Connection) }
