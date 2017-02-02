@@ -42,7 +42,7 @@ var eventSource = func(url string) (chan eventsource.Event, chan error, error) {
 // using api.particle.io server as default
 func NewAdaptor(deviceID string, accessToken string) *Adaptor {
 	return &Adaptor{
-		name:        "Particle",
+		name:        gobot.DefaultName("Particle"),
 		DeviceID:    deviceID,
 		AccessToken: accessToken,
 		servoPins:   make(map[string]bool),

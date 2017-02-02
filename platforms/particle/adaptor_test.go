@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strings"
 	"testing"
 
 	"github.com/donovanhide/eventsource"
@@ -79,7 +80,7 @@ func TestNewAdaptor(t *testing.T) {
 	}
 
 	gobottest.Assert(t, core.APIServer, "https://api.particle.io")
-	gobottest.Assert(t, core.Name(), "Particle")
+	gobottest.Assert(t, strings.HasPrefix(core.Name(), "Particle"), true)
 }
 
 func TestAdaptorConnect(t *testing.T) {
