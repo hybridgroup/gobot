@@ -72,7 +72,7 @@ func changePinMode(pin, mode string) (err error) {
 // NewAdaptor returns a new Edison Adaptor
 func NewAdaptor() *Adaptor {
 	return &Adaptor{
-		name:   "Edison",
+		name:   gobot.DefaultName("Edison"),
 		board:  "arduino",
 		pinmap: arduinoPinMap,
 	}

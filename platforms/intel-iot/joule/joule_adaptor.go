@@ -53,7 +53,7 @@ type Adaptor struct {
 // NewAdaptor returns a new Joule Adaptor
 func NewAdaptor() *Adaptor {
 	return &Adaptor{
-		name: "Joule",
+		name: gobot.DefaultName("Joule"),
 		connect: func(e *Adaptor) (err error) {
 			return
 		},
