@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	multierror "github.com/hashicorp/go-multierror"
+	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/sysfs"
 )
 
@@ -74,7 +75,7 @@ var fixedPins = map[string]int{
 // NewAdaptor creates a C.H.I.P. Adaptor
 func NewAdaptor() *Adaptor {
 	c := &Adaptor{
-		name:        "CHIP",
+		name:        gobot.DefaultName("CHIP"),
 		digitalPins: make(map[int]sysfs.DigitalPin),
 	}
 
