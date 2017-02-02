@@ -24,7 +24,7 @@ type ButtonDriver struct {
 //  time.Duration: Interval at which the ButtonDriver is polled for new information
 func NewButtonDriver(a DigitalReader, pin string, v ...time.Duration) *ButtonDriver {
 	b := &ButtonDriver{
-		name:       "Button",
+		name:       gobot.DefaultName("Button"),
 		connection: a,
 		pin:        pin,
 		Active:     false,

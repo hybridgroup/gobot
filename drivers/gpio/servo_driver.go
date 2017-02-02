@@ -20,7 +20,7 @@ type ServoDriver struct {
 //	"Max" - See ServoDriver.Max
 func NewServoDriver(a ServoWriter, pin string) *ServoDriver {
 	s := &ServoDriver{
-		name:         "Servo",
+		name:         gobot.DefaultName("Servo"),
 		connection:   a,
 		pin:          pin,
 		Commander:    gobot.NewCommander(),

@@ -24,7 +24,7 @@ type MakeyButtonDriver struct {
 //  time.Duration: Interval at which the ButtonDriver is polled for new information
 func NewMakeyButtonDriver(a DigitalReader, pin string, v ...time.Duration) *MakeyButtonDriver {
 	m := &MakeyButtonDriver{
-		name:       "MakeyButton",
+		name:       gobot.DefaultName("MakeyButton"),
 		connection: a,
 		pin:        pin,
 		Active:     false,

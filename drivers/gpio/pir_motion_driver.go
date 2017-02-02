@@ -24,7 +24,7 @@ type PIRMotionDriver struct {
 //  time.Duration: Interval at which the PIRMotionDriver is polled for new information
 func NewPIRMotionDriver(a DigitalReader, pin string, v ...time.Duration) *PIRMotionDriver {
 	b := &PIRMotionDriver{
-		name:       "PIRMotion",
+		name:       gobot.DefaultName("PIRMotion"),
 		connection: a,
 		pin:        pin,
 		Active:     false,

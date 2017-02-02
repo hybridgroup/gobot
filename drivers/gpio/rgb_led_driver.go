@@ -26,7 +26,7 @@ type RgbLedDriver struct {
 //	"Off" - See RgbLedDriver.Off
 func NewRgbLedDriver(a DigitalWriter, redPin string, greenPin string, bluePin string) *RgbLedDriver {
 	l := &RgbLedDriver{
-		name:       "RGBLED",
+		name:       gobot.DefaultName("RGBLED"),
 		pinRed:     redPin,
 		pinGreen:   greenPin,
 		pinBlue:    bluePin,

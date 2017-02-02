@@ -24,7 +24,7 @@ type DirectPinDriver struct {
 // 	"ServoWrite" - See DirectPinDriver.ServoWrite
 func NewDirectPinDriver(a gobot.Connection, pin string) *DirectPinDriver {
 	d := &DirectPinDriver{
-		name:       "DirectPin",
+		name:       gobot.DefaultName("DirectPin"),
 		connection: a,
 		pin:        pin,
 		Commander:  gobot.NewCommander(),
