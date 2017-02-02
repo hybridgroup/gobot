@@ -1,12 +1,13 @@
 package minidrone
 
 import (
-  "testing"
+	"strings"
+	"testing"
 
-  "gobot.io/x/gobot"
-  "gobot.io/x/gobot/gobottest"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/gobottest"
 
-  "gobot.io/x/gobot/platforms/ble"
+	"gobot.io/x/gobot/platforms/ble"
 )
 
 var _ gobot.Driver = (*Driver)(nil)
@@ -18,5 +19,5 @@ func initTestMinidroneDriver() *Driver {
 
 func TestMinidroneDriver(t *testing.T) {
 	d := initTestMinidroneDriver()
-	gobottest.Assert(t, d.Name(), "Minidrone")
+	gobottest.Assert(t, strings.HasPrefix(d.Name(), "Minidrone"), true)
 }

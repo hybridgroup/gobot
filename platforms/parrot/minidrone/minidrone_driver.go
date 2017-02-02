@@ -92,7 +92,7 @@ type Pcmd struct {
 // NewDriver creates a Parrot Minidrone Driver
 func NewDriver(a *ble.ClientAdaptor) *Driver {
 	n := &Driver{
-		name:       "Minidrone",
+		name:       gobot.DefaultName("Minidrone"),
 		connection: a,
 		Pcmd: Pcmd{
 			Flag:  0,
