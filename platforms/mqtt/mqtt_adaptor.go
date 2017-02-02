@@ -5,6 +5,8 @@ import (
 	"crypto/x509"
 	"io/ioutil"
 
+	"gobot.io/x/gobot"
+
 	paho "github.com/eclipse/paho.mqtt.golang"
 	multierror "github.com/hashicorp/go-multierror"
 )
@@ -27,7 +29,7 @@ type Adaptor struct {
 // NewAdaptor creates a new mqtt adaptor with specified host and client id
 func NewAdaptor(host string, clientID string) *Adaptor {
 	return &Adaptor{
-		name:          "MQTT",
+		name:          gobot.DefaultName("MQTT"),
 		Host:          host,
 		autoReconnect: false,
 		useSSL:        false,

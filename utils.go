@@ -2,6 +2,7 @@ package gobot
 
 import (
 	"crypto/rand"
+	"fmt"
 	"math"
 	"math/big"
 	"time"
@@ -54,4 +55,10 @@ func ToScale(input, min, max float64) float64 {
 	} else {
 		return i
 	}
+}
+
+// DefaultName returns a sensible random default name
+// for a robot, adaptor or driver
+func DefaultName(name string) string {
+	return fmt.Sprintf("%s-%X", name, Rand(int(^uint(0)>>1)))
 }

@@ -22,12 +22,15 @@ type Driver struct {
 // NewDriver returns a new Gobot MQTT Driver
 func NewDriver(a *Adaptor, topic string) *Driver {
 	m := &Driver{
-		name:       "MQTT",
+		name:       gobot.DefaultName("MQTT"),
 		topic:      topic,
 		connection: a,
 		Eventer:    gobot.NewEventer(),
 		Commander:  gobot.NewCommander(),
 	}
+
+	m.AddEvent(Data)
+	m.AddEvent(Error)
 
 	return m
 }
