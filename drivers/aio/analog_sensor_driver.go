@@ -27,7 +27,7 @@ type AnalogSensorDriver struct {
 // 	"Read" - See AnalogSensor.Read
 func NewAnalogSensorDriver(a AnalogReader, pin string, v ...time.Duration) *AnalogSensorDriver {
 	d := &AnalogSensorDriver{
-		name:       "AnalogSensor",
+		name:       gobot.DefaultName("AnalogSensor"),
 		connection: a,
 		pin:        pin,
 		Eventer:    gobot.NewEventer(),

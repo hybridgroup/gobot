@@ -31,6 +31,7 @@ type GroveTemperatureSensorDriver struct {
 // 	"Read" - See AnalogSensor.Read
 func NewGroveTemperatureSensorDriver(a AnalogReader, pin string, v ...time.Duration) *GroveTemperatureSensorDriver {
 	d := &GroveTemperatureSensorDriver{
+		name:       gobot.DefaultName("GroveTemperatureSensor"),
 		connection: a,
 		pin:        pin,
 		Eventer:    gobot.NewEventer(),
