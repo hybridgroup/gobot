@@ -1,6 +1,7 @@
 package firmata
 
 import (
+	"strings"
 	"testing"
 
 	"gobot.io/x/gobot"
@@ -16,5 +17,5 @@ func initTestTCPAdaptor() *TCPAdaptor {
 
 func TestFirmataTCPAdaptor(t *testing.T) {
 	a := initTestTCPAdaptor()
-	gobottest.Assert(t, a.Name(), "TCPFirmata")
+	gobottest.Assert(t, strings.HasPrefix(a.Name(), "TCPFirmata"), true)
 }

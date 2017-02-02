@@ -3,6 +3,8 @@ package firmata
 import (
 	"io"
 	"net"
+
+	"gobot.io/x/gobot"
 )
 
 // TCPAdaptor represents a TCP based connection to a microcontroller running
@@ -21,7 +23,7 @@ func NewTCPAdaptor(args ...interface{}) *TCPAdaptor {
 	address := args[0].(string)
 
 	a := NewAdaptor(address)
-	a.SetName("TCPFirmata")
+	a.SetName(gobot.DefaultName("TCPFirmata"))
 	a.PortOpener = func(port string) (io.ReadWriteCloser, error) {
 		return connect(port)
 	}

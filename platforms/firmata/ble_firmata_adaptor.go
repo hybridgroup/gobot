@@ -3,6 +3,7 @@ package firmata
 import (
 	"io"
 
+	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/platforms/ble"
 )
 
@@ -33,7 +34,7 @@ func NewBLEAdaptor(args ...interface{}) *BLEAdaptor {
 	}
 
 	a := NewAdaptor(address)
-	a.SetName("BLEFirmata")
+	a.SetName(gobot.DefaultName("BLEFirmata"))
 	a.PortOpener = func(port string) (io.ReadWriteCloser, error) {
 		sp := ble.NewSerialPort(address, rid, wid)
 		sp.Open()

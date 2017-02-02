@@ -47,7 +47,7 @@ type Adaptor struct {
 // string port as a label to be displayed in the log and api.
 func NewAdaptor(args ...interface{}) *Adaptor {
 	f := &Adaptor{
-		name:  "Firmata",
+		name:  gobot.DefaultName("Firmata"),
 		port:  "",
 		conn:  nil,
 		board: client.New(),

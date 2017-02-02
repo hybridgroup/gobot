@@ -1,6 +1,7 @@
 package firmata
 
 import (
+	"strings"
 	"testing"
 
 	"gobot.io/x/gobot"
@@ -16,5 +17,5 @@ func initTestBLEAdaptor() *BLEAdaptor {
 
 func TestFirmataBLEAdaptor(t *testing.T) {
 	a := initTestBLEAdaptor()
-	gobottest.Assert(t, a.Name(), "BLEFirmata")
+	gobottest.Assert(t, strings.HasPrefix(a.Name(), "BLEFirmata"), true)
 }
