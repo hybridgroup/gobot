@@ -64,7 +64,7 @@ type packet struct {
 // NewDriver creates a Driver for a Sphero Ollie
 func NewDriver(a *ble.ClientAdaptor) *Driver {
 	n := &Driver{
-		name:          "Ollie",
+		name:          gobot.DefaultName("Ollie"),
 		connection:    a,
 		Eventer:       gobot.NewEventer(),
 		packetChannel: make(chan *packet, 1024),
