@@ -1,6 +1,7 @@
 package bb8
 
 import (
+	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/platforms/ble"
 	"gobot.io/x/gobot/platforms/sphero/ollie"
 )
@@ -13,7 +14,7 @@ type BB8Driver struct {
 // NewDriver creates a Driver for a Sphero BB-8
 func NewDriver(a *ble.ClientAdaptor) *BB8Driver {
 	d := ollie.NewDriver(a)
-	d.SetName("BB-8")
+	d.SetName(gobot.DefaultName("BB8"))
 
 	return &BB8Driver{
 		Driver: d,
