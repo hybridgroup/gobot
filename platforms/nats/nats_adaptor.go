@@ -1,6 +1,9 @@
 package nats
 
-import "github.com/nats-io/nats"
+import (
+	"github.com/nats-io/nats"
+	"gobot.io/x/gobot"
+)
 
 // Adaptor is a configuration struct for interacting with a NATS server.
 // Name is a logical name for the adaptor/nats server connection.
@@ -19,7 +22,7 @@ type Adaptor struct {
 // NewAdaptor populates a new NATS Adaptor.
 func NewAdaptor(host string, clientID int) *Adaptor {
 	return &Adaptor{
-		name:     "NATS",
+		name:     gobot.DefaultName("NATS"),
 		Host:     host,
 		clientID: clientID,
 		connect: func() (*nats.Conn, error) {

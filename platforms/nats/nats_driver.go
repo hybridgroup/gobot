@@ -22,7 +22,7 @@ type Driver struct {
 // NewDriver returns a new Gobot NATS Driver
 func NewDriver(a *Adaptor, topic string) *Driver {
 	m := &Driver{
-		name:       "NATS",
+		name:       gobot.DefaultName("NATS"),
 		topic:      topic,
 		connection: a,
 		Eventer:    gobot.NewEventer(),
