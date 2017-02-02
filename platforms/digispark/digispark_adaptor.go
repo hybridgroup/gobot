@@ -3,6 +3,8 @@ package digispark
 import (
 	"errors"
 	"strconv"
+
+	"gobot.io/x/gobot"
 )
 
 // ErrConnection is the error resulting of a connection error with the digispark
@@ -20,7 +22,7 @@ type Adaptor struct {
 // NewAdaptor returns a new Digispark Adaptor
 func NewAdaptor() *Adaptor {
 	return &Adaptor{
-		name: "Digispark",
+		name: gobot.DefaultName("Digispark"),
 		connect: func(d *Adaptor) (err error) {
 			d.littleWire = littleWireConnect()
 			if d.littleWire.(*littleWire).lwHandle == nil {
