@@ -54,7 +54,7 @@ type SpheroDriver struct {
 //  "SetRotationRate" - See SpheroDriver.SetRotationRate
 func NewSpheroDriver(a *Adaptor) *SpheroDriver {
 	s := &SpheroDriver{
-		name:            "Sphero",
+		name:            gobot.DefaultName("Sphero"),
 		connection:      a,
 		Eventer:         gobot.NewEventer(),
 		Commander:       gobot.NewCommander(),

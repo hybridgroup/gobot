@@ -3,6 +3,7 @@ package sphero
 import (
 	"bytes"
 	"encoding/binary"
+	"strings"
 	"testing"
 
 	"gobot.io/x/gobot"
@@ -70,8 +71,8 @@ func TestSpheroDriver(t *testing.T) {
 	ret = d.Command("ReadLocator")(nil)
 	gobottest.Assert(t, ret, []int16{})
 
-	gobottest.Assert(t, d.Name(), "Sphero")
-	gobottest.Assert(t, d.Connection().Name(), "Sphero")
+	gobottest.Assert(t, strings.HasPrefix(d.Name(), "Sphero"), true)
+	gobottest.Assert(t, strings.HasPrefix(d.Connection().Name(), "Sphero"), true)
 }
 
 func TestSpheroDriverStart(t *testing.T) {

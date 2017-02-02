@@ -3,6 +3,8 @@ package sphero
 import (
 	"io"
 
+	"gobot.io/x/gobot"
+
 	"github.com/tarm/serial"
 )
 
@@ -18,7 +20,7 @@ type Adaptor struct {
 // NewAdaptor returns a new Sphero Adaptor given a port
 func NewAdaptor(port string) *Adaptor {
 	return &Adaptor{
-		name: "Sphero",
+		name: gobot.DefaultName("Sphero"),
 		port: port,
 		connect: func(port string) (io.ReadWriteCloser, error) {
 			return serial.OpenPort(&serial.Config{Name: port, Baud: 115200})

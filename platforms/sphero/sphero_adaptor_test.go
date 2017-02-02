@@ -3,6 +3,7 @@ package sphero
 import (
 	"errors"
 	"io"
+	"strings"
 	"testing"
 
 	"gobot.io/x/gobot"
@@ -47,7 +48,7 @@ func initTestSpheroAdaptor() *Adaptor {
 
 func TestSpheroAdaptor(t *testing.T) {
 	a := initTestSpheroAdaptor()
-	gobottest.Assert(t, a.Name(), "Sphero")
+	gobottest.Assert(t, strings.HasPrefix(a.Name(), "Sphero"), true)
 	gobottest.Assert(t, a.Port(), "/dev/null")
 }
 
