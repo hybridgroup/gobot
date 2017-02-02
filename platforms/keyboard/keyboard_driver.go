@@ -25,7 +25,7 @@ type Driver struct {
 //
 func NewDriver() *Driver {
 	k := &Driver{
-		name: "Keyboard",
+		name: gobot.DefaultName("Keyboard"),
 		connect: func(k *Driver) (err error) {
 			if err := configure(); err != nil {
 				return err
