@@ -25,7 +25,7 @@ type Driver struct {
 //
 func NewDriver(a *Adaptor, filename string) *Driver {
 	return &Driver{
-		name:       "Audio",
+		name:       gobot.DefaultName("Audio"),
 		connection: a,
 		interval:   500 * time.Millisecond,
 		filename:   filename,

@@ -7,6 +7,8 @@ import (
 	"os"
 	"os/exec"
 	"path"
+
+	"gobot.io/x/gobot"
 )
 
 // Adaptor is gobot Adaptor connection to audio playback
@@ -17,7 +19,7 @@ type Adaptor struct {
 // NewAdaptor returns a new audio Adaptor
 //
 func NewAdaptor() *Adaptor {
-	return &Adaptor{name: "Audio"}
+	return &Adaptor{name: gobot.DefaultName("Audio")}
 }
 
 // Name returns the Adaptor Name
