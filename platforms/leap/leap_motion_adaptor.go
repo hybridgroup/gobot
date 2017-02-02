@@ -3,6 +3,8 @@ package leap
 import (
 	"io"
 
+	"gobot.io/x/gobot"
+
 	"golang.org/x/net/websocket"
 )
 
@@ -18,7 +20,7 @@ type Adaptor struct {
 // which is this case is the host IP or name of the Leap Motion daemon
 func NewAdaptor(port string) *Adaptor {
 	return &Adaptor{
-		name: "LeapMotion",
+		name: gobot.DefaultName("LeapMotion"),
 		port: port,
 		connect: func(host string) (io.ReadWriteCloser, error) {
 			return websocket.Dial("ws://"+host+"/v3.json", "", "http://"+host)
