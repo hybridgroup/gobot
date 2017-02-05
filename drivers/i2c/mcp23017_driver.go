@@ -81,7 +81,8 @@ func (mc *MCP23017Config) GetUint8Value() uint8 {
 // MCP23017Driver contains the driver configuration parameters.
 type MCP23017Driver struct {
 	name            string
-	connection      I2c
+	connector       I2cConnector
+	connection      I2cConnection
 	conf            MCP23017Config
 	mcp23017Address int
 	interval        time.Duration
@@ -90,10 +91,10 @@ type MCP23017Driver struct {
 }
 
 // NewMCP23017Driver creates a new driver with specified i2c interface.
-func NewMCP23017Driver(a I2c, conf MCP23017Config, deviceAddress int, v ...time.Duration) *MCP23017Driver {
+func NewMCP23017Driver(a I2cConnector, conf MCP23017Config, deviceAddress int, v ...time.Duration) *MCP23017Driver {
 	m := &MCP23017Driver{
 		name:            gobot.DefaultName("MCP23017"),
-		connection:      a,
+		connector:       a,
 		conf:            conf,
 		mcp23017Address: deviceAddress,
 		Commander:       gobot.NewCommander(),
@@ -125,20 +126,22 @@ func (m *MCP23017Driver) Name() string { return m.name }
 func (m *MCP23017Driver) SetName(n string) { m.name = n }
 
 // Connection returns the I2c connection.
-func (m *MCP23017Driver) Connection() gobot.Connection { return m.connection.(gobot.Connection) }
+func (m *MCP23017Driver) Connection() gobot.Connection { return m.connector.(gobot.Connection) }
 
 // Halt stops the driver.
 func (m *MCP23017Driver) Halt() (err error) { return }
 
 // Start writes the device configuration.
-func (m *MCP23017Driver) Start() (errs error) {
-	if err := m.connection.I2cStart(m.mcp23017Address); err != nil {
+func (m *MCP23017Driver) Start() (err error) {
+	bus := m.connector.I2cGetDefaultBus()
+	m.connection, err = m.connector.I2cGetConnection(m.mcp23017Address, bus)
+	if err != nil {
 		return err
 	}
 	// Set IOCON register with MCP23017 configuration.
 	ioconReg := m.getPort("A").IOCON // IOCON address is the same for Port A or B.
 	ioconVal := m.conf.GetUint8Value()
-	if err := m.connection.I2cWrite(m.mcp23017Address, []uint8{ioconReg, ioconVal}); err != nil {
+	if _, err := m.connection.Write([]uint8{ioconReg, ioconVal}); err != nil {
 		return err
 	}
 	return
@@ -213,7 +216,7 @@ func (m *MCP23017Driver) write(reg uint8, pin uint8, val uint8) (err error) {
 	if debug {
 		log.Printf("Writing: MCP address: 0x%X, register: 0x%X\t, value: 0x%X\n", m.mcp23017Address, reg, ioval)
 	}
-	if err = m.connection.I2cWrite(m.mcp23017Address, []uint8{reg, ioval}); err != nil {
+	if _, err = m.connection.Write([]uint8{reg, ioval}); err != nil {
 		return err
 	}
 	return nil
@@ -226,17 +229,18 @@ func (m *MCP23017Driver) write(reg uint8, pin uint8, val uint8) (err error) {
 func (m *MCP23017Driver) read(reg uint8) (val uint8, err error) {
 	register := int(reg)
 	bytesToRead := register + 1
-	v, err := m.connection.I2cRead(m.mcp23017Address, bytesToRead)
+	buf := make([]byte, bytesToRead)
+	bytesRead, err := m.connection.Read(buf)
 	if err != nil {
 		return val, err
 	}
-	if len(v) != bytesToRead {
+	if bytesRead != bytesToRead {
 		return val, fmt.Errorf("Read was unable to get %d bytes for register: 0x%X\n", bytesToRead, reg)
 	}
 	if debug {
-		log.Printf("Reading: MCP address: 0x%X, register:0x%X\t,value: 0x%X\n", m.mcp23017Address, reg, v[register])
+		log.Printf("Reading: MCP address: 0x%X, register:0x%X\t,value: 0x%X\n", m.mcp23017Address, reg, buf[register])
 	}
-	return v[register], nil
+	return buf[register], nil
 }
 
 // getPort return the port (A or B) given a string and the bank.

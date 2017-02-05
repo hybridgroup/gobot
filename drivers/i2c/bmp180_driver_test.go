@@ -51,7 +51,7 @@ func TestBMP180DriverHalt(t *testing.T) {
 
 func TestBMP180DriverMeasurements(t *testing.T) {
 	bmp180, adaptor := initTestBMP180DriverWithStubbedAdaptor()
-	adaptor.i2cReadImpl = func() ([]byte, error) {
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
 		buf := new(bytes.Buffer)
 		// Values from the datasheet example.
 		if adaptor.written[len(adaptor.written)-1] == bmp180RegisterAC1MSB {
@@ -73,7 +73,8 @@ func TestBMP180DriverMeasurements(t *testing.T) {
 			// XLSB, not used in this test.
 			buf.WriteByte(0)
 		}
-		return buf.Bytes(), nil
+		copy(b, buf.Bytes())
+		return buf.Len(), nil
 	}
 	bmp180.Start()
 	temp, err := bmp180.Temperature()

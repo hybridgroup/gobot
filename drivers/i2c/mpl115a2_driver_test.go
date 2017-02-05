@@ -46,8 +46,9 @@ func TestMPL115A2Driver(t *testing.T) {
 func TestMPL115A2DriverStart(t *testing.T) {
 	mpl, adaptor := initTestMPL115A2DriverWithStubbedAdaptor()
 
-	adaptor.i2cReadImpl = func() ([]byte, error) {
-		return []byte{0x00, 0x01, 0x02, 0x04}, nil
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		copy(b, []byte{0x00, 0x01, 0x02, 0x04})
+		return 4, nil
 	}
 	gobottest.Assert(t, mpl.Start(), nil)
 	time.Sleep(100 * time.Millisecond)

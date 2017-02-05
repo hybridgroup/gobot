@@ -1,5 +1,7 @@
 package i2c
 
+import "fmt"
+
 var rgb = map[string]interface{}{
 	"red":   1.0,
 	"green": 1.0,
@@ -17,72 +19,108 @@ var blue = castColor("blue")
 type i2cTestAdaptor struct {
 	name         string
 	written      []byte
-	pos          int
-	i2cReadImpl  func() ([]byte, error)
-	i2cWriteImpl func() error
-	i2cStartImpl func() error
+	i2cReadImpl  func([]byte) (int, error)
+	i2cWriteImpl func([]byte) (int, error)
 }
 
-func (t *i2cTestAdaptor) I2cStart(int) (err error) {
-	t.pos = 0
-	return t.i2cStartImpl()
+func (t *i2cTestAdaptor) Read(b []byte) (count int, err error) {
+	return t.i2cReadImpl(b)
 }
 
-func (t *i2cTestAdaptor) I2cRead(int, int) (data []byte, err error) {
-	return t.i2cReadImpl()
-}
-
-func (t *i2cTestAdaptor) I2cWrite(address int, b []byte) (err error) {
+func (t *i2cTestAdaptor) Write(b []byte) (count int, err error) {
 	t.written = append(t.written, b...)
-	return t.i2cWriteImpl()
+	return t.i2cWriteImpl(b)
+}
+
+func (t *i2cTestAdaptor) Close() error {
+	return nil
 }
 
 func (t *i2cTestAdaptor) ReadByte() (val uint8, err error) {
-	bytes, err := t.i2cReadImpl()
-	val = bytes[t.pos]
-	t.pos++
+	bytes := []byte{0}
+	bytesRead, err := t.i2cReadImpl(bytes)
+	if err != nil {
+		return 0, err
+	}
+	if bytesRead != 1 {
+		return 0, fmt.Errorf("Buffer underrun")
+	}
+	val = bytes[0]
 	return
 }
 
 func (t *i2cTestAdaptor) ReadByteData(reg uint8) (val uint8, err error) {
-	bytes, err := t.i2cReadImpl()
-	return bytes[reg], err
+	bytes := []byte{0}
+	bytesRead, err := t.i2cReadImpl(bytes)
+	if err != nil {
+		return 0, err
+	}
+	if bytesRead != 1 {
+		return 0, fmt.Errorf("Buffer underrun")
+	}
+	val = bytes[0]
+	return
 }
 
 func (t *i2cTestAdaptor) ReadWordData(reg uint8) (val uint16, err error) {
-	bytes, err := t.i2cReadImpl()
-	low, high := bytes[reg], bytes[reg + 1]
+	bytes := []byte{0, 0}
+	bytesRead, err := t.i2cReadImpl(bytes)
+	if err != nil {
+		return 0, err
+	}
+	if bytesRead != 2 {
+		return 0, fmt.Errorf("Buffer underrun")
+	}
+	low, high := bytes[0], bytes[1]
 	return (uint16(high) << 8) | uint16(low), err
 }
 
-func (t *i2cTestAdaptor) ReadBlockData(b []byte) (n int, err error) {
-	reg := b[0]
-	bytes, err := t.i2cReadImpl()
-	copy(b, bytes[reg:])
-	return len(b), err
+func (t *i2cTestAdaptor) ReadBlockData(_ uint8, b []byte) (n int, err error) {
+	bytes := make([]byte, 32)
+	bytesRead, err := t.i2cReadImpl(bytes)
+	copy(b, bytes[:bytesRead])
+	return bytesRead, err
 }
 
 func (t *i2cTestAdaptor) WriteByte(val uint8) (err error) {
-	t.pos = int(val)
 	t.written = append(t.written, val)
-	return t.i2cWriteImpl()
+	bytes := []byte{val}
+	_, err = t.i2cWriteImpl(bytes)
+	return
 }
 
 func (t *i2cTestAdaptor) WriteByteData(reg uint8, val uint8) (err error) {
-	t.pos = int(reg)
 	t.written = append(t.written, reg)
 	t.written = append(t.written, val)
-	return t.i2cWriteImpl()
+	bytes := []byte{val}
+	_, err = t.i2cWriteImpl(bytes)
+	return
 }
 
-func (t *i2cTestAdaptor) WriteBlockData(b []byte) (err error) {
-	t.pos = int(b[0])
+func (t *i2cTestAdaptor) WriteWordData(reg uint8, val uint16) (err error) {
+	t.written = append(t.written, reg)
+	low := uint8(val & 0xff)
+	high := uint8((val >> 8) & 0xff)
+	t.written = append(t.written, low)
+	t.written = append(t.written, high)
+	bytes := []byte{low, high}
+	_, err = t.i2cWriteImpl(bytes)
+	return
+}
+
+func (t *i2cTestAdaptor) WriteBlockData(reg uint8, b []byte) (err error) {
+	t.written = append(t.written, reg)
 	t.written = append(t.written, b...)
-	return t.i2cWriteImpl()
+	_, err = t.i2cWriteImpl(b)
+	return
 }
 
 func (t *i2cTestAdaptor) I2cGetConnection( /* address */ int /* bus */, int) (connection I2cConnection, err error) {
 	return t, nil
+}
+
+func (t *i2cTestAdaptor) I2cGetDefaultBus() int {
+	return 0
 }
 
 func (t *i2cTestAdaptor) Name() string          { return t.name }
@@ -92,14 +130,11 @@ func (t *i2cTestAdaptor) Finalize() (err error) { return }
 
 func newI2cTestAdaptor() *i2cTestAdaptor {
 	return &i2cTestAdaptor{
-		i2cReadImpl: func() ([]byte, error) {
-			return []byte{}, nil
+		i2cReadImpl: func([]byte) (int, error) {
+			return 0, nil
 		},
-		i2cWriteImpl: func() error {
-			return nil
-		},
-		i2cStartImpl: func() error {
-			return nil
+		i2cWriteImpl: func([]byte) (int, error) {
+			return 0, nil
 		},
 	}
 }

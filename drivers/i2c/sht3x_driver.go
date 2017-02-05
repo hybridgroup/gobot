@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package i2c
 
 // SHT3xDriver is a driver for the SHT3x-D based devices.
@@ -55,7 +56,8 @@ type SHT3xDriver struct {
 	Units string
 
 	name         string
-	connection   I2c
+	connector    I2cConnector
+	connection   I2cConnection
 	sht3xAddress int
 	accuracy     byte
 	delay        time.Duration
@@ -63,11 +65,11 @@ type SHT3xDriver struct {
 }
 
 // NewSHT3xDriver creates a new driver with specified i2c interface
-func NewSHT3xDriver(a I2c) *SHT3xDriver {
+func NewSHT3xDriver(a I2cConnector) *SHT3xDriver {
 	s := &SHT3xDriver{
 		Units:        "C",
 		name:         gobot.DefaultName("SHT3x"),
-		connection:   a,
+		connector:    a,
 		sht3xAddress: SHT3xAddressA,
 		crcTable:     crc8.MakeTable(crc8Params),
 	}
@@ -82,11 +84,12 @@ func (s *SHT3xDriver) Name() string { return s.name }
 func (s *SHT3xDriver) SetName(n string) { s.name = n }
 
 // Connection returns the connection for this Driver
-func (s *SHT3xDriver) Connection() gobot.Connection { return s.connection.(gobot.Connection) }
+func (s *SHT3xDriver) Connection() gobot.Connection { return s.connector.(gobot.Connection) }
 
 // Start initializes the SHT3x
 func (s *SHT3xDriver) Start() (err error) {
-	err = s.connection.I2cStart(s.sht3xAddress)
+	bus := s.connector.I2cGetDefaultBus()
+	s.connection, err = s.connector.I2cGetConnection(s.sht3xAddress, bus)
 	return
 }
 
@@ -145,7 +148,8 @@ func (s *SHT3xDriver) SetHeater(enabled bool) (err error) {
 	if true == enabled {
 		out[1] = 0x6d
 	}
-	return s.connection.I2cWrite(s.sht3xAddress, out)
+	_, err = s.connection.Write(out)
+	return
 }
 
 // Sample returns the temperature in celsius and relative humidity for one sample
@@ -188,7 +192,7 @@ func (s *SHT3xDriver) getStatusRegister() (status uint16, err error) {
 
 // sendCommandDelayGetResponse is a helper function to reduce duplicated code
 func (s *SHT3xDriver) sendCommandDelayGetResponse(send []byte, delay *time.Duration, expect int) (read []uint16, err error) {
-	if err = s.connection.I2cWrite(s.sht3xAddress, send); err != nil {
+	if _, err = s.connection.Write(send); err != nil {
 		return
 	}
 
@@ -196,23 +200,24 @@ func (s *SHT3xDriver) sendCommandDelayGetResponse(send []byte, delay *time.Durat
 		time.Sleep(*delay)
 	}
 
-	got, err := s.connection.I2cRead(s.sht3xAddress, 3*expect)
+	buf := make([]byte, 3*expect)
+	got, err := s.connection.Read(buf)
 	if err != nil {
 		return
 	}
-	if len(got) != (3 * expect) {
+	if got != (3 * expect) {
 		err = ErrNotEnoughBytes
 		return
 	}
 
 	read = make([]uint16, expect)
 	for i := 0; i < expect; i++ {
-		crc := crc8.Checksum(got[i*3:i*3+2], s.crcTable)
-		if got[i*3+2] != crc {
+		crc := crc8.Checksum(buf[i*3:i*3+2], s.crcTable)
+		if buf[i*3+2] != crc {
 			err = ErrInvalidCrc
 			return
 		}
-		read[i] = uint16(got[i*3])<<8 | uint16(got[i*3+1])
+		read[i] = uint16(buf[i*3])<<8 | uint16(buf[i*3+1])
 	}
 
 	return

@@ -3,7 +3,7 @@ package i2c
 import (
 	"errors"
 
-	"gobot.io/x/gobot"
+	_ "gobot.io/x/gobot"
 	"gobot.io/x/gobot/sysfs"
 )
 
@@ -21,44 +21,12 @@ const (
 	Z        = "z"
 )
 
-type I2cStarter interface {
-	// I2cStart initializes I2C communication to a device at a specified address
-	// on the default bus for further access using I2cRead() and I2cWrite().
-	I2cStart(address int) (err error)
-}
-
-type I2cReader interface {
-	// I2cStart reads len bytes from a device at the specified address using
-	// block reads.
-	//
-	// Note: There is no way to specify command/register to read from using
-	// this interface, it always starts reading from register 0.
-	// To read register 42 you have to read 43 bytes (0 to 42)
-	// and throw away the first 42 bytes.
-	I2cRead(address int, len int) (data []byte, err error)
-}
-
-type I2cWriter interface {
-	// I2cWrite writes a buffer of bytes to the device at the specified address
-	// using block writes.
-	// Note that the first byte in the buffer is interpreted as the target
-	// command/register.
-	I2cWrite(address int, buf []byte) (err error)
-}
-
-type I2c interface {
-	gobot.Adaptor
-	I2cStarter
-	I2cReader
-	I2cWriter
-}
-
 // I2cConnection is a connection to an I2C device with a specified address
 // on a specific bus. Used as an alternative to the I2c interface.
-// Implements sysfs.SMBusOperations to talk to the device, wrapping the
+// Implements sysfs.I2cOperations to talk to the device, wrapping the
 // calls in SetAddress to always target the specified device.
 // Provided by an Adaptor by implementing the I2cConnector interface.
-type I2cConnection sysfs.SMBusOperations
+type I2cConnection sysfs.I2cOperations
 
 type i2cConnection struct {
 	bus     sysfs.I2cDevice
@@ -67,6 +35,26 @@ type i2cConnection struct {
 
 func NewI2cConnection(bus sysfs.I2cDevice, address int) (connection *i2cConnection) {
 	return &i2cConnection{bus: bus, address: address}
+}
+
+func (c *i2cConnection) Read(data []byte) (read int, err error) {
+	if err := c.bus.SetAddress(c.address); err != nil {
+		return 0, err
+	}
+	read, err = c.bus.Read(data)
+	return
+}
+
+func (c *i2cConnection) Write(data []byte) (written int, err error) {
+	if err := c.bus.SetAddress(c.address); err != nil {
+		return 0, err
+	}
+	written, err = c.bus.Write(data)
+	return
+}
+
+func (c *i2cConnection) Close() error {
+	return c.bus.Close()
 }
 
 func (c *i2cConnection) ReadByte() (val uint8, err error) {
@@ -90,11 +78,11 @@ func (c *i2cConnection) ReadWordData(reg uint8) (val uint16, err error) {
 	return c.bus.ReadWordData(reg)
 }
 
-func (c *i2cConnection) ReadBlockData(b []byte) (n int, err error) {
+func (c *i2cConnection) ReadBlockData(reg uint8, b []byte) (n int, err error) {
 	if err := c.bus.SetAddress(c.address); err != nil {
 		return 0, err
 	}
-	return c.bus.ReadBlockData(b)
+	return c.bus.ReadBlockData(reg, b)
 }
 
 func (c *i2cConnection) WriteByte(val uint8) (err error) {
@@ -111,16 +99,27 @@ func (c *i2cConnection) WriteByteData(reg uint8, val uint8) (err error) {
 	return c.bus.WriteByteData(reg, val)
 }
 
-func (c *i2cConnection) WriteBlockData(b []byte) (err error) {
+func (c *i2cConnection) WriteWordData(reg uint8, val uint16) (err error) {
 	if err := c.bus.SetAddress(c.address); err != nil {
 		return err
 	}
-	return c.bus.WriteBlockData(b)
+	return c.bus.WriteWordData(reg, val)
+}
+
+func (c *i2cConnection) WriteBlockData(reg uint8, b []byte) (err error) {
+	if err := c.bus.SetAddress(c.address); err != nil {
+		return err
+	}
+	return c.bus.WriteBlockData(reg, b)
 }
 
 // I2cConnector is a replacement to the I2c interface, providing
 // access to more than one I2C bus per adaptor, and a more
 // fine grained interface to the I2C bus.
 type I2cConnector interface {
+	// I2cGetConnection returns a connection to device at the specified address
+	// and bus. Bus numbering starts at index 0.
 	I2cGetConnection(address int, bus int) (device I2cConnection, err error)
+	// I2cGetDefaultBus returns the default I2C bus index
+	I2cGetDefaultBus() int
 }
