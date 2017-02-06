@@ -3,7 +3,6 @@ package i2c
 import (
 	"errors"
 
-	_ "gobot.io/x/gobot"
 	"gobot.io/x/gobot/sysfs"
 )
 
@@ -113,12 +112,11 @@ func (c *i2cConnection) WriteBlockData(reg uint8, b []byte) (err error) {
 	return c.bus.WriteBlockData(reg, b)
 }
 
-// I2cConnector is a replacement to the I2c interface, providing
-// access to more than one I2C bus per adaptor, and a more
-// fine grained interface to the I2C bus.
+// I2cConnector provides access to the I2C buses on platforms that support them.
 type I2cConnector interface {
 	// I2cGetConnection returns a connection to device at the specified address
-	// and bus. Bus numbering starts at index 0.
+	// and bus. Bus numbering starts at index 0, the range of valid buses is
+	// platform specific.
 	I2cGetConnection(address int, bus int) (device I2cConnection, err error)
 	// I2cGetDefaultBus returns the default I2C bus index
 	I2cGetDefaultBus() int
