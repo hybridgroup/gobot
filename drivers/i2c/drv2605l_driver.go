@@ -73,14 +73,15 @@ const (
 //
 type DRV2605LDriver struct {
 	name       string
-	connection I2c
+	connector  I2cConnector
+	connection I2cConnection
 }
 
 // NewDRV2605LDriver creates a new driver with the i2c interface for the DRV2605L device.
-func NewDRV2605LDriver(c I2c) *DRV2605LDriver {
+func NewDRV2605LDriver(c I2cConnector) *DRV2605LDriver {
 	return &DRV2605LDriver{
-		name:       "DRV2605L",
-		connection: c,
+		name:      "DRV2605L",
+		connector: c,
 	}
 }
 
@@ -96,7 +97,7 @@ func (d *DRV2605LDriver) SetName(name string) {
 
 // Connection returns the connection of the device.
 func (d *DRV2605LDriver) Connection() gobot.Connection {
-	return d.connection.(gobot.Connection)
+	return d.connector.(gobot.Connection)
 }
 
 // Start initializes the device.
@@ -107,23 +108,9 @@ func (d *DRV2605LDriver) Start() (err error) {
 	return nil
 }
 
-func (d *DRV2605LDriver) readByteRegister(reg int) (val uint8, err error) {
-	var bytes []uint8
-	if bytes, err = d.connection.I2cRead(drv2605Address, reg); err != nil {
-		return 0, err
-	}
-	return bytes[0], nil
-}
-
-func (d *DRV2605LDriver) writeByteRegister(reg uint8, val uint8) (err error) {
-	err = d.connection.I2cWrite(drv2605Address, []byte{reg, val})
-	return err
-}
-
-func (d *DRV2605LDriver) writeByteRegisters(regValPairs [][2]uint8) (err error) {
+func (d *DRV2605LDriver) writeByteRegisters(regValPairs []struct{ reg, val uint8 }) (err error) {
 	for _, rv := range regValPairs {
-		reg, val := rv[0], rv[1]
-		if err = d.connection.I2cWrite(drv2605Address, []uint8{reg, val}); err != nil {
+		if err = d.connection.WriteByteData(rv.reg, rv.val); err != nil {
 			break
 		}
 	}
@@ -131,21 +118,23 @@ func (d *DRV2605LDriver) writeByteRegisters(regValPairs [][2]uint8) (err error) 
 }
 
 func (d *DRV2605LDriver) initialize() (err error) {
-	if err = d.connection.I2cStart(drv2605Address); err != nil {
-		return err
-	}
-
-	feedback, err := d.readByteRegister(drv2605RegFeedback)
+	bus := d.connector.I2cGetDefaultBus()
+	d.connection, err = d.connector.I2cGetConnection(drv2605Address, bus)
 	if err != nil {
 		return err
 	}
 
-	control, err := d.readByteRegister(drv2605RegControl3)
+	feedback, err := d.connection.ReadByteData(drv2605RegFeedback)
 	if err != nil {
 		return err
 	}
 
-	err = d.writeByteRegisters([][2]uint8{
+	control, err := d.connection.ReadByteData(drv2605RegControl3)
+	if err != nil {
+		return err
+	}
+
+	err = d.writeByteRegisters([]struct{ reg, val uint8 }{
 		// leave standby, enter "internal trig" mode
 		{drv2605RegMode, 0},
 		// turn off real-time play
@@ -168,7 +157,7 @@ func (d *DRV2605LDriver) initialize() (err error) {
 // SetMode sets the device in one of the eight modes as described in the
 // datasheet. Defaults to mode 0, internal trig.
 func (d *DRV2605LDriver) SetMode(newMode DRV2605Mode) (err error) {
-	mode, err := d.readByteRegister(drv2605RegMode)
+	mode, err := d.connection.ReadByteData(drv2605RegMode)
 	if err != nil {
 		return err
 	}
@@ -178,14 +167,14 @@ func (d *DRV2605LDriver) SetMode(newMode DRV2605Mode) (err error) {
 	// set new mode bits
 	mode |= uint8(newMode)
 
-	err = d.writeByteRegister(drv2605RegMode, mode)
+	err = d.connection.WriteByteData(drv2605RegMode, mode)
 
 	return err
 }
 
 // SetStandbyMode controls device low power mode
 func (d *DRV2605LDriver) SetStandbyMode(standby bool) (err error) {
-	modeVal, err := d.readByteRegister(drv2605RegMode)
+	modeVal, err := d.connection.ReadByteData(drv2605RegMode)
 	if err != nil {
 		return err
 	}
@@ -195,7 +184,7 @@ func (d *DRV2605LDriver) SetStandbyMode(standby bool) (err error) {
 		modeVal &= 0xFF ^ drv2605Standby
 	}
 
-	err = d.writeByteRegister(drv2605RegMode, modeVal)
+	err = d.connection.WriteByteData(drv2605RegMode, modeVal)
 
 	return err
 }
@@ -203,7 +192,7 @@ func (d *DRV2605LDriver) SetStandbyMode(standby bool) (err error) {
 // SelectLibrary selects which waveform library to play from, 1-7.
 // See datasheet for more info.
 func (d *DRV2605LDriver) SelectLibrary(library uint8) (err error) {
-	err = d.writeByteRegister(drv2605RegLibrary, library&0x7)
+	err = d.connection.WriteByteData(drv2605RegLibrary, library&0x7)
 	return err
 }
 
@@ -233,7 +222,7 @@ func (d *DRV2605LDriver) SetSequence(waveforms []uint8) (err error) {
 		waveforms = waveforms[0:8]
 	}
 	for i, w := range waveforms {
-		if err = d.writeByteRegister(uint8(drv2605RegWaveSeq1+i), w); err != nil {
+		if err = d.connection.WriteByteData(uint8(drv2605RegWaveSeq1+i), w); err != nil {
 			return err
 		}
 	}
@@ -242,17 +231,20 @@ func (d *DRV2605LDriver) SetSequence(waveforms []uint8) (err error) {
 
 // Go plays the current sequence of waveforms.
 func (d *DRV2605LDriver) Go() (err error) {
-	err = d.writeByteRegister(drv2605RegGo, 1)
+	err = d.connection.WriteByteData(drv2605RegGo, 1)
 	return err
 }
 
 // Halt halts the device.
 func (d *DRV2605LDriver) Halt() (err error) {
-	// stop playback
-	if err = d.writeByteRegister(drv2605RegGo, 0); err != nil {
-		return err
-	}
+	if d.connection != nil {
+		// stop playback
+		if err = d.connection.WriteByteData(drv2605RegGo, 0); err != nil {
+			return err
+		}
 
-	// enter standby
-	return d.writeByteRegister(drv2605RegMode, 1)
+		// enter standby
+		return d.connection.WriteByteData(drv2605RegMode, 1)
+	}
+	return
 }

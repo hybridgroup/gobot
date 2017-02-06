@@ -15,6 +15,13 @@ var _ gobot.Driver = (*DRV2605LDriver)(nil)
 
 func initTestDriverAndAdaptor() (*DRV2605LDriver, *i2cTestAdaptor) {
 	adaptor := newI2cTestAdaptor()
+	// Prime adapter reader to make "Start()" call happy
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		buf := new(bytes.Buffer)
+		binary.Write(buf, binary.LittleEndian, uint8(42))
+		copy(b, buf.Bytes())
+		return buf.Len(), nil
+	}
 	return NewDRV2605LDriver(adaptor), adaptor
 }
 
@@ -26,27 +33,21 @@ func TestDRV2605LDriver(t *testing.T) {
 }
 
 func TestDRV2605LDriverStart(t *testing.T) {
-	d, adaptor := initTestDriverAndAdaptor()
-
-	adaptor.i2cReadImpl = func() ([]byte, error) {
-		buf := new(bytes.Buffer)
-		binary.Write(buf, binary.LittleEndian, uint8(42))
-		return buf.Bytes(), nil
-	}
-
+	d, _ := initTestDriverAndAdaptor()
 	gobottest.Assert(t, d.Start(), nil)
 }
 
 func TestDRV2605LDriverHalt(t *testing.T) {
 	d, adaptor := initTestDriverAndAdaptor()
-
+	gobottest.Assert(t, d.Start(), nil)
+	adaptor.written = []byte{}
 	gobottest.Assert(t, d.Halt(), nil)
 	gobottest.Assert(t, adaptor.written, []byte{drv2605RegGo, 0, drv2605RegMode, 1})
 }
 
 func TestDRV2605LDriverGetPause(t *testing.T) {
 	d, _ := initTestDriverAndAdaptor()
-
+	gobottest.Assert(t, d.Start(), nil)
 	gobottest.Assert(t, d.GetPauseWaveform(0), uint8(0x80))
 	gobottest.Assert(t, d.GetPauseWaveform(1), uint8(0x81))
 	gobottest.Assert(t, d.GetPauseWaveform(128), d.GetPauseWaveform(127))
@@ -54,7 +55,8 @@ func TestDRV2605LDriverGetPause(t *testing.T) {
 
 func TestDRV2605LDriverSequenceTermination(t *testing.T) {
 	d, adaptor := initTestDriverAndAdaptor()
-
+	gobottest.Assert(t, d.Start(), nil)
+	adaptor.written = []byte{}
 	gobottest.Assert(t, d.SetSequence([]byte{1, 2}), nil)
 	gobottest.Assert(t, adaptor.written, []byte{
 		drv2605RegWaveSeq1, 1,
@@ -65,7 +67,8 @@ func TestDRV2605LDriverSequenceTermination(t *testing.T) {
 
 func TestDRV2605LDriverSequenceTruncation(t *testing.T) {
 	d, adaptor := initTestDriverAndAdaptor()
-
+	gobottest.Assert(t, d.Start(), nil)
+	adaptor.written = []byte{}
 	gobottest.Assert(t, d.SetSequence([]byte{1, 2, 3, 4, 5, 6, 7, 8, 99, 100}), nil)
 	gobottest.Assert(t, adaptor.written, []byte{
 		drv2605RegWaveSeq1, 1,
