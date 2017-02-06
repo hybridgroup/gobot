@@ -25,7 +25,7 @@ var _ aio.AnalogReader = (*Adaptor)(nil)
 var _ gpio.PwmWriter = (*Adaptor)(nil)
 var _ gpio.ServoWriter = (*Adaptor)(nil)
 
-var _ i2c.I2c = (*Adaptor)(nil)
+var _ i2c.I2cConnector = (*Adaptor)(nil)
 
 type readWriteCloser struct{}
 
@@ -165,8 +165,9 @@ func TestAdaptorAnalogRead(t *testing.T) {
 
 func TestAdaptorI2cStart(t *testing.T) {
 	a := initTestAdaptor()
-	a.I2cStart(0x00)
+	a.I2cGetConnection(0, 0)
 }
+
 func TestAdaptorI2cRead(t *testing.T) {
 	a := initTestAdaptor()
 	i := []byte{100}
@@ -175,13 +176,21 @@ func TestAdaptorI2cRead(t *testing.T) {
 		<-time.After(10 * time.Millisecond)
 		a.Publish(a.board.Event("I2cReply"), i2cReply)
 	}()
-	data, err := a.I2cRead(0x00, 1)
+
+	con, err := a.I2cGetConnection(0, 0)
 	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, data, i)
+
+	response := []byte{12}
+	_, err = con.Read(response)
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, response, i)
 }
+
 func TestAdaptorI2cWrite(t *testing.T) {
 	a := initTestAdaptor()
-	a.I2cWrite(0x00, []byte{0x00, 0x01})
+	con, err := a.I2cGetConnection(0, 0)
+	gobottest.Assert(t, err, nil)
+	con.Write([]byte{0x00, 0x01})
 }
 
 func TestServoConfig(t *testing.T) {
