@@ -10,7 +10,8 @@ const wiichuckAddress = 0x52
 
 type WiichuckDriver struct {
 	name       string
-	connection I2c
+	connector  I2cConnector
+	connection I2cConnection
 	interval   time.Duration
 	pauseTime  time.Duration
 	gobot.Eventer
@@ -25,13 +26,13 @@ type WiichuckDriver struct {
 //	"c" - Gets triggered every interval amount of time if the c button is pressed
 //	"joystick" - Gets triggered every "interval" amount of time if a joystick event occurred, you can access values x, y
 //	"error" - Gets triggered whenever the WiichuckDriver encounters an error
-func NewWiichuckDriver(a I2c, v ...time.Duration) *WiichuckDriver {
+func NewWiichuckDriver(a I2cConnector, v ...time.Duration) *WiichuckDriver {
 	w := &WiichuckDriver{
-		name:       gobot.DefaultName("Wiichuck"),
-		connection: a,
-		interval:   10 * time.Millisecond,
-		pauseTime:  1 * time.Millisecond,
-		Eventer:    gobot.NewEventer(),
+		name:      gobot.DefaultName("Wiichuck"),
+		connector: a,
+		interval:  10 * time.Millisecond,
+		pauseTime: 1 * time.Millisecond,
+		Eventer:   gobot.NewEventer(),
 		joystick: map[string]float64{
 			"sy_origin": -1,
 			"sx_origin": -1,
@@ -56,33 +57,36 @@ func NewWiichuckDriver(a I2c, v ...time.Duration) *WiichuckDriver {
 }
 func (w *WiichuckDriver) Name() string                 { return w.name }
 func (w *WiichuckDriver) SetName(n string)             { w.name = n }
-func (w *WiichuckDriver) Connection() gobot.Connection { return w.connection.(gobot.Connection) }
+func (w *WiichuckDriver) Connection() gobot.Connection { return w.connector.(gobot.Connection) }
 
 // Start initilizes i2c and reads from adaptor
 // using specified interval to update with new value
-func (w *WiichuckDriver) Start() (errs error) {
-	if err := w.connection.I2cStart(wiichuckAddress); err != nil {
+func (w *WiichuckDriver) Start() (err error) {
+	bus := w.connector.I2cGetDefaultBus()
+	w.connection, err = w.connector.I2cGetConnection(wiichuckAddress, bus)
+	if err != nil {
 		return err
 	}
 
 	go func() {
 		for {
-			if err := w.connection.I2cWrite(wiichuckAddress, []byte{0x40, 0x00}); err != nil {
+			if _, err := w.connection.Write([]byte{0x40, 0x00}); err != nil {
 				w.Publish(w.Event(Error), err)
 				continue
 			}
 			time.Sleep(w.pauseTime)
-			if err := w.connection.I2cWrite(wiichuckAddress, []byte{0x00}); err != nil {
+			if _, err := w.connection.Write([]byte{0x00}); err != nil {
 				w.Publish(w.Event(Error), err)
 				continue
 			}
 			time.Sleep(w.pauseTime)
-			newValue, err := w.connection.I2cRead(wiichuckAddress, 6)
+			newValue := make([]byte, 6)
+			bytesRead, err := w.connection.Read(newValue)
 			if err != nil {
 				w.Publish(w.Event(Error), err)
 				continue
 			}
-			if len(newValue) == 6 {
+			if bytesRead == 6 {
 				if err = w.update(newValue); err != nil {
 					w.Publish(w.Event(Error), err)
 					continue

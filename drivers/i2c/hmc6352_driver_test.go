@@ -41,18 +41,11 @@ func TestHMC6352DriverStart(t *testing.T) {
 
 	gobottest.Assert(t, hmc.Start(), nil)
 
-	adaptor.i2cWriteImpl = func() error {
-		return errors.New("write error")
+	adaptor.i2cWriteImpl = func([]byte) (int, error) {
+		return 0, errors.New("write error")
 	}
 	err := hmc.Start()
 	gobottest.Assert(t, err, errors.New("write error"))
-
-	adaptor.i2cStartImpl = func() error {
-		return errors.New("start error")
-	}
-	err = hmc.Start()
-	gobottest.Assert(t, err, errors.New("start error"))
-
 }
 
 func TestHMC6352DriverHalt(t *testing.T) {
@@ -65,8 +58,11 @@ func TestHMC6352DriverHeading(t *testing.T) {
 	// when len(data) is 2
 	hmc, adaptor := initTestHMC6352DriverWithStubbedAdaptor()
 
-	adaptor.i2cReadImpl = func() ([]byte, error) {
-		return []byte{99, 1}, nil
+	gobottest.Assert(t, hmc.Start(), nil)
+
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		copy(b, []byte{99, 1})
+		return 2, nil
 	}
 
 	heading, _ := hmc.Heading()
@@ -75,8 +71,11 @@ func TestHMC6352DriverHeading(t *testing.T) {
 	// when len(data) is not 2
 	hmc, adaptor = initTestHMC6352DriverWithStubbedAdaptor()
 
-	adaptor.i2cReadImpl = func() ([]byte, error) {
-		return []byte{99}, nil
+	gobottest.Assert(t, hmc.Start(), nil)
+
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		copy(b, []byte{99})
+		return 1, nil
 	}
 
 	heading, err := hmc.Heading()
@@ -86,8 +85,10 @@ func TestHMC6352DriverHeading(t *testing.T) {
 	// when read error
 	hmc, adaptor = initTestHMC6352DriverWithStubbedAdaptor()
 
-	adaptor.i2cReadImpl = func() ([]byte, error) {
-		return []byte{}, errors.New("read error")
+	gobottest.Assert(t, hmc.Start(), nil)
+
+	adaptor.i2cReadImpl = func([]byte) (int, error) {
+		return 0, errors.New("read error")
 	}
 
 	heading, err = hmc.Heading()
@@ -97,8 +98,10 @@ func TestHMC6352DriverHeading(t *testing.T) {
 	// when write error
 	hmc, adaptor = initTestHMC6352DriverWithStubbedAdaptor()
 
-	adaptor.i2cWriteImpl = func() error {
-		return errors.New("write error")
+	gobottest.Assert(t, hmc.Start(), nil)
+
+	adaptor.i2cWriteImpl = func([]byte) (int, error) {
+		return 0, errors.New("write error")
 	}
 
 	heading, err = hmc.Heading()

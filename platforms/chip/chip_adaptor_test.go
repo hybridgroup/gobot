@@ -16,7 +16,7 @@ var _ gobot.Adaptor = (*Adaptor)(nil)
 var _ gpio.DigitalReader = (*Adaptor)(nil)
 var _ gpio.DigitalWriter = (*Adaptor)(nil)
 
-var _ i2c.I2c = (*Adaptor)(nil)
+var _ i2c.I2cConnector = (*Adaptor)(nil)
 
 type NullReadWriteCloser struct {
 	contents []byte
@@ -80,11 +80,13 @@ func TestChipAdaptorI2c(t *testing.T) {
 	})
 	sysfs.SetFilesystem(fs)
 	sysfs.SetSyscall(&sysfs.MockSyscall{})
-	a.I2cStart(0xff)
-	a.i2cDevice = &NullReadWriteCloser{}
 
-	a.I2cWrite(0xff, []byte{0x00, 0x01})
-	data, _ := a.I2cRead(0xff, 2)
+	con, err := a.I2cGetConnection(0xff, 1)
+	gobottest.Assert(t, err, nil)
+
+	con.Write([]byte{0x00, 0x01})
+	data := []byte{42, 42}
+	con.Read(data)
 	gobottest.Assert(t, data, []byte{0x00, 0x01})
 
 	gobottest.Assert(t, a.Finalize(), nil)

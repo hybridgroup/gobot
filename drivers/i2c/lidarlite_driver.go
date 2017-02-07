@@ -10,24 +10,27 @@ const lidarliteAddress = 0x62
 
 type LIDARLiteDriver struct {
 	name       string
-	connection I2c
+	connector  I2cConnector
+	connection I2cConnection
 }
 
 // NewLIDARLiteDriver creates a new driver with specified i2c interface
-func NewLIDARLiteDriver(a I2c) *LIDARLiteDriver {
+func NewLIDARLiteDriver(a I2cConnector) *LIDARLiteDriver {
 	return &LIDARLiteDriver{
-		name:       gobot.DefaultName("LIDARLite"),
-		connection: a,
+		name:      gobot.DefaultName("LIDARLite"),
+		connector: a,
 	}
 }
 
 func (h *LIDARLiteDriver) Name() string                 { return h.name }
 func (h *LIDARLiteDriver) SetName(n string)             { h.name = n }
-func (h *LIDARLiteDriver) Connection() gobot.Connection { return h.connection.(gobot.Connection) }
+func (h *LIDARLiteDriver) Connection() gobot.Connection { return h.connector.(gobot.Connection) }
 
 // Start initialized the LIDAR
 func (h *LIDARLiteDriver) Start() (err error) {
-	if err := h.connection.I2cStart(lidarliteAddress); err != nil {
+	bus := h.connector.I2cGetDefaultBus()
+	h.connection, err = h.connector.I2cGetConnection(lidarliteAddress, bus)
+	if err != nil {
 		return err
 	}
 	return
@@ -38,35 +41,37 @@ func (h *LIDARLiteDriver) Halt() (err error) { return }
 
 // Distance returns the current distance in cm
 func (h *LIDARLiteDriver) Distance() (distance int, err error) {
-	if err = h.connection.I2cWrite(lidarliteAddress, []byte{0x00, 0x04}); err != nil {
+	if _, err = h.connection.Write([]byte{0x00, 0x04}); err != nil {
 		return
 	}
 	time.Sleep(20 * time.Millisecond)
 
-	if err = h.connection.I2cWrite(lidarliteAddress, []byte{0x0F}); err != nil {
+	if _, err = h.connection.Write([]byte{0x0F}); err != nil {
 		return
 	}
 
-	upper, err := h.connection.I2cRead(lidarliteAddress, 1)
+	upper := []byte{0}
+	bytesRead, err := h.connection.Read(upper)
 	if err != nil {
 		return
 	}
 
-	if len(upper) != 1 {
+	if bytesRead != 1 {
 		err = ErrNotEnoughBytes
 		return
 	}
 
-	if err = h.connection.I2cWrite(lidarliteAddress, []byte{0x10}); err != nil {
+	if _, err = h.connection.Write([]byte{0x10}); err != nil {
 		return
 	}
 
-	lower, err := h.connection.I2cRead(lidarliteAddress, 1)
+	lower := []byte{0}
+	bytesRead, err = h.connection.Read(lower)
 	if err != nil {
 		return
 	}
 
-	if len(lower) != 1 {
+	if bytesRead != 1 {
 		err = ErrNotEnoughBytes
 		return
 	}

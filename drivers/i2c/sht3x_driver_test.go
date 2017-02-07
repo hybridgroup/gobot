@@ -40,16 +40,9 @@ func TestNewSHT3xDriver(t *testing.T) {
 
 // Test Start
 func TestSHT3xDriverStart(t *testing.T) {
-	sht3x, adaptor := initTestSHT3xDriverWithStubbedAdaptor()
+	sht3x, _ := initTestSHT3xDriverWithStubbedAdaptor()
 
 	gobottest.Assert(t, sht3x.Start(), nil)
-
-	adaptor.i2cStartImpl = func() error {
-		return errors.New("start error")
-	}
-	err := sht3x.Start()
-	gobottest.Assert(t, err, errors.New("start error"))
-
 }
 
 // Test Halt
@@ -90,8 +83,11 @@ func TestSHT3xDriverSetAccuracy(t *testing.T) {
 func TestSHT3xDriverSampleNormal(t *testing.T) {
 	sht3x, adaptor := initTestSHT3xDriverWithStubbedAdaptor()
 
-	adaptor.i2cReadImpl = func() ([]byte, error) {
-		return []byte{0xbe, 0xef, 0x92, 0xbe, 0xef, 0x92}, nil
+	gobottest.Assert(t, sht3x.Start(), nil)
+
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		copy(b, []byte{0xbe, 0xef, 0x92, 0xbe, 0xef, 0x92})
+		return 6, nil
 	}
 
 	temp, rh, _ := sht3x.Sample()
@@ -107,17 +103,21 @@ func TestSHT3xDriverSampleNormal(t *testing.T) {
 func TestSHT3xDriverSampleBadCrc(t *testing.T) {
 	sht3x, adaptor := initTestSHT3xDriverWithStubbedAdaptor()
 
+	gobottest.Assert(t, sht3x.Start(), nil)
+
 	// Check that the 1st crc failure is caught
-	adaptor.i2cReadImpl = func() ([]byte, error) {
-		return []byte{0xbe, 0xef, 0x00, 0xbe, 0xef, 0x92}, nil
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		copy(b, []byte{0xbe, 0xef, 0x00, 0xbe, 0xef, 0x92})
+		return 6, nil
 	}
 
 	_, _, err := sht3x.Sample()
 	gobottest.Assert(t, err, ErrInvalidCrc)
 
 	// Check that the 2nd crc failure is caught
-	adaptor.i2cReadImpl = func() ([]byte, error) {
-		return []byte{0xbe, 0xef, 0x92, 0xbe, 0xef, 0x00}, nil
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		copy(b, []byte{0xbe, 0xef, 0x92, 0xbe, 0xef, 0x00})
+		return 6, nil
 	}
 
 	_, _, err = sht3x.Sample()
@@ -127,9 +127,12 @@ func TestSHT3xDriverSampleBadCrc(t *testing.T) {
 func TestSHT3xDriverSampleBadRead(t *testing.T) {
 	sht3x, adaptor := initTestSHT3xDriverWithStubbedAdaptor()
 
+	gobottest.Assert(t, sht3x.Start(), nil)
+
 	// Check that the 1st crc failure is caught
-	adaptor.i2cReadImpl = func() ([]byte, error) {
-		return []byte{0xbe, 0xef, 0x00, 0xbe, 0xef}, nil
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		copy(b, []byte{0xbe, 0xef, 0x00, 0xbe, 0xef})
+		return 5, nil
 	}
 
 	_, _, err := sht3x.Sample()
@@ -139,9 +142,12 @@ func TestSHT3xDriverSampleBadRead(t *testing.T) {
 func TestSHT3xDriverSampleUnits(t *testing.T) {
 	sht3x, adaptor := initTestSHT3xDriverWithStubbedAdaptor()
 
+	gobottest.Assert(t, sht3x.Start(), nil)
+
 	// Check that the 1st crc failure is caught
-	adaptor.i2cReadImpl = func() ([]byte, error) {
-		return []byte{0xbe, 0xef, 0x92, 0xbe, 0xef, 0x92}, nil
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		copy(b, []byte{0xbe, 0xef, 0x92, 0xbe, 0xef, 0x92})
+		return 6, nil
 	}
 
 	sht3x.Units = "K"
@@ -153,28 +159,31 @@ func TestSHT3xDriverSampleUnits(t *testing.T) {
 func TestSHT3xDriverSCDGRIoFailures(t *testing.T) {
 	sht3x, adaptor := initTestSHT3xDriverWithStubbedAdaptor()
 
+	gobottest.Assert(t, sht3x.Start(), nil)
+
 	invalidRead := errors.New("Read error")
 	invalidWrite := errors.New("Write error")
 
 	// Only send 5 bytes
-	adaptor.i2cReadImpl = func() ([]byte, error) {
-		return []byte{0xbe, 0xef, 0x92, 0xbe, 0xef}, nil
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		copy(b, []byte{0xbe, 0xef, 0x92, 0xbe, 0xef})
+		return 5, nil
 	}
 
 	_, err := sht3x.sendCommandDelayGetResponse(nil, nil, 2)
 	gobottest.Assert(t, err, ErrNotEnoughBytes)
 
 	// Don't read any bytes and return an error
-	adaptor.i2cReadImpl = func() ([]byte, error) {
-		return nil, invalidRead
+	adaptor.i2cReadImpl = func([]byte) (int, error) {
+		return 0, invalidRead
 	}
 
 	_, err = sht3x.sendCommandDelayGetResponse(nil, nil, 1)
 	gobottest.Assert(t, err, invalidRead)
 
 	// Don't write any bytes and return an error
-	adaptor.i2cWriteImpl = func() error {
-		return invalidWrite
+	adaptor.i2cWriteImpl = func([]byte) (int, error) {
+		return 42, invalidWrite
 	}
 
 	_, err = sht3x.sendCommandDelayGetResponse(nil, nil, 1)
@@ -185,9 +194,12 @@ func TestSHT3xDriverSCDGRIoFailures(t *testing.T) {
 func TestSHT3xDriverHeater(t *testing.T) {
 	sht3x, adaptor := initTestSHT3xDriverWithStubbedAdaptor()
 
+	gobottest.Assert(t, sht3x.Start(), nil)
+
 	// heater enabled
-	adaptor.i2cReadImpl = func() ([]byte, error) {
-		return []byte{0x20, 0x00, 0x5d}, nil
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		copy(b, []byte{0x20, 0x00, 0x5d})
+		return 3, nil
 	}
 
 	status, err := sht3x.Heater()
@@ -195,8 +207,9 @@ func TestSHT3xDriverHeater(t *testing.T) {
 	gobottest.Assert(t, status, true)
 
 	// heater disabled
-	adaptor.i2cReadImpl = func() ([]byte, error) {
-		return []byte{0x00, 0x00, 0x81}, nil
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		copy(b, []byte{0x00, 0x00, 0x81})
+		return 3, nil
 	}
 
 	status, err = sht3x.Heater()
@@ -204,16 +217,18 @@ func TestSHT3xDriverHeater(t *testing.T) {
 	gobottest.Assert(t, status, false)
 
 	// heater crc failed
-	adaptor.i2cReadImpl = func() ([]byte, error) {
-		return []byte{0x00, 0x00, 0x00}, nil
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		copy(b, []byte{0x00, 0x00, 0x00})
+		return 3, nil
 	}
 
 	status, err = sht3x.Heater()
 	gobottest.Assert(t, err, ErrInvalidCrc)
 
 	// heater read failed
-	adaptor.i2cReadImpl = func() ([]byte, error) {
-		return []byte{0x00, 0x00}, nil
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		copy(b, []byte{0x00, 0x00})
+		return 2, nil
 	}
 
 	status, err = sht3x.Heater()
@@ -224,6 +239,8 @@ func TestSHT3xDriverHeater(t *testing.T) {
 func TestSHT3xDriverSetHeater(t *testing.T) {
 	sht3x, _ := initTestSHT3xDriverWithStubbedAdaptor()
 
+	gobottest.Assert(t, sht3x.Start(), nil)
+
 	sht3x.SetHeater(false)
 	sht3x.SetHeater(true)
 }
@@ -231,9 +248,12 @@ func TestSHT3xDriverSetHeater(t *testing.T) {
 // Test SerialNumber
 func TestSHT3xDriverSerialNumber(t *testing.T) {
 	sht3x, adaptor := initTestSHT3xDriverWithStubbedAdaptor()
-	adaptor.i2cReadImpl = func() ([]byte, error) {
 
-		return []byte{0x20, 0x00, 0x5d, 0xbe, 0xef, 0x92}, nil
+	gobottest.Assert(t, sht3x.Start(), nil)
+
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		copy(b, []byte{0x20, 0x00, 0x5d, 0xbe, 0xef, 0x92})
+		return 6, nil
 	}
 
 	sn, err := sht3x.SerialNumber()

@@ -64,12 +64,13 @@ func TestL3GD20HDriverMeasurement(t *testing.T) {
 	rawX := 5
 	rawY := 8
 	rawZ := -3
-	adaptor.i2cReadImpl = func() ([]byte, error) {
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
 		buf := new(bytes.Buffer)
 		binary.Write(buf, binary.LittleEndian, int16(rawX))
 		binary.Write(buf, binary.LittleEndian, int16(rawY))
 		binary.Write(buf, binary.LittleEndian, int16(rawZ))
-		return buf.Bytes(), nil
+		copy(b, buf.Bytes())
+		return buf.Len(), nil
 	}
 
 	d.Start()

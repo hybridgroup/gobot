@@ -32,36 +32,40 @@ const (
 
 type MMA7660Driver struct {
 	name       string
-	connection I2c
+	connector  I2cConnector
+	connection I2cConnection
 }
 
 // NewMMA7660Driver creates a new driver with specified i2c interface
-func NewMMA7660Driver(a I2c) *MMA7660Driver {
+func NewMMA7660Driver(a I2cConnector) *MMA7660Driver {
 	return &MMA7660Driver{
-		name:       gobot.DefaultName("MMA7660"),
-		connection: a,
+		name:      gobot.DefaultName("MMA7660"),
+		connector: a,
 	}
 }
 
 func (h *MMA7660Driver) Name() string                 { return h.name }
 func (h *MMA7660Driver) SetName(n string)             { h.name = n }
-func (h *MMA7660Driver) Connection() gobot.Connection { return h.connection.(gobot.Connection) }
+func (h *MMA7660Driver) Connection() gobot.Connection { return h.connector.(gobot.Connection) }
 
 // Start initialized the mma7660
 func (h *MMA7660Driver) Start() (err error) {
-	if err := h.connection.I2cStart(mma7660Address); err != nil {
+	bus := h.connector.I2cGetDefaultBus()
+
+	h.connection, err = h.connector.I2cGetConnection(mma7660Address, bus)
+	if err != nil {
 		return err
 	}
 
-	if err := h.connection.I2cWrite(mma7660Address, []byte{MMA7660_MODE, MMA7660_STAND_BY}); err != nil {
+	if _, err := h.connection.Write([]byte{MMA7660_MODE, MMA7660_STAND_BY}); err != nil {
 		return err
 	}
 
-	if err := h.connection.I2cWrite(mma7660Address, []byte{MMA7660_SR, MMA7660_AUTO_SLEEP_32}); err != nil {
+	if _, err := h.connection.Write([]byte{MMA7660_SR, MMA7660_AUTO_SLEEP_32}); err != nil {
 		return err
 	}
 
-	if err := h.connection.I2cWrite(mma7660Address, []byte{MMA7660_MODE, MMA7660_ACTIVE}); err != nil {
+	if _, err := h.connection.Write([]byte{MMA7660_MODE, MMA7660_ACTIVE}); err != nil {
 		return err
 	}
 
@@ -78,26 +82,27 @@ func (h *MMA7660Driver) Acceleration(x, y, z float64) (ax, ay, az float64) {
 
 // XYZ returns the raw x,y and z axis from the  mma7660
 func (h *MMA7660Driver) XYZ() (x float64, y float64, z float64, err error) {
-	ret, err := h.connection.I2cRead(mma7660Address, 3)
+	buf := []byte{0, 0, 0}
+	bytesRead, err := h.connection.Read(buf)
 	if err != nil {
 		return
 	}
 
-	if len(ret) != 3 {
+	if bytesRead != 3 {
 		err = ErrNotEnoughBytes
 		return
 	}
 
-	for _, val := range ret {
+	for _, val := range buf {
 		if ((val >> 6) & 0x01) == 1 {
 			err = ErrNotReady
 			return
 		}
 	}
 
-	x = float64((int8(ret[0]) << 2)) / 4.0
-	y = float64((int8(ret[1]) << 2)) / 4.0
-	z = float64((int8(ret[2]) << 2)) / 4.0
+	x = float64((int8(buf[0]) << 2)) / 4.0
+	y = float64((int8(buf[1]) << 2)) / 4.0
+	z = float64((int8(buf[2]) << 2)) / 4.0
 
 	return
 }

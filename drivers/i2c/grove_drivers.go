@@ -9,7 +9,7 @@ type GroveLcdDriver struct {
 }
 
 // NewGroveLcdDriver creates a new driver with specified i2c interface.
-func NewGroveLcdDriver(a I2c) *GroveLcdDriver {
+func NewGroveLcdDriver(a I2cConnector) *GroveLcdDriver {
 	return &GroveLcdDriver{
 		JHD1313M1Driver: NewJHD1313M1Driver(a),
 	}
@@ -20,7 +20,7 @@ type GroveAccelerometerDriver struct {
 }
 
 // NewGroveAccelerometerDriver creates a new driver with specified i2c interface
-func NewGroveAccelerometerDriver(a I2c) *GroveAccelerometerDriver {
+func NewGroveAccelerometerDriver(a I2cConnector) *GroveAccelerometerDriver {
 	return &GroveAccelerometerDriver{
 		MMA7660Driver: NewMMA7660Driver(a),
 	}

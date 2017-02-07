@@ -25,7 +25,8 @@ const l3gd20hRegisterOutXLSB = 0x28 | 0x80 // set auto-increment bit.
 // Device datasheet: http://www.st.com/internet/com/TECHNICAL_RESOURCES/TECHNICAL_LITERATURE/DATASHEET/DM00036465.pdf
 type L3GD20HDriver struct {
 	name       string
-	connection I2c
+	connector  I2cConnector
+	connection I2cConnection
 	scale      L3GD20HScale
 }
 
@@ -42,11 +43,11 @@ const (
 )
 
 // NewL3GD20HDriver creates a new driver with the i2c interface for the L3GD20H device.
-func NewL3GD20HDriver(c I2c) *L3GD20HDriver {
+func NewL3GD20HDriver(c I2cConnector) *L3GD20HDriver {
 	return &L3GD20HDriver{
-		name:       gobot.DefaultName("L3GD20H"),
-		connection: c,
-		scale:      L3GD20HScale250dps,
+		name:      gobot.DefaultName("L3GD20H"),
+		connector: c,
+		scale:     L3GD20HScale250dps,
 	}
 }
 
@@ -62,7 +63,7 @@ func (d *L3GD20HDriver) SetName(name string) {
 
 // Connection returns the connection of the device.
 func (d *L3GD20HDriver) Connection() gobot.Connection {
-	return d.connection.(gobot.Connection)
+	return d.connector.(gobot.Connection)
 }
 
 // Scale returns the scale sensitivity of the device.
@@ -84,19 +85,21 @@ func (d *L3GD20HDriver) Start() (err error) {
 }
 
 func (d *L3GD20HDriver) initialization() (err error) {
-	if err = d.connection.I2cStart(l3gd20hAddress); err != nil {
+	bus := d.connector.I2cGetDefaultBus()
+	d.connection, err = d.connector.I2cGetConnection(l3gd20hAddress, bus)
+	if err != nil {
 		return err
 	}
 	// reset the gyroscope.
-	if err := d.connection.I2cWrite(l3gd20hAddress, []byte{l3gd20hRegisterCtl1, 0x00}); err != nil {
+	if _, err := d.connection.Write([]byte{l3gd20hRegisterCtl1, 0x00}); err != nil {
 		return err
 	}
 	// Enable Z, Y and X axis.
-	if err := d.connection.I2cWrite(l3gd20hAddress, []byte{l3gd20hRegisterCtl1, l3gd20hNormalMode | l3gd20hEnableZ | l3gd20hEnableY | l3gd20hEnableX}); err != nil {
+	if _, err := d.connection.Write([]byte{l3gd20hRegisterCtl1, l3gd20hNormalMode | l3gd20hEnableZ | l3gd20hEnableY | l3gd20hEnableX}); err != nil {
 		return err
 	}
 	// Set the sensitivity scale.
-	if err := d.connection.I2cWrite(l3gd20hAddress, []byte{l3gd20hRegisterCtl4, byte(d.scale)}); err != nil {
+	if _, err := d.connection.Write([]byte{l3gd20hRegisterCtl4, byte(d.scale)}); err != nil {
 		return err
 	}
 	return nil
@@ -109,11 +112,11 @@ func (d *L3GD20HDriver) Halt() (err error) {
 
 // XYZ returns the current change in degrees per second, for the 3 axis.
 func (d *L3GD20HDriver) XYZ() (x float32, y float32, z float32, err error) {
-	if err := d.connection.I2cWrite(l3gd20hAddress, []byte{l3gd20hRegisterOutXLSB}); err != nil {
+	if _, err := d.connection.Write([]byte{l3gd20hRegisterOutXLSB}); err != nil {
 		return 0, 0, 0, nil
 	}
-	var measurements []byte
-	if measurements, err = d.connection.I2cRead(l3gd20hAddress, 6); err != nil {
+	measurements := make([]byte, 6)
+	if _, err = d.connection.Read(measurements); err != nil {
 		return 0, 0, 0, nil
 	}
 
