@@ -25,7 +25,7 @@ func (c *firmataI2cConnection) Read(b []byte) (read int, err error) {
 		return
 	}
 
-	c.adaptor.Once(c.adaptor.board.Event("I2cReply"), func(data interface{}) {
+	c.adaptor.board.Once(c.adaptor.board.Event("I2cReply"), func(data interface{}) {
 		ret <- data.(client.I2cReply).Data
 	})
 

@@ -25,7 +25,7 @@ type firmataBoard interface {
 	I2cWrite(int, []byte) error
 	I2cConfig(int) error
 	ServoConfig(int, int, int) error
-	Event(string) string
+	gobot.Eventer
 }
 
 // Adaptor is the Gobot Adaptor for Firmata based boards
