@@ -39,7 +39,7 @@ func (b *ClientAdaptor) Peripheral() gatt.Peripheral { return b.peripheral }
 func (b *ClientAdaptor) Connect() (err error) {
 	device, e := gatt.NewDevice(DefaultClientOptions...)
 	if e != nil {
-		log.Fatalf("Failed to open BLE device, err: %s\n", err)
+		log.Fatalf("Failed to open BLE device, err: %s\n", e)
 		return e
 	}
 
