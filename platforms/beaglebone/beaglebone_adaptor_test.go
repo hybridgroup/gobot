@@ -54,7 +54,7 @@ func TestBeagleboneAdaptor(t *testing.T) {
 		return make([]string, 2), nil
 	}
 	fs := sysfs.NewMockFilesystem([]string{
-		"/dev/i2c-1",
+		"/dev/i2c-2",
 		"/sys/devices/platform/bone_capemgr",
 		"/sys/devices/platform/ocp/ocp4",
 		"/sys/class/leds/beaglebone:green:usr1/brightness",
@@ -140,7 +140,7 @@ func TestBeagleboneAdaptor(t *testing.T) {
 	// I2c
 	sysfs.SetSyscall(&sysfs.MockSyscall{})
 
-	con, err := a.I2cGetConnection(0xff, 1)
+	con, err := a.I2cGetConnection(0xff, 2)
 	gobottest.Assert(t, err, nil)
 
 	con.Write([]byte{0x00, 0x01})

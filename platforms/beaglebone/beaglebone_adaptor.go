@@ -12,8 +12,8 @@ import (
 
 	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/sysfs"
 	"gobot.io/x/gobot/drivers/i2c"
+	"gobot.io/x/gobot/sysfs"
 )
 
 var glob = func(pattern string) (matches []string, err error) {
@@ -26,7 +26,7 @@ type Adaptor struct {
 	kernel       string
 	digitalPins  []sysfs.DigitalPin
 	pwmPins      map[string]*pwmPin
-	i2cBuses     [2]sysfs.I2cDevice
+	i2cBuses     map[int]sysfs.I2cDevice
 	usrLed       string
 	ocp          string
 	analogPath   string
@@ -40,6 +40,7 @@ func NewAdaptor() *Adaptor {
 		name:        gobot.DefaultName("Beaglebone"),
 		digitalPins: make([]sysfs.DigitalPin, 120),
 		pwmPins:     make(map[string]*pwmPin),
+		i2cBuses:    make(map[int]sysfs.I2cDevice),
 	}
 
 	b.setSlots()
@@ -198,11 +199,10 @@ func (b *Adaptor) AnalogRead(pin string) (val int, err error) {
 	return
 }
 
-
 // I2cGetConnection returns a connection to a device on a specified bus.
-// Valid bus number is [0..1] which corresponds to /dev/i2c-0 through /dev/i2c-1.
+// Valid bus number is either 0 or 2 which corresponds to /dev/i2c-0 or /dev/i2c-2.
 func (c *Adaptor) I2cGetConnection(address int, bus int) (connection i2c.I2cConnection, err error) {
-	if (bus < 0) || (bus > 1) {
+	if (bus != 0) && (bus != 2) {
 		return nil, fmt.Errorf("Bus number %d out of range", bus)
 	}
 	if c.i2cBuses[bus] == nil {
@@ -212,7 +212,7 @@ func (c *Adaptor) I2cGetConnection(address int, bus int) (connection i2c.I2cConn
 }
 
 func (c *Adaptor) I2cGetDefaultBus() int {
-	return 1
+	return 2
 }
 
 // translatePin converts digital pin name to pin position
