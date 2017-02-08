@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"sync"
+	"sync/atomic"
 	"time"
 
 	"gobot.io/x/gobot"
@@ -64,10 +66,12 @@ type Client struct {
 	pins             []Pin
 	FirmwareName     string
 	ProtocolVersion  string
-	connected        bool
+	connected        atomic.Value
 	connection       io.ReadWriteCloser
 	analogPins       []int
 	initTimeInterval time.Duration
+	initFunc         func() error
+	initMutex        sync.Mutex
 	gobot.Eventer
 }
 
@@ -95,9 +99,10 @@ func New() *Client {
 		connection:      nil,
 		pins:            []Pin{},
 		analogPins:      []int{},
-		connected:       false,
 		Eventer:         gobot.NewEventer(),
 	}
+
+	c.connected.Store(false)
 
 	for _, s := range []string{
 		"FirmwareQuery",
@@ -114,15 +119,32 @@ func New() *Client {
 	return c
 }
 
+func (b *Client) setInitFunc(f func() error) {
+	b.initMutex.Lock()
+	defer b.initMutex.Unlock()
+	b.initFunc = f
+}
+
+func (b *Client) getInitFunc() func() error {
+	b.initMutex.Lock()
+	defer b.initMutex.Unlock()
+	f := b.initFunc
+	return f
+}
+
+func (b *Client) setConnected(c bool) {
+	b.connected.Store(c)
+}
+
 // Disconnect disconnects the Client
 func (b *Client) Disconnect() (err error) {
-	b.connected = false
+	b.setConnected(false)
 	return b.connection.Close()
 }
 
 // Connected returns the current connection state of the Client
 func (b *Client) Connected() bool {
-	return b.connected
+	return b.connected.Load().(bool)
 }
 
 // Pins returns all available pins
@@ -134,45 +156,46 @@ func (b *Client) Pins() []Pin {
 // then continuously polls the firmata board for new information when it's
 // available.
 func (b *Client) Connect(conn io.ReadWriteCloser) (err error) {
-	if b.connected {
+	if b.Connected() {
 		return ErrConnected
 	}
 
 	b.connection = conn
 	b.Reset()
 
-	initFunc := b.ProtocolVersionQuery
+	b.setInitFunc(b.ProtocolVersionQuery)
 
 	b.Once(b.Event("ProtocolVersion"), func(data interface{}) {
-		initFunc = b.FirmwareQuery
+		b.setInitFunc(b.FirmwareQuery)
 	})
 
 	b.Once(b.Event("FirmwareQuery"), func(data interface{}) {
-		initFunc = b.CapabilitiesQuery
+		b.setInitFunc(b.CapabilitiesQuery)
 	})
 
 	b.Once(b.Event("CapabilityQuery"), func(data interface{}) {
-		initFunc = b.AnalogMappingQuery
+		b.setInitFunc(b.AnalogMappingQuery)
 	})
 
 	b.Once(b.Event("AnalogMappingQuery"), func(data interface{}) {
-		initFunc = func() error { return nil }
+		b.setInitFunc(func() error { return nil })
 		b.ReportDigital(0, 1)
 		b.ReportDigital(1, 1)
-		b.connected = true
+		b.setConnected(true)
 	})
 
 	for {
-		if err := initFunc(); err != nil {
+		f := b.getInitFunc()
+		if err := f(); err != nil {
 			return err
 		}
 		if err := b.process(); err != nil {
 			return err
 		}
-		if b.connected {
+		if b.Connected() {
 			go func() {
 				for {
-					if !b.connected {
+					if !b.Connected() {
 						break
 					}
 

@@ -9,8 +9,8 @@ import (
 func main() {
 	firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
 
-	button := gpio.NewButtonDriver(firmataAdaptor, "5")
-	led := gpio.NewLedDriver(firmataAdaptor, "13")
+	button := gpio.NewButtonDriver(firmataAdaptor, "2")
+	led := gpio.NewLedDriver(firmataAdaptor, "3")
 
 	work := func() {
 		button.On(gpio.ButtonPush, func(data interface{}) {

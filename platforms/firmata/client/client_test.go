@@ -12,16 +12,19 @@ import (
 type readWriteCloser struct{}
 
 func (readWriteCloser) Write(p []byte) (int, error) {
+	writeDataMutex.Lock()
+	defer writeDataMutex.Unlock()
 	return testWriteData.Write(p)
 }
 
 var clientMutex sync.Mutex
+var writeDataMutex sync.Mutex
 var testReadData = []byte{}
 var testWriteData = bytes.Buffer{}
 
 func (readWriteCloser) Read(b []byte) (int, error) {
-	clientMutex.Lock()
-	defer clientMutex.Unlock()
+	writeDataMutex.Lock()
+	defer writeDataMutex.Unlock()
 
 	size := len(b)
 	if len(testReadData) < size {
@@ -80,7 +83,7 @@ func initTestFirmata() *Client {
 		b.process()
 	}
 
-	b.connected = true
+	b.setConnected(true)
 	b.Connect(readWriteCloser{})
 
 	return b
@@ -286,30 +289,43 @@ func TestProcessStringData(t *testing.T) {
 func TestConnect(t *testing.T) {
 	b := New()
 
+	var responseMutex sync.Mutex
+	responseMutex.Lock()
 	response := testProtocolResponse()
-
-	go func() {
-		for {
-			testReadData = append(testReadData, response...)
-			time.Sleep(100 * time.Millisecond)
-		}
-	}()
+	responseMutex.Unlock()
 
 	b.Once(b.Event("ProtocolVersion"), func(data interface{}) {
+		responseMutex.Lock()
 		response = testFirmwareResponse()
+		responseMutex.Unlock()
 	})
 
 	b.Once(b.Event("FirmwareQuery"), func(data interface{}) {
+		responseMutex.Lock()
 		response = testCapabilitiesResponse()
+		responseMutex.Unlock()
 	})
 
 	b.Once(b.Event("CapabilityQuery"), func(data interface{}) {
+		responseMutex.Lock()
 		response = testAnalogMappingResponse()
+		responseMutex.Unlock()
 	})
 
 	b.Once(b.Event("AnalogMappingQuery"), func(data interface{}) {
+		responseMutex.Lock()
 		response = testProtocolResponse()
+		responseMutex.Unlock()
 	})
+
+	go func() {
+		for {
+			responseMutex.Lock()
+			testReadData = append(testReadData, response...)
+			responseMutex.Unlock()
+			time.Sleep(100 * time.Millisecond)
+		}
+	}()
 
 	gobottest.Assert(t, b.Connect(readWriteCloser{}), nil)
 }
@@ -342,9 +358,13 @@ func TestServoConfig(t *testing.T) {
 	}
 
 	for _, test := range tests {
+		writeDataMutex.Lock()
 		testWriteData.Reset()
+		writeDataMutex.Unlock()
 		err := b.ServoConfig(test.arguments[0], test.arguments[1], test.arguments[2])
+		writeDataMutex.Lock()
 		gobottest.Assert(t, testWriteData.Bytes(), test.expected)
 		gobottest.Assert(t, err, test.result)
+		writeDataMutex.Unlock()
 	}
 }
