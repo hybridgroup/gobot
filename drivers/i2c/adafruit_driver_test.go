@@ -1,7 +1,6 @@
 package i2c
 
 import (
-	"errors"
 	"strings"
 	"testing"
 
@@ -36,16 +35,9 @@ func TestNewAdafruitMotorHatDriver(t *testing.T) {
 
 // Methods
 func TestAdafruitMotorHatDriverStart(t *testing.T) {
-	ada, adaptor := initTestAdafruitMotorHatDriverWithStubbedAdaptor()
+	ada, _ := initTestAdafruitMotorHatDriverWithStubbedAdaptor()
 
 	gobottest.Assert(t, ada.Start(), nil)
-
-	adaptor.i2cStartImpl = func() error {
-		return errors.New("start error")
-	}
-	err := ada.Start()
-	gobottest.Assert(t, err, errors.New("start error"))
-
 }
 
 func TestAdafruitMotorHatDriverHalt(t *testing.T) {
@@ -53,6 +45,7 @@ func TestAdafruitMotorHatDriverHalt(t *testing.T) {
 
 	gobottest.Assert(t, ada.Halt(), nil)
 }
+
 func TestSetHatAddresses(t *testing.T) {
 	ada, _ := initTestAdafruitMotorHatDriverWithStubbedAdaptor()
 
@@ -65,6 +58,8 @@ func TestSetHatAddresses(t *testing.T) {
 func TestAdafruitMotorHatDriverSetServoMotorFreq(t *testing.T) {
 	ada, _ := initTestAdafruitMotorHatDriverWithStubbedAdaptor()
 
+	gobottest.Assert(t, ada.Start(), nil)
+
 	freq := 60.0
 	err := ada.SetServoMotorFreq(freq)
 	gobottest.Assert(t, err, nil)
@@ -72,6 +67,8 @@ func TestAdafruitMotorHatDriverSetServoMotorFreq(t *testing.T) {
 
 func TestAdafruitMotorHatDriverSetServoMotorPulse(t *testing.T) {
 	ada, _ := initTestAdafruitMotorHatDriverWithStubbedAdaptor()
+
+	gobottest.Assert(t, ada.Start(), nil)
 
 	var channel byte = 7
 	var on int32 = 1234
@@ -83,6 +80,8 @@ func TestAdafruitMotorHatDriverSetServoMotorPulse(t *testing.T) {
 func TestAdafruitMotorHatDriverSetDCMotorSpeed(t *testing.T) {
 	ada, _ := initTestAdafruitMotorHatDriverWithStubbedAdaptor()
 
+	gobottest.Assert(t, ada.Start(), nil)
+
 	dcMotor := 1
 	var speed int32 = 255
 	err := ada.SetDCMotorSpeed(dcMotor, speed)
@@ -91,6 +90,8 @@ func TestAdafruitMotorHatDriverSetDCMotorSpeed(t *testing.T) {
 
 func TestAdafruitMotorHatDriverRunDCMotor(t *testing.T) {
 	ada, _ := initTestAdafruitMotorHatDriverWithStubbedAdaptor()
+
+	gobottest.Assert(t, ada.Start(), nil)
 
 	dcMotor := 1
 	// NOTE: not using the direction constant to prevent importing
@@ -102,6 +103,8 @@ func TestAdafruitMotorHatDriverRunDCMotor(t *testing.T) {
 func TestAdafruitMotorHatDriverSetStepperMotorSpeed(t *testing.T) {
 	ada, _ := initTestAdafruitMotorHatDriverWithStubbedAdaptor()
 
+	gobottest.Assert(t, ada.Start(), nil)
+
 	stepperMotor := 1
 	rpm := 30
 	gobottest.Assert(t, ada.SetStepperMotorSpeed(stepperMotor, rpm), nil)
@@ -109,6 +112,8 @@ func TestAdafruitMotorHatDriverSetStepperMotorSpeed(t *testing.T) {
 
 func TestAdafruitMotorHatDriverStepperStep(t *testing.T) {
 	ada, _ := initTestAdafruitMotorHatDriverWithStubbedAdaptor()
+
+	gobottest.Assert(t, ada.Start(), nil)
 
 	// NOTE: not using the direction and style constants to prevent importing
 	// the i2c package

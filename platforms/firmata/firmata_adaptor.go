@@ -1,12 +1,14 @@
 package firmata
 
 import (
+	"fmt"
 	"io"
 	"strconv"
 	"time"
 
 	"github.com/tarm/serial"
 	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/platforms/firmata/client"
 )
 
@@ -23,7 +25,7 @@ type firmataBoard interface {
 	I2cWrite(int, []byte) error
 	I2cConfig(int) error
 	ServoConfig(int, int, int) error
-	Event(string) string
+	gobot.Eventer
 }
 
 // Adaptor is the Gobot Adaptor for Firmata based boards
@@ -219,30 +221,16 @@ func (f *Adaptor) digitalPin(pin int) int {
 	return pin + 14
 }
 
-// I2cStart starts an i2c device at specified address
-func (f *Adaptor) I2cStart(address int) (err error) {
-	return f.board.I2cConfig(0)
-}
-
-// I2cRead returns size bytes from the i2c device
-// Returns an empty array if the response from the board has timed out
-func (f *Adaptor) I2cRead(address int, size int) (data []byte, err error) {
-	ret := make(chan []byte)
-
-	if err = f.board.I2cRead(address, size); err != nil {
-		return
+// I2cGetConnection returns a connection to a device on a specified bus.
+// Only supports bus number 0
+func (f *Adaptor) I2cGetConnection(address int, bus int) (connection i2c.I2cConnection, err error) {
+	if bus != 0 {
+		return nil, fmt.Errorf("Invalid bus number %d, only 0 is supported", bus)
 	}
-
-	f.Once(f.board.Event("I2cReply"), func(data interface{}) {
-		ret <- data.(client.I2cReply).Data
-	})
-
-	data = <-ret
-
-	return
+	err = f.board.I2cConfig(0)
+	return NewFirmataI2cConnection(f, address), err
 }
 
-// I2cWrite writes data to i2c device
-func (f *Adaptor) I2cWrite(address int, data []byte) (err error) {
-	return f.board.I2cWrite(address, data)
+func (c *Adaptor) I2cGetDefaultBus() int {
+	return 0
 }

@@ -10,6 +10,7 @@ import (
 
 	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/sysfs"
 )
 
@@ -19,12 +20,12 @@ var readFile = func() ([]byte, error) {
 
 // Adaptor is the Gobot Adaptor for the Raspberry Pi
 type Adaptor struct {
-	name        string
-	revision    string
-	i2cLocation string
-	digitalPins map[int]sysfs.DigitalPin
-	pwmPins     []int
-	i2cDevice   sysfs.I2cDevice
+	name          string
+	revision      string
+	digitalPins   map[int]sysfs.DigitalPin
+	pwmPins       []int
+	i2cDefaultBus int
+	i2cBuses      [2]sysfs.I2cDevice
 }
 
 // NewAdaptor creates a Raspi Adaptor
@@ -39,10 +40,10 @@ func NewAdaptor() *Adaptor {
 		if strings.Contains(v, "Revision") {
 			s := strings.Split(string(v), " ")
 			version, _ := strconv.ParseInt("0x"+s[len(s)-1], 0, 64)
-			r.i2cLocation = "/dev/i2c-1"
+			r.i2cDefaultBus = 1
 			if version <= 3 {
 				r.revision = "1"
-				r.i2cLocation = "/dev/i2c-0"
+				r.i2cDefaultBus = 0
 			} else if version <= 15 {
 				r.revision = "2"
 			} else {
@@ -80,9 +81,11 @@ func (r *Adaptor) Finalize() (err error) {
 			err = multierror.Append(err, perr)
 		}
 	}
-	if r.i2cDevice != nil {
-		if perr := r.i2cDevice.Close(); err != nil {
-			err = multierror.Append(err, perr)
+	for _, bus := range r.i2cBuses {
+		if bus != nil {
+			if e := bus.Close(); e != nil {
+				err = multierror.Append(err, e)
+			}
 		}
 	}
 	return
@@ -161,31 +164,20 @@ func (r *Adaptor) DigitalWrite(pin string, val byte) (err error) {
 	return sysfsPin.Write(int(val))
 }
 
-// I2cStart starts a i2c device in specified address
-func (r *Adaptor) I2cStart(address int) (err error) {
-	if r.i2cDevice == nil {
-		r.i2cDevice, err = sysfs.NewI2cDevice(r.i2cLocation, address)
+// I2cGetConnection returns a connection to a device on a specified bus.
+// Valid bus number is [0..1] which corresponds to /dev/i2c-0 through /dev/i2c-1.
+func (c *Adaptor) I2cGetConnection(address int, bus int) (connection i2c.I2cConnection, err error) {
+	if (bus < 0) || (bus > 1) {
+		return nil, fmt.Errorf("Bus number %d out of range", bus)
 	}
-	return err
+	if c.i2cBuses[bus] == nil {
+		c.i2cBuses[bus], err = sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
+	}
+	return i2c.NewI2cConnection(c.i2cBuses[bus], address), err
 }
 
-// I2CWrite writes data to i2c device
-func (r *Adaptor) I2cWrite(address int, data []byte) (err error) {
-	if err = r.i2cDevice.SetAddress(address); err != nil {
-		return
-	}
-	_, err = r.i2cDevice.Write(data)
-	return
-}
-
-// I2cRead returns value from i2c device using specified size
-func (r *Adaptor) I2cRead(address int, size int) (data []byte, err error) {
-	if err = r.i2cDevice.SetAddress(address); err != nil {
-		return
-	}
-	data = make([]byte, size)
-	_, err = r.i2cDevice.Read(data)
-	return
+func (c *Adaptor) I2cGetDefaultBus() int {
+	return c.i2cDefaultBus
 }
 
 // PwmWrite writes a PWM signal to the specified pin

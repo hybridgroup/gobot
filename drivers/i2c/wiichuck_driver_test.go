@@ -45,8 +45,9 @@ func TestWiichuckDriverStart(t *testing.T) {
 	sem := make(chan bool)
 	wii, adaptor := initTestWiichuckDriverWithStubbedAdaptor()
 
-	adaptor.i2cReadImpl = func() ([]byte, error) {
-		return []byte{1, 2, 3, 4, 5, 6}, nil
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		copy(b, []byte{1, 2, 3, 4, 5, 6})
+		return 6, nil
 	}
 
 	numberOfCyclesForEvery := 3

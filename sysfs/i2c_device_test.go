@@ -11,7 +11,7 @@ func TestNewI2cDevice(t *testing.T) {
 	fs := NewMockFilesystem([]string{})
 	SetFilesystem(fs)
 
-	i, err := NewI2cDevice(os.DevNull, 0xff)
+	i, err := NewI2cDevice(os.DevNull)
 	gobottest.Refute(t, err, nil)
 
 	fs = NewMockFilesystem([]string{
@@ -20,12 +20,12 @@ func TestNewI2cDevice(t *testing.T) {
 
 	SetFilesystem(fs)
 
-	i, err = NewI2cDevice("/dev/i2c-1", 0xff)
+	i, err = NewI2cDevice("/dev/i2c-1")
 	gobottest.Refute(t, err, nil)
 
 	SetSyscall(&MockSyscall{})
 
-	i, err = NewI2cDevice("/dev/i2c-1", 0xff)
+	i, err = NewI2cDevice("/dev/i2c-1")
 	var _ I2cDevice = i
 
 	gobottest.Assert(t, err, nil)

@@ -2,11 +2,13 @@ package edison
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"strconv"
 
 	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/sysfs"
 )
 
@@ -56,7 +58,7 @@ type Adaptor struct {
 	tristate    sysfs.DigitalPin
 	digitalPins map[int]sysfs.DigitalPin
 	pwmPins     map[int]*pwmPin
-	i2cDevice   sysfs.I2cDevice
+	i2cBus      sysfs.I2cDevice
 	connect     func(e *Adaptor) (err error)
 }
 
@@ -140,8 +142,8 @@ func (e *Adaptor) Finalize() (err error) {
 			}
 		}
 	}
-	if e.i2cDevice != nil {
-		if errs := e.i2cDevice.Close(); errs != nil {
+	if e.i2cBus != nil {
+		if errs := e.i2cBus.Close(); errs != nil {
 			err = multierror.Append(err, errs)
 		}
 	}
@@ -421,40 +423,27 @@ func (e *Adaptor) AnalogRead(pin string) (val int, err error) {
 	return val / 4, err
 }
 
-// I2cStart initializes i2c device for addresss
-func (e *Adaptor) I2cStart(address int) (err error) {
-	if e.i2cDevice != nil {
-		return
+// I2cGetConnection returns a connection to a device on a specified bus.
+// Valid bus numbers are 1 and 6 (arduino).
+func (e *Adaptor) I2cGetConnection(address int, bus int) (connection i2c.I2cConnection, err error) {
+	if !(bus == e.I2cGetDefaultBus()) {
+		return nil, errors.New("Unsupported I2C bus")
 	}
+	if e.i2cBus == nil {
+		if bus == 6 && e.board == "arduino" {
+			e.arduinoI2CSetup()
+		}
+		e.i2cBus, err = sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
+	}
+	return i2c.NewI2cConnection(e.i2cBus, address), err
+}
 
-	// most board use I2C bus 1
-	bus := "/dev/i2c-1"
-
-	// except for Arduino which uses bus 6
+func (e *Adaptor) I2cGetDefaultBus() int {
+	// Arduino uses bus 6
 	if e.board == "arduino" {
-		bus = "/dev/i2c-6"
-		e.arduinoI2CSetup()
+		return 6
+	} else {
+		// all other default to 1
+		return 1
 	}
-
-	e.i2cDevice, err = sysfs.NewI2cDevice(bus, address)
-	return
-}
-
-// I2cWrite writes data to i2c device
-func (e *Adaptor) I2cWrite(address int, data []byte) (err error) {
-	if err = e.i2cDevice.SetAddress(address); err != nil {
-		return err
-	}
-	_, err = e.i2cDevice.Write(data)
-	return
-}
-
-// I2cRead returns size bytes from the i2c device
-func (e *Adaptor) I2cRead(address int, size int) (data []byte, err error) {
-	data = make([]byte, size)
-	if err = e.i2cDevice.SetAddress(address); err != nil {
-		return
-	}
-	_, err = e.i2cDevice.Read(data)
-	return
 }

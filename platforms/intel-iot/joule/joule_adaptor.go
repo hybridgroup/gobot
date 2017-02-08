@@ -2,11 +2,13 @@ package joule
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"strconv"
 
 	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/sysfs"
 )
 
@@ -46,7 +48,7 @@ type Adaptor struct {
 	name        string
 	digitalPins map[int]sysfs.DigitalPin
 	pwmPins     map[int]*pwmPin
-	i2cDevice   sysfs.I2cDevice
+	i2cBuses    [3]sysfs.I2cDevice
 	connect     func(e *Adaptor) (err error)
 }
 
@@ -93,9 +95,11 @@ func (e *Adaptor) Finalize() (err error) {
 			}
 		}
 	}
-	if e.i2cDevice != nil {
-		if errs := e.i2cDevice.Close(); errs != nil {
-			err = multierror.Append(err, errs)
+	for _, bus := range e.i2cBuses {
+		if bus != nil {
+			if errs := bus.Close(); errs != nil {
+				err = multierror.Append(err, errs)
+			}
 		}
 	}
 	return
@@ -172,32 +176,18 @@ func (e *Adaptor) PwmWrite(pin string, val byte) (err error) {
 	return errors.New("Not a PWM pin")
 }
 
-// I2cStart initializes i2c device for addresss
-func (e *Adaptor) I2cStart(address int) (err error) {
-	if e.i2cDevice != nil {
-		return
+// I2cGetConnection returns a connection to a device on a specified bus.
+// Valid bus number is [0..2] which corresponds to /dev/i2c-0 through /dev/i2c-2.
+func (c *Adaptor) I2cGetConnection(address int, bus int) (connection i2c.I2cConnection, err error) {
+	if (bus < 0) || (bus > 2) {
+		return nil, fmt.Errorf("Bus number %d out of range", bus)
 	}
-
-	// TODO: handle the additional I2C buses
-	e.i2cDevice, err = sysfs.NewI2cDevice("/dev/i2c-0", address)
-	return
+	if c.i2cBuses[bus] == nil {
+		c.i2cBuses[bus], err = sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
+	}
+	return i2c.NewI2cConnection(c.i2cBuses[bus], address), err
 }
 
-// I2cWrite writes data to i2c device
-func (e *Adaptor) I2cWrite(address int, data []byte) (err error) {
-	if err = e.i2cDevice.SetAddress(address); err != nil {
-		return err
-	}
-	_, err = e.i2cDevice.Write(data)
-	return
-}
-
-// I2cRead returns size bytes from the i2c device
-func (e *Adaptor) I2cRead(address int, size int) (data []byte, err error) {
-	data = make([]byte, size)
-	if err = e.i2cDevice.SetAddress(address); err != nil {
-		return
-	}
-	_, err = e.i2cDevice.Read(data)
-	return
+func (c *Adaptor) I2cGetDefaultBus() int {
+	return 0
 }

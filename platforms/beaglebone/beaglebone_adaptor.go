@@ -12,6 +12,7 @@ import (
 
 	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/sysfs"
 )
 
@@ -25,7 +26,7 @@ type Adaptor struct {
 	kernel       string
 	digitalPins  []sysfs.DigitalPin
 	pwmPins      map[string]*pwmPin
-	i2cDevice    sysfs.I2cDevice
+	i2cBuses     map[int]sysfs.I2cDevice
 	usrLed       string
 	ocp          string
 	analogPath   string
@@ -39,6 +40,7 @@ func NewAdaptor() *Adaptor {
 		name:        gobot.DefaultName("Beaglebone"),
 		digitalPins: make([]sysfs.DigitalPin, 120),
 		pwmPins:     make(map[string]*pwmPin),
+		i2cBuses:    make(map[int]sysfs.I2cDevice),
 	}
 
 	b.setSlots()
@@ -120,9 +122,11 @@ func (b *Adaptor) Finalize() (err error) {
 			}
 		}
 	}
-	if b.i2cDevice != nil {
-		if e := b.i2cDevice.Close(); e != nil {
-			err = multierror.Append(err, e)
+	for _, bus := range b.i2cBuses {
+		if bus != nil {
+			if e := bus.Close(); e != nil {
+				err = multierror.Append(err, e)
+			}
 		}
 	}
 	return
@@ -195,31 +199,20 @@ func (b *Adaptor) AnalogRead(pin string) (val int, err error) {
 	return
 }
 
-// I2cStart starts a i2c device in specified address on i2c bus /dev/i2c-1
-func (b *Adaptor) I2cStart(address int) (err error) {
-	if b.i2cDevice == nil {
-		b.i2cDevice, err = sysfs.NewI2cDevice("/dev/i2c-1", address)
+// I2cGetConnection returns a connection to a device on a specified bus.
+// Valid bus number is either 0 or 2 which corresponds to /dev/i2c-0 or /dev/i2c-2.
+func (c *Adaptor) I2cGetConnection(address int, bus int) (connection i2c.I2cConnection, err error) {
+	if (bus != 0) && (bus != 2) {
+		return nil, fmt.Errorf("Bus number %d out of range", bus)
 	}
-	return
+	if c.i2cBuses[bus] == nil {
+		c.i2cBuses[bus], err = sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
+	}
+	return i2c.NewI2cConnection(c.i2cBuses[bus], address), err
 }
 
-// I2cWrite writes data to i2c device
-func (b *Adaptor) I2cWrite(address int, data []byte) (err error) {
-	if err = b.i2cDevice.SetAddress(address); err != nil {
-		return
-	}
-	_, err = b.i2cDevice.Write(data)
-	return
-}
-
-// I2cRead returns size bytes from the i2c device
-func (b *Adaptor) I2cRead(address int, size int) (data []byte, err error) {
-	if err = b.i2cDevice.SetAddress(address); err != nil {
-		return
-	}
-	data = make([]byte, size)
-	_, err = b.i2cDevice.Read(data)
-	return
+func (c *Adaptor) I2cGetDefaultBus() int {
+	return 2
 }
 
 // translatePin converts digital pin name to pin position

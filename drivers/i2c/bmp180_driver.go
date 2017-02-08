@@ -22,7 +22,8 @@ const bmp180RegisterPressureMSB = 0xF6
 // Device datasheet: https://cdn-shop.adafruit.com/datasheets/BST-BMP180-DS000-09.pdf
 type BMP180Driver struct {
 	name                    string
-	connection              I2c
+	connector               I2cConnector
+	connection              I2cConnection
 	calibrationCoefficients *calibrationCoefficients
 }
 
@@ -55,10 +56,10 @@ type calibrationCoefficients struct {
 }
 
 // NewBMP180Driver creates a new driver with the i2c interface for the BMP180 device.
-func NewBMP180Driver(c I2c) *BMP180Driver {
+func NewBMP180Driver(c I2cConnector) *BMP180Driver {
 	return &BMP180Driver{
 		name:                    gobot.DefaultName("BMP180"),
-		connection:              c,
+		connector:               c,
 		calibrationCoefficients: &calibrationCoefficients{},
 	}
 }
@@ -75,11 +76,15 @@ func (d *BMP180Driver) SetName(n string) {
 
 // Connection returns the connection of the device.
 func (d *BMP180Driver) Connection() gobot.Connection {
-	return d.connection.(gobot.Connection)
+	return d.connector.(gobot.Connection)
 }
 
 // Start initializes the BMP180 and loads the calibration coefficients.
 func (d *BMP180Driver) Start() (err error) {
+	bus := d.connector.I2cGetDefaultBus()
+	if d.connection, err = d.connector.I2cGetConnection(bmp180Address, bus); err != nil {
+		return err
+	}
 	if err := d.initialization(); err != nil {
 		return err
 	}
@@ -87,9 +92,6 @@ func (d *BMP180Driver) Start() (err error) {
 }
 
 func (d *BMP180Driver) initialization() (err error) {
-	if err = d.connection.I2cStart(bmp180Address); err != nil {
-		return err
-	}
 	var coefficients []byte
 	// read the 11 calibration coefficients.
 	if coefficients, err = d.read(bmp180RegisterAC1MSB, 22); err != nil {
@@ -138,7 +140,7 @@ func (d *BMP180Driver) Pressure(mode BMP180OversamplingMode) (pressure float32, 
 }
 
 func (d *BMP180Driver) rawTemp() (int16, error) {
-	if err := d.connection.I2cWrite(bmp180Address, []byte{bmp180RegisterCtl, bmp180CmdTemp}); err != nil {
+	if _, err := d.connection.Write([]byte{bmp180RegisterCtl, bmp180CmdTemp}); err != nil {
 		return 0, err
 	}
 	time.Sleep(5 * time.Millisecond)
@@ -153,14 +155,15 @@ func (d *BMP180Driver) rawTemp() (int16, error) {
 }
 
 func (d *BMP180Driver) read(address byte, n int) ([]byte, error) {
-	if err := d.connection.I2cWrite(bmp180Address, []byte{address}); err != nil {
+	if _, err := d.connection.Write([]byte{address}); err != nil {
 		return nil, err
 	}
-	ret, err := d.connection.I2cRead(bmp180Address, n)
-	if err != nil {
+	buf := make([]byte, n)
+	bytesRead, err := d.connection.Read(buf)
+	if bytesRead != n || err != nil {
 		return nil, err
 	}
-	return ret, nil
+	return buf, nil
 }
 
 func (d *BMP180Driver) calculateTemp(rawTemp int16) float32 {
@@ -176,7 +179,7 @@ func (d *BMP180Driver) calculateB5(rawTemp int16) int32 {
 }
 
 func (d *BMP180Driver) rawPressure(mode BMP180OversamplingMode) (rawPressure int32, err error) {
-	if err := d.connection.I2cWrite(bmp180Address, []byte{bmp180RegisterCtl, bmp180CmdPressure + byte(mode<<6)}); err != nil {
+	if _, err := d.connection.Write([]byte{bmp180RegisterCtl, bmp180CmdPressure + byte(mode<<6)}); err != nil {
 		return 0, err
 	}
 	switch mode {

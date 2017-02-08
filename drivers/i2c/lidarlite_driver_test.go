@@ -37,16 +37,9 @@ func TestNewLIDARLiteDriver(t *testing.T) {
 
 // Methods
 func TestLIDARLiteDriverStart(t *testing.T) {
-	hmc, adaptor := initTestLIDARLiteDriverWithStubbedAdaptor()
+	hmc, _ := initTestLIDARLiteDriverWithStubbedAdaptor()
 
 	gobottest.Assert(t, hmc.Start(), nil)
-
-	adaptor.i2cStartImpl = func() error {
-		return errors.New("start error")
-	}
-	err := hmc.Start()
-	gobottest.Assert(t, err, errors.New("start error"))
-
 }
 
 func TestLIDARLiteDriverHalt(t *testing.T) {
@@ -59,13 +52,17 @@ func TestLIDARLiteDriverDistance(t *testing.T) {
 	// when everything is happy
 	hmc, adaptor := initTestLIDARLiteDriverWithStubbedAdaptor()
 
+	gobottest.Assert(t, hmc.Start(), nil)
+
 	first := true
-	adaptor.i2cReadImpl = func() ([]byte, error) {
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
 		if first {
 			first = false
-			return []byte{99}, nil
+			copy(b, []byte{99})
+			return 1, nil
 		}
-		return []byte{1}, nil
+		copy(b, []byte{1})
+		return 1, nil
 	}
 
 	distance, err := hmc.Distance()
@@ -76,8 +73,10 @@ func TestLIDARLiteDriverDistance(t *testing.T) {
 	// when insufficient bytes have been read
 	hmc, adaptor = initTestLIDARLiteDriverWithStubbedAdaptor()
 
-	adaptor.i2cReadImpl = func() ([]byte, error) {
-		return []byte{}, nil
+	gobottest.Assert(t, hmc.Start(), nil)
+
+	adaptor.i2cReadImpl = func([]byte) (int, error) {
+		return 0, nil
 	}
 
 	distance, err = hmc.Distance()
@@ -87,8 +86,10 @@ func TestLIDARLiteDriverDistance(t *testing.T) {
 	// when read error
 	hmc, adaptor = initTestLIDARLiteDriverWithStubbedAdaptor()
 
-	adaptor.i2cReadImpl = func() ([]byte, error) {
-		return []byte{}, errors.New("read error")
+	gobottest.Assert(t, hmc.Start(), nil)
+
+	adaptor.i2cReadImpl = func([]byte) (int, error) {
+		return 0, errors.New("read error")
 	}
 
 	distance, err = hmc.Distance()
@@ -98,8 +99,10 @@ func TestLIDARLiteDriverDistance(t *testing.T) {
 	// when write error
 	hmc, adaptor = initTestLIDARLiteDriverWithStubbedAdaptor()
 
-	adaptor.i2cWriteImpl = func() error {
-		return errors.New("write error")
+	gobottest.Assert(t, hmc.Start(), nil)
+
+	adaptor.i2cWriteImpl = func([]byte) (int, error) {
+		return 0, errors.New("write error")
 	}
 
 	distance, err = hmc.Distance()

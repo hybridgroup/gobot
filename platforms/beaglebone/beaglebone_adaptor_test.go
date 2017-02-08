@@ -21,7 +21,7 @@ var _ aio.AnalogReader = (*Adaptor)(nil)
 var _ gpio.PwmWriter = (*Adaptor)(nil)
 var _ gpio.ServoWriter = (*Adaptor)(nil)
 
-var _ i2c.I2c = (*Adaptor)(nil)
+var _ i2c.I2cConnector = (*Adaptor)(nil)
 
 type NullReadWriteCloser struct {
 	contents []byte
@@ -54,7 +54,7 @@ func TestBeagleboneAdaptor(t *testing.T) {
 		return make([]string, 2), nil
 	}
 	fs := sysfs.NewMockFilesystem([]string{
-		"/dev/i2c-1",
+		"/dev/i2c-2",
 		"/sys/devices/platform/bone_capemgr",
 		"/sys/devices/platform/ocp/ocp4",
 		"/sys/class/leds/beaglebone:green:usr1/brightness",
@@ -139,12 +139,13 @@ func TestBeagleboneAdaptor(t *testing.T) {
 
 	// I2c
 	sysfs.SetSyscall(&sysfs.MockSyscall{})
-	a.I2cStart(0xff)
 
-	a.i2cDevice = &NullReadWriteCloser{}
+	con, err := a.I2cGetConnection(0xff, 2)
+	gobottest.Assert(t, err, nil)
 
-	a.I2cWrite(0xff, []byte{0x00, 0x01})
-	data, _ := a.I2cRead(0xff, 2)
+	con.Write([]byte{0x00, 0x01})
+	data := []byte{42, 42}
+	con.Read(data)
 	gobottest.Assert(t, data, []byte{0x00, 0x01})
 
 	gobottest.Assert(t, a.Finalize(), nil)
