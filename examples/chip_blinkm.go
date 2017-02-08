@@ -6,12 +6,12 @@ import (
 
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/drivers/i2c"
-	"gobot.io/x/gobot/platforms/raspi"
+	"gobot.io/x/gobot/platforms/chip"
 )
 
 func main() {
-	r := raspi.NewAdaptor()
-	blinkm := i2c.NewBlinkMDriver(r)
+	a := chip.NewAdaptor()
+	blinkm := i2c.NewBlinkMDriver(a)
 
 	work := func() {
 		gobot.Every(1*time.Second, func() {
@@ -25,7 +25,7 @@ func main() {
 	}
 
 	robot := gobot.NewRobot("blinkmBot",
-		[]gobot.Connection{r},
+		[]gobot.Connection{a},
 		[]gobot.Device{blinkm},
 		work,
 	)

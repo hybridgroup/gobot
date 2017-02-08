@@ -14,7 +14,7 @@ func main() {
 	blinkm := i2c.NewBlinkMDriver(beagleboneAdaptor)
 
 	work := func() {
-		gobot.Every(3*time.Second, func() {
+		gobot.Every(1*time.Second, func() {
 			r := byte(gobot.Rand(255))
 			g := byte(gobot.Rand(255))
 			b := byte(gobot.Rand(255))
