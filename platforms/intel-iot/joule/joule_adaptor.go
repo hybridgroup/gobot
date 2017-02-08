@@ -2,14 +2,14 @@ package joule
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"strconv"
-	"fmt"
 
 	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/sysfs"
 	"gobot.io/x/gobot/drivers/i2c"
+	"gobot.io/x/gobot/sysfs"
 )
 
 func writeFile(path string, data []byte) (i int, err error) {
@@ -175,7 +175,6 @@ func (e *Adaptor) PwmWrite(pin string, val byte) (err error) {
 	}
 	return errors.New("Not a PWM pin")
 }
-
 
 // I2cGetConnection returns a connection to a device on a specified bus.
 // Valid bus number is [0..2] which corresponds to /dev/i2c-0 through /dev/i2c-2.
