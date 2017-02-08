@@ -2,7 +2,6 @@ package ble
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"strings"
 	"sync"
@@ -20,17 +19,13 @@ var bleCtx context.Context
 // getBLEDevice is singleton for blelib HCI device connection
 func getBLEDevice(impl string) (d *blelib.Device, err error) {
 	if currentDevice != nil {
-		fmt.Println("getBLEDevice", currentDevice)
 		return currentDevice, nil
 	}
 
-	fmt.Println("getBLEDevice defaultDevice")
 	dev, e := defaultDevice(impl)
 	if e != nil {
-		fmt.Println("can't get device")
 		return nil, errors.Wrap(e, "can't get device")
 	}
-	fmt.Println("getBLEDevice SetDefaultDevice")
 	blelib.SetDefaultDevice(dev)
 
 	currentDevice = &dev
@@ -82,25 +77,16 @@ func (b *ClientAdaptor) Connect() (err error) {
 
 	var cln blelib.Client
 
-	//ctx := blelib.WithSigHandler(context.WithTimeout(context.Background(), 5*time.Second))
-	if bleCtx == nil {
-		bleCtx = context.Background()
-	}
-
-	fmt.Println("Connect", b.Address())
-	//ctx := blelib.WithSigHandler(context.WithTimeout(bleCtx, 10*time.Second))
 	cln, err = blelib.Connect(context.Background(), filter(b.Address()))
 	if err != nil {
 		return errors.Wrap(err, "can't connect")
 	}
 
-	fmt.Println("Connected", b.Address())
 	b.addr = cln.Address()
 	b.address = cln.Address().String()
 	b.SetName(cln.Name())
 	b.client = cln
 
-	fmt.Println("DiscoverProfile", b.Address())
 	p, err := b.client.DiscoverProfile(true)
 	if err != nil {
 		return errors.Wrap(err, "can't discover profile")
