@@ -20,6 +20,10 @@ const (
 	Z        = "z"
 )
 
+const (
+	BusNotInitialized = -1
+)
+
 // I2cConnection is a connection to an I2C device with a specified address
 // on a specific bus. Used as an alternative to the I2c interface.
 // Implements sysfs.I2cOperations to talk to the device, wrapping the
@@ -120,4 +124,40 @@ type I2cConnector interface {
 	I2cGetConnection(address int, bus int) (device I2cConnection, err error)
 	// I2cGetDefaultBus returns the default I2C bus index
 	I2cGetDefaultBus() int
+}
+
+type i2cBusser struct {
+	bus int
+}
+
+// I2cBusser is the interface which describes how a Driver can specify
+// which I2C bus it wants to use
+type I2cBusser interface {
+	// Bus sets which bus to use
+	Bus(bus int)
+
+	// GetBus gets which bus to use
+	GetBus() int
+}
+
+// NewI2cBusser returns a new I2cBusser.
+func NewI2cBusser() I2cBusser {
+	return &i2cBusser{}
+}
+
+// Bus sets which bus to use
+func (i *i2cBusser) Bus(bus int) {
+	i.bus = bus
+}
+
+// GetBus gets which bus to use
+func (i *i2cBusser) GetBus() int {
+	return i.bus
+}
+
+// Bus sets which bus to use as a optional param
+func Bus(bus int) func(I2cBusser) {
+	return func(i I2cBusser) {
+		i.Bus(bus)
+	}
 }
