@@ -36,10 +36,13 @@ type i2cConnection struct {
 	address int
 }
 
+// NewI2cConnection creates and returns a new connection to a specific
+// i2c device on a bus and address
 func NewI2cConnection(bus sysfs.I2cDevice, address int) (connection *i2cConnection) {
 	return &i2cConnection{bus: bus, address: address}
 }
 
+// Read data from an i2c device
 func (c *i2cConnection) Read(data []byte) (read int, err error) {
 	if err := c.bus.SetAddress(c.address); err != nil {
 		return 0, err
@@ -48,6 +51,7 @@ func (c *i2cConnection) Read(data []byte) (read int, err error) {
 	return
 }
 
+// Write data to an i2c device
 func (c *i2cConnection) Write(data []byte) (written int, err error) {
 	if err := c.bus.SetAddress(c.address); err != nil {
 		return 0, err
@@ -56,10 +60,12 @@ func (c *i2cConnection) Write(data []byte) (written int, err error) {
 	return
 }
 
+// Close connection to i2c device
 func (c *i2cConnection) Close() error {
 	return c.bus.Close()
 }
 
+// ReadByte reads a single byte from the i2c device
 func (c *i2cConnection) ReadByte() (val byte, err error) {
 	if err := c.bus.SetAddress(c.address); err != nil {
 		return 0, err
@@ -67,6 +73,7 @@ func (c *i2cConnection) ReadByte() (val byte, err error) {
 	return c.bus.ReadByte()
 }
 
+// ReadByteData reads a byte value for a register on the i2c device
 func (c *i2cConnection) ReadByteData(reg uint8) (val uint8, err error) {
 	if err := c.bus.SetAddress(c.address); err != nil {
 		return 0, err
@@ -74,6 +81,7 @@ func (c *i2cConnection) ReadByteData(reg uint8) (val uint8, err error) {
 	return c.bus.ReadByteData(reg)
 }
 
+// ReadWordData reads a word value for a register on the i2c device
 func (c *i2cConnection) ReadWordData(reg uint8) (val uint16, err error) {
 	if err := c.bus.SetAddress(c.address); err != nil {
 		return 0, err
@@ -81,6 +89,7 @@ func (c *i2cConnection) ReadWordData(reg uint8) (val uint16, err error) {
 	return c.bus.ReadWordData(reg)
 }
 
+// ReadBlockData reads a block of bytes for a register on the i2c device
 func (c *i2cConnection) ReadBlockData(reg uint8, b []byte) (n int, err error) {
 	if err := c.bus.SetAddress(c.address); err != nil {
 		return 0, err
@@ -88,6 +97,7 @@ func (c *i2cConnection) ReadBlockData(reg uint8, b []byte) (n int, err error) {
 	return c.bus.ReadBlockData(reg, b)
 }
 
+// WriteByte writes a single byte to the i2c device
 func (c *i2cConnection) WriteByte(val byte) (err error) {
 	if err := c.bus.SetAddress(c.address); err != nil {
 		return err
@@ -95,6 +105,7 @@ func (c *i2cConnection) WriteByte(val byte) (err error) {
 	return c.bus.WriteByte(val)
 }
 
+// WriteByteData writes a byte value to a register on the i2c device
 func (c *i2cConnection) WriteByteData(reg uint8, val uint8) (err error) {
 	if err := c.bus.SetAddress(c.address); err != nil {
 		return err
@@ -102,6 +113,7 @@ func (c *i2cConnection) WriteByteData(reg uint8, val uint8) (err error) {
 	return c.bus.WriteByteData(reg, val)
 }
 
+// WriteWordData writes a word value to a register on the i2c device
 func (c *i2cConnection) WriteWordData(reg uint8, val uint16) (err error) {
 	if err := c.bus.SetAddress(c.address); err != nil {
 		return err
@@ -109,6 +121,7 @@ func (c *i2cConnection) WriteWordData(reg uint8, val uint16) (err error) {
 	return c.bus.WriteWordData(reg, val)
 }
 
+// WriteBlockData writes a block of bytes to a register on the i2c device
 func (c *i2cConnection) WriteBlockData(reg uint8, b []byte) (err error) {
 	if err := c.bus.SetAddress(c.address); err != nil {
 		return err
@@ -116,7 +129,8 @@ func (c *i2cConnection) WriteBlockData(reg uint8, b []byte) (err error) {
 	return c.bus.WriteBlockData(reg, b)
 }
 
-// I2cConnector provides access to the I2C buses on platforms that support them.
+// I2cConnector lets Adaotors provide the interface for Drivers
+// to get access to the I2C buses on platforms that support I2C.
 type I2cConnector interface {
 	// I2cGetConnection returns a connection to device at the specified address
 	// and bus. Bus numbering starts at index 0, the range of valid buses is
