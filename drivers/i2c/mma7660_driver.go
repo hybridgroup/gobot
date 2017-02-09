@@ -2,8 +2,6 @@ package i2c
 
 import "gobot.io/x/gobot"
 
-var _ gobot.Driver = (*MMA7660Driver)(nil)
-
 const mma7660Address = 0x4c
 
 const (
@@ -34,14 +32,23 @@ type MMA7660Driver struct {
 	name       string
 	connector  I2cConnector
 	connection I2cConnection
+	I2cBusser
 }
 
 // NewMMA7660Driver creates a new driver with specified i2c interface
-func NewMMA7660Driver(a I2cConnector) *MMA7660Driver {
-	return &MMA7660Driver{
+func NewMMA7660Driver(a I2cConnector, options ...func(I2cBusser)) *MMA7660Driver {
+	m := &MMA7660Driver{
 		name:      gobot.DefaultName("MMA7660"),
 		connector: a,
+		I2cBusser: NewI2cBusser(),
 	}
+
+	for _, option := range options {
+		option(m)
+	}
+
+	// TODO: add commands for API
+	return m
 }
 
 func (h *MMA7660Driver) Name() string                 { return h.name }
@@ -50,7 +57,10 @@ func (h *MMA7660Driver) Connection() gobot.Connection { return h.connector.(gobo
 
 // Start initialized the mma7660
 func (h *MMA7660Driver) Start() (err error) {
-	bus := h.connector.I2cGetDefaultBus()
+	if h.GetBus() == BusNotInitialized {
+		h.Bus(h.connector.I2cGetDefaultBus())
+	}
+	bus := h.GetBus()
 
 	h.connection, err = h.connector.I2cGetConnection(mma7660Address, bus)
 	if err != nil {

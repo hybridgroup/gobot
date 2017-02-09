@@ -74,8 +74,9 @@ func (b *BlinkMDriver) Start() (err error) {
 	if b.GetBus() == BusNotInitialized {
 		b.Bus(b.connector.I2cGetDefaultBus())
 	}
+	bus := b.GetBus()
 
-	b.connection, err = b.connector.I2cGetConnection(blinkmAddress, b.GetBus())
+	b.connection, err = b.connector.I2cGetConnection(blinkmAddress, bus)
 	if err != nil {
 		return
 	}

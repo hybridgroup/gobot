@@ -7,8 +7,11 @@ import (
 	"os"
 	"testing"
 
+	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/gobottest"
 )
+
+var _ gobot.Driver = (*MCP23017Driver)(nil)
 
 var pinValPort = map[string]interface{}{
 	"pin":  uint8(7),

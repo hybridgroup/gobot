@@ -21,9 +21,10 @@ const bmp180RegisterPressureMSB = 0xF6
 // BMP180Driver is the gobot driver for the Bosch pressure sensor BMP180.
 // Device datasheet: https://cdn-shop.adafruit.com/datasheets/BST-BMP180-DS000-09.pdf
 type BMP180Driver struct {
-	name                    string
-	connector               I2cConnector
-	connection              I2cConnection
+	name       string
+	connector  I2cConnector
+	connection I2cConnection
+	I2cBusser
 	calibrationCoefficients *calibrationCoefficients
 }
 
@@ -56,12 +57,20 @@ type calibrationCoefficients struct {
 }
 
 // NewBMP180Driver creates a new driver with the i2c interface for the BMP180 device.
-func NewBMP180Driver(c I2cConnector) *BMP180Driver {
-	return &BMP180Driver{
+func NewBMP180Driver(c I2cConnector, options ...func(I2cBusser)) *BMP180Driver {
+	b := &BMP180Driver{
 		name:                    gobot.DefaultName("BMP180"),
 		connector:               c,
+		I2cBusser:               NewI2cBusser(),
 		calibrationCoefficients: &calibrationCoefficients{},
 	}
+
+	for _, option := range options {
+		option(b)
+	}
+
+	// TODO: expose commands to API
+	return b
 }
 
 // Name returns the name of the device.
@@ -81,7 +90,11 @@ func (d *BMP180Driver) Connection() gobot.Connection {
 
 // Start initializes the BMP180 and loads the calibration coefficients.
 func (d *BMP180Driver) Start() (err error) {
-	bus := d.connector.I2cGetDefaultBus()
+	if d.GetBus() == BusNotInitialized {
+		d.Bus(d.connector.I2cGetDefaultBus())
+	}
+	bus := d.GetBus()
+
 	if d.connection, err = d.connector.I2cGetConnection(bmp180Address, bus); err != nil {
 		return err
 	}

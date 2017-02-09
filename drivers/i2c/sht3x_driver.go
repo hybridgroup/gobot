@@ -55,9 +55,10 @@ var (
 type SHT3xDriver struct {
 	Units string
 
-	name         string
-	connector    I2cConnector
-	connection   I2cConnection
+	name       string
+	connector  I2cConnector
+	connection I2cConnection
+	I2cBusser
 	sht3xAddress int
 	accuracy     byte
 	delay        time.Duration
@@ -65,15 +66,21 @@ type SHT3xDriver struct {
 }
 
 // NewSHT3xDriver creates a new driver with specified i2c interface
-func NewSHT3xDriver(a I2cConnector) *SHT3xDriver {
+func NewSHT3xDriver(a I2cConnector, options ...func(I2cBusser)) *SHT3xDriver {
 	s := &SHT3xDriver{
 		Units:        "C",
 		name:         gobot.DefaultName("SHT3x"),
 		connector:    a,
+		I2cBusser:    NewI2cBusser(),
 		sht3xAddress: SHT3xAddressA,
 		crcTable:     crc8.MakeTable(crc8Params),
 	}
 	s.SetAccuracy(SHT3xAccuracyHigh)
+
+	for _, option := range options {
+		option(s)
+	}
+
 	return s
 }
 
@@ -88,7 +95,11 @@ func (s *SHT3xDriver) Connection() gobot.Connection { return s.connector.(gobot.
 
 // Start initializes the SHT3x
 func (s *SHT3xDriver) Start() (err error) {
-	bus := s.connector.I2cGetDefaultBus()
+	if s.GetBus() == BusNotInitialized {
+		s.Bus(s.connector.I2cGetDefaultBus())
+	}
+	bus := s.GetBus()
+
 	s.connection, err = s.connector.I2cGetConnection(s.sht3xAddress, bus)
 	return
 }

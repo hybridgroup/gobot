@@ -12,8 +12,9 @@ type WiichuckDriver struct {
 	name       string
 	connector  I2cConnector
 	connection I2cConnection
-	interval   time.Duration
-	pauseTime  time.Duration
+	I2cBusser
+	interval  time.Duration
+	pauseTime time.Duration
 	gobot.Eventer
 	joystick map[string]float64
 	data     map[string]float64
@@ -26,10 +27,11 @@ type WiichuckDriver struct {
 //	"c" - Gets triggered every interval amount of time if the c button is pressed
 //	"joystick" - Gets triggered every "interval" amount of time if a joystick event occurred, you can access values x, y
 //	"error" - Gets triggered whenever the WiichuckDriver encounters an error
-func NewWiichuckDriver(a I2cConnector, v ...time.Duration) *WiichuckDriver {
+func NewWiichuckDriver(a I2cConnector, options ...func(I2cBusser)) *WiichuckDriver {
 	w := &WiichuckDriver{
 		name:      gobot.DefaultName("Wiichuck"),
 		connector: a,
+		I2cBusser: NewI2cBusser(),
 		interval:  10 * time.Millisecond,
 		pauseTime: 1 * time.Millisecond,
 		Eventer:   gobot.NewEventer(),
@@ -45,14 +47,15 @@ func NewWiichuckDriver(a I2cConnector, v ...time.Duration) *WiichuckDriver {
 		},
 	}
 
-	if len(v) > 0 {
-		w.interval = v[0]
+	for _, option := range options {
+		option(w)
 	}
 
 	w.AddEvent(Z)
 	w.AddEvent(C)
 	w.AddEvent(Joystick)
 	w.AddEvent(Error)
+
 	return w
 }
 func (w *WiichuckDriver) Name() string                 { return w.name }
@@ -62,7 +65,11 @@ func (w *WiichuckDriver) Connection() gobot.Connection { return w.connector.(gob
 // Start initilizes i2c and reads from adaptor
 // using specified interval to update with new value
 func (w *WiichuckDriver) Start() (err error) {
-	bus := w.connector.I2cGetDefaultBus()
+	if w.GetBus() == BusNotInitialized {
+		w.Bus(w.connector.I2cGetDefaultBus())
+	}
+	bus := w.GetBus()
+
 	w.connection, err = w.connector.I2cGetConnection(wiichuckAddress, bus)
 	if err != nil {
 		return err

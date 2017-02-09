@@ -28,7 +28,8 @@ type MPL115A2Driver struct {
 	name       string
 	connector  I2cConnector
 	connection I2cConnection
-	interval   time.Duration
+	I2cBusser
+	interval time.Duration
 	gobot.Eventer
 	A0          float32
 	B1          float32
@@ -39,18 +40,22 @@ type MPL115A2Driver struct {
 }
 
 // NewMPL115A2Driver creates a new driver with specified i2c interface
-func NewMPL115A2Driver(a I2cConnector, v ...time.Duration) *MPL115A2Driver {
+func NewMPL115A2Driver(a I2cConnector, options ...func(I2cBusser)) *MPL115A2Driver {
 	m := &MPL115A2Driver{
 		name:      gobot.DefaultName("MPL115A2"),
 		connector: a,
+		I2cBusser: NewI2cBusser(),
 		Eventer:   gobot.NewEventer(),
 		interval:  10 * time.Millisecond,
 	}
 
-	if len(v) > 0 {
-		m.interval = v[0]
+	for _, option := range options {
+		option(m)
 	}
+
+	// TODO: add commands to API
 	m.AddEvent(Error)
+
 	return m
 }
 
@@ -116,7 +121,11 @@ func (h *MPL115A2Driver) initialization() (err error) {
 	var coB2 int16
 	var coC12 int16
 
-	bus := h.connector.I2cGetDefaultBus()
+	if h.GetBus() == BusNotInitialized {
+		h.Bus(h.connector.I2cGetDefaultBus())
+	}
+	bus := h.GetBus()
+
 	h.connection, err = h.connector.I2cGetConnection(mpl115a2Address, bus)
 	if err != nil {
 		return err

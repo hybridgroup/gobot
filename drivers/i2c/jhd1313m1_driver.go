@@ -41,8 +41,6 @@ const (
 	LCD_2NDLINEOFFSET = 0x40
 )
 
-var _ gobot.Driver = (*JHD1313M1Driver)(nil)
-
 // CustomLCDChars is a map of CGRAM characters that can be loaded
 // into a LCD screen to display custom characters. Some LCD screens such
 // as the Grove screen (jhd1313m1) isn't loaded with latin 1 characters.
@@ -73,8 +71,9 @@ var CustomLCDChars = map[string][8]byte{
 // This module was tested with the Seed Grove LCD RGB Backlight v2.0 display which requires 5V to operate.
 // http://www.seeedstudio.com/wiki/Grove_-_LCD_RGB_Backlight
 type JHD1313M1Driver struct {
-	name          string
-	connector     I2cConnector
+	name      string
+	connector I2cConnector
+	I2cBusser
 	lcdAddress    int
 	lcdConnection I2cConnection
 	rgbAddress    int
@@ -82,13 +81,20 @@ type JHD1313M1Driver struct {
 }
 
 // NewJHD1313M1Driver creates a new driver with specified i2c interface.
-func NewJHD1313M1Driver(a I2cConnector) *JHD1313M1Driver {
-	return &JHD1313M1Driver{
+func NewJHD1313M1Driver(a I2cConnector, options ...func(I2cBusser)) *JHD1313M1Driver {
+	j := &JHD1313M1Driver{
 		name:       gobot.DefaultName("JHD1313M1"),
 		connector:  a,
+		I2cBusser:  NewI2cBusser(),
 		lcdAddress: 0x3E,
 		rgbAddress: 0x62,
 	}
+
+	for _, option := range options {
+		option(j)
+	}
+
+	return j
 }
 
 // Name returns the name the JHD1313M1 Driver was given when created.
@@ -104,7 +110,11 @@ func (h *JHD1313M1Driver) Connection() gobot.Connection {
 
 // Start starts the backlit and the screen and initializes the states.
 func (h *JHD1313M1Driver) Start() (err error) {
-	bus := h.connector.I2cGetDefaultBus()
+	if h.GetBus() == BusNotInitialized {
+		h.Bus(h.connector.I2cGetDefaultBus())
+	}
+	bus := h.GetBus()
+
 	if h.lcdConnection, err = h.connector.I2cGetConnection(h.lcdAddress, bus); err != nil {
 		return err
 	}

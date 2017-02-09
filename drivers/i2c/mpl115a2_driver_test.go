@@ -1,6 +1,7 @@
 package i2c
 
 import (
+	"strings"
 	"testing"
 	"time"
 
@@ -37,10 +38,7 @@ func TestMPL115A2Driver(t *testing.T) {
 	mpl := initTestMPL115A2Driver()
 
 	gobottest.Refute(t, mpl.Connection(), nil)
-	gobottest.Assert(t, mpl.interval, 10*time.Millisecond)
-
-	mpl = NewMPL115A2Driver(newI2cTestAdaptor(), 100*time.Millisecond)
-	gobottest.Assert(t, mpl.interval, 100*time.Millisecond)
+	gobottest.Assert(t, strings.HasPrefix(mpl.Name(), "MPL115A2"), true)
 }
 
 func TestMPL115A2DriverStart(t *testing.T) {

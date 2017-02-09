@@ -1,6 +1,7 @@
 package i2c
 
 import (
+	"strings"
 	"testing"
 	"time"
 
@@ -37,8 +38,8 @@ func TestWiichuckDriver(t *testing.T) {
 	gobottest.Refute(t, wii.Connection(), nil)
 	gobottest.Assert(t, wii.interval, 10*time.Millisecond)
 
-	wii = NewWiichuckDriver(newI2cTestAdaptor(), 100*time.Millisecond)
-	gobottest.Assert(t, wii.interval, 100*time.Millisecond)
+	wii = NewWiichuckDriver(newI2cTestAdaptor())
+	gobottest.Assert(t, strings.HasPrefix(wii.Name(), "Wiichuck"), true)
 }
 
 func TestWiichuckDriverStart(t *testing.T) {

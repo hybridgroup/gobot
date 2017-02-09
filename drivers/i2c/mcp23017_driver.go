@@ -20,16 +20,11 @@ import (
 	"fmt"
 	"log"
 	"strings"
-	"time"
 
 	"gobot.io/x/gobot"
 )
 
-var (
-	debug = false // Set this to true to see debugging information
-	// Register this Driver
-	_ gobot.Driver = (*MCP23017Driver)(nil)
-)
+var debug = false // Set this to true to see debugging information
 
 // Port contains all the registers for the device.
 type port struct {
@@ -80,25 +75,30 @@ func (mc *MCP23017Config) GetUint8Value() uint8 {
 
 // MCP23017Driver contains the driver configuration parameters.
 type MCP23017Driver struct {
-	name            string
-	connector       I2cConnector
-	connection      I2cConnection
+	name       string
+	connector  I2cConnector
+	connection I2cConnection
+	I2cBusser
 	conf            MCP23017Config
 	mcp23017Address int
-	interval        time.Duration
 	gobot.Commander
 	gobot.Eventer
 }
 
 // NewMCP23017Driver creates a new driver with specified i2c interface.
-func NewMCP23017Driver(a I2cConnector, conf MCP23017Config, deviceAddress int, v ...time.Duration) *MCP23017Driver {
+func NewMCP23017Driver(a I2cConnector, conf MCP23017Config, deviceAddress int, options ...func(I2cBusser)) *MCP23017Driver {
 	m := &MCP23017Driver{
 		name:            gobot.DefaultName("MCP23017"),
 		connector:       a,
+		I2cBusser:       NewI2cBusser(),
 		conf:            conf,
 		mcp23017Address: deviceAddress,
 		Commander:       gobot.NewCommander(),
 		Eventer:         gobot.NewEventer(),
+	}
+
+	for _, option := range options {
+		option(m)
 	}
 
 	m.AddCommand("WriteGPIO", func(params map[string]interface{}) interface{} {
@@ -133,7 +133,11 @@ func (m *MCP23017Driver) Halt() (err error) { return }
 
 // Start writes the device configuration.
 func (m *MCP23017Driver) Start() (err error) {
-	bus := m.connector.I2cGetDefaultBus()
+	if m.GetBus() == BusNotInitialized {
+		m.Bus(m.connector.I2cGetDefaultBus())
+	}
+	bus := m.GetBus()
+
 	m.connection, err = m.connector.I2cGetConnection(m.mcp23017Address, bus)
 	if err != nil {
 		return err

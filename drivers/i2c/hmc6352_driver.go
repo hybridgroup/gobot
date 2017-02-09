@@ -9,14 +9,22 @@ type HMC6352Driver struct {
 	name       string
 	connector  I2cConnector
 	connection I2cConnection
+	I2cBusser
 }
 
 // NewHMC6352Driver creates a new driver with specified i2c interface
-func NewHMC6352Driver(a I2cConnector) *HMC6352Driver {
-	return &HMC6352Driver{
+func NewHMC6352Driver(a I2cConnector, options ...func(I2cBusser)) *HMC6352Driver {
+	hmc := &HMC6352Driver{
 		name:      gobot.DefaultName("HMC6352"),
 		connector: a,
+		I2cBusser: NewI2cBusser(),
 	}
+
+	for _, option := range options {
+		option(hmc)
+	}
+
+	return hmc
 }
 
 // Name returns the name for this Driver
@@ -30,7 +38,11 @@ func (h *HMC6352Driver) Connection() gobot.Connection { return h.connector.(gobo
 
 // Start initializes the hmc6352
 func (h *HMC6352Driver) Start() (err error) {
-	bus := h.connector.I2cGetDefaultBus()
+	if h.GetBus() == BusNotInitialized {
+		h.Bus(h.connector.I2cGetDefaultBus())
+	}
+	bus := h.GetBus()
+
 	h.connection, err = h.connector.I2cGetConnection(hmc6352Address, bus)
 	if err != nil {
 		return err

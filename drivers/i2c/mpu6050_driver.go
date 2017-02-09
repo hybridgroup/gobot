@@ -33,9 +33,10 @@ type ThreeDData struct {
 }
 
 type MPU6050Driver struct {
-	name          string
-	connector     I2cConnector
-	connection    I2cConnection
+	name       string
+	connector  I2cConnector
+	connection I2cConnection
+	I2cBusser
 	interval      time.Duration
 	Accelerometer ThreeDData
 	Gyroscope     ThreeDData

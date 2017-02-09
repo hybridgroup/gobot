@@ -98,6 +98,7 @@ type AdafruitMotorHatDriver struct {
 	connector          I2cConnector
 	motorHatConnection I2cConnection
 	servoHatConnection I2cConnection
+	I2cBusser
 	gobot.Commander
 	dcMotors      []adaFruitDCMotor
 	stepperMotors []adaFruitStepperMotor
@@ -128,7 +129,7 @@ func (a *AdafruitMotorHatDriver) Connection() gobot.Connection { return a.connec
 
 // NewAdafruitMotorHatDriver initializes the internal DCMotor and StepperMotor types.
 // Again the Adafruit Motor Hat supports up to four DC motors and up to two stepper motors.
-func NewAdafruitMotorHatDriver(conn I2cConnector) *AdafruitMotorHatDriver {
+func NewAdafruitMotorHatDriver(conn I2cConnector, options ...func(I2cBusser)) *AdafruitMotorHatDriver {
 	var dc []adaFruitDCMotor
 	var st []adaFruitStepperMotor
 	for i := 0; i < 4; i++ {
@@ -151,10 +152,16 @@ func NewAdafruitMotorHatDriver(conn I2cConnector) *AdafruitMotorHatDriver {
 	driver := &AdafruitMotorHatDriver{
 		name:          gobot.DefaultName("AdafruitMotorHat"),
 		connector:     conn,
+		I2cBusser:     NewI2cBusser(),
 		Commander:     gobot.NewCommander(),
 		dcMotors:      dc,
 		stepperMotors: st,
 	}
+
+	for _, option := range options {
+		option(driver)
+	}
+
 	// TODO: add API funcs?
 	return driver
 }
@@ -195,7 +202,11 @@ func (a *AdafruitMotorHatDriver) startDriver(connection I2cConnection) (err erro
 
 // Start initializes both I2C-addressable Adafruit Motor HAT drivers
 func (a *AdafruitMotorHatDriver) Start() (err error) {
-	bus := a.connector.I2cGetDefaultBus()
+	if a.GetBus() == BusNotInitialized {
+		a.Bus(a.connector.I2cGetDefaultBus())
+	}
+
+	bus := a.GetBus()
 
 	if a.servoHatConnection, err = a.connector.I2cGetConnection(servoHatAddress, bus); err != nil {
 		return
