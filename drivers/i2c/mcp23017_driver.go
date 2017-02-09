@@ -86,6 +86,13 @@ type MCP23017Driver struct {
 }
 
 // NewMCP23017Driver creates a new driver with specified i2c interface.
+// Params:
+//		conn I2cConnector - the Adaptor to use with this Driver
+//
+// Optional params:
+//		i2c.Bus(int):	bus to use with this driver
+//		i2c.Address(int):	address to use with this driver
+//
 func NewMCP23017Driver(a I2cConnector, conf MCP23017Config, deviceAddress int, options ...func(I2cConfig)) *MCP23017Driver {
 	m := &MCP23017Driver{
 		name:            gobot.DefaultName("MCP23017"),

@@ -36,6 +36,13 @@ type MMA7660Driver struct {
 }
 
 // NewMMA7660Driver creates a new driver with specified i2c interface
+// Params:
+//		conn I2cConnector - the Adaptor to use with this Driver
+//
+// Optional params:
+//		i2c.Bus(int):	bus to use with this driver
+//		i2c.Address(int):	address to use with this driver
+//
 func NewMMA7660Driver(a I2cConnector, options ...func(I2cConfig)) *MMA7660Driver {
 	m := &MMA7660Driver{
 		name:      gobot.DefaultName("MMA7660"),

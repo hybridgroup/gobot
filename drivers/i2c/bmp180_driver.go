@@ -57,6 +57,13 @@ type calibrationCoefficients struct {
 }
 
 // NewBMP180Driver creates a new driver with the i2c interface for the BMP180 device.
+// Params:
+//		conn I2cConnector - the Adaptor to use with this Driver
+//
+// Optional params:
+//		i2c.Bus(int):	bus to use with this driver
+//		i2c.Address(int):	address to use with this driver
+//
 func NewBMP180Driver(c I2cConnector, options ...func(I2cConfig)) *BMP180Driver {
 	b := &BMP180Driver{
 		name:                    gobot.DefaultName("BMP180"),

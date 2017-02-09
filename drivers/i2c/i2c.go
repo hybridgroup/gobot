@@ -14,10 +14,7 @@ var (
 )
 
 const (
-	Error    = "error"
-	Joystick = "joystick"
-	C        = "c"
-	Z        = "z"
+	Error = "error"
 )
 
 const (

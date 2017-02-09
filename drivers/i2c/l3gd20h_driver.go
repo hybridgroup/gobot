@@ -44,6 +44,13 @@ const (
 )
 
 // NewL3GD20HDriver creates a new driver with the i2c interface for the L3GD20H device.
+// Params:
+//		conn I2cConnector - the Adaptor to use with this Driver
+//
+// Optional params:
+//		i2c.Bus(int):	bus to use with this driver
+//		i2c.Address(int):	address to use with this driver
+//
 func NewL3GD20HDriver(c I2cConnector, options ...func(I2cConfig)) *L3GD20HDriver {
 	l := &L3GD20HDriver{
 		name:      gobot.DefaultName("L3GD20H"),

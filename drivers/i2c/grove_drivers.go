@@ -9,6 +9,13 @@ type GroveLcdDriver struct {
 }
 
 // NewGroveLcdDriver creates a new driver with specified i2c interface.
+// Params:
+//		conn I2cConnector - the Adaptor to use with this Driver
+//
+// Optional params:
+//		i2c.Bus(int):	bus to use with this driver
+//		i2c.Address(int):	address to use with this driver
+//
 func NewGroveLcdDriver(a I2cConnector, options ...func(I2cConfig)) *GroveLcdDriver {
 	lcd := &GroveLcdDriver{
 		JHD1313M1Driver: NewJHD1313M1Driver(a),

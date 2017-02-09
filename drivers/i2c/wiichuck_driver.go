@@ -6,6 +6,17 @@ import (
 	"gobot.io/x/gobot"
 )
 
+const (
+	// Joystick event when the Wiichuck joystick is moved
+	Joystick = "joystick"
+
+	// C event when the Wiichuck "C" button is pressed
+	C = "c"
+
+	// Z event when the Wiichuck "C" button is pressed
+	Z = "z"
+)
+
 const wiichuckAddress = 0x52
 
 type WiichuckDriver struct {
@@ -22,11 +33,13 @@ type WiichuckDriver struct {
 
 // NewWiichuckDriver creates a WiichuckDriver with specified i2c interface.
 //
-// It adds the following events:
-//	"z"- Gets triggered every interval amount of time if the z button is pressed
-//	"c" - Gets triggered every interval amount of time if the c button is pressed
-//	"joystick" - Gets triggered every "interval" amount of time if a joystick event occurred, you can access values x, y
-//	"error" - Gets triggered whenever the WiichuckDriver encounters an error
+// Params:
+//		conn I2cConnector - the Adaptor to use with this Driver
+//
+// Optional params:
+//		i2c.Bus(int):	bus to use with this driver
+//		i2c.Address(int):	address to use with this driver
+//
 func NewWiichuckDriver(a I2cConnector, options ...func(I2cConfig)) *WiichuckDriver {
 	w := &WiichuckDriver{
 		name:      gobot.DefaultName("Wiichuck"),

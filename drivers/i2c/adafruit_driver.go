@@ -129,6 +129,13 @@ func (a *AdafruitMotorHatDriver) Connection() gobot.Connection { return a.connec
 
 // NewAdafruitMotorHatDriver initializes the internal DCMotor and StepperMotor types.
 // Again the Adafruit Motor Hat supports up to four DC motors and up to two stepper motors.
+// Params:
+//		conn I2cConnector - the Adaptor to use with this Driver
+//
+// Optional params:
+//		i2c.Bus(int):	bus to use with this driver
+//		i2c.Address(int):	address to use with this driver
+//
 func NewAdafruitMotorHatDriver(conn I2cConnector, options ...func(I2cConfig)) *AdafruitMotorHatDriver {
 	var dc []adaFruitDCMotor
 	var st []adaFruitStepperMotor

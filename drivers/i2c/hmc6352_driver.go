@@ -13,6 +13,13 @@ type HMC6352Driver struct {
 }
 
 // NewHMC6352Driver creates a new driver with specified i2c interface
+// Params:
+//		conn I2cConnector - the Adaptor to use with this Driver
+//
+// Optional params:
+//		i2c.Bus(int):	bus to use with this driver
+//		i2c.Address(int):	address to use with this driver
+//
 func NewHMC6352Driver(a I2cConnector, options ...func(I2cConfig)) *HMC6352Driver {
 	hmc := &HMC6352Driver{
 		name:      gobot.DefaultName("HMC6352"),

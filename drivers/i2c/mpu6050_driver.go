@@ -45,6 +45,13 @@ type MPU6050Driver struct {
 }
 
 // NewMPU6050Driver creates a new driver with specified i2c interface
+// Params:
+//		conn I2cConnector - the Adaptor to use with this Driver
+//
+// Optional params:
+//		i2c.Bus(int):	bus to use with this driver
+//		i2c.Address(int):	address to use with this driver
+//
 func NewMPU6050Driver(a I2cConnector, options ...func(I2cConfig)) *MPU6050Driver {
 	m := &MPU6050Driver{
 		name:      gobot.DefaultName("MPU6050"),

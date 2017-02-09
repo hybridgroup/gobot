@@ -81,6 +81,12 @@ type JHD1313M1Driver struct {
 }
 
 // NewJHD1313M1Driver creates a new driver with specified i2c interface.
+// Params:
+//		conn I2cConnector - the Adaptor to use with this Driver
+//
+// Optional params:
+//		i2c.Bus(int):	bus to use with this driver
+//
 func NewJHD1313M1Driver(a I2cConnector, options ...func(I2cConfig)) *JHD1313M1Driver {
 	j := &JHD1313M1Driver{
 		name:       gobot.DefaultName("JHD1313M1"),

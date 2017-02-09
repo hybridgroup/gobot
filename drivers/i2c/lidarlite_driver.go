@@ -16,6 +16,13 @@ type LIDARLiteDriver struct {
 }
 
 // NewLIDARLiteDriver creates a new driver with specified i2c interface
+// Params:
+//		conn I2cConnector - the Adaptor to use with this Driver
+//
+// Optional params:
+//		i2c.Bus(int):	bus to use with this driver
+//		i2c.Address(int):	address to use with this driver
+//
 func NewLIDARLiteDriver(a I2cConnector, options ...func(I2cConfig)) *LIDARLiteDriver {
 	l := &LIDARLiteDriver{
 		name:      gobot.DefaultName("LIDARLite"),

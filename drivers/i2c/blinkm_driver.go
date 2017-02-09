@@ -19,11 +19,13 @@ type BlinkMDriver struct {
 
 // NewBlinkMDriver creates a new BlinkMDriver.
 //
-// Adds the following API commands:
-//	Rgb - sets RGB color
-//	Fade - fades the RGB color
-//	FirmwareVersion - returns the version of the current Frimware
-//	Color - returns the color of the LED.
+// Params:
+//		conn I2cConnector - the Adaptor to use with this Driver
+//
+// Optional params:
+//		i2c.Bus(int):	bus to use with this driver
+//		i2c.Address(int):	address to use with this driver
+//
 func NewBlinkMDriver(a I2cConnector, options ...func(I2cConfig)) *BlinkMDriver {
 	b := &BlinkMDriver{
 		name:      gobot.DefaultName("BlinkM"),

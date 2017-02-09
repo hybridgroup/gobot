@@ -40,6 +40,13 @@ type MPL115A2Driver struct {
 }
 
 // NewMPL115A2Driver creates a new driver with specified i2c interface
+// Params:
+//		conn I2cConnector - the Adaptor to use with this Driver
+//
+// Optional params:
+//		i2c.Bus(int):	bus to use with this driver
+//		i2c.Address(int):	address to use with this driver
+//
 func NewMPL115A2Driver(a I2cConnector, options ...func(I2cConfig)) *MPL115A2Driver {
 	m := &MPL115A2Driver{
 		name:      gobot.DefaultName("MPL115A2"),
