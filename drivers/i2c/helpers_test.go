@@ -36,7 +36,7 @@ func (t *i2cTestAdaptor) Close() error {
 	return nil
 }
 
-func (t *i2cTestAdaptor) ReadByte() (val uint8, err error) {
+func (t *i2cTestAdaptor) ReadByte() (val byte, err error) {
 	bytes := []byte{0}
 	bytesRead, err := t.i2cReadImpl(bytes)
 	if err != nil {
@@ -82,7 +82,7 @@ func (t *i2cTestAdaptor) ReadBlockData(_ uint8, b []byte) (n int, err error) {
 	return bytesRead, err
 }
 
-func (t *i2cTestAdaptor) WriteByte(val uint8) (err error) {
+func (t *i2cTestAdaptor) WriteByte(val byte) (err error) {
 	t.written = append(t.written, val)
 	bytes := []byte{val}
 	_, err = t.i2cWriteImpl(bytes)

@@ -60,7 +60,7 @@ func (c *i2cConnection) Close() error {
 	return c.bus.Close()
 }
 
-func (c *i2cConnection) ReadByte() (val uint8, err error) {
+func (c *i2cConnection) ReadByte() (val byte, err error) {
 	if err := c.bus.SetAddress(c.address); err != nil {
 		return 0, err
 	}
@@ -88,7 +88,7 @@ func (c *i2cConnection) ReadBlockData(reg uint8, b []byte) (n int, err error) {
 	return c.bus.ReadBlockData(reg, b)
 }
 
-func (c *i2cConnection) WriteByte(val uint8) (err error) {
+func (c *i2cConnection) WriteByte(val byte) (err error) {
 	if err := c.bus.SetAddress(c.address); err != nil {
 		return err
 	}
