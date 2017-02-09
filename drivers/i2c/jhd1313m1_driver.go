@@ -73,7 +73,7 @@ var CustomLCDChars = map[string][8]byte{
 type JHD1313M1Driver struct {
 	name      string
 	connector I2cConnector
-	I2cBusser
+	I2cConfig
 	lcdAddress    int
 	lcdConnection I2cConnection
 	rgbAddress    int
@@ -81,11 +81,11 @@ type JHD1313M1Driver struct {
 }
 
 // NewJHD1313M1Driver creates a new driver with specified i2c interface.
-func NewJHD1313M1Driver(a I2cConnector, options ...func(I2cBusser)) *JHD1313M1Driver {
+func NewJHD1313M1Driver(a I2cConnector, options ...func(I2cConfig)) *JHD1313M1Driver {
 	j := &JHD1313M1Driver{
 		name:       gobot.DefaultName("JHD1313M1"),
 		connector:  a,
-		I2cBusser:  NewI2cBusser(),
+		I2cConfig:  NewI2cConfig(),
 		lcdAddress: 0x3E,
 		rgbAddress: 0x62,
 	}
@@ -110,10 +110,7 @@ func (h *JHD1313M1Driver) Connection() gobot.Connection {
 
 // Start starts the backlit and the screen and initializes the states.
 func (h *JHD1313M1Driver) Start() (err error) {
-	if h.GetBus() == BusNotInitialized {
-		h.Bus(h.connector.I2cGetDefaultBus())
-	}
-	bus := h.GetBus()
+	bus := h.GetBus(h.connector.I2cGetDefaultBus())
 
 	if h.lcdConnection, err = h.connector.I2cGetConnection(h.lcdAddress, bus); err != nil {
 		return err

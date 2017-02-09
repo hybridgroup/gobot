@@ -32,15 +32,15 @@ type MMA7660Driver struct {
 	name       string
 	connector  I2cConnector
 	connection I2cConnection
-	I2cBusser
+	I2cConfig
 }
 
 // NewMMA7660Driver creates a new driver with specified i2c interface
-func NewMMA7660Driver(a I2cConnector, options ...func(I2cBusser)) *MMA7660Driver {
+func NewMMA7660Driver(a I2cConnector, options ...func(I2cConfig)) *MMA7660Driver {
 	m := &MMA7660Driver{
 		name:      gobot.DefaultName("MMA7660"),
 		connector: a,
-		I2cBusser: NewI2cBusser(),
+		I2cConfig: NewI2cConfig(),
 	}
 
 	for _, option := range options {
@@ -57,12 +57,10 @@ func (h *MMA7660Driver) Connection() gobot.Connection { return h.connector.(gobo
 
 // Start initialized the mma7660
 func (h *MMA7660Driver) Start() (err error) {
-	if h.GetBus() == BusNotInitialized {
-		h.Bus(h.connector.I2cGetDefaultBus())
-	}
-	bus := h.GetBus()
+	bus := h.GetBus(h.connector.I2cGetDefaultBus())
+	address := h.GetAddress(mma7660Address)
 
-	h.connection, err = h.connector.I2cGetConnection(mma7660Address, bus)
+	h.connection, err = h.connector.I2cGetConnection(address, bus)
 	if err != nil {
 		return err
 	}

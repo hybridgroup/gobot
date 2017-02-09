@@ -36,7 +36,7 @@ type MPU6050Driver struct {
 	name       string
 	connector  I2cConnector
 	connection I2cConnection
-	I2cBusser
+	I2cConfig
 	interval      time.Duration
 	Accelerometer ThreeDData
 	Gyroscope     ThreeDData
@@ -45,11 +45,11 @@ type MPU6050Driver struct {
 }
 
 // NewMPU6050Driver creates a new driver with specified i2c interface
-func NewMPU6050Driver(a I2cConnector, options ...func(I2cBusser)) *MPU6050Driver {
+func NewMPU6050Driver(a I2cConnector, options ...func(I2cConfig)) *MPU6050Driver {
 	m := &MPU6050Driver{
 		name:      gobot.DefaultName("MPU6050"),
 		connector: a,
-		I2cBusser: NewI2cBusser(),
+		I2cConfig: NewI2cConfig(),
 		interval:  10 * time.Millisecond,
 		Eventer:   gobot.NewEventer(),
 	}
@@ -103,12 +103,10 @@ func (h *MPU6050Driver) Start() (err error) {
 func (h *MPU6050Driver) Halt() (err error) { return }
 
 func (h *MPU6050Driver) initialize() (err error) {
-	if h.GetBus() == BusNotInitialized {
-		h.Bus(h.connector.I2cGetDefaultBus())
-	}
-	bus := h.GetBus()
+	bus := h.GetBus(h.connector.I2cGetDefaultBus())
+	address := h.GetAddress(mpu6050Address)
 
-	h.connection, err = h.connector.I2cGetConnection(mpu6050Address, bus)
+	h.connection, err = h.connector.I2cGetConnection(address, bus)
 	if err != nil {
 		return err
 	}

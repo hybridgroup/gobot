@@ -39,7 +39,7 @@ func TestMPU6050Driver(t *testing.T) {
 	gobottest.Assert(t, mpu.interval, 10*time.Millisecond)
 
 	mpu = NewMPU6050Driver(newI2cTestAdaptor(), Bus(2))
-	gobottest.Assert(t, mpu.GetBus(), 2)
+	gobottest.Assert(t, mpu.GetBus(1), 2)
 
 	gobottest.Refute(t, mpu.Connection(), nil)
 	gobottest.Assert(t, strings.HasPrefix(mpu.Name(), "MPU6050"), true)

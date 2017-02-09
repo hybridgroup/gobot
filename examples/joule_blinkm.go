@@ -11,7 +11,7 @@ import (
 
 func main() {
 	e := joule.NewAdaptor()
-	blinkm := i2c.NewBlinkMDriver(e, i2c.Bus(2))
+	blinkm := i2c.NewBlinkMDriver(e, i2c.Bus(0), i2c.Address(0x09))
 
 	work := func() {
 		gobot.Every(1*time.Second, func() {

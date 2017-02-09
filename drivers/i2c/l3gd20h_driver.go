@@ -27,7 +27,7 @@ type L3GD20HDriver struct {
 	name       string
 	connector  I2cConnector
 	connection I2cConnection
-	I2cBusser
+	I2cConfig
 	scale L3GD20HScale
 }
 
@@ -44,11 +44,11 @@ const (
 )
 
 // NewL3GD20HDriver creates a new driver with the i2c interface for the L3GD20H device.
-func NewL3GD20HDriver(c I2cConnector, options ...func(I2cBusser)) *L3GD20HDriver {
+func NewL3GD20HDriver(c I2cConnector, options ...func(I2cConfig)) *L3GD20HDriver {
 	l := &L3GD20HDriver{
 		name:      gobot.DefaultName("L3GD20H"),
 		connector: c,
-		I2cBusser: NewI2cBusser(),
+		I2cConfig: NewI2cConfig(),
 		scale:     L3GD20HScale250dps,
 	}
 
@@ -94,12 +94,10 @@ func (d *L3GD20HDriver) Start() (err error) {
 }
 
 func (d *L3GD20HDriver) initialization() (err error) {
-	if d.GetBus() == BusNotInitialized {
-		d.Bus(d.connector.I2cGetDefaultBus())
-	}
-	bus := d.GetBus()
+	bus := d.GetBus(d.connector.I2cGetDefaultBus())
+	address := d.GetAddress(l3gd20hAddress)
 
-	d.connection, err = d.connector.I2cGetConnection(l3gd20hAddress, bus)
+	d.connection, err = d.connector.I2cGetConnection(address, bus)
 	if err != nil {
 		return err
 	}

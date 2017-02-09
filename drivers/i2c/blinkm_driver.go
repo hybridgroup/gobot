@@ -13,7 +13,7 @@ type BlinkMDriver struct {
 	name       string
 	connector  I2cConnector
 	connection I2cConnection
-	I2cBusser
+	I2cConfig
 	gobot.Commander
 }
 
@@ -24,12 +24,12 @@ type BlinkMDriver struct {
 //	Fade - fades the RGB color
 //	FirmwareVersion - returns the version of the current Frimware
 //	Color - returns the color of the LED.
-func NewBlinkMDriver(a I2cConnector, options ...func(I2cBusser)) *BlinkMDriver {
+func NewBlinkMDriver(a I2cConnector, options ...func(I2cConfig)) *BlinkMDriver {
 	b := &BlinkMDriver{
 		name:      gobot.DefaultName("BlinkM"),
 		Commander: gobot.NewCommander(),
 		connector: a,
-		I2cBusser: NewI2cBusser(),
+		I2cConfig: NewI2cConfig(),
 	}
 
 	for _, option := range options {
@@ -71,12 +71,10 @@ func (b *BlinkMDriver) Connection() gobot.Connection { return b.connection.(gobo
 
 // Start starts the Driver up, and writes start command
 func (b *BlinkMDriver) Start() (err error) {
-	if b.GetBus() == BusNotInitialized {
-		b.Bus(b.connector.I2cGetDefaultBus())
-	}
-	bus := b.GetBus()
+	bus := b.GetBus(b.connector.I2cGetDefaultBus())
+	address := b.GetAddress(blinkmAddress)
 
-	b.connection, err = b.connector.I2cGetConnection(blinkmAddress, bus)
+	b.connection, err = b.connector.I2cGetConnection(address, bus)
 	if err != nil {
 		return
 	}

@@ -21,7 +21,8 @@ const (
 )
 
 const (
-	BusNotInitialized = -1
+	BusNotInitialized     = -1
+	AddressNotInitialized = -1
 )
 
 // I2cConnection is a connection to an I2C device with a specified address
@@ -140,38 +141,70 @@ type I2cConnector interface {
 	I2cGetDefaultBus() int
 }
 
-type i2cBusser struct {
-	bus int
+type i2cConfig struct {
+	bus     int
+	address int
 }
 
-// I2cBusser is the interface which describes how a Driver can specify
-// which I2C bus it wants to use
-type I2cBusser interface {
+// I2cConfig is the interface which describes how a Driver can specify
+// optional I2C params such as which I2C bus it wants to use
+type I2cConfig interface {
 	// Bus sets which bus to use
 	Bus(bus int)
 
 	// GetBus gets which bus to use
-	GetBus() int
+	GetBus(def int) int
+
+	// Address sets which address to use
+	Address(address int)
+
+	// GetAddress gets which address to use
+	GetAddress(def int) int
 }
 
-// NewI2cBusser returns a new I2cBusser.
-func NewI2cBusser() I2cBusser {
-	return &i2cBusser{}
+// NewI2cConfig returns a new I2cConfig.
+func NewI2cConfig() I2cConfig {
+	return &i2cConfig{bus: BusNotInitialized, address: AddressNotInitialized}
 }
 
-// Bus sets which bus to use
-func (i *i2cBusser) Bus(bus int) {
+// Bus sets preferred bus to use
+func (i *i2cConfig) Bus(bus int) {
 	i.bus = bus
 }
 
 // GetBus gets which bus to use
-func (i *i2cBusser) GetBus() int {
+func (i *i2cConfig) GetBus(d int) int {
+	if i.bus == BusNotInitialized {
+		return d
+	}
+
 	return i.bus
 }
 
 // Bus sets which bus to use as a optional param
-func Bus(bus int) func(I2cBusser) {
-	return func(i I2cBusser) {
+func Bus(bus int) func(I2cConfig) {
+	return func(i I2cConfig) {
 		i.Bus(bus)
+	}
+}
+
+// Address sets which address to use
+func (i *i2cConfig) Address(address int) {
+	i.address = address
+}
+
+// GetAddress gets which address to use
+func (i *i2cConfig) GetAddress(a int) int {
+	if i.address == AddressNotInitialized {
+		return a
+	}
+
+	return i.address
+}
+
+// Address sets which address to use as a optional param
+func Address(address int) func(I2cConfig) {
+	return func(i I2cConfig) {
+		i.Address(address)
 	}
 }
