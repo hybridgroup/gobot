@@ -45,17 +45,20 @@ type MPU6050Driver struct {
 }
 
 // NewMPU6050Driver creates a new driver with specified i2c interface
-func NewMPU6050Driver(a I2cConnector, v ...time.Duration) *MPU6050Driver {
+func NewMPU6050Driver(a I2cConnector, options ...func(I2cBusser)) *MPU6050Driver {
 	m := &MPU6050Driver{
-		name:      gobot.DefaultName("MPM6050"),
+		name:      gobot.DefaultName("MPU6050"),
 		connector: a,
+		I2cBusser: NewI2cBusser(),
 		interval:  10 * time.Millisecond,
 		Eventer:   gobot.NewEventer(),
 	}
 
-	if len(v) > 0 {
-		m.interval = v[0]
+	for _, option := range options {
+		option(m)
 	}
+
+	// TODO: add commands to API
 
 	m.AddEvent(Error)
 	return m
@@ -100,7 +103,11 @@ func (h *MPU6050Driver) Start() (err error) {
 func (h *MPU6050Driver) Halt() (err error) { return }
 
 func (h *MPU6050Driver) initialize() (err error) {
-	bus := h.connector.I2cGetDefaultBus()
+	if h.GetBus() == BusNotInitialized {
+		h.Bus(h.connector.I2cGetDefaultBus())
+	}
+	bus := h.GetBus()
+
 	h.connection, err = h.connector.I2cGetConnection(mpu6050Address, bus)
 	if err != nil {
 		return err
