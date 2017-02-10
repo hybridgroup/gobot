@@ -6,20 +6,24 @@ import (
 	"gobot.io/x/gobot/sysfs"
 )
 
+const (
+	// Error event
+	Error = "error"
+)
+
+const (
+	// BusNotInitialized is the initial value for a bus
+	BusNotInitialized = -1
+
+	// AddressNotInitialized is the initial value for an address
+	AddressNotInitialized = -1
+)
+
 var (
 	ErrEncryptedBytes  = errors.New("Encrypted bytes")
 	ErrNotEnoughBytes  = errors.New("Not enough bytes read")
 	ErrNotReady        = errors.New("Device is not ready")
 	ErrInvalidPosition = errors.New("Invalid position value")
-)
-
-const (
-	Error = "error"
-)
-
-const (
-	BusNotInitialized     = -1
-	AddressNotInitialized = -1
 )
 
 // Connection is a connection to an I2C device with a specified address
@@ -34,13 +38,51 @@ type i2cConnection struct {
 	address int
 }
 
+// Connector lets Adaptors provide the interface for Drivers
+// to get access to the I2C buses on platforms that support I2C.
+type Connector interface {
+	// GetConnection returns a connection to device at the specified address
+	// and bus. Bus numbering starts at index 0, the range of valid buses is
+	// platform specific.
+	GetConnection(address int, bus int) (device Connection, err error)
+
+	// GetDefaultBus returns the default I2C bus index
+	GetDefaultBus() int
+}
+
+type i2cConfig struct {
+	bus     int
+	address int
+}
+
+// Config is the interface which describes how a Driver can specify
+// optional I2C params such as which I2C bus it wants to use.
+type Config interface {
+	// WithBus sets which bus to use
+	WithBus(bus int)
+
+	// GetBusOrDefault gets which bus to use
+	GetBusOrDefault(def int) int
+
+	// WithAddress sets which address to use
+	WithAddress(address int)
+
+	// GetAddressOrDefault gets which address to use
+	GetAddressOrDefault(def int) int
+}
+
 // NewConnection creates and returns a new connection to a specific
-// i2c device on a bus and address
+// i2c device on a bus and address.
 func NewConnection(bus sysfs.I2cDevice, address int) (connection *i2cConnection) {
 	return &i2cConnection{bus: bus, address: address}
 }
 
-// Read data from an i2c device
+// NewConfig returns a new I2c Config.
+func NewConfig() Config {
+	return &i2cConfig{bus: BusNotInitialized, address: AddressNotInitialized}
+}
+
+// Read data from an i2c device.
 func (c *i2cConnection) Read(data []byte) (read int, err error) {
 	if err := c.bus.SetAddress(c.address); err != nil {
 		return 0, err
@@ -125,44 +167,6 @@ func (c *i2cConnection) WriteBlockData(reg uint8, b []byte) (err error) {
 		return err
 	}
 	return c.bus.WriteBlockData(reg, b)
-}
-
-// Connector lets Adaptors provide the interface for Drivers
-// to get access to the I2C buses on platforms that support I2C.
-type Connector interface {
-	// GetConnection returns a connection to device at the specified address
-	// and bus. Bus numbering starts at index 0, the range of valid buses is
-	// platform specific.
-	GetConnection(address int, bus int) (device Connection, err error)
-
-	// GetDefaultBus returns the default I2C bus index
-	GetDefaultBus() int
-}
-
-type i2cConfig struct {
-	bus     int
-	address int
-}
-
-// Config is the interface which describes how a Driver can specify
-// optional I2C params such as which I2C bus it wants to use
-type Config interface {
-	// WithBus sets which bus to use
-	WithBus(bus int)
-
-	// GetBusOrDefault gets which bus to use
-	GetBusOrDefault(def int) int
-
-	// WithAddress sets which address to use
-	WithAddress(address int)
-
-	// GetAddressOrDefault gets which address to use
-	GetAddressOrDefault(def int) int
-}
-
-// NewConfig returns a new I2c Config.
-func NewConfig() Config {
-	return &i2cConfig{bus: BusNotInitialized, address: AddressNotInitialized}
 }
 
 // WithBus sets preferred bus to use.
