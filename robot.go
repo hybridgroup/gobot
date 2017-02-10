@@ -94,12 +94,13 @@ func (r *Robots) Each(f func(*Robot)) {
 	}
 }
 
-// NewRobot returns a new Robot given optional accepts:
+// NewRobot returns a new Robot. It supports the following optional params:
 //
+//		name:	string with the name of the Robot. A name will be automatically generated if no name is supplied.
 // 	[]Connection: Connections which are automatically started and stopped with the robot
-//	[]Device: Devices which are automatically started and stopped with the robot
-//	func(): The work routine the robot will execute once all devices and connections have been initialized and started
-// A name will be automaically generated if no name is supplied.
+//		[]Device: Devices which are automatically started and stopped with the robot
+//		func(): The work routine the robot will execute once all devices and connections have been initialized and started
+//
 func NewRobot(v ...interface{}) *Robot {
 	r := &Robot{
 		Name:        fmt.Sprintf("%X", Rand(int(^uint(0)>>1))),
