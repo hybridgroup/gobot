@@ -115,11 +115,11 @@ func (t *i2cTestAdaptor) WriteBlockData(reg uint8, b []byte) (err error) {
 	return
 }
 
-func (t *i2cTestAdaptor) I2cGetConnection( /* address */ int /* bus */, int) (connection I2cConnection, err error) {
+func (t *i2cTestAdaptor) GetConnection( /* address */ int /* bus */, int) (connection Connection, err error) {
 	return t, nil
 }
 
-func (t *i2cTestAdaptor) I2cGetDefaultBus() int {
+func (t *i2cTestAdaptor) GetDefaultBus() int {
 	return 0
 }
 

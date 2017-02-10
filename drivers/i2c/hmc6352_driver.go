@@ -7,24 +7,24 @@ const hmc6352Address = 0x21
 // HMC6352Driver is a Driver for a HMC6352 digital compass
 type HMC6352Driver struct {
 	name       string
-	connector  I2cConnector
-	connection I2cConnection
-	I2cConfig
+	connector  Connector
+	connection Connection
+	Config
 }
 
 // NewHMC6352Driver creates a new driver with specified i2c interface
 // Params:
-//		conn I2cConnector - the Adaptor to use with this Driver
+//		conn Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//		i2c.Bus(int):	bus to use with this driver
-//		i2c.Address(int):	address to use with this driver
+//		i2c.WithBus(int):	bus to use with this driver
+//		i2c.WithAddress(int):	address to use with this driver
 //
-func NewHMC6352Driver(a I2cConnector, options ...func(I2cConfig)) *HMC6352Driver {
+func NewHMC6352Driver(a Connector, options ...func(Config)) *HMC6352Driver {
 	hmc := &HMC6352Driver{
 		name:      gobot.DefaultName("HMC6352"),
 		connector: a,
-		I2cConfig: NewI2cConfig(),
+		Config:    NewConfig(),
 	}
 
 	for _, option := range options {
@@ -45,10 +45,10 @@ func (h *HMC6352Driver) Connection() gobot.Connection { return h.connector.(gobo
 
 // Start initializes the hmc6352
 func (h *HMC6352Driver) Start() (err error) {
-	bus := h.GetBus(h.connector.I2cGetDefaultBus())
-	address := h.GetAddress(hmc6352Address)
+	bus := h.GetBusOrDefault(h.connector.GetDefaultBus())
+	address := h.GetAddressOrDefault(hmc6352Address)
 
-	h.connection, err = h.connector.I2cGetConnection(address, bus)
+	h.connection, err = h.connector.GetConnection(address, bus)
 	if err != nil {
 		return err
 	}

@@ -22,21 +22,21 @@ const (
 	AddressNotInitialized = -1
 )
 
-// I2cConnection is a connection to an I2C device with a specified address
+// Connection is a connection to an I2C device with a specified address
 // on a specific bus. Used as an alternative to the I2c interface.
 // Implements sysfs.I2cOperations to talk to the device, wrapping the
 // calls in SetAddress to always target the specified device.
 // Provided by an Adaptor by implementing the I2cConnector interface.
-type I2cConnection sysfs.I2cOperations
+type Connection sysfs.I2cOperations
 
 type i2cConnection struct {
 	bus     sysfs.I2cDevice
 	address int
 }
 
-// NewI2cConnection creates and returns a new connection to a specific
+// NewConnection creates and returns a new connection to a specific
 // i2c device on a bus and address
-func NewI2cConnection(bus sysfs.I2cDevice, address int) (connection *i2cConnection) {
+func NewConnection(bus sysfs.I2cDevice, address int) (connection *i2cConnection) {
 	return &i2cConnection{bus: bus, address: address}
 }
 
@@ -127,15 +127,16 @@ func (c *i2cConnection) WriteBlockData(reg uint8, b []byte) (err error) {
 	return c.bus.WriteBlockData(reg, b)
 }
 
-// I2cConnector lets Adaotors provide the interface for Drivers
+// Connector lets Adaptors provide the interface for Drivers
 // to get access to the I2C buses on platforms that support I2C.
-type I2cConnector interface {
-	// I2cGetConnection returns a connection to device at the specified address
+type Connector interface {
+	// GetConnection returns a connection to device at the specified address
 	// and bus. Bus numbering starts at index 0, the range of valid buses is
 	// platform specific.
-	I2cGetConnection(address int, bus int) (device I2cConnection, err error)
-	// I2cGetDefaultBus returns the default I2C bus index
-	I2cGetDefaultBus() int
+	GetConnection(address int, bus int) (device Connection, err error)
+
+	// GetDefaultBus returns the default I2C bus index
+	GetDefaultBus() int
 }
 
 type i2cConfig struct {
@@ -143,34 +144,35 @@ type i2cConfig struct {
 	address int
 }
 
-// I2cConfig is the interface which describes how a Driver can specify
+// Config is the interface which describes how a Driver can specify
 // optional I2C params such as which I2C bus it wants to use
-type I2cConfig interface {
-	// Bus sets which bus to use
-	Bus(bus int)
+type Config interface {
+	// WithBus sets which bus to use
+	WithBus(bus int)
 
-	// GetBus gets which bus to use
-	GetBus(def int) int
+	// GetBusOrDefault gets which bus to use
+	GetBusOrDefault(def int) int
 
-	// Address sets which address to use
-	Address(address int)
+	// WithAddress sets which address to use
+	WithAddress(address int)
 
-	// GetAddress gets which address to use
-	GetAddress(def int) int
+	// GetAddressOrDefault gets which address to use
+	GetAddressOrDefault(def int) int
 }
 
-// NewI2cConfig returns a new I2cConfig.
-func NewI2cConfig() I2cConfig {
+// NewConfig returns a new I2c Config.
+func NewConfig() Config {
 	return &i2cConfig{bus: BusNotInitialized, address: AddressNotInitialized}
 }
 
-// Bus sets preferred bus to use
-func (i *i2cConfig) Bus(bus int) {
+// WithBus sets preferred bus to use.
+func (i *i2cConfig) WithBus(bus int) {
 	i.bus = bus
 }
 
-// GetBus gets which bus to use
-func (i *i2cConfig) GetBus(d int) int {
+// GetBusOrDefault returns which bus to use, either the one set using WithBus(),
+// or the default value which is passed in as the one param.
+func (i *i2cConfig) GetBusOrDefault(d int) int {
 	if i.bus == BusNotInitialized {
 		return d
 	}
@@ -178,20 +180,22 @@ func (i *i2cConfig) GetBus(d int) int {
 	return i.bus
 }
 
-// Bus sets which bus to use as a optional param
-func Bus(bus int) func(I2cConfig) {
-	return func(i I2cConfig) {
-		i.Bus(bus)
+// WithBus sets which bus to use as a optional param
+func WithBus(bus int) func(Config) {
+	return func(i Config) {
+		i.WithBus(bus)
 	}
 }
 
-// Address sets which address to use
-func (i *i2cConfig) Address(address int) {
+// WithAddress sets which address to use
+func (i *i2cConfig) WithAddress(address int) {
 	i.address = address
 }
 
-// GetAddress gets which address to use
-func (i *i2cConfig) GetAddress(a int) int {
+// GetAddressOrDefault returns which address to use, either
+// the one set using WithBus(), or the default value which
+// is passed in as the param.
+func (i *i2cConfig) GetAddressOrDefault(a int) int {
 	if i.address == AddressNotInitialized {
 		return a
 	}
@@ -199,9 +203,9 @@ func (i *i2cConfig) GetAddress(a int) int {
 	return i.address
 }
 
-// Address sets which address to use as a optional param
-func Address(address int) func(I2cConfig) {
-	return func(i I2cConfig) {
-		i.Address(address)
+// WithAddress sets which address to use as a optional param
+func WithAddress(address int) func(Config) {
+	return func(i Config) {
+		i.WithAddress(address)
 	}
 }

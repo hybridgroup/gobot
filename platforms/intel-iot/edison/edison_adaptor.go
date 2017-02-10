@@ -30,7 +30,7 @@ func readFile(path string) ([]byte, error) {
 	}
 
 	buf := make([]byte, 200)
-	var i = 0
+	var i int
 	i, err = file.Read(buf)
 	if i == 0 {
 		return buf, err
@@ -423,10 +423,10 @@ func (e *Adaptor) AnalogRead(pin string) (val int, err error) {
 	return val / 4, err
 }
 
-// I2cGetConnection returns a connection to a device on a specified bus.
+// GetConnection returns an i2c connection to a device on a specified bus.
 // Valid bus numbers are 1 and 6 (arduino).
-func (e *Adaptor) I2cGetConnection(address int, bus int) (connection i2c.I2cConnection, err error) {
-	if !(bus == e.I2cGetDefaultBus()) {
+func (e *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection, err error) {
+	if !(bus == e.GetDefaultBus()) {
 		return nil, errors.New("Unsupported I2C bus")
 	}
 	if e.i2cBus == nil {
@@ -435,15 +435,15 @@ func (e *Adaptor) I2cGetConnection(address int, bus int) (connection i2c.I2cConn
 		}
 		e.i2cBus, err = sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
 	}
-	return i2c.NewI2cConnection(e.i2cBus, address), err
+	return i2c.NewConnection(e.i2cBus, address), err
 }
 
-func (e *Adaptor) I2cGetDefaultBus() int {
+// GetDefaultBus returns the default i2c bus for this platform
+func (e *Adaptor) GetDefaultBus() int {
 	// Arduino uses bus 6
 	if e.board == "arduino" {
 		return 6
-	} else {
-		// all other default to 1
-		return 1
 	}
+
+	return 1
 }

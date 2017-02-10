@@ -11,27 +11,27 @@ const blinkmAddress = 0x09
 // BlinkMDriver is a Gobot Driver for a BlinkM LED
 type BlinkMDriver struct {
 	name       string
-	connector  I2cConnector
-	connection I2cConnection
-	I2cConfig
+	connector  Connector
+	connection Connection
+	Config
 	gobot.Commander
 }
 
 // NewBlinkMDriver creates a new BlinkMDriver.
 //
 // Params:
-//		conn I2cConnector - the Adaptor to use with this Driver
+//		conn Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//		i2c.Bus(int):	bus to use with this driver
-//		i2c.Address(int):	address to use with this driver
+//		i2c.WithBus(int):	bus to use with this driver
+//		i2c.WithAddress(int):	address to use with this driver
 //
-func NewBlinkMDriver(a I2cConnector, options ...func(I2cConfig)) *BlinkMDriver {
+func NewBlinkMDriver(a Connector, options ...func(Config)) *BlinkMDriver {
 	b := &BlinkMDriver{
 		name:      gobot.DefaultName("BlinkM"),
 		Commander: gobot.NewCommander(),
 		connector: a,
-		I2cConfig: NewI2cConfig(),
+		Config:    NewConfig(),
 	}
 
 	for _, option := range options {
@@ -44,16 +44,19 @@ func NewBlinkMDriver(a I2cConnector, options ...func(I2cConfig)) *BlinkMDriver {
 		blue := byte(params["blue"].(float64))
 		return b.Rgb(red, green, blue)
 	})
+
 	b.AddCommand("Fade", func(params map[string]interface{}) interface{} {
 		red := byte(params["red"].(float64))
 		green := byte(params["green"].(float64))
 		blue := byte(params["blue"].(float64))
 		return b.Fade(red, green, blue)
 	})
+
 	b.AddCommand("FirmwareVersion", func(params map[string]interface{}) interface{} {
 		version, err := b.FirmwareVersion()
 		return map[string]interface{}{"version": version, "err": err}
 	})
+
 	b.AddCommand("Color", func(params map[string]interface{}) interface{} {
 		color, err := b.Color()
 		return map[string]interface{}{"color": color, "err": err}
@@ -73,10 +76,10 @@ func (b *BlinkMDriver) Connection() gobot.Connection { return b.connection.(gobo
 
 // Start starts the Driver up, and writes start command
 func (b *BlinkMDriver) Start() (err error) {
-	bus := b.GetBus(b.connector.I2cGetDefaultBus())
-	address := b.GetAddress(blinkmAddress)
+	bus := b.GetBusOrDefault(b.connector.GetDefaultBus())
+	address := b.GetAddressOrDefault(blinkmAddress)
 
-	b.connection, err = b.connector.I2cGetConnection(address, bus)
+	b.connection, err = b.connector.GetConnection(address, bus)
 	if err != nil {
 		return
 	}

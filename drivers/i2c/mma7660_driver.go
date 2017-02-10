@@ -30,24 +30,24 @@ const (
 
 type MMA7660Driver struct {
 	name       string
-	connector  I2cConnector
-	connection I2cConnection
-	I2cConfig
+	connector  Connector
+	connection Connection
+	Config
 }
 
 // NewMMA7660Driver creates a new driver with specified i2c interface
 // Params:
-//		conn I2cConnector - the Adaptor to use with this Driver
+//		conn Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//		i2c.Bus(int):	bus to use with this driver
-//		i2c.Address(int):	address to use with this driver
+//		i2c.WithBus(int):	bus to use with this driver
+//		i2c.WithAddress(int):	address to use with this driver
 //
-func NewMMA7660Driver(a I2cConnector, options ...func(I2cConfig)) *MMA7660Driver {
+func NewMMA7660Driver(a Connector, options ...func(Config)) *MMA7660Driver {
 	m := &MMA7660Driver{
 		name:      gobot.DefaultName("MMA7660"),
 		connector: a,
-		I2cConfig: NewI2cConfig(),
+		Config:    NewConfig(),
 	}
 
 	for _, option := range options {
@@ -58,16 +58,21 @@ func NewMMA7660Driver(a I2cConnector, options ...func(I2cConfig)) *MMA7660Driver
 	return m
 }
 
-func (h *MMA7660Driver) Name() string                 { return h.name }
-func (h *MMA7660Driver) SetName(n string)             { h.name = n }
+// Name returns the Name for the Driver
+func (h *MMA7660Driver) Name() string { return h.name }
+
+// SetName sets the Name for the Driver
+func (h *MMA7660Driver) SetName(n string) { h.name = n }
+
+// Connection returns the connection for the Driver
 func (h *MMA7660Driver) Connection() gobot.Connection { return h.connector.(gobot.Connection) }
 
 // Start initialized the mma7660
 func (h *MMA7660Driver) Start() (err error) {
-	bus := h.GetBus(h.connector.I2cGetDefaultBus())
-	address := h.GetAddress(mma7660Address)
+	bus := h.GetBusOrDefault(h.connector.GetDefaultBus())
+	address := h.GetAddressOrDefault(mma7660Address)
 
-	h.connection, err = h.connector.I2cGetConnection(address, bus)
+	h.connection, err = h.connector.GetConnection(address, bus)
 	if err != nil {
 		return err
 	}

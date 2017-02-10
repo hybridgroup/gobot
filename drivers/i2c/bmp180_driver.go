@@ -22,9 +22,9 @@ const bmp180RegisterPressureMSB = 0xF6
 // Device datasheet: https://cdn-shop.adafruit.com/datasheets/BST-BMP180-DS000-09.pdf
 type BMP180Driver struct {
 	name       string
-	connector  I2cConnector
-	connection I2cConnection
-	I2cConfig
+	connector  Connector
+	connection Connection
+	Config
 	calibrationCoefficients *calibrationCoefficients
 }
 
@@ -58,17 +58,17 @@ type calibrationCoefficients struct {
 
 // NewBMP180Driver creates a new driver with the i2c interface for the BMP180 device.
 // Params:
-//		conn I2cConnector - the Adaptor to use with this Driver
+//		conn Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//		i2c.Bus(int):	bus to use with this driver
-//		i2c.Address(int):	address to use with this driver
+//		i2c.WithBus(int):	bus to use with this driver
+//		i2c.WithAddress(int):	address to use with this driver
 //
-func NewBMP180Driver(c I2cConnector, options ...func(I2cConfig)) *BMP180Driver {
+func NewBMP180Driver(c Connector, options ...func(Config)) *BMP180Driver {
 	b := &BMP180Driver{
 		name:                    gobot.DefaultName("BMP180"),
 		connector:               c,
-		I2cConfig:               NewI2cConfig(),
+		Config:                  NewConfig(),
 		calibrationCoefficients: &calibrationCoefficients{},
 	}
 
@@ -97,10 +97,10 @@ func (d *BMP180Driver) Connection() gobot.Connection {
 
 // Start initializes the BMP180 and loads the calibration coefficients.
 func (d *BMP180Driver) Start() (err error) {
-	bus := d.GetBus(d.connector.I2cGetDefaultBus())
-	address := d.GetAddress(bmp180Address)
+	bus := d.GetBusOrDefault(d.connector.GetDefaultBus())
+	address := d.GetAddressOrDefault(bmp180Address)
 
-	if d.connection, err = d.connector.I2cGetConnection(address, bus); err != nil {
+	if d.connection, err = d.connector.GetConnection(address, bus); err != nil {
 		return err
 	}
 	if err := d.initialization(); err != nil {

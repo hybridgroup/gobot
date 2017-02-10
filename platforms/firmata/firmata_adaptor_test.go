@@ -17,15 +17,14 @@ import (
 	"gobot.io/x/gobot/platforms/firmata/client"
 )
 
+// make sure that this Adaptor fullfills all the required interfaces
 var _ gobot.Adaptor = (*Adaptor)(nil)
-
 var _ gpio.DigitalReader = (*Adaptor)(nil)
 var _ gpio.DigitalWriter = (*Adaptor)(nil)
 var _ aio.AnalogReader = (*Adaptor)(nil)
 var _ gpio.PwmWriter = (*Adaptor)(nil)
 var _ gpio.ServoWriter = (*Adaptor)(nil)
-
-var _ i2c.I2cConnector = (*Adaptor)(nil)
+var _ i2c.Connector = (*Adaptor)(nil)
 
 type readWriteCloser struct{}
 
@@ -165,7 +164,7 @@ func TestAdaptorAnalogRead(t *testing.T) {
 
 func TestAdaptorI2cStart(t *testing.T) {
 	a := initTestAdaptor()
-	a.I2cGetConnection(0, 0)
+	a.GetConnection(0, 0)
 }
 
 func TestAdaptorI2cRead(t *testing.T) {
@@ -177,7 +176,7 @@ func TestAdaptorI2cRead(t *testing.T) {
 		a.board.Publish(a.board.Event("I2cReply"), i2cReply)
 	}()
 
-	con, err := a.I2cGetConnection(0, 0)
+	con, err := a.GetConnection(0, 0)
 	gobottest.Assert(t, err, nil)
 
 	response := []byte{12}
@@ -188,7 +187,7 @@ func TestAdaptorI2cRead(t *testing.T) {
 
 func TestAdaptorI2cWrite(t *testing.T) {
 	a := initTestAdaptor()
-	con, err := a.I2cGetConnection(0, 0)
+	con, err := a.GetConnection(0, 0)
 	gobottest.Assert(t, err, nil)
 	con.Write([]byte{0x00, 0x01})
 }

@@ -11,13 +11,12 @@ import (
 	"gobot.io/x/gobot/sysfs"
 )
 
+// make sure that this Adaptor fullfills all the required interfaces
 var _ gobot.Adaptor = (*Adaptor)(nil)
-
 var _ gpio.DigitalReader = (*Adaptor)(nil)
 var _ gpio.DigitalWriter = (*Adaptor)(nil)
 var _ gpio.PwmWriter = (*Adaptor)(nil)
-
-var _ i2c.I2cConnector = (*Adaptor)(nil)
+var _ i2c.Connector = (*Adaptor)(nil)
 
 type NullReadWriteCloser struct {
 	contents []byte
@@ -126,7 +125,7 @@ func TestAdaptorFinalize(t *testing.T) {
 	a.PwmWrite("25", 100)
 
 	sysfs.SetSyscall(&sysfs.MockSyscall{})
-	a.I2cGetConnection(0xff, 0)
+	a.GetConnection(0xff, 0)
 
 	gobottest.Assert(t, a.Finalize(), nil)
 
@@ -151,7 +150,7 @@ func TestAdaptorI2c(t *testing.T) {
 	a, _ := initTestAdaptor()
 
 	sysfs.SetSyscall(&sysfs.MockSyscall{})
-	con, err := a.I2cGetConnection(0xff, 0)
+	con, err := a.GetConnection(0xff, 0)
 	gobottest.Assert(t, err, nil)
 
 	con.Write([]byte{0x00, 0x01})

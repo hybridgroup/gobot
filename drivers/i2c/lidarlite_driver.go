@@ -10,24 +10,24 @@ const lidarliteAddress = 0x62
 
 type LIDARLiteDriver struct {
 	name       string
-	connector  I2cConnector
-	connection I2cConnection
-	I2cConfig
+	connector  Connector
+	connection Connection
+	Config
 }
 
 // NewLIDARLiteDriver creates a new driver with specified i2c interface
 // Params:
-//		conn I2cConnector - the Adaptor to use with this Driver
+//		conn Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//		i2c.Bus(int):	bus to use with this driver
-//		i2c.Address(int):	address to use with this driver
+//		i2c.WithBus(int):	bus to use with this driver
+//		i2c.WithAddress(int):	address to use with this driver
 //
-func NewLIDARLiteDriver(a I2cConnector, options ...func(I2cConfig)) *LIDARLiteDriver {
+func NewLIDARLiteDriver(a Connector, options ...func(Config)) *LIDARLiteDriver {
 	l := &LIDARLiteDriver{
 		name:      gobot.DefaultName("LIDARLite"),
 		connector: a,
-		I2cConfig: NewI2cConfig(),
+		Config:    NewConfig(),
 	}
 
 	for _, option := range options {
@@ -38,16 +38,21 @@ func NewLIDARLiteDriver(a I2cConnector, options ...func(I2cConfig)) *LIDARLiteDr
 	return l
 }
 
-func (h *LIDARLiteDriver) Name() string                 { return h.name }
-func (h *LIDARLiteDriver) SetName(n string)             { h.name = n }
+// Name returns the Name for the Driver
+func (h *LIDARLiteDriver) Name() string { return h.name }
+
+// SetName sets the Name for the Driver
+func (h *LIDARLiteDriver) SetName(n string) { h.name = n }
+
+// Connection returns the connection for the Driver
 func (h *LIDARLiteDriver) Connection() gobot.Connection { return h.connector.(gobot.Connection) }
 
 // Start initialized the LIDAR
 func (h *LIDARLiteDriver) Start() (err error) {
-	bus := h.GetBus(h.connector.I2cGetDefaultBus())
-	address := h.GetAddress(lidarliteAddress)
+	bus := h.GetBusOrDefault(h.connector.GetDefaultBus())
+	address := h.GetAddressOrDefault(lidarliteAddress)
 
-	h.connection, err = h.connector.I2cGetConnection(address, bus)
+	h.connection, err = h.connector.GetConnection(address, bus)
 	if err != nil {
 		return err
 	}

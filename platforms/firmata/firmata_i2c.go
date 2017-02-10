@@ -48,7 +48,7 @@ func (c *firmataI2cConnection) Close() error {
 	return nil
 }
 
-func (c *firmataI2cConnection) ReadByte() (val uint8, err error) {
+func (c *firmataI2cConnection) ReadByte() (val byte, err error) {
 	buf := []byte{0}
 	if _, err = c.Read(buf); err != nil {
 		return
@@ -93,13 +93,13 @@ func (c *firmataI2cConnection) ReadBlockData(reg uint8, b []byte) (n int, err er
 	return bytesRead, err
 }
 
-func (c *firmataI2cConnection) WriteByte(val uint8) (err error) {
+func (c *firmataI2cConnection) WriteByte(val byte) (err error) {
 	buf := []byte{val}
 	_, err = c.Write(buf)
 	return
 }
 
-func (c *firmataI2cConnection) WriteByteData(reg uint8, val uint8) (err error) {
+func (c *firmataI2cConnection) WriteByteData(reg uint8, val byte) (err error) {
 	buf := []byte{reg, val}
 	_, err = c.Write(buf)
 	return

@@ -221,9 +221,9 @@ func (f *Adaptor) digitalPin(pin int) int {
 	return pin + 14
 }
 
-// I2cGetConnection returns a connection to a device on a specified bus.
+// GetConnection returns an i2c connection to a device on a specified bus.
 // Only supports bus number 0
-func (f *Adaptor) I2cGetConnection(address int, bus int) (connection i2c.I2cConnection, err error) {
+func (f *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection, err error) {
 	if bus != 0 {
 		return nil, fmt.Errorf("Invalid bus number %d, only 0 is supported", bus)
 	}
@@ -231,6 +231,7 @@ func (f *Adaptor) I2cGetConnection(address int, bus int) (connection i2c.I2cConn
 	return NewFirmataI2cConnection(f, address), err
 }
 
-func (c *Adaptor) I2cGetDefaultBus() int {
+// GetDefaultBus returns the default i2c bus for this platform
+func (f *Adaptor) GetDefaultBus() int {
 	return 0
 }

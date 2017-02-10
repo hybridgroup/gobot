@@ -76,9 +76,9 @@ func (mc *MCP23017Config) GetUint8Value() uint8 {
 // MCP23017Driver contains the driver configuration parameters.
 type MCP23017Driver struct {
 	name       string
-	connector  I2cConnector
-	connection I2cConnection
-	I2cConfig
+	connector  Connector
+	connection Connection
+	Config
 	conf            MCP23017Config
 	mcp23017Address int
 	gobot.Commander
@@ -87,17 +87,17 @@ type MCP23017Driver struct {
 
 // NewMCP23017Driver creates a new driver with specified i2c interface.
 // Params:
-//		conn I2cConnector - the Adaptor to use with this Driver
+//		conn Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//		i2c.Bus(int):	bus to use with this driver
-//		i2c.Address(int):	address to use with this driver
+//		i2c.WithBus(int):	bus to use with this driver
+//		i2c.WithAddress(int):	address to use with this driver
 //
-func NewMCP23017Driver(a I2cConnector, conf MCP23017Config, deviceAddress int, options ...func(I2cConfig)) *MCP23017Driver {
+func NewMCP23017Driver(a Connector, conf MCP23017Config, deviceAddress int, options ...func(Config)) *MCP23017Driver {
 	m := &MCP23017Driver{
 		name:            gobot.DefaultName("MCP23017"),
 		connector:       a,
-		I2cConfig:       NewI2cConfig(),
+		Config:          NewConfig(),
 		conf:            conf,
 		mcp23017Address: deviceAddress,
 		Commander:       gobot.NewCommander(),
@@ -140,10 +140,10 @@ func (m *MCP23017Driver) Halt() (err error) { return }
 
 // Start writes the device configuration.
 func (m *MCP23017Driver) Start() (err error) {
-	bus := m.GetBus(m.connector.I2cGetDefaultBus())
-	address := m.GetAddress(m.mcp23017Address)
+	bus := m.GetBusOrDefault(m.connector.GetDefaultBus())
+	address := m.GetAddressOrDefault(m.mcp23017Address)
 
-	m.connection, err = m.connector.I2cGetConnection(address, bus)
+	m.connection, err = m.connector.GetConnection(address, bus)
 	if err != nil {
 		return err
 	}

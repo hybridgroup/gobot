@@ -174,19 +174,20 @@ func (c *Adaptor) DigitalWrite(pin string, val byte) (err error) {
 	return sysfsPin.Write(int(val))
 }
 
-// I2cGetConnection returns a connection to a device on a specified bus.
+// GetConnection returns a connection to a device on a specified bus.
 // Valid bus number is [0..2] which corresponds to /dev/i2c-0 through /dev/i2c-2.
-func (c *Adaptor) I2cGetConnection(address int, bus int) (connection i2c.I2cConnection, err error) {
+func (c *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection, err error) {
 	if (bus < 0) || (bus > 2) {
 		return nil, fmt.Errorf("Bus number %d out of range", bus)
 	}
 	if c.i2cBuses[bus] == nil {
 		c.i2cBuses[bus], err = sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
 	}
-	return i2c.NewI2cConnection(c.i2cBuses[bus], address), err
+	return i2c.NewConnection(c.i2cBuses[bus], address), err
 }
 
-func (c *Adaptor) I2cGetDefaultBus() int {
+// GetDefaultBus returns the default i2c bus for this platform
+func (c *Adaptor) GetDefaultBus() int {
 	return 1
 }
 

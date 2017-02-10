@@ -34,9 +34,9 @@ type ThreeDData struct {
 
 type MPU6050Driver struct {
 	name       string
-	connector  I2cConnector
-	connection I2cConnection
-	I2cConfig
+	connector  Connector
+	connection Connection
+	Config
 	interval      time.Duration
 	Accelerometer ThreeDData
 	Gyroscope     ThreeDData
@@ -46,17 +46,17 @@ type MPU6050Driver struct {
 
 // NewMPU6050Driver creates a new driver with specified i2c interface
 // Params:
-//		conn I2cConnector - the Adaptor to use with this Driver
+//		conn Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//		i2c.Bus(int):	bus to use with this driver
-//		i2c.Address(int):	address to use with this driver
+//		i2c.WithBus(int):	bus to use with this driver
+//		i2c.WithAddress(int):	address to use with this driver
 //
-func NewMPU6050Driver(a I2cConnector, options ...func(I2cConfig)) *MPU6050Driver {
+func NewMPU6050Driver(a Connector, options ...func(Config)) *MPU6050Driver {
 	m := &MPU6050Driver{
 		name:      gobot.DefaultName("MPU6050"),
 		connector: a,
-		I2cConfig: NewI2cConfig(),
+		Config:    NewConfig(),
 		interval:  10 * time.Millisecond,
 		Eventer:   gobot.NewEventer(),
 	}
@@ -71,8 +71,13 @@ func NewMPU6050Driver(a I2cConnector, options ...func(I2cConfig)) *MPU6050Driver
 	return m
 }
 
-func (h *MPU6050Driver) Name() string                 { return h.name }
-func (h *MPU6050Driver) SetName(n string)             { h.name = n }
+// Name returns the name of the device.
+func (h *MPU6050Driver) Name() string { return h.name }
+
+// SetName sets the name of the device.
+func (h *MPU6050Driver) SetName(n string) { h.name = n }
+
+// Connection returns the connection for the device.
 func (h *MPU6050Driver) Connection() gobot.Connection { return h.connector.(gobot.Connection) }
 
 // Start writes initialization bytes and reads from adaptor
@@ -110,10 +115,10 @@ func (h *MPU6050Driver) Start() (err error) {
 func (h *MPU6050Driver) Halt() (err error) { return }
 
 func (h *MPU6050Driver) initialize() (err error) {
-	bus := h.GetBus(h.connector.I2cGetDefaultBus())
-	address := h.GetAddress(mpu6050Address)
+	bus := h.GetBusOrDefault(h.connector.GetDefaultBus())
+	address := h.GetAddressOrDefault(mpu6050Address)
 
-	h.connection, err = h.connector.I2cGetConnection(address, bus)
+	h.connection, err = h.connector.GetConnection(address, bus)
 	if err != nil {
 		return err
 	}

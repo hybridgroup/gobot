@@ -26,9 +26,9 @@ const MPL115A2_REGISTER_STARTCONVERSION = 0x12
 
 type MPL115A2Driver struct {
 	name       string
-	connector  I2cConnector
-	connection I2cConnection
-	I2cConfig
+	connector  Connector
+	connection Connection
+	Config
 	interval time.Duration
 	gobot.Eventer
 	A0          float32
@@ -41,17 +41,17 @@ type MPL115A2Driver struct {
 
 // NewMPL115A2Driver creates a new driver with specified i2c interface
 // Params:
-//		conn I2cConnector - the Adaptor to use with this Driver
+//		conn Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//		i2c.Bus(int):	bus to use with this driver
-//		i2c.Address(int):	address to use with this driver
+//		i2c.WithBus(int):	bus to use with this driver
+//		i2c.WithAddress(int):	address to use with this driver
 //
-func NewMPL115A2Driver(a I2cConnector, options ...func(I2cConfig)) *MPL115A2Driver {
+func NewMPL115A2Driver(a Connector, options ...func(Config)) *MPL115A2Driver {
 	m := &MPL115A2Driver{
 		name:      gobot.DefaultName("MPL115A2"),
 		connector: a,
-		I2cConfig: NewI2cConfig(),
+		Config:    NewConfig(),
 		Eventer:   gobot.NewEventer(),
 		interval:  10 * time.Millisecond,
 	}
@@ -66,8 +66,13 @@ func NewMPL115A2Driver(a I2cConnector, options ...func(I2cConfig)) *MPL115A2Driv
 	return m
 }
 
-func (h *MPL115A2Driver) Name() string                 { return h.name }
-func (h *MPL115A2Driver) SetName(n string)             { h.name = n }
+// Name returns the name of the device.
+func (h *MPL115A2Driver) Name() string { return h.name }
+
+// SetName sets the name of the device.
+func (h *MPL115A2Driver) SetName(n string) { h.name = n }
+
+// Connection returns the Connection of the device.
 func (h *MPL115A2Driver) Connection() gobot.Connection { return h.connector.(gobot.Connection) }
 
 // Start writes initialization bytes and reads from adaptor
@@ -128,10 +133,10 @@ func (h *MPL115A2Driver) initialization() (err error) {
 	var coB2 int16
 	var coC12 int16
 
-	bus := h.GetBus(h.connector.I2cGetDefaultBus())
-	address := h.GetAddress(mpl115a2Address)
+	bus := h.GetBusOrDefault(h.connector.GetDefaultBus())
+	address := h.GetAddressOrDefault(mpl115a2Address)
 
-	h.connection, err = h.connector.I2cGetConnection(address, bus)
+	h.connection, err = h.connector.GetConnection(address, bus)
 	if err != nil {
 		return err
 	}

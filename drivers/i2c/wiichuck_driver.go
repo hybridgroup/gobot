@@ -21,9 +21,9 @@ const wiichuckAddress = 0x52
 
 type WiichuckDriver struct {
 	name       string
-	connector  I2cConnector
-	connection I2cConnection
-	I2cConfig
+	connector  Connector
+	connection Connection
+	Config
 	interval  time.Duration
 	pauseTime time.Duration
 	gobot.Eventer
@@ -34,17 +34,17 @@ type WiichuckDriver struct {
 // NewWiichuckDriver creates a WiichuckDriver with specified i2c interface.
 //
 // Params:
-//		conn I2cConnector - the Adaptor to use with this Driver
+//		conn Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//		i2c.Bus(int):	bus to use with this driver
-//		i2c.Address(int):	address to use with this driver
+//		i2c.WithBus(int):	bus to use with this driver
+//		i2c.WithAddress(int):	address to use with this driver
 //
-func NewWiichuckDriver(a I2cConnector, options ...func(I2cConfig)) *WiichuckDriver {
+func NewWiichuckDriver(a Connector, options ...func(Config)) *WiichuckDriver {
 	w := &WiichuckDriver{
 		name:      gobot.DefaultName("Wiichuck"),
 		connector: a,
-		I2cConfig: NewI2cConfig(),
+		Config:    NewConfig(),
 		interval:  10 * time.Millisecond,
 		pauseTime: 1 * time.Millisecond,
 		Eventer:   gobot.NewEventer(),
@@ -71,17 +71,23 @@ func NewWiichuckDriver(a I2cConnector, options ...func(I2cConfig)) *WiichuckDriv
 
 	return w
 }
-func (w *WiichuckDriver) Name() string                 { return w.name }
-func (w *WiichuckDriver) SetName(n string)             { w.name = n }
+
+// Name returns the name of the device.
+func (w *WiichuckDriver) Name() string { return w.name }
+
+// SetName sets the name of the device.
+func (w *WiichuckDriver) SetName(n string) { w.name = n }
+
+// Connection returns the connection for the device.
 func (w *WiichuckDriver) Connection() gobot.Connection { return w.connector.(gobot.Connection) }
 
 // Start initilizes i2c and reads from adaptor
 // using specified interval to update with new value
 func (w *WiichuckDriver) Start() (err error) {
-	bus := w.GetBus(w.connector.I2cGetDefaultBus())
-	address := w.GetAddress(wiichuckAddress)
+	bus := w.GetBusOrDefault(w.connector.GetDefaultBus())
+	address := w.GetAddressOrDefault(wiichuckAddress)
 
-	w.connection, err = w.connector.I2cGetConnection(address, bus)
+	w.connection, err = w.connector.GetConnection(address, bus)
 	if err != nil {
 		return err
 	}

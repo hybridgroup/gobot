@@ -56,9 +56,9 @@ type SHT3xDriver struct {
 	Units string
 
 	name       string
-	connector  I2cConnector
-	connection I2cConnection
-	I2cConfig
+	connector  Connector
+	connection Connection
+	Config
 	sht3xAddress int
 	accuracy     byte
 	delay        time.Duration
@@ -67,18 +67,18 @@ type SHT3xDriver struct {
 
 // NewSHT3xDriver creates a new driver with specified i2c interface
 // Params:
-//		conn I2cConnector - the Adaptor to use with this Driver
+//		conn Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//		i2c.Bus(int):	bus to use with this driver
-//		i2c.Address(int):	address to use with this driver
+//		i2c.WithBus(int):	bus to use with this driver
+//		i2c.WithAddress(int):	address to use with this driver
 //
-func NewSHT3xDriver(a I2cConnector, options ...func(I2cConfig)) *SHT3xDriver {
+func NewSHT3xDriver(a Connector, options ...func(Config)) *SHT3xDriver {
 	s := &SHT3xDriver{
 		Units:        "C",
 		name:         gobot.DefaultName("SHT3x"),
 		connector:    a,
-		I2cConfig:    NewI2cConfig(),
+		Config:       NewConfig(),
 		sht3xAddress: SHT3xAddressA,
 		crcTable:     crc8.MakeTable(crc8Params),
 	}
@@ -102,10 +102,10 @@ func (s *SHT3xDriver) Connection() gobot.Connection { return s.connector.(gobot.
 
 // Start initializes the SHT3x
 func (s *SHT3xDriver) Start() (err error) {
-	bus := s.GetBus(s.connector.I2cGetDefaultBus())
-	address := s.GetAddress(s.sht3xAddress)
+	bus := s.GetBusOrDefault(s.connector.GetDefaultBus())
+	address := s.GetAddressOrDefault(s.sht3xAddress)
 
-	s.connection, err = s.connector.I2cGetConnection(address, bus)
+	s.connection, err = s.connector.GetConnection(address, bus)
 	return
 }
 

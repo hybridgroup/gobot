@@ -72,26 +72,26 @@ var CustomLCDChars = map[string][8]byte{
 // http://www.seeedstudio.com/wiki/Grove_-_LCD_RGB_Backlight
 type JHD1313M1Driver struct {
 	name      string
-	connector I2cConnector
-	I2cConfig
+	connector Connector
+	Config
 	lcdAddress    int
-	lcdConnection I2cConnection
+	lcdConnection Connection
 	rgbAddress    int
-	rgbConnection I2cConnection
+	rgbConnection Connection
 }
 
 // NewJHD1313M1Driver creates a new driver with specified i2c interface.
 // Params:
-//		conn I2cConnector - the Adaptor to use with this Driver
+//		conn Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//		i2c.Bus(int):	bus to use with this driver
+//		i2c.WithBus(int):	bus to use with this driver
 //
-func NewJHD1313M1Driver(a I2cConnector, options ...func(I2cConfig)) *JHD1313M1Driver {
+func NewJHD1313M1Driver(a Connector, options ...func(Config)) *JHD1313M1Driver {
 	j := &JHD1313M1Driver{
 		name:       gobot.DefaultName("JHD1313M1"),
 		connector:  a,
-		I2cConfig:  NewI2cConfig(),
+		Config:     NewConfig(),
 		lcdAddress: 0x3E,
 		rgbAddress: 0x62,
 	}
@@ -116,13 +116,13 @@ func (h *JHD1313M1Driver) Connection() gobot.Connection {
 
 // Start starts the backlit and the screen and initializes the states.
 func (h *JHD1313M1Driver) Start() (err error) {
-	bus := h.GetBus(h.connector.I2cGetDefaultBus())
+	bus := h.GetBusOrDefault(h.connector.GetDefaultBus())
 
-	if h.lcdConnection, err = h.connector.I2cGetConnection(h.lcdAddress, bus); err != nil {
+	if h.lcdConnection, err = h.connector.GetConnection(h.lcdAddress, bus); err != nil {
 		return err
 	}
 
-	if h.rgbConnection, err = h.connector.I2cGetConnection(h.rgbAddress, bus); err != nil {
+	if h.rgbConnection, err = h.connector.GetConnection(h.rgbAddress, bus); err != nil {
 		return err
 	}
 

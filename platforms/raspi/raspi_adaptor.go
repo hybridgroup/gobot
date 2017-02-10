@@ -164,20 +164,21 @@ func (r *Adaptor) DigitalWrite(pin string, val byte) (err error) {
 	return sysfsPin.Write(int(val))
 }
 
-// I2cGetConnection returns a connection to a device on a specified bus.
+// GetConnection returns an i2c connection to a device on a specified bus.
 // Valid bus number is [0..1] which corresponds to /dev/i2c-0 through /dev/i2c-1.
-func (c *Adaptor) I2cGetConnection(address int, bus int) (connection i2c.I2cConnection, err error) {
+func (r *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection, err error) {
 	if (bus < 0) || (bus > 1) {
 		return nil, fmt.Errorf("Bus number %d out of range", bus)
 	}
-	if c.i2cBuses[bus] == nil {
-		c.i2cBuses[bus], err = sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
+	if r.i2cBuses[bus] == nil {
+		r.i2cBuses[bus], err = sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
 	}
-	return i2c.NewI2cConnection(c.i2cBuses[bus], address), err
+	return i2c.NewConnection(r.i2cBuses[bus], address), err
 }
 
-func (c *Adaptor) I2cGetDefaultBus() int {
-	return c.i2cDefaultBus
+// GetDefaultBus returns the default i2c bus for this platform
+func (r *Adaptor) GetDefaultBus() int {
+	return r.i2cDefaultBus
 }
 
 // PwmWrite writes a PWM signal to the specified pin
