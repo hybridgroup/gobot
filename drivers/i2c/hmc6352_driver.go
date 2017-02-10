@@ -75,8 +75,8 @@ func (h *HMC6352Driver) Heading() (heading uint16, err error) {
 	if bytesRead == 2 {
 		heading = (uint16(buf[1]) + uint16(buf[0])*256) / 10
 		return
-	} else {
-		err = ErrNotEnoughBytes
 	}
+
+	err = ErrNotEnoughBytes
 	return
 }

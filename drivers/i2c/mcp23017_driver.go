@@ -48,14 +48,6 @@ type bank struct {
 	PortB port
 }
 
-// getBank returns a bank's PortA and PortB registers given a bank number (0/1).
-func getBank(bnk uint8) bank {
-	if bnk == 0 {
-		return bank{PortA: port{0x00, 0x02, 0x04, 0x06, 0x08, 0x0A, 0x0C, 0x0E, 0x10, 0x12, 0x14}, PortB: port{0x01, 0x03, 0x05, 0x07, 0x09, 0x0B, 0x0D, 0x0F, 0x11, 0x13, 0x15}}
-	}
-	return bank{PortA: port{0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A}, PortB: port{0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A}}
-}
-
 // MCP23017Config contains the device configuration for the IOCON register.
 // These fields should only be set with values 0 or 1.
 type MCP23017Config struct {
@@ -66,11 +58,6 @@ type MCP23017Config struct {
 	Haen   uint8
 	Odr    uint8
 	Intpol uint8
-}
-
-// GetUint8Value returns the configuration data as a packed value.
-func (mc *MCP23017Config) GetUint8Value() uint8 {
-	return mc.Bank<<7 | mc.Mirror<<6 | mc.Seqop<<5 | mc.Disslw<<4 | mc.Haen<<3 | mc.Odr<<2 | mc.Intpol<<1
 }
 
 // MCP23017Driver contains the driver configuration parameters.
@@ -266,6 +253,11 @@ func (m *MCP23017Driver) getPort(portStr string) (selectedPort port) {
 	}
 }
 
+// GetUint8Value returns the configuration data as a packed value.
+func (mc *MCP23017Config) GetUint8Value() uint8 {
+	return mc.Bank<<7 | mc.Mirror<<6 | mc.Seqop<<5 | mc.Disslw<<4 | mc.Haen<<3 | mc.Odr<<2 | mc.Intpol<<1
+}
+
 // setBit is used to set a bit at a given position to 1.
 func setBit(n uint8, pos uint8) uint8 {
 	n |= (1 << pos)
@@ -277,4 +269,12 @@ func clearBit(n uint8, pos uint8) uint8 {
 	mask := ^uint8(1 << pos)
 	n &= mask
 	return n
+}
+
+// getBank returns a bank's PortA and PortB registers given a bank number (0/1).
+func getBank(bnk uint8) bank {
+	if bnk == 0 {
+		return bank{PortA: port{0x00, 0x02, 0x04, 0x06, 0x08, 0x0A, 0x0C, 0x0E, 0x10, 0x12, 0x14}, PortB: port{0x01, 0x03, 0x05, 0x07, 0x09, 0x0B, 0x0D, 0x0F, 0x11, 0x13, 0x15}}
+	}
+	return bank{PortA: port{0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A}, PortB: port{0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A}}
 }

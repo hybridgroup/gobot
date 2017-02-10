@@ -8,6 +8,38 @@ import (
 	"gobot.io/x/gobot"
 )
 
+// AdafruitDirection declares a type for specification of the motor direction
+type AdafruitDirection int
+
+// AdafruitStepStyle declares a type for specification of the stepper motor rotation
+type AdafruitStepStyle int
+
+type adaFruitDCMotor struct {
+	pwmPin, in1Pin, in2Pin byte
+}
+type adaFruitStepperMotor struct {
+	pwmPinA, pwmPinB                   byte
+	ain1, ain2                         byte
+	bin1, bin2                         byte
+	secPerStep                         float64
+	currentStep, stepCounter, revSteps int
+}
+
+// AdafruitMotorHatDriver is a driver for the DC+Stepper Motor HAT from Adafruit.
+// The HAT is a Raspberry Pi add-on that can drive up to 4 DC or 2 Stepper motors
+// with full PWM speed control.  It has a dedicated PWM driver chip onboard to
+// control both motor direction and speed over I2C.
+type AdafruitMotorHatDriver struct {
+	name               string
+	connector          Connector
+	motorHatConnection Connection
+	servoHatConnection Connection
+	Config
+	gobot.Commander
+	dcMotors      []adaFruitDCMotor
+	stepperMotors []adaFruitStepperMotor
+}
+
 var adafruitDebug = false // Set this to true to see debug output
 
 var (
@@ -48,84 +80,18 @@ const (
 	_Outdrv  = 0x04
 )
 
-// AdafruitDirection declares a type for specification of the motor direction
-type AdafruitDirection int
-
-// AdafruitStepStyle declares a type for specification of the stepper motor rotation
-type AdafruitStepStyle int
-
 const (
 	AdafruitForward  AdafruitDirection = iota // 0
 	AdafruitBackward                          // 1
 	AdafruitRelease                           // 2
 )
+
 const (
 	AdafruitSingle     AdafruitStepStyle = iota // 0
 	AdafruitDouble                              // 1
 	AdafruitInterleave                          // 2
 	AdafruitMicrostep                           // 3
 )
-
-func init() {
-	stepperMicrostepCurve = []int{0, 50, 98, 142, 180, 212, 236, 250, 255}
-	step2coils[0] = []int32{1, 0, 0, 0}
-	step2coils[1] = []int32{1, 1, 0, 0}
-	step2coils[2] = []int32{0, 1, 0, 0}
-	step2coils[3] = []int32{0, 1, 1, 0}
-	step2coils[4] = []int32{0, 0, 1, 0}
-	step2coils[5] = []int32{0, 0, 1, 1}
-	step2coils[6] = []int32{0, 0, 0, 1}
-	step2coils[7] = []int32{1, 0, 0, 1}
-}
-
-type adaFruitDCMotor struct {
-	pwmPin, in1Pin, in2Pin byte
-}
-type adaFruitStepperMotor struct {
-	pwmPinA, pwmPinB                   byte
-	ain1, ain2                         byte
-	bin1, bin2                         byte
-	secPerStep                         float64
-	currentStep, stepCounter, revSteps int
-}
-
-// AdafruitMotorHatDriver is a driver for the DC+Stepper Motor HAT from Adafruit.
-// The HAT is a Raspberry Pi add-on that can drive up to 4 DC or 2 Stepper motors
-// with full PWM speed control.  It has a dedicated PWM driver chip onboard to
-// control both motor direction and speed over I2C.
-type AdafruitMotorHatDriver struct {
-	name               string
-	connector          Connector
-	motorHatConnection Connection
-	servoHatConnection Connection
-	Config
-	gobot.Commander
-	dcMotors      []adaFruitDCMotor
-	stepperMotors []adaFruitStepperMotor
-}
-
-// SetMotorHatAddress sets the I2C address for the DC and Stepper Motor HAT.
-// This addressing flexibility empowers "stacking" the HATs.
-func (a *AdafruitMotorHatDriver) SetMotorHatAddress(addr int) (err error) {
-	motorHatAddress = addr
-	return
-}
-
-// SetServoHatAddress sets the I2C address for the PWM-Servo Motor HAT.
-// This addressing flexibility empowers "stacking" the HATs.
-func (a *AdafruitMotorHatDriver) SetServoHatAddress(addr int) (err error) {
-	servoHatAddress = addr
-	return
-}
-
-// Name identifies this driver object
-func (a *AdafruitMotorHatDriver) Name() string { return a.name }
-
-// SetName sets nae for driver
-func (a *AdafruitMotorHatDriver) SetName(n string) { a.name = n }
-
-// Connection identifies the particular adapter object
-func (a *AdafruitMotorHatDriver) Connection() gobot.Connection { return a.connector.(gobot.Connection) }
 
 // NewAdafruitMotorHatDriver initializes the internal DCMotor and StepperMotor types.
 // Again the Adafruit Motor Hat supports up to four DC motors and up to two stepper motors.
@@ -172,6 +138,29 @@ func NewAdafruitMotorHatDriver(conn Connector, options ...func(Config)) *Adafrui
 	// TODO: add API funcs
 	return driver
 }
+
+// SetMotorHatAddress sets the I2C address for the DC and Stepper Motor HAT.
+// This addressing flexibility empowers "stacking" the HATs.
+func (a *AdafruitMotorHatDriver) SetMotorHatAddress(addr int) (err error) {
+	motorHatAddress = addr
+	return
+}
+
+// SetServoHatAddress sets the I2C address for the PWM-Servo Motor HAT.
+// This addressing flexibility empowers "stacking" the HATs.
+func (a *AdafruitMotorHatDriver) SetServoHatAddress(addr int) (err error) {
+	servoHatAddress = addr
+	return
+}
+
+// Name identifies this driver object
+func (a *AdafruitMotorHatDriver) Name() string { return a.name }
+
+// SetName sets nae for driver
+func (a *AdafruitMotorHatDriver) SetName(n string) { a.name = n }
+
+// Connection identifies the particular adapter object
+func (a *AdafruitMotorHatDriver) Connection() gobot.Connection { return a.connector.(gobot.Connection) }
 
 func (a *AdafruitMotorHatDriver) startDriver(connection Connection) (err error) {
 	if err = a.setAllPWM(connection, 0, 0); err != nil {
@@ -538,4 +527,16 @@ func (a *AdafruitMotorHatDriver) Step(motor, steps int, dir AdafruitDirection, s
 		}
 	}
 	return
+}
+
+func init() {
+	stepperMicrostepCurve = []int{0, 50, 98, 142, 180, 212, 236, 250, 255}
+	step2coils[0] = []int32{1, 0, 0, 0}
+	step2coils[1] = []int32{1, 1, 0, 0}
+	step2coils[2] = []int32{0, 1, 0, 0}
+	step2coils[3] = []int32{0, 1, 1, 0}
+	step2coils[4] = []int32{0, 0, 1, 0}
+	step2coils[5] = []int32{0, 0, 1, 1}
+	step2coils[6] = []int32{0, 0, 0, 1}
+	step2coils[7] = []int32{1, 0, 0, 1}
 }

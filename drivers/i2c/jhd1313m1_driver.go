@@ -238,16 +238,6 @@ func (h *JHD1313M1Driver) Scroll(leftToRight bool) error {
 // Halt is a noop function.
 func (h *JHD1313M1Driver) Halt() error { return nil }
 
-func (h *JHD1313M1Driver) setReg(command int, data int) error {
-	_, err := h.rgbConnection.Write([]byte{byte(command), byte(data)})
-	return err
-}
-
-func (h *JHD1313M1Driver) command(buf []byte) error {
-	_, err := h.lcdConnection.Write(append([]byte{LCD_CMD}, buf...))
-	return err
-}
-
 // SetCustomChar sets one of the 8 CGRAM locations with a custom character.
 // The custom character can be used by writing a byte of value 0 to 7.
 // When you are using LCD as 5x8 dots in function set then you can define a total of 8 user defined patterns
@@ -265,5 +255,15 @@ func (h *JHD1313M1Driver) SetCustomChar(pos int, charMap [8]byte) error {
 		return err
 	}
 	_, err := h.lcdConnection.Write(append([]byte{LCD_DATA}, charMap[:]...))
+	return err
+}
+
+func (h *JHD1313M1Driver) setReg(command int, data int) error {
+	_, err := h.rgbConnection.Write([]byte{byte(command), byte(data)})
+	return err
+}
+
+func (h *JHD1313M1Driver) command(buf []byte) error {
+	_, err := h.lcdConnection.Write(append([]byte{LCD_CMD}, buf...))
 	return err
 }

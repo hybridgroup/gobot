@@ -8,6 +8,11 @@ type GroveLcdDriver struct {
 	*JHD1313M1Driver
 }
 
+// GroveAccelerometerDriver is a driver for the MMA7660 accelerometer
+type GroveAccelerometerDriver struct {
+	*MMA7660Driver
+}
+
 // NewGroveLcdDriver creates a new driver with specified i2c interface.
 // Params:
 //		conn Connector - the Adaptor to use with this Driver
@@ -26,10 +31,6 @@ func NewGroveLcdDriver(a Connector, options ...func(Config)) *GroveLcdDriver {
 	}
 
 	return lcd
-}
-
-type GroveAccelerometerDriver struct {
-	*MMA7660Driver
 }
 
 // NewGroveAccelerometerDriver creates a new driver with specified i2c interface

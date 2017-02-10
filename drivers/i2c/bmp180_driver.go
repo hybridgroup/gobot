@@ -18,6 +18,17 @@ const bmp180RegisterTempMSB = 0xF6
 const bmp180CmdPressure = 0x34
 const bmp180RegisterPressureMSB = 0xF6
 
+const (
+	// BMP180UltraLowPower is the lowest oversampling mode of the pressure measurement.
+	BMP180UltraLowPower BMP180OversamplingMode = iota
+	// BMP180Standard is the standard oversampling mode of the pressure measurement.
+	BMP180Standard
+	// BMP180HighResolution is a high oversampling mode of the pressure measurement.
+	BMP180HighResolution
+	// BMP180UltraHighResolution is the highest oversampling mode of the pressure measurement.
+	BMP180UltraHighResolution
+)
+
 // BMP180Driver is the gobot driver for the Bosch pressure sensor BMP180.
 // Device datasheet: https://cdn-shop.adafruit.com/datasheets/BST-BMP180-DS000-09.pdf
 type BMP180Driver struct {
@@ -30,17 +41,6 @@ type BMP180Driver struct {
 
 // BMP180OversamplingMode is the oversampling ratio of the pressure measurement.
 type BMP180OversamplingMode uint
-
-const (
-	// BMP180UltraLowPower is the lowest oversampling mode of the pressure measurement.
-	BMP180UltraLowPower BMP180OversamplingMode = iota
-	// BMP180Standard is the standard oversampling mode of the pressure measurement.
-	BMP180Standard
-	// BMP180HighResolution is a high oversampling mode of the pressure measurement.
-	BMP180HighResolution
-	// BMP180UltraHighResolution is the highest oversampling mode of the pressure measurement.
-	BMP180UltraHighResolution
-)
 
 type calibrationCoefficients struct {
 	ac1 int16
