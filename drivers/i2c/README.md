@@ -29,3 +29,11 @@ Gobot has a extensible system for connecting to hardware devices. The following 
 - Wii Nunchuck Controller
 
 More drivers are coming soon...
+
+## Using A Different Bus or Address
+
+You can set a different I2C address or I2C bus than the default when initializing your I2C drivers by using optional parameters. Here is an example:
+
+```go
+blinkm := i2c.NewBlinkMDriver(e, i2c.WithBus(0), i2c.WithAddress(0x09))
+```
