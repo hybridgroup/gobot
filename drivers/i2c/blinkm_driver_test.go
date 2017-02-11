@@ -98,7 +98,6 @@ func TestBlinkMDriver(t *testing.T) {
 	blinkM := initTestBlinkMDriver()
 
 	gobottest.Assert(t, blinkM.Start(), nil)
-
 	gobottest.Refute(t, blinkM.Connection(), nil)
 }
 
@@ -207,4 +206,15 @@ func TestBlinkMDriverRGB(t *testing.T) {
 	err := blinkM.Rgb(100, 100, 100)
 	gobottest.Assert(t, err, errors.New("write error"))
 
+}
+
+func TestBlinkMDriverSetName(t *testing.T) {
+	d := initTestBlinkMDriver()
+	d.SetName("TESTME")
+	gobottest.Assert(t, d.Name(), "TESTME")
+}
+
+func TestBlinkMDriverOptions(t *testing.T) {
+	d := NewBlinkMDriver(newI2cTestAdaptor(), WithBus(2))
+	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
 }

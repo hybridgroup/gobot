@@ -109,3 +109,14 @@ func TestLIDARLiteDriverDistance(t *testing.T) {
 	gobottest.Assert(t, distance, int(0))
 	gobottest.Assert(t, err, errors.New("write error"))
 }
+
+func TestLIDARLiteDriverSetName(t *testing.T) {
+	l := initTestLIDARLiteDriver()
+	l.SetName("TESTME")
+	gobottest.Assert(t, l.Name(), "TESTME")
+}
+
+func TestLIDARLiteDriverOptions(t *testing.T) {
+	l := NewLIDARLiteDriver(newI2cTestAdaptor(), WithBus(2))
+	gobottest.Assert(t, l.GetBusOrDefault(1), 2)
+}

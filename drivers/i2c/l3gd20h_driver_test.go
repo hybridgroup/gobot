@@ -81,3 +81,14 @@ func TestL3GD20HDriverMeasurement(t *testing.T) {
 	gobottest.Assert(t, y, float32(rawY)*sensitivity)
 	gobottest.Assert(t, z, float32(rawZ)*sensitivity)
 }
+
+func TestL3GD20HDriverSetName(t *testing.T) {
+	d := initTestL3GD20HDriver()
+	d.SetName("TESTME")
+	gobottest.Assert(t, d.Name(), "TESTME")
+}
+
+func TestL3GD20HDriverOptions(t *testing.T) {
+	d := NewL3GD20HDriver(newI2cTestAdaptor(), WithBus(2))
+	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
+}

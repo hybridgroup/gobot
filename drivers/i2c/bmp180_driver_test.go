@@ -84,3 +84,14 @@ func TestBMP180DriverMeasurements(t *testing.T) {
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, pressure, float32(69964))
 }
+
+func TestBMP180DriverSetName(t *testing.T) {
+	b := initTestBMP180Driver()
+	b.SetName("TESTME")
+	gobottest.Assert(t, b.Name(), "TESTME")
+}
+
+func TestBMP180DriverOptions(t *testing.T) {
+	b := NewBMP180Driver(newI2cTestAdaptor(), WithBus(2))
+	gobottest.Assert(t, b.GetBusOrDefault(1), 2)
+}

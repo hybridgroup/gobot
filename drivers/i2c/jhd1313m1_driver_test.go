@@ -39,3 +39,14 @@ func TestJHD1313M1Driver(t *testing.T) {
 	gobottest.Refute(t, jhd.Connection(), nil)
 	gobottest.Assert(t, strings.HasPrefix(jhd.Name(), "JHD1313M1"), true)
 }
+
+func TestJHD1313MDriverSetName(t *testing.T) {
+	d := initTestJHD1313M1Driver()
+	d.SetName("TESTME")
+	gobottest.Assert(t, d.Name(), "TESTME")
+}
+
+func TestJHD1313MDriverOptions(t *testing.T) {
+	d := NewJHD1313M1Driver(newI2cTestAdaptor(), WithBus(2))
+	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
+}

@@ -406,3 +406,9 @@ func TestClearBit(t *testing.T) {
 	actualVal := clearBit(128, 7)
 	gobottest.Assert(t, expectedVal, actualVal)
 }
+
+func TestMCP23017DriverSetName(t *testing.T) {
+	d := initTestMCP23017Driver(0)
+	d.SetName("TESTME")
+	gobottest.Assert(t, d.Name(), "TESTME")
+}

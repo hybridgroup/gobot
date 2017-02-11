@@ -40,6 +40,17 @@ func TestMPL115A2Driver(t *testing.T) {
 	gobottest.Assert(t, strings.HasPrefix(mpl.Name(), "MPL115A2"), true)
 }
 
+func TestMPL115A2DriverOptions(t *testing.T) {
+	mpl := NewMPL115A2Driver(newI2cTestAdaptor(), WithBus(2))
+	gobottest.Assert(t, mpl.GetBusOrDefault(1), 2)
+}
+
+func TestMPL115A2DriverSetName(t *testing.T) {
+	mpl := initTestMPL115A2Driver()
+	mpl.SetName("TESTME")
+	gobottest.Assert(t, mpl.Name(), "TESTME")
+}
+
 func TestMPL115A2DriverStart(t *testing.T) {
 	mpl, _ := initTestMPL115A2DriverWithStubbedAdaptor()
 

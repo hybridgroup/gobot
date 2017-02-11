@@ -8,6 +8,7 @@ import (
 	"gobot.io/x/gobot/gobottest"
 )
 
+// ensure that MPU6050Driver fulfills Gobot Driver interface
 var _ gobot.Driver = (*MPU6050Driver)(nil)
 
 // --------- HELPERS
@@ -32,15 +33,15 @@ func TestNewMPU6050Driver(t *testing.T) {
 	}
 }
 
-func TestMPU6050Driver(t *testing.T) {
+func TestMPU6050DriverName(t *testing.T) {
 	mpu := initTestMPU6050Driver()
 	gobottest.Refute(t, mpu.Connection(), nil)
-
-	mpu = NewMPU6050Driver(newI2cTestAdaptor(), WithBus(2))
-	gobottest.Assert(t, mpu.GetBusOrDefault(1), 2)
-
-	gobottest.Refute(t, mpu.Connection(), nil)
 	gobottest.Assert(t, strings.HasPrefix(mpu.Name(), "MPU6050"), true)
+}
+
+func TestMPU6050DriverOptions(t *testing.T) {
+	mpu := NewMPU6050Driver(newI2cTestAdaptor(), WithBus(2))
+	gobottest.Assert(t, mpu.GetBusOrDefault(1), 2)
 }
 
 // Methods
@@ -66,4 +67,10 @@ func TestMPU6050DriverReadData(t *testing.T) {
 	mpu.Start()
 	mpu.GetData()
 	gobottest.Assert(t, mpu.Temperature, int16(36))
+}
+
+func TestMPU6050DriverSetName(t *testing.T) {
+	mpu := initTestMPU6050Driver()
+	mpu.SetName("TESTME")
+	gobottest.Assert(t, mpu.Name(), "TESTME")
 }

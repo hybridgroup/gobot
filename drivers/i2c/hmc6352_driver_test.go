@@ -108,3 +108,14 @@ func TestHMC6352DriverHeading(t *testing.T) {
 	gobottest.Assert(t, heading, uint16(0))
 	gobottest.Assert(t, err, errors.New("write error"))
 }
+
+func TestHMC6352DriverSetName(t *testing.T) {
+	d := initTestHMC6352Driver()
+	d.SetName("TESTME")
+	gobottest.Assert(t, d.Name(), "TESTME")
+}
+
+func TestHMC6352DriverOptions(t *testing.T) {
+	d := NewHMC6352Driver(newI2cTestAdaptor(), WithBus(2))
+	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
+}

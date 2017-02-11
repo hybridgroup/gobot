@@ -122,3 +122,14 @@ func TestAdafruitMotorHatDriverStepperStep(t *testing.T) {
 	err := ada.Step(stepperMotor, steps, 1, 3)
 	gobottest.Assert(t, err, nil)
 }
+
+func TestAdafruitMotorHatDriverSetName(t *testing.T) {
+	d := initTestAdafruitMotorHatDriver()
+	d.SetName("TESTME")
+	gobottest.Assert(t, d.Name(), "TESTME")
+}
+
+func TestAdafruitMotorHatDriverOptions(t *testing.T) {
+	d := NewAdafruitMotorHatDriver(newI2cTestAdaptor(), WithBus(2))
+	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
+}

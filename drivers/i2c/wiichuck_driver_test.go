@@ -298,3 +298,14 @@ func TestWiichuckDriverAdjustOrigins(t *testing.T) {
 	gobottest.Assert(t, wii.joystick["sy_origin"], float64(118))
 	gobottest.Assert(t, wii.joystick["sx_origin"], float64(65))
 }
+
+func TestWiichuckDriverSetName(t *testing.T) {
+	d := initTestWiichuckDriver()
+	d.SetName("TESTME")
+	gobottest.Assert(t, d.Name(), "TESTME")
+}
+
+func TestWiichuckDriverOptions(t *testing.T) {
+	d := NewWiichuckDriver(newI2cTestAdaptor(), WithBus(2))
+	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
+}

@@ -61,6 +61,11 @@ func TestSHT3xDriverName(t *testing.T) {
 	gobottest.Assert(t, sht3x.Name(), "Sensor")
 }
 
+func TestSHT3xDriverOptions(t *testing.T) {
+	d := NewSHT3xDriver(newI2cTestAdaptor(), WithBus(2))
+	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
+}
+
 // Test Accuracy & SetAccuracy
 func TestSHT3xDriverSetAccuracy(t *testing.T) {
 	sht3x := initTestSHT3xDriver()
