@@ -44,7 +44,8 @@ type MPU6050Driver struct {
 	gobot.Eventer
 }
 
-// NewMPU6050Driver creates a new driver with specified i2c interface
+// NewMPU6050Driver creates a new Gobot Driver for an MPU6050 I2C Accelerometer/Gyroscope.
+//
 // Params:
 //		conn Connector - the Adaptor to use with this Driver
 //
@@ -57,7 +58,6 @@ func NewMPU6050Driver(a Connector, options ...func(Config)) *MPU6050Driver {
 		name:      gobot.DefaultName("MPU6050"),
 		connector: a,
 		Config:    NewConfig(),
-		interval:  10 * time.Millisecond,
 		Eventer:   gobot.NewEventer(),
 	}
 
@@ -66,8 +66,6 @@ func NewMPU6050Driver(a Connector, options ...func(Config)) *MPU6050Driver {
 	}
 
 	// TODO: add commands to API
-
-	m.AddEvent(Error)
 	return m
 }
 
@@ -80,39 +78,37 @@ func (h *MPU6050Driver) SetName(n string) { h.name = n }
 // Connection returns the connection for the device.
 func (h *MPU6050Driver) Connection() gobot.Connection { return h.connector.(gobot.Connection) }
 
-// Start writes initialization bytes and reads from adaptor
-// using specified interval to accelerometer andtemperature data
+// Start writes initialization bytes to sensor
 func (h *MPU6050Driver) Start() (err error) {
 	if err := h.initialize(); err != nil {
 		return err
 	}
 
-	go func() {
-		for {
-			if _, err := h.connection.Write([]byte{MPU6050_RA_ACCEL_XOUT_H}); err != nil {
-				h.Publish(h.Event(Error), err)
-				continue
-			}
-
-			data := make([]byte, 14)
-			_, err := h.connection.Read(data)
-			if err != nil {
-				h.Publish(h.Event(Error), err)
-				continue
-			}
-			buf := bytes.NewBuffer(data)
-			binary.Read(buf, binary.BigEndian, &h.Accelerometer)
-			binary.Read(buf, binary.BigEndian, &h.Temperature)
-			binary.Read(buf, binary.BigEndian, &h.Gyroscope)
-			h.convertToCelsius()
-			time.Sleep(h.interval)
-		}
-	}()
 	return
 }
 
 // Halt returns true if devices is halted successfully
 func (h *MPU6050Driver) Halt() (err error) { return }
+
+// GetData fetches the latest data from the MPU6050
+func (h *MPU6050Driver) GetData() (err error) {
+	if _, err = h.connection.Write([]byte{MPU6050_RA_ACCEL_XOUT_H}); err != nil {
+		return
+	}
+
+	data := make([]byte, 14)
+	_, err = h.connection.Read(data)
+	if err != nil {
+		return
+	}
+
+	buf := bytes.NewBuffer(data)
+	binary.Read(buf, binary.BigEndian, &h.Accelerometer)
+	binary.Read(buf, binary.BigEndian, &h.Temperature)
+	binary.Read(buf, binary.BigEndian, &h.Gyroscope)
+	h.convertToCelsius()
+	return
+}
 
 func (h *MPU6050Driver) initialize() (err error) {
 	bus := h.GetBusOrDefault(h.connector.GetDefaultBus())

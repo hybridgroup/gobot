@@ -3,7 +3,6 @@ package i2c
 import (
 	"strings"
 	"testing"
-	"time"
 
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/gobottest"
@@ -42,14 +41,20 @@ func TestMPL115A2Driver(t *testing.T) {
 }
 
 func TestMPL115A2DriverStart(t *testing.T) {
+	mpl, _ := initTestMPL115A2DriverWithStubbedAdaptor()
+
+	gobottest.Assert(t, mpl.Start(), nil)
+}
+
+func TestMPL115A2DriverReadData(t *testing.T) {
 	mpl, adaptor := initTestMPL115A2DriverWithStubbedAdaptor()
 
 	adaptor.i2cReadImpl = func(b []byte) (int, error) {
 		copy(b, []byte{0x00, 0x01, 0x02, 0x04})
 		return 4, nil
 	}
-	gobottest.Assert(t, mpl.Start(), nil)
-	time.Sleep(100 * time.Millisecond)
+	mpl.Start()
+	mpl.GetData()
 	gobottest.Assert(t, mpl.Pressure, float32(50.007942))
 	gobottest.Assert(t, mpl.Temperature, float32(116.58878))
 }

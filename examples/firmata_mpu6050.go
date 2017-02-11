@@ -15,6 +15,8 @@ func main() {
 
 	work := func() {
 		gobot.Every(100*time.Millisecond, func() {
+			mpu6050.GetData()
+
 			fmt.Println("Accelerometer", mpu6050.Accelerometer)
 			fmt.Println("Gyroscope", mpu6050.Gyroscope)
 			fmt.Println("Temperature", mpu6050.Temperature)

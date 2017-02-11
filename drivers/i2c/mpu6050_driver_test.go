@@ -3,7 +3,6 @@ package i2c
 import (
 	"strings"
 	"testing"
-	"time"
 
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/gobottest"
@@ -36,7 +35,6 @@ func TestNewMPU6050Driver(t *testing.T) {
 func TestMPU6050Driver(t *testing.T) {
 	mpu := initTestMPU6050Driver()
 	gobottest.Refute(t, mpu.Connection(), nil)
-	gobottest.Assert(t, mpu.interval, 10*time.Millisecond)
 
 	mpu = NewMPU6050Driver(newI2cTestAdaptor(), WithBus(2))
 	gobottest.Assert(t, mpu.GetBusOrDefault(1), 2)
@@ -56,4 +54,16 @@ func TestMPU6050DriverHalt(t *testing.T) {
 	mpu := initTestMPU6050Driver()
 
 	gobottest.Assert(t, mpu.Halt(), nil)
+}
+
+func TestMPU6050DriverReadData(t *testing.T) {
+	mpu, adaptor := initTestMPU6050DriverWithStubbedAdaptor()
+
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		copy(b, []byte{0x00, 0x01, 0x02, 0x04})
+		return 4, nil
+	}
+	mpu.Start()
+	mpu.GetData()
+	gobottest.Assert(t, mpu.Temperature, int16(36))
 }
