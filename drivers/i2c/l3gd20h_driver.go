@@ -30,6 +30,9 @@ const (
 	L3GD20HScale2000dps L3GD20HScale = 0x30
 )
 
+// L3GD20HScale is the scale sensitivity of degrees-per-second.
+type L3GD20HScale byte
+
 // L3GD20HDriver is the gobot driver for the Adafruit Triple-Axis Gyroscope L3GD20H.
 // Device datasheet: http://www.st.com/internet/com/TECHNICAL_RESOURCES/TECHNICAL_LITERATURE/DATASHEET/DM00036465.pdf
 type L3GD20HDriver struct {
@@ -40,10 +43,9 @@ type L3GD20HDriver struct {
 	scale L3GD20HScale
 }
 
-// L3GD20HScale is the scale sensitivity of degrees-per-second.
-type L3GD20HScale byte
-
-// NewL3GD20HDriver creates a new driver with the i2c interface for the L3GD20H device.
+// NewL3GD20HDriver creates a new Gobot driver for the
+// L3GD20H I2C Triple-Axis Gyroscope.
+//
 // Params:
 //		conn Connector - the Adaptor to use with this Driver
 //

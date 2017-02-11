@@ -32,6 +32,7 @@ type ThreeDData struct {
 	Z int16
 }
 
+// MPU6050Driver is a new Gobot Driver for an MPU6050 I2C Accelerometer/Gyroscope.
 type MPU6050Driver struct {
 	name       string
 	connector  Connector

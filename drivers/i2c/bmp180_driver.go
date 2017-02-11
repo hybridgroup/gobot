@@ -29,16 +29,6 @@ const (
 	BMP180UltraHighResolution
 )
 
-// BMP180Driver is the gobot driver for the Bosch pressure sensor BMP180.
-// Device datasheet: https://cdn-shop.adafruit.com/datasheets/BST-BMP180-DS000-09.pdf
-type BMP180Driver struct {
-	name       string
-	connector  Connector
-	connection Connection
-	Config
-	calibrationCoefficients *calibrationCoefficients
-}
-
 // BMP180OversamplingMode is the oversampling ratio of the pressure measurement.
 type BMP180OversamplingMode uint
 
@@ -54,6 +44,16 @@ type calibrationCoefficients struct {
 	mb  int16
 	mc  int16
 	md  int16
+}
+
+// BMP180Driver is the gobot driver for the Bosch pressure sensor BMP180.
+// Device datasheet: https://cdn-shop.adafruit.com/datasheets/BST-BMP180-DS000-09.pdf
+type BMP180Driver struct {
+	name       string
+	connector  Connector
+	connection Connection
+	Config
+	calibrationCoefficients *calibrationCoefficients
 }
 
 // NewBMP180Driver creates a new driver with the i2c interface for the BMP180 device.

@@ -8,6 +8,7 @@ import (
 
 const lidarliteAddress = 0x62
 
+// LIDARLiteDriver is the Gobot driver for the LIDARLite I2C LIDAR device.
 type LIDARLiteDriver struct {
 	name       string
 	connector  Connector
@@ -15,7 +16,8 @@ type LIDARLiteDriver struct {
 	Config
 }
 
-// NewLIDARLiteDriver creates a new driver with specified i2c interface
+// NewLIDARLiteDriver creates a new driver for the LIDARLite I2C LIDAR device.
+//
 // Params:
 //		conn Connector - the Adaptor to use with this Driver
 //

@@ -95,12 +95,12 @@ func (h *MMA7660Driver) Start() (err error) {
 // Halt returns true if devices is halted successfully
 func (h *MMA7660Driver) Halt() (err error) { return }
 
-// Acceleration returns the acceleration  of the provided x, y, z
+// Acceleration returns the acceleration of the provided x, y, z
 func (h *MMA7660Driver) Acceleration(x, y, z float64) (ax, ay, az float64) {
 	return x / 21.0, y / 21.0, z / 21.0
 }
 
-// XYZ returns the raw x,y and z axis from the  mma7660
+// XYZ returns the raw x,y and z axis from the mma7660
 func (h *MMA7660Driver) XYZ() (x float64, y float64, z float64, err error) {
 	buf := []byte{0, 0, 0}
 	bytesRead, err := h.connection.Read(buf)
