@@ -65,9 +65,8 @@ func TestMPL115A2DriverReadData(t *testing.T) {
 		return 4, nil
 	}
 	mpl.Start()
-	mpl.GetData()
-	gobottest.Assert(t, mpl.Pressure, float32(50.007942))
-	gobottest.Assert(t, mpl.Temperature, float32(116.58878))
+	gobottest.Assert(t, mpl.Pressure(), float32(50.007942))
+	gobottest.Assert(t, mpl.Temperature(), float32(116.58878))
 }
 
 func TestMPL115A2DriverHalt(t *testing.T) {

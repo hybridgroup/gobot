@@ -24,18 +24,17 @@ const MPL115A2_REGISTER_C12_COEFF_MSB = 0x0A
 const MPL115A2_REGISTER_C12_COEFF_LSB = 0x0B
 const MPL115A2_REGISTER_STARTCONVERSION = 0x12
 
+// MPL115A2Driver is a Gobot Driver for the MPL115A2 I2C digitial pressure/temperature sensor.
 type MPL115A2Driver struct {
 	name       string
 	connector  Connector
 	connection Connection
 	Config
 	gobot.Eventer
-	A0          float32
-	B1          float32
-	B2          float32
-	C12         float32
-	Pressure    float32
-	Temperature float32
+	A0  float32
+	B1  float32
+	B2  float32
+	C12 float32
 }
 
 // NewMPL115A2Driver creates a new Gobot Driver for an MPL115A2
@@ -88,41 +87,16 @@ func (h *MPL115A2Driver) Start() (err error) {
 // Halt returns true if devices is halted successfully
 func (h *MPL115A2Driver) Halt() (err error) { return }
 
-// GetData fetches the latest data from the MPL115A2
-func (h *MPL115A2Driver) GetData() error {
-	var temperature uint16
-	var pressure uint16
-	var pressureComp float32
+// Pressure fetches the latest data from the MPL115A2, and returns the pressure
+func (h *MPL115A2Driver) Pressure() (p float32) {
+	p, _, _ = h.getData()
+	return
+}
 
-	if _, err := h.connection.Write([]byte{MPL115A2_REGISTER_STARTCONVERSION, 0}); err != nil {
-		return err
-	}
-	time.Sleep(5 * time.Millisecond)
-
-	if _, err := h.connection.Write([]byte{MPL115A2_REGISTER_PRESSURE_MSB}); err != nil {
-		return err
-	}
-
-	data := []byte{0, 0, 0, 0}
-	bytesRead, err := h.connection.Read(data)
-	if err != nil {
-		return err
-	}
-
-	if bytesRead == 4 {
-		buf := bytes.NewBuffer(data)
-		binary.Read(buf, binary.BigEndian, &pressure)
-		binary.Read(buf, binary.BigEndian, &temperature)
-
-		temperature = temperature >> 6
-		pressure = pressure >> 6
-
-		pressureComp = float32(h.A0) + (float32(h.B1)+float32(h.C12)*float32(temperature))*float32(pressure) + float32(h.B2)*float32(temperature)
-		h.Pressure = (65.0/1023.0)*pressureComp + 50.0
-		h.Temperature = ((float32(temperature) - 498.0) / -5.35) + 25.0
-	}
-
-	return nil
+// Temperature fetches the latest data from the MPL115A2, and returns the temperature
+func (h *MPL115A2Driver) Temperature() (t float32) {
+	_, t, _ = h.getData()
+	return
 }
 
 func (h *MPL115A2Driver) initialization() (err error) {
@@ -160,6 +134,44 @@ func (h *MPL115A2Driver) initialization() (err error) {
 	h.B1 = float32(coB1) / 8192.0
 	h.B2 = float32(coB2) / 16384.0
 	h.C12 = float32(coC12) / 4194304.0
+
+	return
+}
+
+// getData fetches the latest data from the MPL115A2
+func (h *MPL115A2Driver) getData() (p, t float32, err error) {
+	var temperature uint16
+	var pressure uint16
+	var pressureComp float32
+
+	if _, err = h.connection.Write([]byte{MPL115A2_REGISTER_STARTCONVERSION, 0}); err != nil {
+		return
+	}
+	time.Sleep(5 * time.Millisecond)
+
+	if _, err = h.connection.Write([]byte{MPL115A2_REGISTER_PRESSURE_MSB}); err != nil {
+		return
+	}
+
+	data := []byte{0, 0, 0, 0}
+	bytesRead, err1 := h.connection.Read(data)
+	if err1 != nil {
+		err = err1
+		return
+	}
+
+	if bytesRead == 4 {
+		buf := bytes.NewBuffer(data)
+		binary.Read(buf, binary.BigEndian, &pressure)
+		binary.Read(buf, binary.BigEndian, &temperature)
+
+		temperature = temperature >> 6
+		pressure = pressure >> 6
+
+		pressureComp = float32(h.A0) + (float32(h.B1)+float32(h.C12)*float32(temperature))*float32(pressure) + float32(h.B2)*float32(temperature)
+		p = (65.0/1023.0)*pressureComp + 50.0
+		t = ((float32(temperature) - 498.0) / -5.35) + 25.0
+	}
 
 	return
 }
