@@ -107,81 +107,110 @@ const (
 )
 
 // TSL2561Driver is the gobot driver for the Adafruit Digital Luminosity/Lux/Light Sensor
+//
 // Datasheet: http://www.adafruit.com/datasheets/TSL2561.pdf
+//
 // Ported from the Adafruit driver at https://github.com/adafruit/Adafruit_TSL2561 by
 // K. Townsend
 type TSL2561Driver struct {
-	name            string
-	connector       I2cConnector
-	connection      I2cConnection
-	deviceAddress   int
-	i2cBus          int
+	name       string
+	connector  Connector
+	connection Connection
+	Config
 	autoGain        bool
 	gain            TSL2561Gain
 	integrationTime TSL2561IntegrationTime
 }
 
-// NewTSL2561Driver creates a new driver with an I2c connector and optional options.
-// Settings are provided with a map like this:
-//  options := map[string]int {address: TSL2561AddressLow}
-//  d := NewTSL2561Driver(i2ccon, settings)
-func NewTSL2561Driver(c I2cConnector, options ...map[string]int) *TSL2561Driver {
-	integrationTime := TSL2561IntegrationTime402MS
-	gain := TSL2561Gain1X
-	autoGain := false
-	bus := 1
-	address := TSL2561AddressFloat
+// NewTSL2561Driver creates a new driver for the TSL2561 device.
+//
+// Params:
+//		conn Connector - the Adaptor to use with this Driver
+//
+// Optional params:
+//		i2c.WithBus(int):	bus to use with this driver
+//		i2c.WithAddress(int):	address to use with this driver
+//		i2c.WithTSL2561Gain1X:	sets the gain to 1X
+//		i2c.WithTSL2561Gain16X:	sets the gain to 16X
+//		i2c.WithTSL2561AutoGain:	turns on auto gain
+//		i2c.WithTSL2561IntegrationTime13MS:	sets integration time to 13ms
+//		i2c.WithTSL2561IntegrationTime101MS: sets integration time to 101ms
+//		i2c.WithTSL2561IntegrationTime402MS: sets integration time to 402ms
+//
+func NewTSL2561Driver(conn Connector, options ...func(Config)) *TSL2561Driver {
+	driver := &TSL2561Driver{
+		name:            gobot.DefaultName("TSL2561"),
+		connector:       conn,
+		Config:          NewConfig(),
+		integrationTime: TSL2561IntegrationTime402MS,
+		gain:            TSL2561Gain1X,
+		autoGain:        false,
+	}
 
-	if len(options) > 0 {
-		for k, v := range options[0] {
-			switch k {
-			case "bus":
-				bus = v
-			case "address":
-				switch v {
-				case TSL2561AddressLow, TSL2561AddressFloat, TSL2561AddressHigh:
-					address = v
-				default:
-					panic(fmt.Sprintf("Invalid address %v passed to NewTSL2561Driver", v))
-				}
-			case "integrationTime":
-				switch TSL2561IntegrationTime(v) {
-				case TSL2561IntegrationTime13MS, TSL2561IntegrationTime101MS, TSL2561IntegrationTime402MS:
-					integrationTime = TSL2561IntegrationTime(v)
-				default:
-					panic(fmt.Sprintf("Invalid integrationTime %v passed to NewTSL2561Driver", v))
-				}
-			case "gain":
-				switch TSL2561Gain(v) {
-				case TSL2561Gain1X, TSL2561Gain16X:
-					gain = TSL2561Gain(v)
-				default:
-					panic(fmt.Sprintf("Invalid gain value '%v' passed to NewTSL2561Driver", v))
-				}
-			case "autoGain":
-				switch {
-				case v == 0:
-					autoGain = false
-				case v == 1:
-					autoGain = true
-				default:
-					panic(fmt.Sprintf("Invalid autoGain value '%v' passwd to NewTSL2561Driver", v))
-				}
-			default:
-				panic(fmt.Sprintf("Unknown option '%v' passed to NewTSL2561Driver", k))
-			}
+	for _, option := range options {
+		option(driver)
+	}
+
+	return driver
+}
+
+// WithTSL2561Gain1X option sets the TSL2561Driver gain to 1X
+func WithTSL2561Gain1X(c Config) {
+	d, ok := c.(*TSL2561Driver)
+	if ok {
+		d.gain = TSL2561Gain1X
+	} else {
+		panic("Trying to set Gain for non-TSL2561Driver")
+	}
+}
+
+// WithTSL2561Gain16X option sets the TSL2561Driver gain to 16X
+func WithTSL2561Gain16X(c Config) {
+	d, ok := c.(*TSL2561Driver)
+	if ok {
+		d.gain = TSL2561Gain16X
+	} else {
+		panic("Trying to set Gain for non-TSL2561Driver")
+	}
+}
+
+// WithTSL2561AutoGain option turns on TSL2561Driver auto gain
+func WithTSL2561AutoGain(c Config) {
+	d, ok := c.(*TSL2561Driver)
+	if ok {
+		d.autoGain = true
+	} else {
+		panic("Trying to set Auto Gain for non-TSL2561Driver")
+	}
+}
+
+func withTSL2561IntegrationTime(iTime TSL2561IntegrationTime) func(Config) {
+	return func(c Config) {
+		d, ok := c.(*TSL2561Driver)
+		if ok {
+			d.integrationTime = iTime
+		} else {
+			panic("Trying to set integration time for non-TSL2561Driver")
 		}
 	}
+}
 
-	return &TSL2561Driver{
-		name:            "TSL2561",
-		connector:       c,
-		deviceAddress:   address,
-		i2cBus:          bus,
-		integrationTime: integrationTime,
-		gain:            gain,
-		autoGain:        autoGain,
-	}
+// WithTSL2561IntegrationTime13MS option sets the TSL2561Driver integration time
+// to 13ms
+func WithTSL2561IntegrationTime13MS(c Config) {
+	withTSL2561IntegrationTime(TSL2561IntegrationTime13MS)(c)
+}
+
+// WithTSL2561IntegrationTime101MS option sets the TSL2561Driver integration time
+// to 101ms
+func WithTSL2561IntegrationTime101MS(c Config) {
+	withTSL2561IntegrationTime(TSL2561IntegrationTime101MS)(c)
+}
+
+// WithTSL2561IntegrationTime402MS option sets the TSL2561Driver integration time
+// to 402ms
+func WithTSL2561IntegrationTime402MS(c Config) {
+	withTSL2561IntegrationTime(TSL2561IntegrationTime402MS)(c)
 }
 
 // Name returns the name of the device.
@@ -201,8 +230,10 @@ func (d *TSL2561Driver) Connection() gobot.Connection {
 
 // Start initializes the device.
 func (d *TSL2561Driver) Start() (err error) {
+	bus := d.GetBusOrDefault(d.connector.GetDefaultBus())
+	address := d.GetAddressOrDefault(TSL2561AddressFloat)
 
-	if d.connection, err = d.connector.I2cGetConnection(d.deviceAddress, d.i2cBus); err != nil {
+	if d.connection, err = d.connector.GetConnection(address, bus); err != nil {
 		return err
 	}
 
