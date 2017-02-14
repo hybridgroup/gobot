@@ -31,17 +31,17 @@ func initTestMCP23017Driver(b uint8) (driver *MCP23017Driver) {
 
 func initTestMCP23017DriverWithStubbedAdaptor(b uint8) (*MCP23017Driver, *i2cTestAdaptor) {
 	adaptor := newI2cTestAdaptor()
-	return NewMCP23017Driver(adaptor, MCP23017Config{Bank: b}, 0x20), adaptor
+	return NewMCP23017Driver(adaptor, WithMCP23017Bank(b)), adaptor
 }
 
 func TestNewMCP23017Driver(t *testing.T) {
-	var bm interface{} = NewMCP23017Driver(newI2cTestAdaptor(), MCP23017Config{}, 0x20)
+	var bm interface{} = NewMCP23017Driver(newI2cTestAdaptor())
 	_, ok := bm.(*MCP23017Driver)
 	if !ok {
 		t.Errorf("NewMCP23017Driver() should have returned a *MCP23017Driver")
 	}
 
-	b := NewMCP23017Driver(newI2cTestAdaptor(), MCP23017Config{}, 0x20)
+	b := NewMCP23017Driver(newI2cTestAdaptor())
 	gobottest.Refute(t, b.Connection(), nil)
 }
 
