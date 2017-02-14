@@ -45,6 +45,41 @@ func TestNewMCP23017Driver(t *testing.T) {
 	gobottest.Refute(t, b.Connection(), nil)
 }
 
+func TestNewMCP23017DriverBank(t *testing.T) {
+	b := NewMCP23017Driver(newI2cTestAdaptor(), WithMCP23017Bank(1))
+	gobottest.Assert(t, b.MCPConf.Bank, uint8(1))
+}
+
+func TestNewMCP23017DriverMirror(t *testing.T) {
+	b := NewMCP23017Driver(newI2cTestAdaptor(), WithMCP23017Mirror(1))
+	gobottest.Assert(t, b.MCPConf.Mirror, uint8(1))
+}
+
+func TestNewMCP23017DriverSeqop(t *testing.T) {
+	b := NewMCP23017Driver(newI2cTestAdaptor(), WithMCP23017Seqop(1))
+	gobottest.Assert(t, b.MCPConf.Seqop, uint8(1))
+}
+
+func TestNewMCP23017DriverDisslw(t *testing.T) {
+	b := NewMCP23017Driver(newI2cTestAdaptor(), WithMCP23017Disslw(1))
+	gobottest.Assert(t, b.MCPConf.Disslw, uint8(1))
+}
+
+func TestNewMCP23017DriverHaen(t *testing.T) {
+	b := NewMCP23017Driver(newI2cTestAdaptor(), WithMCP23017Haen(1))
+	gobottest.Assert(t, b.MCPConf.Haen, uint8(1))
+}
+
+func TestNewMCP23017DriverOdr(t *testing.T) {
+	b := NewMCP23017Driver(newI2cTestAdaptor(), WithMCP23017Odr(1))
+	gobottest.Assert(t, b.MCPConf.Odr, uint8(1))
+}
+
+func TestNewMCP23017DriverIntpol(t *testing.T) {
+	b := NewMCP23017Driver(newI2cTestAdaptor(), WithMCP23017Intpol(1))
+	gobottest.Assert(t, b.MCPConf.Intpol, uint8(1))
+}
+
 func TestMCP23017DriverStart(t *testing.T) {
 	mcp, adaptor := initTestMCP23017DriverWithStubbedAdaptor(0)
 

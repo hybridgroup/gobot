@@ -68,7 +68,7 @@ type MCP23017Driver struct {
 	connector  Connector
 	connection Connection
 	Config
-	conf MCP23017Config
+	MCPConf MCP23017Config
 	gobot.Commander
 	gobot.Eventer
 }
@@ -93,7 +93,7 @@ func NewMCP23017Driver(a Connector, options ...func(Config)) *MCP23017Driver {
 		name:      gobot.DefaultName("MCP23017"),
 		connector: a,
 		Config:    NewConfig(),
-		conf:      MCP23017Config{},
+		MCPConf:   MCP23017Config{},
 		Commander: gobot.NewCommander(),
 		Eventer:   gobot.NewEventer(),
 	}
@@ -143,7 +143,7 @@ func (m *MCP23017Driver) Start() (err error) {
 	}
 	// Set IOCON register with MCP23017 configuration.
 	ioconReg := m.getPort("A").IOCON // IOCON address is the same for Port A or B.
-	ioconVal := m.conf.GetUint8Value()
+	ioconVal := m.MCPConf.GetUint8Value()
 	if _, err := m.connection.Write([]uint8{ioconReg, ioconVal}); err != nil {
 		return err
 	}
@@ -208,7 +208,7 @@ func WithMCP23017Bank(val uint8) func(Config) {
 	return func(c Config) {
 		d, ok := c.(*MCP23017Driver)
 		if ok {
-			d.conf.Bank = val
+			d.MCPConf.Bank = val
 		} else {
 			panic("Trying to set Bank for non-MCP23017Driver")
 		}
@@ -220,7 +220,7 @@ func WithMCP23017Mirror(val uint8) func(Config) {
 	return func(c Config) {
 		d, ok := c.(*MCP23017Driver)
 		if ok {
-			d.conf.Mirror = val
+			d.MCPConf.Mirror = val
 		} else {
 			panic("Trying to set Mirror for non-MCP23017Driver")
 		}
@@ -232,7 +232,7 @@ func WithMCP23017Seqop(val uint8) func(Config) {
 	return func(c Config) {
 		d, ok := c.(*MCP23017Driver)
 		if ok {
-			d.conf.Seqop = val
+			d.MCPConf.Seqop = val
 		} else {
 			panic("Trying to set Seqop for non-MCP23017Driver")
 		}
@@ -244,7 +244,7 @@ func WithMCP23017Disslw(val uint8) func(Config) {
 	return func(c Config) {
 		d, ok := c.(*MCP23017Driver)
 		if ok {
-			d.conf.Disslw = val
+			d.MCPConf.Disslw = val
 		} else {
 			panic("Trying to set Disslw for non-MCP23017Driver")
 		}
@@ -256,7 +256,7 @@ func WithMCP23017Haen(val uint8) func(Config) {
 	return func(c Config) {
 		d, ok := c.(*MCP23017Driver)
 		if ok {
-			d.conf.Haen = val
+			d.MCPConf.Haen = val
 		} else {
 			panic("Trying to set Haen for non-MCP23017Driver")
 		}
@@ -268,7 +268,7 @@ func WithMCP23017Odr(val uint8) func(Config) {
 	return func(c Config) {
 		d, ok := c.(*MCP23017Driver)
 		if ok {
-			d.conf.Odr = val
+			d.MCPConf.Odr = val
 		} else {
 			panic("Trying to set Odr for non-MCP23017Driver")
 		}
@@ -280,7 +280,7 @@ func WithMCP23017Intpol(val uint8) func(Config) {
 	return func(c Config) {
 		d, ok := c.(*MCP23017Driver)
 		if ok {
-			d.conf.Intpol = val
+			d.MCPConf.Intpol = val
 		} else {
 			panic("Trying to set Intpol for non-MCP23017Driver")
 		}
@@ -336,11 +336,11 @@ func (m *MCP23017Driver) getPort(portStr string) (selectedPort port) {
 	portStr = strings.ToUpper(portStr)
 	switch {
 	case portStr == "A":
-		return getBank(m.conf.Bank).PortA
+		return getBank(m.MCPConf.Bank).PortA
 	case portStr == "B":
-		return getBank(m.conf.Bank).PortB
+		return getBank(m.MCPConf.Bank).PortB
 	default:
-		return getBank(m.conf.Bank).PortA
+		return getBank(m.MCPConf.Bank).PortA
 	}
 }
 
