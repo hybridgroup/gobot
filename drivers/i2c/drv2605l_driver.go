@@ -67,22 +67,38 @@ const (
 //
 // Basic use:
 //
-// haptic := i2c.NewDRV2605Driver(adaptor)
-// haptic.SetSequence([]byte{1, 13})
-// haptic.Go()
+//  haptic := i2c.NewDRV2605Driver(adaptor)
+//  haptic.SetSequence([]byte{1, 13})
+//  haptic.Go()
 //
 type DRV2605LDriver struct {
 	name       string
-	connector  I2cConnector
-	connection I2cConnection
+	connector  Connector
+	connection Connection
+	Config
 }
 
-// NewDRV2605LDriver creates a new driver with the i2c interface for the DRV2605L device.
-func NewDRV2605LDriver(c I2cConnector) *DRV2605LDriver {
-	return &DRV2605LDriver{
-		name:      "DRV2605L",
-		connector: c,
+// NewDRV2605LDriver creates a new driver for the DRV2605L device.
+//
+// Params:
+//		conn Connector - the Adaptor to use with this Driver
+//
+// Optional params:
+//		i2c.WithBus(int):	bus to use with this driver
+//		i2c.WithAddress(int):	address to use with this driver
+//
+func NewDRV2605LDriver(conn Connector, options ...func(Config)) *DRV2605LDriver {
+	driver := &DRV2605LDriver{
+		name:      gobot.DefaultName("DRV2605L"),
+		connector: conn,
+		Config:    NewConfig(),
 	}
+
+	for _, option := range options {
+		option(driver)
+	}
+
+	return driver
 }
 
 // Name returns the name of the device.
@@ -118,20 +134,22 @@ func (d *DRV2605LDriver) writeByteRegisters(regValPairs []struct{ reg, val uint8
 }
 
 func (d *DRV2605LDriver) initialize() (err error) {
-	bus := d.connector.I2cGetDefaultBus()
-	d.connection, err = d.connector.I2cGetConnection(drv2605Address, bus)
+	bus := d.GetBusOrDefault(d.connector.GetDefaultBus())
+	address := d.GetAddressOrDefault(drv2605Address)
+
+	d.connection, err = d.connector.GetConnection(address, bus)
 	if err != nil {
-		return err
+		return
 	}
 
 	feedback, err := d.connection.ReadByteData(drv2605RegFeedback)
 	if err != nil {
-		return err
+		return
 	}
 
 	control, err := d.connection.ReadByteData(drv2605RegControl3)
 	if err != nil {
-		return err
+		return
 	}
 
 	err = d.writeByteRegisters([]struct{ reg, val uint8 }{
@@ -151,7 +169,7 @@ func (d *DRV2605LDriver) initialize() (err error) {
 		{drv2605RegControl3, control | 0x20},
 	})
 
-	return err
+	return
 }
 
 // SetMode sets the device in one of the eight modes as described in the

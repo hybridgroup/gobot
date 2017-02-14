@@ -81,3 +81,14 @@ func TestDRV2605LDriverSequenceTruncation(t *testing.T) {
 		drv2605RegWaveSeq8, 8,
 	})
 }
+
+func TestDRV2605LDriverSetName(t *testing.T) {
+	d, _ := initTestDriverAndAdaptor()
+	d.SetName("TESTME")
+	gobottest.Assert(t, d.Name(), "TESTME")
+}
+
+func TestDRV2605DriverOptions(t *testing.T) {
+	d := NewDRV2605LDriver(newI2cTestAdaptor(), WithBus(2))
+	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
+}
