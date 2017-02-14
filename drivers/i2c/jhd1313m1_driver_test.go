@@ -52,7 +52,7 @@ func TestJHD1313MDriverOptions(t *testing.T) {
 	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
 }
 
-func TestJHD1313MDriverSetNameStart(t *testing.T) {
+func TestJHD1313MDriverStart(t *testing.T) {
 	d := initTestJHD1313M1Driver()
 	gobottest.Assert(t, d.Start(), nil)
 }

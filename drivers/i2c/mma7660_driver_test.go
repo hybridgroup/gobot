@@ -39,3 +39,41 @@ func TestMMA7660Driver(t *testing.T) {
 	gobottest.Refute(t, mma.Connection(), nil)
 	gobottest.Assert(t, strings.HasPrefix(mma.Name(), "MMA7660"), true)
 }
+
+func TestMMA7660DriverSetName(t *testing.T) {
+	d := initTestMMA7660Driver()
+	d.SetName("TESTME")
+	gobottest.Assert(t, d.Name(), "TESTME")
+}
+
+func TestMMA7660DriverOptions(t *testing.T) {
+	d := NewMMA7660Driver(newI2cTestAdaptor(), WithBus(2))
+	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
+}
+
+func TestMMA7660DriverStart(t *testing.T) {
+	d := initTestMMA7660Driver()
+	gobottest.Assert(t, d.Start(), nil)
+}
+
+func TestMMA7660DriverHalt(t *testing.T) {
+	d := initTestMMA7660Driver()
+	gobottest.Assert(t, d.Halt(), nil)
+}
+
+func TestMMA7660DriverAcceleration(t *testing.T) {
+	d := initTestMMA7660Driver()
+	x, y, z := d.Acceleration(21.0, 21.0, 21.0)
+	gobottest.Assert(t, x, 1.0)
+	gobottest.Assert(t, y, 1.0)
+	gobottest.Assert(t, z, 1.0)
+}
+
+func TestMMA7660DriverXYZ(t *testing.T) {
+	d, _ := initTestMMA7660DriverWithStubbedAdaptor()
+	d.Start()
+	x, y, z, _ := d.XYZ()
+	gobottest.Assert(t, x, 0.0)
+	gobottest.Assert(t, y, 0.0)
+	gobottest.Assert(t, z, 0.0)
+}
