@@ -42,3 +42,9 @@ func TestGroveAccelerometerDriverName(t *testing.T) {
 	gobottest.Refute(t, g.Connection(), nil)
 	gobottest.Assert(t, strings.HasPrefix(g.Name(), "MMA7660"), true)
 }
+
+func TestGroveAccelerometerDriverWithAddress(t *testing.T) {
+	adaptor := newI2cTestAdaptor()
+	g := NewGroveAccelerometerDriver(adaptor, WithAddress(0x66))
+	gobottest.Assert(t, g.GetAddressOrDefault(0x33), 0x66)
+}

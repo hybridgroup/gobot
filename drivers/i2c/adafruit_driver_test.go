@@ -36,7 +36,7 @@ func TestNewAdafruitMotorHatDriver(t *testing.T) {
 // Methods
 func TestAdafruitMotorHatDriverStart(t *testing.T) {
 	ada, _ := initTestAdafruitMotorHatDriverWithStubbedAdaptor()
-
+	gobottest.Refute(t, ada.Connection(), nil)
 	gobottest.Assert(t, ada.Start(), nil)
 }
 
