@@ -23,3 +23,6 @@ parts:
     go-importpath: gobot.io/x/gobot
     organize:
       bin/cli: bin/gobot
+    after: [go]
+  go:
+    source-tag: go1.7.5
