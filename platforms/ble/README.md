@@ -2,7 +2,7 @@
 
 The Gobot BLE adaptor makes it easy to interact with Bluetooth LE aka Bluetooth 4.0 using Go.
 
-It is written using the [gatt](https://github.com/currantlabs/gatt) package fork by Currant Labs of the package from [Paypal](https://github.com/paypal). Thank you!
+It is written using the [ble](https://github.com/currantlabs/ble) package by [@roylee17](https://github.com/roylee17). Thank you!
 
 Learn more about Bluetooth LE at http://en.wikipedia.org/wiki/Bluetooth_low_energy
 
@@ -19,7 +19,7 @@ go get gobot.io/x/gobot && go install gobot.io/x/gobot/platforms/ble
 
 ### OSX
 
-You need to have XCode installed to be able to compile code that uses the Gobot BLE adaptor on OSX. This is because the `gatt` package uses a CGo based implementation.
+You need to have XCode installed to be able to compile code that uses the Gobot BLE adaptor on OSX. This is because the `ble` package uses a CGo based implementation.
 
 ### Ubuntu
 
