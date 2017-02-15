@@ -6,7 +6,7 @@ This package provides drivers for [i2c](https://en.wikipedia.org/wiki/I%C2%B2C)d
 
 ## Installing
 ```
-go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/i2c
+go get -d -u gobot.io/x/gobot/...
 ```
 
 ## Hardware Support
