@@ -1,3 +1,45 @@
+1.2.0
+---
+* **core**
+  * Use new improved default namer to avoid API conflicts
+* **gpio**
+  * Removed scaling function from servo driver
+  * Correct servo driver to pass along angle to adaptor to sort out implementation
+* **i2c**
+  * Refactored platforms and drivers to new I2C interfaces
+  * Change to make I2C support more than one bus
+  * Refactor drivers to support new optional params
+* **bb8**
+  * Added collision detection support and example
+* **beaglebone**
+  * Correct i2c buses to match actual mapping
+* **ble**
+  * Switch to using [ble](https://github.com/currantlabs/ble) package for Bluetooth LE
+  * Basic serial over BLE working with Arduino101 with StandardFirmataBLE
+  * WIP on multiple simultaneous ble devices
+* **chip**
+  * Fixed chip XIO base address lookup  
+* **digispark**
+ * Fix #288 by using pkg-config to locate libusb-compat includes
+* **firmata**
+  * Remove race conditions identified in Firmata client
+  * Correct error in I2C reads not listening to board events
+* **mqtt**
+  * Add driver for syntactical sugar around virtual devices
+  * Add SSL/TLS client options support
+  * Fix #277 by adding SetAutoReconnect method to set Paho MQTT client
+  * Change both 'On' and 'Publish' method function signatures to match Eventer interface
+* **nats**
+  * Add driver to make it easier to create virtual devices
+* **ollie**
+  * Added collision detection support and example
+* **parrot**
+  * Add ValidatePitch helper function for Parrot Minidrone, Parrot Bebop & ARDrone 2.0 to package
+* **docs**
+  * Fix #363 by using atomic.Value to protect current values used by multiple goroutines in drone examples
+* **test**
+  * Remove Golang 1.5 from TravisCI tests in prep for Golang 1.8 release
+
 1.1.0
 ---
 * **core**
