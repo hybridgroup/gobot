@@ -4,3 +4,7 @@
 profile.cov
 count.out
 *.swp
+*.snap
+/parts
+/prime
+/stage
