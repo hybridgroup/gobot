@@ -7,12 +7,12 @@ test:
 	done ; \
 
 cover:
-	echo "mode: set" > profile.cov ; \
+	echo "" > profile.cov
 	for package in $(PACKAGES) ; do \
 		go test -a -coverprofile=tmp.cov gobot.io/x/$$package ; \
-		cat tmp.cov | grep -v "mode: set" >> profile.cov ; \
+		cat tmp.cov >> profile.cov ; \
+		rm tmp.cov ; \
 	done ; \
-	rm tmp.cov ; \
 
 robeaux:
 ifeq (,$(shell which go-bindata))
