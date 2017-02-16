@@ -3,6 +3,8 @@ package nats
 import (
 	"github.com/nats-io/nats"
 	"gobot.io/x/gobot"
+	"net/url"
+	"strings"
 )
 
 // Adaptor is a configuration struct for interacting with a NATS server.
@@ -20,28 +22,57 @@ type Adaptor struct {
 }
 
 // NewAdaptor populates a new NATS Adaptor.
-func NewAdaptor(host string, clientID int) *Adaptor {
+func NewAdaptor(host string, clientID int, options ...nats.Option) *Adaptor {
+	hosts, err := processHostString(host)
+
 	return &Adaptor{
 		name:     gobot.DefaultName("NATS"),
-		Host:     host,
+		Host:     hosts,
 		clientID: clientID,
 		connect: func() (*nats.Conn, error) {
-			return nats.Connect("nats://" + host)
+			if err != nil {
+				return nil, err
+			}
+			return nats.Connect(hosts, options...)
 		},
 	}
 }
 
 // NewAdaptorWithAuth populates a NATS Adaptor including username and password.
-func NewAdaptorWithAuth(host string, clientID int, username string, password string) *Adaptor {
+func NewAdaptorWithAuth(host string, clientID int, username string, password string, options ...nats.Option) *Adaptor {
+	hosts, err := processHostString(host)
+
 	return &Adaptor{
-		Host:     host,
+		Host:     hosts,
 		clientID: clientID,
 		username: username,
 		password: password,
 		connect: func() (*nats.Conn, error) {
-			return nats.Connect("nats://" + username + ":" + password + "@" + host)
+			if err != nil {
+				return nil, err
+			}
+			return nats.Connect(hosts, append(options, nats.UserInfo(username, password))...)
 		},
 	}
+}
+
+func processHostString(host string) (string, error) {
+	urls := strings.Split(host, ",")
+	for i, s := range urls {
+		s = strings.TrimSpace(s)
+		if !strings.HasPrefix(s, "tls://") && !strings.HasPrefix(s, "nats://") {
+			s = "nats://" + s
+		}
+
+		u, err := url.Parse(s)
+		if err != nil {
+			return "", err
+		}
+
+		urls[i] = u.String()
+	}
+
+	return strings.Join(urls, ","), nil
 }
 
 // Name returns the logical client name.
