@@ -57,11 +57,53 @@ func main() {
 }
 ```
 
+To run with TLS enabled, set the URL scheme prefix to tls://. Make sure the NATS server has TLS enabled and use the NATS option parameters to pass in the TLS settings to the adaptor. Refer to the github.com/nats-io/go-nats README for more TLS option parameters.
+
+```go
+package main
+
+import (
+  "fmt"
+  "time"
+  natsio "github.com/nats-io/nats"
+  "gobot.io/x/gobot"
+  "gobot.io/x/gobot/platforms/nats"
+)
+
+func main() {
+  natsAdaptor := nats.NewNatsAdaptor("tls://localhost:4222", 1234, natsio.RootCAs("certs/ca.pem"))
+
+  work := func() {
+    natsAdaptor.On("hello", func(data []byte) {
+      fmt.Println("hello")
+    })
+    natsAdaptor.On("hola", func(data []byte) {
+      fmt.Println("hola")
+    })
+    data := []byte("o")
+    gobot.Every(1*time.Second, func() {
+      natsAdaptor.Publish("hello", data)
+    })
+    gobot.Every(5*time.Second, func() {
+      natsAdaptor.Publish("hola", data)
+    })
+  }
+
+  robot := gobot.NewRobot("natsBot",
+    []gobot.Connection{natsAdaptor},
+    work,
+  )
+
+  robot.Start()
+}
+```
+
 ### Supported Features
 
 * Publish messages
 * Respond to incoming message events
 * Support for Username/password authentication
+* Support for NATS adaptor options to support TLS
 
 ### Upcoming Features
 

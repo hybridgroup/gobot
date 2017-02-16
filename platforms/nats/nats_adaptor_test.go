@@ -3,14 +3,26 @@ package nats
 import (
 	"errors"
 	"fmt"
-	"testing"
-
+	"github.com/nats-io/nats"
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/gobottest"
-	"github.com/nats-io/nats"
+	"testing"
 )
 
 var _ gobot.Adaptor = (*Adaptor)(nil)
+
+func connStub(options ...nats.Option) func() (*nats.Conn, error) {
+	return func() (*nats.Conn, error) {
+		opts := nats.DefaultOptions
+		for _, opt := range options {
+			if err := opt(&opts); err != nil {
+				return nil, err
+			}
+		}
+		c := &nats.Conn{Opts: opts}
+		return c, nil
+	}
+}
 
 func initTestNatsAdaptor() *Adaptor {
 	a := NewAdaptor("localhost:4222", 9999)
@@ -21,9 +33,44 @@ func initTestNatsAdaptor() *Adaptor {
 	return a
 }
 
+func initTestNatsAdaptorTLS(options ...nats.Option) *Adaptor {
+	a := NewAdaptor("tls://localhost:4242", 49999, options...)
+	a.connect = connStub(options...)
+	return a
+}
+
 func TestNatsAdaptorReturnsHost(t *testing.T) {
 	a := initTestNatsAdaptor()
-	gobottest.Assert(t, a.Host, "localhost:4222")
+	gobottest.Assert(t, a.Host, "nats://localhost:4222")
+}
+
+func TestNatsAdapterSetsRootCAs(t *testing.T) {
+	a := initTestNatsAdaptorTLS(nats.RootCAs("test_certs/catest.pem"))
+	gobottest.Assert(t, a.Host, "tls://localhost:4242")
+	a.Connect()
+	o := a.client.Opts
+	gobottest.Assert(t, len(o.TLSConfig.RootCAs.Subjects()), 1)
+	gobottest.Assert(t, o.Secure, true)
+}
+
+func TestNatsAdapterSetsClientCerts(t *testing.T) {
+	a := initTestNatsAdaptorTLS(nats.ClientCert("test_certs/client-cert.pem", "test_certs/client-key.pem"))
+	gobottest.Assert(t, a.Host, "tls://localhost:4242")
+	a.Connect()
+	certs := a.client.Opts.TLSConfig.Certificates
+	gobottest.Assert(t, len(certs), 1)
+	gobottest.Assert(t, a.client.Opts.Secure, true)
+}
+
+func TestNatsAdapterSetsClientCertsWithUserInfo(t *testing.T) {
+	a := initTestNatsAdaptorTLS(nats.ClientCert("test_certs/client-cert.pem", "test_certs/client-key.pem"), nats.UserInfo("test", "testwd"))
+	gobottest.Assert(t, a.Host, "tls://localhost:4242")
+	a.Connect()
+	certs := a.client.Opts.TLSConfig.Certificates
+	gobottest.Assert(t, len(certs), 1)
+	gobottest.Assert(t, a.client.Opts.Secure, true)
+	gobottest.Assert(t, a.client.Opts.User, "test")
+	gobottest.Assert(t, a.client.Opts.Password, "testwd")
 }
 
 // TODO: implement this test without requiring actual server connection
