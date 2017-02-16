@@ -155,7 +155,9 @@ func (c *Adaptor) digitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPin,
 }
 
 // DigitalRead reads digital value from the specified pin.
-// Valids pins are XIO-P0 through XIO-P7 (pins 13-20 on header 14).
+// Valids pins are the XIO-P0 through XIO-P7 pins from the
+// extender (pins 13-20 on header 14), as well as the SoC pins
+// aka all the other pins.
 func (c *Adaptor) DigitalRead(pin string) (val int, err error) {
 	sysfsPin, err := c.digitalPin(pin, sysfs.IN)
 	if err != nil {
@@ -165,7 +167,9 @@ func (c *Adaptor) DigitalRead(pin string) (val int, err error) {
 }
 
 // DigitalWrite writes digital value to the specified pin.
-// Valids pins are XIO-P0 through XIO-P7 (pins 13-20 on header 14).
+// Valids pins are the XIO-P0 through XIO-P7 pins from the
+// extender (pins 13-20 on header 14), as well as the SoC pins
+// aka all the other pins.
 func (c *Adaptor) DigitalWrite(pin string, val byte) (err error) {
 	sysfsPin, err := c.digitalPin(pin, sysfs.OUT)
 	if err != nil {
