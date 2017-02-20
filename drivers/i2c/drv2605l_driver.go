@@ -62,7 +62,9 @@ const (
 )
 
 // DRV2605LDriver is the gobot driver for the TI/Adafruit DRV2605L Haptic Controller
+//
 // Device datasheet: http://www.ti.com/lit/ds/symlink/drv2605l.pdf
+//
 // Inspired by the Adafruit Python driver by Sean Mealin.
 //
 // Basic use:
