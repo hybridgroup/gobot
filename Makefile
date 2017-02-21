@@ -2,14 +2,16 @@ PACKAGES := gobot gobot/api gobot/drivers/gpio gobot/drivers/aio gobot/drivers/i
 .PHONY: test cover robeaux examples
 
 test:
+	go test -i ./...
 	for package in $(PACKAGES) ; do \
-		go test -a gobot.io/x/$$package ; \
+		go test gobot.io/x/$$package ; \
 	done ; \
 
 cover:
 	echo "" > profile.cov
+	go test -i ./...
 	for package in $(PACKAGES) ; do \
-		go test -a -coverprofile=tmp.cov gobot.io/x/$$package ; \
+		go test -coverprofile=tmp.cov gobot.io/x/$$package ; \
 		cat tmp.cov >> profile.cov ; \
 		rm tmp.cov ; \
 	done ; \
@@ -54,3 +56,4 @@ deps:
 	go get -d -v github.com/donovanhide/eventsource
 	go get -d -v github.com/hashicorp/go-multierror
 	go get -d -v github.com/sigurn/crc8
+	go get -d -v github.com/codegangsta/cli

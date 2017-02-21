@@ -3,10 +3,11 @@ PACKAGES=('gobot' 'gobot/api' 'gobot/sysfs' 'gobot/drivers/gpio' 'gobot/drivers/
 EXITCODE=0
 
 echo "" > coverage.txt
+go test -i ./...
 
 for package in "${PACKAGES[@]}"
 do
-  go test -a -coverprofile=tmp.cov gobot.io/x/$package
+  go test -coverprofile=tmp.cov gobot.io/x/$package
   if [ $? -ne 0 ]
   then
     EXITCODE=1
