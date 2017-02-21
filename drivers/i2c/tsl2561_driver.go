@@ -128,14 +128,14 @@ type TSL2561Driver struct {
 //		conn Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//		i2c.WithBus(int):	bus to use with this driver
-//		i2c.WithAddress(int):	address to use with this driver
-//		i2c.WithTSL2561Gain1X:	sets the gain to 1X
-//		i2c.WithTSL2561Gain16X:	sets the gain to 16X
+//		i2c.WithBus(int):		bus to use with this driver
+//		i2c.WithAddress(int):		address to use with this driver
+//		i2c.WithTSL2561Gain1X:		sets the gain to 1X
+//		i2c.WithTSL2561Gain16X:		sets the gain to 16X
 //		i2c.WithTSL2561AutoGain:	turns on auto gain
 //		i2c.WithTSL2561IntegrationTime13MS:	sets integration time to 13ms
-//		i2c.WithTSL2561IntegrationTime101MS: sets integration time to 101ms
-//		i2c.WithTSL2561IntegrationTime402MS: sets integration time to 402ms
+//		i2c.WithTSL2561IntegrationTime101MS: 	sets integration time to 101ms
+//		i2c.WithTSL2561IntegrationTime402MS: 	sets integration time to 402ms
 //
 func NewTSL2561Driver(conn Connector, options ...func(Config)) *TSL2561Driver {
 	driver := &TSL2561Driver{
