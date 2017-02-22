@@ -17,6 +17,7 @@ const (
 	I2C_SMBUS_READ  = 1
 	I2C_SMBUS_WRITE = 0
 	// Adapter functionality
+	I2C_FUNC_SMBUS_PEC              = 0x00000008
 	I2C_FUNC_SMBUS_READ_BLOCK_DATA  = 0x01000000
 	I2C_FUNC_SMBUS_WRITE_BLOCK_DATA = 0x02000000
 	// Transaction types
@@ -134,9 +135,14 @@ func (d *i2cDevice) ReadBlockData(reg uint8, buf []byte) (n int, err error) {
 		return 0, fmt.Errorf("SMBus block data reading not supported")
 	}
 
+	var sizeArgument uint32 = I2C_SMBUS_I2C_BLOCK_DATA
+	if d.funcs&I2C_FUNC_SMBUS_PEC != 0 {
+		sizeArgument = I2C_SMBUS_BLOCK_DATA_PEC
+	}
+
 	data := make([]byte, 32+1) // Max message + size as defined by SMBus standard
 
-	err = d.smbusAccess(I2C_SMBUS_READ, reg, I2C_SMBUS_I2C_BLOCK_DATA, uintptr(unsafe.Pointer(&data[0])))
+	err = d.smbusAccess(I2C_SMBUS_READ, reg, sizeArgument, uintptr(unsafe.Pointer(&data[0])))
 
 	copy(buf, data[1:])
 	return int(data[0]), err
@@ -164,6 +170,11 @@ func (d *i2cDevice) WriteBlockData(reg uint8, data []byte) (err error) {
 		return fmt.Errorf("SMBus block data writing not supported")
 	}
 
+	var sizeArgument uint32 = I2C_SMBUS_I2C_BLOCK_DATA
+	if d.funcs&I2C_FUNC_SMBUS_PEC != 0 {
+		sizeArgument = I2C_SMBUS_BLOCK_DATA_PEC
+	}
+
 	if len(data) > 32 {
 		data = data[:32]
 	}
@@ -172,7 +183,7 @@ func (d *i2cDevice) WriteBlockData(reg uint8, data []byte) (err error) {
 	copy(buf[:1], data)
 	buf[0] = uint8(len(data))
 
-	err = d.smbusAccess(I2C_SMBUS_WRITE, reg, I2C_SMBUS_I2C_BLOCK_DATA, uintptr(unsafe.Pointer(&buf[0])))
+	err = d.smbusAccess(I2C_SMBUS_WRITE, reg, sizeArgument, uintptr(unsafe.Pointer(&buf[0])))
 
 	return err
 }
