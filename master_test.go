@@ -103,6 +103,24 @@ func TestMasterStartDriverErrors(t *testing.T) {
 	testDriverStart = func() (err error) { return }
 }
 
+func TestRobotHaltDriverErrors(t *testing.T) {
+	g := initTestMaster1Robot()
+	e := errors.New("driver halt error 1")
+	testDriverHalt = func() (err error) {
+		return e
+	}
+
+	var expected error
+	expected = multierror.Append(expected, e)
+	expected = multierror.Append(expected, e)
+	expected = multierror.Append(expected, e)
+
+	gobottest.Assert(t, g.Start(), nil)
+	gobottest.Assert(t, g.Stop(), expected)
+
+	testDriverHalt = func() (err error) { return }
+}
+
 func TestMasterStartAdaptorErrors(t *testing.T) {
 	g := initTestMaster1Robot()
 	e := errors.New("adaptor start error 1")
