@@ -3,10 +3,6 @@ package dragonboard
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
-	"path/filepath"
-	"strconv"
-	"strings"
 
 	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot"
@@ -14,7 +10,7 @@ import (
 	"gobot.io/x/gobot/sysfs"
 )
 
-// Adaptor represents a Gobot Adaptor for a C.H.I.P.
+// Adaptor represents a Gobot Adaptor for a DragonBoard 410c
 type Adaptor struct {
 	name        string
 	digitalPins map[int]sysfs.DigitalPin
@@ -40,7 +36,7 @@ var fixedPins = map[string]int{
 	"LED_2": 120,
 }
 
-// NewAdaptor creates a C.H.I.P. Adaptor
+// NewAdaptor creates a DragonBoard 410c Adaptor
 func NewAdaptor() *Adaptor {
 	c := &Adaptor{
 		name:        gobot.DefaultName("DragonBoard"),
@@ -83,10 +79,9 @@ func (c *Adaptor) Finalize() (err error) {
 
 func (c *Adaptor) setPins() {
 	c.pinMap = fixedPins
-	baseAddr, _ := getXIOBase()
 	for i := 0; i < 122; i++ {
 		pin := fmt.Sprintf("GPIO_%d", i)
-		c.pinMap[pin] = baseAddr + i
+		c.pinMap[pin] = i
 	}
 }
 
@@ -121,10 +116,10 @@ func (c *Adaptor) digitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPin,
 	return c.digitalPins[i], nil
 }
 
-// DigitalRead reads digital value from the specified pin.
-// Valids pins are the XIO-P0 through XIO-P7 pins from the
-// extender (pins 13-20 on header 14), as well as the SoC pins
-// aka all the other pins.
+// DigitalRead reads digital value to the specified pin.
+// Valids pins are the GPIO_A through GPIO_L pins from the
+// extender (pins 23-34 on header J8), as well as the SoC pins
+// aka all the other pins, APQ GPIO_0-GPIO_122 and PM_MPP_0-4.
 func (c *Adaptor) DigitalRead(pin string) (val int, err error) {
 	sysfsPin, err := c.digitalPin(pin, sysfs.IN)
 	if err != nil {
@@ -134,9 +129,9 @@ func (c *Adaptor) DigitalRead(pin string) (val int, err error) {
 }
 
 // DigitalWrite writes digital value to the specified pin.
-// Valids pins are the XIO-P0 through XIO-P7 pins from the
-// extender (pins 13-20 on header 14), as well as the SoC pins
-// aka all the other pins.
+// Valids pins are the GPIO_A through GPIO_L pins from the
+// extender (pins 23-34 on header J8), as well as the SoC pins
+// aka all the other pins, APQ GPIO_0-GPIO_122 and PM_MPP_0-4.
 func (c *Adaptor) DigitalWrite(pin string, val byte) (err error) {
 	sysfsPin, err := c.digitalPin(pin, sysfs.OUT)
 	if err != nil {
@@ -146,9 +141,9 @@ func (c *Adaptor) DigitalWrite(pin string, val byte) (err error) {
 }
 
 // GetConnection returns a connection to a device on a specified bus.
-// Valid bus number is [0..2] which corresponds to /dev/i2c-0 through /dev/i2c-2.
+// Valid bus number is [0..1] which corresponds to /dev/i2c-0 through /dev/i2c-1.
 func (c *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection, err error) {
-	if (bus < 0) || (bus > 2) {
+	if (bus < 0) || (bus > 1) {
 		return nil, fmt.Errorf("Bus number %d out of range", bus)
 	}
 	if c.i2cBuses[bus] == nil {
@@ -160,34 +155,4 @@ func (c *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection
 // GetDefaultBus returns the default i2c bus for this platform
 func (c *Adaptor) GetDefaultBus() int {
 	return 0
-}
-
-func getXIOBase() (baseAddr int, err error) {
-	// Default to original base from 4.3 kernel
-	baseAddr = 0
-	const expanderID = "1000000.pinctrl"
-
-	labels, err := filepath.Glob("/sys/class/gpio/*/label")
-	if err != nil {
-		return
-	}
-
-	for _, labelPath := range labels {
-		label, err := ioutil.ReadFile(labelPath)
-		if err != nil {
-			return baseAddr, err
-		}
-		if strings.HasPrefix(string(label), expanderID) {
-			expanderPath, _ := filepath.Split(labelPath)
-			basePath := filepath.Join(expanderPath, "base")
-			base, err := ioutil.ReadFile(basePath)
-			if err != nil {
-				return baseAddr, err
-			}
-			baseAddr, _ = strconv.Atoi(strings.TrimSpace(string(base)))
-			break
-		}
-	}
-
-	return baseAddr, nil
 }

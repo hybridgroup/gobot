@@ -43,37 +43,39 @@ func (n *NullReadWriteCloser) Close() error {
 	return closeErr
 }
 
-func initTestChipAdaptor() *Adaptor {
+func initTestDragonBoardAdaptor(t *testing.T) *Adaptor {
 	a := NewAdaptor()
-	a.Connect()
+	if err := a.Connect(); err != nil {
+		t.Error(err)
+	}
 	return a
 }
 
-func TestChipAdaptorDigitalIO(t *testing.T) {
-	a := initTestChipAdaptor()
+func TestDragonBoardAdaptorDigitalIO(t *testing.T) {
+	a := initTestDragonBoardAdaptor(t)
 	fs := sysfs.NewMockFilesystem([]string{
 		"/sys/class/gpio/export",
 		"/sys/class/gpio/unexport",
-		"/sys/class/gpio/gpio50/value",
-		"/sys/class/gpio/gpio50/direction",
-		"/sys/class/gpio/gpio139/value",
-		"/sys/class/gpio/gpio139/direction",
+		"/sys/class/gpio/gpio36/value",
+		"/sys/class/gpio/gpio36/direction",
+		"/sys/class/gpio/gpio12/value",
+		"/sys/class/gpio/gpio12/direction",
 	})
 
 	sysfs.SetFilesystem(fs)
 
-	a.DigitalWrite("CSID7", 1)
-	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio139/value"].Contents, "1")
+	_ = a.DigitalWrite("GPIO_B", 1)
+	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio12/value"].Contents, "1")
 
-	fs.Files["/sys/class/gpio/gpio50/value"].Contents = "1"
-	i, _ := a.DigitalRead("TWI2-SDA")
+	fs.Files["/sys/class/gpio/gpio36/value"].Contents = "1"
+	i, _ := a.DigitalRead("GPIO_A")
 	gobottest.Assert(t, i, 1)
 
-	gobottest.Assert(t, a.DigitalWrite("XIO-P10", 1), errors.New("Not a valid pin"))
+	gobottest.Assert(t, a.DigitalWrite("GPIO_M", 1), errors.New("Not a valid pin"))
 }
 
-func TestChipAdaptorI2c(t *testing.T) {
-	a := initTestChipAdaptor()
+func TestDragonBoardAdaptorI2c(t *testing.T) {
+	a := initTestDragonBoardAdaptor(t)
 	fs := sysfs.NewMockFilesystem([]string{
 		"/dev/i2c-1",
 	})
@@ -83,9 +85,9 @@ func TestChipAdaptorI2c(t *testing.T) {
 	con, err := a.GetConnection(0xff, 1)
 	gobottest.Assert(t, err, nil)
 
-	con.Write([]byte{0x00, 0x01})
+	_, _ = con.Write([]byte{0x00, 0x01})
 	data := []byte{42, 42}
-	con.Read(data)
+	_, _ = con.Read(data)
 	gobottest.Assert(t, data, []byte{0x00, 0x01})
 
 	gobottest.Assert(t, a.Finalize(), nil)
