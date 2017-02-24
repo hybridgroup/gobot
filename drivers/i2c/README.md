@@ -15,17 +15,19 @@ Gobot has a extensible system for connecting to hardware devices. The following 
 - Adafruit Motor Hat
 - BlinkM LED
 - BMP180 Barometric Pressure/Temperature/Altitude Sensor
+- DRV2605L Haptic Controller
 - Grove Digital Accelerometer
 - Grove RGB LCD
 - HMC6352 Compass
 - JHD1313M1 LCD Display w/RGB Backlight
-- LIDAR-Lite
 - L3GD20H 3-Axis Gyroscope
+- LIDAR-Lite
 - MCP23017 Port Expander
 - MMA7660 3-Axis Accelerometer
 - MPL115A2 Barometer
 - MPU6050 Accelerometer/Gyroscope
 - SHT3x-D Temperature/Humidity
+- TSL2561 Digital Luminosity/Lux/Light Sensor
 - Wii Nunchuck Controller
 
 More drivers are coming soon...
