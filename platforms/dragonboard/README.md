@@ -25,7 +25,7 @@ import (
 )
 
 func main() {
-    dragonAdaptor := chip.NewAdaptor()
+    dragonAdaptor := dragonboard.NewAdaptor()
     button := gpio.NewButtonDriver(dragonAdaptor, "GPIO_A")
 
     work := func() {
