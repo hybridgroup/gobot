@@ -25,3 +25,13 @@ func TestRobotToJSON(t *testing.T) {
 	gobottest.Assert(t, len(json.Devices), r.Devices().Len())
 	gobottest.Assert(t, len(json.Commands), len(r.Commands()))
 }
+
+func TestRobotDevicesToJSON(t *testing.T) {
+	r := newTestRobot("Robot99")
+	json := NewJSONRobot(r)
+	gobottest.Assert(t, len(json.Devices), r.Devices().Len())
+	gobottest.Assert(t, json.Devices[0].Name, "Device1")
+	gobottest.Assert(t, json.Devices[0].Driver, "*gobot.testDriver")
+	gobottest.Assert(t, json.Devices[0].Connection, "Connection1")
+	gobottest.Assert(t, len(json.Devices[0].Commands), 1)
+}
