@@ -10,16 +10,6 @@ import (
 	"gobot.io/x/gobot/gobottest"
 )
 
-func TestConnectionEach(t *testing.T) {
-	r := newTestRobot("Robot1")
-
-	i := 0
-	r.Connections().Each(func(conn Connection) {
-		i++
-	})
-	gobottest.Assert(t, r.Connections().Len(), i)
-}
-
 func initTestMaster() *Master {
 	log.SetOutput(&NullReadWriteCloser{})
 	g := NewMaster()
@@ -56,7 +46,7 @@ func TestNullReadWriteCloser(t *testing.T) {
 	gobottest.Assert(t, n.Close(), nil)
 }
 
-func TestGobotRobot(t *testing.T) {
+func TestMasterRobot(t *testing.T) {
 	g := initTestMaster()
 	gobottest.Assert(t, g.Robot("Robot1").Name, "Robot1")
 	gobottest.Assert(t, g.Robot("Robot4"), (*Robot)(nil))
@@ -69,7 +59,7 @@ func TestGobotRobot(t *testing.T) {
 	gobottest.Assert(t, g.Robot("Robot1").Connections().Len(), 3)
 }
 
-func TestGobotToJSON(t *testing.T) {
+func TestMasterToJSON(t *testing.T) {
 	g := initTestMaster()
 	g.AddCommand("test_function", func(params map[string]interface{}) interface{} {
 		return nil
@@ -103,7 +93,7 @@ func TestMasterStartDriverErrors(t *testing.T) {
 	testDriverStart = func() (err error) { return }
 }
 
-func TestRobotHaltDriverErrors(t *testing.T) {
+func TestMasterHaltFromRobotDriverErrors(t *testing.T) {
 	g := initTestMaster1Robot()
 	e := errors.New("driver halt error 1")
 	testDriverHalt = func() (err error) {
@@ -121,7 +111,7 @@ func TestRobotHaltDriverErrors(t *testing.T) {
 	testDriverHalt = func() (err error) { return }
 }
 
-func TestMasterStartAdaptorErrors(t *testing.T) {
+func TestMasterStartRobotAdaptorErrors(t *testing.T) {
 	g := initTestMaster1Robot()
 	e := errors.New("adaptor start error 1")
 
