@@ -3,6 +3,8 @@ package gobot
 import (
 	"testing"
 	"time"
+
+	"gobot.io/x/gobot/gobottest"
 )
 
 func TestEventerAddEvent(t *testing.T) {
@@ -12,6 +14,7 @@ func TestEventerAddEvent(t *testing.T) {
 	if _, ok := e.Events()["test"]; !ok {
 		t.Errorf("Could not add event to list of Event names")
 	}
+	gobottest.Assert(t, e.Event("test"), "test")
 }
 
 func TestEventerDeleteEvent(t *testing.T) {
