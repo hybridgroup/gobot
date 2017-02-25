@@ -7,7 +7,7 @@ go test -i ./...
 
 for package in "${PACKAGES[@]}"
 do
-  go test -coverprofile=tmp.cov gobot.io/x/$package
+  go test -covermode=atomic -coverprofile=tmp.cov gobot.io/x/$package
   if [ $? -ne 0 ]
   then
     EXITCODE=1

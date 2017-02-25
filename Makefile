@@ -11,7 +11,7 @@ cover:
 	echo "" > profile.cov
 	go test -i ./...
 	for package in $(PACKAGES) ; do \
-		go test -coverprofile=tmp.cov gobot.io/x/$$package ; \
+		go test -covermode=atomic -coverprofile=tmp.cov gobot.io/x/$$package ; \
 		cat tmp.cov >> profile.cov ; \
 		rm tmp.cov ; \
 	done ; \
