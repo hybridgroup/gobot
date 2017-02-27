@@ -53,12 +53,6 @@ func TestI2CReadWordData(t *testing.T) {
 	gobottest.Assert(t, v, uint16(0))
 }
 
-func TestI2CReadBlockData(t *testing.T) {
-	c := NewConnection(initI2CDevice(), 0x06)
-	i, _ := c.ReadBlockData(0x01, []byte{})
-	gobottest.Assert(t, i, 0)
-}
-
 func TestI2CWriteByte(t *testing.T) {
 	c := NewConnection(initI2CDevice(), 0x06)
 	err := c.WriteByte(0x01)
@@ -77,8 +71,8 @@ func TestI2CWriteWordData(t *testing.T) {
 	gobottest.Assert(t, err, nil)
 }
 
-func TestI2CWriteBlockDataErrNotSupported(t *testing.T) {
+func TestI2CWriteBlockData(t *testing.T) {
 	c := NewConnection(initI2CDevice(), 0x06)
 	err := c.WriteBlockData(0x01, []byte{0x01, 0x02})
-	gobottest.Refute(t, err, nil)
+	gobottest.Assert(t, err, nil)
 }

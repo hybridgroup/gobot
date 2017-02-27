@@ -103,14 +103,6 @@ func (c *i2cConnection) ReadWordData(reg uint8) (val uint16, err error) {
 	return c.bus.ReadWordData(reg)
 }
 
-// ReadBlockData reads a block of bytes for a register on the i2c device.
-func (c *i2cConnection) ReadBlockData(reg uint8, b []byte) (n int, err error) {
-	if err := c.bus.SetAddress(c.address); err != nil {
-		return 0, err
-	}
-	return c.bus.ReadBlockData(reg, b)
-}
-
 // WriteByte writes a single byte to the i2c device.
 func (c *i2cConnection) WriteByte(val byte) (err error) {
 	if err := c.bus.SetAddress(c.address); err != nil {
