@@ -42,7 +42,7 @@ func TestDRV2605LDriverHalt(t *testing.T) {
 	gobottest.Assert(t, d.Start(), nil)
 	adaptor.written = []byte{}
 	gobottest.Assert(t, d.Halt(), nil)
-	gobottest.Assert(t, adaptor.written, []byte{drv2605RegGo, 0, drv2605RegMode, 1})
+	gobottest.Assert(t, adaptor.written, []byte{drv2605RegGo, 0, drv2605RegMode, 42 | drv2605Standby})
 }
 
 func TestDRV2605LDriverGetPause(t *testing.T) {

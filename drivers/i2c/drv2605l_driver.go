@@ -183,7 +183,7 @@ func (d *DRV2605LDriver) SetMode(newMode DRV2605Mode) (err error) {
 	}
 
 	// clear mode bits (lower three bits)
-	mode &= 0xf1
+	mode &= 0xf8
 	// set new mode bits
 	mode |= uint8(newMode)
 
@@ -264,7 +264,7 @@ func (d *DRV2605LDriver) Halt() (err error) {
 		}
 
 		// enter standby
-		return d.connection.WriteByteData(drv2605RegMode, 1)
+		return d.SetStandbyMode(true)
 	}
 	return
 }
