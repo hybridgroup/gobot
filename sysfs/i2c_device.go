@@ -9,6 +9,7 @@ import (
 )
 
 const (
+	// From  /usr/include/linux/i2c-dev.h:
 	// ioctl signals
 	I2C_SLAVE = 0x0703
 	I2C_FUNCS = 0x0705
@@ -16,7 +17,15 @@ const (
 	// Read/write markers
 	I2C_SMBUS_READ  = 1
 	I2C_SMBUS_WRITE = 0
+
+	// From  /usr/include/linux/i2c.h:
 	// Adapter functionality
+	I2C_FUNC_SMBUS_READ_BYTE        = 0x00020000
+	I2C_FUNC_SMBUS_WRITE_BYTE       = 0x00040000
+	I2C_FUNC_SMBUS_READ_BYTE_DATA   = 0x00080000
+	I2C_FUNC_SMBUS_WRITE_BYTE_DATA  = 0x00100000
+	I2C_FUNC_SMBUS_READ_WORD_DATA   = 0x00200000
+	I2C_FUNC_SMBUS_WRITE_WORD_DATA  = 0x00400000
 	I2C_FUNC_SMBUS_READ_BLOCK_DATA  = 0x01000000
 	I2C_FUNC_SMBUS_WRITE_BLOCK_DATA = 0x02000000
 	// Transaction types
@@ -108,35 +117,59 @@ func (d *i2cDevice) Close() (err error) {
 }
 
 func (d *i2cDevice) ReadByte() (val uint8, err error) {
+	if d.funcs&I2C_FUNC_SMBUS_READ_BYTE == 0 {
+		return 0, fmt.Errorf("SMBus read byte not supported")
+	}
+
 	var data uint8
 	err = d.smbusAccess(I2C_SMBUS_READ, 0, I2C_SMBUS_BYTE, uintptr(unsafe.Pointer(&data)))
 	return data, err
 }
 
 func (d *i2cDevice) ReadByteData(reg uint8) (val uint8, err error) {
+	if d.funcs&I2C_FUNC_SMBUS_READ_BYTE_DATA == 0 {
+		return 0, fmt.Errorf("SMBus read byte data not supported")
+	}
+
 	var data uint8
 	err = d.smbusAccess(I2C_SMBUS_READ, reg, I2C_SMBUS_BYTE_DATA, uintptr(unsafe.Pointer(&data)))
 	return data, err
 }
 
 func (d *i2cDevice) ReadWordData(reg uint8) (val uint16, err error) {
+	if d.funcs&I2C_FUNC_SMBUS_READ_WORD_DATA == 0 {
+		return 0, fmt.Errorf("SMBus read word data not supported")
+	}
+
 	var data uint16
 	err = d.smbusAccess(I2C_SMBUS_READ, reg, I2C_SMBUS_WORD_DATA, uintptr(unsafe.Pointer(&data)))
 	return data, err
 }
 
 func (d *i2cDevice) WriteByte(val uint8) (err error) {
+	if d.funcs&I2C_FUNC_SMBUS_WRITE_BYTE == 0 {
+		return fmt.Errorf("SMBus write byte not supported")
+	}
+
 	err = d.smbusAccess(I2C_SMBUS_WRITE, val, I2C_SMBUS_BYTE, uintptr(0))
 	return err
 }
 
 func (d *i2cDevice) WriteByteData(reg uint8, val uint8) (err error) {
+	if d.funcs&I2C_FUNC_SMBUS_WRITE_BYTE_DATA == 0 {
+		return fmt.Errorf("SMBus write byte data not supported")
+	}
+
 	var data = val
 	err = d.smbusAccess(I2C_SMBUS_WRITE, reg, I2C_SMBUS_BYTE_DATA, uintptr(unsafe.Pointer(&data)))
 	return err
 }
 
 func (d *i2cDevice) WriteWordData(reg uint8, val uint16) (err error) {
+	if d.funcs&I2C_FUNC_SMBUS_WRITE_WORD_DATA == 0 {
+		return fmt.Errorf("SMBus write word data not supported")
+	}
+
 	var data = val
 	err = d.smbusAccess(I2C_SMBUS_WRITE, reg, I2C_SMBUS_WORD_DATA, uintptr(unsafe.Pointer(&data)))
 	return err

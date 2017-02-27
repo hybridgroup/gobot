@@ -5,7 +5,21 @@ import (
 
 	"gobot.io/x/gobot/gobottest"
 	"gobot.io/x/gobot/sysfs"
+	"syscall"
+	"unsafe"
 )
+
+func syscallImpl(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno) {
+	if (trap == syscall.SYS_IOCTL) && (a2 == sysfs.I2C_FUNCS) {
+		var funcPtr *uint64 = (*uint64)(unsafe.Pointer(a3))
+		*funcPtr = sysfs.I2C_FUNC_SMBUS_READ_BYTE | sysfs.I2C_FUNC_SMBUS_READ_BYTE_DATA |
+			sysfs.I2C_FUNC_SMBUS_READ_WORD_DATA |
+			sysfs.I2C_FUNC_SMBUS_WRITE_BYTE | sysfs.I2C_FUNC_SMBUS_WRITE_BYTE_DATA |
+			sysfs.I2C_FUNC_SMBUS_WRITE_WORD_DATA
+	}
+	// Let all operations succeed
+	return 0, 0, 0
+}
 
 func initI2CDevice() sysfs.I2cDevice {
 	fs := sysfs.NewMockFilesystem([]string{
@@ -13,7 +27,9 @@ func initI2CDevice() sysfs.I2cDevice {
 	})
 	sysfs.SetFilesystem(fs)
 
-	sysfs.SetSyscall(&sysfs.MockSyscall{})
+	sysfs.SetSyscall(&sysfs.MockSyscall{
+		Impl: syscallImpl,
+	})
 	i, _ := sysfs.NewI2cDevice("/dev/i2c-1")
 	return i
 }
