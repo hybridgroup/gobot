@@ -59,12 +59,12 @@ func (b *ButtonDriver) adaptor() *ble.ClientAdaptor {
 func (b *ButtonDriver) Start() (err error) {
 	// subscribe to button A notifications
 	b.adaptor().Subscribe(buttonACharacteristic, func(data []byte, e error) {
-		b.Publish(b.Event(ButtonA), nil)
+		b.Publish(b.Event(ButtonA), data)
 	})
 
 	// subscribe to button B notifications
 	b.adaptor().Subscribe(buttonBCharacteristic, func(data []byte, e error) {
-		b.Publish(b.Event(ButtonB), nil)
+		b.Publish(b.Event(ButtonB), data)
 	})
 
 	return

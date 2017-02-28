@@ -15,11 +15,11 @@ func main() {
 
 	work := func() {
 		ubit.On(microbit.ButtonA, func(data interface{}) {
-			fmt.Println("button A")
+			fmt.Println("button A", data)
 		})
 
 		ubit.On(microbit.ButtonB, func(data interface{}) {
-			fmt.Println("button B")
+			fmt.Println("button B", data)
 		})
 	}
 
