@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -98,7 +99,7 @@ func (c *Adaptor) Connect() (err error) {
 	err = c.initPWM()
 	if err != nil {
 		// Let adaptor proceed without PWM, might not be available in the current setup
-		fmt.Printf("Failed to init PWM: %v\n", err)
+		log.Printf("Failed to init PWM: %v\n", err)
 	} else {
 		// Set up some sane PWM defaults to make servo functions
 		// work out of the box.
@@ -229,9 +230,8 @@ func (c *Adaptor) PwmWrite(pin string, val byte) (err error) {
 	if c.pwm != nil {
 		val := gobot.ToScale(gobot.FromScale(float64(val), 0, 255), 0, 100)
 		return c.pwm.setDutycycle(val)
-	} else {
-		return fmt.Errorf("PWM is not available, check device tree setup")
 	}
+	return fmt.Errorf("PWM is not available, check device tree setup")
 }
 
 // ServoWrite writes a servo signal to the specified pin
@@ -247,9 +247,8 @@ func (c *Adaptor) ServoWrite(pin string, angle byte) (err error) {
 		const maxDuty = 100 * 0.0020 * pwmFrequency
 		val := gobot.ToScale(gobot.FromScale(float64(angle), 0, 180), minDuty, maxDuty)
 		return c.pwm.setDutycycle(val)
-	} else {
-		return fmt.Errorf("PWM is not available, check device tree setup")
 	}
+	return fmt.Errorf("PWM is not available, check device tree setup")
 }
 
 func getXIOBase() (baseAddr int, err error) {
