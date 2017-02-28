@@ -5,7 +5,7 @@ import (
 	"gobot.io/x/gobot/platforms/ble"
 )
 
-// LEDDriver is the Gobot interface to the Microbit LED
+// LEDDriver is the Gobot driver for the Microbit's LED array
 type LEDDriver struct {
 	name       string
 	connection gobot.Connection
