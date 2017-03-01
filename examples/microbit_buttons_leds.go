@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"gobot.io/x/gobot"
@@ -16,7 +15,6 @@ func main() {
 
 	work := func() {
 		buttons.On(microbit.ButtonA, func(data interface{}) {
-			fmt.Println("a", data)
 			if data.([]byte)[0] == 1 {
 				leds.UpLeftArrow()
 				return
@@ -26,7 +24,6 @@ func main() {
 		})
 
 		buttons.On(microbit.ButtonB, func(data interface{}) {
-			fmt.Println("b", data)
 			if data.([]byte)[0] == 1 {
 				leds.UpRightArrow()
 				return
