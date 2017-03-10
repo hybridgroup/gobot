@@ -1,6 +1,6 @@
 # Microbit
 
-The Microbit is a tiny computer with built-in Bluetooth LE aka Bluetooth 4.0.
+The [Microbit](http://microbit.org/) is a tiny computer with built-in Bluetooth LE aka Bluetooth 4.0.
 
 ## How to Install
 ```
@@ -8,8 +8,49 @@ go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/micro
 ```
 
 ## How to Use
+
+The Gobot platform for the Microbit includes several different drivers, each one corresponding to a different capability:
+
+- AccelerometerDriver
+- ButtonDriver
+- LEDDriver
+
+The following example uses the LEDDriver:
+
 ```go
-// code here...
+package main
+
+import (
+	"os"
+	"time"
+
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/platforms/ble"
+	"gobot.io/x/gobot/platforms/microbit"
+)
+
+func main() {
+	bleAdaptor := ble.NewClientAdaptor(os.Args[1])
+	ubit := microbit.NewLEDDriver(bleAdaptor)
+
+	work := func() {
+		ubit.Blank()
+		gobot.After(1*time.Second, func() {
+			ubit.WriteText("Hello")
+		})
+		gobot.After(7*time.Second, func() {
+			ubit.Smile()
+		})
+	}
+
+	robot := gobot.NewRobot("blinkBot",
+		[]gobot.Connection{bleAdaptor},
+		[]gobot.Device{ubit},
+		work,
+	)
+
+	robot.Start()
+}
 ```
 
 ## How to Connect
