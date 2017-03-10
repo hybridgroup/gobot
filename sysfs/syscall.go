@@ -13,7 +13,9 @@ type SystemCaller interface {
 type NativeSyscall struct{}
 
 // MockSyscall represents the mock Syscall
-type MockSyscall struct{}
+type MockSyscall struct {
+	Impl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno)
+}
 
 var sys SystemCaller = &NativeSyscall{}
 
@@ -34,5 +36,9 @@ func (sys *NativeSyscall) Syscall(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err
 
 // Syscall implements the SystemCaller interface
 func (sys *MockSyscall) Syscall(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno) {
-	return 0, 0, 0
+	if sys.Impl != nil {
+		return sys.Impl(trap, a1, a2, a3)
+	} else {
+		return 0, 0, 0
+	}
 }

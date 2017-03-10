@@ -9,6 +9,7 @@ import (
 )
 
 const (
+	// From  /usr/include/linux/i2c-dev.h:
 	// ioctl signals
 	I2C_SLAVE = 0x0703
 	I2C_FUNCS = 0x0705
@@ -16,21 +17,26 @@ const (
 	// Read/write markers
 	I2C_SMBUS_READ  = 1
 	I2C_SMBUS_WRITE = 0
+
+	// From  /usr/include/linux/i2c.h:
 	// Adapter functionality
+	I2C_FUNC_SMBUS_READ_BYTE        = 0x00020000
+	I2C_FUNC_SMBUS_WRITE_BYTE       = 0x00040000
+	I2C_FUNC_SMBUS_READ_BYTE_DATA   = 0x00080000
+	I2C_FUNC_SMBUS_WRITE_BYTE_DATA  = 0x00100000
+	I2C_FUNC_SMBUS_READ_WORD_DATA   = 0x00200000
+	I2C_FUNC_SMBUS_WRITE_WORD_DATA  = 0x00400000
 	I2C_FUNC_SMBUS_READ_BLOCK_DATA  = 0x01000000
 	I2C_FUNC_SMBUS_WRITE_BLOCK_DATA = 0x02000000
 	// Transaction types
-	I2C_SMBUS_BYTE                = 1
-	I2C_SMBUS_BYTE_DATA           = 2
-	I2C_SMBUS_WORD_DATA           = 3
-	I2C_SMBUS_PROC_CALL           = 4
-	I2C_SMBUS_BLOCK_DATA          = 5
-	I2C_SMBUS_I2C_BLOCK_DATA      = 6
-	I2C_SMBUS_BLOCK_PROC_CALL     = 7  /* SMBus 2.0 */
-	I2C_SMBUS_BLOCK_DATA_PEC      = 8  /* SMBus 2.0 */
-	I2C_SMBUS_PROC_CALL_PEC       = 9  /* SMBus 2.0 */
-	I2C_SMBUS_BLOCK_PROC_CALL_PEC = 10 /* SMBus 2.0 */
-	I2C_SMBUS_WORD_DATA_PEC       = 11 /* SMBus 2.0 */
+	I2C_SMBUS_BYTE             = 1
+	I2C_SMBUS_BYTE_DATA        = 2
+	I2C_SMBUS_WORD_DATA        = 3
+	I2C_SMBUS_PROC_CALL        = 4
+	I2C_SMBUS_BLOCK_DATA       = 5
+	I2C_SMBUS_I2C_BLOCK_BROKEN = 6
+	I2C_SMBUS_BLOCK_PROC_CALL  = 7 /* SMBus 2.0 */
+	I2C_SMBUS_I2C_BLOCK_DATA   = 8 /* SMBus 2.0 */
 )
 
 type i2cSmbusIoctlData struct {
@@ -45,7 +51,6 @@ type I2cOperations interface {
 	ReadByte() (val uint8, err error)
 	ReadByteData(reg uint8) (val uint8, err error)
 	ReadWordData(reg uint8) (val uint16, err error)
-	ReadBlockData(reg uint8, b []byte) (n int, err error)
 	WriteByte(val uint8) (err error)
 	WriteByteData(reg uint8, val uint8) (err error)
 	WriteWordData(reg uint8, val uint16) (err error)
@@ -112,69 +117,84 @@ func (d *i2cDevice) Close() (err error) {
 }
 
 func (d *i2cDevice) ReadByte() (val uint8, err error) {
+	if d.funcs&I2C_FUNC_SMBUS_READ_BYTE == 0 {
+		return 0, fmt.Errorf("SMBus read byte not supported")
+	}
+
 	var data uint8
 	err = d.smbusAccess(I2C_SMBUS_READ, 0, I2C_SMBUS_BYTE, uintptr(unsafe.Pointer(&data)))
 	return data, err
 }
 
 func (d *i2cDevice) ReadByteData(reg uint8) (val uint8, err error) {
+	if d.funcs&I2C_FUNC_SMBUS_READ_BYTE_DATA == 0 {
+		return 0, fmt.Errorf("SMBus read byte data not supported")
+	}
+
 	var data uint8
 	err = d.smbusAccess(I2C_SMBUS_READ, reg, I2C_SMBUS_BYTE_DATA, uintptr(unsafe.Pointer(&data)))
 	return data, err
 }
 
 func (d *i2cDevice) ReadWordData(reg uint8) (val uint16, err error) {
+	if d.funcs&I2C_FUNC_SMBUS_READ_WORD_DATA == 0 {
+		return 0, fmt.Errorf("SMBus read word data not supported")
+	}
+
 	var data uint16
 	err = d.smbusAccess(I2C_SMBUS_READ, reg, I2C_SMBUS_WORD_DATA, uintptr(unsafe.Pointer(&data)))
 	return data, err
 }
 
-func (d *i2cDevice) ReadBlockData(reg uint8, buf []byte) (n int, err error) {
-	if d.funcs&I2C_FUNC_SMBUS_READ_BLOCK_DATA == 0 {
-		return 0, fmt.Errorf("SMBus block data reading not supported")
+func (d *i2cDevice) WriteByte(val uint8) (err error) {
+	if d.funcs&I2C_FUNC_SMBUS_WRITE_BYTE == 0 {
+		return fmt.Errorf("SMBus write byte not supported")
 	}
 
-	data := make([]byte, 32+1) // Max message + size as defined by SMBus standard
-
-	err = d.smbusAccess(I2C_SMBUS_READ, reg, I2C_SMBUS_I2C_BLOCK_DATA, uintptr(unsafe.Pointer(&data[0])))
-
-	copy(buf, data[1:])
-	return int(data[0]), err
-}
-
-func (d *i2cDevice) WriteByte(val uint8) (err error) {
 	err = d.smbusAccess(I2C_SMBUS_WRITE, val, I2C_SMBUS_BYTE, uintptr(0))
 	return err
 }
 
 func (d *i2cDevice) WriteByteData(reg uint8, val uint8) (err error) {
+	if d.funcs&I2C_FUNC_SMBUS_WRITE_BYTE_DATA == 0 {
+		return fmt.Errorf("SMBus write byte data not supported")
+	}
+
 	var data = val
 	err = d.smbusAccess(I2C_SMBUS_WRITE, reg, I2C_SMBUS_BYTE_DATA, uintptr(unsafe.Pointer(&data)))
 	return err
 }
 
 func (d *i2cDevice) WriteWordData(reg uint8, val uint16) (err error) {
+	if d.funcs&I2C_FUNC_SMBUS_WRITE_WORD_DATA == 0 {
+		return fmt.Errorf("SMBus write word data not supported")
+	}
+
 	var data = val
 	err = d.smbusAccess(I2C_SMBUS_WRITE, reg, I2C_SMBUS_WORD_DATA, uintptr(unsafe.Pointer(&data)))
 	return err
 }
 
 func (d *i2cDevice) WriteBlockData(reg uint8, data []byte) (err error) {
-	if d.funcs&I2C_FUNC_SMBUS_WRITE_BLOCK_DATA == 0 {
-		return fmt.Errorf("SMBus block data writing not supported")
-	}
-
 	if len(data) > 32 {
-		data = data[:32]
+		return fmt.Errorf("Writing blocks larger than 32 bytes (%v) not supported", len(data))
 	}
 
 	buf := make([]byte, len(data)+1)
-	copy(buf[:1], data)
-	buf[0] = uint8(len(data))
+	copy(buf[1:], data)
+	buf[0] = reg
 
-	err = d.smbusAccess(I2C_SMBUS_WRITE, reg, I2C_SMBUS_I2C_BLOCK_DATA, uintptr(unsafe.Pointer(&buf[0])))
+	n, err := d.file.Write(buf)
 
-	return err
+	if err != nil {
+		return err
+	}
+
+	if n != len(buf) {
+		return fmt.Errorf("Write to device truncated, %v of %v written", n, len(buf))
+	}
+
+	return nil
 }
 
 // Read implements the io.ReadWriteCloser method by direct I2C read operations.
