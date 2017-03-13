@@ -1,3 +1,7 @@
+// +build example
+//
+// Do not build by default.
+
 /*
  To run this example, pass the IP address/port as first param:
 

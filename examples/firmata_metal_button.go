@@ -1,3 +1,7 @@
+// +build example
+//
+// Do not build by default.
+
 // TO RUN:
 //	firmata_metal_button <PORT>
 //

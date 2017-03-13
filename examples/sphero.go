@@ -1,3 +1,7 @@
+// +build example
+//
+// Do not build by default.
+
 package main
 
 import (

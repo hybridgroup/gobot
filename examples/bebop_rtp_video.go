@@ -1,3 +1,7 @@
+// +build example
+//
+// Do not build by default.
+
 /*
 	This example will connect to the Parrot Bebop and streams the drone video
 	via the RTP protocol.

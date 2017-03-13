@@ -1,3 +1,7 @@
+// +build example
+//
+// Do not build by default.
+
 // TO RUN:
 //  go run ./examples/mqtt_driver_ping.go <SERVER>
 //
