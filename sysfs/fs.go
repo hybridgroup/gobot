@@ -19,6 +19,7 @@ type File interface {
 // Filesystem opens files and returns either a native file system or user defined
 type Filesystem interface {
 	OpenFile(name string, flag int, perm os.FileMode) (file File, err error)
+	Stat(name string) (os.FileInfo, error)
 }
 
 // NativeFilesystem represents the native file system implementation
@@ -37,7 +38,17 @@ func (fs *NativeFilesystem) OpenFile(name string, flag int, perm os.FileMode) (f
 	return os.OpenFile(name, flag, perm)
 }
 
+// Stat calls os.Stat()
+func (fs *NativeFilesystem) Stat(name string) (os.FileInfo, error) {
+	return os.Stat(name)
+}
+
 // OpenFile calls either the NativeFilesystem or user defined OpenFile
 func OpenFile(name string, flag int, perm os.FileMode) (file File, err error) {
 	return fs.OpenFile(name, flag, perm)
+}
+
+// Stat call either the NativeFilesystem of user defined Stat
+func Stat(name string) (os.FileInfo, error) {
+	return fs.Stat(name)
 }

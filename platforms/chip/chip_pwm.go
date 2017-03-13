@@ -4,15 +4,17 @@ import (
 	"fmt"
 	"io"
 	"os"
+
+	"gobot.io/x/gobot/sysfs"
 )
 
 const pwmSysfsPath = "/sys/class/pwm/pwmchip0"
 
 type pwmControl struct {
-	periodFile   *os.File
-	dutyFile     *os.File
-	polarityFile *os.File
-	enableFile   *os.File
+	periodFile   sysfs.File
+	dutyFile     sysfs.File
+	polarityFile sysfs.File
+	enableFile   sysfs.File
 
 	duty        uint32
 	periodNanos uint32
@@ -20,7 +22,7 @@ type pwmControl struct {
 }
 
 func exportPWM() (err error) {
-	exporter, err := os.OpenFile(pwmSysfsPath+"/export", os.O_WRONLY, 0666)
+	exporter, err := sysfs.OpenFile(pwmSysfsPath+"/export", os.O_WRONLY, 0666)
 	if err != nil {
 		return err
 	}
@@ -29,7 +31,7 @@ func exportPWM() (err error) {
 }
 
 func unexportPWM() (err error) {
-	exporter, err := os.OpenFile(pwmSysfsPath+"/unexport", os.O_WRONLY, 0666)
+	exporter, err := sysfs.OpenFile(pwmSysfsPath+"/unexport", os.O_WRONLY, 0666)
 	if err != nil {
 		return err
 	}
@@ -40,7 +42,7 @@ func unexportPWM() (err error) {
 func (c *Adaptor) initPWM(pwmFrequency float64) (err error) {
 	const basePath = pwmSysfsPath + "/pwm0"
 
-	if _, err = os.Stat(basePath); err != nil {
+	if _, err = sysfs.Stat(basePath); err != nil {
 		if os.IsNotExist(err) {
 			if err = exportPWM(); err != nil {
 				return
@@ -50,10 +52,10 @@ func (c *Adaptor) initPWM(pwmFrequency float64) (err error) {
 		}
 	}
 
-	var enableFile *os.File
-	var periodFile *os.File
-	var dutyFile *os.File
-	var polarityFile *os.File
+	var enableFile sysfs.File
+	var periodFile sysfs.File
+	var dutyFile sysfs.File
+	var polarityFile sysfs.File
 
 	defer func() {
 		if enableFile != nil {
@@ -70,16 +72,16 @@ func (c *Adaptor) initPWM(pwmFrequency float64) (err error) {
 		}
 	}()
 
-	if enableFile, err = os.OpenFile(basePath+"/enable", os.O_WRONLY, 0666); err != nil {
+	if enableFile, err = sysfs.OpenFile(basePath+"/enable", os.O_WRONLY, 0666); err != nil {
 		return
 	}
-	if periodFile, err = os.OpenFile(basePath+"/period", os.O_WRONLY, 0666); err != nil {
+	if periodFile, err = sysfs.OpenFile(basePath+"/period", os.O_WRONLY, 0666); err != nil {
 		return
 	}
-	if dutyFile, err = os.OpenFile(basePath+"/duty_cycle", os.O_WRONLY, 0666); err != nil {
+	if dutyFile, err = sysfs.OpenFile(basePath+"/duty_cycle", os.O_WRONLY, 0666); err != nil {
 		return
 	}
-	if polarityFile, err = os.OpenFile(basePath+"/polarity", os.O_WRONLY, 0666); err != nil {
+	if polarityFile, err = sysfs.OpenFile(basePath+"/polarity", os.O_WRONLY, 0666); err != nil {
 		return
 	}
 
