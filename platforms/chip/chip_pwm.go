@@ -37,8 +37,6 @@ func unexportPWM() (err error) {
 	return err
 }
 
-//	return fmt.Errorf("PWM is not available, check device tree setup")
-
 func (c *Adaptor) initPWM(pwmFrequency float64) (err error) {
 	const basePath = pwmSysfsPath + "/pwm0"
 

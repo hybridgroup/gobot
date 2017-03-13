@@ -15,6 +15,7 @@ import (
 var _ gobot.Adaptor = (*Adaptor)(nil)
 var _ gpio.DigitalReader = (*Adaptor)(nil)
 var _ gpio.DigitalWriter = (*Adaptor)(nil)
+var _ gpio.ServoWriter = (*Adaptor)(nil)
 var _ i2c.Connector = (*Adaptor)(nil)
 
 type NullReadWriteCloser struct {
@@ -89,4 +90,14 @@ func TestChipAdaptorI2c(t *testing.T) {
 	gobottest.Assert(t, data, []byte{0x00, 0x01})
 
 	gobottest.Assert(t, a.Finalize(), nil)
+}
+
+func TestChipAdaptorInvalidPWMPin(t *testing.T) {
+	a := initTestChipAdaptor()
+
+	err := a.PwmWrite("LCD-D2", 42)
+	gobottest.Refute(t, err, nil)
+
+	err = a.ServoWrite("LCD-D2", 120)
+	gobottest.Refute(t, err, nil)
 }
