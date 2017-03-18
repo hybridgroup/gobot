@@ -7,6 +7,12 @@ The [Microbit](http://microbit.org/) is a tiny computer with built-in Bluetooth 
 go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/microbit
 ```
 
+You must install the Microbit firmware from [@sandeepmistry] located at  [https://github.com/sandeepmistry/node-bbc-microbit](https://github.com/sandeepmistry/node-bbc-microbit) to use the Microbit with Gobot. This firmware is based on the micro:bit template, but with a few changes.
+
+You can either use the [Gort](https://gort.io) command line tool's `gort microbit` commands, or follow the firmware installation instructions at [https://github.com/sandeepmistry/node-bbc-microbit#flashing-microbit-firmware](https://github.com/sandeepmistry/node-bbc-microbit#flashing-microbit-firmware).
+
+The source code for the firmware is located at [https://github.com/sandeepmistry/node-bbc-microbit/files/546610/node-bbc-microbit_zip_nrf51_microbit.zip](https://github.com/sandeepmistry/node-bbc-microbit/files/546610/node-bbc-microbit_zip_nrf51_microbit.zip) however you do not need this source code to install the firmware using the installation instructions.
+
 ## How to Use
 
 The Gobot platform for the Microbit includes several different drivers, each one corresponding to a different capability:

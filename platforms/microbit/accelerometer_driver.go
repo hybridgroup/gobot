@@ -67,7 +67,7 @@ func (b *AccelerometerDriver) adaptor() *ble.ClientAdaptor {
 
 // Start tells driver to get ready to do work
 func (b *AccelerometerDriver) Start() (err error) {
-	// subscribe to button A notifications
+	// subscribe to accelerometer notifications
 	b.adaptor().Subscribe(accelerometerCharacteristic, func(data []byte, e error) {
 		a := &RawAccelerometerData{X: 0, Y: 0, Z: 0}
 
@@ -76,7 +76,8 @@ func (b *AccelerometerDriver) Start() (err error) {
 		binary.Read(buf, binary.LittleEndian, &a.Y)
 		binary.Read(buf, binary.LittleEndian, &a.Z)
 
-		result := &AccelerometerData{X: float32(a.X) / 1000.0,
+		result := &AccelerometerData{
+			X: float32(a.X) / 1000.0,
 			Y: float32(a.Y) / 1000.0,
 			Z: float32(a.Z) / 1000.0}
 
