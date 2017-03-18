@@ -57,6 +57,12 @@ func TestJHD1313MDriverStart(t *testing.T) {
 	gobottest.Assert(t, d.Start(), nil)
 }
 
+func TestJHD1313MDriverHalt(t *testing.T) {
+	d := initTestJHD1313M1Driver()
+	d.Start()
+	gobottest.Assert(t, d.Halt(), nil)
+}
+
 func TestJHD1313MDriverSetRgb(t *testing.T) {
 	d, _ := initTestJHD1313M1DriverWithStubbedAdaptor()
 	d.Start()
@@ -81,16 +87,34 @@ func TestJHD1313MDriverWrite(t *testing.T) {
 	gobottest.Assert(t, d.Write("Hello"), nil)
 }
 
+func TestJHD1313MDriverWriteTwoLines(t *testing.T) {
+	d, _ := initTestJHD1313M1DriverWithStubbedAdaptor()
+	d.Start()
+	gobottest.Assert(t, d.Write("Hello\nthere"), nil)
+}
+
 func TestJHD1313MDriverSetPosition(t *testing.T) {
 	d, _ := initTestJHD1313M1DriverWithStubbedAdaptor()
 	d.Start()
 	gobottest.Assert(t, d.SetPosition(2), nil)
 }
 
+func TestJHD1313MDriverSetSecondLinePosition(t *testing.T) {
+	d, _ := initTestJHD1313M1DriverWithStubbedAdaptor()
+	d.Start()
+	gobottest.Assert(t, d.SetPosition(18), nil)
+}
+
 func TestJHD1313MDriverScroll(t *testing.T) {
 	d, _ := initTestJHD1313M1DriverWithStubbedAdaptor()
 	d.Start()
 	gobottest.Assert(t, d.Scroll(true), nil)
+}
+
+func TestJHD1313MDriverReverseScroll(t *testing.T) {
+	d, _ := initTestJHD1313M1DriverWithStubbedAdaptor()
+	d.Start()
+	gobottest.Assert(t, d.Scroll(false), nil)
 }
 
 func TestJHD1313MDriverSetCustomChar(t *testing.T) {
