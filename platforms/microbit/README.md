@@ -20,6 +20,8 @@ The Gobot platform for the Microbit includes several different drivers, each one
 - AccelerometerDriver
 - ButtonDriver
 - LEDDriver
+- MagnetometerDriver
+- TemperatureDriver
 
 The following example uses the LEDDriver:
 
