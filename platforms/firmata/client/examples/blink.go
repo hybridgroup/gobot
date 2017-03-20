@@ -1,11 +1,15 @@
+// +build example
+//
+// Do not build by default.
+
 package main
 
 import (
 	"fmt"
 	"time"
 
-	"gobot.io/x/gobot/platforms/firmata/client"
 	"github.com/tarm/serial"
+	"gobot.io/x/gobot/platforms/firmata/client"
 )
 
 func main() {

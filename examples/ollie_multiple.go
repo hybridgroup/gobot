@@ -1,3 +1,7 @@
+// +build example
+//
+// Do not build by default.
+
 /*
  To run this example, pass the BLE address or BLE name as first param:
 

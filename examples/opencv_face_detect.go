@@ -1,3 +1,7 @@
+// +build example
+//
+// Do not build by default.
+
 package main
 
 import (
@@ -5,9 +9,9 @@ import (
 	"runtime"
 	"time"
 
+	cv "github.com/lazywei/go-opencv/opencv"
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/platforms/opencv"
-	cv "github.com/lazywei/go-opencv/opencv"
 )
 
 func main() {

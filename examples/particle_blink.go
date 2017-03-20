@@ -1,3 +1,7 @@
+// +build example
+//
+// Do not build by default.
+
 /*
  To run this example, pass the device ID as first param,
  and the access token as the second param:

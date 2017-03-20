@@ -1,3 +1,7 @@
+// +build example
+//
+// Do not build by default.
+
 /*
 	This example will connect to the Bebop and stream its video to a webpage
 	via ffserver. This requires you to have both ffmpeg and ffserver installed

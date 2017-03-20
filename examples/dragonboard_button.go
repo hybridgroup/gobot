@@ -1,32 +1,36 @@
+// +build example
+//
+// Do not build by default.
+
 package main
 
 import (
-    "fmt"
+	"fmt"
 
-    "gobot.io/x/gobot"
-    "gobot.io/x/gobot/drivers/gpio"
-    "gobot.io/x/gobot/platforms/dragonboard"
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/gpio"
+	"gobot.io/x/gobot/platforms/chip"
 )
 
 func main() {
-    dragonAdaptor := chip.NewAdaptor()
-    button := gpio.NewButtonDriver(dragonAdaptor, "GPIO_A")
+	dragonAdaptor := chip.NewAdaptor()
+	button := gpio.NewButtonDriver(dragonAdaptor, "GPIO_A")
 
-    work := func() {
-        gobot.On(button.Event("push"), func(data interface{}) {
-            fmt.Println("button pressed")
-        })
+	work := func() {
+		gobot.On(button.Event("push"), func(data interface{}) {
+			fmt.Println("button pressed")
+		})
 
-        gobot.On(button.Event("release"), func(data interface{}) {
-            fmt.Println("button released")
-        })
-    }
+		gobot.On(button.Event("release"), func(data interface{}) {
+			fmt.Println("button released")
+		})
+	}
 
-    robot := gobot.NewRobot("buttonBot",
-        []gobot.Connection{chipAdaptor},
-        []gobot.Device{button},
-        work,
-    )
+	robot := gobot.NewRobot("buttonBot",
+		[]gobot.Connection{chipAdaptor},
+		[]gobot.Device{button},
+		work,
+	)
 
-    robot.Start()
+	robot.Start()
 }

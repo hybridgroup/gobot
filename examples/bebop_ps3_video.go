@@ -1,3 +1,7 @@
+// +build example
+//
+// Do not build by default.
+
 /*
 	This example will connect to the Parrot Bebop allowing you to control
 	it using a PS3 controller.
