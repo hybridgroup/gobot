@@ -58,7 +58,7 @@ func NewConnection(bus sysfs.I2cDevice, address int) (connection *i2cConnection)
 
 // Read data from an i2c device.
 func (c *i2cConnection) Read(data []byte) (read int, err error) {
-	if err := c.bus.SetAddress(c.address); err != nil {
+	if err = c.bus.SetAddress(c.address); err != nil {
 		return 0, err
 	}
 	read, err = c.bus.Read(data)
@@ -67,7 +67,7 @@ func (c *i2cConnection) Read(data []byte) (read int, err error) {
 
 // Write data to an i2c device.
 func (c *i2cConnection) Write(data []byte) (written int, err error) {
-	if err := c.bus.SetAddress(c.address); err != nil {
+	if err = c.bus.SetAddress(c.address); err != nil {
 		return 0, err
 	}
 	written, err = c.bus.Write(data)

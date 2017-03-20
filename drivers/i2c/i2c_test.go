@@ -3,10 +3,11 @@ package i2c
 import (
 	"testing"
 
-	"gobot.io/x/gobot/gobottest"
-	"gobot.io/x/gobot/sysfs"
 	"syscall"
 	"unsafe"
+
+	"gobot.io/x/gobot/gobottest"
+	"gobot.io/x/gobot/sysfs"
 )
 
 func syscallImpl(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno) {
@@ -37,6 +38,11 @@ func initI2CDevice() sysfs.I2cDevice {
 func TestI2CAddress(t *testing.T) {
 	c := NewConnection(initI2CDevice(), 0x66)
 	gobottest.Assert(t, c.address, 0x66)
+}
+
+func TestI2CClose(t *testing.T) {
+	c := NewConnection(initI2CDevice(), 0x06)
+	gobottest.Assert(t, c.Close(), nil)
 }
 
 func TestI2CRead(t *testing.T) {
