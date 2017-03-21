@@ -20,10 +20,16 @@ func initTestRelayDriver(conn DigitalWriter) *RelayDriver {
 	return NewRelayDriver(conn, "1")
 }
 
-func TestRelayDriverName(t *testing.T) {
+func TestRelayDriverDefaultName(t *testing.T) {
 	g := initTestRelayDriver(newGpioTestAdaptor())
 	gobottest.Refute(t, g.Connection(), nil)
 	gobottest.Assert(t, strings.HasPrefix(g.Name(), "Relay"), true)
+}
+
+func TestRelayDriverSetName(t *testing.T) {
+	g := initTestRelayDriver(newGpioTestAdaptor())
+	g.SetName("mybot")
+	gobottest.Assert(t, g.Name(), "mybot")
 }
 
 func TestRelayDriverStart(t *testing.T) {
