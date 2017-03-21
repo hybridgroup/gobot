@@ -44,3 +44,15 @@ func TestRelayDriverToggle(t *testing.T) {
 	d.Toggle()
 	gobottest.Assert(t, d.State(), false)
 }
+
+func TestRelayDriverCommands(t *testing.T) {
+	d := initTestRelayDriver(newGpioTestAdaptor())
+	gobottest.Assert(t, d.Command("Off")(nil), nil)
+	gobottest.Assert(t, d.State(), false)
+
+	gobottest.Assert(t, d.Command("On")(nil), nil)
+	gobottest.Assert(t, d.State(), true)
+
+	gobottest.Assert(t, d.Command("Toggle")(nil), nil)
+	gobottest.Assert(t, d.State(), false)
+}
