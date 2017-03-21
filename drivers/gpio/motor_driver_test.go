@@ -1,6 +1,7 @@
 package gpio
 
 import (
+	"strings"
 	"testing"
 
 	"gobot.io/x/gobot"
@@ -109,4 +110,15 @@ func TestMotorDriverDirection(t *testing.T) {
 	d.DirectionPin = "2"
 	d.Direction("forward")
 	d.Direction("backward")
+}
+
+func TestMotorDriverDefaultName(t *testing.T) {
+	d := initTestMotorDriver()
+	gobottest.Assert(t, strings.HasPrefix(d.Name(), "Motor"), true)
+}
+
+func TestMotorDriverSetName(t *testing.T) {
+	d := initTestMotorDriver()
+	d.SetName("mybot")
+	gobottest.Assert(t, d.Name(), "mybot")
 }

@@ -2,6 +2,7 @@ package gpio
 
 import (
 	"errors"
+	"strings"
 	"testing"
 
 	"gobot.io/x/gobot"
@@ -78,4 +79,15 @@ func TestLedDriverBrightness(t *testing.T) {
 		return
 	}
 	gobottest.Assert(t, d.Brightness(150), errors.New("pwm error"))
+}
+
+func TestLEDDriverDefaultName(t *testing.T) {
+	d := initTestLedDriver(&gpioTestDigitalWriter{})
+	gobottest.Assert(t, strings.HasPrefix(d.Name(), "LED"), true)
+}
+
+func TestLEDDriverSetName(t *testing.T) {
+	d := initTestLedDriver(&gpioTestDigitalWriter{})
+	d.SetName("mybot")
+	gobottest.Assert(t, d.Name(), "mybot")
 }

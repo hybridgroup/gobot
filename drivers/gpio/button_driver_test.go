@@ -2,6 +2,7 @@ package gpio
 
 import (
 	"errors"
+	"strings"
 	"testing"
 	"time"
 
@@ -102,4 +103,15 @@ func TestButtonDriverStart(t *testing.T) {
 	case <-time.After(BUTTON_TEST_DELAY * time.Millisecond):
 	}
 
+}
+
+func TestButtonDriverDefaultName(t *testing.T) {
+	g := initTestButtonDriver()
+	gobottest.Assert(t, strings.HasPrefix(g.Name(), "Button"), true)
+}
+
+func TestButtonDriverSetName(t *testing.T) {
+	g := initTestButtonDriver()
+	g.SetName("mybot")
+	gobottest.Assert(t, g.Name(), "mybot")
 }

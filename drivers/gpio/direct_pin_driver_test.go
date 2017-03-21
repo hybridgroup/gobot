@@ -2,6 +2,7 @@ package gpio
 
 import (
 	"errors"
+	"strings"
 	"testing"
 
 	"gobot.io/x/gobot"
@@ -102,10 +103,21 @@ func TestDirectPinDriverPwmWrite(t *testing.T) {
 	gobottest.Assert(t, d.PwmWrite(1), ErrPwmWriteUnsupported)
 }
 
-func TestDirectPinDriverDigitalWrie(t *testing.T) {
+func TestDirectPinDriverServoWrite(t *testing.T) {
 	d := initTestDirectPinDriver(newGpioTestAdaptor())
 	gobottest.Refute(t, d.ServoWrite(1), nil)
 
 	d = initTestDirectPinDriver(&gpioTestBareAdaptor{})
 	gobottest.Assert(t, d.ServoWrite(1), ErrServoWriteUnsupported)
+}
+
+func TestDirectPinDriverDefaultName(t *testing.T) {
+	d := initTestDirectPinDriver(newGpioTestAdaptor())
+	gobottest.Assert(t, strings.HasPrefix(d.Name(), "Direct"), true)
+}
+
+func TestDirectPinDriverSetName(t *testing.T) {
+	d := initTestDirectPinDriver(newGpioTestAdaptor())
+	d.SetName("mybot")
+	gobottest.Assert(t, d.Name(), "mybot")
 }

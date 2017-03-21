@@ -2,6 +2,7 @@ package gpio
 
 import (
 	"errors"
+	"strings"
 	"testing"
 
 	"gobot.io/x/gobot"
@@ -81,4 +82,15 @@ func TestRgbLedDriverSetLevel(t *testing.T) {
 		return
 	}
 	gobottest.Assert(t, d.SetLevel("1", 150), errors.New("pwm error"))
+}
+
+func TestRgbLedDriverDefaultName(t *testing.T) {
+	d := initTestRgbLedDriver(&gpioTestDigitalWriter{})
+	gobottest.Assert(t, strings.HasPrefix(d.Name(), "RGB"), true)
+}
+
+func TestRgbLedDriverSetName(t *testing.T) {
+	d := initTestRgbLedDriver(&gpioTestDigitalWriter{})
+	d.SetName("mybot")
+	gobottest.Assert(t, d.Name(), "mybot")
 }

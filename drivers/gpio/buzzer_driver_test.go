@@ -20,10 +20,15 @@ func initTestBuzzerDriver(conn DigitalWriter) *BuzzerDriver {
 	return NewBuzzerDriver(conn, "1")
 }
 
-func TestBuzzerDriverName(t *testing.T) {
+func TestBuzzerDriverDefaultName(t *testing.T) {
 	g := initTestBuzzerDriver(newGpioTestAdaptor())
-	gobottest.Refute(t, g.Connection(), nil)
 	gobottest.Assert(t, strings.HasPrefix(g.Name(), "Buzzer"), true)
+}
+
+func TestBuzzerDriverSetName(t *testing.T) {
+	g := initTestBuzzerDriver(newGpioTestAdaptor())
+	g.SetName("mybot")
+	gobottest.Assert(t, g.Name(), "mybot")
 }
 
 func TestBuzzerDriverStart(t *testing.T) {
