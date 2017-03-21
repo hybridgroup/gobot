@@ -40,3 +40,12 @@ func TestBuzzerDriverHalt(t *testing.T) {
 	d := initTestBuzzerDriver(newGpioTestAdaptor())
 	gobottest.Assert(t, d.Halt(), nil)
 }
+
+func TestBuzzerDriverToggle(t *testing.T) {
+	d := initTestBuzzerDriver(newGpioTestAdaptor())
+	d.Off()
+	d.Toggle()
+	gobottest.Assert(t, d.State(), true)
+	d.Toggle()
+	gobottest.Assert(t, d.State(), false)
+}
