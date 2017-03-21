@@ -197,7 +197,7 @@ func (d *BMP180Driver) calculateB5(rawTemp int16) int32 {
 }
 
 func (d *BMP180Driver) rawPressure(mode BMP180OversamplingMode) (rawPressure int32, err error) {
-	if _, err := d.connection.Write([]byte{bmp180RegisterCtl, bmp180CmdPressure + byte(mode<<6)}); err != nil {
+	if _, err = d.connection.Write([]byte{bmp180RegisterCtl, bmp180CmdPressure + byte(mode<<6)}); err != nil {
 		return 0, err
 	}
 	switch mode {

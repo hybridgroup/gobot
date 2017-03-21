@@ -2,8 +2,9 @@ package i2c
 
 import (
 	"fmt"
-	"gobot.io/x/gobot"
 	"time"
+
+	"gobot.io/x/gobot"
 )
 
 const (
@@ -241,7 +242,8 @@ func (d *TSL2561Driver) Start() (err error) {
 		return err
 	}
 
-	if initialized, err := d.connection.ReadByteData(tsl2561RegisterID); err != nil {
+	var initialized byte
+	if initialized, err = d.connection.ReadByteData(tsl2561RegisterID); err != nil {
 		return err
 	} else if (initialized & 0x0A) == 0 {
 		return fmt.Errorf("TSL2561 device not found (0x%X)", initialized)
