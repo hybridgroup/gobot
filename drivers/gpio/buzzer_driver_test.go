@@ -49,3 +49,8 @@ func TestBuzzerDriverToggle(t *testing.T) {
 	d.Toggle()
 	gobottest.Assert(t, d.State(), false)
 }
+
+func TestBuzzerDriverTone(t *testing.T) {
+	d := initTestBuzzerDriver(newGpioTestAdaptor())
+	gobottest.Assert(t, d.Tone(100, 0.01), nil)
+}
