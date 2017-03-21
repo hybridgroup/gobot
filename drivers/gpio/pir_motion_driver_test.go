@@ -2,6 +2,7 @@ package gpio
 
 import (
 	"errors"
+	"strings"
 	"testing"
 	"time"
 
@@ -84,4 +85,15 @@ func TestPIRMotionDriverStart(t *testing.T) {
 	case <-time.After(MOTION_TEST_DELAY * time.Millisecond):
 		t.Errorf("PIRMotionDriver Event \"Error\" was not published")
 	}
+}
+
+func TestPIRDriverDefaultName(t *testing.T) {
+	d := initTestPIRMotionDriver()
+	gobottest.Assert(t, strings.HasPrefix(d.Name(), "PIR"), true)
+}
+
+func TestPIRDriverSetName(t *testing.T) {
+	d := initTestPIRMotionDriver()
+	d.SetName("mybot")
+	gobottest.Assert(t, d.Name(), "mybot")
 }

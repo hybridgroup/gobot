@@ -2,6 +2,7 @@ package gpio
 
 import (
 	"errors"
+	"strings"
 	"testing"
 
 	"gobot.io/x/gobot"
@@ -74,4 +75,15 @@ func TestServoDriverCenter(t *testing.T) {
 	d := initTestServoDriver()
 	d.Center()
 	gobottest.Assert(t, d.CurrentAngle, uint8(90))
+}
+
+func TestServoDriverDefaultName(t *testing.T) {
+	d := initTestServoDriver()
+	gobottest.Assert(t, strings.HasPrefix(d.Name(), "Servo"), true)
+}
+
+func TestServoDriverSetName(t *testing.T) {
+	d := initTestServoDriver()
+	d.SetName("mybot")
+	gobottest.Assert(t, d.Name(), "mybot")
 }
