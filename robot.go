@@ -169,11 +169,6 @@ func (r *Robot) Start(args ...interface{}) (err error) {
 	if r.AutoRun {
 		c := make(chan os.Signal, 1)
 		r.trap(c)
-		if err != nil {
-			// there was an error during start, so we immediately pass the interrupt
-			// in order to disconnect the initialized robots, connections and devices
-			c <- os.Interrupt
-		}
 
 		// waiting for interrupt coming on the channel
 		<-c
