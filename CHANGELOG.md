@@ -1,3 +1,24 @@
+1.3.0
+---
+* **microbit**
+  * Add new platform support
+* **dragonboard**
+  * Add new platform support
+* **gpio**
+  * Increase test coverage
+* **i2c**
+  * Update list of supported i2c devices
+  * Minor adjustments and test coverage improvements
+  * Added more capabilities checks for I2C
+  * Removed smbus block operations
+* **core**
+  * Increase test coverage
+* **test**
+  * Improvements to run tests much faster thanks @maruel
+  * Use codecov.io for code coverage reporting
+* **docs**
+  * Update CoC based on Contributor Covenant
+
 1.2.0
 ---
 * **core**
