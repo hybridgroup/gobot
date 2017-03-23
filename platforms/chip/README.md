@@ -11,6 +11,24 @@ For documentation about the C.H.I.P. platform click [here](http://docs.getchip.c
 go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/chip
 ```
 
+### PWM support
+Note that PWM might not be available in your kernel. In that case, you can install the required device tree overlay
+from the command line using [Gort](https://gobot.io/x/gort) CLI commands on the C.H.I.P device.
+Here are the steps:
+
+Install the required patched device tree compiler as described in the [C.H.I.P docs](https://docs.getchip.com/dip.html#make-a-dtbo-device-tree-overlay-blob):
+```
+gort chip install dtc
+```
+
+Now, install the pwm overlay to activate pwm on the PWM0 pin:
+```
+gort chip install pwm
+```
+
+Reboot the device to make sure the init script loads the overlay on boot.
+
+
 ## How to Use
 
 The pin numbering used by your Gobot program should match the way your board is labeled right on the board itself.

@@ -26,6 +26,21 @@ func TestMockFilesystemOpen(t *testing.T) {
 	gobottest.Refute(t, f4.Fd(), f1.Fd())
 }
 
+func TestMockFilesystemStat(t *testing.T) {
+	fs := NewMockFilesystem([]string{"foo", "bar/baz"})
+
+	fileStat, err := fs.Stat("foo")
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, fileStat.IsDir(), false)
+
+	dirStat, err := fs.Stat("bar")
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, dirStat.IsDir(), true)
+
+	_, err = fs.Stat("plonk")
+	gobottest.Refute(t, err, nil)
+}
+
 func TestMockFilesystemWrite(t *testing.T) {
 	fs := NewMockFilesystem([]string{"bar"})
 	f1 := fs.Files["bar"]

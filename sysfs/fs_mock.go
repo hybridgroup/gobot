@@ -2,7 +2,9 @@ package sysfs
 
 import (
 	"errors"
+	"io/ioutil"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -98,6 +100,38 @@ func (fs *MockFilesystem) OpenFile(name string, flag int, perm os.FileMode) (fil
 		return f, nil
 	}
 	return (*MockFile)(nil), &os.PathError{Err: errors.New(name + ": No such file.")}
+}
+
+// Stat returns a generic FileInfo for all files in fs.Files.
+// If the file does not exist it returns an os.PathError
+func (fs *MockFilesystem) Stat(name string) (os.FileInfo, error) {
+	_, ok := fs.Files[name]
+	if ok {
+		// return file based mock FileInfo
+		tmpFile, err := ioutil.TempFile("", name)
+		if err != nil {
+			return nil, err
+		}
+		defer os.Remove(tmpFile.Name())
+
+		return os.Stat(tmpFile.Name())
+	}
+
+	dirName := name + "/"
+	for path := range fs.Files {
+		if strings.HasPrefix(path, dirName) {
+			// return dir based mock FileInfo
+			tmpDir, err := ioutil.TempDir("", name)
+			if err != nil {
+				return nil, err
+			}
+			defer os.RemoveAll(tmpDir)
+
+			return os.Stat(tmpDir)
+		}
+	}
+
+	return nil, &os.PathError{Err: errors.New(name + ": No such file.")}
 }
 
 // Add adds a new file to fs.Files given a name, and returns the newly created file
