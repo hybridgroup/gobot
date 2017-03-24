@@ -3,6 +3,7 @@ package aio
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"testing"
 	"time"
 
@@ -34,6 +35,14 @@ func TestGroveTempSensorPublishesTemperatureInCelsius(t *testing.T) {
 		gobottest.Assert(t, fmt.Sprintf("%.2f", data.(float64)), "31.62")
 		sem <- true
 	})
+
+	select {
+	case <-sem:
+	case <-time.After(time.Second):
+		t.Errorf("Grove Temperature Sensor Event \"Data\" was not published")
+	}
+
+	gobottest.Assert(t, d.Temperature(), 31.61532462352477)
 }
 
 func TestGroveTempSensorPublishesError(t *testing.T) {
@@ -74,4 +83,15 @@ func TestGroveTempSensorHalt(t *testing.T) {
 	case <-time.After(time.Millisecond):
 		t.Errorf("Grove Temperature Sensor was not halted")
 	}
+}
+
+func TestGroveTempDriverDefaultName(t *testing.T) {
+	d := NewGroveTemperatureSensorDriver(newAioTestAdaptor(), "1")
+	gobottest.Assert(t, strings.HasPrefix(d.Name(), "GroveTemperatureSensor"), true)
+}
+
+func TestGroveTempDriverSetName(t *testing.T) {
+	d := NewGroveTemperatureSensorDriver(newAioTestAdaptor(), "1")
+	d.SetName("mybot")
+	gobottest.Assert(t, d.Name(), "mybot")
 }

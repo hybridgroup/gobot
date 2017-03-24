@@ -35,7 +35,7 @@ func main() {
 			fmt.Println("Wave", data)
 		})
 		neuro.On(neuro.Event("eeg"), func(data interface{}) {
-			eeg := data.(neurosky.EEG)
+			eeg := data.(neurosky.EEGData)
 			fmt.Println("Delta", eeg.Delta)
 			fmt.Println("Theta", eeg.Theta)
 			fmt.Println("LoAlpha", eeg.LoAlpha)

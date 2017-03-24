@@ -2,6 +2,7 @@ package aio
 
 import (
 	"errors"
+	"strings"
 	"testing"
 	"time"
 
@@ -106,4 +107,15 @@ func TestAnalogSensorDriverHalt(t *testing.T) {
 	case <-time.After(time.Millisecond):
 		t.Errorf("AnalogSensor was not halted")
 	}
+}
+
+func TestAnalogSensorDriverDefaultName(t *testing.T) {
+	d := NewAnalogSensorDriver(newAioTestAdaptor(), "1")
+	gobottest.Assert(t, strings.HasPrefix(d.Name(), "AnalogSensor"), true)
+}
+
+func TestAnalogSensorDriverSetName(t *testing.T) {
+	d := NewAnalogSensorDriver(newAioTestAdaptor(), "1")
+	d.SetName("mybot")
+	gobottest.Assert(t, d.Name(), "mybot")
 }
