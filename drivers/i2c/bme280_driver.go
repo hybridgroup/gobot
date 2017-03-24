@@ -90,7 +90,7 @@ func (d *BME280Driver) Humidity() (humidity float32, err error) {
 	if rawH, err = d.rawHumidity(); err != nil {
 		return 0, nil
 	}
-	//return d.calculateHumidity(rawH), nil
+	//TODO: return d.calculateHumidity(rawH), nil
 	return float32(rawH / 1024.0), nil
 }
 
@@ -103,4 +103,9 @@ func (d *BME280Driver) rawHumidity() (int16, error) {
 	var rawH int16
 	binary.Read(buf, binary.BigEndian, &rawH)
 	return rawH, nil
+}
+
+func (d *BME280Driver) calculateHumidity(rawH int16) float32 {
+	// TODO: real adjustment based on hc coefficients
+	return 0.0 / 1024.0
 }
