@@ -76,11 +76,22 @@ func (d *BME280Driver) initHumidity() (err error) {
 		return err
 	}
 	buf = bytes.NewBuffer(coefficients)
-	binary.Read(buf, binary.LittleEndian, &d.hc.h2)
-	binary.Read(buf, binary.BigEndian, &d.hc.h3)
-	binary.Read(buf, binary.BigEndian, &d.hc.h4)
-	binary.Read(buf, binary.BigEndian, &d.hc.h5)
-	binary.Read(buf, binary.BigEndian, &d.hc.h6)
+
+	// H4 and H5 laid out strangely on the bme280
+	var addrE4	byte
+	var addrE5	byte
+	var addrE6	byte
+
+	binary.Read(hu_buf, binary.LittleEndian, &d.hc.h2) // E1 ...
+	binary.Read(hu_buf, binary.BigEndian, &d.hc.h3) // E3
+	binary.Read(hu_buf, binary.BigEndian, &addrE4) // E4
+	binary.Read(hu_buf, binary.BigEndian, &addrE5) // E5
+	binary.Read(hu_buf, binary.BigEndian, &addrE6) // E6
+	binary.Read(hu_buf, binary.BigEndian, &d.hc.h6) // ... E7
+
+	d.hc.h4 = 0 + (int16(addrE4) << 4) | (int16(addrE5 & 0x0F))
+	d.hc.h5 = 0 + (int16(addrE6) << 4) | (int16(addrE5) >> 4)
+
 	return nil
 }
 
@@ -105,7 +116,39 @@ func (d *BME280Driver) rawHumidity() (int16, error) {
 	return rawH, nil
 }
 
+
 func (d *BME280Driver) calculateHumidity(rawH int16) float32 {
-	// TODO: real adjustment based on hc coefficients
-	return 0.0 / 1024.0
+	// Adapted from https://github.com/BoschSensortec/BME280_driver/blob/master/bme280.c
+	// function bme280_compensate_humidity_double(s32 v_uncom_humidity_s32)
+	var rawT int16
+	var err error
+	var var_h float32
+	var t_fine int32
+
+	rawT, err = d.rawTemp()
+	if err != nil {
+		return 0, err
+	}
+
+	t_fine := d.calculateB5(rawT)
+	var_h = float32(t_fine - 76800)
+
+	if var_h == 0 {
+		return 0 // TODO err is 'invalid data' from Bosch - include errors or not?
+	}
+
+	var_h = (
+		rawH -
+			(float32(d.hc.h4) * 64.0) + // H4 double * 64.0 double
+			(float32(d.hc.h5) / 16384.0 * var_h) // H5 double / 16384.0 * var_h
+		) *
+		(
+			(float32(d.hc.h2) / 65536.0) * // H2 double / 65536.0
+			(
+				(1.0 + float32(d.hc.h6) / 67108864.0 * var_h) * // 1.0 + (H6 double / 67108664.0 * var_h
+				(1.0 + float32(d.hc.h3) / 67108864.0 * var_h) // 1.0 + H3 double / 67108864.0 * var_h
+			)
+		)
+
+	return var_h
 }
