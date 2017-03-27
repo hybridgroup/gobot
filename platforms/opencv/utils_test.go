@@ -5,8 +5,8 @@ import (
 	"runtime"
 	"testing"
 
-	"gobot.io/x/gobot/gobottest"
 	cv "github.com/lazywei/go-opencv/opencv"
+	"gobot.io/x/gobot/gobottest"
 )
 
 func TestUtils(t *testing.T) {

@@ -178,8 +178,8 @@ func New() *Bebop {
 		NavData:               make(map[string]string),
 		C2dPort:               54321,
 		D2cPort:               43210,
-		RTPStreamPort:				 55004,
-		RTPControlPort:				 55005,
+		RTPStreamPort:         55004,
+		RTPControlPort:        55005,
 		DiscoveryPort:         44444,
 		networkFrameGenerator: networkFrameGenerator(),
 		Pcmd: Pcmd{
@@ -223,9 +223,9 @@ func (b *Bebop) Discover() error {
 						"arstream2_client_stream_port": "%d",
 						"arstream2_client_control_port": "%d",
 						}`,
-						b.D2cPort,
-						b.RTPStreamPort,
-						b.RTPControlPort),
+				b.D2cPort,
+				b.RTPStreamPort,
+				b.RTPControlPort),
 		),
 	)
 
