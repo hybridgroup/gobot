@@ -3,29 +3,11 @@ package i2c
 import (
 	"bytes"
 	"encoding/binary"
-
-	"gobot.io/x/gobot"
 )
 
 const bme280RegisterHumidityMSB = 0xFD
 const bme280RegisterCalibDigH1 = 0xa1
 const bme280RegisterCalibDigH2LSB = 0xe1
-const bmp280RegisterCalib00 = 0x88
-
-type bmp280CalibrationCoefficients struct {
-	t1 uint16
-	t2 int16
-	t3 int16
-	p1 uint16
-	p2 int16
-	p3 int16
-	p4 int16
-	p5 int16
-	p6 int16
-	p7 int16
-	p8 int16
-	p9 int16
-}
 
 type bmeHumidityCalibrationCoefficients struct {
 	h1 uint8
@@ -38,13 +20,8 @@ type bmeHumidityCalibrationCoefficients struct {
 
 // BME280Driver is a driver for the BME280 temperature/humidity sensor
 type BME280Driver struct {
-	name       string
-	connector  Connector
-	connection Connection
-	Config
-
-	tpc *bmp280CalibrationCoefficients
-	hc  *bmeHumidityCalibrationCoefficients
+	*BMP280Driver
+	hc *bmeHumidityCalibrationCoefficients
 }
 
 // NewBME280Driver creates a new driver with specified i2c interface.
@@ -57,11 +34,8 @@ type BME280Driver struct {
 //
 func NewBME280Driver(c Connector, options ...func(Config)) *BME280Driver {
 	b := &BME280Driver{
-		name:      gobot.DefaultName("BME280"),
-		connector: c,
-		Config:    NewConfig(),
-		tpc:       &bmp280CalibrationCoefficients{},
-		hc:        &bmeHumidityCalibrationCoefficients{},
+		BMP280Driver: NewBMP280Driver(c),
+		hc:           &bmeHumidityCalibrationCoefficients{},
 	}
 
 	for _, option := range options {
@@ -70,21 +44,6 @@ func NewBME280Driver(c Connector, options ...func(Config)) *BME280Driver {
 
 	// TODO: expose commands to API
 	return b
-}
-
-// Name returns the name of the device.
-func (d *BME280Driver) Name() string {
-	return d.name
-}
-
-// SetName sets the name of the device.
-func (d *BME280Driver) SetName(n string) {
-	d.name = n
-}
-
-// Connection returns the connection of the device.
-func (d *BME280Driver) Connection() gobot.Connection {
-	return d.connector.(gobot.Connection)
 }
 
 // Start initializes the BME280 and loads the calibration coefficients.
@@ -96,66 +55,21 @@ func (d *BME280Driver) Start() (err error) {
 		return err
 	}
 
-	// TODO: set sleep mode here...
-
 	if err := d.initialization(); err != nil {
 		return err
 	}
+
 	if err := d.initHumidity(); err != nil {
 		return err
 	}
 
-	// TODO: set usage mode here...
-
-	// TODO: set default sea level here
-
 	return nil
-}
-
-// Halt halts the device.
-func (d *BME280Driver) Halt() (err error) {
-	return nil
-}
-
-// Temperature returns the current temperature, in celsius degrees.
-func (d *BME280Driver) Temperature() (temp float32, err error) {
-	// TODO: implement this
-	return 0, nil
-}
-
-// Pressure returns the current barometric pressure, in Pa
-func (d *BME280Driver) Pressure() (press float32, err error) {
-	// TODO: implement this
-	return 0, nil
 }
 
 // Humidity returns the current humidity in percentage of relative humidity
 func (d *BME280Driver) Humidity() (humidity float32, err error) {
 	// TODO: implement this
 	return 0, nil
-}
-
-// initialization reads the calibration coefficients.
-func (d *BME280Driver) initialization() (err error) {
-	var coefficients []byte
-	if coefficients, err = d.read(bmp280RegisterCalib00, 26); err != nil {
-		return err
-	}
-	buf := bytes.NewBuffer(coefficients)
-	binary.Read(buf, binary.LittleEndian, &d.tpc.t1)
-	binary.Read(buf, binary.LittleEndian, &d.tpc.t2)
-	binary.Read(buf, binary.LittleEndian, &d.tpc.t3)
-	binary.Read(buf, binary.LittleEndian, &d.tpc.p1)
-	binary.Read(buf, binary.LittleEndian, &d.tpc.p2)
-	binary.Read(buf, binary.LittleEndian, &d.tpc.p3)
-	binary.Read(buf, binary.LittleEndian, &d.tpc.p4)
-	binary.Read(buf, binary.LittleEndian, &d.tpc.p5)
-	binary.Read(buf, binary.LittleEndian, &d.tpc.p6)
-	binary.Read(buf, binary.LittleEndian, &d.tpc.p7)
-	binary.Read(buf, binary.LittleEndian, &d.tpc.p8)
-	binary.Read(buf, binary.LittleEndian, &d.tpc.p9)
-
-	return nil
 }
 
 // read the humidity calibration coefficients.
@@ -188,21 +102,6 @@ func (d *BME280Driver) initHumidity() (err error) {
 	d.hc.h5 = 0 + (int16(addrE6) << 4) | (int16(addrE5) >> 4)
 
 	return nil
-}
-
-// TODO: implement
-func (d *BME280Driver) rawTempPress() (temp int16, press int16, err error) {
-	return 0, 0, nil
-}
-
-// TODO: implement
-func (d *BME280Driver) calculateTemp(rawTemp int16) float32 {
-	return 0
-}
-
-// TODO: implement
-func (d *BME280Driver) calculatePress(rawPress int16) float32 {
-	return 0
 }
 
 func (d *BME280Driver) rawHumidity() (int16, error) {
@@ -246,16 +145,4 @@ func (d *BME280Driver) calculateHumidity(rawH int16) float32 {
 			(1.0 + float32(d.hc.h3)/67108864.0*h) // 1.0 + H3 double / 67108864.0 * var_h
 
 	return h * y
-}
-
-func (d *BME280Driver) read(address byte, n int) ([]byte, error) {
-	if _, err := d.connection.Write([]byte{address}); err != nil {
-		return nil, err
-	}
-	buf := make([]byte, n)
-	bytesRead, err := d.connection.Read(buf)
-	if bytesRead != n || err != nil {
-		return nil, err
-	}
-	return buf, nil
 }
