@@ -8,6 +8,7 @@ import (
 )
 
 const bmp280RegisterCalib00 = 0x88
+const bme280RegisterPressureMSB = 0xf7
 
 type bmp280CalibrationCoefficients struct {
 	t1 uint16
@@ -82,15 +83,9 @@ func (d *BMP280Driver) Start() (err error) {
 		return err
 	}
 
-	// TODO: set sleep mode here...
-
 	if err := d.initialization(); err != nil {
 		return err
 	}
-
-	// TODO: set usage mode here...
-
-	// TODO: set default sea level here
 
 	return nil
 }
@@ -102,14 +97,20 @@ func (d *BMP280Driver) Halt() (err error) {
 
 // Temperature returns the current temperature, in celsius degrees.
 func (d *BMP280Driver) Temperature() (temp float32, err error) {
-	// TODO: implement this
-	return 0, nil
+	var rawT int32
+	if rawT, _, err = d.rawTempPress(); err != nil {
+		return 0.0, err
+	}
+	return d.calculateTemp(rawT), nil
 }
 
 // Pressure returns the current barometric pressure, in Pa
 func (d *BMP280Driver) Pressure() (press float32, err error) {
-	// TODO: implement this
-	return 0, nil
+	var rawP int32
+	if _, rawP, err = d.rawTempPress(); err != nil {
+		return 0.0, err
+	}
+	return d.calculatePress(rawP), nil
 }
 
 // initialization reads the calibration coefficients.
@@ -140,18 +141,34 @@ func (d *BMP280Driver) initialization() (err error) {
 	return nil
 }
 
-// TODO: implement
-func (d *BMP280Driver) rawTempPress() (temp int16, press int16, err error) {
-	return 0, 0, nil
+func (d *BMP280Driver) rawTempPress() (temp int32, press int32, err error) {
+	var data []byte
+	var tp0, tp1, tp2, tp3, tp4, tp5 byte
+
+	if data, err = d.read(bme280RegisterPressureMSB, 6); err != nil {
+		return 0, 0, err
+	}
+	buf := bytes.NewBuffer(data)
+	binary.Read(buf, binary.LittleEndian, &tp0)
+	binary.Read(buf, binary.LittleEndian, &tp1)
+	binary.Read(buf, binary.LittleEndian, &tp2)
+	binary.Read(buf, binary.LittleEndian, &tp3)
+	binary.Read(buf, binary.LittleEndian, &tp4)
+	binary.Read(buf, binary.LittleEndian, &tp5)
+
+	temp = ((int32(tp5) >> 4) | (int32(tp4) << 4) | (int32(tp3) << 12))
+	press = ((int32(tp2) >> 4) | (int32(tp1) << 4) | (int32(tp0) << 12))
+
+	return
 }
 
 // TODO: implement
-func (d *BMP280Driver) calculateTemp(rawTemp int16) float32 {
+func (d *BMP280Driver) calculateTemp(rawTemp int32) float32 {
 	return 0
 }
 
 // TODO: implement
-func (d *BMP280Driver) calculatePress(rawPress int16) float32 {
+func (d *BMP280Driver) calculatePress(rawPress int32) float32 {
 	return 0
 }
 

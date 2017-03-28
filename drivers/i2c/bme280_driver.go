@@ -104,21 +104,21 @@ func (d *BME280Driver) initHumidity() (err error) {
 	return nil
 }
 
-func (d *BME280Driver) rawHumidity() (int16, error) {
+func (d *BME280Driver) rawHumidity() (int32, error) {
 	ret, err := d.read(bme280RegisterHumidityMSB, 2)
 	if err != nil {
 		return 0, err
 	}
 	buf := bytes.NewBuffer(ret)
-	var rawH int16
+	var rawH int32
 	binary.Read(buf, binary.BigEndian, &rawH)
 	return rawH, nil
 }
 
 // Adapted from https://github.com/BoschSensortec/BME280_driver/blob/master/bme280.c
 // function bme280_compensate_humidity_double(s32 v_uncom_humidity_s32)
-func (d *BME280Driver) calculateHumidity(rawH int16) float32 {
-	var rawT int16
+func (d *BME280Driver) calculateHumidity(rawH int32) float32 {
+	var rawT int32
 	var err error
 	var h float32
 	var fine int32

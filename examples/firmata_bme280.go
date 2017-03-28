@@ -23,6 +23,9 @@ func main() {
 			//fmt.Println("Pressure", mpl115a2.Pressure())
 			t, _ := bme280.Temperature()
 			fmt.Println("Temperature", t)
+
+			p, _ := bme280.Pressure()
+			fmt.Println("Pressure", p)
 		})
 	}
 
