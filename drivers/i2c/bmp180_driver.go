@@ -127,6 +127,7 @@ func (d *BMP180Driver) initialization() (err error) {
 	binary.Read(buf, binary.BigEndian, &d.calibrationCoefficients.mb)
 	binary.Read(buf, binary.BigEndian, &d.calibrationCoefficients.mc)
 	binary.Read(buf, binary.BigEndian, &d.calibrationCoefficients.md)
+
 	return nil
 }
 
@@ -139,7 +140,7 @@ func (d *BMP180Driver) Halt() (err error) {
 func (d *BMP180Driver) Temperature() (temp float32, err error) {
 	var rawTemp int16
 	if rawTemp, err = d.rawTemp(); err != nil {
-		return 0, nil
+		return 0, err
 	}
 	return d.calculateTemp(rawTemp), nil
 }
