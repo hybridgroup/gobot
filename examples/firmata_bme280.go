@@ -26,6 +26,9 @@ func main() {
 
 			p, _ := bme280.Pressure()
 			fmt.Println("Pressure", p)
+
+			h, _ := bme280.Humidity()
+			fmt.Println("Humidity", h)
 		})
 	}
 
