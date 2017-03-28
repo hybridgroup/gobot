@@ -5,8 +5,8 @@ import (
 
 	"time"
 
-	"gobot.io/x/gobot"
 	cv "github.com/lazywei/go-opencv/opencv"
+	"gobot.io/x/gobot"
 )
 
 type capture interface {

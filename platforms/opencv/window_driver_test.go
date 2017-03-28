@@ -5,9 +5,9 @@ import (
 	"runtime"
 	"testing"
 
+	cv "github.com/lazywei/go-opencv/opencv"
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/gobottest"
-	cv "github.com/lazywei/go-opencv/opencv"
 )
 
 var _ gobot.Driver = (*WindowDriver)(nil)

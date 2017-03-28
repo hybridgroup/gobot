@@ -1,88 +1,88 @@
 package raspi
 
 var pins = map[string]map[string]int{
-	"3": map[string]int{
+	"3": {
 		"1": 0,
 		"2": 2,
 		"3": 2,
 	},
-	"5": map[string]int{
+	"5": {
 		"1": 1,
 		"2": 3,
 		"3": 3,
 	},
-	"7": map[string]int{
+	"7": {
 		"*": 4,
 	},
-	"8": map[string]int{
+	"8": {
 		"*": 14,
 	},
-	"10": map[string]int{
+	"10": {
 		"*": 15,
 	},
-	"11": map[string]int{
+	"11": {
 		"*": 17,
 	},
-	"12": map[string]int{
+	"12": {
 		"*": 18,
 	},
-	"13": map[string]int{
+	"13": {
 		"1": 21,
 		"2": 27,
 		"3": 27,
 	},
-	"15": map[string]int{
+	"15": {
 		"*": 22,
 	},
-	"16": map[string]int{
+	"16": {
 		"*": 23,
 	},
-	"18": map[string]int{
+	"18": {
 		"*": 24,
 	},
-	"19": map[string]int{
+	"19": {
 		"*": 10,
 	},
-	"21": map[string]int{
+	"21": {
 		"*": 9,
 	},
-	"22": map[string]int{
+	"22": {
 		"*": 25,
 	},
-	"23": map[string]int{
+	"23": {
 		"*": 11,
 	},
-	"24": map[string]int{
+	"24": {
 		"*": 8,
 	},
-	"26": map[string]int{
+	"26": {
 		"*": 7,
 	},
-	"29": map[string]int{
+	"29": {
 		"3": 5,
 	},
-	"31": map[string]int{
+	"31": {
 		"3": 6,
 	},
-	"32": map[string]int{
+	"32": {
 		"3": 12,
 	},
-	"33": map[string]int{
+	"33": {
 		"3": 13,
 	},
-	"35": map[string]int{
+	"35": {
 		"3": 19,
 	},
-	"36": map[string]int{
+	"36": {
 		"3": 16,
 	},
-	"37": map[string]int{
+	"37": {
 		"3": 26,
 	},
-	"38": map[string]int{
+	"38": {
 		"3": 20,
 	},
-	"40": map[string]int{
+	"40": {
 		"3": 21,
 	},
 }

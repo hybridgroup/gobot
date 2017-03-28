@@ -1,112 +1,112 @@
 package edison
 
 var sparkfunPinMap = map[string]sysfsPin{
-	"12": sysfsPin{
+	"12": {
 		pin:          12,
 		resistor:     -1,
 		levelShifter: -1,
 		pwmPin:       -1,
 		mux:          []mux{},
 	},
-	"13": sysfsPin{
+	"13": {
 		pin:          13,
 		resistor:     -1,
 		levelShifter: -1,
 		pwmPin:       -1,
 		mux:          []mux{},
 	},
-	"14": sysfsPin{
+	"14": {
 		pin:          14,
 		resistor:     -1,
 		levelShifter: -1,
 		pwmPin:       -1,
 		mux:          []mux{},
 	},
-	"15": sysfsPin{
+	"15": {
 		pin:          15,
 		resistor:     -1,
 		levelShifter: -1,
 		pwmPin:       -1,
 		mux:          []mux{},
 	},
-	"44": sysfsPin{
+	"44": {
 		pin:          44,
 		resistor:     -1,
 		levelShifter: -1,
 		pwmPin:       -1,
 		mux:          []mux{},
 	},
-	"45": sysfsPin{
+	"45": {
 		pin:          45,
 		resistor:     -1,
 		levelShifter: -1,
 		pwmPin:       -1,
 		mux:          []mux{},
 	},
-	"46": sysfsPin{
+	"46": {
 		pin:          46,
 		resistor:     -1,
 		levelShifter: -1,
 		pwmPin:       -1,
 		mux:          []mux{},
 	},
-	"47": sysfsPin{
+	"47": {
 		pin:          47,
 		resistor:     -1,
 		levelShifter: -1,
 		pwmPin:       -1,
 		mux:          []mux{},
 	},
-	"48": sysfsPin{
+	"48": {
 		pin:          48,
 		resistor:     -1,
 		levelShifter: -1,
 		pwmPin:       -1,
 		mux:          []mux{},
 	},
-	"49": sysfsPin{
+	"49": {
 		pin:          49,
 		resistor:     -1,
 		levelShifter: -1,
 		pwmPin:       -1,
 		mux:          []mux{},
 	},
-	"128": sysfsPin{
+	"128": {
 		pin:          128,
 		resistor:     -1,
 		levelShifter: -1,
 		pwmPin:       -1,
 		mux:          []mux{},
 	},
-	"129": sysfsPin{
+	"129": {
 		pin:          129,
 		resistor:     -1,
 		levelShifter: -1,
 		pwmPin:       -1,
 		mux:          []mux{},
 	},
-	"130": sysfsPin{
+	"130": {
 		pin:          130,
 		resistor:     -1,
 		levelShifter: -1,
 		pwmPin:       -1,
 		mux:          []mux{},
 	},
-	"131": sysfsPin{
+	"131": {
 		pin:          131,
 		resistor:     -1,
 		levelShifter: -1,
 		pwmPin:       -1,
 		mux:          []mux{},
 	},
-	"182": sysfsPin{
+	"182": {
 		pin:          182,
 		resistor:     -1,
 		levelShifter: -1,
 		pwmPin:       -1,
 		mux:          []mux{},
 	},
-	"183": sysfsPin{
+	"183": {
 		pin:          183,
 		resistor:     -1,
 		levelShifter: -1,
