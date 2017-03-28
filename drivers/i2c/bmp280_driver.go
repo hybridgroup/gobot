@@ -101,16 +101,18 @@ func (d *BMP280Driver) Temperature() (temp float32, err error) {
 	if rawT, _, err = d.rawTempPress(); err != nil {
 		return 0.0, err
 	}
-	return d.calculateTemp(rawT), nil
+	temp, _ = d.calculateTemp(rawT)
+	return
 }
 
 // Pressure returns the current barometric pressure, in Pa
 func (d *BMP280Driver) Pressure() (press float32, err error) {
-	var rawP int32
-	if _, rawP, err = d.rawTempPress(); err != nil {
+	var rawT, rawP int32
+	if rawT, rawP, err = d.rawTempPress(); err != nil {
 		return 0.0, err
 	}
-	return d.calculatePress(rawP), nil
+	_, tFine := d.calculateTemp(rawT)
+	return d.calculatePress(rawP, tFine), nil
 }
 
 // initialization reads the calibration coefficients.
@@ -162,14 +164,32 @@ func (d *BMP280Driver) rawTempPress() (temp int32, press int32, err error) {
 	return
 }
 
-// TODO: implement
-func (d *BMP280Driver) calculateTemp(rawTemp int32) float32 {
-	return 0
+func (d *BMP280Driver) calculateTemp(rawTemp int32) (float32, int32) {
+	tcvar1 := ((float32(rawTemp) / 16384.0) - (float32(d.tpc.t1) / 1024.0)) * float32(d.tpc.t2)
+	tcvar2 := (((float32(rawTemp) / 131072.0) - (float32(d.tpc.t1) / 8192.0)) * ((float32(rawTemp) / 131072.0) - float32(d.tpc.t1)/8192.0)) * float32(d.tpc.t3)
+	temperatureComp := (tcvar1 + tcvar2) / 5120.0
+
+	tFine := int32(tcvar1 + tcvar2)
+	return temperatureComp, tFine
 }
 
-// TODO: implement
-func (d *BMP280Driver) calculatePress(rawPress int32) float32 {
-	return 0
+func (d *BMP280Driver) calculatePress(rawPress int32, tFine int32) float32 {
+	pcvar1 := (float32(tFine) / 2.0) - 64000.0
+	pcvar2 := pcvar1 * pcvar1 * (float32(d.tpc.p6)) / 32768.0
+	pcvar2 = pcvar2 + pcvar1*(float32(d.tpc.p5))*2.0
+	pcvar2 = (pcvar2 / 4.0) + (float32(d.tpc.p4) * 65536.0)
+	pcvar1 = (float32(d.tpc.p3)*pcvar1*pcvar1/524288.0 + float32(d.tpc.p2)*pcvar1) / 524288.0
+	pcvar1 = (1.0 + pcvar1/32768.0) * (float32(d.tpc.p1))
+	if pcvar1 == 0.0 { // avoid divide by zero
+		return 0.0
+	}
+	pressureComp := 1048576.0 - float32(rawPress)
+	pressureComp = (pressureComp - (pcvar2 / 4096.0)) * (6250.0 / pcvar1)
+	pcvar1 = float32(d.tpc.p9) * pressureComp * pressureComp / 2147483648.0
+	pcvar2 = pressureComp * float32(d.tpc.p8) / 32768.0
+	pressureComp = pressureComp + (pcvar1+pcvar2+float32(d.tpc.p7))/16.0
+
+	return pressureComp
 }
 
 func (d *BMP280Driver) read(address byte, n int) ([]byte, error) {

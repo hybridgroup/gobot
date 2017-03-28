@@ -68,8 +68,12 @@ func (d *BME280Driver) Start() (err error) {
 
 // Humidity returns the current humidity in percentage of relative humidity
 func (d *BME280Driver) Humidity() (humidity float32, err error) {
-	// TODO: implement this
-	return 0, nil
+	var rawH int32
+	if rawH, err = d.rawHumidity(); err != nil {
+		return 0.0, err
+	}
+	humidity = d.calculateHumidity(rawH)
+	return
 }
 
 // read the humidity calibration coefficients.
@@ -121,16 +125,14 @@ func (d *BME280Driver) calculateHumidity(rawH int32) float32 {
 	var rawT int32
 	var err error
 	var h float32
-	var fine int32
 
 	rawT, _, err = d.rawTempPress()
 	if err != nil {
 		return 0
 	}
 
-	// TODO: calculate fine temp adjust
-	fine = int32(rawT)
-	h = float32(fine - 76800)
+	_, tFine := d.calculateTemp(rawT)
+	h = float32(tFine - 76800)
 
 	if h == 0 {
 		return 0 // TODO err is 'invalid data' from Bosch - include errors or not?
