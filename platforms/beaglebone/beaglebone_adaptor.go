@@ -293,7 +293,7 @@ func (b *Adaptor) pwmWrite(pin string, val byte) (err error) {
 	if err != nil {
 		return
 	}
-	period := 50000.0
+	period := 500000.0
 	duty := gobot.FromScale(float64(val), 0, 255.0)
 	return b.pwmPins[i].pwmWrite(strconv.Itoa(int(period)), strconv.Itoa(int(period*duty)))
 }
