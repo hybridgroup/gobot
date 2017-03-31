@@ -7,8 +7,14 @@ import (
 	"gobot.io/x/gobot"
 )
 
+const (
+	bmp280RegisterControl      = 0xf4
+	bmp280RegisterConfig       = 0xf5
+	bmp280RegisterPressureData = 0xf7
+	bmp280RegisterTempData     = 0xfa
+)
+
 const bmp280RegisterCalib00 = 0x88
-const bme280RegisterPressureMSB = 0xf7
 
 type bmp280CalibrationCoefficients struct {
 	t1 uint16
@@ -98,7 +104,7 @@ func (d *BMP280Driver) Halt() (err error) {
 // Temperature returns the current temperature, in celsius degrees.
 func (d *BMP280Driver) Temperature() (temp float32, err error) {
 	var rawT int32
-	if rawT, _, err = d.rawTempPress(); err != nil {
+	if rawT, err = d.rawTemp(); err != nil {
 		return 0.0, err
 	}
 	temp, _ = d.calculateTemp(rawT)
@@ -108,7 +114,11 @@ func (d *BMP280Driver) Temperature() (temp float32, err error) {
 // Pressure returns the current barometric pressure, in Pa
 func (d *BMP280Driver) Pressure() (press float32, err error) {
 	var rawT, rawP int32
-	if rawT, rawP, err = d.rawTempPress(); err != nil {
+	if rawT, err = d.rawTemp(); err != nil {
+		return 0.0, err
+	}
+
+	if rawP, err = d.rawPressure(); err != nil {
 		return 0.0, err
 	}
 	_, tFine := d.calculateTemp(rawT)
@@ -120,7 +130,7 @@ func (d *BMP280Driver) initialization() (err error) {
 	// TODO: set sleep mode here...
 
 	var coefficients []byte
-	if coefficients, err = d.read(bmp280RegisterCalib00, 26); err != nil {
+	if coefficients, err = d.read(bmp280RegisterCalib00, 24); err != nil {
 		return err
 	}
 	buf := bytes.NewBuffer(coefficients)
@@ -137,28 +147,43 @@ func (d *BMP280Driver) initialization() (err error) {
 	binary.Read(buf, binary.LittleEndian, &d.tpc.p8)
 	binary.Read(buf, binary.LittleEndian, &d.tpc.p9)
 
+	d.connection.WriteByteData(bmp280RegisterControl, 0x3F)
+
 	// TODO: set usage mode here...
 	// TODO: set default sea level here
 
 	return nil
 }
 
-func (d *BMP280Driver) rawTempPress() (temp int32, press int32, err error) {
+func (d *BMP280Driver) rawTemp() (temp int32, err error) {
 	var data []byte
-	var tp0, tp1, tp2, tp3, tp4, tp5 byte
+	var tp0, tp1, tp2 byte
 
-	if data, err = d.read(bme280RegisterPressureMSB, 6); err != nil {
-		return 0, 0, err
+	if data, err = d.read(bmp280RegisterTempData, 3); err != nil {
+		return 0, err
 	}
 	buf := bytes.NewBuffer(data)
 	binary.Read(buf, binary.LittleEndian, &tp0)
 	binary.Read(buf, binary.LittleEndian, &tp1)
 	binary.Read(buf, binary.LittleEndian, &tp2)
-	binary.Read(buf, binary.LittleEndian, &tp3)
-	binary.Read(buf, binary.LittleEndian, &tp4)
-	binary.Read(buf, binary.LittleEndian, &tp5)
 
-	temp = ((int32(tp5) >> 4) | (int32(tp4) << 4) | (int32(tp3) << 12))
+	temp = ((int32(tp2) >> 4) | (int32(tp1) << 4) | (int32(tp0) << 12))
+
+	return
+}
+
+func (d *BMP280Driver) rawPressure() (press int32, err error) {
+	var data []byte
+	var tp0, tp1, tp2 byte
+
+	if data, err = d.read(bmp280RegisterPressureData, 3); err != nil {
+		return 0, err
+	}
+	buf := bytes.NewBuffer(data)
+	binary.Read(buf, binary.LittleEndian, &tp0)
+	binary.Read(buf, binary.LittleEndian, &tp1)
+	binary.Read(buf, binary.LittleEndian, &tp2)
+
 	press = ((int32(tp2) >> 4) | (int32(tp1) << 4) | (int32(tp0) << 12))
 
 	return
@@ -174,22 +199,26 @@ func (d *BMP280Driver) calculateTemp(rawTemp int32) (float32, int32) {
 }
 
 func (d *BMP280Driver) calculatePress(rawPress int32, tFine int32) float32 {
-	pcvar1 := (float32(tFine) / 2.0) - 64000.0
-	pcvar2 := pcvar1 * pcvar1 * (float32(d.tpc.p6)) / 32768.0
-	pcvar2 = pcvar2 + pcvar1*(float32(d.tpc.p5))*2.0
-	pcvar2 = (pcvar2 / 4.0) + (float32(d.tpc.p4) * 65536.0)
-	pcvar1 = (float32(d.tpc.p3)*pcvar1*pcvar1/524288.0 + float32(d.tpc.p2)*pcvar1) / 524288.0
-	pcvar1 = (1.0 + pcvar1/32768.0) * (float32(d.tpc.p1))
-	if pcvar1 == 0.0 { // avoid divide by zero
-		return 0.0
-	}
-	pressureComp := 1048576.0 - float32(rawPress)
-	pressureComp = (pressureComp - (pcvar2 / 4096.0)) * (6250.0 / pcvar1)
-	pcvar1 = float32(d.tpc.p9) * pressureComp * pressureComp / 2147483648.0
-	pcvar2 = pressureComp * float32(d.tpc.p8) / 32768.0
-	pressureComp = pressureComp + (pcvar1+pcvar2+float32(d.tpc.p7))/16.0
+	var var1, var2, p int64
 
-	return pressureComp
+	var1 = int64(tFine) - 128000
+	var2 = var1 * var1 * int64(d.tpc.p6)
+	var2 = var2 + ((var1 * int64(d.tpc.p5)) << 17)
+	var2 = var2 + (int64(d.tpc.p4) << 35)
+	var1 = (var1 * var1 * int64(d.tpc.p3) >> 8) +
+		((var1 * int64(d.tpc.p2)) << 12)
+	var1 = ((int64(1) << 47) + var1) * (int64(d.tpc.p1)) >> 33
+
+	if var1 == 0 {
+		return 0 // avoid exception caused by division by zero
+	}
+	p = 1048576 - int64(rawPress)
+	p = (((p << 31) - var2) * 3125) / var1
+	var1 = (int64(d.tpc.p9) * (p >> 13) * (p >> 13)) >> 25
+	var2 = (int64(d.tpc.p8) * p) >> 19
+
+	p = ((p + var1 + var2) >> 8) + (int64(d.tpc.p7) << 4)
+	return float32(p) / 256
 }
 
 func (d *BMP280Driver) read(address byte, n int) ([]byte, error) {

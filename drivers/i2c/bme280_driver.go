@@ -3,8 +3,10 @@ package i2c
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 )
 
+const bme280RegisterControlHumidity = 0xF2
 const bme280RegisterHumidityMSB = 0xFD
 const bme280RegisterCalibDigH1 = 0xa1
 const bme280RegisterCalibDigH2LSB = 0xe1
@@ -68,7 +70,7 @@ func (d *BME280Driver) Start() (err error) {
 
 // Humidity returns the current humidity in percentage of relative humidity
 func (d *BME280Driver) Humidity() (humidity float32, err error) {
-	var rawH int32
+	var rawH uint32
 	if rawH, err = d.rawHumidity(); err != nil {
 		return 0.0, err
 	}
@@ -105,46 +107,52 @@ func (d *BME280Driver) initHumidity() (err error) {
 	d.hc.h4 = 0 + (int16(addrE4) << 4) | (int16(addrE5 & 0x0F))
 	d.hc.h5 = 0 + (int16(addrE6) << 4) | (int16(addrE5) >> 4)
 
+	d.connection.WriteByteData(bme280RegisterControlHumidity, 0x3F)
+
 	return nil
 }
 
-func (d *BME280Driver) rawHumidity() (int32, error) {
+func (d *BME280Driver) rawHumidity() (uint32, error) {
 	ret, err := d.read(bme280RegisterHumidityMSB, 2)
 	if err != nil {
 		return 0, err
 	}
+	if ret[0] == 0x80 && ret[1] == 0x00 {
+		return 0, errors.New("Humidity disabled")
+	}
 	buf := bytes.NewBuffer(ret)
-	var rawH int32
+	var rawH uint16
 	binary.Read(buf, binary.BigEndian, &rawH)
-	return rawH, nil
+	return uint32(rawH), nil
 }
 
 // Adapted from https://github.com/BoschSensortec/BME280_driver/blob/master/bme280.c
 // function bme280_compensate_humidity_double(s32 v_uncom_humidity_s32)
-func (d *BME280Driver) calculateHumidity(rawH int32) float32 {
+func (d *BME280Driver) calculateHumidity(rawH uint32) float32 {
 	var rawT int32
 	var err error
 	var h float32
 
-	rawT, _, err = d.rawTempPress()
+	rawT, err = d.rawTemp()
 	if err != nil {
 		return 0
 	}
 
 	_, tFine := d.calculateTemp(rawT)
-	h = float32(tFine - 76800)
+	h = float32(tFine) - 76800
 
 	if h == 0 {
 		return 0 // TODO err is 'invalid data' from Bosch - include errors or not?
 	}
 
-	h = (float32(rawH) - (float32(d.hc.h4) * 64.0) + // H4 double * 64.0 double
-		(float32(d.hc.h5) / 16384.0 * h)) // H5 double / 16384.0 * var_h
+	x := float32(rawH) - (float32(d.hc.h4)*64.0 +
+		(float32(d.hc.h5) / 16384.0 * h))
 
-	y :=
-		(float32(d.hc.h2) / 65536.0) * // H2 double / 65536.0
-			(1.0 + float32(d.hc.h6)/67108864.0*h) * // 1.0 + (H6 double / 67108664.0 * var_h
-			(1.0 + float32(d.hc.h3)/67108864.0*h) // 1.0 + H3 double / 67108864.0 * var_h
+	y := float32(d.hc.h2) / 65536.0 *
+		(1.0 + float32(d.hc.h6)/67108864.0*h*
+			(1.0+float32(d.hc.h3)/67108864.0*h))
 
-	return h * y
+	h = x * y
+	h = h * (1 - float32(d.hc.h1)*h/524288)
+	return h
 }
