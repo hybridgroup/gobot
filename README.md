@@ -252,7 +252,9 @@ drivers provided using the `gobot/drivers/i2c` package:
 - [I2C](https://en.wikipedia.org/wiki/I%C2%B2C) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/drivers/i2c)
 	- Adafruit Motor Hat
 	- BlinkM LED
+	- BME280 Barometric Pressure/Temperature/Altitude/Humidity Sensor
 	- BMP180 Barometric Pressure/Temperature/Altitude Sensor
+	- BMP280 Barometric Pressure/Temperature/Altitude Sensor
 	- DRV2605L Haptic Controller
 	- Grove Digital Accelerometer
 	- Grove RGB LCD
@@ -265,7 +267,7 @@ drivers provided using the `gobot/drivers/i2c` package:
 	- MPL115A2 Barometer
 	- MPU6050 Accelerometer/Gyroscope
 	- SHT3x-D Temperature/Humidity
-	- SSD1306 Oled Display Controller
+	- SSD1306 OLED Display Controller
 	- TSL2561 Digital Luminosity/Lux/Light Sensor
 	- Wii Nunchuck Controller
 
