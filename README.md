@@ -265,6 +265,7 @@ drivers provided using the `gobot/drivers/i2c` package:
 	- MPL115A2 Barometer
 	- MPU6050 Accelerometer/Gyroscope
 	- SHT3x-D Temperature/Humidity
+	- SSD1306 Oled Display Controller
 	- TSL2561 Digital Luminosity/Lux/Light Sensor
 	- Wii Nunchuck Controller
 

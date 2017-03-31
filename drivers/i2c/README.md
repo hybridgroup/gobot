@@ -27,6 +27,7 @@ Gobot has a extensible system for connecting to hardware devices. The following 
 - MPL115A2 Barometer
 - MPU6050 Accelerometer/Gyroscope
 - SHT3x-D Temperature/Humidity
+- SSD1306 Oled Display Controller
 - TSL2561 Digital Luminosity/Lux/Light Sensor
 - Wii Nunchuck Controller
 
