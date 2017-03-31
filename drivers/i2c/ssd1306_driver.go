@@ -102,10 +102,10 @@ func (s *DisplayBuffer) Set(x, y, c int) {
 	idx := x + (y/ssd1306PageSize)*s.Width
 	bit := uint(y) % ssd1306PageSize
 
-	if c > 0 {
-		s.buffer[idx] |= (1 << bit)
-	} else {
+	if c == 0 {
 		s.buffer[idx] &= ^(1 << bit)
+	} else {
+		s.buffer[idx] |= (1 << bit)
 	}
 }
 
@@ -143,15 +143,39 @@ func NewSSD1306Driver(a Connector, options ...func(Config)) *SSD1306Driver {
 	}
 
 	s.AddCommand("Display", func(params map[string]interface{}) interface{} {
-		return s.Display()
+		err := s.Display()
+		return map[string]interface{}{"err": err}
 	})
 
-	// s.AddCommand("Rgb", func(params map[string]interface{}) interface{} {
-	// 	red := byte(params["red"].(float64))
-	// 	green := byte(params["green"].(float64))
-	// 	blue := byte(params["blue"].(float64))
-	// 	return s.Rgb(red, green, blue)
-	// })
+	s.AddCommand("On", func(params map[string]interface{}) interface{} {
+		err := s.On()
+		return map[string]interface{}{"err": err}
+	})
+
+	s.AddCommand("Off", func(params map[string]interface{}) interface{} {
+		err := s.Off()
+		return map[string]interface{}{"err": err}
+	})
+
+	s.AddCommand("Clear", func(params map[string]interface{}) interface{} {
+		err := s.Clear()
+		return map[string]interface{}{"err": err}
+	})
+
+	s.AddCommand("SetContrast", func(params map[string]interface{}) interface{} {
+		contrast := byte(params["contrast"].(byte))
+		err := s.SetContrast(contrast)
+		return map[string]interface{}{"err": err}
+	})
+
+	s.AddCommand("Set", func(params map[string]interface{}) interface{} {
+		x := int(params["x"].(int))
+		y := int(params["y"].(int))
+		c := int(params["c"].(int))
+
+		s.Set(x, y, c)
+		return nil
+	})
 
 	return s
 }
@@ -217,9 +241,8 @@ func (s *SSD1306Driver) Clear() (err error) {
 }
 
 // Set sets a pixel
-func (s *SSD1306Driver) Set(x, y, c int) (err error) {
+func (s *SSD1306Driver) Set(x, y, c int) {
 	s.Buffer.Set(x, y, c)
-	return nil
 }
 
 // Reset sends the memory buffer to the display
@@ -233,7 +256,6 @@ func (s *SSD1306Driver) Reset() (err error) {
 // SetContrast sets the display contrast
 func (s *SSD1306Driver) SetContrast(contrast byte) (err error) {
 	err = s.commands([]byte{ssd1306SetContrast, contrast})
-	// _, err = s.connection.Write([]byte{0x80, ssd1306SetContrast, contrast})
 	return
 }
 

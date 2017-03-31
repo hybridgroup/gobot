@@ -168,3 +168,69 @@ func TestSSD1306DriverOff(t *testing.T) {
 	err := s.Off()
 	gobottest.Assert(t, err, nil)
 }
+
+// COMMANDS
+
+func TestSSD1306DriverCommandsDisplay(t *testing.T) {
+	s := initTestSSD1306Driver()
+	s.Start()
+
+	result := s.Command("Display")(map[string]interface{}{})
+	gobottest.Assert(t, result.(map[string]interface{})["err"], nil)
+}
+
+func TestSSD1306DriverCommandsOn(t *testing.T) {
+	s := initTestSSD1306Driver()
+	s.Start()
+
+	result := s.Command("On")(map[string]interface{}{})
+	gobottest.Assert(t, result.(map[string]interface{})["err"], nil)
+}
+
+func TestSSD1306DriverCommandsOff(t *testing.T) {
+	s := initTestSSD1306Driver()
+	s.Start()
+
+	result := s.Command("Off")(map[string]interface{}{})
+	gobottest.Assert(t, result.(map[string]interface{})["err"], nil)
+}
+
+func TestSSD1306DriverCommandsClear(t *testing.T) {
+	s := initTestSSD1306Driver()
+	s.Start()
+
+	result := s.Command("Clear")(map[string]interface{}{})
+	gobottest.Assert(t, result.(map[string]interface{})["err"], nil)
+}
+
+func TestSSD1306DriverCommandsSetContrast(t *testing.T) {
+	s, adaptor := initTestSSD1306DriverWithStubbedAdaptor()
+	s.Start()
+
+	adaptor.i2cWriteImpl = func(got []byte) (int, error) {
+		expected := []byte{0x80, ssd1306SetContrast, 0x80, 0x10}
+		if !reflect.DeepEqual(got, expected) {
+			t.Logf("Sequence error, got %+v, expected %+v", got, expected)
+			return 0, fmt.Errorf("Woops!")
+		}
+		return 0, nil
+	}
+
+	result := s.Command("SetContrast")(map[string]interface{}{
+		"contrast": byte(0x10),
+	})
+	gobottest.Assert(t, result.(map[string]interface{})["err"], nil)
+}
+
+func TestSSD1306DriverCommandsSet(t *testing.T) {
+	s := initTestSSD1306Driver()
+	s.Start()
+
+	gobottest.Assert(t, s.Buffer.buffer[0], byte(0))
+	s.Command("Set")(map[string]interface{}{
+		"x": int(0),
+		"y": int(0),
+		"c": int(1),
+	})
+	gobottest.Assert(t, s.Buffer.buffer[0], byte(1))
+}
