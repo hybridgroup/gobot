@@ -140,8 +140,6 @@ func (d *BMP280Driver) Altitude() (alt float32, err error) {
 
 // initialization reads the calibration coefficients.
 func (d *BMP280Driver) initialization() (err error) {
-	// TODO: set sleep mode here...
-
 	var coefficients []byte
 	if coefficients, err = d.read(bmp280RegisterCalib00, 24); err != nil {
 		return err
@@ -161,9 +159,6 @@ func (d *BMP280Driver) initialization() (err error) {
 	binary.Read(buf, binary.LittleEndian, &d.tpc.p9)
 
 	d.connection.WriteByteData(bmp280RegisterControl, 0x3F)
-
-	// TODO: set usage mode here...
-	// TODO: set default sea level here
 
 	return nil
 }

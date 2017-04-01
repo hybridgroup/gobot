@@ -48,7 +48,6 @@ func TestBMP280DriverHalt(t *testing.T) {
 	gobottest.Assert(t, bmp280.Halt(), nil)
 }
 
-// TODO: implement test
 func TestBMP280DriverMeasurements(t *testing.T) {
 	bmp280, adaptor := initTestBMP280DriverWithStubbedAdaptor()
 	adaptor.i2cReadImpl = func(b []byte) (int, error) {
