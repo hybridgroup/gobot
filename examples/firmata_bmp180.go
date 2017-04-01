@@ -20,7 +20,6 @@ func main() {
 
 	work := func() {
 		gobot.Every(1*time.Second, func() {
-			//fmt.Println("Pressure", mpl115a2.Pressure())
 			t, _ := bmp180.Temperature()
 			fmt.Println("Temperature", t)
 		})

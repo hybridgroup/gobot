@@ -3,6 +3,7 @@ package i2c
 import (
 	"bytes"
 	"encoding/binary"
+	"math"
 
 	"gobot.io/x/gobot"
 )
@@ -12,9 +13,9 @@ const (
 	bmp280RegisterConfig       = 0xf5
 	bmp280RegisterPressureData = 0xf7
 	bmp280RegisterTempData     = 0xfa
+	bmp280RegisterCalib00      = 0x88
+	bmp280SeaLevelPressure     = 1013.25
 )
-
-const bmp280RegisterCalib00 = 0x88
 
 type bmp280CalibrationCoefficients struct {
 	t1 uint16
@@ -123,6 +124,18 @@ func (d *BMP280Driver) Pressure() (press float32, err error) {
 	}
 	_, tFine := d.calculateTemp(rawT)
 	return d.calculatePress(rawP, tFine), nil
+}
+
+// Altitude returns the current altitude in meters based on the
+// current barometric pressure and estimated pressure at sea level.
+// Calculation is based on code from Adafruit BME280 library
+// 	https://github.com/adafruit/Adafruit_BME280_Library
+func (d *BMP280Driver) Altitude() (alt float32, err error) {
+	atmP, _ := d.Pressure()
+	atmP /= 100.0
+	alt = float32(44330.0 * (1.0 - math.Pow(float64(atmP/bmp280SeaLevelPressure), 0.1903)))
+
+	return
 }
 
 // initialization reads the calibration coefficients.

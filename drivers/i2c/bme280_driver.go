@@ -20,7 +20,12 @@ type bmeHumidityCalibrationCoefficients struct {
 	h6 int8
 }
 
-// BME280Driver is a driver for the BME280 temperature/humidity sensor
+// BME280Driver is a driver for the BME280 temperature/humidity sensor.
+// It implements all of the same functions as the BMP280Driver, but also
+// adds the Humidity() function by reading the BME280's humidity sensor.
+// For details on the BMP280Driver please see:
+// 	https://godoc.org/gobot.io/x/gobot/drivers/i2c#BMP280Driver
+//
 type BME280Driver struct {
 	*BMP280Driver
 	hc *bmeHumidityCalibrationCoefficients
