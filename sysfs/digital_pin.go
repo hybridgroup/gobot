@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 	"syscall"
+	"time"
 )
 
 const (
@@ -96,7 +97,18 @@ func (d *digitalPin) Export() error {
 		d.direction.Close()
 	}
 
-	d.direction, err = fs.OpenFile(fmt.Sprintf("%v/%v/direction", GPIOPATH, d.label), os.O_RDWR, 0644)
+	attempt := 0
+	for {
+		attempt++
+		d.direction, err = fs.OpenFile(fmt.Sprintf("%v/%v/direction", GPIOPATH, d.label), os.O_RDWR, 0644)
+		if err == nil {
+			break
+		}
+		if attempt > 10 {
+			return err
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
 
 	if d.value != nil {
 		d.value.Close()
