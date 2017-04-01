@@ -1,6 +1,7 @@
 package i2c
 
 import (
+	"bytes"
 	"testing"
 
 	"gobot.io/x/gobot"
@@ -49,7 +50,30 @@ func TestBMP280DriverHalt(t *testing.T) {
 
 // TODO: implement test
 func TestBMP280DriverMeasurements(t *testing.T) {
-
+	bmp280, adaptor := initTestBMP280DriverWithStubbedAdaptor()
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		buf := new(bytes.Buffer)
+		// Values produced by dumping data from actual sensor
+		if adaptor.written[len(adaptor.written)-1] == bmp280RegisterCalib00 {
+			buf.Write([]byte{126, 109, 214, 102, 50, 0, 54, 149, 220, 213, 208, 11, 64, 30, 166, 255, 249, 255, 172, 38, 10, 216, 189, 16})
+		} else if adaptor.written[len(adaptor.written)-1] == bmp280RegisterTempData {
+			buf.Write([]byte{128, 243, 0})
+		} else if adaptor.written[len(adaptor.written)-1] == bmp280RegisterPressureData {
+			buf.Write([]byte{77, 23, 48})
+		}
+		copy(b, buf.Bytes())
+		return buf.Len(), nil
+	}
+	bmp280.Start()
+	temp, err := bmp280.Temperature()
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, temp, float32(25.014637))
+	pressure, err := bmp280.Pressure()
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, pressure, float32(99545.414))
+	alt, err := bmp280.Altitude()
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, alt, float32(149.22713))
 }
 
 func TestBMP280DriverSetName(t *testing.T) {
