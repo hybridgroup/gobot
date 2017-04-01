@@ -14,7 +14,9 @@ Gobot has a extensible system for connecting to hardware devices. The following 
 
 - Adafruit Motor Hat
 - BlinkM LED
+- BME280 Barometric Pressure/Temperature/Altitude/Humidity Sensor
 - BMP180 Barometric Pressure/Temperature/Altitude Sensor
+- BMP280 Barometric Pressure/Temperature/Altitude Sensor
 - DRV2605L Haptic Controller
 - Grove Digital Accelerometer
 - Grove RGB LCD
@@ -27,7 +29,7 @@ Gobot has a extensible system for connecting to hardware devices. The following 
 - MPL115A2 Barometer
 - MPU6050 Accelerometer/Gyroscope
 - SHT3x-D Temperature/Humidity
-- SSD1306 Oled Display Controller
+- SSD1306 OLED Display Controller
 - TSL2561 Digital Luminosity/Lux/Light Sensor
 - Wii Nunchuck Controller
 
