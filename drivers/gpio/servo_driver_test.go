@@ -18,12 +18,13 @@ func initTestServoDriver() *ServoDriver {
 func TestServoDriver(t *testing.T) {
 	var err interface{}
 
-	d := initTestServoDriver()
+	a := newGpioTestAdaptor()
+	d := NewServoDriver(a, "1")
 
 	gobottest.Assert(t, d.Pin(), "1")
 	gobottest.Refute(t, d.Connection(), nil)
 
-	testAdaptorServoWrite = func() (err error) {
+	a.testAdaptorServoWrite = func() (err error) {
 		return errors.New("pwm error")
 	}
 
@@ -38,7 +39,6 @@ func TestServoDriver(t *testing.T) {
 
 	err = d.Command("Move")(map[string]interface{}{"angle": 100.0})
 	gobottest.Assert(t, err.(error), errors.New("pwm error"))
-
 }
 
 func TestServoDriverStart(t *testing.T) {

@@ -11,12 +11,6 @@ import (
 var _ gobot.Driver = (*BuzzerDriver)(nil)
 
 func initTestBuzzerDriver(conn DigitalWriter) *BuzzerDriver {
-	testAdaptorDigitalWrite = func() (err error) {
-		return nil
-	}
-	testAdaptorPwmWrite = func() (err error) {
-		return nil
-	}
 	return NewBuzzerDriver(conn, "1")
 }
 

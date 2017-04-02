@@ -44,10 +44,12 @@ func TestMakeyButtonDriver(t *testing.T) {
 
 func TestMakeyButtonDriverStart(t *testing.T) {
 	sem := make(chan bool)
-	d := initTestMakeyButtonDriver()
+	a := newGpioTestAdaptor()
+	d := NewMakeyButtonDriver(a, "1")
+
 	gobottest.Assert(t, d.Start(), nil)
 
-	testAdaptorDigitalRead = func() (val int, err error) {
+	a.testAdaptorDigitalRead = func() (val int, err error) {
 		val = 0
 		return
 	}
@@ -63,7 +65,7 @@ func TestMakeyButtonDriverStart(t *testing.T) {
 		t.Errorf("MakeyButton Event \"Push\" was not published")
 	}
 
-	testAdaptorDigitalRead = func() (val int, err error) {
+	a.testAdaptorDigitalRead = func() (val int, err error) {
 		val = 1
 		return
 	}
@@ -79,7 +81,7 @@ func TestMakeyButtonDriverStart(t *testing.T) {
 		t.Errorf("MakeyButton Event \"Release\" was not published")
 	}
 
-	testAdaptorDigitalRead = func() (val int, err error) {
+	a.testAdaptorDigitalRead = func() (val int, err error) {
 		err = errors.New("digital read error")
 		return
 	}
@@ -100,7 +102,7 @@ func TestMakeyButtonDriverStart(t *testing.T) {
 		sem <- true
 	})
 
-	testAdaptorDigitalRead = func() (val int, err error) {
+	a.testAdaptorDigitalRead = func() (val int, err error) {
 		val = 1
 		return
 	}

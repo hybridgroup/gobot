@@ -36,7 +36,8 @@ func TestButtonDriver(t *testing.T) {
 
 func TestButtonDriverStart(t *testing.T) {
 	sem := make(chan bool, 0)
-	d := initTestButtonDriver()
+	a := newGpioTestAdaptor()
+	d := NewButtonDriver(a, "1")
 	gobottest.Assert(t, d.Start(), nil)
 
 	d.Once(ButtonPush, func(data interface{}) {
@@ -44,7 +45,7 @@ func TestButtonDriverStart(t *testing.T) {
 		sem <- true
 	})
 
-	testAdaptorDigitalRead = func() (val int, err error) {
+	a.testAdaptorDigitalRead = func() (val int, err error) {
 		val = 1
 		return
 	}
@@ -60,7 +61,7 @@ func TestButtonDriverStart(t *testing.T) {
 		sem <- true
 	})
 
-	testAdaptorDigitalRead = func() (val int, err error) {
+	a.testAdaptorDigitalRead = func() (val int, err error) {
 		val = 0
 		return
 	}
@@ -71,7 +72,7 @@ func TestButtonDriverStart(t *testing.T) {
 		t.Errorf("Button Event \"Release\" was not published")
 	}
 
-	testAdaptorDigitalRead = func() (val int, err error) {
+	a.testAdaptorDigitalRead = func() (val int, err error) {
 		err = errors.New("digital read error")
 		return
 	}
@@ -86,7 +87,7 @@ func TestButtonDriverStart(t *testing.T) {
 		t.Errorf("Button Event \"Error\" was not published")
 	}
 
-	testAdaptorDigitalRead = func() (val int, err error) {
+	a.testAdaptorDigitalRead = func() (val int, err error) {
 		val = 1
 		return
 	}

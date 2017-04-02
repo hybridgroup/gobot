@@ -10,40 +10,41 @@ import (
 
 var _ gobot.Driver = (*RelayDriver)(nil)
 
-func initTestRelayDriver(conn DigitalWriter) *RelayDriver {
-	testAdaptorDigitalWrite = func() (err error) {
+func initTestRelayDriver() *RelayDriver {
+	a := newGpioTestAdaptor()
+	a.testAdaptorDigitalWrite = func() (err error) {
 		return nil
 	}
-	testAdaptorPwmWrite = func() (err error) {
+	a.testAdaptorPwmWrite = func() (err error) {
 		return nil
 	}
-	return NewRelayDriver(conn, "1")
+	return NewRelayDriver(a, "1")
 }
 
 func TestRelayDriverDefaultName(t *testing.T) {
-	g := initTestRelayDriver(newGpioTestAdaptor())
+	g := initTestRelayDriver()
 	gobottest.Refute(t, g.Connection(), nil)
 	gobottest.Assert(t, strings.HasPrefix(g.Name(), "Relay"), true)
 }
 
 func TestRelayDriverSetName(t *testing.T) {
-	g := initTestRelayDriver(newGpioTestAdaptor())
+	g := initTestRelayDriver()
 	g.SetName("mybot")
 	gobottest.Assert(t, g.Name(), "mybot")
 }
 
 func TestRelayDriverStart(t *testing.T) {
-	d := initTestRelayDriver(newGpioTestAdaptor())
+	d := initTestRelayDriver()
 	gobottest.Assert(t, d.Start(), nil)
 }
 
 func TestRelayDriverHalt(t *testing.T) {
-	d := initTestRelayDriver(newGpioTestAdaptor())
+	d := initTestRelayDriver()
 	gobottest.Assert(t, d.Halt(), nil)
 }
 
 func TestRelayDriverToggle(t *testing.T) {
-	d := initTestRelayDriver(newGpioTestAdaptor())
+	d := initTestRelayDriver()
 	d.Off()
 	d.Toggle()
 	gobottest.Assert(t, d.State(), true)
@@ -52,7 +53,7 @@ func TestRelayDriverToggle(t *testing.T) {
 }
 
 func TestRelayDriverCommands(t *testing.T) {
-	d := initTestRelayDriver(newGpioTestAdaptor())
+	d := initTestRelayDriver()
 	gobottest.Assert(t, d.Command("Off")(nil), nil)
 	gobottest.Assert(t, d.State(), false)
 

@@ -36,7 +36,9 @@ func TestPIRMotionDriver(t *testing.T) {
 
 func TestPIRMotionDriverStart(t *testing.T) {
 	sem := make(chan bool, 0)
-	d := initTestPIRMotionDriver()
+	a := newGpioTestAdaptor()
+	d := NewPIRMotionDriver(a, "1")
+
 	gobottest.Assert(t, d.Start(), nil)
 
 	d.Once(MotionDetected, func(data interface{}) {
@@ -44,7 +46,7 @@ func TestPIRMotionDriverStart(t *testing.T) {
 		sem <- true
 	})
 
-	testAdaptorDigitalRead = func() (val int, err error) {
+	a.testAdaptorDigitalRead = func() (val int, err error) {
 		val = 1
 		return
 	}
@@ -60,7 +62,7 @@ func TestPIRMotionDriverStart(t *testing.T) {
 		sem <- true
 	})
 
-	testAdaptorDigitalRead = func() (val int, err error) {
+	a.testAdaptorDigitalRead = func() (val int, err error) {
 		val = 0
 		return
 	}
@@ -71,7 +73,7 @@ func TestPIRMotionDriverStart(t *testing.T) {
 		t.Errorf("PIRMotionDriver Event \"MotionStopped\" was not published")
 	}
 
-	testAdaptorDigitalRead = func() (val int, err error) {
+	a.testAdaptorDigitalRead = func() (val int, err error) {
 		err = errors.New("digital read error")
 		return
 	}
