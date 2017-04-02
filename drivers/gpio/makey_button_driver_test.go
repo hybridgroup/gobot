@@ -49,10 +49,10 @@ func TestMakeyButtonDriverStart(t *testing.T) {
 
 	gobottest.Assert(t, d.Start(), nil)
 
-	a.testAdaptorDigitalRead = func() (val int, err error) {
+	a.TestAdaptorDigitalRead(func() (val int, err error) {
 		val = 0
 		return
-	}
+	})
 
 	d.Once(ButtonPush, func(data interface{}) {
 		gobottest.Assert(t, d.Active, true)
@@ -65,10 +65,10 @@ func TestMakeyButtonDriverStart(t *testing.T) {
 		t.Errorf("MakeyButton Event \"Push\" was not published")
 	}
 
-	a.testAdaptorDigitalRead = func() (val int, err error) {
+	a.TestAdaptorDigitalRead(func() (val int, err error) {
 		val = 1
 		return
-	}
+	})
 
 	d.Once(ButtonRelease, func(data interface{}) {
 		gobottest.Assert(t, d.Active, false)
@@ -81,10 +81,10 @@ func TestMakeyButtonDriverStart(t *testing.T) {
 		t.Errorf("MakeyButton Event \"Release\" was not published")
 	}
 
-	a.testAdaptorDigitalRead = func() (val int, err error) {
+	a.TestAdaptorDigitalRead(func() (val int, err error) {
 		err = errors.New("digital read error")
 		return
-	}
+	})
 
 	d.Once(Error, func(data interface{}) {
 		gobottest.Assert(t, data.(error).Error(), "digital read error")
@@ -102,10 +102,10 @@ func TestMakeyButtonDriverStart(t *testing.T) {
 		sem <- true
 	})
 
-	a.testAdaptorDigitalRead = func() (val int, err error) {
+	a.TestAdaptorDigitalRead(func() (val int, err error) {
 		val = 1
 		return
-	}
+	})
 
 	d.halt <- true
 

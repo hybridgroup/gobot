@@ -45,10 +45,10 @@ func TestButtonDriverStart(t *testing.T) {
 		sem <- true
 	})
 
-	a.testAdaptorDigitalRead = func() (val int, err error) {
+	a.TestAdaptorDigitalRead(func() (val int, err error) {
 		val = 1
 		return
-	}
+	})
 
 	select {
 	case <-sem:
@@ -61,10 +61,10 @@ func TestButtonDriverStart(t *testing.T) {
 		sem <- true
 	})
 
-	a.testAdaptorDigitalRead = func() (val int, err error) {
+	a.TestAdaptorDigitalRead(func() (val int, err error) {
 		val = 0
 		return
-	}
+	})
 
 	select {
 	case <-sem:
@@ -72,10 +72,10 @@ func TestButtonDriverStart(t *testing.T) {
 		t.Errorf("Button Event \"Release\" was not published")
 	}
 
-	a.testAdaptorDigitalRead = func() (val int, err error) {
+	a.TestAdaptorDigitalRead(func() (val int, err error) {
 		err = errors.New("digital read error")
 		return
-	}
+	})
 
 	d.Once(Error, func(data interface{}) {
 		sem <- true
@@ -87,10 +87,10 @@ func TestButtonDriverStart(t *testing.T) {
 		t.Errorf("Button Event \"Error\" was not published")
 	}
 
-	a.testAdaptorDigitalRead = func() (val int, err error) {
+	a.TestAdaptorDigitalRead(func() (val int, err error) {
 		val = 1
 		return
-	}
+	})
 
 	d.Once(ButtonPush, func(data interface{}) {
 		sem <- true
@@ -103,7 +103,6 @@ func TestButtonDriverStart(t *testing.T) {
 		t.Errorf("Button Event \"Press\" should not published")
 	case <-time.After(BUTTON_TEST_DELAY * time.Millisecond):
 	}
-
 }
 
 func TestButtonDriverDefaultName(t *testing.T) {

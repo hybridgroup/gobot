@@ -46,10 +46,10 @@ func TestPIRMotionDriverStart(t *testing.T) {
 		sem <- true
 	})
 
-	a.testAdaptorDigitalRead = func() (val int, err error) {
+	a.TestAdaptorDigitalRead(func() (val int, err error) {
 		val = 1
 		return
-	}
+	})
 
 	select {
 	case <-sem:
@@ -62,10 +62,10 @@ func TestPIRMotionDriverStart(t *testing.T) {
 		sem <- true
 	})
 
-	a.testAdaptorDigitalRead = func() (val int, err error) {
+	a.TestAdaptorDigitalRead(func() (val int, err error) {
 		val = 0
 		return
-	}
+	})
 
 	select {
 	case <-sem:
@@ -73,10 +73,10 @@ func TestPIRMotionDriverStart(t *testing.T) {
 		t.Errorf("PIRMotionDriver Event \"MotionStopped\" was not published")
 	}
 
-	a.testAdaptorDigitalRead = func() (val int, err error) {
+	a.TestAdaptorDigitalRead(func() (val int, err error) {
 		err = errors.New("digital read error")
 		return
-	}
+	})
 
 	d.Once(Error, func(data interface{}) {
 		sem <- true
