@@ -28,16 +28,25 @@ func TestNeuroskyDriver(t *testing.T) {
 }
 func TestNeuroskyDriverStart(t *testing.T) {
 	sem := make(chan bool, 0)
-	d := initTestNeuroskyDriver()
+
+	rwc := &NullReadWriteCloser{}
+	a := NewAdaptor("/dev/null")
+	a.connect = func(n *Adaptor) (io.ReadWriteCloser, error) {
+		return rwc, nil
+	}
+	a.Connect()
+
+	d := NewDriver(a)
+	e := errors.New("read error")
 	d.Once(d.Event(Error), func(data interface{}) {
-		gobottest.Assert(t, data.(error), errors.New("read error"))
+		gobottest.Assert(t, data.(error), e)
 		sem <- true
 	})
 
 	gobottest.Assert(t, d.Start(), nil)
 
 	time.Sleep(50 * time.Millisecond)
-	readError = errors.New("read error")
+	rwc.ReadError(e)
 
 	select {
 	case <-sem:
