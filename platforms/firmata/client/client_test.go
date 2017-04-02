@@ -19,12 +19,20 @@ func (readWriteCloser) Write(p []byte) (int, error) {
 
 var clientMutex sync.Mutex
 var writeDataMutex sync.Mutex
+var readDataMutex sync.Mutex
 var testReadData = []byte{}
 var testWriteData = bytes.Buffer{}
 
+func SetTestReadData(d []byte) {
+	readDataMutex.Lock()
+	defer readDataMutex.Unlock()
+	testReadData = d
+	return
+}
+
 func (readWriteCloser) Read(b []byte) (int, error) {
-	writeDataMutex.Lock()
-	defer writeDataMutex.Unlock()
+	readDataMutex.Lock()
+	defer readDataMutex.Unlock()
 
 	size := len(b)
 	if len(testReadData) < size {
@@ -79,7 +87,7 @@ func initTestFirmata() *Client {
 		testCapabilitiesResponse,
 		testAnalogMappingResponse,
 	} {
-		testReadData = f()
+		SetTestReadData(f())
 		b.process()
 	}
 
@@ -110,7 +118,7 @@ func TestQueryPinState(t *testing.T) {
 func TestProcessProtocolVersion(t *testing.T) {
 	sem := make(chan bool)
 	b := initTestFirmata()
-	testReadData = []byte{249, 2, 3}
+	SetTestReadData([]byte{249, 2, 3})
 
 	b.Once(b.Event("ProtocolVersion"), func(data interface{}) {
 		gobottest.Assert(t, data, "2.3")
@@ -129,7 +137,7 @@ func TestProcessProtocolVersion(t *testing.T) {
 func TestProcessAnalogRead0(t *testing.T) {
 	sem := make(chan bool)
 	b := initTestFirmata()
-	testReadData = []byte{0xE0, 0x23, 0x05}
+	SetTestReadData([]byte{0xE0, 0x23, 0x05})
 
 	b.Once(b.Event("AnalogRead0"), func(data interface{}) {
 		gobottest.Assert(t, data, 675)
@@ -148,7 +156,7 @@ func TestProcessAnalogRead0(t *testing.T) {
 func TestProcessAnalogRead1(t *testing.T) {
 	sem := make(chan bool)
 	b := initTestFirmata()
-	testReadData = []byte{0xE1, 0x23, 0x06}
+	SetTestReadData([]byte{0xE1, 0x23, 0x06})
 
 	b.Once(b.Event("AnalogRead1"), func(data interface{}) {
 		gobottest.Assert(t, data, 803)
@@ -168,7 +176,7 @@ func TestProcessDigitalRead2(t *testing.T) {
 	sem := make(chan bool)
 	b := initTestFirmata()
 	b.pins[2].Mode = Input
-	testReadData = []byte{0x90, 0x04, 0x00}
+	SetTestReadData([]byte{0x90, 0x04, 0x00})
 
 	b.Once(b.Event("DigitalRead2"), func(data interface{}) {
 		gobottest.Assert(t, data, 1)
@@ -188,7 +196,7 @@ func TestProcessDigitalRead4(t *testing.T) {
 	sem := make(chan bool)
 	b := initTestFirmata()
 	b.pins[4].Mode = Input
-	testReadData = []byte{0x90, 0x16, 0x00}
+	SetTestReadData([]byte{0x90, 0x16, 0x00})
 
 	b.Once(b.Event("DigitalRead4"), func(data interface{}) {
 		gobottest.Assert(t, data, 1)
@@ -207,7 +215,7 @@ func TestProcessDigitalRead4(t *testing.T) {
 func TestProcessPinState13(t *testing.T) {
 	sem := make(chan bool)
 	b := initTestFirmata()
-	testReadData = []byte{240, 110, 13, 1, 1, 247}
+	SetTestReadData([]byte{240, 110, 13, 1, 1, 247})
 
 	b.Once(b.Event("PinState13"), func(data interface{}) {
 		gobottest.Assert(t, data, Pin{[]int{0, 1, 4}, 1, 0, 1, 127})
@@ -226,7 +234,7 @@ func TestProcessPinState13(t *testing.T) {
 func TestProcessI2cReply(t *testing.T) {
 	sem := make(chan bool)
 	b := initTestFirmata()
-	testReadData = []byte{240, 119, 9, 0, 0, 0, 24, 1, 1, 0, 26, 1, 247}
+	SetTestReadData([]byte{240, 119, 9, 0, 0, 0, 24, 1, 1, 0, 26, 1, 247})
 
 	b.Once(b.Event("I2cReply"), func(data interface{}) {
 		gobottest.Assert(t, data, I2cReply{
@@ -249,9 +257,9 @@ func TestProcessI2cReply(t *testing.T) {
 func TestProcessFirmwareQuery(t *testing.T) {
 	sem := make(chan bool)
 	b := initTestFirmata()
-	testReadData = []byte{240, 121, 2, 3, 83, 0, 116, 0, 97, 0, 110, 0, 100, 0, 97,
+	SetTestReadData([]byte{240, 121, 2, 3, 83, 0, 116, 0, 97, 0, 110, 0, 100, 0, 97,
 		0, 114, 0, 100, 0, 70, 0, 105, 0, 114, 0, 109, 0, 97, 0, 116, 0, 97, 0, 46,
-		0, 105, 0, 110, 0, 111, 0, 247}
+		0, 105, 0, 110, 0, 111, 0, 247})
 
 	b.Once(b.Event("FirmwareQuery"), func(data interface{}) {
 		gobottest.Assert(t, data, "StandardFirmata.ino")
@@ -270,7 +278,7 @@ func TestProcessFirmwareQuery(t *testing.T) {
 func TestProcessStringData(t *testing.T) {
 	sem := make(chan bool)
 	b := initTestFirmata()
-	testReadData = append([]byte{240, 0x71}, append([]byte("Hello Firmata!"), 247)...)
+	SetTestReadData(append([]byte{240, 0x71}, append([]byte("Hello Firmata!"), 247)...))
 
 	b.Once(b.Event("StringData"), func(data interface{}) {
 		gobottest.Assert(t, data, "Hello Firmata!")
@@ -321,7 +329,9 @@ func TestConnect(t *testing.T) {
 	go func() {
 		for {
 			responseMutex.Lock()
+			readDataMutex.Lock()
 			testReadData = append(testReadData, response...)
+			readDataMutex.Unlock()
 			responseMutex.Unlock()
 			time.Sleep(100 * time.Millisecond)
 		}
