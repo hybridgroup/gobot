@@ -13,8 +13,8 @@ import (
 var _ gobot.Driver = (*SpheroDriver)(nil)
 
 func initTestSpheroDriver() *SpheroDriver {
-	a := NewAdaptor("/dev/null")
-	a.sp = nullReadWriteCloser{}
+	a, _ := initTestSpheroAdaptor()
+	a.Connect()
 	return NewSpheroDriver(a)
 }
 

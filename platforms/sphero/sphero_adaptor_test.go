@@ -12,48 +12,56 @@ import (
 
 var _ gobot.Adaptor = (*Adaptor)(nil)
 
-type nullReadWriteCloser struct{}
-
-var testAdaptorRead = func(p []byte) (int, error) {
-	return len(p), nil
+type nullReadWriteCloser struct {
+	testAdaptorRead  func(p []byte) (int, error)
+	testAdaptorWrite func(b []byte) (int, error)
+	testAdaptorClose func() error
 }
 
-func (nullReadWriteCloser) Write(p []byte) (int, error) {
-	return testAdaptorRead(p)
+func (n *nullReadWriteCloser) Write(p []byte) (int, error) {
+	return n.testAdaptorWrite(p)
 }
 
-var testAdaptorWrite = func(b []byte) (int, error) {
-	return len(b), nil
+func (n *nullReadWriteCloser) Read(b []byte) (int, error) {
+	return n.testAdaptorRead(b)
 }
 
-func (nullReadWriteCloser) Read(b []byte) (int, error) {
-	return testAdaptorWrite(b)
+func (n *nullReadWriteCloser) Close() error {
+	return n.testAdaptorClose()
 }
 
-var testAdaptorClose = func() error {
-	return nil
-}
-
-func (nullReadWriteCloser) Close() error {
-	return testAdaptorClose()
-}
-
-func initTestSpheroAdaptor() *Adaptor {
-	a := NewAdaptor("/dev/null")
-	a.connect = func(string) (io.ReadWriteCloser, error) {
-		return &nullReadWriteCloser{}, nil
+func NewNullReadWriteCloser() *nullReadWriteCloser {
+	return &nullReadWriteCloser{
+		testAdaptorRead: func(p []byte) (int, error) {
+			return len(p), nil
+		},
+		testAdaptorWrite: func(b []byte) (int, error) {
+			return len(b), nil
+		},
+		testAdaptorClose: func() error {
+			return nil
+		},
 	}
-	return a
+}
+
+func initTestSpheroAdaptor() (*Adaptor, *nullReadWriteCloser) {
+	a := NewAdaptor("/dev/null")
+	rwc := NewNullReadWriteCloser()
+
+	a.connect = func(string) (io.ReadWriteCloser, error) {
+		return rwc, nil
+	}
+	return a, rwc
 }
 
 func TestSpheroAdaptor(t *testing.T) {
-	a := initTestSpheroAdaptor()
+	a, _ := initTestSpheroAdaptor()
 	gobottest.Assert(t, strings.HasPrefix(a.Name(), "Sphero"), true)
 	gobottest.Assert(t, a.Port(), "/dev/null")
 }
 
 func TestSpheroAdaptorReconnect(t *testing.T) {
-	a := initTestSpheroAdaptor()
+	a, _ := initTestSpheroAdaptor()
 	a.Connect()
 	gobottest.Assert(t, a.connected, true)
 	a.Reconnect()
@@ -65,11 +73,11 @@ func TestSpheroAdaptorReconnect(t *testing.T) {
 }
 
 func TestSpheroAdaptorFinalize(t *testing.T) {
-	a := initTestSpheroAdaptor()
+	a, rwc := initTestSpheroAdaptor()
 	a.Connect()
 	gobottest.Assert(t, a.Finalize(), nil)
 
-	testAdaptorClose = func() error {
+	rwc.testAdaptorClose = func() error {
 		return errors.New("close error")
 	}
 
@@ -78,7 +86,7 @@ func TestSpheroAdaptorFinalize(t *testing.T) {
 }
 
 func TestSpheroAdaptorConnect(t *testing.T) {
-	a := initTestSpheroAdaptor()
+	a, _ := initTestSpheroAdaptor()
 	gobottest.Assert(t, a.Connect(), nil)
 
 	a.connect = func(string) (io.ReadWriteCloser, error) {

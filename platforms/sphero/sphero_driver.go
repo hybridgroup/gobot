@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"errors"
+	"sync"
 	"time"
 
 	"gobot.io/x/gobot"
@@ -30,6 +31,7 @@ type packet struct {
 type SpheroDriver struct {
 	name            string
 	connection      gobot.Connection
+	mtx             sync.Mutex
 	seq             uint8
 	asyncResponse   [][]uint8
 	syncResponse    [][]uint8
@@ -357,6 +359,8 @@ func (s *SpheroDriver) getSyncResponse(packet *packet) []byte {
 }
 
 func (s *SpheroDriver) craftPacket(body []uint8, did byte, cid byte) *packet {
+	s.mtx.Lock()
+	defer s.mtx.Unlock()
 	packet := new(packet)
 	packet.body = body
 	dlen := len(packet.body) + 1
@@ -366,6 +370,8 @@ func (s *SpheroDriver) craftPacket(body []uint8, did byte, cid byte) *packet {
 }
 
 func (s *SpheroDriver) write(packet *packet) (err error) {
+	s.mtx.Lock()
+	defer s.mtx.Unlock()
 	buf := append(packet.header, packet.body...)
 	buf = append(buf, packet.checksum)
 	length, err := s.adaptor().sp.Write(buf)
