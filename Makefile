@@ -1,20 +1,17 @@
-PACKAGES := gobot gobot/api gobot/drivers/gpio gobot/drivers/aio gobot/drivers/i2c gobot/platforms/firmata/client gobot/platforms/intel-iot/edison gobot/platforms/intel-iot/joule gobot/platforms/parrot/ardrone gobot/platforms/parrot/bebop gobot/platforms/parrot/minidrone gobot/platforms/sphero/ollie gobot/platforms/sphero/bb8 gobot/sysfs $(shell ls ./platforms | sed -e 's/^/gobot\/platforms\//')
-.PHONY: test cover robeaux examples
+.PHONY: test cover robeaux examples deps
 
 test:
-	go test -i ./...
-	for package in $(PACKAGES) ; do \
-		go test gobot.io/x/$$package ; \
-	done ; \
+	go test ./...
 
 cover:
 	echo "" > profile.cov
-	go test -i ./...
-	for package in $(PACKAGES) ; do \
-		go test -covermode=count -coverprofile=tmp.cov gobot.io/x/$$package ; \
-		cat tmp.cov >> profile.cov ; \
-		rm tmp.cov ; \
-	done ; \
+	for package in $$(go list ./...) ; do \
+		go test -covermode=count -coverprofile=tmp.cov $$package ; \
+		if [ -f tmp.cov ]; then \
+			cat tmp.cov >> profile.cov ; \
+			rm tmp.cov ; \
+		fi ; \
+	done
 
 robeaux:
 ifeq (,$(shell which go-bindata))
@@ -42,18 +39,19 @@ examples:
 	done ; \
 
 deps:
-	go get -d -v github.com/bmizerany/pat
-	go get -d -v github.com/hybridgroup/go-ardrone/client
-	go get -d -v github.com/mgutz/logxi/v1
-	go get -d -v golang.org/x/sys/unix
-	go get -d -v github.com/currantlabs/ble
-	go get -d -v github.com/tarm/serial
-	go get -d -v github.com/veandco/go-sdl2/sdl
-	go get -d -v golang.org/x/net/websocket
-	go get -d -v github.com/eclipse/paho.mqtt.golang
-	go get -d -v github.com/nats-io/nats
-	go get -d -v github.com/lazywei/go-opencv
-	go get -d -v github.com/donovanhide/eventsource
-	go get -d -v github.com/hashicorp/go-multierror
-	go get -d -v github.com/sigurn/crc8
-	go get -d -v github.com/codegangsta/cli
+	go get -d -v \
+		github.com/bmizerany/pat \
+		github.com/codegangsta/cli \
+		github.com/currantlabs/ble \
+		github.com/donovanhide/eventsource \
+		github.com/eclipse/paho.mqtt.golang \
+		github.com/hashicorp/go-multierror \
+		github.com/hybridgroup/go-ardrone/client \
+		github.com/lazywei/go-opencv \
+		github.com/mgutz/logxi/v1 \
+		github.com/nats-io/nats \
+		github.com/sigurn/crc8 \
+		github.com/tarm/serial \
+		github.com/veandco/go-sdl2/sdl \
+		golang.org/x/net/websocket \
+		golang.org/x/sys/unix
