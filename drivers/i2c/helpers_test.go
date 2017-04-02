@@ -1,6 +1,9 @@
 package i2c
 
-import "fmt"
+import (
+	"fmt"
+	"sync"
+)
 
 var rgb = map[string]interface{}{
 	"red":   1.0,
@@ -19,15 +22,32 @@ var blue = castColor("blue")
 type i2cTestAdaptor struct {
 	name         string
 	written      []byte
+	mtx          sync.Mutex
 	i2cReadImpl  func([]byte) (int, error)
 	i2cWriteImpl func([]byte) (int, error)
 }
 
+func (t *i2cTestAdaptor) Testi2cReadImpl(f func([]byte) (int, error)) {
+	t.mtx.Lock()
+	defer t.mtx.Unlock()
+	t.i2cReadImpl = f
+}
+
+func (t *i2cTestAdaptor) Testi2cWriteImpl(f func([]byte) (int, error)) {
+	t.mtx.Lock()
+	defer t.mtx.Unlock()
+	t.i2cWriteImpl = f
+}
+
 func (t *i2cTestAdaptor) Read(b []byte) (count int, err error) {
+	t.mtx.Lock()
+	defer t.mtx.Unlock()
 	return t.i2cReadImpl(b)
 }
 
 func (t *i2cTestAdaptor) Write(b []byte) (count int, err error) {
+	t.mtx.Lock()
+	defer t.mtx.Unlock()
 	t.written = append(t.written, b...)
 	return t.i2cWriteImpl(b)
 }
@@ -37,6 +57,8 @@ func (t *i2cTestAdaptor) Close() error {
 }
 
 func (t *i2cTestAdaptor) ReadByte() (val byte, err error) {
+	t.mtx.Lock()
+	defer t.mtx.Unlock()
 	bytes := []byte{0}
 	bytesRead, err := t.i2cReadImpl(bytes)
 	if err != nil {
@@ -50,6 +72,8 @@ func (t *i2cTestAdaptor) ReadByte() (val byte, err error) {
 }
 
 func (t *i2cTestAdaptor) ReadByteData(reg uint8) (val uint8, err error) {
+	t.mtx.Lock()
+	defer t.mtx.Unlock()
 	bytes := []byte{0}
 	bytesRead, err := t.i2cReadImpl(bytes)
 	if err != nil {
@@ -63,6 +87,8 @@ func (t *i2cTestAdaptor) ReadByteData(reg uint8) (val uint8, err error) {
 }
 
 func (t *i2cTestAdaptor) ReadWordData(reg uint8) (val uint16, err error) {
+	t.mtx.Lock()
+	defer t.mtx.Unlock()
 	bytes := []byte{0, 0}
 	bytesRead, err := t.i2cReadImpl(bytes)
 	if err != nil {
@@ -76,6 +102,8 @@ func (t *i2cTestAdaptor) ReadWordData(reg uint8) (val uint16, err error) {
 }
 
 func (t *i2cTestAdaptor) ReadBlockData(_ uint8, b []byte) (n int, err error) {
+	t.mtx.Lock()
+	defer t.mtx.Unlock()
 	bytes := make([]byte, 32)
 	bytesRead, err := t.i2cReadImpl(bytes)
 	copy(b, bytes[:bytesRead])
@@ -83,6 +111,8 @@ func (t *i2cTestAdaptor) ReadBlockData(_ uint8, b []byte) (n int, err error) {
 }
 
 func (t *i2cTestAdaptor) WriteByte(val byte) (err error) {
+	t.mtx.Lock()
+	defer t.mtx.Unlock()
 	t.written = append(t.written, val)
 	bytes := []byte{val}
 	_, err = t.i2cWriteImpl(bytes)
@@ -90,6 +120,8 @@ func (t *i2cTestAdaptor) WriteByte(val byte) (err error) {
 }
 
 func (t *i2cTestAdaptor) WriteByteData(reg uint8, val uint8) (err error) {
+	t.mtx.Lock()
+	defer t.mtx.Unlock()
 	t.written = append(t.written, reg)
 	t.written = append(t.written, val)
 	bytes := []byte{val}
@@ -98,6 +130,8 @@ func (t *i2cTestAdaptor) WriteByteData(reg uint8, val uint8) (err error) {
 }
 
 func (t *i2cTestAdaptor) WriteWordData(reg uint8, val uint16) (err error) {
+	t.mtx.Lock()
+	defer t.mtx.Unlock()
 	t.written = append(t.written, reg)
 	low := uint8(val & 0xff)
 	high := uint8((val >> 8) & 0xff)
@@ -109,6 +143,8 @@ func (t *i2cTestAdaptor) WriteWordData(reg uint8, val uint16) (err error) {
 }
 
 func (t *i2cTestAdaptor) WriteBlockData(reg uint8, b []byte) (err error) {
+	t.mtx.Lock()
+	defer t.mtx.Unlock()
 	t.written = append(t.written, reg)
 	t.written = append(t.written, b...)
 	_, err = t.i2cWriteImpl(b)

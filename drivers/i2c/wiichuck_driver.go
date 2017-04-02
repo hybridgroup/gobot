@@ -1,6 +1,7 @@
 package i2c
 
 import (
+	"sync"
 	"time"
 
 	"gobot.io/x/gobot"
@@ -27,6 +28,7 @@ type WiichuckDriver struct {
 	interval  time.Duration
 	pauseTime time.Duration
 	gobot.Eventer
+	mtx      sync.Mutex
 	joystick map[string]float64
 	data     map[string]float64
 }
@@ -125,6 +127,14 @@ func (w *WiichuckDriver) Start() (err error) {
 // Halt returns true if driver is halted successfully
 func (w *WiichuckDriver) Halt() (err error) { return }
 
+// Joystick returns the current value for the joystick
+func (w *WiichuckDriver) Joystick() map[string]float64 {
+	w.mtx.Lock()
+	defer w.mtx.Unlock()
+	val := w.joystick
+	return val
+}
+
 // update parses value to update buttons and joystick.
 // If value is encrypted, warning message is printed
 func (w *WiichuckDriver) update(value []byte) (err error) {
@@ -141,6 +151,8 @@ func (w *WiichuckDriver) update(value []byte) (err error) {
 
 // setJoystickDefaultValue sets default value if value is -1
 func (w *WiichuckDriver) setJoystickDefaultValue(joystickAxis string, defaultValue float64) {
+	w.mtx.Lock()
+	defer w.mtx.Unlock()
 	if w.joystick[joystickAxis] == -1 {
 		w.joystick[joystickAxis] = defaultValue
 	}
@@ -182,9 +194,10 @@ func (w *WiichuckDriver) updateButtons() {
 
 // updateJoystick publishes event with current x and y values for joystick
 func (w *WiichuckDriver) updateJoystick() {
+	joy := w.Joystick()
 	w.Publish(w.Event(Joystick), map[string]float64{
-		"x": w.calculateJoystickValue(w.data["sx"], w.joystick["sx_origin"]),
-		"y": w.calculateJoystickValue(w.data["sy"], w.joystick["sy_origin"]),
+		"x": w.calculateJoystickValue(w.data["sx"], joy["sx_origin"]),
+		"y": w.calculateJoystickValue(w.data["sy"], joy["sy_origin"]),
 	})
 }
 

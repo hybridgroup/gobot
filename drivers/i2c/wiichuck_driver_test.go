@@ -46,10 +46,10 @@ func TestWiichuckDriverStart(t *testing.T) {
 	sem := make(chan bool)
 	wii, adaptor := initTestWiichuckDriverWithStubbedAdaptor()
 
-	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+	adaptor.Testi2cReadImpl(func(b []byte) (int, error) {
 		copy(b, []byte{1, 2, 3, 4, 5, 6})
 		return 6, nil
-	}
+	})
 
 	numberOfCyclesForEvery := 3
 
@@ -59,9 +59,10 @@ func TestWiichuckDriverStart(t *testing.T) {
 	go func() {
 		for {
 			time.Sleep(time.Duration(numberOfCyclesForEvery) * time.Millisecond)
-			if (wii.joystick["sy_origin"] == float64(44)) &&
-				(wii.joystick["sx_origin"] == float64(45)) {
+			if (wii.Joystick()["sy_origin"] == float64(44)) &&
+				(wii.Joystick()["sx_origin"] == float64(45)) {
 				sem <- true
+				return
 			}
 		}
 	}()
@@ -102,8 +103,8 @@ func TestWiichuckDriverCanAdjustOrigins(t *testing.T) {
 	wii.update(decryptedValue)
 
 	// - This should be done by WiichuckDriver.adjustOrigins
-	gobottest.Assert(t, wii.joystick["sx_origin"], float64(45))
-	gobottest.Assert(t, wii.joystick["sy_origin"], float64(44))
+	gobottest.Assert(t, wii.Joystick()["sx_origin"], float64(45))
+	gobottest.Assert(t, wii.Joystick()["sy_origin"], float64(44))
 }
 
 func TestWiichuckDriverCButton(t *testing.T) {
@@ -195,23 +196,23 @@ func TestWiichuckDriverEncrypted(t *testing.T) {
 	gobottest.Assert(t, wii.data["z"], float64(0))
 	gobottest.Assert(t, wii.data["c"], float64(0))
 
-	gobottest.Assert(t, wii.joystick["sx_origin"], float64(-1))
-	gobottest.Assert(t, wii.joystick["sy_origin"], float64(-1))
+	gobottest.Assert(t, wii.Joystick()["sx_origin"], float64(-1))
+	gobottest.Assert(t, wii.Joystick()["sy_origin"], float64(-1))
 }
 
 func TestWiichuckDriverSetJoystickDefaultValue(t *testing.T) {
 	wii := initTestWiichuckDriver()
 
-	gobottest.Assert(t, wii.joystick["sy_origin"], float64(-1))
+	gobottest.Assert(t, wii.Joystick()["sy_origin"], float64(-1))
 
 	wii.setJoystickDefaultValue("sy_origin", float64(2))
 
-	gobottest.Assert(t, wii.joystick["sy_origin"], float64(2))
+	gobottest.Assert(t, wii.Joystick()["sy_origin"], float64(2))
 
 	// when current default value is not -1 it keeps the current value
 	wii.setJoystickDefaultValue("sy_origin", float64(20))
 
-	gobottest.Assert(t, wii.joystick["sy_origin"], float64(2))
+	gobottest.Assert(t, wii.Joystick()["sy_origin"], float64(2))
 }
 
 func TestWiichuckDriverCalculateJoystickValue(t *testing.T) {
@@ -279,15 +280,15 @@ func TestWiichuckDriverParse(t *testing.T) {
 func TestWiichuckDriverAdjustOrigins(t *testing.T) {
 	wii := initTestWiichuckDriver()
 
-	gobottest.Assert(t, wii.joystick["sy_origin"], float64(-1))
-	gobottest.Assert(t, wii.joystick["sx_origin"], float64(-1))
+	gobottest.Assert(t, wii.Joystick()["sy_origin"], float64(-1))
+	gobottest.Assert(t, wii.Joystick()["sx_origin"], float64(-1))
 
 	// First pass
 	wii.parse([]byte{1, 2, 3, 4, 5, 6})
 	wii.adjustOrigins()
 
-	gobottest.Assert(t, wii.joystick["sy_origin"], float64(44))
-	gobottest.Assert(t, wii.joystick["sx_origin"], float64(45))
+	gobottest.Assert(t, wii.Joystick()["sy_origin"], float64(44))
+	gobottest.Assert(t, wii.Joystick()["sx_origin"], float64(45))
 
 	// Second pass
 	wii = initTestWiichuckDriver()
@@ -295,8 +296,8 @@ func TestWiichuckDriverAdjustOrigins(t *testing.T) {
 	wii.parse([]byte{61, 72, 83, 94, 105, 206})
 	wii.adjustOrigins()
 
-	gobottest.Assert(t, wii.joystick["sy_origin"], float64(118))
-	gobottest.Assert(t, wii.joystick["sx_origin"], float64(65))
+	gobottest.Assert(t, wii.Joystick()["sy_origin"], float64(118))
+	gobottest.Assert(t, wii.Joystick()["sx_origin"], float64(65))
 }
 
 func TestWiichuckDriverSetName(t *testing.T) {
