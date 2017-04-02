@@ -4,6 +4,7 @@ import (
 	"errors"
 	"io"
 	"io/ioutil"
+	"sync"
 	"testing"
 
 	"gobot.io/x/gobot"
@@ -12,54 +13,67 @@ import (
 
 var _ gobot.Driver = (*Driver)(nil)
 
-type NullReadWriteCloser struct{}
-
-var writeError error
-
-func (NullReadWriteCloser) Write(p []byte) (int, error) {
-	return len(p), writeError
+type NullReadWriteCloser struct {
+	mtx        sync.Mutex
+	writeError error
 }
-func (NullReadWriteCloser) Read(b []byte) (int, error) {
+
+func (n *NullReadWriteCloser) WriteError(e error) {
+	n.mtx.Lock()
+	defer n.mtx.Unlock()
+	n.writeError = e
+}
+
+func (n *NullReadWriteCloser) Write(p []byte) (int, error) {
+	n.mtx.Lock()
+	defer n.mtx.Unlock()
+	return len(p), n.writeError
+}
+func (n *NullReadWriteCloser) Read(b []byte) (int, error) {
 	return len(b), nil
 }
-func (NullReadWriteCloser) Close() error {
+func (n *NullReadWriteCloser) Close() error {
 	return nil
 }
 
-func initTestLeapMotionDriver() *Driver {
+func initTestLeapMotionDriver() (*Driver, *NullReadWriteCloser) {
 	a := NewAdaptor("")
+	rwc := &NullReadWriteCloser{}
 	a.connect = func(port string) (io.ReadWriteCloser, error) {
-		return &NullReadWriteCloser{}, nil
+		return rwc, nil
 	}
 	a.Connect()
-	receive = func(ws io.ReadWriteCloser, buf *[]byte) {
+
+	d := NewDriver(a)
+	d.receive = func(ws io.ReadWriteCloser, buf *[]byte) {
 		file, _ := ioutil.ReadFile("./test/support/example_frame.json")
 		copy(*buf, file)
 	}
-	return NewDriver(a)
+	return d, rwc
 }
 
 func TestLeapMotionDriver(t *testing.T) {
-	d := initTestLeapMotionDriver()
+	d, _ := initTestLeapMotionDriver()
 	gobottest.Refute(t, d.Connection(), nil)
 }
 
 func TestLeapMotionDriverStart(t *testing.T) {
-	d := initTestLeapMotionDriver()
+	d, _ := initTestLeapMotionDriver()
 	gobottest.Assert(t, d.Start(), nil)
 
-	d = initTestLeapMotionDriver()
-	writeError = errors.New("write error")
-	gobottest.Assert(t, d.Start(), errors.New("write error"))
+	d2, rwc := initTestLeapMotionDriver()
+	e := errors.New("write error")
+	rwc.WriteError(e)
+	gobottest.Assert(t, d2.Start(), e)
 }
 
 func TestLeapMotionDriverHalt(t *testing.T) {
-	d := initTestLeapMotionDriver()
+	d, _ := initTestLeapMotionDriver()
 	gobottest.Assert(t, d.Halt(), nil)
 }
 
 func TestLeapMotionDriverParser(t *testing.T) {
-	d := initTestLeapMotionDriver()
+	d, _ := initTestLeapMotionDriver()
 	file, _ := ioutil.ReadFile("./test/support/example_frame.json")
 	parsedFrame := d.ParseFrame(file)
 

@@ -21,11 +21,8 @@ const (
 type Driver struct {
 	name       string
 	connection gobot.Connection
+	receive    func(ws io.ReadWriteCloser, msg *[]byte)
 	gobot.Eventer
-}
-
-var receive = func(ws io.ReadWriteCloser, msg *[]byte) {
-	websocket.Message.Receive(ws.(*websocket.Conn), msg)
 }
 
 // NewDriver creates a new leap motion driver
@@ -39,6 +36,9 @@ func NewDriver(a *Adaptor) *Driver {
 		name:       gobot.DefaultName("LeapMotion"),
 		connection: a,
 		Eventer:    gobot.NewEventer(),
+		receive: func(ws io.ReadWriteCloser, msg *[]byte) {
+			websocket.Message.Receive(ws.(*websocket.Conn), msg)
+		},
 	}
 
 	l.AddEvent(MessageEvent)
@@ -83,7 +83,7 @@ func (l *Driver) Start() (err error) {
 		var msg []byte
 		var frame Frame
 		for {
-			receive(l.adaptor().ws, &msg)
+			l.receive(l.adaptor().ws, &msg)
 			frame = l.ParseFrame(msg)
 			l.Publish(MessageEvent, frame)
 
