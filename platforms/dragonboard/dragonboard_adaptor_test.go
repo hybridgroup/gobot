@@ -17,32 +17,6 @@ var _ gpio.DigitalReader = (*Adaptor)(nil)
 var _ gpio.DigitalWriter = (*Adaptor)(nil)
 var _ i2c.Connector = (*Adaptor)(nil)
 
-type NullReadWriteCloser struct {
-	contents []byte
-}
-
-func (n *NullReadWriteCloser) SetAddress(int) error {
-	return nil
-}
-
-func (n *NullReadWriteCloser) Write(b []byte) (int, error) {
-	n.contents = make([]byte, len(b))
-	copy(n.contents[:], b[:])
-
-	return len(b), nil
-}
-
-func (n *NullReadWriteCloser) Read(b []byte) (int, error) {
-	copy(b, n.contents)
-	return len(b), nil
-}
-
-var closeErr error
-
-func (n *NullReadWriteCloser) Close() error {
-	return closeErr
-}
-
 func initTestDragonBoardAdaptor(t *testing.T) *Adaptor {
 	a := NewAdaptor()
 	if err := a.Connect(); err != nil {
