@@ -13,19 +13,22 @@ import (
 var _ gobot.Driver = (*AnalogSensorDriver)(nil)
 
 func TestAnalogSensorDriver(t *testing.T) {
-	d := NewAnalogSensorDriver(newAioTestAdaptor(), "1")
+	a := newAioTestAdaptor()
+	d := NewAnalogSensorDriver(a, "1")
 	gobottest.Refute(t, d.Connection(), nil)
+
 	// default interval
 	gobottest.Assert(t, d.interval, 10*time.Millisecond)
 
-	d = NewAnalogSensorDriver(newAioTestAdaptor(), "42", 30*time.Second)
+	a = newAioTestAdaptor()
+	d = NewAnalogSensorDriver(a, "42", 30*time.Second)
 	gobottest.Assert(t, d.Pin(), "42")
 	gobottest.Assert(t, d.interval, 30*time.Second)
 
-	testAdaptorAnalogRead = func() (val int, err error) {
+	a.TestAdaptorAnalogRead(func() (val int, err error) {
 		val = 100
 		return
-	}
+	})
 	ret := d.Command("Read")(nil).(map[string]interface{})
 
 	gobottest.Assert(t, ret["val"].(int), 100)
@@ -34,8 +37,8 @@ func TestAnalogSensorDriver(t *testing.T) {
 
 func TestAnalogSensorDriverStart(t *testing.T) {
 	sem := make(chan bool, 1)
-
-	d := NewAnalogSensorDriver(newAioTestAdaptor(), "1")
+	a := newAioTestAdaptor()
+	d := NewAnalogSensorDriver(a, "1")
 
 	gobottest.Assert(t, d.Start(), nil)
 
@@ -46,10 +49,10 @@ func TestAnalogSensorDriverStart(t *testing.T) {
 	})
 
 	// send data
-	testAdaptorAnalogRead = func() (val int, err error) {
+	a.TestAdaptorAnalogRead(func() (val int, err error) {
 		val = 100
 		return
-	}
+	})
 
 	select {
 	case <-sem:
@@ -64,10 +67,10 @@ func TestAnalogSensorDriverStart(t *testing.T) {
 	})
 
 	// send error
-	testAdaptorAnalogRead = func() (val int, err error) {
+	a.TestAdaptorAnalogRead(func() (val int, err error) {
 		err = errors.New("read error")
 		return
-	}
+	})
 
 	select {
 	case <-sem:
@@ -80,10 +83,10 @@ func TestAnalogSensorDriverStart(t *testing.T) {
 		sem <- true
 	})
 
-	testAdaptorAnalogRead = func() (val int, err error) {
+	a.TestAdaptorAnalogRead(func() (val int, err error) {
 		val = 200
 		return
-	}
+	})
 
 	d.halt <- true
 

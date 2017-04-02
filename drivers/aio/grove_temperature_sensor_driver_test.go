@@ -23,12 +23,13 @@ func TestGroveTemperatureSensorDriver(t *testing.T) {
 
 func TestGroveTempSensorPublishesTemperatureInCelsius(t *testing.T) {
 	sem := make(chan bool, 1)
-	d := NewGroveTemperatureSensorDriver(newAioTestAdaptor(), "1")
+	a := newAioTestAdaptor()
+	d := NewGroveTemperatureSensorDriver(a, "1")
 
-	testAdaptorAnalogRead = func() (val int, err error) {
+	a.TestAdaptorAnalogRead(func() (val int, err error) {
 		val = 585
 		return
-	}
+	})
 	gobottest.Assert(t, d.Start(), nil)
 
 	d.Once(d.Event(Data), func(data interface{}) {
@@ -47,13 +48,14 @@ func TestGroveTempSensorPublishesTemperatureInCelsius(t *testing.T) {
 
 func TestGroveTempSensorPublishesError(t *testing.T) {
 	sem := make(chan bool, 1)
-	d := NewGroveTemperatureSensorDriver(newAioTestAdaptor(), "1")
+	a := newAioTestAdaptor()
+	d := NewGroveTemperatureSensorDriver(a, "1")
 
 	// send error
-	testAdaptorAnalogRead = func() (val int, err error) {
+	a.TestAdaptorAnalogRead(func() (val int, err error) {
 		err = errors.New("read error")
 		return
-	}
+	})
 
 	gobottest.Assert(t, d.Start(), nil)
 
