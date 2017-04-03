@@ -152,6 +152,31 @@ func TestBME280DriverHumidityReadError(t *testing.T) {
 	gobottest.Assert(t, hum, float32(0.0))
 }
 
+func TestBME280DriverHumidityNotEnabled(t *testing.T) {
+	bme280, adaptor := initTestBME280DriverWithStubbedAdaptor()
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		buf := new(bytes.Buffer)
+		// Values produced by dumping data from actual sensor
+		if adaptor.written[len(adaptor.written)-1] == bmp280RegisterCalib00 {
+			buf.Write([]byte{126, 109, 214, 102, 50, 0, 54, 149, 220, 213, 208, 11, 64, 30, 166, 255, 249, 255, 172, 38, 10, 216, 189, 16})
+		} else if adaptor.written[len(adaptor.written)-1] == bme280RegisterCalibDigH1 {
+			buf.Write([]byte{75})
+		} else if adaptor.written[len(adaptor.written)-1] == bmp280RegisterTempData {
+			buf.Write([]byte{129, 0, 0})
+		} else if adaptor.written[len(adaptor.written)-1] == bme280RegisterCalibDigH2LSB {
+			buf.Write([]byte{112, 1, 0, 19, 1, 0, 30})
+		} else if adaptor.written[len(adaptor.written)-1] == bme280RegisterHumidityMSB {
+			buf.Write([]byte{0x80, 0x00})
+		}
+		copy(b, buf.Bytes())
+		return buf.Len(), nil
+	}
+	bme280.Start()
+	hum, err := bme280.Humidity()
+	gobottest.Assert(t, err, errors.New("Humidity disabled"))
+	gobottest.Assert(t, hum, float32(0.0))
+}
+
 func TestBME280DriverSetName(t *testing.T) {
 	b := initTestBME280Driver()
 	b.SetName("TESTME")
