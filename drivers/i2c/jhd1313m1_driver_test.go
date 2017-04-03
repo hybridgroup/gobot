@@ -57,6 +57,14 @@ func TestJHD1313MDriverStart(t *testing.T) {
 	gobottest.Assert(t, d.Start(), nil)
 }
 
+func TestJHD1313MDriverStartWriteError(t *testing.T) {
+	d, adaptor := initTestJHD1313M1DriverWithStubbedAdaptor()
+	adaptor.i2cWriteImpl = func([]byte) (int, error) {
+		return 0, errors.New("write error")
+	}
+	gobottest.Assert(t, d.Start(), errors.New("write error"))
+}
+
 func TestJHD1313MDriverHalt(t *testing.T) {
 	d := initTestJHD1313M1Driver()
 	d.Start()
@@ -69,10 +77,30 @@ func TestJHD1313MDriverSetRgb(t *testing.T) {
 	gobottest.Assert(t, d.SetRGB(0x00, 0x00, 0x00), nil)
 }
 
+func TestJHD1313MDriverSetRgbError(t *testing.T) {
+	d, a := initTestJHD1313M1DriverWithStubbedAdaptor()
+	d.Start()
+
+	a.i2cWriteImpl = func([]byte) (int, error) {
+		return 0, errors.New("write error")
+	}
+	gobottest.Assert(t, d.SetRGB(0x00, 0x00, 0x00), errors.New("write error"))
+}
+
 func TestJHD1313MDriverClear(t *testing.T) {
 	d, _ := initTestJHD1313M1DriverWithStubbedAdaptor()
 	d.Start()
 	gobottest.Assert(t, d.Clear(), nil)
+}
+
+func TestJHD1313MDriverClearError(t *testing.T) {
+	d, a := initTestJHD1313M1DriverWithStubbedAdaptor()
+	d.Start()
+
+	a.i2cWriteImpl = func([]byte) (int, error) {
+		return 0, errors.New("write error")
+	}
+	gobottest.Assert(t, d.Clear(), errors.New("write error"))
 }
 
 func TestJHD1313MDriverHome(t *testing.T) {
@@ -129,4 +157,15 @@ func TestJHD1313MDriverSetCustomCharError(t *testing.T) {
 	data := [8]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
 	d.Start()
 	gobottest.Assert(t, d.SetCustomChar(10, data), errors.New("can't set a custom character at a position greater than 7"))
+}
+
+func TestJHD1313MDriverSetCustomCharWriteError(t *testing.T) {
+	d, a := initTestJHD1313M1DriverWithStubbedAdaptor()
+	d.Start()
+
+	a.i2cWriteImpl = func([]byte) (int, error) {
+		return 0, errors.New("write error")
+	}
+	data := [8]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
+	gobottest.Assert(t, d.SetCustomChar(0, data), errors.New("write error"))
 }

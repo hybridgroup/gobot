@@ -37,6 +37,12 @@ func TestGroveLcdDriverName(t *testing.T) {
 	gobottest.Assert(t, strings.HasPrefix(g.Name(), "JHD1313M1"), true)
 }
 
+func TestLcdDriverWithAddress(t *testing.T) {
+	adaptor := newI2cTestAdaptor()
+	g := NewGroveLcdDriver(adaptor, WithAddress(0x66))
+	gobottest.Assert(t, g.GetAddressOrDefault(0x33), 0x66)
+}
+
 func TestGroveAccelerometerDriverName(t *testing.T) {
 	g := initTestGroveAccelerometerDriver()
 	gobottest.Refute(t, g.Connection(), nil)
