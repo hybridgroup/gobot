@@ -90,6 +90,44 @@ func TestBME280DriverMeasurements(t *testing.T) {
 	gobottest.Assert(t, hum, float32(51.20179))
 }
 
+func TestBME280DriverInitH1Error(t *testing.T) {
+	bme280, adaptor := initTestBME280DriverWithStubbedAdaptor()
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		buf := new(bytes.Buffer)
+		// Values produced by dumping data from actual sensor
+		if adaptor.written[len(adaptor.written)-1] == bmp280RegisterCalib00 {
+			buf.Write([]byte{126, 109, 214, 102, 50, 0, 54, 149, 220, 213, 208, 11, 64, 30, 166, 255, 249, 255, 172, 38, 10, 216, 189, 16})
+		} else if adaptor.written[len(adaptor.written)-1] == bme280RegisterCalibDigH1 {
+			return 0, errors.New("h1 read error")
+		} else if adaptor.written[len(adaptor.written)-1] == bme280RegisterCalibDigH2LSB {
+			buf.Write([]byte{112, 1, 0, 19, 1, 0, 30})
+		}
+		copy(b, buf.Bytes())
+		return buf.Len(), nil
+	}
+
+	gobottest.Assert(t, bme280.Start(), errors.New("h1 read error"))
+}
+
+func TestBME280DriverInitH2Error(t *testing.T) {
+	bme280, adaptor := initTestBME280DriverWithStubbedAdaptor()
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		buf := new(bytes.Buffer)
+		// Values produced by dumping data from actual sensor
+		if adaptor.written[len(adaptor.written)-1] == bmp280RegisterCalib00 {
+			buf.Write([]byte{126, 109, 214, 102, 50, 0, 54, 149, 220, 213, 208, 11, 64, 30, 166, 255, 249, 255, 172, 38, 10, 216, 189, 16})
+		} else if adaptor.written[len(adaptor.written)-1] == bme280RegisterCalibDigH1 {
+			buf.Write([]byte{75})
+		} else if adaptor.written[len(adaptor.written)-1] == bme280RegisterCalibDigH2LSB {
+			return 0, errors.New("h2 read error")
+		}
+		copy(b, buf.Bytes())
+		return buf.Len(), nil
+	}
+
+	gobottest.Assert(t, bme280.Start(), errors.New("h2 read error"))
+}
+
 func TestBME280DriverHumidityWriteError(t *testing.T) {
 	bme280, adaptor := initTestBME280DriverWithStubbedAdaptor()
 	bme280.Start()
