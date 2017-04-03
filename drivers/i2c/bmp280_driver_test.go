@@ -2,6 +2,7 @@ package i2c
 
 import (
 	"bytes"
+	"errors"
 	"testing"
 
 	"gobot.io/x/gobot"
@@ -42,6 +43,22 @@ func TestBMP280DriverStart(t *testing.T) {
 	gobottest.Assert(t, bmp280.Start(), nil)
 }
 
+func TestBMP280DriverStartWriteError(t *testing.T) {
+	bmp280, adaptor := initTestBMP280DriverWithStubbedAdaptor()
+	adaptor.i2cWriteImpl = func([]byte) (int, error) {
+		return 0, errors.New("write error")
+	}
+	gobottest.Assert(t, bmp280.Start(), errors.New("write error"))
+}
+
+func TestBMP280DriverStartReadError(t *testing.T) {
+	bmp280, adaptor := initTestBMP280DriverWithStubbedAdaptor()
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		return 0, errors.New("read error")
+	}
+	gobottest.Assert(t, bmp280.Start(), errors.New("read error"))
+}
+
 func TestBMP280DriverHalt(t *testing.T) {
 	bmp280 := initTestBMP280Driver()
 
@@ -73,6 +90,54 @@ func TestBMP280DriverMeasurements(t *testing.T) {
 	alt, err := bmp280.Altitude()
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, alt, float32(149.22713))
+}
+
+func TestBMP280DriverTemperatureWriteError(t *testing.T) {
+	bmp280, adaptor := initTestBMP280DriverWithStubbedAdaptor()
+	bmp280.Start()
+
+	adaptor.i2cWriteImpl = func([]byte) (int, error) {
+		return 0, errors.New("write error")
+	}
+	temp, err := bmp280.Temperature()
+	gobottest.Assert(t, err, errors.New("write error"))
+	gobottest.Assert(t, temp, float32(0.0))
+}
+
+func TestBMP280DriverTemperatureReadError(t *testing.T) {
+	bmp280, adaptor := initTestBMP280DriverWithStubbedAdaptor()
+	bmp280.Start()
+
+	adaptor.i2cReadImpl = func([]byte) (int, error) {
+		return 0, errors.New("read error")
+	}
+	temp, err := bmp280.Temperature()
+	gobottest.Assert(t, err, errors.New("read error"))
+	gobottest.Assert(t, temp, float32(0.0))
+}
+
+func TestBMP280DriverPressureWriteError(t *testing.T) {
+	bmp280, adaptor := initTestBMP280DriverWithStubbedAdaptor()
+	bmp280.Start()
+
+	adaptor.i2cWriteImpl = func([]byte) (int, error) {
+		return 0, errors.New("write error")
+	}
+	press, err := bmp280.Pressure()
+	gobottest.Assert(t, err, errors.New("write error"))
+	gobottest.Assert(t, press, float32(0.0))
+}
+
+func TestBMP280DriverPressureReadError(t *testing.T) {
+	bmp280, adaptor := initTestBMP280DriverWithStubbedAdaptor()
+	bmp280.Start()
+
+	adaptor.i2cReadImpl = func([]byte) (int, error) {
+		return 0, errors.New("read error")
+	}
+	press, err := bmp280.Pressure()
+	gobottest.Assert(t, err, errors.New("read error"))
+	gobottest.Assert(t, press, float32(0.0))
 }
 
 func TestBMP280DriverSetName(t *testing.T) {

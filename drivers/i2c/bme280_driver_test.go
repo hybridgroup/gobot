@@ -2,6 +2,7 @@ package i2c
 
 import (
 	"bytes"
+	"errors"
 	"testing"
 
 	"gobot.io/x/gobot"
@@ -42,6 +43,22 @@ func TestBME280DriverStart(t *testing.T) {
 	gobottest.Assert(t, bme280.Start(), nil)
 }
 
+func TestBME280DriverStartWriteError(t *testing.T) {
+	bme280, adaptor := initTestBME280DriverWithStubbedAdaptor()
+	adaptor.i2cWriteImpl = func([]byte) (int, error) {
+		return 0, errors.New("write error")
+	}
+	gobottest.Assert(t, bme280.Start(), errors.New("write error"))
+}
+
+func TestBME280DriverStartReadError(t *testing.T) {
+	bme280, adaptor := initTestBME280DriverWithStubbedAdaptor()
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		return 0, errors.New("read error")
+	}
+	gobottest.Assert(t, bme280.Start(), errors.New("read error"))
+}
+
 func TestBME280DriverHalt(t *testing.T) {
 	bme280 := initTestBME280Driver()
 
@@ -71,6 +88,30 @@ func TestBME280DriverMeasurements(t *testing.T) {
 	hum, err := bme280.Humidity()
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, hum, float32(51.20179))
+}
+
+func TestBME280DriverHumidityWriteError(t *testing.T) {
+	bme280, adaptor := initTestBME280DriverWithStubbedAdaptor()
+	bme280.Start()
+
+	adaptor.i2cWriteImpl = func([]byte) (int, error) {
+		return 0, errors.New("write error")
+	}
+	hum, err := bme280.Humidity()
+	gobottest.Assert(t, err, errors.New("write error"))
+	gobottest.Assert(t, hum, float32(0.0))
+}
+
+func TestBME280DriverHumidityReadError(t *testing.T) {
+	bme280, adaptor := initTestBME280DriverWithStubbedAdaptor()
+	bme280.Start()
+
+	adaptor.i2cReadImpl = func([]byte) (int, error) {
+		return 0, errors.New("read error")
+	}
+	hum, err := bme280.Humidity()
+	gobottest.Assert(t, err, errors.New("read error"))
+	gobottest.Assert(t, hum, float32(0.0))
 }
 
 func TestBME280DriverSetName(t *testing.T) {
