@@ -8,13 +8,14 @@ import (
 	"fmt"
 
 	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/aio"
 	"gobot.io/x/gobot/drivers/gpio"
 	"gobot.io/x/gobot/platforms/beaglebone"
 )
 
 func main() {
 	beagleboneAdaptor := beaglebone.NewAdaptor()
-	sensor := gpio.NewAnalogSensorDriver(beagleboneAdaptor, "P9_33")
+	sensor := aio.NewAnalogSensorDriver(beagleboneAdaptor, "P9_33")
 	led := gpio.NewLedDriver(beagleboneAdaptor, "P9_14")
 
 	work := func() {

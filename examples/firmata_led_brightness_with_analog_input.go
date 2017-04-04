@@ -8,17 +8,18 @@ import (
 	"fmt"
 
 	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/aio"
 	"gobot.io/x/gobot/drivers/gpio"
 	"gobot.io/x/gobot/platforms/firmata"
 )
 
 func main() {
 	firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
-	sensor := gpio.NewAnalogSensorDriver(firmataAdaptor, "0")
+	sensor := aio.NewAnalogSensorDriver(firmataAdaptor, "0")
 	led := gpio.NewLedDriver(firmataAdaptor, "3")
 
 	work := func() {
-		sensor.On(gpio.Data, func(data interface{}) {
+		sensor.On(aio.Data, func(data interface{}) {
 			brightness := uint8(
 				gobot.ToScale(gobot.FromScale(float64(data.(int)), 0, 1024), 0, 255),
 			)

@@ -35,5 +35,5 @@ func main() {
 		work,
 	)
 
-	master.Start()
+	robot.Start()
 }

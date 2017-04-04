@@ -47,7 +47,7 @@ func main() {
 
 	robot := gobot.NewRobot("mqttBot",
 		[]gobot.Connection{mqttAdaptor},
-		[]gobot.Devices{helloDriver, holaDriver},
+		[]gobot.Device{helloDriver, holaDriver},
 		work,
 	)
 
