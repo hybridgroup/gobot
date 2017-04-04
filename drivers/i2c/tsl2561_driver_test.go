@@ -134,3 +134,22 @@ func TestTSL2561DriverOptions(t *testing.T) {
 	d := NewTSL2561Driver(newI2cTestAdaptor(), WithBus(2))
 	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
 }
+
+func TestTSL2561DriverGetLuminocity(t *testing.T) {
+	d, adaptor := initTestTSL2561Driver()
+
+	// TODO: obtain real sensor data here for testing
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		buf := new(bytes.Buffer)
+		buf.Write([]byte{77, 48})
+		copy(b, buf.Bytes())
+		return buf.Len(), nil
+	}
+
+	d.Start()
+	bb, ir, err := d.GetLuminocity()
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, bb, uint16(12365))
+	gobottest.Assert(t, ir, uint16(12365))
+	gobottest.Assert(t, d.CalculateLux(bb, ir), uint32(72))
+}
