@@ -39,7 +39,7 @@ func TestGroveTempSensorPublishesTemperatureInCelsius(t *testing.T) {
 
 	select {
 	case <-sem:
-	case <-time.After(time.Second):
+	case <-time.After(10 * time.Second):
 		t.Errorf("Grove Temperature Sensor Event \"Data\" was not published")
 	}
 
