@@ -3,6 +3,7 @@ package i2c
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"strings"
 	"testing"
 
@@ -25,15 +26,27 @@ func idReader(b []byte) (int, error) {
 	return buf.Len(), nil
 }
 
-func TestTSL2561Driver(t *testing.T) {
+func TestTSL2561DriverStart(t *testing.T) {
 	d, adaptor := initTestTSL2561Driver()
-
+	adaptor.i2cReadImpl = idReader
 	gobottest.Assert(t, strings.HasPrefix(d.Name(), "TSL2561"), true)
+	gobottest.Assert(t, d.Start(), nil)
+}
 
+func TestTSL2561DriverStartError(t *testing.T) {
+	d, adaptor := initTestTSL2561Driver()
+	adaptor.i2cWriteImpl = func([]byte) (int, error) {
+		return 0, errors.New("write error")
+	}
+	gobottest.Assert(t, d.Start(), errors.New("write error"))
+}
+
+func TestTSL2561DriverHalt(t *testing.T) {
+	d, adaptor := initTestTSL2561Driver()
 	adaptor.i2cReadImpl = idReader
 
-	gobottest.Assert(t, d.Start(), nil)
-
+	d.Start()
+	gobottest.Assert(t, strings.HasPrefix(d.Name(), "TSL2561"), true)
 	gobottest.Assert(t, d.Halt(), nil)
 }
 
@@ -64,10 +77,51 @@ func TestTSL2561DriverValidOptions(t *testing.T) {
 	device := NewTSL2561Driver(adaptor,
 		WithTSL2561IntegrationTime101MS,
 		WithAddress(TSL2561AddressLow),
-		WithTSL2561Gain16X,
 		WithTSL2561AutoGain)
 
 	gobottest.Refute(t, device, nil)
+	gobottest.Assert(t, device.autoGain, true)
+	gobottest.Assert(t, device.integrationTime, TSL2561IntegrationTime101MS)
+}
+
+func TestTSL2561DriverMoreOptions(t *testing.T) {
+	adaptor := newI2cTestAdaptor()
+
+	device := NewTSL2561Driver(adaptor,
+		WithTSL2561IntegrationTime101MS,
+		WithAddress(TSL2561AddressLow),
+		WithTSL2561Gain16X)
+
+	gobottest.Refute(t, device, nil)
+	gobottest.Assert(t, device.autoGain, false)
+	gobottest.Assert(t, device.gain, TSL2561Gain(TSL2561Gain16X))
+}
+
+func TestTSL2561DriverEvenMoreOptions(t *testing.T) {
+	adaptor := newI2cTestAdaptor()
+
+	device := NewTSL2561Driver(adaptor,
+		WithTSL2561IntegrationTime101MS,
+		WithAddress(TSL2561AddressLow),
+		WithTSL2561Gain1X)
+
+	gobottest.Refute(t, device, nil)
+	gobottest.Assert(t, device.autoGain, false)
+	gobottest.Assert(t, device.gain, TSL2561Gain(TSL2561Gain1X))
+	gobottest.Assert(t, device.integrationTime, TSL2561IntegrationTime101MS)
+}
+
+func TestTSL2561DriverYetEvenMoreOptions(t *testing.T) {
+	adaptor := newI2cTestAdaptor()
+
+	device := NewTSL2561Driver(adaptor,
+		WithTSL2561IntegrationTime402MS,
+		WithAddress(TSL2561AddressLow),
+		WithTSL2561AutoGain)
+
+	gobottest.Refute(t, device, nil)
+	gobottest.Assert(t, device.autoGain, true)
+	gobottest.Assert(t, device.integrationTime, TSL2561IntegrationTime402MS)
 }
 
 func TestTSL2561DriverSetName(t *testing.T) {
