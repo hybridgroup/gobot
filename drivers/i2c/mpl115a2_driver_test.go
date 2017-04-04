@@ -1,6 +1,7 @@
 package i2c
 
 import (
+	"errors"
 	"strings"
 	"testing"
 
@@ -57,6 +58,14 @@ func TestMPL115A2DriverStart(t *testing.T) {
 	gobottest.Assert(t, mpl.Start(), nil)
 }
 
+func TestMPL115A2DriverStartWriteError(t *testing.T) {
+	mpl, adaptor := initTestMPL115A2DriverWithStubbedAdaptor()
+	adaptor.i2cWriteImpl = func([]byte) (int, error) {
+		return 0, errors.New("write error")
+	}
+	gobottest.Assert(t, mpl.Start(), errors.New("write error"))
+}
+
 func TestMPL115A2DriverReadData(t *testing.T) {
 	mpl, adaptor := initTestMPL115A2DriverWithStubbedAdaptor()
 
@@ -65,8 +74,23 @@ func TestMPL115A2DriverReadData(t *testing.T) {
 		return 4, nil
 	}
 	mpl.Start()
-	gobottest.Assert(t, mpl.Pressure(), float32(50.007942))
-	gobottest.Assert(t, mpl.Temperature(), float32(116.58878))
+
+	press, _ := mpl.Pressure()
+	temp, _ := mpl.Temperature()
+	gobottest.Assert(t, press, float32(50.007942))
+	gobottest.Assert(t, temp, float32(116.58878))
+}
+
+func TestMPL115A2DriverReadDataError(t *testing.T) {
+	mpl, adaptor := initTestMPL115A2DriverWithStubbedAdaptor()
+	mpl.Start()
+
+	adaptor.i2cWriteImpl = func([]byte) (int, error) {
+		return 0, errors.New("write error")
+	}
+	_, err := mpl.Pressure()
+
+	gobottest.Assert(t, err, errors.New("write error"))
 }
 
 func TestMPL115A2DriverHalt(t *testing.T) {

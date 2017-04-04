@@ -88,14 +88,14 @@ func (h *MPL115A2Driver) Start() (err error) {
 func (h *MPL115A2Driver) Halt() (err error) { return }
 
 // Pressure fetches the latest data from the MPL115A2, and returns the pressure
-func (h *MPL115A2Driver) Pressure() (p float32) {
-	p, _, _ = h.getData()
+func (h *MPL115A2Driver) Pressure() (p float32, err error) {
+	p, _, err = h.getData()
 	return
 }
 
 // Temperature fetches the latest data from the MPL115A2, and returns the temperature
-func (h *MPL115A2Driver) Temperature() (t float32) {
-	_, t, _ = h.getData()
+func (h *MPL115A2Driver) Temperature() (t float32, err error) {
+	_, t, err = h.getData()
 	return
 }
 

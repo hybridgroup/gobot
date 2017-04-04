@@ -104,3 +104,30 @@ func TestMMA7660DriverXYZ(t *testing.T) {
 	gobottest.Assert(t, y, 18.0)
 	gobottest.Assert(t, z, 19.0)
 }
+
+func TestMMA7660DriverXYZError(t *testing.T) {
+	d, adaptor := initTestMMA7660DriverWithStubbedAdaptor()
+	d.Start()
+
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		return 0, errors.New("read error")
+	}
+
+	_, _, _, err := d.XYZ()
+	gobottest.Assert(t, err, errors.New("read error"))
+}
+
+func TestMMA7660DriverXYZNotReady(t *testing.T) {
+	d, adaptor := initTestMMA7660DriverWithStubbedAdaptor()
+	d.Start()
+
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		buf := new(bytes.Buffer)
+		buf.Write([]byte{0x40, 0x40, 0x40})
+		copy(b, buf.Bytes())
+		return buf.Len(), nil
+	}
+
+	_, _, _, err := d.XYZ()
+	gobottest.Assert(t, err, ErrNotReady)
+}
