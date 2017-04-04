@@ -50,6 +50,7 @@ type calibrationCoefficients struct {
 // Device datasheet: https://cdn-shop.adafruit.com/datasheets/BST-BMP180-DS000-09.pdf
 type BMP180Driver struct {
 	name       string
+	Mode       BMP180OversamplingMode
 	connector  Connector
 	connection Connection
 	Config
@@ -68,6 +69,7 @@ func NewBMP180Driver(c Connector, options ...func(Config)) *BMP180Driver {
 	b := &BMP180Driver{
 		name:                    gobot.DefaultName("BMP180"),
 		connector:               c,
+		Mode:                    BMP180UltraLowPower,
 		Config:                  NewConfig(),
 		calibrationCoefficients: &calibrationCoefficients{},
 	}
@@ -146,16 +148,16 @@ func (d *BMP180Driver) Temperature() (temp float32, err error) {
 }
 
 // Pressure returns the current pressure, in pascals.
-func (d *BMP180Driver) Pressure(mode BMP180OversamplingMode) (pressure float32, err error) {
+func (d *BMP180Driver) Pressure() (pressure float32, err error) {
 	var rawTemp int16
 	var rawPressure int32
 	if rawTemp, err = d.rawTemp(); err != nil {
 		return 0, err
 	}
-	if rawPressure, err = d.rawPressure(mode); err != nil {
+	if rawPressure, err = d.rawPressure(d.Mode); err != nil {
 		return 0, err
 	}
-	return d.calculatePressure(rawTemp, rawPressure, mode), nil
+	return d.calculatePressure(rawTemp, rawPressure, d.Mode), nil
 }
 
 func (d *BMP180Driver) rawTemp() (int16, error) {

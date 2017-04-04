@@ -133,6 +133,13 @@ func TestJHD1313MDriverSetSecondLinePosition(t *testing.T) {
 	gobottest.Assert(t, d.SetPosition(18), nil)
 }
 
+func TestJHD1313MDriverSetPositionInvalid(t *testing.T) {
+	d, _ := initTestJHD1313M1DriverWithStubbedAdaptor()
+	d.Start()
+	gobottest.Assert(t, d.SetPosition(-1), ErrInvalidPosition)
+	gobottest.Assert(t, d.SetPosition(32), ErrInvalidPosition)
+}
+
 func TestJHD1313MDriverScroll(t *testing.T) {
 	d, _ := initTestJHD1313M1DriverWithStubbedAdaptor()
 	d.Start()
