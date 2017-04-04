@@ -102,6 +102,17 @@ func TestL3GD20HDriverMeasurementError(t *testing.T) {
 	gobottest.Assert(t, err, errors.New("read error"))
 }
 
+func TestL3GD20HDriverMeasurementWriteError(t *testing.T) {
+	d, adaptor := initTestL3GD20HDriverWithStubbedAdaptor()
+	d.Start()
+	adaptor.i2cWriteImpl = func(b []byte) (int, error) {
+		return 0, errors.New("write error")
+	}
+
+	_, _, _, err := d.XYZ()
+	gobottest.Assert(t, err, errors.New("write error"))
+}
+
 func TestL3GD20HDriverSetName(t *testing.T) {
 	d := initTestL3GD20HDriver()
 	d.SetName("TESTME")

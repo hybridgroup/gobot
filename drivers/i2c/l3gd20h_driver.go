@@ -133,7 +133,7 @@ func (d *L3GD20HDriver) Halt() (err error) {
 // XYZ returns the current change in degrees per second, for the 3 axis.
 func (d *L3GD20HDriver) XYZ() (x float32, y float32, z float32, err error) {
 	if _, err = d.connection.Write([]byte{l3gd20hRegisterOutXLSB}); err != nil {
-		return 0, 0, 0, nil
+		return 0, 0, 0, err
 	}
 	measurements := make([]byte, 6)
 	if _, err = d.connection.Read(measurements); err != nil {
