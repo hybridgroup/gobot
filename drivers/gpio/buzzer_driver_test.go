@@ -1,6 +1,7 @@
 package gpio
 
 import (
+	"errors"
 	"strings"
 	"testing"
 
@@ -47,4 +48,34 @@ func TestBuzzerDriverToggle(t *testing.T) {
 func TestBuzzerDriverTone(t *testing.T) {
 	d := initTestBuzzerDriver(newGpioTestAdaptor())
 	gobottest.Assert(t, d.Tone(100, 0.01), nil)
+}
+
+func TestBuzzerDriverOnError(t *testing.T) {
+	a := newGpioTestAdaptor()
+	d := initTestBuzzerDriver(a)
+	a.TestAdaptorDigitalWrite(func() (err error) {
+		return errors.New("write error")
+	})
+
+	gobottest.Assert(t, d.On(), errors.New("write error"))
+}
+
+func TestBuzzerDriverOffError(t *testing.T) {
+	a := newGpioTestAdaptor()
+	d := initTestBuzzerDriver(a)
+	a.TestAdaptorDigitalWrite(func() (err error) {
+		return errors.New("write error")
+	})
+
+	gobottest.Assert(t, d.Off(), errors.New("write error"))
+}
+
+func TestBuzzerDriverToneError(t *testing.T) {
+	a := newGpioTestAdaptor()
+	d := initTestBuzzerDriver(a)
+	a.TestAdaptorDigitalWrite(func() (err error) {
+		return errors.New("write error")
+	})
+
+	gobottest.Assert(t, d.Tone(100, 0.01), errors.New("write error"))
 }
