@@ -1,6 +1,7 @@
 package i2c
 
 import (
+	"bytes"
 	"errors"
 	"testing"
 
@@ -95,17 +96,55 @@ func TestLIDARLiteDriverDistance(t *testing.T) {
 	distance, err = hmc.Distance()
 	gobottest.Assert(t, distance, int(0))
 	gobottest.Assert(t, err, errors.New("read error"))
+}
 
-	// when write error
-	hmc, adaptor = initTestLIDARLiteDriverWithStubbedAdaptor()
-
+func TestLIDARLiteDriverDistanceError1(t *testing.T) {
+	hmc, adaptor := initTestLIDARLiteDriverWithStubbedAdaptor()
 	gobottest.Assert(t, hmc.Start(), nil)
 
 	adaptor.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
 	}
 
-	distance, err = hmc.Distance()
+	distance, err := hmc.Distance()
+	gobottest.Assert(t, distance, int(0))
+	gobottest.Assert(t, err, errors.New("write error"))
+}
+
+func TestLIDARLiteDriverDistanceError2(t *testing.T) {
+	hmc, adaptor := initTestLIDARLiteDriverWithStubbedAdaptor()
+	gobottest.Assert(t, hmc.Start(), nil)
+
+	adaptor.i2cWriteImpl = func(b []byte) (int, error) {
+		if b[0] == 0x0f {
+			return 0, errors.New("write error")
+		}
+		return len(b), nil
+	}
+
+	distance, err := hmc.Distance()
+	gobottest.Assert(t, distance, int(0))
+	gobottest.Assert(t, err, errors.New("write error"))
+}
+
+func TestLIDARLiteDriverDistanceError3(t *testing.T) {
+	hmc, adaptor := initTestLIDARLiteDriverWithStubbedAdaptor()
+	gobottest.Assert(t, hmc.Start(), nil)
+
+	adaptor.i2cWriteImpl = func(b []byte) (int, error) {
+		if b[0] == 0x10 {
+			return 0, errors.New("write error")
+		}
+		return len(b), nil
+	}
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		buf := new(bytes.Buffer)
+		buf.Write([]byte{0x03})
+		copy(b, buf.Bytes())
+		return buf.Len(), nil
+	}
+
+	distance, err := hmc.Distance()
 	gobottest.Assert(t, distance, int(0))
 	gobottest.Assert(t, err, errors.New("write error"))
 }
