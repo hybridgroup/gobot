@@ -1,6 +1,8 @@
 package i2c
 
 import (
+	"bytes"
+	"errors"
 	"strings"
 	"testing"
 
@@ -56,6 +58,14 @@ func TestMMA7660DriverStart(t *testing.T) {
 	gobottest.Assert(t, d.Start(), nil)
 }
 
+func TestMMA7660DriverStartWriteError(t *testing.T) {
+	mma, adaptor := initTestMMA7660DriverWithStubbedAdaptor()
+	adaptor.i2cWriteImpl = func([]byte) (int, error) {
+		return 0, errors.New("write error")
+	}
+	gobottest.Assert(t, mma.Start(), errors.New("write error"))
+}
+
 func TestMMA7660DriverHalt(t *testing.T) {
 	d := initTestMMA7660Driver()
 	gobottest.Assert(t, d.Halt(), nil)
@@ -69,11 +79,28 @@ func TestMMA7660DriverAcceleration(t *testing.T) {
 	gobottest.Assert(t, z, 1.0)
 }
 
-func TestMMA7660DriverXYZ(t *testing.T) {
+func TestMMA7660DriverNullXYZ(t *testing.T) {
 	d, _ := initTestMMA7660DriverWithStubbedAdaptor()
 	d.Start()
 	x, y, z, _ := d.XYZ()
 	gobottest.Assert(t, x, 0.0)
 	gobottest.Assert(t, y, 0.0)
 	gobottest.Assert(t, z, 0.0)
+}
+
+func TestMMA7660DriverXYZ(t *testing.T) {
+	d, adaptor := initTestMMA7660DriverWithStubbedAdaptor()
+	d.Start()
+
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		buf := new(bytes.Buffer)
+		buf.Write([]byte{0x11, 0x12, 0x13})
+		copy(b, buf.Bytes())
+		return buf.Len(), nil
+	}
+
+	x, y, z, _ := d.XYZ()
+	gobottest.Assert(t, x, 17.0)
+	gobottest.Assert(t, y, 18.0)
+	gobottest.Assert(t, z, 19.0)
 }
