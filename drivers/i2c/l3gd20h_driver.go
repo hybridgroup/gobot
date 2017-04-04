@@ -137,7 +137,7 @@ func (d *L3GD20HDriver) XYZ() (x float32, y float32, z float32, err error) {
 	}
 	measurements := make([]byte, 6)
 	if _, err = d.connection.Read(measurements); err != nil {
-		return 0, 0, 0, nil
+		return 0, 0, 0, err
 	}
 
 	var rawX int16

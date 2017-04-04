@@ -3,6 +3,7 @@ package i2c
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"testing"
 
 	"gobot.io/x/gobot"
@@ -45,6 +46,14 @@ func TestL3GD20HDriverStart(t *testing.T) {
 	gobottest.Assert(t, d.Start(), nil)
 }
 
+func TestL3GD20HDriverStartWriteError(t *testing.T) {
+	d, adaptor := initTestL3GD20HDriverWithStubbedAdaptor()
+	adaptor.i2cWriteImpl = func([]byte) (int, error) {
+		return 0, errors.New("write error")
+	}
+	gobottest.Assert(t, d.Start(), errors.New("write error"))
+}
+
 func TestL3GD20HDriverHalt(t *testing.T) {
 	d := initTestL3GD20HDriver()
 
@@ -80,6 +89,17 @@ func TestL3GD20HDriverMeasurement(t *testing.T) {
 	gobottest.Assert(t, x, float32(rawX)*sensitivity)
 	gobottest.Assert(t, y, float32(rawY)*sensitivity)
 	gobottest.Assert(t, z, float32(rawZ)*sensitivity)
+}
+
+func TestL3GD20HDriverMeasurementError(t *testing.T) {
+	d, adaptor := initTestL3GD20HDriverWithStubbedAdaptor()
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		return 0, errors.New("read error")
+	}
+
+	d.Start()
+	_, _, _, err := d.XYZ()
+	gobottest.Assert(t, err, errors.New("read error"))
 }
 
 func TestL3GD20HDriverSetName(t *testing.T) {
