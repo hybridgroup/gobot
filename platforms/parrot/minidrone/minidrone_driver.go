@@ -90,7 +90,7 @@ type Pcmd struct {
 }
 
 // NewDriver creates a Parrot Minidrone Driver
-func NewDriver(a *ble.ClientAdaptor) *Driver {
+func NewDriver(a ble.BLEConnector) *Driver {
 	n := &Driver{
 		name:       gobot.DefaultName("Minidrone"),
 		connection: a,
@@ -129,8 +129,8 @@ func (b *Driver) Name() string { return b.name }
 func (b *Driver) SetName(n string) { b.name = n }
 
 // adaptor returns BLE adaptor
-func (b *Driver) adaptor() *ble.ClientAdaptor {
-	return b.Connection().(*ble.ClientAdaptor)
+func (b *Driver) adaptor() ble.BLEConnector {
+	return b.Connection().(ble.BLEConnector)
 }
 
 // Start tells driver to get ready to do work
