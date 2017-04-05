@@ -12,7 +12,7 @@ type BB8Driver struct {
 }
 
 // NewDriver creates a Driver for a Sphero BB-8
-func NewDriver(a *ble.ClientAdaptor) *BB8Driver {
+func NewDriver(a ble.BLEConnector) *BB8Driver {
 	d := ollie.NewDriver(a)
 	d.SetName(gobot.DefaultName("BB8"))
 
