@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
+	"sync"
 	"time"
 
 	"gobot.io/x/gobot"
@@ -16,6 +17,7 @@ type Driver struct {
 	name              string
 	connection        gobot.Connection
 	seq               uint8
+	mtx               sync.Mutex
 	collisionResponse []uint8
 	packetChannel     chan *packet
 	gobot.Eventer
@@ -222,11 +224,16 @@ func (b *Driver) write(packet *packet) (err error) {
 		return err
 	}
 
+	b.mtx.Lock()
+	defer b.mtx.Unlock()
 	b.seq++
 	return
 }
 
 func (b *Driver) craftPacket(body []uint8, did byte, cid byte) *packet {
+	b.mtx.Lock()
+	defer b.mtx.Unlock()
+
 	packet := new(packet)
 	packet.body = body
 	dlen := len(packet.body) + 1
