@@ -13,6 +13,7 @@ type bleTestClientAdaptor struct {
 	address string
 	mtx     sync.Mutex
 
+	testSubscribe           func([]byte, error)
 	testReadCharacteristic  func(string) ([]byte, error)
 	testWriteCharacteristic func(string, []byte) error
 }
@@ -38,7 +39,7 @@ func (t *bleTestClientAdaptor) WriteCharacteristic(cUUID string, data []byte) (e
 }
 
 func (t *bleTestClientAdaptor) Subscribe(cUUID string, f func([]byte, error)) (err error) {
-	// TODO: implement this...
+	t.testSubscribe = f
 	return
 }
 
@@ -54,6 +55,12 @@ func (t *bleTestClientAdaptor) TestWriteCharacteristic(f func(cUUID string, data
 	t.testWriteCharacteristic = f
 }
 
+func (t *bleTestClientAdaptor) TestReceiveNotification(data []byte, err error) {
+	t.mtx.Lock()
+	defer t.mtx.Unlock()
+	t.testSubscribe(data, err)
+}
+
 func NewBleTestAdaptor() *bleTestClientAdaptor {
 	return &bleTestClientAdaptor{
 		address: "01:02:03:04:05:06",
@@ -61,6 +68,9 @@ func NewBleTestAdaptor() *bleTestClientAdaptor {
 			return
 		},
 		testWriteCharacteristic: func(cUUID string, data []byte) (e error) {
+			return
+		},
+		testSubscribe: func([]byte, error) {
 			return
 		},
 	}
