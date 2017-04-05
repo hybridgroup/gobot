@@ -16,21 +16,17 @@ var currentDevice *blelib.Device
 var bleMutex sync.Mutex
 var bleCtx context.Context
 
-// getBLEDevice is singleton for blelib HCI device connection
-func getBLEDevice(impl string) (d *blelib.Device, err error) {
-	if currentDevice != nil {
-		return currentDevice, nil
-	}
-
-	dev, e := defaultDevice(impl)
-	if e != nil {
-		return nil, errors.Wrap(e, "can't get device")
-	}
-	blelib.SetDefaultDevice(dev)
-
-	currentDevice = &dev
-	d = &dev
-	return
+type BLEConnector interface {
+	Connect() error
+	Reconnect() error
+	Disconnect() error
+	Finalize() error
+	Name() string
+	SetName(string)
+	Address() string
+	ReadCharacteristic(string) ([]byte, error)
+	WriteCharacteristic(string, []byte) error
+	Subscribe(string, func([]byte, error)) error
 }
 
 // ClientAdaptor represents a Client Connection to a BLE Peripheral
@@ -180,6 +176,23 @@ func (b *ClientAdaptor) Subscribe(cUUID string, f func([]byte, error)) (err erro
 		return nil
 	}
 
+	return
+}
+
+// getBLEDevice is singleton for blelib HCI device connection
+func getBLEDevice(impl string) (d *blelib.Device, err error) {
+	if currentDevice != nil {
+		return currentDevice, nil
+	}
+
+	dev, e := defaultDevice(impl)
+	if e != nil {
+		return nil, errors.Wrap(e, "can't get device")
+	}
+	blelib.SetDefaultDevice(dev)
+
+	currentDevice = &dev
+	d = &dev
 	return
 }
 

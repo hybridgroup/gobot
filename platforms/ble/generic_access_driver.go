@@ -15,7 +15,7 @@ type GenericAccessDriver struct {
 }
 
 // NewGenericAccessDriver creates a GenericAccessDriver
-func NewGenericAccessDriver(a *ClientAdaptor) *GenericAccessDriver {
+func NewGenericAccessDriver(a BLEConnector) *GenericAccessDriver {
 	n := &GenericAccessDriver{
 		name:       gobot.DefaultName("GenericAccess"),
 		connection: a,
@@ -35,8 +35,8 @@ func (b *GenericAccessDriver) Name() string { return b.name }
 func (b *GenericAccessDriver) SetName(n string) { b.name = n }
 
 // adaptor returns BLE adaptor for this device
-func (b *GenericAccessDriver) adaptor() *ClientAdaptor {
-	return b.Connection().(*ClientAdaptor)
+func (b *GenericAccessDriver) adaptor() BLEConnector {
+	return b.Connection().(BLEConnector)
 }
 
 // Start tells driver to get ready to do work
