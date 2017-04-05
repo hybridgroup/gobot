@@ -11,7 +11,7 @@ import (
 var _ gobot.Driver = (*GenericAccessDriver)(nil)
 
 func initTestGenericAccessDriver() *GenericAccessDriver {
-	d := NewGenericAccessDriver(newBleTestAdaptor())
+	d := NewGenericAccessDriver(NewBleTestAdaptor())
 	return d
 }
 
@@ -29,7 +29,7 @@ func TestGenericAccessDriverStartAndHalt(t *testing.T) {
 }
 
 func TestGenericAccessDriverGetDeviceName(t *testing.T) {
-	a := newBleTestAdaptor()
+	a := NewBleTestAdaptor()
 	d := NewGenericAccessDriver(a)
 	a.TestReadCharacteristic(func(cUUID string) ([]byte, error) {
 		return []byte("TestDevice"), nil
@@ -39,7 +39,7 @@ func TestGenericAccessDriverGetDeviceName(t *testing.T) {
 }
 
 func TestGenericAccessDriverGetAppearance(t *testing.T) {
-	a := newBleTestAdaptor()
+	a := NewBleTestAdaptor()
 	d := NewGenericAccessDriver(a)
 	a.TestReadCharacteristic(func(cUUID string) ([]byte, error) {
 		return []byte{128, 0}, nil

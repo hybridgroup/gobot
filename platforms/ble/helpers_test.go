@@ -50,7 +50,7 @@ func (t *bleTestClientAdaptor) TestWriteCharacteristic(f func(cUUID string, data
 	t.testWriteCharacteristic = f
 }
 
-func newBleTestAdaptor() *bleTestClientAdaptor {
+func NewBleTestAdaptor() *bleTestClientAdaptor {
 	return &bleTestClientAdaptor{
 		address: "01:02:03:04:05:06",
 		testReadCharacteristic: func(cUUID string) (data []byte, e error) {

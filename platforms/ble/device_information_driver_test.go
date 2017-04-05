@@ -11,7 +11,7 @@ import (
 var _ gobot.Driver = (*DeviceInformationDriver)(nil)
 
 func initTestDeviceInformationDriver() *DeviceInformationDriver {
-	d := NewDeviceInformationDriver(newBleTestAdaptor())
+	d := NewDeviceInformationDriver(NewBleTestAdaptor())
 	return d
 }
 
@@ -29,7 +29,7 @@ func TestDeviceInformationDriverStartAndHalt(t *testing.T) {
 }
 
 func TestDeviceInformationDriverGetModelNumber(t *testing.T) {
-	a := newBleTestAdaptor()
+	a := NewBleTestAdaptor()
 	d := NewDeviceInformationDriver(a)
 	a.TestReadCharacteristic(func(cUUID string) ([]byte, error) {
 		return []byte("TestDevice"), nil
@@ -39,7 +39,7 @@ func TestDeviceInformationDriverGetModelNumber(t *testing.T) {
 }
 
 func TestDeviceInformationDriverGetFirmwareRevision(t *testing.T) {
-	a := newBleTestAdaptor()
+	a := NewBleTestAdaptor()
 	d := NewDeviceInformationDriver(a)
 	a.TestReadCharacteristic(func(cUUID string) ([]byte, error) {
 		return []byte("TestDevice"), nil
@@ -49,7 +49,7 @@ func TestDeviceInformationDriverGetFirmwareRevision(t *testing.T) {
 }
 
 func TestDeviceInformationDriverGetHardwareRevision(t *testing.T) {
-	a := newBleTestAdaptor()
+	a := NewBleTestAdaptor()
 	d := NewDeviceInformationDriver(a)
 	a.TestReadCharacteristic(func(cUUID string) ([]byte, error) {
 		return []byte("TestDevice"), nil
@@ -59,7 +59,7 @@ func TestDeviceInformationDriverGetHardwareRevision(t *testing.T) {
 }
 
 func TestDeviceInformationDriverGetManufacturerName(t *testing.T) {
-	a := newBleTestAdaptor()
+	a := NewBleTestAdaptor()
 	d := NewDeviceInformationDriver(a)
 	a.TestReadCharacteristic(func(cUUID string) ([]byte, error) {
 		return []byte("TestDevice"), nil
@@ -69,7 +69,7 @@ func TestDeviceInformationDriverGetManufacturerName(t *testing.T) {
 }
 
 func TestDeviceInformationDriverGetPnPId(t *testing.T) {
-	a := newBleTestAdaptor()
+	a := NewBleTestAdaptor()
 	d := NewDeviceInformationDriver(a)
 	a.TestReadCharacteristic(func(cUUID string) ([]byte, error) {
 		return []byte("TestDevice"), nil

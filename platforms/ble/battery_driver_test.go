@@ -11,7 +11,7 @@ import (
 var _ gobot.Driver = (*BatteryDriver)(nil)
 
 func initTestBatteryDriver() *BatteryDriver {
-	d := NewBatteryDriver(newBleTestAdaptor())
+	d := NewBatteryDriver(NewBleTestAdaptor())
 	return d
 }
 
@@ -29,7 +29,7 @@ func TestBatteryDriverStartAndHalt(t *testing.T) {
 }
 
 func TestBatteryDriverRead(t *testing.T) {
-	a := newBleTestAdaptor()
+	a := NewBleTestAdaptor()
 	d := NewBatteryDriver(a)
 	a.TestReadCharacteristic(func(cUUID string) ([]byte, error) {
 		return []byte{20}, nil
