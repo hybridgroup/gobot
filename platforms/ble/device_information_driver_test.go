@@ -18,6 +18,14 @@ func initTestDeviceInformationDriver() *DeviceInformationDriver {
 func TestDeviceInformationDriver(t *testing.T) {
 	d := initTestDeviceInformationDriver()
 	gobottest.Assert(t, strings.HasPrefix(d.Name(), "DeviceInformation"), true)
+	d.SetName("NewName")
+	gobottest.Assert(t, d.Name(), "NewName")
+}
+
+func TestDeviceInformationDriverStartAndHalt(t *testing.T) {
+	d := initTestDeviceInformationDriver()
+	gobottest.Assert(t, d.Start(), nil)
+	gobottest.Assert(t, d.Halt(), nil)
 }
 
 func TestDeviceInformationDriverGetModelNumber(t *testing.T) {

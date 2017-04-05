@@ -18,6 +18,14 @@ func initTestGenericAccessDriver() *GenericAccessDriver {
 func TestGenericAccessDriver(t *testing.T) {
 	d := initTestGenericAccessDriver()
 	gobottest.Assert(t, strings.HasPrefix(d.Name(), "GenericAccess"), true)
+	d.SetName("NewName")
+	gobottest.Assert(t, d.Name(), "NewName")
+}
+
+func TestGenericAccessDriverStartAndHalt(t *testing.T) {
+	d := initTestGenericAccessDriver()
+	gobottest.Assert(t, d.Start(), nil)
+	gobottest.Assert(t, d.Halt(), nil)
 }
 
 func TestGenericAccessDriverGetDeviceName(t *testing.T) {

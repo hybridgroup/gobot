@@ -18,6 +18,14 @@ func initTestBatteryDriver() *BatteryDriver {
 func TestBatteryDriver(t *testing.T) {
 	d := initTestBatteryDriver()
 	gobottest.Assert(t, strings.HasPrefix(d.Name(), "Battery"), true)
+	d.SetName("NewName")
+	gobottest.Assert(t, d.Name(), "NewName")
+}
+
+func TestBatteryDriverStartAndHalt(t *testing.T) {
+	d := initTestBatteryDriver()
+	gobottest.Assert(t, d.Start(), nil)
+	gobottest.Assert(t, d.Halt(), nil)
 }
 
 func TestBatteryDriverRead(t *testing.T) {
