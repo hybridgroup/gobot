@@ -26,7 +26,7 @@ const (
 )
 
 // NewTemperatureDriver creates a Microbit TemperatureDriver
-func NewTemperatureDriver(a *ble.ClientAdaptor) *TemperatureDriver {
+func NewTemperatureDriver(a ble.BLEConnector) *TemperatureDriver {
 	n := &TemperatureDriver{
 		name:       gobot.DefaultName("Microbit Temperature"),
 		connection: a,
@@ -48,8 +48,8 @@ func (b *TemperatureDriver) Name() string { return b.name }
 func (b *TemperatureDriver) SetName(n string) { b.name = n }
 
 // adaptor returns BLE adaptor
-func (b *TemperatureDriver) adaptor() *ble.ClientAdaptor {
-	return b.Connection().(*ble.ClientAdaptor)
+func (b *TemperatureDriver) adaptor() ble.BLEConnector {
+	return b.Connection().(ble.BLEConnector)
 }
 
 // Start tells driver to get ready to do work

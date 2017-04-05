@@ -6,18 +6,24 @@ import (
 
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/gobottest"
-
-	"gobot.io/x/gobot/platforms/ble"
 )
 
 var _ gobot.Driver = (*LEDDriver)(nil)
 
 func initTestLEDDriver() *LEDDriver {
-	d := NewLEDDriver(ble.NewClientAdaptor("D7:99:5A:26:EC:38"))
+	d := NewLEDDriver(NewBleTestAdaptor())
 	return d
 }
 
 func TestLEDDriver(t *testing.T) {
 	d := initTestLEDDriver()
 	gobottest.Assert(t, strings.HasPrefix(d.Name(), "Microbit LED"), true)
+	d.SetName("NewName")
+	gobottest.Assert(t, d.Name(), "NewName")
+}
+
+func TestLEDDriverStartAndHalt(t *testing.T) {
+	d := initTestLEDDriver()
+	gobottest.Assert(t, d.Start(), nil)
+	gobottest.Assert(t, d.Halt(), nil)
 }

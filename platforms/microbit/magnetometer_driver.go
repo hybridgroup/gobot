@@ -39,7 +39,7 @@ const (
 )
 
 // NewMagnetometerDriver creates a Microbit MagnetometerDriver
-func NewMagnetometerDriver(a *ble.ClientAdaptor) *MagnetometerDriver {
+func NewMagnetometerDriver(a ble.BLEConnector) *MagnetometerDriver {
 	n := &MagnetometerDriver{
 		name:       gobot.DefaultName("Microbit Magnetometer"),
 		connection: a,
@@ -61,8 +61,8 @@ func (b *MagnetometerDriver) Name() string { return b.name }
 func (b *MagnetometerDriver) SetName(n string) { b.name = n }
 
 // adaptor returns BLE adaptor
-func (b *MagnetometerDriver) adaptor() *ble.ClientAdaptor {
-	return b.Connection().(*ble.ClientAdaptor)
+func (b *MagnetometerDriver) adaptor() ble.BLEConnector {
+	return b.Connection().(ble.BLEConnector)
 }
 
 // Start tells driver to get ready to do work

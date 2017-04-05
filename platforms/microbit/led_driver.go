@@ -23,7 +23,7 @@ const (
 )
 
 // NewLEDDriver creates a Microbit LEDDriver
-func NewLEDDriver(a *ble.ClientAdaptor) *LEDDriver {
+func NewLEDDriver(a ble.BLEConnector) *LEDDriver {
 	n := &LEDDriver{
 		name:       gobot.DefaultName("Microbit LED"),
 		connection: a,
@@ -43,8 +43,8 @@ func (b *LEDDriver) Name() string { return b.name }
 func (b *LEDDriver) SetName(n string) { b.name = n }
 
 // adaptor returns BLE adaptor
-func (b *LEDDriver) adaptor() *ble.ClientAdaptor {
-	return b.Connection().(*ble.ClientAdaptor)
+func (b *LEDDriver) adaptor() ble.BLEConnector {
+	return b.Connection().(ble.BLEConnector)
 }
 
 // Start tells driver to get ready to do work

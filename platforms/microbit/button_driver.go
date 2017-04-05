@@ -28,7 +28,7 @@ const (
 )
 
 // NewButtonDriver creates a Microbit ButtonDriver
-func NewButtonDriver(a *ble.ClientAdaptor) *ButtonDriver {
+func NewButtonDriver(a ble.BLEConnector) *ButtonDriver {
 	n := &ButtonDriver{
 		name:       gobot.DefaultName("Microbit Button"),
 		connection: a,
@@ -51,8 +51,8 @@ func (b *ButtonDriver) Name() string { return b.name }
 func (b *ButtonDriver) SetName(n string) { b.name = n }
 
 // adaptor returns BLE adaptor
-func (b *ButtonDriver) adaptor() *ble.ClientAdaptor {
-	return b.Connection().(*ble.ClientAdaptor)
+func (b *ButtonDriver) adaptor() ble.BLEConnector {
+	return b.Connection().(ble.BLEConnector)
 }
 
 // Start tells driver to get ready to do work

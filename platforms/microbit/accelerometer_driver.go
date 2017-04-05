@@ -39,7 +39,7 @@ const (
 )
 
 // NewAccelerometerDriver creates a Microbit AccelerometerDriver
-func NewAccelerometerDriver(a *ble.ClientAdaptor) *AccelerometerDriver {
+func NewAccelerometerDriver(a ble.BLEConnector) *AccelerometerDriver {
 	n := &AccelerometerDriver{
 		name:       gobot.DefaultName("Microbit Accelerometer"),
 		connection: a,
@@ -61,8 +61,8 @@ func (b *AccelerometerDriver) Name() string { return b.name }
 func (b *AccelerometerDriver) SetName(n string) { b.name = n }
 
 // adaptor returns BLE adaptor
-func (b *AccelerometerDriver) adaptor() *ble.ClientAdaptor {
-	return b.Connection().(*ble.ClientAdaptor)
+func (b *AccelerometerDriver) adaptor() ble.BLEConnector {
+	return b.Connection().(ble.BLEConnector)
 }
 
 // Start tells driver to get ready to do work

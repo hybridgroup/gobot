@@ -6,18 +6,24 @@ import (
 
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/gobottest"
-
-	"gobot.io/x/gobot/platforms/ble"
 )
 
 var _ gobot.Driver = (*ButtonDriver)(nil)
 
 func initTestButtonDriver() *ButtonDriver {
-	d := NewButtonDriver(ble.NewClientAdaptor("D7:99:5A:26:EC:38"))
+	d := NewButtonDriver(NewBleTestAdaptor())
 	return d
 }
 
 func TestButtonDriver(t *testing.T) {
 	d := initTestButtonDriver()
 	gobottest.Assert(t, strings.HasPrefix(d.Name(), "Microbit Button"), true)
+	d.SetName("NewName")
+	gobottest.Assert(t, d.Name(), "NewName")
+}
+
+func TestButtonDriverStartAndHalt(t *testing.T) {
+	d := initTestButtonDriver()
+	gobottest.Assert(t, d.Start(), nil)
+	gobottest.Assert(t, d.Halt(), nil)
 }
