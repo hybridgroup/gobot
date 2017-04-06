@@ -1,6 +1,7 @@
 package opencv
 
 import (
+	"strings"
 	"testing"
 	"time"
 
@@ -23,6 +24,13 @@ func TestCameraDriver(t *testing.T) {
 	d := initTestCameraDriver()
 	gobottest.Assert(t, d.Name(), "Camera")
 	gobottest.Assert(t, d.Connection(), (gobot.Connection)(nil))
+}
+
+func TestCameraDriverName(t *testing.T) {
+	d := initTestCameraDriver()
+	gobottest.Assert(t, strings.HasPrefix(d.Name(), "Camera"), true)
+	d.SetName("NewName")
+	gobottest.Assert(t, d.Name(), "NewName")
 }
 
 func TestCameraDriverStart(t *testing.T) {
