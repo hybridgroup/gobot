@@ -2,6 +2,7 @@ package mavlink
 
 import (
 	"io"
+	"strings"
 	"testing"
 	"time"
 
@@ -30,6 +31,13 @@ func TestMavlinkDriver(t *testing.T) {
 
 	d = NewDriver(m, 100*time.Millisecond)
 	gobottest.Assert(t, d.interval, 100*time.Millisecond)
+}
+
+func TestMavlinkDriverName(t *testing.T) {
+	d := initTestMavlinkDriver()
+	gobottest.Assert(t, strings.HasPrefix(d.Name(), "Mavlink"), true)
+	d.SetName("NewName")
+	gobottest.Assert(t, d.Name(), "NewName")
 }
 
 func TestMavlinkDriverStart(t *testing.T) {

@@ -3,6 +3,7 @@ package mavlink
 import (
 	"errors"
 	"io"
+	"strings"
 	"testing"
 
 	"gobot.io/x/gobot"
@@ -55,6 +56,14 @@ func TestMavlinkAdaptor(t *testing.T) {
 	a := initTestMavlinkAdaptor()
 	gobottest.Assert(t, a.Port(), "/dev/null")
 }
+
+func TestMavlinkAdaptorName(t *testing.T) {
+	a := initTestMavlinkAdaptor()
+	gobottest.Assert(t, strings.HasPrefix(a.Name(), "Mavlink"), true)
+	a.SetName("NewName")
+	gobottest.Assert(t, a.Name(), "NewName")
+}
+
 func TestMavlinkAdaptorConnect(t *testing.T) {
 	a := initTestMavlinkAdaptor()
 	gobottest.Assert(t, a.Connect(), nil)
