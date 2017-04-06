@@ -2,6 +2,7 @@ package ardrone
 
 import (
 	"errors"
+	"strings"
 	"testing"
 
 	"gobot.io/x/gobot"
@@ -34,6 +35,13 @@ func TestArdroneAdaptorConnect(t *testing.T) {
 		return nil, errors.New("connection error")
 	}
 	gobottest.Assert(t, a.Connect(), errors.New("connection error"))
+}
+
+func TestArdroneAdaptorName(t *testing.T) {
+	a := initTestArdroneAdaptor()
+	gobottest.Assert(t, strings.HasPrefix(a.Name(), "ARDrone"), true)
+	a.SetName("NewName")
+	gobottest.Assert(t, a.Name(), "NewName")
 }
 
 func TestArdroneAdaptorFinalize(t *testing.T) {
