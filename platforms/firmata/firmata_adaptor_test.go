@@ -189,7 +189,44 @@ func TestAdaptorI2cWrite(t *testing.T) {
 	a := initTestAdaptor()
 	con, err := a.GetConnection(0, 0)
 	gobottest.Assert(t, err, nil)
-	con.Write([]byte{0x00, 0x01})
+	written, _ := con.Write([]byte{0x00, 0x01})
+	gobottest.Assert(t, written, 2)
+}
+
+func TestAdaptorI2cWrite20bytes(t *testing.T) {
+	a := initTestAdaptor()
+	con, err := a.GetConnection(0, 0)
+	gobottest.Assert(t, err, nil)
+	written, _ := con.Write([]byte{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19})
+	gobottest.Assert(t, written, 20)
+}
+
+func TestAdaptorI2cWriteByte(t *testing.T) {
+	a := initTestAdaptor()
+	con, err := a.GetConnection(0, 0)
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, con.WriteByte(0x00), nil)
+}
+
+func TestAdaptorI2cWriteByteData(t *testing.T) {
+	a := initTestAdaptor()
+	con, err := a.GetConnection(0, 0)
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, con.WriteByteData(0x00, 0x02), nil)
+}
+
+func TestAdaptorI2cWriteWordData(t *testing.T) {
+	a := initTestAdaptor()
+	con, err := a.GetConnection(0, 0)
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, con.WriteWordData(0x00, 0x02), nil)
+}
+
+func TestAdaptorI2cWriteBlockData(t *testing.T) {
+	a := initTestAdaptor()
+	con, err := a.GetConnection(0, 0)
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, con.WriteBlockData(0x00, []byte{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19}), nil)
 }
 
 func TestServoConfig(t *testing.T) {
