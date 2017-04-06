@@ -38,9 +38,19 @@ func (c *firmataI2cConnection) Read(b []byte) (read int, err error) {
 }
 
 func (c *firmataI2cConnection) Write(data []byte) (written int, err error) {
-	err = c.adaptor.board.I2cWrite(c.address, data)
-	// Assume successful write of whole buffer
-	written = len(data)
+	var chunk []byte
+	for len(data) >= 16 {
+		chunk, data = data[:16], data[16:]
+		err = c.adaptor.board.I2cWrite(c.address, chunk)
+		written += len(chunk)
+		if err != nil {
+			return
+		}
+	}
+	if len(data) > 0 {
+		err = c.adaptor.board.I2cWrite(c.address, data[:len(data)])
+		written += len(data)
+	}
 	return
 }
 
