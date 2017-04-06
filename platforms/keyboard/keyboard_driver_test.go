@@ -2,6 +2,7 @@ package keyboard
 
 import (
 	"os"
+	"strings"
 	"testing"
 
 	"gobot.io/x/gobot"
@@ -23,6 +24,13 @@ func initTestKeyboardDriver() *Driver {
 func TestKeyboardDriver(t *testing.T) {
 	d := initTestKeyboardDriver()
 	gobottest.Assert(t, d.Connection(), (gobot.Connection)(nil))
+}
+
+func TestKeyboardDriverName(t *testing.T) {
+	d := initTestKeyboardDriver()
+	gobottest.Assert(t, strings.HasPrefix(d.Name(), "Keyboard"), true)
+	d.SetName("NewName")
+	gobottest.Assert(t, d.Name(), "NewName")
 }
 
 func TestKeyboardDriverStart(t *testing.T) {
