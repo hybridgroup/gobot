@@ -54,6 +54,13 @@ func initTestSpheroAdaptor() (*Adaptor, *nullReadWriteCloser) {
 	return a, rwc
 }
 
+func TestSpheroAdaptorName(t *testing.T) {
+	a, _ := initTestSpheroAdaptor()
+	gobottest.Assert(t, strings.HasPrefix(a.Name(), "Sphero"), true)
+	a.SetName("NewName")
+	gobottest.Assert(t, a.Name(), "NewName")
+}
+
 func TestSpheroAdaptor(t *testing.T) {
 	a, _ := initTestSpheroAdaptor()
 	gobottest.Assert(t, strings.HasPrefix(a.Name(), "Sphero"), true)

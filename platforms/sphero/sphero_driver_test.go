@@ -18,6 +18,13 @@ func initTestSpheroDriver() *SpheroDriver {
 	return NewSpheroDriver(a)
 }
 
+func TestSpheroDriverName(t *testing.T) {
+	d := initTestSpheroDriver()
+	gobottest.Assert(t, strings.HasPrefix(d.Name(), "Sphero"), true)
+	d.SetName("NewName")
+	gobottest.Assert(t, d.Name(), "NewName")
+}
+
 func TestSpheroDriver(t *testing.T) {
 	d := initTestSpheroDriver()
 	var ret interface{}
