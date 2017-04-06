@@ -123,3 +123,10 @@ func TestBeagleboneAdaptor(t *testing.T) {
 
 	gobottest.Assert(t, a.Finalize(), nil)
 }
+
+func TestBeagleboneAdaptorName(t *testing.T) {
+	a := NewAdaptor()
+	gobottest.Assert(t, strings.HasPrefix(a.Name(), "Beaglebone"), true)
+	a.SetName("NewName")
+	gobottest.Assert(t, a.Name(), "NewName")
+}
