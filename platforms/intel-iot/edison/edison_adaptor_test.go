@@ -2,6 +2,7 @@ package edison
 
 import (
 	"errors"
+	"strings"
 	"testing"
 
 	"gobot.io/x/gobot"
@@ -95,6 +96,13 @@ func initTestAdaptor() (*Adaptor, *sysfs.MockFilesystem) {
 	fs.Files["/sys/class/pwm/pwmchip0/pwm1/period"].Contents = "5000\n"
 	a.Connect()
 	return a, fs
+}
+
+func TestEdisonAdaptorName(t *testing.T) {
+	a, _ := initTestAdaptor()
+	gobottest.Assert(t, strings.HasPrefix(a.Name(), "Edison"), true)
+	a.SetName("NewName")
+	gobottest.Assert(t, a.Name(), "NewName")
 }
 
 func TestAdaptorConnect(t *testing.T) {
