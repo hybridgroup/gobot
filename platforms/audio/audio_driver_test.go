@@ -4,6 +4,7 @@ package audio
 
 import (
 	"os/exec"
+	"strings"
 	"testing"
 
 	"gobot.io/x/gobot"
@@ -22,6 +23,13 @@ func TestAudioDriver(t *testing.T) {
 	gobottest.Assert(t, d.Start(), nil)
 
 	gobottest.Assert(t, d.Halt(), nil)
+}
+
+func TestAudioDriverName(t *testing.T) {
+	d := NewDriver(NewAdaptor(), "")
+	gobottest.Assert(t, strings.HasPrefix(d.Name(), "Audio"), true)
+	d.SetName("NewName")
+	gobottest.Assert(t, d.Name(), "NewName")
 }
 
 func TestAudioDriverSoundWithNoFilename(t *testing.T) {

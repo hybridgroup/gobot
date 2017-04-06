@@ -3,6 +3,7 @@ package audio
 
 import (
 	"os/exec"
+	"strings"
 	"testing"
 
 	"gobot.io/x/gobot"
@@ -16,6 +17,13 @@ func TestAudioAdaptor(t *testing.T) {
 
 	gobottest.Assert(t, a.Connect(), nil)
 	gobottest.Assert(t, a.Finalize(), nil)
+}
+
+func TestAudioAdaptorName(t *testing.T) {
+	a := NewAdaptor()
+	gobottest.Assert(t, strings.HasPrefix(a.Name(), "Audio"), true)
+	a.SetName("NewName")
+	gobottest.Assert(t, a.Name(), "NewName")
 }
 
 func TestAudioAdaptorCommandsWav(t *testing.T) {
