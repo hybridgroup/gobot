@@ -3,6 +3,7 @@ package neurosky
 import (
 	"errors"
 	"io"
+	"strings"
 	"sync"
 	"testing"
 
@@ -63,6 +64,13 @@ func initTestNeuroskyAdaptor() *Adaptor {
 func TestNeuroskyAdaptor(t *testing.T) {
 	a := NewAdaptor("/dev/null")
 	gobottest.Assert(t, a.Port(), "/dev/null")
+}
+
+func TestNeuroskyAdaptorName(t *testing.T) {
+	a := NewAdaptor("/dev/null")
+	gobottest.Assert(t, strings.HasPrefix(a.Name(), "Neurosky"), true)
+	a.SetName("NewName")
+	gobottest.Assert(t, a.Name(), "NewName")
 }
 
 func TestNeuroskyAdaptorConnect(t *testing.T) {

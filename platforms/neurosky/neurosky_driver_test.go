@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"io"
+	"strings"
 	"testing"
 	"time"
 
@@ -26,6 +27,14 @@ func TestNeuroskyDriver(t *testing.T) {
 	d := initTestNeuroskyDriver()
 	gobottest.Refute(t, d.Connection(), nil)
 }
+
+func TestNeuroskyDriverName(t *testing.T) {
+	d := initTestNeuroskyDriver()
+	gobottest.Assert(t, strings.HasPrefix(d.Name(), "Neurosky"), true)
+	d.SetName("NewName")
+	gobottest.Assert(t, d.Name(), "NewName")
+}
+
 func TestNeuroskyDriverStart(t *testing.T) {
 	sem := make(chan bool, 0)
 
