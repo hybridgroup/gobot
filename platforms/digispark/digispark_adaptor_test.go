@@ -2,6 +2,7 @@ package digispark
 
 import (
 	"errors"
+	"strings"
 	"testing"
 
 	"gobot.io/x/gobot"
@@ -68,6 +69,13 @@ func initTestAdaptor() *Adaptor {
 	errorFunc = func() error { return nil }
 	pwmInitErrorFunc = func() error { return nil }
 	return a
+}
+
+func TestDigisparkAdaptorName(t *testing.T) {
+	a := NewAdaptor()
+	gobottest.Assert(t, strings.HasPrefix(a.Name(), "Digispark"), true)
+	a.SetName("NewName")
+	gobottest.Assert(t, a.Name(), "NewName")
 }
 
 func TestAdaptorConnect(t *testing.T) {
