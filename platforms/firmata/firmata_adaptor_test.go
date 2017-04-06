@@ -185,6 +185,60 @@ func TestAdaptorI2cRead(t *testing.T) {
 	gobottest.Assert(t, response, i)
 }
 
+func TestAdaptorI2cReadByte(t *testing.T) {
+	a := initTestAdaptor()
+	i := []byte{100}
+	i2cReply := client.I2cReply{Data: i}
+	go func() {
+		<-time.After(10 * time.Millisecond)
+		a.board.Publish(a.board.Event("I2cReply"), i2cReply)
+	}()
+
+	con, err := a.GetConnection(0, 0)
+	gobottest.Assert(t, err, nil)
+
+	var val byte
+	val, err = con.ReadByte()
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, val, uint8(100))
+}
+
+func TestAdaptorI2cReadByteData(t *testing.T) {
+	a := initTestAdaptor()
+	i := []byte{100}
+	i2cReply := client.I2cReply{Data: i}
+	go func() {
+		<-time.After(10 * time.Millisecond)
+		a.board.Publish(a.board.Event("I2cReply"), i2cReply)
+	}()
+
+	con, err := a.GetConnection(0, 0)
+	gobottest.Assert(t, err, nil)
+
+	var val byte
+	val, err = con.ReadByteData(0x01)
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, val, uint8(100))
+}
+
+func TestAdaptorI2cReadWordData(t *testing.T) {
+	a := initTestAdaptor()
+	i := []byte{100}
+	i2cReply := client.I2cReply{Data: i}
+	go func() {
+		<-time.After(10 * time.Millisecond)
+		a.board.Publish(a.board.Event("I2cReply"), i2cReply)
+	}()
+
+	con, err := a.GetConnection(0, 0)
+	gobottest.Assert(t, err, nil)
+
+	var val uint16
+	val, err = con.ReadWordData(0x01)
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, val, uint16(100))
+}
+
 func TestAdaptorI2cWrite(t *testing.T) {
 	a := initTestAdaptor()
 	con, err := a.GetConnection(0, 0)
