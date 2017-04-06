@@ -3,6 +3,7 @@ package leap
 import (
 	"errors"
 	"io"
+	"strings"
 	"testing"
 
 	"gobot.io/x/gobot"
@@ -21,6 +22,14 @@ func TestLeapMotionAdaptor(t *testing.T) {
 	a := NewAdaptor("127.0.0.1")
 	gobottest.Assert(t, a.Port(), "127.0.0.1")
 }
+
+func TestLeapMotionAdaptorName(t *testing.T) {
+	a := NewAdaptor("127.0.0.1")
+	gobottest.Assert(t, strings.HasPrefix(a.Name(), "Leap"), true)
+	a.SetName("NewName")
+	gobottest.Assert(t, a.Name(), "NewName")
+}
+
 func TestLeapMotionAdaptorConnect(t *testing.T) {
 	a := initTestLeapMotionAdaptor()
 	gobottest.Assert(t, a.Connect(), nil)

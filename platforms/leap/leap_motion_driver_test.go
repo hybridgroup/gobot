@@ -4,6 +4,7 @@ import (
 	"errors"
 	"io"
 	"io/ioutil"
+	"strings"
 	"sync"
 	"testing"
 
@@ -55,6 +56,13 @@ func initTestLeapMotionDriver() (*Driver, *NullReadWriteCloser) {
 func TestLeapMotionDriver(t *testing.T) {
 	d, _ := initTestLeapMotionDriver()
 	gobottest.Refute(t, d.Connection(), nil)
+}
+
+func TestLeapMotionDriverName(t *testing.T) {
+	d, _ := initTestLeapMotionDriver()
+	gobottest.Assert(t, strings.HasPrefix(d.Name(), "Leap"), true)
+	d.SetName("NewName")
+	gobottest.Assert(t, d.Name(), "NewName")
 }
 
 func TestLeapMotionDriverStart(t *testing.T) {
