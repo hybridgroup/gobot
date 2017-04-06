@@ -2,6 +2,7 @@ package chip
 
 import (
 	"errors"
+	"strings"
 	"testing"
 
 	"gobot.io/x/gobot"
@@ -22,6 +23,13 @@ func initTestChipAdaptor() *Adaptor {
 	a := NewAdaptor()
 	a.Connect()
 	return a
+}
+
+func TestChipAdaptorName(t *testing.T) {
+	a := NewAdaptor()
+	gobottest.Assert(t, strings.HasPrefix(a.Name(), "CHIP"), true)
+	a.SetName("NewName")
+	gobottest.Assert(t, a.Name(), "NewName")
 }
 
 func TestChipAdaptorDigitalIO(t *testing.T) {
