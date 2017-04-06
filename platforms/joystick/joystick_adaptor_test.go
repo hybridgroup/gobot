@@ -2,6 +2,7 @@ package joystick
 
 import (
 	"errors"
+	"strings"
 	"testing"
 
 	"gobot.io/x/gobot"
@@ -17,6 +18,13 @@ func initTestAdaptor() *Adaptor {
 		return nil
 	}
 	return a
+}
+
+func TestJoystickAdaptorName(t *testing.T) {
+	a := initTestAdaptor()
+	gobottest.Assert(t, strings.HasPrefix(a.Name(), "Joystick"), true)
+	a.SetName("NewName")
+	gobottest.Assert(t, a.Name(), "NewName")
 }
 
 func TestAdaptorConnect(t *testing.T) {

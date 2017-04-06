@@ -1,6 +1,7 @@
 package joystick
 
 import (
+	"strings"
 	"testing"
 	"time"
 
@@ -23,6 +24,13 @@ func initTestDriver() *Driver {
 		return new(interface{})
 	}
 	return d
+}
+
+func TestJoystickDriverName(t *testing.T) {
+	d := initTestDriver()
+	gobottest.Assert(t, strings.HasPrefix(d.Name(), "Joystick"), true)
+	d.SetName("NewName")
+	gobottest.Assert(t, d.Name(), "NewName")
 }
 
 func TestDriverStart(t *testing.T) {
