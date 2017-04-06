@@ -2,6 +2,7 @@ package dragonboard
 
 import (
 	"errors"
+	"strings"
 	"testing"
 
 	"gobot.io/x/gobot"
@@ -23,6 +24,13 @@ func initTestDragonBoardAdaptor(t *testing.T) *Adaptor {
 		t.Error(err)
 	}
 	return a
+}
+
+func TestDragonBoardAdaptorName(t *testing.T) {
+	a := initTestDragonBoardAdaptor(t)
+	gobottest.Assert(t, strings.HasPrefix(a.Name(), "DragonBoard"), true)
+	a.SetName("NewName")
+	gobottest.Assert(t, a.Name(), "NewName")
 }
 
 func TestDragonBoardAdaptorDigitalIO(t *testing.T) {
