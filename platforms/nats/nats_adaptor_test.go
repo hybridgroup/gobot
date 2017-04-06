@@ -3,10 +3,12 @@ package nats
 import (
 	"errors"
 	"fmt"
+	"strings"
+	"testing"
+
 	"github.com/nats-io/nats"
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/gobottest"
-	"testing"
 )
 
 var _ gobot.Adaptor = (*Adaptor)(nil)
@@ -37,6 +39,13 @@ func initTestNatsAdaptorTLS(options ...nats.Option) *Adaptor {
 	a := NewAdaptor("tls://localhost:4242", 49999, options...)
 	a.connect = connStub(options...)
 	return a
+}
+
+func TestNatsAdaptorName(t *testing.T) {
+	a := initTestNatsAdaptor()
+	gobottest.Assert(t, strings.HasPrefix(a.Name(), "NATS"), true)
+	a.SetName("NewName")
+	gobottest.Assert(t, a.Name(), "NewName")
 }
 
 func TestNatsAdaptorReturnsHost(t *testing.T) {

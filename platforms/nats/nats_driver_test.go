@@ -19,3 +19,10 @@ func TestNatsDriver(t *testing.T) {
 	gobottest.Assert(t, d.Start(), nil)
 	gobottest.Assert(t, d.Halt(), nil)
 }
+
+func TestNatsDriverName(t *testing.T) {
+	d := NewDriver(initTestNatsAdaptor(), "/test/topic")
+	gobottest.Assert(t, strings.HasPrefix(d.Name(), "NATS"), true)
+	d.SetName("NewName")
+	gobottest.Assert(t, d.Name(), "NewName")
+}
