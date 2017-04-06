@@ -48,7 +48,7 @@ func (c *firmataI2cConnection) Write(data []byte) (written int, err error) {
 		}
 	}
 	if len(data) > 0 {
-		err = c.adaptor.board.I2cWrite(c.address, data[:len(data)])
+		err = c.adaptor.board.I2cWrite(c.address, data[:])
 		written += len(data)
 	}
 	return
