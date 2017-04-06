@@ -30,6 +30,13 @@ Serial          : 000000003bc748ea
 	return a
 }
 
+func TestRaspiAdaptorName(t *testing.T) {
+	a := initTestAdaptor()
+	gobottest.Assert(t, strings.HasPrefix(a.Name(), "RaspberryPi"), true)
+	a.SetName("NewName")
+	gobottest.Assert(t, a.Name(), "NewName")
+}
+
 func TestAdaptor(t *testing.T) {
 	readFile = func() ([]byte, error) {
 		return []byte(`
@@ -39,7 +46,7 @@ Serial          : 000000003bc748ea
 `), nil
 	}
 	a := NewAdaptor()
-	gobottest.Assert(t, a.Name(), "RaspberryPi")
+	gobottest.Assert(t, strings.HasPrefix(a.Name(), "RaspberryPi"), true)
 	gobottest.Assert(t, a.i2cDefaultBus, 1)
 	gobottest.Assert(t, a.revision, "3")
 

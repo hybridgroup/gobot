@@ -31,7 +31,7 @@ type Adaptor struct {
 // NewAdaptor creates a Raspi Adaptor
 func NewAdaptor() *Adaptor {
 	r := &Adaptor{
-		name:        "RaspberryPi",
+		name:        gobot.DefaultName("RaspberryPi"),
 		digitalPins: make(map[int]sysfs.DigitalPin),
 		pwmPins:     []int{},
 	}
