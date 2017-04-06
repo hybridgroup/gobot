@@ -2,6 +2,7 @@ package bebop
 
 import (
 	"errors"
+	"strings"
 	"testing"
 
 	"gobot.io/x/gobot"
@@ -17,6 +18,13 @@ func initTestBebopAdaptor() *Adaptor {
 		return nil
 	}
 	return a
+}
+
+func TestBebopAdaptorName(t *testing.T) {
+	a := NewAdaptor()
+	gobottest.Assert(t, strings.HasPrefix(a.Name(), "Bebop"), true)
+	a.SetName("NewName")
+	gobottest.Assert(t, a.Name(), "NewName")
 }
 
 func TestBebopAdaptorConnect(t *testing.T) {
