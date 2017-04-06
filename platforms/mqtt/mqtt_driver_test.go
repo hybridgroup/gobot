@@ -19,3 +19,10 @@ func TestMqttDriver(t *testing.T) {
 	gobottest.Assert(t, d.Start(), nil)
 	gobottest.Assert(t, d.Halt(), nil)
 }
+
+func TestMqttDriverName(t *testing.T) {
+	d := NewDriver(initTestMqttAdaptor(), "/test/topic")
+	gobottest.Assert(t, strings.HasPrefix(d.Name(), "MQTT"), true)
+	d.SetName("NewName")
+	gobottest.Assert(t, d.Name(), "NewName")
+}

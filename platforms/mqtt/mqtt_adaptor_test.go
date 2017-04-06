@@ -3,6 +3,7 @@ package mqtt
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"testing"
 
 	multierror "github.com/hashicorp/go-multierror"
@@ -14,6 +15,13 @@ var _ gobot.Adaptor = (*Adaptor)(nil)
 
 func initTestMqttAdaptor() *Adaptor {
 	return NewAdaptor("localhost:1883", "client")
+}
+
+func TestMqttAdaptorName(t *testing.T) {
+	a := initTestMqttAdaptor()
+	gobottest.Assert(t, strings.HasPrefix(a.Name(), "MQTT"), true)
+	a.SetName("NewName")
+	gobottest.Assert(t, a.Name(), "NewName")
 }
 
 func TestMqttAdaptorConnect(t *testing.T) {
