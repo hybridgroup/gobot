@@ -1,6 +1,7 @@
 package i2c
 
 import (
+	"errors"
 	"strings"
 	"testing"
 
@@ -38,6 +39,14 @@ func TestAdafruitMotorHatDriverStart(t *testing.T) {
 	ada, _ := initTestAdafruitMotorHatDriverWithStubbedAdaptor()
 	gobottest.Refute(t, ada.Connection(), nil)
 	gobottest.Assert(t, ada.Start(), nil)
+}
+
+func TestAdafruitMotorHatDriverStartError(t *testing.T) {
+	d, adaptor := initTestAdafruitMotorHatDriverWithStubbedAdaptor()
+	adaptor.i2cWriteImpl = func([]byte) (int, error) {
+		return 0, errors.New("write error")
+	}
+	gobottest.Assert(t, d.Start(), errors.New("write error"))
 }
 
 func TestAdafruitMotorHatDriverHalt(t *testing.T) {
@@ -88,16 +97,39 @@ func TestAdafruitMotorHatDriverSetDCMotorSpeed(t *testing.T) {
 	gobottest.Assert(t, err, nil)
 }
 
+func TestAdafruitMotorHatDriverSetDCMotorSpeedError(t *testing.T) {
+	ada, a := initTestAdafruitMotorHatDriverWithStubbedAdaptor()
+
+	gobottest.Assert(t, ada.Start(), nil)
+	a.i2cWriteImpl = func([]byte) (int, error) {
+		return 0, errors.New("write error")
+	}
+
+	gobottest.Assert(t, ada.SetDCMotorSpeed(1, 255), errors.New("write error"))
+}
+
 func TestAdafruitMotorHatDriverRunDCMotor(t *testing.T) {
 	ada, _ := initTestAdafruitMotorHatDriverWithStubbedAdaptor()
 
 	gobottest.Assert(t, ada.Start(), nil)
 
 	dcMotor := 1
-	// NOTE: not using the direction constant to prevent importing
-	// the i2c package
-	err := ada.RunDCMotor(dcMotor, 1)
-	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, ada.RunDCMotor(dcMotor, AdafruitForward), nil)
+	gobottest.Assert(t, ada.RunDCMotor(dcMotor, AdafruitBackward), nil)
+	gobottest.Assert(t, ada.RunDCMotor(dcMotor, AdafruitRelease), nil)
+}
+
+func TestAdafruitMotorHatDriverRunDCMotorError(t *testing.T) {
+	ada, a := initTestAdafruitMotorHatDriverWithStubbedAdaptor()
+	gobottest.Assert(t, ada.Start(), nil)
+	a.i2cWriteImpl = func([]byte) (int, error) {
+		return 0, errors.New("write error")
+	}
+
+	dcMotor := 1
+	gobottest.Assert(t, ada.RunDCMotor(dcMotor, AdafruitForward), errors.New("write error"))
+	gobottest.Assert(t, ada.RunDCMotor(dcMotor, AdafruitBackward), errors.New("write error"))
+	gobottest.Assert(t, ada.RunDCMotor(dcMotor, AdafruitRelease), errors.New("write error"))
 }
 
 func TestAdafruitMotorHatDriverSetStepperMotorSpeed(t *testing.T) {
