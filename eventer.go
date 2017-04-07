@@ -18,6 +18,8 @@ type eventer struct {
 	eventsMutex sync.Mutex
 }
 
+const eventChanBufferSize = 10
+
 // Eventer is the interface which describes how a Driver or Adaptor
 // handles events.
 type Eventer interface {
@@ -54,7 +56,7 @@ type Eventer interface {
 func NewEventer() Eventer {
 	evtr := &eventer{
 		eventnames: make(map[string]string),
-		in:         make(eventChannel, 1),
+		in:         make(eventChannel, eventChanBufferSize),
 		outs:       make(map[eventChannel]eventChannel),
 	}
 
@@ -106,7 +108,7 @@ func (e *eventer) Publish(name string, data interface{}) {
 func (e *eventer) Subscribe() eventChannel {
 	e.eventsMutex.Lock()
 	defer e.eventsMutex.Unlock()
-	out := make(eventChannel)
+	out := make(eventChannel, eventChanBufferSize)
 	e.outs[out] = out
 	return out
 }
