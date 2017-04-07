@@ -153,3 +153,44 @@ func TestTSL2561DriverGetLuminocity(t *testing.T) {
 	gobottest.Assert(t, ir, uint16(12365))
 	gobottest.Assert(t, d.CalculateLux(bb, ir), uint32(72))
 }
+
+func TestTSL2561DriverGetLuminocityAutoGain(t *testing.T) {
+	adaptor := newI2cTestAdaptor()
+	d := NewTSL2561Driver(adaptor,
+		WithTSL2561IntegrationTime402MS,
+		WithAddress(TSL2561AddressLow),
+		WithTSL2561AutoGain)
+
+	// TODO: obtain real sensor data here for testing
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		buf := new(bytes.Buffer)
+		buf.Write([]byte{77, 48})
+		copy(b, buf.Bytes())
+		return buf.Len(), nil
+	}
+
+	d.Start()
+	bb, ir, err := d.GetLuminocity()
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, bb, uint16(12365))
+	gobottest.Assert(t, ir, uint16(12365))
+	gobottest.Assert(t, d.CalculateLux(bb, ir), uint32(72))
+}
+
+func TestTSL2561SetIntegrationTimeError(t *testing.T) {
+	d, adaptor := initTestTSL2561Driver()
+	d.Start()
+	adaptor.i2cWriteImpl = func([]byte) (int, error) {
+		return 0, errors.New("write error")
+	}
+	gobottest.Assert(t, d.SetIntegrationTime(TSL2561IntegrationTime101MS), errors.New("write error"))
+}
+
+func TestTSL2561SetGainError(t *testing.T) {
+	d, adaptor := initTestTSL2561Driver()
+	d.Start()
+	adaptor.i2cWriteImpl = func([]byte) (int, error) {
+		return 0, errors.New("write error")
+	}
+	gobottest.Assert(t, d.SetGain(TSL2561Gain16X), errors.New("write error"))
+}
