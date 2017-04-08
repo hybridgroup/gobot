@@ -16,6 +16,7 @@ var currentDevice *blelib.Device
 var bleMutex sync.Mutex
 var bleCtx context.Context
 
+// BLEConnector is the interface that a BLE ClientAdaptor must implement
 type BLEConnector interface {
 	Connect() error
 	Reconnect() error
