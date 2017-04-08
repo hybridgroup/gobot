@@ -3,7 +3,7 @@ sudo: true
 go_import_path: gobot.io/x/gobot
 go:
  - 1.7
- - 1.8
+ - 1.8.1
  - tip
 matrix:
  allow_failures:
