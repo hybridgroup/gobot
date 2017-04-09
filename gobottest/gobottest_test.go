@@ -35,3 +35,8 @@ func TestRefute(t *testing.T) {
 		t.Errorf("Refute failed: 1 should not be 1")
 	}
 }
+
+func TestExecCommand(t *testing.T) {
+	val := ExecCommand("echo", "hello")
+	Refute(t, val, nil)
+}
