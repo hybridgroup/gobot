@@ -142,7 +142,7 @@ func TestAdafruitMotorHatDriverSetStepperMotorSpeed(t *testing.T) {
 	gobottest.Assert(t, ada.SetStepperMotorSpeed(stepperMotor, rpm), nil)
 }
 
-func TestAdafruitMotorHatDriverStepperStep(t *testing.T) {
+func TestAdafruitMotorHatDriverStepperMicroStep(t *testing.T) {
 	ada, _ := initTestAdafruitMotorHatDriverWithStubbedAdaptor()
 
 	gobottest.Assert(t, ada.Start(), nil)
@@ -152,6 +152,45 @@ func TestAdafruitMotorHatDriverStepperStep(t *testing.T) {
 	stepperMotor := 0
 	steps := 50
 	err := ada.Step(stepperMotor, steps, 1, 3)
+	gobottest.Assert(t, err, nil)
+}
+
+func TestAdafruitMotorHatDriverStepperSingleStep(t *testing.T) {
+	ada, _ := initTestAdafruitMotorHatDriverWithStubbedAdaptor()
+
+	gobottest.Assert(t, ada.Start(), nil)
+
+	// NOTE: not using the direction and style constants to prevent importing
+	// the i2c package
+	stepperMotor := 0
+	steps := 50
+	err := ada.Step(stepperMotor, steps, 1, 0)
+	gobottest.Assert(t, err, nil)
+}
+
+func TestAdafruitMotorHatDriverStepperDoubleStep(t *testing.T) {
+	ada, _ := initTestAdafruitMotorHatDriverWithStubbedAdaptor()
+
+	gobottest.Assert(t, ada.Start(), nil)
+
+	// NOTE: not using the direction and style constants to prevent importing
+	// the i2c package
+	stepperMotor := 0
+	steps := 50
+	err := ada.Step(stepperMotor, steps, 1, 1)
+	gobottest.Assert(t, err, nil)
+}
+
+func TestAdafruitMotorHatDriverStepperInterleaveStep(t *testing.T) {
+	ada, _ := initTestAdafruitMotorHatDriverWithStubbedAdaptor()
+
+	gobottest.Assert(t, ada.Start(), nil)
+
+	// NOTE: not using the direction and style constants to prevent importing
+	// the i2c package
+	stepperMotor := 0
+	steps := 50
+	err := ada.Step(stepperMotor, steps, 1, 2)
 	gobottest.Assert(t, err, nil)
 }
 
