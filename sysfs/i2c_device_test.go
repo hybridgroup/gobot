@@ -1,6 +1,7 @@
 package sysfs
 
 import (
+	"errors"
 	"os"
 	"syscall"
 	"testing"
@@ -23,9 +24,28 @@ func TestNewI2cDeviceClose(t *testing.T) {
 	gobottest.Assert(t, i.Close(), nil)
 }
 
+func TestNewI2cDeviceQueryFuncError(t *testing.T) {
+	fs := NewMockFilesystem([]string{
+		"/dev/i2c-1",
+	})
+	SetFilesystem(fs)
+
+	SetSyscall(&MockSyscall{
+		Impl: func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno) {
+			return 0, 0, 1
+		},
+	})
+
+	i, err := NewI2cDevice("/dev/i2c-1")
+	var _ I2cDevice = i
+
+	gobottest.Assert(t, err, errors.New("Querying functionality failed with syscall.Errno operation not permitted"))
+}
+
 func TestNewI2cDevice(t *testing.T) {
 	fs := NewMockFilesystem([]string{})
 	SetFilesystem(fs)
+	SetSyscall(&MockSyscall{})
 
 	i, err := NewI2cDevice(os.DevNull)
 	gobottest.Assert(t, err.Error(), " : /dev/null: No such file.")
