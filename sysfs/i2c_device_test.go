@@ -2,6 +2,7 @@ package sysfs
 
 import (
 	"os"
+	"syscall"
 	"testing"
 
 	"gobot.io/x/gobot/gobottest"
@@ -78,6 +79,30 @@ func TestNewI2cDeviceReadByte(t *testing.T) {
 	val, e := i.ReadByte()
 	gobottest.Assert(t, val, byte(0))
 	gobottest.Assert(t, e, nil)
+}
+
+func TestNewI2cDeviceReadByteError(t *testing.T) {
+	fs := NewMockFilesystem([]string{
+		"/dev/i2c-1",
+	})
+	SetFilesystem(fs)
+
+	i, err := NewI2cDevice("/dev/i2c-1")
+	var _ I2cDevice = i
+
+	gobottest.Assert(t, err, nil)
+
+	SetSyscall(&MockSyscall{
+		Impl: func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno) {
+			return 0, 0, 1
+		},
+	})
+
+	i.SetAddress(0xff)
+	i.funcs = I2C_FUNC_SMBUS_READ_BYTE
+
+	_, e := i.ReadByte()
+	gobottest.Refute(t, e, nil)
 }
 
 func TestNewI2cDeviceReadByteNotSupported(t *testing.T) {
