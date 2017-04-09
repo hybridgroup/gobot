@@ -84,3 +84,41 @@ func TestDigitalPin(t *testing.T) {
 	err = pin.Export()
 	gobottest.Assert(t, err.(*os.PathError).Err, errors.New("write error"))
 }
+
+func TestDigitalPinExportError(t *testing.T) {
+	fs := NewMockFilesystem([]string{
+		"/sys/class/gpio/export",
+		"/sys/class/gpio/unexport",
+		"/sys/class/gpio/gpio10/value",
+		"/sys/class/gpio/gpio10/direction",
+	})
+
+	SetFilesystem(fs)
+
+	pin := NewDigitalPin(10, "custom").(*digitalPin)
+	writeFile = func(File, []byte) (int, error) {
+		return 0, &os.PathError{Err: syscall.EBUSY}
+	}
+
+	err := pin.Export()
+	gobottest.Refute(t, err, nil)
+}
+
+func TestDigitalPinUnexportError(t *testing.T) {
+	fs := NewMockFilesystem([]string{
+		"/sys/class/gpio/export",
+		"/sys/class/gpio/unexport",
+		"/sys/class/gpio/gpio10/value",
+		"/sys/class/gpio/gpio10/direction",
+	})
+
+	SetFilesystem(fs)
+
+	pin := NewDigitalPin(10, "custom").(*digitalPin)
+	writeFile = func(File, []byte) (int, error) {
+		return 0, &os.PathError{Err: syscall.EBUSY}
+	}
+
+	err := pin.Unexport()
+	gobottest.Refute(t, err, nil)
+}
