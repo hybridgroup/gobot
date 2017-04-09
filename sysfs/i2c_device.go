@@ -48,10 +48,10 @@ type i2cSmbusIoctlData struct {
 
 type I2cOperations interface {
 	io.ReadWriteCloser
-	ReadByte() (val uint8, err error)
+	ReadByte() (val byte, err error)
 	ReadByteData(reg uint8) (val uint8, err error)
 	ReadWordData(reg uint8) (val uint16, err error)
-	WriteByte(val uint8) (err error)
+	WriteByte(val byte) (err error)
 	WriteByteData(reg uint8, val uint8) (err error)
 	WriteWordData(reg uint8, val uint16) (err error)
 	WriteBlockData(reg uint8, b []byte) (err error)
@@ -116,7 +116,7 @@ func (d *i2cDevice) Close() (err error) {
 	return d.file.Close()
 }
 
-func (d *i2cDevice) ReadByte() (val uint8, err error) {
+func (d *i2cDevice) ReadByte() (val byte, err error) {
 	if d.funcs&I2C_FUNC_SMBUS_READ_BYTE == 0 {
 		return 0, fmt.Errorf("SMBus read byte not supported")
 	}
@@ -146,7 +146,7 @@ func (d *i2cDevice) ReadWordData(reg uint8) (val uint16, err error) {
 	return data, err
 }
 
-func (d *i2cDevice) WriteByte(val uint8) (err error) {
+func (d *i2cDevice) WriteByte(val byte) (err error) {
 	if d.funcs&I2C_FUNC_SMBUS_WRITE_BYTE == 0 {
 		return fmt.Errorf("SMBus write byte not supported")
 	}

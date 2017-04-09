@@ -61,6 +61,25 @@ func TestNewI2cDevice(t *testing.T) {
 	gobottest.Assert(t, err, nil)
 }
 
+func TestNewI2cDeviceReadByte(t *testing.T) {
+	fs := NewMockFilesystem([]string{
+		"/dev/i2c-1",
+	})
+	SetFilesystem(fs)
+
+	i, err := NewI2cDevice("/dev/i2c-1")
+	var _ I2cDevice = i
+
+	gobottest.Assert(t, err, nil)
+
+	i.SetAddress(0xff)
+	i.funcs = I2C_FUNC_SMBUS_READ_BYTE
+
+	val, e := i.ReadByte()
+	gobottest.Assert(t, val, byte(0))
+	gobottest.Assert(t, e, nil)
+}
+
 func TestNewI2cDeviceReadByteNotSupported(t *testing.T) {
 	SetSyscall(&MockSyscall{})
 	i, err := NewI2cDevice("/dev/i2c-1")
@@ -72,6 +91,24 @@ func TestNewI2cDeviceReadByteNotSupported(t *testing.T) {
 
 	_, err = i.ReadByte()
 	gobottest.Assert(t, err.Error(), "SMBus read byte not supported")
+}
+
+func TestNewI2cDeviceWriteByte(t *testing.T) {
+	fs := NewMockFilesystem([]string{
+		"/dev/i2c-1",
+	})
+	SetFilesystem(fs)
+
+	i, err := NewI2cDevice("/dev/i2c-1")
+	var _ I2cDevice = i
+
+	gobottest.Assert(t, err, nil)
+
+	i.SetAddress(0xff)
+	i.funcs = I2C_FUNC_SMBUS_WRITE_BYTE
+
+	e := i.WriteByte(0x01)
+	gobottest.Assert(t, e, nil)
 }
 
 func TestNewI2cDeviceWriteByteNotSupported(t *testing.T) {
@@ -87,6 +124,25 @@ func TestNewI2cDeviceWriteByteNotSupported(t *testing.T) {
 	gobottest.Assert(t, err.Error(), "SMBus write byte not supported")
 }
 
+func TestNewI2cDeviceReadByteData(t *testing.T) {
+	fs := NewMockFilesystem([]string{
+		"/dev/i2c-1",
+	})
+	SetFilesystem(fs)
+
+	i, err := NewI2cDevice("/dev/i2c-1")
+	var _ I2cDevice = i
+
+	gobottest.Assert(t, err, nil)
+
+	i.SetAddress(0xff)
+	i.funcs = I2C_FUNC_SMBUS_READ_BYTE_DATA
+
+	v, e := i.ReadByteData(0x01)
+	gobottest.Assert(t, v, byte(0))
+	gobottest.Assert(t, e, nil)
+}
+
 func TestNewI2cDeviceReadByteDataNotSupported(t *testing.T) {
 	SetSyscall(&MockSyscall{})
 	i, err := NewI2cDevice("/dev/i2c-1")
@@ -98,6 +154,24 @@ func TestNewI2cDeviceReadByteDataNotSupported(t *testing.T) {
 
 	_, err = i.ReadByteData(0x01)
 	gobottest.Assert(t, err.Error(), "SMBus read byte data not supported")
+}
+
+func TestNewI2cDeviceWriteByteData(t *testing.T) {
+	fs := NewMockFilesystem([]string{
+		"/dev/i2c-1",
+	})
+	SetFilesystem(fs)
+
+	i, err := NewI2cDevice("/dev/i2c-1")
+	var _ I2cDevice = i
+
+	gobottest.Assert(t, err, nil)
+
+	i.SetAddress(0xff)
+	i.funcs = I2C_FUNC_SMBUS_WRITE_BYTE_DATA
+
+	e := i.WriteByteData(0x01, 0x02)
+	gobottest.Assert(t, e, nil)
 }
 
 func TestNewI2cDeviceWriteByteDataNotSupported(t *testing.T) {
@@ -113,6 +187,25 @@ func TestNewI2cDeviceWriteByteDataNotSupported(t *testing.T) {
 	gobottest.Assert(t, err.Error(), "SMBus write byte data not supported")
 }
 
+func TestNewI2cDeviceReadWordData(t *testing.T) {
+	fs := NewMockFilesystem([]string{
+		"/dev/i2c-1",
+	})
+	SetFilesystem(fs)
+
+	i, err := NewI2cDevice("/dev/i2c-1")
+	var _ I2cDevice = i
+
+	gobottest.Assert(t, err, nil)
+
+	i.SetAddress(0xff)
+	i.funcs = I2C_FUNC_SMBUS_READ_WORD_DATA
+
+	v, e := i.ReadWordData(0x01)
+	gobottest.Assert(t, v, uint16(0))
+	gobottest.Assert(t, e, nil)
+}
+
 func TestNewI2cDeviceReadWordDataNotSupported(t *testing.T) {
 	SetSyscall(&MockSyscall{})
 	i, err := NewI2cDevice("/dev/i2c-1")
@@ -124,6 +217,24 @@ func TestNewI2cDeviceReadWordDataNotSupported(t *testing.T) {
 
 	_, err = i.ReadWordData(0x01)
 	gobottest.Assert(t, err.Error(), "SMBus read word data not supported")
+}
+
+func TestNewI2cDeviceWriteWordData(t *testing.T) {
+	fs := NewMockFilesystem([]string{
+		"/dev/i2c-1",
+	})
+	SetFilesystem(fs)
+
+	i, err := NewI2cDevice("/dev/i2c-1")
+	var _ I2cDevice = i
+
+	gobottest.Assert(t, err, nil)
+
+	i.SetAddress(0xff)
+	i.funcs = I2C_FUNC_SMBUS_WRITE_WORD_DATA
+
+	e := i.WriteWordData(0x01, 0x0102)
+	gobottest.Assert(t, e, nil)
 }
 
 func TestNewI2cDeviceWriteWordDataNotSupported(t *testing.T) {
