@@ -13,3 +13,10 @@ func TestFilesystemOpen(t *testing.T) {
 	gobottest.Assert(t, err, nil)
 	var _ File = file
 }
+
+func TestFilesystemStat(t *testing.T) {
+	SetFilesystem(&NativeFilesystem{})
+	fileInfo, err := Stat(os.DevNull)
+	gobottest.Assert(t, err, nil)
+	gobottest.Refute(t, fileInfo, nil)
+}
