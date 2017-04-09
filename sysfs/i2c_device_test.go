@@ -295,6 +295,42 @@ func TestNewI2cDeviceWriteWordDataNotSupported(t *testing.T) {
 	gobottest.Assert(t, err.Error(), "SMBus write word data not supported")
 }
 
+func TestNewI2cDeviceWriteBlockData(t *testing.T) {
+	fs := NewMockFilesystem([]string{
+		"/dev/i2c-1",
+	})
+	SetFilesystem(fs)
+
+	i, err := NewI2cDevice("/dev/i2c-1")
+	var _ I2cDevice = i
+
+	gobottest.Assert(t, err, nil)
+
+	i.SetAddress(0xff)
+
+	e := i.WriteBlockData(0x01, []byte{0x01, 0x02, 0x03})
+	gobottest.Assert(t, e, nil)
+}
+
+func TestNewI2cDeviceWriteBlockDataTooMuch(t *testing.T) {
+	fs := NewMockFilesystem([]string{
+		"/dev/i2c-1",
+	})
+	SetFilesystem(fs)
+
+	i, err := NewI2cDevice("/dev/i2c-1")
+	var _ I2cDevice = i
+
+	gobottest.Assert(t, err, nil)
+
+	i.SetAddress(0xff)
+
+	var data []byte
+	data = make([]byte, 33)
+	e := i.WriteBlockData(0x01, data)
+	gobottest.Assert(t, e, errors.New("Writing blocks larger than 32 bytes (33) not supported"))
+}
+
 func TestNewI2cDeviceWrite(t *testing.T) {
 	SetSyscall(&MockSyscall{})
 	i, err := NewI2cDevice("/dev/i2c-1")
