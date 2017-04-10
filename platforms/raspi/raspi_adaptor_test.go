@@ -1,6 +1,7 @@
 package raspi
 
 import (
+	"errors"
 	"strings"
 	"testing"
 
@@ -111,6 +112,8 @@ func TestAdaptorDigitalPWM(t *testing.T) {
 	gobottest.Assert(t, a.ServoWrite("11", 255), nil)
 
 	gobottest.Assert(t, strings.Split(fs.Files["/dev/pi-blaster"].Contents, "\n")[0], "17=0.25")
+
+	gobottest.Assert(t, a.PwmWrite("notexist", 1), errors.New("Not a valid pin"))
 }
 
 func TestAdaptorDigitalIO(t *testing.T) {
@@ -132,6 +135,8 @@ func TestAdaptorDigitalIO(t *testing.T) {
 	a.DigitalWrite("13", 1)
 	i, _ := a.DigitalRead("13")
 	gobottest.Assert(t, i, 1)
+
+	gobottest.Assert(t, a.DigitalWrite("notexist", 1), errors.New("Not a valid pin"))
 }
 
 func TestAdaptorI2c(t *testing.T) {
@@ -149,4 +154,9 @@ func TestAdaptorI2c(t *testing.T) {
 	data := []byte{42, 42}
 	con.Read(data)
 	gobottest.Assert(t, data, []byte{0x00, 0x01})
+
+	_, err = a.GetConnection(0xff, 51)
+	gobottest.Assert(t, err, errors.New("Bus number 51 out of range"))
+
+	gobottest.Assert(t, a.GetDefaultBus(), 1)
 }
