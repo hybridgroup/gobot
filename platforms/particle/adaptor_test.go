@@ -81,6 +81,9 @@ func TestNewAdaptor(t *testing.T) {
 
 	gobottest.Assert(t, core.APIServer, "https://api.particle.io")
 	gobottest.Assert(t, strings.HasPrefix(core.Name(), "Particle"), true)
+
+	core.SetName("sparkie")
+	gobottest.Assert(t, core.Name(), "sparkie")
 }
 
 func TestAdaptorConnect(t *testing.T) {
@@ -166,6 +169,18 @@ func TestAdaptorDigitalWrite(t *testing.T) {
 
 	a.setAPIServer(testServer.URL)
 	a.DigitalWrite("D7", 0)
+}
+
+func TestAdaptorServoOpen(t *testing.T) {
+	response := `{}`
+	params := []string{"1"}
+
+	a := initTestAdaptor()
+	testServer := getDummyResponseForPathWithParams("/"+a.DeviceID+"/servoOpen", params, response, t)
+	defer testServer.Close()
+
+	a.setAPIServer(testServer.URL)
+	a.servoPinOpen("1")
 }
 
 func TestAdaptorServoWrite(t *testing.T) {

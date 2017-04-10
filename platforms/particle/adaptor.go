@@ -132,16 +132,10 @@ func (s *Adaptor) DigitalRead(pin string) (val int, err error) {
 // Particle device. not just the default "tinker".
 func (s *Adaptor) ServoWrite(pin string, angle byte) (err error) {
 	if _, present := s.servoPins[pin]; !present {
-		params := url.Values{
-			"params":       {fmt.Sprintf("%v", pin)},
-			"access_token": {s.AccessToken},
-		}
-		url := fmt.Sprintf("%v/servoOpen", s.deviceURL())
-		_, err = s.request("POST", url, params)
+		err = s.servoPinOpen(pin)
 		if err != nil {
 			return
 		}
-		s.servoPins[pin] = true
 	}
 
 	params := url.Values{
@@ -286,4 +280,18 @@ func (s *Adaptor) request(method string, url string, params url.Values) (m map[s
 	}
 
 	return
+}
+
+func (s *Adaptor) servoPinOpen(pin string) error {
+	params := url.Values{
+		"params":       {fmt.Sprintf("%v", pin)},
+		"access_token": {s.AccessToken},
+	}
+	url := fmt.Sprintf("%v/servoOpen", s.deviceURL())
+	_, err := s.request("POST", url, params)
+	if err != nil {
+		return err
+	}
+	s.servoPins[pin] = true
+	return nil
 }
