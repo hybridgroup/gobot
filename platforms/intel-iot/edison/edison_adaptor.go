@@ -164,36 +164,15 @@ func (e *Adaptor) arduinoSetup() (err error) {
 	}
 
 	for _, i := range []int{263, 262} {
-		io := sysfs.NewDigitalPin(i)
-		if err = io.Export(); err != nil {
-			return err
-		}
-		if err = io.Direction(sysfs.OUT); err != nil {
-			return err
-		}
-		if err = io.Write(sysfs.HIGH); err != nil {
-			return err
-		}
-		if err = io.Unexport(); err != nil {
+		if err = e.newDigitalPin(i, sysfs.HIGH); err != nil {
 			return err
 		}
 	}
 
 	for _, i := range []int{240, 241, 242, 243} {
-		io := sysfs.NewDigitalPin(i)
-		if err = io.Export(); err != nil {
+		if err = e.newDigitalPin(i, sysfs.LOW); err != nil {
 			return err
 		}
-		if err = io.Direction(sysfs.OUT); err != nil {
-			return err
-		}
-		if err = io.Write(sysfs.LOW); err != nil {
-			return err
-		}
-		if err = io.Unexport(); err != nil {
-			return err
-		}
-
 	}
 
 	for _, i := range []string{"111", "115", "114", "109"} {
@@ -231,18 +210,8 @@ func (e *Adaptor) arduinoI2CSetup() (err error) {
 	}
 
 	for _, i := range []int{236, 237, 204, 205} {
-		io := sysfs.NewDigitalPin(i)
-		if err = io.Export(); err != nil {
-			return
-		}
-		if err = io.Direction(sysfs.OUT); err != nil {
-			return
-		}
-		if err = io.Write(sysfs.LOW); err != nil {
-			return
-		}
-		if err = io.Unexport(); err != nil {
-			return
+		if err = e.newDigitalPin(i, sysfs.LOW); err != nil {
+			return err
 		}
 	}
 
@@ -446,4 +415,19 @@ func (e *Adaptor) GetDefaultBus() int {
 	}
 
 	return 1
+}
+
+func (e *Adaptor) newDigitalPin(i int, level int) (err error) {
+	io := sysfs.NewDigitalPin(i)
+	if err = io.Export(); err != nil {
+		return
+	}
+	if err = io.Direction(sysfs.OUT); err != nil {
+		return
+	}
+	if err = io.Write(level); err != nil {
+		return
+	}
+	err = io.Unexport()
+	return
 }
