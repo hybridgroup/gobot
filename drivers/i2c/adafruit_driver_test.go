@@ -41,12 +41,20 @@ func TestAdafruitMotorHatDriverStart(t *testing.T) {
 	gobottest.Assert(t, ada.Start(), nil)
 }
 
-func TestAdafruitMotorHatDriverStartError(t *testing.T) {
+func TestAdafruitMotorHatDriverStartWriteError(t *testing.T) {
 	d, adaptor := initTestAdafruitMotorHatDriverWithStubbedAdaptor()
 	adaptor.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
 	}
 	gobottest.Assert(t, d.Start(), errors.New("write error"))
+}
+
+func TestAdafruitMotorHatDriverStartReadError(t *testing.T) {
+	d, adaptor := initTestAdafruitMotorHatDriverWithStubbedAdaptor()
+	adaptor.i2cReadImpl = func([]byte) (int, error) {
+		return 0, errors.New("read error")
+	}
+	gobottest.Assert(t, d.Start(), errors.New("read error"))
 }
 
 func TestAdafruitMotorHatDriverHalt(t *testing.T) {
@@ -74,6 +82,18 @@ func TestAdafruitMotorHatDriverSetServoMotorFreq(t *testing.T) {
 	gobottest.Assert(t, err, nil)
 }
 
+func TestAdafruitMotorHatDriverSetServoMotorFreqError(t *testing.T) {
+	ada, a := initTestAdafruitMotorHatDriverWithStubbedAdaptor()
+
+	gobottest.Assert(t, ada.Start(), nil)
+	a.i2cWriteImpl = func([]byte) (int, error) {
+		return 0, errors.New("write error")
+	}
+
+	freq := 60.0
+	gobottest.Assert(t, ada.SetServoMotorFreq(freq), errors.New("write error"))
+}
+
 func TestAdafruitMotorHatDriverSetServoMotorPulse(t *testing.T) {
 	ada, _ := initTestAdafruitMotorHatDriverWithStubbedAdaptor()
 
@@ -84,6 +104,20 @@ func TestAdafruitMotorHatDriverSetServoMotorPulse(t *testing.T) {
 	var off int32 = 4321
 	err := ada.SetServoMotorPulse(channel, on, off)
 	gobottest.Assert(t, err, nil)
+}
+
+func TestAdafruitMotorHatDriverSetServoMotorPulseError(t *testing.T) {
+	ada, a := initTestAdafruitMotorHatDriverWithStubbedAdaptor()
+
+	gobottest.Assert(t, ada.Start(), nil)
+	a.i2cWriteImpl = func([]byte) (int, error) {
+		return 0, errors.New("write error")
+	}
+
+	var channel byte = 7
+	var on int32 = 1234
+	var off int32 = 4321
+	gobottest.Assert(t, ada.SetServoMotorPulse(channel, on, off), errors.New("write error"))
 }
 
 func TestAdafruitMotorHatDriverSetDCMotorSpeed(t *testing.T) {
