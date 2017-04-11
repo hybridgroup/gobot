@@ -3,6 +3,7 @@ package i2c
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"testing"
 
 	"gobot.io/x/gobot"
@@ -35,6 +36,14 @@ func TestDRV2605LDriver(t *testing.T) {
 func TestDRV2605LDriverStart(t *testing.T) {
 	d, _ := initTestDriverAndAdaptor()
 	gobottest.Assert(t, d.Start(), nil)
+}
+
+func TestDRVD2605riverStartReadError(t *testing.T) {
+	d, a := initTestDriverAndAdaptor()
+	a.i2cReadImpl = func(b []byte) (int, error) {
+		return 0, errors.New("read error")
+	}
+	gobottest.Assert(t, d.Start(), errors.New("read error"))
 }
 
 func TestDRV2605LDriverHalt(t *testing.T) {
@@ -91,4 +100,38 @@ func TestDRV2605LDriverSetName(t *testing.T) {
 func TestDRV2605DriverOptions(t *testing.T) {
 	d := NewDRV2605LDriver(newI2cTestAdaptor(), WithBus(2))
 	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
+}
+
+func TestDRV2605LDriverSetMode(t *testing.T) {
+	d, _ := initTestDriverAndAdaptor()
+	d.Start()
+	gobottest.Assert(t, d.SetMode(DRV2605ModeIntTrig), nil)
+}
+
+func TestDRV2605LDriverSetModeReadError(t *testing.T) {
+	d, a := initTestDriverAndAdaptor()
+	d.Start()
+
+	a.i2cReadImpl = func(b []byte) (int, error) {
+		return 0, errors.New("read error")
+	}
+	gobottest.Assert(t, d.SetMode(DRV2605ModeIntTrig), errors.New("read error"))
+}
+
+func TestDRV2605LDriverSetStandbyMode(t *testing.T) {
+	d, _ := initTestDriverAndAdaptor()
+	d.Start()
+	gobottest.Assert(t, d.SetStandbyMode(true), nil)
+}
+
+func TestDRV2605LDriverSelectLibrary(t *testing.T) {
+	d, _ := initTestDriverAndAdaptor()
+	d.Start()
+	gobottest.Assert(t, d.SelectLibrary(1), nil)
+}
+
+func TestDRV2605LDriverGo(t *testing.T) {
+	d, _ := initTestDriverAndAdaptor()
+	d.Start()
+	gobottest.Assert(t, d.Go(), nil)
 }
