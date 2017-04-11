@@ -108,9 +108,30 @@ func TestEdisonAdaptorName(t *testing.T) {
 func TestAdaptorConnect(t *testing.T) {
 	a, _ := initTestAdaptor()
 	gobottest.Assert(t, a.Connect(), nil)
+	gobottest.Assert(t, a.GetDefaultBus(), 6)
 
 	a = NewAdaptor()
 	sysfs.SetFilesystem(sysfs.NewMockFilesystem([]string{}))
+	gobottest.Refute(t, a.Connect(), nil)
+}
+
+func TestAdaptorConnectSparkfun(t *testing.T) {
+	a, _ := initTestAdaptor()
+	a.SetBoard("sparkfun")
+	gobottest.Assert(t, a.Connect(), nil)
+	gobottest.Assert(t, a.GetDefaultBus(), 1)
+}
+
+func TestAdaptorConnectMiniboard(t *testing.T) {
+	a, _ := initTestAdaptor()
+	a.SetBoard("miniboard")
+	gobottest.Assert(t, a.Connect(), nil)
+	gobottest.Assert(t, a.GetDefaultBus(), 1)
+}
+
+func TestAdaptorConnectUnknown(t *testing.T) {
+	a, _ := initTestAdaptor()
+	a.SetBoard("wha")
 	gobottest.Refute(t, a.Connect(), nil)
 }
 
