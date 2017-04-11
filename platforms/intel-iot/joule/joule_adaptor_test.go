@@ -99,6 +99,15 @@ func TestJouleAdaptorName(t *testing.T) {
 func TestAdaptorConnect(t *testing.T) {
 	a, _ := initTestAdaptor()
 	gobottest.Assert(t, a.Connect(), nil)
+	gobottest.Assert(t, a.GetDefaultBus(), 0)
+}
+
+func TestAdaptorInvalidBus(t *testing.T) {
+	a, _ := initTestAdaptor()
+	gobottest.Assert(t, a.Connect(), nil)
+
+	_, err := a.GetConnection(0xff, 10)
+	gobottest.Assert(t, err, errors.New("Bus number 10 out of range"))
 }
 
 func TestAdaptorFinalize(t *testing.T) {
@@ -107,8 +116,9 @@ func TestAdaptorFinalize(t *testing.T) {
 	a.PwmWrite("25", 100)
 
 	sysfs.SetSyscall(&sysfs.MockSyscall{})
-	a.GetConnection(0xff, 0)
-
+	gobottest.Assert(t, a.Finalize(), nil)
+	_, err := a.GetConnection(0xff, 0)
+	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, a.Finalize(), nil)
 
 	sysfs.SetFilesystem(sysfs.NewMockFilesystem([]string{}))
