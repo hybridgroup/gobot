@@ -115,10 +115,30 @@ func TestJHD1313MDriverWrite(t *testing.T) {
 	gobottest.Assert(t, d.Write("Hello"), nil)
 }
 
+func TestJHD1313MDriverWriteError(t *testing.T) {
+	d, a := initTestJHD1313M1DriverWithStubbedAdaptor()
+	d.Start()
+	a.i2cWriteImpl = func([]byte) (int, error) {
+		return 0, errors.New("write error")
+	}
+
+	gobottest.Assert(t, d.Write("Hello"), errors.New("write error"))
+}
+
 func TestJHD1313MDriverWriteTwoLines(t *testing.T) {
 	d, _ := initTestJHD1313M1DriverWithStubbedAdaptor()
 	d.Start()
 	gobottest.Assert(t, d.Write("Hello\nthere"), nil)
+}
+
+func TestJHD1313MDriverWriteTwoLinesError(t *testing.T) {
+	d, a := initTestJHD1313M1DriverWithStubbedAdaptor()
+	d.Start()
+
+	a.i2cWriteImpl = func([]byte) (int, error) {
+		return 0, errors.New("write error")
+	}
+	gobottest.Assert(t, d.Write("Hello\nthere"), errors.New("write error"))
 }
 
 func TestJHD1313MDriverSetPosition(t *testing.T) {
