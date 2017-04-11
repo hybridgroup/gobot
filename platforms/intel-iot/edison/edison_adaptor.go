@@ -100,9 +100,7 @@ func (e *Adaptor) Connect() (err error) {
 	switch e.Board() {
 	case "sparkfun":
 		e.pinmap = sparkfunPinMap
-		if errs := e.sparkfunSetup(); errs != nil {
-			err = multierror.Append(err, errs)
-		}
+		e.sparkfunSetup()
 	case "arduino":
 		e.pinmap = arduinoPinMap
 		if errs := e.arduinoSetup(); errs != nil {
@@ -110,9 +108,7 @@ func (e *Adaptor) Connect() (err error) {
 		}
 	case "miniboard":
 		e.pinmap = miniboardPinMap
-		if errs := e.miniboardSetup(); errs != nil {
-			err = multierror.Append(err, errs)
-		}
+		e.miniboardSetup()
 	default:
 		errs := errors.New("Unknown board type: " + e.Board())
 		err = multierror.Append(err, errs)
@@ -148,6 +144,96 @@ func (e *Adaptor) Finalize() (err error) {
 		}
 	}
 	return
+}
+
+// DigitalRead reads digital value from pin
+func (e *Adaptor) DigitalRead(pin string) (i int, err error) {
+	sysfsPin, err := e.digitalPin(pin, "in")
+	if err != nil {
+		return
+	}
+	return sysfsPin.Read()
+}
+
+// DigitalWrite writes a value to the pin. Acceptable values are 1 or 0.
+func (e *Adaptor) DigitalWrite(pin string, val byte) (err error) {
+	sysfsPin, err := e.digitalPin(pin, "out")
+	if err != nil {
+		return
+	}
+	return sysfsPin.Write(int(val))
+}
+
+// PwmWrite writes the 0-254 value to the specified pin
+func (e *Adaptor) PwmWrite(pin string, val byte) (err error) {
+	sysPin := e.pinmap[pin]
+	if sysPin.pwmPin != -1 {
+		if e.pwmPins[sysPin.pwmPin] == nil {
+			if err = e.DigitalWrite(pin, 1); err != nil {
+				return
+			}
+			if err = changePinMode(strconv.Itoa(int(sysPin.pin)), "1"); err != nil {
+				return
+			}
+			e.pwmPins[sysPin.pwmPin] = newPwmPin(sysPin.pwmPin)
+			if err = e.pwmPins[sysPin.pwmPin].export(); err != nil {
+				return
+			}
+			if err = e.pwmPins[sysPin.pwmPin].enable("1"); err != nil {
+				return
+			}
+		}
+		p, err := e.pwmPins[sysPin.pwmPin].period()
+		if err != nil {
+			return err
+		}
+		period, err := strconv.Atoi(p)
+		if err != nil {
+			return err
+		}
+		duty := gobot.FromScale(float64(val), 0, 255.0)
+		return e.pwmPins[sysPin.pwmPin].writeDuty(strconv.Itoa(int(float64(period) * duty)))
+	}
+	return errors.New("Not a PWM pin")
+}
+
+// AnalogRead returns value from analog reading of specified pin
+func (e *Adaptor) AnalogRead(pin string) (val int, err error) {
+	buf, err := readFile(
+		"/sys/bus/iio/devices/iio:device1/in_voltage" + pin + "_raw",
+	)
+	if err != nil {
+		return
+	}
+
+	val, err = strconv.Atoi(string(buf[0 : len(buf)-1]))
+
+	return val / 4, err
+}
+
+// GetConnection returns an i2c connection to a device on a specified bus.
+// Valid bus numbers are 1 and 6 (arduino).
+func (e *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection, err error) {
+	if !(bus == e.GetDefaultBus()) {
+		return nil, errors.New("Unsupported I2C bus")
+	}
+	if e.i2cBus == nil {
+		if bus == 6 && e.board == "arduino" {
+			e.arduinoI2CSetup()
+		}
+		e.i2cBus, err = sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
+	}
+	return i2c.NewConnection(e.i2cBus, address), err
+}
+
+// GetDefaultBus returns the default i2c bus for this platform
+func (e *Adaptor) GetDefaultBus() int {
+	// Arduino uses bus 6
+	if e.board == "arduino" {
+		return 6
+	}
+
+	return 1
 }
 
 // arduinoSetup does needed setup for the Arduino compatible breakout board
@@ -325,96 +411,6 @@ func (e *Adaptor) digitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPin,
 		}
 	}
 	return e.digitalPins[i.pin], nil
-}
-
-// DigitalRead reads digital value from pin
-func (e *Adaptor) DigitalRead(pin string) (i int, err error) {
-	sysfsPin, err := e.digitalPin(pin, "in")
-	if err != nil {
-		return
-	}
-	return sysfsPin.Read()
-}
-
-// DigitalWrite writes a value to the pin. Acceptable values are 1 or 0.
-func (e *Adaptor) DigitalWrite(pin string, val byte) (err error) {
-	sysfsPin, err := e.digitalPin(pin, "out")
-	if err != nil {
-		return
-	}
-	return sysfsPin.Write(int(val))
-}
-
-// PwmWrite writes the 0-254 value to the specified pin
-func (e *Adaptor) PwmWrite(pin string, val byte) (err error) {
-	sysPin := e.pinmap[pin]
-	if sysPin.pwmPin != -1 {
-		if e.pwmPins[sysPin.pwmPin] == nil {
-			if err = e.DigitalWrite(pin, 1); err != nil {
-				return
-			}
-			if err = changePinMode(strconv.Itoa(int(sysPin.pin)), "1"); err != nil {
-				return
-			}
-			e.pwmPins[sysPin.pwmPin] = newPwmPin(sysPin.pwmPin)
-			if err = e.pwmPins[sysPin.pwmPin].export(); err != nil {
-				return
-			}
-			if err = e.pwmPins[sysPin.pwmPin].enable("1"); err != nil {
-				return
-			}
-		}
-		p, err := e.pwmPins[sysPin.pwmPin].period()
-		if err != nil {
-			return err
-		}
-		period, err := strconv.Atoi(p)
-		if err != nil {
-			return err
-		}
-		duty := gobot.FromScale(float64(val), 0, 255.0)
-		return e.pwmPins[sysPin.pwmPin].writeDuty(strconv.Itoa(int(float64(period) * duty)))
-	}
-	return errors.New("Not a PWM pin")
-}
-
-// AnalogRead returns value from analog reading of specified pin
-func (e *Adaptor) AnalogRead(pin string) (val int, err error) {
-	buf, err := readFile(
-		"/sys/bus/iio/devices/iio:device1/in_voltage" + pin + "_raw",
-	)
-	if err != nil {
-		return
-	}
-
-	val, err = strconv.Atoi(string(buf[0 : len(buf)-1]))
-
-	return val / 4, err
-}
-
-// GetConnection returns an i2c connection to a device on a specified bus.
-// Valid bus numbers are 1 and 6 (arduino).
-func (e *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection, err error) {
-	if !(bus == e.GetDefaultBus()) {
-		return nil, errors.New("Unsupported I2C bus")
-	}
-	if e.i2cBus == nil {
-		if bus == 6 && e.board == "arduino" {
-			e.arduinoI2CSetup()
-		}
-		e.i2cBus, err = sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
-	}
-	return i2c.NewConnection(e.i2cBus, address), err
-}
-
-// GetDefaultBus returns the default i2c bus for this platform
-func (e *Adaptor) GetDefaultBus() int {
-	// Arduino uses bus 6
-	if e.board == "arduino" {
-		return 6
-	}
-
-	return 1
 }
 
 func (e *Adaptor) newDigitalPin(i int, level int) (err error) {
