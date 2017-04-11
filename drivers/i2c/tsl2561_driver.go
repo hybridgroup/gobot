@@ -498,7 +498,7 @@ func (d *TSL2561Driver) getBM(ratio uint32) (b uint32, m uint32) {
 	case (ratio <= tsl2561LuxK7T):
 		b = tsl2561LuxB7T
 		m = tsl2561LuxM7T
-	case (ratio > tsl2561LuxK8T):
+	case (ratio > tsl2561LuxK8T): // TODO: there is a gap here...
 		b = tsl2561LuxB8T
 		m = tsl2561LuxM8T
 	}

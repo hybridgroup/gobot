@@ -261,3 +261,42 @@ func TestTSL2561getClipScaling402MS(t *testing.T) {
 	gobottest.Assert(t, c, uint16(tsl2561Clipping402MS))
 	gobottest.Assert(t, s, uint32(1<<tsl2561LuxChScale))
 }
+
+func TestTSL2561getBM(t *testing.T) {
+	adaptor := newI2cTestAdaptor()
+	d := NewTSL2561Driver(adaptor,
+		WithTSL2561IntegrationTime13MS,
+		WithTSL2561AutoGain)
+
+	b, m := d.getBM(tsl2561LuxK1T)
+	gobottest.Assert(t, b, uint32(tsl2561LuxB1T))
+	gobottest.Assert(t, m, uint32(tsl2561LuxM1T))
+
+	b, m = d.getBM(tsl2561LuxK2T)
+	gobottest.Assert(t, b, uint32(tsl2561LuxB2T))
+	gobottest.Assert(t, m, uint32(tsl2561LuxM2T))
+
+	b, m = d.getBM(tsl2561LuxK3T)
+	gobottest.Assert(t, b, uint32(tsl2561LuxB3T))
+	gobottest.Assert(t, m, uint32(tsl2561LuxM3T))
+
+	b, m = d.getBM(tsl2561LuxK4T)
+	gobottest.Assert(t, b, uint32(tsl2561LuxB4T))
+	gobottest.Assert(t, m, uint32(tsl2561LuxM4T))
+
+	b, m = d.getBM(tsl2561LuxK5T)
+	gobottest.Assert(t, b, uint32(tsl2561LuxB5T))
+	gobottest.Assert(t, m, uint32(tsl2561LuxM5T))
+
+	b, m = d.getBM(tsl2561LuxK6T)
+	gobottest.Assert(t, b, uint32(tsl2561LuxB6T))
+	gobottest.Assert(t, m, uint32(tsl2561LuxM6T))
+
+	b, m = d.getBM(tsl2561LuxK7T)
+	gobottest.Assert(t, b, uint32(tsl2561LuxB7T))
+	gobottest.Assert(t, m, uint32(tsl2561LuxM7T))
+
+	b, m = d.getBM(tsl2561LuxK8T + 1)
+	gobottest.Assert(t, b, uint32(tsl2561LuxB8T))
+	gobottest.Assert(t, m, uint32(tsl2561LuxM8T))
+}
