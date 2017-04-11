@@ -195,3 +195,69 @@ func TestTSL2561SetGainError(t *testing.T) {
 	}
 	gobottest.Assert(t, d.SetGain(TSL2561Gain16X), errors.New("write error"))
 }
+
+func TestTSL2561getHiLo13MS(t *testing.T) {
+	adaptor := newI2cTestAdaptor()
+	d := NewTSL2561Driver(adaptor,
+		WithTSL2561IntegrationTime13MS,
+		WithTSL2561AutoGain)
+
+	hi, lo := d.getHiLo()
+	gobottest.Assert(t, hi, uint16(tsl2561AgcTHi13MS))
+	gobottest.Assert(t, lo, uint16(tsl2561AgcTLo13MS))
+}
+
+func TestTSL2561getHiLo101MS(t *testing.T) {
+	adaptor := newI2cTestAdaptor()
+	d := NewTSL2561Driver(adaptor,
+		WithTSL2561IntegrationTime101MS,
+		WithTSL2561AutoGain)
+
+	hi, lo := d.getHiLo()
+	gobottest.Assert(t, hi, uint16(tsl2561AgcTHi101MS))
+	gobottest.Assert(t, lo, uint16(tsl2561AgcTLo101MS))
+}
+
+func TestTSL2561getHiLo402MS(t *testing.T) {
+	adaptor := newI2cTestAdaptor()
+	d := NewTSL2561Driver(adaptor,
+		WithTSL2561IntegrationTime402MS,
+		WithTSL2561AutoGain)
+
+	hi, lo := d.getHiLo()
+	gobottest.Assert(t, hi, uint16(tsl2561AgcTHi402MS))
+	gobottest.Assert(t, lo, uint16(tsl2561AgcTLo402MS))
+}
+
+func TestTSL2561getClipScaling13MS(t *testing.T) {
+	adaptor := newI2cTestAdaptor()
+	d := NewTSL2561Driver(adaptor,
+		WithTSL2561IntegrationTime13MS,
+		WithTSL2561AutoGain)
+
+	c, s := d.getClipScaling()
+	gobottest.Assert(t, c, uint16(tsl2561Clipping13MS))
+	gobottest.Assert(t, s, uint32(tsl2561LuxCHScaleTInt0))
+}
+
+func TestTSL2561getClipScaling101MS(t *testing.T) {
+	adaptor := newI2cTestAdaptor()
+	d := NewTSL2561Driver(adaptor,
+		WithTSL2561IntegrationTime101MS,
+		WithTSL2561AutoGain)
+
+	c, s := d.getClipScaling()
+	gobottest.Assert(t, c, uint16(tsl2561Clipping101MS))
+	gobottest.Assert(t, s, uint32(tsl2561LuxChScaleTInt1))
+}
+
+func TestTSL2561getClipScaling402MS(t *testing.T) {
+	adaptor := newI2cTestAdaptor()
+	d := NewTSL2561Driver(adaptor,
+		WithTSL2561IntegrationTime402MS,
+		WithTSL2561AutoGain)
+
+	c, s := d.getClipScaling()
+	gobottest.Assert(t, c, uint16(tsl2561Clipping402MS))
+	gobottest.Assert(t, s, uint32(1<<tsl2561LuxChScale))
+}

@@ -309,19 +309,7 @@ func (d *TSL2561Driver) GetLuminocity() (broadband uint16, ir uint16, err error)
 	}
 
 	agcCheck := false
-	var hi, lo uint16
-
-	switch d.integrationTime {
-	case TSL2561IntegrationTime13MS:
-		hi = tsl2561AgcTHi13MS
-		lo = tsl2561AgcTLo13MS
-	case TSL2561IntegrationTime101MS:
-		hi = tsl2561AgcTLo101MS
-		lo = tsl2561AgcTHi101MS
-	case TSL2561IntegrationTime402MS:
-		hi = tsl2561AgcTHi402MS
-		lo = tsl2561AgcTLo402MS
-	}
+	hi, lo := d.getHiLo()
 
 	// Read data until we find a valid range
 	valid := false
@@ -370,23 +358,11 @@ func (d *TSL2561Driver) GetLuminocity() (broadband uint16, ir uint16, err error)
 // CalculateLux converts raw sensor values to the standard SI Lux equivalent.
 // Returns 65536 if the sensor is saturated.
 func (d *TSL2561Driver) CalculateLux(broadband uint16, ir uint16) (lux uint32) {
-	var chScale uint32
 	var channel1 uint32
 	var channel0 uint32
-	var clipThreshold uint16
 
 	// Set cliplevel and scaling based on integration time
-	switch d.integrationTime {
-	case TSL2561IntegrationTime13MS:
-		clipThreshold = tsl2561Clipping13MS
-		chScale = tsl2561LuxCHScaleTInt0
-	case TSL2561IntegrationTime101MS:
-		clipThreshold = tsl2561Clipping101MS
-		chScale = tsl2561LuxChScaleTInt1
-	case TSL2561IntegrationTime402MS:
-		clipThreshold = tsl2561Clipping402MS
-		chScale = (1 << tsl2561LuxChScale)
-	}
+	clipThreshold, chScale := d.getClipScaling()
 
 	// Saturated sensor
 	if (broadband > clipThreshold) || (ir > clipThreshold) {
@@ -410,34 +386,7 @@ func (d *TSL2561Driver) CalculateLux(broadband uint16, ir uint16) (lux uint32) {
 	// Round the ratio value
 	ratio := (ratio1 + 1) / 2
 
-	var b, m uint32
-	switch {
-	case (ratio >= 0) && (ratio <= tsl2561LuxK1T):
-		b = tsl2561LuxB1T
-		m = tsl2561LuxM1T
-	case (ratio <= tsl2561LuxK2T):
-		b = tsl2561LuxB2T
-		m = tsl2561LuxM2T
-	case (ratio <= tsl2561LuxK3T):
-		b = tsl2561LuxB3T
-		m = tsl2561LuxM3T
-	case (ratio <= tsl2561LuxK4T):
-		b = tsl2561LuxB4T
-		m = tsl2561LuxM4T
-	case (ratio <= tsl2561LuxK5T):
-		b = tsl2561LuxB5T
-		m = tsl2561LuxM5T
-	case (ratio <= tsl2561LuxK6T):
-		b = tsl2561LuxB6T
-		m = tsl2561LuxM6T
-	case (ratio <= tsl2561LuxK7T):
-		b = tsl2561LuxB7T
-		m = tsl2561LuxM7T
-	case (ratio > tsl2561LuxK8T):
-		b = tsl2561LuxB8T
-		m = tsl2561LuxM8T
-	}
-
+	b, m := d.getBM(ratio)
 	temp := (channel0 * b) - (channel1 * m)
 
 	// Negative lux not allowed
@@ -452,16 +401,6 @@ func (d *TSL2561Driver) CalculateLux(broadband uint16, ir uint16) (lux uint32) {
 	lux = temp >> tsl2561LuxLuxScale
 
 	return lux
-}
-
-func (d *TSL2561Driver) writeByteRegisters(regValPairs [][2]uint8) (err error) {
-	for _, rv := range regValPairs {
-		reg, val := rv[0], rv[1]
-		if err = d.connection.WriteByteData(reg, val); err != nil {
-			break
-		}
-	}
-	return err
 }
 
 func (d *TSL2561Driver) enable() (err error) {
@@ -503,5 +442,65 @@ func (d *TSL2561Driver) getData() (broadband uint16, ir uint16, err error) {
 
 	err = d.disable()
 
+	return
+}
+
+func (d *TSL2561Driver) getHiLo() (hi, lo uint16) {
+	switch d.integrationTime {
+	case TSL2561IntegrationTime13MS:
+		hi = tsl2561AgcTHi13MS
+		lo = tsl2561AgcTLo13MS
+	case TSL2561IntegrationTime101MS:
+		hi = tsl2561AgcTHi101MS
+		lo = tsl2561AgcTLo101MS
+	case TSL2561IntegrationTime402MS:
+		hi = tsl2561AgcTHi402MS
+		lo = tsl2561AgcTLo402MS
+	}
+	return
+}
+
+func (d *TSL2561Driver) getClipScaling() (clipThreshold uint16, chScale uint32) {
+	switch d.integrationTime {
+	case TSL2561IntegrationTime13MS:
+		clipThreshold = tsl2561Clipping13MS
+		chScale = tsl2561LuxCHScaleTInt0
+	case TSL2561IntegrationTime101MS:
+		clipThreshold = tsl2561Clipping101MS
+		chScale = tsl2561LuxChScaleTInt1
+	case TSL2561IntegrationTime402MS:
+		clipThreshold = tsl2561Clipping402MS
+		chScale = (1 << tsl2561LuxChScale)
+	}
+	return
+}
+
+func (d *TSL2561Driver) getBM(ratio uint32) (b uint32, m uint32) {
+	switch {
+	case (ratio >= 0) && (ratio <= tsl2561LuxK1T):
+		b = tsl2561LuxB1T
+		m = tsl2561LuxM1T
+	case (ratio <= tsl2561LuxK2T):
+		b = tsl2561LuxB2T
+		m = tsl2561LuxM2T
+	case (ratio <= tsl2561LuxK3T):
+		b = tsl2561LuxB3T
+		m = tsl2561LuxM3T
+	case (ratio <= tsl2561LuxK4T):
+		b = tsl2561LuxB4T
+		m = tsl2561LuxM4T
+	case (ratio <= tsl2561LuxK5T):
+		b = tsl2561LuxB5T
+		m = tsl2561LuxM5T
+	case (ratio <= tsl2561LuxK6T):
+		b = tsl2561LuxB6T
+		m = tsl2561LuxM6T
+	case (ratio <= tsl2561LuxK7T):
+		b = tsl2561LuxB7T
+		m = tsl2561LuxM7T
+	case (ratio > tsl2561LuxK8T):
+		b = tsl2561LuxB8T
+		m = tsl2561LuxM8T
+	}
 	return
 }
