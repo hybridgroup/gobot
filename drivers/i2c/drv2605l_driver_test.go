@@ -38,7 +38,15 @@ func TestDRV2605LDriverStart(t *testing.T) {
 	gobottest.Assert(t, d.Start(), nil)
 }
 
-func TestDRVD2605riverStartReadError(t *testing.T) {
+func TestDRVD2605DriverStartWriteError(t *testing.T) {
+	d, a := initTestDriverAndAdaptor()
+	a.i2cWriteImpl = func(b []byte) (int, error) {
+		return 0, errors.New("write error")
+	}
+	gobottest.Assert(t, d.Start(), errors.New("write error"))
+}
+
+func TestDRVD2605DriverStartReadError(t *testing.T) {
 	d, a := initTestDriverAndAdaptor()
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		return 0, errors.New("read error")
@@ -52,6 +60,15 @@ func TestDRV2605LDriverHalt(t *testing.T) {
 	adaptor.written = []byte{}
 	gobottest.Assert(t, d.Halt(), nil)
 	gobottest.Assert(t, adaptor.written, []byte{drv2605RegGo, 0, drv2605RegMode, 42 | drv2605Standby})
+}
+
+func TestDRVD2605DriverHaltWriteError(t *testing.T) {
+	d, a := initTestDriverAndAdaptor()
+	d.Start()
+	a.i2cWriteImpl = func(b []byte) (int, error) {
+		return 0, errors.New("write error")
+	}
+	gobottest.Assert(t, d.Halt(), errors.New("write error"))
 }
 
 func TestDRV2605LDriverGetPause(t *testing.T) {
@@ -122,6 +139,16 @@ func TestDRV2605LDriverSetStandbyMode(t *testing.T) {
 	d, _ := initTestDriverAndAdaptor()
 	d.Start()
 	gobottest.Assert(t, d.SetStandbyMode(true), nil)
+}
+
+func TestDRV2605LDriverSetStandbyModeReadError(t *testing.T) {
+	d, a := initTestDriverAndAdaptor()
+	d.Start()
+
+	a.i2cReadImpl = func(b []byte) (int, error) {
+		return 0, errors.New("read error")
+	}
+	gobottest.Assert(t, d.SetStandbyMode(true), errors.New("read error"))
 }
 
 func TestDRV2605LDriverSelectLibrary(t *testing.T) {
