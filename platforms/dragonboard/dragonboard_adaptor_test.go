@@ -74,3 +74,14 @@ func TestDragonBoardAdaptorI2c(t *testing.T) {
 
 	gobottest.Assert(t, a.Finalize(), nil)
 }
+
+func TestDragonBoardDefaultBus(t *testing.T) {
+	a := initTestDragonBoardAdaptor(t)
+	gobottest.Assert(t, a.GetDefaultBus(), 0)
+}
+
+func TestDragonBoardGetConnectionInvalidBus(t *testing.T) {
+	a := initTestDragonBoardAdaptor(t)
+	_, err := a.GetConnection(0x01, 99)
+	gobottest.Assert(t, err, errors.New("Bus number 99 out of range"))
+}
