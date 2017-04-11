@@ -101,6 +101,10 @@ func TestBeagleboneAdaptor(t *testing.T) {
 		"1",
 	)
 
+	// no such LED
+	err = a.DigitalWrite("usr10101", 1)
+	gobottest.Refute(t, err, nil)
+
 	a.DigitalWrite("P9_12", 1)
 	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio60/value"].Contents, "1")
 
@@ -129,4 +133,20 @@ func TestBeagleboneAdaptorName(t *testing.T) {
 	gobottest.Assert(t, strings.HasPrefix(a.Name(), "Beaglebone"), true)
 	a.SetName("NewName")
 	gobottest.Assert(t, a.Name(), "NewName")
+}
+
+func TestBeagleboneAdaptorKernel(t *testing.T) {
+	a := NewAdaptor()
+	gobottest.Refute(t, a.Kernel(), nil)
+}
+
+func TestBeagleboneDefaultBus(t *testing.T) {
+	a := NewAdaptor()
+	gobottest.Assert(t, a.GetDefaultBus(), 2)
+}
+
+func TestBeagleboneGetConnectionInvalidBus(t *testing.T) {
+	a := NewAdaptor()
+	_, err := a.GetConnection(0x01, 99)
+	gobottest.Assert(t, err, errors.New("Bus number 99 out of range"))
 }
