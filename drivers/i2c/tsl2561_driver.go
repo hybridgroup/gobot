@@ -160,9 +160,9 @@ func WithTSL2561Gain1X(c Config) {
 	d, ok := c.(*TSL2561Driver)
 	if ok {
 		d.gain = TSL2561Gain1X
-	} else {
-		panic("Trying to set Gain for non-TSL2561Driver")
+		return
 	}
+	// TODO: return errors.New("Trying to set Gain for non-TSL2561Driver")
 }
 
 // WithTSL2561Gain16X option sets the TSL2561Driver gain to 16X
@@ -170,9 +170,9 @@ func WithTSL2561Gain16X(c Config) {
 	d, ok := c.(*TSL2561Driver)
 	if ok {
 		d.gain = TSL2561Gain16X
-	} else {
-		panic("Trying to set Gain for non-TSL2561Driver")
+		return
 	}
+	// TODO: return errors.New("Trying to set Gain for non-TSL2561Driver")
 }
 
 // WithTSL2561AutoGain option turns on TSL2561Driver auto gain
@@ -180,9 +180,9 @@ func WithTSL2561AutoGain(c Config) {
 	d, ok := c.(*TSL2561Driver)
 	if ok {
 		d.autoGain = true
-	} else {
-		panic("Trying to set Auto Gain for non-TSL2561Driver")
+		return
 	}
+	// TODO: return errors.New("Trying to set Auto Gain for non-TSL2561Driver")
 }
 
 func withTSL2561IntegrationTime(iTime TSL2561IntegrationTime) func(Config) {
@@ -190,9 +190,9 @@ func withTSL2561IntegrationTime(iTime TSL2561IntegrationTime) func(Config) {
 		d, ok := c.(*TSL2561Driver)
 		if ok {
 			d.integrationTime = iTime
-		} else {
-			panic("Trying to set integration time for non-TSL2561Driver")
+			return
 		}
+		// TODO: return errors.New("Trying to set integration time for non-TSL2561Driver")
 	}
 }
 

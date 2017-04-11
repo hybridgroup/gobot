@@ -31,6 +31,7 @@ func TestTSL2561DriverStart(t *testing.T) {
 	adaptor.i2cReadImpl = idReader
 	gobottest.Assert(t, strings.HasPrefix(d.Name(), "TSL2561"), true)
 	gobottest.Assert(t, d.Start(), nil)
+	gobottest.Refute(t, d.Connection(), nil)
 }
 
 func TestTSL2561DriverStartError(t *testing.T) {
@@ -101,14 +102,14 @@ func TestTSL2561DriverEvenMoreOptions(t *testing.T) {
 	adaptor := newI2cTestAdaptor()
 
 	device := NewTSL2561Driver(adaptor,
-		WithTSL2561IntegrationTime101MS,
+		WithTSL2561IntegrationTime13MS,
 		WithAddress(TSL2561AddressLow),
 		WithTSL2561Gain1X)
 
 	gobottest.Refute(t, device, nil)
 	gobottest.Assert(t, device.autoGain, false)
 	gobottest.Assert(t, device.gain, TSL2561Gain(TSL2561Gain1X))
-	gobottest.Assert(t, device.integrationTime, TSL2561IntegrationTime101MS)
+	gobottest.Assert(t, device.integrationTime, TSL2561IntegrationTime13MS)
 }
 
 func TestTSL2561DriverYetEvenMoreOptions(t *testing.T) {
