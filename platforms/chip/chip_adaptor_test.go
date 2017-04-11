@@ -115,3 +115,14 @@ func TestChipAdaptorPWM(t *testing.T) {
 
 	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/pwm0/duty_cycle"].Contents, "2000000")
 }
+
+func TestChipDefaultBus(t *testing.T) {
+	a := initTestChipAdaptor()
+	gobottest.Assert(t, a.GetDefaultBus(), 1)
+}
+
+func TestChipGetConnectionInvalidBus(t *testing.T) {
+	a := initTestChipAdaptor()
+	_, err := a.GetConnection(0x01, 99)
+	gobottest.Assert(t, err, errors.New("Bus number 99 out of range"))
+}
