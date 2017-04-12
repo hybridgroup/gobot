@@ -1,3 +1,98 @@
+1.4.0
+---
+* **core**
+  * Use 10-buffered chans for events, see #374
+* **i2c**
+  * Many refactors and increases in test coverage
+  * Eliminate race conditions introduced by tests
+  * Adds Altitude() function to BMP280/BME280
+  * bme280 driver Humidity compensation formula
+  * ssd1306 driver implementation
+* **aio**
+  * Eliminate race conditions introduced by tests
+* **gpio**
+  * Fix motor mode change when speed is set
+  * Eliminate race conditions introduced by tests
+  * Reduce test side effects
+* **ardrone**
+  * Increase test coverage
+* **audio**
+  * Increase test coverage
+* **bb8**
+  * Refactoring to use BLEConnector interface and provide tests
+* **bebop**
+  * Increase test coverage
+* **beaglebone**
+  * Increase test coverage
+* **ble**
+  * Increase test coverage for battery, device information, and generic access drivers
+  * Refactoring drivers to use BLEConnector interface and provide tests
+* **chip**
+  * Added PWM0 support
+  * Increase test coverage
+* **digispark**
+  * Increase test coverage
+* **dragonboard**
+  * Increase test coverage
+* **edison**
+  * Remove pointless error checking code
+  * Refactor digital pin creation process method
+  * Increase test coverage
+* **firmata**
+  * Eliminate race conditions introduced by tests
+  * Increase test coverage for i2c commands
+* **joule**
+  * Increase test coverage
+* **joystick**
+  * Increase test coverage
+* **keyboard**
+  * Increase test coverage
+* **mavlink**
+  * Eliminate race conditions introduced by tests
+  * Increase test coverage
+* **mavlink**
+  * Increase test coverage
+* **microbit**
+  * Refactoring to use BLEConnector interface and provide tests
+  * Address #404 by adding info about required magnetometer calibration step to README
+  * Increase test coverage
+* **minidrone**
+  * Refactoring to use BLEConnector interface and provide tests
+* **mqtt**
+  * Increase test coverage
+* **nats**
+  * Increase test coverage
+* **neurosky**
+  * Update neurosky README & example
+  * Eliminate race conditions introduced by tests
+  * Increase test coverage
+* **ollie**
+  * Refactoring to use BLEConnector interface and provide tests
+  * Correct race condition error on seq
+  * Increase test coverage
+* **opencv**
+  * Increase test coverage
+* **particle**
+  * Increase test coverage
+* **raspi**
+  * Address #391 by providing more details about normal development workflow
+  * Increase test coverage
+* **sphero**
+  * Eliminate race conditions
+  * Increase test coverage
+* **sysfs**
+  * Address race condition from udev rules when exporting GPIO pins
+  * Increase test coverage
+* **docs**
+  * Improve explanations for scp/ssh workflow on SoC boards
+  * Include entire Apache 2.0 license in the license text
+* **test**
+  * Add crude travis check for gofmt; format all sources
+  * Significantly speed up travis and make runs
+  * Remove test code no longer being called
+  * Update Travis to run tests using Golang 1.8.1
+  * Increase gobottest test coverage
+
 1.3.0
 ---
 * **microbit**
