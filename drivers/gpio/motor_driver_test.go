@@ -115,6 +115,7 @@ func TestMotorDriverDirection(t *testing.T) {
 
 func TestMotorDriverDigital(t *testing.T) {
 	d := initTestMotorDriver()
+	d.SpeedPin = "" // Disable speed
 	d.CurrentMode = "digital"
 	d.ForwardPin = "2"
 	d.BackwardPin = "3"
