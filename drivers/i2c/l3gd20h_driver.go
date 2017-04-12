@@ -102,29 +102,6 @@ func (d *L3GD20HDriver) Start() (err error) {
 	return nil
 }
 
-func (d *L3GD20HDriver) initialization() (err error) {
-	bus := d.GetBusOrDefault(d.connector.GetDefaultBus())
-	address := d.GetAddressOrDefault(l3gd20hAddress)
-
-	d.connection, err = d.connector.GetConnection(address, bus)
-	if err != nil {
-		return err
-	}
-	// reset the gyroscope.
-	if _, err := d.connection.Write([]byte{l3gd20hRegisterCtl1, 0x00}); err != nil {
-		return err
-	}
-	// Enable Z, Y and X axis.
-	if _, err := d.connection.Write([]byte{l3gd20hRegisterCtl1, l3gd20hNormalMode | l3gd20hEnableZ | l3gd20hEnableY | l3gd20hEnableX}); err != nil {
-		return err
-	}
-	// Set the sensitivity scale.
-	if _, err := d.connection.Write([]byte{l3gd20hRegisterCtl4, byte(d.scale)}); err != nil {
-		return err
-	}
-	return nil
-}
-
 // Halt halts the device.
 func (d *L3GD20HDriver) Halt() (err error) {
 	return nil
@@ -149,15 +126,42 @@ func (d *L3GD20HDriver) XYZ() (x float32, y float32, z float32, err error) {
 	binary.Read(buf, binary.LittleEndian, &rawZ)
 
 	// Sensitivity values from the mechanical characteristics in the datasheet.
-	var sensitivity float32
-	switch d.scale {
-	case L3GD20HScale250dps:
-		sensitivity = 0.00875
-	case L3GD20HScale500dps:
-		sensitivity = 0.0175
-	case L3GD20HScale2000dps:
-		sensitivity = 0.07
-	}
+	sensitivity := d.getSensitivity()
 
 	return float32(rawX) * sensitivity, float32(rawY) * sensitivity, float32(rawZ) * sensitivity, nil
+}
+
+func (d *L3GD20HDriver) initialization() (err error) {
+	bus := d.GetBusOrDefault(d.connector.GetDefaultBus())
+	address := d.GetAddressOrDefault(l3gd20hAddress)
+
+	d.connection, err = d.connector.GetConnection(address, bus)
+	if err != nil {
+		return err
+	}
+	// reset the gyroscope.
+	if _, err := d.connection.Write([]byte{l3gd20hRegisterCtl1, 0x00}); err != nil {
+		return err
+	}
+	// Enable Z, Y and X axis.
+	if _, err := d.connection.Write([]byte{l3gd20hRegisterCtl1, l3gd20hNormalMode | l3gd20hEnableZ | l3gd20hEnableY | l3gd20hEnableX}); err != nil {
+		return err
+	}
+	// Set the sensitivity scale.
+	if _, err := d.connection.Write([]byte{l3gd20hRegisterCtl4, byte(d.scale)}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d *L3GD20HDriver) getSensitivity() float32 {
+	switch d.scale {
+	case L3GD20HScale250dps:
+		return 0.00875
+	case L3GD20HScale500dps:
+		return 0.0175
+	case L3GD20HScale2000dps:
+		return 0.07
+	}
+	return 0
 }

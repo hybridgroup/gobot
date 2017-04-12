@@ -69,9 +69,15 @@ func TestL3GD20HDriverHalt(t *testing.T) {
 func TestL3GD20HDriverScale(t *testing.T) {
 	d := initTestL3GD20HDriver()
 	gobottest.Assert(t, d.Scale(), L3GD20HScale250dps)
+	gobottest.Assert(t, d.getSensitivity(), float32(0.00875))
 
 	d.SetScale(L3GD20HScale500dps)
 	gobottest.Assert(t, d.Scale(), L3GD20HScale500dps)
+	gobottest.Assert(t, d.getSensitivity(), float32(0.0175))
+
+	d.SetScale(L3GD20HScale2000dps)
+	gobottest.Assert(t, d.Scale(), L3GD20HScale2000dps)
+	gobottest.Assert(t, d.getSensitivity(), float32(0.07))
 }
 
 func TestL3GD20HDriverMeasurement(t *testing.T) {
