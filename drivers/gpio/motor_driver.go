@@ -182,12 +182,12 @@ func (m *MotorDriver) isDigital() bool {
 func (m *MotorDriver) changeState(state byte) (err error) {
 	m.CurrentState = state
 	if state == 1 {
-		m.CurrentSpeed = 0
-	} else {
 		m.CurrentSpeed = 255
+	} else {
+		m.CurrentSpeed = 0
 	}
 	if m.ForwardPin != "" {
-		if state == 0 {
+		if state == 1 {
 			err = m.Direction(m.CurrentDirection)
 			if err != nil {
 				return
