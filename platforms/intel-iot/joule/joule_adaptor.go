@@ -111,7 +111,6 @@ func (e *Adaptor) digitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPin,
 	if e.digitalPins[i.pin] == nil {
 		e.digitalPins[i.pin] = sysfs.NewDigitalPin(i.pin)
 		if err = e.digitalPins[i.pin].Export(); err != nil {
-			// TODO: log error
 			return
 		}
 	}

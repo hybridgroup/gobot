@@ -148,6 +148,8 @@ func TestAdaptorI2c(t *testing.T) {
 	data := []byte{42, 42}
 	con.Read(data)
 	gobottest.Assert(t, data, []byte{0x00, 0x01})
+
+	gobottest.Assert(t, a.Finalize(), nil)
 }
 
 func TestAdaptorPwm(t *testing.T) {
