@@ -9,12 +9,16 @@ go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/micro
 
 You must install the Microbit firmware from [@sandeepmistry] located at  [https://github.com/sandeepmistry/node-bbc-microbit](https://github.com/sandeepmistry/node-bbc-microbit) to use the Microbit with Gobot. This firmware is based on the micro:bit template, but with a few changes.
 
-If you have the [Gort](https://gort.io) command line tool installed, you can use the following commands:
+If you have the [Gort](https://gort.io) command line tool installed, you can install the firmware using the following commands:
 
 ```
 gort microbit download
 gort microbit install /media/mysystem/MICROBIT
 ```
+
+Substitute the proper location to your Microbit for `/media/mysystem/MICROBIT` in the previous command.
+
+Once the firmware is installed, make sure your rotate your Microbit in a circle to calibrate the magnetometer before your try to connect to it using Gobot, or it will not respond.
 
 You can also follow the firmware installation instructions at [https://github.com/sandeepmistry/node-bbc-microbit#flashing-microbit-firmware](https://github.com/sandeepmistry/node-bbc-microbit#flashing-microbit-firmware).
 
