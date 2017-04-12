@@ -2,9 +2,9 @@
 
 The [DragonBoard 410c](http://www.96boards.org/product/dragonboard410c/), a product of Arrow Electronics, is the development board based on the mid-tier Qualcomm® Snapdragon™ 410E processor. It features advanced processing power, Wi-Fi, Bluetooth connectivity, and GPS, all packed into a board the size of a credit card.
 
-Make sure you are using the latest Linaro Debian image. Both AArch32 and AArch64 work™ though you should stick to 64bit as OS internals may be different and aren't tested.
-
 ## How to Install
+
+Make sure you are using the latest Linaro Debian image. Both AArch32 and AArch64 work™ though you should stick to 64bit as OS internals may be different and aren't tested.
 
 You would normally install Go and Gobot on your workstation. Once installed, cross compile your program on your workstation, transfer the final executable to your DragonBoard and run the program on the DragonBoard itself as documented here.
 

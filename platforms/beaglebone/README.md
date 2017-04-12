@@ -4,12 +4,12 @@ The BeagleBone is an ARM based single board computer, with lots of GPIO, I2C, an
 
 The Gobot adaptor for the BeagleBone should support all of the various BeagleBone boards such as the BeagleBone Black, SeeedStudio BeagleBone Green, SeeedStudio BeagleBone Green Wireless, and others that use the latest Debian and standard "Cape Manager" interfaces.
 
-We recommend updating to the latest Debian Jessie OS when using the BeagleBone, however Gobot should also support older versions of the OS, should your application require this.
-
 For more info about the BeagleBone platform go to  [http://beagleboard.org/getting-started](http://beagleboard.org/getting-started).
 
 
 ## How to Install
+
+We recommend updating to the latest Debian Jessie OS when using the BeagleBone, however Gobot should also support older versions of the OS, should your application require this.
 
 You would normally install Go and Gobot on your workstation. Once installed, cross compile your program on your workstation, transfer the final executable to your BeagleBone, and run the program on the BeagleBone itself as documented here.
 

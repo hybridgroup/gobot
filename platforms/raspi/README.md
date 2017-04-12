@@ -4,11 +4,11 @@ The Raspberry Pi is an inexpensive and popular ARM based single board computer w
 
 The Gobot adaptor for the Raspberry Pi should support all of the various Raspberry Pi boards such as the Raspberry Pi 3 Model B, Raspberry Pi 2 Model B, Raspberry Pi 1 Model A+, Raspberry Pi Zero, and Raspberry Pi Zero W.
 
-We recommend updating to the latest Raspian Jessie OS when using the Raspberry Pi, however Gobot should also support older versions of the OS, should your application require this.
-
 For more info about the Raspberry Pi platform, click [here](http://www.raspberrypi.org/).
 
 ## How to Install
+
+We recommend updating to the latest Raspian Jessie OS when using the Raspberry Pi, however Gobot should also support older versions of the OS, should your application require this.
 
 You would normally install Go and Gobot on your workstation. Once installed, cross compile your program on your workstation, transfer the final executable to your Raspberry Pi, and run the program on the Raspberry Pi as documented here.
 
