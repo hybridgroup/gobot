@@ -129,9 +129,11 @@ func (w *WiichuckDriver) Halt() (err error) { return }
 
 // Joystick returns the current value for the joystick
 func (w *WiichuckDriver) Joystick() map[string]float64 {
+	val := make(map[string]float64)
 	w.mtx.Lock()
 	defer w.mtx.Unlock()
-	val := w.joystick
+	val["sx_origin"] = w.joystick["sx_origin"]
+	val["sy_origin"] = w.joystick["sy_origin"]
 	return val
 }
 
