@@ -242,6 +242,7 @@ func TestTSL2561getClipScaling13MS(t *testing.T) {
 		WithTSL2561AutoGain)
 
 	c, s := d.getClipScaling()
+	d.waitForADC()
 	gobottest.Assert(t, c, uint16(tsl2561Clipping13MS))
 	gobottest.Assert(t, s, uint32(tsl2561LuxCHScaleTInt0))
 }
@@ -253,6 +254,7 @@ func TestTSL2561getClipScaling101MS(t *testing.T) {
 		WithTSL2561AutoGain)
 
 	c, s := d.getClipScaling()
+	d.waitForADC()
 	gobottest.Assert(t, c, uint16(tsl2561Clipping101MS))
 	gobottest.Assert(t, s, uint32(tsl2561LuxChScaleTInt1))
 }
@@ -264,6 +266,7 @@ func TestTSL2561getClipScaling402MS(t *testing.T) {
 		WithTSL2561AutoGain)
 
 	c, s := d.getClipScaling()
+	d.waitForADC()
 	gobottest.Assert(t, c, uint16(tsl2561Clipping402MS))
 	gobottest.Assert(t, s, uint32(1<<tsl2561LuxChScale))
 }

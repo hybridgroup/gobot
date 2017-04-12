@@ -418,15 +418,7 @@ func (d *TSL2561Driver) getData() (broadband uint16, ir uint16, err error) {
 		return
 	}
 
-	// Wait x ms for ADC to complete
-	switch d.integrationTime {
-	case TSL2561IntegrationTime13MS:
-		time.Sleep(15 * time.Millisecond)
-	case TSL2561IntegrationTime101MS:
-		time.Sleep(120 * time.Millisecond)
-	case TSL2561IntegrationTime402MS:
-		time.Sleep(450 * time.Millisecond)
-	}
+	d.waitForADC()
 
 	// Reads a two byte value from channel 0 (visible + infrared)
 	broadband, err = d.connection.ReadWordData(tsl2561CommandBit | tsl2561WordBit | tsl2561RegisterChan0Low)
@@ -501,6 +493,18 @@ func (d *TSL2561Driver) getBM(ratio uint32) (b uint32, m uint32) {
 	case (ratio > tsl2561LuxK8T): // TODO: there is a gap here...
 		b = tsl2561LuxB8T
 		m = tsl2561LuxM8T
+	}
+	return
+}
+
+func (d *TSL2561Driver) waitForADC() {
+	switch d.integrationTime {
+	case TSL2561IntegrationTime13MS:
+		time.Sleep(15 * time.Millisecond)
+	case TSL2561IntegrationTime101MS:
+		time.Sleep(120 * time.Millisecond)
+	case TSL2561IntegrationTime402MS:
+		time.Sleep(450 * time.Millisecond)
 	}
 	return
 }
