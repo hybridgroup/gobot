@@ -48,6 +48,17 @@ func TestTSL2561DriverStartError(t *testing.T) {
 	gobottest.Assert(t, d.Start(), errors.New("write error"))
 }
 
+func TestTSL2561DriverStartNotFound(t *testing.T) {
+	d, adaptor := initTestTSL2561Driver()
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		buf := new(bytes.Buffer)
+		buf.Write([]byte{1})
+		copy(b, buf.Bytes())
+		return buf.Len(), nil
+	}
+	gobottest.Assert(t, d.Start(), errors.New("TSL2561 device not found (0x1)"))
+}
+
 func TestTSL2561DriverHalt(t *testing.T) {
 	d, adaptor := initTestTSL2561Driver()
 	adaptor.i2cReadImpl = idReader
