@@ -34,6 +34,12 @@ func TestTSL2561DriverStart(t *testing.T) {
 	gobottest.Refute(t, d.Connection(), nil)
 }
 
+func TestTSL2561StartConnectError(t *testing.T) {
+	d, adaptor := initTestTSL2561Driver()
+	adaptor.Testi2cConnectErr(true)
+	gobottest.Assert(t, d.Start(), errors.New("Invalid i2c connection"))
+}
+
 func TestTSL2561DriverStartError(t *testing.T) {
 	d, adaptor := initTestTSL2561Driver()
 	adaptor.i2cWriteImpl = func([]byte) (int, error) {

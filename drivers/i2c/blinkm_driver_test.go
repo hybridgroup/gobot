@@ -112,6 +112,12 @@ func TestBlinkMDriverStart(t *testing.T) {
 	gobottest.Assert(t, blinkM.Start(), errors.New("write error"))
 }
 
+func TestBlinkMDriverStartConnectError(t *testing.T) {
+	d, adaptor := initTestBlinkDriverWithStubbedAdaptor()
+	adaptor.Testi2cConnectErr(true)
+	gobottest.Assert(t, d.Start(), errors.New("Invalid i2c connection"))
+}
+
 func TestBlinkMDriverHalt(t *testing.T) {
 	blinkM := initTestBlinkMDriver()
 	gobottest.Assert(t, blinkM.Halt(), nil)

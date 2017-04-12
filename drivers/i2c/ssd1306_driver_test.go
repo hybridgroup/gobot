@@ -1,6 +1,7 @@
 package i2c
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"strings"
@@ -71,14 +72,18 @@ func TestNewSSD1306Driver(t *testing.T) {
 
 // Methods
 
-// Test Start
 func TestSSD1306DriverStart(t *testing.T) {
 	s, _ := initTestSSD1306DriverWithStubbedAdaptor()
 
 	gobottest.Assert(t, s.Start(), nil)
 }
 
-// Test Halt
+func TestSSD1306StartConnectError(t *testing.T) {
+	d, adaptor := initTestSSD1306DriverWithStubbedAdaptor()
+	adaptor.Testi2cConnectErr(true)
+	gobottest.Assert(t, d.Start(), errors.New("Invalid i2c connection"))
+}
+
 func TestSSD1306DriverHalt(t *testing.T) {
 	s := initTestSSD1306Driver()
 

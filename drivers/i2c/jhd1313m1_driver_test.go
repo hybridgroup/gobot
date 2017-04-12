@@ -57,6 +57,12 @@ func TestJHD1313MDriverStart(t *testing.T) {
 	gobottest.Assert(t, d.Start(), nil)
 }
 
+func TestJHD1313MStartConnectError(t *testing.T) {
+	d, adaptor := initTestJHD1313M1DriverWithStubbedAdaptor()
+	adaptor.Testi2cConnectErr(true)
+	gobottest.Assert(t, d.Start(), errors.New("Invalid i2c connection"))
+}
+
 func TestJHD1313MDriverStartWriteError(t *testing.T) {
 	d, adaptor := initTestJHD1313M1DriverWithStubbedAdaptor()
 	adaptor.i2cWriteImpl = func([]byte) (int, error) {

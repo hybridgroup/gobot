@@ -48,6 +48,12 @@ func TestHMC6352DriverStart(t *testing.T) {
 	gobottest.Assert(t, err, errors.New("write error"))
 }
 
+func TestHMC6352StartConnectError(t *testing.T) {
+	d, adaptor := initTestHMC6352DriverWithStubbedAdaptor()
+	adaptor.Testi2cConnectErr(true)
+	gobottest.Assert(t, d.Start(), errors.New("Invalid i2c connection"))
+}
+
 func TestHMC6352DriverHalt(t *testing.T) {
 	hmc := initTestHMC6352Driver()
 

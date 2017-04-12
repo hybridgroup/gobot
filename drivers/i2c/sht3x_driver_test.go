@@ -38,14 +38,18 @@ func TestNewSHT3xDriver(t *testing.T) {
 
 // Methods
 
-// Test Start
 func TestSHT3xDriverStart(t *testing.T) {
 	sht3x, _ := initTestSHT3xDriverWithStubbedAdaptor()
 
 	gobottest.Assert(t, sht3x.Start(), nil)
 }
 
-// Test Halt
+func TestSHT3xStartConnectError(t *testing.T) {
+	d, adaptor := initTestSHT3xDriverWithStubbedAdaptor()
+	adaptor.Testi2cConnectErr(true)
+	gobottest.Assert(t, d.Start(), errors.New("Invalid i2c connection"))
+}
+
 func TestSHT3xDriverHalt(t *testing.T) {
 	sht3x := initTestSHT3xDriver()
 

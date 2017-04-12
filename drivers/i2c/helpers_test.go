@@ -1,6 +1,7 @@
 package i2c
 
 import (
+	"errors"
 	"fmt"
 	"sync"
 )
@@ -20,11 +21,18 @@ var green = castColor("green")
 var blue = castColor("blue")
 
 type i2cTestAdaptor struct {
-	name         string
-	written      []byte
-	mtx          sync.Mutex
-	i2cReadImpl  func([]byte) (int, error)
-	i2cWriteImpl func([]byte) (int, error)
+	name          string
+	written       []byte
+	mtx           sync.Mutex
+	i2cConnectErr bool
+	i2cReadImpl   func([]byte) (int, error)
+	i2cWriteImpl  func([]byte) (int, error)
+}
+
+func (t *i2cTestAdaptor) Testi2cConnectErr(val bool) {
+	t.mtx.Lock()
+	defer t.mtx.Unlock()
+	t.i2cConnectErr = val
 }
 
 func (t *i2cTestAdaptor) Testi2cReadImpl(f func([]byte) (int, error)) {
@@ -152,6 +160,9 @@ func (t *i2cTestAdaptor) WriteBlockData(reg uint8, b []byte) (err error) {
 }
 
 func (t *i2cTestAdaptor) GetConnection( /* address */ int /* bus */, int) (connection Connection, err error) {
+	if t.i2cConnectErr {
+		return nil, errors.New("Invalid i2c connection")
+	}
 	return t, nil
 }
 
@@ -166,6 +177,7 @@ func (t *i2cTestAdaptor) Finalize() (err error) { return }
 
 func newI2cTestAdaptor() *i2cTestAdaptor {
 	return &i2cTestAdaptor{
+		i2cConnectErr: false,
 		i2cReadImpl: func([]byte) (int, error) {
 			return 0, nil
 		},

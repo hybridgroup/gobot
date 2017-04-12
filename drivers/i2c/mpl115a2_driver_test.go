@@ -58,6 +58,12 @@ func TestMPL115A2DriverStart(t *testing.T) {
 	gobottest.Assert(t, mpl.Start(), nil)
 }
 
+func TestMPL115A2StartConnectError(t *testing.T) {
+	d, adaptor := initTestMPL115A2DriverWithStubbedAdaptor()
+	adaptor.Testi2cConnectErr(true)
+	gobottest.Assert(t, d.Start(), errors.New("Invalid i2c connection"))
+}
+
 func TestMPL115A2DriverStartWriteError(t *testing.T) {
 	mpl, adaptor := initTestMPL115A2DriverWithStubbedAdaptor()
 	adaptor.i2cWriteImpl = func([]byte) (int, error) {

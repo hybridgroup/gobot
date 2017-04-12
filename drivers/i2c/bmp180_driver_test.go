@@ -44,6 +44,12 @@ func TestBMP180DriverStart(t *testing.T) {
 	gobottest.Assert(t, bmp180.Start(), nil)
 }
 
+func TestBMP180StartConnectError(t *testing.T) {
+	d, adaptor := initTestBMP180DriverWithStubbedAdaptor()
+	adaptor.Testi2cConnectErr(true)
+	gobottest.Assert(t, d.Start(), errors.New("Invalid i2c connection"))
+}
+
 func TestBMP180DriverStartWriteError(t *testing.T) {
 	bmp180, adaptor := initTestBMP180DriverWithStubbedAdaptor()
 	adaptor.i2cWriteImpl = func([]byte) (int, error) {

@@ -38,6 +38,12 @@ func TestDRV2605LDriverStart(t *testing.T) {
 	gobottest.Assert(t, d.Start(), nil)
 }
 
+func TestDRV2605LStartConnectError(t *testing.T) {
+	d, adaptor := initTestDriverAndAdaptor()
+	adaptor.Testi2cConnectErr(true)
+	gobottest.Assert(t, d.Start(), errors.New("Invalid i2c connection"))
+}
+
 func TestDRVD2605DriverStartWriteError(t *testing.T) {
 	d, a := initTestDriverAndAdaptor()
 	a.i2cWriteImpl = func(b []byte) (int, error) {

@@ -43,6 +43,12 @@ func TestLIDARLiteDriverStart(t *testing.T) {
 	gobottest.Assert(t, hmc.Start(), nil)
 }
 
+func TestLIDARLiteStartConnectError(t *testing.T) {
+	d, adaptor := initTestLIDARLiteDriverWithStubbedAdaptor()
+	adaptor.Testi2cConnectErr(true)
+	gobottest.Assert(t, d.Start(), errors.New("Invalid i2c connection"))
+}
+
 func TestLIDARLiteDriverHalt(t *testing.T) {
 	hmc := initTestLIDARLiteDriver()
 

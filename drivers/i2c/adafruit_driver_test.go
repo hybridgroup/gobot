@@ -57,6 +57,12 @@ func TestAdafruitMotorHatDriverStartReadError(t *testing.T) {
 	gobottest.Assert(t, d.Start(), errors.New("read error"))
 }
 
+func TestAdafruitMotorHatDriverStartConnectError(t *testing.T) {
+	d, adaptor := initTestAdafruitMotorHatDriverWithStubbedAdaptor()
+	adaptor.Testi2cConnectErr(true)
+	gobottest.Assert(t, d.Start(), errors.New("Invalid i2c connection"))
+}
+
 func TestAdafruitMotorHatDriverHalt(t *testing.T) {
 	ada, _ := initTestAdafruitMotorHatDriverWithStubbedAdaptor()
 

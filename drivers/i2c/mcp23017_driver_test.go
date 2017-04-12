@@ -92,6 +92,12 @@ func TestMCP23017DriverStart(t *testing.T) {
 	gobottest.Assert(t, err, errors.New("write error"))
 }
 
+func TestMCP23017StartConnectError(t *testing.T) {
+	d, adaptor := initTestMCP23017DriverWithStubbedAdaptor(0)
+	adaptor.Testi2cConnectErr(true)
+	gobottest.Assert(t, d.Start(), errors.New("Invalid i2c connection"))
+}
+
 func TestMCP23017DriverHalt(t *testing.T) {
 	mcp := initTestMCP23017Driver(0)
 	gobottest.Assert(t, mcp.Halt(), nil)

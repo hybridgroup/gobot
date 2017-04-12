@@ -46,6 +46,12 @@ func TestL3GD20HDriverStart(t *testing.T) {
 	gobottest.Assert(t, d.Start(), nil)
 }
 
+func TestL3GD20HStartConnectError(t *testing.T) {
+	d, adaptor := initTestL3GD20HDriverWithStubbedAdaptor()
+	adaptor.Testi2cConnectErr(true)
+	gobottest.Assert(t, d.Start(), errors.New("Invalid i2c connection"))
+}
+
 func TestL3GD20HDriverStartWriteError(t *testing.T) {
 	d, adaptor := initTestL3GD20HDriverWithStubbedAdaptor()
 	adaptor.i2cWriteImpl = func([]byte) (int, error) {

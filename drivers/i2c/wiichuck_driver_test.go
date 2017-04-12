@@ -1,6 +1,7 @@
 package i2c
 
 import (
+	"errors"
 	"strings"
 	"testing"
 	"time"
@@ -73,6 +74,12 @@ func TestWiichuckDriverStart(t *testing.T) {
 		t.Errorf("origin not read correctly")
 	}
 
+}
+
+func TestWiichuckStartConnectError(t *testing.T) {
+	d, adaptor := initTestWiichuckDriverWithStubbedAdaptor()
+	adaptor.Testi2cConnectErr(true)
+	gobottest.Assert(t, d.Start(), errors.New("Invalid i2c connection"))
 }
 
 func TestWiichuckDriverHalt(t *testing.T) {
