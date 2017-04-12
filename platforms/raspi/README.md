@@ -2,16 +2,18 @@
 
 The Raspberry Pi is an inexpensive and popular ARM based single board computer with digital & PWM GPIO, and i2c interfaces built in.
 
-The Gobot adaptor for the Raspberry Pi should support all of the various Raspberry Pi boards such as the Raspberry Pi 3 Model B, Raspberry Pi 2 Model B, Raspberry Pi 1 Model A+, and Raspberry Pi Zero.
+The Gobot adaptor for the Raspberry Pi should support all of the various Raspberry Pi boards such as the Raspberry Pi 3 Model B, Raspberry Pi 2 Model B, Raspberry Pi 1 Model A+, Raspberry Pi Zero, and Raspberry Pi Zero W.
 
 We recommend updating to the latest Raspian Jessie OS when using the Raspberry Pi, however Gobot should also support older versions of the OS, should your application require this.
 
 For more info about the Raspberry Pi platform, click [here](http://www.raspberrypi.org/).
 
+You would normally install Go and Gobot on your workstation. Once installed, cross compile your program on your workstation, transfer the final executable to your Raspberry Pi, and run the program on the Raspberry Pi as documented here.
+
 ## How to Install
 
 ```
-go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/raspi
+go get -d -u gobot.io/x/gobot/...
 ```
 
 ## How to Use
@@ -53,7 +55,7 @@ func main() {
 
 ### Compiling
 
-Simply compile your Gobot program like this:
+Compile your Gobot program on your workstation like this:
 
 ```bash
 $ GOARM=6 GOARCH=arm GOOS=linux go build examples/raspi_blink.go
@@ -64,13 +66,19 @@ Use the following `GOARM` values to compile depending on which model Raspberry P
 `GOARM=6` (Raspberry Pi A, A+, B, B+, Zero)
 `GOARM=7` (Raspberry Pi 2, 3)
 
-Once you have compiled your code, you can simply upload your program over the network from your host computer to the Raspi
+Once you have compiled your code, you can upload your program over the network from your host computer to the Raspi
 
 ```bash
 $ scp raspi_blink pi@192.168.1.xxx:/home/pi/
 ```
 
-and execute it on your Raspberry Pi with
+and then SSH to your Raspberry Pi
+
+```bash
+$ ssh pi@192.168.1.xxx
+```
+
+and execute it on the Raspberry Pi itself with
 
 ```bash
 $ ./raspi_blink
