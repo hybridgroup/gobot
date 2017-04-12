@@ -142,6 +142,32 @@ func TestTSL2561DriverOptions(t *testing.T) {
 	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
 }
 
+func TestTSL2561DriverGetDataWriteError(t *testing.T) {
+	d, adaptor := initTestTSL2561Driver()
+	adaptor.i2cReadImpl = idReader
+	gobottest.Assert(t, d.Start(), nil)
+
+	adaptor.i2cWriteImpl = func([]byte) (int, error) {
+		return 0, errors.New("write error")
+	}
+
+	_, _, err := d.getData()
+	gobottest.Assert(t, err, errors.New("write error"))
+}
+
+func TestTSL2561DriverGetDataReadError(t *testing.T) {
+	d, adaptor := initTestTSL2561Driver()
+	adaptor.i2cReadImpl = idReader
+	gobottest.Assert(t, d.Start(), nil)
+
+	adaptor.i2cReadImpl = func([]byte) (int, error) {
+		return 0, errors.New("read error")
+	}
+
+	_, _, err := d.getData()
+	gobottest.Assert(t, err, errors.New("read error"))
+}
+
 func TestTSL2561DriverGetLuminocity(t *testing.T) {
 	d, adaptor := initTestTSL2561Driver()
 
