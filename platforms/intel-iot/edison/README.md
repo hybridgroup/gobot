@@ -1,17 +1,18 @@
 # Edison
 
-The Intel Edison is a wifi and Bluetooth® enabled devolopment platform for the Internet of Things. It packs a robust set of features into its small size and supports a broad spectrum of I/O and software support.
+The Intel Edison is a WiFi and Bluetooth enabled development platform for the Internet of Things. It packs a robust set of features into its small size and supports a broad spectrum of I/O and software support.
 
 For more info about the Edison platform click [here](http://www.intel.com/content/www/us/en/do-it-yourself/edison.html).
 
-## How to Install (using Go 1.5+)
+## How to Install
 
-Install Go from source or use an [official distribution](https://golang.org/dl/).
+You would normally install Go and Gobot on your workstation. Once installed, cross compile your program on your workstation, transfer the final executable to your Intel Edison, and run the program on the Intel Edison itself as documented here.
 
-Then you must install the appropriate Go packages
+```
+go get -d -u gobot.io/x/gobot/...
+```
 
-
-## Setting up your Intel Edison
+### Setting up your Intel Edison
 
 Everything you need to get started with the Edison is in the Intel Getting Started Guide:
 
@@ -43,9 +44,8 @@ password. This password will obviously be needed next time you connect to
 your device.
 
 
-## Example program
+## How To Use
 
-Save the following code into a file called `main.go`.
 
 ```go
 package main
@@ -61,10 +61,6 @@ import (
 func main() {
 	e := edison.NewAdaptor()
 	led := gpio.NewLedDriver(e, "13")
-
-	// Uncomment the line below if you are using a Sparkfun
-	// Edison board with the GPIO block
-	// e.SetBoard("sparkfun")
 
 	work := func() {
 		gobot.Every(1*time.Second, func() {
@@ -84,29 +80,24 @@ func main() {
 
 You can read the [full API documentation online](http://godoc.org/gobot.io/x/gobot).
 
-#### Cross compiling for the Intel Edison
+## How to Connect
 
-Compile your Gobot program run the following command using the command
-line from the directory where you have your `main.go` file:
+### Compiling
 
-```bash
-$ GOARCH=386 GOOS=linux go build .
-```
-
-Then you can simply upload your program over the network from your host computer to the Edison
+Compile your Gobot program on your workstation like this:
 
 ```bash
-$ scp main root@<IP of your device>:/home/root/blink
+$ GOARCH=386 GOOS=linux go build examples/edison_blink.go
 ```
 
-and execute it on your Edison (use screen to connect, see the Intel
-setup steps if you don't recall how to connect)
+Once you have compiled your code, you can you can upload your program and execute it on the Intel Edison from your workstation using the `scp` and `ssh` commands like this:
 
 ```bash
-$ ./blink
+$ scp edison_blink root@<IP of your device>:/home/root/
+$ ssh -t root@<IP of your device> "./edison_blink"
 ```
 
-At this point you should see the onboard LED blinking. Press control + c
+At this point you should see one of the onboard LEDs blinking. Press control + c
 to exit.
 
 To update the program after you made a change, you will need to scp it

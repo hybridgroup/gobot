@@ -8,9 +8,9 @@ We recommend updating to the latest Raspian Jessie OS when using the Raspberry P
 
 For more info about the Raspberry Pi platform, click [here](http://www.raspberrypi.org/).
 
-You would normally install Go and Gobot on your workstation. Once installed, cross compile your program on your workstation, transfer the final executable to your Raspberry Pi, and run the program on the Raspberry Pi as documented here.
-
 ## How to Install
+
+You would normally install Go and Gobot on your workstation. Once installed, cross compile your program on your workstation, transfer the final executable to your Raspberry Pi, and run the program on the Raspberry Pi as documented here.
 
 ```
 go get -d -u gobot.io/x/gobot/...
@@ -66,22 +66,11 @@ Use the following `GOARM` values to compile depending on which model Raspberry P
 `GOARM=6` (Raspberry Pi A, A+, B, B+, Zero)
 `GOARM=7` (Raspberry Pi 2, 3)
 
-Once you have compiled your code, you can upload your program over the network from your host computer to the Raspi
+Once you have compiled your code, you can you can upload your program and execute it on the Raspberry Pi from your workstation using the `scp` and `ssh` commands like this:
 
 ```bash
 $ scp raspi_blink pi@192.168.1.xxx:/home/pi/
-```
-
-and then SSH to your Raspberry Pi
-
-```bash
-$ ssh pi@192.168.1.xxx
-```
-
-and execute it on the Raspberry Pi itself with
-
-```bash
-$ ./raspi_blink
+$ ssh -t pi@192.168.1.xxx "./raspi_blink"
 ```
 
 ### Enabling PWM output on GPIO pins.

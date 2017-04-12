@@ -8,10 +8,13 @@ We recommend updating to the latest Debian Jessie OS when using the BeagleBone, 
 
 For more info about the BeagleBone platform go to  [http://beagleboard.org/getting-started](http://beagleboard.org/getting-started).
 
+
 ## How to Install
 
+You would normally install Go and Gobot on your workstation. Once installed, cross compile your program on your workstation, transfer the final executable to your BeagleBone, and run the program on the BeagleBone itself as documented here.
+
 ```
-go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/beaglebone
+go get -d -u gobot.io/x/gobot/...
 ```
 
 ## How to Use
@@ -55,18 +58,20 @@ func main() {
 
 ### Compiling
 
-Simply compile your Gobot program like this:
+Compile your Gobot program on your workstation like this:
 
 ```bash
 $ GOARM=7 GOARCH=arm GOOS=linux go build examples/beaglebone_blink.go
 ```
 
-If you are running the official Debian Linux through the usb->ethernet connection, or are connected to the board using WiFi, you can simply upload your program and execute it with the `scp` command like this:
+Once you have compiled your code, you can you can upload your program and execute it on the BeagleBone from your workstation using the `scp` and `ssh` commands like this:
 
 ```bash
 $ scp beaglebone_blink root@192.168.7.2:/home/root/
 $ ssh -t root@192.168.7.2 "./beaglebone_blink"
 ```
+
+In order to run the preceeding commands, you must be running the official Debian Linux through the usb->ethernet connection, or be connected to the board using WiFi.
 
 ### Updating your board to the latest OS
 

@@ -7,8 +7,11 @@ We recommend updating to the latest Debian OS when using the C.H.I.P., however G
 For documentation about the C.H.I.P. platform click [here](http://docs.getchip.com/).
 
 ## How to Install
+
+You would normally install Go and Gobot on your workstation. Once installed, cross compile your program on your workstation, transfer the final executable to your C.H.I.P and run the program on the C.H.I.P. itself as documented here.
+
 ```
-go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/chip
+go get -d -u gobot.io/x/gobot/...
 ```
 
 ### PWM support
@@ -72,13 +75,13 @@ func main() {
 
 ### Compiling
 
-Compile your Gobot program like this:
+Compile your Gobot program on your workstation like this:
 
 ```bash
 $ GOARM=7 GOARCH=arm GOOS=linux go build examples/chip_button.go
 ```
 
-Then you can simply upload your program to the CHIP and execute it with
+Once you have compiled your code, you can you can upload your program and execute it on the C.H.I.P. from your workstation using the `scp` and `ssh` commands like this:
 
 ```bash
 $ scp chip_button root@192.168.1.xx:

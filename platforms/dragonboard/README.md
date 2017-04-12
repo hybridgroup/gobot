@@ -5,8 +5,11 @@ The [DragonBoard 410c](http://www.96boards.org/product/dragonboard410c/), a prod
 Make sure you are using the latest Linaro Debian image. Both AArch32 and AArch64 work™ though you should stick to 64bit as OS internals may be different and aren't tested.
 
 ## How to Install
+
+You would normally install Go and Gobot on your workstation. Once installed, cross compile your program on your workstation, transfer the final executable to your DragonBoard and run the program on the DragonBoard itself as documented here.
+
 ```
-go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/dragonboard
+go get -d -u gobot.io/x/gobot/...
 ```
 
 ## How to Use
@@ -52,13 +55,13 @@ func main() {
 
 ### Compiling
 
-Compile your Gobot program like this:
+Compile your Gobot program on your workstation like this:
 
 ```bash
 $ GOARCH=arm64 GOOS=linux go build examples/dragon_button.go
 ```
 
-Then you can simply upload your program to the board and execute it with
+Once you have compiled your code, you can you can upload your program and execute it on the DragonBoard from your workstation using the `scp` and `ssh` commands like this:
 
 ```bash
 $ scp dragon_button root@192.168.1.xx:
