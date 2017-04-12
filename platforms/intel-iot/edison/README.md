@@ -102,6 +102,3 @@ to exit.
 
 To update the program after you made a change, you will need to scp it
 over once again and start it from the command line (via screen).
-
-## License
-Copyright (c) 2014-2017 The Hybrid Group. Licensed under the Apache 2.0 license.
