@@ -84,11 +84,22 @@ func TestMPU6050DriverReadData(t *testing.T) {
 	gobottest.Assert(t, mpu.Temperature, int16(36))
 }
 
-func TestMPU6050DriverReadDataError(t *testing.T) {
+func TestMPU6050DriverGetDataReadError(t *testing.T) {
 	mpu, adaptor := initTestMPU6050DriverWithStubbedAdaptor()
 	mpu.Start()
 
 	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		return 0, errors.New("read error")
+	}
+
+	gobottest.Assert(t, mpu.GetData(), errors.New("read error"))
+}
+
+func TestMPU6050DriverGetDataWriteError(t *testing.T) {
+	mpu, adaptor := initTestMPU6050DriverWithStubbedAdaptor()
+	mpu.Start()
+
+	adaptor.i2cWriteImpl = func(b []byte) (int, error) {
 		return 0, errors.New("write error")
 	}
 
