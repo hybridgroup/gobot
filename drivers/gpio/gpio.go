@@ -48,6 +48,7 @@ const (
 type PwmWriter interface {
 	gobot.Adaptor
 	PwmWrite(string, byte) (err error)
+	SetPwmPeriod(string, float64) (err error)
 }
 
 // ServoWriter interface represents an Adaptor which has Servo capabilities
