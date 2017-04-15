@@ -63,8 +63,11 @@ func (b *IOPinDriver) adaptor() ble.BLEConnector {
 
 // Start tells driver to get ready to do work
 func (b *IOPinDriver) Start() (err error) {
-	b.ReadPinADConfig()
-	b.ReadPinIOConfig()
+	_, err = b.ReadPinADConfig()
+	if err != nil {
+		return
+	}
+	_, err = b.ReadPinIOConfig()
 	return
 }
 
