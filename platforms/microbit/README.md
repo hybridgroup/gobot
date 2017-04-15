@@ -75,7 +75,9 @@ func main() {
 
 ### Using Microbit with GPIO and AIO Drivers
 
-The IOPinDriver is both a Driver, as well as an Adaptor. This means you can use it as the Adaptor for any gpio or aio Driver. In this example, we are just using the normal `gpio.ButtonDriver` and `gpio.LedDriver`:
+The IOPinDriver is a special kind of Driver. It supports the DigitalReader, DigitalWriter, and AnalogReader interfaces.
+
+This means you can use it with any gpio or aio Driver. In this example, we are using the normal `gpio.ButtonDriver` and `gpio.LedDriver`:
 
 ```go
 package main
@@ -106,7 +108,7 @@ func main() {
 	}
 
 	robot := gobot.NewRobot("buttonBot",
-		[]gobot.Connection{bleAdaptor, ubit},
+		[]gobot.Connection{bleAdaptor},
 		[]gobot.Device{ubit, button, led},
 		work,
 	)
