@@ -37,6 +37,9 @@ func TestIOPinDriver(t *testing.T) {
 func TestIOPinDriverStartAndHalt(t *testing.T) {
 	d := initTestIOPinDriver()
 	gobottest.Assert(t, d.Start(), nil)
+	gobottest.Assert(t, d.Connect(), nil)
+
+	gobottest.Assert(t, d.Finalize(), nil)
 	gobottest.Assert(t, d.Halt(), nil)
 }
 
