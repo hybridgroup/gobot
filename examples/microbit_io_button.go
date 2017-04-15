@@ -30,7 +30,7 @@ func main() {
 	}
 
 	robot := gobot.NewRobot("buttonBot",
-		[]gobot.Connection{bleAdaptor, ubit},
+		[]gobot.Connection{bleAdaptor},
 		[]gobot.Device{ubit, button, led},
 		work,
 	)
