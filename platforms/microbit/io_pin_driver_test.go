@@ -14,9 +14,6 @@ import (
 // the IOPinDriver is a Driver
 var _ gobot.Driver = (*IOPinDriver)(nil)
 
-// and is also an Adaptor
-var _ gobot.Adaptor = (*IOPinDriver)(nil)
-
 // that supports the DigitalReader, DigitalWriter, & AnalogReader interfaces
 var _ gpio.DigitalReader = (*IOPinDriver)(nil)
 var _ gpio.DigitalWriter = (*IOPinDriver)(nil)
@@ -37,9 +34,7 @@ func TestIOPinDriver(t *testing.T) {
 func TestIOPinDriverStartAndHalt(t *testing.T) {
 	d := initTestIOPinDriver()
 	gobottest.Assert(t, d.Start(), nil)
-	gobottest.Assert(t, d.Connect(), nil)
 
-	gobottest.Assert(t, d.Finalize(), nil)
 	gobottest.Assert(t, d.Halt(), nil)
 }
 

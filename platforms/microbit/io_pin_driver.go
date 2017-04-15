@@ -63,6 +63,8 @@ func (b *IOPinDriver) adaptor() ble.BLEConnector {
 
 // Start tells driver to get ready to do work
 func (b *IOPinDriver) Start() (err error) {
+	b.ReadPinADConfig()
+	b.ReadPinIOConfig()
 	return
 }
 
@@ -141,16 +143,6 @@ func (b *IOPinDriver) WritePinIOConfig(config int) (err error) {
 	binary.Write(data, binary.LittleEndian, uint32(config))
 	err = b.adaptor().WriteCharacteristic(pinIOConfigCharacteristic, data.Bytes())
 	return
-}
-
-// Connect here to allow Driver to also act as an Adaptor
-func (b *IOPinDriver) Connect() (err error) {
-	return nil
-}
-
-// Finalize here to allow Driver to also act as an Adaptor
-func (b *IOPinDriver) Finalize() (err error) {
-	return nil
 }
 
 // DigitalRead reads from a pin
@@ -232,7 +224,6 @@ func validatedPin(pin string) (int, error) {
 }
 
 // via http://stackoverflow.com/questions/23192262/how-would-you-set-and-clear-a-single-bit-in-go
-
 // Sets the bit at pos in the integer n.
 func setBit(n int, pos int) int {
 	n |= (1 << uint(pos))
