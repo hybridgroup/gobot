@@ -3,6 +3,7 @@ package microbit
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"strconv"
 
 	"gobot.io/x/gobot"
@@ -154,7 +155,7 @@ func (b *IOPinDriver) Finalize() (err error) {
 
 // DigitalRead reads from a pin
 func (b *IOPinDriver) DigitalRead(pin string) (val int, err error) {
-	p, err := strconv.Atoi(pin)
+	p, err := validatedPin(pin)
 	if err != nil {
 		return
 	}
@@ -168,7 +169,7 @@ func (b *IOPinDriver) DigitalRead(pin string) (val int, err error) {
 
 // DigitalWrite writes to a pin
 func (b *IOPinDriver) DigitalWrite(pin string, level byte) (err error) {
-	p, err := strconv.Atoi(pin)
+	p, err := validatedPin(pin)
 	if err != nil {
 		return
 	}
@@ -181,7 +182,7 @@ func (b *IOPinDriver) DigitalWrite(pin string, level byte) (err error) {
 
 // AnalogRead reads from a pin
 func (b *IOPinDriver) AnalogRead(pin string) (val int, err error) {
-	p, err := strconv.Atoi(pin)
+	p, err := validatedPin(pin)
 	if err != nil {
 		return
 	}
@@ -215,6 +216,19 @@ func (b *IOPinDriver) ensureOutput(pin int) {
 	if hasBit(b.ioMask, pin) {
 		b.WritePinIOConfig(clearBit(b.ioMask, pin))
 	}
+}
+
+func validatedPin(pin string) (int, error) {
+	i, err := strconv.Atoi(pin)
+	if err != nil {
+		return 0, err
+	}
+
+	if i < 0 || i > 2 {
+		return 0, errors.New("Invalid pin.")
+	}
+
+	return i, nil
 }
 
 // via http://stackoverflow.com/questions/23192262/how-would-you-set-and-clear-a-single-bit-in-go

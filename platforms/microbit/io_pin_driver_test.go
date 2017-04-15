@@ -1,6 +1,7 @@
 package microbit
 
 import (
+	"errors"
 	"strings"
 	"testing"
 
@@ -53,12 +54,31 @@ func TestIOPinDriverDigitalRead(t *testing.T) {
 	gobottest.Assert(t, val, 0)
 }
 
+func TestIOPinDriverDigitalReadInvalidPin(t *testing.T) {
+	a := NewBleTestAdaptor()
+	d := NewIOPinDriver(a)
+
+	_, err := d.DigitalRead("A3")
+	gobottest.Refute(t, err, nil)
+
+	_, err = d.DigitalRead("6")
+	gobottest.Assert(t, err, errors.New("Invalid pin."))
+}
+
 func TestIOPinDriverDigitalWrite(t *testing.T) {
 	a := NewBleTestAdaptor()
 	d := NewIOPinDriver(a)
 
 	// TODO: a better test
 	gobottest.Assert(t, d.DigitalWrite("0", 1), nil)
+}
+
+func TestIOPinDriverDigitalWriteInvalidPin(t *testing.T) {
+	a := NewBleTestAdaptor()
+	d := NewIOPinDriver(a)
+
+	gobottest.Refute(t, d.DigitalWrite("A3", 1), nil)
+	gobottest.Assert(t, d.DigitalWrite("6", 1), errors.New("Invalid pin."))
 }
 
 func TestIOPinDriverAnalogRead(t *testing.T) {
@@ -73,6 +93,17 @@ func TestIOPinDriverAnalogRead(t *testing.T) {
 
 	val, _ = d.AnalogRead("1")
 	gobottest.Assert(t, val, 128)
+}
+
+func TestIOPinDriverAnalogReadInvalidPin(t *testing.T) {
+	a := NewBleTestAdaptor()
+	d := NewIOPinDriver(a)
+
+	_, err := d.AnalogRead("A3")
+	gobottest.Refute(t, err, nil)
+
+	_, err = d.AnalogRead("6")
+	gobottest.Assert(t, err, errors.New("Invalid pin."))
 }
 
 func TestIOPinDriverDigitalAnalogRead(t *testing.T) {
@@ -100,4 +131,17 @@ func TestIOPinDriverDigitalWriteAnalogRead(t *testing.T) {
 
 	val, _ := d.AnalogRead("1")
 	gobottest.Assert(t, val, 128)
+}
+
+func TestIOPinDriverAnalogReadDigitalWrite(t *testing.T) {
+	a := NewBleTestAdaptor()
+	d := NewIOPinDriver(a)
+	a.TestReadCharacteristic(func(cUUID string) ([]byte, error) {
+		return []byte{0, 0, 1, 128, 2, 1}, nil
+	})
+
+	val, _ := d.AnalogRead("1")
+	gobottest.Assert(t, val, 128)
+
+	gobottest.Assert(t, d.DigitalWrite("1", 0), nil)
 }
