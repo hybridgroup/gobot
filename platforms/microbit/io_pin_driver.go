@@ -102,16 +102,18 @@ func (b *IOPinDriver) WritePinData(pin string, data byte) (err error) {
 }
 
 // ReadPinADConfig reads and returns the pin A/D config mask for all pins
-func (b *IOPinDriver) ReadPinADConfig() (config uint32, err error) {
-	var result uint32
+func (b *IOPinDriver) ReadPinADConfig() (config int, err error) {
 	c, e := b.adaptor().ReadCharacteristic(pinADConfigCharacteristic)
 	if e != nil {
 		return 0, e
 	}
-	buf := bytes.NewBuffer(c)
-	binary.Read(buf, binary.LittleEndian, result)
+	var result byte
+	for i := 0; i < 4; i++ {
+		result |= c[i] << uint(i)
+	}
+
 	b.adMask = int(result)
-	return result, nil
+	return int(result), nil
 }
 
 // WritePinADConfig writes the pin A/D config mask for all pins
@@ -125,13 +127,16 @@ func (b *IOPinDriver) WritePinADConfig(config int) (err error) {
 
 // ReadPinIOConfig reads and returns the pin IO config mask for all pins
 func (b *IOPinDriver) ReadPinIOConfig() (config int, err error) {
-	var result uint32
 	c, e := b.adaptor().ReadCharacteristic(pinIOConfigCharacteristic)
 	if e != nil {
 		return 0, e
 	}
-	buf := bytes.NewBuffer(c)
-	binary.Read(buf, binary.LittleEndian, result)
+
+	var result byte
+	for i := 0; i < 4; i++ {
+		result |= c[i] << uint(i)
+	}
+
 	b.ioMask = int(result)
 	return int(result), nil
 }

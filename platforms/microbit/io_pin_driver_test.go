@@ -32,9 +32,12 @@ func TestIOPinDriver(t *testing.T) {
 }
 
 func TestIOPinDriverStartAndHalt(t *testing.T) {
-	d := initTestIOPinDriver()
+	a := NewBleTestAdaptor()
+	d := NewIOPinDriver(a)
+	a.TestReadCharacteristic(func(cUUID string) ([]byte, error) {
+		return []byte{0, 1, 1, 0}, nil
+	})
 	gobottest.Assert(t, d.Start(), nil)
-
 	gobottest.Assert(t, d.Halt(), nil)
 }
 
