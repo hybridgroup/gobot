@@ -74,3 +74,30 @@ func TestIOPinDriverAnalogRead(t *testing.T) {
 	val, _ = d.AnalogRead("1")
 	gobottest.Assert(t, val, 128)
 }
+
+func TestIOPinDriverDigitalAnalogRead(t *testing.T) {
+	a := NewBleTestAdaptor()
+	d := NewIOPinDriver(a)
+	a.TestReadCharacteristic(func(cUUID string) ([]byte, error) {
+		return []byte{0, 0, 1, 128, 2, 1}, nil
+	})
+
+	val, _ := d.DigitalRead("0")
+	gobottest.Assert(t, val, 0)
+
+	val, _ = d.AnalogRead("0")
+	gobottest.Assert(t, val, 0)
+}
+
+func TestIOPinDriverDigitalWriteAnalogRead(t *testing.T) {
+	a := NewBleTestAdaptor()
+	d := NewIOPinDriver(a)
+	a.TestReadCharacteristic(func(cUUID string) ([]byte, error) {
+		return []byte{0, 0, 1, 128, 2, 1}, nil
+	})
+
+	gobottest.Assert(t, d.DigitalWrite("1", 0), nil)
+
+	val, _ := d.AnalogRead("1")
+	gobottest.Assert(t, val, 128)
+}
