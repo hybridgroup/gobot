@@ -33,7 +33,7 @@ type MavlinkInterface interface {
 // It add the following events:
 //	"packet" - triggered when a new packet is read
 //	"message" - triggered when a new valid message is processed
-func NewDriver(a *Adaptor, v ...time.Duration) *Driver {
+func NewDriver(a BaseAdaptor, v ...time.Duration) *Driver {
 	m := &Driver{
 		name:       "Mavlink",
 		connection: a,
@@ -58,8 +58,8 @@ func (m *Driver) Name() string                 { return m.name }
 func (m *Driver) SetName(n string)             { m.name = n }
 
 // adaptor returns driver associated adaptor
-func (m *Driver) adaptor() *Adaptor {
-	return m.Connection().(*Adaptor)
+func (m *Driver) adaptor() BaseAdaptor {
+	return m.Connection().(BaseAdaptor)
 }
 
 // Start begins process to read mavlink packets every m.Interval
@@ -67,7 +67,7 @@ func (m *Driver) adaptor() *Adaptor {
 func (m *Driver) Start() error {
 	go func() {
 		for {
-			packet, err := common.ReadMAVLinkPacket(m.adaptor().sp)
+			packet, err := m.adaptor().ReadMAVLinkPacket()
 			if err != nil {
 				m.Publish(ErrorIOEvent, err)
 				continue
@@ -90,6 +90,6 @@ func (m *Driver) Halt() (err error) { return }
 
 // SendPacket sends a packet to mavlink device
 func (m *Driver) SendPacket(packet *common.MAVLinkPacket) (err error) {
-	_, err = m.adaptor().sp.Write(packet.Pack())
+	_, err = m.adaptor().Write(packet.Pack())
 	return err
 }
