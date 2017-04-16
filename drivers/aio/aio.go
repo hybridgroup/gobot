@@ -2,8 +2,6 @@ package aio
 
 import (
 	"errors"
-
-	"gobot.io/x/gobot"
 )
 
 var (
@@ -23,6 +21,6 @@ const (
 
 // AnalogReader interface represents an Adaptor which has Analog capabilities
 type AnalogReader interface {
-	gobot.Adaptor
+	//gobot.Adaptor
 	AnalogRead(string) (val int, err error)
 }

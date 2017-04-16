@@ -30,6 +30,7 @@ The Gobot platform for the Microbit includes several different drivers, each one
 
 - AccelerometerDriver
 - ButtonDriver
+- IOPinDriver
 - LEDDriver
 - MagnetometerDriver
 - TemperatureDriver
@@ -65,6 +66,50 @@ func main() {
 	robot := gobot.NewRobot("blinkBot",
 		[]gobot.Connection{bleAdaptor},
 		[]gobot.Device{ubit},
+		work,
+	)
+
+	robot.Start()
+}
+```
+
+### Using Microbit with GPIO and AIO Drivers
+
+The IOPinDriver is a special kind of Driver. It supports the DigitalReader, DigitalWriter, and AnalogReader interfaces.
+
+This means you can use it with any gpio or aio Driver. In this example, we are using the normal `gpio.ButtonDriver` and `gpio.LedDriver`:
+
+```go
+package main
+
+import (
+	"os"
+
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/gpio"
+	"gobot.io/x/gobot/platforms/ble"
+	"gobot.io/x/gobot/platforms/microbit"
+)
+
+func main() {
+	bleAdaptor := ble.NewClientAdaptor(os.Args[1])
+
+	ubit := microbit.NewIOPinDriver(bleAdaptor)
+	button := gpio.NewButtonDriver(ubit, "0")
+	led := gpio.NewLedDriver(ubit, "1")
+
+	work := func() {
+		button.On(gpio.ButtonPush, func(data interface{}) {
+			led.On()
+		})
+		button.On(gpio.ButtonRelease, func(data interface{}) {
+			led.Off()
+		})
+	}
+
+	robot := gobot.NewRobot("buttonBot",
+		[]gobot.Connection{bleAdaptor},
+		[]gobot.Device{ubit, button, led},
 		work,
 	)
 
