@@ -32,11 +32,11 @@ func main() {
   mqttAdaptor := mqtt.NewAdaptor("tcp://0.0.0.0:1883", "pinger")
 
   work := func() {
-    mqttAdaptor.On("hello", func(data []byte) {
-      fmt.Println("hello")
+    mqttAdaptor.On("hello", func(topic string, data []byte) {
+      fmt.Println(topic)
     })
-    mqttAdaptor.On("hola", func(data []byte) {
-      fmt.Println("hola")
+    mqttAdaptor.On("hola", func(topic string, data []byte) {
+      fmt.Println(topic)
     })
     data := []byte("o")
     gobot.Every(1*time.Second, func() {
