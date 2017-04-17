@@ -6,10 +6,16 @@ import (
 	common "gobot.io/x/gobot/platforms/mavlink/common"
 )
 
+type UDPConnection interface {
+	Close() error
+	ReadFromUDP([]byte) (int, *net.UDPAddr, error)
+	WriteTo([]byte, net.Addr) (int, error)
+}
+
 type UDPAdaptor struct {
 	name string
 	port string
-	sock *net.UDPConn
+	sock UDPConnection
 }
 
 var _ BaseAdaptor = (*UDPAdaptor)(nil)
