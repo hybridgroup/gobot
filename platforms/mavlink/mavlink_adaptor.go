@@ -4,8 +4,19 @@ import (
 	"io"
 
 	"github.com/tarm/serial"
+	"gobot.io/x/gobot"
+	common "gobot.io/x/gobot/platforms/mavlink/common"
 )
 
+// Adaptor is a Mavlink transport adaptor.
+type BaseAdaptor interface {
+	gobot.Connection
+
+	io.Writer
+	ReadMAVLinkPacket() (*common.MAVLinkPacket, error)
+}
+
+// Adaptor is a Mavlink-over-serial adaptor.
 type Adaptor struct {
 	name    string
 	port    string
@@ -42,4 +53,12 @@ func (m *Adaptor) Connect() (err error) {
 func (m *Adaptor) Finalize() (err error) {
 	err = m.sp.Close()
 	return
+}
+
+func (m *Adaptor) ReadMAVLinkPacket() (*common.MAVLinkPacket, error) {
+	return common.ReadMAVLinkPacket(m.sp)
+}
+
+func (m *Adaptor) Write(b []byte) (int, error) {
+	return m.sp.Write(b)
 }
