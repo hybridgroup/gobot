@@ -38,7 +38,6 @@ func (sys *NativeSyscall) Syscall(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err
 func (sys *MockSyscall) Syscall(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno) {
 	if sys.Impl != nil {
 		return sys.Impl(trap, a1, a2, a3)
-	} else {
-		return 0, 0, 0
 	}
+	return 0, 0, 0
 }
