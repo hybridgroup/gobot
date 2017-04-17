@@ -123,19 +123,7 @@ func (a *Adaptor) Publish(topic string, message []byte) bool {
 }
 
 // On subscribes to a topic, and then calls the message handler function when data is received
-func (a *Adaptor) On(event string, f func(s []byte)) bool {
-	if a.client == nil {
-		return false
-	}
-	a.client.Subscribe(event, 0, func(client paho.Client, msg paho.Message) {
-		f(msg.Payload())
-	})
-	return true
-}
-
-// OnTopic subscribes to a topic, and then calls the message handler
-// function when data is received
-func (a *Adaptor) OnTopic(event string, f func(topic string, s []byte)) bool {
+func (a *Adaptor) On(event string, f func(topic string, s []byte)) bool {
 	if a.client == nil {
 		return false
 	}
