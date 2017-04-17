@@ -33,11 +33,11 @@ func main() {
   natsAdaptor := nats.NewNatsAdaptor("nats", "localhost:4222", 1234)
 
   work := func() {
-    natsAdaptor.On("hello", func(data []byte) {
-      fmt.Println("hello")
+    natsAdaptor.On("hello", func(subject string, data []byte) {
+      fmt.Println(subject)
     })
-    natsAdaptor.On("hola", func(data []byte) {
-      fmt.Println("hola")
+    natsAdaptor.On("hola", func(subject string, data []byte) {
+      fmt.Println(subject)
     })
     data := []byte("o")
     gobot.Every(1*time.Second, func() {
@@ -74,11 +74,11 @@ func main() {
   natsAdaptor := nats.NewNatsAdaptor("tls://localhost:4222", 1234, natsio.RootCAs("certs/ca.pem"))
 
   work := func() {
-    natsAdaptor.On("hello", func(data []byte) {
-      fmt.Println("hello")
+    natsAdaptor.On("hello", func(subject string, data []byte) {
+      fmt.Println(subject)
     })
-    natsAdaptor.On("hola", func(data []byte) {
-      fmt.Println("hola")
+    natsAdaptor.On("hola", func(subject string, data []byte) {
+      fmt.Println(subject)
     })
     data := []byte("o")
     gobot.Every(1*time.Second, func() {

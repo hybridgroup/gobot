@@ -112,12 +112,12 @@ func (a *Adaptor) Publish(topic string, message []byte) bool {
 
 // On is an event-handler style subscriber to a particular topic (named event).
 // Supply a handler function to use the bytes returned by the server.
-func (a *Adaptor) On(event string, f func(s []byte)) bool {
+func (a *Adaptor) On(event string, f func(subject string, s []byte)) bool {
 	if a.client == nil {
 		return false
 	}
 	a.client.Subscribe(event, func(msg *nats.Msg) {
-		f(msg.Data)
+		f(msg.Subject, msg.Data)
 	})
 	return true
 }

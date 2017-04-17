@@ -96,7 +96,7 @@ func TestNatsAdaptorOnWhenConnected(t *testing.T) {
 	t.Skip("TODO: implement this test without requiring actual server connection")
 	a := initTestNatsAdaptor()
 	a.Connect()
-	gobottest.Assert(t, a.On("hola", func(data []byte) {
+	gobottest.Assert(t, a.On("hola", func(subject string, data []byte) {
 		fmt.Println("hola")
 	}), true)
 }
@@ -115,7 +115,7 @@ func TestNatsAdaptorOnWhenConnectedWithAuth(t *testing.T) {
 	t.Skip("TODO: implement this test without requiring actual server connection")
 	a := NewAdaptorWithAuth("localhost:4222", 9999, "test", "testwd")
 	a.Connect()
-	gobottest.Assert(t, a.On("hola", func(data []byte) {
+	gobottest.Assert(t, a.On("hola", func(subject string, data []byte) {
 		fmt.Println("hola")
 	}), true)
 }
@@ -138,7 +138,7 @@ func TestNatsAdaptorCannotPublishUnlessConnected(t *testing.T) {
 
 func TestNatsAdaptorCannotOnUnlessConnected(t *testing.T) {
 	a := NewAdaptor("localhost:9999", 9999)
-	gobottest.Assert(t, a.On("hola", func(data []byte) {
+	gobottest.Assert(t, a.On("hola", func(subject string, data []byte) {
 		fmt.Println("hola")
 	}), false)
 }
