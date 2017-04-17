@@ -27,12 +27,18 @@ func TestMavlinkUDPAdaptorName(t *testing.T) {
 	gobottest.Assert(t, a.Name(), "NewName")
 }
 
-func TestMavlinkUDPAdaptorConnect(t *testing.T) {
+func TestMavlinkUDPAdaptorConnectAndFinalize(t *testing.T) {
 	a := initTestMavlinkUDPAdaptor()
 	gobottest.Assert(t, a.Connect(), nil)
+	gobottest.Assert(t, a.Finalize(), nil)
 }
 
-func TestMavlinkUDPAdaptorFinalize(t *testing.T) {
+func TestMavlinkUDPAdaptorWrite(t *testing.T) {
 	a := initTestMavlinkUDPAdaptor()
-	gobottest.Assert(t, a.Finalize(), nil)
+	a.Connect()
+	defer a.Finalize()
+
+	i, err := a.Write([]byte{0x01, 0x02, 0x03})
+	gobottest.Assert(t, i, 3)
+	gobottest.Assert(t, err, nil)
 }

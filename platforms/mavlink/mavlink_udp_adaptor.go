@@ -86,5 +86,10 @@ func (m *UDPAdaptor) ReadMAVLinkPacket() (*common.MAVLinkPacket, error) {
 }
 
 func (m *UDPAdaptor) Write(b []byte) (int, error) {
-	return m.sock.Write(b)
+	addr, err := net.ResolveUDPAddr("udp", m.Port())
+	if err != nil {
+		return 0, err
+	}
+
+	return m.sock.WriteTo(b, addr)
 }
