@@ -125,7 +125,10 @@ func TestMavlinkReadMAVLinkPacketReadError(t *testing.T) {
 			return buf.Len(), nil, nil
 		case 2:
 			i = 3
-			return 251, nil, nil
+			buf := new(bytes.Buffer)
+			buf.Write([]byte{mavlink.MAVLINK_10_STX, 255})
+			copy(b, buf.Bytes())
+			return buf.Len(), nil, nil
 		}
 
 		return 0, nil, errors.New("read error")
