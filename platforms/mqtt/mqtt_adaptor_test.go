@@ -52,7 +52,7 @@ func TestMqttAdaptorPublishWhenConnected(t *testing.T) {
 
 func TestMqttAdaptorCannotOnUnlessConnected(t *testing.T) {
 	a := initTestMqttAdaptor()
-	gobottest.Assert(t, a.On("hola", func(topic string, data []byte) {
+	gobottest.Assert(t, a.On("hola", func(msg Message) {
 		fmt.Println("hola")
 	}), false)
 }
@@ -60,7 +60,7 @@ func TestMqttAdaptorCannotOnUnlessConnected(t *testing.T) {
 func TestMqttAdaptorOnWhenConnected(t *testing.T) {
 	a := initTestMqttAdaptor()
 	a.Connect()
-	gobottest.Assert(t, a.On("hola", func(topic string, data []byte) {
+	gobottest.Assert(t, a.On("hola", func(msg Message) {
 		fmt.Println("hola")
 	}), true)
 }

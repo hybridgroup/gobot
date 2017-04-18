@@ -11,6 +11,8 @@ import (
 	multierror "github.com/hashicorp/go-multierror"
 )
 
+type Message paho.Message
+
 // Adaptor is the Gobot Adaptor for MQTT
 type Adaptor struct {
 	name          string
@@ -123,12 +125,12 @@ func (a *Adaptor) Publish(topic string, message []byte) bool {
 }
 
 // On subscribes to a topic, and then calls the message handler function when data is received
-func (a *Adaptor) On(event string, f func(topic string, s []byte)) bool {
+func (a *Adaptor) On(event string, f func(msg Message)) bool {
 	if a.client == nil {
 		return false
 	}
 	a.client.Subscribe(event, 0, func(client paho.Client, msg paho.Message) {
-		f(msg.Topic(), msg.Payload())
+		f(msg)
 	})
 	return true
 }
