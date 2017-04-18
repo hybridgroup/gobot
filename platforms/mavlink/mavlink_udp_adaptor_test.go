@@ -1,12 +1,15 @@
 package mavlink
 
 import (
+	"bytes"
+	"errors"
 	"net"
 	"strings"
 	"testing"
 
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/gobottest"
+	mavlink "gobot.io/x/gobot/platforms/mavlink/common"
 )
 
 var _ gobot.Adaptor = (*UDPAdaptor)(nil)
@@ -80,4 +83,55 @@ func TestMavlinkUDPAdaptorWrite(t *testing.T) {
 	i, err := a.Write([]byte{0x01, 0x02, 0x03})
 	gobottest.Assert(t, i, 3)
 	gobottest.Assert(t, err, nil)
+}
+
+func TestMavlinkReadMAVLinkReadDefaultPacket(t *testing.T) {
+	a := initTestMavlinkUDPAdaptor()
+	a.Connect()
+	defer a.Finalize()
+
+	m := NewMockUDPConnection()
+
+	m.TestReadFromUDP = func(b []byte) (int, *net.UDPAddr, error) {
+		buf := new(bytes.Buffer)
+		buf.Write([]byte{mavlink.MAVLINK_10_STX, 0x02, 0x03})
+		copy(b, buf.Bytes())
+		return buf.Len(), nil, nil
+	}
+	a.sock = m
+
+	p, _ := a.ReadMAVLinkPacket()
+	gobottest.Assert(t, p.Protocol, uint8(254))
+}
+
+func TestMavlinkReadMAVLinkPacketReadError(t *testing.T) {
+	a := initTestMavlinkUDPAdaptor()
+	a.Connect()
+	defer a.Finalize()
+
+	m := NewMockUDPConnection()
+
+	i := 0
+	m.TestReadFromUDP = func(b []byte) (int, *net.UDPAddr, error) {
+		switch i {
+		case 0:
+			i = 1
+			return 1, nil, nil
+		case 1:
+			i = 2
+			buf := new(bytes.Buffer)
+			buf.Write([]byte{0x01, 0x02, 0x03})
+			copy(b, buf.Bytes())
+			return buf.Len(), nil, nil
+		case 2:
+			i = 3
+			return 251, nil, nil
+		}
+
+		return 0, nil, errors.New("read error")
+	}
+	a.sock = m
+
+	_, err := a.ReadMAVLinkPacket()
+	gobottest.Assert(t, err, errors.New("read error"))
 }
