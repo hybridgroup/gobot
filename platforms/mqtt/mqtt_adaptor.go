@@ -11,6 +11,7 @@ import (
 	multierror "github.com/hashicorp/go-multierror"
 )
 
+// Message is a message received from the broker.
 type Message paho.Message
 
 // Adaptor is the Gobot Adaptor for MQTT
