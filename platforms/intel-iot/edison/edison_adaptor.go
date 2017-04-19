@@ -60,11 +60,13 @@ type Adaptor struct {
 	pwmPins     map[int]*pwmPin
 	i2cBus      sysfs.I2cDevice
 	connect     func(e *Adaptor) (err error)
+	writeFile   func(path string, data []byte) (i int, err error)
+	readFile    func(path string) ([]byte, error)
 }
 
 // changePinMode writes pin mode to current_pinmux file
-func changePinMode(pin, mode string) (err error) {
-	_, err = writeFile(
+func changePinMode(a *Adaptor, pin, mode string) (err error) {
+	_, err = a.writeFile(
 		"/sys/kernel/debug/gpio_debug/gpio"+pin+"/current_pinmux",
 		[]byte("mode"+mode),
 	)
@@ -74,9 +76,11 @@ func changePinMode(pin, mode string) (err error) {
 // NewAdaptor returns a new Edison Adaptor
 func NewAdaptor() *Adaptor {
 	return &Adaptor{
-		name:   gobot.DefaultName("Edison"),
-		board:  "arduino",
-		pinmap: arduinoPinMap,
+		name:      gobot.DefaultName("Edison"),
+		board:     "arduino",
+		pinmap:    arduinoPinMap,
+		writeFile: writeFile,
+		readFile:  readFile,
 	}
 }
 
@@ -172,7 +176,7 @@ func (e *Adaptor) PwmWrite(pin string, val byte) (err error) {
 			if err = e.DigitalWrite(pin, 1); err != nil {
 				return
 			}
-			if err = changePinMode(strconv.Itoa(int(sysPin.pin)), "1"); err != nil {
+			if err = changePinMode(e, strconv.Itoa(int(sysPin.pin)), "1"); err != nil {
 				return
 			}
 			e.pwmPins[sysPin.pwmPin] = newPwmPin(sysPin.pwmPin)
@@ -199,7 +203,7 @@ func (e *Adaptor) PwmWrite(pin string, val byte) (err error) {
 
 // AnalogRead returns value from analog reading of specified pin
 func (e *Adaptor) AnalogRead(pin string) (val int, err error) {
-	buf, err := readFile(
+	buf, err := e.readFile(
 		"/sys/bus/iio/devices/iio:device1/in_voltage" + pin + "_raw",
 	)
 	if err != nil {
@@ -262,13 +266,13 @@ func (e *Adaptor) arduinoSetup() (err error) {
 	}
 
 	for _, i := range []string{"111", "115", "114", "109"} {
-		if err = changePinMode(i, "1"); err != nil {
+		if err = changePinMode(e, i, "1"); err != nil {
 			return err
 		}
 	}
 
 	for _, i := range []string{"131", "129", "40"} {
-		if err = changePinMode(i, "0"); err != nil {
+		if err = changePinMode(e, i, "0"); err != nil {
 			return err
 		}
 	}
@@ -302,7 +306,7 @@ func (e *Adaptor) arduinoI2CSetup() (err error) {
 	}
 
 	for _, i := range []string{"28", "27"} {
-		if err = changePinMode(i, "1"); err != nil {
+		if err = changePinMode(e, i, "1"); err != nil {
 			return
 		}
 	}

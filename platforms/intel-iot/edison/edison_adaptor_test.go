@@ -115,6 +115,16 @@ func TestAdaptorConnect(t *testing.T) {
 	gobottest.Refute(t, a.Connect(), nil)
 }
 
+func TestAdaptorConnectArduinoError(t *testing.T) {
+	a, _ := initTestAdaptor()
+	a.writeFile = func(string, []byte) (int, error) {
+		return 0, errors.New("write error")
+	}
+
+	err := a.Connect()
+	gobottest.Assert(t, strings.Contains(err.Error(), "write error"), true)
+}
+
 func TestAdaptorConnectSparkfun(t *testing.T) {
 	a, _ := initTestAdaptor()
 	a.SetBoard("sparkfun")
@@ -176,6 +186,12 @@ func TestAdaptorI2c(t *testing.T) {
 	gobottest.Assert(t, a.Finalize(), nil)
 }
 
+func TestAdaptorI2cInvalidBus(t *testing.T) {
+	a, _ := initTestAdaptor()
+	_, err := a.GetConnection(0xff, 3)
+	gobottest.Assert(t, err, errors.New("Unsupported I2C bus"))
+}
+
 func TestAdaptorPwm(t *testing.T) {
 	a, fs := initTestAdaptor()
 
@@ -187,10 +203,31 @@ func TestAdaptorPwm(t *testing.T) {
 	gobottest.Assert(t, err, errors.New("Not a PWM pin"))
 }
 
+func TestAdaptorPwmError(t *testing.T) {
+	a, _ := initTestAdaptor()
+
+	a.writeFile = func(string, []byte) (int, error) {
+		return 0, errors.New("write error")
+	}
+
+	err := a.PwmWrite("5", 100)
+	gobottest.Assert(t, err, errors.New("write error"))
+}
+
 func TestAdaptorAnalog(t *testing.T) {
 	a, fs := initTestAdaptor()
 
 	fs.Files["/sys/bus/iio/devices/iio:device1/in_voltage0_raw"].Contents = "1000\n"
 	i, _ := a.AnalogRead("0")
 	gobottest.Assert(t, i, 250)
+}
+
+func TestAdaptorAnalogError(t *testing.T) {
+	a, _ := initTestAdaptor()
+
+	a.readFile = func(string) ([]byte, error) {
+		return nil, errors.New("read error")
+	}
+	_, err := a.AnalogRead("0")
+	gobottest.Assert(t, err, errors.New("read error"))
 }
