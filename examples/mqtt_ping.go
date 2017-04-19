@@ -16,10 +16,10 @@ func main() {
 	mqttAdaptor := mqtt.NewAdaptor("tcp://test.mosquitto.org:1883", "pinger")
 
 	work := func() {
-		mqttAdaptor.On("hello", func(data []byte) {
+		mqttAdaptor.On("hello", func(msg mqtt.Message) {
 			fmt.Println("hello")
 		})
-		mqttAdaptor.On("hola", func(data []byte) {
+		mqttAdaptor.On("hola", func(msg mqtt.Message) {
 			fmt.Println("hola")
 		})
 		data := []byte("o")
