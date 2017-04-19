@@ -12,36 +12,11 @@ import (
 	"gobot.io/x/gobot/sysfs"
 )
 
-func writeFile(path string, data []byte) (i int, err error) {
-	file, err := sysfs.OpenFile(path, os.O_WRONLY, 0644)
-	defer file.Close()
-	if err != nil {
-		return
-	}
-
-	return file.Write(data)
-}
-
-func readFile(path string) ([]byte, error) {
-	file, err := sysfs.OpenFile(path, os.O_RDONLY, 0644)
-	defer file.Close()
-	if err != nil {
-		return make([]byte, 0), err
-	}
-
-	buf := make([]byte, 200)
-	var i int
-	i, err = file.Read(buf)
-	if i == 0 {
-		return buf, err
-	}
-	return buf[:i], err
-}
-
 type mux struct {
 	pin   int
 	value int
 }
+
 type sysfsPin struct {
 	pin          int
 	resistor     int
@@ -62,15 +37,6 @@ type Adaptor struct {
 	connect     func(e *Adaptor) (err error)
 	writeFile   func(path string, data []byte) (i int, err error)
 	readFile    func(path string) ([]byte, error)
-}
-
-// changePinMode writes pin mode to current_pinmux file
-func changePinMode(a *Adaptor, pin, mode string) (err error) {
-	_, err = a.writeFile(
-		"/sys/kernel/debug/gpio_debug/gpio"+pin+"/current_pinmux",
-		[]byte("mode"+mode),
-	)
-	return
 }
 
 // NewAdaptor returns a new Edison Adaptor
@@ -429,5 +395,40 @@ func (e *Adaptor) newDigitalPin(i int, level int) (err error) {
 		return
 	}
 	err = io.Unexport()
+	return
+}
+
+func writeFile(path string, data []byte) (i int, err error) {
+	file, err := sysfs.OpenFile(path, os.O_WRONLY, 0644)
+	defer file.Close()
+	if err != nil {
+		return
+	}
+
+	return file.Write(data)
+}
+
+func readFile(path string) ([]byte, error) {
+	file, err := sysfs.OpenFile(path, os.O_RDONLY, 0644)
+	defer file.Close()
+	if err != nil {
+		return make([]byte, 0), err
+	}
+
+	buf := make([]byte, 200)
+	var i int
+	i, err = file.Read(buf)
+	if i == 0 {
+		return buf, err
+	}
+	return buf[:i], err
+}
+
+// changePinMode writes pin mode to current_pinmux file
+func changePinMode(a *Adaptor, pin, mode string) (err error) {
+	_, err = a.writeFile(
+		"/sys/kernel/debug/gpio_debug/gpio"+pin+"/current_pinmux",
+		[]byte("mode"+mode),
+	)
 	return
 }
