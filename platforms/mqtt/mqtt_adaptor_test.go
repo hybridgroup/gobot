@@ -24,8 +24,56 @@ func TestMqttAdaptorName(t *testing.T) {
 	gobottest.Assert(t, a.Name(), "NewName")
 }
 
-func TestMqttAdaptorConnect(t *testing.T) {
+func TestMqttAdaptorPort(t *testing.T) {
 	a := initTestMqttAdaptor()
+	gobottest.Assert(t, a.Port(), "localhost:1883")
+}
+
+func TestMqttAdaptorAutoReconnect(t *testing.T) {
+	a := initTestMqttAdaptor()
+	gobottest.Assert(t, a.AutoReconnect(), false)
+	a.SetAutoReconnect(true)
+	gobottest.Assert(t, a.AutoReconnect(), true)
+}
+
+func TestMqttAdaptorUseSSL(t *testing.T) {
+	a := initTestMqttAdaptor()
+	gobottest.Assert(t, a.UseSSL(), false)
+	a.SetUseSSL(true)
+	gobottest.Assert(t, a.UseSSL(), true)
+}
+
+func TestMqttAdaptorUseServerCert(t *testing.T) {
+	a := initTestMqttAdaptor()
+	gobottest.Assert(t, a.ServerCert(), "")
+	a.SetServerCert("/path/to/server.cert")
+	gobottest.Assert(t, a.ServerCert(), "/path/to/server.cert")
+}
+
+func TestMqttAdaptorUseClientCert(t *testing.T) {
+	a := initTestMqttAdaptor()
+	gobottest.Assert(t, a.ClientCert(), "")
+	a.SetClientCert("/path/to/client.cert")
+	gobottest.Assert(t, a.ClientCert(), "/path/to/client.cert")
+}
+
+func TestMqttAdaptorUseClientKey(t *testing.T) {
+	a := initTestMqttAdaptor()
+	gobottest.Assert(t, a.ClientKey(), "")
+	a.SetClientKey("/path/to/client.key")
+	gobottest.Assert(t, a.ClientKey(), "/path/to/client.key")
+}
+
+func TestMqttAdaptorConnectError(t *testing.T) {
+	a := initTestMqttAdaptor()
+	var expected error
+	expected = multierror.Append(expected, errors.New("Network Error : Unknown protocol"))
+
+	gobottest.Assert(t, a.Connect(), expected)
+}
+
+func TestMqttAdaptorConnectWithAuthError(t *testing.T) {
+	a := NewAdaptorWithAuth("localhost:1883", "client", "user", "pass")
 	var expected error
 	expected = multierror.Append(expected, errors.New("Network Error : Unknown protocol"))
 
