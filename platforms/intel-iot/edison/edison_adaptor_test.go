@@ -109,6 +109,7 @@ func TestAdaptorConnect(t *testing.T) {
 	a, _ := initTestAdaptor()
 	gobottest.Assert(t, a.Connect(), nil)
 	gobottest.Assert(t, a.GetDefaultBus(), 6)
+	gobottest.Assert(t, a.Board(), "arduino")
 
 	a = NewAdaptor()
 	sysfs.SetFilesystem(sysfs.NewMockFilesystem([]string{}))
@@ -130,6 +131,7 @@ func TestAdaptorConnectSparkfun(t *testing.T) {
 	a.SetBoard("sparkfun")
 	gobottest.Assert(t, a.Connect(), nil)
 	gobottest.Assert(t, a.GetDefaultBus(), 1)
+	gobottest.Assert(t, a.Board(), "sparkfun")
 }
 
 func TestAdaptorConnectMiniboard(t *testing.T) {
@@ -137,6 +139,7 @@ func TestAdaptorConnectMiniboard(t *testing.T) {
 	a.SetBoard("miniboard")
 	gobottest.Assert(t, a.Connect(), nil)
 	gobottest.Assert(t, a.GetDefaultBus(), 1)
+	gobottest.Assert(t, a.Board(), "miniboard")
 }
 
 func TestAdaptorConnectUnknown(t *testing.T) {

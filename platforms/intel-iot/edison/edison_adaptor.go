@@ -43,7 +43,6 @@ type Adaptor struct {
 func NewAdaptor() *Adaptor {
 	return &Adaptor{
 		name:      gobot.DefaultName("Edison"),
-		board:     "arduino",
 		pinmap:    arduinoPinMap,
 		writeFile: writeFile,
 		readFile:  readFile,
@@ -66,6 +65,10 @@ func (e *Adaptor) SetBoard(n string) { e.board = n }
 func (e *Adaptor) Connect() (err error) {
 	e.digitalPins = make(map[int]sysfs.DigitalPin)
 	e.pwmPins = make(map[int]*pwmPin)
+
+	if e.board == "" && e.checkForArduino() {
+		e.board = "arduino"
+	}
 
 	switch e.Board() {
 	case "sparkfun":
@@ -206,12 +209,25 @@ func (e *Adaptor) GetDefaultBus() int {
 	return 1
 }
 
-// arduinoSetup does needed setup for the Arduino compatible breakout board
-func (e *Adaptor) arduinoSetup() (err error) {
+// TODO: also check to see if device labels for
+// /sys/class/gpio/gpiochip{200,216,232,248}/label == "pcal9555a"
+func (e *Adaptor) checkForArduino() bool {
+	if err := e.exportTristatePin(); err != nil {
+		return false
+	}
+	return true
+}
+
+func (e *Adaptor) exportTristatePin() (err error) {
 	e.tristate = sysfs.NewDigitalPin(214)
 	if err = e.tristate.Export(); err != nil {
 		return err
 	}
+	return
+}
+
+// arduinoSetup does needed setup for the Arduino compatible breakout board
+func (e *Adaptor) arduinoSetup() (err error) {
 	if err = e.tristate.Direction(sysfs.OUT); err != nil {
 		return err
 	}
