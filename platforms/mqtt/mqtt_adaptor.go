@@ -11,6 +11,9 @@ import (
 	multierror "github.com/hashicorp/go-multierror"
 )
 
+// Message is a message received from the broker.
+type Message paho.Message
+
 // Adaptor is the Gobot Adaptor for MQTT
 type Adaptor struct {
 	name          string
@@ -86,7 +89,7 @@ func (a *Adaptor) SetClientCert(val string) { a.clientCert = val }
 // ClientKey returns the MQTT client SSL key file
 func (a *Adaptor) ClientKey() string { return a.clientKey }
 
-// SetClientCert sets the MQTT server SSL key file
+// SetClientKey sets the MQTT client SSL key file
 func (a *Adaptor) SetClientKey(val string) { a.clientKey = val }
 
 // Connect returns true if connection to mqtt is established
@@ -123,12 +126,12 @@ func (a *Adaptor) Publish(topic string, message []byte) bool {
 }
 
 // On subscribes to a topic, and then calls the message handler function when data is received
-func (a *Adaptor) On(event string, f func(s []byte)) bool {
+func (a *Adaptor) On(event string, f func(msg Message)) bool {
 	if a.client == nil {
 		return false
 	}
 	a.client.Subscribe(event, 0, func(client paho.Client, msg paho.Message) {
-		f(msg.Payload())
+		f(msg)
 	})
 	return true
 }
