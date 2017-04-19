@@ -228,6 +228,10 @@ func (e *Adaptor) exportTristatePin() (err error) {
 
 // arduinoSetup does needed setup for the Arduino compatible breakout board
 func (e *Adaptor) arduinoSetup() (err error) {
+	if err = e.exportTristatePin(); err != nil {
+		return err
+	}
+
 	if err = e.tristate.Direction(sysfs.OUT); err != nil {
 		return err
 	}
