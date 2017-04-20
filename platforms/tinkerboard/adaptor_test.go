@@ -26,7 +26,7 @@ func initTestTinkerboardAdaptor() *Adaptor {
 
 func TestTinkerboardAdaptorName(t *testing.T) {
 	a := NewAdaptor()
-	gobottest.Assert(t, strings.HasPrefix(a.Name(), "Tinkerboard"), true)
+	gobottest.Assert(t, strings.HasPrefix(a.Name(), "Tinker Board"), true)
 	a.SetName("NewName")
 	gobottest.Assert(t, a.Name(), "NewName")
 }

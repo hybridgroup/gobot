@@ -1,12 +1,14 @@
-# Tinkerboard
+# Tinker Board
 
-The Tinkerboard is a single board SoC computer based on the Rockchip RK3288 processor. It has built-in GPIO, PWM, SPI, and I2C interfaces.
+The ASUS Tinker Board is a single board SoC computer based on the Rockchip RK3288 processor. It has built-in GPIO, PWM, SPI, and I2C interfaces.
 
-For more info about the Tinkerboard, go to [https://www.asus.com/uk/Single-Board-Computer/Tinker-Board/](https://www.asus.com/uk/Single-Board-Computer/Tinker-Board/).
+For more info about the Tinker Board, go to [https://www.asus.com/uk/Single-Board-Computer/Tinker-Board/](https://www.asus.com/uk/Single-Board-Computer/Tinker-Board/).
 
 ## How to Install
 
-Info here...
+We recommend updating to the latest Debian TinkerOS when using the Tinker Board.
+
+You would normally install Go and Gobot on your workstation. Once installed, cross compile your program on your workstation, transfer the final executable to your Tinker Board, and run the program on the Tinker Board as documented here.
 
 ```
 go get -d -u gobot.io/x/gobot/...

@@ -10,7 +10,7 @@ import (
 	"gobot.io/x/gobot/sysfs"
 )
 
-// Adaptor represents a Gobot Adaptor for Tinkerboard
+// Adaptor represents a Gobot Adaptor for the ASUS Tinker Board
 type Adaptor struct {
 	name        string
 	digitalPins map[int]sysfs.DigitalPin
@@ -22,7 +22,7 @@ type Adaptor struct {
 // NewAdaptor creates a Tinkerboard Adaptor
 func NewAdaptor() *Adaptor {
 	c := &Adaptor{
-		name:        gobot.DefaultName("Tinkerboard"),
+		name:        gobot.DefaultName("Tinker Board"),
 		digitalPins: make(map[int]sysfs.DigitalPin),
 	}
 
