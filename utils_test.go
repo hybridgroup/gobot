@@ -1,6 +1,7 @@
 package gobot
 
 import (
+	"strings"
 	"testing"
 	"time"
 
@@ -78,4 +79,9 @@ func TestRand(t *testing.T) {
 	if a == b {
 		t.Errorf("%v should not equal %v", a, b)
 	}
+}
+
+func TestDefaultName(t *testing.T) {
+	name := DefaultName("tester")
+	gobottest.Assert(t, strings.Contains(name, "tester"), true)
 }

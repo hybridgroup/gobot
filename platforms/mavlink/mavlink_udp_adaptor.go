@@ -6,10 +6,16 @@ import (
 	common "gobot.io/x/gobot/platforms/mavlink/common"
 )
 
+type UDPConnection interface {
+	Close() error
+	ReadFromUDP([]byte) (int, *net.UDPAddr, error)
+	WriteTo([]byte, net.Addr) (int, error)
+}
+
 type UDPAdaptor struct {
 	name string
 	port string
-	sock *net.UDPConn
+	sock UDPConnection
 }
 
 var _ BaseAdaptor = (*UDPAdaptor)(nil)
@@ -86,5 +92,10 @@ func (m *UDPAdaptor) ReadMAVLinkPacket() (*common.MAVLinkPacket, error) {
 }
 
 func (m *UDPAdaptor) Write(b []byte) (int, error) {
-	return m.sock.Write(b)
+	addr, err := net.ResolveUDPAddr("udp", m.Port())
+	if err != nil {
+		return 0, err
+	}
+
+	return m.sock.WriteTo(b, addr)
 }

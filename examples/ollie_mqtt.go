@@ -31,8 +31,8 @@ func main() {
 	work := func() {
 		ollie.SetRGB(255, 0, 255)
 
-		mqttAdaptor.On("sensores/dial", func(data []byte) {
-			val, _ := strconv.Atoi(string(data))
+		mqttAdaptor.On("sensores/dial", func(msg mqtt.Message) {
+			val, _ := strconv.Atoi(string(msg.Payload()))
 
 			if val > 2000 {
 				ollie.SetRGB(0, 255, 0)
@@ -45,28 +45,28 @@ func main() {
 			ollie.SetRGB(255, 0, 0)
 		})
 
-		mqttAdaptor.On("rover/frente", func(data []byte) {
+		mqttAdaptor.On("rover/frente", func(msg mqtt.Message) {
 			ollie.Roll(40, FRENTE)
 			gobot.After(1*time.Second, func() {
 				ollie.Stop()
 			})
 		})
 
-		mqttAdaptor.On("rover/derecha", func(data []byte) {
+		mqttAdaptor.On("rover/derecha", func(msg mqtt.Message) {
 			ollie.Roll(40, DERECHA)
 			gobot.After(1*time.Second, func() {
 				ollie.Stop()
 			})
 		})
 
-		mqttAdaptor.On("rover/atras", func(data []byte) {
+		mqttAdaptor.On("rover/atras", func(msg mqtt.Message) {
 			ollie.Roll(40, ATRAS)
 			gobot.After(1*time.Second, func() {
 				ollie.Stop()
 			})
 		})
 
-		mqttAdaptor.On("rover/izquierda", func(data []byte) {
+		mqttAdaptor.On("rover/izquierda", func(msg mqtt.Message) {
 			ollie.Roll(40, IZQUIERDA)
 			gobot.After(1*time.Second, func() {
 				ollie.Stop()

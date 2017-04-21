@@ -3,7 +3,6 @@ package joule
 import (
 	"errors"
 	"fmt"
-	"os"
 	"strconv"
 
 	multierror "github.com/hashicorp/go-multierror"
@@ -11,32 +10,6 @@ import (
 	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/sysfs"
 )
-
-func writeFile(path string, data []byte) (i int, err error) {
-	file, err := sysfs.OpenFile(path, os.O_WRONLY, 0644)
-	defer file.Close()
-	if err != nil {
-		return
-	}
-
-	return file.Write(data)
-}
-
-func readFile(path string) ([]byte, error) {
-	file, err := sysfs.OpenFile(path, os.O_RDONLY, 0644)
-	defer file.Close()
-	if err != nil {
-		return make([]byte, 0), err
-	}
-
-	buf := make([]byte, 200)
-	var i int
-	i, err = file.Read(buf)
-	if i == 0 {
-		return buf, err
-	}
-	return buf[:i], err
-}
 
 type sysfsPin struct {
 	pin    int
@@ -47,7 +20,7 @@ type sysfsPin struct {
 type Adaptor struct {
 	name        string
 	digitalPins map[int]sysfs.DigitalPin
-	pwmPins     map[int]*pwmPin
+	pwmPins     map[int]*sysfs.PWMPin
 	i2cBuses    [3]sysfs.I2cDevice
 	connect     func(e *Adaptor) (err error)
 }
@@ -71,7 +44,7 @@ func (e *Adaptor) SetName(n string) { e.name = n }
 // Connect initializes the Joule for use with the Arduino beakout board
 func (e *Adaptor) Connect() (err error) {
 	e.digitalPins = make(map[int]sysfs.DigitalPin)
-	e.pwmPins = make(map[int]*pwmPin)
+	e.pwmPins = make(map[int]*sysfs.PWMPin)
 	err = e.connect(e)
 	return
 }
@@ -87,10 +60,10 @@ func (e *Adaptor) Finalize() (err error) {
 	}
 	for _, pin := range e.pwmPins {
 		if pin != nil {
-			if errs := pin.enable("0"); errs != nil {
+			if errs := pin.Enable("0"); errs != nil {
 				err = multierror.Append(err, errs)
 			}
-			if errs := pin.unexport(); errs != nil {
+			if errs := pin.Unexport(); errs != nil {
 				err = multierror.Append(err, errs)
 			}
 		}
@@ -153,15 +126,15 @@ func (e *Adaptor) PwmWrite(pin string, val byte) (err error) {
 			if err = e.DigitalWrite(pin, 1); err != nil {
 				return
 			}
-			e.pwmPins[sysPin.pwmPin] = newPwmPin(sysPin.pwmPin)
-			if err = e.pwmPins[sysPin.pwmPin].export(); err != nil {
+			e.pwmPins[sysPin.pwmPin] = sysfs.NewPWMPin(sysPin.pwmPin)
+			if err = e.pwmPins[sysPin.pwmPin].Export(); err != nil {
 				return
 			}
-			if err = e.pwmPins[sysPin.pwmPin].enable("1"); err != nil {
+			if err = e.pwmPins[sysPin.pwmPin].Enable("1"); err != nil {
 				return
 			}
 		}
-		p, err := e.pwmPins[sysPin.pwmPin].period()
+		p, err := e.pwmPins[sysPin.pwmPin].Period()
 		if err != nil {
 			return err
 		}
@@ -170,7 +143,7 @@ func (e *Adaptor) PwmWrite(pin string, val byte) (err error) {
 			return err
 		}
 		duty := gobot.FromScale(float64(val), 0, 255.0)
-		return e.pwmPins[sysPin.pwmPin].writeDuty(strconv.Itoa(int(float64(period) * duty)))
+		return e.pwmPins[sysPin.pwmPin].WriteDuty(strconv.Itoa(int(float64(period) * duty)))
 	}
 	return errors.New("Not a PWM pin")
 }

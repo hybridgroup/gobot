@@ -38,7 +38,7 @@ func TestGroveTempSensorPublishesTemperatureInCelsius(t *testing.T) {
 
 	select {
 	case <-sem:
-	case <-time.After(10 * time.Second):
+	case <-time.After(1 * time.Second):
 		t.Errorf("Grove Temperature Sensor Event \"Data\" was not published")
 	}
 
@@ -66,7 +66,7 @@ func TestGroveTempSensorPublishesError(t *testing.T) {
 
 	select {
 	case <-sem:
-	case <-time.After(time.Second):
+	case <-time.After(1 * time.Second):
 		t.Errorf("Grove Temperature Sensor Event \"Error\" was not published")
 	}
 }
@@ -81,7 +81,7 @@ func TestGroveTempSensorHalt(t *testing.T) {
 	gobottest.Assert(t, d.Halt(), nil)
 	select {
 	case <-done:
-	case <-time.After(time.Millisecond):
+	case <-time.After(100 * time.Millisecond):
 		t.Errorf("Grove Temperature Sensor was not halted")
 	}
 }

@@ -56,7 +56,7 @@ func TestAnalogSensorDriverStart(t *testing.T) {
 
 	select {
 	case <-sem:
-	case <-time.After(10 * time.Second):
+	case <-time.After(1 * time.Second):
 		t.Errorf("AnalogSensor Event \"Data\" was not published")
 	}
 
@@ -74,7 +74,7 @@ func TestAnalogSensorDriverStart(t *testing.T) {
 
 	select {
 	case <-sem:
-	case <-time.After(10 * time.Second):
+	case <-time.After(1 * time.Second):
 		t.Errorf("AnalogSensor Event \"Error\" was not published")
 	}
 
@@ -93,7 +93,7 @@ func TestAnalogSensorDriverStart(t *testing.T) {
 	select {
 	case <-sem:
 		t.Errorf("AnalogSensor Event should not published")
-	case <-time.After(100 * time.Millisecond):
+	case <-time.After(1 * time.Second):
 	}
 }
 
@@ -107,7 +107,7 @@ func TestAnalogSensorDriverHalt(t *testing.T) {
 	gobottest.Assert(t, d.Halt(), nil)
 	select {
 	case <-done:
-	case <-time.After(time.Millisecond):
+	case <-time.After(100 * time.Millisecond):
 		t.Errorf("AnalogSensor was not halted")
 	}
 }

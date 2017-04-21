@@ -12,7 +12,7 @@ import (
 
 var _ gobot.Driver = (*PIRMotionDriver)(nil)
 
-const MOTION_TEST_DELAY = 150
+const motionTestDelay = 150
 
 func initTestPIRMotionDriver() *PIRMotionDriver {
 	return NewPIRMotionDriver(newGpioTestAdaptor(), "1")
@@ -53,7 +53,7 @@ func TestPIRMotionDriverStart(t *testing.T) {
 
 	select {
 	case <-sem:
-	case <-time.After(MOTION_TEST_DELAY * time.Millisecond):
+	case <-time.After(motionTestDelay * time.Millisecond):
 		t.Errorf("PIRMotionDriver Event \"MotionDetected\" was not published")
 	}
 
@@ -69,22 +69,22 @@ func TestPIRMotionDriverStart(t *testing.T) {
 
 	select {
 	case <-sem:
-	case <-time.After(MOTION_TEST_DELAY * time.Millisecond):
+	case <-time.After(motionTestDelay * time.Millisecond):
 		t.Errorf("PIRMotionDriver Event \"MotionStopped\" was not published")
 	}
+
+	d.Once(Error, func(data interface{}) {
+		sem <- true
+	})
 
 	a.TestAdaptorDigitalRead(func() (val int, err error) {
 		err = errors.New("digital read error")
 		return
 	})
 
-	d.Once(Error, func(data interface{}) {
-		sem <- true
-	})
-
 	select {
 	case <-sem:
-	case <-time.After(MOTION_TEST_DELAY * time.Millisecond):
+	case <-time.After(motionTestDelay * time.Millisecond):
 		t.Errorf("PIRMotionDriver Event \"Error\" was not published")
 	}
 }

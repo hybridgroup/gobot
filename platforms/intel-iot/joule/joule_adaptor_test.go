@@ -84,7 +84,7 @@ func initTestAdaptor() (*Adaptor, *sysfs.MockFilesystem) {
 		"/dev/i2c-0",
 	})
 	sysfs.SetFilesystem(fs)
-	fs.Files["/sys/class/pwm/pwmchip0/pwm0/period"].Contents = "5000\n"
+	fs.Files["/sys/class/pwm/pwmchip0/pwm0/period"].Contents = "5000"
 	a.Connect()
 	return a, fs
 }

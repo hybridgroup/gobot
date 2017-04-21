@@ -14,7 +14,7 @@ import (
 var _ gobot.Adaptor = (*Adaptor)(nil)
 
 func initTestMqttAdaptor() *Adaptor {
-	return NewAdaptor("localhost:1883", "client")
+	return NewAdaptor("tcp://localhost:1883", "client")
 }
 
 func TestMqttAdaptorName(t *testing.T) {
@@ -24,8 +24,65 @@ func TestMqttAdaptorName(t *testing.T) {
 	gobottest.Assert(t, a.Name(), "NewName")
 }
 
-func TestMqttAdaptorConnect(t *testing.T) {
+func TestMqttAdaptorPort(t *testing.T) {
 	a := initTestMqttAdaptor()
+	gobottest.Assert(t, a.Port(), "tcp://localhost:1883")
+}
+
+func TestMqttAdaptorAutoReconnect(t *testing.T) {
+	a := initTestMqttAdaptor()
+	gobottest.Assert(t, a.AutoReconnect(), false)
+	a.SetAutoReconnect(true)
+	gobottest.Assert(t, a.AutoReconnect(), true)
+}
+
+func TestMqttAdaptorUseSSL(t *testing.T) {
+	a := initTestMqttAdaptor()
+	gobottest.Assert(t, a.UseSSL(), false)
+	a.SetUseSSL(true)
+	gobottest.Assert(t, a.UseSSL(), true)
+}
+
+func TestMqttAdaptorUseServerCert(t *testing.T) {
+	a := initTestMqttAdaptor()
+	gobottest.Assert(t, a.ServerCert(), "")
+	a.SetServerCert("/path/to/server.cert")
+	gobottest.Assert(t, a.ServerCert(), "/path/to/server.cert")
+}
+
+func TestMqttAdaptorUseClientCert(t *testing.T) {
+	a := initTestMqttAdaptor()
+	gobottest.Assert(t, a.ClientCert(), "")
+	a.SetClientCert("/path/to/client.cert")
+	gobottest.Assert(t, a.ClientCert(), "/path/to/client.cert")
+}
+
+func TestMqttAdaptorUseClientKey(t *testing.T) {
+	a := initTestMqttAdaptor()
+	gobottest.Assert(t, a.ClientKey(), "")
+	a.SetClientKey("/path/to/client.key")
+	gobottest.Assert(t, a.ClientKey(), "/path/to/client.key")
+}
+
+func TestMqttAdaptorConnectError(t *testing.T) {
+	a := initTestMqttAdaptor()
+	var expected error
+	expected = multierror.Append(expected, errors.New("Network Error : dial tcp 127.0.0.1:1883: getsockopt: connection refused"))
+
+	gobottest.Assert(t, a.Connect(), expected)
+}
+
+func TestMqttAdaptorConnectSSLError(t *testing.T) {
+	a := initTestMqttAdaptor()
+	a.SetUseSSL(true)
+	var expected error
+	expected = multierror.Append(expected, errors.New("Network Error : dial tcp 127.0.0.1:1883: getsockopt: connection refused"))
+
+	gobottest.Assert(t, a.Connect(), expected)
+}
+
+func TestMqttAdaptorConnectWithAuthError(t *testing.T) {
+	a := NewAdaptorWithAuth("localhost:1883", "client", "user", "pass")
 	var expected error
 	expected = multierror.Append(expected, errors.New("Network Error : Unknown protocol"))
 
@@ -52,7 +109,7 @@ func TestMqttAdaptorPublishWhenConnected(t *testing.T) {
 
 func TestMqttAdaptorCannotOnUnlessConnected(t *testing.T) {
 	a := initTestMqttAdaptor()
-	gobottest.Assert(t, a.On("hola", func(data []byte) {
+	gobottest.Assert(t, a.On("hola", func(msg Message) {
 		fmt.Println("hola")
 	}), false)
 }
@@ -60,7 +117,7 @@ func TestMqttAdaptorCannotOnUnlessConnected(t *testing.T) {
 func TestMqttAdaptorOnWhenConnected(t *testing.T) {
 	a := initTestMqttAdaptor()
 	a.Connect()
-	gobottest.Assert(t, a.On("hola", func(data []byte) {
+	gobottest.Assert(t, a.On("hola", func(msg Message) {
 		fmt.Println("hola")
 	}), true)
 }

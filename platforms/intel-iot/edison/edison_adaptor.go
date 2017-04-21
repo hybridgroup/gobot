@@ -12,36 +12,11 @@ import (
 	"gobot.io/x/gobot/sysfs"
 )
 
-func writeFile(path string, data []byte) (i int, err error) {
-	file, err := sysfs.OpenFile(path, os.O_WRONLY, 0644)
-	defer file.Close()
-	if err != nil {
-		return
-	}
-
-	return file.Write(data)
-}
-
-func readFile(path string) ([]byte, error) {
-	file, err := sysfs.OpenFile(path, os.O_RDONLY, 0644)
-	defer file.Close()
-	if err != nil {
-		return make([]byte, 0), err
-	}
-
-	buf := make([]byte, 200)
-	var i int
-	i, err = file.Read(buf)
-	if i == 0 {
-		return buf, err
-	}
-	return buf[:i], err
-}
-
 type mux struct {
 	pin   int
 	value int
 }
+
 type sysfsPin struct {
 	pin          int
 	resistor     int
@@ -57,26 +32,20 @@ type Adaptor struct {
 	pinmap      map[string]sysfsPin
 	tristate    sysfs.DigitalPin
 	digitalPins map[int]sysfs.DigitalPin
-	pwmPins     map[int]*pwmPin
+	pwmPins     map[int]*sysfs.PWMPin
 	i2cBus      sysfs.I2cDevice
 	connect     func(e *Adaptor) (err error)
-}
-
-// changePinMode writes pin mode to current_pinmux file
-func changePinMode(pin, mode string) (err error) {
-	_, err = writeFile(
-		"/sys/kernel/debug/gpio_debug/gpio"+pin+"/current_pinmux",
-		[]byte("mode"+mode),
-	)
-	return
+	writeFile   func(path string, data []byte) (i int, err error)
+	readFile    func(path string) ([]byte, error)
 }
 
 // NewAdaptor returns a new Edison Adaptor
 func NewAdaptor() *Adaptor {
 	return &Adaptor{
-		name:   gobot.DefaultName("Edison"),
-		board:  "arduino",
-		pinmap: arduinoPinMap,
+		name:      gobot.DefaultName("Edison"),
+		pinmap:    arduinoPinMap,
+		writeFile: writeFile,
+		readFile:  readFile,
 	}
 }
 
@@ -95,7 +64,11 @@ func (e *Adaptor) SetBoard(n string) { e.board = n }
 // Connect initializes the Edison for use with the Arduino beakout board
 func (e *Adaptor) Connect() (err error) {
 	e.digitalPins = make(map[int]sysfs.DigitalPin)
-	e.pwmPins = make(map[int]*pwmPin)
+	e.pwmPins = make(map[int]*sysfs.PWMPin)
+
+	if e.board == "" && e.checkForArduino() {
+		e.board = "arduino"
+	}
 
 	switch e.Board() {
 	case "sparkfun":
@@ -130,10 +103,10 @@ func (e *Adaptor) Finalize() (err error) {
 	}
 	for _, pin := range e.pwmPins {
 		if pin != nil {
-			if errs := pin.enable("0"); errs != nil {
+			if errs := pin.Enable("0"); errs != nil {
 				err = multierror.Append(err, errs)
 			}
-			if errs := pin.unexport(); errs != nil {
+			if errs := pin.Unexport(); errs != nil {
 				err = multierror.Append(err, errs)
 			}
 		}
@@ -172,18 +145,18 @@ func (e *Adaptor) PwmWrite(pin string, val byte) (err error) {
 			if err = e.DigitalWrite(pin, 1); err != nil {
 				return
 			}
-			if err = changePinMode(strconv.Itoa(int(sysPin.pin)), "1"); err != nil {
+			if err = changePinMode(e, strconv.Itoa(int(sysPin.pin)), "1"); err != nil {
 				return
 			}
-			e.pwmPins[sysPin.pwmPin] = newPwmPin(sysPin.pwmPin)
-			if err = e.pwmPins[sysPin.pwmPin].export(); err != nil {
+			e.pwmPins[sysPin.pwmPin] = sysfs.NewPWMPin(sysPin.pwmPin)
+			if err = e.pwmPins[sysPin.pwmPin].Export(); err != nil {
 				return
 			}
-			if err = e.pwmPins[sysPin.pwmPin].enable("1"); err != nil {
+			if err = e.pwmPins[sysPin.pwmPin].Enable("1"); err != nil {
 				return
 			}
 		}
-		p, err := e.pwmPins[sysPin.pwmPin].period()
+		p, err := e.pwmPins[sysPin.pwmPin].Period()
 		if err != nil {
 			return err
 		}
@@ -192,14 +165,14 @@ func (e *Adaptor) PwmWrite(pin string, val byte) (err error) {
 			return err
 		}
 		duty := gobot.FromScale(float64(val), 0, 255.0)
-		return e.pwmPins[sysPin.pwmPin].writeDuty(strconv.Itoa(int(float64(period) * duty)))
+		return e.pwmPins[sysPin.pwmPin].WriteDuty(strconv.Itoa(int(float64(period) * duty)))
 	}
 	return errors.New("Not a PWM pin")
 }
 
 // AnalogRead returns value from analog reading of specified pin
 func (e *Adaptor) AnalogRead(pin string) (val int, err error) {
-	buf, err := readFile(
+	buf, err := e.readFile(
 		"/sys/bus/iio/devices/iio:device1/in_voltage" + pin + "_raw",
 	)
 	if err != nil {
@@ -236,12 +209,29 @@ func (e *Adaptor) GetDefaultBus() int {
 	return 1
 }
 
-// arduinoSetup does needed setup for the Arduino compatible breakout board
-func (e *Adaptor) arduinoSetup() (err error) {
+// TODO: also check to see if device labels for
+// /sys/class/gpio/gpiochip{200,216,232,248}/label == "pcal9555a"
+func (e *Adaptor) checkForArduino() bool {
+	if err := e.exportTristatePin(); err != nil {
+		return false
+	}
+	return true
+}
+
+func (e *Adaptor) exportTristatePin() (err error) {
 	e.tristate = sysfs.NewDigitalPin(214)
 	if err = e.tristate.Export(); err != nil {
 		return err
 	}
+	return
+}
+
+// arduinoSetup does needed setup for the Arduino compatible breakout board
+func (e *Adaptor) arduinoSetup() (err error) {
+	if err = e.exportTristatePin(); err != nil {
+		return err
+	}
+
 	if err = e.tristate.Direction(sysfs.OUT); err != nil {
 		return err
 	}
@@ -262,13 +252,13 @@ func (e *Adaptor) arduinoSetup() (err error) {
 	}
 
 	for _, i := range []string{"111", "115", "114", "109"} {
-		if err = changePinMode(i, "1"); err != nil {
+		if err = changePinMode(e, i, "1"); err != nil {
 			return err
 		}
 	}
 
 	for _, i := range []string{"131", "129", "40"} {
-		if err = changePinMode(i, "0"); err != nil {
+		if err = changePinMode(e, i, "0"); err != nil {
 			return err
 		}
 	}
@@ -302,7 +292,7 @@ func (e *Adaptor) arduinoI2CSetup() (err error) {
 	}
 
 	for _, i := range []string{"28", "27"} {
-		if err = changePinMode(i, "1"); err != nil {
+		if err = changePinMode(e, i, "1"); err != nil {
 			return
 		}
 	}
@@ -425,5 +415,40 @@ func (e *Adaptor) newDigitalPin(i int, level int) (err error) {
 		return
 	}
 	err = io.Unexport()
+	return
+}
+
+func writeFile(path string, data []byte) (i int, err error) {
+	file, err := sysfs.OpenFile(path, os.O_WRONLY, 0644)
+	defer file.Close()
+	if err != nil {
+		return
+	}
+
+	return file.Write(data)
+}
+
+func readFile(path string) ([]byte, error) {
+	file, err := sysfs.OpenFile(path, os.O_RDONLY, 0644)
+	defer file.Close()
+	if err != nil {
+		return make([]byte, 0), err
+	}
+
+	buf := make([]byte, 200)
+	var i int
+	i, err = file.Read(buf)
+	if i == 0 {
+		return buf, err
+	}
+	return buf[:i], err
+}
+
+// changePinMode writes pin mode to current_pinmux file
+func changePinMode(a *Adaptor, pin, mode string) (err error) {
+	_, err = a.writeFile(
+		"/sys/kernel/debug/gpio_debug/gpio"+pin+"/current_pinmux",
+		[]byte("mode"+mode),
+	)
 	return
 }

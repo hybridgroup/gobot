@@ -11,7 +11,7 @@ import (
 
 var _ gobot.Driver = (*MakeyButtonDriver)(nil)
 
-const MAKEY_TEST_DELAY = 30
+const makeyTestDelay = 250
 
 func initTestMakeyButtonDriver() *MakeyButtonDriver {
 	return NewMakeyButtonDriver(newGpioTestAdaptor(), "1")
@@ -27,7 +27,7 @@ func TestMakeyButtonDriverHalt(t *testing.T) {
 	gobottest.Assert(t, d.Halt(), nil)
 	select {
 	case <-done:
-	case <-time.After(time.Millisecond):
+	case <-time.After(makeyTestDelay * time.Millisecond):
 		t.Errorf("MakeyButton was not halted")
 	}
 }
@@ -39,7 +39,7 @@ func TestMakeyButtonDriver(t *testing.T) {
 	gobottest.Assert(t, d.interval, 10*time.Millisecond)
 
 	d = NewMakeyButtonDriver(newGpioTestAdaptor(), "1", 30*time.Second)
-	gobottest.Assert(t, d.interval, MAKEY_TEST_DELAY*time.Second)
+	gobottest.Assert(t, d.interval, 30*time.Second)
 }
 
 func TestMakeyButtonDriverStart(t *testing.T) {
@@ -49,51 +49,51 @@ func TestMakeyButtonDriverStart(t *testing.T) {
 
 	gobottest.Assert(t, d.Start(), nil)
 
-	a.TestAdaptorDigitalRead(func() (val int, err error) {
-		val = 0
-		return
-	})
-
 	d.Once(ButtonPush, func(data interface{}) {
 		gobottest.Assert(t, d.Active, true)
 		sem <- true
 	})
 
-	select {
-	case <-sem:
-	case <-time.After(MAKEY_TEST_DELAY * time.Millisecond):
-		t.Errorf("MakeyButton Event \"Push\" was not published")
-	}
-
 	a.TestAdaptorDigitalRead(func() (val int, err error) {
-		val = 1
+		val = 0
 		return
 	})
+
+	select {
+	case <-sem:
+	case <-time.After(makeyTestDelay * time.Millisecond):
+		t.Errorf("MakeyButton Event \"Push\" was not published")
+	}
 
 	d.Once(ButtonRelease, func(data interface{}) {
 		gobottest.Assert(t, d.Active, false)
 		sem <- true
 	})
 
-	select {
-	case <-sem:
-	case <-time.After(MAKEY_TEST_DELAY * time.Millisecond):
-		t.Errorf("MakeyButton Event \"Release\" was not published")
-	}
-
 	a.TestAdaptorDigitalRead(func() (val int, err error) {
-		err = errors.New("digital read error")
+		val = 1
 		return
 	})
+
+	select {
+	case <-sem:
+	case <-time.After(makeyTestDelay * time.Millisecond):
+		t.Errorf("MakeyButton Event \"Release\" was not published")
+	}
 
 	d.Once(Error, func(data interface{}) {
 		gobottest.Assert(t, data.(error).Error(), "digital read error")
 		sem <- true
 	})
 
+	a.TestAdaptorDigitalRead(func() (val int, err error) {
+		err = errors.New("digital read error")
+		return
+	})
+
 	select {
 	case <-sem:
-	case <-time.After(MAKEY_TEST_DELAY * time.Millisecond):
+	case <-time.After(makeyTestDelay * time.Millisecond):
 		t.Errorf("MakeyButton Event \"Error\" was not published")
 	}
 
@@ -112,6 +112,6 @@ func TestMakeyButtonDriverStart(t *testing.T) {
 	select {
 	case <-sem:
 		t.Errorf("MakeyButton Event should not have been published")
-	case <-time.After(MAKEY_TEST_DELAY * time.Millisecond):
+	case <-time.After(makeyTestDelay * time.Millisecond):
 	}
 }

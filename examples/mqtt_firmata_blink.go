@@ -19,10 +19,10 @@ func main() {
 	led := gpio.NewLedDriver(firmataAdaptor, "13")
 
 	work := func() {
-		mqttAdaptor.On("lights/on", func(data []byte) {
+		mqttAdaptor.On("lights/on", func(msg mqtt.Message) {
 			led.On()
 		})
-		mqttAdaptor.On("lights/off", func(data []byte) {
+		mqttAdaptor.On("lights/off", func(msg mqtt.Message) {
 			led.Off()
 		})
 		data := []byte("")

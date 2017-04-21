@@ -71,9 +71,6 @@ func TestLedDriverToggle(t *testing.T) {
 }
 
 func TestLedDriverBrightness(t *testing.T) {
-	// d := initTestLedDriver(&gpioTestDigitalWriter{})
-	// gobottest.Assert(t, d.Brightness(150), ErrPwmWriteUnsupported)
-
 	a := newGpioTestAdaptor()
 	d := NewLedDriver(a, "1")
 	a.testAdaptorPwmWrite = func() (err error) {
