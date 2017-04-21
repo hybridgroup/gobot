@@ -75,7 +75,7 @@ func (h *MPL115A2Driver) SetName(n string) { h.name = n }
 func (h *MPL115A2Driver) Connection() gobot.Connection { return h.connector.(gobot.Connection) }
 
 // Start writes initialization bytes and reads from adaptor
-// using specified interval to accelerometer andtemperature data
+// using specified interval to accelerometer and temperature data
 func (h *MPL115A2Driver) Start() (err error) {
 	if err := h.initialization(); err != nil {
 		return err
