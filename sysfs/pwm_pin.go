@@ -7,11 +7,11 @@ import (
 
 // PWMPin is the interface for sysfs PWM interactions
 type PWMPin interface {
-	// Unexport unexports the pin and releases the pin from the operating system
-	Unexport() error
 	// Export exports the pin for use by the operating system
 	Export() error
-	// Enable enables the PWM pin
+	// Unexport unexports the pin and releases the pin from the operating system
+	Unexport() error
+	// Enable enables/disables the PWM pin
 	Enable(val string) (err error)
 	// Period returns the current PWM period for pin
 	Period() (period string, err error)
@@ -33,6 +33,18 @@ func NewPwmPin(pin int) *pwmPin {
 	return p
 }
 
+// Export writes pin to pwm export path
+func (p *pwmPin) Export() (err error) {
+	_, err = p.write(pwmExportPath(), []byte(p.pin))
+	return
+}
+
+// Unexport writes pin to pwm unexport path
+func (p *pwmPin) Unexport() (err error) {
+	_, err = p.write(pwmUnexportPath(), []byte(p.pin))
+	return
+}
+
 // Enable writes value to pwm enable path
 func (p *pwmPin) Enable(val string) (err error) {
 	_, err = p.write(pwmEnablePath(p.pin), []byte(val))
@@ -51,18 +63,6 @@ func (p *pwmPin) Period() (period string, err error) {
 // WriteDuty writes value to pwm duty cycle path
 func (p *pwmPin) WriteDuty(duty string) (err error) {
 	_, err = p.write(pwmDutyCyclePath(p.pin), []byte(duty))
-	return
-}
-
-// Export writes pin to pwm export path
-func (p *pwmPin) Export() (err error) {
-	_, err = p.write(pwmExportPath(), []byte(p.pin))
-	return
-}
-
-// Unexport writes pin to pwm unexport path
-func (p *pwmPin) Unexport() (err error) {
-	_, err = p.write(pwmUnexportPath(), []byte(p.pin))
 	return
 }
 
