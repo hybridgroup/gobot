@@ -6,7 +6,7 @@ import (
 )
 
 // PWMPin is the interface for sysfs PWM interactions
-type PWMPin interface {
+type PWMPinner interface {
 	// Export exports the pin for use by the operating system
 	Export() error
 	// Unexport unexports the pin and releases the pin from the operating system
@@ -19,7 +19,7 @@ type PWMPin interface {
 	WriteDuty(duty string) (err error)
 }
 
-type pwmPin struct {
+type PWMPin struct {
 	pin   string
 	Chip  string
 	write func(path string, data []byte) (i int, err error)
@@ -27,8 +27,8 @@ type pwmPin struct {
 }
 
 // NewPwmPin returns a new pwmPin
-func NewPwmPin(pin int) *pwmPin {
-	return &pwmPin{
+func NewPWMPin(pin int) *PWMPin {
+	return &PWMPin{
 		pin:   strconv.Itoa(pin),
 		Chip:  "0",
 		read:  readPwmFile,
@@ -36,25 +36,25 @@ func NewPwmPin(pin int) *pwmPin {
 }
 
 // Export writes pin to pwm export path
-func (p *pwmPin) Export() (err error) {
+func (p *PWMPin) Export() (err error) {
 	_, err = p.write(p.pwmExportPath(), []byte(p.pin))
 	return
 }
 
 // Unexport writes pin to pwm unexport path
-func (p *pwmPin) Unexport() (err error) {
+func (p *PWMPin) Unexport() (err error) {
 	_, err = p.write(p.pwmUnexportPath(), []byte(p.pin))
 	return
 }
 
 // Enable writes value to pwm enable path
-func (p *pwmPin) Enable(val string) (err error) {
+func (p *PWMPin) Enable(val string) (err error) {
 	_, err = p.write(p.pwmEnablePath(), []byte(val))
 	return
 }
 
 // Period reads from pwm period path and returns value
-func (p *pwmPin) Period() (period string, err error) {
+func (p *PWMPin) Period() (period string, err error) {
 	buf, err := p.read(p.pwmPeriodPath())
 	if err != nil {
 		return
@@ -63,38 +63,38 @@ func (p *pwmPin) Period() (period string, err error) {
 }
 
 // WriteDuty writes value to pwm duty cycle path
-func (p *pwmPin) WriteDuty(duty string) (err error) {
+func (p *PWMPin) WriteDuty(duty string) (err error) {
 	_, err = p.write(p.pwmDutyCyclePath(), []byte(duty))
 	return
 }
 
 // pwmPath returns pwm base path
-func (p *pwmPin) pwmPath() string {
+func (p *PWMPin) pwmPath() string {
 	return "/sys/class/pwm/pwmchip" + p.Chip
 }
 
 // pwmExportPath returns export path
-func (p *pwmPin) pwmExportPath() string {
+func (p *PWMPin) pwmExportPath() string {
 	return p.pwmPath() + "/export"
 }
 
 // pwmUnexportPath returns unexport path
-func (p *pwmPin) pwmUnexportPath() string {
+func (p *PWMPin) pwmUnexportPath() string {
 	return p.pwmPath() + "/unexport"
 }
 
 // pwmDutyCyclePath returns duty_cycle path for specified pin
-func (p *pwmPin) pwmDutyCyclePath() string {
+func (p *PWMPin) pwmDutyCyclePath() string {
 	return p.pwmPath() + "/pwm" + p.pin + "/duty_cycle"
 }
 
 // pwmPeriodPath returns period path for specified pin
-func (p *pwmPin) pwmPeriodPath() string {
+func (p *PWMPin) pwmPeriodPath() string {
 	return p.pwmPath() + "/pwm" + p.pin + "/period"
 }
 
 // pwmEnablePath returns enable path for specified pin
-func (p *pwmPin) pwmEnablePath() string {
+func (p *PWMPin) pwmEnablePath() string {
 	return p.pwmPath() + "/pwm" + p.pin + "/enable"
 }
 
