@@ -26,11 +26,11 @@ func main() {
 	helloDriver := nats.NewDriver(natsAdaptor, "hello")
 
 	work := func() {
-		helloDriver.On(nats.Data, func(data interface{}) {
+		helloDriver.On(nats.Data, func(msg nats.Message) {
 			fmt.Println("hello")
 		})
 
-		holaDriver.On(nats.Data, func(data interface{}) {
+		holaDriver.On(nats.Data, func(msg nats.Message) {
 			fmt.Println("hola")
 		})
 
