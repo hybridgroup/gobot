@@ -33,10 +33,10 @@ func main() {
   natsAdaptor := nats.NewNatsAdaptor("nats", "localhost:4222", 1234)
 
   work := func() {
-    natsAdaptor.On("hello", func(subject string, data []byte) {
+    natsAdaptor.On("hello", func(msg nats.Message) {
       fmt.Println(subject)
     })
-    natsAdaptor.On("hola", func(subject string, data []byte) {
+    natsAdaptor.On("hola", func(msg nats.Message) {
       fmt.Println(subject)
     })
     data := []byte("o")
@@ -74,10 +74,10 @@ func main() {
   natsAdaptor := nats.NewNatsAdaptor("tls://localhost:4222", 1234, natsio.RootCAs("certs/ca.pem"))
 
   work := func() {
-    natsAdaptor.On("hello", func(subject string, data []byte) {
+    natsAdaptor.On("hello", func(msg nats.Message) {
       fmt.Println(subject)
     })
-    natsAdaptor.On("hola", func(subject string, data []byte) {
+    natsAdaptor.On("hola", func(msg nats.Message) {
       fmt.Println(subject)
     })
     data := []byte("o")

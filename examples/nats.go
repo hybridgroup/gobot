@@ -16,10 +16,10 @@ func main() {
 	natsAdaptor := nats.NewAdaptorWithAuth("localhost:4222", 1234, "user", "pass")
 
 	work := func() {
-		natsAdaptor.On("hello", func(data []byte) {
+		natsAdaptor.On("hello", func(msg nats.Message) {
 			fmt.Println("hello")
 		})
-		natsAdaptor.On("hola", func(data []byte) {
+		natsAdaptor.On("hola", func(msg nats.Message) {
 			fmt.Println("hola")
 		})
 		data := []byte("o")

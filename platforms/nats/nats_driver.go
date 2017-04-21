@@ -71,11 +71,8 @@ func (m *Driver) Publish(data interface{}) bool {
 
 // On subscribes to data updates for the current device topic,
 // and then calls the message handler function when data is received
-func (m *Driver) On(n string, f func(subject string, d interface{})) error {
+func (m *Driver) On(n string, f func(msg Message)) error {
 	// TODO: also be able to subscribe to Error updates
-	f1 := func(subject string, d []byte) {
-		f(subject, d)
-	}
-	m.adaptor().On(m.topic, f1)
+	m.adaptor().On(m.topic, f)
 	return nil
 }

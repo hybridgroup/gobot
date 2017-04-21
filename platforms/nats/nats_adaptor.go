@@ -21,6 +21,9 @@ type Adaptor struct {
 	connect  func() (*nats.Conn, error)
 }
 
+// Message is a message received from the server.
+type Message *nats.Msg
+
 // NewAdaptor populates a new NATS Adaptor.
 func NewAdaptor(host string, clientID int, options ...nats.Option) *Adaptor {
 	hosts, err := processHostString(host)
@@ -112,12 +115,13 @@ func (a *Adaptor) Publish(topic string, message []byte) bool {
 
 // On is an event-handler style subscriber to a particular topic (named event).
 // Supply a handler function to use the bytes returned by the server.
-func (a *Adaptor) On(event string, f func(subject string, s []byte)) bool {
+func (a *Adaptor) On(event string, f func(msg Message)) bool {
 	if a.client == nil {
 		return false
 	}
 	a.client.Subscribe(event, func(msg *nats.Msg) {
-		f(msg.Subject, msg.Data)
+		f(msg)
 	})
+
 	return true
 }
