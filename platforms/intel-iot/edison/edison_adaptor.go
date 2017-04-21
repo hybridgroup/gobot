@@ -32,7 +32,7 @@ type Adaptor struct {
 	pinmap      map[string]sysfsPin
 	tristate    sysfs.DigitalPin
 	digitalPins map[int]sysfs.DigitalPin
-	pwmPins     map[int]*pwmPin
+	pwmPins     map[int]*sysfs.PWMPin
 	i2cBus      sysfs.I2cDevice
 	connect     func(e *Adaptor) (err error)
 	writeFile   func(path string, data []byte) (i int, err error)
@@ -64,7 +64,7 @@ func (e *Adaptor) SetBoard(n string) { e.board = n }
 // Connect initializes the Edison for use with the Arduino beakout board
 func (e *Adaptor) Connect() (err error) {
 	e.digitalPins = make(map[int]sysfs.DigitalPin)
-	e.pwmPins = make(map[int]*pwmPin)
+	e.pwmPins = make(map[int]*sysfs.PWMPin)
 
 	if e.board == "" && e.checkForArduino() {
 		e.board = "arduino"
@@ -103,10 +103,10 @@ func (e *Adaptor) Finalize() (err error) {
 	}
 	for _, pin := range e.pwmPins {
 		if pin != nil {
-			if errs := pin.enable("0"); errs != nil {
+			if errs := pin.Enable("0"); errs != nil {
 				err = multierror.Append(err, errs)
 			}
-			if errs := pin.unexport(); errs != nil {
+			if errs := pin.Unexport(); errs != nil {
 				err = multierror.Append(err, errs)
 			}
 		}
@@ -148,15 +148,15 @@ func (e *Adaptor) PwmWrite(pin string, val byte) (err error) {
 			if err = changePinMode(e, strconv.Itoa(int(sysPin.pin)), "1"); err != nil {
 				return
 			}
-			e.pwmPins[sysPin.pwmPin] = newPwmPin(sysPin.pwmPin)
-			if err = e.pwmPins[sysPin.pwmPin].export(); err != nil {
+			e.pwmPins[sysPin.pwmPin] = sysfs.NewPWMPin(sysPin.pwmPin)
+			if err = e.pwmPins[sysPin.pwmPin].Export(); err != nil {
 				return
 			}
-			if err = e.pwmPins[sysPin.pwmPin].enable("1"); err != nil {
+			if err = e.pwmPins[sysPin.pwmPin].Enable("1"); err != nil {
 				return
 			}
 		}
-		p, err := e.pwmPins[sysPin.pwmPin].period()
+		p, err := e.pwmPins[sysPin.pwmPin].Period()
 		if err != nil {
 			return err
 		}
@@ -165,7 +165,7 @@ func (e *Adaptor) PwmWrite(pin string, val byte) (err error) {
 			return err
 		}
 		duty := gobot.FromScale(float64(val), 0, 255.0)
-		return e.pwmPins[sysPin.pwmPin].writeDuty(strconv.Itoa(int(float64(period) * duty)))
+		return e.pwmPins[sysPin.pwmPin].WriteDuty(strconv.Itoa(int(float64(period) * duty)))
 	}
 	return errors.New("Not a PWM pin")
 }
