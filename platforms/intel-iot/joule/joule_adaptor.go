@@ -60,7 +60,7 @@ func (e *Adaptor) Finalize() (err error) {
 	}
 	for _, pin := range e.pwmPins {
 		if pin != nil {
-			if errs := pin.Enable("0"); errs != nil {
+			if errs := pin.Enable(false); errs != nil {
 				err = multierror.Append(err, errs)
 			}
 			if errs := pin.Unexport(); errs != nil {
@@ -130,7 +130,7 @@ func (e *Adaptor) PwmWrite(pin string, val byte) (err error) {
 			if err = e.pwmPins[sysPin.pwmPin].Export(); err != nil {
 				return
 			}
-			if err = e.pwmPins[sysPin.pwmPin].Enable("1"); err != nil {
+			if err = e.pwmPins[sysPin.pwmPin].Enable(true); err != nil {
 				return
 			}
 		}
@@ -143,7 +143,7 @@ func (e *Adaptor) PwmWrite(pin string, val byte) (err error) {
 			return err
 		}
 		duty := gobot.FromScale(float64(val), 0, 255.0)
-		return e.pwmPins[sysPin.pwmPin].WriteDuty(strconv.Itoa(int(float64(period) * duty)))
+		return e.pwmPins[sysPin.pwmPin].SetDutyCycle(uint32(float64(period) * duty))
 	}
 	return errors.New("Not a PWM pin")
 }
