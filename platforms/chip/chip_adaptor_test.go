@@ -54,6 +54,7 @@ func TestChipAdaptorDigitalIO(t *testing.T) {
 	gobottest.Assert(t, i, 1)
 
 	gobottest.Assert(t, a.DigitalWrite("XIO-P10", 1), errors.New("Not a valid pin"))
+	gobottest.Assert(t, a.Finalize(), nil)
 }
 
 func TestChipAdaptorI2c(t *testing.T) {
@@ -114,6 +115,7 @@ func TestChipAdaptorPWM(t *testing.T) {
 	gobottest.Assert(t, err, nil)
 
 	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/pwm0/duty_cycle"].Contents, "2000000")
+	gobottest.Assert(t, a.Finalize(), nil)
 }
 
 func TestChipDefaultBus(t *testing.T) {
