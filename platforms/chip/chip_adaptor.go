@@ -14,64 +14,18 @@ import (
 	"gobot.io/x/gobot/sysfs"
 )
 
+type sysfsPin struct {
+	pin    int
+	pwmPin int
+}
+
 // Adaptor represents a Gobot Adaptor for a C.H.I.P.
 type Adaptor struct {
 	name        string
 	digitalPins map[int]sysfs.DigitalPin
-	pinMap      map[string]int
+	pinmap      map[string]sysfsPin
 	i2cBuses    [3]sysfs.I2cDevice
-	pwm         *pwmControl
-}
-
-var fixedPins = map[string]int{
-	"PWM0":     34,
-	"AP-EINT3": 35,
-
-	"TWI1-SCK": 47,
-	"TWI1-SDA": 48,
-	"TWI2-SCK": 49,
-	"TWI2-SDA": 50,
-
-	"LCD-D2":    98,
-	"LCD-D3":    99,
-	"LCD-D4":    100,
-	"LCD-D5":    101,
-	"LCD-D6":    102,
-	"LCD-D7":    103,
-	"LCD-D10":   106,
-	"LCD-D11":   107,
-	"LCD-D12":   108,
-	"LCD-D13":   109,
-	"LCD-D14":   110,
-	"LCD-D15":   111,
-	"LCD-D18":   114,
-	"LCD-D19":   115,
-	"LCD-D20":   116,
-	"LCD-D21":   117,
-	"LCD-D22":   118,
-	"LCD-D23":   119,
-	"LCD-CLK":   120,
-	"LCD-DE":    121,
-	"LCD-HSYNC": 122,
-	"LCD-VSYNC": 123,
-
-	"CSIPCK":   128,
-	"CSICK":    129,
-	"CSIHSYNC": 130,
-	"CSIVSYNC": 131,
-	"CSID0":    132,
-	"CSID1":    133,
-	"CSID2":    134,
-	"CSID3":    135,
-	"CSID4":    136,
-	"CSID5":    137,
-	"CSID6":    138,
-	"CSID7":    139,
-
-	"AP-EINT1": 193,
-
-	"UART1-TX": 195,
-	"UART1-RX": 196,
+	pwmPins     map[int]*sysfs.PWMPin
 }
 
 // NewAdaptor creates a C.H.I.P. Adaptor
@@ -93,21 +47,26 @@ func (c *Adaptor) SetName(n string) { c.name = n }
 
 // Connect initializes the board
 func (c *Adaptor) Connect() (err error) {
+	c.pwmPins = make(map[int]*sysfs.PWMPin)
 	return nil
 }
 
 // Finalize closes connection to board and pins
 func (c *Adaptor) Finalize() (err error) {
-	if c.pwm != nil {
-		if e := c.closePWM(); e != nil {
-			err = multierror.Append(err, e)
-		}
-		c.pwm = nil
-	}
 	for _, pin := range c.digitalPins {
 		if pin != nil {
 			if e := pin.Unexport(); e != nil {
 				err = multierror.Append(err, e)
+			}
+		}
+	}
+	for _, pin := range c.pwmPins {
+		if pin != nil {
+			if errs := pin.Enable(false); errs != nil {
+				err = multierror.Append(err, errs)
+			}
+			if errs := pin.Unexport(); errs != nil {
+				err = multierror.Append(err, errs)
 			}
 		}
 	}
@@ -122,17 +81,17 @@ func (c *Adaptor) Finalize() (err error) {
 }
 
 func (c *Adaptor) setPins() {
-	c.pinMap = fixedPins
+	c.pinmap = fixedPins
 	baseAddr, _ := getXIOBase()
 	for i := 0; i < 8; i++ {
 		pin := fmt.Sprintf("XIO-P%d", i)
-		c.pinMap[pin] = baseAddr + i
+		c.pinmap[pin] = sysfsPin{pin: baseAddr + i, pwmPin: -1}
 	}
 }
 
 func (c *Adaptor) translatePin(pin string) (i int, err error) {
-	if val, ok := c.pinMap[pin]; ok {
-		i = val
+	if val, ok := c.pinmap[pin]; ok {
+		i = val.pin
 	} else {
 		err = errors.New("Not a valid pin")
 	}
@@ -204,40 +163,52 @@ func (c *Adaptor) GetDefaultBus() int {
 
 // PwmWrite writes a PWM signal to the specified pin
 func (c *Adaptor) PwmWrite(pin string, val byte) (err error) {
-	if pin != "PWM0" {
-		return fmt.Errorf("PWM is only available on pin PWM0")
-	}
-	if c.pwm == nil {
-		err = c.initPWM(pwmFrequency)
-		if err != nil {
-			return
+	sysPin := c.pinmap[pin]
+	if sysPin.pwmPin != -1 {
+		if c.pwmPins[sysPin.pwmPin] == nil {
+			c.pwmPins[sysPin.pwmPin] = sysfs.NewPWMPin(sysPin.pwmPin)
+			if err = c.pwmPins[sysPin.pwmPin].Export(); err != nil {
+				return
+			}
+			if err = c.pwmPins[sysPin.pwmPin].Enable(true); err != nil {
+				return
+			}
 		}
+		p, err := c.pwmPins[sysPin.pwmPin].Period()
+		if err != nil {
+			return err
+		}
+		period, err := strconv.Atoi(p)
+		if err != nil {
+			return err
+		}
+		duty := gobot.FromScale(float64(val), 0, 255.0)
+		return c.pwmPins[sysPin.pwmPin].SetDutyCycle(uint32(float64(period) * duty))
 	}
-	duty := gobot.ToScale(gobot.FromScale(float64(val), 0, 255), 0, 100)
-	return c.pwm.setDutycycle(duty)
+	return errors.New("Not a PWM pin")
 }
 
 const pwmFrequency = 100
 
 // ServoWrite writes a servo signal to the specified pin
-func (c *Adaptor) ServoWrite(pin string, angle byte) (err error) {
-	if pin != "PWM0" {
-		return fmt.Errorf("Servo is only available on pin PWM0")
-	}
-	if c.pwm == nil {
-		err = c.initPWM(pwmFrequency)
-		if err != nil {
-			return
-		}
-	}
-	// 0.5 ms => -90
-	// 1.5 ms =>   0
-	// 2.0 ms =>  90
-	const minDuty = 100 * 0.0005 * pwmFrequency
-	const maxDuty = 100 * 0.0020 * pwmFrequency
-	duty := gobot.ToScale(gobot.FromScale(float64(angle), 0, 180), minDuty, maxDuty)
-	return c.pwm.setDutycycle(duty)
-}
+// func (c *Adaptor) ServoWrite(pin string, angle byte) (err error) {
+// 	if pin != "PWM0" {
+// 		return fmt.Errorf("Servo is only available on pin PWM0")
+// 	}
+// 	if c.pwm == nil {
+// 		err = c.initPWM(pwmFrequency)
+// 		if err != nil {
+// 			return
+// 		}
+// 	}
+// 	// 0.5 ms => -90
+// 	// 1.5 ms =>   0
+// 	// 2.0 ms =>  90
+// 	const minDuty = 100 * 0.0005 * pwmFrequency
+// 	const maxDuty = 100 * 0.0020 * pwmFrequency
+// 	duty := gobot.ToScale(gobot.FromScale(float64(angle), 0, 180), minDuty, maxDuty)
+// 	return c.pwm.setDutycycle(duty)
+// }
 
 func getXIOBase() (baseAddr int, err error) {
 	// Default to original base from 4.3 kernel
