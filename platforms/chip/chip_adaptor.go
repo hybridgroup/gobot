@@ -22,16 +22,18 @@ type sysfsPin struct {
 // Adaptor represents a Gobot Adaptor for a C.H.I.P.
 type Adaptor struct {
 	name        string
-	digitalPins map[int]sysfs.DigitalPin
+	board       string
 	pinmap      map[string]sysfsPin
-	i2cBuses    [3]sysfs.I2cDevice
+	digitalPins map[int]sysfs.DigitalPin
 	pwmPins     map[int]*sysfs.PWMPin
+	i2cBuses    [3]sysfs.I2cDevice
 }
 
 // NewAdaptor creates a C.H.I.P. Adaptor
 func NewAdaptor() *Adaptor {
 	c := &Adaptor{
 		name:        gobot.DefaultName("CHIP"),
+		board:       "CHIP",
 		digitalPins: make(map[int]sysfs.DigitalPin),
 	}
 
@@ -158,6 +160,30 @@ func (c *Adaptor) ServoWrite(pin string, angle byte) (err error) {
 	return pwmPin.SetDutyCycle(duty)
 }
 
+// SetBoard sets the name of the type of board
+func (c *Adaptor) SetBoard(n string) (err error) {
+	if n == "CHIP Pro" || n == "CHIP" {
+		c.board = n
+		c.setPins()
+		return
+	}
+	return errors.New("Invalid board type")
+}
+
+func (c *Adaptor) setPins() {
+	if c.board == "CHIP Pro" {
+		c.pinmap = chipProPins
+		return
+	}
+	// otherwise, original CHIP
+	c.pinmap = chipPins
+	baseAddr, _ := getXIOBase()
+	for i := 0; i < 8; i++ {
+		pin := fmt.Sprintf("XIO-P%d", i)
+		c.pinmap[pin] = sysfsPin{pin: baseAddr + i, pwmPin: -1}
+	}
+}
+
 func getXIOBase() (baseAddr int, err error) {
 	// Default to original base from 4.3 kernel
 	baseAddr = 408
@@ -186,15 +212,6 @@ func getXIOBase() (baseAddr int, err error) {
 	}
 
 	return baseAddr, nil
-}
-
-func (c *Adaptor) setPins() {
-	c.pinmap = fixedPins
-	baseAddr, _ := getXIOBase()
-	for i := 0; i < 8; i++ {
-		pin := fmt.Sprintf("XIO-P%d", i)
-		c.pinmap[pin] = sysfsPin{pin: baseAddr + i, pwmPin: -1}
-	}
 }
 
 func (c *Adaptor) translatePin(pin string) (i int, err error) {

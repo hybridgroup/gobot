@@ -1,29 +1,13 @@
 package chip
 
-var chipPins = map[string]sysfsPin{
+var chipProPins = map[string]sysfsPin{
 	"PWM0": {
 		pin:    34,
 		pwmPin: 0,
 	},
-	"AP-EINT3": {
-		pin:    35,
-		pwmPin: -1,
-	},
-	"TWI1-SCK": {
-		pin:    47,
-		pwmPin: -1,
-	},
-	"TWI1-SDA": {
-		pin:    48,
-		pwmPin: -1,
-	},
-	"TWI2-SCK": {
-		pin:    49,
-		pwmPin: -1,
-	},
-	"TWI2-SDA": {
-		pin:    50,
-		pwmPin: -1,
+	"PWM1": {
+		pin:    205,
+		pwmPin: 1,
 	},
 	"LCD-D2": {
 		pin:    98,
@@ -101,16 +85,36 @@ var chipPins = map[string]sysfsPin{
 		pin:    120,
 		pwmPin: -1,
 	},
-	"LCD-DE": {
-		pin:    121,
-		pwmPin: -1,
-	},
 	"LCD-HSYNC": {
 		pin:    122,
 		pwmPin: -1,
 	},
 	"LCD-VSYNC": {
 		pin:    123,
+		pwmPin: -1,
+	},
+	"UART1-TX": {
+		pin:    195,
+		pwmPin: -1,
+	},
+	"UART1-RX": {
+		pin:    196,
+		pwmPin: -1,
+	},
+	"AP-EINT1": {
+		pin:    193,
+		pwmPin: -1,
+	},
+	"AP-EINT3": {
+		pin:    35,
+		pwmPin: -1,
+	},
+	"TWI2-SCK": {
+		pin:    49,
+		pwmPin: -1,
+	},
+	"TWI2-SDA": {
+		pin:    50,
 		pwmPin: -1,
 	},
 	"CSIPCK": {
@@ -159,18 +163,6 @@ var chipPins = map[string]sysfsPin{
 	},
 	"CSID7": {
 		pin:    139,
-		pwmPin: -1,
-	},
-	"AP-EINT1": {
-		pin:    193,
-		pwmPin: -1,
-	},
-	"UART1-TX": {
-		pin:    195,
-		pwmPin: -1,
-	},
-	"UART1-RX": {
-		pin:    196,
 		pwmPin: -1,
 	},
 }

@@ -4,6 +4,9 @@ The [C.H.I.P.](http://www.getchip.com/) is a small, inexpensive ARM based single
 
 For documentation about the C.H.I.P. platform click [here](http://docs.getchip.com/).
 
+The [C.H.I.P. Pro](https://getchip.com/pages/chippro) is a version of C.H.I.P. intended for use in embedded product development. Here is info about the [C.H.I.P. Pro pin headers](https://docs.getchip.com/chip_pro.html#pin-descriptions).
+
+
 ## How to Install
 
 We recommend updating to the latest Debian OS when using the C.H.I.P., however Gobot should also support older versions of the OS, should your application require this.
@@ -69,6 +72,13 @@ func main() {
 
     robot.Start()
 }
+```
+
+If you want to use the C.H.I.P. Pro, use the `SetBoard()` function like this:
+
+```go
+chipProAdaptor := chip.NewAdaptor()
+chipProAdaptor.SetBoard("CHIP Pro")
 ```
 
 ## How to Connect
