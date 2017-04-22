@@ -85,6 +85,9 @@ func (p *PWMPin) Period() (period string, err error) {
 	if err != nil {
 		return
 	}
+	if len(buf) == 0 {
+		return "0", nil
+	}
 	return string(buf), nil
 }
 
@@ -166,7 +169,7 @@ func readPwmFile(path string) ([]byte, error) {
 	var i int
 	i, err = file.Read(buf)
 	if i == 0 {
-		return buf, err
+		return []byte{}, err
 	}
 	return buf[:i], err
 }
