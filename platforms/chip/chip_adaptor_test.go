@@ -96,8 +96,6 @@ func TestChipAdaptorPWM(t *testing.T) {
 		"/sys/class/pwm/pwmchip0/pwm0/polarity",
 	})
 	sysfs.SetFilesystem(fs)
-	fs.Files["/sys/class/pwm/pwmchip0/pwm0/period"].Contents = "10000000"
-	fs.Files["/sys/class/pwm/pwmchip0/pwm0/polarity"].Contents = "normal"
 
 	err := a.PwmWrite("PWM0", 100)
 	gobottest.Assert(t, err, nil)
