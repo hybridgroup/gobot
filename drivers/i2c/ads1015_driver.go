@@ -2,6 +2,7 @@ package i2c
 
 import (
 	"errors"
+	"strconv"
 	"time"
 
 	"gobot.io/x/gobot"
@@ -33,13 +34,15 @@ type ADS1015Driver struct {
 // Optional params:
 //		i2c.WithBus(int):	bus to use with this driver
 //		i2c.WithAddress(int):	address to use with this driver
+//		i2c.WithADS1015Gain(int):	input gain to use, valid options are
+// 										any of the ADS1015RegConfigPga* const values
 //
 func NewADS1015Driver(a Connector, options ...func(Config)) *ADS1015Driver {
 	d := &ADS1015Driver{
 		name:            gobot.DefaultName("ADS1015"),
 		connector:       a,
 		conversionDelay: ADS1015ConversionDelay,
-		gain:            ADS1015RegConfigPga6144v,
+		gain:            ADS1015RegConfigPga6144V,
 		Config:          NewConfig(),
 	}
 
@@ -75,6 +78,20 @@ func (d *ADS1015Driver) Start() (err error) {
 // Halt returns true if device is halted successfully
 func (d *ADS1015Driver) Halt() (err error) { return }
 
+// WithADS1015Gain option sets the ADS1015Driver gain option.
+// Valid gain settings are any of the ADS1015RegConfigPga* values
+func WithADS1015Gain(val int) func(Config) {
+	return func(c Config) {
+		d, ok := c.(*ADS1015Driver)
+		if ok {
+			d.gain = uint16(val)
+		} else {
+			// TODO: return error for trying to set Gain for non-ADS1015Driver
+			return
+		}
+	}
+}
+
 // ReadADC gets a single ADC reading from the specified channel
 func (d *ADS1015Driver) ReadADC(c uint8) (val uint16, err error) {
 	cfg := d.getDefaultConfig()
@@ -93,19 +110,25 @@ func (d *ADS1015Driver) ReadADC(c uint8) (val uint16, err error) {
 		return
 	}
 
-	if err = d.connection.WriteWordData(ADS1015RegPointerConfig, cfg); err != nil {
+	if _, err = d.connection.Write([]byte{ADS1015RegPointerConfig, byte(cfg >> 8), byte(cfg & 0xff)}); err != nil {
 		return
 	}
 
 	time.Sleep(time.Duration(d.conversionDelay) * time.Millisecond)
 
-	if val, err = d.connection.ReadWordData(ADS1015RegPointerConvert); err != nil {
-		val = 0
+	if _, err = d.connection.Write([]byte{ADS1015RegPointerConvert}); err != nil {
 		return
 	}
 
-	// Shift 12-bit results right 4 bits for the ADS1015
-	val >>= 4
+	b := []byte{0, 0}
+	if _, err = d.connection.Read(b); err != nil {
+		return
+	}
+
+	// Convert to 12-bit value
+	val = uint16(b[0]&0xff) << 4
+	val |= uint16(b[1]&0xff) >> 4
+
 	return
 }
 
@@ -145,6 +168,26 @@ func (d *ADS1015Driver) ReadADCDifference23() (val int16, err error) {
 	return d.getConversionResult()
 }
 
+// AnalogRead returns value from analog reading of specified pin
+func (d *ADS1015Driver) AnalogRead(pin string) (int, error) {
+	switch pin {
+	case "0-1":
+		val, e := d.ReadADCDifference01()
+		return int(val), e
+	case "2-3":
+		val, e := d.ReadADCDifference23()
+		return int(val), e
+	}
+
+	p, e := strconv.Atoi(pin)
+	if e != nil {
+		return 0, e
+	}
+
+	val, e2 := d.ReadADC(uint8(p))
+	return int(val), e2
+}
+
 func (d *ADS1015Driver) getDefaultConfig() uint16 {
 	var cfg uint16
 	cfg = ADS1015RegConfigCqueNone |
@@ -161,20 +204,18 @@ func (d *ADS1015Driver) getDefaultConfig() uint16 {
 }
 
 func (d *ADS1015Driver) getConversionResult() (val int16, err error) {
-	var v uint16
-	if v, err = d.connection.ReadWordData(ADS1015RegPointerConvert); err != nil {
-		return int16(0), err
+	d.connection.Write([]byte{ADS1015RegPointerConvert})
+	b := []byte{0, 0}
+	d.connection.Read(b)
+	// Convert to 12-bit value
+	val = int16(b[0]&0xff) << 4
+	val |= int16(b[1]&0xff) >> 4
+
+	if val&0x800 != 0 {
+		val -= 1 << 12
 	}
 
-	// Shift 12-bit results right 4 bits for the ADS1015
-	v >>= 4
-
-	if v > 0x07FF {
-		// negative number - extend the sign to 16th bit
-		v |= 0xF000
-	}
-
-	return int16(v), nil
+	return val, nil
 }
 
 const (
@@ -183,7 +224,7 @@ const (
 
 	// pointer register
 	ADS1015RegPointerMask      = 0x03
-	ADS1015RegPointerConvert   = 0x03
+	ADS1015RegPointerConvert   = 0x00
 	ADS1015RegPointerConfig    = 0x01
 	ADS1015RegPointerLowThresh = 0x02
 	ADS1015RegPointerHiThresh  = 0x03
@@ -217,17 +258,17 @@ const (
 
 	ADS1015RegConfigPgaMask = 0x0e00
 	// +/-6.144V range = Gain 2/3
-	ADS1015RegConfigPga6144v = 0x0000
+	ADS1015RegConfigPga6144V = 0x0000
 	// +/-4.096V range = Gain 1
-	ADS1015RegConfigPga4096v = 0x0200
+	ADS1015RegConfigPga4096V = 0x0200
 	// +/-2.048V range = Gain 2 (default)
-	ADS1015RegConfigPga2048v = 0x0400
+	ADS1015RegConfigPga2048V = 0x0400
 	// +/-1.024V range = Gain 4
-	ADS1015RegConfigPga1024v = 0x0600
+	ADS1015RegConfigPga1024V = 0x0600
 	// +/-0.512V range = Gain 8
-	ADS1015RegConfigPga0512v = 0x0800
+	ADS1015RegConfigPga0512V = 0x0800
 	// +/-0.256V range = Gain 16
-	ADS1015RegConfigPga0256v = 0x0800
+	ADS1015RegConfigPga0256V = 0x0800
 
 	ADS1015RegConfigModeMask = 0x0100
 	// Continuous conversion mode
