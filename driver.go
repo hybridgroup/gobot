@@ -10,7 +10,7 @@ type Driver interface {
 	Start() error
 	// Halt terminates the Driver
 	Halt() error
-	// Connection returns the Connection assiciated with the Driver
+	// Connection returns the Connection associated with the Driver
 	Connection() Connection
 }
 
