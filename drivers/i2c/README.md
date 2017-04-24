@@ -13,6 +13,7 @@ go get -d -u gobot.io/x/gobot/...
 Gobot has a extensible system for connecting to hardware devices. The following i2c devices are currently supported:
 
 - Adafruit Motor Hat
+- ADS1015 Analog to Digital Converter
 - BlinkM LED
 - BME280 Barometric Pressure/Temperature/Altitude/Humidity Sensor
 - BMP180 Barometric Pressure/Temperature/Altitude Sensor
