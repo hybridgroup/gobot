@@ -40,18 +40,18 @@ func TestAnalogSensorDriverStart(t *testing.T) {
 	a := newAioTestAdaptor()
 	d := NewAnalogSensorDriver(a, "1")
 
-	// send data
-	a.TestAdaptorAnalogRead(func() (val int, err error) {
-		val = 100
-		return
-	})
-
 	gobottest.Assert(t, d.Start(), nil)
 
 	// expect data to be received
 	d.Once(d.Event(Data), func(data interface{}) {
 		gobottest.Assert(t, data.(int), 100)
 		sem <- true
+	})
+
+	// send data
+	a.TestAdaptorAnalogRead(func() (val int, err error) {
+		val = 100
+		return
 	})
 
 	select {
