@@ -141,7 +141,7 @@ func (d *ADS1015Driver) ReadADCDifference01() (val int16, err error) {
 
 	cfg |= ADS1015RegConfigMuxDiff01
 
-	if err = d.connection.WriteWordData(ADS1015RegPointerConfig, cfg); err != nil {
+	if _, err = d.connection.Write([]byte{ADS1015RegPointerConfig, byte(cfg >> 8), byte(cfg & 0xff)}); err != nil {
 		return
 	}
 
@@ -159,7 +159,7 @@ func (d *ADS1015Driver) ReadADCDifference23() (val int16, err error) {
 
 	cfg |= ADS1015RegConfigMuxDiff23
 
-	if err = d.connection.WriteWordData(ADS1015RegPointerConfig, cfg); err != nil {
+	if _, err = d.connection.Write([]byte{ADS1015RegPointerConfig, byte(cfg >> 8), byte(cfg & 0xff)}); err != nil {
 		return
 	}
 

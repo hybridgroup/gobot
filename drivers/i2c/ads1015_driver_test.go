@@ -48,6 +48,12 @@ func TestADS1015DriverOptions(t *testing.T) {
 	gobottest.Assert(t, d.gain, uint16(ADS1015RegConfigPga2048V))
 }
 
+func TestADS1015StartAndHalt(t *testing.T) {
+	d, _ := initTestADS1015DriverWithStubbedAdaptor()
+	gobottest.Assert(t, d.Start(), nil)
+	gobottest.Assert(t, d.Halt(), nil)
+}
+
 func TestADS1015StartConnectError(t *testing.T) {
 	d, adaptor := initTestADS1015DriverWithStubbedAdaptor()
 	adaptor.Testi2cConnectErr(true)
@@ -66,6 +72,18 @@ func TestADS1015DriverAnalogRead(t *testing.T) {
 	}
 
 	val, err := d.AnalogRead("0")
+	gobottest.Assert(t, val, 1584)
+	gobottest.Assert(t, err, nil)
+
+	val, err = d.AnalogRead("1")
+	gobottest.Assert(t, val, 1584)
+	gobottest.Assert(t, err, nil)
+
+	val, err = d.AnalogRead("2")
+	gobottest.Assert(t, val, 1584)
+	gobottest.Assert(t, err, nil)
+
+	val, err = d.AnalogRead("3")
 	gobottest.Assert(t, val, 1584)
 	gobottest.Assert(t, err, nil)
 
@@ -95,4 +113,22 @@ func TestADS1015DriverAnalogReadInvalidPin(t *testing.T) {
 
 	_, err := d.AnalogRead("99")
 	gobottest.Assert(t, err, errors.New("Invalid channel."))
+}
+
+func TestADS1015DriverAnalogReadWriteError(t *testing.T) {
+	d, a := initTestADS1015DriverWithStubbedAdaptor()
+	d.Start()
+
+	a.i2cWriteImpl = func([]byte) (int, error) {
+		return 0, errors.New("write error")
+	}
+
+	_, err := d.AnalogRead("0")
+	gobottest.Assert(t, err, errors.New("write error"))
+
+	_, err = d.AnalogRead("0-1")
+	gobottest.Assert(t, err, errors.New("write error"))
+
+	_, err = d.AnalogRead("2-3")
+	gobottest.Assert(t, err, errors.New("write error"))
 }
