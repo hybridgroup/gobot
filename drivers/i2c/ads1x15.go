@@ -139,7 +139,6 @@ func newADS1x15Driver(a Connector, options ...func(Config)) *ADS1x15Driver {
 	return l
 }
 
-// Start initializes the sensor
 func (d *ADS1x15Driver) Start() (err error) {
 	bus := d.GetBusOrDefault(d.connector.GetDefaultBus())
 	address := d.GetAddressOrDefault(ads1x15Address)
@@ -163,22 +162,10 @@ func (d *ADS1x15Driver) Connection() gobot.Connection { return d.connector.(gobo
 // Halt returns true if devices is halted successfully
 func (d *ADS1x15Driver) Halt() (err error) { return }
 
-// ReadDifferenceWithDefaults reads the difference in V between 2 inputs. It uses the default gain and data rate
-// diff can be:
-// * 0: Channel 0 - channel 1
-// * 1: Channel 0 - channel 3
-// * 2: Channel 1 - channel 3
-// * 3: Channel 2 - channel 3
 func (d *ADS1x15Driver) ReadDifferenceWithDefaults(diff int) (value float64, err error) {
 	return d.ReadDifference(diff, d.DefaultGain, d.DefaultDataRate)
 }
 
-// ReadDifference reads the difference in V between 2 inputs.
-// diff can be:
-// * 0: Channel 0 - channel 1
-// * 1: Channel 0 - channel 3
-// * 2: Channel 1 - channel 3
-// * 3: Channel 2 - channel 3
 func (d *ADS1x15Driver) ReadDifference(diff int, gain int, dataRate int) (value float64, err error) {
 	if err = d.checkChannel(diff); err != nil {
 		return
@@ -187,13 +174,10 @@ func (d *ADS1x15Driver) ReadDifference(diff int, gain int, dataRate int) (value 
 	return d.rawRead(diff, gain, dataRate)
 }
 
-// ReadWithDefaults reads the voltage at the specified channel (between 0 and 3).
-// Default values are used for the gain and data rate. The result is in V.
 func (d *ADS1x15Driver) ReadWithDefaults(channel int) (value float64, err error) {
 	return d.Read(channel, d.DefaultGain, d.DefaultDataRate)
 }
 
-// Read reads the voltage at the specified channel (between 0 and 3). The result is in V.
 func (d *ADS1x15Driver) Read(channel int, gain int, dataRate int) (value float64, err error) {
 	if err = d.checkChannel(channel); err != nil {
 		return
@@ -236,18 +220,19 @@ func (d *ADS1x15Driver) rawRead(mux int, gain int, dataRate int) (value float64,
 	// between ADS1015 and ADS1115).
 	config |= dataRateConf
 	config |= ADS1x15_CONFIG_COMP_QUE_DISABLE // Disable comparator mode.
-
 	// Send the config value to start the ADC conversion.
 	// Explicitly break the 16-bit value down to a big endian pair of bytes.
 	if _, err = d.connection.Write([]byte{ADS1x15_POINTER_CONFIG, byte((config >> 8) & 0xFF), byte(config & 0xFF)}); err != nil {
 		return
 	}
-
 	// Wait for the ADC sample to finish based on the sample rate plus a
 	// small offset to be sure (0.1 millisecond).
 	time.Sleep(time.Duration(1000000/dataRate+100) * time.Microsecond)
-
 	// Retrieve the result.
+
+	/*if result, err = d.connection.ReadWordData(ADS1x15_POINTER_CONVERSION); err != nil {
+		return
+	}*/
 	if _, err = d.connection.Write([]byte{ADS1x15_POINTER_CONVERSION}); err != nil {
 		return
 	}
