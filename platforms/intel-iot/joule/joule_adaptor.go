@@ -3,7 +3,6 @@ package joule
 import (
 	"errors"
 	"fmt"
-	"strconv"
 
 	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot"
@@ -134,11 +133,7 @@ func (e *Adaptor) PwmWrite(pin string, val byte) (err error) {
 				return
 			}
 		}
-		p, err := e.pwmPins[sysPin.pwmPin].Period()
-		if err != nil {
-			return err
-		}
-		period, err := strconv.Atoi(p)
+		period, err := e.pwmPins[sysPin.pwmPin].Period()
 		if err != nil {
 			return err
 		}
