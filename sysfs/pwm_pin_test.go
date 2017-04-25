@@ -8,6 +8,8 @@ import (
 	"gobot.io/x/gobot/gobottest"
 )
 
+var _ PWMPinner = (*PWMPin)(nil)
+
 func TestPwmPin(t *testing.T) {
 	fs := NewMockFilesystem([]string{
 		"/sys/class/pwm/pwmchip0/export",
@@ -38,14 +40,14 @@ func TestPwmPin(t *testing.T) {
 
 	fs.Files["/sys/class/pwm/pwmchip0/pwm10/period"].Contents = "6"
 	data, _ := pin.Period()
-	gobottest.Assert(t, data, "6")
+	gobottest.Assert(t, data, uint32(6))
 	gobottest.Assert(t, pin.SetPeriod(100000), nil)
 	data, _ = pin.Period()
-	gobottest.Assert(t, data, "100000")
+	gobottest.Assert(t, data, uint32(100000))
 
-	gobottest.Assert(t, pin.SetPolarityInverted(true), nil)
+	gobottest.Assert(t, pin.InvertPolarity(true), nil)
 	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/pwm10/polarity"].Contents, "inverted")
-	gobottest.Assert(t, pin.SetPolarityInverted(false), nil)
+	gobottest.Assert(t, pin.InvertPolarity(false), nil)
 	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/pwm10/polarity"].Contents, "normal")
 
 	gobottest.Refute(t, fs.Files["/sys/class/pwm/pwmchip0/pwm10/duty_cycle"].Contents, "1")
@@ -53,7 +55,7 @@ func TestPwmPin(t *testing.T) {
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/pwm10/duty_cycle"].Contents, "100")
 	data, _ = pin.DutyCycle()
-	gobottest.Assert(t, data, "100")
+	gobottest.Assert(t, data, uint32(100))
 }
 
 func TestPwmPinExportError(t *testing.T) {

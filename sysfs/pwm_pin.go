@@ -14,14 +14,18 @@ type PWMPinner interface {
 	Unexport() error
 	// Enable enables/disables the PWM pin
 	Enable(bool) (err error)
+	// Polarity returns the polarity either normal or inverted
+	Polarity() (polarity string, err error)
+	// InvertPolarity sets the polarity to inverted if called with true
+	InvertPolarity(invert bool) (err error)
 	// Period returns the current PWM period for pin
-	Period() (period string, err error)
+	Period() (period uint32, err error)
 	// SetPeriod sets the current PWM period for pin
-	SetPeriod(period string) (err error)
+	SetPeriod(period uint32) (err error)
 	// DutyCycle returns the duty cycle for the pin
-	DutyCycle() (duty float64, err error)
+	DutyCycle() (duty uint32, err error)
 	// SetDutyCycle writes the duty cycle to the pin
-	SetDutyCycle(duty float64) (err error)
+	SetDutyCycle(duty uint32) (err error)
 }
 
 type PWMPin struct {
@@ -67,8 +71,21 @@ func (p *PWMPin) Enable(enable bool) (err error) {
 	return
 }
 
-// SetPolarityInverted writes value to pwm polarity path
-func (p *PWMPin) SetPolarityInverted(invert bool) (err error) {
+// Polarity returns current polarity value
+func (p *PWMPin) Polarity() (polarity string, err error) {
+	buf, err := p.read(p.pwmPolarityPath())
+	if err != nil {
+		return
+	}
+	if len(buf) == 0 {
+		return "", nil
+	}
+
+	return string(buf), nil
+}
+
+// InvertPolarity writes value to pwm polarity path
+func (p *PWMPin) InvertPolarity(invert bool) (err error) {
 	if p.enabled {
 		polarity := "normal"
 		if invert {
@@ -79,16 +96,18 @@ func (p *PWMPin) SetPolarityInverted(invert bool) (err error) {
 	return
 }
 
-// Period reads from pwm period path and returns value
-func (p *PWMPin) Period() (period string, err error) {
+// Period reads from pwm period path and returns value in nanoseconds
+func (p *PWMPin) Period() (period uint32, err error) {
 	buf, err := p.read(p.pwmPeriodPath())
 	if err != nil {
 		return
 	}
 	if len(buf) == 0 {
-		return "0", nil
+		return 0, nil
 	}
-	return string(buf), nil
+
+	val, e := strconv.Atoi(string(buf))
+	return uint32(val), e
 }
 
 // SetPeriod sets pwm period in nanoseconds
@@ -97,13 +116,15 @@ func (p *PWMPin) SetPeriod(period uint32) (err error) {
 	return
 }
 
-// DutyCycle reads from pwm duty cycle path and returns value
-func (p *PWMPin) DutyCycle() (duty string, err error) {
+// DutyCycle reads from pwm duty cycle path and returns value in nanoseconds
+func (p *PWMPin) DutyCycle() (duty uint32, err error) {
 	buf, err := p.read(p.pwmDutyCyclePath())
 	if err != nil {
 		return
 	}
-	return string(buf), nil
+
+	val, e := strconv.Atoi(string(buf))
+	return uint32(val), e
 }
 
 // SetDutyCycle writes value to pwm duty cycle path
