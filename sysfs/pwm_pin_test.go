@@ -47,8 +47,12 @@ func TestPwmPin(t *testing.T) {
 
 	gobottest.Assert(t, pin.InvertPolarity(true), nil)
 	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/pwm10/polarity"].Contents, "inverted")
+	pol, _ := pin.Polarity()
+	gobottest.Assert(t, pol, "inverted")
 	gobottest.Assert(t, pin.InvertPolarity(false), nil)
 	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/pwm10/polarity"].Contents, "normal")
+	pol, _ = pin.Polarity()
+	gobottest.Assert(t, pol, "normal")
 
 	gobottest.Refute(t, fs.Files["/sys/class/pwm/pwmchip0/pwm10/duty_cycle"].Contents, "1")
 	err = pin.SetDutyCycle(100)
@@ -113,5 +117,45 @@ func TestPwmPinPeriodError(t *testing.T) {
 	}
 
 	_, err := pin.Period()
+	gobottest.Refute(t, err, nil)
+}
+
+func TestPwmPinPolarityError(t *testing.T) {
+	fs := NewMockFilesystem([]string{
+		"/sys/class/pwm/pwmchip0/export",
+		"/sys/class/pwm/pwmchip0/unexport",
+		"/sys/class/pwm/pwmchip0/pwm10/enable",
+		"/sys/class/pwm/pwmchip0/pwm10/period",
+		"/sys/class/pwm/pwmchip0/pwm10/duty_cycle",
+	})
+
+	SetFilesystem(fs)
+
+	pin := NewPWMPin(10)
+	pin.read = func(string) ([]byte, error) {
+		return nil, &os.PathError{Err: syscall.EBUSY}
+	}
+
+	_, err := pin.Polarity()
+	gobottest.Refute(t, err, nil)
+}
+
+func TestPwmPinDutyCycleError(t *testing.T) {
+	fs := NewMockFilesystem([]string{
+		"/sys/class/pwm/pwmchip0/export",
+		"/sys/class/pwm/pwmchip0/unexport",
+		"/sys/class/pwm/pwmchip0/pwm10/enable",
+		"/sys/class/pwm/pwmchip0/pwm10/period",
+		"/sys/class/pwm/pwmchip0/pwm10/duty_cycle",
+	})
+
+	SetFilesystem(fs)
+
+	pin := NewPWMPin(10)
+	pin.read = func(string) ([]byte, error) {
+		return nil, &os.PathError{Err: syscall.EBUSY}
+	}
+
+	_, err := pin.DutyCycle()
 	gobottest.Refute(t, err, nil)
 }
