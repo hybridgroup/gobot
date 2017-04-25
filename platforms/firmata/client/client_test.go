@@ -289,7 +289,7 @@ func TestProcessStringData(t *testing.T) {
 
 	select {
 	case <-sem:
-	case <-time.After(10 * time.Millisecond):
+	case <-time.After(100 * time.Millisecond):
 		t.Errorf("StringData was not published")
 	}
 }
