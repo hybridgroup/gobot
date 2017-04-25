@@ -3,7 +3,6 @@ package tinkerboard
 import (
 	"errors"
 	"fmt"
-	"strconv"
 
 	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot"
@@ -101,11 +100,7 @@ func (c *Adaptor) PwmWrite(pin string, val byte) (err error) {
 	if err != nil {
 		return
 	}
-	p, err := pwmPin.Period()
-	if err != nil {
-		return err
-	}
-	period, err := strconv.Atoi(p)
+	period, err := pwmPin.Period()
 	if err != nil {
 		return err
 	}
@@ -199,7 +194,7 @@ func (c *Adaptor) pwmPin(pin string) (sysfsPin *sysfs.PWMPin, err error) {
 			if err = newPin.SetPeriod(10000000); err != nil {
 				return
 			}
-			if err = newPin.SetPolarityInverted(false); err != nil {
+			if err = newPin.InvertPolarity(false); err != nil {
 				return
 			}
 			c.pwmPins[sysPin.pwmPin] = newPin
