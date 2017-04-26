@@ -72,7 +72,7 @@ func NewADS1015Driver(a Connector, options ...func(Config)) *ADS1x15Driver {
 			result -= 1 << 16
 		}
 
-		return float64(result) / float64(1<<12)
+		return float64(result) / float64(1<<15)
 	}
 
 	return l

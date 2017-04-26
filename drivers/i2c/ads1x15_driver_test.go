@@ -86,40 +86,40 @@ func TestADS1015DriverAnalogRead(t *testing.T) {
 	d.Start()
 
 	adaptor.i2cReadImpl = func(b []byte) (int, error) {
-		copy(b, []byte{99, 1})
+		copy(b, []byte{0x7F, 0xFF})
 		return 2, nil
 	}
 
 	val, err := d.AnalogRead("0")
-	gobottest.Assert(t, val, 1023)
+	gobottest.Assert(t, val, 1022)
 	gobottest.Assert(t, err, nil)
 
 	val, err = d.AnalogRead("1")
-	gobottest.Assert(t, val, 1023)
+	gobottest.Assert(t, val, 1022)
 	gobottest.Assert(t, err, nil)
 
 	val, err = d.AnalogRead("2")
-	gobottest.Assert(t, val, 1023)
+	gobottest.Assert(t, val, 1022)
 	gobottest.Assert(t, err, nil)
 
 	val, err = d.AnalogRead("3")
-	gobottest.Assert(t, val, 1023)
+	gobottest.Assert(t, val, 1022)
 	gobottest.Assert(t, err, nil)
 
 	val, err = d.AnalogRead("0-1")
-	gobottest.Assert(t, val, 1023)
+	gobottest.Assert(t, val, 1022)
 	gobottest.Assert(t, err, nil)
 
 	val, err = d.AnalogRead("0-3")
-	gobottest.Assert(t, val, 1023)
+	gobottest.Assert(t, val, 1022)
 	gobottest.Assert(t, err, nil)
 
 	val, err = d.AnalogRead("1-3")
-	gobottest.Assert(t, val, 1023)
+	gobottest.Assert(t, val, 1022)
 	gobottest.Assert(t, err, nil)
 
 	val, err = d.AnalogRead("2-3")
-	gobottest.Assert(t, val, 1023)
+	gobottest.Assert(t, val, 1022)
 	gobottest.Assert(t, err, nil)
 
 	val, err = d.AnalogRead("3-2")
@@ -131,44 +131,44 @@ func TestADS1115DriverAnalogRead(t *testing.T) {
 	d.Start()
 
 	adaptor.i2cReadImpl = func(b []byte) (int, error) {
-		copy(b, []byte{99, 1})
+		copy(b, []byte{0x7F, 0xFF})
 		return 2, nil
 	}
 
 	val, err := d.AnalogRead("0")
-	gobottest.Assert(t, val, 791)
+	gobottest.Assert(t, val, 1022)
 	gobottest.Assert(t, err, nil)
 
 	val, err = d.AnalogRead("1")
-	gobottest.Assert(t, val, 791)
+	gobottest.Assert(t, val, 1022)
 	gobottest.Assert(t, err, nil)
 
 	val, err = d.AnalogRead("2")
-	gobottest.Assert(t, val, 791)
+	gobottest.Assert(t, val, 1022)
 	gobottest.Assert(t, err, nil)
 
 	val, err = d.AnalogRead("3")
-	gobottest.Assert(t, val, 791)
+	gobottest.Assert(t, val, 1022)
 	gobottest.Assert(t, err, nil)
 
 	val, err = d.AnalogRead("0-1")
-	gobottest.Assert(t, val, 791)
+	gobottest.Assert(t, val, 1022)
 	gobottest.Assert(t, err, nil)
 
 	val, err = d.AnalogRead("0-3")
-	gobottest.Assert(t, val, 791)
+	gobottest.Assert(t, val, 1022)
 	gobottest.Assert(t, err, nil)
 
 	val, err = d.AnalogRead("1-3")
-	gobottest.Assert(t, val, 791)
+	gobottest.Assert(t, val, 1022)
 	gobottest.Assert(t, err, nil)
 
 	val, err = d.AnalogRead("2-3")
-	gobottest.Assert(t, val, 791)
+	gobottest.Assert(t, val, 1022)
 	gobottest.Assert(t, err, nil)
 
 	val, err = d.AnalogRead("3-2")
-	gobottest.Assert(t, err.Error(), "strconv.Atoi: parsing \"3-2\": invalid syntax")
+	gobottest.Refute(t, err.Error(), nil)
 }
 
 func TestADS1x15DriverAnalogReadError(t *testing.T) {
