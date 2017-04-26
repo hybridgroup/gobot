@@ -2,6 +2,7 @@ package i2c
 
 import (
 	"errors"
+	"math"
 	"strconv"
 	"time"
 
@@ -195,6 +196,30 @@ func WithADS1x15DataRate(val int) func(Config) {
 	}
 }
 
+// BestGainForVoltage returns the gain the most adapted to read up to the specified difference of potential.
+func (d *ADS1x15Driver) BestGainForVoltage(voltage float64) (bestGain int, err error) {
+	var max float64
+	difference := math.MaxFloat64
+	currentBestGain := -1
+
+	for key, value := range d.gainVoltage {
+		max = math.Max(max, value)
+		newDiff := value - voltage
+		if newDiff >= 0 && newDiff < difference {
+			difference = newDiff
+			currentBestGain = key
+		}
+	}
+
+	if currentBestGain < 0 {
+		err = fmt.Errorf("The maximum voltage which can be read is %f", max)
+		return
+	}
+
+	bestGain = currentBestGain
+	return
+}
+
 // ReadDifferenceWithDefaults reads the difference in V between 2 inputs. It uses the default gain and data rate
 // diff can be:
 // * 0: Channel 0 - channel 1
@@ -263,22 +288,18 @@ func (d *ADS1x15Driver) AnalogRead(pin string) (value int, err error) {
 
 	if useDifference {
 		read, err = d.ReadDifferenceWithDefaults(channel)
-		if err == nil {
-			value = int(1000.0 * read)
+	} else {
+		// Second case: read the voltage at a specific pin, compared to the ground
+		channel, err = strconv.Atoi(pin)
+		if err != nil {
+			return
 		}
 
-		return
+		read, err = d.ReadWithDefaults(channel)
 	}
 
-	// Second case: read the voltage at a specific pin, compared to the ground
-	channel, err = strconv.Atoi(pin)
-	if err != nil {
-		return
-	}
-
-	read, err = d.ReadWithDefaults(channel)
 	if err == nil {
-		value = int(1000.0 * read)
+		value = int(gobot.ToScale(gobot.FromScale(read, 0, d.gainVoltage[d.DefaultGain]), 0, 1023))
 	}
 
 	return
