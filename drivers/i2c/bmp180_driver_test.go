@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"testing"
+	"time"
 
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/gobottest"
@@ -162,6 +163,18 @@ func TestBMP180DriverPressureError(t *testing.T) {
 	gobottest.Assert(t, err, errors.New("press error"))
 }
 
+func TestBMP180DriverPressureWriteError(t *testing.T) {
+	bmp180, adaptor := initTestBMP180DriverWithStubbedAdaptor()
+	bmp180.Start()
+
+	adaptor.i2cWriteImpl = func([]byte) (int, error) {
+		return 0, errors.New("write error")
+	}
+
+	_, err := bmp180.Pressure()
+	gobottest.Assert(t, err, errors.New("write error"))
+}
+
 func TestBMP180DriverSetName(t *testing.T) {
 	b := initTestBMP180Driver()
 	b.SetName("TESTME")
@@ -171,4 +184,11 @@ func TestBMP180DriverSetName(t *testing.T) {
 func TestBMP180DriverOptions(t *testing.T) {
 	b := NewBMP180Driver(newI2cTestAdaptor(), WithBus(2))
 	gobottest.Assert(t, b.GetBusOrDefault(1), 2)
+}
+
+func TestBMP180PauseForReading(t *testing.T) {
+	gobottest.Assert(t, pauseForReading(BMP180UltraLowPower), time.Duration(5*time.Millisecond))
+	gobottest.Assert(t, pauseForReading(BMP180Standard), time.Duration(8*time.Millisecond))
+	gobottest.Assert(t, pauseForReading(BMP180HighResolution), time.Duration(14*time.Millisecond))
+	gobottest.Assert(t, pauseForReading(BMP180UltraHighResolution), time.Duration(26*time.Millisecond))
 }

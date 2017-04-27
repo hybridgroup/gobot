@@ -203,16 +203,7 @@ func (d *BMP180Driver) rawPressure(mode BMP180OversamplingMode) (rawPressure int
 	if _, err = d.connection.Write([]byte{bmp180RegisterCtl, bmp180CmdPressure + byte(mode<<6)}); err != nil {
 		return 0, err
 	}
-	switch mode {
-	case BMP180UltraLowPower:
-		time.Sleep(5 * time.Millisecond)
-	case BMP180Standard:
-		time.Sleep(8 * time.Millisecond)
-	case BMP180HighResolution:
-		time.Sleep(14 * time.Millisecond)
-	case BMP180UltraHighResolution:
-		time.Sleep(26 * time.Millisecond)
-	}
+	time.Sleep(pauseForReading(mode))
 	var ret []byte
 	if ret, err = d.read(bmp180RegisterPressureMSB, 3); err != nil {
 		return 0, err
@@ -243,4 +234,19 @@ func (d *BMP180Driver) calculatePressure(rawTemp int16, rawPressure int32, mode 
 	x1 = (x1 * 3038) >> 16
 	x2 = (-7357 * p) >> 16
 	return float32(p + ((x1 + x2 + 3791) >> 4))
+}
+
+func pauseForReading(mode BMP180OversamplingMode) time.Duration {
+	var d time.Duration
+	switch mode {
+	case BMP180UltraLowPower:
+		d = 5 * time.Millisecond
+	case BMP180Standard:
+		d = 8 * time.Millisecond
+	case BMP180HighResolution:
+		d = 14 * time.Millisecond
+	case BMP180UltraHighResolution:
+		d = 26 * time.Millisecond
+	}
+	return d
 }
