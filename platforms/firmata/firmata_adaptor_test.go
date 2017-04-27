@@ -131,6 +131,9 @@ func TestAdaptorConnect(t *testing.T) {
 	a.board = newMockFirmataBoard()
 	gobottest.Assert(t, a.Connect(), nil)
 
+	a = NewAdaptor("/dev/null")
+	a.board = nil
+	gobottest.Assert(t, a.Disconnect(), nil)
 }
 
 func TestAdaptorServoWrite(t *testing.T) {
@@ -138,14 +141,29 @@ func TestAdaptorServoWrite(t *testing.T) {
 	a.ServoWrite("1", 50)
 }
 
+func TestAdaptorServoWriteBadPin(t *testing.T) {
+	a := initTestAdaptor()
+	gobottest.Refute(t, a.ServoWrite("xyz", 50), nil)
+}
+
 func TestAdaptorPwmWrite(t *testing.T) {
 	a := initTestAdaptor()
 	a.PwmWrite("1", 50)
 }
 
+func TestAdaptorPwmWriteBadPin(t *testing.T) {
+	a := initTestAdaptor()
+	gobottest.Refute(t, a.PwmWrite("xyz", 50), nil)
+}
+
 func TestAdaptorDigitalWrite(t *testing.T) {
 	a := initTestAdaptor()
 	a.DigitalWrite("1", 1)
+}
+
+func TestAdaptorDigitalWriteBadPin(t *testing.T) {
+	a := initTestAdaptor()
+	gobottest.Refute(t, a.DigitalWrite("xyz", 50), nil)
 }
 
 func TestAdaptorDigitalRead(t *testing.T) {
@@ -155,11 +173,23 @@ func TestAdaptorDigitalRead(t *testing.T) {
 	gobottest.Assert(t, val, 1)
 }
 
+func TestAdaptorDigitalReadBadPin(t *testing.T) {
+	a := initTestAdaptor()
+	_, err := a.DigitalRead("xyz")
+	gobottest.Refute(t, err, nil)
+}
+
 func TestAdaptorAnalogRead(t *testing.T) {
 	a := initTestAdaptor()
 	val, err := a.AnalogRead("1")
 	gobottest.Assert(t, val, 133)
 	gobottest.Assert(t, err, nil)
+}
+
+func TestAdaptorAnalogReadBadPin(t *testing.T) {
+	a := initTestAdaptor()
+	_, err := a.AnalogRead("xyz")
+	gobottest.Refute(t, err, nil)
 }
 
 func TestAdaptorI2cStart(t *testing.T) {
@@ -291,4 +321,15 @@ func TestServoConfig(t *testing.T) {
 	// test atoi error
 	err = a.ServoConfig("a", 0, 0)
 	gobottest.Assert(t, true, strings.Contains(fmt.Sprintf("%v", err), "invalid syntax"))
+}
+
+func TestDefaultBus(t *testing.T) {
+	a := initTestAdaptor()
+	gobottest.Assert(t, a.GetDefaultBus(), 0)
+}
+
+func TestGetConnectionInvalidBus(t *testing.T) {
+	a := initTestAdaptor()
+	_, err := a.GetConnection(0x01, 99)
+	gobottest.Assert(t, err, errors.New("Invalid bus number 99, only 0 is supported"))
 }
