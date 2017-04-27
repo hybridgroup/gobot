@@ -146,7 +146,8 @@ func (d *digitalPin) Unexport() error {
 	_, err = writeFile(unexport, []byte(d.pin))
 	if err != nil {
 		// If EINVAL then the pin is reserved in the system and can't be unexported
-		if err.(*os.PathError).Err != syscall.EINVAL {
+		e, ok := err.(*os.PathError)
+		if !ok || e.Err != syscall.EINVAL {
 			return err
 		}
 	}

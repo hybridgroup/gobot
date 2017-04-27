@@ -69,6 +69,34 @@ func TestChipAdaptorName(t *testing.T) {
 	gobottest.Assert(t, a.Name(), "NewName")
 }
 
+func TestChipAdaptorBoard(t *testing.T) {
+	a := NewAdaptor()
+	a.SetBoard("pro")
+	gobottest.Assert(t, a.board, "pro")
+}
+
+func TestAdaptorFinalizeErrorAfterGPIO(t *testing.T) {
+	a, fs := initTestChipAdaptor()
+	gobottest.Assert(t, a.Connect(), nil)
+	gobottest.Assert(t, a.DigitalWrite("CSID7", 1), nil)
+
+	fs.WithWriteError = true
+
+	err := a.Finalize()
+	gobottest.Assert(t, strings.Contains(err.Error(), "write error"), true)
+}
+
+func TestAdaptorFinalizeErrorAfterPWM(t *testing.T) {
+	a, fs := initTestChipAdaptor()
+	gobottest.Assert(t, a.Connect(), nil)
+	gobottest.Assert(t, a.PwmWrite("PWM0", 100), nil)
+
+	fs.WithWriteError = true
+
+	err := a.Finalize()
+	gobottest.Assert(t, strings.Contains(err.Error(), "write error"), true)
+}
+
 func TestChipAdaptorDigitalIO(t *testing.T) {
 	a, fs := initTestChipAdaptor()
 	a.Connect()
