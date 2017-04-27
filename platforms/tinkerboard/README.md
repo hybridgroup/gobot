@@ -18,6 +18,12 @@ go get -d -u gobot.io/x/gobot/...
 
 To enable use of the Tinker Board GPIO pins, you need to perform the following steps as a one-time configuration. Once your Tinker Board has been configured, you do not need to do so again.
 
+Note that these configuration steps must be performed on the Tinker Board itself. The easiest is to login to the Tinker Board via SSH:
+
+```
+ssh linaro@192.168.1.xxx
+```
+
 #### Create a group "gpio"
 
 Create a Linux group named "gpio" by running the following command:
@@ -58,6 +64,12 @@ Press the "Esc" key, then press the ":" key and then the "q" key, and then press
 ### Enabling I2C
 
 To enable use of the Tinker Board I2C, you need to perform the following steps as a one-time configuration. Once your Tinker Board has been configured, you do not need to do so again.
+
+Note that these configuration steps must be performed on the Tinker Board itself. The easiest is to login to the Tinker Board via SSH:
+
+```
+ssh linaro@192.168.1.xxx
+```
 
 #### Create a group "i2c"
 
@@ -101,7 +113,8 @@ Press the "Esc" key, then press the ":" key and then the "q" key, and then press
 The pin numbering used by your Gobot program should match the way your board is labeled right on the board itself.
 
 ```go
-// code here...
+r := tinkerboard.NewAdaptor()
+led := gpio.NewLedDriver(r, "7")
 ```
 
 ## How to Connect
@@ -115,8 +128,6 @@ $ GOARM=7 GOARCH=arm GOOS=linux go build examples/tinkerboard_blink.go
 ```
 
 Once you have compiled your code, you can you can upload your program and execute it on the Tinkerboard from your workstation using the `scp` and `ssh` commands like this:
-
-Once you have compiled your code, you can you can upload your program and execute it on the Raspberry Pi from your workstation using the `scp` and `ssh` commands like this:
 
 ```bash
 $ scp tinkerboard_blink linaro@192.168.1.xxx:/home/linaro/
