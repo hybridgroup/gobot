@@ -74,6 +74,7 @@ Serial          : 000000003bc748ea
 	gobottest.Assert(t, a.revision, "1")
 
 }
+
 func TestAdaptorFinalize(t *testing.T) {
 	a := initTestAdaptor()
 
@@ -114,6 +115,7 @@ func TestAdaptorDigitalPWM(t *testing.T) {
 	gobottest.Assert(t, strings.Split(fs.Files["/dev/pi-blaster"].Contents, "\n")[0], "17=0.25")
 
 	gobottest.Assert(t, a.PwmWrite("notexist", 1), errors.New("Not a valid pin"))
+	gobottest.Assert(t, a.ServoWrite("notexist", 1), errors.New("Not a valid pin"))
 }
 
 func TestAdaptorDigitalIO(t *testing.T) {
@@ -137,6 +139,10 @@ func TestAdaptorDigitalIO(t *testing.T) {
 	gobottest.Assert(t, i, 1)
 
 	gobottest.Assert(t, a.DigitalWrite("notexist", 1), errors.New("Not a valid pin"))
+
+	fs.WithReadError = true
+	_, err := a.DigitalRead("13")
+	gobottest.Assert(t, err, errors.New("read error"))
 }
 
 func TestAdaptorI2c(t *testing.T) {
