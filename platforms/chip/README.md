@@ -74,11 +74,10 @@ func main() {
 }
 ```
 
-If you want to use the C.H.I.P. Pro, use the `SetBoard()` function like this:
+If you want to use the C.H.I.P. Pro, use the `NewProAdaptor()` function like this:
 
 ```go
-chipProAdaptor := chip.NewAdaptor()
-chipProAdaptor.SetBoard("CHIP Pro")
+chipProAdaptor := chip.NewProAdaptor()
 ```
 
 ## How to Connect

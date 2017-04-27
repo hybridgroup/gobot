@@ -32,9 +32,19 @@ type Adaptor struct {
 // NewAdaptor creates a C.H.I.P. Adaptor
 func NewAdaptor() *Adaptor {
 	c := &Adaptor{
-		name:        gobot.DefaultName("CHIP"),
-		board:       "CHIP",
-		digitalPins: make(map[int]sysfs.DigitalPin),
+		name:  gobot.DefaultName("CHIP"),
+		board: "chip",
+	}
+
+	c.setPins()
+	return c
+}
+
+// NewAdaptor creates a C.H.I.P. Pro Adaptor
+func NewProAdaptor() *Adaptor {
+	c := &Adaptor{
+		name:  gobot.DefaultName("CHIP Pro"),
+		board: "pro",
 	}
 
 	c.setPins()
@@ -49,7 +59,6 @@ func (c *Adaptor) SetName(n string) { c.name = n }
 
 // Connect initializes the board
 func (c *Adaptor) Connect() (err error) {
-	c.pwmPins = make(map[int]*sysfs.PWMPin)
 	return nil
 }
 
@@ -158,7 +167,7 @@ func (c *Adaptor) ServoWrite(pin string, angle byte) (err error) {
 
 // SetBoard sets the name of the type of board
 func (c *Adaptor) SetBoard(n string) (err error) {
-	if n == "CHIP Pro" || n == "CHIP" {
+	if n == "chip" || n == "pro" {
 		c.board = n
 		c.setPins()
 		return
@@ -167,7 +176,10 @@ func (c *Adaptor) SetBoard(n string) (err error) {
 }
 
 func (c *Adaptor) setPins() {
-	if c.board == "CHIP Pro" {
+	c.digitalPins = make(map[int]sysfs.DigitalPin)
+	c.pwmPins = make(map[int]*sysfs.PWMPin)
+
+	if c.board == "pro" {
 		c.pinmap = chipProPins
 		return
 	}
