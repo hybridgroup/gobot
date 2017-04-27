@@ -27,8 +27,7 @@ type Adaptor struct {
 // NewAdaptor creates a Tinkerboard Adaptor
 func NewAdaptor() *Adaptor {
 	c := &Adaptor{
-		name:        gobot.DefaultName("Tinker Board"),
-		digitalPins: make(map[int]sysfs.DigitalPin),
+		name: gobot.DefaultName("Tinker Board"),
 	}
 
 	c.setPins()
@@ -43,7 +42,6 @@ func (c *Adaptor) SetName(n string) { c.name = n }
 
 // Connect initializes the board
 func (c *Adaptor) Connect() (err error) {
-	c.pwmPins = make(map[int]*sysfs.PWMPin)
 	return nil
 }
 
@@ -145,6 +143,8 @@ func (c *Adaptor) GetDefaultBus() int {
 }
 
 func (c *Adaptor) setPins() {
+	c.digitalPins = make(map[int]sysfs.DigitalPin)
+	c.pwmPins = make(map[int]*sysfs.PWMPin)
 	c.pinmap = fixedPins
 }
 
@@ -179,30 +179,42 @@ func (c *Adaptor) digitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPin,
 	return c.digitalPins[i], nil
 }
 
+func (c *Adaptor) translatePwmPin(pin string) (i int, err error) {
+	if val, ok := c.pinmap[pin]; ok {
+		i = val.pwmPin
+	} else {
+		err = errors.New("Not a valid pin")
+	}
+	return
+}
+
 // pwmPin returns matched pwmPin for specified pin number
 func (c *Adaptor) pwmPin(pin string) (sysfsPin *sysfs.PWMPin, err error) {
-	sysPin := c.pinmap[pin]
-	if sysPin.pwmPin != -1 {
-		if c.pwmPins[sysPin.pwmPin] == nil {
-			newPin := sysfs.NewPWMPin(sysPin.pwmPin)
-			if err = newPin.Export(); err != nil {
-				return
-			}
-			if err = newPin.Enable(true); err != nil {
-				return
-			}
-			if err = newPin.SetPeriod(10000000); err != nil {
-				return
-			}
-			if err = newPin.InvertPolarity(false); err != nil {
-				return
-			}
-			c.pwmPins[sysPin.pwmPin] = newPin
-		}
-
-		sysfsPin = c.pwmPins[sysPin.pwmPin]
-		return
+	i, err := c.translatePwmPin(pin)
+	if err != nil {
+		return nil, err
 	}
-	err = errors.New("Not a PWM pin")
+	if i == -1 {
+		return nil, errors.New("Not a PWM pin")
+	}
+
+	if c.pwmPins[i] == nil {
+		newPin := sysfs.NewPWMPin(i)
+		if err = newPin.Export(); err != nil {
+			return
+		}
+		if err = newPin.Enable(true); err != nil {
+			return
+		}
+		if err = newPin.SetPeriod(10000000); err != nil {
+			return
+		}
+		if err = newPin.InvertPolarity(false); err != nil {
+			return
+		}
+		c.pwmPins[i] = newPin
+	}
+
+	sysfsPin = c.pwmPins[i]
 	return
 }

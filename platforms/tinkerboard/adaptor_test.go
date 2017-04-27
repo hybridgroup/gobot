@@ -20,10 +20,25 @@ var _ gpio.PwmWriter = (*Adaptor)(nil)
 var _ gpio.ServoWriter = (*Adaptor)(nil)
 var _ i2c.Connector = (*Adaptor)(nil)
 
-func initTestTinkerboardAdaptor() *Adaptor {
+func initTestTinkerboardAdaptor() (*Adaptor, *sysfs.MockFilesystem) {
 	a := NewAdaptor()
-	a.Connect()
-	return a
+	fs := sysfs.NewMockFilesystem([]string{
+		"/sys/class/gpio/export",
+		"/sys/class/gpio/unexport",
+		"/sys/class/gpio/gpio17/value",
+		"/sys/class/gpio/gpio17/direction",
+		"/sys/class/gpio/gpio160/value",
+		"/sys/class/gpio/gpio160/direction",
+		"/sys/class/pwm/pwmchip0/export",
+		"/sys/class/pwm/pwmchip0/unexport",
+		"/sys/class/pwm/pwmchip0/pwm0/enable",
+		"/sys/class/pwm/pwmchip0/pwm0/period",
+		"/sys/class/pwm/pwmchip0/pwm0/duty_cycle",
+		"/sys/class/pwm/pwmchip0/pwm0/polarity",
+	})
+
+	sysfs.SetFilesystem(fs)
+	return a, fs
 }
 
 func TestTinkerboardAdaptorName(t *testing.T) {
@@ -34,17 +49,8 @@ func TestTinkerboardAdaptorName(t *testing.T) {
 }
 
 func TestTinkerboardAdaptorDigitalIO(t *testing.T) {
-	a := initTestTinkerboardAdaptor()
-	fs := sysfs.NewMockFilesystem([]string{
-		"/sys/class/gpio/export",
-		"/sys/class/gpio/unexport",
-		"/sys/class/gpio/gpio17/value",
-		"/sys/class/gpio/gpio17/direction",
-		"/sys/class/gpio/gpio160/value",
-		"/sys/class/gpio/gpio160/direction",
-	})
-
-	sysfs.SetFilesystem(fs)
+	a, fs := initTestTinkerboardAdaptor()
+	a.Connect()
 
 	a.DigitalWrite("7", 1)
 	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio17/value"].Contents, "1")
@@ -56,8 +62,24 @@ func TestTinkerboardAdaptorDigitalIO(t *testing.T) {
 	gobottest.Assert(t, a.DigitalWrite("99", 1), errors.New("Not a valid pin"))
 }
 
+func TestAdaptorDigitalWriteError(t *testing.T) {
+	a, fs := initTestTinkerboardAdaptor()
+	fs.WithWriteError = true
+
+	err := a.DigitalWrite("7", 1)
+	gobottest.Assert(t, err, errors.New("write error"))
+}
+
+func TestAdaptorDigitalReadWriteError(t *testing.T) {
+	a, fs := initTestTinkerboardAdaptor()
+	fs.WithWriteError = true
+
+	_, err := a.DigitalRead("7")
+	gobottest.Assert(t, err, errors.New("write error"))
+}
+
 func TestTinkerboardAdaptorI2c(t *testing.T) {
-	a := initTestTinkerboardAdaptor()
+	a := NewAdaptor()
 	fs := sysfs.NewMockFilesystem([]string{
 		"/dev/i2c-1",
 	})
@@ -76,28 +98,26 @@ func TestTinkerboardAdaptorI2c(t *testing.T) {
 }
 
 func TestTinkerboardAdaptorInvalidPWMPin(t *testing.T) {
-	a := initTestTinkerboardAdaptor()
+	a, _ := initTestTinkerboardAdaptor()
+	a.Connect()
 
 	err := a.PwmWrite("666", 42)
 	gobottest.Refute(t, err, nil)
 
 	err = a.ServoWrite("666", 120)
 	gobottest.Refute(t, err, nil)
+
+	err = a.PwmWrite("3", 42)
+	gobottest.Refute(t, err, nil)
+
+	err = a.ServoWrite("3", 120)
+	gobottest.Refute(t, err, nil)
 }
 
 func TestTinkerboardAdaptorPWM(t *testing.T) {
-	a := initTestTinkerboardAdaptor()
-	fs := sysfs.NewMockFilesystem([]string{
-		"/sys/class/pwm/pwmchip0/export",
-		"/sys/class/pwm/pwmchip0/unexport",
-		"/sys/class/pwm/pwmchip0/pwm0/enable",
-		"/sys/class/pwm/pwmchip0/pwm0/period",
-		"/sys/class/pwm/pwmchip0/pwm0/duty_cycle",
-		"/sys/class/pwm/pwmchip0/pwm0/polarity",
-	})
-	sysfs.SetFilesystem(fs)
+	a, fs := initTestTinkerboardAdaptor()
 
-	err := a.PwmWrite("PWM0", 100)
+	err := a.PwmWrite("33", 100)
 	gobottest.Assert(t, err, nil)
 
 	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/export"].Contents, "0")
@@ -105,25 +125,41 @@ func TestTinkerboardAdaptorPWM(t *testing.T) {
 	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/pwm0/duty_cycle"].Contents, "3921568")
 	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/pwm0/polarity"].Contents, "normal")
 
-	err = a.ServoWrite("PWM0", 0)
+	err = a.ServoWrite("33", 0)
 	gobottest.Assert(t, err, nil)
 
 	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/pwm0/duty_cycle"].Contents, "500000")
 
-	err = a.ServoWrite("PWM0", 180)
+	err = a.ServoWrite("33", 180)
 	gobottest.Assert(t, err, nil)
 
 	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/pwm0/duty_cycle"].Contents, "2000000")
 	gobottest.Assert(t, a.Finalize(), nil)
 }
 
+func TestTinkerboardAdaptorPwmWriteError(t *testing.T) {
+	a, fs := initTestTinkerboardAdaptor()
+	fs.WithWriteError = true
+
+	err := a.PwmWrite("33", 100)
+	gobottest.Assert(t, err, errors.New("write error"))
+}
+
+func TestTinkerboardAdaptorPwmReadError(t *testing.T) {
+	a, fs := initTestTinkerboardAdaptor()
+	fs.WithReadError = true
+
+	err := a.PwmWrite("33", 100)
+	gobottest.Assert(t, err, errors.New("read error"))
+}
+
 func TestTinkerboardDefaultBus(t *testing.T) {
-	a := initTestTinkerboardAdaptor()
+	a, _ := initTestTinkerboardAdaptor()
 	gobottest.Assert(t, a.GetDefaultBus(), 1)
 }
 
 func TestTinkerboardGetConnectionInvalidBus(t *testing.T) {
-	a := initTestTinkerboardAdaptor()
+	a, _ := initTestTinkerboardAdaptor()
 	_, err := a.GetConnection(0x01, 99)
 	gobottest.Assert(t, err, errors.New("Bus number 99 out of range"))
 }
