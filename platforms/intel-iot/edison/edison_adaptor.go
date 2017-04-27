@@ -228,11 +228,9 @@ func (e *Adaptor) arduinoSetup() (err error) {
 		return err
 	}
 
-	if err = e.tristate.Direction(sysfs.OUT); err != nil {
-		return err
-	}
-	if err = e.tristate.Write(sysfs.LOW); err != nil {
-		return err
+	err = pinWrite(e.tristate, sysfs.OUT, sysfs.LOW)
+	if err != nil {
+		return
 	}
 
 	for _, i := range []int{263, 262} {
@@ -339,14 +337,10 @@ func (e *Adaptor) digitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPin,
 					return
 				}
 
-				if err = e.digitalPins[mux.pin].Direction(sysfs.OUT); err != nil {
+				err = pinWrite(e.digitalPins[mux.pin], sysfs.OUT, mux.value)
+				if err != nil {
 					return
 				}
-
-				if err = e.digitalPins[mux.pin].Write(mux.value); err != nil {
-					return
-				}
-
 			}
 		}
 	}
@@ -357,21 +351,15 @@ func (e *Adaptor) digitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPin,
 		}
 
 		if i.resistor > 0 {
-			if err = e.digitalPins[i.resistor].Direction(sysfs.OUT); err != nil {
-				return
-			}
-
-			if err = e.digitalPins[i.resistor].Write(sysfs.LOW); err != nil {
+			err = pinWrite(e.digitalPins[i.resistor], sysfs.OUT, sysfs.LOW)
+			if err != nil {
 				return
 			}
 		}
 
 		if i.levelShifter > 0 {
-			if err = e.digitalPins[i.levelShifter].Direction(sysfs.OUT); err != nil {
-				return
-			}
-
-			if err = e.digitalPins[i.levelShifter].Write(sysfs.LOW); err != nil {
+			err = pinWrite(e.digitalPins[i.levelShifter], sysfs.OUT, sysfs.LOW)
+			if err != nil {
 				return
 			}
 		}
@@ -387,11 +375,8 @@ func (e *Adaptor) digitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPin,
 		}
 
 		if i.levelShifter > 0 {
-			if err = e.digitalPins[i.levelShifter].Direction(sysfs.OUT); err != nil {
-				return
-			}
-
-			if err = e.digitalPins[i.levelShifter].Write(sysfs.HIGH); err != nil {
+			err = pinWrite(e.digitalPins[i.levelShifter], sysfs.OUT, sysfs.HIGH)
+			if err != nil {
 				return
 			}
 		}
@@ -446,5 +431,15 @@ func changePinMode(a *Adaptor, pin, mode string) (err error) {
 		"/sys/kernel/debug/gpio_debug/gpio"+pin+"/current_pinmux",
 		[]byte("mode"+mode),
 	)
+	return
+}
+
+// pinWrite sets Direction and writes level for a specific pin
+func pinWrite(pin sysfs.DigitalPin, dir string, level int) (err error) {
+	if err = pin.Direction(dir); err != nil {
+		return
+	}
+
+	err = pin.Write(level)
 	return
 }
