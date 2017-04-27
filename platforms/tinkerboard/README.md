@@ -18,7 +18,7 @@ go get -d -u gobot.io/x/gobot/...
 
 To enable use of the Tinker Board GPIO pins, you need to perform the following steps as a one-time configuration. Once your Tinker Board has been configured, you do not need to do so again.
 
-- Create a group "gpio"
+#### Create a group "gpio"
 
 Create a Linux group named "gpio" by running the following command:
 
@@ -28,7 +28,7 @@ sudo groupadd -f --system gpio
 
 If you already have a "gpio" group, you can skip to the next step.
 
-- Add the "linaro" user to the new "gpio" group
+#### Add the "linaro" user to the new "gpio" group
 
 Add the user "linaro" to be a member of the Linux group named "gpio" by running the following command:
 
@@ -38,7 +38,7 @@ sudo usermod -a -G gpio linaro
 
 If you already have added the "gpio" group, you can skip to the next step.
 
-- Add a "udev" rules file
+#### Add a "udev" rules file
 
 Create a new "udev" rules file for the GPIO on the Tinker Board by running the following command:
 
@@ -59,7 +59,7 @@ Press the "Esc" key, then press the ":" key and then the "q" key, and then press
 
 To enable use of the Tinker Board I2C, you need to perform the following steps as a one-time configuration. Once your Tinker Board has been configured, you do not need to do so again.
 
-- Create a group "i2c"
+#### Create a group "i2c"
 
 Create a Linux group named "i2c" by running the following command:
 
@@ -69,7 +69,7 @@ sudo groupadd -f --system i2c
 
 If you already have a "i2c" group, you can skip to the next step.
 
-- Add the "linaro" user to the new "i2c" group
+#### Add the "linaro" user to the new "i2c" group
 
 Add the user "linaro" to be a member of the Linux group named "i2c" by running the following command:
 
@@ -79,7 +79,7 @@ sudo usermod -a -G gpio linaro
 
 If you already have added the "i2c" group, you can skip to the next step.
 
-- Add a "udev" rules file
+#### Add a "udev" rules file
 
 Create a new "udev" rules file for the I2C on the Tinker Board by running the following command:
 
