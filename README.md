@@ -189,6 +189,7 @@ Gobot has a extensible system for connecting to hardware devices. The following 
 - [Beaglebone Black](http://beagleboard.org/Products/BeagleBone+Black/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/beaglebone)
 - [Bluetooth LE](https://www.bluetooth.com/what-is-bluetooth-technology/bluetooth-technology-basics/low-energy) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/ble)
 - [C.H.I.P](http://www.nextthing.co/pages/chip) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/chip)
+- [C.H.I.P Pro](https://docs.getchip.com/chip_pro.html) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/chip)
 - [Digispark](http://digistump.com/products/1) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/digispark)
 - [DragonBoard](https://developer.qualcomm.com/hardware/dragonboard-410c) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/dragonboard)
 - [ESP8266](http://esp8266.net/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/firmata)
@@ -213,6 +214,7 @@ Gobot has a extensible system for connecting to hardware devices. The following 
 - [Sphero](http://www.sphero.com/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/sphero)
 - [Sphero BB-8](http://www.sphero.com/bb8) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/sphero/bb8)
 - [Sphero Ollie](http://www.sphero.com/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/sphero/ollie)
+- [Tinker Board](https://www.asus.com/us/Single-Board-Computer/Tinker-Board/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/tinkerboard)
 
 Support for many devices that use General Purpose Input/Output (GPIO) have
 a shared set of drivers provided using the `gobot/drivers/gpio` package:
