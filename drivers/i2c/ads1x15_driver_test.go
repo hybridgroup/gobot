@@ -2,6 +2,7 @@ package i2c
 
 import (
 	"errors"
+	"strings"
 	"testing"
 
 	"gobot.io/x/gobot"
@@ -62,14 +63,16 @@ func TestADS1x15DriverSetName(t *testing.T) {
 }
 
 func TestADS1x15DriverOptions(t *testing.T) {
-	d := NewADS1015Driver(newI2cTestAdaptor(), WithBus(2), WithADS1x15Gain(2))
+	d := NewADS1015Driver(newI2cTestAdaptor(), WithBus(2), WithADS1x15Gain(2), WithADS1x15DataRate(920))
 	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
 	gobottest.Assert(t, d.DefaultGain, 2)
+	gobottest.Assert(t, d.DefaultDataRate, 920)
 }
 
 func TestADS1x15StartAndHalt(t *testing.T) {
 	d, _ := initTestADS1015DriverWithStubbedAdaptor()
 	gobottest.Assert(t, d.Start(), nil)
+	gobottest.Refute(t, d.Connection(), nil)
 	gobottest.Assert(t, d.Halt(), nil)
 }
 
@@ -216,4 +219,32 @@ func TestADS1x15DriverBestGainForVoltage(t *testing.T) {
 
 	g, err = d.BestGainForVoltage(20.0)
 	gobottest.Assert(t, err, errors.New("The maximum voltage which can be read is 6.144000"))
+}
+
+func TestADS1x15DriverReadInvalidChannel(t *testing.T) {
+	d, _ := initTestADS1015DriverWithStubbedAdaptor()
+
+	_, err := d.Read(9, d.DefaultGain, d.DefaultDataRate)
+	gobottest.Assert(t, err, errors.New("Invalid channel, must be between 0 and 3"))
+}
+
+func TestADS1x15DriverReadInvalidGain(t *testing.T) {
+	d, _ := initTestADS1015DriverWithStubbedAdaptor()
+
+	_, err := d.Read(0, 21, d.DefaultDataRate)
+	gobottest.Assert(t, err, errors.New("Gain must be one of: 2/3, 1, 2, 4, 8, 16"))
+}
+
+func TestADS1x15DriverReadInvalidDataRate(t *testing.T) {
+	d, _ := initTestADS1015DriverWithStubbedAdaptor()
+
+	_, err := d.Read(0, d.DefaultGain, 666)
+	gobottest.Assert(t, strings.Contains(err.Error(), "Invalid data rate."), true)
+}
+
+func TestADS1x15DriverReadDifferenceInvalidChannel(t *testing.T) {
+	d, _ := initTestADS1015DriverWithStubbedAdaptor()
+
+	_, err := d.ReadDifference(9, d.DefaultGain, d.DefaultDataRate)
+	gobottest.Assert(t, err, errors.New("Invalid channel, must be between 0 and 3"))
 }
