@@ -73,6 +73,8 @@ func TestChipAdaptorBoard(t *testing.T) {
 	a := NewAdaptor()
 	a.SetBoard("pro")
 	gobottest.Assert(t, a.board, "pro")
+
+	gobottest.Assert(t, a.SetBoard("bad"), errors.New("Invalid board type"))
 }
 
 func TestAdaptorFinalizeErrorAfterGPIO(t *testing.T) {
