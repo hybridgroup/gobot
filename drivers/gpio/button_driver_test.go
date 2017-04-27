@@ -91,12 +91,12 @@ func TestButtonDriverStart(t *testing.T) {
 		sem <- true
 	})
 
+	d.halt <- true
+
 	a.TestAdaptorDigitalRead(func() (val int, err error) {
 		val = 1
 		return
 	})
-
-	d.halt <- true
 
 	select {
 	case <-sem:
