@@ -88,7 +88,8 @@ func (d *digitalPin) Export() error {
 	_, err = writeFile(export, []byte(d.pin))
 	if err != nil {
 		// If EBUSY then the pin has already been exported
-		if err.(*os.PathError).Err != syscall.EBUSY {
+		e, ok := err.(*os.PathError)
+		if !ok || e.Err != syscall.EBUSY {
 			return err
 		}
 	}

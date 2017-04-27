@@ -13,8 +13,10 @@ var _ Filesystem = (*MockFilesystem)(nil)
 
 // MockFilesystem represents  a filesystem of mock files.
 type MockFilesystem struct {
-	Seq   int // Increases with each write or read.
-	Files map[string]*MockFile
+	Seq            int // Increases with each write or read.
+	Files          map[string]*MockFile
+	WithReadError  bool
+	WithWriteError bool
 }
 
 // A MockFile represents a mock file that contains a single string.  Any write
@@ -29,8 +31,16 @@ type MockFile struct {
 	fs *MockFilesystem
 }
 
+var (
+	readErr  = errors.New("read error")
+	writeErr = errors.New("write error")
+)
+
 // Write writes string(b) to f.Contents
 func (f *MockFile) Write(b []byte) (n int, err error) {
+	if f.fs.WithWriteError {
+		return 0, writeErr
+	}
 	return f.WriteString(string(b))
 }
 
@@ -53,6 +63,10 @@ func (f *MockFile) Sync() (err error) {
 
 // Read copies b bytes from f.Contents
 func (f *MockFile) Read(b []byte) (n int, err error) {
+	if f.fs.WithReadError {
+		return 0, readErr
+	}
+
 	count := len(b)
 	if len(f.Contents) < count {
 		count = len(f.Contents)
