@@ -123,7 +123,7 @@ func TestADS1015DriverAnalogRead(t *testing.T) {
 	gobottest.Assert(t, err, nil)
 
 	val, err = d.AnalogRead("3-2")
-	gobottest.Assert(t, err.Error(), "strconv.Atoi: parsing \"3-2\": invalid syntax")
+	gobottest.Refute(t, err.Error(), nil)
 }
 
 func TestADS1115DriverAnalogRead(t *testing.T) {
