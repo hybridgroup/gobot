@@ -126,6 +126,13 @@ func TestAdaptorConnectArduinoError(t *testing.T) {
 	gobottest.Assert(t, strings.Contains(err.Error(), "write error"), true)
 }
 
+func TestAdaptorConnectArduinoWriteError(t *testing.T) {
+	a, fs := initTestAdaptor()
+	fs.WithWriteError = true
+	err := a.Connect()
+	gobottest.Assert(t, strings.Contains(err.Error(), "write error"), true)
+}
+
 func TestAdaptorConnectSparkfun(t *testing.T) {
 	a, _ := initTestAdaptor()
 	a.SetBoard("sparkfun")
