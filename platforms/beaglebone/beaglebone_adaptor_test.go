@@ -86,6 +86,8 @@ func TestBeagleboneAdaptor(t *testing.T) {
 		"1898148",
 	)
 
+	gobottest.Assert(t, a.ServoWrite("P9_99", 175), errors.New("Not a valid pin"))
+
 	// Analog
 	fs.Files["/sys/bus/iio/devices/iio:device0/in_voltage1_raw"].Contents = "567\n"
 	i, _ := a.AnalogRead("P9_40")
@@ -113,6 +115,11 @@ func TestBeagleboneAdaptor(t *testing.T) {
 	fs.Files["/sys/class/gpio/gpio10/value"].Contents = "1"
 	i, _ = a.DigitalRead("P8_31")
 	gobottest.Assert(t, i, 1)
+
+	fs.WithReadError = true
+	_, err = a.DigitalRead("P8_31")
+	gobottest.Assert(t, err, errors.New("read error"))
+	fs.WithReadError = false
 
 	// I2c
 	sysfs.SetSyscall(&sysfs.MockSyscall{})
