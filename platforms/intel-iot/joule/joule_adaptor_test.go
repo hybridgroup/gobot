@@ -145,6 +145,14 @@ func TestAdaptorDigitalWriteError(t *testing.T) {
 	gobottest.Assert(t, err, errors.New("write error"))
 }
 
+func TestAdaptorDigitalReadWriteError(t *testing.T) {
+	a, fs := initTestAdaptor()
+	fs.WithWriteError = true
+
+	_, err := a.DigitalRead("13")
+	gobottest.Assert(t, err, errors.New("write error"))
+}
+
 func TestAdaptorI2c(t *testing.T) {
 	a, _ := initTestAdaptor()
 
