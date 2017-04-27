@@ -174,6 +174,14 @@ func TestAdaptorDigitalIO(t *testing.T) {
 	gobottest.Assert(t, i, 0)
 }
 
+func TestAdaptorDigitalWriteError(t *testing.T) {
+	a, fs := initTestAdaptor()
+	fs.WithWriteError = true
+
+	err := a.DigitalWrite("13", 1)
+	gobottest.Assert(t, err, errors.New("write error"))
+}
+
 func TestAdaptorI2c(t *testing.T) {
 	a, _ := initTestAdaptor()
 
@@ -206,7 +214,7 @@ func TestAdaptorPwm(t *testing.T) {
 	gobottest.Assert(t, err, errors.New("Not a PWM pin"))
 }
 
-func TestAdaptorPwmError(t *testing.T) {
+func TestAdaptorPwmWritePinError(t *testing.T) {
 	a, _ := initTestAdaptor()
 
 	a.writeFile = func(string, []byte) (int, error) {
@@ -215,6 +223,24 @@ func TestAdaptorPwmError(t *testing.T) {
 
 	err := a.PwmWrite("5", 100)
 	gobottest.Assert(t, err, errors.New("write error"))
+}
+
+func TestAdaptorPwmWriteError(t *testing.T) {
+	a, fs := initTestAdaptor()
+
+	fs.WithWriteError = true
+
+	err := a.PwmWrite("5", 100)
+	gobottest.Assert(t, err, errors.New("write error"))
+}
+
+func TestAdaptorPwmReadError(t *testing.T) {
+	a, fs := initTestAdaptor()
+
+	fs.WithReadError = true
+
+	err := a.PwmWrite("5", 100)
+	gobottest.Assert(t, err, errors.New("read error"))
 }
 
 func TestAdaptorAnalog(t *testing.T) {
