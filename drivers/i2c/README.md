@@ -14,6 +14,7 @@ Gobot has a extensible system for connecting to hardware devices. The following 
 
 - Adafruit Motor Hat
 - ADS1015 Analog to Digital Converter
+- ADS1115 Analog to Digital Converter
 - BlinkM LED
 - BME280 Barometric Pressure/Temperature/Altitude/Humidity Sensor
 - BMP180 Barometric Pressure/Temperature/Altitude Sensor

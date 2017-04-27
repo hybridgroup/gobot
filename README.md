@@ -254,6 +254,7 @@ drivers provided using the `gobot/drivers/i2c` package:
 - [I2C](https://en.wikipedia.org/wiki/I%C2%B2C) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/drivers/i2c)
 	- Adafruit Motor Hat
 	- ADS1015 Analog to Digital Converter
+	- ADS1115 Analog to Digital Converter
 	- BlinkM LED
 	- BME280 Barometric Pressure/Temperature/Altitude/Humidity Sensor
 	- BMP180 Barometric Pressure/Temperature/Altitude Sensor
