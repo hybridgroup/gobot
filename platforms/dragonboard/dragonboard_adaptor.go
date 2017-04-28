@@ -13,7 +13,7 @@ import (
 // Adaptor represents a Gobot Adaptor for a DragonBoard 410c
 type Adaptor struct {
 	name        string
-	digitalPins map[int]sysfs.DigitalPin
+	digitalPins map[int]*sysfs.DigitalPin
 	pinMap      map[string]int
 	i2cBuses    [3]sysfs.I2cDevice
 }
@@ -39,8 +39,7 @@ var fixedPins = map[string]int{
 // NewAdaptor creates a DragonBoard 410c Adaptor
 func NewAdaptor() *Adaptor {
 	c := &Adaptor{
-		name:        gobot.DefaultName("DragonBoard"),
-		digitalPins: make(map[int]sysfs.DigitalPin),
+		name: gobot.DefaultName("DragonBoard"),
 	}
 
 	c.setPins()
@@ -78,6 +77,7 @@ func (c *Adaptor) Finalize() (err error) {
 }
 
 func (c *Adaptor) setPins() {
+	c.digitalPins = make(map[int]*sysfs.DigitalPin)
 	c.pinMap = fixedPins
 	for i := 0; i < 122; i++ {
 		pin := fmt.Sprintf("GPIO_%d", i)
@@ -94,8 +94,8 @@ func (c *Adaptor) translatePin(pin string) (i int, err error) {
 	return
 }
 
-// digitalPin returns matched digitalPin for specified values
-func (c *Adaptor) digitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPin, err error) {
+// DigitalPin returns matched digitalPin for specified values
+func (c *Adaptor) DigitalPin(pin string, dir string) (sysfsPin *sysfs.DigitalPin, err error) {
 	i, err := c.translatePin(pin)
 
 	if err != nil {
@@ -121,7 +121,7 @@ func (c *Adaptor) digitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPin,
 // extender (pins 23-34 on header J8), as well as the SoC pins
 // aka all the other pins, APQ GPIO_0-GPIO_122 and PM_MPP_0-4.
 func (c *Adaptor) DigitalRead(pin string) (val int, err error) {
-	sysfsPin, err := c.digitalPin(pin, sysfs.IN)
+	sysfsPin, err := c.DigitalPin(pin, sysfs.IN)
 	if err != nil {
 		return
 	}
@@ -133,7 +133,7 @@ func (c *Adaptor) DigitalRead(pin string) (val int, err error) {
 // extender (pins 23-34 on header J8), as well as the SoC pins
 // aka all the other pins, APQ GPIO_0-GPIO_122 and PM_MPP_0-4.
 func (c *Adaptor) DigitalWrite(pin string, val byte) (err error) {
-	sysfsPin, err := c.digitalPin(pin, sysfs.OUT)
+	sysfsPin, err := c.DigitalPin(pin, sysfs.OUT)
 	if err != nil {
 		return err
 	}
