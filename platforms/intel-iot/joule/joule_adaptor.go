@@ -18,7 +18,7 @@ type sysfsPin struct {
 // Adaptor represents an Intel Joule
 type Adaptor struct {
 	name        string
-	digitalPins map[int]sysfs.DigitalPin
+	digitalPins map[int]*sysfs.DigitalPin
 	pwmPins     map[int]*sysfs.PWMPin
 	i2cBuses    [3]sysfs.I2cDevice
 	connect     func(e *Adaptor) (err error)
@@ -42,7 +42,7 @@ func (e *Adaptor) SetName(n string) { e.name = n }
 
 // Connect initializes the Joule for use with the Arduino beakout board
 func (e *Adaptor) Connect() (err error) {
-	e.digitalPins = make(map[int]sysfs.DigitalPin)
+	e.digitalPins = make(map[int]*sysfs.DigitalPin)
 	e.pwmPins = make(map[int]*sysfs.PWMPin)
 	err = e.connect(e)
 	return
@@ -78,7 +78,7 @@ func (e *Adaptor) Finalize() (err error) {
 }
 
 // digitalPin returns matched digitalPin for specified values
-func (e *Adaptor) digitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPin, err error) {
+func (e *Adaptor) DigitalPin(pin string, dir string) (sysfsPin *sysfs.DigitalPin, err error) {
 	i := sysfsPinMap[pin]
 	if e.digitalPins[i.pin] == nil {
 		e.digitalPins[i.pin] = sysfs.NewDigitalPin(i.pin)
@@ -101,7 +101,7 @@ func (e *Adaptor) digitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPin,
 
 // DigitalRead reads digital value from pin
 func (e *Adaptor) DigitalRead(pin string) (i int, err error) {
-	sysfsPin, err := e.digitalPin(pin, "in")
+	sysfsPin, err := e.DigitalPin(pin, "in")
 	if err != nil {
 		return
 	}
@@ -110,7 +110,7 @@ func (e *Adaptor) DigitalRead(pin string) (i int, err error) {
 
 // DigitalWrite writes a value to the pin. Acceptable values are 1 or 0.
 func (e *Adaptor) DigitalWrite(pin string, val byte) (err error) {
-	sysfsPin, err := e.digitalPin(pin, "out")
+	sysfsPin, err := e.DigitalPin(pin, "out")
 	if err != nil {
 		return
 	}
