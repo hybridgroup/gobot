@@ -22,21 +22,23 @@ const (
 	GPIOPATH = "/sys/class/gpio"
 )
 
-// DigitalPin is the interface for sysfs gpio interactions
-type DigitalPin interface {
-	// Unexport unexports the pin and releases the pin from the operating system
-	Unexport() error
+var errNotExported = errors.New("pin has not been exported")
+
+// DigitalPinner is the interface for sysfs gpio interactions
+type DigitalPinner interface {
 	// Export exports the pin for use by the operating system
 	Export() error
-	// Read reads the current value of the pin
-	Read() (int, error)
+	// Unexport unexports the pin and releases the pin from the operating system
+	Unexport() error
 	// Direction sets the direction for the pin
 	Direction(string) error
+	// Read reads the current value of the pin
+	Read() (int, error)
 	// Write writes to the pin
 	Write(int) error
 }
 
-type digitalPin struct {
+type DigitalPin struct {
 	pin   string
 	label string
 
@@ -47,8 +49,8 @@ type digitalPin struct {
 // NewDigitalPin returns a DigitalPin given the pin number and an optional sysfs pin label.
 // If no label is supplied the default label will prepend "gpio" to the pin number,
 // eg. a pin number of 10 will have a label of "gpio10"
-func NewDigitalPin(pin int, v ...string) DigitalPin {
-	d := &digitalPin{pin: strconv.Itoa(pin)}
+func NewDigitalPin(pin int, v ...string) *DigitalPin {
+	d := &DigitalPin{pin: strconv.Itoa(pin)}
 	if len(v) > 0 {
 		d.label = v[0]
 	} else {
@@ -58,19 +60,17 @@ func NewDigitalPin(pin int, v ...string) DigitalPin {
 	return d
 }
 
-var errNotExported = errors.New("pin has not been exported")
-
-func (d *digitalPin) Direction(dir string) error {
+func (d *DigitalPin) Direction(dir string) error {
 	_, err := writeFile(d.direction, []byte(dir))
 	return err
 }
 
-func (d *digitalPin) Write(b int) error {
+func (d *DigitalPin) Write(b int) error {
 	_, err := writeFile(d.value, []byte(strconv.Itoa(b)))
 	return err
 }
 
-func (d *digitalPin) Read() (n int, err error) {
+func (d *DigitalPin) Read() (n int, err error) {
 	buf, err := readFile(d.value)
 	if err != nil {
 		return 0, err
@@ -78,7 +78,7 @@ func (d *digitalPin) Read() (n int, err error) {
 	return strconv.Atoi(string(buf[0]))
 }
 
-func (d *digitalPin) Export() error {
+func (d *DigitalPin) Export() error {
 	export, err := fs.OpenFile(GPIOPATH+"/export", os.O_WRONLY, 0644)
 	if err != nil {
 		return err
@@ -127,7 +127,7 @@ func (d *digitalPin) Export() error {
 	return err
 }
 
-func (d *digitalPin) Unexport() error {
+func (d *DigitalPin) Unexport() error {
 	unexport, err := fs.OpenFile(GPIOPATH+"/unexport", os.O_WRONLY, 0644)
 	if err != nil {
 		return err

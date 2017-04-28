@@ -19,11 +19,11 @@ func TestDigitalPin(t *testing.T) {
 
 	SetFilesystem(fs)
 
-	pin := NewDigitalPin(10, "custom").(*digitalPin)
+	pin := NewDigitalPin(10, "custom")
 	gobottest.Assert(t, pin.pin, "10")
 	gobottest.Assert(t, pin.label, "custom")
 
-	pin = NewDigitalPin(10).(*digitalPin)
+	pin = NewDigitalPin(10)
 	gobottest.Assert(t, pin.pin, "10")
 	gobottest.Assert(t, pin.label, "gpio10")
 	gobottest.Assert(t, pin.value, nil)
@@ -95,7 +95,7 @@ func TestDigitalPinExportError(t *testing.T) {
 
 	SetFilesystem(fs)
 
-	pin := NewDigitalPin(10, "custom").(*digitalPin)
+	pin := NewDigitalPin(10, "custom")
 	writeFile = func(File, []byte) (int, error) {
 		return 0, &os.PathError{Err: syscall.EBUSY}
 	}
@@ -114,7 +114,7 @@ func TestDigitalPinUnexportError(t *testing.T) {
 
 	SetFilesystem(fs)
 
-	pin := NewDigitalPin(10, "custom").(*digitalPin)
+	pin := NewDigitalPin(10, "custom")
 	writeFile = func(File, []byte) (int, error) {
 		return 0, &os.PathError{Err: syscall.EBUSY}
 	}
