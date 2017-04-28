@@ -30,8 +30,8 @@ type Adaptor struct {
 	name        string
 	board       string
 	pinmap      map[string]sysfsPin
-	tristate    sysfs.DigitalPin
-	digitalPins map[int]sysfs.DigitalPin
+	tristate    *sysfs.DigitalPin
+	digitalPins map[int]*sysfs.DigitalPin
 	pwmPins     map[int]*sysfs.PWMPin
 	i2cBus      sysfs.I2cDevice
 	connect     func(e *Adaptor) (err error)
@@ -63,7 +63,7 @@ func (e *Adaptor) SetBoard(n string) { e.board = n }
 
 // Connect initializes the Edison for use with the Arduino beakout board
 func (e *Adaptor) Connect() (err error) {
-	e.digitalPins = make(map[int]sysfs.DigitalPin)
+	e.digitalPins = make(map[int]*sysfs.DigitalPin)
 	e.pwmPins = make(map[int]*sysfs.PWMPin)
 
 	if e.board == "" && e.checkForArduino() {
@@ -121,7 +121,7 @@ func (e *Adaptor) Finalize() (err error) {
 
 // DigitalRead reads digital value from pin
 func (e *Adaptor) DigitalRead(pin string) (i int, err error) {
-	sysfsPin, err := e.digitalPin(pin, "in")
+	sysfsPin, err := e.DigitalPin(pin, "in")
 	if err != nil {
 		return
 	}
@@ -130,7 +130,7 @@ func (e *Adaptor) DigitalRead(pin string) (i int, err error) {
 
 // DigitalWrite writes a value to the pin. Acceptable values are 1 or 0.
 func (e *Adaptor) DigitalWrite(pin string, val byte) (err error) {
-	sysfsPin, err := e.digitalPin(pin, "out")
+	sysfsPin, err := e.DigitalPin(pin, "out")
 	if err != nil {
 		return
 	}
@@ -139,31 +139,16 @@ func (e *Adaptor) DigitalWrite(pin string, val byte) (err error) {
 
 // PwmWrite writes the 0-254 value to the specified pin
 func (e *Adaptor) PwmWrite(pin string, val byte) (err error) {
-	sysPin := e.pinmap[pin]
-	if sysPin.pwmPin != -1 {
-		if e.pwmPins[sysPin.pwmPin] == nil {
-			if err = e.DigitalWrite(pin, 1); err != nil {
-				return
-			}
-			if err = changePinMode(e, strconv.Itoa(int(sysPin.pin)), "1"); err != nil {
-				return
-			}
-			e.pwmPins[sysPin.pwmPin] = sysfs.NewPWMPin(sysPin.pwmPin)
-			if err = e.pwmPins[sysPin.pwmPin].Export(); err != nil {
-				return
-			}
-			if err = e.pwmPins[sysPin.pwmPin].Enable(true); err != nil {
-				return
-			}
-		}
-		period, err := e.pwmPins[sysPin.pwmPin].Period()
-		if err != nil {
-			return err
-		}
-		duty := gobot.FromScale(float64(val), 0, 255.0)
-		return e.pwmPins[sysPin.pwmPin].SetDutyCycle(uint32(float64(period) * duty))
+	pwmPin, err := e.PWMPin(pin)
+	if err != nil {
+		return
 	}
-	return errors.New("Not a PWM pin")
+	period, err := pwmPin.Period()
+	if err != nil {
+		return err
+	}
+	duty := gobot.FromScale(float64(val), 0, 255.0)
+	return pwmPin.SetDutyCycle(uint32(float64(period) * duty))
 }
 
 // AnalogRead returns value from analog reading of specified pin
@@ -205,6 +190,109 @@ func (e *Adaptor) GetDefaultBus() int {
 	return 1
 }
 
+// DigitalPin returns matched sysfs.DigitalPin for specified values
+func (e *Adaptor) DigitalPin(pin string, dir string) (sysfsPin *sysfs.DigitalPin, err error) {
+	i := e.pinmap[pin]
+	if e.digitalPins[i.pin] == nil {
+		e.digitalPins[i.pin], err = e.newExportedPin(i.pin)
+		if err != nil {
+			return
+		}
+
+		if i.resistor > 0 {
+			e.digitalPins[i.resistor], err = e.newExportedPin(i.resistor)
+			if err != nil {
+				return
+			}
+		}
+
+		if i.levelShifter > 0 {
+			e.digitalPins[i.levelShifter], err = e.newExportedPin(i.levelShifter)
+			if err != nil {
+				return
+			}
+		}
+
+		if len(i.mux) > 0 {
+			for _, mux := range i.mux {
+				e.digitalPins[mux.pin], err = e.newExportedPin(mux.pin)
+				if err != nil {
+					return
+				}
+
+				err = pinWrite(e.digitalPins[mux.pin], sysfs.OUT, mux.value)
+				if err != nil {
+					return
+				}
+			}
+		}
+	}
+
+	if dir == "in" {
+		if err = e.digitalPins[i.pin].Direction(sysfs.IN); err != nil {
+			return
+		}
+
+		if i.resistor > 0 {
+			err = pinWrite(e.digitalPins[i.resistor], sysfs.OUT, sysfs.LOW)
+			if err != nil {
+				return
+			}
+		}
+
+		if i.levelShifter > 0 {
+			err = pinWrite(e.digitalPins[i.levelShifter], sysfs.OUT, sysfs.LOW)
+			if err != nil {
+				return
+			}
+		}
+	} else if dir == "out" {
+		if err = e.digitalPins[i.pin].Direction(sysfs.OUT); err != nil {
+			return
+		}
+
+		if i.resistor > 0 {
+			if err = e.digitalPins[i.resistor].Direction(sysfs.IN); err != nil {
+				return
+			}
+		}
+
+		if i.levelShifter > 0 {
+			err = pinWrite(e.digitalPins[i.levelShifter], sysfs.OUT, sysfs.HIGH)
+			if err != nil {
+				return
+			}
+		}
+	}
+	return e.digitalPins[i.pin], nil
+}
+
+func (e *Adaptor) PWMPin(pin string) (sysfsPin *sysfs.PWMPin, err error) {
+	sysPin := e.pinmap[pin]
+	if sysPin.pwmPin != -1 {
+		if e.pwmPins[sysPin.pwmPin] == nil {
+			if err = e.DigitalWrite(pin, 1); err != nil {
+				return
+			}
+			if err = changePinMode(e, strconv.Itoa(int(sysPin.pin)), "1"); err != nil {
+				return
+			}
+			e.pwmPins[sysPin.pwmPin] = sysfs.NewPWMPin(sysPin.pwmPin)
+			if err = e.pwmPins[sysPin.pwmPin].Export(); err != nil {
+				return
+			}
+			if err = e.pwmPins[sysPin.pwmPin].Enable(true); err != nil {
+				return
+			}
+		}
+
+		sysfsPin = e.pwmPins[sysPin.pwmPin]
+		return
+	}
+	err = errors.New("Not a PWM pin")
+	return
+}
+
 // TODO: also check to see if device labels for
 // /sys/class/gpio/gpiochip{200,216,232,248}/label == "pcal9555a"
 func (e *Adaptor) checkForArduino() bool {
@@ -214,11 +302,14 @@ func (e *Adaptor) checkForArduino() bool {
 	return true
 }
 
+func (e *Adaptor) newExportedPin(pin int) (sysfsPin *sysfs.DigitalPin, err error) {
+	sysfsPin = sysfs.NewDigitalPin(pin)
+	err = sysfsPin.Export()
+	return
+}
+
 func (e *Adaptor) exportTristatePin() (err error) {
-	e.tristate = sysfs.NewDigitalPin(214)
-	if err = e.tristate.Export(); err != nil {
-		return err
-	}
+	e.tristate, err = e.newExportedPin(214)
 	return
 }
 
@@ -307,83 +398,6 @@ func (e *Adaptor) miniboardSetup() (err error) {
 	return
 }
 
-// digitalPin returns matched digitalPin for specified values
-func (e *Adaptor) digitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPin, err error) {
-	i := e.pinmap[pin]
-	if e.digitalPins[i.pin] == nil {
-		e.digitalPins[i.pin] = sysfs.NewDigitalPin(i.pin)
-		if err = e.digitalPins[i.pin].Export(); err != nil {
-			return
-		}
-
-		if i.resistor > 0 {
-			e.digitalPins[i.resistor] = sysfs.NewDigitalPin(i.resistor)
-			if err = e.digitalPins[i.resistor].Export(); err != nil {
-				return
-			}
-		}
-
-		if i.levelShifter > 0 {
-			e.digitalPins[i.levelShifter] = sysfs.NewDigitalPin(i.levelShifter)
-			if err = e.digitalPins[i.levelShifter].Export(); err != nil {
-				return
-			}
-		}
-
-		if len(i.mux) > 0 {
-			for _, mux := range i.mux {
-				e.digitalPins[mux.pin] = sysfs.NewDigitalPin(mux.pin)
-				if err = e.digitalPins[mux.pin].Export(); err != nil {
-					return
-				}
-
-				err = pinWrite(e.digitalPins[mux.pin], sysfs.OUT, mux.value)
-				if err != nil {
-					return
-				}
-			}
-		}
-	}
-
-	if dir == "in" {
-		if err = e.digitalPins[i.pin].Direction(sysfs.IN); err != nil {
-			return
-		}
-
-		if i.resistor > 0 {
-			err = pinWrite(e.digitalPins[i.resistor], sysfs.OUT, sysfs.LOW)
-			if err != nil {
-				return
-			}
-		}
-
-		if i.levelShifter > 0 {
-			err = pinWrite(e.digitalPins[i.levelShifter], sysfs.OUT, sysfs.LOW)
-			if err != nil {
-				return
-			}
-		}
-	} else if dir == "out" {
-		if err = e.digitalPins[i.pin].Direction(sysfs.OUT); err != nil {
-			return
-		}
-
-		if i.resistor > 0 {
-			if err = e.digitalPins[i.resistor].Direction(sysfs.IN); err != nil {
-				return
-			}
-		}
-
-		if i.levelShifter > 0 {
-			err = pinWrite(e.digitalPins[i.levelShifter], sysfs.OUT, sysfs.HIGH)
-			if err != nil {
-				return
-			}
-		}
-	}
-	return e.digitalPins[i.pin], nil
-}
-
 func (e *Adaptor) newDigitalPin(i int, level int) (err error) {
 	io := sysfs.NewDigitalPin(i)
 	if err = io.Export(); err != nil {
@@ -435,7 +449,7 @@ func changePinMode(a *Adaptor, pin, mode string) (err error) {
 }
 
 // pinWrite sets Direction and writes level for a specific pin
-func pinWrite(pin sysfs.DigitalPin, dir string, level int) (err error) {
+func pinWrite(pin *sysfs.DigitalPin, dir string, level int) (err error) {
 	if err = pin.Direction(dir); err != nil {
 		return
 	}
