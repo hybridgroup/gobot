@@ -24,7 +24,7 @@ type Adaptor struct {
 	name        string
 	board       string
 	pinmap      map[string]sysfsPin
-	digitalPins map[int]sysfs.DigitalPin
+	digitalPins map[int]*sysfs.DigitalPin
 	pwmPins     map[int]*sysfs.PWMPin
 	i2cBuses    [3]sysfs.I2cDevice
 }
@@ -96,7 +96,7 @@ func (c *Adaptor) Finalize() (err error) {
 // extender (pins 13-20 on header 14), as well as the SoC pins
 // aka all the other pins.
 func (c *Adaptor) DigitalRead(pin string) (val int, err error) {
-	sysfsPin, err := c.digitalPin(pin, sysfs.IN)
+	sysfsPin, err := c.DigitalPin(pin, sysfs.IN)
 	if err != nil {
 		return
 	}
@@ -108,7 +108,7 @@ func (c *Adaptor) DigitalRead(pin string) (val int, err error) {
 // extender (pins 13-20 on header 14), as well as the SoC pins
 // aka all the other pins.
 func (c *Adaptor) DigitalWrite(pin string, val byte) (err error) {
-	sysfsPin, err := c.digitalPin(pin, sysfs.OUT)
+	sysfsPin, err := c.DigitalPin(pin, sysfs.OUT)
 	if err != nil {
 		return err
 	}
@@ -132,9 +132,59 @@ func (c *Adaptor) GetDefaultBus() int {
 	return 1
 }
 
+// digitalPin returns matched digitalPin for specified values
+func (c *Adaptor) DigitalPin(pin string, dir string) (sysfsPin *sysfs.DigitalPin, err error) {
+	i, err := c.translatePin(pin)
+
+	if err != nil {
+		return
+	}
+
+	if c.digitalPins[i] == nil {
+		c.digitalPins[i] = sysfs.NewDigitalPin(i)
+		if err = c.digitalPins[i].Export(); err != nil {
+			return
+		}
+	}
+
+	if err = c.digitalPins[i].Direction(dir); err != nil {
+		return
+	}
+
+	return c.digitalPins[i], nil
+}
+
+// pwmPin returns matched pwmPin for specified pin number
+func (c *Adaptor) PWMPin(pin string) (sysfsPin *sysfs.PWMPin, err error) {
+	sysPin := c.pinmap[pin]
+	if sysPin.pwmPin != -1 {
+		if c.pwmPins[sysPin.pwmPin] == nil {
+			newPin := sysfs.NewPWMPin(sysPin.pwmPin)
+			if err = newPin.Export(); err != nil {
+				return
+			}
+			if err = newPin.Enable(true); err != nil {
+				return
+			}
+			if err = newPin.SetPeriod(10000000); err != nil {
+				return
+			}
+			if err = newPin.InvertPolarity(false); err != nil {
+				return
+			}
+			c.pwmPins[sysPin.pwmPin] = newPin
+		}
+
+		sysfsPin = c.pwmPins[sysPin.pwmPin]
+		return
+	}
+	err = errors.New("Not a PWM pin")
+	return
+}
+
 // PwmWrite writes a PWM signal to the specified pin
 func (c *Adaptor) PwmWrite(pin string, val byte) (err error) {
-	pwmPin, err := c.pwmPin(pin)
+	pwmPin, err := c.PWMPin(pin)
 	if err != nil {
 		return
 	}
@@ -151,7 +201,7 @@ const pwmPeriod = 10000000
 
 // ServoWrite writes a servo signal to the specified pin
 func (c *Adaptor) ServoWrite(pin string, angle byte) (err error) {
-	pwmPin, err := c.pwmPin(pin)
+	pwmPin, err := c.PWMPin(pin)
 	if err != nil {
 		return
 	}
@@ -176,7 +226,7 @@ func (c *Adaptor) SetBoard(n string) (err error) {
 }
 
 func (c *Adaptor) setPins() {
-	c.digitalPins = make(map[int]sysfs.DigitalPin)
+	c.digitalPins = make(map[int]*sysfs.DigitalPin)
 	c.pwmPins = make(map[int]*sysfs.PWMPin)
 
 	if c.board == "pro" {
@@ -228,55 +278,5 @@ func (c *Adaptor) translatePin(pin string) (i int, err error) {
 	} else {
 		err = errors.New("Not a valid pin")
 	}
-	return
-}
-
-// digitalPin returns matched digitalPin for specified values
-func (c *Adaptor) digitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPin, err error) {
-	i, err := c.translatePin(pin)
-
-	if err != nil {
-		return
-	}
-
-	if c.digitalPins[i] == nil {
-		c.digitalPins[i] = sysfs.NewDigitalPin(i)
-		if err = c.digitalPins[i].Export(); err != nil {
-			return
-		}
-	}
-
-	if err = c.digitalPins[i].Direction(dir); err != nil {
-		return
-	}
-
-	return c.digitalPins[i], nil
-}
-
-// pwmPin returns matched pwmPin for specified pin number
-func (c *Adaptor) pwmPin(pin string) (sysfsPin *sysfs.PWMPin, err error) {
-	sysPin := c.pinmap[pin]
-	if sysPin.pwmPin != -1 {
-		if c.pwmPins[sysPin.pwmPin] == nil {
-			newPin := sysfs.NewPWMPin(sysPin.pwmPin)
-			if err = newPin.Export(); err != nil {
-				return
-			}
-			if err = newPin.Enable(true); err != nil {
-				return
-			}
-			if err = newPin.SetPeriod(10000000); err != nil {
-				return
-			}
-			if err = newPin.InvertPolarity(false); err != nil {
-				return
-			}
-			c.pwmPins[sysPin.pwmPin] = newPin
-		}
-
-		sysfsPin = c.pwmPins[sysPin.pwmPin]
-		return
-	}
-	err = errors.New("Not a PWM pin")
 	return
 }
