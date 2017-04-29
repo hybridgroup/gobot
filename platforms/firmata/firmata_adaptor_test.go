@@ -138,7 +138,7 @@ func TestAdaptorConnect(t *testing.T) {
 
 func TestAdaptorServoWrite(t *testing.T) {
 	a := initTestAdaptor()
-	a.ServoWrite("1", 50)
+	gobottest.Assert(t, a.ServoWrite("1", 50), nil)
 }
 
 func TestAdaptorServoWriteBadPin(t *testing.T) {
@@ -148,7 +148,7 @@ func TestAdaptorServoWriteBadPin(t *testing.T) {
 
 func TestAdaptorPwmWrite(t *testing.T) {
 	a := initTestAdaptor()
-	a.PwmWrite("1", 50)
+	gobottest.Assert(t, a.PwmWrite("1", 50), nil)
 }
 
 func TestAdaptorPwmWriteBadPin(t *testing.T) {
@@ -158,7 +158,7 @@ func TestAdaptorPwmWriteBadPin(t *testing.T) {
 
 func TestAdaptorDigitalWrite(t *testing.T) {
 	a := initTestAdaptor()
-	a.DigitalWrite("1", 1)
+	gobottest.Assert(t, a.DigitalWrite("1", 1), nil)
 }
 
 func TestAdaptorDigitalWriteBadPin(t *testing.T) {
@@ -171,6 +171,10 @@ func TestAdaptorDigitalRead(t *testing.T) {
 	val, err := a.DigitalRead("1")
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, val, 1)
+
+	val, err = a.DigitalRead("0")
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, val, 0)
 }
 
 func TestAdaptorDigitalReadBadPin(t *testing.T) {
@@ -184,6 +188,10 @@ func TestAdaptorAnalogRead(t *testing.T) {
 	val, err := a.AnalogRead("1")
 	gobottest.Assert(t, val, 133)
 	gobottest.Assert(t, err, nil)
+
+	val, err = a.AnalogRead("0")
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, val, 0)
 }
 
 func TestAdaptorAnalogReadBadPin(t *testing.T) {
