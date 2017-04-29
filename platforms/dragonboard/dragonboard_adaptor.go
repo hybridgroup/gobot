@@ -76,24 +76,6 @@ func (c *Adaptor) Finalize() (err error) {
 	return
 }
 
-func (c *Adaptor) setPins() {
-	c.digitalPins = make(map[int]*sysfs.DigitalPin)
-	c.pinMap = fixedPins
-	for i := 0; i < 122; i++ {
-		pin := fmt.Sprintf("GPIO_%d", i)
-		c.pinMap[pin] = i
-	}
-}
-
-func (c *Adaptor) translatePin(pin string) (i int, err error) {
-	if val, ok := c.pinMap[pin]; ok {
-		i = val
-	} else {
-		err = errors.New("Not a valid pin")
-	}
-	return
-}
-
 // DigitalPin returns matched digitalPin for specified values
 func (c *Adaptor) DigitalPin(pin string, dir string) (sysfsPin *sysfs.DigitalPin, err error) {
 	i, err := c.translatePin(pin)
@@ -155,4 +137,22 @@ func (c *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection
 // GetDefaultBus returns the default i2c bus for this platform
 func (c *Adaptor) GetDefaultBus() int {
 	return 0
+}
+
+func (c *Adaptor) setPins() {
+	c.digitalPins = make(map[int]*sysfs.DigitalPin)
+	c.pinMap = fixedPins
+	for i := 0; i < 122; i++ {
+		pin := fmt.Sprintf("GPIO_%d", i)
+		c.pinMap[pin] = i
+	}
+}
+
+func (c *Adaptor) translatePin(pin string) (i int, err error) {
+	if val, ok := c.pinMap[pin]; ok {
+		i = val
+	} else {
+		err = errors.New("Not a valid pin")
+	}
+	return
 }

@@ -54,6 +54,7 @@ func TestDragonBoardAdaptorDigitalIO(t *testing.T) {
 	gobottest.Assert(t, i, 1)
 
 	gobottest.Assert(t, a.DigitalWrite("GPIO_M", 1), errors.New("Not a valid pin"))
+	gobottest.Assert(t, a.Finalize(), nil)
 }
 
 func TestDragonBoardAdaptorI2c(t *testing.T) {
@@ -84,4 +85,26 @@ func TestDragonBoardGetConnectionInvalidBus(t *testing.T) {
 	a := initTestDragonBoardAdaptor(t)
 	_, err := a.GetConnection(0x01, 99)
 	gobottest.Assert(t, err, errors.New("Bus number 99 out of range"))
+}
+
+func TestAdaptorFinalizeErrorAfterGPIO(t *testing.T) {
+	a := initTestDragonBoardAdaptor(t)
+	fs := sysfs.NewMockFilesystem([]string{
+		"/sys/class/gpio/export",
+		"/sys/class/gpio/unexport",
+		"/sys/class/gpio/gpio36/value",
+		"/sys/class/gpio/gpio36/direction",
+		"/sys/class/gpio/gpio12/value",
+		"/sys/class/gpio/gpio12/direction",
+	})
+
+	sysfs.SetFilesystem(fs)
+
+	gobottest.Assert(t, a.Connect(), nil)
+	gobottest.Assert(t, a.DigitalWrite("GPIO_B", 1), nil)
+
+	fs.WithWriteError = true
+
+	err := a.Finalize()
+	gobottest.Assert(t, strings.Contains(err.Error(), "write error"), true)
 }
