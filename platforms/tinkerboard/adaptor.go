@@ -19,7 +19,7 @@ type sysfsPin struct {
 type Adaptor struct {
 	name        string
 	pinmap      map[string]sysfsPin
-	digitalPins map[int]sysfs.DigitalPin
+	digitalPins map[int]*sysfs.DigitalPin
 	pwmPins     map[int]*sysfs.PWMPin
 	i2cBuses    [2]sysfs.I2cDevice
 }
@@ -76,7 +76,7 @@ func (c *Adaptor) Finalize() (err error) {
 
 // DigitalRead reads digital value from the specified pin.
 func (c *Adaptor) DigitalRead(pin string) (val int, err error) {
-	sysfsPin, err := c.digitalPin(pin, sysfs.IN)
+	sysfsPin, err := c.DigitalPin(pin, sysfs.IN)
 	if err != nil {
 		return
 	}
@@ -85,7 +85,7 @@ func (c *Adaptor) DigitalRead(pin string) (val int, err error) {
 
 // DigitalWrite writes digital value to the specified pin.
 func (c *Adaptor) DigitalWrite(pin string, val byte) (err error) {
-	sysfsPin, err := c.digitalPin(pin, sysfs.OUT)
+	sysfsPin, err := c.DigitalPin(pin, sysfs.OUT)
 	if err != nil {
 		return err
 	}
@@ -94,7 +94,7 @@ func (c *Adaptor) DigitalWrite(pin string, val byte) (err error) {
 
 // PwmWrite writes a PWM signal to the specified pin
 func (c *Adaptor) PwmWrite(pin string, val byte) (err error) {
-	pwmPin, err := c.pwmPin(pin)
+	pwmPin, err := c.PWMPin(pin)
 	if err != nil {
 		return
 	}
@@ -111,7 +111,7 @@ const pwmPeriod = 10000000
 
 // ServoWrite writes a servo signal to the specified pin
 func (c *Adaptor) ServoWrite(pin string, angle byte) (err error) {
-	pwmPin, err := c.pwmPin(pin)
+	pwmPin, err := c.PWMPin(pin)
 	if err != nil {
 		return
 	}
@@ -125,40 +125,8 @@ func (c *Adaptor) ServoWrite(pin string, angle byte) (err error) {
 	return pwmPin.SetDutyCycle(duty)
 }
 
-// GetConnection returns a connection to a device on a specified bus.
-// Valid bus number is [0..1] which corresponds to /dev/i2c-0 through /dev/i2c-1.
-func (c *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection, err error) {
-	if (bus < 0) || (bus > 1) {
-		return nil, fmt.Errorf("Bus number %d out of range", bus)
-	}
-	if c.i2cBuses[bus] == nil {
-		c.i2cBuses[bus], err = sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
-	}
-	return i2c.NewConnection(c.i2cBuses[bus], address), err
-}
-
-// GetDefaultBus returns the default i2c bus for this platform
-func (c *Adaptor) GetDefaultBus() int {
-	return 1
-}
-
-func (c *Adaptor) setPins() {
-	c.digitalPins = make(map[int]sysfs.DigitalPin)
-	c.pwmPins = make(map[int]*sysfs.PWMPin)
-	c.pinmap = fixedPins
-}
-
-func (c *Adaptor) translatePin(pin string) (i int, err error) {
-	if val, ok := c.pinmap[pin]; ok {
-		i = val.pin
-	} else {
-		err = errors.New("Not a valid pin")
-	}
-	return
-}
-
-// digitalPin returns matched digitalPin for specified values
-func (c *Adaptor) digitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPin, err error) {
+// DigitalPin returns matched digitalPin for specified values
+func (c *Adaptor) DigitalPin(pin string, dir string) (sysfsPin *sysfs.DigitalPin, err error) {
 	i, err := c.translatePin(pin)
 
 	if err != nil {
@@ -179,17 +147,8 @@ func (c *Adaptor) digitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPin,
 	return c.digitalPins[i], nil
 }
 
-func (c *Adaptor) translatePwmPin(pin string) (i int, err error) {
-	if val, ok := c.pinmap[pin]; ok {
-		i = val.pwmPin
-	} else {
-		err = errors.New("Not a valid pin")
-	}
-	return
-}
-
-// pwmPin returns matched pwmPin for specified pin number
-func (c *Adaptor) pwmPin(pin string) (sysfsPin *sysfs.PWMPin, err error) {
+// PWMPin returns matched pwmPin for specified pin number
+func (c *Adaptor) PWMPin(pin string) (sysfsPin *sysfs.PWMPin, err error) {
 	i, err := c.translatePwmPin(pin)
 	if err != nil {
 		return nil, err
@@ -216,5 +175,46 @@ func (c *Adaptor) pwmPin(pin string) (sysfsPin *sysfs.PWMPin, err error) {
 	}
 
 	sysfsPin = c.pwmPins[i]
+	return
+}
+
+// GetConnection returns a connection to a device on a specified bus.
+// Valid bus number is [0..1] which corresponds to /dev/i2c-0 through /dev/i2c-1.
+func (c *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection, err error) {
+	if (bus < 0) || (bus > 1) {
+		return nil, fmt.Errorf("Bus number %d out of range", bus)
+	}
+	if c.i2cBuses[bus] == nil {
+		c.i2cBuses[bus], err = sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
+	}
+	return i2c.NewConnection(c.i2cBuses[bus], address), err
+}
+
+// GetDefaultBus returns the default i2c bus for this platform
+func (c *Adaptor) GetDefaultBus() int {
+	return 1
+}
+
+func (c *Adaptor) setPins() {
+	c.digitalPins = make(map[int]*sysfs.DigitalPin)
+	c.pwmPins = make(map[int]*sysfs.PWMPin)
+	c.pinmap = fixedPins
+}
+
+func (c *Adaptor) translatePin(pin string) (i int, err error) {
+	if val, ok := c.pinmap[pin]; ok {
+		i = val.pin
+	} else {
+		err = errors.New("Not a valid pin")
+	}
+	return
+}
+
+func (c *Adaptor) translatePwmPin(pin string) (i int, err error) {
+	if val, ok := c.pinmap[pin]; ok {
+		i = val.pwmPin
+	} else {
+		err = errors.New("Not a valid pin")
+	}
 	return
 }
