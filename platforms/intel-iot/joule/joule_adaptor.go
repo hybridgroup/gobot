@@ -119,6 +119,20 @@ func (e *Adaptor) DigitalWrite(pin string, val byte) (err error) {
 
 // PwmWrite writes the 0-254 value to the specified pin
 func (e *Adaptor) PwmWrite(pin string, val byte) (err error) {
+	pwmPin, err := e.PWMPin(pin)
+	if err != nil {
+		return
+	}
+	period, err := pwmPin.Period()
+	if err != nil {
+		return err
+	}
+	duty := gobot.FromScale(float64(val), 0, 255.0)
+	return pwmPin.SetDutyCycle(uint32(float64(period) * duty))
+}
+
+// PWMPin returns a sysfs.PWMPin
+func (e *Adaptor) PWMPin(pin string) (sysfsPin *sysfs.PWMPin, err error) {
 	sysPin := sysfsPinMap[pin]
 	if sysPin.pwmPin != -1 {
 		if e.pwmPins[sysPin.pwmPin] == nil {
@@ -133,14 +147,12 @@ func (e *Adaptor) PwmWrite(pin string, val byte) (err error) {
 				return
 			}
 		}
-		period, err := e.pwmPins[sysPin.pwmPin].Period()
-		if err != nil {
-			return err
-		}
-		duty := gobot.FromScale(float64(val), 0, 255.0)
-		return e.pwmPins[sysPin.pwmPin].SetDutyCycle(uint32(float64(period) * duty))
+
+		sysfsPin = e.pwmPins[sysPin.pwmPin]
+		return
 	}
-	return errors.New("Not a PWM pin")
+	err = errors.New("Not a PWM pin")
+	return
 }
 
 // GetConnection returns an i2c connection to a device on a specified bus.

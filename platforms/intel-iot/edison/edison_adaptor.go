@@ -267,6 +267,7 @@ func (e *Adaptor) DigitalPin(pin string, dir string) (sysfsPin *sysfs.DigitalPin
 	return e.digitalPins[i.pin], nil
 }
 
+// PWMPin returns a sysfs.PWMPin
 func (e *Adaptor) PWMPin(pin string) (sysfsPin *sysfs.PWMPin, err error) {
 	sysPin := e.pinmap[pin]
 	if sysPin.pwmPin != -1 {
