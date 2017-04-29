@@ -60,6 +60,7 @@ func TestTinkerboardAdaptorDigitalIO(t *testing.T) {
 	gobottest.Assert(t, i, 1)
 
 	gobottest.Assert(t, a.DigitalWrite("99", 1), errors.New("Not a valid pin"))
+	gobottest.Assert(t, a.Finalize(), nil)
 }
 
 func TestAdaptorDigitalWriteError(t *testing.T) {
@@ -162,4 +163,28 @@ func TestTinkerboardGetConnectionInvalidBus(t *testing.T) {
 	a, _ := initTestTinkerboardAdaptor()
 	_, err := a.GetConnection(0x01, 99)
 	gobottest.Assert(t, err, errors.New("Bus number 99 out of range"))
+}
+
+func TestTinkerboardFinalizeErrorAfterGPIO(t *testing.T) {
+	a, fs := initTestTinkerboardAdaptor()
+
+	gobottest.Assert(t, a.Connect(), nil)
+	gobottest.Assert(t, a.DigitalWrite("7", 1), nil)
+
+	fs.WithWriteError = true
+
+	err := a.Finalize()
+	gobottest.Assert(t, strings.Contains(err.Error(), "write error"), true)
+}
+
+func TestTinkerboardFinalizeErrorAfterPWM(t *testing.T) {
+	a, fs := initTestTinkerboardAdaptor()
+
+	gobottest.Assert(t, a.Connect(), nil)
+	gobottest.Assert(t, a.PwmWrite("33", 1), nil)
+
+	fs.WithWriteError = true
+
+	err := a.Finalize()
+	gobottest.Assert(t, strings.Contains(err.Error(), "write error"), true)
 }
