@@ -22,7 +22,7 @@ var readFile = func() ([]byte, error) {
 type Adaptor struct {
 	name          string
 	revision      string
-	digitalPins   map[int]sysfs.DigitalPin
+	digitalPins   map[int]*sysfs.DigitalPin
 	pwmPins       []int
 	i2cDefaultBus int
 	i2cBuses      [2]sysfs.I2cDevice
@@ -32,7 +32,7 @@ type Adaptor struct {
 func NewAdaptor() *Adaptor {
 	r := &Adaptor{
 		name:        gobot.DefaultName("RaspberryPi"),
-		digitalPins: make(map[int]sysfs.DigitalPin),
+		digitalPins: make(map[int]*sysfs.DigitalPin),
 		pwmPins:     []int{},
 	}
 	content, _ := readFile()
@@ -91,41 +91,8 @@ func (r *Adaptor) Finalize() (err error) {
 	return
 }
 
-func (r *Adaptor) translatePin(pin string) (i int, err error) {
-	if val, ok := pins[pin][r.revision]; ok {
-		i = val
-	} else if val, ok := pins[pin]["*"]; ok {
-		i = val
-	} else {
-		err = errors.New("Not a valid pin")
-		return
-	}
-	return
-}
-
-func (r *Adaptor) pwmPin(pin string) (i int, err error) {
-	i, err = r.translatePin(pin)
-	if err != nil {
-		return
-	}
-
-	newPin := true
-	for _, pin := range r.pwmPins {
-		if i == pin {
-			newPin = false
-			return
-		}
-	}
-
-	if newPin {
-		r.pwmPins = append(r.pwmPins, i)
-	}
-
-	return
-}
-
-// digitalPin returns matched digitalPin for specified values
-func (r *Adaptor) digitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPin, err error) {
+// DigitalPin returns matched digitalPin for specified values
+func (r *Adaptor) DigitalPin(pin string, dir string) (sysfsPin *sysfs.DigitalPin, err error) {
 	i, err := r.translatePin(pin)
 
 	if err != nil {
@@ -148,7 +115,7 @@ func (r *Adaptor) digitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPin,
 
 // DigitalRead reads digital value from pin
 func (r *Adaptor) DigitalRead(pin string) (val int, err error) {
-	sysfsPin, err := r.digitalPin(pin, sysfs.IN)
+	sysfsPin, err := r.DigitalPin(pin, sysfs.IN)
 	if err != nil {
 		return
 	}
@@ -157,7 +124,7 @@ func (r *Adaptor) DigitalRead(pin string) (val int, err error) {
 
 // DigitalWrite writes digital value to specified pin
 func (r *Adaptor) DigitalWrite(pin string, val byte) (err error) {
-	sysfsPin, err := r.digitalPin(pin, sysfs.OUT)
+	sysfsPin, err := r.DigitalPin(pin, sysfs.OUT)
 	if err != nil {
 		return err
 	}
@@ -200,6 +167,39 @@ func (r *Adaptor) ServoWrite(pin string, angle byte) (err error) {
 	val := (gobot.ToScale(gobot.FromScale(float64(angle), 0, 180), 0, 200) / 1000.0) + 0.05
 
 	return r.piBlaster(fmt.Sprintf("%v=%v\n", sysfsPin, val))
+}
+
+func (r *Adaptor) translatePin(pin string) (i int, err error) {
+	if val, ok := pins[pin][r.revision]; ok {
+		i = val
+	} else if val, ok := pins[pin]["*"]; ok {
+		i = val
+	} else {
+		err = errors.New("Not a valid pin")
+		return
+	}
+	return
+}
+
+func (r *Adaptor) pwmPin(pin string) (i int, err error) {
+	i, err = r.translatePin(pin)
+	if err != nil {
+		return
+	}
+
+	newPin := true
+	for _, pin := range r.pwmPins {
+		if i == pin {
+			newPin = false
+			return
+		}
+	}
+
+	if newPin {
+		r.pwmPins = append(r.pwmPins, i)
+	}
+
+	return
 }
 
 func (r *Adaptor) piBlaster(data string) (err error) {
