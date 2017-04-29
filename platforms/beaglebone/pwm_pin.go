@@ -31,7 +31,7 @@ func newPwmPin(pinNum string, ocp string) (p *pwmPin, err error) {
 
 	go func() {
 		for {
-			if _, err := sysfs.OpenFile(fmt.Sprintf("%v/period", p.pwmDevice), os.O_RDONLY, 0644); err == nil {
+			if _, err = sysfs.OpenFile(fmt.Sprintf("%v/period", p.pwmDevice), os.O_RDONLY, 0644); err == nil {
 				break
 			}
 		}

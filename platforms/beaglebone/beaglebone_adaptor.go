@@ -16,15 +16,11 @@ import (
 	"gobot.io/x/gobot/sysfs"
 )
 
-var glob = func(pattern string) (matches []string, err error) {
-	return filepath.Glob(pattern)
-}
-
 // Adaptor is the gobot.Adaptor representation for the Beaglebone
 type Adaptor struct {
 	name         string
 	kernel       string
-	digitalPins  []sysfs.DigitalPin
+	digitalPins  []*sysfs.DigitalPin
 	pwmPins      map[string]*pwmPin
 	i2cBuses     map[int]sysfs.I2cDevice
 	usrLed       string
@@ -38,7 +34,7 @@ type Adaptor struct {
 func NewAdaptor() *Adaptor {
 	b := &Adaptor{
 		name:        gobot.DefaultName("Beaglebone"),
-		digitalPins: make([]sysfs.DigitalPin, 120),
+		digitalPins: make([]*sysfs.DigitalPin, 120),
 		pwmPins:     make(map[string]*pwmPin),
 		i2cBuses:    make(map[int]sysfs.I2cDevice),
 	}
@@ -150,7 +146,7 @@ func (b *Adaptor) ServoWrite(pin string, val byte) (err error) {
 
 // DigitalRead returns a digital value from specified pin
 func (b *Adaptor) DigitalRead(pin string) (val int, err error) {
-	sysfsPin, err := b.digitalPin(pin, sysfs.IN)
+	sysfsPin, err := b.DigitalPin(pin, sysfs.IN)
 	if err != nil {
 		return
 	}
@@ -169,11 +165,30 @@ func (b *Adaptor) DigitalWrite(pin string, val byte) (err error) {
 		_, err = fi.WriteString(strconv.Itoa(int(val)))
 		return err
 	}
-	sysfsPin, err := b.digitalPin(pin, sysfs.OUT)
+	sysfsPin, err := b.DigitalPin(pin, sysfs.OUT)
 	if err != nil {
 		return err
 	}
 	return sysfsPin.Write(int(val))
+}
+
+// DigitalPin retrieves digital pin value by name
+func (b *Adaptor) DigitalPin(pin string, dir string) (sysfsPin *sysfs.DigitalPin, err error) {
+	i, err := b.translatePin(pin)
+	if err != nil {
+		return
+	}
+	if b.digitalPins[i] == nil {
+		b.digitalPins[i] = sysfs.NewDigitalPin(i)
+		err := b.digitalPins[i].Export()
+		if err != nil {
+			return nil, err
+		}
+	}
+	if err = b.digitalPins[i].Direction(dir); err != nil {
+		return
+	}
+	return b.digitalPins[i], nil
 }
 
 // AnalogRead returns an analog value from specified pin
@@ -249,25 +264,6 @@ func (b *Adaptor) translateAnalogPin(pin string) (value string, err error) {
 	return
 }
 
-// digitalPin retrieves digital pin value by name
-func (b *Adaptor) digitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPin, err error) {
-	i, err := b.translatePin(pin)
-	if err != nil {
-		return
-	}
-	if b.digitalPins[i] == nil {
-		b.digitalPins[i] = sysfs.NewDigitalPin(i)
-		err := b.digitalPins[i].Export()
-		if err != nil {
-			return nil, err
-		}
-	}
-	if err = b.digitalPins[i].Direction(dir); err != nil {
-		return
-	}
-	return b.digitalPins[i], nil
-}
-
 // pwPin retrieves pwm pin value by name
 func (b *Adaptor) pwmPin(pin string) (i string, err error) {
 	i, err = b.translatePwmPin(pin)
@@ -335,4 +331,8 @@ func getKernel() string {
 	result, _ := exec.Command("uname", "-r").Output()
 
 	return strings.TrimSpace(string(result))
+}
+
+var glob = func(pattern string) (matches []string, err error) {
+	return filepath.Glob(pattern)
 }
