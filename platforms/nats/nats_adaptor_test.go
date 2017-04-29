@@ -35,6 +35,15 @@ func initTestNatsAdaptor() *Adaptor {
 	return a
 }
 
+func initTestNatsAdaptorWithAuth() *Adaptor {
+	a := NewAdaptorWithAuth("localhost:4222", 9999, "user", "pass")
+	a.connect = func() (*nats.Conn, error) {
+		c := &nats.Conn{}
+		return c, nil
+	}
+	return a
+}
+
 func initTestNatsAdaptorTLS(options ...nats.Option) *Adaptor {
 	a := NewAdaptor("tls://localhost:4242", 49999, options...)
 	a.connect = connStub(options...)
@@ -51,6 +60,12 @@ func TestNatsAdaptorName(t *testing.T) {
 func TestNatsAdaptorReturnsHost(t *testing.T) {
 	a := initTestNatsAdaptor()
 	gobottest.Assert(t, a.Host, "nats://localhost:4222")
+}
+
+func TestNatsAdaptorWithAuth(t *testing.T) {
+	a := initTestNatsAdaptorWithAuth()
+	gobottest.Assert(t, a.username, "user")
+	gobottest.Assert(t, a.password, "pass")
 }
 
 func TestNatsAdapterSetsRootCAs(t *testing.T) {
