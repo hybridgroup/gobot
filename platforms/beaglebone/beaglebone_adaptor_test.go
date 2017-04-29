@@ -112,6 +112,9 @@ func TestBeagleboneAdaptor(t *testing.T) {
 
 	gobottest.Assert(t, a.DigitalWrite("P9_99", 1), errors.New("Not a valid pin"))
 
+	_, err = a.DigitalRead("P9_99")
+	gobottest.Assert(t, err, errors.New("Not a valid pin"))
+
 	fs.Files["/sys/class/gpio/gpio10/value"].Contents = "1"
 	i, _ = a.DigitalRead("P8_31")
 	gobottest.Assert(t, i, 1)
