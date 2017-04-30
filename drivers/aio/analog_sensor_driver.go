@@ -56,7 +56,7 @@ func NewAnalogSensorDriver(a AnalogReader, pin string, v ...time.Duration) *Anal
 //	Data int - Event is emitted on change and represents the current reading from the sensor.
 //	Error error - Event is emitted on error reading from the sensor.
 func (a *AnalogSensorDriver) Start() (err error) {
-	value := 0
+	var value int = 0
 	go func() {
 		timer := time.NewTimer(a.interval)
 		timer.Stop()
