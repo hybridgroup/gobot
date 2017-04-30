@@ -11,6 +11,9 @@ matrix:
       - go: tip
 addons:
    apt:
+      sources:
+         lucid
+         kubuntu-backports
       packages:
          libcv-dev
          libcvaux-dev
