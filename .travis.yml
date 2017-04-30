@@ -14,7 +14,7 @@ addons:
       sources:
          - lucid
          - kubuntu-backports
-         - debian-sid
+         - ubuntu-toolchain-r-test
       packages:
          - libcv-dev
          - libcvaux-dev
