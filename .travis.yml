@@ -12,20 +12,20 @@ matrix:
 addons:
    apt:
       sources:
-         lucid
-         kubuntu-backports
+         - lucid
+         - kubuntu-backports
       packages:
-         libcv-dev
-         libcvaux-dev
-         libhighgui-dev
-         libopencv-dev
-         libsdl2-dev
-         libsdl2-image-dev
-         libsdl2
-         libusb-dev
-         xvfb
-         unzip
-         libgtk2.0-0
+         - libcv-dev
+         - libcvaux-dev
+         - libhighgui-dev
+         - libopencv-dev
+         - libsdl2-dev
+         - libsdl2-image-dev
+         - libsdl2
+         - libusb-dev
+         - xvfb
+         - unzip
+         - libgtk2.0-0
 before_install:
    - cd $HOME/gopath/src/gobot.io/x/gobot
    - go get github.com/axw/gocov/gocov
