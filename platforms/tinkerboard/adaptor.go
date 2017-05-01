@@ -126,7 +126,7 @@ func (c *Adaptor) ServoWrite(pin string, angle byte) (err error) {
 }
 
 // DigitalPin returns matched digitalPin for specified values
-func (c *Adaptor) DigitalPin(pin string, dir string) (sysfsPin *sysfs.DigitalPin, err error) {
+func (c *Adaptor) DigitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPinner, err error) {
 	i, err := c.translatePin(pin)
 
 	if err != nil {
@@ -148,7 +148,7 @@ func (c *Adaptor) DigitalPin(pin string, dir string) (sysfsPin *sysfs.DigitalPin
 }
 
 // PWMPin returns matched pwmPin for specified pin number
-func (c *Adaptor) PWMPin(pin string) (sysfsPin *sysfs.PWMPin, err error) {
+func (c *Adaptor) PWMPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
 	i, err := c.translatePwmPin(pin)
 	if err != nil {
 		return nil, err
