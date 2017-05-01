@@ -1,6 +1,7 @@
 package raspi
 
 import (
+	"errors"
 	"testing"
 
 	"gobot.io/x/gobot/gobottest"
@@ -30,6 +31,10 @@ func TestPwmPin(t *testing.T) {
 
 	// call currently fails in test
 	gobottest.Refute(t, pin.SetDutyCycle(10000), nil)
+	dc, _ = pin.DutyCycle()
+	gobottest.Assert(t, dc, uint32(10000))
+
+	gobottest.Assert(t, pin.SetDutyCycle(999999999), errors.New("Duty cycle exceeds period."))
 	dc, _ = pin.DutyCycle()
 	gobottest.Assert(t, dc, uint32(10000))
 
