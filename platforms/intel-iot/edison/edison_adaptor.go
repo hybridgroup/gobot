@@ -191,7 +191,7 @@ func (e *Adaptor) GetDefaultBus() int {
 }
 
 // DigitalPin returns matched sysfs.DigitalPin for specified values
-func (e *Adaptor) DigitalPin(pin string, dir string) (sysfsPin *sysfs.DigitalPin, err error) {
+func (e *Adaptor) DigitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPinner, err error) {
 	i := e.pinmap[pin]
 	if e.digitalPins[i.pin] == nil {
 		e.digitalPins[i.pin], err = e.newExportedPin(i.pin)
@@ -268,7 +268,7 @@ func (e *Adaptor) DigitalPin(pin string, dir string) (sysfsPin *sysfs.DigitalPin
 }
 
 // PWMPin returns a sysfs.PWMPin
-func (e *Adaptor) PWMPin(pin string) (sysfsPin *sysfs.PWMPin, err error) {
+func (e *Adaptor) PWMPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
 	sysPin := e.pinmap[pin]
 	if sysPin.pwmPin != -1 {
 		if e.pwmPins[sysPin.pwmPin] == nil {

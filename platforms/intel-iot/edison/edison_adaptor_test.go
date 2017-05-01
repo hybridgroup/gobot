@@ -19,6 +19,8 @@ var _ gpio.DigitalReader = (*Adaptor)(nil)
 var _ gpio.DigitalWriter = (*Adaptor)(nil)
 var _ aio.AnalogReader = (*Adaptor)(nil)
 var _ gpio.PwmWriter = (*Adaptor)(nil)
+var _ sysfs.DigitalPinnerProvider = (*Adaptor)(nil)
+var _ sysfs.PWMPinnerProvider = (*Adaptor)(nil)
 var _ i2c.Connector = (*Adaptor)(nil)
 
 func initTestAdaptor() (*Adaptor, *sysfs.MockFilesystem) {
