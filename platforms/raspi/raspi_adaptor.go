@@ -93,7 +93,7 @@ func (r *Adaptor) Finalize() (err error) {
 }
 
 // DigitalPin returns matched digitalPin for specified values
-func (r *Adaptor) DigitalPin(pin string, dir string) (sysfsPin *sysfs.DigitalPin, err error) {
+func (r *Adaptor) DigitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPinner, err error) {
 	i, err := r.translatePin(pin)
 
 	if err != nil {
@@ -149,8 +149,8 @@ func (r *Adaptor) GetDefaultBus() int {
 	return r.i2cDefaultBus
 }
 
-// PWMPin returns a raspi.PWMPin which provides the PWMPinner interface
-func (r *Adaptor) PWMPin(pin string) (raspiPWMPin *PWMPin, err error) {
+// PWMPin returns a raspi.PWMPin which provides the sysfs.PWMPinner interface
+func (r *Adaptor) PWMPin(pin string) (raspiPWMPin sysfs.PWMPinner, err error) {
 	i, err := r.translatePin(pin)
 	if err != nil {
 		return
