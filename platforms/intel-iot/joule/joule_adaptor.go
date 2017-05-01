@@ -78,7 +78,7 @@ func (e *Adaptor) Finalize() (err error) {
 }
 
 // digitalPin returns matched digitalPin for specified values
-func (e *Adaptor) DigitalPin(pin string, dir string) (sysfsPin *sysfs.DigitalPin, err error) {
+func (e *Adaptor) DigitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPinner, err error) {
 	i := sysfsPinMap[pin]
 	if e.digitalPins[i.pin] == nil {
 		e.digitalPins[i.pin] = sysfs.NewDigitalPin(i.pin)
@@ -132,7 +132,7 @@ func (e *Adaptor) PwmWrite(pin string, val byte) (err error) {
 }
 
 // PWMPin returns a sysfs.PWMPin
-func (e *Adaptor) PWMPin(pin string) (sysfsPin *sysfs.PWMPin, err error) {
+func (e *Adaptor) PWMPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
 	sysPin := sysfsPinMap[pin]
 	if sysPin.pwmPin != -1 {
 		if e.pwmPins[sysPin.pwmPin] == nil {
