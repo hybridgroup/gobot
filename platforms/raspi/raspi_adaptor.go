@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"os"
 	"strconv"
 	"strings"
 
@@ -198,16 +197,4 @@ func (r *Adaptor) PWMPin(pin string) (raspiPWMPin *PWMPin, err error) {
 	}
 
 	return r.pwmPins[i], nil
-}
-
-func (r *Adaptor) piBlaster(data string) (err error) {
-	fi, err := sysfs.OpenFile("/dev/pi-blaster", os.O_WRONLY|os.O_APPEND, 0644)
-	defer fi.Close()
-
-	if err != nil {
-		return err
-	}
-
-	_, err = fi.WriteString(data)
-	return
 }
