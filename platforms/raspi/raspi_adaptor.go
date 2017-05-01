@@ -149,6 +149,20 @@ func (r *Adaptor) GetDefaultBus() int {
 	return r.i2cDefaultBus
 }
 
+// PWMPin returns a raspi.PWMPin which provides the PWMPinner interface
+func (r *Adaptor) PWMPin(pin string) (raspiPWMPin *PWMPin, err error) {
+	i, err := r.translatePin(pin)
+	if err != nil {
+		return
+	}
+
+	if r.pwmPins[i] == nil {
+		r.pwmPins[i] = NewPWMPin(strconv.Itoa(i))
+	}
+
+	return r.pwmPins[i], nil
+}
+
 // PwmWrite writes a PWM signal to the specified pin
 func (r *Adaptor) PwmWrite(pin string, val byte) (err error) {
 	sysfsPin, err := r.PWMPin(pin)
@@ -181,20 +195,4 @@ func (r *Adaptor) translatePin(pin string) (i int, err error) {
 		return
 	}
 	return
-}
-
-func (r *Adaptor) PWMPin(pin string) (raspiPWMPin *PWMPin, err error) {
-	i, err := r.translatePin(pin)
-	if err != nil {
-		return
-	}
-
-	if r.pwmPins[i] == nil {
-		r.pwmPins[i] = NewPWMPin(strconv.Itoa(i))
-		if err = r.pwmPins[i].Export(); err != nil {
-			return
-		}
-	}
-
-	return r.pwmPins[i], nil
 }
