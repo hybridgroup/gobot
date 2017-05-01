@@ -133,7 +133,7 @@ func (c *Adaptor) GetDefaultBus() int {
 }
 
 // digitalPin returns matched digitalPin for specified values
-func (c *Adaptor) DigitalPin(pin string, dir string) (sysfsPin *sysfs.DigitalPin, err error) {
+func (c *Adaptor) DigitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPinner, err error) {
 	i, err := c.translatePin(pin)
 
 	if err != nil {
@@ -155,7 +155,7 @@ func (c *Adaptor) DigitalPin(pin string, dir string) (sysfsPin *sysfs.DigitalPin
 }
 
 // pwmPin returns matched pwmPin for specified pin number
-func (c *Adaptor) PWMPin(pin string) (sysfsPin *sysfs.PWMPin, err error) {
+func (c *Adaptor) PWMPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
 	sysPin := c.pinmap[pin]
 	if sysPin.pwmPin != -1 {
 		if c.pwmPins[sysPin.pwmPin] == nil {
