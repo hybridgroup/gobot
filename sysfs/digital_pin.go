@@ -38,6 +38,12 @@ type DigitalPinner interface {
 	Write(int) error
 }
 
+// DigitalPinnerProvider is the interface that an Adaptor should implement to allow
+// clients to obtain access to any DigitalPin's available on that board.
+type DigitalPinnerProvider interface {
+	DigitalPin(string, string) (DigitalPinner, error)
+}
+
 type DigitalPin struct {
 	pin   string
 	label string

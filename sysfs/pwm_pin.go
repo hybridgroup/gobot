@@ -28,6 +28,12 @@ type PWMPinner interface {
 	SetDutyCycle(duty uint32) (err error)
 }
 
+// PWMPinnerProvider is the interface that an Adaptor should implement to allow
+// clients to obtain access to any PWMPin's available on that board.
+type PWMPinnerProvider interface {
+	PWMPin(string) (PWMPinner, error)
+}
+
 type PWMPin struct {
 	pin     string
 	Chip    string
