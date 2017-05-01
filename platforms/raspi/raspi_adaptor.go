@@ -23,7 +23,7 @@ type Adaptor struct {
 	name          string
 	revision      string
 	digitalPins   map[int]*sysfs.DigitalPin
-	pwmPins       []int
+	pwmPins       map[int]*PWMPin
 	i2cDefaultBus int
 	i2cBuses      [2]sysfs.I2cDevice
 }
@@ -33,7 +33,7 @@ func NewAdaptor() *Adaptor {
 	r := &Adaptor{
 		name:        gobot.DefaultName("RaspberryPi"),
 		digitalPins: make(map[int]*sysfs.DigitalPin),
-		pwmPins:     []int{},
+		pwmPins:     make(map[int]*PWMPin),
 	}
 	content, _ := readFile()
 	for _, v := range strings.Split(string(content), "\n") {
@@ -77,8 +77,10 @@ func (r *Adaptor) Finalize() (err error) {
 		}
 	}
 	for _, pin := range r.pwmPins {
-		if perr := r.piBlaster(fmt.Sprintf("release %v\n", pin)); err != nil {
-			err = multierror.Append(err, perr)
+		if pin != nil {
+			if perr := pin.Unexport(); err != nil {
+				err = multierror.Append(err, perr)
+			}
 		}
 	}
 	for _, bus := range r.i2cBuses {
@@ -150,23 +152,24 @@ func (r *Adaptor) GetDefaultBus() int {
 
 // PwmWrite writes a PWM signal to the specified pin
 func (r *Adaptor) PwmWrite(pin string, val byte) (err error) {
-	sysfsPin, err := r.pwmPin(pin)
+	sysfsPin, err := r.PWMPin(pin)
 	if err != nil {
 		return err
 	}
-	return r.piBlaster(fmt.Sprintf("%v=%v\n", sysfsPin, gobot.FromScale(float64(val), 0, 255)))
+
+	duty := uint32(gobot.FromScale(float64(val), 0, 255) * piBlasterPeriod)
+	return sysfsPin.SetDutyCycle(duty)
 }
 
 // ServoWrite writes a servo signal to the specified pin
 func (r *Adaptor) ServoWrite(pin string, angle byte) (err error) {
-	sysfsPin, err := r.pwmPin(pin)
+	sysfsPin, err := r.PWMPin(pin)
 	if err != nil {
 		return err
 	}
 
-	val := (gobot.ToScale(gobot.FromScale(float64(angle), 0, 180), 0, 200) / 1000.0) + 0.05
-
-	return r.piBlaster(fmt.Sprintf("%v=%v\n", sysfsPin, val))
+	duty := uint32(gobot.FromScale(float64(angle), 0, 180) * piBlasterPeriod)
+	return sysfsPin.SetDutyCycle(duty)
 }
 
 func (r *Adaptor) translatePin(pin string) (i int, err error) {
@@ -181,25 +184,20 @@ func (r *Adaptor) translatePin(pin string) (i int, err error) {
 	return
 }
 
-func (r *Adaptor) pwmPin(pin string) (i int, err error) {
-	i, err = r.translatePin(pin)
+func (r *Adaptor) PWMPin(pin string) (raspiPWMPin *PWMPin, err error) {
+	i, err := r.translatePin(pin)
 	if err != nil {
 		return
 	}
 
-	newPin := true
-	for _, pin := range r.pwmPins {
-		if i == pin {
-			newPin = false
+	if r.pwmPins[i] == nil {
+		r.pwmPins[i] = NewPWMPin(strconv.Itoa(i))
+		if err = r.pwmPins[i].Export(); err != nil {
 			return
 		}
 	}
 
-	if newPin {
-		r.pwmPins = append(r.pwmPins, i)
-	}
-
-	return
+	return r.pwmPins[i], nil
 }
 
 func (r *Adaptor) piBlaster(data string) (err error) {

@@ -110,9 +110,9 @@ func TestAdaptorDigitalPWM(t *testing.T) {
 
 	gobottest.Assert(t, strings.Split(fs.Files["/dev/pi-blaster"].Contents, "\n")[0], "4=1")
 
-	gobottest.Assert(t, a.ServoWrite("11", 255), nil)
+	gobottest.Assert(t, a.ServoWrite("11", 90), nil)
 
-	gobottest.Assert(t, strings.Split(fs.Files["/dev/pi-blaster"].Contents, "\n")[0], "17=0.25")
+	gobottest.Assert(t, strings.Split(fs.Files["/dev/pi-blaster"].Contents, "\n")[0], "17=0.5")
 
 	gobottest.Assert(t, a.PwmWrite("notexist", 1), errors.New("Not a valid pin"))
 	gobottest.Assert(t, a.ServoWrite("notexist", 1), errors.New("Not a valid pin"))
