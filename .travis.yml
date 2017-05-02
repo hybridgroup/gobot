@@ -1,6 +1,6 @@
 language: go
 sudo: false
-dist: precise
+dist: trusty
 go_import_path: gobot.io/x/gobot
 go:
    - 1.7.5
@@ -22,7 +22,7 @@ addons:
          - libopencv-dev
          - libsdl2-dev
          - libsdl2-image-dev
-         - libsdl2
+         - libdsl2-2.0.0
          - libusb-dev
          - xvfb
          - unzip
