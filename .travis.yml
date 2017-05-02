@@ -1,35 +1,44 @@
 language: go
+sudo: false
 dist: trusty
-sudo: true
 go_import_path: gobot.io/x/gobot
 go:
- - 1.7.5
- - 1.8.1
- - tip
+   - 1.7.5
+   - 1.8.1
+   - tip
 matrix:
- allow_failures:
-   - go: tip
+   allow_failures:
+      - go: tip
+addons:
+   apt:
+      packages:
+         - libcv-dev
+         - libcvaux-dev
+         - libhighgui-dev
+         - libopencv-dev
+         - libsdl2-dev
+         - libsdl2-image-dev
+         - libsdl2-2.0.0
+         - libusb-dev
+         - xvfb
+         - unzip
+         - libgtk2.0-0
 before_install:
- - sudo add-apt-repository -y ppa:kubuntu-ppa/backports
- - sudo add-apt-repository -y ppa:zoogie/sdl2-snapshots
- - sudo apt-get update
- - sudo apt-get install --force-yes libcv-dev libcvaux-dev libhighgui-dev libopencv-dev libsdl2-dev libsdl2-image-dev libsdl2 libusb-dev xvfb unzip libgtk2.0-0
- - cd $HOME/gopath/src/gobot.io/x/gobot
- - go get github.com/axw/gocov/gocov
- - if ! go get github.com/golang/tools/cmd/cover; then go get golang.org/x/tools/cmd/cover; fi
+   - cd $HOME/gopath/src/gobot.io/x/gobot
+   - go get github.com/axw/gocov/gocov
 install:
- - make deps
+   - make deps
 before_script:
- - export DISPLAY=:99.0
- - sh -e /etc/init.d/xvfb start
+   - export DISPLAY=:99.0
+   - sh -e /etc/init.d/xvfb start
 script:
- - echo "Ensuring code is well formatted"; ! gofmt -s -d . | read
- - bash -c 'set -e; echo "" > coverage.txt; for d in $(go list ./...); do go test -covermode=count -coverprofile=p.out $d; if [ -f p.out ]; then cat p.out >> coverage.txt; rm p.out; fi; done'
- - go test -race ./...
+   - echo "Ensuring code is well formatted"; ! gofmt -s -d . | read
+   - bash -c 'set -e; echo "" > coverage.txt; for d in $(go list ./...); do go test -covermode=count -coverprofile=p.out $d; if [ -f p.out ]; then cat p.out >> coverage.txt; rm p.out; fi; done'
+   - go test -race ./...
 after_success:
- - bash <(curl -s https://codecov.io/bash)
+   - bash <(curl -s https://codecov.io/bash)
 branches:
-  except:
-    - gobot.io
-    - /^gobot-.*$/
+   except:
+      - gobot.io
+      - /^gobot-.*$/
 secure: "HggklzWOwKqImvjQe1yvojCoTaUBDrOVXRjsrZaoTaKpUtmho1tpCMtKF1dbyT0T5Y68P6f9e/XyANWVeziJNZ+YmNkY+CNdNYHiNnpl8att3MuL4hpwKDPAqLK8H2G+71j3O/rBvf6oIJHtSEesR5Sbb+2fSmhNFtLrDgp5FZA="
