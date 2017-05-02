@@ -66,19 +66,16 @@ func TestMqttAdaptorUseClientKey(t *testing.T) {
 
 func TestMqttAdaptorConnectError(t *testing.T) {
 	a := initTestMqttAdaptor()
-	var expected error
-	expected = multierror.Append(expected, errors.New("Network Error : dial tcp 127.0.0.1:1883: getsockopt: connection refused"))
 
-	gobottest.Assert(t, a.Connect(), expected)
+	err := a.Connect()
+	gobottest.Assert(t, strings.Contains(err.Error(), "Network Error : dial tcp 127.0.0.1:1883: getsockopt: connection refused"), true)
 }
 
 func TestMqttAdaptorConnectSSLError(t *testing.T) {
 	a := initTestMqttAdaptor()
 	a.SetUseSSL(true)
-	var expected error
-	expected = multierror.Append(expected, errors.New("Network Error : dial tcp 127.0.0.1:1883: getsockopt: connection refused"))
-
-	gobottest.Assert(t, a.Connect(), expected)
+	err := a.Connect()
+	gobottest.Assert(t, strings.Contains(err.Error(), "Network Error : dial tcp 127.0.0.1:1883: getsockopt: connection refused"), true)
 }
 
 func TestMqttAdaptorConnectWithAuthError(t *testing.T) {
