@@ -213,29 +213,6 @@ func TestAdaptorDigitalPinInFileError(t *testing.T) {
 
 }
 
-func TestAdaptorDigitalPinOutFileError(t *testing.T) {
-	a := NewAdaptor()
-	fs := sysfs.NewMockFilesystem([]string{
-		"/sys/kernel/debug/gpio_debug/gpio40/current_pinmux",
-		"/sys/class/gpio/export",
-		"/sys/class/gpio/unexport",
-		// "/sys/class/gpio/gpio40/value",
-		// "/sys/class/gpio/gpio40/direction",
-		"/sys/class/gpio/gpio229/value", // resistor
-		"/sys/class/gpio/gpio229/direction",
-		"/sys/class/gpio/gpio243/value",
-		"/sys/class/gpio/gpio243/direction",
-		"/sys/class/gpio/gpio261/value", // level shifter
-		"/sys/class/gpio/gpio261/direction",
-	})
-	sysfs.SetFilesystem(fs)
-
-	a.Connect()
-
-	_, err := a.DigitalPin("13", "out")
-	gobottest.Assert(t, strings.Contains(err.Error(), "No such file"), true)
-}
-
 func TestAdaptorDigitalPinInResistorFileError(t *testing.T) {
 	a := NewAdaptor()
 	fs := sysfs.NewMockFilesystem([]string{
@@ -256,29 +233,6 @@ func TestAdaptorDigitalPinInResistorFileError(t *testing.T) {
 	a.Connect()
 
 	_, err := a.DigitalPin("13", "in")
-	gobottest.Assert(t, strings.Contains(err.Error(), "No such file"), true)
-}
-
-func TestAdaptorDigitalPinOutResistorFileError(t *testing.T) {
-	a := NewAdaptor()
-	fs := sysfs.NewMockFilesystem([]string{
-		"/sys/kernel/debug/gpio_debug/gpio40/current_pinmux",
-		"/sys/class/gpio/export",
-		"/sys/class/gpio/unexport",
-		"/sys/class/gpio/gpio40/value",
-		"/sys/class/gpio/gpio40/direction",
-		// "/sys/class/gpio/gpio229/value", // resistor
-		// "/sys/class/gpio/gpio229/direction",
-		"/sys/class/gpio/gpio243/value",
-		"/sys/class/gpio/gpio243/direction",
-		"/sys/class/gpio/gpio261/value", // level shifter
-		"/sys/class/gpio/gpio261/direction",
-	})
-	sysfs.SetFilesystem(fs)
-
-	a.Connect()
-
-	_, err := a.DigitalPin("13", "out")
 	gobottest.Assert(t, strings.Contains(err.Error(), "No such file"), true)
 }
 
@@ -305,7 +259,7 @@ func TestAdaptorDigitalPinInLevelShifterFileError(t *testing.T) {
 	gobottest.Assert(t, strings.Contains(err.Error(), "No such file"), true)
 }
 
-func TestAdaptorDigitalPinOutLevelShifterFileError(t *testing.T) {
+func TestAdaptorDigitalPinInMuxFileError(t *testing.T) {
 	a := NewAdaptor()
 	fs := sysfs.NewMockFilesystem([]string{
 		"/sys/kernel/debug/gpio_debug/gpio40/current_pinmux",
@@ -315,16 +269,16 @@ func TestAdaptorDigitalPinOutLevelShifterFileError(t *testing.T) {
 		"/sys/class/gpio/gpio40/direction",
 		"/sys/class/gpio/gpio229/value", // resistor
 		"/sys/class/gpio/gpio229/direction",
-		"/sys/class/gpio/gpio243/value",
-		"/sys/class/gpio/gpio243/direction",
-		// "/sys/class/gpio/gpio261/value", // level shifter
-		// "/sys/class/gpio/gpio261/direction",
+		// "/sys/class/gpio/gpio243/value",
+		// "/sys/class/gpio/gpio243/direction",
+		"/sys/class/gpio/gpio261/value", // level shifter
+		"/sys/class/gpio/gpio261/direction",
 	})
 	sysfs.SetFilesystem(fs)
 
 	a.Connect()
 
-	_, err := a.DigitalPin("13", "out")
+	_, err := a.DigitalPin("13", "in")
 	gobottest.Assert(t, strings.Contains(err.Error(), "No such file"), true)
 }
 
@@ -374,6 +328,54 @@ func TestAdaptorPwm(t *testing.T) {
 
 	err = a.PwmWrite("7", 100)
 	gobottest.Assert(t, err, errors.New("Not a PWM pin"))
+}
+
+func TestAdaptorPwmExportError(t *testing.T) {
+	a := NewAdaptor()
+	fs := sysfs.NewMockFilesystem([]string{
+		"/sys/kernel/debug/gpio_debug/gpio13/current_pinmux",
+		"/sys/class/gpio/export",
+		"/sys/class/gpio/gpio13/direction",
+		"/sys/class/gpio/gpio13/value",
+		"/sys/class/gpio/gpio221/direction",
+		"/sys/class/gpio/gpio221/value",
+		"/sys/class/gpio/gpio253/direction",
+		"/sys/class/gpio/gpio253/value",
+		//"/sys/class/pwm/pwmchip0/export",
+		"/sys/class/pwm/pwmchip0/unexport",
+		"/sys/class/pwm/pwmchip0/pwm1/duty_cycle",
+		"/sys/class/pwm/pwmchip0/pwm1/period",
+		"/sys/class/pwm/pwmchip0/pwm1/enable",
+	})
+	sysfs.SetFilesystem(fs)
+	a.Connect()
+
+	err := a.PwmWrite("5", 100)
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/pwm/pwmchip0/export: No such file"), true)
+}
+
+func TestAdaptorPwmEnableError(t *testing.T) {
+	a := NewAdaptor()
+	fs := sysfs.NewMockFilesystem([]string{
+		"/sys/kernel/debug/gpio_debug/gpio13/current_pinmux",
+		"/sys/class/gpio/export",
+		"/sys/class/gpio/gpio13/direction",
+		"/sys/class/gpio/gpio13/value",
+		"/sys/class/gpio/gpio221/direction",
+		"/sys/class/gpio/gpio221/value",
+		"/sys/class/gpio/gpio253/direction",
+		"/sys/class/gpio/gpio253/value",
+		"/sys/class/pwm/pwmchip0/export",
+		"/sys/class/pwm/pwmchip0/unexport",
+		"/sys/class/pwm/pwmchip0/pwm1/duty_cycle",
+		"/sys/class/pwm/pwmchip0/pwm1/period",
+		//"/sys/class/pwm/pwmchip0/pwm1/enable",
+	})
+	sysfs.SetFilesystem(fs)
+	a.Connect()
+
+	err := a.PwmWrite("5", 100)
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/pwm/pwmchip0/pwm1/enable: No such file"), true)
 }
 
 func TestAdaptorPwmWritePinError(t *testing.T) {
