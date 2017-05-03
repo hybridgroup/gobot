@@ -29,10 +29,15 @@ func TestBeagleboneAdaptor(t *testing.T) {
 		"/dev/i2c-2",
 		"/sys/devices/platform/bone_capemgr",
 		"/sys/devices/platform/ocp/ocp:P9_21_pinmux/state",
+		"/sys/devices/platform/ocp/ocp:P9_22_pinmux/state",
 		"/sys/class/leds/beaglebone:green:usr1/brightness",
 		"/sys/bus/iio/devices/iio:device0/in_voltage1_raw",
 		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/export",
 		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/unexport",
+		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/enable",
+		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/period",
+		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/duty_cycle",
+		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/polarity",
 		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/enable",
 		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/period",
 		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/duty_cycle",
@@ -45,14 +50,14 @@ func TestBeagleboneAdaptor(t *testing.T) {
 		"/sys/class/gpio/gpio66/direction",
 		"/sys/class/gpio/gpio10/value",
 		"/sys/class/gpio/gpio10/direction",
+		"/sys/class/gpio/gpio30/value",
+		"/sys/class/gpio/gpio30/direction",
 	})
 
 	sysfs.SetFilesystem(fs)
 	a := NewAdaptor()
 
 	a.Connect()
-
-	a.analogPath = "/sys/bus/iio/devices/iio:device0"
 
 	// PWM
 	gobottest.Assert(t, a.PwmWrite("P9_99", 175), errors.New("Not a valid PWM pin"))
@@ -79,8 +84,15 @@ func TestBeagleboneAdaptor(t *testing.T) {
 		fs.Files["/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/duty_cycle"].Contents,
 		"66666",
 	)
-
 	gobottest.Assert(t, a.ServoWrite("P9_99", 175), errors.New("Not a valid PWM pin"))
+
+	fs.WithReadError = true
+	gobottest.Assert(t, a.PwmWrite("P9_21", 175), errors.New("read error"))
+	fs.WithReadError = false
+
+	fs.WithWriteError = true
+	gobottest.Assert(t, a.PwmWrite("P9_22", 175), errors.New("write error"))
+	fs.WithWriteError = false
 
 	// Analog
 	fs.Files["/sys/bus/iio/devices/iio:device0/in_voltage1_raw"].Contents = "567\n"
@@ -90,6 +102,11 @@ func TestBeagleboneAdaptor(t *testing.T) {
 
 	_, err = a.AnalogRead("P9_99")
 	gobottest.Assert(t, err, errors.New("Not a valid analog pin"))
+
+	fs.WithReadError = true
+	_, err = a.AnalogRead("P9_40")
+	gobottest.Assert(t, err, errors.New("read error"))
+	fs.WithReadError = false
 
 	// DigitalIO
 	a.DigitalWrite("usr1", 1)
@@ -119,6 +136,11 @@ func TestBeagleboneAdaptor(t *testing.T) {
 	_, err = a.DigitalRead("P8_7")
 	gobottest.Assert(t, err, errors.New("read error"))
 	fs.WithReadError = false
+
+	fs.WithWriteError = true
+	_, err = a.DigitalRead("P9_11")
+	gobottest.Assert(t, err, errors.New("write error"))
+	fs.WithWriteError = false
 
 	// I2c
 	sysfs.SetSyscall(&sysfs.MockSyscall{})

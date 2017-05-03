@@ -19,7 +19,6 @@ const pwmDefaultPeriod = 500000
 // Adaptor is the gobot.Adaptor representation for the Beaglebone
 type Adaptor struct {
 	name        string
-	kernel      string
 	digitalPins []*sysfs.DigitalPin
 	pwmPins     map[string]*sysfs.PWMPin
 	i2cBuses    map[int]sysfs.I2cDevice
@@ -44,6 +43,7 @@ func NewAdaptor() *Adaptor {
 func (b *Adaptor) setSlots() {
 	b.slots = "/sys/devices/platform/bone_capemgr/slots"
 	b.usrLed = "/sys/class/leds/beaglebone:green:"
+	b.analogPath = "/sys/bus/iio/devices/iio:device0"
 }
 
 // Name returns the Adaptor name
@@ -52,30 +52,25 @@ func (b *Adaptor) Name() string { return b.name }
 // SetName sets the Adaptor name
 func (b *Adaptor) SetName(n string) { b.name = n }
 
-// Kernel returns the Linux kernel version for the BeagleBone
-func (b *Adaptor) Kernel() string { return b.kernel }
-
 // Connect initializes the pwm and analog dts.
 func (b *Adaptor) Connect() error {
 	if err := ensureSlot(b.slots, "BB-ADC"); err != nil {
 		return err
 	}
 
-	b.analogPath = "/sys/bus/iio/devices/iio:device0"
-
 	return nil
 }
 
 // Finalize releases all i2c devices and exported analog, digital, pwm pins.
 func (b *Adaptor) Finalize() (err error) {
-	for _, pin := range b.pwmPins {
+	for _, pin := range b.digitalPins {
 		if pin != nil {
 			if e := pin.Unexport(); e != nil {
 				err = multierror.Append(err, e)
 			}
 		}
 	}
-	for _, pin := range b.digitalPins {
+	for _, pin := range b.pwmPins {
 		if pin != nil {
 			if e := pin.Unexport(); e != nil {
 				err = multierror.Append(err, e)
