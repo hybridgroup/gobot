@@ -23,77 +23,79 @@ var _ sysfs.DigitalPinnerProvider = (*Adaptor)(nil)
 var _ sysfs.PWMPinnerProvider = (*Adaptor)(nil)
 var _ i2c.Connector = (*Adaptor)(nil)
 
+var testPinFiles = []string{
+	"/sys/bus/iio/devices/iio:device1/in_voltage0_raw",
+	"/sys/kernel/debug/gpio_debug/gpio111/current_pinmux",
+	"/sys/kernel/debug/gpio_debug/gpio115/current_pinmux",
+	"/sys/kernel/debug/gpio_debug/gpio114/current_pinmux",
+	"/sys/kernel/debug/gpio_debug/gpio109/current_pinmux",
+	"/sys/kernel/debug/gpio_debug/gpio131/current_pinmux",
+	"/sys/kernel/debug/gpio_debug/gpio129/current_pinmux",
+	"/sys/kernel/debug/gpio_debug/gpio40/current_pinmux",
+	"/sys/kernel/debug/gpio_debug/gpio13/current_pinmux",
+	"/sys/kernel/debug/gpio_debug/gpio28/current_pinmux",
+	"/sys/kernel/debug/gpio_debug/gpio27/current_pinmux",
+	"/sys/class/pwm/pwmchip0/export",
+	"/sys/class/pwm/pwmchip0/unexport",
+	"/sys/class/pwm/pwmchip0/pwm1/duty_cycle",
+	"/sys/class/pwm/pwmchip0/pwm1/period",
+	"/sys/class/pwm/pwmchip0/pwm1/enable",
+	"/sys/class/gpio/export",
+	"/sys/class/gpio/unexport",
+	"/sys/class/gpio/gpio13/value",
+	"/sys/class/gpio/gpio13/direction",
+	"/sys/class/gpio/gpio40/value",
+	"/sys/class/gpio/gpio40/direction",
+	"/sys/class/gpio/gpio128/value",
+	"/sys/class/gpio/gpio128/direction",
+	"/sys/class/gpio/gpio221/value",
+	"/sys/class/gpio/gpio221/direction",
+	"/sys/class/gpio/gpio243/value",
+	"/sys/class/gpio/gpio243/direction",
+	"/sys/class/gpio/gpio229/value",
+	"/sys/class/gpio/gpio229/direction",
+	"/sys/class/gpio/gpio253/value",
+	"/sys/class/gpio/gpio253/direction",
+	"/sys/class/gpio/gpio261/value",
+	"/sys/class/gpio/gpio261/direction",
+	"/sys/class/gpio/gpio214/value",
+	"/sys/class/gpio/gpio214/direction",
+	"/sys/class/gpio/gpio14/direction",
+	"/sys/class/gpio/gpio14/value",
+	"/sys/class/gpio/gpio165/direction",
+	"/sys/class/gpio/gpio165/value",
+	"/sys/class/gpio/gpio212/direction",
+	"/sys/class/gpio/gpio212/value",
+	"/sys/class/gpio/gpio213/direction",
+	"/sys/class/gpio/gpio213/value",
+	"/sys/class/gpio/gpio236/direction",
+	"/sys/class/gpio/gpio236/value",
+	"/sys/class/gpio/gpio237/direction",
+	"/sys/class/gpio/gpio237/value",
+	"/sys/class/gpio/gpio204/direction",
+	"/sys/class/gpio/gpio204/value",
+	"/sys/class/gpio/gpio205/direction",
+	"/sys/class/gpio/gpio205/value",
+	"/sys/class/gpio/gpio263/direction",
+	"/sys/class/gpio/gpio263/value",
+	"/sys/class/gpio/gpio262/direction",
+	"/sys/class/gpio/gpio262/value",
+	"/sys/class/gpio/gpio240/direction",
+	"/sys/class/gpio/gpio240/value",
+	"/sys/class/gpio/gpio241/direction",
+	"/sys/class/gpio/gpio241/value",
+	"/sys/class/gpio/gpio242/direction",
+	"/sys/class/gpio/gpio242/value",
+	"/sys/class/gpio/gpio218/direction",
+	"/sys/class/gpio/gpio218/value",
+	"/sys/class/gpio/gpio250/direction",
+	"/sys/class/gpio/gpio250/value",
+	"/dev/i2c-6",
+}
+
 func initTestAdaptor() (*Adaptor, *sysfs.MockFilesystem) {
 	a := NewAdaptor()
-	fs := sysfs.NewMockFilesystem([]string{
-		"/sys/bus/iio/devices/iio:device1/in_voltage0_raw",
-		"/sys/kernel/debug/gpio_debug/gpio111/current_pinmux",
-		"/sys/kernel/debug/gpio_debug/gpio115/current_pinmux",
-		"/sys/kernel/debug/gpio_debug/gpio114/current_pinmux",
-		"/sys/kernel/debug/gpio_debug/gpio109/current_pinmux",
-		"/sys/kernel/debug/gpio_debug/gpio131/current_pinmux",
-		"/sys/kernel/debug/gpio_debug/gpio129/current_pinmux",
-		"/sys/kernel/debug/gpio_debug/gpio40/current_pinmux",
-		"/sys/kernel/debug/gpio_debug/gpio13/current_pinmux",
-		"/sys/kernel/debug/gpio_debug/gpio28/current_pinmux",
-		"/sys/kernel/debug/gpio_debug/gpio27/current_pinmux",
-		"/sys/class/pwm/pwmchip0/export",
-		"/sys/class/pwm/pwmchip0/unexport",
-		"/sys/class/pwm/pwmchip0/pwm1/duty_cycle",
-		"/sys/class/pwm/pwmchip0/pwm1/period",
-		"/sys/class/pwm/pwmchip0/pwm1/enable",
-		"/sys/class/gpio/export",
-		"/sys/class/gpio/unexport",
-		"/sys/class/gpio/gpio13/value",
-		"/sys/class/gpio/gpio13/direction",
-		"/sys/class/gpio/gpio40/value",
-		"/sys/class/gpio/gpio40/direction",
-		"/sys/class/gpio/gpio128/value",
-		"/sys/class/gpio/gpio128/direction",
-		"/sys/class/gpio/gpio221/value",
-		"/sys/class/gpio/gpio221/direction",
-		"/sys/class/gpio/gpio243/value",
-		"/sys/class/gpio/gpio243/direction",
-		"/sys/class/gpio/gpio229/value",
-		"/sys/class/gpio/gpio229/direction",
-		"/sys/class/gpio/gpio253/value",
-		"/sys/class/gpio/gpio253/direction",
-		"/sys/class/gpio/gpio261/value",
-		"/sys/class/gpio/gpio261/direction",
-		"/sys/class/gpio/gpio214/value",
-		"/sys/class/gpio/gpio214/direction",
-		"/sys/class/gpio/gpio14/direction",
-		"/sys/class/gpio/gpio14/value",
-		"/sys/class/gpio/gpio165/direction",
-		"/sys/class/gpio/gpio165/value",
-		"/sys/class/gpio/gpio212/direction",
-		"/sys/class/gpio/gpio212/value",
-		"/sys/class/gpio/gpio213/direction",
-		"/sys/class/gpio/gpio213/value",
-		"/sys/class/gpio/gpio236/direction",
-		"/sys/class/gpio/gpio236/value",
-		"/sys/class/gpio/gpio237/direction",
-		"/sys/class/gpio/gpio237/value",
-		"/sys/class/gpio/gpio204/direction",
-		"/sys/class/gpio/gpio204/value",
-		"/sys/class/gpio/gpio205/direction",
-		"/sys/class/gpio/gpio205/value",
-		"/sys/class/gpio/gpio263/direction",
-		"/sys/class/gpio/gpio263/value",
-		"/sys/class/gpio/gpio262/direction",
-		"/sys/class/gpio/gpio262/value",
-		"/sys/class/gpio/gpio240/direction",
-		"/sys/class/gpio/gpio240/value",
-		"/sys/class/gpio/gpio241/direction",
-		"/sys/class/gpio/gpio241/value",
-		"/sys/class/gpio/gpio242/direction",
-		"/sys/class/gpio/gpio242/value",
-		"/sys/class/gpio/gpio218/direction",
-		"/sys/class/gpio/gpio218/value",
-		"/sys/class/gpio/gpio250/direction",
-		"/sys/class/gpio/gpio250/value",
-		"/dev/i2c-6",
-	})
+	fs := sysfs.NewMockFilesystem(testPinFiles)
 	sysfs.SetFilesystem(fs)
 	fs.Files["/sys/class/pwm/pwmchip0/pwm1/period"].Contents = "5000"
 	a.Connect()
@@ -114,6 +116,68 @@ func TestAdaptorConnect(t *testing.T) {
 	gobottest.Assert(t, a.Board(), "arduino")
 
 	gobottest.Assert(t, a.Connect(), nil)
+}
+
+func TestAdaptorArduinoSetupFail263(t *testing.T) {
+	a, fs := initTestAdaptor()
+	delete(fs.Files, "/sys/class/gpio/gpio263/direction")
+
+	err := a.arduinoSetup()
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/gpio263/direction: No such file"), true)
+}
+
+func TestAdaptorArduinoSetupFail240(t *testing.T) {
+	a, fs := initTestAdaptor()
+	delete(fs.Files, "/sys/class/gpio/gpio240/direction")
+
+	err := a.arduinoSetup()
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/gpio240/direction: No such file"), true)
+}
+
+func TestAdaptorArduinoSetupFail111(t *testing.T) {
+	a, fs := initTestAdaptor()
+	delete(fs.Files, "/sys/kernel/debug/gpio_debug/gpio111/current_pinmux")
+
+	err := a.arduinoSetup()
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/kernel/debug/gpio_debug/gpio111/current_pinmux: No such file"), true)
+}
+
+func TestAdaptorArduinoSetupFail131(t *testing.T) {
+	a, fs := initTestAdaptor()
+	delete(fs.Files, "/sys/kernel/debug/gpio_debug/gpio131/current_pinmux")
+
+	err := a.arduinoSetup()
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/kernel/debug/gpio_debug/gpio131/current_pinmux: No such file"), true)
+}
+
+func TestAdaptorArduinoI2CSetupFail14(t *testing.T) {
+	a, fs := initTestAdaptor()
+
+	gobottest.Assert(t, a.arduinoSetup(), nil)
+	delete(fs.Files, "/sys/class/gpio/gpio14/direction")
+
+	err := a.arduinoI2CSetup()
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/gpio14/direction: No such file"), true)
+}
+
+func TestAdaptorArduinoI2CSetupFail236(t *testing.T) {
+	a, fs := initTestAdaptor()
+
+	gobottest.Assert(t, a.arduinoSetup(), nil)
+	delete(fs.Files, "/sys/class/gpio/gpio236/direction")
+
+	err := a.arduinoI2CSetup()
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/gpio236/direction: No such file"), true)
+}
+
+func TestAdaptorArduinoI2CSetupFail28(t *testing.T) {
+	a, fs := initTestAdaptor()
+
+	gobottest.Assert(t, a.arduinoSetup(), nil)
+	delete(fs.Files, "/sys/kernel/debug/gpio_debug/gpio28/current_pinmux")
+
+	err := a.arduinoI2CSetup()
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/kernel/debug/gpio_debug/gpio28/current_pinmux: No such file"), true)
 }
 
 func TestAdaptorConnectArduinoError(t *testing.T) {
