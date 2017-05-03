@@ -150,6 +150,16 @@ func TestAdaptorArduinoSetupFail131(t *testing.T) {
 	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/kernel/debug/gpio_debug/gpio131/current_pinmux: No such file"), true)
 }
 
+func TestAdaptorArduinoI2CSetupFailTristate(t *testing.T) {
+	a, fs := initTestAdaptor()
+
+	gobottest.Assert(t, a.arduinoSetup(), nil)
+
+	fs.WithWriteError = true
+	err := a.arduinoI2CSetup()
+	gobottest.Assert(t, err, errors.New("write error"))
+}
+
 func TestAdaptorArduinoI2CSetupFail14(t *testing.T) {
 	a, fs := initTestAdaptor()
 
@@ -158,6 +168,16 @@ func TestAdaptorArduinoI2CSetupFail14(t *testing.T) {
 
 	err := a.arduinoI2CSetup()
 	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/gpio14/direction: No such file"), true)
+}
+
+func TestAdaptorArduinoI2CSetupUnexportFail(t *testing.T) {
+	a, fs := initTestAdaptor()
+
+	gobottest.Assert(t, a.arduinoSetup(), nil)
+	delete(fs.Files, "/sys/class/gpio/unexport")
+
+	err := a.arduinoI2CSetup()
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/unexport: No such file"), true)
 }
 
 func TestAdaptorArduinoI2CSetupFail236(t *testing.T) {
