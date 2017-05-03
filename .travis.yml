@@ -34,7 +34,6 @@ before_script:
 script:
    - echo "Ensuring code is well formatted"; ! gofmt -s -d . | read
    - bash -c 'set -e; echo "" > coverage.txt; for d in $(go list ./...); do go test -covermode=count -coverprofile=p.out $d; if [ -f p.out ]; then cat p.out >> coverage.txt; rm p.out; fi; done'
-   - bash -c 'set -e; for d in $(go list ./...); do go test -race $d; done'
 after_success:
    - bash <(curl -s https://codecov.io/bash)
 branches:
