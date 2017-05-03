@@ -27,19 +27,19 @@ func main() {
 			if err != nil {
 
 			}
-			log.Printf("Ch 1 Shunt Voltage: %f", bv)
+			log.Printf("Ch 1 Shunt Voltage: %f", sv)
 
 			ma, err := ina.GetCurrent(i2c.INA3221Channel1)
 			if err != nil {
 
 			}
-			log.Printf("Ch 1 Current: %f", bv)
+			log.Printf("Ch 1 Current: %f", ma)
 
 			lv, err := ina.GetLoadVoltage(i2c.INA3221Channel1)
 			if err != nil {
 
 			}
-			log.Printf("Ch 1 Load Voltage: %f", bv)
+			log.Printf("Ch 1 Load Voltage: %f", lv)
 		})
 	}
 
