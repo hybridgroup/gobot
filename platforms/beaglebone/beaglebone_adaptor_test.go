@@ -28,6 +28,7 @@ func TestBeagleboneAdaptor(t *testing.T) {
 	fs := sysfs.NewMockFilesystem([]string{
 		"/dev/i2c-2",
 		"/sys/devices/platform/bone_capemgr",
+		"/sys/devices/platform/bone_capemgr/slots",
 		"/sys/devices/platform/ocp/ocp:P9_21_pinmux/state",
 		"/sys/devices/platform/ocp/ocp:P9_22_pinmux/state",
 		"/sys/class/leds/beaglebone:green:usr1/brightness",
