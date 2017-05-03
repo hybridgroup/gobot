@@ -391,7 +391,7 @@ func TestRobotDeviceEvent(t *testing.T) {
 	}()
 
 	done := false
-	timer := time.NewTimer(time.Millisecond * 20)
+	timer := time.NewTimer(time.Millisecond * 50)
 
 	for !done {
 		select {
