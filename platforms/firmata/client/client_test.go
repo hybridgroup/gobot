@@ -285,6 +285,7 @@ func TestProcessStringData(t *testing.T) {
 		sem <- true
 	})
 
+	time.Sleep(10 * time.Millisecond)
 	go b.process()
 
 	select {
