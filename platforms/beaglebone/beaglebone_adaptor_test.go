@@ -174,3 +174,64 @@ func TestBeagleboneGetConnectionInvalidBus(t *testing.T) {
 	_, err := a.GetConnection(0x01, 99)
 	gobottest.Assert(t, err, errors.New("Bus number 99 out of range"))
 }
+
+func TestBeagleboneConnectNoSlot(t *testing.T) {
+	fs := sysfs.NewMockFilesystem([]string{
+		"/dev/i2c-2",
+	})
+	sysfs.SetFilesystem(fs)
+
+	a := NewAdaptor()
+	err := a.Connect()
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/devices/platform/bone_capemgr/slots: No such file."), true)
+}
+
+func TestBeagleboneAnalogReadFileError(t *testing.T) {
+	fs := sysfs.NewMockFilesystem([]string{
+		"/sys/devices/platform/bone_capemgr/slots",
+	})
+	sysfs.SetFilesystem(fs)
+
+	a := NewAdaptor()
+	a.Connect()
+
+	_, err := a.AnalogRead("P9_40")
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/bus/iio/devices/iio:device0/in_voltage1_raw: No such file."), true)
+}
+
+func TestBeagleboneDigitalPinDirectionFileError(t *testing.T) {
+	fs := sysfs.NewMockFilesystem([]string{
+		"/sys/devices/platform/bone_capemgr/slots",
+		"/sys/class/gpio/export",
+		"/sys/class/gpio/gpio60/value",
+	})
+	sysfs.SetFilesystem(fs)
+
+	a := NewAdaptor()
+	a.Connect()
+
+	err := a.DigitalWrite("P9_12", 1)
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/gpio60/direction: No such file."), true)
+
+	err = a.Finalize()
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/unexport: No such file."), true)
+}
+
+func TestBeagleboneDigitalPinFinalizeFileError(t *testing.T) {
+	fs := sysfs.NewMockFilesystem([]string{
+		"/sys/devices/platform/bone_capemgr/slots",
+		"/sys/class/gpio/export",
+		"/sys/class/gpio/gpio60/value",
+		"/sys/class/gpio/gpio60/direction",
+	})
+	sysfs.SetFilesystem(fs)
+
+	a := NewAdaptor()
+	a.Connect()
+
+	err := a.DigitalWrite("P9_12", 1)
+	gobottest.Assert(t, err, nil)
+
+	err = a.Finalize()
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/unexport: No such file."), true)
+}
