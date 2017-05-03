@@ -40,8 +40,6 @@ func TestAnalogSensorDriverStart(t *testing.T) {
 	a := newAioTestAdaptor()
 	d := NewAnalogSensorDriver(a, "1")
 
-	gobottest.Assert(t, d.Start(), nil)
-
 	// expect data to be received
 	d.Once(d.Event(Data), func(data interface{}) {
 		gobottest.Assert(t, data.(int), 100)
@@ -53,6 +51,8 @@ func TestAnalogSensorDriverStart(t *testing.T) {
 		val = 100
 		return
 	})
+
+	gobottest.Assert(t, d.Start(), nil)
 
 	select {
 	case <-sem:
