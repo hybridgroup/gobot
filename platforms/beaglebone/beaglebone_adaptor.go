@@ -5,8 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"os/exec"
-	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -16,18 +14,18 @@ import (
 	"gobot.io/x/gobot/sysfs"
 )
 
+const pwmDefaultPeriod = 500000
+
 // Adaptor is the gobot.Adaptor representation for the Beaglebone
 type Adaptor struct {
-	name         string
-	kernel       string
-	digitalPins  []*sysfs.DigitalPin
-	pwmPins      map[string]*pwmPin
-	i2cBuses     map[int]sysfs.I2cDevice
-	usrLed       string
-	ocp          string
-	analogPath   string
-	analogPinMap map[string]string
-	slots        string
+	name        string
+	kernel      string
+	digitalPins []*sysfs.DigitalPin
+	pwmPins     map[string]*sysfs.PWMPin
+	i2cBuses    map[int]sysfs.I2cDevice
+	usrLed      string
+	analogPath  string
+	slots       string
 }
 
 // NewAdaptor returns a new Beaglebone Adaptor
@@ -35,7 +33,7 @@ func NewAdaptor() *Adaptor {
 	b := &Adaptor{
 		name:        gobot.DefaultName("Beaglebone"),
 		digitalPins: make([]*sysfs.DigitalPin, 120),
-		pwmPins:     make(map[string]*pwmPin),
+		pwmPins:     make(map[string]*sysfs.PWMPin),
 		i2cBuses:    make(map[int]sysfs.I2cDevice),
 	}
 
@@ -44,22 +42,8 @@ func NewAdaptor() *Adaptor {
 }
 
 func (b *Adaptor) setSlots() {
-	ocp := "/sys/devices/ocp.*"
-	slots := "/sys/devices/bone_capemgr.*"
-
-	b.kernel = getKernel()
-	if b.kernel[:1] == "4" {
-		ocp = "/sys/devices/platform/ocp/ocp*"
-		slots = "/sys/devices/platform/bone_capemgr"
-	}
-
+	b.slots = "/sys/devices/platform/bone_capemgr/slots"
 	b.usrLed = "/sys/class/leds/beaglebone:green:"
-
-	g, _ := glob(ocp)
-	b.ocp = g[0]
-
-	g, _ = glob(slots)
-	b.slots = fmt.Sprintf("%v/slots", g[0])
 }
 
 // Name returns the Adaptor name
@@ -73,31 +57,11 @@ func (b *Adaptor) Kernel() string { return b.kernel }
 
 // Connect initializes the pwm and analog dts.
 func (b *Adaptor) Connect() error {
-	// enable analog
-	if b.kernel[:1] == "4" {
-		if err := ensureSlot(b.slots, "BB-ADC"); err != nil {
-			return err
-		}
-
-		b.analogPath = "/sys/bus/iio/devices/iio:device0"
-		b.analogPinMap = analogPins44
-	} else {
-		if err := ensureSlot(b.slots, "cape-bone-iio"); err != nil {
-			return err
-		}
-
-		g, err := glob(fmt.Sprintf("%v/helper.*", b.ocp))
-		if err != nil {
-			return err
-		}
-		b.analogPath = g[0]
-		b.analogPinMap = analogPins3
-	}
-
-	// enable pwm
-	if err := ensureSlot(b.slots, "am33xx_pwm"); err != nil {
+	if err := ensureSlot(b.slots, "BB-ADC"); err != nil {
 		return err
 	}
+
+	b.analogPath = "/sys/bus/iio/devices/iio:device0"
 
 	return nil
 }
@@ -106,7 +70,7 @@ func (b *Adaptor) Connect() error {
 func (b *Adaptor) Finalize() (err error) {
 	for _, pin := range b.pwmPins {
 		if pin != nil {
-			if e := pin.release(); e != nil {
+			if e := pin.Unexport(); e != nil {
 				err = multierror.Append(err, e)
 			}
 		}
@@ -130,18 +94,30 @@ func (b *Adaptor) Finalize() (err error) {
 
 // PwmWrite writes the 0-254 value to the specified pin
 func (b *Adaptor) PwmWrite(pin string, val byte) (err error) {
-	return b.pwmWrite(pin, val)
-}
-
-// ServoWrite writes the 0-180 degree val to the specified pin.
-func (b *Adaptor) ServoWrite(pin string, val byte) (err error) {
-	i, err := b.pwmPin(pin)
+	pwmPin, err := b.PWMPin(pin)
+	if err != nil {
+		return
+	}
+	period, err := pwmPin.Period()
 	if err != nil {
 		return err
 	}
-	period := 16666666.0
-	duty := (gobot.FromScale(float64(val), 0, 180.0) * 0.115) + 0.05
-	return b.pwmPins[i].pwmWrite(strconv.Itoa(int(period)), strconv.Itoa(int(period*duty)))
+	duty := gobot.FromScale(float64(val), 0, 255.0)
+	return pwmPin.SetDutyCycle(uint32(float64(period) * duty))
+}
+
+// ServoWrite writes a servo signal to the specified pin
+func (b *Adaptor) ServoWrite(pin string, angle byte) (err error) {
+	pwmPin, err := b.PWMPin(pin)
+	if err != nil {
+		return
+	}
+
+	// TODO: take into account the actual period setting, not just assume default
+	const minDuty = 100 * 0.0005 * pwmDefaultPeriod
+	const maxDuty = 100 * 0.0020 * pwmDefaultPeriod
+	duty := uint32(gobot.ToScale(gobot.FromScale(float64(angle), 0, 180), minDuty, maxDuty))
+	return pwmPin.SetDutyCycle(duty)
 }
 
 // DigitalRead returns a digital value from specified pin
@@ -157,10 +133,10 @@ func (b *Adaptor) DigitalRead(pin string) (val int, err error) {
 // valid usr pin values are usr0, usr1, usr2 and usr3
 func (b *Adaptor) DigitalWrite(pin string, val byte) (err error) {
 	if strings.Contains(pin, "usr") {
-		fi, err := sysfs.OpenFile(b.usrLed+pin+"/brightness", os.O_WRONLY|os.O_APPEND, 0666)
+		fi, e := sysfs.OpenFile(b.usrLed+pin+"/brightness", os.O_WRONLY|os.O_APPEND, 0666)
 		defer fi.Close()
-		if err != nil {
-			return err
+		if e != nil {
+			return e
 		}
 		_, err = fi.WriteString(strconv.Itoa(int(val)))
 		return err
@@ -173,7 +149,7 @@ func (b *Adaptor) DigitalWrite(pin string, val byte) (err error) {
 }
 
 // DigitalPin retrieves digital pin value by name
-func (b *Adaptor) DigitalPin(pin string, dir string) (sysfsPin *sysfs.DigitalPin, err error) {
+func (b *Adaptor) DigitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPinner, err error) {
 	i, err := b.translatePin(pin)
 	if err != nil {
 		return
@@ -189,6 +165,40 @@ func (b *Adaptor) DigitalPin(pin string, dir string) (sysfsPin *sysfs.DigitalPin
 		return
 	}
 	return b.digitalPins[i], nil
+}
+
+// PWMPin returns matched pwmPin for specified pin number
+func (b *Adaptor) PWMPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
+	pinInfo, err := b.translatePwmPin(pin)
+	if err != nil {
+		return nil, err
+	}
+
+	if b.pwmPins[pin] == nil {
+		newPin := sysfs.NewPWMPin(pinInfo.channel)
+		newPin.Path = pinInfo.path
+
+		if err = muxPWMPin(pin); err != nil {
+			return
+		}
+		if err = newPin.Export(); err != nil {
+			return
+		}
+		if err = newPin.SetPeriod(pwmDefaultPeriod); err != nil {
+			return
+		}
+		// if err = newPin.InvertPolarity(false); err != nil {
+		// 	return
+		// }
+		if err = newPin.Enable(true); err != nil {
+			return
+		}
+		b.pwmPins[pin] = newPin
+	}
+
+	sysfsPin = b.pwmPins[pin]
+
+	return
 }
 
 // AnalogRead returns an analog value from specified pin
@@ -233,65 +243,31 @@ func (b *Adaptor) GetDefaultBus() int {
 
 // translatePin converts digital pin name to pin position
 func (b *Adaptor) translatePin(pin string) (value int, err error) {
-	for key, value := range pins {
-		if key == pin {
-			return value, nil
-		}
+	if val, ok := pins[pin]; ok {
+		value = val
+	} else {
+		err = errors.New("Not a valid pin")
 	}
-	err = errors.New("Not a valid pin")
 	return
 }
 
-// translatePwmPin converts pwm pin name to pin position
-func (b *Adaptor) translatePwmPin(pin string) (value string, err error) {
-	for key, value := range pwmPins {
-		if key == pin {
-			return value, nil
-		}
+func (b *Adaptor) translatePwmPin(pin string) (p pwmPinData, err error) {
+	if val, ok := pwmPins[pin]; ok {
+		p = val
+	} else {
+		err = errors.New("Not a valid PWM pin")
 	}
-	err = errors.New("Not a valid pin")
 	return
 }
 
 // translateAnalogPin converts analog pin name to pin position
 func (b *Adaptor) translateAnalogPin(pin string) (value string, err error) {
-	for key, value := range b.analogPinMap {
-		if key == pin {
-			return value, nil
-		}
-	}
-	err = errors.New("Not a valid pin")
-	return
-}
-
-// pwPin retrieves pwm pin value by name
-func (b *Adaptor) pwmPin(pin string) (i string, err error) {
-	i, err = b.translatePwmPin(pin)
-	if err != nil {
-		return
-	}
-	if b.pwmPins[i] == nil {
-		err = ensureSlot(b.slots, fmt.Sprintf("bone_pwm_%v", pin))
-		if err != nil {
-			return
-		}
-		b.pwmPins[i], err = newPwmPin(i, b.ocp)
-		if err != nil {
-			return
-		}
+	if val, ok := analogPins[pin]; ok {
+		value = val
+	} else {
+		err = errors.New("Not a valid analog pin")
 	}
 	return
-}
-
-// pwmWrite writes pwm value to specified pin
-func (b *Adaptor) pwmWrite(pin string, val byte) (err error) {
-	i, err := b.pwmPin(pin)
-	if err != nil {
-		return
-	}
-	period := 500000.0
-	duty := gobot.FromScale(float64(val), 0, 255.0)
-	return b.pwmPins[i].pwmWrite(strconv.Itoa(int(period)), strconv.Itoa(int(period*duty)))
 }
 
 func ensureSlot(slots, item string) (err error) {
@@ -327,12 +303,13 @@ func ensureSlot(slots, item string) (err error) {
 	return
 }
 
-func getKernel() string {
-	result, _ := exec.Command("uname", "-r").Output()
-
-	return strings.TrimSpace(string(result))
-}
-
-var glob = func(pattern string) (matches []string, err error) {
-	return filepath.Glob(pattern)
+func muxPWMPin(pin string) error {
+	path := fmt.Sprintf("/sys/devices/platform/ocp/ocp:%s_pinmux/state", pin)
+	fi, e := sysfs.OpenFile(path, os.O_WRONLY, 0666)
+	defer fi.Close()
+	if e != nil {
+		return e
+	}
+	_, e = fi.WriteString("pwm")
+	return e
 }
