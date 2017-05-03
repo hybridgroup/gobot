@@ -136,9 +136,6 @@ func (e *Adaptor) PWMPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
 	sysPin := sysfsPinMap[pin]
 	if sysPin.pwmPin != -1 {
 		if e.pwmPins[sysPin.pwmPin] == nil {
-			if err = e.DigitalWrite(pin, 1); err != nil {
-				return
-			}
 			e.pwmPins[sysPin.pwmPin] = sysfs.NewPWMPin(sysPin.pwmPin)
 			if err = e.pwmPins[sysPin.pwmPin].Export(); err != nil {
 				return

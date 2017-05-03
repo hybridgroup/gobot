@@ -62,7 +62,7 @@ func TestPwmPin(t *testing.T) {
 	gobottest.Assert(t, data, uint32(100))
 }
 
-func TestPwmPinExportError(t *testing.T) {
+func TestPwmPinAlreadyExported(t *testing.T) {
 	fs := NewMockFilesystem([]string{
 		"/sys/class/pwm/pwmchip0/export",
 		"/sys/class/pwm/pwmchip0/unexport",
@@ -78,6 +78,27 @@ func TestPwmPinExportError(t *testing.T) {
 		return 0, &os.PathError{Err: syscall.EBUSY}
 	}
 
+	// no error indicates that the pin was already exported
+	gobottest.Assert(t, pin.Export(), nil)
+}
+
+func TestPwmPinExportError(t *testing.T) {
+	fs := NewMockFilesystem([]string{
+		"/sys/class/pwm/pwmchip0/export",
+		"/sys/class/pwm/pwmchip0/unexport",
+		"/sys/class/pwm/pwmchip0/pwm10/enable",
+		"/sys/class/pwm/pwmchip0/pwm10/period",
+		"/sys/class/pwm/pwmchip0/pwm10/duty_cycle",
+	})
+
+	SetFilesystem(fs)
+
+	pin := NewPWMPin(10)
+	pin.write = func(string, []byte) (int, error) {
+		return 0, &os.PathError{Err: syscall.EFAULT}
+	}
+
+	// no error indicates that the pin was already exported
 	gobottest.Refute(t, pin.Export(), nil)
 }
 

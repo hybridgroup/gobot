@@ -20,81 +20,94 @@ var _ gpio.DigitalWriter = (*Adaptor)(nil)
 var _ aio.AnalogReader = (*Adaptor)(nil)
 var _ gpio.PwmWriter = (*Adaptor)(nil)
 var _ gpio.ServoWriter = (*Adaptor)(nil)
+var _ sysfs.DigitalPinnerProvider = (*Adaptor)(nil)
+var _ sysfs.PWMPinnerProvider = (*Adaptor)(nil)
 var _ i2c.Connector = (*Adaptor)(nil)
 
 func TestBeagleboneAdaptor(t *testing.T) {
-	glob = func(pattern string) (matches []string, err error) {
-		return make([]string, 2), nil
-	}
 	fs := sysfs.NewMockFilesystem([]string{
 		"/dev/i2c-2",
 		"/sys/devices/platform/bone_capemgr",
-		"/sys/devices/platform/ocp/ocp4",
+		"/sys/devices/platform/bone_capemgr/slots",
+		"/sys/devices/platform/ocp/ocp:P9_21_pinmux/state",
+		"/sys/devices/platform/ocp/ocp:P9_22_pinmux/state",
 		"/sys/class/leds/beaglebone:green:usr1/brightness",
 		"/sys/bus/iio/devices/iio:device0/in_voltage1_raw",
-		"/sys/devices/platform/ocp/ocp4/pwm_test_P9_14.5",
-		"/sys/devices/platform/ocp/ocp4/pwm_test_P9_14.5/run",
-		"/sys/devices/platform/ocp/ocp4/pwm_test_P9_14.5/period",
-		"/sys/devices/platform/ocp/ocp4/pwm_test_P9_14.5/polarity",
-		"/sys/devices/platform/ocp/ocp4/pwm_test_P9_14.5/duty",
+		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/export",
+		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/unexport",
+		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/enable",
+		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/period",
+		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/duty_cycle",
+		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/polarity",
+		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/enable",
+		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/period",
+		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/duty_cycle",
+		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/polarity",
 		"/sys/class/gpio/export",
 		"/sys/class/gpio/unexport",
 		"/sys/class/gpio/gpio60/value",
 		"/sys/class/gpio/gpio60/direction",
+		"/sys/class/gpio/gpio66/value",
+		"/sys/class/gpio/gpio66/direction",
 		"/sys/class/gpio/gpio10/value",
 		"/sys/class/gpio/gpio10/direction",
+		"/sys/class/gpio/gpio30/value",
+		"/sys/class/gpio/gpio30/direction",
 	})
 
 	sysfs.SetFilesystem(fs)
 	a := NewAdaptor()
-	a.slots = "/sys/devices/platform/bone_capemgr"
-	a.ocp = "/sys/devices/platform/ocp/ocp4"
-	a.kernel = "4.4"
 
 	a.Connect()
 
-	a.analogPath = "/sys/bus/iio/devices/iio:device0"
-
 	// PWM
-	glob = func(pattern string) (matches []string, err error) {
-		pattern = strings.TrimSuffix(pattern, "*")
-		return []string{pattern + "5"}, nil
-	}
-
-	gobottest.Assert(t, a.PwmWrite("P9_99", 175), errors.New("Not a valid pin"))
-	a.PwmWrite("P9_14", 175)
+	gobottest.Assert(t, a.PwmWrite("P9_99", 175), errors.New("Not a valid PWM pin"))
+	a.PwmWrite("P9_21", 175)
 	gobottest.Assert(
 		t,
-		fs.Files["/sys/devices/platform/ocp/ocp4/pwm_test_P9_14.5/period"].Contents,
+		fs.Files["/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/period"].Contents,
 		"500000",
 	)
 	gobottest.Assert(
 		t,
-		fs.Files["/sys/devices/platform/ocp/ocp4/pwm_test_P9_14.5/duty"].Contents,
+		fs.Files["/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/duty_cycle"].Contents,
 		"343137",
 	)
 
-	a.ServoWrite("P9_14", 100)
+	a.ServoWrite("P9_21", 100)
 	gobottest.Assert(
 		t,
-		fs.Files["/sys/devices/platform/ocp/ocp4/pwm_test_P9_14.5/period"].Contents,
-		"16666666",
+		fs.Files["/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/period"].Contents,
+		"500000",
 	)
 	gobottest.Assert(
 		t,
-		fs.Files["/sys/devices/platform/ocp/ocp4/pwm_test_P9_14.5/duty"].Contents,
-		"1898148",
+		fs.Files["/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/duty_cycle"].Contents,
+		"66666",
 	)
+	gobottest.Assert(t, a.ServoWrite("P9_99", 175), errors.New("Not a valid PWM pin"))
 
-	gobottest.Assert(t, a.ServoWrite("P9_99", 175), errors.New("Not a valid pin"))
+	fs.WithReadError = true
+	gobottest.Assert(t, a.PwmWrite("P9_21", 175), errors.New("read error"))
+	fs.WithReadError = false
+
+	fs.WithWriteError = true
+	gobottest.Assert(t, a.PwmWrite("P9_22", 175), errors.New("write error"))
+	fs.WithWriteError = false
 
 	// Analog
 	fs.Files["/sys/bus/iio/devices/iio:device0/in_voltage1_raw"].Contents = "567\n"
-	i, _ := a.AnalogRead("P9_40")
+	i, err := a.AnalogRead("P9_40")
 	gobottest.Assert(t, i, 567)
+	gobottest.Assert(t, err, nil)
 
-	_, err := a.AnalogRead("P9_99")
-	gobottest.Assert(t, err, errors.New("Not a valid pin"))
+	_, err = a.AnalogRead("P9_99")
+	gobottest.Assert(t, err, errors.New("Not a valid analog pin"))
+
+	fs.WithReadError = true
+	_, err = a.AnalogRead("P9_40")
+	gobottest.Assert(t, err, errors.New("read error"))
+	fs.WithReadError = false
 
 	// DigitalIO
 	a.DigitalWrite("usr1", 1)
@@ -115,14 +128,20 @@ func TestBeagleboneAdaptor(t *testing.T) {
 	_, err = a.DigitalRead("P9_99")
 	gobottest.Assert(t, err, errors.New("Not a valid pin"))
 
-	fs.Files["/sys/class/gpio/gpio10/value"].Contents = "1"
-	i, _ = a.DigitalRead("P8_31")
+	fs.Files["/sys/class/gpio/gpio66/value"].Contents = "1"
+	i, err = a.DigitalRead("P8_7")
 	gobottest.Assert(t, i, 1)
+	gobottest.Assert(t, err, nil)
 
 	fs.WithReadError = true
-	_, err = a.DigitalRead("P8_31")
+	_, err = a.DigitalRead("P8_7")
 	gobottest.Assert(t, err, errors.New("read error"))
 	fs.WithReadError = false
+
+	fs.WithWriteError = true
+	_, err = a.DigitalRead("P9_11")
+	gobottest.Assert(t, err, errors.New("write error"))
+	fs.WithWriteError = false
 
 	// I2c
 	sysfs.SetSyscall(&sysfs.MockSyscall{})
@@ -145,11 +164,6 @@ func TestBeagleboneAdaptorName(t *testing.T) {
 	gobottest.Assert(t, a.Name(), "NewName")
 }
 
-func TestBeagleboneAdaptorKernel(t *testing.T) {
-	a := NewAdaptor()
-	gobottest.Refute(t, a.Kernel(), nil)
-}
-
 func TestBeagleboneDefaultBus(t *testing.T) {
 	a := NewAdaptor()
 	gobottest.Assert(t, a.GetDefaultBus(), 2)
@@ -159,4 +173,65 @@ func TestBeagleboneGetConnectionInvalidBus(t *testing.T) {
 	a := NewAdaptor()
 	_, err := a.GetConnection(0x01, 99)
 	gobottest.Assert(t, err, errors.New("Bus number 99 out of range"))
+}
+
+func TestBeagleboneConnectNoSlot(t *testing.T) {
+	fs := sysfs.NewMockFilesystem([]string{
+		"/dev/i2c-2",
+	})
+	sysfs.SetFilesystem(fs)
+
+	a := NewAdaptor()
+	err := a.Connect()
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/devices/platform/bone_capemgr/slots: No such file."), true)
+}
+
+func TestBeagleboneAnalogReadFileError(t *testing.T) {
+	fs := sysfs.NewMockFilesystem([]string{
+		"/sys/devices/platform/bone_capemgr/slots",
+	})
+	sysfs.SetFilesystem(fs)
+
+	a := NewAdaptor()
+	a.Connect()
+
+	_, err := a.AnalogRead("P9_40")
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/bus/iio/devices/iio:device0/in_voltage1_raw: No such file."), true)
+}
+
+func TestBeagleboneDigitalPinDirectionFileError(t *testing.T) {
+	fs := sysfs.NewMockFilesystem([]string{
+		"/sys/devices/platform/bone_capemgr/slots",
+		"/sys/class/gpio/export",
+		"/sys/class/gpio/gpio60/value",
+	})
+	sysfs.SetFilesystem(fs)
+
+	a := NewAdaptor()
+	a.Connect()
+
+	err := a.DigitalWrite("P9_12", 1)
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/gpio60/direction: No such file."), true)
+
+	err = a.Finalize()
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/unexport: No such file."), true)
+}
+
+func TestBeagleboneDigitalPinFinalizeFileError(t *testing.T) {
+	fs := sysfs.NewMockFilesystem([]string{
+		"/sys/devices/platform/bone_capemgr/slots",
+		"/sys/class/gpio/export",
+		"/sys/class/gpio/gpio60/value",
+		"/sys/class/gpio/gpio60/direction",
+	})
+	sysfs.SetFilesystem(fs)
+
+	a := NewAdaptor()
+	a.Connect()
+
+	err := a.DigitalWrite("P9_12", 1)
+	gobottest.Assert(t, err, nil)
+
+	err = a.Finalize()
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/unexport: No such file."), true)
 }

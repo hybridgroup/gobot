@@ -38,7 +38,6 @@ func TestButtonDriverStart(t *testing.T) {
 	sem := make(chan bool, 0)
 	a := newGpioTestAdaptor()
 	d := NewButtonDriver(a, "1")
-	gobottest.Assert(t, d.Start(), nil)
 
 	d.Once(ButtonPush, func(data interface{}) {
 		gobottest.Assert(t, d.Active, true)
@@ -49,6 +48,8 @@ func TestButtonDriverStart(t *testing.T) {
 		val = 1
 		return
 	})
+
+	gobottest.Assert(t, d.Start(), nil)
 
 	select {
 	case <-sem:

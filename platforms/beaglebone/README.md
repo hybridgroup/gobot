@@ -9,7 +9,7 @@ For more info about the BeagleBone platform go to  [http://beagleboard.org/getti
 
 ## How to Install
 
-We recommend updating to the latest Debian Jessie OS when using the BeagleBone, however Gobot should also support older versions of the OS, should your application require this.
+We recommend updating to the latest Debian Jessie OS when using the BeagleBone. The current Gobot only supports 4.x versions of the OS. If you need support for older versions of the OS, you will need to use Gobot v1.4.
 
 You would normally install Go and Gobot on your workstation. Once installed, cross compile your program on your workstation, transfer the final executable to your BeagleBone, and run the program on the BeagleBone itself as documented here.
 

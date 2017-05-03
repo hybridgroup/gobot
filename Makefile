@@ -1,7 +1,10 @@
-.PHONY: test cover robeaux examples deps
+.PHONY: test race cover robeaux examples deps
 
 test:
 	go test ./...
+
+race:
+	go test ./... -race
 
 cover:
 	echo "" > profile.cov

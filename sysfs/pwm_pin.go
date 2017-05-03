@@ -1,9 +1,11 @@
 package sysfs
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"strconv"
+	"syscall"
 )
 
 // PWMPin is the interface for sysfs PWM interactions
@@ -36,7 +38,7 @@ type PWMPinnerProvider interface {
 
 type PWMPin struct {
 	pin     string
-	Chip    string
+	Path    string
 	enabled bool
 	write   func(path string, data []byte) (i int, err error)
 	read    func(path string) ([]byte, error)
@@ -47,15 +49,23 @@ func NewPWMPin(pin int) *PWMPin {
 	return &PWMPin{
 		pin:     strconv.Itoa(pin),
 		enabled: false,
-		Chip:    "0",
+		Path:    "/sys/class/pwm/pwmchip0",
 		read:    readPwmFile,
 		write:   writePwmFile}
 }
 
 // Export writes pin to pwm export path
-func (p *PWMPin) Export() (err error) {
-	_, err = p.write(p.pwmExportPath(), []byte(p.pin))
-	return
+func (p *PWMPin) Export() error {
+	_, err := p.write(p.pwmExportPath(), []byte(p.pin))
+	if err != nil {
+		// If EBUSY then the pin has already been exported
+		e, ok := err.(*os.PathError)
+		if !ok || e.Err != syscall.EBUSY {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // Unexport writes pin to pwm unexport path
@@ -112,7 +122,8 @@ func (p *PWMPin) Period() (period uint32, err error) {
 		return 0, nil
 	}
 
-	val, e := strconv.Atoi(string(buf))
+	v := bytes.TrimRight(buf, "\n")
+	val, e := strconv.Atoi(string(v))
 	return uint32(val), e
 }
 
@@ -140,39 +151,34 @@ func (p *PWMPin) SetDutyCycle(duty uint32) (err error) {
 	return
 }
 
-// pwmPath returns pwm base path
-func (p *PWMPin) pwmPath() string {
-	return "/sys/class/pwm/pwmchip" + p.Chip
-}
-
 // pwmExportPath returns export path
 func (p *PWMPin) pwmExportPath() string {
-	return p.pwmPath() + "/export"
+	return p.Path + "/export"
 }
 
 // pwmUnexportPath returns unexport path
 func (p *PWMPin) pwmUnexportPath() string {
-	return p.pwmPath() + "/unexport"
+	return p.Path + "/unexport"
 }
 
 // pwmDutyCyclePath returns duty_cycle path for specified pin
 func (p *PWMPin) pwmDutyCyclePath() string {
-	return p.pwmPath() + "/pwm" + p.pin + "/duty_cycle"
+	return p.Path + "/pwm" + p.pin + "/duty_cycle"
 }
 
 // pwmPeriodPath returns period path for specified pin
 func (p *PWMPin) pwmPeriodPath() string {
-	return p.pwmPath() + "/pwm" + p.pin + "/period"
+	return p.Path + "/pwm" + p.pin + "/period"
 }
 
 // pwmEnablePath returns enable path for specified pin
 func (p *PWMPin) pwmEnablePath() string {
-	return p.pwmPath() + "/pwm" + p.pin + "/enable"
+	return p.Path + "/pwm" + p.pin + "/enable"
 }
 
 // pwmPolarityPath returns polarity path for specified pin
 func (p *PWMPin) pwmPolarityPath() string {
-	return p.pwmPath() + "/pwm" + p.pin + "/polarity"
+	return p.Path + "/pwm" + p.pin + "/polarity"
 }
 
 func writePwmFile(path string, data []byte) (i int, err error) {

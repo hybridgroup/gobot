@@ -23,77 +23,79 @@ var _ sysfs.DigitalPinnerProvider = (*Adaptor)(nil)
 var _ sysfs.PWMPinnerProvider = (*Adaptor)(nil)
 var _ i2c.Connector = (*Adaptor)(nil)
 
+var testPinFiles = []string{
+	"/sys/bus/iio/devices/iio:device1/in_voltage0_raw",
+	"/sys/kernel/debug/gpio_debug/gpio111/current_pinmux",
+	"/sys/kernel/debug/gpio_debug/gpio115/current_pinmux",
+	"/sys/kernel/debug/gpio_debug/gpio114/current_pinmux",
+	"/sys/kernel/debug/gpio_debug/gpio109/current_pinmux",
+	"/sys/kernel/debug/gpio_debug/gpio131/current_pinmux",
+	"/sys/kernel/debug/gpio_debug/gpio129/current_pinmux",
+	"/sys/kernel/debug/gpio_debug/gpio40/current_pinmux",
+	"/sys/kernel/debug/gpio_debug/gpio13/current_pinmux",
+	"/sys/kernel/debug/gpio_debug/gpio28/current_pinmux",
+	"/sys/kernel/debug/gpio_debug/gpio27/current_pinmux",
+	"/sys/class/pwm/pwmchip0/export",
+	"/sys/class/pwm/pwmchip0/unexport",
+	"/sys/class/pwm/pwmchip0/pwm1/duty_cycle",
+	"/sys/class/pwm/pwmchip0/pwm1/period",
+	"/sys/class/pwm/pwmchip0/pwm1/enable",
+	"/sys/class/gpio/export",
+	"/sys/class/gpio/unexport",
+	"/sys/class/gpio/gpio13/value",
+	"/sys/class/gpio/gpio13/direction",
+	"/sys/class/gpio/gpio40/value",
+	"/sys/class/gpio/gpio40/direction",
+	"/sys/class/gpio/gpio128/value",
+	"/sys/class/gpio/gpio128/direction",
+	"/sys/class/gpio/gpio221/value",
+	"/sys/class/gpio/gpio221/direction",
+	"/sys/class/gpio/gpio243/value",
+	"/sys/class/gpio/gpio243/direction",
+	"/sys/class/gpio/gpio229/value",
+	"/sys/class/gpio/gpio229/direction",
+	"/sys/class/gpio/gpio253/value",
+	"/sys/class/gpio/gpio253/direction",
+	"/sys/class/gpio/gpio261/value",
+	"/sys/class/gpio/gpio261/direction",
+	"/sys/class/gpio/gpio214/value",
+	"/sys/class/gpio/gpio214/direction",
+	"/sys/class/gpio/gpio14/direction",
+	"/sys/class/gpio/gpio14/value",
+	"/sys/class/gpio/gpio165/direction",
+	"/sys/class/gpio/gpio165/value",
+	"/sys/class/gpio/gpio212/direction",
+	"/sys/class/gpio/gpio212/value",
+	"/sys/class/gpio/gpio213/direction",
+	"/sys/class/gpio/gpio213/value",
+	"/sys/class/gpio/gpio236/direction",
+	"/sys/class/gpio/gpio236/value",
+	"/sys/class/gpio/gpio237/direction",
+	"/sys/class/gpio/gpio237/value",
+	"/sys/class/gpio/gpio204/direction",
+	"/sys/class/gpio/gpio204/value",
+	"/sys/class/gpio/gpio205/direction",
+	"/sys/class/gpio/gpio205/value",
+	"/sys/class/gpio/gpio263/direction",
+	"/sys/class/gpio/gpio263/value",
+	"/sys/class/gpio/gpio262/direction",
+	"/sys/class/gpio/gpio262/value",
+	"/sys/class/gpio/gpio240/direction",
+	"/sys/class/gpio/gpio240/value",
+	"/sys/class/gpio/gpio241/direction",
+	"/sys/class/gpio/gpio241/value",
+	"/sys/class/gpio/gpio242/direction",
+	"/sys/class/gpio/gpio242/value",
+	"/sys/class/gpio/gpio218/direction",
+	"/sys/class/gpio/gpio218/value",
+	"/sys/class/gpio/gpio250/direction",
+	"/sys/class/gpio/gpio250/value",
+	"/dev/i2c-6",
+}
+
 func initTestAdaptor() (*Adaptor, *sysfs.MockFilesystem) {
 	a := NewAdaptor()
-	fs := sysfs.NewMockFilesystem([]string{
-		"/sys/bus/iio/devices/iio:device1/in_voltage0_raw",
-		"/sys/kernel/debug/gpio_debug/gpio111/current_pinmux",
-		"/sys/kernel/debug/gpio_debug/gpio115/current_pinmux",
-		"/sys/kernel/debug/gpio_debug/gpio114/current_pinmux",
-		"/sys/kernel/debug/gpio_debug/gpio109/current_pinmux",
-		"/sys/kernel/debug/gpio_debug/gpio131/current_pinmux",
-		"/sys/kernel/debug/gpio_debug/gpio129/current_pinmux",
-		"/sys/kernel/debug/gpio_debug/gpio40/current_pinmux",
-		"/sys/kernel/debug/gpio_debug/gpio13/current_pinmux",
-		"/sys/kernel/debug/gpio_debug/gpio28/current_pinmux",
-		"/sys/kernel/debug/gpio_debug/gpio27/current_pinmux",
-		"/sys/class/pwm/pwmchip0/export",
-		"/sys/class/pwm/pwmchip0/unexport",
-		"/sys/class/pwm/pwmchip0/pwm1/duty_cycle",
-		"/sys/class/pwm/pwmchip0/pwm1/period",
-		"/sys/class/pwm/pwmchip0/pwm1/enable",
-		"/sys/class/gpio/export",
-		"/sys/class/gpio/unexport",
-		"/sys/class/gpio/gpio13/value",
-		"/sys/class/gpio/gpio13/direction",
-		"/sys/class/gpio/gpio40/value",
-		"/sys/class/gpio/gpio40/direction",
-		"/sys/class/gpio/gpio128/value",
-		"/sys/class/gpio/gpio128/direction",
-		"/sys/class/gpio/gpio221/value",
-		"/sys/class/gpio/gpio221/direction",
-		"/sys/class/gpio/gpio243/value",
-		"/sys/class/gpio/gpio243/direction",
-		"/sys/class/gpio/gpio229/value",
-		"/sys/class/gpio/gpio229/direction",
-		"/sys/class/gpio/gpio253/value",
-		"/sys/class/gpio/gpio253/direction",
-		"/sys/class/gpio/gpio261/value",
-		"/sys/class/gpio/gpio261/direction",
-		"/sys/class/gpio/gpio214/value",
-		"/sys/class/gpio/gpio214/direction",
-		"/sys/class/gpio/gpio14/direction",
-		"/sys/class/gpio/gpio14/value",
-		"/sys/class/gpio/gpio165/direction",
-		"/sys/class/gpio/gpio165/value",
-		"/sys/class/gpio/gpio212/direction",
-		"/sys/class/gpio/gpio212/value",
-		"/sys/class/gpio/gpio213/direction",
-		"/sys/class/gpio/gpio213/value",
-		"/sys/class/gpio/gpio236/direction",
-		"/sys/class/gpio/gpio236/value",
-		"/sys/class/gpio/gpio237/direction",
-		"/sys/class/gpio/gpio237/value",
-		"/sys/class/gpio/gpio204/direction",
-		"/sys/class/gpio/gpio204/value",
-		"/sys/class/gpio/gpio205/direction",
-		"/sys/class/gpio/gpio205/value",
-		"/sys/class/gpio/gpio263/direction",
-		"/sys/class/gpio/gpio263/value",
-		"/sys/class/gpio/gpio262/direction",
-		"/sys/class/gpio/gpio262/value",
-		"/sys/class/gpio/gpio240/direction",
-		"/sys/class/gpio/gpio240/value",
-		"/sys/class/gpio/gpio241/direction",
-		"/sys/class/gpio/gpio241/value",
-		"/sys/class/gpio/gpio242/direction",
-		"/sys/class/gpio/gpio242/value",
-		"/sys/class/gpio/gpio218/direction",
-		"/sys/class/gpio/gpio218/value",
-		"/sys/class/gpio/gpio250/direction",
-		"/sys/class/gpio/gpio250/value",
-		"/dev/i2c-6",
-	})
+	fs := sysfs.NewMockFilesystem(testPinFiles)
 	sysfs.SetFilesystem(fs)
 	fs.Files["/sys/class/pwm/pwmchip0/pwm1/period"].Contents = "5000"
 	a.Connect()
@@ -113,9 +115,89 @@ func TestAdaptorConnect(t *testing.T) {
 	gobottest.Assert(t, a.GetDefaultBus(), 6)
 	gobottest.Assert(t, a.Board(), "arduino")
 
-	a = NewAdaptor()
-	sysfs.SetFilesystem(sysfs.NewMockFilesystem([]string{}))
-	gobottest.Refute(t, a.Connect(), nil)
+	gobottest.Assert(t, a.Connect(), nil)
+}
+
+func TestAdaptorArduinoSetupFail263(t *testing.T) {
+	a, fs := initTestAdaptor()
+	delete(fs.Files, "/sys/class/gpio/gpio263/direction")
+
+	err := a.arduinoSetup()
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/gpio263/direction: No such file"), true)
+}
+
+func TestAdaptorArduinoSetupFail240(t *testing.T) {
+	a, fs := initTestAdaptor()
+	delete(fs.Files, "/sys/class/gpio/gpio240/direction")
+
+	err := a.arduinoSetup()
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/gpio240/direction: No such file"), true)
+}
+
+func TestAdaptorArduinoSetupFail111(t *testing.T) {
+	a, fs := initTestAdaptor()
+	delete(fs.Files, "/sys/kernel/debug/gpio_debug/gpio111/current_pinmux")
+
+	err := a.arduinoSetup()
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/kernel/debug/gpio_debug/gpio111/current_pinmux: No such file"), true)
+}
+
+func TestAdaptorArduinoSetupFail131(t *testing.T) {
+	a, fs := initTestAdaptor()
+	delete(fs.Files, "/sys/kernel/debug/gpio_debug/gpio131/current_pinmux")
+
+	err := a.arduinoSetup()
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/kernel/debug/gpio_debug/gpio131/current_pinmux: No such file"), true)
+}
+
+func TestAdaptorArduinoI2CSetupFailTristate(t *testing.T) {
+	a, fs := initTestAdaptor()
+
+	gobottest.Assert(t, a.arduinoSetup(), nil)
+
+	fs.WithWriteError = true
+	err := a.arduinoI2CSetup()
+	gobottest.Assert(t, err, errors.New("write error"))
+}
+
+func TestAdaptorArduinoI2CSetupFail14(t *testing.T) {
+	a, fs := initTestAdaptor()
+
+	gobottest.Assert(t, a.arduinoSetup(), nil)
+	delete(fs.Files, "/sys/class/gpio/gpio14/direction")
+
+	err := a.arduinoI2CSetup()
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/gpio14/direction: No such file"), true)
+}
+
+func TestAdaptorArduinoI2CSetupUnexportFail(t *testing.T) {
+	a, fs := initTestAdaptor()
+
+	gobottest.Assert(t, a.arduinoSetup(), nil)
+	delete(fs.Files, "/sys/class/gpio/unexport")
+
+	err := a.arduinoI2CSetup()
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/unexport: No such file"), true)
+}
+
+func TestAdaptorArduinoI2CSetupFail236(t *testing.T) {
+	a, fs := initTestAdaptor()
+
+	gobottest.Assert(t, a.arduinoSetup(), nil)
+	delete(fs.Files, "/sys/class/gpio/gpio236/direction")
+
+	err := a.arduinoI2CSetup()
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/gpio236/direction: No such file"), true)
+}
+
+func TestAdaptorArduinoI2CSetupFail28(t *testing.T) {
+	a, fs := initTestAdaptor()
+
+	gobottest.Assert(t, a.arduinoSetup(), nil)
+	delete(fs.Files, "/sys/kernel/debug/gpio_debug/gpio28/current_pinmux")
+
+	err := a.arduinoI2CSetup()
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/kernel/debug/gpio_debug/gpio28/current_pinmux: No such file"), true)
 }
 
 func TestAdaptorConnectArduinoError(t *testing.T) {
@@ -171,6 +253,14 @@ func TestAdaptorFinalize(t *testing.T) {
 	gobottest.Refute(t, a.Finalize(), nil)
 }
 
+func TestAdaptorFinalizeError(t *testing.T) {
+	a, fs := initTestAdaptor()
+	a.PwmWrite("5", 100)
+
+	fs.WithWriteError = true
+	gobottest.Refute(t, a.Finalize(), nil)
+}
+
 func TestAdaptorDigitalIO(t *testing.T) {
 	a, fs := initTestAdaptor()
 
@@ -181,6 +271,99 @@ func TestAdaptorDigitalIO(t *testing.T) {
 	i, err := a.DigitalRead("2")
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, i, 0)
+}
+
+func TestAdaptorDigitalPinInFileError(t *testing.T) {
+	a := NewAdaptor()
+	fs := sysfs.NewMockFilesystem([]string{
+		"/sys/kernel/debug/gpio_debug/gpio40/current_pinmux",
+		"/sys/class/gpio/export",
+		"/sys/class/gpio/unexport",
+		// "/sys/class/gpio/gpio40/value",
+		// "/sys/class/gpio/gpio40/direction",
+		"/sys/class/gpio/gpio229/value", // resistor
+		"/sys/class/gpio/gpio229/direction",
+		"/sys/class/gpio/gpio243/value",
+		"/sys/class/gpio/gpio243/direction",
+		"/sys/class/gpio/gpio261/value", // level shifter
+		"/sys/class/gpio/gpio261/direction",
+	})
+	sysfs.SetFilesystem(fs)
+
+	a.Connect()
+
+	_, err := a.DigitalPin("13", "in")
+	gobottest.Assert(t, strings.Contains(err.Error(), "No such file"), true)
+
+}
+
+func TestAdaptorDigitalPinInResistorFileError(t *testing.T) {
+	a := NewAdaptor()
+	fs := sysfs.NewMockFilesystem([]string{
+		"/sys/kernel/debug/gpio_debug/gpio40/current_pinmux",
+		"/sys/class/gpio/export",
+		"/sys/class/gpio/unexport",
+		"/sys/class/gpio/gpio40/value",
+		"/sys/class/gpio/gpio40/direction",
+		// "/sys/class/gpio/gpio229/value", // resistor
+		// "/sys/class/gpio/gpio229/direction",
+		"/sys/class/gpio/gpio243/value",
+		"/sys/class/gpio/gpio243/direction",
+		"/sys/class/gpio/gpio261/value", // level shifter
+		"/sys/class/gpio/gpio261/direction",
+	})
+	sysfs.SetFilesystem(fs)
+
+	a.Connect()
+
+	_, err := a.DigitalPin("13", "in")
+	gobottest.Assert(t, strings.Contains(err.Error(), "No such file"), true)
+}
+
+func TestAdaptorDigitalPinInLevelShifterFileError(t *testing.T) {
+	a := NewAdaptor()
+	fs := sysfs.NewMockFilesystem([]string{
+		"/sys/kernel/debug/gpio_debug/gpio40/current_pinmux",
+		"/sys/class/gpio/export",
+		"/sys/class/gpio/unexport",
+		"/sys/class/gpio/gpio40/value",
+		"/sys/class/gpio/gpio40/direction",
+		"/sys/class/gpio/gpio229/value", // resistor
+		"/sys/class/gpio/gpio229/direction",
+		"/sys/class/gpio/gpio243/value",
+		"/sys/class/gpio/gpio243/direction",
+		// "/sys/class/gpio/gpio261/value", // level shifter
+		// "/sys/class/gpio/gpio261/direction",
+	})
+	sysfs.SetFilesystem(fs)
+
+	a.Connect()
+
+	_, err := a.DigitalPin("13", "in")
+	gobottest.Assert(t, strings.Contains(err.Error(), "No such file"), true)
+}
+
+func TestAdaptorDigitalPinInMuxFileError(t *testing.T) {
+	a := NewAdaptor()
+	fs := sysfs.NewMockFilesystem([]string{
+		"/sys/kernel/debug/gpio_debug/gpio40/current_pinmux",
+		"/sys/class/gpio/export",
+		"/sys/class/gpio/unexport",
+		"/sys/class/gpio/gpio40/value",
+		"/sys/class/gpio/gpio40/direction",
+		"/sys/class/gpio/gpio229/value", // resistor
+		"/sys/class/gpio/gpio229/direction",
+		// "/sys/class/gpio/gpio243/value",
+		// "/sys/class/gpio/gpio243/direction",
+		"/sys/class/gpio/gpio261/value", // level shifter
+		"/sys/class/gpio/gpio261/direction",
+	})
+	sysfs.SetFilesystem(fs)
+
+	a.Connect()
+
+	_, err := a.DigitalPin("13", "in")
+	gobottest.Assert(t, strings.Contains(err.Error(), "No such file"), true)
 }
 
 func TestAdaptorDigitalWriteError(t *testing.T) {
@@ -229,6 +412,54 @@ func TestAdaptorPwm(t *testing.T) {
 
 	err = a.PwmWrite("7", 100)
 	gobottest.Assert(t, err, errors.New("Not a PWM pin"))
+}
+
+func TestAdaptorPwmExportError(t *testing.T) {
+	a := NewAdaptor()
+	fs := sysfs.NewMockFilesystem([]string{
+		"/sys/kernel/debug/gpio_debug/gpio13/current_pinmux",
+		"/sys/class/gpio/export",
+		"/sys/class/gpio/gpio13/direction",
+		"/sys/class/gpio/gpio13/value",
+		"/sys/class/gpio/gpio221/direction",
+		"/sys/class/gpio/gpio221/value",
+		"/sys/class/gpio/gpio253/direction",
+		"/sys/class/gpio/gpio253/value",
+		//"/sys/class/pwm/pwmchip0/export",
+		"/sys/class/pwm/pwmchip0/unexport",
+		"/sys/class/pwm/pwmchip0/pwm1/duty_cycle",
+		"/sys/class/pwm/pwmchip0/pwm1/period",
+		"/sys/class/pwm/pwmchip0/pwm1/enable",
+	})
+	sysfs.SetFilesystem(fs)
+	a.Connect()
+
+	err := a.PwmWrite("5", 100)
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/pwm/pwmchip0/export: No such file"), true)
+}
+
+func TestAdaptorPwmEnableError(t *testing.T) {
+	a := NewAdaptor()
+	fs := sysfs.NewMockFilesystem([]string{
+		"/sys/kernel/debug/gpio_debug/gpio13/current_pinmux",
+		"/sys/class/gpio/export",
+		"/sys/class/gpio/gpio13/direction",
+		"/sys/class/gpio/gpio13/value",
+		"/sys/class/gpio/gpio221/direction",
+		"/sys/class/gpio/gpio221/value",
+		"/sys/class/gpio/gpio253/direction",
+		"/sys/class/gpio/gpio253/value",
+		"/sys/class/pwm/pwmchip0/export",
+		"/sys/class/pwm/pwmchip0/unexport",
+		"/sys/class/pwm/pwmchip0/pwm1/duty_cycle",
+		"/sys/class/pwm/pwmchip0/pwm1/period",
+		//"/sys/class/pwm/pwmchip0/pwm1/enable",
+	})
+	sysfs.SetFilesystem(fs)
+	a.Connect()
+
+	err := a.PwmWrite("5", 100)
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/pwm/pwmchip0/pwm1/enable: No such file"), true)
 }
 
 func TestAdaptorPwmWritePinError(t *testing.T) {
