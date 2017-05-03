@@ -180,3 +180,21 @@ func TestAdaptorPwm(t *testing.T) {
 	err = a.PwmWrite("4", 100)
 	gobottest.Assert(t, err, errors.New("Not a PWM pin"))
 }
+
+func TestAdaptorPwmPinExportError(t *testing.T) {
+	a, fs := initTestAdaptor()
+
+	delete(fs.Files, "/sys/class/pwm/pwmchip0/export")
+
+	err := a.PwmWrite("25", 100)
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/pwm/pwmchip0/export: No such file"), true)
+}
+
+func TestAdaptorPwmPinEnableError(t *testing.T) {
+	a, fs := initTestAdaptor()
+
+	delete(fs.Files, "/sys/class/pwm/pwmchip0/pwm0/enable")
+
+	err := a.PwmWrite("25", 100)
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/pwm/pwmchip0/pwm0/enable: No such file"), true)
+}
