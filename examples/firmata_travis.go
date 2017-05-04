@@ -49,10 +49,10 @@ func checkTravis(robot *gobot.Robot) {
 	fmt.Printf("Checking repo %s/%s\n", user, name)
 	turnOn(robot, "blue")
 	resp, err := http.Get(fmt.Sprintf("https://api.travis-ci.org/repos/%s/%s.json", user, name))
-	defer resp.Body.Close()
 	if err != nil {
 		panic(err)
 	}
+	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		panic(err)
