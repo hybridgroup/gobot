@@ -92,7 +92,7 @@ func initTestFirmata() *Client {
 	}
 
 	b.setConnected(true)
-	b.Connect(readWriteCloser{})
+	//b.Connect(readWriteCloser{})
 
 	return b
 }
@@ -100,19 +100,19 @@ func initTestFirmata() *Client {
 func TestReportVersion(t *testing.T) {
 	b := initTestFirmata()
 	//test if functions executes
-	b.ProtocolVersionQuery()
+	gobottest.Assert(t, b.ProtocolVersionQuery(), nil)
 }
 
 func TestQueryFirmware(t *testing.T) {
 	b := initTestFirmata()
 	//test if functions executes
-	b.FirmwareQuery()
+	gobottest.Assert(t, b.FirmwareQuery(), nil)
 }
 
 func TestQueryPinState(t *testing.T) {
 	b := initTestFirmata()
 	//test if functions executes
-	b.PinStateQuery(1)
+	gobottest.Assert(t, b.PinStateQuery(1), nil)
 }
 
 func TestProcessProtocolVersion(t *testing.T) {
@@ -285,7 +285,6 @@ func TestProcessStringData(t *testing.T) {
 		sem <- true
 	})
 
-	time.Sleep(10 * time.Millisecond)
 	go b.process()
 
 	select {
@@ -339,6 +338,8 @@ func TestConnect(t *testing.T) {
 	}()
 
 	gobottest.Assert(t, b.Connect(readWriteCloser{}), nil)
+	time.Sleep(150 * time.Millisecond)
+	gobottest.Assert(t, b.Disconnect(), nil)
 }
 
 func TestServoConfig(t *testing.T) {
