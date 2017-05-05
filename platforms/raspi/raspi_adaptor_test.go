@@ -10,6 +10,9 @@ import (
 	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/gobottest"
 	"gobot.io/x/gobot/sysfs"
+	"runtime"
+	"sync"
+	"strconv"
 )
 
 // make sure that this Adaptor fullfills all the required interfaces
@@ -173,4 +176,54 @@ func TestAdaptorI2c(t *testing.T) {
 	gobottest.Assert(t, err, errors.New("Bus number 51 out of range"))
 
 	gobottest.Assert(t, a.GetDefaultBus(), 1)
+}
+
+func TestAdaptorDigitalPinConcurrency(t *testing.T) {
+
+	oldProcs := runtime.GOMAXPROCS(0)
+	runtime.GOMAXPROCS(8)
+
+	for retry := 0; retry < 20; retry++ {
+
+		a := initTestAdaptor()
+		var wg sync.WaitGroup
+		wg.Add(20)
+
+		for i := 0; i < 20; i++ {
+			pinAsString := strconv.Itoa(i)
+			go func() {
+				defer wg.Done()
+				a.DigitalPin(pinAsString, sysfs.IN)
+			}()
+		}
+
+		wg.Wait()
+	}
+
+	runtime.GOMAXPROCS(oldProcs)
+
+}
+
+
+func TestAdaptorPWMPin(t *testing.T) {
+	a := initTestAdaptor()
+
+	gobottest.Assert(t, len(a.pwmPins), 0)
+
+	firstSysPin, err := a.PWMPin("35")
+
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, len(a.pwmPins), 1)
+
+	secondSysPin, err := a.PWMPin("35")
+
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, len(a.pwmPins), 1)
+	gobottest.Assert(t, firstSysPin, secondSysPin)
+
+	otherSysPin, err := a.PWMPin("36")
+
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, len(a.pwmPins), 2)
+	gobottest.Refute(t, firstSysPin, otherSysPin)
 }
