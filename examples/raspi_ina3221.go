@@ -1,12 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/platforms/raspi"
-	"log"
 )
 
 func main() {
@@ -17,33 +17,35 @@ func main() {
 	work := func() {
 
 		gobot.Every(5*time.Second, func() {
-			bv, err := ina.GetBusVoltage(i2c.INA3221Channel1)
-			if err != nil {
+			for _, ch := range []i2c.INA3221Channel{i2c.INA3221Channel1, i2c.INA3221Channel2, i2c.INA3221Channel3} {
+				val, err := ina.GetBusVoltage(ch)
+				if err != nil {
+					fmt.Printf("INA3221Channel %v Bus Voltage error: %v\n", ch, err)
+				}
+				fmt.Printf("INA3221Channel %v Bus Voltage: %fV\n", ch, val)
 
+				val, err = ina.GetShuntVoltage(ch)
+				if err != nil {
+					fmt.Printf("INA3221Channel %v Shunt Voltage error: %v\n", ch, err)
+				}
+				fmt.Printf("INA3221Channel %v Shunt Voltage: %fV\n", ch, val)
+
+				val, err = ina.GetCurrent(ch)
+				if err != nil {
+					fmt.Printf("INA3221Channel %v Current error: %v\n", ch, err)
+				}
+				fmt.Printf("INA3221Channel %v Current: %fmA\n", ch, val)
+
+				val, err = ina.GetLoadVoltage(ch)
+				if err != nil {
+					fmt.Printf("INA3221Channel %v Load Voltage error: %v\n", ch, err)
+				}
+				fmt.Printf("INA3221Channel %v Load Voltage: %fV\n", ch, val)
 			}
-			log.Printf("Ch 1 Bus Voltage: %f", bv)
-
-			sv, err := ina.GetShuntVoltage(i2c.INA3221Channel1)
-			if err != nil {
-
-			}
-			log.Printf("Ch 1 Shunt Voltage: %f", sv)
-
-			ma, err := ina.GetCurrent(i2c.INA3221Channel1)
-			if err != nil {
-
-			}
-			log.Printf("Ch 1 Current: %f", ma)
-
-			lv, err := ina.GetLoadVoltage(i2c.INA3221Channel1)
-			if err != nil {
-
-			}
-			log.Printf("Ch 1 Load Voltage: %f", lv)
 		})
 	}
 
-	robot := gobot.NewRobot("ina3221Robot",
+	robot := gobot.NewRobot("INA3221 Robot",
 		[]gobot.Connection{r},
 		[]gobot.Device{ina},
 		work,
