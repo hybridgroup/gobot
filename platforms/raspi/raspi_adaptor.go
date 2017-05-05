@@ -122,7 +122,6 @@ func (r *Adaptor) DigitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPinn
 		return
 	}
 
-
 	if err = currentPin.Direction(dir); err != nil {
 		return
 	}

@@ -11,8 +11,8 @@ import (
 	"gobot.io/x/gobot/gobottest"
 	"gobot.io/x/gobot/sysfs"
 	"runtime"
-	"sync"
 	"strconv"
+	"sync"
 )
 
 // make sure that this Adaptor fullfills all the required interfaces
@@ -203,7 +203,6 @@ func TestAdaptorDigitalPinConcurrency(t *testing.T) {
 	runtime.GOMAXPROCS(oldProcs)
 
 }
-
 
 func TestAdaptorPWMPin(t *testing.T) {
 	a := initTestAdaptor()
