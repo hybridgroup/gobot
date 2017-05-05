@@ -11,6 +11,7 @@ import (
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/sysfs"
+	"sync"
 )
 
 var readFile = func() ([]byte, error) {
@@ -19,6 +20,7 @@ var readFile = func() ([]byte, error) {
 
 // Adaptor is the Gobot Adaptor for the Raspberry Pi
 type Adaptor struct {
+	mutex         *sync.Mutex
 	name          string
 	revision      string
 	digitalPins   map[int]*sysfs.DigitalPin
@@ -30,6 +32,7 @@ type Adaptor struct {
 // NewAdaptor creates a Raspi Adaptor
 func NewAdaptor() *Adaptor {
 	r := &Adaptor{
+		mutex:       &sync.Mutex{},
 		name:        gobot.DefaultName("RaspberryPi"),
 		digitalPins: make(map[int]*sysfs.DigitalPin),
 		pwmPins:     make(map[int]*PWMPin),
@@ -55,10 +58,20 @@ func NewAdaptor() *Adaptor {
 }
 
 // Name returns the Adaptor's name
-func (r *Adaptor) Name() string { return r.name }
+func (r *Adaptor) Name() string {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+
+	return r.name
+}
 
 // SetName sets the Adaptor's name
-func (r *Adaptor) SetName(n string) { r.name = n }
+func (r *Adaptor) SetName(n string) {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+
+	r.name = n
+}
 
 // Connect starts connection with board and creates
 // digitalPins and pwmPins adaptor maps
@@ -68,6 +81,9 @@ func (r *Adaptor) Connect() (err error) {
 
 // Finalize closes connection to board and pins
 func (r *Adaptor) Finalize() (err error) {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+
 	for _, pin := range r.digitalPins {
 		if pin != nil {
 			if perr := pin.Unexport(); err != nil {
@@ -100,18 +116,31 @@ func (r *Adaptor) DigitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPinn
 		return
 	}
 
-	if r.digitalPins[i] == nil {
-		r.digitalPins[i] = sysfs.NewDigitalPin(i)
-		if err = r.digitalPins[i].Export(); err != nil {
+	currentPin, err := r.getExportedDigitalPin(i, dir)
+
+	if err != nil {
+		return
+	}
+
+	if err = currentPin.Direction(dir); err != nil {
+		return
+	}
+
+	return currentPin, nil
+}
+
+func (r *Adaptor) getExportedDigitalPin(translatedPin int, dir string) (sysfsPin sysfs.DigitalPinner, err error) {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+
+	if r.digitalPins[translatedPin] == nil {
+		r.digitalPins[translatedPin] = sysfs.NewDigitalPin(translatedPin)
+		if err = r.digitalPins[translatedPin].Export(); err != nil {
 			return
 		}
 	}
 
-	if err = r.digitalPins[i].Direction(dir); err != nil {
-		return
-	}
-
-	return r.digitalPins[i], nil
+	return r.digitalPins[translatedPin], nil
 }
 
 // DigitalRead reads digital value from pin
@@ -138,10 +167,21 @@ func (r *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection
 	if (bus < 0) || (bus > 1) {
 		return nil, fmt.Errorf("Bus number %d out of range", bus)
 	}
+
+	device, err := r.getI2cBus(bus)
+
+	return i2c.NewConnection(device, address), err
+}
+
+func (r *Adaptor) getI2cBus(bus int) (_ sysfs.I2cDevice, err error) {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+
 	if r.i2cBuses[bus] == nil {
 		r.i2cBuses[bus], err = sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
 	}
-	return i2c.NewConnection(r.i2cBuses[bus], address), err
+
+	return r.i2cBuses[bus], err
 }
 
 // GetDefaultBus returns the default i2c bus for this platform
@@ -155,6 +195,9 @@ func (r *Adaptor) PWMPin(pin string) (raspiPWMPin sysfs.PWMPinner, err error) {
 	if err != nil {
 		return
 	}
+
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
 
 	if r.pwmPins[i] == nil {
 		r.pwmPins[i] = NewPWMPin(strconv.Itoa(i))
