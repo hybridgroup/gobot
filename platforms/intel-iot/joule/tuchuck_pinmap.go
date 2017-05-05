@@ -1,369 +1,406 @@
 package joule
 
 var sysfsPinMap = map[string]sysfsPin{
-	// disabled
-	"0": {
-		pin:    -1,
+	// GPIO22
+	"J12_1": {
+		pin:    451,
 		pwmPin: -1,
 	},
-	"1": {
-		pin:    446,
-		pwmPin: -1,
-	},
-	"2": {
+	// SPP1RX
+	"J12_2": {
 		pin:    421,
 		pwmPin: -1,
 	},
-	// disabled
-	"3": {
+	// PMICRST
+	"J12_3": {
 		pin:    -1,
 		pwmPin: -1,
 	},
-	"4": {
+	// SPP1TX
+	"J12_4": {
 		pin:    422,
 		pwmPin: -1,
 	},
-	"5": {
+	// 19.2mhz
+	"J12_5": {
 		pin:    356,
 		pwmPin: -1,
 	},
-	"6": {
+	// SPP1FS0
+	"J12_6": {
 		pin:    417,
 		pwmPin: -1,
 	},
-	// UART
-	"7": {
+	// UART0TX
+	"J12_7": {
 		pin:    -1,
 		pwmPin: -1,
 	},
-	"8": {
+	// SPP1FS2
+	"J12_8": {
 		pin:    419,
 		pwmPin: -1,
 	},
-	// disabled
-	"9": {
+	// PWRGD
+	"J12_9": {
 		pin:    -1,
 		pwmPin: -1,
 	},
-	"10": {
+	// SPP1CLK
+	"J12_10": {
 		pin:    416,
 		pwmPin: -1,
 	},
-	"11": {
-		pin:    381,
+	// I2C0SDA
+	"J12_11": {
+		pin:    -1,
 		pwmPin: -1,
 	},
-	"13": {
-		pin:    382,
+	// I2S1SDI
+	"J12_12": {
+		pin:    -1,
 		pwmPin: -1,
 	},
-	"15": {
+	// I2C0SCL
+	"J12_13": {
+		pin:    -1,
+		pwmPin: -1,
+	},
+	// I2S1SDO
+	"J12_14": {
+		pin:    -1,
+		pwmPin: -1,
+	},
+	// II0SDA
+	"J12_15": {
+		pin:    -1,
+		pwmPin: -1,
+	},
+	// I2S1WS
+	"J12_16": {
 		pin:    380,
 		pwmPin: -1,
 	},
-	"17": {
+	// IIC0SCL
+	"J12_17": {
+		pin:    -1,
+		pwmPin: -1,
+	},
+	// I2S1CLK
+	"J12_18": {
 		pin:    379,
 		pwmPin: -1,
 	},
-	"19": {
+	// IIC1SDA
+	"J12_19": {
+		pin:    -1,
+		pwmPin: -1,
+	},
+	// I2S1MCL
+	"J12_20": {
 		pin:    378,
 		pwmPin: -1,
 	},
-	// UART
-	"21": {
+	// IIC1SCL
+	"J12_21": {
 		pin:    -1,
 		pwmPin: -1,
 	},
-	// disabled
-	"22": {
+	// UART1TX
+	"J12_22": {
 		pin:    -1,
 		pwmPin: -1,
 	},
-	// UART
-	"23": {
+	// ISH_IO6
+	"J12_23": {
+		pin:    343,
+		pwmPin: -1,
+	},
+	// UART1RX
+	"J12_24": {
 		pin:    -1,
 		pwmPin: -1,
 	},
-	// disabled
-	"24": {
-		pin:    -1,
+	// ISH_IO5
+	"J12_25": {
+		pin:    342,
 		pwmPin: -1,
 	},
-	"25": {
+	// PWM0
+	"J12_26": {
 		pin:    463,
 		pwmPin: 0,
 	},
-	// low voltage should not use
-	"26": {
-		pin:    -1,
+	// ISH_IO4
+	"J12_27": {
+		pin:    341,
 		pwmPin: -1,
 	},
-	"27": {
+	// PWM1
+	"J12_28": {
 		pin:    464,
 		pwmPin: 1,
 	},
-	// disabled
-	"28": {
-		pin:    -1,
+	// ISH_IO3
+	"J12_29": {
+		pin:    340,
 		pwmPin: -1,
 	},
-	"29": {
+	// PWM2
+	"J12_30": {
 		pin:    465,
 		pwmPin: 2,
 	},
-	// disabled?
-	"30": {
-		pin:    -1,
+	// ISH_IO2
+	"J12_31": {
+		pin:    339,
 		pwmPin: -1,
 	},
-	"31": {
+	// PWM3
+	"J12_32": {
 		pin:    466,
 		pwmPin: 3,
 	},
-	// disabled?
-	"32": {
+	// ISH_IO1
+	"J12_33": {
+		pin:    338,
+		pwmPin: -1,
+	},
+	// 1.8V
+	"J12_34": {
 		pin:    -1,
 		pwmPin: -1,
 	},
-	// disabled
-	"33": {
-		pin:    -1,
-		pwmPin: -1,
-	},
-	"34": {
-		pin:    393,
+	// ISH_IO0
+	"J12_35": {
+		pin:    337,
 		pwmPin: -1,
 	},
 	// GND
-	"35": {
-		pin:    -1,
-		pwmPin: -1,
-	},
-	// GND
-	"36": {
+	"J12_36": {
 		pin:    -1,
 		pwmPin: -1,
 	},
 	// GND
-	"37": {
+	"J12_37": {
 		pin:    -1,
 		pwmPin: -1,
 	},
 	// GND
-	"38": {
-		pin:    -1,
-		pwmPin: -1,
-	},
-	// disabled
-	"39": {
+	"J12_38": {
 		pin:    -1,
 		pwmPin: -1,
 	},
 	// GND
-	"40": {
+	"J12_39": {
+		pin:    -1,
+		pwmPin: -1,
+	},
+	// GND
+	"J12_40": {
 		pin:    -1,
 		pwmPin: -1,
 	},
 
 	// Second header
 	// GND
-	"41": {
+	"J13_1": {
 		pin:    -1,
 		pwmPin: -1,
 	},
 	// 5V
-	"42": {
+	"J13_2": {
 		pin:    -1,
 		pwmPin: -1,
 	},
 	// GND
-	"43": {
+	"J13_3": {
 		pin:    -1,
 		pwmPin: -1,
 	},
 	// 5V
-	"44": {
+	"J13_4": {
 		pin:    -1,
 		pwmPin: -1,
 	},
 	// GND
-	"45": {
+	"J13_5": {
 		pin:    -1,
 		pwmPin: -1,
 	},
 	// 3.3V
-	"46": {
+	"J13_6": {
 		pin:    -1,
 		pwmPin: -1,
 	},
 	// GND
-	"47": {
+	"J13_7": {
 		pin:    -1,
 		pwmPin: -1,
 	},
 	// 3.3V
-	"48": {
+	"J13_8": {
 		pin:    -1,
 		pwmPin: -1,
 	},
 	// GND
-	"49": {
+	"J13_9": {
 		pin:    -1,
 		pwmPin: -1,
 	},
 	// 1.8V
-	"50": {
+	"J13_10": {
 		pin:    -1,
 		pwmPin: -1,
 	},
 	// GPIO
-	"51": {
+	"J13_11": {
 		pin:    456,
 		pwmPin: -1,
 	},
 	// 1.8V
-	"52": {
+	"J13_12": {
 		pin:    -1,
 		pwmPin: -1,
 	},
 	// PANEL
-	"53": {
+	"J13_13": {
 		pin:    270,
 		pwmPin: -1,
 	},
 	// GND
-	"54": {
+	"J13_14": {
 		pin:    -1,
 		pwmPin: -1,
 	},
 	// PANEL
-	"55": {
+	"J13_15": {
 		pin:    271,
 		pwmPin: -1,
 	},
 	// CAMERA
-	"56": {
+	"J13_16": {
 		pin:    -1,
 		pwmPin: -1,
 	},
 	// PANEL
-	"57": {
+	"J13_17": {
 		pin:    272,
 		pwmPin: -1,
 	},
 	// CAMERA
-	"58": {
+	"J13_18": {
 		pin:    -1,
 		pwmPin: -1,
 	},
 	// SPP0FS0
-	"59": {
+	"J13_19": {
 		pin:    411,
 		pwmPin: -1,
 	},
 	// CAMERA
-	"60": {
+	"J13_20": {
 		pin:    -1,
 		pwmPin: -1,
 	},
 	// SPP0FS1
-	"61": {
+	"J13_21": {
 		pin:    412,
 		pwmPin: -1,
 	},
 	// SPI_DAT
-	"62": {
+	"J13_22": {
 		pin:    -1,
 		pwmPin: -1,
 	},
 	// SPP0FS2
-	"63": {
-		pin:    411,
+	"J13_23": {
+		pin:    413,
 		pwmPin: -1,
 	},
 	// SPICLKB
-	"64": {
+	"J13_24": {
 		pin:    384,
 		pwmPin: -1,
 	},
-	// SPP0FS3
-	"65": {
+	// SPP0CLK
+	"J13_25": {
 		pin:    410,
 		pwmPin: -1,
 	},
 	// SPICLKA
-	"66": {
+	"J13_26": {
 		pin:    383,
 		pwmPin: -1,
 	},
 	// SPP0TX
-	"67": {
+	"J13_27": {
 		pin:    414,
 		pwmPin: -1,
 	},
 	// UART0RX
-	"68": {
-		pin:    467,
+	"J13_28": {
+		pin:    -1,
 		pwmPin: -1,
 	},
 	// SPP0RX
-	"69": {
+	"J13_29": {
 		pin:    415,
 		pwmPin: -1,
 	},
 	// UART0RT
-	"70": {
-		pin:    469,
+	"J13_30": {
+		pin:    -1,
 		pwmPin: -1,
 	},
 	// I2C1SDA
-	"71": {
-		pin:    317,
+	"J13_31": {
+		pin:    -1,
 		pwmPin: -1,
 	},
 	// UART0CT
-	"72": {
-		pin:    412,
+	"J13_32": {
+		pin:    -1,
 		pwmPin: -1,
 	},
 	// I2C1SCL
-	"73": {
-		pin:    418,
+	"J13_33": {
+		pin:    -1,
 		pwmPin: -1,
 	},
-	// UART1TX
-	"74": {
-		pin:    484,
+	// IURT0TX
+	"J13_34": {
+		pin:    -1,
 		pwmPin: -1,
 	},
 	// I2C2SDA
-	"75": {
-		pin:    319,
+	"J13_35": {
+		pin:    -1,
 		pwmPin: -1,
 	},
-	// UART1RX
-	"76": {
-		pin:    483,
+	// IURT0RX
+	"J13_36": {
+		pin:    -1,
 		pwmPin: -1,
 	},
 	// I2C2SCL
-	"77": {
-		pin:    320,
+	"J13_37": {
+		pin:    -1,
 		pwmPin: -1,
 	},
-	// UART1RT
-	"78": {
-		pin:    485,
+	// IURT0RT
+	"J13_38": {
+		pin:    -1,
 		pwmPin: -1,
 	},
 	// RTC_CLK
-	"79": {
+	"J13_39": {
 		pin:    367,
 		pwmPin: -1,
 	},
-	// UART1CT
-	"80": {
-		pin:    486,
+	// IURT0CT
+	"J13_40": {
+		pin:    -1,
 		pwmPin: -1,
 	},
 

@@ -83,6 +83,8 @@ func initTestAdaptor() (*Adaptor, *sysfs.MockFilesystem) {
 		"/sys/class/gpio/gpio218/value",
 		"/sys/class/gpio/gpio250/direction",
 		"/sys/class/gpio/gpio250/value",
+		"/sys/class/gpio/gpio451/direction",
+		"/sys/class/gpio/gpio451/value",
 		"/dev/i2c-0",
 	})
 	sysfs.SetFilesystem(fs)
@@ -114,8 +116,8 @@ func TestAdaptorInvalidBus(t *testing.T) {
 
 func TestAdaptorFinalize(t *testing.T) {
 	a, _ := initTestAdaptor()
-	a.DigitalWrite("1", 1)
-	a.PwmWrite("25", 100)
+	a.DigitalWrite("J12_1", 1)
+	a.PwmWrite("J12_26", 100)
 
 	sysfs.SetSyscall(&sysfs.MockSyscall{})
 	gobottest.Assert(t, a.Finalize(), nil)
@@ -130,11 +132,11 @@ func TestAdaptorFinalize(t *testing.T) {
 func TestAdaptorDigitalIO(t *testing.T) {
 	a, fs := initTestAdaptor()
 
-	a.DigitalWrite("1", 1)
-	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio446/value"].Contents, "1")
+	a.DigitalWrite("J12_1", 1)
+	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio451/value"].Contents, "1")
 
-	a.DigitalWrite("2", 0)
-	i, err := a.DigitalRead("2")
+	a.DigitalWrite("J12_1", 0)
+	i, err := a.DigitalRead("J12_1")
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, i, 0)
 }
@@ -173,11 +175,14 @@ func TestAdaptorI2c(t *testing.T) {
 func TestAdaptorPwm(t *testing.T) {
 	a, fs := initTestAdaptor()
 
-	err := a.PwmWrite("25", 100)
+	err := a.PwmWrite("J12_26", 100)
 	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/pwm0/duty_cycle"].Contents, "1960")
+	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/pwm0/duty_cycle"].Contents, "3921568")
 
 	err = a.PwmWrite("4", 100)
+	gobottest.Assert(t, err, errors.New("Not a valid pin"))
+
+	err = a.PwmWrite("J12_1", 100)
 	gobottest.Assert(t, err, errors.New("Not a PWM pin"))
 }
 
@@ -186,7 +191,7 @@ func TestAdaptorPwmPinExportError(t *testing.T) {
 
 	delete(fs.Files, "/sys/class/pwm/pwmchip0/export")
 
-	err := a.PwmWrite("25", 100)
+	err := a.PwmWrite("J12_26", 100)
 	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/pwm/pwmchip0/export: No such file"), true)
 }
 
@@ -195,6 +200,6 @@ func TestAdaptorPwmPinEnableError(t *testing.T) {
 
 	delete(fs.Files, "/sys/class/pwm/pwmchip0/pwm0/enable")
 
-	err := a.PwmWrite("25", 100)
+	err := a.PwmWrite("J12_26", 100)
 	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/pwm/pwmchip0/pwm0/enable: No such file"), true)
 }

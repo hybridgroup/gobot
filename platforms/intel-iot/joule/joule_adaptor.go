@@ -133,11 +133,18 @@ func (e *Adaptor) PwmWrite(pin string, val byte) (err error) {
 
 // PWMPin returns a sysfs.PWMPin
 func (e *Adaptor) PWMPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
-	sysPin := sysfsPinMap[pin]
+	sysPin, ok := sysfsPinMap[pin]
+	if !ok {
+		err = errors.New("Not a valid pin")
+		return
+	}
 	if sysPin.pwmPin != -1 {
 		if e.pwmPins[sysPin.pwmPin] == nil {
 			e.pwmPins[sysPin.pwmPin] = sysfs.NewPWMPin(sysPin.pwmPin)
 			if err = e.pwmPins[sysPin.pwmPin].Export(); err != nil {
+				return
+			}
+			if err = e.pwmPins[sysPin.pwmPin].SetPeriod(10000000); err != nil {
 				return
 			}
 			if err = e.pwmPins[sysPin.pwmPin].Enable(true); err != nil {
