@@ -23,6 +23,7 @@ Gobot has a extensible system for connecting to hardware devices. The following 
 - Grove Digital Accelerometer
 - Grove RGB LCD
 - HMC6352 Compass
+- INA3221 Voltage Monitor
 - JHD1313M1 LCD Display w/RGB Backlight
 - L3GD20H 3-Axis Gyroscope
 - LIDAR-Lite
