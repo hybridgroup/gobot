@@ -15,7 +15,7 @@ import (
 type INA3221Channel uint8
 
 const (
-	ina3221Address            uint8   = 0x40   // 1000000 (A0+A1=GND)
+	ina3221Address            uint8   = 0x40 // 1000000 (A0+A1=GND)
 	ina3221Read               uint8   = 0x01
 	ina3221RegConfig          uint8   = 0x00   // CONFIG REGISTER (R/W)
 	ina3221ConfigReset        uint16  = 0x8000 // Reset Bit
