@@ -91,33 +91,44 @@ func initTestFirmata() *Client {
 		b.process()
 	}
 
-	b.setConnected(true)
-	b.Connect(readWriteCloser{})
+	//b.setConnected(true)
+	//b.Connect(readWriteCloser{})
 
 	return b
 }
 
+func TestPins(t *testing.T) {
+	b := initTestFirmata()
+	b.setConnected(true)
+	//test if functions executes
+	gobottest.Assert(t, len(b.Pins()), 19)
+}
+
 func TestReportVersion(t *testing.T) {
 	b := initTestFirmata()
+	b.setConnected(true)
 	//test if functions executes
-	b.ProtocolVersionQuery()
+	gobottest.Assert(t, b.ProtocolVersionQuery(), nil)
 }
 
 func TestQueryFirmware(t *testing.T) {
 	b := initTestFirmata()
+	b.setConnected(true)
 	//test if functions executes
-	b.FirmwareQuery()
+	gobottest.Assert(t, b.FirmwareQuery(), nil)
 }
 
 func TestQueryPinState(t *testing.T) {
 	b := initTestFirmata()
+	b.setConnected(true)
 	//test if functions executes
-	b.PinStateQuery(1)
+	gobottest.Assert(t, b.PinStateQuery(1), nil)
 }
 
 func TestProcessProtocolVersion(t *testing.T) {
 	sem := make(chan bool)
 	b := initTestFirmata()
+	b.setConnected(true)
 	SetTestReadData([]byte{249, 2, 3})
 
 	b.Once(b.Event("ProtocolVersion"), func(data interface{}) {
@@ -137,6 +148,7 @@ func TestProcessProtocolVersion(t *testing.T) {
 func TestProcessAnalogRead0(t *testing.T) {
 	sem := make(chan bool)
 	b := initTestFirmata()
+	b.setConnected(true)
 	SetTestReadData([]byte{0xE0, 0x23, 0x05})
 
 	b.Once(b.Event("AnalogRead0"), func(data interface{}) {
@@ -156,6 +168,7 @@ func TestProcessAnalogRead0(t *testing.T) {
 func TestProcessAnalogRead1(t *testing.T) {
 	sem := make(chan bool)
 	b := initTestFirmata()
+	b.setConnected(true)
 	SetTestReadData([]byte{0xE1, 0x23, 0x06})
 
 	b.Once(b.Event("AnalogRead1"), func(data interface{}) {
@@ -175,6 +188,7 @@ func TestProcessAnalogRead1(t *testing.T) {
 func TestProcessDigitalRead2(t *testing.T) {
 	sem := make(chan bool)
 	b := initTestFirmata()
+	b.setConnected(true)
 	b.pins[2].Mode = Input
 	SetTestReadData([]byte{0x90, 0x04, 0x00})
 
@@ -195,6 +209,7 @@ func TestProcessDigitalRead2(t *testing.T) {
 func TestProcessDigitalRead4(t *testing.T) {
 	sem := make(chan bool)
 	b := initTestFirmata()
+	b.setConnected(true)
 	b.pins[4].Mode = Input
 	SetTestReadData([]byte{0x90, 0x16, 0x00})
 
@@ -212,9 +227,35 @@ func TestProcessDigitalRead4(t *testing.T) {
 	}
 }
 
+func TestDigitalWrite(t *testing.T) {
+	b := initTestFirmata()
+	b.setConnected(true)
+	gobottest.Assert(t, b.DigitalWrite(13, 0), nil)
+}
+
+func TestSetPinMode(t *testing.T) {
+	b := initTestFirmata()
+	b.setConnected(true)
+	gobottest.Assert(t, b.SetPinMode(13, Output), nil)
+}
+
+func TestAnalogWrite(t *testing.T) {
+	b := initTestFirmata()
+	b.setConnected(true)
+	gobottest.Assert(t, b.AnalogWrite(0, 128), nil)
+}
+
+func TestReportAnalog(t *testing.T) {
+	b := initTestFirmata()
+	b.setConnected(true)
+	gobottest.Assert(t, b.ReportAnalog(0, 1), nil)
+	gobottest.Assert(t, b.ReportAnalog(0, 0), nil)
+}
+
 func TestProcessPinState13(t *testing.T) {
 	sem := make(chan bool)
 	b := initTestFirmata()
+	b.setConnected(true)
 	SetTestReadData([]byte{240, 110, 13, 1, 1, 247})
 
 	b.Once(b.Event("PinState13"), func(data interface{}) {
@@ -234,6 +275,7 @@ func TestProcessPinState13(t *testing.T) {
 func TestProcessI2cReply(t *testing.T) {
 	sem := make(chan bool)
 	b := initTestFirmata()
+	b.setConnected(true)
 	SetTestReadData([]byte{240, 119, 9, 0, 0, 0, 24, 1, 1, 0, 26, 1, 247})
 
 	b.Once(b.Event("I2cReply"), func(data interface{}) {
@@ -257,6 +299,7 @@ func TestProcessI2cReply(t *testing.T) {
 func TestProcessFirmwareQuery(t *testing.T) {
 	sem := make(chan bool)
 	b := initTestFirmata()
+	b.setConnected(true)
 	SetTestReadData([]byte{240, 121, 2, 3, 83, 0, 116, 0, 97, 0, 110, 0, 100, 0, 97,
 		0, 114, 0, 100, 0, 70, 0, 105, 0, 114, 0, 109, 0, 97, 0, 116, 0, 97, 0, 46,
 		0, 105, 0, 110, 0, 111, 0, 247})
@@ -278,6 +321,7 @@ func TestProcessFirmwareQuery(t *testing.T) {
 func TestProcessStringData(t *testing.T) {
 	sem := make(chan bool)
 	b := initTestFirmata()
+	b.setConnected(true)
 	SetTestReadData(append([]byte{240, 0x71}, append([]byte("Hello Firmata!"), 247)...))
 
 	b.Once(b.Event("StringData"), func(data interface{}) {
@@ -285,7 +329,6 @@ func TestProcessStringData(t *testing.T) {
 		sem <- true
 	})
 
-	time.Sleep(10 * time.Millisecond)
 	go b.process()
 
 	select {
@@ -339,6 +382,8 @@ func TestConnect(t *testing.T) {
 	}()
 
 	gobottest.Assert(t, b.Connect(readWriteCloser{}), nil)
+	time.Sleep(150 * time.Millisecond)
+	gobottest.Assert(t, b.Disconnect(), nil)
 }
 
 func TestServoConfig(t *testing.T) {

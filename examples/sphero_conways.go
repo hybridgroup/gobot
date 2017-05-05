@@ -78,7 +78,7 @@ func (c *conway) contact() {
 }
 
 func (c *conway) rebirth() {
-	fmt.Println("Welcome back", c.cell.Name, "!")
+	fmt.Println("Welcome back", c.cell.Name(), "!")
 	c.life()
 }
 
@@ -95,7 +95,7 @@ func (c *conway) life() {
 }
 
 func (c *conway) death() {
-	fmt.Println(c.cell.Name, "died :(")
+	fmt.Println(c.cell.Name(), "died :(")
 	c.alive = false
 	c.cell.SetRGB(255, 0, 0)
 	c.cell.Stop()
@@ -111,7 +111,7 @@ func (c *conway) enoughContacts() bool {
 func (c *conway) birthday() {
 	c.age++
 
-	fmt.Println("Happy birthday", c.cell.Name, "you are", c.age, "and had", c.contacts, "contacts.")
+	fmt.Println("Happy birthday", c.cell.Name(), "you are", c.age, "and had", c.contacts, "contacts.")
 
 	if c.enoughContacts() {
 		if !c.alive {
