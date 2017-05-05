@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"errors"
+
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/gobottest"
 )
@@ -54,4 +55,112 @@ func TestINA3221Driver_StartWriteError(t *testing.T) {
 func TestINA3221Driver_Halt(t *testing.T) {
 	d := initTestINA3221Driver()
 	gobottest.Assert(t, d.Halt(), nil)
+}
+
+func TestINA3221DriverGetBusVoltage(t *testing.T) {
+	d, a := initTestINA3221DriverWithStubbedAdaptor()
+	gobottest.Assert(t, d.Start(), nil)
+
+	a.i2cReadImpl = func(b []byte) (int, error) {
+		// TODO: return test data as read from actual sensor
+		copy(b, []byte{0x22, 0x33})
+		return 2, nil
+	}
+
+	v, err := d.GetBusVoltage(INA3221Channel1)
+	gobottest.Assert(t, v, float64(8.755))
+	gobottest.Assert(t, err, nil)
+}
+
+func TestINA3221DriverGetBusVoltageReadError(t *testing.T) {
+	d, a := initTestINA3221DriverWithStubbedAdaptor()
+	gobottest.Assert(t, d.Start(), nil)
+
+	a.i2cReadImpl = func(b []byte) (int, error) {
+		return 0, errors.New("read error")
+	}
+
+	_, err := d.GetBusVoltage(INA3221Channel1)
+	gobottest.Assert(t, err, errors.New("read error"))
+}
+
+func TestINA3221DriverGetShuntVoltage(t *testing.T) {
+	d, a := initTestINA3221DriverWithStubbedAdaptor()
+	gobottest.Assert(t, d.Start(), nil)
+
+	a.i2cReadImpl = func(b []byte) (int, error) {
+		// TODO: return test data as read from actual sensor
+		copy(b, []byte{0x22, 0x33})
+		return 2, nil
+	}
+
+	v, err := d.GetShuntVoltage(INA3221Channel1)
+	gobottest.Assert(t, v, float64(43.775))
+	gobottest.Assert(t, err, nil)
+}
+
+func TestINA3221DriverGetShuntVoltageReadError(t *testing.T) {
+	d, a := initTestINA3221DriverWithStubbedAdaptor()
+	gobottest.Assert(t, d.Start(), nil)
+
+	a.i2cReadImpl = func(b []byte) (int, error) {
+		return 0, errors.New("read error")
+	}
+
+	_, err := d.GetShuntVoltage(INA3221Channel1)
+	gobottest.Assert(t, err, errors.New("read error"))
+}
+
+func TestINA3221DriverGetCurrent(t *testing.T) {
+	d, a := initTestINA3221DriverWithStubbedAdaptor()
+	gobottest.Assert(t, d.Start(), nil)
+
+	a.i2cReadImpl = func(b []byte) (int, error) {
+		// TODO: return test data as read from actual sensor
+		copy(b, []byte{0x22, 0x33})
+		return 2, nil
+	}
+
+	v, err := d.GetCurrent(INA3221Channel1)
+	gobottest.Assert(t, v, float64(437.74999999999994))
+	gobottest.Assert(t, err, nil)
+}
+
+func TestINA3221DriverCurrentReadError(t *testing.T) {
+	d, a := initTestINA3221DriverWithStubbedAdaptor()
+	gobottest.Assert(t, d.Start(), nil)
+
+	a.i2cReadImpl = func(b []byte) (int, error) {
+		return 0, errors.New("read error")
+	}
+
+	_, err := d.GetCurrent(INA3221Channel1)
+	gobottest.Assert(t, err, errors.New("read error"))
+}
+
+func TestINA3221DriverGetLoadVoltage(t *testing.T) {
+	d, a := initTestINA3221DriverWithStubbedAdaptor()
+	gobottest.Assert(t, d.Start(), nil)
+
+	a.i2cReadImpl = func(b []byte) (int, error) {
+		// TODO: return test data as read from actual sensor
+		copy(b, []byte{0x22, 0x33})
+		return 2, nil
+	}
+
+	v, err := d.GetLoadVoltage(INA3221Channel2)
+	gobottest.Assert(t, v, float64(8.798775000000001))
+	gobottest.Assert(t, err, nil)
+}
+
+func TestINA3221DriverGetLoadVoltageReadError(t *testing.T) {
+	d, a := initTestINA3221DriverWithStubbedAdaptor()
+	gobottest.Assert(t, d.Start(), nil)
+
+	a.i2cReadImpl = func(b []byte) (int, error) {
+		return 0, errors.New("read error")
+	}
+
+	_, err := d.GetLoadVoltage(INA3221Channel2)
+	gobottest.Assert(t, err, errors.New("read error"))
 }
