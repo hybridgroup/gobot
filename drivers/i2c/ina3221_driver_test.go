@@ -7,6 +7,7 @@ import (
 
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/gobottest"
+	"strings"
 )
 
 var _ gobot.Driver = (*INA3221Driver)(nil)
@@ -62,13 +63,13 @@ func TestINA3221DriverGetBusVoltage(t *testing.T) {
 	gobottest.Assert(t, d.Start(), nil)
 
 	a.i2cReadImpl = func(b []byte) (int, error) {
-		// TODO: return test data as read from actual sensor
-		copy(b, []byte{0x22, 0x33})
+		// bus voltage sensor values from 12V battery
+		copy(b, []byte{0x36, 0x68})
 		return 2, nil
 	}
 
 	v, err := d.GetBusVoltage(INA3221Channel1)
-	gobottest.Assert(t, v, float64(8.755))
+	gobottest.Assert(t, v, float64(13.928))
 	gobottest.Assert(t, err, nil)
 }
 
@@ -89,13 +90,13 @@ func TestINA3221DriverGetShuntVoltage(t *testing.T) {
 	gobottest.Assert(t, d.Start(), nil)
 
 	a.i2cReadImpl = func(b []byte) (int, error) {
-		// TODO: return test data as read from actual sensor
-		copy(b, []byte{0x22, 0x33})
+		// shunt voltage sensor values from 12V battery
+		copy(b, []byte{0x05, 0xD8})
 		return 2, nil
 	}
 
 	v, err := d.GetShuntVoltage(INA3221Channel1)
-	gobottest.Assert(t, v, float64(43.775))
+	gobottest.Assert(t, v, float64(7.48))
 	gobottest.Assert(t, err, nil)
 }
 
@@ -116,13 +117,13 @@ func TestINA3221DriverGetCurrent(t *testing.T) {
 	gobottest.Assert(t, d.Start(), nil)
 
 	a.i2cReadImpl = func(b []byte) (int, error) {
-		// TODO: return test data as read from actual sensor
-		copy(b, []byte{0x22, 0x33})
+		// shunt voltage sensor values from 12V battery
+		copy(b, []byte{0x05, 0x0D8})
 		return 2, nil
 	}
 
 	v, err := d.GetCurrent(INA3221Channel1)
-	gobottest.Assert(t, v, float64(437.74999999999994))
+	gobottest.Assert(t, v, float64(74.8))
 	gobottest.Assert(t, err, nil)
 }
 
@@ -142,14 +143,16 @@ func TestINA3221DriverGetLoadVoltage(t *testing.T) {
 	d, a := initTestINA3221DriverWithStubbedAdaptor()
 	gobottest.Assert(t, d.Start(), nil)
 
+	i := 0
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		// TODO: return test data as read from actual sensor
-		copy(b, []byte{0x22, 0x33})
+		copy(b, []byte{0x36, 0x68, 0x05, 0xd8}[i:i+2])
+		i += 2
 		return 2, nil
 	}
 
 	v, err := d.GetLoadVoltage(INA3221Channel2)
-	gobottest.Assert(t, v, float64(8.798775000000001))
+	gobottest.Assert(t, v, float64(13.935480))
 	gobottest.Assert(t, err, nil)
 }
 
@@ -163,4 +166,15 @@ func TestINA3221DriverGetLoadVoltageReadError(t *testing.T) {
 
 	_, err := d.GetLoadVoltage(INA3221Channel2)
 	gobottest.Assert(t, err, errors.New("read error"))
+}
+
+func TestINA3221DriverName(t *testing.T) {
+	d := initTestINA3221Driver()
+	gobottest.Assert(t, strings.HasPrefix(d.Name(),"INA3221"), true)
+}
+
+func TestINA3221DriverSetName(t *testing.T) {
+	d := initTestINA3221Driver()
+	d.SetName("foobot")
+	gobottest.Assert(t, d.Name(), "foobot")
 }
