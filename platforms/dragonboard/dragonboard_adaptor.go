@@ -3,6 +3,7 @@ package dragonboard
 import (
 	"errors"
 	"fmt"
+	"sync"
 
 	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot"
@@ -16,6 +17,7 @@ type Adaptor struct {
 	digitalPins map[int]*sysfs.DigitalPin
 	pinMap      map[string]int
 	i2cBuses    [3]sysfs.I2cDevice
+	mutex       *sync.Mutex
 }
 
 var fixedPins = map[string]int{
@@ -39,7 +41,8 @@ var fixedPins = map[string]int{
 // NewAdaptor creates a DragonBoard 410c Adaptor
 func NewAdaptor() *Adaptor {
 	c := &Adaptor{
-		name: gobot.DefaultName("DragonBoard"),
+		name:  gobot.DefaultName("DragonBoard"),
+		mutex: &sync.Mutex{},
 	}
 
 	c.setPins()
@@ -59,6 +62,9 @@ func (c *Adaptor) Connect() (err error) {
 
 // Finalize closes connection to board and pins
 func (c *Adaptor) Finalize() (err error) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	for _, pin := range c.digitalPins {
 		if pin != nil {
 			if e := pin.Unexport(); e != nil {
@@ -78,6 +84,9 @@ func (c *Adaptor) Finalize() (err error) {
 
 // DigitalPin returns matched digitalPin for specified values
 func (c *Adaptor) DigitalPin(pin string, dir string) (sysfsPin *sysfs.DigitalPin, err error) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	i, err := c.translatePin(pin)
 
 	if err != nil {
@@ -125,6 +134,9 @@ func (c *Adaptor) DigitalWrite(pin string, val byte) (err error) {
 // GetConnection returns a connection to a device on a specified bus.
 // Valid bus number is [0..1] which corresponds to /dev/i2c-0 through /dev/i2c-1.
 func (c *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection, err error) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	if (bus < 0) || (bus > 1) {
 		return nil, fmt.Errorf("Bus number %d out of range", bus)
 	}
