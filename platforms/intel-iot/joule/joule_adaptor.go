@@ -3,6 +3,7 @@ package joule
 import (
 	"errors"
 	"fmt"
+	"sync"
 
 	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot"
@@ -22,6 +23,7 @@ type Adaptor struct {
 	pwmPins     map[int]*sysfs.PWMPin
 	i2cBuses    [3]sysfs.I2cDevice
 	connect     func(e *Adaptor) (err error)
+	mutex       *sync.Mutex
 }
 
 // NewAdaptor returns a new Joule Adaptor
@@ -31,6 +33,7 @@ func NewAdaptor() *Adaptor {
 		connect: func(e *Adaptor) (err error) {
 			return
 		},
+		mutex: &sync.Mutex{},
 	}
 }
 
@@ -42,6 +45,9 @@ func (e *Adaptor) SetName(n string) { e.name = n }
 
 // Connect initializes the Joule for use with the Arduino beakout board
 func (e *Adaptor) Connect() (err error) {
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
+
 	e.digitalPins = make(map[int]*sysfs.DigitalPin)
 	e.pwmPins = make(map[int]*sysfs.PWMPin)
 	err = e.connect(e)
@@ -50,6 +56,9 @@ func (e *Adaptor) Connect() (err error) {
 
 // Finalize releases all i2c devices and exported digital and pwm pins.
 func (e *Adaptor) Finalize() (err error) {
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
+
 	for _, pin := range e.digitalPins {
 		if pin != nil {
 			if errs := pin.Unexport(); errs != nil {
@@ -79,6 +88,9 @@ func (e *Adaptor) Finalize() (err error) {
 
 // digitalPin returns matched digitalPin for specified values
 func (e *Adaptor) DigitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPinner, err error) {
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
+
 	i := sysfsPinMap[pin]
 	if e.digitalPins[i.pin] == nil {
 		e.digitalPins[i.pin] = sysfs.NewDigitalPin(i.pin)
@@ -133,6 +145,9 @@ func (e *Adaptor) PwmWrite(pin string, val byte) (err error) {
 
 // PWMPin returns a sysfs.PWMPin
 func (e *Adaptor) PWMPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
+
 	sysPin, ok := sysfsPinMap[pin]
 	if !ok {
 		err = errors.New("Not a valid pin")
