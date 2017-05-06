@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 
 	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot"
@@ -25,6 +26,7 @@ type Adaptor struct {
 	usrLed      string
 	analogPath  string
 	slots       string
+	mutex       *sync.Mutex
 }
 
 // NewAdaptor returns a new Beaglebone Adaptor
@@ -34,6 +36,7 @@ func NewAdaptor() *Adaptor {
 		digitalPins: make([]*sysfs.DigitalPin, 120),
 		pwmPins:     make(map[string]*sysfs.PWMPin),
 		i2cBuses:    make(map[int]sysfs.I2cDevice),
+		mutex:       &sync.Mutex{},
 	}
 
 	b.setSlots()
@@ -54,6 +57,9 @@ func (b *Adaptor) SetName(n string) { b.name = n }
 
 // Connect initializes the pwm and analog dts.
 func (b *Adaptor) Connect() error {
+	b.mutex.Lock()
+	defer b.mutex.Unlock()
+
 	if err := ensureSlot(b.slots, "BB-ADC"); err != nil {
 		return err
 	}
@@ -63,6 +69,9 @@ func (b *Adaptor) Connect() error {
 
 // Finalize releases all i2c devices and exported analog, digital, pwm pins.
 func (b *Adaptor) Finalize() (err error) {
+	b.mutex.Lock()
+	defer b.mutex.Unlock()
+
 	for _, pin := range b.digitalPins {
 		if pin != nil {
 			if e := pin.Unexport(); e != nil {
@@ -145,6 +154,9 @@ func (b *Adaptor) DigitalWrite(pin string, val byte) (err error) {
 
 // DigitalPin retrieves digital pin value by name
 func (b *Adaptor) DigitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPinner, err error) {
+	b.mutex.Lock()
+	defer b.mutex.Unlock()
+
 	i, err := b.translatePin(pin)
 	if err != nil {
 		return
@@ -164,6 +176,9 @@ func (b *Adaptor) DigitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPinn
 
 // PWMPin returns matched pwmPin for specified pin number
 func (b *Adaptor) PWMPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
+	b.mutex.Lock()
+	defer b.mutex.Unlock()
+
 	pinInfo, err := b.translatePwmPin(pin)
 	if err != nil {
 		return nil, err
@@ -222,6 +237,9 @@ func (b *Adaptor) AnalogRead(pin string) (val int, err error) {
 // GetConnection returns a connection to a device on a specified bus.
 // Valid bus number is either 0 or 2 which corresponds to /dev/i2c-0 or /dev/i2c-2.
 func (b *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection, err error) {
+	b.mutex.Lock()
+	defer b.mutex.Unlock()
+
 	if (bus != 0) && (bus != 2) {
 		return nil, fmt.Errorf("Bus number %d out of range", bus)
 	}
