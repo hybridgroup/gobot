@@ -5,9 +5,10 @@ import (
 
 	"errors"
 
+	"strings"
+
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/gobottest"
-	"strings"
 )
 
 var _ gobot.Driver = (*INA3221Driver)(nil)
@@ -170,7 +171,7 @@ func TestINA3221DriverGetLoadVoltageReadError(t *testing.T) {
 
 func TestINA3221DriverName(t *testing.T) {
 	d := initTestINA3221Driver()
-	gobottest.Assert(t, strings.HasPrefix(d.Name(),"INA3221"), true)
+	gobottest.Assert(t, strings.HasPrefix(d.Name(), "INA3221"), true)
 }
 
 func TestINA3221DriverSetName(t *testing.T) {
