@@ -20,7 +20,7 @@ Everything you need to get started with the Joule is in the Intel Getting Starte
 
 https://intel.com/joule/getstarted
 
-Don't forget to configure your Joule's wifi connection and update your Joule to the latest firmware image!
+Don't forget to configure your Joule's WiFi connection and update your Joule to the latest firmware image. Gobot has been tested using the reference OS based on Ostro.
 
 ## How To Use
 
@@ -83,10 +83,10 @@ over once again and start it from the command line (via screen).
 
 ## Pin Mapping
 
-The Gobot pin mapping for the Intel Joule uses the same numbering as the MRAA library does, as documented here:
+The Gobot pin mapping for the Intel Joule uses a naming system based on how the pins are labeled on the board itself.
 
-https://software.intel.com/en-us/pin-mapping-for-carrier-board-joule
+There are 2 jumpers on the Joule expansion board, labeled "J12" and "J13". There are 2 rows of pins on each jumper, labeled from 1 to 40. So to use the 26th pin of jumper J12, you use pin name "J12_26".
 
-Of special note are the pins that control the build-in LEDs, which are pins 100 thru 103, as used in the example above.
+In addition, there are pins that control the build-in LEDs (pins 100 thru 103) as used in the example above.
 
 The i2c interfaces on the Intel Joule developer kit board require that you terminate the SDA & SCL lines using 2 10K resistors pulled up to the voltage used for the i2c device, for example 5V.
