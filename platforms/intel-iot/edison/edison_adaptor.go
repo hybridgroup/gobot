@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"sync"
 
 	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot"
@@ -37,6 +38,7 @@ type Adaptor struct {
 	connect     func(e *Adaptor) (err error)
 	writeFile   func(path string, data []byte) (i int, err error)
 	readFile    func(path string) ([]byte, error)
+	mutex       *sync.Mutex
 }
 
 // NewAdaptor returns a new Edison Adaptor
@@ -46,6 +48,7 @@ func NewAdaptor() *Adaptor {
 		pinmap:    arduinoPinMap,
 		writeFile: writeFile,
 		readFile:  readFile,
+		mutex:     &sync.Mutex{},
 	}
 }
 
@@ -91,6 +94,9 @@ func (e *Adaptor) Connect() (err error) {
 
 // Finalize releases all i2c devices and exported analog, digital, pwm pins.
 func (e *Adaptor) Finalize() (err error) {
+	// e.mutex.Lock()
+	// defer e.mutex.Unlock()
+
 	if errs := e.tristate.Unexport(); errs != nil {
 		err = multierror.Append(err, errs)
 	}
@@ -168,6 +174,9 @@ func (e *Adaptor) AnalogRead(pin string) (val int, err error) {
 // GetConnection returns an i2c connection to a device on a specified bus.
 // Valid bus numbers are 1 and 6 (arduino).
 func (e *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection, err error) {
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
+
 	if !(bus == e.GetDefaultBus()) {
 		return nil, errors.New("Unsupported I2C bus")
 	}
@@ -192,6 +201,9 @@ func (e *Adaptor) GetDefaultBus() int {
 
 // DigitalPin returns matched sysfs.DigitalPin for specified values
 func (e *Adaptor) DigitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPinner, err error) {
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
+
 	i := e.pinmap[pin]
 	if e.digitalPins[i.pin] == nil {
 		e.digitalPins[i.pin], err = e.newExportedPin(i.pin)
@@ -278,6 +290,9 @@ func (e *Adaptor) PWMPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
 			if err = changePinMode(e, strconv.Itoa(int(sysPin.pin)), "1"); err != nil {
 				return
 			}
+			e.mutex.Lock()
+			defer e.mutex.Unlock()
+
 			e.pwmPins[sysPin.pwmPin] = sysfs.NewPWMPin(sysPin.pwmPin)
 			if err = e.pwmPins[sysPin.pwmPin].Export(); err != nil {
 				return
