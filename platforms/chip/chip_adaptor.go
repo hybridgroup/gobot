@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 
 	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot"
@@ -27,6 +28,7 @@ type Adaptor struct {
 	digitalPins map[int]*sysfs.DigitalPin
 	pwmPins     map[int]*sysfs.PWMPin
 	i2cBuses    [3]sysfs.I2cDevice
+	mutex       *sync.Mutex
 }
 
 // NewAdaptor creates a C.H.I.P. Adaptor
@@ -34,6 +36,7 @@ func NewAdaptor() *Adaptor {
 	c := &Adaptor{
 		name:  gobot.DefaultName("CHIP"),
 		board: "chip",
+		mutex: &sync.Mutex{},
 	}
 
 	c.setPins()
@@ -45,6 +48,7 @@ func NewProAdaptor() *Adaptor {
 	c := &Adaptor{
 		name:  gobot.DefaultName("CHIP Pro"),
 		board: "pro",
+		mutex: &sync.Mutex{},
 	}
 
 	c.setPins()
@@ -64,6 +68,9 @@ func (c *Adaptor) Connect() (err error) {
 
 // Finalize closes connection to board and pins
 func (c *Adaptor) Finalize() (err error) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	for _, pin := range c.digitalPins {
 		if pin != nil {
 			if e := pin.Unexport(); e != nil {
@@ -118,6 +125,9 @@ func (c *Adaptor) DigitalWrite(pin string, val byte) (err error) {
 // GetConnection returns a connection to a device on a specified bus.
 // Valid bus number is [0..2] which corresponds to /dev/i2c-0 through /dev/i2c-2.
 func (c *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection, err error) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	if (bus < 0) || (bus > 2) {
 		return nil, fmt.Errorf("Bus number %d out of range", bus)
 	}
@@ -134,6 +144,9 @@ func (c *Adaptor) GetDefaultBus() int {
 
 // digitalPin returns matched digitalPin for specified values
 func (c *Adaptor) DigitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPinner, err error) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	i, err := c.translatePin(pin)
 
 	if err != nil {
@@ -156,6 +169,9 @@ func (c *Adaptor) DigitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPinn
 
 // pwmPin returns matched pwmPin for specified pin number
 func (c *Adaptor) PWMPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	sysPin := c.pinmap[pin]
 	if sysPin.pwmPin != -1 {
 		if c.pwmPins[sysPin.pwmPin] == nil {
