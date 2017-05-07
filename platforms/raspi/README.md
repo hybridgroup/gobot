@@ -66,7 +66,7 @@ Use the following `GOARM` values to compile depending on which model Raspberry P
 `GOARM=6` (Raspberry Pi A, A+, B, B+, Zero)
 `GOARM=7` (Raspberry Pi 2, 3)
 
-Once you have compiled your code, you can you can upload your program and execute it on the Raspberry Pi from your workstation using the `scp` and `ssh` commands like this:
+Once you have compiled your code, you can upload your program and execute it on the Raspberry Pi from your workstation using the `scp` and `ssh` commands like this:
 
 ```bash
 $ scp raspi_blink pi@192.168.1.xxx:/home/pi/
