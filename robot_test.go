@@ -2,6 +2,7 @@ package gobot
 
 import (
 	"testing"
+	"time"
 
 	"gobot.io/x/gobot/gobottest"
 )
@@ -34,4 +35,33 @@ func TestRobotDevicesToJSON(t *testing.T) {
 	gobottest.Assert(t, json.Devices[0].Driver, "*gobot.testDriver")
 	gobottest.Assert(t, json.Devices[0].Connection, "Connection1")
 	gobottest.Assert(t, len(json.Devices[0].Commands), 1)
+}
+
+func TestRobotStart(t *testing.T) {
+	r := newTestRobot("Robot99")
+	gobottest.Assert(t, r.Start(), nil)
+	gobottest.Assert(t, r.Stop(), nil)
+	gobottest.Assert(t, r.Running(), false)
+}
+
+func TestRobotStartAutoRun(t *testing.T) {
+	adaptor1 := newTestAdaptor("Connection1", "/dev/null")
+	driver1 := newTestDriver(adaptor1, "Device1", "0")
+	work := func() {}
+	r := NewRobot("autorun",
+		[]Connection{adaptor1},
+		[]Device{driver1},
+		work,
+	)
+
+	go func() {
+		gobottest.Assert(t, r.Start(), nil)
+	}()
+
+	time.Sleep(10 * time.Millisecond)
+	gobottest.Assert(t, r.Running(), true)
+
+	// stop it
+	gobottest.Assert(t, r.Stop(), nil)
+	gobottest.Assert(t, r.Running(), false)
 }

@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"testing"
+	"time"
 
 	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot/gobottest"
@@ -73,6 +74,19 @@ func TestMasterStart(t *testing.T) {
 	g := initTestMaster()
 	gobottest.Assert(t, g.Start(), nil)
 	gobottest.Assert(t, g.Stop(), nil)
+	gobottest.Assert(t, g.Running(), false)
+}
+
+func TestMasterStartAutoRun(t *testing.T) {
+	g := NewMaster()
+	g.AddRobot(newTestRobot("Robot99"))
+	go g.Start()
+	time.Sleep(10 * time.Millisecond)
+	gobottest.Assert(t, g.Running(), true)
+
+	// stop it
+	gobottest.Assert(t, g.Stop(), nil)
+	gobottest.Assert(t, g.Running(), false)
 }
 
 func TestMasterStartDriverErrors(t *testing.T) {
@@ -145,4 +159,8 @@ func TestMasterFinalizeErrors(t *testing.T) {
 
 	gobottest.Assert(t, g.Start(), nil)
 	gobottest.Assert(t, g.Stop(), expected)
+
+	testAdaptorFinalize = func() (err error) {
+		return nil
+	}
 }

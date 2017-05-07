@@ -3,6 +3,7 @@ package gobot
 import (
 	"os"
 	"os/signal"
+	"sync/atomic"
 
 	multierror "github.com/hashicorp/go-multierror"
 )
@@ -36,13 +37,14 @@ type Master struct {
 	robots  *Robots
 	trap    func(chan os.Signal)
 	AutoRun bool
+	running atomic.Value
 	Commander
 	Eventer
 }
 
 // NewMaster returns a new Gobot Master
 func NewMaster() *Master {
-	return &Master{
+	m := &Master{
 		robots: &Robots{},
 		trap: func(c chan os.Signal) {
 			signal.Notify(c, os.Interrupt)
@@ -51,6 +53,8 @@ func NewMaster() *Master {
 		Commander: NewCommander(),
 		Eventer:   NewEventer(),
 	}
+	m.running.Store(false)
+	return m
 }
 
 // Start calls the Start method on each robot in its collection of robots. On
@@ -61,6 +65,8 @@ func (g *Master) Start() (err error) {
 		err = multierror.Append(err, rerr)
 		return
 	}
+
+	g.running.Store(true)
 
 	if g.AutoRun {
 		c := make(chan os.Signal, 1)
@@ -82,7 +88,13 @@ func (g *Master) Stop() (err error) {
 		err = multierror.Append(err, rerr)
 	}
 
+	g.running.Store(false)
 	return
+}
+
+// Running returns if the Master is currently started or not
+func (g *Master) Running() bool {
+	return g.running.Load().(bool)
 }
 
 // Robots returns all robots associated with this Gobot Master.

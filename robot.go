@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"sync/atomic"
 
 	multierror "github.com/hashicorp/go-multierror"
 )
@@ -48,6 +49,7 @@ type Robot struct {
 	devices     *Devices
 	trap        func(chan os.Signal)
 	AutoRun     bool
+	running     atomic.Value
 	done        chan bool
 	Commander
 	Eventer
@@ -137,6 +139,7 @@ func NewRobot(v ...interface{}) *Robot {
 		}
 	}
 
+	r.running.Store(false)
 	log.Println("Robot", r.Name, "initialized.")
 
 	return r
@@ -166,6 +169,7 @@ func (r *Robot) Start(args ...interface{}) (err error) {
 		<-r.done
 	}()
 
+	r.running.Store(true)
 	if r.AutoRun {
 		c := make(chan os.Signal, 1)
 		r.trap(c)
@@ -194,7 +198,13 @@ func (r *Robot) Stop() error {
 	}
 
 	r.done <- true
+	r.running.Store(false)
 	return result
+}
+
+// Running returns if the Robot is currently started or not
+func (r *Robot) Running() bool {
+	return r.running.Load().(bool)
 }
 
 // Devices returns all devices associated with this Robot.
