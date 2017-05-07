@@ -2,6 +2,7 @@ package i2c
 
 import (
 	"errors"
+	"sync"
 
 	"gobot.io/x/gobot/sysfs"
 )
@@ -48,16 +49,20 @@ type Connection sysfs.I2cOperations
 type i2cConnection struct {
 	bus     sysfs.I2cDevice
 	address int
+	mutex   *sync.Mutex
 }
 
 // NewConnection creates and returns a new connection to a specific
 // i2c device on a bus and address.
 func NewConnection(bus sysfs.I2cDevice, address int) (connection *i2cConnection) {
-	return &i2cConnection{bus: bus, address: address}
+	return &i2cConnection{bus: bus, address: address, mutex: &sync.Mutex{}}
 }
 
 // Read data from an i2c device.
 func (c *i2cConnection) Read(data []byte) (read int, err error) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	if err = c.bus.SetAddress(c.address); err != nil {
 		return 0, err
 	}
@@ -67,6 +72,9 @@ func (c *i2cConnection) Read(data []byte) (read int, err error) {
 
 // Write data to an i2c device.
 func (c *i2cConnection) Write(data []byte) (written int, err error) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	if err = c.bus.SetAddress(c.address); err != nil {
 		return 0, err
 	}
@@ -76,11 +84,17 @@ func (c *i2cConnection) Write(data []byte) (written int, err error) {
 
 // Close connection to i2c device.
 func (c *i2cConnection) Close() error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	return c.bus.Close()
 }
 
 // ReadByte reads a single byte from the i2c device.
 func (c *i2cConnection) ReadByte() (val byte, err error) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	if err := c.bus.SetAddress(c.address); err != nil {
 		return 0, err
 	}
@@ -89,6 +103,9 @@ func (c *i2cConnection) ReadByte() (val byte, err error) {
 
 // ReadByteData reads a byte value for a register on the i2c device.
 func (c *i2cConnection) ReadByteData(reg uint8) (val uint8, err error) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	if err := c.bus.SetAddress(c.address); err != nil {
 		return 0, err
 	}
@@ -97,6 +114,9 @@ func (c *i2cConnection) ReadByteData(reg uint8) (val uint8, err error) {
 
 // ReadWordData reads a word value for a register on the i2c device.
 func (c *i2cConnection) ReadWordData(reg uint8) (val uint16, err error) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	if err := c.bus.SetAddress(c.address); err != nil {
 		return 0, err
 	}
@@ -105,6 +125,9 @@ func (c *i2cConnection) ReadWordData(reg uint8) (val uint16, err error) {
 
 // WriteByte writes a single byte to the i2c device.
 func (c *i2cConnection) WriteByte(val byte) (err error) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	if err := c.bus.SetAddress(c.address); err != nil {
 		return err
 	}
@@ -113,6 +136,9 @@ func (c *i2cConnection) WriteByte(val byte) (err error) {
 
 // WriteByteData writes a byte value to a register on the i2c device.
 func (c *i2cConnection) WriteByteData(reg uint8, val uint8) (err error) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	if err := c.bus.SetAddress(c.address); err != nil {
 		return err
 	}
@@ -121,6 +147,9 @@ func (c *i2cConnection) WriteByteData(reg uint8, val uint8) (err error) {
 
 // WriteWordData writes a word value to a register on the i2c device.
 func (c *i2cConnection) WriteWordData(reg uint8, val uint16) (err error) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	if err := c.bus.SetAddress(c.address); err != nil {
 		return err
 	}
@@ -129,6 +158,9 @@ func (c *i2cConnection) WriteWordData(reg uint8, val uint16) (err error) {
 
 // WriteBlockData writes a block of bytes to a register on the i2c device.
 func (c *i2cConnection) WriteBlockData(reg uint8, b []byte) (err error) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	if err := c.bus.SetAddress(c.address); err != nil {
 		return err
 	}
