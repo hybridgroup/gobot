@@ -4,6 +4,7 @@ import "testing"
 
 func TestAssert(t *testing.T) {
 	err := ""
+	oldErr := errFunc
 	errFunc = func(t *testing.T, message string) {
 		err = message
 	}
@@ -17,9 +18,11 @@ func TestAssert(t *testing.T) {
 	if err != `gobottest_test.go:16: 1 - "int", should equal,  2 - "int"` {
 		t.Errorf("Assert failed: 1 should not equal 2")
 	}
+	errFunc = oldErr
 }
 
 func TestRefute(t *testing.T) {
+	oldErr := errFunc
 	err := ""
 	errFunc = func(t *testing.T, message string) {
 		err = message
@@ -34,6 +37,7 @@ func TestRefute(t *testing.T) {
 	if err != `gobottest_test.go:33: 1 - "int", should not equal,  1 - "int"` {
 		t.Errorf("Refute failed: 1 should not be 1")
 	}
+	errFunc = oldErr
 }
 
 func TestExecCommand(t *testing.T) {
