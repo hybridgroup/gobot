@@ -14,10 +14,10 @@ import (
 
 func main() {
 	e := joule.NewAdaptor()
-	led0 := gpio.NewLedDriver(e, "100")
-	led1 := gpio.NewLedDriver(e, "101")
-	led2 := gpio.NewLedDriver(e, "102")
-	led3 := gpio.NewLedDriver(e, "103")
+	led0 := gpio.NewLedDriver(e, "GP100")
+	led1 := gpio.NewLedDriver(e, "GP101")
+	led2 := gpio.NewLedDriver(e, "GP102")
+	led3 := gpio.NewLedDriver(e, "GP103")
 
 	work := func() {
 		led0.Off()

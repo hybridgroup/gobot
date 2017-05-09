@@ -14,7 +14,7 @@ import (
 
 func main() {
 	e := joule.NewAdaptor()
-	led := gpio.NewLedDriver(e, "100")
+	led := gpio.NewLedDriver(e, "GP100")
 
 	work := func() {
 		gobot.Every(1*time.Second, func() {

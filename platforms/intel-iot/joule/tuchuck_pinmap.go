@@ -406,32 +406,32 @@ var sysfsPinMap = map[string]sysfsPin{
 
 	// Built-in LEDs
 	// LED100
-	"100": {
+	"GP100": {
 		pin:    337,
 		pwmPin: -1,
 	},
 	// LED101
-	"101": {
+	"GP101": {
 		pin:    338,
 		pwmPin: -1,
 	},
 	// LED102
-	"102": {
+	"GP102": {
 		pin:    339,
 		pwmPin: -1,
 	},
 	// LED103
-	"103": {
+	"GP103": {
 		pin:    340,
 		pwmPin: -1,
 	},
 	// LEDWIFI
-	"104": {
+	"GP104": {
 		pin:    438,
 		pwmPin: -1,
 	},
 	// LEDBT
-	"105": {
+	"GP105": {
 		pin:    439,
 		pwmPin: -1,
 	},
