@@ -1,3 +1,78 @@
+1.5.0
+---
+* **core**
+  * Add Running() methods for Master and Robot and increase test coverage accordingly
+* **sysfs**
+  * define DigitalPinnerProvider and PWMPinnerProvider interfaces
+  * add Chip to be able to change pwmchip, and some related refactoring
+  * add file read/write testing for failure conditions
+  * proper handling of busy state vs. other errors
+  * return sensible result when no valid data read
+* **test**
+  * increase coverage on test helpers
+* **build**
+  * switching to Travis builds using Ubuntu 14.04 Trusty
+* **aio**
+  * only need to support AnalogReader interface
+  * avoid test race conditions
+  * ensure that AnalogSensor event Data is always int
+* **gpio**
+  * only need to support DigitalReader/DigitalWriter interface
+* **i2c**
+  * Added support for the ADS1015 and ADS1115 ADCs
+  * Add INA3221 Voltage Monitor
+  * Ensure lock of i2c bus for each individual operation
+  * Small refactoring and increase test coverage for BMP180
+* **beaglebone**
+  * implement DigitalPinner and PWMPinner interfaces
+  * protect against pin map races
+  * increase test coverage
+* **chip**
+  * add preliminary support for C.H.I.P. Pro
+  * add back ServoWrite implementation
+  * implement DigitalPinnerProvider and PWMPinnerProvider interfaces
+  * protect against pin map races
+* **dragonboard**
+  * export DigitalPin and PWMPin adaptor methods
+  * protect against pin map races
+  * increase test coverage
+* **edison**
+  * auto-detect arduino breakout board, if no specific board is expected
+  * ensure that we initialize tristate if arduino breakout board
+  * export DigitalPin and PWMPin adaptor methods
+  * implement DigitalPinnerProvider and PWMPinnerProvider interfaces
+  * protect against pin map races
+  * refactoring to reduce code duplication
+* **firmata**
+  * remove processing that might have been eating test events, increase test coverage
+* **joule**
+  * implement DigitalPinnerProvider and PWMPinnerProvider interfaces
+  * protect against pin map races
+  * remove incorrect pin assignment and improve test coverage
+  * add examples using Joule with ADS1015 ADC
+  * naming system changes
+  * correct pin mappings and add PWM example    
+* **microbit**
+  * add a Mavlink-over-UDP adaptor.
+* **microbit**
+  * Add DigitalWriter, DigitalReader, and AnalogReader support using IOPinDriver
+  * Handle start error and increase test coverage
+* **microbit**
+  * Add a (topic, payload) event type
+  * change the On handler to take mqtt.Message
+  * increase test coverage
+  * update examples that use mqtt for updated notification signature
+* **nats**
+  * change the On() handler to take the subject as an argument
+  * increase test coverage
+* **raspi**
+  * implement DigitalPinnerProvider and PWMPinnerProvider interfaces
+  * add implementation for PWMPinner interface that wraps pi blaster
+  * fix adaptor race conditions
+  * increase test coverage
+* **tinkerboard**
+  * Add support for ASUS Tinker Board
+
 1.4.0
 ---
 * **core**
