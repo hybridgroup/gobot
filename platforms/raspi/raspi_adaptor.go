@@ -217,6 +217,22 @@ func (r *Adaptor) PwmWrite(pin string, val byte) (err error) {
 	return sysfsPin.SetDutyCycle(duty)
 }
 
+// SetPwmPeriod writes a PWM signal of the given period to the specified pin
+func (r *Adaptor) SetPwmPeriod(pin string, period float64) (err error) {
+	sysfsPin, err := r.pwmPin(pin)
+	if err != nil {
+		return err
+	}
+	const maxPeriod float64 = 0.01 //10000us
+	const minPeriod float64 = 0    //10us
+	if period < minPeriod || period > maxPeriod {
+		return errors.New("Out of bound: the PWM value must be between 0 and 1")
+	}
+
+	val := (period - minPeriod) / (maxPeriod - minPeriod)
+	return r.piBlaster(fmt.Sprintf("%v=%v\n", sysfsPin, val))
+}
+
 // ServoWrite writes a servo signal to the specified pin
 func (r *Adaptor) ServoWrite(pin string, angle byte) (err error) {
 	sysfsPin, err := r.PWMPin(pin)
