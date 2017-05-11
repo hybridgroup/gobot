@@ -193,7 +193,7 @@ func (i *INA3221Driver) readWordFromRegister(reg uint8) (uint16, error) {
 		return 0, err
 	}
 
-	return uint16((val << 8) | ((val >> 8) & 0xFF)), nil
+	return uint16((val << 8) | ((val >> 8) & 0x00FF)), nil
 }
 
 // initialize initializes the INA3221 device
@@ -208,5 +208,5 @@ func (i *INA3221Driver) initialize() error {
 		ina3221ConfigMode1 |
 		ina3221ConfigMode0
 
-	return i.connection.WriteWordData(ina3221RegConfig, config)
+	return i.connection.WriteBlockData(ina3221RegConfig, []byte{byte(config >> 8), byte(config & 0x00FF)})
 }
