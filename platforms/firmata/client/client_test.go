@@ -133,11 +133,11 @@ func TestProcessProtocolVersion(t *testing.T) {
 		sem <- true
 	})
 
-	go b.process()
+	b.process()
 
 	select {
 	case <-sem:
-	case <-time.After(20 * time.Millisecond):
+	case <-time.After(100 * time.Millisecond):
 		t.Errorf("ProtocolVersion was not published")
 	}
 }
@@ -153,11 +153,11 @@ func TestProcessAnalogRead0(t *testing.T) {
 		sem <- true
 	})
 
-	go b.process()
+	b.process()
 
 	select {
 	case <-sem:
-	case <-time.After(20 * time.Millisecond):
+	case <-time.After(100 * time.Millisecond):
 		t.Errorf("AnalogRead0 was not published")
 	}
 }
@@ -173,11 +173,11 @@ func TestProcessAnalogRead1(t *testing.T) {
 		sem <- true
 	})
 
-	go b.process()
+	b.process()
 
 	select {
 	case <-sem:
-	case <-time.After(20 * time.Millisecond):
+	case <-time.After(100 * time.Millisecond):
 		t.Errorf("AnalogRead1 was not published")
 	}
 }
@@ -194,11 +194,11 @@ func TestProcessDigitalRead2(t *testing.T) {
 		sem <- true
 	})
 
-	go b.process()
+	b.process()
 
 	select {
 	case <-sem:
-	case <-time.After(20 * time.Millisecond):
+	case <-time.After(100 * time.Millisecond):
 		t.Errorf("DigitalRead2 was not published")
 	}
 }
@@ -215,11 +215,11 @@ func TestProcessDigitalRead4(t *testing.T) {
 		sem <- true
 	})
 
-	go b.process()
+	b.process()
 
 	select {
 	case <-sem:
-	case <-time.After(20 * time.Millisecond):
+	case <-time.After(100 * time.Millisecond):
 		t.Errorf("DigitalRead4 was not published")
 	}
 }
@@ -260,11 +260,11 @@ func TestProcessPinState13(t *testing.T) {
 		sem <- true
 	})
 
-	go b.process()
+	b.process()
 
 	select {
 	case <-sem:
-	case <-time.After(20 * time.Millisecond):
+	case <-time.After(100 * time.Millisecond):
 		t.Errorf("PinState13 was not published")
 	}
 }
@@ -284,11 +284,11 @@ func TestProcessI2cReply(t *testing.T) {
 		sem <- true
 	})
 
-	go b.process()
+	b.process()
 
 	select {
 	case <-sem:
-	case <-time.After(20 * time.Millisecond):
+	case <-time.After(100 * time.Millisecond):
 		t.Errorf("I2cReply was not published")
 	}
 }
@@ -306,11 +306,11 @@ func TestProcessFirmwareQuery(t *testing.T) {
 		sem <- true
 	})
 
-	go b.process()
+	b.process()
 
 	select {
 	case <-sem:
-	case <-time.After(20 * time.Millisecond):
+	case <-time.After(100 * time.Millisecond):
 		t.Errorf("FirmwareQuery was not published")
 	}
 }
@@ -326,11 +326,11 @@ func TestProcessStringData(t *testing.T) {
 		sem <- true
 	})
 
-	go b.process()
+	b.process()
 
 	select {
 	case <-sem:
-	case <-time.After(20 * time.Millisecond):
+	case <-time.After(100 * time.Millisecond):
 		t.Errorf("StringData was not published")
 	}
 }
