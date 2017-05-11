@@ -66,6 +66,7 @@ type Client struct {
 	pins             []Pin
 	FirmwareName     string
 	ProtocolVersion  string
+	connecting       atomic.Value
 	connected        atomic.Value
 	connection       io.ReadWriteCloser
 	analogPins       []int
@@ -102,6 +103,7 @@ func New() *Client {
 		Eventer:         gobot.NewEventer(),
 	}
 
+	c.connecting.Store(false)
 	c.connected.Store(false)
 
 	for _, s := range []string{
@@ -119,17 +121,8 @@ func New() *Client {
 	return c
 }
 
-func (b *Client) setInitFunc(f func() error) {
-	b.initMutex.Lock()
-	defer b.initMutex.Unlock()
-	b.initFunc = f
-}
-
-func (b *Client) getInitFunc() func() error {
-	b.initMutex.Lock()
-	defer b.initMutex.Unlock()
-	f := b.initFunc
-	return f
+func (b *Client) setConnecting(c bool) {
+	b.connecting.Store(c)
 }
 
 func (b *Client) setConnected(c bool) {
@@ -140,6 +133,11 @@ func (b *Client) setConnected(c bool) {
 func (b *Client) Disconnect() (err error) {
 	b.setConnected(false)
 	return b.connection.Close()
+}
+
+// Connecting returns true when the client is connecting
+func (b *Client) Connecting() bool {
+	return b.connecting.Load().(bool)
 }
 
 // Connected returns the current connection state of the Client
@@ -163,36 +161,45 @@ func (b *Client) Connect(conn io.ReadWriteCloser) (err error) {
 	b.connection = conn
 	b.Reset()
 
-	b.setInitFunc(b.ProtocolVersionQuery)
-
 	b.Once(b.Event("ProtocolVersion"), func(data interface{}) {
-		b.setInitFunc(b.FirmwareQuery)
+		err := b.FirmwareQuery()
+		if err != nil {
+			b.setConnecting(false)
+		}
 	})
 
 	b.Once(b.Event("FirmwareQuery"), func(data interface{}) {
-		b.setInitFunc(b.CapabilitiesQuery)
+		err := b.CapabilitiesQuery()
+		if err != nil {
+			b.setConnecting(false)
+		}
 	})
 
 	b.Once(b.Event("CapabilityQuery"), func(data interface{}) {
-		b.setInitFunc(b.AnalogMappingQuery)
+		err := b.AnalogMappingQuery()
+		if err != nil {
+			b.setConnecting(false)
+		}
 	})
 
 	b.Once(b.Event("AnalogMappingQuery"), func(data interface{}) {
-		b.setInitFunc(func() error { return nil })
 		b.ReportDigital(0, 1)
 		b.ReportDigital(1, 1)
+		b.setConnecting(false)
 		b.setConnected(true)
 	})
 
+	// start it off...
+	b.setConnecting(true)
+	b.ProtocolVersionQuery()
+
 	for {
-		f := b.getInitFunc()
-		if err := f(); err != nil {
-			return err
-		}
-		if err := b.process(); err != nil {
-			return err
-		}
-		if b.Connected() {
+		switch {
+		case b.Connecting():
+			if err := b.process(); err != nil {
+				return err
+			}
+		case b.Connected():
 			go func() {
 				for {
 					if !b.Connected() {
@@ -204,10 +211,12 @@ func (b *Client) Connect(conn io.ReadWriteCloser) (err error) {
 					}
 				}
 			}()
+
+			return
+		default:
 			break
 		}
 	}
-	return
 }
 
 // Reset sends the SystemReset sysex code.
