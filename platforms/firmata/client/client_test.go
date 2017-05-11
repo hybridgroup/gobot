@@ -91,9 +91,6 @@ func initTestFirmata() *Client {
 		b.process()
 	}
 
-	//b.setConnected(true)
-	//b.Connect(readWriteCloser{})
-
 	return b
 }
 
