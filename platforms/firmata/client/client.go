@@ -158,26 +158,27 @@ func (b *Client) Connect(conn io.ReadWriteCloser) (err error) {
 		return ErrConnected
 	}
 
+	var connectErr error
 	b.connection = conn
 	b.Reset()
 
 	b.Once(b.Event("ProtocolVersion"), func(data interface{}) {
-		err := b.FirmwareQuery()
-		if err != nil {
+		connectErr = b.FirmwareQuery()
+		if connectErr != nil {
 			b.setConnecting(false)
 		}
 	})
 
 	b.Once(b.Event("FirmwareQuery"), func(data interface{}) {
-		err := b.CapabilitiesQuery()
-		if err != nil {
+		connectErr = b.CapabilitiesQuery()
+		if connectErr != nil {
 			b.setConnecting(false)
 		}
 	})
 
 	b.Once(b.Event("CapabilityQuery"), func(data interface{}) {
-		err := b.AnalogMappingQuery()
-		if err != nil {
+		connectErr = b.AnalogMappingQuery()
+		if connectErr != nil {
 			b.setConnecting(false)
 		}
 	})
@@ -214,6 +215,9 @@ func (b *Client) Connect(conn io.ReadWriteCloser) (err error) {
 
 			return
 		default:
+			if connectErr != nil {
+				return connectErr
+			}
 			break
 		}
 	}
