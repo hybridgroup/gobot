@@ -52,12 +52,12 @@
   * add examples using Joule with ADS1015 ADC
   * naming system changes
   * correct pin mappings and add PWM example    
-* **microbit**
+* **mavlink**
   * add a Mavlink-over-UDP adaptor.
 * **microbit**
   * Add DigitalWriter, DigitalReader, and AnalogReader support using IOPinDriver
   * Handle start error and increase test coverage
-* **microbit**
+* **mqtt**
   * Add a (topic, payload) event type
   * change the On handler to take mqtt.Message
   * increase test coverage
