@@ -5,7 +5,7 @@ import (
 
 	"gobot.io/x/gobot"
 
-	"github.com/tarm/serial"
+	serial "go.bug.st/serial.v1"
 )
 
 // Adaptor represents a Connection to a Sphero
@@ -23,7 +23,7 @@ func NewAdaptor(port string) *Adaptor {
 		name: gobot.DefaultName("Sphero"),
 		port: port,
 		connect: func(port string) (io.ReadWriteCloser, error) {
-			return serial.OpenPort(&serial.Config{Name: port, Baud: 115200})
+			return serial.Open(port, &serial.Mode{BaudRate: 115200})
 		},
 	}
 }
