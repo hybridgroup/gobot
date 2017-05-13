@@ -89,20 +89,6 @@ func (c *firmataI2cConnection) ReadWordData(reg uint8) (val uint16, err error) {
 	return
 }
 
-func (c *firmataI2cConnection) ReadBlockData(reg uint8, b []byte) (n int, err error) {
-	// Assume target device handles this well, will not behave exactly as on SMBus
-	if err = c.WriteByte(reg); err != nil {
-		return
-	}
-
-	// Try to read full 32 bytes
-	buf := make([]byte, 32)
-	bytesRead, err := c.Read(buf)
-	copy(b, buf)
-
-	return bytesRead, err
-}
-
 func (c *firmataI2cConnection) WriteByte(val byte) (err error) {
 	buf := []byte{val}
 	_, err = c.Write(buf)
