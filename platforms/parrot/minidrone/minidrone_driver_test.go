@@ -52,6 +52,13 @@ func TestMinidroneUp(t *testing.T) {
 	gobottest.Assert(t, d.Up(25), nil)
 }
 
+func TestMinidroneUpTooFar(t *testing.T) {
+	d := initTestMinidroneDriver()
+	gobottest.Assert(t, d.Start(), nil)
+	gobottest.Assert(t, d.Up(125), nil)
+	gobottest.Assert(t, d.Up(-50), nil)
+}
+
 func TestMinidroneDown(t *testing.T) {
 	d := initTestMinidroneDriver()
 	gobottest.Assert(t, d.Start(), nil)
@@ -92,6 +99,12 @@ func TestMinidroneCounterClockwise(t *testing.T) {
 	d := initTestMinidroneDriver()
 	gobottest.Assert(t, d.Start(), nil)
 	gobottest.Assert(t, d.CounterClockwise(25), nil)
+}
+
+func TestMinidroneStop(t *testing.T) {
+	d := initTestMinidroneDriver()
+	gobottest.Assert(t, d.Start(), nil)
+	gobottest.Assert(t, d.Stop(), nil)
 }
 
 func TestMinidroneStartStopRecording(t *testing.T) {
