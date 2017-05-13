@@ -3,7 +3,7 @@ package mavlink
 import (
 	"io"
 
-	"github.com/tarm/serial"
+	serial "go.bug.st/serial.v1"
 	"gobot.io/x/gobot"
 	common "gobot.io/x/gobot/platforms/mavlink/common"
 )
@@ -30,7 +30,7 @@ func NewAdaptor(port string) *Adaptor {
 		name: "Mavlink",
 		port: port,
 		connect: func(port string) (io.ReadWriteCloser, error) {
-			return serial.OpenPort(&serial.Config{Name: port, Baud: 57600})
+			return serial.Open(port, &serial.Mode{BaudRate: 57600})
 		},
 	}
 }
