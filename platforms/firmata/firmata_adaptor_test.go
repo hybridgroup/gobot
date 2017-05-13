@@ -202,7 +202,10 @@ func TestAdaptorAnalogReadBadPin(t *testing.T) {
 
 func TestAdaptorI2cStart(t *testing.T) {
 	a := initTestAdaptor()
-	a.GetConnection(0, 0)
+	i2c, err := a.GetConnection(0, 0)
+	gobottest.Assert(t, err, nil)
+	gobottest.Refute(t, i2c, nil)
+	gobottest.Assert(t, i2c.Close(), nil)
 }
 
 func TestAdaptorI2cRead(t *testing.T) {
