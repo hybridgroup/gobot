@@ -209,10 +209,6 @@ func (b *Driver) GenerateAllStates() (err error) {
 	b.stepsfa0b++
 	buf := []byte{0x04, byte(b.stepsfa0b), 0x00, 0x04, 0x01, 0x00, 0x32, 0x30, 0x31, 0x34, 0x2D, 0x31, 0x30, 0x2D, 0x32, 0x38, 0x00}
 	err = b.adaptor().WriteCharacteristic(commandCharacteristic, buf)
-	if err != nil {
-		fmt.Println("GenerateAllStates error:", err)
-		return err
-	}
 
 	return
 }
@@ -222,10 +218,6 @@ func (b *Driver) TakeOff() (err error) {
 	b.stepsfa0b++
 	buf := []byte{0x02, byte(b.stepsfa0b) & 0xff, 0x02, 0x00, 0x01, 0x00}
 	err = b.adaptor().WriteCharacteristic(commandCharacteristic, buf)
-	if err != nil {
-		fmt.Println("takeoff error:", err)
-		return err
-	}
 
 	return
 }
