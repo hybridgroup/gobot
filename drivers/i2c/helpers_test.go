@@ -109,15 +109,6 @@ func (t *i2cTestAdaptor) ReadWordData(reg uint8) (val uint16, err error) {
 	return (uint16(high) << 8) | uint16(low), err
 }
 
-func (t *i2cTestAdaptor) ReadBlockData(_ uint8, b []byte) (n int, err error) {
-	t.mtx.Lock()
-	defer t.mtx.Unlock()
-	bytes := make([]byte, 32)
-	bytesRead, err := t.i2cReadImpl(bytes)
-	copy(b, bytes[:bytesRead])
-	return bytesRead, err
-}
-
 func (t *i2cTestAdaptor) WriteByte(val byte) (err error) {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
