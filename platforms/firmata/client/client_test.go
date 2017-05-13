@@ -269,6 +269,24 @@ func TestProcessPinState13(t *testing.T) {
 	}
 }
 
+func TestI2cConfig(t *testing.T) {
+	b := initTestFirmata()
+	b.setConnected(true)
+	gobottest.Assert(t, b.I2cConfig(100), nil)
+}
+
+func TestI2cWrite(t *testing.T) {
+	b := initTestFirmata()
+	b.setConnected(true)
+	gobottest.Assert(t, b.I2cWrite(0x00, []byte{0x01, 0x02}), nil)
+}
+
+func TestI2cRead(t *testing.T) {
+	b := initTestFirmata()
+	b.setConnected(true)
+	gobottest.Assert(t, b.I2cRead(0x00, 10), nil)
+}
+
 func TestProcessI2cReply(t *testing.T) {
 	sem := make(chan bool)
 	b := initTestFirmata()
