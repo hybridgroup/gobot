@@ -281,56 +281,57 @@ func (b *Driver) StartPcmd() {
 	}()
 }
 
-// Up tells the drone to ascend
+// Up tells the drone to ascend. Pass in an int from 0-100.
 func (b *Driver) Up(val int) error {
 	b.Pcmd.Flag = 1
 	b.Pcmd.Gaz = validatePitch(val)
 	return nil
 }
 
-// Down tells the drone to descend
+// Down tells the drone to descend. Pass in an int from 0-100.
 func (b *Driver) Down(val int) error {
 	b.Pcmd.Flag = 1
 	b.Pcmd.Gaz = validatePitch(val) * -1
 	return nil
 }
 
-// Forward tells the drone to go forward
+// Forward tells the drone to go forward. Pass in an int from 0-100.
 func (b *Driver) Forward(val int) error {
 	b.Pcmd.Flag = 1
 	b.Pcmd.Pitch = validatePitch(val)
 	return nil
 }
 
-// Backward tells drone to go in reverse
+// Backward tells drone to go in reverse. Pass in an int from 0-100.
 func (b *Driver) Backward(val int) error {
 	b.Pcmd.Flag = 1
 	b.Pcmd.Pitch = validatePitch(val) * -1
 	return nil
 }
 
-// Right tells drone to go right
+// Right tells drone to go right. Pass in an int from 0-100.
 func (b *Driver) Right(val int) error {
 	b.Pcmd.Flag = 1
 	b.Pcmd.Roll = validatePitch(val)
 	return nil
 }
 
-// Left tells drone to go left
+// Left tells drone to go left. Pass in an int from 0-100.
 func (b *Driver) Left(val int) error {
 	b.Pcmd.Flag = 1
 	b.Pcmd.Roll = validatePitch(val) * -1
 	return nil
 }
 
-// Clockwise tells drone to rotate in a clockwise direction
+// Clockwise tells drone to rotate in a clockwise direction. Pass in an int from 0-100.
 func (b *Driver) Clockwise(val int) error {
 	b.Pcmd.Flag = 1
 	b.Pcmd.Yaw = validatePitch(val)
 	return nil
 }
 
-// CounterClockwise tells drone to rotate in a counter-clockwise direction
+// CounterClockwise tells drone to rotate in a counter-clockwise direction.
+// Pass in an int from 0-100.
 func (b *Driver) CounterClockwise(val int) error {
 	b.Pcmd.Flag = 1
 	b.Pcmd.Yaw = validatePitch(val) * -1
