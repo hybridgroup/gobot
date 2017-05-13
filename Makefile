@@ -54,7 +54,7 @@ deps:
 		github.com/mgutz/logxi/v1 \
 		github.com/nats-io/nats \
 		github.com/sigurn/crc8 \
-		github.com/tarm/serial \
+		go.bug.st/serial.v1 \
 		github.com/veandco/go-sdl2/sdl \
 		golang.org/x/net/websocket \
 		golang.org/x/sys/unix

@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/tarm/serial"
+	serial "go.bug.st/serial.v1"
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/platforms/firmata/client"
@@ -54,7 +54,7 @@ func NewAdaptor(args ...interface{}) *Adaptor {
 		conn:  nil,
 		board: client.New(),
 		PortOpener: func(port string) (io.ReadWriteCloser, error) {
-			return serial.OpenPort(&serial.Config{Name: port, Baud: 57600})
+			return serial.Open(port, &serial.Mode{BaudRate: 57600})
 		},
 		Eventer: gobot.NewEventer(),
 	}
