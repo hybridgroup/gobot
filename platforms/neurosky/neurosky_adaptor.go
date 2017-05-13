@@ -4,7 +4,7 @@ package neurosky
 import (
 	"io"
 
-	"github.com/tarm/serial"
+	serial "go.bug.st/serial.v1"
 )
 
 // Adaptor is the Gobot Adaptor for the Neurosky Mindwave
@@ -21,7 +21,7 @@ func NewAdaptor(port string) *Adaptor {
 		name: "Neurosky",
 		port: port,
 		connect: func(n *Adaptor) (io.ReadWriteCloser, error) {
-			return serial.OpenPort(&serial.Config{Name: n.Port(), Baud: 57600})
+			return serial.Open(n.Port(), &serial.Mode{BaudRate: 57600})
 		},
 	}
 }
