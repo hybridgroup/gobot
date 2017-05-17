@@ -18,6 +18,7 @@ func main() {
 	)
 
 	work := func() {
+		// buttons
 		stick.On(joystick.SquarePress, func(data interface{}) {
 			fmt.Println("square_press")
 		})
@@ -30,6 +31,32 @@ func main() {
 		stick.On(joystick.TriangleRelease, func(data interface{}) {
 			fmt.Println("triangle_release")
 		})
+		stick.On(joystick.CirclePress, func(data interface{}) {
+			fmt.Println("circle_press")
+		})
+		stick.On(joystick.CircleRelease, func(data interface{}) {
+			fmt.Println("circle_release")
+		})
+		stick.On(joystick.XPress, func(data interface{}) {
+			fmt.Println("x_press")
+		})
+		stick.On(joystick.XRelease, func(data interface{}) {
+			fmt.Println("x_release")
+		})
+		stick.On(joystick.StartPress, func(data interface{}) {
+			fmt.Println("start_press")
+		})
+		stick.On(joystick.StartRelease, func(data interface{}) {
+			fmt.Println("start_release")
+		})
+		stick.On(joystick.SelectPress, func(data interface{}) {
+			fmt.Println("select_press")
+		})
+		stick.On(joystick.SelectRelease, func(data interface{}) {
+			fmt.Println("select_release")
+		})
+
+		// joysticks
 		stick.On(joystick.LeftX, func(data interface{}) {
 			fmt.Println("left_x", data)
 		})
@@ -41,6 +68,20 @@ func main() {
 		})
 		stick.On(joystick.RightY, func(data interface{}) {
 			fmt.Println("right_y", data)
+		})
+
+		// triggers
+		stick.On(joystick.R1Press, func(data interface{}) {
+			fmt.Println("R1Press", data)
+		})
+		stick.On(joystick.R2Press, func(data interface{}) {
+			fmt.Println("R2Press", data)
+		})
+		stick.On(joystick.L1Press, func(data interface{}) {
+			fmt.Println("L1Press", data)
+		})
+		stick.On(joystick.L2Press, func(data interface{}) {
+			fmt.Println("L2Press", data)
 		})
 	}
 
