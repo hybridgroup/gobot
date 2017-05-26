@@ -63,16 +63,16 @@ var (
 
 // Client represents a client connection to a firmata board
 type Client struct {
-	pins             []Pin
-	FirmwareName     string
-	ProtocolVersion  string
-	connecting       atomic.Value
-	connected        atomic.Value
-	connection       io.ReadWriteCloser
-	analogPins       []int
-	initTimeInterval time.Duration
-	initFunc         func() error
-	initMutex        sync.Mutex
+	pins            []Pin
+	FirmwareName    string
+	ProtocolVersion string
+	connecting      atomic.Value
+	connected       atomic.Value
+	connection      io.ReadWriteCloser
+	analogPins      []int
+	ConnectTimeout  time.Duration
+	initFunc        func() error
+	initMutex       sync.Mutex
 	gobot.Eventer
 }
 
@@ -98,6 +98,7 @@ func New() *Client {
 		ProtocolVersion: "",
 		FirmwareName:    "",
 		connection:      nil,
+		ConnectTimeout:  15 * time.Second,
 		pins:            []Pin{},
 		analogPins:      []int{},
 		Eventer:         gobot.NewEventer(),
@@ -161,11 +162,14 @@ func (b *Client) Connect(conn io.ReadWriteCloser) (err error) {
 	var connectErr error
 	b.connection = conn
 	b.Reset()
+	connected := make(chan bool, 1)
+	connectError := make(chan bool, 1)
 
 	b.Once(b.Event("ProtocolVersion"), func(data interface{}) {
 		connectErr = b.FirmwareQuery()
 		if connectErr != nil {
 			b.setConnecting(false)
+			connectError <- true
 		}
 	})
 
@@ -173,6 +177,7 @@ func (b *Client) Connect(conn io.ReadWriteCloser) (err error) {
 		connectErr = b.CapabilitiesQuery()
 		if connectErr != nil {
 			b.setConnecting(false)
+			connectError <- true
 		}
 	})
 
@@ -180,6 +185,7 @@ func (b *Client) Connect(conn io.ReadWriteCloser) (err error) {
 		connectErr = b.AnalogMappingQuery()
 		if connectErr != nil {
 			b.setConnecting(false)
+			connectError <- true
 		}
 	})
 
@@ -188,39 +194,48 @@ func (b *Client) Connect(conn io.ReadWriteCloser) (err error) {
 		b.ReportDigital(1, 1)
 		b.setConnecting(false)
 		b.setConnected(true)
+		connected <- true
 	})
 
 	// start it off...
 	b.setConnecting(true)
 	b.ProtocolVersionQuery()
 
-	for {
-		switch {
-		case b.Connecting():
+	go func() {
+		for {
+			if !b.Connecting() {
+				return
+			}
 			if err := b.process(); err != nil {
-				return err
+				connectErr = err
+				connectError <- true
+				return
 			}
-		case b.Connected():
-			go func() {
-				for {
-					if !b.Connected() {
-						break
-					}
-
-					if err := b.process(); err != nil {
-						b.Publish(b.Event("Error"), err)
-					}
-				}
-			}()
-
-			return
-		default:
-			if connectErr != nil {
-				return connectErr
-			}
-			break
+			time.Sleep(10 * time.Millisecond)
 		}
+	}()
+
+	select {
+	case <-connected:
+	case <-connectError:
+		return connectErr
+	case <-time.After(b.ConnectTimeout):
+		return errors.New("unable to connect. Perhaps you need to flash your Arduino with Firmata?")
 	}
+
+	go func() {
+		for {
+			if !b.Connected() {
+				break
+			}
+
+			if err := b.process(); err != nil {
+				b.Publish(b.Event("Error"), err)
+			}
+		}
+	}()
+
+	return
 }
 
 // Reset sends the SystemReset sysex code.
