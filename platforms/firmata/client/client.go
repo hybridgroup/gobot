@@ -159,33 +159,32 @@ func (b *Client) Connect(conn io.ReadWriteCloser) (err error) {
 		return ErrConnected
 	}
 
-	var connectErr error
 	b.connection = conn
 	b.Reset()
 	connected := make(chan bool, 1)
-	connectError := make(chan bool, 1)
+	connectError := make(chan error, 1)
 
 	b.Once(b.Event("ProtocolVersion"), func(data interface{}) {
-		connectErr = b.FirmwareQuery()
-		if connectErr != nil {
+		e := b.FirmwareQuery()
+		if e != nil {
 			b.setConnecting(false)
-			connectError <- true
+			connectError <- e
 		}
 	})
 
 	b.Once(b.Event("FirmwareQuery"), func(data interface{}) {
-		connectErr = b.CapabilitiesQuery()
-		if connectErr != nil {
+		e := b.CapabilitiesQuery()
+		if e != nil {
 			b.setConnecting(false)
-			connectError <- true
+			connectError <- e
 		}
 	})
 
 	b.Once(b.Event("CapabilityQuery"), func(data interface{}) {
-		connectErr = b.AnalogMappingQuery()
-		if connectErr != nil {
+		e := b.AnalogMappingQuery()
+		if e != nil {
 			b.setConnecting(false)
-			connectError <- true
+			connectError <- e
 		}
 	})
 
@@ -206,9 +205,8 @@ func (b *Client) Connect(conn io.ReadWriteCloser) (err error) {
 			if !b.Connecting() {
 				return
 			}
-			if err := b.process(); err != nil {
-				connectErr = err
-				connectError <- true
+			if e := b.process(); e != nil {
+				connectError <- e
 				return
 			}
 			time.Sleep(10 * time.Millisecond)
@@ -217,8 +215,8 @@ func (b *Client) Connect(conn io.ReadWriteCloser) (err error) {
 
 	select {
 	case <-connected:
-	case <-connectError:
-		return connectErr
+	case e := <-connectError:
+		return e
 	case <-time.After(b.ConnectTimeout):
 		return errors.New("unable to connect. Perhaps you need to flash your Arduino with Firmata?")
 	}
