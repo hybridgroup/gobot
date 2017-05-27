@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
+	"sync"
 	"time"
 
 	"gobot.io/x/gobot"
@@ -16,6 +17,7 @@ type Driver struct {
 	connection gobot.Connection
 	stepsfa0a  uint16
 	stepsfa0b  uint16
+	pcmdMutex  sync.Mutex
 	flying     bool
 	Pcmd       Pcmd
 	gobot.Eventer
@@ -77,6 +79,21 @@ const (
 
 	// FlatTrimChange event
 	FlatTrimChange = "flattrimchange"
+
+	// LightFixed mode for LightControl
+	LightFixed = 0
+
+	// LightBlinked mode for LightControl
+	LightBlinked = 1
+
+	// LightOscillated mode for LightControl
+	LightOscillated = 3
+
+	// ClawOpen mode for ClawControl
+	ClawOpen = 0
+
+	// ClawClosed mode for ClawControl
+	ClawClosed = 1
 )
 
 // Pcmd is the Parrot Command structure for flight control
@@ -275,6 +292,9 @@ func (b *Driver) StartPcmd() {
 
 // Up tells the drone to ascend. Pass in an int from 0-100.
 func (b *Driver) Up(val int) error {
+	b.pcmdMutex.Lock()
+	defer b.pcmdMutex.Unlock()
+
 	b.Pcmd.Flag = 1
 	b.Pcmd.Gaz = validatePitch(val)
 	return nil
@@ -282,6 +302,9 @@ func (b *Driver) Up(val int) error {
 
 // Down tells the drone to descend. Pass in an int from 0-100.
 func (b *Driver) Down(val int) error {
+	b.pcmdMutex.Lock()
+	defer b.pcmdMutex.Unlock()
+
 	b.Pcmd.Flag = 1
 	b.Pcmd.Gaz = validatePitch(val) * -1
 	return nil
@@ -289,6 +312,9 @@ func (b *Driver) Down(val int) error {
 
 // Forward tells the drone to go forward. Pass in an int from 0-100.
 func (b *Driver) Forward(val int) error {
+	b.pcmdMutex.Lock()
+	defer b.pcmdMutex.Unlock()
+
 	b.Pcmd.Flag = 1
 	b.Pcmd.Pitch = validatePitch(val)
 	return nil
@@ -296,6 +322,9 @@ func (b *Driver) Forward(val int) error {
 
 // Backward tells drone to go in reverse. Pass in an int from 0-100.
 func (b *Driver) Backward(val int) error {
+	b.pcmdMutex.Lock()
+	defer b.pcmdMutex.Unlock()
+
 	b.Pcmd.Flag = 1
 	b.Pcmd.Pitch = validatePitch(val) * -1
 	return nil
@@ -303,6 +332,9 @@ func (b *Driver) Backward(val int) error {
 
 // Right tells drone to go right. Pass in an int from 0-100.
 func (b *Driver) Right(val int) error {
+	b.pcmdMutex.Lock()
+	defer b.pcmdMutex.Unlock()
+
 	b.Pcmd.Flag = 1
 	b.Pcmd.Roll = validatePitch(val)
 	return nil
@@ -310,6 +342,9 @@ func (b *Driver) Right(val int) error {
 
 // Left tells drone to go left. Pass in an int from 0-100.
 func (b *Driver) Left(val int) error {
+	b.pcmdMutex.Lock()
+	defer b.pcmdMutex.Unlock()
+
 	b.Pcmd.Flag = 1
 	b.Pcmd.Roll = validatePitch(val) * -1
 	return nil
@@ -317,6 +352,9 @@ func (b *Driver) Left(val int) error {
 
 // Clockwise tells drone to rotate in a clockwise direction. Pass in an int from 0-100.
 func (b *Driver) Clockwise(val int) error {
+	b.pcmdMutex.Lock()
+	defer b.pcmdMutex.Unlock()
+
 	b.Pcmd.Flag = 1
 	b.Pcmd.Yaw = validatePitch(val)
 	return nil
@@ -325,6 +363,9 @@ func (b *Driver) Clockwise(val int) error {
 // CounterClockwise tells drone to rotate in a counter-clockwise direction.
 // Pass in an int from 0-100.
 func (b *Driver) CounterClockwise(val int) error {
+	b.pcmdMutex.Lock()
+	defer b.pcmdMutex.Unlock()
+
 	b.Pcmd.Flag = 1
 	b.Pcmd.Yaw = validatePitch(val) * -1
 	return nil
@@ -332,6 +373,9 @@ func (b *Driver) CounterClockwise(val int) error {
 
 // Stop tells the drone to stop moving in any direction and simply hover in place
 func (b *Driver) Stop() error {
+	b.pcmdMutex.Lock()
+	defer b.pcmdMutex.Unlock()
+
 	b.Pcmd = Pcmd{
 		Flag:  0,
 		Roll:  0,
@@ -359,7 +403,7 @@ func (b *Driver) HullProtection(protect bool) error {
 	return nil
 }
 
-// Outdoor mdoe is not supported by the Parrot Minidrone
+// Outdoor mode is not supported by the Parrot Minidrone
 func (b *Driver) Outdoor(outdoor bool) error {
 	return nil
 }
@@ -384,6 +428,44 @@ func (b *Driver) LeftFlip() (err error) {
 	return b.adaptor().WriteCharacteristic(commandCharacteristic, b.generateAnimation(3).Bytes())
 }
 
+// LightControl controls lights on those Minidrone models which
+// have the correct hardware, such as the Maclane, Blaze, & Swat.
+// Params:
+//		id - always 0
+//		mode - either LightFixed, LightBlinked, or LightOscillated
+//		intensity - Light intensity from 0 (OFF) to 100 (Max intensity).
+// 					Only used in LightFixed mode.
+//
+func (b *Driver) LightControl(id uint8, mode uint8, intensity uint8) (err error) {
+	b.stepsfa0b++
+	buf := []byte{0x02, byte(b.stepsfa0b) & 0xff, 0x02, 0x10, 0x00, id, mode, intensity, 0x00}
+	err = b.adaptor().WriteCharacteristic(commandCharacteristic, buf)
+	return
+}
+
+// ClawControl controls the claw on the Parrot Mambo
+// Params:
+//		id - always 0
+//		mode - either ClawOpen or ClawClosed
+//
+func (b *Driver) ClawControl(id uint8, mode uint8) (err error) {
+	b.stepsfa0b++
+	buf := []byte{0x02, byte(b.stepsfa0b) & 0xff, 0x02, 0x10, 0x01, id, mode, 0x00}
+	err = b.adaptor().WriteCharacteristic(commandCharacteristic, buf)
+	return
+}
+
+// GunControl fires the gun on the Parrot Mambo
+// Params:
+//		id - always 0
+//
+func (b *Driver) GunControl(id uint8) (err error) {
+	b.stepsfa0b++
+	buf := []byte{0x02, byte(b.stepsfa0b) & 0xff, 0x02, 0x10, 0x02, id, 0x00}
+	err = b.adaptor().WriteCharacteristic(commandCharacteristic, buf)
+	return
+}
+
 func (b *Driver) generateAnimation(direction int8) *bytes.Buffer {
 	b.stepsfa0b++
 	buf := []byte{0x02, byte(b.stepsfa0b) & 0xff, 0x02, 0x04, 0x00, 0x00, byte(direction), 0x00, 0x00, 0x00}
@@ -391,7 +473,10 @@ func (b *Driver) generateAnimation(direction int8) *bytes.Buffer {
 }
 
 func (b *Driver) generatePcmd() *bytes.Buffer {
+	b.pcmdMutex.Lock()
+	defer b.pcmdMutex.Unlock()
 	b.stepsfa0a++
+	pcmd := b.Pcmd
 
 	cmd := &bytes.Buffer{}
 	binary.Write(cmd, binary.LittleEndian, int8(2))
@@ -400,12 +485,12 @@ func (b *Driver) generatePcmd() *bytes.Buffer {
 	binary.Write(cmd, binary.LittleEndian, int8(0))
 	binary.Write(cmd, binary.LittleEndian, int8(2))
 	binary.Write(cmd, binary.LittleEndian, int8(0))
-	binary.Write(cmd, binary.LittleEndian, int8(b.Pcmd.Flag))
-	binary.Write(cmd, binary.LittleEndian, int8(b.Pcmd.Roll))
-	binary.Write(cmd, binary.LittleEndian, int8(b.Pcmd.Pitch))
-	binary.Write(cmd, binary.LittleEndian, int8(b.Pcmd.Yaw))
-	binary.Write(cmd, binary.LittleEndian, int8(b.Pcmd.Gaz))
-	binary.Write(cmd, binary.LittleEndian, float32(b.Pcmd.Psi))
+	binary.Write(cmd, binary.LittleEndian, int8(pcmd.Flag))
+	binary.Write(cmd, binary.LittleEndian, int8(pcmd.Roll))
+	binary.Write(cmd, binary.LittleEndian, int8(pcmd.Pitch))
+	binary.Write(cmd, binary.LittleEndian, int8(pcmd.Yaw))
+	binary.Write(cmd, binary.LittleEndian, int8(pcmd.Gaz))
+	binary.Write(cmd, binary.LittleEndian, float32(pcmd.Psi))
 	binary.Write(cmd, binary.LittleEndian, int16(0))
 	binary.Write(cmd, binary.LittleEndian, int16(0))
 
