@@ -129,3 +129,21 @@ func TestMinidroneHullFlips(t *testing.T) {
 	gobottest.Assert(t, d.RightFlip(), nil)
 	gobottest.Assert(t, d.LeftFlip(), nil)
 }
+
+func TestMinidroneLightControl(t *testing.T) {
+	d := initTestMinidroneDriver()
+	gobottest.Assert(t, d.Start(), nil)
+	gobottest.Assert(t, d.LightControl(0, LightBlinked, 25), nil)
+}
+
+func TestMinidroneClawControl(t *testing.T) {
+	d := initTestMinidroneDriver()
+	gobottest.Assert(t, d.Start(), nil)
+	gobottest.Assert(t, d.ClawControl(0, ClawOpen), nil)
+}
+
+func TestMinidroneGunControl(t *testing.T) {
+	d := initTestMinidroneDriver()
+	gobottest.Assert(t, d.Start(), nil)
+	gobottest.Assert(t, d.GunControl(0), nil)
+}
