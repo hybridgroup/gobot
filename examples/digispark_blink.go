@@ -5,6 +5,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"gobot.io/x/gobot"
@@ -28,5 +29,8 @@ func main() {
 		work,
 	)
 
-	robot.Start()
+	err := robot.Start()
+	if err != nil {
+		fmt.Println(err)
+	}
 }
