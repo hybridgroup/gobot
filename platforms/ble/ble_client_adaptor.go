@@ -32,8 +32,9 @@ type BLEConnector interface {
 
 // ClientAdaptor represents a Client Connection to a BLE Peripheral
 type ClientAdaptor struct {
-	name    string
-	address string
+	name       string
+	address    string
+	DeviceName string
 
 	addr    blelib.Addr
 	device  *blelib.Device
@@ -47,9 +48,10 @@ type ClientAdaptor struct {
 // NewClientAdaptor returns a new ClientAdaptor given an address or peripheral name
 func NewClientAdaptor(address string) *ClientAdaptor {
 	return &ClientAdaptor{
-		name:      gobot.DefaultName("BLEClient"),
-		address:   address,
-		connected: false,
+		name:       gobot.DefaultName("BLEClient"),
+		address:    address,
+		DeviceName: "default",
+		connected:  false,
 	}
 }
 
@@ -67,16 +69,16 @@ func (b *ClientAdaptor) Connect() (err error) {
 	bleMutex.Lock()
 	defer bleMutex.Unlock()
 
-	b.device, err = getBLEDevice("default")
+	b.device, err = getBLEDevice(b.DeviceName)
 	if err != nil {
-		return errors.Wrap(err, "can't connect")
+		return errors.Wrap(err, "can't connect to device "+b.DeviceName)
 	}
 
 	var cln blelib.Client
 
 	cln, err = blelib.Connect(context.Background(), filter(b.Address()))
 	if err != nil {
-		return errors.Wrap(err, "can't connect")
+		return errors.Wrap(err, "can't connect to peripheral "+b.Address())
 	}
 
 	b.addr = cln.Address()
