@@ -179,13 +179,13 @@ func (c *Adaptor) PWMPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
 			if err = newPin.Export(); err != nil {
 				return
 			}
+			if err = newPin.InvertPolarity(false); err != nil {
+				return
+			}
 			if err = newPin.Enable(true); err != nil {
 				return
 			}
 			if err = newPin.SetPeriod(10000000); err != nil {
-				return
-			}
-			if err = newPin.InvertPolarity(false); err != nil {
 				return
 			}
 			c.pwmPins[sysPin.pwmPin] = newPin
