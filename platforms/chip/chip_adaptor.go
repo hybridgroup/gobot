@@ -212,9 +212,6 @@ func (c *Adaptor) PwmWrite(pin string, val byte) (err error) {
 	return pwmPin.SetDutyCycle(uint32(float64(period) * duty))
 }
 
-// TODO: take into account the actual period setting, not just assume default
-const pwmPeriod = 10000000
-
 // ServoWrite writes a servo signal to the specified pin
 func (c *Adaptor) ServoWrite(pin string, angle byte) (err error) {
 	pwmPin, err := c.PWMPin(pin)
@@ -225,8 +222,10 @@ func (c *Adaptor) ServoWrite(pin string, angle byte) (err error) {
 	// 0.5 ms => -90
 	// 1.5 ms =>   0
 	// 2.0 ms =>  90
-	const minDuty = 100 * 0.0005 * pwmPeriod
-	const maxDuty = 100 * 0.0020 * pwmPeriod
+	//
+	// Duty cycle is in nanos
+	const minDuty = 0.0005 * 1e9
+	const maxDuty = 0.0020 * 1e9
 	duty := uint32(gobot.ToScale(gobot.FromScale(float64(angle), 0, 180), minDuty, maxDuty))
 	return pwmPin.SetDutyCycle(duty)
 }

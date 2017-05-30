@@ -102,12 +102,14 @@ func (p *PWMPin) Polarity() (polarity string, err error) {
 
 // InvertPolarity writes value to pwm polarity path
 func (p *PWMPin) InvertPolarity(invert bool) (err error) {
-	if p.enabled {
+	if !p.enabled {
 		polarity := "normal"
 		if invert {
 			polarity = "inverted"
 		}
 		_, err = p.write(p.pwmPolarityPath(), []byte(polarity))
+	} else {
+		err = fmt.Errorf("Cannot set PWM polarity when enabled")
 	}
 	return
 }
