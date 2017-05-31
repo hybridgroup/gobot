@@ -153,10 +153,12 @@ func (r *Robot) Start(args ...interface{}) (err error) {
 	log.Println("Starting Robot", r.Name, "...")
 	if cerr := r.Connections().Start(); cerr != nil {
 		err = multierror.Append(err, cerr)
+		log.Println(err)
 		return
 	}
 	if derr := r.Devices().Start(); derr != nil {
 		err = multierror.Append(err, derr)
+		log.Println(err)
 		return
 	}
 	if r.Work == nil {
