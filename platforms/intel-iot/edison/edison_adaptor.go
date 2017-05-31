@@ -94,9 +94,6 @@ func (e *Adaptor) Connect() (err error) {
 
 // Finalize releases all i2c devices and exported analog, digital, pwm pins.
 func (e *Adaptor) Finalize() (err error) {
-	// e.mutex.Lock()
-	// defer e.mutex.Unlock()
-
 	if errs := e.tristate.Unexport(); errs != nil {
 		err = multierror.Append(err, errs)
 	}
