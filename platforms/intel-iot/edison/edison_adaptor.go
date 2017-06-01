@@ -69,7 +69,11 @@ func (e *Adaptor) Connect() (err error) {
 	e.digitalPins = make(map[int]*sysfs.DigitalPin)
 	e.pwmPins = make(map[int]*sysfs.PWMPin)
 
-	if e.board == "" && e.checkForArduino() {
+	if e.Board() == "arduino" || e.Board() == "" {
+		aerr := e.checkForArduino()
+		if aerr != nil {
+			return aerr
+		}
 		e.board = "arduino"
 	}
 
@@ -308,11 +312,11 @@ func (e *Adaptor) PWMPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
 
 // TODO: also check to see if device labels for
 // /sys/class/gpio/gpiochip{200,216,232,248}/label == "pcal9555a"
-func (e *Adaptor) checkForArduino() bool {
+func (e *Adaptor) checkForArduino() error {
 	if err := e.exportTristatePin(); err != nil {
-		return false
+		return err
 	}
-	return true
+	return nil
 }
 
 func (e *Adaptor) newExportedPin(pin int) (sysfsPin *sysfs.DigitalPin, err error) {
