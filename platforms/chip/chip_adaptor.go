@@ -179,6 +179,10 @@ func (c *Adaptor) PWMPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
 			if err = newPin.Export(); err != nil {
 				return
 			}
+			// Make sure pwm is disabled when setting polarity
+			if err = newPin.Enable(false); err != nil {
+				return
+			}
 			if err = newPin.InvertPolarity(false); err != nil {
 				return
 			}
