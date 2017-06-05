@@ -24,6 +24,20 @@ https://github.com/hybridgroup/gobot/issues
 - helper method for interrupts to handle "ping" timing-based devices.
 - Windows 10 support.
 
+## i2c
+
+- ensure that SMBUS operations are working as expected.
+- add support for the following i2c devices:
+   - ADXL345
+   - HMC5883L
+   - LSM303DLHC
+   - MAG3110
+   - MMA8452
+   - PCF8591
+   - T5403
+   - TMP006
+   - VCNL4000
+
 ## spi
 
 - add support for spidev.
@@ -32,11 +46,11 @@ https://github.com/hybridgroup/gobot/issues
 
 - add support for 1-wire protocol.
 
-# serial
+## serial
 
 - create a common serial Adaptor, so different serial devices such as GPS, LIDAR etc only need to implement drivers.
 
-# ble
+## ble
 
 - improve the ble package to allow support for multiple peripherals.
 - Windows 10 support.
