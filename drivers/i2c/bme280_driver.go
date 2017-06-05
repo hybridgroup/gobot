@@ -7,7 +7,6 @@ import (
 )
 
 const bme280RegisterControlHumidity = 0xF2
-const bme280RegisterControl = 0xf4
 const bme280RegisterHumidityMSB = 0xFD
 const bme280RegisterCalibDigH1 = 0xa1
 const bme280RegisterCalibDigH2LSB = 0xe1
@@ -114,9 +113,15 @@ func (d *BME280Driver) initHumidity() (err error) {
 	d.hc.h5 = 0 + (int16(addrE6) << 4) | (int16(addrE5) >> 4)
 
 	d.connection.WriteByteData(bme280RegisterControlHumidity, 0x3F)
-	d.connection.WriteByteData(bmp280RegisterControl, 0x3F)
 
-	return nil
+	// The 'ctrl_hum' register sets the humidity data acquisition options of
+	// the device. Changes to this register only become effective after a write
+	// operation to 'ctrl_meas'. Read the current value in, then write it back
+	cmr, err := d.connection.ReadByteData(bmp280RegisterControl)
+	if err != nil {
+		d.connection.WriteByteData(bmp280RegisterControl, cmr)
+	}
+	return err
 }
 
 func (d *BME280Driver) rawHumidity() (uint32, error) {
