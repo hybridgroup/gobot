@@ -39,7 +39,12 @@ func TestBME280Driver(t *testing.T) {
 }
 
 func TestBME280DriverStart(t *testing.T) {
-	bme280, _ := initTestBME280DriverWithStubbedAdaptor()
+	bme280, adaptor := initTestBME280DriverWithStubbedAdaptor()
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		// Simulate returning a single byte for the
+		// ReadByteData(bmp280RegisterControl) call in Start()
+		return 1, nil
+	}
 	gobottest.Assert(t, bme280.Start(), nil)
 }
 

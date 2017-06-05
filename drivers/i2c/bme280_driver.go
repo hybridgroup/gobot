@@ -117,9 +117,10 @@ func (d *BME280Driver) initHumidity() (err error) {
 	// The 'ctrl_hum' register sets the humidity data acquisition options of
 	// the device. Changes to this register only become effective after a write
 	// operation to 'ctrl_meas'. Read the current value in, then write it back
-	cmr, err := d.connection.ReadByteData(bmp280RegisterControl)
-	if err != nil {
-		d.connection.WriteByteData(bmp280RegisterControl, cmr)
+	var cmr uint8
+	cmr, err = d.connection.ReadByteData(bmp280RegisterControl)
+	if err == nil {
+		err = d.connection.WriteByteData(bmp280RegisterControl, cmr)
 	}
 	return err
 }
