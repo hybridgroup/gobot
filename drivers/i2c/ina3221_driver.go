@@ -157,33 +157,33 @@ func (i *INA3221Driver) GetLoadVoltage(channel INA3221Channel) (float64, error) 
 }
 
 // getBusVoltageRaw gets the raw bus voltage (16-bit signed integer, so +-32767)
-func (i *INA3221Driver) getBusVoltageRaw(channel INA3221Channel) (uint16, error) {
+func (i *INA3221Driver) getBusVoltageRaw(channel INA3221Channel) (int16, error) {
 	val, err := i.readWordFromRegister(ina3221RegBusVoltage1 + (uint8(channel)-1)*2)
 	if err != nil {
 		return 0, err
 	}
 
-	value := uint32(val)
+	value := int32(val)
 	if value > 0x7FFF {
 		value -= 0x10000
 	}
 
-	return uint16(value), nil
+	return int16(value), nil
 }
 
 // getShuntVoltageRaw gets the raw shunt voltage (16-bit signed integer, so +-32767)
-func (i *INA3221Driver) getShuntVoltageRaw(channel INA3221Channel) (uint16, error) {
+func (i *INA3221Driver) getShuntVoltageRaw(channel INA3221Channel) (int16, error) {
 	val, err := i.readWordFromRegister(ina3221RegShuntVoltage1 + (uint8(channel)-1)*2)
 	if err != nil {
 		return 0, err
 	}
 
-	value := uint32(val)
+	value := int32(val)
 	if value > 0x7FFF {
 		value -= 0x10000
 	}
 
-	return uint16(value), nil
+	return int16(value), nil
 }
 
 // reads word from supplied register address
@@ -193,7 +193,7 @@ func (i *INA3221Driver) readWordFromRegister(reg uint8) (uint16, error) {
 		return 0, err
 	}
 
-	return uint16((val << 8) | ((val >> 8) & 0x00FF)), nil
+	return uint16(((val & 0x00FF) << 8) | ((val & 0xFF00) >> 8)), nil
 }
 
 // initialize initializes the INA3221 device
