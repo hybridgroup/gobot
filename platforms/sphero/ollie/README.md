@@ -3,11 +3,13 @@
 The Sphero Ollie is a toy robot from Sphero that is controlled using Bluetooth LE. For more information, go to [http://www.sphero.com/ollie](http://www.sphero.com/ollie)
 
 ## How to Install
+
 ```
 go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/ble
 ```
 
 ## How to Use
+
 ```go
 package main
 
@@ -51,13 +53,11 @@ You need to know the BLE ID of the Ollie you want to connect to. The Gobot BLE c
 
 ### OSX
 
-To run any of the Gobot BLE code you must use the `GODEBUG=cgocheck=0` flag in order to get around some of the issues in the CGo-based implementation.
+If you connect by name, then you do not need to worry about the Bluetooth LE ID. However, if you want to connect by ID, OS X uses its own Bluetooth ID system which is different from the IDs used on Linux. The code calls thru the XPC interfaces provided by OSX, so as a result does not need to run under sudo.
 
 For example:
 
-    GODEBUG=cgocheck=0 go run examples/ollie.go 2B-1247
-
-OSX uses its own Bluetooth ID system which is different from the IDs used on Linux. The code calls thru the XPC interfaces provided by OSX, so as a result does not need to run under sudo.
+    go run examples/ollie.go 2B-1247
 
 ### Ubuntu
 

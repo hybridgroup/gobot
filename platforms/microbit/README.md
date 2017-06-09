@@ -4,7 +4,7 @@ The [Microbit](http://microbit.org/) is a tiny computer with built-in Bluetooth 
 
 ## How to Install
 ```
-go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/microbit
+go get -d -u gobot.io/x/gobot/...
 ```
 
 You must install the Microbit firmware from [@sandeepmistry] located at  [https://github.com/sandeepmistry/node-bbc-microbit](https://github.com/sandeepmistry/node-bbc-microbit) to use the Microbit with Gobot. This firmware is based on the micro:bit template, but with a few changes.
@@ -125,11 +125,11 @@ You need to know the BLE ID of the Microbit that you want to connect to.
 
 ### OSX
 
-To run any of the Gobot BLE code you must use the `GODEBUG=cgocheck=0` flag in order to get around some of the issues in the CGo-based implementation.
+If you connect by name, then you do not need to worry about the Bluetooth LE ID. However, if you want to connect by ID, OS X uses its own Bluetooth ID system which is different from the IDs used on Linux. The code calls thru the XPC interfaces provided by OSX, so as a result does not need to run under sudo.
 
 For example:
 
-    GODEBUG=cgocheck=0 go run examples/microbit_blink.go "BBC micro:bit"
+    go run examples/microbit_led.go "BBC micro:bit"
 
 OSX uses its own Bluetooth ID system which is different from the IDs used on Linux. The code calls thru the XPC interfaces provided by OSX, so as a result does not need to run under sudo.
 
@@ -139,8 +139,8 @@ On Linux the BLE code will need to run as a root user account. The easiest way t
 
 For example:
 
-    go build examples/microbit_blink.go
-    sudo ./microbit_blink "BBC micro:bit"
+    go build examples/microbit_led.go
+    sudo ./microbit_led "BBC micro:bit"
 
 ### Windows
 

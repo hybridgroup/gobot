@@ -184,9 +184,9 @@ with your arduino.
 ## Hardware Support
 The following Firmata devices have been tested and are known to work:
 
-  - [Arduino Uno R3](http://arduino.cc/en/Main/arduinoBoardUno)
+  	- [Arduino Uno R3](http://arduino.cc/en/Main/arduinoBoardUno)
 	- [Arduino/Genuino 101](https://www.arduino.cc/en/Main/ArduinoBoard101)
-  - [Teensy 3.0](http://www.pjrc.com/store/teensy3.html)
+  	- [Teensy 3.0](http://www.pjrc.com/store/teensy3.html)
 
 The following WiFi devices have been tested and are known to work:
 	- [NodeMCU 1.0](http://nodemcu.com/index_en.html)

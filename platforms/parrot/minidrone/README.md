@@ -7,6 +7,7 @@ Models that are known to work with this package include:
 	- Parrot Rolling Spider
 	- Parrot Airborne Cargo Mars
 	- Parrot Airborne Cargo Travis
+	- Parrot Mambo
 
 Models that should work now, but have not been tested by us:
 
@@ -19,14 +20,15 @@ Models that should work now, but have not been tested by us:
 Models that will require additional work for compatibility:
 
 	- Parrot Swing
-	- Parrot Mambo
 
 ## How to Install
+
 ```
-go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/ble
+go get -d -u gobot.io/x/gobot/...
 ```
 
 ## How to Use
+
 ```go
 package main
 
@@ -90,17 +92,15 @@ func main() {
 
 The Parrot Minidrones are Bluetooth LE devices.
 
-You need to know the BLE ID of the Minidrone you want to connect to. The Gobot BLE client adaptor also lets you connect by friendly name, aka "RS_1234".
+You need to know the BLE ID or name of the Minidrone you want to connect to. The Gobot BLE client adaptor also lets you connect by friendly name, aka "RS_1234".
 
 ### OSX
 
-To run any of the Gobot BLE code you must use the `GODEBUG=cgocheck=0` flag in order to get around some of the issues in the CGo-based implementation.
+If you connect by name, then you do not need to worry about the Bluetooth LE ID. However, if you want to connect by ID, OS X uses its own Bluetooth ID system which is different from the IDs used on Linux. The code calls thru the XPC interfaces provided by OSX, so as a result does not need to run under sudo.
 
 For example:
 
-    GODEBUG=cgocheck=0 go run examples/minidrone.go RS_1234
-
-OSX uses its own Bluetooth ID system which is different from the IDs used on Linux. The code calls thru the XPC interfaces provided by OSX, so as a result does not need to run under sudo.
+    go run examples/minidrone.go RS_1234
 
 ### Ubuntu
 
