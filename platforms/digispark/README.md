@@ -2,7 +2,7 @@
 
 The Digispark is an Attiny85 based microcontroller development board similar to the Arduino line, only cheaper, smaller, and a bit less powerful. With a whole host of shields to extend its functionality and the ability to use the familiar Arduino IDE the Digispark is a great way to jump into electronics, or perfect for when an Arduino is too big or too much.
 
-This package provides the Gobot adaptor for the [Digispark](http://digistump.com/products/1) ATTiny-based USB development board with the [Little Wire](http://littlewire.cc/) protocol firmware installed.
+This package provides the Gobot adaptor for the [Digispark](http://digistump.com/products/1) ATTiny-based USB development board with the [Little Wire](http://littlewire.github.io/) protocol firmware installed.
 
 ## How to Install
 
