@@ -4,7 +4,7 @@
 /*
   Cross platform computer interface library for Little Wire project
 
-  http://littlewire.cc
+  http://littlewire.github.io
 
   Copyright (C) <2013> ihsan Kehribar <ihsan@kehribar.me>
   Copyright (C) <2013> Omer Kilic <omerkilic@gmail.com>
