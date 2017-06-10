@@ -11,7 +11,7 @@ For more info about the Arduino platform, go to [http://arduino.cc/](http://ardu
 ## How to Install
 
 ```
-go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/firmata
+go get -d -u gobot.io/x/gobot/...
 ```
 
 You must install Firmata on your microcontroller before you can connect to it using Gobot. You can do this in many cases using Gort ([http://gort.io](http://gort.io)).

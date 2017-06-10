@@ -6,8 +6,9 @@ For more info about the ARDrone platform click [here](http://ardrone2.parrot.com
 
 ## How to Install
 ```
-go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/parrot/ardrone
+go get -d -u gobot.io/x/gobot/...
 ```
+
 ## How to Use
 ```go
 package main

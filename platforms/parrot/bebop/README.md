@@ -4,7 +4,7 @@ The Parrot Bebop and Parrot Bebop 2 are inexpensive quadcopters that can be cont
 
 ## How to Install
 ```
-go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/parrot/bebop
+go get -d -u gobot.io/x/gobot/...
 ```
 
 ## How to Use

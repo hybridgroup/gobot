@@ -5,7 +5,7 @@ This module implements support for keyboard events, wrapping the `stty` utility.
 ## How to Install
 
 ```
-go get gobot.io/x/gobot && go install gobot.io/x/gobot/platforms/keyboard
+go get -d -u gobot.io/x/gobot/...
 ```
 
 ## How to Use

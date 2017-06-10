@@ -11,7 +11,7 @@ For more info about the MQTT machine to machine messaging standard, go to http:/
 Install running:
 
 ```
-go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/mqtt
+go get -d -u gobot.io/x/gobot/...
 ```
 
 ## How to Use

@@ -11,7 +11,7 @@ The NATS messaging protocol (http://www.nats.io/documentation/internals/nats-pro
 Install running:
 
 ```
-go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/nats
+go get -d -u gobot.io/x/gobot/...
 ```
 
 ## How to Use

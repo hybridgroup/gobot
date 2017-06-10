@@ -17,7 +17,7 @@ configured to send version 1.0 frames.
 ## How to Install
 
 ```
-go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/mavlink
+go get -d -u gobot.io/x/gobot/...
 
 ```
 

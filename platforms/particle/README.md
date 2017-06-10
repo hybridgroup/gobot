@@ -9,7 +9,7 @@ For more info about the Particle platform go to https://www.particle.io/
 Installing Gobot with Particle support is pretty easy.
 
 ```
-go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/particle
+go get -d -u gobot.io/x/gobot/...
 ```
 
 ## How to Use

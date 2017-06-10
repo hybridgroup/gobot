@@ -33,7 +33,7 @@ Follow the official [OpenCV installation guide](http://docs.opencv.org/doc/tutor
 
 Now you can install the package with
 ```
-go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/opencv
+go get -d -u gobot.io/x/gobot/...
 ```
 
 ## How to Use

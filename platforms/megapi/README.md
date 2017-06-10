@@ -7,7 +7,7 @@ The code is based on a python implementation that can be found [here](https://gi
 ## How to Install
 
 ```
-go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/megapi
+go get -d -u gobot.io/x/gobot/...
 ```
 
 ## How to Use
