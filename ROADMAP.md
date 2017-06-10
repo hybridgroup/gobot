@@ -4,7 +4,7 @@ This is the roadmap of what we as a community want to see happen with Gobot. It 
 
 Requests for changes to the roadmap should be made in the form of pull requests to this document.
 
-Specific to any implementation, including requests for platform support, bug reports, or other specifics should still be made by creating a new issue here:
+Anything tied to any implementation, including requests for platform support, bug reports, or other specifics should still be made by creating a new issue here:
 
 https://github.com/hybridgroup/gobot/issues
 
