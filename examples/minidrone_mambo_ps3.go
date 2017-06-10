@@ -2,6 +2,22 @@
 //
 // Do not build by default.
 
+/*
+ How to setup
+ You must be using a PS3 or compatible controller, along with
+ one of the Parrot Mambo drones to run this example.
+
+ You run the Go program on your computer and communicate
+ wirelessly with the Mambo.
+
+ How to run
+ Pass the Bluetooth name or address as first param:
+
+	go run examples/minidrone_mambo_ps3.go "Mambo_1234"
+
+ NOTE: sudo is required to use BLE in Linux
+*/
+
 package main
 
 import (

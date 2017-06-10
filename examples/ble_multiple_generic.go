@@ -3,9 +3,10 @@
 // Do not build by default.
 
 /*
- To run this example, pass the BLE addresses or BLE names as first param:
+ How to run
+ Pass the Bluetooth address or name as the first param:
 
- go run examples/ble_multiple.go 2B-1234 2B-5678
+	go run examples/ble_multiple_generic.go BB-1234 BB-1235
 
  NOTE: sudo is required to use BLE in Linux
 */

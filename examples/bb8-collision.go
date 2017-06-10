@@ -2,6 +2,15 @@
 //
 // Do not build by default.
 
+/*
+ How to run
+ Pass the Bluetooth address or name as the first param:
+
+	go run examples/bb8-collision.go BB-1234
+
+ NOTE: sudo is required to use BLE in Linux
+*/
+
 package main
 
 import (

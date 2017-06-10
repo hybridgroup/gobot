@@ -3,7 +3,14 @@
 // Do not build by default.
 
 /*
- To run this example, pass the IP address/port as first param:
+ How to setup
+ You must be using a WiFi-connected microcontroller,
+ that has been flashed with the WifiFirmata sketch.
+ You then run the go program on your computer, and communicate
+ wirelessly with the microcontroller.
+
+ How to run
+ Pass the IP address/port as first param:
 
 	go run examples/wifi_firmata_blink.go 192.168.0.39:3030
 */

@@ -3,11 +3,12 @@
 // Do not build by default.
 
 /*
- To run this example, pass the BLE address or BLE name as first param:
+ How to run
+ Pass the BLE address or BLE name as first param:
 
 	go run examples/ble_firmata_blink.go FIRMATA
 
-	NOTE: sudo is required to use BLE in Linux
+ NOTE: sudo is required to use BLE in Linux
 */
 
 package main
