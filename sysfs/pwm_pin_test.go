@@ -46,6 +46,7 @@ func TestPwmPin(t *testing.T) {
 	err = pin.Enable(true)
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/pwm10/enable"].Contents, "1")
+	gobottest.Refute(t, pin.InvertPolarity(false), nil)
 
 	fs.Files["/sys/class/pwm/pwmchip0/pwm10/period"].Contents = "6"
 	data, _ := pin.Period()
