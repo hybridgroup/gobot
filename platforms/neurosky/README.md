@@ -8,7 +8,7 @@ This package contains the Gobot adaptor and driver for the [Neurosky Mindwave Mo
 Installing Gobot with Neurosky support is pretty easy.
 
 ```
-go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/neurosky
+go get -d -u gobot.io/x/gobot/...
 ```
 
 ## How To Connect

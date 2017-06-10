@@ -28,7 +28,7 @@ $ sudo apt-get install libsdl2-2.0-0
 Now you can install the package with
 
 ```
-go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/joystick
+go get -d -u gobot.io/x/gobot/...
 ```
 
 ## How to Use

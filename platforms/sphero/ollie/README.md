@@ -5,7 +5,7 @@ The Sphero Ollie is a toy robot from Sphero that is controlled using Bluetooth L
 ## How to Install
 
 ```
-go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/ble
+go get -d -u gobot.io/x/gobot/...
 ```
 
 ## How to Use

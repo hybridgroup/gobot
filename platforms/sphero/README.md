@@ -8,7 +8,7 @@ Learn more about the Sphero robot go here: http://www.gosphero.com/
 
 ## How to Install
 ```
-go get -d -u gobot.io/x/gobot/... && go install gobot.io/x/gobot/platforms/sphero
+go get -d -u gobot.io/x/gobot/...
 ```
 
 ## How To Connect
