@@ -2,6 +2,15 @@
 //
 // Do not build by default.
 
+/*
+ How to run
+ Pass the Bluetooth name or address as first param:
+
+	go run examples/minidrone.go "Mambo_1234"
+
+ NOTE: sudo is required to use BLE in Linux
+*/
+
 package main
 
 import (
