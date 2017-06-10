@@ -11,6 +11,7 @@ https://github.com/hybridgroup/gobot/issues
 ## core
 
 - standardized logging
+- use Context to allow for graceful exits.
 
 ## api
 
@@ -23,6 +24,13 @@ https://github.com/hybridgroup/gobot/issues
 - support for epoll/interrupt based gpio events.
 - helper method for interrupts to handle "ping" timing-based devices.
 - Windows 10 support.
+- use variadic constructor functions to allow for additional params, similar to i2c drivers.
+
+## aio
+
+- support for epoll based aio events possible?
+- Windows 10 support.
+- use variadic constructor functions to allow for additional params, similar to i2c drivers.
 
 ## i2c
 
