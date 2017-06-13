@@ -272,7 +272,7 @@ func (b *Client) ServoConfig(pin int, max int, min int) error {
 		byte(max & 0x7F),
 		byte((max >> 7) & 0x7F),
 	}
-	return b.writeSysex(ret)
+	return b.WriteSysex(ret)
 }
 
 // AnalogWrite writes value to pin.
@@ -283,27 +283,27 @@ func (b *Client) AnalogWrite(pin int, value int) error {
 
 // FirmwareQuery sends the FirmwareQuery sysex code.
 func (b *Client) FirmwareQuery() error {
-	return b.writeSysex([]byte{FirmwareQuery})
+	return b.WriteSysex([]byte{FirmwareQuery})
 }
 
 // PinStateQuery sends a PinStateQuery for pin.
 func (b *Client) PinStateQuery(pin int) error {
-	return b.writeSysex([]byte{PinStateQuery, byte(pin)})
+	return b.WriteSysex([]byte{PinStateQuery, byte(pin)})
 }
 
 // ProtocolVersionQuery sends the ProtocolVersion sysex code.
 func (b *Client) ProtocolVersionQuery() error {
-	return b.write([]byte{ProtocolVersion})
+	return b.WriteSysex([]byte{ProtocolVersion})
 }
 
 // CapabilitiesQuery sends the CapabilityQuery sysex code.
 func (b *Client) CapabilitiesQuery() error {
-	return b.writeSysex([]byte{CapabilityQuery})
+	return b.WriteSysex([]byte{CapabilityQuery})
 }
 
 // AnalogMappingQuery sends the AnalogMappingQuery sysex code.
 func (b *Client) AnalogMappingQuery() error {
-	return b.writeSysex([]byte{AnalogMappingQuery})
+	return b.WriteSysex([]byte{AnalogMappingQuery})
 }
 
 // ReportDigital enables or disables digital reporting for pin, a non zero
@@ -320,7 +320,7 @@ func (b *Client) ReportAnalog(pin int, state int) error {
 
 // I2cRead reads numBytes from address once.
 func (b *Client) I2cRead(address int, numBytes int) error {
-	return b.writeSysex([]byte{I2CRequest, byte(address), (I2CModeRead << 3),
+	return b.WriteSysex([]byte{I2CRequest, byte(address), (I2CModeRead << 3),
 		byte(numBytes) & 0x7F, (byte(numBytes) >> 7) & 0x7F})
 }
 
@@ -331,13 +331,13 @@ func (b *Client) I2cWrite(address int, data []byte) error {
 		ret = append(ret, byte(val&0x7F))
 		ret = append(ret, byte((val>>7)&0x7F))
 	}
-	return b.writeSysex(ret)
+	return b.WriteSysex(ret)
 }
 
 // I2cConfig configures the delay in which a register can be read from after it
 // has been written to.
 func (b *Client) I2cConfig(delay int) error {
-	return b.writeSysex([]byte{I2CConfig, byte(delay & 0xFF), byte((delay >> 8) & 0xFF)})
+	return b.WriteSysex([]byte{I2CConfig, byte(delay & 0xFF), byte((delay >> 8) & 0xFF)})
 }
 
 func (b *Client) togglePinReporting(pin int, state int, mode byte) error {
@@ -355,7 +355,8 @@ func (b *Client) togglePinReporting(pin int, state int, mode byte) error {
 
 }
 
-func (b *Client) writeSysex(data []byte) (err error) {
+// WriteSysex writes an arbitrary Sysex command to the microcontroller.
+func (b *Client) WriteSysex(data []byte) (err error) {
 	return b.write(append([]byte{StartSysex}, append(data, EndSysex)...))
 }
 
@@ -508,6 +509,10 @@ func (b *Client) process() (err error) {
 		case StringData:
 			str := currentBuffer[2:]
 			b.Publish(b.Event("StringData"), string(str[:len(str)-1]))
+		default:
+			data := make([]byte, len(currentBuffer))
+			copy(data, currentBuffer)
+			b.Publish(b.Event("SysexResponse"), data)
 		}
 	}
 	return
