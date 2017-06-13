@@ -287,6 +287,12 @@ func TestI2cRead(t *testing.T) {
 	gobottest.Assert(t, b.I2cRead(0x00, 10), nil)
 }
 
+func TestWriteSysex(t *testing.T) {
+	b := initTestFirmata()
+	b.setConnected(true)
+	gobottest.Assert(t, b.WriteSysex([]byte{0x01, 0x02}), nil)
+}
+
 func TestProcessI2cReply(t *testing.T) {
 	sem := make(chan bool)
 	b := initTestFirmata()
@@ -437,5 +443,25 @@ func TestServoConfig(t *testing.T) {
 		gobottest.Assert(t, testWriteData.Bytes(), test.expected)
 		gobottest.Assert(t, err, test.result)
 		writeDataMutex.Unlock()
+	}
+}
+
+func TestProcessSysexData(t *testing.T) {
+	sem := make(chan bool)
+	b := initTestFirmata()
+	b.setConnected(true)
+	SetTestReadData([]byte{240, 17, 1, 2, 3, 247})
+
+	b.Once(b.Event("SysexResponse"), func(data interface{}) {
+		gobottest.Assert(t, data, []byte{240, 17, 1, 2, 3, 247})
+		sem <- true
+	})
+
+	b.process()
+
+	select {
+	case <-sem:
+	case <-time.After(100 * time.Millisecond):
+		t.Errorf("SysexResponse was not published")
 	}
 }
