@@ -293,7 +293,7 @@ func (b *Client) PinStateQuery(pin int) error {
 
 // ProtocolVersionQuery sends the ProtocolVersion sysex code.
 func (b *Client) ProtocolVersionQuery() error {
-	return b.WriteSysex([]byte{ProtocolVersion})
+	return b.write([]byte{ProtocolVersion})
 }
 
 // CapabilitiesQuery sends the CapabilityQuery sysex code.
@@ -512,7 +512,7 @@ func (b *Client) process() (err error) {
 		default:
 			data := make([]byte, len(currentBuffer))
 			copy(data, currentBuffer)
-			b.Publish(b.Event("SysexResponse"), data)
+			b.Publish("SysexResponse", data)
 		}
 	}
 	return
