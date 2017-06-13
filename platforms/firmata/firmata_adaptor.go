@@ -25,6 +25,7 @@ type firmataBoard interface {
 	I2cWrite(int, []byte) error
 	I2cConfig(int) error
 	ServoConfig(int, int, int) error
+	WriteSysex(data []byte) error
 	gobot.Eventer
 }
 
@@ -214,6 +215,10 @@ func (f *Adaptor) AnalogRead(pin string) (val int, err error) {
 	}
 
 	return f.board.Pins()[p].Value, nil
+}
+
+func (f *Adaptor) WriteSysex(data []byte) error {
+	return f.board.WriteSysex(data[:])
 }
 
 // digitalPin converts pin number to digital mapping
