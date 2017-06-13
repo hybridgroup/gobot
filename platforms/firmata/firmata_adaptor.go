@@ -84,6 +84,11 @@ func (f *Adaptor) Connect() (err error) {
 	if err = f.board.Connect(f.conn); err != nil {
 		return err
 	}
+
+	f.board.On("SysexResponse", func(data interface{}) {
+		f.Publish("SysexResponse", data)
+	})
+
 	return
 }
 
@@ -218,7 +223,7 @@ func (f *Adaptor) AnalogRead(pin string) (val int, err error) {
 }
 
 func (f *Adaptor) WriteSysex(data []byte) error {
-	return f.board.WriteSysex(data[:])
+	return f.board.WriteSysex(data)
 }
 
 // digitalPin converts pin number to digital mapping

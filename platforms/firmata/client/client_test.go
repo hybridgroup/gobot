@@ -452,7 +452,7 @@ func TestProcessSysexData(t *testing.T) {
 	b.setConnected(true)
 	SetTestReadData([]byte{240, 17, 1, 2, 3, 247})
 
-	b.Once(b.Event("SysexResponse"), func(data interface{}) {
+	b.Once("SysexResponse", func(data interface{}) {
 		gobottest.Assert(t, data, []byte{240, 17, 1, 2, 3, 247})
 		sem <- true
 	})
