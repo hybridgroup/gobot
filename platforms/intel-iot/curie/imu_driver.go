@@ -30,6 +30,11 @@ type GyroscopeData struct {
 	Z int16
 }
 
+type ShockData struct {
+	Axis      byte
+	Direction byte
+}
+
 // IMUDriver represents the IMU that is built-in to the Curie
 type IMUDriver struct {
 	name       string
@@ -65,6 +70,10 @@ func (imu *IMUDriver) Start() (err error) {
 			case CURIE_IMU_READ_TEMP:
 				val, _ := parseTemperatureData(data)
 				imu.Publish("Temperature", val)
+
+			case CURIE_IMU_SHOCK_DETECT:
+				val, _ := parseShockData(data)
+				imu.Publish("Shock", val)
 
 			}
 		}
@@ -104,6 +113,16 @@ func (imu *IMUDriver) ReadTemperature() error {
 	return imu.connection.WriteSysex([]byte{CURIE_IMU, CURIE_IMU_READ_TEMP})
 }
 
+// EnableShockDetection turns on the Curie's built-in shock detection.
+// The result will be returned by the Sysex response message
+func (imu *IMUDriver) EnableShockDetection(detect bool) error {
+	var d byte
+	if detect {
+		d = 1
+	}
+	return imu.connection.WriteSysex([]byte{CURIE_IMU, CURIE_IMU_SHOCK_DETECT, d})
+}
+
 func parseAccelerometerData(data []byte) (*AccelerometerData, error) {
 	if len(data) < 9 {
 		return nil, errors.New("Invalid data")
@@ -136,5 +155,14 @@ func parseTemperatureData(data []byte) (float32, error) {
 	t2 := int16(uint16(data[5]) | uint16(data[6])<<7)
 
 	res := (float32(t1+(t2*8)) / 512.0) + 23.0
+	return res, nil
+}
+
+func parseShockData(data []byte) (*ShockData, error) {
+	if len(data) < 6 {
+		return nil, errors.New("Invalid data")
+	}
+
+	res := &ShockData{Axis: data[3], Direction: data[4]}
 	return res, nil
 }
