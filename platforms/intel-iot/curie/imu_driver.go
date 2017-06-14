@@ -71,37 +71,7 @@ func NewIMUDriver(a *firmata.Adaptor) *IMUDriver {
 func (imu *IMUDriver) Start() (err error) {
 	imu.connection.On("SysexResponse", func(res interface{}) {
 		data := res.([]byte)
-		if data[1] == CURIE_IMU {
-			switch data[2] {
-			case CURIE_IMU_READ_ACCEL:
-				val, _ := parseAccelerometerData(data)
-				imu.Publish("Accelerometer", val)
-
-			case CURIE_IMU_READ_GYRO:
-				val, _ := parseGyroscopeData(data)
-				imu.Publish("Gyroscope", val)
-
-			case CURIE_IMU_READ_TEMP:
-				val, _ := parseTemperatureData(data)
-				imu.Publish("Temperature", val)
-
-			case CURIE_IMU_SHOCK_DETECT:
-				val, _ := parseShockData(data)
-				imu.Publish("Shock", val)
-
-			case CURIE_IMU_STEP_COUNTER:
-				val, _ := parseStepData(data)
-				imu.Publish("Steps", val)
-
-			case CURIE_IMU_TAP_DETECT:
-				val, _ := parseTapData(data)
-				imu.Publish("Tap", val)
-
-			case CURIE_IMU_READ_MOTION:
-				val, _ := parseMotionData(data)
-				imu.Publish("Motion", val)
-			}
-		}
+		imu.handleEvent(data)
 	})
 	return
 }
@@ -172,6 +142,49 @@ func (imu *IMUDriver) EnableTapDetection(detect bool) error {
 // The result will be returned by the Sysex response message
 func (imu *IMUDriver) ReadMotion() error {
 	return imu.connection.WriteSysex([]byte{CURIE_IMU, CURIE_IMU_READ_MOTION})
+}
+
+func (imu *IMUDriver) handleEvent(data []byte) (err error) {
+	if data[1] == CURIE_IMU {
+		switch data[2] {
+		case CURIE_IMU_READ_ACCEL:
+			val, err := parseAccelerometerData(data)
+			if err == nil {
+				imu.Publish("Accelerometer", val)
+			}
+		case CURIE_IMU_READ_GYRO:
+			val, err := parseGyroscopeData(data)
+			if err == nil {
+				imu.Publish("Gyroscope", val)
+			}
+		case CURIE_IMU_READ_TEMP:
+			val, err := parseTemperatureData(data)
+			if err == nil {
+				imu.Publish("Temperature", val)
+			}
+		case CURIE_IMU_SHOCK_DETECT:
+			val, err := parseShockData(data)
+			if err == nil {
+				imu.Publish("Shock", val)
+			}
+		case CURIE_IMU_STEP_COUNTER:
+			val, err := parseStepData(data)
+			if err == nil {
+				imu.Publish("Steps", val)
+			}
+		case CURIE_IMU_TAP_DETECT:
+			val, err := parseTapData(data)
+			if err == nil {
+				imu.Publish("Tap", val)
+			}
+		case CURIE_IMU_READ_MOTION:
+			val, err := parseMotionData(data)
+			if err == nil {
+				imu.Publish("Motion", val)
+			}
+		}
+	}
+	return
 }
 
 func parseAccelerometerData(data []byte) (*AccelerometerData, error) {
