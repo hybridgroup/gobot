@@ -29,6 +29,15 @@ type firmataBoard interface {
 	gobot.Eventer
 }
 
+type FirmataAdaptor interface {
+	Connect() (err error)
+	Finalize() (err error)
+	Name() string
+	SetName(n string)
+	WriteSysex(data []byte) error
+	gobot.Eventer
+}
+
 // Adaptor is the Gobot Adaptor for Firmata based boards
 type Adaptor struct {
 	name       string

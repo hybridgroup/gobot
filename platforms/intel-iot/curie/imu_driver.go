@@ -52,12 +52,12 @@ type MotionData struct {
 // IMUDriver represents the IMU that is built-in to the Curie
 type IMUDriver struct {
 	name       string
-	connection *firmata.Adaptor
+	connection firmata.FirmataAdaptor
 	gobot.Eventer
 }
 
 // NewIMUDriver returns a new IMUDriver
-func NewIMUDriver(a *firmata.Adaptor) *IMUDriver {
+func NewIMUDriver(a firmata.FirmataAdaptor) *IMUDriver {
 	imu := &IMUDriver{
 		name:       gobot.DefaultName("CurieIMU"),
 		connection: a,
