@@ -31,7 +31,7 @@ func main() {
 		imu.EnableTapDetection(true)
 	}
 
-	robot := gobot.NewRobot("blinkmBot",
+	robot := gobot.NewRobot("curieBot",
 		[]gobot.Connection{firmataAdaptor},
 		[]gobot.Device{imu, led},
 		work,

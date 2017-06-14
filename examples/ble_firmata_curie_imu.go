@@ -2,10 +2,20 @@
 //
 // Do not build by default.
 
+/*
+ How to run
+ Pass the BLE address or BLE name as first param:
+
+	go run examples/ble_firmata_curie_imu.go FIRMATA
+
+ NOTE: sudo is required to use BLE in Linux
+*/
+
 package main
 
 import (
 	"log"
+	"os"
 	"time"
 
 	"gobot.io/x/gobot"
@@ -15,7 +25,7 @@ import (
 )
 
 func main() {
-	firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
+	firmataAdaptor := firmata.NewBLEAdaptor(os.Args[1])
 	led := gpio.NewLedDriver(firmataAdaptor, "13")
 	imu := curie.NewIMUDriver(firmataAdaptor)
 
@@ -32,10 +42,6 @@ func main() {
 			log.Println("Temperature", data)
 		})
 
-		imu.On("Motion", func(data interface{}) {
-			log.Println("Motion", data)
-		})
-
 		gobot.Every(1*time.Second, func() {
 			led.Toggle()
 		})
@@ -44,13 +50,12 @@ func main() {
 			imu.ReadAccelerometer()
 			imu.ReadGyroscope()
 			imu.ReadTemperature()
-			imu.ReadMotion()
 		})
 	}
 
-	robot := gobot.NewRobot("curieBot",
+	robot := gobot.NewRobot("bot",
 		[]gobot.Connection{firmataAdaptor},
-		[]gobot.Device{imu, led},
+		[]gobot.Device{led, imu},
 		work,
 	)
 

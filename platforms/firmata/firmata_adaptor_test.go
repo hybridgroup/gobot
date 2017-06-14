@@ -14,6 +14,7 @@ import (
 	"gobot.io/x/gobot/drivers/gpio"
 	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/gobottest"
+	"gobot.io/x/gobot/platforms/firmata"
 	"gobot.io/x/gobot/platforms/firmata/client"
 )
 
@@ -25,6 +26,7 @@ var _ aio.AnalogReader = (*Adaptor)(nil)
 var _ gpio.PwmWriter = (*Adaptor)(nil)
 var _ gpio.ServoWriter = (*Adaptor)(nil)
 var _ i2c.Connector = (*Adaptor)(nil)
+var _ firmata.FirmataAdaptor = (*Adaptor)(nil)
 
 type readWriteCloser struct{}
 
