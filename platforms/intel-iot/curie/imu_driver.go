@@ -75,6 +75,10 @@ func (imu *IMUDriver) Start() (err error) {
 				val, _ := parseShockData(data)
 				imu.Publish("Shock", val)
 
+			case CURIE_IMU_STEP_COUNTER:
+				val, _ := parseStepData(data)
+				imu.Publish("Steps", val)
+
 			}
 		}
 	})
@@ -113,7 +117,7 @@ func (imu *IMUDriver) ReadTemperature() error {
 	return imu.connection.WriteSysex([]byte{CURIE_IMU, CURIE_IMU_READ_TEMP})
 }
 
-// EnableShockDetection turns on the Curie's built-in shock detection.
+// EnableShockDetection turns on/off the Curie's built-in shock detection.
 // The result will be returned by the Sysex response message
 func (imu *IMUDriver) EnableShockDetection(detect bool) error {
 	var d byte
@@ -121,6 +125,16 @@ func (imu *IMUDriver) EnableShockDetection(detect bool) error {
 		d = 1
 	}
 	return imu.connection.WriteSysex([]byte{CURIE_IMU, CURIE_IMU_SHOCK_DETECT, d})
+}
+
+// EnableStepCounter turns on/off the Curie's built-in step counter.
+// The result will be returned by the Sysex response message
+func (imu *IMUDriver) EnableStepCounter(count bool) error {
+	var c byte
+	if count {
+		c = 1
+	}
+	return imu.connection.WriteSysex([]byte{CURIE_IMU, CURIE_IMU_STEP_COUNTER, c})
 }
 
 func parseAccelerometerData(data []byte) (*AccelerometerData, error) {
@@ -164,5 +178,14 @@ func parseShockData(data []byte) (*ShockData, error) {
 	}
 
 	res := &ShockData{Axis: data[3], Direction: data[4]}
+	return res, nil
+}
+
+func parseStepData(data []byte) (int16, error) {
+	if len(data) < 6 {
+		return 0, errors.New("Invalid data")
+	}
+
+	res := int16(uint16(data[3]) | uint16(data[4])<<7)
 	return res, nil
 }
