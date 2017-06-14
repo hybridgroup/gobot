@@ -33,7 +33,7 @@ type firmataBoard interface {
 type Adaptor struct {
 	name       string
 	port       string
-	board      firmataBoard
+	Board      firmataBoard
 	conn       io.ReadWriteCloser
 	PortOpener func(port string) (io.ReadWriteCloser, error)
 	gobot.Eventer
@@ -53,7 +53,7 @@ func NewAdaptor(args ...interface{}) *Adaptor {
 		name:  gobot.DefaultName("Firmata"),
 		port:  "",
 		conn:  nil,
-		board: client.New(),
+		Board: client.New(),
 		PortOpener: func(port string) (io.ReadWriteCloser, error) {
 			return serial.Open(port, &serial.Mode{BaudRate: 57600})
 		},
@@ -81,21 +81,21 @@ func (f *Adaptor) Connect() (err error) {
 		}
 		f.conn = sp
 	}
-	if err = f.board.Connect(f.conn); err != nil {
+	if err = f.Board.Connect(f.conn); err != nil {
 		return err
 	}
 
-	f.board.On("SysexResponse", func(data interface{}) {
+	f.Board.On("SysexResponse", func(data interface{}) {
 		f.Publish("SysexResponse", data)
 	})
 
 	return
 }
 
-// Disconnect closes the io connection to the board
+// Disconnect closes the io connection to the Board
 func (f *Adaptor) Disconnect() (err error) {
-	if f.board != nil {
-		return f.board.Disconnect()
+	if f.Board != nil {
+		return f.Board.Disconnect()
 	}
 	return nil
 }
@@ -122,7 +122,7 @@ func (f *Adaptor) ServoConfig(pin string, min, max int) error {
 		return err
 	}
 
-	return f.board.ServoConfig(p, max, min)
+	return f.Board.ServoConfig(p, max, min)
 }
 
 // ServoWrite writes the 0-180 degree angle to the specified pin.
@@ -132,13 +132,13 @@ func (f *Adaptor) ServoWrite(pin string, angle byte) (err error) {
 		return err
 	}
 
-	if f.board.Pins()[p].Mode != client.Servo {
-		err = f.board.SetPinMode(p, client.Servo)
+	if f.Board.Pins()[p].Mode != client.Servo {
+		err = f.Board.SetPinMode(p, client.Servo)
 		if err != nil {
 			return err
 		}
 	}
-	err = f.board.AnalogWrite(p, int(angle))
+	err = f.Board.AnalogWrite(p, int(angle))
 	return
 }
 
@@ -149,13 +149,13 @@ func (f *Adaptor) PwmWrite(pin string, level byte) (err error) {
 		return err
 	}
 
-	if f.board.Pins()[p].Mode != client.Pwm {
-		err = f.board.SetPinMode(p, client.Pwm)
+	if f.Board.Pins()[p].Mode != client.Pwm {
+		err = f.Board.SetPinMode(p, client.Pwm)
 		if err != nil {
 			return err
 		}
 	}
-	err = f.board.AnalogWrite(p, int(level))
+	err = f.Board.AnalogWrite(p, int(level))
 	return
 }
 
@@ -166,14 +166,14 @@ func (f *Adaptor) DigitalWrite(pin string, level byte) (err error) {
 		return
 	}
 
-	if f.board.Pins()[p].Mode != client.Output {
-		err = f.board.SetPinMode(p, client.Output)
+	if f.Board.Pins()[p].Mode != client.Output {
+		err = f.Board.SetPinMode(p, client.Output)
 		if err != nil {
 			return
 		}
 	}
 
-	err = f.board.DigitalWrite(p, int(level))
+	err = f.Board.DigitalWrite(p, int(level))
 	return
 }
 
@@ -185,17 +185,17 @@ func (f *Adaptor) DigitalRead(pin string) (val int, err error) {
 		return
 	}
 
-	if f.board.Pins()[p].Mode != client.Input {
-		if err = f.board.SetPinMode(p, client.Input); err != nil {
+	if f.Board.Pins()[p].Mode != client.Input {
+		if err = f.Board.SetPinMode(p, client.Input); err != nil {
 			return
 		}
-		if err = f.board.ReportDigital(p, 1); err != nil {
+		if err = f.Board.ReportDigital(p, 1); err != nil {
 			return
 		}
 		<-time.After(10 * time.Millisecond)
 	}
 
-	return f.board.Pins()[p].Value, nil
+	return f.Board.Pins()[p].Value, nil
 }
 
 // AnalogRead retrieves value from analog pin.
@@ -208,22 +208,22 @@ func (f *Adaptor) AnalogRead(pin string) (val int, err error) {
 
 	p = f.digitalPin(p)
 
-	if f.board.Pins()[p].Mode != client.Analog {
-		if err = f.board.SetPinMode(p, client.Analog); err != nil {
+	if f.Board.Pins()[p].Mode != client.Analog {
+		if err = f.Board.SetPinMode(p, client.Analog); err != nil {
 			return
 		}
 
-		if err = f.board.ReportAnalog(p, 1); err != nil {
+		if err = f.Board.ReportAnalog(p, 1); err != nil {
 			return
 		}
 		<-time.After(10 * time.Millisecond)
 	}
 
-	return f.board.Pins()[p].Value, nil
+	return f.Board.Pins()[p].Value, nil
 }
 
 func (f *Adaptor) WriteSysex(data []byte) error {
-	return f.board.WriteSysex(data)
+	return f.Board.WriteSysex(data)
 }
 
 // digitalPin converts pin number to digital mapping
@@ -237,7 +237,7 @@ func (f *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection
 	if bus != 0 {
 		return nil, fmt.Errorf("Invalid bus number %d, only 0 is supported", bus)
 	}
-	err = f.board.I2cConfig(0)
+	err = f.Board.I2cConfig(0)
 	return NewFirmataI2cConnection(f, address), err
 }
 
