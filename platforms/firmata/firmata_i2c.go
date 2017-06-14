@@ -21,11 +21,11 @@ func NewFirmataI2cConnection(adaptor *Adaptor, address int) (connection *firmata
 func (c *firmataI2cConnection) Read(b []byte) (read int, err error) {
 	ret := make(chan []byte)
 
-	if err = c.adaptor.board.I2cRead(c.address, len(b)); err != nil {
+	if err = c.adaptor.Board.I2cRead(c.address, len(b)); err != nil {
 		return
 	}
 
-	c.adaptor.board.Once(c.adaptor.board.Event("I2cReply"), func(data interface{}) {
+	c.adaptor.Board.Once(c.adaptor.Board.Event("I2cReply"), func(data interface{}) {
 		ret <- data.(client.I2cReply).Data
 	})
 
@@ -41,14 +41,14 @@ func (c *firmataI2cConnection) Write(data []byte) (written int, err error) {
 	var chunk []byte
 	for len(data) >= 16 {
 		chunk, data = data[:16], data[16:]
-		err = c.adaptor.board.I2cWrite(c.address, chunk)
+		err = c.adaptor.Board.I2cWrite(c.address, chunk)
 		if err != nil {
 			return
 		}
 		written += len(chunk)
 	}
 	if len(data) > 0 {
-		err = c.adaptor.board.I2cWrite(c.address, data[:])
+		err = c.adaptor.Board.I2cWrite(c.address, data[:])
 		written += len(data)
 	}
 	return
