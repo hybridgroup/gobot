@@ -32,6 +32,10 @@ func main() {
 			log.Println("Temperature", data)
 		})
 
+		imu.On("Motion", func(data interface{}) {
+			log.Println("Motion", data)
+		})
+
 		gobot.Every(1*time.Second, func() {
 			led.Toggle()
 		})
@@ -40,6 +44,7 @@ func main() {
 			imu.ReadAccelerometer()
 			imu.ReadGyroscope()
 			imu.ReadTemperature()
+			imu.ReadMotion()
 		})
 	}
 

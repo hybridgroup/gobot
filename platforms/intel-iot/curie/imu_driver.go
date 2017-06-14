@@ -40,6 +40,15 @@ type TapData struct {
 	Direction byte
 }
 
+type MotionData struct {
+	AX int16
+	AY int16
+	AZ int16
+	GX int16
+	GY int16
+	GZ int16
+}
+
 // IMUDriver represents the IMU that is built-in to the Curie
 type IMUDriver struct {
 	name       string
@@ -88,6 +97,9 @@ func (imu *IMUDriver) Start() (err error) {
 				val, _ := parseTapData(data)
 				imu.Publish("Tap", val)
 
+			case CURIE_IMU_READ_MOTION:
+				val, _ := parseMotionData(data)
+				imu.Publish("Motion", val)
 			}
 		}
 	})
@@ -156,6 +168,12 @@ func (imu *IMUDriver) EnableTapDetection(detect bool) error {
 	return imu.connection.WriteSysex([]byte{CURIE_IMU, CURIE_IMU_TAP_DETECT, d})
 }
 
+// ReadMotion calls the Curie's built-in accelerometer & gyroscope.
+// The result will be returned by the Sysex response message
+func (imu *IMUDriver) ReadMotion() error {
+	return imu.connection.WriteSysex([]byte{CURIE_IMU, CURIE_IMU_READ_MOTION})
+}
+
 func parseAccelerometerData(data []byte) (*AccelerometerData, error) {
 	if len(data) < 9 {
 		return nil, errors.New("Invalid data")
@@ -215,5 +233,21 @@ func parseTapData(data []byte) (*TapData, error) {
 	}
 
 	res := &TapData{Axis: data[3], Direction: data[4]}
+	return res, nil
+}
+
+func parseMotionData(data []byte) (*MotionData, error) {
+	if len(data) < 16 {
+		return nil, errors.New("Invalid data")
+	}
+	ax := int16(uint16(data[3]) | uint16(data[4])<<7)
+	ay := int16(uint16(data[5]) | uint16(data[6])<<7)
+	az := int16(uint16(data[7]) | uint16(data[8])<<7)
+
+	gx := int16(uint16(data[9]) | uint16(data[10])<<7)
+	gy := int16(uint16(data[11]) | uint16(data[12])<<7)
+	gz := int16(uint16(data[13]) | uint16(data[14])<<7)
+
+	res := &MotionData{AX: ax, AY: ay, AZ: az, GX: gx, GY: gy, GZ: gz}
 	return res, nil
 }
