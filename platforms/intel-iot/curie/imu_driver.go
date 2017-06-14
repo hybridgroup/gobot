@@ -35,6 +35,11 @@ type ShockData struct {
 	Direction byte
 }
 
+type TapData struct {
+	Axis      byte
+	Direction byte
+}
+
 // IMUDriver represents the IMU that is built-in to the Curie
 type IMUDriver struct {
 	name       string
@@ -78,6 +83,10 @@ func (imu *IMUDriver) Start() (err error) {
 			case CURIE_IMU_STEP_COUNTER:
 				val, _ := parseStepData(data)
 				imu.Publish("Steps", val)
+
+			case CURIE_IMU_TAP_DETECT:
+				val, _ := parseTapData(data)
+				imu.Publish("Tap", val)
 
 			}
 		}
@@ -137,6 +146,16 @@ func (imu *IMUDriver) EnableStepCounter(count bool) error {
 	return imu.connection.WriteSysex([]byte{CURIE_IMU, CURIE_IMU_STEP_COUNTER, c})
 }
 
+// EnableTapDetection turns on/off the Curie's built-in tap detection.
+// The result will be returned by the Sysex response message
+func (imu *IMUDriver) EnableTapDetection(detect bool) error {
+	var d byte
+	if detect {
+		d = 1
+	}
+	return imu.connection.WriteSysex([]byte{CURIE_IMU, CURIE_IMU_TAP_DETECT, d})
+}
+
 func parseAccelerometerData(data []byte) (*AccelerometerData, error) {
 	if len(data) < 9 {
 		return nil, errors.New("Invalid data")
@@ -187,5 +206,14 @@ func parseStepData(data []byte) (int16, error) {
 	}
 
 	res := int16(uint16(data[3]) | uint16(data[4])<<7)
+	return res, nil
+}
+
+func parseTapData(data []byte) (*TapData, error) {
+	if len(data) < 6 {
+		return nil, errors.New("Invalid data")
+	}
+
+	res := &TapData{Axis: data[3], Direction: data[4]}
 	return res, nil
 }
