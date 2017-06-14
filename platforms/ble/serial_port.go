@@ -23,6 +23,7 @@ func NewSerialPort(address string, rid string, tid string) *SerialPort {
 // Open opens a connection to a BLE serial device
 func (p *SerialPort) Open() (err error) {
 	p.client = NewClientAdaptor(p.address)
+
 	err = p.client.Connect()
 
 	// subscribe to response notifications
@@ -40,13 +41,13 @@ func (p *SerialPort) Read(b []byte) (n int, err error) {
 		return
 	}
 
+	p.responseMutex.Lock()
 	n = len(b)
 	if len(p.responseData) < n {
 		n = len(p.responseData)
 	}
 	copy(b, p.responseData[:n])
 
-	p.responseMutex.Lock()
 	if len(p.responseData) > n {
 		p.responseData = p.responseData[n:]
 	} else {
