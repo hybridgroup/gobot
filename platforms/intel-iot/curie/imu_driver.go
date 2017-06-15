@@ -189,7 +189,7 @@ func (imu *IMUDriver) handleEvent(data []byte) (err error) {
 			}
 		}
 	}
-
+	return
 }
 
 func parseAccelerometerData(data []byte) (*AccelerometerData, error) {
