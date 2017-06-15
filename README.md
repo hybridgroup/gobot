@@ -193,6 +193,7 @@ Gobot has a extensible system for connecting to hardware devices. The following 
 - [Digispark](http://digistump.com/products/1) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/digispark)
 - [DragonBoard](https://developer.qualcomm.com/hardware/dragonboard-410c) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/dragonboard)
 - [ESP8266](http://esp8266.net/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/firmata)
+- [Intel Curie](https://www.intel.com/content/www/us/en/products/boards-kits/curie.html) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/intel-iot/curie)
 - [Intel Edison](http://www.intel.com/content/www/us/en/do-it-yourself/edison.html) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/intel-iot/edison)
 - [Intel Joule](http://intel.com/joule/getstarted) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/intel-iot/joule)
 - [Joystick](http://en.wikipedia.org/wiki/Joystick) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/joystick)
