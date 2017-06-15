@@ -74,10 +74,41 @@ func main() {
 
 You need to flash your Intel Curie with firmware that uses ConfigurableFirmata along with the FirmataCurieIMU plugin. There are 2 versions of this firmware, once that allows connecting using the serial interface, the other using a Bluetooth LE connection.
 
+To setup your Arduino environment:
+
+- Install the latest Arduino, if you have not done so yet.
+- Install the "Intel Curie Boards" board files using the "Board Manager". You can find it in the Arduino IDE under the "Tools" menu. Choose "Boards > Boards Manager".
+
+Search for the "Intel Curie Boards" package in the "Boards Manager" dialog, and then install the latest version.
+
+- Download the ZIP file for the ConfigurableFirmata library. You can download the latest version of the ConfigurableFirmata from here:
+
+https://github.com/firmata/ConfigurableFirmata/archive/master.zip
+
+Once you have downloaded ConfigurableFirmata, install it by using the "Library Manager". You can find it in the Arduino IDE under the "Sketch" menu. Choose "Include Library > Add .ZIP Library". Select the ZIP file for the ConfigurableFirmata library that you just downloaded.
+
+- Download the ZIP file for the FirmataCurieIMU library. You can download the latest version of FirmataCurieIMU from here:
+
+https://github.com/intel-iot-devkit/firmata-curie-imu/archive/master.zip
+
+Once you have downloaded the FirmataCurieIMU library, install it by using the "Library Manager". You can find it in the Arduino IDE under the "Sketch" menu. Choose "Include Library > Add .ZIP Library". Select the ZIP file for the FirmataCurieIMU library that you just downloaded.
+
+Now you are ready to build your firmware.
+
 ### Serial Port
 
-Connect your Arduino 101 or TinyTILE using a serial cable, and connect using the correct serial port name.
+To use your Intel Curie connected via serial port, you should use the sketch located here:
+
+https://github.com/intel-iot-devkit/firmata-curie-imu/blob/master/examples/everythingIMU/everythingIMU.ino
+
+Once you have loaded this sketch on your Intel Curie, you can run your Gobot code to communicate with it. Leave your Arduino 101 or TinyTILE connected using the serial cable that you used to flash the firmware, and refer to that same serial port name in your Gobot code.
 
 ### Bluetooth LE
 
-Power up your Arduino 101 or TinyTILE using a battery or other power source, and connect using the BLE address or name.
+To use your Intel Curie connected via Bluetooth LE, you should use the sketch located here:
+
+https://github.com/intel-iot-devkit/firmata-curie-imu/blob/master/examples/bleIMU/bleIMU.ino
+
+Once you have loaded this sketch on your Intel Curie, you can run your Gobot code to communicate with it.
+
+Power up your Arduino 101 or TinyTILE using a battery or other power source, and connect using the BLE address or name. The default BLE name is "FIRMATA".
