@@ -83,13 +83,13 @@ To setup your Arduino environment:
 
 - Download the ZIP file for the ConfigurableFirmata library. You can download the latest version of the ConfigurableFirmata from here:
 
-	https://github.com/firmata/ConfigurableFirmata/archive/master.zip
+	[https://github.com/firmata/ConfigurableFirmata/archive/master.zip](https://github.com/firmata/ConfigurableFirmata/archive/master.zip)
 
 	Once you have downloaded ConfigurableFirmata, install it by using the "Library Manager". You can find it in the Arduino IDE under the "Sketch" menu. Choose "Include Library > Add .ZIP Library". Select the ZIP file for the ConfigurableFirmata library that you just downloaded.
 
 - Download the ZIP file for the FirmataCurieIMU library. You can download the latest version of FirmataCurieIMU from here:
 
-	https://github.com/intel-iot-devkit/firmata-curie-imu/archive/master.zip
+	[https://github.com/intel-iot-devkit/firmata-curie-imu/archive/master.zip](https://github.com/intel-iot-devkit/firmata-curie-imu/archive/master.zip)
 
 	Once you have downloaded the FirmataCurieIMU library, install it by using the "Library Manager". You can find it in the Arduino IDE under the "Sketch" menu. Choose "Include Library > Add .ZIP Library". Select the ZIP file for the FirmataCurieIMU library that you just downloaded.
 
@@ -99,7 +99,7 @@ Now you are ready to install your firmware. You must decide if you want to conne
 
 To use your Intel Curie connected via serial port, you should use the sketch located here:
 
-https://github.com/intel-iot-devkit/firmata-curie-imu/blob/master/examples/everythingIMU/everythingIMU.ino
+[https://github.com/intel-iot-devkit/firmata-curie-imu/blob/master/examples/everythingIMU/everythingIMU.ino](https://github.com/intel-iot-devkit/firmata-curie-imu/blob/master/examples/everythingIMU/everythingIMU.ino)
 
 Once you have loaded this sketch on your Intel Curie, you can run your Gobot code to communicate with it. Leave your Arduino 101 or TinyTILE connected using the serial cable that you used to flash the firmware, and refer to that same serial port name in your Gobot code.
 
@@ -107,7 +107,7 @@ Once you have loaded this sketch on your Intel Curie, you can run your Gobot cod
 
 To use your Intel Curie connected via Bluetooth LE, you should use the sketch located here:
 
-https://github.com/intel-iot-devkit/firmata-curie-imu/blob/master/examples/bleIMU/bleIMU.ino
+[https://github.com/intel-iot-devkit/firmata-curie-imu/blob/master/examples/bleIMU/bleIMU.ino](https://github.com/intel-iot-devkit/firmata-curie-imu/blob/master/examples/bleIMU/bleIMU.ino)
 
 Once you have loaded this sketch on your Intel Curie, you can run your Gobot code to communicate with it.
 

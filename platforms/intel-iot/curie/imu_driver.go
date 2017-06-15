@@ -18,28 +18,33 @@ const (
 	CURIE_IMU_READ_MOTION  = 0x06
 )
 
+// AccelerometerData is what gets returned with the "Accelerometer" event.
 type AccelerometerData struct {
 	X int16
 	Y int16
 	Z int16
 }
 
+// GyroscopeData is what gets returned with the "Gyroscope" event.
 type GyroscopeData struct {
 	X int16
 	Y int16
 	Z int16
 }
 
+// ShockData is what gets returned with the "Shock" event.
 type ShockData struct {
 	Axis      byte
 	Direction byte
 }
 
+// TapData is what gets returned with the "Tap" event.
 type TapData struct {
 	Axis      byte
 	Direction byte
 }
 
+// MotionData is what gets returned with the "Motion" event.
 type MotionData struct {
 	AX int16
 	AY int16
@@ -52,12 +57,12 @@ type MotionData struct {
 // IMUDriver represents the IMU that is built-in to the Curie
 type IMUDriver struct {
 	name       string
-	connection firmata.FirmataAdaptor
+	connection *firmata.Adaptor
 	gobot.Eventer
 }
 
 // NewIMUDriver returns a new IMUDriver
-func NewIMUDriver(a firmata.FirmataAdaptor) *IMUDriver {
+func NewIMUDriver(a *firmata.Adaptor) *IMUDriver {
 	imu := &IMUDriver{
 		name:       gobot.DefaultName("CurieIMU"),
 		connection: a,
@@ -184,7 +189,7 @@ func (imu *IMUDriver) handleEvent(data []byte) (err error) {
 			}
 		}
 	}
-	return
+
 }
 
 func parseAccelerometerData(data []byte) (*AccelerometerData, error) {
