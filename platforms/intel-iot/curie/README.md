@@ -79,21 +79,21 @@ To setup your Arduino environment:
 - Install the latest Arduino, if you have not done so yet.
 - Install the "Intel Curie Boards" board files using the "Board Manager". You can find it in the Arduino IDE under the "Tools" menu. Choose "Boards > Boards Manager".
 
-Search for the "Intel Curie Boards" package in the "Boards Manager" dialog, and then install the latest version.
+	Search for the "Intel Curie Boards" package in the "Boards Manager" dialog, and then install the latest version.
 
 - Download the ZIP file for the ConfigurableFirmata library. You can download the latest version of the ConfigurableFirmata from here:
 
-https://github.com/firmata/ConfigurableFirmata/archive/master.zip
+	https://github.com/firmata/ConfigurableFirmata/archive/master.zip
 
-Once you have downloaded ConfigurableFirmata, install it by using the "Library Manager". You can find it in the Arduino IDE under the "Sketch" menu. Choose "Include Library > Add .ZIP Library". Select the ZIP file for the ConfigurableFirmata library that you just downloaded.
+	Once you have downloaded ConfigurableFirmata, install it by using the "Library Manager". You can find it in the Arduino IDE under the "Sketch" menu. Choose "Include Library > Add .ZIP Library". Select the ZIP file for the ConfigurableFirmata library that you just downloaded.
 
 - Download the ZIP file for the FirmataCurieIMU library. You can download the latest version of FirmataCurieIMU from here:
 
-https://github.com/intel-iot-devkit/firmata-curie-imu/archive/master.zip
+	https://github.com/intel-iot-devkit/firmata-curie-imu/archive/master.zip
 
-Once you have downloaded the FirmataCurieIMU library, install it by using the "Library Manager". You can find it in the Arduino IDE under the "Sketch" menu. Choose "Include Library > Add .ZIP Library". Select the ZIP file for the FirmataCurieIMU library that you just downloaded.
+	Once you have downloaded the FirmataCurieIMU library, install it by using the "Library Manager". You can find it in the Arduino IDE under the "Sketch" menu. Choose "Include Library > Add .ZIP Library". Select the ZIP file for the FirmataCurieIMU library that you just downloaded.
 
-Now you are ready to build your firmware.
+Now you are ready to install your firmware. You must decide if you want to connect via the serial port, or using Bluetooth LE.
 
 ### Serial Port
 
