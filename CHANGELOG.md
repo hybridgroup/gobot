@@ -1,3 +1,85 @@
+1.6.0
+---
+* **core**
+  * log failure errors on Robot Start()
+* **build**
+  * run test coverage with covermode=set
+  * update build to use Golang 1.7.6 and 1.8.3
+* **docs**
+  * work on ROADMAP doc
+* **sysfs**
+  * increase test coverage
+* **bb8**
+  * use updated ble adaptor interface for tests
+* **ble**
+  * allow for characteristic writes both with and without a response
+  * allow override of specific HCI device to use
+  * eliminate race conditions from response handling
+* **curie**
+  * Implement Accelerometer, Gyroscope, and Temperature sensors implemented
+  * motion detect implemented
+  * shock detect implemented
+  * step count implemented
+  * tap detect implemented
+* **digispark**
+  * update blink example to display error message on Start()
+  * update README with latest development info
+* **edison**
+  * auto-discovery of Edison board option
+  * removed commented lines
+* **firmata**
+  * expose WriteSysex to external callers
+  * adjust client test timeout values
+  * cleanup error handling for connection code
+  * client tests don't need so many goroutines
+  * expose WriteSysex to external callers
+  * improve connection code to use a proper timeout
+  * increase test coverage
+  * make it possible to test external devices that use firmata adaptor
+  * refactoring firmata client
+  * remove circular import in test
+  * remove unused code, increase test coverage
+  * return connect errors to client
+  * switch to using go-serial package
+  * Sysex response events now being handled as expected
+* **bme280**
+  * fix signed/unsigned bug
+  * Fixed incorrect error condition check when reading the 'ctrl_hum' register.
+  * Expanded the BME280 unit test for TestBME280DriverStart() to support reading from the 'ctrl_hum' register.
+  * Enables humidity readings in the BME280 driver by enforcing the write to the 'ctrl_meas' register, as per Section 5.4.3 of the BME280 data sheet
+* **chip**
+  * Fixed PWM duty cycle calculation for C.H.I.P ServoWrite
+  * Fixed PWM init bug for C.H.I.P
+  * C.H.I.P PWM init robust for already enabled state
+* **i2c**
+  * remove unused test code
+  * write config register in little endian
+* **joystick**
+  * add needed constants for all PS3 buttons
+* **littlewire**
+  * littlewire.cc links changed to littlewire.github.io
+* **mavlink**
+  * switch to using go-serial package
+* **megapi**
+  * switch to using go-serial package
+* **microbit**
+  * use updated ble adaptor interface for tests
+* **minidrone**
+  * add example for Parrot Mambo
+  * add support for Mambo external accessories
+  * increase test coverage
+  * never expect responses for characteristic writes
+  * remove unneeded code, increase test coverage
+  * separate flight status processing and add test coverage
+* **neurosky**
+  * switch to using go-serial package
+* **ollie**
+  * use updated ble adaptor interface for tests
+* **sphero**
+  * switch to using go-serial package
+* **tinkerboard**
+  * Updated Tinkerboard and sysfs tests to updated PWM polarity contract
+
 1.5.0
 ---
 * **core**
