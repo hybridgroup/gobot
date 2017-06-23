@@ -15,9 +15,9 @@ type ServoDriver struct {
 //
 // Adds the following API Commands:
 // 	"Move" - See ServoDriver.Move
-//	"Min" - See ServoDriver.Min
-//	"Center" - See ServoDriver.Center
-//	"Max" - See ServoDriver.Max
+//		"Min" - See ServoDriver.Min
+//		"Center" - See ServoDriver.Center
+//		"Max" - See ServoDriver.Max
 func NewServoDriver(a ServoWriter, pin string) *ServoDriver {
 	s := &ServoDriver{
 		name:         gobot.DefaultName("Servo"),
