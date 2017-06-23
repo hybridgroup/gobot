@@ -73,21 +73,56 @@ func TestPCA9685DriverStartWriteError(t *testing.T) {
 
 func TestPCA9685DriverHalt(t *testing.T) {
 	pca := initTestPCA9685Driver()
-
+	gobottest.Assert(t, pca.Start(), nil)
 	gobottest.Assert(t, pca.Halt(), nil)
 }
 
-// func TestPCA9685DriverWriteData(t *testing.T) {
-// 	pca, adaptor := initTestPCA9685DriverWithStubbedAdaptor()
-//
-// 	adaptor.i2cReadImpl = func(b []byte) (int, error) {
-// 		copy(b, []byte{0x00, 0x01, 0x02, 0x04})
-// 		return 4, nil
-// 	}
-// 	pca.Start()
-// 	mpu.GetData()
-// 	gobottest.Assert(t, mpu.Temperature, int16(36))
-// }
+func TestPCA9685DriverSetPWM(t *testing.T) {
+	pca := initTestPCA9685Driver()
+	gobottest.Assert(t, pca.Start(), nil)
+	gobottest.Assert(t, pca.SetPWM(0, 0, 256), nil)
+}
+
+func TestPCA9685DriverSetPWMError(t *testing.T) {
+	pca, adaptor := initTestPCA9685DriverWithStubbedAdaptor()
+	gobottest.Assert(t, pca.Start(), nil)
+
+	adaptor.i2cWriteImpl = func([]byte) (int, error) {
+		return 0, errors.New("write error")
+	}
+	gobottest.Assert(t, pca.SetPWM(0, 0, 256), errors.New("write error"))
+}
+
+func TestPCA9685DriverSetPWMFreq(t *testing.T) {
+	pca, adaptor := initTestPCA9685DriverWithStubbedAdaptor()
+	gobottest.Assert(t, pca.Start(), nil)
+
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		copy(b, []byte{0x01})
+		return 1, nil
+	}
+	gobottest.Assert(t, pca.SetPWMFreq(60), nil)
+}
+
+func TestPCA9685DriverSetPWMFreqReadError(t *testing.T) {
+	pca, adaptor := initTestPCA9685DriverWithStubbedAdaptor()
+	gobottest.Assert(t, pca.Start(), nil)
+
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		return 0, errors.New("read error")
+	}
+	gobottest.Assert(t, pca.SetPWMFreq(60), errors.New("read error"))
+}
+
+func TestPCA9685DriverSetPWMFreqWriteError(t *testing.T) {
+	pca, adaptor := initTestPCA9685DriverWithStubbedAdaptor()
+	gobottest.Assert(t, pca.Start(), nil)
+
+	adaptor.i2cWriteImpl = func([]byte) (int, error) {
+		return 0, errors.New("write error")
+	}
+	gobottest.Assert(t, pca.SetPWMFreq(60), errors.New("write error"))
+}
 
 func TestPCA9685DriverSetName(t *testing.T) {
 	pca := initTestPCA9685Driver()

@@ -25,6 +25,8 @@ const (
 	PCA9685_ALLLED_OFF_H = 0xFD
 )
 
+// PCA9685Driver is a Gobot Driver for the PCA9685 16-channel 12-bit
+// PWM/Servo controller.
 type PCA9685Driver struct {
 	name       string
 	connector  Connector
@@ -41,76 +43,67 @@ type PCA9685Driver struct {
 //		i2c.WithAddress(int):	address to use with this driver
 //
 func NewPCA9685Driver(a Connector, options ...func(Config)) *PCA9685Driver {
-	m := &PCA9685Driver{
+	p := &PCA9685Driver{
 		name:      gobot.DefaultName("PCA9685"),
 		connector: a,
 		Config:    NewConfig(),
 	}
 
 	for _, option := range options {
-		option(m)
+		option(p)
 	}
 
 	// TODO: add commands for API
-	return m
+	return p
 }
 
 // Name returns the Name for the Driver
-func (h *PCA9685Driver) Name() string { return h.name }
+func (p *PCA9685Driver) Name() string { return p.name }
 
 // SetName sets the Name for the Driver
-func (h *PCA9685Driver) SetName(n string) { h.name = n }
+func (p *PCA9685Driver) SetName(n string) { p.name = n }
 
 // Connection returns the connection for the Driver
-func (h *PCA9685Driver) Connection() gobot.Connection { return h.connector.(gobot.Connection) }
+func (p *PCA9685Driver) Connection() gobot.Connection { return p.connector.(gobot.Connection) }
 
 // Start initializes the pca9685
-func (h *PCA9685Driver) Start() (err error) {
-	bus := h.GetBusOrDefault(h.connector.GetDefaultBus())
-	address := h.GetAddressOrDefault(pca9685Address)
+func (p *PCA9685Driver) Start() (err error) {
+	bus := p.GetBusOrDefault(p.connector.GetDefaultBus())
+	address := p.GetAddressOrDefault(pca9685Address)
 
-	h.connection, err = h.connector.GetConnection(address, bus)
+	p.connection, err = p.connector.GetConnection(address, bus)
 	if err != nil {
 		return err
 	}
 
-	if _, err := h.connection.Write([]byte{PCA9685_MODE1, 0x00}); err != nil {
+	if _, err := p.connection.Write([]byte{PCA9685_MODE1, 0x00}); err != nil {
 		return err
 	}
 
-	if _, err := h.connection.Write([]byte{PCA9685_ALLLED_OFF_H, 0x10}); err != nil {
+	if _, err := p.connection.Write([]byte{PCA9685_ALLLED_OFF_H, 0x10}); err != nil {
 		return err
 	}
 
 	return
 }
 
-// Halt returns true if devices is halted successfully
-func (h *PCA9685Driver) Halt() (err error) { return }
-
-// SetPWM sets the channel to whichever pwm setting from 0-4096
-func (h *PCA9685Driver) SetPWM(channel int, on uint16, off uint16) (err error) {
-	if _, err := h.connection.Write([]byte{byte(PCA9685_LED0_ON_L + 4*channel), byte(on), byte(on >> 8), byte(off), byte(off >> 8)}); err != nil {
-		return err
-	}
-
-	// if _, err := h.connection.Write([]byte{byte(PCA9685_LED0_ON_L + 4*channel), byte(on & 0xff)}); err != nil {
-	// 	return err
-	// }
-	// if _, err := h.connection.Write([]byte{byte(PCA9685_LED0_ON_H + 4*channel), byte(on >> 8)}); err != nil {
-	// 	return err
-	// }
-	// if _, err := h.connection.Write([]byte{byte(PCA9685_LED0_OFF_L + 4*channel), byte(off & 0xff)}); err != nil {
-	// 	return err
-	// }
-	// if _, err := h.connection.Write([]byte{byte(PCA9685_LED0_OFF_H + 4*channel), byte(off >> 8)}); err != nil {
-	// 	return err
-	// }
+// Halt stops the device
+func (p *PCA9685Driver) Halt() (err error) {
+	_, err = p.connection.Write([]byte{PCA9685_ALLLED_OFF_H, 0x10})
 	return
 }
 
-func (h *PCA9685Driver) SetPWMFreq(freq float32) error {
-	// Correct for overshoot in the frequency setting (see issue #11).
+// SetPWM sets a specific channel to a pwm value from 0-4096
+func (p *PCA9685Driver) SetPWM(channel int, on uint16, off uint16) (err error) {
+	if _, err := p.connection.Write([]byte{byte(PCA9685_LED0_ON_L + 4*channel), byte(on), byte(on >> 8), byte(off), byte(off >> 8)}); err != nil {
+		return err
+	}
+
+	return
+}
+
+// SetPWMFreq sets the PWM frequency in Hz
+func (p *PCA9685Driver) SetPWMFreq(freq float32) error {
 	freq *= 0.9
 
 	var prescalevel float32 = 25000000
@@ -119,50 +112,53 @@ func (h *PCA9685Driver) SetPWMFreq(freq float32) error {
 	prescalevel -= 1
 	prescale := byte(prescalevel + 0.5)
 
-	if _, err := h.connection.Write([]byte{byte(PCA9685_MODE1)}); err != nil {
+	if _, err := p.connection.Write([]byte{byte(PCA9685_MODE1)}); err != nil {
 		return err
 	}
 	data := make([]byte, 1)
-	oldmode, err := h.connection.Read(data)
+	oldmode, err := p.connection.Read(data)
 	if err != nil {
 		return err
 	}
 
-	newmode := (oldmode & 0x7F) | 0x10 // sleep
-	if _, err := h.connection.Write([]byte{byte(PCA9685_MODE1), byte(newmode)}); err != nil {
+	newmode := (oldmode & 0x7F) | 0x10
+	if _, err := p.connection.Write([]byte{byte(PCA9685_MODE1), byte(newmode)}); err != nil {
 		return err
 	}
 
-	if _, err := h.connection.Write([]byte{byte(PCA9685_PRESCALE), prescale}); err != nil {
+	if _, err := p.connection.Write([]byte{byte(PCA9685_PRESCALE), prescale}); err != nil {
 		return err
 	}
 
-	if _, err := h.connection.Write([]byte{byte(PCA9685_MODE1), byte(oldmode)}); err != nil {
+	if _, err := p.connection.Write([]byte{byte(PCA9685_MODE1), byte(oldmode)}); err != nil {
 		return err
 	}
 
 	time.Sleep(100 * time.Millisecond)
-	if _, err := h.connection.Write([]byte{byte(PCA9685_MODE1), byte(oldmode | 0xa1)}); err != nil {
+	if _, err := p.connection.Write([]byte{byte(PCA9685_MODE1), byte(oldmode | 0xa1)}); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (h *PCA9685Driver) PwmWrite(pin string, val byte) (err error) {
+// PwmWrite writes a PWM signal to the specified pin
+func (p *PCA9685Driver) PwmWrite(pin string, val byte) (err error) {
 	i, err := strconv.Atoi(pin)
 	if err != nil {
 		return
 	}
 	v := gobot.ToScale(gobot.FromScale(float64(val), 0, 255), 0, 4096)
-	return h.SetPWM(i, 0, uint16(v))
+	return p.SetPWM(i, 0, uint16(v))
 }
 
-func (h *PCA9685Driver) ServoWrite(pin string, val byte) (err error) {
+// ServoWrite writes a servo signal to the specified pin.
+// Valid values are from 0-180.
+func (p *PCA9685Driver) ServoWrite(pin string, val byte) (err error) {
 	i, err := strconv.Atoi(pin)
 	if err != nil {
 		return
 	}
 	v := gobot.ToScale(gobot.FromScale(float64(val), 0, 180), 200, 500)
-	return h.SetPWM(i, 0, uint16(v))
+	return p.SetPWM(i, 0, uint16(v))
 }
