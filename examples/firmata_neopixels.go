@@ -15,7 +15,7 @@ import (
 func main() {
 	firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
 	led := gpio.NewLedDriver(firmataAdaptor, "13")
-	neo := gpio.NewNeopixelDriver(firmataAdaptor, "6", 5)
+	neo := firmata.NewNeopixelDriver(firmataAdaptor, "6", 5)
 
 	work := func() {
 		cols := []uint32{0xff0000, 0x00ff00, 0x0000ff, 0xffff00, 0xffffff}

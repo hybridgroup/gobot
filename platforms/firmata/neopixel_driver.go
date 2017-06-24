@@ -1,10 +1,9 @@
-package gpio
+package firmata
 
 import (
 	"strconv"
 
 	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/platforms/firmata"
 )
 
 const (
@@ -28,12 +27,12 @@ type NeopixelDriver struct {
 	name       string
 	pin        string
 	pixelCount uint16
-	connection *firmata.Adaptor
+	connection *Adaptor
 	gobot.Eventer
 }
 
 // NewNeopixelDriver returns a new NeopixelDriver
-func NewNeopixelDriver(a *firmata.Adaptor, pin string, pixelCount uint16) *NeopixelDriver {
+func NewNeopixelDriver(a *Adaptor, pin string, pixelCount uint16) *NeopixelDriver {
 	neo := &NeopixelDriver{
 		name:       gobot.DefaultName("Neopixel"),
 		connection: a,
