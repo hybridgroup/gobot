@@ -69,9 +69,9 @@ func (neo *NeopixelDriver) Show() error {
 		neo.writeByte(g)
 		neo.writeByte(r)
 		neo.writeByte(b)
-		neo.reset()
 	}
 
+	neo.reset()
 	return nil
 }
 
