@@ -28,5 +28,13 @@ CLI tool for generating new Gobot projects.
 ...
 ```
 
+## Installing from the snap
+
+Gobot is also published in the [snap store](https://snapcraft.io/). It is not yet stable, so you can help testing it in any of the [supported Linux distributions](https://snapcraft.io/docs/core/install) with:
+
+```
+sudo snap install gobot --edge
+```
+
 ## License
 Copyright (c) 2013-2017 The Hybrid Group. Licensed under the Apache 2.0 license.
