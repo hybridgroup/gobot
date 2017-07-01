@@ -163,9 +163,27 @@ func TestAdaptorDigitalWrite(t *testing.T) {
 	gobottest.Assert(t, a.DigitalWrite("1", 1), nil)
 }
 
+func TestAdaptorDigitalWriteESP8266(t *testing.T) {
+	a := initTestAdaptor()
+	a.BoardType = "esp8266"
+	gobottest.Assert(t, a.DigitalWrite("D1", 1), nil)
+}
+
 func TestAdaptorDigitalWriteBadPin(t *testing.T) {
 	a := initTestAdaptor()
 	gobottest.Refute(t, a.DigitalWrite("xyz", 50), nil)
+}
+
+func TestAdaptorDigitalWriteBadPinESP8266(t *testing.T) {
+	a := initTestAdaptor()
+	a.BoardType = "esp8266"
+	gobottest.Refute(t, a.DigitalWrite("xyz", 50), nil)
+}
+
+func TestAdaptorDigitalWriteBadBoardType(t *testing.T) {
+	a := initTestAdaptor()
+	a.BoardType = "bogus"
+	gobottest.Assert(t, a.DigitalWrite("xyz", 50), errors.New("invalid board type"))
 }
 
 func TestAdaptorDigitalRead(t *testing.T) {

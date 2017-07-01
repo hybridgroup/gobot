@@ -1,6 +1,7 @@
 package firmata
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"strconv"
@@ -42,6 +43,7 @@ type FirmataAdaptor interface {
 type Adaptor struct {
 	name       string
 	port       string
+	BoardType  string
 	Board      firmataBoard
 	conn       io.ReadWriteCloser
 	PortOpener func(port string) (io.ReadWriteCloser, error)
@@ -59,10 +61,11 @@ type Adaptor struct {
 // string port as a label to be displayed in the log and api.
 func NewAdaptor(args ...interface{}) *Adaptor {
 	f := &Adaptor{
-		name:  gobot.DefaultName("Firmata"),
-		port:  "",
-		conn:  nil,
-		Board: client.New(),
+		name:      gobot.DefaultName("Firmata"),
+		port:      "",
+		BoardType: "arduino",
+		conn:      nil,
+		Board:     client.New(),
 		PortOpener: func(port string) (io.ReadWriteCloser, error) {
 			return serial.Open(port, &serial.Mode{BaudRate: 57600})
 		},
@@ -126,7 +129,7 @@ func (f *Adaptor) SetName(n string) { f.name = n }
 
 // ServoConfig sets the pulse width in microseconds for a pin attached to a servo
 func (f *Adaptor) ServoConfig(pin string, min, max int) error {
-	p, err := strconv.Atoi(pin)
+	p, err := f.mappedPin(pin)
 	if err != nil {
 		return err
 	}
@@ -136,7 +139,7 @@ func (f *Adaptor) ServoConfig(pin string, min, max int) error {
 
 // ServoWrite writes the 0-180 degree angle to the specified pin.
 func (f *Adaptor) ServoWrite(pin string, angle byte) (err error) {
-	p, err := strconv.Atoi(pin)
+	p, err := f.mappedPin(pin)
 	if err != nil {
 		return err
 	}
@@ -153,7 +156,7 @@ func (f *Adaptor) ServoWrite(pin string, angle byte) (err error) {
 
 // PwmWrite writes the 0-254 value to the specified pin
 func (f *Adaptor) PwmWrite(pin string, level byte) (err error) {
-	p, err := strconv.Atoi(pin)
+	p, err := f.mappedPin(pin)
 	if err != nil {
 		return err
 	}
@@ -170,7 +173,7 @@ func (f *Adaptor) PwmWrite(pin string, level byte) (err error) {
 
 // DigitalWrite writes a value to the pin. Acceptable values are 1 or 0.
 func (f *Adaptor) DigitalWrite(pin string, level byte) (err error) {
-	p, err := strconv.Atoi(pin)
+	p, err := f.mappedPin(pin)
 	if err != nil {
 		return
 	}
@@ -189,7 +192,7 @@ func (f *Adaptor) DigitalWrite(pin string, level byte) (err error) {
 // DigitalRead retrieves digital value from specified pin.
 // Returns -1 if the response from the board has timed out
 func (f *Adaptor) DigitalRead(pin string) (val int, err error) {
-	p, err := strconv.Atoi(pin)
+	p, err := f.mappedPin(pin)
 	if err != nil {
 		return
 	}
@@ -210,11 +213,12 @@ func (f *Adaptor) DigitalRead(pin string) (val int, err error) {
 // AnalogRead retrieves value from analog pin.
 // Returns -1 if the response from the board has timed out
 func (f *Adaptor) AnalogRead(pin string) (val int, err error) {
-	p, err := strconv.Atoi(pin)
+	p, err := f.mappedPin(pin)
 	if err != nil {
 		return
 	}
 
+	// TODO: handle special board mappings
 	p = f.digitalPin(p)
 
 	if f.Board.Pins()[p].Mode != client.Analog {
@@ -238,6 +242,23 @@ func (f *Adaptor) WriteSysex(data []byte) error {
 // digitalPin converts pin number to digital mapping
 func (f *Adaptor) digitalPin(pin int) int {
 	return pin + 14
+}
+
+func (f *Adaptor) mappedPin(pin string) (p int, err error) {
+	switch f.BoardType {
+	case "arduino":
+		p, err = strconv.Atoi(pin)
+	case "esp8266":
+		pinNo, ok := esp8266PinMap[pin]
+		if !ok {
+			err = errors.New("invalid pin")
+		}
+		p = pinNo
+	default:
+		err = errors.New("invalid board type")
+	}
+
+	return
 }
 
 // GetConnection returns an i2c connection to a device on a specified bus.
