@@ -18,12 +18,14 @@ func connect(address string) (io.ReadWriteCloser, error) {
 }
 
 // NewTCPAdaptor opens and uses a TCP connection to a microcontroller running
-// WiFiFirmata
+// WiFiFirmata. NewTCPAdaptor defaults to a BoardType of esp8266. Set to a
+// different boardtype if your application requires it.
 func NewTCPAdaptor(args ...interface{}) *TCPAdaptor {
 	address := args[0].(string)
 
 	a := NewAdaptor(address)
 	a.SetName(gobot.DefaultName("TCPFirmata"))
+	a.BoardType = "esp8266"
 	a.PortOpener = func(port string) (io.ReadWriteCloser, error) {
 		return connect(port)
 	}
