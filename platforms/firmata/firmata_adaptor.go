@@ -219,7 +219,7 @@ func (f *Adaptor) AnalogRead(pin string) (val int, err error) {
 	}
 
 	// TODO: handle special board mappings
-	p = f.digitalPin(p)
+	p = f.analogToDigitalPin(p)
 
 	if f.Board.Pins()[p].Mode != client.Analog {
 		if err = f.Board.SetPinMode(p, client.Analog); err != nil {
@@ -229,7 +229,7 @@ func (f *Adaptor) AnalogRead(pin string) (val int, err error) {
 		if err = f.Board.ReportAnalog(p, 1); err != nil {
 			return
 		}
-		<-time.After(10 * time.Millisecond)
+		time.Sleep(10 * time.Millisecond)
 	}
 
 	return f.Board.Pins()[p].Value, nil
@@ -239,8 +239,8 @@ func (f *Adaptor) WriteSysex(data []byte) error {
 	return f.Board.WriteSysex(data)
 }
 
-// digitalPin converts pin number to digital mapping
-func (f *Adaptor) digitalPin(pin int) int {
+// analogToDigitalPin converts analog pin number to digital mapping
+func (f *Adaptor) analogToDigitalPin(pin int) int {
 	return pin + 14
 }
 
