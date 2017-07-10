@@ -6,6 +6,7 @@ clone_folder: c:\gopath\src\github.com\hybridgroup\gobot
 
 environment:
   GOPATH: c:\gopath
+  GOROOT: c:\go
 
 install:
   - echo %PATH%
