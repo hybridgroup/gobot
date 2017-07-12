@@ -2,7 +2,6 @@ package sysfs
 
 import (
 	"fmt"
-	"io"
 	"os"
 	"syscall"
 	"unsafe"
@@ -44,23 +43,6 @@ type i2cSmbusIoctlData struct {
 	command   byte
 	size      uint32
 	data      uintptr
-}
-
-type I2cOperations interface {
-	io.ReadWriteCloser
-	ReadByte() (val byte, err error)
-	ReadByteData(reg uint8) (val uint8, err error)
-	ReadWordData(reg uint8) (val uint16, err error)
-	WriteByte(val byte) (err error)
-	WriteByteData(reg uint8, val uint8) (err error)
-	WriteWordData(reg uint8, val uint16) (err error)
-	WriteBlockData(reg uint8, b []byte) (err error)
-}
-
-// I2cDevice is the interface to a specific i2c bus
-type I2cDevice interface {
-	I2cOperations
-	SetAddress(int) error
 }
 
 type i2cDevice struct {
