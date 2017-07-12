@@ -17,4 +17,8 @@ install:
 
 build_script:
  - go test -v -cpu=2 .
+ - go test -v -cpu=2 ./api
+ - go test -v -cpu=2 ./drivers/aio
+ - go test -v -cpu=2 ./drivers/gpio
+ - go test -v -cpu=2 ./drivers/i2c
  - go test -v -cpu=2 ./platforms/firmata/...
