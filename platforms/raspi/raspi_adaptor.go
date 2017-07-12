@@ -7,11 +7,12 @@ import (
 	"strconv"
 	"strings"
 
+	"sync"
+
 	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/sysfs"
-	"sync"
 )
 
 var readFile = func() ([]byte, error) {
@@ -26,7 +27,7 @@ type Adaptor struct {
 	digitalPins   map[int]*sysfs.DigitalPin
 	pwmPins       map[int]*PWMPin
 	i2cDefaultBus int
-	i2cBuses      [2]sysfs.I2cDevice
+	i2cBuses      [2]i2c.I2cDevice
 }
 
 // NewAdaptor creates a Raspi Adaptor
@@ -173,7 +174,7 @@ func (r *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection
 	return i2c.NewConnection(device, address), err
 }
 
-func (r *Adaptor) getI2cBus(bus int) (_ sysfs.I2cDevice, err error) {
+func (r *Adaptor) getI2cBus(bus int) (_ i2c.I2cDevice, err error) {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 

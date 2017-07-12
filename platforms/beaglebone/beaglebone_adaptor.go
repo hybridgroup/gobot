@@ -22,7 +22,7 @@ type Adaptor struct {
 	name        string
 	digitalPins []*sysfs.DigitalPin
 	pwmPins     map[string]*sysfs.PWMPin
-	i2cBuses    map[int]sysfs.I2cDevice
+	i2cBuses    map[int]i2c.I2cDevice
 	usrLed      string
 	analogPath  string
 	slots       string
@@ -35,7 +35,7 @@ func NewAdaptor() *Adaptor {
 		name:        gobot.DefaultName("Beaglebone"),
 		digitalPins: make([]*sysfs.DigitalPin, 120),
 		pwmPins:     make(map[string]*sysfs.PWMPin),
-		i2cBuses:    make(map[int]sysfs.I2cDevice),
+		i2cBuses:    make(map[int]i2c.I2cDevice),
 		mutex:       &sync.Mutex{},
 	}
 

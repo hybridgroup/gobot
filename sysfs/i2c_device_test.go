@@ -6,6 +6,7 @@ import (
 	"syscall"
 	"testing"
 
+	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/gobottest"
 )
 
@@ -18,7 +19,7 @@ func TestNewI2cDeviceClose(t *testing.T) {
 	SetSyscall(&MockSyscall{})
 
 	i, err := NewI2cDevice("/dev/i2c-1")
-	var _ I2cDevice = i
+	var _ i2c.I2cDevice = i
 
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, i.Close(), nil)
@@ -37,7 +38,7 @@ func TestNewI2cDeviceQueryFuncError(t *testing.T) {
 	})
 
 	i, err := NewI2cDevice("/dev/i2c-1")
-	var _ I2cDevice = i
+	var _ i2c.I2cDevice = i
 
 	gobottest.Assert(t, err, errors.New("Querying functionality failed with syscall.Errno operation not permitted"))
 }
@@ -61,7 +62,7 @@ func TestNewI2cDevice(t *testing.T) {
 	SetSyscall(&MockSyscall{})
 
 	i, err = NewI2cDevice("/dev/i2c-1")
-	var _ I2cDevice = i
+	var _ i2c.I2cDevice = i
 
 	gobottest.Assert(t, err, nil)
 
@@ -89,7 +90,7 @@ func TestNewI2cDeviceReadByte(t *testing.T) {
 	SetFilesystem(fs)
 
 	i, err := NewI2cDevice("/dev/i2c-1")
-	var _ I2cDevice = i
+	var _ i2c.I2cDevice = i
 
 	gobottest.Assert(t, err, nil)
 
@@ -108,7 +109,7 @@ func TestNewI2cDeviceReadByteError(t *testing.T) {
 	SetFilesystem(fs)
 
 	i, err := NewI2cDevice("/dev/i2c-1")
-	var _ I2cDevice = i
+	var _ i2c.I2cDevice = i
 
 	gobottest.Assert(t, err, nil)
 
@@ -128,7 +129,7 @@ func TestNewI2cDeviceReadByteError(t *testing.T) {
 func TestNewI2cDeviceReadByteNotSupported(t *testing.T) {
 	SetSyscall(&MockSyscall{})
 	i, err := NewI2cDevice("/dev/i2c-1")
-	var _ I2cDevice = i
+	var _ i2c.I2cDevice = i
 
 	gobottest.Assert(t, err, nil)
 
@@ -145,7 +146,7 @@ func TestNewI2cDeviceWriteByte(t *testing.T) {
 	SetFilesystem(fs)
 
 	i, err := NewI2cDevice("/dev/i2c-1")
-	var _ I2cDevice = i
+	var _ i2c.I2cDevice = i
 
 	gobottest.Assert(t, err, nil)
 
@@ -159,7 +160,7 @@ func TestNewI2cDeviceWriteByte(t *testing.T) {
 func TestNewI2cDeviceWriteByteNotSupported(t *testing.T) {
 	SetSyscall(&MockSyscall{})
 	i, err := NewI2cDevice("/dev/i2c-1")
-	var _ I2cDevice = i
+	var _ i2c.I2cDevice = i
 
 	gobottest.Assert(t, err, nil)
 
@@ -176,7 +177,7 @@ func TestNewI2cDeviceReadByteData(t *testing.T) {
 	SetFilesystem(fs)
 
 	i, err := NewI2cDevice("/dev/i2c-1")
-	var _ I2cDevice = i
+	var _ i2c.I2cDevice = i
 
 	gobottest.Assert(t, err, nil)
 
@@ -191,7 +192,7 @@ func TestNewI2cDeviceReadByteData(t *testing.T) {
 func TestNewI2cDeviceReadByteDataNotSupported(t *testing.T) {
 	SetSyscall(&MockSyscall{})
 	i, err := NewI2cDevice("/dev/i2c-1")
-	var _ I2cDevice = i
+	var _ i2c.I2cDevice = i
 
 	gobottest.Assert(t, err, nil)
 
@@ -208,7 +209,7 @@ func TestNewI2cDeviceWriteByteData(t *testing.T) {
 	SetFilesystem(fs)
 
 	i, err := NewI2cDevice("/dev/i2c-1")
-	var _ I2cDevice = i
+	var _ i2c.I2cDevice = i
 
 	gobottest.Assert(t, err, nil)
 
@@ -222,7 +223,7 @@ func TestNewI2cDeviceWriteByteData(t *testing.T) {
 func TestNewI2cDeviceWriteByteDataNotSupported(t *testing.T) {
 	SetSyscall(&MockSyscall{})
 	i, err := NewI2cDevice("/dev/i2c-1")
-	var _ I2cDevice = i
+	var _ i2c.I2cDevice = i
 
 	gobottest.Assert(t, err, nil)
 
@@ -239,7 +240,7 @@ func TestNewI2cDeviceReadWordData(t *testing.T) {
 	SetFilesystem(fs)
 
 	i, err := NewI2cDevice("/dev/i2c-1")
-	var _ I2cDevice = i
+	var _ i2c.I2cDevice = i
 
 	gobottest.Assert(t, err, nil)
 
@@ -254,7 +255,7 @@ func TestNewI2cDeviceReadWordData(t *testing.T) {
 func TestNewI2cDeviceReadWordDataNotSupported(t *testing.T) {
 	SetSyscall(&MockSyscall{})
 	i, err := NewI2cDevice("/dev/i2c-1")
-	var _ I2cDevice = i
+	var _ i2c.I2cDevice = i
 
 	gobottest.Assert(t, err, nil)
 
@@ -271,7 +272,7 @@ func TestNewI2cDeviceWriteWordData(t *testing.T) {
 	SetFilesystem(fs)
 
 	i, err := NewI2cDevice("/dev/i2c-1")
-	var _ I2cDevice = i
+	var _ i2c.I2cDevice = i
 
 	gobottest.Assert(t, err, nil)
 
@@ -285,7 +286,7 @@ func TestNewI2cDeviceWriteWordData(t *testing.T) {
 func TestNewI2cDeviceWriteWordDataNotSupported(t *testing.T) {
 	SetSyscall(&MockSyscall{})
 	i, err := NewI2cDevice("/dev/i2c-1")
-	var _ I2cDevice = i
+	var _ i2c.I2cDevice = i
 
 	gobottest.Assert(t, err, nil)
 
@@ -302,7 +303,7 @@ func TestNewI2cDeviceWriteBlockData(t *testing.T) {
 	SetFilesystem(fs)
 
 	i, err := NewI2cDevice("/dev/i2c-1")
-	var _ I2cDevice = i
+	var _ i2c.I2cDevice = i
 
 	gobottest.Assert(t, err, nil)
 
@@ -319,7 +320,7 @@ func TestNewI2cDeviceWriteBlockDataTooMuch(t *testing.T) {
 	SetFilesystem(fs)
 
 	i, err := NewI2cDevice("/dev/i2c-1")
-	var _ I2cDevice = i
+	var _ i2c.I2cDevice = i
 
 	gobottest.Assert(t, err, nil)
 
@@ -334,7 +335,7 @@ func TestNewI2cDeviceWriteBlockDataTooMuch(t *testing.T) {
 func TestNewI2cDeviceWrite(t *testing.T) {
 	SetSyscall(&MockSyscall{})
 	i, err := NewI2cDevice("/dev/i2c-1")
-	var _ I2cDevice = i
+	var _ i2c.I2cDevice = i
 
 	gobottest.Assert(t, err, nil)
 

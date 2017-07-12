@@ -34,7 +34,7 @@ type Adaptor struct {
 	tristate    *sysfs.DigitalPin
 	digitalPins map[int]*sysfs.DigitalPin
 	pwmPins     map[int]*sysfs.PWMPin
-	i2cBus      sysfs.I2cDevice
+	i2cBus      i2c.I2cDevice
 	connect     func(e *Adaptor) (err error)
 	writeFile   func(path string, data []byte) (i int, err error)
 	readFile    func(path string) ([]byte, error)

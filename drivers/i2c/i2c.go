@@ -2,9 +2,9 @@ package i2c
 
 import (
 	"errors"
+	"io"
 	"sync"
-
-	"gobot.io/x/gobot/sysfs"
+	//"gobot.io/x/gobot/sysfs"
 )
 
 const (
@@ -27,6 +27,23 @@ var (
 	ErrInvalidPosition = errors.New("Invalid position value")
 )
 
+type I2cOperations interface {
+	io.ReadWriteCloser
+	ReadByte() (val byte, err error)
+	ReadByteData(reg uint8) (val uint8, err error)
+	ReadWordData(reg uint8) (val uint16, err error)
+	WriteByte(val byte) (err error)
+	WriteByteData(reg uint8, val uint8) (err error)
+	WriteWordData(reg uint8, val uint16) (err error)
+	WriteBlockData(reg uint8, b []byte) (err error)
+}
+
+// I2cDevice is the interface to a specific i2c bus
+type I2cDevice interface {
+	I2cOperations
+	SetAddress(int) error
+}
+
 // Connector lets Adaptors provide the interface for Drivers
 // to get access to the I2C buses on platforms that support I2C.
 type Connector interface {
@@ -44,17 +61,17 @@ type Connector interface {
 // Implements sysfs.I2cOperations to talk to the device, wrapping the
 // calls in SetAddress to always target the specified device.
 // Provided by an Adaptor by implementing the I2cConnector interface.
-type Connection sysfs.I2cOperations
+type Connection I2cOperations
 
 type i2cConnection struct {
-	bus     sysfs.I2cDevice
+	bus     I2cDevice
 	address int
 	mutex   *sync.Mutex
 }
 
 // NewConnection creates and returns a new connection to a specific
 // i2c device on a bus and address.
-func NewConnection(bus sysfs.I2cDevice, address int) (connection *i2cConnection) {
+func NewConnection(bus I2cDevice, address int) (connection *i2cConnection) {
 	return &i2cConnection{bus: bus, address: address, mutex: &sync.Mutex{}}
 }
 

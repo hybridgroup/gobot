@@ -28,7 +28,7 @@ func syscallImplFail(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errn
 	return 0, 0, 1
 }
 
-func initI2CDevice() sysfs.I2cDevice {
+func initI2CDevice() I2cDevice {
 	fs := sysfs.NewMockFilesystem([]string{
 		"/dev/i2c-1",
 	})
@@ -41,7 +41,7 @@ func initI2CDevice() sysfs.I2cDevice {
 	return i
 }
 
-func initI2CDeviceAddressError() sysfs.I2cDevice {
+func initI2CDeviceAddressError() I2cDevice {
 	fs := sysfs.NewMockFilesystem([]string{
 		"/dev/i2c-1",
 	})

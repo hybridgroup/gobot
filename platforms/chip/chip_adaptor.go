@@ -27,7 +27,7 @@ type Adaptor struct {
 	pinmap      map[string]sysfsPin
 	digitalPins map[int]*sysfs.DigitalPin
 	pwmPins     map[int]*sysfs.PWMPin
-	i2cBuses    [3]sysfs.I2cDevice
+	i2cBuses    [3]i2c.I2cDevice
 	mutex       *sync.Mutex
 }
 
