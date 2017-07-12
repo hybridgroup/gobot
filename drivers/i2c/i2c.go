@@ -4,7 +4,6 @@ import (
 	"errors"
 	"io"
 	"sync"
-	//"gobot.io/x/gobot/sysfs"
 )
 
 const (
@@ -58,7 +57,7 @@ type Connector interface {
 
 // Connection is a connection to an I2C device with a specified address
 // on a specific bus. Used as an alternative to the I2c interface.
-// Implements sysfs.I2cOperations to talk to the device, wrapping the
+// Implements I2cOperations to talk to the device, wrapping the
 // calls in SetAddress to always target the specified device.
 // Provided by an Adaptor by implementing the I2cConnector interface.
 type Connection I2cOperations
