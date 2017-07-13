@@ -2,10 +2,18 @@
 //
 // Do not build by default.
 
+/*
+ How to run
+ Pass serial port to use as the first param:
+
+	go run examples/firmata_mpl115a2.go /dev/ttyACM0
+*/
+
 package main
 
 import (
 	"fmt"
+	"os"
 	"time"
 
 	"gobot.io/x/gobot"
@@ -14,7 +22,7 @@ import (
 )
 
 func main() {
-	firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
+	firmataAdaptor := firmata.NewAdaptor(os.Args[1])
 	mpl115a2 := i2c.NewMPL115A2Driver(firmataAdaptor)
 
 	work := func() {

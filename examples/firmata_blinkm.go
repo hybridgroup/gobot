@@ -2,10 +2,18 @@
 //
 // Do not build by default.
 
+/*
+ How to run
+ Pass serial port to use as the first param:
+
+	go run examples/firmata_blinkm.go /dev/ttyACM0
+*/
+
 package main
 
 import (
 	"fmt"
+	"os"
 	"time"
 
 	"gobot.io/x/gobot"
@@ -14,7 +22,7 @@ import (
 )
 
 func main() {
-	firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
+	firmataAdaptor := firmata.NewAdaptor(os.Args[1])
 	blinkm := i2c.NewBlinkMDriver(firmataAdaptor)
 
 	work := func() {
