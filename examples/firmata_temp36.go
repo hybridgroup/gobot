@@ -2,9 +2,17 @@
 //
 // Do not build by default.
 
+/*
+ How to run
+ Pass serial port to use as the first param:
+
+	go run examples/firmata_temp36.go /dev/ttyACM0
+*/
+
 package main
 
 import (
+	"os"
 	"time"
 
 	"fmt"
@@ -14,7 +22,7 @@ import (
 )
 
 func main() {
-	firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
+	firmataAdaptor := firmata.NewAdaptor(os.Args[1])
 
 	work := func() {
 		gobot.Every(1*time.Second, func() {

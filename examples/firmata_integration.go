@@ -2,10 +2,18 @@
 //
 // Do not build by default.
 
+/*
+ How to run
+ Pass serial port to use as the first param:
+
+	go run examples/firmata_integration.go /dev/ttyACM0
+*/
+
 package main
 
 import (
 	"fmt"
+	"os"
 	"time"
 
 	"gobot.io/x/gobot"
@@ -15,7 +23,7 @@ import (
 )
 
 func main() {
-	firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
+	firmataAdaptor := firmata.NewAdaptor(os.Args[1])
 	led1 := gpio.NewLedDriver(firmataAdaptor, "3")
 	led2 := gpio.NewLedDriver(firmataAdaptor, "4")
 	button := gpio.NewButtonDriver(firmataAdaptor, "2")

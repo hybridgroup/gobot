@@ -2,6 +2,13 @@
 //
 // Do not build by default.
 
+/*
+ How to run
+ Pass serial port to use as the first param:
+
+	go run examples/firmata_travis.go /dev/ttyACM0
+*/
+
 package main
 
 import (
@@ -9,6 +16,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"time"
 
 	"gobot.io/x/gobot"
@@ -69,7 +77,7 @@ func checkTravis(robot *gobot.Robot) {
 
 func main() {
 	master := gobot.NewMaster()
-	firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
+	firmataAdaptor := firmata.NewAdaptor(os.Args[1])
 	red := gpio.NewLedDriver(firmataAdaptor, "7")
 	red.SetName("red")
 	green := gpio.NewLedDriver(firmataAdaptor, "6")

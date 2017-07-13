@@ -2,13 +2,6 @@
 //
 // Do not build by default.
 
-/*
- How to run
- Pass serial port to use as the first param:
-
-	go run examples/firmata_led_brightness_with_analog_input.go /dev/ttyACM0
-*/
-
 package main
 
 import (
@@ -17,14 +10,12 @@ import (
 
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/drivers/aio"
-	"gobot.io/x/gobot/drivers/gpio"
 	"gobot.io/x/gobot/platforms/firmata"
 )
 
 func main() {
-	firmataAdaptor := firmata.NewAdaptor(os.Args[1])
-	sensor := aio.NewAnalogSensorDriver(firmataAdaptor, "0")
-	led := gpio.NewLedDriver(firmataAdaptor, "3")
+	firmataAdaptor := firmata.NewTCPAdaptor(os.Args[1])
+	sensor := aio.NewAnalogSensorDriver(firmataAdaptor, "A0")
 
 	work := func() {
 		sensor.On(aio.Data, func(data interface{}) {
@@ -33,13 +24,12 @@ func main() {
 			)
 			fmt.Println("sensor", data)
 			fmt.Println("brightness", brightness)
-			led.Brightness(brightness)
 		})
 	}
 
 	robot := gobot.NewRobot("sensorBot",
 		[]gobot.Connection{firmataAdaptor},
-		[]gobot.Device{sensor, led},
+		[]gobot.Device{sensor},
 		work,
 	)
 
