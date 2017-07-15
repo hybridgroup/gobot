@@ -1,0 +1,25 @@
+package main
+
+import (
+	"fmt"
+	"gobot.io/x/gobot/platforms/holystone/hs200"
+	"log"
+	"time"
+)
+
+func main() {
+	drone, err := hs200.NewDriver("172.16.10.1:8888", "172.16.10.1:8080")
+	if err != nil {
+		log.Fatal(err)
+	}
+	drone.Enable()
+	drone.TakeOff()
+	time.Sleep(5 * time.Second)
+	for lift := 256; lift >= 0; lift -= 16 {
+		fmt.Printf("Lift is %d\n", lift)
+		drone.VerticalControl(lift)
+		time.Sleep(250*time.Millisecond)
+	}
+	drone.Land()
+	time.Sleep(10 * time.Second)
+}
