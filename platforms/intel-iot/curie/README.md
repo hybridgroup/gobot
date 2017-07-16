@@ -93,6 +93,12 @@ To setup your Arduino environment:
 
 	Once you have downloaded the FirmataCurieIMU library, install it by using the "Library Manager". You can find it in the Arduino IDE under the "Sketch" menu. Choose "Include Library > Add .ZIP Library". Select the ZIP file for the FirmataCurieIMU library that you just downloaded.
 
+- Linux only: On some Linux distributions, additional device rules are required in order to connect to the board. Run the following command then unplug the board and plug it back in before proceeding:
+
+  ```sh
+  curl -sL https://raw.githubusercontent.com/01org/corelibs-arduino101/master/scripts/create_dfu_udev_rule | sudo -E bash -
+  ```
+
 Now you are ready to install your firmware. You must decide if you want to connect via the serial port, or using Bluetooth LE.
 
 ### Serial Port
