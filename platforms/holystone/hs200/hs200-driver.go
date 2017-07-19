@@ -3,20 +3,24 @@ package hs200
 import (
 	"fmt"
 	"net"
+	"sync"
 	"time"
 )
 
 type Driver struct {
+	mutex   sync.RWMutex
+	stop    chan struct{}
 	cmd     []byte
+	enabled bool
 	udpconn net.Conn
 	tcpconn net.Conn
 }
 
 func NewDriver(tcpaddress string, udpaddress string) (*Driver, error) {
-	tc, terr := net.Dial("tcp", tcpaddress)
-	if terr != nil {
-		return nil, terr
-	}
+//	tc, terr := net.Dial("tcp", tcpaddress)
+//	if terr != nil {
+//		return nil, terr
+//	}
 	uc, uerr := net.Dial("udp4", udpaddress)
 	if uerr != nil {
 		return nil, uerr
@@ -24,7 +28,7 @@ func NewDriver(tcpaddress string, udpaddress string) (*Driver, error) {
 	command := []byte{
 		0xff, //unknown header sent with apparently constant value
 		0x04, //unknown header sent with apparently constant value
-		0x7e, // 0x7f,//vertical lift up/down
+		0x3f, //vertical lift up/down
 		0x3f, //rotation rate left/right
 		0xc0, //advance forward / backward
 		0x3f, //strafe left / right
@@ -36,18 +40,28 @@ func NewDriver(tcpaddress string, udpaddress string) (*Driver, error) {
 	}
 	command[10] = checksum(command)
 
-	return &Driver{command, uc, tc}, nil
+	return &Driver{stop: make(chan struct{}), cmd: command, udpconn: uc, tcpconn: nil}, nil
 }
 
-func (d Driver) flightloop() {
-	i := 0
+func (d *Driver) flightLoop(stop chan struct{}) {
+	udpTick := time.NewTicker(50 * time.Millisecond)
+	defer udpTick.Stop()
+	tcpTick := time.NewTicker(1000 * time.Millisecond)
+	defer tcpTick.Stop()
 	for {
-		time.Sleep(20 * time.Millisecond)
-		if i%5 == 0 {
-			d.tcpconn.Write([]byte("remote\r\n"))
+		select {
+		case <-udpTick.C:
+			d.mutex.RLock()
+			defer d.mutex.RUnlock()
+			d.sendUDP()
+		case <-tcpTick.C:
+			//d.tcpconn.Write([]byte("1\r\n"))
+		case <-stop:
+			d.mutex.Lock()
+			defer d.mutex.Unlock()
+			d.enabled = false
+			return
 		}
-		d.sendUDP()
-		i++
 	}
 }
 
@@ -63,10 +77,25 @@ func (d Driver) sendUDP() {
 }
 
 func (d Driver) Enable() {
-	go d.flightloop()
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
+	if !d.enabled {
+		go d.flightLoop(d.stop)
+		d.enabled = true
+	}
+}
+
+func (d Driver) Disable() {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
+	if d.enabled {
+		d.stop <- struct{}{}
+	}
 }
 
 func (d Driver) TakeOff() {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
 	d.cmd[2] = 0x7e
 	d.cmd[10] = checksum(d.cmd)
 }
@@ -87,6 +116,8 @@ func (d Driver) VerticalControl(delta int) {
 }
 
 func (d Driver) Land() {
-	d.cmd[2] = 0x3f
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
+	d.cmd[2] = 0
 	d.cmd[10] = checksum(d.cmd)
 }
