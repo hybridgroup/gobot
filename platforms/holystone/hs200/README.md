@@ -1,5 +1,9 @@
 ## How to Use
+- Connect to the drone's Wi-Fi network and identify the drone/gateway IP address.
+- Use that IP address when you create a new driver.
+- Some drones appear to use a different TCP port (8080 vs. 8888?).  If the example doesn't work scan the drone for open ports or modify the driver not to use TCP.
 
+Here is a sample of how you initialize and use the driver:
 ```go
 package main
 
@@ -7,8 +11,9 @@ import (
 	"log"
 	"time"
 
-	"gobot.io/x/gobot/platforms/holystone/hs200"
 	"fmt"
+
+	"gobot.io/x/gobot/platforms/holystone/hs200"
 )
 
 func main() {
@@ -22,11 +27,36 @@ func main() {
 	fmt.Println("Take off!")
 	drone.TakeOff()
 	time.Sleep(5 * time.Second)
+	fmt.Println("Full steam ahead!")
+	drone.Forward(1.0)
+	time.Sleep(3 * time.Second)
+	fmt.Println("Full steam back!")
+	drone.Forward(-1.0)
+	time.Sleep(3 * time.Second)
+	fmt.Println("Hover!")
+	drone.Forward(0)
+	time.Sleep(3 * time.Second)
 	fmt.Println("Land!")
 	drone.Land()
 	time.Sleep(5 * time.Second)
 	fmt.Println("Disable!")
 	drone.Disable()
-	time.Sleep(5*time.Second)
+	time.Sleep(5 * time.Second)
 }
 ```
+
+## References
+https://hackaday.io/project/19356/logs
+
+https://github.com/lancecaraccioli/holystone-hs110w
+
+## Random notes
+- The hs200 sends out an RTSP video feed from its own board camera.  Not clear how this is turned on.  The data is apparently streamed over UDP. (Reference mentions rtsp://192.168.0.1/0 in VLC, I didn't try it!)
+- The Android control app seems to be sending out the following TCP bytes for an unknown purpose:
+`00 01 02 03 04 05 06 07 08 09 25 25` but the drone flies without a TCP connection.
+- The drone apparently always replies "noact\r\n" over TCP.
+- The app occasionally sends out 29 bytes long UDP packets besides the 11 byte control packet for an unknown purpose:
+`26 e1 07 00 00 07 00 00 00 10 00 00 00 00 00 00 00 14 00 00 00 0e 00 00 00 03 00 00 00`
+- The doesn't seem to be any telemetry coming out of the drone besides the video feed.
+- The drone can sometimes be a little flaky.  Ensure you've got a fully charged battery, minimal Wi-Fi interference, various connectors on the drone all well seated.
+- It's not clear whether the drone's remote uses Wi-Fi or not, possibly Wi-Fi is only for the mobile app.
