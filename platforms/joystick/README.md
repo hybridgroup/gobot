@@ -19,6 +19,8 @@ To install `sdl2` on OSX using Homebrew:
 $ brew install sdl2
 ```
 
+To use an XBox360 controller on OS X, you will most likely need to install additional software such as [https://github.com/360Controller/360Controller](https://github.com/360Controller/360Controller).
+
 ### Ubuntu
 
 ```
@@ -152,40 +154,81 @@ import (
 
 func main() {
 	joystickAdaptor := joystick.NewAdaptor()
-	joystick := joystick.NewDriver(joystickAdaptor,
+	stick := joystick.NewDriver(joystickAdaptor,
 		"./platforms/joystick/configs/dualshock3.json",
 	)
 
 	work := func() {
-		gobot.On(joystick.Event("square_press"), func(data interface{}) {
+		// buttons
+		stick.On(joystick.SquarePress, func(data interface{}) {
 			fmt.Println("square_press")
 		})
-		gobot.On(joystick.Event("square_release"), func(data interface{}) {
+		stick.On(joystick.SquareRelease, func(data interface{}) {
 			fmt.Println("square_release")
 		})
-		gobot.On(joystick.Event("triangle_press"), func(data interface{}) {
+		stick.On(joystick.TrianglePress, func(data interface{}) {
 			fmt.Println("triangle_press")
 		})
-		gobot.On(joystick.Event("triangle_release"), func(data interface{}) {
+		stick.On(joystick.TriangleRelease, func(data interface{}) {
 			fmt.Println("triangle_release")
 		})
-		gobot.On(joystick.Event("left_x"), func(data interface{}) {
+		stick.On(joystick.CirclePress, func(data interface{}) {
+			fmt.Println("circle_press")
+		})
+		stick.On(joystick.CircleRelease, func(data interface{}) {
+			fmt.Println("circle_release")
+		})
+		stick.On(joystick.XPress, func(data interface{}) {
+			fmt.Println("x_press")
+		})
+		stick.On(joystick.XRelease, func(data interface{}) {
+			fmt.Println("x_release")
+		})
+		stick.On(joystick.StartPress, func(data interface{}) {
+			fmt.Println("start_press")
+		})
+		stick.On(joystick.StartRelease, func(data interface{}) {
+			fmt.Println("start_release")
+		})
+		stick.On(joystick.SelectPress, func(data interface{}) {
+			fmt.Println("select_press")
+		})
+		stick.On(joystick.SelectRelease, func(data interface{}) {
+			fmt.Println("select_release")
+		})
+
+		// joysticks
+		stick.On(joystick.LeftX, func(data interface{}) {
 			fmt.Println("left_x", data)
 		})
-		gobot.On(joystick.Event("left_y"), func(data interface{}) {
+		stick.On(joystick.LeftY, func(data interface{}) {
 			fmt.Println("left_y", data)
 		})
-		gobot.On(joystick.Event("right_x"), func(data interface{}) {
+		stick.On(joystick.RightX, func(data interface{}) {
 			fmt.Println("right_x", data)
 		})
-		gobot.On(joystick.Event("right_y"), func(data interface{}) {
+		stick.On(joystick.RightY, func(data interface{}) {
 			fmt.Println("right_y", data)
+		})
+
+		// triggers
+		stick.On(joystick.R1Press, func(data interface{}) {
+			fmt.Println("R1Press", data)
+		})
+		stick.On(joystick.R2Press, func(data interface{}) {
+			fmt.Println("R2Press", data)
+		})
+		stick.On(joystick.L1Press, func(data interface{}) {
+			fmt.Println("L1Press", data)
+		})
+		stick.On(joystick.L2Press, func(data interface{}) {
+			fmt.Println("L2Press", data)
 		})
 	}
 
 	robot := gobot.NewRobot("joystickBot",
 		[]gobot.Connection{joystickAdaptor},
-		[]gobot.Device{joystick},
+		[]gobot.Device{stick},
 		work,
 	)
 
