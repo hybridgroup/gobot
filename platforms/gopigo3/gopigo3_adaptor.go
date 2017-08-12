@@ -1,8 +1,8 @@
 package gopigo3
 
 import (
-	"github.com/hybridgroup/gobot/platforms/raspi"
-	"github.com/hybridgroup/gobot/drivers/spi"
+	"gobot.io/x/gobot/drivers/spi"
+	"gobot.io/x/gobot/platforms/raspi"
 	go_spi "golang.org/x/exp/io/spi"
 )
 
@@ -12,9 +12,9 @@ const (
 
 // Adaptor represents a connection to a GoPiGo3
 type Adaptor struct {
-	name  string
-	raspi *raspi.Adaptor
-	connect func() *spi.Connection
+	name       string
+	raspi      *raspi.Adaptor
+	connect    func() *spi.Connection
 	connection *spi.Connection
 }
 
@@ -23,7 +23,7 @@ func NewAdaptor() (*Adaptor, error) {
 	a := &Adaptor{
 		name:  "GoPiGo",
 		raspi: raspi.NewAdaptor(),
-		connect: func() (*spi.Connection) {
+		connect: func() *spi.Connection {
 			return spi.NewConnection(&go_spi.Devfs{
 				Dev:      "/dev/spidev0.1",
 				Mode:     go_spi.Mode0,

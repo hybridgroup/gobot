@@ -3,7 +3,8 @@ package gopigo3
 import (
 	"errors"
 	"fmt"
-	"github.com/hybridgroup/gobot"
+
+	"gobot.io/x/gobot"
 )
 
 type Motor byte
@@ -142,4 +143,12 @@ func (g *GoPiGo3Driver) SetMotorPower(motor Motor, power int) error {
 		byte(motor),
 		byte(power),
 	})
+}
+
+func (g *GoPiGo3Driver) GetFirmwareVersion() string {
+	response := g.adaptor().connection.Read32(GOPIGO_ADDRESS, GET_FIRMWARE_VERSION)
+	major := response / 1000000
+	minor := response / 1000 % 1000
+	patch := response % 1000
+	return fmt.Sprintf("%d.%d.%d", major, minor, patch)
 }

@@ -1,6 +1,7 @@
 package gopigo3
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -29,6 +30,7 @@ func ExampleNewGoPiGoDriver() {
 
 	driver := NewGoPiGo3Driver(adapter)
 	work := func() {
+		fmt.Printf("Firmware version: %s\n", driver.GetFirmwareVersion())
 		gobot.Every(10*time.Second, func() {
 			driver.SetLed(LED_EYE_LEFT, 10, 10, 10)
 			time.Sleep(1 * time.Second)
@@ -47,7 +49,7 @@ func ExampleNewGoPiGoDriver() {
 			driver.SetLed(LED_WIFI, 0, 0, 0)
 		})
 
-		gobot.Every(10* time.Second, func() {
+		gobot.Every(10*time.Second, func() {
 			driver.SetMotorPower(MOTOR_LEFT, 50)
 			driver.SetMotorPower(MOTOR_RIGHT, 50)
 			time.Sleep(3 * time.Second)
