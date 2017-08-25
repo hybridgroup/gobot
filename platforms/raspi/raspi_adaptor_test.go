@@ -8,6 +8,7 @@ import (
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/drivers/gpio"
 	"gobot.io/x/gobot/drivers/i2c"
+	"gobot.io/x/gobot/drivers/spi"
 	"gobot.io/x/gobot/gobottest"
 	"gobot.io/x/gobot/sysfs"
 	"runtime"
@@ -24,6 +25,7 @@ var _ gpio.ServoWriter = (*Adaptor)(nil)
 var _ sysfs.DigitalPinnerProvider = (*Adaptor)(nil)
 var _ sysfs.PWMPinnerProvider = (*Adaptor)(nil)
 var _ i2c.Connector = (*Adaptor)(nil)
+var _ spi.Connector = (*Adaptor)(nil)
 
 func initTestAdaptor() *Adaptor {
 	readFile = func() ([]byte, error) {
@@ -91,6 +93,8 @@ func TestAdaptorFinalize(t *testing.T) {
 		"/dev/pi-blaster",
 		"/dev/i2c-1",
 		"/dev/i2c-0",
+		"/dev/spidev0.0",
+		"/dev/spidev0.1",
 	})
 
 	sysfs.SetFilesystem(fs)
@@ -176,6 +180,27 @@ func TestAdaptorI2c(t *testing.T) {
 	gobottest.Assert(t, err, errors.New("Bus number 51 out of range"))
 
 	gobottest.Assert(t, a.GetDefaultBus(), 1)
+}
+
+func TestAdaptorSPI(t *testing.T) {
+	a := initTestAdaptor()
+	fs := sysfs.NewMockFilesystem([]string{
+		"/dev/spidev0.1",
+	})
+	sysfs.SetFilesystem(fs)
+	sysfs.SetSyscall(&sysfs.MockSyscall{})
+	// TODO: find a better way to test this
+	_, err := a.GetSpiConnection(1, 0xC0, 0, 500000)
+	gobottest.Assert(t, err, err)
+	gobottest.Assert(t, a.GetSpiDefaultBus(), 1)
+	gobottest.Assert(t, a.GetSpiDefaultMode(), 0)
+	gobottest.Assert(t, a.GetSpiDefaultMaxSpeed(), int64(500000))
+
+	_, err = a.GetSpiConnection(1, 0xC0, 1, 500000)
+	_, err = a.GetSpiConnection(1, 0xC0, 2, 500000)
+	_, err = a.GetSpiConnection(1, 0xC0, 3, 500000)
+	_, err = a.GetSpiConnection(1, 0xC0, 5, 500000)
+	_, err = a.GetSpiConnection(4, 0xC0, 0, 500000)
 }
 
 func TestAdaptorDigitalPinConcurrency(t *testing.T) {
