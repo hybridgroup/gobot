@@ -5,6 +5,7 @@ go_import_path: gobot.io/x/gobot
 go:
    - 1.7.6
    - 1.8.3
+   - 1.9.0
    - tip
 matrix:
    allow_failures:
