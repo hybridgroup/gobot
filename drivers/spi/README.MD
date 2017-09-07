@@ -12,8 +12,6 @@ go get -d -u gobot.io/x/gobot/...
 ## Hardware Support
 Gobot has a extensible system for connecting to hardware devices. The following spi devices are currently supported:
 
-- GoPiGo3 robotics board (built for Rapsberry Pi, but in theory it could be used in another platform)
-
 More drivers are coming soon...
 
 ## Using A Different Bus or Address
