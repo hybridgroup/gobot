@@ -163,16 +163,6 @@ func NewGoPiGo3Driver(a *Adaptor) *GoPiGo3Driver {
 	return g
 }
 
-// func (g *GoPiGo3Driver) initialization() (err error) {
-// 	bus := g.GetBusOrDefault(g.connector.GetSpiDefaultBus())
-// 	address := g.GetAddressOrDefault(goPiGo3Address)
-// 	mode := g.connector.GetSpiDefaultMode()
-// 	maxSpeed := g.connector.GetSpiDefaultMaxSpeed()
-// 	g.connection, err = g.connector.GetSpiConnection(bus, address, mode, maxSpeed)
-// 	g.sCon = g.connection.(*SpiConnection)
-// 	return err
-// }
-
 // Name returns the name of the device.
 func (g *GoPiGo3Driver) Name() string { return g.name }
 
@@ -187,7 +177,6 @@ func (g *GoPiGo3Driver) Halt() (err error) { return }
 
 // Start initializes the GoPiGo3
 func (g *GoPiGo3Driver) Start() (err error) {
-	//	return g.initialization()
 	return nil
 }
 

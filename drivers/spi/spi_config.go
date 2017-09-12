@@ -1,8 +1,7 @@
 package spi
 
 type spiConfig struct {
-	bus     int
-	address int
+	bus int
 }
 
 // Config is the interface which describes how a Driver can specify
@@ -13,17 +12,11 @@ type Config interface {
 
 	// GetBusOrDefault gets which bus to use
 	GetBusOrDefault(def int) int
-
-	// WithAddress sets which address to use
-	WithAddress(address int)
-
-	// GetAddressOrDefault gets which address to use
-	GetAddressOrDefault(def int) int
 }
 
 // NewConfig returns a new SPI Config.
 func NewConfig() Config {
-	return &spiConfig{bus: BusNotInitialized, address: AddressNotInitialized}
+	return &spiConfig{bus: BusNotInitialized}
 }
 
 // WithBus sets preferred bus to use.
@@ -44,27 +37,5 @@ func (s *spiConfig) GetBusOrDefault(d int) int {
 func WithBus(bus int) func(Config) {
 	return func(s Config) {
 		s.WithBus(bus)
-	}
-}
-
-// WithAddress sets which address to use.
-func (s *spiConfig) WithAddress(address int) {
-	s.address = address
-}
-
-// GetAddressOrDefault returns which address to use, either
-// the one set using WithBus(), or the default value which
-// is passed in as the param.
-func (s *spiConfig) GetAddressOrDefault(a int) int {
-	if s.address == AddressNotInitialized {
-		return a
-	}
-	return s.address
-}
-
-// WithAddress sets which address to use as a optional param.
-func WithAddress(address int) func(Config) {
-	return func(s Config) {
-		s.WithAddress(address)
 	}
 }

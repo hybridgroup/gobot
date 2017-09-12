@@ -208,15 +208,15 @@ func (r *Adaptor) GetDefaultBus() int {
 
 // GetSpiConnection returns an spi connection to a device on a specified bus.
 // Valid bus number is [0..1] which corresponds to /dev/spidev0.0 through /dev/spidev0.1.
-func (r *Adaptor) GetSpiConnection(busNum, address, mode int, maxSpeed int64) (connection spi.Connection, err error) {
+func (r *Adaptor) GetSpiConnection(busNum, mode int, maxSpeed int64) (connection spi.Connection, err error) {
 	if (busNum < 0) || (busNum > 1) {
 		return nil, fmt.Errorf("Bus number %d out of range", busNum)
 	}
-	device, err := r.getSpiBus(busNum, address, mode, maxSpeed)
-	return spi.NewConnection(device, address), err
+	device, err := r.getSpiBus(busNum, mode, maxSpeed)
+	return spi.NewConnection(device), err
 }
 
-func (r *Adaptor) getSpiBus(busNum, address, mode int, maxSpeed int64) (_ spi.SPIDevice, err error) {
+func (r *Adaptor) getSpiBus(busNum, mode int, maxSpeed int64) (_ spi.SPIDevice, err error) {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
@@ -245,7 +245,7 @@ func (r *Adaptor) getSpiBus(busNum, address, mode int, maxSpeed int64) (_ spi.SP
 			if err != nil {
 				return nil, err
 			}
-			r.spiBuses[busNum] = spi.NewConnection(bus, address)
+			r.spiBuses[busNum] = spi.NewConnection(bus)
 		}
 	}
 	return r.spiBuses[busNum], err

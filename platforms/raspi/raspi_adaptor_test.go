@@ -190,17 +190,17 @@ func TestAdaptorSPI(t *testing.T) {
 	sysfs.SetFilesystem(fs)
 	sysfs.SetSyscall(&sysfs.MockSyscall{})
 	// TODO: find a better way to test this
-	_, err := a.GetSpiConnection(1, 0xC0, 0, 500000)
+	_, err := a.GetSpiConnection(1, 0, 500000)
 	gobottest.Assert(t, err, err)
 	gobottest.Assert(t, a.GetSpiDefaultBus(), 1)
 	gobottest.Assert(t, a.GetSpiDefaultMode(), 0)
 	gobottest.Assert(t, a.GetSpiDefaultMaxSpeed(), int64(500000))
 
-	_, err = a.GetSpiConnection(1, 0xC0, 1, 500000)
-	_, err = a.GetSpiConnection(1, 0xC0, 2, 500000)
-	_, err = a.GetSpiConnection(1, 0xC0, 3, 500000)
-	_, err = a.GetSpiConnection(1, 0xC0, 5, 500000)
-	_, err = a.GetSpiConnection(4, 0xC0, 0, 500000)
+	_, err = a.GetSpiConnection(1, 1, 500000)
+	_, err = a.GetSpiConnection(1, 2, 500000)
+	_, err = a.GetSpiConnection(1, 3, 500000)
+	_, err = a.GetSpiConnection(1, 5, 500000)
+	_, err = a.GetSpiConnection(4, 0, 500000)
 }
 
 func TestAdaptorDigitalPinConcurrency(t *testing.T) {

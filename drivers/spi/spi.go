@@ -8,9 +8,6 @@ import (
 const (
 	// BusNotInitialized is the initial value for a bus
 	BusNotInitialized = -1
-
-	// AddressNotInitialized is the initial value for an address
-	AddressNotInitialized = -1
 )
 
 type SPIOperations interface {
@@ -27,16 +24,15 @@ type SPIOperations interface {
 // SPIDevice is the interface to a specific spi bus
 type SPIDevice interface {
 	SPIOperations
-	//	SetAddress(int) error
 }
 
 // Connector lets Adaptors provide the interface for Drivers
 // to get access to the SPI buses on platforms that support SPI.
 type Connector interface {
-	// GetConnection returns a connection to device at the specified address
-	// and bus. Bus numbering starts at index 0, the range of valid buses is
+	// GetConnection returns a connection to device at the specified bus.
+	// Bus numbering starts at index 0, the range of valid buses is
 	// platform specific.
-	GetSpiConnection(busNum, address, mode int, maxSpeed int64) (device Connection, err error)
+	GetSpiConnection(busNum, mode int, maxSpeed int64) (device Connection, err error)
 
 	// GetDefaultBus returns the default SPI bus index
 	GetSpiDefaultBus() int
@@ -59,13 +55,12 @@ type SpiConnection struct {
 	bus      SPIDevice
 	mode     int
 	maxSpeed int64
-	address  int
 }
 
 // NewConnection creates and returns a new connection to a specific
 // spi device on a bus and address
-func NewConnection(bus SPIDevice, address int) (connection *SpiConnection) {
-	return &SpiConnection{bus: bus, address: address}
+func NewConnection(bus SPIDevice) (connection *SpiConnection) {
+	return &SpiConnection{bus: bus}
 }
 
 func (c *SpiConnection) Close() error {
