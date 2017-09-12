@@ -23,7 +23,7 @@ import (
 )
 
 func main() {
-	gopigo3Adaptor := g.NewAdaptor("/dev/spidev0.1", 0, 500000)
+	gopigo3Adaptor := g.NewAdaptor()
 	gopigo3 := g.NewGoPiGo3Driver(gopigo3Adaptor)
 
 	work := func() {

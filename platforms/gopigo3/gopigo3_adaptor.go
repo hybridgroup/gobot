@@ -11,37 +11,24 @@ import (
 var _ gobot.Adaptor = (*Adaptor)(nil)
 
 type Adaptor struct {
-	name              string
-	port              string
-	spiMode           xspi.Mode
-	maxSpeed          int64
-	connection        spi.SPIDevice
-	writeBytesChannel chan []byte
-	finalizeChannel   chan struct{}
+	name               string
+	port               string
+	spiDefaultMode     xspi.Mode
+	spiDefaultMaxSpeed int64
+	connection         spi.SPIDevice
+	writeBytesChannel  chan []byte
+	finalizeChannel    chan struct{}
 }
 
-func NewAdaptor(port string, mode int, maxSpeed int64) *Adaptor {
-	var spiMode xspi.Mode
-	switch mode {
-	case 0:
-		spiMode = xspi.Mode0
-	case 1:
-		spiMode = xspi.Mode1
-	case 2:
-		spiMode = xspi.Mode2
-	case 3:
-		spiMode = xspi.Mode3
-	default:
-		spiMode = xspi.Mode0
-	}
+func NewAdaptor() *Adaptor {
 	return &Adaptor{
-		name:              "GoPiGo3",
-		port:              port,
-		spiMode:           spiMode,
-		maxSpeed:          maxSpeed,
-		connection:        nil,
-		writeBytesChannel: make(chan []byte),
-		finalizeChannel:   make(chan struct{}),
+		name:               "GoPiGo3",
+		port:               "/dev/spidev0.1", //gopigo3 uses chip select CE1 on raspberry pi
+		spiDefaultMode:     xspi.Mode0,
+		spiDefaultMaxSpeed: 500000,
+		connection:         nil,
+		writeBytesChannel:  make(chan []byte),
+		finalizeChannel:    make(chan struct{}),
 	}
 }
 
@@ -57,8 +44,8 @@ func (a *Adaptor) Connect() error {
 	if a.connection == nil {
 		devfs := &xspi.Devfs{
 			Dev:      a.port,
-			Mode:     a.spiMode,
-			MaxSpeed: a.maxSpeed,
+			Mode:     a.spiDefaultMode,
+			MaxSpeed: a.spiDefaultMaxSpeed,
 		}
 		con, err := xspi.Open(devfs)
 		if err != nil {
