@@ -8,6 +8,7 @@ import (
 	"math"
 
 	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/spi"
 )
 
 // spi address for gopigo3
@@ -147,7 +148,8 @@ var _ gobot.Driver = (*GoPiGo3Driver)(nil)
 // GoPiGo3Driver is a Gobot Driver for the GoPiGo3 board.
 type GoPiGo3Driver struct {
 	name       string
-	connection *Adaptor
+	connector  spi.Connector
+	connection spi.Connection
 }
 
 // NewGoPiGo3Driver creates a new Gobot Driver for the GoPiGo3 board.
@@ -155,10 +157,10 @@ type GoPiGo3Driver struct {
 // Params:
 //		a *Adaptor - the Adaptor to use with this Driver
 //
-func NewGoPiGo3Driver(a *Adaptor) *GoPiGo3Driver {
+func NewGoPiGo3Driver(a spi.Connector) *GoPiGo3Driver {
 	g := &GoPiGo3Driver{
-		name:       gobot.DefaultName("GoPiGo3"),
-		connection: a,
+		name:      gobot.DefaultName("GoPiGo3"),
+		connector: a,
 	}
 	return g
 }
@@ -170,20 +172,24 @@ func (g *GoPiGo3Driver) Name() string { return g.name }
 func (g *GoPiGo3Driver) SetName(n string) { g.name = n }
 
 // Connection returns the Connection of the device.
-func (g *GoPiGo3Driver) Connection() gobot.Connection { return gobot.Connection(g.connection) }
+func (g *GoPiGo3Driver) Connection() gobot.Connection { return g.connection.(gobot.Connection) }
 
 // Halt stops the driver.
 func (g *GoPiGo3Driver) Halt() (err error) { return }
 
 // Start initializes the GoPiGo3
 func (g *GoPiGo3Driver) Start() (err error) {
+	bus := g.connector.GetSpiDefaultBus()
+	mode := g.connector.GetSpiDefaultMode()
+	maxSpeed := g.connector.GetSpiDefaultMaxSpeed()
+	g.connection, err = g.connector.GetSpiConnection(bus, mode, maxSpeed)
 	return nil
 }
 
 // GetManufacturerName returns the manufacturer from the firmware.
 func (g *GoPiGo3Driver) GetManufacturerName() (mName string, err error) {
 	// read 24 bytes to get manufacturer name
-	response, err := g.connection.ReadBytes(goPiGo3Address, GET_MANUFACTURER, 24)
+	response, err := g.readBytes(goPiGo3Address, GET_MANUFACTURER, 24)
 	if err != nil {
 		return mName, err
 	}
@@ -197,7 +203,7 @@ func (g *GoPiGo3Driver) GetManufacturerName() (mName string, err error) {
 // GetBoardName returns the board name from the firmware.
 func (g *GoPiGo3Driver) GetBoardName() (bName string, err error) {
 	// read 24 bytes to get board name
-	response, err := g.connection.ReadBytes(goPiGo3Address, GET_NAME, 24)
+	response, err := g.readBytes(goPiGo3Address, GET_NAME, 24)
 	if err != nil {
 		return bName, err
 	}
@@ -210,7 +216,7 @@ func (g *GoPiGo3Driver) GetBoardName() (bName string, err error) {
 
 // GetHardwareVersion returns the hardware version from the firmware.
 func (g *GoPiGo3Driver) GetHardwareVersion() (hVer string, err error) {
-	response, err := g.connection.ReadUint32(goPiGo3Address, GET_HARDWARE_VERSION)
+	response, err := g.readUint32(goPiGo3Address, GET_HARDWARE_VERSION)
 	if err != nil {
 		return hVer, err
 	}
@@ -222,7 +228,7 @@ func (g *GoPiGo3Driver) GetHardwareVersion() (hVer string, err error) {
 
 // GetFirmwareVersion returns the current firmware version.
 func (g *GoPiGo3Driver) GetFirmwareVersion() (fVer string, err error) {
-	response, err := g.connection.ReadUint32(goPiGo3Address, GET_FIRMWARE_VERSION)
+	response, err := g.readUint32(goPiGo3Address, GET_FIRMWARE_VERSION)
 	if err != nil {
 		return fVer, err
 	}
@@ -235,7 +241,7 @@ func (g *GoPiGo3Driver) GetFirmwareVersion() (fVer string, err error) {
 // GetSerialNumber returns the 128-bit hardware serial number of the board.
 func (g *GoPiGo3Driver) GetSerialNumber() (sNum string, err error) {
 	// read 20 bytes to get the serial number
-	response, err := g.connection.ReadBytes(goPiGo3Address, GET_ID, 20)
+	response, err := g.readBytes(goPiGo3Address, GET_ID, 20)
 	if err != nil {
 		return sNum, err
 	}
@@ -248,19 +254,19 @@ func (g *GoPiGo3Driver) GetSerialNumber() (sNum string, err error) {
 
 // Get5vVoltage returns the current voltage on the 5v line.
 func (g *GoPiGo3Driver) Get5vVoltage() (voltage float32, err error) {
-	val, err := g.connection.ReadUint16(goPiGo3Address, GET_VOLTAGE_5V)
+	val, err := g.readUint16(goPiGo3Address, GET_VOLTAGE_5V)
 	return (float32(val) / 1000.0), err
 }
 
 // GetBatteryVoltage gets the battery voltage from the main battery pack (7v-12v).
 func (g *GoPiGo3Driver) GetBatteryVoltage() (voltage float32, err error) {
-	val, err := g.connection.ReadUint16(goPiGo3Address, GET_VOLTAGE_VCC)
+	val, err := g.readUint16(goPiGo3Address, GET_VOLTAGE_VCC)
 	return (float32(val) / 1000.0), err
 }
 
 // SetLED sets rgb values from 0 to 255.
 func (g *GoPiGo3Driver) SetLED(led Led, red, green, blue uint8) error {
-	return g.connection.WriteBytes([]byte{
+	return g.writeBytes([]byte{
 		goPiGo3Address,
 		SET_LED,
 		byte(led),
@@ -272,7 +278,7 @@ func (g *GoPiGo3Driver) SetLED(led Led, red, green, blue uint8) error {
 
 // SetServo sets a servo's position in microseconds (0-16666).
 func (g *GoPiGo3Driver) SetServo(servo Servo, us uint16) error {
-	return g.connection.WriteBytes([]byte{
+	return g.writeBytes([]byte{
 		goPiGo3Address,
 		SET_SERVO,
 		byte(servo),
@@ -282,7 +288,7 @@ func (g *GoPiGo3Driver) SetServo(servo Servo, us uint16) error {
 
 // SetMotorPower from -128 to 127.
 func (g *GoPiGo3Driver) SetMotorPower(motor Motor, power int8) error {
-	return g.connection.WriteBytes([]byte{
+	return g.writeBytes([]byte{
 		goPiGo3Address,
 		SET_MOTOR_PWM,
 		byte(motor),
@@ -293,7 +299,7 @@ func (g *GoPiGo3Driver) SetMotorPower(motor Motor, power int8) error {
 // SetMotorPosition sets the motor's position in degrees.
 func (g *GoPiGo3Driver) SetMotorPosition(motor Motor, position float64) error {
 	positionRaw := math.Float64bits(position * MOTOR_TICKS_PER_DEGREE)
-	return g.connection.WriteBytes([]byte{
+	return g.writeBytes([]byte{
 		goPiGo3Address,
 		SET_MOTOR_POSITION,
 		byte(motor),
@@ -307,7 +313,7 @@ func (g *GoPiGo3Driver) SetMotorPosition(motor Motor, position float64) error {
 // SetMotorDps sets the motor target speed in degrees per second.
 func (g *GoPiGo3Driver) SetMotorDps(motor Motor, dps float64) error {
 	dpsUint := math.Float64bits(dps * MOTOR_TICKS_PER_DEGREE)
-	return g.connection.WriteBytes([]byte{
+	return g.writeBytes([]byte{
 		goPiGo3Address,
 		SET_MOTOR_DPS,
 		byte(motor),
@@ -319,7 +325,7 @@ func (g *GoPiGo3Driver) SetMotorDps(motor Motor, dps float64) error {
 // SetMotorLimits sets the speed limits for a motor.
 func (g *GoPiGo3Driver) SetMotorLimits(motor Motor, power int8, dps float64) error {
 	dpsUint := math.Float64bits(dps * MOTOR_TICKS_PER_DEGREE)
-	return g.connection.WriteBytes([]byte{
+	return g.writeBytes([]byte{
 		goPiGo3Address,
 		SET_MOTOR_LIMITS,
 		byte(motor),
@@ -335,7 +341,7 @@ func (g *GoPiGo3Driver) GetMotorStatus(motor Motor) (flags uint8, power uint16, 
 	if motor == MOTOR_LEFT {
 		message = GET_MOTOR_STATUS_LEFT
 	}
-	response, err := g.connection.ReadBytes(goPiGo3Address, message, 12)
+	response, err := g.readBytes(goPiGo3Address, message, 12)
 	if err != nil {
 		return flags, power, encoder, dps, err
 	}
@@ -364,7 +370,7 @@ func (g *GoPiGo3Driver) GetMotorEncoder(motor Motor) (encoder float64, err error
 	if motor == MOTOR_LEFT {
 		message = GET_MOTOR_ENCODER_LEFT
 	}
-	response, err := g.connection.ReadUint32(goPiGo3Address, message)
+	response, err := g.readUint32(goPiGo3Address, message)
 	if err != nil {
 		return encoder, err
 	}
@@ -377,7 +383,7 @@ func (g *GoPiGo3Driver) GetMotorEncoder(motor Motor) (encoder float64, err error
 // OffsetMotorEncoder offsets a motor's encoder for calibration purposes.
 func (g *GoPiGo3Driver) OffsetMotorEncoder(motor Motor, offset float64) error {
 	offsetUint := math.Float64bits(offset * MOTOR_TICKS_PER_DEGREE)
-	return g.connection.WriteBytes([]byte{
+	return g.writeBytes([]byte{
 		goPiGo3Address,
 		OFFSET_MOTOR_ENCODER,
 		byte(motor),
@@ -389,3 +395,43 @@ func (g *GoPiGo3Driver) OffsetMotorEncoder(motor Motor, offset float64) error {
 }
 
 //TODO: add grove functions
+
+func (g *GoPiGo3Driver) readBytes(address byte, msg byte, numBytes int) (val []byte, err error) {
+	w := make([]byte, numBytes)
+	w[0] = address
+	w[1] = msg
+	r := make([]byte, len(w))
+	err = g.connection.Tx(w, r)
+	if err != nil {
+		return val, err
+	}
+	return r, nil
+}
+
+func (g *GoPiGo3Driver) readUint8(address, msg byte) (val uint8, err error) {
+	r, err := g.readBytes(address, msg, 8)
+	if err != nil {
+		return val, err
+	}
+	return uint8(r[4]) << 8, nil
+}
+
+func (g *GoPiGo3Driver) readUint16(address, msg byte) (val uint16, err error) {
+	r, err := g.readBytes(address, msg, 8)
+	if err != nil {
+		return val, err
+	}
+	return uint16(r[4])<<8 | uint16(r[5]), nil
+}
+
+func (g *GoPiGo3Driver) readUint32(address, msg byte) (val uint32, err error) {
+	r, err := g.readBytes(address, msg, 8)
+	if err != nil {
+		return val, err
+	}
+	return uint32(r[4])<<24 | uint32(r[5])<<16 | uint32(r[6])<<8 | uint32(r[7]), nil
+}
+
+func (g *GoPiGo3Driver) writeBytes(w []byte) (err error) {
+	return g.connection.Tx(w, nil)
+}

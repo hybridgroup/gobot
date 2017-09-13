@@ -10,11 +10,12 @@ import (
 
 	"gobot.io/x/gobot"
 	g "gobot.io/x/gobot/platforms/gopigo3"
+	"gobot.io/x/gobot/platforms/raspi"
 )
 
 func main() {
-	gopigo3Adaptor := g.NewAdaptor()
-	gopigo3 := g.NewGoPiGo3Driver(gopigo3Adaptor)
+	raspiAdaptor := raspi.NewAdaptor()
+	gopigo3 := g.NewGoPiGo3Driver(raspiAdaptor)
 
 	work := func() {
 		on := uint8(0xFF)
@@ -32,7 +33,7 @@ func main() {
 	}
 
 	robot := gobot.NewRobot("gopigo3",
-		[]gobot.Connection{gopigo3Adaptor},
+		[]gobot.Connection{raspiAdaptor},
 		[]gobot.Device{gopigo3},
 		work,
 	)
