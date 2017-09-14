@@ -1,6 +1,6 @@
 # SPI
 
-This package provides drivers for [spi](https://en.wikipedia.org/wiki/Serial_Peripheral_Interface_Bus) devices. It must be used along with the [raspberry pi](https://gobot.io/documentation/platforms/raspi) adaptor that supports the needed interfaces for spi devices. This uses the experimental [spi package](https://github.com/golang/exp/tree/master/io/spi) which only works on linux systems.
+This package provides drivers for [spi](https://en.wikipedia.org/wiki/Serial_Peripheral_Interface_Bus) devices. It currently must be used along with the [raspberry pi](https://gobot.io/documentation/platforms/raspi) adaptor that supports the needed interfaces for spi devices. This uses the experimental [spi package](https://github.com/golang/exp/tree/master/io/spi) which only works on linux systems.
 
 ## Getting Started
 
@@ -10,14 +10,16 @@ go get -d -u gobot.io/x/gobot/...
 ```
 
 ## Hardware Support
-Gobot has a extensible system for connecting to hardware devices. The following spi devices are currently supported:
+Gobot has a extensible system for connecting to hardware devices. 
 
-More drivers are coming soon...
+The following spi Devices are currently supported:
 
-## Using A Different Bus or Address
+- GoPiGo3 Robot
 
-You can set a different SPI address or SPI bus than the default when initializing your SPI drivers by using optional parameters. Here is an example:
+Drivers wanted! :)
 
-```go
-blinkm := spi.NewGoPiGo3DriverDriver(e, spi.WithBus(0), spi.WithAddress(0x10), spi.With)
-```
+The following spi Adaptors are currently supported:
+
+- Raspberry Pi
+
+Adaptors wanted too!
