@@ -57,4 +57,5 @@ deps:
 		go.bug.st/serial.v1 \
 		github.com/veandco/go-sdl2/sdl \
 		golang.org/x/net/websocket \
+		golang.org/x/exp/io/spi \
 		golang.org/x/sys/unix
