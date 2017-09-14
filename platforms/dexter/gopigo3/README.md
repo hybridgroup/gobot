@@ -19,13 +19,13 @@ import (
 	"time"
 
 	"gobot.io/x/gobot"
-	g "gobot.io/x/gobot/platforms/gopigo3"
+	g "gobot.io/x/gobot/platforms/dexter/gopigo3"
 	"gobot.io/x/gobot/platforms/raspi"
 )
 
 func main() {
 	raspiAdaptor := raspi.NewAdaptor()
-	gopigo3 := g.NewGoPiGo3Driver(raspiAdaptor)
+	gopigo3 := g.NewDriver(raspiAdaptor)
 
 	work := func() {
 		on := uint8(0xFF)
