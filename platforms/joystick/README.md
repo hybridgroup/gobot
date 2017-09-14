@@ -235,3 +235,25 @@ func main() {
 	robot.Start()
 }
 ```
+
+## How to Add A New Joystick
+
+In the `bin` directory for this package is a CLI utility program that scans for SDL joystick events, and displays the ID and value:
+
+```
+$ go run ./platforms/joystick/bin/scanner.go 
+Joystick 0 connected
+[6625 ms] Axis: 1       value:-22686
+[6641 ms] Axis: 1       value:-32768
+[6836 ms] Axis: 1       value:-18317
+[6852 ms] Axis: 1       value:0
+[8663 ms] Axis: 3       value:-32768
+[8873 ms] Axis: 3       value:0
+[10183 ms] Axis: 0      value:-24703
+[10183 ms] Axis: 0      value:-32768
+[10313 ms] Axis: 1      value:-3193
+[10329 ms] Axis: 1      value:0
+[10345 ms] Axis: 0      value:0
+```
+
+You can use the output from this program to create a JSON file for the various buttons and axes on your joystick/gamepad.
