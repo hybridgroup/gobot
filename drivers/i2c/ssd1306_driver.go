@@ -97,7 +97,7 @@ func (s *DisplayBuffer) Clear() {
 	s.buffer = make([]byte, s.Size())
 }
 
-// Set sets the x, y pixel witn c color
+// Set sets the x, y pixel with c color
 func (s *DisplayBuffer) Set(x, y, c int) {
 	idx := x + (y/ssd1306PageSize)*s.Width
 	bit := uint(y) % ssd1306PageSize

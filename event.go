@@ -1,6 +1,6 @@
 package gobot
 
-// Event represents when something asyncronous happens in a Driver
+// Event represents when something asynchronous happens in a Driver
 // or Adaptor
 type Event struct {
 	Name string
