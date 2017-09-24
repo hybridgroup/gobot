@@ -48,7 +48,7 @@ func (c *CORS) isOriginAllowed(origin string) (allowed bool) {
 	return
 }
 
-// generatePatterns generates regex expresions for AllowOrigins
+// generatePatterns generates regex expression for AllowOrigins
 func (c *CORS) generatePatterns() {
 	if c.AllowOrigins != nil {
 		for _, origin := range c.AllowOrigins {

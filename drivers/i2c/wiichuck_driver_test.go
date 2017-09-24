@@ -135,7 +135,7 @@ func TestWiichuckDriverCButton(t *testing.T) {
 	select {
 	case <-done:
 	case <-time.After(10 * time.Second):
-		t.Errorf("Did not recieve 'C' event")
+		t.Errorf("Did not receive 'C' event")
 	}
 }
 
@@ -158,7 +158,7 @@ func TestWiichuckDriverZButton(t *testing.T) {
 	select {
 	case <-done:
 	case <-time.After(10 * time.Second):
-		t.Errorf("Did not recieve 'Z' event")
+		t.Errorf("Did not receive 'Z' event")
 	}
 }
 
@@ -186,7 +186,7 @@ func TestWiichuckDriverUpdateJoystick(t *testing.T) {
 	select {
 	case <-done:
 	case <-time.After(10 * time.Second):
-		t.Errorf("Did not recieve 'Joystick' event")
+		t.Errorf("Did not receive 'Joystick' event")
 	}
 }
 

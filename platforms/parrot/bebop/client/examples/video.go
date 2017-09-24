@@ -13,7 +13,7 @@
 	then in a separate terminal run this program:
 		$ go run video.go
 
-	You will then be able to view the video feed by navigatin to
+	You will then be able to view the video feed by navigation to
 	http://localhost:8090/bebop.mjpeg in a web browser. *NOTE* firefox works
 	best for viewing the video feed.
 */
