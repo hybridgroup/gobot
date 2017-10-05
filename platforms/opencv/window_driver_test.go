@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	cv "github.com/lazywei/go-opencv/opencv"
+	"github.com/hybridgroup/gocv"
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/gobottest"
 )
@@ -44,7 +44,7 @@ func TestWindowDriverHalt(t *testing.T) {
 func TestWindowDriverShowImage(t *testing.T) {
 	d := initTestWindowDriver()
 	_, currentfile, _, _ := runtime.Caller(0)
-	image := cv.LoadImage(path.Join(path.Dir(currentfile), "lena-256x256.jpg"))
+	image := gocv.IMRead(path.Join(path.Dir(currentfile), "lena-256x256.jpg"), gocv.IMReadColor)
 	d.Start()
 	d.ShowImage(image)
 }

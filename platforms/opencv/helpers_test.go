@@ -1,17 +1,15 @@
 package opencv
 
-import cv "github.com/lazywei/go-opencv/opencv"
+import (
+	"github.com/hybridgroup/gocv"
+)
 
 type testCapture struct{}
 
-func (c *testCapture) RetrieveFrame(i int) *cv.IplImage {
-	return &cv.IplImage{}
-}
-
-func (c *testCapture) GrabFrame() bool {
+func (c *testCapture) Read(img gocv.Mat) bool {
 	return true
 }
 
 type testWindow struct{}
 
-func (w *testWindow) ShowImage(i *cv.IplImage) { return }
+func (w *testWindow) ShowImage(img gocv.Mat) { return }

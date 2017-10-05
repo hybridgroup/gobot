@@ -13,26 +13,46 @@ matrix:
 addons:
    apt:
       packages:
-         - libcv-dev
-         - libcvaux-dev
-         - libhighgui-dev
-         - libopencv-dev
+         - libgmp-dev
+         - build-essential
+         - cmake
+         - git
+         - libgtk2.0-dev
+         - pkg-config
+         - libavcodec-dev
+         - libavformat-dev
+         - libswscale-dev
+         - libtbb2
+         - libtbb-dev
+         - libjpeg-dev
+         - libpng-dev
+         - libtiff-dev
+         - libjasper-dev
+         - libdc1394-22-dev
          - libsdl2-dev
          - libsdl2-image-dev
          - libsdl2-2.0.0
          - libusb-dev
          - xvfb
          - unzip
-         - libgtk2.0-0
 before_install:
+   - ./travis_build_opencv.sh
+   - export PKG_CONFIG_PATH=$(pkg-config --variable pc_path pkg-config):$HOME/usr/lib/pkgconfig
+   - export INCLUDE_PATH=$HOME/usr/include:${INCLUDE_PATH}
+   - export LD_LIBRARY_PATH=$HOME/usr/lib:${LD_LIBRARY_PATH}
+   - sudo ln /dev/null /dev/raw1394
    - cd $HOME/gopath/src/gobot.io/x/gobot
    - go get github.com/axw/gocov/gocov
+before_cache:
+   - rm -f $HOME/fresh-cache   
 install:
    - make deps
 before_script:
    - export DISPLAY=:99.0
    - sh -e /etc/init.d/xvfb start
 script:
+   - export CGO_CPPFLAGS="-I${HOME}/usr/include"
+   - export CGO_LDFLAGS="-L${HOME}/usr/lib -lopencv_core -lopencv_videoio -lopencv_imgproc -lopencv_highgui -lopencv_imgcodecs -lopencv_objdetect -lopencv_calib3d"
    - echo "Ensuring code is well formatted"; ! gofmt -s -d . | read
    - bash -c 'set -e; echo "" > coverage.txt; for d in $(go list ./...); do go test -covermode=set -coverprofile=p.out $d; if [ -f p.out ]; then cat p.out >> coverage.txt; rm p.out; fi; done'
 after_success:
@@ -42,3 +62,8 @@ branches:
       - gobot.io
       - /^gobot-.*$/
 secure: "HggklzWOwKqImvjQe1yvojCoTaUBDrOVXRjsrZaoTaKpUtmho1tpCMtKF1dbyT0T5Y68P6f9e/XyANWVeziJNZ+YmNkY+CNdNYHiNnpl8att3MuL4hpwKDPAqLK8H2G+71j3O/rBvf6oIJHtSEesR5Sbb+2fSmhNFtLrDgp5FZA="
+# Caching so the next build will be fast as possible.
+cache:
+   timeout: 1000
+   directories:
+      - $HOME/usr

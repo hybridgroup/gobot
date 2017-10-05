@@ -7,11 +7,11 @@ package main
 import (
 	"path"
 	"runtime"
-	"time"
+	//"time"
 
-	cv "github.com/lazywei/go-opencv/opencv"
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/platforms/opencv"
+	"github.com/hybridgroup/gocv"
 )
 
 func main() {
@@ -22,20 +22,12 @@ func main() {
 	camera := opencv.NewCameraDriver(0)
 
 	work := func() {
-		var image *cv.IplImage
-
 		camera.On(opencv.Frame, func(data interface{}) {
-			image = data.(*cv.IplImage)
-		})
-
-		gobot.Every(500*time.Millisecond, func() {
-			if image != nil {
-				i := image.Clone()
-				faces := opencv.DetectFaces(cascade, i)
-				i = opencv.DrawRectangles(i, faces, 0, 255, 0, 5)
-				window.ShowImage(i)
-			}
-
+			i := data.(gocv.Mat)
+			faces := opencv.DetectFaces(cascade, i)
+			opencv.DrawRectangles(i, faces, 0, 255, 0, 5)
+			window.ShowImage(i)
+			window.WaitKey(1)	
 		})
 	}
 

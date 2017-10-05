@@ -6,14 +6,14 @@ For more info about OpenCV click [here](http://opencv.org/)
 
 ## How to Install
 
-This package requires OpenCV version 2.4 to be installed on your system. Please note that it is not compatible with OpenCV 3.x at this time.
+This package requires OpenCV version 3.3 to be installed on your system.
 
 ### OSX
 
 To install OpenCV on OSX using Homebrew:
 
 ```
-$ brew tap homebrew/science && brew install opencv
+$ brew install opencv
 ```
 
 ### Ubuntu
@@ -44,7 +44,7 @@ Example using the camera.
 package main
 
 import (
-	cv "github.com/lazywei/go-opencv/opencv"
+	"github.com/hybridgroup/gocv"
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/platforms/opencv"
 )
@@ -54,8 +54,10 @@ func main() {
 	camera := opencv.NewCameraDriver(0)
 
 	work := func() {
-		camera.On(camera.Event("frame"), func(data interface{}) {
-			window.ShowImage(data.(*cv.IplImage))
+		camera.On(opencv.Frame, func(data interface{}) {
+			img := data.(gocv.Mat)
+			window.ShowImage(img)
+			window.WaitKey(1)
 		})
 	}
 

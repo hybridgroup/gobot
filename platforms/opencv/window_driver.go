@@ -1,12 +1,12 @@
 package opencv
 
 import (
-	cv "github.com/lazywei/go-opencv/opencv"
+	"github.com/hybridgroup/gocv"
 	"gobot.io/x/gobot"
 )
 
 type window interface {
-	ShowImage(*cv.IplImage)
+	IMShow(gocv.Mat)
 }
 
 // WindowDriver is the Gobot Driver for the OpenCV window
@@ -22,7 +22,7 @@ func NewWindowDriver() *WindowDriver {
 	return &WindowDriver{
 		name: "Window",
 		start: func(w *WindowDriver) {
-			w.window = cv.NewWindow(w.Name(), cv.CV_WINDOW_NORMAL)
+			w.window = gocv.NewWindow(w.Name())
 		},
 	}
 }
@@ -38,7 +38,6 @@ func (w *WindowDriver) Connection() gobot.Connection { return nil }
 
 // Start starts window thread and driver
 func (w *WindowDriver) Start() (err error) {
-	cv.StartWindowThread()
 	w.start(w)
 	return
 }
@@ -47,6 +46,11 @@ func (w *WindowDriver) Start() (err error) {
 func (w *WindowDriver) Halt() (err error) { return }
 
 // ShowImage displays image in window
-func (w *WindowDriver) ShowImage(image *cv.IplImage) {
-	w.window.ShowImage(image)
+func (w *WindowDriver) ShowImage(img gocv.Mat) {
+	w.window.IMShow(img)
+}
+
+// WaitKey gives window a chance to redraw, and checks for keyboard input
+func (w *WindowDriver) WaitKey(pause int) int {
+	return gocv.WaitKey(pause)
 }

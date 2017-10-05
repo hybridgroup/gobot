@@ -5,13 +5,12 @@ import (
 
 	"time"
 
-	cv "github.com/lazywei/go-opencv/opencv"
+	"github.com/hybridgroup/gocv"
 	"gobot.io/x/gobot"
 )
 
 type capture interface {
-	RetrieveFrame(int) *cv.IplImage
-	GrabFrame() bool
+	Read(img gocv.Mat) bool
 }
 
 const (
@@ -40,9 +39,9 @@ func NewCameraDriver(source interface{}, v ...time.Duration) *CameraDriver {
 		start: func(c *CameraDriver) (err error) {
 			switch v := c.Source.(type) {
 			case string:
-				c.camera = cv.NewFileCapture(v)
+				c.camera, _ = gocv.VideoCaptureFile(v)
 			case int:
-				c.camera = cv.NewCameraCapture(v)
+				c.camera, _ = gocv.VideoCaptureDevice(v)
 			default:
 				return errors.New("Unknown camera source")
 			}
@@ -74,13 +73,11 @@ func (c *CameraDriver) Start() (err error) {
 	if err := c.start(c); err != nil {
 		return err
 	}
+	img := gocv.NewMat()
 	go func() {
 		for {
-			if c.camera.GrabFrame() {
-				image := c.camera.RetrieveFrame(1)
-				if image != nil {
-					c.Publish(Frame, image)
-				}
+			if ok := c.camera.Read(img); ok {
+				c.Publish(Frame, img)
 			}
 			time.Sleep(c.interval)
 		}

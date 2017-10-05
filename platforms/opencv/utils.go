@@ -1,26 +1,35 @@
 package opencv
 
 import (
-	cv "github.com/lazywei/go-opencv/opencv"
+	"image"
+	"image/color"
+
+	"github.com/hybridgroup/gocv"
 )
 
+var classifier *gocv.CascadeClassifier
+
 // loadHaarClassifierCascade returns open cv HaarCascade loaded
-func loadHaarClassifierCascade(haar string) *cv.HaarCascade {
-	return cv.LoadHaarClassifierCascade(haar)
+func loadCascadeClassifier(haar string) *gocv.CascadeClassifier {
+	if classifier != nil {
+		return classifier
+	}
+
+	c := gocv.NewCascadeClassifier()
+	c.Load(haar)
+	classifier = &c
+	return classifier
 }
 
 // DetectFaces loads Haar cascade to detect face objects in image
-func DetectFaces(haar string, image *cv.IplImage) []*cv.Rect {
-	return loadHaarClassifierCascade(haar).DetectObjects(image)
+func DetectFaces(haar string, img gocv.Mat) []image.Rectangle {
+	return loadCascadeClassifier(haar).DetectMultiScale(img)
 }
 
 // DrawRectangles uses Rect array values to return image with rectangles drawn.
-func DrawRectangles(image *cv.IplImage, rect []*cv.Rect, r int, g int, b int, thickness int) *cv.IplImage {
-	for _, value := range rect {
-		cv.Rectangle(image,
-			cv.Point{value.X() + value.Width(), value.Y()},
-			cv.Point{value.X(), value.Y() + value.Height()},
-			cv.NewScalar(float64(b), float64(g), float64(r), 0), thickness, 1, 0)
+func DrawRectangles(img gocv.Mat, rects []image.Rectangle, r int, g int, b int, thickness int) {
+	for _, rect := range rects {
+		gocv.Rectangle(img, rect, color.RGBA{uint8(r), uint8(g), uint8(b), 0}, thickness)
 	}
-	return image
+	return
 }
