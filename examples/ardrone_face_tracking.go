@@ -11,7 +11,7 @@ import (
 	"runtime"
 	"time"
 
-	cv "github.com/lazywei/go-opencv/opencv"
+	"github.com/hybridgroup/gocv"
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/platforms/opencv"
 	"gobot.io/x/gobot/platforms/parrot/ardrone"
@@ -30,11 +30,12 @@ func main() {
 	work := func() {
 		detect := false
 		drone.TakeOff()
-		var image *cv.IplImage
+		var img gocv.Mat
 		camera.On(opencv.Frame, func(data interface{}) {
-			image = data.(*cv.IplImage)
+			img = data.(gocv.Mat)
 			if !detect {
-				window.ShowImage(image)
+				window.IMShow(img)
+				window.WaitKey(1)
 			}
 		})
 		drone.On(ardrone.Flying, func(data interface{}) {
@@ -44,10 +45,10 @@ func main() {
 				detect = true
 				gobot.Every(300*time.Millisecond, func() {
 					drone.Hover()
-					i := image
+					i := img
 					faces := opencv.DetectFaces(cascade, i)
 					biggest := 0
-					var face *cv.Rect
+					var face image.Rectangle
 					for _, f := range faces {
 						if f.Width() > biggest {
 							biggest = f.Width()
@@ -55,9 +56,9 @@ func main() {
 						}
 					}
 					if face != nil {
-						opencv.DrawRectangles(i, []*cv.Rect{face}, 0, 255, 0, 5)
-						centerX := float64(image.Width()) * 0.5
-						turn := -(float64(face.X()) - centerX) / centerX
+						opencv.DrawRectangles(i, []img.Rectangle{face}, 0, 255, 0, 5)
+						centerX := float64(img.Size()).X * 0.5
+						turn := -(float64(face.Min.X - centerX) / centerX
 						fmt.Println("turning:", turn)
 						if turn < 0 {
 							drone.Clockwise(math.Abs(turn * 0.4))
@@ -65,7 +66,8 @@ func main() {
 							drone.CounterClockwise(math.Abs(turn * 0.4))
 						}
 					}
-					window.ShowImage(i)
+					window.IMShow(i)
+					window.WaitKey(1)
 				})
 				gobot.After(20*time.Second, func() { drone.Land() })
 			})
