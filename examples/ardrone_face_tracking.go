@@ -58,7 +58,7 @@ func main() {
 					if face != nil {
 						opencv.DrawRectangles(i, []img.Rectangle{face}, 0, 255, 0, 5)
 						centerX := float64(img.Size()).X * 0.5
-						turn := -(float64(face.Min.X - centerX) / centerX
+						turn := -(float64(face.Min.X - centerX)) / centerX
 						fmt.Println("turning:", turn)
 						if turn < 0 {
 							drone.Clockwise(math.Abs(turn * 0.4))
