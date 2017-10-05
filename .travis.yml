@@ -1,5 +1,5 @@
 language: go
-sudo: false
+sudo: required
 dist: trusty
 go_import_path: gobot.io/x/gobot
 go:
