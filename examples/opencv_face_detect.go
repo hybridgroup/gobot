@@ -7,11 +7,15 @@ package main
 import (
 	"path"
 	"runtime"
+	"sync/atomic"
+	"time"
 
 	"github.com/hybridgroup/gocv"
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/platforms/opencv"
 )
+
+var img atomic.Value
 
 func main() {
 	_, currentfile, _, _ := runtime.Caller(0)
@@ -21,8 +25,19 @@ func main() {
 	camera := opencv.NewCameraDriver(1)
 
 	work := func() {
+		mat := gocv.NewMat()
+		img.Store(mat)
+
 		camera.On(opencv.Frame, func(data interface{}) {
 			i := data.(gocv.Mat)
+			img.Store(i)
+		})
+
+		gobot.Every(10*time.Millisecond, func() {
+			i := img.Load().(gocv.Mat)
+			if i.Empty() {
+				return
+			}
 			faces := opencv.DetectFaces(cascade, i)
 			opencv.DrawRectangles(i, faces, 0, 255, 0, 5)
 			window.ShowImage(i)
