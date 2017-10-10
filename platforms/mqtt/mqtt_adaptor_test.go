@@ -36,6 +36,13 @@ func TestMqttAdaptorAutoReconnect(t *testing.T) {
 	gobottest.Assert(t, a.AutoReconnect(), true)
 }
 
+func TestMqttAdaptorCleanSession(t *testing.T) {
+	a := initTestMqttAdaptor()
+	gobottest.Assert(t, a.CleanSession(), true)
+	a.SetCleanSession(false)
+	gobottest.Assert(t, a.CleanSession(), false)
+}
+
 func TestMqttAdaptorUseSSL(t *testing.T) {
 	a := initTestMqttAdaptor()
 	gobottest.Assert(t, a.UseSSL(), false)
