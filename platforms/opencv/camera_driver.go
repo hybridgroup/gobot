@@ -3,8 +3,8 @@ package opencv
 import (
 	"errors"
 
-	"github.com/hybridgroup/gocv"
 	"gobot.io/x/gobot"
+	"gocv.io/x/gocv"
 )
 
 type capture interface {

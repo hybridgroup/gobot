@@ -5,9 +5,9 @@
 package main
 
 import (
-	"github.com/hybridgroup/gocv"
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/platforms/opencv"
+	"gocv.io/x/gocv"
 )
 
 func main() {

@@ -1,7 +1,7 @@
 package opencv
 
 import (
-	"github.com/hybridgroup/gocv"
+	"gocv.io/x/gocv"
 )
 
 type testCapture struct{}

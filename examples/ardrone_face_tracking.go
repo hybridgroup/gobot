@@ -11,10 +11,10 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/hybridgroup/gocv"
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/platforms/opencv"
 	"gobot.io/x/gobot/platforms/parrot/ardrone"
+	"gocv.io/x/gocv"
 )
 
 func main() {

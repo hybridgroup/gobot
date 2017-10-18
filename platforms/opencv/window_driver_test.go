@@ -6,9 +6,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hybridgroup/gocv"
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/gobottest"
+	"gocv.io/x/gocv"
 )
 
 var _ gobot.Driver = (*WindowDriver)(nil)

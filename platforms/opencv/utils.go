@@ -4,7 +4,7 @@ import (
 	"image"
 	"image/color"
 
-	"github.com/hybridgroup/gocv"
+	"gocv.io/x/gocv"
 )
 
 var classifier *gocv.CascadeClassifier

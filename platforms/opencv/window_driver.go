@@ -1,8 +1,8 @@
 package opencv
 
 import (
-	"github.com/hybridgroup/gocv"
 	"gobot.io/x/gobot"
+	"gocv.io/x/gocv"
 )
 
 type window interface {

@@ -50,7 +50,7 @@ deps:
 		github.com/eclipse/paho.mqtt.golang \
 		github.com/hashicorp/go-multierror \
 		github.com/hybridgroup/go-ardrone/client \
-		github.com/hybridgroup/gocv \
+		gocv.io/x/gocv \
 		github.com/mgutz/logxi/v1 \
 		github.com/nats-io/nats \
 		github.com/sigurn/crc8 \

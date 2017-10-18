@@ -5,8 +5,8 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/hybridgroup/gocv"
 	"gobot.io/x/gobot/gobottest"
+	"gocv.io/x/gocv"
 )
 
 func TestUtils(t *testing.T) {

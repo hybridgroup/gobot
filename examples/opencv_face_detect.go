@@ -10,9 +10,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/hybridgroup/gocv"
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/platforms/opencv"
+	"gocv.io/x/gocv"
 )
 
 var img atomic.Value
