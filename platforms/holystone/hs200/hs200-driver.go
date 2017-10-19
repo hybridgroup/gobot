@@ -4,29 +4,25 @@ import (
 	"net"
 	"sync"
 	"time"
+
+	"gobot.io/x/gobot"
 )
 
 // Driver reperesents the control information for the hs200 drone
 type Driver struct {
-	mutex   sync.RWMutex  // Protect the command from concurrent access
-	stopc   chan struct{} // Stop the flight loop goroutine
-	cmd     []byte        // the UDP command packet we keep sending the drone
-	enabled bool          // Are we in an enabled state
-	udpconn net.Conn      // UDP connection to the drone
-	tcpconn net.Conn      // TCP connection to the drone
+	name       string
+	mutex      *sync.RWMutex // Protect the command from concurrent access
+	stopc      chan struct{} // Stop the flight loop goroutine
+	cmd        []byte        // the UDP command packet we keep sending the drone
+	enabled    bool          // Are we in an enabled state
+	tcpaddress string
+	udpaddress string
+	udpconn    net.Conn // UDP connection to the drone
+	tcpconn    net.Conn // TCP connection to the drone
 }
 
 // NewDriver creates a driver for the HolyStone hs200
-func NewDriver(tcpaddress string, udpaddress string) (*Driver, error) {
-	tc, terr := net.Dial("tcp", tcpaddress)
-	if terr != nil {
-		return nil, terr
-	}
-	uc, uerr := net.Dial("udp4", udpaddress)
-	if uerr != nil {
-		return nil, uerr
-	}
-
+func NewDriver(tcpaddress string, udpaddress string) *Driver {
 	command := []byte{
 		0xff, // 2 byte header
 		0x04,
@@ -49,7 +45,40 @@ func NewDriver(tcpaddress string, udpaddress string) (*Driver, error) {
 	}
 	command[10] = checksum(command)
 
-	return &Driver{stopc: make(chan struct{}), cmd: command, udpconn: uc, tcpconn: tc}, nil
+	return &Driver{name: gobot.DefaultName("HS200"), stopc: make(chan struct{}),
+		tcpaddress: tcpaddress, udpaddress: udpaddress, cmd: command, mutex: &sync.RWMutex{}}
+}
+
+// Name returns the name of the device.
+func (d *Driver) Name() string { return d.name }
+
+// SetName sets the name of the device.
+func (d *Driver) SetName(n string) { d.name = n }
+
+// Connection returns the Connection of the device.
+func (d *Driver) Connection() gobot.Connection { return nil }
+
+// Start starts the driver.
+func (d *Driver) Start() (err error) {
+	tc, terr := net.Dial("tcp", d.tcpaddress)
+	if terr != nil {
+		return terr
+	}
+	uc, uerr := net.Dial("udp4", d.udpaddress)
+	if uerr != nil {
+		return uerr
+	}
+
+	d.udpconn = uc
+	d.tcpconn = tc
+
+	return
+}
+
+// Halt stops the driver.
+func (d *Driver) Halt() (err error) {
+	d.stop()
+	return
 }
 
 func (d *Driver) stop() {
@@ -83,12 +112,14 @@ func checksum(c []byte) byte {
 	}
 	return 255 - sum
 }
+
 func (d *Driver) sendUDP() {
 	d.mutex.RLock()
 	defer d.mutex.RUnlock()
 	d.udpconn.Write(d.cmd)
 }
 
+// Enable enables the drone to start flying.
 func (d Driver) Enable() {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
@@ -98,6 +129,7 @@ func (d Driver) Enable() {
 	}
 }
 
+// Disable disables the drone from flying.
 func (d Driver) Disable() {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
@@ -106,6 +138,7 @@ func (d Driver) Disable() {
 	}
 }
 
+// TakeOff tells drones to liftoff and start flying.
 func (d Driver) TakeOff() {
 	d.mutex.Lock()
 	d.cmd[9] = 0x40
@@ -118,6 +151,7 @@ func (d Driver) TakeOff() {
 	d.mutex.Unlock()
 }
 
+// Land tells drone to come in for landing.
 func (d Driver) Land() {
 	d.mutex.Lock()
 	d.cmd[9] = 0x80

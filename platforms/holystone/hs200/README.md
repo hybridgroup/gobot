@@ -1,9 +1,18 @@
+# Holystone HS200
+
+## How to Install
+
+```
+go get -d -u gobot.io/x/gobot/...
+```
+
 ## How to Use
 - Connect to the drone's Wi-Fi network and identify the drone/gateway IP address.
 - Use that IP address when you create a new driver.
 - Some drones appear to use a different TCP port (8080 vs. 8888?).  If the example doesn't work scan the drone for open ports or modify the driver not to use TCP.
 
 Here is a sample of how you initialize and use the driver:
+
 ```go
 package main
 
