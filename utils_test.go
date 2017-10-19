@@ -74,8 +74,8 @@ func TestToScale(t *testing.T) {
 }
 
 func TestRand(t *testing.T) {
-	a := Rand(1000)
-	b := Rand(1000)
+	a := Rand(10000)
+	b := Rand(10000)
 	if a == b {
 		t.Errorf("%v should not equal %v", a, b)
 	}
