@@ -1,5 +1,10 @@
 # Holystone HS200
 
+This package contains the Gobot driver for the Holystone HS200 drone.
+
+For more information on this drone, go to:
+http://www.holystone.com/product/Holy_Stone_HS200W_FPV_Drone_with_720P_HD_Live_Video_Wifi_Camera_2_4GHz_4CH_6_Axis_Gyro_RC_Quadcopter_with_Altitude_Hold,_Gravity_Sensor_and_Headless_Mode_Function_RTF,_Color_Red-39.html
+
 ## How to Install
 
 ```
@@ -17,40 +22,30 @@ Here is a sample of how you initialize and use the driver:
 package main
 
 import (
-	"log"
 	"time"
 
-	"fmt"
-
+	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/platforms/holystone/hs200"
 )
 
 func main() {
-	drone, err := hs200.NewDriver("172.16.10.1:8888", "172.16.10.1:8080")
-	if err != nil {
-		log.Fatal(err)
+	drone := hs200.NewDriver("172.16.10.1:8888", "172.16.10.1:8080")
+
+	work := func() {
+		drone.TakeOff()
+
+		gobot.After(5*time.Second, func() {
+			drone.Land()
+		})
 	}
-	fmt.Println("Enable!")
-	drone.Enable()
-	time.Sleep(5 * time.Second)
-	fmt.Println("Take off!")
-	drone.TakeOff()
-	time.Sleep(5 * time.Second)
-	fmt.Println("Full steam ahead!")
-	drone.Forward(1.0)
-	time.Sleep(3 * time.Second)
-	fmt.Println("Full steam back!")
-	drone.Forward(-1.0)
-	time.Sleep(3 * time.Second)
-	fmt.Println("Hover!")
-	drone.Forward(0)
-	time.Sleep(3 * time.Second)
-	fmt.Println("Land!")
-	drone.Land()
-	time.Sleep(5 * time.Second)
-	fmt.Println("Disable!")
-	drone.Disable()
-	time.Sleep(5 * time.Second)
+
+	robot := gobot.NewRobot("hs200",
+		[]gobot.Connection{},
+		[]gobot.Device{drone},
+		work,
+	)
+
+	robot.Start()
 }
 ```
 

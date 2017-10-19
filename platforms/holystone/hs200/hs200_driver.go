@@ -8,7 +8,7 @@ import (
 	"gobot.io/x/gobot"
 )
 
-// Driver reperesents the control information for the hs200 drone
+// Driver represents the control information for the hs200 drone
 type Driver struct {
 	name       string
 	mutex      *sync.RWMutex // Protect the command from concurrent access
