@@ -117,7 +117,9 @@ type SSD1306Driver struct {
 	Config
 	gobot.Commander
 
-	Buffer *DisplayBuffer
+	DisplayWidth  int
+	DisplayHeight int
+	Buffer        *DisplayBuffer
 }
 
 // NewSSD1306Driver creates a new SSD1306Driver.
@@ -126,21 +128,26 @@ type SSD1306Driver struct {
 //        conn Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//        WithBus(int):    bus to use with this driver
-//        WithAddress(int):    address to use with this driver
+//        WithBus(int):    			bus to use with this driver
+//        WithAddress(int):    		address to use with this driver
+//        WithDisplayWidth(int): 	width of display (defaults to 128)
+//        WithDisplayHeight(int): 	height of display (defaults to 64)
 //
 func NewSSD1306Driver(a Connector, options ...func(Config)) *SSD1306Driver {
 	s := &SSD1306Driver{
-		name:      gobot.DefaultName("SSD1306"),
-		Commander: gobot.NewCommander(),
-		connector: a,
-		Config:    NewConfig(),
-		Buffer:    NewDisplayBuffer(ssd1306Width, ssd1306Height),
+		name:          gobot.DefaultName("SSD1306"),
+		Commander:     gobot.NewCommander(),
+		connector:     a,
+		Config:        NewConfig(),
+		DisplayHeight: ssd1306Height,
+		DisplayWidth:  ssd1306Width,
 	}
 
 	for _, option := range options {
 		option(s)
 	}
+
+	s.Buffer = NewDisplayBuffer(s.DisplayWidth, s.DisplayHeight)
 
 	s.AddCommand("Display", func(params map[string]interface{}) interface{} {
 		err := s.Display()
@@ -207,6 +214,32 @@ func (s *SSD1306Driver) Start() (err error) {
 
 // Halt returns true if device is halted successfully
 func (s *SSD1306Driver) Halt() (err error) { return nil }
+
+// WithDisplayWidth option sets the SSD1306Driver DisplayWidth option.
+func WithDisplayWidth(val int) func(Config) {
+	return func(c Config) {
+		d, ok := c.(*SSD1306Driver)
+		if ok {
+			d.DisplayWidth = val
+		} else {
+			// TODO: return error for trying to set DisplayWidth for non-SSD1306Driver
+			return
+		}
+	}
+}
+
+// WithDisplayHeight option sets the SSD1306Driver DisplayHeight option.
+func WithDisplayHeight(val int) func(Config) {
+	return func(c Config) {
+		d, ok := c.(*SSD1306Driver)
+		if ok {
+			d.DisplayHeight = val
+		} else {
+			// TODO: return error for trying to set DisplayHeight for non-SSD1306Driver
+			return
+		}
+	}
+}
 
 // Init turns display on
 func (s *SSD1306Driver) Init() (err error) {

@@ -100,8 +100,10 @@ func TestSSD1306DriverName(t *testing.T) {
 }
 
 func TestSSD1306DriverOptions(t *testing.T) {
-	s := NewSSD1306Driver(newI2cTestAdaptor(), WithBus(2))
+	s := NewSSD1306Driver(newI2cTestAdaptor(), WithBus(2), WithDisplayHeight(32), WithDisplayWidth(128))
 	gobottest.Assert(t, s.GetBusOrDefault(1), 2)
+	gobottest.Assert(t, s.DisplayHeight, 32)
+	gobottest.Assert(t, s.DisplayWidth, 128)
 }
 
 func TestSSD1306DriverDisplay(t *testing.T) {
