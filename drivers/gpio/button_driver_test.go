@@ -106,6 +106,47 @@ func TestButtonDriverStart(t *testing.T) {
 	}
 }
 
+func TestButtonDriverDefaultState(t *testing.T) {
+	sem := make(chan bool, 0)
+	a := newGpioTestAdaptor()
+	d := NewButtonDriver(a, "1")
+	d.DefaultState = 1
+
+	d.Once(ButtonPush, func(data interface{}) {
+		gobottest.Assert(t, d.Active, true)
+		sem <- true
+	})
+
+	a.TestAdaptorDigitalRead(func() (val int, err error) {
+		val = 0
+		return
+	})
+
+	gobottest.Assert(t, d.Start(), nil)
+
+	select {
+	case <-sem:
+	case <-time.After(buttonTestDelay * time.Millisecond):
+		t.Errorf("Button Event \"Push\" was not published")
+	}
+
+	d.Once(ButtonRelease, func(data interface{}) {
+		gobottest.Assert(t, d.Active, false)
+		sem <- true
+	})
+
+	a.TestAdaptorDigitalRead(func() (val int, err error) {
+		val = 1
+		return
+	})
+
+	select {
+	case <-sem:
+	case <-time.After(buttonTestDelay * time.Millisecond):
+		t.Errorf("Button Event \"Release\" was not published")
+	}
+}
+
 func TestButtonDriverDefaultName(t *testing.T) {
 	g := initTestButtonDriver()
 	gobottest.Assert(t, strings.HasPrefix(g.Name(), "Button"), true)

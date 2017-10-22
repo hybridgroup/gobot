@@ -8,12 +8,13 @@ import (
 
 // ButtonDriver Represents a digital Button
 type ButtonDriver struct {
-	Active     bool
-	pin        string
-	name       string
-	halt       chan bool
-	interval   time.Duration
-	connection DigitalReader
+	Active       bool
+	DefaultState int
+	pin          string
+	name         string
+	halt         chan bool
+	interval     time.Duration
+	connection   DigitalReader
 	gobot.Eventer
 }
 
@@ -24,13 +25,14 @@ type ButtonDriver struct {
 //  time.Duration: Interval at which the ButtonDriver is polled for new information
 func NewButtonDriver(a DigitalReader, pin string, v ...time.Duration) *ButtonDriver {
 	b := &ButtonDriver{
-		name:       gobot.DefaultName("Button"),
-		connection: a,
-		pin:        pin,
-		Active:     false,
-		Eventer:    gobot.NewEventer(),
-		interval:   10 * time.Millisecond,
-		halt:       make(chan bool),
+		name:         gobot.DefaultName("Button"),
+		connection:   a,
+		pin:          pin,
+		Active:       false,
+		DefaultState: 0,
+		Eventer:      gobot.NewEventer(),
+		interval:     10 * time.Millisecond,
+		halt:         make(chan bool),
 	}
 
 	if len(v) > 0 {
@@ -51,7 +53,7 @@ func NewButtonDriver(a DigitalReader, pin string, v ...time.Duration) *ButtonDri
 //	Release int - On button release
 //	Error error - On button error
 func (b *ButtonDriver) Start() (err error) {
-	state := 0
+	state := b.DefaultState
 	go func() {
 		for {
 			newValue, err := b.connection.DigitalRead(b.Pin())
@@ -90,7 +92,7 @@ func (b *ButtonDriver) Pin() string { return b.pin }
 func (b *ButtonDriver) Connection() gobot.Connection { return b.connection.(gobot.Connection) }
 
 func (b *ButtonDriver) update(newValue int) {
-	if newValue == 1 {
+	if newValue != b.DefaultState {
 		b.Active = true
 		b.Publish(ButtonPush, newValue)
 	} else {
