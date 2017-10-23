@@ -21,8 +21,8 @@ func loadCascadeClassifier(haar string) *gocv.CascadeClassifier {
 	return classifier
 }
 
-// DetectFaces loads Haar cascade to detect face objects in image
-func DetectFaces(haar string, img gocv.Mat) []image.Rectangle {
+// DetectObjects loads Haar cascade to detect face objects in image
+func DetectObjects(haar string, img gocv.Mat) []image.Rectangle {
 	return loadCascadeClassifier(haar).DetectMultiScale(img)
 }
 

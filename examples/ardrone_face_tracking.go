@@ -46,7 +46,7 @@ func main() {
 				gobot.Every(300*time.Millisecond, func() {
 					drone.Hover()
 					i := img
-					faces := opencv.DetectFaces(cascade, i)
+					faces := opencv.DetectObjects(cascade, i)
 					biggest := 0
 					var face image.Rectangle
 					for _, f := range faces {

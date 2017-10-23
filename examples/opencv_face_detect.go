@@ -38,7 +38,7 @@ func main() {
 			if i.Empty() {
 				return
 			}
-			faces := opencv.DetectFaces(cascade, i)
+			faces := opencv.DetectObjects(cascade, i)
 			opencv.DrawRectangles(i, faces, 0, 255, 0, 5)
 			window.ShowImage(i)
 			window.WaitKey(1)
