@@ -15,16 +15,16 @@ import (
 
 func main() {
 	raspiAdaptor := raspi.NewAdaptor()
-	gpg3 := g.NewDriver(raspiAdaptor)
+	gpg3 := gopigo3.NewDriver(raspiAdaptor)
 
 	work := func() {
 		on := uint8(0xFF)
 		gobot.Every(1000*time.Millisecond, func() {
-			err := gpg3.SetLED(g.LED_EYE_RIGHT, 0x00, 0x00, on)
+			err := gpg3.SetLED(gopigo3.LED_EYE_RIGHT, 0x00, 0x00, on)
 			if err != nil {
 				fmt.Println(err)
 			}
-			err = gpg3.SetLED(g.LED_EYE_LEFT, ^on, 0x00, 0x00)
+			err = gpg3.SetLED(gopigo3.LED_EYE_LEFT, ^on, 0x00, 0x00)
 			if err != nil {
 				fmt.Println(err)
 			}
