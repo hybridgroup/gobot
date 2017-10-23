@@ -1,3 +1,36 @@
+1.7.0
+---
+* **curie**
+  * Add Linux specific step to Intel Curie docs
+* **mqtt**
+  * Added SetCleanSession
+* **build**
+  * add go1.9 to versions tested in Travis CI
+  * add missing OpenCV lib dependency
+  * Update build to use latest Golang versions
+  * Travis build will now require sudo to install due to OpenCV
+* **docs**
+  * some helpful edits for the initial spi implementation
+* **gopigo3**
+  * integration of recent GoPiGo3 contributions
+  * Added grove support, and more gopigo3 examples
+* **gpio**
+  * Add ButtonDriver.DefaultState to allow for 'reverse' buttons (ones that go from HIGH to LOW)
+* **holystone**
+  * Add initial support for HS-200
+* **i2c**
+  * SSD1306.WithDisplayHeight() and SSD1306.WithDisplayWidth() for SSD1306 that use different display ratios
+* **joystick**
+  * add CLI utilty to scan display events to make it easier to add new joyticks
+  * update README to address #441
+* **opencv**
+  * Switchover to use GoCV and OpenCV 3.3
+  * Switch to use custom domain for GoCV package
+  * all examples using new GoCV based code
+  * correct formatting in face detect example
+  * OpenCV face detector that is much more concurrent
+  * update interface and examples to indicate multipurpose
+
 1.6.0
 ---
 * **core**
