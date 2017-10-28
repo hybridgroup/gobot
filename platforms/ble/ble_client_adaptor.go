@@ -8,7 +8,7 @@ import (
 
 	"gobot.io/x/gobot"
 
-	blelib "github.com/currantlabs/ble"
+	blelib "github.com/hybridgroup/ble"
 	"github.com/pkg/errors"
 )
 
@@ -88,8 +88,8 @@ func (b *ClientAdaptor) Connect() (err error) {
 		return errors.Wrap(err, "can't connect to peripheral "+b.Address())
 	}
 
-	b.addr = cln.Address()
-	b.address = cln.Address().String()
+	b.addr = cln.Addr()
+	b.address = cln.Addr().String()
 	b.SetName(cln.Name())
 	b.client = cln
 
@@ -200,6 +200,6 @@ func getBLEDevice(impl string) (d *blelib.Device, err error) {
 func filter(name string) blelib.AdvFilter {
 	return func(a blelib.Advertisement) bool {
 		return strings.ToLower(a.LocalName()) == strings.ToLower(name) ||
-			a.Address().String() == strings.ToLower(name)
+			a.Addr().String() == strings.ToLower(name)
 	}
 }

@@ -53,11 +53,13 @@ You need to know the BLE ID of the Ollie you want to connect to. The Gobot BLE c
 
 ### OSX
 
+To run any of the Gobot BLE code you must use the `GODEBUG=cgocheck=0` flag in order to get around some of the issues in the CGo-based implementation.
+
 If you connect by name, then you do not need to worry about the Bluetooth LE ID. However, if you want to connect by ID, OS X uses its own Bluetooth ID system which is different from the IDs used on Linux. The code calls thru the XPC interfaces provided by OSX, so as a result does not need to run under sudo.
 
 For example:
 
-    go run examples/ollie.go 2B-1247
+    GODEBUG=cgocheck=0 go run examples/ollie.go 2B-1247
 
 ### Ubuntu
 
