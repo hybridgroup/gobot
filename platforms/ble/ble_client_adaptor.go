@@ -8,7 +8,7 @@ import (
 
 	"gobot.io/x/gobot"
 
-	blelib "github.com/hybridgroup/ble"
+	blelib "github.com/go-ble/ble"
 	"github.com/pkg/errors"
 )
 
@@ -67,7 +67,7 @@ func (b *ClientAdaptor) SetName(n string) { b.name = n }
 // Address returns the Bluetooth LE address for the adaptor
 func (b *ClientAdaptor) Address() string { return b.address }
 
-// Address sets if the adaptor should expect responses after
+// WithoutReponses sets if the adaptor should expect responses after
 // writing characteristics for this device
 func (b *ClientAdaptor) WithoutReponses(use bool) { b.withoutReponses = use }
 

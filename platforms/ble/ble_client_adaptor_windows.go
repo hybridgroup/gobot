@@ -3,7 +3,7 @@ package ble
 import (
 	"errors"
 
-	blelib "github.com/hybridgroup/ble"
+	blelib "github.com/go-ble/ble"
 )
 
 func defaultDevice(impl string) (d blelib.Device, err error) {

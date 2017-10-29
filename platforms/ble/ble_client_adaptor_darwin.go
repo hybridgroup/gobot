@@ -1,8 +1,8 @@
 package ble
 
 import (
-	blelib "github.com/hybridgroup/ble"
-	"github.com/hybridgroup/ble/darwin"
+	blelib "github.com/go-ble/ble"
+	"github.com/go-ble/ble/darwin"
 )
 
 func defaultDevice(impl string) (d blelib.Device, err error) {

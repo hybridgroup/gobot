@@ -45,7 +45,7 @@ deps:
 	go get -d -v \
 		github.com/bmizerany/pat \
 		github.com/codegangsta/cli \
-		github.com/hybridgroup/ble \
+		github.com/go-ble/ble \
 		github.com/donovanhide/eventsource \
 		github.com/eclipse/paho.mqtt.golang \
 		github.com/hashicorp/go-multierror \
