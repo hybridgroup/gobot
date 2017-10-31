@@ -340,19 +340,15 @@ func (b *Client) I2cConfig(delay int) error {
 	return b.WriteSysex([]byte{I2CConfig, byte(delay & 0xFF), byte((delay >> 8) & 0xFF)})
 }
 
-func (b *Client) togglePinReporting(pin int, state int, mode byte) error {
+func (b *Client) togglePinReporting(pin int, state int, mode byte) (err error) {
 	if state != 0 {
 		state = 1
 	} else {
 		state = 0
 	}
 
-	if err := b.write([]byte{byte(mode) | byte(pin), byte(state)}); err != nil {
-		return err
-	}
-
-	return nil
-
+	err = b.write([]byte{byte(mode) | byte(pin), byte(state)})
+	return
 }
 
 // WriteSysex writes an arbitrary Sysex command to the microcontroller.
@@ -428,7 +424,7 @@ func (b *Client) process() (err error) {
 			supportedModes := 0
 			n := 0
 
-			for _, val := range currentBuffer[2:(len(currentBuffer) - 5)] {
+			for _, val := range currentBuffer[2 : len(currentBuffer)-1] {
 				if val == 127 {
 					modes := []int{}
 					for _, mode := range []int{Input, Output, Analog, Pwm, Servo} {
@@ -455,8 +451,7 @@ func (b *Client) process() (err error) {
 			pinIndex := 0
 			b.analogPins = []int{}
 
-			for _, val := range currentBuffer[2 : len(b.pins)-1] {
-
+			for _, val := range currentBuffer[2 : len(currentBuffer)-1] {
 				b.pins[pinIndex].AnalogChannel = int(val)
 
 				if val != 127 {

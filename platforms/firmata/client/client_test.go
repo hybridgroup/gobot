@@ -97,8 +97,9 @@ func initTestFirmata() *Client {
 func TestPins(t *testing.T) {
 	b := initTestFirmata()
 	b.setConnected(true)
-	//test if functions executes
-	gobottest.Assert(t, len(b.Pins()), 19)
+
+	gobottest.Assert(t, len(b.Pins()), 20)
+	gobottest.Assert(t, len(b.analogPins), 6)
 }
 
 func TestReportVersion(t *testing.T) {
