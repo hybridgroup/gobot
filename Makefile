@@ -12,18 +12,11 @@ race:
 
 # Check for code well-formedness
 fmt_check:
-	gofmt -s -d . | read
+	! gofmt -s -d . | read
 
 # Test and generate coverage
 test_with_coverage:
-	echo "" > profile.cov
-	for package in $(excluding_vendor) ; do \
-		go test -covermode=count -coverprofile=tmp.cov $$package ; \
-		if [ -f tmp.cov ]; then \
-			cat tmp.cov >> profile.cov ; \
-			rm tmp.cov ; \
-		fi ; \
-	done
+	./ci/test.sh
 
 deps:
 ifeq (,$(shell which dep))
