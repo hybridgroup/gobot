@@ -1,3 +1,15 @@
+1.7.1
+---
+* **sprkplus**
+  * add new platform for Sphero SPRK+
+* **firmata** 
+  * correct problem where last analog pin(s) were being ignored from capabilities query
+* **ble** 
+  * use go-ble/ble fork for BLE interactions
+* **build** 
+  * update to use latest OpenCV version
+  * update to use latest Golang versions
+
 1.7.0
 ---
 * **curie**
