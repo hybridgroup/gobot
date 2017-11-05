@@ -1,12 +1,10 @@
 #!/bin/bash
-set -euo pipefail
 
-# Print commands as executed
-#set -x
-
+## Only uncomment the below for debugging
+#set -euxo pipefail
 
 # Hold the package names that contain failures
-fail_packages=()
+FAIL_PACKAGES=()
 
 pushd $PWD/..
 	# Set up coverage report file
@@ -19,13 +17,13 @@ pushd $PWD/..
 	# Iterate over all non-vendor packages and run tests with coverage
 	for package in $EXCLUDING_VENDOR; do \
 		result=$(go test -covermode=count -coverprofile=tmp.cov $package)
-		echo $result
-
 		# If a `go test` command has failures, it will exit 1
-		# a go vet check should exit 2
+		# a go vet check should exit 2 (https://github.com/golang/go/blob/master/src/cmd/vet/all/main.go#L58)
+		# `go test` contains `vet` was introduced in this Change https://go-review.googlesource.com/c/go/+/74356
 		if [ $? -eq 1 ]; then
-			fail_packages+=($package);
+			FAIL_PACKAGES+=($package);
 		fi;
+			echo "$result"
 		if [ -f tmp.cov ]; then
 			cat tmp.cov >> profile.cov;
 			rm tmp.cov;
@@ -33,7 +31,7 @@ pushd $PWD/..
 	done
 
 	# exit 1 if there have been any test failures
-	if [ ${#fails[@]} -ne 0 ]; then
+	if [ ${#FAIL_PACKAGES[@]} -ne 0 ]; then
 		exit 1
 	fi;
 popd
