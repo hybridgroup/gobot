@@ -22,7 +22,8 @@ pushd $PWD/..
 		echo $result
 
 		# If a `go test` command has failures, it will exit 1
-		if [ $? -ne 0 ]; then
+		# a go vet check should exit 2
+		if [ $? -eq 1 ]; then
 			fail_packages+=($package);
 		fi;
 		if [ -f tmp.cov ]; then
