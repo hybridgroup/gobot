@@ -126,15 +126,32 @@ func (h *JHD1313M1Driver) Start() (err error) {
 		return err
 	}
 
-	time.Sleep(50000 * time.Microsecond)
-	payload := []byte{LCD_CMD, LCD_FUNCTIONSET | LCD_2LINE}
-	if _, err := h.lcdConnection.Write(payload); err != nil {
-		if _, err := h.lcdConnection.Write(payload); err != nil {
-			return err
-		}
+	// SEE PAGE 45/46 FOR INITIALIZATION SPECIFICATION!
+	// according to datasheet, we need at least 40ms after power rises above 2.7V
+	// before sending commands. Arduino can turn on way befer 4.5V so we'll wait 50
+	time.Sleep(50 * time.Millisecond)
+
+	// this is according to the hitachi HD44780 datasheet
+	// page 45 figure 23
+	// Send function set command sequence
+	init_payload := []byte{LCD_CMD, LCD_FUNCTIONSET | LCD_2LINE}
+	if _, err := h.lcdConnection.Write(init_payload); err != nil {
+		return err
 	}
 
-	time.Sleep(100 * time.Microsecond)
+	// wait more than 4.1ms
+	time.Sleep(4500 * time.Microsecond)
+	// second try
+	if _, err := h.lcdConnection.Write(init_payload); err != nil {
+		return err
+	}
+
+	time.Sleep(150 * time.Microsecond)
+	// third go
+	if _, err := h.lcdConnection.Write(init_payload); err != nil {
+		return err
+	}
+
 	if _, err := h.lcdConnection.Write([]byte{LCD_CMD, LCD_DISPLAYCONTROL | LCD_DISPLAYON}); err != nil {
 		return err
 	}
