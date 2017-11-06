@@ -4,7 +4,7 @@ dist: trusty
 go_import_path: gobot.io/x/gobot
 go:
    - 1.8.4
-   - 1.9.1
+   - 1.9.2
    - tip
 matrix:
    allow_failures:

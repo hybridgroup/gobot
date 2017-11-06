@@ -16,8 +16,7 @@ fmt_check:
 
 # Test and generate coverage
 test_with_coverage:
-	./ci/test.sh
-	exit $$?
+	./ci/test.sh || exit 1
 
 deps:
 ifeq (,$(shell which dep))

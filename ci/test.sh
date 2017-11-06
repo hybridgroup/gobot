@@ -3,6 +3,11 @@
 ## Only uncomment the below for debugging
 #set -euxo pipefail
 
+LOCAL_GO_VERSION=$(go version | awk -F' ' '{print $3}' | tr -d '[:space:]')
+GO_VERSION="${TRAVIS_GO_VERSION:=$LOCAL_GO_VERSION}"
+TIP_VERSION_IDENTIFIER="tip"
+echo $GO_VERSION
+
 # Hold the package names that contain failures
 FAIL_PACKAGES=()
 
@@ -16,11 +21,13 @@ pushd $PWD/..
 
 	# Iterate over all non-vendor packages and run tests with coverage
 	for package in $EXCLUDING_VENDOR; do \
-		result=$(go test -covermode=count -coverprofile=tmp.cov $package)
-		# If a `go test` command has failures, it will exit 1
-		# a go vet check should exit 2 (https://github.com/golang/go/blob/master/src/cmd/vet/all/main.go#L58)
-		# `go test` contains `vet` was introduced in this Change https://go-review.googlesource.com/c/go/+/74356
-		if [ $? -eq 1 ]; then
+    if [ $GO_VERSION == $TIP_VERSION_IDENTIFIER ]; then
+		# `go test` runs a vet subset as of this Change https://go-review.googlesource.com/c/go/+/74356
+		  result=$(go test -vet=off -covermode=count -coverprofile=tmp.cov $package)
+    else
+		  result=$(go test -covermode=count -coverprofile=tmp.cov $package)
+    fi
+		if [ $? -ne 0 ]; then
 			FAIL_PACKAGES+=($package);
 		fi;
 			echo "$result"
