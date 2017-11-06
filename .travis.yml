@@ -3,7 +3,7 @@ sudo: required
 dist: trusty
 go_import_path: gobot.io/x/gobot
 go:
-   - 1.8.4
+   - 1.8.5
    - 1.9.2
    - tip
 matrix:
