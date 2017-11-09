@@ -1,7 +1,6 @@
 .PHONY: test race cover robeaux examples deps test_with_coverage fmt_check
 
 excluding_vendor := $(shell go list ./... | grep -v /vendor/)
-gofiles_excluding_vendor = $(shell find . -type f -name '*.go' -not -path "./vendor/*")
 
 # Run tests on all non-vendor directories
 test:
@@ -13,11 +12,11 @@ race:
 
 # Check for code well-formedness
 fmt_check:
-	gofmt -d $(gofiles_excluding_vendor)
+	./ci/format.sh
 
 # Test and generate coverage
 test_with_coverage:
-	./ci/test.sh || exit 1
+	./ci/test.sh
 
 deps:
 ifeq (,$(shell which dep))
