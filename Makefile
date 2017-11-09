@@ -12,7 +12,7 @@ race:
 
 # Check for code well-formedness
 fmt_check:
-	! gofmt -s -d . | read
+	gofmt -d .
 
 # Test and generate coverage
 test_with_coverage:
