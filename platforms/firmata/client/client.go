@@ -368,20 +368,28 @@ func (b *Client) read(n int) (buf []byte, err error) {
 }
 
 func (b *Client) process() (err error) {
-	buf, err := b.read(3)
+	msgBuf, err := b.read(1)
 	if err != nil {
 		return err
 	}
-	messageType := buf[0]
+	messageType := msgBuf[0]
 	switch {
 	case ProtocolVersion == messageType:
-		b.ProtocolVersion = fmt.Sprintf("%v.%v", buf[1], buf[2])
+		buf, err := b.read(2)
+		if err != nil {
+			return err
+		}
+		b.ProtocolVersion = fmt.Sprintf("%v.%v", buf[0], buf[1])
 
 		b.Publish(b.Event("ProtocolVersion"), b.ProtocolVersion)
 	case AnalogMessageRangeStart <= messageType &&
 		AnalogMessageRangeEnd >= messageType:
 
-		value := uint(buf[1]) | uint(buf[2])<<7
+		buf, err := b.read(2)
+		if err != nil {
+			return err
+		}
+		value := uint(buf[0]) | uint(buf[1])<<7
 		pin := int((messageType & 0x0F))
 
 		if len(b.analogPins) > pin {
@@ -393,8 +401,12 @@ func (b *Client) process() (err error) {
 	case DigitalMessageRangeStart <= messageType &&
 		DigitalMessageRangeEnd >= messageType:
 
+		buf, err := b.read(2)
+		if err != nil {
+			return err
+		}
 		port := messageType & 0x0F
-		portValue := buf[1] | (buf[2] << 7)
+		portValue := buf[0] | (buf[1] << 7)
 
 		for i := 0; i < 8; i++ {
 			pinNumber := int((8*byte(port) + byte(i)))
@@ -406,7 +418,12 @@ func (b *Client) process() (err error) {
 			}
 		}
 	case StartSysex == messageType:
-		currentBuffer := buf
+		buf, err := b.read(2)
+		if err != nil {
+			return err
+		}
+
+		currentBuffer := append(msgBuf, buf[0], buf[1])
 		for {
 			buf, err = b.read(1)
 			if err != nil {
