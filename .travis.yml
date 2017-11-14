@@ -51,7 +51,7 @@ before_script:
    - export DISPLAY=:99.0
    - sh -e /etc/init.d/xvfb start
 script:
-   - echo "Running tests
+   - echo "Running tests"
    - make test_with_coverage
    - echo "Checking that code is well-formatted"
    - make fmt_check
