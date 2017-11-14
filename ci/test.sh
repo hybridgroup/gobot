@@ -11,6 +11,20 @@ echo $GO_VERSION
 # Hold the package names that contain failures
 FAIL_PACKAGES=()
 
+# OpenCV components to link in CGO compile
+OPENCV_LDFLAGS="-lopencv_core -lopencv_videoio -lopencv_imgproc -lopencv_highgui -lopencv_imgcodecs -lopencv_objdetect -lopencv_calib3d -lopencv_video"
+
+# Use $HOME on Travis
+# Use /usr/local on local
+if [[ $TRAVIS == "true" ]]; then
+  export CGO_CPPFLAGS="-I${HOME}/usr/include"
+  export CGO_LDFLAGS="-L${HOME}/usr/lib $OPENCV_LDFLAGS"
+else
+  export CGO_CPPFLAGS="-I/usr/local/include"
+  export CGO_LDFLAGS="-L/usr/local/lib $OPENCV_LDFLAGS"
+fi
+
+
 pushd $PWD/..
 	# Set up coverage report file
 	COVERAGE_REPORT_LOCATION="./profile.cov"

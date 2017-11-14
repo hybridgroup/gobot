@@ -6,7 +6,8 @@
 pushd $PWD/..
   GO_FILES_EXCLUDING_VENDOR=$(find . -type f -name '*.go' -not -path "./vendor/*")
   FMT_RESULTS=$(gofmt -l $GO_FILES_EXCLUDING_VENDOR)
-  if [ ${#FMT_RESULTS[@]} -ne 0 ]; then
+  FMT_RESULTS_COUNT=$(echo $FMT_RESULTS | wc -l) # returns one empty line when everything passes
+  if [ "$FMT_RESULTS_COUNT" -gt 1 ]; then
     # some files have formatting errors
     echo "--- gofmt found errors found in the following files:"
     echo $FMT_RESULTS
