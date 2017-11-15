@@ -1,20 +1,29 @@
-.PHONY: test race cover robeaux examples deps
+.PHONY: test race cover robeaux examples deps test_with_coverage fmt_check
 
+excluding_vendor := $(shell go list ./... | grep -v /vendor/)
+
+# Run tests on all non-vendor directories
 test:
-	go test ./...
+	go test -v $(excluding_vendor)
 
+# Run tests with race detection on all non-vendor directories
 race:
-	go test ./... -race
+	go test -race $(excluding_vendor)
 
-cover:
-	echo "" > profile.cov
-	for package in $$(go list ./...) ; do \
-		go test -covermode=count -coverprofile=tmp.cov $$package ; \
-		if [ -f tmp.cov ]; then \
-			cat tmp.cov >> profile.cov ; \
-			rm tmp.cov ; \
-		fi ; \
-	done
+# Check for code well-formedness
+fmt_check:
+	./ci/format.sh
+
+# Test and generate coverage
+test_with_coverage:
+	./ci/test.sh
+
+deps:
+ifeq (,$(shell which dep))
+	$(error dep tool not found! https://github.com/golang/dep is required to install Gobot deps)
+endif
+	dep ensure
+
 
 robeaux:
 ifeq (,$(shell which go-bindata))
@@ -40,22 +49,3 @@ examples:
 	for example in $(EXAMPLES) ; do \
 		go build -o /tmp/$$example examples/$$example ; \
 	done ; \
-
-deps:
-	go get -d -v \
-		github.com/bmizerany/pat \
-		github.com/codegangsta/cli \
-		github.com/go-ble/ble \
-		github.com/donovanhide/eventsource \
-		github.com/eclipse/paho.mqtt.golang \
-		github.com/hashicorp/go-multierror \
-		github.com/hybridgroup/go-ardrone/client \
-		gocv.io/x/gocv \
-		github.com/mgutz/logxi/v1 \
-		github.com/nats-io/nats \
-		github.com/sigurn/crc8 \
-		go.bug.st/serial.v1 \
-		github.com/veandco/go-sdl2/sdl \
-		golang.org/x/net/websocket \
-		golang.org/x/exp/io/spi \
-		golang.org/x/sys/unix

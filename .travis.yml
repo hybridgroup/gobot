@@ -3,7 +3,6 @@ sudo: required
 dist: trusty
 go_import_path: gobot.io/x/gobot
 go:
-   - 1.7.6
    - 1.8.5
    - 1.9.2
    - tip
@@ -43,18 +42,19 @@ before_install:
    - sudo ln /dev/null /dev/raw1394
    - cd $HOME/gopath/src/gobot.io/x/gobot
    - go get github.com/axw/gocov/gocov
+   - go get -u github.com/golang/dep/cmd/dep
 before_cache:
-   - rm -f $HOME/fresh-cache   
+   - rm -f $HOME/fresh-cache
 install:
-   - make deps
+   - dep ensure
 before_script:
    - export DISPLAY=:99.0
    - sh -e /etc/init.d/xvfb start
 script:
-   - export CGO_CPPFLAGS="-I${HOME}/usr/include"
-   - export CGO_LDFLAGS="-L${HOME}/usr/lib -lopencv_core -lopencv_videoio -lopencv_imgproc -lopencv_highgui -lopencv_imgcodecs -lopencv_objdetect -lopencv_calib3d -lopencv_video"
-   - echo "Ensuring code is well formatted"; ! gofmt -s -d . | read
-   - bash -c 'set -e; echo "" > coverage.txt; for d in $(go list ./...); do go test -covermode=set -coverprofile=p.out $d; if [ -f p.out ]; then cat p.out >> coverage.txt; rm p.out; fi; done'
+   - echo "Running tests"
+   - make test_with_coverage
+   - echo "Checking that code is well-formatted"
+   - make fmt_check
 after_success:
    - bash <(curl -s https://codecov.io/bash)
 branches:

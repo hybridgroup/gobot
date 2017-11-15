@@ -8,3 +8,5 @@ count.out
 /parts
 /prime
 /stage
+vendor/
+.idea/
