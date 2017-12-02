@@ -186,9 +186,10 @@ func (s *StepperDriver) Move(stepsToMove int) error {
 	if stepsToMove < 0 {
 		s.direction = "backward"
 	}
-	defer s.mutex.Unlock()
+	s.mutex.Unlock()
 
 	stepsLeft := int64(math.Abs(float64(stepsToMove)))
+	//Do not remove *1000 and change duration to time.Millisecond. It has been done for a reason
 	delay := time.Duration(60000*1000/(s.stepsPerRev*s.speed)) * time.Microsecond
 
 	for stepsLeft > 0 {
@@ -196,7 +197,7 @@ func (s *StepperDriver) Move(stepsToMove int) error {
 			return err
 		}
 		stepsLeft--
-		time.Sleep(delay) //adjust accordingly
+		time.Sleep(delay)
 	}
 
 	s.moving = false
@@ -217,7 +218,7 @@ func (s *StepperDriver) GetMaxSpeed() uint {
 // SetSpeed sets the rpm
 func (s *StepperDriver) SetSpeed(rpm uint) error {
 	if rpm <= 0 {
-		return errors.New("RPM cannot be a negative value")
+		return errors.New("RPM cannot be a zero or negative value")
 	}
 
 	m := s.GetMaxSpeed()
