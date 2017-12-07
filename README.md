@@ -194,6 +194,7 @@ Gobot has a extensible system for connecting to hardware devices. The following 
 - [Digispark](http://digistump.com/products/1) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/digispark)
 - [DragonBoard](https://developer.qualcomm.com/hardware/dragonboard-410c) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/dragonboard)
 - [ESP8266](http://esp8266.net/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/firmata)
+- [GoPiGo 3](https://www.dexterindustries.com/gopigo3/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/dexter/gopigo3)
 - [Intel Curie](https://www.intel.com/content/www/us/en/products/boards-kits/curie.html) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/intel-iot/curie)
 - [Intel Edison](http://www.intel.com/content/www/us/en/do-it-yourself/edison.html) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/intel-iot/edison)
 - [Intel Joule](http://intel.com/joule/getstarted) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/intel-iot/joule)
@@ -239,6 +240,7 @@ a shared set of drivers provided using the `gobot/drivers/gpio` package:
 	- Relay
 	- RGB LED
 	- Servo
+	- Stepper Motor
 
 Support for many devices that use Analog Input/Output (AIO) have
 a shared set of drivers provided using the `gobot/drivers/aio` package:
@@ -311,7 +313,7 @@ Gobot uses the Gort [http://gort.io](http://gort.io) Command Line Interface (CLI
 Gobot also has its own CLI to generate new platforms, adaptors, and drivers. You can check it out in the `/cli` directory.
 
 ## Documentation
-We're busy adding documentation to our web site at http://gobot.io/ please check there as we continue to work on Gobot
+We're always adding documentation to our web site at http://gobot.io/ please check there as we continue to work on Gobot
 
 Thank you!
 
