@@ -5,6 +5,7 @@ package gopigo3
 
 import (
 	"bytes"
+	"encoding/binary"
 	"fmt"
 	"math"
 	"time"
@@ -159,7 +160,7 @@ type Driver struct {
 // NewDriver creates a new Gobot Driver for the GoPiGo3 board.
 //
 // Params:
-//		a *Adaptor - the Adaptor to use with this Driver
+//      a *Adaptor - the Adaptor to use with this Driver
 //
 func NewDriver(a spi.Connector) *Driver {
 	g := &Driver{
@@ -326,8 +327,8 @@ func (g *Driver) SetMotorPower(motor Motor, power int8) error {
 }
 
 // SetMotorPosition sets the motor's position in degrees.
-func (g *Driver) SetMotorPosition(motor Motor, position float64) error {
-	positionRaw := math.Float64bits(position * MOTOR_TICKS_PER_DEGREE)
+func (g *Driver) SetMotorPosition(motor Motor, position int) error {
+	positionRaw := position * MOTOR_TICKS_PER_DEGREE
 	return g.writeBytes([]byte{
 		goPiGo3Address,
 		SET_MOTOR_POSITION,
@@ -340,20 +341,20 @@ func (g *Driver) SetMotorPosition(motor Motor, position float64) error {
 }
 
 // SetMotorDps sets the motor target speed in degrees per second.
-func (g *Driver) SetMotorDps(motor Motor, dps float64) error {
-	dpsUint := math.Float64bits(dps * MOTOR_TICKS_PER_DEGREE)
+func (g *Driver) SetMotorDps(motor Motor, dps int) error {
+	d := dps * MOTOR_TICKS_PER_DEGREE
 	return g.writeBytes([]byte{
 		goPiGo3Address,
 		SET_MOTOR_DPS,
 		byte(motor),
-		byte((dpsUint >> 8) & 0xFF),
-		byte(dpsUint & 0xFF),
+		byte((d >> 8) & 0xFF),
+		byte(d & 0xFF),
 	})
 }
 
 // SetMotorLimits sets the speed limits for a motor.
-func (g *Driver) SetMotorLimits(motor Motor, power int8, dps float64) error {
-	dpsUint := math.Float64bits(dps * MOTOR_TICKS_PER_DEGREE)
+func (g *Driver) SetMotorLimits(motor Motor, power int8, dps int) error {
+	dpsUint := dps * MOTOR_TICKS_PER_DEGREE
 	return g.writeBytes([]byte{
 		goPiGo3Address,
 		SET_MOTOR_LIMITS,
@@ -365,7 +366,7 @@ func (g *Driver) SetMotorLimits(motor Motor, power int8, dps float64) error {
 }
 
 // GetMotorStatus returns the status for the given motor.
-func (g *Driver) GetMotorStatus(motor Motor) (flags uint8, power uint16, encoder, dps float64, err error) {
+func (g *Driver) GetMotorStatus(motor Motor) (flags uint8, power uint16, encoder, dps int, err error) {
 	message := GET_MOTOR_STATUS_RIGHT
 	if motor == MOTOR_LEFT {
 		message = GET_MOTOR_STATUS_LEFT
@@ -377,21 +378,34 @@ func (g *Driver) GetMotorStatus(motor Motor) (flags uint8, power uint16, encoder
 	if err := g.responseValid(response); err != nil {
 		return flags, power, encoder, dps, err
 	}
+	// get flags
 	flags = uint8(response[4])
+	// get power
 	power = uint16(response[5])
 	if power&0x80 == 0x80 {
 		power = power - 0x100
 	}
-	enc := uint64(response[6]<<24 | response[7]<<16 | response[8]<<8 | response[9])
-	if enc&0x80000000 == 0x80000000 {
-		encoder = float64(enc - 0x100000000)
+	// get encoder
+	enc := make([]byte, 4)
+	enc[3] = response[6]
+	enc[2] = response[7]
+	enc[1] = response[8]
+	enc[0] = response[9]
+	e := binary.LittleEndian.Uint32(enc)
+	if e&0x80000000 == 0x80000000 {
+		encoder = int(uint64(e) - 0x100000000)
 	}
-	d := uint64(response[10]<<8 | response[11])
-	if d&0x8000 == 0x8000 {
-		dps = float64(d - 0x10000)
+	encoder = int(e)
+	//get dps
+	d := make([]byte, 4)
+	d[1] = response[10]
+	d[0] = response[11]
+	ds := binary.LittleEndian.Uint32(d)
+	if ds&0x8000 == 0x8000 {
+		dps = int(ds - 0x10000)
 	}
+	dps = int(ds)
 	return flags, power, encoder / MOTOR_TICKS_PER_DEGREE, dps / MOTOR_TICKS_PER_DEGREE, nil
-
 }
 
 // GetMotorEncoder reads a motor's encoder in degrees.
