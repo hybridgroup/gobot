@@ -283,6 +283,12 @@ drivers provided using the `gobot/drivers/i2c` package:
 	- TSL2561 Digital Luminosity/Lux/Light Sensor
 	- Wii Nunchuck Controller
 
+Support for devices that use Serial Peripheral Interface (SPI) have
+a shared set of drivers provided using the `gobot/drivers/spi` package:
+
+- [SPI](https://en.wikipedia.org/wiki/Serial_Peripheral_Interface_Bus) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/drivers/spi)
+	- APA102 Programmable LEDs
+
 More platforms and drivers are coming soon...
 
 ## API:
