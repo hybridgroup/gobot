@@ -1,10 +1,14 @@
 package spi
 
 import (
+	"errors"
 	"strconv"
 
 	"gobot.io/x/gobot"
 )
+
+// MCP3004DriverMaxChannel is the number of channels (plus one) of this A/D converter.
+const MCP3004DriverMaxChannel = 3
 
 // MCP3004Driver is a driver for the MCP3008 A/D converter.
 type MCP3004Driver struct {
@@ -54,15 +58,24 @@ func (d *MCP3004Driver) Halt() (err error) {
 }
 
 // Read reads the current analog data for the desired channel.
-func (d *MCP3004Driver) Read(channel int) (int, error) {
+func (d *MCP3004Driver) Read(channel int) (result int, err error) {
+	if channel < 0 || channel > MCP3004DriverMaxChannel {
+		return 0, errors.New("Invalid channel for read")
+	}
+
 	tx := make([]byte, 3)
 	tx[0] = 0x01
 	tx[1] = 0x80 + (byte(channel) << 4)
 	tx[2] = 0x00
 
-	d.connection.Tx(tx, nil)
+	rx := make([]byte, 3)
 
-	return 0, nil
+	err = d.connection.Tx(tx, rx)
+	if err == nil && len(rx) == 3 {
+		result = int(((rx[1] & 0x03) << 8) + rx[2])
+	}
+
+	return result, err
 }
 
 // AnalogRead returns value from analog reading of specified pin

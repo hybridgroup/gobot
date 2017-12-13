@@ -32,4 +32,6 @@ func TestMCP3004DriverHalt(t *testing.T) {
 func TestMCP3004DriverRead(t *testing.T) {
 	d := initTestMCP3004Driver()
 	d.Start()
+
+	// TODO: actual read test
 }
