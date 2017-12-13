@@ -17,14 +17,14 @@ type MCP3004Driver struct {
 	connection Connection
 }
 
-// NewMCP3004Driver creates a new Gobot Driver for MCP3004Driver A/D converter
+// NewMCP3004Driver creates a new Gobot Driver for MCP3004 A/D converter
 //
 // Params:
 //      a *Adaptor - the Adaptor to use with this Driver
 //
 func NewMCP3004Driver(a Connector) *MCP3004Driver {
 	d := &MCP3004Driver{
-		name:      gobot.DefaultName("MCP3008"),
+		name:      gobot.DefaultName("MCP3004"),
 		connector: a,
 	}
 	return d
@@ -65,14 +65,14 @@ func (d *MCP3004Driver) Read(channel int) (result int, err error) {
 
 	tx := make([]byte, 3)
 	tx[0] = 0x01
-	tx[1] = 0x80 + (byte(channel) << 4)
+	tx[1] = byte(8+channel) << 4
 	tx[2] = 0x00
 
 	rx := make([]byte, 3)
 
 	err = d.connection.Tx(tx, rx)
 	if err == nil && len(rx) == 3 {
-		result = int(((rx[1] & 0x03) << 8) + rx[2])
+		result = int(((rx[1] & 0x3) << 8) + rx[2])
 	}
 
 	return result, err

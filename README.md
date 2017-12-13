@@ -288,6 +288,7 @@ a shared set of drivers provided using the `gobot/drivers/spi` package:
 
 - [SPI](https://en.wikipedia.org/wiki/Serial_Peripheral_Interface_Bus) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/drivers/spi)
 	- APA102 Programmable LEDs
+	- MCP3002 Analog/Digital Converter
 	- MCP3004 Analog/Digital Converter
 	- MCP3008 Analog/Digital Converter
 
