@@ -219,6 +219,7 @@ Gobot has a extensible system for connecting to hardware devices. The following 
 - [Sphero Ollie](http://www.sphero.com/ollie) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/sphero/ollie)
 - [Sphero SPRK+](http://www.sphero.com/sprk-plus) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/sphero/sprkplus)
 - [Tinker Board](https://www.asus.com/us/Single-Board-Computer/Tinker-Board/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/tinkerboard)
+- [UP2](http://www.up-board.org/upsquared/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/upboard/up2)
 
 Support for many devices that use General Purpose Input/Output (GPIO) have
 a shared set of drivers provided using the `gobot/drivers/gpio` package:
