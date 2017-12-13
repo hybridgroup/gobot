@@ -7,8 +7,8 @@ import (
 	"gobot.io/x/gobot"
 )
 
-// MCP3002DriverMaxChannel is the number of channels (plus one) of this A/D converter.
-const MCP3002DriverMaxChannel = 1
+// MCP3002DriverMaxChannel is the number of channels of this A/D converter.
+const MCP3002DriverMaxChannel = 2
 
 // MCP3002Driver is a driver for the MCP3002 A/D converter.
 type MCP3002Driver struct {
@@ -59,7 +59,7 @@ func (d *MCP3002Driver) Halt() (err error) {
 
 // Read reads the current analog data for the desired channel.
 func (d *MCP3002Driver) Read(channel int) (result int, err error) {
-	if channel < 0 || channel > MCP3002DriverMaxChannel {
+	if channel < 0 || channel > MCP3002DriverMaxChannel-1 {
 		return 0, errors.New("Invalid channel for read")
 	}
 
