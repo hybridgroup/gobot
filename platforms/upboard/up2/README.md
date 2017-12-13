@@ -1,4 +1,4 @@
-# Tinker Board
+# UP2 (Squared)
 
 The UP2 Board is a single board SoC computer based on the Intel Apollo Lake processor. It has built-in GPIO, PWM, SPI, and I2C interfaces.
 
