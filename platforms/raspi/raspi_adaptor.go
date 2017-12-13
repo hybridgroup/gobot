@@ -14,7 +14,6 @@ import (
 	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/drivers/spi"
 	"gobot.io/x/gobot/sysfs"
-	xspi "golang.org/x/exp/io/spi"
 )
 
 var readFile = func() ([]byte, error) {
@@ -209,46 +208,18 @@ func (r *Adaptor) GetDefaultBus() int {
 // GetSpiConnection returns an spi connection to a device on a specified bus.
 // Valid bus number is [0..1] which corresponds to /dev/spidev0.0 through /dev/spidev0.1.
 func (r *Adaptor) GetSpiConnection(busNum, mode int, maxSpeed int64) (connection spi.Connection, err error) {
-	if (busNum < 0) || (busNum > 1) {
-		return nil, fmt.Errorf("Bus number %d out of range", busNum)
-	}
-	device, err := r.getSpiBus(busNum, mode, maxSpeed)
-	return spi.NewConnection(device), err
-}
-
-func (r *Adaptor) getSpiBus(busNum, mode int, maxSpeed int64) (_ spi.SPIDevice, err error) {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
-	if r.spiBuses[busNum] == nil {
-		var spiMode xspi.Mode
-		switch mode {
-		case 0:
-			spiMode = xspi.Mode0
-		case 1:
-			spiMode = xspi.Mode1
-		case 2:
-			spiMode = xspi.Mode2
-		case 3:
-			spiMode = xspi.Mode3
-		default:
-			spiMode = xspi.Mode0
-		}
-		dev := fmt.Sprintf("/dev/spidev0.%d", busNum)
-		devfs := &xspi.Devfs{
-			Dev:      dev,
-			Mode:     spiMode,
-			MaxSpeed: maxSpeed,
-		}
-		if r.spiBuses[busNum] == nil {
-			bus, err := xspi.Open(devfs)
-			if err != nil {
-				return nil, err
-			}
-			r.spiBuses[busNum] = spi.NewConnection(bus)
-		}
+	if (busNum < 0) || (busNum > 1) {
+		return nil, fmt.Errorf("Bus number %d out of range", busNum)
 	}
-	return r.spiBuses[busNum], err
+
+	if r.spiBuses[busNum] == nil {
+		r.spiBuses[busNum], err = spi.GetSpiBus(busNum, mode, maxSpeed)
+	}
+
+	return spi.NewConnection(r.spiBuses[busNum]), err
 }
 
 // GetSpiDefaultBus returns the default spi bus for this platform.

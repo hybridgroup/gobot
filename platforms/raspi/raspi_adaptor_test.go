@@ -5,15 +5,16 @@ import (
 	"strings"
 	"testing"
 
+	"runtime"
+	"strconv"
+	"sync"
+
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/drivers/gpio"
 	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/drivers/spi"
 	"gobot.io/x/gobot/gobottest"
 	"gobot.io/x/gobot/sysfs"
-	"runtime"
-	"strconv"
-	"sync"
 )
 
 // make sure that this Adaptor fullfills all the required interfaces
@@ -189,18 +190,15 @@ func TestAdaptorSPI(t *testing.T) {
 	})
 	sysfs.SetFilesystem(fs)
 	sysfs.SetSyscall(&sysfs.MockSyscall{})
-	// TODO: find a better way to test this
-	_, err := a.GetSpiConnection(1, 0, 500000)
-	gobottest.Assert(t, err, err)
+
 	gobottest.Assert(t, a.GetSpiDefaultBus(), 1)
 	gobottest.Assert(t, a.GetSpiDefaultMode(), 0)
 	gobottest.Assert(t, a.GetSpiDefaultMaxSpeed(), int64(500000))
 
-	_, err = a.GetSpiConnection(1, 1, 500000)
-	_, err = a.GetSpiConnection(1, 2, 500000)
-	_, err = a.GetSpiConnection(1, 3, 500000)
-	_, err = a.GetSpiConnection(1, 5, 500000)
-	_, err = a.GetSpiConnection(4, 0, 500000)
+	_, err := a.GetSpiConnection(10, 0, 500000)
+	gobottest.Assert(t, err.Error(), "Bus number 10 out of range")
+
+	// TODO: test tx/rx here...
 }
 
 func TestAdaptorDigitalPinConcurrency(t *testing.T) {
