@@ -291,6 +291,10 @@ a shared set of drivers provided using the `gobot/drivers/spi` package:
 	- MCP3002 Analog/Digital Converter
 	- MCP3004 Analog/Digital Converter
 	- MCP3008 Analog/Digital Converter
+	- MCP3202 Analog/Digital Converter
+	- MCP3204 Analog/Digital Converter
+	- MCP3208 Analog/Digital Converter
+	- MCP3304 Analog/Digital Converter
 
 More platforms and drivers are coming soon...
 

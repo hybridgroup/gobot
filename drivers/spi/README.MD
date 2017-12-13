@@ -18,6 +18,10 @@ The following spi Devices are currently supported:
 - MCP3002 Analog/Digital Converter
 - MCP3004 Analog/Digital Converter
 - MCP3008 Analog/Digital Converter
+- MCP3202 Analog/Digital Converter
+- MCP3204 Analog/Digital Converter
+- MCP3208 Analog/Digital Converter
+- MCP3304 Analog/Digital Converter
 - GoPiGo3 Robot
 
 Drivers wanted! :)
