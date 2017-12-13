@@ -8,6 +8,7 @@ import (
 	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/drivers/i2c"
+	"gobot.io/x/gobot/drivers/spi"
 	"gobot.io/x/gobot/sysfs"
 )
 
@@ -18,12 +19,16 @@ type sysfsPin struct {
 
 // Adaptor represents a Gobot Adaptor for the Upboard UP2
 type Adaptor struct {
-	name        string
-	pinmap      map[string]sysfsPin
-	digitalPins map[int]*sysfs.DigitalPin
-	pwmPins     map[int]*sysfs.PWMPin
-	i2cBuses    [2]i2c.I2cDevice
-	mutex       *sync.Mutex
+	name               string
+	pinmap             map[string]sysfsPin
+	digitalPins        map[int]*sysfs.DigitalPin
+	pwmPins            map[int]*sysfs.PWMPin
+	i2cBuses           [2]i2c.I2cDevice
+	mutex              *sync.Mutex
+	spiDefaultBus      int
+	spiBuses           [2]spi.SPIDevice
+	spiDefaultMode     int
+	spiDefaultMaxSpeed int64
 }
 
 // NewAdaptor creates a UP2 Adaptor
@@ -77,6 +82,14 @@ func (c *Adaptor) Finalize() (err error) {
 			}
 		}
 	}
+	for _, bus := range c.spiBuses {
+		if bus != nil {
+			if e := bus.Close(); e != nil {
+				err = multierror.Append(err, e)
+			}
+		}
+	}
+
 	return
 }
 
@@ -214,10 +227,46 @@ func (c *Adaptor) GetDefaultBus() int {
 	return 0
 }
 
+// GetSpiConnection returns an spi connection to a device on a specified bus.
+// Valid bus number is [0..1] which corresponds to /dev/spidev0.0 through /dev/spidev0.1.
+func (c *Adaptor) GetSpiConnection(busNum, mode int, maxSpeed int64) (connection spi.Connection, err error) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	if (busNum < 0) || (busNum > 1) {
+		return nil, fmt.Errorf("Bus number %d out of range", busNum)
+	}
+
+	if c.spiBuses[busNum] == nil {
+		c.spiBuses[busNum], err = spi.GetSpiBus(busNum, mode, maxSpeed)
+	}
+
+	return spi.NewConnection(c.spiBuses[busNum]), err
+}
+
+// GetSpiDefaultBus returns the default spi bus for this platform.
+func (c *Adaptor) GetSpiDefaultBus() int {
+	return c.spiDefaultBus
+}
+
+// GetSpiDefaultMode returns the default spi mode for this platform.
+func (c *Adaptor) GetSpiDefaultMode() int {
+	return c.spiDefaultMode
+}
+
+// GetSpiDefaultMaxSpeed returns the default spi bus for this platform.
+func (c *Adaptor) GetSpiDefaultMaxSpeed() int64 {
+	return c.spiDefaultMaxSpeed
+}
+
 func (c *Adaptor) setPins() {
 	c.digitalPins = make(map[int]*sysfs.DigitalPin)
 	c.pwmPins = make(map[int]*sysfs.PWMPin)
 	c.pinmap = fixedPins
+
+	c.spiDefaultBus = 0
+	c.spiDefaultMode = 0
+	c.spiDefaultMaxSpeed = 500000
 }
 
 func (c *Adaptor) translatePin(pin string) (i int, err error) {

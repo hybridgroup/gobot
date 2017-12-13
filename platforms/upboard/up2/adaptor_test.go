@@ -8,6 +8,7 @@ import (
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/drivers/gpio"
 	"gobot.io/x/gobot/drivers/i2c"
+	"gobot.io/x/gobot/drivers/spi"
 	"gobot.io/x/gobot/gobottest"
 	"gobot.io/x/gobot/sysfs"
 )
@@ -21,6 +22,7 @@ var _ gpio.ServoWriter = (*Adaptor)(nil)
 var _ sysfs.DigitalPinnerProvider = (*Adaptor)(nil)
 var _ sysfs.PWMPinnerProvider = (*Adaptor)(nil)
 var _ i2c.Connector = (*Adaptor)(nil)
+var _ spi.Connector = (*Adaptor)(nil)
 
 func initTestUP2Adaptor() (*Adaptor, *sysfs.MockFilesystem) {
 	a := NewAdaptor()
@@ -100,6 +102,21 @@ func TestUP2AdaptorI2c(t *testing.T) {
 	gobottest.Assert(t, a.Finalize(), nil)
 }
 
+func TestAdaptorSPI(t *testing.T) {
+	a := NewAdaptor()
+	a.Connect()
+
+	gobottest.Assert(t, a.GetSpiDefaultBus(), 0)
+	gobottest.Assert(t, a.GetSpiDefaultMode(), 0)
+	gobottest.Assert(t, a.GetSpiDefaultMaxSpeed(), int64(500000))
+
+	_, err := a.GetSpiConnection(10, 0, 500000)
+	gobottest.Assert(t, err.Error(), "Bus number 10 out of range")
+
+	// TODO: test tx/rx here...
+
+}
+
 func TestUP2AdaptorInvalidPWMPin(t *testing.T) {
 	a, _ := initTestUP2Adaptor()
 	a.Connect()
@@ -156,7 +173,7 @@ func TestUP2AdaptorPwmReadError(t *testing.T) {
 	gobottest.Assert(t, err, errors.New("read error"))
 }
 
-func TestUP2DefaultBus(t *testing.T) {
+func TestUP2I2CDefaultBus(t *testing.T) {
 	a, _ := initTestUP2Adaptor()
 	gobottest.Assert(t, a.GetDefaultBus(), 0)
 }

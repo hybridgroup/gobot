@@ -1,8 +1,10 @@
 package spi
 
 import (
-	xspi "golang.org/x/exp/io/spi"
+	"fmt"
 	"time"
+
+	xspi "golang.org/x/exp/io/spi"
 )
 
 const (
@@ -93,4 +95,34 @@ func (c *SpiConnection) SetMode(mode xspi.Mode) error {
 
 func (c *SpiConnection) Tx(w, r []byte) error {
 	return c.bus.Tx(w, r)
+}
+
+// GetSPIBus is a helper to return a SPI bus
+func GetSpiBus(busNum, mode int, maxSpeed int64) (spiDevice SPIDevice, err error) {
+	var spiMode xspi.Mode
+	switch mode {
+	case 0:
+		spiMode = xspi.Mode0
+	case 1:
+		spiMode = xspi.Mode1
+	case 2:
+		spiMode = xspi.Mode2
+	case 3:
+		spiMode = xspi.Mode3
+	default:
+		spiMode = xspi.Mode0
+	}
+	dev := fmt.Sprintf("/dev/spidev0.%d", busNum)
+	devfs := &xspi.Devfs{
+		Dev:      dev,
+		Mode:     spiMode,
+		MaxSpeed: maxSpeed,
+	}
+	bus, err := xspi.Open(devfs)
+	if err != nil {
+		return nil, err
+	}
+	spiDevice = NewConnection(bus)
+
+	return
 }
