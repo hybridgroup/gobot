@@ -29,8 +29,11 @@ func TestBeagleboneAdaptor(t *testing.T) {
 		"/dev/i2c-2",
 		"/sys/devices/platform/bone_capemgr",
 		"/sys/devices/platform/bone_capemgr/slots",
-		"/sys/devices/platform/ocp/ocp:P9_21_pinmux/state",
+		"/sys/devices/platform/ocp/ocp:P8_7_pinmux/state",
+		"/sys/devices/platform/ocp/ocp:P9_11_pinmux/state",
+		"/sys/devices/platform/ocp/ocp:P9_12_pinmux/state",
 		"/sys/devices/platform/ocp/ocp:P9_22_pinmux/state",
+		"/sys/devices/platform/ocp/ocp:P9_21_pinmux/state",
 		"/sys/class/leds/beaglebone:green:usr1/brightness",
 		"/sys/bus/iio/devices/iio:device0/in_voltage1_raw",
 		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/export",
@@ -204,6 +207,7 @@ func TestBeagleboneDigitalPinDirectionFileError(t *testing.T) {
 		"/sys/devices/platform/bone_capemgr/slots",
 		"/sys/class/gpio/export",
 		"/sys/class/gpio/gpio60/value",
+		"/sys/devices/platform/ocp/ocp:P9_12_pinmux/state",
 	})
 	sysfs.SetFilesystem(fs)
 
@@ -223,6 +227,7 @@ func TestBeagleboneDigitalPinFinalizeFileError(t *testing.T) {
 		"/sys/class/gpio/export",
 		"/sys/class/gpio/gpio60/value",
 		"/sys/class/gpio/gpio60/direction",
+		"/sys/devices/platform/ocp/ocp:P9_12_pinmux/state",
 	})
 	sysfs.SetFilesystem(fs)
 

@@ -15,28 +15,39 @@ import (
 	"gobot.io/x/gobot/sysfs"
 )
 
+type pwmPinData struct {
+	channel int
+	path    string
+}
+
 const pwmDefaultPeriod = 500000
 
 // Adaptor is the gobot.Adaptor representation for the Beaglebone
 type Adaptor struct {
-	name        string
-	digitalPins []*sysfs.DigitalPin
-	pwmPins     map[string]*sysfs.PWMPin
-	i2cBuses    map[int]i2c.I2cDevice
-	usrLed      string
-	analogPath  string
-	slots       string
-	mutex       *sync.Mutex
+	name         string
+	digitalPins  []*sysfs.DigitalPin
+	pwmPins      map[string]*sysfs.PWMPin
+	i2cBuses     map[int]i2c.I2cDevice
+	usrLed       string
+	analogPath   string
+	slots        string
+	pinMap       map[string]int
+	pwmPinMap    map[string]pwmPinData
+	analogPinMap map[string]string
+	mutex        *sync.Mutex
 }
 
 // NewAdaptor returns a new Beaglebone Adaptor
 func NewAdaptor() *Adaptor {
 	b := &Adaptor{
-		name:        gobot.DefaultName("Beaglebone"),
-		digitalPins: make([]*sysfs.DigitalPin, 120),
-		pwmPins:     make(map[string]*sysfs.PWMPin),
-		i2cBuses:    make(map[int]i2c.I2cDevice),
-		mutex:       &sync.Mutex{},
+		name:         gobot.DefaultName("Beaglebone"),
+		digitalPins:  make([]*sysfs.DigitalPin, 120),
+		pwmPins:      make(map[string]*sysfs.PWMPin),
+		i2cBuses:     make(map[int]i2c.I2cDevice),
+		mutex:        &sync.Mutex{},
+		pinMap:       bbbPinMap,
+		pwmPinMap:    bbbPwmPinMap,
+		analogPinMap: bbbAnalogPinMap,
 	}
 
 	b.setSlots()
@@ -163,6 +174,10 @@ func (b *Adaptor) DigitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPinn
 	}
 	if b.digitalPins[i] == nil {
 		b.digitalPins[i] = sysfs.NewDigitalPin(i)
+		if err = muxPin(pin, "gpio"); err != nil {
+			return
+		}
+
 		err := b.digitalPins[i].Export()
 		if err != nil {
 			return nil, err
@@ -188,7 +203,7 @@ func (b *Adaptor) PWMPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
 		newPin := sysfs.NewPWMPin(pinInfo.channel)
 		newPin.Path = pinInfo.path
 
-		if err = muxPWMPin(pin); err != nil {
+		if err = muxPin(pin, "pwm"); err != nil {
 			return
 		}
 		if err = newPin.Export(); err != nil {
@@ -256,7 +271,7 @@ func (b *Adaptor) GetDefaultBus() int {
 
 // translatePin converts digital pin name to pin position
 func (b *Adaptor) translatePin(pin string) (value int, err error) {
-	if val, ok := pins[pin]; ok {
+	if val, ok := b.pinMap[pin]; ok {
 		value = val
 	} else {
 		err = errors.New("Not a valid pin")
@@ -265,7 +280,7 @@ func (b *Adaptor) translatePin(pin string) (value int, err error) {
 }
 
 func (b *Adaptor) translatePwmPin(pin string) (p pwmPinData, err error) {
-	if val, ok := pwmPins[pin]; ok {
+	if val, ok := b.pwmPinMap[pin]; ok {
 		p = val
 	} else {
 		err = errors.New("Not a valid PWM pin")
@@ -275,7 +290,7 @@ func (b *Adaptor) translatePwmPin(pin string) (p pwmPinData, err error) {
 
 // translateAnalogPin converts analog pin name to pin position
 func (b *Adaptor) translateAnalogPin(pin string) (value string, err error) {
-	if val, ok := analogPins[pin]; ok {
+	if val, ok := b.analogPinMap[pin]; ok {
 		value = val
 	} else {
 		err = errors.New("Not a valid analog pin")
@@ -316,13 +331,13 @@ func ensureSlot(slots, item string) (err error) {
 	return
 }
 
-func muxPWMPin(pin string) error {
+func muxPin(pin, cmd string) error {
 	path := fmt.Sprintf("/sys/devices/platform/ocp/ocp:%s_pinmux/state", pin)
 	fi, e := sysfs.OpenFile(path, os.O_WRONLY, 0666)
 	defer fi.Close()
 	if e != nil {
 		return e
 	}
-	_, e = fi.WriteString("pwm")
+	_, e = fi.WriteString(cmd)
 	return e
 }
