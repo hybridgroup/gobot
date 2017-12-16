@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"sync"
@@ -35,6 +36,7 @@ type Adaptor struct {
 	pwmPinMap    map[string]pwmPinData
 	analogPinMap map[string]string
 	mutex        *sync.Mutex
+	findPin      func(pinPath string) string
 }
 
 // NewAdaptor returns a new Beaglebone Adaptor
@@ -48,6 +50,10 @@ func NewAdaptor() *Adaptor {
 		pinMap:       bbbPinMap,
 		pwmPinMap:    bbbPwmPinMap,
 		analogPinMap: bbbAnalogPinMap,
+		findPin: func(pinPath string) string {
+			files, _ := filepath.Glob(pinPath)
+			return files[0]
+		},
 	}
 
 	b.setSlots()
@@ -201,7 +207,7 @@ func (b *Adaptor) PWMPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
 
 	if b.pwmPins[pin] == nil {
 		newPin := sysfs.NewPWMPin(pinInfo.channel)
-		newPin.Path = pinInfo.path
+		newPin.Path = b.findPin(pinInfo.path)
 
 		if err = muxPin(pin, "pwm"); err != nil {
 			return
@@ -212,9 +218,6 @@ func (b *Adaptor) PWMPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
 		if err = newPin.SetPeriod(pwmDefaultPeriod); err != nil {
 			return
 		}
-		// if err = newPin.InvertPolarity(false); err != nil {
-		// 	return
-		// }
 		if err = newPin.Enable(true); err != nil {
 			return
 		}

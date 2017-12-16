@@ -24,6 +24,28 @@ var _ sysfs.DigitalPinnerProvider = (*Adaptor)(nil)
 var _ sysfs.PWMPinnerProvider = (*Adaptor)(nil)
 var _ i2c.Connector = (*Adaptor)(nil)
 
+func initBBBTestAdaptor() (*Adaptor, error) {
+	a := NewAdaptor()
+	a.findPin = func(pinPath string) string {
+		switch pinPath {
+		case "/sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm/pwmchip*":
+			return "/sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm/pwmchip4"
+		case "/sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm/pwmchip*":
+			return "/sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm/pwmchip2"
+		case "/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip*":
+			return "/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0"
+		case "/sys/devices/platform/ocp/48300000.epwmss/48300100.ecap/pwm/pwmchip*":
+			return "/sys/devices/platform/ocp/48300000.epwmss/48300100.ecap/pwm/pwmchip0"
+		default:
+			return pinPath
+		}
+	}
+
+	err := a.Connect()
+
+	return a, err
+}
+
 func TestBeagleboneAdaptor(t *testing.T) {
 	fs := sysfs.NewMockFilesystem([]string{
 		"/dev/i2c-2",
@@ -59,9 +81,8 @@ func TestBeagleboneAdaptor(t *testing.T) {
 	})
 
 	sysfs.SetFilesystem(fs)
-	a := NewAdaptor()
 
-	a.Connect()
+	a, _ := initBBBTestAdaptor()
 
 	// PWM
 	gobottest.Assert(t, a.PwmWrite("P9_99", 175), errors.New("Not a valid PWM pin"))
@@ -184,8 +205,7 @@ func TestBeagleboneConnectNoSlot(t *testing.T) {
 	})
 	sysfs.SetFilesystem(fs)
 
-	a := NewAdaptor()
-	err := a.Connect()
+	_, err := initBBBTestAdaptor()
 	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/devices/platform/bone_capemgr/slots: No such file."), true)
 }
 
@@ -195,8 +215,7 @@ func TestBeagleboneAnalogReadFileError(t *testing.T) {
 	})
 	sysfs.SetFilesystem(fs)
 
-	a := NewAdaptor()
-	a.Connect()
+	a, _ := initBBBTestAdaptor()
 
 	_, err := a.AnalogRead("P9_40")
 	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/bus/iio/devices/iio:device0/in_voltage1_raw: No such file."), true)
@@ -211,8 +230,7 @@ func TestBeagleboneDigitalPinDirectionFileError(t *testing.T) {
 	})
 	sysfs.SetFilesystem(fs)
 
-	a := NewAdaptor()
-	a.Connect()
+	a, _ := initBBBTestAdaptor()
 
 	err := a.DigitalWrite("P9_12", 1)
 	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/gpio60/direction: No such file."), true)
@@ -231,8 +249,7 @@ func TestBeagleboneDigitalPinFinalizeFileError(t *testing.T) {
 	})
 	sysfs.SetFilesystem(fs)
 
-	a := NewAdaptor()
-	a.Connect()
+	a, _ := initBBBTestAdaptor()
 
 	err := a.DigitalWrite("P9_12", 1)
 	gobottest.Assert(t, err, nil)

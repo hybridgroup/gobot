@@ -50,14 +50,14 @@ var bbbPinMap = map[string]int{
 }
 
 var bbbPwmPinMap = map[string]pwmPinData{
-	"P8_13": {path: "/sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm/pwmchip4", channel: 1},
-	"P8_19": {path: "/sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm/pwmchip4", channel: 0},
+	"P8_13": {path: "/sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm/pwmchip*", channel: 1},
+	"P8_19": {path: "/sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm/pwmchip*", channel: 0},
 
-	"P9_14": {path: "/sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm/pwmchip2", channel: 0},
-	"P9_16": {path: "/sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm/pwmchip2", channel: 1},
-	"P9_21": {path: "/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0", channel: 1},
-	"P9_22": {path: "/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0", channel: 0},
-	"P9_42": {path: "/sys/devices/platform/ocp/48300000.epwmss/48300100.ecap/pwm/pwmchip0", channel: 0},
+	"P9_14": {path: "/sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm/pwmchip*", channel: 0},
+	"P9_16": {path: "/sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm/pwmchip*", channel: 1},
+	"P9_21": {path: "/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip*", channel: 1},
+	"P9_22": {path: "/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip*", channel: 0},
+	"P9_42": {path: "/sys/devices/platform/ocp/48300000.epwmss/48300100.ecap/pwm/pwmchip*", channel: 0},
 }
 
 var bbbAnalogPinMap = map[string]string{
