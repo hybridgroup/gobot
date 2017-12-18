@@ -56,11 +56,11 @@ func NewAdaptor() *Adaptor {
 		},
 	}
 
-	b.setSlots()
+	b.setPaths()
 	return b
 }
 
-func (b *Adaptor) setSlots() {
+func (b *Adaptor) setPaths() {
 	b.slots = "/sys/devices/platform/bone_capemgr/slots"
 	b.usrLed = "/sys/class/leds/beaglebone:green:"
 	b.analogPath = "/sys/bus/iio/devices/iio:device0"

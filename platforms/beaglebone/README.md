@@ -9,7 +9,7 @@ For more info about the BeagleBone platform go to  [http://beagleboard.org/getti
 
 ## How to Install
 
-We recommend updating to the latest Debian Jessie OS when using the BeagleBone. The current Gobot only supports 4.x versions of the OS. If you need support for older versions of the OS, you will need to use Gobot v1.4.
+We recommend updating to the latest Debian OS when using the BeagleBone. The current Gobot only supports 4.x versions of the OS. If you need support for older versions of the OS, you will need to use Gobot v1.4.
 
 You would normally install Go and Gobot on your workstation. Once installed, cross compile your program on your workstation, transfer the final executable to your BeagleBone, and run the program on the BeagleBone itself as documented here.
 
@@ -67,11 +67,11 @@ $ GOARM=7 GOARCH=arm GOOS=linux go build examples/beaglebone_blink.go
 Once you have compiled your code, you can you can upload your program and execute it on the BeagleBone from your workstation using the `scp` and `ssh` commands like this:
 
 ```bash
-$ scp beaglebone_blink root@192.168.7.2:/home/root/
-$ ssh -t root@192.168.7.2 "./beaglebone_blink"
+$ scp beaglebone_blink debian@192.168.7.2:/home/debian/
+$ ssh -t debian@192.168.7.2 "./beaglebone_blink"
 ```
 
-In order to run the preceeding commands, you must be running the official Debian Linux through the usb->ethernet connection, or be connected to the board using WiFi.
+In order to run the preceeding commands, you must be running the official Debian Linux through the usb->ethernet connection, or be connected to the board using WiFi. You must also setup the needed permissions to run as non-root user, as described below.
 
 ### Updating your board to the latest OS
 
@@ -92,3 +92,36 @@ Once you have created the SD card, boot your BeagleBone using the new image as f
 These instructions come from the Beagleboard web site's "Getting Started" page located here:
 
 http://beagleboard.org/getting-started
+
+### Running as Non-Root user
+
+In order to run as a non-root user, you will need to add a udev rule to your BeagleBone.
+
+First connect to the BeagleBone using ssh:
+
+```
+ssh debian@192.168.7.2
+```
+
+Once you are connected to the BeagleBone, create the new udev rule file:
+
+```
+sudo nano /etc/udev/rules.d/75-bone_capemgr-noroot.rules
+```
+
+Make sure the file contains the following rules text:
+
+```
+# Change group to gpio
+SUBSYSTEM=="platform", PROGRAM="/bin/sh -c '/bin/chown -R root:gpio /sys/devices/platform/bone_capemgr'"
+# Change user permissions to ensure user and group have read/write permissions
+SUBSYSTEM=="platform", PROGRAM="/bin/sh -c '/bin/chmod -R ug+rw /sys/devices/platform/bone_capemgr'"
+```
+
+Save the file, then either reboot your BeagleBone, or run the following command to reload your udev rules:
+
+```
+sudo udevadm control --reload-rules && sudo udevadm trigger
+```
+
+You will now be able to run your Gobot programs without using sudo.
