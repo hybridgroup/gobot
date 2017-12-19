@@ -108,7 +108,9 @@ $ scp beaglebone_blink debian@192.168.7.2:/home/debian/
 $ ssh -t debian@192.168.7.2 "./beaglebone_blink"
 ```
 
-In order to run the preceeding commands, you must be running the official Debian Linux through the usb->ethernet connection, or be connected to the board using WiFi. You must also setup the needed permissions to run as non-root user, as described below.
+In order to run the preceeding commands, you must be running the official Debian Linux through the usb->ethernet connection, or be connected to the board using WiFi.
+
+You must also configure hardware settings as described below.
 
 ### Updating your board to the latest OS
 
@@ -130,9 +132,11 @@ These instructions come from the Beagleboard web site's "Getting Started" page l
 
 http://beagleboard.org/getting-started
 
-### Running as Non-Root user
+### Configure hardware settings
 
-In order to run as a non-root user, you will need to add a udev rule to your BeagleBone.
+In order to enable the various hardware devices on your BeagleBone or PocketBeagle, you need to configure a special file named `/boot/uEnv.txt`.
+
+This file controls all of the different hardware options used at startup time, so you can enable or disable features based on your specific needs. You only need to do this once, and then the settings will apply each time you start up your BeagleBone.
 
 First connect to the BeagleBone using ssh:
 
@@ -140,25 +144,19 @@ First connect to the BeagleBone using ssh:
 ssh debian@192.168.7.2
 ```
 
-Once you are connected to the BeagleBone, create the new udev rule file:
+Once you are connected to the BeagleBone, edit the /boot/uEnv.txt file like this:
 
 ```
-sudo nano /etc/udev/rules.d/75-bone_capemgr-noroot.rules
+sudo nano /boot/uEnv.txt
 ```
 
-Make sure the file contains the following rules text:
+To enable GPIO, PWM, I2C, and SPI, modify the `##Example v4.1.x` section to add a line to enable the cape manager:
 
 ```
-# Change group to gpio
-SUBSYSTEM=="platform", PROGRAM="/bin/sh -c '/bin/chown -R root:gpio /sys/devices/platform/bone_capemgr'"
-# Change user permissions to ensure user and group have read/write permissions
-SUBSYSTEM=="platform", PROGRAM="/bin/sh -c '/bin/chmod -R ug+rw /sys/devices/platform/bone_capemgr'"
+##Example v4.1.x
+cape_enable=bone_capemgr.enable_partno=cape-universaln,BB-ADC,BB-SPIDEV0
 ```
 
-Save the file, then either reboot your BeagleBone, or run the following command to reload your udev rules:
+Save the file, then reboot your BeagleBone.
 
-```
-sudo udevadm control --reload-rules && sudo udevadm trigger
-```
-
-You will now be able to run your Gobot programs without using sudo.
+You will now be able to run your Gobot programs to control the various hardware.

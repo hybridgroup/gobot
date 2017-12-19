@@ -74,18 +74,7 @@ func (b *Adaptor) SetName(n string) { b.name = n }
 
 // Connect initializes the pwm and analog dts.
 func (b *Adaptor) Connect() error {
-	b.mutex.Lock()
-	defer b.mutex.Unlock()
-
-	// loads U-Boot Cape Universal
-	// https://github.com/cdsteinkuehler/beaglebone-universal-io
-	if err := ensureSlot(b.slots, "cape-universaln"); err != nil {
-		return err
-	}
-
-	// loads U-Boot ADC
-	err := ensureSlot(b.slots, "BB-ADC")
-	return err
+	return nil
 }
 
 // Finalize releases all i2c devices and exported analog, digital, pwm pins.
