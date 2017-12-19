@@ -154,7 +154,7 @@ To enable GPIO, PWM, I2C, and SPI, modify the `##Example v4.1.x` section to add 
 
 ```
 ##Example v4.1.x
-cape_enable=bone_capemgr.enable_partno=cape-universaln,BB-ADC,BB-SPIDEV0
+cape_enable=bone_capemgr.enable_partno=cape-universaln,BB-ADC
 ```
 
 Save the file, then reboot your BeagleBone.
