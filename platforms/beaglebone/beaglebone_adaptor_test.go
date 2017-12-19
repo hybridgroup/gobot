@@ -26,18 +26,18 @@ var _ i2c.Connector = (*Adaptor)(nil)
 
 func initBBBTestAdaptor() (*Adaptor, error) {
 	a := NewAdaptor()
-	a.findPin = func(pinPath string) string {
+	a.findPin = func(pinPath string) (string, error) {
 		switch pinPath {
 		case "/sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm/pwmchip*":
-			return "/sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm/pwmchip4"
+			return "/sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm/pwmchip4", nil
 		case "/sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm/pwmchip*":
-			return "/sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm/pwmchip2"
+			return "/sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm/pwmchip2", nil
 		case "/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip*":
-			return "/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0"
+			return "/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0", nil
 		case "/sys/devices/platform/ocp/48300000.epwmss/48300100.ecap/pwm/pwmchip*":
-			return "/sys/devices/platform/ocp/48300000.epwmss/48300100.ecap/pwm/pwmchip0"
+			return "/sys/devices/platform/ocp/48300000.epwmss/48300100.ecap/pwm/pwmchip0", nil
 		default:
-			return pinPath
+			return pinPath, nil
 		}
 	}
 

@@ -36,7 +36,7 @@ type Adaptor struct {
 	pwmPinMap    map[string]pwmPinData
 	analogPinMap map[string]string
 	mutex        *sync.Mutex
-	findPin      func(pinPath string) string
+	findPin      func(pinPath string) (string, error)
 }
 
 // NewAdaptor returns a new Beaglebone Adaptor
@@ -50,9 +50,9 @@ func NewAdaptor() *Adaptor {
 		pinMap:       bbbPinMap,
 		pwmPinMap:    bbbPwmPinMap,
 		analogPinMap: bbbAnalogPinMap,
-		findPin: func(pinPath string) string {
-			files, _ := filepath.Glob(pinPath)
-			return files[0]
+		findPin: func(pinPath string) (string, error) {
+			files, err := filepath.Glob(pinPath)
+			return files[0], err
 		},
 	}
 
@@ -77,11 +77,15 @@ func (b *Adaptor) Connect() error {
 	b.mutex.Lock()
 	defer b.mutex.Unlock()
 
-	if err := ensureSlot(b.slots, "BB-ADC"); err != nil {
+	// loads U-Boot Cape Universal
+	// https://github.com/cdsteinkuehler/beaglebone-universal-io
+	if err := ensureSlot(b.slots, "cape-universaln"); err != nil {
 		return err
 	}
 
-	return nil
+	// loads U-Boot ADC
+	err := ensureSlot(b.slots, "BB-ADC")
+	return err
 }
 
 // Finalize releases all i2c devices and exported analog, digital, pwm pins.
@@ -207,9 +211,11 @@ func (b *Adaptor) PWMPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
 
 	if b.pwmPins[pin] == nil {
 		newPin := sysfs.NewPWMPin(pinInfo.channel)
-		newPin.Path = b.findPin(pinInfo.path)
-
 		if err = muxPin(pin, "pwm"); err != nil {
+			return
+		}
+
+		if newPin.Path, err = b.findPin(pinInfo.path); err != nil {
 			return
 		}
 		if err = newPin.Export(); err != nil {
