@@ -187,7 +187,8 @@ Gobot has a extensible system for connecting to hardware devices. The following 
 
 - [Arduino](http://www.arduino.cc/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/firmata)
 - Audio <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/audio)
-- [Beaglebone Black](http://beagleboard.org/Products/BeagleBone+Black/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/beaglebone)
+- [Beaglebone Black](http://beagleboard.org/boards) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/beaglebone)
+- [Beaglebone PocketBeagle](http://beagleboard.org/pocket/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/beaglebone)
 - [Bluetooth LE](https://www.bluetooth.com/what-is-bluetooth-technology/bluetooth-technology-basics/low-energy) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/ble)
 - [C.H.I.P](http://www.nextthing.co/pages/chip) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/chip)
 - [C.H.I.P Pro](https://docs.getchip.com/chip_pro.html) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/chip)

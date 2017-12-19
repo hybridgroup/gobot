@@ -23,7 +23,7 @@ type pwmPinData struct {
 
 const pwmDefaultPeriod = 500000
 
-// Adaptor is the gobot.Adaptor representation for the Beaglebone
+// Adaptor is the gobot.Adaptor representation for the Beaglebone Black/Green
 type Adaptor struct {
 	name         string
 	digitalPins  []*sysfs.DigitalPin
@@ -39,10 +39,10 @@ type Adaptor struct {
 	findPin      func(pinPath string) (string, error)
 }
 
-// NewAdaptor returns a new Beaglebone Adaptor
+// NewAdaptor returns a new Beaglebone Black/Green Adaptor
 func NewAdaptor() *Adaptor {
 	b := &Adaptor{
-		name:         gobot.DefaultName("Beaglebone"),
+		name:         gobot.DefaultName("BeagleboneBlack"),
 		digitalPins:  make([]*sysfs.DigitalPin, 120),
 		pwmPins:      make(map[string]*sysfs.PWMPin),
 		i2cBuses:     make(map[int]i2c.I2cDevice),

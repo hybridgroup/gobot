@@ -257,3 +257,8 @@ func TestBeagleboneDigitalPinFinalizeFileError(t *testing.T) {
 	err = a.Finalize()
 	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/unexport: No such file."), true)
 }
+
+func TestPocketBeagleAdaptorName(t *testing.T) {
+	a := NewPocketBeagleAdaptor()
+	gobottest.Assert(t, strings.HasPrefix(a.Name(), "PocketBeagle"), true)
+}
