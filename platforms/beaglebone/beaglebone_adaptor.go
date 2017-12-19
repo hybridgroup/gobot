@@ -1,7 +1,6 @@
 package beaglebone
 
 import (
-	"bufio"
 	"errors"
 	"fmt"
 	"os"
@@ -13,6 +12,7 @@ import (
 	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/drivers/i2c"
+	"gobot.io/x/gobot/drivers/spi"
 	"gobot.io/x/gobot/sysfs"
 )
 
@@ -25,18 +25,21 @@ const pwmDefaultPeriod = 500000
 
 // Adaptor is the gobot.Adaptor representation for the Beaglebone Black/Green
 type Adaptor struct {
-	name         string
-	digitalPins  []*sysfs.DigitalPin
-	pwmPins      map[string]*sysfs.PWMPin
-	i2cBuses     map[int]i2c.I2cDevice
-	usrLed       string
-	analogPath   string
-	slots        string
-	pinMap       map[string]int
-	pwmPinMap    map[string]pwmPinData
-	analogPinMap map[string]string
-	mutex        *sync.Mutex
-	findPin      func(pinPath string) (string, error)
+	name               string
+	digitalPins        []*sysfs.DigitalPin
+	pwmPins            map[string]*sysfs.PWMPin
+	i2cBuses           map[int]i2c.I2cDevice
+	usrLed             string
+	analogPath         string
+	pinMap             map[string]int
+	pwmPinMap          map[string]pwmPinData
+	analogPinMap       map[string]string
+	mutex              *sync.Mutex
+	findPin            func(pinPath string) (string, error)
+	spiDefaultBus      int
+	spiBuses           [2]spi.SPIDevice
+	spiDefaultMode     int
+	spiDefaultMaxSpeed int64
 }
 
 // NewAdaptor returns a new Beaglebone Black/Green Adaptor
@@ -61,9 +64,12 @@ func NewAdaptor() *Adaptor {
 }
 
 func (b *Adaptor) setPaths() {
-	b.slots = "/sys/devices/platform/bone_capemgr/slots"
 	b.usrLed = "/sys/class/leds/beaglebone:green:"
 	b.analogPath = "/sys/bus/iio/devices/iio:device0"
+
+	b.spiDefaultBus = 0
+	b.spiDefaultMode = 0
+	b.spiDefaultMaxSpeed = 500000
 }
 
 // Name returns the Adaptor name
@@ -97,6 +103,13 @@ func (b *Adaptor) Finalize() (err error) {
 		}
 	}
 	for _, bus := range b.i2cBuses {
+		if bus != nil {
+			if e := bus.Close(); e != nil {
+				err = multierror.Append(err, e)
+			}
+		}
+	}
+	for _, bus := range b.spiBuses {
 		if bus != nil {
 			if e := bus.Close(); e != nil {
 				err = multierror.Append(err, e)
@@ -267,6 +280,38 @@ func (b *Adaptor) GetDefaultBus() int {
 	return 2
 }
 
+// GetSpiConnection returns an spi connection to a device on a specified bus.
+// Valid bus number is [0..1] which corresponds to /dev/spidev0.0 through /dev/spidev0.1.
+func (b *Adaptor) GetSpiConnection(busNum, mode int, maxSpeed int64) (connection spi.Connection, err error) {
+	b.mutex.Lock()
+	defer b.mutex.Unlock()
+
+	if (busNum < 0) || (busNum > 1) {
+		return nil, fmt.Errorf("Bus number %d out of range", busNum)
+	}
+
+	if b.spiBuses[busNum] == nil {
+		b.spiBuses[busNum], err = spi.GetSpiBus(busNum, mode, maxSpeed)
+	}
+
+	return spi.NewConnection(b.spiBuses[busNum]), err
+}
+
+// GetSpiDefaultBus returns the default spi bus for this platform.
+func (b *Adaptor) GetSpiDefaultBus() int {
+	return b.spiDefaultBus
+}
+
+// GetSpiDefaultMode returns the default spi mode for this platform.
+func (b *Adaptor) GetSpiDefaultMode() int {
+	return b.spiDefaultMode
+}
+
+// GetSpiDefaultMaxSpeed returns the default spi bus for this platform.
+func (b *Adaptor) GetSpiDefaultMaxSpeed() int64 {
+	return b.spiDefaultMaxSpeed
+}
+
 // translatePin converts digital pin name to pin position
 func (b *Adaptor) translatePin(pin string) (value int, err error) {
 	if val, ok := b.pinMap[pin]; ok {
@@ -292,39 +337,6 @@ func (b *Adaptor) translateAnalogPin(pin string) (value string, err error) {
 		value = val
 	} else {
 		err = errors.New("Not a valid analog pin")
-	}
-	return
-}
-
-func ensureSlot(slots, item string) (err error) {
-	fi, err := sysfs.OpenFile(slots, os.O_RDWR|os.O_APPEND, 0666)
-	defer fi.Close()
-	if err != nil {
-		return
-	}
-
-	// ensure the slot is not already written into the capemanager
-	// (from: https://github.com/mrmorphic/hwio/blob/master/module_bb_pwm.go#L190)
-	scanner := bufio.NewScanner(fi)
-	for scanner.Scan() {
-		line := scanner.Text()
-		if strings.Index(line, item) > 0 {
-			return
-		}
-	}
-
-	_, err = fi.WriteString(item)
-	if err != nil {
-		return err
-	}
-	fi.Sync()
-
-	scanner = bufio.NewScanner(fi)
-	for scanner.Scan() {
-		line := scanner.Text()
-		if strings.Index(line, item) > 0 {
-			return
-		}
 	}
 	return
 }

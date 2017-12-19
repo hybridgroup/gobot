@@ -9,6 +9,7 @@ import (
 	"gobot.io/x/gobot/drivers/aio"
 	"gobot.io/x/gobot/drivers/gpio"
 	"gobot.io/x/gobot/drivers/i2c"
+	"gobot.io/x/gobot/drivers/spi"
 	"gobot.io/x/gobot/gobottest"
 	"gobot.io/x/gobot/sysfs"
 )
@@ -23,6 +24,7 @@ var _ gpio.ServoWriter = (*Adaptor)(nil)
 var _ sysfs.DigitalPinnerProvider = (*Adaptor)(nil)
 var _ sysfs.PWMPinnerProvider = (*Adaptor)(nil)
 var _ i2c.Connector = (*Adaptor)(nil)
+var _ spi.Connector = (*Adaptor)(nil)
 
 func initBBBTestAdaptor() (*Adaptor, error) {
 	a := NewAdaptor()
@@ -50,7 +52,6 @@ func TestBeagleboneAdaptor(t *testing.T) {
 	fs := sysfs.NewMockFilesystem([]string{
 		"/dev/i2c-2",
 		"/sys/devices/platform/bone_capemgr",
-		"/sys/devices/platform/bone_capemgr/slots",
 		"/sys/devices/platform/ocp/ocp:P8_7_pinmux/state",
 		"/sys/devices/platform/ocp/ocp:P9_11_pinmux/state",
 		"/sys/devices/platform/ocp/ocp:P9_12_pinmux/state",
@@ -199,19 +200,9 @@ func TestBeagleboneGetConnectionInvalidBus(t *testing.T) {
 	gobottest.Assert(t, err, errors.New("Bus number 99 out of range"))
 }
 
-func TestBeagleboneConnectNoSlot(t *testing.T) {
-	fs := sysfs.NewMockFilesystem([]string{
-		"/dev/i2c-2",
-	})
-	sysfs.SetFilesystem(fs)
-
-	_, err := initBBBTestAdaptor()
-	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/devices/platform/bone_capemgr/slots: No such file."), true)
-}
-
 func TestBeagleboneAnalogReadFileError(t *testing.T) {
 	fs := sysfs.NewMockFilesystem([]string{
-		"/sys/devices/platform/bone_capemgr/slots",
+		"/sys/devices/platform/whatever",
 	})
 	sysfs.SetFilesystem(fs)
 
