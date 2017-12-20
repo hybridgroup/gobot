@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 	"syscall"
+	"time"
 )
 
 // PWMPin is the interface for sysfs PWM interactions
@@ -64,6 +65,11 @@ func (p *PWMPin) Export() error {
 			return err
 		}
 	}
+
+	// Pause to avoid race condition in case there is any udev rule
+	// that changes file permissions on newly exported PWMPin. This
+	// is a common circumstance when running as a non-root user.
+	time.Sleep(100 * time.Millisecond)
 
 	return nil
 }

@@ -9,6 +9,7 @@ import (
 	"gobot.io/x/gobot/drivers/aio"
 	"gobot.io/x/gobot/drivers/gpio"
 	"gobot.io/x/gobot/drivers/i2c"
+	"gobot.io/x/gobot/drivers/spi"
 	"gobot.io/x/gobot/gobottest"
 	"gobot.io/x/gobot/sysfs"
 )
@@ -23,14 +24,39 @@ var _ gpio.ServoWriter = (*Adaptor)(nil)
 var _ sysfs.DigitalPinnerProvider = (*Adaptor)(nil)
 var _ sysfs.PWMPinnerProvider = (*Adaptor)(nil)
 var _ i2c.Connector = (*Adaptor)(nil)
+var _ spi.Connector = (*Adaptor)(nil)
+
+func initBBBTestAdaptor() (*Adaptor, error) {
+	a := NewAdaptor()
+	a.findPin = func(pinPath string) (string, error) {
+		switch pinPath {
+		case "/sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm/pwmchip*":
+			return "/sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm/pwmchip4", nil
+		case "/sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm/pwmchip*":
+			return "/sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm/pwmchip2", nil
+		case "/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip*":
+			return "/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0", nil
+		case "/sys/devices/platform/ocp/48300000.epwmss/48300100.ecap/pwm/pwmchip*":
+			return "/sys/devices/platform/ocp/48300000.epwmss/48300100.ecap/pwm/pwmchip0", nil
+		default:
+			return pinPath, nil
+		}
+	}
+
+	err := a.Connect()
+
+	return a, err
+}
 
 func TestBeagleboneAdaptor(t *testing.T) {
 	fs := sysfs.NewMockFilesystem([]string{
 		"/dev/i2c-2",
 		"/sys/devices/platform/bone_capemgr",
-		"/sys/devices/platform/bone_capemgr/slots",
-		"/sys/devices/platform/ocp/ocp:P9_21_pinmux/state",
+		"/sys/devices/platform/ocp/ocp:P8_7_pinmux/state",
+		"/sys/devices/platform/ocp/ocp:P9_11_pinmux/state",
+		"/sys/devices/platform/ocp/ocp:P9_12_pinmux/state",
 		"/sys/devices/platform/ocp/ocp:P9_22_pinmux/state",
+		"/sys/devices/platform/ocp/ocp:P9_21_pinmux/state",
 		"/sys/class/leds/beaglebone:green:usr1/brightness",
 		"/sys/bus/iio/devices/iio:device0/in_voltage1_raw",
 		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/export",
@@ -56,9 +82,8 @@ func TestBeagleboneAdaptor(t *testing.T) {
 	})
 
 	sysfs.SetFilesystem(fs)
-	a := NewAdaptor()
 
-	a.Connect()
+	a, _ := initBBBTestAdaptor()
 
 	// PWM
 	gobottest.Assert(t, a.PwmWrite("P9_99", 175), errors.New("Not a valid PWM pin"))
@@ -175,25 +200,13 @@ func TestBeagleboneGetConnectionInvalidBus(t *testing.T) {
 	gobottest.Assert(t, err, errors.New("Bus number 99 out of range"))
 }
 
-func TestBeagleboneConnectNoSlot(t *testing.T) {
-	fs := sysfs.NewMockFilesystem([]string{
-		"/dev/i2c-2",
-	})
-	sysfs.SetFilesystem(fs)
-
-	a := NewAdaptor()
-	err := a.Connect()
-	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/devices/platform/bone_capemgr/slots: No such file."), true)
-}
-
 func TestBeagleboneAnalogReadFileError(t *testing.T) {
 	fs := sysfs.NewMockFilesystem([]string{
-		"/sys/devices/platform/bone_capemgr/slots",
+		"/sys/devices/platform/whatever",
 	})
 	sysfs.SetFilesystem(fs)
 
-	a := NewAdaptor()
-	a.Connect()
+	a, _ := initBBBTestAdaptor()
 
 	_, err := a.AnalogRead("P9_40")
 	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/bus/iio/devices/iio:device0/in_voltage1_raw: No such file."), true)
@@ -204,11 +217,11 @@ func TestBeagleboneDigitalPinDirectionFileError(t *testing.T) {
 		"/sys/devices/platform/bone_capemgr/slots",
 		"/sys/class/gpio/export",
 		"/sys/class/gpio/gpio60/value",
+		"/sys/devices/platform/ocp/ocp:P9_12_pinmux/state",
 	})
 	sysfs.SetFilesystem(fs)
 
-	a := NewAdaptor()
-	a.Connect()
+	a, _ := initBBBTestAdaptor()
 
 	err := a.DigitalWrite("P9_12", 1)
 	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/gpio60/direction: No such file."), true)
@@ -223,15 +236,20 @@ func TestBeagleboneDigitalPinFinalizeFileError(t *testing.T) {
 		"/sys/class/gpio/export",
 		"/sys/class/gpio/gpio60/value",
 		"/sys/class/gpio/gpio60/direction",
+		"/sys/devices/platform/ocp/ocp:P9_12_pinmux/state",
 	})
 	sysfs.SetFilesystem(fs)
 
-	a := NewAdaptor()
-	a.Connect()
+	a, _ := initBBBTestAdaptor()
 
 	err := a.DigitalWrite("P9_12", 1)
 	gobottest.Assert(t, err, nil)
 
 	err = a.Finalize()
 	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/unexport: No such file."), true)
+}
+
+func TestPocketBeagleAdaptorName(t *testing.T) {
+	a := NewPocketBeagleAdaptor()
+	gobottest.Assert(t, strings.HasPrefix(a.Name(), "PocketBeagle"), true)
 }

@@ -1,5 +1,6 @@
 /*
-Package beaglebone provides the Gobot adaptor for the Beaglebone Black.
+Package beaglebone provides the Gobot adaptor for the Beaglebone Black/Green, as well as a
+separate Adaptor for the PocketBeagle.
 
 Installing:
 

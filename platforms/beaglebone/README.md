@@ -2,14 +2,18 @@
 
 The BeagleBone is an ARM based single board computer, with lots of GPIO, I2C, and analog interfaces built in.
 
-The Gobot adaptor for the BeagleBone should support all of the various BeagleBone boards such as the BeagleBone Black, SeeedStudio BeagleBone Green, SeeedStudio BeagleBone Green Wireless, and others that use the latest Debian and standard "Cape Manager" interfaces.
+The Gobot adaptor for the BeagleBone supports all of the various BeagleBone boards such as the BeagleBone Black, SeeedStudio BeagleBone Green, SeeedStudio BeagleBone Green Wireless, and others that use the latest Debian and standard "Cape Manager" interfaces.
 
 For more info about the BeagleBone platform go to  [http://beagleboard.org/getting-started](http://beagleboard.org/getting-started).
+
+In addition, there is an separate Adaptor for the PocketBeagle, a USB-key-fob sized computer. The PocketBeagle has a different pin layout and somewhat different capabilities.
+
+For more info about the PocketBeagle platform go to  [http://beagleboard.org/pocket](http://beagleboard.org/pocket).
 
 
 ## How to Install
 
-We recommend updating to the latest Debian Jessie OS when using the BeagleBone. The current Gobot only supports 4.x versions of the OS. If you need support for older versions of the OS, you will need to use Gobot v1.4.
+We recommend updating to the latest Debian OS when using the BeagleBone. The current Gobot only supports 4.x versions of the OS. If you need support for older versions of the OS, you will need to use Gobot v1.4.
 
 You would normally install Go and Gobot on your workstation. Once installed, cross compile your program on your workstation, transfer the final executable to your BeagleBone, and run the program on the BeagleBone itself as documented here.
 
@@ -54,6 +58,39 @@ func main() {
 }
 ```
 
+To use the PocketBeagle, use `beaglebone.NewPocketBeagleAdaptor()` like this:
+
+```go
+package main
+
+import (
+	"time"
+
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/gpio"
+	"gobot.io/x/gobot/platforms/beaglebone"
+)
+
+func main() {
+	beagleboneAdaptor := beaglebone.NewPocketBeagleAdaptor()
+	led := gpio.NewLedDriver(beagleboneAdaptor, "P1_2")
+
+	work := func() {
+		gobot.Every(1*time.Second, func() {
+			led.Toggle()
+		})
+	}
+
+	robot := gobot.NewRobot("pocketBeagleBot",
+		[]gobot.Connection{beagleboneAdaptor},
+		[]gobot.Device{led},
+		work,
+	)
+
+	robot.Start()
+}
+```
+
 ## How to Connect
 
 ### Compiling
@@ -67,11 +104,13 @@ $ GOARM=7 GOARCH=arm GOOS=linux go build examples/beaglebone_blink.go
 Once you have compiled your code, you can you can upload your program and execute it on the BeagleBone from your workstation using the `scp` and `ssh` commands like this:
 
 ```bash
-$ scp beaglebone_blink root@192.168.7.2:/home/root/
-$ ssh -t root@192.168.7.2 "./beaglebone_blink"
+$ scp beaglebone_blink debian@192.168.7.2:/home/debian/
+$ ssh -t debian@192.168.7.2 "./beaglebone_blink"
 ```
 
 In order to run the preceeding commands, you must be running the official Debian Linux through the usb->ethernet connection, or be connected to the board using WiFi.
+
+You must also configure hardware settings as described below.
 
 ### Updating your board to the latest OS
 
@@ -92,3 +131,32 @@ Once you have created the SD card, boot your BeagleBone using the new image as f
 These instructions come from the Beagleboard web site's "Getting Started" page located here:
 
 http://beagleboard.org/getting-started
+
+### Configure hardware settings
+
+In order to enable the various hardware devices on your BeagleBone or PocketBeagle, you need to configure a special file named `/boot/uEnv.txt`.
+
+This file controls all of the different hardware options used at startup time, so you can enable or disable features based on your specific needs. You only need to do this once, and then the settings will apply each time you start up your BeagleBone.
+
+First connect to the BeagleBone using ssh:
+
+```
+ssh debian@192.168.7.2
+```
+
+Once you are connected to the BeagleBone, edit the /boot/uEnv.txt file like this:
+
+```
+sudo nano /boot/uEnv.txt
+```
+
+To enable GPIO, PWM, I2C, and SPI, modify the `##Example v4.1.x` section to add a line to enable the cape manager:
+
+```
+##Example v4.1.x
+cape_enable=bone_capemgr.enable_partno=cape-universaln,BB-ADC
+```
+
+Save the file, then reboot your BeagleBone.
+
+You will now be able to run your Gobot programs to control the various hardware.

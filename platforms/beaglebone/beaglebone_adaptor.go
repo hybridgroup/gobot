@@ -1,10 +1,10 @@
 package beaglebone
 
 import (
-	"bufio"
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"sync"
@@ -12,41 +12,64 @@ import (
 	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/drivers/i2c"
+	"gobot.io/x/gobot/drivers/spi"
 	"gobot.io/x/gobot/sysfs"
 )
 
-const pwmDefaultPeriod = 500000
-
-// Adaptor is the gobot.Adaptor representation for the Beaglebone
-type Adaptor struct {
-	name        string
-	digitalPins []*sysfs.DigitalPin
-	pwmPins     map[string]*sysfs.PWMPin
-	i2cBuses    map[int]i2c.I2cDevice
-	usrLed      string
-	analogPath  string
-	slots       string
-	mutex       *sync.Mutex
+type pwmPinData struct {
+	channel int
+	path    string
 }
 
-// NewAdaptor returns a new Beaglebone Adaptor
+const pwmDefaultPeriod = 500000
+
+// Adaptor is the gobot.Adaptor representation for the Beaglebone Black/Green
+type Adaptor struct {
+	name               string
+	digitalPins        []*sysfs.DigitalPin
+	pwmPins            map[string]*sysfs.PWMPin
+	i2cBuses           map[int]i2c.I2cDevice
+	usrLed             string
+	analogPath         string
+	pinMap             map[string]int
+	pwmPinMap          map[string]pwmPinData
+	analogPinMap       map[string]string
+	mutex              *sync.Mutex
+	findPin            func(pinPath string) (string, error)
+	spiDefaultBus      int
+	spiBuses           [2]spi.SPIDevice
+	spiDefaultMode     int
+	spiDefaultMaxSpeed int64
+}
+
+// NewAdaptor returns a new Beaglebone Black/Green Adaptor
 func NewAdaptor() *Adaptor {
 	b := &Adaptor{
-		name:        gobot.DefaultName("Beaglebone"),
-		digitalPins: make([]*sysfs.DigitalPin, 120),
-		pwmPins:     make(map[string]*sysfs.PWMPin),
-		i2cBuses:    make(map[int]i2c.I2cDevice),
-		mutex:       &sync.Mutex{},
+		name:         gobot.DefaultName("BeagleboneBlack"),
+		digitalPins:  make([]*sysfs.DigitalPin, 120),
+		pwmPins:      make(map[string]*sysfs.PWMPin),
+		i2cBuses:     make(map[int]i2c.I2cDevice),
+		mutex:        &sync.Mutex{},
+		pinMap:       bbbPinMap,
+		pwmPinMap:    bbbPwmPinMap,
+		analogPinMap: bbbAnalogPinMap,
+		findPin: func(pinPath string) (string, error) {
+			files, err := filepath.Glob(pinPath)
+			return files[0], err
+		},
 	}
 
-	b.setSlots()
+	b.setPaths()
 	return b
 }
 
-func (b *Adaptor) setSlots() {
-	b.slots = "/sys/devices/platform/bone_capemgr/slots"
+func (b *Adaptor) setPaths() {
 	b.usrLed = "/sys/class/leds/beaglebone:green:"
 	b.analogPath = "/sys/bus/iio/devices/iio:device0"
+
+	b.spiDefaultBus = 0
+	b.spiDefaultMode = 0
+	b.spiDefaultMaxSpeed = 500000
 }
 
 // Name returns the Adaptor name
@@ -57,13 +80,6 @@ func (b *Adaptor) SetName(n string) { b.name = n }
 
 // Connect initializes the pwm and analog dts.
 func (b *Adaptor) Connect() error {
-	b.mutex.Lock()
-	defer b.mutex.Unlock()
-
-	if err := ensureSlot(b.slots, "BB-ADC"); err != nil {
-		return err
-	}
-
 	return nil
 }
 
@@ -87,6 +103,13 @@ func (b *Adaptor) Finalize() (err error) {
 		}
 	}
 	for _, bus := range b.i2cBuses {
+		if bus != nil {
+			if e := bus.Close(); e != nil {
+				err = multierror.Append(err, e)
+			}
+		}
+	}
+	for _, bus := range b.spiBuses {
 		if bus != nil {
 			if e := bus.Close(); e != nil {
 				err = multierror.Append(err, e)
@@ -163,6 +186,10 @@ func (b *Adaptor) DigitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPinn
 	}
 	if b.digitalPins[i] == nil {
 		b.digitalPins[i] = sysfs.NewDigitalPin(i)
+		if err = muxPin(pin, "gpio"); err != nil {
+			return
+		}
+
 		err := b.digitalPins[i].Export()
 		if err != nil {
 			return nil, err
@@ -186,9 +213,11 @@ func (b *Adaptor) PWMPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
 
 	if b.pwmPins[pin] == nil {
 		newPin := sysfs.NewPWMPin(pinInfo.channel)
-		newPin.Path = pinInfo.path
+		if err = muxPin(pin, "pwm"); err != nil {
+			return
+		}
 
-		if err = muxPWMPin(pin); err != nil {
+		if newPin.Path, err = b.findPin(pinInfo.path); err != nil {
 			return
 		}
 		if err = newPin.Export(); err != nil {
@@ -197,9 +226,6 @@ func (b *Adaptor) PWMPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
 		if err = newPin.SetPeriod(pwmDefaultPeriod); err != nil {
 			return
 		}
-		// if err = newPin.InvertPolarity(false); err != nil {
-		// 	return
-		// }
 		if err = newPin.Enable(true); err != nil {
 			return
 		}
@@ -254,9 +280,41 @@ func (b *Adaptor) GetDefaultBus() int {
 	return 2
 }
 
+// GetSpiConnection returns an spi connection to a device on a specified bus.
+// Valid bus number is [0..1] which corresponds to /dev/spidev0.0 through /dev/spidev0.1.
+func (b *Adaptor) GetSpiConnection(busNum, mode int, maxSpeed int64) (connection spi.Connection, err error) {
+	b.mutex.Lock()
+	defer b.mutex.Unlock()
+
+	if (busNum < 0) || (busNum > 1) {
+		return nil, fmt.Errorf("Bus number %d out of range", busNum)
+	}
+
+	if b.spiBuses[busNum] == nil {
+		b.spiBuses[busNum], err = spi.GetSpiBus(busNum, mode, maxSpeed)
+	}
+
+	return spi.NewConnection(b.spiBuses[busNum]), err
+}
+
+// GetSpiDefaultBus returns the default spi bus for this platform.
+func (b *Adaptor) GetSpiDefaultBus() int {
+	return b.spiDefaultBus
+}
+
+// GetSpiDefaultMode returns the default spi mode for this platform.
+func (b *Adaptor) GetSpiDefaultMode() int {
+	return b.spiDefaultMode
+}
+
+// GetSpiDefaultMaxSpeed returns the default spi bus for this platform.
+func (b *Adaptor) GetSpiDefaultMaxSpeed() int64 {
+	return b.spiDefaultMaxSpeed
+}
+
 // translatePin converts digital pin name to pin position
 func (b *Adaptor) translatePin(pin string) (value int, err error) {
-	if val, ok := pins[pin]; ok {
+	if val, ok := b.pinMap[pin]; ok {
 		value = val
 	} else {
 		err = errors.New("Not a valid pin")
@@ -265,7 +323,7 @@ func (b *Adaptor) translatePin(pin string) (value int, err error) {
 }
 
 func (b *Adaptor) translatePwmPin(pin string) (p pwmPinData, err error) {
-	if val, ok := pwmPins[pin]; ok {
+	if val, ok := b.pwmPinMap[pin]; ok {
 		p = val
 	} else {
 		err = errors.New("Not a valid PWM pin")
@@ -275,7 +333,7 @@ func (b *Adaptor) translatePwmPin(pin string) (p pwmPinData, err error) {
 
 // translateAnalogPin converts analog pin name to pin position
 func (b *Adaptor) translateAnalogPin(pin string) (value string, err error) {
-	if val, ok := analogPins[pin]; ok {
+	if val, ok := b.analogPinMap[pin]; ok {
 		value = val
 	} else {
 		err = errors.New("Not a valid analog pin")
@@ -283,46 +341,13 @@ func (b *Adaptor) translateAnalogPin(pin string) (value string, err error) {
 	return
 }
 
-func ensureSlot(slots, item string) (err error) {
-	fi, err := sysfs.OpenFile(slots, os.O_RDWR|os.O_APPEND, 0666)
-	defer fi.Close()
-	if err != nil {
-		return
-	}
-
-	// ensure the slot is not already written into the capemanager
-	// (from: https://github.com/mrmorphic/hwio/blob/master/module_bb_pwm.go#L190)
-	scanner := bufio.NewScanner(fi)
-	for scanner.Scan() {
-		line := scanner.Text()
-		if strings.Index(line, item) > 0 {
-			return
-		}
-	}
-
-	_, err = fi.WriteString(item)
-	if err != nil {
-		return err
-	}
-	fi.Sync()
-
-	scanner = bufio.NewScanner(fi)
-	for scanner.Scan() {
-		line := scanner.Text()
-		if strings.Index(line, item) > 0 {
-			return
-		}
-	}
-	return
-}
-
-func muxPWMPin(pin string) error {
+func muxPin(pin, cmd string) error {
 	path := fmt.Sprintf("/sys/devices/platform/ocp/ocp:%s_pinmux/state", pin)
 	fi, e := sysfs.OpenFile(path, os.O_WRONLY, 0666)
 	defer fi.Close()
 	if e != nil {
 		return e
 	}
-	_, e = fi.WriteString("pwm")
+	_, e = fi.WriteString(cmd)
 	return e
 }
