@@ -46,10 +46,6 @@ https://github.com/hybridgroup/gobot/issues
    - TMP006
    - VCNL4000
 
-## spi
-
-- add support for spidev.
-
 ## 1-wire
 
 - add support for 1-wire protocol.
