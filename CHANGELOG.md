@@ -1,3 +1,34 @@
+1.8.0
+---
+* **sysfs** 
+  * pause briefly to allow udev rules to apply when exporting PWMPin
+* **beaglebone** 
+  * correct uboot installation instructions
+  * add SPI support
+  * no more slots, add docs on configuring u-boot overlays
+  * handle gpio pinmux without relying on specific pre-existing setup
+* **pocketbeagle** 
+  * add support for PocketBeagle
+  * use universal io cape manager to initialize board setup
+  * improve docs for latest Debian OS
+* **build** 
+  * Add dep, change how tests run in CI
+  * update dependencies to latest GoCV version
+* **spi** 
+  * Add MCP3002, MCP3202, MCP3204, MCP3208, MCP3304, MCP3004, and MCP3008 A/D converter drivers
+  * adding initial support for APA102 LEDs, thanks to code sample from @rakyll
+  * extract shared SPI init code into spi package
+* **up2** 
+  * initial work on support for UP2 board
+* **gopigo3**
+  * fixed set/get bug with motor dps
+* **gpio**
+  * Adding stepper motor module
+* **firmata** 
+  * handle cases where out of sync data is read from serial port on first connecting
+* **i2c**
+  * Change init payload sequence within jhd1313m1 driver Start() func.
+
 1.7.1
 ---
 * **sprkplus**
