@@ -210,14 +210,14 @@ func TestAdaptorDigitalPinConcurrency(t *testing.T) {
 
 		a := initTestAdaptor()
 		var wg sync.WaitGroup
-		wg.Add(20)
 
 		for i := 0; i < 20; i++ {
+			wg.Add(1)
 			pinAsString := strconv.Itoa(i)
-			go func() {
+			go func(pin string) {
 				defer wg.Done()
-				a.DigitalPin(pinAsString, sysfs.IN)
-			}()
+				a.DigitalPin(pin, sysfs.IN)
+			}(pinAsString)
 		}
 
 		wg.Wait()
