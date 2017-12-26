@@ -57,6 +57,17 @@ const (
 	CollisionResponseSize = PacketHeaderSize + CollisionDataSize
 )
 
+type MotorModes uint8
+
+// MotorModes required for SetRawMotorValues command
+const (
+	Off MotorModes = iota
+	Forward
+	Reverse
+	Brake
+	Ignore
+)
+
 type packet struct {
 	header   []uint8
 	body     []uint8
@@ -193,6 +204,44 @@ func (b *Driver) SetRGB(r uint8, g uint8, bl uint8) {
 // Roll tells the Ollie to roll
 func (b *Driver) Roll(speed uint8, heading uint16) {
 	b.packetChannel <- b.craftPacket([]uint8{speed, uint8(heading >> 8), uint8(heading & 0xFF), 0x01}, 0x02, 0x30)
+}
+
+// Boost executes the boost macro from within the SSB which takes a
+// 1 byte parameter which is either 01h to begin boosting or 00h to stop.
+func (b *Driver) Boost(state bool) {
+	s := uint8(0x01)
+	if !state {
+		s = 0x00
+	}
+	b.packetChannel <- b.craftPacket([]uint8{s}, 0x02, 0x31)
+}
+
+// SetStabilization enables or disables the built-in auto stabilizing features of the Ollie
+func (b *Driver) SetStabilization(state bool) {
+	s := uint8(0x01)
+	if !state {
+		s = 0x00
+	}
+	b.packetChannel <- b.craftPacket([]uint8{s}, 0x02, 0x02)
+}
+
+// SetRotationRate allows you to control the rotation rate that Sphero will use to meet new
+// heading commands. A value of 255 jumps to the maximum (currently 400 degrees/sec).
+// A value of zero doesn't make much sense so it's interpreted as 1, the minimum.
+func (b *Driver) SetRotationRate(speed uint8) {
+	b.packetChannel <- b.craftPacket([]uint8{speed}, 0x02, 0x03)
+}
+
+// SetRawMotorValues allows you to take over one or both of the motor output values,
+// instead of having the stabilization system control them. Each motor (left and right)
+// requires a mode and a power value from 0-255
+func (b *Driver) SetRawMotorValues(lmode MotorModes, lpower uint8, rmode MotorModes, rpower uint8) {
+	b.packetChannel <- b.craftPacket([]uint8{uint8(lmode), lpower, uint8(rmode), rpower}, 0x02, 0x33)
+}
+
+// SetBackLEDOutput allows you to control the brightness of the back(tail) LED.
+func (b *Driver) SetBackLEDOutput(value uint8) {
+	b.packetChannel <- b.craftPacket([]uint8{value}, 0x02, 0x21)
 }
 
 // Stop tells the Ollie to stop
