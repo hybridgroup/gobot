@@ -21,6 +21,8 @@ const (
 	BH1750_ONE_TIME_LOW_RES_MODE      = 0x23
 )
 
+// BH1750Driver is a driver for the BH1750 digital Ambient Light Sensor IC for I²C bus interface.
+//
 type BH1750Driver struct {
 	name       string
 	connector  Connector
@@ -84,6 +86,7 @@ func (h *BH1750Driver) Start() (err error) {
 // Halt returns true if devices is halted successfully
 func (h *BH1750Driver) Halt() (err error) { return }
 
+// RawSensorData returns the raw value from the bh1750
 func (h *BH1750Driver) RawSensorData() (level int, err error) {
 
 	buf := []byte{0, 0}
@@ -100,6 +103,7 @@ func (h *BH1750Driver) RawSensorData() (level int, err error) {
 	return
 }
 
+// Lux returns the adjusted value from the bh1750
 func (h *BH1750Driver) Lux() (lux int, err error) {
 
 	lux, err = h.RawSensorData()
