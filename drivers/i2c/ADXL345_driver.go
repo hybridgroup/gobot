@@ -67,6 +67,12 @@ const (
 	ADXL345_REG_FIFO_STATUS    = 0x39 // R,     00000000,   FIFO status
 )
 
+// ADXL345Driver is the gobot driver for the digital accelerometer ADXL345
+//
+// Datasheet EN: http://www.analog.com/media/en/technical-documentation/data-sheets/ADXL345.pdf
+// Datasheet JP: http://www.analog.com/media/jp/technical-documentation/data-sheets/ADXL345_jp.pdf
+//
+// Ported from the Arduino driver https://github.com/jakalada/Arduino-ADXL345
 type ADXL345Driver struct {
 	name       string
 	connector  Connector
@@ -83,25 +89,25 @@ type ADXL345Driver struct {
 }
 
 type adxl345PowerCtl struct {
-	Link      uint8
-	AutoSleep uint8
-	Measure   uint8
-	Sleep     uint8
-	WakeUp    uint8
+	link      uint8
+	autoSleep uint8
+	measure   uint8
+	sleep     uint8
+	wakeUp    uint8
 }
 
 type adxl345DataFormat struct {
-	SelfTest  uint8
-	SPI       uint8
-	IntInvert uint8
-	FullRes   uint8
-	Justify   uint8
-	Range     uint8
+	selfTest    uint8
+	spi         uint8
+	intInvert   uint8
+	fullRes     uint8
+	justify     uint8
+	sensorRange uint8
 }
 
 type adxl345BwRate struct {
-	LowPower uint8
-	Rate     uint8
+	lowPower uint8
+	rate     uint8
 }
 
 // NewADXL345Driver creates a new driver with specified i2c interface
@@ -117,14 +123,14 @@ func NewADXL345Driver(a Connector, options ...func(Config)) *ADXL345Driver {
 		name:      gobot.DefaultName("ADXL345"),
 		connector: a,
 		powerCtl: adxl345PowerCtl{
-			Measure: 1,
+			measure: 1,
 		},
 		dataFormat: adxl345DataFormat{
-			Range: ADXL345_RANGE_2G,
+			sensorRange: ADXL345_RANGE_2G,
 		},
 		bwRate: adxl345BwRate{
-			LowPower: 1,
-			Rate:     ADXL345_RATE_100HZ,
+			lowPower: 1,
+			rate:     ADXL345_RATE_100HZ,
 		},
 		Config: NewConfig(),
 	}
@@ -173,7 +179,11 @@ func (h *ADXL345Driver) Start() (err error) {
 
 // Stop adxl345
 func (h *ADXL345Driver) Stop() (err error) {
-	if _, err := h.connection.Write([]byte{ADXL345_REG_POWER_CTL, 0}); err != nil {
+	h.powerCtl.measure = 0
+	if h.connection == nil {
+		return errors.New("connection not available")
+	}
+	if _, err := h.connection.Write([]byte{ADXL345_REG_POWER_CTL, h.powerCtl.toByte()}); err != nil {
 		return err
 	}
 
@@ -187,15 +197,15 @@ func (h *ADXL345Driver) Halt() (err error) {
 }
 
 // XYZ returns the adjusted x, y and z axis from the adxl345
-func (h *ADXL345Driver) XYZ() (x float64, y float64, z float64) {
-	h.update()
-	return h.x, h.y, h.z
+func (h *ADXL345Driver) XYZ() (float64, float64, float64, error) {
+	err := h.update()
+	return h.x, h.y, h.z, err
 }
 
 // XYZ returns the raw x,y and z axis from the adxl345
-func (h *ADXL345Driver) RawXYZ() (x int16, y int16, z int16) {
-	h.update()
-	return h.rawX, h.rawY, h.rawZ
+func (h *ADXL345Driver) RawXYZ() (int16, int16, int16, error) {
+	err := h.update()
+	return h.rawX, h.rawY, h.rawZ, err
 }
 
 // update the cached values for the axis to avoid errors if the connection is not available (polling too frequently)
@@ -224,9 +234,49 @@ func (h *ADXL345Driver) update() (err error) {
 	return
 }
 
+// SetRate change the current rate of the sensor
+func (h *ADXL345Driver) UseLowPower(power bool) (err error) {
+	if power {
+		h.bwRate.lowPower = 1
+	} else {
+		h.bwRate.lowPower = 0
+	}
+	if _, err := h.connection.Write([]byte{ADXL345_REG_BW_RATE, h.bwRate.toByte()}); err != nil {
+		return err
+	}
+	return
+}
+
+// SetRate change the current rate of the sensor
+func (h *ADXL345Driver) SetRate(rate byte) (err error) {
+	if rate <= ADXL345_RATE_3200HZ {
+		return errors.New("not a valid rate")
+	}
+	h.bwRate.rate = rate & 0x0F
+	if _, err := h.connection.Write([]byte{ADXL345_REG_BW_RATE, h.bwRate.toByte()}); err != nil {
+		return err
+	}
+	return
+}
+
+// SetRange change the current range of the sensor
+func (h *ADXL345Driver) SetRange(sensorRange byte) (err error) {
+	if sensorRange != ADXL345_RANGE_2G &&
+		sensorRange != ADXL345_RANGE_4G &&
+		sensorRange != ADXL345_RANGE_8G &&
+		sensorRange != ADXL345_RANGE_16G {
+		return errors.New("not a valid range")
+	}
+	h.dataFormat.sensorRange = sensorRange & 0x03
+	if _, err := h.connection.Write([]byte{ADXL345_REG_DATA_FORMAT, h.dataFormat.toByte()}); err != nil {
+		return err
+	}
+	return
+}
+
 // ConvertToSI adjusts the raw values from the adxl345 with the range configuration
 func (d *adxl345DataFormat) ConvertToSI(rawValue int16) float64 {
-	switch d.Range {
+	switch d.sensorRange {
 	case ADXL345_RANGE_2G:
 		return float64(rawValue) * 2 / 512
 	case ADXL345_RANGE_4G:
@@ -243,11 +293,11 @@ func (d *adxl345DataFormat) ConvertToSI(rawValue int16) float64 {
 // toByte returns a byte from the powerCtl configuration
 func (p *adxl345PowerCtl) toByte() (bits uint8) {
 	bits = 0x00
-	bits = bits | (p.Link << 5)
-	bits = bits | (p.AutoSleep << 4)
-	bits = bits | (p.Measure << 3)
-	bits = bits | (p.Sleep << 2)
-	bits = bits | p.WakeUp
+	bits = bits | (p.link << 5)
+	bits = bits | (p.autoSleep << 4)
+	bits = bits | (p.measure << 3)
+	bits = bits | (p.sleep << 2)
+	bits = bits | p.wakeUp
 
 	return bits
 }
@@ -255,12 +305,12 @@ func (p *adxl345PowerCtl) toByte() (bits uint8) {
 // toByte returns a byte from the dataFormat configuration
 func (d *adxl345DataFormat) toByte() (bits uint8) {
 	bits = 0x00
-	bits = bits | (d.SelfTest << 7)
-	bits = bits | (d.SPI << 6)
-	bits = bits | (d.IntInvert << 5)
-	bits = bits | (d.FullRes << 3)
-	bits = bits | (d.Justify << 2)
-	bits = bits | d.Range
+	bits = bits | (d.selfTest << 7)
+	bits = bits | (d.spi << 6)
+	bits = bits | (d.intInvert << 5)
+	bits = bits | (d.fullRes << 3)
+	bits = bits | (d.justify << 2)
+	bits = bits | d.sensorRange
 
 	return bits
 }
@@ -268,8 +318,8 @@ func (d *adxl345DataFormat) toByte() (bits uint8) {
 // toByte returns a byte from the bwRate configuration
 func (b *adxl345BwRate) toByte() (bits uint8) {
 	bits = 0x00
-	bits = bits | (b.LowPower << 4)
-	bits = bits | b.Rate
+	bits = bits | (b.lowPower << 4)
+	bits = bits | b.rate
 
 	return bits
 }
