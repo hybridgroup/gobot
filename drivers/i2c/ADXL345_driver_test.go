@@ -146,3 +146,8 @@ func TestADXL345DriverRawXYZError(t *testing.T) {
 	gobottest.Assert(t, err, errors.New("read error"))
 }
 
+func TestADXL345DriverSetRange(t *testing.T) {
+	d := initTestADXL345Driver()
+	d.Start()
+	gobottest.Assert(t, d.SetRange(ADXL345_RANGE_16G), nil)
+}
