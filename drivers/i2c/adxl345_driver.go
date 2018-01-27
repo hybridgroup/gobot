@@ -88,6 +88,7 @@ type ADXL345Driver struct {
 	Config
 }
 
+// Internal structure for the power configuration
 type adxl345PowerCtl struct {
 	link      uint8
 	autoSleep uint8
@@ -96,6 +97,7 @@ type adxl345PowerCtl struct {
 	wakeUp    uint8
 }
 
+// Internal structure for the sensor's data format configuration
 type adxl345DataFormat struct {
 	selfTest    uint8
 	spi         uint8
@@ -105,6 +107,7 @@ type adxl345DataFormat struct {
 	sensorRange uint8
 }
 
+// Internal structure for the sampling rate configuration
 type adxl345BwRate struct {
 	lowPower uint8
 	rate     uint8
