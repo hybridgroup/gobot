@@ -12,12 +12,11 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"time"
 
 	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/i2c"
+	"gobot.io/x/gobot/drivers/gpio"
 	"gobot.io/x/gobot/platforms/firmata"
 )
 
@@ -38,7 +37,7 @@ func main() {
 	// Repeat and concat strings until long enough that with scroll it still shows text
 	const showText = "  HELLO WORLD    -    gobot.io    -    TM1638  "
 	text := showText
-	for ;len(text)-len(showText)<len(modules)*8; {
+	for len(text)-len(showText) < len(modules)*8 {
 		text += showText
 	}
 
