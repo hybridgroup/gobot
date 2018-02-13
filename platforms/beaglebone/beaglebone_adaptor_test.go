@@ -52,7 +52,7 @@ func TestBeagleboneAdaptor(t *testing.T) {
 	fs := sysfs.NewMockFilesystem([]string{
 		"/dev/i2c-2",
 		"/sys/devices/platform/bone_capemgr",
-		"/sys/devices/platform/ocp/ocp:P8_7_pinmux/state",
+		"/sys/devices/platform/ocp/ocp:P8_07_pinmux/state",
 		"/sys/devices/platform/ocp/ocp:P9_11_pinmux/state",
 		"/sys/devices/platform/ocp/ocp:P9_12_pinmux/state",
 		"/sys/devices/platform/ocp/ocp:P9_22_pinmux/state",
@@ -154,12 +154,12 @@ func TestBeagleboneAdaptor(t *testing.T) {
 	gobottest.Assert(t, err, errors.New("Not a valid pin"))
 
 	fs.Files["/sys/class/gpio/gpio66/value"].Contents = "1"
-	i, err = a.DigitalRead("P8_7")
+	i, err = a.DigitalRead("P8_07")
 	gobottest.Assert(t, i, 1)
 	gobottest.Assert(t, err, nil)
 
 	fs.WithReadError = true
-	_, err = a.DigitalRead("P8_7")
+	_, err = a.DigitalRead("P8_07")
 	gobottest.Assert(t, err, errors.New("read error"))
 	fs.WithReadError = false
 
@@ -214,7 +214,6 @@ func TestBeagleboneAnalogReadFileError(t *testing.T) {
 
 func TestBeagleboneDigitalPinDirectionFileError(t *testing.T) {
 	fs := sysfs.NewMockFilesystem([]string{
-		"/sys/devices/platform/bone_capemgr/slots",
 		"/sys/class/gpio/export",
 		"/sys/class/gpio/gpio60/value",
 		"/sys/devices/platform/ocp/ocp:P9_12_pinmux/state",
@@ -232,7 +231,6 @@ func TestBeagleboneDigitalPinDirectionFileError(t *testing.T) {
 
 func TestBeagleboneDigitalPinFinalizeFileError(t *testing.T) {
 	fs := sysfs.NewMockFilesystem([]string{
-		"/sys/devices/platform/bone_capemgr/slots",
 		"/sys/class/gpio/export",
 		"/sys/class/gpio/gpio60/value",
 		"/sys/class/gpio/gpio60/direction",

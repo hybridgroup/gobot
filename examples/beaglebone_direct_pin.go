@@ -15,7 +15,7 @@ import (
 func main() {
 	beagleboneAdaptor := beaglebone.NewAdaptor()
 	led := gpio.NewDirectPinDriver(beagleboneAdaptor, "P8_10")
-	button := gpio.NewDirectPinDriver(beagleboneAdaptor, "P8_9")
+	button := gpio.NewDirectPinDriver(beagleboneAdaptor, "P8_09")
 
 	work := func() {
 		gobot.Every(500*time.Millisecond, func() {

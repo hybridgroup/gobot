@@ -73,7 +73,7 @@ import (
 
 func main() {
 	beagleboneAdaptor := beaglebone.NewPocketBeagleAdaptor()
-	led := gpio.NewLedDriver(beagleboneAdaptor, "P1_2")
+	led := gpio.NewLedDriver(beagleboneAdaptor, "P1_02")
 
 	work := func() {
 		gobot.Every(1*time.Second, func() {
@@ -114,7 +114,7 @@ You must also configure hardware settings as described below.
 
 ### Updating your board to the latest OS
 
-We recommend updating your BeagleBone to the latest Debian OS. It is very easy to do this using the Etcher (https://etcher.io/) utility program.
+We recommend using your BeagleBone with the latest Debian OS. It is very easy to do this using the Etcher (https://etcher.io/) utility program.
 
 First, download the latest BeagleBone OS from http://beagleboard.org/latest-images
 
@@ -134,29 +134,16 @@ http://beagleboard.org/getting-started
 
 ### Configure hardware settings
 
-In order to enable the various hardware devices on your BeagleBone or PocketBeagle, you need to configure a special file named `/boot/uEnv.txt`.
+Thanks to the BeagleBone team, the new "U-Boot Overlays" system for enabling hardware and the "cape-universal", the latest Debian OS should "just work" with any GPIO, PWM, I2C, or SPI pins.
 
-This file controls all of the different hardware options used at startup time, so you can enable or disable features based on your specific needs. You only need to do this once, and then the settings will apply each time you start up your BeagleBone.
+If you want to dig in and learn more about this check out:
 
-First connect to the BeagleBone using ssh:
+https://elinux.org/Beagleboard:BeagleBoneBlack_Debian#U-Boot_Overlays
 
-```
-ssh debian@192.168.7.2
-```
+### Upgrading from an older version
 
-Once you are connected to the BeagleBone, edit the /boot/uEnv.txt file like this:
+Please note that if you are upgrading a board that has already run from an older version of Debian OS, you might need to clear out your older eMMC bootloader, otherwise the new U-Boot Overlays in the newer U-Boot may not get enabled. If so, login using SSH and run the following command on your BeagleBone board:
 
-```
-sudo nano /boot/uEnv.txt
-```
+	sudo dd if=/dev/zero of=/dev/mmcblk1 count=1 seek=1 bs=128k
 
-To enable GPIO, PWM, I2C, and SPI, modify the `##Example v4.1.x` section to add a line to enable the cape manager:
-
-```
-##Example v4.1.x
-cape_enable=bone_capemgr.enable_partno=cape-universaln,BB-ADC
-```
-
-Save the file, then reboot your BeagleBone.
-
-You will now be able to run your Gobot programs to control the various hardware.
+Thanks to [@RobertCNelson](https://github.com/RobertCNelson) for the tip on the above.

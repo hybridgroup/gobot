@@ -1,11 +1,11 @@
 package beaglebone
 
 var bbbPinMap = map[string]int{
-	// P8_1 - P8_2 GND
-	// P8_3 - P8_6 EMCC
-	"P8_7":  66,
-	"P8_8":  67,
-	"P8_9":  69,
+	// P8_01 - P8_2 GND
+	// P8_03 - P8_6 EMCC
+	"P8_07": 66,
+	"P8_08": 67,
+	"P8_09": 69,
 	"P8_10": 68,
 	"P8_11": 45,
 	"P8_12": 44,

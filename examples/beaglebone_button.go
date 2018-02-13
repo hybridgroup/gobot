@@ -14,7 +14,7 @@ import (
 
 func main() {
 	beagleboneAdaptor := beaglebone.NewAdaptor()
-	button := gpio.NewButtonDriver(beagleboneAdaptor, "P8_9")
+	button := gpio.NewButtonDriver(beagleboneAdaptor, "P8_09")
 
 	work := func() {
 		button.On(gpio.ButtonPush, func(data interface{}) {
