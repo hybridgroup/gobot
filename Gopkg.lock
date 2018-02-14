@@ -27,14 +27,28 @@
 
 [[projects]]
   name = "github.com/eclipse/paho.mqtt.golang"
-  packages = [".","packets"]
+  packages = [
+    ".",
+    "packets"
+  ]
   revision = "aff15770515e3c57fc6109da73d42b0d46f7f483"
   version = "v1.1.0"
 
 [[projects]]
   branch = "master"
   name = "github.com/go-ble/ble"
-  packages = [".","darwin","linux","linux/adv","linux/att","linux/gatt","linux/hci","linux/hci/cmd","linux/hci/evt","linux/hci/socket"]
+  packages = [
+    ".",
+    "darwin",
+    "linux",
+    "linux/adv",
+    "linux/att",
+    "linux/gatt",
+    "linux/hci",
+    "linux/hci/cmd",
+    "linux/hci/evt",
+    "linux/hci/socket"
+  ]
   revision = "788214691384e85e345bff9fd5eeb046f5983594"
 
 [[projects]]
@@ -52,7 +66,11 @@
 [[projects]]
   branch = "master"
   name = "github.com/hybridgroup/go-ardrone"
-  packages = ["client","client/commands","client/navdata"]
+  packages = [
+    "client",
+    "client/commands",
+    "client/navdata"
+  ]
   revision = "b9750d8d7b78f9638e5fdd899835e99d46b5a56c"
 
 [[projects]]
@@ -81,7 +99,10 @@
 
 [[projects]]
   name = "github.com/nats-io/go-nats"
-  packages = ["encoders/builtin","util"]
+  packages = [
+    "encoders/builtin",
+    "util"
+  ]
   revision = "29f9728a183bf3fa7e809e14edac00b33be72088"
   version = "v1.3.0"
 
@@ -136,36 +157,48 @@
 [[projects]]
   branch = "master"
   name = "go.bug.st/serial.v1"
-  packages = [".","unixutils"]
+  packages = [
+    ".",
+    "unixutils"
+  ]
   revision = "eae1344f9f90101f887b08d13391c34399f97873"
 
 [[projects]]
   name = "gocv.io/x/gocv"
   packages = ["."]
-  revision = "be25d727bf4f5c0b25e5846da1e3c8f7a3c010df"
-  version = "v0.7.0"
+  revision = "65d6ebdd323af342cc48ac0d146ef7ad16b33fbc"
+  version = "v0.9.0"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/exp"
-  packages = ["io/spi","io/spi/driver"]
+  packages = [
+    "io/spi",
+    "io/spi/driver"
+  ]
   revision = "be09b602c40b1028d91bf805b38a6f54741fc34d"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/net"
-  packages = ["proxy","websocket"]
+  packages = [
+    "proxy",
+    "websocket"
+  ]
   revision = "01c190206fbdffa42f334f4b2bf2220f50e64920"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
-  packages = ["unix","windows"]
+  packages = [
+    "unix",
+    "windows"
+  ]
   revision = "8eb05f94d449fdf134ec24630ce69ada5b469c1c"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "10fd686f55a97e596994bbdc37a9a49484b94e5f2affbbc089c8851356520859"
+  inputs-digest = "47c663dbf541bbde363dde0ec70250c47226f608d6bdd9f4a64a6bc01faeea52"
   solver-name = "gps-cdcl"
   solver-version = 1
