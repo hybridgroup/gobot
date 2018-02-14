@@ -1,3 +1,30 @@
+1.9.0
+---
+* **beaglebone**
+  * update pin naming, docs, and examples for the latest Debian OS releases
+* **opencv**
+  * update build settings needed to build OpenCV/GoCV as part of test suite
+  * deps for latest GoCV v0.9.0
+* **build**
+  * update Travis build to use very latest Go versions
+* **docs**
+  * add references to new drivers for ADXL345, BH1750, and TM1638.
+  * improve docs for installation and use of OpenCV/GoCV from Gobot
+  * update copyright date to 2018
+* **gpio**
+  * Initial support for TM1638 modules
+* **i2c**
+  * Added basic driver for BH1750 (light sensor), board GY-302
+  * support for accel ADXL345
+* **bb8/ollie/sprkplus**
+  * add Boost command
+  * add Set Back LED Output command
+  * add Set Raw Motor Values command
+  * add Set Rotation Rate command
+  * add Set Stabilization command
+* **test** 
+  * Refactor TestAdaptorDigitalPinConcurrency test
+
 1.8.0
 ---
 * **sysfs** 

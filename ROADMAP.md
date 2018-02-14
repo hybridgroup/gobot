@@ -36,7 +36,6 @@ https://github.com/hybridgroup/gobot/issues
 
 - ensure that SMBUS operations are working as expected.
 - add support for the following i2c devices:
-   - ADXL345
    - HMC5883L
    - LSM303DLHC
    - MAG3110
