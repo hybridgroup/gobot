@@ -11,21 +11,23 @@ go get -d -u gobot.io/x/gobot/...
 
 ## Hardware Support
 Gobot has a extensible system for connecting to hardware devices. The following GPIO devices are currently supported:
-  - Button
-  - Buzzer
-  - Direct Pin
-  - Grove Button
-  - Grove Buzzer
-  - Grove LED
-  - Grove Magnetic Switch
-  - Grove Relay
-  - Grove Touch Sensor
-  - LED
-  - Makey Button
-  - Motor
-  - Proximity Infra Red (PIR) Motion Sensor
-  - Relay
-  - RGB LED
-  - Servo
+	- Button
+	- Buzzer
+	- Direct Pin
+	- Grove Button
+	- Grove Buzzer
+	- Grove LED
+	- Grove Magnetic Switch
+	- Grove Relay
+	- Grove Touch Sensor
+	- LED
+	- Makey Button
+	- Motor
+	- Proximity Infra Red (PIR) Motion Sensor
+	- Relay
+	- RGB LED
+	- Servo
+	- Stepper Motor
+	- TM1638 LED Controller
 
 More drivers are coming soon...

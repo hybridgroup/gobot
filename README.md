@@ -243,6 +243,7 @@ a shared set of drivers provided using the `gobot/drivers/gpio` package:
 	- RGB LED
 	- Servo
 	- Stepper Motor
+	- TM1638 LED Controller
 
 Support for many devices that use Analog Input/Output (AIO) have
 a shared set of drivers provided using the `gobot/drivers/aio` package:
@@ -262,6 +263,8 @@ drivers provided using the `gobot/drivers/i2c` package:
 	- Adafruit Motor Hat
 	- ADS1015 Analog to Digital Converter
 	- ADS1115 Analog to Digital Converter
+	- ADXL345 Digital Accelerometer
+	- BH1750 Digital Luminosity/Lux/Light Sensor
 	- BlinkM LED
 	- BME280 Barometric Pressure/Temperature/Altitude/Humidity Sensor
 	- BMP180 Barometric Pressure/Temperature/Altitude Sensor
