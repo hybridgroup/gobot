@@ -6,39 +6,44 @@ For more info about OpenCV click [here](http://opencv.org/)
 
 ## How to Install
 
-This package requires OpenCV version 3.3 to be installed on your system.
+This package requires OpenCV version 3.4 be installed on your system, along with GoCV, which is the Go programming language wrapper used by Gobot. The best way is to follow the installation instructions on the GoCV website at [https://gocv.io](https://gocv.io).
 
-### OSX
+### macOS
 
-To install OpenCV on OSX using Homebrew:
+To install on macOS follow the instructions here:
 
-```
-$ brew install opencv
-```
+https://gocv.io/getting-started/macos/
 
 ### Ubuntu
 
-To install OpenCV on Ubuntu 14.04:
+To install on Ubuntu follow the instructions here:
 
-```
-$ sudo apt-get install libopencv-dev
-```
-
-Or, follow the official [OpenCV installation guide](http://docs.opencv.org/doc/tutorials/introduction/linux_install/linux_install.html)
+https://gocv.io/getting-started/linux/
 
 ### Windows
 
-Follow the official [OpenCV installation guide](http://docs.opencv.org/doc/tutorials/introduction/windows_install/windows_install.html#windows-installation)
+To install on Windows follow the instructions here:
+
+https://gocv.io/getting-started/windows/
 
 
-Now you can install the package with
+Now you can install the Gobot package itself with
+
 ```
 go get -d -u gobot.io/x/gobot/...
 ```
 
 ## How to Use
 
-Example using the camera.
+When you run code that uses OpenCV, you must setup some environment variables first. The best way to do this, is to first run the `env.sh` script that comes with GoCV, like this:
+
+```
+source $GOPATH/src/gocv.io/x/gocv/env.sh
+```
+
+Once you have run this script you can use `go run` or `go build` on your Gobot code that uses OpenCV as you normally would.
+
+Here is an example using the camera:
 
 ```go
 package main
