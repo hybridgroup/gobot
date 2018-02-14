@@ -12,7 +12,7 @@ echo $GO_VERSION
 FAIL_PACKAGES=()
 
 # OpenCV components to link in CGO compile
-OPENCV_LDFLAGS="-lopencv_core -lopencv_videoio -lopencv_imgproc -lopencv_highgui -lopencv_imgcodecs -lopencv_objdetect -lopencv_video -lopencv_features2d -lopencv_face -lopencv_xfeatures2d"
+OPENCV_LDFLAGS="-lopencv_core -lopencv_face -lopencv_videoio -lopencv_imgproc -lopencv_highgui -lopencv_imgcodecs -lopencv_objdetect -lopencv_features2d -lopencv_video -lopencv_dnn -lopencv_xfeatures2d"
 
 # Use $HOME on Travis
 # Use /usr/local on local
