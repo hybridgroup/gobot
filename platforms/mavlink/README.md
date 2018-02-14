@@ -10,7 +10,7 @@ for point to point links, and UDP is useful for where you have
 multiple simultaneous clients such as the robot and
 [QGroundControl](http://qgroundcontrol.com/).
 
-As at 2017-04, this package supports Mavlink 1.0 only.  If the robot
+As at 2018-04, this package supports Mavlink 1.0 only.  If the robot
 doesn't receiving data then check that the other devices are
 configured to send version 1.0 frames.
 

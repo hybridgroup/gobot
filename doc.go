@@ -1,4 +1,4 @@
-// Copyright 2014-2017 The Hybrid Group. All rights reserved.
+// Copyright 2014-2018 The Hybrid Group. All rights reserved.
 
 /*
 Package gobot is the primary entrypoint for Gobot (http://gobot.io), a framework for robotics, physical computing, and the Internet of Things written using the Go programming language .
@@ -128,6 +128,6 @@ Finally, you can use Master Gobot to add the complete Gobot API or control swarm
     	master.Start()
     }
 
-Copyright (c) 2013-2017 The Hybrid Group. Licensed under the Apache 2.0 license.
+Copyright (c) 2013-2018 The Hybrid Group. Licensed under the Apache 2.0 license.
 */
 package gobot // import "gobot.io/x/gobot"
