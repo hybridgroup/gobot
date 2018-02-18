@@ -152,7 +152,7 @@ func (b *Driver) adaptor() ble.BLEConnector {
 
 // Start tells driver to get ready to do work
 func (b *Driver) Start() (err error) {
-	b.adaptor().WithoutReponses(true)
+	b.adaptor().WithoutResponses(true)
 	b.Init()
 	b.FlatTrim()
 	b.StartPcmd()
