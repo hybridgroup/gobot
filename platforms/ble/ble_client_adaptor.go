@@ -28,7 +28,7 @@ type BLEConnector interface {
 	ReadCharacteristic(string) ([]byte, error)
 	WriteCharacteristic(string, []byte) error
 	Subscribe(string, func([]byte, error)) error
-	WithoutReponses(bool)
+	WithoutResponses(bool)
 }
 
 // ClientAdaptor represents a Client Connection to a BLE Peripheral
@@ -42,19 +42,19 @@ type ClientAdaptor struct {
 	client  blelib.Client
 	profile *blelib.Profile
 
-	connected       bool
-	ready           chan struct{}
-	withoutReponses bool
+	connected        bool
+	ready            chan struct{}
+	withoutResponses bool
 }
 
 // NewClientAdaptor returns a new ClientAdaptor given an address or peripheral name
 func NewClientAdaptor(address string) *ClientAdaptor {
 	return &ClientAdaptor{
-		name:            gobot.DefaultName("BLEClient"),
-		address:         address,
-		DeviceName:      "default",
-		connected:       false,
-		withoutReponses: false,
+		name:             gobot.DefaultName("BLEClient"),
+		address:          address,
+		DeviceName:       "default",
+		connected:        false,
+		withoutResponses: false,
 	}
 }
 
@@ -67,9 +67,9 @@ func (b *ClientAdaptor) SetName(n string) { b.name = n }
 // Address returns the Bluetooth LE address for the adaptor
 func (b *ClientAdaptor) Address() string { return b.address }
 
-// WithoutReponses sets if the adaptor should expect responses after
+// WithoutResponses sets if the adaptor should expect responses after
 // writing characteristics for this device
-func (b *ClientAdaptor) WithoutReponses(use bool) { b.withoutReponses = use }
+func (b *ClientAdaptor) WithoutResponses(use bool) { b.withoutResponses = use }
 
 // Connect initiates a connection to the BLE peripheral. Returns true on successful connection.
 func (b *ClientAdaptor) Connect() (err error) {
@@ -152,7 +152,7 @@ func (b *ClientAdaptor) WriteCharacteristic(cUUID string, data []byte) (err erro
 	uuid, _ := blelib.Parse(cUUID)
 
 	if u := b.profile.Find(blelib.NewCharacteristic(uuid)); u != nil {
-		err = b.client.WriteCharacteristic(u.(*blelib.Characteristic), data, b.withoutReponses)
+		err = b.client.WriteCharacteristic(u.(*blelib.Characteristic), data, b.withoutResponses)
 	}
 
 	return
