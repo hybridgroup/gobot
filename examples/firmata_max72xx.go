@@ -29,7 +29,7 @@ func main() {
 	firmataAdaptor := firmata.NewAdaptor(os.Args[1])
 	max := gpio.NewMAX72xxDriver(firmataAdaptor, "11", "10", "9", 4)
 
-	var row byte = 1
+	var digit byte = 1 // digit address goes from 0x01 (MAX72xxDigit0) to 0x08 (MAX72xxDigit8)
 	var bits byte = 1
 	var module uint
 	count := 0
@@ -37,16 +37,16 @@ func main() {
 	work := func() {
 		gobot.Every(100*time.Millisecond, func() {
 			max.ClearAll()
-			max.One(module, row, bits)
+			max.One(module, digit, bits)
 			bits = bits << 1
 
 			count++
 			if count > 7 {
 				count = 0
-				row++
+				digit++
 				bits = 1
-				if row > 8 {
-					row = 1
+				if digit > 8 {
+					digit = 1
 					module++
 					if module >= 4 {
 						module = 0

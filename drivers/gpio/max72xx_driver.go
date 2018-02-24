@@ -5,6 +5,15 @@ import (
 )
 
 const (
+	MAX72xxDigit0  = 0x01
+	MAX72xxDigit1  = 0x02
+	MAX72xxDigit2  = 0x03
+	MAX72xxDigit3  = 0x04
+	MAX72xxDigit4  = 0x05
+	MAX72xxDigit5  = 0x06
+	MAX72xxDigit6  = 0x07
+	MAX72xxDigit7  = 0x08
+
 	MAX72xxDecodeMode  = 0x09
 	MAX72xxIntensity   = 0x0a
 	MAX72xxScanLimit   = 0x0b
