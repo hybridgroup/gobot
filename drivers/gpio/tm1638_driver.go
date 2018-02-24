@@ -33,7 +33,7 @@ const (
 // Ported from the Arduino driver https://github.com/rjbatista/tm1638-library
 
 type TM1638Driver struct {
-	pintClock  *DirectPinDriver
+	pinClock  *DirectPinDriver
 	pinData    *DirectPinDriver
 	pinStrobe  *DirectPinDriver
 	fonts      map[string]byte
@@ -46,7 +46,7 @@ type TM1638Driver struct {
 func NewTM1638Driver(a gobot.Connection, clockPin string, dataPin string, strobePin string) *TM1638Driver {
 	t := &TM1638Driver{
 		name:       gobot.DefaultName("TM1638"),
-		pintClock:  NewDirectPinDriver(a, clockPin),
+		pinClock:  NewDirectPinDriver(a, clockPin),
 		pinData:    NewDirectPinDriver(a, dataPin),
 		pinStrobe:  NewDirectPinDriver(a, strobePin),
 		fonts:      NewTM1638Fonts(),
@@ -63,7 +63,7 @@ func NewTM1638Driver(a gobot.Connection, clockPin string, dataPin string, strobe
 func (t *TM1638Driver) Start() (err error) {
 
 	t.pinStrobe.On()
-	t.pintClock.On()
+	t.pinClock.On()
 
 	t.sendCommand(TM1638DataCmd)
 	t.sendCommand(TM1638DispCtrl | 8 | 7)
@@ -102,7 +102,7 @@ func (t *TM1638Driver) sendCommand(cmd byte) {
 // send writes data on the module
 func (t *TM1638Driver) send(data byte) {
 	for i := 0; i < 8; i++ {
-		t.pintClock.Off()
+		t.pinClock.Off()
 
 		if (data & 1) > 0 {
 			t.pinData.On()
@@ -111,7 +111,7 @@ func (t *TM1638Driver) send(data byte) {
 		}
 		data >>= 1
 
-		t.pintClock.On()
+		t.pinClock.On()
 	}
 }
 
