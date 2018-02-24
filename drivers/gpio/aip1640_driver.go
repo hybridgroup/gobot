@@ -21,7 +21,7 @@ const (
 //
 // Library ported from: https://github.com/wemos/WEMOS_Matrix_LED_Shield_Arduino_Library
 type AIP1640Driver struct {
-	pintClock  *DirectPinDriver
+	pinClock  *DirectPinDriver
 	pinData    *DirectPinDriver
 	name       string
 	intensity  byte
@@ -34,7 +34,7 @@ type AIP1640Driver struct {
 func NewAIP1640Driver(a gobot.Connection, clockPin string, dataPin string) *AIP1640Driver {
 	t := &AIP1640Driver{
 		name:       gobot.DefaultName("AIP1640Driver"),
-		pintClock:  NewDirectPinDriver(a, clockPin),
+		pinClock:  NewDirectPinDriver(a, clockPin),
 		pinData:    NewDirectPinDriver(a, dataPin),
 		intensity:  7,
 		connection: a,
@@ -49,7 +49,7 @@ func NewAIP1640Driver(a gobot.Connection, clockPin string, dataPin string) *AIP1
 // Start initializes the tm1638, it uses a SPI-like communication protocol
 func (a *AIP1640Driver) Start() (err error) {
 	a.pinData.On()
-	a.pintClock.On()
+	a.pinClock.On()
 
 	return
 }
@@ -82,9 +82,9 @@ func (a *AIP1640Driver) Display() {
 		a.sendData(byte(i), a.buffer[i])
 
 		a.pinData.Off()
-		a.pintClock.Off()
+		a.pinClock.Off()
 		time.Sleep(1 * time.Millisecond)
-		a.pintClock.On()
+		a.pinClock.On()
 		a.pinData.On()
 	}
 
@@ -145,7 +145,7 @@ func (a *AIP1640Driver) sendData(address byte, data byte) {
 // send writes data on the module
 func (a *AIP1640Driver) send(data byte) {
 	for i := 0; i < 8; i++ {
-		a.pintClock.Off()
+		a.pinClock.Off()
 
 		if (data & 1) > 0 {
 			a.pinData.On()
@@ -154,6 +154,6 @@ func (a *AIP1640Driver) send(data byte) {
 		}
 		data >>= 1
 
-		a.pintClock.On()
+		a.pinClock.On()
 	}
 }
