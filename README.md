@@ -7,6 +7,7 @@
 [![Go Report Card](https://goreportcard.com/badge/hybridgroup/gobot)](https://goreportcard.com/report/hybridgroup/gobot)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/hybridgroup/gobot/blob/master/LICENSE.txt)
 [![GoDoc](https://godoc.org/gobot.io/x/gobot?status.svg)](https://godoc.org/gobot.io/x/gobot)
+[![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/hybridgroup/gobot)
 
 Gobot (http://gobot.io/) is a framework using the Go programming language (http://golang.org/) for robotics, physical computing, and the Internet of Things.
 
