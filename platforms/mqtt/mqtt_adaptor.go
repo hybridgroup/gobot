@@ -92,7 +92,7 @@ func (a *Adaptor) SetServerCert(val string) { a.serverCert = val }
 // ClientCert returns the MQTT client SSL cert file
 func (a *Adaptor) ClientCert() string { return a.clientCert }
 
-// SetClientCert sets the MQTT server SSL cert file
+// SetClientCert sets the MQTT client SSL cert file
 func (a *Adaptor) SetClientCert(val string) { a.clientCert = val }
 
 // ClientKey returns the MQTT client SSL key file
