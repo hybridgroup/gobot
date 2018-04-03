@@ -38,31 +38,33 @@ func (d *Driver) Connection() gobot.Connection { return nil }
 
 // Start starts the driver.
 func (d *Driver) Start() error {
-	rc, err := net.Dial("udp", d.reqAddr)
+	// start listener for responses from drone
+	udpAddr, err := net.ResolveUDPAddr("udp4", d.respAddr)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	d.respConn, err = net.ListenUDP("udp4", udpAddr)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	time.Sleep(1 * time.Second)
+	go func() {
+		for {
+			d.handleResponse()
+		}
+	}()
+
+	// get ready to make requests
+	rc, err := net.Dial("udp4", d.reqAddr)
 	if err != nil {
 		fmt.Println(err)
 		return err
 	}
 
 	d.reqConn = rc
-
-	// start listener for responses from drone
-	udpAddr, err := net.ResolveUDPAddr("udp", d.respAddr)
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
-
-	d.respConn, err = net.ListenUDP("udp", udpAddr)
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
-	go func() {
-		for {
-			d.handleResponse()
-		}
-	}()
 
 	// puts Tello drone into command mode, so we can send it further commands
 	err = d.sendCommand("command")
@@ -83,7 +85,7 @@ func (d *Driver) handleResponse() {
 	}
 
 	resp := string(buf[0:n])
-	fmt.Println(resp)
+	//fmt.Println(resp)
 	d.responses <- resp
 }
 
