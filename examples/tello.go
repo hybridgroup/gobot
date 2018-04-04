@@ -24,11 +24,19 @@ func main() {
 	drone := tello.NewDriver(os.Args[1])
 
 	work := func() {
+		battery, _ := drone.Battery()
+		fmt.Println("battery:", battery)
+
+		speed, _ := drone.Speed()
+		fmt.Println("speed:", speed)
+
 		fmt.Println("Flying")
 		drone.TakeOff()
 
 		gobot.After(5*time.Second, func() {
 			drone.Land()
+			ft, _ := drone.FlightTime()
+			fmt.Println("flight time:", ft)
 		})
 	}
 
