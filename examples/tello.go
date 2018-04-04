@@ -4,9 +4,9 @@
 
 /*
  How to run
- Pass the IP address for the ground station as first param:
+ Pass the UDP port to use for the ground station to receive responses from the drone as first param:
 
-	go run examples/tello.go "192.168.10.2:8888"
+	go run examples/tello.go "8888"
 */
 
 package main

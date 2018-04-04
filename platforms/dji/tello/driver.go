@@ -13,17 +13,17 @@ import (
 type Driver struct {
 	name      string
 	reqAddr   string
-	reqConn   net.Conn // UDP connection to send commands to the drone
-	respAddr  string
-	respConn  *net.UDPConn // UDP connection to receive responses from the drone
+	reqConn   *net.UDPConn // UDP connection to send/receive drone commands
+	respPort  string
 	responses chan string
 }
 
-// NewDriver creates a driver for the Tello drone
-func NewDriver(respAddr string) *Driver {
+// NewDriver creates a driver for the Tello drone. Pass in the UDP port to use for the responses
+// from the drone.
+func NewDriver(port string) *Driver {
 	return &Driver{name: gobot.DefaultName("Tello"),
 		reqAddr:   "192.168.10.1:8889",
-		respAddr:  respAddr,
+		respPort:  port,
 		responses: make(chan string)}
 }
 
@@ -38,33 +38,27 @@ func (d *Driver) Connection() gobot.Connection { return nil }
 
 // Start starts the driver.
 func (d *Driver) Start() error {
-	// start listener for responses from drone
-	udpAddr, err := net.ResolveUDPAddr("udp4", d.respAddr)
+	reqAddr, err := net.ResolveUDPAddr("udp", d.reqAddr)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	respPort, err := net.ResolveUDPAddr("udp", ":"+d.respPort)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	d.reqConn, err = net.DialUDP("udp", respPort, reqAddr)
 	if err != nil {
 		fmt.Println(err)
 		return err
 	}
 
-	d.respConn, err = net.ListenUDP("udp4", udpAddr)
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
-	time.Sleep(1 * time.Second)
 	go func() {
 		for {
 			d.handleResponse()
 		}
 	}()
-
-	// get ready to make requests
-	rc, err := net.Dial("udp4", d.reqAddr)
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
-
-	d.reqConn = rc
 
 	// puts Tello drone into command mode, so we can send it further commands
 	err = d.sendCommand("command")
@@ -78,21 +72,19 @@ func (d *Driver) Start() error {
 
 func (d *Driver) handleResponse() {
 	var buf [256]byte
-	n, err := d.respConn.Read(buf[0:])
+	n, err := d.reqConn.Read(buf[0:])
 	if err != nil {
 		fmt.Println("Error on response")
 		return
 	}
 
 	resp := string(buf[0:n])
-	//fmt.Println(resp)
 	d.responses <- resp
 }
 
 // Halt stops the driver.
 func (d *Driver) Halt() (err error) {
 	d.reqConn.Close()
-	d.respConn.Close()
 	return
 }
 
