@@ -2,7 +2,7 @@
 
 This package contains the Gobot driver for the Ryze Tello drone, sold by DJI.
 
-For more information on this drone, go to:
+For more information on this drone, go to: https://www.ryzerobotics.com/tello
 
 ## How to Install
 
@@ -11,7 +11,10 @@ go get -d -u gobot.io/x/gobot/...
 ```
 
 ## How to Use
-- Connect to the drone's Wi-Fi network.
+
+Connect to the drone's Wi-Fi network from your computer. It will be named something like "TELLO-XXXXXX".
+
+Once you are connected you can run the Gobot code on your computer to control the drone.
 
 Here is a sample of how you initialize and use the driver:
 
@@ -27,7 +30,7 @@ import (
 )
 
 func main() {
-	drone := tello.NewDriver("192.168.10.2:8888")
+	drone := tello.NewDriver("8888")
 
 	work := func() {
 		drone.TakeOff()
