@@ -1,6 +1,8 @@
 package tello
 
 import (
+	"bytes"
+	"encoding/binary"
 	"errors"
 	"fmt"
 	"net"
@@ -10,6 +12,47 @@ import (
 
 	"gobot.io/x/gobot"
 )
+
+// FlightData returned by the Tello
+type FlightData struct {
+	batteryLow               int16
+	batteryLower             int16
+	batteryPercentage        int8
+	batteryState             int16
+	cameraState              int8
+	downVisualState          int16
+	droneBatteryLeft         int16
+	droneFlyTimeLeft         int16
+	droneHover               int16
+	eMOpen                   int16
+	eMSky                    int16
+	eMgroud                  int16
+	eastSpeed                int16
+	electricalMachineryState int16
+	factoryMode              int16
+	flyMode                  int8
+	flySpeed                 int16
+	flyTime                  int16
+	frontIn                  int16
+	frontLSC                 int16
+	frontOut                 int16
+	gravityState             int16
+	groundSpeed              int16
+	height                   int16
+	imuCalibrationState      int8
+	imuState                 int16
+	lightStrength            int16
+	northSpeed               int16
+	outageRecording          int16
+	powerState               int16
+	pressureState            int16
+	smartVideoExitMode       int16
+	temperatureHeight        int16
+	throwFlyTimer            int8
+	wifiDisturb              int16
+	wifiStrength             int16
+	windState                int16
+}
 
 // Driver represents the DJI Tello drone
 type Driver struct {
@@ -65,22 +108,35 @@ func (d *Driver) Start() error {
 		}
 	}()
 
+	// starts notifications coming from drone
+	d.sendCommand("conn_req:\x96\x17")
+
 	// puts Tello drone into command mode, so we can send it further commands
-	err = d.sendCommand("command")
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
+	// err = d.sendCommand("command")
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return err
+	// }
 
 	return nil
 }
 
 func (d *Driver) handleResponse() error {
-	var buf [256]byte
+	var buf [2048]byte
 	n, err := d.reqConn.Read(buf[0:])
 	if err != nil {
 		fmt.Println(err)
 		return err
+	}
+
+	if buf[0] == 0xcc {
+		// parse binary packet
+		switch buf[5] {
+		case 0x56:
+			fd, _ := d.LoadFlightData(buf[9:])
+			fmt.Printf("%+v\n", fd)
+		}
+		return nil
 	}
 
 	resp := string(buf[0:n])
@@ -216,6 +272,11 @@ func (d *Driver) StopRecording() error {
 	return nil
 }
 
+// ExitCommand
+func (d *Driver) ExitCommand() error {
+	return d.sendCommand("tello?")
+}
+
 // Battery returns the current battery level in the drone as a percentage.
 func (d *Driver) Battery() (int, error) {
 	res, err := d.sendFunction("battery?")
@@ -242,4 +303,64 @@ func (d *Driver) Speed() (float64, error) {
 // SetSpeed sets the drone speed from 1-100 cm per second.
 func (d *Driver) SetSpeed(speed int) error {
 	return d.sendCommand(fmt.Sprintf("speed %d", speed))
+}
+
+// LoadFlightData from drone
+func (d *Driver) LoadFlightData(b []byte) (fd *FlightData, err error) {
+	buf := bytes.NewReader(b)
+	fd = &FlightData{}
+	var data byte
+
+	if buf.Len() < 24 {
+		err = errors.New("Invalid buffer length for flight data packet")
+		fmt.Println(err)
+		return
+	}
+
+	err = binary.Read(buf, binary.LittleEndian, &fd.height)
+	err = binary.Read(buf, binary.LittleEndian, &fd.northSpeed)
+	err = binary.Read(buf, binary.LittleEndian, &fd.eastSpeed)
+	err = binary.Read(buf, binary.LittleEndian, &fd.groundSpeed)
+	err = binary.Read(buf, binary.LittleEndian, &fd.flyTime)
+
+	err = binary.Read(buf, binary.LittleEndian, &data)
+	fd.imuState = int16(data >> 0 & 0x1)
+	fd.pressureState = int16(data >> 1 & 0x1)
+	fd.downVisualState = int16(data >> 2 & 0x1)
+	fd.powerState = int16(data >> 3 & 0x1)
+	fd.batteryState = int16(data >> 4 & 0x1)
+	fd.gravityState = int16(data >> 5 & 0x1)
+	fd.windState = int16(data >> 7 & 0x1)
+
+	err = binary.Read(buf, binary.LittleEndian, &fd.imuCalibrationState)
+	err = binary.Read(buf, binary.LittleEndian, &fd.batteryPercentage)
+	err = binary.Read(buf, binary.LittleEndian, &fd.droneFlyTimeLeft)
+	err = binary.Read(buf, binary.LittleEndian, &fd.droneBatteryLeft)
+
+	err = binary.Read(buf, binary.LittleEndian, &data)
+	fd.eMSky = int16(data >> 0 & 0x1)
+	fd.eMgroud = int16(data >> 1 & 0x1)
+	fd.eMOpen = int16(data >> 2 & 0x1)
+	fd.droneHover = int16(data >> 3 & 0x1)
+	fd.outageRecording = int16(data >> 4 & 0x1)
+	fd.batteryLow = int16(data >> 5 & 0x1)
+	fd.batteryLower = int16(data >> 6 & 0x1)
+	fd.factoryMode = int16(data >> 7 & 0x1)
+
+	err = binary.Read(buf, binary.LittleEndian, &fd.flyMode)
+	err = binary.Read(buf, binary.LittleEndian, &fd.throwFlyTimer)
+	err = binary.Read(buf, binary.LittleEndian, &fd.cameraState)
+
+	err = binary.Read(buf, binary.LittleEndian, &data)
+	fd.electricalMachineryState = int16(data & 0xff)
+
+	err = binary.Read(buf, binary.LittleEndian, &data)
+	fd.frontIn = int16(data >> 0 & 0x1)
+	fd.frontOut = int16(data >> 1 & 0x1)
+	fd.frontLSC = int16(data >> 2 & 0x1)
+
+	err = binary.Read(buf, binary.LittleEndian, &data)
+	fd.temperatureHeight = int16(data >> 0 & 0x1)
+
+	return
 }
