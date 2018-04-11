@@ -26,7 +26,8 @@ type Adaptor struct {
 	i2cBuses           [2]i2c.I2cDevice
 	mutex              *sync.Mutex
 	spiDefaultBus      int
-	spiBuses           [2]spi.SPIDevice
+	spiDefaultChip     int
+	spiBuses           [2]spi.Device
 	spiDefaultMode     int
 	spiDefaultMaxSpeed int64
 }
@@ -229,7 +230,7 @@ func (c *Adaptor) GetDefaultBus() int {
 
 // GetSpiConnection returns an spi connection to a device on a specified bus.
 // Valid bus number is [0..1] which corresponds to /dev/spidev0.0 through /dev/spidev0.1.
-func (c *Adaptor) GetSpiConnection(busNum, mode int, maxSpeed int64) (connection spi.Connection, err error) {
+func (c *Adaptor) GetSpiConnection(busNum, chipNum, mode, bits int, maxSpeed int64) (connection spi.Device, err error) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
@@ -238,10 +239,10 @@ func (c *Adaptor) GetSpiConnection(busNum, mode int, maxSpeed int64) (connection
 	}
 
 	if c.spiBuses[busNum] == nil {
-		c.spiBuses[busNum], err = spi.GetSpiBus(busNum, mode, maxSpeed)
+		c.spiBuses[busNum], err = spi.GetSpiConnection(busNum, chipNum, mode, bits, maxSpeed)
 	}
 
-	return spi.NewConnection(c.spiBuses[busNum]), err
+	return c.spiBuses[busNum], err
 }
 
 // GetSpiDefaultBus returns the default spi bus for this platform.
@@ -249,12 +250,22 @@ func (c *Adaptor) GetSpiDefaultBus() int {
 	return c.spiDefaultBus
 }
 
+// GetSpiDefaultChip returns the default spi chip for this platform.
+func (c *Adaptor) GetSpiDefaultChip() int {
+	return c.spiDefaultChip
+}
+
 // GetSpiDefaultMode returns the default spi mode for this platform.
 func (c *Adaptor) GetSpiDefaultMode() int {
 	return c.spiDefaultMode
 }
 
-// GetSpiDefaultMaxSpeed returns the default spi bus for this platform.
+// GetSpiDefaultBits returns the default spi number of bits for this platform.
+func (c *Adaptor) GetSpiDefaultBits() int {
+	return 8
+}
+
+// GetSpiDefaultMaxSpeed returns the default spi max speed for this platform.
 func (c *Adaptor) GetSpiDefaultMaxSpeed() int64 {
 	return c.spiDefaultMaxSpeed
 }

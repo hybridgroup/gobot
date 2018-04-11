@@ -42,9 +42,11 @@ func (d *MCP3304Driver) Connection() gobot.Connection { return d.connection.(gob
 // Start initializes the driver.
 func (d *MCP3304Driver) Start() (err error) {
 	bus := d.connector.GetSpiDefaultBus()
+	chip := d.connector.GetSpiDefaultChip()
 	mode := d.connector.GetSpiDefaultMode()
+	bits := d.connector.GetSpiDefaultBits()
 	maxSpeed := d.connector.GetSpiDefaultMaxSpeed()
-	d.connection, err = d.connector.GetSpiConnection(bus, mode, maxSpeed)
+	d.connection, err = d.connector.GetSpiConnection(bus, chip, mode, bits, maxSpeed)
 	if err != nil {
 		return err
 	}

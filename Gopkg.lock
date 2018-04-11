@@ -171,15 +171,6 @@
 
 [[projects]]
   branch = "master"
-  name = "golang.org/x/exp"
-  packages = [
-    "io/spi",
-    "io/spi/driver"
-  ]
-  revision = "be09b602c40b1028d91bf805b38a6f54741fc34d"
-
-[[projects]]
-  branch = "master"
   name = "golang.org/x/net"
   packages = [
     "proxy",
@@ -196,9 +187,41 @@
   ]
   revision = "8eb05f94d449fdf134ec24630ce69ada5b469c1c"
 
+[[projects]]
+  branch = "master"
+  name = "periph.io/x/periph"
+  packages = [
+    ".",
+    "conn",
+    "conn/gpio",
+    "conn/gpio/gpioreg",
+    "conn/gpio/gpiostream",
+    "conn/i2c",
+    "conn/i2c/i2creg",
+    "conn/pin",
+    "conn/pin/pinreg",
+    "conn/spi",
+    "conn/spi/spireg",
+    "devices",
+    "host",
+    "host/allwinner",
+    "host/bcm283x",
+    "host/chip",
+    "host/cpu",
+    "host/distro",
+    "host/fs",
+    "host/odroidc1",
+    "host/pine64",
+    "host/pmem",
+    "host/rpi",
+    "host/sysfs",
+    "host/videocore"
+  ]
+  revision = "a8b45e63d61cc00328dfe54149cfe7abd7115a7f"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "47c663dbf541bbde363dde0ec70250c47226f608d6bdd9f4a64a6bc01faeea52"
+  inputs-digest = "3bcf2897d7ee15e9e4b2923907a9b6ebd412da4b3c00c7feea10267bb35c86f2"
   solver-name = "gps-cdcl"
   solver-version = 1

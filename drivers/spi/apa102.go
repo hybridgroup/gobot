@@ -42,9 +42,11 @@ func (d *APA102Driver) Connection() gobot.Connection { return d.connection.(gobo
 // Start initializes the driver.
 func (d *APA102Driver) Start() (err error) {
 	bus := d.connector.GetSpiDefaultBus()
+	chip := d.connector.GetSpiDefaultChip()
 	mode := d.connector.GetSpiDefaultMode()
+	bits := d.connector.GetSpiDefaultBits()
 	maxSpeed := d.connector.GetSpiDefaultMaxSpeed()
-	d.connection, err = d.connector.GetSpiConnection(bus, mode, maxSpeed)
+	d.connection, err = d.connector.GetSpiConnection(bus, chip, mode, bits, maxSpeed)
 	if err != nil {
 		return err
 	}

@@ -79,7 +79,7 @@
 
 [[constraint]]
   branch = "master"
-  name = "golang.org/x/exp"
+  name = "periph.io/x/periph"
 
 [[constraint]]
   branch = "master"

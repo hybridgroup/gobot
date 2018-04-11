@@ -191,11 +191,12 @@ func TestAdaptorSPI(t *testing.T) {
 	sysfs.SetFilesystem(fs)
 	sysfs.SetSyscall(&sysfs.MockSyscall{})
 
-	gobottest.Assert(t, a.GetSpiDefaultBus(), 1)
+	gobottest.Assert(t, a.GetSpiDefaultBus(), 0)
+	gobottest.Assert(t, a.GetSpiDefaultChip(), 0)
 	gobottest.Assert(t, a.GetSpiDefaultMode(), 0)
 	gobottest.Assert(t, a.GetSpiDefaultMaxSpeed(), int64(500000))
 
-	_, err := a.GetSpiConnection(10, 0, 500000)
+	_, err := a.GetSpiConnection(10, 0, 0, 8, 500000)
 	gobottest.Assert(t, err.Error(), "Bus number 10 out of range")
 
 	// TODO: test tx/rx here...

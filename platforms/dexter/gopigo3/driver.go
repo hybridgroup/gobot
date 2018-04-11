@@ -189,9 +189,11 @@ func (g *Driver) Halt() (err error) {
 // Start initializes the GoPiGo3
 func (g *Driver) Start() (err error) {
 	bus := g.connector.GetSpiDefaultBus()
+	chip := g.connector.GetSpiDefaultChip()
 	mode := g.connector.GetSpiDefaultMode()
+	bits := g.connector.GetSpiDefaultBits()
 	maxSpeed := g.connector.GetSpiDefaultMaxSpeed()
-	g.connection, err = g.connector.GetSpiConnection(bus, mode, maxSpeed)
+	g.connection, err = g.connector.GetSpiConnection(bus, chip, mode, bits, maxSpeed)
 	if err != nil {
 		return err
 	}

@@ -3,12 +3,10 @@ package gopigo3
 import (
 	"encoding/hex"
 	"testing"
-	"time"
 
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/drivers/spi"
 	"gobot.io/x/gobot/gobottest"
-	xspi "golang.org/x/exp/io/spi"
 )
 
 var _ gobot.Driver = (*Driver)(nil)
@@ -250,11 +248,15 @@ func TestDigitalWrite(t *testing.T) {
 
 type TestConnector struct{}
 
-func (ctr *TestConnector) GetSpiConnection(busNum, mode int, maxSpeed int64) (device spi.Connection, err error) {
-	return spi.NewConnection(&TestSpiDevice{}), nil
+func (ctr *TestConnector) GetSpiConnection(busNum, chipNum, mode, bits int, maxSpeed int64) (device spi.Device, err error) {
+	return TestSpiDevice{}, nil
 }
 
 func (ctr *TestConnector) GetSpiDefaultBus() int {
+	return 0
+}
+
+func (ctr *TestConnector) GetSpiDefaultChip() int {
 	return 0
 }
 
@@ -262,43 +264,23 @@ func (ctr *TestConnector) GetSpiDefaultMode() int {
 	return 0
 }
 
+func (ctr *TestConnector) GetSpiDefaultBits() int {
+	return 8
+}
+
 func (ctr *TestConnector) GetSpiDefaultMaxSpeed() int64 {
 	return 0
 }
 
 type TestSpiDevice struct {
-	bus spi.SPIDevice
+	bus spi.Device
 }
 
-func (c *TestSpiDevice) Close() error {
+func (c TestSpiDevice) Close() error {
 	return nil
 }
 
-func (c *TestSpiDevice) SetBitOrder(o xspi.Order) error {
-	return nil
-}
-
-func (c *TestSpiDevice) SetBitsPerWord(bits int) error {
-	return nil
-}
-
-func (c *TestSpiDevice) SetCSChange(leaveEnabled bool) error {
-	return nil
-}
-
-func (c *TestSpiDevice) SetDelay(t time.Duration) error {
-	return nil
-}
-
-func (c *TestSpiDevice) SetMaxSpeed(speed int) error {
-	return nil
-}
-
-func (c *TestSpiDevice) SetMode(mode xspi.Mode) error {
-	return nil
-}
-
-func (c *TestSpiDevice) Tx(w, r []byte) error {
+func (c TestSpiDevice) Tx(w, r []byte) error {
 	manName, _ := hex.DecodeString("ff0000a544657874657220496e6475737472696573000000")
 	boardName, _ := hex.DecodeString("ff0000a5476f5069476f3300000000000000000000000000")
 	hwVersion, _ := hex.DecodeString("ff0000a5002dcaab")

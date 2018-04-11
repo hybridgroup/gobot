@@ -251,9 +251,11 @@ func (s *SSD1306Driver) Connection() gobot.Connection { return s.connector.(gobo
 // Start sets up the needed connection, and initialized the device.
 func (s *SSD1306Driver) Start() (err error) {
 	bus := s.connector.GetSpiDefaultBus()
+	chip := s.connector.GetSpiDefaultChip()
 	mode := s.connector.GetSpiDefaultMode()
+	bits := s.connector.GetSpiDefaultBits()
 	maxSpeed := s.connector.GetSpiDefaultMaxSpeed()
-	s.connection, err = s.connector.GetSpiConnection(bus, mode, maxSpeed)
+	s.connection, err = s.connector.GetSpiConnection(bus, chip, mode, bits, maxSpeed)
 	if err != nil {
 		return err
 	}

@@ -1,6 +1,6 @@
 /*
 Package spi provides Gobot drivers for spi devices.
-Uses "golang.org/x/exp/io/spi" for spi
+Uses periph.io for spi
 Installing:
 	go get -d -u gobot.io/x/gobot
 For further information refer to spi README:
