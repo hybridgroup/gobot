@@ -15,6 +15,8 @@ type MCP3008Driver struct {
 	name       string
 	connector  Connector
 	connection Connection
+	Config
+	gobot.Commander
 }
 
 // NewMCP3008Driver creates a new Gobot Driver for MCP3008Driver A/D converter
@@ -22,10 +24,21 @@ type MCP3008Driver struct {
 // Params:
 //      a *Adaptor - the Adaptor to use with this Driver
 //
-func NewMCP3008Driver(a Connector) *MCP3008Driver {
+// Optional params:
+//      spi.WithBus(int):    	bus to use with this driver
+//     	spi.WithChip(int):    	chip to use with this driver
+//      spi.WithMode(int):    	mode to use with this driver
+//      spi.WithBits(int):    	number of bits to use with this driver
+//      spi.WithSpeed(int64):   speed in Hz to use with this driver
+//
+func NewMCP3008Driver(a Connector, options ...func(Config)) *MCP3008Driver {
 	d := &MCP3008Driver{
 		name:      gobot.DefaultName("MCP3008"),
 		connector: a,
+		Config:    NewConfig(),
+	}
+	for _, option := range options {
+		option(d)
 	}
 	return d
 }
@@ -41,11 +54,12 @@ func (d *MCP3008Driver) Connection() gobot.Connection { return d.connection.(gob
 
 // Start initializes the driver.
 func (d *MCP3008Driver) Start() (err error) {
-	bus := d.connector.GetSpiDefaultBus()
-	chip := d.connector.GetSpiDefaultChip()
-	mode := d.connector.GetSpiDefaultMode()
-	bits := d.connector.GetSpiDefaultBits()
-	maxSpeed := d.connector.GetSpiDefaultMaxSpeed()
+	bus := d.GetBusOrDefault(d.connector.GetSpiDefaultBus())
+	chip := d.GetChipOrDefault(d.connector.GetSpiDefaultChip())
+	mode := d.GetModeOrDefault(d.connector.GetSpiDefaultMode())
+	bits := d.GetBitsOrDefault(d.connector.GetSpiDefaultBits())
+	maxSpeed := d.GetSpeedOrDefault(d.connector.GetSpiDefaultMaxSpeed())
+
 	d.connection, err = d.connector.GetSpiConnection(bus, chip, mode, bits, maxSpeed)
 	if err != nil {
 		return err

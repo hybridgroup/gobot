@@ -30,6 +30,7 @@ type Adaptor struct {
 	i2cDefaultBus      int
 	i2cBuses           [2]i2c.I2cDevice
 	spiDefaultBus      int
+	spiDefaultChip     int
 	spiDevices         [2]spi.Device
 	spiDefaultMode     int
 	spiDefaultMaxSpeed int64
@@ -50,6 +51,7 @@ func NewAdaptor() *Adaptor {
 			version, _ := strconv.ParseInt("0x"+s[len(s)-1], 0, 64)
 			r.i2cDefaultBus = 1
 			r.spiDefaultBus = 0
+			r.spiDefaultChip = 0
 			r.spiDefaultMode = 0
 			r.spiDefaultMaxSpeed = 500000
 			if version <= 3 {
@@ -229,7 +231,7 @@ func (r *Adaptor) GetSpiDefaultBus() int {
 
 // GetSpiDefaultChip returns the default spi chip for this platform.
 func (r *Adaptor) GetSpiDefaultChip() int {
-	return 0
+	return r.spiDefaultChip
 }
 
 // GetSpiDefaultMode returns the default spi mode for this platform.

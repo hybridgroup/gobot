@@ -155,6 +155,7 @@ type Driver struct {
 	name       string
 	connector  spi.Connector
 	connection spi.Connection
+	spi.Config
 }
 
 // NewDriver creates a new Gobot Driver for the GoPiGo3 board.
@@ -162,10 +163,21 @@ type Driver struct {
 // Params:
 //      a *Adaptor - the Adaptor to use with this Driver
 //
-func NewDriver(a spi.Connector) *Driver {
+// Optional params:
+//      spi.WithBus(int):    	bus to use with this driver
+//     	spi.WithChip(int):    	chip to use with this driver
+//      spi.WithMode(int):    	mode to use with this driver
+//      spi.WithBits(int):    	number of bits to use with this driver
+//      spi.WithSpeed(int64):   speed in Hz to use with this driver
+//
+func NewDriver(a spi.Connector, options ...func(spi.Config)) *Driver {
 	g := &Driver{
 		name:      gobot.DefaultName("GoPiGo3"),
 		connector: a,
+		Config:    spi.NewConfig(),
+	}
+	for _, option := range options {
+		option(g)
 	}
 	return g
 }
@@ -188,11 +200,12 @@ func (g *Driver) Halt() (err error) {
 
 // Start initializes the GoPiGo3
 func (g *Driver) Start() (err error) {
-	bus := g.connector.GetSpiDefaultBus()
-	chip := g.connector.GetSpiDefaultChip()
-	mode := g.connector.GetSpiDefaultMode()
-	bits := g.connector.GetSpiDefaultBits()
-	maxSpeed := g.connector.GetSpiDefaultMaxSpeed()
+	bus := g.GetBusOrDefault(g.connector.GetSpiDefaultBus())
+	chip := g.GetChipOrDefault(g.connector.GetSpiDefaultChip())
+	mode := g.GetModeOrDefault(g.connector.GetSpiDefaultMode())
+	bits := g.GetBitsOrDefault(g.connector.GetSpiDefaultBits())
+	maxSpeed := g.GetSpeedOrDefault(g.connector.GetSpiDefaultMaxSpeed())
+
 	g.connection, err = g.connector.GetSpiConnection(bus, chip, mode, bits, maxSpeed)
 	if err != nil {
 		return err

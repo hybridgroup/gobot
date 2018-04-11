@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	// BusNotInitialized is the initial value for a bus
-	BusNotInitialized = -1
+	// NotInitialized is the initial value for a bus/chip
+	NotInitialized = -1
 )
 
 // Operations are the wrappers around the actual functions used by the SPI Device interface

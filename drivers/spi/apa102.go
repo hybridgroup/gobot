@@ -11,6 +11,8 @@ type APA102Driver struct {
 	name       string
 	connector  Connector
 	connection Connection
+	Config
+	gobot.Commander
 
 	vals []color.RGBA
 }
@@ -21,11 +23,22 @@ type APA102Driver struct {
 //      a *Adaptor - the Adaptor to use with this Driver
 //		count int - how many LEDs are in the array controlled by this driver
 //
-func NewAPA102Driver(a Connector, count int) *APA102Driver {
+// Optional params:
+//      spi.WithBus(int):    	bus to use with this driver
+//     	spi.WithChip(int):    	chip to use with this driver
+//      spi.WithMode(int):    	mode to use with this driver
+//      spi.WithBits(int):    	number of bits to use with this driver
+//      spi.WithSpeed(int64):   speed in Hz to use with this driver
+//
+func NewAPA102Driver(a Connector, count int, options ...func(Config)) *APA102Driver {
 	d := &APA102Driver{
 		name:      gobot.DefaultName("APA102"),
 		connector: a,
 		vals:      make([]color.RGBA, count),
+		Config:    NewConfig(),
+	}
+	for _, option := range options {
+		option(d)
 	}
 	return d
 }
@@ -41,11 +54,12 @@ func (d *APA102Driver) Connection() gobot.Connection { return d.connection.(gobo
 
 // Start initializes the driver.
 func (d *APA102Driver) Start() (err error) {
-	bus := d.connector.GetSpiDefaultBus()
-	chip := d.connector.GetSpiDefaultChip()
-	mode := d.connector.GetSpiDefaultMode()
-	bits := d.connector.GetSpiDefaultBits()
-	maxSpeed := d.connector.GetSpiDefaultMaxSpeed()
+	bus := d.GetBusOrDefault(d.connector.GetSpiDefaultBus())
+	chip := d.GetChipOrDefault(d.connector.GetSpiDefaultChip())
+	mode := d.GetModeOrDefault(d.connector.GetSpiDefaultMode())
+	bits := d.GetBitsOrDefault(d.connector.GetSpiDefaultBits())
+	maxSpeed := d.GetSpeedOrDefault(d.connector.GetSpiDefaultMaxSpeed())
+
 	d.connection, err = d.connector.GetSpiConnection(bus, chip, mode, bits, maxSpeed)
 	if err != nil {
 		return err

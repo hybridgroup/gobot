@@ -173,16 +173,19 @@ type SSD1306Driver struct {
 // NewSSD1306Driver creates a new SSD1306Driver.
 //
 // Params:
-//        conn Connector - the Adaptor to use with this Driver
+//      conn Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//        WithBus(int):    			bus to use with this driver
-//        WithAddress(int):    		address to use with this driver
-//        WithDisplayWidth(int): 	width of display (defaults to 128)
-//        WithDisplayHeight(int): 	height of display (defaults to 64)
-//        WithDCPin(string): gpio pin number connected to dc pin on display (defaults to "16")
-//        WithRstPin(string): gpio pin number connected to rst pin on display (defaults to "18")
-//        WithExternalVCC(bool): set to true if using external vcc (defaults to false)
+//      spi.WithBus(int):    		bus to use with this driver
+//     	spi.WithChip(int):    		chip to use with this driver
+//      spi.WithMode(int):    		mode to use with this driver
+//      spi.WithBits(int):    		number of bits to use with this driver
+//      spi.WithSpeed(int64):   	speed in Hz to use with this driver
+//      spi.WithDisplayWidth(int): 	width of display (defaults to 128)
+//      spi.WithDisplayHeight(int): height of display (defaults to 64)
+//      spi.WithDCPin(string): 		gpio pin number connected to dc pin on display (defaults to "16")
+//      spi.WithRstPin(string): 	gpio pin number connected to rst pin on display (defaults to "18")
+//      spi.WithExternalVCC(bool): 	set to true if using external vcc (defaults to false)
 //
 func NewSSD1306Driver(a gobot.Adaptor, options ...func(Config)) *SSD1306Driver {
 	// cast adaptor to spi connector since we also need the adaptor for gpio
@@ -250,11 +253,12 @@ func (s *SSD1306Driver) Connection() gobot.Connection { return s.connector.(gobo
 
 // Start sets up the needed connection, and initialized the device.
 func (s *SSD1306Driver) Start() (err error) {
-	bus := s.connector.GetSpiDefaultBus()
-	chip := s.connector.GetSpiDefaultChip()
-	mode := s.connector.GetSpiDefaultMode()
-	bits := s.connector.GetSpiDefaultBits()
-	maxSpeed := s.connector.GetSpiDefaultMaxSpeed()
+	bus := s.GetBusOrDefault(s.connector.GetSpiDefaultBus())
+	chip := s.GetChipOrDefault(s.connector.GetSpiDefaultChip())
+	mode := s.GetModeOrDefault(s.connector.GetSpiDefaultMode())
+	bits := s.GetBitsOrDefault(s.connector.GetSpiDefaultBits())
+	maxSpeed := s.GetSpeedOrDefault(s.connector.GetSpiDefaultMaxSpeed())
+
 	s.connection, err = s.connector.GetSpiConnection(bus, chip, mode, bits, maxSpeed)
 	if err != nil {
 		return err
