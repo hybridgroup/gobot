@@ -1,6 +1,10 @@
 # SPI
 
-This package provides drivers for [spi](https://en.wikipedia.org/wiki/Serial_Peripheral_Interface_Bus) devices. It currently must be used along with the [raspberry pi](https://gobot.io/documentation/platforms/raspi) adaptor that supports the needed interfaces for spi devices. This uses the experimental [spi package](https://github.com/golang/exp/tree/master/io/spi) which only works on linux systems.
+This package provides drivers for [spi](https://en.wikipedia.org/wiki/Serial_Peripheral_Interface_Bus) devices. 
+
+It currently must be used along with platforms such as the [Raspberry Pi](https://gobot.io/documentation/platforms/raspi) and [Beaglebone Black](https://gobot.io/documentation/platforms/beaglebone) that have adaptors that implement the needed SPI interface. 
+
+The SPI implementation uses the awesome [periph.io](https://periph.io/) which currently only works on Linux systems.
 
 ## Getting Started
 
