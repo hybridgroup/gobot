@@ -52,4 +52,10 @@ func main() {
 
 ## References
 
-Thanks to https://github.com/microlinux/tello for serving as an example for the Tello community with his Python library.
+This driver could not exist without the awesome members of the unofficial Tello forum:
+
+https://tellopilots.com/forums/tello-development.8/
+
+Special thanks to [@Kragrathea](https://github.com/Kragrathea) who figured out a LOT of the packets and code as implemented in C#: [https://github.com/Kragrathea/TelloPC](https://github.com/Kragrathea/TelloPC)
+
+Also thanks to [@microlinux](https://github.com/microlinux) with the Python library which served as the first example for the Tello community: [https://github.com/microlinux/tello](https://github.com/microlinux/tello)

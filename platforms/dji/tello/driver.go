@@ -6,14 +6,13 @@ import (
 	"errors"
 	"fmt"
 	"net"
-	"strconv"
-	"strings"
+	"sync"
 	"time"
 
 	"gobot.io/x/gobot"
 )
 
-// FlightData returned by the Tello
+// FlightData packet returned by the Tello
 type FlightData struct {
 	batteryLow               int16
 	batteryLower             int16
@@ -26,7 +25,7 @@ type FlightData struct {
 	droneHover               int16
 	eMOpen                   int16
 	eMSky                    int16
-	eMgroud                  int16
+	eMGround                 int16
 	eastSpeed                int16
 	electricalMachineryState int16
 	factoryMode              int16
@@ -56,11 +55,13 @@ type FlightData struct {
 
 // Driver represents the DJI Tello drone
 type Driver struct {
-	name      string
-	reqAddr   string
-	reqConn   *net.UDPConn // UDP connection to send/receive drone commands
-	respPort  string
-	responses chan string
+	name                     string
+	reqAddr                  string
+	reqConn                  *net.UDPConn // UDP connection to send/receive drone commands
+	respPort                 string
+	responses                chan string
+	cmdMutex                 sync.Mutex
+	rx, ry, lx, ly, throttle float32
 }
 
 // NewDriver creates a driver for the Tello drone. Pass in the UDP port to use for the responses
@@ -99,24 +100,30 @@ func (d *Driver) Start() error {
 		return err
 	}
 
+	// handle responses
 	go func() {
 		for {
 			err := d.handleResponse()
 			if err != nil {
-				return
+				fmt.Println("response parse error:", err)
 			}
 		}
 	}()
 
-	// starts notifications coming from drone
-	d.sendCommand("conn_req:\x96\x17")
+	// starts notifications coming from drone to port aka 0x9617 when encoded low-endian.
+	d.SendCommand("conn_req:\x96\x17")
 
-	// puts Tello drone into command mode, so we can send it further commands
-	// err = d.sendCommand("command")
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	return err
-	// }
+	// send stick commands
+	go func() {
+		time.Sleep(500 * time.Millisecond)
+		for {
+			err := d.SendStickCommand()
+			if err != nil {
+				fmt.Println("stick command error:", err)
+			}
+			time.Sleep(50 * time.Millisecond)
+		}
+	}()
 
 	return nil
 }
@@ -125,7 +132,6 @@ func (d *Driver) handleResponse() error {
 	var buf [2048]byte
 	n, err := d.reqConn.Read(buf[0:])
 	if err != nil {
-		fmt.Println(err)
 		return err
 	}
 
@@ -133,8 +139,10 @@ func (d *Driver) handleResponse() error {
 		// parse binary packet
 		switch buf[5] {
 		case 0x56:
-			fd, _ := d.LoadFlightData(buf[9:])
-			fmt.Printf("%+v\n", fd)
+			fd, _ := d.ParseFlightData(buf[9:])
+			fmt.Printf("Flight data: %+v\n", fd)
+		default:
+			fmt.Printf("Unknown message: %+v\n", buf)
 		}
 		return nil
 	}
@@ -150,163 +158,95 @@ func (d *Driver) Halt() (err error) {
 	return
 }
 
-func (d *Driver) sendCommand(cmd string) error {
-	_, err := d.reqConn.Write([]byte(cmd))
-	if err != nil {
-		return err
-	}
-
-	select {
-	case res := <-d.responses:
-		switch res {
-		case "OK":
-			return nil
-		case "FALSE":
-			return errors.New("Command returned false: " + cmd)
-		default:
-			fmt.Println("Unknown response:", res)
-			return nil
-		}
-	case <-time.After(5 * time.Second):
-		return errors.New("Command timeout: " + cmd)
-	}
-}
-
-func (d *Driver) sendFunction(cmd string) (string, error) {
-	_, err := d.reqConn.Write([]byte(cmd))
-	if err != nil {
-		return "", err
-	}
-
-	select {
-	case res := <-d.responses:
-		return strings.Replace(res, "\r\n", "", -1), nil
-	case <-time.After(5 * time.Second):
-		return "", errors.New("Command timeout: " + cmd)
-	}
-}
-
 // TakeOff tells drones to liftoff and start flying.
-func (d *Driver) TakeOff() error {
-	return d.sendCommand("takeoff")
+func (d *Driver) TakeOff() (err error) {
+	takeOffPacket := []byte{0xcc, 0x58, 0x00, 0x7c, 0x68, 0x54, 0x00, 0xe4, 0x01, 0xc2, 0x16}
+	_, err = d.reqConn.Write(takeOffPacket)
+	return
 }
 
 // Land tells drone to come in for landing.
-func (d *Driver) Land() error {
-	return d.sendCommand("land")
+func (d *Driver) Land() (err error) {
+	landPacket := []byte{0xcc, 0x60, 0x00, 0x27, 0x68, 0x55, 0x00, 0xe5, 0x01, 0x00, 0xba, 0xc7}
+	_, err = d.reqConn.Write(landPacket)
+	return
 }
 
-// Move tells drone to move in particular direction for particular distance
-func (d *Driver) Move(dir string, dist int) error {
-	return d.sendCommand(fmt.Sprintf("%s %d", dir, dist))
+// Up tells the drone to ascend. Pass in an int from 0-100.
+func (d *Driver) Up(val int) error {
+	d.cmdMutex.Lock()
+	defer d.cmdMutex.Unlock()
+
+	d.ly = float32(val) / 100.0
+	return nil
 }
 
-// Forward sends the drone forward
-func (d *Driver) Forward(dist int) error {
-	return d.Move("forward", dist)
+// Down tells the drone to descend. Pass in an int from 0-100.
+func (d *Driver) Down(val int) error {
+	d.cmdMutex.Lock()
+	defer d.cmdMutex.Unlock()
+
+	d.ly = float32(val) / 100.0 * -1
+	return nil
 }
 
-// Backward sends the drone backward
-func (d *Driver) Backward(dist int) error {
-	return d.Move("back", dist)
+// Forward tells the drone to go forward. Pass in an int from 0-100.
+func (d *Driver) Forward(val int) error {
+	d.cmdMutex.Lock()
+	defer d.cmdMutex.Unlock()
+
+	d.ry = float32(val) / 100.0
+	return nil
 }
 
-// Right sends the drone right.
-func (d *Driver) Right(dist int) error {
-	return d.Move("right", dist)
+// Backward tells drone to go in reverse. Pass in an int from 0-100.
+func (d *Driver) Backward(val int) error {
+	d.cmdMutex.Lock()
+	defer d.cmdMutex.Unlock()
+
+	d.ry = float32(val) / 100.0 * -1
+	return nil
 }
 
-// Left sends the drone left.
-func (d *Driver) Left(dist int) error {
-	return d.Move("left", dist)
+// Right tells drone to go right. Pass in an int from 0-100.
+func (d *Driver) Right(val int) error {
+	d.cmdMutex.Lock()
+	defer d.cmdMutex.Unlock()
+
+	d.rx = float32(val) / 100.0
+	return nil
 }
 
-// Up sends the drone up.
-func (d *Driver) Up(dist int) error {
-	return d.Move("up", dist)
+// Left tells drone to go left. Pass in an int from 0-100.
+func (d *Driver) Left(val int) error {
+	d.cmdMutex.Lock()
+	defer d.cmdMutex.Unlock()
+
+	d.rx = float32(val) / 100.0 * -1
+	return nil
 }
 
-// Down sends the drone down.
-func (d *Driver) Down(dist int) error {
-	return d.Move("down", dist)
-}
+// Clockwise tells drone to rotate in a clockwise direction. Pass in an int from 0-100.
+func (d *Driver) Clockwise(val int) error {
+	d.cmdMutex.Lock()
+	defer d.cmdMutex.Unlock()
 
-// Clockwise tells drone to rotate in a clockwise direction. Pass in an int from 1-360.
-func (d *Driver) Clockwise(deg int) error {
-	return d.Move("cw", deg)
+	d.lx = float32(val) / 100.0
+	return nil
 }
 
 // CounterClockwise tells drone to rotate in a counter-clockwise direction.
-// Pass in an int from 1-360.
-func (d *Driver) CounterClockwise(deg int) error {
-	return d.Move("ccw", deg)
-}
+// Pass in an int from 0-100.
+func (d *Driver) CounterClockwise(val int) error {
+	d.cmdMutex.Lock()
+	defer d.cmdMutex.Unlock()
 
-// FrontFlip tells the drone to perform a front flip
-func (d *Driver) FrontFlip() (err error) {
-	return d.sendCommand("flip f")
-}
-
-// BackFlip tells the drone to perform a backflip
-func (d *Driver) BackFlip() (err error) {
-	return d.sendCommand("flip b")
-}
-
-// RightFlip tells the drone to perform a flip to the right
-func (d *Driver) RightFlip() (err error) {
-	return d.sendCommand("flip r")
-}
-
-// LeftFlip tells the drone to perform a flip to the left
-func (d *Driver) LeftFlip() (err error) {
-	return d.sendCommand("flip l")
-}
-
-// StartRecording is not yet supported.
-func (d *Driver) StartRecording() error {
+	d.lx = float32(val) / 100.0 * -1
 	return nil
 }
 
-// StopRecording is not yet supported.
-func (d *Driver) StopRecording() error {
-	return nil
-}
-
-// ExitCommand
-func (d *Driver) ExitCommand() error {
-	return d.sendCommand("tello?")
-}
-
-// Battery returns the current battery level in the drone as a percentage.
-func (d *Driver) Battery() (int, error) {
-	res, err := d.sendFunction("battery?")
-	if err != nil {
-		return 0, err
-	}
-	return strconv.Atoi(res)
-}
-
-// FlightTime returns the current elapsed flight time for the drone in seconds.
-func (d *Driver) FlightTime() (string, error) {
-	return d.sendFunction("time?")
-}
-
-// Speed returns the current speed for the drone in cm per second.
-func (d *Driver) Speed() (float64, error) {
-	res, err := d.sendFunction("speed?")
-	if err != nil {
-		return 0, err
-	}
-	return strconv.ParseFloat(res, 32)
-}
-
-// SetSpeed sets the drone speed from 1-100 cm per second.
-func (d *Driver) SetSpeed(speed int) error {
-	return d.sendCommand(fmt.Sprintf("speed %d", speed))
-}
-
-// LoadFlightData from drone
-func (d *Driver) LoadFlightData(b []byte) (fd *FlightData, err error) {
+// ParseFlightData from drone
+func (d *Driver) ParseFlightData(b []byte) (fd *FlightData, err error) {
 	buf := bytes.NewReader(b)
 	fd = &FlightData{}
 	var data byte
@@ -339,7 +279,7 @@ func (d *Driver) LoadFlightData(b []byte) (fd *FlightData, err error) {
 
 	err = binary.Read(buf, binary.LittleEndian, &data)
 	fd.eMSky = int16(data >> 0 & 0x1)
-	fd.eMgroud = int16(data >> 1 & 0x1)
+	fd.eMGround = int16(data >> 1 & 0x1)
 	fd.eMOpen = int16(data >> 2 & 0x1)
 	fd.droneHover = int16(data >> 3 & 0x1)
 	fd.outageRecording = int16(data >> 4 & 0x1)
@@ -363,4 +303,65 @@ func (d *Driver) LoadFlightData(b []byte) (fd *FlightData, err error) {
 	fd.temperatureHeight = int16(data >> 0 & 0x1)
 
 	return
+}
+
+func (d *Driver) SendStickCommand() (err error) {
+	d.cmdMutex.Lock()
+	defer d.cmdMutex.Unlock()
+
+	pkt := []byte{0xcc, 0xb0, 0x00, 0x7f, 0x60, 0x50, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x12, 0x16, 0x01, 0x0e, 0x00, 0x25, 0x54}
+
+	// RightX center=1024 left =364 right =-364
+	axis1 := int16(660.0*d.rx + 1024.0)
+
+	//RightY down =364 up =-364
+	axis2 := int16(660.0*d.ry + 1024.0)
+
+	//LeftY down =364 up =-364
+	axis3 := int16(660.0*d.ly + 1024.0)
+
+	//LeftX left =364 right =-364
+	axis4 := int16(660.0*d.lx + 1024.0)
+
+	// speed control
+	axis5 := int16(660.0*d.throttle + 1024.0)
+
+	packedAxis := int64(axis1)&0x7FF | int64(axis2&0x7FF)<<11 | 0x7FF&int64(axis3)<<22 | 0x7FF&int64(axis4)<<33 | int64(axis5)<<44
+	pkt[9] = byte(0xFF & packedAxis)
+	pkt[10] = byte(packedAxis >> 8 & 0xFF)
+	pkt[11] = byte(packedAxis >> 16 & 0xFF)
+	pkt[12] = byte(packedAxis >> 24 & 0xFF)
+	pkt[13] = byte(packedAxis >> 32 & 0xFF)
+	pkt[14] = byte(packedAxis >> 40 & 0xFF)
+
+	now := time.Now()
+	pkt[15] = byte(now.Hour())
+	pkt[16] = byte(now.Minute())
+	pkt[17] = byte(now.Second())
+	pkt[18] = byte(now.UnixNano() / int64(time.Millisecond) & 0xff)
+	pkt[19] = byte(now.UnixNano() / int64(time.Millisecond) >> 8)
+
+	// sets crc for packet
+	l := len(pkt)
+	i := fsc16(pkt, l-2, poly)
+	pkt[(l - 2)] = ((byte)(i & 0xFF))
+	pkt[(l - 1)] = ((byte)(i >> 8 & 0xFF))
+
+	_, err = d.reqConn.Write(pkt)
+	return
+}
+
+func (d *Driver) SendCommand(cmd string) (err error) {
+	_, err = d.reqConn.Write([]byte(cmd))
+	return
+}
+
+func validatePitch(val int) int {
+	if val > 100 {
+		return 100
+	} else if val < 0 {
+		return 0
+	}
+
+	return val
 }
