@@ -3,25 +3,19 @@
 // Do not build by default.
 
 /*
- How to setup
- You must be using a PS3 or compatible controller, along with
- the DJI Tello drones to run this example.
+How to setup
+You must be using a PS3 or compatible controller, along with a DJI Tello drone to run this example.
 
- You run the Go program on your computer and communicate
- wirelessly with the Tello.
+You run the Go program on your computer and communicate wirelessly via WiFi with the Tello.
 
- How to run
- Pass the Bluetooth name or address as first param:
+How to run
 
-	go run examples/tello_ps3.go "Travis_1234"
-
- NOTE: sudo is required to use BLE in Linux
+	go run examples/tello_ps3.go
 */
 
 package main
 
 import (
-	"os"
 	"sync/atomic"
 	"time"
 
@@ -45,28 +39,13 @@ func main() {
 		"./platforms/joystick/configs/dualshock3.json",
 	)
 
-	drone := tello.NewDriver(os.Args[1])
+	drone := tello.NewDriver("8888")
 
 	work := func() {
 		leftX.Store(float64(0.0))
 		leftY.Store(float64(0.0))
 		rightX.Store(float64(0.0))
 		rightY.Store(float64(0.0))
-
-		recording := false
-
-		stick.On(joystick.CirclePress, func(data interface{}) {
-			// if recording {
-			// 	drone.StopRecording()
-			// } else {
-			// 	drone.StartRecording()
-			// }
-			recording = !recording
-		})
-
-		stick.On(joystick.SquarePress, func(data interface{}) {
-			//drone.Stop()
-		})
 
 		stick.On(joystick.TrianglePress, func(data interface{}) {
 			drone.TakeOff()
