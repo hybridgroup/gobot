@@ -81,9 +81,7 @@ func ffmpeg() (stdin io.WriteCloser, stderr io.ReadCloser, err error) {
 
 func main() {
 	joystickAdaptor := joystick.NewAdaptor()
-	stick := joystick.NewDriver(joystickAdaptor,
-		"./platforms/joystick/configs/dualshock3.json",
-	)
+	stick := joystick.NewDriver(joystickAdaptor, "dualshock3")
 
 	bebopAdaptor := bebop.NewAdaptor()
 	drone := bebop.NewDriver(bebopAdaptor)

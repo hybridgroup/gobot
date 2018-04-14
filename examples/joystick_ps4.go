@@ -13,9 +13,7 @@ import (
 
 func main() {
 	joystickAdaptor := joystick.NewAdaptor()
-	stick := joystick.NewDriver(joystickAdaptor,
-		"./platforms/joystick/configs/dualshock4.json",
-	)
+	stick := joystick.NewDriver(joystickAdaptor, "dualshock4")
 
 	work := func() {
 		stick.On(joystick.SquarePress, func(data interface{}) {

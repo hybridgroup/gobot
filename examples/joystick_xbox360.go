@@ -13,9 +13,7 @@ import (
 
 func main() {
 	joystickAdaptor := joystick.NewAdaptor()
-	stick := joystick.NewDriver(joystickAdaptor,
-		"./platforms/joystick/configs/joystick/configs/xbox360_power_a_mini_proex.json",
-	)
+	stick := joystick.NewDriver(joystickAdaptor, "xbox360")
 
 	work := func() {
 		stick.On(joystick.APress, func(data interface{}) {
