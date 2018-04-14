@@ -157,8 +157,9 @@ func (j *Driver) handleEvent(event sdl.Event) error {
 			}
 			if data.State == 1 {
 				j.Publish(j.Event(fmt.Sprintf("%s_press", button)), nil)
+			} else {
+				j.Publish(j.Event(fmt.Sprintf("%s_release", button)), nil)
 			}
-			j.Publish(j.Event(fmt.Sprintf("%s_release", button)), nil)
 		}
 	case *sdl.JoyHatEvent:
 		if data.Which == j.adaptor().joystick.InstanceID() {
