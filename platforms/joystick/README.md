@@ -35,102 +35,8 @@ go get -d -u gobot.io/x/gobot/...
 
 ## How to Use
 
-Controller configurations are stored in JSON format. Here's an example configuration file for the Dualshock 3 controller
+Controller configurations are stored in Gobot it, but you can also use external file in JSON format. Take a look at the `configs` directory for examples.
 
-```json
-{
-    "name": "Sony PLAYSTATION(R)3 Controller",
-    "guid": "030000004c0500006802000011010000",
-    "axis": [
-        {
-            "name": "left_x",
-            "id": 0
-        },
-        {
-            "name": "left_y",
-            "id": 1
-        },
-        {
-            "name": "right_x",
-            "id": 2
-        },
-        {
-            "name": "right_y",
-            "id": 3
-        }
-    ],
-    "buttons": [
-        {
-            "name": "square",
-            "id": 15
-        },
-        {
-            "name": "triangle",
-            "id": 12
-        },
-        {
-            "name": "circle",
-            "id": 13
-        },
-        {
-            "name": "x",
-            "id": 14
-        },
-        {
-            "name": "up",
-            "id": 4
-        },
-        {
-            "name": "down",
-            "id": 6
-        },
-        {
-            "name": "left",
-            "id": 7
-        },
-        {
-            "name": "right",
-            "id": 5
-        },
-        {
-            "name": "left_stick",
-            "id": 1
-        },
-        {
-            "name": "right_stick",
-            "id": 2
-        },
-        {
-            "name": "l1",
-            "id": 10
-        },
-        {
-            "name": "l2",
-            "id": 8
-        },
-        {
-            "name": "r1",
-            "id": 11
-        },
-        {
-            "name": "r2",
-            "id": 9
-        },
-        {
-            "name": "start",
-            "id": 3
-        },
-        {
-            "name": "select",
-            "id": 0
-        },
-        {
-            "name": "home",
-            "id": 16
-        }
-    ]
-}
-```
 
 ## How to Connect
 
@@ -154,8 +60,7 @@ import (
 
 func main() {
 	joystickAdaptor := joystick.NewAdaptor()
-	stick := joystick.NewDriver(joystickAdaptor,
-		"./platforms/joystick/configs/dualshock3.json",
+	stick := joystick.NewDriver(joystickAdaptor, "dualshock3",
 	)
 
 	work := func() {
@@ -256,4 +161,4 @@ Joystick 0 connected
 [10345 ms] Axis: 0      value:0
 ```
 
-You can use the output from this program to create a JSON file for the various buttons and axes on your joystick/gamepad.
+You can use the output from this program to create a JSON file for the various buttons and axes on your joystick/gamepad. You could also create a file similar to `joystick_dualshock3.go` and submit a pull request with the new configuration so others can use it as well.

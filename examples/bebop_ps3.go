@@ -24,9 +24,7 @@ const offset = 32767.0
 
 func main() {
 	joystickAdaptor := joystick.NewAdaptor()
-	stick := joystick.NewDriver(joystickAdaptor,
-		"./platforms/joystick/configs/dualshock3.json",
-	)
+	stick := joystick.NewDriver(joystickAdaptor, "dualshock3")
 
 	bebopAdaptor := bebop.NewAdaptor()
 	drone := bebop.NewDriver(bebopAdaptor)

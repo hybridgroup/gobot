@@ -95,14 +95,16 @@ func (j *Driver) adaptor() *Adaptor {
 //		[button]_release
 //		[axis]
 func (j *Driver) Start() (err error) {
-	file, e := ioutil.ReadFile(j.configPath)
-	if e != nil {
-		return e
+	switch j.configPath {
+	case "dualshock3":
+		j.config = dualshock3Config
+	case "dualshock4":
+		j.config = dualshock4Config
+	case "xbox360":
+		j.config = xbox360Config
+	default:
+		j.loadFile()
 	}
-
-	var jsontype joystickConfig
-	json.Unmarshal(file, &jsontype)
-	j.config = jsontype
 
 	for _, value := range j.config.Buttons {
 		j.AddEvent(fmt.Sprintf("%s_press", value.Name))
@@ -189,4 +191,17 @@ func (j *Driver) findHatName(id uint8, hat uint8, list []hat) string {
 		}
 	}
 	return ""
+}
+
+// loadFile load the joystick config from a .json file
+func (j *Driver) loadFile() error {
+	file, e := ioutil.ReadFile(j.configPath)
+	if e != nil {
+		return e
+	}
+
+	var jsontype joystickConfig
+	json.Unmarshal(file, &jsontype)
+	j.config = jsontype
+	return nil
 }
