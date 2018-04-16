@@ -38,7 +38,7 @@ type Adaptor struct {
 	findPin            func(pinPath string) (string, error)
 	spiDefaultBus      int
 	spiDefaultChip     int
-	spiBuses           [2]spi.Device
+	spiBuses           [2]spi.Connection
 	spiDefaultMode     int
 	spiDefaultMaxSpeed int64
 }
@@ -283,7 +283,7 @@ func (b *Adaptor) GetDefaultBus() int {
 
 // GetSpiConnection returns an spi connection to a device on a specified bus.
 // Valid bus number is [0..1] which corresponds to /dev/spidev0.0 through /dev/spidev0.1.
-func (b *Adaptor) GetSpiConnection(busNum, chipNum, mode, bits int, maxSpeed int64) (connection spi.Device, err error) {
+func (b *Adaptor) GetSpiConnection(busNum, chipNum, mode, bits int, maxSpeed int64) (connection spi.Connection, err error) {
 	b.mutex.Lock()
 	defer b.mutex.Unlock()
 

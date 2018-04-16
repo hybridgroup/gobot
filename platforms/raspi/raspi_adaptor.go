@@ -31,7 +31,7 @@ type Adaptor struct {
 	i2cBuses           [2]i2c.I2cDevice
 	spiDefaultBus      int
 	spiDefaultChip     int
-	spiDevices         [2]spi.Device
+	spiDevices         [2]spi.Connection
 	spiDefaultMode     int
 	spiDefaultMaxSpeed int64
 }
@@ -209,7 +209,7 @@ func (r *Adaptor) GetDefaultBus() int {
 
 // GetSpiConnection returns an spi connection to a device on a specified bus.
 // Valid bus number is [0..1] which corresponds to /dev/spidev0.0 through /dev/spidev0.1.
-func (r *Adaptor) GetSpiConnection(busNum, chipNum, mode, bits int, maxSpeed int64) (connection spi.Device, err error) {
+func (r *Adaptor) GetSpiConnection(busNum, chipNum, mode, bits int, maxSpeed int64) (connection spi.Connection, err error) {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 

@@ -248,7 +248,7 @@ func TestDigitalWrite(t *testing.T) {
 
 type TestConnector struct{}
 
-func (ctr *TestConnector) GetSpiConnection(busNum, chipNum, mode, bits int, maxSpeed int64) (device spi.Device, err error) {
+func (ctr *TestConnector) GetSpiConnection(busNum, chipNum, mode, bits int, maxSpeed int64) (device spi.Connection, err error) {
 	return TestSpiDevice{}, nil
 }
 
@@ -273,7 +273,7 @@ func (ctr *TestConnector) GetSpiDefaultMaxSpeed() int64 {
 }
 
 type TestSpiDevice struct {
-	bus spi.Device
+	bus spi.Connection
 }
 
 func (c TestSpiDevice) Close() error {
