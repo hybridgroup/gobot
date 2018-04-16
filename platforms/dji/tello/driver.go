@@ -12,6 +12,14 @@ import (
 	"gobot.io/x/gobot"
 )
 
+const (
+	// EvtFlightData event
+	EvtFlightData = "flightdata"
+
+	// EvtVideoFrame event
+	EvtVideoFrame = "videoframe"
+)
+
 // FlightData packet returned by the Tello
 type FlightData struct {
 	batteryLow               int16
@@ -58,19 +66,28 @@ type Driver struct {
 	name                     string
 	reqAddr                  string
 	reqConn                  *net.UDPConn // UDP connection to send/receive drone commands
+	videoConn                *net.UDPConn // UDP connection for drone video
 	respPort                 string
 	responses                chan string
 	cmdMutex                 sync.Mutex
 	rx, ry, lx, ly, throttle float32
+	gobot.Eventer
 }
 
 // NewDriver creates a driver for the Tello drone. Pass in the UDP port to use for the responses
 // from the drone.
 func NewDriver(port string) *Driver {
-	return &Driver{name: gobot.DefaultName("Tello"),
+	d := &Driver{name: gobot.DefaultName("Tello"),
 		reqAddr:   "192.168.10.1:8889",
 		respPort:  port,
-		responses: make(chan string)}
+		responses: make(chan string),
+		Eventer:   gobot.NewEventer(),
+	}
+
+	d.AddEvent(EvtFlightData)
+	d.AddEvent(EvtVideoFrame)
+
+	return d
 }
 
 // Name returns the name of the device.
@@ -100,6 +117,10 @@ func (d *Driver) Start() error {
 		return err
 	}
 
+	// video listener
+	videoPort, err := net.ResolveUDPAddr("udp", ":6038")
+	d.videoConn, err = net.ListenUDP("udp", videoPort)
+
 	// handle responses
 	go func() {
 		for {
@@ -110,12 +131,25 @@ func (d *Driver) Start() error {
 		}
 	}()
 
-	// starts notifications coming from drone to port aka 0x9617 when encoded low-endian.
+	// handle video
+	go func() {
+		buf := make([]byte, 2048)
+		for {
+			n, _, err := d.videoConn.ReadFromUDP(buf)
+			d.Publish(d.Event(EvtVideoFrame), buf[2:n])
+
+			if err != nil {
+				fmt.Println("Error: ", err)
+			}
+		}
+	}()
+
+	// starts notifications coming from drone to port 6038 aka 0x9617 when encoded low-endian.
 	d.SendCommand("conn_req:\x96\x17")
 
 	// send stick commands
 	go func() {
-		time.Sleep(500 * time.Millisecond)
+		time.Sleep(100 * time.Millisecond)
 		for {
 			err := d.SendStickCommand()
 			if err != nil {
@@ -140,7 +174,7 @@ func (d *Driver) handleResponse() error {
 		switch buf[5] {
 		case 0x56:
 			fd, _ := d.ParseFlightData(buf[9:])
-			fmt.Printf("Flight data: %+v\n", fd)
+			d.Publish(d.Event(EvtFlightData), fd)
 		default:
 			fmt.Printf("Unknown message: %+v\n", buf)
 		}
@@ -169,6 +203,13 @@ func (d *Driver) TakeOff() (err error) {
 func (d *Driver) Land() (err error) {
 	landPacket := []byte{0xcc, 0x60, 0x00, 0x27, 0x68, 0x55, 0x00, 0xe5, 0x01, 0x00, 0xba, 0xc7}
 	_, err = d.reqConn.Write(landPacket)
+	return
+}
+
+// StartVideo tells to start video stream.
+func (d *Driver) StartVideo() (err error) {
+	pkt := []byte{0xcc, 0x58, 0x00, 0x7c, 0x60, 0x25, 0x00, 0x00, 0x00, 0x6c, 0x95}
+	_, err = d.reqConn.Write(pkt)
 	return
 }
 
