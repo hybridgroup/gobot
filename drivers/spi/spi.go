@@ -1,12 +1,8 @@
 package spi
 
 import (
-	"fmt"
-	"log"
-
 	xspi "periph.io/x/periph/conn/spi"
-	"periph.io/x/periph/conn/spi/spireg"
-	"periph.io/x/periph/host"
+	xsysfs "periph.io/x/periph/host/sysfs"
 )
 
 const (
@@ -56,6 +52,8 @@ type Connector interface {
 // Provided by an Adaptor by implementing the SPIConnector interface.
 type Connection Operations
 
+// SpiConnection is the implementation of the SPI interface using the periph.io
+// implementataion for Linux.
 type SpiConnection struct {
 	Connection
 	port     xspi.PortCloser
@@ -84,35 +82,14 @@ func (c *SpiConnection) Tx(w, r []byte) error {
 }
 
 // GetSpiConnection is a helper to return a SPI device
-func GetSpiConnection(busNum, chipNum, mode, bits int, maxSpeed int64) (spiDevice Device, err error) {
-	if _, err := host.Init(); err != nil {
-		log.Fatal(err)
-	}
-
-	var spiMode xspi.Mode
-	switch mode {
-	case 0:
-		spiMode = xspi.Mode0
-	case 1:
-		spiMode = xspi.Mode1
-	case 2:
-		spiMode = xspi.Mode2
-	case 3:
-		spiMode = xspi.Mode3
-	default:
-		spiMode = xspi.Mode0
-	}
-	devName := fmt.Sprintf("/dev/spidev%d.%d", busNum, chipNum)
-	p, err := spireg.Open(devName)
+func GetSpiConnection(busNum, chipNum, mode, bits int, maxSpeed int64) (Device, error) {
+	p, err := xsysfs.NewSPI(busNum, chipNum)
 	if err != nil {
 		return nil, err
 	}
-
-	c, err := p.Connect(maxSpeed, spiMode, bits)
+	c, err := p.Connect(maxSpeed, xspi.Mode(mode), bits)
 	if err != nil {
 		return nil, err
 	}
-	spiDevice = NewConnection(p, c)
-
-	return
+	return NewConnection(p, c), nil
 }
