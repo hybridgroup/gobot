@@ -355,8 +355,7 @@ func (s *SSD1306Driver) Set(x, y, c int) {
 	s.buffer.SetPixel(x, y, c)
 }
 
-// Reset re-intializes the device to a clean state.
-
+// Reset re-initializes the device to a clean state.
 func (s *SSD1306Driver) Reset() (err error) {
 	s.rstDriver.DigitalWrite(1)
 	time.Sleep(10 * time.Millisecond)

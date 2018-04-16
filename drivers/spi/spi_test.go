@@ -7,7 +7,7 @@ import (
 
 type TestConnector struct{}
 
-func (ctr *TestConnector) GetSpiConnection(busNum, chipNum, mode, bits int, maxSpeed int64) (device Device, err error) {
+func (ctr *TestConnector) GetSpiConnection(busNum, chipNum, mode, bits int, maxSpeed int64) (device Connection, err error) {
 	return NewConnection(&TestSpiConnection{}, &TestSpiDevice{}), nil
 }
 
@@ -32,7 +32,7 @@ func (ctr *TestConnector) GetSpiDefaultMaxSpeed() int64 {
 }
 
 type TestSpiDevice struct {
-	dev Device
+	dev Connection
 }
 
 func (c *TestSpiDevice) Duplex() conn.Duplex {
@@ -48,7 +48,7 @@ func (c *TestSpiDevice) Tx(w, r []byte) error {
 }
 
 type TestSpiConnection struct {
-	conn Connection
+	conn Operations
 }
 
 func (c *TestSpiConnection) Close() error {

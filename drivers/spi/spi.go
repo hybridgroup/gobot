@@ -10,15 +10,10 @@ const (
 	NotInitialized = -1
 )
 
-// Operations are the wrappers around the actual functions used by the SPI Device interface
+// Operations are the wrappers around the actual functions used by the SPI device interface
 type Operations interface {
 	Close() error
 	Tx(w, r []byte) error
-}
-
-// Device is the interface to a specific spi bus/chip
-type Device interface {
-	Operations
 }
 
 // Connector lets Adaptors provide the interface for Drivers
@@ -27,7 +22,7 @@ type Connector interface {
 	// GetSpiConnection returns a connection to a SPI device at the specified bus and chip.
 	// Bus numbering starts at index 0, the range of valid buses is
 	// platform specific. Same with chip numbering.
-	GetSpiConnection(busNum, chip, mode, bits int, maxSpeed int64) (device Device, err error)
+	GetSpiConnection(busNum, chip, mode, bits int, maxSpeed int64) (device Connection, err error)
 
 	// GetSpiDefaultBus returns the default SPI bus index
 	GetSpiDefaultBus() int
@@ -45,17 +40,14 @@ type Connector interface {
 	GetSpiDefaultMaxSpeed() int64
 }
 
-// Connection is a connection to an SPI device with a specified bus
-// on a specific chip.
-// Implements SPIOperations to talk to the device, wrapping the
-// calls in SetAddress to always target the specified device.
-// Provided by an Adaptor by implementing the SPIConnector interface.
+// Connection is a connection to a SPI device with a specific bus/chip.
+// Provided by an Adaptor, usually just by calling the spi package's GetSpiConnection() function.
 type Connection Operations
 
 // SpiConnection is the implementation of the SPI interface using the periph.io
-// implementataion for Linux.
+// sysfs implementation for Linux.
 type SpiConnection struct {
-	Connection
+	Operations
 	port     xspi.PortCloser
 	dev      xspi.Conn
 	bus      int
@@ -66,12 +58,12 @@ type SpiConnection struct {
 }
 
 // NewConnection creates and returns a new connection to a specific
-// spi device on a bus/chip using the periph.io interface
+// spi device on a bus/chip using the periph.io interface.
 func NewConnection(port xspi.PortCloser, conn xspi.Conn) (connection *SpiConnection) {
 	return &SpiConnection{port: port, dev: conn}
 }
 
-// Close the SPI connection
+// Close the SPI connection.
 func (c *SpiConnection) Close() error {
 	return c.port.Close()
 }
@@ -81,8 +73,8 @@ func (c *SpiConnection) Tx(w, r []byte) error {
 	return c.dev.Tx(w, r)
 }
 
-// GetSpiConnection is a helper to return a SPI device
-func GetSpiConnection(busNum, chipNum, mode, bits int, maxSpeed int64) (Device, error) {
+// GetSpiConnection is a helper to return a SPI device.
+func GetSpiConnection(busNum, chipNum, mode, bits int, maxSpeed int64) (Connection, error) {
 	p, err := xsysfs.NewSPI(busNum, chipNum)
 	if err != nil {
 		return nil, err
