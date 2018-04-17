@@ -30,15 +30,19 @@ func main() {
 			return
 		}
 
-		drone.StartVideo()
-		gobot.Every(1*time.Second, func() {
+		drone.On(tello.ConnectedEvent, func(data interface{}) {
+			fmt.Println("Connected")
 			drone.StartVideo()
+			gobot.Every(1*time.Second, func() {
+				drone.StartVideo()
+			})
 		})
 
-		drone.On(tello.EvtVideoFrame, func(data interface{}) {
+		drone.On(tello.VideoFrameEvent, func(data interface{}) {
 			pkt := data.([]byte)
 			if len(pkt) > 6 && pkt[0] == 0x00 && pkt[1] == 0x00 && pkt[2] == 0x00 && pkt[3] == 0x01 {
-				fmt.Println("nal type = ", pkt[6]&0x1f)
+				nalType := pkt[6] & 0x1f
+				fmt.Println("nal type = ", nalType)
 			}
 
 			fmt.Printf("Writing %d bytes\n", len(pkt))

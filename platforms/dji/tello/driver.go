@@ -13,11 +13,17 @@ import (
 )
 
 const (
-	// EvtFlightData event
-	EvtFlightData = "flightdata"
+	// ConnectedEvent event
+	ConnectedEvent = "connected"
 
-	// EvtVideoFrame event
-	EvtVideoFrame = "videoframe"
+	// FlightDataEvent event
+	FlightDataEvent = "flightdata"
+
+	// WifiEvent event
+	WifiEvent = "wifi"
+
+	// VideoFrameEvent event
+	VideoFrameEvent = "videoframe"
 )
 
 // FlightData packet returned by the Tello
@@ -84,8 +90,10 @@ func NewDriver(port string) *Driver {
 		Eventer:   gobot.NewEventer(),
 	}
 
-	d.AddEvent(EvtFlightData)
-	d.AddEvent(EvtVideoFrame)
+	d.AddEvent(ConnectedEvent)
+	d.AddEvent(FlightDataEvent)
+	d.AddEvent(WifiEvent)
+	d.AddEvent(VideoFrameEvent)
 
 	return d
 }
@@ -117,29 +125,12 @@ func (d *Driver) Start() error {
 		return err
 	}
 
-	// video listener
-	videoPort, err := net.ResolveUDPAddr("udp", ":6038")
-	d.videoConn, err = net.ListenUDP("udp", videoPort)
-
 	// handle responses
 	go func() {
 		for {
 			err := d.handleResponse()
 			if err != nil {
 				fmt.Println("response parse error:", err)
-			}
-		}
-	}()
-
-	// handle video
-	go func() {
-		buf := make([]byte, 2048)
-		for {
-			n, _, err := d.videoConn.ReadFromUDP(buf)
-			d.Publish(d.Event(EvtVideoFrame), buf[2:n])
-
-			if err != nil {
-				fmt.Println("Error: ", err)
 			}
 		}
 	}()
@@ -174,15 +165,48 @@ func (d *Driver) handleResponse() error {
 		switch buf[5] {
 		case 0x56:
 			fd, _ := d.ParseFlightData(buf[9:])
-			d.Publish(d.Event(EvtFlightData), fd)
+			d.Publish(d.Event(FlightDataEvent), fd)
+		case 26:
+			d.Publish(d.Event(WifiEvent), buf[9:12])
 		default:
-			fmt.Printf("Unknown message: %+v\n", buf)
+			fmt.Printf("Unknown message: %+v\n", buf[0:n])
 		}
 		return nil
 	}
 
-	resp := string(buf[0:n])
-	d.responses <- resp
+	if buf[0] == 0x63 && buf[1] == 0x6f && buf[2] == 0x6e {
+		d.Publish(d.Event(ConnectedEvent), nil)
+		d.processVideo()
+	}
+
+	// resp := string(buf[0:n])
+	// d.responses <- resp
+	return nil
+}
+
+func (d *Driver) processVideo() error {
+	// handle video
+	videoPort, err := net.ResolveUDPAddr("udp", ":6038")
+	if err != nil {
+		return err
+	}
+	d.videoConn, err = net.ListenUDP("udp", videoPort)
+	if err != nil {
+		return err
+	}
+
+	go func() {
+		buf := make([]byte, 2048)
+		for {
+			n, _, err := d.videoConn.ReadFromUDP(buf)
+			d.Publish(d.Event(VideoFrameEvent), buf[2:n])
+
+			if err != nil {
+				fmt.Println("Error: ", err)
+			}
+		}
+	}()
+
 	return nil
 }
 
