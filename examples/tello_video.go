@@ -26,7 +26,7 @@ func main() {
 	drone := tello.NewDriver("8890")
 
 	work := func() {
-		ffplay := exec.Command("ffplay", "-i", "pipe:0")
+		ffplay := exec.Command("ffplay", "-fast", "-i", "pipe:0")
 		ffplayIn, _ := ffplay.StdinPipe()
 		if err := ffplay.Start(); err != nil {
 			fmt.Println(err)
