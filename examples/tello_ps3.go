@@ -16,6 +16,7 @@ How to run
 package main
 
 import (
+	"fmt"
 	"sync/atomic"
 	"time"
 
@@ -51,6 +52,26 @@ func main() {
 
 		stick.On(joystick.XPress, func(data interface{}) {
 			drone.Land()
+		})
+
+		stick.On(joystick.UpPress, func(data interface{}) {
+			fmt.Println("FrontFlip")
+			drone.FrontFlip()
+		})
+
+		stick.On(joystick.DownPress, func(data interface{}) {
+			fmt.Println("BackFlip")
+			drone.BackFlip()
+		})
+
+		stick.On(joystick.RightPress, func(data interface{}) {
+			fmt.Println("RightFlip")
+			drone.RightFlip()
+		})
+
+		stick.On(joystick.LeftPress, func(data interface{}) {
+			fmt.Println("LeftFlip")
+			drone.LeftFlip()
 		})
 
 		stick.On(joystick.LeftX, func(data interface{}) {

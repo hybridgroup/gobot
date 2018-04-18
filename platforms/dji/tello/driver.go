@@ -19,11 +19,49 @@ const (
 	// FlightDataEvent event
 	FlightDataEvent = "flightdata"
 
-	// WifiEvent event
-	WifiEvent = "wifi"
+	// TakeoffEvent event
+	TakeoffEvent = "takeoff"
+
+	// LandingEvent event
+	LandingEvent = "landing"
+
+	// FlipEvent event
+	FlipEvent = "flip"
+
+	// TimeEvent event
+	TimeEvent = "time"
+
+	// LogEvent event
+	LogEvent = "log"
+
+	// WifiDataEvent event
+	WifiDataEvent = "wifidata"
+
+	// LightStrengthEvent event
+	LightStrengthEvent = "lightstrength"
 
 	// VideoFrameEvent event
 	VideoFrameEvent = "videoframe"
+)
+
+const (
+	messageStart  = 0xcc
+	wifiMessage   = 26
+	lightMessage  = 53
+	timeMessage   = 70
+	flightMessage = 86
+
+	logMessage = 0x50
+
+	videoStartCommand = 0x25
+	takeoffCommand    = 0x54
+	landCommand       = 0x55
+	flipCommand       = 0x5c
+
+	flipFront = 0
+	flipLeft  = 1
+	flipBack  = 2
+	flipRight = 3
 )
 
 // FlightData packet returned by the Tello
@@ -67,6 +105,12 @@ type FlightData struct {
 	windState                int16
 }
 
+// WifiData packet returned by the Tello
+type WifiData struct {
+	Disturb  int16
+	Strength int16
+}
+
 // Driver represents the DJI Tello drone
 type Driver struct {
 	name                     string
@@ -74,7 +118,6 @@ type Driver struct {
 	reqConn                  *net.UDPConn // UDP connection to send/receive drone commands
 	videoConn                *net.UDPConn // UDP connection for drone video
 	respPort                 string
-	responses                chan string
 	cmdMutex                 sync.Mutex
 	rx, ry, lx, ly, throttle float32
 	gobot.Eventer
@@ -84,15 +127,15 @@ type Driver struct {
 // from the drone.
 func NewDriver(port string) *Driver {
 	d := &Driver{name: gobot.DefaultName("Tello"),
-		reqAddr:   "192.168.10.1:8889",
-		respPort:  port,
-		responses: make(chan string),
-		Eventer:   gobot.NewEventer(),
+		reqAddr:  "192.168.10.1:8889",
+		respPort: port,
+		Eventer:  gobot.NewEventer(),
 	}
 
 	d.AddEvent(ConnectedEvent)
 	d.AddEvent(FlightDataEvent)
-	d.AddEvent(WifiEvent)
+	d.AddEvent(WifiDataEvent)
+	d.AddEvent(LightStrengthEvent)
 	d.AddEvent(VideoFrameEvent)
 
 	return d
@@ -136,6 +179,7 @@ func (d *Driver) Start() error {
 	}()
 
 	// starts notifications coming from drone to port 6038 aka 0x9617 when encoded low-endian.
+	// TODO: allow setting a specific video port.
 	d.SendCommand("conn_req:\x96\x17")
 
 	// send stick commands
@@ -160,32 +204,59 @@ func (d *Driver) handleResponse() error {
 		return err
 	}
 
-	if buf[0] == 0xcc {
-		// parse binary packet
+	// parse binary packet
+	if buf[0] == messageStart {
+		if buf[6] == 0x10 {
+			switch buf[5] {
+			case logMessage:
+				d.Publish(d.Event(LogEvent), buf[9:])
+			default:
+				fmt.Printf("Unknown message: %+v\n", buf[0:n])
+			}
+			return nil
+		}
+
 		switch buf[5] {
-		case 0x56:
+		case wifiMessage:
+			buf := bytes.NewReader(buf[9:12])
+			wd := &WifiData{}
+
+			err = binary.Read(buf, binary.LittleEndian, &wd.Disturb)
+			err = binary.Read(buf, binary.LittleEndian, &wd.Strength)
+			d.Publish(d.Event(WifiDataEvent), wd)
+		case lightMessage:
+			buf := bytes.NewReader(buf[9:10])
+			var ld int16
+
+			err = binary.Read(buf, binary.LittleEndian, &ld)
+			d.Publish(d.Event(LightStrengthEvent), ld)
+		case timeMessage:
+			d.Publish(d.Event(TimeEvent), buf[7:8])
+		case takeoffCommand:
+			d.Publish(d.Event(TakeoffEvent), buf[7:8])
+		case landCommand:
+			d.Publish(d.Event(LandingEvent), buf[7:8])
+		case flipCommand:
+			d.Publish(d.Event(FlipEvent), buf[7:8])
+		case flightMessage:
 			fd, _ := d.ParseFlightData(buf[9:])
 			d.Publish(d.Event(FlightDataEvent), fd)
-		case 26:
-			d.Publish(d.Event(WifiEvent), buf[9:12])
 		default:
 			fmt.Printf("Unknown message: %+v\n", buf[0:n])
 		}
 		return nil
 	}
 
+	// parse text packet
 	if buf[0] == 0x63 && buf[1] == 0x6f && buf[2] == 0x6e {
 		d.Publish(d.Event(ConnectedEvent), nil)
 		d.processVideo()
 	}
 
-	// resp := string(buf[0:n])
-	// d.responses <- resp
 	return nil
 }
 
 func (d *Driver) processVideo() error {
-	// handle video
 	videoPort, err := net.ResolveUDPAddr("udp", ":6038")
 	if err != nil {
 		return err
@@ -213,26 +284,27 @@ func (d *Driver) processVideo() error {
 // Halt stops the driver.
 func (d *Driver) Halt() (err error) {
 	d.reqConn.Close()
+	d.videoConn.Close()
 	return
 }
 
 // TakeOff tells drones to liftoff and start flying.
 func (d *Driver) TakeOff() (err error) {
-	takeOffPacket := []byte{0xcc, 0x58, 0x00, 0x7c, 0x68, 0x54, 0x00, 0xe4, 0x01, 0xc2, 0x16}
+	takeOffPacket := []byte{messageStart, 0x58, 0x00, 0x7c, 0x68, takeoffCommand, 0x00, 0xe4, 0x01, 0xc2, 0x16}
 	_, err = d.reqConn.Write(takeOffPacket)
 	return
 }
 
 // Land tells drone to come in for landing.
 func (d *Driver) Land() (err error) {
-	landPacket := []byte{0xcc, 0x60, 0x00, 0x27, 0x68, 0x55, 0x00, 0xe5, 0x01, 0x00, 0xba, 0xc7}
+	landPacket := []byte{messageStart, 0x60, 0x00, 0x27, 0x68, landCommand, 0x00, 0xe5, 0x01, 0x00, 0xba, 0xc7}
 	_, err = d.reqConn.Write(landPacket)
 	return
 }
 
 // StartVideo tells to start video stream.
 func (d *Driver) StartVideo() (err error) {
-	pkt := []byte{0xcc, 0x58, 0x00, 0x7c, 0x60, 0x25, 0x00, 0x00, 0x00, 0x6c, 0x95}
+	pkt := []byte{messageStart, 0x58, 0x00, 0x7c, 0x60, videoStartCommand, 0x00, 0x00, 0x00, 0x6c, 0x95}
 	_, err = d.reqConn.Write(pkt)
 	return
 }
@@ -310,6 +382,38 @@ func (d *Driver) CounterClockwise(val int) error {
 	return nil
 }
 
+// Flip tells drone to flip
+func (d *Driver) Flip(direction int) (err error) {
+	pkt := []byte{messageStart, 0x60, 0x00, 0x27, 0x70, flipCommand, 0x00, 0xe6, 0x01, byte(direction), 0x00, 0x00}
+
+	// sets ending crc bytes for packet
+	l := len(pkt)
+	pkt[(l - 2)], pkt[(l - 1)] = CalculateCRC(pkt)
+
+	_, err = d.reqConn.Write(pkt)
+	return
+}
+
+// FrontFlip tells the drone to perform a front flip.
+func (d *Driver) FrontFlip() (err error) {
+	return d.Flip(flipFront)
+}
+
+// BackFlip tells the drone to perform a back flip.
+func (d *Driver) BackFlip() (err error) {
+	return d.Flip(flipBack)
+}
+
+// RightFlip tells the drone to perform a flip to the right.
+func (d *Driver) RightFlip() (err error) {
+	return d.Flip(flipRight)
+}
+
+// LeftFlip tells the drone to perform a flip to the left.
+func (d *Driver) LeftFlip() (err error) {
+	return d.Flip(flipLeft)
+}
+
 // ParseFlightData from drone
 func (d *Driver) ParseFlightData(b []byte) (fd *FlightData, err error) {
 	buf := bytes.NewReader(b)
@@ -370,11 +474,12 @@ func (d *Driver) ParseFlightData(b []byte) (fd *FlightData, err error) {
 	return
 }
 
+// SendStickCommand sends the joystick command packet to the drone.
 func (d *Driver) SendStickCommand() (err error) {
 	d.cmdMutex.Lock()
 	defer d.cmdMutex.Unlock()
 
-	pkt := []byte{0xcc, 0xb0, 0x00, 0x7f, 0x60, 0x50, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x12, 0x16, 0x01, 0x0e, 0x00, 0x25, 0x54}
+	pkt := []byte{messageStart, 0xb0, 0x00, 0x7f, 0x60, 0x50, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x12, 0x16, 0x01, 0x0e, 0x00, 0x25, 0x54}
 
 	// RightX center=1024 left =364 right =-364
 	axis1 := int16(660.0*d.rx + 1024.0)
@@ -406,16 +511,15 @@ func (d *Driver) SendStickCommand() (err error) {
 	pkt[18] = byte(now.UnixNano() / int64(time.Millisecond) & 0xff)
 	pkt[19] = byte(now.UnixNano() / int64(time.Millisecond) >> 8)
 
-	// sets crc for packet
+	// sets ending crc for packet
 	l := len(pkt)
-	i := fsc16(pkt, l-2, poly)
-	pkt[(l - 2)] = ((byte)(i & 0xFF))
-	pkt[(l - 1)] = ((byte)(i >> 8 & 0xFF))
+	pkt[(l - 2)], pkt[(l - 1)] = CalculateCRC(pkt)
 
 	_, err = d.reqConn.Write(pkt)
 	return
 }
 
+// SendCommand is used to send a text command such as the initial connection request to the drone.
 func (d *Driver) SendCommand(cmd string) (err error) {
 	_, err = d.reqConn.Write([]byte(cmd))
 	return
