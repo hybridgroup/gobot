@@ -33,14 +33,22 @@ const (
 	R2Press = "r2_press"
 	// R1 button release event
 	R2Release = "r2_release"
-	// up gamepad event
-	Up = "up"
-	// down gamepad event
-	Down = "down"
-	// left gamepad event
-	Left = "left"
-	// right gamepad event
-	Right = "right"
+	// up gamepad press event
+	UpPress = "up_press"
+	// up gamepad release event
+	UpRelease = "up_release"
+	// down gamepad press event
+	DownPress = "down_press"
+	// down gamepad release event
+	DownRelease = "down_release"
+	// left gamepad press event
+	LeftPress = "left_press"
+	// left gamepad release event
+	LeftRelease = "left_release"
+	// right gamepad press event
+	RightPress = "right_press"
+	// right gamepad release event
+	RightRelease = "right_release"
 	// square button press event
 	SquarePress = "square_press"
 	// square button release event
