@@ -59,3 +59,5 @@ https://tellopilots.com/forums/tello-development.8/
 Special thanks to [@Kragrathea](https://github.com/Kragrathea) who figured out a LOT of the packets and code as implemented in C#: [https://github.com/Kragrathea/TelloPC](https://github.com/Kragrathea/TelloPC)
 
 Also thanks to [@microlinux](https://github.com/microlinux) with the Python library which served as the first example for the Tello community: [https://github.com/microlinux/tello](https://github.com/microlinux/tello)
+
+Thank you to bluejune for the [https://bitbucket.org/PingguSoft/pytello](https://bitbucket.org/PingguSoft/pytello) repo, especially the Wireshark Lua dissector which has proven indispensable.
