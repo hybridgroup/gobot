@@ -191,13 +191,13 @@ func (d *Driver) Start() error {
 
 	// send stick commands
 	go func() {
-		time.Sleep(100 * time.Millisecond)
+		time.Sleep(50 * time.Millisecond)
 		for {
 			err := d.SendStickCommand()
 			if err != nil {
 				fmt.Println("stick command error:", err)
 			}
-			time.Sleep(50 * time.Millisecond)
+			time.Sleep(20 * time.Millisecond)
 		}
 	}()
 
@@ -335,7 +335,19 @@ func (d *Driver) SetExposure(level int) (err error) {
 
 // SetVideoEncoderRate sets the drone video encoder rate.
 func (d *Driver) SetVideoEncoderRate(rate int) (err error) {
-	pkt := []byte{messageStart, 0x60, 0x00, 0x27, 0x68, videoEncoderRateCommand, 0x00, 0xe6, 0x01, byte(rate), 0x00, 0x00}
+	pkt := []byte{messageStart, 0x62, 0x00, 0x27, 0x68, videoEncoderRateCommand, 0x00, 0xe6, 0x01, byte(rate), 0x00, 0x00, 0x00}
+
+	// sets ending crc bytes for packet
+	l := len(pkt)
+	pkt[(l - 2)], pkt[(l - 1)] = CalculateCRC(pkt)
+
+	_, err = d.reqConn.Write(pkt)
+	return
+}
+
+// Rate does some still unknown thing.
+func (d *Driver) Rate() (err error) {
+	pkt := []byte{messageStart, 0x58, 0x00, 0x7c, 0x48, 40, 0x00, 0xe6, 0x01, 0x6c, 0x95}
 
 	// sets ending crc bytes for packet
 	l := len(pkt)

@@ -64,7 +64,8 @@ func main() {
 			fmt.Println("Connected")
 			drone.StartVideo()
 			drone.SetExposure(1)
-			drone.SetVideoEncoderRate(3)
+			drone.SetVideoEncoderRate(4)
+
 			gobot.Every(250*time.Millisecond, func() {
 				drone.StartVideo()
 			})
