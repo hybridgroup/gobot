@@ -228,6 +228,7 @@ Support for many devices that use General Purpose Input/Output (GPIO) have
 a shared set of drivers provided using the `gobot/drivers/gpio` package:
 
 - [GPIO](https://en.wikipedia.org/wiki/General_Purpose_Input/Output) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/drivers/gpio)
+	- AIP1640 LED
 	- Button
 	- Buzzer
 	- Direct Pin
@@ -301,6 +302,7 @@ a shared set of drivers provided using the `gobot/drivers/spi` package:
 	- MCP3204 Analog/Digital Converter
 	- MCP3208 Analog/Digital Converter
 	- MCP3304 Analog/Digital Converter
+	- SSD1306 OLED Display Controller
 
 More platforms and drivers are coming soon...
 
