@@ -71,7 +71,7 @@ func (d *MCP3002Driver) Read(channel int) (result int, err error) {
 
 	err = d.connection.Tx(tx, rx)
 	if err == nil && len(rx) == 2 {
-		result = int(((rx[0] & 0x3) << 8) + rx[1])
+		result = int(rx[0]&0x3)<<8 + int(rx[1])
 	}
 
 	return result, err

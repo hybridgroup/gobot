@@ -553,8 +553,7 @@ func (g *Driver) AnalogRead(pin string) (value int, err error) {
 	if err := g.valueValid(response); err != nil {
 		return value, err
 	}
-	return int((uint64(response[5]<<8) & 0xFF00) | uint64(response[6]&0xFF)), nil
-	return
+	return int(response[5])<<8 | int(response[6]), nil
 }
 
 // DigitalWrite writes a 0/1 value to the given pin.

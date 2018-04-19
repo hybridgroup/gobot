@@ -72,7 +72,7 @@ func (d *MCP3208Driver) Read(channel int) (result int, err error) {
 
 	err = d.connection.Tx(tx, rx)
 	if err == nil && len(rx) == 3 {
-		result = int(((rx[1] & 0xf) << 8) + rx[2])
+		result = int(rx[1]&0xf)<<8 + int(rx[2])
 	}
 
 	return result, err
