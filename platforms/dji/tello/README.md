@@ -2,7 +2,7 @@
 
 This package contains the Gobot driver for the Ryze Tello drone, sold by DJI.
 
-For more information on this drone, go to: https://www.ryzerobotics.com/tello
+For more information on this drone, go to: [https://www.ryzerobotics.com/tello](https://www.ryzerobotics.com/tello)
 
 ## How to Install
 
@@ -23,7 +23,7 @@ package main
 
 import (
 	"fmt"
-    "time"
+	"time"
 
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/platforms/dji/tello"

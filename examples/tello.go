@@ -3,16 +3,17 @@
 // Do not build by default.
 
 /*
- How to run
- Pass the UDP port to use for the ground station to receive responses from the drone as first param:
+How to run:
+Connect to the drone's Wi-Fi network from your computer. It will be named something like "TELLO-XXXXXX".
 
-	go run examples/tello.go "8888"
+Once you are connected you can run the Gobot code on your computer to control the drone.
+
+	go run examples/tello.go
 */
 
 package main
 
 import (
-	"os"
 	"time"
 
 	"gobot.io/x/gobot"
@@ -20,7 +21,7 @@ import (
 )
 
 func main() {
-	drone := tello.NewDriver(os.Args[1])
+	drone := tello.NewDriver("8888")
 
 	work := func() {
 		drone.TakeOff()
