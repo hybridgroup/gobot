@@ -35,7 +35,7 @@ func main() {
 
 	work := func() {
 		ffmpeg := exec.Command("ffmpeg", "-i", "pipe:0", "-pix_fmt", "bgr24", "-vcodec", "rawvideo",
-			"-an", "-sn", "-f", "rawvideo", "pipe:1")
+			"-an", "-sn", "-r", "25", "-s", "960x720", "-f", "rawvideo", "pipe:1")
 		ffmpegIn, _ := ffmpeg.StdinPipe()
 		ffmpegOut, _ := ffmpeg.StdoutPipe()
 		if err := ffmpeg.Start(); err != nil {
