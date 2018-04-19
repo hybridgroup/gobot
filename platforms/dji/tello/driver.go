@@ -40,6 +40,9 @@ const (
 	// LightStrengthEvent event
 	LightStrengthEvent = "lightstrength"
 
+	// SetExposureEvent event
+	SetExposureEvent = "setexposure"
+
 	// VideoFrameEvent event
 	VideoFrameEvent = "videoframe"
 )
@@ -53,10 +56,13 @@ const (
 
 	logMessage = 0x50
 
-	videoStartCommand = 0x25
-	takeoffCommand    = 0x54
-	landCommand       = 0x55
-	flipCommand       = 0x5c
+	videoEncoderRateCommand = 0x20
+	videoStartCommand       = 0x25
+	exposureCommand         = 0x34
+	stickCommand            = 0x50
+	takeoffCommand          = 0x54
+	landCommand             = 0x55
+	flipCommand             = 0x5c
 
 	flipFront = 0
 	flipLeft  = 1
@@ -137,6 +143,7 @@ func NewDriver(port string) *Driver {
 	d.AddEvent(WifiDataEvent)
 	d.AddEvent(LightStrengthEvent)
 	d.AddEvent(VideoFrameEvent)
+	d.AddEvent(SetExposureEvent)
 
 	return d
 }
@@ -241,6 +248,8 @@ func (d *Driver) handleResponse() error {
 		case flightMessage:
 			fd, _ := d.ParseFlightData(buf[9:])
 			d.Publish(d.Event(FlightDataEvent), fd)
+		case exposureCommand:
+			d.Publish(d.Event(SetExposureEvent), buf[7:8])
 		default:
 			fmt.Printf("Unknown message: %+v\n", buf[0:n])
 		}
@@ -305,6 +314,33 @@ func (d *Driver) Land() (err error) {
 // StartVideo tells to start video stream.
 func (d *Driver) StartVideo() (err error) {
 	pkt := []byte{messageStart, 0x58, 0x00, 0x7c, 0x60, videoStartCommand, 0x00, 0x00, 0x00, 0x6c, 0x95}
+	_, err = d.reqConn.Write(pkt)
+	return
+}
+
+// SetExposure sets the drone camera exposure level. Valid levels are 0, 1, and 2.
+func (d *Driver) SetExposure(level int) (err error) {
+	if level < 0 || level > 2 {
+		return errors.New("Invalid exposure level")
+	}
+	pkt := []byte{messageStart, 0x60, 0x00, 0x27, 0x48, exposureCommand, 0x00, 0xe6, 0x01, byte(level), 0x00, 0x00}
+
+	// sets ending crc bytes for packet
+	l := len(pkt)
+	pkt[(l - 2)], pkt[(l - 1)] = CalculateCRC(pkt)
+
+	_, err = d.reqConn.Write(pkt)
+	return
+}
+
+// SetVideoEncoderRate sets the drone video encoder rate.
+func (d *Driver) SetVideoEncoderRate(rate int) (err error) {
+	pkt := []byte{messageStart, 0x60, 0x00, 0x27, 0x68, videoEncoderRateCommand, 0x00, 0xe6, 0x01, byte(rate), 0x00, 0x00}
+
+	// sets ending crc bytes for packet
+	l := len(pkt)
+	pkt[(l - 2)], pkt[(l - 1)] = CalculateCRC(pkt)
+
 	_, err = d.reqConn.Write(pkt)
 	return
 }
@@ -479,7 +515,7 @@ func (d *Driver) SendStickCommand() (err error) {
 	d.cmdMutex.Lock()
 	defer d.cmdMutex.Unlock()
 
-	pkt := []byte{messageStart, 0xb0, 0x00, 0x7f, 0x60, 0x50, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x12, 0x16, 0x01, 0x0e, 0x00, 0x25, 0x54}
+	pkt := []byte{messageStart, 0xb0, 0x00, 0x7f, 0x60, stickCommand, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x12, 0x16, 0x01, 0x0e, 0x00, 0x25, 0x54}
 
 	// RightX center=1024 left =364 right =-364
 	axis1 := int16(660.0*d.rx + 1024.0)

@@ -3,8 +3,8 @@
 // Do not build by default.
 
 /*
-You must have ffmpeg and ffplay installed in order to run this code. it will connect to the Tello
-and then open a window using ffplay showing the streaming video.
+You must have ffmpeg and OpenCV installed in order to run this code. It will connect to the Tello
+and then open a window using OpenCV showing the streaming video.
 
 How to run
 
@@ -35,7 +35,7 @@ func main() {
 
 	work := func() {
 		ffmpeg := exec.Command("ffmpeg", "-i", "pipe:0", "-pix_fmt", "bgr24", "-vcodec", "rawvideo",
-			"-an", "-sn", "-r", "25", "-s", "960x720", "-f", "rawvideo", "pipe:1")
+			"-an", "-sn", "-s", "960x720", "-f", "rawvideo", "pipe:1")
 		ffmpegIn, _ := ffmpeg.StdinPipe()
 		ffmpegOut, _ := ffmpeg.StdoutPipe()
 		if err := ffmpeg.Start(); err != nil {
@@ -63,7 +63,9 @@ func main() {
 		drone.On(tello.ConnectedEvent, func(data interface{}) {
 			fmt.Println("Connected")
 			drone.StartVideo()
-			gobot.Every(1*time.Second, func() {
+			drone.SetExposure(1)
+			drone.SetVideoEncoderRate(3)
+			gobot.Every(250*time.Millisecond, func() {
 				drone.StartVideo()
 			})
 		})
