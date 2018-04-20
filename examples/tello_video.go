@@ -3,8 +3,8 @@
 // Do not build by default.
 
 /*
-You must have ffmpeg and ffplay installed in order to run this code. it will connect to the Tello
-and then open a window using ffplay showing the streaming video.
+You must have MPlayer (https://mplayerhq.hu) installed in order to run this code. it will connect to the Tello
+and then open a window using MPlayer showing the streaming video.
 
 How to run
 
@@ -26,9 +26,9 @@ func main() {
 	drone := tello.NewDriver("8890")
 
 	work := func() {
-		ffplay := exec.Command("ffplay", "-fast", "-i", "pipe:0")
-		ffplayIn, _ := ffplay.StdinPipe()
-		if err := ffplay.Start(); err != nil {
+		mplayer := exec.Command("mplayer", "-fps", "25", "-")
+		mplayerIn, _ := mplayer.StdinPipe()
+		if err := mplayer.Start(); err != nil {
 			fmt.Println(err)
 			return
 		}
@@ -37,14 +37,14 @@ func main() {
 			fmt.Println("Connected")
 			drone.StartVideo()
 			drone.SetVideoEncoderRate(4)
-			gobot.Every(250*time.Millisecond, func() {
+			gobot.Every(100*time.Millisecond, func() {
 				drone.StartVideo()
 			})
 		})
 
 		drone.On(tello.VideoFrameEvent, func(data interface{}) {
 			pkt := data.([]byte)
-			if _, err := ffplayIn.Write(pkt); err != nil {
+			if _, err := mplayerIn.Write(pkt); err != nil {
 				fmt.Println(err)
 			}
 		})
