@@ -1,3 +1,33 @@
+1.10.0
+---
+* **docs**
+    * add gitter badge to readme
+* **gpio**
+    * AIP1640 led driver, used in Wemos D1 mini's matrix LED shield
+* **spi**
+    * switch to using periph.io for SPI interfaces
+    * add support for ssd1306 
+    * add optional params such as bus/chip to all current drivers
+    * complete refactoring to spi.Connection
+    * remove unneeded code as suggested by @maruel
+    * remove unneeded type and cleanup GoDocs
+* **ble**
+    * correct spelling error in function name
+* **build**
+    * update to latest version of Go 1.10 for Travis build
+* **cli**
+    * remove extra newline
+* **docs**
+    * add recently contributed GPIO devices to README
+* **joystick**
+    * able to configure joysticks without external json file
+    * correct error in scanning script
+    * correct events used by gamepad-style up/down/left/right buttons
+    * correct scanner error from ID
+    * removed double release event
+* **tello**
+    * add support for DJI Tello drone
+
 1.9.0
 ---
 * **beaglebone**
