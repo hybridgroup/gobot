@@ -66,7 +66,7 @@ func main() {
 			drone.SetExposure(1)
 			drone.SetVideoEncoderRate(4)
 
-			gobot.Every(250*time.Millisecond, func() {
+			gobot.Every(100*time.Millisecond, func() {
 				drone.StartVideo()
 			})
 		})
