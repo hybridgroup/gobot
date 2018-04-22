@@ -63,8 +63,8 @@ func main() {
 		drone.On(tello.ConnectedEvent, func(data interface{}) {
 			fmt.Println("Connected")
 			drone.StartVideo()
-			drone.SetExposure(1)
-			drone.SetVideoEncoderRate(4)
+			drone.SetVideoEncoderRate(tello.VideoBitRateAuto)
+			drone.SetExposure(0)
 
 			gobot.Every(100*time.Millisecond, func() {
 				drone.StartVideo()

@@ -45,14 +45,18 @@ const (
 
 	// VideoFrameEvent event
 	VideoFrameEvent = "videoframe"
+
+	// SetVideoEncoderRateEvent event
+	SetVideoEncoderRateEvent = "setvideoencoder"
 )
 
 const (
-	messageStart  = 0xcc
-	wifiMessage   = 26
-	lightMessage  = 53
-	timeMessage   = 70
-	flightMessage = 86
+	messageStart   = 0xcc
+	wifiMessage    = 26
+	videoRateQuery = 40
+	lightMessage   = 53
+	timeMessage    = 70
+	flightMessage  = 86
 
 	logMessage = 0x50
 
@@ -63,11 +67,58 @@ const (
 	takeoffCommand          = 0x54
 	landCommand             = 0x55
 	flipCommand             = 0x5c
+)
 
-	flipFront = 0
-	flipLeft  = 1
-	flipBack  = 2
-	flipRight = 3
+// FlipType is used for the various flips supported by the Tello.
+type FlipType int
+
+const (
+	// FlipFront flips forward.
+	FlipFront FlipType = 0
+
+	// FlipLeft flips left.
+	FlipLeft FlipType = 1
+
+	// FlipBack flips backwards.
+	FlipBack FlipType = 2
+
+	// FlipRight flips to the right.
+	FlipRight FlipType = 3
+
+	// FlipForwardLeft flips forwards and to the left.
+	FlipForwardLeft FlipType = 4
+
+	// FlipBackLeft flips backwards and to the left.
+	FlipBackLeft FlipType = 5
+
+	// FlipBackRight flips backwards and to the right.
+	FlipBackRight FlipType = 6
+
+	// FlipForwardRight flips forewards and to the right.
+	FlipForwardRight FlipType = 7
+)
+
+// VideoBitRate is used to set the bit rate for the streaming video returned by the Tello.
+type VideoBitRate int
+
+const (
+	// VideoBitRateAuto sets the bitrate for streaming video to auto-adjust.
+	VideoBitRateAuto VideoBitRate = 0
+
+	// VideoBitRate1M sets the bitrate for streaming video to 1 Mb/s.
+	VideoBitRate1M VideoBitRate = 1
+
+	// VideoBitRate15M sets the bitrate for streaming video to 1.5 Mb/s
+	VideoBitRate15M VideoBitRate = 2
+
+	// VideoBitRate2M sets the bitrate for streaming video to 2 Mb/s.
+	VideoBitRate2M VideoBitRate = 3
+
+	// VideoBitRate3M sets the bitrate for streaming video to 3 Mb/s.
+	VideoBitRate3M VideoBitRate = 4
+
+	// VideoBitRate4M sets the bitrate for streaming video to 4 Mb/s.
+	VideoBitRate4M VideoBitRate = 5
 )
 
 // FlightData packet returned by the Tello
@@ -140,10 +191,16 @@ func NewDriver(port string) *Driver {
 
 	d.AddEvent(ConnectedEvent)
 	d.AddEvent(FlightDataEvent)
+	d.AddEvent(TakeoffEvent)
+	d.AddEvent(LandingEvent)
+	d.AddEvent(FlipEvent)
+	d.AddEvent(TimeEvent)
+	d.AddEvent(LogEvent)
 	d.AddEvent(WifiDataEvent)
 	d.AddEvent(LightStrengthEvent)
-	d.AddEvent(VideoFrameEvent)
 	d.AddEvent(SetExposureEvent)
+	d.AddEvent(VideoFrameEvent)
+	d.AddEvent(SetVideoEncoderRateEvent)
 
 	return d
 }
@@ -250,6 +307,8 @@ func (d *Driver) handleResponse() error {
 			d.Publish(d.Event(FlightDataEvent), fd)
 		case exposureCommand:
 			d.Publish(d.Event(SetExposureEvent), buf[7:8])
+		case videoEncoderRateCommand:
+			d.Publish(d.Event(SetVideoEncoderRateEvent), buf[7:8])
 		default:
 			fmt.Printf("Unknown message: %+v\n", buf[0:n])
 		}
@@ -311,7 +370,7 @@ func (d *Driver) Land() (err error) {
 	return
 }
 
-// StartVideo tells to start video stream.
+// StartVideo tells Tello to send start info (SPS/PPS) for video stream.
 func (d *Driver) StartVideo() (err error) {
 	pkt := []byte{messageStart, 0x58, 0x00, 0x7c, 0x60, videoStartCommand, 0x00, 0x00, 0x00, 0x6c, 0x95}
 	_, err = d.reqConn.Write(pkt)
@@ -334,8 +393,8 @@ func (d *Driver) SetExposure(level int) (err error) {
 }
 
 // SetVideoEncoderRate sets the drone video encoder rate.
-func (d *Driver) SetVideoEncoderRate(rate int) (err error) {
-	pkt := []byte{messageStart, 0x62, 0x00, 0x27, 0x68, videoEncoderRateCommand, 0x00, 0xe6, 0x01, byte(rate), 0x00, 0x00, 0x00}
+func (d *Driver) SetVideoEncoderRate(rate VideoBitRate) (err error) {
+	pkt := []byte{messageStart, 0x60, 0x00, 0x27, 0x68, videoEncoderRateCommand, 0x00, 0xe6, 0x01, byte(rate), 0x00, 0x00}
 
 	// sets ending crc bytes for packet
 	l := len(pkt)
@@ -345,9 +404,9 @@ func (d *Driver) SetVideoEncoderRate(rate int) (err error) {
 	return
 }
 
-// Rate does some still unknown thing.
+// Rate queries the current video bit rate.
 func (d *Driver) Rate() (err error) {
-	pkt := []byte{messageStart, 0x58, 0x00, 0x7c, 0x48, 40, 0x00, 0xe6, 0x01, 0x6c, 0x95}
+	pkt := []byte{messageStart, 0x58, 0x00, 0x7c, 0x48, videoRateQuery, 0x00, 0xe6, 0x01, 0x6c, 0x95}
 
 	// sets ending crc bytes for packet
 	l := len(pkt)
@@ -431,7 +490,7 @@ func (d *Driver) CounterClockwise(val int) error {
 }
 
 // Flip tells drone to flip
-func (d *Driver) Flip(direction int) (err error) {
+func (d *Driver) Flip(direction FlipType) (err error) {
 	pkt := []byte{messageStart, 0x60, 0x00, 0x27, 0x70, flipCommand, 0x00, 0xe6, 0x01, byte(direction), 0x00, 0x00}
 
 	// sets ending crc bytes for packet
@@ -444,22 +503,22 @@ func (d *Driver) Flip(direction int) (err error) {
 
 // FrontFlip tells the drone to perform a front flip.
 func (d *Driver) FrontFlip() (err error) {
-	return d.Flip(flipFront)
+	return d.Flip(FlipFront)
 }
 
 // BackFlip tells the drone to perform a back flip.
 func (d *Driver) BackFlip() (err error) {
-	return d.Flip(flipBack)
+	return d.Flip(FlipBack)
 }
 
 // RightFlip tells the drone to perform a flip to the right.
 func (d *Driver) RightFlip() (err error) {
-	return d.Flip(flipRight)
+	return d.Flip(FlipRight)
 }
 
 // LeftFlip tells the drone to perform a flip to the left.
 func (d *Driver) LeftFlip() (err error) {
-	return d.Flip(flipLeft)
+	return d.Flip(FlipLeft)
 }
 
 // ParseFlightData from drone
