@@ -55,7 +55,6 @@ const (
 	wifiMessage    = 26
 	videoRateQuery = 40
 	lightMessage   = 53
-	timeMessage    = 70
 	flightMessage  = 86
 
 	logMessage = 0x50
@@ -63,7 +62,8 @@ const (
 	videoEncoderRateCommand = 0x20
 	videoStartCommand       = 0x25
 	exposureCommand         = 0x34
-	stickCommand            = 0x50
+	timeCommand             = 70
+	stickCommand            = 80
 	takeoffCommand          = 0x54
 	landCommand             = 0x55
 	flipCommand             = 0x5c
@@ -248,7 +248,6 @@ func (d *Driver) Start() error {
 
 	// send stick commands
 	go func() {
-		time.Sleep(50 * time.Millisecond)
 		for {
 			err := d.SendStickCommand()
 			if err != nil {
@@ -294,7 +293,7 @@ func (d *Driver) handleResponse() error {
 
 			err = binary.Read(buf, binary.LittleEndian, &ld)
 			d.Publish(d.Event(LightStrengthEvent), ld)
-		case timeMessage:
+		case timeCommand:
 			d.Publish(d.Event(TimeEvent), buf[7:8])
 		case takeoffCommand:
 			d.Publish(d.Event(TakeoffEvent), buf[7:8])
@@ -318,6 +317,7 @@ func (d *Driver) handleResponse() error {
 	// parse text packet
 	if buf[0] == 0x63 && buf[1] == 0x6f && buf[2] == 0x6e {
 		d.Publish(d.Event(ConnectedEvent), nil)
+		d.SendDateTime()
 		d.processVideo()
 	}
 
@@ -386,7 +386,7 @@ func (d *Driver) SetExposure(level int) (err error) {
 
 	// sets ending crc bytes for packet
 	l := len(pkt)
-	pkt[(l - 2)], pkt[(l - 1)] = CalculateCRC(pkt)
+	pkt[(l - 2)], pkt[(l - 1)] = CalculateCRC16(pkt)
 
 	_, err = d.reqConn.Write(pkt)
 	return
@@ -398,7 +398,7 @@ func (d *Driver) SetVideoEncoderRate(rate VideoBitRate) (err error) {
 
 	// sets ending crc bytes for packet
 	l := len(pkt)
-	pkt[(l - 2)], pkt[(l - 1)] = CalculateCRC(pkt)
+	pkt[(l - 2)], pkt[(l - 1)] = CalculateCRC16(pkt)
 
 	_, err = d.reqConn.Write(pkt)
 	return
@@ -410,7 +410,7 @@ func (d *Driver) Rate() (err error) {
 
 	// sets ending crc bytes for packet
 	l := len(pkt)
-	pkt[(l - 2)], pkt[(l - 1)] = CalculateCRC(pkt)
+	pkt[(l - 2)], pkt[(l - 1)] = CalculateCRC16(pkt)
 
 	_, err = d.reqConn.Write(pkt)
 	return
@@ -495,7 +495,7 @@ func (d *Driver) Flip(direction FlipType) (err error) {
 
 	// sets ending crc bytes for packet
 	l := len(pkt)
-	pkt[(l - 2)], pkt[(l - 1)] = CalculateCRC(pkt)
+	pkt[(l - 2)], pkt[(l - 1)] = CalculateCRC16(pkt)
 
 	_, err = d.reqConn.Write(pkt)
 	return
@@ -620,7 +620,41 @@ func (d *Driver) SendStickCommand() (err error) {
 
 	// sets ending crc for packet
 	l := len(pkt)
-	pkt[(l - 2)], pkt[(l - 1)] = CalculateCRC(pkt)
+	pkt[(l - 2)], pkt[(l - 1)] = CalculateCRC16(pkt)
+
+	_, err = d.reqConn.Write(pkt)
+	return
+}
+
+// SendDateTime sends the current date/time to the drone.
+func (d *Driver) SendDateTime() (err error) {
+	d.cmdMutex.Lock()
+	defer d.cmdMutex.Unlock()
+
+	l := 22
+	pkt := make([]byte, l)
+	buf := bytes.NewBuffer(pkt)
+
+	binary.Write(buf, binary.LittleEndian, byte(messageStart))
+	binary.Write(buf, binary.LittleEndian, byte(l<<3))
+	binary.Write(buf, binary.LittleEndian, byte(0x00))
+	binary.Write(buf, binary.LittleEndian, byte(CalculateCRC8(pkt[0:2])))
+	binary.Write(buf, binary.LittleEndian, byte(0x50)) // packet type 0x50
+	binary.Write(buf, binary.LittleEndian, timeCommand)
+	binary.Write(buf, binary.LittleEndian, byte(0x00))
+	binary.Write(buf, binary.LittleEndian, byte(0x12)) // seq
+	binary.Write(buf, binary.LittleEndian, byte(0x00))
+
+	now := time.Now()
+	binary.Write(buf, binary.LittleEndian, byte(0x00))
+	binary.Write(buf, binary.LittleEndian, now.Hour())
+	binary.Write(buf, binary.LittleEndian, now.Minute())
+	binary.Write(buf, binary.LittleEndian, now.Second())
+	binary.Write(buf, binary.LittleEndian, int16(now.UnixNano()/int64(time.Millisecond)&0xff))
+	binary.Write(buf, binary.LittleEndian, int16(now.UnixNano()/int64(time.Millisecond)>>8))
+
+	// sets ending crc for packet
+	pkt[(l - 2)], pkt[(l - 1)] = CalculateCRC16(pkt)
 
 	_, err = d.reqConn.Write(pkt)
 	return

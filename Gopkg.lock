@@ -53,6 +53,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/go-daq/crc8"
+  packages = ["."]
+  revision = "380c22547098d3312cdeca99eba43cbbee549f77"
+
+[[projects]]
+  branch = "master"
   name = "github.com/hashicorp/errwrap"
   packages = ["."]
   revision = "7554cd9344cec97297fa6649b055a8c98c2a1e55"
@@ -62,6 +68,12 @@
   name = "github.com/hashicorp/go-multierror"
   packages = ["."]
   revision = "83588e72410abfbe4df460eeb6f30841ae47d4c4"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/howeyc/crc16"
+  packages = ["."]
+  revision = "2b2a61e366a66d3efb279e46176e7291001e0354"
 
 [[projects]]
   branch = "master"
@@ -195,33 +207,20 @@
     "conn",
     "conn/gpio",
     "conn/gpio/gpioreg",
-    "conn/gpio/gpiostream",
     "conn/i2c",
     "conn/i2c/i2creg",
     "conn/pin",
-    "conn/pin/pinreg",
     "conn/spi",
     "conn/spi/spireg",
     "devices",
-    "host",
-    "host/allwinner",
-    "host/bcm283x",
-    "host/chip",
-    "host/cpu",
-    "host/distro",
     "host/fs",
-    "host/odroidc1",
-    "host/pine64",
-    "host/pmem",
-    "host/rpi",
-    "host/sysfs",
-    "host/videocore"
+    "host/sysfs"
   ]
   revision = "a8b45e63d61cc00328dfe54149cfe7abd7115a7f"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "3bcf2897d7ee15e9e4b2923907a9b6ebd412da4b3c00c7feea10267bb35c86f2"
+  inputs-digest = "b44d7a852c8f09ede08c21c5e72ca4822f2e04af363da033646c5b36b1763d68"
   solver-name = "gps-cdcl"
   solver-version = 1
