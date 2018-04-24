@@ -176,6 +176,7 @@ type Driver struct {
 	videoConn                *net.UDPConn // UDP connection for drone video
 	respPort                 string
 	cmdMutex                 sync.Mutex
+	seq                      int16
 	rx, ry, lx, ly, throttle float32
 	gobot.Eventer
 }
@@ -335,8 +336,8 @@ func (d *Driver) processVideo() error {
 	}
 
 	go func() {
-		buf := make([]byte, 2048)
 		for {
+			buf := make([]byte, 2048)
 			n, _, err := d.videoConn.ReadFromUDP(buf)
 			d.Publish(d.Event(VideoFrameEvent), buf[2:n])
 
@@ -358,22 +359,34 @@ func (d *Driver) Halt() (err error) {
 
 // TakeOff tells drones to liftoff and start flying.
 func (d *Driver) TakeOff() (err error) {
-	takeOffPacket := []byte{messageStart, 0x58, 0x00, 0x7c, 0x68, takeoffCommand, 0x00, 0xe4, 0x01, 0xc2, 0x16}
-	_, err = d.reqConn.Write(takeOffPacket)
+	buf, _ := d.createPacket(takeoffCommand, 0x68, 0)
+	d.seq++
+	binary.Write(buf, binary.LittleEndian, d.seq)
+	binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes()))
+
+	_, err = d.reqConn.Write(buf.Bytes())
 	return
 }
 
 // Land tells drone to come in for landing.
 func (d *Driver) Land() (err error) {
-	landPacket := []byte{messageStart, 0x60, 0x00, 0x27, 0x68, landCommand, 0x00, 0xe5, 0x01, 0x00, 0xba, 0xc7}
-	_, err = d.reqConn.Write(landPacket)
+	buf, _ := d.createPacket(landCommand, 0x68, 1)
+	d.seq++
+	binary.Write(buf, binary.LittleEndian, d.seq)
+	binary.Write(buf, binary.LittleEndian, byte(0x00))
+	binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes()))
+
+	_, err = d.reqConn.Write(buf.Bytes())
 	return
 }
 
 // StartVideo tells Tello to send start info (SPS/PPS) for video stream.
 func (d *Driver) StartVideo() (err error) {
-	pkt := []byte{messageStart, 0x58, 0x00, 0x7c, 0x60, videoStartCommand, 0x00, 0x00, 0x00, 0x6c, 0x95}
-	_, err = d.reqConn.Write(pkt)
+	buf, _ := d.createPacket(videoStartCommand, 0x60, 0)
+	binary.Write(buf, binary.LittleEndian, int16(0x00)) // seq = 0
+	binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes()))
+
+	_, err = d.reqConn.Write(buf.Bytes())
 	return
 }
 
@@ -382,37 +395,37 @@ func (d *Driver) SetExposure(level int) (err error) {
 	if level < 0 || level > 2 {
 		return errors.New("Invalid exposure level")
 	}
-	pkt := []byte{messageStart, 0x60, 0x00, 0x27, 0x48, exposureCommand, 0x00, 0xe6, 0x01, byte(level), 0x00, 0x00}
 
-	// sets ending crc bytes for packet
-	l := len(pkt)
-	pkt[(l - 2)], pkt[(l - 1)] = CalculateCRC16(pkt)
+	buf, _ := d.createPacket(exposureCommand, 0x48, 1)
+	d.seq++
+	binary.Write(buf, binary.LittleEndian, d.seq)
+	binary.Write(buf, binary.LittleEndian, byte(level))
+	binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes()))
 
-	_, err = d.reqConn.Write(pkt)
+	_, err = d.reqConn.Write(buf.Bytes())
 	return
 }
 
 // SetVideoEncoderRate sets the drone video encoder rate.
 func (d *Driver) SetVideoEncoderRate(rate VideoBitRate) (err error) {
-	pkt := []byte{messageStart, 0x60, 0x00, 0x27, 0x68, videoEncoderRateCommand, 0x00, 0xe6, 0x01, byte(rate), 0x00, 0x00}
+	buf, _ := d.createPacket(videoEncoderRateCommand, 0x68, 1)
+	d.seq++
+	binary.Write(buf, binary.LittleEndian, d.seq)
+	binary.Write(buf, binary.LittleEndian, byte(rate))
+	binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes()))
 
-	// sets ending crc bytes for packet
-	l := len(pkt)
-	pkt[(l - 2)], pkt[(l - 1)] = CalculateCRC16(pkt)
-
-	_, err = d.reqConn.Write(pkt)
+	_, err = d.reqConn.Write(buf.Bytes())
 	return
 }
 
 // Rate queries the current video bit rate.
 func (d *Driver) Rate() (err error) {
-	pkt := []byte{messageStart, 0x58, 0x00, 0x7c, 0x48, videoRateQuery, 0x00, 0xe6, 0x01, 0x6c, 0x95}
+	buf, _ := d.createPacket(videoRateQuery, 0x48, 0)
+	d.seq++
+	binary.Write(buf, binary.LittleEndian, d.seq)
+	binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes()))
 
-	// sets ending crc bytes for packet
-	l := len(pkt)
-	pkt[(l - 2)], pkt[(l - 1)] = CalculateCRC16(pkt)
-
-	_, err = d.reqConn.Write(pkt)
+	_, err = d.reqConn.Write(buf.Bytes())
 	return
 }
 
@@ -491,13 +504,13 @@ func (d *Driver) CounterClockwise(val int) error {
 
 // Flip tells drone to flip
 func (d *Driver) Flip(direction FlipType) (err error) {
-	pkt := []byte{messageStart, 0x60, 0x00, 0x27, 0x70, flipCommand, 0x00, 0xe6, 0x01, byte(direction), 0x00, 0x00}
+	buf, _ := d.createPacket(flipCommand, 0x70, 1)
+	d.seq++
+	binary.Write(buf, binary.LittleEndian, d.seq)
+	binary.Write(buf, binary.LittleEndian, byte(direction))
+	binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes()))
 
-	// sets ending crc bytes for packet
-	l := len(pkt)
-	pkt[(l - 2)], pkt[(l - 1)] = CalculateCRC16(pkt)
-
-	_, err = d.reqConn.Write(pkt)
+	_, err = d.reqConn.Write(buf.Bytes())
 	return
 }
 
@@ -586,7 +599,8 @@ func (d *Driver) SendStickCommand() (err error) {
 	d.cmdMutex.Lock()
 	defer d.cmdMutex.Unlock()
 
-	pkt := []byte{messageStart, 0xb0, 0x00, 0x7f, 0x60, stickCommand, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x12, 0x16, 0x01, 0x0e, 0x00, 0x25, 0x54}
+	buf, _ := d.createPacket(stickCommand, 0x60, 11)
+	binary.Write(buf, binary.LittleEndian, int16(0x00)) // seq = 0
 
 	// RightX center=1024 left =364 right =-364
 	axis1 := int16(660.0*d.rx + 1024.0)
@@ -604,25 +618,25 @@ func (d *Driver) SendStickCommand() (err error) {
 	axis5 := int16(660.0*d.throttle + 1024.0)
 
 	packedAxis := int64(axis1)&0x7FF | int64(axis2&0x7FF)<<11 | 0x7FF&int64(axis3)<<22 | 0x7FF&int64(axis4)<<33 | int64(axis5)<<44
-	pkt[9] = byte(0xFF & packedAxis)
-	pkt[10] = byte(packedAxis >> 8 & 0xFF)
-	pkt[11] = byte(packedAxis >> 16 & 0xFF)
-	pkt[12] = byte(packedAxis >> 24 & 0xFF)
-	pkt[13] = byte(packedAxis >> 32 & 0xFF)
-	pkt[14] = byte(packedAxis >> 40 & 0xFF)
+	binary.Write(buf, binary.LittleEndian, byte(0xFF&packedAxis))
+	binary.Write(buf, binary.LittleEndian, byte(packedAxis>>8&0xFF))
+	binary.Write(buf, binary.LittleEndian, byte(packedAxis>>16&0xFF))
+	binary.Write(buf, binary.LittleEndian, byte(packedAxis>>24&0xFF))
+	binary.Write(buf, binary.LittleEndian, byte(packedAxis>>32&0xFF))
+	binary.Write(buf, binary.LittleEndian, byte(packedAxis>>40&0xFF))
 
 	now := time.Now()
-	pkt[15] = byte(now.Hour())
-	pkt[16] = byte(now.Minute())
-	pkt[17] = byte(now.Second())
-	pkt[18] = byte(now.UnixNano() / int64(time.Millisecond) & 0xff)
-	pkt[19] = byte(now.UnixNano() / int64(time.Millisecond) >> 8)
+	binary.Write(buf, binary.LittleEndian, byte(now.Hour()))
+	binary.Write(buf, binary.LittleEndian, byte(now.Minute()))
+	binary.Write(buf, binary.LittleEndian, byte(now.Second()))
+	binary.Write(buf, binary.LittleEndian, byte(now.UnixNano()/int64(time.Millisecond)&0xff))
+	binary.Write(buf, binary.LittleEndian, byte(now.UnixNano()/int64(time.Millisecond)>>8))
 
 	// sets ending crc for packet
-	l := len(pkt)
-	pkt[(l - 2)], pkt[(l - 1)] = CalculateCRC16(pkt)
+	binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes()))
 
-	_, err = d.reqConn.Write(pkt)
+	_, err = d.reqConn.Write(buf.Bytes())
+
 	return
 }
 
@@ -631,19 +645,9 @@ func (d *Driver) SendDateTime() (err error) {
 	d.cmdMutex.Lock()
 	defer d.cmdMutex.Unlock()
 
-	l := 22
-	pkt := make([]byte, l)
-	buf := bytes.NewBuffer(pkt)
-
-	binary.Write(buf, binary.LittleEndian, byte(messageStart))
-	binary.Write(buf, binary.LittleEndian, byte(l<<3))
-	binary.Write(buf, binary.LittleEndian, byte(0x00))
-	binary.Write(buf, binary.LittleEndian, byte(CalculateCRC8(pkt[0:2])))
-	binary.Write(buf, binary.LittleEndian, byte(0x50)) // packet type 0x50
-	binary.Write(buf, binary.LittleEndian, timeCommand)
-	binary.Write(buf, binary.LittleEndian, byte(0x00))
-	binary.Write(buf, binary.LittleEndian, byte(0x12)) // seq
-	binary.Write(buf, binary.LittleEndian, byte(0x00))
+	buf, _ := d.createPacket(timeCommand, 0x50, 11)
+	d.seq++
+	binary.Write(buf, binary.LittleEndian, d.seq)
 
 	now := time.Now()
 	binary.Write(buf, binary.LittleEndian, byte(0x00))
@@ -654,9 +658,9 @@ func (d *Driver) SendDateTime() (err error) {
 	binary.Write(buf, binary.LittleEndian, int16(now.UnixNano()/int64(time.Millisecond)>>8))
 
 	// sets ending crc for packet
-	pkt[(l - 2)], pkt[(l - 1)] = CalculateCRC16(pkt)
+	binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes()))
 
-	_, err = d.reqConn.Write(pkt)
+	_, err = d.reqConn.Write(buf.Bytes())
 	return
 }
 
@@ -666,10 +670,24 @@ func (d *Driver) SendCommand(cmd string) (err error) {
 	return
 }
 
+func (d *Driver) createPacket(cmd int16, pktType byte, len int16) (buf *bytes.Buffer, err error) {
+	l := len + 11
+	buf = &bytes.Buffer{}
+
+	binary.Write(buf, binary.LittleEndian, byte(messageStart))
+	binary.Write(buf, binary.LittleEndian, l<<3)
+	binary.Write(buf, binary.LittleEndian, CalculateCRC8(buf.Bytes()[0:3]))
+	binary.Write(buf, binary.LittleEndian, pktType)
+	binary.Write(buf, binary.LittleEndian, cmd)
+
+	return buf, nil
+}
+
 func validatePitch(val int) int {
 	if val > 100 {
 		return 100
-	} else if val < 0 {
+	}
+	if val < 0 {
 		return 0
 	}
 
