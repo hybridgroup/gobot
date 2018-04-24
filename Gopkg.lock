@@ -166,8 +166,8 @@
 [[projects]]
   name = "gocv.io/x/gocv"
   packages = ["."]
-  revision = "65d6ebdd323af342cc48ac0d146ef7ad16b33fbc"
-  version = "v0.9.0"
+  revision = "ab6d932219faf43e531eea89ef3496cdb67aa734"
+  version = "0.11.0"
 
 [[projects]]
   branch = "master"
@@ -209,6 +209,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "ce3deb9e4c499f6262bf532372e9f8fec873daa6ddb9c19d2a0ecc55d2c50da4"
+  inputs-digest = "c43dc994a8c7f2d4c032139478a57e90a174738d54033e5076e9705e13352dda"
   solver-name = "gps-cdcl"
   solver-version = 1

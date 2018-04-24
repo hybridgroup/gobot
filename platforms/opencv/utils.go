@@ -29,7 +29,7 @@ func DetectObjects(haar string, img gocv.Mat) []image.Rectangle {
 // DrawRectangles uses Rect array values to return image with rectangles drawn.
 func DrawRectangles(img gocv.Mat, rects []image.Rectangle, r int, g int, b int, thickness int) {
 	for _, rect := range rects {
-		gocv.Rectangle(img, rect, color.RGBA{uint8(r), uint8(g), uint8(b), 0}, thickness)
+		gocv.Rectangle(&img, rect, color.RGBA{uint8(r), uint8(g), uint8(b), 0}, thickness)
 	}
 	return
 }

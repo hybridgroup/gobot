@@ -8,7 +8,7 @@ import (
 )
 
 type capture interface {
-	Read(img gocv.Mat) bool
+	Read(img *gocv.Mat) bool
 }
 
 const (
@@ -67,7 +67,7 @@ func (c *CameraDriver) Start() (err error) {
 	img := gocv.NewMat()
 	go func() {
 		for {
-			if ok := c.camera.Read(img); ok {
+			if ok := c.camera.Read(&img); ok {
 				c.Publish(Frame, img)
 			}
 		}

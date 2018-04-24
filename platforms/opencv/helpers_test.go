@@ -6,7 +6,7 @@ import (
 
 type testCapture struct{}
 
-func (c *testCapture) Read(img gocv.Mat) bool {
+func (c *testCapture) Read(img *gocv.Mat) bool {
 	return true
 }
 
