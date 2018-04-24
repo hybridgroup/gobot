@@ -261,95 +261,6 @@ func (d *Driver) Start() error {
 	return nil
 }
 
-func (d *Driver) handleResponse() error {
-	var buf [2048]byte
-	n, err := d.reqConn.Read(buf[0:])
-	if err != nil {
-		return err
-	}
-
-	// parse binary packet
-	if buf[0] == messageStart {
-		if buf[6] == 0x10 {
-			switch buf[5] {
-			case logMessage:
-				d.Publish(d.Event(LogEvent), buf[9:])
-			default:
-				fmt.Printf("Unknown message: %+v\n", buf[0:n])
-			}
-			return nil
-		}
-
-		switch buf[5] {
-		case wifiMessage:
-			buf := bytes.NewReader(buf[9:12])
-			wd := &WifiData{}
-
-			err = binary.Read(buf, binary.LittleEndian, &wd.Disturb)
-			err = binary.Read(buf, binary.LittleEndian, &wd.Strength)
-			d.Publish(d.Event(WifiDataEvent), wd)
-		case lightMessage:
-			buf := bytes.NewReader(buf[9:10])
-			var ld int16
-
-			err = binary.Read(buf, binary.LittleEndian, &ld)
-			d.Publish(d.Event(LightStrengthEvent), ld)
-		case timeCommand:
-			d.Publish(d.Event(TimeEvent), buf[7:8])
-		case takeoffCommand:
-			d.Publish(d.Event(TakeoffEvent), buf[7:8])
-		case landCommand:
-			d.Publish(d.Event(LandingEvent), buf[7:8])
-		case flipCommand:
-			d.Publish(d.Event(FlipEvent), buf[7:8])
-		case flightMessage:
-			fd, _ := d.ParseFlightData(buf[9:])
-			d.Publish(d.Event(FlightDataEvent), fd)
-		case exposureCommand:
-			d.Publish(d.Event(SetExposureEvent), buf[7:8])
-		case videoEncoderRateCommand:
-			d.Publish(d.Event(SetVideoEncoderRateEvent), buf[7:8])
-		default:
-			fmt.Printf("Unknown message: %+v\n", buf[0:n])
-		}
-		return nil
-	}
-
-	// parse text packet
-	if buf[0] == 0x63 && buf[1] == 0x6f && buf[2] == 0x6e {
-		d.Publish(d.Event(ConnectedEvent), nil)
-		d.SendDateTime()
-		d.processVideo()
-	}
-
-	return nil
-}
-
-func (d *Driver) processVideo() error {
-	videoPort, err := net.ResolveUDPAddr("udp", ":6038")
-	if err != nil {
-		return err
-	}
-	d.videoConn, err = net.ListenUDP("udp", videoPort)
-	if err != nil {
-		return err
-	}
-
-	go func() {
-		for {
-			buf := make([]byte, 2048)
-			n, _, err := d.videoConn.ReadFromUDP(buf)
-			d.Publish(d.Event(VideoFrameEvent), buf[2:n])
-
-			if err != nil {
-				fmt.Println("Error: ", err)
-			}
-		}
-	}()
-
-	return nil
-}
-
 // Halt stops the driver.
 func (d *Driver) Halt() (err error) {
 	d.reqConn.Close()
@@ -605,13 +516,13 @@ func (d *Driver) SendStickCommand() (err error) {
 	// RightX center=1024 left =364 right =-364
 	axis1 := int16(660.0*d.rx + 1024.0)
 
-	//RightY down =364 up =-364
+	// RightY down =364 up =-364
 	axis2 := int16(660.0*d.ry + 1024.0)
 
-	//LeftY down =364 up =-364
+	// LeftY down =364 up =-364
 	axis3 := int16(660.0*d.ly + 1024.0)
 
-	//LeftX left =364 right =-364
+	// LeftX left =364 right =-364
 	axis4 := int16(660.0*d.lx + 1024.0)
 
 	// speed control
@@ -632,7 +543,6 @@ func (d *Driver) SendStickCommand() (err error) {
 	binary.Write(buf, binary.LittleEndian, byte(now.UnixNano()/int64(time.Millisecond)&0xff))
 	binary.Write(buf, binary.LittleEndian, byte(now.UnixNano()/int64(time.Millisecond)>>8))
 
-	// sets ending crc for packet
 	binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes()))
 
 	_, err = d.reqConn.Write(buf.Bytes())
@@ -657,7 +567,6 @@ func (d *Driver) SendDateTime() (err error) {
 	binary.Write(buf, binary.LittleEndian, int16(now.UnixNano()/int64(time.Millisecond)&0xff))
 	binary.Write(buf, binary.LittleEndian, int16(now.UnixNano()/int64(time.Millisecond)>>8))
 
-	// sets ending crc for packet
 	binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes()))
 
 	_, err = d.reqConn.Write(buf.Bytes())
@@ -668,6 +577,95 @@ func (d *Driver) SendDateTime() (err error) {
 func (d *Driver) SendCommand(cmd string) (err error) {
 	_, err = d.reqConn.Write([]byte(cmd))
 	return
+}
+
+func (d *Driver) handleResponse() error {
+	var buf [2048]byte
+	n, err := d.reqConn.Read(buf[0:])
+	if err != nil {
+		return err
+	}
+
+	// parse binary packet
+	if buf[0] == messageStart {
+		if buf[6] == 0x10 {
+			switch buf[5] {
+			case logMessage:
+				d.Publish(d.Event(LogEvent), buf[9:])
+			default:
+				fmt.Printf("Unknown message: %+v\n", buf[0:n])
+			}
+			return nil
+		}
+
+		switch buf[5] {
+		case wifiMessage:
+			buf := bytes.NewReader(buf[9:12])
+			wd := &WifiData{}
+
+			err = binary.Read(buf, binary.LittleEndian, &wd.Disturb)
+			err = binary.Read(buf, binary.LittleEndian, &wd.Strength)
+			d.Publish(d.Event(WifiDataEvent), wd)
+		case lightMessage:
+			buf := bytes.NewReader(buf[9:10])
+			var ld int16
+
+			err = binary.Read(buf, binary.LittleEndian, &ld)
+			d.Publish(d.Event(LightStrengthEvent), ld)
+		case timeCommand:
+			d.Publish(d.Event(TimeEvent), buf[7:8])
+		case takeoffCommand:
+			d.Publish(d.Event(TakeoffEvent), buf[7:8])
+		case landCommand:
+			d.Publish(d.Event(LandingEvent), buf[7:8])
+		case flipCommand:
+			d.Publish(d.Event(FlipEvent), buf[7:8])
+		case flightMessage:
+			fd, _ := d.ParseFlightData(buf[9:])
+			d.Publish(d.Event(FlightDataEvent), fd)
+		case exposureCommand:
+			d.Publish(d.Event(SetExposureEvent), buf[7:8])
+		case videoEncoderRateCommand:
+			d.Publish(d.Event(SetVideoEncoderRateEvent), buf[7:8])
+		default:
+			fmt.Printf("Unknown message: %+v\n", buf[0:n])
+		}
+		return nil
+	}
+
+	// parse text packet
+	if buf[0] == 0x63 && buf[1] == 0x6f && buf[2] == 0x6e {
+		d.Publish(d.Event(ConnectedEvent), nil)
+		d.SendDateTime()
+		d.processVideo()
+	}
+
+	return nil
+}
+
+func (d *Driver) processVideo() error {
+	videoPort, err := net.ResolveUDPAddr("udp", ":6038")
+	if err != nil {
+		return err
+	}
+	d.videoConn, err = net.ListenUDP("udp", videoPort)
+	if err != nil {
+		return err
+	}
+
+	go func() {
+		for {
+			buf := make([]byte, 2048)
+			n, _, err := d.videoConn.ReadFromUDP(buf)
+			d.Publish(d.Event(VideoFrameEvent), buf[2:n])
+
+			if err != nil {
+				fmt.Println("Error: ", err)
+			}
+		}
+	}()
+
+	return nil
 }
 
 func (d *Driver) createPacket(cmd int16, pktType byte, len int16) (buf *bytes.Buffer, err error) {
