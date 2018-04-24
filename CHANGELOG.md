@@ -1,3 +1,8 @@
+1.10.1
+---
+* **tello**
+    * improve support for DJI Tello drone, especially video
+
 1.10.0
 ---
 * **docs**
