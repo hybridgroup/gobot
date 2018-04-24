@@ -21,16 +21,12 @@ var crc8table = []byte{
 
 // CalculateCRC8 calculates the starting CRC8 byte for packet.
 func CalculateCRC8(pkt []byte) byte {
-	i := 0
-	l := len(pkt)
-	seed := byte(0x77)
-	for l > 0 {
-		seed = crc8table[(seed^pkt[i])&0xff]
-		i = i + 1
-		l = l - 1
+	crc := byte(0x77)
+	for _, val := range pkt {
+		crc = crc8table[(crc^byte(val))&0xff]
 	}
 
-	return seed
+	return crc
 }
 
 var crc16table = []uint16{
@@ -53,14 +49,11 @@ var crc16table = []uint16{
 }
 
 // CalculateCRC16 calculates the ending CRC16 bytes for packet.
-func CalculateCRC16(pkt []byte) (i uint16) {
-	i = 0
-	l := len(pkt)
-	seed := uint16(0x3692)
-	for l > 0 {
-		seed = crc16table[(seed^uint16(pkt[i]))&0xff] ^ (seed >> 8)
-		i = i + 1
-		l = l - 1
+func CalculateCRC16(pkt []byte) uint16 {
+	crc := uint16(0x3692)
+	for _, val := range pkt {
+		crc = crc16table[(crc^uint16(val))&0xff] ^ (crc >> 8)
 	}
-	return seed
+
+	return crc
 }
