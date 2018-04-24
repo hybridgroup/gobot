@@ -53,12 +53,6 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/go-daq/crc8"
-  packages = ["."]
-  revision = "380c22547098d3312cdeca99eba43cbbee549f77"
-
-[[projects]]
-  branch = "master"
   name = "github.com/hashicorp/errwrap"
   packages = ["."]
   revision = "7554cd9344cec97297fa6649b055a8c98c2a1e55"
@@ -68,12 +62,6 @@
   name = "github.com/hashicorp/go-multierror"
   packages = ["."]
   revision = "83588e72410abfbe4df460eeb6f30841ae47d4c4"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/howeyc/crc16"
-  packages = ["."]
-  revision = "2b2a61e366a66d3efb279e46176e7291001e0354"
 
 [[projects]]
   branch = "master"
@@ -221,6 +209,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "b44d7a852c8f09ede08c21c5e72ca4822f2e04af363da033646c5b36b1763d68"
+  inputs-digest = "ce3deb9e4c499f6262bf532372e9f8fec873daa6ddb9c19d2a0ecc55d2c50da4"
   solver-name = "gps-cdcl"
   solver-version = 1
