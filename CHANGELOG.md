@@ -1,3 +1,8 @@
+1.10.2
+---
+* **opencv**
+    * update GoCV to latest version
+
 1.10.1
 ---
 * **tello**
