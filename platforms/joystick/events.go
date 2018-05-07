@@ -117,4 +117,24 @@ const (
 	BackPress = "back_press"
 	// back button release event
 	BackRelease = "back_release"
+	// red pad press event
+	RedPress = "red_press"
+	// red pad release event
+	RedRelease = "red_release"
+	// yellow pad press event
+	YellowPress = "yellow_press"
+	// yellow pad release event
+	YellowRelease = "yellow_release"
+	// blue pad press event
+	BluePress = "blue_press"
+	// blue pad release event
+	BlueRelease = "blue_release"
+	// green pad press event
+	GreenPress = "green_press"
+	// green pad release event
+	GreenRelease = "green_release"
+	// pedal press event
+	PedalPress = "pedal_press"
+	// pedal release event
+	PedalRelease = "pedal_release"
 )

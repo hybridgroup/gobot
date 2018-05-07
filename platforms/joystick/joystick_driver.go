@@ -102,6 +102,8 @@ func (j *Driver) Start() (err error) {
 		j.config = dualshock4Config
 	case "xbox360":
 		j.config = xbox360Config
+	case "xbox360RockBandDrums":
+		j.config = xbox360RockBandDrumsConfig
 	default:
 		j.loadFile()
 	}
