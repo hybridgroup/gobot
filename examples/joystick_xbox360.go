@@ -28,16 +28,16 @@ func main() {
 		stick.On(joystick.BRelease, func(data interface{}) {
 			fmt.Println("b_release")
 		})
-		stick.On(joystick.Up, func(data interface{}) {
+		stick.On(joystick.UpPress, func(data interface{}) {
 			fmt.Println("up", data)
 		})
-		stick.On(joystick.Down, func(data interface{}) {
+		stick.On(joystick.DownPress, func(data interface{}) {
 			fmt.Println("down", data)
 		})
-		stick.On(joystick.Left, func(data interface{}) {
+		stick.On(joystick.LeftPress, func(data interface{}) {
 			fmt.Println("left", data)
 		})
-		stick.On(joystick.Right, func(data interface{}) {
+		stick.On(joystick.RightPress, func(data interface{}) {
 			fmt.Println("right", data)
 		})
 		stick.On(joystick.LeftX, func(data interface{}) {
