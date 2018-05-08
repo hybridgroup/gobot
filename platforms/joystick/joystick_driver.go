@@ -100,6 +100,8 @@ func (j *Driver) Start() (err error) {
 		j.config = dualshock3Config
 	case "dualshock4":
 		j.config = dualshock4Config
+	case "tflightHotasX":
+		j.config = tflightHotasXConfig
 	case "xbox360":
 		j.config = xbox360Config
 	default:
