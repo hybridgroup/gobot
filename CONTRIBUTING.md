@@ -61,6 +61,11 @@ The basics are as follows:
 All import paths should now work fine assuming that you've got the
 proper branch checked out.
 
+3. Get all the needed gobot's dependencies each of them at their needed version. Gobot uses [dep (Dependency management for Go)](https://golang.github.io/dep/) to manage the project's dependencies. To get all the correct dependencies:
+
+* Install dep tool. Follow the dep [installation](https://golang.github.io/dep/docs/installation.html) instructions in case you don't have it already installed.
+* `cd $GOPATH/src/gobot.io/x/gobot` 
+* `dep ensure` will fetch  all the dependencies at their needed version.
 
 ## Landing Pull Requests
 (This is for committers only. If you are unsure whether you are a committer, you are not.)
