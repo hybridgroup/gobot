@@ -21,6 +21,10 @@ const (
 	L2Press = "l2_press"
 	// L2 button release event
 	L2Release = "l2_release"
+	// L3 button press event
+	L3Press = "l3_press"
+	// L3 button release event
+	L3Release = "l3_release"
 	// R1 button joystick event
 	R1 = "r1"
 	// R1 button press event
@@ -33,6 +37,10 @@ const (
 	R2Press = "r2_press"
 	// R1 button release event
 	R2Release = "r2_release"
+	// R3 button press event
+	R3Press = "r3_press"
+	// R1 button release event
+	R3Release = "r3_release"
 	// up gamepad press event
 	UpPress = "up_press"
 	// up gamepad release event
