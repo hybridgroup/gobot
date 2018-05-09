@@ -1,3 +1,7 @@
+// +build utils
+//
+// Do not build by default.
+//
 // Joystick scanner
 // Based on original code from Jacky Boen
 // https://github.com/veandco/go-sdl2/blob/master/examples/events/events.go
