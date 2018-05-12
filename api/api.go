@@ -11,13 +11,13 @@ import (
 	"github.com/bmizerany/pat"
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/api/robeaux"
-	logger "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 )
 
-var log *logger.Logger
+var log *logrus.Logger
 
 func init(){
-	log = logger.New()
+	log = logrus.New()
 }
 
 // API represents an API server
@@ -32,7 +32,7 @@ type API struct {
 	start    func(*API)
 }
 
-func RegisterLogger(l logger.Logger)  {
+func RegisterLogger(l logrus.Logger)  {
 	log = l
 }
 

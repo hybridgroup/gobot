@@ -2,7 +2,6 @@ package gobot
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"os/signal"
 	"sync/atomic"

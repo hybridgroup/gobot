@@ -1,7 +1,6 @@
 package gobot
 
 import (
-	"log"
 	"reflect"
 
 	multierror "github.com/hashicorp/go-multierror"

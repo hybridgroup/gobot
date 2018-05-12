@@ -4,14 +4,14 @@ import (
 	"reflect"
 
 	"github.com/hashicorp/go-multierror"
-	logger "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 )
 
 // package-global logger
-var log *logger.Logger
+var log *logrus.Logger
 
 func init(){
-	log = logger.New()
+	log = logrus.New()
 }
 
 // JSONConnection is a JSON representation of a Connection.
@@ -28,7 +28,7 @@ func NewJSONConnection(connection Connection) *JSONConnection {
 	}
 }
 
-func RegisterLogger(l logger.Logger)  {
+func RegisterLogger(l *logrus.Logger)  {
 	log = l
 }
 

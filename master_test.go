@@ -2,7 +2,6 @@ package gobot
 
 import (
 	"errors"
-	"log"
 	"os"
 	"testing"
 	"time"
@@ -12,7 +11,6 @@ import (
 )
 
 func initTestMaster() *Master {
-	log.SetOutput(&NullReadWriteCloser{})
 	g := NewMaster()
 	g.trap = func(c chan os.Signal) {
 		c <- os.Interrupt
@@ -24,7 +22,6 @@ func initTestMaster() *Master {
 }
 
 func initTestMaster1Robot() *Master {
-	log.SetOutput(&NullReadWriteCloser{})
 	g := NewMaster()
 	g.trap = func(c chan os.Signal) {
 		c <- os.Interrupt
