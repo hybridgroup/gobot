@@ -4,11 +4,11 @@ import (
 	"reflect"
 
 	"github.com/hashicorp/go-multierror"
-	log "github.com/sirupsen/logrus"
+	logger "github.com/sirupsen/logrus"
 )
 
 // package-global logger
-var logger log.Logger
+var log logger.Logger
 
 // JSONConnection is a JSON representation of a Connection.
 type JSONConnection struct {
@@ -24,8 +24,8 @@ func NewJSONConnection(connection Connection) *JSONConnection {
 	}
 }
 
-func RegisterLogger(l log.Logger)  {
-	logger = l
+func RegisterLogger(l logger.Logger)  {
+	log = l
 }
 
 // A Connection is an instance of an Adaptor
