@@ -14,7 +14,11 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
-var log logger.Logger
+var log *logger.Logger
+
+func init(){
+	log = logger.New()
+}
 
 // API represents an API server
 type API struct {

@@ -8,7 +8,11 @@ import (
 )
 
 // package-global logger
-var log logger.Logger
+var log *logger.Logger
+
+func init(){
+	log = logger.New()
+}
 
 // JSONConnection is a JSON representation of a Connection.
 type JSONConnection struct {
