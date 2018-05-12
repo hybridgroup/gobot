@@ -14,11 +14,9 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var log *logrus.Logger
-
-func init(){
-	log = logrus.New()
-}
+var (
+	log = logrus.StandardLogger()
+	)
 
 // API represents an API server
 type API struct {
@@ -32,7 +30,7 @@ type API struct {
 	start    func(*API)
 }
 
-func RegisterLogger(l logrus.Logger)  {
+func RegisterLogger(l *logrus.Logger)  {
 	log = l
 }
 

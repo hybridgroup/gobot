@@ -7,12 +7,9 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// package-global logger
-var log *logrus.Logger
-
-func init(){
-	log = logrus.New()
-}
+var (
+	log = logrus.StandardLogger()
+)
 
 // JSONConnection is a JSON representation of a Connection.
 type JSONConnection struct {
@@ -28,7 +25,7 @@ func NewJSONConnection(connection Connection) *JSONConnection {
 	}
 }
 
-func RegisterLogger(l *logrus.Logger)  {
+func RegisterLogger(l *logrus.Logger) {
 	log = l
 }
 

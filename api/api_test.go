@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -13,10 +12,11 @@ import (
 
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/gobottest"
+	"github.com/sirupsen/logrus"
 )
 
 func initTestAPI() *API {
-	log.SetOutput(NullReadWriteCloser{})
+	logrus.SetOutput(NullReadWriteCloser{})
 	g := gobot.NewMaster()
 	a := NewAPI(g)
 	a.start = func(m *API) {}
