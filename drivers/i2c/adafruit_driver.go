@@ -2,7 +2,7 @@ package i2c
 
 import (
 	"errors"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"math"
 	"time"
 

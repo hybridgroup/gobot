@@ -2,7 +2,7 @@ package ble
 
 import (
 	"context"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"strings"
 	"sync"
 

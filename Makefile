@@ -2,6 +2,7 @@
 
 excluding_vendor := $(shell go list ./... | grep -v /vendor/)
 
+
 # Run tests on all non-vendor directories
 test:
 	go test -v $(excluding_vendor)
@@ -17,6 +18,9 @@ fmt_check:
 # Test and generate coverage
 test_with_coverage:
 	./ci/test.sh
+
+build:
+	go build
 
 deps:
 ifeq (,$(shell which dep))

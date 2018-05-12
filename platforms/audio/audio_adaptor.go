@@ -3,7 +3,7 @@ package audio
 
 import (
 	"errors"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"os"
 	"os/exec"
 	"path"

@@ -1,7 +1,7 @@
 package keyboard
 
 import (
-	"log"
+	log "github.com/sirupsen/logrus"
 	"os"
 
 	"gobot.io/x/gobot"

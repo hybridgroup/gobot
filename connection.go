@@ -1,11 +1,14 @@
 package gobot
 
 import (
-	"log"
 	"reflect"
 
-	multierror "github.com/hashicorp/go-multierror"
+	"github.com/hashicorp/go-multierror"
+	log "github.com/sirupsen/logrus"
 )
+
+// package-global logger
+var logger log.Logger
 
 // JSONConnection is a JSON representation of a Connection.
 type JSONConnection struct {
@@ -19,6 +22,10 @@ func NewJSONConnection(connection Connection) *JSONConnection {
 		Name:    connection.Name(),
 		Adaptor: reflect.TypeOf(connection).String(),
 	}
+}
+
+func RegisterLogger(l log.Logger)  {
+	logger = l
 }
 
 // A Connection is an instance of an Adaptor

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -12,7 +11,10 @@ import (
 	"github.com/bmizerany/pat"
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/api/robeaux"
+	log "github.com/sirupsen/logrus"
 )
+
+var logger log.Logger
 
 // API represents an API server
 type API struct {
@@ -24,6 +26,10 @@ type API struct {
 	Key      string
 	handlers []func(http.ResponseWriter, *http.Request)
 	start    func(*API)
+}
+
+func RegisterLogger(l log.Logger)  {
+	logger = l
 }
 
 // NewAPI returns a new api instance

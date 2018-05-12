@@ -3,7 +3,7 @@ package i2c
 import (
 	"errors"
 	"io/ioutil"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"os"
 	"testing"
 

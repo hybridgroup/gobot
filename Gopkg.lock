@@ -37,18 +37,7 @@
 [[projects]]
   branch = "master"
   name = "github.com/go-ble/ble"
-  packages = [
-    ".",
-    "darwin",
-    "linux",
-    "linux/adv",
-    "linux/att",
-    "linux/gatt",
-    "linux/hci",
-    "linux/hci/cmd",
-    "linux/hci/evt",
-    "linux/hci/socket"
-  ]
+  packages = [".","darwin","linux","linux/adv","linux/att","linux/gatt","linux/hci","linux/hci/cmd","linux/hci/evt","linux/hci/socket"]
   revision = "788214691384e85e345bff9fd5eeb046f5983594"
 
 [[projects]]
@@ -66,11 +55,7 @@
 [[projects]]
   branch = "master"
   name = "github.com/hybridgroup/go-ardrone"
-  packages = [
-    "client",
-    "client/commands",
-    "client/navdata"
-  ]
+  packages = ["client","client/commands","client/navdata"]
   revision = "b9750d8d7b78f9638e5fdd899835e99d46b5a56c"
 
 [[projects]]
@@ -99,10 +84,7 @@
 
 [[projects]]
   name = "github.com/nats-io/go-nats"
-  packages = [
-    "encoders/builtin",
-    "util"
-  ]
+  packages = ["encoders/builtin","util"]
   revision = "29f9728a183bf3fa7e809e14edac00b33be72088"
   version = "v1.3.0"
 
@@ -143,6 +125,12 @@
   revision = "f19e41f79f8f006116f682c1af454591bc278ad4"
 
 [[projects]]
+  name = "github.com/sirupsen/logrus"
+  packages = ["."]
+  revision = "c155da19408a8799da419ed3eeb0cb5db0ad5dbc"
+  version = "v1.0.5"
+
+[[projects]]
   branch = "master"
   name = "github.com/tarm/serial"
   packages = ["."]
@@ -157,10 +145,7 @@
 [[projects]]
   branch = "master"
   name = "go.bug.st/serial.v1"
-  packages = [
-    ".",
-    "unixutils"
-  ]
+  packages = [".","unixutils"]
   revision = "eae1344f9f90101f887b08d13391c34399f97873"
 
 [[projects]]
@@ -171,39 +156,26 @@
 
 [[projects]]
   branch = "master"
+  name = "golang.org/x/crypto"
+  packages = ["ssh/terminal"]
+  revision = "2d027ae1dddd4694d54f7a8b6cbe78dca8720226"
+
+[[projects]]
+  branch = "master"
   name = "golang.org/x/net"
-  packages = [
-    "proxy",
-    "websocket"
-  ]
+  packages = ["proxy","websocket"]
   revision = "01c190206fbdffa42f334f4b2bf2220f50e64920"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
-  packages = [
-    "unix",
-    "windows"
-  ]
+  packages = ["unix","windows"]
   revision = "8eb05f94d449fdf134ec24630ce69ada5b469c1c"
 
 [[projects]]
   branch = "master"
   name = "periph.io/x/periph"
-  packages = [
-    ".",
-    "conn",
-    "conn/gpio",
-    "conn/gpio/gpioreg",
-    "conn/i2c",
-    "conn/i2c/i2creg",
-    "conn/pin",
-    "conn/spi",
-    "conn/spi/spireg",
-    "devices",
-    "host/fs",
-    "host/sysfs"
-  ]
+  packages = [".","conn","conn/gpio","conn/gpio/gpioreg","conn/i2c","conn/i2c/i2creg","conn/pin","conn/spi","conn/spi/spireg","devices","host/fs","host/sysfs"]
   revision = "a8b45e63d61cc00328dfe54149cfe7abd7115a7f"
 
 [solve-meta]
