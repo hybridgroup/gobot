@@ -2,7 +2,7 @@
 
 Arduino is an open-source electronics prototyping platform based on flexible, easy-to-use hardware and software. It's intended for artists, designers, hobbyists and anyone interested in creating interactive objects or environments.
 
-This package provides the adaptor for microcontrollers such as Arduino that support the [Firmata](http://firmata.org/wiki/Main_Page) protocol
+This package provides the adaptor for microcontrollers such as Arduino that support the [Firmata](https://github.com/firmata/protocol) protocol
 
 You can connect to the microcontroller using either a serial connection, or a TCP connection to a WiFi-connected microcontroller such as the ESP8266.
 
