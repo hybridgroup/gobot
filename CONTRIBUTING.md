@@ -57,6 +57,7 @@ The basics are as follows:
 `cd $GOPATH/src/gobot.io/x/gobot`
 `git remote rename origin upstream`
 `git remote add origin git@github.com/YOUR_GITHUB_NAME/gobot`
+`get checkout dev
 
 All import paths should now work fine assuming that you've got the
 proper branch checked out.
