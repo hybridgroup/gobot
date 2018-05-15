@@ -123,43 +123,43 @@ const (
 
 // FlightData packet returned by the Tello
 type FlightData struct {
-	BatteryLow               int16
-	BatteryLower             int16
+	BatteryLow               bool
+	BatteryLower             bool
 	BatteryPercentage        int8
-	BatteryState             int16
+	BatteryState             bool
 	CameraState              int8
-	DownVisualState          int16
+	DownVisualState          bool
 	DroneBatteryLeft         int16
 	DroneFlyTimeLeft         int16
-	DroneHover               int16
-	EmOpen                   int16
-	EmSky                    int16
-	EmGround                 int16
+	DroneHover               bool
+	EmOpen                   bool
+	EmSky                    bool
+	EmGround                 bool
 	EastSpeed                int16
 	ElectricalMachineryState int16
-	FactoryMode              int16
+	FactoryMode              bool
 	FlyMode                  int8
 	FlySpeed                 int16
 	FlyTime                  int16
-	FrontIn                  int16
-	FrontLSC                 int16
-	FrontOut                 int16
-	GravityState             int16
+	FrontIn                  bool
+	FrontLSC                 bool
+	FrontOut                 bool
+	GravityState             bool
 	GroundSpeed              int16
 	Height                   int16
 	ImuCalibrationState      int8
-	ImuState                 int16
+	ImuState                 bool
 	LightStrength            int16
 	NorthSpeed               int16
-	OutageRecording          int16
-	PowerState               int16
-	PressureState            int16
+	OutageRecording          bool
+	PowerState               bool
+	PressureState            bool
 	SmartVideoExitMode       int16
-	TemperatureHeight        int16
+	TemperatureHeight        bool
 	ThrowFlyTimer            int8
 	WifiDisturb              int16
 	WifiStrength             int16
-	WindState                int16
+	WindState                bool
 }
 
 // WifiData packet returned by the Tello
@@ -458,49 +458,100 @@ func (d *Driver) ParseFlightData(b []byte) (fd *FlightData, err error) {
 	}
 
 	err = binary.Read(buf, binary.LittleEndian, &fd.Height)
+	if err != nil {
+		return
+	}
 	err = binary.Read(buf, binary.LittleEndian, &fd.NorthSpeed)
+	if err != nil {
+		return
+	}
 	err = binary.Read(buf, binary.LittleEndian, &fd.EastSpeed)
+	if err != nil {
+		return
+	}
 	err = binary.Read(buf, binary.LittleEndian, &fd.GroundSpeed)
+	if err != nil {
+		return
+	}
 	err = binary.Read(buf, binary.LittleEndian, &fd.FlyTime)
+	if err != nil {
+		return
+	}
 
 	err = binary.Read(buf, binary.LittleEndian, &data)
-	fd.ImuState = int16(data >> 0 & 0x1)
-	fd.PressureState = int16(data >> 1 & 0x1)
-	fd.DownVisualState = int16(data >> 2 & 0x1)
-	fd.PowerState = int16(data >> 3 & 0x1)
-	fd.BatteryState = int16(data >> 4 & 0x1)
-	fd.GravityState = int16(data >> 5 & 0x1)
-	fd.WindState = int16(data >> 7 & 0x1)
+	if err != nil {
+		return
+	}
+	fd.ImuState = (data >> 0 & 0x1) == 1
+	fd.PressureState = (data >> 1 & 0x1) == 1
+	fd.DownVisualState = (data >> 2 & 0x1) == 1
+	fd.PowerState = (data >> 3 & 0x1) == 1
+	fd.BatteryState = (data >> 4 & 0x1) == 1
+	fd.GravityState = (data >> 5 & 0x1) == 1
+	fd.WindState = (data >> 7 & 0x1) == 1
 
 	err = binary.Read(buf, binary.LittleEndian, &fd.ImuCalibrationState)
+	if err != nil {
+		return
+	}
 	err = binary.Read(buf, binary.LittleEndian, &fd.BatteryPercentage)
+	if err != nil {
+		return
+	}
 	err = binary.Read(buf, binary.LittleEndian, &fd.DroneFlyTimeLeft)
+	if err != nil {
+		return
+	}
 	err = binary.Read(buf, binary.LittleEndian, &fd.DroneBatteryLeft)
+	if err != nil {
+		return
+	}
 
 	err = binary.Read(buf, binary.LittleEndian, &data)
-	fd.EmSky = int16(data >> 0 & 0x1)
-	fd.EmGround = int16(data >> 1 & 0x1)
-	fd.EmOpen = int16(data >> 2 & 0x1)
-	fd.DroneHover = int16(data >> 3 & 0x1)
-	fd.OutageRecording = int16(data >> 4 & 0x1)
-	fd.BatteryLow = int16(data >> 5 & 0x1)
-	fd.BatteryLower = int16(data >> 6 & 0x1)
-	fd.FactoryMode = int16(data >> 7 & 0x1)
+	if err != nil {
+		return
+	}
+	fd.EmSky = (data >> 0 & 0x1) == 1
+	fd.EmGround = (data >> 1 & 0x1) == 1
+	fd.EmOpen = (data >> 2 & 0x1) == 1
+	fd.DroneHover = (data >> 3 & 0x1) == 1
+	fd.OutageRecording = (data >> 4 & 0x1) == 1
+	fd.BatteryLow = (data >> 5 & 0x1) == 1
+	fd.BatteryLower = (data >> 6 & 0x1) == 1
+	fd.FactoryMode = (data >> 7 & 0x1) == 1
 
 	err = binary.Read(buf, binary.LittleEndian, &fd.FlyMode)
+	if err != nil {
+		return
+	}
 	err = binary.Read(buf, binary.LittleEndian, &fd.ThrowFlyTimer)
+	if err != nil {
+		return
+	}
 	err = binary.Read(buf, binary.LittleEndian, &fd.CameraState)
+	if err != nil {
+		return
+	}
 
 	err = binary.Read(buf, binary.LittleEndian, &data)
+	if err != nil {
+		return
+	}
 	fd.ElectricalMachineryState = int16(data & 0xff)
 
 	err = binary.Read(buf, binary.LittleEndian, &data)
-	fd.FrontIn = int16(data >> 0 & 0x1)
-	fd.FrontOut = int16(data >> 1 & 0x1)
-	fd.FrontLSC = int16(data >> 2 & 0x1)
+	if err != nil {
+		return
+	}
+	fd.FrontIn = (data >> 0 & 0x1) == 1
+	fd.FrontOut = (data >> 1 & 0x1) == 1
+	fd.FrontLSC = (data >> 2 & 0x1) == 1
 
 	err = binary.Read(buf, binary.LittleEndian, &data)
-	fd.TemperatureHeight = int16(data >> 0 & 0x1)
+	if err != nil {
+		return
+	}
+	fd.TemperatureHeight = (data >> 0 & 0x1) == 1
 
 	return
 }
