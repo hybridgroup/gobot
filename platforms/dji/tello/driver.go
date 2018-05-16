@@ -612,9 +612,9 @@ func (d *Driver) SendDateTime() (err error) {
 
 	now := time.Now()
 	binary.Write(buf, binary.LittleEndian, byte(0x00))
-	binary.Write(buf, binary.LittleEndian, now.Hour())
-	binary.Write(buf, binary.LittleEndian, now.Minute())
-	binary.Write(buf, binary.LittleEndian, now.Second())
+	binary.Write(buf, binary.LittleEndian, int16(now.Hour()))
+	binary.Write(buf, binary.LittleEndian, int16(now.Minute()))
+	binary.Write(buf, binary.LittleEndian, int16(now.Second()))
 	binary.Write(buf, binary.LittleEndian, int16(now.UnixNano()/int64(time.Millisecond)&0xff))
 	binary.Write(buf, binary.LittleEndian, int16(now.UnixNano()/int64(time.Millisecond)>>8))
 
@@ -653,15 +653,13 @@ func (d *Driver) handleResponse() error {
 		case wifiMessage:
 			buf := bytes.NewReader(buf[9:12])
 			wd := &WifiData{}
-
-			err = binary.Read(buf, binary.LittleEndian, &wd.Disturb)
-			err = binary.Read(buf, binary.LittleEndian, &wd.Strength)
+			_ = binary.Read(buf, binary.LittleEndian, &wd.Disturb)
+			_ = binary.Read(buf, binary.LittleEndian, &wd.Strength)
 			d.Publish(d.Event(WifiDataEvent), wd)
 		case lightMessage:
 			buf := bytes.NewReader(buf[9:10])
 			var ld int16
-
-			err = binary.Read(buf, binary.LittleEndian, &ld)
+			_ = binary.Read(buf, binary.LittleEndian, &ld)
 			d.Publish(d.Event(LightStrengthEvent), ld)
 		case timeCommand:
 			d.Publish(d.Event(TimeEvent), buf[7:8])
@@ -732,13 +730,13 @@ func (d *Driver) createPacket(cmd int16, pktType byte, len int16) (buf *bytes.Bu
 	return buf, nil
 }
 
-func validatePitch(val int) int {
-	if val > 100 {
-		return 100
-	}
-	if val < 0 {
-		return 0
-	}
+// func validatePitch(val int) int {
+// 	if val > 100 {
+// 		return 100
+// 	}
+// 	if val < 0 {
+// 		return 0
+// 	}
 
-	return val
-}
+// 	return val
+// }
