@@ -73,6 +73,7 @@ const (
 	takeoffCommand          = 0x0054 // 84
 	landCommand             = 0x0055 // 85
 	flipCommand             = 0x005c // 92
+	throwtakeoffCommand     = 0x005d // 93
 	palmLandCommand         = 0x005e // 94
 	bounceCommand           = 0x1053 // 4179
 )
@@ -282,6 +283,17 @@ func (d *Driver) Halt() (err error) {
 // TakeOff tells drones to liftoff and start flying.
 func (d *Driver) TakeOff() (err error) {
 	buf, _ := d.createPacket(takeoffCommand, 0x68, 0)
+	d.seq++
+	binary.Write(buf, binary.LittleEndian, d.seq)
+	binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes()))
+
+	_, err = d.reqConn.Write(buf.Bytes())
+	return
+}
+
+// Throw & Go support 
+func (d *Driver) ThrowTakeOff() (err error) {
+	buf, _ := d.createPacket(throwtakeoffCommand, 0x48, 0)
 	d.seq++
 	binary.Write(buf, binary.LittleEndian, d.seq)
 	binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes()))
