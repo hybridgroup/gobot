@@ -279,6 +279,17 @@ func (d *Driver) TakeOff() (err error) {
 	return
 }
 
+// Throw & Go support 
+func (d *Driver) ThrowTakeOff() (err error) {
+	buf, _ := d.createPacket(0x5d, 0x48, 0)
+	d.seq++
+	binary.Write(buf, binary.LittleEndian, d.seq)
+	binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes()))
+
+	_, err = d.reqConn.Write(buf.Bytes())
+	return
+}
+
 // Land tells drone to come in for landing.
 func (d *Driver) Land() (err error) {
 	buf, _ := d.createPacket(landCommand, 0x68, 1)
