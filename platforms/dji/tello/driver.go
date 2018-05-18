@@ -13,6 +13,9 @@ import (
 )
 
 const (
+	// BounceEvent event
+	BounceEvent = "bounce"
+
 	// ConnectedEvent event
 	ConnectedEvent = "connected"
 
@@ -24,6 +27,9 @@ const (
 
 	// LandingEvent event
 	LandingEvent = "landing"
+
+	// PalmLandingEvent event
+	PalmLandingEvent = "palm-landing"
 
 	// FlipEvent event
 	FlipEvent = "flip"
@@ -50,24 +56,26 @@ const (
 	SetVideoEncoderRateEvent = "setvideoencoder"
 )
 
+// the 16-bit messages and commands stored in bytes 6 & 5 of the packet
 const (
-	messageStart   = 0xcc
-	wifiMessage    = 26
-	videoRateQuery = 40
-	lightMessage   = 53
-	flightMessage  = 86
+	messageStart   = 0x00cc // 204
+	wifiMessage    = 0x001a // 26
+	videoRateQuery = 0x0028 // 40
+	lightMessage   = 0x0035 // 53
+	flightMessage  = 0x0056 // 86
+	logMessage     = 0x1050 // 4176
 
-	logMessage = 0x50
-
-	videoEncoderRateCommand = 0x20
-	videoStartCommand       = 0x25
-	exposureCommand         = 0x34
-	timeCommand             = 70
-	stickCommand            = 80
-	takeoffCommand          = 0x54
-	landCommand             = 0x55
-	flipCommand             = 0x5c
-	throwtakeoffCommand     = 0x5d
+	videoEncoderRateCommand = 0x0020 // 32
+	videoStartCommand       = 0x0025 // 37
+	exposureCommand         = 0x0034 // 52
+	timeCommand             = 0x0046 // 70
+	stickCommand            = 0x0050 // 80
+	takeoffCommand          = 0x0054 // 84
+	landCommand             = 0x0055 // 85
+	flipCommand             = 0x005c // 92
+	throwtakeoffCommand     = 0x005d // 93
+	palmLandCommand         = 0x005e // 94
+	bounceCommand           = 0x1053 // 4179
 )
 
 // FlipType is used for the various flips supported by the Tello.
@@ -179,6 +187,7 @@ type Driver struct {
 	cmdMutex                 sync.Mutex
 	seq                      int16
 	rx, ry, lx, ly, throttle float32
+	bouncing                 bool
 	gobot.Eventer
 }
 
@@ -195,6 +204,8 @@ func NewDriver(port string) *Driver {
 	d.AddEvent(FlightDataEvent)
 	d.AddEvent(TakeoffEvent)
 	d.AddEvent(LandingEvent)
+	d.AddEvent(PalmLandingEvent)
+	d.AddEvent(BounceEvent)
 	d.AddEvent(FlipEvent)
 	d.AddEvent(TimeEvent)
 	d.AddEvent(LogEvent)
@@ -294,6 +305,18 @@ func (d *Driver) ThrowTakeOff() (err error) {
 // Land tells drone to come in for landing.
 func (d *Driver) Land() (err error) {
 	buf, _ := d.createPacket(landCommand, 0x68, 1)
+	d.seq++
+	binary.Write(buf, binary.LittleEndian, d.seq)
+	binary.Write(buf, binary.LittleEndian, byte(0x00))
+	binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes()))
+
+	_, err = d.reqConn.Write(buf.Bytes())
+	return
+}
+
+// PalmLand tells drone to come in for a hand landing.
+func (d *Driver) PalmLand() (err error) {
+	buf, _ := d.createPacket(palmLandCommand, 0x68, 1)
 	d.seq++
 	binary.Write(buf, binary.LittleEndian, d.seq)
 	binary.Write(buf, binary.LittleEndian, byte(0x00))
@@ -423,6 +446,22 @@ func (d *Driver) CounterClockwise(val int) error {
 
 	d.lx = float32(val) / 100.0 * -1
 	return nil
+}
+
+// Bounce tells drone to start/stop performing the bouncing action
+func (d *Driver) Bounce() (err error) {
+	buf, _ := d.createPacket(bounceCommand, 0x68, 1)
+	d.seq++
+	binary.Write(buf, binary.LittleEndian, d.seq)
+	if d.bouncing {
+		binary.Write(buf, binary.LittleEndian, byte(0x31))
+	} else {
+		binary.Write(buf, binary.LittleEndian, byte(0x30))
+	}
+	binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes()))
+	_, err = d.reqConn.Write(buf.Bytes())
+	d.bouncing = !d.bouncing
+	return
 }
 
 // Flip tells drone to flip
@@ -644,6 +683,7 @@ func (d *Driver) SendCommand(cmd string) (err error) {
 
 func (d *Driver) handleResponse() error {
 	var buf [2048]byte
+	var msgType uint16
 	n, err := d.reqConn.Read(buf[0:])
 	if err != nil {
 		return err
@@ -651,17 +691,8 @@ func (d *Driver) handleResponse() error {
 
 	// parse binary packet
 	if buf[0] == messageStart {
-		if buf[6] == 0x10 {
-			switch buf[5] {
-			case logMessage:
-				d.Publish(d.Event(LogEvent), buf[9:])
-			default:
-				fmt.Printf("Unknown message: %+v\n", buf[0:n])
-			}
-			return nil
-		}
-
-		switch buf[5] {
+		msgType = (uint16(buf[6]) << 8) | uint16(buf[5])
+		switch msgType {
 		case wifiMessage:
 			buf := bytes.NewReader(buf[9:12])
 			wd := &WifiData{}
@@ -673,12 +704,18 @@ func (d *Driver) handleResponse() error {
 			var ld int16
 			binary.Read(buf, binary.LittleEndian, &ld)
 			d.Publish(d.Event(LightStrengthEvent), ld)
+		case logMessage:
+			d.Publish(d.Event(LogEvent), buf[9:])
 		case timeCommand:
 			d.Publish(d.Event(TimeEvent), buf[7:8])
+		case bounceCommand:
+			d.Publish(d.Event(BounceEvent), buf[7:8])
 		case takeoffCommand:
 			d.Publish(d.Event(TakeoffEvent), buf[7:8])
 		case landCommand:
 			d.Publish(d.Event(LandingEvent), buf[7:8])
+		case palmLandCommand:
+			d.Publish(d.Event(PalmLandingEvent), buf[7:8])
 		case flipCommand:
 			d.Publish(d.Event(FlipEvent), buf[7:8])
 		case flightMessage:
