@@ -67,6 +67,7 @@ const (
 	takeoffCommand          = 0x54
 	landCommand             = 0x55
 	flipCommand             = 0x5c
+	throwtakeoffCommand     = 0x5d
 )
 
 // FlipType is used for the various flips supported by the Tello.
@@ -281,7 +282,7 @@ func (d *Driver) TakeOff() (err error) {
 
 // Throw & Go support 
 func (d *Driver) ThrowTakeOff() (err error) {
-	buf, _ := d.createPacket(0x5d, 0x48, 0)
+	buf, _ := d.createPacket(throwtakeoffCommand, 0x48, 0)
 	d.seq++
 	binary.Write(buf, binary.LittleEndian, d.seq)
 	binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes()))
