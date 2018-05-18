@@ -653,8 +653,8 @@ func (d *Driver) handleResponse() error {
 		case wifiMessage:
 			buf := bytes.NewReader(buf[9:12])
 			wd := &WifiData{}
-			binary.Read(buf, binary.LittleEndian, &wd.Disturb)
 			binary.Read(buf, binary.LittleEndian, &wd.Strength)
+			binary.Read(buf, binary.LittleEndian, &wd.Disturb)
 			d.Publish(d.Event(WifiDataEvent), wd)
 		case lightMessage:
 			buf := bytes.NewReader(buf[9:10])
