@@ -66,7 +66,7 @@ type Frame struct {
 	R                [][]float64    `json:"r"`
 	S                float64        `json:"s"`
 	T                []float64      `json:"t"`
-	Timestamp        int            `json:"timestamp"`
+	Timestamp        uint64         `json:"timestamp"`
 }
 
 // X returns hand x value
