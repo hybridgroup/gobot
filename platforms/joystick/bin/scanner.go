@@ -42,7 +42,7 @@ func run() int {
 					t.Timestamp, t.Hat, t.Value)
 			case *sdl.JoyDeviceEvent:
 				if t.Type == sdl.JOYDEVICEADDED {
-					joysticks[int(t.Which)] = sdl.JoystickOpen(t.Which)
+					joysticks[int(t.Which)] = sdl.JoystickOpen(int(t.Which))
 					if joysticks[int(t.Which)] != nil {
 						fmt.Printf("Joystick %d connected\n", t.Which)
 					}
