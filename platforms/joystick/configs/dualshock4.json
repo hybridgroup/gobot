@@ -12,19 +12,19 @@
         },
         {
             "name": "right_x",
-            "id": 2
-        },
-        {
-            "name": "right_y",
-            "id": 5
-        },
-        {
-            "name": "l2",
             "id": 3
         },
         {
-            "name": "r2",
+            "name": "right_y",
             "id": 4
+        },
+        {
+            "name": "l2",
+            "id": 2
+        },
+        {
+            "name": "r2",
+            "id": 5
         },
         {
             "name": "up",
@@ -32,33 +32,33 @@
         },
         {
             "name": "down",
-            "id": 6
-        },
-        {
-            "name": "left",
             "id": 7
         },
         {
+            "name": "left",
+            "id": 6
+        },
+        {
             "name": "right",
-            "id": 8
+            "id": 6
         }
     ],
     "buttons": [
         {
             "name": "square",
-            "id": 0
-        },
-        {
-            "name": "triangle",
             "id": 3
         },
         {
-            "name": "circle",
+            "name": "triangle",
             "id": 2
         },
         {
-            "name": "x",
+            "name": "circle",
             "id": 1
+        },
+        {
+            "name": "x",
+            "id": 0
         },
         {
             "name": "l1",
@@ -85,7 +85,15 @@
             "id": 9
         },
         {
-            "name": "home",
+            "name": "ps",
+            "id": 10
+        },
+        {
+            "name": "left",
+            "id": 11
+        },
+        {
+            "name": "right",
             "id": 12
         }
     ]
