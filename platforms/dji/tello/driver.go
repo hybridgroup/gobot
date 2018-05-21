@@ -186,7 +186,8 @@ type Driver struct {
 	respPort                 string
 	cmdMutex                 sync.Mutex
 	seq                      int16
-	rx, ry, lx, ly, throttle float32
+	rx, ry, lx, ly           float32
+	throttle                 int
 	bouncing                 bool
 	gobot.Eventer
 }
@@ -362,6 +363,24 @@ func (d *Driver) SetVideoEncoderRate(rate VideoBitRate) (err error) {
 
 	_, err = d.reqConn.Write(buf.Bytes())
 	return
+}
+
+// SetFastMode sets the drone throttle to 1.
+func (d *Driver) SetFastMode() error {
+	d.cmdMutex.Lock()
+	defer d.cmdMutex.Unlock()
+
+	d.throttle = 1
+	return nil
+}
+
+// SetSlowMode sets the drone throttle to 0.
+func (d *Driver) SetSlowMode() error {
+	d.cmdMutex.Lock()
+	defer d.cmdMutex.Unlock()
+
+	d.throttle = 0
+	return nil
 }
 
 // Rate queries the current video bit rate.
@@ -628,7 +647,7 @@ func (d *Driver) SendStickCommand() (err error) {
 	axis4 := int16(660.0*d.lx + 1024.0)
 
 	// speed control
-	axis5 := int16(660.0*d.throttle + 1024.0)
+	axis5 := int16(d.throttle)
 
 	packedAxis := int64(axis1)&0x7FF | int64(axis2&0x7FF)<<11 | 0x7FF&int64(axis3)<<22 | 0x7FF&int64(axis4)<<33 | int64(axis5)<<44
 	binary.Write(buf, binary.LittleEndian, byte(0xFF&packedAxis))
