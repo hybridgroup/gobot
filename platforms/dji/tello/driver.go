@@ -158,7 +158,7 @@ type FlightData struct {
 	Height                   int16
 	ImuCalibrationState      int8
 	ImuState                 bool
-	LightStrength            int16
+	LightStrength            int8
 	NorthSpeed               int16
 	OutageRecording          bool
 	PowerState               bool
@@ -166,15 +166,15 @@ type FlightData struct {
 	SmartVideoExitMode       int16
 	TemperatureHeight        bool
 	ThrowFlyTimer            int8
-	WifiDisturb              int16
-	WifiStrength             int16
+	WifiDisturb              int8
+	WifiStrength             int8
 	WindState                bool
 }
 
 // WifiData packet returned by the Tello
 type WifiData struct {
-	Disturb  int16
-	Strength int16
+	Disturb  int8
+	Strength int8
 }
 
 // Driver represents the DJI Tello drone
@@ -725,14 +725,14 @@ func (d *Driver) handleResponse() error {
 		msgType = (uint16(buf[6]) << 8) | uint16(buf[5])
 		switch msgType {
 		case wifiMessage:
-			buf := bytes.NewReader(buf[9:12])
+			buf := bytes.NewReader(buf[9:10])
 			wd := &WifiData{}
 			binary.Read(buf, binary.LittleEndian, &wd.Strength)
 			binary.Read(buf, binary.LittleEndian, &wd.Disturb)
 			d.Publish(d.Event(WifiDataEvent), wd)
 		case lightMessage:
-			buf := bytes.NewReader(buf[9:10])
-			var ld int16
+			buf := bytes.NewReader(buf[9:9])
+			var ld int8
 			binary.Read(buf, binary.LittleEndian, &ld)
 			d.Publish(d.Event(LightStrengthEvent), ld)
 		case logMessage:
