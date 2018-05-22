@@ -315,6 +315,18 @@ func (d *Driver) Land() (err error) {
 	return
 }
 
+// StopLanding tells drone to stop landing.
+func (d *Driver) StopLanding() (err error) {
+	buf, _ := d.createPacket(landCommand, 0x68, 1)
+	d.seq++
+	binary.Write(buf, binary.LittleEndian, d.seq)
+	binary.Write(buf, binary.LittleEndian, byte(0x01))
+	binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes()))
+
+	_, err = d.reqConn.Write(buf.Bytes())
+	return
+}
+
 // PalmLand tells drone to come in for a hand landing.
 func (d *Driver) PalmLand() (err error) {
 	buf, _ := d.createPacket(palmLandCommand, 0x68, 1)
