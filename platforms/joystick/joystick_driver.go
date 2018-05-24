@@ -114,7 +114,8 @@ func (j *Driver) Start() (err error) {
 		j.AddEvent(value.Name)
 	}
 	for _, value := range j.config.Hats {
-		j.AddEvent(value.Name)
+		j.AddEvent(fmt.Sprintf("%s_press", value.Name))
+		j.AddEvent(fmt.Sprintf("%s_release", value.Name))
 	}
 
 	go func() {
@@ -139,6 +140,8 @@ func (j *Driver) Halt() (err error) {
 	j.halt <- true
 	return
 }
+
+var previousHat = ""
 
 // HandleEvent publishes an specific event according to data received
 func (j *Driver) handleEvent(event sdl.Event) error {
@@ -168,8 +171,13 @@ func (j *Driver) handleEvent(event sdl.Event) error {
 			hat := j.findHatName(data.Value, data.Hat, j.config.Hats)
 			if hat == "" {
 				return fmt.Errorf("Unknown Hat: %v %v", data.Hat, data.Value)
+			} else if hat == "released" {
+				hat = previousHat
+				j.Publish(j.Event(fmt.Sprintf("%s_release", hat)), true)
+			} else {
+				previousHat = hat
+				j.Publish(j.Event(fmt.Sprintf("%s_press", hat)), true)
 			}
-			j.Publish(j.Event(hat), true)
 		}
 	}
 	return nil
