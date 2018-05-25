@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"strings"
 	"sync"
 	"time"
 
@@ -174,6 +175,7 @@ type Driver struct {
 	reqAddr                  string
 	reqConn                  *net.UDPConn // UDP connection to send/receive drone commands
 	videoConn                *net.UDPConn // UDP connection for drone video
+	respIP                   string
 	respPort                 string
 	cmdMutex                 sync.Mutex
 	seq                      int16
@@ -183,10 +185,18 @@ type Driver struct {
 
 // NewDriver creates a driver for the Tello drone. Pass in the UDP port to use for the responses
 // from the drone.
-func NewDriver(port string) *Driver {
+func NewDriver(ipBindedAndPort string) *Driver {
+	localIP := ""
+	localPort := ipBindedAndPort
+	u := strings.Split(ipBindedAndPort, ":")
+	if len(u) == 2 {
+		localIP = u[0]
+		localPort = u[1]
+	}
 	d := &Driver{name: gobot.DefaultName("Tello"),
 		reqAddr:  "192.168.10.1:8889",
-		respPort: port,
+		respIP:   localIP,
+		respPort: localPort,
 		Eventer:  gobot.NewEventer(),
 	}
 
@@ -222,7 +232,7 @@ func (d *Driver) Start() error {
 		fmt.Println(err)
 		return err
 	}
-	respPort, err := net.ResolveUDPAddr("udp", ":"+d.respPort)
+	respPort, err := net.ResolveUDPAddr("udp", d.respIP+":"+d.respPort)
 	if err != nil {
 		fmt.Println(err)
 		return err
@@ -644,7 +654,7 @@ func (d *Driver) handleResponse() error {
 }
 
 func (d *Driver) processVideo() error {
-	videoPort, err := net.ResolveUDPAddr("udp", ":6038")
+	videoPort, err := net.ResolveUDPAddr("udp", d.respIP+":6038")
 	if err != nil {
 		return err
 	}
