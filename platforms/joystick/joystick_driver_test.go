@@ -21,7 +21,7 @@ func initTestDriver() *Driver {
 	a.Connect()
 	d := NewDriver(a, "./configs/xbox360_power_a_mini_proex.json")
 	d.poll = func() sdl.Event {
-		return new(interface{})
+		return nil
 	}
 	return d
 }
