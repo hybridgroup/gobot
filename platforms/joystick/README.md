@@ -26,7 +26,10 @@ To use an XBox360 controller on OS X, you will most likely need to install addit
 ### Ubuntu
 
 ```
-$ sudo apt-get install libsdl2-2.0-0
+wget https://www.libsdl.org/release/SDL2-2.0.8.tar.gz
+tar -zxvf SDL2-2.0.8.tar.gz
+cd SDL2-2.0.8/
+./configure && make && sudo make install
 ```
 
 Now you can install the package with
