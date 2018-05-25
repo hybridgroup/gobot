@@ -53,6 +53,12 @@ func main() {
 		stick.On(joystick.SelectRelease, func(data interface{}) {
 			fmt.Println("select_release")
 		})
+		stick.On(joystick.HomePress, func(data interface{}) {
+			fmt.Println("home_press")
+		})
+		stick.On(joystick.HomeRelease, func(data interface{}) {
+			fmt.Println("home_release")
+		})
 		stick.On(joystick.RightPress, func(data interface{}) {
 			fmt.Println("right_press")
 		})

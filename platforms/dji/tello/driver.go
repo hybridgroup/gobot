@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"strconv"
 	"sync"
 	"time"
 
@@ -179,16 +180,17 @@ type WifiData struct {
 
 // Driver represents the DJI Tello drone
 type Driver struct {
-	name                     string
-	reqAddr                  string
-	reqConn                  *net.UDPConn // UDP connection to send/receive drone commands
-	videoConn                *net.UDPConn // UDP connection for drone video
-	respPort                 string
-	cmdMutex                 sync.Mutex
-	seq                      int16
-	rx, ry, lx, ly           float32
-	throttle                 int
-	bouncing                 bool
+	name           string
+	reqAddr        string
+	reqConn        *net.UDPConn // UDP connection to send/receive drone commands
+	videoConn      *net.UDPConn // UDP connection for drone video
+	respPort       string
+	videoPort      string
+	cmdMutex       sync.Mutex
+	seq            int16
+	rx, ry, lx, ly float32
+	throttle       int
+	bouncing       bool
 	gobot.Eventer
 }
 
@@ -196,9 +198,10 @@ type Driver struct {
 // from the drone.
 func NewDriver(port string) *Driver {
 	d := &Driver{name: gobot.DefaultName("Tello"),
-		reqAddr:  "192.168.10.1:8889",
-		respPort: port,
-		Eventer:  gobot.NewEventer(),
+		reqAddr:   "192.168.10.1:8889",
+		respPort:  port,
+		videoPort: "6038",
+		Eventer:   gobot.NewEventer(),
 	}
 
 	d.AddEvent(ConnectedEvent)
@@ -256,9 +259,8 @@ func (d *Driver) Start() error {
 		}
 	}()
 
-	// starts notifications coming from drone to port 6038 aka 0x9617 when encoded low-endian.
-	// TODO: allow setting a specific video port.
-	d.SendCommand("conn_req:\x96\x17")
+	// starts notifications coming from drone to video port normally 6038
+	d.SendCommand(d.connectionString())
 
 	// send stick commands
 	go func() {
@@ -292,7 +294,7 @@ func (d *Driver) TakeOff() (err error) {
 	return
 }
 
-// Throw & Go support 
+// Throw & Go support
 func (d *Driver) ThrowTakeOff() (err error) {
 	buf, _ := d.createPacket(throwtakeoffCommand, 0x48, 0)
 	d.seq++
@@ -808,4 +810,12 @@ func (d *Driver) createPacket(cmd int16, pktType byte, len int16) (buf *bytes.Bu
 	binary.Write(buf, binary.LittleEndian, cmd)
 
 	return buf, nil
+}
+
+func (d *Driver) connectionString() string {
+	x, _ := strconv.Atoi(d.videoPort)
+	b := [2]byte{}
+	binary.LittleEndian.PutUint16(b[:], uint16(x))
+	res := fmt.Sprintf("conn_req:%s", b)
+	return res
 }
