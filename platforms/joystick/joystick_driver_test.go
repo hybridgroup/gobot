@@ -100,7 +100,7 @@ func TestDriverHandleEvent(t *testing.T) {
 	}
 
 	// down button press
-	d.On(d.Event("down"), func(data interface{}) {
+	d.On(d.Event("down_press"), func(data interface{}) {
 		sem <- true
 	})
 	d.handleEvent(&sdl.JoyHatEvent{
