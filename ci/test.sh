@@ -55,4 +55,6 @@ pushd $PWD/..
 	if [ ${#FAIL_PACKAGES[@]} -ne 0 ]; then
 		exit 1
 	fi;
+
+	ls
 popd
