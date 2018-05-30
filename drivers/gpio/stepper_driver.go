@@ -3,6 +3,7 @@ package gpio
 import (
 	"errors"
 	"math"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -57,6 +58,7 @@ type StepperDriver struct {
 	stepNum     int
 	speed       uint
 	mutex       *sync.Mutex
+	gobot.Commander
 }
 
 // NewStepperDriver returns a new StepperDriver given a
@@ -76,9 +78,21 @@ func NewStepperDriver(a DigitalWriter, pins [4]string, phase phase, stepsPerRev 
 		stepNum:     0,
 		speed:       1,
 		mutex:       &sync.Mutex{},
+		Commander:   gobot.NewCommander(),
 	}
-
 	s.speed = s.GetMaxSpeed()
+
+	s.AddCommand("Move", func(params map[string]interface{}) interface{} {
+		steps, _ := strconv.Atoi(params["steps"].(string))
+		return s.Move(steps)
+	})
+	s.AddCommand("Run", func(params map[string]interface{}) interface{} {
+		return s.Run()
+	})
+	s.AddCommand("Halt", func(params map[string]interface{}) interface{} {
+		return s.Halt()
+	})
+
 	return s
 }
 
