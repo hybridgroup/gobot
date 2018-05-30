@@ -31,8 +31,8 @@
     ".",
     "packets"
   ]
-  revision = "aff15770515e3c57fc6109da73d42b0d46f7f483"
-  version = "v1.1.0"
+  revision = "36d01c2b4cbeb3d2a12063e4880ce30800af9560"
+  version = "v1.1.1"
 
 [[projects]]
   branch = "master"
@@ -151,8 +151,8 @@
 [[projects]]
   name = "github.com/veandco/go-sdl2"
   packages = ["sdl"]
-  revision = "30f30965227962032c13bd0b12a89e6a5107c768"
-  version = "v0.2"
+  revision = "271d2ec43388932fd2a80f4c2e81021734685a62"
+  version = "v0.3"
 
 [[projects]]
   branch = "master"
@@ -166,8 +166,8 @@
 [[projects]]
   name = "gocv.io/x/gocv"
   packages = ["."]
-  revision = "ab6d932219faf43e531eea89ef3496cdb67aa734"
-  version = "0.11.0"
+  revision = "3be8ce8c6f62591817042dd3913fb233023326c3"
+  version = "0.13.0"
 
 [[projects]]
   branch = "master"
@@ -209,6 +209,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c43dc994a8c7f2d4c032139478a57e90a174738d54033e5076e9705e13352dda"
+  inputs-digest = "a724c1b9ea1ff6144acde7636320ea2bd2793e9b5fedb9cebc392d046356c625"
   solver-name = "gps-cdcl"
   solver-version = 1
