@@ -57,7 +57,7 @@ script:
    - make fmt_check
 after_success:
    - ls -l
-   - bash <(curl -s https://codecov.io/bash) -f "./profile.cov"
+   - bash <(curl -s https://codecov.io/bash) -f "../profile.cov"
 branches:
    except:
       - gobot.io
