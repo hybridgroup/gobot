@@ -56,7 +56,7 @@ script:
    - echo "Checking that code is well-formatted"
    - make fmt_check
 after_success:
-   - bash <(curl -s https://codecov.io/bash) -f '*.cov'
+   - bash <(curl -s https://codecov.io/bash) -f '../*.cov'
 branches:
    except:
       - gobot.io
