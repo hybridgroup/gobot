@@ -24,40 +24,28 @@ else
   export CGO_LDFLAGS="-L/usr/local/lib $OPENCV_LDFLAGS"
 fi
 
+# Set up core coverage report file
+result=$(go test -vet=off -covermode=count -coverprofile=core.cov . ./api/ ./sysfs/)
+if [ $? -ne 0 ]; then
+	FAIL_PACKAGES+="core";
+fi;
+echo "$result"
 
-pushd $PWD/..
-	# Set up core coverage report file
-	COVERAGE_REPORT_LOCATION="./core.cov"
-	echo "" > $COVERAGE_REPORT_LOCATION
+# Set up platforms coverage report file
+result=$(go test -vet=off -covermode=count -coverprofile=platforms.cov ./platforms/...)
+if [ $? -ne 0 ]; then
+	FAIL_PACKAGES+="platforms";
+fi;
+echo "$result"
 
-	result=$(go test -vet=off -covermode=count -coverprofile=core.cov ./gobot/. ./gobot/api/ ./gobot/sysfs/)
-	if [ $? -ne 0 ]; then
-		FAIL_PACKAGES+="CORE";
-	fi;
-	echo "$result"
+# Set up drivers coverage report file
+result=$(go test -vet=off -covermode=count -coverprofile=drivers.cov ./drivers/...)
+if [ $? -ne 0 ]; then
+	FAIL_PACKAGES+="drivers";
+fi;
+echo "$result"
 
-	# Set up platforms coverage report file
-	PLATFORMS_COVERAGE_REPORT_LOCATION="./platforms.cov"
-	echo "" > $PLATFORMS_COVERAGE_REPORT_LOCATION
-
-	result=$(go test -vet=off -covermode=count -coverprofile=platforms.cov ./gobot/platforms/...)
-	if [ $? -ne 0 ]; then
-		FAIL_PACKAGES+="PLATFORMS";
-	fi;
-	echo "$result"
-
-	# Set up drivers coverage report file
-	DRIVERS_COVERAGE_REPORT_LOCATION="./drivers.cov"
-	echo "" > $DRIVERS_COVERAGE_REPORT_LOCATION
-
-	result=$(go test -vet=off -covermode=count -coverprofile=platforms.cov ./gobot/drivers/...)
-	if [ $? -ne 0 ]; then
-		FAIL_PACKAGES+="PLATFORMS";
-	fi;
-	echo "$result"
-
-	# exit 1 if there have been any test failures
-	if [ ${#FAIL_PACKAGES[@]} -ne 0 ]; then
-		exit 1
-	fi;
-popd
+# exit 1 if there have been any test failures
+if [ ${#FAIL_PACKAGES[@]} -ne 0 ]; then
+	exit 1
+fi;
