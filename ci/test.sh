@@ -25,21 +25,21 @@ else
 fi
 
 # Set up core coverage report file
-result=$(go test -vet=off -covermode=count -coverprofile=core.cov . ./api/ ./sysfs/)
+result=$(go test -covermode=count -coverprofile=core.cov . ./api/ ./sysfs/)
 if [ $? -ne 0 ]; then
 	FAIL_PACKAGES+="core";
 fi;
 echo "$result"
 
 # Set up platforms coverage report file
-result=$(go test -vet=off -covermode=count -coverprofile=platforms.cov ./platforms/...)
+result=$(go test -covermode=count -coverprofile=platforms.cov ./platforms/...)
 if [ $? -ne 0 ]; then
 	FAIL_PACKAGES+="platforms";
 fi;
 echo "$result"
 
 # Set up drivers coverage report file
-result=$(go test -vet=off -covermode=count -coverprofile=drivers.cov ./drivers/...)
+result=$(go test -covermode=count -coverprofile=drivers.cov ./drivers/...)
 if [ $? -ne 0 ]; then
 	FAIL_PACKAGES+="drivers";
 fi;
