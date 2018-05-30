@@ -26,30 +26,35 @@ fi
 
 
 pushd $PWD/..
-	# Set up coverage report file
-	COVERAGE_REPORT_LOCATION="./profile.cov"
+	# Set up core coverage report file
+	COVERAGE_REPORT_LOCATION="./core.cov"
 	echo "" > $COVERAGE_REPORT_LOCATION
 
-	# Exclude vendor in the same way as Makefile does
-	EXCLUDING_VENDOR=$(go list ./... | grep -v /vendor/)
+	result=$(go test -vet=off -covermode=count -coverprofile=core.cov ./gobot/. ./gobot/api/ ./gobot/sysfs/)
+	if [ $? -ne 0 ]; then
+		FAIL_PACKAGES+="CORE";
+	fi;
+	echo "$result"
 
-	# Iterate over all non-vendor packages and run tests with coverage
-	for package in $EXCLUDING_VENDOR; do \
-    if [ $GO_VERSION == $TIP_VERSION_IDENTIFIER ]; then
-		# `go test` runs a vet subset as of this Change https://go-review.googlesource.com/c/go/+/74356
-		  result=$(go test -vet=off -covermode=count -coverprofile=tmp.cov $package)
-    else
-		  result=$(go test -covermode=count -coverprofile=tmp.cov $package)
-    fi
-		if [ $? -ne 0 ]; then
-			FAIL_PACKAGES+=($package);
-		fi;
-			echo "$result"
-		if [ -f tmp.cov ]; then
-			cat tmp.cov >> profile.cov;
-			rm tmp.cov;
-		fi;
-	done
+	# Set up platforms coverage report file
+	PLATFORMS_COVERAGE_REPORT_LOCATION="./platforms.cov"
+	echo "" > $PLATFORMS_COVERAGE_REPORT_LOCATION
+
+	result=$(go test -vet=off -covermode=count -coverprofile=platforms.cov ./gobot/platforms/...)
+	if [ $? -ne 0 ]; then
+		FAIL_PACKAGES+="PLATFORMS";
+	fi;
+	echo "$result"
+
+	# Set up drivers coverage report file
+	DRIVERS_COVERAGE_REPORT_LOCATION="./drivers.cov"
+	echo "" > $DRIVERS_COVERAGE_REPORT_LOCATION
+
+	result=$(go test -vet=off -covermode=count -coverprofile=platforms.cov ./gobot/drivers/...)
+	if [ $? -ne 0 ]; then
+		FAIL_PACKAGES+="PLATFORMS";
+	fi;
+	echo "$result"
 
 	# exit 1 if there have been any test failures
 	if [ ${#FAIL_PACKAGES[@]} -ne 0 ]; then
