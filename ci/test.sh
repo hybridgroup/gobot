@@ -25,9 +25,21 @@ else
 fi
 
 # Set up core coverage report file
-result=$(go test -covermode=count -coverprofile=core.cov . ./api/ ./sysfs/)
+result=$(go test -covermode=count -coverprofile=core.cov .)
 if [ $? -ne 0 ]; then
 	FAIL_PACKAGES+="core";
+fi;
+echo "$result"
+
+result=$(go test -covermode=count -coverprofile=api.cov ./api/...)
+if [ $? -ne 0 ]; then
+	FAIL_PACKAGES+="api";
+fi;
+echo "$result"
+
+result=$(go test -covermode=count -coverprofile=sysfs.cov ./sysfs/...)
+if [ $? -ne 0 ]; then
+	FAIL_PACKAGES+="sysfs";
 fi;
 echo "$result"
 

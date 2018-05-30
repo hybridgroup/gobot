@@ -57,6 +57,8 @@ script:
    - make fmt_check
 after_success:
    - bash <(curl -s https://codecov.io/bash) -f "./core.cov" -F core
+   - bash <(curl -s https://codecov.io/bash) -f "./api.cov" -F core
+   - bash <(curl -s https://codecov.io/bash) -f "./sysfs.cov" -F core
    - bash <(curl -s https://codecov.io/bash) -f "./platforms.cov" -F platforms
    - bash <(curl -s https://codecov.io/bash) -f "./drivers.cov" -F drivers
 branches:
