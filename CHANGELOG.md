@@ -1,3 +1,44 @@
+1.11.0
+---
+* **build**
+    * correct profile file location for codecov upload
+    * Make Go Lint happier by adding some explicit type conversions and ignoring unused error returns
+    * single quotes needed to upload any .cov file to codecov for reporting
+    * update deps to latest versions for Paho MQTT, go-sdl, and gocv
+    * upload any .cov file to codecov for reporting
+    * use go 1.10.2 and 1.9.6 for Travis builds
+    * add step to call dep ensure before contributing #524
+* **examples**
+    * correct events used by XBox360 joystick example
+* **firmata**
+    * Update the Firmata homepage in platform README
+* **gpio**
+    * Improve Stepper Driver
+    * Initial support for MAX7219 (gpio) led driver
+* **joystick**
+    * full corrected ds3 and ds4 mappings plus examples to match for latest sdl 2.0.8
+    * add instructions to README on how to install SDL on Linux from source
+    * add missing type conversion
+    * add new contributions to README
+    * Add T-Flight Hotas X flight controoller
+    * add xbox360 rock band drums controller
+    * Correct Dualshock4 controller mappings and add ps/left/right buttons
+    * correct test issue
+    * exclude scanner from test builds
+    * Fix joystick_driver to detect dpad input for xbox controllers
+    * Update dualshock4.json to match joystick_dualshock4.go
+    * update scanner to match go-sdl 0.3 API changes
+    * Update the joystick driver test to read DPAD properly
+* **leapmotion**
+    * change timestamp to uint64 to fix #516
+* **tello**
+    * slow/fast mode switch function
+    * StopLanding feature
+    * Add Bounce() and PalmLand() funcs and their associated events.
+    * bug fix
+    * Change several fields in FlightData struct from int16 to bool
+    * Export the FlightData fields (see Issue #531)
+
 1.10.2
 ---
 * **opencv**
