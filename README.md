@@ -203,7 +203,7 @@ Gobot has a extensible system for connecting to hardware devices. The following 
 - [Intel Joule](http://intel.com/joule/getstarted) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/intel-iot/joule)
 - [Joystick](http://en.wikipedia.org/wiki/Joystick) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/joystick)
 - [Keyboard](https://en.wikipedia.org/wiki/Computer_keyboard) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/keyboard)
-- [Leap Motion](https://www.leapmotion.com/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/leapmotion)
+- [Leap Motion](https://www.leapmotion.com/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/leap)
 - [MavLink](http://qgroundcontrol.org/mavlink/start) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/mavlink)
 - [MegaPi](http://www.makeblock.com/megapi) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/megapi)
 - [Microbit](http://microbit.org/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/microbit)
