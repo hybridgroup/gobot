@@ -116,7 +116,6 @@ func TestADXL345DriverXYZError(t *testing.T) {
 	gobottest.Assert(t, err, errors.New("read error"))
 }
 
-
 func TestADXL345DriverRawXYZ(t *testing.T) {
 	d, adaptor := initTestADXL345DriverWithStubbedAdaptor()
 	d.Start()
