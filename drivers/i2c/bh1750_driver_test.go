@@ -145,4 +145,3 @@ func TestBH1750DriverRawSensorDataError(t *testing.T) {
 	_, err := d.RawSensorData()
 	gobottest.Assert(t, err, errors.New("wrong number of bytes read"))
 }
-
