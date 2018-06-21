@@ -11,9 +11,9 @@ import (
 	"gobot.io/x/gobot/gobottest"
 )
 
+var _ gobot.Driver = (*MCP23017Driver)(nil)
 var (
-	_          gobot.Driver = (*MCP23017Driver)(nil)
-	pinValPort              = map[string]interface{}{
+	pinValPort = map[string]interface{}{
 		"pin":  uint8(7),
 		"val":  uint8(0),
 		"port": "A",
