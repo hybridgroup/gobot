@@ -1,7 +1,6 @@
 package spi
 
 import (
-	"periph.io/x/periph/conn/physic"
 	xspi "periph.io/x/periph/conn/spi"
 	xsysfs "periph.io/x/periph/host/sysfs"
 )
@@ -80,7 +79,7 @@ func GetSpiConnection(busNum, chipNum, mode, bits int, maxSpeed int64) (Connecti
 	if err != nil {
 		return nil, err
 	}
-	c, err := p.Connect(physic.Frequency(maxSpeed), xspi.Mode(mode), bits)
+	c, err := p.Connect(maxSpeed, xspi.Mode(mode), bits)
 	if err != nil {
 		return nil, err
 	}
