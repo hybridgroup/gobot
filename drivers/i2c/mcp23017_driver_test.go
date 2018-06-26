@@ -12,17 +12,17 @@ import (
 )
 
 var _ gobot.Driver = (*MCP23017Driver)(nil)
-
-var pinValPort = map[string]interface{}{
-	"pin":  uint8(7),
-	"val":  uint8(0),
-	"port": "A",
-}
-
-var pinPort = map[string]interface{}{
-	"pin":  uint8(7),
-	"port": "A",
-}
+var (
+	pinValPort = map[string]interface{}{
+		"pin":  uint8(7),
+		"val":  uint8(0),
+		"port": "A",
+	}
+	pinPort = map[string]interface{}{
+		"pin":  uint8(7),
+		"port": "A",
+	}
+)
 
 func initTestMCP23017Driver(b uint8) (driver *MCP23017Driver) {
 	driver, _ = initTestMCP23017DriverWithStubbedAdaptor(b)
@@ -82,9 +82,7 @@ func TestNewMCP23017DriverIntpol(t *testing.T) {
 
 func TestMCP23017DriverStart(t *testing.T) {
 	mcp, adaptor := initTestMCP23017DriverWithStubbedAdaptor(0)
-
 	gobottest.Assert(t, mcp.Start(), nil)
-
 	adaptor.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
 	}
@@ -106,7 +104,6 @@ func TestMCP23017DriverHalt(t *testing.T) {
 func TestMCP23017DriverCommandsWriteGPIO(t *testing.T) {
 	mcp, adaptor := initTestMCP23017DriverWithStubbedAdaptor(0)
 	gobottest.Assert(t, mcp.Start(), nil)
-
 	adaptor.i2cReadImpl = func(b []byte) (int, error) {
 		return len(b), nil
 	}
@@ -120,7 +117,6 @@ func TestMCP23017DriverCommandsWriteGPIO(t *testing.T) {
 func TestMCP23017DriverCommandsReadGPIO(t *testing.T) {
 	mcp, adaptor := initTestMCP23017DriverWithStubbedAdaptor(0)
 	gobottest.Assert(t, mcp.Start(), nil)
-
 	adaptor.i2cReadImpl = func(b []byte) (int, error) {
 		return len(b), nil
 	}
@@ -131,7 +127,6 @@ func TestMCP23017DriverCommandsReadGPIO(t *testing.T) {
 func TestMCP23017DriverWriteGPIO(t *testing.T) {
 	mcp, adaptor := initTestMCP23017DriverWithStubbedAdaptor(0)
 	gobottest.Assert(t, mcp.Start(), nil)
-
 	adaptor.i2cReadImpl = func(b []byte) (int, error) {
 		return len(b), nil
 	}
@@ -145,7 +140,6 @@ func TestMCP23017DriverWriteGPIO(t *testing.T) {
 func TestMCP23017DriverCommandsWriteGPIOErrIODIR(t *testing.T) {
 	mcp, adaptor := initTestMCP23017DriverWithStubbedAdaptor(0)
 	gobottest.Assert(t, mcp.Start(), nil)
-
 	adaptor.i2cReadImpl = func(b []byte) (int, error) {
 		return len(b), nil
 	}
@@ -159,7 +153,6 @@ func TestMCP23017DriverCommandsWriteGPIOErrIODIR(t *testing.T) {
 func TestMCP23017DriverCommandsWriteGPIOErrOLAT(t *testing.T) {
 	mcp, adaptor := initTestMCP23017DriverWithStubbedAdaptor(0)
 	gobottest.Assert(t, mcp.Start(), nil)
-
 	adaptor.i2cReadImpl = func(b []byte) (int, error) {
 		return len(b), nil
 	}
@@ -178,13 +171,11 @@ func TestMCP23017DriverCommandsWriteGPIOErrOLAT(t *testing.T) {
 func TestMCP23017DriverReadGPIO(t *testing.T) {
 	mcp, adaptor := initTestMCP23017DriverWithStubbedAdaptor(0)
 	gobottest.Assert(t, mcp.Start(), nil)
-
 	adaptor.i2cReadImpl = func(b []byte) (int, error) {
 		return len(b), nil
 	}
 	val, _ := mcp.ReadGPIO(7, "A")
 	gobottest.Assert(t, val, uint8(0))
-
 	// read error
 	mcp, adaptor = initTestMCP23017DriverWithStubbedAdaptor(0)
 	gobottest.Assert(t, mcp.Start(), nil)
@@ -194,7 +185,6 @@ func TestMCP23017DriverReadGPIO(t *testing.T) {
 	}
 	_, err := mcp.ReadGPIO(7, "A")
 	gobottest.Assert(t, err, errors.New("read error"))
-
 	// empty value from read
 	mcp, adaptor = initTestMCP23017DriverWithStubbedAdaptor(0)
 	gobottest.Assert(t, mcp.Start(), nil)
@@ -204,33 +194,6 @@ func TestMCP23017DriverReadGPIO(t *testing.T) {
 	}
 	_, err = mcp.ReadGPIO(7, "A")
 	gobottest.Assert(t, err, errors.New("Read came back with no data"))
-}
-
-func TestMCP23017DriverPinMode(t *testing.T) {
-	mcp, adaptor := initTestMCP23017DriverWithStubbedAdaptor(0)
-	gobottest.Assert(t, mcp.Start(), nil)
-
-	adaptor.i2cReadImpl = func(b []byte) (int, error) {
-		return len(b), nil
-	}
-	adaptor.i2cWriteImpl = func([]byte) (int, error) {
-		return 0, nil
-	}
-	err := mcp.PinMode(7, 0, "A")
-	gobottest.Assert(t, err, nil)
-
-	// write error
-	mcp, adaptor = initTestMCP23017DriverWithStubbedAdaptor(0)
-	gobottest.Assert(t, mcp.Start(), nil)
-
-	adaptor.i2cReadImpl = func(b []byte) (int, error) {
-		return len(b), nil
-	}
-	adaptor.i2cWriteImpl = func([]byte) (int, error) {
-		return 0, errors.New("write error")
-	}
-	err = mcp.PinMode(7, 0, "A")
-	gobottest.Assert(t, err, errors.New("write error"))
 }
 
 func TestMCP23017DriverSetPullUp(t *testing.T) {
@@ -245,7 +208,6 @@ func TestMCP23017DriverSetPullUp(t *testing.T) {
 	}
 	err := mcp.SetPullUp(7, 0, "A")
 	gobottest.Assert(t, err, nil)
-
 	// write error
 	mcp, adaptor = initTestMCP23017DriverWithStubbedAdaptor(0)
 	gobottest.Assert(t, mcp.Start(), nil)
@@ -272,7 +234,6 @@ func TestMCP23017DriverSetGPIOPolarity(t *testing.T) {
 	}
 	err := mcp.SetGPIOPolarity(7, 0, "A")
 	gobottest.Assert(t, err, nil)
-
 	// write error
 	mcp, adaptor = initTestMCP23017DriverWithStubbedAdaptor(0)
 	gobottest.Assert(t, mcp.Start(), nil)
@@ -285,14 +246,12 @@ func TestMCP23017DriverSetGPIOPolarity(t *testing.T) {
 	}
 	err = mcp.SetGPIOPolarity(7, 0, "A")
 	gobottest.Assert(t, err, errors.New("write error"))
-
 }
 
 func TestMCP23017DriverWrite(t *testing.T) {
 	// clear bit
 	mcp, adaptor := initTestMCP23017DriverWithStubbedAdaptor(0)
 	gobottest.Assert(t, mcp.Start(), nil)
-
 	port := mcp.getPort("A")
 	adaptor.i2cReadImpl = func(b []byte) (int, error) {
 		return len(b), nil
@@ -302,11 +261,9 @@ func TestMCP23017DriverWrite(t *testing.T) {
 	}
 	err := mcp.write(port.IODIR, uint8(7), 0)
 	gobottest.Assert(t, err, nil)
-
 	// set bit
 	mcp, adaptor = initTestMCP23017DriverWithStubbedAdaptor(0)
 	gobottest.Assert(t, mcp.Start(), nil)
-
 	port = mcp.getPort("B")
 	adaptor.i2cReadImpl = func(b []byte) (int, error) {
 		return len(b), nil
@@ -316,7 +273,6 @@ func TestMCP23017DriverWrite(t *testing.T) {
 	}
 	err = mcp.write(port.IODIR, uint8(7), 1)
 	gobottest.Assert(t, err, nil)
-
 	// write error
 	mcp, adaptor = initTestMCP23017DriverWithStubbedAdaptor(0)
 	gobottest.Assert(t, mcp.Start(), nil)
@@ -329,17 +285,6 @@ func TestMCP23017DriverWrite(t *testing.T) {
 	}
 	err = mcp.write(port.IODIR, uint8(7), 0)
 	gobottest.Assert(t, err, errors.New("write error"))
-
-	// read error
-	mcp, adaptor = initTestMCP23017DriverWithStubbedAdaptor(0)
-	gobottest.Assert(t, mcp.Start(), nil)
-
-	adaptor.i2cReadImpl = func(b []byte) (int, error) {
-		return len(b), errors.New("read error")
-	}
-	err = mcp.write(port.IODIR, uint8(7), 0)
-	gobottest.Assert(t, err, errors.New("read error"))
-
 	//debug
 	debug = true
 	log.SetOutput(ioutil.Discard)
@@ -367,7 +312,6 @@ func TestMCP23017DriverReadPort(t *testing.T) {
 	}
 	val, _ := mcp.read(port.IODIR)
 	gobottest.Assert(t, val, uint8(255))
-
 	// read error
 	mcp, adaptor = initTestMCP23017DriverWithStubbedAdaptor(0)
 	gobottest.Assert(t, mcp.Start(), nil)
@@ -375,35 +319,19 @@ func TestMCP23017DriverReadPort(t *testing.T) {
 	adaptor.i2cReadImpl = func(b []byte) (int, error) {
 		return len(b), errors.New("read error")
 	}
-
 	val, err := mcp.read(port.IODIR)
 	gobottest.Assert(t, val, uint8(0))
 	gobottest.Assert(t, err, errors.New("read error"))
-
-	// read
-	mcp, adaptor = initTestMCP23017DriverWithStubbedAdaptor(0)
-	gobottest.Assert(t, mcp.Start(), nil)
-
-	port = mcp.getPort("A")
-	adaptor.i2cReadImpl = func(b []byte) (int, error) {
-		return 0, nil
-	}
-	_, err = mcp.read(port.IODIR)
-	gobottest.Assert(t, err, errors.New("Read was unable to get 1 bytes for register: 0x0\n"))
-
 	// debug
 	debug = true
 	log.SetOutput(ioutil.Discard)
 	mcp, adaptor = initTestMCP23017DriverWithStubbedAdaptor(0)
 	gobottest.Assert(t, mcp.Start(), nil)
-
 	port = mcp.getPort("A")
-
 	adaptor.i2cReadImpl = func(b []byte) (int, error) {
 		copy(b, []byte{255})
 		return 1, nil
 	}
-
 	val, _ = mcp.read(port.IODIR)
 	gobottest.Assert(t, val, uint8(255))
 	debug = false
@@ -416,19 +344,16 @@ func TestMCP23017DriverGetPort(t *testing.T) {
 	expectedPort := getBank(0).PortA
 	actualPort := mcp.getPort("A")
 	gobottest.Assert(t, expectedPort, actualPort)
-
 	// port B
 	mcp = initTestMCP23017Driver(0)
 	expectedPort = getBank(0).PortB
 	actualPort = mcp.getPort("B")
 	gobottest.Assert(t, expectedPort, actualPort)
-
 	// default
 	mcp = initTestMCP23017Driver(0)
 	expectedPort = getBank(0).PortA
 	actualPort = mcp.getPort("")
 	gobottest.Assert(t, expectedPort, actualPort)
-
 	// port A bank 1
 	mcp = initTestMCP23017Driver(1)
 	expectedPort = getBank(1).PortA
