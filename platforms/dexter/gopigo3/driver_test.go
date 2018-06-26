@@ -176,7 +176,7 @@ func TestDigitalRead(t *testing.T) {
 
 func TestServoWrite(t *testing.T) {
 	d := initTestDriver()
-	err := d.ServoWrite("SERVO_1", 0x7F)
+	err := d.ServoWrite(SERVO_1, 0x7F)
 	if err != nil {
 		t.Error(err)
 	}
@@ -216,7 +216,7 @@ func TestOffsetMotorEncoder(t *testing.T) {
 
 func TestSetPWMDuty(t *testing.T) {
 	d := initTestDriver()
-	err := d.SetPWMDuty(AD_1_1, 80)
+	err := d.SetPWMDuty(AD_1_1_G, 80)
 	if err != nil {
 		t.Error(err)
 	}
@@ -224,7 +224,7 @@ func TestSetPWMDuty(t *testing.T) {
 
 func TestSetPWMfreq(t *testing.T) {
 	d := initTestDriver()
-	err := d.SetPWMFreq(AD_1_2, 100)
+	err := d.SetPWMFreq(AD_1_2_G, 100)
 	if err != nil {
 		t.Error(err)
 	}
