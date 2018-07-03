@@ -1,6 +1,7 @@
-// Based on https://github.com/DexterInd/GoPiGo3/blob/master/Software/Python/gopigo3.py
-// You will need to run the following script if using a stock raspbian image before this library will work:
-// https://www.dexterindustries.com/GoPiGo/get-started-with-the-gopigo3-raspberry-pi-robot/3-program-your-raspberry-pi-robot/python-programming-language/
+// Package gopigo3 is based on https://github.com/DexterInd/GoPiGo3/blob/master/Software/Python/gopigo3.py
+// You will need to run the following commands if using a stock raspbian image before this library will work:
+// sudo curl -kL dexterindustries.com/update_gopigo3 | bash
+// sudo reboot
 package gopigo3
 
 import (
@@ -120,12 +121,16 @@ const (
 type Grove byte
 
 const (
-	AD_1_1 Grove = 0x01 // default pin for most grove devices, A0/D0
-	AD_1_2 Grove = 0x02
-	AD_2_1 Grove = 0x04 // default pin for most grove devices, A0/D0
-	AD_2_2 Grove = 0x08
-	AD_1   Grove = AD_1_1 + AD_1_2
-	AD_2   Grove = AD_2_1 + AD_2_2
+	AD11     string = "AD_1_1"
+	AD12     string = "AD_1_2"
+	AD21     string = "AD_2_1"
+	AD22     string = "AD_2_2"
+	AD_1_1_G Grove  = 0x01 // default pin for most grove devices, A0/D0
+	AD_1_2_G Grove  = 0x02
+	AD_2_1_G Grove  = 0x04 // default pin for most grove devices, A0/D0
+	AD_2_2_G Grove  = 0x08
+	AD_1_G   Grove  = AD_1_1_G + AD_1_2_G
+	AD_2_G   Grove  = AD_2_1_G + AD_2_2_G
 )
 
 // GroveType represents the type of a grove device.
@@ -171,10 +176,14 @@ type Driver struct {
 //      spi.WithSpeed(int64):   speed in Hz to use with this driver
 //
 func NewDriver(a spi.Connector, options ...func(spi.Config)) *Driver {
+	spiConfig := spi.NewConfig()
+	// use /dev/spidev0.1
+	spiConfig.WithBus(0)
+	spiConfig.WithChip(1)
 	g := &Driver{
 		name:      gobot.DefaultName("GoPiGo3"),
 		connector: a,
-		Config:    spi.NewConfig(),
+		Config:    spiConfig,
 	}
 	for _, option := range options {
 		option(g)
@@ -305,17 +314,18 @@ func (g *Driver) SetLED(led Led, red, green, blue uint8) error {
 }
 
 // SetServo sets a servo's position in microseconds (0-16666).
-func (g *Driver) SetServo(servo Servo, us uint16) error {
+func (g *Driver) SetServo(srvo Servo, us uint16) error {
 	return g.writeBytes([]byte{
 		goPiGo3Address,
 		SET_SERVO,
-		byte(servo),
+		byte(srvo),
 		byte((us >> 8) & 0xFF),
 		byte(us & 0xFF),
 	})
 }
 
-func (g *Driver) ServoWrite(pin string, angle byte) error {
+// ServoWrite writes an angle (0-180) to the given servo (servo 1 or servo 2).
+func (g *Driver) ServoWrite(srvo Servo, angle byte) error {
 	pulseWidthRange := 1850
 	if angle > 180 {
 		angle = 180
@@ -324,11 +334,7 @@ func (g *Driver) ServoWrite(pin string, angle byte) error {
 		angle = 0
 	}
 	pulseWidth := ((1500 - (pulseWidthRange / 2)) + ((pulseWidthRange / 180) * int(angle)))
-	servoPin, err := strToServo(pin)
-	if err != nil {
-		return err
-	}
-	return g.SetServo(servoPin, uint16(pulseWidth))
+	return g.SetServo(srvo, uint16(pulseWidth))
 }
 
 // SetMotorPower sets a motor's power from -128 to 127.
@@ -476,7 +482,7 @@ func (g *Driver) SetGroveMode(port Grove, mode GroveMode) error {
 }
 
 // SetPWMDuty sets the pwm duty cycle for the given pin/port.
-func (g *Driver) SetPWMDuty(port Grove, duty uint8) (err error) {
+func (g *Driver) SetPWMDuty(port Grove, duty uint16) (err error) {
 	if duty < 0 {
 		duty = 0
 	}
@@ -534,7 +540,7 @@ func (g *Driver) PwmWrite(pin string, val byte) (err error) {
 		return err
 	}
 	val64 := math.Float64frombits(uint64(val))
-	dutyCycle := uint8(math.Float64bits((100.0 / 255.0) * val64))
+	dutyCycle := uint16(math.Float64bits((100.0 / 255.0) * val64))
 	return g.SetPWMDuty(grovePin, dutyCycle)
 }
 
@@ -568,8 +574,9 @@ func (g *Driver) AnalogRead(pin string) (value int, err error) {
 	if err := g.valueValid(response); err != nil {
 		return value, err
 	}
-	return int((uint64(response[5]<<8) & 0xFF00) | uint64(response[6]&0xFF)), nil
-	return
+	highBytes := uint16(response[5])
+	lowBytes := uint16(response[6])
+	return int((highBytes<<8)&0xFF00) | int(lowBytes&0xFF), nil
 }
 
 // DigitalWrite writes a 0/1 value to the given pin.
@@ -633,38 +640,26 @@ func (g *Driver) DigitalRead(pin string) (value int, err error) {
 	return int(response[5]), nil
 }
 
-func strToServo(pin string) (servo Servo, err error) {
-	switch pin {
-	case "SERVO_1":
-		servo = SERVO_1
-	case "SERVO_2":
-		servo = SERVO_2
-	default:
-		err = fmt.Errorf("Invalid servo pin name")
-	}
-	return servo, err
-}
-
 func getGroveAddresses(pin string) (gPin, gPort Grove, analog, state byte, err error) {
 	switch pin {
 	case "AD_1_1":
-		gPin = AD_1_1
-		gPort = AD_1
+		gPin = AD_1_1_G
+		gPort = AD_1_G
 		analog = GET_GROVE_ANALOG_1_1
 		state = GET_GROVE_STATE_1_1
 	case "AD_1_2":
-		gPin = AD_1_2
-		gPort = AD_1
+		gPin = AD_1_2_G
+		gPort = AD_1_G
 		analog = GET_GROVE_ANALOG_1_2
 		state = GET_GROVE_STATE_1_2
 	case "AD_2_1":
-		gPin = AD_2_1
-		gPort = AD_2
+		gPin = AD_2_1_G
+		gPort = AD_2_G
 		analog = GET_GROVE_ANALOG_2_1
 		state = GET_GROVE_STATE_2_1
 	case "AD_2_2":
-		gPin = AD_2_2
-		gPort = AD_2
+		gPin = AD_2_2_G
+		gPort = AD_2_G
 		analog = GET_GROVE_ANALOG_2_2
 		state = GET_GROVE_STATE_2_2
 	default:
@@ -726,9 +721,9 @@ func (g *Driver) writeBytes(w []byte) (err error) {
 }
 
 func (g *Driver) resetAll() {
-	g.SetGroveType(AD_1+AD_2, CUSTOM)
+	g.SetGroveType(AD_1_G+AD_2_G, CUSTOM)
 	time.Sleep(10 * time.Millisecond)
-	g.SetGroveMode(AD_1+AD_2, GROVE_INPUT_DIGITAL)
+	g.SetGroveMode(AD_1_G+AD_2_G, GROVE_INPUT_DIGITAL)
 	time.Sleep(10 * time.Millisecond)
 	g.SetMotorPower(MOTOR_LEFT+MOTOR_RIGHT, 0.0)
 	g.SetMotorLimits(MOTOR_LEFT+MOTOR_RIGHT, 0, 0)

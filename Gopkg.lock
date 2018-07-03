@@ -27,28 +27,14 @@
 
 [[projects]]
   name = "github.com/eclipse/paho.mqtt.golang"
-  packages = [
-    ".",
-    "packets"
-  ]
+  packages = [".","packets"]
   revision = "36d01c2b4cbeb3d2a12063e4880ce30800af9560"
   version = "v1.1.1"
 
 [[projects]]
   branch = "master"
   name = "github.com/go-ble/ble"
-  packages = [
-    ".",
-    "darwin",
-    "linux",
-    "linux/adv",
-    "linux/att",
-    "linux/gatt",
-    "linux/hci",
-    "linux/hci/cmd",
-    "linux/hci/evt",
-    "linux/hci/socket"
-  ]
+  packages = [".","darwin","linux","linux/adv","linux/att","linux/gatt","linux/hci","linux/hci/cmd","linux/hci/evt","linux/hci/socket"]
   revision = "788214691384e85e345bff9fd5eeb046f5983594"
 
 [[projects]]
@@ -66,11 +52,7 @@
 [[projects]]
   branch = "master"
   name = "github.com/hybridgroup/go-ardrone"
-  packages = [
-    "client",
-    "client/commands",
-    "client/navdata"
-  ]
+  packages = ["client","client/commands","client/navdata"]
   revision = "b9750d8d7b78f9638e5fdd899835e99d46b5a56c"
 
 [[projects]]
@@ -99,10 +81,7 @@
 
 [[projects]]
   name = "github.com/nats-io/go-nats"
-  packages = [
-    "encoders/builtin",
-    "util"
-  ]
+  packages = ["encoders/builtin","util"]
   revision = "29f9728a183bf3fa7e809e14edac00b33be72088"
   version = "v1.3.0"
 
@@ -157,10 +136,7 @@
 [[projects]]
   branch = "master"
   name = "go.bug.st/serial.v1"
-  packages = [
-    ".",
-    "unixutils"
-  ]
+  packages = [".","unixutils"]
   revision = "eae1344f9f90101f887b08d13391c34399f97873"
 
 [[projects]]
@@ -172,43 +148,24 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/net"
-  packages = [
-    "proxy",
-    "websocket"
-  ]
+  packages = ["proxy","websocket"]
   revision = "01c190206fbdffa42f334f4b2bf2220f50e64920"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
-  packages = [
-    "unix",
-    "windows"
-  ]
+  packages = ["unix","windows"]
   revision = "8eb05f94d449fdf134ec24630ce69ada5b469c1c"
 
 [[projects]]
-  branch = "master"
   name = "periph.io/x/periph"
-  packages = [
-    ".",
-    "conn",
-    "conn/gpio",
-    "conn/gpio/gpioreg",
-    "conn/i2c",
-    "conn/i2c/i2creg",
-    "conn/pin",
-    "conn/spi",
-    "conn/spi/spireg",
-    "devices",
-    "host/fs",
-    "host/sysfs"
-  ]
-  revision = "a8b45e63d61cc00328dfe54149cfe7abd7115a7f"
+  packages = [".", "conn", "conn/gpio","conn/gpio/gpioreg","conn/i2c","conn/i2c/i2creg","conn/pin","conn/spi","conn/spi/spireg","devices","host/fs","host/sysfs"]
+  revision = "c0de80b1b075a2019fced09524f2318cf690a685"
+  version = "v2.3.0"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "a724c1b9ea1ff6144acde7636320ea2bd2793e9b5fedb9cebc392d046356c625"
+  inputs-digest = "da1b45abbc42d33c260a2faeeae33da906f384b360b96ceb0c5eb8ca236efec4"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -78,8 +78,8 @@
   version = "0.13.0"
 
 [[constraint]]
-  branch = "master"
   name = "periph.io/x/periph"
+  version = "2.3.0"
 
 [[constraint]]
   branch = "master"
