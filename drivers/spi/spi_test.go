@@ -2,6 +2,7 @@ package spi
 
 import (
 	"periph.io/x/periph/conn"
+	"periph.io/x/periph/conn/physic"
 	xspi "periph.io/x/periph/conn/spi"
 )
 
@@ -35,6 +36,10 @@ type TestSpiDevice struct {
 	dev Connection
 }
 
+func (c *TestSpiDevice) String() string {
+	return "TestSpiDevice"
+}
+
 func (c *TestSpiDevice) Duplex() conn.Duplex {
 	return conn.Half
 }
@@ -51,14 +56,18 @@ type TestSpiConnection struct {
 	conn Operations
 }
 
+func (c *TestSpiConnection) String() string {
+	return "TestSpiConnection"
+}
+
 func (c *TestSpiConnection) Close() error {
 	return nil
 }
 
-func (c *TestSpiConnection) Connect(maxHz int64, mode xspi.Mode, bits int) (xspi.Conn, error) {
+func (c *TestSpiConnection) Connect(maxHz physic.Frequency, mode xspi.Mode, bits int) (xspi.Conn, error) {
 	return nil, nil
 }
 
-func (c *TestSpiConnection) LimitSpeed(maxHz int64) error {
+func (c *TestSpiConnection) LimitSpeed(maxHz physic.Frequency) error {
 	return nil
 }
