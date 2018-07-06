@@ -30,8 +30,8 @@ pushd $PWD/..
 	COVERAGE_REPORT_LOCATION="./profile.cov"
 	echo "" > $COVERAGE_REPORT_LOCATION
 
-	# Exclude vendor in the same way as Makefile does
-	EXCLUDING_VENDOR=$(go list ./... | grep -v /vendor/)
+	# Exclude vendor etc.
+	EXCLUDING_VENDOR=$(go list ./... | grep -Ev 'vendor|common|client|cli|examples|robeaux')
 
 	# Iterate over all non-vendor packages and run tests with coverage
 	for package in $EXCLUDING_VENDOR; do \
