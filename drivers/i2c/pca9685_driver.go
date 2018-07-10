@@ -104,12 +104,14 @@ func (p *PCA9685Driver) SetPWM(channel int, on uint16, off uint16) (err error) {
 
 // SetPWMFreq sets the PWM frequency in Hz
 func (p *PCA9685Driver) SetPWMFreq(freq float32) error {
-	freq *= 0.9
-
+	// IC oscillator frequency is 25 MHz
 	var prescalevel float32 = 25000000
+	// Find frequency of PWM waveform
 	prescalevel /= 4096
+	// Ratio between desired frequency and maximum
 	prescalevel /= freq
 	prescalevel -= 1
+	// Round value to nearest whole
 	prescale := byte(prescalevel + 0.5)
 
 	if _, err := p.connection.Write([]byte{byte(PCA9685_MODE1)}); err != nil {
@@ -121,20 +123,23 @@ func (p *PCA9685Driver) SetPWMFreq(freq float32) error {
 		return err
 	}
 
+	// Put oscillator in sleep mode, clear bit 7 here to avoid overwriting
+	// previous setting
 	newmode := (oldmode & 0x7F) | 0x10
 	if _, err := p.connection.Write([]byte{byte(PCA9685_MODE1), byte(newmode)}); err != nil {
 		return err
 	}
-
+	// Write prescaler value
 	if _, err := p.connection.Write([]byte{byte(PCA9685_PRESCALE), prescale}); err != nil {
 		return err
 	}
-
+	// Put back to old settings
 	if _, err := p.connection.Write([]byte{byte(PCA9685_MODE1), byte(oldmode)}); err != nil {
 		return err
 	}
 
 	time.Sleep(100 * time.Millisecond)
+	// Enable response to All Call address, enable auto-increment, clear restart 
 	if _, err := p.connection.Write([]byte{byte(PCA9685_MODE1), byte(oldmode | 0xa1)}); err != nil {
 		return err
 	}
