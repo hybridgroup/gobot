@@ -25,14 +25,14 @@ import (
 func main() {
 	drone := tello.NewDriver("8890")
 
-	work := func() {
-		mplayer := exec.Command("mplayer", "-fps", "25", "-")
-		mplayerIn, _ := mplayer.StdinPipe()
-		if err := mplayer.Start(); err != nil {
-			fmt.Println(err)
-			return
-		}
+	mplayer := exec.Command("mplayer", "-fps", "25", "-")
+	mplayerIn, _ := mplayer.StdinPipe()
+	if err := mplayer.Start(); err != nil {
+		fmt.Println(err)
+		return
+	}
 
+	work := func() {
 		drone.On(tello.ConnectedEvent, func(data interface{}) {
 			fmt.Println("Connected")
 			drone.StartVideo()
