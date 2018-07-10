@@ -1,0 +1,50 @@
+{
+    "name": "Magicse R1",
+    "guid": "030000004c0",
+    "axis": [
+        {
+            "name": "left_x",
+            "id": 0
+        },
+        {
+            "name": "left_y",
+            "id": 1
+        },
+        {
+            "name": "right_x",
+            "id": 2
+        },
+        {
+            "name": "right_y",
+            "id": 3
+        }
+    ],
+    "buttons": [
+        {
+            "name": "a",
+            "id": 1
+        },
+        {
+            "name": "b",
+            "id": 3
+        },
+        {
+            "name": "c",
+            "id": 0
+        },
+        {
+            "name": "d",
+            "id": 4
+        },
+        {
+            "name": "enter",
+            "id": 6
+        },
+        {
+            "name": "back",
+            "id": 7
+        }
+    ],
+    "hats": [
+    ]
+}
