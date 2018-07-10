@@ -1,3 +1,18 @@
+1.11.1
+---
+* **build**
+    * exclude vendor and other previously excluded subpackages
+    * update Travis build to use OpenCV 3.4.2 release
+    * update deps for GoCV to v0.14.0 release
+    * Bump periph.io/x/periph to v3.0.0
+    * update to Go 1.10.3 and 1.9.7 for Travis builds
+* **docs** 
+    * Fix Leap Motion package link
+* **i2c** 
+    * fix write/read gpio on mcp23017, and cleaned up some comments
+* **gopigo3** 
+    * update with default spi values, cleanup
+
 1.11.0
 ---
 * **build**
