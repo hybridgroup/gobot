@@ -10,6 +10,7 @@
     * Fix Leap Motion package link
 * **i2c** 
     * fix write/read gpio on mcp23017, and cleaned up some comments
+    * correct pca9685 SetPWMFreq function scaling
 * **gopigo3** 
     * update with default spi values, cleanup
 
