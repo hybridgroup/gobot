@@ -100,11 +100,11 @@ func TestHandleResponse(t *testing.T) {
 			msg:    bytes.NewReader(statusMessage(videoEncoderRateCommand)),
 			events: []gobot.Event{{Name: SetVideoEncoderRateEvent}},
 		},
-		// {
-		// 	name:   "videoEncoderRateCommand",
-		// 	msg:    bytes.NewReader([]byte{0x63, 0x6f, 0x6e}),
-		// 	events: []gobot.Event{{Name: ConnectedEvent}},
-		// },
+		{
+			name:   "ConnectedEvent",
+			msg:    bytes.NewReader([]byte{0x63, 0x6f, 0x6e}),
+			events: []gobot.Event{{Name: ConnectedEvent}},
+		},
 	}
 
 	for _, c := range cc {

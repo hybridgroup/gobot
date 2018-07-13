@@ -253,6 +253,11 @@ func (d *Driver) Start() error {
 
 	// handle responses
 	go func() {
+		d.On(d.Event(ConnectedEvent), func(interface{}) {
+			d.SendDateTime()
+			d.processVideo()
+		})
+
 		for {
 			err := d.handleResponse(cmdConn)
 			if err != nil {
@@ -769,8 +774,6 @@ func (d *Driver) handleResponse(r io.Reader) error {
 	// parse text packet
 	if buf[0] == 0x63 && buf[1] == 0x6f && buf[2] == 0x6e {
 		d.Publish(d.Event(ConnectedEvent), nil)
-		d.SendDateTime()
-		d.processVideo()
 	}
 
 	return nil
