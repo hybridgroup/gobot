@@ -23,7 +23,7 @@ func TestTelloDriver(t *testing.T) {
 func statusMessage(msgType uint16, msgAfter7 ...byte) []byte {
 	msg := make([]byte, 7, len(msgAfter7)+7)
 	msg[0] = messageStart
-	binary.LittleEndian.PutUint16(msg[5:], msgType)
+	binary.LittleEndian.PutUint16(msg[5:7], msgType)
 	msg = append(msg, msgAfter7...)
 	return msg
 }
