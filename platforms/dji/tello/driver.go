@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"io"
 	"net"
 	"strconv"
 	"sync"
@@ -243,16 +244,17 @@ func (d *Driver) Start() error {
 		fmt.Println(err)
 		return err
 	}
-	d.reqConn, err = net.DialUDP("udp", respPort, reqAddr)
+	cmdConn, err := net.DialUDP("udp", respPort, reqAddr)
 	if err != nil {
 		fmt.Println(err)
 		return err
 	}
+	d.reqConn = cmdConn
 
 	// handle responses
 	go func() {
 		for {
-			err := d.handleResponse()
+			err := d.handleResponse(cmdConn)
 			if err != nil {
 				fmt.Println("response parse error:", err)
 			}
@@ -714,10 +716,10 @@ func (d *Driver) SendCommand(cmd string) (err error) {
 	return
 }
 
-func (d *Driver) handleResponse() error {
+func (d *Driver) handleResponse(r io.Reader) error {
 	var buf [2048]byte
 	var msgType uint16
-	n, err := d.reqConn.Read(buf[0:])
+	n, err := r.Read(buf[0:])
 	if err != nil {
 		return err
 	}
