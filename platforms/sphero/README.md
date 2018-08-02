@@ -21,7 +21,7 @@ Now you must pair with the Sphero. Open System Preferences > Bluetooth. Now with
 
 ### Ubuntu
 
-Connecting to the Sphero from Ubuntu or any other Linux-based OS can be done entirely from the command line using [Gort](https://gobot.io/x/gort) CLI commands. Here are the steps.
+Connecting to the Sphero from Ubuntu or any other Linux-based OS can be done entirely from the command line using [Gort](http://gort.io/) CLI commands. Here are the steps.
 
 Find the address of the Sphero, by using:
 ```
