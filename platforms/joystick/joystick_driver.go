@@ -107,7 +107,10 @@ func (j *Driver) Start() (err error) {
 	case "xbox360RockBandDrums":
 		j.config = xbox360RockBandDrumsConfig
 	default:
-		j.loadFile()
+		err := j.loadFile()
+		if err != nil {
+			return err
+		}
 	}
 
 	for _, value := range j.config.Buttons {
