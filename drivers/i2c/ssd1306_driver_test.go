@@ -3,6 +3,7 @@ package i2c
 import (
 	"errors"
 	"fmt"
+	"image"
 	"reflect"
 	"strings"
 	"testing"
@@ -110,6 +111,16 @@ func TestSSD1306DriverDisplay(t *testing.T) {
 	s, _ := initTestSSD1306DriverWithStubbedAdaptor()
 	s.Start()
 	gobottest.Assert(t, s.Display(), nil)
+}
+
+func TestSSD1306DriverShowImage(t *testing.T) {
+	s, _ := initTestSSD1306DriverWithStubbedAdaptor()
+	s.Start()
+	img := image.NewRGBA(image.Rect(0, 0, 640, 480))
+	gobottest.Assert(t, s.ShowImage(img), errors.New("Image must match the display width and height"))
+
+	img = image.NewRGBA(image.Rect(0, 0, 128, 64))
+	gobottest.Assert(t, s.ShowImage(img), nil)
 }
 
 func TestSSD1306DriverCommand(t *testing.T) {

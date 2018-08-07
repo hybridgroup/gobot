@@ -1,6 +1,9 @@
 package i2c
 
 import (
+	"errors"
+	"image"
+
 	"gobot.io/x/gobot"
 )
 
@@ -297,6 +300,24 @@ func (s *SSD1306Driver) Display() (err error) {
 	// Write the buffer
 	_, err = s.connection.Write(append([]byte{0x40}, s.Buffer.buffer...))
 	return err
+}
+
+// ShowImage takes a standard Go image and shows it on the display in monochrome.
+func (s *SSD1306Driver) ShowImage(img image.Image) (err error) {
+	if img.Bounds().Dx() != s.DisplayWidth || img.Bounds().Dy() != s.DisplayHeight {
+		return errors.New("Image must match the display width and height")
+	}
+
+	s.Clear()
+	for y, w, h := 0, img.Bounds().Dx(), img.Bounds().Dy(); y < h; y++ {
+		for x := 0; x < w; x++ {
+			c := img.At(x, y)
+			if r, g, b, _ := c.RGBA(); r > 0 || g > 0 || b > 0 {
+				s.Set(x, y, 1)
+			}
+		}
+	}
+	return s.Display()
 }
 
 // command sends a unique command
