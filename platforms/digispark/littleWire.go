@@ -17,6 +17,11 @@ type lw interface {
 	pwmUpdatePrescaler(uint) error
 	servoInit() error
 	servoUpdateLocation(uint8, uint8) error
+	i2cInit() error
+	i2cStart(address7bit uint8, direction uint8) error
+	i2cWrite(sendBuffer []byte, length int, endWithStop uint8) error
+	i2cRead(readBuffer []byte, length int, endWithStop uint8) error
+	//	i2cUpdateDelay(uint duration) error
 	error() error
 }
 
@@ -69,6 +74,37 @@ func (l *littleWire) servoUpdateLocation(locationA uint8, locationB uint8) error
 	C.servo_updateLocation(l.lwHandle, C.uchar(locationA), C.uchar(locationB))
 	return l.error()
 }
+
+func (l *littleWire) i2cInit() error {
+	C.i2c_init(l.lwHandle)
+	return l.error()
+}
+
+// i2cStart starts the i2c communication; set direction to 1 for reading, 0 for writing
+func (l *littleWire) i2cStart(address7bit uint8, direction uint8) error {
+	if C.i2c_start(l.lwHandle, C.uchar(address7bit), C.uchar(direction)) == 1 {
+		return nil
+	}
+	return l.error()
+}
+
+// i2cWrite sends byte(s) over i2c with a given length <= 4
+func (l *littleWire) i2cWrite(sendBuffer []byte, length int, endWithStop uint8) error {
+	C.i2c_write(l.lwHandle, (*C.uchar)(&sendBuffer[0]), C.uchar(length), C.uchar(endWithStop))
+	return l.error()
+}
+
+// i2cRead reads byte(s) over i2c with a given length <= 8
+func (l *littleWire) i2cRead(readBuffer []byte, length int, endWithStop uint8) error {
+	C.i2c_read(l.lwHandle, (*C.uchar)(&readBuffer[0]), C.uchar(length), C.uchar(endWithStop))
+	return l.error()
+}
+
+//// i2cUpdateDelay updates i2c signal delay amount. Tune if neccessary to fit your requirements
+//func (l *littleWire) i2cUpdateDelay(uint duration) error {
+//	C.i2c_updateDelay(l.lwHandle, C.uint(duration))
+//	return l.error()
+//}
 
 func (l *littleWire) error() error {
 	str := C.GoString(C.littleWire_errorName())
