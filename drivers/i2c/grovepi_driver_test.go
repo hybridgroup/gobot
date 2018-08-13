@@ -12,6 +12,9 @@ import (
 
 var _ gobot.Driver = (*GrovePiDriver)(nil)
 
+// must implement the DigitalReader interface
+var _ gpio.DigitalReader = (*GrovePiDriver)(nil)
+
 // must implement the DigitalWriter interface
 var _ gpio.DigitalWriter = (*GrovePiDriver)(nil)
 
