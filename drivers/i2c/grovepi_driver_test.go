@@ -21,6 +21,9 @@ var _ gpio.DigitalWriter = (*GrovePiDriver)(nil)
 // must implement the AnalogReader interface
 var _ aio.AnalogReader = (*GrovePiDriver)(nil)
 
+// must implement the Adaptor interface
+var _ gobot.Adaptor = (*GrovePiDriver)(nil)
+
 func initTestGrovePiDriver() (driver *GrovePiDriver) {
 	driver, _ = initGrovePiDriverWithStubbedAdaptor()
 	return

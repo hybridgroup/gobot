@@ -80,6 +80,16 @@ func (d *GrovePiDriver) Start() (err error) {
 // Halt returns true if devices is halted successfully
 func (d *GrovePiDriver) Halt() (err error) { return }
 
+// Connect is here to implement the Adaptor interface.
+func (d *GrovePiDriver) Connect() (err error) {
+	return
+}
+
+// Finalize is here to implement the Adaptor interface.
+func (d *GrovePiDriver) Finalize() (err error) {
+	return
+}
+
 // AnalogRead returns value from analog pin implementing the AnalogReader interface.
 func (d *GrovePiDriver) AnalogRead(pin string) (value int, err error) {
 	pin = getPin(pin)
