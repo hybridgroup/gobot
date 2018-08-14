@@ -90,58 +90,9 @@ func (d *GrovePiDriver) AnalogRead(pin string) (value int, err error) {
 		return
 	}
 
-	if dir, ok := d.analogPins[pinNum]; !ok || dir != "input" {
-		d.PinMode(byte(pinNum), "input")
-		d.analogPins[pinNum] = "input"
-	}
-
 	value, err = d.readAnalog(byte(pinNum))
 
 	return
-}
-
-// ReadAnalog reads analog value from the GrovePi
-func (d *GrovePiDriver) readAnalog(pin byte) (int, error) {
-	b := []byte{1, CommandReadAnalog, pin, 0, 0}
-	_, err := d.connection.Write(b)
-	if err != nil {
-		return 0, err
-	}
-
-	time.Sleep(100 * time.Millisecond)
-
-	d.connection.Write([]byte{1})
-	d.connection.ReadByte()
-
-	data := make([]byte, 4)
-	d.connection.Write([]byte{1})
-	_, err = d.connection.Read(data)
-	if err != nil {
-		return 0, err
-	}
-
-	v1 := int(data[1])
-	v2 := int(data[2])
-	return ((v1 * 256) + v2), nil
-}
-
-// ReadDigital reads digitally to the GrovePi
-func (d *GrovePiDriver) readDigital(pin byte) (val int, err error) {
-	buf := []byte{1, CommandReadDigital, pin, 0, 0}
-	_, err = d.connection.Write(buf)
-	if err != nil {
-		return
-	}
-
-	time.Sleep(100 * time.Millisecond)
-
-	d.connection.Write([]byte{1})
-	v, err := d.connection.ReadByte()
-	if err != nil {
-		return
-	}
-
-	return int(v), err
 }
 
 // DigitalRead performs a read on a digital pin.
@@ -164,14 +115,6 @@ func (d *GrovePiDriver) DigitalRead(pin string) (val int, err error) {
 	return
 }
 
-// WriteDigital writes digitally to the GrovePi
-func (d *GrovePiDriver) writeDigital(pin byte, val byte) error {
-	buf := []byte{1, CommandWriteDigital, pin, val, 0}
-	_, err := d.connection.Write(buf)
-	time.Sleep(100 * time.Millisecond)
-	return err
-}
-
 // DigitalWrite writes a value to a specific digital pin implementing the DigitalWriter interface.
 func (d *GrovePiDriver) DigitalWrite(pin string, val byte) (err error) {
 	pin = getPin(pin)
@@ -192,11 +135,16 @@ func (d *GrovePiDriver) DigitalWrite(pin string, val byte) (err error) {
 	return
 }
 
-// WriteAnalog writes PWM aka analog to the GrovePi
+// WriteAnalog writes PWM aka analog to the GrovePi. Not yet working.
 func (d *GrovePiDriver) WriteAnalog(pin byte, val byte) error {
-	buf := []byte{1, CommandWriteAnalog, pin, val, 0}
+	buf := []byte{CommandWriteAnalog, pin, val, 0}
 	_, err := d.connection.Write(buf)
-	time.Sleep(100 * time.Millisecond)
+
+	time.Sleep(2 * time.Millisecond)
+
+	data := make([]byte, 1)
+	_, err = d.connection.Read(data)
+
 	return err
 }
 
@@ -204,40 +152,17 @@ func (d *GrovePiDriver) WriteAnalog(pin byte, val byte) error {
 func (d *GrovePiDriver) PinMode(pin byte, mode string) error {
 	var b []byte
 	if mode == "output" {
-		b = []byte{1, CommandPinMode, pin, 1, 0}
+		b = []byte{CommandPinMode, pin, 1, 0}
 	} else {
-		b = []byte{1, CommandPinMode, pin, 0, 0}
+		b = []byte{CommandPinMode, pin, 0, 0}
 	}
 	_, err := d.connection.Write(b)
-	time.Sleep(100 * time.Millisecond)
-	if err != nil {
-		return err
-	}
-	return nil
-}
 
-// ReadDHT returns temperature and humidity from DHT sensor
-func (d *GrovePiDriver) ReadDHT(pin byte, size int) ([]byte, error) {
-	cmd := []byte{1, CommandReadDHT, pin, 0, 0}
+	time.Sleep(2 * time.Millisecond)
 
-	// prepare and read raw data
-	_, err := d.connection.Write(cmd)
-	if err != nil {
-		return nil, err
-	}
-	time.Sleep(600 * time.Millisecond)
-	d.connection.Write([]byte{1})
-	d.connection.ReadByte()
-	time.Sleep(100 * time.Millisecond)
+	_, err = d.connection.ReadByte()
 
-	data := make([]byte, size)
-	d.connection.Write([]byte{1})
-	_, err = d.connection.Read(data)
-	if err != nil {
-		return nil, err
-	}
-
-	return data, err
+	return err
 }
 
 func getPin(pin string) string {
@@ -248,4 +173,56 @@ func getPin(pin string) string {
 	}
 
 	return pin
+}
+
+// readAnalog reads analog value from the GrovePi.
+func (d *GrovePiDriver) readAnalog(pin byte) (int, error) {
+	b := []byte{CommandReadAnalog, pin, 0, 0}
+	_, err := d.connection.Write(b)
+	if err != nil {
+		return 0, err
+	}
+
+	time.Sleep(2 * time.Millisecond)
+
+	data := make([]byte, 3)
+	_, err = d.connection.Read(data)
+	if err != nil || data[0] != CommandReadAnalog {
+		return -1, err
+	}
+
+	v1 := int(data[1])
+	v2 := int(data[2])
+	return ((v1 * 256) + v2), nil
+}
+
+// readDigital reads digitally from the GrovePi.
+func (d *GrovePiDriver) readDigital(pin byte) (val int, err error) {
+	buf := []byte{CommandReadDigital, pin, 0, 0}
+	_, err = d.connection.Write(buf)
+	if err != nil {
+		return
+	}
+
+	time.Sleep(2 * time.Millisecond)
+
+	data := make([]byte, 2)
+	_, err = d.connection.Read(data)
+	if err != nil || data[0] != CommandReadDigital {
+		return 0, err
+	}
+
+	return int(data[1]), err
+}
+
+// writeDigital writes digitally to the GrovePi.
+func (d *GrovePiDriver) writeDigital(pin byte, val byte) error {
+	buf := []byte{CommandWriteDigital, pin, val, 0}
+	_, err := d.connection.Write(buf)
+
+	time.Sleep(2 * time.Millisecond)
+
+	_, err = d.connection.ReadByte()
+
+	return err
 }
