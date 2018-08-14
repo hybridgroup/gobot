@@ -2,6 +2,7 @@ package i2c
 
 import (
 	"strconv"
+	"strings"
 	"time"
 
 	"gobot.io/x/gobot"
@@ -81,7 +82,7 @@ func (d *GrovePiDriver) Halt() (err error) { return }
 
 // AnalogRead returns value from analog pin implementing the AnalogReader interface.
 func (d *GrovePiDriver) AnalogRead(pin string) (value int, err error) {
-	// TODO: strip off the leading "A"
+	pin = getPin(pin)
 
 	var pinNum int
 	pinNum, err = strconv.Atoi(pin)
@@ -94,13 +95,13 @@ func (d *GrovePiDriver) AnalogRead(pin string) (value int, err error) {
 		d.analogPins[pinNum] = "input"
 	}
 
-	value, err = d.ReadAnalog(byte(pinNum))
+	value, err = d.readAnalog(byte(pinNum))
 
 	return
 }
 
 // ReadAnalog reads analog value from the GrovePi
-func (d *GrovePiDriver) ReadAnalog(pin byte) (int, error) {
+func (d *GrovePiDriver) readAnalog(pin byte) (int, error) {
 	b := []byte{1, CommandReadAnalog, pin, 0, 0}
 	_, err := d.connection.Write(b)
 	if err != nil {
@@ -125,7 +126,7 @@ func (d *GrovePiDriver) ReadAnalog(pin byte) (int, error) {
 }
 
 // ReadDigital reads digitally to the GrovePi
-func (d *GrovePiDriver) ReadDigital(pin byte) (val int, err error) {
+func (d *GrovePiDriver) readDigital(pin byte) (val int, err error) {
 	buf := []byte{1, CommandReadDigital, pin, 0, 0}
 	_, err = d.connection.Write(buf)
 	if err != nil {
@@ -145,7 +146,8 @@ func (d *GrovePiDriver) ReadDigital(pin byte) (val int, err error) {
 
 // DigitalRead performs a read on a digital pin.
 func (d *GrovePiDriver) DigitalRead(pin string) (val int, err error) {
-	// TODO: strip off the leading "D"
+	pin = getPin(pin)
+
 	var pinNum int
 	pinNum, err = strconv.Atoi(pin)
 	if err != nil {
@@ -157,13 +159,13 @@ func (d *GrovePiDriver) DigitalRead(pin string) (val int, err error) {
 		d.digitalPins[pinNum] = "input"
 	}
 
-	val, err = d.ReadDigital(byte(pinNum))
+	val, err = d.readDigital(byte(pinNum))
 
 	return
 }
 
 // WriteDigital writes digitally to the GrovePi
-func (d *GrovePiDriver) WriteDigital(pin byte, val byte) error {
+func (d *GrovePiDriver) writeDigital(pin byte, val byte) error {
 	buf := []byte{1, CommandWriteDigital, pin, val, 0}
 	_, err := d.connection.Write(buf)
 	time.Sleep(100 * time.Millisecond)
@@ -172,7 +174,8 @@ func (d *GrovePiDriver) WriteDigital(pin byte, val byte) error {
 
 // DigitalWrite writes a value to a specific digital pin implementing the DigitalWriter interface.
 func (d *GrovePiDriver) DigitalWrite(pin string, val byte) (err error) {
-	// TODO: strip off the leading "D"
+	pin = getPin(pin)
+
 	var pinNum int
 	pinNum, err = strconv.Atoi(pin)
 	if err != nil {
@@ -184,12 +187,12 @@ func (d *GrovePiDriver) DigitalWrite(pin string, val byte) (err error) {
 		d.digitalPins[pinNum] = "output"
 	}
 
-	err = d.WriteDigital(byte(pinNum), val)
+	err = d.writeDigital(byte(pinNum), val)
 
 	return
 }
 
-// WriteAnalog writes analog to the GrovePi
+// WriteAnalog writes PWM aka analog to the GrovePi
 func (d *GrovePiDriver) WriteAnalog(pin byte, val byte) error {
 	buf := []byte{1, CommandWriteAnalog, pin, val, 0}
 	_, err := d.connection.Write(buf)
@@ -235,4 +238,14 @@ func (d *GrovePiDriver) ReadDHT(pin byte, size int) ([]byte, error) {
 	}
 
 	return data, err
+}
+
+func getPin(pin string) string {
+	if len(pin) > 1 {
+		if strings.ToUpper(pin[0:1]) == "A" || strings.ToUpper(pin[0:1]) == "D" {
+			return pin[1:len(pin)]
+		}
+	}
+
+	return pin
 }

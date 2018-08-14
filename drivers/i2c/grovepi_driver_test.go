@@ -36,3 +36,23 @@ func TestGrovePiDriverName(t *testing.T) {
 	gobottest.Refute(t, g.Connection(), nil)
 	gobottest.Assert(t, strings.HasPrefix(g.Name(), "GrovePi"), true)
 }
+
+func TestGrovePiDriverOptions(t *testing.T) {
+	g := NewGrovePiDriver(newI2cTestAdaptor(), WithBus(2))
+	gobottest.Assert(t, g.GetBusOrDefault(1), 2)
+}
+
+// Methods
+func TestGrovePiDriverStart(t *testing.T) {
+	g := initTestGrovePiDriver()
+
+	gobottest.Assert(t, g.Start(), nil)
+}
+
+func TestGrovePiDrivergetPin(t *testing.T) {
+	gobottest.Assert(t, getPin("a1"), "1")
+	gobottest.Assert(t, getPin("A16"), "16")
+	gobottest.Assert(t, getPin("D3"), "3")
+	gobottest.Assert(t, getPin("d22"), "22")
+	gobottest.Assert(t, getPin("22"), "22")
+}
