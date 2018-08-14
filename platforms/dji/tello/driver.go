@@ -488,6 +488,24 @@ func (d *Driver) CounterClockwise(val int) error {
 	return nil
 }
 
+// Hover tells the drone to stop moving on the X, Y, and Z axes and stay in place
+func (d *Driver) Hover() {
+	d.cmdMutex.Lock()
+	defer d.cmdMutex.Unlock()
+
+	d.rx = float32(0)
+	d.ry = float32(0)
+	d.ly = float32(0)
+}
+
+// CeaseRotation stops any rotational motion
+func (d *Driver) CeaseRotation() {
+	d.cmdMutex.Lock()
+	defer d.cmdMutex.Unlock()
+
+	d.lx = float32(0)
+}
+
 // Bounce tells drone to start/stop performing the bouncing action
 func (d *Driver) Bounce() (err error) {
 	buf, _ := d.createPacket(bounceCommand, 0x68, 1)
