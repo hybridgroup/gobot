@@ -12,14 +12,14 @@ import (
 
 var _ gobot.Driver = (*Driver)(nil)
 
-func initTestDriver() *Driver {
+func initTestDriver(config string) *Driver {
 	a := NewAdaptor()
 	a.connect = func(j *Adaptor) (err error) {
 		j.joystick = &testJoystick{}
 		return nil
 	}
 	a.Connect()
-	d := NewDriver(a, "./configs/xbox360_power_a_mini_proex.json")
+	d := NewDriver(a, config)
 	d.poll = func() sdl.Event {
 		return nil
 	}
@@ -27,21 +27,21 @@ func initTestDriver() *Driver {
 }
 
 func TestJoystickDriverName(t *testing.T) {
-	d := initTestDriver()
+	d := initTestDriver("./configs/xbox360_power_a_mini_proex.json")
 	gobottest.Assert(t, strings.HasPrefix(d.Name(), "Joystick"), true)
 	d.SetName("NewName")
 	gobottest.Assert(t, d.Name(), "NewName")
 }
 
 func TestDriverStart(t *testing.T) {
-	d := initTestDriver()
+	d := initTestDriver("./configs/xbox360_power_a_mini_proex.json")
 	d.interval = 1 * time.Millisecond
 	gobottest.Assert(t, d.Start(), nil)
 	time.Sleep(2 * time.Millisecond)
 }
 
 func TestDriverHalt(t *testing.T) {
-	d := initTestDriver()
+	d := initTestDriver("./configs/xbox360_power_a_mini_proex.json")
 	go func() {
 		<-d.halt
 	}()
@@ -50,7 +50,7 @@ func TestDriverHalt(t *testing.T) {
 
 func TestDriverHandleEvent(t *testing.T) {
 	sem := make(chan bool)
-	d := initTestDriver()
+	d := initTestDriver("./configs/xbox360_power_a_mini_proex.json")
 	d.Start()
 
 	// left x stick
@@ -137,4 +137,10 @@ func TestDriverHandleEvent(t *testing.T) {
 	})
 
 	gobottest.Assert(t, err.Error(), "Unknown Button: 99")
+}
+
+func TestDriverInvalidConfig(t *testing.T) {
+	d := initTestDriver("./configs/doesnotexist")
+	err := d.Start()
+	gobottest.Assert(t, strings.Contains(err.Error(), "open ./configs/doesnotexist: no such file or directory"), true)
 }
