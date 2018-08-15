@@ -202,3 +202,26 @@ func TestJHD1313MDriverSetCustomCharWriteError(t *testing.T) {
 	data := [8]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
 	gobottest.Assert(t, d.SetCustomChar(0, data), errors.New("write error"))
 }
+
+func TestJHD1313MDriverCommands(t *testing.T) {
+	d, _ := initTestJHD1313M1DriverWithStubbedAdaptor()
+	d.Start()
+
+	err := d.Command("SetRGB")(map[string]interface{}{"r": "1", "g": "1", "b": "1"})
+	gobottest.Assert(t, err, nil)
+
+	err = d.Command("Clear")(map[string]interface{}{})
+	gobottest.Assert(t, err, nil)
+
+	err = d.Command("Home")(map[string]interface{}{})
+	gobottest.Assert(t, err, nil)
+
+	err = d.Command("Write")(map[string]interface{}{"msg": "Hello"})
+	gobottest.Assert(t, err, nil)
+
+	err = d.Command("SetPosition")(map[string]interface{}{"pos": "1"})
+	gobottest.Assert(t, err, nil)
+
+	err = d.Command("Scroll")(map[string]interface{}{"lr": "true"})
+	gobottest.Assert(t, err, nil)
+}

@@ -2,6 +2,7 @@ package i2c
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
 	"gobot.io/x/gobot"
@@ -74,6 +75,7 @@ type JHD1313M1Driver struct {
 	name      string
 	connector Connector
 	Config
+	gobot.Commander
 	lcdAddress    int
 	lcdConnection Connection
 	rgbAddress    int
@@ -92,6 +94,7 @@ func NewJHD1313M1Driver(a Connector, options ...func(Config)) *JHD1313M1Driver {
 		name:       gobot.DefaultName("JHD1313M1"),
 		connector:  a,
 		Config:     NewConfig(),
+		Commander:  gobot.NewCommander(),
 		lcdAddress: 0x3E,
 		rgbAddress: 0x62,
 	}
@@ -99,6 +102,31 @@ func NewJHD1313M1Driver(a Connector, options ...func(Config)) *JHD1313M1Driver {
 	for _, option := range options {
 		option(j)
 	}
+
+	j.AddCommand("SetRGB", func(params map[string]interface{}) interface{} {
+		r, _ := strconv.Atoi(params["r"].(string))
+		g, _ := strconv.Atoi(params["g"].(string))
+		b, _ := strconv.Atoi(params["b"].(string))
+		return j.SetRGB(r, g, b)
+	})
+	j.AddCommand("Clear", func(params map[string]interface{}) interface{} {
+		return j.Clear()
+	})
+	j.AddCommand("Home", func(params map[string]interface{}) interface{} {
+		return j.Home()
+	})
+	j.AddCommand("Write", func(params map[string]interface{}) interface{} {
+		msg := params["msg"].(string)
+		return j.Write(msg)
+	})
+	j.AddCommand("SetPosition", func(params map[string]interface{}) interface{} {
+		pos, _ := strconv.Atoi(params["pos"].(string))
+		return j.SetPosition(pos)
+	})
+	j.AddCommand("Scroll", func(params map[string]interface{}) interface{} {
+		lr, _ := strconv.ParseBool(params["lr"].(string))
+		return j.Scroll(lr)
+	})
 
 	return j
 }
@@ -242,8 +270,10 @@ func (h *JHD1313M1Driver) SetPosition(pos int) (err error) {
 	return
 }
 
-func (h *JHD1313M1Driver) Scroll(leftToRight bool) error {
-	if leftToRight {
+// Scroll sets the scrolling direction for the display, either left to right, or
+// right to left.
+func (h *JHD1313M1Driver) Scroll(lr bool) error {
+	if lr {
 		_, err := h.lcdConnection.Write([]byte{LCD_CMD, LCD_CURSORSHIFT | LCD_DISPLAYMOVE | LCD_MOVELEFT})
 		return err
 	}
