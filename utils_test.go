@@ -73,6 +73,11 @@ func TestToScale(t *testing.T) {
 	gobottest.Assert(t, ToScale(0.5, 0, 10), 5.0)
 }
 
+func TestRescale(t *testing.T) {
+	gobottest.Assert(t, Rescale(500, 0, 1000, 0, 10), 5.0)
+	gobottest.Assert(t, Rescale(-1.0, -1, 0, 490, 350), 490.0)
+}
+
 func TestRand(t *testing.T) {
 	a := Rand(10000)
 	b := Rand(10000)

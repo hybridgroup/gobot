@@ -57,6 +57,11 @@ func ToScale(input, min, max float64) float64 {
 	}
 }
 
+// Rescale performs a direct linear rescaling of a number from one scale to another.
+func Rescale(input, fromMin, fromMax, toMin, toMax float64) float64 {
+	return (input-fromMin)*(toMax-toMin)/(fromMax-fromMin) + toMin
+}
+
 // DefaultName returns a sensible random default name
 // for a robot, adaptor or driver
 func DefaultName(name string) string {
