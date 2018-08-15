@@ -25,8 +25,11 @@ const (
 	PCA9685_ALLLED_OFF_H = 0xFD
 )
 
-// PCA9685Driver is a Gobot Driver for the PCA9685 16-channel 12-bit
-// PWM/Servo controller.
+// PCA9685Driver is a Gobot Driver for the PCA9685 16-channel 12-bit PWM/Servo controller.
+//
+// For example, here is the Adafruit board that uses this chip:
+// https://www.adafruit.com/product/815
+//
 type PCA9685Driver struct {
 	name       string
 	connector  Connector
@@ -93,7 +96,14 @@ func (p *PCA9685Driver) Halt() (err error) {
 	return
 }
 
-// SetPWM sets a specific channel to a pwm value from 0-4096
+// SetPWM sets a specific channel to a pwm value from 0-4096.
+// Params:
+//		channel int - the channel to send the pulse
+//		on uint16 - the time to start the pulse
+//		off uint16 - the time to stop the pulse
+//
+// Most typically you set "on" to a zero value, and then set "off" to your desired duty.
+//
 func (p *PCA9685Driver) SetPWM(channel int, on uint16, off uint16) (err error) {
 	if _, err := p.connection.Write([]byte{byte(PCA9685_LED0_ON_L + 4*channel), byte(on), byte(on >> 8), byte(off), byte(off >> 8)}); err != nil {
 		return err
@@ -139,7 +149,7 @@ func (p *PCA9685Driver) SetPWMFreq(freq float32) error {
 	}
 
 	time.Sleep(100 * time.Millisecond)
-	// Enable response to All Call address, enable auto-increment, clear restart 
+	// Enable response to All Call address, enable auto-increment, clear restart
 	if _, err := p.connection.Write([]byte{byte(PCA9685_MODE1), byte(oldmode | 0xa1)}); err != nil {
 		return err
 	}
@@ -147,7 +157,10 @@ func (p *PCA9685Driver) SetPWMFreq(freq float32) error {
 	return nil
 }
 
-// PwmWrite writes a PWM signal to the specified pin
+// PwmWrite writes a PWM signal to the specified pin.
+// Value values are from 0-255, to conform to the PwmWriter interface.
+// If you need finer control, please look at SetPWM().
+//
 func (p *PCA9685Driver) PwmWrite(pin string, val byte) (err error) {
 	i, err := strconv.Atoi(pin)
 	if err != nil {
@@ -158,7 +171,9 @@ func (p *PCA9685Driver) PwmWrite(pin string, val byte) (err error) {
 }
 
 // ServoWrite writes a servo signal to the specified pin.
-// Valid values are from 0-180.
+// Valid values are from 0-180, to conform to the ServoWriter interface.
+// If you need finer control, please look at SetPWM().
+//
 func (p *PCA9685Driver) ServoWrite(pin string, val byte) (err error) {
 	i, err := strconv.Atoi(pin)
 	if err != nil {
