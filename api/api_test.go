@@ -34,6 +34,21 @@ func initTestAPI() *API {
 	return a
 }
 
+func TestStartRaw(t *testing.T) {
+	log.SetOutput(NullReadWriteCloser{})
+	g := gobot.NewMaster()
+	a := NewAPI(g)
+	a.start = func(m *API) {}
+
+	a.Get("/", func(res http.ResponseWriter, req *http.Request) {})
+	a.StartRaw()
+
+	request, _ := http.NewRequest("GET", "/", nil)
+	response := httptest.NewRecorder()
+	a.ServeHTTP(response, request)
+	gobottest.Assert(t, response.Code, 200)
+}
+
 func TestRobeaux(t *testing.T) {
 	a := initTestAPI()
 	// html assets

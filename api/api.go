@@ -102,6 +102,19 @@ func (a *API) AddHandler(f func(http.ResponseWriter, *http.Request)) {
 
 // Start initializes the api by setting up c3pio routes and robeaux
 func (a *API) Start() {
+	a.AddC3PIORoutes()
+	a.AddRobeauxRoutes()
+
+	a.start(a)
+}
+
+// StartRaw initializes the api without setting up any routes. Good for custom web interfaces.
+func (a *API) StartRaw() {
+	a.start(a)
+}
+
+// AddC3PIORoutes adds all of the standard C3PIO routes to the API.
+func (a *API) AddC3PIORoutes() {
 	mcpCommandRoute := "/api/commands/:command"
 	robotDeviceCommandRoute := "/api/robots/:robot/devices/:device/commands/:command"
 	robotCommandRoute := "/api/robots/:robot/commands/:command"
@@ -123,7 +136,10 @@ func (a *API) Start() {
 	a.Get("/api/robots/:robot/connections", a.robotConnections)
 	a.Get("/api/robots/:robot/connections/:connection", a.robotConnection)
 	a.Get("/api/", a.mcp)
+}
 
+// AddRobeauxRoutes adds all of the robeaux web interface routes to the API.
+func (a *API) AddRobeauxRoutes() {
 	a.Get("/", func(res http.ResponseWriter, req *http.Request) {
 		http.Redirect(res, req, "/index.html", http.StatusMovedPermanently)
 	})
@@ -136,8 +152,6 @@ func (a *API) Start() {
 	a.Get("/css/:a/", a.robeaux)
 	a.Get("/css/:a/:b", a.robeaux)
 	a.Get("/partials/:a", a.robeaux)
-
-	a.start(a)
 }
 
 // robeaux returns handler for robeaux routes.
