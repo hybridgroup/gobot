@@ -129,3 +129,20 @@ func TestPCA9685DriverSetName(t *testing.T) {
 	pca.SetName("TESTME")
 	gobottest.Assert(t, pca.Name(), "TESTME")
 }
+
+func TestPCA9685DriverCommands(t *testing.T) {
+	pca := initTestPCA9685Driver()
+	pca.Start()
+
+	err := pca.Command("PwmWrite")(map[string]interface{}{"pin": "1", "val": "1"})
+	gobottest.Assert(t, err, nil)
+
+	err = pca.Command("ServoWrite")(map[string]interface{}{"pin": "1", "val": "1"})
+	gobottest.Assert(t, err, nil)
+
+	err = pca.Command("SetPWM")(map[string]interface{}{"channel": "1", "on": "0", "off": "1024"})
+	gobottest.Assert(t, err, nil)
+
+	err = pca.Command("SetPWMFreq")(map[string]interface{}{"freq": "60"})
+	gobottest.Assert(t, err, nil)
+}

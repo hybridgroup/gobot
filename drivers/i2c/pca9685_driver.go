@@ -35,6 +35,7 @@ type PCA9685Driver struct {
 	connector  Connector
 	connection Connection
 	Config
+	gobot.Commander
 }
 
 // NewPCA9685Driver creates a new driver with specified i2c interface
@@ -50,13 +51,34 @@ func NewPCA9685Driver(a Connector, options ...func(Config)) *PCA9685Driver {
 		name:      gobot.DefaultName("PCA9685"),
 		connector: a,
 		Config:    NewConfig(),
+		Commander: gobot.NewCommander(),
 	}
 
 	for _, option := range options {
 		option(p)
 	}
 
-	// TODO: add commands for API
+	p.AddCommand("PwmWrite", func(params map[string]interface{}) interface{} {
+		pin := params["pin"].(string)
+		val, _ := strconv.Atoi(params["val"].(string))
+		return p.PwmWrite(pin, byte(val))
+	})
+	p.AddCommand("ServoWrite", func(params map[string]interface{}) interface{} {
+		pin := params["pin"].(string)
+		val, _ := strconv.Atoi(params["val"].(string))
+		return p.ServoWrite(pin, byte(val))
+	})
+	p.AddCommand("SetPWM", func(params map[string]interface{}) interface{} {
+		channel, _ := strconv.Atoi(params["channel"].(string))
+		on, _ := strconv.Atoi(params["on"].(string))
+		off, _ := strconv.Atoi(params["off"].(string))
+		return p.SetPWM(channel, uint16(on), uint16(off))
+	})
+	p.AddCommand("SetPWMFreq", func(params map[string]interface{}) interface{} {
+		freq, _ := strconv.ParseFloat(params["freq"].(string), 32)
+		return p.SetPWMFreq(float32(freq))
+	})
+
 	return p
 }
 
@@ -157,7 +179,7 @@ func (p *PCA9685Driver) SetPWMFreq(freq float32) error {
 	return nil
 }
 
-// PwmWrite writes a PWM signal to the specified pin.
+// PwmWrite writes a PWM signal to the specified channel aka "pin".
 // Value values are from 0-255, to conform to the PwmWriter interface.
 // If you need finer control, please look at SetPWM().
 //
@@ -170,7 +192,7 @@ func (p *PCA9685Driver) PwmWrite(pin string, val byte) (err error) {
 	return p.SetPWM(i, 0, uint16(v))
 }
 
-// ServoWrite writes a servo signal to the specified pin.
+// ServoWrite writes a servo signal to the specified channel aka "pin".
 // Valid values are from 0-180, to conform to the ServoWriter interface.
 // If you need finer control, please look at SetPWM().
 //
