@@ -20,7 +20,12 @@ const (
 	CommandReadDHT      = 40
 )
 
-// GrovePiDriver is a driver for the GrovePi for I²C bus interface.
+// GrovePiDriver is a driver for the GrovePi+ for I²C bus interface.
+// https://www.dexterindustries.com/grovepi/
+//
+// To use this driver with the GrovePi, it must be running the 1.3.0+ firmware.
+// https://forum.dexterindustries.com/t/pre-release-of-grovepis-firmware-v1-3-0-open-to-testers/5119
+//
 type GrovePiDriver struct {
 	name        string
 	digitalPins map[int]string
