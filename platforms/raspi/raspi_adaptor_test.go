@@ -110,6 +110,7 @@ func TestAdaptorFinalize(t *testing.T) {
 
 func TestAdaptorDigitalPWM(t *testing.T) {
 	a := initTestAdaptor()
+	a.PiBlasterPeriod = 20000000
 
 	gobottest.Assert(t, a.PwmWrite("7", 4), nil)
 
@@ -117,6 +118,10 @@ func TestAdaptorDigitalPWM(t *testing.T) {
 		"/dev/pi-blaster",
 	})
 	sysfs.SetFilesystem(fs)
+
+	pin, _ := a.PWMPin("7")
+	period, _ := pin.Period()
+	gobottest.Assert(t, period, uint32(20000000))
 
 	gobottest.Assert(t, a.PwmWrite("7", 255), nil)
 
@@ -128,6 +133,14 @@ func TestAdaptorDigitalPWM(t *testing.T) {
 
 	gobottest.Assert(t, a.PwmWrite("notexist", 1), errors.New("Not a valid pin"))
 	gobottest.Assert(t, a.ServoWrite("notexist", 1), errors.New("Not a valid pin"))
+
+	pin, _ = a.PWMPin("12")
+	period, _ = pin.Period()
+	gobottest.Assert(t, period, uint32(20000000))
+
+	gobottest.Assert(t, pin.SetDutyCycle(1.5*1000*1000), nil)
+
+	gobottest.Assert(t, strings.Split(fs.Files["/dev/pi-blaster"].Contents, "\n")[0], "18=0.075")
 }
 
 func TestAdaptorDigitalIO(t *testing.T) {
