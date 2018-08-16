@@ -29,8 +29,12 @@ func main() {
 	master := gobot.NewMaster()
 
 	a := api.NewAPI(master)
+
+	// add the standard C3PIO API routes manually.
 	a.AddC3PIORoutes()
-	a.AddRobeauxRoutes()
+
+	// starts the API without adding the Robeaux web interface. However, since the C3PIO API was
+	// already added manually above, that will be available.
 	a.StartRaw()
 
 	hello := master.AddRobot(gobot.NewRobot("hello"))
@@ -49,12 +53,10 @@ func main() {
 
 	// create the mjpeg stream
 	stream = mjpeg.NewStream()
+	http.Handle("/video", stream)
 
 	// start capturing
 	go mjpegCapture()
-
-	// handle video stream
-	http.Handle("/video", stream)
 
 	master.Start()
 }

@@ -100,9 +100,8 @@ func (a *API) AddHandler(f func(http.ResponseWriter, *http.Request)) {
 	a.handlers = append(a.handlers, f)
 }
 
-// Start initializes the api by setting up c3pio routes and robeaux
+// Start initializes the api by setting up Robeaux web interface.
 func (a *API) Start() {
-	a.AddC3PIORoutes()
 	a.AddRobeauxRoutes()
 
 	a.start(a)
@@ -114,6 +113,9 @@ func (a *API) StartRaw() {
 }
 
 // AddC3PIORoutes adds all of the standard C3PIO routes to the API.
+// For more information, please see:
+// http://cppp.io/
+//
 func (a *API) AddC3PIORoutes() {
 	mcpCommandRoute := "/api/commands/:command"
 	robotDeviceCommandRoute := "/api/robots/:robot/devices/:device/commands/:command"
@@ -139,7 +141,11 @@ func (a *API) AddC3PIORoutes() {
 }
 
 // AddRobeauxRoutes adds all of the robeaux web interface routes to the API.
+// The Robeaux web interface requires the C3PIO API, so it is also
+// activated when you call this method.
 func (a *API) AddRobeauxRoutes() {
+	a.AddC3PIORoutes()
+
 	a.Get("/", func(res http.ResponseWriter, req *http.Request) {
 		http.Redirect(res, req, "/index.html", http.StatusMovedPermanently)
 	})
