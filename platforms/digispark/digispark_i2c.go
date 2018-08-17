@@ -1,25 +1,24 @@
 package digispark
 
+import (
+	"errors"
+)
+
 type digisparkI2cConnection struct {
 	address uint8
 	adaptor *Adaptor
 }
 
-// NewDigisparkI2cConnection creates an I2C connection to an I2C device at
+// NewDigisparkI2cConnection creates an i2c connection to an i2c device at
 // the specified address
 func NewDigisparkI2cConnection(adaptor *Adaptor, address uint8) (connection *digisparkI2cConnection) {
-	c := &digisparkI2cConnection{adaptor: adaptor, address: address}
-	c.Init()
-	return c
+	return &digisparkI2cConnection{adaptor: adaptor, address: address}
 }
 
-// Init makes sure that the i2c device is already initialized and started
+// Init makes sure that the i2c device is already initialized
 func (c *digisparkI2cConnection) Init() (err error) {
 	if !c.adaptor.i2c {
 		if err = c.adaptor.littleWire.i2cInit(); err != nil {
-			return
-		}
-		if err = c.adaptor.littleWire.i2cStart(c.address, 0); err != nil { // direction as a param?
 			return
 		}
 		c.adaptor.i2c = true
@@ -27,10 +26,32 @@ func (c *digisparkI2cConnection) Init() (err error) {
 	return
 }
 
+// Test tests i2c connection with the given address
+func (c *digisparkI2cConnection) Test(address uint8) error {
+	if !c.adaptor.i2c {
+		return errors.New("Digispark i2c not initialized")
+	}
+	return c.adaptor.littleWire.i2cStart(address, 0)
+}
+
+// UpdateDelay updates i2c signal delay amount; tune if neccessary to fit your requirements
+func (c *digisparkI2cConnection) UpdateDelay(duration uint) error {
+	if !c.adaptor.i2c {
+		return errors.New("Digispark i2c not initialized")
+	}
+	return c.adaptor.littleWire.i2cUpdateDelay(duration)
+}
+
 // Read tries to read a full buffer from the i2c device.
 // Returns an empty array if the response from the board has timed out.
 func (c *digisparkI2cConnection) Read(b []byte) (read int, err error) {
-	err = c.Init()
+	if !c.adaptor.i2c {
+		err = errors.New("Digispark i2c not initialized")
+		return
+	}
+	if err = c.adaptor.littleWire.i2cStart(c.address, 1); err != nil {
+		return
+	}
 	l := 8
 	stop := uint8(0)
 
@@ -48,7 +69,13 @@ func (c *digisparkI2cConnection) Read(b []byte) (read int, err error) {
 }
 
 func (c *digisparkI2cConnection) Write(data []byte) (written int, err error) {
-	err = c.Init()
+	if !c.adaptor.i2c {
+		err = errors.New("Digispark i2c not initialized")
+		return
+	}
+	if err = c.adaptor.littleWire.i2cStart(c.address, 0); err != nil {
+		return
+	}
 	l := 4
 	stop := uint8(0)
 

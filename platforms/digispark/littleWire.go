@@ -6,7 +6,10 @@ package digispark
 //typedef usb_dev_handle littleWire;
 import "C"
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 type lw interface {
 	digitalWrite(uint8, uint8) error
@@ -21,7 +24,7 @@ type lw interface {
 	i2cStart(address7bit uint8, direction uint8) error
 	i2cWrite(sendBuffer []byte, length int, endWithStop uint8) error
 	i2cRead(readBuffer []byte, length int, endWithStop uint8) error
-	//	i2cUpdateDelay(uint duration) error
+	i2cUpdateDelay(duration uint) error
 	error() error
 }
 
@@ -85,7 +88,10 @@ func (l *littleWire) i2cStart(address7bit uint8, direction uint8) error {
 	if C.i2c_start(l.lwHandle, C.uchar(address7bit), C.uchar(direction)) == 1 {
 		return nil
 	}
-	return l.error()
+	if err := l.error(); err != nil {
+		return err
+	}
+	return fmt.Errorf("Littlewire i2cStart failed for %d in direction %d", address7bit, direction)
 }
 
 // i2cWrite sends byte(s) over i2c with a given length <= 4
@@ -100,11 +106,11 @@ func (l *littleWire) i2cRead(readBuffer []byte, length int, endWithStop uint8) e
 	return l.error()
 }
 
-//// i2cUpdateDelay updates i2c signal delay amount. Tune if neccessary to fit your requirements
-//func (l *littleWire) i2cUpdateDelay(uint duration) error {
-//	C.i2c_updateDelay(l.lwHandle, C.uint(duration))
-//	return l.error()
-//}
+// i2cUpdateDelay updates i2c signal delay amount. Tune if neccessary to fit your requirements
+func (l *littleWire) i2cUpdateDelay(duration uint) error {
+	C.i2c_updateDelay(l.lwHandle, C.uint(duration))
+	return l.error()
+}
 
 func (l *littleWire) error() error {
 	str := C.GoString(C.littleWire_errorName())
