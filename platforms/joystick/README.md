@@ -13,17 +13,21 @@ Current configurations included:
 
 This package requires `sdl2` to be installed on your system
 
-### OSX
+### macOS
 
-To install `sdl2` on OSX using Homebrew:
+To install `sdl2` on macOS using Homebrew:
 
 ```
 $ brew install sdl2
 ```
 
-To use an XBox360 controller on OS X, you will most likely need to install additional software such as [https://github.com/360Controller/360Controller](https://github.com/360Controller/360Controller).
+To use an XBox360 controller on macOS, you will most likely need to install additional software such as [https://github.com/360Controller/360Controller](https://github.com/360Controller/360Controller).
 
-### Ubuntu
+### Linux (Ubuntu and Raspbian)
+
+You must be running a Linux kernel that is v4.14+ in order for the various controller mappings to work as expected.
+
+Then you must install the latest SDL2 v2.0.8 or greater:
 
 ```
 wget https://www.libsdl.org/release/SDL2-2.0.8.tar.gz
