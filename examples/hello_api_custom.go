@@ -26,8 +26,8 @@ func main() {
 		res.Write([]byte(msg))
 	})
 
-	// starts the API without the "standard" C2PIO API or Robeaux web interface.
-	a.StartRaw()
+	// starts the API without the default C2PIO API and Robeaux web interface.
+	a.StartWithoutDefaults()
 
 	master.AddRobot(gobot.NewRobot("hello"))
 

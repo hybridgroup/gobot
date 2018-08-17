@@ -107,8 +107,10 @@ func (a *API) Start() {
 	a.start(a)
 }
 
-// StartRaw initializes the api without setting up any routes. Good for custom web interfaces.
-func (a *API) StartRaw() {
+// StartWithoutDefaults initializes the api without setting up the default routes.
+// Good for custom web interfaces.
+//
+func (a *API) StartWithoutDefaults() {
 	a.start(a)
 }
 

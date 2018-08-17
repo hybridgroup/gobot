@@ -34,14 +34,14 @@ func initTestAPI() *API {
 	return a
 }
 
-func TestStartRaw(t *testing.T) {
+func TestStartWithoutDefaults(t *testing.T) {
 	log.SetOutput(NullReadWriteCloser{})
 	g := gobot.NewMaster()
 	a := NewAPI(g)
 	a.start = func(m *API) {}
 
 	a.Get("/", func(res http.ResponseWriter, req *http.Request) {})
-	a.StartRaw()
+	a.StartWithoutDefaults()
 
 	request, _ := http.NewRequest("GET", "/", nil)
 	response := httptest.NewRecorder()

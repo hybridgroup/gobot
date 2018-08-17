@@ -33,9 +33,10 @@ func main() {
 	// add the standard C3PIO API routes manually.
 	a.AddC3PIORoutes()
 
-	// starts the API without adding the Robeaux web interface. However, since the C3PIO API was
-	// already added manually above, that will be available.
-	a.StartRaw()
+	// starts the API without the default C2PIO API and Robeaux web interface.
+	// However, the C3PIO API was added manually using a.AddC3PIORoutes() which
+	// means the REST API will be available, but not the web interface.
+	a.StartWithoutDefaults()
 
 	hello := master.AddRobot(gobot.NewRobot("hello"))
 
