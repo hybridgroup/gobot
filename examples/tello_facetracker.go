@@ -22,6 +22,7 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
+	"sync/atomic"
 	"time"
 
 	"gobot.io/x/gobot"
@@ -30,49 +31,58 @@ import (
 	"gocv.io/x/gocv"
 )
 
+type pair struct {
+	x float64
+	y float64
+}
+
 const (
-	maxJoyVal = 32768
 	frameX    = 400
 	frameY    = 300
 	frameSize = frameX * frameY * 3
+	offset    = 32767.0
 )
 
-// ffmpeg command to decode video stream from drone
-var ffmpeg = exec.Command("ffmpeg", "-hwaccel", "auto", "-hwaccel_device", "opencl", "-i", "pipe:0",
-	"-pix_fmt", "bgr24", "-s", strconv.Itoa(frameX)+"x"+strconv.Itoa(frameY), "-f", "rawvideo", "pipe:1")
-var ffmpegIn, _ = ffmpeg.StdinPipe()
-var ffmpegOut, _ = ffmpeg.StdoutPipe()
+var (
+	// ffmpeg command to decode video stream from drone
+	ffmpeg = exec.Command("ffmpeg", "-hwaccel", "auto", "-hwaccel_device", "opencl", "-i", "pipe:0",
+		"-pix_fmt", "bgr24", "-s", strconv.Itoa(frameX)+"x"+strconv.Itoa(frameY), "-f", "rawvideo", "pipe:1")
+	ffmpegIn, _  = ffmpeg.StdinPipe()
+	ffmpegOut, _ = ffmpeg.StdoutPipe()
 
-// gocv
-var window = gocv.NewWindow("Tello")
-var net *gocv.Net
-var green = color.RGBA{0, 255, 0, 0}
+	// gocv
+	window = gocv.NewWindow("Tello")
+	net    *gocv.Net
+	green  = color.RGBA{0, 255, 0, 0}
 
-// tracking
-var tracking = false
-var detected = false
-var detectSize = false
-var distTolerance = 0.05 * dist(0, 0, frameX, frameY)
-var refDistance float64
-var left float64
-var top float64
-var right float64
-var bottom float64
+	// tracking
+	tracking                 = false
+	detected                 = false
+	detectSize               = false
+	distTolerance            = 0.05 * dist(0, 0, frameX, frameY)
+	refDistance              float64
+	left, top, right, bottom float64
 
-// drone
-var drone = tello.NewDriver("8890")
-var flightData *tello.FlightData
+	// drone
+	drone      = tello.NewDriver("8890")
+	flightData *tello.FlightData
 
-// joystick
-var joyAdaptor = joystick.NewAdaptor()
-var stick = joystick.NewDriver(joyAdaptor, "dualshock4")
+	// joystick
+	joyAdaptor                   = joystick.NewAdaptor()
+	stick                        = joystick.NewDriver(joyAdaptor, "dualshock4")
+	leftX, leftY, rightX, rightY atomic.Value
+)
 
 func init() {
-	// process joystick events in main goroutine to keep SDL happy
-	handleJoystick()
+	leftX.Store(float64(0.0))
+	leftY.Store(float64(0.0))
+	rightX.Store(float64(0.0))
+	rightY.Store(float64(0.0))
 
 	// process drone events in separate goroutine for concurrency
 	go func() {
+		handleJoystick()
+
 		if err := ffmpeg.Start(); err != nil {
 			fmt.Println(err)
 			return
@@ -265,36 +275,79 @@ func handleJoystick() {
 		drone.Land()
 		println("Land")
 	})
-	stick.On(joystick.RightY, func(data interface{}) {
-		val := float64(data.(int16))
-		if val >= 0 {
-			drone.Backward(tello.ValidatePitch(val, maxJoyVal))
-		} else {
-			drone.Forward(tello.ValidatePitch(val, maxJoyVal))
-		}
-	})
-	stick.On(joystick.RightX, func(data interface{}) {
-		val := float64(data.(int16))
-		if val >= 0 {
-			drone.Right(tello.ValidatePitch(val, maxJoyVal))
-		} else {
-			drone.Left(tello.ValidatePitch(val, maxJoyVal))
-		}
-	})
-	stick.On(joystick.LeftY, func(data interface{}) {
-		val := float64(data.(int16))
-		if val >= 0 {
-			drone.Down(tello.ValidatePitch(val, maxJoyVal))
-		} else {
-			drone.Up(tello.ValidatePitch(val, maxJoyVal))
-		}
-	})
 	stick.On(joystick.LeftX, func(data interface{}) {
 		val := float64(data.(int16))
-		if val >= 0 {
-			drone.Clockwise(tello.ValidatePitch(val, maxJoyVal))
-		} else {
-			drone.CounterClockwise(tello.ValidatePitch(val, maxJoyVal))
+		leftX.Store(val)
+	})
+
+	stick.On(joystick.LeftY, func(data interface{}) {
+		val := float64(data.(int16))
+		leftY.Store(val)
+	})
+
+	stick.On(joystick.RightX, func(data interface{}) {
+		val := float64(data.(int16))
+		rightX.Store(val)
+	})
+
+	stick.On(joystick.RightY, func(data interface{}) {
+		val := float64(data.(int16))
+		rightY.Store(val)
+	})
+	gobot.Every(50*time.Millisecond, func() {
+		rightStick := getRightStick()
+
+		switch {
+		case rightStick.y < -10:
+			drone.Forward(tello.ValidatePitch(rightStick.y, offset))
+		case rightStick.y > 10:
+			drone.Backward(tello.ValidatePitch(rightStick.y, offset))
+		default:
+			drone.Forward(0)
+		}
+
+		switch {
+		case rightStick.x > 10:
+			drone.Right(tello.ValidatePitch(rightStick.x, offset))
+		case rightStick.x < -10:
+			drone.Left(tello.ValidatePitch(rightStick.x, offset))
+		default:
+			drone.Right(0)
 		}
 	})
+
+	gobot.Every(50*time.Millisecond, func() {
+		leftStick := getLeftStick()
+		switch {
+		case leftStick.y < -10:
+			drone.Up(tello.ValidatePitch(leftStick.y, offset))
+		case leftStick.y > 10:
+			drone.Down(tello.ValidatePitch(leftStick.y, offset))
+		default:
+			drone.Up(0)
+		}
+
+		switch {
+		case leftStick.x > 20:
+			drone.Clockwise(tello.ValidatePitch(leftStick.x, offset))
+		case leftStick.x < -20:
+			drone.CounterClockwise(tello.ValidatePitch(leftStick.x, offset))
+		default:
+			drone.Clockwise(0)
+		}
+	})
+}
+
+func getLeftStick() pair {
+	s := pair{x: 0, y: 0}
+	s.x = leftX.Load().(float64)
+	s.y = leftY.Load().(float64)
+	return s
+}
+
+func getRightStick() pair {
+	s := pair{x: 0, y: 0}
+	s.x = rightX.Load().(float64)
+	s.y = rightY.Load().(float64)
+	return s
 }

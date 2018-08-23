@@ -94,7 +94,7 @@ func main() {
 			rightY.Store(val)
 		})
 
-		gobot.Every(10*time.Millisecond, func() {
+		gobot.Every(50*time.Millisecond, func() {
 			rightStick := getRightStick()
 
 			switch {
@@ -116,7 +116,7 @@ func main() {
 			}
 		})
 
-		gobot.Every(10*time.Millisecond, func() {
+		gobot.Every(50*time.Millisecond, func() {
 			leftStick := getLeftStick()
 			switch {
 			case leftStick.y < -10:
