@@ -23,6 +23,7 @@ Gobot has a extensible system for connecting to hardware devices. The following 
 - BMP280 Barometric Pressure/Temperature/Altitude Sensor
 - DRV2605L Haptic Controller
 - Grove Digital Accelerometer
+- GrovePi Expansion Board
 - Grove RGB LCD
 - HMC6352 Compass
 - INA3221 Voltage Monitor
