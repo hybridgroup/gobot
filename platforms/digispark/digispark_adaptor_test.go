@@ -128,10 +128,7 @@ func TestDigisparkAdaptorName(t *testing.T) {
 }
 
 func TestAdaptorConnect(t *testing.T) {
-	a := NewAdaptor()
-	gobottest.Assert(t, a.Connect(), ErrConnection)
-
-	a = initTestAdaptor()
+	a := initTestAdaptor()
 	gobottest.Assert(t, a.Connect(), nil)
 }
 
