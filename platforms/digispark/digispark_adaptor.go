@@ -2,9 +2,11 @@ package digispark
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 
 	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/drivers/i2c"
 )
 
 // ErrConnection is the error resulting of a connection error with the digispark
@@ -16,6 +18,7 @@ type Adaptor struct {
 	littleWire lw
 	servo      bool
 	pwm        bool
+	i2c        bool
 	connect    func(*Adaptor) (err error)
 }
 
@@ -88,4 +91,22 @@ func (d *Adaptor) ServoWrite(pin string, angle uint8) (err error) {
 		d.servo = true
 	}
 	return d.littleWire.servoUpdateLocation(angle, angle)
+}
+
+// GetConnection returns an i2c connection to a device on a specified bus.
+// Only supports bus number 0
+func (d *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection, err error) {
+	if bus != 0 {
+		return nil, fmt.Errorf("Invalid bus number %d, only 0 is supported", bus)
+	}
+	c := NewDigisparkI2cConnection(d, uint8(address))
+	if err := c.Init(); err != nil {
+		return nil, err
+	}
+	return i2c.Connection(c), nil
+}
+
+// GetDefaultBus returns the default i2c bus for this platform
+func (d *Adaptor) GetDefaultBus() int {
+	return 0
 }
