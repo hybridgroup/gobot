@@ -110,24 +110,3 @@ func (d *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection
 func (d *Adaptor) GetDefaultBus() int {
 	return 0
 }
-
-// TestConnection returns found i2c connections to devices in a given range of addresses
-func (d *Adaptor) TestConnection(start, end int, success func(int)) error {
-	conn, err := d.GetConnection(start, d.GetDefaultBus())
-	if err != nil {
-		return err
-	}
-	c := conn.(*digisparkI2cConnection)
-	if !d.i2c {
-		return errors.New("Digispark i2c not initialized")
-	}
-	if start > end {
-		start, end = end, start
-	}
-	for ; start <= end; start++ {
-		if err = c.Test(uint8(start)); err == nil {
-			success(start)
-		}
-	}
-	return nil
-}
