@@ -13,7 +13,7 @@ import (
 
 func main() {
 	joystickAdaptor := joystick.NewAdaptor()
-	stick := joystick.NewDriver(joystickAdaptor, "xbox360RockBandDrums")
+	stick := joystick.NewDriver(joystickAdaptor, joystick.Xbox360RockBandDrums)
 
 	work := func() {
 		stick.On(joystick.RedPress, func(data interface{}) {

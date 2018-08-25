@@ -13,7 +13,7 @@ import (
 
 func main() {
 	joystickAdaptor := joystick.NewAdaptor()
-	stick := joystick.NewDriver(joystickAdaptor, "dualshock3")
+	stick := joystick.NewDriver(joystickAdaptor, joystick.Dualshock3)
 
 	work := func() {
 		// buttons

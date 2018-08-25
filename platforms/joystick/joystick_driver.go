@@ -10,6 +10,23 @@ import (
 	"gobot.io/x/gobot"
 )
 
+const (
+	// Dualshock3 joystick configuration.
+	Dualshock3 = "dualshock3"
+
+	// Dualshock4 joystick configuration.
+	Dualshock4 = "dualshock4"
+
+	// TFlightHotasX flight stick configuration.
+	TFlightHotasX = "tflightHotasX"
+
+	// Xbox360 joystick configuration.
+	Xbox360 = "xbox360"
+
+	// Xbox360RockBandDrums controller configuration.
+	Xbox360RockBandDrums = "xbox360RockBandDrums"
+)
+
 // Driver represents a joystick
 type Driver struct {
 	name       string
