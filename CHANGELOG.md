@@ -1,3 +1,57 @@
+1.12.0
+---
+* **api**
+  * further improvement of the modular API changes
+  * modify Start() for more modular initialization, and add StartRaw() for completely custom API implementations
+  * settled on StartWithoutDefaults() as the method to start API without default routes
+* **core**
+  * add Rescale utility function for straight linear rescaling
+* **digispark**
+  * add examples using digispark with i2c devices blinkm and mlp115a2
+  * Added i2c to digispark, but not working yet
+  * Added some tests for digispark i2c connector
+  * Digispark i2c fixes, added Test for checking available addresses
+  * remove test method that should not be in adaptor
+  * remove test that is expected to ofail, but passes when digispark board is actually connected
+* **docs**
+  * add GrovePi to README
+  * adjust order of badges in README
+  * Fixing broken link
+* **examples**
+  * add example that uses both the API and also a custom handler with MJPEG streaming from an attached camera
+  * small improvements to Tello examples
+  * update Tello examples for main thread friendly macOS/Windows, add Tello face tracker
+* **i2c**
+  * add commands to JHD1313MDriver
+  * add commands to PCA9685Driver
+  * add missing methods so the GrovePi fully implements the Adaptor interface
+  * add ShowImage() function to ssd1306 driver based on @mikegleasonjr suggestion
+  * GrovePi digitalwrite implemented
+  * implemented DigitalRead, DigitalWrite, and AnalogRead for GrovePi
+  * improve godocs for PCA9685
+  * mention that GrovePi requires running firmware 1.3.0
+  * update GrovePi to v1.3.0 firmware
+  * work in progress on GrovePi plus driver
+* **joystick**
+  * add config file for Magicsee R1 contributed by @carl-ranson
+  * add some additional test coverage for file-based config
+  * added error handling for config loading in joystick driver
+  * mention need to be running a Linux kernel v4.14+ for controller mappings to work as expected
+  * provide constant values for existing joystick configurations
+* **raspi**
+  * export PiBlasterPeriod in Adaptor
+* **spi**
+  * add ShowImage() function to ssd1306 driver based on @mikegleasonjr suggestion
+* **tello**
+  * specify end of msgType position
+  * add handleResponse testing
+  * Add motion cessation commands to Tello
+  * handleResponse only needs an io.Reader
+  * handleResponse should not send commands
+  * rename reqConn to cmdConn
+  * reqConn is only an io.WriteCloser
+  * send Land() command to drone on Halt() to avoid floating mid-air
+
 1.11.1
 ---
 * **build**
