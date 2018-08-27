@@ -74,6 +74,12 @@
   revision = "b9750d8d7b78f9638e5fdd899835e99d46b5a56c"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/hybridgroup/mjpeg"
+  packages = ["."]
+  revision = "4680f319790ebffe28bbee775ecd1725693731ca"
+
+[[projects]]
   name = "github.com/mattn/go-colorable"
   packages = ["."]
   revision = "167de6bfdfba052fa6b2d3664c8f5272e23c9072"
@@ -166,8 +172,8 @@
 [[projects]]
   name = "gocv.io/x/gocv"
   packages = ["."]
-  revision = "0d9b22a6450a7d81761a4b763f58fb99e962ab47"
-  version = "0.14.0"
+  revision = "116580adca5ee7dbf8d1307c9072f5094051116f"
+  version = "v0.16.0"
 
 [[projects]]
   branch = "master"
@@ -209,6 +215,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "97cff5a0c56259857493449e763e5c32f4a379d3a12f74d68a1bfa31b71f781c"
+  inputs-digest = "a0e4e9de33316ccc61210696bc25b441cb91684cb0197619239635be1d0fa7f7"
   solver-name = "gps-cdcl"
   solver-version = 1
