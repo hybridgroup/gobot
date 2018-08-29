@@ -43,14 +43,15 @@ func NewJSONRobot(robot *Robot) *JSONRobot {
 // It contains its own work routine and a collection of
 // custom commands to control a robot remotely via the Gobot api.
 type Robot struct {
-	Name        string
-	Work        func()
-	connections *Connections
-	devices     *Devices
-	trap        func(chan os.Signal)
-	AutoRun     bool
-	running     atomic.Value
-	done        chan bool
+	Name         string
+	Work         func()
+	connections  *Connections
+	devices      *Devices
+	trap         func(chan os.Signal)
+	AutoRun      bool
+	running      atomic.Value
+	done         chan bool
+	workRegistry *RobotWorkRegistry
 	Commander
 	Eventer
 }
@@ -137,6 +138,10 @@ func NewRobot(v ...interface{}) *Robot {
 		case func():
 			r.Work = v[i].(func())
 		}
+	}
+
+	r.workRegistry = &RobotWorkRegistry{
+		r: make(map[string]*RobotWork),
 	}
 
 	r.running.Store(false)
