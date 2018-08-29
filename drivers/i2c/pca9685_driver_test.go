@@ -52,8 +52,11 @@ func TestPCA9685DriverOptions(t *testing.T) {
 
 // Methods
 func TestPCA9685DriverStart(t *testing.T) {
-	pca := initTestPCA9685Driver()
-
+	pca, adaptor := initTestPCA9685DriverWithStubbedAdaptor()
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		copy(b, []byte{0x01})
+		return 1, nil
+	}
 	gobottest.Assert(t, pca.Start(), nil)
 }
 
@@ -72,21 +75,32 @@ func TestPCA9685DriverStartWriteError(t *testing.T) {
 }
 
 func TestPCA9685DriverHalt(t *testing.T) {
-	pca := initTestPCA9685Driver()
+	pca, adaptor := initTestPCA9685DriverWithStubbedAdaptor()
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		copy(b, []byte{0x01})
+		return 1, nil
+	}
 	gobottest.Assert(t, pca.Start(), nil)
 	gobottest.Assert(t, pca.Halt(), nil)
 }
 
 func TestPCA9685DriverSetPWM(t *testing.T) {
-	pca := initTestPCA9685Driver()
+	pca, adaptor := initTestPCA9685DriverWithStubbedAdaptor()
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		copy(b, []byte{0x01})
+		return 1, nil
+	}
 	gobottest.Assert(t, pca.Start(), nil)
 	gobottest.Assert(t, pca.SetPWM(0, 0, 256), nil)
 }
 
 func TestPCA9685DriverSetPWMError(t *testing.T) {
 	pca, adaptor := initTestPCA9685DriverWithStubbedAdaptor()
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		copy(b, []byte{0x01})
+		return 1, nil
+	}
 	gobottest.Assert(t, pca.Start(), nil)
-
 	adaptor.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
 	}
@@ -95,6 +109,10 @@ func TestPCA9685DriverSetPWMError(t *testing.T) {
 
 func TestPCA9685DriverSetPWMFreq(t *testing.T) {
 	pca, adaptor := initTestPCA9685DriverWithStubbedAdaptor()
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		copy(b, []byte{0x01})
+		return 1, nil
+	}
 	gobottest.Assert(t, pca.Start(), nil)
 
 	adaptor.i2cReadImpl = func(b []byte) (int, error) {
@@ -106,6 +124,10 @@ func TestPCA9685DriverSetPWMFreq(t *testing.T) {
 
 func TestPCA9685DriverSetPWMFreqReadError(t *testing.T) {
 	pca, adaptor := initTestPCA9685DriverWithStubbedAdaptor()
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		copy(b, []byte{0x01})
+		return 1, nil
+	}
 	gobottest.Assert(t, pca.Start(), nil)
 
 	adaptor.i2cReadImpl = func(b []byte) (int, error) {
@@ -116,6 +138,10 @@ func TestPCA9685DriverSetPWMFreqReadError(t *testing.T) {
 
 func TestPCA9685DriverSetPWMFreqWriteError(t *testing.T) {
 	pca, adaptor := initTestPCA9685DriverWithStubbedAdaptor()
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		copy(b, []byte{0x01})
+		return 1, nil
+	}
 	gobottest.Assert(t, pca.Start(), nil)
 
 	adaptor.i2cWriteImpl = func([]byte) (int, error) {
@@ -131,7 +157,11 @@ func TestPCA9685DriverSetName(t *testing.T) {
 }
 
 func TestPCA9685DriverCommands(t *testing.T) {
-	pca := initTestPCA9685Driver()
+	pca, adaptor := initTestPCA9685DriverWithStubbedAdaptor()
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		copy(b, []byte{0x01})
+		return 1, nil
+	}
 	pca.Start()
 
 	err := pca.Command("PwmWrite")(map[string]interface{}{"pin": "1", "val": "1"})
