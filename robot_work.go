@@ -85,6 +85,7 @@ func (r *Robot) Every(ctx context.Context, d time.Duration, f func()) *RobotWork
 			select {
 			case <-rw.ctx.Done():
 				r.workRegistry.delete(rw.id)
+				rw.ticker.Stop()
 				break EVERYWORK
 			case <-rw.ticker.C:
 				rw.tickCount++
