@@ -57,6 +57,40 @@ func TestRobotWorkRegistry(t *testing.T) {
 	})
 }
 
+func TestRobotAutomationFunctions(t *testing.T) {
+	t.Run("Every with cancel", func(t *testing.T) {
+		robot := NewRobot("testbot")
+
+		rw := robot.Every(context.Background(), time.Millisecond*10, func() {
+			_ = 1 + 1 // perform mindless computation!
+		})
+
+		time.Sleep(time.Millisecond * 25)
+		rw.CallCancelFunc()
+
+		robot.WorkEveryWaitGroup.Wait()
+
+		assert.Equal(t, 2, rw.tickCount)
+		postDeleteKeys := collectStringKeysFromWorkRegistry(robot.workRegistry)
+		assert.NotContains(t, postDeleteKeys, rw.id.String())
+	})
+
+	t.Run("After with cancel", func(t *testing.T) {
+		robot := NewRobot("testbot")
+
+		rw := robot.After(context.Background(), time.Millisecond*10, func() {
+			_ = 1 + 1 // perform mindless computation!
+		})
+
+		rw.CallCancelFunc()
+
+		robot.WorkAfterWaitGroup.Wait()
+
+		postDeleteKeys := collectStringKeysFromWorkRegistry(robot.workRegistry)
+		assert.NotContains(t, postDeleteKeys, rw.id.String())
+	})
+}
+
 func collectStringKeysFromWorkRegistry(rwr *RobotWorkRegistry) []string {
 	keys := make([]string, len(rwr.r))
 	for k, _ := range rwr.r {

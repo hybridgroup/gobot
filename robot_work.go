@@ -1,6 +1,3 @@
-// RobotWork and the RobotWork registry represent units of executing computation
-// managed at the Robot level. Unlike the utility functions gobot.After and gobot.Every,
-// RobotWork units require a context.Context, and can be cancelled externally by calling code.
 package gobot
 
 import (
@@ -25,9 +22,28 @@ const (
 	AfterWorkKind = "after"
 )
 
-// RobotWork represents a unit of work (in the form of an arbitrary Go function)
-// to be done once or on a recurring basis. It encapsulations notions of duration,
-// context, count of successful runs, etc.
+// RobotWork and the RobotWork registry represent units of executing computation
+// managed at the Robot level. Unlike the utility functions gobot.After and gobot.Every,
+// RobotWork units require a context.Context, and can be cancelled externally by calling code.
+//
+// Usage:
+//
+//	someWork := myRobot.Every(context.Background(), time.Second * 2, func(){
+//		fmt.Println("Here I am doing work")
+// 	})
+//
+//	someWork.CallCancelFunc() // Cancel next tick and remove from work registry
+//
+// goroutines for Every and After are run on their own WaitGroups for synchronization:
+//
+//	someWork2 := myRobot.Every(context.Background(), time.Second * 2, func(){
+//		fmt.Println("Here I am doing more work")
+// 	})
+//
+//	somework2.CallCancelFunc()
+//
+//	// wait for both Every calls to finish
+//	robot.WorkEveryWaitGroup().Wait()
 type RobotWork struct {
 	id         uuid.UUID
 	kind       string
@@ -49,12 +65,22 @@ func (rw *RobotWork) CancelFunc() context.CancelFunc {
 	return rw.cancelFunc
 }
 
+// CallCancelFunc calls the context.CancelFunc used to cancel the work
+func (rw *RobotWork) CallCancelFunc() {
+	rw.cancelFunc()
+}
+
 // Ticker returns the time.Ticker used in an Every so that calling code can sync on the same channel
 func (rw *RobotWork) Ticker() *time.Ticker {
 	if rw.kind == AfterWorkKind {
 		return nil
 	}
 	return rw.ticker
+}
+
+// TickCount returns the number of times the function successfully ran
+func (rw *RobotWork) TickCount() int {
+	return rw.tickCount
 }
 
 // Duration returns the timeout until an After fires or the period of an Every
@@ -79,6 +105,7 @@ func (r *Robot) WorkRegistry() *RobotWorkRegistry {
 // Every calls the given function for every tick of the provided duration.
 func (r *Robot) Every(ctx context.Context, d time.Duration, f func()) *RobotWork {
 	rw := r.workRegistry.registerEvery(ctx, d, f)
+	r.WorkEveryWaitGroup.Add(1)
 	go func() {
 	EVERYWORK:
 		for {
@@ -88,12 +115,12 @@ func (r *Robot) Every(ctx context.Context, d time.Duration, f func()) *RobotWork
 				rw.ticker.Stop()
 				break EVERYWORK
 			case <-rw.ticker.C:
-				rw.tickCount++
 				f()
+				rw.tickCount++
 			}
 		}
+		r.WorkEveryWaitGroup.Done()
 	}()
-
 	return rw
 }
 
@@ -101,6 +128,7 @@ func (r *Robot) Every(ctx context.Context, d time.Duration, f func()) *RobotWork
 func (r *Robot) After(ctx context.Context, d time.Duration, f func()) *RobotWork {
 	rw := r.workRegistry.registerAfter(ctx, d, f)
 	ch := time.After(d)
+	r.WorkAfterWaitGroup.Add(1)
 	go func() {
 	AFTERWORK:
 		for {
@@ -112,6 +140,7 @@ func (r *Robot) After(ctx context.Context, d time.Duration, f func()) *RobotWork
 				f()
 			}
 		}
+		r.WorkAfterWaitGroup.Done()
 	}()
 	return rw
 }
