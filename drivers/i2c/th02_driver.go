@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Nicholas Potts <nick@the-potts.com>
+ * Copyright (c) 2016-2017 Weston Schmidt <weston_schmidt@alumni.purdue.edu>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package i2c
 
 // TH02Driver is a driver for the TH02-D based devices.
 //
-// This module was tested with a Grove Temperature and Humidty Sensor (High Accuracy)
-// https://www.seeedstudio.com/Grove-Temperature-Humidity-Sensor-High-Accuracy-Min-p-1921.html
+// This module was tested with AdaFruit Sensiron SHT32-D Breakout.
+// https://www.adafruit.com/products/2857
 
 import (
 	"fmt"
@@ -28,17 +28,31 @@ import (
 	"gobot.io/x/gobot"
 )
 
-// TH02Address is the default address of device
-const TH02Address = 0x40
+const (
 
-//TH02ConfigReg is the configuration register
-const TH02ConfigReg = 0x03
+	// TH02AddressA is the default address of device
+	TH02Address = 0x40
 
-// TH02HighAccuracyTemp is the CONFIG write value to start reading temperature
-const TH02HighAccuracyTemp = 0x11
+	//TH02ConfigReg is the configuration register
+	TH02ConfigReg = 0x03
 
-//TH02HighAccuracyRH is the CONFIG write value to start reading high accuracy RH
-const TH02HighAccuracyRH = 0x01
+	// TH02RegConfigHighAccuracyTemp is the CONFIG register to read temperature
+	// TH02HighAccuracyTemp = 0x11
+
+	//TH02RegConfigHighAccuracyRH is the CONFIG register to read high accuracy RH
+//	TH02HighAccuracyRH = 0x01
+)
+
+const (
+	TH02HighAccuracy = 0 //High Accuracy
+	TH02LowAccuracy  = 1 //Lower Accuracy
+)
+
+var (
+//ErrInvalidAccuracy = errors.New("Invalid accuracy")
+//ErrInvalidCrc      = errors.New("Invalid crc")
+//ErrInvalidTemp     = errors.New("Invalid temperature units")
+)
 
 // TH02Driver is a Driver for a TH02 humidity and temperature sensor
 type TH02Driver struct {
@@ -49,10 +63,15 @@ type TH02Driver struct {
 	Config
 	addr     byte
 	accuracy byte
-	delay    time.Duration
+	heating  bool
+
+	delay time.Duration
 }
 
-// NewTH02Driver creates a new driver with specified i2c interface
+// NewTH02Driver creates a new driver with specified i2c interface.
+// Defaults to:
+//	- Using high accuracy (lower speed) measurements cycles.
+//  - Emitting values in "C". If you want F, set Units to "F"
 // Params:
 //		conn Connector - the Adaptor to use with this Driver
 //
@@ -67,8 +86,10 @@ func NewTH02Driver(a Connector, options ...func(Config)) *TH02Driver {
 		connector: a,
 		addr:      TH02Address,
 		Config:    NewConfig(),
+		heating:   false,
 	}
-	//	s.SetAccuracy(TH02AccuracyHigh)
+
+	s.SetAccuracy(1)
 
 	for _, option := range options {
 		option(s)
@@ -101,48 +122,75 @@ func (s *TH02Driver) Halt() (err error) { return }
 // SetAddress sets the address of the device
 func (s *TH02Driver) SetAddress(address int) { s.addr = byte(address) }
 
+// Accuracy returns the accuracy of the sampling
+func (s *TH02Driver) Accuracy() byte { return s.accuracy }
+
+// SetAccuracy sets the accuracy of the sampling.  It will only be used on the next
+// measurment request.  Invalid value will use the default of High
+func (s *TH02Driver) SetAccuracy(a byte) {
+	if a == TH02LowAccuracy {
+		s.accuracy = a
+	} else {
+		s.accuracy = TH02HighAccuracy
+	}
+}
+
 // SerialNumber returns the serial number of the chip
 func (s *TH02Driver) SerialNumber() (sn uint32, err error) {
 	ret, err := s.readRegister(0x11)
 	return uint32(ret) >> 4, err
 }
 
+// Heater returns true if the heater is enabled
+func (s *TH02Driver) Heater() (status bool, err error) {
+	st, err := s.readRegister(0x11)
+	return (0x02 & st) == 0x02, err
+}
+
+func (s *TH02Driver) applysettings(base byte) byte {
+	if s.accuracy == TH02LowAccuracy {
+		base = base & 0xd5
+	} else {
+		base = base | 0x20
+	}
+	if s.heating {
+		base = base & 0xfd
+	} else {
+		base = base | 0x02
+	}
+	base = base | 0x01 //set the "sample" bit
+	return base
+}
+
 // Sample returns the temperature in celsius and relative humidity for one sample
-func (s *TH02Driver) Sample() (temp float32, rh float32, err error) {
-	if err := s.writeRegister(TH02ConfigReg, TH02HighAccuracyRH); err != nil {
+func (s *TH02Driver) Sample() (temperature float32, relhumidity float32, _ error) {
+
+	if err := s.writeRegister(TH02ConfigReg, s.applysettings(0x10)); err != nil {
 		return 0, 0, err
 	}
 
-	rrh, err := s.readData()
+	rawrh, err := s.readData()
 	if err != nil {
 		return 0, 0, err
 	}
-	rrh = rrh >> 4
-	rh = float32(rrh)/16.0 - 24.0
+	relhumidity = float32(rawrh>>4)/16.0 - 24.0
 
-	if err := s.writeRegister(TH02ConfigReg, TH02HighAccuracyTemp); err != nil {
-		return 0, 0, err
+	if err := s.writeRegister(TH02ConfigReg, s.applysettings(0x00)); err != nil {
+		return 0, relhumidity, err
 	}
-
-	rt, err := s.readData()
+	rawt, err := s.readData()
 	if err != nil {
-		return 0, rh, err
+		return 0, relhumidity, err
 	}
-	rt = rt / 4
-	temp = float32(rt)/32.0 - 50.0
+	temperature = float32(rawt>>2)/32.0 - 50.0
 
 	switch s.Units {
 	case "F":
-		temp = 9.0/5.0 + 32.0
+		temperature = 9.0/5.0*temperature + 32.0
 	}
 
-	return temp, rh, nil
+	return temperature, relhumidity, nil
 
-}
-
-// getStatusRegister returns the device status register
-func (s *TH02Driver) getStatusRegister() (status byte, err error) {
-	return s.readRegister(TH02ConfigReg)
 }
 
 //writeRegister writes the value to the register.
@@ -161,22 +209,33 @@ func (s *TH02Driver) readRegister(reg byte) (byte, error) {
 	return rcvd[0], err
 }
 
-func (s *TH02Driver) waitForReady() error {
+/*waitForReady blocks for up to the passed duration (which defaults to 50mS if nil)
+until the ~RDY bit is cleared, meanign a sample has been fully sampled and is ready for reading.
+
+This is greedy.
+*/
+func (s *TH02Driver) waitForReady(dur *time.Duration) error {
+	wait := 100 * time.Millisecond
+	if dur != nil {
+		wait = *dur
+	}
 	start := time.Now()
 	for {
-		if time.Since(start) > 100*time.Millisecond {
+		if time.Since(start) > wait {
 			return fmt.Errorf("timeout on \\RDY")
 		}
-		reg, _ := s.readRegister(0x00)
-		if reg == 0 {
+
+		//yes, i am eating the error.
+		if reg, _ := s.readRegister(0x00); reg == 0 {
 			return nil
 		}
 	}
 }
 
+/*readData fetches the data from the data 'registers'*/
 func (s *TH02Driver) readData() (uint16, error) {
-	if err := s.waitForReady(); err != nil {
-		return 1, err
+	if err := s.waitForReady(nil); err != nil {
+		return 0, err
 	}
 
 	if n, err := s.connection.Write([]byte{0x01}); err != nil || n != 1 {
