@@ -86,12 +86,12 @@ func TestAdaptorDigitalReadWriteError(t *testing.T) {
 func TestUP2AdaptorI2c(t *testing.T) {
 	a := NewAdaptor()
 	fs := sysfs.NewMockFilesystem([]string{
-		"/dev/i2c-0",
+		"/dev/i2c-5",
 	})
 	sysfs.SetFilesystem(fs)
 	sysfs.SetSyscall(&sysfs.MockSyscall{})
 
-	con, err := a.GetConnection(0xff, 0)
+	con, err := a.GetConnection(0xff, 5)
 	gobottest.Assert(t, err, nil)
 
 	con.Write([]byte{0x00, 0x01})
@@ -175,7 +175,7 @@ func TestUP2AdaptorPwmReadError(t *testing.T) {
 
 func TestUP2I2CDefaultBus(t *testing.T) {
 	a, _ := initTestUP2Adaptor()
-	gobottest.Assert(t, a.GetDefaultBus(), 0)
+	gobottest.Assert(t, a.GetDefaultBus(), 5)
 }
 
 func TestUP2GetConnectionInvalidBus(t *testing.T) {
