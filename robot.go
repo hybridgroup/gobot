@@ -7,6 +7,8 @@ import (
 	"os/signal"
 	"sync/atomic"
 
+	"sync"
+
 	multierror "github.com/hashicorp/go-multierror"
 )
 
@@ -43,14 +45,17 @@ func NewJSONRobot(robot *Robot) *JSONRobot {
 // It contains its own work routine and a collection of
 // custom commands to control a robot remotely via the Gobot api.
 type Robot struct {
-	Name        string
-	Work        func()
-	connections *Connections
-	devices     *Devices
-	trap        func(chan os.Signal)
-	AutoRun     bool
-	running     atomic.Value
-	done        chan bool
+	Name               string
+	Work               func()
+	connections        *Connections
+	devices            *Devices
+	trap               func(chan os.Signal)
+	AutoRun            bool
+	running            atomic.Value
+	done               chan bool
+	workRegistry       *RobotWorkRegistry
+	WorkEveryWaitGroup *sync.WaitGroup
+	WorkAfterWaitGroup *sync.WaitGroup
 	Commander
 	Eventer
 }
@@ -138,6 +143,12 @@ func NewRobot(v ...interface{}) *Robot {
 			r.Work = v[i].(func())
 		}
 	}
+
+	r.workRegistry = &RobotWorkRegistry{
+		r: make(map[string]*RobotWork),
+	}
+	r.WorkAfterWaitGroup = &sync.WaitGroup{}
+	r.WorkEveryWaitGroup = &sync.WaitGroup{}
 
 	r.running.Store(false)
 	log.Println("Robot", r.Name, "initialized.")

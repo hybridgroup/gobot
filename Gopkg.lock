@@ -3,39 +3,58 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:da54e55f2f63347514121c0d7b53631970367b26281d057ec66925c57324b8f1"
   name = "github.com/bmizerany/pat"
   packages = ["."]
+  pruneopts = ""
   revision = "6226ea591a40176dd3ff9cd8eff81ed6ca721a00"
 
 [[projects]]
+  digest = "1:e85837cb04b78f61688c6eba93ea9d14f60d611e2aaf8319999b1a60d2dafbfa"
   name = "github.com/codegangsta/cli"
   packages = ["."]
+  pruneopts = ""
   revision = "cfb38830724cc34fedffe9a2a29fb54fa9169cd1"
   version = "v1.20.0"
 
 [[projects]]
   branch = "master"
+  digest = "1:ea040951144214212d0402e862a786e8d68d2a1734f975933e6ba084b4d05f2f"
   name = "github.com/creack/goselect"
   packages = ["."]
-  revision = "1bd5ca702c6154bccc56ecd598932ee8b295cab2"
+  pruneopts = ""
+  revision = "58854f77ee8d858ce751b0a9bcc5533fef7bfa9e"
+
+[[projects]]
+  digest = "1:0deddd908b6b4b768cfc272c16ee61e7088a60f7fe2f06c547bd3d8e1f8b8e77"
+  name = "github.com/davecgh/go-spew"
+  packages = ["spew"]
+  pruneopts = ""
+  revision = "8991bc29aa16c548c550c7ff78260e27b9ab7c73"
+  version = "v1.1.1"
 
 [[projects]]
   branch = "master"
+  digest = "1:917123ed8122468eb815cc418af3bbf298c91f9cb1c36164e063f50e1a726e97"
   name = "github.com/donovanhide/eventsource"
   packages = ["."]
+  pruneopts = ""
   revision = "3ed64d21fb0b6bd8b49bcfec08f3004daee8723d"
 
 [[projects]]
+  digest = "1:3fa846cb3feb4e65371fe3c347c299de9b5bc3e71e256c0d940cd19b767a6ba0"
   name = "github.com/eclipse/paho.mqtt.golang"
   packages = [
     ".",
-    "packets"
+    "packets",
   ]
+  pruneopts = ""
   revision = "36d01c2b4cbeb3d2a12063e4880ce30800af9560"
   version = "v1.1.1"
 
 [[projects]]
   branch = "master"
+  digest = "1:c177fa1d2bdfc487f4bb7188f0fc683f85fd8cadcf1293eece899c86e75d6337"
   name = "github.com/go-ble/ble"
   packages = [
     ".",
@@ -47,153 +66,222 @@
     "linux/hci",
     "linux/hci/cmd",
     "linux/hci/evt",
-    "linux/hci/socket"
+    "linux/hci/socket",
   ]
-  revision = "788214691384e85e345bff9fd5eeb046f5983594"
+  pruneopts = ""
+  revision = "731710e91806e163fe770d93dc318683f6f53c63"
 
 [[projects]]
-  branch = "master"
+  digest = "1:c7382630b7f8958a68cf9c9314477a192890bea01d6bed9b22f95d3bad5530d2"
+  name = "github.com/gobuffalo/uuid"
+  packages = ["."]
+  pruneopts = ""
+  revision = "7652001f1b1ff3d69aa899943b668e9be27284a0"
+  version = "v2.0.3"
+
+[[projects]]
+  digest = "1:8e3bd93036b4a925fe2250d3e4f38f21cadb8ef623561cd80c3c50c114b13201"
   name = "github.com/hashicorp/errwrap"
   packages = ["."]
-  revision = "7554cd9344cec97297fa6649b055a8c98c2a1e55"
+  pruneopts = ""
+  revision = "8a6fb523712970c966eefc6b39ed2c5e74880354"
+  version = "v1.0.0"
 
 [[projects]]
   branch = "master"
+  digest = "1:72308fdd6d5ef61106a95be7ca72349a5565809042b6426a3cfb61d99483b824"
   name = "github.com/hashicorp/go-multierror"
   packages = ["."]
-  revision = "83588e72410abfbe4df460eeb6f30841ae47d4c4"
+  pruneopts = ""
+  revision = "886a7fbe3eb1c874d46f623bfa70af45f425b3d1"
 
 [[projects]]
   branch = "master"
+  digest = "1:aba830e5898f09dd06027a27a10f4d44e8b0762a3ba0c83a771a01f4e72b81c3"
   name = "github.com/hybridgroup/go-ardrone"
   packages = [
     "client",
     "client/commands",
-    "client/navdata"
+    "client/navdata",
   ]
+  pruneopts = ""
   revision = "b9750d8d7b78f9638e5fdd899835e99d46b5a56c"
 
 [[projects]]
   branch = "master"
+  digest = "1:9956f4f58b2ccea25656086bcd7be0273915961a8231965a1a6c886874172054"
   name = "github.com/hybridgroup/mjpeg"
   packages = ["."]
+  pruneopts = ""
   revision = "4680f319790ebffe28bbee775ecd1725693731ca"
 
 [[projects]]
+  digest = "1:9ea83adf8e96d6304f394d40436f2eb44c1dc3250d223b74088cc253a6cd0a1c"
   name = "github.com/mattn/go-colorable"
   packages = ["."]
+  pruneopts = ""
   revision = "167de6bfdfba052fa6b2d3664c8f5272e23c9072"
   version = "v0.0.9"
 
 [[projects]]
+  digest = "1:78229b46ddb7434f881390029bd1af7661294af31f6802e0e1bedaad4ab0af3c"
   name = "github.com/mattn/go-isatty"
   packages = ["."]
+  pruneopts = ""
   revision = "0360b2af4f38e8d38c7fce2a9f4e702702d73a39"
   version = "v0.0.3"
 
 [[projects]]
   branch = "master"
+  digest = "1:50416da10e189bc201e122e20078fb8e680a439cbdd24aaece06c434b4415b60"
   name = "github.com/mgutz/ansi"
   packages = ["."]
+  pruneopts = ""
   revision = "9520e82c474b0a04dd04f8a40959027271bab992"
 
 [[projects]]
+  digest = "1:47af139ef25cee26d54b8422b73a043ab5d8f5ec26a1ae49d3ca9212f1dbfdac"
   name = "github.com/mgutz/logxi"
   packages = ["v1"]
+  pruneopts = ""
   revision = "aebf8a7d67ab4625e0fd4a665766fef9a709161b"
   version = "v1"
 
 [[projects]]
+  digest = "1:f04a78a43f55f089c919beee8ec4a1495dee1bd271548da2cb44bf44699a6a61"
   name = "github.com/nats-io/go-nats"
   packages = [
     "encoders/builtin",
-    "util"
+    "util",
   ]
-  revision = "29f9728a183bf3fa7e809e14edac00b33be72088"
-  version = "v1.3.0"
+  pruneopts = ""
+  revision = "fb0396ee0bdb8018b0fef30d6d1de798ce99cd05"
+  version = "v1.6.0"
 
 [[projects]]
+  digest = "1:f04a78a43f55f089c919beee8ec4a1495dee1bd271548da2cb44bf44699a6a61"
   name = "github.com/nats-io/nats"
   packages = ["."]
-  revision = "29f9728a183bf3fa7e809e14edac00b33be72088"
-  version = "v1.3.0"
+  pruneopts = ""
+  revision = "fb0396ee0bdb8018b0fef30d6d1de798ce99cd05"
+  version = "v1.6.0"
 
 [[projects]]
+  digest = "1:be61e8224b84064109eaba8157cbb4bbe6ca12443e182b6624fdfa1c0dcf53d9"
   name = "github.com/nats-io/nuid"
   packages = ["."]
+  pruneopts = ""
   revision = "289cccf02c178dc782430d534e3c1f5b72af807f"
   version = "v1.0.0"
 
 [[projects]]
+  digest = "1:7365acd48986e205ccb8652cc746f09c8b7876030d53710ea6ef7d0bd0dcd7ca"
   name = "github.com/pkg/errors"
   packages = ["."]
+  pruneopts = ""
   revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
   version = "v0.8.0"
 
 [[projects]]
-  branch = "master"
-  name = "github.com/raff/goble"
-  packages = ["xpc"]
-  revision = "b12b34f940c4cf4363660073539b5fa9fd96bd16"
+  digest = "1:256484dbbcd271f9ecebc6795b2df8cad4c458dd0f5fd82a8c2fa0c29f233411"
+  name = "github.com/pmezard/go-difflib"
+  packages = ["difflib"]
+  pruneopts = ""
+  revision = "792786c7400a136282c1664665ae0a8db921c6c2"
+  version = "v1.0.0"
 
 [[projects]]
   branch = "master"
+  digest = "1:7b2df17857c98bcb45e200d6005f7af1f1e04757a77cd9e20cf27db05f0ad611"
+  name = "github.com/raff/goble"
+  packages = ["xpc"]
+  pruneopts = ""
+  revision = "efeac611681b89806d673dfbd8fc1690ca6bd093"
+
+[[projects]]
+  branch = "master"
+  digest = "1:eb22cc3727f58f5939373c397b0b9a8076f63e5b19584dcc00901dc5d407a77b"
   name = "github.com/sigurn/crc8"
   packages = ["."]
+  pruneopts = ""
   revision = "e55481d6f45c5a8f040343bace9013571dae103e"
 
 [[projects]]
   branch = "master"
+  digest = "1:52ed74cbf4d1bb1975642c817ec91b221c8963fa599885319407bf468431851d"
   name = "github.com/sigurn/utils"
   packages = ["."]
+  pruneopts = ""
   revision = "f19e41f79f8f006116f682c1af454591bc278ad4"
 
 [[projects]]
-  branch = "master"
-  name = "github.com/tarm/serial"
-  packages = ["."]
-  revision = "794054cb266296569307c08d1b475f44505dfab1"
+  digest = "1:c587772fb8ad29ad4db67575dad25ba17a51f072ff18a22b4f0257a4d9c24f75"
+  name = "github.com/stretchr/testify"
+  packages = ["assert"]
+  pruneopts = ""
+  revision = "f35b8ab0b5a2cef36673838d662e249dd9c94686"
+  version = "v1.2.2"
 
 [[projects]]
+  branch = "master"
+  digest = "1:54f00349c493a13c9340be00aebfe75c1cf7c58f2ed2d1ed5d1952105c925992"
+  name = "github.com/tarm/serial"
+  packages = ["."]
+  pruneopts = ""
+  revision = "eaafced92e9619f03c72527efeab21e326f3bc36"
+
+[[projects]]
+  digest = "1:4aa77644fa15ef170580070adcb70bd0adb02b0980bcc632eeaa528fd0e8137e"
   name = "github.com/veandco/go-sdl2"
   packages = ["sdl"]
+  pruneopts = ""
   revision = "271d2ec43388932fd2a80f4c2e81021734685a62"
   version = "v0.3"
 
 [[projects]]
   branch = "master"
+  digest = "1:488c97dd29d2f0ddb48e8a04aed2da02f43efbd6e6c9a7bf9653819f55c8e90c"
   name = "go.bug.st/serial.v1"
   packages = [
     ".",
-    "unixutils"
+    "unixutils",
   ]
-  revision = "eae1344f9f90101f887b08d13391c34399f97873"
+  pruneopts = ""
+  revision = "5f7892a7bb453066bdc6683b9b5d24d9dee03ec1"
 
 [[projects]]
+  digest = "1:a5253f1c452abd612cf8975cde3f96285a00dc9015660e8d446291a48662b54d"
   name = "gocv.io/x/gocv"
   packages = ["."]
+  pruneopts = ""
   revision = "116580adca5ee7dbf8d1307c9072f5094051116f"
   version = "v0.16.0"
 
 [[projects]]
   branch = "master"
+  digest = "1:7dd0f1b8c8bd70dbae4d3ed3fbfaec224e2b27bcc0fc65882d6f1dba5b1f6e22"
   name = "golang.org/x/net"
   packages = [
+    "internal/socks",
     "proxy",
-    "websocket"
+    "websocket",
   ]
-  revision = "01c190206fbdffa42f334f4b2bf2220f50e64920"
+  pruneopts = ""
+  revision = "8a410e7b638dca158bf9e766925842f6651ff828"
 
 [[projects]]
   branch = "master"
+  digest = "1:79b4fb7cfed68c4d0727858bd32dbe3be4b97ea58e2d767f92287f67810cbc98"
   name = "golang.org/x/sys"
   packages = [
     "unix",
-    "windows"
+    "windows",
   ]
-  revision = "8eb05f94d449fdf134ec24630ce69ada5b469c1c"
+  pruneopts = ""
+  revision = "d99a578cf41bfccdeaf48b0845c823a4b8b0ad5e"
 
 [[projects]]
+  digest = "1:5a0018233f499284a0f49f649d657ebe3ca4c3db74c7a7a26ef9bf08e41df4c9"
   name = "periph.io/x/periph"
   packages = [
     ".",
@@ -207,14 +295,40 @@
     "conn/spi",
     "conn/spi/spireg",
     "host/fs",
-    "host/sysfs"
+    "host/sysfs",
   ]
-  revision = "000523f7fa26b78f012b93221c94434ac5b18e37"
-  version = "v3.0.0"
+  pruneopts = ""
+  revision = "f34a1b4e75c5935f6269723ae45eacd0aa1d1a2a"
+  version = "v3.1.0"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "a0e4e9de33316ccc61210696bc25b441cb91684cb0197619239635be1d0fa7f7"
+  input-imports = [
+    "github.com/bmizerany/pat",
+    "github.com/codegangsta/cli",
+    "github.com/donovanhide/eventsource",
+    "github.com/eclipse/paho.mqtt.golang",
+    "github.com/go-ble/ble",
+    "github.com/go-ble/ble/darwin",
+    "github.com/go-ble/ble/linux",
+    "github.com/gobuffalo/uuid",
+    "github.com/hashicorp/go-multierror",
+    "github.com/hybridgroup/go-ardrone/client",
+    "github.com/hybridgroup/mjpeg",
+    "github.com/nats-io/nats",
+    "github.com/pkg/errors",
+    "github.com/sigurn/crc8",
+    "github.com/stretchr/testify/assert",
+    "github.com/tarm/serial",
+    "github.com/veandco/go-sdl2/sdl",
+    "go.bug.st/serial.v1",
+    "gocv.io/x/gocv",
+    "golang.org/x/net/websocket",
+    "periph.io/x/periph/conn",
+    "periph.io/x/periph/conn/physic",
+    "periph.io/x/periph/conn/spi",
+    "periph.io/x/periph/host/sysfs",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1

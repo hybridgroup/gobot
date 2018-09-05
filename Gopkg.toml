@@ -84,3 +84,7 @@
 [[constraint]]
   branch = "master"
   name = "golang.org/x/net"
+
+[[constraint]]
+  name = "github.com/stretchr/testify"
+  version = "1.2.2"

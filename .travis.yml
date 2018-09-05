@@ -43,6 +43,7 @@ before_install:
    - cd $HOME/gopath/src/gobot.io/x/gobot
    - go get github.com/axw/gocov/gocov
    - go get -u github.com/golang/dep/cmd/dep
+   - go get -u github.com/stretchr/testify
 before_cache:
    - rm -f $HOME/fresh-cache
 install:
