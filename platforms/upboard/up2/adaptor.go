@@ -23,7 +23,7 @@ type Adaptor struct {
 	pinmap             map[string]sysfsPin
 	digitalPins        map[int]*sysfs.DigitalPin
 	pwmPins            map[int]*sysfs.PWMPin
-	i2cBuses           [2]i2c.I2cDevice
+	i2cBuses           [6]i2c.I2cDevice
 	mutex              *sync.Mutex
 	spiDefaultBus      int
 	spiDefaultChip     int
@@ -209,12 +209,12 @@ func (c *Adaptor) PWMPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
 }
 
 // GetConnection returns a connection to a device on a specified bus.
-// Valid bus number is [0..1] which corresponds to /dev/i2c-0 through /dev/i2c-1.
+// Valid bus number is [5..6] which corresponds to /dev/i2c-5 through /dev/i2c-6.
 func (c *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection, err error) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
-	if (bus < 0) || (bus > 1) {
+	if (bus < 5) || (bus > 6) {
 		return nil, fmt.Errorf("Bus number %d out of range", bus)
 	}
 	if c.i2cBuses[bus] == nil {
@@ -225,7 +225,7 @@ func (c *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection
 
 // GetDefaultBus returns the default i2c bus for this platform
 func (c *Adaptor) GetDefaultBus() int {
-	return 0
+	return 5
 }
 
 // GetSpiConnection returns an spi connection to a device on a specified bus.
