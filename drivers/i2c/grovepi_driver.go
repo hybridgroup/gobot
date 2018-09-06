@@ -3,6 +3,7 @@ package i2c
 import (
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"gobot.io/x/gobot"
@@ -30,6 +31,7 @@ type GrovePiDriver struct {
 	name        string
 	digitalPins map[int]string
 	analogPins  map[int]string
+	mutex       *sync.Mutex
 	connector   Connector
 	connection  Connection
 	Config
@@ -48,6 +50,7 @@ func NewGrovePiDriver(a Connector, options ...func(Config)) *GrovePiDriver {
 		name:        gobot.DefaultName("GrovePi"),
 		digitalPins: make(map[int]string),
 		analogPins:  make(map[int]string),
+		mutex:       &sync.Mutex{},
 		connector:   a,
 		Config:      NewConfig(),
 	}
@@ -192,6 +195,9 @@ func getPin(pin string) string {
 
 // readAnalog reads analog value from the GrovePi.
 func (d *GrovePiDriver) readAnalog(pin byte) (int, error) {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
+
 	b := []byte{CommandReadAnalog, pin, 0, 0}
 	_, err := d.connection.Write(b)
 	if err != nil {
@@ -213,6 +219,9 @@ func (d *GrovePiDriver) readAnalog(pin byte) (int, error) {
 
 // readDigital reads digitally from the GrovePi.
 func (d *GrovePiDriver) readDigital(pin byte) (val int, err error) {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
+
 	buf := []byte{CommandReadDigital, pin, 0, 0}
 	_, err = d.connection.Write(buf)
 	if err != nil {
@@ -232,6 +241,9 @@ func (d *GrovePiDriver) readDigital(pin byte) (val int, err error) {
 
 // writeDigital writes digitally to the GrovePi.
 func (d *GrovePiDriver) writeDigital(pin byte, val byte) error {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
+
 	buf := []byte{CommandWriteDigital, pin, val, 0}
 	_, err := d.connection.Write(buf)
 
