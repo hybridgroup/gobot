@@ -39,6 +39,7 @@ func initTestUP2Adaptor() (*Adaptor, *sysfs.MockFilesystem) {
 		"/sys/class/pwm/pwmchip0/pwm0/period",
 		"/sys/class/pwm/pwmchip0/pwm0/duty_cycle",
 		"/sys/class/pwm/pwmchip0/pwm0/polarity",
+		"/sys/class/leds/upboard:green:/brightness",
 	})
 
 	sysfs.SetFilesystem(fs)
@@ -62,6 +63,12 @@ func TestUP2AdaptorDigitalIO(t *testing.T) {
 	fs.Files["/sys/class/gpio/gpio432/value"].Contents = "1"
 	i, _ := a.DigitalRead("13")
 	gobottest.Assert(t, i, 1)
+
+	a.DigitalWrite("green", 1)
+	gobottest.Assert(t,
+		fs.Files["/sys/class/leds/upboard:green:/brightness"].Contents,
+		"1",
+	)
 
 	gobottest.Assert(t, a.DigitalWrite("99", 1), errors.New("Not a valid pin"))
 	gobottest.Assert(t, a.Finalize(), nil)

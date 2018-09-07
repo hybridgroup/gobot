@@ -3,6 +3,8 @@ package up2
 import (
 	"errors"
 	"fmt"
+	"os"
+	"strconv"
 	"sync"
 
 	multierror "github.com/hashicorp/go-multierror"
@@ -21,6 +23,7 @@ type sysfsPin struct {
 type Adaptor struct {
 	name               string
 	pinmap             map[string]sysfsPin
+	ledPath            string
 	digitalPins        map[int]*sysfs.DigitalPin
 	pwmPins            map[int]*sysfs.PWMPin
 	i2cBuses           [6]i2c.I2cDevice
@@ -35,8 +38,9 @@ type Adaptor struct {
 // NewAdaptor creates a UP2 Adaptor
 func NewAdaptor() *Adaptor {
 	c := &Adaptor{
-		name:  gobot.DefaultName("UP2"),
-		mutex: &sync.Mutex{},
+		name:    gobot.DefaultName("UP2"),
+		mutex:   &sync.Mutex{},
+		ledPath: "/sys/class/leds/upboard:%s:/brightness",
 	}
 
 	c.setPins()
@@ -105,6 +109,18 @@ func (c *Adaptor) DigitalRead(pin string) (val int, err error) {
 
 // DigitalWrite writes digital value to the specified pin.
 func (c *Adaptor) DigitalWrite(pin string, val byte) (err error) {
+	// is it one of the built-in LEDs?
+	if pin == "red" || pin == "blue" || pin == "green" || pin == "yellow" {
+		pinPath := fmt.Sprintf(c.ledPath, pin)
+		fi, e := sysfs.OpenFile(pinPath, os.O_WRONLY|os.O_APPEND, 0666)
+		defer fi.Close()
+		if e != nil {
+			return e
+		}
+		_, err = fi.WriteString(strconv.Itoa(int(val)))
+		return err
+	}
+	// one of the normal GPIO pins, then
 	sysfsPin, err := c.DigitalPin(pin, sysfs.OUT)
 	if err != nil {
 		return err
