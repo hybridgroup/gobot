@@ -35,6 +35,23 @@ sudo groupadd gpio
 sudo adduser upsquared gpio
 ```
 
+To use the built-in LEDs you will need to create a new group, add your user to the group, and then add a UDEV rule.
+
+Add the following text as a new UDEV rule named `/etc/udev/rules.d/99-leds.rules`:
+
+```
+SUBSYSTEM=="leds*", PROGRAM="/bin/sh -c '\
+        chown -R root:leds /sys/class/leds && chmod -R 770 /sys/class/leds;\
+        chown -R root:leds /sys/devices/platform/up-pinctrl/leds && chmod -R 770 /sys/devices/platform/up-pinctrl/leds;\
+        chown -R root:leds /sys/devices/platform/AANT0F01:00/upboard-led.* && chmod -R 770 /sys/devices/platform/AANT0F01:00/upboard-led.*;\
+'"
+```
+
+```
+sudo groupadd leds
+sudo adduser upsquared leds
+```
+
 To access the I2C subsystem, run the following command:
 
 ```
