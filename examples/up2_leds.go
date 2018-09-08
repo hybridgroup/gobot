@@ -14,10 +14,10 @@ import (
 
 func main() {
 	b := up2.NewAdaptor()
-	red := gpio.NewLedDriver(b, "red")
-	blue := gpio.NewLedDriver(b, "blue")
-	green := gpio.NewLedDriver(b, "green")
-	yellow := gpio.NewLedDriver(b, "yellow")
+	red := gpio.NewLedDriver(b, up2.LEDRed)
+	blue := gpio.NewLedDriver(b, up2.LEDBlue)
+	green := gpio.NewLedDriver(b, up2.LEDGreen)
+	yellow := gpio.NewLedDriver(b, up2.LEDYellow)
 
 	work := func() {
 		red.Off()

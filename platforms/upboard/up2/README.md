@@ -80,6 +80,13 @@ r := up2.NewAdaptor()
 led := gpio.NewLedDriver(r, "13")
 ```
 
+You can also use the values `up2.LEDRed`, `up2.LEDBlue`, `up2.LEDGreen`, and `up2.LEDYellow` as pin reference to access the 4 built-in LEDs. For example:
+
+```go
+r := up2.NewAdaptor()
+led := gpio.NewLedDriver(r, up2.LEDRed)
+```
+
 ## How to Connect
 
 ### Compiling
