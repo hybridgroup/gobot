@@ -14,6 +14,20 @@ import (
 	"gobot.io/x/gobot/sysfs"
 )
 
+const (
+	// LEDRed is the built-in red LED.
+	LEDRed = "red"
+
+	// LEDBlue is the built-in blue LED.
+	LEDBlue = "blue"
+
+	// LEDGreen is the built-in green LED.
+	LEDGreen = "green"
+
+	// LEDYellow is the built-in yellow LED.
+	LEDYellow = "yellow"
+)
+
 type sysfsPin struct {
 	pin    int
 	pwmPin int
@@ -110,7 +124,7 @@ func (c *Adaptor) DigitalRead(pin string) (val int, err error) {
 // DigitalWrite writes digital value to the specified pin.
 func (c *Adaptor) DigitalWrite(pin string, val byte) (err error) {
 	// is it one of the built-in LEDs?
-	if pin == "red" || pin == "blue" || pin == "green" || pin == "yellow" {
+	if pin == LEDRed || pin == LEDBlue || pin == LEDGreen || pin == LEDYellow {
 		pinPath := fmt.Sprintf(c.ledPath, pin)
 		fi, e := sysfs.OpenFile(pinPath, os.O_WRONLY|os.O_APPEND, 0666)
 		defer fi.Close()
