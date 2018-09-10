@@ -1,12 +1,12 @@
-# UP2 (Squared)
+# UP2
 
-The UP2 Board is a single board SoC computer based on the Intel Apollo Lake processor. It has built-in GPIO, PWM, SPI, and I2C interfaces.
+The UP2 Board aka "Up Squared" is a single board SoC computer based on the Intel Apollo Lake processor. It has built-in GPIO, PWM, SPI, and I2C interfaces.
 
 For more info about the UP2 Board, go to [http://www.up-board.org/upsquared/](http://www.up-board.org/upsquared/).
 
 ## How to Install
 
-### Setting up your UP2 board
+### Update operating system and BIOS on UP2 board
 
 We recommend updating to the latest Ubuntu 16.04 and BIOS v3.3 when using the UP2 board. To update your UP2 OS go to:
 
@@ -16,11 +16,20 @@ To update your UP2 BIOS, go to:
 
 https://downloads.up-community.org/download/up-squared-uefi-bios-v3-3/
 
-Once your UP@ has been updated, you will need to provide permission to the `upsquared` user to access the GPIO or I2C subsystems on the board. 
+Once your UP2 has been updated, you will need to provide permission to the `upsquared` user to access the GPIO or I2C subsystems on the board.
+
+### Configuring GPIO on UP2 board
 
 To access the GPIO subsystem, you will need to create a new group, add your user to the group, and then add a UDEV rule.
 
-First add a new UDEV rule to the UP2 board. Add the following text as a new UDEV rule named `/etc/udev/rules.d/99-gpio.rules`:
+First, run the following commands on the board itself:
+
+```
+sudo groupadd gpio
+sudo adduser upsquared gpio
+```
+
+Now, add a new UDEV rule to the UP2 board. Add the following text as a new UDEV rule named `/etc/udev/rules.d/99-gpio.rules`:
 
 ```
 SUBSYSTEM=="gpio*", PROGRAM="/bin/sh -c '\
@@ -30,14 +39,18 @@ SUBSYSTEM=="gpio*", PROGRAM="/bin/sh -c '\
 '"
 ```
 
-```
-sudo groupadd gpio
-sudo adduser upsquared gpio
-```
+### Configuring built-in LEDs on UP2 board
 
 To use the built-in LEDs you will need to create a new group, add your user to the group, and then add a UDEV rule.
 
-Add the following text as a new UDEV rule named `/etc/udev/rules.d/99-leds.rules`:
+First, run the following commands on the board itself:
+
+```
+sudo groupadd leds
+sudo adduser upsquared leds
+```
+
+Now add the following text as a new UDEV rule named `/etc/udev/rules.d/99-leds.rules`:
 
 ```
 SUBSYSTEM=="leds*", PROGRAM="/bin/sh -c '\
@@ -47,10 +60,7 @@ SUBSYSTEM=="leds*", PROGRAM="/bin/sh -c '\
 '"
 ```
 
-```
-sudo groupadd leds
-sudo adduser upsquared leds
-```
+### Configuring I2C on UP2 board
 
 To access the I2C subsystem, run the following command:
 
