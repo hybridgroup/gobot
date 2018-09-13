@@ -231,6 +231,7 @@ a shared set of drivers provided using the `gobot/drivers/gpio` package:
 	- Button
 	- Buzzer
 	- Direct Pin
+	- EasyDriver
 	- Grove Button
 	- Grove Buzzer
 	- Grove LED
