@@ -1,7 +1,7 @@
 package nats
 
 import (
-	"github.com/nats-io/nats"
+	"github.com/nats-io/go-nats"
 	"gobot.io/x/gobot"
 	"net/url"
 	"strings"
