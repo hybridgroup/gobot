@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017 Weston Schmidt <weston_schmidt@alumni.purdue.edu>
+ * Copyright (c) 2018 Nick Potts <nick@the-potts.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,9 @@ package i2c
 
 // TH02Driver is a driver for the TH02-D based devices.
 //
-// This module was tested with AdaFruit Sensiron SHT32-D Breakout.
-// https://www.adafruit.com/products/2857
+// This module was tested with a Grove "Temperature&Humidity Sensor (High-Accuracy & Mini ) v1.0"
+// from https://www.seeedstudio.com/Grove-Temperature-Humidity-Sensor-High-Accuracy-Min-p-1921.htm
+// Datasheet is at http://www.hoperf.com/upload/sensor/TH02_V1.1.pdf
 
 import (
 	"fmt"
@@ -30,28 +31,17 @@ import (
 
 const (
 
-	// TH02AddressA is the default address of device
+	// TH02Address is the default address of device
 	TH02Address = 0x40
 
 	//TH02ConfigReg is the configuration register
 	TH02ConfigReg = 0x03
-
-	// TH02RegConfigHighAccuracyTemp is the CONFIG register to read temperature
-	// TH02HighAccuracyTemp = 0x11
-
-	//TH02RegConfigHighAccuracyRH is the CONFIG register to read high accuracy RH
-//	TH02HighAccuracyRH = 0x01
 )
 
+//Accuracy constants for the TH02 devices
 const (
 	TH02HighAccuracy = 0 //High Accuracy
 	TH02LowAccuracy  = 1 //Lower Accuracy
-)
-
-var (
-//ErrInvalidAccuracy = errors.New("Invalid accuracy")
-//ErrInvalidCrc      = errors.New("Invalid crc")
-//ErrInvalidTemp     = errors.New("Invalid temperature units")
 )
 
 // TH02Driver is a Driver for a TH02 humidity and temperature sensor
