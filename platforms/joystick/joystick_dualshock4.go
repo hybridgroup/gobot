@@ -14,37 +14,37 @@ var dualshock4Config = joystickConfig{
 		},
 		pair{
 			Name: "right_x",
-			ID:   3,
-		},
-		pair{
-			Name: "right_y",
-			ID:   4,
-		},
-		pair{
-			Name: "l2",
 			ID:   2,
 		},
 		pair{
-			Name: "r2",
+			Name: "right_y",
 			ID:   5,
+		},
+		pair{
+			Name: "l2",
+			ID:   3,
+		},
+		pair{
+			Name: "r2",
+			ID:   4,
 		},
 	},
 	Buttons: []pair{
 		pair{
 			Name: "square",
-			ID:   3,
+			ID:   0,
 		},
 		pair{
 			Name: "triangle",
-			ID:   2,
+			ID:   3,
 		},
 		pair{
 			Name: "circle",
-			ID:   1,
+			ID:   2,
 		},
 		pair{
 			Name: "x",
-			ID:   0,
+			ID:   1,
 		},
 		pair{
 			Name: "l1",
