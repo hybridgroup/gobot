@@ -62,7 +62,7 @@ func (a *MAX7219Driver) Start() (err error) {
 	a.All(MAX7219Shutdown, 0x01)
 	a.All(MAX7219DisplayTest, 0x00)
 	a.ClearAll()
-	a.All(MAX7219Intensity, 0x0f&0x0f)
+	a.All(MAX7219Intensity, 0x0f)
 
 	return
 }
@@ -86,7 +86,7 @@ func (a *MAX7219Driver) SetIntensity(level byte) {
 	if level > 15 {
 		level = 15
 	}
-	a.All(MAX7219Intensity, level&level)
+	a.All(MAX7219Intensity, level)
 }
 
 // ClearAll turns off all LEDs of all modules
