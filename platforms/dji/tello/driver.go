@@ -418,6 +418,103 @@ func (d *Driver) Rate() (err error) {
 	return
 }
 
+// bound is a naive implementation that returns the smaller of x or y.
+func bound(x, y float32) float32 {
+	if x < -y {
+		return -y
+	}
+	if x > y {
+		return y
+	}
+	return x
+}
+
+// Vector returns the current motion vector.
+// Values are from 0 to 1.
+// x, y, z denote forward, side and vertical translation,
+// and psi  yaw (rotation around the z-axis).
+func (d *Driver) Vector() (x, y, z, psi float32) {
+	return d.ry, d.rx, d.ly, d.lx
+}
+
+// AddVector adds to the current motion vector.
+// Pass values from 0 to 1.
+// See Vector() for the frame of reference.
+func (d *Driver) AddVector(x, y, z, psi float32) error {
+	d.cmdMutex.Lock()
+	defer d.cmdMutex.Unlock()
+
+	d.ry = bound(d.ry+x, 1)
+	d.rx = bound(d.rx+y, 1)
+	d.ly = bound(d.ly+z, 1)
+	d.lx = bound(d.lx+psi, 1)
+
+	return nil
+}
+
+// SetVector sets the current motion vector.
+// Pass values from 0 to 1.
+// See Vector() for the frame of reference.
+func (d *Driver) SetVector(x, y, z, psi float32) error {
+	d.cmdMutex.Lock()
+	defer d.cmdMutex.Unlock()
+
+	d.ry = x
+	d.rx = y
+	d.ly = z
+	d.lx = psi
+
+	return nil
+}
+
+// SetX sets the x component of the current motion vector
+// Pass values from 0 to 1.
+// See Vector() for the frame of reference.
+func (d *Driver) SetX(x float32) error {
+	d.cmdMutex.Lock()
+	defer d.cmdMutex.Unlock()
+
+	d.ry = x
+
+	return nil
+}
+
+// SetY sets the y component of the current motion vector
+// Pass values from 0 to 1.
+// See Vector() for the frame of reference.
+func (d *Driver) SetY(y float32) error {
+	d.cmdMutex.Lock()
+	defer d.cmdMutex.Unlock()
+
+	d.rx = y
+
+	return nil
+}
+
+// SetZ sets the z component of the current motion vector
+// Pass values from 0 to 1.
+// See Vector() for the frame of reference.
+func (d *Driver) SetZ(z float32) error {
+	d.cmdMutex.Lock()
+	defer d.cmdMutex.Unlock()
+
+	d.ly = z
+
+	return nil
+}
+
+// SetPsi sets the psi component (yaw) of the current motion vector
+// Pass values from 0 to 1.
+// See Vector() for the frame of reference.
+func (d *Driver) SetPsi(psi float32) error {
+	d.cmdMutex.Lock()
+	defer d.cmdMutex.Unlock()
+
+	d.lx = psi
+
+	return nil
+}
+
 // Up tells the drone to ascend. Pass in an int from 0-100.
 func (d *Driver) Up(val int) error {
 	d.cmdMutex.Lock()
