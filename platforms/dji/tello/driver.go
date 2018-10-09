@@ -816,11 +816,12 @@ func (d *Driver) processVideo() error {
 		for {
 			buf := make([]byte, 2048)
 			n, _, err := d.videoConn.ReadFromUDP(buf)
-			d.Publish(d.Event(VideoFrameEvent), buf[2:n])
-
 			if err != nil {
 				fmt.Println("Error: ", err)
+				continue
 			}
+
+			d.Publish(d.Event(VideoFrameEvent), buf[2:n])
 		}
 	}()
 
