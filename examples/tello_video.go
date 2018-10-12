@@ -25,7 +25,7 @@ import (
 func main() {
 	drone := tello.NewDriver("8890")
 
-	mplayer := exec.Command("mplayer", "-fps", "25", "-")
+	mplayer := exec.Command("mplayer", "-fps", "60", "-")
 	mplayerIn, _ := mplayer.StdinPipe()
 	if err := mplayer.Start(); err != nil {
 		fmt.Println(err)
