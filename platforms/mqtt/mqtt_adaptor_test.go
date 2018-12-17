@@ -125,3 +125,9 @@ func TestMqttAdaptorOnWhenConnected(t *testing.T) {
 		fmt.Println("hola")
 	}), true)
 }
+
+func TestMqttAdaptorQoS(t *testing.T) {
+	a := initTestMqttAdaptor()
+	a.SetQoS(1)
+	gobottest.Assert(t, 1, a.qos)
+}

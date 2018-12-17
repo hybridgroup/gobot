@@ -28,6 +28,7 @@ type Adaptor struct {
 	autoReconnect bool
 	cleanSession  bool
 	client        paho.Client
+	qos           int
 }
 
 // NewAdaptor creates a new mqtt adaptor with specified host and client id
@@ -86,6 +87,9 @@ func (a *Adaptor) SetUseSSL(val bool) { a.useSSL = val }
 // ServerCert returns the MQTT server SSL cert file
 func (a *Adaptor) ServerCert() string { return a.serverCert }
 
+// SetQoS sets the QoS value passed into the MTT client on Publish/Subscribe events
+func (a *Adaptor) SetQoS(qos int) { a.qos = qos }
+
 // SetServerCert sets the MQTT server SSL cert file
 func (a *Adaptor) SetServerCert(val string) { a.serverCert = val }
 
@@ -130,7 +134,7 @@ func (a *Adaptor) Publish(topic string, message []byte) bool {
 	if a.client == nil {
 		return false
 	}
-	a.client.Publish(topic, 0, false, message)
+	a.client.Publish(topic, byte(a.qos), false, message)
 	return true
 }
 
@@ -139,7 +143,7 @@ func (a *Adaptor) On(event string, f func(msg Message)) bool {
 	if a.client == nil {
 		return false
 	}
-	a.client.Subscribe(event, 0, func(client paho.Client, msg paho.Message) {
+	a.client.Subscribe(event, byte(a.qos), func(client paho.Client, msg paho.Message) {
 		f(msg)
 	})
 	return true
