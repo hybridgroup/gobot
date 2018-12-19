@@ -500,6 +500,7 @@ func (d *Driver) Hover() {
 
 	d.rx = float32(0)
 	d.ry = float32(0)
+	d.lx = float32(0)
 	d.ly = float32(0)
 }
 
