@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math"
 	"net"
 	"strconv"
 	"sync"
@@ -144,19 +145,18 @@ type FlightData struct {
 	DroneFlyTimeLeft         int16
 	DroneHover               bool
 	EmOpen                   bool
-	EmSky                    bool
-	EmGround                 bool
+	Flying                   bool
+	OnGround                 bool
 	EastSpeed                int16
 	ElectricalMachineryState int16
 	FactoryMode              bool
 	FlyMode                  int8
-	FlySpeed                 int16
 	FlyTime                  int16
 	FrontIn                  bool
 	FrontLSC                 bool
 	FrontOut                 bool
 	GravityState             bool
-	GroundSpeed              int16
+	VerticalSpeed            int16
 	Height                   int16
 	ImuCalibrationState      int8
 	ImuState                 bool
@@ -166,10 +166,8 @@ type FlightData struct {
 	PowerState               bool
 	PressureState            bool
 	SmartVideoExitMode       int16
-	TemperatureHeight        bool
+	TemperatureHigh          bool
 	ThrowFlyTimer            int8
-	WifiDisturb              int8
-	WifiStrength             int8
 	WindState                bool
 }
 
@@ -583,7 +581,7 @@ func (d *Driver) ParseFlightData(b []byte) (fd *FlightData, err error) {
 	if err != nil {
 		return
 	}
-	err = binary.Read(buf, binary.LittleEndian, &fd.GroundSpeed)
+	err = binary.Read(buf, binary.LittleEndian, &fd.VerticalSpeed)
 	if err != nil {
 		return
 	}
@@ -625,8 +623,8 @@ func (d *Driver) ParseFlightData(b []byte) (fd *FlightData, err error) {
 	if err != nil {
 		return
 	}
-	fd.EmSky = (data >> 0 & 0x1) == 1
-	fd.EmGround = (data >> 1 & 0x1) == 1
+	fd.Flying = (data >> 0 & 0x1) == 1
+	fd.OnGround = (data >> 1 & 0x1) == 1
 	fd.EmOpen = (data >> 2 & 0x1) == 1
 	fd.DroneHover = (data >> 3 & 0x1) == 1
 	fd.OutageRecording = (data >> 4 & 0x1) == 1
@@ -665,7 +663,7 @@ func (d *Driver) ParseFlightData(b []byte) (fd *FlightData, err error) {
 	if err != nil {
 		return
 	}
-	fd.TemperatureHeight = (data >> 0 & 0x1) == 1
+	fd.TemperatureHigh = (data >> 0 & 0x1) == 1
 
 	return
 }
@@ -847,4 +845,17 @@ func (d *Driver) connectionString() string {
 	binary.LittleEndian.PutUint16(b[:], uint16(x))
 	res := fmt.Sprintf("conn_req:%s", b)
 	return res
+}
+
+func (f *FlightData) AirSpeed() float64 {
+	return math.Sqrt(
+		math.Pow(float64(f.NorthSpeed), 2) +
+			math.Pow(float64(f.EastSpeed), 2) +
+			math.Pow(float64(f.VerticalSpeed), 2))
+}
+
+func (f *FlightData) GroundSpeed() float64 {
+	return math.Sqrt(
+		math.Pow(float64(f.NorthSpeed), 2) +
+			math.Pow(float64(f.EastSpeed), 2))
 }
