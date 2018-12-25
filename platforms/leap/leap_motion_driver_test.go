@@ -89,8 +89,8 @@ func TestLeapMotionDriverParser(t *testing.T) {
 		t.Errorf("ParseFrame incorrectly parsed frame")
 	}
 
-	gobottest.Assert(t, parsedFrame.Timestamp, uint64(4729292670))
-	gobottest.Assert(t, parsedFrame.Hands[0].X(), 117.546)
-	gobottest.Assert(t, parsedFrame.Hands[0].Y(), 236.007)
-	gobottest.Assert(t, parsedFrame.Hands[0].Z(), 76.3394)
+	gobottest.Assert(t, parsedFrame.Timestamp, uint64(134211791358))
+	gobottest.Assert(t, parsedFrame.Hands[0].X(), 247.410)
+	gobottest.Assert(t, parsedFrame.Hands[0].Y(), 275.868)
+	gobottest.Assert(t, parsedFrame.Hands[0].Z(), 132.843)
 }

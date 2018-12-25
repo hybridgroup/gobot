@@ -30,7 +30,7 @@ type Driver struct {
 // Adds the following events:
 //		"message" - Gets triggered when receiving a message from leap motion
 //		"hand" - Gets triggered per-message when leap motion detects a hand
-//		"gesture" - Gets triggered per-message when leap motion detects a hand
+//		"gesture" - Gets triggered per-message when leap motion detects a gesture
 func NewDriver(a *Adaptor) *Driver {
 	l := &Driver{
 		name:       gobot.DefaultName("LeapMotion"),
@@ -61,6 +61,20 @@ func (l *Driver) adaptor() *Adaptor {
 	return l.Connection().(*Adaptor)
 }
 
+func enableFeature(l *Driver, feature string) (err error) {
+	command := map[string]bool{feature: true}
+	b, e := json.Marshal(command)
+	if e != nil {
+		return e
+	}
+	_, e = l.adaptor().ws.Write(b)
+	if e != nil {
+		return e
+	}
+
+	return nil
+}
+
 // Start inits leap motion driver by enabling gestures
 // and listening from incoming messages.
 //
@@ -69,14 +83,13 @@ func (l *Driver) adaptor() *Adaptor {
 //		"hand" - Emits Hand when detected in message from Leap.
 //		"gesture" - Emits Gesture when detected in message from Leap.
 func (l *Driver) Start() (err error) {
-	enableGestures := map[string]bool{"enableGestures": true}
-	b, e := json.Marshal(enableGestures)
-	if e != nil {
-		return e
+	err = enableFeature(l,"enableGestures")
+	if err != nil {
+		return err
 	}
-	_, e = l.adaptor().ws.Write(b)
-	if e != nil {
-		return e
+	err = enableFeature(l,"background")
+	if err != nil {
+		return err
 	}
 
 	go func() {
