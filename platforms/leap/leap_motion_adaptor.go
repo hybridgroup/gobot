@@ -23,7 +23,7 @@ func NewAdaptor(port string) *Adaptor {
 		name: gobot.DefaultName("LeapMotion"),
 		port: port,
 		connect: func(host string) (io.ReadWriteCloser, error) {
-			return websocket.Dial("ws://"+host+"/v3.json", "", "http://"+host)
+			return websocket.Dial("ws://"+host+"/v6.json", "", "http://"+host)
 		},
 	}
 }
