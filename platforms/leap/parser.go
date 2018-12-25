@@ -9,10 +9,10 @@ type Gesture struct {
 	Center        []float64   `json:"center"`
 	Direction     []float64   `json:"direction"`
 	Duration      int         `json:"duration"`
-	HandIds       []int       `json:"handIds"`
+	HandIDs       []int       `json:"handIds"`
 	ID            int         `json:"id"`
 	Normal        []float64   `json:"normal"`
-	PointableIds  []int       `json:"pointableIds"`
+	PointableIDs  []int       `json:"pointableIds"`
 	Position      []float64   `json:"position"`
 	Progress      float64     `json:"progress"`
 	Radius        float64     `json:"radius"`
