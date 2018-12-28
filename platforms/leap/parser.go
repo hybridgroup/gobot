@@ -48,7 +48,7 @@ type Hand struct {
 
 // Pointable is a Leap Motion pointing motion that has been detected
 type Pointable struct {
-	Bases                 [][]float64  `json:"bases"`
+	Bases                 [][][]float64  `json:"bases"`
 	BTipPosition          []float64    `json:"btipPosition"`
 	CarpPosition          []float64    `json:"carpPosition"`
 	DipPosition           []float64    `json:"dipPosition"`
