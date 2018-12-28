@@ -93,4 +93,14 @@ func TestLeapMotionDriverParser(t *testing.T) {
 	gobottest.Assert(t, parsedFrame.Hands[0].X(), 247.410)
 	gobottest.Assert(t, parsedFrame.Hands[0].Y(), 275.868)
 	gobottest.Assert(t, parsedFrame.Hands[0].Z(), 132.843)
+
+	gobottest.Assert(t, parsedFrame.Pointables[0].BTipPosition[0], 214.293)
+	gobottest.Assert(t, parsedFrame.Pointables[0].BTipPosition[1], 213.865)
+	gobottest.Assert(t, parsedFrame.Pointables[0].BTipPosition[2], 95.0224)
+
+	gobottest.Assert(t, parsedFrame.Pointables[0].Bases[0][0][0], -0.468069)
+	gobottest.Assert(t, parsedFrame.Pointables[0].Bases[0][0][1], 0.807844)
+	gobottest.Assert(t, parsedFrame.Pointables[0].Bases[0][0][2], -0.358190)
+
+	gobottest.Assert(t, parsedFrame.Pointables[0].Width, 19.7871)
 }
