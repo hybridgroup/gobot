@@ -39,7 +39,7 @@ func main() {
 	iris := mavlink.NewDriver(adaptor)
 
 	work := func() {
-		gobot.Once(iris.Event("packet"), func(data interface{}) {
+		iris.Once(iris.Event("packet"), func(data interface{}) {
 			packet := data.(*common.MAVLinkPacket)
 
 			dataStream := common.NewRequestDataStream(100,
@@ -54,7 +54,7 @@ func main() {
 			))
 		})
 
-		gobot.On(iris.Event("message"), func(data interface{}) {
+		iris.On(iris.Event("message"), func(data interface{}) {
 			if data.(common.MAVLinkMessage).Id() == 30 {
 				message := data.(*common.Attitude)
 				fmt.Println("Attitude")
