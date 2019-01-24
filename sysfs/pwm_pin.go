@@ -148,7 +148,8 @@ func (p *PWMPin) DutyCycle() (duty uint32, err error) {
 		return
 	}
 
-	val, e := strconv.Atoi(string(buf))
+	v := bytes.TrimRight(buf, "\n")
+	val, e := strconv.Atoi(string(v))
 	return uint32(val), e
 }
 
