@@ -178,7 +178,7 @@ func (e *Adaptor) PWMPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
 // Valid bus number is [0..2] which corresponds to /dev/i2c-0 through /dev/i2c-2.
 func (e *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection, err error) {
 	if (bus < 0) || (bus > 2) {
-		return nil, fmt.Errorf("Bus number %d out of range", bus)
+		return nil, fmt.Errorf("bus number %d out of range", bus)
 	}
 	if e.i2cBuses[bus] == nil {
 		e.i2cBuses[bus], err = sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))

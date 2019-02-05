@@ -663,21 +663,21 @@ func getGroveAddresses(pin string) (gPin, gPort Grove, analog, state byte, err e
 		analog = GET_GROVE_ANALOG_2_2
 		state = GET_GROVE_STATE_2_2
 	default:
-		err = fmt.Errorf("Invalid grove pin name")
+		err = fmt.Errorf("invalid grove pin name")
 	}
 	return gPin, gPort, analog, state, err
 }
 
 func (g *Driver) responseValid(response []byte) error {
 	if response[3] != 0xA5 {
-		return fmt.Errorf("No SPI response, response not valid")
+		return fmt.Errorf("no SPI response, response not valid")
 	}
 	return nil
 }
 
 func (g *Driver) valueValid(value []byte) error {
 	if value[4] != byte(VALID_DATA) {
-		return fmt.Errorf("Invalid value")
+		return fmt.Errorf("invalid value")
 	}
 	return nil
 }

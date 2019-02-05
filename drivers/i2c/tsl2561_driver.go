@@ -246,7 +246,7 @@ func (d *TSL2561Driver) Start() (err error) {
 	if initialized, err = d.connection.ReadByteData(tsl2561RegisterID); err != nil {
 		return err
 	} else if (initialized & 0x0A) == 0 {
-		return fmt.Errorf("TSL2561 device not found (0x%X)", initialized)
+		return fmt.Errorf("tSL2561 device not found (0x%X)", initialized)
 	}
 
 	if err = d.SetIntegrationTime(d.integrationTime); err != nil {

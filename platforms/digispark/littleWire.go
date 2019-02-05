@@ -91,7 +91,7 @@ func (l *littleWire) i2cStart(address7bit uint8, direction uint8) error {
 	if err := l.error(); err != nil {
 		return err
 	}
-	return fmt.Errorf("Littlewire i2cStart failed for %d in direction %d", address7bit, direction)
+	return fmt.Errorf("littlewire i2cStart failed for %d in direction %d", address7bit, direction)
 }
 
 // i2cWrite sends byte(s) over i2c with a given length <= 4

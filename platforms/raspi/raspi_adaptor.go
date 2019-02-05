@@ -185,7 +185,7 @@ func (r *Adaptor) DigitalWrite(pin string, val byte) (err error) {
 // Valid bus number is [0..1] which corresponds to /dev/i2c-0 through /dev/i2c-1.
 func (r *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection, err error) {
 	if (bus < 0) || (bus > 1) {
-		return nil, fmt.Errorf("Bus number %d out of range", bus)
+		return nil, fmt.Errorf("bus number %d out of range", bus)
 	}
 
 	device, err := r.getI2cBus(bus)
@@ -216,7 +216,7 @@ func (r *Adaptor) GetSpiConnection(busNum, chipNum, mode, bits int, maxSpeed int
 	defer r.mutex.Unlock()
 
 	if (busNum < 0) || (busNum > 1) {
-		return nil, fmt.Errorf("Bus number %d out of range", busNum)
+		return nil, fmt.Errorf("bus number %d out of range", busNum)
 	}
 
 	if r.spiDevices[busNum] == nil {

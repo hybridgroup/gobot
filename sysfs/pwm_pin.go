@@ -115,7 +115,7 @@ func (p *PWMPin) InvertPolarity(invert bool) (err error) {
 		}
 		_, err = p.write(p.pwmPolarityPath(), []byte(polarity))
 	} else {
-		err = fmt.Errorf("Cannot set PWM polarity when enabled")
+		err = fmt.Errorf("cannot set PWM polarity when enabled")
 	}
 	return
 }

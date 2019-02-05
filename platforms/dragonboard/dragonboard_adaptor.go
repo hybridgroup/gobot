@@ -138,7 +138,7 @@ func (c *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection
 	defer c.mutex.Unlock()
 
 	if (bus < 0) || (bus > 1) {
-		return nil, fmt.Errorf("Bus number %d out of range", bus)
+		return nil, fmt.Errorf("bus number %d out of range", bus)
 	}
 	if c.i2cBuses[bus] == nil {
 		c.i2cBuses[bus], err = sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))

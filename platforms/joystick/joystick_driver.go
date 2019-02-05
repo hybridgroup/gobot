@@ -174,7 +174,7 @@ func (j *Driver) handleEvent(event sdl.Event) error {
 		if data.Which == j.adaptor().joystick.InstanceID() {
 			axis := j.findName(data.Axis, j.config.Axis)
 			if axis == "" {
-				return fmt.Errorf("Unknown Axis: %v", data.Axis)
+				return fmt.Errorf("unknown Axis: %v", data.Axis)
 			}
 			j.Publish(j.Event(axis), data.Value)
 		}
@@ -182,7 +182,7 @@ func (j *Driver) handleEvent(event sdl.Event) error {
 		if data.Which == j.adaptor().joystick.InstanceID() {
 			button := j.findName(data.Button, j.config.Buttons)
 			if button == "" {
-				return fmt.Errorf("Unknown Button: %v", data.Button)
+				return fmt.Errorf("unknown Button: %v", data.Button)
 			}
 			if data.State == 1 {
 				j.Publish(j.Event(fmt.Sprintf("%s_press", button)), nil)
@@ -194,7 +194,7 @@ func (j *Driver) handleEvent(event sdl.Event) error {
 		if data.Which == j.adaptor().joystick.InstanceID() {
 			hat := j.findHatName(data.Value, data.Hat, j.config.Hats)
 			if hat == "" {
-				return fmt.Errorf("Unknown Hat: %v %v", data.Hat, data.Value)
+				return fmt.Errorf("unknown Hat: %v %v", data.Hat, data.Value)
 			} else if hat == "released" {
 				hat = previousHat
 				j.Publish(j.Event(fmt.Sprintf("%s_release", hat)), true)

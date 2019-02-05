@@ -131,7 +131,7 @@ func TestSSD1306DriverCommand(t *testing.T) {
 		expected := []byte{0x80, 0xFF}
 		if !reflect.DeepEqual(got, expected) {
 			t.Logf("Sequence error, got %+v, expected %+v", got, expected)
-			return 0, fmt.Errorf("Woops!")
+			return 0, fmt.Errorf("woops")
 		}
 		return 0, nil
 	}
@@ -147,7 +147,7 @@ func TestSSD1306DriverCommands(t *testing.T) {
 		expected := []byte{0x80, 0x00, 0x80, 0xFF}
 		if !reflect.DeepEqual(got, expected) {
 			t.Logf("Sequence error, got %+v, expected %+v", got, expected)
-			return 0, fmt.Errorf("Woops!")
+			return 0, fmt.Errorf("woops")
 		}
 		return 0, nil
 	}
@@ -163,7 +163,7 @@ func TestSSD1306DriverOn(t *testing.T) {
 		expected := []byte{0x80, ssd1306SetDisplayOn}
 		if !reflect.DeepEqual(got, expected) {
 			t.Logf("Sequence error, got %+v, expected %+v", got, expected)
-			return 0, fmt.Errorf("Woops!")
+			return 0, fmt.Errorf("woops")
 		}
 		return 0, nil
 	}
@@ -179,7 +179,7 @@ func TestSSD1306DriverOff(t *testing.T) {
 		expected := []byte{0x80, ssd1306SetDisplayOff}
 		if !reflect.DeepEqual(got, expected) {
 			t.Logf("Sequence error, got %+v, expected %+v", got, expected)
-			return 0, fmt.Errorf("Woops!")
+			return 0, fmt.Errorf("woops")
 		}
 		return 0, nil
 	}
@@ -229,7 +229,7 @@ func TestSSD1306DriverCommandsSetContrast(t *testing.T) {
 		expected := []byte{0x80, ssd1306SetContrast, 0x80, 0x10}
 		if !reflect.DeepEqual(got, expected) {
 			t.Logf("Sequence error, got %+v, expected %+v", got, expected)
-			return 0, fmt.Errorf("Woops!")
+			return 0, fmt.Errorf("woops")
 		}
 		return 0, nil
 	}

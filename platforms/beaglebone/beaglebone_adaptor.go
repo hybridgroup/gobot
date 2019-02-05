@@ -268,7 +268,7 @@ func (b *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection
 	defer b.mutex.Unlock()
 
 	if (bus != 0) && (bus != 2) {
-		return nil, fmt.Errorf("Bus number %d out of range", bus)
+		return nil, fmt.Errorf("bus number %d out of range", bus)
 	}
 	if b.i2cBuses[bus] == nil {
 		b.i2cBuses[bus], err = sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
@@ -288,7 +288,7 @@ func (b *Adaptor) GetSpiConnection(busNum, chipNum, mode, bits int, maxSpeed int
 	defer b.mutex.Unlock()
 
 	if (busNum < 0) || (busNum > 1) {
-		return nil, fmt.Errorf("Bus number %d out of range", busNum)
+		return nil, fmt.Errorf("bus number %d out of range", busNum)
 	}
 
 	if b.spiBuses[busNum] == nil {

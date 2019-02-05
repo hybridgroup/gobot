@@ -212,7 +212,7 @@ func (d *ADS1x15Driver) BestGainForVoltage(voltage float64) (bestGain int, err e
 	}
 
 	if currentBestGain < 0 {
-		err = fmt.Errorf("The maximum voltage which can be read is %f", max)
+		err = fmt.Errorf("the maximum voltage which can be read is %f", max)
 		return
 	}
 
@@ -331,7 +331,7 @@ func (d *ADS1x15Driver) rawRead(mux int, gain int, dataRate int) (value float64,
 			keys = append(keys, k)
 		}
 
-		err = fmt.Errorf("Invalid data rate. Accepted values: %d", keys)
+		err = fmt.Errorf("invalid data rate. Accepted values: %d", keys)
 		return
 	}
 	// Set the data rate (this is controlled by the subclass as it differs

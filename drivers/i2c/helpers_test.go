@@ -73,7 +73,7 @@ func (t *i2cTestAdaptor) ReadByte() (val byte, err error) {
 		return 0, err
 	}
 	if bytesRead != 1 {
-		return 0, fmt.Errorf("Buffer underrun")
+		return 0, fmt.Errorf("buffer underrun")
 	}
 	val = bytes[0]
 	return
@@ -88,7 +88,7 @@ func (t *i2cTestAdaptor) ReadByteData(reg uint8) (val uint8, err error) {
 		return 0, err
 	}
 	if bytesRead != 1 {
-		return 0, fmt.Errorf("Buffer underrun")
+		return 0, fmt.Errorf("buffer underrun")
 	}
 	val = bytes[0]
 	return
@@ -103,7 +103,7 @@ func (t *i2cTestAdaptor) ReadWordData(reg uint8) (val uint16, err error) {
 		return 0, err
 	}
 	if bytesRead != 2 {
-		return 0, fmt.Errorf("Buffer underrun")
+		return 0, fmt.Errorf("buffer underrun")
 	}
 	low, high := bytes[0], bytes[1]
 	return (uint16(high) << 8) | uint16(low), err

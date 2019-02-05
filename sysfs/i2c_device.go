@@ -74,7 +74,7 @@ func (d *i2cDevice) queryFunctionality() (err error) {
 	)
 
 	if errno != 0 {
-		err = fmt.Errorf("Querying functionality failed with syscall.Errno %v", errno)
+		err = fmt.Errorf("querying functionality failed with syscall.Errno %v", errno)
 	}
 	return
 }
@@ -88,7 +88,7 @@ func (d *i2cDevice) SetAddress(address int) (err error) {
 	)
 
 	if errno != 0 {
-		err = fmt.Errorf("Setting address failed with syscall.Errno %v", errno)
+		err = fmt.Errorf("setting address failed with syscall.Errno %v", errno)
 	}
 
 	return
@@ -100,7 +100,7 @@ func (d *i2cDevice) Close() (err error) {
 
 func (d *i2cDevice) ReadByte() (val byte, err error) {
 	if d.funcs&I2C_FUNC_SMBUS_READ_BYTE == 0 {
-		return 0, fmt.Errorf("SMBus read byte not supported")
+		return 0, fmt.Errorf("sMBus read byte not supported")
 	}
 
 	var data uint8
@@ -110,7 +110,7 @@ func (d *i2cDevice) ReadByte() (val byte, err error) {
 
 func (d *i2cDevice) ReadByteData(reg uint8) (val uint8, err error) {
 	if d.funcs&I2C_FUNC_SMBUS_READ_BYTE_DATA == 0 {
-		return 0, fmt.Errorf("SMBus read byte data not supported")
+		return 0, fmt.Errorf("sMBus read byte data not supported")
 	}
 
 	var data uint8
@@ -120,7 +120,7 @@ func (d *i2cDevice) ReadByteData(reg uint8) (val uint8, err error) {
 
 func (d *i2cDevice) ReadWordData(reg uint8) (val uint16, err error) {
 	if d.funcs&I2C_FUNC_SMBUS_READ_WORD_DATA == 0 {
-		return 0, fmt.Errorf("SMBus read word data not supported")
+		return 0, fmt.Errorf("sMBus read word data not supported")
 	}
 
 	var data uint16
@@ -130,7 +130,7 @@ func (d *i2cDevice) ReadWordData(reg uint8) (val uint16, err error) {
 
 func (d *i2cDevice) WriteByte(val byte) (err error) {
 	if d.funcs&I2C_FUNC_SMBUS_WRITE_BYTE == 0 {
-		return fmt.Errorf("SMBus write byte not supported")
+		return fmt.Errorf("sMBus write byte not supported")
 	}
 
 	err = d.smbusAccess(I2C_SMBUS_WRITE, val, I2C_SMBUS_BYTE, uintptr(0))
@@ -139,7 +139,7 @@ func (d *i2cDevice) WriteByte(val byte) (err error) {
 
 func (d *i2cDevice) WriteByteData(reg uint8, val uint8) (err error) {
 	if d.funcs&I2C_FUNC_SMBUS_WRITE_BYTE_DATA == 0 {
-		return fmt.Errorf("SMBus write byte data not supported")
+		return fmt.Errorf("sMBus write byte data not supported")
 	}
 
 	var data = val
@@ -149,7 +149,7 @@ func (d *i2cDevice) WriteByteData(reg uint8, val uint8) (err error) {
 
 func (d *i2cDevice) WriteWordData(reg uint8, val uint16) (err error) {
 	if d.funcs&I2C_FUNC_SMBUS_WRITE_WORD_DATA == 0 {
-		return fmt.Errorf("SMBus write word data not supported")
+		return fmt.Errorf("sMBus write word data not supported")
 	}
 
 	var data = val
@@ -159,7 +159,7 @@ func (d *i2cDevice) WriteWordData(reg uint8, val uint16) (err error) {
 
 func (d *i2cDevice) WriteBlockData(reg uint8, data []byte) (err error) {
 	if len(data) > 32 {
-		return fmt.Errorf("Writing blocks larger than 32 bytes (%v) not supported", len(data))
+		return fmt.Errorf("writing blocks larger than 32 bytes (%v) not supported", len(data))
 	}
 
 	buf := make([]byte, len(data)+1)
@@ -173,7 +173,7 @@ func (d *i2cDevice) WriteBlockData(reg uint8, data []byte) (err error) {
 	}
 
 	if n != len(buf) {
-		return fmt.Errorf("Write to device truncated, %v of %v written", n, len(buf))
+		return fmt.Errorf("write to device truncated, %v of %v written", n, len(buf))
 	}
 
 	return nil
@@ -205,7 +205,7 @@ func (d *i2cDevice) smbusAccess(readWrite byte, command byte, size uint32, data 
 	)
 
 	if errno != 0 {
-		return fmt.Errorf("Failed with syscall.Errno %v", errno)
+		return fmt.Errorf("failed with syscall.Errno %v", errno)
 	}
 
 	return nil

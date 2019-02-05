@@ -244,7 +244,7 @@ func (f *Adaptor) digitalPin(pin int) int {
 // Only supports bus number 0
 func (f *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection, err error) {
 	if bus != 0 {
-		return nil, fmt.Errorf("Invalid bus number %d, only 0 is supported", bus)
+		return nil, fmt.Errorf("invalid bus number %d, only 0 is supported", bus)
 	}
 	err = f.Board.I2cConfig(0)
 	return NewFirmataI2cConnection(f, address), err

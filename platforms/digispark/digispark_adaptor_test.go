@@ -76,7 +76,7 @@ func (l *mock) i2cInit() error {
 
 func (l *mock) i2cStart(address7bit uint8, direction uint8) error {
 	if address7bit != availableI2cAddress {
-		return fmt.Errorf("Invalid address, only %d is supported", availableI2cAddress)
+		return fmt.Errorf("invalid address, only %d is supported", availableI2cAddress)
 	}
 	if err := l.error(); err != nil {
 		return err
@@ -207,7 +207,7 @@ func TestAdaptorI2c(t *testing.T) {
 	gobottest.Assert(t, a.littleWire.(*mock).duration, uint(100))
 	count, err = c.Write(data)
 	gobottest.Assert(t, count, 0)
-	gobottest.Assert(t, err, fmt.Errorf("Invalid address, only %d is supported", availableI2cAddress))
+	gobottest.Assert(t, err, fmt.Errorf("invalid address, only %d is supported", availableI2cAddress))
 	gobottest.Assert(t, a.littleWire.(*mock).direction, maxUint8)
 
 	// connection inits, but start will succeed
