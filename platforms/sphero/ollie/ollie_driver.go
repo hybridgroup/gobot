@@ -14,15 +14,16 @@ import (
 
 // Driver is the Gobot driver for the Sphero Ollie robot
 type Driver struct {
-	name              string
-	connection        gobot.Connection
-	seq               uint8
-	mtx               sync.Mutex
-	collisionResponse []uint8
-	packetChannel     chan *Packet
-	asyncBuffer       []byte
-	asyncMessage      []byte
-	locatorCallback   func(p Point2D)
+	name               string
+	connection         gobot.Connection
+	seq                uint8
+	mtx                sync.Mutex
+	collisionResponse  []uint8
+	packetChannel      chan *Packet
+	asyncBuffer        []byte
+	asyncMessage       []byte
+	locatorCallback    func(p Point2D)
+	powerstateCallback func(p PowerStatePacket)
 	gobot.Eventer
 }
 
@@ -236,6 +237,10 @@ func (b *Driver) HandleResponses(data []byte, e error) {
 		if data[4] == 0x0B && len(data) == 16 {
 			b.handleLocatorDetected(data)
 		}
+
+		if data[4] == 0x09 {
+			b.handlePowerStateDetected(data)
+		}
 	}
 
 	b.handleCollisionDetected(data)
@@ -246,6 +251,13 @@ func (b *Driver) GetLocatorData(f func(p Point2D)) {
 	//CID 0x15 is the code for the locator request
 	b.PacketChannel() <- b.craftPacket([]uint8{}, 0x02, 0x15)
 	b.locatorCallback = f
+}
+
+// GetPowerState calls the passed function with the Power State information from the sphero
+func (b *Driver) GetPowerState(f func(p PowerStatePacket)) {
+	//CID 0x20 is the code for the power state
+	b.PacketChannel() <- b.craftPacket([]uint8{}, 0x00, 0x20)
+	b.powerstateCallback = f
 }
 
 func (b *Driver) handleDataStreaming(data []byte) {
@@ -363,6 +375,15 @@ func (b *Driver) craftPacket(body []uint8, did byte, cid byte) *Packet {
 	packet.Header = []uint8{0xFF, 0xFF, did, cid, b.seq, uint8(dlen)}
 	packet.Checksum = b.calculateChecksum(packet)
 	return packet
+}
+
+func (b *Driver) handlePowerStateDetected(data []uint8) {
+
+	var dataPacket PowerStatePacket
+	buffer := bytes.NewBuffer(data[5:]) // skip header
+	binary.Read(buffer, binary.BigEndian, &dataPacket)
+
+	b.powerstateCallback(dataPacket)
 }
 
 func (b *Driver) handleLocatorDetected(data []uint8) {

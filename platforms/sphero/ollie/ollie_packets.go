@@ -14,6 +14,20 @@ func DefaultCollisionConfig() sphero.CollisionConfig {
 	}
 }
 
+// PowerStatePacket contains all data relevant to the power state of the sphero
+type PowerStatePacket struct {
+	// record Version Code
+	RecVer uint8
+	// High-Level State of the Battery; 1=charging, 2=battery ok, 3=battery low, 4=battery critical
+	PowerState uint8
+	// Battery Voltage, scaled in 100th of a Volt, 0x02EF would be 7.51 volts
+	BattVoltage uint16
+	// Number of charges in the total lifetime of the sphero
+	NumCharges uint16
+	//Seconds awake since last charge
+	TimeSinceChg uint16
+}
+
 // DataStreamingPacket represents the response from a Data Streaming event
 type DataStreamingPacket struct {
 	// 8000 0000h	accelerometer axis X, raw	-2048 to 2047	4mG
