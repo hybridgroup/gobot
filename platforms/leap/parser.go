@@ -4,27 +4,37 @@ import (
 	"encoding/json"
 )
 
-// Gesture is a Leap Motion gesture tht has been detected
+// Gesture is a Leap Motion gesture that has been detected
 type Gesture struct {
+	Center        []float64   `json:"center"`
 	Direction     []float64   `json:"direction"`
 	Duration      int         `json:"duration"`
-	Hands         []Hand      `json:"hands"`
+	HandIDs       []int       `json:"handIds"`
 	ID            int         `json:"id"`
-	Pointables    []Pointable `json:"pointables"`
+	Normal        []float64   `json:"normal"`
+	PointableIDs  []int       `json:"pointableIds"`
 	Position      []float64   `json:"position"`
+	Progress      float64     `json:"progress"`
+	Radius        float64     `json:"radius"`
 	Speed         float64     `json:"speed"`
 	StartPosition []float64   `json:"StartPosition"`
 	State         string      `json:"state"`
 	Type          string      `json:"type"`
 }
 
-// Hand is a Leap Motion hand tht has been detected
+// Hand is a Leap Motion hand that has been detected
 type Hand struct {
+	ArmBasis               [][]float64 `json:"armBasis"`
+	ArmWidth               float64     `json:"armWidth"`
+	Confidence             float64     `json:"confidence"`
 	Direction              []float64   `json:"direction"`
+	Elbow                  []float64   `json:"elbow"`
+	GrabStrength           float64     `json:"grabStrength"`
 	ID                     int         `json:"id"`
 	PalmNormal             []float64   `json:"palmNormal"`
 	PalmPosition           []float64   `json:"PalmPosition"`
 	PalmVelocity           []float64   `json:"PalmVelocity"`
+	PinchStrength          float64     `json:"PinchStrength"`
 	R                      [][]float64 `json:"r"`
 	S                      float64     `json:"s"`
 	SphereCenter           []float64   `json:"sphereCenter"`
@@ -32,26 +42,37 @@ type Hand struct {
 	StabilizedPalmPosition []float64   `json:"stabilizedPalmPosition"`
 	T                      []float64   `json:"t"`
 	TimeVisible            float64     `json:"TimeVisible"`
+	Type                   string      `json:"type"`
+	Wrist                  []float64   `json:"wrist"`
 }
 
-// Pointable is a Leap Motion pointing motion tht has been detected
+// Pointable is a Leap Motion pointing motion that has been detected
 type Pointable struct {
-	Direction             []float64 `json:"direction"`
-	HandID                int       `json:"handId"`
-	ID                    int       `json:"id"`
-	Length                float64   `json:"length"`
-	StabilizedTipPosition []float64 `json:"stabilizedTipPosition"`
-	TimeVisible           float64   `json:"timeVisible"`
-	TipPosition           []float64 `json:"tipPosition"`
-	TipVelocity           []float64 `json:"tipVelocity"`
-	Tool                  bool      `json:"tool"`
-	TouchDistance         float64   `json:"touchDistance"`
-	TouchZone             string    `json:"touchZone"`
+	Bases                 [][][]float64  `json:"bases"`
+	BTipPosition          []float64    `json:"btipPosition"`
+	CarpPosition          []float64    `json:"carpPosition"`
+	DipPosition           []float64    `json:"dipPosition"`
+	Direction             []float64    `json:"direction"`
+	Extended              bool         `json:"extended"`
+	HandID                int          `json:"handId"`
+	ID                    int          `json:"id"`
+	Length                float64      `json:"length"`
+	MCPPosition           []float64    `json:"mcpPosition"`
+	PIPPosition           []float64    `json:"pipPosition"`
+	StabilizedTipPosition []float64    `json:"stabilizedTipPosition"`
+	TimeVisible           float64      `json:"timeVisible"`
+	TipPosition           []float64    `json:"tipPosition"`
+	TipVelocity           []float64    `json:"tipVelocity"`
+	Tool                  bool         `json:"tool"`
+	TouchDistance         float64      `json:"touchDistance"`
+	TouchZone             string       `json:"touchZone"`
+	Type                  int          `json:"type"`
+	Width                 float64      `json:"width"`
 }
 
 // InteractionBox is the area within which the gestural interaction has been detected
 type InteractionBox struct {
-	Center []int     `json:"center"`
+	Center []float64 `json:"center"`
 	Size   []float64 `json:"size"`
 }
 
