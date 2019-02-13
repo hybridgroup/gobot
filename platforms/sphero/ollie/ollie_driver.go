@@ -14,12 +14,16 @@ import (
 
 // Driver is the Gobot driver for the Sphero Ollie robot
 type Driver struct {
-	name              string
-	connection        gobot.Connection
-	seq               uint8
-	mtx               sync.Mutex
-	collisionResponse []uint8
-	packetChannel     chan *packet
+	name               string
+	connection         gobot.Connection
+	seq                uint8
+	mtx                sync.Mutex
+	collisionResponse  []uint8
+	packetChannel      chan *Packet
+	asyncBuffer        []byte
+	asyncMessage       []byte
+	locatorCallback    func(p Point2D)
+	powerstateCallback func(p PowerStatePacket)
 	gobot.Eventer
 }
 
@@ -57,6 +61,7 @@ const (
 	CollisionResponseSize = PacketHeaderSize + CollisionDataSize
 )
 
+// MotorModes is used to configure the motor
 type MotorModes uint8
 
 // MotorModes required for SetRawMotorValues command
@@ -68,10 +73,17 @@ const (
 	Ignore
 )
 
-type packet struct {
-	header   []uint8
-	body     []uint8
-	checksum uint8
+// Packet describes head, body and checksum for a data package to be sent to the sphero.
+type Packet struct {
+	Header   []uint8
+	Body     []uint8
+	Checksum uint8
+}
+
+// Point2D represents a koordinate in 2-Dimensional space
+type Point2D struct {
+	X int16
+	Y int16
 }
 
 // NewDriver creates a Driver for a Sphero Ollie
@@ -80,13 +92,19 @@ func NewDriver(a ble.BLEConnector) *Driver {
 		name:          gobot.DefaultName("Ollie"),
 		connection:    a,
 		Eventer:       gobot.NewEventer(),
-		packetChannel: make(chan *packet, 1024),
+		packetChannel: make(chan *Packet, 1024),
 	}
 
 	n.AddEvent(Collision)
 
 	return n
 }
+
+// PacketChannel returns the channel for packets to be sent to the sp
+func (b *Driver) PacketChannel() chan *Packet { return b.packetChannel }
+
+// Sequence returns the Sequence number of the current packet
+func (b *Driver) Sequence() uint8 { return b.seq }
 
 // Connection returns the connection to this Ollie
 func (b *Driver) Connection() gobot.Connection { return b.connection }
@@ -191,9 +209,70 @@ func (b *Driver) SetTXPower(level int) (err error) {
 
 // HandleResponses handles responses returned from Ollie
 func (b *Driver) HandleResponses(data []byte, e error) {
-	//fmt.Println("response data:", data, e)
+
+	//since packets can only be 20 bytes long, we have to puzzle them together
+	newMessage := false
+
+	//append message parts to existing
+	if len(data) > 0 && data[0] != 0xFF {
+		b.asyncBuffer = append(b.asyncBuffer, data...)
+	}
+
+	//clear message when new one begins (first byte is always 0xFF)
+	if len(data) > 0 && data[0] == 0xFF {
+		b.asyncMessage = b.asyncBuffer
+		b.asyncBuffer = data
+		newMessage = true
+	}
+
+	parts := b.asyncMessage
+	//3 is the id of data streaming, located at index 2 byte
+	if newMessage && len(parts) > 2 && parts[2] == 3 {
+		b.handleDataStreaming(parts)
+	}
+
+	//index 1 is the type of the message, 0xFF being a direct response, 0xFE an asynchronous message
+	if len(data) > 4 && data[1] == 0xFF && data[0] == 0xFF {
+		//locator request
+		if data[4] == 0x0B && len(data) == 16 {
+			b.handleLocatorDetected(data)
+		}
+
+		if data[4] == 0x09 {
+			b.handlePowerStateDetected(data)
+		}
+	}
 
 	b.handleCollisionDetected(data)
+}
+
+// GetLocatorData calls the passed function with the data from the locator
+func (b *Driver) GetLocatorData(f func(p Point2D)) {
+	//CID 0x15 is the code for the locator request
+	b.PacketChannel() <- b.craftPacket([]uint8{}, 0x02, 0x15)
+	b.locatorCallback = f
+}
+
+// GetPowerState calls the passed function with the Power State information from the sphero
+func (b *Driver) GetPowerState(f func(p PowerStatePacket)) {
+	//CID 0x20 is the code for the power state
+	b.PacketChannel() <- b.craftPacket([]uint8{}, 0x00, 0x20)
+	b.powerstateCallback = f
+}
+
+func (b *Driver) handleDataStreaming(data []byte) {
+	// ensure data is the right length:
+	if len(data) != 88 {
+		return
+	}
+
+	//data packet is the same as for the normal sphero, since the same communication api is used
+	//only difference in communication is that the "newer" spheros use BLE for communinations
+	var dataPacket DataStreamingPacket
+	buffer := bytes.NewBuffer(data[5:]) // skip header
+	binary.Read(buffer, binary.BigEndian, &dataPacket)
+
+	b.Publish(SensorData, dataPacket)
 }
 
 // SetRGB sets the Ollie to the given r, g, and b values
@@ -264,9 +343,16 @@ func (b *Driver) ConfigureCollisionDetection(cc sphero.CollisionConfig) {
 	b.packetChannel <- b.craftPacket([]uint8{cc.Method, cc.Xt, cc.Yt, cc.Xs, cc.Ys, cc.Dead}, 0x02, 0x12)
 }
 
-func (b *Driver) write(packet *packet) (err error) {
-	buf := append(packet.header, packet.body...)
-	buf = append(buf, packet.checksum)
+//SetDataStreamingConfig passes the config to the sphero to stream sensor data
+func (b *Driver) SetDataStreamingConfig(d sphero.DataStreamingConfig) {
+	buf := new(bytes.Buffer)
+	binary.Write(buf, binary.BigEndian, d)
+	b.PacketChannel() <- b.craftPacket(buf.Bytes(), 0x02, 0x11)
+}
+
+func (b *Driver) write(packet *Packet) (err error) {
+	buf := append(packet.Header, packet.Body...)
+	buf = append(buf, packet.Checksum)
 	err = b.adaptor().WriteCharacteristic(commandsCharacteristic, buf)
 	if err != nil {
 		fmt.Println("send command error:", err)
@@ -279,16 +365,55 @@ func (b *Driver) write(packet *packet) (err error) {
 	return
 }
 
-func (b *Driver) craftPacket(body []uint8, did byte, cid byte) *packet {
+func (b *Driver) craftPacket(body []uint8, did byte, cid byte) *Packet {
 	b.mtx.Lock()
 	defer b.mtx.Unlock()
 
-	packet := new(packet)
-	packet.body = body
-	dlen := len(packet.body) + 1
-	packet.header = []uint8{0xFF, 0xFF, did, cid, b.seq, uint8(dlen)}
-	packet.checksum = b.calculateChecksum(packet)
+	packet := new(Packet)
+	packet.Body = body
+	dlen := len(packet.Body) + 1
+	packet.Header = []uint8{0xFF, 0xFF, did, cid, b.seq, uint8(dlen)}
+	packet.Checksum = b.calculateChecksum(packet)
 	return packet
+}
+
+func (b *Driver) handlePowerStateDetected(data []uint8) {
+
+	var dataPacket PowerStatePacket
+	buffer := bytes.NewBuffer(data[5:]) // skip header
+	binary.Read(buffer, binary.BigEndian, &dataPacket)
+
+	b.powerstateCallback(dataPacket)
+}
+
+func (b *Driver) handleLocatorDetected(data []uint8) {
+	//read the unsigned raw values
+	ux := binary.BigEndian.Uint16(data[5:7])
+	uy := binary.BigEndian.Uint16(data[7:9])
+
+	//convert to signed values
+	var x, y int16
+
+	if ux > 32255 {
+		x = int16(ux - 65535)
+	} else {
+		x = int16(ux)
+	}
+
+	if uy > 32255 {
+		y = int16(uy - 65535)
+	} else {
+		y = int16(uy)
+	}
+
+	//create point obj
+	p := new(Point2D)
+	p.X = x
+	p.Y = y
+
+	if b.locatorCallback != nil {
+		b.locatorCallback(*p)
+	}
 }
 
 func (b *Driver) handleCollisionDetected(data []uint8) {
@@ -335,8 +460,8 @@ func (b *Driver) handleCollisionDetected(data []uint8) {
 	b.Publish(Collision, collision)
 }
 
-func (b *Driver) calculateChecksum(packet *packet) uint8 {
-	buf := append(packet.header, packet.body...)
+func (b *Driver) calculateChecksum(packet *Packet) uint8 {
+	buf := append(packet.Header, packet.Body...)
 	return calculateChecksum(buf[2:])
 }
 
