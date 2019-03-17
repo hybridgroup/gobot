@@ -151,17 +151,10 @@
   digest = "1:f04a78a43f55f089c919beee8ec4a1495dee1bd271548da2cb44bf44699a6a61"
   name = "github.com/nats-io/go-nats"
   packages = [
+    ".",
     "encoders/builtin",
     "util",
   ]
-  pruneopts = ""
-  revision = "fb0396ee0bdb8018b0fef30d6d1de798ce99cd05"
-  version = "v1.6.0"
-
-[[projects]]
-  digest = "1:f04a78a43f55f089c919beee8ec4a1495dee1bd271548da2cb44bf44699a6a61"
-  name = "github.com/nats-io/nats"
-  packages = ["."]
   pruneopts = ""
   revision = "fb0396ee0bdb8018b0fef30d6d1de798ce99cd05"
   version = "v1.6.0"
@@ -316,7 +309,7 @@
     "github.com/hashicorp/go-multierror",
     "github.com/hybridgroup/go-ardrone/client",
     "github.com/hybridgroup/mjpeg",
-    "github.com/nats-io/nats",
+    "github.com/nats-io/go-nats",
     "github.com/pkg/errors",
     "github.com/sigurn/crc8",
     "github.com/stretchr/testify/assert",
