@@ -127,17 +127,17 @@ func (p *PCA9685Driver) Halt() (err error) {
 // Most typically you set "on" to a zero value, and then set "off" to your desired duty.
 //
 func (p *PCA9685Driver) SetPWM(channel int, on uint16, off uint16) (err error) {
-	if _, err_on_l := p.connection.Write([]byte{byte(PCA9685_LED0_ON_L + 4*channel), byte(on)}); err_on_l != nil {
-		return err_on_l
+	if _, err := p.connection.Write([]byte{byte(PCA9685_LED0_ON_L + 4*channel), byte(on)}); err != nil {
+		return err
 	}
-	if _, err_on_h := p.connection.Write([]byte{byte(PCA9685_LED0_ON_H + 4*channel), byte(on >> 8)}); err_on_h != nil {
-		return err_on_h
+	if _, err := p.connection.Write([]byte{byte(PCA9685_LED0_ON_H + 4*channel), byte(on >> 8)}); err != nil {
+		return err
 	}
-	if _, err_off_l := p.connection.Write([]byte{byte(PCA9685_LED0_OFF_L + 4*channel), byte(off)}); err_off_l != nil {
-		return err_off_l
+	if _, err := p.connection.Write([]byte{byte(PCA9685_LED0_OFF_L + 4*channel), byte(off)}); err != nil {
+		return err
 	}
-	if _, err_off_h := p.connection.Write([]byte{byte(PCA9685_LED0_OFF_H + 4*channel), byte(off >> 8)}); err_off_h != nil {
-		return err_off_h
+	if _, err := p.connection.Write([]byte{byte(PCA9685_LED0_OFF_H + 4*channel), byte(off >> 8)}); err != nil {
+		return err
 	}
 	return nil
 }
