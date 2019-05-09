@@ -14,7 +14,14 @@ type APA102Driver struct {
 	Config
 	gobot.Commander
 
-	vals []color.RGBA
+	vals       []Color
+	brightness int
+}
+
+// Color embeds an additional brightness field.
+type Color struct {
+	color.RGBA
+	Brightness int
 }
 
 // NewAPA102Driver creates a new Gobot Driver for APA102 RGB LEDs.
@@ -31,12 +38,13 @@ type APA102Driver struct {
 //      spi.WithBits(int):    	number of bits to use with this driver.
 //      spi.WithSpeed(int64):   speed in Hz to use with this driver.
 //
-func NewAPA102Driver(a Connector, count int, options ...func(Config)) *APA102Driver {
+func NewAPA102Driver(a Connector, count int, bright int, options ...func(Config)) *APA102Driver {
 	d := &APA102Driver{
-		name:      gobot.DefaultName("APA102"),
-		connector: a,
-		vals:      make([]color.RGBA, count),
-		Config:    NewConfig(),
+		name:       gobot.DefaultName("APA102"),
+		connector:  a,
+		vals:       make([]Color, count),
+		brightness: bright,
+		Config:     NewConfig(),
 	}
 	for _, option := range options {
 		option(d)
@@ -77,7 +85,7 @@ func (d *APA102Driver) Halt() (err error) {
 // SetRGBA sets the ith LED's color to the given RGBA value.
 // A subsequent call to Draw is required to transmit values
 // to the LED strip.
-func (d *APA102Driver) SetRGBA(i int, v color.RGBA) {
+func (d *APA102Driver) SetRGBA(i int, v Color) {
 	d.vals[i] = v
 }
 
@@ -94,10 +102,14 @@ func (d *APA102Driver) Draw() error {
 
 	for i, c := range d.vals {
 		j := (i + 1) * 4
-		tx[j] = 0xe0 + byte(c.R)
-		tx[j+1] = byte(c.B)
-		tx[j+2] = byte(c.G)
-		tx[j+3] = byte(c.R)
+		if c.Brightness != 0 {
+			tx[j] = 0xe0 + byte(c.Brightness)
+		} else {
+			tx[j] = 0xe0 + byte(d.brightness)
+		}
+		tx[j+1] = c.B
+		tx[j+2] = c.G
+		tx[j+3] = c.R
 	}
 
 	// end frame with at least n/2 0xff vals
