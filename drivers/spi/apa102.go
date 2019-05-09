@@ -6,7 +6,7 @@ import (
 	"gobot.io/x/gobot"
 )
 
-// APA102Driver is a driver for the APA102 programmable RGB LEDs
+// APA102Driver is a driver for the APA102 programmable RGB LEDs.
 type APA102Driver struct {
 	name       string
 	connector  Connector
@@ -20,15 +20,16 @@ type APA102Driver struct {
 // NewAPA102Driver creates a new Gobot Driver for APA102 RGB LEDs.
 //
 // Params:
-//      a *Adaptor - the Adaptor to use with this Driver
-//		count int - how many LEDs are in the array controlled by this driver
+//      a *Adaptor - the Adaptor to use with this Driver.
+//      count int - how many LEDs are in the array controlled by this driver.
+//      bright - the default brightness to apply for all LEDs (must be between 0 and 31).
 //
 // Optional params:
-//      spi.WithBus(int):    	bus to use with this driver
-//     	spi.WithChip(int):    	chip to use with this driver
-//      spi.WithMode(int):    	mode to use with this driver
-//      spi.WithBits(int):    	number of bits to use with this driver
-//      spi.WithSpeed(int64):   speed in Hz to use with this driver
+//      spi.WithBus(int):    	  bus to use with this driver.
+//      spi.WithChip(int):    	chip to use with this driver.
+//      spi.WithMode(int):    	mode to use with this driver.
+//      spi.WithBits(int):    	number of bits to use with this driver.
+//      spi.WithSpeed(int64):   speed in Hz to use with this driver.
 //
 func NewAPA102Driver(a Connector, count int, options ...func(Config)) *APA102Driver {
 	d := &APA102Driver{
