@@ -2,6 +2,7 @@ package spi
 
 import (
 	"image/color"
+	"math"
 
 	"gobot.io/x/gobot"
 )
@@ -14,14 +15,8 @@ type APA102Driver struct {
 	Config
 	gobot.Commander
 
-	vals       []Color
-	brightness int
-}
-
-// Color embeds an additional brightness field.
-type Color struct {
-	color.RGBA
-	Brightness int
+	vals       []color.RGBA
+	brightness uint8
 }
 
 // NewAPA102Driver creates a new Gobot Driver for APA102 RGB LEDs.
@@ -38,12 +33,12 @@ type Color struct {
 //      spi.WithBits(int):    	number of bits to use with this driver.
 //      spi.WithSpeed(int64):   speed in Hz to use with this driver.
 //
-func NewAPA102Driver(a Connector, count int, bright int, options ...func(Config)) *APA102Driver {
+func NewAPA102Driver(a Connector, count int, bright uint8, options ...func(Config)) *APA102Driver {
 	d := &APA102Driver{
 		name:       gobot.DefaultName("APA102"),
 		connector:  a,
-		vals:       make([]Color, count),
-		brightness: bright,
+		vals:       make([]color.RGBA, count),
+		brightness: uint8(math.Min(float64(bright), 31)),
 		Config:     NewConfig(),
 	}
 	for _, option := range options {
@@ -85,8 +80,19 @@ func (d *APA102Driver) Halt() (err error) {
 // SetRGBA sets the ith LED's color to the given RGBA value.
 // A subsequent call to Draw is required to transmit values
 // to the LED strip.
-func (d *APA102Driver) SetRGBA(i int, v Color) {
+func (d *APA102Driver) SetRGBA(i int, v color.RGBA) {
 	d.vals[i] = v
+}
+
+// SetBrightness sets the ith LED's brightness to the given value.
+// Must be between 0 and 31.
+func (d *APA102Driver) SetBrightness(i uint8) {
+	d.brightness = uint8(math.Min(float64(i), 31))
+}
+
+// Brightness return driver brightness value.
+func (d *APA102Driver) Brightness() uint8 {
+	return d.brightness
 }
 
 // Draw displays the RGBA values set on the actual LED strip.
@@ -102,8 +108,8 @@ func (d *APA102Driver) Draw() error {
 
 	for i, c := range d.vals {
 		j := (i + 1) * 4
-		if c.Brightness != 0 {
-			tx[j] = 0xe0 + byte(c.Brightness)
+		if c.A != 0 {
+			tx[j] = 0xe0 + byte(math.Min(float64(c.A), 31))
 		} else {
 			tx[j] = 0xe0 + byte(d.brightness)
 		}

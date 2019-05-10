@@ -30,10 +30,10 @@ func TestDriverLEDs(t *testing.T) {
 	d := initTestDriver()
 	d.Start()
 
-	d.SetRGBA(0, Color{color.RGBA{255, 255, 255, 0}, 15})
-	d.SetRGBA(1, Color{color.RGBA{255, 255, 255, 0}, 15})
-	d.SetRGBA(2, Color{color.RGBA{255, 255, 255, 0}, 15})
-	d.SetRGBA(3, Color{color.RGBA{255, 255, 255, 0}, 15})
+	d.SetRGBA(0, color.RGBA{255, 255, 255, 15})
+	d.SetRGBA(1, color.RGBA{255, 255, 255, 15})
+	d.SetRGBA(2, color.RGBA{255, 255, 255, 15})
+	d.SetRGBA(3, color.RGBA{255, 255, 255, 15})
 
 	gobottest.Assert(t, d.Draw(), nil)
 }
