@@ -27,12 +27,12 @@ const (
 	ssd1306SetComOutput8 = 0xC8
 	ssd1306SetContrast   = 0x81
 	// scrolling commands
-	ssd1306ContinuousHScrollRight  = 0x26
-	ssd1306ContinuousHScrollLeft   = 0x27
-	ssd1306ContinuousVHScrollRight = 0x29
-	ssd1306ContinuousVHScrollLeft  = 0x2A
-	ssd1306StopScroll              = 0x2E
-	ssd1306StartScroll             = 0x2F
+	// ssd1306ContinuousHScrollRight  = 0x26
+	// ssd1306ContinuousHScrollLeft   = 0x27
+	// ssd1306ContinuousVHScrollRight = 0x29
+	// ssd1306ContinuousVHScrollLeft  = 0x2A
+	// ssd1306StopScroll              = 0x2E
+	// ssd1306StartScroll             = 0x2F
 	// adressing settings commands
 	ssd1306SetMemoryAddressingMode = 0x20
 	ssd1306ColumnAddr              = 0x21

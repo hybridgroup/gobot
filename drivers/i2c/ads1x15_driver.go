@@ -212,7 +212,7 @@ func (d *ADS1x15Driver) BestGainForVoltage(voltage float64) (bestGain int, err e
 	}
 
 	if currentBestGain < 0 {
-		err = fmt.Errorf("The maximum voltage which can be read is %f", max)
+		err = fmt.Errorf("the maximum voltage which can be read is %f", max)
 		return
 	}
 
@@ -271,19 +271,15 @@ func (d *ADS1x15Driver) AnalogRead(pin string) (value int, err error) {
 	case "0-1":
 		useDifference = true
 		channel = 0
-		break
 	case "0-3":
 		useDifference = true
 		channel = 1
-		break
 	case "1-3":
 		useDifference = true
 		channel = 2
-		break
 	case "2-3":
 		useDifference = true
 		channel = 3
-		break
 	}
 
 	if useDifference {
@@ -315,7 +311,7 @@ func (d *ADS1x15Driver) rawRead(mux int, gain int, dataRate int) (value float64,
 	gainConf, ok := d.gainConfig[gain]
 
 	if !ok {
-		err = errors.New("Gain must be one of: 2/3, 1, 2, 4, 8, 16")
+		err = errors.New("gain must be one of: 2/3, 1, 2, 4, 8, 16")
 		return
 	}
 	config |= gainConf
@@ -331,7 +327,7 @@ func (d *ADS1x15Driver) rawRead(mux int, gain int, dataRate int) (value float64,
 			keys = append(keys, k)
 		}
 
-		err = fmt.Errorf("Invalid data rate. Accepted values: %d", keys)
+		err = fmt.Errorf("invalid data rate. Accepted values: %d", keys)
 		return
 	}
 	// Set the data rate (this is controlled by the subclass as it differs
@@ -363,7 +359,7 @@ func (d *ADS1x15Driver) rawRead(mux int, gain int, dataRate int) (value float64,
 	voltageMultiplier, ok := d.gainVoltage[gain]
 
 	if !ok {
-		err = errors.New("Gain must be one of: 2/3, 1, 2, 4, 8, 16")
+		err = errors.New("gain must be one of: 2/3, 1, 2, 4, 8, 16")
 		return
 	}
 
@@ -374,7 +370,7 @@ func (d *ADS1x15Driver) rawRead(mux int, gain int, dataRate int) (value float64,
 
 func (d *ADS1x15Driver) checkChannel(channel int) (err error) {
 	if channel < 0 || channel > 3 {
-		err = errors.New("Invalid channel, must be between 0 and 3")
+		err = errors.New("invalid channel, must be between 0 and 3")
 	}
 	return
 }

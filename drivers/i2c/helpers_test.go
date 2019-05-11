@@ -12,14 +12,6 @@ var rgb = map[string]interface{}{
 	"blue":  1.0,
 }
 
-func castColor(color string) byte {
-	return byte(rgb[color].(float64))
-}
-
-var red = castColor("red")
-var green = castColor("green")
-var blue = castColor("blue")
-
 type i2cTestAdaptor struct {
 	name          string
 	written       []byte

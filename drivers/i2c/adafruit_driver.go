@@ -327,7 +327,7 @@ func (a *AdafruitMotorHatDriver) setPin(conn Connection, pin byte, value int32) 
 	if value == 1 {
 		return a.setPWM(conn, pin, 4096, 0)
 	}
-	return errors.New("Invalid pin")
+	return errors.New("invalid pin")
 }
 
 // SetDCMotorSpeed will set the appropriate pins to run the specified DC motor

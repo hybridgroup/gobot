@@ -49,7 +49,6 @@ type INA3221Driver struct {
 	connector  Connector
 	connection Connection
 	Config
-	halt chan bool
 }
 
 // NewINA3221Driver creates a new driver with the specified i2c interface.

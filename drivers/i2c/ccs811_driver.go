@@ -13,11 +13,11 @@ type CCS811DriveMode uint8
 
 // Operating modes which dictate how often measurements are being made. If 0x00 is used as an operating mode, measurements will be disabled
 const (
-	CCS811DriveModeIdle  CCS811DriveMode = 0x00
-	CCS811DriveMode1Sec                  = 0x01
-	CCS811DriveMode10Sec                 = 0x02
-	CCS811DriveMode60Sec                 = 0x03
-	CCS811DriveMode250MS                 = 0x04
+	CCS811DriveModeIdle CCS811DriveMode = iota
+	CCS811DriveMode1Sec
+	CCS811DriveMode10Sec
+	CCS811DriveMode60Sec
+	CCS811DriveMode250MS
 )
 
 const (
@@ -33,9 +33,9 @@ const (
 	//This multi-byte read only register contains the calculated eCO2 (ppm) and eTVOC (ppb) values followed by the STATUS register, ERROR_ID register and the RAW_DATA register.
 	ccs811RegAlgResultData = 0x02
 	//Two byte read only register which contains the latest readings from the sensor.
-	ccs811RegRawData = 0x03
+	// ccs811RegRawData = 0x03
 	//A multi-byte register that can be written with the current Humidity and Temperature values if known.
-	ccs811RegEnvData = 0x05
+	// ccs811RegEnvData = 0x05
 	//Register that holds the NTC value used for temperature calcualtions
 	ccs811RegNtc = 0x06
 	//Asserting the SW_RESET will restart the CCS811 in Boot mode to enable new application firmware to be downloaded.
@@ -309,27 +309,27 @@ func (d *CCS811Driver) startApp() error {
 func (d *CCS811Driver) initialize() error {
 	deviceID, err := d.connection.ReadByteData(ccs811RegHwID)
 	if err != nil {
-		return fmt.Errorf("Failed to get the device id from ccs811RegHwID with error: %s", err.Error())
+		return fmt.Errorf("failed to get the device id from ccs811RegHwID with error: %s", err.Error())
 	}
 
 	// Verify that the connected device is the CCS811 sensor
 	if deviceID != ccs811HwIDCode {
-		return fmt.Errorf("The fetched device id %d is not the known id %d with error", deviceID, ccs811HwIDCode)
+		return fmt.Errorf("the fetched device id %d is not the known id %d with error", deviceID, ccs811HwIDCode)
 	}
 
 	if err := d.resetDevice(); err != nil {
-		return fmt.Errorf("Was not able to reset the device with error: %s", err.Error())
+		return fmt.Errorf("was not able to reset the device with error: %s", err.Error())
 	}
 
 	// Required sleep to allow device to switch states
 	time.Sleep(100 * time.Millisecond)
 
 	if err := d.startApp(); err != nil {
-		return fmt.Errorf("Failed to start app code with error: %s", err.Error())
+		return fmt.Errorf("failed to start app code with error: %s", err.Error())
 	}
 
 	if err := d.updateMeasMode(); err != nil {
-		return fmt.Errorf("Failed to update the measMode register with error: %s", err.Error())
+		return fmt.Errorf("failed to update the measMode register with error: %s", err.Error())
 	}
 
 	return nil

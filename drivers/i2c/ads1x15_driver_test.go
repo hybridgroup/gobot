@@ -22,11 +22,6 @@ func initTestADS1015Driver() (driver *ADS1x15Driver) {
 	return
 }
 
-func initTestADS1115Driver() (driver *ADS1x15Driver) {
-	driver, _ = initTestADS1115DriverWithStubbedAdaptor()
-	return
-}
-
 func initTestADS1015DriverWithStubbedAdaptor() (*ADS1x15Driver, *i2cTestAdaptor) {
 	adaptor := newI2cTestAdaptor()
 	return NewADS1015Driver(adaptor), adaptor
@@ -125,7 +120,7 @@ func TestADS1015DriverAnalogRead(t *testing.T) {
 	gobottest.Assert(t, val, 1022)
 	gobottest.Assert(t, err, nil)
 
-	val, err = d.AnalogRead("3-2")
+	_, err = d.AnalogRead("3-2")
 	gobottest.Refute(t, err.Error(), nil)
 }
 
@@ -170,7 +165,7 @@ func TestADS1115DriverAnalogRead(t *testing.T) {
 	gobottest.Assert(t, val, 1022)
 	gobottest.Assert(t, err, nil)
 
-	val, err = d.AnalogRead("3-2")
+	_, err = d.AnalogRead("3-2")
 	gobottest.Refute(t, err.Error(), nil)
 }
 
@@ -216,8 +211,9 @@ func TestADS1x15DriverBestGainForVoltage(t *testing.T) {
 
 	g, err := d.BestGainForVoltage(1.5)
 	gobottest.Assert(t, g, 2)
+	gobottest.Assert(t, err, nil)
 
-	g, err = d.BestGainForVoltage(20.0)
+	_, err = d.BestGainForVoltage(20.0)
 	gobottest.Assert(t, err, errors.New("The maximum voltage which can be read is 6.144000"))
 }
 

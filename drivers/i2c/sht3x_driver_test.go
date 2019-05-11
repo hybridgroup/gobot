@@ -231,7 +231,7 @@ func TestSHT3xDriverHeater(t *testing.T) {
 		return 3, nil
 	}
 
-	status, err = sht3x.Heater()
+	_, err = sht3x.Heater()
 	gobottest.Assert(t, err, ErrInvalidCrc)
 
 	// heater read failed
@@ -240,7 +240,7 @@ func TestSHT3xDriverHeater(t *testing.T) {
 		return 2, nil
 	}
 
-	status, err = sht3x.Heater()
+	_, err = sht3x.Heater()
 	gobottest.Refute(t, err, nil)
 }
 

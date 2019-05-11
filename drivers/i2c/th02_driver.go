@@ -54,8 +54,6 @@ type TH02Driver struct {
 	addr     byte
 	accuracy byte
 	heating  bool
-
-	delay time.Duration
 }
 
 // NewTH02Driver creates a new driver with specified i2c interface.

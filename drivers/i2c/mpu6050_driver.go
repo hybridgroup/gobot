@@ -3,7 +3,6 @@ package i2c
 import (
 	"bytes"
 	"encoding/binary"
-	"time"
 
 	"gobot.io/x/gobot"
 )
@@ -38,7 +37,6 @@ type MPU6050Driver struct {
 	connector  Connector
 	connection Connection
 	Config
-	interval      time.Duration
 	Accelerometer ThreeDData
 	Gyroscope     ThreeDData
 	Temperature   int16

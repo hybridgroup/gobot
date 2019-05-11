@@ -387,7 +387,7 @@ func (d *TSL2561Driver) CalculateLux(broadband uint16, ir uint16) (lux uint32) {
 	ratio := (ratio1 + 1) / 2
 
 	b, m := d.getBM(ratio)
-	temp := (channel0 * b) - (channel1 * m)
+	temp := int64(channel0*b) - int64(channel1*m)
 
 	// Negative lux not allowed
 	if temp < 0 {
@@ -398,7 +398,7 @@ func (d *TSL2561Driver) CalculateLux(broadband uint16, ir uint16) (lux uint32) {
 	temp += (1 << (tsl2561LuxLuxScale - 1))
 
 	// Strip off fractional portion
-	lux = temp >> tsl2561LuxLuxScale
+	lux = uint32(temp) >> tsl2561LuxLuxScale
 
 	return lux
 }
@@ -469,7 +469,7 @@ func (d *TSL2561Driver) getClipScaling() (clipThreshold uint16, chScale uint32) 
 
 func (d *TSL2561Driver) getBM(ratio uint32) (b uint32, m uint32) {
 	switch {
-	case (ratio >= 0) && (ratio <= tsl2561LuxK1T):
+	case ratio <= tsl2561LuxK1T:
 		b = tsl2561LuxB1T
 		m = tsl2561LuxM1T
 	case (ratio <= tsl2561LuxK2T):
@@ -506,5 +506,4 @@ func (d *TSL2561Driver) waitForADC() {
 	case TSL2561IntegrationTime402MS:
 		time.Sleep(450 * time.Millisecond)
 	}
-	return
 }

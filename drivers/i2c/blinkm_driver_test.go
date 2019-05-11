@@ -150,7 +150,7 @@ func TestBlinkMDriverFirmwareVersion(t *testing.T) {
 		return 0, errors.New("write error")
 	}
 
-	version, err := blinkM.FirmwareVersion()
+	_, err := blinkM.FirmwareVersion()
 	gobottest.Assert(t, err, errors.New("write error"))
 }
 
@@ -181,9 +181,8 @@ func TestBlinkMDriverColor(t *testing.T) {
 		return 0, errors.New("write error")
 	}
 
-	color, err := blinkM.Color()
+	_, err := blinkM.Color()
 	gobottest.Assert(t, err, errors.New("write error"))
-
 }
 
 func TestBlinkMDriverFade(t *testing.T) {

@@ -191,10 +191,8 @@ func TestWiichuckDriverUpdateJoystick(t *testing.T) {
 }
 
 func TestWiichuckDriverEncrypted(t *testing.T) {
-	wii := initTestWiichuckDriver()
-
 	// ------ When value is encrypted
-	wii = initTestWiichuckDriver()
+	wii := initTestWiichuckDriver()
 	encryptedValue := []byte{1, 1, 2, 2, 3, 3}
 
 	wii.update(encryptedValue)

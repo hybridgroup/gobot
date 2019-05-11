@@ -156,12 +156,14 @@ func (d *GrovePiDriver) DigitalWrite(pin string, val byte) (err error) {
 // WriteAnalog writes PWM aka analog to the GrovePi. Not yet working.
 func (d *GrovePiDriver) WriteAnalog(pin byte, val byte) error {
 	buf := []byte{CommandWriteAnalog, pin, val, 0}
-	_, err := d.connection.Write(buf)
+	if _, err := d.connection.Write(buf); err != nil {
+		return err
+	}
 
 	time.Sleep(2 * time.Millisecond)
 
 	data := make([]byte, 1)
-	_, err = d.connection.Read(data)
+	_, err := d.connection.Read(data)
 
 	return err
 }
@@ -174,11 +176,13 @@ func (d *GrovePiDriver) PinMode(pin byte, mode string) error {
 	} else {
 		b = []byte{CommandPinMode, pin, 0, 0}
 	}
-	_, err := d.connection.Write(b)
+	if _, err := d.connection.Write(b); err != nil {
+		return err
+	}
 
 	time.Sleep(2 * time.Millisecond)
 
-	_, err = d.connection.ReadByte()
+	_, err := d.connection.ReadByte()
 
 	return err
 }
@@ -186,7 +190,7 @@ func (d *GrovePiDriver) PinMode(pin byte, mode string) error {
 func getPin(pin string) string {
 	if len(pin) > 1 {
 		if strings.ToUpper(pin[0:1]) == "A" || strings.ToUpper(pin[0:1]) == "D" {
-			return pin[1:len(pin)]
+			return pin[1:]
 		}
 	}
 
@@ -245,11 +249,13 @@ func (d *GrovePiDriver) writeDigital(pin byte, val byte) error {
 	defer d.mutex.Unlock()
 
 	buf := []byte{CommandWriteDigital, pin, val, 0}
-	_, err := d.connection.Write(buf)
+	if _, err := d.connection.Write(buf); err != nil {
+		return err
+	}
 
 	time.Sleep(2 * time.Millisecond)
 
-	_, err = d.connection.ReadByte()
+	_, err := d.connection.ReadByte()
 
 	return err
 }
