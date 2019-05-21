@@ -35,7 +35,7 @@
 
 [[constraint]]
   name = "github.com/eclipse/paho.mqtt.golang"
-  version = "1.1.1"
+  version = "1.2.0"
 
 [[constraint]]
   branch = "master"
@@ -75,11 +75,11 @@
 
 [[constraint]]
   name = "gocv.io/x/gocv"
-  version = "0.16.0"
+  version = "0.20.0"
 
 [[constraint]]
   name = "periph.io/x/periph"
-  version = "3.0.0"
+  version = "3.5.0"
 
 [[constraint]]
   branch = "master"
