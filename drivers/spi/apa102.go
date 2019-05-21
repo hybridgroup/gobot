@@ -1,9 +1,10 @@
 package spi
 
 import (
-	"gobot.io/x/gobot"
 	"image/color"
 	"math"
+
+	"gobot.io/x/gobot"
 )
 
 // APA102Driver is a driver for the APA102 programmable RGB LEDs
@@ -93,7 +94,7 @@ func (d *APA102Driver) Draw() error {
 
 	for i, c := range d.vals {
 		j := (i + 1) * 4
-		tx[j] = 0xe0 + byte(math.Min(c.A, 31))
+		tx[j] = 0xe0 + byte(math.Min(float64(c.A), 31))
 		tx[j+1] = byte(c.B)
 		tx[j+2] = byte(c.G)
 		tx[j+3] = byte(c.R)
