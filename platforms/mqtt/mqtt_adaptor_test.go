@@ -72,21 +72,21 @@ func TestMqttAdaptorUseClientKey(t *testing.T) {
 }
 
 func TestMqttAdaptorConnectError(t *testing.T) {
-	a := initTestMqttAdaptor()
+	a := NewAdaptor("tcp://localhost:1884", "client")
 
 	err := a.Connect()
 	gobottest.Assert(t, strings.Contains(err.Error(), "connection refused"), true)
 }
 
 func TestMqttAdaptorConnectSSLError(t *testing.T) {
-	a := initTestMqttAdaptor()
+	a := NewAdaptor("tcp://localhost:1884", "client")
 	a.SetUseSSL(true)
 	err := a.Connect()
 	gobottest.Assert(t, strings.Contains(err.Error(), "connection refused"), true)
 }
 
 func TestMqttAdaptorConnectWithAuthError(t *testing.T) {
-	a := NewAdaptorWithAuth("localhost:1883", "client", "user", "pass")
+	a := NewAdaptorWithAuth("xyz://localhost:1883", "client", "user", "pass")
 	var expected error
 	expected = multierror.Append(expected, errors.New("Network Error : Unknown protocol"))
 
