@@ -1,3 +1,64 @@
+1.13.0
+---
+* **api**
+    * Initial stab at Robot-based work
+* **build**
+    * correct package version as suggested by @dlisin thanks
+    * only build last 2 versions of Go plus tip for CI
+    * Update dep script for AppVeyor
+    * update deps to latest versions of dependencies for GoCV and others
+    * Update Gopkg and add test dep to Travis YML
+    * update OpenCV build script for OpenCV 4.1.0
+* **docs**
+    * update to remove Gitter and replace with Slack, and update copyright dates
+* **example**
+    * add missing nobuild header
+* **gpio**
+    * Add SparkFun’s EasyDriver (and BigEasyDriver)
+    * Add unit tests for TH02 & Minor improvement
+    * Added rudiementary support for TH02  Grove Sensor
+    * pwm_pin - Fix DutyCycle() parse error, need to trim off trailing '\n' before calling strconv.Atoi(), as other functions in this package do
+    * Simplify code as suggested in #617
+* **grovepi**
+    * add mutex to control transactionality of the device communication
+* **i2c**
+    * add 128x32 and 96x16 sizes to the i2c ssd1306 driver
+    * build out the ccs811 driver
+    * update PCA9685 driver to use same protocol as Adafruit Python lib
+* **leapmotion**
+    * Parser error in Pointable.Bases: Write test and fix
+    * Update gobot leap platform to support Leap Motion API v6
+* **mavlink**
+    * fix mavlink README to use correct example code
+* **mqtt**
+    * Add some new MQTT adaptor functions with QOS
+    * Allow setting QoS on MTT adaptor
+    * make tests run correctly even when a local MQTT server is in fact running
+    * Do not skip verification of root CA certificates by default InsecureSkipVerify
+* **nats**
+    * Update Go NATS client library import
+* **opencv**
+    * minor updates to opencv README
+    * update to OpenCV 4.1.0
+* **sphero**
+    * Added methods to read Sphero Power States
+    * Added some new features to the sphero ollie, bb-8 and sprkplus
+* **spi**
+    * correct param used for APA102 Draw() method
+    * Stop using Red parameter for brightness value
+* **tello**
+    * add direct vector access
+    * add example with keyboard
+    * Change fps to 60
+    * Check for error immediately and skip publish if error occurred
+    * update FlightData struct
+* **up2**
+    * add support for built-in LEDs
+    * correct i2c default bus information to match correct values
+    * finalize docs for UP2 config steps
+    * update README to include more complete setup information
+    * useful constant values to access the built-in LEDs
+
 1.12.0
 ---
 * **api**
