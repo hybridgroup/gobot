@@ -6,15 +6,12 @@
 [![Coverage Status](https://codecov.io/gh/hybridgroup/gobot/branch/dev/graph/badge.svg)](https://codecov.io/gh/hybridgroup/gobot)
 [![Go Report Card](https://goreportcard.com/badge/hybridgroup/gobot)](https://goreportcard.com/report/hybridgroup/gobot)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/hybridgroup/gobot/blob/master/LICENSE.txt)
-[![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/hybridgroup/gobot)
 
-Gobot (http://gobot.io/) is a framework using the Go programming language (http://golang.org/) for robotics, physical computing, and the Internet of Things.
+Gobot (https://gobot.io/) is a framework using the Go programming language (https://golang.org/) for robotics, physical computing, and the Internet of Things.
 
 It provides a simple, yet powerful way to create solutions that incorporate multiple, different hardware devices at the same time.
 
-Want to use Javascript robotics? Check out our sister project Cylon.js (http://cylonjs.com/)
-
-Want to use Ruby on robots? Check out our sister project Artoo (http://artoo.io)
+Want to run Go directly on microcontrollers? Check out our sister project TinyGo (https://tinygo.org/)
 
 ## Getting Started
 
@@ -336,14 +333,15 @@ Gobot uses the Gort [http://gort.io](http://gort.io) Command Line Interface (CLI
 Gobot also has its own CLI to generate new platforms, adaptors, and drivers. You can check it out in the `/cli` directory.
 
 ## Documentation
-We're always adding documentation to our web site at http://gobot.io/ please check there as we continue to work on Gobot
+We're always adding documentation to our web site at https://gobot.io/ please check there as we continue to work on Gobot
 
 Thank you!
 
 ## Need help?
-* Join our mailing list: https://groups.google.com/forum/#!forum/gobotio
 * Issues: https://github.com/hybridgroup/gobot/issues
-* twitter: [@gobotio](https://twitter.com/gobotio)
+* Twitter: [@gobotio](https://twitter.com/gobotio)
+* Slack: [https://gophers.slack.com/messages/C0N5HDB08](https://gophers.slack.com/messages/C0N5HDB08)
+* Mailing list: https://groups.google.com/forum/#!forum/gobotio
 
 ## Contributing
 For our contribution guidelines, please go to [https://github.com/hybridgroup/gobot/blob/master/CONTRIBUTING.md
@@ -353,6 +351,6 @@ For our contribution guidelines, please go to [https://github.com/hybridgroup/go
 Gobot is released with a Contributor Code of Conduct. By participating in this project you agree to abide by its terms. [You can read about it here](https://github.com/hybridgroup/gobot/tree/master/CODE_OF_CONDUCT.md).
 
 ## License
-Copyright (c) 2013-2018 The Hybrid Group. Licensed under the Apache 2.0 license.
+Copyright (c) 2013-2019 The Hybrid Group. Licensed under the Apache 2.0 license.
 
 The Contributor Covenant is released under the Creative Commons Attribution 4.0 International Public License, which requires that attribution be included.
