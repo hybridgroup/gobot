@@ -93,8 +93,28 @@ var xbox360Config = joystickConfig{
 		},
 		hat{
 			Hat:  0,
+			Name: "upLeft",
+			ID:   9,
+		},
+		hat{
+			Hat:  0,
+			Name: "downLeft",
+			ID:   12,
+		},
+		hat{
+			Hat:  0,
 			Name: "right",
 			ID:   2,
+		},
+		hat{
+			Hat:  0,
+			Name: "upRight",
+			ID:   3,
+		},
+		hat{
+			Hat:  0,
+			Name: "downRight",
+			ID:   6,
 		},
 		hat{
 			Hat:  0,
