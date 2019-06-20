@@ -8,7 +8,7 @@ type RelayDriver struct {
 	name       string
 	connection DigitalWriter
 	high       bool
-	inverted   bool
+	Inverted   bool
 	gobot.Commander
 }
 
@@ -24,7 +24,7 @@ func NewRelayDriver(a DigitalWriter, pin string) *RelayDriver {
 		pin:        pin,
 		connection: a,
 		high:       false,
-		inverted:   false,
+		Inverted:   false,
 		Commander:  gobot.NewCommander(),
 	}
 
@@ -55,12 +55,6 @@ func (l *RelayDriver) Name() string { return l.name }
 // SetName sets the RelayDrivers name
 func (l *RelayDriver) SetName(n string) { l.name = n }
 
-// Inverted returns the RelayDrivers inverted state
-func (l *RelayDriver) Inverted() bool { return l.inverted }
-
-// SetInverted sets the RelayDrivers inverted state
-func (l *RelayDriver) SetInverted(inverted bool) { l.inverted = inverted }
-
 // Pin returns the RelayDrivers name
 func (l *RelayDriver) Pin() string { return l.pin }
 
@@ -71,7 +65,7 @@ func (l *RelayDriver) Connection() gobot.Connection {
 
 // State return true if the relay is On and false if the relay is Off
 func (l *RelayDriver) State() bool {
-	if l.inverted {
+	if l.Inverted {
 		return !l.high
 	}
 	return l.high
@@ -83,7 +77,7 @@ func (l *RelayDriver) On() (err error) {
 		return
 	}
 
-	if l.inverted {
+	if l.Inverted {
 		l.high = false
 	} else {
 		l.high = true
@@ -98,7 +92,7 @@ func (l *RelayDriver) Off() (err error) {
 		return
 	}
 
-	if l.inverted {
+	if l.Inverted {
 		l.high = true
 	} else {
 		l.high = false

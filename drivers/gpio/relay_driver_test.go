@@ -36,13 +36,6 @@ func TestRelayDriverSetName(t *testing.T) {
 	gobottest.Assert(t, g.Name(), "mybot")
 }
 
-func TestRelayDriverSetInverted(t *testing.T) {
-	d := initTestRelayDriver()
-	gobottest.Assert(t, d.Inverted(), false)
-	d.SetInverted(true)
-	gobottest.Assert(t, d.Inverted(), true)
-}
-
 func TestRelayDriverStart(t *testing.T) {
 	d := initTestRelayDriver()
 	gobottest.Assert(t, d.Start(), nil)
@@ -64,7 +57,7 @@ func TestRelayDriverToggle(t *testing.T) {
 
 func TestRelayDriverToggleInverted(t *testing.T) {
 	d := initTestRelayDriver()
-	d.SetInverted(true)
+	d.Inverted = true
 	d.Off()
 	gobottest.Assert(t, d.State(), false)
 	d.Toggle()
@@ -87,7 +80,7 @@ func TestRelayDriverCommands(t *testing.T) {
 
 func TestRelayDriverCommandsInverted(t *testing.T) {
 	d := initTestRelayDriver()
-	d.SetInverted(true)
+	d.Inverted = true
 
 	gobottest.Assert(t, d.Command("Off")(nil), nil)
 	gobottest.Assert(t, d.High(), true)
