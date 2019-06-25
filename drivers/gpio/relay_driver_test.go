@@ -10,6 +10,9 @@ import (
 
 var _ gobot.Driver = (*RelayDriver)(nil)
 
+// Helper to return low/high value for testing
+func (l *RelayDriver) High() bool { return l.high }
+
 func initTestRelayDriver() *RelayDriver {
 	a := newGpioTestAdaptor()
 	a.testAdaptorDigitalWrite = func() (err error) {
@@ -52,6 +55,17 @@ func TestRelayDriverToggle(t *testing.T) {
 	gobottest.Assert(t, d.State(), false)
 }
 
+func TestRelayDriverToggleInverted(t *testing.T) {
+	d := initTestRelayDriver()
+	d.Inverted = true
+	d.Off()
+	gobottest.Assert(t, d.State(), false)
+	d.Toggle()
+	gobottest.Assert(t, d.State(), true)
+	d.Toggle()
+	gobottest.Assert(t, d.State(), false)
+}
+
 func TestRelayDriverCommands(t *testing.T) {
 	d := initTestRelayDriver()
 	gobottest.Assert(t, d.Command("Off")(nil), nil)
@@ -61,5 +75,22 @@ func TestRelayDriverCommands(t *testing.T) {
 	gobottest.Assert(t, d.State(), true)
 
 	gobottest.Assert(t, d.Command("Toggle")(nil), nil)
+	gobottest.Assert(t, d.State(), false)
+}
+
+func TestRelayDriverCommandsInverted(t *testing.T) {
+	d := initTestRelayDriver()
+	d.Inverted = true
+
+	gobottest.Assert(t, d.Command("Off")(nil), nil)
+	gobottest.Assert(t, d.High(), true)
+	gobottest.Assert(t, d.State(), false)
+
+	gobottest.Assert(t, d.Command("On")(nil), nil)
+	gobottest.Assert(t, d.High(), false)
+	gobottest.Assert(t, d.State(), true)
+
+	gobottest.Assert(t, d.Command("Toggle")(nil), nil)
+	gobottest.Assert(t, d.High(), true)
 	gobottest.Assert(t, d.State(), false)
 }
