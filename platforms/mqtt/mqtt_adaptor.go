@@ -33,7 +33,7 @@ type Adaptor struct {
 	clientKey     string
 	autoReconnect bool
 	cleanSession  bool
-	client        paho.Client
+	Client        paho.Client
 	qos           int
 }
 
@@ -113,8 +113,8 @@ func (a *Adaptor) SetClientKey(val string) { a.clientKey = val }
 
 // Connect returns true if connection to mqtt is established
 func (a *Adaptor) Connect() (err error) {
-	a.client = paho.NewClient(a.createClientOptions())
-	if token := a.client.Connect(); token.Wait() && token.Error() != nil {
+	a.Client = paho.NewClient(a.createClientOptions())
+	if token := a.Client.Connect(); token.Wait() && token.Error() != nil {
 		err = multierror.Append(err, token.Error())
 	}
 
@@ -123,8 +123,8 @@ func (a *Adaptor) Connect() (err error) {
 
 // Disconnect returns true if connection to mqtt is closed
 func (a *Adaptor) Disconnect() (err error) {
-	if a.client != nil {
-		a.client.Disconnect(500)
+	if a.Client != nil {
+		a.Client.Disconnect(500)
 	}
 	return
 }
@@ -147,21 +147,21 @@ func (a *Adaptor) Publish(topic string, message []byte) bool {
 
 // PublishWithQOS allows per-publish QOS values to be set and returns a poken.Token
 func (a *Adaptor) PublishWithQOS(topic string, qos int, message []byte) (paho.Token, error) {
-	if a.client == nil {
+	if a.Client == nil {
 		return nil, ErrNilClient
 	}
 
-	token := a.client.Publish(topic, byte(qos), false, message)
+	token := a.Client.Publish(topic, byte(qos), false, message)
 	return token, nil
 }
 
 // OnWithQOS allows per-subscribe QOS values to be set and returns a paho.Token
 func (a *Adaptor) OnWithQOS(event string, qos int, f func(msg Message)) (paho.Token, error) {
-	if a.client == nil {
+	if a.Client == nil {
 		return nil, ErrNilClient
 	}
 
-	token := a.client.Subscribe(event, byte(qos), func(client paho.Client, msg paho.Message) {
+	token := a.Client.Subscribe(event, byte(qos), func(client paho.Client, msg paho.Message) {
 		f(msg)
 	})
 
