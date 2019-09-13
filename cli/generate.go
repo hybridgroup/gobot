@@ -7,7 +7,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 )
 
 type config struct {
