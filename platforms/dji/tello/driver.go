@@ -2,6 +2,7 @@ package tello
 
 import (
 	"bytes"
+	"context"
 	"encoding/binary"
 	"errors"
 	"fmt"
@@ -180,6 +181,8 @@ type WifiData struct {
 
 // Driver represents the DJI Tello drone
 type Driver struct {
+	cancel         context.CancelFunc
+	ctx            context.Context
 	name           string
 	reqAddr        string
 	cmdConn        io.WriteCloser // UDP connection to send/receive drone commands
@@ -233,17 +236,21 @@ func (d *Driver) Connection() gobot.Connection { return nil }
 
 // Start starts the driver.
 func (d *Driver) Start() error {
+	// create context
+	d.ctx, d.cancel = context.WithCancel(context.Background())
+
+	// connect
 	reqAddr, err := net.ResolveUDPAddr("udp", d.reqAddr)
 	if err != nil {
 		log.Println(err)
 		return err
 	}
-	respPort, err := net.ResolveUDPAddr("udp", ":"+d.respPort)
+	respAddr, err := net.ResolveUDPAddr("udp", ":"+d.respPort)
 	if err != nil {
 		log.Println(err)
 		return err
 	}
-	cmdConn, err := net.DialUDP("udp", respPort, reqAddr)
+	cmdConn, err := net.DialUDP("udp", respAddr, reqAddr)
 	if err != nil {
 		log.Println(err)
 		return err
@@ -258,9 +265,16 @@ func (d *Driver) Start() error {
 		})
 
 		for {
+			if d.ctx.Err() != nil {
+				break
+			}
+
 			err := d.handleResponse(cmdConn)
 			if err != nil {
-				log.Println("response parse error:", err)
+				if d.ctx.Err() == nil {
+					log.Println("response parse error:", err)
+				}
+				continue
 			}
 		}
 	}()
@@ -270,12 +284,21 @@ func (d *Driver) Start() error {
 
 	// send stick commands
 	go func() {
+		t := time.NewTicker(20 * time.Millisecond)
+		defer t.Stop()
 		for {
-			err := d.SendStickCommand()
-			if err != nil {
-				log.Println("stick command error:", err)
+			select {
+			case <-t.C:
+				err := d.SendStickCommand()
+				if err != nil {
+					if d.ctx.Err() == nil {
+						log.Println("stick command error:", err)
+					}
+					continue
+				}
+			case <-d.ctx.Done():
+				return
 			}
-			time.Sleep(20 * time.Millisecond)
 		}
 	}()
 
@@ -288,7 +311,13 @@ func (d *Driver) Halt() (err error) {
 	d.Land()
 	time.Sleep(500 * time.Millisecond)
 
-	// TODO: cleanly shutdown the goroutines that are handling the UDP connections before closing
+	// cancel context
+	if d.cancel != nil {
+		d.cancel()
+		d.cancel = nil
+	}
+
+	// close connections
 	d.cmdConn.Close()
 	if d.videoConn != nil {
 		d.videoConn.Close()
@@ -888,7 +917,7 @@ func (d *Driver) handleResponse(r io.Reader) error {
 		case videoEncoderRateCommand:
 			d.Publish(d.Event(SetVideoEncoderRateEvent), buf[7:8])
 		default:
-			fmt.Printf("Unknown message: %+v\n", buf[0:n])
+			log.Printf("Unknown message: %+v\n", buf[0:n])
 		}
 		return nil
 	}
@@ -902,21 +931,27 @@ func (d *Driver) handleResponse(r io.Reader) error {
 }
 
 func (d *Driver) processVideo() error {
-	videoPort, err := net.ResolveUDPAddr("udp", ":6038")
+	videoAddr, err := net.ResolveUDPAddr("udp", ":6038")
 	if err != nil {
 		return err
 	}
-	d.videoConn, err = net.ListenUDP("udp", videoPort)
+	d.videoConn, err = net.ListenUDP("udp", videoAddr)
 	if err != nil {
 		return err
 	}
 
 	go func() {
 		for {
+			if d.ctx.Err() != nil {
+				break
+			}
+
 			buf := make([]byte, 2048)
 			n, _, err := d.videoConn.ReadFromUDP(buf)
 			if err != nil {
-				log.Println("Error: ", err)
+				if d.ctx.Err() == nil {
+					log.Println("Error: ", err)
+				}
 				continue
 			}
 
