@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"math"
 	"net"
 	"strconv"
@@ -234,17 +235,17 @@ func (d *Driver) Connection() gobot.Connection { return nil }
 func (d *Driver) Start() error {
 	reqAddr, err := net.ResolveUDPAddr("udp", d.reqAddr)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return err
 	}
 	respPort, err := net.ResolveUDPAddr("udp", ":"+d.respPort)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return err
 	}
 	cmdConn, err := net.DialUDP("udp", respPort, reqAddr)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return err
 	}
 	d.cmdConn = cmdConn
@@ -259,7 +260,7 @@ func (d *Driver) Start() error {
 		for {
 			err := d.handleResponse(cmdConn)
 			if err != nil {
-				fmt.Println("response parse error:", err)
+				log.Println("response parse error:", err)
 			}
 		}
 	}()
@@ -272,7 +273,7 @@ func (d *Driver) Start() error {
 		for {
 			err := d.SendStickCommand()
 			if err != nil {
-				fmt.Println("stick command error:", err)
+				log.Println("stick command error:", err)
 			}
 			time.Sleep(20 * time.Millisecond)
 		}
@@ -663,7 +664,7 @@ func (d *Driver) ParseFlightData(b []byte) (fd *FlightData, err error) {
 
 	if buf.Len() < 24 {
 		err = errors.New("Invalid buffer length for flight data packet")
-		fmt.Println(err)
+		log.Println(err)
 		return
 	}
 
@@ -913,7 +914,7 @@ func (d *Driver) processVideo() error {
 			buf := make([]byte, 2048)
 			n, _, err := d.videoConn.ReadFromUDP(buf)
 			if err != nil {
-				fmt.Println("Error: ", err)
+				log.Println("Error: ", err)
 				continue
 			}
 
