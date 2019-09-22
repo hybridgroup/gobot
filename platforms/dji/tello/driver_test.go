@@ -10,6 +10,7 @@ import (
 
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/gobottest"
+	"github.com/pkg/errors"
 )
 
 var _ gobot.Driver = (*Driver)(nil)
@@ -38,7 +39,7 @@ func TestHandleResponse(t *testing.T) {
 		{
 			name: "[empty messsage]",
 			msg:  bytes.NewReader(nil),
-			err:  io.EOF,
+			err:  errors.Wrap(io.EOF,"tello: reading failed"),
 		},
 		{
 			name:   "wifiMessage",
@@ -112,8 +113,8 @@ func TestHandleResponse(t *testing.T) {
 			d := NewDriver("8888")
 			events := d.Subscribe()
 			err := d.handleResponse(c.msg)
-			if c.err != err {
-				t.Errorf("expected '%v' error, got: %v", c.err, err)
+			if errors.Cause(c.err) != errors.Cause(err) {
+				t.Errorf("expected '%v' error, got: '%v'", c.err, err)
 			}
 			for i, cev := range c.events {
 				t.Run(fmt.Sprintf("event %d", i), func(t *testing.T) {
