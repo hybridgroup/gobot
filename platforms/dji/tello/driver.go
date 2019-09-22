@@ -304,11 +304,36 @@ func (d *Driver) Start() (err error) {
 			return
 		}
 
-		// Process video
-		if err := d.processVideo(); err != nil {
-			log.Println(errors.Wrap(err, "tello: processing video failed"))
+		// Create video addr
+		var videoAddr *net.UDPAddr
+		if videoAddr, err = net.ResolveUDPAddr("udp", ":"+d.videoPort); err != nil {
+			log.Println(errors.Wrap(err, "tello: creating video addr failed"))
 			return
 		}
+
+		// Listen to video
+		if d.videoConn, err = net.ListenUDP("udp", videoAddr); err != nil {
+			log.Println(errors.Wrap(err, "tello: listening to video failed"))
+			return
+		}
+
+		// Handle video frames
+		go func() {
+			for {
+				// Check context
+				if d.ctx.Err() != nil {
+					break
+				}
+
+				// Handle video frame
+				if err := d.handleVideoFrame(d.videoConn); err != nil {
+					if d.ctx.Err() == nil {
+						log.Println(errors.Wrap(err, "tello: handling video frame failed"))
+					}
+					continue
+				}
+			}
+		}()
 	})
 
 	// Starts notifications coming from drone to video port normally 6038
@@ -885,12 +910,13 @@ func (d *Driver) SendCommand(cmd string) (err error) {
 	return
 }
 
-func (d *Driver) handleResponse(r io.Reader) error {
+func (d *Driver) handleResponse(r io.Reader) (err error) {
+	var n int
 	var buf [2048]byte
 	var msgType uint16
-	n, err := r.Read(buf[0:])
-	if err != nil {
-		return err
+	if n, err = r.Read(buf[0:]); err != nil {
+		err = errors.Wrap(err, "tello: reading failed")
+		return
 	}
 
 	// parse binary packet
@@ -932,7 +958,7 @@ func (d *Driver) handleResponse(r io.Reader) error {
 		default:
 			log.Printf("Unknown message: %+v\n", buf[0:n])
 		}
-		return nil
+		return
 	}
 
 	// parse text packet
@@ -940,43 +966,21 @@ func (d *Driver) handleResponse(r io.Reader) error {
 		d.Publish(d.Event(ConnectedEvent), nil)
 	}
 
-	return nil
+	return
 }
 
-func (d *Driver) processVideo() (err error) {
-	// Create video addr
-	var videoAddr *net.UDPAddr
-	if videoAddr, err = net.ResolveUDPAddr("udp", ":"+d.videoPort); err != nil {
-		err = errors.Wrap(err, "tello: creating video addr failed")
+func (d *Driver) handleVideoFrame(r io.Reader) (err error) {
+	// Read
+	var n int
+	buf := make([]byte, 2048)
+	if n, err = r.Read(buf); err != nil {
+		err = errors.Wrap(err, "tello: reading failed")
 		return
 	}
 
-	// Listen to video
-	if d.videoConn, err = net.ListenUDP("udp", videoAddr); err != nil {
-		err = errors.Wrap(err, "tello: listening to video failed")
-		return
-	}
-
-	go func() {
-		for {
-			if d.ctx.Err() != nil {
-				break
-			}
-
-			buf := make([]byte, 2048)
-			n, _, err := d.videoConn.ReadFromUDP(buf)
-			if err != nil {
-				if d.ctx.Err() == nil {
-					log.Println(errors.Wrap(err, "tello: reading from video UDP failed"))
-				}
-				continue
-			}
-
-			d.Publish(d.Event(VideoFrameEvent), buf[2:n])
-		}
-	}()
-
-	return nil
+	// Publish
+	d.Publish(d.Event(VideoFrameEvent), buf[2:n])
+	return
 }
 
 func (d *Driver) createPacket(cmd int16, pktType byte, len int16) (buf *bytes.Buffer) {
