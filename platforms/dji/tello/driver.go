@@ -242,17 +242,14 @@ func (d *Driver) Start() error {
 	// connect
 	reqAddr, err := net.ResolveUDPAddr("udp", d.reqAddr)
 	if err != nil {
-		log.Println(err)
 		return err
 	}
 	respAddr, err := net.ResolveUDPAddr("udp", ":"+d.respPort)
 	if err != nil {
-		log.Println(err)
 		return err
 	}
 	cmdConn, err := net.DialUDP("udp", respAddr, reqAddr)
 	if err != nil {
-		log.Println(err)
 		return err
 	}
 	d.cmdConn = cmdConn
@@ -695,7 +692,6 @@ func (d *Driver) ParseFlightData(b []byte) (fd *FlightData, err error) {
 
 	if buf.Len() < 24 {
 		err = errors.New("Invalid buffer length for flight data packet")
-		log.Println(err)
 		return
 	}
 
