@@ -324,7 +324,7 @@ func (d *Driver) Halt() (err error) {
 
 // TakeOff tells drones to liftoff and start flying.
 func (d *Driver) TakeOff() (err error) {
-	buf, _ := d.createPacket(takeoffCommand, 0x68, 0)
+	buf := d.createPacket(takeoffCommand, 0x68, 0)
 	d.seq++
 	binary.Write(buf, binary.LittleEndian, d.seq)
 	binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes()))
@@ -335,7 +335,7 @@ func (d *Driver) TakeOff() (err error) {
 
 // Throw & Go support
 func (d *Driver) ThrowTakeOff() (err error) {
-	buf, _ := d.createPacket(throwtakeoffCommand, 0x48, 0)
+	buf := d.createPacket(throwtakeoffCommand, 0x48, 0)
 	d.seq++
 	binary.Write(buf, binary.LittleEndian, d.seq)
 	binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes()))
@@ -346,7 +346,7 @@ func (d *Driver) ThrowTakeOff() (err error) {
 
 // Land tells drone to come in for landing.
 func (d *Driver) Land() (err error) {
-	buf, _ := d.createPacket(landCommand, 0x68, 1)
+	buf := d.createPacket(landCommand, 0x68, 1)
 	d.seq++
 	binary.Write(buf, binary.LittleEndian, d.seq)
 	binary.Write(buf, binary.LittleEndian, byte(0x00))
@@ -358,7 +358,7 @@ func (d *Driver) Land() (err error) {
 
 // StopLanding tells drone to stop landing.
 func (d *Driver) StopLanding() (err error) {
-	buf, _ := d.createPacket(landCommand, 0x68, 1)
+	buf := d.createPacket(landCommand, 0x68, 1)
 	d.seq++
 	binary.Write(buf, binary.LittleEndian, d.seq)
 	binary.Write(buf, binary.LittleEndian, byte(0x01))
@@ -370,7 +370,7 @@ func (d *Driver) StopLanding() (err error) {
 
 // PalmLand tells drone to come in for a hand landing.
 func (d *Driver) PalmLand() (err error) {
-	buf, _ := d.createPacket(palmLandCommand, 0x68, 1)
+	buf := d.createPacket(palmLandCommand, 0x68, 1)
 	d.seq++
 	binary.Write(buf, binary.LittleEndian, d.seq)
 	binary.Write(buf, binary.LittleEndian, byte(0x00))
@@ -382,7 +382,7 @@ func (d *Driver) PalmLand() (err error) {
 
 // StartVideo tells Tello to send start info (SPS/PPS) for video stream.
 func (d *Driver) StartVideo() (err error) {
-	buf, _ := d.createPacket(videoStartCommand, 0x60, 0)
+	buf := d.createPacket(videoStartCommand, 0x60, 0)
 	binary.Write(buf, binary.LittleEndian, int16(0x00)) // seq = 0
 	binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes()))
 
@@ -396,7 +396,7 @@ func (d *Driver) SetExposure(level int) (err error) {
 		return errors.New("Invalid exposure level")
 	}
 
-	buf, _ := d.createPacket(exposureCommand, 0x48, 1)
+	buf := d.createPacket(exposureCommand, 0x48, 1)
 	d.seq++
 	binary.Write(buf, binary.LittleEndian, d.seq)
 	binary.Write(buf, binary.LittleEndian, byte(level))
@@ -408,7 +408,7 @@ func (d *Driver) SetExposure(level int) (err error) {
 
 // SetVideoEncoderRate sets the drone video encoder rate.
 func (d *Driver) SetVideoEncoderRate(rate VideoBitRate) (err error) {
-	buf, _ := d.createPacket(videoEncoderRateCommand, 0x68, 1)
+	buf := d.createPacket(videoEncoderRateCommand, 0x68, 1)
 	d.seq++
 	binary.Write(buf, binary.LittleEndian, d.seq)
 	binary.Write(buf, binary.LittleEndian, byte(rate))
@@ -438,7 +438,7 @@ func (d *Driver) SetSlowMode() error {
 
 // Rate queries the current video bit rate.
 func (d *Driver) Rate() (err error) {
-	buf, _ := d.createPacket(videoRateQuery, 0x48, 0)
+	buf := d.createPacket(videoRateQuery, 0x48, 0)
 	d.seq++
 	binary.Write(buf, binary.LittleEndian, d.seq)
 	binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes()))
@@ -638,7 +638,7 @@ func (d *Driver) CeaseRotation() {
 
 // Bounce tells drone to start/stop performing the bouncing action
 func (d *Driver) Bounce() (err error) {
-	buf, _ := d.createPacket(bounceCommand, 0x68, 1)
+	buf := d.createPacket(bounceCommand, 0x68, 1)
 	d.seq++
 	binary.Write(buf, binary.LittleEndian, d.seq)
 	if d.bouncing {
@@ -654,7 +654,7 @@ func (d *Driver) Bounce() (err error) {
 
 // Flip tells drone to flip
 func (d *Driver) Flip(direction FlipType) (err error) {
-	buf, _ := d.createPacket(flipCommand, 0x70, 1)
+	buf := d.createPacket(flipCommand, 0x70, 1)
 	d.seq++
 	binary.Write(buf, binary.LittleEndian, d.seq)
 	binary.Write(buf, binary.LittleEndian, byte(direction))
@@ -799,7 +799,7 @@ func (d *Driver) SendStickCommand() (err error) {
 	d.cmdMutex.Lock()
 	defer d.cmdMutex.Unlock()
 
-	buf, _ := d.createPacket(stickCommand, 0x60, 11)
+	buf := d.createPacket(stickCommand, 0x60, 11)
 	binary.Write(buf, binary.LittleEndian, int16(0x00)) // seq = 0
 
 	// RightX center=1024 left =364 right =-364
@@ -844,7 +844,7 @@ func (d *Driver) SendDateTime() (err error) {
 	d.cmdMutex.Lock()
 	defer d.cmdMutex.Unlock()
 
-	buf, _ := d.createPacket(timeCommand, 0x50, 11)
+	buf := d.createPacket(timeCommand, 0x50, 11)
 	d.seq++
 	binary.Write(buf, binary.LittleEndian, d.seq)
 
@@ -958,7 +958,7 @@ func (d *Driver) processVideo() error {
 	return nil
 }
 
-func (d *Driver) createPacket(cmd int16, pktType byte, len int16) (buf *bytes.Buffer, err error) {
+func (d *Driver) createPacket(cmd int16, pktType byte, len int16) (buf *bytes.Buffer) {
 	l := len + 11
 	buf = &bytes.Buffer{}
 
@@ -968,7 +968,7 @@ func (d *Driver) createPacket(cmd int16, pktType byte, len int16) (buf *bytes.Bu
 	binary.Write(buf, binary.LittleEndian, pktType)
 	binary.Write(buf, binary.LittleEndian, cmd)
 
-	return buf, nil
+	return
 }
 
 func (d *Driver) connectionString() string {
