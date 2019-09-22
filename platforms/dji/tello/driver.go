@@ -259,20 +259,16 @@ func (d *Driver) Start() (err error) {
 		return
 	}
 
-	// handle responses
+	// Handle responses
 	go func() {
-		d.On(d.Event(ConnectedEvent), func(interface{}) {
-			d.SendDateTime()
-			d.processVideo()
-		})
-
 		for {
+			// Check context
 			if d.ctx.Err() != nil {
 				break
 			}
 
-			err := d.handleResponse(d.cmdConn)
-			if err != nil {
+			// Handle response
+			if err := d.handleResponse(d.cmdConn); err != nil {
 				if d.ctx.Err() == nil {
 					log.Println(errors.Wrap(err, "tello: handling response failed"))
 				}
@@ -281,21 +277,14 @@ func (d *Driver) Start() (err error) {
 		}
 	}()
 
-	// starts notifications coming from drone to video port normally 6038
-	if err = d.SendCommand(d.connectionString()); err != nil {
-		err = errors.Wrap(err, "tello: sending connection command failed")
-		return
-	}
-
-	// send stick commands
+	// Send stick commands
 	go func() {
 		t := time.NewTicker(20 * time.Millisecond)
 		defer t.Stop()
 		for {
 			select {
 			case <-t.C:
-				err := d.SendStickCommand()
-				if err != nil {
+				if err := d.SendStickCommand(); err != nil {
 					if d.ctx.Err() == nil {
 						log.Println(errors.Wrap(err, "tello: sending stick command failed"))
 					}
@@ -307,6 +296,26 @@ func (d *Driver) Start() (err error) {
 		}
 	}()
 
+	// Handle the connected event
+	d.On(d.Event(ConnectedEvent), func(interface{}) {
+		// Send date time
+		if err := d.SendDateTime(); err != nil {
+			log.Println(errors.Wrap(err, "tello: sending date time failed"))
+			return
+		}
+
+		// Process video
+		if err := d.processVideo(); err != nil {
+			log.Println(errors.Wrap(err, "tello: processing video failed"))
+			return
+		}
+	})
+
+	// Starts notifications coming from drone to video port normally 6038
+	if err = d.SendCommand(d.connectionString()); err != nil {
+		err = errors.Wrap(err, "tello: sending connection command failed")
+		return
+	}
 	return
 }
 
