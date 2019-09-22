@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/binary"
-	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -14,6 +13,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/pkg/errors"
 	"gobot.io/x/gobot"
 )
 
@@ -185,8 +185,8 @@ type Driver struct {
 	ctx            context.Context
 	name           string
 	reqAddr        string
-	cmdConn        io.WriteCloser // UDP connection to send/receive drone commands
-	videoConn      *net.UDPConn   // UDP connection for drone video
+	cmdConn        *net.UDPConn // UDP connection to send/receive drone commands
+	videoConn      *net.UDPConn // UDP connection for drone video
 	respPort       string
 	videoPort      string
 	cmdMutex       sync.Mutex
@@ -235,24 +235,29 @@ func (d *Driver) SetName(n string) { d.name = n }
 func (d *Driver) Connection() gobot.Connection { return nil }
 
 // Start starts the driver.
-func (d *Driver) Start() error {
-	// create context
+func (d *Driver) Start() (err error) {
+	// Create context
 	d.ctx, d.cancel = context.WithCancel(context.Background())
 
-	// connect
-	reqAddr, err := net.ResolveUDPAddr("udp", d.reqAddr)
-	if err != nil {
-		return err
+	// Create request addr
+	var reqAddr *net.UDPAddr
+	if reqAddr, err = net.ResolveUDPAddr("udp", d.reqAddr); err != nil {
+		err = errors.Wrap(err, "tello: creating request addr failed")
+		return
 	}
-	respAddr, err := net.ResolveUDPAddr("udp", ":"+d.respPort)
-	if err != nil {
-		return err
+
+	// Create response addr
+	var respAddr *net.UDPAddr
+	if respAddr, err = net.ResolveUDPAddr("udp", ":"+d.respPort); err != nil {
+		err = errors.Wrap(err, "tello: creating response addr failed")
+		return
 	}
-	cmdConn, err := net.DialUDP("udp", respAddr, reqAddr)
-	if err != nil {
-		return err
+
+	// Dial
+	if d.cmdConn, err = net.DialUDP("udp", respAddr, reqAddr); err != nil {
+		err = errors.Wrap(err, "tello: dialing failed")
+		return
 	}
-	d.cmdConn = cmdConn
 
 	// handle responses
 	go func() {
@@ -266,10 +271,10 @@ func (d *Driver) Start() error {
 				break
 			}
 
-			err := d.handleResponse(cmdConn)
+			err := d.handleResponse(d.cmdConn)
 			if err != nil {
 				if d.ctx.Err() == nil {
-					log.Println("response parse error:", err)
+					log.Println(errors.Wrap(err, "tello: handling response failed"))
 				}
 				continue
 			}
@@ -277,7 +282,10 @@ func (d *Driver) Start() error {
 	}()
 
 	// starts notifications coming from drone to video port normally 6038
-	d.SendCommand(d.connectionString())
+	if err = d.SendCommand(d.connectionString()); err != nil {
+		err = errors.Wrap(err, "tello: sending connection command failed")
+		return
+	}
 
 	// send stick commands
 	go func() {
@@ -289,7 +297,7 @@ func (d *Driver) Start() error {
 				err := d.SendStickCommand()
 				if err != nil {
 					if d.ctx.Err() == nil {
-						log.Println("stick command error:", err)
+						log.Println(errors.Wrap(err, "tello: sending stick command failed"))
 					}
 					continue
 				}
@@ -299,7 +307,7 @@ func (d *Driver) Start() error {
 		}
 	}()
 
-	return nil
+	return
 }
 
 // Halt stops the driver.
@@ -926,14 +934,18 @@ func (d *Driver) handleResponse(r io.Reader) error {
 	return nil
 }
 
-func (d *Driver) processVideo() error {
-	videoAddr, err := net.ResolveUDPAddr("udp", ":"+d.videoPort)
-	if err != nil {
-		return err
+func (d *Driver) processVideo() (err error) {
+	// Create video addr
+	var videoAddr *net.UDPAddr
+	if videoAddr, err = net.ResolveUDPAddr("udp", ":"+d.videoPort); err != nil {
+		err = errors.Wrap(err, "tello: creating video addr failed")
+		return
 	}
-	d.videoConn, err = net.ListenUDP("udp", videoAddr)
-	if err != nil {
-		return err
+
+	// Listen to video
+	if d.videoConn, err = net.ListenUDP("udp", videoAddr); err != nil {
+		err = errors.Wrap(err, "tello: listening to video failed")
+		return
 	}
 
 	go func() {
@@ -946,7 +958,7 @@ func (d *Driver) processVideo() error {
 			n, _, err := d.videoConn.ReadFromUDP(buf)
 			if err != nil {
 				if d.ctx.Err() == nil {
-					log.Println("Error: ", err)
+					log.Println(errors.Wrap(err, "tello: reading from video UDP failed"))
 				}
 				continue
 			}
