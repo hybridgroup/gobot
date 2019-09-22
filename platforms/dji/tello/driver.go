@@ -30,6 +30,9 @@ const (
 	// TakeoffEvent event
 	TakeoffEvent = "takeoff"
 
+	// ThrowTakeoffEvent event
+	ThrowTakeoffEvent = "throw-takeoff"
+
 	// LandingEvent event
 	LandingEvent = "landing"
 
@@ -195,6 +198,7 @@ type Driver struct {
 	throttle       int
 	bouncing       bool
 	gobot.Eventer
+	flying bool
 }
 
 // NewDriver creates a driver for the Tello drone. Pass in the UDP port to use for the responses
@@ -210,6 +214,7 @@ func NewDriver(port string) *Driver {
 	d.AddEvent(ConnectedEvent)
 	d.AddEvent(FlightDataEvent)
 	d.AddEvent(TakeoffEvent)
+	d.AddEvent(ThrowTakeoffEvent)
 	d.AddEvent(LandingEvent)
 	d.AddEvent(PalmLandingEvent)
 	d.AddEvent(BounceEvent)
@@ -296,7 +301,10 @@ func (d *Driver) Start() (err error) {
 		}
 	}()
 
-	// Handle the connected event
+	// Update flying status
+	d.On(d.Event(FlightDataEvent), func(s interface{}) { d.flying = s.(*FlightData).Flying })
+
+	// Handle connected event
 	d.On(d.Event(ConnectedEvent), func(interface{}) {
 		// Send date time
 		if err := d.SendDateTime(); err != nil {
@@ -347,8 +355,10 @@ func (d *Driver) Start() (err error) {
 // Halt stops the driver.
 func (d *Driver) Halt() (err error) {
 	// send a landing command when we disconnect, and give it 500ms to be received before we shutdown
-	d.Land()
-	time.Sleep(500 * time.Millisecond)
+	if d.flying {
+		d.Land()
+		time.Sleep(500 * time.Millisecond)
+	}
 
 	// cancel context
 	if d.cancel != nil {
@@ -942,6 +952,8 @@ func (d *Driver) handleResponse(r io.Reader) (err error) {
 			d.Publish(d.Event(BounceEvent), buf[7:8])
 		case takeoffCommand:
 			d.Publish(d.Event(TakeoffEvent), buf[7:8])
+		case throwtakeoffCommand:
+			d.Publish(d.Event(ThrowTakeoffEvent), buf[7:8])
 		case landCommand:
 			d.Publish(d.Event(LandingEvent), buf[7:8])
 		case palmLandCommand:
