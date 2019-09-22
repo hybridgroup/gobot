@@ -927,7 +927,7 @@ func (d *Driver) handleResponse(r io.Reader) error {
 }
 
 func (d *Driver) processVideo() error {
-	videoAddr, err := net.ResolveUDPAddr("udp", ":6038")
+	videoAddr, err := net.ResolveUDPAddr("udp", ":"+d.videoPort)
 	if err != nil {
 		return err
 	}
