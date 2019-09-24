@@ -25,7 +25,7 @@ Example:
 
     	hello := gbot.AddRobot(gobot.NewRobot("Eve"))
 
-      // Accessible via http://localhost:3000/robots/Eve/commands/say_hello
+      // Accessible via http://localhost:3000/api/robots/Eve/commands/say_hello
     	hello.AddCommand("say_hello", func(params map[string]interface{}) interface{} {
     		return fmt.Sprintf("%v says hello!", hello.Name)
     	})
