@@ -35,7 +35,7 @@ func NewDriver(a *Adaptor, topic string) *Driver {
 // Name returns name for the Driver
 func (m *Driver) Name() string { return m.name }
 
-// Name sets name for the Driver
+// SetName sets name for the Driver
 func (m *Driver) SetName(name string) { m.name = name }
 
 // Connection returns Connections used by the Driver
