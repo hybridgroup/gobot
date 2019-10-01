@@ -199,7 +199,7 @@ func NewDriver(port string) *Driver {
 	d := &Driver{name: gobot.DefaultName("Tello"),
 		reqAddr:   "192.168.10.1:8889",
 		respPort:  port,
-		videoPort: "6038",
+		videoPort: "11111",
 		Eventer:   gobot.NewEventer(),
 	}
 
@@ -264,7 +264,7 @@ func (d *Driver) Start() error {
 		}
 	}()
 
-	// starts notifications coming from drone to video port normally 6038
+	// starts notifications coming from drone to video port normally 11111
 	d.SendCommand(d.connectionString())
 
 	// send stick commands
@@ -899,7 +899,7 @@ func (d *Driver) handleResponse(r io.Reader) error {
 }
 
 func (d *Driver) processVideo() error {
-	videoPort, err := net.ResolveUDPAddr("udp", ":6038")
+	videoPort, err := net.ResolveUDPAddr("udp", ":11111")
 	if err != nil {
 		return err
 	}
