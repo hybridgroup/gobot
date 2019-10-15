@@ -1,3 +1,21 @@
+1.14.0
+---
+* **core**
+    * migrating from dep to go modules
+    * update codegangsta to urfave (#690)
+* **docs**
+    * Fix a link in package docs' example code.
+* **examples**
+    * fixed broken imports due to changed path causing go get to fail
+* **gpio**
+    * Added ability to make a relay driver inverted (#674)
+* **opencv**
+    * Update to GoCV 0.21.0
+* **spi**
+    * Apa102 use default brightness (#671)
+* **tello**
+    * Updated videoPort for DJI Tello to 11111
+
 1.13.0
 ---
 * **api**
