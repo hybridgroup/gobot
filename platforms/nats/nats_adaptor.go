@@ -1,10 +1,11 @@
 package nats
 
 import (
-	"github.com/nats-io/go-nats"
-	"gobot.io/x/gobot"
 	"net/url"
 	"strings"
+
+	"github.com/nats-io/nats.go"
+	"gobot.io/x/gobot"
 )
 
 // Adaptor is a configuration struct for interacting with a NATS server.
