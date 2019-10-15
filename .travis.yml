@@ -5,6 +5,7 @@ go_import_path: gobot.io/x/gobot
 go:
    - 1.11.x
    - 1.12.x
+   - 1.13.x
    - tip
 matrix:
    allow_failures:
@@ -39,15 +40,13 @@ before_install:
    - export PKG_CONFIG_PATH=$(pkg-config --variable pc_path pkg-config):$HOME/usr/lib/pkgconfig
    - export INCLUDE_PATH=$HOME/usr/include:${INCLUDE_PATH}
    - export LD_LIBRARY_PATH=$HOME/usr/lib:${LD_LIBRARY_PATH}
+   - export GO111MODULE=on
    - sudo ln /dev/null /dev/raw1394
    - cd $HOME/gopath/src/gobot.io/x/gobot
    - go get github.com/axw/gocov/gocov
-   - go get -u github.com/golang/dep/cmd/dep
    - go get -u github.com/stretchr/testify
 before_cache:
    - rm -f $HOME/fresh-cache
-install:
-   - dep ensure
 before_script:
    - export DISPLAY=:99.0
    - sh -e /etc/init.d/xvfb start

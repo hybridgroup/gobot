@@ -29,7 +29,7 @@ require (
 	github.com/urfave/cli v1.22.1
 	github.com/veandco/go-sdl2 v0.3.3
 	go.bug.st/serial.v1 v0.0.0-20180827123349-5f7892a7bb45
-	gocv.io/x/gocv v0.20.0
+	gocv.io/x/gocv v0.21.0
 	golang.org/x/crypto v0.0.0-20191001170739-f9e2070545dc // indirect
 	golang.org/x/net v0.0.0-20190930134127-c5a3c61f89f3
 	golang.org/x/sys v0.0.0-20191001151750-bb3f8db39f24 // indirect

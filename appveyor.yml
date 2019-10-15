@@ -7,6 +7,7 @@ clone_folder: c:\gopath\src\gobot.io\x\gobot
 environment:
   GOPATH: c:\gopath
   GOROOT: c:\go
+  GO111MODULE: on
 
 install:
   - echo %PATH%

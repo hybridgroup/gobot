@@ -1,4 +1,4 @@
-.PHONY: test race cover robeaux examples deps test_with_coverage fmt_check
+.PHONY: test race cover robeaux examples test_with_coverage fmt_check
 
 excluding_vendor := $(shell go list ./... | grep -v /vendor/)
 
@@ -17,13 +17,6 @@ fmt_check:
 # Test and generate coverage
 test_with_coverage:
 	./ci/test.sh
-
-deps:
-ifeq (,$(shell which dep))
-	$(error dep tool not found! https://github.com/golang/dep is required to install Gobot deps)
-endif
-	dep ensure
-
 
 robeaux:
 ifeq (,$(shell which go-bindata))
