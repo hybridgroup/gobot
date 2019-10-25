@@ -2,7 +2,7 @@
 
 The Raspberry Pi is an inexpensive and popular ARM based single board computer with digital & PWM GPIO, and i2c interfaces built in.
 
-The Gobot adaptor for the Raspberry Pi should support all of the various Raspberry Pi boards such as the Raspberry Pi 3 Model B, Raspberry Pi 2 Model B, Raspberry Pi 1 Model A+, Raspberry Pi Zero, and Raspberry Pi Zero W.
+The Gobot adaptor for the Raspberry Pi should support all of the various Raspberry Pi boards such as the Raspberry Pi 4 Model B, Raspberry Pi 3 Model B, Raspberry Pi 2 Model B, Raspberry Pi 1 Model A+, Raspberry Pi Zero, and Raspberry Pi Zero W.
 
 For more info about the Raspberry Pi platform, click [here](http://www.raspberrypi.org/).
 
