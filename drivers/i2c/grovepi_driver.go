@@ -257,11 +257,7 @@ func (d *GrovePiDriver) readUltrasonic(pin byte, duration int) (val int, err err
 		return 0, err
 	}
 
-	if data[1] == 2 {
-		return 255, err
-	}
-
-	return int(data[2]), err
+	return int(data[1] * 255 + data[2]), err
 }
 
 // readDigital reads digitally from the GrovePi.
