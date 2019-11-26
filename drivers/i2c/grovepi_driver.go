@@ -13,12 +13,13 @@ const grovePiAddress = 0x04
 
 // Commands format
 const (
-	CommandReadDigital  = 1
-	CommandWriteDigital = 2
-	CommandReadAnalog   = 3
-	CommandWriteAnalog  = 4
-	CommandPinMode      = 5
-	CommandReadDHT      = 40
+	CommandReadDigital    = 1
+	CommandWriteDigital   = 2
+	CommandReadAnalog     = 3
+	CommandWriteAnalog    = 4
+	CommandPinMode        = 5
+	CommandReadUltrasonic = 7
+	CommandReadDHT        = 40
 )
 
 // GrovePiDriver is a driver for the GrovePi+ for I²C bus interface.
@@ -133,6 +134,26 @@ func (d *GrovePiDriver) DigitalRead(pin string) (val int, err error) {
 	return
 }
 
+// UltrasonicRead performs a read on an ultrasonic pin.
+func (d *GrovePiDriver) UltrasonicRead(pin string, duration int) (val int, err error) {
+	pin = getPin(pin)
+
+	var pinNum int
+	pinNum, err = strconv.Atoi(pin)
+	if err != nil {
+		return
+	}
+
+	if dir, ok := d.digitalPins[pinNum]; !ok || dir != "input" {
+		d.PinMode(byte(pinNum), "input")
+		d.digitalPins[pinNum] = "input"
+	}
+
+	val, err = d.readUltrasonic(byte(pinNum), duration)
+
+	return
+}
+
 // DigitalWrite writes a value to a specific digital pin implementing the DigitalWriter interface.
 func (d *GrovePiDriver) DigitalWrite(pin string, val byte) (err error) {
 	pin = getPin(pin)
@@ -215,6 +236,28 @@ func (d *GrovePiDriver) readAnalog(pin byte) (int, error) {
 	v1 := int(data[1])
 	v2 := int(data[2])
 	return ((v1 * 256) + v2), nil
+}
+
+// readUltrasonic reads ultrasonic from the GrovePi.
+func (d *GrovePiDriver) readUltrasonic(pin byte, duration int) (val int, err error) {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
+
+	buf := []byte{CommandReadUltrasonic, pin, 0, 0}
+	_, err = d.connection.Write(buf)
+	if err != nil {
+		return
+	}
+
+	time.Sleep(time.Duration(duration) * time.Millisecond)
+
+	data := make([]byte, 3)
+	_, err = d.connection.Read(data)
+	if err != nil || data[0] != CommandReadUltrasonic {
+		return 0, err
+	}
+
+	return int(data[1]) * 255 + int(data[2]), err
 }
 
 // readDigital reads digitally from the GrovePi.
