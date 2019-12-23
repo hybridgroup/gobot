@@ -35,6 +35,22 @@ func NewAdaptor() *Adaptor {
 	}
 }
 
+// NewAdaptorByID returns a new Joystick Adaptor by the ID of the joystick in case of multiple joysticks.
+func NewAdaptorByID(i int) *Adaptor {
+	return &Adaptor{
+		name: gobot.DefaultName("Joystick"),
+		connect: func(j *Adaptor) (err error) {
+			sdl.Init(sdl.INIT_JOYSTICK)
+			if sdl.NumJoysticks() > 0 {
+				j.joystick = sdl.JoystickOpen(i)
+				return
+			}
+			return errors.New("No joystick available")
+		},
+	}
+}
+
+
 // Name returns the Adaptors name
 func (j *Adaptor) Name() string { return j.name }
 
