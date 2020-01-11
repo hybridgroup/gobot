@@ -43,7 +43,7 @@ before_install:
    - export GO111MODULE=on
    - sudo ln /dev/null /dev/raw1394
    - cd $HOME/gopath/src/gobot.io/x/gobot
-   - go get github.com/axw/gocov/gocov
+   - go get github.com/axw/gocov
    - go get -u github.com/stretchr/testify
 before_cache:
    - rm -f $HOME/fresh-cache
