@@ -50,6 +50,14 @@ func main() {
 }
 ```
 
+## Telo Edu driver
+
+If you are planning to connect to the edu version of the tello, please use the `NewDriverWithIP` driver instead
+
+```go
+drone := tello.NewDriverWithIP("192.168.10.1", "8888")
+```
+
 ## References
 
 This driver could not exist without the awesome members of the unofficial Tello forum:
