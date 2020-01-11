@@ -61,7 +61,6 @@ branches:
    except:
       - gobot.io
       - /^gobot-.*$/
-secure: "HggklzWOwKqImvjQe1yvojCoTaUBDrOVXRjsrZaoTaKpUtmho1tpCMtKF1dbyT0T5Y68P6f9e/XyANWVeziJNZ+YmNkY+CNdNYHiNnpl8att3MuL4hpwKDPAqLK8H2G+71j3O/rBvf6oIJHtSEesR5Sbb+2fSmhNFtLrDgp5FZA="
 # Caching so the next build will be fast as possible.
 cache:
    timeout: 1000
