@@ -221,6 +221,34 @@ func NewDriver(port string) *Driver {
 	return d
 }
 
+// NewDriverWithIP creates a driver for the Tello EDU drone. Pass in the ip address and UDP port to use for the responses
+// from the drone.
+func NewDriverWithIP(ip string, port string) *Driver {
+	d := &Driver{name: gobot.DefaultName("Tello"),
+		reqAddr:   ip + ":8889",
+		respPort:  port,
+		videoPort: "11111",
+		Eventer:   gobot.NewEventer(),
+	}
+
+	d.AddEvent(ConnectedEvent)
+	d.AddEvent(FlightDataEvent)
+	d.AddEvent(TakeoffEvent)
+	d.AddEvent(LandingEvent)
+	d.AddEvent(PalmLandingEvent)
+	d.AddEvent(BounceEvent)
+	d.AddEvent(FlipEvent)
+	d.AddEvent(TimeEvent)
+	d.AddEvent(LogEvent)
+	d.AddEvent(WifiDataEvent)
+	d.AddEvent(LightStrengthEvent)
+	d.AddEvent(SetExposureEvent)
+	d.AddEvent(VideoFrameEvent)
+	d.AddEvent(SetVideoEncoderRateEvent)
+
+	return d
+}
+
 // Name returns the name of the device.
 func (d *Driver) Name() string { return d.name }
 
