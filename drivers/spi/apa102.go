@@ -73,7 +73,6 @@ func (d *APA102Driver) Start() (err error) {
 
 // Halt stops the driver.
 func (d *APA102Driver) Halt() (err error) {
-	d.connection.Close()
 	return
 }
 
