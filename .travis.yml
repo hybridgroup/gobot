@@ -43,7 +43,7 @@ before_install:
    - export GO111MODULE=on
    - sudo ln /dev/null /dev/raw1394
    - cd $HOME/gopath/src/gobot.io/x/gobot
-   - GIT_SSL_NO_VERIFY=1 go get -insecure github.com/axw/gocov/gocov # TODO: remove when https://github.com/bugst/go-serial/issues/71 is fixed
+   - go get github.com/axw/gocov/gocov
    - go get -u github.com/stretchr/testify
 before_cache:
    - rm -f $HOME/fresh-cache
