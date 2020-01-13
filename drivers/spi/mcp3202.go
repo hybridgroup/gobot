@@ -69,7 +69,6 @@ func (d *MCP3202Driver) Start() (err error) {
 
 // Halt stops the driver.
 func (d *MCP3202Driver) Halt() (err error) {
-	d.connection.Close()
 	return
 }
 
