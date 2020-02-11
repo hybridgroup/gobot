@@ -29,6 +29,28 @@ func initTestDirectPinDriver() *DirectPinDriver {
 	return NewDirectPinDriver(a, "1")
 }
 
+func initTestDirectPinInputPullupDriver() *DirectPinDriver {
+	a := newGpioInputPullupTestAdaptor()
+	a.testAdaptorDigitalRead = func() (val int, err error) {
+		val = 1
+		return
+	}
+	a.testAdaptorDigitalReadInputPullup = func() (val int, err error) {
+		val = 1
+		return
+	}
+	a.testAdaptorDigitalWrite = func() (err error) {
+		return errors.New("write error")
+	}
+	a.testAdaptorPwmWrite = func() (err error) {
+		return errors.New("write error")
+	}
+	a.testAdaptorServoWrite = func() (err error) {
+		return errors.New("write error")
+	}
+	return NewDirectPinDriver(a, "1")
+}
+
 func TestDirectPinDriver(t *testing.T) {
 	var ret map[string]interface{}
 	var err interface{}
@@ -168,4 +190,24 @@ func TestDirectPinDriverSetName(t *testing.T) {
 	d := initTestDirectPinDriver()
 	d.SetName("mybot")
 	gobottest.Assert(t, d.Name(), "mybot")
+}
+
+func TestDirectPinDriverSetInputPullup(t *testing.T) {
+	d := initTestDirectPinInputPullupDriver()
+	err := d.SetInputPullup()
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, d.IsInputPullup(), true)
+
+	d = initTestDirectPinDriver()
+	err = d.SetInputPullup()
+	gobottest.Assert(t, err, ErrDigitalReadInputPullupUnsupported)
+}
+
+func TestDirectPinDriverDigitalReadInputPullup(t *testing.T) {
+	d := initTestDirectPinInputPullupDriver()
+	err := d.SetInputPullup()
+	gobottest.Assert(t, err, nil)
+	ret, err := d.DigitalRead()
+	gobottest.Assert(t, ret, 1)
+	gobottest.Assert(t, err, nil)
 }

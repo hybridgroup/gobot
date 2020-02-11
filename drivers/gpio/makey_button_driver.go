@@ -8,12 +8,14 @@ import (
 
 // MakeyButtonDriver Represents a Makey Button
 type MakeyButtonDriver struct {
-	name       string
-	pin        string
-	halt       chan bool
-	connection DigitalReader
-	Active     bool
-	interval   time.Duration
+	name                  string
+	pin                   string
+	halt                  chan bool
+	connection            DigitalReader
+	connectionInputPullup DigitalReaderInputPullup
+	Active                bool
+	inputPullup           bool
+	interval              time.Duration
 	gobot.Eventer
 }
 
@@ -24,13 +26,14 @@ type MakeyButtonDriver struct {
 //  time.Duration: Interval at which the ButtonDriver is polled for new information
 func NewMakeyButtonDriver(a DigitalReader, pin string, v ...time.Duration) *MakeyButtonDriver {
 	m := &MakeyButtonDriver{
-		name:       gobot.DefaultName("MakeyButton"),
-		connection: a,
-		pin:        pin,
-		Active:     false,
-		Eventer:    gobot.NewEventer(),
-		interval:   10 * time.Millisecond,
-		halt:       make(chan bool),
+		name:        gobot.DefaultName("MakeyButton"),
+		connection:  a,
+		pin:         pin,
+		Active:      false,
+		Eventer:     gobot.NewEventer(),
+		interval:    10 * time.Millisecond,
+		halt:        make(chan bool),
+		inputPullup: false,
 	}
 
 	if len(v) > 0 {
@@ -43,6 +46,24 @@ func NewMakeyButtonDriver(a DigitalReader, pin string, v ...time.Duration) *Make
 
 	return m
 }
+
+// SetInputPullup permit to put pin mode as INPUT_PULLUP
+// Your pletaform must be support it
+func (b *MakeyButtonDriver) SetInputPullup() (err error) {
+	if reader, ok := b.Connection().(DigitalReaderInputPullup); ok {
+		b.connectionInputPullup = reader
+		b.inputPullup = true
+
+		return
+	}
+
+	err = ErrDigitalReadInputPullupUnsupported
+
+	return
+}
+
+// IsInputPullup return if pin is setting as INPUT_PULLUP
+func (b *MakeyButtonDriver) IsInputPullup() bool { return b.inputPullup }
 
 // Name returns the MakeyButtonDrivers name
 func (b *MakeyButtonDriver) Name() string { return b.name }
@@ -68,7 +89,14 @@ func (b *MakeyButtonDriver) Start() (err error) {
 		timer := time.NewTimer(b.interval)
 		timer.Stop()
 		for {
-			newValue, err := b.connection.DigitalRead(b.Pin())
+			var newValue int
+			var err error
+			if b.IsInputPullup() {
+				newValue, err = b.connectionInputPullup.DigitalReadInputPullup(b.Pin())
+			} else {
+				newValue, err = b.connection.DigitalRead(b.Pin())
+			}
+
 			if err != nil {
 				b.Publish(Error, err)
 			} else if newValue != state && newValue != -1 {

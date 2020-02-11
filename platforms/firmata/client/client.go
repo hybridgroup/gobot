@@ -16,11 +16,12 @@ import (
 
 // Pin Modes
 const (
-	Input  = 0x00
-	Output = 0x01
-	Analog = 0x02
-	Pwm    = 0x03
-	Servo  = 0x04
+	Input       = 0x00
+	Output      = 0x01
+	Analog      = 0x02
+	Pwm         = 0x03
+	Servo       = 0x04
+	InputPullup = 0x0B
 )
 
 // Sysex Codes
@@ -411,7 +412,7 @@ func (b *Client) process() (err error) {
 		for i := 0; i < 8; i++ {
 			pinNumber := int((8*byte(port) + byte(i)))
 			if len(b.pins) > pinNumber {
-				if b.pins[pinNumber].Mode == Input {
+				if b.pins[pinNumber].Mode == Input || b.pins[pinNumber].Mode == InputPullup {
 					b.pins[pinNumber].Value = int((portValue >> (byte(i) & 0x07)) & 0x01)
 					b.Publish(b.Event(fmt.Sprintf("DigitalRead%v", pinNumber)), b.pins[pinNumber].Value)
 				}
@@ -444,7 +445,7 @@ func (b *Client) process() (err error) {
 			for _, val := range currentBuffer[2 : len(currentBuffer)-1] {
 				if val == 127 {
 					modes := []int{}
-					for _, mode := range []int{Input, Output, Analog, Pwm, Servo} {
+					for _, mode := range []int{Input, InputPullup, Output, Analog, Pwm, Servo} {
 						if (supportedModes & (1 << byte(mode))) != 0 {
 							modes = append(modes, mode)
 						}

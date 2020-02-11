@@ -8,9 +8,11 @@ import (
 
 // DirectPinDriver represents a GPIO pin
 type DirectPinDriver struct {
-	name       string
-	pin        string
-	connection gobot.Connection
+	name                  string
+	pin                   string
+	inputPullup           bool
+	connection            gobot.Connection
+	connectionInputPullup DigitalReaderInputPullup
 	gobot.Commander
 }
 
@@ -24,10 +26,11 @@ type DirectPinDriver struct {
 // 	"ServoWrite" - See DirectPinDriver.ServoWrite
 func NewDirectPinDriver(a gobot.Connection, pin string) *DirectPinDriver {
 	d := &DirectPinDriver{
-		name:       gobot.DefaultName("DirectPin"),
-		connection: a,
-		pin:        pin,
-		Commander:  gobot.NewCommander(),
+		name:        gobot.DefaultName("DirectPin"),
+		connection:  a,
+		pin:         pin,
+		Commander:   gobot.NewCommander(),
+		inputPullup: false,
 	}
 
 	d.AddCommand("DigitalRead", func(params map[string]interface{}) interface{} {
@@ -49,6 +52,25 @@ func NewDirectPinDriver(a gobot.Connection, pin string) *DirectPinDriver {
 
 	return d
 }
+
+// SetInputPullup permit to put pin mode as INPUT_PULLUP
+// Your pletaform must be support it
+func (d *DirectPinDriver) SetInputPullup() (err error) {
+
+	if reader, ok := d.Connection().(DigitalReaderInputPullup); ok {
+		d.connectionInputPullup = reader
+		d.inputPullup = true
+
+		return
+	}
+
+	err = ErrDigitalReadInputPullupUnsupported
+
+	return
+}
+
+// IsInputPullup return if pin is setting as INPUT_PULLUP
+func (d *DirectPinDriver) IsInputPullup() bool { return d.inputPullup }
 
 // Name returns the DirectPinDrivers name
 func (d *DirectPinDriver) Name() string { return d.name }
@@ -88,10 +110,17 @@ func (d *DirectPinDriver) On() (err error) {
 
 // DigitalRead returns the current digital state of the pin
 func (d *DirectPinDriver) DigitalRead() (val int, err error) {
+
+	if d.IsInputPullup() {
+		return d.connectionInputPullup.DigitalReadInputPullup(d.Pin())
+	}
+
 	if reader, ok := d.Connection().(DigitalReader); ok {
 		return reader.DigitalRead(d.Pin())
+
 	}
 	err = ErrDigitalReadUnsupported
+
 	return
 }
 

@@ -8,13 +8,15 @@ import (
 
 // ButtonDriver Represents a digital Button
 type ButtonDriver struct {
-	Active       bool
-	DefaultState int
-	pin          string
-	name         string
-	halt         chan bool
-	interval     time.Duration
-	connection   DigitalReader
+	Active                bool
+	DefaultState          int
+	pin                   string
+	name                  string
+	halt                  chan bool
+	interval              time.Duration
+	connection            DigitalReader
+	connectionInputPullup DigitalReaderInputPullup
+	inputPullup           bool
 	gobot.Eventer
 }
 
@@ -33,6 +35,7 @@ func NewButtonDriver(a DigitalReader, pin string, v ...time.Duration) *ButtonDri
 		Eventer:      gobot.NewEventer(),
 		interval:     10 * time.Millisecond,
 		halt:         make(chan bool),
+		inputPullup:  false,
 	}
 
 	if len(v) > 0 {
@@ -56,7 +59,14 @@ func (b *ButtonDriver) Start() (err error) {
 	state := b.DefaultState
 	go func() {
 		for {
-			newValue, err := b.connection.DigitalRead(b.Pin())
+			var newValue int
+			var err error
+			if b.IsInputPullup() {
+				newValue, err = b.connectionInputPullup.DigitalReadInputPullup(b.Pin())
+			} else {
+				newValue, err = b.connection.DigitalRead(b.Pin())
+			}
+
 			if err != nil {
 				b.Publish(Error, err)
 			} else if newValue != state && newValue != -1 {
@@ -72,6 +82,24 @@ func (b *ButtonDriver) Start() (err error) {
 	}()
 	return
 }
+
+// SetInputPullup permit to put pin mode as INPUT_PULLUP
+// Your pletaform must be support it
+func (b *ButtonDriver) SetInputPullup() (err error) {
+	if reader, ok := b.Connection().(DigitalReaderInputPullup); ok {
+		b.connectionInputPullup = reader
+		b.inputPullup = true
+
+		return
+	}
+
+	err = ErrDigitalReadInputPullupUnsupported
+
+	return
+}
+
+// IsInputPullup return if pin is setting as INPUT_PULLUP
+func (b *ButtonDriver) IsInputPullup() bool { return b.inputPullup }
 
 // Halt stops polling the button for new information
 func (b *ButtonDriver) Halt() (err error) {

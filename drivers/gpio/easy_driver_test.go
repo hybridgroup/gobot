@@ -183,4 +183,3 @@ func TestEasyDriverDisable(t *testing.T) {
 	gobottest.Assert(t, d.IsEnabled(), false)
 	gobottest.Assert(t, d.IsMoving(), false)
 }
-

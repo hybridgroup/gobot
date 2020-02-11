@@ -6,20 +6,20 @@ import (
 
 // Gesture is a Leap Motion gesture that has been detected
 type Gesture struct {
-	Center        []float64   `json:"center"`
-	Direction     []float64   `json:"direction"`
-	Duration      int         `json:"duration"`
-	HandIDs       []int       `json:"handIds"`
-	ID            int         `json:"id"`
-	Normal        []float64   `json:"normal"`
-	PointableIDs  []int       `json:"pointableIds"`
-	Position      []float64   `json:"position"`
-	Progress      float64     `json:"progress"`
-	Radius        float64     `json:"radius"`
-	Speed         float64     `json:"speed"`
-	StartPosition []float64   `json:"StartPosition"`
-	State         string      `json:"state"`
-	Type          string      `json:"type"`
+	Center        []float64 `json:"center"`
+	Direction     []float64 `json:"direction"`
+	Duration      int       `json:"duration"`
+	HandIDs       []int     `json:"handIds"`
+	ID            int       `json:"id"`
+	Normal        []float64 `json:"normal"`
+	PointableIDs  []int     `json:"pointableIds"`
+	Position      []float64 `json:"position"`
+	Progress      float64   `json:"progress"`
+	Radius        float64   `json:"radius"`
+	Speed         float64   `json:"speed"`
+	StartPosition []float64 `json:"StartPosition"`
+	State         string    `json:"state"`
+	Type          string    `json:"type"`
 }
 
 // Hand is a Leap Motion hand that has been detected
@@ -48,26 +48,26 @@ type Hand struct {
 
 // Pointable is a Leap Motion pointing motion that has been detected
 type Pointable struct {
-	Bases                 [][][]float64  `json:"bases"`
-	BTipPosition          []float64    `json:"btipPosition"`
-	CarpPosition          []float64    `json:"carpPosition"`
-	DipPosition           []float64    `json:"dipPosition"`
-	Direction             []float64    `json:"direction"`
-	Extended              bool         `json:"extended"`
-	HandID                int          `json:"handId"`
-	ID                    int          `json:"id"`
-	Length                float64      `json:"length"`
-	MCPPosition           []float64    `json:"mcpPosition"`
-	PIPPosition           []float64    `json:"pipPosition"`
-	StabilizedTipPosition []float64    `json:"stabilizedTipPosition"`
-	TimeVisible           float64      `json:"timeVisible"`
-	TipPosition           []float64    `json:"tipPosition"`
-	TipVelocity           []float64    `json:"tipVelocity"`
-	Tool                  bool         `json:"tool"`
-	TouchDistance         float64      `json:"touchDistance"`
-	TouchZone             string       `json:"touchZone"`
-	Type                  int          `json:"type"`
-	Width                 float64      `json:"width"`
+	Bases                 [][][]float64 `json:"bases"`
+	BTipPosition          []float64     `json:"btipPosition"`
+	CarpPosition          []float64     `json:"carpPosition"`
+	DipPosition           []float64     `json:"dipPosition"`
+	Direction             []float64     `json:"direction"`
+	Extended              bool          `json:"extended"`
+	HandID                int           `json:"handId"`
+	ID                    int           `json:"id"`
+	Length                float64       `json:"length"`
+	MCPPosition           []float64     `json:"mcpPosition"`
+	PIPPosition           []float64     `json:"pipPosition"`
+	StabilizedTipPosition []float64     `json:"stabilizedTipPosition"`
+	TimeVisible           float64       `json:"timeVisible"`
+	TipPosition           []float64     `json:"tipPosition"`
+	TipVelocity           []float64     `json:"tipVelocity"`
+	Tool                  bool          `json:"tool"`
+	TouchDistance         float64       `json:"touchDistance"`
+	TouchZone             string        `json:"touchZone"`
+	Type                  int           `json:"type"`
+	Width                 float64       `json:"width"`
 }
 
 // InteractionBox is the area within which the gestural interaction has been detected

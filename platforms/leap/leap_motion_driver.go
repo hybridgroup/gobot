@@ -83,11 +83,11 @@ func enableFeature(l *Driver, feature string) (err error) {
 //		"hand" - Emits Hand when detected in message from Leap.
 //		"gesture" - Emits Gesture when detected in message from Leap.
 func (l *Driver) Start() (err error) {
-	err = enableFeature(l,"enableGestures")
+	err = enableFeature(l, "enableGestures")
 	if err != nil {
 		return err
 	}
-	err = enableFeature(l,"background")
+	err = enableFeature(l, "background")
 	if err != nil {
 		return err
 	}

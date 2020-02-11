@@ -8,12 +8,14 @@ import (
 
 // PIRMotionDriver represents a digital Proximity Infra Red (PIR) motion detecter
 type PIRMotionDriver struct {
-	Active     bool
-	pin        string
-	name       string
-	halt       chan bool
-	interval   time.Duration
-	connection DigitalReader
+	Active                bool
+	pin                   string
+	name                  string
+	halt                  chan bool
+	interval              time.Duration
+	inputPullup           bool
+	connection            DigitalReader
+	connectionInputPullup DigitalReaderInputPullup
 	gobot.Eventer
 }
 
@@ -24,13 +26,14 @@ type PIRMotionDriver struct {
 //  time.Duration: Interval at which the PIRMotionDriver is polled for new information
 func NewPIRMotionDriver(a DigitalReader, pin string, v ...time.Duration) *PIRMotionDriver {
 	b := &PIRMotionDriver{
-		name:       gobot.DefaultName("PIRMotion"),
-		connection: a,
-		pin:        pin,
-		Active:     false,
-		Eventer:    gobot.NewEventer(),
-		interval:   10 * time.Millisecond,
-		halt:       make(chan bool),
+		name:        gobot.DefaultName("PIRMotion"),
+		connection:  a,
+		pin:         pin,
+		Active:      false,
+		Eventer:     gobot.NewEventer(),
+		interval:    10 * time.Millisecond,
+		halt:        make(chan bool),
+		inputPullup: false,
 	}
 
 	if len(v) > 0 {
@@ -58,7 +61,13 @@ func NewPIRMotionDriver(a DigitalReader, pin string, v ...time.Duration) *PIRMot
 func (p *PIRMotionDriver) Start() (err error) {
 	go func() {
 		for {
-			newValue, err := p.connection.DigitalRead(p.Pin())
+			var newValue int
+			var err error
+			if p.IsInputPullup() {
+				newValue, err = p.connectionInputPullup.DigitalReadInputPullup(p.Pin())
+			} else {
+				newValue, err = p.connection.DigitalRead(p.Pin())
+			}
 			if err != nil {
 				p.Publish(Error, err)
 			}
@@ -84,6 +93,24 @@ func (p *PIRMotionDriver) Start() (err error) {
 	}()
 	return
 }
+
+// SetInputPullup permit to put pin mode as INPUT_PULLUP
+// Your pletaform must be support it
+func (p *PIRMotionDriver) SetInputPullup() (err error) {
+	if reader, ok := p.Connection().(DigitalReaderInputPullup); ok {
+		p.connectionInputPullup = reader
+		p.inputPullup = true
+
+		return
+	}
+
+	err = ErrDigitalReadInputPullupUnsupported
+
+	return
+}
+
+// IsInputPullup return if pin is setting as INPUT_PULLUP
+func (p *PIRMotionDriver) IsInputPullup() bool { return p.inputPullup }
 
 // Halt stops polling the button for new information
 func (p *PIRMotionDriver) Halt() (err error) {

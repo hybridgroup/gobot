@@ -20,6 +20,9 @@ var (
 	// ErrDigitalReadUnsupported is the error resulting when a driver attempts to use
 	// hardware capabilities which a connection does not support
 	ErrDigitalReadUnsupported = errors.New("DigitalRead is not supported by this platform")
+	// ErrDigitalReadInputPullupUnsupported is the error resulting when a driver attempts to use
+	// hardware capabilities which a connection does not support
+	ErrDigitalReadInputPullupUnsupported = errors.New("DigitalRead with INPUT_PULLUP is not supported by this platform")
 	// ErrServoOutOfRange is the error resulting when a driver attempts to use
 	// hardware capabilities which a connection does not support
 	ErrServoOutOfRange = errors.New("servo angle must be between 0-180")
@@ -60,4 +63,9 @@ type DigitalWriter interface {
 // DigitalReader interface represents an Adaptor which has DigitalRead capabilities
 type DigitalReader interface {
 	DigitalRead(string) (val int, err error)
+}
+
+// DigitalReaderInputPullup interface represents an Adaptor which has DigitalRead capabilities with INPUT_PULLUP
+type DigitalReaderInputPullup interface {
+	DigitalReadInputPullup(string) (val int, err error)
 }

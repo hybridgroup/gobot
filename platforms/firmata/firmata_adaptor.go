@@ -45,6 +45,7 @@ type Adaptor struct {
 	Board      firmataBoard
 	conn       io.ReadWriteCloser
 	PortOpener func(port string) (io.ReadWriteCloser, error)
+	inputMode  int
 	gobot.Eventer
 }
 
@@ -57,6 +58,7 @@ type Adaptor struct {
 // to a serial port with a baude rate of 57600. If an io.ReadWriteCloser
 // is supplied, then the Adaptor will use the provided io.ReadWriteCloser and use the
 // string port as a label to be displayed in the log and api.
+// If an int is not suplied, The Adaptor will set pin to INPUT for read on digital pin.
 func NewAdaptor(args ...interface{}) *Adaptor {
 	f := &Adaptor{
 		name:  gobot.DefaultName("Firmata"),
@@ -205,6 +207,36 @@ func (f *Adaptor) DigitalRead(pin string) (val int, err error) {
 	}
 
 	return f.Board.Pins()[p].Value, nil
+
+}
+
+// DigitalReadInputPullup retrieves digital value from specified pin with INPUT_PULLUP mode.
+// Returns -1 if the response from the board has timed out
+func (f *Adaptor) DigitalReadInputPullup(pin string) (val int, err error) {
+	p, err := strconv.Atoi(pin)
+	if err != nil {
+		return
+	}
+
+	if f.Board.Pins()[p].Mode != client.InputPullup {
+		if err = f.Board.SetPinMode(p, client.InputPullup); err != nil {
+			return
+		}
+		if err = f.Board.ReportDigital(p, 1); err != nil {
+			return
+		}
+		<-time.After(10 * time.Millisecond)
+	}
+
+	// On INPUT_PULLUP, we need to reverse value
+	switch f.Board.Pins()[p].Value {
+	case 0:
+		val = 1
+	case 1:
+		val = 0
+	}
+
+	return
 }
 
 // AnalogRead retrieves value from analog pin.

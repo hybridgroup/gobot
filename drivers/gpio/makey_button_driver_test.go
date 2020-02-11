@@ -17,6 +17,10 @@ func initTestMakeyButtonDriver() *MakeyButtonDriver {
 	return NewMakeyButtonDriver(newGpioTestAdaptor(), "1")
 }
 
+func initTestMakeyButtonInputPullupDriver() *MakeyButtonDriver {
+	return NewMakeyButtonDriver(newGpioInputPullupTestAdaptor(), "1")
+}
+
 func TestMakeyButtonDriverHalt(t *testing.T) {
 	d := initTestMakeyButtonDriver()
 	done := make(chan struct{})
@@ -46,6 +50,94 @@ func TestMakeyButtonDriverStart(t *testing.T) {
 	sem := make(chan bool)
 	a := newGpioTestAdaptor()
 	d := NewMakeyButtonDriver(a, "1")
+
+	gobottest.Assert(t, d.Start(), nil)
+
+	d.Once(ButtonPush, func(data interface{}) {
+		gobottest.Assert(t, d.Active, true)
+		sem <- true
+	})
+
+	a.TestAdaptorDigitalRead(func() (val int, err error) {
+		val = 0
+		return
+	})
+
+	select {
+	case <-sem:
+	case <-time.After(makeyTestDelay * time.Millisecond):
+		t.Errorf("MakeyButton Event \"Push\" was not published")
+	}
+
+	d.Once(ButtonRelease, func(data interface{}) {
+		gobottest.Assert(t, d.Active, false)
+		sem <- true
+	})
+
+	a.TestAdaptorDigitalRead(func() (val int, err error) {
+		val = 1
+		return
+	})
+
+	select {
+	case <-sem:
+	case <-time.After(makeyTestDelay * time.Millisecond):
+		t.Errorf("MakeyButton Event \"Release\" was not published")
+	}
+
+	d.Once(Error, func(data interface{}) {
+		gobottest.Assert(t, data.(error).Error(), "digital read error")
+		sem <- true
+	})
+
+	a.TestAdaptorDigitalRead(func() (val int, err error) {
+		err = errors.New("digital read error")
+		return
+	})
+
+	select {
+	case <-sem:
+	case <-time.After(makeyTestDelay * time.Millisecond):
+		t.Errorf("MakeyButton Event \"Error\" was not published")
+	}
+
+	// send a halt message
+	d.Once(ButtonRelease, func(data interface{}) {
+		sem <- true
+	})
+
+	a.TestAdaptorDigitalRead(func() (val int, err error) {
+		val = 1
+		return
+	})
+
+	d.halt <- true
+
+	select {
+	case <-sem:
+		t.Errorf("MakeyButton Event should not have been published")
+	case <-time.After(makeyTestDelay * time.Millisecond):
+	}
+}
+
+func TestMakeyButtonDriverSetInputPullup(t *testing.T) {
+	d := initTestMakeyButtonInputPullupDriver()
+	err := d.SetInputPullup()
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, d.IsInputPullup(), true)
+
+	d = initTestMakeyButtonDriver()
+	err = d.SetInputPullup()
+	gobottest.Assert(t, err, ErrDigitalReadInputPullupUnsupported)
+}
+
+func TestMakeyButtonInputPullupDriverStart(t *testing.T) {
+	sem := make(chan bool)
+	a := newGpioInputPullupTestAdaptor()
+	d := NewMakeyButtonDriver(a, "1")
+
+	err := d.SetInputPullup()
+	gobottest.Assert(t, err, nil)
 
 	gobottest.Assert(t, d.Start(), nil)
 

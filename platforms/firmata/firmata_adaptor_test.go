@@ -20,6 +20,7 @@ import (
 // make sure that this Adaptor fullfills all the required interfaces
 var _ gobot.Adaptor = (*Adaptor)(nil)
 var _ gpio.DigitalReader = (*Adaptor)(nil)
+var _ gpio.DigitalReaderInputPullup = (*Adaptor)(nil)
 var _ gpio.DigitalWriter = (*Adaptor)(nil)
 var _ aio.AnalogReader = (*Adaptor)(nil)
 var _ gpio.PwmWriter = (*Adaptor)(nil)
@@ -78,16 +79,17 @@ func (m mockFirmataBoard) Disconnect() error {
 func (m mockFirmataBoard) Pins() []client.Pin {
 	return m.pins
 }
-func (mockFirmataBoard) AnalogWrite(int, int) error      { return nil }
-func (mockFirmataBoard) SetPinMode(int, int) error       { return nil }
-func (mockFirmataBoard) ReportAnalog(int, int) error     { return nil }
-func (mockFirmataBoard) ReportDigital(int, int) error    { return nil }
-func (mockFirmataBoard) DigitalWrite(int, int) error     { return nil }
-func (mockFirmataBoard) I2cRead(int, int) error          { return nil }
-func (mockFirmataBoard) I2cWrite(int, []byte) error      { return nil }
-func (mockFirmataBoard) I2cConfig(int) error             { return nil }
-func (mockFirmataBoard) ServoConfig(int, int, int) error { return nil }
-func (mockFirmataBoard) WriteSysex(data []byte) error    { return nil }
+func (mockFirmataBoard) AnalogWrite(int, int) error              { return nil }
+func (mockFirmataBoard) SetPinMode(int, int) error               { return nil }
+func (mockFirmataBoard) ReportAnalog(int, int) error             { return nil }
+func (mockFirmataBoard) ReportDigital(int, int) error            { return nil }
+func (mockFirmataBoard) ReportDigitalInputPullup(int, int) error { return nil }
+func (mockFirmataBoard) DigitalWrite(int, int) error             { return nil }
+func (mockFirmataBoard) I2cRead(int, int) error                  { return nil }
+func (mockFirmataBoard) I2cWrite(int, []byte) error              { return nil }
+func (mockFirmataBoard) I2cConfig(int) error                     { return nil }
+func (mockFirmataBoard) ServoConfig(int, int, int) error         { return nil }
+func (mockFirmataBoard) WriteSysex(data []byte) error            { return nil }
 
 func initTestAdaptor() *Adaptor {
 	a := NewAdaptor("/dev/null")
@@ -182,6 +184,23 @@ func TestAdaptorDigitalRead(t *testing.T) {
 func TestAdaptorDigitalReadBadPin(t *testing.T) {
 	a := initTestAdaptor()
 	_, err := a.DigitalRead("xyz")
+	gobottest.Refute(t, err, nil)
+}
+
+func TestAdaptorDigitalReadInputPullup(t *testing.T) {
+	a := initTestAdaptor()
+	val, err := a.DigitalReadInputPullup("1")
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, val, 0)
+
+	val, err = a.DigitalReadInputPullup("0")
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, val, 1)
+}
+
+func TestAdaptorDigitalReadInputPullupBadPin(t *testing.T) {
+	a := initTestAdaptor()
+	_, err := a.DigitalReadInputPullup("xyz")
 	gobottest.Refute(t, err, nil)
 }
 

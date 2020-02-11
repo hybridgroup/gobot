@@ -26,6 +26,11 @@ type gpioTestAdaptor struct {
 	testAdaptorDigitalRead  func() (val int, err error)
 }
 
+type gpioInputPullupTestAdaptor struct {
+	testAdaptorDigitalReadInputPullup func() (val int, err error)
+	gpioTestAdaptor
+}
+
 func (t *gpioTestAdaptor) TestAdaptorDigitalWrite(f func() (err error)) {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
@@ -99,6 +104,42 @@ func newGpioTestAdaptor() *gpioTestAdaptor {
 			return 99, nil
 		},
 		testAdaptorDigitalRead: func() (val int, err error) {
+			return 1, nil
+		},
+	}
+}
+
+func (t *gpioInputPullupTestAdaptor) TestAdaptorDigitalReadInputPullup(f func() (val int, err error)) {
+	t.mtx.Lock()
+	defer t.mtx.Unlock()
+	t.testAdaptorDigitalReadInputPullup = f
+}
+func (t *gpioInputPullupTestAdaptor) DigitalReadInputPullup(string) (val int, err error) {
+	t.mtx.Lock()
+	defer t.mtx.Unlock()
+	return t.testAdaptorDigitalRead()
+}
+func newGpioInputPullupTestAdaptor() *gpioInputPullupTestAdaptor {
+	return &gpioInputPullupTestAdaptor{
+		gpioTestAdaptor: gpioTestAdaptor{
+			port: "/dev/null",
+			testAdaptorDigitalWrite: func() (err error) {
+				return nil
+			},
+			testAdaptorServoWrite: func() (err error) {
+				return nil
+			},
+			testAdaptorPwmWrite: func() (err error) {
+				return nil
+			},
+			testAdaptorAnalogRead: func() (val int, err error) {
+				return 99, nil
+			},
+			testAdaptorDigitalRead: func() (val int, err error) {
+				return 1, nil
+			},
+		},
+		testAdaptorDigitalReadInputPullup: func() (val int, err error) {
 			return 1, nil
 		},
 	}
