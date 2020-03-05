@@ -32,6 +32,7 @@ endif
 	go-bindata -pkg="robeaux" -o robeaux.go -ignore=\\.git ./... ; \
 	mv robeaux.go ../robeaux ; \
 	cd .. ; \
+	
 	rm -rf robeaux-tmp/ ; \
 	rm -rf node_modules/ ; \
 	go fmt ./robeaux/robeaux.go ; \
