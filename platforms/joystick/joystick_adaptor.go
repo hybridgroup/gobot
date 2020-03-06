@@ -2,6 +2,7 @@ package joystick
 
 import (
 	"errors"
+	"strings"
 
 	"gobot.io/x/gobot"
 
@@ -31,6 +32,27 @@ func NewAdaptor() *Adaptor {
 				return
 			}
 			return errors.New("No joystick available")
+		},
+	}
+}
+
+// Returns a new Joystick Adaptor for an implementation-specific named device
+func NewNamedAdaptor(targetName string) *Adaptor {
+	return &Adaptor{
+		name: gobot.DefaultName("Joystick"),
+		connect: func(adaptor *Adaptor) (err error) {
+			initErr := sdl.Init(sdl.INIT_JOYSTICK)
+			if initErr != nil {
+				return initErr
+			}
+			foundIndex := -1
+			for i := 0; i < sdl.NumJoysticks(); i++ {
+				if strings.TrimSpace(targetName) == strings.TrimSpace(sdl.JoystickNameForIndex(i)) {
+					adaptor.joystick = sdl.JoystickOpen(foundIndex)
+					return
+				}
+			}
+			return errors.New("cannot find joystick by specified name")
 		},
 	}
 }
