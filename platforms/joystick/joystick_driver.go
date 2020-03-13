@@ -25,6 +25,9 @@ const (
 
 	// Xbox360RockBandDrums controller configuration.
 	Xbox360RockBandDrums = "xbox360RockBandDrums"
+
+	// Nvidia Shield TV Controller
+	Shield = "shield"
 )
 
 // Driver represents a joystick
@@ -123,6 +126,8 @@ func (j *Driver) Start() (err error) {
 		j.config = xbox360Config
 	case "xbox360RockBandDrums":
 		j.config = xbox360RockBandDrumsConfig
+	case "shield":
+		j.config = shieldConfig
 	default:
 		err := j.loadFile()
 		if err != nil {
