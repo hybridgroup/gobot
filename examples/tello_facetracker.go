@@ -9,6 +9,9 @@ and then open a window using OpenCV showing the streaming video.
 How to run
 
 	go run examples/tello_facetracker.go ~/Downloads/res10_300x300_ssd_iter_140000.caffemodel ~/Development/opencv/samples/dnn/face_detector/deploy.prototxt
+
+You can find download the weight via https://github.com/opencv/opencv_3rdparty/raw/dnn_samples_face_detector_20170830/res10_300x300_ssd_iter_140000.caffemodel
+And you can find protofile in OpenCV samples directory
 */
 
 package main
@@ -46,6 +49,7 @@ const (
 var (
 	// ffmpeg command to decode video stream from drone
 	ffmpeg = exec.Command("ffmpeg", "-hwaccel", "auto", "-hwaccel_device", "opencl", "-i", "pipe:0",
+		"-nostats", "-flags", "low_delay", "-probesize", "32", "-fflags", "nobuffer+fastseek+flush_packets", "-analyzeduration", "0", "-af", "aresample=async=1:min_comp=0.1:first_pts=0",
 		"-pix_fmt", "bgr24", "-s", strconv.Itoa(frameX)+"x"+strconv.Itoa(frameY), "-f", "rawvideo", "pipe:1")
 	ffmpegIn, _  = ffmpeg.StdinPipe()
 	ffmpegOut, _ = ffmpeg.StdoutPipe()
