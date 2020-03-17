@@ -191,6 +191,7 @@ type Driver struct {
 	throttle       int
 	bouncing       bool
 	gobot.Eventer
+	doneCh chan struct{}
 }
 
 // NewDriver creates a driver for the Tello drone. Pass in the UDP port to use for the responses
@@ -201,6 +202,7 @@ func NewDriver(port string) *Driver {
 		respPort:  port,
 		videoPort: "11111",
 		Eventer:   gobot.NewEventer(),
+		doneCh:    make(chan struct{}, 1),
 	}
 
 	d.AddEvent(ConnectedEvent)
@@ -284,10 +286,16 @@ func (d *Driver) Start() error {
 			d.processVideo()
 		})
 
+	cmdLoop:
 		for {
-			err := d.handleResponse(cmdConn)
-			if err != nil {
-				fmt.Println("response parse error:", err)
+			select {
+			case <-d.doneCh:
+				break cmdLoop
+			default:
+				err := d.handleResponse(cmdConn)
+				if err != nil {
+					fmt.Println("response parse error:", err)
+				}
 			}
 		}
 	}()
@@ -313,9 +321,9 @@ func (d *Driver) Start() error {
 func (d *Driver) Halt() (err error) {
 	// send a landing command when we disconnect, and give it 500ms to be received before we shutdown
 	d.Land()
+	d.doneCh <- struct{}{}
 	time.Sleep(500 * time.Millisecond)
 
-	// TODO: cleanly shutdown the goroutines that are handling the UDP connections before closing
 	d.cmdConn.Close()
 	d.videoConn.Close()
 	return
@@ -937,15 +945,21 @@ func (d *Driver) processVideo() error {
 	}
 
 	go func() {
+	videoConnLoop:
 		for {
-			buf := make([]byte, 2048)
-			n, _, err := d.videoConn.ReadFromUDP(buf)
-			if err != nil {
-				fmt.Println("Error: ", err)
-				continue
-			}
+			select {
+			case <-d.doneCh:
+				break videoConnLoop
+			default:
+				buf := make([]byte, 2048)
+				n, _, err := d.videoConn.ReadFromUDP(buf)
+				if err != nil {
+					fmt.Println("Error: ", err)
+					continue
+				}
 
-			d.Publish(d.Event(VideoFrameEvent), buf[2:n])
+				d.Publish(d.Event(VideoFrameEvent), buf[2:n])
+			}
 		}
 	}()
 
