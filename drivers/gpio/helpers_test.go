@@ -19,63 +19,63 @@ type gpioTestAdaptor struct {
 	name                    string
 	port                    string
 	mtx                     sync.Mutex
-	testAdaptorDigitalWrite func() (err error)
-	testAdaptorServoWrite   func() (err error)
-	testAdaptorPwmWrite     func() (err error)
-	testAdaptorAnalogRead   func() (val int, err error)
-	testAdaptorDigitalRead  func() (val int, err error)
+	testAdaptorDigitalWrite func(pin string, val byte) (err error)
+	testAdaptorServoWrite   func(pin string, val byte) (err error)
+	testAdaptorPwmWrite     func(pin string, val byte) (err error)
+	testAdaptorAnalogRead   func(ping string) (val int, err error)
+	testAdaptorDigitalRead  func(ping string) (val int, err error)
 }
 
-func (t *gpioTestAdaptor) TestAdaptorDigitalWrite(f func() (err error)) {
+func (t *gpioTestAdaptor) TestAdaptorDigitalWrite(f func(pin string, val byte) (err error)) {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 	t.testAdaptorDigitalWrite = f
 }
-func (t *gpioTestAdaptor) TestAdaptorServoWrite(f func() (err error)) {
+func (t *gpioTestAdaptor) TestAdaptorServoWrite(f func(pin string, val byte) (err error)) {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 	t.testAdaptorServoWrite = f
 }
-func (t *gpioTestAdaptor) TestAdaptorPwmWrite(f func() (err error)) {
+func (t *gpioTestAdaptor) TestAdaptorPwmWrite(f func(pin string, val byte) (err error)) {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 	t.testAdaptorPwmWrite = f
 }
-func (t *gpioTestAdaptor) TestAdaptorAnalogRead(f func() (val int, err error)) {
+func (t *gpioTestAdaptor) TestAdaptorAnalogRead(f func(pin string) (val int, err error)) {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 	t.testAdaptorAnalogRead = f
 }
-func (t *gpioTestAdaptor) TestAdaptorDigitalRead(f func() (val int, err error)) {
+func (t *gpioTestAdaptor) TestAdaptorDigitalRead(f func(pin string) (val int, err error)) {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 	t.testAdaptorDigitalRead = f
 }
 
-func (t *gpioTestAdaptor) ServoWrite(string, byte) (err error) {
+func (t *gpioTestAdaptor) ServoWrite(pin string, val byte) (err error) {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
-	return t.testAdaptorServoWrite()
+	return t.testAdaptorServoWrite(pin, val)
 }
-func (t *gpioTestAdaptor) PwmWrite(string, byte) (err error) {
+func (t *gpioTestAdaptor) PwmWrite(pin string, val byte) (err error) {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
-	return t.testAdaptorPwmWrite()
+	return t.testAdaptorPwmWrite(pin, val)
 }
-func (t *gpioTestAdaptor) AnalogRead(string) (val int, err error) {
+func (t *gpioTestAdaptor) AnalogRead(pin string) (val int, err error) {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
-	return t.testAdaptorAnalogRead()
+	return t.testAdaptorAnalogRead(pin)
 }
-func (t *gpioTestAdaptor) DigitalRead(string) (val int, err error) {
+func (t *gpioTestAdaptor) DigitalRead(pin string) (val int, err error) {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
-	return t.testAdaptorDigitalRead()
+	return t.testAdaptorDigitalRead(pin)
 }
-func (t *gpioTestAdaptor) DigitalWrite(string, byte) (err error) {
+func (t *gpioTestAdaptor) DigitalWrite(pin string, val byte) (err error) {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
-	return t.testAdaptorDigitalWrite()
+	return t.testAdaptorDigitalWrite(pin, val)
 }
 func (t *gpioTestAdaptor) Connect() (err error)  { return }
 func (t *gpioTestAdaptor) Finalize() (err error) { return }
@@ -86,19 +86,19 @@ func (t *gpioTestAdaptor) Port() string          { return t.port }
 func newGpioTestAdaptor() *gpioTestAdaptor {
 	return &gpioTestAdaptor{
 		port: "/dev/null",
-		testAdaptorDigitalWrite: func() (err error) {
+		testAdaptorDigitalWrite: func(pin string, val byte) (err error) {
 			return nil
 		},
-		testAdaptorServoWrite: func() (err error) {
+		testAdaptorServoWrite: func(pin string, val byte) (err error) {
 			return nil
 		},
-		testAdaptorPwmWrite: func() (err error) {
+		testAdaptorPwmWrite: func(pin string, val byte) (err error) {
 			return nil
 		},
-		testAdaptorAnalogRead: func() (val int, err error) {
+		testAdaptorAnalogRead: func(pin string) (val int, err error) {
 			return 99, nil
 		},
-		testAdaptorDigitalRead: func() (val int, err error) {
+		testAdaptorDigitalRead: func(pin string) (val int, err error) {
 			return 1, nil
 		},
 	}

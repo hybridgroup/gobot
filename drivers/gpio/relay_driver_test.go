@@ -15,10 +15,10 @@ func (l *RelayDriver) High() bool { return l.high }
 
 func initTestRelayDriver() *RelayDriver {
 	a := newGpioTestAdaptor()
-	a.testAdaptorDigitalWrite = func() (err error) {
+	a.testAdaptorDigitalWrite = func(string, byte) (err error) {
 		return nil
 	}
-	a.testAdaptorPwmWrite = func() (err error) {
+	a.testAdaptorPwmWrite = func(string, byte) (err error) {
 		return nil
 	}
 	return NewRelayDriver(a, "1")

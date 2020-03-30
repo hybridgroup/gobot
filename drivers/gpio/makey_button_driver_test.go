@@ -54,7 +54,7 @@ func TestMakeyButtonDriverStart(t *testing.T) {
 		sem <- true
 	})
 
-	a.TestAdaptorDigitalRead(func() (val int, err error) {
+	a.TestAdaptorDigitalRead(func(string) (val int, err error) {
 		val = 0
 		return
 	})
@@ -70,7 +70,7 @@ func TestMakeyButtonDriverStart(t *testing.T) {
 		sem <- true
 	})
 
-	a.TestAdaptorDigitalRead(func() (val int, err error) {
+	a.TestAdaptorDigitalRead(func(string) (val int, err error) {
 		val = 1
 		return
 	})
@@ -86,7 +86,7 @@ func TestMakeyButtonDriverStart(t *testing.T) {
 		sem <- true
 	})
 
-	a.TestAdaptorDigitalRead(func() (val int, err error) {
+	a.TestAdaptorDigitalRead(func(string) (val int, err error) {
 		err = errors.New("digital read error")
 		return
 	})
@@ -102,7 +102,7 @@ func TestMakeyButtonDriverStart(t *testing.T) {
 		sem <- true
 	})
 
-	a.TestAdaptorDigitalRead(func() (val int, err error) {
+	a.TestAdaptorDigitalRead(func(string) (val int, err error) {
 		val = 1
 		return
 	})
