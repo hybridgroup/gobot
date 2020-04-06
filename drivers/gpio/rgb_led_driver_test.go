@@ -13,10 +13,10 @@ var _ gobot.Driver = (*RgbLedDriver)(nil)
 
 func initTestRgbLedDriver() *RgbLedDriver {
 	a := newGpioTestAdaptor()
-	a.testAdaptorDigitalWrite = func() (err error) {
+	a.testAdaptorDigitalWrite = func(string, byte) (err error) {
 		return nil
 	}
-	a.testAdaptorPwmWrite = func() (err error) {
+	a.testAdaptorPwmWrite = func(string, byte) (err error) {
 		return nil
 	}
 	return NewRgbLedDriver(a, "1", "2", "3")
@@ -34,10 +34,10 @@ func TestRgbLedDriver(t *testing.T) {
 	gobottest.Assert(t, d.BluePin(), "3")
 	gobottest.Refute(t, d.Connection(), nil)
 
-	a.testAdaptorDigitalWrite = func() (err error) {
+	a.testAdaptorDigitalWrite = func(string, byte) (err error) {
 		return errors.New("write error")
 	}
-	a.testAdaptorPwmWrite = func() (err error) {
+	a.testAdaptorPwmWrite = func(string, byte) (err error) {
 		return errors.New("pwm error")
 	}
 
@@ -79,7 +79,7 @@ func TestRgbLedDriverSetLevel(t *testing.T) {
 	gobottest.Assert(t, d.SetLevel("1", 150), nil)
 
 	d = NewRgbLedDriver(a, "1", "2", "3")
-	a.testAdaptorPwmWrite = func() (err error) {
+	a.testAdaptorPwmWrite = func(string, byte) (err error) {
 		err = errors.New("pwm error")
 		return
 	}

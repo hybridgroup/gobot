@@ -13,17 +13,17 @@ var _ gobot.Driver = (*DirectPinDriver)(nil)
 
 func initTestDirectPinDriver() *DirectPinDriver {
 	a := newGpioTestAdaptor()
-	a.testAdaptorDigitalRead = func() (val int, err error) {
+	a.testAdaptorDigitalRead = func(string) (val int, err error) {
 		val = 1
 		return
 	}
-	a.testAdaptorDigitalWrite = func() (err error) {
+	a.testAdaptorDigitalWrite = func(string, byte) (err error) {
 		return errors.New("write error")
 	}
-	a.testAdaptorPwmWrite = func() (err error) {
+	a.testAdaptorPwmWrite = func(string, byte) (err error) {
 		return errors.New("write error")
 	}
-	a.testAdaptorServoWrite = func() (err error) {
+	a.testAdaptorServoWrite = func(string, byte) (err error) {
 		return errors.New("write error")
 	}
 	return NewDirectPinDriver(a, "1")

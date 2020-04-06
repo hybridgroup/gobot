@@ -24,7 +24,7 @@ func TestServoDriver(t *testing.T) {
 	gobottest.Assert(t, d.Pin(), "1")
 	gobottest.Refute(t, d.Connection(), nil)
 
-	a.testAdaptorServoWrite = func() (err error) {
+	a.testAdaptorServoWrite = func(string, byte) (err error) {
 		return errors.New("pwm error")
 	}
 
