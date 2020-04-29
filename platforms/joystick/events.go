@@ -81,6 +81,10 @@ const (
 	OptionsPress = "options_press"
 	// options button release event
 	OptionsRelease = "options_release"
+	// touchpad press event
+	TouchpadPress = "touchpad_press"
+	// touchpad release event
+	TouchpadRelease = "touchpad_release"
 	// home button press event
 	HomePress = "home_press"
 	// home button release event
