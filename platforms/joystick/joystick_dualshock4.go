@@ -6,19 +6,19 @@ var dualshock4Config = joystickConfig{
 	Axis: []pair{
 		pair{
 			Name: "left_x",
-			ID:   1,
-		},
-		pair{
-			Name: "left_y",
 			ID:   0,
 		},
 		pair{
+			Name: "left_y",
+			ID:   1,
+		},
+		pair{
 			Name: "right_x",
-			ID:   5,
+			ID:   2,
 		},
 		pair{
 			Name: "right_y",
-			ID:   2,
+			ID:   5,
 		},
 	},
 	Buttons: []pair{
