@@ -3,7 +3,7 @@ package mavlink
 import (
 	"io"
 
-	serial "go.bug.st/serial.v1"
+	"go.bug.st/serial"
 	"gobot.io/x/gobot"
 	common "gobot.io/x/gobot/platforms/mavlink/common"
 )

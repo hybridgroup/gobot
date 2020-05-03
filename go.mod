@@ -5,7 +5,6 @@ go 1.13
 require (
 	github.com/bmizerany/pat v0.0.0-20170815010413-6226ea591a40
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
-	github.com/creack/goselect v0.1.0 // indirect
 	github.com/donovanhide/eventsource v0.0.0-20171031113327-3ed64d21fb0b
 	github.com/eclipse/paho.mqtt.golang v1.2.0
 	github.com/go-ble/ble v0.0.0-20190521171521-147700f13610
@@ -25,13 +24,11 @@ require (
 	github.com/sigurn/crc8 v0.0.0-20160107002456-e55481d6f45c
 	github.com/sigurn/utils v0.0.0-20190728110027-e1fefb11a144 // indirect
 	github.com/stretchr/testify v1.4.0
-	github.com/tarm/serial v0.0.0-20180830185346-98f6abe2eb07
 	github.com/urfave/cli v1.22.1
 	github.com/veandco/go-sdl2 v0.3.3
-	go.bug.st/serial.v1 v0.0.0-20180827123349-5f7892a7bb45
+	go.bug.st/serial v1.0.0
 	gocv.io/x/gocv v0.21.0
 	golang.org/x/crypto v0.0.0-20191001170739-f9e2070545dc // indirect
 	golang.org/x/net v0.0.0-20190930134127-c5a3c61f89f3
-	golang.org/x/sys v0.0.0-20191001151750-bb3f8db39f24 // indirect
 	periph.io/x/periph v3.6.2+incompatible
 )

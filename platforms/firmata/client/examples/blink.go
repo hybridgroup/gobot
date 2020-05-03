@@ -8,12 +8,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/tarm/serial"
+	"go.bug.st/serial"
 	"gobot.io/x/gobot/platforms/firmata/client"
 )
 
 func main() {
-	sp, err := serial.OpenPort(&serial.Config{Name: "/dev/ttyACM0", Baud: 57600})
+	sp, err := serial.Open("/dev/ttyACM0", &serial.Mode{BaudRate: 57600})
 	if err != nil {
 		panic(err)
 	}
