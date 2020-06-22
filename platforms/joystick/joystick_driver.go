@@ -25,6 +25,10 @@ const (
 
 	// Xbox360RockBandDrums controller configuration.
 	Xbox360RockBandDrums = "xbox360RockBandDrums"
+	
+	// Xbox360 joystick configuration.
+	xboxONE = "xboxONE"
+	
 )
 
 // Driver represents a joystick
@@ -121,6 +125,8 @@ func (j *Driver) Start() (err error) {
 		j.config = tflightHotasXConfig
 	case "xbox360":
 		j.config = xbox360Config
+	case "xboxONE":
+		j.config = xboxONEConfig
 	case "xbox360RockBandDrums":
 		j.config = xbox360RockBandDrumsConfig
 	default:
