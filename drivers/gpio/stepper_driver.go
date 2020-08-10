@@ -120,11 +120,14 @@ func (s *StepperDriver) Run() (err error) {
 	s.mutex.Unlock()
 
 	go func() {
+		var delay time.Duration;
 		for {
 			if s.moving == false {
 				break
 			}
 			s.step()
+			delay = time.Duration(60000*1000/(s.stepsPerRev*s.speed)) * time.Microsecond
+			time.Sleep(delay)
 		}
 	}()
 
