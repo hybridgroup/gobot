@@ -1,6 +1,7 @@
 package i2c
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"sync"
@@ -20,6 +21,7 @@ const (
 	CommandPinMode        = 5
 	CommandReadUltrasonic = 7
 	CommandReadDHT        = 40
+	firmwareVersion       = 8
 )
 
 // GrovePiDriver is a driver for the GrovePi+ for I²C bus interface.
@@ -295,4 +297,25 @@ func (d *GrovePiDriver) writeDigital(pin byte, val byte) error {
 	_, err = d.connection.ReadByte()
 
 	return err
+}
+
+// GetFirmwareVersion returns the GrovePi firmware version.
+func (d *GrovePiDriver) GetFirmwareVersion() (string, error) {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
+
+	write := []byte{0, firmwareVersion, 0, 0, 0}
+	read := make([]byte, 5)
+
+	_, err := d.connection.Write(write)
+
+	time.Sleep(2 * time.Millisecond)
+
+	_, err = d.connection.Read(read)
+
+	if err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("%v.%v.%v", read[1], read[2], read[3]), nil
 }
