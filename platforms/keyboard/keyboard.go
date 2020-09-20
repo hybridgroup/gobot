@@ -47,6 +47,11 @@ const (
 const (
 	Escape   = 27
 	Spacebar = 32
+	Hyphen   = 45
+	Asterisk = 42
+	Plus     = 43
+	Slash    = 47
+	Dot      = 46
 )
 
 const (
@@ -89,6 +94,31 @@ func Parse(input bytes) KeyEvent {
 		// vanilla escape
 		if code == Escape {
 			event.Key = Escape
+		}
+
+		// Hyphen
+		if code == Hyphen {
+			event.Key = Hyphen
+		}
+
+		// Asterisk
+		if code == Asterisk {
+			event.Key = Asterisk
+		}
+
+		// Plus
+		if code == Plus {
+			event.Key = Plus
+		}
+
+		// Slash
+		if code == Slash {
+			event.Key = Slash
+		}
+
+		// Dot
+		if code == Dot {
+			event.Key = Dot
 		}
 
 		// number keys

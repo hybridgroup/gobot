@@ -14,6 +14,26 @@ func TestParseEscape(t *testing.T) {
 	gobottest.Assert(t, Parse(bytes{27, 0, 0}).Key, Escape)
 }
 
+func TestParseHyphen(t *testing.T) {
+	gobottest.Assert(t, Parse(bytes{45, 0, 0}).Key, Escape)
+}
+
+func TestParseAsterisk(t *testing.T) {
+	gobottest.Assert(t, Parse(bytes{42, 0, 0}).Key, Escape)
+}
+
+func TestParsePlus(t *testing.T) {
+	gobottest.Assert(t, Parse(bytes{43, 0, 0}).Key, Escape)
+}
+
+func TestParseSlash(t *testing.T) {
+	gobottest.Assert(t, Parse(bytes{47, 0, 0}).Key, Escape)
+}
+
+func TestParseDot(t *testing.T) {
+	gobottest.Assert(t, Parse(bytes{46, 0, 0}).Key, Escape)
+}
+
 func TestParseNotEscape(t *testing.T) {
 	gobottest.Refute(t, Parse(bytes{27, 91, 65}).Key, Escape)
 }
