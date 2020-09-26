@@ -269,6 +269,7 @@ drivers provided using the `gobot/drivers/i2c` package:
 	- BME280 Barometric Pressure/Temperature/Altitude/Humidity Sensor
 	- BMP180 Barometric Pressure/Temperature/Altitude Sensor
 	- BMP280 Barometric Pressure/Temperature/Altitude Sensor
+	- BMP388 Barometric Pressure/Temperature/Altitude Sensor
 	- DRV2605L Haptic Controller
 	- Grove Digital Accelerometer
 	- GrovePi Expansion Board
