@@ -2,6 +2,7 @@ package i2c
 
 import (
 	"bytes"
+	"encoding/binary"
 	"errors"
 	"testing"
 
@@ -19,6 +20,14 @@ func initTestBMP388Driver() (driver *BMP388Driver) {
 
 func initTestBMP388DriverWithStubbedAdaptor() (*BMP388Driver, *i2cTestAdaptor) {
 	adaptor := newI2cTestAdaptor()
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		buf := new(bytes.Buffer)
+		// Simulate returning of 0x50 for the
+		// ReadByteData(bmp388RegisterChipID) call in initialisation()
+		binary.Write(buf, binary.LittleEndian, uint8(0x50))
+		copy(b, buf.Bytes())
+		return buf.Len(), nil
+	}
 	return NewBMP388Driver(adaptor), adaptor
 }
 
@@ -44,9 +53,9 @@ func TestBMP388DriverStart(t *testing.T) {
 }
 
 func TestBMP388StartConnectError(t *testing.T) {
-	d, adaptor := initTestBMP388DriverWithStubbedAdaptor()
+	bmp388, adaptor := initTestBMP388DriverWithStubbedAdaptor()
 	adaptor.Testi2cConnectErr(true)
-	gobottest.Assert(t, d.Start(), errors.New("Invalid i2c connection"))
+	gobottest.Assert(t, bmp388.Start(), errors.New("Invalid i2c connection"))
 }
 
 func TestBMP388DriverStartWriteError(t *testing.T) {
@@ -75,27 +84,32 @@ func TestBMP388DriverMeasurements(t *testing.T) {
 	bmp388, adaptor := initTestBMP388DriverWithStubbedAdaptor()
 	adaptor.i2cReadImpl = func(b []byte) (int, error) {
 		buf := new(bytes.Buffer)
-		// Values produced by dumping data from actual sensor
-		if adaptor.written[len(adaptor.written)-1] == bmp388RegisterCalib00 {
-			buf.Write([]byte{126, 109, 214, 102, 50, 0, 54, 149, 220, 213, 208, 11, 64, 30, 166, 255, 249, 255, 172, 38, 10, 216, 189, 16})
+		if len(adaptor.written) == 0 {
+			// Simulate returning of 0x50 for the
+			// ReadByteData(bmp388RegisterChipID) call in initialisation()
+			binary.Write(buf, binary.LittleEndian, uint8(0x50))
+		} else if adaptor.written[len(adaptor.written)-1] == bmp388RegisterCalib00 {
+			// Values produced by dumping data from actual sensor
+			buf.Write([]byte{36, 107, 156, 73, 246, 104, 255, 189, 245, 35, 0, 151, 101, 184, 122, 243, 246, 211, 64, 14, 196, 0, 0, 0})
 		} else if adaptor.written[len(adaptor.written)-1] == bmp388RegisterTempData {
-			buf.Write([]byte{128, 243, 0})
+			buf.Write([]byte{0, 28, 127})
 		} else if adaptor.written[len(adaptor.written)-1] == bmp388RegisterPressureData {
-			buf.Write([]byte{77, 23, 48})
+			buf.Write([]byte{0, 66, 113})
 		}
+
 		copy(b, buf.Bytes())
 		return buf.Len(), nil
 	}
 	bmp388.Start()
 	temp, err := bmp388.Temperature(2)
 	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, temp, float32(25.014637))
+	gobottest.Assert(t, temp, float32(22.906143))
 	pressure, err := bmp388.Pressure(2)
 	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, pressure, float32(99545.414))
+	gobottest.Assert(t, pressure, float32(98874.85))
 	alt, err := bmp388.Altitude(2)
 	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, alt, float32(149.22713))
+	gobottest.Assert(t, alt, float32(205.89395))
 }
 
 func TestBMP388DriverTemperatureWriteError(t *testing.T) {

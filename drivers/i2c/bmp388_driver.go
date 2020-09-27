@@ -125,11 +125,21 @@ func (d *BMP388Driver) Connection() gobot.Connection {
 
 // Start initializes the BMP388 and loads the calibration coefficients.
 func (d *BMP388Driver) Start() (err error) {
+	var chipID uint8
+
 	bus := d.GetBusOrDefault(d.connector.GetDefaultBus())
 	address := d.GetAddressOrDefault(bmp180Address)
 
 	if d.connection, err = d.connector.GetConnection(address, bus); err != nil {
 		return err
+	}
+
+	if chipID, err = d.connection.ReadByteData(bmp388RegisterChipID); err != nil {
+		return err
+	}
+
+	if bmp388ChipID != chipID {
+		return fmt.Errorf("Incorrect BMP388 chip ID '0%x' Expected 0x%x", chipID, bmp388ChipID)
 	}
 
 	if err := d.initialization(); err != nil {
@@ -206,7 +216,6 @@ func (d *BMP388Driver) Altitude(accuracy BMP388Accuracy) (alt float32, err error
 // initialization reads the calibration coefficients.
 func (d *BMP388Driver) initialization() (err error) {
 	var (
-		chipID       uint8
 		coefficients []byte
 		t1           uint16
 		t2           uint16
@@ -224,18 +233,11 @@ func (d *BMP388Driver) initialization() (err error) {
 		p11          int8
 	)
 
-	if chipID, err = d.connection.ReadByteData(bmp388RegisterChipID); err != nil {
-		return err
-	}
-
-	if bmp388ChipID != chipID {
-		return fmt.Errorf("Incorrect BMP388 chip ID '0%x' Expected 0x%x", chipID, bmp388ChipID)
-	}
-
 	if coefficients, err = d.read(bmp388RegisterCalib00, 24); err != nil {
 		return err
 	}
 	buf := bytes.NewBuffer(coefficients)
+
 	binary.Read(buf, binary.LittleEndian, &t1)
 	binary.Read(buf, binary.LittleEndian, &t2)
 	binary.Read(buf, binary.LittleEndian, &t3)
@@ -288,12 +290,12 @@ func (d *BMP388Driver) rawTemp() (temp int32, err error) {
 		return 0, err
 	}
 	buf := bytes.NewBuffer(data)
+
 	binary.Read(buf, binary.LittleEndian, &tp0) // XLSB
 	binary.Read(buf, binary.LittleEndian, &tp1) // LSB
 	binary.Read(buf, binary.LittleEndian, &tp2) // MSB
 
 	temp = ((int32(tp2) << 16) | (int32(tp1) << 8) | int32(tp0))
-
 	return
 }
 
@@ -305,6 +307,7 @@ func (d *BMP388Driver) rawPressure() (press int32, err error) {
 		return 0, err
 	}
 	buf := bytes.NewBuffer(data)
+
 	binary.Read(buf, binary.LittleEndian, &tp0) // XLSB
 	binary.Read(buf, binary.LittleEndian, &tp1) // LSB
 	binary.Read(buf, binary.LittleEndian, &tp2) // MSB
