@@ -7,7 +7,7 @@ require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
 	github.com/donovanhide/eventsource v0.0.0-20171031113327-3ed64d21fb0b
 	github.com/eclipse/paho.mqtt.golang v1.2.0
-	github.com/go-ble/ble v0.0.0-20190521171521-147700f13610
+	github.com/go-ble/ble v0.0.0-20190521171521-147700f13610 // indirect
 	github.com/gobuffalo/uuid v2.0.5+incompatible
 	github.com/gofrs/uuid v3.2.0+incompatible // indirect
 	github.com/hashicorp/go-multierror v1.0.0
@@ -28,10 +28,10 @@ require (
 	github.com/stretchr/testify v1.6.1
 	github.com/urfave/cli v1.22.1
 	github.com/veandco/go-sdl2 v0.3.3
-	go.bug.st/serial v1.0.0
+	go.bug.st/serial v1.1.1
 	gocv.io/x/gocv v0.21.0
 	golang.org/x/net v0.0.0-20200822124328-c89045814202
-	golang.org/x/sys v0.0.0-20201024132449-ef9fd89ba245 // indirect
+	golang.org/x/sys v0.0.0-20201024232916-9f70ab9862d5 // indirect
 	periph.io/x/periph v3.6.2+incompatible
-	tinygo.org/x/bluetooth v0.1.1-0.20201022170447-266de9824a65
+	tinygo.org/x/bluetooth v0.1.1-0.20201025205303-04979c45b54d
 )
