@@ -2,6 +2,7 @@ package ble
 
 import (
 	"bytes"
+	"log"
 
 	"gobot.io/x/gobot"
 )
@@ -48,15 +49,23 @@ func (b *DeviceInformationDriver) Halt() (err error) { return }
 
 // GetModelNumber returns the model number for the BLE Peripheral
 func (b *DeviceInformationDriver) GetModelNumber() (model string) {
-	c, _ := b.adaptor().ReadCharacteristic("2a24")
+	c, err := b.adaptor().ReadCharacteristic("2a24")
+	if err != nil {
+		log.Println(err)
+		return
+	}
 	buf := bytes.NewBuffer(c)
-	val := buf.String()
-	return val
+	model = buf.String()
+	return
 }
 
 // GetFirmwareRevision returns the firmware revision for the BLE Peripheral
 func (b *DeviceInformationDriver) GetFirmwareRevision() (revision string) {
-	c, _ := b.adaptor().ReadCharacteristic("2a26")
+	c, err := b.adaptor().ReadCharacteristic("2a26")
+	if err != nil {
+		log.Println(err)
+		return
+	}
 	buf := bytes.NewBuffer(c)
 	val := buf.String()
 	return val
@@ -64,7 +73,11 @@ func (b *DeviceInformationDriver) GetFirmwareRevision() (revision string) {
 
 // GetHardwareRevision returns the hardware revision for the BLE Peripheral
 func (b *DeviceInformationDriver) GetHardwareRevision() (revision string) {
-	c, _ := b.adaptor().ReadCharacteristic("2a27")
+	c, err := b.adaptor().ReadCharacteristic("2a27")
+	if err != nil {
+		log.Println(err)
+		return
+	}
 	buf := bytes.NewBuffer(c)
 	val := buf.String()
 	return val
@@ -72,7 +85,11 @@ func (b *DeviceInformationDriver) GetHardwareRevision() (revision string) {
 
 // GetManufacturerName returns the manufacturer name for the BLE Peripheral
 func (b *DeviceInformationDriver) GetManufacturerName() (manufacturer string) {
-	c, _ := b.adaptor().ReadCharacteristic("2a29")
+	c, err := b.adaptor().ReadCharacteristic("2a29")
+	if err != nil {
+		log.Println(err)
+		return
+	}
 	buf := bytes.NewBuffer(c)
 	val := buf.String()
 	return val
@@ -80,7 +97,11 @@ func (b *DeviceInformationDriver) GetManufacturerName() (manufacturer string) {
 
 // GetPnPId returns the PnP ID for the BLE Peripheral
 func (b *DeviceInformationDriver) GetPnPId() (model string) {
-	c, _ := b.adaptor().ReadCharacteristic("2a50")
+	c, err := b.adaptor().ReadCharacteristic("2a50")
+	if err != nil {
+		log.Println(err)
+		return
+	}
 	buf := bytes.NewBuffer(c)
 	val := buf.String()
 	return val

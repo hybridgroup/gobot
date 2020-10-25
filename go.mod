@@ -17,18 +17,21 @@ require (
 	github.com/mattn/go-isatty v0.0.9 // indirect
 	github.com/mgutz/ansi v0.0.0-20170206155736-9520e82c474b // indirect
 	github.com/mgutz/logxi v0.0.0-20161027140823-aebf8a7d67ab // indirect
+	github.com/muka/go-bluetooth v0.0.0-20200928120822-44d49b402aee // indirect
 	github.com/nats-io/nats-server/v2 v2.1.0 // indirect
 	github.com/nats-io/nats.go v1.8.1
-	github.com/pkg/errors v0.8.1
+	github.com/pkg/errors v0.9.1
 	github.com/raff/goble v0.0.0-20190909174656-72afc67d6a99 // indirect
 	github.com/sigurn/crc8 v0.0.0-20160107002456-e55481d6f45c
 	github.com/sigurn/utils v0.0.0-20190728110027-e1fefb11a144 // indirect
-	github.com/stretchr/testify v1.4.0
+	github.com/sirupsen/logrus v1.7.0 // indirect
+	github.com/stretchr/testify v1.6.1
 	github.com/urfave/cli v1.22.1
 	github.com/veandco/go-sdl2 v0.3.3
 	go.bug.st/serial v1.0.0
 	gocv.io/x/gocv v0.21.0
-	golang.org/x/crypto v0.0.0-20191001170739-f9e2070545dc // indirect
-	golang.org/x/net v0.0.0-20190930134127-c5a3c61f89f3
+	golang.org/x/net v0.0.0-20200822124328-c89045814202
+	golang.org/x/sys v0.0.0-20201024132449-ef9fd89ba245 // indirect
 	periph.io/x/periph v3.6.2+incompatible
+	tinygo.org/x/bluetooth v0.1.1-0.20201022170447-266de9824a65
 )
