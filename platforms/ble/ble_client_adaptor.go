@@ -91,6 +91,7 @@ func (b *ClientAdaptor) Connect() (err error) {
 	err = b.adpt.Scan(func(adapter *bluetooth.Adapter, result bluetooth.ScanResult) {
 		if result.Address.String() == b.Address() {
 			b.adpt.StopScan()
+			b.SetName(result.LocalName())
 			ch <- result
 		}
 	})
@@ -107,8 +108,6 @@ func (b *ClientAdaptor) Connect() (err error) {
 			return err
 		}
 	}
-
-	// b.SetName(cln.Name())
 
 	// get all services/characteristics
 	srvcs, err := b.device.DiscoverServices(nil)
@@ -155,16 +154,7 @@ func (b *ClientAdaptor) ReadCharacteristic(cUUID string) (data []byte, err error
 		return
 	}
 
-	if len(cUUID) == 4 {
-		// convert to full uuid
-		uid, e := strconv.ParseUint("0x"+cUUID, 0, 16)
-		if e != nil {
-			return nil, e
-		}
-
-		uuid := bluetooth.New16BitUUID(uint16(uid))
-		cUUID = uuid.String()
-	}
+	cUUID = convertUUID(cUUID)
 
 	if char, ok := b.characteristics[cUUID]; ok {
 		buf := make([]byte, 255)
@@ -186,6 +176,8 @@ func (b *ClientAdaptor) WriteCharacteristic(cUUID string, data []byte) (err erro
 		return
 	}
 
+	cUUID = convertUUID(cUUID)
+
 	if char, ok := b.characteristics[cUUID]; ok {
 		_, err := char.WriteWithoutResponse(data)
 		if err != nil {
@@ -204,6 +196,8 @@ func (b *ClientAdaptor) Subscribe(cUUID string, f func([]byte, error)) (err erro
 		log.Fatalf("Cannot subscribe to BLE device until connected")
 		return
 	}
+
+	cUUID = convertUUID(cUUID)
 
 	if char, ok := b.characteristics[cUUID]; ok {
 		fn := func(d []byte) {
@@ -229,4 +223,26 @@ func getBLEAdapter(impl string) (*bluetooth.Adapter, error) {
 	}
 
 	return currentAdapter, nil
+}
+
+func convertUUID(cUUID string) string {
+	switch len(cUUID) {
+	case 4:
+		// convert to full uuid from "22bb"
+		uid, e := strconv.ParseUint("0x"+cUUID, 0, 16)
+		if e != nil {
+			return ""
+		}
+
+		uuid := bluetooth.New16BitUUID(uint16(uid))
+		return uuid.String()
+
+	case 32:
+		// convert "22bb746f2bbd75542d6f726568705327"
+		// to "00001234-0000-1000-8000-00805f9b34fb"
+		return fmt.Sprintf("%s-%s-%s-%s-%s", cUUID[:8], cUUID[8:12], cUUID[12:16], cUUID[16:20],
+			cUUID[20:32])
+	}
+
+	return cUUID
 }
