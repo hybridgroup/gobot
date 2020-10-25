@@ -1,20 +1,20 @@
 package ble
 
 import (
-	"context"
+	"fmt"
 	"log"
-	"strings"
+	"strconv"
 	"sync"
 
+	"github.com/pkg/errors"
 	"gobot.io/x/gobot"
 
-	blelib "github.com/go-ble/ble"
-	"github.com/pkg/errors"
+	"tinygo.org/x/bluetooth"
 )
 
-var currentDevice *blelib.Device
+//var currentDevice *blelib.Device
+var currentAdapter *bluetooth.Adapter
 var bleMutex sync.Mutex
-var bleCtx context.Context
 
 // BLEConnector is the interface that a BLE ClientAdaptor must implement
 type BLEConnector interface {
@@ -33,28 +33,29 @@ type BLEConnector interface {
 
 // ClientAdaptor represents a Client Connection to a BLE Peripheral
 type ClientAdaptor struct {
-	name       string
-	address    string
-	DeviceName string
+	name        string
+	address     string
+	AdapterName string
 
-	addr    blelib.Addr
-	device  *blelib.Device
-	client  blelib.Client
-	profile *blelib.Profile
+	addr            bluetooth.Address
+	adpt            *bluetooth.Adapter
+	device          *bluetooth.Device
+	characteristics map[string]bluetooth.DeviceCharacteristic
 
 	connected        bool
 	ready            chan struct{}
 	withoutResponses bool
 }
 
-// NewClientAdaptor returns a new ClientAdaptor given an address or peripheral name
+// NewClientAdaptor returns a new ClientAdaptor given an address
 func NewClientAdaptor(address string) *ClientAdaptor {
 	return &ClientAdaptor{
 		name:             gobot.DefaultName("BLEClient"),
 		address:          address,
-		DeviceName:       "default",
+		AdapterName:      "default",
 		connected:        false,
 		withoutResponses: false,
+		characteristics:  make(map[string]bluetooth.DeviceCharacteristic),
 	}
 }
 
@@ -76,29 +77,52 @@ func (b *ClientAdaptor) Connect() (err error) {
 	bleMutex.Lock()
 	defer bleMutex.Unlock()
 
-	b.device, err = getBLEDevice(b.DeviceName)
+	// enable adaptor
+	b.adpt, err = getBLEAdapter(b.AdapterName)
 	if err != nil {
-		return errors.Wrap(err, "can't connect to device "+b.DeviceName)
+		return errors.Wrap(err, "can't enable adapter "+b.AdapterName)
 	}
 
-	var cln blelib.Client
+	// handle address
+	b.addr.Set(b.Address())
 
-	cln, err = blelib.Connect(context.Background(), filter(b.Address()))
+	// scan for the address
+	ch := make(chan bluetooth.ScanResult, 1)
+	err = b.adpt.Scan(func(adapter *bluetooth.Adapter, result bluetooth.ScanResult) {
+		if result.Address.String() == b.Address() {
+			b.adpt.StopScan()
+			ch <- result
+		}
+	})
+
 	if err != nil {
-		return errors.Wrap(err, "can't connect to peripheral "+b.Address())
+		return err
 	}
 
-	b.addr = cln.Addr()
-	b.address = cln.Addr().String()
-	b.SetName(cln.Name())
-	b.client = cln
-
-	p, err := b.client.DiscoverProfile(true)
-	if err != nil {
-		return errors.Wrap(err, "can't discover profile")
+	// wait to connect to peripheral device
+	select {
+	case result := <-ch:
+		b.device, err = b.adpt.Connect(result.Address, bluetooth.ConnectionParams{})
+		if err != nil {
+			return err
+		}
 	}
 
-	b.profile = p
+	// b.SetName(cln.Name())
+
+	// get all services/characteristics
+	srvcs, err := b.device.DiscoverServices(nil)
+	for _, srvc := range srvcs {
+		chars, err := srvc.DiscoverCharacteristics(nil)
+		if err != nil {
+			log.Println(err)
+			continue
+		}
+		for _, char := range chars {
+			b.characteristics[char.UUID().String()] = char
+		}
+	}
+
 	b.connected = true
 	return
 }
@@ -115,8 +139,7 @@ func (b *ClientAdaptor) Reconnect() (err error) {
 
 // Disconnect terminates the connection to the BLE peripheral. Returns true on successful disconnect.
 func (b *ClientAdaptor) Disconnect() (err error) {
-	b.client.CancelConnection()
-	return
+	return b.device.Disconnect()
 }
 
 // Finalize finalizes the BLEAdaptor
@@ -132,13 +155,27 @@ func (b *ClientAdaptor) ReadCharacteristic(cUUID string) (data []byte, err error
 		return
 	}
 
-	uuid, _ := blelib.Parse(cUUID)
+	if len(cUUID) == 4 {
+		// convert to full uuid
+		uid, e := strconv.ParseUint("0x"+cUUID, 0, 16)
+		if e != nil {
+			return nil, e
+		}
 
-	if u := b.profile.Find(blelib.NewCharacteristic(uuid)); u != nil {
-		data, err = b.client.ReadCharacteristic(u.(*blelib.Characteristic))
+		uuid := bluetooth.New16BitUUID(uint16(uid))
+		cUUID = uuid.String()
 	}
 
-	return
+	if char, ok := b.characteristics[cUUID]; ok {
+		buf := make([]byte, 255)
+		n, err := char.Read(buf)
+		if err != nil {
+			return nil, err
+		}
+		return buf[:n], nil
+	}
+
+	return nil, fmt.Errorf("Unknown characteristic: %s", cUUID)
 }
 
 // WriteCharacteristic writes bytes to the BLE device for the
@@ -149,13 +186,15 @@ func (b *ClientAdaptor) WriteCharacteristic(cUUID string, data []byte) (err erro
 		return
 	}
 
-	uuid, _ := blelib.Parse(cUUID)
-
-	if u := b.profile.Find(blelib.NewCharacteristic(uuid)); u != nil {
-		err = b.client.WriteCharacteristic(u.(*blelib.Characteristic), data, b.withoutResponses)
+	if char, ok := b.characteristics[cUUID]; ok {
+		_, err := char.WriteWithoutResponse(data)
+		if err != nil {
+			return err
+		}
+		return nil
 	}
 
-	return
+	return fmt.Errorf("Unknown characteristic: %s", cUUID)
 }
 
 // Subscribe subscribes to notifications from the BLE device for the
@@ -166,40 +205,28 @@ func (b *ClientAdaptor) Subscribe(cUUID string, f func([]byte, error)) (err erro
 		return
 	}
 
-	uuid, _ := blelib.Parse(cUUID)
-
-	if u := b.profile.Find(blelib.NewCharacteristic(uuid)); u != nil {
-		h := func(req []byte) { f(req, nil) }
-		err = b.client.Subscribe(u.(*blelib.Characteristic), false, h)
-		if err != nil {
-			return err
+	if char, ok := b.characteristics[cUUID]; ok {
+		fn := func(d []byte) {
+			f(d, nil)
 		}
-		return nil
+		err = char.EnableNotifications(fn)
+		return
 	}
 
-	return
+	return fmt.Errorf("Unknown characteristic: %s", cUUID)
 }
 
-// getBLEDevice is singleton for blelib HCI device connection
-func getBLEDevice(impl string) (d *blelib.Device, err error) {
-	if currentDevice != nil {
-		return currentDevice, nil
+// getBLEDevice is singleton for bluetooth adapter connection
+func getBLEAdapter(impl string) (*bluetooth.Adapter, error) {
+	if currentAdapter != nil {
+		return currentAdapter, nil
 	}
 
-	dev, e := defaultDevice(impl)
-	if e != nil {
-		return nil, errors.Wrap(e, "can't get device")
+	currentAdapter = bluetooth.DefaultAdapter
+	err := currentAdapter.Enable()
+	if err != nil {
+		return nil, errors.Wrap(err, "can't get device")
 	}
-	blelib.SetDefaultDevice(dev)
 
-	currentDevice = &dev
-	d = &dev
-	return
-}
-
-func filter(name string) blelib.AdvFilter {
-	return func(a blelib.Advertisement) bool {
-		return strings.ToLower(a.LocalName()) == strings.ToLower(name) ||
-			a.Addr().String() == strings.ToLower(name)
-	}
+	return currentAdapter, nil
 }
