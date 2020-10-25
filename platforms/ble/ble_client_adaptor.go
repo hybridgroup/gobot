@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"sync"
+	"time"
 
 	"github.com/pkg/errors"
 	"gobot.io/x/gobot"
@@ -86,7 +87,7 @@ func (b *ClientAdaptor) Connect() (err error) {
 	b.addr.Set(b.Address())
 
 	// scan for the address
-	ch := make(chan bluetooth.ScanResult)
+	ch := make(chan bluetooth.ScanResult, 1)
 	err = b.adpt.Scan(func(adapter *bluetooth.Adapter, result bluetooth.ScanResult) {
 		if result.Address.String() == b.Address() {
 			b.adpt.StopScan()
@@ -137,7 +138,9 @@ func (b *ClientAdaptor) Reconnect() (err error) {
 
 // Disconnect terminates the connection to the BLE peripheral. Returns true on successful disconnect.
 func (b *ClientAdaptor) Disconnect() (err error) {
-	return b.device.Disconnect()
+	err = b.device.Disconnect()
+	time.Sleep(500 * time.Millisecond)
+	return
 }
 
 // Finalize finalizes the BLEAdaptor
