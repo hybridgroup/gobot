@@ -12,6 +12,7 @@ environment:
   TEST_EXTERNAL: 1
 
 install:
+  - set PATH=%PATH%;C:\mingw-w64\x86_64-7.3.0-posix-seh-rt_v5-rev0\mingw64\bin
   - echo %PATH%
   - echo %GOPATH%
   - go version
