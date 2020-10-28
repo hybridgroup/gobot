@@ -31,7 +31,7 @@ require (
 	go.bug.st/serial v1.1.1
 	gocv.io/x/gocv v0.21.0
 	golang.org/x/net v0.0.0-20200822124328-c89045814202
-	golang.org/x/sys v0.0.0-20201024232916-9f70ab9862d5 // indirect
+	golang.org/x/sys v0.0.0-20201028094953-708e7fb298ac // indirect
 	periph.io/x/periph v3.6.2+incompatible
-	tinygo.org/x/bluetooth v0.1.1-0.20201025205303-04979c45b54d
+	tinygo.org/x/bluetooth v0.1.1-0.20201028071015-0bc0ef868def
 )
