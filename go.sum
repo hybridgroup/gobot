@@ -161,6 +161,8 @@ golang.org/x/sys v0.0.0-20201024232916-9f70ab9862d5 h1:iCaAy5bMeEvwANu3YnJfWwI0k
 golang.org/x/sys v0.0.0-20201024232916-9f70ab9862d5/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20201028094953-708e7fb298ac h1:bplbaOojU0hnrC9nvWJ5Nvp/gPIWKFMiGBFI9Cpp16I=
 golang.org/x/sys v0.0.0-20201028094953-708e7fb298ac/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+golang.org/x/sys v0.0.0-20201126233918-771906719818 h1:f1CIuDlJhwANEC2MM87MBEVMr3jl5bifgsfj90XAF9c=
+golang.org/x/sys v0.0.0-20201126233918-771906719818/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/text v0.3.0/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
 golang.org/x/tools v0.0.0-20191119224855-298f0cb1881e/go.mod h1:b+2E5dAYhXwXZwtnZ6UAqBI28+e2cm9otk0dWdXHAEo=
 golang.org/x/tools v0.0.0-20200925191224-5d1fdd8fa346/go.mod h1:z6u4i615ZeAfBE4XtMziQW1fSVJXACjjbWkB/mvPzlU=
@@ -193,4 +195,6 @@ tinygo.org/x/bluetooth v0.1.1-0.20201025205303-04979c45b54d h1:vDaytgqMOON0RQC98
 tinygo.org/x/bluetooth v0.1.1-0.20201025205303-04979c45b54d/go.mod h1:Rx8KLr5nmrJ4uUf4Fy14JIoV3pF9vvbQ0KCv/c+ELOo=
 tinygo.org/x/bluetooth v0.1.1-0.20201028071015-0bc0ef868def h1:ihxiPHpnXYIC+J07Le5MJF48mDiGt774ugkfiWRjNu0=
 tinygo.org/x/bluetooth v0.1.1-0.20201028071015-0bc0ef868def/go.mod h1:Rx8KLr5nmrJ4uUf4Fy14JIoV3pF9vvbQ0KCv/c+ELOo=
+tinygo.org/x/bluetooth v0.2.0 h1:WS127BFPltv3PXudOFs2MhZVs76nTsQquj8ls1kFD5c=
+tinygo.org/x/bluetooth v0.2.0/go.mod h1:Rx8KLr5nmrJ4uUf4Fy14JIoV3pF9vvbQ0KCv/c+ELOo=
 tinygo.org/x/drivers v0.13.0/go.mod h1:mShi1lpVtJFpApkZgwyrzDKHToeGfWIuB08utyHxZ7g=
