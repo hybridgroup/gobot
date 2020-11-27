@@ -1,0 +1,19 @@
+version: 2
+jobs:
+  build:
+    docker:
+      # specify the version
+      - image: circleci/golang:1.15
+
+      # Specify service dependencies here if necessary
+      # CircleCI maintains a library of pre-built images
+      # documented at https://circleci.com/docs/2.0/circleci-images/
+      # - image: circleci/postgres:9.4
+
+    working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}
+    steps:
+      - checkout
+      - run: go test -v -cpu=2 .
+      - run: go test -v -cpu=2 ./drivers/aio
+      - run: go test -v -cpu=2 ./drivers/gpio
+      - run: go test -v -cpu=2 ./drivers/i2c
