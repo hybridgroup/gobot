@@ -3,7 +3,6 @@
 [![GoDoc](https://godoc.org/gobot.io/x/gobot?status.svg)](https://godoc.org/gobot.io/x/gobot)
 [![CircleCI Build status](https://circleci.com/gh/hybridgroup/gobot/tree/dev.svg?style=svg)](https://circleci.com/gh/hybridgroup/gobot/tree/dev)
 [![Appveyor Build status](https://ci.appveyor.com/api/projects/status/ix29evnbdrhkr7ud/branch/dev?svg=true)](https://ci.appveyor.com/project/deadprogram/gobot/branch/dev)
-[![Coverage Status](https://codecov.io/gh/hybridgroup/gobot/branch/dev/graph/badge.svg)](https://codecov.io/gh/hybridgroup/gobot)
 [![Go Report Card](https://goreportcard.com/badge/hybridgroup/gobot)](https://goreportcard.com/report/hybridgroup/gobot)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/hybridgroup/gobot/blob/master/LICENSE.txt)
 
@@ -15,7 +14,7 @@ Want to run Go directly on microcontrollers? Check out our sister project TinyGo
 
 ## Getting Started
 
-Get the Gobot source with: `go get -d -u gobot.io/x/gobot/...`
+Get the Gobot package by running this command: `go get -d -u gobot.io/x/gobot`
 
 ## Examples
 
@@ -353,6 +352,6 @@ For our contribution guidelines, please go to [https://github.com/hybridgroup/go
 Gobot is released with a Contributor Code of Conduct. By participating in this project you agree to abide by its terms. [You can read about it here](https://github.com/hybridgroup/gobot/tree/master/CODE_OF_CONDUCT.md).
 
 ## License
-Copyright (c) 2013-2019 The Hybrid Group. Licensed under the Apache 2.0 license.
+Copyright (c) 2013-2020 The Hybrid Group. Licensed under the Apache 2.0 license.
 
 The Contributor Covenant is released under the Creative Commons Attribution 4.0 International Public License, which requires that attribution be included.
