@@ -2,10 +2,11 @@ package gpio
 
 import (
 	"errors"
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/gobottest"
 	"strings"
 	"testing"
+
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/gobottest"
 )
 
 var _ gobot.Driver = (*HD44780Driver)(nil)
@@ -121,14 +122,14 @@ func TestHD44780DriverWriteError(t *testing.T) {
 	var a *gpioTestAdaptor
 
 	d, a = initTestHD44780Driver4BitModeWithStubbedAdaptor()
-	a.testAdaptorDigitalWrite = func() (err error) {
+	a.testAdaptorDigitalWrite = func(string, byte) (err error) {
 		return errors.New("write error")
 	}
 	d.Start()
 	gobottest.Assert(t, d.Write("hello gobot"), errors.New("write error"))
 
 	d, a = initTestHD44780Driver8BitModeWithStubbedAdaptor()
-	a.testAdaptorDigitalWrite = func() (err error) {
+	a.testAdaptorDigitalWrite = func(string, byte) (err error) {
 		return errors.New("write error")
 	}
 	d.Start()
