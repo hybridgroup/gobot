@@ -13,7 +13,13 @@ jobs:
     working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}
     steps:
       - checkout
-      - run: go test -v -cpu=2 .
-      - run: go test -v -cpu=2 ./drivers/aio
-      - run: go test -v -cpu=2 ./drivers/gpio
-      - run: go test -v -cpu=2 ./drivers/i2c
+      - run:
+          name: Core and drivers tests
+          command: go test -v -cpu=2 -coverprofile=coverage.txt -covermode=atomic . ./drivers/...
+      - run:
+          name: Firmata tests
+          command: go test -v -cpu=2 ./platforms/firmata/...
+      - run:
+          name: Code coverage
+          command: | 
+            bash <(curl -s https://codecov.io/bash)
