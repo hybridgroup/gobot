@@ -7,7 +7,7 @@ import (
 
 	"sync"
 
-	"github.com/gobuffalo/uuid"
+	"github.com/gofrs/uuid"
 )
 
 // RobotWorkRegistry contains all the work units registered on a Robot

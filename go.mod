@@ -8,8 +8,7 @@ require (
 	github.com/donovanhide/eventsource v0.0.0-20171031113327-3ed64d21fb0b
 	github.com/eclipse/paho.mqtt.golang v1.2.0
 	github.com/go-ble/ble v0.0.0-20190521171521-147700f13610 // indirect
-	github.com/gobuffalo/uuid v2.0.5+incompatible
-	github.com/gofrs/uuid v3.2.0+incompatible // indirect
+	github.com/gofrs/uuid v4.0.0+incompatible
 	github.com/hashicorp/go-multierror v1.0.0
 	github.com/hybridgroup/go-ardrone v0.0.0-20140402002621-b9750d8d7b78
 	github.com/hybridgroup/mjpeg v0.0.0-20140228234708-4680f319790e
