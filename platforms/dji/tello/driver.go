@@ -325,7 +325,9 @@ func (d *Driver) Halt() (err error) {
 	time.Sleep(500 * time.Millisecond)
 
 	d.cmdConn.Close()
-	d.videoConn.Close()
+	if d.videoConn != nil {
+		d.videoConn.Close()
+	}
 	return
 }
 
