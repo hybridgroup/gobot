@@ -201,6 +201,21 @@ func (a *AdafruitMotorHatDriver) startDriver(connection Connection) (err error) 
 func (a *AdafruitMotorHatDriver) Start() (err error) {
 	bus := a.GetBusOrDefault(a.connector.GetDefaultBus())
 
+	err = a.startServoHat(bus)
+	if adafruitDebug && err != nil {
+		log.Printf("[adafruit_driver] start servohat error: %s\n", err)
+	}
+
+	err = a.startMotorHat(bus)
+	if adafruitDebug && err != nil {
+		log.Printf("[adafruit_driver] start motorhat error: %s\n", err)
+	}
+
+	return
+}
+
+// startServoHat starts the Servo motors connection.
+func (a *AdafruitMotorHatDriver) startServoHat(bus int) (err error) {
 	if a.servoHatConnection, err = a.connector.GetConnection(servoHatAddress, bus); err != nil {
 		return
 	}
@@ -209,6 +224,11 @@ func (a *AdafruitMotorHatDriver) Start() (err error) {
 		return
 	}
 
+	return
+}
+
+// startMotorHat starts the DC motors connection.
+func (a *AdafruitMotorHatDriver) startMotorHat(bus int) (err error) {
 	if a.motorHatConnection, err = a.connector.GetConnection(motorHatAddress, bus); err != nil {
 		return
 	}
