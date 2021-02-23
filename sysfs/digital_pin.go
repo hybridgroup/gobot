@@ -36,6 +36,8 @@ type DigitalPinner interface {
 	Read() (int, error)
 	// Write writes to the pin
 	Write(int) error
+
+	Listen(edgeType string, listener *InterruptListener, handler InterruptListenerHandler) error
 }
 
 // DigitalPinnerProvider is the interface that an Adaptor should implement to allow
@@ -64,6 +66,36 @@ func NewDigitalPin(pin int, v ...string) *DigitalPin {
 	}
 
 	return d
+}
+
+func (d *DigitalPin) Listen(edgeType string, listener *InterruptListener, handler InterruptListenerHandler) error {
+	err := d.Export()
+	if err != nil {
+		return err
+	}
+
+	err = d.Direction("in")
+	if err != nil {
+		return err
+	}
+
+	err = d.edge(edgeType)
+	if err != nil {
+		return err
+	}
+
+	return listener.add(int(d.value.Fd()), handler)
+}
+
+func (d *DigitalPin) edge(val string) error {
+	fn := fmt.Sprintf("%v/%v/edge", GPIOPATH, d.label)
+	f, err := fs.OpenFile(fn, os.O_RDWR, 0644)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	_, err = writeFile(f, []byte(val))
+	return err
 }
 
 func (d *DigitalPin) Direction(dir string) error {
