@@ -53,6 +53,11 @@ func (m *MotorDriver) Off() (err error) {
 		err = m.changeState(0)
 	} else {
 		err = m.Speed(0)
+		if err == nil && m.ForwardPin != "" {
+			// even if we're in analog speed mode, if we're using a forward and backward pin,
+			// we should set them both to 0 to really disable the motor
+			err = m.Direction("none")
+		}
 	}
 	return
 }
