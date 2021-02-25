@@ -29,6 +29,7 @@ func main() {
 		motor.Off()
 	}()
 
+	r.DigitalPinSetPullUpDown("36", true)
 	encoder, err := r.DigitalPin("36", "")
 	if err != nil {
 		panic(err)

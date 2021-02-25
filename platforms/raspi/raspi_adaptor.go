@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"os/exec"
 	"strconv"
 	"strings"
 
@@ -147,6 +148,15 @@ func (r *Adaptor) DigitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPinn
 	}
 
 	return currentPin, nil
+}
+
+func (r *Adaptor) DigitalPinSetPullUpDown(pin string, up bool) error {
+	dir := "down"
+	if up {
+		dir = "up"
+	}
+	cmd := exec.Command("gpio", "-1", "mode", pin, dir)
+	return cmd.Run()
 }
 
 func (r *Adaptor) getExportedDigitalPin(translatedPin int, dir string) (sysfsPin sysfs.DigitalPinner, err error) {
