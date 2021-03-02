@@ -281,8 +281,13 @@ func (r *Adaptor) PWMPin(pin string) (raspiPWMPin sysfs.PWMPinner, err error) {
 }
 
 func (r *Adaptor) havePigs() bool {
-	_, err := os.Stat("/usr/local/bin/pigs")
-	return err == nil
+	for _, f := range []string{"/usr/bin/pigs", "/usr/local/bin/pigs"} {
+		_, err := os.Stat(f)
+		if err == nil {
+			return true
+		}
+	}
+	return false
 }
 
 func (r *Adaptor) createPWMPin(pin int) sysfs.PWMPinner {
