@@ -93,7 +93,7 @@ func (p *PigPWM) SetDutyCycle(duty uint32) (err error) {
 }
 
 func pigs(args ...string) (err error) {
-	fmt.Printf("hi %v\n", args)
+	//fmt.Printf("pigs command %v\n", args)
 	cmd := exec.Command("pigs", args...)
 	output, err := cmd.CombinedOutput()
 	if err == nil {
