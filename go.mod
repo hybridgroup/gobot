@@ -28,6 +28,7 @@ require (
 	github.com/urfave/cli v1.22.1
 	github.com/veandco/go-sdl2 v0.3.3
 	go.bug.st/serial v1.1.1
+	go.uber.org/multierr v1.6.0 // indirect
 	gocv.io/x/gocv v0.21.0
 	golang.org/x/net v0.0.0-20200822124328-c89045814202
 	golang.org/x/sys v0.0.0-20201126233918-771906719818 // indirect
