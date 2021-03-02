@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -27,7 +28,7 @@ type Adaptor struct {
 	name               string
 	revision           string
 	digitalPins        map[int]*sysfs.DigitalPin
-	pwmPins            map[int]*PWMPin
+	pwmPins            map[int]sysfs.PWMPinner
 	i2cDefaultBus      int
 	i2cBuses           [2]i2c.I2cDevice
 	spiDefaultBus      int
@@ -44,7 +45,7 @@ func NewAdaptor() *Adaptor {
 		mutex:           &sync.Mutex{},
 		name:            gobot.DefaultName("RaspberryPi"),
 		digitalPins:     make(map[int]*sysfs.DigitalPin),
-		pwmPins:         make(map[int]*PWMPin),
+		pwmPins:         make(map[int]sysfs.PWMPinner),
 		PiBlasterPeriod: 10000000,
 	}
 	content, _ := readFile()
@@ -272,11 +273,20 @@ func (r *Adaptor) PWMPin(pin string) (raspiPWMPin sysfs.PWMPinner, err error) {
 	defer r.mutex.Unlock()
 
 	if r.pwmPins[i] == nil {
-		r.pwmPins[i] = NewPWMPin(strconv.Itoa(i))
+		r.pwmPins[i] = r.createPWMPin(i)
 		r.pwmPins[i].SetPeriod(r.PiBlasterPeriod)
 	}
 
 	return r.pwmPins[i], nil
+}
+
+func (r *Adaptor) createPWMPin(pin int) sysfs.PWMPinner {
+	pinString := strconv.Itoa(pin)
+	_, err := os.Stat("/usr/local/bin/pigs")
+	if err == nil {
+		return NewPigPWM(pinString)
+	}
+	return NewPWMPin(pinString)
 }
 
 // PwmWrite writes a PWM signal to the specified pin

@@ -5,7 +5,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"time"
 
 	"gobot.io/x/gobot/drivers/gpio"
@@ -14,30 +14,37 @@ import (
 )
 
 func main() {
+	err := mainReal()
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func mainReal() error {
 	r := raspi.NewAdaptor()
 
 	motor := gpio.NewMotorDriver(r, "11")
 	motor.ForwardPin = "40"
 	motor.BackwardPin = "38"
 
-	err := motor.Backward(255)
-	if err != nil {
-		panic(err)
-	}
-
 	defer func() {
 		motor.Off()
 	}()
 
+	err := motor.Backward(255)
+	if err != nil {
+		return err
+	}
+
 	r.DigitalPinSetPullUpDown("36", true)
 	encoder, err := r.DigitalPin("36", "")
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	listener, err := sysfs.NewInterruptListener()
 	if err != nil {
-		panic(err)
+		return err
 	}
 	defer listener.Close()
 	listener.Start()
@@ -48,11 +55,12 @@ func main() {
 		numEvents++
 	})
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	secs := time.Second * 2
 	time.Sleep(secs)
 
-	fmt.Printf("numEvents: %d\n", numEvents)
+	log.Printf("numEvents: %d", numEvents)
+	return nil
 }
