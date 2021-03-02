@@ -280,10 +280,14 @@ func (r *Adaptor) PWMPin(pin string) (raspiPWMPin sysfs.PWMPinner, err error) {
 	return r.pwmPins[i], nil
 }
 
+func (r *Adaptor) havePigs() bool {
+	_, err := os.Stat("/usr/local/bin/pigs")
+	return err == nil
+}
+
 func (r *Adaptor) createPWMPin(pin int) sysfs.PWMPinner {
 	pinString := strconv.Itoa(pin)
-	_, err := os.Stat("/usr/local/bin/pigs")
-	if err == nil {
+	if r.havePigs() {
 		return NewPigPWM(pinString)
 	}
 	return NewPWMPin(pinString)
@@ -302,6 +306,18 @@ func (r *Adaptor) PwmWrite(pin string, val byte) (err error) {
 
 // ServoWrite writes a servo signal to the specified pin
 func (r *Adaptor) ServoWrite(pin string, angle byte) (err error) {
+	if angle > 180 {
+		return fmt.Errorf("servo angle has to be less than 180")
+	}
+	if r.havePigs() {
+		i, err := r.translatePin(pin)
+		if err != nil {
+			return err
+		}
+		val := 500 + (2000.0 * float64(angle) / 180.0)
+		return pigs("s", strconv.Itoa(i), strconv.Itoa(int(val)))
+	}
+
 	sysfsPin, err := r.PWMPin(pin)
 	if err != nil {
 		return err

@@ -89,10 +89,11 @@ func (p *PigPWM) SetDutyCycle(duty uint32) (err error) {
 
 	byteValue := int(255 * val)
 
-	return p.pigs("p", p.pin, fmt.Sprintf("%d", byteValue))
+	return pigs("p", p.pin, fmt.Sprintf("%d", byteValue))
 }
 
-func (p *PigPWM) pigs(args ...string) (err error) {
+func pigs(args ...string) (err error) {
+	fmt.Printf("hi %v\n", args)
 	cmd := exec.Command("pigs", args...)
 	output, err := cmd.CombinedOutput()
 	if err == nil {
