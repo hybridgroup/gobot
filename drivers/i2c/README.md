@@ -24,6 +24,7 @@ Gobot has a extensible system for connecting to hardware devices. The following 
 - BMP280 Barometric Pressure/Temperature/Altitude Sensor
 - BMP388 Barometric Pressure/Temperature/Altitude Sensor
 - DRV2605L Haptic Controller
+- Generic driver for read and write values to/from register address
 - Grove Digital Accelerometer
 - GrovePi Expansion Board
 - Grove RGB LCD
@@ -44,7 +45,7 @@ Gobot has a extensible system for connecting to hardware devices. The following 
 - SSD1306 OLED Display Controller
 - TSL2561 Digital Luminosity/Lux/Light Sensor
 - Wii Nunchuck Controller
-- Y-40 Brightness/Temperature sensor, Potentiometer, analog input, analog output Driver
+- YL-40 Brightness/Temperature sensor, Potentiometer, analog input, analog output Driver
 
 More drivers are coming soon...
 

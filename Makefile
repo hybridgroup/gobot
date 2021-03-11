@@ -8,9 +8,9 @@ EXAMPLES := $(shell grep -L 'joystick' $$(grep -L 'gocv' $(ALL_EXAMPLES)))
 # opencv platform currently skipped to prevent install of preconditions
 including_except := $(shell go list ./... | grep -v platforms/opencv)
 
-# Run tests on nearly all directories
+# Run tests on nearly all directories without test cache
 test:
-	go test -v $(including_except)
+	go test -count=1 -v $(including_except)
 
 # Run tests with race detection
 test_race:
