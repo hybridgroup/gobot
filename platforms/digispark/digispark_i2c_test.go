@@ -28,8 +28,6 @@ func initTestAdaptorI2c() *Adaptor {
 	a := NewAdaptor()
 	a.connect = func(a *Adaptor) (err error) { return nil }
 	a.littleWire = new(i2cMock)
-	errorFunc = func() error { return nil }
-	pwmInitErrorFunc = func() error { return nil }
 	return a
 }
 
