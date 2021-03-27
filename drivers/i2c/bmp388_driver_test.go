@@ -84,16 +84,18 @@ func TestBMP388DriverMeasurements(t *testing.T) {
 	bmp388, adaptor := initTestBMP388DriverWithStubbedAdaptor()
 	adaptor.i2cReadImpl = func(b []byte) (int, error) {
 		buf := new(bytes.Buffer)
-		if len(adaptor.written) == 0 {
+		lastWritten := adaptor.written[len(adaptor.written)-1]
+		switch lastWritten {
+		case bmp388RegisterChipID:
 			// Simulate returning of 0x50 for the
 			// ReadByteData(bmp388RegisterChipID) call in initialisation()
 			binary.Write(buf, binary.LittleEndian, uint8(0x50))
-		} else if adaptor.written[len(adaptor.written)-1] == bmp388RegisterCalib00 {
+		case bmp388RegisterCalib00:
 			// Values produced by dumping data from actual sensor
 			buf.Write([]byte{36, 107, 156, 73, 246, 104, 255, 189, 245, 35, 0, 151, 101, 184, 122, 243, 246, 211, 64, 14, 196, 0, 0, 0})
-		} else if adaptor.written[len(adaptor.written)-1] == bmp388RegisterTempData {
+		case bmp388RegisterTempData:
 			buf.Write([]byte{0, 28, 127})
-		} else if adaptor.written[len(adaptor.written)-1] == bmp388RegisterPressureData {
+		case bmp388RegisterPressureData:
 			buf.Write([]byte{0, 66, 113})
 		}
 
