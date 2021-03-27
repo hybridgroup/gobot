@@ -80,6 +80,9 @@ func (t *i2cTestAdaptor) ReadByte() (val byte, err error) {
 }
 
 func (t *i2cTestAdaptor) ReadByteData(reg uint8) (val uint8, err error) {
+	if err = t.WriteByte(reg); err != nil {
+		return
+	}
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 	bytes := []byte{0}
@@ -95,6 +98,9 @@ func (t *i2cTestAdaptor) ReadByteData(reg uint8) (val uint8, err error) {
 }
 
 func (t *i2cTestAdaptor) ReadWordData(reg uint8) (val uint16, err error) {
+	if err = t.WriteByte(reg); err != nil {
+		return
+	}
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 	bytes := []byte{0, 0}
