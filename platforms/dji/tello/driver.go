@@ -10,6 +10,7 @@ import (
 	"net"
 	"strconv"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"gobot.io/x/gobot"
@@ -191,7 +192,8 @@ type Driver struct {
 	throttle       int
 	bouncing       bool
 	gobot.Eventer
-	doneCh chan struct{}
+	doneCh            chan struct{}
+	doneChReaderCount int32
 }
 
 // NewDriver creates a driver for the Tello drone. Pass in the UDP port to use for the responses
@@ -280,7 +282,10 @@ func (d *Driver) Start() error {
 	d.cmdConn = cmdConn
 
 	// handle responses
+	d.addDoneChReaderCount(1)
 	go func() {
+		defer d.addDoneChReaderCount(-1)
+
 		d.On(d.Event(ConnectedEvent), func(interface{}) {
 			d.SendDateTime()
 			d.processVideo()
@@ -304,13 +309,22 @@ func (d *Driver) Start() error {
 	d.SendCommand(d.connectionString())
 
 	// send stick commands
+	d.addDoneChReaderCount(1)
 	go func() {
+		defer d.addDoneChReaderCount(-1)
+
+	stickCmdLoop:
 		for {
-			err := d.SendStickCommand()
-			if err != nil {
-				fmt.Println("stick command error:", err)
+			select {
+			case <-d.doneCh:
+				break stickCmdLoop
+			default:
+				err := d.SendStickCommand()
+				if err != nil {
+					fmt.Println("stick command error:", err)
+				}
+				time.Sleep(20 * time.Millisecond)
 			}
-			time.Sleep(20 * time.Millisecond)
 		}
 	}()
 
@@ -321,7 +335,11 @@ func (d *Driver) Start() error {
 func (d *Driver) Halt() (err error) {
 	// send a landing command when we disconnect, and give it 500ms to be received before we shutdown
 	d.Land()
-	d.doneCh <- struct{}{}
+	readerCount := atomic.LoadInt32(&d.doneChReaderCount)
+	for i := 0; i < int(readerCount); i++ {
+		d.doneCh <- struct{}{}
+	}
+
 	time.Sleep(500 * time.Millisecond)
 
 	d.cmdConn.Close()
@@ -946,7 +964,10 @@ func (d *Driver) processVideo() error {
 		return err
 	}
 
+	d.addDoneChReaderCount(1)
 	go func() {
+		defer d.addDoneChReaderCount(-1)
+
 	videoConnLoop:
 		for {
 			select {
@@ -987,6 +1008,10 @@ func (d *Driver) connectionString() string {
 	binary.LittleEndian.PutUint16(b[:], uint16(x))
 	res := fmt.Sprintf("conn_req:%s", b)
 	return res
+}
+
+func (d *Driver) addDoneChReaderCount(delta int32) {
+	atomic.AddInt32(&d.doneChReaderCount, delta)
 }
 
 func (f *FlightData) AirSpeed() float64 {

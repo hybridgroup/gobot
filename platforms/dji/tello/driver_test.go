@@ -151,17 +151,29 @@ func TestHaltShouldTerminateAllTheRelatedGoroutines(t *testing.T) {
 
 	var wg sync.WaitGroup
 	wg.Add(3)
+
+	d.addDoneChReaderCount(1)
 	go func() {
+		defer d.addDoneChReaderCount(-1)
+
 		<-d.doneCh
 		wg.Done()
 		fmt.Println("Done routine 1.")
 	}()
+
+	d.addDoneChReaderCount(1)
 	go func() {
+		defer d.addDoneChReaderCount(-1)
+
 		<-d.doneCh
 		wg.Done()
 		fmt.Println("Done routine 2.")
 	}()
+
+	d.addDoneChReaderCount(1)
 	go func() {
+		defer d.addDoneChReaderCount(-1)
+
 		<-d.doneCh
 		wg.Done()
 		fmt.Println("Done routine 3.")
@@ -169,6 +181,8 @@ func TestHaltShouldTerminateAllTheRelatedGoroutines(t *testing.T) {
 
 	d.Halt()
 	wg.Wait()
+
+	gobottest.Assert(t, d.doneChReaderCount, int32(0))
 }
 
 func TestHaltNotWaitForeverWhenCalledMultipleTimes(t *testing.T) {
