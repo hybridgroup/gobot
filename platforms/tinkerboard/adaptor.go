@@ -22,7 +22,7 @@ type Adaptor struct {
 	pinmap      map[string]sysfsPin
 	digitalPins map[int]*sysfs.DigitalPin
 	pwmPins     map[int]*sysfs.PWMPin
-	i2cBuses    [2]i2c.I2cDevice
+	i2cBuses    [5]i2c.I2cDevice
 	mutex       *sync.Mutex
 }
 
@@ -195,12 +195,13 @@ func (c *Adaptor) PWMPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
 }
 
 // GetConnection returns a connection to a device on a specified bus.
-// Valid bus number is [0..1] which corresponds to /dev/i2c-0 through /dev/i2c-1.
+// Valid bus number is [0..4] which corresponds to /dev/i2c-0 through /dev/i2c-4.
+// We don't support "/dev/i2c-6 DesignWare HDMI".
 func (c *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection, err error) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
-	if (bus < 0) || (bus > 1) {
+	if (bus < 0) || (bus > 4) {
 		return nil, fmt.Errorf("Bus number %d out of range", bus)
 	}
 	if c.i2cBuses[bus] == nil {
