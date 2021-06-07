@@ -6,7 +6,7 @@ For more info about the Tinker Board, go to [https://www.asus.com/uk/Single-Boar
 
 ## How to Install
 
-We recommend updating to the latest Debian TinkerOS when using the Tinker Board.
+We recommend updating to the [latest Debian TinkerOS](https://github.com/TinkerBoard/debian_kernel/releases) when using the Tinker Board.
 
 You would normally install Go and Gobot on your workstation. Once installed, cross compile your program on your workstation, transfer the final executable to your Tinker Board, and run the program on the Tinker Board as documented here.
 
@@ -18,10 +18,10 @@ go get -d -u gobot.io/x/gobot/...
 
 To enable use of the Tinker Board GPIO pins, you need to perform the following steps as a one-time configuration. Once your Tinker Board has been configured, you do not need to do so again.
 
-Note that these configuration steps must be performed on the Tinker Board itself. The easiest is to login to the Tinker Board via SSH:
+Note that these configuration steps must be performed on the Tinker Board itself. The easiest is to login to the Tinker Board via SSH (option "-4" is used to force IPv4, which is needed for some versions of TinkerOS):
 
 ```
-ssh linaro@192.168.1.xxx
+ssh -4 linaro@192.168.1.xxx
 ```
 
 #### Create a group "gpio"
