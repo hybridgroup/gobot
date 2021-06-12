@@ -334,18 +334,23 @@ func (d *Driver) Start() error {
 // Halt stops the driver.
 func (d *Driver) Halt() (err error) {
 	// send a landing command when we disconnect, and give it 500ms to be received before we shutdown
-	d.Land()
+	if d.cmdConn != nil {
+		d.Land()
+	}
+	time.Sleep(500 * time.Millisecond)
+
+	if d.cmdConn != nil {
+		d.cmdConn.Close()
+	}
+
+	if d.videoConn != nil {
+		d.videoConn.Close()
+	}
 	readerCount := atomic.LoadInt32(&d.doneChReaderCount)
 	for i := 0; i < int(readerCount); i++ {
 		d.doneCh <- struct{}{}
 	}
 
-	time.Sleep(500 * time.Millisecond)
-
-	d.cmdConn.Close()
-	if d.videoConn != nil {
-		d.videoConn.Close()
-	}
 	return
 }
 
