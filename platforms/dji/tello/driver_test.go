@@ -154,27 +154,24 @@ func TestHaltShouldTerminateAllTheRelatedGoroutines(t *testing.T) {
 
 	d.addDoneChReaderCount(1)
 	go func() {
-		defer d.addDoneChReaderCount(-1)
-
 		<-d.doneCh
+		d.addDoneChReaderCount(-1)
 		wg.Done()
 		fmt.Println("Done routine 1.")
 	}()
 
 	d.addDoneChReaderCount(1)
 	go func() {
-		defer d.addDoneChReaderCount(-1)
-
 		<-d.doneCh
+		d.addDoneChReaderCount(-1)
 		wg.Done()
 		fmt.Println("Done routine 2.")
 	}()
 
 	d.addDoneChReaderCount(1)
 	go func() {
-		defer d.addDoneChReaderCount(-1)
-
 		<-d.doneCh
+		d.addDoneChReaderCount(-1)
 		wg.Done()
 		fmt.Println("Done routine 3.")
 	}()
