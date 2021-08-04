@@ -83,7 +83,12 @@ func (p *PWMPin) SetDutyCycle(duty uint32) (err error) {
 	p.dc = duty
 
 	val := gobot.FromScale(float64(p.dc), 0, float64(p.period))
-
+	
+	// never go below minimum allowed duty for pi blaster
+	// unless the duty equals to 0
+	if val < 0.05 && val != 0 {
+		val = 0.05
+	}
 	return p.piBlaster(fmt.Sprintf("%v=%v\n", p.pin, val))
 }
 
