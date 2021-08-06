@@ -14,6 +14,7 @@ type aioTestAdaptor struct {
 	port                  string
 	mtx                   sync.Mutex
 	testAdaptorAnalogRead func() (val int, err error)
+	testAdaptorDHTRead    func() (t, h float32, err error)
 }
 
 func (t *aioTestAdaptor) TestAdaptorAnalogRead(f func() (val int, err error)) {
@@ -27,6 +28,19 @@ func (t *aioTestAdaptor) AnalogRead(string) (val int, err error) {
 	defer t.mtx.Unlock()
 	return t.testAdaptorAnalogRead()
 }
+
+func (t *aioTestAdaptor) TestAdaptorDHTRead(f func() (t, h float32, err error)) {
+	t.mtx.Lock()
+	defer t.mtx.Unlock()
+	t.testAdaptorDHTRead = f
+}
+
+func (t *aioTestAdaptor) ReadDHT(pin string) (temperature, humidity float32, err error) {
+	t.mtx.Lock()
+	defer t.mtx.Unlock()
+	return t.testAdaptorDHTRead()
+}
+
 func (t *aioTestAdaptor) Connect() (err error)  { return }
 func (t *aioTestAdaptor) Finalize() (err error) { return }
 func (t *aioTestAdaptor) Name() string          { return t.name }
@@ -38,6 +52,9 @@ func newAioTestAdaptor() *aioTestAdaptor {
 		port: "/dev/null",
 		testAdaptorAnalogRead: func() (val int, err error) {
 			return 99, nil
+		},
+		testAdaptorDHTRead: func() (t, h float32, err error) {
+			return 99.99, 88.88, nil
 		},
 	}
 }

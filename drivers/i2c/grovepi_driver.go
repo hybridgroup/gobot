@@ -5,6 +5,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"unsafe"
 
 	"gobot.io/x/gobot"
 )
@@ -154,6 +155,34 @@ func (d *GrovePiDriver) UltrasonicRead(pin string, duration int) (val int, err e
 	return
 }
 
+// ReadDHT performs a DHT read for DHT11 and DHT22 sensors.
+func (d *GrovePiDriver) ReadDHT(pin string) (temperature, humidity float32, err error) {
+	pin = getPin(pin)
+
+	var pinNum int
+	pinNum, err = strconv.Atoi(pin)
+	if err != nil {
+		return
+	}
+
+	b := []byte{CommandReadDHT, byte(pinNum), 0, 0}
+	rawdata, err := d.readDHTRawData(b)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	temperatureData := rawdata[1:5]
+
+	tInt := int32(temperatureData[0]) | int32(temperatureData[1])<<8 | int32(temperatureData[2])<<16 | int32(temperatureData[3])<<24
+	t := (*(*float32)(unsafe.Pointer(&tInt)))
+
+	humidityData := rawdata[5:9]
+	humInt := int32(humidityData[0]) | int32(humidityData[1])<<8 | int32(humidityData[2])<<16 | int32(humidityData[3])<<24
+	h := (*(*float32)(unsafe.Pointer(&humInt)))
+
+	return t, h, nil
+}
+
 // DigitalWrite writes a value to a specific digital pin implementing the DigitalWriter interface.
 func (d *GrovePiDriver) DigitalWrite(pin string, val byte) (err error) {
 	pin = getPin(pin)
@@ -257,7 +286,29 @@ func (d *GrovePiDriver) readUltrasonic(pin byte, duration int) (val int, err err
 		return 0, err
 	}
 
-	return int(data[1]) * 255 + int(data[2]), err
+	return int(data[1])*255 + int(data[2]), err
+}
+
+func (d *GrovePiDriver) readDHTRawData(cmd []byte) (raw []byte, err error) {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
+
+	var n int
+	raw = make([]byte, 9)
+
+	_, err = d.connection.Write(cmd)
+	if err != nil {
+		return
+	}
+
+	time.Sleep(600 * time.Millisecond)
+	d.connection.ReadByte()
+	time.Sleep(100 * time.Millisecond)
+	if n, err = d.connection.Read(raw); err != nil || n != 9 {
+		return nil, err
+	}
+
+	return raw, nil
 }
 
 // readDigital reads digitally from the GrovePi.
