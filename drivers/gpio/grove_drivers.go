@@ -102,3 +102,32 @@ func NewGroveMagneticSwitchDriver(a DigitalReader, pin string, v ...time.Duratio
 		ButtonDriver: NewButtonDriver(a, pin, v...),
 	}
 }
+
+// GroveHumidityTemperatureSensorDriver represents a humidity and
+// temperature sensor with a Grove connector.
+type GroveHumidityTemperatureSensorDriver struct {
+	*GroveDHT11SensorDriver
+}
+
+// NewGroveHumidityTemperatureSensorDriver returns a new GroveHumidityTemperatureSensorDriver with
+// a polling interval of 1000ms given a DHTReader and pin. Currently underyling sensor should
+// support DHT11 and DHT22 sensors. DHT11 interval should not be less than 1000ms.
+//
+// Optionally accepts:
+//  time.Duration: Interval at which the sensor is polled for new information
+func NewGroveHumidityTemperatureSensorDriver(dht DHTReader, pin string, v ...time.Duration) *GroveHumidityTemperatureSensorDriver {
+	var opts []GroveDHT11SensorOption
+	if len(v) > 0 {
+		opts = append(opts, WithGroveDHT11SensorInterval(v[0]))
+	}
+
+	return &GroveHumidityTemperatureSensorDriver{
+		GroveDHT11SensorDriver: NewGroveDHT11SensorDriver(dht, pin, opts...),
+	}
+}
+
+// DHTReader interface represents an Adaptor which has capabilities to
+// read digital humidity and temperature for the GrovePi DHT sensors.
+type DHTReader interface {
+	ReadDHT(pin string) (temperature, humidity float32, err error)
+}

@@ -1,4 +1,4 @@
-package aio
+package gpio
 
 import (
 	"math"

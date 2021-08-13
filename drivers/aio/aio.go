@@ -24,9 +24,3 @@ type AnalogReader interface {
 	//gobot.Adaptor
 	AnalogRead(string) (val int, err error)
 }
-
-// DHTReader interface represents an Adaptor which has capabilities to
-// read digital humidity and temperature for the GrovePi DHT sensors.
-type DHTReader interface {
-	ReadDHT(pin string) (temperature, humidity float32, err error)
-}
