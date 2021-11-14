@@ -8,7 +8,7 @@ import (
 )
 
 // MCP3004DriverMaxChannel is the number of channels of this A/D converter.
-const MCP3004DriverMaxChannel = 3
+const MCP3004DriverMaxChannel = 4
 
 // MCP3004Driver is a driver for the MCP3008 A/D converter.
 type MCP3004Driver struct {
