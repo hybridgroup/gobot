@@ -1,3 +1,31 @@
+1.15.0
+---
+* **build**
+    * Switch to CircleCI
+* **ble**
+    * replace go-ble with tinygo bluetooth package, restore macOS functionality
+* **gpio**
+    * Update RelayDriver to invert value written on Inverted
+    * Add tests for DigitalWrite value
+    * Add support for HD44780 LCD controller
+    * Add delay for Run function of StepperDriver
+* **spi**
+    * fixes #700 - Avoid to close the connection.
+* **i2c**
+    * add SHT2x device
+    * add BMP388 Barometric Pressure/Temperature/Altitude Sensor
+* **pwm**
+    * Resolve issue with PWM for PWMWrite
+* **mqtt**
+    * Add method to publish MQTT messages with retain flag
+* **tello**
+    * Add graceful halt for Tello driver
+    * Add Tello EDU driver
+* **keyboard**
+    * add symbol keys for platform/keyboard
+* **examples**
+    * Update ffmpeg command to decrease latency in tello example
+
 1.14.0
 ---
 * **core**

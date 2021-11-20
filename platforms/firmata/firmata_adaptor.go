@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	serial "go.bug.st/serial.v1"
+	"go.bug.st/serial"
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/platforms/firmata/client"

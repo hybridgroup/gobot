@@ -73,7 +73,11 @@ func (l *RelayDriver) State() bool {
 
 // On sets the relay to a high state.
 func (l *RelayDriver) On() (err error) {
-	if err = l.connection.DigitalWrite(l.Pin(), 1); err != nil {
+	newValue := byte(1)
+	if l.Inverted {
+		newValue = 0
+	}
+	if err = l.connection.DigitalWrite(l.Pin(), newValue); err != nil {
 		return
 	}
 
@@ -88,7 +92,11 @@ func (l *RelayDriver) On() (err error) {
 
 // Off sets the relay to a low state.
 func (l *RelayDriver) Off() (err error) {
-	if err = l.connection.DigitalWrite(l.Pin(), 0); err != nil {
+	newValue := byte(0)
+	if l.Inverted {
+		newValue = 1
+	}
+	if err = l.connection.DigitalWrite(l.Pin(), newValue); err != nil {
 		return
 	}
 

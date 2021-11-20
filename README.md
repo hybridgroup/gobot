@@ -1,9 +1,9 @@
 [![Gobot](https://raw.githubusercontent.com/hybridgroup/gobot-site/master/source/images/elements/gobot-logo-small.png)](http://gobot.io/)
 
 [![GoDoc](https://godoc.org/gobot.io/x/gobot?status.svg)](https://godoc.org/gobot.io/x/gobot)
-[![Build Status](https://travis-ci.org/hybridgroup/gobot.png?branch=dev)](https://travis-ci.org/hybridgroup/gobot)
-[![Build status](https://ci.appveyor.com/api/projects/status/ix29evnbdrhkr7ud/branch/dev?svg=true)](https://ci.appveyor.com/project/deadprogram/gobot/branch/dev)
-[![Coverage Status](https://codecov.io/gh/hybridgroup/gobot/branch/dev/graph/badge.svg)](https://codecov.io/gh/hybridgroup/gobot)
+[![CircleCI Build status](https://circleci.com/gh/hybridgroup/gobot/tree/dev.svg?style=svg)](https://circleci.com/gh/hybridgroup/gobot/tree/dev)
+[![Appveyor Build status](https://ci.appveyor.com/api/projects/status/ix29evnbdrhkr7ud/branch/dev?svg=true)](https://ci.appveyor.com/project/deadprogram/gobot/branch/dev)
+[![codecov](https://codecov.io/gh/hybridgroup/gobot/branch/dev/graph/badge.svg)](https://codecov.io/gh/hybridgroup/gobot)
 [![Go Report Card](https://goreportcard.com/badge/hybridgroup/gobot)](https://goreportcard.com/report/hybridgroup/gobot)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/hybridgroup/gobot/blob/master/LICENSE.txt)
 
@@ -15,7 +15,7 @@ Want to run Go directly on microcontrollers? Check out our sister project TinyGo
 
 ## Getting Started
 
-Get the Gobot source with: `go get -d -u gobot.io/x/gobot/...`
+Get the Gobot package by running this command: `go get -d -u gobot.io/x/gobot`
 
 ## Examples
 
@@ -269,11 +269,13 @@ drivers provided using the `gobot/drivers/i2c` package:
 	- BME280 Barometric Pressure/Temperature/Altitude/Humidity Sensor
 	- BMP180 Barometric Pressure/Temperature/Altitude Sensor
 	- BMP280 Barometric Pressure/Temperature/Altitude Sensor
+	- BMP388 Barometric Pressure/Temperature/Altitude Sensor
 	- DRV2605L Haptic Controller
 	- Grove Digital Accelerometer
 	- GrovePi Expansion Board
 	- Grove RGB LCD
 	- HMC6352 Compass
+	- HMC8553L 3-Axis Digital Compass
 	- INA3221 Voltage Monitor
 	- JHD1313M1 LCD Display w/RGB Backlight
 	- L3GD20H 3-Axis Gyroscope
@@ -283,6 +285,7 @@ drivers provided using the `gobot/drivers/i2c` package:
 	- MPL115A2 Barometer
 	- MPU6050 Accelerometer/Gyroscope
 	- PCA9685 16-channel 12-bit PWM/Servo Driver
+	- SHT2x Temperature/Humidity
 	- SHT3x-D Temperature/Humidity
 	- SSD1306 OLED Display Controller
 	- TSL2561 Digital Luminosity/Lux/Light Sensor
@@ -351,6 +354,6 @@ For our contribution guidelines, please go to [https://github.com/hybridgroup/go
 Gobot is released with a Contributor Code of Conduct. By participating in this project you agree to abide by its terms. [You can read about it here](https://github.com/hybridgroup/gobot/tree/master/CODE_OF_CONDUCT.md).
 
 ## License
-Copyright (c) 2013-2019 The Hybrid Group. Licensed under the Apache 2.0 license.
+Copyright (c) 2013-2020 The Hybrid Group. Licensed under the Apache 2.0 license.
 
 The Contributor Covenant is released under the Creative Commons Attribution 4.0 International Public License, which requires that attribution be included.

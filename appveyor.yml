@@ -1,25 +1,25 @@
 version: "{build}"
 
-os: Windows Server 2012 R2
-
 clone_folder: c:\gopath\src\gobot.io\x\gobot
+
+platform:
+  - MinGW_x64
 
 environment:
   GOPATH: c:\gopath
   GOROOT: c:\go
-  GO111MODULE: on
+  GOVERSION: 1.15
+  TEST_EXTERNAL: 1
 
 install:
+  - set PATH=%PATH%;C:\mingw-w64\x86_64-7.3.0-posix-seh-rt_v5-rev0\mingw64\bin
   - echo %PATH%
   - echo %GOPATH%
   - go version
   - go env
   - go get -d ./...
-  - go get github.com/stretchr/testify
 
 build_script:
- - go test -v -cpu=2 .
- - go test -v -cpu=2 ./drivers/aio
- - go test -v -cpu=2 ./drivers/gpio
- - go test -v -cpu=2 ./drivers/i2c
- - go test -v -cpu=2 ./platforms/firmata/...
+  - go test -v -cpu=2 .
+  - go test -v -cpu=2 ./drivers/...
+  - go test -v -cpu=2 ./platforms/firmata/...

@@ -2,6 +2,7 @@ package ble
 
 import (
 	"bytes"
+	"log"
 
 	"gobot.io/x/gobot"
 )
@@ -49,7 +50,11 @@ func (b *BatteryDriver) Halt() (err error) { return }
 // GetBatteryLevel reads and returns the current battery level
 func (b *BatteryDriver) GetBatteryLevel() (level uint8) {
 	var l uint8
-	c, _ := b.adaptor().ReadCharacteristic("2a19")
+	c, err := b.adaptor().ReadCharacteristic("2a19")
+	if err != nil {
+		log.Println(err)
+		return
+	}
 	buf := bytes.NewBuffer(c)
 	val, _ := buf.ReadByte()
 	l = uint8(val)

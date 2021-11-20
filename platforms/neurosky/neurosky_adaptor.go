@@ -4,7 +4,7 @@ package neurosky
 import (
 	"io"
 
-	serial "go.bug.st/serial.v1"
+	"go.bug.st/serial"
 )
 
 // Adaptor is the Gobot Adaptor for the Neurosky Mindwave

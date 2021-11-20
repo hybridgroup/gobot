@@ -53,7 +53,7 @@ func TestBuzzerDriverTone(t *testing.T) {
 func TestBuzzerDriverOnError(t *testing.T) {
 	a := newGpioTestAdaptor()
 	d := initTestBuzzerDriver(a)
-	a.TestAdaptorDigitalWrite(func() (err error) {
+	a.TestAdaptorDigitalWrite(func(string, byte) (err error) {
 		return errors.New("write error")
 	})
 
@@ -63,7 +63,7 @@ func TestBuzzerDriverOnError(t *testing.T) {
 func TestBuzzerDriverOffError(t *testing.T) {
 	a := newGpioTestAdaptor()
 	d := initTestBuzzerDriver(a)
-	a.TestAdaptorDigitalWrite(func() (err error) {
+	a.TestAdaptorDigitalWrite(func(string, byte) (err error) {
 		return errors.New("write error")
 	})
 
@@ -73,7 +73,7 @@ func TestBuzzerDriverOffError(t *testing.T) {
 func TestBuzzerDriverToneError(t *testing.T) {
 	a := newGpioTestAdaptor()
 	d := initTestBuzzerDriver(a)
-	a.TestAdaptorDigitalWrite(func() (err error) {
+	a.TestAdaptorDigitalWrite(func(string, byte) (err error) {
 		return errors.New("write error")
 	})
 

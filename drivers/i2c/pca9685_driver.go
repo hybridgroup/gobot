@@ -146,7 +146,7 @@ func (p *PCA9685Driver) Halt() (err error) {
 	return
 }
 
-// SetPWM sets a specific channel to a pwm value from 0-4096.
+// SetPWM sets a specific channel to a pwm value from 0-4095.
 // Params:
 //		channel int - the channel to send the pulse
 //		on uint16 - the time to start the pulse
@@ -174,7 +174,7 @@ func (p *PCA9685Driver) SetPWM(channel int, on uint16, off uint16) (err error) {
 	return
 }
 
-// SetAllPWM sets all channels to a pwm value from 0-4096.
+// SetAllPWM sets all channels to a pwm value from 0-4095.
 // Params:
 //		on uint16 - the time to start the pulse
 //		off uint16 - the time to stop the pulse
@@ -255,7 +255,7 @@ func (p *PCA9685Driver) PwmWrite(pin string, val byte) (err error) {
 	if err != nil {
 		return
 	}
-	v := gobot.ToScale(gobot.FromScale(float64(val), 0, 255), 0, 4096)
+	v := gobot.ToScale(gobot.FromScale(float64(val), 0, 255), 0, 4095)
 	return p.SetPWM(i, 0, uint16(v))
 }
 

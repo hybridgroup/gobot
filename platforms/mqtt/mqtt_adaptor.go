@@ -145,7 +145,17 @@ func (a *Adaptor) Publish(topic string, message []byte) bool {
 	return true
 }
 
-// PublishWithQOS allows per-publish QOS values to be set and returns a poken.Token
+// PublishAndRetain publishes a message under a specific topic with retain flag
+func (a *Adaptor) PublishAndRetain(topic string, message []byte) bool {
+	if a.client == nil {
+		return false
+	}
+
+	a.client.Publish(topic, byte(a.qos), true, message)
+	return true
+}
+
+// PublishWithQOS allows per-publish QOS values to be set and returns a paho.Token
 func (a *Adaptor) PublishWithQOS(topic string, qos int, message []byte) (paho.Token, error) {
 	if a.client == nil {
 		return nil, ErrNilClient

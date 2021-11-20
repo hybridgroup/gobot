@@ -21,11 +21,13 @@ Gobot has a extensible system for connecting to hardware devices. The following 
 - BME280 Barometric Pressure/Temperature/Altitude/Humidity Sensor
 - BMP180 Barometric Pressure/Temperature/Altitude Sensor
 - BMP280 Barometric Pressure/Temperature/Altitude Sensor
+- BMP388 Barometric Pressure/Temperature/Altitude Sensor
 - DRV2605L Haptic Controller
 - Grove Digital Accelerometer
 - GrovePi Expansion Board
 - Grove RGB LCD
 - HMC6352 Compass
+- HMC8553L 3-Axis Digital Compass
 - INA3221 Voltage Monitor
 - JHD1313M1 LCD Display w/RGB Backlight
 - L3GD20H 3-Axis Gyroscope
@@ -35,6 +37,7 @@ Gobot has a extensible system for connecting to hardware devices. The following 
 - MPL115A2 Barometer
 - MPU6050 Accelerometer/Gyroscope
 - PCA9685 16-channel 12-bit PWM/Servo Driver
+- SHT2x Temperature/Humidity
 - SHT3x-D Temperature/Humidity
 - SSD1306 OLED Display Controller
 - TSL2561 Digital Luminosity/Lux/Light Sensor

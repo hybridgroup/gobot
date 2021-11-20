@@ -119,12 +119,15 @@ func (s *StepperDriver) Run() (err error) {
 	s.moving = true
 	s.mutex.Unlock()
 
+	delay := s.getDelayPerStep()
+
 	go func() {
 		for {
 			if s.moving == false {
 				break
 			}
 			s.step()
+			time.Sleep(delay)
 		}
 	}()
 
@@ -203,8 +206,7 @@ func (s *StepperDriver) Move(stepsToMove int) error {
 	s.mutex.Unlock()
 
 	stepsLeft := int64(math.Abs(float64(stepsToMove)))
-	//Do not remove *1000 and change duration to time.Millisecond. It has been done for a reason
-	delay := time.Duration(60000*1000/(s.stepsPerRev*s.speed)) * time.Microsecond
+	delay := s.getDelayPerStep()
 
 	for stepsLeft > 0 {
 		if err := s.step(); err != nil {
@@ -216,6 +218,12 @@ func (s *StepperDriver) Move(stepsToMove int) error {
 
 	s.moving = false
 	return nil
+}
+
+// getDelayPerStep gives the delay per step
+func (s *StepperDriver) getDelayPerStep() time.Duration {
+	//Do not remove *1000 and change duration to time.Millisecond. It has been done for a reason
+	return time.Duration(60000*1000/(s.stepsPerRev*s.speed)) * time.Microsecond
 }
 
 // GetCurrentStep gives the current step of motor
