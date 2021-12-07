@@ -1,6 +1,7 @@
 package i2c
 
 import (
+	"bytes"
 	"testing"
 
 	"gobot.io/x/gobot"
@@ -55,4 +56,49 @@ func TestAS5600DriverOptions(t *testing.T) {
 
 	as := NewAS5600Driver(newI2cTestAdaptor(), WithBus(2))
 	gobottest.Assert(t, as.GetBusOrDefault(1), 2)
+}
+
+func TestAS5600DriverDetecMagnet(t *testing.T) {
+
+	as, adaptor := initTestAS5600DriverWithStubbedAdaptor()
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		buf := new(bytes.Buffer)
+		buf.Write([]byte{(0x0 | as5600StatusMDBit)})
+		copy(b, buf.Bytes())
+		return buf.Len(), nil
+	}
+	as.Start()
+	magnet, err := as.DetecMagnet()
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, magnet, true)
+}
+
+func TestAS5600DriverMagnetTooWeak(t *testing.T) {
+
+	as, adaptor := initTestAS5600DriverWithStubbedAdaptor()
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		buf := new(bytes.Buffer)
+		buf.Write([]byte{(0x0 | as5600StatusMLBit)})
+		copy(b, buf.Bytes())
+		return buf.Len(), nil
+	}
+	as.Start()
+	magnet, err := as.GetMagnetStrength()
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, magnet, as5600MagnetTooWeak)
+}
+
+func TestAS5600DriverMagnetTooStrong(t *testing.T) {
+
+	as, adaptor := initTestAS5600DriverWithStubbedAdaptor()
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		buf := new(bytes.Buffer)
+		buf.Write([]byte{(0x0 | as5600StatusMHBit)})
+		copy(b, buf.Bytes())
+		return buf.Len(), nil
+	}
+	as.Start()
+	magnet, err := as.GetMagnetStrength()
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, magnet, as5600MagnetTooStrong)
 }

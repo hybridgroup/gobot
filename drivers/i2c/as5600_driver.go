@@ -67,6 +67,15 @@ const (
 	as5600StatusMDBit
 )
 
+// Magnet status
+const (
+	as5600NoMagnetDetected = iota
+	as5600MagnetTooWeak
+	as5600MagnetOk
+	as5600MagnetTooStrong
+	as5600MagnetUnknown
+)
+
 // AS5600Driver is a Driver for a AS5600 magnetic encoder
 type AS5600Driver struct {
 	name       string
@@ -132,4 +141,39 @@ func (as *AS5600Driver) Start() (err error) {
 func (as *AS5600Driver) Halt() (err error) {
 
 	return nil
+}
+
+// DetectMagnet returns if the magnet is detected
+func (as *AS5600Driver) DetecMagnet() (bool, error) {
+	var magStatus uint8
+	var err error
+
+	magStatus, err = as.connection.ReadByteData(as5600STATUS)
+	if err != nil {
+		return false, err
+	}
+
+	return (magStatus&as5600StatusMDBit != 0), err
+}
+
+// GetMagnetStrength returns if the magnet is detected
+func (as *AS5600Driver) GetMagnetStrength() (int, error) {
+	var magStatus uint8
+	var err error
+
+	magStatus, err = as.connection.ReadByteData(as5600STATUS)
+	if err != nil {
+		return as5600MagnetUnknown, err
+	}
+	if magStatus&as5600StatusMDBit != 0 {
+		return as5600NoMagnetDetected, nil
+	}
+	if magStatus&as5600StatusMHBit != 0 {
+		return as5600MagnetTooStrong, nil
+	}
+	if magStatus&as5600StatusMLBit != 0 {
+		return as5600MagnetTooWeak, nil
+	}
+
+	return as5600MagnetOk, nil
 }
