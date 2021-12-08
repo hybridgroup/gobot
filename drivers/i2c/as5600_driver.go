@@ -17,9 +17,9 @@ const (
 	// //maximum position
 	// as5600MPOSMSB = 0x03
 	// as5600MPOSLSB = 0x04
-	// // maximum angle
-	// as5600MANGMSB = 0x05
-	// as5600MANGLSB = 0x06
+	// maximum angle
+	as5600MANGMSB = 0x05
+	as5600MANGLSB = 0x06
 	// // Customize the device
 	// as5600CONFMSB = 0x07
 	// as5600CONFLSB = 0x08
@@ -174,7 +174,7 @@ func (as *AS5600Driver) GetMagnetStrength() (AS5600StatusType, error) {
 	if err != nil {
 		return as5600MagnetUnknown, err
 	}
-	if magStatus&as5600StatusMDBit == 0 {
+	if magStatus&as5600StatusMDBit != 0 {
 		return as5600MagnetNotDetected, nil
 	}
 	if magStatus&as5600StatusMHBit != 0 {
@@ -193,6 +193,20 @@ func (as *AS5600Driver) GetRawAngle() (uint16, error) {
 	var rc uint16
 
 	angle, err = as.read(as5600RAWANGLEMSB, 2)
+	if err != nil {
+		return 0x0, err
+	}
+	rc = binary.LittleEndian.Uint16(angle[0:])
+
+	return rc & 0x0fff, nil
+}
+
+func (as *AS5600Driver) GetMaxAngle() (uint16, error) {
+	var angle []byte
+	var err error
+	var rc uint16
+
+	angle, err = as.read(as5600MANGMSB, 2)
 	if err != nil {
 		return 0x0, err
 	}
