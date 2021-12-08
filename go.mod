@@ -29,8 +29,8 @@ require (
 	github.com/veandco/go-sdl2 v0.3.3
 	go.bug.st/serial v1.1.1
 	gocv.io/x/gocv v0.21.0
-	golang.org/x/net v0.0.0-20200822124328-c89045814202
-	golang.org/x/sys v0.0.0-20201126233918-771906719818 // indirect
+	golang.org/x/net v0.0.0-20211015210444-4f30a5c0130f
+	golang.org/x/tools v0.1.8 // indirect
 	periph.io/x/periph v3.6.2+incompatible
 	tinygo.org/x/bluetooth v0.2.0
 )

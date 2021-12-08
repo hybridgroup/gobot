@@ -2,6 +2,7 @@ package i2c
 
 import (
 	"bytes"
+	"fmt"
 	"testing"
 
 	"gobot.io/x/gobot"
@@ -101,4 +102,35 @@ func TestAS5600DriverMagnetTooStrong(t *testing.T) {
 	magnet, err := as.GetMagnetStrength()
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, magnet, as5600MagnetTooStrong)
+}
+
+func TestAS5600DriverGetRawAngle(t *testing.T) {
+	as, adaptor := initTestAS5600DriverWithStubbedAdaptor()
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		buf := new(bytes.Buffer)
+		tmp := make([]byte, len(b))
+		if adaptor.written[len(adaptor.written)-1] == as5600RAWANGLEMSB {
+			tmp[0] = as5600RAWANGLEMSB
+		} else if adaptor.written[len(adaptor.written)-1] == as5600RAWANGLELSB {
+			tmp[0] = as5600RAWANGLELSB
+		}
+		for i := 1; i < len(b); i++ {
+			tmp[i] = byte(i)
+		}
+		buf.Write(tmp)
+		copy(b, buf.Bytes())
+
+		return buf.Len(), nil
+	}
+	adaptor.i2cWriteImpl = func(b []byte) (int, error) {
+		if b[0] == as5600RAWANGLEMSB {
+			return 1, nil
+		}
+
+		return 0, fmt.Errorf("0x%x wrong register", b[0])
+	}
+	as.Start()
+	angle, err := as.GetRawAngle()
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, angle, uint16(0x010c))
 }
