@@ -2,6 +2,7 @@ package i2c
 
 import (
 	"encoding/binary"
+	"log"
 
 	"gobot.io/x/gobot"
 )
@@ -26,9 +27,9 @@ const (
 	//Unscaled and unmodified angle
 	as5600RAWANGLEMSB = 0x0C
 	as5600RAWANGLELSB = 0x0D
-	// // Scaled output value
-	// as5600ANGLEMSB = 0x0E
-	// as5600ANGLELSB = 0x0F
+	// Scaled output value
+	as5600ANGLEMSB = 0x0E
+	as5600ANGLELSB = 0x0F
 	// Current state (basically strength of magnet)
 	as5600STATUS = 0x0B
 	// // Automatic Gain Control
@@ -174,7 +175,7 @@ func (as *AS5600Driver) GetMagnetStrength() (AS5600StatusType, error) {
 	if err != nil {
 		return as5600MagnetUnknown, err
 	}
-	if magStatus&as5600StatusMDBit != 0 {
+	if magStatus&as5600StatusMDBit == 0 {
 		return as5600MagnetNotDetected, nil
 	}
 	if magStatus&as5600StatusMHBit != 0 {
@@ -193,6 +194,20 @@ func (as *AS5600Driver) GetRawAngle() (uint16, error) {
 	var rc uint16
 
 	angle, err = as.read(as5600RAWANGLEMSB, 2)
+	if err != nil {
+		return 0x0, err
+	}
+	rc = binary.LittleEndian.Uint16(angle[0:])
+
+	return rc & 0x0fff, nil
+}
+
+func (as *AS5600Driver) GetAngle() (uint16, error) {
+	var angle []byte
+	var err error
+	var rc uint16
+
+	angle, err = as.read(as5600ANGLEMSB, 2)
 	if err != nil {
 		return 0x0, err
 	}

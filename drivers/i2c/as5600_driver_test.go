@@ -135,6 +135,37 @@ func TestAS5600DriverGetRawAngle(t *testing.T) {
 	gobottest.Assert(t, angle, uint16(0x010c))
 }
 
+func TestAS5600DriverGetAngle(t *testing.T) {
+	as, adaptor := initTestAS5600DriverWithStubbedAdaptor()
+	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		buf := new(bytes.Buffer)
+		tmp := make([]byte, len(b))
+		if adaptor.written[len(adaptor.written)-1] == as5600ANGLEMSB {
+			tmp[0] = as5600ANGLEMSB
+		} else if adaptor.written[len(adaptor.written)-1] == as5600ANGLELSB {
+			tmp[0] = as5600ANGLELSB
+		}
+		for i := 1; i < len(b); i++ {
+			tmp[i] = byte(i)
+		}
+		buf.Write(tmp)
+		copy(b, buf.Bytes())
+
+		return buf.Len(), nil
+	}
+	adaptor.i2cWriteImpl = func(b []byte) (int, error) {
+		if b[0] == as5600ANGLEMSB {
+			return 1, nil
+		}
+
+		return 0, fmt.Errorf("0x%x wrong register", b[0])
+	}
+	as.Start()
+	angle, err := as.GetAngle()
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, angle, uint16(0x010e))
+}
+
 func TestAS5600DriverGetMaxAngle(t *testing.T) {
 	as, adaptor := initTestAS5600DriverWithStubbedAdaptor()
 	adaptor.i2cReadImpl = func(b []byte) (int, error) {
