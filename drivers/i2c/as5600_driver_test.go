@@ -161,7 +161,7 @@ func TestAS5600DriverGetAngle(t *testing.T) {
 		return 0, fmt.Errorf("0x%x wrong register", b[0])
 	}
 	as.Start()
-	angle, err := as.GetAngle()
+	angle, err := as.GetScaledAngle()
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, angle, uint16(0x010e))
 }

@@ -2,7 +2,6 @@ package i2c
 
 import (
 	"encoding/binary"
-	"log"
 
 	"gobot.io/x/gobot"
 )
@@ -166,7 +165,7 @@ func (as *AS5600Driver) DetecMagnet() (bool, error) {
 	return (magStatus&as5600StatusMDBit != 0), err
 }
 
-// GetMagnetStrength returns if the magnet is detected
+// GetMagnetStrength returns the magnet's strength
 func (as *AS5600Driver) GetMagnetStrength() (AS5600StatusType, error) {
 	var magStatus uint8
 	var err error
@@ -188,6 +187,8 @@ func (as *AS5600Driver) GetMagnetStrength() (AS5600StatusType, error) {
 	return as5600MagnetOk, nil
 }
 
+// GetRawAngle gets raw value of magnet position.
+// start, end, and max angle settings do not apply
 func (as *AS5600Driver) GetRawAngle() (uint16, error) {
 	var angle []byte
 	var err error
@@ -202,7 +203,9 @@ func (as *AS5600Driver) GetRawAngle() (uint16, error) {
 	return rc & 0x0fff, nil
 }
 
-func (as *AS5600Driver) GetAngle() (uint16, error) {
+// GetScaledAngle gets scaled value of magnet position.
+// start, end, or max angle settings are used to determine value
+func (as *AS5600Driver) GetScaledAngle() (uint16, error) {
 	var angle []byte
 	var err error
 	var rc uint16
@@ -216,6 +219,7 @@ func (as *AS5600Driver) GetAngle() (uint16, error) {
 	return rc & 0x0fff, nil
 }
 
+// GetMaxAngle gets value of maximum angle register.
 func (as *AS5600Driver) GetMaxAngle() (uint16, error) {
 	var angle []byte
 	var err error
