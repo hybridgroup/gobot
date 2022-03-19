@@ -1,19 +1,3 @@
-/*
-Copyright (c) 2015 Ulises Flynn
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-
 package i2c
 
 import (
@@ -71,6 +55,90 @@ type MCP23017Driver struct {
 	MCPConf MCP23017Config
 	gobot.Commander
 	gobot.Eventer
+}
+
+// WithMCP23017Bank option sets the MCP23017Driver bank option
+func WithMCP23017Bank(val uint8) func(Config) {
+	return func(c Config) {
+		d, ok := c.(*MCP23017Driver)
+		if ok {
+			d.MCPConf.Bank = val
+		} else {
+			panic("Trying to set Bank for non-MCP23017Driver")
+		}
+	}
+}
+
+// WithMCP23017Mirror option sets the MCP23017Driver Mirror option
+func WithMCP23017Mirror(val uint8) func(Config) {
+	return func(c Config) {
+		d, ok := c.(*MCP23017Driver)
+		if ok {
+			d.MCPConf.Mirror = val
+		} else {
+			panic("Trying to set Mirror for non-MCP23017Driver")
+		}
+	}
+}
+
+// WithMCP23017Seqop option sets the MCP23017Driver Seqop option
+func WithMCP23017Seqop(val uint8) func(Config) {
+	return func(c Config) {
+		d, ok := c.(*MCP23017Driver)
+		if ok {
+			d.MCPConf.Seqop = val
+		} else {
+			panic("Trying to set Seqop for non-MCP23017Driver")
+		}
+	}
+}
+
+// WithMCP23017Disslw option sets the MCP23017Driver Disslw option
+func WithMCP23017Disslw(val uint8) func(Config) {
+	return func(c Config) {
+		d, ok := c.(*MCP23017Driver)
+		if ok {
+			d.MCPConf.Disslw = val
+		} else {
+			panic("Trying to set Disslw for non-MCP23017Driver")
+		}
+	}
+}
+
+// WithMCP23017Haen option sets the MCP23017Driver Haen option
+func WithMCP23017Haen(val uint8) func(Config) {
+	return func(c Config) {
+		d, ok := c.(*MCP23017Driver)
+		if ok {
+			d.MCPConf.Haen = val
+		} else {
+			panic("Trying to set Haen for non-MCP23017Driver")
+		}
+	}
+}
+
+// WithMCP23017Odr option sets the MCP23017Driver Odr option
+func WithMCP23017Odr(val uint8) func(Config) {
+	return func(c Config) {
+		d, ok := c.(*MCP23017Driver)
+		if ok {
+			d.MCPConf.Odr = val
+		} else {
+			panic("Trying to set Odr for non-MCP23017Driver")
+		}
+	}
+}
+
+// WithMCP23017Intpol option sets the MCP23017Driver Intpol option
+func WithMCP23017Intpol(val uint8) func(Config) {
+	return func(c Config) {
+		d, ok := c.(*MCP23017Driver)
+		if ok {
+			d.MCPConf.Intpol = val
+		} else {
+			panic("Trying to set Intpol for non-MCP23017Driver")
+		}
+	}
 }
 
 // NewMCP23017Driver creates a new Gobot Driver to the MCP23017 i2c port expander.
@@ -164,18 +232,6 @@ func (m *MCP23017Driver) WriteGPIO(pin uint8, val uint8, portStr string) (err er
 	return nil
 }
 
-// PinMode set pin mode
-// val (0 output 1 input)
-// port (A or B).
-func (m *MCP23017Driver) PinMode(pin, val uint8, portStr string) (err error) {
-	selectedPort := m.getPort(portStr)
-	// Set IODIR register bit for given pin to an output/input.
-	if err = m.write(selectedPort.IODIR, uint8(pin), val); err != nil {
-		return
-	}
-	return
-}
-
 // ReadGPIO reads a value from a given gpio pin (0-7) and a
 // port (A or B).
 func (m *MCP23017Driver) ReadGPIO(pin uint8, portStr string) (val uint8, err error) {
@@ -203,88 +259,16 @@ func (m *MCP23017Driver) SetGPIOPolarity(pin uint8, val uint8, portStr string) (
 	return m.write(selectedPort.IPOL, pin, val)
 }
 
-// WithMCP23017Bank option sets the MCP23017Driver bank option
-func WithMCP23017Bank(val uint8) func(Config) {
-	return func(c Config) {
-		d, ok := c.(*MCP23017Driver)
-		if ok {
-			d.MCPConf.Bank = val
-		} else {
-			panic("Trying to set Bank for non-MCP23017Driver")
-		}
+// PinMode set pin mode
+// val (0 output 1 input)
+// port (A or B).
+func (m *MCP23017Driver) PinMode(pin, val uint8, portStr string) (err error) {
+	selectedPort := m.getPort(portStr)
+	// Set IODIR register bit for given pin to an output/input.
+	if err = m.write(selectedPort.IODIR, uint8(pin), val); err != nil {
+		return
 	}
-}
-
-// WithMCP23017Mirror option sets the MCP23017Driver Mirror option
-func WithMCP23017Mirror(val uint8) func(Config) {
-	return func(c Config) {
-		d, ok := c.(*MCP23017Driver)
-		if ok {
-			d.MCPConf.Mirror = val
-		} else {
-			panic("Trying to set Mirror for non-MCP23017Driver")
-		}
-	}
-}
-
-// WithMCP23017Seqop option sets the MCP23017Driver Seqop option
-func WithMCP23017Seqop(val uint8) func(Config) {
-	return func(c Config) {
-		d, ok := c.(*MCP23017Driver)
-		if ok {
-			d.MCPConf.Seqop = val
-		} else {
-			panic("Trying to set Seqop for non-MCP23017Driver")
-		}
-	}
-}
-
-// WithMCP23017Disslw option sets the MCP23017Driver Disslw option
-func WithMCP23017Disslw(val uint8) func(Config) {
-	return func(c Config) {
-		d, ok := c.(*MCP23017Driver)
-		if ok {
-			d.MCPConf.Disslw = val
-		} else {
-			panic("Trying to set Disslw for non-MCP23017Driver")
-		}
-	}
-}
-
-// WithMCP23017Haen option sets the MCP23017Driver Haen option
-func WithMCP23017Haen(val uint8) func(Config) {
-	return func(c Config) {
-		d, ok := c.(*MCP23017Driver)
-		if ok {
-			d.MCPConf.Haen = val
-		} else {
-			panic("Trying to set Haen for non-MCP23017Driver")
-		}
-	}
-}
-
-// WithMCP23017Odr option sets the MCP23017Driver Odr option
-func WithMCP23017Odr(val uint8) func(Config) {
-	return func(c Config) {
-		d, ok := c.(*MCP23017Driver)
-		if ok {
-			d.MCPConf.Odr = val
-		} else {
-			panic("Trying to set Odr for non-MCP23017Driver")
-		}
-	}
-}
-
-// WithMCP23017Intpol option sets the MCP23017Driver Intpol option
-func WithMCP23017Intpol(val uint8) func(Config) {
-	return func(c Config) {
-		d, ok := c.(*MCP23017Driver)
-		if ok {
-			d.MCPConf.Intpol = val
-		} else {
-			panic("Trying to set Intpol for non-MCP23017Driver")
-		}
-	}
+	return
 }
 
 // write gets the value of the passed in register, and then overwrites
