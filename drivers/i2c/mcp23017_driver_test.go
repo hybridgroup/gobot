@@ -214,10 +214,9 @@ func TestMCP23017DriverCommandsWriteGPIOErrOLAT(t *testing.T) {
 
 func TestMCP23017DriverReadGPIO(t *testing.T) {
 	// sequence to read:
-	// * read current state of IODIR (write reg, read val) => not done here, PinMode()
-	// * set IODIR of pin to input (manipulate val, write reg, write val) => not done here, PinMode()
+	// * read current state of IODIR (write reg, read val) => see also PinMode()
+	// * set IODIR of pin to input (manipulate val, write reg, write val) => see also PinMode()
 	// * read GPIO (write reg, read val)
-	// * return last item of values, means the value of the requested register
 	// arrange
 	mcp, adaptor := initTestMCP23017DriverWithStubbedAdaptor(0)
 	for bitState := 0; bitState <= 1; bitState++ {
@@ -225,25 +224,30 @@ func TestMCP23017DriverReadGPIO(t *testing.T) {
 		// arrange some values
 		testPort := "A"
 		testPin := uint8(7)
-		wantReg := uint8(0x12)    // GPIOA
-		returnRead := uint8(0x7F) // emulate bit is off
+		wantReg1 := uint8(0x00)             // IODIRA
+		wantReg2 := uint8(0x12)             // GPIOA
+		returnRead := []uint8{0x00, 0x7F}   // emulate all IO's are outputs, emulate bit is off
+		wantReg1Val := returnRead[0] | 0x80 // IODIRA: bit 7 set, all other untouched
 		if bitState == 1 {
-			returnRead = 0xFF // emulate bit is set
+			returnRead[1] = 0xFF // emulate bit is set
 		}
 		// arrange reads
 		numCallsRead := 0
 		adaptor.i2cReadImpl = func(b []byte) (int, error) {
 			numCallsRead++
-			b[len(b)-1] = returnRead
+			b[len(b)-1] = returnRead[numCallsRead-1]
 			return len(b), nil
 		}
 		// act
 		val, err := mcp.ReadGPIO(testPin, testPort)
 		// assert
 		gobottest.Assert(t, err, nil)
-		gobottest.Assert(t, numCallsRead, 1)
-		gobottest.Assert(t, len(adaptor.written), 1)
-		gobottest.Assert(t, adaptor.written[0], wantReg)
+		gobottest.Assert(t, numCallsRead, 2)
+		gobottest.Assert(t, len(adaptor.written), 4)
+		gobottest.Assert(t, adaptor.written[0], wantReg1)
+		gobottest.Assert(t, adaptor.written[1], wantReg1)
+		gobottest.Assert(t, adaptor.written[2], wantReg1Val)
+		gobottest.Assert(t, adaptor.written[3], wantReg2)
 		gobottest.Assert(t, val, uint8(bitState))
 	}
 }
