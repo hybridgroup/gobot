@@ -9,9 +9,17 @@ import (
 )
 
 // default address for device when a2/a1/a0 pins are all tied to ground
+// please consider special handling for MCP23S17
 const mcp23017Address = 0x20
 
-const debug = false // toggle debugging information
+const mcp23017Debug = false // toggle debugging information
+
+type bitState uint8
+
+const (
+	clear bitState = 0x00
+	set            = 0x01
+)
 
 // port contains all the registers for the device.
 type port struct {
@@ -107,6 +115,8 @@ func WithMCP23017Disslw(val uint8) func(Config) {
 }
 
 // WithMCP23017Haen option sets the MCP23017Driver Haen option
+// This feature is only available for MCP23S17.
+// Address pins are always enabled on the MCP23017.
 func WithMCP23017Haen(val uint8) func(Config) {
 	return func(c Config) {
 		d, ok := c.(*MCP23017Driver)
@@ -222,51 +232,21 @@ func (m *MCP23017Driver) Start() (err error) {
 // WriteGPIO writes a value to a gpio pin (0-7) and a port (A or B).
 func (m *MCP23017Driver) WriteGPIO(pin uint8, val uint8, portStr string) (err error) {
 	selectedPort := m.getPort(portStr)
-	// read current value of IODIR register
-	iodir, err := m.read(selectedPort.IODIR)
-	if err != nil {
-		return err
-	}
 	// set pin as output by clearing bit
-	iodirVal := clearBit(iodir, uint8(pin))
-	// write IODIR register bit
-	err = m.write(selectedPort.IODIR, uint8(pin), uint8(iodirVal))
-	if err != nil {
-		return err
-	}
-	// read current value of OLAT register
-	olat, err := m.read(selectedPort.OLAT)
-	if err != nil {
-		return err
-	}
-	// set or clear olat value, 0 is no output, 1 is an output
-	var olatVal uint8
-	if val == 0 {
-		olatVal = clearBit(olat, uint8(pin))
-	} else {
-		olatVal = setBit(olat, uint8(pin))
-	}
-	// write OLAT register bit
-	err = m.write(selectedPort.OLAT, uint8(pin), uint8(olatVal))
+	err = m.write(selectedPort.IODIR, pin, clear)
+	// write value to OLAT register bit
+	err = m.write(selectedPort.OLAT, pin, bitState(val))
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-// ReadGPIO reads a value from a given gpio pin (0-7) and a
-// port (A or B).
+// ReadGPIO reads a value from a given gpio pin (0-7) and a port (A or B).
 func (m *MCP23017Driver) ReadGPIO(pin uint8, portStr string) (val uint8, err error) {
 	selectedPort := m.getPort(portStr)
-	// read current value of IODIR register
-	iodir, err := m.read(selectedPort.IODIR)
-	if err != nil {
-		return 0, err
-	}
 	// set pin as input by setting bit
-	iodirVal := setBit(iodir, uint8(pin))
-	// write IODIR register bit
-	err = m.write(selectedPort.IODIR, uint8(pin), uint8(iodirVal))
+	err = m.write(selectedPort.IODIR, pin, set)
 	if err != nil {
 		return 0, err
 	}
@@ -286,7 +266,7 @@ func (m *MCP23017Driver) ReadGPIO(pin uint8, portStr string) (val uint8, err err
 // val = 0 pull up disabled.
 func (m *MCP23017Driver) SetPullUp(pin uint8, val uint8, portStr string) error {
 	selectedPort := m.getPort(portStr)
-	return m.write(selectedPort.GPPU, pin, val)
+	return m.write(selectedPort.GPPU, pin, bitState(val))
 }
 
 // SetGPIOPolarity will change a given pin's polarity based on the value:
@@ -294,7 +274,7 @@ func (m *MCP23017Driver) SetPullUp(pin uint8, val uint8, portStr string) error {
 // val = 0 same logic state of the input pin.
 func (m *MCP23017Driver) SetGPIOPolarity(pin uint8, val uint8, portStr string) (err error) {
 	selectedPort := m.getPort(portStr)
-	return m.write(selectedPort.IPOL, pin, val)
+	return m.write(selectedPort.IPOL, pin, bitState(val))
 }
 
 // PinMode set pin mode of a given pin based on the value:
@@ -303,42 +283,43 @@ func (m *MCP23017Driver) SetGPIOPolarity(pin uint8, val uint8, portStr string) (
 func (m *MCP23017Driver) PinMode(pin, val uint8, portStr string) (err error) {
 	selectedPort := m.getPort(portStr)
 	// Set IODIR register bit for given pin to an output/input.
-	if err = m.write(selectedPort.IODIR, uint8(pin), val); err != nil {
+	if err = m.write(selectedPort.IODIR, uint8(pin), bitState(val)); err != nil {
 		return
 	}
 	return
 }
 
-// write gets the value of the passed in register, and then overwrites
-// the bit specified by the pin, with the given value.
-func (m *MCP23017Driver) write(reg uint8, pin uint8, val uint8) (err error) {
-	ioval := val
-	if debug {
+// write gets the value of the passed in register, and then sets the bit specified
+// by the pin to the given state.
+func (m *MCP23017Driver) write(reg uint8, pin uint8, state bitState) (err error) {
+	var ioval uint8
+	iodir, err := m.read(reg)
+	if err != nil {
+		return err
+	}
+	if state == set {
+		ioval = setBit(iodir, pin)
+	} else {
+		ioval = clearBit(iodir, pin)
+	}
+	if mcp23017Debug {
 		log.Printf("write: MCP address: 0x%X, register: 0x%X, name: %s, value: 0x%X\n",
 			m.GetAddressOrDefault(mcp23017Address), reg, m.getRegName(reg), ioval)
 	}
-	if _, err = m.connection.Write([]uint8{reg, val}); err != nil {
+	if err = m.connection.WriteByteData(reg, ioval); err != nil {
 		return err
 	}
 	return nil
 }
 
 // read get the data from a given register
+// it is mainly a wrapper to create additional debug messages, when activated
 func (m *MCP23017Driver) read(reg uint8) (val uint8, err error) {
-	buf := []byte{0}
-	if _, err := m.connection.Write([]uint8{reg}); err != nil {
-		return val, err
-	}
-	bytesRead, err := m.connection.Read(buf)
+	val, err = m.connection.ReadByteData(reg)
 	if err != nil {
 		return val, err
 	}
-	if bytesRead != 1 {
-		err = ErrNotEnoughBytes
-		return
-	}
-	val = buf[0]
-	if debug {
+	if mcp23017Debug {
 		log.Printf("reading: MCP address: 0x%X, register:0x%X, name: %s, value: 0x%X\n",
 			m.GetAddressOrDefault(mcp23017Address), reg, m.getRegName(reg), val)
 	}
