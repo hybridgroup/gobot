@@ -173,3 +173,15 @@ func TestI2CWriteBlockDataAddressError(t *testing.T) {
 	err := c.WriteBlockData(0x01, []byte{0x01, 0x02})
 	gobottest.Assert(t, err, errors.New("Setting address failed with syscall.Errno operation not permitted"))
 }
+
+func Test_setBit(t *testing.T) {
+	var expectedVal uint8 = 129
+	actualVal := setBit(1, 7)
+	gobottest.Assert(t, expectedVal, actualVal)
+}
+
+func Test_clearBit(t *testing.T) {
+	var expectedVal uint8
+	actualVal := clearBit(128, 7)
+	gobottest.Assert(t, expectedVal, actualVal)
+}
