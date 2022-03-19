@@ -26,7 +26,7 @@ import (
 
 const mcp23017Address = 0x20
 
-var debug = false // Set this to true to see debugging information
+const debug = false // Set this to true to see debugging information
 
 // Port contains all the registers for the device.
 type port struct {
@@ -301,7 +301,8 @@ func (m *MCP23017Driver) write(reg uint8, pin uint8, val uint8) (err error) {
 		ioval = setBit(iodir, uint8(pin))
 	}
 	if debug {
-		log.Printf("Writing: MCP address: 0x%X, register: 0x%X\t, value: 0x%X\n", m.GetAddressOrDefault(mcp23017Address), reg, ioval)
+		log.Printf("write: MCP address: 0x%X, register: 0x%X, name: %s, value: 0x%X\n",
+			m.GetAddressOrDefault(mcp23017Address), reg, m.getRegName(reg), ioval)
 	}
 	if _, err = m.connection.Write([]uint8{reg, ioval}); err != nil {
 		return err
@@ -314,6 +315,12 @@ func (m *MCP23017Driver) write(reg uint8, pin uint8, val uint8) (err error) {
 // device address. To read a specific register, read register + 1 bytes, and then index
 // the result with the given register to get the value.
 func (m *MCP23017Driver) read(reg uint8) (val uint8, err error) {
+	// reset to position 0, that fixes the originated problem of #568
+	// because the sequential read will change the pointer on each access
+	if _, err = m.connection.Write([]uint8{0x00}); err != nil {
+		return val, err
+	}
+	// read
 	register := int(reg)
 	bytesToRead := register + 1
 	buf := make([]byte, bytesToRead)
@@ -322,12 +329,15 @@ func (m *MCP23017Driver) read(reg uint8) (val uint8, err error) {
 		return val, err
 	}
 	if bytesRead != bytesToRead {
-		return val, fmt.Errorf("Read was unable to get %d bytes for register: 0x%X\n", bytesToRead, reg)
+		return val, fmt.Errorf("Read was unable to get %d bytes for register: 0x%X, name: %s\n",
+			bytesToRead, reg, m.getRegName(reg))
 	}
+	val = buf[register]
 	if debug {
-		log.Printf("Reading: MCP address: 0x%X, register:0x%X\t,value: 0x%X\n", m.GetAddressOrDefault(mcp23017Address), reg, buf[register])
+		log.Printf("reading: MCP address: 0x%X, register:0x%X, name: %s, value: 0x%X\n",
+			m.GetAddressOrDefault(mcp23017Address), reg, m.getRegName(reg), val)
 	}
-	return buf[register], nil
+	return val, nil
 }
 
 // getPort return the port (A or B) given a string and the bank.
@@ -368,4 +378,48 @@ func getBank(bnk uint8) bank {
 		return bank{PortA: port{0x00, 0x02, 0x04, 0x06, 0x08, 0x0A, 0x0C, 0x0E, 0x10, 0x12, 0x14}, PortB: port{0x01, 0x03, 0x05, 0x07, 0x09, 0x0B, 0x0D, 0x0F, 0x11, 0x13, 0x15}}
 	}
 	return bank{PortA: port{0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A}, PortB: port{0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A}}
+}
+
+// getRegName returns the name of the given register related to the configured bank
+// and can be used to write nice debug messages
+func (m *MCP23017Driver) getRegName(reg uint8) string {
+	b := getBank(m.MCPConf.Bank)
+	portStr := "A"
+	regStr := "unknown"
+
+	for i := 1; i <= 2; i++ {
+		if regStr == "unknown" {
+			p := b.PortA
+			if i == 2 {
+				p = b.PortB
+				portStr = "B"
+			}
+			switch reg {
+			case p.IODIR:
+				regStr = "IODIR"
+			case p.IPOL:
+				regStr = "IPOL"
+			case p.GPINTEN:
+				regStr = "GPINTEN"
+			case p.DEFVAL:
+				regStr = "DEFVAL"
+			case p.INTCON:
+				regStr = "INTCON"
+			case p.IOCON:
+				regStr = "IOCON"
+			case p.GPPU:
+				regStr = "GPPU"
+			case p.INTF:
+				regStr = "INTF"
+			case p.INTCAP:
+				regStr = "INTCAP"
+			case p.GPIO:
+				regStr = "GPIO"
+			case p.OLAT:
+				regStr = "OLAT"
+			}
+		}
+	}
+
+	return fmt.Sprintf("%s_%s", regStr, portStr)
 }
