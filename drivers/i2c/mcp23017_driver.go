@@ -227,13 +227,8 @@ func (m *MCP23017Driver) WriteGPIO(pin uint8, val uint8, portStr string) (err er
 	if err != nil {
 		return err
 	}
-	// set or clear iodir value, a 1 sets the pin as an input, 0 as an output
-	var iodirVal uint8
-	if val == 1 {
-		iodirVal = clearBit(iodir, uint8(pin))
-	} else {
-		iodirVal = setBit(iodir, uint8(pin))
-	}
+	// set pin as output by clearing bit
+	iodirVal := clearBit(iodir, uint8(pin))
 	// write IODIR register bit
 	err = m.write(selectedPort.IODIR, uint8(pin), uint8(iodirVal))
 	if err != nil {
@@ -263,6 +258,18 @@ func (m *MCP23017Driver) WriteGPIO(pin uint8, val uint8, portStr string) (err er
 // port (A or B).
 func (m *MCP23017Driver) ReadGPIO(pin uint8, portStr string) (val uint8, err error) {
 	selectedPort := m.getPort(portStr)
+	// read current value of IODIR register
+	iodir, err := m.read(selectedPort.IODIR)
+	if err != nil {
+		return 0, err
+	}
+	// set pin as input by setting bit
+	iodirVal := setBit(iodir, uint8(pin))
+	// write IODIR register bit
+	err = m.write(selectedPort.IODIR, uint8(pin), uint8(iodirVal))
+	if err != nil {
+		return 0, err
+	}
 	val, err = m.read(selectedPort.GPIO)
 	if err != nil {
 		return val, err
