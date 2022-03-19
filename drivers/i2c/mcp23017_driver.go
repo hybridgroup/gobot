@@ -14,13 +14,6 @@ const mcp23017Address = 0x20
 
 const mcp23017Debug = false // toggle debugging information
 
-type bitState uint8
-
-const (
-	clear bitState = 0x00
-	set            = 0x01
-)
-
 // port contains all the registers for the device.
 type port struct {
 	IODIR   uint8 // I/O direction register: 0=output / 1=input
@@ -205,7 +198,7 @@ func (m *MCP23017Driver) Name() string { return m.name }
 // SetName set the driver name.
 func (m *MCP23017Driver) SetName(n string) { m.name = n }
 
-// Connection returns the I2c connection.
+// Connection returns the i2c connection.
 func (m *MCP23017Driver) Connection() gobot.Connection { return m.connector.(gobot.Connection) }
 
 // Halt stops the driver.
@@ -229,11 +222,26 @@ func (m *MCP23017Driver) Start() (err error) {
 	return
 }
 
+// PinMode set pin mode of a given pin based on the value:
+// val = 0 output
+// val = 1 input
+func (m *MCP23017Driver) PinMode(pin, val uint8, portStr string) (err error) {
+	selectedPort := m.getPort(portStr)
+	// Set IODIR register bit for given pin to an output/input.
+	if err = m.write(selectedPort.IODIR, uint8(pin), bitState(val)); err != nil {
+		return
+	}
+	return
+}
+
 // WriteGPIO writes a value to a gpio pin (0-7) and a port (A or B).
 func (m *MCP23017Driver) WriteGPIO(pin uint8, val uint8, portStr string) (err error) {
 	selectedPort := m.getPort(portStr)
 	// set pin as output by clearing bit
-	err = m.write(selectedPort.IODIR, pin, clear)
+	err = m.PinMode(pin, uint8(clear), portStr)
+	if err != nil {
+		return err
+	}
 	// write value to OLAT register bit
 	err = m.write(selectedPort.OLAT, pin, bitState(val))
 	if err != nil {
@@ -245,8 +253,8 @@ func (m *MCP23017Driver) WriteGPIO(pin uint8, val uint8, portStr string) (err er
 // ReadGPIO reads a value from a given gpio pin (0-7) and a port (A or B).
 func (m *MCP23017Driver) ReadGPIO(pin uint8, portStr string) (val uint8, err error) {
 	selectedPort := m.getPort(portStr)
-	// set pin as input by setting bit
-	err = m.write(selectedPort.IODIR, pin, set)
+	// set pin as input by set bit
+	err = m.PinMode(pin, uint8(set), portStr)
 	if err != nil {
 		return 0, err
 	}
@@ -277,18 +285,6 @@ func (m *MCP23017Driver) SetGPIOPolarity(pin uint8, val uint8, portStr string) (
 	return m.write(selectedPort.IPOL, pin, bitState(val))
 }
 
-// PinMode set pin mode of a given pin based on the value:
-// val = 0 output
-// val = 1 input
-func (m *MCP23017Driver) PinMode(pin, val uint8, portStr string) (err error) {
-	selectedPort := m.getPort(portStr)
-	// Set IODIR register bit for given pin to an output/input.
-	if err = m.write(selectedPort.IODIR, uint8(pin), bitState(val)); err != nil {
-		return
-	}
-	return
-}
-
 // write gets the value of the passed in register, and then sets the bit specified
 // by the pin to the given state.
 func (m *MCP23017Driver) write(reg uint8, pin uint8, state bitState) (err error) {
@@ -297,10 +293,10 @@ func (m *MCP23017Driver) write(reg uint8, pin uint8, state bitState) (err error)
 	if err != nil {
 		return err
 	}
-	if state == set {
-		ioval = setBit(iodir, pin)
-	} else {
+	if state == clear {
 		ioval = clearBit(iodir, pin)
+	} else {
+		ioval = setBit(iodir, pin)
 	}
 	if mcp23017Debug {
 		log.Printf("write: MCP address: 0x%X, register: 0x%X, name: %s, value: 0x%X\n",
@@ -343,19 +339,6 @@ func (m *MCP23017Driver) getPort(portStr string) (selectedPort port) {
 // getUint8Value returns the configuration data as a packed value.
 func (mc *MCP23017Config) getUint8Value() uint8 {
 	return mc.Bank<<7 | mc.Mirror<<6 | mc.Seqop<<5 | mc.Disslw<<4 | mc.Haen<<3 | mc.Odr<<2 | mc.Intpol<<1
-}
-
-// setBit is used to set a bit at a given position to 1.
-func setBit(n uint8, pos uint8) uint8 {
-	n |= (1 << pos)
-	return n
-}
-
-// clearBit is used to set a bit at a given position to 0.
-func clearBit(n uint8, pos uint8) uint8 {
-	mask := ^uint8(1 << pos)
-	n &= mask
-	return n
 }
 
 // getBank returns a bank's PortA and PortB registers given a bank number (0/1).

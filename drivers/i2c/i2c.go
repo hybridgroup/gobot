@@ -26,6 +26,13 @@ var (
 	ErrInvalidPosition = errors.New("Invalid position value")
 )
 
+type bitState uint8
+
+const (
+	clear bitState = 0x00
+	set            = 0x01
+)
+
 type I2cOperations interface {
 	io.ReadWriteCloser
 	ReadByte() (val byte, err error)
@@ -181,4 +188,17 @@ func (c *i2cConnection) WriteBlockData(reg uint8, b []byte) (err error) {
 		return err
 	}
 	return c.bus.WriteBlockData(reg, b)
+}
+
+// setBit is used to set a bit at a given position to 1.
+func setBit(n uint8, pos uint8) uint8 {
+	n |= (1 << pos)
+	return n
+}
+
+// clearBit is used to set a bit at a given position to 0.
+func clearBit(n uint8, pos uint8) uint8 {
+	mask := ^uint8(1 << pos)
+	n &= mask
+	return n
 }

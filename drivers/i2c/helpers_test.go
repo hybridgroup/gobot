@@ -175,8 +175,8 @@ func (t *i2cTestAdaptor) Finalize() (err error) { return }
 func newI2cTestAdaptor() *i2cTestAdaptor {
 	return &i2cTestAdaptor{
 		i2cConnectErr: false,
-		i2cReadImpl: func([]byte) (int, error) {
-			return 0, nil
+		i2cReadImpl: func(b []byte) (int, error) {
+			return len(b), nil
 		},
 		i2cWriteImpl: func([]byte) (int, error) {
 			return 0, nil
