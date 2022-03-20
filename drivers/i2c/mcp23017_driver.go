@@ -12,7 +12,7 @@ import (
 // please consider special handling for MCP23S17
 const mcp23017Address = 0x20
 
-const mcp23017Debug = false // toggle debugging information
+const mcp23017Debug = true // toggle debugging information
 
 // port contains all the registers for the device.
 type port struct {
@@ -45,7 +45,18 @@ type MCP23017Config struct {
 	Disslw uint8
 	Haen   uint8
 	Odr    uint8
-	Intpol uint8
+	intpol uint8
+}
+
+type MCP23017Behavior struct {
+	// Force refresh operation to register, although there is no change. Normally this is not needed, so default is off.
+	// When there is something flaky, there is a small chance to stabilize by setting this flag to true.
+	forceRefresh bool
+	// Set IO direction at each read or write operation ensures the correct direction, which is the the default setting.
+	// Most hardware is configured statically, so this can avoided by setting the direction using PinMode(),
+	// e.g. in the start up sequence. If this way is taken, the automatic set of direction at each call can
+	// be safely deactivated with this flag (set to true) and will speedup each IO access by >50%.
+	autoIODirOff bool
 }
 
 // MCP23017Driver contains the driver configuration parameters.
@@ -54,7 +65,8 @@ type MCP23017Driver struct {
 	connector  Connector
 	connection Connection
 	Config
-	MCPConf MCP23017Config
+	MCPConf  MCP23017Config
+	MCPBehav MCP23017Behavior
 	gobot.Commander
 	gobot.Eventer
 }
@@ -138,9 +150,33 @@ func WithMCP23017Intpol(val uint8) func(Config) {
 	return func(c Config) {
 		d, ok := c.(*MCP23017Driver)
 		if ok {
-			d.MCPConf.Intpol = val
+			d.MCPConf.intpol = val
 		} else {
 			panic("Trying to set Intpol for non-MCP23017Driver")
+		}
+	}
+}
+
+// WithMCP23017ForceWrite option modifies the MCP23017Driver forceRefresh option
+func WithMCP23017ForceRefresh(val uint8) func(Config) {
+	return func(c Config) {
+		d, ok := c.(*MCP23017Driver)
+		if ok {
+			d.MCPBehav.forceRefresh = val > 0
+		} else {
+			panic("Trying to set forceRefresh for non-MCP23017Driver")
+		}
+	}
+}
+
+// WithMCP23017AutoIODirOff option modifies the MCP23017Driver autoIODirOff option
+func WithMCP23017AutoIODirOff(val uint8) func(Config) {
+	return func(c Config) {
+		d, ok := c.(*MCP23017Driver)
+		if ok {
+			d.MCPBehav.autoIODirOff = val > 0
+		} else {
+			panic("Trying to set autoIODirOff for non-MCP23017Driver")
 		}
 	}
 }
@@ -237,10 +273,12 @@ func (m *MCP23017Driver) PinMode(pin, val uint8, portStr string) (err error) {
 // WriteGPIO writes a value to a gpio pin (0-7) and a port (A or B).
 func (m *MCP23017Driver) WriteGPIO(pin uint8, val uint8, portStr string) (err error) {
 	selectedPort := m.getPort(portStr)
-	// set pin as output by clearing bit
-	err = m.PinMode(pin, uint8(clear), portStr)
-	if err != nil {
-		return err
+	if !m.MCPBehav.autoIODirOff {
+		// set pin as output by clearing bit
+		err = m.PinMode(pin, uint8(clear), portStr)
+		if err != nil {
+			return err
+		}
 	}
 	// write value to OLAT register bit
 	err = m.write(selectedPort.OLAT, pin, bitState(val))
@@ -253,10 +291,12 @@ func (m *MCP23017Driver) WriteGPIO(pin uint8, val uint8, portStr string) (err er
 // ReadGPIO reads a value from a given gpio pin (0-7) and a port (A or B).
 func (m *MCP23017Driver) ReadGPIO(pin uint8, portStr string) (val uint8, err error) {
 	selectedPort := m.getPort(portStr)
-	// set pin as input by set bit
-	err = m.PinMode(pin, uint8(set), portStr)
-	if err != nil {
-		return 0, err
+	if !m.MCPBehav.autoIODirOff {
+		// set pin as input by set bit
+		err = m.PinMode(pin, uint8(set), portStr)
+		if err != nil {
+			return 0, err
+		}
 	}
 	val, err = m.read(selectedPort.GPIO)
 	if err != nil {
@@ -288,22 +328,31 @@ func (m *MCP23017Driver) SetGPIOPolarity(pin uint8, val uint8, portStr string) (
 // write gets the value of the passed in register, and then sets the bit specified
 // by the pin to the given state.
 func (m *MCP23017Driver) write(reg uint8, pin uint8, state bitState) (err error) {
-	var ioval uint8
-	iodir, err := m.read(reg)
+	valOrg, err := m.read(reg)
 	if err != nil {
 		return err
 	}
+
+	var val uint8
 	if state == clear {
-		ioval = clearBit(iodir, pin)
+		val = clearBit(valOrg, pin)
 	} else {
-		ioval = setBit(iodir, pin)
+		val = setBit(valOrg, pin)
 	}
-	if mcp23017Debug {
-		log.Printf("write: MCP address: 0x%X, register: 0x%X, name: %s, value: 0x%X\n",
-			m.GetAddressOrDefault(mcp23017Address), reg, m.getRegName(reg), ioval)
-	}
-	if err = m.connection.WriteByteData(reg, ioval); err != nil {
-		return err
+
+	if val != valOrg || m.MCPBehav.forceRefresh {
+		if mcp23017Debug {
+			log.Printf("write done: MCP forceRefresh: %t, address: 0x%X, register: 0x%X, name: %s, value: 0x%X\n",
+				m.MCPBehav.forceRefresh, m.GetAddressOrDefault(mcp23017Address), reg, m.getRegName(reg), val)
+		}
+		if err = m.connection.WriteByteData(reg, val); err != nil {
+			return err
+		}
+	} else {
+		if mcp23017Debug {
+			log.Printf("write skipped: MCP forceRefresh: %t, address: 0x%X, register: 0x%X, name: %s, value: 0x%X\n",
+				m.MCPBehav.forceRefresh, m.GetAddressOrDefault(mcp23017Address), reg, m.getRegName(reg), val)
+		}
 	}
 	return nil
 }
@@ -316,8 +365,8 @@ func (m *MCP23017Driver) read(reg uint8) (val uint8, err error) {
 		return val, err
 	}
 	if mcp23017Debug {
-		log.Printf("reading: MCP address: 0x%X, register:0x%X, name: %s, value: 0x%X\n",
-			m.GetAddressOrDefault(mcp23017Address), reg, m.getRegName(reg), val)
+		log.Printf("reading done: MCP autoIODirOff: %t, address: 0x%X, register:0x%X, name: %s, value: 0x%X\n",
+			m.MCPBehav.autoIODirOff, m.GetAddressOrDefault(mcp23017Address), reg, m.getRegName(reg), val)
 	}
 	return val, nil
 }
@@ -338,7 +387,7 @@ func (m *MCP23017Driver) getPort(portStr string) (selectedPort port) {
 
 // getUint8Value returns the configuration data as a packed value.
 func (mc *MCP23017Config) getUint8Value() uint8 {
-	return mc.Bank<<7 | mc.Mirror<<6 | mc.Seqop<<5 | mc.Disslw<<4 | mc.Haen<<3 | mc.Odr<<2 | mc.Intpol<<1
+	return mc.Bank<<7 | mc.Mirror<<6 | mc.Seqop<<5 | mc.Disslw<<4 | mc.Haen<<3 | mc.Odr<<2 | mc.intpol<<1
 }
 
 // getBank returns a bank's PortA and PortB registers given a bank number (0/1).
