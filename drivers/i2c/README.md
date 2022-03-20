@@ -12,6 +12,7 @@ go get -d -u gobot.io/x/gobot/...
 ## Hardware Support
 Gobot has a extensible system for connecting to hardware devices. The following i2c devices are currently supported:
 
+- Adafruit 2x16 RGB-LCD with 5 keys
 - Adafruit Motor Hat
 - ADS1015 Analog to Digital Converter
 - ADS1115 Analog to Digital Converter
