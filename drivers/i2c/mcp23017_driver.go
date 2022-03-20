@@ -32,30 +32,24 @@ type port struct {
 // A bank is made up of PortA and PortB pins.
 // Port B pins are on the left side of the chip (starting with pin 1), while port A pins are on the right side.
 type bank struct {
-	PortA port
-	PortB port
+	portA port
+	portB port
 }
 
 // MCP23017Config contains the device configuration for the IOCON register.
 // These fields should only be set with values 0 or 1.
 type MCP23017Config struct {
-	Bank   uint8
-	Mirror uint8
-	Seqop  uint8
-	Disslw uint8
-	Haen   uint8
-	Odr    uint8
+	bank   uint8
+	mirror uint8
+	seqop  uint8
+	disslw uint8
+	haen   uint8
+	odr    uint8
 	intpol uint8
 }
 
 type MCP23017Behavior struct {
-	// Force refresh operation to register, although there is no change. Normally this is not needed, so default is off.
-	// When there is something flaky, there is a small chance to stabilize by setting this flag to true.
 	forceRefresh bool
-	// Set IO direction at each read or write operation ensures the correct direction, which is the the default setting.
-	// Most hardware is configured statically, so this can avoided by setting the direction using PinMode(),
-	// e.g. in the start up sequence. If this way is taken, the automatic set of direction at each call can
-	// be safely deactivated with this flag (set to true) and will speedup each IO access by >50%.
 	autoIODirOff bool
 }
 
@@ -65,8 +59,8 @@ type MCP23017Driver struct {
 	connector  Connector
 	connection Connection
 	Config
-	MCPConf  MCP23017Config
-	MCPBehav MCP23017Behavior
+	mcpConf  MCP23017Config
+	mvpBehav MCP23017Behavior
 	gobot.Commander
 	gobot.Eventer
 }
@@ -76,93 +70,96 @@ func WithMCP23017Bank(val uint8) func(Config) {
 	return func(c Config) {
 		d, ok := c.(*MCP23017Driver)
 		if ok {
-			d.MCPConf.Bank = val
+			d.mcpConf.bank = val
 		} else {
 			panic("trying to set bank for non-MCP23017Driver")
 		}
 	}
 }
 
-// WithMCP23017Mirror option sets the MCP23017Driver Mirror option
+// WithMCP23017Mirror option sets the MCP23017Driver mirror option
 func WithMCP23017Mirror(val uint8) func(Config) {
 	return func(c Config) {
 		d, ok := c.(*MCP23017Driver)
 		if ok {
-			d.MCPConf.Mirror = val
+			d.mcpConf.mirror = val
 		} else {
-			panic("Trying to set Mirror for non-MCP23017Driver")
+			panic("Trying to set mirror for non-MCP23017Driver")
 		}
 	}
 }
 
-// WithMCP23017Seqop option sets the MCP23017Driver Seqop option
+// WithMCP23017Seqop option sets the MCP23017Driver seqop option
 func WithMCP23017Seqop(val uint8) func(Config) {
 	return func(c Config) {
 		d, ok := c.(*MCP23017Driver)
 		if ok {
-			d.MCPConf.Seqop = val
+			d.mcpConf.seqop = val
 		} else {
-			panic("Trying to set Seqop for non-MCP23017Driver")
+			panic("Trying to set seqop for non-MCP23017Driver")
 		}
 	}
 }
 
-// WithMCP23017Disslw option sets the MCP23017Driver Disslw option
+// WithMCP23017Disslw option sets the MCP23017Driver disslw option
 func WithMCP23017Disslw(val uint8) func(Config) {
 	return func(c Config) {
 		d, ok := c.(*MCP23017Driver)
 		if ok {
-			d.MCPConf.Disslw = val
+			d.mcpConf.disslw = val
 		} else {
-			panic("Trying to set Disslw for non-MCP23017Driver")
+			panic("Trying to set disslw for non-MCP23017Driver")
 		}
 	}
 }
 
-// WithMCP23017Haen option sets the MCP23017Driver Haen option
-// This feature is only available for MCP23S17.
-// Address pins are always enabled on the MCP23017.
+// WithMCP23017Haen option sets the MCP23017Driver haen option
+// This feature is only available for MCP23S17, because address pins are always enabled on the MCP23017.
 func WithMCP23017Haen(val uint8) func(Config) {
 	return func(c Config) {
 		d, ok := c.(*MCP23017Driver)
 		if ok {
-			d.MCPConf.Haen = val
+			d.mcpConf.haen = val
 		} else {
-			panic("Trying to set Haen for non-MCP23017Driver")
+			panic("Trying to set haen for non-MCP23017Driver")
 		}
 	}
 }
 
-// WithMCP23017Odr option sets the MCP23017Driver Odr option
+// WithMCP23017Odr option sets the MCP23017Driver odr option
 func WithMCP23017Odr(val uint8) func(Config) {
 	return func(c Config) {
 		d, ok := c.(*MCP23017Driver)
 		if ok {
-			d.MCPConf.Odr = val
+			d.mcpConf.odr = val
 		} else {
-			panic("Trying to set Odr for non-MCP23017Driver")
+			panic("Trying to set odr for non-MCP23017Driver")
 		}
 	}
 }
 
-// WithMCP23017Intpol option sets the MCP23017Driver Intpol option
+// WithMCP23017Intpol option sets the MCP23017Driver intpol option
 func WithMCP23017Intpol(val uint8) func(Config) {
 	return func(c Config) {
 		d, ok := c.(*MCP23017Driver)
 		if ok {
-			d.MCPConf.intpol = val
+			d.mcpConf.intpol = val
 		} else {
-			panic("Trying to set Intpol for non-MCP23017Driver")
+			panic("Trying to set intpol for non-MCP23017Driver")
 		}
 	}
 }
 
 // WithMCP23017ForceWrite option modifies the MCP23017Driver forceRefresh option
+// Setting to true (1) will force refresh operation to register, although there is no change.
+// Normally this is not needed, so default is off (0).
+// When there is something flaky, there is a small chance to stabilize by setting this flag to true.
+// However, setting this flag to true slows down each IO operation up to 100%.
 func WithMCP23017ForceRefresh(val uint8) func(Config) {
 	return func(c Config) {
 		d, ok := c.(*MCP23017Driver)
 		if ok {
-			d.MCPBehav.forceRefresh = val > 0
+			d.mvpBehav.forceRefresh = val > 0
 		} else {
 			panic("Trying to set forceRefresh for non-MCP23017Driver")
 		}
@@ -170,11 +167,16 @@ func WithMCP23017ForceRefresh(val uint8) func(Config) {
 }
 
 // WithMCP23017AutoIODirOff option modifies the MCP23017Driver autoIODirOff option
+// Set IO direction at each read or write operation ensures the correct direction, which is the the default setting.
+// Most hardware is configured statically, so this can avoided by setting the direction using PinMode(),
+// e.g. in the start up sequence. If this way is taken, the automatic set of direction at each call can
+// be safely deactivated with this flag (set to true, 1).
+// This will speedup each WriteGPIO by 50% and each ReadGPIO by 60%.
 func WithMCP23017AutoIODirOff(val uint8) func(Config) {
 	return func(c Config) {
 		d, ok := c.(*MCP23017Driver)
 		if ok {
-			d.MCPBehav.autoIODirOff = val > 0
+			d.mvpBehav.autoIODirOff = val > 0
 		} else {
 			panic("Trying to set autoIODirOff for non-MCP23017Driver")
 		}
@@ -201,7 +203,7 @@ func NewMCP23017Driver(a Connector, options ...func(Config)) *MCP23017Driver {
 		name:      gobot.DefaultName("MCP23017"),
 		connector: a,
 		Config:    NewConfig(),
-		MCPConf:   MCP23017Config{},
+		mcpConf:   MCP23017Config{},
 		Commander: gobot.NewCommander(),
 		Eventer:   gobot.NewEventer(),
 	}
@@ -251,7 +253,7 @@ func (m *MCP23017Driver) Start() (err error) {
 	}
 	// Set IOCON register with MCP23017 configuration.
 	ioconReg := m.getPort("A").IOCON // IOCON address is the same for Port A or B.
-	ioconVal := m.MCPConf.getUint8Value()
+	ioconVal := m.mcpConf.getUint8Value()
 	if _, err := m.connection.Write([]uint8{ioconReg, ioconVal}); err != nil {
 		return err
 	}
@@ -273,7 +275,7 @@ func (m *MCP23017Driver) PinMode(pin, val uint8, portStr string) (err error) {
 // WriteGPIO writes a value to a gpio pin (0-7) and a port (A or B).
 func (m *MCP23017Driver) WriteGPIO(pin uint8, val uint8, portStr string) (err error) {
 	selectedPort := m.getPort(portStr)
-	if !m.MCPBehav.autoIODirOff {
+	if !m.mvpBehav.autoIODirOff {
 		// set pin as output by clearing bit
 		err = m.PinMode(pin, uint8(clear), portStr)
 		if err != nil {
@@ -291,7 +293,7 @@ func (m *MCP23017Driver) WriteGPIO(pin uint8, val uint8, portStr string) (err er
 // ReadGPIO reads a value from a given gpio pin (0-7) and a port (A or B).
 func (m *MCP23017Driver) ReadGPIO(pin uint8, portStr string) (val uint8, err error) {
 	selectedPort := m.getPort(portStr)
-	if !m.MCPBehav.autoIODirOff {
+	if !m.mvpBehav.autoIODirOff {
 		// set pin as input by set bit
 		err = m.PinMode(pin, uint8(set), portStr)
 		if err != nil {
@@ -340,10 +342,10 @@ func (m *MCP23017Driver) write(reg uint8, pin uint8, state bitState) (err error)
 		val = setBit(valOrg, pin)
 	}
 
-	if val != valOrg || m.MCPBehav.forceRefresh {
+	if val != valOrg || m.mvpBehav.forceRefresh {
 		if mcp23017Debug {
 			log.Printf("write done: MCP forceRefresh: %t, address: 0x%X, register: 0x%X, name: %s, value: 0x%X\n",
-				m.MCPBehav.forceRefresh, m.GetAddressOrDefault(mcp23017Address), reg, m.getRegName(reg), val)
+				m.mvpBehav.forceRefresh, m.GetAddressOrDefault(mcp23017Address), reg, m.getRegName(reg), val)
 		}
 		if err = m.connection.WriteByteData(reg, val); err != nil {
 			return err
@@ -351,7 +353,7 @@ func (m *MCP23017Driver) write(reg uint8, pin uint8, state bitState) (err error)
 	} else {
 		if mcp23017Debug {
 			log.Printf("write skipped: MCP forceRefresh: %t, address: 0x%X, register: 0x%X, name: %s, value: 0x%X\n",
-				m.MCPBehav.forceRefresh, m.GetAddressOrDefault(mcp23017Address), reg, m.getRegName(reg), val)
+				m.mvpBehav.forceRefresh, m.GetAddressOrDefault(mcp23017Address), reg, m.getRegName(reg), val)
 		}
 	}
 	return nil
@@ -366,7 +368,7 @@ func (m *MCP23017Driver) read(reg uint8) (val uint8, err error) {
 	}
 	if mcp23017Debug {
 		log.Printf("reading done: MCP autoIODirOff: %t, address: 0x%X, register:0x%X, name: %s, value: 0x%X\n",
-			m.MCPBehav.autoIODirOff, m.GetAddressOrDefault(mcp23017Address), reg, m.getRegName(reg), val)
+			m.mvpBehav.autoIODirOff, m.GetAddressOrDefault(mcp23017Address), reg, m.getRegName(reg), val)
 	}
 	return val, nil
 }
@@ -377,39 +379,39 @@ func (m *MCP23017Driver) getPort(portStr string) (selectedPort port) {
 	portStr = strings.ToUpper(portStr)
 	switch {
 	case portStr == "A":
-		return getBank(m.MCPConf.Bank).PortA
+		return getBank(m.mcpConf.bank).portA
 	case portStr == "B":
-		return getBank(m.MCPConf.Bank).PortB
+		return getBank(m.mcpConf.bank).portB
 	default:
-		return getBank(m.MCPConf.Bank).PortA
+		return getBank(m.mcpConf.bank).portA
 	}
 }
 
 // getUint8Value returns the configuration data as a packed value.
 func (mc *MCP23017Config) getUint8Value() uint8 {
-	return mc.Bank<<7 | mc.Mirror<<6 | mc.Seqop<<5 | mc.Disslw<<4 | mc.Haen<<3 | mc.Odr<<2 | mc.intpol<<1
+	return mc.bank<<7 | mc.mirror<<6 | mc.seqop<<5 | mc.disslw<<4 | mc.haen<<3 | mc.odr<<2 | mc.intpol<<1
 }
 
 // getBank returns a bank's PortA and PortB registers given a bank number (0/1).
 func getBank(bnk uint8) bank {
 	if bnk == 0 {
-		return bank{PortA: port{0x00, 0x02, 0x04, 0x06, 0x08, 0x0A, 0x0C, 0x0E, 0x10, 0x12, 0x14}, PortB: port{0x01, 0x03, 0x05, 0x07, 0x09, 0x0B, 0x0D, 0x0F, 0x11, 0x13, 0x15}}
+		return bank{portA: port{0x00, 0x02, 0x04, 0x06, 0x08, 0x0A, 0x0C, 0x0E, 0x10, 0x12, 0x14}, portB: port{0x01, 0x03, 0x05, 0x07, 0x09, 0x0B, 0x0D, 0x0F, 0x11, 0x13, 0x15}}
 	}
-	return bank{PortA: port{0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A}, PortB: port{0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A}}
+	return bank{portA: port{0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A}, portB: port{0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A}}
 }
 
 // getRegName returns the name of the given register related to the configured bank
 // and can be used to write nice debug messages
 func (m *MCP23017Driver) getRegName(reg uint8) string {
-	b := getBank(m.MCPConf.Bank)
+	b := getBank(m.mcpConf.bank)
 	portStr := "A"
 	regStr := "unknown"
 
 	for i := 1; i <= 2; i++ {
 		if regStr == "unknown" {
-			p := b.PortA
+			p := b.portA
 			if i == 2 {
-				p = b.PortB
+				p = b.portB
 				portStr = "B"
 			}
 			switch reg {
