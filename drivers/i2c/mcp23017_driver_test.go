@@ -79,7 +79,17 @@ func TestNewMCP23017DriverOdr(t *testing.T) {
 
 func TestNewMCP23017DriverIntpol(t *testing.T) {
 	b := NewMCP23017Driver(newI2cTestAdaptor(), WithMCP23017Intpol(1))
-	gobottest.Assert(t, b.MCPConf.Intpol, uint8(1))
+	gobottest.Assert(t, b.MCPConf.intpol, uint8(1))
+}
+
+func TestNewMCP23017DriverForceRefresh(t *testing.T) {
+	b := NewMCP23017Driver(newI2cTestAdaptor(), WithMCP23017ForceRefresh(1))
+	gobottest.Assert(t, b.MCPBehav.forceRefresh, true)
+}
+
+func TestNewMCP23017DriverAutoIODirOff(t *testing.T) {
+	b := NewMCP23017Driver(newI2cTestAdaptor(), WithMCP23017AutoIODirOff(1))
+	gobottest.Assert(t, b.MCPBehav.autoIODirOff, true)
 }
 
 func TestMCP23017DriverStart(t *testing.T) {
@@ -126,13 +136,11 @@ func TestMCP23017DriverCommandsReadGPIO(t *testing.T) {
 }
 
 func TestMCP23017DriverWriteGPIO(t *testing.T) {
-	// sequence to write:
+	// sequence to write (we force the refresh by preset with inverse bit state):
 	// * read current state of IODIR (write reg, read val) => see also PinMode()
 	// * set IODIR of pin to input (manipulate val, write reg, write val) => see also PinMode()
 	// * read current state of OLAT (write reg, read val)
 	// * write OLAT (manipulate val, write reg, write val)
-	// TODO: can be optimized by not writing, when value is already fine
-	// TODO: can be optimized by calling PinMode()
 	// arrange
 	mcp, adaptor := initTestMCP23017DriverWithStubbedAdaptor(0)
 	for bitState := 0; bitState <= 1; bitState++ {
@@ -167,6 +175,41 @@ func TestMCP23017DriverWriteGPIO(t *testing.T) {
 		gobottest.Assert(t, adaptor.written[3], wantReg2)
 		gobottest.Assert(t, adaptor.written[4], wantReg2)
 		gobottest.Assert(t, adaptor.written[5], wantReg2Val)
+		gobottest.Assert(t, numCallsRead, 2)
+	}
+}
+
+func TestMCP23017DriverWriteGPIONoRefresh(t *testing.T) {
+	// sequence to write with take advantage of refresh optimization (see forceRefresh):
+	// * read current state of IODIR (write reg, read val) => by PinMode()
+	// * read current state of OLAT (write reg, read val)
+	// arrange
+	mcp, adaptor := initTestMCP23017DriverWithStubbedAdaptor(0)
+	for bitState := 0; bitState <= 1; bitState++ {
+		adaptor.written = []byte{} // reset writes of Start() and former test
+		// arrange some values
+		testPort := "B"
+		testPin := uint8(3)
+		wantReg1 := uint8(0x01)           // IODIRB
+		wantReg2 := uint8(0x15)           // OLATB
+		returnRead := []uint8{0xF7, 0xF7} // emulate all IO's are inputs except pin 3, emulate bit is already off
+		if bitState == 1 {
+			returnRead[1] = 0x08 // emulate bit is already on
+		}
+		// arrange reads
+		numCallsRead := 0
+		adaptor.i2cReadImpl = func(b []byte) (int, error) {
+			numCallsRead++
+			b[len(b)-1] = returnRead[numCallsRead-1]
+			return len(b), nil
+		}
+		// act
+		err := mcp.WriteGPIO(testPin, uint8(bitState), testPort)
+		// assert
+		gobottest.Assert(t, err, nil)
+		gobottest.Assert(t, len(adaptor.written), 2)
+		gobottest.Assert(t, adaptor.written[0], wantReg1)
+		gobottest.Assert(t, adaptor.written[1], wantReg2)
 		gobottest.Assert(t, numCallsRead, 2)
 	}
 }
@@ -236,6 +279,42 @@ func TestMCP23017DriverReadGPIO(t *testing.T) {
 		gobottest.Assert(t, adaptor.written[1], wantReg1)
 		gobottest.Assert(t, adaptor.written[2], wantReg1Val)
 		gobottest.Assert(t, adaptor.written[3], wantReg2)
+		gobottest.Assert(t, val, uint8(bitState))
+	}
+}
+
+func TestMCP23017DriverReadGPIONoRefresh(t *testing.T) {
+	// sequence to read with take advantage of refresh optimization (see forceRefresh):
+	// * read current state of IODIR (write reg, read val) => by PinMode()
+	// * read GPIO (write reg, read val)
+	// arrange
+	mcp, adaptor := initTestMCP23017DriverWithStubbedAdaptor(0)
+	for bitState := 0; bitState <= 1; bitState++ {
+		adaptor.written = []byte{} // reset writes of Start() and former test
+		// arrange some values
+		testPort := "A"
+		testPin := uint8(7)
+		wantReg1 := uint8(0x00)           // IODIRA
+		wantReg2 := uint8(0x12)           // GPIOA
+		returnRead := []uint8{0x80, 0x7F} // emulate all IO's are outputs except pin 7, emulate bit is off
+		if bitState == 1 {
+			returnRead[1] = 0xFF // emulate bit is set
+		}
+		// arrange reads
+		numCallsRead := 0
+		adaptor.i2cReadImpl = func(b []byte) (int, error) {
+			numCallsRead++
+			b[len(b)-1] = returnRead[numCallsRead-1]
+			return len(b), nil
+		}
+		// act
+		val, err := mcp.ReadGPIO(testPin, testPort)
+		// assert
+		gobottest.Assert(t, err, nil)
+		gobottest.Assert(t, numCallsRead, 2)
+		gobottest.Assert(t, len(adaptor.written), 2)
+		gobottest.Assert(t, adaptor.written[0], wantReg1)
+		gobottest.Assert(t, adaptor.written[1], wantReg2)
 		gobottest.Assert(t, val, uint8(bitState))
 	}
 }
