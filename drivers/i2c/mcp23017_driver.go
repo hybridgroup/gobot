@@ -12,7 +12,7 @@ import (
 // please consider special handling for MCP23S17
 const mcp23017Address = 0x20
 
-const mcp23017Debug = true // toggle debugging information
+const mcp23017Debug = false // toggle debugging information
 
 // port contains all the registers for the device.
 type port struct {
