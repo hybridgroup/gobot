@@ -15,12 +15,20 @@ const (
 	Error = "error"
 	// Data event
 	Data = "data"
+	// Value event
+	Value = "value"
 	// Vibration event
 	Vibration = "vibration"
 )
 
-// AnalogReader interface represents an Adaptor which has Analog capabilities
+// AnalogReader interface represents an Adaptor which has AnalogRead capabilities
 type AnalogReader interface {
 	//gobot.Adaptor
-	AnalogRead(string) (val int, err error)
+	AnalogRead(pin string) (val int, err error)
+}
+
+// AnalogWriter interface represents an Adaptor which has AnalogWrite capabilities
+type AnalogWriter interface {
+	//gobot.Adaptor
+	AnalogWrite(pin string, val int) (err error)
 }
