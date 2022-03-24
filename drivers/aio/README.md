@@ -12,9 +12,11 @@ go get -d -u gobot.io/x/gobot/...
 ## Hardware Support
 Gobot has a extensible system for connecting to hardware devices. The following AIO devices are currently supported:
   - Analog Sensor
+  - Analog Actuator
   - Grove Light Sensor
   - Grove Rotary Dial
   - Grove Sound Sensor
   - Grove Temperature Sensor
+  - Temperature Sensor (supports linear and NTC thermistor in normal and inverse mode)
 
 More drivers are coming soon...

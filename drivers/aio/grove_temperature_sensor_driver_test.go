@@ -1,7 +1,6 @@
 package aio
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 	"testing"
@@ -21,6 +20,39 @@ func TestGroveTemperatureSensorDriver(t *testing.T) {
 	gobottest.Assert(t, d.interval, 10*time.Millisecond)
 }
 
+func TestGroveTemperatureSensorDriverScaling(t *testing.T) {
+	var tests = map[string]struct {
+		input int
+		want  float64
+	}{
+		"min":           {input: 0, want: -273.15},
+		"nearMin":       {input: 1, want: -76.96736464322436},
+		"T-25C":         {input: 65, want: -25.064097201780044},
+		"T0C":           {input: 233, want: -0.014379114122164083},
+		"T25C":          {input: 511, want: 24.956285721537938},
+		"585":           {input: 585, want: 31.61532462352477},
+		"nearMax":       {input: 1022, want: 347.6819764792606},
+		"max":           {input: 1023, want: 347.77682140097613},
+		"biggerThanMax": {input: 5000, want: 347.77682140097613},
+	}
+	a := newAioTestAdaptor()
+	d := NewGroveTemperatureSensorDriver(a, "54")
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			a.TestAdaptorAnalogRead(func() (val int, err error) {
+				val = tt.input
+				return
+			})
+			// act
+			got, err := d.ReadValue()
+			// assert
+			gobottest.Assert(t, err, nil)
+			gobottest.Assert(t, got, tt.want)
+		})
+	}
+}
+
 func TestGroveTempSensorPublishesTemperatureInCelsius(t *testing.T) {
 	sem := make(chan bool, 1)
 	a := newAioTestAdaptor()
@@ -30,7 +62,7 @@ func TestGroveTempSensorPublishesTemperatureInCelsius(t *testing.T) {
 		val = 585
 		return
 	})
-	d.Once(d.Event(Data), func(data interface{}) {
+	d.Once(d.Event(Value), func(data interface{}) {
 		gobottest.Assert(t, fmt.Sprintf("%.2f", data.(float64)), "31.62")
 		sem <- true
 	})
@@ -45,54 +77,7 @@ func TestGroveTempSensorPublishesTemperatureInCelsius(t *testing.T) {
 	gobottest.Assert(t, d.Temperature(), 31.61532462352477)
 }
 
-func TestGroveTempSensorPublishesError(t *testing.T) {
-	sem := make(chan bool, 1)
-	a := newAioTestAdaptor()
-	d := NewGroveTemperatureSensorDriver(a, "1")
-
-	// send error
-	a.TestAdaptorAnalogRead(func() (val int, err error) {
-		err = errors.New("read error")
-		return
-	})
-
-	gobottest.Assert(t, d.Start(), nil)
-
-	// expect error
-	d.Once(d.Event(Error), func(data interface{}) {
-		gobottest.Assert(t, data.(error).Error(), "read error")
-		sem <- true
-	})
-
-	select {
-	case <-sem:
-	case <-time.After(1 * time.Second):
-		t.Errorf("Grove Temperature Sensor Event \"Error\" was not published")
-	}
-}
-
-func TestGroveTempSensorHalt(t *testing.T) {
-	d := NewGroveTemperatureSensorDriver(newAioTestAdaptor(), "1")
-	done := make(chan struct{})
-	go func() {
-		<-d.halt
-		close(done)
-	}()
-	gobottest.Assert(t, d.Halt(), nil)
-	select {
-	case <-done:
-	case <-time.After(100 * time.Millisecond):
-		t.Errorf("Grove Temperature Sensor was not halted")
-	}
-}
-
 func TestGroveTempDriverDefaultName(t *testing.T) {
 	d := NewGroveTemperatureSensorDriver(newAioTestAdaptor(), "1")
 	gobottest.Assert(t, strings.HasPrefix(d.Name(), "GroveTemperatureSensor"), true)
-}
-
-func TestGroveTempDriverSetName(t *testing.T) {
-	d := NewGroveTemperatureSensorDriver(newAioTestAdaptor(), "1")
-	d.SetName("mybot")
-	gobottest.Assert(t, d.Name(), "mybot")
 }
