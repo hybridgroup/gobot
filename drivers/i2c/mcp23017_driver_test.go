@@ -84,12 +84,12 @@ func TestNewMCP23017DriverIntpol(t *testing.T) {
 
 func TestNewMCP23017DriverForceRefresh(t *testing.T) {
 	b := NewMCP23017Driver(newI2cTestAdaptor(), WithMCP23017ForceRefresh(1))
-	gobottest.Assert(t, b.mvpBehav.forceRefresh, true)
+	gobottest.Assert(t, b.mcpBehav.forceRefresh, true)
 }
 
 func TestNewMCP23017DriverAutoIODirOff(t *testing.T) {
 	b := NewMCP23017Driver(newI2cTestAdaptor(), WithMCP23017AutoIODirOff(1))
-	gobottest.Assert(t, b.mvpBehav.autoIODirOff, true)
+	gobottest.Assert(t, b.mcpBehav.autoIODirOff, true)
 }
 
 func TestMCP23017DriverStart(t *testing.T) {
@@ -220,7 +220,7 @@ func TestMCP23017DriverWriteGPIONoAutoDir(t *testing.T) {
 	// * write OLAT (manipulate val, write reg, write val)
 	// arrange
 	mcp, adaptor := initTestMCP23017DriverWithStubbedAdaptor(0)
-	mcp.mvpBehav.autoIODirOff = true
+	mcp.mcpBehav.autoIODirOff = true
 	for bitState := 0; bitState <= 1; bitState++ {
 		adaptor.written = []byte{} // reset writes of Start() and former test
 		// arrange some values
@@ -362,7 +362,7 @@ func TestMCP23017DriverReadGPIONoAutoDir(t *testing.T) {
 	// * read GPIO (write reg, read val)
 	// arrange
 	mcp, adaptor := initTestMCP23017DriverWithStubbedAdaptor(0)
-	mcp.mvpBehav.autoIODirOff = true
+	mcp.mcpBehav.autoIODirOff = true
 	for bitState := 0; bitState <= 1; bitState++ {
 		adaptor.written = []byte{} // reset writes of Start() and former test
 		// arrange some values

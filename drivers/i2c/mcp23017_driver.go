@@ -60,7 +60,7 @@ type MCP23017Driver struct {
 	connection Connection
 	Config
 	mcpConf  MCP23017Config
-	mvpBehav MCP23017Behavior
+	mcpBehav MCP23017Behavior
 	gobot.Commander
 	gobot.Eventer
 }
@@ -71,8 +71,8 @@ func WithMCP23017Bank(val uint8) func(Config) {
 		d, ok := c.(*MCP23017Driver)
 		if ok {
 			d.mcpConf.bank = val
-		} else {
-			panic("trying to set bank for non-MCP23017Driver")
+		} else if mcp23017Debug {
+			log.Printf("trying to set bank for non-MCP23017Driver %v", c)
 		}
 	}
 }
@@ -83,8 +83,8 @@ func WithMCP23017Mirror(val uint8) func(Config) {
 		d, ok := c.(*MCP23017Driver)
 		if ok {
 			d.mcpConf.mirror = val
-		} else {
-			panic("Trying to set mirror for non-MCP23017Driver")
+		} else if mcp23017Debug {
+			log.Printf("Trying to set mirror for non-MCP23017Driver %v", c)
 		}
 	}
 }
@@ -95,8 +95,8 @@ func WithMCP23017Seqop(val uint8) func(Config) {
 		d, ok := c.(*MCP23017Driver)
 		if ok {
 			d.mcpConf.seqop = val
-		} else {
-			panic("Trying to set seqop for non-MCP23017Driver")
+		} else if mcp23017Debug {
+			log.Printf("Trying to set seqop for non-MCP23017Driver %v", c)
 		}
 	}
 }
@@ -107,8 +107,8 @@ func WithMCP23017Disslw(val uint8) func(Config) {
 		d, ok := c.(*MCP23017Driver)
 		if ok {
 			d.mcpConf.disslw = val
-		} else {
-			panic("Trying to set disslw for non-MCP23017Driver")
+		} else if mcp23017Debug {
+			log.Printf("Trying to set disslw for non-MCP23017Driver %v", c)
 		}
 	}
 }
@@ -120,8 +120,8 @@ func WithMCP23017Haen(val uint8) func(Config) {
 		d, ok := c.(*MCP23017Driver)
 		if ok {
 			d.mcpConf.haen = val
-		} else {
-			panic("Trying to set haen for non-MCP23017Driver")
+		} else if mcp23017Debug {
+			log.Printf("Trying to set haen for non-MCP23017Driver %v", c)
 		}
 	}
 }
@@ -132,8 +132,8 @@ func WithMCP23017Odr(val uint8) func(Config) {
 		d, ok := c.(*MCP23017Driver)
 		if ok {
 			d.mcpConf.odr = val
-		} else {
-			panic("Trying to set odr for non-MCP23017Driver")
+		} else if mcp23017Debug {
+			log.Printf("Trying to set odr for non-MCP23017Driver %v", c)
 		}
 	}
 }
@@ -144,8 +144,8 @@ func WithMCP23017Intpol(val uint8) func(Config) {
 		d, ok := c.(*MCP23017Driver)
 		if ok {
 			d.mcpConf.intpol = val
-		} else {
-			panic("Trying to set intpol for non-MCP23017Driver")
+		} else if mcp23017Debug {
+			log.Printf("Trying to set intpol for non-MCP23017Driver %v", c)
 		}
 	}
 }
@@ -159,9 +159,9 @@ func WithMCP23017ForceRefresh(val uint8) func(Config) {
 	return func(c Config) {
 		d, ok := c.(*MCP23017Driver)
 		if ok {
-			d.mvpBehav.forceRefresh = val > 0
-		} else {
-			panic("Trying to set forceRefresh for non-MCP23017Driver")
+			d.mcpBehav.forceRefresh = val > 0
+		} else if mcp23017Debug {
+			log.Printf("Trying to set forceRefresh for non-MCP23017Driver %v", c)
 		}
 	}
 }
@@ -176,9 +176,9 @@ func WithMCP23017AutoIODirOff(val uint8) func(Config) {
 	return func(c Config) {
 		d, ok := c.(*MCP23017Driver)
 		if ok {
-			d.mvpBehav.autoIODirOff = val > 0
-		} else {
-			panic("Trying to set autoIODirOff for non-MCP23017Driver")
+			d.mcpBehav.autoIODirOff = val > 0
+		} else if mcp23017Debug {
+			log.Printf("Trying to set autoIODirOff for non-MCP23017Driver %v", c)
 		}
 	}
 }
@@ -275,7 +275,7 @@ func (m *MCP23017Driver) PinMode(pin, val uint8, portStr string) (err error) {
 // WriteGPIO writes a value to a gpio pin (0-7) and a port (A or B).
 func (m *MCP23017Driver) WriteGPIO(pin uint8, val uint8, portStr string) (err error) {
 	selectedPort := m.getPort(portStr)
-	if !m.mvpBehav.autoIODirOff {
+	if !m.mcpBehav.autoIODirOff {
 		// set pin as output by clearing bit
 		err = m.PinMode(pin, uint8(clear), portStr)
 		if err != nil {
@@ -293,7 +293,7 @@ func (m *MCP23017Driver) WriteGPIO(pin uint8, val uint8, portStr string) (err er
 // ReadGPIO reads a value from a given gpio pin (0-7) and a port (A or B).
 func (m *MCP23017Driver) ReadGPIO(pin uint8, portStr string) (val uint8, err error) {
 	selectedPort := m.getPort(portStr)
-	if !m.mvpBehav.autoIODirOff {
+	if !m.mcpBehav.autoIODirOff {
 		// set pin as input by set bit
 		err = m.PinMode(pin, uint8(set), portStr)
 		if err != nil {
@@ -342,10 +342,10 @@ func (m *MCP23017Driver) write(reg uint8, pin uint8, state bitState) (err error)
 		val = setBit(valOrg, pin)
 	}
 
-	if val != valOrg || m.mvpBehav.forceRefresh {
+	if val != valOrg || m.mcpBehav.forceRefresh {
 		if mcp23017Debug {
 			log.Printf("write done: MCP forceRefresh: %t, address: 0x%X, register: 0x%X, name: %s, value: 0x%X\n",
-				m.mvpBehav.forceRefresh, m.GetAddressOrDefault(mcp23017Address), reg, m.getRegName(reg), val)
+				m.mcpBehav.forceRefresh, m.GetAddressOrDefault(mcp23017Address), reg, m.getRegName(reg), val)
 		}
 		if err = m.connection.WriteByteData(reg, val); err != nil {
 			return err
@@ -353,7 +353,7 @@ func (m *MCP23017Driver) write(reg uint8, pin uint8, state bitState) (err error)
 	} else {
 		if mcp23017Debug {
 			log.Printf("write skipped: MCP forceRefresh: %t, address: 0x%X, register: 0x%X, name: %s, value: 0x%X\n",
-				m.mvpBehav.forceRefresh, m.GetAddressOrDefault(mcp23017Address), reg, m.getRegName(reg), val)
+				m.mcpBehav.forceRefresh, m.GetAddressOrDefault(mcp23017Address), reg, m.getRegName(reg), val)
 		}
 	}
 	return nil
@@ -368,7 +368,7 @@ func (m *MCP23017Driver) read(reg uint8) (val uint8, err error) {
 	}
 	if mcp23017Debug {
 		log.Printf("reading done: MCP autoIODirOff: %t, address: 0x%X, register:0x%X, name: %s, value: 0x%X\n",
-			m.mvpBehav.autoIODirOff, m.GetAddressOrDefault(mcp23017Address), reg, m.getRegName(reg), val)
+			m.mcpBehav.autoIODirOff, m.GetAddressOrDefault(mcp23017Address), reg, m.getRegName(reg), val)
 	}
 	return val, nil
 }
