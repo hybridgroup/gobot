@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"sync"
 
 	"gobot.io/x/gobot"
 )
@@ -63,6 +64,11 @@ type MCP23017Driver struct {
 	mcpBehav MCP23017Behavior
 	gobot.Commander
 	gobot.Eventer
+	// mutex needed because following sequences must not be interrupted:
+	// read-write-read-write in WriteGPIO()
+	// read-write-read in ReadGPIO()
+	// read-write in all other public methods using write()
+	mutex *sync.Mutex
 }
 
 // WithMCP23017Bank option sets the MCP23017Driver bank option
@@ -206,6 +212,7 @@ func NewMCP23017Driver(a Connector, options ...func(Config)) *MCP23017Driver {
 		mcpConf:   MCP23017Config{},
 		Commander: gobot.NewCommander(),
 		Eventer:   gobot.NewEventer(),
+		mutex:     &sync.Mutex{},
 	}
 
 	for _, option := range options {
@@ -264,6 +271,9 @@ func (m *MCP23017Driver) Start() (err error) {
 // val = 0 output
 // val = 1 input
 func (m *MCP23017Driver) PinMode(pin, val uint8, portStr string) (err error) {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+
 	selectedPort := m.getPort(portStr)
 	// Set IODIR register bit for given pin to an output/input.
 	if err = m.write(selectedPort.IODIR, uint8(pin), bitState(val)); err != nil {
@@ -274,11 +284,14 @@ func (m *MCP23017Driver) PinMode(pin, val uint8, portStr string) (err error) {
 
 // WriteGPIO writes a value to a gpio pin (0-7) and a port (A or B).
 func (m *MCP23017Driver) WriteGPIO(pin uint8, val uint8, portStr string) (err error) {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+
 	selectedPort := m.getPort(portStr)
 	if !m.mcpBehav.autoIODirOff {
-		// set pin as output by clearing bit
-		err = m.PinMode(pin, uint8(clear), portStr)
-		if err != nil {
+		// Set IODIR register bit for given pin to an output by clearing bit.
+		// can't call PinMode() because mutex will cause deadlock
+		if err = m.write(selectedPort.IODIR, uint8(pin), clear); err != nil {
 			return err
 		}
 	}
@@ -292,11 +305,14 @@ func (m *MCP23017Driver) WriteGPIO(pin uint8, val uint8, portStr string) (err er
 
 // ReadGPIO reads a value from a given gpio pin (0-7) and a port (A or B).
 func (m *MCP23017Driver) ReadGPIO(pin uint8, portStr string) (val uint8, err error) {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+
 	selectedPort := m.getPort(portStr)
 	if !m.mcpBehav.autoIODirOff {
-		// set pin as input by set bit
-		err = m.PinMode(pin, uint8(set), portStr)
-		if err != nil {
+		// Set IODIR register bit for given pin to an input by set bit.
+		// can't call PinMode() because mutex will cause deadlock
+		if err = m.write(selectedPort.IODIR, uint8(pin), set); err != nil {
 			return 0, err
 		}
 	}
@@ -315,6 +331,9 @@ func (m *MCP23017Driver) ReadGPIO(pin uint8, portStr string) (val uint8, err err
 // val = 1 pull up enabled.
 // val = 0 pull up disabled.
 func (m *MCP23017Driver) SetPullUp(pin uint8, val uint8, portStr string) error {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+
 	selectedPort := m.getPort(portStr)
 	return m.write(selectedPort.GPPU, pin, bitState(val))
 }
@@ -323,6 +342,9 @@ func (m *MCP23017Driver) SetPullUp(pin uint8, val uint8, portStr string) error {
 // val = 1 opposite logic state of the input pin.
 // val = 0 same logic state of the input pin.
 func (m *MCP23017Driver) SetGPIOPolarity(pin uint8, val uint8, portStr string) (err error) {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+
 	selectedPort := m.getPort(portStr)
 	return m.write(selectedPort.IPOL, pin, bitState(val))
 }
