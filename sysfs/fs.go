@@ -2,6 +2,8 @@ package sysfs
 
 import (
 	"os"
+	"path"
+	"regexp"
 )
 
 // A File represents basic IO interactions with the underlying file system
@@ -20,6 +22,7 @@ type File interface {
 type Filesystem interface {
 	OpenFile(name string, flag int, perm os.FileMode) (file File, err error)
 	Stat(name string) (os.FileInfo, error)
+	Find(baseDir string, pattern string) (dirs []string, err error)
 }
 
 // NativeFilesystem represents the native file system implementation
@@ -43,12 +46,39 @@ func (fs *NativeFilesystem) Stat(name string) (os.FileInfo, error) {
 	return os.Stat(name)
 }
 
+// Find returns all items (files or folders) below the given directory matching the given pattern.
+func (fs *NativeFilesystem) Find(baseDir string, pattern string) ([]string, error) {
+	reg, err := regexp.Compile(pattern)
+	if err != nil {
+		return nil, err
+	}
+
+	items, err := os.ReadDir(baseDir)
+	if err != nil {
+		return nil, err
+	}
+
+	var found []string
+	for _, item := range items {
+		if reg.MatchString(item.Name()) {
+			found = append(found, path.Join(baseDir, item.Name()))
+
+		}
+	}
+	return found, nil
+}
+
 // OpenFile calls either the NativeFilesystem or user defined OpenFile
 func OpenFile(name string, flag int, perm os.FileMode) (file File, err error) {
 	return fs.OpenFile(name, flag, perm)
 }
 
-// Stat call either the NativeFilesystem of user defined Stat
+// Stat calls either the NativeFilesystem or user defined Stat
 func Stat(name string) (os.FileInfo, error) {
 	return fs.Stat(name)
+}
+
+// Find calls either the implementation with NativeFilesystem or user defined Find
+func Find(baseDir string, pattern string) ([]string, error) {
+	return fs.Find(baseDir, pattern)
 }
