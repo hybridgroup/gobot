@@ -1,6 +1,7 @@
 package sysfs
 
 import (
+	"sort"
 	"testing"
 
 	"gobot.io/x/gobot/gobottest"
@@ -39,6 +40,32 @@ func TestMockFilesystemStat(t *testing.T) {
 
 	_, err = fs.Stat("plonk")
 	gobottest.Refute(t, err, nil)
+}
+
+func TestMockFilesystemFind(t *testing.T) {
+	// arrange
+	fs := NewMockFilesystem([]string{"/foo", "/bar/foo", "/bar/foo/baz", "/bar/baz/foo", "/bar/foo/bak"})
+	var tests = map[string]struct {
+		baseDir string
+		pattern string
+		want    []string
+	}{
+		"flat":                  {baseDir: "/", pattern: "foo", want: []string{"/foo"}},
+		"in directory no slash": {baseDir: "/bar", pattern: "foo", want: []string{"/bar/foo", "/bar/foo", "/bar/foo"}},
+		"file":                  {baseDir: "/bar/baz/", pattern: "foo", want: []string{"/bar/baz/foo"}},
+		"file pattern":          {baseDir: "/bar/foo/", pattern: "ba.?", want: []string{"/bar/foo/bak", "/bar/foo/baz"}},
+		"empty":                 {baseDir: "/", pattern: "plonk", want: nil},
+	}
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			// act
+			dirs, err := fs.Find(tt.baseDir, tt.pattern)
+			// assert
+			gobottest.Assert(t, err, nil)
+			sort.Strings(dirs)
+			gobottest.Assert(t, dirs, tt.want)
+		})
+	}
 }
 
 func TestMockFilesystemWrite(t *testing.T) {
