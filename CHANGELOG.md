@@ -1,3 +1,34 @@
+1.16.0
+---
+* **bugfix**
+  * failing leftovers after usage of PR #569
+  * Fix servo and DC motors presence
+  * FIX the bug #568 without further impact, heavy improvements of tests
+  * fixed PinMode, SetPullUp and SetPolarity, unit tests activated
+  * ReadGPIO fixed with #576, failing leftovers for PinMode, SetPullUp and SetPolarity
+  * helper_test ReadByteData, ReadWordData to use reg
+* **core**
+  * update uuid package and directly access it; remove archived uuid package
+* **digispark**
+  * fix ReadByte & WriteByte, rework and add i2c tests
+  * remove useless code in i2c test
+* **drivers**
+  * add AnalogActuatorDriver, analog temperature sensor, driver for PCF8591 (with 400kbit stabilization), driver for YL-40
+  * Adding support for hmc8553l compass
+  * bmp388 fix missing address write byte in test of Measurements
+  * drv2605l fix missing address write byte in test of Halt()
+  * introduce adafruit1109 2x16 LCD with 5 keys
+  * mcp23017: add mutex for write, hd44780: fix mutexes
+  * MCP3004: correct number of channels
+* **raspi**
+  * fix raspi PWMPin.SetDutyCycle (#800)
+* **tello**
+  * Guards Dji Tello Halt against nil dereference
+* **test**
+  * don't panic on 'With*' allow simpler wrapping of drivers
+* **tinkerboard**
+  * fix tinkerboard i2c0 to i2c4, improve comments in pin map, improve README
+
 1.15.0
 ---
 * **build**
