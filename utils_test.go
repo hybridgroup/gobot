@@ -1,5 +1,6 @@
 package gobot
 
+
 import (
 	"strings"
 	"testing"
