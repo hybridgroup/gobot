@@ -46,11 +46,11 @@ func main() {
 		stick.On(joystick.HomeRelease, func(data interface{}) {
 			fmt.Println("home_release")
 		})
-		stick.On(joystick.SharePress, func(data interface{}) {
-			fmt.Println("share_press")
+		stick.On(joystick.CreatePress, func(data interface{}) {
+			fmt.Println("create_press")
 		})
-		stick.On(joystick.ShareRelease, func(data interface{}) {
-			fmt.Println("share_release")
+		stick.On(joystick.CreateRelease, func(data interface{}) {
+			fmt.Println("create_release")
 		})
 		stick.On(joystick.OptionsPress, func(data interface{}) {
 			fmt.Println("options_press")
@@ -64,23 +64,23 @@ func main() {
 		stick.On(joystick.L1Release, func(data interface{}) {
 			fmt.Println("l1_release")
 		})
-		stick.On(joystick.L2Press, func(data interface{}) {
-			fmt.Println("l2_press")
-		})
-		stick.On(joystick.L2Release, func(data interface{}) {
-			fmt.Println("l2_release")
-		})
 		stick.On(joystick.R1Press, func(data interface{}) {
 			fmt.Println("r1_press")
 		})
 		stick.On(joystick.R1Release, func(data interface{}) {
 			fmt.Println("r1_release")
 		})
-		stick.On(joystick.R2Press, func(data interface{}) {
-			fmt.Println("r2_press")
+		stick.On(joystick.PSPress, func(data interface{}) {
+			fmt.Println("ps_press")
 		})
-		stick.On(joystick.R2Release, func(data interface{}) {
-			fmt.Println("r2_release")
+		stick.On(joystick.PSRelease, func(data interface{}) {
+			fmt.Println("ps_release")
+		})
+		stick.On(joystick.TrackpadPress, func(data interface{}) {
+			fmt.Println("trackpad_press")
+		})
+		stick.On(joystick.TrackpadRelease, func(data interface{}) {
+			fmt.Println("trackpad_release")
 		})
 
 		stick.On(joystick.UpPress, func(data interface{}) {
@@ -108,24 +108,24 @@ func main() {
 			fmt.Println("left_release")
 		})
 
-		// stick.On(joystick.LeftX, func(data interface{}) {
-		// 	fmt.Println("left_x", data)
-		// })
-		// stick.On(joystick.LeftY, func(data interface{}) {
-		// 	fmt.Println("left_y", data)
-		// })
-		// stick.On(joystick.RightX, func(data interface{}) {
-		// 	fmt.Println("right_x", data)
-		// })
-		// stick.On(joystick.RightY, func(data interface{}) {
-		// 	fmt.Println("right_y", data)
-		// })
-		// stick.On(joystick.L2, func(data interface{}) {
-		// 	fmt.Println("L2", data)
-		// })
-		// stick.On(joystick.R2, func(data interface{}) {
-		// 	fmt.Println("R2", data)
-		// })
+		stick.On(joystick.LeftX, func(data interface{}) {
+			fmt.Println("left_x", data)
+		})
+		stick.On(joystick.LeftY, func(data interface{}) {
+			fmt.Println("left_y", data)
+		})
+		stick.On(joystick.RightX, func(data interface{}) {
+			fmt.Println("right_x", data)
+		})
+		stick.On(joystick.RightY, func(data interface{}) {
+			fmt.Println("right_y", data)
+		})
+		stick.On(joystick.L2, func(data interface{}) {
+			fmt.Println("L2", data)
+		})
+		stick.On(joystick.R2, func(data interface{}) {
+			fmt.Println("R2", data)
+		})
 	}
 
 	robot := gobot.NewRobot("joystickBot",

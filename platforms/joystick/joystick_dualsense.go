@@ -14,15 +14,15 @@ var dualsenseConfig = joystickConfig{
 		},
 		{
 			Name: "right_x",
-			ID:   3,
+			ID:   2,
 		},
 		{
 			Name: "right_y",
-			ID:   4,
+			ID:   3,
 		},
 		{
 			Name: "l2",
-			ID:   2,
+			ID:   4,
 		},
 		{
 			Name: "r2",
@@ -31,11 +31,11 @@ var dualsenseConfig = joystickConfig{
 	},
 	Buttons: []pair{
 		{
-			Name: "square",
+			Name: "triangle",
 			ID:   3,
 		},
 		{
-			Name: "triangle",
+			Name: "square",
 			ID:   2,
 		},
 		{
@@ -47,15 +47,15 @@ var dualsenseConfig = joystickConfig{
 			ID:   0,
 		},
 		{
-			Name: "l1",
+			Name: "create",
 			ID:   4,
 		},
 		{
-			Name: "l2",
+			Name: "options",
 			ID:   6,
 		},
 		{
-			Name: "r1",
+			Name: "ps",
 			ID:   5,
 		},
 		{
@@ -67,12 +67,32 @@ var dualsenseConfig = joystickConfig{
 			ID:   8,
 		},
 		{
-			Name: "options",
+			Name: "l1",
 			ID:   9,
 		},
 		{
-			Name: "home",
+			Name: "r1",
 			ID:   10,
+		},
+		{
+			Name: "up",
+			ID:   11,
+		},
+		{
+			Name: "down",
+			ID:   12,
+		},
+		{
+			Name: "left",
+			ID:   13,
+		},
+		{
+			Name: "right",
+			ID:   14,
+		},
+		{
+			Name: "trackpad",
+			ID:   15,
 		},
 	},
 	Hats: []hat{
