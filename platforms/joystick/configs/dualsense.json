@@ -1,0 +1,100 @@
+{
+    "name": "Sony PLAYSTATION(R)5 Controller",
+    "guid": "E7D56FCA-A01F-4A14-B0D0-4FDAFD847E5E",
+    "axis": [
+        {
+            "name": "left_x",
+            "id": 0
+        },
+        {
+            "name": "left_y",
+            "id": 1
+        },
+        {
+            "name": "right_x",
+            "id": 3
+        },
+        {
+            "name": "right_y",
+            "id": 4
+        },
+        {
+            "name": "l2",
+            "id": 2
+        },
+        {
+            "name": "r2",
+            "id": 5
+        },
+        {
+            "name": "up",
+            "id": 7
+        },
+        {
+            "name": "down",
+            "id": 7
+        },
+        {
+            "name": "left",
+            "id": 6
+        },
+        {
+            "name": "right",
+            "id": 6
+        }
+    ],
+    "buttons": [
+        {
+            "name": "square",
+            "id": 3
+        },
+        {
+            "name": "triangle",
+            "id": 2
+        },
+        {
+            "name": "circle",
+            "id": 1
+        },
+        {
+            "name": "x",
+            "id": 0
+        },
+        {
+            "name": "l1",
+            "id": 4
+        },
+        {
+            "name": "l2",
+            "id": 6
+        },
+        {
+            "name": "r2",
+            "id": 7
+        },
+        {
+            "name": "r1",
+            "id": 5
+        },
+        {
+            "name": "share",
+            "id": 8
+        },
+        {
+            "name": "options",
+            "id": 9
+        },
+        {
+            "name": "ps",
+            "id": 10
+        },
+        {
+            "name": "left",
+            "id": 11
+        },
+        {
+            "name": "right",
+            "id": 12
+        }
+    ]
+}

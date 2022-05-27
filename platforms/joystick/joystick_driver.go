@@ -17,6 +17,9 @@ const (
 	// Dualshock4 joystick configuration.
 	Dualshock4 = "dualshock4"
 
+	// Dualsense joystick configuration.
+	Dualsense = "dualsense"
+
 	// TFlightHotasX flight stick configuration.
 	TFlightHotasX = "tflightHotasX"
 
@@ -120,6 +123,8 @@ func (j *Driver) Start() (err error) {
 		j.config = dualshock3Config
 	case "dualshock4":
 		j.config = dualshock4Config
+	case "dualsense":
+		j.config = dualsenseConfig
 	case "tflightHotasX":
 		j.config = tflightHotasXConfig
 	case "xbox360":

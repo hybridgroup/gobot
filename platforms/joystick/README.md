@@ -5,6 +5,7 @@ You can use Gobot with any USB joystick or game controller that is compatible wi
 Current configurations included:
 - Dualshock3 game controller
 - Dualshock4 game controller
+- Dualsense game controller
 - Thrustmaster T-Flight Hotas X Joystick
 - XBox360 game controller
 - XBox360 "Rock Band" drum controller
