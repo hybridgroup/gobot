@@ -12,89 +12,77 @@
         },
         {
             "name": "right_x",
-            "id": 3
+            "id": 2
         },
         {
             "name": "right_y",
-            "id": 4
+            "id": 3
         },
         {
             "name": "l2",
-            "id": 2
+            "id": 4
         },
         {
             "name": "r2",
             "id": 5
-        },
-        {
-            "name": "up",
-            "id": 7
-        },
-        {
-            "name": "down",
-            "id": 7
-        },
-        {
-            "name": "left",
-            "id": 6
-        },
-        {
-            "name": "right",
-            "id": 6
         }
     ],
     "buttons": [
         {
-            "name": "square",
-            "id": 3
-        },
-        {
-            "name": "triangle",
-            "id": 2
+            "name": "x",
+            "id": 0
         },
         {
             "name": "circle",
             "id": 1
         },
         {
-            "name": "x",
-            "id": 0
+            "name": "square",
+            "id": 2
+        },
+        {
+            "name": "triangle",
+            "id": 3
         },
         {
             "name": "l1",
-            "id": 4
-        },
-        {
-            "name": "l2",
-            "id": 6
-        },
-        {
-            "name": "r2",
-            "id": 7
-        },
-        {
-            "name": "r1",
-            "id": 5
-        },
-        {
-            "name": "share",
-            "id": 8
-        },
-        {
-            "name": "options",
             "id": 9
         },
         {
-            "name": "ps",
+            "name": "r1",
             "id": 10
         },
         {
-            "name": "left",
+            "name": "create",
+            "id": 4
+        },
+        {
+            "name": "options",
+            "id": 6
+        },
+        {
+            "name": "ps",
+            "id": 5
+        },
+        {
+            "name": "up",
             "id": 11
         },
         {
-            "name": "right",
+            "name": "down",
             "id": 12
+        },
+        {
+            "name": "left",
+            "id": 13
+        },
+        {
+            "name": "right",
+            "id": 14
+        },
+        {
+            "name": "trackpad",
+            "id": 15
         }
     ]
 }
