@@ -1,4 +1,4 @@
-// // +build example
+// +build example
 //
 // Do not build by default.
 
