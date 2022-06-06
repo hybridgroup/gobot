@@ -54,10 +54,10 @@ const (
 
 // databit pins
 type HD44780DataPin struct {
-	D0 string // not used if 4bit mode
-	D1 string // not used if 4bit mode
-	D2 string // not used if 4bit mode
-	D3 string // not used if 4bit mode
+	D0 string // not used if 4Bit mode
+	D1 string // not used if 4Bit mode
+	D2 string // not used if 4Bit mode
+	D3 string // not used if 4Bit mode
 	D4 string
 	D5 string
 	D6 string
@@ -81,11 +81,11 @@ type HD44780Driver struct {
 	displayMode int
 	connection  gobot.Connection
 	gobot.Commander
-	mutex *sync.Mutex // mutex is needed for sequences, like CreateChar(), Write(), Start()
+	mutex *sync.Mutex // mutex is needed for sequences, like CreateChar(), Write(), Start(), Halt()
 }
 
 // NewHD44780Driver return a new HD44780Driver
-// a: gobot.Conenction
+// a: gobot.Connection
 // cols: lcd columns
 // rows: lcd rows
 // busMode: 4Bit or 8Bit
@@ -133,8 +133,13 @@ func NewHD44780Driver(a gobot.Connection, cols int, rows int, busMode HD44780Bus
 	return h
 }
 
-// Halt implements the Driver interface
-func (h *HD44780Driver) Halt() error { return nil }
+// SetRWPin initializes the RW pin
+func (h *HD44780Driver) SetRWPin(pinRW string) {
+	h.mutex.Lock()
+	defer h.mutex.Unlock()
+
+	h.pinRW = NewDirectPinDriver(h.connection, pinRW)
+}
 
 // Name returns the HD44780Driver name
 func (h *HD44780Driver) Name() string { return h.name }
@@ -142,13 +147,13 @@ func (h *HD44780Driver) Name() string { return h.name }
 // SetName sets the HD44780Driver name
 func (h *HD44780Driver) SetName(n string) { h.name = n }
 
-// Connecton returns the HD44780Driver Connection
+// Connection returns the HD44780Driver Connection
 func (h *HD44780Driver) Connection() gobot.Connection {
 	return h.connection
 }
 
 // Start initializes the HD44780 LCD controller
-// refer to page 45/46 of hitachi HD44780 datasheet
+// refer to page 45/46 of Hitachi HD44780 datasheet
 func (h *HD44780Driver) Start() (err error) {
 	h.mutex.Lock()
 	defer h.mutex.Unlock()
@@ -165,22 +170,20 @@ func (h *HD44780Driver) Start() (err error) {
 		return err
 	}
 
+	// for initialization refer to documentation, page 45 and 46
 	if h.busMode == HD44780_4BITMODE {
 		if err := h.writeDataPins(0x03); err != nil {
 			return err
 		}
 		time.Sleep(5 * time.Millisecond)
-
 		if err := h.writeDataPins(0x03); err != nil {
 			return err
 		}
 		time.Sleep(100 * time.Microsecond)
-
 		if err := h.writeDataPins(0x03); err != nil {
 			return err
 		}
-		time.Sleep(100 * time.Microsecond)
-
+		// no additional delay is necessary now
 		if err := h.writeDataPins(0x02); err != nil {
 			return err
 		}
@@ -189,17 +192,15 @@ func (h *HD44780Driver) Start() (err error) {
 			return err
 		}
 		time.Sleep(5 * time.Millisecond)
-
 		if err := h.sendCommand(0x30); err != nil {
 			return err
 		}
 		time.Sleep(100 * time.Microsecond)
-
 		if err := h.sendCommand(0x30); err != nil {
 			return err
 		}
+		// no additional delay is necessary now
 	}
-	time.Sleep(100 * time.Microsecond)
 
 	if h.busMode == HD44780_4BITMODE {
 		h.displayFunc |= HD44780_4BITBUS
@@ -217,25 +218,34 @@ func (h *HD44780Driver) Start() (err error) {
 	h.displayCtrl = HD44780_DISPLAYON | HD44780_BLINKOFF | HD44780_CURSOROFF
 	h.displayMode = HD44780_ENTRYLEFT | HD44780_ENTRYSHIFTDECREMENT
 
-	if err := h.sendCommand(HD44780_DISPLAYCONTROL | h.displayCtrl); err != nil {
-		return err
-	}
 	if err := h.sendCommand(HD44780_FUNCTIONSET | h.displayFunc); err != nil {
 		return err
 	}
+
+	if err := h.sendCommand(HD44780_DISPLAYCONTROL | h.displayCtrl); err != nil {
+		return err
+	}
+
+	if err := h.clear(); err != nil {
+		return err
+	}
+
 	if err := h.sendCommand(HD44780_ENTRYMODESET | h.displayMode); err != nil {
 		return err
 	}
 
-	return h.clear()
+	// see documentation, page 45, 46: the busy flag can't be checked before
+	return nil
 }
 
-// SetRWPin initializes the RW pin
-func (h *HD44780Driver) SetRWPin(pinRW string) {
+// Halt implements the Driver interface
+func (h *HD44780Driver) Halt() error {
+	// mutex: bad characters and device locking can be prevented
+	// if the last action is finished before return
 	h.mutex.Lock()
 	defer h.mutex.Unlock()
 
-	h.pinRW = NewDirectPinDriver(h.connection, pinRW)
+	return nil
 }
 
 // Write output text to the display
@@ -445,7 +455,10 @@ func (h *HD44780Driver) clear() (err error) {
 	if err := h.sendCommand(HD44780_CLEARDISPLAY); err != nil {
 		return err
 	}
-	time.Sleep(2 * time.Millisecond)
+
+	// clear is time consuming, see documentation for JHD1313
+	// for lower clock speed it takes more time
+	time.Sleep(4 * time.Millisecond)
 
 	return nil
 }
