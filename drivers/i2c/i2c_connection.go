@@ -263,3 +263,7 @@ func twosComplement16Bit(uValue uint16) int16 {
 	}
 	return int16(result)
 }
+
+func swapBytes(value uint16) uint16 {
+	return (value << 8) | (value >> 8)
+}

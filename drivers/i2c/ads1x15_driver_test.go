@@ -2,7 +2,6 @@ package i2c
 
 import (
 	"errors"
-	"strings"
 	"testing"
 
 	"gobot.io/x/gobot"
@@ -10,241 +9,96 @@ import (
 	"gobot.io/x/gobot/gobottest"
 )
 
-// the ADS1x15Driver is a Driver
+// this ensures that the implementation is based on i2c.Driver, which implements the gobot.Driver
+// and tests all implementations, so no further tests needed here for gobot.Driver interface
 var _ gobot.Driver = (*ADS1x15Driver)(nil)
 
 // that supports the AnalogReader interface
 var _ aio.AnalogReader = (*ADS1x15Driver)(nil)
 
-// --------- HELPERS
-func initTestADS1015Driver() (driver *ADS1x15Driver) {
-	driver, _ = initTestADS1015DriverWithStubbedAdaptor()
-	return
-}
-
-func initTestADS1115Driver() (driver *ADS1x15Driver) {
-	driver, _ = initTestADS1115DriverWithStubbedAdaptor()
-	return
-}
-
-func initTestADS1015DriverWithStubbedAdaptor() (*ADS1x15Driver, *i2cTestAdaptor) {
-	adaptor := newI2cTestAdaptor()
-	return NewADS1015Driver(adaptor), adaptor
-}
-
-func initTestADS1115DriverWithStubbedAdaptor() (*ADS1x15Driver, *i2cTestAdaptor) {
-	adaptor := newI2cTestAdaptor()
-	return NewADS1115Driver(adaptor), adaptor
-}
-
-// --------- BASE TESTS
-func TestNewADS1015Driver(t *testing.T) {
-	// Does it return a pointer to an instance of ADS1x15Driver?
-	var bm interface{} = NewADS1015Driver(newI2cTestAdaptor())
-	_, ok := bm.(*ADS1x15Driver)
-	if !ok {
-		t.Errorf("NewADS1015Driver() should have returned a *ADS1x15Driver")
-	}
-}
-
-func TestNewADS1115Driver(t *testing.T) {
-	// Does it return a pointer to an instance of ADS1x15Driver?
-	var bm interface{} = NewADS1115Driver(newI2cTestAdaptor())
-	_, ok := bm.(*ADS1x15Driver)
-	if !ok {
-		t.Errorf("NewADS1115Driver() should have returned a *ADS1x15Driver")
-	}
-}
-
-func TestADS1x15DriverSetName(t *testing.T) {
-	d := initTestADS1015Driver()
-	d.SetName("TESTME")
-	gobottest.Assert(t, d.Name(), "TESTME")
-}
-
-func TestADS1x15DriverOptions(t *testing.T) {
-	d := NewADS1015Driver(newI2cTestAdaptor(), WithBus(2), WithADS1x15Gain(2), WithADS1x15DataRate(920))
-	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
-	gobottest.Assert(t, d.DefaultGain, 2)
-	gobottest.Assert(t, d.DefaultDataRate, 920)
-}
-
-func TestADS1x15StartAndHalt(t *testing.T) {
-	d, _ := initTestADS1015DriverWithStubbedAdaptor()
-	gobottest.Assert(t, d.Start(), nil)
-	gobottest.Refute(t, d.Connection(), nil)
-	gobottest.Assert(t, d.Halt(), nil)
-}
-
-func TestADS1x15StartConnectError(t *testing.T) {
-	d, adaptor := initTestADS1015DriverWithStubbedAdaptor()
-	adaptor.Testi2cConnectErr(true)
-	gobottest.Assert(t, d.Start(), errors.New("Invalid i2c connection"))
-}
-
-// --------- DRIVER SPECIFIC TESTS
-
-func TestADS1015DriverAnalogRead(t *testing.T) {
-	d, adaptor := initTestADS1015DriverWithStubbedAdaptor()
-	d.Start()
-
-	adaptor.i2cReadImpl = func(b []byte) (int, error) {
-		copy(b, []byte{0x7F, 0xFF})
-		return 2, nil
-	}
-
-	val, err := d.AnalogRead("0")
-	gobottest.Assert(t, val, 1022)
-	gobottest.Assert(t, err, nil)
-
-	val, err = d.AnalogRead("1")
-	gobottest.Assert(t, val, 1022)
-	gobottest.Assert(t, err, nil)
-
-	val, err = d.AnalogRead("2")
-	gobottest.Assert(t, val, 1022)
-	gobottest.Assert(t, err, nil)
-
-	val, err = d.AnalogRead("3")
-	gobottest.Assert(t, val, 1022)
-	gobottest.Assert(t, err, nil)
-
-	val, err = d.AnalogRead("0-1")
-	gobottest.Assert(t, val, 1022)
-	gobottest.Assert(t, err, nil)
-
-	val, err = d.AnalogRead("0-3")
-	gobottest.Assert(t, val, 1022)
-	gobottest.Assert(t, err, nil)
-
-	val, err = d.AnalogRead("1-3")
-	gobottest.Assert(t, val, 1022)
-	gobottest.Assert(t, err, nil)
-
-	val, err = d.AnalogRead("2-3")
-	gobottest.Assert(t, val, 1022)
-	gobottest.Assert(t, err, nil)
-
-	val, err = d.AnalogRead("3-2")
-	gobottest.Refute(t, err.Error(), nil)
-}
-
-func TestADS1115DriverAnalogRead(t *testing.T) {
-	d, adaptor := initTestADS1115DriverWithStubbedAdaptor()
-	d.Start()
-
-	adaptor.i2cReadImpl = func(b []byte) (int, error) {
-		copy(b, []byte{0x7F, 0xFF})
-		return 2, nil
-	}
-
-	val, err := d.AnalogRead("0")
-	gobottest.Assert(t, val, 1022)
-	gobottest.Assert(t, err, nil)
-
-	val, err = d.AnalogRead("1")
-	gobottest.Assert(t, val, 1022)
-	gobottest.Assert(t, err, nil)
-
-	val, err = d.AnalogRead("2")
-	gobottest.Assert(t, val, 1022)
-	gobottest.Assert(t, err, nil)
-
-	val, err = d.AnalogRead("3")
-	gobottest.Assert(t, val, 1022)
-	gobottest.Assert(t, err, nil)
-
-	val, err = d.AnalogRead("0-1")
-	gobottest.Assert(t, val, 1022)
-	gobottest.Assert(t, err, nil)
-
-	val, err = d.AnalogRead("0-3")
-	gobottest.Assert(t, val, 1022)
-	gobottest.Assert(t, err, nil)
-
-	val, err = d.AnalogRead("1-3")
-	gobottest.Assert(t, val, 1022)
-	gobottest.Assert(t, err, nil)
-
-	val, err = d.AnalogRead("2-3")
-	gobottest.Assert(t, val, 1022)
-	gobottest.Assert(t, err, nil)
-
-	val, err = d.AnalogRead("3-2")
-	gobottest.Refute(t, err.Error(), nil)
-}
-
-func TestADS1x15DriverAnalogReadError(t *testing.T) {
-	d, a := initTestADS1015DriverWithStubbedAdaptor()
-	d.Start()
-
+func initTestADS1x15DriverWithStubbedAdaptor() (*ADS1x15Driver, *i2cTestAdaptor) {
+	a := newI2cTestAdaptor()
+	const defaultDataRate = 3
+	dataRates := map[int]uint16{defaultDataRate: 0x0003}
+	d := newADS1x15Driver(a, "ADS1x15", dataRates, defaultDataRate)
+	noConversion := []uint8{0x80, 0x00} // no conversion in progress
 	a.i2cReadImpl = func(b []byte) (int, error) {
-		return 0, errors.New("read error")
+		copy(b, noConversion)
+		return 2, nil
 	}
-
-	_, err := d.AnalogRead("0")
-	gobottest.Assert(t, err, errors.New("read error"))
-}
-
-func TestADS1x15DriverAnalogReadInvalidPin(t *testing.T) {
-	d, _ := initTestADS1015DriverWithStubbedAdaptor()
-
-	_, err := d.AnalogRead("99")
-	gobottest.Assert(t, err, errors.New("Invalid channel, must be between 0 and 3"))
-}
-
-func TestADS1x15DriverAnalogReadWriteError(t *testing.T) {
-	d, a := initTestADS1015DriverWithStubbedAdaptor()
-	d.Start()
-
-	a.i2cWriteImpl = func([]byte) (int, error) {
-		return 0, errors.New("write error")
+	if err := d.Start(); err != nil {
+		panic(err)
 	}
-
-	_, err := d.AnalogRead("0")
-	gobottest.Assert(t, err, errors.New("write error"))
-
-	_, err = d.AnalogRead("0-1")
-	gobottest.Assert(t, err, errors.New("write error"))
-
-	_, err = d.AnalogRead("2-3")
-	gobottest.Assert(t, err, errors.New("write error"))
+	return d, a
 }
 
-func TestADS1x15DriverBestGainForVoltage(t *testing.T) {
-	d, _ := initTestADS1015DriverWithStubbedAdaptor()
+var ads1x15TestChannel = map[string]interface{}{
+	"channel": int(2),
+}
 
-	g, err := d.BestGainForVoltage(1.5)
+var ads1x15TestChannelGainDataRate = map[string]interface{}{
+	"channel":  int(1),
+	"gain":     int(2),
+	"dataRate": int(3),
+}
+
+func TestADS1x15CommandsReadDifferenceWithDefaults(t *testing.T) {
+	// arrange
+	d, _ := initTestADS1x15DriverWithStubbedAdaptor()
+	// act
+	result := d.Command("ReadDifferenceWithDefaults")(ads1x15TestChannel)
+	// assert
+	gobottest.Assert(t, result.(map[string]interface{})["err"], nil)
+	gobottest.Assert(t, result.(map[string]interface{})["val"], -4.096)
+}
+
+func TestADS1x15CommandsReadDifference(t *testing.T) {
+	// arrange
+	d, _ := initTestADS1x15DriverWithStubbedAdaptor()
+	// act
+	result := d.Command("ReadDifference")(ads1x15TestChannelGainDataRate)
+	// assert
+	gobottest.Assert(t, result.(map[string]interface{})["err"], nil)
+	gobottest.Assert(t, result.(map[string]interface{})["val"], -2.048)
+}
+
+func TestADS1x15CommandsReadWithDefaults(t *testing.T) {
+	// arrange
+	d, _ := initTestADS1x15DriverWithStubbedAdaptor()
+	// act
+	result := d.Command("ReadWithDefaults")(ads1x15TestChannel)
+	// assert
+	gobottest.Assert(t, result.(map[string]interface{})["err"], nil)
+	gobottest.Assert(t, result.(map[string]interface{})["val"], -4.096)
+}
+
+func TestADS1x15CommandsRead(t *testing.T) {
+	// arrange
+	d, _ := initTestADS1x15DriverWithStubbedAdaptor()
+	// act
+	result := d.Command("Read")(ads1x15TestChannelGainDataRate)
+	// assert
+	gobottest.Assert(t, result.(map[string]interface{})["err"], nil)
+	gobottest.Assert(t, result.(map[string]interface{})["val"], -2.048)
+}
+
+func TestADS1x15CommandsAnalogRead(t *testing.T) {
+	// arrange
+	d, _ := initTestADS1x15DriverWithStubbedAdaptor()
+	ads1x15TestPin := map[string]interface{}{
+		"pin": string("2"),
+	}
+	// act
+	result := d.Command("AnalogRead")(ads1x15TestPin)
+	// assert
+	gobottest.Assert(t, result.(map[string]interface{})["err"], nil)
+	gobottest.Assert(t, result.(map[string]interface{})["val"], -32768)
+}
+
+func TestADS1x15_ads1x15BestGainForVoltage(t *testing.T) {
+	g, err := ads1x15BestGainForVoltage(1.5)
 	gobottest.Assert(t, g, 2)
 
-	g, err = d.BestGainForVoltage(20.0)
+	g, err = ads1x15BestGainForVoltage(20.0)
 	gobottest.Assert(t, err, errors.New("The maximum voltage which can be read is 6.144000"))
-}
-
-func TestADS1x15DriverReadInvalidChannel(t *testing.T) {
-	d, _ := initTestADS1015DriverWithStubbedAdaptor()
-
-	_, err := d.Read(9, d.DefaultGain, d.DefaultDataRate)
-	gobottest.Assert(t, err, errors.New("Invalid channel, must be between 0 and 3"))
-}
-
-func TestADS1x15DriverReadInvalidGain(t *testing.T) {
-	d, _ := initTestADS1015DriverWithStubbedAdaptor()
-
-	_, err := d.Read(0, 21, d.DefaultDataRate)
-	gobottest.Assert(t, err, errors.New("Gain must be one of: 2/3, 1, 2, 4, 8, 16"))
-}
-
-func TestADS1x15DriverReadInvalidDataRate(t *testing.T) {
-	d, _ := initTestADS1015DriverWithStubbedAdaptor()
-
-	_, err := d.Read(0, d.DefaultGain, 666)
-	gobottest.Assert(t, strings.Contains(err.Error(), "Invalid data rate."), true)
-}
-
-func TestADS1x15DriverReadDifferenceInvalidChannel(t *testing.T) {
-	d, _ := initTestADS1015DriverWithStubbedAdaptor()
-
-	_, err := d.ReadDifference(9, d.DefaultGain, d.DefaultDataRate)
-	gobottest.Assert(t, err, errors.New("Invalid channel, must be between 0 and 3"))
 }
