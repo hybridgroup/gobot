@@ -14,7 +14,7 @@
   * remove useless code in i2c test
 * **drivers**
   * add AnalogActuatorDriver, analog temperature sensor, driver for PCF8591 (with 400kbit stabilization), driver for YL-40
-  * Adding support for hmc8553l compass
+  * Adding support for hmc5883l compass
   * bmp388 fix missing address write byte in test of Measurements
   * drv2605l fix missing address write byte in test of Halt()
   * introduce adafruit1109 2x16 LCD with 5 keys
