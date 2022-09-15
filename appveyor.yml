@@ -11,13 +11,14 @@ environment:
   GOVERSION: 1.18
   TEST_EXTERNAL: 1
 
-install:
+before_test:
   - set PATH=%PATH%;C:\mingw-w64\x86_64-7.3.0-posix-seh-rt_v5-rev0\mingw64\bin
+  - set PATH=C:\go118\bin;%PATH%
+  - set GOROOT=C:\go118
   - echo %PATH%
   - echo %GOPATH%
   - go version
   - go env
-  - go get -d ./...
 
 build_script:
   - go test -v -cpu=2 .
