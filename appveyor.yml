@@ -8,7 +8,7 @@ platform:
 environment:
   GOPATH: c:\gopath
   GOROOT: c:\go
-  GOVERSION: 1.15
+  GOVERSION: 1.18
   TEST_EXTERNAL: 1
 
 install:
@@ -23,3 +23,4 @@ build_script:
   - go test -v -cpu=2 .
   - go test -v -cpu=2 ./drivers/...
   - go test -v -cpu=2 ./platforms/firmata/...
+  - go test -v -cpu=2 ./platforms/ble/...
