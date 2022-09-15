@@ -179,8 +179,8 @@ func newI2cTestAdaptor() *i2cTestAdaptor {
 		i2cReadImpl: func(b []byte) (int, error) {
 			return len(b), nil
 		},
-		i2cWriteImpl: func([]byte) (int, error) {
-			return 0, nil
+		i2cWriteImpl: func(b []byte) (int, error) {
+			return len(b), nil
 		},
 	}
 }
