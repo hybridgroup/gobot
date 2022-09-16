@@ -1,5 +1,7 @@
 version: "{build}"
 
+image: Visual Studio 2019
+
 clone_folder: c:\gopath\src\gobot.io\x\gobot
 
 platform:
