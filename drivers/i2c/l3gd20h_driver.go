@@ -3,43 +3,53 @@ package i2c
 import (
 	"bytes"
 	"encoding/binary"
-
-	"gobot.io/x/gobot"
+	"log"
 )
 
-const l3gd20hAddress = 0x6B
-
-// Control Register 1
-const l3gd20hRegisterCtl1 = 0x20
-const l3gd20hNormalMode = 0x8
-const l3gd20hEnableZ = 0x04
-const l3gd20hEnableY = 0x02
-const l3gd20hEnableX = 0x01
-
-// Control Register 4
-const l3gd20hRegisterCtl4 = 0x23
-
-const l3gd20hRegisterOutXLSB = 0x28 | 0x80 // set auto-increment bit.
+const (
+	l3gd20hDebug          = false
+	l3gd20hDefaultAddress = 0x6B
+)
 
 const (
-	// L3GD20HScale250dps is the 250 degress-per-second scale.
+	l3gd20hReg_Ctl1    = 0x20 // output data rate selection, bandwidth selection, power mode, axis X/Y/Z enable
+	l3gd20hReg_Ctl4    = 0x23 // block data update, big/little-endian, full scale, level sensitive latch, self test, serial interface mode
+	l3gd20hReg_OutXLSB = 0x28 // X-axis angular rate data, LSB
+
+	l3gd20hCtl1_NormalModeBit = 0x08
+	l3gd20hCtl1_EnableZBit    = 0x04
+	l3gd20hCtl1_EnableYBit    = 0x02
+	l3gd20hCtl1_EnableXBit    = 0x01
+
+	l3gd20hCtl4_FullScaleRangeBits = 0x30
+)
+
+// L3GD20HScale is for configurable full scale range.
+type L3GD20HScale byte
+
+const (
+	// L3GD20HScale250dps is the +/-250 degrees-per-second full scale range (+/-245 from datasheet, but can hold around +/-286).
 	L3GD20HScale250dps L3GD20HScale = 0x00
-	// L3GD20HScale500dps is the 500 degress-per-second scale.
+	// L3GD20HScale500dps is the +/-500 degrees-per-second full scale range.
 	L3GD20HScale500dps L3GD20HScale = 0x10
-	// L3GD20HScale2000dps is the 2000 degress-per-second scale.
+	// L3GD20HScale2001dps is the +/-2000 degrees-per-second full scale range by using 0x20 setting.
+	L3GD20HScale2001dps L3GD20HScale = 0x20
+	// L3GD20HScale2000dps is the +/-2000 degrees-per-second full scale range.
 	L3GD20HScale2000dps L3GD20HScale = 0x30
 )
 
-// L3GD20HScale is the scale sensitivity of degrees-per-second.
-type L3GD20HScale byte
+// l3gdhSensibility in °/s, see the mechanical characteristics in the datasheet
+var l3gdhSensibility = map[L3GD20HScale]float32{
+	L3GD20HScale250dps:  0.00875,
+	L3GD20HScale500dps:  0.0175,
+	L3GD20HScale2001dps: 0.07,
+	L3GD20HScale2000dps: 0.07,
+}
 
 // L3GD20HDriver is the gobot driver for the Adafruit Triple-Axis Gyroscope L3GD20H.
 // Device datasheet: http://www.st.com/internet/com/TECHNICAL_RESOURCES/TECHNICAL_LITERATURE/DATASHEET/DM00036465.pdf
 type L3GD20HDriver struct {
-	name       string
-	connector  Connector
-	connection Connection
-	Config
+	*Driver
 	scale L3GD20HScale
 }
 
@@ -47,7 +57,7 @@ type L3GD20HDriver struct {
 // L3GD20H I2C Triple-Axis Gyroscope.
 //
 // Params:
-//		conn Connector - the Adaptor to use with this Driver
+//		c Connector - the Adaptor to use with this Driver
 //
 // Optional params:
 //		i2c.WithBus(int):	bus to use with this driver
@@ -55,65 +65,58 @@ type L3GD20HDriver struct {
 //
 func NewL3GD20HDriver(c Connector, options ...func(Config)) *L3GD20HDriver {
 	l := &L3GD20HDriver{
-		name:      gobot.DefaultName("L3GD20H"),
-		connector: c,
-		Config:    NewConfig(),
-		scale:     L3GD20HScale250dps,
+		Driver: NewDriver(c, "L3GD20H", l3gd20hDefaultAddress, options...),
+		scale:  L3GD20HScale250dps,
 	}
-
-	for _, option := range options {
-		option(l)
-	}
+	l.afterStart = l.initialize
 
 	// TODO: add commands to API
 	return l
 }
 
-// Name returns the name of the device.
-func (d *L3GD20HDriver) Name() string {
-	return d.name
+// WithL3GD20HFullScaleRange option sets the full scale range for the gyroscope.
+// Valid settings are of type "L3GD20HScale"
+func WithL3GD20HFullScaleRange(val L3GD20HScale) func(Config) {
+	return func(c Config) {
+		d, ok := c.(*L3GD20HDriver)
+		if ok {
+			d.scale = val
+		} else if l3gd20hDebug {
+			log.Printf("Trying to set full scale range of gyroscope for non-L3GD20HDriver %v", c)
+		}
+	}
 }
 
-// SetName sets the name of the device.
-func (d *L3GD20HDriver) SetName(name string) {
-	d.name = name
-}
-
-// Connection returns the connection of the device.
-func (d *L3GD20HDriver) Connection() gobot.Connection {
-	return d.connector.(gobot.Connection)
-}
-
-// Scale returns the scale sensitivity of the device.
-func (d *L3GD20HDriver) Scale() L3GD20HScale {
-	return d.scale
-}
-
-// SetScale sets the scale sensitivity of the device.
+// SetScale sets the full scale range of the device (deprecated, use WithL3GD20HFullScaleRange() instead).
 func (d *L3GD20HDriver) SetScale(s L3GD20HScale) {
 	d.scale = s
 }
 
-// Start initializes the device.
-func (d *L3GD20HDriver) Start() (err error) {
-	if err := d.initialization(); err != nil {
-		return err
-	}
-	return nil
+// Scale returns the full scale range (deprecated, use FullScaleRange() instead).
+func (d *L3GD20HDriver) Scale() L3GD20HScale {
+	return d.scale
 }
 
-// Halt halts the device.
-func (d *L3GD20HDriver) Halt() (err error) {
-	return nil
+// FullScaleRange returns the full scale range of the device.
+func (d *L3GD20HDriver) FullScaleRange() (uint8, error) {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
+
+	val, err := d.connection.ReadByteData(l3gd20hReg_Ctl4)
+	if err != nil {
+		return 0, err
+	}
+	return val & l3gd20hCtl4_FullScaleRangeBits, nil
 }
 
 // XYZ returns the current change in degrees per second, for the 3 axis.
 func (d *L3GD20HDriver) XYZ() (x float32, y float32, z float32, err error) {
-	if _, err = d.connection.Write([]byte{l3gd20hRegisterOutXLSB}); err != nil {
-		return 0, 0, 0, err
-	}
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
+
 	measurements := make([]byte, 6)
-	if _, err = d.connection.Read(measurements); err != nil {
+	reg := l3gd20hReg_OutXLSB | 0x80 // set auto-increment bit
+	if err = d.connection.ReadBlockData(uint8(reg), measurements); err != nil {
 		return 0, 0, 0, err
 	}
 
@@ -125,43 +128,24 @@ func (d *L3GD20HDriver) XYZ() (x float32, y float32, z float32, err error) {
 	binary.Read(buf, binary.LittleEndian, &rawY)
 	binary.Read(buf, binary.LittleEndian, &rawZ)
 
-	// Sensitivity values from the mechanical characteristics in the datasheet.
-	sensitivity := d.getSensitivity()
+	sensitivity := l3gdhSensibility[d.scale]
 
 	return float32(rawX) * sensitivity, float32(rawY) * sensitivity, float32(rawZ) * sensitivity, nil
 }
 
-func (d *L3GD20HDriver) initialization() (err error) {
-	bus := d.GetBusOrDefault(d.connector.GetDefaultBus())
-	address := d.GetAddressOrDefault(l3gd20hAddress)
-
-	d.connection, err = d.connector.GetConnection(address, bus)
-	if err != nil {
-		return err
-	}
+func (d *L3GD20HDriver) initialize() (err error) {
 	// reset the gyroscope.
-	if _, err := d.connection.Write([]byte{l3gd20hRegisterCtl1, 0x00}); err != nil {
+	if err := d.connection.WriteByteData(l3gd20hReg_Ctl1, 0x00); err != nil {
 		return err
 	}
 	// Enable Z, Y and X axis.
-	if _, err := d.connection.Write([]byte{l3gd20hRegisterCtl1, l3gd20hNormalMode | l3gd20hEnableZ | l3gd20hEnableY | l3gd20hEnableX}); err != nil {
+	ctl1 := l3gd20hCtl1_NormalModeBit | l3gd20hCtl1_EnableZBit | l3gd20hCtl1_EnableYBit | l3gd20hCtl1_EnableXBit
+	if err := d.connection.WriteByteData(l3gd20hReg_Ctl1, uint8(ctl1)); err != nil {
 		return err
 	}
 	// Set the sensitivity scale.
-	if _, err := d.connection.Write([]byte{l3gd20hRegisterCtl4, byte(d.scale)}); err != nil {
+	if err := d.connection.WriteByteData(l3gd20hReg_Ctl4, byte(d.scale)); err != nil {
 		return err
 	}
 	return nil
-}
-
-func (d *L3GD20HDriver) getSensitivity() float32 {
-	switch d.scale {
-	case L3GD20HScale250dps:
-		return 0.00875
-	case L3GD20HScale500dps:
-		return 0.0175
-	case L3GD20HScale2000dps:
-		return 0.07
-	}
-	return 0
 }
