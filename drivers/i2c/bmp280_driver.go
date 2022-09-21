@@ -3,18 +3,70 @@ package i2c
 import (
 	"bytes"
 	"encoding/binary"
+	"log"
 	"math"
-
-	"gobot.io/x/gobot"
 )
 
+const bmp280Debug = true
+
+// the default address is applicable for SDO to VDD, for SDO to GND it will be 0x76
+// this is also true for bme280 (which using this address as well)
+const bmp280DefaultAddress = 0x77
+
+type BMP280PressureOversampling uint8
+type BMP280TemperatureOversampling uint8
+type BMP280IIRFilter uint8
+
 const (
-	bmp280RegisterControl      = 0xf4
-	bmp280RegisterConfig       = 0xf5
-	bmp280RegisterPressureData = 0xf7
-	bmp280RegisterTempData     = 0xfa
-	bmp280RegisterCalib00      = 0x88
-	bmp280SeaLevelPressure     = 1013.25
+	bmp280RegCalib00      = 0x88 // 12 x 16 bit calibration data (T1..T3, P1..P9)
+	bmp280RegCtrl         = 0xF4 // data acquisition options (oversampling of temperature and pressure, power mode)
+	bmp280RegConf         = 0xF5 // rate, IIR-filter and interface options (SPI)
+	bmp280RegPressureData = 0xF7
+	bmp280RegTempData     = 0xFA
+
+	// bits 0, 1 of control register
+	bmp280CtrlPwrSleepMode   = 0x00
+	bmp280CtrlPwrForcedMode  = 0x01
+	bmp280CtrlPwrForcedMode2 = 0x02 // same function as 0x01
+	bmp280CtrlPwrNormalMode  = 0x03
+
+	// bits 2, 3, 4 of control register (will be shifted on write)
+	BMP280CtrlPressNoMeasurement  BMP280PressureOversampling = 0x00 // no measurement (value will be 0x08 0x00 0x00)
+	BMP280CtrlPressOversampling1  BMP280PressureOversampling = 0x01 // resolution 16 bit
+	BMP280CtrlPressOversampling2  BMP280PressureOversampling = 0x02 // resolution 17 bit
+	BMP280CtrlPressOversampling4  BMP280PressureOversampling = 0x03 // resolution 18 bit
+	BMP280CtrlPressOversampling8  BMP280PressureOversampling = 0x04 // resolution 19 bit
+	BMP280CtrlPressOversampling16 BMP280PressureOversampling = 0x05 // resolution 20 bit (same as 0x06, 0x07)
+
+	// bits 5, 6, 7 of control register (will be shifted on write)
+	BMP280CtrlTempNoMeasurement  BMP280TemperatureOversampling = 0x00 // no measurement (value will be 0x08 0x00 0x00)
+	BMP280CtrlTempOversampling1  BMP280TemperatureOversampling = 0x01 // resolution 16 bit
+	BMP280CtrlTempOversampling2  BMP280TemperatureOversampling = 0x02 // resolution 17 bit
+	BMP280CtrlTempOversampling4  BMP280TemperatureOversampling = 0x03 // resolution 18 bit
+	BMP280CtrlTempOversampling8  BMP280TemperatureOversampling = 0x04 // resolution 19 bit
+	BMP280CtrlTempOversampling16 BMP280TemperatureOversampling = 0x05 // resolution 20 bit
+
+	// bit 0 of config register
+	bmp280ConfSPIBit = 0x01 // if set, SPI is used
+
+	// bits 2, 3, 4 of config register (bit 1 is unused, will be shifted on write)
+	bmp280ConfStandBy0005 = 0x00 //	0.5 ms
+	bmp280ConfStandBy0625 = 0x01 //	62.5 ms
+	bmp280ConfStandBy0125 = 0x02 //	125 ms
+	bmp280ConfStandBy0250 = 0x03 //	250 ms
+	bmp280ConfStandBy0500 = 0x04 //	500 ms
+	bmp280ConfStandBy1000 = 0x05 //	1000 ms
+	bmp280ConfStandBy2000 = 0x06 //	2000 ms
+	bmp280ConfStandBy4000 = 0x07 //	4000 ms
+
+	// bits 5, 6, 7 of config register
+	BMP280ConfFilterOff BMP280IIRFilter = 0x00
+	BMP280ConfFilter2   BMP280IIRFilter = 0x01
+	BMP280ConfFilter4   BMP280IIRFilter = 0x02
+	BMP280ConfFilter8   BMP280IIRFilter = 0x03
+	BMP280ConfFilter16  BMP280IIRFilter = 0x04
+
+	bmp280SeaLevelPressure = 1013.25
 )
 
 type bmp280CalibrationCoefficients struct {
@@ -34,76 +86,82 @@ type bmp280CalibrationCoefficients struct {
 
 // BMP280Driver is a driver for the BMP280 temperature/pressure sensor
 type BMP280Driver struct {
-	name       string
-	connector  Connector
-	connection Connection
-	Config
-
-	tpc *bmp280CalibrationCoefficients
+	*Driver
+	calCoeffs         *bmp280CalibrationCoefficients
+	ctrlPwrMode       uint8
+	ctrlPressOversamp BMP280PressureOversampling
+	ctrlTempOversamp  BMP280TemperatureOversampling
+	confFilter        BMP280IIRFilter
 }
 
 // NewBMP280Driver creates a new driver with specified i2c interface.
 // Params:
-//		conn Connector - the Adaptor to use with this Driver
+//		c Connector - the Adaptor to use with this Driver
 //
 // Optional params:
 //		i2c.WithBus(int):	bus to use with this driver
 //		i2c.WithAddress(int):	address to use with this driver
 //
 func NewBMP280Driver(c Connector, options ...func(Config)) *BMP280Driver {
-	b := &BMP280Driver{
-		name:      gobot.DefaultName("BMP280"),
-		connector: c,
-		Config:    NewConfig(),
-		tpc:       &bmp280CalibrationCoefficients{},
+	d := &BMP280Driver{
+		Driver:            NewDriver(c, "BMP280", bmp280DefaultAddress),
+		calCoeffs:         &bmp280CalibrationCoefficients{},
+		ctrlPwrMode:       bmp280CtrlPwrNormalMode,
+		ctrlPressOversamp: BMP280CtrlPressOversampling16,
+		ctrlTempOversamp:  BMP280CtrlTempOversampling1,
+		confFilter:        BMP280ConfFilterOff,
 	}
+	d.afterStart = d.initialization
 
 	for _, option := range options {
-		option(b)
+		option(d)
 	}
 
 	// TODO: expose commands to API
-	return b
+	return d
 }
 
-// Name returns the name of the device.
-func (d *BMP280Driver) Name() string {
-	return d.name
-}
-
-// SetName sets the name of the device.
-func (d *BMP280Driver) SetName(n string) {
-	d.name = n
-}
-
-// Connection returns the connection of the device.
-func (d *BMP280Driver) Connection() gobot.Connection {
-	return d.connector.(gobot.Connection)
-}
-
-// Start initializes the BMP280 and loads the calibration coefficients.
-func (d *BMP280Driver) Start() (err error) {
-	bus := d.GetBusOrDefault(d.connector.GetDefaultBus())
-	address := d.GetAddressOrDefault(bmp180Address)
-
-	if d.connection, err = d.connector.GetConnection(address, bus); err != nil {
-		return err
+// WithBMP280PressureOversampling option sets the oversampling for pressure.
+// Valid settings are of type "BMP280PressureOversampling"
+func WithBMP280PressureOversampling(val BMP280PressureOversampling) func(Config) {
+	return func(c Config) {
+		if d, ok := c.(*BMP280Driver); ok {
+			d.ctrlPressOversamp = val
+		} else if bmp280Debug {
+			log.Printf("Trying to set pressure oversampling for non-BMP280Driver %v", c)
+		}
 	}
-
-	if err := d.initialization(); err != nil {
-		return err
-	}
-
-	return nil
 }
 
-// Halt halts the device.
-func (d *BMP280Driver) Halt() (err error) {
-	return nil
+// WithBMP280TemperatureOversampling option sets oversampling for temperature.
+// Valid settings are of type "BMP280TemperatureOversampling"
+func WithBMP280TemperatureOversampling(val BMP280TemperatureOversampling) func(Config) {
+	return func(c Config) {
+		if d, ok := c.(*BMP280Driver); ok {
+			d.ctrlTempOversamp = val
+		} else if bmp280Debug {
+			log.Printf("Trying to set temperature oversampling for non-BMP280Driver %v", c)
+		}
+	}
+}
+
+// WithBMP280IIRFilter option sets the count of IIR filter coefficients.
+// Valid settings are of type "BMP280IIRFilter"
+func WithBMP280IIRFilter(val BMP280IIRFilter) func(Config) {
+	return func(c Config) {
+		if d, ok := c.(*BMP280Driver); ok {
+			d.confFilter = val
+		} else if bmp280Debug {
+			log.Printf("Trying to set IIR filter for non-BMP280Driver %v", c)
+		}
+	}
 }
 
 // Temperature returns the current temperature, in celsius degrees.
 func (d *BMP280Driver) Temperature() (temp float32, err error) {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
+
 	var rawT int32
 	if rawT, err = d.rawTemp(); err != nil {
 		return 0.0, err
@@ -114,6 +172,9 @@ func (d *BMP280Driver) Temperature() (temp float32, err error) {
 
 // Pressure returns the current barometric pressure, in Pa
 func (d *BMP280Driver) Pressure() (press float32, err error) {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
+
 	var rawT, rawP int32
 	if rawT, err = d.rawTemp(); err != nil {
 		return 0.0, err
@@ -140,34 +201,38 @@ func (d *BMP280Driver) Altitude() (alt float32, err error) {
 
 // initialization reads the calibration coefficients.
 func (d *BMP280Driver) initialization() (err error) {
-	var coefficients []byte
-	if coefficients, err = d.read(bmp280RegisterCalib00, 24); err != nil {
+	coefficients := make([]byte, 24)
+	if err = d.connection.ReadBlockData(bmp280RegCalib00, coefficients); err != nil {
 		return err
 	}
 	buf := bytes.NewBuffer(coefficients)
-	binary.Read(buf, binary.LittleEndian, &d.tpc.t1)
-	binary.Read(buf, binary.LittleEndian, &d.tpc.t2)
-	binary.Read(buf, binary.LittleEndian, &d.tpc.t3)
-	binary.Read(buf, binary.LittleEndian, &d.tpc.p1)
-	binary.Read(buf, binary.LittleEndian, &d.tpc.p2)
-	binary.Read(buf, binary.LittleEndian, &d.tpc.p3)
-	binary.Read(buf, binary.LittleEndian, &d.tpc.p4)
-	binary.Read(buf, binary.LittleEndian, &d.tpc.p5)
-	binary.Read(buf, binary.LittleEndian, &d.tpc.p6)
-	binary.Read(buf, binary.LittleEndian, &d.tpc.p7)
-	binary.Read(buf, binary.LittleEndian, &d.tpc.p8)
-	binary.Read(buf, binary.LittleEndian, &d.tpc.p9)
+	binary.Read(buf, binary.LittleEndian, &d.calCoeffs.t1)
+	binary.Read(buf, binary.LittleEndian, &d.calCoeffs.t2)
+	binary.Read(buf, binary.LittleEndian, &d.calCoeffs.t3)
+	binary.Read(buf, binary.LittleEndian, &d.calCoeffs.p1)
+	binary.Read(buf, binary.LittleEndian, &d.calCoeffs.p2)
+	binary.Read(buf, binary.LittleEndian, &d.calCoeffs.p3)
+	binary.Read(buf, binary.LittleEndian, &d.calCoeffs.p4)
+	binary.Read(buf, binary.LittleEndian, &d.calCoeffs.p5)
+	binary.Read(buf, binary.LittleEndian, &d.calCoeffs.p6)
+	binary.Read(buf, binary.LittleEndian, &d.calCoeffs.p7)
+	binary.Read(buf, binary.LittleEndian, &d.calCoeffs.p8)
+	binary.Read(buf, binary.LittleEndian, &d.calCoeffs.p9)
 
-	d.connection.WriteByteData(bmp280RegisterControl, 0x3F)
+	ctrlReg := uint8(d.ctrlPwrMode) | uint8(d.ctrlPressOversamp)<<2 | uint8(d.ctrlTempOversamp)<<5
+	d.connection.WriteByteData(bmp280RegCtrl, ctrlReg)
+
+	confReg := uint8(bmp280ConfStandBy0005)<<2 | uint8(d.confFilter)<<5
+	d.connection.WriteByteData(bmp280RegConf, confReg & ^uint8(bmp280ConfSPIBit))
 
 	return nil
 }
 
 func (d *BMP280Driver) rawTemp() (temp int32, err error) {
-	var data []byte
 	var tp0, tp1, tp2 byte
 
-	if data, err = d.read(bmp280RegisterTempData, 3); err != nil {
+	data := make([]byte, 3)
+	if err = d.connection.ReadBlockData(bmp280RegTempData, data); err != nil {
 		return 0, err
 	}
 	buf := bytes.NewBuffer(data)
@@ -181,10 +246,10 @@ func (d *BMP280Driver) rawTemp() (temp int32, err error) {
 }
 
 func (d *BMP280Driver) rawPressure() (press int32, err error) {
-	var data []byte
 	var tp0, tp1, tp2 byte
 
-	if data, err = d.read(bmp280RegisterPressureData, 3); err != nil {
+	data := make([]byte, 3)
+	if err = d.connection.ReadBlockData(bmp280RegPressureData, data); err != nil {
 		return 0, err
 	}
 	buf := bytes.NewBuffer(data)
@@ -198,8 +263,8 @@ func (d *BMP280Driver) rawPressure() (press int32, err error) {
 }
 
 func (d *BMP280Driver) calculateTemp(rawTemp int32) (float32, int32) {
-	tcvar1 := ((float32(rawTemp) / 16384.0) - (float32(d.tpc.t1) / 1024.0)) * float32(d.tpc.t2)
-	tcvar2 := (((float32(rawTemp) / 131072.0) - (float32(d.tpc.t1) / 8192.0)) * ((float32(rawTemp) / 131072.0) - float32(d.tpc.t1)/8192.0)) * float32(d.tpc.t3)
+	tcvar1 := ((float32(rawTemp) / 16384.0) - (float32(d.calCoeffs.t1) / 1024.0)) * float32(d.calCoeffs.t2)
+	tcvar2 := (((float32(rawTemp) / 131072.0) - (float32(d.calCoeffs.t1) / 8192.0)) * ((float32(rawTemp) / 131072.0) - float32(d.calCoeffs.t1)/8192.0)) * float32(d.calCoeffs.t3)
 	temperatureComp := (tcvar1 + tcvar2) / 5120.0
 
 	tFine := int32(tcvar1 + tcvar2)
@@ -210,33 +275,21 @@ func (d *BMP280Driver) calculatePress(rawPress int32, tFine int32) float32 {
 	var var1, var2, p int64
 
 	var1 = int64(tFine) - 128000
-	var2 = var1 * var1 * int64(d.tpc.p6)
-	var2 = var2 + ((var1 * int64(d.tpc.p5)) << 17)
-	var2 = var2 + (int64(d.tpc.p4) << 35)
-	var1 = (var1 * var1 * int64(d.tpc.p3) >> 8) +
-		((var1 * int64(d.tpc.p2)) << 12)
-	var1 = ((int64(1) << 47) + var1) * (int64(d.tpc.p1)) >> 33
+	var2 = var1 * var1 * int64(d.calCoeffs.p6)
+	var2 = var2 + ((var1 * int64(d.calCoeffs.p5)) << 17)
+	var2 = var2 + (int64(d.calCoeffs.p4) << 35)
+	var1 = (var1 * var1 * int64(d.calCoeffs.p3) >> 8) +
+		((var1 * int64(d.calCoeffs.p2)) << 12)
+	var1 = ((int64(1) << 47) + var1) * (int64(d.calCoeffs.p1)) >> 33
 
 	if var1 == 0 {
 		return 0 // avoid exception caused by division by zero
 	}
 	p = 1048576 - int64(rawPress)
 	p = (((p << 31) - var2) * 3125) / var1
-	var1 = (int64(d.tpc.p9) * (p >> 13) * (p >> 13)) >> 25
-	var2 = (int64(d.tpc.p8) * p) >> 19
+	var1 = (int64(d.calCoeffs.p9) * (p >> 13) * (p >> 13)) >> 25
+	var2 = (int64(d.calCoeffs.p8) * p) >> 19
 
-	p = ((p + var1 + var2) >> 8) + (int64(d.tpc.p7) << 4)
+	p = ((p + var1 + var2) >> 8) + (int64(d.calCoeffs.p7) << 4)
 	return float32(p) / 256
-}
-
-func (d *BMP280Driver) read(address byte, n int) ([]byte, error) {
-	if _, err := d.connection.Write([]byte{address}); err != nil {
-		return nil, err
-	}
-	buf := make([]byte, n)
-	bytesRead, err := d.connection.Read(buf)
-	if bytesRead != n || err != nil {
-		return nil, err
-	}
-	return buf, nil
 }
