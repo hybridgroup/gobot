@@ -3,12 +3,12 @@ jobs:
   build:
     docker:
       # specify the version
-      - image: cimg/go:1.18
+      - image: cimg/go:1.19
     steps:
       - checkout
       - run:
           name: Core and drivers tests
-          command: go test -v -cpu=2 -coverprofile=coverage.txt -covermode=atomic . ./drivers/...
+          command: go test -v -coverprofile=coverage.txt -covermode=atomic . ./drivers/...
       - run:
           name: Firmata tests
-          command: go test -v -cpu=2 ./platforms/firmata/...
+          command: go test -v ./platforms/firmata/...
