@@ -1,14 +1,19 @@
-version: 2
 jobs:
   build:
     docker:
-      # specify the version
-      - image: circleci/golang:1.15
+      - image: cimg/go:1.19
+
+      # Since switch to cimg, the GOPATH has been changed from /go to $HOME/go. 
+      # The latter will expand to the full path of /home/circleci/go. 
+      # On first run, this change may affect caching and some other commands if
+      # you don’t correct the page in your config.
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
+      # documented at https://circleci.com/docs/circleci-images
+      # - image: cimg/postgres:14.5.0
+
+      # For more information, please read https://github.com/CircleCI-Public/cimg-go/blob/main/README.md
 
     working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}
     steps:
