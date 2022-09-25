@@ -1,6 +1,6 @@
 module gobot.io/x/gobot
 
-go 1.13
+go 1.16
 
 require (
 	github.com/bmizerany/pat v0.0.0-20170815010413-6226ea591a40
@@ -22,10 +22,10 @@ require (
 	github.com/stretchr/testify v1.7.5
 	github.com/urfave/cli v1.22.1
 	github.com/veandco/go-sdl2 v0.3.3
-	go.bug.st/serial v1.1.1
+	go.bug.st/serial v1.4.0
 	gocv.io/x/gocv v0.21.0
 	golang.org/x/net v0.0.0-20211015210444-4f30a5c0130f
-	golang.org/x/sys v0.0.0-20220913175220-63ea55921009 // indirect
+	golang.org/x/sys v0.0.0-20220919091848-fb04ddd9f9c8 // indirect
 	periph.io/x/periph v3.6.2+incompatible
 	tinygo.org/x/bluetooth v0.5.1-0.20220915173542-e843ce91a6c8
 )
