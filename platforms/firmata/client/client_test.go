@@ -462,7 +462,7 @@ func TestProcessSysexData(t *testing.T) {
 
 	select {
 	case <-sem:
-	case <-time.After(100 * time.Millisecond):
+	case <-time.After(250 * time.Millisecond):
 		t.Errorf("SysexResponse was not published")
 	}
 }
