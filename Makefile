@@ -1,14 +1,15 @@
 .PHONY: test race cover robeaux examples test_with_coverage fmt_check
 
-excluding_vendor := $(shell go list ./... | grep -v /vendor/)
+# opencv platform currently skipped to prevent install of preconditions
+including_except := $(shell go list ./... | grep -v platforms/opencv)
 
-# Run tests on all non-vendor directories
+# Run tests on nearly all directories
 test:
-	go test -v $(excluding_vendor)
+	go test -v $(including_except)
 
-# Run tests with race detection on all non-vendor directories
+# Run tests with race detection
 race:
-	go test -race $(excluding_vendor)
+	go test -race $(including_except)
 
 # Check for code well-formedness
 fmt_check:

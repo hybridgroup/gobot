@@ -479,7 +479,7 @@ func TestAdaptorPwmWriteError(t *testing.T) {
 	fs.WithWriteError = true
 
 	err := a.PwmWrite("5", 100)
-	gobottest.Assert(t, err, errors.New("write error"))
+	gobottest.Assert(t, strings.Contains(err.Error(), "write error"), true)
 }
 
 func TestAdaptorPwmReadError(t *testing.T) {
@@ -488,7 +488,7 @@ func TestAdaptorPwmReadError(t *testing.T) {
 	fs.WithReadError = true
 
 	err := a.PwmWrite("5", 100)
-	gobottest.Assert(t, err, errors.New("read error"))
+	gobottest.Assert(t, strings.Contains(err.Error(), "read error"), true)
 }
 
 func TestAdaptorAnalog(t *testing.T) {

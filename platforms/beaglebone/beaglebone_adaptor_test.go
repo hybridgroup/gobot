@@ -113,11 +113,11 @@ func TestBeagleboneAdaptor(t *testing.T) {
 	gobottest.Assert(t, a.ServoWrite("P9_99", 175), errors.New("Not a valid PWM pin"))
 
 	fs.WithReadError = true
-	gobottest.Assert(t, a.PwmWrite("P9_21", 175), errors.New("read error"))
+	gobottest.Assert(t, strings.Contains(a.PwmWrite("P9_21", 175).Error(), "read error"), true)
 	fs.WithReadError = false
 
 	fs.WithWriteError = true
-	gobottest.Assert(t, a.PwmWrite("P9_22", 175), errors.New("write error"))
+	gobottest.Assert(t, strings.Contains(a.PwmWrite("P9_22", 175).Error(), "write error"), true)
 	fs.WithWriteError = false
 
 	// Analog
