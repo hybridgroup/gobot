@@ -15,15 +15,17 @@ jobs:
 
       # For more information, please read https://github.com/CircleCI-Public/cimg-go/blob/main/README.md
 
-    working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}
     steps:
       - checkout
       - run:
+          name: Debug version
+          command: go version
+      - run:
           name: Core and drivers tests
-          command: go test -v -cpu=2 -coverprofile=coverage.txt -covermode=atomic . ./drivers/...
+          command: go test -v -coverprofile=coverage.txt -covermode=atomic . ./drivers/...
       - run:
           name: Firmata tests
-          command: go test -v -cpu=2 ./platforms/firmata/...
+          command: go test -v ./platforms/firmata/...
       - run:
           name: Code coverage
           command: | 
