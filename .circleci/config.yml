@@ -1,20 +1,20 @@
+# Since switch to cimg, the GOPATH has been changed from /go to $HOME/go. 
+# The latter will expand to the full path of /home/circleci/go. 
+# On first run, this change may affect caching and some other commands if
+# you don’t correct the page in your config.
+#
+# Specify service dependencies here if necessary
+# CircleCI maintains a library of pre-built images
+# documented at https://circleci.com/docs/circleci-images
+# - image: cimg/postgres:14.5.0
+#
+# For more information, please read https://github.com/CircleCI-Public/cimg-go/blob/main/README.md
+
+version: 2
 jobs:
-  build:
+  "test_core_and_drivers_with_coverage":
     docker:
       - image: cimg/go:1.19
-
-      # Since switch to cimg, the GOPATH has been changed from /go to $HOME/go. 
-      # The latter will expand to the full path of /home/circleci/go. 
-      # On first run, this change may affect caching and some other commands if
-      # you don’t correct the page in your config.
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/circleci-images
-      # - image: cimg/postgres:14.5.0
-
-      # For more information, please read https://github.com/CircleCI-Public/cimg-go/blob/main/README.md
-
     steps:
       - checkout
       - run:
@@ -24,9 +24,26 @@ jobs:
           name: Core and drivers tests
           command: go test -v -coverprofile=coverage.txt -covermode=atomic . ./drivers/...
       - run:
-          name: Firmata tests
-          command: go test -v ./platforms/firmata/...
-      - run:
           name: Code coverage
           command: | 
             bash <(curl -s https://codecov.io/bash)
+
+  "test_platforms":
+    docker:
+      - image: cimg/go:1.19
+    steps:
+      - checkout
+      - run:
+          name: Debug version
+          command: go version
+      - run:
+          # digispark needs libusb, joystick needs sdl2, opencv needs opencv
+          name: Platform tests (except digispark, joystick, opencv)
+          command: go test -v $(go list ./platforms/... | grep -v platforms/digispark | grep -v platforms/joystick | grep -v platforms/opencv)
+
+workflows:
+  version: 2
+  build:
+      jobs:
+        - "test_core_and_drivers_with_coverage"
+        - "test_platforms"
