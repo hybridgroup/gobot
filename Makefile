@@ -1,4 +1,9 @@
-.PHONY: test race cover robeaux examples test_with_coverage fmt_check
+# include also examples in other than ./examples folder
+ALL_EXAMPLES := $(shell grep -l -r --include "*.go" 'build example' ./)
+# prevent examples with joystick (sdl2) and gocv (opencv) dependencies
+EXAMPLES := $(shell grep -L 'joystick' $$(grep -L 'gocv' $(ALL_EXAMPLES)))
+
+.PHONY: test race cover robeaux test_with_coverage fmt_check examples $(EXAMPLES)
 
 # opencv platform currently skipped to prevent install of preconditions
 including_except := $(shell go list ./... | grep -v platforms/opencv)
@@ -37,9 +42,7 @@ endif
 	rm -rf node_modules/ ; \
 	go fmt ./robeaux/robeaux.go ; \
 
-EXAMPLES := $(shell ls examples/*.go | sed -e 's/examples\///')
+examples: $(EXAMPLES)
 
-examples:
-	for example in $(EXAMPLES) ; do \
-		go build -o /tmp/$$example examples/$$example ; \
-	done ; \
+$(EXAMPLES):
+	go build -o /tmp/gobot_examples/$@ ./$@
