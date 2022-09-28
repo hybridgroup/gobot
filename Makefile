@@ -3,7 +3,7 @@ ALL_EXAMPLES := $(shell grep -l -r --include "*.go" 'build example' ./)
 # prevent examples with joystick (sdl2) and gocv (opencv) dependencies
 EXAMPLES := $(shell grep -L 'joystick' $$(grep -L 'gocv' $(ALL_EXAMPLES)))
 
-.PHONY: test race cover robeaux test_with_coverage fmt_check examples $(EXAMPLES)
+.PHONY: test test_race test_cover robeaux version_check fmt_check fmt_fix examples $(EXAMPLES)
 
 # opencv platform currently skipped to prevent install of preconditions
 including_except := $(shell go list ./... | grep -v platforms/opencv)
@@ -13,16 +13,13 @@ test:
 	go test -v $(including_except)
 
 # Run tests with race detection
-race:
+test_race:
 	go test -race $(including_except)
 
-# Check for code well-formedness
-fmt_check:
-	./ci/format.sh
-
-# Test and generate coverage
-test_with_coverage:
-	./ci/test.sh
+# Test, generate and show coverage in browser
+test_cover:
+	go test -v $(including_except) -coverprofile=coverage.txt ; \
+	go tool cover -html=coverage.txt ; \
 
 robeaux:
 ifeq (,$(shell which go-bindata))
@@ -41,6 +38,24 @@ endif
 	rm -rf robeaux-tmp/ ; \
 	rm -rf node_modules/ ; \
 	go fmt ./robeaux/robeaux.go ; \
+
+# Check for installed and module version match. Will exit with code 50 if not match.
+# There is nothing bad in general, if you program with a higher version.
+# At least the recipe "fmt_fix" will not work in that case.
+version_check:
+	@gv=$$(echo $$(go version) | sed "s/^.* go\([0-9].[0-9]*\).*/\1/") ; \
+	mv=$$(grep -m 1 'go 1.' ./go.mod | sed "s/^go \([0-9].[0-9]*\).*/\1/") ; \
+	echo "go: $${gv}.*, go.mod: $${mv}" ; \
+	if [ "$${gv}" != "$${mv}" ]; then exit 50; fi ; \
+
+# Check for bad code style and other issues
+fmt_check:
+	gofmt -l ./
+	go vet ./...
+
+# Fix bad code style (will only be executed, on version match)
+fmt_fix: version_check
+	go fmt ./...
 
 examples: $(EXAMPLES)
 

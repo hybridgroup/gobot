@@ -10,3 +10,4 @@ count.out
 /stage
 vendor/
 .idea/
+coverage.txt
