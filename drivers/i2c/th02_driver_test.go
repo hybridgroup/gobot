@@ -1,7 +1,6 @@
 package i2c
 
 import (
-	"errors"
 	"fmt"
 	"testing"
 	"time"
@@ -12,176 +11,419 @@ import (
 
 var _ gobot.Driver = (*TH02Driver)(nil)
 
-// // --------- HELPERS
-func initTestTH02Driver() *SHT3xDriver {
-	driver, _ := initTestSHT3xDriverWithStubbedAdaptor()
-	return driver
-}
-
-func initTestTH02DriverWithStubbedAdaptor() (*TH02Driver, *i2cTestAdaptor) {
+func initTH02WithStubbedAdaptor() (*TH02Driver, *i2cTestAdaptor) {
 	adaptor := newI2cTestAdaptor()
-	return NewTH02Driver(adaptor), adaptor
+	driver := NewTH02Driver(adaptor)
+	if err := driver.Start(); err != nil {
+		panic(err)
+	}
+	return driver, adaptor
 }
-
-// --------- TESTS
 
 func TestNewTH02Driver(t *testing.T) {
-	i2cd := newI2cTestAdaptor()
-	defer i2cd.Close()
-	// Does it return a pointer to an instance of SHT3xDriver?
-	var iface interface{} = NewTH02Driver(i2cd)
-	_, ok := iface.(*TH02Driver)
+	var id interface{} = NewTH02Driver(newI2cTestAdaptor())
+	d, ok := id.(*TH02Driver)
 	if !ok {
 		t.Errorf("NewTH02Driver() should have returned a *NewTH02Driver")
 	}
-	b := NewTH02Driver(i2cd, func(Config) {})
-	gobottest.Refute(t, b.Connection(), nil)
-
-	//cover some basically useless protions the Interface demands
-	if name := b.Name(); name != b.name {
-		t.Errorf("Didnt return the proper name.  Got %q wanted %q", name, b.name)
-	}
-
-	if b.SetName("42"); b.name != "42" {
-		t.Errorf("yikes - didnt set name.")
-	}
+	gobottest.Refute(t, d.Driver, nil)
 }
 
-func TestTH02Driver_Accuracy(t *testing.T) {
-	i2cd := newI2cTestAdaptor()
-	defer i2cd.Close()
-	b := NewTH02Driver(i2cd)
+func TestNewTH02DriverOptions(t *testing.T) {
+	// This is a general test, that options are applied in constructor by using the common options.
+	// Further tests for options can also be done by call of "WithOption(val)(d)".
+	d := NewTH02Driver(newI2cTestAdaptor(), WithBus(2), WithAddress(0x42))
+	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
+	gobottest.Assert(t, d.GetAddressOrDefault(0x33), 0x42)
+}
 
-	if b.SetAddress(0x42); b.addr != 0x42 {
-		t.Error("Didnt set address as expected")
-	}
+func TestTH02SetAccuracy(t *testing.T) {
+	a := newI2cTestAdaptor()
+	b := NewTH02Driver(a)
 
-	if b.SetAccuracy(0x42); b.accuracy != TH02HighAccuracy {
+	if b.SetAccuracy(0x42); b.Accuracy() != TH02HighAccuracy {
 		t.Error("Setting an invalid accuracy should resolve to TH02HighAccuracy")
 	}
 
-	if b.SetAccuracy(TH02LowAccuracy); b.accuracy != TH02LowAccuracy {
+	if b.SetAccuracy(TH02LowAccuracy); b.Accuracy() != TH02LowAccuracy {
 		t.Error("Expected setting low accuracy to actually set to low accuracy")
 	}
 
 	if acc := b.Accuracy(); acc != TH02LowAccuracy {
-		t.Errorf("Accuract() didnt return what was expected")
+		t.Errorf("Accuracy() didn't return what was expected")
 	}
 }
 
-func TestTH022DriverStart(t *testing.T) {
-	b, _ := initTestTH02DriverWithStubbedAdaptor()
-	gobottest.Assert(t, b.Start(), nil)
-}
-
-func TestTH02StartConnectError(t *testing.T) {
-	d, adaptor := initTestTH02DriverWithStubbedAdaptor()
-	adaptor.Testi2cConnectErr(true)
-	gobottest.Assert(t, d.Start(), errors.New("Invalid i2c connection"))
-}
-
-func TestTH02DriverHalt(t *testing.T) {
-	sht3x := initTestTH02Driver()
-	gobottest.Assert(t, sht3x.Halt(), nil)
-}
-
-func TestTH02DriverOptions(t *testing.T) {
-	d := NewTH02Driver(newI2cTestAdaptor(), WithBus(2))
-	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
-	d.Halt()
-}
-
-func TestTH02Driver_ReadData(t *testing.T) {
-	d, i2cd := initTestTH02DriverWithStubbedAdaptor()
-	gobottest.Assert(t, d.Start(), nil)
-
-	type x struct {
-		rd, wr func([]byte) (int, error)
-		rtn    uint16
-		errNil bool
+func TestTH02WithFastMode(t *testing.T) {
+	var tests = map[string]struct {
+		value int
+		want  bool
+	}{
+		"fast_on_for >0":  {value: 1, want: true},
+		"fast_off_for =0": {value: 0, want: false},
+		"fast_off_for <0": {value: -1, want: false},
 	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			d := NewTH02Driver(newI2cTestAdaptor())
+			// act
+			WithTH02FastMode(tc.value)(d)
+			// assert
+			gobottest.Assert(t, d.fastMode, tc.want)
+		})
+	}
+}
 
-	tests := map[string]x{
-		"example RH": x{
-			rd: func(b []byte) (int, error) {
-				copy(b, []byte{0x00, 0x07, 0xC0})
-				return 3, nil
-			},
-			wr: func([]byte) (int, error) {
-				return 1, nil
-			},
-			errNil: true,
-			rtn:    1984,
+func TestTH02FastMode(t *testing.T) {
+	// sequence to read the fast mode status
+	// * write config register address (0x03)
+	// * read register content
+	// * if sixth bit (D5) is set, the fast mode is configured on, otherwise off
+	var tests = map[string]struct {
+		read uint8
+		want bool
+	}{
+		"fast on":  {read: 0x20, want: true},
+		"fast off": {read: ^uint8(0x20), want: false},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			d, a := initTH02WithStubbedAdaptor()
+			a.i2cReadImpl = func(b []byte) (int, error) {
+				b[0] = tc.read
+				return len(b), nil
+			}
+			// act
+			got, err := d.FastMode()
+			// assert
+			gobottest.Assert(t, err, nil)
+			gobottest.Assert(t, len(a.written), 1)
+			gobottest.Assert(t, a.written[0], uint8(0x03))
+			gobottest.Assert(t, got, tc.want)
+		})
+	}
+}
+
+func TestTH02SetHeater(t *testing.T) {
+	// sequence to set the heater status
+	// * set the local heater state
+	// * write config register address (0x03)
+	// * prepare config value by set/reset the heater bit (0x02, D1)
+	// * write the config value
+	var tests = map[string]struct {
+		heater bool
+		want   uint8
+	}{
+		"heater on":  {heater: true, want: 0x02},
+		"heater off": {heater: false, want: 0x00},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			d, a := initTH02WithStubbedAdaptor()
+			// act
+			err := d.SetHeater(tc.heater)
+			// assert
+			gobottest.Assert(t, err, nil)
+			gobottest.Assert(t, d.heating, tc.heater)
+			gobottest.Assert(t, len(a.written), 2)
+			gobottest.Assert(t, a.written[0], uint8(0x03))
+			gobottest.Assert(t, a.written[1], tc.want)
+		})
+	}
+}
+
+func TestTH02Heater(t *testing.T) {
+	// sequence to read the heater status
+	// * write config register address (0x03)
+	// * read register content
+	// * if second bit (D1) is set, the heater is configured on, otherwise off
+	var tests = map[string]struct {
+		read uint8
+		want bool
+	}{
+		"heater on":  {read: 0x02, want: true},
+		"heater off": {read: ^uint8(0x02), want: false},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			d, a := initTH02WithStubbedAdaptor()
+			a.i2cReadImpl = func(b []byte) (int, error) {
+				b[0] = tc.read
+				return len(b), nil
+			}
+			// act
+			got, err := d.Heater()
+			// assert
+			gobottest.Assert(t, err, nil)
+			gobottest.Assert(t, len(a.written), 1)
+			gobottest.Assert(t, a.written[0], uint8(0x03))
+			gobottest.Assert(t, got, tc.want)
+		})
+	}
+}
+
+func TestTH02SerialNumber(t *testing.T) {
+	// sequence to read SN
+	// * write identification register address (0x11)
+	// * read register content
+	// * use the higher nibble of byte
+
+	// arrange
+	d, a := initTH02WithStubbedAdaptor()
+	a.i2cReadImpl = func(b []byte) (int, error) {
+		b[0] = 0x4F
+		return len(b), nil
+	}
+	want := uint8(0x04)
+	// act
+	sn, err := d.SerialNumber()
+	// assert
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, len(a.written), 1)
+	gobottest.Assert(t, a.written[0], uint8(0x11))
+	gobottest.Assert(t, sn, want)
+}
+
+func TestTH02Sample(t *testing.T) {
+	// sequence to read values
+	// * write config register address (0x03)
+	// * prepare config bits (START, HEAT, TEMP, FAST)
+	// * write config register with config
+	// * write status register address (0x00)
+	// * read until value is "0" (means ready)
+	// * write data register MSB address (0x01)
+	// * read 2 bytes little-endian (MSB, LSB)
+	// * shift and scale
+	//    RH: 4 bits shift right, RH[%]=RH/16-24
+	//    T:  2 bits shift right, T[°C]=T/32-50
+
+	// test table according to data sheet page 15, 17
+	// operating range of the temperature sensor is -40..85 °C (F-grade 0..70 °C)
+	var tests = map[string]struct {
+		hData  uint16
+		tData  uint16
+		wantRH float32
+		wantT  float32
+	}{
+		"RH 0, T -40": {
+			hData: 0x0180, wantRH: 0.0,
+			tData: 0x0140, wantT: -40.0,
 		},
-		"example T": x{
-			rd: func(b []byte) (int, error) {
-				copy(b, []byte{0x00, 0x12, 0xC0})
-				return 3, nil
-			},
-			wr: func([]byte) (int, error) {
-				return 1, nil
-			},
-			errNil: true,
-			rtn:    4800,
+		"RH 10, T -20": {
+			hData: 0x0220, wantRH: 10.0,
+			tData: 0x03C0, wantT: -20.0,
 		},
-		"timeout - no wait for ready": x{
+		"RH 20, T -10": {
+			hData: 0x02C0, wantRH: 20.0,
+			tData: 0x0500, wantT: -10.0,
+		},
+		"RH 30, T 0": {
+			hData: 0x0360, wantRH: 30.0,
+			tData: 0x0640, wantT: 0.0,
+		},
+		"RH 40, T 10": {
+			hData: 0x0400, wantRH: 40.0,
+			tData: 0x0780, wantT: 10.0,
+		},
+		"RH 50, T 20": {
+			hData: 0x04A0, wantRH: 50.0,
+			tData: 0x08C0, wantT: 20.0,
+		},
+		"RH 60, T 30": {
+			hData: 0x0540, wantRH: 60.0,
+			tData: 0x0A00, wantT: 30.0,
+		},
+		"RH 70, T 40": {
+			hData: 0x05E0, wantRH: 70.0,
+			tData: 0x0B40, wantT: 40.0,
+		},
+		"RH 80, T 50": {
+			hData: 0x0680, wantRH: 80.0,
+			tData: 0x0C80, wantT: 50.0,
+		},
+		"RH 90, T 60": {
+			hData: 0x0720, wantRH: 90.0,
+			tData: 0x0DC0, wantT: 60.0,
+		},
+		"RH 100, T 70": {
+			hData: 0x07C0, wantRH: 100.0,
+			tData: 0x0F00, wantT: 70.0,
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			d, a := initTH02WithStubbedAdaptor()
+			var reg uint8
+			var regVal uint8
+			a.i2cWriteImpl = func(b []byte) (int, error) {
+				reg = b[0]
+				if len(b) == 2 {
+					regVal = b[1]
+				}
+				return len(b), nil
+			}
+			a.i2cReadImpl = func(b []byte) (int, error) {
+				switch reg {
+				case 0x00:
+					// status
+					b[0] = 0
+				case 0x01:
+					// data register MSB
+					var data uint16
+					if (regVal & 0x10) == 0x10 {
+						// temperature
+						data = tc.tData << 2 // data sheet values are after shift 2 bits
+					} else {
+						// humidity
+						data = tc.hData << 4 // data sheet values are after shift 4 bits
+					}
+					b[0] = byte(data >> 8)   // first read MSB from register 0x01
+					b[1] = byte(data & 0xFF) // second read LSB from register 0x02
+				default:
+					gobottest.Assert(t, fmt.Sprintf("unexpected register %d", reg), "only register 0 and 1 expected")
+					return 0, nil
+				}
+				return len(b), nil
+			}
+			// act
+			temp, rh, err := d.Sample()
+			// assert
+			gobottest.Assert(t, err, nil)
+			gobottest.Assert(t, rh, float32(tc.wantRH))
+			gobottest.Assert(t, temp, float32(tc.wantT))
+		})
+	}
+}
+
+func TestTH02_readData(t *testing.T) {
+	d, a := initTH02WithStubbedAdaptor()
+
+	var callCounter int
+
+	var tests = map[string]struct {
+		rd      func([]byte) (int, error)
+		wr      func([]byte) (int, error)
+		rtn     uint16
+		wantErr error
+	}{
+		"example RH": {
+			rd: func(b []byte) (int, error) {
+				callCounter++
+				if callCounter == 1 {
+					// read for ready
+					b[0] = 0x00
+				} else {
+					copy(b, []byte{0x07, 0xC0})
+				}
+				return len(b), nil
+			},
+			rtn: 1984,
+		},
+		"example T": {
+			rd: func(b []byte) (int, error) {
+				callCounter++
+				if callCounter == 1 {
+					// read for ready
+					b[0] = 0x00
+				} else {
+					copy(b, []byte{0x12, 0xC0})
+				}
+				return len(b), nil
+			},
+			rtn: 4800,
+		},
+		"timeout - no wait for ready": {
 			rd: func(b []byte) (int, error) {
 				time.Sleep(200 * time.Millisecond)
-				copy(b, []byte{0x01})
-				return 1, fmt.Errorf("nope")
+				// simulate not ready
+				b[0] = 0x01
+				return len(b), nil
 			},
-			wr: func([]byte) (int, error) {
-				return 1, nil
-			},
-			errNil: false,
-			rtn:    0,
+			wantErr: fmt.Errorf("timeout on \\RDY"),
+			rtn:     0,
 		},
-		"unable to write status register": x{
+		"unable to write status register": {
 			rd: func(b []byte) (int, error) {
-				copy(b, []byte{0x00})
-				return 0, nil
+				callCounter++
+				if callCounter == 1 {
+					// read for ready
+					b[0] = 0x00
+				}
+				return len(b), nil
 			},
-			wr: func([]byte) (int, error) {
-				return 0, fmt.Errorf("Nope")
+			wr: func(b []byte) (int, error) {
+				return len(b), fmt.Errorf("an write error")
 			},
-			errNil: false,
-			rtn:    0,
+			wantErr: fmt.Errorf("timeout on \\RDY"),
+			rtn:     0,
 		},
-		"unable to read doesnt provide enought data": x{
+		"unable to write data register": {
 			rd: func(b []byte) (int, error) {
-				copy(b, []byte{0x00, 0x01})
-				return 2, nil
+				callCounter++
+				if callCounter == 1 {
+					// read for ready
+					b[0] = 0x00
+				}
+				return len(b), nil
 			},
-			wr: func([]byte) (int, error) {
-				return 1, nil
+			wr: func(b []byte) (int, error) {
+				if len(b) == 1 && b[0] == 0x00 {
+					// register of ready check
+					return len(b), nil
+				}
+				// data register
+				return len(b), fmt.Errorf("Nope")
 			},
-			errNil: false,
-			rtn:    0,
+			wantErr: fmt.Errorf("Nope"),
+			rtn:     0,
+		},
+		"unable to read doesn't provide enough data": {
+			rd: func(b []byte) (int, error) {
+				callCounter++
+				if callCounter == 1 {
+					// read for ready
+					b[0] = 0x00
+				} else {
+					b = []byte{0x01}
+				}
+				return len(b), nil
+			},
+			wantErr: fmt.Errorf("Read 1 bytes from device by i2c helpers, expected 2"),
+			rtn:     0,
 		},
 	}
 
-	for name, x := range tests {
-		t.Log("Running", name)
-		i2cd.i2cReadImpl = x.rd
-		i2cd.i2cWriteImpl = x.wr
-		got, err := d.readData()
-		gobottest.Assert(t, err == nil, x.errNil)
-		gobottest.Assert(t, got, x.rtn)
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			a.i2cReadImpl = tc.rd
+			if tc.wr != nil {
+				oldwr := a.i2cWriteImpl
+				a.i2cWriteImpl = tc.wr
+				defer func() { a.i2cWriteImpl = oldwr }()
+			}
+			callCounter = 0
+			// act
+			got, err := d.waitAndReadData()
+			// assert
+			gobottest.Assert(t, err, tc.wantErr)
+			gobottest.Assert(t, got, tc.rtn)
+		})
 	}
 }
 
-func TestTH02Driver_waitForReady(t *testing.T) {
-	d, i2cd := initTestTH02DriverWithStubbedAdaptor()
-	gobottest.Assert(t, d.Start(), nil)
+func TestTH02_waitForReadyFailOnTimeout(t *testing.T) {
+	d, a := initTH02WithStubbedAdaptor()
 
-	i2cd.i2cReadImpl = func(b []byte) (int, error) {
+	a.i2cReadImpl = func(b []byte) (int, error) {
 		time.Sleep(50 * time.Millisecond)
-		copy(b, []byte{0x01, 0x00})
-		return 3, nil
-	}
-
-	i2cd.i2cWriteImpl = func([]byte) (int, error) {
-		return 1, nil
+		b[0] = 0x01
+		return len(b), nil
 	}
 
 	timeout := 10 * time.Microsecond
@@ -190,93 +432,56 @@ func TestTH02Driver_waitForReady(t *testing.T) {
 	}
 }
 
-func TestTH02Driver_WriteRegister(t *testing.T) {
-	d, i2cd := initTestTH02DriverWithStubbedAdaptor()
-	gobottest.Assert(t, d.Start(), nil)
+func TestTH02_waitForReadyFailOnReadError(t *testing.T) {
+	d, a := initTH02WithStubbedAdaptor()
 
-	i2cd.i2cWriteImpl = func([]byte) (int, error) {
-		return 1, nil
+	a.i2cReadImpl = func(b []byte) (int, error) {
+		time.Sleep(50 * time.Millisecond)
+		b[0] = 0x00
+		wrongLength := 2
+		return wrongLength, nil
 	}
 
-	if err := d.writeRegister(0x00, 0x00); err != nil {
-		t.Errorf("expected a nil error write")
+	timeout := 10 * time.Microsecond
+	if err := d.waitForReady(&timeout); err == nil {
+		t.Error("Expected a timeout error")
 	}
 }
 
-func TestTH02Driver_Heater(t *testing.T) {
-	d, i2cd := initTestTH02DriverWithStubbedAdaptor()
-	gobottest.Assert(t, d.Start(), nil)
-
-	i2cd.i2cReadImpl = func(b []byte) (int, error) {
-		copy(b, []byte{0xff})
-		return 1, nil
-	}
-
-	i2cd.i2cWriteImpl = func([]byte) (int, error) {
-		return 1, nil
-	}
-
-	on, err := d.Heater()
-	gobottest.Assert(t, on, true)
-	gobottest.Assert(t, err, nil)
-}
-func TestTH02Driver_SerialNumber(t *testing.T) {
-	d, i2cd := initTestTH02DriverWithStubbedAdaptor()
-	gobottest.Assert(t, d.Start(), nil)
-
-	i2cd.i2cReadImpl = func(b []byte) (int, error) {
-		copy(b, []byte{0x42})
-		return 1, nil
-	}
-
-	i2cd.i2cWriteImpl = func([]byte) (int, error) {
-		return 1, nil
-	}
-
-	sn, err := d.SerialNumber()
-
-	gobottest.Assert(t, sn, uint32((0x42)>>4))
-	gobottest.Assert(t, err, nil)
-}
-
-func TestTH02Driver_ApplySettings(t *testing.T) {
+func TestTH02_createConfig(t *testing.T) {
 	d := &TH02Driver{}
 
-	type x struct {
-		acc, base, out byte
-		heating        bool
+	var tests = map[string]struct {
+		meas     bool
+		fast     bool
+		readTemp bool
+		heating  bool
+		want     byte
+	}{
+		"meas, no fast, RH, no heating":    {meas: true, fast: false, readTemp: false, heating: false, want: 0x01},
+		"meas, no fast, RH, heating":       {meas: true, fast: false, readTemp: false, heating: true, want: 0x03},
+		"meas, no fast, TE, no heating":    {meas: true, fast: false, readTemp: true, heating: false, want: 0x11},
+		"meas, no fast, TE, heating":       {meas: true, fast: false, readTemp: true, heating: true, want: 0x13},
+		"meas, fast, RH, no heating":       {meas: true, fast: true, readTemp: false, heating: false, want: 0x21},
+		"meas, fast, RH, heating":          {meas: true, fast: true, readTemp: false, heating: true, want: 0x23},
+		"meas, fast, TE, no heating":       {meas: true, fast: true, readTemp: true, heating: false, want: 0x31},
+		"meas, fast, TE, heating":          {meas: true, fast: true, readTemp: true, heating: true, want: 0x33},
+		"no meas, no fast, RH, no heating": {meas: false, fast: false, readTemp: false, heating: false, want: 0x00},
+		"no meas, no fast, RH, heating":    {meas: false, fast: false, readTemp: false, heating: true, want: 0x02},
+		"no meas, no fast, TE, no heating": {meas: false, fast: false, readTemp: true, heating: false, want: 0x00},
+		"no meas, no fast, TE, heating":    {meas: false, fast: false, readTemp: true, heating: true, want: 0x02},
+		"no meas, fast, RH, no heating":    {meas: false, fast: true, readTemp: false, heating: false, want: 0x00},
+		"no meas, fast, RH, heating":       {meas: false, fast: true, readTemp: false, heating: true, want: 0x02},
+		"no meas, fast, TE, no heating":    {meas: false, fast: true, readTemp: true, heating: false, want: 0x00},
+		"no meas, fast, TE, heating":       {meas: false, fast: true, readTemp: true, heating: true, want: 0x02},
 	}
 
-	tests := map[string]x{
-		"low acc, heating":     x{acc: TH02LowAccuracy, base: 0x00, heating: true, out: 0x01},
-		"high acc, no heating": x{acc: TH02HighAccuracy, base: 0x00, heating: false, out: 0x23},
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			d.fastMode = tc.fast
+			d.heating = tc.heating
+			got := d.createConfig(tc.meas, tc.readTemp)
+			gobottest.Assert(t, tc.want, got)
+		})
 	}
-
-	for name, x := range tests {
-		t.Log(name)
-		d.accuracy = x.acc
-		d.heating = x.heating
-		got := d.applysettings(x.base)
-		gobottest.Assert(t, x.out, got)
-	}
-}
-
-func TestTH02Driver_Sample(t *testing.T) {
-	d, i2cd := initTestTH02DriverWithStubbedAdaptor()
-	gobottest.Assert(t, d.Start(), nil)
-
-	i2cd.i2cReadImpl = func(b []byte) (int, error) {
-		copy(b, []byte{0x00, 0x00, 0x07, 0xC0})
-		return 4, nil
-	}
-
-	i2cd.i2cWriteImpl = func([]byte) (int, error) {
-		return 1, nil
-	}
-
-	temp, rh, _ := d.Sample()
-
-	gobottest.Assert(t, temp, float32(0))
-	gobottest.Assert(t, rh, float32(0))
-
 }
