@@ -12,7 +12,6 @@ require (
 	github.com/hashicorp/go-multierror v1.0.0
 	github.com/hybridgroup/go-ardrone v0.0.0-20140402002621-b9750d8d7b78
 	github.com/hybridgroup/mjpeg v0.0.0-20140228234708-4680f319790e
-	github.com/muka/go-bluetooth v0.0.0-20220830075246-0746e3a1ea53 // indirect
 	github.com/nats-io/nats-server/v2 v2.1.0 // indirect
 	github.com/nats-io/nats.go v1.8.1
 	github.com/pkg/errors v0.9.1
@@ -25,7 +24,7 @@ require (
 	go.bug.st/serial v1.4.0
 	gocv.io/x/gocv v0.21.0
 	golang.org/x/net v0.0.0-20211015210444-4f30a5c0130f
-	golang.org/x/sys v0.0.0-20220919091848-fb04ddd9f9c8 // indirect
+	golang.org/x/sys v0.0.0-20220928140112-f11e5e49a4ec // indirect
 	periph.io/x/periph v3.6.2+incompatible
-	tinygo.org/x/bluetooth v0.5.1-0.20220915173542-e843ce91a6c8
+	tinygo.org/x/bluetooth v0.6.0
 )
