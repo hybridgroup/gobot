@@ -60,17 +60,18 @@ func TestRobotWorkRegistry(t *testing.T) {
 func TestRobotAutomationFunctions(t *testing.T) {
 	t.Run("Every with cancel", func(t *testing.T) {
 		robot := NewRobot("testbot")
+		counter := 0
 
-		rw := robot.Every(context.Background(), time.Millisecond*10, func() {
-			_ = 1 + 1 // perform mindless computation!
+		rw := robot.Every(context.Background(), time.Millisecond*100, func() {
+			counter++
 		})
 
-		time.Sleep(time.Millisecond * 25)
+		time.Sleep(time.Millisecond * 225)
 		rw.CallCancelFunc()
 
 		robot.WorkEveryWaitGroup.Wait()
 
-		assert.Equal(t, 2, rw.tickCount)
+		assert.Equal(t, 2, counter)
 		postDeleteKeys := collectStringKeysFromWorkRegistry(robot.workRegistry)
 		assert.NotContains(t, postDeleteKeys, rw.id.String())
 	})

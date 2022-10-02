@@ -22,6 +22,8 @@ var blue = castColor("blue")
 
 type i2cTestAdaptor struct {
 	name          string
+	bus           int
+	address       int
 	written       []byte
 	mtx           sync.Mutex
 	i2cConnectErr bool
@@ -153,10 +155,12 @@ func (t *i2cTestAdaptor) WriteBlockData(reg uint8, b []byte) error {
 	return t.writeBytes(buf)
 }
 
-func (t *i2cTestAdaptor) GetConnection( /* address */ int /* bus */, int) (connection Connection, err error) {
+func (t *i2cTestAdaptor) GetConnection(address int, bus int) (connection Connection, err error) {
 	if t.i2cConnectErr {
 		return nil, errors.New("Invalid i2c connection")
 	}
+	t.bus = bus
+	t.address = address
 	return t, nil
 }
 
