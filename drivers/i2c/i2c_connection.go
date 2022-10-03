@@ -255,3 +255,11 @@ func clearBit(n uint8, pos uint8) uint8 {
 	n &= mask
 	return n
 }
+
+func twosComplement16Bit(uValue uint16) int16 {
+	result := int32(uValue)
+	if result&0x8000 != 0 {
+		result -= 1 << 16
+	}
+	return int16(result)
+}

@@ -5,7 +5,7 @@
 /*
  How to run
 
-	go run examples/firmata_hmc8553l.go
+	go run examples/raspi_hmc5883l.go
 */
 
 package main
@@ -21,24 +21,24 @@ import (
 
 func main() {
 	raspi := raspi.NewAdaptor()
-	hmc8553l := i2c.NewHMC8553LDriver(raspi)
+	hmc5883l := i2c.NewHMC5883LDriver(raspi)
 
 	work := func() {
 		gobot.Every(200*time.Millisecond, func() {
 
 			// get heading in radians, to convert to degrees multiply by 180/math.Pi
-			heading, _ := hmc8553l.Heading()
+			heading, _ := hmc5883l.Heading()
 			fmt.Println("Heading", heading)
 
-			// read the raw data from the device, this is useful for calibration
-			x, y, z, _ := hmc8553l.ReadRawData()
+			// read the data in Gauss
+			x, y, z, _ := hmc5883l.Read()
 			fmt.Println(x, y, z)
 		})
 	}
 
-	robot := gobot.NewRobot("hmc8553LBot",
+	robot := gobot.NewRobot("hmc5883LBot",
 		[]gobot.Connection{raspi},
-		[]gobot.Device{hmc8553l},
+		[]gobot.Device{hmc5883l},
 		work,
 	)
 
