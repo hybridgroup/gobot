@@ -36,7 +36,7 @@ Gobot has a extensible system for connecting to hardware devices. The following 
 - LIDAR-Lite
 - MCP23017 Port Expander
 - MMA7660 3-Axis Accelerometer
-- MPL115A2 Barometer
+- MPL115A2 Barometric Pressure/Temperature
 - MPU6050 Accelerometer/Gyroscope
 - PCA9501 8-bit I/O port with interrupt, 2-kbit EEPROM
 - PCA9685 16-channel 12-bit PWM/Servo Driver
