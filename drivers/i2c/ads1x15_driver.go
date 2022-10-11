@@ -1,58 +1,81 @@
 package i2c
 
 import (
-	"errors"
+	"log"
 	"math"
+	"sort"
 	"strconv"
 	"time"
 
 	"fmt"
+)
 
-	"gobot.io/x/gobot"
+const ads1x15DefaultAddress = 0x48
+
+const (
+	ads1x15Debug          = false
+	ads1x15WaitMaxCount   = 200
+	ads1x15FullScaleValue = 0x7FFF // same as 32768, 1<<15 or 64
 )
 
 const (
-
-	// ADS1x15DefaultAddress is the default I2C address for the ADS1x15 components
-	ADS1x15DefaultAddress = 0x48
-
+	// Address pointer registers
 	ads1x15PointerConversion    = 0x00
 	ads1x15PointerConfig        = 0x01
 	ads1x15PointerLowThreshold  = 0x02
 	ads1x15PointerHighThreshold = 0x03
-	// Write: Set to start a single-conversion
-	ads1x15ConfigOsSingle       = 0x8000
-	ads1x15ConfigMuxOffset      = 12
-	ads1x15ConfigModeContinuous = 0x0000
-	//Single shoot mode
-	ads1x15ConfigModeSingle = 0x0100
 
-	ads1x15ConfigCompWindow      = 0x0010
-	ads1x15ConfigCompAactiveHigh = 0x0008
-	ads1x15ConfigCompLatching    = 0x0004
-	ads1x15ConfigCompQueDisable  = 0x0003
+	// Values for config register
+	ads1x15ConfigCompQueDisable = 0x0003
+	ads1x15ConfigCompLatching   = 0x0004
+	ads1x15ConfigCompActiveHigh = 0x0008
+	ads1x15ConfigCompWindow     = 0x0010
+
+	ads1x15ConfigModeContinuous = 0x0000
+	ads1x15ConfigModeSingle     = 0x0100 // single shot mode
+	ads1x15ConfigOsSingle       = 0x8000 // write: set to start a single-conversion, read: wait for finished
+	ads1x15ConfigMuxOffset      = 12
+	ads1x15ConfigPgaOffset      = 9
 )
 
+type ads1x15ChanCfg struct {
+	gain     int
+	dataRate int
+}
+
+type ads1x15GainCfg struct {
+	bits      uint16
+	fullrange float64
+}
+
 // ADS1x15Driver is the Gobot driver for the ADS1015/ADS1115 ADC
+// datasheet:
+// https://www.ti.com/lit/gpn/ads1115
+//
+// reference implementations:
+// * https://github.com/adafruit/Adafruit_Python_ADS1x15
+// * https://github.com/Wh1teRabbitHU/ADS1115-Driver
 type ADS1x15Driver struct {
-	name            string
-	connector       Connector
-	connection      Connection
-	gainConfig      map[int]uint16
-	dataRates       map[int]uint16
-	gainVoltage     map[int]float64
-	converter       func([]byte) float64
-	DefaultGain     int
-	DefaultDataRate int
-	Config
+	*Driver
+	dataRates        map[int]uint16
+	channelCfgs      map[int]*ads1x15ChanCfg
+	waitOnlyOneCycle bool
+}
+
+var ads1x15FullScaleRange = map[int]float64{
+	0: 6.144,
+	1: 4.096,
+	2: 2.048,
+	3: 1.024,
+	4: 0.512,
+	5: 0.256,
+	6: 0.256,
+	7: 0.256,
 }
 
 // NewADS1015Driver creates a new driver for the ADS1015 (12-bit ADC)
-// Largely inspired by: https://github.com/adafruit/Adafruit_Python_ADS1x15
 func NewADS1015Driver(a Connector, options ...func(Config)) *ADS1x15Driver {
-	l := newADS1x15Driver(a, options...)
-
-	l.dataRates = map[int]uint16{
+	dataRates := map[int]uint16{
 		128:  0x0000,
 		250:  0x0020,
 		490:  0x0040,
@@ -61,28 +84,14 @@ func NewADS1015Driver(a Connector, options ...func(Config)) *ADS1x15Driver {
 		2400: 0x00A0,
 		3300: 0x00C0,
 	}
-	if l.DefaultDataRate == 0 {
-		l.DefaultDataRate = 1600
-	}
+	defaultDataRate := 1600
 
-	l.converter = func(data []byte) (value float64) {
-		result := (int(data[0]) << 8) | int(data[1])
-
-		if result&0x8000 != 0 {
-			result -= 1 << 16
-		}
-
-		return float64(result) / float64(1<<15)
-	}
-
-	return l
+	return newADS1x15Driver(a, "ADS1015", dataRates, defaultDataRate, options...)
 }
 
 // NewADS1115Driver creates a new driver for the ADS1115 (16-bit ADC)
 func NewADS1115Driver(a Connector, options ...func(Config)) *ADS1x15Driver {
-	l := newADS1x15Driver(a, options...)
-
-	l.dataRates = map[int]uint16{
+	dataRates := map[int]uint16{
 		8:   0x0000,
 		16:  0x0020,
 		32:  0x0040,
@@ -92,119 +101,446 @@ func NewADS1115Driver(a Connector, options ...func(Config)) *ADS1x15Driver {
 		475: 0x00C0,
 		860: 0x00E0,
 	}
+	defaultDataRate := 128
 
-	if l.DefaultDataRate == 0 {
-		l.DefaultDataRate = 128
-	}
-
-	l.converter = func(data []byte) (value float64) {
-		result := (int(data[0]) << 8) | int(data[1])
-
-		if result&0x8000 != 0 {
-			result -= 1 << 16
-		}
-
-		return float64(result) / float64(1<<15)
-	}
-
-	return l
+	return newADS1x15Driver(a, "ADS1115", dataRates, defaultDataRate, options...)
 }
 
-func newADS1x15Driver(a Connector, options ...func(Config)) *ADS1x15Driver {
-	l := &ADS1x15Driver{
-		name:      gobot.DefaultName("ADS1x15"),
-		connector: a,
-		// Mapping of gain values to config register values.
-		gainConfig: map[int]uint16{
-			2 / 3: 0x0000,
-			1:     0x0200,
-			2:     0x0400,
-			4:     0x0600,
-			8:     0x0800,
-			16:    0x0A00,
-		},
-		gainVoltage: map[int]float64{
-			2 / 3: 6.144,
-			1:     4.096,
-			2:     2.048,
-			4:     1.024,
-			8:     0.512,
-			16:    0.256,
-		},
-		DefaultGain: 1,
-
-		Config: NewConfig(),
+func newADS1x15Driver(c Connector, name string, drs map[int]uint16, ddr int, options ...func(Config)) *ADS1x15Driver {
+	ccs := map[int]*ads1x15ChanCfg{0: {1, ddr}, 1: {1, ddr}, 2: {1, ddr}, 3: {1, ddr}}
+	d := &ADS1x15Driver{
+		Driver:      NewDriver(c, name, ads1x15DefaultAddress),
+		dataRates:   drs,
+		channelCfgs: ccs,
 	}
 
 	for _, option := range options {
-		option(l)
+		option(d)
 	}
 
-	// TODO: add commands to API
-	return l
+	d.AddCommand("ReadDifferenceWithDefaults", func(params map[string]interface{}) interface{} {
+		channel := params["channel"].(int)
+		val, err := d.ReadDifferenceWithDefaults(channel)
+		return map[string]interface{}{"val": val, "err": err}
+	})
+
+	d.AddCommand("ReadDifference", func(params map[string]interface{}) interface{} {
+		channel := params["channel"].(int)
+		gain := params["gain"].(int)
+		dataRate := params["dataRate"].(int)
+		val, err := d.ReadDifference(channel, gain, dataRate)
+		return map[string]interface{}{"val": val, "err": err}
+	})
+
+	d.AddCommand("ReadWithDefaults", func(params map[string]interface{}) interface{} {
+		channel := params["channel"].(int)
+		val, err := d.ReadWithDefaults(channel)
+		return map[string]interface{}{"val": val, "err": err}
+	})
+
+	d.AddCommand("Read", func(params map[string]interface{}) interface{} {
+		channel := params["channel"].(int)
+		gain := params["gain"].(int)
+		dataRate := params["dataRate"].(int)
+		val, err := d.Read(channel, gain, dataRate)
+		return map[string]interface{}{"val": val, "err": err}
+	})
+
+	d.AddCommand("AnalogRead", func(params map[string]interface{}) interface{} {
+		pin := params["pin"].(string)
+		val, err := d.AnalogRead(pin)
+		return map[string]interface{}{"val": val, "err": err}
+	})
+
+	return d
 }
 
-// Start initializes the sensor
-func (d *ADS1x15Driver) Start() (err error) {
-	bus := d.GetBusOrDefault(d.connector.GetDefaultBus())
-	address := d.GetAddressOrDefault(ADS1x15DefaultAddress)
+// WithADS1x15BestGainForVoltage option sets the ADS1x15Driver best gain for all channels.
+func WithADS1x15BestGainForVoltage(voltage float64) func(Config) {
+	return func(c Config) {
+		d, ok := c.(*ADS1x15Driver)
+		if ok {
+			// validate the given value
+			bestGain, err := ads1x15BestGainForVoltage(voltage)
+			if err != nil {
+				panic(err)
+			}
+			WithADS1x15Gain(bestGain)(d)
+		} else if ads1x15Debug {
+			log.Printf("Trying to set best gain for voltage for non-ADS1x15Driver %v", c)
+		}
+	}
+}
 
-	if d.connection, err = d.connector.GetConnection(address, bus); err != nil {
-		return err
+// WithADS1x15ChannelBestGainForVoltage option sets the ADS1x15Driver best gain for one channel.
+func WithADS1x15ChannelBestGainForVoltage(channel int, voltage float64) func(Config) {
+	return func(c Config) {
+		d, ok := c.(*ADS1x15Driver)
+		if ok {
+			// validate the given value
+			bestGain, err := ads1x15BestGainForVoltage(voltage)
+			if err != nil {
+				panic(err)
+			}
+			WithADS1x15ChannelGain(channel, bestGain)(d)
+		} else if ads1x15Debug {
+			log.Printf("Trying to set channel best gain for voltage for non-ADS1x15Driver %v", c)
+		}
+	}
+}
+
+// WithADS1x15Gain option sets the ADS1x15Driver gain for all channels.
+// Valid gain settings are any of the PGA values (0..7).
+func WithADS1x15Gain(val int) func(Config) {
+	return func(c Config) {
+		d, ok := c.(*ADS1x15Driver)
+		if ok {
+			// validate the given value
+			if _, err := ads1x15GetFullScaleRange(val); err != nil {
+				panic(err)
+			}
+			d.setChannelGains(val)
+		} else if ads1x15Debug {
+			log.Printf("Trying to set gain for non-ADS1x15Driver %v", c)
+		}
+	}
+}
+
+// WithADS1x15ChannelGain option sets the ADS1x15Driver gain for one channel.
+// Valid gain settings are any of the PGA values (0..7).
+func WithADS1x15ChannelGain(channel int, val int) func(Config) {
+	return func(c Config) {
+		d, ok := c.(*ADS1x15Driver)
+		if ok {
+			// validate the given value
+			if _, err := ads1x15GetFullScaleRange(val); err != nil {
+				panic(err)
+			}
+			if err := d.checkChannel(channel); err != nil {
+				panic(err)
+			}
+			d.channelCfgs[channel].gain = val
+		} else if ads1x15Debug {
+			log.Printf("Trying to set channel gain for non-ADS1x15Driver %v", c)
+		}
+	}
+}
+
+// WithADS1x15DataRate option sets the ADS1x15Driver data rate for all channels.
+// Valid gain settings are any of the DR values in SPS.
+func WithADS1x15DataRate(val int) func(Config) {
+	return func(c Config) {
+		d, ok := c.(*ADS1x15Driver)
+		if ok {
+			// validate the given value
+			if _, err := ads1x15GetDataRateBits(d.dataRates, val); err != nil {
+				panic(err)
+			}
+			d.setChannelDataRates(val)
+		} else if ads1x15Debug {
+			log.Printf("Trying to set data rate for non-ADS1x15Driver %v", c)
+		}
+	}
+}
+
+// WithADS1x15ChannelDataRate option sets the ADS1x15Driver data rate for one channel.
+// Valid gain settings are any of the DR values in SPS.
+func WithADS1x15ChannelDataRate(channel int, val int) func(Config) {
+	return func(c Config) {
+		d, ok := c.(*ADS1x15Driver)
+		if ok {
+			// validate the given values
+			if _, err := ads1x15GetDataRateBits(d.dataRates, val); err != nil {
+				panic(err)
+			}
+			if err := d.checkChannel(channel); err != nil {
+				panic(err)
+			}
+			d.channelCfgs[channel].dataRate = val
+		} else if ads1x15Debug {
+			log.Printf("Trying to set channel data rate for non-ADS1x15Driver %v", c)
+		}
+	}
+}
+
+// WithADS1x15WaitSingleCycle option sets the ADS1x15Driver to wait only a single cycle for conversion. According to the
+// specification, chapter "Output Data Rate and Conversion Time", the device normally finishes the conversion within one
+// cycle (after wake up). The cycle time depends on configured data rate and will be calculated. For unknown reasons
+// some devices do not work with this setting. So the default behavior for single shot mode is to wait for a conversion
+// is finished by reading the configuration register bit 15. Activating this option will switch off this behavior and
+// will possibly create faster response. But, if multiple inputs are used and some inputs calculates the same result,
+// most likely the device is not working with this option.
+func WithADS1x15WaitSingleCycle() func(Config) {
+	return func(c Config) {
+		d, ok := c.(*ADS1x15Driver)
+		if ok {
+			d.waitOnlyOneCycle = true
+		} else if ads1x15Debug {
+			log.Printf("Trying to set wait single cycle for non-ADS1x15Driver %v", c)
+		}
+	}
+}
+
+// ReadDifferenceWithDefaults reads the difference in V between 2 inputs. It uses the default gain and data rate
+// diff can be:
+// * 0: Channel 0 - channel 1
+// * 1: Channel 0 - channel 3
+// * 2: Channel 1 - channel 3
+// * 3: Channel 2 - channel 3
+func (d *ADS1x15Driver) ReadDifferenceWithDefaults(diff int) (value float64, err error) {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
+
+	if err = d.checkChannel(diff); err != nil {
+		return
+	}
+	return d.readVoltage(diff, 0, d.channelCfgs[diff].gain, d.channelCfgs[diff].dataRate)
+}
+
+// ReadDifference reads the difference in V between 2 inputs.
+// diff can be:
+// * 0: Channel 0 - channel 1
+// * 1: Channel 0 - channel 3
+// * 2: Channel 1 - channel 3
+// * 3: Channel 2 - channel 3
+func (d *ADS1x15Driver) ReadDifference(diff int, gain int, dataRate int) (value float64, err error) {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
+
+	if err = d.checkChannel(diff); err != nil {
+		return
+	}
+	return d.readVoltage(diff, 0, gain, dataRate)
+}
+
+// ReadWithDefaults reads the voltage at the specified channel (between 0 and 3).
+// Default values are used for the gain and data rate. The result is in V.
+func (d *ADS1x15Driver) ReadWithDefaults(channel int) (value float64, err error) {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
+
+	if err = d.checkChannel(channel); err != nil {
+		return
+	}
+	return d.readVoltage(channel, 0x04, d.channelCfgs[channel].gain, d.channelCfgs[channel].dataRate)
+}
+
+// Read reads the voltage at the specified channel (between 0 and 3). The result is in V.
+func (d *ADS1x15Driver) Read(channel int, gain int, dataRate int) (value float64, err error) {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
+
+	if err = d.checkChannel(channel); err != nil {
+		return
+	}
+	return d.readVoltage(channel, 0x04, gain, dataRate)
+}
+
+// AnalogRead returns value from analog reading of specified pin using the default values.
+func (d *ADS1x15Driver) AnalogRead(pin string) (value int, err error) {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
+
+	var channel int
+	var channelOffset int
+
+	// Check for the ADC is used in difference mode
+	switch pin {
+	case "0-1":
+		channel = 0
+		break
+	case "0-3":
+		channel = 1
+		break
+	case "1-3":
+		channel = 2
+		break
+	case "2-3":
+		channel = 3
+		break
+	default:
+		// read the voltage at a specific pin, compared to the ground
+		channel, err = strconv.Atoi(pin)
+		if err != nil {
+			return
+		}
+		channelOffset = 0x04
+	}
+
+	if err = d.checkChannel(channel); err != nil {
+		return
+	}
+
+	value, err = d.rawRead(channel, channelOffset, d.channelCfgs[channel].gain, d.channelCfgs[channel].dataRate)
+
+	return
+}
+
+func (d *ADS1x15Driver) readVoltage(channel int, channelOffset int, gain int, dataRate int) (value float64, err error) {
+	fsr, err := ads1x15GetFullScaleRange(gain)
+	if err != nil {
+		return
+	}
+
+	rawValue, err := d.rawRead(channel, channelOffset, gain, dataRate)
+
+	// Calculate return value in V
+	value = float64(rawValue) / float64(1<<15) * fsr
+
+	return
+}
+
+func (d *ADS1x15Driver) rawRead(channel int, channelOffset int, gain int, dataRate int) (data int, err error) {
+	// Validate the passed in data rate (differs between ADS1015 and ADS1115).
+	dataRateBits, err := ads1x15GetDataRateBits(d.dataRates, dataRate)
+	if err != nil {
+		return
+	}
+
+	var config uint16
+	// Go out of power-down mode for conversion.
+	config = ads1x15ConfigOsSingle
+
+	// Specify mux value.
+	mux := channel + channelOffset
+	config |= uint16((mux & 0x07) << ads1x15ConfigMuxOffset)
+
+	// Set the programmable gain amplifier bits.
+	config |= uint16(gain) << ads1x15ConfigPgaOffset
+
+	// Set the mode (continuous or single shot).
+	config |= ads1x15ConfigModeSingle
+
+	// Set the data rate.
+	config |= dataRateBits
+
+	// Disable comparator mode.
+	config |= ads1x15ConfigCompQueDisable
+
+	// Send the config value to start the ADC conversion.
+	if err = d.writeWordBigEndian(ads1x15PointerConfig, config); err != nil {
+		return
+	}
+
+	// Wait for the ADC sample to finish based on the sample rate plus a
+	// small offset to be sure (0.1 millisecond).
+	delay := time.Duration(1000000/dataRate+100) * time.Microsecond
+	if err = d.waitForConversionFinished(delay); err != nil {
+		return
+	}
+
+	// Retrieve the result.
+	udata, err := d.readWordBigEndian(ads1x15PointerConversion)
+	if err != nil {
+		return
+	}
+
+	// Handle negative values as two's complement
+	return int(twosComplement16Bit(udata)), nil
+}
+
+func (d *ADS1x15Driver) checkChannel(channel int) (err error) {
+	if channel < 0 || channel > 3 {
+		err = fmt.Errorf("Invalid channel (%d), must be between 0 and 3", channel)
+	}
+	return
+}
+
+func (d *ADS1x15Driver) waitForConversionFinished(delay time.Duration) (err error) {
+	start := time.Now()
+
+	for i := 0; i < ads1x15WaitMaxCount; i++ {
+		if i == ads1x15WaitMaxCount-1 {
+			// most likely the last try will also not finish, so we stop with an error
+			return fmt.Errorf("The conversion is not finished within %s", time.Since(start))
+		}
+		var data uint16
+		if data, err = d.readWordBigEndian(ads1x15PointerConfig); err != nil {
+			return
+		}
+		if ads1x15Debug {
+			log.Printf("ADS1x15Driver: config register state: 0x%X\n", data)
+		}
+		// the highest bit 15: 0-device perform a conversion, 1-no conversion in progress
+		if data&ads1x15ConfigOsSingle > 0 {
+			break
+		}
+		time.Sleep(delay)
+		if d.waitOnlyOneCycle {
+			break
+		}
+	}
+
+	if ads1x15Debug {
+		elapsed := time.Since(start)
+		log.Printf("conversion takes %s", elapsed)
 	}
 
 	return
 }
 
-// Name returns the Name for the Driver
-func (d *ADS1x15Driver) Name() string { return d.name }
+func (d *ADS1x15Driver) writeWordBigEndian(reg uint8, val uint16) error {
+	return d.connection.WriteWordData(reg, swapBytes(val))
+}
 
-// SetName sets the Name for the Driver
-func (d *ADS1x15Driver) SetName(n string) { d.name = n }
+func (d *ADS1x15Driver) readWordBigEndian(reg uint8) (data uint16, err error) {
+	if data, err = d.connection.ReadWordData(reg); err != nil {
+		return
+	}
+	return swapBytes(data), err
+}
 
-// Connection returns the connection for the Driver
-func (d *ADS1x15Driver) Connection() gobot.Connection { return d.connector.(gobot.Connection) }
-
-// Halt returns true if devices is halted successfully
-func (d *ADS1x15Driver) Halt() (err error) { return }
-
-// WithADS1x15Gain option sets the ADS1x15Driver gain option.
-// Valid gain settings are any of the ADS1x15RegConfigPga* values
-func WithADS1x15Gain(val int) func(Config) {
-	return func(c Config) {
-		d, ok := c.(*ADS1x15Driver)
-		if ok {
-			d.DefaultGain = val
-		} else {
-			// TODO: return error for trying to set Gain for non-ADS1015Driver
-			return
-		}
+func (d *ADS1x15Driver) setChannelDataRates(ddr int) {
+	for i := 0; i <= 3; i++ {
+		d.channelCfgs[i].dataRate = ddr
 	}
 }
 
-// WithADS1x15DataRate option sets the ADS1x15Driver data rate option.
-// Valid gain settings are any of the ADS1x15RegConfigPga* values
-func WithADS1x15DataRate(val int) func(Config) {
-	return func(c Config) {
-		d, ok := c.(*ADS1x15Driver)
-		if ok {
-			d.DefaultDataRate = val
-		} else {
-			// TODO: return error for trying to set data rate for non-ADS1015Driver
-			return
-		}
+func (d *ADS1x15Driver) setChannelGains(gain int) {
+	for i := 0; i <= 3; i++ {
+		d.channelCfgs[i].gain = gain
 	}
 }
 
-// BestGainForVoltage returns the gain the most adapted to read up to the specified difference of potential.
-func (d *ADS1x15Driver) BestGainForVoltage(voltage float64) (bestGain int, err error) {
+func ads1x15GetFullScaleRange(gain int) (fsr float64, err error) {
+	fsr, ok := ads1x15FullScaleRange[gain]
+	if ok {
+		return
+	}
+
+	keys := []int{}
+	for k := range ads1x15FullScaleRange {
+		keys = append(keys, k)
+	}
+	sort.Ints(keys)
+	err = fmt.Errorf("Gain (%d) must be one of: %d", gain, keys)
+	return
+}
+
+func ads1x15GetDataRateBits(dataRates map[int]uint16, dataRate int) (bits uint16, err error) {
+	bits, ok := dataRates[dataRate]
+	if ok {
+		return
+	}
+
+	keys := []int{}
+	for k := range dataRates {
+		keys = append(keys, k)
+	}
+	sort.Ints(keys)
+	err = fmt.Errorf("Invalid data rate (%d). Accepted values: %d", dataRate, keys)
+	return
+}
+
+// ads1x15BestGainForVoltage returns the gain the most adapted to read up to the specified difference of potential.
+func ads1x15BestGainForVoltage(voltage float64) (bestGain int, err error) {
 	var max float64
 	difference := math.MaxFloat64
 	currentBestGain := -1
 
-	for key, value := range d.gainVoltage {
-		max = math.Max(max, value)
-		newDiff := value - voltage
+	for key, fsr := range ads1x15FullScaleRange {
+		max = math.Max(max, fsr)
+		newDiff := fsr - voltage
 		if newDiff >= 0 && newDiff < difference {
 			difference = newDiff
 			currentBestGain = key
@@ -217,164 +553,5 @@ func (d *ADS1x15Driver) BestGainForVoltage(voltage float64) (bestGain int, err e
 	}
 
 	bestGain = currentBestGain
-	return
-}
-
-// ReadDifferenceWithDefaults reads the difference in V between 2 inputs. It uses the default gain and data rate
-// diff can be:
-// * 0: Channel 0 - channel 1
-// * 1: Channel 0 - channel 3
-// * 2: Channel 1 - channel 3
-// * 3: Channel 2 - channel 3
-func (d *ADS1x15Driver) ReadDifferenceWithDefaults(diff int) (value float64, err error) {
-	return d.ReadDifference(diff, d.DefaultGain, d.DefaultDataRate)
-}
-
-// ReadDifference reads the difference in V between 2 inputs.
-// diff can be:
-// * 0: Channel 0 - channel 1
-// * 1: Channel 0 - channel 3
-// * 2: Channel 1 - channel 3
-// * 3: Channel 2 - channel 3
-func (d *ADS1x15Driver) ReadDifference(diff int, gain int, dataRate int) (value float64, err error) {
-	if err = d.checkChannel(diff); err != nil {
-		return
-	}
-
-	return d.rawRead(diff, gain, dataRate)
-}
-
-// ReadWithDefaults reads the voltage at the specified channel (between 0 and 3).
-// Default values are used for the gain and data rate. The result is in V.
-func (d *ADS1x15Driver) ReadWithDefaults(channel int) (value float64, err error) {
-	return d.Read(channel, d.DefaultGain, d.DefaultDataRate)
-}
-
-// Read reads the voltage at the specified channel (between 0 and 3). The result is in V.
-func (d *ADS1x15Driver) Read(channel int, gain int, dataRate int) (value float64, err error) {
-	if err = d.checkChannel(channel); err != nil {
-		return
-	}
-	mux := channel + 0x04
-
-	return d.rawRead(mux, gain, dataRate)
-}
-
-// AnalogRead returns value from analog reading of specified pin
-func (d *ADS1x15Driver) AnalogRead(pin string) (value int, err error) {
-	var useDifference = false
-	var channel int
-	var read float64
-
-	// First case: the ADC is used in difference mode
-	switch pin {
-	case "0-1":
-		useDifference = true
-		channel = 0
-		break
-	case "0-3":
-		useDifference = true
-		channel = 1
-		break
-	case "1-3":
-		useDifference = true
-		channel = 2
-		break
-	case "2-3":
-		useDifference = true
-		channel = 3
-		break
-	}
-
-	if useDifference {
-		read, err = d.ReadDifferenceWithDefaults(channel)
-	} else {
-		// Second case: read the voltage at a specific pin, compared to the ground
-		channel, err = strconv.Atoi(pin)
-		if err != nil {
-			return
-		}
-
-		read, err = d.ReadWithDefaults(channel)
-	}
-
-	if err == nil {
-		value = int(gobot.ToScale(gobot.FromScale(read, 0, d.gainVoltage[d.DefaultGain]), 0, 1023))
-	}
-
-	return
-}
-
-func (d *ADS1x15Driver) rawRead(mux int, gain int, dataRate int) (value float64, err error) {
-	var config uint16
-	config = ads1x15ConfigOsSingle // Go out of power-down mode for conversion.
-	// Specify mux value.
-	config |= uint16((mux & 0x07) << ads1x15ConfigMuxOffset)
-	// Validate the passed in gain and then set it in the config.
-
-	gainConf, ok := d.gainConfig[gain]
-
-	if !ok {
-		err = errors.New("Gain must be one of: 2/3, 1, 2, 4, 8, 16")
-		return
-	}
-	config |= gainConf
-	// Set the mode (continuous or single shot).
-	config |= ads1x15ConfigModeSingle
-	// Get the default data rate if none is specified (default differs between
-	// ADS1015 and ADS1115).
-	dataRateConf, ok := d.dataRates[dataRate]
-
-	if !ok {
-		keys := []int{}
-		for k := range d.dataRates {
-			keys = append(keys, k)
-		}
-
-		err = fmt.Errorf("Invalid data rate. Accepted values: %d", keys)
-		return
-	}
-	// Set the data rate (this is controlled by the subclass as it differs
-	// between ADS1015 and ADS1115).
-	config |= dataRateConf
-	config |= ads1x15ConfigCompQueDisable // Disable comparator mode.
-
-	// Send the config value to start the ADC conversion.
-	// Explicitly break the 16-bit value down to a big endian pair of bytes.
-	if _, err = d.connection.Write([]byte{ads1x15PointerConfig, byte((config >> 8) & 0xFF), byte(config & 0xFF)}); err != nil {
-		return
-	}
-
-	// Wait for the ADC sample to finish based on the sample rate plus a
-	// small offset to be sure (0.1 millisecond).
-	time.Sleep(time.Duration(1000000/dataRate+100) * time.Microsecond)
-
-	// Retrieve the result.
-	if _, err = d.connection.Write([]byte{ads1x15PointerConversion}); err != nil {
-		return
-	}
-
-	data := make([]byte, 2)
-	_, err = d.connection.Read(data)
-	if err != nil {
-		return
-	}
-
-	voltageMultiplier, ok := d.gainVoltage[gain]
-
-	if !ok {
-		err = errors.New("Gain must be one of: 2/3, 1, 2, 4, 8, 16")
-		return
-	}
-
-	value = d.converter(data) * voltageMultiplier
-
-	return
-}
-
-func (d *ADS1x15Driver) checkChannel(channel int) (err error) {
-	if channel < 0 || channel > 3 {
-		err = errors.New("Invalid channel, must be between 0 and 3")
-	}
 	return
 }

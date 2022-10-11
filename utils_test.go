@@ -27,19 +27,19 @@ func TestEvery(t *testing.T) {
 func TestEveryWhenStopped(t *testing.T) {
 	sem := make(chan bool)
 
-	done := Every(50*time.Millisecond, func() {
+	done := Every(100*time.Millisecond, func() {
 		sem <- true
 	})
 
 	select {
 	case <-sem:
 		done.Stop()
-	case <-time.After(70 * time.Millisecond):
+	case <-time.After(120 * time.Millisecond):
 		t.Errorf("Every was not called")
 	}
 
 	select {
-	case <-time.After(70 * time.Millisecond):
+	case <-time.After(120 * time.Millisecond):
 	case <-sem:
 		t.Error("Every should have stopped")
 	}
