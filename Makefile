@@ -3,7 +3,7 @@ ALL_EXAMPLES := $(shell grep -l -r --include "*.go" 'build example' ./)
 # prevent examples with joystick (sdl2) and gocv (opencv) dependencies
 EXAMPLES := $(shell grep -L 'joystick' $$(grep -L 'gocv' $(ALL_EXAMPLES)))
 
-.PHONY: test test_race test_cover robeaux version_check fmt_check fmt_fix examples $(EXAMPLES)
+.PHONY: test test_race test_cover robeaux version_check fmt_check fmt_fix examples examples_check $(EXAMPLES)
 
 # opencv platform currently skipped to prevent install of preconditions
 including_except := $(shell go list ./... | grep -v platforms/opencv)
@@ -59,5 +59,12 @@ fmt_fix: version_check
 
 examples: $(EXAMPLES)
 
+examples_check: 
+	$(MAKE) CHECK=ON examples
+
 $(EXAMPLES):
+ifeq ($(CHECK),ON)
+	go vet ./$@
+else
 	go build -o /tmp/gobot_examples/$@ ./$@
+endif
