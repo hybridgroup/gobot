@@ -213,7 +213,7 @@ func (b *Adaptor) PWMPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
 	}
 
 	if b.pwmPins[pin] == nil {
-		newPin := sysfs.NewPWMPin(pinInfo.channel)
+		newPin := sysfs.NewPWMPin(0, pinInfo.channel)
 		if err = muxPin(pin, "pwm"); err != nil {
 			return
 		}

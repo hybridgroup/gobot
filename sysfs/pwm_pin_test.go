@@ -22,7 +22,7 @@ func TestPwmPin(t *testing.T) {
 
 	SetFilesystem(fs)
 
-	pin := NewPWMPin(10)
+	pin := NewPWMPin(0, 10)
 	gobottest.Assert(t, pin.pin, "10")
 
 	err := pin.Unexport()
@@ -74,7 +74,7 @@ func TestPwmPinAlreadyExported(t *testing.T) {
 
 	SetFilesystem(fs)
 
-	pin := NewPWMPin(10)
+	pin := NewPWMPin(0, 10)
 	pin.write = func(string, []byte) (int, error) {
 		return 0, &os.PathError{Err: syscall.EBUSY}
 	}
@@ -94,7 +94,7 @@ func TestPwmPinExportError(t *testing.T) {
 
 	SetFilesystem(fs)
 
-	pin := NewPWMPin(10)
+	pin := NewPWMPin(0, 10)
 	pin.write = func(string, []byte) (int, error) {
 		return 0, &os.PathError{Err: syscall.EFAULT}
 	}
@@ -114,7 +114,7 @@ func TestPwmPinUnxportError(t *testing.T) {
 
 	SetFilesystem(fs)
 
-	pin := NewPWMPin(10)
+	pin := NewPWMPin(0, 10)
 	pin.write = func(string, []byte) (int, error) {
 		return 0, &os.PathError{Err: syscall.EBUSY}
 	}
@@ -133,7 +133,7 @@ func TestPwmPinPeriodError(t *testing.T) {
 
 	SetFilesystem(fs)
 
-	pin := NewPWMPin(10)
+	pin := NewPWMPin(0, 10)
 	pin.read = func(string) ([]byte, error) {
 		return nil, &os.PathError{Err: syscall.EBUSY}
 	}
@@ -153,7 +153,7 @@ func TestPwmPinPolarityError(t *testing.T) {
 
 	SetFilesystem(fs)
 
-	pin := NewPWMPin(10)
+	pin := NewPWMPin(0, 10)
 	pin.read = func(string) ([]byte, error) {
 		return nil, &os.PathError{Err: syscall.EBUSY}
 	}
@@ -173,7 +173,7 @@ func TestPwmPinDutyCycleError(t *testing.T) {
 
 	SetFilesystem(fs)
 
-	pin := NewPWMPin(10)
+	pin := NewPWMPin(0, 10)
 	pin.read = func(string) ([]byte, error) {
 		return nil, &os.PathError{Err: syscall.EBUSY}
 	}

@@ -175,7 +175,7 @@ func (c *Adaptor) PWMPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
 	sysPin := c.pinmap[pin]
 	if sysPin.pwmPin != -1 {
 		if c.pwmPins[sysPin.pwmPin] == nil {
-			newPin := sysfs.NewPWMPin(sysPin.pwmPin)
+			newPin := sysfs.NewPWMPin(0, sysPin.pwmPin)
 			if err = newPin.Export(); err != nil {
 				return
 			}
