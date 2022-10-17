@@ -46,13 +46,17 @@ type PWMPin struct {
 }
 
 // NewPwmPin returns a new pwmPin
-func NewPWMPin(pin int) *PWMPin {
-	return &PWMPin{
+func NewPWMPin(chip int, pin int) *PWMPin {
+	pwmpin := PWMPin{
 		pin:     strconv.Itoa(pin),
 		enabled: false,
-		Path:    "/sys/class/pwm/pwmchip0",
+		Path:    "/sys/class/pwm/pwmchip",
 		read:    readPwmFile,
 		write:   writePwmFile}
+
+	pwmpin.Path = pwmpin.Path + strconv.Itoa(chip)
+
+	return &pwmpin
 }
 
 // Export writes pin to pwm export path
