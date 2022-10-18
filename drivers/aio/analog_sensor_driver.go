@@ -29,8 +29,8 @@ type AnalogSensorDriver struct {
 // 	time.Duration: Interval at which the AnalogSensor is polled for new information
 //
 // Adds the following API Commands:
-// 	"Read"      - See AnalogDriverSensor.Read
-// 	"ReadValue" - See AnalogDriverSensor.ReadValue
+// 	"Read"    - See AnalogDriverSensor.Read
+// 	"ReadRaw" - See AnalogDriverSensor.ReadRaw
 func NewAnalogSensorDriver(a AnalogReader, pin string, v ...time.Duration) *AnalogSensorDriver {
 	d := &AnalogSensorDriver{
 		name:       gobot.DefaultName("AnalogSensor"),
@@ -56,8 +56,8 @@ func NewAnalogSensorDriver(a AnalogReader, pin string, v ...time.Duration) *Anal
 		return map[string]interface{}{"val": val, "err": err}
 	})
 
-	d.AddCommand("ReadValue", func(params map[string]interface{}) interface{} {
-		val, err := d.ReadValue()
+	d.AddCommand("ReadRaw", func(params map[string]interface{}) interface{} {
+		val, err := d.ReadRaw()
 		return map[string]interface{}{"val": val, "err": err}
 	})
 
@@ -80,7 +80,7 @@ func (a *AnalogSensorDriver) Start() (err error) {
 		timer := time.NewTimer(a.interval)
 		timer.Stop()
 		for {
-			_, err := a.ReadValue()
+			_, err := a.Read()
 			if err != nil {
 				a.Publish(a.Event(Error), err)
 			} else {
@@ -128,23 +128,23 @@ func (a *AnalogSensorDriver) Pin() string { return a.pin }
 // Connection returns the AnalogSensorDrivers Connection
 func (a *AnalogSensorDriver) Connection() gobot.Connection { return a.connection.(gobot.Connection) }
 
-// Read returns the current reading from the sensor without scaling
-func (a *AnalogSensorDriver) Read() (val int, err error) {
+// Read returns the current reading from the sensor
+func (a *AnalogSensorDriver) Read() (val float64, err error) {
+	if a.rawValue, err = a.ReadRaw(); err != nil {
+		return
+	}
+	a.value = a.scale(a.rawValue)
+	return a.value, nil
+}
+
+// ReadRaw returns the current reading from the sensor without scaling
+func (a *AnalogSensorDriver) ReadRaw() (val int, err error) {
 	return a.connection.AnalogRead(a.Pin())
 }
 
 // SetScaler substitute the default 1:1 return value function by a new scaling function
 func (a *AnalogSensorDriver) SetScaler(scaler func(int) float64) {
 	a.scale = scaler
-}
-
-// ReadValue returns the current reading from the sensor
-func (a *AnalogSensorDriver) ReadValue() (val float64, err error) {
-	if a.rawValue, err = a.Read(); err != nil {
-		return
-	}
-	a.value = a.scale(a.rawValue)
-	return a.value, nil
 }
 
 // Value returns the last read value from the sensor

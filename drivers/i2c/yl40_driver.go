@@ -241,13 +241,13 @@ func (y *YL40Driver) Halt() (err error) {
 func (y *YL40Driver) Read(pin YL40Pin) (val float64, err error) {
 	switch pin {
 	case YL40Bri:
-		return y.aBri.ReadValue()
+		return y.aBri.Read()
 	case YL40Temp:
-		return y.aTemp.ReadValue()
+		return y.aTemp.Read()
 	case YL40AIN2:
-		return y.aAIN2.ReadValue()
+		return y.aAIN2.Read()
 	case YL40Poti:
-		return y.aPoti.ReadValue()
+		return y.aPoti.Read()
 	case YL40AOUT:
 		return y.aOut.Value(), nil
 	default:

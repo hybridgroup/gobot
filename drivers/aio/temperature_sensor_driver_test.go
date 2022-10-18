@@ -46,7 +46,7 @@ func TestTemperatureSensorDriverNtcScaling(t *testing.T) {
 				return
 			})
 			// act
-			got, err := d.ReadValue()
+			got, err := d.Read()
 			// assert
 			gobottest.Assert(t, err, nil)
 			gobottest.Assert(t, got, tt.want)
@@ -81,7 +81,7 @@ func TestTemperatureSensorDriverLinearScaling(t *testing.T) {
 				return
 			})
 			// act
-			got, err := d.ReadValue()
+			got, err := d.Read()
 			// assert
 			gobottest.Assert(t, err, nil)
 			gobottest.Assert(t, got, tt.want)
