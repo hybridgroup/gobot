@@ -88,7 +88,7 @@ func TestMqttAdaptorConnectSSLError(t *testing.T) {
 func TestMqttAdaptorConnectWithAuthError(t *testing.T) {
 	a := NewAdaptorWithAuth("xyz://localhost:1883", "client", "user", "pass")
 	var expected error
-	expected = multierror.Append(expected, errors.New("Network Error : Unknown protocol"))
+	expected = multierror.Append(expected, errors.New("network Error : unknown protocol"))
 
 	gobottest.Assert(t, a.Connect(), expected)
 }
