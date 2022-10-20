@@ -10,6 +10,7 @@ import (
 	"net"
 	"strconv"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"gobot.io/x/gobot"
@@ -133,42 +134,45 @@ const (
 	VideoBitRate4M VideoBitRate = 5
 )
 
-// FlightData packet returned by the Tello
+// FlightData packet returned by the Tello.
+//
+// The meaning of some fields is not documented. If you learned more, please, contribute.
+// See https://github.com/hybridgroup/gobot/issues/798.
 type FlightData struct {
 	BatteryLow               bool
 	BatteryLower             bool
-	BatteryPercentage        int8
-	BatteryState             bool
+	BatteryPercentage        int8 // How much battery left [in %].
 	CameraState              int8
-	DownVisualState          bool
 	DroneBatteryLeft         int16
 	DroneFlyTimeLeft         int16
-	DroneHover               bool
+	DroneHover               bool // If the drone is in the air and not moving.
 	EmOpen                   bool
-	Flying                   bool
-	OnGround                 bool
-	EastSpeed                int16
+	Flying                   bool  // If the drone is currently in the air.
+	OnGround                 bool  // If the drone is currently on the ground.
+	EastSpeed                int16 // Movement speed towards East [in cm/s]. Negative if moving west.
 	ElectricalMachineryState int16
 	FactoryMode              bool
 	FlyMode                  int8
-	FlyTime                  int16
+	FlyTime                  int16 // How long since take off [in s/10].
 	FrontIn                  bool
 	FrontLSC                 bool
 	FrontOut                 bool
 	GravityState             bool
-	VerticalSpeed            int16
-	Height                   int16
-	ImuCalibrationState      int8
-	ImuState                 bool
-	LightStrength            int8
-	NorthSpeed               int16
-	OutageRecording          bool
-	PowerState               bool
-	PressureState            bool
-	SmartVideoExitMode       int16
-	TemperatureHigh          bool
+	VerticalSpeed            int16 // Movement speed up [in cm/s].
+	Height                   int16 // The height [in decimeters].
+	ImuCalibrationState      int8  // The IMU calibration step (when doing IMU calibration).
+	NorthSpeed               int16 // Movement speed towards North [in cm/s]. Negative if moving South.
 	ThrowFlyTimer            int8
-	WindState                bool
+
+	// Warnings:
+	DownVisualState bool // If the ground is visible by the down camera.
+	BatteryState    bool // If there is an issue with battery.
+	ImuState        bool // If drone needs IMU (Inertial Measurement Unit) calibration.
+	OutageRecording bool // If there is an issue with video recording.
+	PowerState      bool // If there is an issue with power supply.
+	PressureState   bool // If there is an issue with air pressure.
+	TemperatureHigh bool // If drone is overheating.
+	WindState       bool // If the wind is too strong.
 }
 
 // WifiData packet returned by the Tello
@@ -191,7 +195,8 @@ type Driver struct {
 	throttle       int
 	bouncing       bool
 	gobot.Eventer
-	doneCh chan struct{}
+	doneCh            chan struct{}
+	doneChReaderCount int32
 }
 
 // NewDriver creates a driver for the Tello drone. Pass in the UDP port to use for the responses
@@ -280,7 +285,10 @@ func (d *Driver) Start() error {
 	d.cmdConn = cmdConn
 
 	// handle responses
+	d.addDoneChReaderCount(1)
 	go func() {
+		defer d.addDoneChReaderCount(-1)
+
 		d.On(d.Event(ConnectedEvent), func(interface{}) {
 			d.SendDateTime()
 			d.processVideo()
@@ -304,13 +312,22 @@ func (d *Driver) Start() error {
 	d.SendCommand(d.connectionString())
 
 	// send stick commands
+	d.addDoneChReaderCount(1)
 	go func() {
+		defer d.addDoneChReaderCount(-1)
+
+	stickCmdLoop:
 		for {
-			err := d.SendStickCommand()
-			if err != nil {
-				fmt.Println("stick command error:", err)
+			select {
+			case <-d.doneCh:
+				break stickCmdLoop
+			default:
+				err := d.SendStickCommand()
+				if err != nil {
+					fmt.Println("stick command error:", err)
+				}
+				time.Sleep(20 * time.Millisecond)
 			}
-			time.Sleep(20 * time.Millisecond)
 		}
 	}()
 
@@ -320,14 +337,23 @@ func (d *Driver) Start() error {
 // Halt stops the driver.
 func (d *Driver) Halt() (err error) {
 	// send a landing command when we disconnect, and give it 500ms to be received before we shutdown
-	d.Land()
-	d.doneCh <- struct{}{}
+	if d.cmdConn != nil {
+		d.Land()
+	}
 	time.Sleep(500 * time.Millisecond)
 
-	d.cmdConn.Close()
+	if d.cmdConn != nil {
+		d.cmdConn.Close()
+	}
+
 	if d.videoConn != nil {
 		d.videoConn.Close()
 	}
+	readerCount := atomic.LoadInt32(&d.doneChReaderCount)
+	for i := 0; i < int(readerCount); i++ {
+		d.doneCh <- struct{}{}
+	}
+
 	return
 }
 
@@ -946,7 +972,10 @@ func (d *Driver) processVideo() error {
 		return err
 	}
 
+	d.addDoneChReaderCount(1)
 	go func() {
+		defer d.addDoneChReaderCount(-1)
+
 	videoConnLoop:
 		for {
 			select {
@@ -987,6 +1016,10 @@ func (d *Driver) connectionString() string {
 	binary.LittleEndian.PutUint16(b[:], uint16(x))
 	res := fmt.Sprintf("conn_req:%s", b)
 	return res
+}
+
+func (d *Driver) addDoneChReaderCount(delta int32) {
+	atomic.AddInt32(&d.doneChReaderCount, delta)
 }
 
 func (f *FlightData) AirSpeed() float64 {

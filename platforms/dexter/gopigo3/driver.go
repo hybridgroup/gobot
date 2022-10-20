@@ -325,7 +325,13 @@ func (g *Driver) SetServo(srvo Servo, us uint16) error {
 }
 
 // ServoWrite writes an angle (0-180) to the given servo (servo 1 or servo 2).
-func (g *Driver) ServoWrite(srvo Servo, angle byte) error {
+// Must implement the ServoWriter interface of gpio package.
+func (g *Driver) ServoWrite(port string, angle byte) error {
+	srvo := SERVO_1 // default for unknown ports
+	if port == "2" || port == "SERVO_2" {
+		srvo = SERVO_2
+	}
+
 	pulseWidthRange := 1850
 	if angle > 180 {
 		angle = 180

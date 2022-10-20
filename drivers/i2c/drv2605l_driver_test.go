@@ -61,11 +61,16 @@ func TestDRVD2605DriverStartReadError(t *testing.T) {
 }
 
 func TestDRV2605LDriverHalt(t *testing.T) {
+	writeStopPlaybackData := []byte{drv2605RegGo, 0}
+	// single-byte-read starts with a write operation to set the register for reading
+	// see section 8.5.3.5 of data sheet
+	readCurrentStandbyModeData := byte(drv2605RegMode)
+	writeNewStandbyModeData := []byte{drv2605RegMode, 42 | drv2605Standby}
 	d, adaptor := initTestDriverAndAdaptor()
 	gobottest.Assert(t, d.Start(), nil)
 	adaptor.written = []byte{}
 	gobottest.Assert(t, d.Halt(), nil)
-	gobottest.Assert(t, adaptor.written, []byte{drv2605RegGo, 0, drv2605RegMode, 42 | drv2605Standby})
+	gobottest.Assert(t, adaptor.written, append(append(writeStopPlaybackData, readCurrentStandbyModeData), writeNewStandbyModeData...))
 }
 
 func TestDRVD2605DriverHaltWriteError(t *testing.T) {

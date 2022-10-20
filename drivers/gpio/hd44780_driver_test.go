@@ -157,10 +157,10 @@ func TestHD44780DriverSetCursor(t *testing.T) {
 func TestHD44780DriverSetCursorInvalid(t *testing.T) {
 	d := initTestHD44780Driver()
 	d.Start()
-	gobottest.Assert(t, d.SetCursor(-1, 3), errors.New("Invalid position value"))
-	gobottest.Assert(t, d.SetCursor(2, 3), errors.New("Invalid position value"))
-	gobottest.Assert(t, d.SetCursor(0, -1), errors.New("Invalid position value"))
-	gobottest.Assert(t, d.SetCursor(0, 16), errors.New("Invalid position value"))
+	gobottest.Assert(t, d.SetCursor(-1, 3), errors.New("Invalid position value (-1, 3), range (1, 15)"))
+	gobottest.Assert(t, d.SetCursor(2, 3), errors.New("Invalid position value (2, 3), range (1, 15)"))
+	gobottest.Assert(t, d.SetCursor(0, -1), errors.New("Invalid position value (0, -1), range (1, 15)"))
+	gobottest.Assert(t, d.SetCursor(0, 16), errors.New("Invalid position value (0, 16), range (1, 15)"))
 }
 
 func TestHD44780DriverDisplayOn(t *testing.T) {

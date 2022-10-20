@@ -57,7 +57,7 @@ func main() {
 	}
 
 	robot := gobot.NewRobot("Max7219Bot",
-		[]gobot.Connection{esp8266},
+		[]gobot.Connection{firmataAdaptor},
 		[]gobot.Device{max},
 		work,
 	)

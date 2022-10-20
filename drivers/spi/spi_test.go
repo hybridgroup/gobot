@@ -1,9 +1,9 @@
 package spi
 
 import (
-	"periph.io/x/periph/conn"
-	"periph.io/x/periph/conn/physic"
-	xspi "periph.io/x/periph/conn/spi"
+	"periph.io/x/conn/v3"
+	"periph.io/x/conn/v3/physic"
+	xspi "periph.io/x/conn/v3/spi"
 )
 
 type TestConnector struct{}

@@ -4,6 +4,8 @@ import (
 	"errors"
 	"io/ioutil"
 	"os"
+	"path"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -134,8 +136,8 @@ func (fs *MockFilesystem) Stat(name string) (os.FileInfo, error) {
 	dirName := name + "/"
 	for path := range fs.Files {
 		if strings.HasPrefix(path, dirName) {
-			// return dir based mock FileInfo
-			tmpDir, err := ioutil.TempDir("", name)
+			// return dir based mock FileInfo, TempDir don't like "/" in between
+			tmpDir, err := ioutil.TempDir("", strings.ReplaceAll(name, "/", "_"))
 			if err != nil {
 				return nil, err
 			}
@@ -146,6 +148,30 @@ func (fs *MockFilesystem) Stat(name string) (os.FileInfo, error) {
 	}
 
 	return nil, &os.PathError{Err: errors.New(name + ": No such file.")}
+}
+
+// Find returns all items (files or folders) below the given directory matching the given pattern.
+func (fs *MockFilesystem) Find(baseDir string, pattern string) ([]string, error) {
+	reg, err := regexp.Compile(pattern)
+	if err != nil {
+		return nil, err
+	}
+
+	var found []string
+	for name, _ := range fs.Files {
+		if !strings.HasPrefix(name, baseDir) {
+			continue
+		}
+		item := name[len(baseDir):]
+		if strings.HasPrefix(item, "/") {
+			item = item[1:]
+		}
+		firstItem := strings.Split(item, "/")[0]
+		if reg.MatchString(firstItem) {
+			found = append(found, path.Join(baseDir, firstItem))
+		}
+	}
+	return found, nil
 }
 
 // Add adds a new file to fs.Files given a name, and returns the newly created file

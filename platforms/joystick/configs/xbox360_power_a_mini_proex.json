@@ -19,8 +19,28 @@
         },
         {
             "hat": 0,
+            "name": "upLeft",
+            "id": 9
+        },
+        {
+            "hat": 0,
+            "name": "downLeft",
+            "id": 12
+        },
+        {
+            "hat": 0,
             "name": "right",
             "id": 2
+        },
+        {
+            "hat": 0,
+            "name": "upRight",
+            "id": 3
+        },
+        {
+            "hat": 0,
+            "name": "downRight",
+            "id": 6
         },
         {
             "hat": 0,

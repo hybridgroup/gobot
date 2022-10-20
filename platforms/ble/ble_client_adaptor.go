@@ -12,7 +12,6 @@ import (
 	"tinygo.org/x/bluetooth"
 )
 
-//var currentDevice *blelib.Device
 var currentAdapter *bluetooth.Adapter
 var bleMutex sync.Mutex
 

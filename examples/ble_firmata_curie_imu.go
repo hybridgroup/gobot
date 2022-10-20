@@ -25,7 +25,8 @@ import (
 )
 
 func main() {
-	firmataAdaptor := firmata.NewBLEAdaptor(os.Args[1])
+	var bleAdaptor interface{} = firmata.NewBLEAdaptor(os.Args[1])
+	firmataAdaptor := bleAdaptor.(*firmata.Adaptor)
 	led := gpio.NewLedDriver(firmataAdaptor, "13")
 	imu := curie.NewIMUDriver(firmataAdaptor)
 

@@ -12,6 +12,7 @@ go get -d -u gobot.io/x/gobot/...
 ## Hardware Support
 Gobot has a extensible system for connecting to hardware devices. The following i2c devices are currently supported:
 
+- Adafruit 2x16 RGB-LCD with 5 keys
 - Adafruit Motor Hat
 - ADS1015 Analog to Digital Converter
 - ADS1115 Analog to Digital Converter
@@ -23,25 +24,29 @@ Gobot has a extensible system for connecting to hardware devices. The following 
 - BMP280 Barometric Pressure/Temperature/Altitude Sensor
 - BMP388 Barometric Pressure/Temperature/Altitude Sensor
 - DRV2605L Haptic Controller
+- Generic driver for read and write values to/from register address
 - Grove Digital Accelerometer
 - GrovePi Expansion Board
 - Grove RGB LCD
 - HMC6352 Compass
-- HMC8553L 3-Axis Digital Compass
+- HMC5883L 3-Axis Digital Compass
 - INA3221 Voltage Monitor
 - JHD1313M1 LCD Display w/RGB Backlight
 - L3GD20H 3-Axis Gyroscope
 - LIDAR-Lite
 - MCP23017 Port Expander
 - MMA7660 3-Axis Accelerometer
-- MPL115A2 Barometer
+- MPL115A2 Barometric Pressure/Temperature
 - MPU6050 Accelerometer/Gyroscope
+- PCA9501 8-bit I/O port with interrupt, 2-kbit EEPROM
 - PCA9685 16-channel 12-bit PWM/Servo Driver
+- PCF8591 8-bit 4xA/D & 1xD/A converter
 - SHT2x Temperature/Humidity
 - SHT3x-D Temperature/Humidity
 - SSD1306 OLED Display Controller
 - TSL2561 Digital Luminosity/Lux/Light Sensor
 - Wii Nunchuck Controller
+- YL-40 Brightness/Temperature sensor, Potentiometer, analog input, analog output Driver
 
 More drivers are coming soon...
 
