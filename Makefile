@@ -1,7 +1,11 @@
 # include also examples in other than ./examples folder
 ALL_EXAMPLES := $(shell grep -l -r --include "*.go" 'build example' ./)
+# prevent examples with gocv (opencv) dependencies
+EXAMPLES_NO_GOCV := $(shell grep -L 'gocv' $(ALL_EXAMPLES))
 # prevent examples with joystick (sdl2) and gocv (opencv) dependencies
-EXAMPLES := $(shell grep -L 'joystick' $$(grep -L 'gocv' $(ALL_EXAMPLES)))
+EXAMPLES_NO_GOCV_JOYSTICK := $(shell grep -L 'joystick' $$(grep -L 'gocv' $(EXAMPLES_NO_GOCV)))
+# used examples
+EXAMPLES := $(EXAMPLES_NO_GOCV)
 
 .PHONY: test test_race test_cover robeaux version_check fmt_check fmt_fix examples examples_check $(EXAMPLES)
 

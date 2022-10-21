@@ -20,14 +20,14 @@ const (
 	// TFlightHotasX flight stick configuration.
 	TFlightHotasX = "tflightHotasX"
 
-	// Xbox360 joystick configuration.
+	// Configuration for Xbox 360 controller.
 	Xbox360 = "xbox360"
 
 	// Xbox360RockBandDrums controller configuration.
 	Xbox360RockBandDrums = "xbox360RockBandDrums"
 
-	// Nvidia Shield TV Controller
-	Shield = "shield"
+	// Configuration for the Xbox One controller.
+	XboxOne = "xboxOne"
 )
 
 // Driver represents a joystick
@@ -116,18 +116,18 @@ func (j *Driver) adaptor() *Adaptor {
 //		[axis]
 func (j *Driver) Start() (err error) {
 	switch j.configPath {
-	case "dualshock3":
+	case Dualshock3:
 		j.config = dualshock3Config
-	case "dualshock4":
+	case Dualshock4:
 		j.config = dualshock4Config
-	case "tflightHotasX":
+	case TFlightHotasX:
 		j.config = tflightHotasXConfig
-	case "xbox360":
+	case Xbox360:
 		j.config = xbox360Config
-	case "xbox360RockBandDrums":
+	case Xbox360RockBandDrums:
 		j.config = xbox360RockBandDrumsConfig
-	case "shield":
-		j.config = shieldConfig
+	case XboxOne:
+		j.config = xboxOneConfig
 	default:
 		err := j.loadFile()
 		if err != nil {
