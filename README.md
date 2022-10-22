@@ -288,6 +288,7 @@ drivers provided using the `gobot/drivers/i2c` package:
 	- MPU6050 Accelerometer/Gyroscope
 	- PCA9501 8-bit I/O port with interrupt, 2-kbit EEPROM
 	- PCA9685 16-channel 12-bit PWM/Servo Driver
+	- PCF8583 clock and calendar or event counter, 240 x 8-bit RAM
 	- PCF8591 8-bit 4xA/D & 1xD/A converter
 	- SHT2x Temperature/Humidity
 	- SHT3x-D Temperature/Humidity
