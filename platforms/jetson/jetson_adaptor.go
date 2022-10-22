@@ -3,7 +3,6 @@ package jetson
 import (
 	"errors"
 	"fmt"
-
 	"sync"
 
 	multierror "github.com/hashicorp/go-multierror"
@@ -130,20 +129,6 @@ func (j *Adaptor) DigitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPinn
 	return currentPin, nil
 }
 
-func (j *Adaptor) getExportedDigitalPin(translatedPin int, dir string) (sysfsPin sysfs.DigitalPinner, err error) {
-	j.mutex.Lock()
-	defer j.mutex.Unlock()
-
-	if j.digitalPins[translatedPin] == nil {
-		j.digitalPins[translatedPin] = sysfs.NewDigitalPin(translatedPin)
-		if err = j.digitalPins[translatedPin].Export(); err != nil {
-			return
-		}
-	}
-
-	return j.digitalPins[translatedPin], nil
-}
-
 // DigitalRead reads digital value from pin
 func (j *Adaptor) DigitalRead(pin string) (val int, err error) {
 	sysfsPin, err := j.DigitalPin(pin, sysfs.IN)
@@ -172,17 +157,6 @@ func (j *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection
 	device, err := j.getI2cBus(bus)
 
 	return i2c.NewConnection(device, address), err
-}
-
-func (j *Adaptor) getI2cBus(bus int) (_ i2c.I2cDevice, err error) {
-	j.mutex.Lock()
-	defer j.mutex.Unlock()
-
-	if j.i2cBuses[bus] == nil {
-		j.i2cBuses[bus], err = sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
-	}
-
-	return j.i2cBuses[bus], err
 }
 
 // GetDefaultBus returns the default i2c bus for this platform
@@ -232,18 +206,6 @@ func (j *Adaptor) GetSpiDefaultMaxSpeed() int64 {
 	return j.spiDefaultMaxSpeed
 }
 
-func (j *Adaptor) translatePin(pin string) (i int, err error) {
-	if val, ok := pins[pin][j.revision]; ok {
-		i = val
-	} else if val, ok := pins[pin]["*"]; ok {
-		i = val
-	} else {
-		err = errors.New("Not a valid pin")
-		return
-	}
-	return
-}
-
 //PWMPin returns a Jetson Nano. PWMPin which provides the sysfs.PWMPinner interface
 func (j *Adaptor) PWMPin(pin string) (JetsonPWMPin sysfs.PWMPinner, err error) {
 	i, err := j.translatePin(pin)
@@ -288,4 +250,41 @@ func (j *Adaptor) ServoWrite(pin string, angle byte) (err error) {
 
 	duty := uint32(gobot.FromScale(float64(angle), 0, 180) * float64(j.JSBlasterPeriod))
 	return sysfsPin.SetDutyCycle(duty)
+}
+
+func (j *Adaptor) getExportedDigitalPin(translatedPin int, dir string) (sysfsPin sysfs.DigitalPinner, err error) {
+	j.mutex.Lock()
+	defer j.mutex.Unlock()
+
+	if j.digitalPins[translatedPin] == nil {
+		j.digitalPins[translatedPin] = sysfs.NewDigitalPin(translatedPin)
+		if err = j.digitalPins[translatedPin].Export(); err != nil {
+			return
+		}
+	}
+
+	return j.digitalPins[translatedPin], nil
+}
+
+func (j *Adaptor) getI2cBus(bus int) (_ i2c.I2cDevice, err error) {
+	j.mutex.Lock()
+	defer j.mutex.Unlock()
+
+	if j.i2cBuses[bus] == nil {
+		j.i2cBuses[bus], err = sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
+	}
+
+	return j.i2cBuses[bus], err
+}
+
+func (j *Adaptor) translatePin(pin string) (i int, err error) {
+	if val, ok := pins[pin][j.revision]; ok {
+		i = val
+	} else if val, ok := pins[pin]["*"]; ok {
+		i = val
+	} else {
+		err = errors.New("Not a valid pin")
+		return
+	}
+	return
 }
