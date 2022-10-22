@@ -32,7 +32,7 @@ func initTestAdaptor() *Adaptor {
 	return a
 }
 
-func TestRaspiAdaptorName(t *testing.T) {
+func TestJetsonAdaptorName(t *testing.T) {
 	a := initTestAdaptor()
 	gobottest.Assert(t, strings.HasPrefix(a.Name(), "JetsonNano"), true)
 	a.SetName("NewName")
@@ -74,10 +74,10 @@ func TestAdaptorDigitalIO(t *testing.T) {
 	fs := sysfs.NewMockFilesystem([]string{
 		"/sys/class/gpio/export",
 		"/sys/class/gpio/unexport",
-		"/sys/class/gpio/gpio4/value",
-		"/sys/class/gpio/gpio4/direction",
-		"/sys/class/gpio/gpio27/value",
-		"/sys/class/gpio/gpio27/direction",
+		"/sys/class/gpio/gpio216/value",
+		"/sys/class/gpio/gpio216/direction",
+		"/sys/class/gpio/gpio14/value",
+		"/sys/class/gpio/gpio14/direction",
 	})
 
 	sysfs.SetFilesystem(fs)
@@ -85,18 +85,18 @@ func TestAdaptorDigitalIO(t *testing.T) {
 	a.DigitalWrite("7", 1)
 	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio216/value"].Contents, "1")
 
-	a.DigitalWrite("8", 1)
+	a.DigitalWrite("13", 1)
 	i, _ := a.DigitalRead("13")
 	gobottest.Assert(t, i, 1)
 
 	gobottest.Assert(t, a.DigitalWrite("notexist", 1), errors.New("Not a valid pin"))
 
 	fs.WithReadError = true
-	_, err := a.DigitalRead("8")
+	_, err := a.DigitalRead("7")
 	gobottest.Assert(t, err, errors.New("read error"))
 
 	fs.WithWriteError = true
-	_, err = a.DigitalRead("7")
+	_, err = a.DigitalRead("13")
 	gobottest.Assert(t, err, errors.New("write error"))
 }
 

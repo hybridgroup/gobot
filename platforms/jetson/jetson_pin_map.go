@@ -68,3 +68,8 @@ var pins = map[string]map[string]int{
 		"*": 78,
 	},
 }
+
+var pwms = map[string]string{
+	"32": "0",
+	"33": "2",
+}

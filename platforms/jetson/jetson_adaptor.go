@@ -15,11 +15,11 @@ import (
 
 // Adaptor is the Gobot Adaptor for the Jetson Nano
 type Adaptor struct {
-	mutex       *sync.Mutex
-	name        string
-	revision    string
-	digitalPins map[int]*sysfs.DigitalPin
-	//pwmPins            map[int]*PWMPin
+	mutex              *sync.Mutex
+	name               string
+	revision           string
+	digitalPins        map[int]*sysfs.DigitalPin
+	pwmPins            map[int]*PWMPin
 	i2cDefaultBus      int
 	i2cBuses           [2]i2c.I2cDevice
 	spiDefaultBus      int
@@ -27,17 +27,17 @@ type Adaptor struct {
 	spiDevices         [2]spi.Connection
 	spiDefaultMode     int
 	spiDefaultMaxSpeed int64
-	//JSBlasterPeriod    uint32
+	JSBlasterPeriod    uint32
 }
 
 // NewAdaptor creates a Raspi Adaptor
 func NewAdaptor() *Adaptor {
 	j := &Adaptor{
-		mutex:       &sync.Mutex{},
-		name:        gobot.DefaultName("JetsonNano"),
-		digitalPins: make(map[int]*sysfs.DigitalPin),
-		//pwmPins:         make(map[int]*PWMPin),
-		//JSBlasterPeriod: 10000000,
+		mutex:           &sync.Mutex{},
+		name:            gobot.DefaultName("JetsonNano"),
+		digitalPins:     make(map[int]*sysfs.DigitalPin),
+		pwmPins:         make(map[int]*PWMPin),
+		JSBlasterPeriod: 3000000,
 	}
 
 	j.i2cDefaultBus = 1
@@ -83,15 +83,15 @@ func (j *Adaptor) Finalize() (err error) {
 			}
 		}
 	}
-	/*
-		for _, pin := range r.pwmPins {
-			if pin != nil {
-				if perr := pin.Unexport(); err != nil {
-					err = multierror.Append(err, perr)
-				}
+
+	for _, pin := range j.pwmPins {
+		if pin != nil {
+			if perr := pin.Unexport(); err != nil {
+				err = multierror.Append(err, perr)
 			}
 		}
-	*/
+	}
+
 	for _, bus := range j.i2cBuses {
 		if bus != nil {
 			if e := bus.Close(); e != nil {
@@ -244,45 +244,48 @@ func (j *Adaptor) translatePin(pin string) (i int, err error) {
 	return
 }
 
-/*
-//PWMPin returns a jetson.PWMPin which provides the sysfs.PWMPinner interface
-//
-func (r *Adaptor) PWMPin(pin string) (raspiPWMPin sysfs.PWMPinner, err error) {
-	i, err := r.translatePin(pin)
+//PWMPin returns a Jetson Nano. PWMPin which provides the sysfs.PWMPinner interface
+func (j *Adaptor) PWMPin(pin string) (JetsonPWMPin sysfs.PWMPinner, err error) {
+	i, err := j.translatePin(pin)
 	if err != nil {
 		return
 	}
+	j.mutex.Lock()
+	defer j.mutex.Unlock()
 
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
-
-	if r.pwmPins[i] == nil {
-		r.pwmPins[i] = NewPWMPin(strconv.Itoa(i))
-		r.pwmPins[i].SetPeriod(r.JSBlasterPeriod)
+	if j.pwmPins[i] != nil {
+		return j.pwmPins[i], nil
 	}
 
-	return r.pwmPins[i], nil
+	j.pwmPins[i], err = NewPWMPin(pin)
+	if err != nil {
+		return
+	}
+	j.pwmPins[i].Export()
+	j.pwmPins[i].SetPeriod(j.JSBlasterPeriod)
+	j.pwmPins[i].Enable(true)
+
+	return j.pwmPins[i], nil
 }
 
 // PwmWrite writes a PWM signal to the specified pin
-func (r *Adaptor) PwmWrite(pin string, val byte) (err error) {
-	sysfsPin, err := r.PWMPin(pin)
+func (j *Adaptor) PwmWrite(pin string, val byte) (err error) {
+	sysfsPin, err := j.PWMPin(pin)
 	if err != nil {
 		return err
 	}
 
-	duty := uint32(gobot.FromScale(float64(val), 0, 255) * float64(r.JSBlasterPeriod))
+	duty := uint32(gobot.FromScale(float64(val), 0, 255) * float64(j.JSBlasterPeriod))
 	return sysfsPin.SetDutyCycle(duty)
 }
 
 // ServoWrite writes a servo signal to the specified pin
-func (r *Adaptor) ServoWrite(pin string, angle byte) (err error) {
-	sysfsPin, err := r.PWMPin(pin)
+func (j *Adaptor) ServoWrite(pin string, angle byte) (err error) {
+	sysfsPin, err := j.PWMPin(pin)
 	if err != nil {
 		return err
 	}
 
-	duty := uint32(gobot.FromScale(float64(angle), 0, 180) * float64(r.JSBlasterPeriod))
+	duty := uint32(gobot.FromScale(float64(angle), 0, 180) * float64(j.JSBlasterPeriod))
 	return sysfsPin.SetDutyCycle(duty)
 }
-*/
