@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	JETSON_MINIMUM_PERIOD = 5334
-	MINIMUM_RATE          = 0.05
+	minimumPeriod = 5334
+	minimumRate          = 0.05
 )
 
 // PWMPin is the Jetson Nano implementation of the PWMPinner interface.
