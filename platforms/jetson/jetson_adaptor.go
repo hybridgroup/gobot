@@ -12,6 +12,8 @@ import (
 	"gobot.io/x/gobot/sysfs"
 )
 
+const pwmDefaultPeriod = 3000000
+
 // Adaptor is the Gobot Adaptor for the Jetson Nano
 type Adaptor struct {
 	mutex              *sync.Mutex
@@ -26,17 +28,15 @@ type Adaptor struct {
 	spiDevices         [2]spi.Connection
 	spiDefaultMode     int
 	spiDefaultMaxSpeed int64
-	JSBlasterPeriod    uint32
 }
 
 // NewAdaptor creates a Raspi Adaptor
 func NewAdaptor() *Adaptor {
 	j := &Adaptor{
-		mutex:           &sync.Mutex{},
-		name:            gobot.DefaultName("JetsonNano"),
-		digitalPins:     make(map[int]*sysfs.DigitalPin),
-		pwmPins:         make(map[int]*PWMPin),
-		JSBlasterPeriod: 3000000,
+		mutex:       &sync.Mutex{},
+		name:        gobot.DefaultName("JetsonNano"),
+		digitalPins: make(map[int]*sysfs.DigitalPin),
+		pwmPins:     make(map[int]*PWMPin),
 	}
 
 	j.i2cDefaultBus = 1
@@ -224,7 +224,7 @@ func (j *Adaptor) PWMPin(pin string) (JetsonPWMPin sysfs.PWMPinner, err error) {
 		return
 	}
 	j.pwmPins[i].Export()
-	j.pwmPins[i].SetPeriod(j.JSBlasterPeriod)
+	j.pwmPins[i].SetPeriod(pwmDefaultPeriod)
 	j.pwmPins[i].Enable(true)
 
 	return j.pwmPins[i], nil
@@ -237,7 +237,7 @@ func (j *Adaptor) PwmWrite(pin string, val byte) (err error) {
 		return err
 	}
 
-	duty := uint32(gobot.FromScale(float64(val), 0, 255) * float64(j.JSBlasterPeriod))
+	duty := uint32(gobot.FromScale(float64(val), 0, 255) * float64(pwmDefaultPeriod))
 	return sysfsPin.SetDutyCycle(duty)
 }
 
@@ -248,7 +248,7 @@ func (j *Adaptor) ServoWrite(pin string, angle byte) (err error) {
 		return err
 	}
 
-	duty := uint32(gobot.FromScale(float64(angle), 0, 180) * float64(j.JSBlasterPeriod))
+	duty := uint32(gobot.FromScale(float64(angle), 0, 180) * float64(pwmDefaultPeriod))
 	return sysfsPin.SetDutyCycle(duty)
 }
 
