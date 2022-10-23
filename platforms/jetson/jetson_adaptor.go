@@ -207,7 +207,7 @@ func (j *Adaptor) GetSpiDefaultMaxSpeed() int64 {
 }
 
 //PWMPin returns a Jetson Nano. PWMPin which provides the sysfs.PWMPinner interface
-func (j *Adaptor) PWMPin(pin string) (JetsonPWMPin sysfs.PWMPinner, err error) {
+func (j *Adaptor) PWMPin(pin string) (pwmPin sysfs.PWMPinner, err error) {
 	i, err := j.translatePin(pin)
 	if err != nil {
 		return
