@@ -82,6 +82,11 @@ func (p *PWMPin) Polarity() (polarity string, err error) {
 	return "normal", nil
 }
 
+// SetPolarity does not do anything when using Jetson Nano
+func (p *PWMPin) SetPolarity(value string) (err error) {
+	return nil
+}
+
 // InvertPolarity does not do anything when using Jetson Nano
 func (p *PWMPin) InvertPolarity(invert bool) (err error) {
 	return nil
