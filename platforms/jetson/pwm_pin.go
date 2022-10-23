@@ -11,7 +11,7 @@ import (
 
 const (
 	minimumPeriod = 5334
-	minimumRate          = 0.05
+	minimumRate   = 0.05
 )
 
 // PWMPin is the Jetson Nano implementation of the PWMPinner interface.
@@ -102,7 +102,7 @@ func (p *PWMPin) SetPeriod(period uint32) (err error) {
 		return errors.New("Cannot set the period of individual PWM pins on Jetson")
 	}
 	// JetsonNano Minimum period
-	if period < JETSON_MINIMUM_PERIOD {
+	if period < minimumPeriod {
 		return errors.New("Cannot set the period more Then minimum.")
 	}
 
@@ -138,14 +138,11 @@ func (p *PWMPin) SetDutyCycle(duty uint32) (err error) {
 	rate := gobot.FromScale(float64(p.dc), 0, float64(p.period))
 
 	// never go below minimum allowed duty becuse very short duty
-	if rate < MINIMUM_RATE {
-		duty = uint32(MINIMUM_RATE * float64(p.period) / 100)
+	if rate < minimumRate {
+		duty = uint32(minimumRate * float64(p.period) / 100)
 		p.dc = duty
 	}
-	return p.jetsonBlaster(fmt.Sprintf("%v", duty))
-}
 
-func (p *PWMPin) jetsonBlaster(data string) (err error) {
 	fi, err := sysfs.OpenFile(fmt.Sprintf("/sys/class/pwm/pwmchip0/pwm%s/duty_cycle", p.fn), os.O_WRONLY|os.O_APPEND, 0644)
 	defer fi.Close()
 
@@ -153,7 +150,8 @@ func (p *PWMPin) jetsonBlaster(data string) (err error) {
 		return err
 	}
 
-	_, err = fi.WriteString(data)
+	_, err = fi.WriteString(fmt.Sprintf("%v", duty))
+
 	return
 }
 
