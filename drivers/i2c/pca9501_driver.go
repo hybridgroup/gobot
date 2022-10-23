@@ -13,6 +13,8 @@ const pca9501DefaultAddress = 0x3F // this applies, if all 6 address pins left o
 // PCA9501Driver is a Gobot Driver for the PCA9501 8-bit GPIO & 2-kbit EEPROM with 6 address program pins.
 // 2-kbit EEPROM has 256 byte, means addresses between 0x00-0xFF
 //
+// please refer to data sheet: https://www.nxp.com/docs/en/data-sheet/PCA9501.pdf
+//
 // PCA9501 is the replacement for PCF8574, so this driver should also work for PCF8574 except EEPROM calls
 //
 type PCA9501Driver struct {
