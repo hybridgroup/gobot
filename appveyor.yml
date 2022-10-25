@@ -1,25 +1,19 @@
 version: "{build}"
 
+image: Visual Studio 2019
+
 clone_folder: c:\gopath\src\gobot.io\x\gobot
 
-platform:
-  - MinGW_x64
-
 environment:
+  PATH: C:\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin;%PATH%
   GOPATH: c:\gopath
-  GOROOT: c:\go
-  GOVERSION: 1.15
-  TEST_EXTERNAL: 1
 
-install:
-  - set PATH=%PATH%;C:\mingw-w64\x86_64-7.3.0-posix-seh-rt_v5-rev0\mingw64\bin
-  - echo %PATH%
-  - echo %GOPATH%
+before_test:
   - go version
   - go env
-  - go get -d ./...
 
 build_script:
   - go test -v -cpu=2 .
   - go test -v -cpu=2 ./drivers/...
   - go test -v -cpu=2 ./platforms/firmata/...
+  - go test -v -cpu=2 ./platforms/ble/...

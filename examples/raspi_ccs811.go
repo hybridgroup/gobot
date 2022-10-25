@@ -61,7 +61,7 @@ func main() {
 				temp, _ := ccs811Driver.GetTemperature()
 				fmt.Printf("Temperature %+v \n\n", temp)
 			} else {
-				fmt.Println("New data is not avaliable\n")
+				fmt.Println("New data is not available")
 			}
 		})
 	}

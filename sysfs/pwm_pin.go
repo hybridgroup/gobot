@@ -4,10 +4,23 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"path"
 	"strconv"
 	"syscall"
 	"time"
 )
+
+const (
+	pwmPinErrorPattern    = "%s() failed for pin %s with %v"
+	pwmPinSetErrorPattern = "%s(%v) failed for pin %s with %v"
+)
+
+const (
+	polarityNormal   = "normal"
+	polarityInverted = "inverted"
+)
+
+const pwmDebug = false
 
 // PWMPin is the interface for sysfs PWM interactions
 type PWMPinner interface {
@@ -16,9 +29,12 @@ type PWMPinner interface {
 	// Unexport unexports the pin and releases the pin from the operating system
 	Unexport() error
 	// Enable enables/disables the PWM pin
+	// TODO: rename to "SetEnable(bool)" according to golang style and allow "Enable()" to be the getter function
 	Enable(bool) (err error)
 	// Polarity returns the polarity either normal or inverted
 	Polarity() (polarity string, err error)
+	// SetPolarity writes value to pwm polarity path
+	SetPolarity(value string) (err error)
 	// InvertPolarity sets the polarity to inverted if called with true
 	InvertPolarity(invert bool) (err error)
 	// Period returns the current PWM period for pin
@@ -62,7 +78,7 @@ func (p *PWMPin) Export() error {
 		// If EBUSY then the pin has already been exported
 		e, ok := err.(*os.PathError)
 		if !ok || e.Err != syscall.EBUSY {
-			return err
+			return fmt.Errorf(pwmPinErrorPattern, "Export", p.pin, err)
 		}
 	}
 
@@ -76,8 +92,25 @@ func (p *PWMPin) Export() error {
 
 // Unexport writes pin to pwm unexport path
 func (p *PWMPin) Unexport() (err error) {
-	_, err = p.write(p.pwmUnexportPath(), []byte(p.pin))
+	if _, err = p.write(p.pwmUnexportPath(), []byte(p.pin)); err != nil {
+		err = fmt.Errorf(pwmPinErrorPattern, "Unexport", p.pin, err)
+	}
 	return
+}
+
+// enable returns current enable value
+func (p *PWMPin) enable() (enabled bool, err error) {
+	buf, err := p.read(p.pwmEnablePath())
+	if err != nil {
+		return enabled, fmt.Errorf(pwmPinErrorPattern, "enable", p.pin, err)
+	}
+	if len(buf) == 0 {
+		return enabled, nil
+	}
+
+	v := bytes.TrimRight(buf, "\n")
+	val, e := strconv.Atoi(string(v))
+	return val > 0, e
 }
 
 // Enable writes value to pwm enable path
@@ -88,7 +121,12 @@ func (p *PWMPin) Enable(enable bool) (err error) {
 		if enable {
 			enableVal = 1
 		}
-		_, err = p.write(p.pwmEnablePath(), []byte(fmt.Sprintf("%v", enableVal)))
+		if _, err = p.write(p.pwmEnablePath(), []byte(fmt.Sprintf("%v", enableVal))); err != nil {
+			err = fmt.Errorf(pwmPinSetErrorPattern, "Enable", enable, p.pin, err)
+			if pwmDebug {
+				p.printState()
+			}
+		}
 	}
 	return
 }
@@ -97,34 +135,43 @@ func (p *PWMPin) Enable(enable bool) (err error) {
 func (p *PWMPin) Polarity() (polarity string, err error) {
 	buf, err := p.read(p.pwmPolarityPath())
 	if err != nil {
-		return
+		return polarity, fmt.Errorf(pwmPinErrorPattern, "Polarity", p.pin, err)
 	}
 	if len(buf) == 0 {
 		return "", nil
 	}
 
-	return string(buf), nil
+	return string(bytes.TrimRight(buf, "\n")), nil
 }
 
-// InvertPolarity writes value to pwm polarity path
-func (p *PWMPin) InvertPolarity(invert bool) (err error) {
-	if !p.enabled {
-		polarity := "normal"
-		if invert {
-			polarity = "inverted"
+// SetPolarity writes value to pwm polarity path
+func (p *PWMPin) SetPolarity(value string) (err error) {
+	if p.enabled {
+		return fmt.Errorf("Cannot set PWM polarity when enabled")
+	}
+	if _, err = p.write(p.pwmPolarityPath(), []byte(value)); err != nil {
+		err = fmt.Errorf(pwmPinSetErrorPattern, "SetPolarity", value, p.pin, err)
+		if pwmDebug {
+			p.printState()
 		}
-		_, err = p.write(p.pwmPolarityPath(), []byte(polarity))
-	} else {
-		err = fmt.Errorf("Cannot set PWM polarity when enabled")
 	}
 	return
+}
+
+// InvertPolarity sets the polarity to "inverted" when 'true' is given, otherwise to "normal"
+func (p *PWMPin) InvertPolarity(invert bool) (err error) {
+	polarity := polarityNormal
+	if invert {
+		polarity = polarityInverted
+	}
+	return p.SetPolarity(polarity)
 }
 
 // Period reads from pwm period path and returns value in nanoseconds
 func (p *PWMPin) Period() (period uint32, err error) {
 	buf, err := p.read(p.pwmPeriodPath())
 	if err != nil {
-		return
+		return period, fmt.Errorf(pwmPinErrorPattern, "Period", p.pin, err)
 	}
 	if len(buf) == 0 {
 		return 0, nil
@@ -137,7 +184,12 @@ func (p *PWMPin) Period() (period uint32, err error) {
 
 // SetPeriod sets pwm period in nanoseconds
 func (p *PWMPin) SetPeriod(period uint32) (err error) {
-	_, err = p.write(p.pwmPeriodPath(), []byte(fmt.Sprintf("%v", period)))
+	if _, err = p.write(p.pwmPeriodPath(), []byte(fmt.Sprintf("%v", period))); err != nil {
+		err = fmt.Errorf(pwmPinSetErrorPattern, "SetPeriod", period, p.pin, err)
+		if pwmDebug {
+			p.printState()
+		}
+	}
 	return
 }
 
@@ -145,7 +197,7 @@ func (p *PWMPin) SetPeriod(period uint32) (err error) {
 func (p *PWMPin) DutyCycle() (duty uint32, err error) {
 	buf, err := p.read(p.pwmDutyCyclePath())
 	if err != nil {
-		return
+		return duty, fmt.Errorf(pwmPinErrorPattern, "DutyCycle", p.pin, err)
 	}
 
 	v := bytes.TrimRight(buf, "\n")
@@ -156,38 +208,43 @@ func (p *PWMPin) DutyCycle() (duty uint32, err error) {
 // SetDutyCycle writes value to pwm duty cycle path
 // duty is in nanoseconds
 func (p *PWMPin) SetDutyCycle(duty uint32) (err error) {
-	_, err = p.write(p.pwmDutyCyclePath(), []byte(fmt.Sprintf("%v", duty)))
+	if _, err = p.write(p.pwmDutyCyclePath(), []byte(fmt.Sprintf("%v", duty))); err != nil {
+		err = fmt.Errorf(pwmPinSetErrorPattern, "SetDutyCycle", duty, p.pin, err)
+		if pwmDebug {
+			p.printState()
+		}
+	}
 	return
 }
 
 // pwmExportPath returns export path
 func (p *PWMPin) pwmExportPath() string {
-	return p.Path + "/export"
+	return path.Join(p.Path, "export")
 }
 
 // pwmUnexportPath returns unexport path
 func (p *PWMPin) pwmUnexportPath() string {
-	return p.Path + "/unexport"
+	return path.Join(p.Path, "unexport")
 }
 
 // pwmDutyCyclePath returns duty_cycle path for specified pin
 func (p *PWMPin) pwmDutyCyclePath() string {
-	return p.Path + "/pwm" + p.pin + "/duty_cycle"
+	return path.Join(p.Path, "pwm"+p.pin, "duty_cycle")
 }
 
 // pwmPeriodPath returns period path for specified pin
 func (p *PWMPin) pwmPeriodPath() string {
-	return p.Path + "/pwm" + p.pin + "/period"
+	return path.Join(p.Path, "pwm"+p.pin, "period")
 }
 
 // pwmEnablePath returns enable path for specified pin
 func (p *PWMPin) pwmEnablePath() string {
-	return p.Path + "/pwm" + p.pin + "/enable"
+	return path.Join(p.Path, "pwm"+p.pin, "enable")
 }
 
 // pwmPolarityPath returns polarity path for specified pin
 func (p *PWMPin) pwmPolarityPath() string {
-	return p.Path + "/pwm" + p.pin + "/polarity"
+	return path.Join(p.Path, "pwm"+p.pin, "polarity")
 }
 
 func writePwmFile(path string, data []byte) (i int, err error) {
@@ -214,4 +271,26 @@ func readPwmFile(path string) ([]byte, error) {
 		return []byte{}, err
 	}
 	return buf[:i], err
+}
+
+func (p *PWMPin) printState() {
+	enabled, _ := p.enable()
+	polarity, _ := p.Polarity()
+	period, _ := p.Period()
+	duty, _ := p.DutyCycle()
+
+	fmt.Println("Print state of all PWM variables...")
+	fmt.Printf("Enable: %v, ", enabled)
+	fmt.Printf("Polarity: %v, ", polarity)
+	fmt.Printf("Period: %v, ", period)
+	fmt.Printf("DutyCycle: %v, ", duty)
+	var powerPercent float64
+	if enabled {
+		if polarity == polarityNormal {
+			powerPercent = float64(duty) / float64(period) * 100
+		} else {
+			powerPercent = float64(period) / float64(duty) * 100
+		}
+	}
+	fmt.Printf("Power: %.1f\n", powerPercent)
 }

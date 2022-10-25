@@ -2,10 +2,13 @@ package sysfs
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"syscall"
 	"unsafe"
 )
+
+const i2cDeviceDebug = false
 
 const (
 	// From  /usr/include/linux/i2c-dev.h:
@@ -65,7 +68,7 @@ func NewI2cDevice(location string) (d *i2cDevice, err error) {
 	return
 }
 
-func (d *i2cDevice) queryFunctionality() (err error) {
+func (d *i2cDevice) queryFunctionality() error {
 	_, _, errno := Syscall(
 		syscall.SYS_IOCTL,
 		d.file.Fd(),
@@ -74,12 +77,12 @@ func (d *i2cDevice) queryFunctionality() (err error) {
 	)
 
 	if errno != 0 {
-		err = fmt.Errorf("Querying functionality failed with syscall.Errno %v", errno)
+		return fmt.Errorf("Querying functionality failed with syscall.Errno %v", errno)
 	}
-	return
+	return nil
 }
 
-func (d *i2cDevice) SetAddress(address int) (err error) {
+func (d *i2cDevice) SetAddress(address int) error {
 	_, _, errno := Syscall(
 		syscall.SYS_IOCTL,
 		d.file.Fd(),
@@ -88,13 +91,12 @@ func (d *i2cDevice) SetAddress(address int) (err error) {
 	)
 
 	if errno != 0 {
-		err = fmt.Errorf("Setting address failed with syscall.Errno %v", errno)
+		return fmt.Errorf("Setting address failed with syscall.Errno %v", errno)
 	}
-
-	return
+	return nil
 }
 
-func (d *i2cDevice) Close() (err error) {
+func (d *i2cDevice) Close() error {
 	return d.file.Close()
 }
 
@@ -128,55 +130,60 @@ func (d *i2cDevice) ReadWordData(reg uint8) (val uint16, err error) {
 	return data, err
 }
 
-func (d *i2cDevice) WriteByte(val byte) (err error) {
+func (d *i2cDevice) ReadBlockData(reg uint8, data []byte) error {
+	if len(data) > 32 {
+		return fmt.Errorf("Reading blocks larger than 32 bytes (%v) not supported", len(data))
+	}
+
+	if d.funcs&I2C_FUNC_SMBUS_READ_BLOCK_DATA == 0 {
+		if i2cDeviceDebug {
+			log.Printf("SMBus read block data not supported, use fallback\n")
+		}
+		return d.readBlockDataFallback(reg, data)
+	}
+
+	return d.smbusAccess(I2C_SMBUS_READ, reg, I2C_SMBUS_BLOCK_DATA, uintptr(unsafe.Pointer(&data)))
+}
+
+func (d *i2cDevice) WriteByte(val byte) error {
 	if d.funcs&I2C_FUNC_SMBUS_WRITE_BYTE == 0 {
 		return fmt.Errorf("SMBus write byte not supported")
 	}
 
-	err = d.smbusAccess(I2C_SMBUS_WRITE, val, I2C_SMBUS_BYTE, uintptr(0))
-	return err
+	return d.smbusAccess(I2C_SMBUS_WRITE, val, I2C_SMBUS_BYTE, uintptr(0))
 }
 
-func (d *i2cDevice) WriteByteData(reg uint8, val uint8) (err error) {
+func (d *i2cDevice) WriteByteData(reg uint8, val uint8) error {
 	if d.funcs&I2C_FUNC_SMBUS_WRITE_BYTE_DATA == 0 {
 		return fmt.Errorf("SMBus write byte data not supported")
 	}
 
 	var data = val
-	err = d.smbusAccess(I2C_SMBUS_WRITE, reg, I2C_SMBUS_BYTE_DATA, uintptr(unsafe.Pointer(&data)))
-	return err
+	return d.smbusAccess(I2C_SMBUS_WRITE, reg, I2C_SMBUS_BYTE_DATA, uintptr(unsafe.Pointer(&data)))
 }
 
-func (d *i2cDevice) WriteWordData(reg uint8, val uint16) (err error) {
+func (d *i2cDevice) WriteWordData(reg uint8, val uint16) error {
 	if d.funcs&I2C_FUNC_SMBUS_WRITE_WORD_DATA == 0 {
 		return fmt.Errorf("SMBus write word data not supported")
 	}
 
 	var data = val
-	err = d.smbusAccess(I2C_SMBUS_WRITE, reg, I2C_SMBUS_WORD_DATA, uintptr(unsafe.Pointer(&data)))
-	return err
+	return d.smbusAccess(I2C_SMBUS_WRITE, reg, I2C_SMBUS_WORD_DATA, uintptr(unsafe.Pointer(&data)))
 }
 
-func (d *i2cDevice) WriteBlockData(reg uint8, data []byte) (err error) {
+func (d *i2cDevice) WriteBlockData(reg uint8, data []byte) error {
 	if len(data) > 32 {
 		return fmt.Errorf("Writing blocks larger than 32 bytes (%v) not supported", len(data))
 	}
 
-	buf := make([]byte, len(data)+1)
-	copy(buf[1:], data)
-	buf[0] = reg
-
-	n, err := d.file.Write(buf)
-
-	if err != nil {
-		return err
+	if d.funcs&I2C_FUNC_SMBUS_WRITE_BLOCK_DATA == 0 {
+		if i2cDeviceDebug {
+			log.Printf("SMBus write block data not supported, use fallback\n")
+		}
+		return d.writeBlockDataFallback(reg, data)
 	}
 
-	if n != len(buf) {
-		return fmt.Errorf("Write to device truncated, %v of %v written", n, len(buf))
-	}
-
-	return nil
+	return d.smbusAccess(I2C_SMBUS_WRITE, reg, I2C_SMBUS_BLOCK_DATA, uintptr(unsafe.Pointer(&data)))
 }
 
 // Read implements the io.ReadWriteCloser method by direct I2C read operations.
@@ -208,5 +215,48 @@ func (d *i2cDevice) smbusAccess(readWrite byte, command byte, size uint32, data 
 		return fmt.Errorf("Failed with syscall.Errno %v", errno)
 	}
 
+	return nil
+}
+
+func (d *i2cDevice) readBlockDataFallback(reg uint8, data []byte) error {
+	if err := d.writeAndCheckCount([]byte{reg}); err != nil {
+		return err
+	}
+	if err := d.readAndCheckCount(data); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d *i2cDevice) writeBlockDataFallback(reg uint8, data []byte) error {
+	buf := make([]byte, len(data)+1)
+	copy(buf[1:], data)
+	buf[0] = reg
+
+	if err := d.writeAndCheckCount(buf); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d *i2cDevice) readAndCheckCount(data []byte) error {
+	n, err := d.file.Read(data)
+	if err != nil {
+		return err
+	}
+	if n != len(data) {
+		return fmt.Errorf("Read %v bytes from device by sysfs, expected %v", n, len(data))
+	}
+	return nil
+}
+
+func (d *i2cDevice) writeAndCheckCount(data []byte) error {
+	n, err := d.file.Write(data)
+	if err != nil {
+		return err
+	}
+	if n != len(data) {
+		return fmt.Errorf("Write %v bytes to device by sysfs, expected %v", n, len(data))
+	}
 	return nil
 }

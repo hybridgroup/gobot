@@ -176,7 +176,7 @@ func TestDigitalRead(t *testing.T) {
 
 func TestServoWrite(t *testing.T) {
 	d := initTestDriver()
-	err := d.ServoWrite(SERVO_1, 0x7F)
+	err := d.ServoWrite("SERVO_1", 0x7F)
 	if err != nil {
 		t.Error(err)
 	}

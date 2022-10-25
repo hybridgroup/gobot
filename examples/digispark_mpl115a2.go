@@ -27,7 +27,7 @@ func main() {
 		})
 	}
 
-	robot := gobot.NewRobot("blinkBot",
+	robot := gobot.NewRobot("mpl115Bot",
 		[]gobot.Connection{board},
 		[]gobot.Device{mpl115a2},
 		work,
