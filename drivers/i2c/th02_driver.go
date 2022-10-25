@@ -24,38 +24,42 @@ package i2c
 
 import (
 	"fmt"
+	"log"
 	"time"
-
-	"gobot.io/x/gobot"
 )
 
 const (
-
-	// TH02Address is the default address of device
-	TH02Address = 0x40
-
-	//TH02ConfigReg is the configuration register
-	TH02ConfigReg = 0x03
+	th02Debug          = false
+	th02DefaultAddress = 0x40
 )
 
-//Accuracy constants for the TH02 devices
 const (
-	TH02HighAccuracy = 0 //High Accuracy
-	TH02LowAccuracy  = 1 //Lower Accuracy
+	th02Reg_Status  = 0x00
+	th02Reg_DataMSB = 0x01
+	th02Reg_DataLSB = 0x02
+	th02Reg_Config  = 0x03
+	th02Reg_ID      = 0x11
+
+	th02Status_ReadyBit = 0x01 // D0 is /RDY
+
+	th02Config_StartBit = 0x01 // D0 is START
+	th02Config_HeatBit  = 0x02 // D1 is HEAT
+	th02Config_TempBit  = 0x10 // D4 is TEMP (if not set read humidity)
+	th02Config_FastBit  = 0x20 // D5 is FAST (if set use 18 ms, but lower accuracy T: 13 bit, H: 11 bit)
+)
+
+//Accuracy constants for the TH02 devices (deprecated, use WithFastMode() instead)
+const (
+	TH02HighAccuracy = 0 //High Accuracy (T: 14 bit, H: 12 bit), normal (35 ms)
+	TH02LowAccuracy  = 1 //Lower Accuracy (T: 13 bit, H: 11 bit), fast (18 ms)
 )
 
 // TH02Driver is a Driver for a TH02 humidity and temperature sensor
 type TH02Driver struct {
-	Units      string
-	name       string
-	connector  Connector
-	connection Connection
-	Config
-	addr     byte
-	accuracy byte
+	*Driver
+	Units    string
 	heating  bool
-
-	delay time.Duration
+	fastMode bool
 }
 
 // NewTH02Driver creates a new driver with specified i2c interface.
@@ -71,15 +75,11 @@ type TH02Driver struct {
 //
 func NewTH02Driver(a Connector, options ...func(Config)) *TH02Driver {
 	s := &TH02Driver{
-		Units:     "C",
-		name:      gobot.DefaultName("TH02"),
-		connector: a,
-		addr:      TH02Address,
-		Config:    NewConfig(),
-		heating:   false,
+		Driver:   NewDriver(a, "TH02", th02DefaultAddress, options...),
+		Units:    "C",
+		heating:  false,
+		fastMode: false,
 	}
-
-	s.SetAccuracy(1)
 
 	for _, option := range options {
 		option(s)
@@ -88,87 +88,95 @@ func NewTH02Driver(a Connector, options ...func(Config)) *TH02Driver {
 	return s
 }
 
-// Name returns the name for this Driver
-func (s *TH02Driver) Name() string { return s.name }
-
-// SetName sets the name for this Driver
-func (s *TH02Driver) SetName(n string) { s.name = n }
-
-// Connection returns the connection for this Driver
-func (s *TH02Driver) Connection() gobot.Connection { return s.connector.(gobot.Connection) }
-
-// Start initializes the TH02
-func (s *TH02Driver) Start() (err error) {
-	bus := s.GetBusOrDefault(s.connector.GetDefaultBus())
-	address := s.GetAddressOrDefault(int(s.addr))
-
-	s.connection, err = s.connector.GetConnection(address, bus)
-	return err
+// WithTH02FastMode option sets the fast mode (leads to lower accuracy).
+// Valid settings are <=0 (off), >0 (on).
+func WithTH02FastMode(val int) func(Config) {
+	return func(c Config) {
+		d, ok := c.(*TH02Driver)
+		if ok {
+			d.fastMode = (val > 0)
+		} else if th02Debug {
+			log.Printf("Trying to set fast mode for non-TH02Driver %v", c)
+		}
+	}
 }
 
-// Halt returns true if devices is halted successfully
-func (s *TH02Driver) Halt() (err error) { return }
+// SetAddress sets the address of the device (deprecated, use WithAddress() instead)
+func (s *TH02Driver) SetAddress(address int) {
+	WithAddress(address)(s)
+}
 
-// SetAddress sets the address of the device
-func (s *TH02Driver) SetAddress(address int) { s.addr = byte(address) }
-
-// Accuracy returns the accuracy of the sampling
-func (s *TH02Driver) Accuracy() byte { return s.accuracy }
-
-// SetAccuracy sets the accuracy of the sampling.  It will only be used on the next
-// measurment request.  Invalid value will use the default of High
-func (s *TH02Driver) SetAccuracy(a byte) {
-	if a == TH02LowAccuracy {
-		s.accuracy = a
-	} else {
-		s.accuracy = TH02HighAccuracy
+// Accuracy returns the accuracy of the sampling (deprecated, use FastMode() instead)
+func (s *TH02Driver) Accuracy() byte {
+	if s.fastMode {
+		return TH02LowAccuracy
 	}
+	return TH02HighAccuracy
+}
+
+// SetAccuracy sets the accuracy of the sampling. (deprecated, use WithFastMode() instead)
+// It will only be used on the next measurement request.  Invalid value will use the default of High
+func (s *TH02Driver) SetAccuracy(a byte) {
+	s.fastMode = (a == TH02LowAccuracy)
 }
 
 // SerialNumber returns the serial number of the chip
-func (s *TH02Driver) SerialNumber() (sn uint32, err error) {
-	ret, err := s.readRegister(0x11)
-	return uint32(ret) >> 4, err
+func (s *TH02Driver) SerialNumber() (uint8, error) {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+
+	ret, err := s.connection.ReadByteData(th02Reg_ID)
+	return uint8(ret) >> 4, err
 }
 
-// Heater returns true if the heater is enabled
-func (s *TH02Driver) Heater() (status bool, err error) {
-	st, err := s.readRegister(0x11)
-	return (0x02 & st) == 0x02, err
+// FastMode returns true if the fast mode is enabled in the device
+func (s *TH02Driver) FastMode() (bool, error) {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+
+	cfg, err := s.connection.ReadByteData(th02Reg_Config)
+	return (th02Config_FastBit & cfg) == th02Config_FastBit, err
 }
 
-func (s *TH02Driver) applysettings(base byte) byte {
-	if s.accuracy == TH02LowAccuracy {
-		base = base & 0xd5
-	} else {
-		base = base | 0x20
-	}
-	if s.heating {
-		base = base & 0xfd
-	} else {
-		base = base | 0x02
-	}
-	base = base | 0x01 //set the "sample" bit
-	return base
+// SetHeater sets the heater of the device to the given state.
+func (s *TH02Driver) SetHeater(state bool) error {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+
+	s.heating = state
+	return s.connection.WriteByteData(th02Reg_Config, s.createConfig(false, false))
+}
+
+// Heater returns true if the heater is enabled in the device
+func (s *TH02Driver) Heater() (bool, error) {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+
+	cfg, err := s.connection.ReadByteData(th02Reg_Config)
+	return (th02Config_HeatBit & cfg) == th02Config_HeatBit, err
 }
 
 // Sample returns the temperature in celsius and relative humidity for one sample
 func (s *TH02Driver) Sample() (temperature float32, relhumidity float32, _ error) {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
 
-	if err := s.writeRegister(TH02ConfigReg, s.applysettings(0x10)); err != nil {
+	// read humidity
+	if err := s.connection.WriteByteData(th02Reg_Config, s.createConfig(true, false)); err != nil {
 		return 0, 0, err
 	}
 
-	rawrh, err := s.readData()
+	rawrh, err := s.waitAndReadData()
 	if err != nil {
 		return 0, 0, err
 	}
 	relhumidity = float32(rawrh>>4)/16.0 - 24.0
 
-	if err := s.writeRegister(TH02ConfigReg, s.applysettings(0x00)); err != nil {
+	// read temperature
+	if err := s.connection.WriteByteData(th02Reg_Config, s.createConfig(true, true)); err != nil {
 		return 0, relhumidity, err
 	}
-	rawt, err := s.readData()
+	rawt, err := s.waitAndReadData()
 	if err != nil {
 		return 0, relhumidity, err
 	}
@@ -183,27 +191,38 @@ func (s *TH02Driver) Sample() (temperature float32, relhumidity float32, _ error
 
 }
 
-//writeRegister writes the value to the register.
-func (s *TH02Driver) writeRegister(reg, value byte) error {
-	_, err := s.connection.Write([]byte{reg, value})
-	return err
+func (s *TH02Driver) createConfig(measurement bool, readTemp bool) byte {
+	cfg := byte(0x00)
+	if measurement {
+		cfg = cfg | th02Config_StartBit
+		if readTemp {
+			cfg = cfg | th02Config_TempBit
+		}
+		if s.fastMode {
+			cfg = cfg | th02Config_FastBit
+		}
+	}
+	if s.heating {
+		cfg = cfg | th02Config_HeatBit
+	}
+	return cfg
 }
 
-//readRegister returns the value of a single regusterm and a non-nil error on problem
-func (s *TH02Driver) readRegister(reg byte) (byte, error) {
-	if _, err := s.connection.Write([]byte{reg}); err != nil {
+func (s *TH02Driver) waitAndReadData() (uint16, error) {
+	if err := s.waitForReady(nil); err != nil {
 		return 0, err
 	}
-	rcvd := make([]byte, 1)
-	_, err := s.connection.Read(rcvd)
-	return rcvd[0], err
+
+	rcvd := make([]byte, 2)
+	err := s.connection.ReadBlockData(th02Reg_DataMSB, rcvd)
+	if err != nil {
+		return 0, err
+	}
+	return uint16(rcvd[0])<<8 + uint16(rcvd[1]), nil
 }
 
-/*waitForReady blocks for up to the passed duration (which defaults to 50mS if nil)
-until the ~RDY bit is cleared, meanign a sample has been fully sampled and is ready for reading.
-
-This is greedy.
-*/
+// waitForReady blocks for up to the passed duration (which defaults to 50mS if nil)
+// until the ~RDY bit is cleared, meaning a sample has been fully sampled and is ready for reading.
 func (s *TH02Driver) waitForReady(dur *time.Duration) error {
 	wait := 100 * time.Millisecond
 	if dur != nil {
@@ -215,27 +234,9 @@ func (s *TH02Driver) waitForReady(dur *time.Duration) error {
 			return fmt.Errorf("timeout on \\RDY")
 		}
 
-		//yes, i am eating the error.
-		if reg, _ := s.readRegister(0x00); reg == 0 {
+		if reg, err := s.connection.ReadByteData(th02Reg_Status); (reg == 0) && (err == nil) {
 			return nil
 		}
+		time.Sleep(wait / 10)
 	}
-}
-
-/*readData fetches the data from the data 'registers'*/
-func (s *TH02Driver) readData() (uint16, error) {
-	if err := s.waitForReady(nil); err != nil {
-		return 0, err
-	}
-
-	if n, err := s.connection.Write([]byte{0x01}); err != nil || n != 1 {
-		return 0, fmt.Errorf("n=%d not 1, or err = %v", n, err)
-	}
-	rcvd := make([]byte, 3)
-	n, err := s.connection.Read(rcvd)
-	if err != nil || n != 3 {
-		return 0, fmt.Errorf("n=%d not 3, or err = %v", n, err)
-	}
-	return uint16(rcvd[1])<<8 + uint16(rcvd[2]), nil
-
 }

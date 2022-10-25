@@ -15,9 +15,8 @@ import (
 
 func main() {
 	a := raspi.NewAdaptor()
-	ads1015 := i2c.NewADS1015Driver(a)
-	// Adjust the gain to be able to read values of at least 5V
-	ads1015.DefaultGain, _ = ads1015.BestGainForVoltage(5.0)
+	// Use the gain to be able to read values of at least 5V (for all channels)
+	ads1015 := i2c.NewADS1015Driver(a, i2c.WithADS1x15BestGainForVoltage(5.0))
 
 	work := func() {
 		gobot.Every(100*time.Millisecond, func() {

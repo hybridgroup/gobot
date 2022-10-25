@@ -13,8 +13,11 @@ import (
 	"gobot.io/x/gobot/platforms/tinkerboard"
 )
 
+// Wiring
+// PWR  Tinkerboard: 1 (+3.3V, VCC), 2 (+5V), 6, 9, 14, 20 (GND)
+// I2C1 Tinkerboard: 3 (SDA), 5 (SCL)
+// PLATE: connected via pin header (pin 1..26)
 func main() {
-	// * I2C1: 3 (SDA), 5 (SCL) --> connected to plate
 	board := tinkerboard.NewAdaptor()
 	ada := i2c.NewAdafruit1109Driver(board, i2c.WithBus(1))
 

@@ -1,41 +1,40 @@
 package i2c
 
 import (
+	"encoding/binary"
+	"fmt"
+	"math"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
-
-	"gobot.io/x/gobot"
 )
 
-const grovePiAddress = 0x04
+// default is for grovepi4 installer
+const grovePiDefaultAddress = 0x04
 
-// Commands format
+// commands, see:
+// * https://www.dexterindustries.com/GrovePi/programming/grovepi-protocol-adding-custom-sensors/
+// * https://github.com/DexterInd/GrovePi/blob/master/Script/multi_grovepi_installer/grovepi4.py
 const (
-	CommandReadDigital    = 1
-	CommandWriteDigital   = 2
-	CommandReadAnalog     = 3
-	CommandWriteAnalog    = 4
-	CommandPinMode        = 5
-	CommandReadUltrasonic = 7
-	CommandReadDHT        = 40
+	commandReadDigital         = 1
+	commandWriteDigital        = 2
+	commandReadAnalog          = 3
+	commandWriteAnalog         = 4
+	commandSetPinMode          = 5
+	commandReadUltrasonic      = 7
+	commandReadFirmwareVersion = 8
+	commandReadDHT             = 40
 )
 
 // GrovePiDriver is a driver for the GrovePi+ for I²C bus interface.
 // https://www.dexterindustries.com/grovepi/
 //
-// To use this driver with the GrovePi, it must be running the 1.3.0+ firmware.
-// https://forum.dexterindustries.com/t/pre-release-of-grovepis-firmware-v1-3-0-open-to-testers/5119
+// To use this driver with the GrovePi, it must be running the firmware >= 1.4.0 and and the system version >=3.
+// https://github.com/DexterInd/GrovePi/blob/master/README.md
 //
 type GrovePiDriver struct {
-	name        string
-	digitalPins map[int]string
-	analogPins  map[int]string
-	mutex       *sync.Mutex
-	connector   Connector
-	connection  Connection
-	Config
+	*Driver
+	pins map[int]string
 }
 
 // NewGrovePiDriver creates a new driver with specified i2c interface
@@ -46,14 +45,10 @@ type GrovePiDriver struct {
 //		i2c.WithBus(int):	bus to use with this driver
 //		i2c.WithAddress(int):	address to use with this driver
 //
-func NewGrovePiDriver(a Connector, options ...func(Config)) *GrovePiDriver {
+func NewGrovePiDriver(c Connector, options ...func(Config)) *GrovePiDriver {
 	d := &GrovePiDriver{
-		name:        gobot.DefaultName("GrovePi"),
-		digitalPins: make(map[int]string),
-		analogPins:  make(map[int]string),
-		mutex:       &sync.Mutex{},
-		connector:   a,
-		Config:      NewConfig(),
+		Driver: NewDriver(c, "GrovePi", grovePiDefaultAddress),
+		pins:   make(map[int]string),
 	}
 
 	for _, option := range options {
@@ -64,144 +59,209 @@ func NewGrovePiDriver(a Connector, options ...func(Config)) *GrovePiDriver {
 	return d
 }
 
-// Name returns the Name for the Driver
-func (d *GrovePiDriver) Name() string { return d.name }
-
-// SetName sets the Name for the Driver
-func (d *GrovePiDriver) SetName(n string) { d.name = n }
-
-// Connection returns the connection for the Driver
-func (d *GrovePiDriver) Connection() gobot.Connection { return d.connector.(gobot.Connection) }
-
-// Start initialized the GrovePi
-func (d *GrovePiDriver) Start() (err error) {
-	bus := d.GetBusOrDefault(d.connector.GetDefaultBus())
-	address := d.GetAddressOrDefault(grovePiAddress)
-
-	d.connection, err = d.connector.GetConnection(address, bus)
-	if err != nil {
-		return err
-	}
-
-	return
-}
-
-// Halt returns true if devices is halted successfully
-func (d *GrovePiDriver) Halt() (err error) { return }
-
 // Connect is here to implement the Adaptor interface.
-func (d *GrovePiDriver) Connect() (err error) {
-	return
+func (d *GrovePiDriver) Connect() error {
+	return nil
 }
 
 // Finalize is here to implement the Adaptor interface.
-func (d *GrovePiDriver) Finalize() (err error) {
-	return
+func (d *GrovePiDriver) Finalize() error {
+	return nil
 }
 
 // AnalogRead returns value from analog pin implementing the AnalogReader interface.
 func (d *GrovePiDriver) AnalogRead(pin string) (value int, err error) {
-	pin = getPin(pin)
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
 
-	var pinNum int
-	pinNum, err = strconv.Atoi(pin)
+	pinNum, err := d.preparePin(pin, "input")
 	if err != nil {
-		return
+		return 0, err
 	}
 
-	value, err = d.readAnalog(byte(pinNum))
+	buf := []byte{commandReadAnalog, byte(pinNum), 0, 0}
+	if _, err := d.connection.Write(buf); err != nil {
+		return 0, err
+	}
 
-	return
+	time.Sleep(2 * time.Millisecond)
+
+	data := make([]byte, 3)
+	if err = d.readForCommand(commandReadAnalog, data); err != nil {
+		return 0, err
+	}
+
+	return int(data[1])*256 + int(data[2]), nil
 }
 
 // DigitalRead performs a read on a digital pin.
-func (d *GrovePiDriver) DigitalRead(pin string) (val int, err error) {
-	pin = getPin(pin)
+func (d *GrovePiDriver) DigitalRead(pin string) (int, error) {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
 
-	var pinNum int
-	pinNum, err = strconv.Atoi(pin)
+	pinNum, err := d.preparePin(pin, "input")
 	if err != nil {
-		return
+		return 0, err
 	}
 
-	if dir, ok := d.digitalPins[pinNum]; !ok || dir != "input" {
-		d.PinMode(byte(pinNum), "input")
-		d.digitalPins[pinNum] = "input"
+	buf := []byte{commandReadDigital, byte(pinNum), 0, 0}
+	if _, err := d.connection.Write(buf); err != nil {
+		return 0, err
 	}
 
-	val, err = d.readDigital(byte(pinNum))
+	time.Sleep(2 * time.Millisecond)
 
-	return
+	data := make([]byte, 2)
+	if err = d.readForCommand(commandReadDigital, data); err != nil {
+		return 0, err
+	}
+
+	return int(data[1]), nil
 }
 
-// UltrasonicRead performs a read on an ultrasonic pin.
-func (d *GrovePiDriver) UltrasonicRead(pin string, duration int) (val int, err error) {
-	pin = getPin(pin)
+// UltrasonicRead performs a read on an ultrasonic pin with duration >=2 millisecond.
+func (d *GrovePiDriver) UltrasonicRead(pin string, duration int) (int, error) {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
 
-	var pinNum int
-	pinNum, err = strconv.Atoi(pin)
+	if duration < 2 {
+		duration = 2
+	}
+
+	pinNum, err := d.preparePin(pin, "input")
 	if err != nil {
+		return 0, err
+	}
+
+	buf := []byte{commandReadUltrasonic, byte(pinNum), 0, 0}
+	if _, err = d.connection.Write(buf); err != nil {
+		return 0, err
+	}
+
+	time.Sleep(time.Duration(duration) * time.Millisecond)
+
+	data := make([]byte, 3)
+	if err := d.readForCommand(commandReadUltrasonic, data); err != nil {
+		return 0, err
+	}
+
+	return int(data[1])*255 + int(data[2]), nil
+}
+
+// FirmwareVersionRead returns the GrovePi firmware version.
+func (d *GrovePiDriver) FirmwareVersionRead() (string, error) {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
+
+	buf := []byte{commandReadFirmwareVersion, 0, 0, 0}
+	if _, err := d.connection.Write(buf); err != nil {
+		return "", err
+	}
+
+	time.Sleep(2 * time.Millisecond)
+
+	data := make([]byte, 4)
+	if err := d.readForCommand(commandReadFirmwareVersion, data); err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("%v.%v.%v", data[1], data[2], data[3]), nil
+}
+
+// DHTRead performs a read temperature and humidity sensors with duration >=2 millisecond.
+// DHT11 (blue): sensorType=0
+// DHT22 (white): sensorTyp=1
+func (d *GrovePiDriver) DHTRead(pin string, sensorType byte, duration int) (temp float32, hum float32, err error) {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
+
+	if duration < 2 {
+		duration = 2
+	}
+
+	pinNum, err := d.preparePin(pin, "input")
+	if err != nil {
+		return 0, 0, err
+	}
+
+	buf := []byte{commandReadDHT, byte(pinNum), sensorType, 0}
+	if _, err = d.connection.Write(buf); err != nil {
+		return
+	}
+	time.Sleep(time.Duration(duration) * time.Millisecond)
+
+	data := make([]byte, 9)
+	if err = d.readForCommand(commandReadDHT, data); err != nil {
 		return
 	}
 
-	if dir, ok := d.digitalPins[pinNum]; !ok || dir != "input" {
-		d.PinMode(byte(pinNum), "input")
-		d.digitalPins[pinNum] = "input"
+	temp = float32Of4BytesLittleEndian(data[1:5])
+	if temp > 150 {
+		temp = 150
+	}
+	if temp < -100 {
+		temp = -100
 	}
 
-	val, err = d.readUltrasonic(byte(pinNum), duration)
+	hum = float32Of4BytesLittleEndian(data[5:9])
+	if hum > 100 {
+		hum = 100
+	}
+	if hum < 0 {
+		hum = 0
+	}
 
 	return
 }
 
 // DigitalWrite writes a value to a specific digital pin implementing the DigitalWriter interface.
-func (d *GrovePiDriver) DigitalWrite(pin string, val byte) (err error) {
-	pin = getPin(pin)
+func (d *GrovePiDriver) DigitalWrite(pin string, val byte) error {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
 
-	var pinNum int
-	pinNum, err = strconv.Atoi(pin)
+	pinNum, err := d.preparePin(pin, "output")
 	if err != nil {
-		return
+		return err
 	}
 
-	if dir, ok := d.digitalPins[pinNum]; !ok || dir != "output" {
-		d.PinMode(byte(pinNum), "output")
-		d.digitalPins[pinNum] = "output"
+	buf := []byte{commandWriteDigital, byte(pinNum), val, 0}
+	if _, err := d.connection.Write(buf); err != nil {
+		return err
 	}
-
-	err = d.writeDigital(byte(pinNum), val)
-
-	return
-}
-
-// WriteAnalog writes PWM aka analog to the GrovePi. Not yet working.
-func (d *GrovePiDriver) WriteAnalog(pin byte, val byte) error {
-	buf := []byte{CommandWriteAnalog, pin, val, 0}
-	_, err := d.connection.Write(buf)
-
-	time.Sleep(2 * time.Millisecond)
-
-	data := make([]byte, 1)
-	_, err = d.connection.Read(data)
-
-	return err
-}
-
-// PinMode sets the pin mode to input or output.
-func (d *GrovePiDriver) PinMode(pin byte, mode string) error {
-	var b []byte
-	if mode == "output" {
-		b = []byte{CommandPinMode, pin, 1, 0}
-	} else {
-		b = []byte{CommandPinMode, pin, 0, 0}
-	}
-	_, err := d.connection.Write(b)
 
 	time.Sleep(2 * time.Millisecond)
 
 	_, err = d.connection.ReadByte()
-
 	return err
+}
+
+// AnalogWrite writes PWM aka analog to the GrovePi analog pin implementing the AnalogWriter interface.
+func (d *GrovePiDriver) AnalogWrite(pin string, val int) error {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
+
+	pinNum, err := d.preparePin(pin, "output")
+	if err != nil {
+		return err
+	}
+
+	buf := []byte{commandWriteAnalog, byte(pinNum), byte(val), 0}
+	if _, err := d.connection.Write(buf); err != nil {
+		return err
+	}
+
+	time.Sleep(2 * time.Millisecond)
+
+	_, err = d.connection.ReadByte()
+	return err
+}
+
+// SetPinMode sets the pin mode to input or output.
+func (d *GrovePiDriver) SetPinMode(pin byte, mode string) error {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
+
+	return d.setPinMode(pin, mode)
 }
 
 func getPin(pin string) string {
@@ -214,85 +274,63 @@ func getPin(pin string) string {
 	return pin
 }
 
-// readAnalog reads analog value from the GrovePi.
-func (d *GrovePiDriver) readAnalog(pin byte) (int, error) {
-	d.mutex.Lock()
-	defer d.mutex.Unlock()
-
-	b := []byte{CommandReadAnalog, pin, 0, 0}
-	_, err := d.connection.Write(b)
-	if err != nil {
-		return 0, err
+func (d *GrovePiDriver) setPinMode(pin byte, mode string) error {
+	var b []byte
+	if mode == "output" {
+		b = []byte{commandSetPinMode, pin, 1, 0}
+	} else {
+		b = []byte{commandSetPinMode, pin, 0, 0}
+	}
+	if _, err := d.connection.Write(b); err != nil {
+		return err
 	}
 
 	time.Sleep(2 * time.Millisecond)
 
-	data := make([]byte, 3)
-	_, err = d.connection.Read(data)
-	if err != nil || data[0] != CommandReadAnalog {
+	_, err := d.connection.ReadByte()
+	return err
+}
+
+func (d *GrovePiDriver) ensurePinMode(pinNum int, mode string) error {
+	if dir, ok := d.pins[pinNum]; !ok || dir != mode {
+		if err := d.setPinMode(byte(pinNum), mode); err != nil {
+			return err
+		}
+		d.pins[pinNum] = mode
+	}
+	return nil
+}
+
+func (d *GrovePiDriver) preparePin(pin string, mode string) (int, error) {
+	pin = getPin(pin)
+	pinNum, err := strconv.Atoi(pin)
+	if err != nil {
 		return -1, err
 	}
 
-	v1 := int(data[1])
-	v2 := int(data[2])
-	return ((v1 * 256) + v2), nil
+	if err := d.ensurePinMode(pinNum, mode); err != nil {
+		return -1, err
+	}
+
+	return pinNum, nil
 }
 
-// readUltrasonic reads ultrasonic from the GrovePi.
-func (d *GrovePiDriver) readUltrasonic(pin byte, duration int) (val int, err error) {
-	d.mutex.Lock()
-	defer d.mutex.Unlock()
-
-	buf := []byte{CommandReadUltrasonic, pin, 0, 0}
-	_, err = d.connection.Write(buf)
+func (d *GrovePiDriver) readForCommand(command byte, data []byte) error {
+	cnt, err := d.connection.Read(data)
 	if err != nil {
-		return
+		return err
 	}
-
-	time.Sleep(time.Duration(duration) * time.Millisecond)
-
-	data := make([]byte, 3)
-	_, err = d.connection.Read(data)
-	if err != nil || data[0] != CommandReadUltrasonic {
-		return 0, err
+	if len(data) != cnt {
+		return fmt.Errorf("read count mismatch (%d should be %d)", cnt, len(data))
 	}
-
-	return int(data[1]) * 255 + int(data[2]), err
+	if data[0] != command {
+		return fmt.Errorf("answer (%d) was not for command (%d)", data[0], command)
+	}
+	return nil
 }
 
-// readDigital reads digitally from the GrovePi.
-func (d *GrovePiDriver) readDigital(pin byte) (val int, err error) {
-	d.mutex.Lock()
-	defer d.mutex.Unlock()
-
-	buf := []byte{CommandReadDigital, pin, 0, 0}
-	_, err = d.connection.Write(buf)
-	if err != nil {
-		return
-	}
-
-	time.Sleep(2 * time.Millisecond)
-
-	data := make([]byte, 2)
-	_, err = d.connection.Read(data)
-	if err != nil || data[0] != CommandReadDigital {
-		return 0, err
-	}
-
-	return int(data[1]), err
-}
-
-// writeDigital writes digitally to the GrovePi.
-func (d *GrovePiDriver) writeDigital(pin byte, val byte) error {
-	d.mutex.Lock()
-	defer d.mutex.Unlock()
-
-	buf := []byte{CommandWriteDigital, pin, val, 0}
-	_, err := d.connection.Write(buf)
-
-	time.Sleep(2 * time.Millisecond)
-
-	_, err = d.connection.ReadByte()
-
-	return err
+func float32Of4BytesLittleEndian(bytes []byte) float32 {
+	bits := binary.LittleEndian.Uint32(bytes)
+	float := math.Float32frombits(bits)
+	return float
 }

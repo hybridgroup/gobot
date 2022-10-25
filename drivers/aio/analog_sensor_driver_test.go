@@ -31,11 +31,11 @@ func TestAnalogSensorDriver(t *testing.T) {
 		val = 100
 		return
 	})
-	ret := d.Command("Read")(nil).(map[string]interface{})
+	ret := d.Command("ReadRaw")(nil).(map[string]interface{})
 	gobottest.Assert(t, ret["val"].(int), 100)
 	gobottest.Assert(t, ret["err"], nil)
 
-	ret = d.Command("ReadValue")(nil).(map[string]interface{})
+	ret = d.Command("Read")(nil).(map[string]interface{})
 	gobottest.Assert(t, ret["val"].(float64), 247.0)
 	gobottest.Assert(t, ret["err"], nil)
 
@@ -47,7 +47,7 @@ func TestAnalogSensorDriver(t *testing.T) {
 		return
 	})
 	gobottest.Assert(t, d.Value(), 0.0)
-	val, err := d.ReadValue()
+	val, err := d.Read()
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, val, 150.0)
 	gobottest.Assert(t, d.Value(), 150.0)
@@ -82,7 +82,7 @@ func TestAnalogSensorDriverWithLinearScaler(t *testing.T) {
 				return tt.input, nil
 			})
 			// act
-			got, err := d.ReadValue()
+			got, err := d.Read()
 			// assert
 			gobottest.Assert(t, err, nil)
 			gobottest.Assert(t, got, tt.want)

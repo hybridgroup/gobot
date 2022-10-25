@@ -17,17 +17,20 @@ const (
 	// Dualshock4 joystick configuration.
 	Dualshock4 = "dualshock4"
 
+	// Dualsense joystick configuration.
+	Dualsense = "dualsense"
+
 	// TFlightHotasX flight stick configuration.
 	TFlightHotasX = "tflightHotasX"
 
-	// Xbox360 joystick configuration.
+	// Configuration for Xbox 360 controller.
 	Xbox360 = "xbox360"
 
 	// Xbox360RockBandDrums controller configuration.
 	Xbox360RockBandDrums = "xbox360RockBandDrums"
 
-	// Nvidia Shield TV Controller
-	Shield = "shield"
+	// Configuration for the Xbox One controller.
+	XboxOne = "xboxOne"
 )
 
 // Driver represents a joystick
@@ -69,7 +72,8 @@ type joystickConfig struct {
 // file location.
 //
 // Optionally accepts:
-//  time.Duration: Interval at which the Driver is polled for new information
+//
+//	time.Duration: Interval at which the Driver is polled for new information
 func NewDriver(a *Adaptor, config string, v ...time.Duration) *Driver {
 	d := &Driver{
 		name:       gobot.DefaultName("Joystick"),
@@ -108,6 +112,7 @@ func (j *Driver) adaptor() *Adaptor {
 // Start and polls the state of the joystick at the given interval.
 //
 // Emits the Events:
+//
 //	Error error - On button error
 //	Events defined in the json button configuration file.
 //	They will have the format:
@@ -116,18 +121,20 @@ func (j *Driver) adaptor() *Adaptor {
 //		[axis]
 func (j *Driver) Start() (err error) {
 	switch j.configPath {
-	case "dualshock3":
+	case Dualshock3:
 		j.config = dualshock3Config
-	case "dualshock4":
+	case Dualshock4:
 		j.config = dualshock4Config
-	case "tflightHotasX":
+	case Dualsense:
+		j.config = dualsenseConfig
+	case TFlightHotasX:
 		j.config = tflightHotasXConfig
-	case "xbox360":
+	case Xbox360:
 		j.config = xbox360Config
-	case "xbox360RockBandDrums":
+	case Xbox360RockBandDrums:
 		j.config = xbox360RockBandDrumsConfig
-	case "shield":
-		j.config = shieldConfig
+	case XboxOne:
+		j.config = xboxOneConfig
 	default:
 		err := j.loadFile()
 		if err != nil {

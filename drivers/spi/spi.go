@@ -1,9 +1,9 @@
 package spi
 
 import (
-	"periph.io/x/periph/conn/physic"
-	xspi "periph.io/x/periph/conn/spi"
-	xsysfs "periph.io/x/periph/host/sysfs"
+	"periph.io/x/conn/v3/physic"
+	xspi "periph.io/x/conn/v3/spi"
+	xsysfs "periph.io/x/host/v3/sysfs"
 )
 
 const (

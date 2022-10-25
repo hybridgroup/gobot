@@ -2,7 +2,7 @@
 
 The Gobot BLE adaptor makes it easy to interact with Bluetooth LE aka Bluetooth 4.0 using Go.
 
-It is written using the [ble](https://github.com/currantlabs/ble) package by [@roylee17](https://github.com/roylee17). Thank you!
+It is written using the [TinyGo Bluetooh](tinygo.org/x/bluetooth) package.
 
 Learn more about Bluetooth LE at http://en.wikipedia.org/wiki/Bluetooth_low_energy
 
@@ -17,29 +17,23 @@ This package also includes drivers for several well-known BLE Services:
 go get -d -u gobot.io/x/gobot/...
 ```
 
-### OSX
+### macOS
 
-You need to have XCode installed to be able to compile code that uses the Gobot BLE adaptor on OSX. This is because the `ble` package uses a CGo based implementation.
+You need to have XCode installed to be able to compile code that uses the Gobot BLE adaptor on macOS. This is because the `bluetooth` package uses a CGo based implementation.
 
 ### Ubuntu
 
 Everything should already just compile on most Linux systems.
+
+### Windows
+
+You will need to have a GCC compiler such as [mingw-w64](https://github.com/mingw-w64/mingw-w64) installed in order to use BLE on Windows.
 
 ## How To Connect
 
 When using BLE a "peripheral" aka "server" is something you connect to such a a pulse meter. A "central" aka "client" is what does the connecting, such as your computer or mobile phone.
 
 You need to know the BLE ID of the peripheral you want to connect to. The Gobot BLE client adaptor also lets you connect to a peripheral by friendly name.
-
-### OSX
-
-To run any of the Gobot BLE code you must use the `GODEBUG=cgocheck=0` flag in order to get around some of the issues in the CGo-based implementation.
-
-If you connect by name, then you do not need to worry about the Bluetooth LE ID. However, if you want to connect by ID, OS X uses its own Bluetooth ID system which is different from the IDs used on Linux. The code calls thru the XPC interfaces provided by OSX, so as a result does not need to run under sudo.
-
-For example:
-
-    GODEBUG=cgocheck=0 go run examples/minidrone.go 8b2f8032290143e18fc7c426619632e8
 
 ### Ubuntu
 
