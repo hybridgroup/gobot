@@ -13,16 +13,18 @@ EXAMPLES := $(EXAMPLES_NO_GOCV)
 including_except := $(shell go list ./... | grep -v platforms/opencv)
 
 # Run tests on nearly all directories without test cache
+# TODO: set back to parallel running (remove "-p 1"), when issue #878 is fixed
 test:
-	go test -count=1 -v $(including_except)
+	go test -p 1 -count=1 -v $(including_except)
 
 # Run tests with race detection
 test_race:
 	go test -race $(including_except)
 
 # Test, generate and show coverage in browser
+# TODO: set back to parallel running (remove "-p 1"), when issue #878 is fixed
 test_cover:
-	go test -v $(including_except) -coverprofile=coverage.txt ; \
+	go test -p 1 -v $(including_except) -coverprofile=coverage.txt ; \
 	go tool cover -html=coverage.txt ; \
 
 robeaux:

@@ -87,6 +87,10 @@ func initTestTinkerboard(fs *sysfs.MockFilesystem) *Adaptor {
 	return a
 }
 
+func cleanTestTinkerboard() {
+	defer sysfs.SetFilesystem(&sysfs.NativeFilesystem{})
+}
+
 func TestTinkerboardName(t *testing.T) {
 	a := NewAdaptor()
 	gobottest.Assert(t, strings.HasPrefix(a.Name(), "Tinker Board"), true)
@@ -97,6 +101,7 @@ func TestTinkerboardName(t *testing.T) {
 func TestTinkerboardDigitalIO(t *testing.T) {
 	fs := gpioFs()
 	a := initTestTinkerboard(fs)
+	defer cleanTestTinkerboard()
 	a.Connect()
 
 	a.DigitalWrite("7", 1)
@@ -114,6 +119,7 @@ func TestTinkerboardDigitalWriteError(t *testing.T) {
 	fs := gpioFs()
 	fs.WithWriteError = true
 	a := initTestTinkerboard(fs)
+	defer cleanTestTinkerboard()
 
 	err := a.DigitalWrite("7", 1)
 	gobottest.Assert(t, err, errors.New("write error"))
@@ -123,6 +129,7 @@ func TestTinkerboardDigitalReadWriteError(t *testing.T) {
 	fs := gpioFs()
 	fs.WithWriteError = true
 	a := initTestTinkerboard(fs)
+	defer cleanTestTinkerboard()
 
 	_, err := a.DigitalRead("7")
 	gobottest.Assert(t, err, errors.New("write error"))
@@ -131,6 +138,7 @@ func TestTinkerboardDigitalReadWriteError(t *testing.T) {
 func TestTinkerboardInvalidPWMPin(t *testing.T) {
 	fs := pwmFs(t)
 	a := initTestTinkerboard(fs)
+	defer cleanTestTinkerboard()
 
 	err := a.PwmWrite("666", 42)
 	gobottest.Refute(t, err, nil)
@@ -148,6 +156,7 @@ func TestTinkerboardInvalidPWMPin(t *testing.T) {
 func TestTinkerboardPwmWrite(t *testing.T) {
 	fs := pwmFs(t)
 	a := initTestTinkerboard(fs)
+	defer cleanTestTinkerboard()
 
 	err := a.PwmWrite("33", 100)
 	gobottest.Assert(t, err, nil)
@@ -174,6 +183,7 @@ func TestTinkerboardPwmWriteError(t *testing.T) {
 	fs := pwmFs(t)
 	fs.WithWriteError = true
 	a := initTestTinkerboard(fs)
+	defer cleanTestTinkerboard()
 
 	err := a.PwmWrite("33", 100)
 	gobottest.Assert(t, strings.Contains(err.Error(), "write error"), true)
@@ -183,6 +193,7 @@ func TestTinkerboardPwmWriteReadError(t *testing.T) {
 	fs := pwmFs(t)
 	fs.WithReadError = true
 	a := initTestTinkerboard(fs)
+	defer cleanTestTinkerboard()
 
 	err := a.PwmWrite("33", 100)
 	gobottest.Assert(t, strings.Contains(err.Error(), "read error"), true)
@@ -192,6 +203,7 @@ func TestTinkerboardSetPeriod(t *testing.T) {
 	// arrange
 	fs := pwmFs(t)
 	a := initTestTinkerboard(fs)
+	defer cleanTestTinkerboard()
 	newPeriod := uint32(2550000)
 
 	// act
@@ -232,7 +244,9 @@ func TestTinkerboardSetPeriod(t *testing.T) {
 func TestTinkerboardI2c(t *testing.T) {
 	fs := i2cFs()
 	a := initTestTinkerboard(fs)
+	defer cleanTestTinkerboard()
 	sysfs.SetSyscall(&sysfs.MockSyscall{})
+	defer sysfs.SetSyscall(&sysfs.NativeSyscall{})
 
 	con, err := a.GetConnection(0xff, 1)
 	gobottest.Assert(t, err, nil)
@@ -259,6 +273,7 @@ func TestTinkerboardGetConnectionInvalidBus(t *testing.T) {
 func TestTinkerboardFinalizeErrorAfterGPIO(t *testing.T) {
 	fs := gpioFs()
 	a := initTestTinkerboard(fs)
+	defer cleanTestTinkerboard()
 
 	gobottest.Assert(t, a.Connect(), nil)
 	gobottest.Assert(t, a.DigitalWrite("7", 1), nil)
@@ -272,6 +287,7 @@ func TestTinkerboardFinalizeErrorAfterGPIO(t *testing.T) {
 func TestTinkerboardFinalizeErrorAfterPWM(t *testing.T) {
 	fs := pwmFs(t)
 	a := initTestTinkerboard(fs)
+	defer cleanTestTinkerboard()
 
 	gobottest.Assert(t, a.Connect(), nil)
 	gobottest.Assert(t, a.PwmWrite("33", 1), nil)

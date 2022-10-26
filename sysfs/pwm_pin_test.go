@@ -21,6 +21,7 @@ func TestPwmPin(t *testing.T) {
 	})
 
 	SetFilesystem(fs)
+	defer SetFilesystem(&NativeFilesystem{})
 
 	pin := NewPWMPin(10)
 	gobottest.Assert(t, pin.pin, "10")
@@ -73,6 +74,7 @@ func TestPwmPinAlreadyExported(t *testing.T) {
 	})
 
 	SetFilesystem(fs)
+	defer SetFilesystem(&NativeFilesystem{})
 
 	pin := NewPWMPin(10)
 	pin.write = func(string, []byte) (int, error) {
@@ -93,6 +95,7 @@ func TestPwmPinExportError(t *testing.T) {
 	})
 
 	SetFilesystem(fs)
+	defer SetFilesystem(&NativeFilesystem{})
 
 	pin := NewPWMPin(10)
 	pin.write = func(string, []byte) (int, error) {
@@ -113,6 +116,7 @@ func TestPwmPinUnxportError(t *testing.T) {
 	})
 
 	SetFilesystem(fs)
+	defer SetFilesystem(&NativeFilesystem{})
 
 	pin := NewPWMPin(10)
 	pin.write = func(string, []byte) (int, error) {
@@ -132,6 +136,7 @@ func TestPwmPinPeriodError(t *testing.T) {
 	})
 
 	SetFilesystem(fs)
+	defer SetFilesystem(&NativeFilesystem{})
 
 	pin := NewPWMPin(10)
 	pin.read = func(string) ([]byte, error) {
@@ -152,6 +157,7 @@ func TestPwmPinPolarityError(t *testing.T) {
 	})
 
 	SetFilesystem(fs)
+	defer SetFilesystem(&NativeFilesystem{})
 
 	pin := NewPWMPin(10)
 	pin.read = func(string) ([]byte, error) {
@@ -172,6 +178,7 @@ func TestPwmPinDutyCycleError(t *testing.T) {
 	})
 
 	SetFilesystem(fs)
+	defer SetFilesystem(&NativeFilesystem{})
 
 	pin := NewPWMPin(10)
 	pin.read = func(string) ([]byte, error) {

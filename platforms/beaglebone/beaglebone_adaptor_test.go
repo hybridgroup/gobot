@@ -82,6 +82,7 @@ func TestBeagleboneAdaptor(t *testing.T) {
 	})
 
 	sysfs.SetFilesystem(fs)
+	defer sysfs.SetFilesystem(&sysfs.NativeFilesystem{})
 
 	a, _ := initBBBTestAdaptor()
 
@@ -170,6 +171,7 @@ func TestBeagleboneAdaptor(t *testing.T) {
 
 	// I2c
 	sysfs.SetSyscall(&sysfs.MockSyscall{})
+	defer sysfs.SetSyscall(&sysfs.NativeSyscall{})
 
 	con, err := a.GetConnection(0xff, 2)
 	gobottest.Assert(t, err, nil)
@@ -205,6 +207,7 @@ func TestBeagleboneAnalogReadFileError(t *testing.T) {
 		"/sys/devices/platform/whatever",
 	})
 	sysfs.SetFilesystem(fs)
+	defer sysfs.SetFilesystem(&sysfs.NativeFilesystem{})
 
 	a, _ := initBBBTestAdaptor()
 
@@ -219,6 +222,7 @@ func TestBeagleboneDigitalPinDirectionFileError(t *testing.T) {
 		"/sys/devices/platform/ocp/ocp:P9_12_pinmux/state",
 	})
 	sysfs.SetFilesystem(fs)
+	defer sysfs.SetFilesystem(&sysfs.NativeFilesystem{})
 
 	a, _ := initBBBTestAdaptor()
 
@@ -237,6 +241,7 @@ func TestBeagleboneDigitalPinFinalizeFileError(t *testing.T) {
 		"/sys/devices/platform/ocp/ocp:P9_12_pinmux/state",
 	})
 	sysfs.SetFilesystem(fs)
+	defer sysfs.SetFilesystem(&sysfs.NativeFilesystem{})
 
 	a, _ := initBBBTestAdaptor()
 
