@@ -1,4 +1,4 @@
-package hcsr04
+package gpio
 
 import (
 	"errors"
@@ -20,12 +20,10 @@ const (
 
 // HCSR04 instance
 type HCSR04 struct {
-	name       string
-	connection gobot.Adaptor
-	triggerPin *gpio.DirectPinDriver
-	echoPin    *gpio.DirectPinDriver
-	// triggerPin             rpio.Pin
-	// echoPin                rpio.Pin
+	name                   string
+	connection             gobot.Adaptor
+	triggerPin             *gpio.DirectPinDriver
+	echoPin                *gpio.DirectPinDriver
 	mux                    sync.Mutex
 	Measure                float32 // The last measure
 	distanceMonitorControl chan int
@@ -35,26 +33,13 @@ type HCSR04 struct {
 
 // NewHCSR04 creates a new HCSR04 instance
 func NewHCSR04(a gobot.Adaptor, triggerPinID string, echoPinID string) *HCSR04 {
-	hcsr04 := &HCSR04{
+	return &HCSR04{
 		name:       gobot.DefaultName("HCSR04"),
 		triggerPin: gpio.NewDirectPinDriver(a, triggerPinID),
 		echoPin:    gpio.NewDirectPinDriver(a, echoPinID),
 		connection: a,
 		Commander:  gobot.NewCommander(),
 	}
-
-	// hcsr04 := HCSR04{
-	// 	triggerPinID: triggerPinID,
-	// 	echoPinID:    echoPinID,
-	// }
-	// hcsr04.triggerPin = rpio.Pin(hcsr04.triggerPinID)
-	// hcsr04.triggerPin.Mode(rpio.Output)
-
-	// hcsr04.echoPin = rpio.Pin(hcsr04.echoPinID)
-	// hcsr04.echoPin.Mode(rpio.Input)
-	// hcsr04.echoPin.PullDown()
-	// hcsr04.triggerPin.Low()
-	return hcsr04
 }
 
 // MeasureDistance measure the distance in front of sensor in meters
@@ -89,10 +74,6 @@ func (hcsr04 *HCSR04) measurePulse() (int64, error) {
 	var stopTime int64
 	go getPinStateChangeTime(hcsr04.echoPin, 1, startChan, &startQuit)
 	hcsr04.emitTrigger()
-	// readedValue, _ := hcsr04.echoPin.DigitalRead()
-	// if readedValue == 1 {
-	// 	return 0, errors.New("already receiving echo")
-	// }
 	select {
 	case t := <-startChan:
 		startTime = t
@@ -116,7 +97,7 @@ func getPinStateChangeTime(pin *gpio.DirectPinDriver, state int, outChan chan in
 	for {
 		readedValue, _ := pin.DigitalRead()
 		// stop the loop if the state is different or a quit is done
-		if readedValue != state && !*quit {
+		if readedValue == state || *quit {
 			break
 		}
 	}
