@@ -6,16 +6,16 @@ import (
 	"sync"
 	"time"
 
-	log "github.com/sirupsen/logrus"
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/drivers/gpio"
 )
 
 const (
-	soundSpeed       float32       = 343.0
+	soundSpeed float32 = 343.0 // in [m/s]
+	// the device can measure 2cm .. 4m, this means sweep distances between 4cm and 8m
+	// this cause pulse durations between 0.12ms and  24ms (at 34.3 cm/ms, ~0.03 ms/cm, ~3ms/m)
 	measurementCycle time.Duration = 60 // 60ms between two measurements
-	// MonitorUpdate is the time between each monitor update
-	MonitorUpdate time.Duration = 100 * time.Millisecond
+	MonitorUpdate    time.Duration = 100 * time.Millisecond
 )
 
 // HCSR04 instance
@@ -89,10 +89,10 @@ func (hcsr04 *HCSR04) measurePulse() (int64, error) {
 	var stopTime int64
 	go getPinStateChangeTime(hcsr04.echoPin, 1, startChan, &startQuit)
 	hcsr04.emitTrigger()
-	readedValue, _ := hcsr04.echoPin.DigitalRead()
-	if readedValue == 1 {
-		return 0, errors.New("already receiving echo")
-	}
+	// readedValue, _ := hcsr04.echoPin.DigitalRead()
+	// if readedValue == 1 {
+	// 	return 0, errors.New("already receiving echo")
+	// }
 	select {
 	case t := <-startChan:
 		startTime = t
@@ -114,15 +114,17 @@ func (hcsr04 *HCSR04) measurePulse() (int64, error) {
 func getPinStateChangeTime(pin *gpio.DirectPinDriver, state int, outChan chan int64, quit *bool) {
 
 	for {
-		// readedValue, _ := pin.DigitalRead()
-		readedValue := 1
-		// fmt.Println("Lectura: ", readedValue, state, *quit)
+		readedValue, _ := pin.DigitalRead()
+		// stop the loop if the state is different or a quit is done
 		if readedValue != state && !*quit {
 			break
 		}
 	}
 	time.Sleep(100)
-	readedValue, _ := pin.DigitalRead()
+	readedValue, err := pin.DigitalRead()
+	if err != nil {
+		fmt.Println(err)
+	}
 	if readedValue == state && !*quit {
 		outChan <- time.Now().UnixNano()
 	}
@@ -163,7 +165,7 @@ func (hcsr04 *HCSR04) distanceMonitor() {
 			return
 		default:
 			if _, err := hcsr04.MeasureDistance(); err != nil {
-				log.WithField("error", err).Error("impossible to measure distance")
+				fmt.Println("error: impossible to measure distance", err)
 			}
 		}
 		time.Sleep(MonitorUpdate)
