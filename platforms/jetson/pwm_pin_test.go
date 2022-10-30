@@ -23,6 +23,7 @@ func TestPwmPin(t *testing.T) {
 	})
 
 	sysfs.SetFilesystem(fs)
+	defer sysfs.SetFilesystem(&sysfs.NativeFilesystem{})
 
 	pin, err := NewPWMPin("32")
 	gobottest.Assert(t, pin.Export(), nil)

@@ -18,6 +18,7 @@ func TestDigitalPin(t *testing.T) {
 	})
 
 	SetFilesystem(fs)
+	defer SetFilesystem(&NativeFilesystem{})
 
 	pin := NewDigitalPin(10, "custom")
 	gobottest.Assert(t, pin.pin, "10")
@@ -94,6 +95,7 @@ func TestDigitalPinExportError(t *testing.T) {
 	})
 
 	SetFilesystem(fs)
+	defer SetFilesystem(&NativeFilesystem{})
 
 	pin := NewDigitalPin(10, "custom")
 	writeFile = func(File, []byte) (int, error) {
@@ -113,6 +115,7 @@ func TestDigitalPinUnexportError(t *testing.T) {
 	})
 
 	SetFilesystem(fs)
+	defer SetFilesystem(&NativeFilesystem{})
 
 	pin := NewDigitalPin(10, "custom")
 	writeFile = func(File, []byte) (int, error) {

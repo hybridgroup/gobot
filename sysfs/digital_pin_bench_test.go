@@ -1,6 +1,8 @@
 package sysfs
 
-import "testing"
+import (
+	"testing"
+)
 
 func BenchmarkDigitalRead(b *testing.B) {
 	fs := NewMockFilesystem([]string{
@@ -11,6 +13,8 @@ func BenchmarkDigitalRead(b *testing.B) {
 	})
 
 	SetFilesystem(fs)
+	defer SetFilesystem(&NativeFilesystem{})
+
 	pin := NewDigitalPin(10)
 	pin.Write(1)
 

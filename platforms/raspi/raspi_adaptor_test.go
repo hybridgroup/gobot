@@ -99,7 +99,9 @@ func TestAdaptorFinalize(t *testing.T) {
 	})
 
 	sysfs.SetFilesystem(fs)
+	defer sysfs.SetFilesystem(&sysfs.NativeFilesystem{})
 	sysfs.SetSyscall(&sysfs.MockSyscall{})
+	defer sysfs.SetSyscall(&sysfs.NativeSyscall{})
 
 	a.DigitalWrite("3", 1)
 	a.PwmWrite("7", 255)
@@ -112,12 +114,13 @@ func TestAdaptorDigitalPWM(t *testing.T) {
 	a := initTestAdaptor()
 	a.PiBlasterPeriod = 20000000
 
-	gobottest.Assert(t, a.PwmWrite("7", 4), nil)
-
 	fs := sysfs.NewMockFilesystem([]string{
 		"/dev/pi-blaster",
 	})
 	sysfs.SetFilesystem(fs)
+	defer sysfs.SetFilesystem(&sysfs.NativeFilesystem{})
+
+	gobottest.Assert(t, a.PwmWrite("7", 4), nil)
 
 	pin, _ := a.PWMPin("7")
 	period, _ := pin.Period()
@@ -155,6 +158,7 @@ func TestAdaptorDigitalIO(t *testing.T) {
 	})
 
 	sysfs.SetFilesystem(fs)
+	defer sysfs.SetFilesystem(&sysfs.NativeFilesystem{})
 
 	a.DigitalWrite("7", 1)
 	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio4/value"].Contents, "1")
@@ -180,7 +184,9 @@ func TestAdaptorI2c(t *testing.T) {
 		"/dev/i2c-1",
 	})
 	sysfs.SetFilesystem(fs)
+	defer sysfs.SetFilesystem(&sysfs.NativeFilesystem{})
 	sysfs.SetSyscall(&sysfs.MockSyscall{})
+	defer sysfs.SetSyscall(&sysfs.NativeSyscall{})
 
 	con, err := a.GetConnection(0xff, 1)
 	gobottest.Assert(t, err, nil)
@@ -202,7 +208,9 @@ func TestAdaptorSPI(t *testing.T) {
 		"/dev/spidev0.1",
 	})
 	sysfs.SetFilesystem(fs)
+	defer sysfs.SetFilesystem(&sysfs.NativeFilesystem{})
 	sysfs.SetSyscall(&sysfs.MockSyscall{})
+	defer sysfs.SetSyscall(&sysfs.NativeSyscall{})
 
 	gobottest.Assert(t, a.GetSpiDefaultBus(), 0)
 	gobottest.Assert(t, a.GetSpiDefaultChip(), 0)
@@ -219,6 +227,7 @@ func TestAdaptorDigitalPinConcurrency(t *testing.T) {
 
 	oldProcs := runtime.GOMAXPROCS(0)
 	runtime.GOMAXPROCS(8)
+	defer runtime.GOMAXPROCS(oldProcs)
 
 	for retry := 0; retry < 20; retry++ {
 
@@ -236,9 +245,6 @@ func TestAdaptorDigitalPinConcurrency(t *testing.T) {
 
 		wg.Wait()
 	}
-
-	runtime.GOMAXPROCS(oldProcs)
-
 }
 
 func TestAdaptorPWMPin(t *testing.T) {

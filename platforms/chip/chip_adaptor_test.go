@@ -40,6 +40,7 @@ func initTestChipAdaptor() (*Adaptor, *sysfs.MockFilesystem) {
 	})
 
 	sysfs.SetFilesystem(fs)
+
 	return a, fs
 }
 
@@ -64,6 +65,10 @@ func initTestChipProAdaptor() (*Adaptor, *sysfs.MockFilesystem) {
 	return a, fs
 }
 
+func cleanTestChipAdaptor() {
+	defer sysfs.SetFilesystem(&sysfs.NativeFilesystem{})
+}
+
 func TestChipAdaptorName(t *testing.T) {
 	a := NewAdaptor()
 	gobottest.Assert(t, strings.HasPrefix(a.Name(), "CHIP"), true)
@@ -81,6 +86,7 @@ func TestChipAdaptorBoard(t *testing.T) {
 
 func TestAdaptorFinalizeErrorAfterGPIO(t *testing.T) {
 	a, fs := initTestChipAdaptor()
+	defer cleanTestChipAdaptor()
 	gobottest.Assert(t, a.Connect(), nil)
 	gobottest.Assert(t, a.DigitalWrite("CSID7", 1), nil)
 
@@ -92,6 +98,7 @@ func TestAdaptorFinalizeErrorAfterGPIO(t *testing.T) {
 
 func TestAdaptorFinalizeErrorAfterPWM(t *testing.T) {
 	a, fs := initTestChipAdaptor()
+	defer cleanTestChipAdaptor()
 	gobottest.Assert(t, a.Connect(), nil)
 	gobottest.Assert(t, a.PwmWrite("PWM0", 100), nil)
 
@@ -103,6 +110,7 @@ func TestAdaptorFinalizeErrorAfterPWM(t *testing.T) {
 
 func TestChipAdaptorDigitalIO(t *testing.T) {
 	a, fs := initTestChipAdaptor()
+	defer cleanTestChipAdaptor()
 	a.Connect()
 
 	a.DigitalWrite("CSID7", 1)
@@ -118,6 +126,7 @@ func TestChipAdaptorDigitalIO(t *testing.T) {
 
 func TestChipProAdaptorDigitalIO(t *testing.T) {
 	a, fs := initTestChipProAdaptor()
+	defer cleanTestChipAdaptor()
 	a.Connect()
 
 	a.DigitalWrite("CSID7", 1)
@@ -133,6 +142,7 @@ func TestChipProAdaptorDigitalIO(t *testing.T) {
 
 func TestAdaptorDigitalWriteError(t *testing.T) {
 	a, fs := initTestChipAdaptor()
+	defer cleanTestChipAdaptor()
 	fs.WithWriteError = true
 
 	err := a.DigitalWrite("CSID7", 1)
@@ -141,6 +151,7 @@ func TestAdaptorDigitalWriteError(t *testing.T) {
 
 func TestAdaptorDigitalReadWriteError(t *testing.T) {
 	a, fs := initTestChipAdaptor()
+	defer cleanTestChipAdaptor()
 	fs.WithWriteError = true
 
 	_, err := a.DigitalRead("CSID7")
@@ -156,6 +167,7 @@ func TestChipAdaptorI2c(t *testing.T) {
 	})
 	sysfs.SetFilesystem(fs)
 	sysfs.SetSyscall(&sysfs.MockSyscall{})
+	defer sysfs.SetSyscall(&sysfs.NativeSyscall{})
 
 	con, err := a.GetConnection(0xff, 1)
 	gobottest.Assert(t, err, nil)
@@ -170,6 +182,7 @@ func TestChipAdaptorI2c(t *testing.T) {
 
 func TestChipAdaptorInvalidPWMPin(t *testing.T) {
 	a, _ := initTestChipAdaptor()
+	defer cleanTestChipAdaptor()
 	a.Connect()
 
 	err := a.PwmWrite("LCD-D2", 42)
@@ -181,6 +194,7 @@ func TestChipAdaptorInvalidPWMPin(t *testing.T) {
 
 func TestChipAdaptorPWM(t *testing.T) {
 	a, fs := initTestChipAdaptor()
+	defer cleanTestChipAdaptor()
 	a.Connect()
 
 	err := a.PwmWrite("PWM0", 100)
@@ -205,6 +219,7 @@ func TestChipAdaptorPWM(t *testing.T) {
 
 func TestAdaptorPwmWriteError(t *testing.T) {
 	a, fs := initTestChipAdaptor()
+	defer cleanTestChipAdaptor()
 	fs.WithWriteError = true
 
 	err := a.PwmWrite("PWM0", 100)
@@ -213,6 +228,7 @@ func TestAdaptorPwmWriteError(t *testing.T) {
 
 func TestAdaptorPwmReadError(t *testing.T) {
 	a, fs := initTestChipAdaptor()
+	defer cleanTestChipAdaptor()
 	fs.WithReadError = true
 
 	err := a.PwmWrite("PWM0", 100)
@@ -221,11 +237,13 @@ func TestAdaptorPwmReadError(t *testing.T) {
 
 func TestChipDefaultBus(t *testing.T) {
 	a, _ := initTestChipAdaptor()
+	defer cleanTestChipAdaptor()
 	gobottest.Assert(t, a.GetDefaultBus(), 1)
 }
 
 func TestChipGetConnectionInvalidBus(t *testing.T) {
 	a, _ := initTestChipAdaptor()
+	defer cleanTestChipAdaptor()
 	_, err := a.GetConnection(0x01, 99)
 	gobottest.Assert(t, err, errors.New("Bus number 99 out of range"))
 }

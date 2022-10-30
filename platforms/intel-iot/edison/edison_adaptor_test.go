@@ -102,8 +102,13 @@ func initTestAdaptor() (*Adaptor, *sysfs.MockFilesystem) {
 	return a, fs
 }
 
+func cleanTestAdaptor() {
+	defer sysfs.SetFilesystem(&sysfs.NativeFilesystem{})
+}
+
 func TestEdisonAdaptorName(t *testing.T) {
 	a, _ := initTestAdaptor()
+	defer cleanTestAdaptor()
 	gobottest.Assert(t, strings.HasPrefix(a.Name(), "Edison"), true)
 	a.SetName("NewName")
 	gobottest.Assert(t, a.Name(), "NewName")
@@ -111,6 +116,7 @@ func TestEdisonAdaptorName(t *testing.T) {
 
 func TestAdaptorConnect(t *testing.T) {
 	a, _ := initTestAdaptor()
+	defer cleanTestAdaptor()
 	gobottest.Assert(t, a.Connect(), nil)
 	gobottest.Assert(t, a.GetDefaultBus(), 6)
 	gobottest.Assert(t, a.Board(), "arduino")
@@ -120,6 +126,7 @@ func TestAdaptorConnect(t *testing.T) {
 
 func TestAdaptorArduinoSetupFail263(t *testing.T) {
 	a, fs := initTestAdaptor()
+	defer cleanTestAdaptor()
 	delete(fs.Files, "/sys/class/gpio/gpio263/direction")
 
 	err := a.arduinoSetup()
@@ -128,6 +135,7 @@ func TestAdaptorArduinoSetupFail263(t *testing.T) {
 
 func TestAdaptorArduinoSetupFail240(t *testing.T) {
 	a, fs := initTestAdaptor()
+	defer cleanTestAdaptor()
 	delete(fs.Files, "/sys/class/gpio/gpio240/direction")
 
 	err := a.arduinoSetup()
@@ -136,6 +144,7 @@ func TestAdaptorArduinoSetupFail240(t *testing.T) {
 
 func TestAdaptorArduinoSetupFail111(t *testing.T) {
 	a, fs := initTestAdaptor()
+	defer cleanTestAdaptor()
 	delete(fs.Files, "/sys/kernel/debug/gpio_debug/gpio111/current_pinmux")
 
 	err := a.arduinoSetup()
@@ -144,6 +153,7 @@ func TestAdaptorArduinoSetupFail111(t *testing.T) {
 
 func TestAdaptorArduinoSetupFail131(t *testing.T) {
 	a, fs := initTestAdaptor()
+	defer cleanTestAdaptor()
 	delete(fs.Files, "/sys/kernel/debug/gpio_debug/gpio131/current_pinmux")
 
 	err := a.arduinoSetup()
@@ -152,6 +162,7 @@ func TestAdaptorArduinoSetupFail131(t *testing.T) {
 
 func TestAdaptorArduinoI2CSetupFailTristate(t *testing.T) {
 	a, fs := initTestAdaptor()
+	defer cleanTestAdaptor()
 
 	gobottest.Assert(t, a.arduinoSetup(), nil)
 
@@ -162,6 +173,7 @@ func TestAdaptorArduinoI2CSetupFailTristate(t *testing.T) {
 
 func TestAdaptorArduinoI2CSetupFail14(t *testing.T) {
 	a, fs := initTestAdaptor()
+	defer cleanTestAdaptor()
 
 	gobottest.Assert(t, a.arduinoSetup(), nil)
 	delete(fs.Files, "/sys/class/gpio/gpio14/direction")
@@ -172,6 +184,7 @@ func TestAdaptorArduinoI2CSetupFail14(t *testing.T) {
 
 func TestAdaptorArduinoI2CSetupUnexportFail(t *testing.T) {
 	a, fs := initTestAdaptor()
+	defer cleanTestAdaptor()
 
 	gobottest.Assert(t, a.arduinoSetup(), nil)
 	delete(fs.Files, "/sys/class/gpio/unexport")
@@ -182,6 +195,7 @@ func TestAdaptorArduinoI2CSetupUnexportFail(t *testing.T) {
 
 func TestAdaptorArduinoI2CSetupFail236(t *testing.T) {
 	a, fs := initTestAdaptor()
+	defer cleanTestAdaptor()
 
 	gobottest.Assert(t, a.arduinoSetup(), nil)
 	delete(fs.Files, "/sys/class/gpio/gpio236/direction")
@@ -192,6 +206,7 @@ func TestAdaptorArduinoI2CSetupFail236(t *testing.T) {
 
 func TestAdaptorArduinoI2CSetupFail28(t *testing.T) {
 	a, fs := initTestAdaptor()
+	defer cleanTestAdaptor()
 
 	gobottest.Assert(t, a.arduinoSetup(), nil)
 	delete(fs.Files, "/sys/kernel/debug/gpio_debug/gpio28/current_pinmux")
@@ -202,6 +217,7 @@ func TestAdaptorArduinoI2CSetupFail28(t *testing.T) {
 
 func TestAdaptorConnectArduinoError(t *testing.T) {
 	a, _ := initTestAdaptor()
+	defer cleanTestAdaptor()
 	a.writeFile = func(string, []byte) (int, error) {
 		return 0, errors.New("write error")
 	}
@@ -212,6 +228,7 @@ func TestAdaptorConnectArduinoError(t *testing.T) {
 
 func TestAdaptorConnectArduinoWriteError(t *testing.T) {
 	a, fs := initTestAdaptor()
+	defer cleanTestAdaptor()
 	fs.WithWriteError = true
 	err := a.Connect()
 	gobottest.Assert(t, strings.Contains(err.Error(), "write error"), true)
@@ -219,6 +236,7 @@ func TestAdaptorConnectArduinoWriteError(t *testing.T) {
 
 func TestAdaptorConnectSparkfun(t *testing.T) {
 	a, _ := initTestAdaptor()
+	defer cleanTestAdaptor()
 	a.SetBoard("sparkfun")
 	gobottest.Assert(t, a.Connect(), nil)
 	gobottest.Assert(t, a.GetDefaultBus(), 1)
@@ -227,6 +245,7 @@ func TestAdaptorConnectSparkfun(t *testing.T) {
 
 func TestAdaptorConnectMiniboard(t *testing.T) {
 	a, _ := initTestAdaptor()
+	defer cleanTestAdaptor()
 	a.SetBoard("miniboard")
 	gobottest.Assert(t, a.Connect(), nil)
 	gobottest.Assert(t, a.GetDefaultBus(), 1)
@@ -235,16 +254,19 @@ func TestAdaptorConnectMiniboard(t *testing.T) {
 
 func TestAdaptorConnectUnknown(t *testing.T) {
 	a, _ := initTestAdaptor()
+	defer cleanTestAdaptor()
 	a.SetBoard("wha")
 	gobottest.Refute(t, a.Connect(), nil)
 }
 
 func TestAdaptorFinalize(t *testing.T) {
 	a, _ := initTestAdaptor()
+	defer cleanTestAdaptor()
 	a.DigitalWrite("3", 1)
 	a.PwmWrite("5", 100)
 
 	sysfs.SetSyscall(&sysfs.MockSyscall{})
+	defer sysfs.SetSyscall(&sysfs.NativeSyscall{})
 	a.GetConnection(0xff, 6)
 
 	gobottest.Assert(t, a.Finalize(), nil)
@@ -255,6 +277,7 @@ func TestAdaptorFinalize(t *testing.T) {
 
 func TestAdaptorFinalizeError(t *testing.T) {
 	a, fs := initTestAdaptor()
+	defer cleanTestAdaptor()
 	a.PwmWrite("5", 100)
 
 	fs.WithWriteError = true
@@ -263,6 +286,7 @@ func TestAdaptorFinalizeError(t *testing.T) {
 
 func TestAdaptorDigitalIO(t *testing.T) {
 	a, fs := initTestAdaptor()
+	defer cleanTestAdaptor()
 
 	a.DigitalWrite("13", 1)
 	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio40/value"].Contents, "1")
@@ -289,6 +313,7 @@ func TestAdaptorDigitalPinInFileError(t *testing.T) {
 		"/sys/class/gpio/gpio261/direction",
 	})
 	sysfs.SetFilesystem(fs)
+	defer sysfs.SetFilesystem(&sysfs.NativeFilesystem{})
 
 	a.Connect()
 
@@ -313,6 +338,7 @@ func TestAdaptorDigitalPinInResistorFileError(t *testing.T) {
 		"/sys/class/gpio/gpio261/direction",
 	})
 	sysfs.SetFilesystem(fs)
+	defer sysfs.SetFilesystem(&sysfs.NativeFilesystem{})
 
 	a.Connect()
 
@@ -336,6 +362,7 @@ func TestAdaptorDigitalPinInLevelShifterFileError(t *testing.T) {
 		// "/sys/class/gpio/gpio261/direction",
 	})
 	sysfs.SetFilesystem(fs)
+	defer sysfs.SetFilesystem(&sysfs.NativeFilesystem{})
 
 	a.Connect()
 
@@ -359,6 +386,7 @@ func TestAdaptorDigitalPinInMuxFileError(t *testing.T) {
 		"/sys/class/gpio/gpio261/direction",
 	})
 	sysfs.SetFilesystem(fs)
+	defer sysfs.SetFilesystem(&sysfs.NativeFilesystem{})
 
 	a.Connect()
 
@@ -368,6 +396,7 @@ func TestAdaptorDigitalPinInMuxFileError(t *testing.T) {
 
 func TestAdaptorDigitalWriteError(t *testing.T) {
 	a, fs := initTestAdaptor()
+	defer cleanTestAdaptor()
 	fs.WithWriteError = true
 
 	err := a.DigitalWrite("13", 1)
@@ -376,6 +405,7 @@ func TestAdaptorDigitalWriteError(t *testing.T) {
 
 func TestAdaptorDigitalReadWriteError(t *testing.T) {
 	a, fs := initTestAdaptor()
+	defer cleanTestAdaptor()
 	fs.WithWriteError = true
 
 	_, err := a.DigitalRead("13")
@@ -384,8 +414,11 @@ func TestAdaptorDigitalReadWriteError(t *testing.T) {
 
 func TestAdaptorI2c(t *testing.T) {
 	a, _ := initTestAdaptor()
+	defer cleanTestAdaptor()
 
 	sysfs.SetSyscall(&sysfs.MockSyscall{})
+	defer sysfs.SetSyscall(&sysfs.NativeSyscall{})
+
 	con, err := a.GetConnection(0xff, 6)
 	gobottest.Assert(t, err, nil)
 
@@ -399,12 +432,14 @@ func TestAdaptorI2c(t *testing.T) {
 
 func TestAdaptorI2cInvalidBus(t *testing.T) {
 	a, _ := initTestAdaptor()
+	defer cleanTestAdaptor()
 	_, err := a.GetConnection(0xff, 3)
 	gobottest.Assert(t, err, errors.New("Unsupported I2C bus"))
 }
 
 func TestAdaptorPwm(t *testing.T) {
 	a, fs := initTestAdaptor()
+	defer cleanTestAdaptor()
 
 	err := a.PwmWrite("5", 100)
 	gobottest.Assert(t, err, nil)
@@ -432,6 +467,7 @@ func TestAdaptorPwmExportError(t *testing.T) {
 		"/sys/class/pwm/pwmchip0/pwm1/enable",
 	})
 	sysfs.SetFilesystem(fs)
+	defer sysfs.SetFilesystem(&sysfs.NativeFilesystem{})
 	a.Connect()
 
 	err := a.PwmWrite("5", 100)
@@ -456,6 +492,7 @@ func TestAdaptorPwmEnableError(t *testing.T) {
 		//"/sys/class/pwm/pwmchip0/pwm1/enable",
 	})
 	sysfs.SetFilesystem(fs)
+	defer sysfs.SetFilesystem(&sysfs.NativeFilesystem{})
 	a.Connect()
 
 	err := a.PwmWrite("5", 100)
@@ -464,6 +501,7 @@ func TestAdaptorPwmEnableError(t *testing.T) {
 
 func TestAdaptorPwmWritePinError(t *testing.T) {
 	a, _ := initTestAdaptor()
+	defer cleanTestAdaptor()
 
 	a.writeFile = func(string, []byte) (int, error) {
 		return 0, errors.New("write error")
@@ -475,6 +513,7 @@ func TestAdaptorPwmWritePinError(t *testing.T) {
 
 func TestAdaptorPwmWriteError(t *testing.T) {
 	a, fs := initTestAdaptor()
+	defer cleanTestAdaptor()
 
 	fs.WithWriteError = true
 
@@ -484,6 +523,7 @@ func TestAdaptorPwmWriteError(t *testing.T) {
 
 func TestAdaptorPwmReadError(t *testing.T) {
 	a, fs := initTestAdaptor()
+	defer cleanTestAdaptor()
 
 	fs.WithReadError = true
 
@@ -493,6 +533,7 @@ func TestAdaptorPwmReadError(t *testing.T) {
 
 func TestAdaptorAnalog(t *testing.T) {
 	a, fs := initTestAdaptor()
+	defer cleanTestAdaptor()
 
 	fs.Files["/sys/bus/iio/devices/iio:device1/in_voltage0_raw"].Contents = "1000\n"
 	i, _ := a.AnalogRead("0")
@@ -501,6 +542,7 @@ func TestAdaptorAnalog(t *testing.T) {
 
 func TestAdaptorAnalogError(t *testing.T) {
 	a, _ := initTestAdaptor()
+	defer cleanTestAdaptor()
 
 	a.readFile = func(string) ([]byte, error) {
 		return nil, errors.New("read error")

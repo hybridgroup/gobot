@@ -46,6 +46,10 @@ func initTestUP2Adaptor() (*Adaptor, *sysfs.MockFilesystem) {
 	return a, fs
 }
 
+func cleanTestUP2Adaptor() {
+	defer sysfs.SetFilesystem(&sysfs.NativeFilesystem{})
+}
+
 func TestUP2AdaptorName(t *testing.T) {
 	a := NewAdaptor()
 	gobottest.Assert(t, strings.HasPrefix(a.Name(), "UP2"), true)
@@ -55,6 +59,7 @@ func TestUP2AdaptorName(t *testing.T) {
 
 func TestUP2AdaptorDigitalIO(t *testing.T) {
 	a, fs := initTestUP2Adaptor()
+	defer cleanTestUP2Adaptor()
 	a.Connect()
 
 	a.DigitalWrite("7", 1)
@@ -76,6 +81,7 @@ func TestUP2AdaptorDigitalIO(t *testing.T) {
 
 func TestAdaptorDigitalWriteError(t *testing.T) {
 	a, fs := initTestUP2Adaptor()
+	defer cleanTestUP2Adaptor()
 	fs.WithWriteError = true
 
 	err := a.DigitalWrite("7", 1)
@@ -84,6 +90,7 @@ func TestAdaptorDigitalWriteError(t *testing.T) {
 
 func TestAdaptorDigitalReadWriteError(t *testing.T) {
 	a, fs := initTestUP2Adaptor()
+	defer cleanTestUP2Adaptor()
 	fs.WithWriteError = true
 
 	_, err := a.DigitalRead("7")
@@ -97,6 +104,7 @@ func TestUP2AdaptorI2c(t *testing.T) {
 	})
 	sysfs.SetFilesystem(fs)
 	sysfs.SetSyscall(&sysfs.MockSyscall{})
+	defer sysfs.SetSyscall(&sysfs.NativeSyscall{})
 
 	con, err := a.GetConnection(0xff, 5)
 	gobottest.Assert(t, err, nil)
@@ -126,6 +134,7 @@ func TestAdaptorSPI(t *testing.T) {
 
 func TestUP2AdaptorInvalidPWMPin(t *testing.T) {
 	a, _ := initTestUP2Adaptor()
+	defer cleanTestUP2Adaptor()
 	a.Connect()
 
 	err := a.PwmWrite("666", 42)
@@ -143,6 +152,7 @@ func TestUP2AdaptorInvalidPWMPin(t *testing.T) {
 
 func TestUP2AdaptorPWM(t *testing.T) {
 	a, fs := initTestUP2Adaptor()
+	defer cleanTestUP2Adaptor()
 
 	err := a.PwmWrite("32", 100)
 	gobottest.Assert(t, err, nil)
@@ -166,6 +176,7 @@ func TestUP2AdaptorPWM(t *testing.T) {
 
 func TestUP2AdaptorPwmWriteError(t *testing.T) {
 	a, fs := initTestUP2Adaptor()
+	defer cleanTestUP2Adaptor()
 	fs.WithWriteError = true
 
 	err := a.PwmWrite("32", 100)
@@ -174,6 +185,7 @@ func TestUP2AdaptorPwmWriteError(t *testing.T) {
 
 func TestUP2AdaptorPwmReadError(t *testing.T) {
 	a, fs := initTestUP2Adaptor()
+	defer cleanTestUP2Adaptor()
 	fs.WithReadError = true
 
 	err := a.PwmWrite("32", 100)
@@ -182,17 +194,20 @@ func TestUP2AdaptorPwmReadError(t *testing.T) {
 
 func TestUP2I2CDefaultBus(t *testing.T) {
 	a, _ := initTestUP2Adaptor()
+	defer cleanTestUP2Adaptor()
 	gobottest.Assert(t, a.GetDefaultBus(), 5)
 }
 
 func TestUP2GetConnectionInvalidBus(t *testing.T) {
 	a, _ := initTestUP2Adaptor()
+	defer cleanTestUP2Adaptor()
 	_, err := a.GetConnection(0x01, 99)
 	gobottest.Assert(t, err, errors.New("Bus number 99 out of range"))
 }
 
 func TestUP2FinalizeErrorAfterGPIO(t *testing.T) {
 	a, fs := initTestUP2Adaptor()
+	defer cleanTestUP2Adaptor()
 
 	gobottest.Assert(t, a.Connect(), nil)
 	gobottest.Assert(t, a.DigitalWrite("7", 1), nil)
@@ -205,6 +220,7 @@ func TestUP2FinalizeErrorAfterGPIO(t *testing.T) {
 
 func TestUP2FinalizeErrorAfterPWM(t *testing.T) {
 	a, fs := initTestUP2Adaptor()
+	defer cleanTestUP2Adaptor()
 
 	gobottest.Assert(t, a.Connect(), nil)
 	gobottest.Assert(t, a.PwmWrite("32", 1), nil)

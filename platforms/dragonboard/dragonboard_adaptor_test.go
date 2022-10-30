@@ -45,6 +45,7 @@ func TestDragonBoardAdaptorDigitalIO(t *testing.T) {
 	})
 
 	sysfs.SetFilesystem(fs)
+	defer sysfs.SetFilesystem(&sysfs.NativeFilesystem{})
 
 	_ = a.DigitalWrite("GPIO_B", 1)
 	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio12/value"].Contents, "1")
@@ -63,7 +64,9 @@ func TestDragonBoardAdaptorI2c(t *testing.T) {
 		"/dev/i2c-1",
 	})
 	sysfs.SetFilesystem(fs)
+	defer sysfs.SetFilesystem(&sysfs.NativeFilesystem{})
 	sysfs.SetSyscall(&sysfs.MockSyscall{})
+	defer sysfs.SetSyscall(&sysfs.NativeSyscall{})
 
 	con, err := a.GetConnection(0xff, 1)
 	gobottest.Assert(t, err, nil)
@@ -99,6 +102,7 @@ func TestAdaptorFinalizeErrorAfterGPIO(t *testing.T) {
 	})
 
 	sysfs.SetFilesystem(fs)
+	defer sysfs.SetFilesystem(&sysfs.NativeFilesystem{})
 
 	gobottest.Assert(t, a.Connect(), nil)
 	gobottest.Assert(t, a.DigitalWrite("GPIO_B", 1), nil)
