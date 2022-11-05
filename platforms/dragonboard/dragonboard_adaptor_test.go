@@ -9,7 +9,6 @@ import (
 	"gobot.io/x/gobot/drivers/gpio"
 	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/gobottest"
-	"gobot.io/x/gobot/sysfs"
 )
 
 // make sure that this Adaptor fullfills all the required interfaces
@@ -18,7 +17,7 @@ var _ gpio.DigitalReader = (*Adaptor)(nil)
 var _ gpio.DigitalWriter = (*Adaptor)(nil)
 var _ i2c.Connector = (*Adaptor)(nil)
 
-func initTestDragonBoardAdaptor(t *testing.T) *Adaptor {
+func initTestAdaptor(t *testing.T) *Adaptor {
 	a := NewAdaptor()
 	if err := a.Connect(); err != nil {
 		t.Error(err)
@@ -26,26 +25,24 @@ func initTestDragonBoardAdaptor(t *testing.T) *Adaptor {
 	return a
 }
 
-func TestDragonBoardAdaptorName(t *testing.T) {
-	a := initTestDragonBoardAdaptor(t)
+func TestName(t *testing.T) {
+	a := initTestAdaptor(t)
 	gobottest.Assert(t, strings.HasPrefix(a.Name(), "DragonBoard"), true)
 	a.SetName("NewName")
 	gobottest.Assert(t, a.Name(), "NewName")
 }
 
-func TestDragonBoardAdaptorDigitalIO(t *testing.T) {
-	a := initTestDragonBoardAdaptor(t)
-	fs := sysfs.NewMockFilesystem([]string{
+func TestDigitalIO(t *testing.T) {
+	a := initTestAdaptor(t)
+	mockPaths := []string{
 		"/sys/class/gpio/export",
 		"/sys/class/gpio/unexport",
 		"/sys/class/gpio/gpio36/value",
 		"/sys/class/gpio/gpio36/direction",
 		"/sys/class/gpio/gpio12/value",
 		"/sys/class/gpio/gpio12/direction",
-	})
-
-	sysfs.SetFilesystem(fs)
-	defer sysfs.SetFilesystem(&sysfs.NativeFilesystem{})
+	}
+	fs := a.sysfs.UseMockFilesystem(mockPaths)
 
 	_ = a.DigitalWrite("GPIO_B", 1)
 	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio12/value"].Contents, "1")
@@ -58,51 +55,47 @@ func TestDragonBoardAdaptorDigitalIO(t *testing.T) {
 	gobottest.Assert(t, a.Finalize(), nil)
 }
 
-func TestDragonBoardAdaptorI2c(t *testing.T) {
-	a := initTestDragonBoardAdaptor(t)
-	fs := sysfs.NewMockFilesystem([]string{
-		"/dev/i2c-1",
-	})
-	sysfs.SetFilesystem(fs)
-	defer sysfs.SetFilesystem(&sysfs.NativeFilesystem{})
-	sysfs.SetSyscall(&sysfs.MockSyscall{})
-	defer sysfs.SetSyscall(&sysfs.NativeSyscall{})
+func TestI2c(t *testing.T) {
+	a := initTestAdaptor(t)
+	a.sysfs.UseMockFilesystem([]string{"/dev/i2c-1"})
+	a.sysfs.UseMockSyscall()
 
 	con, err := a.GetConnection(0xff, 1)
 	gobottest.Assert(t, err, nil)
 
-	_, _ = con.Write([]byte{0x00, 0x01})
+	_, err = con.Write([]byte{0x00, 0x01})
+	gobottest.Assert(t, err, nil)
+
 	data := []byte{42, 42}
-	_, _ = con.Read(data)
+	_, err = con.Read(data)
+	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, data, []byte{0x00, 0x01})
 
 	gobottest.Assert(t, a.Finalize(), nil)
 }
 
-func TestDragonBoardDefaultBus(t *testing.T) {
-	a := initTestDragonBoardAdaptor(t)
+func TestDefaultBus(t *testing.T) {
+	a := initTestAdaptor(t)
 	gobottest.Assert(t, a.GetDefaultBus(), 0)
 }
 
-func TestDragonBoardGetConnectionInvalidBus(t *testing.T) {
-	a := initTestDragonBoardAdaptor(t)
+func TestGetConnectionInvalidBus(t *testing.T) {
+	a := initTestAdaptor(t)
 	_, err := a.GetConnection(0x01, 99)
 	gobottest.Assert(t, err, errors.New("Bus number 99 out of range"))
 }
 
-func TestAdaptorFinalizeErrorAfterGPIO(t *testing.T) {
-	a := initTestDragonBoardAdaptor(t)
-	fs := sysfs.NewMockFilesystem([]string{
+func TestFinalizeErrorAfterGPIO(t *testing.T) {
+	a := initTestAdaptor(t)
+	mockPaths := []string{
 		"/sys/class/gpio/export",
 		"/sys/class/gpio/unexport",
 		"/sys/class/gpio/gpio36/value",
 		"/sys/class/gpio/gpio36/direction",
 		"/sys/class/gpio/gpio12/value",
 		"/sys/class/gpio/gpio12/direction",
-	})
-
-	sysfs.SetFilesystem(fs)
-	defer sysfs.SetFilesystem(&sysfs.NativeFilesystem{})
+	}
+	fs := a.sysfs.UseMockFilesystem(mockPaths)
 
 	gobottest.Assert(t, a.Connect(), nil)
 	gobottest.Assert(t, a.DigitalWrite("GPIO_B", 1), nil)

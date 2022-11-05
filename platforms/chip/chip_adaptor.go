@@ -24,11 +24,12 @@ type sysfsPin struct {
 type Adaptor struct {
 	name        string
 	board       string
+	sysfs       *sysfs.Accesser
+	mutex       *sync.Mutex
 	pinmap      map[string]sysfsPin
 	digitalPins map[int]*sysfs.DigitalPin
 	pwmPins     map[int]*sysfs.PWMPin
 	i2cBuses    [3]i2c.I2cDevice
-	mutex       *sync.Mutex
 }
 
 // NewAdaptor creates a C.H.I.P. Adaptor
@@ -36,6 +37,7 @@ func NewAdaptor() *Adaptor {
 	c := &Adaptor{
 		name:  gobot.DefaultName("CHIP"),
 		board: "chip",
+		sysfs: sysfs.NewAccesser(),
 		mutex: &sync.Mutex{},
 	}
 
@@ -43,12 +45,13 @@ func NewAdaptor() *Adaptor {
 	return c
 }
 
-// NewAdaptor creates a C.H.I.P. Pro Adaptor
+// NewProAdaptor creates a C.H.I.P. Pro Adaptor
 func NewProAdaptor() *Adaptor {
 	c := &Adaptor{
 		name:  gobot.DefaultName("CHIP Pro"),
-		board: "pro",
+		sysfs: sysfs.NewAccesser(),
 		mutex: &sync.Mutex{},
+		board: "pro",
 	}
 
 	c.setPins()
@@ -132,7 +135,7 @@ func (c *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection
 		return nil, fmt.Errorf("Bus number %d out of range", bus)
 	}
 	if c.i2cBuses[bus] == nil {
-		c.i2cBuses[bus], err = sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
+		c.i2cBuses[bus], err = c.sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
 	}
 	return i2c.NewConnection(c.i2cBuses[bus], address), err
 }
@@ -142,7 +145,7 @@ func (c *Adaptor) GetDefaultBus() int {
 	return 1
 }
 
-// digitalPin returns matched digitalPin for specified values
+// DigitalPin returns matched digitalPin for specified values
 func (c *Adaptor) DigitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPinner, err error) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
@@ -154,7 +157,7 @@ func (c *Adaptor) DigitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPinn
 	}
 
 	if c.digitalPins[i] == nil {
-		c.digitalPins[i] = sysfs.NewDigitalPin(i)
+		c.digitalPins[i] = c.sysfs.NewDigitalPin(i)
 		if err = c.digitalPins[i].Export(); err != nil {
 			return
 		}
@@ -167,7 +170,7 @@ func (c *Adaptor) DigitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPinn
 	return c.digitalPins[i], nil
 }
 
-// pwmPin returns matched pwmPin for specified pin number
+// PWMPin returns matched pwmPin for specified pin number
 func (c *Adaptor) PWMPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
@@ -175,7 +178,7 @@ func (c *Adaptor) PWMPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
 	sysPin := c.pinmap[pin]
 	if sysPin.pwmPin != -1 {
 		if c.pwmPins[sysPin.pwmPin] == nil {
-			newPin := sysfs.NewPWMPin(sysPin.pwmPin)
+			newPin := c.sysfs.NewPWMPin(sysPin.pwmPin)
 			if err = newPin.Export(); err != nil {
 				return
 			}

@@ -34,7 +34,7 @@ func main() {
 			if val, err := pcf.ReadCounter(); err != nil {
 				fmt.Println(err)
 			} else {
-				log.Printf("read Counter: %d, diff: %d", val, val-lastCnt)
+				log.Printf("read Counter: %d, diff [Hz]: %d", val, val-lastCnt)
 				lastCnt = val
 			}
 

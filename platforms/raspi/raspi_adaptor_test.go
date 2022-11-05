@@ -2,6 +2,7 @@ package raspi
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 	"testing"
 
@@ -28,67 +29,65 @@ var _ sysfs.PWMPinnerProvider = (*Adaptor)(nil)
 var _ i2c.Connector = (*Adaptor)(nil)
 var _ spi.Connector = (*Adaptor)(nil)
 
-func initTestAdaptor() *Adaptor {
-	readFile = func() ([]byte, error) {
-		return []byte(`
-Hardware        : BCM2708
-Revision        : 0010
-Serial          : 000000003bc748ea
-`), nil
-	}
+func initTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *sysfs.MockFilesystem) {
 	a := NewAdaptor()
-	a.Connect()
-	return a
+	fs := a.sysfs.UseMockFilesystem(mockPaths)
+	return a, fs
 }
 
-func TestRaspiAdaptorName(t *testing.T) {
-	a := initTestAdaptor()
+func TestName(t *testing.T) {
+	a := NewAdaptor()
+
 	gobottest.Assert(t, strings.HasPrefix(a.Name(), "RaspberryPi"), true)
 	a.SetName("NewName")
 	gobottest.Assert(t, a.Name(), "NewName")
 }
 
-func TestAdaptor(t *testing.T) {
-	readFile = func() ([]byte, error) {
-		return []byte(`
-Hardware        : BCM2708
-Revision        : 0010
-Serial          : 000000003bc748ea
-`), nil
+func TestGetDefaultBus(t *testing.T) {
+	const contentPattern = "Hardware        : BCM2708\n%sSerial          : 000000003bc748ea\n"
+	var tests = map[string]struct {
+		revisionPart string
+		wantRev      string
+		wantBus      int
+	}{
+		"no_revision": {
+			wantRev: "0",
+			wantBus: 0,
+		},
+		"rev_1": {
+			revisionPart: "Revision        : 0002\n",
+			wantRev:      "1",
+			wantBus:      0,
+		},
+		"rev_2": {
+			revisionPart: "Revision        : 000D\n",
+			wantRev:      "2",
+			wantBus:      1,
+		},
+		"rev_3": {
+			revisionPart: "Revision        : 0010\n",
+			wantRev:      "3",
+			wantBus:      1,
+		},
 	}
-	a := NewAdaptor()
-	gobottest.Assert(t, strings.HasPrefix(a.Name(), "RaspberryPi"), true)
-	gobottest.Assert(t, a.i2cDefaultBus, 1)
-	gobottest.Assert(t, a.revision, "3")
-
-	readFile = func() ([]byte, error) {
-		return []byte(`
-Hardware        : BCM2708
-Revision        : 000D
-Serial          : 000000003bc748ea
-`), nil
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			a := NewAdaptor()
+			fs := a.sysfs.UseMockFilesystem([]string{infoFile})
+			fs.Files[infoFile].Contents = fmt.Sprintf(contentPattern, tc.revisionPart)
+			gobottest.Assert(t, a.revision, "")
+			//act, will read and refresh the revision
+			gotBus := a.GetDefaultBus()
+			//assert
+			gobottest.Assert(t, a.revision, tc.wantRev)
+			gobottest.Assert(t, gotBus, tc.wantBus)
+		})
 	}
-	a = NewAdaptor()
-	gobottest.Assert(t, a.i2cDefaultBus, 1)
-	gobottest.Assert(t, a.revision, "2")
-
-	readFile = func() ([]byte, error) {
-		return []byte(`
-Hardware        : BCM2708
-Revision        : 0002
-Serial          : 000000003bc748ea
-`), nil
-	}
-	a = NewAdaptor()
-	gobottest.Assert(t, a.i2cDefaultBus, 0)
-	gobottest.Assert(t, a.revision, "1")
-
 }
 
-func TestAdaptorFinalize(t *testing.T) {
-	a := initTestAdaptor()
-
-	fs := sysfs.NewMockFilesystem([]string{
+func TestFinalize(t *testing.T) {
+	mockedPaths := []string{
 		"/sys/class/gpio/export",
 		"/sys/class/gpio/unexport",
 		"/dev/pi-blaster",
@@ -96,12 +95,8 @@ func TestAdaptorFinalize(t *testing.T) {
 		"/dev/i2c-0",
 		"/dev/spidev0.0",
 		"/dev/spidev0.1",
-	})
-
-	sysfs.SetFilesystem(fs)
-	defer sysfs.SetFilesystem(&sysfs.NativeFilesystem{})
-	sysfs.SetSyscall(&sysfs.MockSyscall{})
-	defer sysfs.SetSyscall(&sysfs.NativeSyscall{})
+	}
+	a, _ := initTestAdaptorWithMockedFilesystem(mockedPaths)
 
 	a.DigitalWrite("3", 1)
 	a.PwmWrite("7", 255)
@@ -110,15 +105,10 @@ func TestAdaptorFinalize(t *testing.T) {
 	gobottest.Assert(t, a.Finalize(), nil)
 }
 
-func TestAdaptorDigitalPWM(t *testing.T) {
-	a := initTestAdaptor()
+func TestDigitalPWM(t *testing.T) {
+	mockedPaths := []string{"/dev/pi-blaster"}
+	a, fs := initTestAdaptorWithMockedFilesystem(mockedPaths)
 	a.PiBlasterPeriod = 20000000
-
-	fs := sysfs.NewMockFilesystem([]string{
-		"/dev/pi-blaster",
-	})
-	sysfs.SetFilesystem(fs)
-	defer sysfs.SetFilesystem(&sysfs.NativeFilesystem{})
 
 	gobottest.Assert(t, a.PwmWrite("7", 4), nil)
 
@@ -146,31 +136,33 @@ func TestAdaptorDigitalPWM(t *testing.T) {
 	gobottest.Assert(t, strings.Split(fs.Files["/dev/pi-blaster"].Contents, "\n")[0], "18=0.075")
 }
 
-func TestAdaptorDigitalIO(t *testing.T) {
-	a := initTestAdaptor()
-	fs := sysfs.NewMockFilesystem([]string{
+func TestDigitalIO(t *testing.T) {
+	mockedPaths := []string{
 		"/sys/class/gpio/export",
 		"/sys/class/gpio/unexport",
 		"/sys/class/gpio/gpio4/value",
 		"/sys/class/gpio/gpio4/direction",
 		"/sys/class/gpio/gpio27/value",
 		"/sys/class/gpio/gpio27/direction",
-	})
+	}
+	a, fs := initTestAdaptorWithMockedFilesystem(mockedPaths)
 
-	sysfs.SetFilesystem(fs)
-	defer sysfs.SetFilesystem(&sysfs.NativeFilesystem{})
-
-	a.DigitalWrite("7", 1)
+	err := a.DigitalWrite("7", 1)
+	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio4/value"].Contents, "1")
 
-	a.DigitalWrite("13", 1)
-	i, _ := a.DigitalRead("13")
+	a.revision = "2"
+	err = a.DigitalWrite("13", 1)
+	gobottest.Assert(t, err, nil)
+
+	i, err := a.DigitalRead("13")
+	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, i, 1)
 
 	gobottest.Assert(t, a.DigitalWrite("notexist", 1), errors.New("Not a valid pin"))
 
 	fs.WithReadError = true
-	_, err := a.DigitalRead("13")
+	_, err = a.DigitalRead("13")
 	gobottest.Assert(t, err, errors.New("read error"))
 
 	fs.WithWriteError = true
@@ -178,39 +170,34 @@ func TestAdaptorDigitalIO(t *testing.T) {
 	gobottest.Assert(t, err, errors.New("write error"))
 }
 
-func TestAdaptorI2c(t *testing.T) {
-	a := initTestAdaptor()
-	fs := sysfs.NewMockFilesystem([]string{
-		"/dev/i2c-1",
-	})
-	sysfs.SetFilesystem(fs)
-	defer sysfs.SetFilesystem(&sysfs.NativeFilesystem{})
-	sysfs.SetSyscall(&sysfs.MockSyscall{})
-	defer sysfs.SetSyscall(&sysfs.NativeSyscall{})
+func TestI2c(t *testing.T) {
+	mockedPaths := []string{"/dev/i2c-1"}
+	a, _ := initTestAdaptorWithMockedFilesystem(mockedPaths)
+	a.sysfs.UseMockSyscall()
 
 	con, err := a.GetConnection(0xff, 1)
 	gobottest.Assert(t, err, nil)
 
-	con.Write([]byte{0x00, 0x01})
+	_, err = con.Write([]byte{0x00, 0x01})
+	gobottest.Assert(t, err, nil)
+
 	data := []byte{42, 42}
-	con.Read(data)
+	_, err = con.Read(data)
+	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, data, []byte{0x00, 0x01})
 
 	_, err = a.GetConnection(0xff, 51)
 	gobottest.Assert(t, err, errors.New("Bus number 51 out of range"))
 
+	a.revision = "0"
+	gobottest.Assert(t, a.GetDefaultBus(), 0)
+
+	a.revision = "2"
 	gobottest.Assert(t, a.GetDefaultBus(), 1)
 }
 
-func TestAdaptorSPI(t *testing.T) {
-	a := initTestAdaptor()
-	fs := sysfs.NewMockFilesystem([]string{
-		"/dev/spidev0.1",
-	})
-	sysfs.SetFilesystem(fs)
-	defer sysfs.SetFilesystem(&sysfs.NativeFilesystem{})
-	sysfs.SetSyscall(&sysfs.MockSyscall{})
-	defer sysfs.SetSyscall(&sysfs.NativeSyscall{})
+func TestSPI(t *testing.T) {
+	a := NewAdaptor()
 
 	gobottest.Assert(t, a.GetSpiDefaultBus(), 0)
 	gobottest.Assert(t, a.GetSpiDefaultChip(), 0)
@@ -220,10 +207,11 @@ func TestAdaptorSPI(t *testing.T) {
 	_, err := a.GetSpiConnection(10, 0, 0, 8, 500000)
 	gobottest.Assert(t, err.Error(), "Bus number 10 out of range")
 
+	// TODO: tests for real connection currently not possible, because not using sysfs.Accessor using
 	// TODO: test tx/rx here...
 }
 
-func TestAdaptorDigitalPinConcurrency(t *testing.T) {
+func TestDigitalPinConcurrency(t *testing.T) {
 
 	oldProcs := runtime.GOMAXPROCS(0)
 	runtime.GOMAXPROCS(8)
@@ -231,7 +219,7 @@ func TestAdaptorDigitalPinConcurrency(t *testing.T) {
 
 	for retry := 0; retry < 20; retry++ {
 
-		a := initTestAdaptor()
+		a := NewAdaptor()
 		var wg sync.WaitGroup
 
 		for i := 0; i < 20; i++ {
@@ -247,13 +235,13 @@ func TestAdaptorDigitalPinConcurrency(t *testing.T) {
 	}
 }
 
-func TestAdaptorPWMPin(t *testing.T) {
-	a := initTestAdaptor()
+func TestPWMPin(t *testing.T) {
+	a := NewAdaptor()
 
 	gobottest.Assert(t, len(a.pwmPins), 0)
 
+	a.revision = "3"
 	firstSysPin, err := a.PWMPin("35")
-
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, len(a.pwmPins), 1)
 

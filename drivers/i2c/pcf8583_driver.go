@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	pcf8583Debug = true
+	pcf8583Debug = false
 
 	// PCF8583 supports addresses 0x50 and 0x51
 	// The default address applies when the address pin is grounded.
@@ -147,22 +147,18 @@ func (d *PCF8583Driver) WriteTime(val time.Time) error {
 	if !PCF8583Control(ctrlRegVal).isClockMode() {
 		return fmt.Errorf("%s: can't write time because the device is in wrong mode 0x%02x", d.name, ctrlRegVal)
 	}
-	// auto increment feature is used
 	year, month, day := val.Date()
-	written, err := d.connection.Write([]byte{
-		uint8(pcf8583Reg_CTRL), ctrlRegVal | uint8(pcf8583CtrlStopCounting),
-		pcf8583encodeBcd(uint8(val.Nanosecond() / 1000000 / 10)), // sub seconds in 1/10th seconds
-		pcf8583encodeBcd(uint8(val.Second())),
-		pcf8583encodeBcd(uint8(val.Minute())),
-		pcf8583encodeBcd(uint8(val.Hour())),
-		pcf8583encodeBcd(uint8(day)),                             // year, date (we keep the year counter zero and set the offset)
-		uint8(val.Weekday())<<5 | pcf8583encodeBcd(uint8(month)), // month, weekday (not BCD): Sunday = 0, Monday = 1 ...
-	})
+	err = d.connection.WriteBlockData(uint8(pcf8583Reg_CTRL),
+		[]byte{ctrlRegVal | uint8(pcf8583CtrlStopCounting),
+			pcf8583encodeBcd(uint8(val.Nanosecond() / 1000000 / 10)), // sub seconds in 1/10th seconds
+			pcf8583encodeBcd(uint8(val.Second())),
+			pcf8583encodeBcd(uint8(val.Minute())),
+			pcf8583encodeBcd(uint8(val.Hour())),
+			pcf8583encodeBcd(uint8(day)),                             // year, date (we keep the year counter zero and set the offset)
+			uint8(val.Weekday())<<5 | pcf8583encodeBcd(uint8(month)), // month, weekday (not BCD): Sunday = 0, Monday = 1 ...
+		})
 	if err != nil {
 		return err
-	}
-	if written != 8 {
-		return fmt.Errorf("%s: %d bytes written, but %d expected", d.name, written, 8)
 	}
 	d.yearOffset = year
 	return d.run(ctrlRegVal)
@@ -219,18 +215,14 @@ func (d *PCF8583Driver) WriteCounter(val int32) error {
 	if !PCF8583Control(ctrlRegVal).isCounterMode() {
 		return fmt.Errorf("%s: can't write counter because the device is in wrong mode 0x%02x", d.name, ctrlRegVal)
 	}
-	// auto increment feature is used, PCF8583 not working with WriteBlockData
-	written, err := d.connection.Write([]byte{
-		uint8(pcf8583Reg_CTRL), ctrlRegVal | uint8(pcf8583CtrlStopCounting), // stop
-		pcf8583encodeBcd(uint8(val % 100)),           // 2 lowest digits
-		pcf8583encodeBcd(uint8((val / 100) % 100)),   // 2 middle digits
-		pcf8583encodeBcd(uint8((val / 10000) % 100)), // 2 highest digits
-	})
+	err = d.connection.WriteBlockData(uint8(pcf8583Reg_CTRL),
+		[]byte{ctrlRegVal | uint8(pcf8583CtrlStopCounting), // stop
+			pcf8583encodeBcd(uint8(val % 100)),           // 2 lowest digits
+			pcf8583encodeBcd(uint8((val / 100) % 100)),   // 2 middle digits
+			pcf8583encodeBcd(uint8((val / 10000) % 100)), // 2 highest digits
+		})
 	if err != nil {
 		return err
-	}
-	if written != 5 {
-		return fmt.Errorf("%s: %d bytes written, but %d expected", d.name, written, 5)
 	}
 	return d.run(ctrlRegVal)
 }

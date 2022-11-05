@@ -3,7 +3,6 @@ package raspi
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"strconv"
 	"strings"
 
@@ -16,23 +15,18 @@ import (
 	"gobot.io/x/gobot/sysfs"
 )
 
-var readFile = func() ([]byte, error) {
-	return ioutil.ReadFile("/proc/cpuinfo")
-}
+const infoFile = "/proc/cpuinfo"
 
 // Adaptor is the Gobot Adaptor for the Raspberry Pi
 type Adaptor struct {
-	mutex              *sync.Mutex
 	name               string
+	mutex              *sync.Mutex
+	sysfs              *sysfs.Accesser
 	revision           string
 	digitalPins        map[int]*sysfs.DigitalPin
 	pwmPins            map[int]*PWMPin
-	i2cDefaultBus      int
 	i2cBuses           [2]i2c.I2cDevice
-	spiDefaultBus      int
-	spiDefaultChip     int
 	spiDevices         [2]spi.Connection
-	spiDefaultMode     int
 	spiDefaultMaxSpeed int64
 	PiBlasterPeriod    uint32
 }
@@ -40,31 +34,12 @@ type Adaptor struct {
 // NewAdaptor creates a Raspi Adaptor
 func NewAdaptor() *Adaptor {
 	r := &Adaptor{
-		mutex:           &sync.Mutex{},
 		name:            gobot.DefaultName("RaspberryPi"),
+		sysfs:           sysfs.NewAccesser(),
+		mutex:           &sync.Mutex{},
 		digitalPins:     make(map[int]*sysfs.DigitalPin),
 		pwmPins:         make(map[int]*PWMPin),
 		PiBlasterPeriod: 10000000,
-	}
-	content, _ := readFile()
-	for _, v := range strings.Split(string(content), "\n") {
-		if strings.Contains(v, "Revision") {
-			s := strings.Split(string(v), " ")
-			version, _ := strconv.ParseInt("0x"+s[len(s)-1], 0, 64)
-			r.i2cDefaultBus = 1
-			r.spiDefaultBus = 0
-			r.spiDefaultChip = 0
-			r.spiDefaultMode = 0
-			r.spiDefaultMaxSpeed = 500000
-			if version <= 3 {
-				r.revision = "1"
-				r.i2cDefaultBus = 0
-			} else if version <= 15 {
-				r.revision = "2"
-			} else {
-				r.revision = "3"
-			}
-		}
 	}
 
 	return r
@@ -86,11 +61,8 @@ func (r *Adaptor) SetName(n string) {
 	r.name = n
 }
 
-// Connect starts connection with board and creates
-// digitalPins and pwmPins adaptor maps
-func (r *Adaptor) Connect() (err error) {
-	return
-}
+// Connect do nothing at the moment
+func (r *Adaptor) Connect() error { return nil }
 
 // Finalize closes connection to board and pins
 func (r *Adaptor) Finalize() (err error) {
@@ -154,7 +126,7 @@ func (r *Adaptor) getExportedDigitalPin(translatedPin int, dir string) (sysfsPin
 	defer r.mutex.Unlock()
 
 	if r.digitalPins[translatedPin] == nil {
-		r.digitalPins[translatedPin] = sysfs.NewDigitalPin(translatedPin)
+		r.digitalPins[translatedPin] = r.sysfs.NewDigitalPin(translatedPin)
 		if err = r.digitalPins[translatedPin].Export(); err != nil {
 			return
 		}
@@ -198,7 +170,7 @@ func (r *Adaptor) getI2cBus(bus int) (_ i2c.I2cDevice, err error) {
 	defer r.mutex.Unlock()
 
 	if r.i2cBuses[bus] == nil {
-		r.i2cBuses[bus], err = sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
+		r.i2cBuses[bus], err = r.sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
 	}
 
 	return r.i2cBuses[bus], err
@@ -206,7 +178,11 @@ func (r *Adaptor) getI2cBus(bus int) (_ i2c.I2cDevice, err error) {
 
 // GetDefaultBus returns the default i2c bus for this platform
 func (r *Adaptor) GetDefaultBus() int {
-	return r.i2cDefaultBus
+	rev := r.readRevision()
+	if rev == "2" || rev == "3" {
+		return 1
+	}
+	return 0
 }
 
 // GetSpiConnection returns an spi connection to a device on a specified bus.
@@ -228,17 +204,17 @@ func (r *Adaptor) GetSpiConnection(busNum, chipNum, mode, bits int, maxSpeed int
 
 // GetSpiDefaultBus returns the default spi bus for this platform.
 func (r *Adaptor) GetSpiDefaultBus() int {
-	return r.spiDefaultBus
+	return 0
 }
 
 // GetSpiDefaultChip returns the default spi chip for this platform.
 func (r *Adaptor) GetSpiDefaultChip() int {
-	return r.spiDefaultChip
+	return 0
 }
 
 // GetSpiDefaultMode returns the default spi mode for this platform.
 func (r *Adaptor) GetSpiDefaultMode() int {
-	return r.spiDefaultMode
+	return 0
 }
 
 // GetSpiDefaultBits returns the default spi number of bits for this platform.
@@ -248,7 +224,7 @@ func (r *Adaptor) GetSpiDefaultBits() int {
 
 // GetSpiDefaultMaxSpeed returns the default spi bus for this platform.
 func (r *Adaptor) GetSpiDefaultMaxSpeed() int64 {
-	return r.spiDefaultMaxSpeed
+	return 500000
 }
 
 // PWMPin returns a raspi.PWMPin which provides the sysfs.PWMPinner interface
@@ -262,7 +238,7 @@ func (r *Adaptor) PWMPin(pin string) (raspiPWMPin sysfs.PWMPinner, err error) {
 	defer r.mutex.Unlock()
 
 	if r.pwmPins[i] == nil {
-		r.pwmPins[i] = NewPWMPin(strconv.Itoa(i))
+		r.pwmPins[i] = NewPWMPin(r.sysfs, strconv.Itoa(i))
 		r.pwmPins[i].SetPeriod(r.PiBlasterPeriod)
 	}
 
@@ -292,7 +268,7 @@ func (r *Adaptor) ServoWrite(pin string, angle byte) (err error) {
 }
 
 func (r *Adaptor) translatePin(pin string) (i int, err error) {
-	if val, ok := pins[pin][r.revision]; ok {
+	if val, ok := pins[pin][r.readRevision()]; ok {
 		i = val
 	} else if val, ok := pins[pin]["*"]; ok {
 		i = val
@@ -301,4 +277,29 @@ func (r *Adaptor) translatePin(pin string) (i int, err error) {
 		return
 	}
 	return
+}
+
+func (r *Adaptor) readRevision() string {
+	if r.revision == "" {
+		r.revision = "0"
+		content, err := r.sysfs.ReadFile(infoFile)
+		if err != nil {
+			return r.revision
+		}
+		for _, v := range strings.Split(string(content), "\n") {
+			if strings.Contains(v, "Revision") {
+				s := strings.Split(string(v), " ")
+				version, _ := strconv.ParseInt("0x"+s[len(s)-1], 0, 64)
+				if version <= 3 {
+					r.revision = "1"
+				} else if version <= 15 {
+					r.revision = "2"
+				} else {
+					r.revision = "3"
+				}
+			}
+		}
+	}
+
+	return r.revision
 }

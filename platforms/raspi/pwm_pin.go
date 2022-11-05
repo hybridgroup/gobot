@@ -12,15 +12,18 @@ import (
 // PWMPin is the Raspberry Pi implementation of the PWMPinner interface.
 // It uses Pi Blaster.
 type PWMPin struct {
+	sysfs  *sysfs.Accesser
 	pin    string
 	dc     uint32
 	period uint32
 }
 
-// NewPwmPin returns a new PWMPin
-func NewPWMPin(pin string) *PWMPin {
+// NewPWMPin returns a new PWMPin
+func NewPWMPin(sysfs *sysfs.Accesser, pin string) *PWMPin {
 	return &PWMPin{
-		pin: pin}
+		sysfs: sysfs,
+		pin:   pin,
+	}
 }
 
 // Export exports the pin for use by the Raspberry Pi
@@ -83,7 +86,7 @@ func (p *PWMPin) SetDutyCycle(duty uint32) (err error) {
 	}
 
 	if duty > p.period {
-		return errors.New("Duty cycle exceeds period.")
+		return errors.New("Duty cycle exceeds period")
 	}
 	p.dc = duty
 
@@ -98,7 +101,7 @@ func (p *PWMPin) SetDutyCycle(duty uint32) (err error) {
 }
 
 func (p *PWMPin) piBlaster(data string) (err error) {
-	fi, err := sysfs.OpenFile("/dev/pi-blaster", os.O_WRONLY|os.O_APPEND, 0644)
+	fi, err := p.sysfs.OpenFile("/dev/pi-blaster", os.O_WRONLY|os.O_APPEND, 0644)
 	defer fi.Close()
 
 	if err != nil {

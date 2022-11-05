@@ -11,7 +11,8 @@ import (
 var _ sysfs.PWMPinner = (*PWMPin)(nil)
 
 func TestPwmPin(t *testing.T) {
-	fs := sysfs.NewMockFilesystem([]string{
+	a := sysfs.NewAccesser()
+	mockPaths := []string{
 		"/sys/class/pwm/pwmchip0/export",
 		"/sys/class/pwm/pwmchip0/unexport",
 		"/sys/class/pwm/pwmchip0/pwm0/enable",
@@ -20,12 +21,10 @@ func TestPwmPin(t *testing.T) {
 		"/sys/class/pwm/pwmchip0/pwm2/enable",
 		"/sys/class/pwm/pwmchip0/pwm2/period",
 		"/sys/class/pwm/pwmchip0/pwm2/duty_cycle",
-	})
+	}
+	a.UseMockFilesystem(mockPaths)
 
-	sysfs.SetFilesystem(fs)
-	defer sysfs.SetFilesystem(&sysfs.NativeFilesystem{})
-
-	pin, err := NewPWMPin("32")
+	pin, err := NewPWMPin(a, "32")
 	gobottest.Assert(t, pin.Export(), nil)
 	gobottest.Assert(t, pin.Enable(true), nil)
 	val, _ := pin.Polarity()
@@ -50,7 +49,7 @@ func TestPwmPin(t *testing.T) {
 	dc, _ = pin.DutyCycle()
 	gobottest.Assert(t, dc, uint32(10000))
 
-	gobottest.Assert(t, pin.SetDutyCycle(999999999), errors.New("Duty cycle exceeds period."))
+	gobottest.Assert(t, pin.SetDutyCycle(999999999), errors.New("Duty cycle exceeds period"))
 	dc, _ = pin.DutyCycle()
 	gobottest.Assert(t, dc, uint32(10000))
 

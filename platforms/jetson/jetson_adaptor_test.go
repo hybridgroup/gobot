@@ -25,45 +25,32 @@ var _ sysfs.DigitalPinnerProvider = (*Adaptor)(nil)
 var _ i2c.Connector = (*Adaptor)(nil)
 var _ spi.Connector = (*Adaptor)(nil)
 
-func initTestAdaptor() *Adaptor {
-
+func initTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *sysfs.MockFilesystem) {
 	a := NewAdaptor()
-	a.Connect()
-	return a
+	fs := a.sysfs.UseMockFilesystem(mockPaths)
+	return a, fs
 }
 
-func TestJetsonAdaptorName(t *testing.T) {
-	a := initTestAdaptor()
+func TestNewAdaptor(t *testing.T) {
+	a := NewAdaptor()
+
 	gobottest.Assert(t, strings.HasPrefix(a.Name(), "JetsonNano"), true)
+	gobottest.Assert(t, a.GetDefaultBus(), 1)
+
 	a.SetName("NewName")
 	gobottest.Assert(t, a.Name(), "NewName")
 }
 
-func TestAdaptor(t *testing.T) {
-
-	a := NewAdaptor()
-	gobottest.Assert(t, strings.HasPrefix(a.Name(), "JetsonNano"), true)
-	gobottest.Assert(t, a.i2cDefaultBus, 1)
-	gobottest.Assert(t, a.revision, "")
-
-}
-
-func TestAdaptorFinalize(t *testing.T) {
-	a := initTestAdaptor()
-
-	fs := sysfs.NewMockFilesystem([]string{
+func TestFinalize(t *testing.T) {
+	mockPaths := []string{
 		"/sys/class/gpio/export",
 		"/sys/class/gpio/unexport",
 		"/dev/i2c-1",
 		"/dev/i2c-0",
 		"/dev/spidev0.0",
 		"/dev/spidev0.1",
-	})
-
-	sysfs.SetFilesystem(fs)
-	defer sysfs.SetFilesystem(&sysfs.NativeFilesystem{})
-	sysfs.SetSyscall(&sysfs.MockSyscall{})
-	defer sysfs.SetSyscall(&sysfs.NativeSyscall{})
+	}
+	a, _ := initTestAdaptorWithMockedFilesystem(mockPaths)
 
 	a.DigitalWrite("3", 1)
 
@@ -71,19 +58,16 @@ func TestAdaptorFinalize(t *testing.T) {
 	gobottest.Assert(t, a.Finalize(), nil)
 }
 
-func TestAdaptorDigitalIO(t *testing.T) {
-	a := initTestAdaptor()
-	fs := sysfs.NewMockFilesystem([]string{
+func TestDigitalIO(t *testing.T) {
+	mockPaths := []string{
 		"/sys/class/gpio/export",
 		"/sys/class/gpio/unexport",
 		"/sys/class/gpio/gpio216/value",
 		"/sys/class/gpio/gpio216/direction",
 		"/sys/class/gpio/gpio14/value",
 		"/sys/class/gpio/gpio14/direction",
-	})
-
-	sysfs.SetFilesystem(fs)
-	defer sysfs.SetFilesystem(&sysfs.NativeFilesystem{})
+	}
+	a, fs := initTestAdaptorWithMockedFilesystem(mockPaths)
 
 	a.DigitalWrite("7", 1)
 	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio216/value"].Contents, "1")
@@ -103,22 +87,19 @@ func TestAdaptorDigitalIO(t *testing.T) {
 	gobottest.Assert(t, err, errors.New("write error"))
 }
 
-func TestAdaptorI2c(t *testing.T) {
-	a := initTestAdaptor()
-	fs := sysfs.NewMockFilesystem([]string{
-		"/dev/i2c-1",
-	})
-	sysfs.SetFilesystem(fs)
-	defer sysfs.SetFilesystem(&sysfs.NativeFilesystem{})
-	sysfs.SetSyscall(&sysfs.MockSyscall{})
-	defer sysfs.SetSyscall(&sysfs.NativeSyscall{})
+func TestI2c(t *testing.T) {
+	a, _ := initTestAdaptorWithMockedFilesystem([]string{"/dev/i2c-1"})
+	a.sysfs.UseMockSyscall()
 
 	con, err := a.GetConnection(0xff, 1)
 	gobottest.Assert(t, err, nil)
 
-	con.Write([]byte{0x00, 0x01})
+	_, err = con.Write([]byte{0x00, 0x01})
+	gobottest.Assert(t, err, nil)
+
 	data := []byte{42, 42}
-	con.Read(data)
+	_, err = con.Read(data)
+	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, data, []byte{0x00, 0x01})
 
 	_, err = a.GetConnection(0xff, 51)
@@ -127,15 +108,8 @@ func TestAdaptorI2c(t *testing.T) {
 	gobottest.Assert(t, a.GetDefaultBus(), 1)
 }
 
-func TestAdaptorSPI(t *testing.T) {
-	a := initTestAdaptor()
-	fs := sysfs.NewMockFilesystem([]string{
-		"/dev/spidev0.1",
-	})
-	sysfs.SetFilesystem(fs)
-	defer sysfs.SetFilesystem(&sysfs.NativeFilesystem{})
-	sysfs.SetSyscall(&sysfs.MockSyscall{})
-	defer sysfs.SetSyscall(&sysfs.NativeSyscall{})
+func TestSPI(t *testing.T) {
+	a := NewAdaptor()
 
 	gobottest.Assert(t, a.GetSpiDefaultBus(), 0)
 	gobottest.Assert(t, a.GetSpiDefaultChip(), 0)
@@ -145,10 +119,11 @@ func TestAdaptorSPI(t *testing.T) {
 	_, err := a.GetSpiConnection(10, 0, 0, 8, 10000000)
 	gobottest.Assert(t, err.Error(), "Bus number 10 out of range")
 
+	// TODO: tests for real connection currently not possible, because not using sysfs.Accessor using
 	// TODO: test tx/rx here...
 }
 
-func TestAdaptorDigitalPinConcurrency(t *testing.T) {
+func TestDigitalPinConcurrency(t *testing.T) {
 
 	oldProcs := runtime.GOMAXPROCS(0)
 	runtime.GOMAXPROCS(8)
@@ -156,7 +131,7 @@ func TestAdaptorDigitalPinConcurrency(t *testing.T) {
 
 	for retry := 0; retry < 20; retry++ {
 
-		a := initTestAdaptor()
+		a := NewAdaptor()
 		var wg sync.WaitGroup
 
 		for i := 0; i < 20; i++ {
