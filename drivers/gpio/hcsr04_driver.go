@@ -59,6 +59,56 @@ func (hcsr04 *HCSR04) MeasureDistance() (float32, error) {
 	return hcsr04.Measure, nil
 }
 
+// GetDistance returns the last distance measured
+// Contrary to MeasureDistance, GetDistance does not trigger a distance measurement
+func (hcsr04 *HCSR04) GetDistance() float32 {
+	return hcsr04.Measure
+}
+
+// StartDistanceMonitor starts a process which will keep Measure updated
+func (hcsr04 *HCSR04) StartDistanceMonitor() error {
+	hcsr04.distanceMonitorControl = make(chan int)
+	if hcsr04.distanceMonitorStarted {
+		return errors.New("monitor already started")
+	}
+	go hcsr04.distanceMonitor()
+	return nil
+}
+
+// StopDistanceMonitor stop the monitor process
+func (hcsr04 *HCSR04) StopDistanceMonitor() {
+	if hcsr04.distanceMonitorStarted {
+		hcsr04.distanceMonitorControl <- 1
+	}
+}
+
+func (h *HCSR04) Name() string { return h.name }
+
+func (h *HCSR04) SetName(n string) { h.name = n }
+
+func (h *HCSR04) Start() (err error) { return }
+
+func (h *HCSR04) Halt() (err error) { return }
+
+func (h *HCSR04) Connection() gobot.Connection {
+	return h.connection.(gobot.Connection)
+}
+
+func (hcsr04 *HCSR04) distanceMonitor() {
+	for {
+		select {
+		case <-hcsr04.distanceMonitorControl:
+			hcsr04.distanceMonitorStarted = false
+			return
+		default:
+			if _, err := hcsr04.MeasureDistance(); err != nil {
+				fmt.Println("error: impossible to measure distance", err)
+			}
+		}
+		time.Sleep(MonitorUpdate)
+	}
+}
+
 func (hcsr04 *HCSR04) emitTrigger() {
 	hcsr04.triggerPin.On()
 	time.Sleep(10 * time.Microsecond)
@@ -113,54 +163,4 @@ func getPinStateChangeTime(pin *gpio.DirectPinDriver, state int, outChan chan in
 
 func pulseToDistance(pulseDuration int64) float32 {
 	return float32(pulseDuration) / 1000000000.0 * soundSpeed / 2
-}
-
-// // GetDistance returns the last distance measured
-// // Contrary to MeasureDistance, GetDistance does not trigger a distance measurement
-func (hcsr04 *HCSR04) GetDistance() float32 {
-	return hcsr04.Measure
-}
-
-// // StartDistanceMonitor starts a process which will keep Measure updated
-func (hcsr04 *HCSR04) StartDistanceMonitor() error {
-	hcsr04.distanceMonitorControl = make(chan int)
-	if hcsr04.distanceMonitorStarted {
-		return errors.New("monitor already started")
-	}
-	go hcsr04.distanceMonitor()
-	return nil
-}
-
-// // StopDistanceMonitor stop the monitor process
-func (hcsr04 *HCSR04) StopDistanceMonitor() {
-	if hcsr04.distanceMonitorStarted {
-		hcsr04.distanceMonitorControl <- 1
-	}
-}
-
-func (hcsr04 *HCSR04) distanceMonitor() {
-	for {
-		select {
-		case <-hcsr04.distanceMonitorControl:
-			hcsr04.distanceMonitorStarted = false
-			return
-		default:
-			if _, err := hcsr04.MeasureDistance(); err != nil {
-				fmt.Println("error: impossible to measure distance", err)
-			}
-		}
-		time.Sleep(MonitorUpdate)
-	}
-}
-
-func (h *HCSR04) Name() string { return h.name }
-
-func (h *HCSR04) SetName(n string) { h.name = n }
-
-func (h *HCSR04) Start() (err error) { return }
-
-func (h *HCSR04) Halt() (err error) { return }
-
-func (h *HCSR04) Connection() gobot.Connection {
-	return h.connection.(gobot.Connection)
 }
