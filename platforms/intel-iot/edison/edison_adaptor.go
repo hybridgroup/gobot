@@ -30,25 +30,22 @@ type sysfsPin struct {
 type Adaptor struct {
 	name        string
 	board       string
+	sysfs       *sysfs.Accesser
+	mutex       *sync.Mutex
 	pinmap      map[string]sysfsPin
 	tristate    *sysfs.DigitalPin
 	digitalPins map[int]*sysfs.DigitalPin
 	pwmPins     map[int]*sysfs.PWMPin
 	i2cBus      i2c.I2cDevice
-	connect     func(e *Adaptor) (err error)
-	writeFile   func(path string, data []byte) (i int, err error)
-	readFile    func(path string) ([]byte, error)
-	mutex       *sync.Mutex
 }
 
 // NewAdaptor returns a new Edison Adaptor
 func NewAdaptor() *Adaptor {
 	return &Adaptor{
-		name:      gobot.DefaultName("Edison"),
-		pinmap:    arduinoPinMap,
-		writeFile: writeFile,
-		readFile:  readFile,
-		mutex:     &sync.Mutex{},
+		name:   gobot.DefaultName("Edison"),
+		sysfs:  sysfs.NewAccesser(),
+		mutex:  &sync.Mutex{},
+		pinmap: arduinoPinMap,
 	}
 }
 
@@ -64,7 +61,7 @@ func (e *Adaptor) Board() string { return e.board }
 // SetBoard sets the Adaptors name
 func (e *Adaptor) SetBoard(n string) { e.board = n }
 
-// Connect initializes the Edison for use with the Arduino beakout board
+// Connect initializes the Edison for use with the Arduino breakout board
 func (e *Adaptor) Connect() (err error) {
 	e.digitalPins = make(map[int]*sysfs.DigitalPin)
 	e.pwmPins = make(map[int]*sysfs.PWMPin)
@@ -80,7 +77,6 @@ func (e *Adaptor) Connect() (err error) {
 	switch e.Board() {
 	case "sparkfun":
 		e.pinmap = sparkfunPinMap
-		e.sparkfunSetup()
 	case "arduino":
 		e.pinmap = arduinoPinMap
 		if errs := e.arduinoSetup(); errs != nil {
@@ -88,7 +84,6 @@ func (e *Adaptor) Connect() (err error) {
 		}
 	case "miniboard":
 		e.pinmap = miniboardPinMap
-		e.miniboardSetup()
 	default:
 		errs := errors.New("Unknown board type: " + e.Board())
 		err = multierror.Append(err, errs)
@@ -160,9 +155,7 @@ func (e *Adaptor) PwmWrite(pin string, val byte) (err error) {
 
 // AnalogRead returns value from analog reading of specified pin
 func (e *Adaptor) AnalogRead(pin string) (val int, err error) {
-	buf, err := e.readFile(
-		"/sys/bus/iio/devices/iio:device1/in_voltage" + pin + "_raw",
-	)
+	buf, err := e.readFile("/sys/bus/iio/devices/iio:device1/in_voltage" + pin + "_raw")
 	if err != nil {
 		return
 	}
@@ -185,7 +178,7 @@ func (e *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection
 		if bus == 6 && e.board == "arduino" {
 			e.arduinoI2CSetup()
 		}
-		e.i2cBus, err = sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
+		e.i2cBus, err = e.sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
 	}
 	return i2c.NewConnection(e.i2cBus, address), err
 }
@@ -288,13 +281,13 @@ func (e *Adaptor) PWMPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
 			if err = e.DigitalWrite(pin, 1); err != nil {
 				return
 			}
-			if err = changePinMode(e, strconv.Itoa(int(sysPin.pin)), "1"); err != nil {
+			if err = e.changePinMode(strconv.Itoa(int(sysPin.pin)), "1"); err != nil {
 				return
 			}
 			e.mutex.Lock()
 			defer e.mutex.Unlock()
 
-			e.pwmPins[sysPin.pwmPin] = sysfs.NewPWMPin(sysPin.pwmPin)
+			e.pwmPins[sysPin.pwmPin] = e.sysfs.NewPWMPin(sysPin.pwmPin)
 			if err = e.pwmPins[sysPin.pwmPin].Export(); err != nil {
 				return
 			}
@@ -320,7 +313,7 @@ func (e *Adaptor) checkForArduino() error {
 }
 
 func (e *Adaptor) newExportedPin(pin int) (sysfsPin *sysfs.DigitalPin, err error) {
-	sysfsPin = sysfs.NewDigitalPin(pin)
+	sysfsPin = e.sysfs.NewDigitalPin(pin)
 	err = sysfsPin.Export()
 	return
 }
@@ -354,13 +347,13 @@ func (e *Adaptor) arduinoSetup() (err error) {
 	}
 
 	for _, i := range []string{"111", "115", "114", "109"} {
-		if err = changePinMode(e, i, "1"); err != nil {
+		if err = e.changePinMode(i, "1"); err != nil {
 			return err
 		}
 	}
 
 	for _, i := range []string{"131", "129", "40"} {
-		if err = changePinMode(e, i, "0"); err != nil {
+		if err = e.changePinMode(i, "0"); err != nil {
 			return err
 		}
 	}
@@ -375,7 +368,7 @@ func (e *Adaptor) arduinoI2CSetup() (err error) {
 	}
 
 	for _, i := range []int{14, 165, 212, 213} {
-		io := sysfs.NewDigitalPin(i)
+		io := e.sysfs.NewDigitalPin(i)
 		if err = io.Export(); err != nil {
 			return
 		}
@@ -394,7 +387,7 @@ func (e *Adaptor) arduinoI2CSetup() (err error) {
 	}
 
 	for _, i := range []string{"28", "27"} {
-		if err = changePinMode(e, i, "1"); err != nil {
+		if err = e.changePinMode(i, "1"); err != nil {
 			return
 		}
 	}
@@ -406,17 +399,8 @@ func (e *Adaptor) arduinoI2CSetup() (err error) {
 	return
 }
 
-func (e *Adaptor) sparkfunSetup() (err error) {
-	return
-}
-
-// miniboardSetup does needed setup for Edison minibpard and other compatible boards
-func (e *Adaptor) miniboardSetup() (err error) {
-	return
-}
-
 func (e *Adaptor) newDigitalPin(i int, level int) (err error) {
-	io := sysfs.NewDigitalPin(i)
+	io := e.sysfs.NewDigitalPin(i)
 	if err = io.Export(); err != nil {
 		return
 	}
@@ -430,8 +414,8 @@ func (e *Adaptor) newDigitalPin(i int, level int) (err error) {
 	return
 }
 
-func writeFile(path string, data []byte) (i int, err error) {
-	file, err := sysfs.OpenFile(path, os.O_WRONLY, 0644)
+func (e *Adaptor) writeFile(path string, data []byte) (i int, err error) {
+	file, err := e.sysfs.OpenFile(path, os.O_WRONLY, 0644)
 	defer file.Close()
 	if err != nil {
 		return
@@ -440,8 +424,8 @@ func writeFile(path string, data []byte) (i int, err error) {
 	return file.Write(data)
 }
 
-func readFile(path string) ([]byte, error) {
-	file, err := sysfs.OpenFile(path, os.O_RDONLY, 0644)
+func (e *Adaptor) readFile(path string) ([]byte, error) {
+	file, err := e.sysfs.OpenFile(path, os.O_RDONLY, 0644)
 	defer file.Close()
 	if err != nil {
 		return make([]byte, 0), err
@@ -457,20 +441,15 @@ func readFile(path string) ([]byte, error) {
 }
 
 // changePinMode writes pin mode to current_pinmux file
-func changePinMode(a *Adaptor, pin, mode string) (err error) {
-	_, err = a.writeFile(
-		"/sys/kernel/debug/gpio_debug/gpio"+pin+"/current_pinmux",
-		[]byte("mode"+mode),
-	)
-	return
+func (e *Adaptor) changePinMode(pin, mode string) error {
+	_, err := e.writeFile("/sys/kernel/debug/gpio_debug/gpio"+pin+"/current_pinmux", []byte("mode"+mode))
+	return err
 }
 
 // pinWrite sets Direction and writes level for a specific pin
-func pinWrite(pin *sysfs.DigitalPin, dir string, level int) (err error) {
-	if err = pin.Direction(dir); err != nil {
-		return
+func pinWrite(pin *sysfs.DigitalPin, dir string, level int) error {
+	if err := pin.Direction(dir); err != nil {
+		return err
 	}
-
-	err = pin.Write(level)
-	return
+	return pin.Write(level)
 }

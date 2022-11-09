@@ -11,9 +11,9 @@ import (
 )
 
 var _ File = (*MockFile)(nil)
-var _ Filesystem = (*MockFilesystem)(nil)
+var _ filesystem = (*MockFilesystem)(nil)
 
-// MockFilesystem represents  a filesystem of mock files.
+// MockFilesystem represents a filesystem of mock files.
 type MockFilesystem struct {
 	Seq            int // Increases with each write or read.
 	Files          map[string]*MockFile
@@ -34,14 +34,14 @@ type MockFile struct {
 }
 
 var (
-	readErr  = errors.New("read error")
-	writeErr = errors.New("write error")
+	errRead  = errors.New("read error")
+	errWrite = errors.New("write error")
 )
 
 // Write writes string(b) to f.Contents
 func (f *MockFile) Write(b []byte) (n int, err error) {
 	if f.fs.WithWriteError {
-		return 0, writeErr
+		return 0, errWrite
 	}
 	return f.WriteString(string(b))
 }
@@ -66,7 +66,7 @@ func (f *MockFile) Sync() (err error) {
 // Read copies b bytes from f.Contents
 func (f *MockFile) Read(b []byte) (n int, err error) {
 	if f.fs.WithReadError {
-		return 0, readErr
+		return 0, errRead
 	}
 
 	count := len(b)
@@ -94,8 +94,8 @@ func (f *MockFile) Close() error {
 	return nil
 }
 
-// NewMockFilesystem returns a new MockFilesystem given a list of file paths
-func NewMockFilesystem(files []string) *MockFilesystem {
+// newMockFilesystem returns a new MockFilesystem given a list of file paths
+func newMockFilesystem(files []string) *MockFilesystem {
 	m := &MockFilesystem{
 		Files: make(map[string]*MockFile),
 	}
@@ -108,7 +108,7 @@ func NewMockFilesystem(files []string) *MockFilesystem {
 }
 
 // OpenFile opens file name from fs.Files, if the file does not exist it returns an os.PathError
-func (fs *MockFilesystem) OpenFile(name string, flag int, perm os.FileMode) (file File, err error) {
+func (fs *MockFilesystem) openFile(name string, flag int, perm os.FileMode) (file File, err error) {
 	f, ok := fs.Files[name]
 	if ok {
 		f.Opened = true
@@ -120,7 +120,7 @@ func (fs *MockFilesystem) OpenFile(name string, flag int, perm os.FileMode) (fil
 
 // Stat returns a generic FileInfo for all files in fs.Files.
 // If the file does not exist it returns an os.PathError
-func (fs *MockFilesystem) Stat(name string) (os.FileInfo, error) {
+func (fs *MockFilesystem) stat(name string) (os.FileInfo, error) {
 	_, ok := fs.Files[name]
 	if ok {
 		// return file based mock FileInfo
@@ -151,14 +151,14 @@ func (fs *MockFilesystem) Stat(name string) (os.FileInfo, error) {
 }
 
 // Find returns all items (files or folders) below the given directory matching the given pattern.
-func (fs *MockFilesystem) Find(baseDir string, pattern string) ([]string, error) {
+func (fs *MockFilesystem) find(baseDir string, pattern string) ([]string, error) {
 	reg, err := regexp.Compile(pattern)
 	if err != nil {
 		return nil, err
 	}
 
 	var found []string
-	for name, _ := range fs.Files {
+	for name := range fs.Files {
 		if !strings.HasPrefix(name, baseDir) {
 			continue
 		}
@@ -174,6 +174,24 @@ func (fs *MockFilesystem) Find(baseDir string, pattern string) ([]string, error)
 	return found, nil
 }
 
+// readFile returns the contents of the given file. If the file does not exist it returns an os.PathError
+func (fs *MockFilesystem) readFile(name string) ([]byte, error) {
+	if fs.WithReadError {
+		return nil, errRead
+	}
+
+	f, ok := fs.Files[name]
+	if !ok {
+		return nil, &os.PathError{Err: errors.New(name + ": No such file.")}
+	}
+	return []byte(f.Contents), nil
+}
+
+func (fs *MockFilesystem) next() int {
+	fs.Seq++
+	return fs.Seq
+}
+
 // Add adds a new file to fs.Files given a name, and returns the newly created file
 func (fs *MockFilesystem) Add(name string) *MockFile {
 	f := &MockFile{
@@ -183,9 +201,4 @@ func (fs *MockFilesystem) Add(name string) *MockFile {
 	}
 	fs.Files[name] = f
 	return f
-}
-
-func (fs *MockFilesystem) next() int {
-	fs.Seq++
-	return fs.Seq
 }

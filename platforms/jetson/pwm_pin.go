@@ -17,17 +17,22 @@ const (
 // PWMPin is the Jetson Nano implementation of the PWMPinner interface.
 // It uses gpio pwm.
 type PWMPin struct {
+	sysfs  *sysfs.Accesser
 	pin    string
 	fn     string
 	dc     uint32
 	period uint32
 }
 
-// NewPwmPin returns a new PWMPin
+// NewPWMPin returns a new PWMPin
 // pin32 pwm0, pin33 pwm2
-func NewPWMPin(pin string) (p *PWMPin, err error) {
+func NewPWMPin(sysfs *sysfs.Accesser, pin string) (p *PWMPin, err error) {
 	if val, ok := pwms[pin]; ok {
-		p = &PWMPin{pin: pin, fn: val}
+		p = &PWMPin{
+			sysfs: sysfs,
+			pin:   pin,
+			fn:    val,
+		}
 	} else {
 		err = errors.New("Not a valid pin")
 	}
@@ -37,7 +42,7 @@ func NewPWMPin(pin string) (p *PWMPin, err error) {
 
 // Export exports the pin for use by the Jetson Nano
 func (p *PWMPin) Export() error {
-	fi, err := sysfs.OpenFile("/sys/class/pwm/pwmchip0/export", os.O_WRONLY|os.O_APPEND, 0644)
+	fi, err := p.sysfs.OpenFile("/sys/class/pwm/pwmchip0/export", os.O_WRONLY|os.O_APPEND, 0644)
 	defer fi.Close()
 
 	if err != nil {
@@ -51,7 +56,7 @@ func (p *PWMPin) Export() error {
 
 // Unexport unexports the pin and releases the pin from the operating system
 func (p *PWMPin) Unexport() error {
-	fi, err := sysfs.OpenFile("/sys/class/pwm/pwmchip0/unexport", os.O_WRONLY|os.O_APPEND, 0644)
+	fi, err := p.sysfs.OpenFile("/sys/class/pwm/pwmchip0/unexport", os.O_WRONLY|os.O_APPEND, 0644)
 	defer fi.Close()
 
 	if err != nil {
@@ -65,7 +70,7 @@ func (p *PWMPin) Unexport() error {
 
 // Enable enables/disables the PWM pin
 func (p *PWMPin) Enable(e bool) (err error) {
-	fi, err := sysfs.OpenFile(fmt.Sprintf("/sys/class/pwm/pwmchip0/pwm%s/enable", p.fn), os.O_WRONLY|os.O_APPEND, 0644)
+	fi, err := p.sysfs.OpenFile(fmt.Sprintf("/sys/class/pwm/pwmchip0/pwm%s/enable", p.fn), os.O_WRONLY|os.O_APPEND, 0644)
 	defer fi.Close()
 
 	if err != nil {
@@ -108,11 +113,11 @@ func (p *PWMPin) SetPeriod(period uint32) (err error) {
 	}
 	// JetsonNano Minimum period
 	if period < minimumPeriod {
-		return errors.New("Cannot set the period more Then minimum.")
+		return errors.New("Cannot set the period more then minimum")
 	}
 
 	p.period = period
-	fi, err := sysfs.OpenFile(fmt.Sprintf("/sys/class/pwm/pwmchip0/pwm%s/period", p.fn), os.O_WRONLY|os.O_APPEND, 0644)
+	fi, err := p.sysfs.OpenFile(fmt.Sprintf("/sys/class/pwm/pwmchip0/pwm%s/period", p.fn), os.O_WRONLY|os.O_APPEND, 0644)
 	defer fi.Close()
 
 	if err != nil {
@@ -136,7 +141,7 @@ func (p *PWMPin) SetDutyCycle(duty uint32) (err error) {
 	}
 
 	if duty > p.period {
-		return errors.New("Duty cycle exceeds period.")
+		return errors.New("Duty cycle exceeds period")
 	}
 	p.dc = duty
 
@@ -148,7 +153,7 @@ func (p *PWMPin) SetDutyCycle(duty uint32) (err error) {
 		p.dc = duty
 	}
 
-	fi, err := sysfs.OpenFile(fmt.Sprintf("/sys/class/pwm/pwmchip0/pwm%s/duty_cycle", p.fn), os.O_WRONLY|os.O_APPEND, 0644)
+	fi, err := p.sysfs.OpenFile(fmt.Sprintf("/sys/class/pwm/pwmchip0/pwm%s/duty_cycle", p.fn), os.O_WRONLY|os.O_APPEND, 0644)
 	defer fi.Close()
 
 	if err != nil {

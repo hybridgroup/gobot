@@ -24,9 +24,9 @@ var _ sysfs.PWMPinnerProvider = (*Adaptor)(nil)
 var _ i2c.Connector = (*Adaptor)(nil)
 var _ spi.Connector = (*Adaptor)(nil)
 
-func initTestUP2Adaptor() (*Adaptor, *sysfs.MockFilesystem) {
+func initTestAdaptorWithMockedFilesystem() (*Adaptor, *sysfs.MockFilesystem) {
 	a := NewAdaptor()
-	fs := sysfs.NewMockFilesystem([]string{
+	mockPaths := []string{
 		"/sys/class/gpio/export",
 		"/sys/class/gpio/unexport",
 		"/sys/class/gpio/gpio462/value",
@@ -40,27 +40,20 @@ func initTestUP2Adaptor() (*Adaptor, *sysfs.MockFilesystem) {
 		"/sys/class/pwm/pwmchip0/pwm0/duty_cycle",
 		"/sys/class/pwm/pwmchip0/pwm0/polarity",
 		"/sys/class/leds/upboard:green:/brightness",
-	})
-
-	sysfs.SetFilesystem(fs)
+	}
+	fs := a.sysfs.UseMockFilesystem(mockPaths)
 	return a, fs
 }
 
-func cleanTestUP2Adaptor() {
-	defer sysfs.SetFilesystem(&sysfs.NativeFilesystem{})
-}
-
-func TestUP2AdaptorName(t *testing.T) {
+func TestName(t *testing.T) {
 	a := NewAdaptor()
 	gobottest.Assert(t, strings.HasPrefix(a.Name(), "UP2"), true)
 	a.SetName("NewName")
 	gobottest.Assert(t, a.Name(), "NewName")
 }
 
-func TestUP2AdaptorDigitalIO(t *testing.T) {
-	a, fs := initTestUP2Adaptor()
-	defer cleanTestUP2Adaptor()
-	a.Connect()
+func TestDigitalIO(t *testing.T) {
+	a, fs := initTestAdaptorWithMockedFilesystem()
 
 	a.DigitalWrite("7", 1)
 	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio462/value"].Contents, "1")
@@ -79,47 +72,43 @@ func TestUP2AdaptorDigitalIO(t *testing.T) {
 	gobottest.Assert(t, a.Finalize(), nil)
 }
 
-func TestAdaptorDigitalWriteError(t *testing.T) {
-	a, fs := initTestUP2Adaptor()
-	defer cleanTestUP2Adaptor()
+func TestDigitalWriteError(t *testing.T) {
+	a, fs := initTestAdaptorWithMockedFilesystem()
 	fs.WithWriteError = true
 
 	err := a.DigitalWrite("7", 1)
 	gobottest.Assert(t, err, errors.New("write error"))
 }
 
-func TestAdaptorDigitalReadWriteError(t *testing.T) {
-	a, fs := initTestUP2Adaptor()
-	defer cleanTestUP2Adaptor()
+func TestDigitalReadWriteError(t *testing.T) {
+	a, fs := initTestAdaptorWithMockedFilesystem()
 	fs.WithWriteError = true
 
 	_, err := a.DigitalRead("7")
 	gobottest.Assert(t, err, errors.New("write error"))
 }
 
-func TestUP2AdaptorI2c(t *testing.T) {
+func TestI2c(t *testing.T) {
 	a := NewAdaptor()
-	fs := sysfs.NewMockFilesystem([]string{
-		"/dev/i2c-5",
-	})
-	sysfs.SetFilesystem(fs)
-	sysfs.SetSyscall(&sysfs.MockSyscall{})
-	defer sysfs.SetSyscall(&sysfs.NativeSyscall{})
+	a.sysfs.UseMockFilesystem([]string{"/dev/i2c-5"})
+	a.sysfs.UseMockSyscall()
 
 	con, err := a.GetConnection(0xff, 5)
 	gobottest.Assert(t, err, nil)
 
-	con.Write([]byte{0x00, 0x01})
+	_, err = con.Write([]byte{0x00, 0x01})
+	gobottest.Assert(t, err, nil)
+
 	data := []byte{42, 42}
-	con.Read(data)
+	_, err = con.Read(data)
+	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, data, []byte{0x00, 0x01})
 
 	gobottest.Assert(t, a.Finalize(), nil)
 }
 
-func TestAdaptorSPI(t *testing.T) {
+func TestSPI(t *testing.T) {
 	a := NewAdaptor()
-	a.Connect()
 
 	gobottest.Assert(t, a.GetSpiDefaultBus(), 0)
 	gobottest.Assert(t, a.GetSpiDefaultMode(), 0)
@@ -128,31 +117,28 @@ func TestAdaptorSPI(t *testing.T) {
 	_, err := a.GetSpiConnection(10, 0, 0, 8, 500000)
 	gobottest.Assert(t, err.Error(), "Bus number 10 out of range")
 
+	// TODO: tests for real connection currently not possible, because not using sysfs.Accessor using
 	// TODO: test tx/rx here...
-
 }
 
-func TestUP2AdaptorInvalidPWMPin(t *testing.T) {
-	a, _ := initTestUP2Adaptor()
-	defer cleanTestUP2Adaptor()
-	a.Connect()
+func TestInvalidPWMPin(t *testing.T) {
+	a, _ := initTestAdaptorWithMockedFilesystem()
 
 	err := a.PwmWrite("666", 42)
-	gobottest.Refute(t, err, nil)
+	gobottest.Assert(t, err.Error(), "Not a valid pin")
 
 	err = a.ServoWrite("666", 120)
-	gobottest.Refute(t, err, nil)
+	gobottest.Assert(t, err.Error(), "Not a valid pin")
 
 	err = a.PwmWrite("3", 42)
-	gobottest.Refute(t, err, nil)
+	gobottest.Assert(t, err.Error(), "Not a valid pin")
 
 	err = a.ServoWrite("3", 120)
-	gobottest.Refute(t, err, nil)
+	gobottest.Assert(t, err.Error(), "Not a valid pin")
 }
 
-func TestUP2AdaptorPWM(t *testing.T) {
-	a, fs := initTestUP2Adaptor()
-	defer cleanTestUP2Adaptor()
+func TestPWM(t *testing.T) {
+	a, fs := initTestAdaptorWithMockedFilesystem()
 
 	err := a.PwmWrite("32", 100)
 	gobottest.Assert(t, err, nil)
@@ -174,42 +160,37 @@ func TestUP2AdaptorPWM(t *testing.T) {
 	gobottest.Assert(t, a.Finalize(), nil)
 }
 
-func TestUP2AdaptorPwmWriteError(t *testing.T) {
-	a, fs := initTestUP2Adaptor()
-	defer cleanTestUP2Adaptor()
+func TestPwmWriteError(t *testing.T) {
+	a, fs := initTestAdaptorWithMockedFilesystem()
 	fs.WithWriteError = true
 
 	err := a.PwmWrite("32", 100)
 	gobottest.Assert(t, strings.Contains(err.Error(), "write error"), true)
 }
 
-func TestUP2AdaptorPwmReadError(t *testing.T) {
-	a, fs := initTestUP2Adaptor()
-	defer cleanTestUP2Adaptor()
+func TestPwmReadError(t *testing.T) {
+	a, fs := initTestAdaptorWithMockedFilesystem()
 	fs.WithReadError = true
 
 	err := a.PwmWrite("32", 100)
 	gobottest.Assert(t, strings.Contains(err.Error(), "read error"), true)
 }
 
-func TestUP2I2CDefaultBus(t *testing.T) {
-	a, _ := initTestUP2Adaptor()
-	defer cleanTestUP2Adaptor()
+func TestI2CDefaultBus(t *testing.T) {
+	a, _ := initTestAdaptorWithMockedFilesystem()
 	gobottest.Assert(t, a.GetDefaultBus(), 5)
 }
 
-func TestUP2GetConnectionInvalidBus(t *testing.T) {
-	a, _ := initTestUP2Adaptor()
-	defer cleanTestUP2Adaptor()
+func TestGetConnectionInvalidBus(t *testing.T) {
+	a, _ := initTestAdaptorWithMockedFilesystem()
+
 	_, err := a.GetConnection(0x01, 99)
 	gobottest.Assert(t, err, errors.New("Bus number 99 out of range"))
 }
 
-func TestUP2FinalizeErrorAfterGPIO(t *testing.T) {
-	a, fs := initTestUP2Adaptor()
-	defer cleanTestUP2Adaptor()
+func TestFinalizeErrorAfterGPIO(t *testing.T) {
+	a, fs := initTestAdaptorWithMockedFilesystem()
 
-	gobottest.Assert(t, a.Connect(), nil)
 	gobottest.Assert(t, a.DigitalWrite("7", 1), nil)
 
 	fs.WithWriteError = true
@@ -218,11 +199,9 @@ func TestUP2FinalizeErrorAfterGPIO(t *testing.T) {
 	gobottest.Assert(t, strings.Contains(err.Error(), "write error"), true)
 }
 
-func TestUP2FinalizeErrorAfterPWM(t *testing.T) {
-	a, fs := initTestUP2Adaptor()
-	defer cleanTestUP2Adaptor()
+func TestFinalizeErrorAfterPWM(t *testing.T) {
+	a, fs := initTestAdaptorWithMockedFilesystem()
 
-	gobottest.Assert(t, a.Connect(), nil)
 	gobottest.Assert(t, a.PwmWrite("32", 1), nil)
 
 	fs.WithWriteError = true

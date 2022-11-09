@@ -13,9 +13,8 @@ EXAMPLES := $(EXAMPLES_NO_GOCV)
 including_except := $(shell go list ./... | grep -v platforms/opencv)
 
 # Run tests on nearly all directories without test cache
-# TODO: set back to parallel running (remove "-p 1"), when issue #878 is fixed
 test:
-	go test -p 1 -count=1 -v $(including_except)
+	go test -count=1 -v $(including_except)
 
 # Run tests with race detection
 test_race:

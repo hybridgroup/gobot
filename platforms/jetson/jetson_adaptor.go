@@ -16,35 +16,24 @@ const pwmDefaultPeriod = 3000000
 
 // Adaptor is the Gobot Adaptor for the Jetson Nano
 type Adaptor struct {
-	mutex              *sync.Mutex
-	name               string
-	revision           string
-	digitalPins        map[int]*sysfs.DigitalPin
-	pwmPins            map[int]*PWMPin
-	i2cDefaultBus      int
-	i2cBuses           [2]i2c.I2cDevice
-	spiDefaultBus      int
-	spiDefaultChip     int
-	spiDevices         [2]spi.Connection
-	spiDefaultMode     int
-	spiDefaultMaxSpeed int64
+	name        string
+	sysfs       *sysfs.Accesser
+	mutex       *sync.Mutex
+	digitalPins map[int]*sysfs.DigitalPin
+	pwmPins     map[int]*PWMPin
+	i2cBuses    [2]i2c.I2cDevice
+	spiDevices  [2]spi.Connection
 }
 
 // NewAdaptor creates a Raspi Adaptor
 func NewAdaptor() *Adaptor {
 	j := &Adaptor{
-		mutex:       &sync.Mutex{},
 		name:        gobot.DefaultName("JetsonNano"),
+		sysfs:       sysfs.NewAccesser(),
+		mutex:       &sync.Mutex{},
 		digitalPins: make(map[int]*sysfs.DigitalPin),
 		pwmPins:     make(map[int]*PWMPin),
 	}
-
-	j.i2cDefaultBus = 1
-	j.spiDefaultBus = 0
-	j.spiDefaultChip = 0
-	j.spiDefaultMode = 0
-	j.spiDefaultMaxSpeed = 10000000
-
 	return j
 }
 
@@ -64,11 +53,8 @@ func (j *Adaptor) SetName(n string) {
 	j.name = n
 }
 
-// Connect starts connection with board and creates
-// digitalPins and pwmPins adaptor maps
-func (j *Adaptor) Connect() (err error) {
-	return
-}
+// Connect do nothing at the moment
+func (j *Adaptor) Connect() error { return nil }
 
 // Finalize closes connection to board and pins
 func (j *Adaptor) Finalize() (err error) {
@@ -161,7 +147,7 @@ func (j *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection
 
 // GetDefaultBus returns the default i2c bus for this platform
 func (j *Adaptor) GetDefaultBus() int {
-	return j.i2cDefaultBus
+	return 1
 }
 
 // GetSpiConnection returns an spi connection to a device on a specified bus.
@@ -183,17 +169,17 @@ func (j *Adaptor) GetSpiConnection(busNum, chipNum, mode, bits int, maxSpeed int
 
 // GetSpiDefaultBus returns the default spi bus for this platform.
 func (j *Adaptor) GetSpiDefaultBus() int {
-	return j.spiDefaultBus
+	return 0
 }
 
 // GetSpiDefaultChip returns the default spi chip for this platform.
 func (j *Adaptor) GetSpiDefaultChip() int {
-	return j.spiDefaultChip
+	return 0
 }
 
 // GetSpiDefaultMode returns the default spi mode for this platform.
 func (j *Adaptor) GetSpiDefaultMode() int {
-	return j.spiDefaultMode
+	return 0
 }
 
 // GetSpiDefaultBits returns the default spi number of bits for this platform.
@@ -203,7 +189,7 @@ func (j *Adaptor) GetSpiDefaultBits() int {
 
 // GetSpiDefaultMaxSpeed returns the default spi bus for this platform.
 func (j *Adaptor) GetSpiDefaultMaxSpeed() int64 {
-	return j.spiDefaultMaxSpeed
+	return 10000000
 }
 
 //PWMPin returns a Jetson Nano. PWMPin which provides the sysfs.PWMPinner interface
@@ -219,7 +205,7 @@ func (j *Adaptor) PWMPin(pin string) (pwmPin sysfs.PWMPinner, err error) {
 		return j.pwmPins[i], nil
 	}
 
-	j.pwmPins[i], err = NewPWMPin(pin)
+	j.pwmPins[i], err = NewPWMPin(j.sysfs, pin)
 	if err != nil {
 		return
 	}
@@ -257,7 +243,7 @@ func (j *Adaptor) getExportedDigitalPin(translatedPin int, dir string) (sysfsPin
 	defer j.mutex.Unlock()
 
 	if j.digitalPins[translatedPin] == nil {
-		j.digitalPins[translatedPin] = sysfs.NewDigitalPin(translatedPin)
+		j.digitalPins[translatedPin] = j.sysfs.NewDigitalPin(translatedPin)
 		if err = j.digitalPins[translatedPin].Export(); err != nil {
 			return
 		}
@@ -271,16 +257,14 @@ func (j *Adaptor) getI2cBus(bus int) (_ i2c.I2cDevice, err error) {
 	defer j.mutex.Unlock()
 
 	if j.i2cBuses[bus] == nil {
-		j.i2cBuses[bus], err = sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
+		j.i2cBuses[bus], err = j.sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
 	}
 
 	return j.i2cBuses[bus], err
 }
 
 func (j *Adaptor) translatePin(pin string) (i int, err error) {
-	if val, ok := pins[pin][j.revision]; ok {
-		i = val
-	} else if val, ok := pins[pin]["*"]; ok {
+	if val, ok := pins[pin]["*"]; ok {
 		i = val
 	} else {
 		err = errors.New("Not a valid pin")

@@ -44,19 +44,25 @@ type DigitalPinnerProvider interface {
 	DigitalPin(string, string) (DigitalPinner, error)
 }
 
+// DigitalPin represents a digital pin
 type DigitalPin struct {
 	pin   string
 	label string
 
 	value     File
 	direction File
+
+	fs filesystem
 }
 
 // NewDigitalPin returns a DigitalPin given the pin number and an optional sysfs pin label.
 // If no label is supplied the default label will prepend "gpio" to the pin number,
 // eg. a pin number of 10 will have a label of "gpio10"
-func NewDigitalPin(pin int, v ...string) *DigitalPin {
-	d := &DigitalPin{pin: strconv.Itoa(pin)}
+func (a *Accesser) NewDigitalPin(pin int, v ...string) *DigitalPin {
+	d := &DigitalPin{
+		pin: strconv.Itoa(pin),
+		fs:  a.fs,
+	}
 	if len(v) > 0 {
 		d.label = v[0]
 	} else {
@@ -66,16 +72,19 @@ func NewDigitalPin(pin int, v ...string) *DigitalPin {
 	return d
 }
 
+// Direction sets (writes) the direction of the digital pin
 func (d *DigitalPin) Direction(dir string) error {
 	_, err := writeFile(d.direction, []byte(dir))
 	return err
 }
 
+// Write writes the given value to the character device
 func (d *DigitalPin) Write(b int) error {
 	_, err := writeFile(d.value, []byte(strconv.Itoa(b)))
 	return err
 }
 
+// Read reads the given value from character device
 func (d *DigitalPin) Read() (n int, err error) {
 	buf, err := readFile(d.value)
 	if err != nil {
@@ -84,8 +93,9 @@ func (d *DigitalPin) Read() (n int, err error) {
 	return strconv.Atoi(string(buf[0]))
 }
 
+// Export sets the pin as exported
 func (d *DigitalPin) Export() error {
-	export, err := fs.OpenFile(GPIOPATH+"/export", os.O_WRONLY, 0644)
+	export, err := d.fs.openFile(GPIOPATH+"/export", os.O_WRONLY, 0644)
 	if err != nil {
 		return err
 	}
@@ -107,7 +117,7 @@ func (d *DigitalPin) Export() error {
 	attempt := 0
 	for {
 		attempt++
-		d.direction, err = fs.OpenFile(fmt.Sprintf("%v/%v/direction", GPIOPATH, d.label), os.O_RDWR, 0644)
+		d.direction, err = d.fs.openFile(fmt.Sprintf("%v/%v/direction", GPIOPATH, d.label), os.O_RDWR, 0644)
 		if err == nil {
 			break
 		}
@@ -121,7 +131,7 @@ func (d *DigitalPin) Export() error {
 		d.value.Close()
 	}
 	if err == nil {
-		d.value, err = fs.OpenFile(fmt.Sprintf("%v/%v/value", GPIOPATH, d.label), os.O_RDWR, 0644)
+		d.value, err = d.fs.openFile(fmt.Sprintf("%v/%v/value", GPIOPATH, d.label), os.O_RDWR, 0644)
 	}
 
 	if err != nil {
@@ -133,8 +143,9 @@ func (d *DigitalPin) Export() error {
 	return err
 }
 
+// Unexport sets the pin as unexported
 func (d *DigitalPin) Unexport() error {
-	unexport, err := fs.OpenFile(GPIOPATH+"/unexport", os.O_WRONLY, 0644)
+	unexport, err := d.fs.openFile(GPIOPATH+"/unexport", os.O_WRONLY, 0644)
 	if err != nil {
 		return err
 	}

@@ -29,6 +29,24 @@ const (
 	pwm2PolarityPath  = pwm2pwm0Dir + "polarity"
 )
 
+var pwmMockPaths = []string{
+	pwm2ExportPath,
+	pwm2UnexportPath,
+	pwm2EnablePath,
+	pwm2PeriodPath,
+	pwm2DutyCyclePath,
+	pwm2PolarityPath,
+}
+
+var gpioMockPaths = []string{
+	"/sys/class/gpio/export",
+	"/sys/class/gpio/unexport",
+	gpio17Path + "value",
+	gpio17Path + "direction",
+	gpio160Path + "value",
+	gpio160Path + "direction",
+}
+
 // make sure that this Adaptor fullfills all the required interfaces
 var _ gobot.Adaptor = (*Adaptor)(nil)
 var _ gpio.DigitalReader = (*Adaptor)(nil)
@@ -39,70 +57,28 @@ var _ sysfs.DigitalPinnerProvider = (*Adaptor)(nil)
 var _ sysfs.PWMPinnerProvider = (*Adaptor)(nil)
 var _ i2c.Connector = (*Adaptor)(nil)
 
-func gpioFs() *sysfs.MockFilesystem {
-	fs := sysfs.NewMockFilesystem([]string{
-		"/sys/class/gpio/export",
-		"/sys/class/gpio/unexport",
-		gpio17Path + "value",
-		gpio17Path + "direction",
-		gpio160Path + "value",
-		gpio160Path + "direction",
-	})
-
-	return fs
+func preparePwmFs(fs *sysfs.MockFilesystem) {
+	fs.Files[pwm2EnablePath].Contents = "0"
+	fs.Files[pwm2PeriodPath].Contents = "0"
+	fs.Files[pwm2DutyCyclePath].Contents = "0"
+	fs.Files[pwm2PolarityPath].Contents = pwmInverted
 }
 
-func pwmFs(t *testing.T) *sysfs.MockFilesystem {
-	fs := sysfs.NewMockFilesystem([]string{
-		pwm2ExportPath,
-		pwm2UnexportPath,
-		pwm2EnablePath,
-		pwm2PeriodPath,
-		pwm2DutyCyclePath,
-		pwm2PolarityPath,
-	})
-	gobottest.Assert(t, writePwmPath(fs, pwm2EnablePath, "0"), nil)
-	gobottest.Assert(t, writePwmPath(fs, pwm2PeriodPath, "0"), nil)
-	gobottest.Assert(t, writePwmPath(fs, pwm2DutyCyclePath, "0"), nil)
-	gobottest.Assert(t, writePwmPath(fs, pwm2PolarityPath, pwmInverted), nil)
-	return fs
-}
-
-func writePwmPath(fs *sysfs.MockFilesystem, filePath string, value string) error {
-	file, err := fs.OpenFile(filePath, 0, 0)
-	if err != nil {
-		return err
-	}
-	_, err = file.WriteString(value)
-	return err
-}
-
-func i2cFs() *sysfs.MockFilesystem {
-	return sysfs.NewMockFilesystem([]string{"/dev/i2c-1"})
-}
-
-func initTestTinkerboard(fs *sysfs.MockFilesystem) *Adaptor {
+func initTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *sysfs.MockFilesystem) {
 	a := NewAdaptor()
-	sysfs.SetFilesystem(fs)
-	return a
+	fs := a.sysfs.UseMockFilesystem(mockPaths)
+	return a, fs
 }
 
-func cleanTestTinkerboard() {
-	defer sysfs.SetFilesystem(&sysfs.NativeFilesystem{})
-}
-
-func TestTinkerboardName(t *testing.T) {
+func TestName(t *testing.T) {
 	a := NewAdaptor()
 	gobottest.Assert(t, strings.HasPrefix(a.Name(), "Tinker Board"), true)
 	a.SetName("NewName")
 	gobottest.Assert(t, a.Name(), "NewName")
 }
 
-func TestTinkerboardDigitalIO(t *testing.T) {
-	fs := gpioFs()
-	a := initTestTinkerboard(fs)
-	defer cleanTestTinkerboard()
-	a.Connect()
+func TestDigitalIO(t *testing.T) {
+	a, fs := initTestAdaptorWithMockedFilesystem(gpioMockPaths)
 
 	a.DigitalWrite("7", 1)
 	gobottest.Assert(t, fs.Files[gpio17Path+"value"].Contents, "1")
@@ -115,48 +91,42 @@ func TestTinkerboardDigitalIO(t *testing.T) {
 	gobottest.Assert(t, a.Finalize(), nil)
 }
 
-func TestTinkerboardDigitalWriteError(t *testing.T) {
-	fs := gpioFs()
+func TestDigitalWriteError(t *testing.T) {
+	a, fs := initTestAdaptorWithMockedFilesystem(gpioMockPaths)
 	fs.WithWriteError = true
-	a := initTestTinkerboard(fs)
-	defer cleanTestTinkerboard()
 
 	err := a.DigitalWrite("7", 1)
 	gobottest.Assert(t, err, errors.New("write error"))
 }
 
-func TestTinkerboardDigitalReadWriteError(t *testing.T) {
-	fs := gpioFs()
+func TestDigitalReadWriteError(t *testing.T) {
+	a, fs := initTestAdaptorWithMockedFilesystem(gpioMockPaths)
 	fs.WithWriteError = true
-	a := initTestTinkerboard(fs)
-	defer cleanTestTinkerboard()
 
 	_, err := a.DigitalRead("7")
 	gobottest.Assert(t, err, errors.New("write error"))
 }
 
-func TestTinkerboardInvalidPWMPin(t *testing.T) {
-	fs := pwmFs(t)
-	a := initTestTinkerboard(fs)
-	defer cleanTestTinkerboard()
+func TestInvalidPWMPin(t *testing.T) {
+	a, fs := initTestAdaptorWithMockedFilesystem(pwmMockPaths)
+	preparePwmFs(fs)
 
 	err := a.PwmWrite("666", 42)
-	gobottest.Refute(t, err, nil)
+	gobottest.Assert(t, err.Error(), "Not a valid PWM pin")
 
 	err = a.ServoWrite("666", 120)
-	gobottest.Refute(t, err, nil)
+	gobottest.Assert(t, err.Error(), "Not a valid PWM pin")
 
 	err = a.PwmWrite("3", 42)
-	gobottest.Refute(t, err, nil)
+	gobottest.Assert(t, err.Error(), "Not a valid PWM pin")
 
 	err = a.ServoWrite("3", 120)
-	gobottest.Refute(t, err, nil)
+	gobottest.Assert(t, err.Error(), "Not a valid PWM pin")
 }
 
-func TestTinkerboardPwmWrite(t *testing.T) {
-	fs := pwmFs(t)
-	a := initTestTinkerboard(fs)
-	defer cleanTestTinkerboard()
+func TestPwmWrite(t *testing.T) {
+	a, fs := initTestAdaptorWithMockedFilesystem(pwmMockPaths)
+	preparePwmFs(fs)
 
 	err := a.PwmWrite("33", 100)
 	gobottest.Assert(t, err, nil)
@@ -179,36 +149,32 @@ func TestTinkerboardPwmWrite(t *testing.T) {
 	gobottest.Assert(t, a.Finalize(), nil)
 }
 
-func TestTinkerboardPwmWriteError(t *testing.T) {
-	fs := pwmFs(t)
+func TestPwmWriteError(t *testing.T) {
+	a, fs := initTestAdaptorWithMockedFilesystem(pwmMockPaths)
+	preparePwmFs(fs)
 	fs.WithWriteError = true
-	a := initTestTinkerboard(fs)
-	defer cleanTestTinkerboard()
 
 	err := a.PwmWrite("33", 100)
 	gobottest.Assert(t, strings.Contains(err.Error(), "write error"), true)
 }
 
-func TestTinkerboardPwmWriteReadError(t *testing.T) {
-	fs := pwmFs(t)
+func TestPwmWriteReadError(t *testing.T) {
+	a, fs := initTestAdaptorWithMockedFilesystem(pwmMockPaths)
+	preparePwmFs(fs)
 	fs.WithReadError = true
-	a := initTestTinkerboard(fs)
-	defer cleanTestTinkerboard()
 
 	err := a.PwmWrite("33", 100)
 	gobottest.Assert(t, strings.Contains(err.Error(), "read error"), true)
 }
 
-func TestTinkerboardSetPeriod(t *testing.T) {
+func TestSetPeriod(t *testing.T) {
 	// arrange
-	fs := pwmFs(t)
-	a := initTestTinkerboard(fs)
-	defer cleanTestTinkerboard()
-	newPeriod := uint32(2550000)
+	a, fs := initTestAdaptorWithMockedFilesystem(pwmMockPaths)
+	preparePwmFs(fs)
 
+	newPeriod := uint32(2550000)
 	// act
 	err := a.SetPeriod("33", newPeriod)
-
 	// assert
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, fs.Files[pwm2ExportPath].Contents, "0")
@@ -241,41 +207,38 @@ func TestTinkerboardSetPeriod(t *testing.T) {
 	gobottest.Assert(t, fs.Files[pwm2DutyCyclePath].Contents, fmt.Sprintf("%d", 2540000))
 }
 
-func TestTinkerboardI2c(t *testing.T) {
-	fs := i2cFs()
-	a := initTestTinkerboard(fs)
-	defer cleanTestTinkerboard()
-	sysfs.SetSyscall(&sysfs.MockSyscall{})
-	defer sysfs.SetSyscall(&sysfs.NativeSyscall{})
+func TestI2c(t *testing.T) {
+	a, _ := initTestAdaptorWithMockedFilesystem([]string{"/dev/i2c-1"})
+	a.sysfs.UseMockSyscall()
 
 	con, err := a.GetConnection(0xff, 1)
 	gobottest.Assert(t, err, nil)
 
-	con.Write([]byte{0x00, 0x01})
+	_, err = con.Write([]byte{0x00, 0x01})
+	gobottest.Assert(t, err, nil)
+
 	data := []byte{42, 42}
-	con.Read(data)
+	_, err = con.Read(data)
+	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, data, []byte{0x00, 0x01})
 
 	gobottest.Assert(t, a.Finalize(), nil)
 }
 
-func TestTinkerboardDefaultBus(t *testing.T) {
+func TestDefaultBus(t *testing.T) {
 	a := NewAdaptor()
 	gobottest.Assert(t, a.GetDefaultBus(), 1)
 }
 
-func TestTinkerboardGetConnectionInvalidBus(t *testing.T) {
+func TestGetConnectionInvalidBus(t *testing.T) {
 	a := NewAdaptor()
 	_, err := a.GetConnection(0x01, 99)
 	gobottest.Assert(t, err, errors.New("Bus number 99 out of range"))
 }
 
-func TestTinkerboardFinalizeErrorAfterGPIO(t *testing.T) {
-	fs := gpioFs()
-	a := initTestTinkerboard(fs)
-	defer cleanTestTinkerboard()
+func TestFinalizeErrorAfterGPIO(t *testing.T) {
+	a, fs := initTestAdaptorWithMockedFilesystem(gpioMockPaths)
 
-	gobottest.Assert(t, a.Connect(), nil)
 	gobottest.Assert(t, a.DigitalWrite("7", 1), nil)
 
 	fs.WithWriteError = true
@@ -284,12 +247,10 @@ func TestTinkerboardFinalizeErrorAfterGPIO(t *testing.T) {
 	gobottest.Assert(t, strings.Contains(err.Error(), "write error"), true)
 }
 
-func TestTinkerboardFinalizeErrorAfterPWM(t *testing.T) {
-	fs := pwmFs(t)
-	a := initTestTinkerboard(fs)
-	defer cleanTestTinkerboard()
+func TestFinalizeErrorAfterPWM(t *testing.T) {
+	a, fs := initTestAdaptorWithMockedFilesystem(pwmMockPaths)
+	preparePwmFs(fs)
 
-	gobottest.Assert(t, a.Connect(), nil)
 	gobottest.Assert(t, a.PwmWrite("33", 1), nil)
 
 	fs.WithWriteError = true
