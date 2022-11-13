@@ -1,6 +1,7 @@
 package i2c
 
 import (
+	"encoding/binary"
 	"fmt"
 	"strconv"
 	"sync"
@@ -85,7 +86,7 @@ func (d *Driver) Halt() error {
 	return nil
 }
 
-// Write implements a simple write mechanism to the given register of an i2c device.
+// Write implements a simple write mechanism, starting from the given register of an i2c device.
 func (d *Driver) Write(pin string, val int) error {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
@@ -95,10 +96,15 @@ func (d *Driver) Write(pin string, val int) error {
 		return err
 	}
 
-	// TODO: create buffer from size
-	// currently only one byte value is supported
-	b := []byte{uint8(val)}
-	return d.connection.WriteBlockData(uint8(register), b)
+	if val > 0xFFFF {
+		buf := make([]byte, 4)
+		binary.LittleEndian.PutUint32(buf, uint32(val))
+		return d.connection.WriteBlockData(register, buf)
+	}
+	if val > 0xFF {
+		return d.connection.WriteWordData(register, uint16(val))
+	}
+	return d.connection.WriteByteData(register, uint8(val))
 }
 
 // Read implements a simple read mechanism from the given register of an i2c device.
@@ -111,14 +117,12 @@ func (d *Driver) Read(pin string) (int, error) {
 		return 0, err
 	}
 
-	// TODO: create buffer from size
-	// currently only one byte value is supported
-	b := []byte{0}
-	if err := d.connection.ReadBlockData(register, b); err != nil {
+	val, err := d.connection.ReadByteData(register)
+	if err != nil {
 		return 0, err
 	}
 
-	return int(b[0]), nil
+	return int(val), nil
 }
 
 func driverParseRegister(pin string) (uint8, error) {

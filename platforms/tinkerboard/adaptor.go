@@ -28,16 +28,18 @@ type pwmPinDefinition struct {
 // Adaptor represents a Gobot Adaptor for the ASUS Tinker Board
 type Adaptor struct {
 	name        string
+	sysfs       *sysfs.Accesser
+	mutex       *sync.Mutex
 	digitalPins map[string]*sysfs.DigitalPin
 	pwmPins     map[string]*sysfs.PWMPin
 	i2cBuses    [5]i2c.I2cDevice
-	mutex       *sync.Mutex
 }
 
 // NewAdaptor creates a Tinkerboard Adaptor
 func NewAdaptor() *Adaptor {
 	c := &Adaptor{
 		name:  gobot.DefaultName("Tinker Board"),
+		sysfs: sysfs.NewAccesser(),
 		mutex: &sync.Mutex{},
 	}
 
@@ -51,10 +53,8 @@ func (c *Adaptor) Name() string { return c.name }
 // SetName sets the name of the Adaptor
 func (c *Adaptor) SetName(n string) { c.name = n }
 
-// Connect initializes the board
-func (c *Adaptor) Connect() (err error) {
-	return nil
-}
+// Connect do nothing at the moment
+func (c *Adaptor) Connect() error { return nil }
 
 // Finalize closes connection to board and pins
 func (c *Adaptor) Finalize() (err error) {
@@ -174,7 +174,7 @@ func (c *Adaptor) DigitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPinn
 	}
 
 	if c.digitalPins[pin] == nil {
-		c.digitalPins[pin] = sysfs.NewDigitalPin(i)
+		c.digitalPins[pin] = c.sysfs.NewDigitalPin(i)
 		if err = c.digitalPins[pin].Export(); err != nil {
 			return
 		}
@@ -207,7 +207,7 @@ func (c *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection
 		return nil, fmt.Errorf("Bus number %d out of range", bus)
 	}
 	if c.i2cBuses[bus] == nil {
-		c.i2cBuses[bus], err = sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
+		c.i2cBuses[bus], err = c.sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
 	}
 	return i2c.NewConnection(c.i2cBuses[bus], address), err
 }
@@ -226,10 +226,10 @@ func (c *Adaptor) pwmPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
 
 	if c.pwmPins[pin] == nil {
 		var path string
-		if path, err = pwmPinData.findDir(); err != nil {
+		if path, err = pwmPinData.findDir(*c.sysfs); err != nil {
 			return
 		}
-		newPin := sysfs.NewPWMPin(pwmPinData.channel)
+		newPin := c.sysfs.NewPWMPin(pwmPinData.channel)
 		newPin.Path = path
 		if err = newPin.Export(); err != nil {
 			return
@@ -327,19 +327,19 @@ func (c *Adaptor) translatePwmPin(pin string) (pwmPin pwmPinDefinition, err erro
 	return
 }
 
-func (p pwmPinDefinition) findDir() (dir string, err error) {
+func (p pwmPinDefinition) findDir(sysfs sysfs.Accesser) (dir string, err error) {
 	items, _ := sysfs.Find(p.dir, p.dirRegexp)
 	if items == nil || len(items) == 0 {
-		return "", fmt.Errorf("No path found for PWM directory pattern, '%s' in path '%s'. See README.md for activation.", p.dirRegexp, p.dir)
+		return "", fmt.Errorf("No path found for PWM directory pattern, '%s' in path '%s'. See README.md for activation", p.dirRegexp, p.dir)
 	}
 
 	dir = items[0]
 	info, err := sysfs.Stat(dir)
 	if err != nil {
-		return "", fmt.Errorf("Error (%v) on access '%s'.", err, dir)
+		return "", fmt.Errorf("Error (%v) on access '%s'", err, dir)
 	}
 	if !info.IsDir() {
-		return "", fmt.Errorf("The item '%s' is not a directory, which is not expected.", dir)
+		return "", fmt.Errorf("The item '%s' is not a directory, which is not expected", dir)
 	}
 
 	return

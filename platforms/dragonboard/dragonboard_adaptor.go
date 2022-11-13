@@ -14,10 +14,11 @@ import (
 // Adaptor represents a Gobot Adaptor for a DragonBoard 410c
 type Adaptor struct {
 	name        string
+	sysfs       *sysfs.Accesser
+	mutex       *sync.Mutex
 	digitalPins map[int]*sysfs.DigitalPin
 	pinMap      map[string]int
 	i2cBuses    [3]i2c.I2cDevice
-	mutex       *sync.Mutex
 }
 
 var fixedPins = map[string]int{
@@ -42,6 +43,7 @@ var fixedPins = map[string]int{
 func NewAdaptor() *Adaptor {
 	c := &Adaptor{
 		name:  gobot.DefaultName("DragonBoard"),
+		sysfs: sysfs.NewAccesser(),
 		mutex: &sync.Mutex{},
 	}
 
@@ -94,7 +96,7 @@ func (c *Adaptor) DigitalPin(pin string, dir string) (sysfsPin *sysfs.DigitalPin
 	}
 
 	if c.digitalPins[i] == nil {
-		c.digitalPins[i] = sysfs.NewDigitalPin(i)
+		c.digitalPins[i] = c.sysfs.NewDigitalPin(i)
 		if err = c.digitalPins[i].Export(); err != nil {
 			return
 		}
@@ -141,7 +143,7 @@ func (c *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection
 		return nil, fmt.Errorf("Bus number %d out of range", bus)
 	}
 	if c.i2cBuses[bus] == nil {
-		c.i2cBuses[bus], err = sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
+		c.i2cBuses[bus], err = c.sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
 	}
 	return i2c.NewConnection(c.i2cBuses[bus], address), err
 }

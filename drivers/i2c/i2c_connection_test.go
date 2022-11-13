@@ -13,6 +13,8 @@ import (
 	"gobot.io/x/gobot/sysfs"
 )
 
+const dev = "/dev/i2c-1"
+
 func syscallImpl(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno) {
 	if (trap == syscall.SYS_IOCTL) && (a2 == sysfs.I2C_FUNCS) {
 		var funcPtr *uint64 = (*uint64)(unsafe.Pointer(a3))
@@ -26,34 +28,37 @@ func syscallImpl(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno) {
 }
 
 func syscallImplFail(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno) {
+	if (trap == syscall.SYS_IOCTL) && (a2 == sysfs.I2C_FUNCS) {
+		var funcPtr *uint64 = (*uint64)(unsafe.Pointer(a3))
+		*funcPtr = sysfs.I2C_FUNC_SMBUS_READ_BYTE | sysfs.I2C_FUNC_SMBUS_READ_BYTE_DATA |
+			sysfs.I2C_FUNC_SMBUS_READ_WORD_DATA |
+			sysfs.I2C_FUNC_SMBUS_WRITE_BYTE | sysfs.I2C_FUNC_SMBUS_WRITE_BYTE_DATA |
+			sysfs.I2C_FUNC_SMBUS_WRITE_WORD_DATA
+		// retrieve functions call succeed
+		return 0, 0, 0
+	}
 	// Let all operations fail
 	return 0, 0, 1
 }
 
 func initI2CDevice() I2cDevice {
-	fs := sysfs.NewMockFilesystem([]string{
-		"/dev/i2c-1",
-	})
-	sysfs.SetFilesystem(fs)
+	a := sysfs.NewAccesser()
+	a.UseMockFilesystem([]string{dev})
+	msc := a.UseMockSyscall()
+	msc.Impl = syscallImpl
 
-	sysfs.SetSyscall(&sysfs.MockSyscall{
-		Impl: syscallImpl,
-	})
-	i, _ := sysfs.NewI2cDevice("/dev/i2c-1")
-	return i
+	d, _ := a.NewI2cDevice(dev)
+	return d
 }
 
 func initI2CDeviceAddressError() I2cDevice {
-	fs := sysfs.NewMockFilesystem([]string{
-		"/dev/i2c-1",
-	})
-	sysfs.SetFilesystem(fs)
+	a := sysfs.NewAccesser()
+	a.UseMockFilesystem([]string{dev})
+	msc := a.UseMockSyscall()
+	msc.Impl = syscallImplFail
 
-	sysfs.SetSyscall(&sysfs.MockSyscall{
-		Impl: syscallImplFail,
-	})
-	i, _ := sysfs.NewI2cDevice("/dev/i2c-1")
-	return i
+	d, _ := a.NewI2cDevice(dev)
+	return d
 }
 
 func TestI2CAddress(t *testing.T) {
@@ -93,7 +98,7 @@ func TestI2CWriteAddressError(t *testing.T) {
 func TestI2CReadByte(t *testing.T) {
 	c := NewConnection(initI2CDevice(), 0x06)
 	v, _ := c.ReadByte()
-	gobottest.Assert(t, v, uint8(0))
+	gobottest.Assert(t, v, uint8(0xFC))
 }
 
 func TestI2CReadByteAddressError(t *testing.T) {
@@ -105,7 +110,7 @@ func TestI2CReadByteAddressError(t *testing.T) {
 func TestI2CReadByteData(t *testing.T) {
 	c := NewConnection(initI2CDevice(), 0x06)
 	v, _ := c.ReadByteData(0x01)
-	gobottest.Assert(t, v, uint8(0))
+	gobottest.Assert(t, v, uint8(0xFD))
 }
 
 func TestI2CReadByteDataAddressError(t *testing.T) {
@@ -117,7 +122,7 @@ func TestI2CReadByteDataAddressError(t *testing.T) {
 func TestI2CReadWordData(t *testing.T) {
 	c := NewConnection(initI2CDevice(), 0x06)
 	v, _ := c.ReadWordData(0x01)
-	gobottest.Assert(t, v, uint16(0))
+	gobottest.Assert(t, v, uint16(0xFFFE))
 }
 
 func TestI2CReadWordDataAddressError(t *testing.T) {

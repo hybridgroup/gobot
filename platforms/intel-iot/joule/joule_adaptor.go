@@ -19,20 +19,18 @@ type sysfsPin struct {
 // Adaptor represents an Intel Joule
 type Adaptor struct {
 	name        string
+	sysfs       *sysfs.Accesser
+	mutex       *sync.Mutex
 	digitalPins map[int]*sysfs.DigitalPin
 	pwmPins     map[int]*sysfs.PWMPin
 	i2cBuses    [3]i2c.I2cDevice
-	connect     func(e *Adaptor) (err error)
-	mutex       *sync.Mutex
 }
 
 // NewAdaptor returns a new Joule Adaptor
 func NewAdaptor() *Adaptor {
 	return &Adaptor{
-		name: gobot.DefaultName("Joule"),
-		connect: func(e *Adaptor) (err error) {
-			return
-		},
+		name:  gobot.DefaultName("Joule"),
+		sysfs: sysfs.NewAccesser(),
 		mutex: &sync.Mutex{},
 	}
 }
@@ -50,7 +48,6 @@ func (e *Adaptor) Connect() (err error) {
 
 	e.digitalPins = make(map[int]*sysfs.DigitalPin)
 	e.pwmPins = make(map[int]*sysfs.PWMPin)
-	err = e.connect(e)
 	return
 }
 
@@ -86,14 +83,14 @@ func (e *Adaptor) Finalize() (err error) {
 	return
 }
 
-// digitalPin returns matched digitalPin for specified values
+// DigitalPin returns matched digitalPin for specified values
 func (e *Adaptor) DigitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPinner, err error) {
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
 
 	i := sysfsPinMap[pin]
 	if e.digitalPins[i.pin] == nil {
-		e.digitalPins[i.pin] = sysfs.NewDigitalPin(i.pin)
+		e.digitalPins[i.pin] = e.sysfs.NewDigitalPin(i.pin)
 		if err = e.digitalPins[i.pin].Export(); err != nil {
 			return
 		}
@@ -155,7 +152,7 @@ func (e *Adaptor) PWMPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
 	}
 	if sysPin.pwmPin != -1 {
 		if e.pwmPins[sysPin.pwmPin] == nil {
-			e.pwmPins[sysPin.pwmPin] = sysfs.NewPWMPin(sysPin.pwmPin)
+			e.pwmPins[sysPin.pwmPin] = e.sysfs.NewPWMPin(sysPin.pwmPin)
 			if err = e.pwmPins[sysPin.pwmPin].Export(); err != nil {
 				return
 			}
@@ -181,7 +178,7 @@ func (e *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection
 		return nil, fmt.Errorf("Bus number %d out of range", bus)
 	}
 	if e.i2cBuses[bus] == nil {
-		e.i2cBuses[bus], err = sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
+		e.i2cBuses[bus], err = e.sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
 	}
 	return i2c.NewConnection(e.i2cBuses[bus], address), err
 }

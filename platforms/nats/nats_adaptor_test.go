@@ -3,6 +3,7 @@ package nats
 import (
 	"errors"
 	"fmt"
+	"log"
 	"strings"
 	"testing"
 
@@ -27,7 +28,7 @@ func connStub(options ...nats.Option) func() (*nats.Conn, error) {
 }
 
 func initTestNatsAdaptor() *Adaptor {
-	a := NewAdaptor("localhost:4222", 9999)
+	a := NewAdaptor("localhost:4222", 19999)
 	a.connect = func() (*nats.Conn, error) {
 		c := &nats.Conn{}
 		return c, nil
@@ -36,7 +37,7 @@ func initTestNatsAdaptor() *Adaptor {
 }
 
 func initTestNatsAdaptorWithAuth() *Adaptor {
-	a := NewAdaptorWithAuth("localhost:4222", 9999, "user", "pass")
+	a := NewAdaptorWithAuth("localhost:4222", 29999, "user", "pass")
 	a.connect = func() (*nats.Conn, error) {
 		c := &nats.Conn{}
 		return c, nil
@@ -45,7 +46,7 @@ func initTestNatsAdaptorWithAuth() *Adaptor {
 }
 
 func initTestNatsAdaptorTLS(options ...nats.Option) *Adaptor {
-	a := NewAdaptor("tls://localhost:4242", 49999, options...)
+	a := NewAdaptor("tls://localhost:4242", 39999, options...)
 	a.connect = connStub(options...)
 	return a
 }
@@ -119,7 +120,7 @@ func TestNatsAdaptorOnWhenConnected(t *testing.T) {
 // TODO: implement this test without requiring actual server connection
 func TestNatsAdaptorPublishWhenConnectedWithAuth(t *testing.T) {
 	t.Skip("TODO: implement this test without requiring actual server connection")
-	a := NewAdaptorWithAuth("localhost:4222", 9999, "test", "testwd")
+	a := NewAdaptorWithAuth("localhost:4222", 49999, "test", "testwd")
 	a.Connect()
 	data := []byte("o")
 	gobottest.Assert(t, a.Publish("test", data), true)
@@ -128,7 +129,8 @@ func TestNatsAdaptorPublishWhenConnectedWithAuth(t *testing.T) {
 // TODO: implement this test without requiring actual server connection
 func TestNatsAdaptorOnWhenConnectedWithAuth(t *testing.T) {
 	t.Skip("TODO: implement this test without requiring actual server connection")
-	a := NewAdaptorWithAuth("localhost:4222", 9999, "test", "testwd")
+	log.Println("###not skipped###")
+	a := NewAdaptorWithAuth("localhost:4222", 59999, "test", "testwd")
 	a.Connect()
 	gobottest.Assert(t, a.On("hola", func(msg Message) {
 		fmt.Println("hola")
@@ -136,23 +138,27 @@ func TestNatsAdaptorOnWhenConnectedWithAuth(t *testing.T) {
 }
 
 func TestNatsAdaptorFailedConnect(t *testing.T) {
-	a := NewAdaptor("localhost:9999", 9999)
-	gobottest.Assert(t, a.Connect(), errors.New("nats: no servers available for connection"))
+	a := NewAdaptor("localhost:9999", 69999)
+	err := a.Connect()
+	if err != nil && strings.Contains(err.Error(), "cannot assign requested address") {
+		t.Skip("FLAKY: Can not test, because IP or port is in use.")
+	}
+	gobottest.Assert(t, err, errors.New("nats: no servers available for connection"))
 }
 
 func TestNatsAdaptorFinalize(t *testing.T) {
-	a := NewAdaptor("localhost:9999", 9999)
+	a := NewAdaptor("localhost:9999", 79999)
 	gobottest.Assert(t, a.Finalize(), nil)
 }
 
 func TestNatsAdaptorCannotPublishUnlessConnected(t *testing.T) {
-	a := NewAdaptor("localhost:9999", 9999)
+	a := NewAdaptor("localhost:9999", 89999)
 	data := []byte("o")
 	gobottest.Assert(t, a.Publish("test", data), false)
 }
 
 func TestNatsAdaptorCannotOnUnlessConnected(t *testing.T) {
-	a := NewAdaptor("localhost:9999", 9999)
+	a := NewAdaptor("localhost:9999", 99999)
 	gobottest.Assert(t, a.On("hola", func(msg Message) {
 		fmt.Println("hola")
 	}), false)

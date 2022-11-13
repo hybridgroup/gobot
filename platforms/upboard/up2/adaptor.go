@@ -28,6 +28,9 @@ const (
 	LEDYellow = "yellow"
 )
 
+// TODO: take into account the actual period setting, not just assume default
+const pwmPeriod = 10000000
+
 type sysfsPin struct {
 	pin    int
 	pwmPin int
@@ -35,29 +38,28 @@ type sysfsPin struct {
 
 // Adaptor represents a Gobot Adaptor for the Upboard UP2
 type Adaptor struct {
-	name               string
-	pinmap             map[string]sysfsPin
-	ledPath            string
-	digitalPins        map[int]*sysfs.DigitalPin
-	pwmPins            map[int]*sysfs.PWMPin
-	i2cBuses           [6]i2c.I2cDevice
-	mutex              *sync.Mutex
-	spiDefaultBus      int
-	spiDefaultChip     int
-	spiBuses           [2]spi.Connection
-	spiDefaultMode     int
-	spiDefaultMaxSpeed int64
+	name        string
+	sysfs       *sysfs.Accesser
+	mutex       *sync.Mutex
+	pinmap      map[string]sysfsPin
+	ledPath     string
+	digitalPins map[int]*sysfs.DigitalPin
+	pwmPins     map[int]*sysfs.PWMPin
+	i2cBuses    [6]i2c.I2cDevice
+	spiBuses    [2]spi.Connection
 }
 
 // NewAdaptor creates a UP2 Adaptor
 func NewAdaptor() *Adaptor {
 	c := &Adaptor{
-		name:    gobot.DefaultName("UP2"),
-		mutex:   &sync.Mutex{},
-		ledPath: "/sys/class/leds/upboard:%s:/brightness",
+		name:        gobot.DefaultName("UP2"),
+		sysfs:       sysfs.NewAccesser(),
+		mutex:       &sync.Mutex{},
+		ledPath:     "/sys/class/leds/upboard:%s:/brightness",
+		digitalPins: make(map[int]*sysfs.DigitalPin),
+		pwmPins:     make(map[int]*sysfs.PWMPin),
+		pinmap:      fixedPins,
 	}
-
-	c.setPins()
 	return c
 }
 
@@ -67,10 +69,8 @@ func (c *Adaptor) Name() string { return c.name }
 // SetName sets the name of the Adaptor
 func (c *Adaptor) SetName(n string) { c.name = n }
 
-// Connect initializes the board
-func (c *Adaptor) Connect() (err error) {
-	return nil
-}
+// Connect do nothing at the moment
+func (c *Adaptor) Connect() error { return nil }
 
 // Finalize closes connection to board and pins
 func (c *Adaptor) Finalize() (err error) {
@@ -126,7 +126,7 @@ func (c *Adaptor) DigitalWrite(pin string, val byte) (err error) {
 	// is it one of the built-in LEDs?
 	if pin == LEDRed || pin == LEDBlue || pin == LEDGreen || pin == LEDYellow {
 		pinPath := fmt.Sprintf(c.ledPath, pin)
-		fi, e := sysfs.OpenFile(pinPath, os.O_WRONLY|os.O_APPEND, 0666)
+		fi, e := c.sysfs.OpenFile(pinPath, os.O_WRONLY|os.O_APPEND, 0666)
 		defer fi.Close()
 		if e != nil {
 			return e
@@ -156,9 +156,6 @@ func (c *Adaptor) PwmWrite(pin string, val byte) (err error) {
 	return pwmPin.SetDutyCycle(uint32(float64(period) * duty))
 }
 
-// TODO: take into account the actual period setting, not just assume default
-const pwmPeriod = 10000000
-
 // ServoWrite writes a servo signal to the specified pin
 func (c *Adaptor) ServoWrite(pin string, angle byte) (err error) {
 	pwmPin, err := c.PWMPin(pin)
@@ -187,7 +184,7 @@ func (c *Adaptor) DigitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPinn
 	}
 
 	if c.digitalPins[i] == nil {
-		c.digitalPins[i] = sysfs.NewDigitalPin(i)
+		c.digitalPins[i] = c.sysfs.NewDigitalPin(i)
 		if err = c.digitalPins[i].Export(); err != nil {
 			return
 		}
@@ -214,7 +211,7 @@ func (c *Adaptor) PWMPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
 	}
 
 	if c.pwmPins[i] == nil {
-		newPin := sysfs.NewPWMPin(i)
+		newPin := c.sysfs.NewPWMPin(i)
 		if err = newPin.Export(); err != nil {
 			return
 		}
@@ -248,7 +245,7 @@ func (c *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection
 		return nil, fmt.Errorf("Bus number %d out of range", bus)
 	}
 	if c.i2cBuses[bus] == nil {
-		c.i2cBuses[bus], err = sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
+		c.i2cBuses[bus], err = c.sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
 	}
 	return i2c.NewConnection(c.i2cBuses[bus], address), err
 }
@@ -277,17 +274,17 @@ func (c *Adaptor) GetSpiConnection(busNum, chipNum, mode, bits int, maxSpeed int
 
 // GetSpiDefaultBus returns the default spi bus for this platform.
 func (c *Adaptor) GetSpiDefaultBus() int {
-	return c.spiDefaultBus
+	return 0
 }
 
 // GetSpiDefaultChip returns the default spi chip for this platform.
 func (c *Adaptor) GetSpiDefaultChip() int {
-	return c.spiDefaultChip
+	return 0
 }
 
 // GetSpiDefaultMode returns the default spi mode for this platform.
 func (c *Adaptor) GetSpiDefaultMode() int {
-	return c.spiDefaultMode
+	return 0
 }
 
 // GetSpiDefaultBits returns the default spi number of bits for this platform.
@@ -297,17 +294,7 @@ func (c *Adaptor) GetSpiDefaultBits() int {
 
 // GetSpiDefaultMaxSpeed returns the default spi max speed for this platform.
 func (c *Adaptor) GetSpiDefaultMaxSpeed() int64 {
-	return c.spiDefaultMaxSpeed
-}
-
-func (c *Adaptor) setPins() {
-	c.digitalPins = make(map[int]*sysfs.DigitalPin)
-	c.pwmPins = make(map[int]*sysfs.PWMPin)
-	c.pinmap = fixedPins
-
-	c.spiDefaultBus = 0
-	c.spiDefaultMode = 0
-	c.spiDefaultMaxSpeed = 500000
+	return 500000
 }
 
 func (c *Adaptor) translatePin(pin string) (i int, err error) {

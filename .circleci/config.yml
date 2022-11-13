@@ -25,7 +25,7 @@ jobs:
           command: go test -v -coverprofile=coverage.txt -covermode=atomic . ./drivers/...
       - run:
           name: Code coverage
-          command: | 
+          command: |
             bash <(curl -s https://codecov.io/bash)
 
   "test_platforms":
@@ -40,6 +40,22 @@ jobs:
           # digispark needs libusb, joystick needs sdl2, opencv needs opencv
           name: Platform tests (except digispark, joystick, opencv)
           command: go test -v $(go list ./platforms/... | grep -v platforms/digispark | grep -v platforms/joystick | grep -v platforms/opencv)
+  
+  "check_examples":
+    docker:
+      - image: cimg/go:1.17
+    steps:
+      - checkout
+      - run:
+          name: Debug version
+          command: go version
+      - run:
+          # digispark needs libusb, joystick needs sdl2, opencv needs opencv
+          name: Check examples (except digispark, joystick, opencv)
+          command: |
+            ALL=$(grep -l -r --include "*.go" 'build example' ./)
+            SOME=$(grep -L 'digispark' $(grep -L 'joystick' $(grep -L 'gocv' ${ALL})))
+            for e in ${SOME} ; do go vet "${e}" ; done
 
 workflows:
   version: 2
@@ -47,3 +63,4 @@ workflows:
       jobs:
         - "test_core_and_drivers_with_coverage"
         - "test_platforms"
+        - "check_examples"

@@ -22,56 +22,41 @@ var _ sysfs.DigitalPinnerProvider = (*Adaptor)(nil)
 var _ sysfs.PWMPinnerProvider = (*Adaptor)(nil)
 var _ i2c.Connector = (*Adaptor)(nil)
 
-func initTestChipAdaptor() (*Adaptor, *sysfs.MockFilesystem) {
+var mockPaths = []string{
+	"/sys/class/gpio/export",
+	"/sys/class/gpio/unexport",
+	"/sys/class/gpio/gpio50/value",
+	"/sys/class/gpio/gpio50/direction",
+	"/sys/class/gpio/gpio139/value",
+	"/sys/class/gpio/gpio139/direction",
+	"/sys/class/pwm/pwmchip0/export",
+	"/sys/class/pwm/pwmchip0/unexport",
+	"/sys/class/pwm/pwmchip0/pwm0/enable",
+	"/sys/class/pwm/pwmchip0/pwm0/duty_cycle",
+	"/sys/class/pwm/pwmchip0/pwm0/polarity",
+	"/sys/class/pwm/pwmchip0/pwm0/period",
+}
+
+func initTestAdaptorWithMockedFilesystem() (*Adaptor, *sysfs.MockFilesystem) {
 	a := NewAdaptor()
-	fs := sysfs.NewMockFilesystem([]string{
-		"/sys/class/gpio/export",
-		"/sys/class/gpio/unexport",
-		"/sys/class/gpio/gpio50/value",
-		"/sys/class/gpio/gpio50/direction",
-		"/sys/class/gpio/gpio139/value",
-		"/sys/class/gpio/gpio139/direction",
-		"/sys/class/pwm/pwmchip0/export",
-		"/sys/class/pwm/pwmchip0/unexport",
-		"/sys/class/pwm/pwmchip0/pwm0/enable",
-		"/sys/class/pwm/pwmchip0/pwm0/duty_cycle",
-		"/sys/class/pwm/pwmchip0/pwm0/polarity",
-		"/sys/class/pwm/pwmchip0/pwm0/period",
-	})
-
-	sysfs.SetFilesystem(fs)
+	fs := a.sysfs.UseMockFilesystem(mockPaths)
 	return a, fs
 }
 
-func initTestChipProAdaptor() (*Adaptor, *sysfs.MockFilesystem) {
+func initTestProAdaptorWithMockedFilesystem() (*Adaptor, *sysfs.MockFilesystem) {
 	a := NewProAdaptor()
-	fs := sysfs.NewMockFilesystem([]string{
-		"/sys/class/gpio/export",
-		"/sys/class/gpio/unexport",
-		"/sys/class/gpio/gpio50/value",
-		"/sys/class/gpio/gpio50/direction",
-		"/sys/class/gpio/gpio139/value",
-		"/sys/class/gpio/gpio139/direction",
-		"/sys/class/pwm/pwmchip0/export",
-		"/sys/class/pwm/pwmchip0/unexport",
-		"/sys/class/pwm/pwmchip0/pwm0/enable",
-		"/sys/class/pwm/pwmchip0/pwm0/duty_cycle",
-		"/sys/class/pwm/pwmchip0/pwm0/polarity",
-		"/sys/class/pwm/pwmchip0/pwm0/period",
-	})
-
-	sysfs.SetFilesystem(fs)
+	fs := a.sysfs.UseMockFilesystem(mockPaths)
 	return a, fs
 }
 
-func TestChipAdaptorName(t *testing.T) {
+func TestName(t *testing.T) {
 	a := NewAdaptor()
 	gobottest.Assert(t, strings.HasPrefix(a.Name(), "CHIP"), true)
 	a.SetName("NewName")
 	gobottest.Assert(t, a.Name(), "NewName")
 }
 
-func TestChipAdaptorBoard(t *testing.T) {
+func TestNewAdaptor(t *testing.T) {
 	a := NewAdaptor()
 	a.SetBoard("pro")
 	gobottest.Assert(t, a.board, "pro")
@@ -79,8 +64,8 @@ func TestChipAdaptorBoard(t *testing.T) {
 	gobottest.Assert(t, a.SetBoard("bad"), errors.New("Invalid board type"))
 }
 
-func TestAdaptorFinalizeErrorAfterGPIO(t *testing.T) {
-	a, fs := initTestChipAdaptor()
+func TestFinalizeErrorAfterGPIO(t *testing.T) {
+	a, fs := initTestAdaptorWithMockedFilesystem()
 	gobottest.Assert(t, a.Connect(), nil)
 	gobottest.Assert(t, a.DigitalWrite("CSID7", 1), nil)
 
@@ -90,8 +75,8 @@ func TestAdaptorFinalizeErrorAfterGPIO(t *testing.T) {
 	gobottest.Assert(t, strings.Contains(err.Error(), "write error"), true)
 }
 
-func TestAdaptorFinalizeErrorAfterPWM(t *testing.T) {
-	a, fs := initTestChipAdaptor()
+func TestFinalizeErrorAfterPWM(t *testing.T) {
+	a, fs := initTestAdaptorWithMockedFilesystem()
 	gobottest.Assert(t, a.Connect(), nil)
 	gobottest.Assert(t, a.PwmWrite("PWM0", 100), nil)
 
@@ -101,8 +86,8 @@ func TestAdaptorFinalizeErrorAfterPWM(t *testing.T) {
 	gobottest.Assert(t, strings.Contains(err.Error(), "write error"), true)
 }
 
-func TestChipAdaptorDigitalIO(t *testing.T) {
-	a, fs := initTestChipAdaptor()
+func TestDigitalIO(t *testing.T) {
+	a, fs := initTestAdaptorWithMockedFilesystem()
 	a.Connect()
 
 	a.DigitalWrite("CSID7", 1)
@@ -116,8 +101,8 @@ func TestChipAdaptorDigitalIO(t *testing.T) {
 	gobottest.Assert(t, a.Finalize(), nil)
 }
 
-func TestChipProAdaptorDigitalIO(t *testing.T) {
-	a, fs := initTestChipProAdaptor()
+func TestProDigitalIO(t *testing.T) {
+	a, fs := initTestProAdaptorWithMockedFilesystem()
 	a.Connect()
 
 	a.DigitalWrite("CSID7", 1)
@@ -131,56 +116,56 @@ func TestChipProAdaptorDigitalIO(t *testing.T) {
 	gobottest.Assert(t, a.Finalize(), nil)
 }
 
-func TestAdaptorDigitalWriteError(t *testing.T) {
-	a, fs := initTestChipAdaptor()
+func TestDigitalWriteError(t *testing.T) {
+	a, fs := initTestAdaptorWithMockedFilesystem()
 	fs.WithWriteError = true
 
 	err := a.DigitalWrite("CSID7", 1)
 	gobottest.Assert(t, err, errors.New("write error"))
 }
 
-func TestAdaptorDigitalReadWriteError(t *testing.T) {
-	a, fs := initTestChipAdaptor()
+func TestDigitalReadWriteError(t *testing.T) {
+	a, fs := initTestAdaptorWithMockedFilesystem()
 	fs.WithWriteError = true
 
 	_, err := a.DigitalRead("CSID7")
 	gobottest.Assert(t, err, errors.New("write error"))
 }
 
-func TestChipAdaptorI2c(t *testing.T) {
+func TestI2c(t *testing.T) {
 	a := NewAdaptor()
-	a.Connect()
+	a.sysfs.UseMockFilesystem([]string{"/dev/i2c-1"})
+	a.sysfs.UseMockSyscall()
 
-	fs := sysfs.NewMockFilesystem([]string{
-		"/dev/i2c-1",
-	})
-	sysfs.SetFilesystem(fs)
-	sysfs.SetSyscall(&sysfs.MockSyscall{})
+	a.Connect()
 
 	con, err := a.GetConnection(0xff, 1)
 	gobottest.Assert(t, err, nil)
 
-	con.Write([]byte{0x00, 0x01})
+	_, err = con.Write([]byte{0x00, 0x01})
+	gobottest.Assert(t, err, nil)
+
 	data := []byte{42, 42}
-	con.Read(data)
+	_, err = con.Read(data)
+	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, data, []byte{0x00, 0x01})
 
 	gobottest.Assert(t, a.Finalize(), nil)
 }
 
-func TestChipAdaptorInvalidPWMPin(t *testing.T) {
-	a, _ := initTestChipAdaptor()
+func TestInvalidPWMPin(t *testing.T) {
+	a, _ := initTestAdaptorWithMockedFilesystem()
 	a.Connect()
 
 	err := a.PwmWrite("LCD-D2", 42)
-	gobottest.Refute(t, err, nil)
+	gobottest.Assert(t, err.Error(), "Not a PWM pin")
 
 	err = a.ServoWrite("LCD-D2", 120)
-	gobottest.Refute(t, err, nil)
+	gobottest.Assert(t, err.Error(), "Not a PWM pin")
 }
 
-func TestChipAdaptorPWM(t *testing.T) {
-	a, fs := initTestChipAdaptor()
+func TestPWM(t *testing.T) {
+	a, fs := initTestAdaptorWithMockedFilesystem()
 	a.Connect()
 
 	err := a.PwmWrite("PWM0", 100)
@@ -203,29 +188,29 @@ func TestChipAdaptorPWM(t *testing.T) {
 	gobottest.Assert(t, a.Finalize(), nil)
 }
 
-func TestAdaptorPwmWriteError(t *testing.T) {
-	a, fs := initTestChipAdaptor()
+func TestPwmWriteError(t *testing.T) {
+	a, fs := initTestAdaptorWithMockedFilesystem()
 	fs.WithWriteError = true
 
 	err := a.PwmWrite("PWM0", 100)
 	gobottest.Assert(t, strings.Contains(err.Error(), "write error"), true)
 }
 
-func TestAdaptorPwmReadError(t *testing.T) {
-	a, fs := initTestChipAdaptor()
+func TestPwmReadError(t *testing.T) {
+	a, fs := initTestAdaptorWithMockedFilesystem()
 	fs.WithReadError = true
 
 	err := a.PwmWrite("PWM0", 100)
 	gobottest.Assert(t, strings.Contains(err.Error(), "read error"), true)
 }
 
-func TestChipDefaultBus(t *testing.T) {
-	a, _ := initTestChipAdaptor()
+func TestDefaultBus(t *testing.T) {
+	a, _ := initTestAdaptorWithMockedFilesystem()
 	gobottest.Assert(t, a.GetDefaultBus(), 1)
 }
 
-func TestChipGetConnectionInvalidBus(t *testing.T) {
-	a, _ := initTestChipAdaptor()
+func TestGetConnectionInvalidBus(t *testing.T) {
+	a, _ := initTestAdaptorWithMockedFilesystem()
 	_, err := a.GetConnection(0x01, 99)
 	gobottest.Assert(t, err, errors.New("Bus number 99 out of range"))
 }

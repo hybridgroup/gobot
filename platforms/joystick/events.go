@@ -75,8 +75,20 @@ const (
 	XRelease = "x_release"
 	// share button press event
 	SharePress = "share_press"
-	// share button relase event
+	// share button release event
 	ShareRelease = "share_release"
+	// create button press event
+	CreatePress = "create_press"
+	// create button release event
+	CreateRelease = "create_release"
+	// ps button press event
+	PSPress = "ps_press"
+	// ps button release event
+	PSRelease = "ps_release"
+	// trackpad button press event
+	TrackpadPress = "trackpad_press"
+	// trackpad button release event
+	TrackpadRelease = "trackpad_release"
 	// options button press event
 	OptionsPress = "options_press"
 	// options button release event

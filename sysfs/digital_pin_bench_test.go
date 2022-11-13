@@ -1,17 +1,20 @@
 package sysfs
 
-import "testing"
+import (
+	"testing"
+)
 
 func BenchmarkDigitalRead(b *testing.B) {
-	fs := NewMockFilesystem([]string{
+	a := NewAccesser()
+	mockPaths := []string{
 		"/sys/class/gpio/export",
 		"/sys/class/gpio/unexport",
 		"/sys/class/gpio/gpio10/value",
 		"/sys/class/gpio/gpio10/direction",
-	})
+	}
+	a.UseMockFilesystem(mockPaths)
 
-	SetFilesystem(fs)
-	pin := NewDigitalPin(10)
+	pin := a.NewDigitalPin(10)
 	pin.Write(1)
 
 	for i := 0; i < b.N; i++ {

@@ -8,43 +8,43 @@ import (
 )
 
 func TestMockFilesystemOpen(t *testing.T) {
-	fs := NewMockFilesystem([]string{"foo"})
+	fs := newMockFilesystem([]string{"foo"})
 	f1 := fs.Files["foo"]
 
 	gobottest.Assert(t, f1.Opened, false)
-	f2, err := fs.OpenFile("foo", 0, 0666)
+	f2, err := fs.openFile("foo", 0, 0666)
 	gobottest.Assert(t, f1, f2)
 	gobottest.Assert(t, err, nil)
 
 	err = f2.Sync()
 	gobottest.Assert(t, err, nil)
 
-	_, err = fs.OpenFile("bar", 0, 0666)
-	gobottest.Refute(t, err, nil)
+	_, err = fs.openFile("bar", 0, 0666)
+	gobottest.Assert(t, err.Error(), " : bar: No such file.")
 
 	fs.Add("bar")
-	f4, _ := fs.OpenFile("bar", 0, 0666)
+	f4, _ := fs.openFile("bar", 0, 0666)
 	gobottest.Refute(t, f4.Fd(), f1.Fd())
 }
 
 func TestMockFilesystemStat(t *testing.T) {
-	fs := NewMockFilesystem([]string{"foo", "bar/baz"})
+	fs := newMockFilesystem([]string{"foo", "bar/baz"})
 
-	fileStat, err := fs.Stat("foo")
+	fileStat, err := fs.stat("foo")
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, fileStat.IsDir(), false)
 
-	dirStat, err := fs.Stat("bar")
+	dirStat, err := fs.stat("bar")
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, dirStat.IsDir(), true)
 
-	_, err = fs.Stat("plonk")
-	gobottest.Refute(t, err, nil)
+	_, err = fs.stat("plonk")
+	gobottest.Assert(t, err.Error(), " : plonk: No such file.")
 }
 
 func TestMockFilesystemFind(t *testing.T) {
 	// arrange
-	fs := NewMockFilesystem([]string{"/foo", "/bar/foo", "/bar/foo/baz", "/bar/baz/foo", "/bar/foo/bak"})
+	fs := newMockFilesystem([]string{"/foo", "/bar/foo", "/bar/foo/baz", "/bar/baz/foo", "/bar/foo/bak"})
 	var tests = map[string]struct {
 		baseDir string
 		pattern string
@@ -59,7 +59,7 @@ func TestMockFilesystemFind(t *testing.T) {
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			// act
-			dirs, err := fs.Find(tt.baseDir, tt.pattern)
+			dirs, err := fs.find(tt.baseDir, tt.pattern)
 			// assert
 			gobottest.Assert(t, err, nil)
 			sort.Strings(dirs)
@@ -69,10 +69,10 @@ func TestMockFilesystemFind(t *testing.T) {
 }
 
 func TestMockFilesystemWrite(t *testing.T) {
-	fs := NewMockFilesystem([]string{"bar"})
+	fs := newMockFilesystem([]string{"bar"})
 	f1 := fs.Files["bar"]
 
-	f2, err := fs.OpenFile("bar", 0, 0666)
+	f2, err := fs.openFile("bar", 0, 0666)
 	gobottest.Assert(t, err, nil)
 	// Never been read or written.
 	gobottest.Assert(t, f1.Seq <= 0, true)
@@ -84,11 +84,11 @@ func TestMockFilesystemWrite(t *testing.T) {
 }
 
 func TestMockFilesystemRead(t *testing.T) {
-	fs := NewMockFilesystem([]string{"bar"})
+	fs := newMockFilesystem([]string{"bar"})
 	f1 := fs.Files["bar"]
 	f1.Contents = "Yip"
 
-	f2, err := fs.OpenFile("bar", 0, 0666)
+	f2, err := fs.openFile("bar", 0, 0666)
 	gobottest.Assert(t, err, nil)
 	// Never been read or written.
 	gobottest.Assert(t, f1.Seq <= 0, true)
