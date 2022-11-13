@@ -21,9 +21,8 @@ test_race:
 	go test -race $(including_except)
 
 # Test, generate and show coverage in browser
-# TODO: set back to parallel running (remove "-p 1"), when issue #878 is fixed
 test_cover:
-	go test -p 1 -v $(including_except) -coverprofile=coverage.txt ; \
+	go test -v $(including_except) -coverprofile=coverage.txt ; \
 	go tool cover -html=coverage.txt ; \
 
 robeaux:
