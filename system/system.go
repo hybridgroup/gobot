@@ -1,10 +1,15 @@
 package system
 
 import (
+	"fmt"
 	"os"
 	"syscall"
 	"unsafe"
+
+	"gobot.io/x/gobot"
 )
+
+const systemDebug = false
 
 // A File represents basic IO interactions with the underlying file system
 type File interface {
@@ -32,19 +37,54 @@ type systemCaller interface {
 	syscall(trap uintptr, f File, signal uintptr, payload unsafe.Pointer) (r1, r2 uintptr, err syscall.Errno)
 }
 
-// Accesser provides access to system calls and filesystem
-type Accesser struct {
-	sys systemCaller
-	fs  filesystem
+type digitalPinAccesser interface {
+	isSupported() bool
+	createPin(chip string, pin int, o ...func(gobot.DigitalPinOptioner) bool) gobot.DigitalPinner
+	setFs(fs filesystem)
 }
 
-// NewAccesser returns a accesser to native system call and native file system
-func NewAccesser() *Accesser {
+// Accesser provides access to system calls and filesystem
+type Accesser struct {
+	sys              systemCaller
+	fs               filesystem
+	digitalPinAccess digitalPinAccesser
+}
+
+// NewAccesser returns a accesser to native system call, native file system and the chosen digital pin access.
+// Digital pin accesser can be empty or "sysfs", otherwise it will be automatically chosen.
+func NewAccesser(digitalPinAccesser ...string) *Accesser {
 	s := Accesser{
 		sys: &nativeSyscall{},
 		fs:  &nativeFilesystem{},
 	}
+	a := "sysfs"
+	if len(digitalPinAccesser) > 0 && digitalPinAccesser[0] != "" {
+		a = digitalPinAccesser[0]
+	}
+	if a != "sysfs" {
+		dpa := &gpiodDigitalPinAccess{fs: s.fs}
+		if dpa.isSupported() {
+			s.digitalPinAccess = dpa
+			if systemDebug {
+				fmt.Printf("use gpiod driver for digital pins with this chips: %v\n", dpa.chips)
+			}
+			return &s
+		}
+		if systemDebug {
+			fmt.Println("gpiod driver not supported, fallback to sysfs")
+		}
+	}
+	s.digitalPinAccess = &sysfsDigitalPinAccess{fs: s.fs}
 	return &s
+}
+
+// UseMockDigitalPinWithMockFs sets the digital pin handler accesser to the mocked one. Used only for tests.
+func (a *Accesser) UseMockDigitalPinWithMockFs(files []string) *mockDigitalPinHandler {
+	fs := newMockFilesystem(files)
+	mdph := &mockDigitalPinHandler{fs: fs}
+	a.fs = fs
+	a.digitalPinAccess = mdph
+	return mdph
 }
 
 // UseMockSyscall sets the Syscall implementation of the accesser to the mocked one. Used only for tests.
@@ -58,7 +98,23 @@ func (a *Accesser) UseMockSyscall() *mockSyscall {
 func (a *Accesser) UseMockFilesystem(files []string) *MockFilesystem {
 	fs := newMockFilesystem(files)
 	a.fs = fs
+	a.digitalPinAccess.setFs(fs)
 	return fs
+}
+
+// NewDigitalPin returns a new system digital pin given the pin number and an optional pin label.
+// If no label is supplied a default label will prepend to the pin number.
+func (a *Accesser) NewDigitalPin(chip string, pin int,
+	o ...func(gobot.DigitalPinOptioner) bool) gobot.DigitalPinner {
+	return a.digitalPinAccess.createPin(chip, pin, o...)
+}
+
+// IsSysfsDigitalPinAccess returns whether the used digital pin accesser is a sysfs one.
+func (a *Accesser) IsSysfsDigitalPinAccess() bool {
+	if _, ok := a.digitalPinAccess.(*sysfsDigitalPinAccess); ok {
+		return true
+	}
+	return false
 }
 
 // OpenFile opens file of given name from native or the mocked file system

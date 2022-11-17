@@ -7,132 +7,78 @@ import (
 	"strconv"
 	"syscall"
 	"time"
+
+	"gobot.io/x/gobot"
 )
 
 const (
-	// IN gpio direction
-	IN = "in"
-	// OUT gpio direction
-	OUT = "out"
-	// HIGH gpio level
-	HIGH = 1
-	// LOW gpio level
-	LOW = 0
-	// gpioPath default linux gpio path
+	// gpioPath default linux sysfs gpio path
 	gpioPath = "/sys/class/gpio"
 )
 
 var errNotExported = errors.New("pin has not been exported")
 
-// DigitalPin represents a digital pin
-type DigitalPin struct {
-	pin   string
-	label string
-
-	value     File
-	direction File
-
+// digitalPin represents a digital pin
+type digitalPinSysfs struct {
+	pin string
+	*digitalPinConfig
 	fs filesystem
+
+	dirFile File
+	valFile File
 }
 
-// NewDigitalPin returns a DigitalPin given the pin number. The name of the sysfs file will prepend "gpio"
-// to the pin number, eg. a pin number of 10 will have a name of "gpio10"
-func (a *Accesser) NewDigitalPin(pin int) *DigitalPin {
-	d := &DigitalPin{
-		pin: strconv.Itoa(pin),
-		fs:  a.fs,
+// newDigitalPinSysfs returns a digital pin using for the given number. The name of the sysfs file will prepend "gpio"
+// to the pin number, eg. a pin number of 10 will have a name of "gpio10". The pin is handled by the sysfs Kernel ABI.
+func newDigitalPinSysfs(fs filesystem, pin string, options ...func(gobot.DigitalPinOptioner) bool) *digitalPinSysfs {
+	cfg := newDigitalPinConfig("gpio"+pin, options...)
+	d := &digitalPinSysfs{
+		pin:              pin,
+		digitalPinConfig: cfg,
+		fs:               fs,
 	}
-	d.label = "gpio" + d.pin
-
 	return d
 }
 
-// Direction sets (writes) the direction of the digital pin
-func (d *DigitalPin) Direction(dir string) error {
-	_, err := writeFile(d.direction, []byte(dir))
+// ApplyOptions apply all given options to the pin immediately. Implements interface gobot.DigitalPinOptionApplier.
+func (d *digitalPinSysfs) ApplyOptions(options ...func(gobot.DigitalPinOptioner) bool) error {
+	anyChange := false
+	for _, option := range options {
+		anyChange = anyChange || option(d)
+	}
+	if anyChange {
+		return d.reconfigure()
+	}
+	return nil
+}
+
+// DirectionBehavior gets the direction behavior when the pin is used the next time. This means its possibly not in
+// this direction type at the moment. Implements the interface gobot.DigitalPinValuer, but should be rarely used.
+func (d *digitalPinSysfs) DirectionBehavior() string {
+	return d.direction
+}
+
+// Export sets the pin as exported with the configured direction
+func (d *digitalPinSysfs) Export() error {
+	err := d.reconfigure()
 	return err
 }
 
-// Write writes the given value to the character device
-func (d *DigitalPin) Write(b int) error {
-	_, err := writeFile(d.value, []byte(strconv.Itoa(b)))
-	return err
-}
-
-// Read reads the given value from character device
-func (d *DigitalPin) Read() (n int, err error) {
-	buf, err := readFile(d.value)
-	if err != nil {
-		return 0, err
-	}
-	return strconv.Atoi(string(buf[0]))
-}
-
-// Export sets the pin as exported
-func (d *DigitalPin) Export() error {
-	export, err := d.fs.openFile(gpioPath+"/export", os.O_WRONLY, 0644)
-	if err != nil {
-		return err
-	}
-	defer export.Close()
-
-	_, err = writeFile(export, []byte(d.pin))
-	if err != nil {
-		// If EBUSY then the pin has already been exported
-		e, ok := err.(*os.PathError)
-		if !ok || e.Err != syscall.EBUSY {
-			return err
-		}
-	}
-
-	if d.direction != nil {
-		d.direction.Close()
-	}
-
-	attempt := 0
-	for {
-		attempt++
-		d.direction, err = d.fs.openFile(fmt.Sprintf("%v/%v/direction", gpioPath, d.label), os.O_RDWR, 0644)
-		if err == nil {
-			break
-		}
-		if attempt > 10 {
-			return err
-		}
-		time.Sleep(10 * time.Millisecond)
-	}
-
-	if d.value != nil {
-		d.value.Close()
-	}
-	if err == nil {
-		d.value, err = d.fs.openFile(fmt.Sprintf("%v/%v/value", gpioPath, d.label), os.O_RDWR, 0644)
-	}
-
-	if err != nil {
-		// Should we unexport here?
-		// If we don't unexport we should make sure to close d.direction and d.value here
-		d.Unexport()
-	}
-
-	return err
-}
-
-// Unexport sets the pin as unexported
-func (d *DigitalPin) Unexport() error {
+// Unexport release the pin
+func (d *digitalPinSysfs) Unexport() error {
 	unexport, err := d.fs.openFile(gpioPath+"/unexport", os.O_WRONLY, 0644)
 	if err != nil {
 		return err
 	}
 	defer unexport.Close()
 
-	if d.direction != nil {
-		d.direction.Close()
-		d.direction = nil
+	if d.dirFile != nil {
+		d.dirFile.Close()
+		d.dirFile = nil
 	}
-	if d.value != nil {
-		d.value.Close()
-		d.value = nil
+	if d.valFile != nil {
+		d.valFile.Close()
+		d.valFile = nil
 	}
 
 	_, err = writeFile(unexport, []byte(d.pin))
@@ -145,6 +91,81 @@ func (d *DigitalPin) Unexport() error {
 	}
 
 	return nil
+}
+
+// Write writes the given value to the character device
+func (d *digitalPinSysfs) Write(b int) error {
+	_, err := writeFile(d.valFile, []byte(strconv.Itoa(b)))
+	return err
+}
+
+// Read reads the given value from character device
+func (d *digitalPinSysfs) Read() (int, error) {
+	buf, err := readFile(d.valFile)
+	if err != nil {
+		return 0, err
+	}
+	return strconv.Atoi(string(buf[0]))
+}
+
+func (d *digitalPinSysfs) reconfigure() error {
+	exportFile, err := d.fs.openFile(gpioPath+"/export", os.O_WRONLY, 0644)
+	if err != nil {
+		return err
+	}
+	defer exportFile.Close()
+
+	_, err = writeFile(exportFile, []byte(d.pin))
+	if err != nil {
+		// If EBUSY then the pin has already been exported
+		e, ok := err.(*os.PathError)
+		if !ok || e.Err != syscall.EBUSY {
+			return err
+		}
+	}
+
+	if d.dirFile != nil {
+		d.dirFile.Close()
+	}
+
+	attempt := 0
+	for {
+		attempt++
+		d.dirFile, err = d.fs.openFile(fmt.Sprintf("%s/%s/direction", gpioPath, d.label), os.O_RDWR, 0644)
+		if err == nil {
+			break
+		}
+		if attempt > 10 {
+			return err
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
+
+	if d.valFile != nil {
+		d.valFile.Close()
+	}
+	if err == nil {
+		d.valFile, err = d.fs.openFile(fmt.Sprintf("%s/%s/value", gpioPath, d.label), os.O_RDWR, 0644)
+	}
+
+	// configure line
+	if err == nil {
+		err = d.writeDirectionWithInitialOutput()
+	}
+
+	if err != nil {
+		d.Unexport()
+	}
+
+	return err
+}
+
+func (d *digitalPinSysfs) writeDirectionWithInitialOutput() error {
+	if _, err := writeFile(d.dirFile, []byte(d.direction)); err != nil || d.direction == IN {
+		return err
+	}
+	_, err := writeFile(d.valFile, []byte(strconv.Itoa(d.outInitialState)))
+	return err
 }
 
 // Linux sysfs / GPIO specific sysfs docs.

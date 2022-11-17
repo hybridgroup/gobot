@@ -82,47 +82,38 @@ func (e *Adaptor) Finalize() (err error) {
 	return
 }
 
-// DigitalPin returns matched digitalPin for specified values
-func (e *Adaptor) DigitalPin(pin string, dir string) (gobot.DigitalPinner, error) {
+// DigitalRead reads digital value from pin
+func (e *Adaptor) DigitalRead(id string) (int, error) {
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
 
-	i := sysfsPinMap[pin]
-	if e.digitalPins[i.pin] == nil {
-		e.digitalPins[i.pin] = e.sys.NewDigitalPin(i.pin)
-		if err := e.digitalPins[i.pin].Export(); err != nil {
-			return nil, err
-		}
-	}
-
-	if dir == "in" {
-		if err := e.digitalPins[i.pin].Direction(system.IN); err != nil {
-			return nil, err
-		}
-	} else if dir == "out" {
-		if err := e.digitalPins[i.pin].Direction(system.OUT); err != nil {
-			return nil, err
-		}
-	}
-	return e.digitalPins[i.pin], nil
-}
-
-// DigitalRead reads digital value from pin
-func (e *Adaptor) DigitalRead(pin string) (i int, err error) {
-	sysPin, err := e.DigitalPin(pin, "in")
+	pin, err := e.digitalPin(id, system.WithDirectionInput())
 	if err != nil {
-		return
+		return 0, err
 	}
-	return sysPin.Read()
+	return pin.Read()
 }
 
 // DigitalWrite writes a value to the pin. Acceptable values are 1 or 0.
-func (e *Adaptor) DigitalWrite(pin string, val byte) (err error) {
-	sysPin, err := e.DigitalPin(pin, "out")
+func (e *Adaptor) DigitalWrite(id string, val byte) error {
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
+
+	pin, err := e.digitalPin(id, system.WithDirectionOutput(int(val)))
 	if err != nil {
-		return
+		return err
 	}
-	return sysPin.Write(int(val))
+
+	return pin.Write(int(val))
+}
+
+// DigitalPin returns a digital pin. If the pin is initially acquired, it is an input.
+// Pin direction and other options can be changed afterwards by pin.ApplyOptions() at any time.
+func (e *Adaptor) DigitalPin(id string) (gobot.DigitalPinner, error) {
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
+
+	return e.digitalPin(id)
 }
 
 // PwmWrite writes the 0-254 value to the specified pin
@@ -183,4 +174,22 @@ func (e *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection
 // GetDefaultBus returns the default i2c bus for this platform
 func (e *Adaptor) GetDefaultBus() int {
 	return 0
+}
+
+func (e *Adaptor) digitalPin(id string, o ...func(gobot.DigitalPinOptioner) bool) (gobot.DigitalPinner, error) {
+	i := sysfsPinMap[id]
+	pin := e.digitalPins[i.pin]
+
+	if pin == nil {
+		pin = e.sys.NewDigitalPin("", i.pin, o...)
+		if err := pin.Export(); err != nil {
+			return nil, err
+		}
+		e.digitalPins[i.pin] = pin
+	} else {
+		if err := pin.ApplyOptions(o...); err != nil {
+			return nil, err
+		}
+	}
+	return pin, nil
 }

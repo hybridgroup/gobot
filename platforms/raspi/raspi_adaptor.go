@@ -12,6 +12,7 @@ import (
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/drivers/spi"
+	"gobot.io/x/gobot/platforms/adaptors"
 	"gobot.io/x/gobot/system"
 )
 
@@ -19,11 +20,11 @@ const infoFile = "/proc/cpuinfo"
 
 // Adaptor is the Gobot Adaptor for the Raspberry Pi
 type Adaptor struct {
-	name               string
-	mutex              sync.Mutex
-	sys                *system.Accesser
-	revision           string
-	digitalPins        map[int]gobot.DigitalPinner
+	name     string
+	mutex    sync.Mutex
+	sys      *system.Accesser
+	revision string
+	*adaptors.DigitalPinsAdaptor
 	pwmPins            map[int]gobot.PWMPinner
 	i2cBuses           [2]i2c.I2cDevice
 	spiDevices         [2]spi.Connection
@@ -33,14 +34,14 @@ type Adaptor struct {
 
 // NewAdaptor creates a Raspi Adaptor
 func NewAdaptor() *Adaptor {
+	sys := system.NewAccesser("cdev")
 	r := &Adaptor{
 		name:            gobot.DefaultName("RaspberryPi"),
-		sys:             system.NewAccesser(),
-		digitalPins:     make(map[int]gobot.DigitalPinner),
+		sys:             sys,
 		pwmPins:         make(map[int]gobot.PWMPinner),
 		PiBlasterPeriod: 10000000,
 	}
-
+	r.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, r.getPinTranslatorFunction())
 	return r
 }
 
@@ -60,21 +61,19 @@ func (r *Adaptor) SetName(n string) {
 	r.name = n
 }
 
-// Connect do nothing at the moment
-func (r *Adaptor) Connect() error { return nil }
+// Connect create new connection to board and pins.
+func (r *Adaptor) Connect() error {
+	err := r.DigitalPinsAdaptor.Connect()
+	return err
+}
 
 // Finalize closes connection to board and pins
-func (r *Adaptor) Finalize() (err error) {
+func (r *Adaptor) Finalize() error {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
-	for _, pin := range r.digitalPins {
-		if pin != nil {
-			if perr := pin.Unexport(); err != nil {
-				err = multierror.Append(err, perr)
-			}
-		}
-	}
+	err := r.DigitalPinsAdaptor.Finalize()
+
 	for _, pin := range r.pwmPins {
 		if pin != nil {
 			if perr := pin.Unexport(); err != nil {
@@ -96,60 +95,7 @@ func (r *Adaptor) Finalize() (err error) {
 			}
 		}
 	}
-	return
-}
-
-// DigitalPin returns matched digitalPin for specified values
-func (r *Adaptor) DigitalPin(pin string, dir string) (gobot.DigitalPinner, error) {
-	i, err := r.translatePin(pin)
-
-	if err != nil {
-		return nil, err
-	}
-
-	currentPin, err := r.getExportedDigitalPin(i, dir)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if err = currentPin.Direction(dir); err != nil {
-		return nil, err
-	}
-
-	return currentPin, nil
-}
-
-func (r *Adaptor) getExportedDigitalPin(translatedPin int, dir string) (gobot.DigitalPinner, error) {
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
-
-	if r.digitalPins[translatedPin] == nil {
-		r.digitalPins[translatedPin] = r.sys.NewDigitalPin(translatedPin)
-		if err := r.digitalPins[translatedPin].Export(); err != nil {
-			return nil, err
-		}
-	}
-
-	return r.digitalPins[translatedPin], nil
-}
-
-// DigitalRead reads digital value from pin
-func (r *Adaptor) DigitalRead(pin string) (val int, err error) {
-	sysPin, err := r.DigitalPin(pin, system.IN)
-	if err != nil {
-		return
-	}
-	return sysPin.Read()
-}
-
-// DigitalWrite writes digital value to specified pin
-func (r *Adaptor) DigitalWrite(pin string, val byte) error {
-	sysPin, err := r.DigitalPin(pin, system.OUT)
-	if err != nil {
-		return err
-	}
-	return sysPin.Write(int(val))
+	return err
 }
 
 // GetConnection returns an i2c connection to a device on a specified bus.
@@ -228,7 +174,8 @@ func (r *Adaptor) GetSpiDefaultMaxSpeed() int64 {
 
 // PWMPin returns a raspi.PWMPin which provides the gobot.PWMPinner interface
 func (r *Adaptor) PWMPin(pin string) (gobot.PWMPinner, error) {
-	i, err := r.translatePin(pin)
+	tf := r.getPinTranslatorFunction()
+	_, i, err := tf(pin)
 	if err != nil {
 		return nil, err
 	}
@@ -266,16 +213,20 @@ func (r *Adaptor) ServoWrite(pin string, angle byte) (err error) {
 	return sysPin.SetDutyCycle(duty)
 }
 
-func (r *Adaptor) translatePin(pin string) (i int, err error) {
-	if val, ok := pins[pin][r.readRevision()]; ok {
-		i = val
-	} else if val, ok := pins[pin]["*"]; ok {
-		i = val
-	} else {
-		err = errors.New("Not a valid pin")
-		return
+func (r *Adaptor) getPinTranslatorFunction() func(string) (string, int, error) {
+	return func(pin string) (chip string, line int, err error) {
+		if val, ok := pins[pin][r.readRevision()]; ok {
+			line = val
+		} else if val, ok := pins[pin]["*"]; ok {
+			line = val
+		} else {
+			err = errors.New("Not a valid pin")
+			return
+		}
+		// TODO: Pi1 model B has only this single "gpiochip0", a change of the translator is needed,
+		// to support different chips with different revisions
+		return "gpiochip0", line, nil
 	}
-	return
 }
 
 func (r *Adaptor) readRevision() string {

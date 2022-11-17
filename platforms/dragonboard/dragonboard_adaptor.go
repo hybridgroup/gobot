@@ -83,53 +83,43 @@ func (c *Adaptor) Finalize() (err error) {
 	return
 }
 
-// DigitalPin returns matched digitalPin for specified values
-func (c *Adaptor) DigitalPin(pin string, dir string) (gobot.DigitalPinner, error) {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-
-	i, err := c.translatePin(pin)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if c.digitalPins[i] == nil {
-		c.digitalPins[i] = c.sys.NewDigitalPin(i)
-		if err = c.digitalPins[i].Export(); err != nil {
-			return nil, err
-		}
-	}
-
-	if err = c.digitalPins[i].Direction(dir); err != nil {
-		return nil, err
-	}
-
-	return c.digitalPins[i], nil
-}
-
 // DigitalRead reads digital value to the specified pin.
 // Valids pins are the GPIO_A through GPIO_L pins from the
 // extender (pins 23-34 on header J8), as well as the SoC pins
 // aka all the other pins, APQ GPIO_0-GPIO_122 and PM_MPP_0-4.
-func (c *Adaptor) DigitalRead(pin string) (val int, err error) {
-	sysPin, err := c.DigitalPin(pin, system.IN)
+func (c *Adaptor) DigitalRead(id string) (int, error) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	pin, err := c.digitalPin(id, system.WithDirectionInput())
 	if err != nil {
-		return
+		return 0, err
 	}
-	return sysPin.Read()
+	return pin.Read()
 }
 
 // DigitalWrite writes digital value to the specified pin.
 // Valids pins are the GPIO_A through GPIO_L pins from the
 // extender (pins 23-34 on header J8), as well as the SoC pins
 // aka all the other pins, APQ GPIO_0-GPIO_122 and PM_MPP_0-4.
-func (c *Adaptor) DigitalWrite(pin string, val byte) (err error) {
-	sysPin, err := c.DigitalPin(pin, system.OUT)
+func (c *Adaptor) DigitalWrite(id string, val byte) error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	pin, err := c.digitalPin(id, system.WithDirectionOutput(int(val)))
 	if err != nil {
 		return err
 	}
-	return sysPin.Write(int(val))
+	return pin.Write(int(val))
+}
+
+// DigitalPin returns a digital pin. If the pin is initially acquired, it is an input.
+// Pin direction and other options can be changed afterwards by pin.ApplyOptions() at any time.
+func (c *Adaptor) DigitalPin(id string) (gobot.DigitalPinner, error) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	return c.digitalPin(id)
 }
 
 // GetConnection returns a connection to a device on a specified bus.
@@ -161,11 +151,33 @@ func (c *Adaptor) setPins() {
 	}
 }
 
-func (c *Adaptor) translatePin(pin string) (i int, err error) {
-	if val, ok := c.pinMap[pin]; ok {
+func (c *Adaptor) translateDigitalPin(id string) (i int, err error) {
+	if val, ok := c.pinMap[id]; ok {
 		i = val
 	} else {
 		err = errors.New("Not a valid pin")
 	}
 	return
+}
+
+func (c *Adaptor) digitalPin(id string, o ...func(gobot.DigitalPinOptioner) bool) (gobot.DigitalPinner, error) {
+	i, err := c.translateDigitalPin(id)
+	if err != nil {
+		return nil, err
+	}
+
+	pin := c.digitalPins[i]
+	if pin == nil {
+		pin = c.sys.NewDigitalPin("", i, o...)
+		if err = pin.Export(); err != nil {
+			return nil, err
+		}
+		c.digitalPins[i] = pin
+	} else {
+		if err := pin.ApplyOptions(o...); err != nil {
+			return nil, err
+		}
+	}
+
+	return pin, nil
 }

@@ -32,6 +32,7 @@ var _ spi.Connector = (*Adaptor)(nil)
 func initTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *system.MockFilesystem) {
 	a := NewAdaptor()
 	fs := a.sys.UseMockFilesystem(mockPaths)
+	a.Connect()
 	return a, fs
 }
 
@@ -227,7 +228,7 @@ func TestDigitalPinConcurrency(t *testing.T) {
 			pinAsString := strconv.Itoa(i)
 			go func(pin string) {
 				defer wg.Done()
-				a.DigitalPin(pin, system.IN)
+				a.DigitalPin(pin)
 			}(pinAsString)
 		}
 

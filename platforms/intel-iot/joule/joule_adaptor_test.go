@@ -2,6 +2,7 @@ package joule
 
 import (
 	"errors"
+	"log"
 	"strings"
 	"testing"
 
@@ -133,10 +134,14 @@ func TestFinalize(t *testing.T) {
 func TestDigitalIO(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem()
 
+	log.Println("now test write")
 	a.DigitalWrite("J12_1", 1)
 	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio451/value"].Contents, "1")
 
+	log.Println("now test write")
 	a.DigitalWrite("J12_1", 0)
+
+	log.Println("now test read")
 	i, err := a.DigitalRead("J12_1")
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, i, 0)

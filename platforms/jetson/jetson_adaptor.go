@@ -93,43 +93,37 @@ func (j *Adaptor) Finalize() (err error) {
 	return
 }
 
-// DigitalPin returns matched digitalPin for specified values
-func (j *Adaptor) DigitalPin(pin string, dir string) (gobot.DigitalPinner, error) {
-	i, err := j.translatePin(pin)
-
-	if err != nil {
-		return nil, err
-	}
-
-	currentPin, err := j.getExportedDigitalPin(i, dir)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if err = currentPin.Direction(dir); err != nil {
-		return nil, err
-	}
-
-	return currentPin, nil
-}
-
 // DigitalRead reads digital value from pin
-func (j *Adaptor) DigitalRead(pin string) (val int, err error) {
-	sysPin, err := j.DigitalPin(pin, system.IN)
+func (j *Adaptor) DigitalRead(id string) (int, error) {
+	j.mutex.Lock()
+	defer j.mutex.Unlock()
+
+	pin, err := j.digitalPin(id, system.WithDirectionInput())
 	if err != nil {
-		return
+		return 0, err
 	}
-	return sysPin.Read()
+	return pin.Read()
 }
 
 // DigitalWrite writes digital value to specified pin
-func (j *Adaptor) DigitalWrite(pin string, val byte) (err error) {
-	sysPin, err := j.DigitalPin(pin, system.OUT)
+func (j *Adaptor) DigitalWrite(id string, val byte) error {
+	j.mutex.Lock()
+	defer j.mutex.Unlock()
+
+	pin, err := j.digitalPin(id, system.WithDirectionOutput(int(val)))
 	if err != nil {
 		return err
 	}
-	return sysPin.Write(int(val))
+	return pin.Write(int(val))
+}
+
+// DigitalPin returns a digital pin. If the pin is initially acquired, it is an input.
+// Pin direction and other options can be changed afterwards by pin.ApplyOptions() at any time.
+func (j *Adaptor) DigitalPin(id string) (gobot.DigitalPinner, error) {
+	j.mutex.Lock()
+	defer j.mutex.Unlock()
+
+	return j.digitalPin(id)
 }
 
 // GetConnection returns an i2c connection to a device on a specified bus.
@@ -237,20 +231,6 @@ func (j *Adaptor) ServoWrite(pin string, angle byte) (err error) {
 	return sysPin.SetDutyCycle(duty)
 }
 
-func (j *Adaptor) getExportedDigitalPin(translatedPin int, dir string) (gobot.DigitalPinner, error) {
-	j.mutex.Lock()
-	defer j.mutex.Unlock()
-
-	if j.digitalPins[translatedPin] == nil {
-		j.digitalPins[translatedPin] = j.sys.NewDigitalPin(translatedPin)
-		if err := j.digitalPins[translatedPin].Export(); err != nil {
-			return nil, err
-		}
-	}
-
-	return j.digitalPins[translatedPin], nil
-}
-
 func (j *Adaptor) getI2cBus(bus int) (_ i2c.I2cDevice, err error) {
 	j.mutex.Lock()
 	defer j.mutex.Unlock()
@@ -270,4 +250,26 @@ func (j *Adaptor) translatePin(pin string) (i int, err error) {
 		return
 	}
 	return
+}
+
+func (j *Adaptor) digitalPin(id string, o ...func(gobot.DigitalPinOptioner) bool) (gobot.DigitalPinner, error) {
+	i, err := j.translatePin(id)
+	if err != nil {
+		return nil, err
+	}
+
+	pin := j.digitalPins[i]
+	if pin == nil {
+		pin = j.sys.NewDigitalPin("", i, o...)
+		if err := pin.Export(); err != nil {
+			return nil, err
+		}
+		j.digitalPins[i] = pin
+	} else {
+		if err := pin.ApplyOptions(o...); err != nil {
+			return nil, err
+		}
+	}
+
+	return pin, nil
 }

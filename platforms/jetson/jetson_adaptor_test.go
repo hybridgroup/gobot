@@ -70,21 +70,24 @@ func TestDigitalIO(t *testing.T) {
 	}
 	a, fs := initTestAdaptorWithMockedFilesystem(mockPaths)
 
-	a.DigitalWrite("7", 1)
+	err := a.DigitalWrite("7", 1)
+	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio216/value"].Contents, "1")
 
-	a.DigitalWrite("13", 1)
-	i, _ := a.DigitalRead("13")
+	err = a.DigitalWrite("13", 1)
+	gobottest.Assert(t, err, nil)
+	i, err := a.DigitalRead("13")
+	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, i, 1)
 
 	gobottest.Assert(t, a.DigitalWrite("notexist", 1), errors.New("Not a valid pin"))
 
 	fs.WithReadError = true
-	_, err := a.DigitalRead("7")
+	_, err = a.DigitalRead("13")
 	gobottest.Assert(t, err, errors.New("read error"))
 
 	fs.WithWriteError = true
-	_, err = a.DigitalRead("13")
+	_, err = a.DigitalRead("7")
 	gobottest.Assert(t, err, errors.New("write error"))
 }
 
@@ -140,7 +143,7 @@ func TestDigitalPinConcurrency(t *testing.T) {
 			pinAsString := strconv.Itoa(i)
 			go func(pin string) {
 				defer wg.Done()
-				a.DigitalPin(pin, system.IN)
+				a.DigitalPin(pin)
 			}(pinAsString)
 		}
 
