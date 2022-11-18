@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/gpio"
 )
 
 const (
