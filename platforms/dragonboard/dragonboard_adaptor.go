@@ -16,7 +16,7 @@ type Adaptor struct {
 	name        string
 	sys         *system.Accesser
 	mutex       sync.Mutex
-	digitalPins map[int]system.DigitalPinner
+	digitalPins map[int]gobot.DigitalPinner
 	pinMap      map[string]int
 	i2cBuses    [3]i2c.I2cDevice
 }
@@ -84,7 +84,7 @@ func (c *Adaptor) Finalize() (err error) {
 }
 
 // DigitalPin returns matched digitalPin for specified values
-func (c *Adaptor) DigitalPin(pin string, dir string) (system.DigitalPinner, error) {
+func (c *Adaptor) DigitalPin(pin string, dir string) (gobot.DigitalPinner, error) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
@@ -153,7 +153,7 @@ func (c *Adaptor) GetDefaultBus() int {
 }
 
 func (c *Adaptor) setPins() {
-	c.digitalPins = make(map[int]system.DigitalPinner)
+	c.digitalPins = make(map[int]gobot.DigitalPinner)
 	c.pinMap = fixedPins
 	for i := 0; i < 122; i++ {
 		pin := fmt.Sprintf("GPIO_%d", i)

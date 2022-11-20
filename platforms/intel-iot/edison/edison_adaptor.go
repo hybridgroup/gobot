@@ -33,9 +33,9 @@ type Adaptor struct {
 	sys         *system.Accesser
 	mutex       sync.Mutex
 	pinmap      map[string]sysfsPin
-	tristate    system.DigitalPinner
-	digitalPins map[int]system.DigitalPinner
-	pwmPins     map[int]system.PWMPinner
+	tristate    gobot.DigitalPinner
+	digitalPins map[int]gobot.DigitalPinner
+	pwmPins     map[int]gobot.PWMPinner
 	i2cBus      i2c.I2cDevice
 }
 
@@ -62,8 +62,8 @@ func (e *Adaptor) SetBoard(n string) { e.board = n }
 
 // Connect initializes the Edison for use with the Arduino breakout board
 func (e *Adaptor) Connect() (err error) {
-	e.digitalPins = make(map[int]system.DigitalPinner)
-	e.pwmPins = make(map[int]system.PWMPinner)
+	e.digitalPins = make(map[int]gobot.DigitalPinner)
+	e.pwmPins = make(map[int]gobot.PWMPinner)
 
 	if e.Board() == "arduino" || e.Board() == "" {
 		aerr := e.checkForArduino()
@@ -193,7 +193,7 @@ func (e *Adaptor) GetDefaultBus() int {
 }
 
 // DigitalPin returns matched system.DigitalPin for specified values
-func (e *Adaptor) DigitalPin(pin string, dir string) (system.DigitalPinner, error) {
+func (e *Adaptor) DigitalPin(pin string, dir string) (gobot.DigitalPinner, error) {
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
 
@@ -267,7 +267,7 @@ func (e *Adaptor) DigitalPin(pin string, dir string) (system.DigitalPinner, erro
 }
 
 // PWMPin returns a system.PWMPin
-func (e *Adaptor) PWMPin(pin string) (system.PWMPinner, error) {
+func (e *Adaptor) PWMPin(pin string) (gobot.PWMPinner, error) {
 	sysPin := e.pinmap[pin]
 	if sysPin.pwmPin != -1 {
 		if e.pwmPins[sysPin.pwmPin] == nil {
@@ -304,7 +304,7 @@ func (e *Adaptor) checkForArduino() error {
 	return nil
 }
 
-func (e *Adaptor) newExportedPin(pin int) (system.DigitalPinner, error) {
+func (e *Adaptor) newExportedPin(pin int) (gobot.DigitalPinner, error) {
 	sysPin := e.sys.NewDigitalPin(pin)
 	err := sysPin.Export()
 	return sysPin, err
@@ -439,7 +439,7 @@ func (e *Adaptor) changePinMode(pin, mode string) error {
 }
 
 // pinWrite sets Direction and writes level for a specific pin
-func pinWrite(pin system.DigitalPinner, dir string, level int) error {
+func pinWrite(pin gobot.DigitalPinner, dir string, level int) error {
 	if err := pin.Direction(dir); err != nil {
 		return err
 	}

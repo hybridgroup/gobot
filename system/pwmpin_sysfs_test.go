@@ -5,10 +5,11 @@ import (
 	"syscall"
 	"testing"
 
+	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/gobottest"
 )
 
-var _ PWMPinner = (*PWMPin)(nil)
+var _ gobot.PWMPinner = (*PWMPin)(nil)
 
 func TestPwmPin(t *testing.T) {
 	a := NewAccesser()

@@ -27,8 +27,8 @@ type Adaptor struct {
 	sys         *system.Accesser
 	mutex       sync.Mutex
 	pinmap      map[string]sysfsPin
-	digitalPins map[int]system.DigitalPinner
-	pwmPins     map[int]system.PWMPinner
+	digitalPins map[int]gobot.DigitalPinner
+	pwmPins     map[int]gobot.PWMPinner
 	i2cBuses    [3]i2c.I2cDevice
 }
 
@@ -144,7 +144,7 @@ func (c *Adaptor) GetDefaultBus() int {
 }
 
 // DigitalPin returns matched digitalPin for specified values
-func (c *Adaptor) DigitalPin(pin string, dir string) (system.DigitalPinner, error) {
+func (c *Adaptor) DigitalPin(pin string, dir string) (gobot.DigitalPinner, error) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
@@ -169,7 +169,7 @@ func (c *Adaptor) DigitalPin(pin string, dir string) (system.DigitalPinner, erro
 }
 
 // PWMPin returns matched pwmPin for specified pin number
-func (c *Adaptor) PWMPin(pin string) (system.PWMPinner, error) {
+func (c *Adaptor) PWMPin(pin string) (gobot.PWMPinner, error) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
@@ -245,8 +245,8 @@ func (c *Adaptor) SetBoard(n string) (err error) {
 }
 
 func (c *Adaptor) setPins() {
-	c.digitalPins = make(map[int]system.DigitalPinner)
-	c.pwmPins = make(map[int]system.PWMPinner)
+	c.digitalPins = make(map[int]gobot.DigitalPinner)
+	c.pwmPins = make(map[int]gobot.PWMPinner)
 
 	if c.board == "pro" {
 		c.pinmap = chipProPins

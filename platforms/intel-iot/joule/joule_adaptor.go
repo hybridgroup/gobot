@@ -21,8 +21,8 @@ type Adaptor struct {
 	name        string
 	sys         *system.Accesser
 	mutex       sync.Mutex
-	digitalPins map[int]system.DigitalPinner
-	pwmPins     map[int]system.PWMPinner
+	digitalPins map[int]gobot.DigitalPinner
+	pwmPins     map[int]gobot.PWMPinner
 	i2cBuses    [3]i2c.I2cDevice
 }
 
@@ -45,8 +45,8 @@ func (e *Adaptor) Connect() (err error) {
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
 
-	e.digitalPins = make(map[int]system.DigitalPinner)
-	e.pwmPins = make(map[int]system.PWMPinner)
+	e.digitalPins = make(map[int]gobot.DigitalPinner)
+	e.pwmPins = make(map[int]gobot.PWMPinner)
 	return
 }
 
@@ -83,7 +83,7 @@ func (e *Adaptor) Finalize() (err error) {
 }
 
 // DigitalPin returns matched digitalPin for specified values
-func (e *Adaptor) DigitalPin(pin string, dir string) (system.DigitalPinner, error) {
+func (e *Adaptor) DigitalPin(pin string, dir string) (gobot.DigitalPinner, error) {
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
 
@@ -140,14 +140,13 @@ func (e *Adaptor) PwmWrite(pin string, val byte) (err error) {
 }
 
 // PWMPin returns a sys.PWMPin
-func (e *Adaptor) PWMPin(pin string) (system.PWMPinner, error) {
+func (e *Adaptor) PWMPin(pin string) (gobot.PWMPinner, error) {
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
 
 	sysPin, ok := sysfsPinMap[pin]
 	if !ok {
-		err := errors.New("Not a valid pin")
-		return nil, err
+		return nil, errors.New("Not a valid pin")
 	}
 	if sysPin.pwmPin != -1 {
 		if e.pwmPins[sysPin.pwmPin] == nil {

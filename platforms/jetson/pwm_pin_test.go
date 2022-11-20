@@ -4,11 +4,12 @@ import (
 	"errors"
 	"testing"
 
+	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/gobottest"
 	"gobot.io/x/gobot/system"
 )
 
-var _ system.PWMPinner = (*PWMPin)(nil)
+var _ gobot.PWMPinner = (*PWMPin)(nil)
 
 func TestPwmPin(t *testing.T) {
 	a := system.NewAccesser()

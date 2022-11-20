@@ -30,8 +30,8 @@ type Adaptor struct {
 	name        string
 	sys         *system.Accesser
 	mutex       sync.Mutex
-	digitalPins map[string]system.DigitalPinner
-	pwmPins     map[string]system.PWMPinner
+	digitalPins map[string]gobot.DigitalPinner
+	pwmPins     map[string]gobot.PWMPinner
 	i2cBuses    [5]i2c.I2cDevice
 }
 
@@ -162,7 +162,7 @@ func (c *Adaptor) SetPeriod(pin string, period uint32) error {
 }
 
 // DigitalPin returns matched digitalPin for specified values.
-func (c *Adaptor) DigitalPin(pin string, dir string) (system.DigitalPinner, error) {
+func (c *Adaptor) DigitalPin(pin string, dir string) (gobot.DigitalPinner, error) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
@@ -187,7 +187,7 @@ func (c *Adaptor) DigitalPin(pin string, dir string) (system.DigitalPinner, erro
 
 // PWMPin initializes the pin for PWM and returns matched pwmPin for specified pin number.
 // It implements the PWMPinnerProvider interface.
-func (c *Adaptor) PWMPin(pin string) (system.PWMPinner, error) {
+func (c *Adaptor) PWMPin(pin string) (gobot.PWMPinner, error) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
@@ -216,7 +216,7 @@ func (c *Adaptor) GetDefaultBus() int {
 }
 
 // pwmPin initializes the pin for PWM and returns matched pwmPin for specified pin number.
-func (c *Adaptor) pwmPin(pin string) (system.PWMPinner, error) {
+func (c *Adaptor) pwmPin(pin string) (gobot.PWMPinner, error) {
 	var pwmPinData pwmPinDefinition
 	pwmPinData, err := c.translatePwmPin(pin)
 	if err != nil {
@@ -258,7 +258,7 @@ func (c *Adaptor) pwmPin(pin string) (system.PWMPinner, error) {
 // setPeriod adjusts the PWM period of the given pin.
 // If duty cycle is already set, also this value will be adjusted in the same ratio.
 // The order in which the values are written must be observed, otherwise an error occur "write error: Invalid argument".
-func setPeriod(pwmPin system.PWMPinner, period uint32) error {
+func setPeriod(pwmPin gobot.PWMPinner, period uint32) error {
 	var errorBase = fmt.Sprintf("tinkerboard.setPeriod(%v, %d) failed", pwmPin, period)
 	oldDuty, err := pwmPin.DutyCycle()
 	if err != nil {
@@ -306,8 +306,8 @@ func setPeriod(pwmPin system.PWMPinner, period uint32) error {
 }
 
 func (c *Adaptor) setPins() {
-	c.digitalPins = make(map[string]system.DigitalPinner)
-	c.pwmPins = make(map[string]system.PWMPinner)
+	c.digitalPins = make(map[string]gobot.DigitalPinner)
+	c.pwmPins = make(map[string]gobot.PWMPinner)
 }
 
 func (c *Adaptor) translatePin(pin string) (sysPinNo int, err error) {

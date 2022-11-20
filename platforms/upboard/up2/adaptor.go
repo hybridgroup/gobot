@@ -43,8 +43,8 @@ type Adaptor struct {
 	mutex       sync.Mutex
 	pinmap      map[string]sysfsPin
 	ledPath     string
-	digitalPins map[int]system.DigitalPinner
-	pwmPins     map[int]system.PWMPinner
+	digitalPins map[int]gobot.DigitalPinner
+	pwmPins     map[int]gobot.PWMPinner
 	i2cBuses    [6]i2c.I2cDevice
 	spiBuses    [2]spi.Connection
 }
@@ -55,8 +55,8 @@ func NewAdaptor() *Adaptor {
 		name:        gobot.DefaultName("UP2"),
 		sys:         system.NewAccesser(),
 		ledPath:     "/sys/class/leds/upboard:%s:/brightness",
-		digitalPins: make(map[int]system.DigitalPinner),
-		pwmPins:     make(map[int]system.PWMPinner),
+		digitalPins: make(map[int]gobot.DigitalPinner),
+		pwmPins:     make(map[int]gobot.PWMPinner),
 		pinmap:      fixedPins,
 	}
 	return c
@@ -172,7 +172,7 @@ func (c *Adaptor) ServoWrite(pin string, angle byte) (err error) {
 }
 
 // DigitalPin returns matched digitalPin for specified values
-func (c *Adaptor) DigitalPin(pin string, dir string) (system.DigitalPinner, error) {
+func (c *Adaptor) DigitalPin(pin string, dir string) (gobot.DigitalPinner, error) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
@@ -197,7 +197,7 @@ func (c *Adaptor) DigitalPin(pin string, dir string) (system.DigitalPinner, erro
 }
 
 // PWMPin returns matched pwmPin for specified pin number
-func (c *Adaptor) PWMPin(pin string) (system.PWMPinner, error) {
+func (c *Adaptor) PWMPin(pin string) (gobot.PWMPinner, error) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 

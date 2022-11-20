@@ -23,8 +23,8 @@ type Adaptor struct {
 	mutex              sync.Mutex
 	sys                *system.Accesser
 	revision           string
-	digitalPins        map[int]system.DigitalPinner
-	pwmPins            map[int]system.PWMPinner
+	digitalPins        map[int]gobot.DigitalPinner
+	pwmPins            map[int]gobot.PWMPinner
 	i2cBuses           [2]i2c.I2cDevice
 	spiDevices         [2]spi.Connection
 	spiDefaultMaxSpeed int64
@@ -36,8 +36,8 @@ func NewAdaptor() *Adaptor {
 	r := &Adaptor{
 		name:            gobot.DefaultName("RaspberryPi"),
 		sys:             system.NewAccesser(),
-		digitalPins:     make(map[int]system.DigitalPinner),
-		pwmPins:         make(map[int]system.PWMPinner),
+		digitalPins:     make(map[int]gobot.DigitalPinner),
+		pwmPins:         make(map[int]gobot.PWMPinner),
 		PiBlasterPeriod: 10000000,
 	}
 
@@ -100,7 +100,7 @@ func (r *Adaptor) Finalize() (err error) {
 }
 
 // DigitalPin returns matched digitalPin for specified values
-func (r *Adaptor) DigitalPin(pin string, dir string) (system.DigitalPinner, error) {
+func (r *Adaptor) DigitalPin(pin string, dir string) (gobot.DigitalPinner, error) {
 	i, err := r.translatePin(pin)
 
 	if err != nil {
@@ -120,7 +120,7 @@ func (r *Adaptor) DigitalPin(pin string, dir string) (system.DigitalPinner, erro
 	return currentPin, nil
 }
 
-func (r *Adaptor) getExportedDigitalPin(translatedPin int, dir string) (system.DigitalPinner, error) {
+func (r *Adaptor) getExportedDigitalPin(translatedPin int, dir string) (gobot.DigitalPinner, error) {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
@@ -226,8 +226,8 @@ func (r *Adaptor) GetSpiDefaultMaxSpeed() int64 {
 	return 500000
 }
 
-// PWMPin returns a raspi.PWMPin which provides the system.PWMPinner interface
-func (r *Adaptor) PWMPin(pin string) (system.PWMPinner, error) {
+// PWMPin returns a raspi.PWMPin which provides the gobot.PWMPinner interface
+func (r *Adaptor) PWMPin(pin string) (gobot.PWMPinner, error) {
 	i, err := r.translatePin(pin)
 	if err != nil {
 		return nil, err

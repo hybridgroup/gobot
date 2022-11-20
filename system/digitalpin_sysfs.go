@@ -24,26 +24,6 @@ const (
 
 var errNotExported = errors.New("pin has not been exported")
 
-// DigitalPinner is the interface for system gpio interactions
-type DigitalPinner interface {
-	// Export exports the pin for use by the operating system
-	Export() error
-	// Unexport unexports the pin and releases the pin from the operating system
-	Unexport() error
-	// Direction sets the direction for the pin
-	Direction(string) error
-	// Read reads the current value of the pin
-	Read() (int, error)
-	// Write writes to the pin
-	Write(int) error
-}
-
-// DigitalPinnerProvider is the interface that an Adaptor should implement to allow
-// clients to obtain access to any DigitalPin's available on that board.
-type DigitalPinnerProvider interface {
-	DigitalPin(string, string) (DigitalPinner, error)
-}
-
 // DigitalPin represents a digital pin
 type DigitalPin struct {
 	pin   string

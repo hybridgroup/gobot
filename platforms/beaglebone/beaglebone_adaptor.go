@@ -28,8 +28,8 @@ type Adaptor struct {
 	name         string
 	sys          *system.Accesser
 	mutex        sync.Mutex
-	digitalPins  []system.DigitalPinner
-	pwmPins      map[string]system.PWMPinner
+	digitalPins  []gobot.DigitalPinner
+	pwmPins      map[string]gobot.PWMPinner
 	i2cBuses     map[int]i2c.I2cDevice
 	usrLed       string
 	analogPath   string
@@ -45,8 +45,8 @@ func NewAdaptor() *Adaptor {
 	b := &Adaptor{
 		name:         gobot.DefaultName("BeagleboneBlack"),
 		sys:          system.NewAccesser(),
-		digitalPins:  make([]system.DigitalPinner, 120),
-		pwmPins:      make(map[string]system.PWMPinner),
+		digitalPins:  make([]gobot.DigitalPinner, 120),
+		pwmPins:      make(map[string]gobot.PWMPinner),
 		i2cBuses:     make(map[int]i2c.I2cDevice),
 		pinMap:       bbbPinMap,
 		pwmPinMap:    bbbPwmPinMap,
@@ -164,7 +164,7 @@ func (b *Adaptor) DigitalWrite(pin string, val byte) (err error) {
 }
 
 // DigitalPin retrieves digital pin value by name
-func (b *Adaptor) DigitalPin(pin string, dir string) (system.DigitalPinner, error) {
+func (b *Adaptor) DigitalPin(pin string, dir string) (gobot.DigitalPinner, error) {
 	b.mutex.Lock()
 	defer b.mutex.Unlock()
 
@@ -190,7 +190,7 @@ func (b *Adaptor) DigitalPin(pin string, dir string) (system.DigitalPinner, erro
 }
 
 // PWMPin returns matched pwmPin for specified pin number
-func (b *Adaptor) PWMPin(pin string) (system.PWMPinner, error) {
+func (b *Adaptor) PWMPin(pin string) (gobot.PWMPinner, error) {
 	b.mutex.Lock()
 	defer b.mutex.Unlock()
 

@@ -19,8 +19,8 @@ type Adaptor struct {
 	name        string
 	sys         *system.Accesser
 	mutex       sync.Mutex
-	digitalPins map[int]system.DigitalPinner
-	pwmPins     map[int]system.PWMPinner
+	digitalPins map[int]gobot.DigitalPinner
+	pwmPins     map[int]gobot.PWMPinner
 	i2cBuses    [2]i2c.I2cDevice
 	spiDevices  [2]spi.Connection
 }
@@ -30,8 +30,8 @@ func NewAdaptor() *Adaptor {
 	j := &Adaptor{
 		name:        gobot.DefaultName("JetsonNano"),
 		sys:         system.NewAccesser(),
-		digitalPins: make(map[int]system.DigitalPinner),
-		pwmPins:     make(map[int]system.PWMPinner),
+		digitalPins: make(map[int]gobot.DigitalPinner),
+		pwmPins:     make(map[int]gobot.PWMPinner),
 	}
 	return j
 }
@@ -94,7 +94,7 @@ func (j *Adaptor) Finalize() (err error) {
 }
 
 // DigitalPin returns matched digitalPin for specified values
-func (j *Adaptor) DigitalPin(pin string, dir string) (system.DigitalPinner, error) {
+func (j *Adaptor) DigitalPin(pin string, dir string) (gobot.DigitalPinner, error) {
 	i, err := j.translatePin(pin)
 
 	if err != nil {
@@ -191,8 +191,8 @@ func (j *Adaptor) GetSpiDefaultMaxSpeed() int64 {
 	return 10000000
 }
 
-//PWMPin returns a Jetson Nano. PWMPin which provides the system.PWMPinner interface
-func (j *Adaptor) PWMPin(pin string) (system.PWMPinner, error) {
+//PWMPin returns a Jetson Nano. PWMPin which provides the gobot.PWMPinner interface
+func (j *Adaptor) PWMPin(pin string) (gobot.PWMPinner, error) {
 	i, err := j.translatePin(pin)
 	if err != nil {
 		return nil, err
@@ -237,7 +237,7 @@ func (j *Adaptor) ServoWrite(pin string, angle byte) (err error) {
 	return sysPin.SetDutyCycle(duty)
 }
 
-func (j *Adaptor) getExportedDigitalPin(translatedPin int, dir string) (system.DigitalPinner, error) {
+func (j *Adaptor) getExportedDigitalPin(translatedPin int, dir string) (gobot.DigitalPinner, error) {
 	j.mutex.Lock()
 	defer j.mutex.Unlock()
 

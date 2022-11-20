@@ -47,14 +47,14 @@ var gpioMockPaths = []string{
 	gpio160Path + "direction",
 }
 
-// make sure that this Adaptor fullfills all the required interfaces
+// make sure that this Adaptor fulfills all the required interfaces
 var _ gobot.Adaptor = (*Adaptor)(nil)
+var _ gobot.DigitalPinnerProvider = (*Adaptor)(nil)
+var _ gobot.PWMPinnerProvider = (*Adaptor)(nil)
 var _ gpio.DigitalReader = (*Adaptor)(nil)
 var _ gpio.DigitalWriter = (*Adaptor)(nil)
 var _ gpio.PwmWriter = (*Adaptor)(nil)
 var _ gpio.ServoWriter = (*Adaptor)(nil)
-var _ system.DigitalPinnerProvider = (*Adaptor)(nil)
-var _ system.PWMPinnerProvider = (*Adaptor)(nil)
 var _ i2c.Connector = (*Adaptor)(nil)
 
 func preparePwmFs(fs *system.MockFilesystem) {
