@@ -192,7 +192,7 @@ func (e *Adaptor) GetDefaultBus() int {
 	return 1
 }
 
-// DigitalPin returns matched sys.DigitalPin for specified values
+// DigitalPin returns matched system.DigitalPin for specified values
 func (e *Adaptor) DigitalPin(pin string, dir string) (system.DigitalPinner, error) {
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
@@ -266,7 +266,7 @@ func (e *Adaptor) DigitalPin(pin string, dir string) (system.DigitalPinner, erro
 	return e.digitalPins[i.pin], nil
 }
 
-// PWMPin returns a sys.PWMPin
+// PWMPin returns a system.PWMPin
 func (e *Adaptor) PWMPin(pin string) (system.PWMPinner, error) {
 	sysPin := e.pinmap[pin]
 	if sysPin.pwmPin != -1 {
