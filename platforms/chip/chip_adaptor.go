@@ -25,10 +25,10 @@ type Adaptor struct {
 	name        string
 	board       string
 	sysfs       *sysfs.Accesser
-	mutex       *sync.Mutex
+	mutex       sync.Mutex
 	pinmap      map[string]sysfsPin
-	digitalPins map[int]*sysfs.DigitalPin
-	pwmPins     map[int]*sysfs.PWMPin
+	digitalPins map[int]sysfs.DigitalPinner
+	pwmPins     map[int]sysfs.PWMPinner
 	i2cBuses    [3]i2c.I2cDevice
 }
 
@@ -38,7 +38,6 @@ func NewAdaptor() *Adaptor {
 		name:  gobot.DefaultName("CHIP"),
 		board: "chip",
 		sysfs: sysfs.NewAccesser(),
-		mutex: &sync.Mutex{},
 	}
 
 	c.setPins()
@@ -50,7 +49,6 @@ func NewProAdaptor() *Adaptor {
 	c := &Adaptor{
 		name:  gobot.DefaultName("CHIP Pro"),
 		sysfs: sysfs.NewAccesser(),
-		mutex: &sync.Mutex{},
 		board: "pro",
 	}
 
@@ -178,7 +176,7 @@ func (c *Adaptor) PWMPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
 	sysPin := c.pinmap[pin]
 	if sysPin.pwmPin != -1 {
 		if c.pwmPins[sysPin.pwmPin] == nil {
-			newPin := c.sysfs.NewPWMPin(sysPin.pwmPin)
+			newPin := c.sysfs.NewPWMPin("/sys/class/pwm/pwmchip0", sysPin.pwmPin)
 			if err = newPin.Export(); err != nil {
 				return
 			}
@@ -248,8 +246,8 @@ func (c *Adaptor) SetBoard(n string) (err error) {
 }
 
 func (c *Adaptor) setPins() {
-	c.digitalPins = make(map[int]*sysfs.DigitalPin)
-	c.pwmPins = make(map[int]*sysfs.PWMPin)
+	c.digitalPins = make(map[int]sysfs.DigitalPinner)
+	c.pwmPins = make(map[int]sysfs.PWMPinner)
 
 	if c.board == "pro" {
 		c.pinmap = chipProPins

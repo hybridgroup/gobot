@@ -29,9 +29,9 @@ type pwmPinDefinition struct {
 type Adaptor struct {
 	name        string
 	sysfs       *sysfs.Accesser
-	mutex       *sync.Mutex
-	digitalPins map[string]*sysfs.DigitalPin
-	pwmPins     map[string]*sysfs.PWMPin
+	mutex       sync.Mutex
+	digitalPins map[string]sysfs.DigitalPinner
+	pwmPins     map[string]sysfs.PWMPinner
 	i2cBuses    [5]i2c.I2cDevice
 }
 
@@ -40,7 +40,6 @@ func NewAdaptor() *Adaptor {
 	c := &Adaptor{
 		name:  gobot.DefaultName("Tinker Board"),
 		sysfs: sysfs.NewAccesser(),
-		mutex: &sync.Mutex{},
 	}
 
 	c.setPins()
@@ -229,8 +228,7 @@ func (c *Adaptor) pwmPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
 		if path, err = pwmPinData.findDir(*c.sysfs); err != nil {
 			return
 		}
-		newPin := c.sysfs.NewPWMPin(pwmPinData.channel)
-		newPin.Path = path
+		newPin := c.sysfs.NewPWMPin(path, pwmPinData.channel)
 		if err = newPin.Export(); err != nil {
 			return
 		}
@@ -307,8 +305,8 @@ func setPeriod(pwmPin sysfs.PWMPinner, period uint32) error {
 }
 
 func (c *Adaptor) setPins() {
-	c.digitalPins = make(map[string]*sysfs.DigitalPin)
-	c.pwmPins = make(map[string]*sysfs.PWMPin)
+	c.digitalPins = make(map[string]sysfs.DigitalPinner)
+	c.pwmPins = make(map[string]sysfs.PWMPinner)
 }
 
 func (c *Adaptor) translatePin(pin string) (sysfsPinNo int, err error) {

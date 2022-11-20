@@ -20,9 +20,9 @@ type sysfsPin struct {
 type Adaptor struct {
 	name        string
 	sysfs       *sysfs.Accesser
-	mutex       *sync.Mutex
-	digitalPins map[int]*sysfs.DigitalPin
-	pwmPins     map[int]*sysfs.PWMPin
+	mutex       sync.Mutex
+	digitalPins map[int]sysfs.DigitalPinner
+	pwmPins     map[int]sysfs.PWMPinner
 	i2cBuses    [3]i2c.I2cDevice
 }
 
@@ -31,7 +31,6 @@ func NewAdaptor() *Adaptor {
 	return &Adaptor{
 		name:  gobot.DefaultName("Joule"),
 		sysfs: sysfs.NewAccesser(),
-		mutex: &sync.Mutex{},
 	}
 }
 
@@ -46,8 +45,8 @@ func (e *Adaptor) Connect() (err error) {
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
 
-	e.digitalPins = make(map[int]*sysfs.DigitalPin)
-	e.pwmPins = make(map[int]*sysfs.PWMPin)
+	e.digitalPins = make(map[int]sysfs.DigitalPinner)
+	e.pwmPins = make(map[int]sysfs.PWMPinner)
 	return
 }
 
@@ -152,7 +151,7 @@ func (e *Adaptor) PWMPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
 	}
 	if sysPin.pwmPin != -1 {
 		if e.pwmPins[sysPin.pwmPin] == nil {
-			e.pwmPins[sysPin.pwmPin] = e.sysfs.NewPWMPin(sysPin.pwmPin)
+			e.pwmPins[sysPin.pwmPin] = e.sysfs.NewPWMPin("/sys/class/pwm/pwmchip0", sysPin.pwmPin)
 			if err = e.pwmPins[sysPin.pwmPin].Export(); err != nil {
 				return
 			}

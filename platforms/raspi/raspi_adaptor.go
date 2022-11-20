@@ -20,10 +20,10 @@ const infoFile = "/proc/cpuinfo"
 // Adaptor is the Gobot Adaptor for the Raspberry Pi
 type Adaptor struct {
 	name               string
-	mutex              *sync.Mutex
+	mutex              sync.Mutex
 	sysfs              *sysfs.Accesser
 	revision           string
-	digitalPins        map[int]*sysfs.DigitalPin
+	digitalPins        map[int]sysfs.DigitalPinner
 	pwmPins            map[int]*PWMPin
 	i2cBuses           [2]i2c.I2cDevice
 	spiDevices         [2]spi.Connection
@@ -36,8 +36,7 @@ func NewAdaptor() *Adaptor {
 	r := &Adaptor{
 		name:            gobot.DefaultName("RaspberryPi"),
 		sysfs:           sysfs.NewAccesser(),
-		mutex:           &sync.Mutex{},
-		digitalPins:     make(map[int]*sysfs.DigitalPin),
+		digitalPins:     make(map[int]sysfs.DigitalPinner),
 		pwmPins:         make(map[int]*PWMPin),
 		PiBlasterPeriod: 10000000,
 	}
@@ -238,7 +237,7 @@ func (r *Adaptor) PWMPin(pin string) (raspiPWMPin sysfs.PWMPinner, err error) {
 	defer r.mutex.Unlock()
 
 	if r.pwmPins[i] == nil {
-		r.pwmPins[i] = NewPWMPin(r.sysfs, strconv.Itoa(i))
+		r.pwmPins[i] = NewPWMPin(r.sysfs, "/sys/class/pwm/pwmchip0", strconv.Itoa(i))
 		r.pwmPins[i].SetPeriod(r.PiBlasterPeriod)
 	}
 

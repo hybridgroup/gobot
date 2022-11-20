@@ -14,7 +14,7 @@ func TestPwmPin(t *testing.T) {
 	a := sysfs.NewAccesser()
 	a.UseMockFilesystem([]string{"/dev/pi-blaster"})
 
-	pin := NewPWMPin(a, "1")
+	pin := NewPWMPin(a, "/sys/class/pwm/pwmchip0", "1")
 
 	gobottest.Assert(t, pin.Export(), nil)
 	gobottest.Assert(t, pin.Enable(true), nil)

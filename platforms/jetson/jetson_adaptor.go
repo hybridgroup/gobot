@@ -18,8 +18,8 @@ const pwmDefaultPeriod = 3000000
 type Adaptor struct {
 	name        string
 	sysfs       *sysfs.Accesser
-	mutex       *sync.Mutex
-	digitalPins map[int]*sysfs.DigitalPin
+	mutex       sync.Mutex
+	digitalPins map[int]sysfs.DigitalPinner
 	pwmPins     map[int]*PWMPin
 	i2cBuses    [2]i2c.I2cDevice
 	spiDevices  [2]spi.Connection
@@ -30,8 +30,7 @@ func NewAdaptor() *Adaptor {
 	j := &Adaptor{
 		name:        gobot.DefaultName("JetsonNano"),
 		sysfs:       sysfs.NewAccesser(),
-		mutex:       &sync.Mutex{},
-		digitalPins: make(map[int]*sysfs.DigitalPin),
+		digitalPins: make(map[int]sysfs.DigitalPinner),
 		pwmPins:     make(map[int]*PWMPin),
 	}
 	return j
@@ -205,7 +204,7 @@ func (j *Adaptor) PWMPin(pin string) (pwmPin sysfs.PWMPinner, err error) {
 		return j.pwmPins[i], nil
 	}
 
-	j.pwmPins[i], err = NewPWMPin(j.sysfs, pin)
+	j.pwmPins[i], err = NewPWMPin(j.sysfs, "/sys/class/pwm/pwmchip0", pin)
 	if err != nil {
 		return
 	}

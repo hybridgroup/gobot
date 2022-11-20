@@ -40,11 +40,11 @@ type sysfsPin struct {
 type Adaptor struct {
 	name        string
 	sysfs       *sysfs.Accesser
-	mutex       *sync.Mutex
+	mutex       sync.Mutex
 	pinmap      map[string]sysfsPin
 	ledPath     string
-	digitalPins map[int]*sysfs.DigitalPin
-	pwmPins     map[int]*sysfs.PWMPin
+	digitalPins map[int]sysfs.DigitalPinner
+	pwmPins     map[int]sysfs.PWMPinner
 	i2cBuses    [6]i2c.I2cDevice
 	spiBuses    [2]spi.Connection
 }
@@ -54,10 +54,9 @@ func NewAdaptor() *Adaptor {
 	c := &Adaptor{
 		name:        gobot.DefaultName("UP2"),
 		sysfs:       sysfs.NewAccesser(),
-		mutex:       &sync.Mutex{},
 		ledPath:     "/sys/class/leds/upboard:%s:/brightness",
-		digitalPins: make(map[int]*sysfs.DigitalPin),
-		pwmPins:     make(map[int]*sysfs.PWMPin),
+		digitalPins: make(map[int]sysfs.DigitalPinner),
+		pwmPins:     make(map[int]sysfs.PWMPinner),
 		pinmap:      fixedPins,
 	}
 	return c
@@ -211,7 +210,7 @@ func (c *Adaptor) PWMPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
 	}
 
 	if c.pwmPins[i] == nil {
-		newPin := c.sysfs.NewPWMPin(i)
+		newPin := c.sysfs.NewPWMPin("/sys/class/pwm/pwmchip0", i)
 		if err = newPin.Export(); err != nil {
 			return
 		}

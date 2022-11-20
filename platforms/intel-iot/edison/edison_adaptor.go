@@ -31,11 +31,11 @@ type Adaptor struct {
 	name        string
 	board       string
 	sysfs       *sysfs.Accesser
-	mutex       *sync.Mutex
+	mutex       sync.Mutex
 	pinmap      map[string]sysfsPin
-	tristate    *sysfs.DigitalPin
-	digitalPins map[int]*sysfs.DigitalPin
-	pwmPins     map[int]*sysfs.PWMPin
+	tristate    sysfs.DigitalPinner
+	digitalPins map[int]sysfs.DigitalPinner
+	pwmPins     map[int]sysfs.PWMPinner
 	i2cBus      i2c.I2cDevice
 }
 
@@ -44,7 +44,6 @@ func NewAdaptor() *Adaptor {
 	return &Adaptor{
 		name:   gobot.DefaultName("Edison"),
 		sysfs:  sysfs.NewAccesser(),
-		mutex:  &sync.Mutex{},
 		pinmap: arduinoPinMap,
 	}
 }
@@ -63,8 +62,8 @@ func (e *Adaptor) SetBoard(n string) { e.board = n }
 
 // Connect initializes the Edison for use with the Arduino breakout board
 func (e *Adaptor) Connect() (err error) {
-	e.digitalPins = make(map[int]*sysfs.DigitalPin)
-	e.pwmPins = make(map[int]*sysfs.PWMPin)
+	e.digitalPins = make(map[int]sysfs.DigitalPinner)
+	e.pwmPins = make(map[int]sysfs.PWMPinner)
 
 	if e.Board() == "arduino" || e.Board() == "" {
 		aerr := e.checkForArduino()
@@ -287,7 +286,7 @@ func (e *Adaptor) PWMPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
 			e.mutex.Lock()
 			defer e.mutex.Unlock()
 
-			e.pwmPins[sysPin.pwmPin] = e.sysfs.NewPWMPin(sysPin.pwmPin)
+			e.pwmPins[sysPin.pwmPin] = e.sysfs.NewPWMPin("/sys/class/pwm/pwmchip0", sysPin.pwmPin)
 			if err = e.pwmPins[sysPin.pwmPin].Export(); err != nil {
 				return
 			}
@@ -312,7 +311,7 @@ func (e *Adaptor) checkForArduino() error {
 	return nil
 }
 
-func (e *Adaptor) newExportedPin(pin int) (sysfsPin *sysfs.DigitalPin, err error) {
+func (e *Adaptor) newExportedPin(pin int) (sysfsPin sysfs.DigitalPinner, err error) {
 	sysfsPin = e.sysfs.NewDigitalPin(pin)
 	err = sysfsPin.Export()
 	return
@@ -447,7 +446,7 @@ func (e *Adaptor) changePinMode(pin, mode string) error {
 }
 
 // pinWrite sets Direction and writes level for a specific pin
-func pinWrite(pin *sysfs.DigitalPin, dir string, level int) error {
+func pinWrite(pin sysfs.DigitalPinner, dir string, level int) error {
 	if err := pin.Direction(dir); err != nil {
 		return err
 	}

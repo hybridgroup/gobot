@@ -18,6 +18,7 @@ const (
 // It uses gpio pwm.
 type PWMPin struct {
 	sysfs  *sysfs.Accesser
+	path   string
 	pin    string
 	fn     string
 	dc     uint32
@@ -26,10 +27,11 @@ type PWMPin struct {
 
 // NewPWMPin returns a new PWMPin
 // pin32 pwm0, pin33 pwm2
-func NewPWMPin(sysfs *sysfs.Accesser, pin string) (p *PWMPin, err error) {
+func NewPWMPin(sysfs *sysfs.Accesser, path string, pin string) (p *PWMPin, err error) {
 	if val, ok := pwms[pin]; ok {
 		p = &PWMPin{
 			sysfs: sysfs,
+			path:  path,
 			pin:   pin,
 			fn:    val,
 		}

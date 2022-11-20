@@ -24,7 +24,7 @@ func TestPwmPin(t *testing.T) {
 	}
 	a.UseMockFilesystem(mockPaths)
 
-	pin, err := NewPWMPin(a, "32")
+	pin, err := NewPWMPin(a, "/sys/class/pwm/pwmchip0", "32")
 	gobottest.Assert(t, pin.Export(), nil)
 	gobottest.Assert(t, pin.Enable(true), nil)
 	val, _ := pin.Polarity()

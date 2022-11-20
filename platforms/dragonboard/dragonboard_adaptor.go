@@ -15,8 +15,8 @@ import (
 type Adaptor struct {
 	name        string
 	sysfs       *sysfs.Accesser
-	mutex       *sync.Mutex
-	digitalPins map[int]*sysfs.DigitalPin
+	mutex       sync.Mutex
+	digitalPins map[int]sysfs.DigitalPinner
 	pinMap      map[string]int
 	i2cBuses    [3]i2c.I2cDevice
 }
@@ -44,7 +44,6 @@ func NewAdaptor() *Adaptor {
 	c := &Adaptor{
 		name:  gobot.DefaultName("DragonBoard"),
 		sysfs: sysfs.NewAccesser(),
-		mutex: &sync.Mutex{},
 	}
 
 	c.setPins()
@@ -85,7 +84,7 @@ func (c *Adaptor) Finalize() (err error) {
 }
 
 // DigitalPin returns matched digitalPin for specified values
-func (c *Adaptor) DigitalPin(pin string, dir string) (sysfsPin *sysfs.DigitalPin, err error) {
+func (c *Adaptor) DigitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPinner, err error) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
@@ -154,7 +153,7 @@ func (c *Adaptor) GetDefaultBus() int {
 }
 
 func (c *Adaptor) setPins() {
-	c.digitalPins = make(map[int]*sysfs.DigitalPin)
+	c.digitalPins = make(map[int]sysfs.DigitalPinner)
 	c.pinMap = fixedPins
 	for i := 0; i < 122; i++ {
 		pin := fmt.Sprintf("GPIO_%d", i)

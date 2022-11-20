@@ -27,9 +27,9 @@ const pwmDefaultPeriod = 500000
 type Adaptor struct {
 	name         string
 	sysfs        *sysfs.Accesser
-	mutex        *sync.Mutex
-	digitalPins  []*sysfs.DigitalPin
-	pwmPins      map[string]*sysfs.PWMPin
+	mutex        sync.Mutex
+	digitalPins  []sysfs.DigitalPinner
+	pwmPins      map[string]sysfs.PWMPinner
 	i2cBuses     map[int]i2c.I2cDevice
 	usrLed       string
 	analogPath   string
@@ -45,9 +45,8 @@ func NewAdaptor() *Adaptor {
 	b := &Adaptor{
 		name:         gobot.DefaultName("BeagleboneBlack"),
 		sysfs:        sysfs.NewAccesser(),
-		mutex:        &sync.Mutex{},
-		digitalPins:  make([]*sysfs.DigitalPin, 120),
-		pwmPins:      make(map[string]*sysfs.PWMPin),
+		digitalPins:  make([]sysfs.DigitalPinner, 120),
+		pwmPins:      make(map[string]sysfs.PWMPinner),
 		i2cBuses:     make(map[int]i2c.I2cDevice),
 		pinMap:       bbbPinMap,
 		pwmPinMap:    bbbPwmPinMap,
@@ -191,7 +190,7 @@ func (b *Adaptor) DigitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPinn
 }
 
 // PWMPin returns matched pwmPin for specified pin number
-func (b *Adaptor) PWMPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
+func (b *Adaptor) PWMPin(pin string) (sysfs.PWMPinner, error) {
 	b.mutex.Lock()
 	defer b.mutex.Unlock()
 
@@ -201,29 +200,27 @@ func (b *Adaptor) PWMPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
 	}
 
 	if b.pwmPins[pin] == nil {
-		newPin := b.sysfs.NewPWMPin(pinInfo.channel)
-		if err = b.muxPin(pin, "pwm"); err != nil {
-			return
+		newPath, err := b.findPin(pinInfo.path)
+		if err != nil {
+			return nil, err
 		}
-
-		if newPin.Path, err = b.findPin(pinInfo.path); err != nil {
-			return
+		newPin := b.sysfs.NewPWMPin(newPath, pinInfo.channel)
+		if err := b.muxPin(pin, "pwm"); err != nil {
+			return nil, err
 		}
 		if err = newPin.Export(); err != nil {
-			return
+			return nil, err
 		}
 		if err = newPin.SetPeriod(pwmDefaultPeriod); err != nil {
-			return
+			return nil, err
 		}
 		if err = newPin.Enable(true); err != nil {
-			return
+			return nil, err
 		}
 		b.pwmPins[pin] = newPin
 	}
 
-	sysfsPin = b.pwmPins[pin]
-
-	return
+	return b.pwmPins[pin], nil
 }
 
 // AnalogRead returns an analog value from specified pin

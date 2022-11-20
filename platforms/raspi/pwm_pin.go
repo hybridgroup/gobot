@@ -13,15 +13,17 @@ import (
 // It uses Pi Blaster.
 type PWMPin struct {
 	sysfs  *sysfs.Accesser
+	path   string
 	pin    string
 	dc     uint32
 	period uint32
 }
 
 // NewPWMPin returns a new PWMPin
-func NewPWMPin(sysfs *sysfs.Accesser, pin string) *PWMPin {
+func NewPWMPin(sysfs *sysfs.Accesser, path string, pin string) *PWMPin {
 	return &PWMPin{
 		sysfs: sysfs,
+		path:  path,
 		pin:   pin,
 	}
 }

@@ -22,7 +22,7 @@ func TestPwmPin(t *testing.T) {
 	}
 	fs := a.UseMockFilesystem(mockedPaths)
 
-	pin := a.NewPWMPin(10)
+	pin := a.NewPWMPin("/sys/class/pwm/pwmchip0", 10)
 	gobottest.Assert(t, pin.pin, "10")
 
 	err := pin.Unexport()
@@ -75,7 +75,7 @@ func TestPwmPinAlreadyExported(t *testing.T) {
 	}
 	a.UseMockFilesystem(mockedPaths)
 
-	pin := a.NewPWMPin(10)
+	pin := a.NewPWMPin("/sys/class/pwm/pwmchip0", 10)
 	pin.write = func(filesystem, string, []byte) (int, error) {
 		return 0, &os.PathError{Err: syscall.EBUSY}
 	}
@@ -95,7 +95,7 @@ func TestPwmPinExportError(t *testing.T) {
 	}
 	a.UseMockFilesystem(mockedPaths)
 
-	pin := a.NewPWMPin(10)
+	pin := a.NewPWMPin("/sys/class/pwm/pwmchip0", 10)
 
 	pin.write = func(filesystem, string, []byte) (int, error) {
 		return 0, &os.PathError{Err: syscall.EFAULT}
@@ -117,7 +117,7 @@ func TestPwmPinUnxportError(t *testing.T) {
 	}
 	a.UseMockFilesystem(mockedPaths)
 
-	pin := a.NewPWMPin(10)
+	pin := a.NewPWMPin("/sys/class/pwm/pwmchip0", 10)
 
 	pin.write = func(filesystem, string, []byte) (int, error) {
 		return 0, &os.PathError{Err: syscall.EBUSY}
@@ -138,7 +138,7 @@ func TestPwmPinPeriodError(t *testing.T) {
 	}
 	a.UseMockFilesystem(mockedPaths)
 
-	pin := a.NewPWMPin(10)
+	pin := a.NewPWMPin("/sys/class/pwm/pwmchip0", 10)
 
 	pin.read = func(filesystem, string) ([]byte, error) {
 		return nil, &os.PathError{Err: syscall.EBUSY}
@@ -159,7 +159,7 @@ func TestPwmPinPolarityError(t *testing.T) {
 	}
 	a.UseMockFilesystem(mockedPaths)
 
-	pin := a.NewPWMPin(10)
+	pin := a.NewPWMPin("/sys/class/pwm/pwmchip0", 10)
 
 	pin.read = func(filesystem, string) ([]byte, error) {
 		return nil, &os.PathError{Err: syscall.EBUSY}
@@ -180,7 +180,7 @@ func TestPwmPinDutyCycleError(t *testing.T) {
 	}
 	a.UseMockFilesystem(mockedPaths)
 
-	pin := a.NewPWMPin(10)
+	pin := a.NewPWMPin("/sys/class/pwm/pwmchip0", 10)
 
 	pin.read = func(filesystem, string) ([]byte, error) {
 		return nil, &os.PathError{Err: syscall.EBUSY}

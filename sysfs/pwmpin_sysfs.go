@@ -56,7 +56,7 @@ type PWMPinnerProvider interface {
 // PWMPin represents a PWM pin
 type PWMPin struct {
 	pin     string
-	Path    string
+	path    string
 	enabled bool
 	write   func(fs filesystem, path string, data []byte) (i int, err error)
 	read    func(fs filesystem, path string) ([]byte, error)
@@ -64,11 +64,11 @@ type PWMPin struct {
 }
 
 // NewPWMPin returns a new pwmPin
-func (a *Accesser) NewPWMPin(pin int) *PWMPin {
+func (a *Accesser) NewPWMPin(path string, pin int) *PWMPin {
 	return &PWMPin{
 		pin:     strconv.Itoa(pin),
 		enabled: false,
-		Path:    "/sys/class/pwm/pwmchip0",
+		path:    path, //"/sys/class/pwm/pwmchip0"
 		read:    readPwmFile,
 		write:   writePwmFile,
 		fs:      a.fs,
@@ -223,32 +223,32 @@ func (p *PWMPin) SetDutyCycle(duty uint32) (err error) {
 
 // pwmExportPath returns export path
 func (p *PWMPin) pwmExportPath() string {
-	return path.Join(p.Path, "export")
+	return path.Join(p.path, "export")
 }
 
 // pwmUnexportPath returns unexport path
 func (p *PWMPin) pwmUnexportPath() string {
-	return path.Join(p.Path, "unexport")
+	return path.Join(p.path, "unexport")
 }
 
 // pwmDutyCyclePath returns duty_cycle path for specified pin
 func (p *PWMPin) pwmDutyCyclePath() string {
-	return path.Join(p.Path, "pwm"+p.pin, "duty_cycle")
+	return path.Join(p.path, "pwm"+p.pin, "duty_cycle")
 }
 
 // pwmPeriodPath returns period path for specified pin
 func (p *PWMPin) pwmPeriodPath() string {
-	return path.Join(p.Path, "pwm"+p.pin, "period")
+	return path.Join(p.path, "pwm"+p.pin, "period")
 }
 
 // pwmEnablePath returns enable path for specified pin
 func (p *PWMPin) pwmEnablePath() string {
-	return path.Join(p.Path, "pwm"+p.pin, "enable")
+	return path.Join(p.path, "pwm"+p.pin, "enable")
 }
 
 // pwmPolarityPath returns polarity path for specified pin
 func (p *PWMPin) pwmPolarityPath() string {
-	return path.Join(p.Path, "pwm"+p.pin, "polarity")
+	return path.Join(p.path, "pwm"+p.pin, "polarity")
 }
 
 func writePwmFile(fs filesystem, path string, data []byte) (i int, err error) {
