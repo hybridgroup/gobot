@@ -237,7 +237,7 @@ func (r *Adaptor) PWMPin(pin string) (gobot.PWMPinner, error) {
 	defer r.mutex.Unlock()
 
 	if r.pwmPins[i] == nil {
-		r.pwmPins[i] = NewPWMPin(r.sys, "/sys/class/pwm/pwmchip0", strconv.Itoa(i))
+		r.pwmPins[i] = NewPWMPin(r.sys, "/dev/pi-blaster", strconv.Itoa(i))
 		r.pwmPins[i].SetPeriod(r.PiBlasterPeriod)
 	}
 

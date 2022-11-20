@@ -12,10 +12,11 @@ import (
 var _ gobot.PWMPinner = (*PWMPin)(nil)
 
 func TestPwmPin(t *testing.T) {
+	const path = "/dev/pi-blaster"
 	a := system.NewAccesser()
-	a.UseMockFilesystem([]string{"/dev/pi-blaster"})
+	a.UseMockFilesystem([]string{path})
 
-	pin := NewPWMPin(a, "/sys/class/pwm/pwmchip0", "1")
+	pin := NewPWMPin(a, path, "1")
 
 	gobottest.Assert(t, pin.Export(), nil)
 	gobottest.Assert(t, pin.Enable(true), nil)
