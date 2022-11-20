@@ -10,17 +10,17 @@ import (
 	"gobot.io/x/gobot/drivers/gpio"
 	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/gobottest"
-	"gobot.io/x/gobot/sysfs"
+	"gobot.io/x/gobot/system"
 )
 
-// make sure that this Adaptor fullfills all the required interfaces
+// make sure that this Adaptor fulfills all the required interfaces
 var _ gobot.Adaptor = (*Adaptor)(nil)
+var _ gobot.DigitalPinnerProvider = (*Adaptor)(nil)
+var _ gobot.PWMPinnerProvider = (*Adaptor)(nil)
 var _ gpio.DigitalReader = (*Adaptor)(nil)
 var _ gpio.DigitalWriter = (*Adaptor)(nil)
 var _ aio.AnalogReader = (*Adaptor)(nil)
 var _ gpio.PwmWriter = (*Adaptor)(nil)
-var _ sysfs.DigitalPinnerProvider = (*Adaptor)(nil)
-var _ sysfs.PWMPinnerProvider = (*Adaptor)(nil)
 var _ i2c.Connector = (*Adaptor)(nil)
 
 var testPinFiles = []string{
@@ -123,9 +123,9 @@ var pwmMockPathsMux40 = []string{
 	"/sys/class/gpio/gpio261/direction",
 }
 
-func initTestAdaptorWithMockedFilesystem() (*Adaptor, *sysfs.MockFilesystem) {
+func initTestAdaptorWithMockedFilesystem() (*Adaptor, *system.MockFilesystem) {
 	a := NewAdaptor()
-	fs := a.sysfs.UseMockFilesystem(testPinFiles)
+	fs := a.sys.UseMockFilesystem(testPinFiles)
 	fs.Files["/sys/class/pwm/pwmchip0/pwm1/period"].Contents = "5000"
 	if err := a.Connect(); err != nil {
 		panic(err)
@@ -283,7 +283,7 @@ func TestFinalize(t *testing.T) {
 	gobottest.Assert(t, a.Finalize(), nil)
 
 	a = NewAdaptor()
-	a.sysfs.UseMockFilesystem([]string{})
+	a.sys.UseMockFilesystem([]string{})
 	a.Connect()
 	err := a.Finalize()
 	gobottest.Assert(t, strings.Contains(err.Error(), "1 error occurred"), true)
@@ -317,7 +317,7 @@ func TestDigitalIO(t *testing.T) {
 
 func TestDigitalPinInFileError(t *testing.T) {
 	a := NewAdaptor()
-	fs := a.sysfs.UseMockFilesystem(pwmMockPathsMux40)
+	fs := a.sys.UseMockFilesystem(pwmMockPathsMux40)
 	delete(fs.Files, "/sys/class/gpio/gpio40/value")
 	delete(fs.Files, "/sys/class/gpio/gpio40/direction")
 	a.Connect()
@@ -329,7 +329,7 @@ func TestDigitalPinInFileError(t *testing.T) {
 
 func TestDigitalPinInResistorFileError(t *testing.T) {
 	a := NewAdaptor()
-	fs := a.sysfs.UseMockFilesystem(pwmMockPathsMux40)
+	fs := a.sys.UseMockFilesystem(pwmMockPathsMux40)
 	delete(fs.Files, "/sys/class/gpio/gpio229/value")
 	delete(fs.Files, "/sys/class/gpio/gpio229/direction")
 	a.Connect()
@@ -340,7 +340,7 @@ func TestDigitalPinInResistorFileError(t *testing.T) {
 
 func TestDigitalPinInLevelShifterFileError(t *testing.T) {
 	a := NewAdaptor()
-	fs := a.sysfs.UseMockFilesystem(pwmMockPathsMux40)
+	fs := a.sys.UseMockFilesystem(pwmMockPathsMux40)
 	delete(fs.Files, "/sys/class/gpio/gpio261/value")
 	delete(fs.Files, "/sys/class/gpio/gpio261/direction")
 	a.Connect()
@@ -351,7 +351,7 @@ func TestDigitalPinInLevelShifterFileError(t *testing.T) {
 
 func TestDigitalPinInMuxFileError(t *testing.T) {
 	a := NewAdaptor()
-	fs := a.sysfs.UseMockFilesystem(pwmMockPathsMux40)
+	fs := a.sys.UseMockFilesystem(pwmMockPathsMux40)
 	delete(fs.Files, "/sys/class/gpio/gpio243/value")
 	delete(fs.Files, "/sys/class/gpio/gpio243/direction")
 	a.Connect()
@@ -378,7 +378,7 @@ func TestDigitalReadWriteError(t *testing.T) {
 
 func TestI2c(t *testing.T) {
 	a, _ := initTestAdaptorWithMockedFilesystem()
-	a.sysfs.UseMockSyscall()
+	a.sys.UseMockSyscall()
 
 	con, err := a.GetConnection(0xff, 6)
 	gobottest.Assert(t, err, nil)
@@ -414,7 +414,7 @@ func TestPwm(t *testing.T) {
 
 func TestPwmExportError(t *testing.T) {
 	a := NewAdaptor()
-	fs := a.sysfs.UseMockFilesystem(pwmMockPathsMux13)
+	fs := a.sys.UseMockFilesystem(pwmMockPathsMux13)
 	delete(fs.Files, "/sys/class/pwm/pwmchip0/export")
 	a.Connect()
 
@@ -424,7 +424,7 @@ func TestPwmExportError(t *testing.T) {
 
 func TestPwmEnableError(t *testing.T) {
 	a := NewAdaptor()
-	fs := a.sysfs.UseMockFilesystem(pwmMockPathsMux13)
+	fs := a.sys.UseMockFilesystem(pwmMockPathsMux13)
 	delete(fs.Files, "/sys/class/pwm/pwmchip0/pwm1/enable")
 	a.Connect()
 

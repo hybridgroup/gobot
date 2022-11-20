@@ -9,17 +9,17 @@ import (
 	"gobot.io/x/gobot/drivers/gpio"
 	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/gobottest"
-	"gobot.io/x/gobot/sysfs"
+	"gobot.io/x/gobot/system"
 )
 
-// make sure that this Adaptor fullfills all the required interfaces
+// make sure that this Adaptor fulfills all the required interfaces
 var _ gobot.Adaptor = (*Adaptor)(nil)
+var _ gobot.DigitalPinnerProvider = (*Adaptor)(nil)
+var _ gobot.PWMPinnerProvider = (*Adaptor)(nil)
 var _ gpio.DigitalReader = (*Adaptor)(nil)
 var _ gpio.DigitalWriter = (*Adaptor)(nil)
 var _ gpio.PwmWriter = (*Adaptor)(nil)
 var _ gpio.ServoWriter = (*Adaptor)(nil)
-var _ sysfs.DigitalPinnerProvider = (*Adaptor)(nil)
-var _ sysfs.PWMPinnerProvider = (*Adaptor)(nil)
 var _ i2c.Connector = (*Adaptor)(nil)
 
 var mockPaths = []string{
@@ -37,15 +37,15 @@ var mockPaths = []string{
 	"/sys/class/pwm/pwmchip0/pwm0/period",
 }
 
-func initTestAdaptorWithMockedFilesystem() (*Adaptor, *sysfs.MockFilesystem) {
+func initTestAdaptorWithMockedFilesystem() (*Adaptor, *system.MockFilesystem) {
 	a := NewAdaptor()
-	fs := a.sysfs.UseMockFilesystem(mockPaths)
+	fs := a.sys.UseMockFilesystem(mockPaths)
 	return a, fs
 }
 
-func initTestProAdaptorWithMockedFilesystem() (*Adaptor, *sysfs.MockFilesystem) {
+func initTestProAdaptorWithMockedFilesystem() (*Adaptor, *system.MockFilesystem) {
 	a := NewProAdaptor()
-	fs := a.sysfs.UseMockFilesystem(mockPaths)
+	fs := a.sys.UseMockFilesystem(mockPaths)
 	return a, fs
 }
 
@@ -134,8 +134,8 @@ func TestDigitalReadWriteError(t *testing.T) {
 
 func TestI2c(t *testing.T) {
 	a := NewAdaptor()
-	a.sysfs.UseMockFilesystem([]string{"/dev/i2c-1"})
-	a.sysfs.UseMockSyscall()
+	a.sys.UseMockFilesystem([]string{"/dev/i2c-1"})
+	a.sys.UseMockSyscall()
 
 	a.Connect()
 

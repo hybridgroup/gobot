@@ -1,4 +1,4 @@
-package sysfs
+package system
 
 import (
 	"errors"
@@ -18,31 +18,11 @@ const (
 	HIGH = 1
 	// LOW gpio level
 	LOW = 0
-	// GPIOPATH default linux gpio path
-	GPIOPATH = "/sys/class/gpio"
+	// gpioPath default linux gpio path
+	gpioPath = "/sys/class/gpio"
 )
 
 var errNotExported = errors.New("pin has not been exported")
-
-// DigitalPinner is the interface for sysfs gpio interactions
-type DigitalPinner interface {
-	// Export exports the pin for use by the operating system
-	Export() error
-	// Unexport unexports the pin and releases the pin from the operating system
-	Unexport() error
-	// Direction sets the direction for the pin
-	Direction(string) error
-	// Read reads the current value of the pin
-	Read() (int, error)
-	// Write writes to the pin
-	Write(int) error
-}
-
-// DigitalPinnerProvider is the interface that an Adaptor should implement to allow
-// clients to obtain access to any DigitalPin's available on that board.
-type DigitalPinnerProvider interface {
-	DigitalPin(string, string) (DigitalPinner, error)
-}
 
 // DigitalPin represents a digital pin
 type DigitalPin struct {
@@ -55,19 +35,14 @@ type DigitalPin struct {
 	fs filesystem
 }
 
-// NewDigitalPin returns a DigitalPin given the pin number and an optional sysfs pin label.
-// If no label is supplied the default label will prepend "gpio" to the pin number,
-// eg. a pin number of 10 will have a label of "gpio10"
-func (a *Accesser) NewDigitalPin(pin int, v ...string) *DigitalPin {
+// NewDigitalPin returns a DigitalPin given the pin number. The name of the sysfs file will prepend "gpio"
+// to the pin number, eg. a pin number of 10 will have a name of "gpio10"
+func (a *Accesser) NewDigitalPin(pin int) *DigitalPin {
 	d := &DigitalPin{
 		pin: strconv.Itoa(pin),
 		fs:  a.fs,
 	}
-	if len(v) > 0 {
-		d.label = v[0]
-	} else {
-		d.label = "gpio" + d.pin
-	}
+	d.label = "gpio" + d.pin
 
 	return d
 }
@@ -95,7 +70,7 @@ func (d *DigitalPin) Read() (n int, err error) {
 
 // Export sets the pin as exported
 func (d *DigitalPin) Export() error {
-	export, err := d.fs.openFile(GPIOPATH+"/export", os.O_WRONLY, 0644)
+	export, err := d.fs.openFile(gpioPath+"/export", os.O_WRONLY, 0644)
 	if err != nil {
 		return err
 	}
@@ -117,7 +92,7 @@ func (d *DigitalPin) Export() error {
 	attempt := 0
 	for {
 		attempt++
-		d.direction, err = d.fs.openFile(fmt.Sprintf("%v/%v/direction", GPIOPATH, d.label), os.O_RDWR, 0644)
+		d.direction, err = d.fs.openFile(fmt.Sprintf("%v/%v/direction", gpioPath, d.label), os.O_RDWR, 0644)
 		if err == nil {
 			break
 		}
@@ -131,7 +106,7 @@ func (d *DigitalPin) Export() error {
 		d.value.Close()
 	}
 	if err == nil {
-		d.value, err = d.fs.openFile(fmt.Sprintf("%v/%v/value", GPIOPATH, d.label), os.O_RDWR, 0644)
+		d.value, err = d.fs.openFile(fmt.Sprintf("%v/%v/value", gpioPath, d.label), os.O_RDWR, 0644)
 	}
 
 	if err != nil {
@@ -145,7 +120,7 @@ func (d *DigitalPin) Export() error {
 
 // Unexport sets the pin as unexported
 func (d *DigitalPin) Unexport() error {
-	unexport, err := d.fs.openFile(GPIOPATH+"/unexport", os.O_WRONLY, 0644)
+	unexport, err := d.fs.openFile(gpioPath+"/unexport", os.O_WRONLY, 0644)
 	if err != nil {
 		return err
 	}

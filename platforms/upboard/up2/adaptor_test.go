@@ -10,21 +10,21 @@ import (
 	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/drivers/spi"
 	"gobot.io/x/gobot/gobottest"
-	"gobot.io/x/gobot/sysfs"
+	"gobot.io/x/gobot/system"
 )
 
-// make sure that this Adaptor fullfills all the required interfaces
+// make sure that this Adaptor fulfills all the required interfaces
 var _ gobot.Adaptor = (*Adaptor)(nil)
+var _ gobot.DigitalPinnerProvider = (*Adaptor)(nil)
+var _ gobot.PWMPinnerProvider = (*Adaptor)(nil)
 var _ gpio.DigitalReader = (*Adaptor)(nil)
 var _ gpio.DigitalWriter = (*Adaptor)(nil)
 var _ gpio.PwmWriter = (*Adaptor)(nil)
 var _ gpio.ServoWriter = (*Adaptor)(nil)
-var _ sysfs.DigitalPinnerProvider = (*Adaptor)(nil)
-var _ sysfs.PWMPinnerProvider = (*Adaptor)(nil)
 var _ i2c.Connector = (*Adaptor)(nil)
 var _ spi.Connector = (*Adaptor)(nil)
 
-func initTestAdaptorWithMockedFilesystem() (*Adaptor, *sysfs.MockFilesystem) {
+func initTestAdaptorWithMockedFilesystem() (*Adaptor, *system.MockFilesystem) {
 	a := NewAdaptor()
 	mockPaths := []string{
 		"/sys/class/gpio/export",
@@ -41,7 +41,7 @@ func initTestAdaptorWithMockedFilesystem() (*Adaptor, *sysfs.MockFilesystem) {
 		"/sys/class/pwm/pwmchip0/pwm0/polarity",
 		"/sys/class/leds/upboard:green:/brightness",
 	}
-	fs := a.sysfs.UseMockFilesystem(mockPaths)
+	fs := a.sys.UseMockFilesystem(mockPaths)
 	return a, fs
 }
 
@@ -90,8 +90,8 @@ func TestDigitalReadWriteError(t *testing.T) {
 
 func TestI2c(t *testing.T) {
 	a := NewAdaptor()
-	a.sysfs.UseMockFilesystem([]string{"/dev/i2c-5"})
-	a.sysfs.UseMockSyscall()
+	a.sys.UseMockFilesystem([]string{"/dev/i2c-5"})
+	a.sys.UseMockSyscall()
 
 	con, err := a.GetConnection(0xff, 5)
 	gobottest.Assert(t, err, nil)
@@ -117,7 +117,7 @@ func TestSPI(t *testing.T) {
 	_, err := a.GetSpiConnection(10, 0, 0, 8, 500000)
 	gobottest.Assert(t, err.Error(), "Bus number 10 out of range")
 
-	// TODO: tests for real connection currently not possible, because not using sysfs.Accessor using
+	// TODO: tests for real connection currently not possible, because not using system.Accessor using
 	// TODO: test tx/rx here...
 }
 

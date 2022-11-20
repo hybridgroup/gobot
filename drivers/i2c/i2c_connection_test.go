@@ -10,30 +10,30 @@ import (
 	"unsafe"
 
 	"gobot.io/x/gobot/gobottest"
-	"gobot.io/x/gobot/sysfs"
+	"gobot.io/x/gobot/system"
 )
 
 const dev = "/dev/i2c-1"
 
 func syscallImpl(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno) {
-	if (trap == syscall.SYS_IOCTL) && (a2 == sysfs.I2C_FUNCS) {
+	if (trap == syscall.SYS_IOCTL) && (a2 == system.I2C_FUNCS) {
 		var funcPtr *uint64 = (*uint64)(unsafe.Pointer(a3))
-		*funcPtr = sysfs.I2C_FUNC_SMBUS_READ_BYTE | sysfs.I2C_FUNC_SMBUS_READ_BYTE_DATA |
-			sysfs.I2C_FUNC_SMBUS_READ_WORD_DATA |
-			sysfs.I2C_FUNC_SMBUS_WRITE_BYTE | sysfs.I2C_FUNC_SMBUS_WRITE_BYTE_DATA |
-			sysfs.I2C_FUNC_SMBUS_WRITE_WORD_DATA
+		*funcPtr = system.I2C_FUNC_SMBUS_READ_BYTE | system.I2C_FUNC_SMBUS_READ_BYTE_DATA |
+			system.I2C_FUNC_SMBUS_READ_WORD_DATA |
+			system.I2C_FUNC_SMBUS_WRITE_BYTE | system.I2C_FUNC_SMBUS_WRITE_BYTE_DATA |
+			system.I2C_FUNC_SMBUS_WRITE_WORD_DATA
 	}
 	// Let all operations succeed
 	return 0, 0, 0
 }
 
 func syscallImplFail(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno) {
-	if (trap == syscall.SYS_IOCTL) && (a2 == sysfs.I2C_FUNCS) {
+	if (trap == syscall.SYS_IOCTL) && (a2 == system.I2C_FUNCS) {
 		var funcPtr *uint64 = (*uint64)(unsafe.Pointer(a3))
-		*funcPtr = sysfs.I2C_FUNC_SMBUS_READ_BYTE | sysfs.I2C_FUNC_SMBUS_READ_BYTE_DATA |
-			sysfs.I2C_FUNC_SMBUS_READ_WORD_DATA |
-			sysfs.I2C_FUNC_SMBUS_WRITE_BYTE | sysfs.I2C_FUNC_SMBUS_WRITE_BYTE_DATA |
-			sysfs.I2C_FUNC_SMBUS_WRITE_WORD_DATA
+		*funcPtr = system.I2C_FUNC_SMBUS_READ_BYTE | system.I2C_FUNC_SMBUS_READ_BYTE_DATA |
+			system.I2C_FUNC_SMBUS_READ_WORD_DATA |
+			system.I2C_FUNC_SMBUS_WRITE_BYTE | system.I2C_FUNC_SMBUS_WRITE_BYTE_DATA |
+			system.I2C_FUNC_SMBUS_WRITE_WORD_DATA
 		// retrieve functions call succeed
 		return 0, 0, 0
 	}
@@ -42,7 +42,7 @@ func syscallImplFail(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errn
 }
 
 func initI2CDevice() I2cDevice {
-	a := sysfs.NewAccesser()
+	a := system.NewAccesser()
 	a.UseMockFilesystem([]string{dev})
 	msc := a.UseMockSyscall()
 	msc.Impl = syscallImpl
@@ -52,7 +52,7 @@ func initI2CDevice() I2cDevice {
 }
 
 func initI2CDeviceAddressError() I2cDevice {
-	a := sysfs.NewAccesser()
+	a := system.NewAccesser()
 	a.UseMockFilesystem([]string{dev})
 	msc := a.UseMockSyscall()
 	msc.Impl = syscallImplFail

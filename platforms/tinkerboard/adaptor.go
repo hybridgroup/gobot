@@ -8,7 +8,7 @@ import (
 	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/drivers/i2c"
-	"gobot.io/x/gobot/sysfs"
+	"gobot.io/x/gobot/system"
 )
 
 const debug = false
@@ -28,19 +28,18 @@ type pwmPinDefinition struct {
 // Adaptor represents a Gobot Adaptor for the ASUS Tinker Board
 type Adaptor struct {
 	name        string
-	sysfs       *sysfs.Accesser
-	mutex       *sync.Mutex
-	digitalPins map[string]*sysfs.DigitalPin
-	pwmPins     map[string]*sysfs.PWMPin
+	sys         *system.Accesser
+	mutex       sync.Mutex
+	digitalPins map[string]gobot.DigitalPinner
+	pwmPins     map[string]gobot.PWMPinner
 	i2cBuses    [5]i2c.I2cDevice
 }
 
 // NewAdaptor creates a Tinkerboard Adaptor
 func NewAdaptor() *Adaptor {
 	c := &Adaptor{
-		name:  gobot.DefaultName("Tinker Board"),
-		sysfs: sysfs.NewAccesser(),
-		mutex: &sync.Mutex{},
+		name: gobot.DefaultName("Tinker Board"),
+		sys:  system.NewAccesser(),
 	}
 
 	c.setPins()
@@ -90,20 +89,20 @@ func (c *Adaptor) Finalize() (err error) {
 
 // DigitalRead reads digital value from the specified pin.
 func (c *Adaptor) DigitalRead(pin string) (val int, err error) {
-	sysfsPin, err := c.DigitalPin(pin, sysfs.IN)
+	sysPin, err := c.DigitalPin(pin, system.IN)
 	if err != nil {
 		return
 	}
-	return sysfsPin.Read()
+	return sysPin.Read()
 }
 
 // DigitalWrite writes digital value to the specified pin.
 func (c *Adaptor) DigitalWrite(pin string, val byte) (err error) {
-	sysfsPin, err := c.DigitalPin(pin, sysfs.OUT)
+	sysPin, err := c.DigitalPin(pin, system.OUT)
 	if err != nil {
 		return err
 	}
-	return sysfsPin.Write(int(val))
+	return sysPin.Write(int(val))
 }
 
 // PwmWrite writes a PWM signal to the specified pin.
@@ -163,25 +162,24 @@ func (c *Adaptor) SetPeriod(pin string, period uint32) error {
 }
 
 // DigitalPin returns matched digitalPin for specified values.
-func (c *Adaptor) DigitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPinner, err error) {
+func (c *Adaptor) DigitalPin(pin string, dir string) (gobot.DigitalPinner, error) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
 	i, err := c.translatePin(pin)
-
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	if c.digitalPins[pin] == nil {
-		c.digitalPins[pin] = c.sysfs.NewDigitalPin(i)
+		c.digitalPins[pin] = c.sys.NewDigitalPin(i)
 		if err = c.digitalPins[pin].Export(); err != nil {
-			return
+			return nil, err
 		}
 	}
 
 	if err = c.digitalPins[pin].Direction(dir); err != nil {
-		return
+		return nil, err
 	}
 
 	return c.digitalPins[pin], nil
@@ -189,7 +187,7 @@ func (c *Adaptor) DigitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPinn
 
 // PWMPin initializes the pin for PWM and returns matched pwmPin for specified pin number.
 // It implements the PWMPinnerProvider interface.
-func (c *Adaptor) PWMPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
+func (c *Adaptor) PWMPin(pin string) (gobot.PWMPinner, error) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
@@ -207,7 +205,7 @@ func (c *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection
 		return nil, fmt.Errorf("Bus number %d out of range", bus)
 	}
 	if c.i2cBuses[bus] == nil {
-		c.i2cBuses[bus], err = c.sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
+		c.i2cBuses[bus], err = c.sys.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
 	}
 	return i2c.NewConnection(c.i2cBuses[bus], address), err
 }
@@ -218,34 +216,35 @@ func (c *Adaptor) GetDefaultBus() int {
 }
 
 // pwmPin initializes the pin for PWM and returns matched pwmPin for specified pin number.
-func (c *Adaptor) pwmPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
+func (c *Adaptor) pwmPin(pin string) (gobot.PWMPinner, error) {
 	var pwmPinData pwmPinDefinition
-	if pwmPinData, err = c.translatePwmPin(pin); err != nil {
-		return
+	pwmPinData, err := c.translatePwmPin(pin)
+	if err != nil {
+		return nil, err
 	}
 
 	if c.pwmPins[pin] == nil {
 		var path string
-		if path, err = pwmPinData.findDir(*c.sysfs); err != nil {
-			return
+		path, err := pwmPinData.findDir(*c.sys)
+		if err != nil {
+			return nil, err
 		}
-		newPin := c.sysfs.NewPWMPin(pwmPinData.channel)
-		newPin.Path = path
-		if err = newPin.Export(); err != nil {
-			return
+		newPin := c.sys.NewPWMPin(path, pwmPinData.channel)
+		if err := newPin.Export(); err != nil {
+			return nil, err
 		}
 		// Make sure pwm is disabled before change anything
-		if err = newPin.Enable(false); err != nil {
-			return
+		if err := newPin.Enable(false); err != nil {
+			return nil, err
 		}
-		if err = setPeriod(newPin, pwmPeriodDefault); err != nil {
-			return
+		if err := setPeriod(newPin, pwmPeriodDefault); err != nil {
+			return nil, err
 		}
-		if err = newPin.SetPolarity(pwmNormal); err != nil {
-			return
+		if err := newPin.SetPolarity(pwmNormal); err != nil {
+			return nil, err
 		}
-		if err = newPin.Enable(true); err != nil {
-			return
+		if err := newPin.Enable(true); err != nil {
+			return nil, err
 		}
 		if debug {
 			log.Printf("New PWMPin created for %s\n", pin)
@@ -259,7 +258,7 @@ func (c *Adaptor) pwmPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
 // setPeriod adjusts the PWM period of the given pin.
 // If duty cycle is already set, also this value will be adjusted in the same ratio.
 // The order in which the values are written must be observed, otherwise an error occur "write error: Invalid argument".
-func setPeriod(pwmPin sysfs.PWMPinner, period uint32) error {
+func setPeriod(pwmPin gobot.PWMPinner, period uint32) error {
 	var errorBase = fmt.Sprintf("tinkerboard.setPeriod(%v, %d) failed", pwmPin, period)
 	oldDuty, err := pwmPin.DutyCycle()
 	if err != nil {
@@ -307,12 +306,12 @@ func setPeriod(pwmPin sysfs.PWMPinner, period uint32) error {
 }
 
 func (c *Adaptor) setPins() {
-	c.digitalPins = make(map[string]*sysfs.DigitalPin)
-	c.pwmPins = make(map[string]*sysfs.PWMPin)
+	c.digitalPins = make(map[string]gobot.DigitalPinner)
+	c.pwmPins = make(map[string]gobot.PWMPinner)
 }
 
-func (c *Adaptor) translatePin(pin string) (sysfsPinNo int, err error) {
-	sysfsPinNo, ok := gpioPinDefinitions[pin]
+func (c *Adaptor) translatePin(pin string) (sysPinNo int, err error) {
+	sysPinNo, ok := gpioPinDefinitions[pin]
 	if !ok {
 		err = fmt.Errorf("Not a valid pin")
 	}
@@ -327,14 +326,14 @@ func (c *Adaptor) translatePwmPin(pin string) (pwmPin pwmPinDefinition, err erro
 	return
 }
 
-func (p pwmPinDefinition) findDir(sysfs sysfs.Accesser) (dir string, err error) {
-	items, _ := sysfs.Find(p.dir, p.dirRegexp)
+func (p pwmPinDefinition) findDir(sys system.Accesser) (dir string, err error) {
+	items, _ := sys.Find(p.dir, p.dirRegexp)
 	if items == nil || len(items) == 0 {
 		return "", fmt.Errorf("No path found for PWM directory pattern, '%s' in path '%s'. See README.md for activation", p.dirRegexp, p.dir)
 	}
 
 	dir = items[0]
-	info, err := sysfs.Stat(dir)
+	info, err := sys.Stat(dir)
 	if err != nil {
 		return "", fmt.Errorf("Error (%v) on access '%s'", err, dir)
 	}

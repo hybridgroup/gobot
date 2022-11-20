@@ -1,6 +1,6 @@
 package edison
 
-import "gobot.io/x/gobot/sysfs"
+import "gobot.io/x/gobot/system"
 
 var arduinoPinMap = map[string]sysfsPin{
 	"0": {
@@ -80,8 +80,8 @@ var arduinoPinMap = map[string]sysfsPin{
 		levelShifter: 258,
 		pwmPin:       4,
 		mux: []mux{
-			{263, sysfs.HIGH},
-			{240, sysfs.LOW},
+			{263, system.HIGH},
+			{240, system.LOW},
 		},
 	},
 	"11": {
@@ -90,8 +90,8 @@ var arduinoPinMap = map[string]sysfsPin{
 		levelShifter: 259,
 		pwmPin:       5,
 		mux: []mux{
-			{262, sysfs.HIGH},
-			{241, sysfs.LOW},
+			{262, system.HIGH},
+			{241, system.LOW},
 		},
 	},
 	"12": {
@@ -100,7 +100,7 @@ var arduinoPinMap = map[string]sysfsPin{
 		levelShifter: 260,
 		pwmPin:       -1,
 		mux: []mux{
-			{242, sysfs.LOW},
+			{242, system.LOW},
 		},
 	},
 	"13": {
@@ -109,7 +109,7 @@ var arduinoPinMap = map[string]sysfsPin{
 		levelShifter: 261,
 		pwmPin:       -1,
 		mux: []mux{
-			{243, sysfs.LOW},
+			{243, system.LOW},
 		},
 	},
 }

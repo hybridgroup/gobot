@@ -4,14 +4,15 @@ import (
 	"errors"
 	"testing"
 
+	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/gobottest"
-	"gobot.io/x/gobot/sysfs"
+	"gobot.io/x/gobot/system"
 )
 
-var _ sysfs.PWMPinner = (*PWMPin)(nil)
+var _ gobot.PWMPinner = (*PWMPin)(nil)
 
 func TestPwmPin(t *testing.T) {
-	a := sysfs.NewAccesser()
+	a := system.NewAccesser()
 	mockPaths := []string{
 		"/sys/class/pwm/pwmchip0/export",
 		"/sys/class/pwm/pwmchip0/unexport",
@@ -24,7 +25,7 @@ func TestPwmPin(t *testing.T) {
 	}
 	a.UseMockFilesystem(mockPaths)
 
-	pin, err := NewPWMPin(a, "32")
+	pin, err := NewPWMPin(a, "/sys/class/pwm/pwmchip0", "32")
 	gobottest.Assert(t, pin.Export(), nil)
 	gobottest.Assert(t, pin.Enable(true), nil)
 	val, _ := pin.Polarity()

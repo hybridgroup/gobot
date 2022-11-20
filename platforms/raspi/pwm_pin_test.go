@@ -4,17 +4,19 @@ import (
 	"errors"
 	"testing"
 
+	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/gobottest"
-	"gobot.io/x/gobot/sysfs"
+	"gobot.io/x/gobot/system"
 )
 
-var _ sysfs.PWMPinner = (*PWMPin)(nil)
+var _ gobot.PWMPinner = (*PWMPin)(nil)
 
 func TestPwmPin(t *testing.T) {
-	a := sysfs.NewAccesser()
-	a.UseMockFilesystem([]string{"/dev/pi-blaster"})
+	const path = "/dev/pi-blaster"
+	a := system.NewAccesser()
+	a.UseMockFilesystem([]string{path})
 
-	pin := NewPWMPin(a, "1")
+	pin := NewPWMPin(a, path, "1")
 
 	gobottest.Assert(t, pin.Export(), nil)
 	gobottest.Assert(t, pin.Enable(true), nil)

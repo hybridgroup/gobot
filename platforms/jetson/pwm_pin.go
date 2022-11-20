@@ -4,9 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path"
 
 	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/sysfs"
+	"gobot.io/x/gobot/system"
 )
 
 const (
@@ -17,7 +18,8 @@ const (
 // PWMPin is the Jetson Nano implementation of the PWMPinner interface.
 // It uses gpio pwm.
 type PWMPin struct {
-	sysfs  *sysfs.Accesser
+	sys    *system.Accesser
+	path   string
 	pin    string
 	fn     string
 	dc     uint32
@@ -26,12 +28,13 @@ type PWMPin struct {
 
 // NewPWMPin returns a new PWMPin
 // pin32 pwm0, pin33 pwm2
-func NewPWMPin(sysfs *sysfs.Accesser, pin string) (p *PWMPin, err error) {
+func NewPWMPin(sys *system.Accesser, path string, pin string) (p *PWMPin, err error) {
 	if val, ok := pwms[pin]; ok {
 		p = &PWMPin{
-			sysfs: sysfs,
-			pin:   pin,
-			fn:    val,
+			sys:  sys,
+			path: path,
+			pin:  pin,
+			fn:   val,
 		}
 	} else {
 		err = errors.New("Not a valid pin")
@@ -42,44 +45,17 @@ func NewPWMPin(sysfs *sysfs.Accesser, pin string) (p *PWMPin, err error) {
 
 // Export exports the pin for use by the Jetson Nano
 func (p *PWMPin) Export() error {
-	fi, err := p.sysfs.OpenFile("/sys/class/pwm/pwmchip0/export", os.O_WRONLY|os.O_APPEND, 0644)
-	defer fi.Close()
-
-	if err != nil {
-		return err
-	}
-
-	_, err = fi.WriteString(p.fn)
-
-	return err
+	return p.writeFile("export", p.fn)
 }
 
 // Unexport unexports the pin and releases the pin from the operating system
 func (p *PWMPin) Unexport() error {
-	fi, err := p.sysfs.OpenFile("/sys/class/pwm/pwmchip0/unexport", os.O_WRONLY|os.O_APPEND, 0644)
-	defer fi.Close()
-
-	if err != nil {
-		return err
-	}
-
-	_, err = fi.WriteString(p.fn)
-
-	return err
+	return p.writeFile("unexport", p.fn)
 }
 
 // Enable enables/disables the PWM pin
 func (p *PWMPin) Enable(e bool) (err error) {
-	fi, err := p.sysfs.OpenFile(fmt.Sprintf("/sys/class/pwm/pwmchip0/pwm%s/enable", p.fn), os.O_WRONLY|os.O_APPEND, 0644)
-	defer fi.Close()
-
-	if err != nil {
-		return err
-	}
-
-	_, err = fi.WriteString(fmt.Sprintf("%v", bool2int(e)))
-
-	return err
+	return p.writeFile(fmt.Sprintf("pwm%s/enable", p.fn), fmt.Sprintf("%v", bool2int(e)))
 }
 
 // Polarity returns the polarity either normal or inverted
@@ -117,16 +93,7 @@ func (p *PWMPin) SetPeriod(period uint32) (err error) {
 	}
 
 	p.period = period
-	fi, err := p.sysfs.OpenFile(fmt.Sprintf("/sys/class/pwm/pwmchip0/pwm%s/period", p.fn), os.O_WRONLY|os.O_APPEND, 0644)
-	defer fi.Close()
-
-	if err != nil {
-		return err
-	}
-
-	_, err = fi.WriteString(fmt.Sprintf("%v", p.period))
-
-	return nil
+	return p.writeFile(fmt.Sprintf("pwm%s/period", p.fn), fmt.Sprintf("%v", p.period))
 }
 
 // DutyCycle returns the duty cycle for the pin
@@ -153,16 +120,20 @@ func (p *PWMPin) SetDutyCycle(duty uint32) (err error) {
 		p.dc = duty
 	}
 
-	fi, err := p.sysfs.OpenFile(fmt.Sprintf("/sys/class/pwm/pwmchip0/pwm%s/duty_cycle", p.fn), os.O_WRONLY|os.O_APPEND, 0644)
+	return p.writeFile(fmt.Sprintf("pwm%s/duty_cycle", p.fn), fmt.Sprintf("%v", duty))
+}
+
+func (p *PWMPin) writeFile(subpath string, value string) error {
+	sysfspath := path.Join(p.path, subpath)
+	fi, err := p.sys.OpenFile(sysfspath, os.O_WRONLY|os.O_APPEND, 0644)
 	defer fi.Close()
 
 	if err != nil {
 		return err
 	}
 
-	_, err = fi.WriteString(fmt.Sprintf("%v", duty))
-
-	return
+	_, err = fi.WriteString(value)
+	return err
 }
 
 func bool2int(b bool) int {

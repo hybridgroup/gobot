@@ -11,24 +11,24 @@ import (
 	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/drivers/spi"
 	"gobot.io/x/gobot/gobottest"
-	"gobot.io/x/gobot/sysfs"
+	"gobot.io/x/gobot/system"
 )
 
 // make sure that this Adaptor fulfills all the required interfaces
 var _ gobot.Adaptor = (*Adaptor)(nil)
+var _ gobot.DigitalPinnerProvider = (*Adaptor)(nil)
+var _ gobot.PWMPinnerProvider = (*Adaptor)(nil)
 var _ gpio.DigitalReader = (*Adaptor)(nil)
 var _ gpio.DigitalWriter = (*Adaptor)(nil)
 var _ aio.AnalogReader = (*Adaptor)(nil)
 var _ gpio.PwmWriter = (*Adaptor)(nil)
 var _ gpio.ServoWriter = (*Adaptor)(nil)
-var _ sysfs.DigitalPinnerProvider = (*Adaptor)(nil)
-var _ sysfs.PWMPinnerProvider = (*Adaptor)(nil)
 var _ i2c.Connector = (*Adaptor)(nil)
 var _ spi.Connector = (*Adaptor)(nil)
 
-func initTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *sysfs.MockFilesystem) {
+func initTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *system.MockFilesystem) {
 	a := NewAdaptor()
-	fs := a.sysfs.UseMockFilesystem(mockPaths)
+	fs := a.sys.UseMockFilesystem(mockPaths)
 
 	a.findPin = func(pinPath string) (string, error) {
 		switch pinPath {
@@ -167,7 +167,7 @@ func TestGeneral(t *testing.T) {
 	fs.WithWriteError = false
 
 	// I2c
-	a.sysfs.UseMockSyscall()
+	a.sys.UseMockSyscall()
 
 	con, err := a.GetConnection(0xff, 2)
 	gobottest.Assert(t, err, nil)
@@ -195,7 +195,7 @@ func TestSPI(t *testing.T) {
 	_, err := a.GetSpiConnection(10, 0, 0, 8, 10000000)
 	gobottest.Assert(t, err.Error(), "Bus number 10 out of range")
 
-	// TODO: tests for real connection currently not possible, because not using sysfs.Accessor using
+	// TODO: tests for real connection currently not possible, because not using system.Accessor using
 	// TODO: test tx/rx here...
 }
 

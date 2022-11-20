@@ -6,23 +6,25 @@ import (
 	"os"
 
 	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/sysfs"
+	"gobot.io/x/gobot/system"
 )
 
 // PWMPin is the Raspberry Pi implementation of the PWMPinner interface.
 // It uses Pi Blaster.
 type PWMPin struct {
-	sysfs  *sysfs.Accesser
+	sys    *system.Accesser
+	path   string
 	pin    string
 	dc     uint32
 	period uint32
 }
 
 // NewPWMPin returns a new PWMPin
-func NewPWMPin(sysfs *sysfs.Accesser, pin string) *PWMPin {
+func NewPWMPin(sys *system.Accesser, path string, pin string) *PWMPin {
 	return &PWMPin{
-		sysfs: sysfs,
-		pin:   pin,
+		sys:  sys,
+		path: path,
+		pin:  pin,
 	}
 }
 
@@ -33,7 +35,7 @@ func (p *PWMPin) Export() error {
 
 // Unexport unexports the pin and releases the pin from the operating system
 func (p *PWMPin) Unexport() error {
-	return p.piBlaster(fmt.Sprintf("release %v\n", p.pin))
+	return p.writeValue(fmt.Sprintf("release %v\n", p.pin))
 }
 
 // Enable enables/disables the PWM pin
@@ -97,11 +99,11 @@ func (p *PWMPin) SetDutyCycle(duty uint32) (err error) {
 	if val < 0.05 && val != 0 {
 		val = 0.05
 	}
-	return p.piBlaster(fmt.Sprintf("%v=%v\n", p.pin, val))
+	return p.writeValue(fmt.Sprintf("%v=%v\n", p.pin, val))
 }
 
-func (p *PWMPin) piBlaster(data string) (err error) {
-	fi, err := p.sysfs.OpenFile("/dev/pi-blaster", os.O_WRONLY|os.O_APPEND, 0644)
+func (p *PWMPin) writeValue(data string) (err error) {
+	fi, err := p.sys.OpenFile(p.path, os.O_WRONLY|os.O_APPEND, 0644)
 	defer fi.Close()
 
 	if err != nil {
