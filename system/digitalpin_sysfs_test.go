@@ -1,4 +1,4 @@
-package sysfs
+package system
 
 import (
 	"errors"
@@ -19,11 +19,7 @@ func TestDigitalPin(t *testing.T) {
 	}
 	fs := a.UseMockFilesystem(mockPaths)
 
-	pin := a.NewDigitalPin(10, "custom")
-	gobottest.Assert(t, pin.pin, "10")
-	gobottest.Assert(t, pin.label, "custom")
-
-	pin = a.NewDigitalPin(10)
+	pin := a.NewDigitalPin(10)
 	gobottest.Assert(t, pin.pin, "10")
 	gobottest.Assert(t, pin.label, "gpio10")
 	gobottest.Assert(t, pin.value, nil)
@@ -48,7 +44,7 @@ func TestDigitalPin(t *testing.T) {
 	data, _ := pin.Read()
 	gobottest.Assert(t, 1, data)
 
-	pin2 := a.NewDigitalPin(30, "custom")
+	pin2 := a.NewDigitalPin(30)
 	err = pin2.Write(1)
 	gobottest.Assert(t, err.Error(), "pin has not been exported")
 
@@ -89,33 +85,28 @@ func TestDigitalPinExportError(t *testing.T) {
 	a := NewAccesser()
 	mockPaths := []string{
 		"/sys/class/gpio/export",
-		"/sys/class/gpio/unexport",
-		"/sys/class/gpio/gpio10/value",
-		"/sys/class/gpio/gpio10/direction",
+		"/sys/class/gpio/gpio11/direction",
 	}
 	a.UseMockFilesystem(mockPaths)
 
-	pin := a.NewDigitalPin(10, "custom")
+	pin := a.NewDigitalPin(10)
 
 	writeFile = func(File, []byte) (int, error) {
 		return 0, &os.PathError{Err: syscall.EBUSY}
 	}
 
 	err := pin.Export()
-	gobottest.Assert(t, err.Error(), " : /sys/class/gpio/custom/direction: No such file.")
+	gobottest.Assert(t, err.Error(), " : /sys/class/gpio/gpio10/direction: No such file.")
 }
 
 func TestDigitalPinUnexportError(t *testing.T) {
 	a := NewAccesser()
 	mockPaths := []string{
-		"/sys/class/gpio/export",
 		"/sys/class/gpio/unexport",
-		"/sys/class/gpio/gpio10/value",
-		"/sys/class/gpio/gpio10/direction",
 	}
 	a.UseMockFilesystem(mockPaths)
 
-	pin := a.NewDigitalPin(10, "custom")
+	pin := a.NewDigitalPin(10)
 
 	writeFile = func(File, []byte) (int, error) {
 		return 0, &os.PathError{Err: syscall.EBUSY}

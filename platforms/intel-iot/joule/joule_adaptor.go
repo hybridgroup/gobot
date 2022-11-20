@@ -8,7 +8,7 @@ import (
 	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/drivers/i2c"
-	"gobot.io/x/gobot/sysfs"
+	"gobot.io/x/gobot/system"
 )
 
 type sysfsPin struct {
@@ -19,18 +19,18 @@ type sysfsPin struct {
 // Adaptor represents an Intel Joule
 type Adaptor struct {
 	name        string
-	sysfs       *sysfs.Accesser
+	sys         *system.Accesser
 	mutex       sync.Mutex
-	digitalPins map[int]sysfs.DigitalPinner
-	pwmPins     map[int]sysfs.PWMPinner
+	digitalPins map[int]system.DigitalPinner
+	pwmPins     map[int]system.PWMPinner
 	i2cBuses    [3]i2c.I2cDevice
 }
 
 // NewAdaptor returns a new Joule Adaptor
 func NewAdaptor() *Adaptor {
 	return &Adaptor{
-		name:  gobot.DefaultName("Joule"),
-		sysfs: sysfs.NewAccesser(),
+		name: gobot.DefaultName("Joule"),
+		sys:  system.NewAccesser(),
 	}
 }
 
@@ -45,8 +45,8 @@ func (e *Adaptor) Connect() (err error) {
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
 
-	e.digitalPins = make(map[int]sysfs.DigitalPinner)
-	e.pwmPins = make(map[int]sysfs.PWMPinner)
+	e.digitalPins = make(map[int]system.DigitalPinner)
+	e.pwmPins = make(map[int]system.PWMPinner)
 	return
 }
 
@@ -83,25 +83,25 @@ func (e *Adaptor) Finalize() (err error) {
 }
 
 // DigitalPin returns matched digitalPin for specified values
-func (e *Adaptor) DigitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPinner, err error) {
+func (e *Adaptor) DigitalPin(pin string, dir string) (system.DigitalPinner, error) {
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
 
 	i := sysfsPinMap[pin]
 	if e.digitalPins[i.pin] == nil {
-		e.digitalPins[i.pin] = e.sysfs.NewDigitalPin(i.pin)
-		if err = e.digitalPins[i.pin].Export(); err != nil {
-			return
+		e.digitalPins[i.pin] = e.sys.NewDigitalPin(i.pin)
+		if err := e.digitalPins[i.pin].Export(); err != nil {
+			return nil, err
 		}
 	}
 
 	if dir == "in" {
-		if err = e.digitalPins[i.pin].Direction(sysfs.IN); err != nil {
-			return
+		if err := e.digitalPins[i.pin].Direction(system.IN); err != nil {
+			return nil, err
 		}
 	} else if dir == "out" {
-		if err = e.digitalPins[i.pin].Direction(sysfs.OUT); err != nil {
-			return
+		if err := e.digitalPins[i.pin].Direction(system.OUT); err != nil {
+			return nil, err
 		}
 	}
 	return e.digitalPins[i.pin], nil
@@ -109,20 +109,20 @@ func (e *Adaptor) DigitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPinn
 
 // DigitalRead reads digital value from pin
 func (e *Adaptor) DigitalRead(pin string) (i int, err error) {
-	sysfsPin, err := e.DigitalPin(pin, "in")
+	sysPin, err := e.DigitalPin(pin, "in")
 	if err != nil {
 		return
 	}
-	return sysfsPin.Read()
+	return sysPin.Read()
 }
 
 // DigitalWrite writes a value to the pin. Acceptable values are 1 or 0.
 func (e *Adaptor) DigitalWrite(pin string, val byte) (err error) {
-	sysfsPin, err := e.DigitalPin(pin, "out")
+	sysPin, err := e.DigitalPin(pin, "out")
 	if err != nil {
 		return
 	}
-	return sysfsPin.Write(int(val))
+	return sysPin.Write(int(val))
 }
 
 // PwmWrite writes the 0-254 value to the specified pin
@@ -139,35 +139,34 @@ func (e *Adaptor) PwmWrite(pin string, val byte) (err error) {
 	return pwmPin.SetDutyCycle(uint32(float64(period) * duty))
 }
 
-// PWMPin returns a sysfs.PWMPin
-func (e *Adaptor) PWMPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
+// PWMPin returns a sys.PWMPin
+func (e *Adaptor) PWMPin(pin string) (system.PWMPinner, error) {
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
 
 	sysPin, ok := sysfsPinMap[pin]
 	if !ok {
-		err = errors.New("Not a valid pin")
-		return
+		err := errors.New("Not a valid pin")
+		return nil, err
 	}
 	if sysPin.pwmPin != -1 {
 		if e.pwmPins[sysPin.pwmPin] == nil {
-			e.pwmPins[sysPin.pwmPin] = e.sysfs.NewPWMPin("/sys/class/pwm/pwmchip0", sysPin.pwmPin)
-			if err = e.pwmPins[sysPin.pwmPin].Export(); err != nil {
-				return
+			e.pwmPins[sysPin.pwmPin] = e.sys.NewPWMPin("/sys/class/pwm/pwmchip0", sysPin.pwmPin)
+			if err := e.pwmPins[sysPin.pwmPin].Export(); err != nil {
+				return nil, err
 			}
-			if err = e.pwmPins[sysPin.pwmPin].SetPeriod(10000000); err != nil {
-				return
+			if err := e.pwmPins[sysPin.pwmPin].SetPeriod(10000000); err != nil {
+				return nil, err
 			}
-			if err = e.pwmPins[sysPin.pwmPin].Enable(true); err != nil {
-				return
+			if err := e.pwmPins[sysPin.pwmPin].Enable(true); err != nil {
+				return nil, err
 			}
 		}
 
-		sysfsPin = e.pwmPins[sysPin.pwmPin]
-		return
+		return e.pwmPins[sysPin.pwmPin], nil
 	}
-	err = errors.New("Not a PWM pin")
-	return
+
+	return nil, errors.New("Not a PWM pin")
 }
 
 // GetConnection returns an i2c connection to a device on a specified bus.
@@ -177,7 +176,7 @@ func (e *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection
 		return nil, fmt.Errorf("Bus number %d out of range", bus)
 	}
 	if e.i2cBuses[bus] == nil {
-		e.i2cBuses[bus], err = e.sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
+		e.i2cBuses[bus], err = e.sys.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
 	}
 	return i2c.NewConnection(e.i2cBuses[bus], address), err
 }

@@ -9,7 +9,7 @@ import (
 	"gobot.io/x/gobot/drivers/gpio"
 	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/gobottest"
-	"gobot.io/x/gobot/sysfs"
+	"gobot.io/x/gobot/system"
 )
 
 // make sure that this Adaptor fullfills all the required interfaces
@@ -17,11 +17,11 @@ var _ gobot.Adaptor = (*Adaptor)(nil)
 var _ gpio.DigitalReader = (*Adaptor)(nil)
 var _ gpio.DigitalWriter = (*Adaptor)(nil)
 var _ gpio.PwmWriter = (*Adaptor)(nil)
-var _ sysfs.DigitalPinnerProvider = (*Adaptor)(nil)
-var _ sysfs.PWMPinnerProvider = (*Adaptor)(nil)
+var _ system.DigitalPinnerProvider = (*Adaptor)(nil)
+var _ system.PWMPinnerProvider = (*Adaptor)(nil)
 var _ i2c.Connector = (*Adaptor)(nil)
 
-func initTestAdaptorWithMockedFilesystem() (*Adaptor, *sysfs.MockFilesystem) {
+func initTestAdaptorWithMockedFilesystem() (*Adaptor, *system.MockFilesystem) {
 	a := NewAdaptor()
 	mockPaths := []string{
 		"/sys/class/pwm/pwmchip0/export",
@@ -87,7 +87,7 @@ func initTestAdaptorWithMockedFilesystem() (*Adaptor, *sysfs.MockFilesystem) {
 		"/sys/class/gpio/gpio451/value",
 		"/dev/i2c-0",
 	}
-	fs := a.sysfs.UseMockFilesystem(mockPaths)
+	fs := a.sys.UseMockFilesystem(mockPaths)
 	fs.Files["/sys/class/pwm/pwmchip0/pwm0/period"].Contents = "5000"
 	if err := a.Connect(); err != nil {
 		panic(err)
@@ -160,7 +160,7 @@ func TestDigitalReadWriteError(t *testing.T) {
 
 func TestI2c(t *testing.T) {
 	a, _ := initTestAdaptorWithMockedFilesystem()
-	a.sysfs.UseMockSyscall()
+	a.sys.UseMockSyscall()
 
 	con, err := a.GetConnection(0xff, 0)
 	gobottest.Assert(t, err, nil)

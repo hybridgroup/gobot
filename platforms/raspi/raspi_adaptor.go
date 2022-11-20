@@ -12,7 +12,7 @@ import (
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/drivers/spi"
-	"gobot.io/x/gobot/sysfs"
+	"gobot.io/x/gobot/system"
 )
 
 const infoFile = "/proc/cpuinfo"
@@ -21,10 +21,10 @@ const infoFile = "/proc/cpuinfo"
 type Adaptor struct {
 	name               string
 	mutex              sync.Mutex
-	sysfs              *sysfs.Accesser
+	sys                *system.Accesser
 	revision           string
-	digitalPins        map[int]sysfs.DigitalPinner
-	pwmPins            map[int]*PWMPin
+	digitalPins        map[int]system.DigitalPinner
+	pwmPins            map[int]system.PWMPinner
 	i2cBuses           [2]i2c.I2cDevice
 	spiDevices         [2]spi.Connection
 	spiDefaultMaxSpeed int64
@@ -35,9 +35,9 @@ type Adaptor struct {
 func NewAdaptor() *Adaptor {
 	r := &Adaptor{
 		name:            gobot.DefaultName("RaspberryPi"),
-		sysfs:           sysfs.NewAccesser(),
-		digitalPins:     make(map[int]sysfs.DigitalPinner),
-		pwmPins:         make(map[int]*PWMPin),
+		sys:             system.NewAccesser(),
+		digitalPins:     make(map[int]system.DigitalPinner),
+		pwmPins:         make(map[int]system.PWMPinner),
 		PiBlasterPeriod: 10000000,
 	}
 
@@ -100,34 +100,34 @@ func (r *Adaptor) Finalize() (err error) {
 }
 
 // DigitalPin returns matched digitalPin for specified values
-func (r *Adaptor) DigitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPinner, err error) {
+func (r *Adaptor) DigitalPin(pin string, dir string) (system.DigitalPinner, error) {
 	i, err := r.translatePin(pin)
 
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	currentPin, err := r.getExportedDigitalPin(i, dir)
 
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	if err = currentPin.Direction(dir); err != nil {
-		return
+		return nil, err
 	}
 
 	return currentPin, nil
 }
 
-func (r *Adaptor) getExportedDigitalPin(translatedPin int, dir string) (sysfsPin sysfs.DigitalPinner, err error) {
+func (r *Adaptor) getExportedDigitalPin(translatedPin int, dir string) (system.DigitalPinner, error) {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
 	if r.digitalPins[translatedPin] == nil {
-		r.digitalPins[translatedPin] = r.sysfs.NewDigitalPin(translatedPin)
-		if err = r.digitalPins[translatedPin].Export(); err != nil {
-			return
+		r.digitalPins[translatedPin] = r.sys.NewDigitalPin(translatedPin)
+		if err := r.digitalPins[translatedPin].Export(); err != nil {
+			return nil, err
 		}
 	}
 
@@ -136,20 +136,20 @@ func (r *Adaptor) getExportedDigitalPin(translatedPin int, dir string) (sysfsPin
 
 // DigitalRead reads digital value from pin
 func (r *Adaptor) DigitalRead(pin string) (val int, err error) {
-	sysfsPin, err := r.DigitalPin(pin, sysfs.IN)
+	sysPin, err := r.DigitalPin(pin, system.IN)
 	if err != nil {
 		return
 	}
-	return sysfsPin.Read()
+	return sysPin.Read()
 }
 
 // DigitalWrite writes digital value to specified pin
-func (r *Adaptor) DigitalWrite(pin string, val byte) (err error) {
-	sysfsPin, err := r.DigitalPin(pin, sysfs.OUT)
+func (r *Adaptor) DigitalWrite(pin string, val byte) error {
+	sysPin, err := r.DigitalPin(pin, system.OUT)
 	if err != nil {
 		return err
 	}
-	return sysfsPin.Write(int(val))
+	return sysPin.Write(int(val))
 }
 
 // GetConnection returns an i2c connection to a device on a specified bus.
@@ -169,7 +169,7 @@ func (r *Adaptor) getI2cBus(bus int) (_ i2c.I2cDevice, err error) {
 	defer r.mutex.Unlock()
 
 	if r.i2cBuses[bus] == nil {
-		r.i2cBuses[bus], err = r.sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
+		r.i2cBuses[bus], err = r.sys.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
 	}
 
 	return r.i2cBuses[bus], err
@@ -226,18 +226,18 @@ func (r *Adaptor) GetSpiDefaultMaxSpeed() int64 {
 	return 500000
 }
 
-// PWMPin returns a raspi.PWMPin which provides the sysfs.PWMPinner interface
-func (r *Adaptor) PWMPin(pin string) (raspiPWMPin sysfs.PWMPinner, err error) {
+// PWMPin returns a raspi.PWMPin which provides the system.PWMPinner interface
+func (r *Adaptor) PWMPin(pin string) (system.PWMPinner, error) {
 	i, err := r.translatePin(pin)
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
 	if r.pwmPins[i] == nil {
-		r.pwmPins[i] = NewPWMPin(r.sysfs, "/sys/class/pwm/pwmchip0", strconv.Itoa(i))
+		r.pwmPins[i] = NewPWMPin(r.sys, "/sys/class/pwm/pwmchip0", strconv.Itoa(i))
 		r.pwmPins[i].SetPeriod(r.PiBlasterPeriod)
 	}
 
@@ -246,24 +246,24 @@ func (r *Adaptor) PWMPin(pin string) (raspiPWMPin sysfs.PWMPinner, err error) {
 
 // PwmWrite writes a PWM signal to the specified pin
 func (r *Adaptor) PwmWrite(pin string, val byte) (err error) {
-	sysfsPin, err := r.PWMPin(pin)
+	sysPin, err := r.PWMPin(pin)
 	if err != nil {
 		return err
 	}
 
 	duty := uint32(gobot.FromScale(float64(val), 0, 255) * float64(r.PiBlasterPeriod))
-	return sysfsPin.SetDutyCycle(duty)
+	return sysPin.SetDutyCycle(duty)
 }
 
 // ServoWrite writes a servo signal to the specified pin
 func (r *Adaptor) ServoWrite(pin string, angle byte) (err error) {
-	sysfsPin, err := r.PWMPin(pin)
+	sysPin, err := r.PWMPin(pin)
 	if err != nil {
 		return err
 	}
 
 	duty := uint32(gobot.FromScale(float64(angle), 0, 180) * float64(r.PiBlasterPeriod))
-	return sysfsPin.SetDutyCycle(duty)
+	return sysPin.SetDutyCycle(duty)
 }
 
 func (r *Adaptor) translatePin(pin string) (i int, err error) {
@@ -281,7 +281,7 @@ func (r *Adaptor) translatePin(pin string) (i int, err error) {
 func (r *Adaptor) readRevision() string {
 	if r.revision == "" {
 		r.revision = "0"
-		content, err := r.sysfs.ReadFile(infoFile)
+		content, err := r.sys.ReadFile(infoFile)
 		if err != nil {
 			return r.revision
 		}

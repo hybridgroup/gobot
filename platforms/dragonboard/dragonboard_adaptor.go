@@ -8,15 +8,15 @@ import (
 	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/drivers/i2c"
-	"gobot.io/x/gobot/sysfs"
+	"gobot.io/x/gobot/system"
 )
 
 // Adaptor represents a Gobot Adaptor for a DragonBoard 410c
 type Adaptor struct {
 	name        string
-	sysfs       *sysfs.Accesser
+	sys         *system.Accesser
 	mutex       sync.Mutex
-	digitalPins map[int]sysfs.DigitalPinner
+	digitalPins map[int]system.DigitalPinner
 	pinMap      map[string]int
 	i2cBuses    [3]i2c.I2cDevice
 }
@@ -42,8 +42,8 @@ var fixedPins = map[string]int{
 // NewAdaptor creates a DragonBoard 410c Adaptor
 func NewAdaptor() *Adaptor {
 	c := &Adaptor{
-		name:  gobot.DefaultName("DragonBoard"),
-		sysfs: sysfs.NewAccesser(),
+		name: gobot.DefaultName("DragonBoard"),
+		sys:  system.NewAccesser(),
 	}
 
 	c.setPins()
@@ -84,25 +84,25 @@ func (c *Adaptor) Finalize() (err error) {
 }
 
 // DigitalPin returns matched digitalPin for specified values
-func (c *Adaptor) DigitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPinner, err error) {
+func (c *Adaptor) DigitalPin(pin string, dir string) (system.DigitalPinner, error) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
 	i, err := c.translatePin(pin)
 
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	if c.digitalPins[i] == nil {
-		c.digitalPins[i] = c.sysfs.NewDigitalPin(i)
+		c.digitalPins[i] = c.sys.NewDigitalPin(i)
 		if err = c.digitalPins[i].Export(); err != nil {
-			return
+			return nil, err
 		}
 	}
 
 	if err = c.digitalPins[i].Direction(dir); err != nil {
-		return
+		return nil, err
 	}
 
 	return c.digitalPins[i], nil
@@ -113,11 +113,11 @@ func (c *Adaptor) DigitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPinn
 // extender (pins 23-34 on header J8), as well as the SoC pins
 // aka all the other pins, APQ GPIO_0-GPIO_122 and PM_MPP_0-4.
 func (c *Adaptor) DigitalRead(pin string) (val int, err error) {
-	sysfsPin, err := c.DigitalPin(pin, sysfs.IN)
+	sysPin, err := c.DigitalPin(pin, system.IN)
 	if err != nil {
 		return
 	}
-	return sysfsPin.Read()
+	return sysPin.Read()
 }
 
 // DigitalWrite writes digital value to the specified pin.
@@ -125,11 +125,11 @@ func (c *Adaptor) DigitalRead(pin string) (val int, err error) {
 // extender (pins 23-34 on header J8), as well as the SoC pins
 // aka all the other pins, APQ GPIO_0-GPIO_122 and PM_MPP_0-4.
 func (c *Adaptor) DigitalWrite(pin string, val byte) (err error) {
-	sysfsPin, err := c.DigitalPin(pin, sysfs.OUT)
+	sysPin, err := c.DigitalPin(pin, system.OUT)
 	if err != nil {
 		return err
 	}
-	return sysfsPin.Write(int(val))
+	return sysPin.Write(int(val))
 }
 
 // GetConnection returns a connection to a device on a specified bus.
@@ -142,7 +142,7 @@ func (c *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection
 		return nil, fmt.Errorf("Bus number %d out of range", bus)
 	}
 	if c.i2cBuses[bus] == nil {
-		c.i2cBuses[bus], err = c.sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
+		c.i2cBuses[bus], err = c.sys.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
 	}
 	return i2c.NewConnection(c.i2cBuses[bus], address), err
 }
@@ -153,7 +153,7 @@ func (c *Adaptor) GetDefaultBus() int {
 }
 
 func (c *Adaptor) setPins() {
-	c.digitalPins = make(map[int]sysfs.DigitalPinner)
+	c.digitalPins = make(map[int]system.DigitalPinner)
 	c.pinMap = fixedPins
 	for i := 0; i < 122; i++ {
 		pin := fmt.Sprintf("GPIO_%d", i)

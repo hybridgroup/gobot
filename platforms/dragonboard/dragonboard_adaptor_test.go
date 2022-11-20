@@ -42,7 +42,7 @@ func TestDigitalIO(t *testing.T) {
 		"/sys/class/gpio/gpio12/value",
 		"/sys/class/gpio/gpio12/direction",
 	}
-	fs := a.sysfs.UseMockFilesystem(mockPaths)
+	fs := a.sys.UseMockFilesystem(mockPaths)
 
 	_ = a.DigitalWrite("GPIO_B", 1)
 	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio12/value"].Contents, "1")
@@ -57,8 +57,8 @@ func TestDigitalIO(t *testing.T) {
 
 func TestI2c(t *testing.T) {
 	a := initTestAdaptor(t)
-	a.sysfs.UseMockFilesystem([]string{"/dev/i2c-1"})
-	a.sysfs.UseMockSyscall()
+	a.sys.UseMockFilesystem([]string{"/dev/i2c-1"})
+	a.sys.UseMockSyscall()
 
 	con, err := a.GetConnection(0xff, 1)
 	gobottest.Assert(t, err, nil)
@@ -95,7 +95,7 @@ func TestFinalizeErrorAfterGPIO(t *testing.T) {
 		"/sys/class/gpio/gpio12/value",
 		"/sys/class/gpio/gpio12/direction",
 	}
-	fs := a.sysfs.UseMockFilesystem(mockPaths)
+	fs := a.sys.UseMockFilesystem(mockPaths)
 
 	gobottest.Assert(t, a.Connect(), nil)
 	gobottest.Assert(t, a.DigitalWrite("GPIO_B", 1), nil)

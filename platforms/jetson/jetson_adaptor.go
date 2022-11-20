@@ -9,7 +9,7 @@ import (
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/drivers/spi"
-	"gobot.io/x/gobot/sysfs"
+	"gobot.io/x/gobot/system"
 )
 
 const pwmDefaultPeriod = 3000000
@@ -17,10 +17,10 @@ const pwmDefaultPeriod = 3000000
 // Adaptor is the Gobot Adaptor for the Jetson Nano
 type Adaptor struct {
 	name        string
-	sysfs       *sysfs.Accesser
+	sys         *system.Accesser
 	mutex       sync.Mutex
-	digitalPins map[int]sysfs.DigitalPinner
-	pwmPins     map[int]*PWMPin
+	digitalPins map[int]system.DigitalPinner
+	pwmPins     map[int]system.PWMPinner
 	i2cBuses    [2]i2c.I2cDevice
 	spiDevices  [2]spi.Connection
 }
@@ -29,9 +29,9 @@ type Adaptor struct {
 func NewAdaptor() *Adaptor {
 	j := &Adaptor{
 		name:        gobot.DefaultName("JetsonNano"),
-		sysfs:       sysfs.NewAccesser(),
-		digitalPins: make(map[int]sysfs.DigitalPinner),
-		pwmPins:     make(map[int]*PWMPin),
+		sys:         system.NewAccesser(),
+		digitalPins: make(map[int]system.DigitalPinner),
+		pwmPins:     make(map[int]system.PWMPinner),
 	}
 	return j
 }
@@ -94,21 +94,21 @@ func (j *Adaptor) Finalize() (err error) {
 }
 
 // DigitalPin returns matched digitalPin for specified values
-func (j *Adaptor) DigitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPinner, err error) {
+func (j *Adaptor) DigitalPin(pin string, dir string) (system.DigitalPinner, error) {
 	i, err := j.translatePin(pin)
 
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	currentPin, err := j.getExportedDigitalPin(i, dir)
 
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	if err = currentPin.Direction(dir); err != nil {
-		return
+		return nil, err
 	}
 
 	return currentPin, nil
@@ -116,20 +116,20 @@ func (j *Adaptor) DigitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPinn
 
 // DigitalRead reads digital value from pin
 func (j *Adaptor) DigitalRead(pin string) (val int, err error) {
-	sysfsPin, err := j.DigitalPin(pin, sysfs.IN)
+	sysPin, err := j.DigitalPin(pin, system.IN)
 	if err != nil {
 		return
 	}
-	return sysfsPin.Read()
+	return sysPin.Read()
 }
 
 // DigitalWrite writes digital value to specified pin
 func (j *Adaptor) DigitalWrite(pin string, val byte) (err error) {
-	sysfsPin, err := j.DigitalPin(pin, sysfs.OUT)
+	sysPin, err := j.DigitalPin(pin, system.OUT)
 	if err != nil {
 		return err
 	}
-	return sysfsPin.Write(int(val))
+	return sysPin.Write(int(val))
 }
 
 // GetConnection returns an i2c connection to a device on a specified bus.
@@ -191,11 +191,11 @@ func (j *Adaptor) GetSpiDefaultMaxSpeed() int64 {
 	return 10000000
 }
 
-//PWMPin returns a Jetson Nano. PWMPin which provides the sysfs.PWMPinner interface
-func (j *Adaptor) PWMPin(pin string) (pwmPin sysfs.PWMPinner, err error) {
+//PWMPin returns a Jetson Nano. PWMPin which provides the system.PWMPinner interface
+func (j *Adaptor) PWMPin(pin string) (system.PWMPinner, error) {
 	i, err := j.translatePin(pin)
 	if err != nil {
-		return
+		return nil, err
 	}
 	j.mutex.Lock()
 	defer j.mutex.Unlock()
@@ -204,9 +204,9 @@ func (j *Adaptor) PWMPin(pin string) (pwmPin sysfs.PWMPinner, err error) {
 		return j.pwmPins[i], nil
 	}
 
-	j.pwmPins[i], err = NewPWMPin(j.sysfs, "/sys/class/pwm/pwmchip0", pin)
+	j.pwmPins[i], err = NewPWMPin(j.sys, "/sys/class/pwm/pwmchip0", pin)
 	if err != nil {
-		return
+		return nil, err
 	}
 	j.pwmPins[i].Export()
 	j.pwmPins[i].SetPeriod(pwmDefaultPeriod)
@@ -217,34 +217,34 @@ func (j *Adaptor) PWMPin(pin string) (pwmPin sysfs.PWMPinner, err error) {
 
 // PwmWrite writes a PWM signal to the specified pin
 func (j *Adaptor) PwmWrite(pin string, val byte) (err error) {
-	sysfsPin, err := j.PWMPin(pin)
+	sysPin, err := j.PWMPin(pin)
 	if err != nil {
 		return err
 	}
 
 	duty := uint32(gobot.FromScale(float64(val), 0, 255) * float64(pwmDefaultPeriod))
-	return sysfsPin.SetDutyCycle(duty)
+	return sysPin.SetDutyCycle(duty)
 }
 
 // ServoWrite writes a servo signal to the specified pin
 func (j *Adaptor) ServoWrite(pin string, angle byte) (err error) {
-	sysfsPin, err := j.PWMPin(pin)
+	sysPin, err := j.PWMPin(pin)
 	if err != nil {
 		return err
 	}
 
 	duty := uint32(gobot.FromScale(float64(angle), 0, 180) * float64(pwmDefaultPeriod))
-	return sysfsPin.SetDutyCycle(duty)
+	return sysPin.SetDutyCycle(duty)
 }
 
-func (j *Adaptor) getExportedDigitalPin(translatedPin int, dir string) (sysfsPin sysfs.DigitalPinner, err error) {
+func (j *Adaptor) getExportedDigitalPin(translatedPin int, dir string) (system.DigitalPinner, error) {
 	j.mutex.Lock()
 	defer j.mutex.Unlock()
 
 	if j.digitalPins[translatedPin] == nil {
-		j.digitalPins[translatedPin] = j.sysfs.NewDigitalPin(translatedPin)
-		if err = j.digitalPins[translatedPin].Export(); err != nil {
-			return
+		j.digitalPins[translatedPin] = j.sys.NewDigitalPin(translatedPin)
+		if err := j.digitalPins[translatedPin].Export(); err != nil {
+			return nil, err
 		}
 	}
 
@@ -256,7 +256,7 @@ func (j *Adaptor) getI2cBus(bus int) (_ i2c.I2cDevice, err error) {
 	defer j.mutex.Unlock()
 
 	if j.i2cBuses[bus] == nil {
-		j.i2cBuses[bus], err = j.sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
+		j.i2cBuses[bus], err = j.sys.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
 	}
 
 	return j.i2cBuses[bus], err

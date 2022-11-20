@@ -1,4 +1,4 @@
-package sysfs
+package system
 
 import (
 	"bytes"
@@ -22,7 +22,7 @@ const (
 
 const pwmDebug = false
 
-// PWMPinner is the interface for sysfs PWM interactions
+// PWMPinner is the interface for system PWM interactions
 type PWMPinner interface {
 	// Export exports the pin for use by the operating system
 	Export() error

@@ -1,4 +1,4 @@
-package sysfs
+package system
 
 import (
 	"syscall"

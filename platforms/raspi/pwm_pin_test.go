@@ -5,13 +5,13 @@ import (
 	"testing"
 
 	"gobot.io/x/gobot/gobottest"
-	"gobot.io/x/gobot/sysfs"
+	"gobot.io/x/gobot/system"
 )
 
-var _ sysfs.PWMPinner = (*PWMPin)(nil)
+var _ system.PWMPinner = (*PWMPin)(nil)
 
 func TestPwmPin(t *testing.T) {
-	a := sysfs.NewAccesser()
+	a := system.NewAccesser()
 	a.UseMockFilesystem([]string{"/dev/pi-blaster"})
 
 	pin := NewPWMPin(a, "/sys/class/pwm/pwmchip0", "1")
