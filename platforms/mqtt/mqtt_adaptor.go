@@ -35,6 +35,8 @@ type Adaptor struct {
 	cleanSession  bool
 	client        paho.Client
 	qos           int
+
+	optsFn func(*paho.ClientOptions)
 }
 
 // NewAdaptor creates a new mqtt adaptor with specified host and client id
@@ -111,9 +113,19 @@ func (a *Adaptor) ClientKey() string { return a.clientKey }
 // SetClientKey sets the MQTT client SSL key file
 func (a *Adaptor) SetClientKey(val string) { a.clientKey = val }
 
+// OptsFn returns the MQTT client extended options set function
+func (a *Adaptor) OptsFn() func(*paho.ClientOptions) { return a.optsFn }
+
+// SetOptsFn sets the MQTT client extended options
+func (a *Adaptor) SetOptsFn(fn func(*paho.ClientOptions)) { a.optsFn = fn }
+
 // Connect returns true if connection to mqtt is established
 func (a *Adaptor) Connect() (err error) {
-	a.client = paho.NewClient(a.createClientOptions())
+	opts := a.createClientOptions()
+	if a.optsFn != nil {
+		a.optsFn(opts)
+	}
+	a.client = paho.NewClient(opts)
 	if token := a.client.Connect(); token.Wait() && token.Error() != nil {
 		err = multierror.Append(err, token.Error())
 	}
