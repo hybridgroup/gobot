@@ -39,7 +39,7 @@ type Adaptor struct {
 func NewAdaptor() *Adaptor {
 	c := &Adaptor{
 		name: gobot.DefaultName("Tinker Board"),
-		sys:  system.NewAccesser(),
+		sys:  system.NewAccesser("cdev"),
 	}
 
 	c.setPins()
@@ -88,21 +88,36 @@ func (c *Adaptor) Finalize() (err error) {
 }
 
 // DigitalRead reads digital value from the specified pin.
-func (c *Adaptor) DigitalRead(pin string) (val int, err error) {
-	sysPin, err := c.DigitalPin(pin, system.IN)
+func (c *Adaptor) DigitalRead(id string) (int, error) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	pin, err := c.digitalPin(id, system.WithDirectionInput())
 	if err != nil {
-		return
+		return 0, err
 	}
-	return sysPin.Read()
+	return pin.Read()
 }
 
 // DigitalWrite writes digital value to the specified pin.
-func (c *Adaptor) DigitalWrite(pin string, val byte) (err error) {
-	sysPin, err := c.DigitalPin(pin, system.OUT)
+func (c *Adaptor) DigitalWrite(id string, val byte) error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	pin, err := c.digitalPin(id, system.WithDirectionOutput(int(val)))
 	if err != nil {
 		return err
 	}
-	return sysPin.Write(int(val))
+	return pin.Write(int(val))
+}
+
+// DigitalPin returns a digital pin. If the pin is initially acquired, it is an input.
+// Pin direction and other options can be changed afterwards by pin.ApplyOptions() at any time.
+func (c *Adaptor) DigitalPin(id string) (gobot.DigitalPinner, error) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	return c.digitalPin(id)
 }
 
 // PwmWrite writes a PWM signal to the specified pin.
@@ -159,30 +174,6 @@ func (c *Adaptor) SetPeriod(pin string, period uint32) error {
 		return err
 	}
 	return setPeriod(pwmPin, period)
-}
-
-// DigitalPin returns matched digitalPin for specified values.
-func (c *Adaptor) DigitalPin(pin string, dir string) (gobot.DigitalPinner, error) {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-
-	i, err := c.translatePin(pin)
-	if err != nil {
-		return nil, err
-	}
-
-	if c.digitalPins[pin] == nil {
-		c.digitalPins[pin] = c.sys.NewDigitalPin(i)
-		if err = c.digitalPins[pin].Export(); err != nil {
-			return nil, err
-		}
-	}
-
-	if err = c.digitalPins[pin].Direction(dir); err != nil {
-		return nil, err
-	}
-
-	return c.digitalPins[pin], nil
 }
 
 // PWMPin initializes the pin for PWM and returns matched pwmPin for specified pin number.
@@ -310,12 +301,18 @@ func (c *Adaptor) setPins() {
 	c.pwmPins = make(map[string]gobot.PWMPinner)
 }
 
-func (c *Adaptor) translatePin(pin string) (sysPinNo int, err error) {
-	sysPinNo, ok := gpioPinDefinitions[pin]
+func (c *Adaptor) translatePin(pin string) (chip string, line int, err error) {
+	pindef, ok := gpioPinDefinitions[pin]
 	if !ok {
-		err = fmt.Errorf("Not a valid pin")
+		return "", -1, fmt.Errorf("Not a valid pin")
 	}
-	return
+
+	if c.sys.IsSysfsDigitalPinAccess() {
+		return "", pindef.sysfs, nil
+	}
+	chip = fmt.Sprintf("gpiochip%d", pindef.cdev.chip)
+	line = int(pindef.cdev.line)
+	return chip, line, nil
 }
 
 func (c *Adaptor) translatePwmPin(pin string) (pwmPin pwmPinDefinition, err error) {
@@ -342,4 +339,26 @@ func (p pwmPinDefinition) findDir(sys system.Accesser) (dir string, err error) {
 	}
 
 	return
+}
+
+func (c *Adaptor) digitalPin(id string, o ...func(gobot.DigitalPinOptioner) bool) (gobot.DigitalPinner, error) {
+	chip, line, err := c.translatePin(id)
+	if err != nil {
+		return nil, err
+	}
+
+	pin := c.digitalPins[id]
+	if pin == nil {
+		pin = c.sys.NewDigitalPin(chip, line, o...)
+		if err = pin.Export(); err != nil {
+			return nil, err
+		}
+		c.digitalPins[id] = pin
+	} else {
+		if err := pin.ApplyOptions(o...); err != nil {
+			return nil, err
+		}
+	}
+
+	return pin, nil
 }

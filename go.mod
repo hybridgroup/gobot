@@ -16,6 +16,7 @@ require (
 	github.com/stretchr/testify v1.8.0
 	github.com/urfave/cli v1.22.10
 	github.com/veandco/go-sdl2 v0.4.25
+	github.com/warthog618/gpiod v0.8.0
 	go.bug.st/serial v1.4.0
 	gocv.io/x/gocv v0.31.0
 	golang.org/x/net v0.1.0

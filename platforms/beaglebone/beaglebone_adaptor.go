@@ -28,7 +28,7 @@ type Adaptor struct {
 	name         string
 	sys          *system.Accesser
 	mutex        sync.Mutex
-	digitalPins  []gobot.DigitalPinner
+	digitalPins  map[string]gobot.DigitalPinner
 	pwmPins      map[string]gobot.PWMPinner
 	i2cBuses     map[int]i2c.I2cDevice
 	usrLed       string
@@ -45,7 +45,7 @@ func NewAdaptor() *Adaptor {
 	b := &Adaptor{
 		name:         gobot.DefaultName("BeagleboneBlack"),
 		sys:          system.NewAccesser(),
-		digitalPins:  make([]gobot.DigitalPinner, 120),
+		digitalPins:  make(map[string]gobot.DigitalPinner, 120),
 		pwmPins:      make(map[string]gobot.PWMPinner),
 		i2cBuses:     make(map[int]i2c.I2cDevice),
 		pinMap:       bbbPinMap,
@@ -136,57 +136,47 @@ func (b *Adaptor) ServoWrite(pin string, angle byte) (err error) {
 }
 
 // DigitalRead returns a digital value from specified pin
-func (b *Adaptor) DigitalRead(pin string) (val int, err error) {
-	sysPin, err := b.DigitalPin(pin, system.IN)
+func (b *Adaptor) DigitalRead(id string) (int, error) {
+	b.mutex.Lock()
+	defer b.mutex.Unlock()
+
+	pin, err := b.digitalPin(id, system.WithDirectionInput())
 	if err != nil {
-		return
+		return 0, err
 	}
-	return sysPin.Read()
+	return pin.Read()
 }
 
 // DigitalWrite writes a digital value to specified pin.
 // valid usr pin values are usr0, usr1, usr2 and usr3
-func (b *Adaptor) DigitalWrite(pin string, val byte) (err error) {
-	if strings.Contains(pin, "usr") {
-		fi, e := b.sys.OpenFile(b.usrLed+pin+"/brightness", os.O_WRONLY|os.O_APPEND, 0666)
+func (b *Adaptor) DigitalWrite(id string, val byte) error {
+	b.mutex.Lock()
+	defer b.mutex.Unlock()
+
+	if strings.Contains(id, "usr") {
+		fi, e := b.sys.OpenFile(b.usrLed+id+"/brightness", os.O_WRONLY|os.O_APPEND, 0666)
 		defer fi.Close()
 		if e != nil {
 			return e
 		}
-		_, err = fi.WriteString(strconv.Itoa(int(val)))
+		_, err := fi.WriteString(strconv.Itoa(int(val)))
 		return err
 	}
-	sysPin, err := b.DigitalPin(pin, system.OUT)
+
+	pin, err := b.digitalPin(id, system.WithDirectionOutput(int(val)))
 	if err != nil {
 		return err
 	}
-	return sysPin.Write(int(val))
+	return pin.Write(int(val))
 }
 
-// DigitalPin retrieves digital pin value by name
-func (b *Adaptor) DigitalPin(pin string, dir string) (gobot.DigitalPinner, error) {
+// DigitalPin returns a digital pin. If the pin is initially acquired, it is an input.
+// Pin direction and other options can be changed afterwards by pin.ApplyOptions() at any time.
+func (b *Adaptor) DigitalPin(id string) (gobot.DigitalPinner, error) {
 	b.mutex.Lock()
 	defer b.mutex.Unlock()
 
-	i, err := b.translatePin(pin)
-	if err != nil {
-		return nil, err
-	}
-	if b.digitalPins[i] == nil {
-		b.digitalPins[i] = b.sys.NewDigitalPin(i)
-		if err = b.muxPin(pin, "gpio"); err != nil {
-			return nil, err
-		}
-
-		err := b.digitalPins[i].Export()
-		if err != nil {
-			return nil, err
-		}
-	}
-	if err = b.digitalPins[i].Direction(dir); err != nil {
-		return nil, err
-	}
-	return b.digitalPins[i], nil
+	return b.digitalPin(id)
 }
 
 // PWMPin returns matched pwmPin for specified pin number
@@ -309,7 +299,7 @@ func (b *Adaptor) GetSpiDefaultMaxSpeed() int64 {
 }
 
 // translatePin converts digital pin name to pin position
-func (b *Adaptor) translatePin(pin string) (value int, err error) {
+func (b *Adaptor) translateDigitalPin(pin string) (value int, err error) {
 	if val, ok := b.pinMap[pin]; ok {
 		value = val
 	} else {
@@ -335,6 +325,30 @@ func (b *Adaptor) translateAnalogPin(pin string) (value string, err error) {
 		err = errors.New("Not a valid analog pin")
 	}
 	return
+}
+
+func (b *Adaptor) digitalPin(id string, o ...func(gobot.DigitalPinOptioner) bool) (gobot.DigitalPinner, error) {
+	pin := b.digitalPins[id]
+	if pin == nil {
+		i, err := b.translateDigitalPin(id)
+		if err != nil {
+			return nil, err
+		}
+		pin = b.sys.NewDigitalPin("", i, o...)
+		if err := b.muxPin(id, "gpio"); err != nil {
+			return nil, err
+		}
+		if err := pin.Export(); err != nil {
+			return nil, err
+		}
+		b.digitalPins[id] = pin
+	} else {
+		if err := pin.ApplyOptions(o...); err != nil {
+			return nil, err
+		}
+	}
+
+	return pin, nil
 }
 
 func (b *Adaptor) muxPin(pin, cmd string) error {

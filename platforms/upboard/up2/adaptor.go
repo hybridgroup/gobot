@@ -112,33 +112,48 @@ func (c *Adaptor) Finalize() (err error) {
 }
 
 // DigitalRead reads digital value from the specified pin.
-func (c *Adaptor) DigitalRead(pin string) (val int, err error) {
-	sysPin, err := c.DigitalPin(pin, system.IN)
+func (c *Adaptor) DigitalRead(id string) (int, error) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	pin, err := c.digitalPin(id, system.WithDirectionInput())
 	if err != nil {
-		return
+		return 0, err
 	}
-	return sysPin.Read()
+	return pin.Read()
 }
 
 // DigitalWrite writes digital value to the specified pin.
-func (c *Adaptor) DigitalWrite(pin string, val byte) (err error) {
+func (c *Adaptor) DigitalWrite(id string, val byte) error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	// is it one of the built-in LEDs?
-	if pin == LEDRed || pin == LEDBlue || pin == LEDGreen || pin == LEDYellow {
-		pinPath := fmt.Sprintf(c.ledPath, pin)
+	if id == LEDRed || id == LEDBlue || id == LEDGreen || id == LEDYellow {
+		pinPath := fmt.Sprintf(c.ledPath, id)
 		fi, e := c.sys.OpenFile(pinPath, os.O_WRONLY|os.O_APPEND, 0666)
 		defer fi.Close()
 		if e != nil {
 			return e
 		}
-		_, err = fi.WriteString(strconv.Itoa(int(val)))
+		_, err := fi.WriteString(strconv.Itoa(int(val)))
 		return err
 	}
-	// one of the normal GPIO pins, then
-	sysPin, err := c.DigitalPin(pin, system.OUT)
+
+	pin, err := c.digitalPin(id, system.WithDirectionOutput(int(val)))
 	if err != nil {
 		return err
 	}
-	return sysPin.Write(int(val))
+	return pin.Write(int(val))
+}
+
+// DigitalPin returns a digital pin. If the pin is initially acquired, it is an input.
+// Pin direction and other options can be changed afterwards by pin.ApplyOptions() at any time.
+func (c *Adaptor) DigitalPin(id string) (gobot.DigitalPinner, error) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	return c.digitalPin(id)
 }
 
 // PwmWrite writes a PWM signal to the specified pin
@@ -171,29 +186,26 @@ func (c *Adaptor) ServoWrite(pin string, angle byte) (err error) {
 	return pwmPin.SetDutyCycle(duty)
 }
 
-// DigitalPin returns matched digitalPin for specified values
-func (c *Adaptor) DigitalPin(pin string, dir string) (gobot.DigitalPinner, error) {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-
-	i, err := c.translatePin(pin)
-
+func (c *Adaptor) digitalPin(id string, o ...func(gobot.DigitalPinOptioner) bool) (gobot.DigitalPinner, error) {
+	i, err := c.translatePin(id)
 	if err != nil {
 		return nil, err
 	}
 
-	if c.digitalPins[i] == nil {
-		c.digitalPins[i] = c.sys.NewDigitalPin(i)
-		if err = c.digitalPins[i].Export(); err != nil {
+	pin := c.digitalPins[i]
+	if pin == nil {
+		pin = c.sys.NewDigitalPin("", i, o...)
+		if err = pin.Export(); err != nil {
+			return nil, err
+		}
+		c.digitalPins[i] = pin
+	} else {
+		if err := pin.ApplyOptions(o...); err != nil {
 			return nil, err
 		}
 	}
 
-	if err = c.digitalPins[i].Direction(dir); err != nil {
-		return nil, err
-	}
-
-	return c.digitalPins[i], nil
+	return pin, nil
 }
 
 // PWMPin returns matched pwmPin for specified pin number

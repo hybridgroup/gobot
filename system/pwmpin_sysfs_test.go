@@ -12,7 +12,6 @@ import (
 var _ gobot.PWMPinner = (*PWMPin)(nil)
 
 func TestPwmPin(t *testing.T) {
-	a := NewAccesser()
 	mockedPaths := []string{
 		"/sys/class/pwm/pwmchip0/export",
 		"/sys/class/pwm/pwmchip0/unexport",
@@ -21,9 +20,9 @@ func TestPwmPin(t *testing.T) {
 		"/sys/class/pwm/pwmchip0/pwm10/duty_cycle",
 		"/sys/class/pwm/pwmchip0/pwm10/polarity",
 	}
-	fs := a.UseMockFilesystem(mockedPaths)
+	fs := newMockFilesystem(mockedPaths)
 
-	pin := a.NewPWMPin("/sys/class/pwm/pwmchip0", 10)
+	pin := newPWMPinSysfs(fs, "/sys/class/pwm/pwmchip0", 10)
 	gobottest.Assert(t, pin.pin, "10")
 
 	err := pin.Unexport()
@@ -66,7 +65,6 @@ func TestPwmPin(t *testing.T) {
 }
 
 func TestPwmPinAlreadyExported(t *testing.T) {
-	a := NewAccesser()
 	mockedPaths := []string{
 		"/sys/class/pwm/pwmchip0/export",
 		"/sys/class/pwm/pwmchip0/unexport",
@@ -74,9 +72,9 @@ func TestPwmPinAlreadyExported(t *testing.T) {
 		"/sys/class/pwm/pwmchip0/pwm10/period",
 		"/sys/class/pwm/pwmchip0/pwm10/duty_cycle",
 	}
-	a.UseMockFilesystem(mockedPaths)
+	fs := newMockFilesystem(mockedPaths)
 
-	pin := a.NewPWMPin("/sys/class/pwm/pwmchip0", 10)
+	pin := newPWMPinSysfs(fs, "/sys/class/pwm/pwmchip0", 10)
 	pin.write = func(filesystem, string, []byte) (int, error) {
 		return 0, &os.PathError{Err: syscall.EBUSY}
 	}
@@ -86,7 +84,6 @@ func TestPwmPinAlreadyExported(t *testing.T) {
 }
 
 func TestPwmPinExportError(t *testing.T) {
-	a := NewAccesser()
 	mockedPaths := []string{
 		"/sys/class/pwm/pwmchip0/export",
 		"/sys/class/pwm/pwmchip0/unexport",
@@ -94,9 +91,9 @@ func TestPwmPinExportError(t *testing.T) {
 		"/sys/class/pwm/pwmchip0/pwm10/period",
 		"/sys/class/pwm/pwmchip0/pwm10/duty_cycle",
 	}
-	a.UseMockFilesystem(mockedPaths)
+	fs := newMockFilesystem(mockedPaths)
 
-	pin := a.NewPWMPin("/sys/class/pwm/pwmchip0", 10)
+	pin := newPWMPinSysfs(fs, "/sys/class/pwm/pwmchip0", 10)
 
 	pin.write = func(filesystem, string, []byte) (int, error) {
 		return 0, &os.PathError{Err: syscall.EFAULT}
@@ -108,7 +105,6 @@ func TestPwmPinExportError(t *testing.T) {
 }
 
 func TestPwmPinUnxportError(t *testing.T) {
-	a := NewAccesser()
 	mockedPaths := []string{
 		"/sys/class/pwm/pwmchip0/export",
 		"/sys/class/pwm/pwmchip0/unexport",
@@ -116,9 +112,9 @@ func TestPwmPinUnxportError(t *testing.T) {
 		"/sys/class/pwm/pwmchip0/pwm10/period",
 		"/sys/class/pwm/pwmchip0/pwm10/duty_cycle",
 	}
-	a.UseMockFilesystem(mockedPaths)
+	fs := newMockFilesystem(mockedPaths)
 
-	pin := a.NewPWMPin("/sys/class/pwm/pwmchip0", 10)
+	pin := newPWMPinSysfs(fs, "/sys/class/pwm/pwmchip0", 10)
 
 	pin.write = func(filesystem, string, []byte) (int, error) {
 		return 0, &os.PathError{Err: syscall.EBUSY}
@@ -129,7 +125,6 @@ func TestPwmPinUnxportError(t *testing.T) {
 }
 
 func TestPwmPinPeriodError(t *testing.T) {
-	a := NewAccesser()
 	mockedPaths := []string{
 		"/sys/class/pwm/pwmchip0/export",
 		"/sys/class/pwm/pwmchip0/unexport",
@@ -137,9 +132,9 @@ func TestPwmPinPeriodError(t *testing.T) {
 		"/sys/class/pwm/pwmchip0/pwm10/period",
 		"/sys/class/pwm/pwmchip0/pwm10/duty_cycle",
 	}
-	a.UseMockFilesystem(mockedPaths)
+	fs := newMockFilesystem(mockedPaths)
 
-	pin := a.NewPWMPin("/sys/class/pwm/pwmchip0", 10)
+	pin := newPWMPinSysfs(fs, "/sys/class/pwm/pwmchip0", 10)
 
 	pin.read = func(filesystem, string) ([]byte, error) {
 		return nil, &os.PathError{Err: syscall.EBUSY}
@@ -150,7 +145,6 @@ func TestPwmPinPeriodError(t *testing.T) {
 }
 
 func TestPwmPinPolarityError(t *testing.T) {
-	a := NewAccesser()
 	mockedPaths := []string{
 		"/sys/class/pwm/pwmchip0/export",
 		"/sys/class/pwm/pwmchip0/unexport",
@@ -158,9 +152,9 @@ func TestPwmPinPolarityError(t *testing.T) {
 		"/sys/class/pwm/pwmchip0/pwm10/period",
 		"/sys/class/pwm/pwmchip0/pwm10/duty_cycle",
 	}
-	a.UseMockFilesystem(mockedPaths)
+	fs := newMockFilesystem(mockedPaths)
 
-	pin := a.NewPWMPin("/sys/class/pwm/pwmchip0", 10)
+	pin := newPWMPinSysfs(fs, "/sys/class/pwm/pwmchip0", 10)
 
 	pin.read = func(filesystem, string) ([]byte, error) {
 		return nil, &os.PathError{Err: syscall.EBUSY}
@@ -171,7 +165,6 @@ func TestPwmPinPolarityError(t *testing.T) {
 }
 
 func TestPwmPinDutyCycleError(t *testing.T) {
-	a := NewAccesser()
 	mockedPaths := []string{
 		"/sys/class/pwm/pwmchip0/export",
 		"/sys/class/pwm/pwmchip0/unexport",
@@ -179,9 +172,9 @@ func TestPwmPinDutyCycleError(t *testing.T) {
 		"/sys/class/pwm/pwmchip0/pwm10/period",
 		"/sys/class/pwm/pwmchip0/pwm10/duty_cycle",
 	}
-	a.UseMockFilesystem(mockedPaths)
+	fs := newMockFilesystem(mockedPaths)
 
-	pin := a.NewPWMPin("/sys/class/pwm/pwmchip0", 10)
+	pin := newPWMPinSysfs(fs, "/sys/class/pwm/pwmchip0", 10)
 
 	pin.read = func(filesystem, string) ([]byte, error) {
 		return nil, &os.PathError{Err: syscall.EBUSY}

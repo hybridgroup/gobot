@@ -32,15 +32,15 @@ type PWMPin struct {
 	fs      filesystem
 }
 
-// NewPWMPin returns a new pwmPin
-func (a *Accesser) NewPWMPin(path string, pin int) *PWMPin {
+// newPWMPinSysfs returns a new pwmPin, working with sysfs file access.
+func newPWMPinSysfs(fs filesystem, path string, pin int) *PWMPin {
 	return &PWMPin{
 		pin:     strconv.Itoa(pin),
 		enabled: false,
 		path:    path,
 		read:    readPwmFile,
 		write:   writePwmFile,
-		fs:      a.fs,
+		fs:      fs,
 	}
 }
 

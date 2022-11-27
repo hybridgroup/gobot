@@ -269,12 +269,11 @@ func TestConnectUnknown(t *testing.T) {
 	a.SetBoard("wha")
 
 	err := a.Connect()
-	gobottest.Assert(t, strings.Contains(err.Error(), "1 error occurred"), true)
 	gobottest.Assert(t, strings.Contains(err.Error(), "Unknown board type: wha"), true)
 }
 
 func TestFinalize(t *testing.T) {
-	a, _ := initTestAdaptorWithMockedFilesystem()
+	a, fs := initTestAdaptorWithMockedFilesystem()
 
 	a.DigitalWrite("3", 1)
 	a.PwmWrite("5", 100)
@@ -282,11 +281,10 @@ func TestFinalize(t *testing.T) {
 	a.GetConnection(0xff, 6)
 	gobottest.Assert(t, a.Finalize(), nil)
 
-	a = NewAdaptor()
-	a.sys.UseMockFilesystem([]string{})
-	a.Connect()
+	// remove one file to force Finalize error
+	delete(fs.Files, "/sys/class/gpio/unexport")
 	err := a.Finalize()
-	gobottest.Assert(t, strings.Contains(err.Error(), "1 error occurred"), true)
+	gobottest.Assert(t, strings.Contains(err.Error(), "4 errors occurred"), true)
 	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/unexport"), true)
 }
 
@@ -322,7 +320,7 @@ func TestDigitalPinInFileError(t *testing.T) {
 	delete(fs.Files, "/sys/class/gpio/gpio40/direction")
 	a.Connect()
 
-	_, err := a.DigitalPin("13", "in")
+	_, err := a.DigitalPin("13")
 	gobottest.Assert(t, strings.Contains(err.Error(), "No such file"), true)
 
 }
@@ -334,7 +332,7 @@ func TestDigitalPinInResistorFileError(t *testing.T) {
 	delete(fs.Files, "/sys/class/gpio/gpio229/direction")
 	a.Connect()
 
-	_, err := a.DigitalPin("13", "in")
+	_, err := a.DigitalPin("13")
 	gobottest.Assert(t, strings.Contains(err.Error(), "No such file"), true)
 }
 
@@ -345,7 +343,7 @@ func TestDigitalPinInLevelShifterFileError(t *testing.T) {
 	delete(fs.Files, "/sys/class/gpio/gpio261/direction")
 	a.Connect()
 
-	_, err := a.DigitalPin("13", "in")
+	_, err := a.DigitalPin("13")
 	gobottest.Assert(t, strings.Contains(err.Error(), "No such file"), true)
 }
 
@@ -356,7 +354,7 @@ func TestDigitalPinInMuxFileError(t *testing.T) {
 	delete(fs.Files, "/sys/class/gpio/gpio243/direction")
 	a.Connect()
 
-	_, err := a.DigitalPin("13", "in")
+	_, err := a.DigitalPin("13")
 	gobottest.Assert(t, strings.Contains(err.Error(), "No such file"), true)
 }
 

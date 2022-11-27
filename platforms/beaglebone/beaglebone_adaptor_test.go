@@ -240,8 +240,9 @@ func TestDigitalPinDirectionFileError(t *testing.T) {
 	err := a.DigitalWrite("P9_12", 1)
 	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/gpio60/direction: No such file."), true)
 
+	// no pin added after previous problem, so no pin to unexport in finalize
 	err = a.Finalize()
-	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/unexport: No such file."), true)
+	gobottest.Assert(t, nil, err)
 }
 
 func TestDigitalPinFinalizeFileError(t *testing.T) {

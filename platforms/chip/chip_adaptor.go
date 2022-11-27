@@ -103,24 +103,39 @@ func (c *Adaptor) Finalize() (err error) {
 // Valids pins are the XIO-P0 through XIO-P7 pins from the
 // extender (pins 13-20 on header 14), as well as the SoC pins
 // aka all the other pins.
-func (c *Adaptor) DigitalRead(pin string) (val int, err error) {
-	sysPin, err := c.DigitalPin(pin, system.IN)
+func (c *Adaptor) DigitalRead(id string) (int, error) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	pin, err := c.digitalPin(id, system.WithDirectionInput())
 	if err != nil {
-		return
+		return 0, err
 	}
-	return sysPin.Read()
+	return pin.Read()
 }
 
 // DigitalWrite writes digital value to the specified pin.
 // Valids pins are the XIO-P0 through XIO-P7 pins from the
 // extender (pins 13-20 on header 14), as well as the SoC pins
 // aka all the other pins.
-func (c *Adaptor) DigitalWrite(pin string, val byte) (err error) {
-	sysPin, err := c.DigitalPin(pin, system.OUT)
+func (c *Adaptor) DigitalWrite(id string, val byte) error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	pin, err := c.digitalPin(id, system.WithDirectionOutput(int(val)))
 	if err != nil {
 		return err
 	}
-	return sysPin.Write(int(val))
+	return pin.Write(int(val))
+}
+
+// DigitalPin returns a digital pin. If the pin is initially acquired, it is an input.
+// Pin direction and other options can be changed afterwards by pin.ApplyOptions() at any time.
+func (c *Adaptor) DigitalPin(id string) (gobot.DigitalPinner, error) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	return c.digitalPin(id)
 }
 
 // GetConnection returns a connection to a device on a specified bus.
@@ -141,31 +156,6 @@ func (c *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection
 // GetDefaultBus returns the default i2c bus for this platform
 func (c *Adaptor) GetDefaultBus() int {
 	return 1
-}
-
-// DigitalPin returns matched digitalPin for specified values
-func (c *Adaptor) DigitalPin(pin string, dir string) (gobot.DigitalPinner, error) {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-
-	i, err := c.translatePin(pin)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if c.digitalPins[i] == nil {
-		c.digitalPins[i] = c.sys.NewDigitalPin(i)
-		if err = c.digitalPins[i].Export(); err != nil {
-			return nil, err
-		}
-	}
-
-	if err = c.digitalPins[i].Direction(dir); err != nil {
-		return nil, err
-	}
-
-	return c.digitalPins[i], nil
 }
 
 // PWMPin returns matched pwmPin for specified pin number
@@ -291,11 +281,34 @@ func getXIOBase() (baseAddr int, err error) {
 	return baseAddr, nil
 }
 
-func (c *Adaptor) translatePin(pin string) (i int, err error) {
-	if val, ok := c.pinmap[pin]; ok {
+func (c *Adaptor) translateDigitalPin(id string) (i int, err error) {
+	if val, ok := c.pinmap[id]; ok {
 		i = val.pin
 	} else {
 		err = errors.New("Not a valid pin")
 	}
 	return
+}
+
+func (c *Adaptor) digitalPin(id string, o ...func(gobot.DigitalPinOptioner) bool) (gobot.DigitalPinner, error) {
+	i, err := c.translateDigitalPin(id)
+	if err != nil {
+		return nil, err
+	}
+
+	pin := c.digitalPins[i]
+
+	if pin == nil {
+		pin = c.sys.NewDigitalPin("", i, o...)
+		if err = pin.Export(); err != nil {
+			return nil, err
+		}
+		c.digitalPins[i] = pin
+	} else {
+		if err := pin.ApplyOptions(o...); err != nil {
+			return nil, err
+		}
+	}
+
+	return pin, nil
 }

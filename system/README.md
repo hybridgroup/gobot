@@ -1,4 +1,4 @@
-# sysfs
+# system
 
 This document describes some basics for developers.
 

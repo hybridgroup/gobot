@@ -61,39 +61,33 @@ func (e *Adaptor) Board() string { return e.board }
 func (e *Adaptor) SetBoard(n string) { e.board = n }
 
 // Connect initializes the Edison for use with the Arduino breakout board
-func (e *Adaptor) Connect() (err error) {
+func (e *Adaptor) Connect() error {
 	e.digitalPins = make(map[int]gobot.DigitalPinner)
 	e.pwmPins = make(map[int]gobot.PWMPinner)
 
-	if e.Board() == "arduino" || e.Board() == "" {
-		aerr := e.checkForArduino()
-		if aerr != nil {
-			return aerr
-		}
-		e.board = "arduino"
-	}
-
-	switch e.Board() {
+	switch e.board {
 	case "sparkfun":
 		e.pinmap = sparkfunPinMap
-	case "arduino":
+	case "arduino", "":
+		e.board = "arduino"
 		e.pinmap = arduinoPinMap
-		if errs := e.arduinoSetup(); errs != nil {
-			err = multierror.Append(err, errs)
+		if err := e.arduinoSetup(); err != nil {
+			return err
 		}
 	case "miniboard":
 		e.pinmap = miniboardPinMap
 	default:
-		errs := errors.New("Unknown board type: " + e.Board())
-		err = multierror.Append(err, errs)
+		return errors.New("Unknown board type: " + e.Board())
 	}
-	return
+	return nil
 }
 
 // Finalize releases all i2c devices and exported analog, digital, pwm pins.
 func (e *Adaptor) Finalize() (err error) {
-	if errs := e.tristate.Unexport(); errs != nil {
-		err = multierror.Append(err, errs)
+	if e.tristate != nil {
+		if errs := e.tristate.Unexport(); errs != nil {
+			err = multierror.Append(err, errs)
+		}
 	}
 	for _, pin := range e.digitalPins {
 		if pin != nil {
@@ -122,7 +116,10 @@ func (e *Adaptor) Finalize() (err error) {
 
 // DigitalRead reads digital value from pin
 func (e *Adaptor) DigitalRead(pin string) (i int, err error) {
-	sysPin, err := e.DigitalPin(pin, "in")
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
+
+	sysPin, err := e.digitalPin(pin, system.WithDirectionInput())
 	if err != nil {
 		return
 	}
@@ -131,11 +128,23 @@ func (e *Adaptor) DigitalRead(pin string) (i int, err error) {
 
 // DigitalWrite writes a value to the pin. Acceptable values are 1 or 0.
 func (e *Adaptor) DigitalWrite(pin string, val byte) (err error) {
-	sysPin, err := e.DigitalPin(pin, "out")
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
+
+	sysPin, err := e.digitalPin(pin, system.WithDirectionOutput(int(val)))
 	if err != nil {
 		return
 	}
 	return sysPin.Write(int(val))
+}
+
+// DigitalPin returns a digital pin. If the pin is initially acquired, it is an input.
+// Pin direction and other options can be changed afterwards by pin.ApplyOptions() at any time.
+func (e *Adaptor) DigitalPin(id string) (gobot.DigitalPinner, error) {
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
+
+	return e.digitalPin(id)
 }
 
 // PwmWrite writes the 0-254 value to the specified pin
@@ -192,80 +201,6 @@ func (e *Adaptor) GetDefaultBus() int {
 	return 1
 }
 
-// DigitalPin returns matched system.DigitalPin for specified values
-func (e *Adaptor) DigitalPin(pin string, dir string) (gobot.DigitalPinner, error) {
-	e.mutex.Lock()
-	defer e.mutex.Unlock()
-
-	i := e.pinmap[pin]
-	var err error
-	if e.digitalPins[i.pin] == nil {
-		if e.digitalPins[i.pin], err = e.newExportedPin(i.pin); err != nil {
-			return nil, err
-		}
-
-		if i.resistor > 0 {
-			if e.digitalPins[i.resistor], err = e.newExportedPin(i.resistor); err != nil {
-				return nil, err
-			}
-		}
-
-		if i.levelShifter > 0 {
-			if e.digitalPins[i.levelShifter], err = e.newExportedPin(i.levelShifter); err != nil {
-				return nil, err
-			}
-		}
-
-		if len(i.mux) > 0 {
-			for _, mux := range i.mux {
-				if e.digitalPins[mux.pin], err = e.newExportedPin(mux.pin); err != nil {
-					return nil, err
-				}
-
-				if err = pinWrite(e.digitalPins[mux.pin], system.OUT, mux.value); err != nil {
-					return nil, err
-				}
-			}
-		}
-	}
-
-	if dir == "in" {
-		if err = e.digitalPins[i.pin].Direction(system.IN); err != nil {
-			return nil, err
-		}
-
-		if i.resistor > 0 {
-			if err = pinWrite(e.digitalPins[i.resistor], system.OUT, system.LOW); err != nil {
-				return nil, err
-			}
-		}
-
-		if i.levelShifter > 0 {
-			if err = pinWrite(e.digitalPins[i.levelShifter], system.OUT, system.LOW); err != nil {
-				return nil, err
-			}
-		}
-	} else if dir == "out" {
-		if err = e.digitalPins[i.pin].Direction(system.OUT); err != nil {
-			return nil, err
-		}
-
-		if i.resistor > 0 {
-			if err = e.digitalPins[i.resistor].Direction(system.IN); err != nil {
-				return nil, err
-			}
-		}
-
-		if i.levelShifter > 0 {
-			err = pinWrite(e.digitalPins[i.levelShifter], system.OUT, system.HIGH)
-			if err != nil {
-				return nil, err
-			}
-		}
-	}
-	return e.digitalPins[i.pin], nil
-}
-
 // PWMPin returns a system.PWMPin
 func (e *Adaptor) PWMPin(pin string) (gobot.PWMPinner, error) {
 	sysPin := e.pinmap[pin]
@@ -295,115 +230,82 @@ func (e *Adaptor) PWMPin(pin string) (gobot.PWMPinner, error) {
 	return nil, errors.New("Not a PWM pin")
 }
 
-// TODO: also check to see if device labels for
-// /sys/class/gpio/gpiochip{200,216,232,248}/label == "pcal9555a"
-func (e *Adaptor) checkForArduino() error {
-	if err := e.exportTristatePin(); err != nil {
+func (e *Adaptor) newUnexportedDigitalPin(i int, o ...func(gobot.DigitalPinOptioner) bool) error {
+	io := e.sys.NewDigitalPin("", i, o...)
+	if err := io.Export(); err != nil {
 		return err
 	}
-	return nil
+	return io.Unexport()
 }
 
-func (e *Adaptor) newExportedPin(pin int) (gobot.DigitalPinner, error) {
-	sysPin := e.sys.NewDigitalPin(pin)
+func (e *Adaptor) newExportedDigitalPin(pin int, o ...func(gobot.DigitalPinOptioner) bool) (gobot.DigitalPinner, error) {
+	sysPin := e.sys.NewDigitalPin("", pin, o...)
 	err := sysPin.Export()
 	return sysPin, err
 }
 
-func (e *Adaptor) exportTristatePin() (err error) {
-	e.tristate, err = e.newExportedPin(214)
-	return
-}
-
 // arduinoSetup does needed setup for the Arduino compatible breakout board
-func (e *Adaptor) arduinoSetup() (err error) {
-	if err = e.exportTristatePin(); err != nil {
+func (e *Adaptor) arduinoSetup() error {
+	// TODO: also check to see if device labels for
+	// /sys/class/gpio/gpiochip{200,216,232,248}/label == "pcal9555a"
+
+	tpin, err := e.newExportedDigitalPin(214, system.WithDirectionOutput(system.LOW))
+	if err != nil {
 		return err
 	}
-
-	err = pinWrite(e.tristate, system.OUT, system.LOW)
-	if err != nil {
-		return
-	}
+	e.tristate = tpin
 
 	for _, i := range []int{263, 262} {
-		if err = e.newDigitalPin(i, system.HIGH); err != nil {
+		if err := e.newUnexportedDigitalPin(i, system.WithDirectionOutput(system.HIGH)); err != nil {
 			return err
 		}
 	}
 
 	for _, i := range []int{240, 241, 242, 243} {
-		if err = e.newDigitalPin(i, system.LOW); err != nil {
+		if err := e.newUnexportedDigitalPin(i, system.WithDirectionOutput(system.LOW)); err != nil {
 			return err
 		}
 	}
 
 	for _, i := range []string{"111", "115", "114", "109"} {
-		if err = e.changePinMode(i, "1"); err != nil {
+		if err := e.changePinMode(i, "1"); err != nil {
 			return err
 		}
 	}
 
 	for _, i := range []string{"131", "129", "40"} {
-		if err = e.changePinMode(i, "0"); err != nil {
+		if err := e.changePinMode(i, "0"); err != nil {
 			return err
 		}
 	}
 
-	err = e.tristate.Write(system.HIGH)
-	return
+	return e.tristate.Write(system.HIGH)
 }
 
-func (e *Adaptor) arduinoI2CSetup() (err error) {
-	if err = e.tristate.Write(system.LOW); err != nil {
-		return
+func (e *Adaptor) arduinoI2CSetup() error {
+	if err := e.tristate.Write(system.LOW); err != nil {
+		return err
 	}
 
 	for _, i := range []int{14, 165, 212, 213} {
-		io := e.sys.NewDigitalPin(i)
-		if err = io.Export(); err != nil {
-			return
-		}
-		if err = io.Direction(system.IN); err != nil {
-			return
-		}
-		if err = io.Unexport(); err != nil {
-			return
+		if err := e.newUnexportedDigitalPin(i, system.WithDirectionInput()); err != nil {
+			return err
 		}
 	}
 
 	for _, i := range []int{236, 237, 204, 205} {
-		if err = e.newDigitalPin(i, system.LOW); err != nil {
+		if err := e.newUnexportedDigitalPin(i, system.WithDirectionOutput(system.LOW)); err != nil {
 			return err
 		}
 	}
 
 	for _, i := range []string{"28", "27"} {
-		if err = e.changePinMode(i, "1"); err != nil {
-			return
+		if err := e.changePinMode(i, "1"); err != nil {
+			return err
 		}
 	}
 
-	if err = e.tristate.Write(system.HIGH); err != nil {
-		return
-	}
-
-	return
-}
-
-func (e *Adaptor) newDigitalPin(i int, level int) (err error) {
-	io := e.sys.NewDigitalPin(i)
-	if err = io.Export(); err != nil {
-		return
-	}
-	if err = io.Direction(system.OUT); err != nil {
-		return
-	}
-	if err = io.Write(level); err != nil {
-		return
-	}
-	err = io.Unexport()
-	return
+	return e.tristate.Write(system.HIGH)
 }
 
 func (e *Adaptor) writeFile(path string, data []byte) (i int, err error) {
@@ -438,10 +340,63 @@ func (e *Adaptor) changePinMode(pin, mode string) error {
 	return err
 }
 
-// pinWrite sets Direction and writes level for a specific pin
-func pinWrite(pin gobot.DigitalPinner, dir string, level int) error {
-	if err := pin.Direction(dir); err != nil {
-		return err
+func (e *Adaptor) digitalPin(id string, o ...func(gobot.DigitalPinOptioner) bool) (gobot.DigitalPinner, error) {
+	i := e.pinmap[id]
+
+	err := e.ensureDigitalPin(i.pin, o...)
+	if err != nil {
+		return nil, err
 	}
-	return pin.Write(level)
+	pin := e.digitalPins[i.pin]
+	vpin, ok := pin.(gobot.DigitalPinValuer)
+	if !ok {
+		return nil, fmt.Errorf("can not determine the direction behavior")
+	}
+	dir := vpin.DirectionBehavior()
+	if i.resistor > 0 {
+		rop := system.WithDirectionOutput(system.LOW)
+		if dir == system.OUT {
+			rop = system.WithDirectionInput()
+		}
+		if err := e.ensureDigitalPin(i.resistor, rop); err != nil {
+			return nil, err
+		}
+	}
+
+	if i.levelShifter > 0 {
+		lop := system.WithDirectionOutput(system.LOW)
+		if dir == system.OUT {
+			lop = system.WithDirectionOutput(system.HIGH)
+		}
+		if err := e.ensureDigitalPin(i.levelShifter, lop); err != nil {
+			return nil, err
+		}
+	}
+
+	if len(i.mux) > 0 {
+		for _, mux := range i.mux {
+			if err := e.ensureDigitalPin(mux.pin, system.WithDirectionOutput(mux.value)); err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	return pin, nil
+}
+
+func (e *Adaptor) ensureDigitalPin(idx int, o ...func(gobot.DigitalPinOptioner) bool) error {
+	pin := e.digitalPins[idx]
+	var err error
+	if pin == nil {
+		pin, err = e.newExportedDigitalPin(idx, o...)
+		if err != nil {
+			return err
+		}
+		e.digitalPins[idx] = pin
+	} else {
+		if err := pin.ApplyOptions(o...); err != nil {
+			return err
+		}
+	}
+	return nil
 }
