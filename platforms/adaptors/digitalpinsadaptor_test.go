@@ -103,10 +103,53 @@ func TestDigitalIO(t *testing.T) {
 	mockedPaths := []string{
 		"/sys/class/gpio/export",
 		"/sys/class/gpio/unexport",
-		"/sys/class/gpio/gpio18/value",
-		"/sys/class/gpio/gpio18/direction",
+		"/sys/class/gpio/gpio25/value",
+		"/sys/class/gpio/gpio25/direction",
+	}
+	a, _ := initTestAdaptorWithMockedFilesystem(mockedPaths)
+	a.Connect()
+
+	err := a.DigitalWrite("14", 1)
+	gobottest.Assert(t, err, nil)
+
+	i, err := a.DigitalRead("14")
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, i, 1)
+}
+
+func TestDigitalRead(t *testing.T) {
+	mockedPaths := []string{
+		"/sys/class/gpio/export",
+		"/sys/class/gpio/unexport",
 		"/sys/class/gpio/gpio24/value",
 		"/sys/class/gpio/gpio24/direction",
+	}
+	a, fs := initTestAdaptorWithMockedFilesystem(mockedPaths)
+	fs.Files["/sys/class/gpio/gpio24/value"].Contents = "1"
+	i, err := a.DigitalRead("13")
+	gobottest.Assert(t, err.Error(), "not connected")
+
+	a.Connect()
+
+	i, err = a.DigitalRead("13")
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, i, 1)
+
+	fs.WithReadError = true
+	_, err = a.DigitalRead("13")
+	gobottest.Assert(t, err, errors.New("read error"))
+
+	fs.WithWriteError = true
+	_, err = a.DigitalRead("7")
+	gobottest.Assert(t, err, errors.New("write error"))
+}
+
+func TestDigitalWrite(t *testing.T) {
+	mockedPaths := []string{
+		"/sys/class/gpio/export",
+		"/sys/class/gpio/unexport",
+		"/sys/class/gpio/gpio18/value",
+		"/sys/class/gpio/gpio18/direction",
 	}
 	a, fs := initTestAdaptorWithMockedFilesystem(mockedPaths)
 	err := a.DigitalWrite("7", 1)
@@ -118,21 +161,13 @@ func TestDigitalIO(t *testing.T) {
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio18/value"].Contents, "1")
 
-	err = a.DigitalWrite("13", 1)
+	err = a.DigitalWrite("7", 1)
 	gobottest.Assert(t, err, nil)
-
-	i, err := a.DigitalRead("13")
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, i, 1)
 
 	gobottest.Assert(t, a.DigitalWrite("notexist", 1), errors.New("not a valid pin"))
 
-	fs.WithReadError = true
-	_, err = a.DigitalRead("13")
-	gobottest.Assert(t, err, errors.New("read error"))
-
 	fs.WithWriteError = true
-	_, err = a.DigitalRead("7")
+	err = a.DigitalWrite("7", 0)
 	gobottest.Assert(t, err, errors.New("write error"))
 }
 

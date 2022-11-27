@@ -8,6 +8,7 @@ import (
 	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/drivers/i2c"
+	"gobot.io/x/gobot/platforms/adaptors"
 	"gobot.io/x/gobot/system"
 )
 
@@ -27,22 +28,23 @@ type pwmPinDefinition struct {
 
 // Adaptor represents a Gobot Adaptor for the ASUS Tinker Board
 type Adaptor struct {
-	name        string
-	sys         *system.Accesser
-	mutex       sync.Mutex
-	digitalPins map[string]gobot.DigitalPinner
-	pwmPins     map[string]gobot.PWMPinner
-	i2cBuses    [5]i2c.I2cDevice
+	name  string
+	sys   *system.Accesser
+	mutex sync.Mutex
+	*adaptors.DigitalPinsAdaptor
+	pwmPins  map[string]gobot.PWMPinner
+	i2cBuses [5]i2c.I2cDevice
 }
 
 // NewAdaptor creates a Tinkerboard Adaptor
 func NewAdaptor() *Adaptor {
+	sys := system.NewAccesser("cdev")
 	c := &Adaptor{
-		name: gobot.DefaultName("Tinker Board"),
-		sys:  system.NewAccesser("cdev"),
+		name:    gobot.DefaultName("Tinker Board"),
+		sys:     sys,
+		pwmPins: make(map[string]gobot.PWMPinner),
 	}
-
-	c.setPins()
+	c.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, c.translateDigitalPin)
 	return c
 }
 
@@ -52,21 +54,19 @@ func (c *Adaptor) Name() string { return c.name }
 // SetName sets the name of the Adaptor
 func (c *Adaptor) SetName(n string) { c.name = n }
 
-// Connect do nothing at the moment
-func (c *Adaptor) Connect() error { return nil }
+// Connect create new connection to board and pins.
+func (c *Adaptor) Connect() error {
+	err := c.DigitalPinsAdaptor.Connect()
+	return err
+}
 
 // Finalize closes connection to board and pins
-func (c *Adaptor) Finalize() (err error) {
+func (c *Adaptor) Finalize() error {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
-	for _, pin := range c.digitalPins {
-		if pin != nil {
-			if e := pin.Unexport(); e != nil {
-				err = multierror.Append(err, e)
-			}
-		}
-	}
+	err := c.DigitalPinsAdaptor.Finalize()
+
 	for _, pin := range c.pwmPins {
 		if pin != nil {
 			if errs := pin.Enable(false); errs != nil {
@@ -84,40 +84,7 @@ func (c *Adaptor) Finalize() (err error) {
 			}
 		}
 	}
-	return
-}
-
-// DigitalRead reads digital value from the specified pin.
-func (c *Adaptor) DigitalRead(id string) (int, error) {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-
-	pin, err := c.digitalPin(id, system.WithDirectionInput())
-	if err != nil {
-		return 0, err
-	}
-	return pin.Read()
-}
-
-// DigitalWrite writes digital value to the specified pin.
-func (c *Adaptor) DigitalWrite(id string, val byte) error {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-
-	pin, err := c.digitalPin(id, system.WithDirectionOutput(int(val)))
-	if err != nil {
-		return err
-	}
-	return pin.Write(int(val))
-}
-
-// DigitalPin returns a digital pin. If the pin is initially acquired, it is an input.
-// Pin direction and other options can be changed afterwards by pin.ApplyOptions() at any time.
-func (c *Adaptor) DigitalPin(id string) (gobot.DigitalPinner, error) {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-
-	return c.digitalPin(id)
+	return err
 }
 
 // PwmWrite writes a PWM signal to the specified pin.
@@ -216,7 +183,7 @@ func (c *Adaptor) pwmPin(pin string) (gobot.PWMPinner, error) {
 
 	if c.pwmPins[pin] == nil {
 		var path string
-		path, err := pwmPinData.findDir(*c.sys)
+		path, err := pwmPinData.findPwmDir(*c.sys)
 		if err != nil {
 			return nil, err
 		}
@@ -296,12 +263,7 @@ func setPeriod(pwmPin gobot.PWMPinner, period uint32) error {
 	return nil
 }
 
-func (c *Adaptor) setPins() {
-	c.digitalPins = make(map[string]gobot.DigitalPinner)
-	c.pwmPins = make(map[string]gobot.PWMPinner)
-}
-
-func (c *Adaptor) translatePin(pin string) (chip string, line int, err error) {
+func (c *Adaptor) translateDigitalPin(pin string) (chip string, line int, err error) {
 	pindef, ok := gpioPinDefinitions[pin]
 	if !ok {
 		return "", -1, fmt.Errorf("Not a valid pin")
@@ -323,7 +285,7 @@ func (c *Adaptor) translatePwmPin(pin string) (pwmPin pwmPinDefinition, err erro
 	return
 }
 
-func (p pwmPinDefinition) findDir(sys system.Accesser) (dir string, err error) {
+func (p pwmPinDefinition) findPwmDir(sys system.Accesser) (dir string, err error) {
 	items, _ := sys.Find(p.dir, p.dirRegexp)
 	if items == nil || len(items) == 0 {
 		return "", fmt.Errorf("No path found for PWM directory pattern, '%s' in path '%s'. See README.md for activation", p.dirRegexp, p.dir)
@@ -339,26 +301,4 @@ func (p pwmPinDefinition) findDir(sys system.Accesser) (dir string, err error) {
 	}
 
 	return
-}
-
-func (c *Adaptor) digitalPin(id string, o ...func(gobot.DigitalPinOptioner) bool) (gobot.DigitalPinner, error) {
-	chip, line, err := c.translatePin(id)
-	if err != nil {
-		return nil, err
-	}
-
-	pin := c.digitalPins[id]
-	if pin == nil {
-		pin = c.sys.NewDigitalPin(chip, line, o...)
-		if err = pin.Export(); err != nil {
-			return nil, err
-		}
-		c.digitalPins[id] = pin
-	} else {
-		if err := pin.ApplyOptions(o...); err != nil {
-			return nil, err
-		}
-	}
-
-	return pin, nil
 }

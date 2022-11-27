@@ -4,21 +4,21 @@ import (
 	"gobot.io/x/gobot"
 )
 
-type mockDigitalPinHandler struct {
+type mockDigitalPinAccess struct {
 	fs *MockFilesystem
 }
 
 type digitalPinMock struct{}
 
-func (h *mockDigitalPinHandler) isSupported() bool { return true }
+func (h *mockDigitalPinAccess) isSupported() bool { return true }
 
-func (h *mockDigitalPinHandler) createPin(chip string, pin int,
+func (h *mockDigitalPinAccess) createPin(chip string, pin int,
 	o ...func(gobot.DigitalPinOptioner) bool) gobot.DigitalPinner {
 	dpm := &digitalPinMock{}
 	return dpm
 }
 
-func (h *mockDigitalPinHandler) setFs(fs filesystem) {
+func (h *mockDigitalPinAccess) setFs(fs filesystem) {
 	// do nothing
 	return
 }

@@ -52,14 +52,14 @@ type Accesser struct {
 
 // NewAccesser returns a accesser to native system call, native file system and the chosen digital pin access.
 // Digital pin accesser can be empty or "sysfs", otherwise it will be automatically chosen.
-func NewAccesser(digitalPinAccesser ...string) *Accesser {
+func NewAccesser(digitalPinAccess ...string) *Accesser {
 	s := Accesser{
 		sys: &nativeSyscall{},
 		fs:  &nativeFilesystem{},
 	}
 	a := "sysfs"
-	if len(digitalPinAccesser) > 0 && digitalPinAccesser[0] != "" {
-		a = digitalPinAccesser[0]
+	if len(digitalPinAccess) > 0 && digitalPinAccess[0] != "" {
+		a = digitalPinAccess[0]
 	}
 	if a != "sysfs" {
 		dpa := &gpiodDigitalPinAccess{fs: s.fs}
@@ -78,13 +78,21 @@ func NewAccesser(digitalPinAccesser ...string) *Accesser {
 	return &s
 }
 
-// UseMockDigitalPinWithMockFs sets the digital pin handler accesser to the mocked one. Used only for tests.
-func (a *Accesser) UseMockDigitalPinWithMockFs(files []string) *mockDigitalPinHandler {
+// UseDigitalPinAccessWithMockFs sets the digital pin handler accesser to the chosen one. Used only for tests.
+func (a *Accesser) UseDigitalPinAccessWithMockFs(digitalPinAccess string, files []string) digitalPinAccesser {
 	fs := newMockFilesystem(files)
-	mdph := &mockDigitalPinHandler{fs: fs}
+	var dph digitalPinAccesser
+	switch digitalPinAccess {
+	case "sysfs":
+		dph = &sysfsDigitalPinAccess{fs: fs}
+	case "cdev":
+		dph = &gpiodDigitalPinAccess{fs: fs}
+	default:
+		dph = &mockDigitalPinAccess{fs: fs}
+	}
 	a.fs = fs
-	a.digitalPinAccess = mdph
-	return mdph
+	a.digitalPinAccess = dph
+	return dph
 }
 
 // UseMockSyscall sets the Syscall implementation of the accesser to the mocked one. Used only for tests.
