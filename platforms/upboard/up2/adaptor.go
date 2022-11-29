@@ -11,6 +11,7 @@ import (
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/drivers/spi"
+	"gobot.io/x/gobot/platforms/adaptors"
 	"gobot.io/x/gobot/system"
 )
 
@@ -38,27 +39,28 @@ type sysfsPin struct {
 
 // Adaptor represents a Gobot Adaptor for the Upboard UP2
 type Adaptor struct {
-	name        string
-	sys         *system.Accesser
-	mutex       sync.Mutex
-	pinmap      map[string]sysfsPin
-	ledPath     string
-	digitalPins map[int]gobot.DigitalPinner
-	pwmPins     map[int]gobot.PWMPinner
-	i2cBuses    [6]i2c.I2cDevice
-	spiBuses    [2]spi.Connection
+	name    string
+	sys     *system.Accesser
+	mutex   sync.Mutex
+	pinmap  map[string]sysfsPin
+	ledPath string
+	*adaptors.DigitalPinsAdaptor
+	pwmPins  map[int]gobot.PWMPinner
+	i2cBuses [6]i2c.I2cDevice
+	spiBuses [2]spi.Connection
 }
 
 // NewAdaptor creates a UP2 Adaptor
 func NewAdaptor() *Adaptor {
+	sys := system.NewAccesser()
 	c := &Adaptor{
-		name:        gobot.DefaultName("UP2"),
-		sys:         system.NewAccesser(),
-		ledPath:     "/sys/class/leds/upboard:%s:/brightness",
-		digitalPins: make(map[int]gobot.DigitalPinner),
-		pwmPins:     make(map[int]gobot.PWMPinner),
-		pinmap:      fixedPins,
+		name:    gobot.DefaultName("UP2"),
+		sys:     sys,
+		ledPath: "/sys/class/leds/upboard:%s:/brightness",
+		pwmPins: make(map[int]gobot.PWMPinner),
+		pinmap:  fixedPins,
 	}
+	c.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, c.translateDigitalPin)
 	return c
 }
 
@@ -68,21 +70,19 @@ func (c *Adaptor) Name() string { return c.name }
 // SetName sets the name of the Adaptor
 func (c *Adaptor) SetName(n string) { c.name = n }
 
-// Connect do nothing at the moment
-func (c *Adaptor) Connect() error { return nil }
+// Connect create new connection to board and pins.
+func (c *Adaptor) Connect() error {
+	err := c.DigitalPinsAdaptor.Connect()
+	return err
+}
 
 // Finalize closes connection to board and pins
-func (c *Adaptor) Finalize() (err error) {
+func (c *Adaptor) Finalize() error {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
-	for _, pin := range c.digitalPins {
-		if pin != nil {
-			if e := pin.Unexport(); e != nil {
-				err = multierror.Append(err, e)
-			}
-		}
-	}
+	err := c.DigitalPinsAdaptor.Finalize()
+
 	for _, pin := range c.pwmPins {
 		if pin != nil {
 			if errs := pin.Enable(false); errs != nil {
@@ -108,19 +108,7 @@ func (c *Adaptor) Finalize() (err error) {
 		}
 	}
 
-	return
-}
-
-// DigitalRead reads digital value from the specified pin.
-func (c *Adaptor) DigitalRead(id string) (int, error) {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-
-	pin, err := c.digitalPin(id, system.WithDirectionInput())
-	if err != nil {
-		return 0, err
-	}
-	return pin.Read()
+	return err
 }
 
 // DigitalWrite writes digital value to the specified pin.
@@ -131,29 +119,16 @@ func (c *Adaptor) DigitalWrite(id string, val byte) error {
 	// is it one of the built-in LEDs?
 	if id == LEDRed || id == LEDBlue || id == LEDGreen || id == LEDYellow {
 		pinPath := fmt.Sprintf(c.ledPath, id)
-		fi, e := c.sys.OpenFile(pinPath, os.O_WRONLY|os.O_APPEND, 0666)
+		fi, err := c.sys.OpenFile(pinPath, os.O_WRONLY|os.O_APPEND, 0666)
 		defer fi.Close()
-		if e != nil {
-			return e
+		if err != nil {
+			return err
 		}
-		_, err := fi.WriteString(strconv.Itoa(int(val)))
+		_, err = fi.WriteString(strconv.Itoa(int(val)))
 		return err
 	}
 
-	pin, err := c.digitalPin(id, system.WithDirectionOutput(int(val)))
-	if err != nil {
-		return err
-	}
-	return pin.Write(int(val))
-}
-
-// DigitalPin returns a digital pin. If the pin is initially acquired, it is an input.
-// Pin direction and other options can be changed afterwards by pin.ApplyOptions() at any time.
-func (c *Adaptor) DigitalPin(id string) (gobot.DigitalPinner, error) {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-
-	return c.digitalPin(id)
+	return c.DigitalPinsAdaptor.DigitalWrite(id, val)
 }
 
 // PwmWrite writes a PWM signal to the specified pin
@@ -184,28 +159,6 @@ func (c *Adaptor) ServoWrite(pin string, angle byte) (err error) {
 	const maxDuty = 100 * 0.0020 * pwmPeriod
 	duty := uint32(gobot.ToScale(gobot.FromScale(float64(angle), 0, 180), minDuty, maxDuty))
 	return pwmPin.SetDutyCycle(duty)
-}
-
-func (c *Adaptor) digitalPin(id string, o ...func(gobot.DigitalPinOptioner) bool) (gobot.DigitalPinner, error) {
-	i, err := c.translatePin(id)
-	if err != nil {
-		return nil, err
-	}
-
-	pin := c.digitalPins[i]
-	if pin == nil {
-		pin = c.sys.NewDigitalPin("", i, o...)
-		if err = pin.Export(); err != nil {
-			return nil, err
-		}
-		c.digitalPins[i] = pin
-	} else {
-		if err := pin.ApplyOptions(o...); err != nil {
-			return nil, err
-		}
-	}
-
-	return pin, nil
 }
 
 // PWMPin returns matched pwmPin for specified pin number
@@ -307,13 +260,13 @@ func (c *Adaptor) GetSpiDefaultMaxSpeed() int64 {
 	return 500000
 }
 
-func (c *Adaptor) translatePin(pin string) (i int, err error) {
+func (c *Adaptor) translateDigitalPin(pin string) (chip string, line int, err error) {
 	if val, ok := c.pinmap[pin]; ok {
-		i = val.pin
+		line = val.pin
 	} else {
-		err = errors.New("Not a valid pin")
+		return "", -1, errors.New("Not a valid pin")
 	}
-	return
+	return "", line, nil
 }
 
 func (c *Adaptor) translatePwmPin(pin string) (i int, err error) {

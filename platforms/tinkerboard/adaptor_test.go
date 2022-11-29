@@ -67,7 +67,9 @@ func preparePwmFs(fs *system.MockFilesystem) {
 func initTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *system.MockFilesystem) {
 	a := NewAdaptor()
 	fs := a.sys.UseMockFilesystem(mockPaths)
-	a.Connect()
+	if err := a.Connect(); err != nil {
+		panic(err)
+	}
 	return a, fs
 }
 
