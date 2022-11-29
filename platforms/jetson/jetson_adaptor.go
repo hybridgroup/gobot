@@ -207,18 +207,15 @@ func (c *Adaptor) getI2cBus(bus int) (_ i2c.I2cDevice, err error) {
 }
 
 func (c *Adaptor) translateDigitalPin(pin string) (chip string, line int, err error) {
-	if val, ok := gpioPins[pin]; ok {
-		line = val
-	} else {
-		return "", -1, errors.New("Not a valid pin")
+	if line, ok := gpioPins[pin]; ok {
+		return "", line, nil
 	}
-	return "", line, nil
+	return "", -1, errors.New("Not a valid pin")
 }
 
 func (c *Adaptor) translatePwmPin(pin string) (fn string, err error) {
 	if fn, ok := pwmPins[pin]; ok {
 		return fn, nil
-	} else {
-		return "", errors.New("Not a valid pin")
 	}
+	return "", errors.New("Not a valid pin")
 }
