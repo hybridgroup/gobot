@@ -29,6 +29,9 @@ var _ spi.Connector = (*Adaptor)(nil)
 func initTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *system.MockFilesystem) {
 	a := NewAdaptor()
 	fs := a.sys.UseMockFilesystem(mockPaths)
+	if err := a.Connect(); err != nil {
+		panic(err)
+	}
 	return a, fs
 }
 

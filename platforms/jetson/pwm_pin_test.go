@@ -19,13 +19,10 @@ func TestPwmPin(t *testing.T) {
 		"/sys/class/pwm/pwmchip0/pwm0/enable",
 		"/sys/class/pwm/pwmchip0/pwm0/period",
 		"/sys/class/pwm/pwmchip0/pwm0/duty_cycle",
-		"/sys/class/pwm/pwmchip0/pwm2/enable",
-		"/sys/class/pwm/pwmchip0/pwm2/period",
-		"/sys/class/pwm/pwmchip0/pwm2/duty_cycle",
 	}
 	a.UseMockFilesystem(mockPaths)
 
-	pin, err := NewPWMPin(a, "/sys/class/pwm/pwmchip0", "32")
+	pin := NewPWMPin(a, "/sys/class/pwm/pwmchip0", "0")
 	gobottest.Assert(t, pin.Export(), nil)
 	gobottest.Assert(t, pin.Enable(true), nil)
 	val, _ := pin.Polarity()

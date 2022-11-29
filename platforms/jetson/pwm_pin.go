@@ -20,7 +20,6 @@ const (
 type PWMPin struct {
 	sys    *system.Accesser
 	path   string
-	pin    string
 	fn     string
 	dc     uint32
 	period uint32
@@ -28,19 +27,13 @@ type PWMPin struct {
 
 // NewPWMPin returns a new PWMPin
 // pin32 pwm0, pin33 pwm2
-func NewPWMPin(sys *system.Accesser, path string, pin string) (p *PWMPin, err error) {
-	if val, ok := pwms[pin]; ok {
-		p = &PWMPin{
-			sys:  sys,
-			path: path,
-			pin:  pin,
-			fn:   val,
-		}
-	} else {
-		err = errors.New("Not a valid pin")
+func NewPWMPin(sys *system.Accesser, path string, fn string) *PWMPin {
+	p := &PWMPin{
+		sys:  sys,
+		path: path,
+		fn:   fn,
 	}
-
-	return
+	return p
 }
 
 // Export exports the pin for use by the Jetson Nano
