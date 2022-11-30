@@ -100,7 +100,7 @@ func TestDigitalIO(t *testing.T) {
 	i, _ := a.DigitalRead("TWI2-SDA")
 	gobottest.Assert(t, i, 1)
 
-	gobottest.Assert(t, a.DigitalWrite("XIO-P10", 1), errors.New("Not a valid pin"))
+	gobottest.Assert(t, a.DigitalWrite("XIO-P10", 1), errors.New("'XIO-P10' is not a valid id for a digital pin"))
 	gobottest.Assert(t, a.Finalize(), nil)
 }
 
@@ -115,7 +115,7 @@ func TestProDigitalIO(t *testing.T) {
 	i, _ := a.DigitalRead("TWI2-SDA")
 	gobottest.Assert(t, i, 1)
 
-	gobottest.Assert(t, a.DigitalWrite("XIO-P0", 1), errors.New("Not a valid pin"))
+	gobottest.Assert(t, a.DigitalWrite("XIO-P0", 1), errors.New("'XIO-P0' is not a valid id for a digital pin"))
 	gobottest.Assert(t, a.Finalize(), nil)
 }
 

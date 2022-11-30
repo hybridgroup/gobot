@@ -1,7 +1,6 @@
 package dragonboard
 
 import (
-	"errors"
 	"fmt"
 	"sync"
 
@@ -108,9 +107,9 @@ func (c *Adaptor) GetDefaultBus() int {
 	return 0
 }
 
-func (c *Adaptor) translateDigitalPin(id string) (chip string, line int, err error) {
+func (c *Adaptor) translateDigitalPin(id string) (string, int, error) {
 	if line, ok := c.pinMap[id]; ok {
 		return "", line, nil
 	}
-	return "", -1, errors.New("Not a valid pin")
+	return "", -1, fmt.Errorf("'%s' is not a valid id for a digital pin", id)
 }

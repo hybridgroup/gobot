@@ -104,7 +104,7 @@ func Test_translateDigitalPin(t *testing.T) {
 			pin:      "99",
 			wantChip: "",
 			wantLine: -1,
-			wantErr:  fmt.Errorf("Not a valid pin"),
+			wantErr:  fmt.Errorf("'99' is not a valid id for a digital pin"),
 		},
 	}
 	for name, tc := range tests {
@@ -133,7 +133,7 @@ func TestDigitalIO(t *testing.T) {
 	i, _ := a.DigitalRead("10")
 	gobottest.Assert(t, i, 1)
 
-	gobottest.Assert(t, a.DigitalWrite("99", 1), errors.New("Not a valid pin"))
+	gobottest.Assert(t, a.DigitalWrite("99", 1), errors.New("'99' is not a valid id for a digital pin"))
 	gobottest.Assert(t, a.Finalize(), nil)
 }
 

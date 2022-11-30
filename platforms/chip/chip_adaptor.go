@@ -218,9 +218,9 @@ func getXIOBase() (baseAddr int, err error) {
 	return baseAddr, nil
 }
 
-func (c *Adaptor) translateDigitalPin(id string) (chip string, line int, err error) {
+func (c *Adaptor) translateDigitalPin(id string) (string, int, error) {
 	if val, ok := c.pinmap[id]; ok {
 		return "", val.pin, nil
 	}
-	return "", -1, errors.New("Not a valid pin")
+	return "", -1, fmt.Errorf("'%s' is not a valid id for a digital pin", id)
 }

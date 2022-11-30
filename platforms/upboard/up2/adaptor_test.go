@@ -75,7 +75,7 @@ func TestDigitalIO(t *testing.T) {
 		"1",
 	)
 
-	gobottest.Assert(t, a.DigitalWrite("99", 1), errors.New("Not a valid pin"))
+	gobottest.Assert(t, a.DigitalWrite("99", 1), errors.New("'99' is not a valid id for a digital pin"))
 	gobottest.Assert(t, a.Finalize(), nil)
 }
 

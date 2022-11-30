@@ -52,7 +52,7 @@ func TestDigitalIO(t *testing.T) {
 	i, _ := a.DigitalRead("GPIO_A")
 	gobottest.Assert(t, i, 1)
 
-	gobottest.Assert(t, a.DigitalWrite("GPIO_M", 1), errors.New("Not a valid pin"))
+	gobottest.Assert(t, a.DigitalWrite("GPIO_M", 1), errors.New("'GPIO_M' is not a valid id for a digital pin"))
 	gobottest.Assert(t, a.Finalize(), nil)
 }
 

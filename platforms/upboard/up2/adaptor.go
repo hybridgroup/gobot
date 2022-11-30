@@ -260,13 +260,11 @@ func (c *Adaptor) GetSpiDefaultMaxSpeed() int64 {
 	return 500000
 }
 
-func (c *Adaptor) translateDigitalPin(pin string) (chip string, line int, err error) {
-	if val, ok := c.pinmap[pin]; ok {
-		line = val.pin
-	} else {
-		return "", -1, errors.New("Not a valid pin")
+func (c *Adaptor) translateDigitalPin(id string) (string, int, error) {
+	if val, ok := c.pinmap[id]; ok {
+		return "", val.pin, nil
 	}
-	return "", line, nil
+	return "", -1, fmt.Errorf("'%s' is not a valid id for a digital pin", id)
 }
 
 func (c *Adaptor) translatePwmPin(pin string) (i int, err error) {

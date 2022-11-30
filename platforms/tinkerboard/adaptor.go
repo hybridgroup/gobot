@@ -263,17 +263,16 @@ func setPeriod(pwmPin gobot.PWMPinner, period uint32) error {
 	return nil
 }
 
-func (c *Adaptor) translateDigitalPin(pin string) (chip string, line int, err error) {
-	pindef, ok := gpioPinDefinitions[pin]
+func (c *Adaptor) translateDigitalPin(id string) (string, int, error) {
+	pindef, ok := gpioPinDefinitions[id]
 	if !ok {
-		return "", -1, fmt.Errorf("Not a valid pin")
+		return "", -1, fmt.Errorf("'%s' is not a valid id for a digital pin", id)
 	}
-
 	if c.sys.IsSysfsDigitalPinAccess() {
 		return "", pindef.sysfs, nil
 	}
-	chip = fmt.Sprintf("gpiochip%d", pindef.cdev.chip)
-	line = int(pindef.cdev.line)
+	chip := fmt.Sprintf("gpiochip%d", pindef.cdev.chip)
+	line := int(pindef.cdev.line)
 	return chip, line, nil
 }
 
