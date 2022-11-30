@@ -8,6 +8,7 @@ import (
 	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/drivers/i2c"
+	"gobot.io/x/gobot/platforms/adaptors"
 	"gobot.io/x/gobot/system"
 )
 
@@ -18,51 +19,48 @@ type sysfsPin struct {
 
 // Adaptor represents an Intel Joule
 type Adaptor struct {
-	name        string
-	sys         *system.Accesser
-	mutex       sync.Mutex
-	digitalPins map[int]gobot.DigitalPinner
-	pwmPins     map[int]gobot.PWMPinner
-	i2cBuses    [3]i2c.I2cDevice
+	name  string
+	sys   *system.Accesser
+	mutex sync.Mutex
+	*adaptors.DigitalPinsAdaptor
+	pwmPins  map[int]gobot.PWMPinner
+	i2cBuses [3]i2c.I2cDevice
 }
 
 // NewAdaptor returns a new Joule Adaptor
 func NewAdaptor() *Adaptor {
-	return &Adaptor{
+	sys := system.NewAccesser()
+	c := &Adaptor{
 		name: gobot.DefaultName("Joule"),
-		sys:  system.NewAccesser(),
+		sys:  sys,
 	}
+	c.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, c.translateDigitalPin)
+	return c
 }
 
 // Name returns the Adaptors name
-func (e *Adaptor) Name() string { return e.name }
+func (c *Adaptor) Name() string { return c.name }
 
 // SetName sets the Adaptors name
-func (e *Adaptor) SetName(n string) { e.name = n }
+func (c *Adaptor) SetName(n string) { c.name = n }
 
-// Connect initializes the Joule for use with the Arduino beakout board
-func (e *Adaptor) Connect() (err error) {
-	e.mutex.Lock()
-	defer e.mutex.Unlock()
+// Connect initializes the Joule for use with the Arduino breakout board
+func (c *Adaptor) Connect() error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 
-	e.digitalPins = make(map[int]gobot.DigitalPinner)
-	e.pwmPins = make(map[int]gobot.PWMPinner)
-	return
+	c.pwmPins = make(map[int]gobot.PWMPinner)
+	return c.DigitalPinsAdaptor.Connect()
 }
 
 // Finalize releases all i2c devices and exported digital and pwm pins.
-func (e *Adaptor) Finalize() (err error) {
-	e.mutex.Lock()
-	defer e.mutex.Unlock()
+func (c *Adaptor) Finalize() error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 
-	for _, pin := range e.digitalPins {
-		if pin != nil {
-			if errs := pin.Unexport(); errs != nil {
-				err = multierror.Append(err, errs)
-			}
-		}
-	}
-	for _, pin := range e.pwmPins {
+	err := c.DigitalPinsAdaptor.Finalize()
+
+	for _, pin := range c.pwmPins {
 		if pin != nil {
 			if errs := pin.Enable(false); errs != nil {
 				err = multierror.Append(err, errs)
@@ -72,53 +70,19 @@ func (e *Adaptor) Finalize() (err error) {
 			}
 		}
 	}
-	for _, bus := range e.i2cBuses {
+	for _, bus := range c.i2cBuses {
 		if bus != nil {
 			if errs := bus.Close(); errs != nil {
 				err = multierror.Append(err, errs)
 			}
 		}
 	}
-	return
-}
-
-// DigitalRead reads digital value from pin
-func (e *Adaptor) DigitalRead(id string) (int, error) {
-	e.mutex.Lock()
-	defer e.mutex.Unlock()
-
-	pin, err := e.digitalPin(id, system.WithDirectionInput())
-	if err != nil {
-		return 0, err
-	}
-	return pin.Read()
-}
-
-// DigitalWrite writes a value to the pin. Acceptable values are 1 or 0.
-func (e *Adaptor) DigitalWrite(id string, val byte) error {
-	e.mutex.Lock()
-	defer e.mutex.Unlock()
-
-	pin, err := e.digitalPin(id, system.WithDirectionOutput(int(val)))
-	if err != nil {
-		return err
-	}
-
-	return pin.Write(int(val))
-}
-
-// DigitalPin returns a digital pin. If the pin is initially acquired, it is an input.
-// Pin direction and other options can be changed afterwards by pin.ApplyOptions() at any time.
-func (e *Adaptor) DigitalPin(id string) (gobot.DigitalPinner, error) {
-	e.mutex.Lock()
-	defer e.mutex.Unlock()
-
-	return e.digitalPin(id)
+	return err
 }
 
 // PwmWrite writes the 0-254 value to the specified pin
-func (e *Adaptor) PwmWrite(pin string, val byte) (err error) {
-	pwmPin, err := e.PWMPin(pin)
+func (c *Adaptor) PwmWrite(pin string, val byte) (err error) {
+	pwmPin, err := c.PWMPin(pin)
 	if err != nil {
 		return
 	}
@@ -130,30 +94,30 @@ func (e *Adaptor) PwmWrite(pin string, val byte) (err error) {
 	return pwmPin.SetDutyCycle(uint32(float64(period) * duty))
 }
 
-// PWMPin returns a sys.PWMPin
-func (e *Adaptor) PWMPin(pin string) (gobot.PWMPinner, error) {
-	e.mutex.Lock()
-	defer e.mutex.Unlock()
+// PWMPin returns a PWM pin, implements the interface gobot.PWMPinnerProvider
+func (c *Adaptor) PWMPin(pin string) (gobot.PWMPinner, error) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 
 	sysPin, ok := sysfsPinMap[pin]
 	if !ok {
 		return nil, errors.New("Not a valid pin")
 	}
 	if sysPin.pwmPin != -1 {
-		if e.pwmPins[sysPin.pwmPin] == nil {
-			e.pwmPins[sysPin.pwmPin] = e.sys.NewPWMPin("/sys/class/pwm/pwmchip0", sysPin.pwmPin)
-			if err := e.pwmPins[sysPin.pwmPin].Export(); err != nil {
+		if c.pwmPins[sysPin.pwmPin] == nil {
+			c.pwmPins[sysPin.pwmPin] = c.sys.NewPWMPin("/sys/class/pwm/pwmchip0", sysPin.pwmPin)
+			if err := c.pwmPins[sysPin.pwmPin].Export(); err != nil {
 				return nil, err
 			}
-			if err := e.pwmPins[sysPin.pwmPin].SetPeriod(10000000); err != nil {
+			if err := c.pwmPins[sysPin.pwmPin].SetPeriod(10000000); err != nil {
 				return nil, err
 			}
-			if err := e.pwmPins[sysPin.pwmPin].Enable(true); err != nil {
+			if err := c.pwmPins[sysPin.pwmPin].Enable(true); err != nil {
 				return nil, err
 			}
 		}
 
-		return e.pwmPins[sysPin.pwmPin], nil
+		return c.pwmPins[sysPin.pwmPin], nil
 	}
 
 	return nil, errors.New("Not a PWM pin")
@@ -161,35 +125,24 @@ func (e *Adaptor) PWMPin(pin string) (gobot.PWMPinner, error) {
 
 // GetConnection returns an i2c connection to a device on a specified bus.
 // Valid bus number is [0..2] which corresponds to /dev/i2c-0 through /dev/i2c-2.
-func (e *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection, err error) {
+func (c *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection, err error) {
 	if (bus < 0) || (bus > 2) {
 		return nil, fmt.Errorf("Bus number %d out of range", bus)
 	}
-	if e.i2cBuses[bus] == nil {
-		e.i2cBuses[bus], err = e.sys.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
+	if c.i2cBuses[bus] == nil {
+		c.i2cBuses[bus], err = c.sys.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
 	}
-	return i2c.NewConnection(e.i2cBuses[bus], address), err
+	return i2c.NewConnection(c.i2cBuses[bus], address), err
 }
 
 // GetDefaultBus returns the default i2c bus for this platform
-func (e *Adaptor) GetDefaultBus() int {
+func (c *Adaptor) GetDefaultBus() int {
 	return 0
 }
 
-func (e *Adaptor) digitalPin(id string, o ...func(gobot.DigitalPinOptioner) bool) (gobot.DigitalPinner, error) {
-	i := sysfsPinMap[id]
-	pin := e.digitalPins[i.pin]
-
-	if pin == nil {
-		pin = e.sys.NewDigitalPin("", i.pin, o...)
-		if err := pin.Export(); err != nil {
-			return nil, err
-		}
-		e.digitalPins[i.pin] = pin
-	} else {
-		if err := pin.ApplyOptions(o...); err != nil {
-			return nil, err
-		}
+func (c *Adaptor) translateDigitalPin(id string) (string, int, error) {
+	if val, ok := sysfsPinMap[id]; ok {
+		return "", val.pin, nil
 	}
-	return pin, nil
+	return "", -1, fmt.Errorf("'%s' is not a valid id for a digital pin", id)
 }
