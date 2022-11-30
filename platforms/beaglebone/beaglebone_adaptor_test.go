@@ -44,20 +44,16 @@ func initTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *system.
 			return pinPath, nil
 		}
 	}
-
+	if err := a.Connect(); err != nil {
+		panic(err)
+	}
 	return a, fs
 }
 
-func TestGeneral(t *testing.T) {
+func TestPWM(t *testing.T) {
 	mockPaths := []string{
-		"/dev/i2c-2",
-		"/sys/devices/platform/bone_capemgr",
-		"/sys/devices/platform/ocp/ocp:P8_07_pinmux/state",
-		"/sys/devices/platform/ocp/ocp:P9_11_pinmux/state",
-		"/sys/devices/platform/ocp/ocp:P9_12_pinmux/state",
 		"/sys/devices/platform/ocp/ocp:P9_22_pinmux/state",
 		"/sys/devices/platform/ocp/ocp:P9_21_pinmux/state",
-		"/sys/class/leds/beaglebone:green:usr1/brightness",
 		"/sys/bus/iio/devices/iio:device0/in_voltage1_raw",
 		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/export",
 		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/unexport",
@@ -69,21 +65,10 @@ func TestGeneral(t *testing.T) {
 		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/period",
 		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/duty_cycle",
 		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/polarity",
-		"/sys/class/gpio/export",
-		"/sys/class/gpio/unexport",
-		"/sys/class/gpio/gpio60/value",
-		"/sys/class/gpio/gpio60/direction",
-		"/sys/class/gpio/gpio66/value",
-		"/sys/class/gpio/gpio66/direction",
-		"/sys/class/gpio/gpio10/value",
-		"/sys/class/gpio/gpio10/direction",
-		"/sys/class/gpio/gpio30/value",
-		"/sys/class/gpio/gpio30/direction",
 	}
 
 	a, fs := initTestAdaptorWithMockedFilesystem(mockPaths)
 
-	// PWM
 	gobottest.Assert(t, a.PwmWrite("P9_99", 175), errors.New("Not a valid PWM pin"))
 	a.PwmWrite("P9_21", 175)
 	gobottest.Assert(
@@ -118,7 +103,16 @@ func TestGeneral(t *testing.T) {
 	gobottest.Assert(t, strings.Contains(a.PwmWrite("P9_22", 175).Error(), "write error"), true)
 	fs.WithWriteError = false
 
-	// Analog
+	gobottest.Assert(t, a.Finalize(), nil)
+}
+
+func TestAnalog(t *testing.T) {
+	mockPaths := []string{
+		"/sys/bus/iio/devices/iio:device0/in_voltage1_raw",
+	}
+
+	a, fs := initTestAdaptorWithMockedFilesystem(mockPaths)
+
 	fs.Files["/sys/bus/iio/devices/iio:device0/in_voltage1_raw"].Contents = "567\n"
 	i, err := a.AnalogRead("P9_40")
 	gobottest.Assert(t, i, 567)
@@ -132,6 +126,29 @@ func TestGeneral(t *testing.T) {
 	gobottest.Assert(t, err, errors.New("read error"))
 	fs.WithReadError = false
 
+	gobottest.Assert(t, a.Finalize(), nil)
+}
+
+func TestDigitalIO(t *testing.T) {
+	mockPaths := []string{
+		"/sys/devices/platform/ocp/ocp:P8_07_pinmux/state",
+		"/sys/devices/platform/ocp/ocp:P9_11_pinmux/state",
+		"/sys/devices/platform/ocp/ocp:P9_12_pinmux/state",
+		"/sys/class/leds/beaglebone:green:usr1/brightness",
+		"/sys/class/gpio/export",
+		"/sys/class/gpio/unexport",
+		"/sys/class/gpio/gpio60/value",
+		"/sys/class/gpio/gpio60/direction",
+		"/sys/class/gpio/gpio66/value",
+		"/sys/class/gpio/gpio66/direction",
+		"/sys/class/gpio/gpio10/value",
+		"/sys/class/gpio/gpio10/direction",
+		"/sys/class/gpio/gpio30/value",
+		"/sys/class/gpio/gpio30/direction",
+	}
+
+	a, fs := initTestAdaptorWithMockedFilesystem(mockPaths)
+
 	// DigitalIO
 	a.DigitalWrite("usr1", 1)
 	gobottest.Assert(t,
@@ -140,33 +157,28 @@ func TestGeneral(t *testing.T) {
 	)
 
 	// no such LED
-	err = a.DigitalWrite("usr10101", 1)
+	err := a.DigitalWrite("usr10101", 1)
 	gobottest.Assert(t, err.Error(), " : /sys/class/leds/beaglebone:green:usr10101/brightness: No such file.")
 
 	a.DigitalWrite("P9_12", 1)
 	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio60/value"].Contents, "1")
 
-	gobottest.Assert(t, a.DigitalWrite("P9_99", 1), errors.New("Not a valid pin"))
+	gobottest.Assert(t, a.DigitalWrite("P9_99", 1), errors.New("'P9_99' is not a valid id for a digital pin"))
 
 	_, err = a.DigitalRead("P9_99")
-	gobottest.Assert(t, err, errors.New("Not a valid pin"))
+	gobottest.Assert(t, err, errors.New("'P9_99' is not a valid id for a digital pin"))
 
 	fs.Files["/sys/class/gpio/gpio66/value"].Contents = "1"
-	i, err = a.DigitalRead("P8_07")
+	i, err := a.DigitalRead("P8_07")
 	gobottest.Assert(t, i, 1)
 	gobottest.Assert(t, err, nil)
 
-	fs.WithReadError = true
-	_, err = a.DigitalRead("P8_07")
-	gobottest.Assert(t, err, errors.New("read error"))
-	fs.WithReadError = false
+	gobottest.Assert(t, a.Finalize(), nil)
+}
 
-	fs.WithWriteError = true
-	_, err = a.DigitalRead("P9_11")
-	gobottest.Assert(t, err, errors.New("write error"))
-	fs.WithWriteError = false
+func TestI2c(t *testing.T) {
+	a, _ := initTestAdaptorWithMockedFilesystem([]string{"/dev/i2c-2"})
 
-	// I2c
 	a.sys.UseMockSyscall()
 
 	con, err := a.GetConnection(0xff, 2)
