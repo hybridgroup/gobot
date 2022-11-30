@@ -72,6 +72,9 @@ func (c *Adaptor) SetName(n string) { c.name = n }
 
 // Connect create new connection to board and pins.
 func (c *Adaptor) Connect() error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	err := c.DigitalPinsAdaptor.Connect()
 	return err
 }

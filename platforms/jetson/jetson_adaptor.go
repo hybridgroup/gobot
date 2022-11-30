@@ -15,7 +15,7 @@ import (
 
 const pwmDefaultPeriod = 3000000
 
-// Adaptor is the Gobot Adaptor for the Jetson Nano
+// Adaptor is the Gobot adaptor for the Jetson Nano
 type Adaptor struct {
 	name  string
 	sys   *system.Accesser
@@ -26,7 +26,7 @@ type Adaptor struct {
 	spiDevices [2]spi.Connection
 }
 
-// NewAdaptor creates a Raspi Adaptor
+// NewAdaptor creates a Jetson Nano adaptor
 func NewAdaptor() *Adaptor {
 	sys := system.NewAccesser()
 	c := &Adaptor{
@@ -56,6 +56,9 @@ func (c *Adaptor) SetName(n string) {
 
 // Connect create new connection to board and pins.
 func (c *Adaptor) Connect() error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	err := c.DigitalPinsAdaptor.Connect()
 	return err
 }
