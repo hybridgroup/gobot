@@ -142,16 +142,16 @@ func TestInvalidPWMPin(t *testing.T) {
 	preparePwmFs(fs)
 
 	err := a.PwmWrite("666", 42)
-	gobottest.Assert(t, err.Error(), "Not a valid PWM pin")
+	gobottest.Assert(t, err.Error(), "'666' is not a valid id for a PWM pin")
 
 	err = a.ServoWrite("666", 120)
-	gobottest.Assert(t, err.Error(), "Not a valid PWM pin")
+	gobottest.Assert(t, err.Error(), "'666' is not a valid id for a PWM pin")
 
 	err = a.PwmWrite("3", 42)
-	gobottest.Assert(t, err.Error(), "Not a valid PWM pin")
+	gobottest.Assert(t, err.Error(), "'3' is not a valid id for a PWM pin")
 
 	err = a.ServoWrite("3", 120)
-	gobottest.Assert(t, err.Error(), "Not a valid PWM pin")
+	gobottest.Assert(t, err.Error(), "'3' is not a valid id for a PWM pin")
 }
 
 func TestPwmWrite(t *testing.T) {
@@ -177,24 +177,6 @@ func TestPwmWrite(t *testing.T) {
 
 	gobottest.Assert(t, fs.Files[pwm2DutyCyclePath].Contents, "2000000")
 	gobottest.Assert(t, a.Finalize(), nil)
-}
-
-func TestPwmWriteError(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem(pwmMockPaths)
-	preparePwmFs(fs)
-	fs.WithWriteError = true
-
-	err := a.PwmWrite("33", 100)
-	gobottest.Assert(t, strings.Contains(err.Error(), "write error"), true)
-}
-
-func TestPwmWriteReadError(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem(pwmMockPaths)
-	preparePwmFs(fs)
-	fs.WithReadError = true
-
-	err := a.PwmWrite("33", 100)
-	gobottest.Assert(t, strings.Contains(err.Error(), "read error"), true)
 }
 
 func TestSetPeriod(t *testing.T) {

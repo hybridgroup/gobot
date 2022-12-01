@@ -21,14 +21,17 @@ var _ gobot.DigitalPinnerProvider = (*DigitalPinsAdaptor)(nil)
 var _ gpio.DigitalReader = (*DigitalPinsAdaptor)(nil)
 var _ gpio.DigitalWriter = (*DigitalPinsAdaptor)(nil)
 
-func initTestAdaptorWithMockedFilesystem(mockPaths []string) (*DigitalPinsAdaptor, *system.MockFilesystem) {
+func initTestDigitalPinsAdaptorWithMockedFilesystem(mockPaths []string) (*DigitalPinsAdaptor, *system.MockFilesystem) {
 	sys := system.NewAccesser()
 	fs := sys.UseMockFilesystem(mockPaths)
-	a := NewDigitalPinsAdaptor(sys, testTranslator)
+	a := NewDigitalPinsAdaptor(sys, testDigitalPinTranslator)
+	if err := a.Connect(); err != nil {
+		panic(err)
+	}
 	return a, fs
 }
 
-func testTranslator(pin string) (string, int, error) {
+func testDigitalPinTranslator(pin string) (string, int, error) {
 	line, err := strconv.Atoi(pin)
 	if err != nil {
 		return "", 0, fmt.Errorf("not a valid pin")
@@ -37,19 +40,26 @@ func testTranslator(pin string) (string, int, error) {
 	return "", line, err
 }
 
-func TestConnect(t *testing.T) {
+func TestDigitalPinsConnect(t *testing.T) {
 	translate := func(pin string) (chip string, line int, err error) { return }
 	sys := system.NewAccesser()
 
 	a := NewDigitalPinsAdaptor(sys, translate)
 	gobottest.Assert(t, a.pins, (map[string]gobot.DigitalPinner)(nil))
 
-	a.Connect()
+	_, err := a.DigitalRead("13")
+	gobottest.Assert(t, err.Error(), "not connected")
+
+	err = a.DigitalWrite("7", 1)
+	gobottest.Assert(t, err.Error(), "not connected")
+
+	err = a.Connect()
+	gobottest.Assert(t, err, nil)
 	gobottest.Refute(t, a.pins, (map[string]gobot.DigitalPinner)(nil))
 	gobottest.Assert(t, len(a.pins), 0)
 }
 
-func TestFinalize(t *testing.T) {
+func TestDigitalPinsFinalize(t *testing.T) {
 	// arrange
 	mockedPaths := []string{
 		"/sys/class/gpio/export",
@@ -57,7 +67,7 @@ func TestFinalize(t *testing.T) {
 		"/sys/class/gpio/gpio14/direction",
 		"/sys/class/gpio/gpio14/value",
 	}
-	a, fs := initTestAdaptorWithMockedFilesystem(mockedPaths)
+	a, fs := initTestDigitalPinsAdaptorWithMockedFilesystem(mockedPaths)
 	// assert that finalize before connect is working
 	gobottest.Assert(t, a.Finalize(), nil)
 	// arrange
@@ -79,7 +89,7 @@ func TestFinalize(t *testing.T) {
 	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/unexport: No such file"), true)
 }
 
-func TestReConnect(t *testing.T) {
+func TestDigitalPinsReConnect(t *testing.T) {
 	// arrange
 	mockedPaths := []string{
 		"/sys/class/gpio/export",
@@ -87,8 +97,7 @@ func TestReConnect(t *testing.T) {
 		"/sys/class/gpio/gpio15/direction",
 		"/sys/class/gpio/gpio15/value",
 	}
-	a, _ := initTestAdaptorWithMockedFilesystem(mockedPaths)
-	a.Connect()
+	a, _ := initTestDigitalPinsAdaptorWithMockedFilesystem(mockedPaths)
 	gobottest.Assert(t, a.DigitalWrite("4", 1), nil)
 	gobottest.Assert(t, len(a.pins), 1)
 	gobottest.Assert(t, a.Finalize(), nil)
@@ -106,8 +115,7 @@ func TestDigitalIO(t *testing.T) {
 		"/sys/class/gpio/gpio25/value",
 		"/sys/class/gpio/gpio25/direction",
 	}
-	a, _ := initTestAdaptorWithMockedFilesystem(mockedPaths)
-	a.Connect()
+	a, _ := initTestDigitalPinsAdaptorWithMockedFilesystem(mockedPaths)
 
 	err := a.DigitalWrite("14", 1)
 	gobottest.Assert(t, err, nil)
@@ -124,14 +132,10 @@ func TestDigitalRead(t *testing.T) {
 		"/sys/class/gpio/gpio24/value",
 		"/sys/class/gpio/gpio24/direction",
 	}
-	a, fs := initTestAdaptorWithMockedFilesystem(mockedPaths)
+	a, fs := initTestDigitalPinsAdaptorWithMockedFilesystem(mockedPaths)
 	fs.Files["/sys/class/gpio/gpio24/value"].Contents = "1"
+
 	i, err := a.DigitalRead("13")
-	gobottest.Assert(t, err.Error(), "not connected")
-
-	a.Connect()
-
-	i, err = a.DigitalRead("13")
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, i, 1)
 
@@ -151,13 +155,9 @@ func TestDigitalWrite(t *testing.T) {
 		"/sys/class/gpio/gpio18/value",
 		"/sys/class/gpio/gpio18/direction",
 	}
-	a, fs := initTestAdaptorWithMockedFilesystem(mockedPaths)
+	a, fs := initTestDigitalPinsAdaptorWithMockedFilesystem(mockedPaths)
+
 	err := a.DigitalWrite("7", 1)
-	gobottest.Assert(t, err.Error(), "not connected")
-
-	a.Connect()
-
-	err = a.DigitalWrite("7", 1)
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio18/value"].Contents, "1")
 
