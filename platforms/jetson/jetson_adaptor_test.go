@@ -29,6 +29,9 @@ var _ spi.Connector = (*Adaptor)(nil)
 func initTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *system.MockFilesystem) {
 	a := NewAdaptor()
 	fs := a.sys.UseMockFilesystem(mockPaths)
+	if err := a.Connect(); err != nil {
+		panic(err)
+	}
 	return a, fs
 }
 
@@ -80,15 +83,8 @@ func TestDigitalIO(t *testing.T) {
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, i, 1)
 
-	gobottest.Assert(t, a.DigitalWrite("notexist", 1), errors.New("Not a valid pin"))
-
-	fs.WithReadError = true
-	_, err = a.DigitalRead("13")
-	gobottest.Assert(t, err, errors.New("read error"))
-
-	fs.WithWriteError = true
-	_, err = a.DigitalRead("7")
-	gobottest.Assert(t, err, errors.New("write error"))
+	gobottest.Assert(t, a.DigitalWrite("notexist", 1), errors.New("'notexist' is not a valid id for a digital pin"))
+	gobottest.Assert(t, a.Finalize(), nil)
 }
 
 func TestI2c(t *testing.T) {

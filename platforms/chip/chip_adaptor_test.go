@@ -40,12 +40,18 @@ var mockPaths = []string{
 func initTestAdaptorWithMockedFilesystem() (*Adaptor, *system.MockFilesystem) {
 	a := NewAdaptor()
 	fs := a.sys.UseMockFilesystem(mockPaths)
+	if err := a.Connect(); err != nil {
+		panic(err)
+	}
 	return a, fs
 }
 
 func initTestProAdaptorWithMockedFilesystem() (*Adaptor, *system.MockFilesystem) {
 	a := NewProAdaptor()
 	fs := a.sys.UseMockFilesystem(mockPaths)
+	if err := a.Connect(); err != nil {
+		panic(err)
+	}
 	return a, fs
 }
 
@@ -56,12 +62,9 @@ func TestName(t *testing.T) {
 	gobottest.Assert(t, a.Name(), "NewName")
 }
 
-func TestNewAdaptor(t *testing.T) {
-	a := NewAdaptor()
-	a.SetBoard("pro")
-	gobottest.Assert(t, a.board, "pro")
-
-	gobottest.Assert(t, a.SetBoard("bad"), errors.New("Invalid board type"))
+func TestNewProAdaptor(t *testing.T) {
+	a := NewProAdaptor()
+	gobottest.Assert(t, strings.HasPrefix(a.Name(), "CHIP Pro"), true)
 }
 
 func TestFinalizeErrorAfterGPIO(t *testing.T) {
@@ -97,7 +100,7 @@ func TestDigitalIO(t *testing.T) {
 	i, _ := a.DigitalRead("TWI2-SDA")
 	gobottest.Assert(t, i, 1)
 
-	gobottest.Assert(t, a.DigitalWrite("XIO-P10", 1), errors.New("Not a valid pin"))
+	gobottest.Assert(t, a.DigitalWrite("XIO-P10", 1), errors.New("'XIO-P10' is not a valid id for a digital pin"))
 	gobottest.Assert(t, a.Finalize(), nil)
 }
 
@@ -112,24 +115,8 @@ func TestProDigitalIO(t *testing.T) {
 	i, _ := a.DigitalRead("TWI2-SDA")
 	gobottest.Assert(t, i, 1)
 
-	gobottest.Assert(t, a.DigitalWrite("XIO-P0", 1), errors.New("Not a valid pin"))
+	gobottest.Assert(t, a.DigitalWrite("XIO-P0", 1), errors.New("'XIO-P0' is not a valid id for a digital pin"))
 	gobottest.Assert(t, a.Finalize(), nil)
-}
-
-func TestDigitalWriteError(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem()
-	fs.WithWriteError = true
-
-	err := a.DigitalWrite("CSID7", 1)
-	gobottest.Assert(t, err, errors.New("write error"))
-}
-
-func TestDigitalReadWriteError(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem()
-	fs.WithWriteError = true
-
-	_, err := a.DigitalRead("CSID7")
-	gobottest.Assert(t, err, errors.New("write error"))
 }
 
 func TestI2c(t *testing.T) {

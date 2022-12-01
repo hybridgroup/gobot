@@ -12,9 +12,13 @@ import (
 	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/drivers/i2c"
+	"gobot.io/x/gobot/platforms/adaptors"
 	"gobot.io/x/gobot/system"
 )
 
+// Valids pins are the XIO-P0 through XIO-P7 pins from the
+// extender (pins 13-20 on header 14), as well as the SoC pins
+// aka all the other pins.
 type sysfsPin struct {
 	pin    int
 	pwmPin int
@@ -22,37 +26,40 @@ type sysfsPin struct {
 
 // Adaptor represents a Gobot Adaptor for a C.H.I.P.
 type Adaptor struct {
-	name        string
-	board       string
-	sys         *system.Accesser
-	mutex       sync.Mutex
-	pinmap      map[string]sysfsPin
-	digitalPins map[int]gobot.DigitalPinner
-	pwmPins     map[int]gobot.PWMPinner
-	i2cBuses    [3]i2c.I2cDevice
+	name   string
+	sys    *system.Accesser
+	mutex  sync.Mutex
+	pinmap map[string]sysfsPin
+	*adaptors.DigitalPinsAdaptor
+	pwmPins  map[int]gobot.PWMPinner
+	i2cBuses [3]i2c.I2cDevice
 }
 
 // NewAdaptor creates a C.H.I.P. Adaptor
 func NewAdaptor() *Adaptor {
+	sys := system.NewAccesser()
 	c := &Adaptor{
-		name:  gobot.DefaultName("CHIP"),
-		board: "chip",
-		sys:   system.NewAccesser(),
+		name: gobot.DefaultName("CHIP"),
+		sys:  sys,
 	}
 
-	c.setPins()
+	c.pwmPins = make(map[int]gobot.PWMPinner)
+	c.pinmap = chipPins
+	baseAddr, _ := getXIOBase()
+	for i := 0; i < 8; i++ {
+		pin := fmt.Sprintf("XIO-P%d", i)
+		c.pinmap[pin] = sysfsPin{pin: baseAddr + i, pwmPin: -1}
+	}
+
+	c.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, c.translateDigitalPin)
 	return c
 }
 
 // NewProAdaptor creates a C.H.I.P. Pro Adaptor
 func NewProAdaptor() *Adaptor {
-	c := &Adaptor{
-		name:  gobot.DefaultName("CHIP Pro"),
-		sys:   system.NewAccesser(),
-		board: "pro",
-	}
-
-	c.setPins()
+	c := NewAdaptor()
+	c.name = gobot.DefaultName("CHIP Pro")
+	c.pinmap = chipProPins
 	return c
 }
 
@@ -62,23 +69,22 @@ func (c *Adaptor) Name() string { return c.name }
 // SetName sets the name of the Adaptor
 func (c *Adaptor) SetName(n string) { c.name = n }
 
-// Connect initializes the board
-func (c *Adaptor) Connect() (err error) {
-	return nil
-}
-
-// Finalize closes connection to board and pins
-func (c *Adaptor) Finalize() (err error) {
+// Connect create new connection to board and pins.
+func (c *Adaptor) Connect() error {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
-	for _, pin := range c.digitalPins {
-		if pin != nil {
-			if e := pin.Unexport(); e != nil {
-				err = multierror.Append(err, e)
-			}
-		}
-	}
+	err := c.DigitalPinsAdaptor.Connect()
+	return err
+}
+
+// Finalize closes connection to board and pins
+func (c *Adaptor) Finalize() error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	err := c.DigitalPinsAdaptor.Finalize()
+
 	for _, pin := range c.pwmPins {
 		if pin != nil {
 			if errs := pin.Enable(false); errs != nil {
@@ -96,46 +102,7 @@ func (c *Adaptor) Finalize() (err error) {
 			}
 		}
 	}
-	return
-}
-
-// DigitalRead reads digital value from the specified pin.
-// Valids pins are the XIO-P0 through XIO-P7 pins from the
-// extender (pins 13-20 on header 14), as well as the SoC pins
-// aka all the other pins.
-func (c *Adaptor) DigitalRead(id string) (int, error) {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-
-	pin, err := c.digitalPin(id, system.WithDirectionInput())
-	if err != nil {
-		return 0, err
-	}
-	return pin.Read()
-}
-
-// DigitalWrite writes digital value to the specified pin.
-// Valids pins are the XIO-P0 through XIO-P7 pins from the
-// extender (pins 13-20 on header 14), as well as the SoC pins
-// aka all the other pins.
-func (c *Adaptor) DigitalWrite(id string, val byte) error {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-
-	pin, err := c.digitalPin(id, system.WithDirectionOutput(int(val)))
-	if err != nil {
-		return err
-	}
-	return pin.Write(int(val))
-}
-
-// DigitalPin returns a digital pin. If the pin is initially acquired, it is an input.
-// Pin direction and other options can be changed afterwards by pin.ApplyOptions() at any time.
-func (c *Adaptor) DigitalPin(id string) (gobot.DigitalPinner, error) {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-
-	return c.digitalPin(id)
+	return err
 }
 
 // GetConnection returns a connection to a device on a specified bus.
@@ -224,33 +191,6 @@ func (c *Adaptor) ServoWrite(pin string, angle byte) (err error) {
 	return pwmPin.SetDutyCycle(duty)
 }
 
-// SetBoard sets the name of the type of board
-func (c *Adaptor) SetBoard(n string) (err error) {
-	if n == "chip" || n == "pro" {
-		c.board = n
-		c.setPins()
-		return
-	}
-	return errors.New("Invalid board type")
-}
-
-func (c *Adaptor) setPins() {
-	c.digitalPins = make(map[int]gobot.DigitalPinner)
-	c.pwmPins = make(map[int]gobot.PWMPinner)
-
-	if c.board == "pro" {
-		c.pinmap = chipProPins
-		return
-	}
-	// otherwise, original CHIP
-	c.pinmap = chipPins
-	baseAddr, _ := getXIOBase()
-	for i := 0; i < 8; i++ {
-		pin := fmt.Sprintf("XIO-P%d", i)
-		c.pinmap[pin] = sysfsPin{pin: baseAddr + i, pwmPin: -1}
-	}
-}
-
 func getXIOBase() (baseAddr int, err error) {
 	// Default to original base from 4.3 kernel
 	baseAddr = 408
@@ -281,34 +221,9 @@ func getXIOBase() (baseAddr int, err error) {
 	return baseAddr, nil
 }
 
-func (c *Adaptor) translateDigitalPin(id string) (i int, err error) {
+func (c *Adaptor) translateDigitalPin(id string) (string, int, error) {
 	if val, ok := c.pinmap[id]; ok {
-		i = val.pin
-	} else {
-		err = errors.New("Not a valid pin")
+		return "", val.pin, nil
 	}
-	return
-}
-
-func (c *Adaptor) digitalPin(id string, o ...func(gobot.DigitalPinOptioner) bool) (gobot.DigitalPinner, error) {
-	i, err := c.translateDigitalPin(id)
-	if err != nil {
-		return nil, err
-	}
-
-	pin := c.digitalPins[i]
-
-	if pin == nil {
-		pin = c.sys.NewDigitalPin("", i, o...)
-		if err = pin.Export(); err != nil {
-			return nil, err
-		}
-		c.digitalPins[i] = pin
-	} else {
-		if err := pin.ApplyOptions(o...); err != nil {
-			return nil, err
-		}
-	}
-
-	return pin, nil
+	return "", -1, fmt.Errorf("'%s' is not a valid id for a digital pin", id)
 }

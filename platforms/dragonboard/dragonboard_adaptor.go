@@ -1,26 +1,29 @@
 package dragonboard
 
 import (
-	"errors"
 	"fmt"
 	"sync"
 
 	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/drivers/i2c"
+	"gobot.io/x/gobot/platforms/adaptors"
 	"gobot.io/x/gobot/system"
 )
 
 // Adaptor represents a Gobot Adaptor for a DragonBoard 410c
 type Adaptor struct {
-	name        string
-	sys         *system.Accesser
-	mutex       sync.Mutex
-	digitalPins map[int]gobot.DigitalPinner
-	pinMap      map[string]int
-	i2cBuses    [3]i2c.I2cDevice
+	name  string
+	sys   *system.Accesser
+	mutex sync.Mutex
+	*adaptors.DigitalPinsAdaptor
+	pinMap   map[string]int
+	i2cBuses [3]i2c.I2cDevice
 }
 
+// Valid pins are the GPIO_A through GPIO_L pins from the
+// extender (pins 23-34 on header J8), as well as the SoC pins
+// aka all the other pins, APQ GPIO_0-GPIO_122 and PM_MPP_0-4.
 var fixedPins = map[string]int{
 	"GPIO_A": 36,
 	"GPIO_B": 12,
@@ -41,12 +44,17 @@ var fixedPins = map[string]int{
 
 // NewAdaptor creates a DragonBoard 410c Adaptor
 func NewAdaptor() *Adaptor {
+	sys := system.NewAccesser()
 	c := &Adaptor{
 		name: gobot.DefaultName("DragonBoard"),
-		sys:  system.NewAccesser(),
+		sys:  sys,
 	}
-
-	c.setPins()
+	c.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, c.translateDigitalPin)
+	c.pinMap = fixedPins
+	for i := 0; i < 122; i++ {
+		pin := fmt.Sprintf("GPIO_%d", i)
+		c.pinMap[pin] = i
+	}
 	return c
 }
 
@@ -56,23 +64,22 @@ func (c *Adaptor) Name() string { return c.name }
 // SetName sets the name of the Adaptor
 func (c *Adaptor) SetName(n string) { c.name = n }
 
-// Connect initializes the board
-func (c *Adaptor) Connect() (err error) {
-	return
-}
-
-// Finalize closes connection to board and pins
-func (c *Adaptor) Finalize() (err error) {
+// Connect create new connection to board and pins.
+func (c *Adaptor) Connect() error {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
-	for _, pin := range c.digitalPins {
-		if pin != nil {
-			if e := pin.Unexport(); e != nil {
-				err = multierror.Append(err, e)
-			}
-		}
-	}
+	err := c.DigitalPinsAdaptor.Connect()
+	return err
+}
+
+// Finalize closes connection to board and pins
+func (c *Adaptor) Finalize() error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	err := c.DigitalPinsAdaptor.Finalize()
+
 	for _, bus := range c.i2cBuses {
 		if bus != nil {
 			if e := bus.Close(); e != nil {
@@ -80,46 +87,7 @@ func (c *Adaptor) Finalize() (err error) {
 			}
 		}
 	}
-	return
-}
-
-// DigitalRead reads digital value to the specified pin.
-// Valids pins are the GPIO_A through GPIO_L pins from the
-// extender (pins 23-34 on header J8), as well as the SoC pins
-// aka all the other pins, APQ GPIO_0-GPIO_122 and PM_MPP_0-4.
-func (c *Adaptor) DigitalRead(id string) (int, error) {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-
-	pin, err := c.digitalPin(id, system.WithDirectionInput())
-	if err != nil {
-		return 0, err
-	}
-	return pin.Read()
-}
-
-// DigitalWrite writes digital value to the specified pin.
-// Valids pins are the GPIO_A through GPIO_L pins from the
-// extender (pins 23-34 on header J8), as well as the SoC pins
-// aka all the other pins, APQ GPIO_0-GPIO_122 and PM_MPP_0-4.
-func (c *Adaptor) DigitalWrite(id string, val byte) error {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-
-	pin, err := c.digitalPin(id, system.WithDirectionOutput(int(val)))
-	if err != nil {
-		return err
-	}
-	return pin.Write(int(val))
-}
-
-// DigitalPin returns a digital pin. If the pin is initially acquired, it is an input.
-// Pin direction and other options can be changed afterwards by pin.ApplyOptions() at any time.
-func (c *Adaptor) DigitalPin(id string) (gobot.DigitalPinner, error) {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-
-	return c.digitalPin(id)
+	return err
 }
 
 // GetConnection returns a connection to a device on a specified bus.
@@ -142,42 +110,9 @@ func (c *Adaptor) GetDefaultBus() int {
 	return 0
 }
 
-func (c *Adaptor) setPins() {
-	c.digitalPins = make(map[int]gobot.DigitalPinner)
-	c.pinMap = fixedPins
-	for i := 0; i < 122; i++ {
-		pin := fmt.Sprintf("GPIO_%d", i)
-		c.pinMap[pin] = i
+func (c *Adaptor) translateDigitalPin(id string) (string, int, error) {
+	if line, ok := c.pinMap[id]; ok {
+		return "", line, nil
 	}
-}
-
-func (c *Adaptor) translateDigitalPin(id string) (i int, err error) {
-	if val, ok := c.pinMap[id]; ok {
-		i = val
-	} else {
-		err = errors.New("Not a valid pin")
-	}
-	return
-}
-
-func (c *Adaptor) digitalPin(id string, o ...func(gobot.DigitalPinOptioner) bool) (gobot.DigitalPinner, error) {
-	i, err := c.translateDigitalPin(id)
-	if err != nil {
-		return nil, err
-	}
-
-	pin := c.digitalPins[i]
-	if pin == nil {
-		pin = c.sys.NewDigitalPin("", i, o...)
-		if err = pin.Export(); err != nil {
-			return nil, err
-		}
-		c.digitalPins[i] = pin
-	} else {
-		if err := pin.ApplyOptions(o...); err != nil {
-			return nil, err
-		}
-	}
-
-	return pin, nil
+	return "", -1, fmt.Errorf("'%s' is not a valid id for a digital pin", id)
 }

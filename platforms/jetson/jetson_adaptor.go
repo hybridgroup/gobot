@@ -9,58 +9,68 @@ import (
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/drivers/spi"
+	"gobot.io/x/gobot/platforms/adaptors"
 	"gobot.io/x/gobot/system"
 )
 
 const pwmDefaultPeriod = 3000000
 
-// Adaptor is the Gobot Adaptor for the Jetson Nano
+// Adaptor is the Gobot adaptor for the Jetson Nano
 type Adaptor struct {
-	name        string
-	sys         *system.Accesser
-	mutex       sync.Mutex
-	digitalPins map[int]gobot.DigitalPinner
-	pwmPins     map[int]gobot.PWMPinner
-	i2cBuses    [2]i2c.I2cDevice
-	spiDevices  [2]spi.Connection
+	name  string
+	sys   *system.Accesser
+	mutex sync.Mutex
+	*adaptors.DigitalPinsAdaptor
+	pwmPins    map[string]gobot.PWMPinner
+	i2cBuses   [2]i2c.I2cDevice
+	spiDevices [2]spi.Connection
 }
 
-// NewAdaptor creates a Raspi Adaptor
+// NewAdaptor creates a Jetson Nano adaptor
 func NewAdaptor() *Adaptor {
-	j := &Adaptor{
-		name:        gobot.DefaultName("JetsonNano"),
-		sys:         system.NewAccesser(),
-		digitalPins: make(map[int]gobot.DigitalPinner),
-		pwmPins:     make(map[int]gobot.PWMPinner),
+	sys := system.NewAccesser()
+	c := &Adaptor{
+		name:    gobot.DefaultName("JetsonNano"),
+		sys:     sys,
+		pwmPins: make(map[string]gobot.PWMPinner),
 	}
-	return j
+	c.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, c.translateDigitalPin)
+	return c
 }
 
 // Name returns the Adaptor's name
-func (j *Adaptor) Name() string {
-	j.mutex.Lock()
-	defer j.mutex.Unlock()
+func (c *Adaptor) Name() string {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 
-	return j.name
+	return c.name
 }
 
 // SetName sets the Adaptor's name
-func (j *Adaptor) SetName(n string) {
-	j.mutex.Lock()
-	defer j.mutex.Unlock()
+func (c *Adaptor) SetName(n string) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 
-	j.name = n
+	c.name = n
 }
 
-// Connect do nothing at the moment
-func (j *Adaptor) Connect() error { return nil }
+// Connect create new connection to board and pins.
+func (c *Adaptor) Connect() error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	err := c.DigitalPinsAdaptor.Connect()
+	return err
+}
 
 // Finalize closes connection to board and pins
-func (j *Adaptor) Finalize() (err error) {
-	j.mutex.Lock()
-	defer j.mutex.Unlock()
+func (c *Adaptor) Finalize() error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 
-	for _, pin := range j.digitalPins {
+	err := c.DigitalPinsAdaptor.Finalize()
+
+	for _, pin := range c.pwmPins {
 		if pin != nil {
 			if perr := pin.Unexport(); err != nil {
 				err = multierror.Append(err, perr)
@@ -68,150 +78,107 @@ func (j *Adaptor) Finalize() (err error) {
 		}
 	}
 
-	for _, pin := range j.pwmPins {
-		if pin != nil {
-			if perr := pin.Unexport(); err != nil {
-				err = multierror.Append(err, perr)
-			}
-		}
-	}
-
-	for _, bus := range j.i2cBuses {
+	for _, bus := range c.i2cBuses {
 		if bus != nil {
 			if e := bus.Close(); e != nil {
 				err = multierror.Append(err, e)
 			}
 		}
 	}
-	for _, dev := range j.spiDevices {
+	for _, dev := range c.spiDevices {
 		if dev != nil {
 			if e := dev.Close(); e != nil {
 				err = multierror.Append(err, e)
 			}
 		}
 	}
-	return
-}
-
-// DigitalRead reads digital value from pin
-func (j *Adaptor) DigitalRead(id string) (int, error) {
-	j.mutex.Lock()
-	defer j.mutex.Unlock()
-
-	pin, err := j.digitalPin(id, system.WithDirectionInput())
-	if err != nil {
-		return 0, err
-	}
-	return pin.Read()
-}
-
-// DigitalWrite writes digital value to specified pin
-func (j *Adaptor) DigitalWrite(id string, val byte) error {
-	j.mutex.Lock()
-	defer j.mutex.Unlock()
-
-	pin, err := j.digitalPin(id, system.WithDirectionOutput(int(val)))
-	if err != nil {
-		return err
-	}
-	return pin.Write(int(val))
-}
-
-// DigitalPin returns a digital pin. If the pin is initially acquired, it is an input.
-// Pin direction and other options can be changed afterwards by pin.ApplyOptions() at any time.
-func (j *Adaptor) DigitalPin(id string) (gobot.DigitalPinner, error) {
-	j.mutex.Lock()
-	defer j.mutex.Unlock()
-
-	return j.digitalPin(id)
+	return err
 }
 
 // GetConnection returns an i2c connection to a device on a specified bus.
 // Valid bus number is [0..1] which corresponds to /dev/i2c-0 through /dev/i2c-1.
-func (j *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection, err error) {
+func (c *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection, err error) {
 	if (bus < 0) || (bus > 1) {
 		return nil, fmt.Errorf("Bus number %d out of range", bus)
 	}
 
-	device, err := j.getI2cBus(bus)
+	device, err := c.getI2cBus(bus)
 
 	return i2c.NewConnection(device, address), err
 }
 
 // GetDefaultBus returns the default i2c bus for this platform
-func (j *Adaptor) GetDefaultBus() int {
+func (c *Adaptor) GetDefaultBus() int {
 	return 1
 }
 
 // GetSpiConnection returns an spi connection to a device on a specified bus.
 // Valid bus number is [0..1] which corresponds to /dev/spidev0.0 through /dev/spidev0.1.
-func (j *Adaptor) GetSpiConnection(busNum, chipNum, mode, bits int, maxSpeed int64) (connection spi.Connection, err error) {
-	j.mutex.Lock()
-	defer j.mutex.Unlock()
+func (c *Adaptor) GetSpiConnection(busNum, chipNum, mode, bits int, maxSpeed int64) (connection spi.Connection, err error) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 
 	if (busNum < 0) || (busNum > 1) {
 		return nil, fmt.Errorf("Bus number %d out of range", busNum)
 	}
 
-	if j.spiDevices[busNum] == nil {
-		j.spiDevices[busNum], err = spi.GetSpiConnection(busNum, chipNum, mode, bits, maxSpeed)
+	if c.spiDevices[busNum] == nil {
+		c.spiDevices[busNum], err = spi.GetSpiConnection(busNum, chipNum, mode, bits, maxSpeed)
 	}
 
-	return j.spiDevices[busNum], err
+	return c.spiDevices[busNum], err
 }
 
 // GetSpiDefaultBus returns the default spi bus for this platform.
-func (j *Adaptor) GetSpiDefaultBus() int {
+func (c *Adaptor) GetSpiDefaultBus() int {
 	return 0
 }
 
 // GetSpiDefaultChip returns the default spi chip for this platform.
-func (j *Adaptor) GetSpiDefaultChip() int {
+func (c *Adaptor) GetSpiDefaultChip() int {
 	return 0
 }
 
 // GetSpiDefaultMode returns the default spi mode for this platform.
-func (j *Adaptor) GetSpiDefaultMode() int {
+func (c *Adaptor) GetSpiDefaultMode() int {
 	return 0
 }
 
 // GetSpiDefaultBits returns the default spi number of bits for this platform.
-func (j *Adaptor) GetSpiDefaultBits() int {
+func (c *Adaptor) GetSpiDefaultBits() int {
 	return 8
 }
 
 // GetSpiDefaultMaxSpeed returns the default spi bus for this platform.
-func (j *Adaptor) GetSpiDefaultMaxSpeed() int64 {
+func (c *Adaptor) GetSpiDefaultMaxSpeed() int64 {
 	return 10000000
 }
 
 //PWMPin returns a Jetson Nano. PWMPin which provides the gobot.PWMPinner interface
-func (j *Adaptor) PWMPin(pin string) (gobot.PWMPinner, error) {
-	i, err := j.translatePin(pin)
+func (c *Adaptor) PWMPin(pin string) (gobot.PWMPinner, error) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	if c.pwmPins[pin] != nil {
+		return c.pwmPins[pin], nil
+	}
+
+	fn, err := c.translatePwmPin(pin)
 	if err != nil {
 		return nil, err
 	}
-	j.mutex.Lock()
-	defer j.mutex.Unlock()
 
-	if j.pwmPins[i] != nil {
-		return j.pwmPins[i], nil
-	}
+	c.pwmPins[pin] = NewPWMPin(c.sys, "/sys/class/pwm/pwmchip0", fn)
+	c.pwmPins[pin].Export()
+	c.pwmPins[pin].SetPeriod(pwmDefaultPeriod)
+	c.pwmPins[pin].Enable(true)
 
-	j.pwmPins[i], err = NewPWMPin(j.sys, "/sys/class/pwm/pwmchip0", pin)
-	if err != nil {
-		return nil, err
-	}
-	j.pwmPins[i].Export()
-	j.pwmPins[i].SetPeriod(pwmDefaultPeriod)
-	j.pwmPins[i].Enable(true)
-
-	return j.pwmPins[i], nil
+	return c.pwmPins[pin], nil
 }
 
 // PwmWrite writes a PWM signal to the specified pin
-func (j *Adaptor) PwmWrite(pin string, val byte) (err error) {
-	sysPin, err := j.PWMPin(pin)
+func (c *Adaptor) PwmWrite(pin string, val byte) (err error) {
+	sysPin, err := c.PWMPin(pin)
 	if err != nil {
 		return err
 	}
@@ -221,8 +188,8 @@ func (j *Adaptor) PwmWrite(pin string, val byte) (err error) {
 }
 
 // ServoWrite writes a servo signal to the specified pin
-func (j *Adaptor) ServoWrite(pin string, angle byte) (err error) {
-	sysPin, err := j.PWMPin(pin)
+func (c *Adaptor) ServoWrite(pin string, angle byte) (err error) {
+	sysPin, err := c.PWMPin(pin)
 	if err != nil {
 		return err
 	}
@@ -231,45 +198,27 @@ func (j *Adaptor) ServoWrite(pin string, angle byte) (err error) {
 	return sysPin.SetDutyCycle(duty)
 }
 
-func (j *Adaptor) getI2cBus(bus int) (_ i2c.I2cDevice, err error) {
-	j.mutex.Lock()
-	defer j.mutex.Unlock()
+func (c *Adaptor) getI2cBus(bus int) (_ i2c.I2cDevice, err error) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 
-	if j.i2cBuses[bus] == nil {
-		j.i2cBuses[bus], err = j.sys.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
+	if c.i2cBuses[bus] == nil {
+		c.i2cBuses[bus], err = c.sys.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
 	}
 
-	return j.i2cBuses[bus], err
+	return c.i2cBuses[bus], err
 }
 
-func (j *Adaptor) translatePin(pin string) (i int, err error) {
-	if val, ok := pins[pin]["*"]; ok {
-		i = val
-	} else {
-		err = errors.New("Not a valid pin")
-		return
+func (c *Adaptor) translateDigitalPin(id string) (string, int, error) {
+	if line, ok := gpioPins[id]; ok {
+		return "", line, nil
 	}
-	return
+	return "", -1, fmt.Errorf("'%s' is not a valid id for a digital pin", id)
 }
 
-func (j *Adaptor) digitalPin(id string, o ...func(gobot.DigitalPinOptioner) bool) (gobot.DigitalPinner, error) {
-	i, err := j.translatePin(id)
-	if err != nil {
-		return nil, err
+func (c *Adaptor) translatePwmPin(pin string) (fn string, err error) {
+	if fn, ok := pwmPins[pin]; ok {
+		return fn, nil
 	}
-
-	pin := j.digitalPins[i]
-	if pin == nil {
-		pin = j.sys.NewDigitalPin("", i, o...)
-		if err := pin.Export(); err != nil {
-			return nil, err
-		}
-		j.digitalPins[i] = pin
-	} else {
-		if err := pin.ApplyOptions(o...); err != nil {
-			return nil, err
-		}
-	}
-
-	return pin, nil
+	return "", errors.New("Not a valid pin")
 }

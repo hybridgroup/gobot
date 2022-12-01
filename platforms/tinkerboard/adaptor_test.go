@@ -67,6 +67,9 @@ func preparePwmFs(fs *system.MockFilesystem) {
 func initTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *system.MockFilesystem) {
 	a := NewAdaptor()
 	fs := a.sys.UseMockFilesystem(mockPaths)
+	if err := a.Connect(); err != nil {
+		panic(err)
+	}
 	return a, fs
 }
 
@@ -77,7 +80,50 @@ func TestName(t *testing.T) {
 	gobottest.Assert(t, a.Name(), "NewName")
 }
 
+func Test_translateDigitalPin(t *testing.T) {
+	var tests = map[string]struct {
+		access   string
+		pin      string
+		wantChip string
+		wantLine int
+		wantErr  error
+	}{
+		"cdev_ok": {
+			access:   "cdev",
+			pin:      "7",
+			wantChip: "gpiochip0",
+			wantLine: 17,
+		},
+		"sysfs_ok": {
+			access:   "sysfs",
+			pin:      "7",
+			wantChip: "",
+			wantLine: 17,
+		},
+		"unknown_pin": {
+			pin:      "99",
+			wantChip: "",
+			wantLine: -1,
+			wantErr:  fmt.Errorf("'99' is not a valid id for a digital pin"),
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			a := NewAdaptor()
+			a.sys.UseDigitalPinAccessWithMockFs(tc.access, []string{})
+			// act
+			chip, line, err := a.translateDigitalPin(tc.pin)
+			// assert
+			gobottest.Assert(t, err, tc.wantErr)
+			gobottest.Assert(t, chip, tc.wantChip)
+			gobottest.Assert(t, line, tc.wantLine)
+		})
+	}
+}
+
 func TestDigitalIO(t *testing.T) {
+	// only basic tests needed, further tests are done in "digitalpinsadaptor.go"
 	a, fs := initTestAdaptorWithMockedFilesystem(gpioMockPaths)
 
 	a.DigitalWrite("7", 1)
@@ -87,24 +133,8 @@ func TestDigitalIO(t *testing.T) {
 	i, _ := a.DigitalRead("10")
 	gobottest.Assert(t, i, 1)
 
-	gobottest.Assert(t, a.DigitalWrite("99", 1), errors.New("Not a valid pin"))
+	gobottest.Assert(t, a.DigitalWrite("99", 1), errors.New("'99' is not a valid id for a digital pin"))
 	gobottest.Assert(t, a.Finalize(), nil)
-}
-
-func TestDigitalWriteError(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem(gpioMockPaths)
-	fs.WithWriteError = true
-
-	err := a.DigitalWrite("7", 1)
-	gobottest.Assert(t, err, errors.New("write error"))
-}
-
-func TestDigitalReadWriteError(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem(gpioMockPaths)
-	fs.WithWriteError = true
-
-	_, err := a.DigitalRead("7")
-	gobottest.Assert(t, err, errors.New("write error"))
 }
 
 func TestInvalidPWMPin(t *testing.T) {

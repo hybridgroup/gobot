@@ -161,14 +161,7 @@ func TestDigitalIO(t *testing.T) {
 	gobottest.Assert(t, i, 1)
 
 	gobottest.Assert(t, a.DigitalWrite("notexist", 1), errors.New("Not a valid pin"))
-
-	fs.WithReadError = true
-	_, err = a.DigitalRead("13")
-	gobottest.Assert(t, err, errors.New("read error"))
-
-	fs.WithWriteError = true
-	_, err = a.DigitalRead("7")
-	gobottest.Assert(t, err, errors.New("write error"))
+	gobottest.Assert(t, a.Finalize(), nil)
 }
 
 func TestI2c(t *testing.T) {

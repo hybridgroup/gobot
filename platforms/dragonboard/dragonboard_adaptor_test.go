@@ -13,6 +13,7 @@ import (
 
 // make sure that this Adaptor fulfills all the required interfaces
 var _ gobot.Adaptor = (*Adaptor)(nil)
+var _ gobot.DigitalPinnerProvider = (*Adaptor)(nil)
 var _ gpio.DigitalReader = (*Adaptor)(nil)
 var _ gpio.DigitalWriter = (*Adaptor)(nil)
 var _ i2c.Connector = (*Adaptor)(nil)
@@ -20,7 +21,7 @@ var _ i2c.Connector = (*Adaptor)(nil)
 func initTestAdaptor(t *testing.T) *Adaptor {
 	a := NewAdaptor()
 	if err := a.Connect(); err != nil {
-		t.Error(err)
+		panic(err)
 	}
 	return a
 }
@@ -51,7 +52,7 @@ func TestDigitalIO(t *testing.T) {
 	i, _ := a.DigitalRead("GPIO_A")
 	gobottest.Assert(t, i, 1)
 
-	gobottest.Assert(t, a.DigitalWrite("GPIO_M", 1), errors.New("Not a valid pin"))
+	gobottest.Assert(t, a.DigitalWrite("GPIO_M", 1), errors.New("'GPIO_M' is not a valid id for a digital pin"))
 	gobottest.Assert(t, a.Finalize(), nil)
 }
 
