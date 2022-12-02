@@ -2,7 +2,6 @@ package adaptors
 
 import (
 	"fmt"
-	"log"
 	"sync"
 
 	multierror "github.com/hashicorp/go-multierror"
@@ -11,40 +10,50 @@ import (
 )
 
 type pwmPinTranslator func(pin string) (path string, channel int, err error)
-type pwmPinCreator func(chip string, line int) gobot.PWMPinner
+type pwmPinInitializer func(gobot.PWMPinner) error
 
 type pwmPinsOption interface {
-	setPWMPinCreator(pwmPinCreator)
+	setPWMPinInitializer(pwmPinInitializer)
 }
 
 // PWMPinsAdaptor is a adaptor for PWM pins, normally used for composition in platforms.
 type PWMPinsAdaptor struct {
-	sys              *system.Accesser
-	translate        pwmPinTranslator
-	create           pwmPinCreator
-	periodDefault    uint32
-	polarityNormal   string
-	polarityInverted string
-	pins             map[string]gobot.PWMPinner
-	mutex            sync.Mutex
+	sys                   *system.Accesser
+	translate             pwmPinTranslator
+	initialize            pwmPinInitializer
+	periodDefault         uint32
+	polarityNormal        string
+	polarityInverted      string
+	adjustDutyOnSetPeriod bool
+	pins                  map[string]gobot.PWMPinner
+	mutex                 sync.Mutex
 }
 
 // NewPWMPinsAdaptor provides the access to PWM pins of the board. It uses sysfs system drivers. The translator is used
 // to adapt the pin header naming, which is given by user, to the internal file name nomenclature. This varies by each
-// platform. If for some reasons the default creator is not suitable, it can be given by the option
-// "WithPWMPinCreator()". This is especially needed, if some values needs to be adjusted after the pin was created.
+// platform. If for some reasons the default initializer is not suitable, it can be given by the option
+// "WithPWMPinInitializer()".
 func NewPWMPinsAdaptor(sys *system.Accesser, t pwmPinTranslator, options ...func(pwmPinsOption)) *PWMPinsAdaptor {
-	s := &PWMPinsAdaptor{
-		translate:        t,
-		create:           sys.NewPWMPin,
-		periodDefault:    10000000, // 10ms = 100Hz
-		polarityNormal:   "normal",
-		polarityInverted: "inversed",
+	a := &PWMPinsAdaptor{
+		sys:                   sys,
+		translate:             t,
+		periodDefault:         10000000, // 10ms = 100Hz
+		polarityNormal:        "normal",
+		polarityInverted:      "inversed",
+		adjustDutyOnSetPeriod: true,
 	}
 	for _, option := range options {
-		option(s)
+		option(a)
 	}
-	return s
+	a.initialize = getPwmPinInitializer(a.periodDefault, a.polarityNormal)
+	return a
+}
+
+// WithPWMPinInitializer can be used to substitute the default initializer.
+func WithPWMPinInitializer(pc pwmPinInitializer) func(pwmPinsOption) {
+	return func(a pwmPinsOption) {
+		a.setPWMPinInitializer(pc)
+	}
 }
 
 // Connect prepare new connection to PWM pins.
@@ -71,6 +80,7 @@ func (a *PWMPinsAdaptor) Finalize() (err error) {
 			}
 		}
 	}
+	a.pins = nil
 	return err
 }
 
@@ -124,7 +134,7 @@ func (a *PWMPinsAdaptor) SetPeriod(id string, period uint32) error {
 	if err != nil {
 		return err
 	}
-	return setPeriod(pin, period)
+	return setPeriod(pin, period, a.adjustDutyOnSetPeriod)
 }
 
 // PWMPin initializes the pin for PWM and returns matched pwmPin for specified pin number.
@@ -136,11 +146,15 @@ func (a *PWMPinsAdaptor) PWMPin(id string) (gobot.PWMPinner, error) {
 	return a.pwmPin(id)
 }
 
-func (a *PWMPinsAdaptor) setPWMPinCreator(pc pwmPinCreator) {
-	a.create = pc
+func (a *PWMPinsAdaptor) setPWMPinInitializer(pinInit pwmPinInitializer) {
+	a.initialize = pinInit
 }
 
 func (a *PWMPinsAdaptor) pwmPin(id string) (gobot.PWMPinner, error) {
+	if a.pins == nil {
+		return nil, fmt.Errorf("not connected")
+	}
+
 	pin := a.pins[id]
 
 	if pin == nil {
@@ -148,21 +162,8 @@ func (a *PWMPinsAdaptor) pwmPin(id string) (gobot.PWMPinner, error) {
 		if err != nil {
 			return nil, err
 		}
-		pin = a.create(path, channel)
-		if err := pin.Export(); err != nil {
-			return nil, err
-		}
-		// Make sure pwm is disabled before change anything
-		if err := pin.Enable(false); err != nil {
-			return nil, err
-		}
-		if err := setPeriod(pin, a.periodDefault); err != nil {
-			return nil, err
-		}
-		if err := pin.SetPolarity(a.polarityNormal); err != nil {
-			return nil, err
-		}
-		if err := pin.Enable(true); err != nil {
+		pin = a.sys.NewPWMPin(path, channel)
+		if err := a.initialize(pin); err != nil {
 			return nil, err
 		}
 		a.pins[id] = pin
@@ -171,19 +172,41 @@ func (a *PWMPinsAdaptor) pwmPin(id string) (gobot.PWMPinner, error) {
 	return pin, nil
 }
 
-// setPeriod adjusts the PWM period of the given pin.
-// If duty cycle is already set, also this value will be adjusted in the same ratio.
-// The order in which the values are written must be observed, otherwise an error occur "write error: Invalid argument".
-func setPeriod(pin gobot.PWMPinner, period uint32) error {
+func getPwmPinInitializer(periodDefault uint32, polarityNormal string) func(gobot.PWMPinner) error {
+	return func(pin gobot.PWMPinner) error {
+		if err := pin.Export(); err != nil {
+			return err
+		}
+		// Make sure pwm is disabled before change anything
+		if err := pin.Enable(false); err != nil {
+			return err
+		}
+		if err := setPeriod(pin, periodDefault, false); err != nil {
+			return err
+		}
+		if err := pin.SetPolarity(polarityNormal); err != nil {
+			return err
+		}
+		return pin.Enable(true)
+	}
+}
+
+// setPeriod adjusts the PWM period of the given pin. If duty cycle is already set and this feature is not suppressed,
+// also this value will be adjusted in the same ratio. The order in which the values are written must be observed,
+// otherwise an error occur "write error: Invalid argument".
+func setPeriod(pin gobot.PWMPinner, period uint32, adjustDuty bool) error {
 	var errorBase = fmt.Sprintf("setPeriod(%v, %d) failed", pin, period)
-	oldDuty, err := pin.DutyCycle()
-	if err != nil {
-		return fmt.Errorf("%s with '%v'", errorBase, err)
+
+	var oldDuty uint32
+	var err error
+	if adjustDuty {
+		if oldDuty, err = pin.DutyCycle(); err != nil {
+			return fmt.Errorf("%s with '%v'", errorBase, err)
+		}
 	}
 
 	if oldDuty == 0 {
 		if err := pin.SetPeriod(period); err != nil {
-			log.Println(1, period)
 			return fmt.Errorf("%s with '%v'", errorBase, err)
 		}
 	} else {

@@ -67,7 +67,9 @@ func TestDigitalPinsFinalize(t *testing.T) {
 		"/sys/class/gpio/gpio14/direction",
 		"/sys/class/gpio/gpio14/value",
 	}
-	a, fs := initTestDigitalPinsAdaptorWithMockedFilesystem(mockedPaths)
+	sys := system.NewAccesser()
+	fs := sys.UseMockFilesystem(mockedPaths)
+	a := NewDigitalPinsAdaptor(sys, testDigitalPinTranslator)
 	// assert that finalize before connect is working
 	gobottest.Assert(t, a.Finalize(), nil)
 	// arrange
