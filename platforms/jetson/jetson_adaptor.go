@@ -30,9 +30,8 @@ type Adaptor struct {
 func NewAdaptor() *Adaptor {
 	sys := system.NewAccesser()
 	c := &Adaptor{
-		name:    gobot.DefaultName("JetsonNano"),
-		sys:     sys,
-		pwmPins: make(map[string]gobot.PWMPinner),
+		name: gobot.DefaultName("JetsonNano"),
+		sys:  sys,
 	}
 	c.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, c.translateDigitalPin)
 	return c
@@ -59,8 +58,8 @@ func (c *Adaptor) Connect() error {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
-	err := c.DigitalPinsAdaptor.Connect()
-	return err
+	c.pwmPins = make(map[string]gobot.PWMPinner)
+	return c.DigitalPinsAdaptor.Connect()
 }
 
 // Finalize closes connection to board and pins
@@ -77,6 +76,7 @@ func (c *Adaptor) Finalize() error {
 			}
 		}
 	}
+	c.pwmPins = nil
 
 	for _, bus := range c.i2cBuses {
 		if bus != nil {
