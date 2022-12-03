@@ -159,26 +159,15 @@ func (c *Adaptor) PWMPin(pin string) (gobot.PWMPinner, error) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
-	if c.pwmPins[pin] != nil {
-		return c.pwmPins[pin], nil
-	}
-
-	fn, err := c.translatePwmPin(pin)
-	if err != nil {
-		return nil, err
-	}
-
-	c.pwmPins[pin] = NewPWMPin(c.sys, "/sys/class/pwm/pwmchip0", fn)
-	c.pwmPins[pin].Export()
-	c.pwmPins[pin].SetPeriod(pwmPeriodDefault)
-	c.pwmPins[pin].Enable(true)
-
-	return c.pwmPins[pin], nil
+	return c.pwmPin(pin)
 }
 
 // PwmWrite writes a PWM signal to the specified pin
 func (c *Adaptor) PwmWrite(pin string, val byte) (err error) {
-	sysPin, err := c.PWMPin(pin)
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	sysPin, err := c.pwmPin(pin)
 	if err != nil {
 		return err
 	}
@@ -189,7 +178,10 @@ func (c *Adaptor) PwmWrite(pin string, val byte) (err error) {
 
 // ServoWrite writes a servo signal to the specified pin
 func (c *Adaptor) ServoWrite(pin string, angle byte) (err error) {
-	sysPin, err := c.PWMPin(pin)
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	sysPin, err := c.pwmPin(pin)
 	if err != nil {
 		return err
 	}
@@ -207,6 +199,28 @@ func (c *Adaptor) getI2cBus(bus int) (_ i2c.I2cDevice, err error) {
 	}
 
 	return c.i2cBuses[bus], err
+}
+
+func (c *Adaptor) pwmPin(pin string) (gobot.PWMPinner, error) {
+	if c.pwmPins == nil {
+		return nil, fmt.Errorf("not connected")
+	}
+
+	if c.pwmPins[pin] != nil {
+		return c.pwmPins[pin], nil
+	}
+
+	fn, err := c.translatePwmPin(pin)
+	if err != nil {
+		return nil, err
+	}
+
+	c.pwmPins[pin] = NewPWMPin(c.sys, "/sys/class/pwm/pwmchip0", fn)
+	c.pwmPins[pin].Export()
+	c.pwmPins[pin].SetPeriod(pwmPeriodDefault)
+	c.pwmPins[pin].Enable(true)
+
+	return c.pwmPins[pin], nil
 }
 
 func (c *Adaptor) translateDigitalPin(id string) (string, int, error) {
