@@ -56,52 +56,6 @@ func initTestProAdaptorWithMockedFilesystem() (*Adaptor, *system.MockFilesystem)
 	return a, fs
 }
 
-func Test_translatePWMPin(t *testing.T) {
-	var tests = map[string]struct {
-		usePro      bool
-		wantDir     string
-		wantChannel int
-		wantErr     error
-	}{
-		"PWM0": {
-			wantDir:     "/sys/class/pwm/pwmchip0",
-			wantChannel: 0,
-		},
-		"PWM1": {
-			usePro:      true,
-			wantDir:     "/sys/class/pwm/pwmchip0",
-			wantChannel: 1,
-		},
-		"33_1": {
-			wantDir:     "",
-			wantChannel: -1,
-			wantErr:     fmt.Errorf("'33_1' is not a valid id for a pin"),
-		},
-		"AP-EINT3": {
-			wantDir:     "",
-			wantChannel: -1,
-			wantErr:     fmt.Errorf("'AP-EINT3' is not a valid id for a PWM pin"),
-		},
-	}
-	for name, tc := range tests {
-		t.Run(name, func(t *testing.T) {
-			// arrange
-			var a *Adaptor
-			if tc.usePro {
-				a = NewProAdaptor()
-			} else {
-				a = NewAdaptor()
-			}
-			// act
-			dir, channel, err := a.translatePWMPin(name)
-			// assert
-			gobottest.Assert(t, err, tc.wantErr)
-			gobottest.Assert(t, dir, tc.wantDir)
-			gobottest.Assert(t, channel, tc.wantChannel)
-		})
-	}
-}
-
 func TestName(t *testing.T) {
 	a := NewAdaptor()
 	gobottest.Assert(t, strings.HasPrefix(a.Name(), "CHIP"), true)
@@ -220,4 +174,50 @@ func TestGetConnectionInvalidBus(t *testing.T) {
 	a, _ := initTestAdaptorWithMockedFilesystem()
 	_, err := a.GetConnection(0x01, 99)
 	gobottest.Assert(t, err, errors.New("Bus number 99 out of range"))
+}
+
+func Test_translatePWMPin(t *testing.T) {
+	var tests = map[string]struct {
+		usePro      bool
+		wantDir     string
+		wantChannel int
+		wantErr     error
+	}{
+		"PWM0": {
+			wantDir:     "/sys/class/pwm/pwmchip0",
+			wantChannel: 0,
+		},
+		"PWM1": {
+			usePro:      true,
+			wantDir:     "/sys/class/pwm/pwmchip0",
+			wantChannel: 1,
+		},
+		"33_1": {
+			wantDir:     "",
+			wantChannel: -1,
+			wantErr:     fmt.Errorf("'33_1' is not a valid id for a pin"),
+		},
+		"AP-EINT3": {
+			wantDir:     "",
+			wantChannel: -1,
+			wantErr:     fmt.Errorf("'AP-EINT3' is not a valid id for a PWM pin"),
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			var a *Adaptor
+			if tc.usePro {
+				a = NewProAdaptor()
+			} else {
+				a = NewAdaptor()
+			}
+			// act
+			dir, channel, err := a.translatePWMPin(name)
+			// assert
+			gobottest.Assert(t, err, tc.wantErr)
+			gobottest.Assert(t, dir, tc.wantDir)
+			gobottest.Assert(t, channel, tc.wantChannel)
+		})
+	}
 }
