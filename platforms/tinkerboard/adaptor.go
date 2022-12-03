@@ -58,11 +58,10 @@ func (c *Adaptor) Connect() error {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
-	if err := c.DigitalPinsAdaptor.Connect(); err != nil {
+	if err := c.PWMPinsAdaptor.Connect(); err != nil {
 		return err
 	}
-
-	return c.PWMPinsAdaptor.Connect()
+	return c.DigitalPinsAdaptor.Connect()
 }
 
 // Finalize closes connection to board, pins and bus

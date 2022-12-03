@@ -32,13 +32,13 @@ type DigitalPinsAdaptor struct {
 // if some values needs to be adjusted after the pin was created but before the pin is exported.
 func NewDigitalPinsAdaptor(sys *system.Accesser, t digitalPinTranslator, options ...func(digitalPinsOption)) *DigitalPinsAdaptor {
 	a := &DigitalPinsAdaptor{
-		sys:       sys,
-		translate: t,
+		sys:        sys,
+		translate:  t,
+		initialize: getDigitalPinInitializer(),
 	}
 	for _, option := range options {
 		option(a)
 	}
-	a.initialize = getDigitalPinInitializer()
 	return a
 }
 

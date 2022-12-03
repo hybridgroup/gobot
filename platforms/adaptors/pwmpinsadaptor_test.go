@@ -34,6 +34,8 @@ var pwmMockPaths = []string{
 	pwmPolarityPath,
 }
 
+const pwmPeriodDefault = 10000000
+
 // make sure that this PWMPinsAdaptor fulfills all the required interfaces
 var _ gobot.PWMPinnerProvider = (*PWMPinsAdaptor)(nil)
 var _ gpio.PwmWriter = (*PWMPinsAdaptor)(nil)
@@ -42,7 +44,7 @@ var _ gpio.ServoWriter = (*PWMPinsAdaptor)(nil)
 func initTestPWMPinsAdaptorWithMockedFilesystem(mockPaths []string) (*PWMPinsAdaptor, *system.MockFilesystem) {
 	sys := system.NewAccesser()
 	fs := sys.UseMockFilesystem(mockPaths)
-	a := NewPWMPinsAdaptor(sys, testPWMPinTranslator)
+	a := NewPWMPinsAdaptor(sys, pwmPeriodDefault, testPWMPinTranslator)
 	fs.Files[pwmEnablePath].Contents = "0"
 	fs.Files[pwmPeriodPath].Contents = "0"
 	fs.Files[pwmDutyCyclePath].Contents = "0"
@@ -68,7 +70,7 @@ func TestPWMPinsConnect(t *testing.T) {
 	translate := func(pin string) (chip string, line int, err error) { return }
 	sys := system.NewAccesser()
 
-	a := NewPWMPinsAdaptor(sys, translate)
+	a := NewPWMPinsAdaptor(sys, 2000, translate)
 	gobottest.Assert(t, a.pins, (map[string]gobot.PWMPinner)(nil))
 
 	err := a.PwmWrite("33", 1)
@@ -84,7 +86,7 @@ func TestPWMPinsFinalize(t *testing.T) {
 	// arrange
 	sys := system.NewAccesser()
 	fs := sys.UseMockFilesystem(pwmMockPaths)
-	a := NewPWMPinsAdaptor(sys, testPWMPinTranslator)
+	a := NewPWMPinsAdaptor(sys, 3000, testPWMPinTranslator)
 	// assert that finalize before connect is working
 	gobottest.Assert(t, a.Finalize(), nil)
 	// arrange
@@ -133,7 +135,7 @@ func TestPwmWrite(t *testing.T) {
 
 	gobottest.Assert(t, fs.Files[pwmExportPath].Contents, "44")
 	gobottest.Assert(t, fs.Files[pwmEnablePath].Contents, "1")
-	gobottest.Assert(t, fs.Files[pwmPeriodPath].Contents, fmt.Sprintf("%d", a.periodDefault))
+	gobottest.Assert(t, fs.Files[pwmPeriodPath].Contents, fmt.Sprintf("%d", pwmPeriodDefault))
 	gobottest.Assert(t, fs.Files[pwmDutyCyclePath].Contents, "3921568")
 	gobottest.Assert(t, fs.Files[pwmPolarityPath].Contents, "normal")
 
@@ -207,7 +209,7 @@ func TestPWMPinConcurrency(t *testing.T) {
 
 	for retry := 0; retry < 20; retry++ {
 
-		a := NewPWMPinsAdaptor(sys, translate)
+		a := NewPWMPinsAdaptor(sys, 4000, translate)
 		a.Connect()
 		var wg sync.WaitGroup
 

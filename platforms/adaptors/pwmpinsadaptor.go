@@ -12,19 +12,22 @@ import (
 type pwmPinTranslator func(pin string) (path string, channel int, err error)
 type pwmPinInitializer func(gobot.PWMPinner) error
 
+// TODO: decide to add WithDefaultPeriod
+
 type pwmPinsOption interface {
 	setPWMPinInitializer(pwmPinInitializer)
 }
 
+//note for period in nano seconds:
+// 100000000ns = 100ms = 10Hz, 10000000ns = 10ms = 100Hz,  1000000ns = 1ms = 1kHz,
+// 100000ns = 100us = 10kHz, 10000ns = 10us = 100kHz, 1000ns = 1us = 1MHz,
+// 100ns = 10MHz, 10ns = 100MHz, 1ns = 1GHz
+
 // PWMPinsAdaptor is a adaptor for PWM pins, normally used for composition in platforms.
 type PWMPinsAdaptor struct {
-	sys        *system.Accesser
-	translate  pwmPinTranslator
-	initialize pwmPinInitializer
-	// 100000000ns = 100ms = 10Hz, 10000000ns = 10ms = 100Hz,  1000000ns = 1ms = 1kHz,
-	// 100000ns = 100us = 10kHz, 10000ns = 10us = 100kHz, 1000ns = 1us = 1MHz,
-	// 100ns = 10MHz, 10ns = 100MHz, 1ns = 1GHz
-	period                uint32 // in nano seconds, 1 = 1GHz
+	sys                   *system.Accesser
+	translate             pwmPinTranslator
+	initialize            pwmPinInitializer
 	polarityNormal        string
 	polarityInverted      string
 	adjustDutyOnSetPeriod bool
@@ -36,19 +39,19 @@ type PWMPinsAdaptor struct {
 // to adapt the pin header naming, which is given by user, to the internal file name nomenclature. This varies by each
 // platform. If for some reasons the default initializer is not suitable, it can be given by the option
 // "WithPWMPinInitializer()".
-func NewPWMPinsAdaptor(sys *system.Accesser, periodNano uint32, t pwmPinTranslator, options ...func(pwmPinsOption)) *PWMPinsAdaptor {
+func NewPWMPinsAdaptor(sys *system.Accesser, periodNanoSec uint32, t pwmPinTranslator, options ...func(pwmPinsOption)) *PWMPinsAdaptor {
+	const polarityNormal = "normal"
 	a := &PWMPinsAdaptor{
 		sys:                   sys,
 		translate:             t,
-		period:                periodNano,
-		polarityNormal:        "normal",
+		initialize:            getPwmPinInitializer(periodNanoSec, polarityNormal),
+		polarityNormal:        polarityNormal,
 		polarityInverted:      "inversed",
 		adjustDutyOnSetPeriod: true,
 	}
 	for _, option := range options {
 		option(a)
 	}
-	a.initialize = getPwmPinInitializer(a.period, a.polarityNormal)
 	return a
 }
 
