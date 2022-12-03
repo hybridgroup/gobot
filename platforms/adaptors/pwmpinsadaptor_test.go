@@ -2,8 +2,10 @@ package adaptors
 
 import (
 	"fmt"
+	"runtime"
 	"strconv"
 	"strings"
+	"sync"
 	"testing"
 
 	"gobot.io/x/gobot"
@@ -193,4 +195,31 @@ func TestSetPeriod(t *testing.T) {
 	// assert
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, fs.Files[pwmDutyCyclePath].Contents, fmt.Sprintf("%d", 2540000))
+}
+
+func TestPWMPinConcurrency(t *testing.T) {
+	oldProcs := runtime.GOMAXPROCS(0)
+	runtime.GOMAXPROCS(8)
+	defer runtime.GOMAXPROCS(oldProcs)
+
+	translate := func(pin string) (string, int, error) { line, err := strconv.Atoi(pin); return "", line, err }
+	sys := system.NewAccesser()
+
+	for retry := 0; retry < 20; retry++ {
+
+		a := NewPWMPinsAdaptor(sys, translate)
+		a.Connect()
+		var wg sync.WaitGroup
+
+		for i := 0; i < 20; i++ {
+			wg.Add(1)
+			pinAsString := strconv.Itoa(i)
+			go func(pin string) {
+				defer wg.Done()
+				a.PWMPin(pin)
+			}(pinAsString)
+		}
+
+		wg.Wait()
+	}
 }

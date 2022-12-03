@@ -94,14 +94,14 @@ func (f *MockFile) Close() error {
 	return nil
 }
 
-// newMockFilesystem returns a new MockFilesystem given a list of file paths
-func newMockFilesystem(files []string) *MockFilesystem {
+// newMockFilesystem returns a new MockFilesystem given a list of file and folder paths
+func newMockFilesystem(items []string) *MockFilesystem {
 	m := &MockFilesystem{
 		Files: make(map[string]*MockFile),
 	}
 
-	for i := range files {
-		m.Add(files[i])
+	for _, item := range items {
+		m.Add(item)
 	}
 
 	return m

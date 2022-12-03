@@ -2,6 +2,7 @@ package beaglebone
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 	"testing"
 
@@ -29,21 +30,6 @@ var _ spi.Connector = (*Adaptor)(nil)
 func initTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *system.MockFilesystem) {
 	a := NewAdaptor()
 	fs := a.sys.UseMockFilesystem(mockPaths)
-
-	a.findPin = func(pinPath string) (string, error) {
-		switch pinPath {
-		case "/sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm/pwmchip*":
-			return "/sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm/pwmchip4", nil
-		case "/sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm/pwmchip*":
-			return "/sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm/pwmchip2", nil
-		case "/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip*":
-			return "/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0", nil
-		case "/sys/devices/platform/ocp/48300000.epwmss/48300100.ecap/pwm/pwmchip*":
-			return "/sys/devices/platform/ocp/48300000.epwmss/48300100.ecap/pwm/pwmchip0", nil
-		default:
-			return pinPath, nil
-		}
-	}
 	if err := a.Connect(); err != nil {
 		panic(err)
 	}
@@ -69,7 +55,7 @@ func TestPWM(t *testing.T) {
 
 	a, fs := initTestAdaptorWithMockedFilesystem(mockPaths)
 
-	gobottest.Assert(t, a.PwmWrite("P9_99", 175), errors.New("Not a valid PWM pin"))
+	gobottest.Assert(t, a.PwmWrite("P9_99", 175), errors.New("'P9_99' is not a valid id for a PWM pin"))
 	a.PwmWrite("P9_21", 175)
 	gobottest.Assert(
 		t,
@@ -93,15 +79,6 @@ func TestPWM(t *testing.T) {
 		fs.Files["/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/duty_cycle"].Contents,
 		"66666",
 	)
-	gobottest.Assert(t, a.ServoWrite("P9_99", 175), errors.New("Not a valid PWM pin"))
-
-	fs.WithReadError = true
-	gobottest.Assert(t, strings.Contains(a.PwmWrite("P9_21", 175).Error(), "read error"), true)
-	fs.WithReadError = false
-
-	fs.WithWriteError = true
-	gobottest.Assert(t, strings.Contains(a.PwmWrite("P9_22", 175).Error(), "write error"), true)
-	fs.WithWriteError = false
 
 	gobottest.Assert(t, a.Finalize(), nil)
 }
@@ -277,4 +254,71 @@ func TestDigitalPinFinalizeFileError(t *testing.T) {
 func TestPocketName(t *testing.T) {
 	a := NewPocketBeagleAdaptor()
 	gobottest.Assert(t, strings.HasPrefix(a.Name(), "PocketBeagle"), true)
+}
+
+func Test_translateAndMuxPWMPin(t *testing.T) {
+	// arrange
+	mockPaths := []string{
+		"/sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm/pwmchip4/",
+		"/sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm/pwmchip2/",
+		"/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/",
+		"/sys/devices/platform/ocp/48300000.epwmss/48300100.ecap/pwm/pwmchip0/",
+	}
+	a, fs := initTestAdaptorWithMockedFilesystem(mockPaths)
+
+	var tests = map[string]struct {
+		wantDir     string
+		wantChannel int
+		wantErr     error
+	}{
+		"P8_13": {
+			wantDir:     "/sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm/pwmchip4",
+			wantChannel: 1,
+		},
+		"P8_19": {
+			wantDir:     "/sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm/pwmchip4",
+			wantChannel: 0,
+		},
+		"P9_14": {
+			wantDir:     "/sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm/pwmchip2",
+			wantChannel: 0,
+		},
+		"P9_16": {
+			wantDir:     "/sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm/pwmchip2",
+			wantChannel: 1,
+		},
+		"P9_21": {
+			wantDir:     "/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0",
+			wantChannel: 1,
+		},
+		"P9_22": {
+			wantDir:     "/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0",
+			wantChannel: 0,
+		},
+		"P9_42": {
+			wantDir:     "/sys/devices/platform/ocp/48300000.epwmss/48300100.ecap/pwm/pwmchip0",
+			wantChannel: 0,
+		},
+		"P9_99": {
+			wantDir:     "",
+			wantChannel: -1,
+			wantErr:     fmt.Errorf("'P9_99' is not a valid id for a PWM pin"),
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			muxPath := fmt.Sprintf("/sys/devices/platform/ocp/ocp:%s_pinmux/state", name)
+			fs.Add(muxPath)
+			// act
+			path, channel, err := a.translateAndMuxPWMPin(name)
+			// assert
+			gobottest.Assert(t, err, tc.wantErr)
+			gobottest.Assert(t, path, tc.wantDir)
+			gobottest.Assert(t, channel, tc.wantChannel)
+			if tc.wantErr == nil {
+				gobottest.Assert(t, fs.Files[muxPath].Contents, "pwm")
+			}
+		})
+	}
 }

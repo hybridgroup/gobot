@@ -13,7 +13,7 @@ import (
 	"gobot.io/x/gobot/system"
 )
 
-const pwmDefaultPeriod = 3000000
+const pwmPeriodDefault = 3000000
 
 // Adaptor is the Gobot adaptor for the Jetson Nano
 type Adaptor struct {
@@ -170,7 +170,7 @@ func (c *Adaptor) PWMPin(pin string) (gobot.PWMPinner, error) {
 
 	c.pwmPins[pin] = NewPWMPin(c.sys, "/sys/class/pwm/pwmchip0", fn)
 	c.pwmPins[pin].Export()
-	c.pwmPins[pin].SetPeriod(pwmDefaultPeriod)
+	c.pwmPins[pin].SetPeriod(pwmPeriodDefault)
 	c.pwmPins[pin].Enable(true)
 
 	return c.pwmPins[pin], nil
@@ -183,7 +183,7 @@ func (c *Adaptor) PwmWrite(pin string, val byte) (err error) {
 		return err
 	}
 
-	duty := uint32(gobot.FromScale(float64(val), 0, 255) * float64(pwmDefaultPeriod))
+	duty := uint32(gobot.FromScale(float64(val), 0, 255) * float64(pwmPeriodDefault))
 	return sysPin.SetDutyCycle(duty)
 }
 
@@ -194,7 +194,7 @@ func (c *Adaptor) ServoWrite(pin string, angle byte) (err error) {
 		return err
 	}
 
-	duty := uint32(gobot.FromScale(float64(angle), 0, 180) * float64(pwmDefaultPeriod))
+	duty := uint32(gobot.FromScale(float64(angle), 0, 180) * float64(pwmPeriodDefault))
 	return sysPin.SetDutyCycle(duty)
 }
 

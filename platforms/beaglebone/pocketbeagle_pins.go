@@ -77,11 +77,11 @@ var pocketBeaglePinMap = map[string]int{
 }
 
 var pocketBeaglePwmPinMap = map[string]pwmPinData{
-	"P1_33": {path: "/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip*", channel: 1},
-	"P1_36": {path: "/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip*", channel: 0},
+	"P1_33": {dir: "/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/", dirRegexp: "pwmchip[0-9]+$", channel: 1},
+	"P1_36": {dir: "/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/", dirRegexp: "pwmchip[0-9]+$", channel: 0},
 
-	"P2_1": {path: "/sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm/pwmchip*", channel: 0},
-	"P2_3": {path: "/sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm/pwmchip*", channel: 1},
+	"P2_1": {dir: "/sys/devices/platform/ocp/48302000.epwmss/48302200.pwm/pwm/", dirRegexp: "pwmchip[0-9]+$", channel: 0},
+	"P2_3": {dir: "/sys/devices/platform/ocp/48304000.epwmss/48304200.pwm/pwm/", dirRegexp: "pwmchip[0-9]+$", channel: 1},
 }
 
 var pocketBeagleAnalogPinMap = map[string]string{

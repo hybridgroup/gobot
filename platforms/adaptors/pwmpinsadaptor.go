@@ -18,10 +18,13 @@ type pwmPinsOption interface {
 
 // PWMPinsAdaptor is a adaptor for PWM pins, normally used for composition in platforms.
 type PWMPinsAdaptor struct {
-	sys                   *system.Accesser
-	translate             pwmPinTranslator
-	initialize            pwmPinInitializer
-	periodDefault         uint32
+	sys        *system.Accesser
+	translate  pwmPinTranslator
+	initialize pwmPinInitializer
+	// 100000000ns = 100ms = 10Hz, 10000000ns = 10ms = 100Hz,  1000000ns = 1ms = 1kHz,
+	// 100000ns = 100us = 10kHz, 10000ns = 10us = 100kHz, 1000ns = 1us = 1MHz,
+	// 100ns = 10MHz, 10ns = 100MHz, 1ns = 1GHz
+	period                uint32 // in nano seconds, 1 = 1GHz
 	polarityNormal        string
 	polarityInverted      string
 	adjustDutyOnSetPeriod bool
@@ -33,11 +36,11 @@ type PWMPinsAdaptor struct {
 // to adapt the pin header naming, which is given by user, to the internal file name nomenclature. This varies by each
 // platform. If for some reasons the default initializer is not suitable, it can be given by the option
 // "WithPWMPinInitializer()".
-func NewPWMPinsAdaptor(sys *system.Accesser, t pwmPinTranslator, options ...func(pwmPinsOption)) *PWMPinsAdaptor {
+func NewPWMPinsAdaptor(sys *system.Accesser, periodNano uint32, t pwmPinTranslator, options ...func(pwmPinsOption)) *PWMPinsAdaptor {
 	a := &PWMPinsAdaptor{
 		sys:                   sys,
 		translate:             t,
-		periodDefault:         10000000, // 10ms = 100Hz
+		period:                periodNano,
 		polarityNormal:        "normal",
 		polarityInverted:      "inversed",
 		adjustDutyOnSetPeriod: true,
@@ -45,7 +48,7 @@ func NewPWMPinsAdaptor(sys *system.Accesser, t pwmPinTranslator, options ...func
 	for _, option := range options {
 		option(a)
 	}
-	a.initialize = getPwmPinInitializer(a.periodDefault, a.polarityNormal)
+	a.initialize = getPwmPinInitializer(a.period, a.polarityNormal)
 	return a
 }
 
@@ -124,7 +127,7 @@ func (a *PWMPinsAdaptor) ServoWrite(id string, angle byte) (err error) {
 	return pin.SetDutyCycle(duty)
 }
 
-// SetPeriod adjusts the period of the specified PWM pin.
+// SetPeriod adjusts the period of the specified PWM pin immediately.
 // If duty cycle is already set, also this value will be adjusted in the same ratio.
 func (a *PWMPinsAdaptor) SetPeriod(id string, period uint32) error {
 	a.mutex.Lock()

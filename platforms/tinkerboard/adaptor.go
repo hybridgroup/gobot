@@ -16,7 +16,7 @@ const debug = false
 const (
 	pwmNormal        = "normal"
 	pwmInverted      = "inversed"
-	pwmPeriodDefault = 10000000 // 10ms = 100Hz
+	pwmPeriodDefault = 10000000 // 10000000ns = 10ms = 100Hz
 )
 
 type pwmPinDefinition struct {
@@ -43,7 +43,7 @@ func NewAdaptor() *Adaptor {
 		sys:  sys,
 	}
 	c.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, c.translateDigitalPin)
-	c.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, c.translatePWMPin)
+	c.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, pwmPeriodDefault, c.translatePWMPin)
 	return c
 }
 
@@ -122,18 +122,18 @@ func (c *Adaptor) translateDigitalPin(id string) (string, int, error) {
 
 // TODO: test for this function:
 func (c *Adaptor) translatePWMPin(id string) (string, int, error) {
-	pin, ok := pwmPinDefinitions[id]
+	pinInfo, ok := pwmPinDefinitions[id]
 	if !ok {
 		return "", -1, fmt.Errorf("'%s' is not a valid id for a PWM pin", id)
 	}
-	path, err := pin.findPwmDir(*c.sys)
+	path, err := pinInfo.findPWMDir(c.sys)
 	if err != nil {
 		return "", -1, err
 	}
-	return path, pin.channel, nil
+	return path, pinInfo.channel, nil
 }
 
-func (p pwmPinDefinition) findPwmDir(sys system.Accesser) (dir string, err error) {
+func (p pwmPinDefinition) findPWMDir(sys *system.Accesser) (dir string, err error) {
 	items, _ := sys.Find(p.dir, p.dirRegexp)
 	if items == nil || len(items) == 0 {
 		return "", fmt.Errorf("No path found for PWM directory pattern, '%s' in path '%s'. See README.md for activation", p.dirRegexp, p.dir)
