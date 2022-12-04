@@ -46,7 +46,7 @@ func initTestPWMPinsAdaptorWithMockedFilesystem(mockPaths []string) (*PWMPinsAda
 	fs.Files[pwmEnablePath].Contents = "0"
 	fs.Files[pwmPeriodPath].Contents = "0"
 	fs.Files[pwmDutyCyclePath].Contents = "0"
-	fs.Files[pwmPolarityPath].Contents = a.polarityInverted
+	fs.Files[pwmPolarityPath].Contents = a.polarityInvertedIdentifier
 	if err := a.Connect(); err != nil {
 		panic(err)
 	}

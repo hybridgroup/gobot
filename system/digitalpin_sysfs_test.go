@@ -15,6 +15,12 @@ var _ gobot.DigitalPinValuer = (*digitalPinSysfs)(nil)
 var _ gobot.DigitalPinOptioner = (*digitalPinSysfs)(nil)
 var _ gobot.DigitalPinOptionApplier = (*digitalPinSysfs)(nil)
 
+func initTestDigitalPinSysFsWithMockedFilesystem(mockPaths []string) (*digitalPinSysfs, *MockFilesystem) {
+	fs := newMockFilesystem(mockPaths)
+	pin := newDigitalPinSysfs(fs, "10")
+	return pin, fs
+}
+
 func TestDigitalPin(t *testing.T) {
 	mockPaths := []string{
 		"/sys/class/gpio/export",
@@ -22,9 +28,8 @@ func TestDigitalPin(t *testing.T) {
 		"/sys/class/gpio/gpio10/value",
 		"/sys/class/gpio/gpio10/direction",
 	}
-	fs := newMockFilesystem(mockPaths)
+	pin, fs := initTestDigitalPinSysFsWithMockedFilesystem(mockPaths)
 
-	pin := newDigitalPinSysfs(fs, "10")
 	gobottest.Assert(t, pin.pin, "10")
 	gobottest.Assert(t, pin.label, "gpio10")
 	gobottest.Assert(t, pin.valFile, nil)
@@ -96,9 +101,7 @@ func TestDigitalPinExportError(t *testing.T) {
 		"/sys/class/gpio/export",
 		"/sys/class/gpio/gpio11/direction",
 	}
-	fs := newMockFilesystem(mockPaths)
-
-	pin := newDigitalPinSysfs(fs, "10")
+	pin, _ := initTestDigitalPinSysFsWithMockedFilesystem(mockPaths)
 
 	writeFile = func(File, []byte) (int, error) {
 		return 0, &os.PathError{Err: syscall.EBUSY}
@@ -112,9 +115,7 @@ func TestDigitalPinUnexportError(t *testing.T) {
 	mockPaths := []string{
 		"/sys/class/gpio/unexport",
 	}
-	fs := newMockFilesystem(mockPaths)
-
-	pin := newDigitalPinSysfs(fs, "10")
+	pin, _ := initTestDigitalPinSysFsWithMockedFilesystem(mockPaths)
 
 	writeFile = func(File, []byte) (int, error) {
 		return 0, &os.PathError{Err: syscall.EBUSY}

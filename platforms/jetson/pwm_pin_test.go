@@ -24,12 +24,12 @@ func TestPwmPin(t *testing.T) {
 
 	pin := NewPWMPin(a, "/sys/class/pwm/pwmchip0", "0")
 	gobottest.Assert(t, pin.Export(), nil)
-	gobottest.Assert(t, pin.Enable(true), nil)
+	gobottest.Assert(t, pin.SetEnabled(true), nil)
 	val, _ := pin.Polarity()
-	gobottest.Assert(t, val, "normal")
-	gobottest.Assert(t, pin.InvertPolarity(true), nil)
+	gobottest.Assert(t, val, true)
+	gobottest.Assert(t, pin.SetPolarity(false), nil)
 	val, _ = pin.Polarity()
-	gobottest.Assert(t, val, "normal")
+	gobottest.Assert(t, val, true)
 
 	period, err := pin.Period()
 	gobottest.Assert(t, err, errors.New("Jetson PWM pin period not set"))

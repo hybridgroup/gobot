@@ -19,21 +19,22 @@ type pwmPinTranslator func(pin string) (path string, channel int, err error)
 type pwmPinInitializer func(gobot.PWMPinner) error
 
 type pwmPinsOption interface {
-	setPWMPinInitializer(pwmPinInitializer)
-	setPWMPinDefaultPeriod(uint32)
+	setInitializer(pwmPinInitializer)
+	setDefaultPeriod(uint32)
+	setPolarityInvertedIdentifier(string)
 }
 
 // PWMPinsAdaptor is a adaptor for PWM pins, normally used for composition in platforms.
 type PWMPinsAdaptor struct {
-	sys                   *system.Accesser
-	translate             pwmPinTranslator
-	initialize            pwmPinInitializer
-	periodDefault         uint32
-	polarityNormal        string
-	polarityInverted      string
-	adjustDutyOnSetPeriod bool
-	pins                  map[string]gobot.PWMPinner
-	mutex                 sync.Mutex
+	sys                        *system.Accesser
+	translate                  pwmPinTranslator
+	initialize                 pwmPinInitializer
+	periodDefault              uint32
+	polarityNormalIdentifier   string
+	polarityInvertedIdentifier string
+	adjustDutyOnSetPeriod      bool
+	pins                       map[string]gobot.PWMPinner
+	mutex                      sync.Mutex
 }
 
 // NewPWMPinsAdaptor provides the access to PWM pins of the board. It uses sysfs system drivers. The translator is used
@@ -41,34 +42,39 @@ type PWMPinsAdaptor struct {
 // platform. If for some reasons the default initializer is not suitable, it can be given by the option
 // "WithPWMPinInitializer()".
 func NewPWMPinsAdaptor(sys *system.Accesser, t pwmPinTranslator, options ...func(pwmPinsOption)) *PWMPinsAdaptor {
-	// TODO: use normal and inverted values for pin creator
-	const polarityNormal = "normal"
 	a := &PWMPinsAdaptor{
-		sys:                   sys,
-		translate:             t,
-		periodDefault:         pwmPeriodDefault,
-		polarityNormal:        polarityNormal,
-		polarityInverted:      "inversed",
-		adjustDutyOnSetPeriod: true,
+		sys:                        sys,
+		translate:                  t,
+		periodDefault:              pwmPeriodDefault,
+		polarityNormalIdentifier:   "normal",
+		polarityInvertedIdentifier: "inverted",
+		adjustDutyOnSetPeriod:      true,
 	}
-	a.initialize = a.getPwmPinDefaultInitializer()
+	a.initialize = a.getDefaultInitializer()
 	for _, option := range options {
 		option(a)
 	}
 	return a
 }
 
-// WithPWMPinInitializer can be used to substitute the default initializer.
+// WithPWMPinInitializer substitute the default initializer.
 func WithPWMPinInitializer(pc pwmPinInitializer) func(pwmPinsOption) {
 	return func(a pwmPinsOption) {
-		a.setPWMPinInitializer(pc)
+		a.setInitializer(pc)
 	}
 }
 
-// WithPWMPinDefaultPeriod can be used to substitute the default period of 10 ms (100 Hz) for all created pins.
+// WithPWMPinDefaultPeriod substitute the default period of 10 ms (100 Hz) for all created pins.
 func WithPWMPinDefaultPeriod(periodNanoSec uint32) func(pwmPinsOption) {
 	return func(a pwmPinsOption) {
-		a.setPWMPinDefaultPeriod(periodNanoSec)
+		a.setDefaultPeriod(periodNanoSec)
+	}
+}
+
+// WithPolarityInvertedIdentifier use the given identifier, which will replace the default "inverted".
+func WithPolarityInvertedIdentifier(identifier string) func(pwmPinsOption) {
+	return func(a pwmPinsOption) {
+		a.setPolarityInvertedIdentifier(identifier)
 	}
 }
 
@@ -88,7 +94,7 @@ func (a *PWMPinsAdaptor) Finalize() (err error) {
 
 	for _, pin := range a.pins {
 		if pin != nil {
-			if errs := pin.Enable(false); errs != nil {
+			if errs := pin.SetEnabled(false); errs != nil {
 				err = multierror.Append(err, errs)
 			}
 			if errs := pin.Unexport(); errs != nil {
@@ -162,30 +168,34 @@ func (a *PWMPinsAdaptor) PWMPin(id string) (gobot.PWMPinner, error) {
 	return a.pwmPin(id)
 }
 
-func (a *PWMPinsAdaptor) setPWMPinInitializer(pinInit pwmPinInitializer) {
+func (a *PWMPinsAdaptor) setInitializer(pinInit pwmPinInitializer) {
 	a.initialize = pinInit
 }
 
-func (a *PWMPinsAdaptor) setPWMPinDefaultPeriod(periodNanoSec uint32) {
+func (a *PWMPinsAdaptor) setDefaultPeriod(periodNanoSec uint32) {
 	a.periodDefault = periodNanoSec
 }
 
-func (a *PWMPinsAdaptor) getPwmPinDefaultInitializer() func(gobot.PWMPinner) error {
+func (a *PWMPinsAdaptor) setPolarityInvertedIdentifier(identifier string) {
+	a.polarityInvertedIdentifier = identifier
+}
+
+func (a *PWMPinsAdaptor) getDefaultInitializer() func(gobot.PWMPinner) error {
 	return func(pin gobot.PWMPinner) error {
 		if err := pin.Export(); err != nil {
 			return err
 		}
 		// Make sure pwm is disabled before change anything
-		if err := pin.Enable(false); err != nil {
+		if err := pin.SetEnabled(false); err != nil {
 			return err
 		}
 		if err := setPeriod(pin, a.periodDefault, false); err != nil {
 			return err
 		}
-		if err := pin.SetPolarity(a.polarityNormal); err != nil {
+		if err := pin.SetPolarity(true); err != nil {
 			return err
 		}
-		return pin.Enable(true)
+		return pin.SetEnabled(true)
 	}
 }
 
@@ -201,7 +211,7 @@ func (a *PWMPinsAdaptor) pwmPin(id string) (gobot.PWMPinner, error) {
 		if err != nil {
 			return nil, err
 		}
-		pin = a.sys.NewPWMPin(path, channel)
+		pin = a.sys.NewPWMPin(path, channel, a.polarityNormalIdentifier, a.polarityInvertedIdentifier)
 		if err := a.initialize(pin); err != nil {
 			return nil, err
 		}

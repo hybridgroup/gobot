@@ -329,7 +329,7 @@ func pwmPinInitializer(pin gobot.PWMPinner) error {
 	if err := pin.Export(); err != nil {
 		return err
 	}
-	return pin.Enable(true)
+	return pin.SetEnabled(true)
 }
 
 func (c *Adaptor) translateAndMuxPWMPin(id string) (string, int, error) {

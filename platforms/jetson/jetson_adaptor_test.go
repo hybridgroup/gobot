@@ -81,6 +81,8 @@ func TestPWMPinsReConnect(t *testing.T) {
 		"/sys/class/pwm/pwmchip0/export",
 		"/sys/class/pwm/pwmchip0/unexport",
 		"/sys/class/pwm/pwmchip0/pwm2/duty_cycle",
+		"/sys/class/pwm/pwmchip0/pwm2/period",
+		"/sys/class/pwm/pwmchip0/pwm2/enable",
 	}
 	a, _ := initTestAdaptorWithMockedFilesystem(mockPaths)
 	gobottest.Assert(t, len(a.pwmPins), 0)

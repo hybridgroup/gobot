@@ -216,9 +216,15 @@ func (c *Adaptor) pwmPin(pin string) (gobot.PWMPinner, error) {
 	}
 
 	c.pwmPins[pin] = NewPWMPin(c.sys, "/sys/class/pwm/pwmchip0", fn)
-	c.pwmPins[pin].Export()
-	c.pwmPins[pin].SetPeriod(pwmPeriodDefault)
-	c.pwmPins[pin].Enable(true)
+	if err := c.pwmPins[pin].Export(); err != nil {
+		return nil, err
+	}
+	if err := c.pwmPins[pin].SetPeriod(pwmPeriodDefault); err != nil {
+		return nil, err
+	}
+	if err := c.pwmPins[pin].SetEnabled(true); err != nil {
+		return nil, err
+	}
 
 	return c.pwmPins[pin], nil
 }

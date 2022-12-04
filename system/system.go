@@ -110,8 +110,7 @@ func (a *Accesser) UseMockFilesystem(files []string) *MockFilesystem {
 	return fs
 }
 
-// NewDigitalPin returns a new system digital pin given the pin number and an optional pin label.
-// If no label is supplied a default label will prepend to the pin number.
+// NewDigitalPin returns a new system digital pin, according to the given pin number.
 func (a *Accesser) NewDigitalPin(chip string, pin int,
 	o ...func(gobot.DigitalPinOptioner) bool) gobot.DigitalPinner {
 	return a.digitalPinAccess.createPin(chip, pin, o...)
@@ -123,6 +122,11 @@ func (a *Accesser) IsSysfsDigitalPinAccess() bool {
 		return true
 	}
 	return false
+}
+
+// NewPWMPin returns a new system PWM pin, according to the given pin number.
+func (a *Accesser) NewPWMPin(path string, pin int, polNormIdent string, polInvIdent string) gobot.PWMPinner {
+	return newPWMPinSysfs(a.fs, path, pin, polNormIdent, polInvIdent)
 }
 
 // OpenFile opens file of given name from native or the mocked file system

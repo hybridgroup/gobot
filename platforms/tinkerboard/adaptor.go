@@ -42,7 +42,8 @@ func NewAdaptor() *Adaptor {
 		sys:  sys,
 	}
 	c.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, c.translateDigitalPin)
-	c.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, c.translatePWMPin)
+	c.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, c.translatePWMPin,
+		adaptors.WithPolarityInvertedIdentifier("inversed"))
 	return c
 }
 

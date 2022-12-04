@@ -118,5 +118,5 @@ func pwmPinInitializer(pin gobot.PWMPinner) error {
 	if err := pin.SetPeriod(10000000); err != nil {
 		return err
 	}
-	return pin.Enable(true)
+	return pin.SetEnabled(true)
 }
