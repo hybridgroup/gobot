@@ -22,7 +22,7 @@ type pwmPinData struct {
 	dirRegexp string
 }
 
-const pwmPeriodDefault = 500000
+const pwmPeriodDefault = 500000 // 0.5 ms = 2 kHz
 
 // Adaptor is the gobot.Adaptor representation for the Beaglebone Black/Green
 type Adaptor struct {
@@ -55,7 +55,8 @@ func NewAdaptor() *Adaptor {
 	}
 
 	c.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, c.translateAndMuxDigitalPin)
-	c.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, pwmPeriodDefault, c.translateAndMuxPWMPin)
+	c.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, c.translateAndMuxPWMPin,
+		adaptors.WithPWMPinDefaultPeriod(pwmPeriodDefault))
 	return c
 }
 

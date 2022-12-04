@@ -9,25 +9,26 @@ import (
 	"gobot.io/x/gobot/system"
 )
 
-type pwmPinTranslator func(pin string) (path string, channel int, err error)
-type pwmPinInitializer func(gobot.PWMPinner) error
-
-// TODO: decide to add WithDefaultPeriod
-
-type pwmPinsOption interface {
-	setPWMPinInitializer(pwmPinInitializer)
-}
-
 //note for period in nano seconds:
 // 100000000ns = 100ms = 10Hz, 10000000ns = 10ms = 100Hz,  1000000ns = 1ms = 1kHz,
 // 100000ns = 100us = 10kHz, 10000ns = 10us = 100kHz, 1000ns = 1us = 1MHz,
 // 100ns = 10MHz, 10ns = 100MHz, 1ns = 1GHz
+const pwmPeriodDefault = 10000000 // 10 ms = 100 Hz
+
+type pwmPinTranslator func(pin string) (path string, channel int, err error)
+type pwmPinInitializer func(gobot.PWMPinner) error
+
+type pwmPinsOption interface {
+	setPWMPinInitializer(pwmPinInitializer)
+	setPWMPinDefaultPeriod(uint32)
+}
 
 // PWMPinsAdaptor is a adaptor for PWM pins, normally used for composition in platforms.
 type PWMPinsAdaptor struct {
 	sys                   *system.Accesser
 	translate             pwmPinTranslator
 	initialize            pwmPinInitializer
+	periodDefault         uint32
 	polarityNormal        string
 	polarityInverted      string
 	adjustDutyOnSetPeriod bool
@@ -39,16 +40,18 @@ type PWMPinsAdaptor struct {
 // to adapt the pin header naming, which is given by user, to the internal file name nomenclature. This varies by each
 // platform. If for some reasons the default initializer is not suitable, it can be given by the option
 // "WithPWMPinInitializer()".
-func NewPWMPinsAdaptor(sys *system.Accesser, periodNanoSec uint32, t pwmPinTranslator, options ...func(pwmPinsOption)) *PWMPinsAdaptor {
+func NewPWMPinsAdaptor(sys *system.Accesser, t pwmPinTranslator, options ...func(pwmPinsOption)) *PWMPinsAdaptor {
+	// TODO: use normal and inverted values for pin creator
 	const polarityNormal = "normal"
 	a := &PWMPinsAdaptor{
 		sys:                   sys,
 		translate:             t,
-		initialize:            getPwmPinInitializer(periodNanoSec, polarityNormal),
+		periodDefault:         pwmPeriodDefault,
 		polarityNormal:        polarityNormal,
 		polarityInverted:      "inversed",
 		adjustDutyOnSetPeriod: true,
 	}
+	a.initialize = a.getPwmPinDefaultInitializer()
 	for _, option := range options {
 		option(a)
 	}
@@ -59,6 +62,13 @@ func NewPWMPinsAdaptor(sys *system.Accesser, periodNanoSec uint32, t pwmPinTrans
 func WithPWMPinInitializer(pc pwmPinInitializer) func(pwmPinsOption) {
 	return func(a pwmPinsOption) {
 		a.setPWMPinInitializer(pc)
+	}
+}
+
+// WithPWMPinDefaultPeriod can be used to substitute the default period of 10 ms (100 Hz) for all created pins.
+func WithPWMPinDefaultPeriod(periodNanoSec uint32) func(pwmPinsOption) {
+	return func(a pwmPinsOption) {
+		a.setPWMPinDefaultPeriod(periodNanoSec)
 	}
 }
 
@@ -156,6 +166,29 @@ func (a *PWMPinsAdaptor) setPWMPinInitializer(pinInit pwmPinInitializer) {
 	a.initialize = pinInit
 }
 
+func (a *PWMPinsAdaptor) setPWMPinDefaultPeriod(periodNanoSec uint32) {
+	a.periodDefault = periodNanoSec
+}
+
+func (a *PWMPinsAdaptor) getPwmPinDefaultInitializer() func(gobot.PWMPinner) error {
+	return func(pin gobot.PWMPinner) error {
+		if err := pin.Export(); err != nil {
+			return err
+		}
+		// Make sure pwm is disabled before change anything
+		if err := pin.Enable(false); err != nil {
+			return err
+		}
+		if err := setPeriod(pin, a.periodDefault, false); err != nil {
+			return err
+		}
+		if err := pin.SetPolarity(a.polarityNormal); err != nil {
+			return err
+		}
+		return pin.Enable(true)
+	}
+}
+
 func (a *PWMPinsAdaptor) pwmPin(id string) (gobot.PWMPinner, error) {
 	if a.pins == nil {
 		return nil, fmt.Errorf("not connected")
@@ -176,25 +209,6 @@ func (a *PWMPinsAdaptor) pwmPin(id string) (gobot.PWMPinner, error) {
 	}
 
 	return pin, nil
-}
-
-func getPwmPinInitializer(periodDefault uint32, polarityNormal string) func(gobot.PWMPinner) error {
-	return func(pin gobot.PWMPinner) error {
-		if err := pin.Export(); err != nil {
-			return err
-		}
-		// Make sure pwm is disabled before change anything
-		if err := pin.Enable(false); err != nil {
-			return err
-		}
-		if err := setPeriod(pin, periodDefault, false); err != nil {
-			return err
-		}
-		if err := pin.SetPolarity(polarityNormal); err != nil {
-			return err
-		}
-		return pin.Enable(true)
-	}
 }
 
 // setPeriod adjusts the PWM period of the given pin. If duty cycle is already set and this feature is not suppressed,

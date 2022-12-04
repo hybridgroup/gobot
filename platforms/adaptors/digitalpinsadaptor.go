@@ -34,7 +34,7 @@ func NewDigitalPinsAdaptor(sys *system.Accesser, t digitalPinTranslator, options
 	a := &DigitalPinsAdaptor{
 		sys:        sys,
 		translate:  t,
-		initialize: getDigitalPinInitializer(),
+		initialize: func(pin gobot.DigitalPinner) error { return pin.Export() },
 	}
 	for _, option := range options {
 		option(a)
@@ -135,10 +135,4 @@ func (a *DigitalPinsAdaptor) digitalPin(id string, o ...func(gobot.DigitalPinOpt
 	}
 
 	return pin, nil
-}
-
-func getDigitalPinInitializer() func(gobot.DigitalPinner) error {
-	return func(pin gobot.DigitalPinner) error {
-		return pin.Export()
-	}
 }

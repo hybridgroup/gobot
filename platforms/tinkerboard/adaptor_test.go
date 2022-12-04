@@ -163,7 +163,7 @@ func TestPwmWrite(t *testing.T) {
 
 	gobottest.Assert(t, fs.Files[pwm2ExportPath].Contents, "0")
 	gobottest.Assert(t, fs.Files[pwm2EnablePath].Contents, "1")
-	gobottest.Assert(t, fs.Files[pwm2PeriodPath].Contents, fmt.Sprintf("%d", pwmPeriodDefault))
+	gobottest.Assert(t, fs.Files[pwm2PeriodPath].Contents, fmt.Sprintf("%d", 10000000))
 	gobottest.Assert(t, fs.Files[pwm2DutyCyclePath].Contents, "3921568")
 	gobottest.Assert(t, fs.Files[pwm2PolarityPath].Contents, "normal")
 

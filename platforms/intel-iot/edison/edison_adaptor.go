@@ -14,8 +14,6 @@ import (
 	"gobot.io/x/gobot/system"
 )
 
-const pwmPeriodDefault = 10000000 // 10 ms = 100 Hz
-
 type mux struct {
 	pin   int
 	value int
@@ -50,7 +48,7 @@ func NewAdaptor() *Adaptor {
 		sys:    sys,
 		pinmap: arduinoPinMap,
 	}
-	c.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, pwmPeriodDefault, c.translateAndMuxPWMPin,
+	c.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, c.translateAndMuxPWMPin,
 		adaptors.WithPWMPinInitializer(pwmPinInitializer))
 	return c
 }

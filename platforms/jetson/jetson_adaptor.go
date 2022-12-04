@@ -13,7 +13,7 @@ import (
 	"gobot.io/x/gobot/system"
 )
 
-const pwmPeriodDefault = 3000000
+const pwmPeriodDefault = 3000000 // 3 ms = 333 Hz
 
 // Adaptor is the Gobot adaptor for the Jetson Nano
 type Adaptor struct {

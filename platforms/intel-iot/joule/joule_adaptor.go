@@ -11,8 +11,6 @@ import (
 	"gobot.io/x/gobot/system"
 )
 
-const pwmPeriodDefault = 10000000 // 10 ms = 100 Hz
-
 type sysfsPin struct {
 	pin    int
 	pwmPin int
@@ -36,8 +34,7 @@ func NewAdaptor() *Adaptor {
 		sys:  sys,
 	}
 	c.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, c.translateDigitalPin)
-	c.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, pwmPeriodDefault, c.translatePWMPin,
-		adaptors.WithPWMPinInitializer(pwmPinInitializer))
+	c.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, c.translatePWMPin, adaptors.WithPWMPinInitializer(pwmPinInitializer))
 	return c
 }
 
@@ -118,7 +115,7 @@ func pwmPinInitializer(pin gobot.PWMPinner) error {
 	if err := pin.Export(); err != nil {
 		return err
 	}
-	if err := pin.SetPeriod(pwmPeriodDefault); err != nil {
+	if err := pin.SetPeriod(10000000); err != nil {
 		return err
 	}
 	return pin.Enable(true)

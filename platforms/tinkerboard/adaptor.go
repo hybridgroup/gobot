@@ -14,9 +14,8 @@ import (
 const debug = false
 
 const (
-	pwmNormal        = "normal"
-	pwmInverted      = "inversed"
-	pwmPeriodDefault = 10000000 // 10000000ns = 10ms = 100Hz
+	pwmNormal   = "normal"
+	pwmInverted = "inversed"
 )
 
 type pwmPinDefinition struct {
@@ -43,7 +42,7 @@ func NewAdaptor() *Adaptor {
 		sys:  sys,
 	}
 	c.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, c.translateDigitalPin)
-	c.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, pwmPeriodDefault, c.translatePWMPin)
+	c.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, c.translatePWMPin)
 	return c
 }
 

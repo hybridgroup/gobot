@@ -15,8 +15,6 @@ import (
 	"gobot.io/x/gobot/system"
 )
 
-const pwmPeriodDefault = 10000000 // 10 ms = 100 Hz
-
 // Valids pins are the XIO-P0 through XIO-P7 pins from the
 // extender (pins 13-20 on header 14), as well as the SoC pins
 // aka all the other pins.
@@ -52,7 +50,7 @@ func NewAdaptor() *Adaptor {
 	}
 
 	c.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, c.translateDigitalPin)
-	c.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, pwmPeriodDefault, c.translatePWMPin)
+	c.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, c.translatePWMPin)
 	return c
 }
 

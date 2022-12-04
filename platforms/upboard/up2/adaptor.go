@@ -28,8 +28,6 @@ const (
 	LEDYellow = "yellow"
 )
 
-const pwmPeriodDefault = 10000000 // 10 ms = 100 Hz
-
 type sysfsPin struct {
 	pin    int
 	pwmPin int
@@ -58,7 +56,7 @@ func NewAdaptor() *Adaptor {
 		pinmap:  fixedPins,
 	}
 	c.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, c.translateDigitalPin)
-	c.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, pwmPeriodDefault, c.translatePWMPin)
+	c.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, c.translatePWMPin)
 	return c
 }
 
