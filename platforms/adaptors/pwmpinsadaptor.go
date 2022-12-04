@@ -222,8 +222,8 @@ func (a *PWMPinsAdaptor) pwmPin(id string) (gobot.PWMPinner, error) {
 }
 
 // setPeriod adjusts the PWM period of the given pin. If duty cycle is already set and this feature is not suppressed,
-// also this value will be adjusted in the same ratio. The order in which the values are written must be observed,
-// otherwise an error occur "write error: Invalid argument".
+// also this value will be adjusted in the same ratio. The order of writing the values must be observed, otherwise an
+// error occur "write error: Invalid argument".
 func setPeriod(pin gobot.PWMPinner, period uint32, adjustDuty bool) error {
 	var errorBase = fmt.Sprintf("setPeriod(%v, %d) failed", pin, period)
 

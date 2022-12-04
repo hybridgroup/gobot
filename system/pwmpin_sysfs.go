@@ -75,7 +75,7 @@ func (p *pwmPinSysFs) Unexport() error {
 func (p *pwmPinSysFs) Enabled() (bool, error) {
 	buf, err := p.read(p.fs, p.pwmEnablePath())
 	if err != nil {
-		return false, fmt.Errorf(pwmPinErrorPattern, "enable", p.pin, err)
+		return false, fmt.Errorf(pwmPinErrorPattern, "Enabled", p.pin, err)
 	}
 	if len(buf) == 0 {
 		return false, nil
@@ -95,7 +95,7 @@ func (p *pwmPinSysFs) SetEnabled(enable bool) error {
 		if pwmDebug {
 			p.printState()
 		}
-		return fmt.Errorf(pwmPinSetErrorPattern, "Enable", enable, p.pin, err)
+		return fmt.Errorf(pwmPinSetErrorPattern, "SetEnabled", enable, p.pin, err)
 	}
 
 	return nil

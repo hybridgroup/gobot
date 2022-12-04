@@ -80,48 +80,6 @@ func TestName(t *testing.T) {
 	gobottest.Assert(t, a.Name(), "NewName")
 }
 
-func Test_translateDigitalPin(t *testing.T) {
-	var tests = map[string]struct {
-		access   string
-		pin      string
-		wantChip string
-		wantLine int
-		wantErr  error
-	}{
-		"cdev_ok": {
-			access:   "cdev",
-			pin:      "7",
-			wantChip: "gpiochip0",
-			wantLine: 17,
-		},
-		"sysfs_ok": {
-			access:   "sysfs",
-			pin:      "7",
-			wantChip: "",
-			wantLine: 17,
-		},
-		"unknown_pin": {
-			pin:      "99",
-			wantChip: "",
-			wantLine: -1,
-			wantErr:  fmt.Errorf("'99' is not a valid id for a digital pin"),
-		},
-	}
-	for name, tc := range tests {
-		t.Run(name, func(t *testing.T) {
-			// arrange
-			a := NewAdaptor()
-			a.sys.UseDigitalPinAccessWithMockFs(tc.access, []string{})
-			// act
-			chip, line, err := a.translateDigitalPin(tc.pin)
-			// assert
-			gobottest.Assert(t, err, tc.wantErr)
-			gobottest.Assert(t, chip, tc.wantChip)
-			gobottest.Assert(t, line, tc.wantLine)
-		})
-	}
-}
-
 func TestDigitalIO(t *testing.T) {
 	// only basic tests needed, further tests are done in "digitalpinsadaptor.go"
 	a, fs := initTestAdaptorWithMockedFilesystem(gpioMockPaths)
@@ -269,4 +227,46 @@ func TestFinalizeErrorAfterPWM(t *testing.T) {
 
 	err := a.Finalize()
 	gobottest.Assert(t, strings.Contains(err.Error(), "write error"), true)
+}
+
+func Test_translateDigitalPin(t *testing.T) {
+	var tests = map[string]struct {
+		access   string
+		pin      string
+		wantChip string
+		wantLine int
+		wantErr  error
+	}{
+		"cdev_ok": {
+			access:   "cdev",
+			pin:      "7",
+			wantChip: "gpiochip0",
+			wantLine: 17,
+		},
+		"sysfs_ok": {
+			access:   "sysfs",
+			pin:      "7",
+			wantChip: "",
+			wantLine: 17,
+		},
+		"unknown_pin": {
+			pin:      "99",
+			wantChip: "",
+			wantLine: -1,
+			wantErr:  fmt.Errorf("'99' is not a valid id for a digital pin"),
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			a := NewAdaptor()
+			a.sys.UseDigitalPinAccessWithMockFs(tc.access, []string{})
+			// act
+			chip, line, err := a.translateDigitalPin(tc.pin)
+			// assert
+			gobottest.Assert(t, err, tc.wantErr)
+			gobottest.Assert(t, chip, tc.wantChip)
+			gobottest.Assert(t, line, tc.wantLine)
+		})
+	}
 }

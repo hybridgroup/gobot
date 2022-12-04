@@ -74,8 +74,6 @@ func TestNewPWMPinsAdaptor(t *testing.T) {
 	gobottest.Assert(t, a.adjustDutyOnSetPeriod, true)
 }
 
-// TODO: test With...
-
 func TestWithPWMPinInitializer(t *testing.T) {
 	// This is a general test, that options are applied by using the WithPWMPinInitializer() option.
 	// All other configuration options can also be tested by With..(val)(a).
@@ -181,15 +179,6 @@ func TestPwmWrite(t *testing.T) {
 	gobottest.Assert(t, fs.Files[pwmDutyCyclePath].Contents, "3921568")
 	gobottest.Assert(t, fs.Files[pwmPolarityPath].Contents, "normal")
 
-	err = a.ServoWrite("33", 0)
-	gobottest.Assert(t, err, nil)
-
-	gobottest.Assert(t, fs.Files[pwmDutyCyclePath].Contents, "500000")
-
-	err = a.ServoWrite("33", 180)
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, fs.Files[pwmDutyCyclePath].Contents, "2000000")
-
 	err = a.PwmWrite("notexist", 42)
 	gobottest.Assert(t, err.Error(), "'notexist' is not a valid id of a PWM pin")
 
@@ -200,6 +189,34 @@ func TestPwmWrite(t *testing.T) {
 
 	fs.WithReadError = true
 	err = a.PwmWrite("33", 100)
+	gobottest.Assert(t, strings.Contains(err.Error(), "read error"), true)
+}
+
+func TestServoWrite(t *testing.T) {
+	a, fs := initTestPWMPinsAdaptorWithMockedFilesystem(pwmMockPaths)
+
+	err := a.ServoWrite("33", 0)
+	gobottest.Assert(t, fs.Files[pwmExportPath].Contents, "44")
+	gobottest.Assert(t, fs.Files[pwmEnablePath].Contents, "1")
+	gobottest.Assert(t, fs.Files[pwmPeriodPath].Contents, fmt.Sprintf("%d", a.periodDefault))
+	gobottest.Assert(t, fs.Files[pwmDutyCyclePath].Contents, "500000")
+	gobottest.Assert(t, fs.Files[pwmPolarityPath].Contents, "normal")
+	gobottest.Assert(t, err, nil)
+
+	err = a.ServoWrite("33", 180)
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, fs.Files[pwmDutyCyclePath].Contents, "2000000")
+
+	err = a.ServoWrite("notexist", 42)
+	gobottest.Assert(t, err.Error(), "'notexist' is not a valid id of a PWM pin")
+
+	fs.WithWriteError = true
+	err = a.ServoWrite("33", 100)
+	gobottest.Assert(t, strings.Contains(err.Error(), "write error"), true)
+	fs.WithWriteError = false
+
+	fs.WithReadError = true
+	err = a.ServoWrite("33", 100)
 	gobottest.Assert(t, strings.Contains(err.Error(), "read error"), true)
 }
 
@@ -239,6 +256,83 @@ func TestSetPeriod(t *testing.T) {
 	// assert
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, fs.Files[pwmDutyCyclePath].Contents, fmt.Sprintf("%d", 2540000))
+
+	// act
+	err = a.SetPeriod("not_exist", newPeriod)
+	// assert
+	gobottest.Assert(t, err.Error(), "'not_exist' is not a valid id of a PWM pin")
+}
+
+func Test_PWMPin(t *testing.T) {
+	translateErr := "translator_error"
+	translator := func(string) (string, int, error) { return pwmDir, 44, nil }
+	var tests = map[string]struct {
+		mockPaths []string
+		translate func(string) (string, int, error)
+		pin       string
+		wantErr   string
+	}{
+		"pin_ok": {
+			mockPaths: []string{pwmExportPath, pwmEnablePath, pwmPeriodPath, pwmDutyCyclePath, pwmPolarityPath},
+			translate: translator,
+			pin:       "33",
+		},
+		"init_export_error": {
+			mockPaths: []string{},
+			translate: translator,
+			pin:       "33",
+			wantErr:   "Export() failed for pin 44 with  : /sys/devices/platform/ff680020.pwm/pwm/pwmchip3/export: No such file.",
+		},
+		"init_setenabled_error": {
+			mockPaths: []string{pwmExportPath},
+			translate: translator,
+			pin:       "33",
+			wantErr:   "SetEnabled(false) failed for pin 44 with  : /sys/devices/platform/ff680020.pwm/pwm/pwmchip3/pwm44/enable: No such file.",
+		},
+		"init_setperiod_dutycycle_no_error": {
+			mockPaths: []string{pwmExportPath, pwmEnablePath, pwmPeriodPath, pwmPolarityPath},
+			translate: translator,
+			pin:       "33",
+		},
+		"init_setperiod_error": {
+			mockPaths: []string{pwmExportPath, pwmEnablePath},
+			translate: translator,
+			pin:       "33",
+			wantErr:   "SetPeriod(10000000) failed for pin 44 with  : /sys/devices/platform/ff680020.pwm/pwm/pwmchip3/pwm44/period: No such file.",
+		},
+		"init_setpolarity_error": {
+			mockPaths: []string{pwmExportPath, pwmEnablePath, pwmPeriodPath, pwmDutyCyclePath},
+			translate: translator,
+			pin:       "33",
+			wantErr:   "SetPolarity(normal) failed for pin 44 with  : /sys/devices/platform/ff680020.pwm/pwm/pwmchip3/pwm44/polarity: No such file.",
+		},
+		"translate_error": {
+			translate: func(string) (string, int, error) { return "", -1, fmt.Errorf(translateErr) },
+			wantErr:   translateErr,
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			sys := system.NewAccesser()
+			sys.UseMockFilesystem(tc.mockPaths)
+			a := NewPWMPinsAdaptor(sys, tc.translate)
+			if err := a.Connect(); err != nil {
+				panic(err)
+			}
+			// act
+			got, err := a.PWMPin(tc.pin)
+			// assert
+			if tc.wantErr == "" {
+				gobottest.Assert(t, err, nil)
+				gobottest.Refute(t, got, nil)
+			} else {
+				gobottest.Assert(t, strings.Contains(err.Error(), tc.wantErr), true)
+				gobottest.Assert(t, got, nil)
+			}
+
+		})
+	}
 }
 
 func TestPWMPinConcurrency(t *testing.T) {
