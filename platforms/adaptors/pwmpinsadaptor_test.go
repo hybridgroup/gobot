@@ -62,13 +62,57 @@ func testPWMPinTranslator(id string) (string, int, error) {
 	return pwmDir, channel, err
 }
 
+func TestNewPWMPinsAdaptor(t *testing.T) {
+	// arrange
+	translate := func(pin string) (chip string, line int, err error) { return }
+	// act
+	a := NewPWMPinsAdaptor(system.NewAccesser(), translate)
+	// assert
+	gobottest.Assert(t, a.periodDefault, uint32(pwmPeriodDefault))
+	gobottest.Assert(t, a.polarityNormalIdentifier, "normal")
+	gobottest.Assert(t, a.polarityInvertedIdentifier, "inverted")
+	gobottest.Assert(t, a.adjustDutyOnSetPeriod, true)
+}
+
 // TODO: test With...
+
+func TestWithPWMPinInitializer(t *testing.T) {
+	// This is a general test, that options are applied by using the WithPWMPinInitializer() option.
+	// All other configuration options can also be tested by With..(val)(a).
+	// arrange
+	wantErr := fmt.Errorf("new_initializer")
+	newInitializer := func(gobot.PWMPinner) error { return wantErr }
+	// act
+	a := NewPWMPinsAdaptor(system.NewAccesser(), func(pin string) (c string, l int, e error) { return },
+		WithPWMPinInitializer(newInitializer))
+	// assert
+	err := a.initialize(nil)
+	gobottest.Assert(t, err, wantErr)
+}
+
+func TestWithPWMPinDefaultPeriod(t *testing.T) {
+	// arrange
+	const newPeriod = uint32(10)
+	a := NewPWMPinsAdaptor(system.NewAccesser(), func(string) (c string, l int, e error) { return })
+	// act
+	WithPWMPinDefaultPeriod(newPeriod)(a)
+	// assert
+	gobottest.Assert(t, a.periodDefault, newPeriod)
+}
+
+func TestWithPolarityInvertedIdentifier(t *testing.T) {
+	// arrange
+	const newPolarityIdent = "pwm_invers"
+	a := NewPWMPinsAdaptor(system.NewAccesser(), func(pin string) (c string, l int, e error) { return })
+	// act
+	WithPolarityInvertedIdentifier(newPolarityIdent)(a)
+	// assert
+	gobottest.Assert(t, a.polarityInvertedIdentifier, newPolarityIdent)
+}
 
 func TestPWMPinsConnect(t *testing.T) {
 	translate := func(pin string) (chip string, line int, err error) { return }
-	sys := system.NewAccesser()
-
-	a := NewPWMPinsAdaptor(sys, translate)
+	a := NewPWMPinsAdaptor(system.NewAccesser(), translate)
 	gobottest.Assert(t, a.pins, (map[string]gobot.PWMPinner)(nil))
 
 	err := a.PwmWrite("33", 1)

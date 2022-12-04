@@ -24,9 +24,6 @@ type pwmPinSysFs struct {
 	polarityNormalIdentifier   string
 	polarityInvertedIdentifier string
 
-	enabled bool
-
-	// TODO: remove this, if possible
 	write func(fs filesystem, path string, data []byte) (i int, err error)
 	read  func(fs filesystem, path string) ([]byte, error)
 	fs    filesystem
@@ -40,10 +37,9 @@ func newPWMPinSysfs(fs filesystem, path string, pin int, polNormIdent string, po
 		polarityNormalIdentifier:   polNormIdent,
 		polarityInvertedIdentifier: polInvIdent,
 
-		enabled: false,
-		read:    readPwmFile,
-		write:   writePwmFile,
-		fs:      fs,
+		read:  readPwmFile,
+		write: writePwmFile,
+		fs:    fs,
 	}
 	return p
 }
@@ -91,19 +87,17 @@ func (p *pwmPinSysFs) Enabled() (bool, error) {
 
 // SetEnabled writes enable(1) or disable(0) status
 func (p *pwmPinSysFs) SetEnabled(enable bool) error {
-	if p.enabled != enable {
-		enableVal := 0
-		if enable {
-			enableVal = 1
-		}
-		if _, err := p.write(p.fs, p.pwmEnablePath(), []byte(fmt.Sprintf("%v", enableVal))); err != nil {
-			if pwmDebug {
-				p.printState()
-			}
-			return fmt.Errorf(pwmPinSetErrorPattern, "Enable", enable, p.pin, err)
-		}
-		p.enabled = enable
+	enableVal := 0
+	if enable {
+		enableVal = 1
 	}
+	if _, err := p.write(p.fs, p.pwmEnablePath(), []byte(fmt.Sprintf("%v", enableVal))); err != nil {
+		if pwmDebug {
+			p.printState()
+		}
+		return fmt.Errorf(pwmPinSetErrorPattern, "Enable", enable, p.pin, err)
+	}
+
 	return nil
 }
 
@@ -130,7 +124,8 @@ func (p *pwmPinSysFs) Polarity() (bool, error) {
 
 // SetPolarity writes the polarity as normal if called with true and as inverted if called with false
 func (p *pwmPinSysFs) SetPolarity(normal bool) error {
-	if p.enabled {
+	enabled, _ := p.Enabled()
+	if enabled {
 		return fmt.Errorf("Cannot set PWM polarity when enabled")
 	}
 	value := p.polarityNormalIdentifier
