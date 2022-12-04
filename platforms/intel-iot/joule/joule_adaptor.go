@@ -11,7 +11,7 @@ import (
 	"gobot.io/x/gobot/system"
 )
 
-const pwmPeriodDefault = 10000000
+const pwmPeriodDefault = 10000000 // 10 ms = 100 Hz
 
 type sysfsPin struct {
 	pin    int

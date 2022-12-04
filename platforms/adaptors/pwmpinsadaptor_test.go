@@ -34,7 +34,7 @@ var pwmMockPaths = []string{
 	pwmPolarityPath,
 }
 
-const pwmPeriodDefault = 10000000
+const pwmPeriodDefault = 10000000 // 10 ms = 100 Hz
 
 // make sure that this PWMPinsAdaptor fulfills all the required interfaces
 var _ gobot.PWMPinnerProvider = (*PWMPinsAdaptor)(nil)

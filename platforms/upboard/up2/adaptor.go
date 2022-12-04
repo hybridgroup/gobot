@@ -28,7 +28,7 @@ const (
 	LEDYellow = "yellow"
 )
 
-const pwmPeriodDefault = 10000000
+const pwmPeriodDefault = 10000000 // 10 ms = 100 Hz
 
 type sysfsPin struct {
 	pin    int
@@ -197,7 +197,7 @@ func (c *Adaptor) translateDigitalPin(id string) (string, int, error) {
 	return "", -1, fmt.Errorf("'%s' is not a valid id for a digital pin", id)
 }
 
-func (c *Adaptor) translatePWMPin(id string) (path string, i int, err error) {
+func (c *Adaptor) translatePWMPin(id string) (string, int, error) {
 	sysPin, ok := c.pinmap[id]
 	if !ok {
 		return "", -1, fmt.Errorf("'%s' is not a valid id for a pin", id)
@@ -205,6 +205,6 @@ func (c *Adaptor) translatePWMPin(id string) (path string, i int, err error) {
 	if sysPin.pwmPin == -1 {
 		return "", -1, fmt.Errorf("'%s' is not a valid id for a PWM pin", id)
 	}
-	return "/sys/class/pwm/pwmchip0", sysPin.pwmPin, err
+	return "/sys/class/pwm/pwmchip0", sysPin.pwmPin, nil
 
 }
