@@ -297,8 +297,8 @@ func TestFinalizeError(t *testing.T) {
 	err := a.Finalize()
 	gobottest.Assert(t, strings.Contains(err.Error(), "6 errors occurred"), true)
 	gobottest.Assert(t, strings.Contains(err.Error(), "write error"), true)
-	gobottest.Assert(t, strings.Contains(err.Error(), "SetEnabled(false) failed for pin 1 with write error"), true)
-	gobottest.Assert(t, strings.Contains(err.Error(), "Unexport() failed for pin 1 with write error"), true)
+	gobottest.Assert(t, strings.Contains(err.Error(), "SetEnabled(false) failed for id 1 with write error"), true)
+	gobottest.Assert(t, strings.Contains(err.Error(), "Unexport() failed for id 1 with write error"), true)
 }
 
 func TestDigitalIO(t *testing.T) {

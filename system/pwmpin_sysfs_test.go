@@ -108,7 +108,7 @@ func TestPwmPinExportError(t *testing.T) {
 
 	// no error indicates that the pin was already exported
 	err := pin.Export()
-	gobottest.Assert(t, err.Error(), "Export() failed for pin 10 with  : bad address")
+	gobottest.Assert(t, err.Error(), "Export() failed for id 10 with  : bad address")
 }
 
 func TestPwmPinUnxportError(t *testing.T) {
@@ -126,7 +126,7 @@ func TestPwmPinUnxportError(t *testing.T) {
 	}
 
 	err := pin.Unexport()
-	gobottest.Assert(t, err.Error(), "Unexport() failed for pin 10 with  : device or resource busy")
+	gobottest.Assert(t, err.Error(), "Unexport() failed for id 10 with  : device or resource busy")
 }
 
 func TestPwmPinPeriodError(t *testing.T) {
@@ -144,7 +144,7 @@ func TestPwmPinPeriodError(t *testing.T) {
 	}
 
 	_, err := pin.Period()
-	gobottest.Assert(t, err.Error(), "Period() failed for pin 10 with  : device or resource busy")
+	gobottest.Assert(t, err.Error(), "Period() failed for id 10 with  : device or resource busy")
 }
 
 func TestPwmPinPolarityError(t *testing.T) {
@@ -162,7 +162,7 @@ func TestPwmPinPolarityError(t *testing.T) {
 	}
 
 	_, err := pin.Polarity()
-	gobottest.Assert(t, err.Error(), "Polarity() failed for pin 10 with  : device or resource busy")
+	gobottest.Assert(t, err.Error(), "Polarity() failed for id 10 with  : device or resource busy")
 }
 
 func TestPwmPinDutyCycleError(t *testing.T) {
@@ -180,5 +180,5 @@ func TestPwmPinDutyCycleError(t *testing.T) {
 	}
 
 	_, err := pin.DutyCycle()
-	gobottest.Assert(t, err.Error(), "DutyCycle() failed for pin 10 with  : device or resource busy")
+	gobottest.Assert(t, err.Error(), "DutyCycle() failed for id 10 with  : device or resource busy")
 }

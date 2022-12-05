@@ -13,8 +13,8 @@ import (
 const pwmDebug = false
 
 const (
-	pwmPinErrorPattern    = "%s() failed for pin %s with %v"
-	pwmPinSetErrorPattern = "%s(%v) failed for pin %s with %v"
+	pwmPinErrorPattern    = "%s() failed for id %s with %v"
+	pwmPinSetErrorPattern = "%s(%v) failed for id %s with %v"
 )
 
 // pwmPinSysFs represents a PWM pin
@@ -85,7 +85,8 @@ func (p *pwmPinSysFs) Enabled() (bool, error) {
 	return val > 0, e
 }
 
-// SetEnabled writes enable(1) or disable(0) status
+// SetEnabled writes enable(1) or disable(0) status. For most platforms this is only possible if period was
+// already set to > 0. Regardless of setting to enable or disable, a "write error: Invalid argument" will occur.
 func (p *pwmPinSysFs) SetEnabled(enable bool) error {
 	enableVal := 0
 	if enable {

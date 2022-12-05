@@ -175,12 +175,18 @@ ssh -t linaro@192.168.1.xxx "./tinkerboard_blink"
 #### Investigate state
 
 ```sh
-$ ls /sys/class/pwm/
-pwmchip0  pwmchip1
-
+# ls -la /sys/class/pwm/
+total 0
+drwxr-xr-x  2 root root 0 Apr 24 14:11 .
+drwxr-xr-x 66 root root 0 Apr 24 14:09 ..
+lrwxrwxrwx  1 root root 0 Apr 24 14:09 pwmchip0 -> ../../devices/platform/ff680000.pwm/pwm/pwmchip0
 ```
 
-pwmchip0 and pwmchip1 seems to be not usable (unknown, which functionality make use of that, maybe fan?)
+looking for one of the following items in the path:
+ff680000 => internally, not usable
+ff680010 => internally, not usable
+ff680020 => pwm2, pin33
+ff680030 => pwm3, pin32
 
 #### Activate
 
@@ -195,18 +201,6 @@ Then save the file, close and reboot.
 After reboot check the state:
 
 ```sh
-$ ls /sys/class/pwm/
-pwmchip0  pwmchip1  pwmchip2  pwmchip3
-
-```
-
-pwmchip2: the pin 33 is usable
-pwmchip3: the pin 32 is usable
-
-When only one pwm was enabled it will be always "pwmchip2". In this case, the activated pin can be found by
-investigating the symbolic link of the device:
-
-```sh
 # ls -la /sys/class/pwm/
 total 0
 drwxr-xr-x  2 root root 0 Apr 24 14:11 .
@@ -215,9 +209,6 @@ lrwxrwxrwx  1 root root 0 Apr 24 14:09 pwmchip0 -> ../../devices/platform/ff6800
 lrwxrwxrwx  1 root root 0 Apr 24 14:09 pwmchip1 -> ../../devices/platform/ff680010.pwm/pwm/pwmchip1
 lrwxrwxrwx  1 root root 0 Apr 24 14:09 pwmchip2 -> ../../devices/platform/ff680030.pwm/pwm/pwmchip2
 ```
-
-ff680020 => pwm2, pin33
-ff680030 => pwm3, pin32
 
 #### Test
 

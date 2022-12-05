@@ -185,13 +185,16 @@ func (a *PWMPinsAdaptor) getDefaultInitializer() func(gobot.PWMPinner) error {
 		if err := pin.Export(); err != nil {
 			return err
 		}
-		// Make sure pwm is disabled before change anything
-		if err := pin.SetEnabled(false); err != nil {
-			return err
+		// Make sure PWM is disabled before change anything (period needs to be >0 for this check)
+		if period, _ := pin.Period(); period > 0 {
+			if err := pin.SetEnabled(false); err != nil {
+				return err
+			}
 		}
 		if err := setPeriod(pin, a.periodDefault, false); err != nil {
 			return err
 		}
+		// period needs to be set >1 before all next statements
 		if err := pin.SetPolarity(true); err != nil {
 			return err
 		}
