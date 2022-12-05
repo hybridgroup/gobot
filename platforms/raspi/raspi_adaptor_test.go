@@ -231,6 +231,9 @@ func TestDigitalPinConcurrency(t *testing.T) {
 
 func TestPWMPin(t *testing.T) {
 	a := NewAdaptor()
+	if err := a.Connect(); err != nil {
+		panic(err)
+	}
 
 	gobottest.Assert(t, len(a.pwmPins), 0)
 
@@ -250,4 +253,27 @@ func TestPWMPin(t *testing.T) {
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, len(a.pwmPins), 2)
 	gobottest.Refute(t, firstSysPin, otherSysPin)
+}
+
+func TestPWMPinsReConnect(t *testing.T) {
+	// arrange
+	a := NewAdaptor()
+	a.revision = "3"
+	if err := a.Connect(); err != nil {
+		panic(err)
+	}
+
+	_, err := a.PWMPin("35")
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, len(a.pwmPins), 1)
+	gobottest.Assert(t, a.Finalize(), nil)
+	// act
+	err = a.Connect()
+	// assert
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, len(a.pwmPins), 0)
+	_, err = a.PWMPin("35")
+	_, err = a.PWMPin("36")
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, len(a.pwmPins), 2)
 }
