@@ -119,7 +119,6 @@ func (c *Adaptor) translateDigitalPin(id string) (string, int, error) {
 	return chip, line, nil
 }
 
-// TODO: test for this function:
 func (c *Adaptor) translatePWMPin(id string) (string, int, error) {
 	pinInfo, ok := pwmPinDefinitions[id]
 	if !ok {

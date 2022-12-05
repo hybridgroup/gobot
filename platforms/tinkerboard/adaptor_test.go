@@ -19,23 +19,23 @@ const (
 )
 
 const (
-	pwm2Dir           = "/sys/devices/platform/ff680020.pwm/pwm/pwmchip2/"
-	pwm2pwm0Dir       = pwm2Dir + "pwm0/"
-	pwm2ExportPath    = pwm2Dir + "export"
-	pwm2UnexportPath  = pwm2Dir + "unexport"
-	pwm2EnablePath    = pwm2pwm0Dir + "enable"
-	pwm2PeriodPath    = pwm2pwm0Dir + "period"
-	pwm2DutyCyclePath = pwm2pwm0Dir + "duty_cycle"
-	pwm2PolarityPath  = pwm2pwm0Dir + "polarity"
+	pwmDir           = "/sys/devices/platform/ff680020.pwm/pwm/pwmchip2/"
+	pwmPwmDir        = pwmDir + "pwm0/"
+	pwmExportPath    = pwmDir + "export"
+	pwmUnexportPath  = pwmDir + "unexport"
+	pwmEnablePath    = pwmPwmDir + "enable"
+	pwmPeriodPath    = pwmPwmDir + "period"
+	pwmDutyCyclePath = pwmPwmDir + "duty_cycle"
+	pwmPolarityPath  = pwmPwmDir + "polarity"
 )
 
 var pwmMockPaths = []string{
-	pwm2ExportPath,
-	pwm2UnexportPath,
-	pwm2EnablePath,
-	pwm2PeriodPath,
-	pwm2DutyCyclePath,
-	pwm2PolarityPath,
+	pwmExportPath,
+	pwmUnexportPath,
+	pwmEnablePath,
+	pwmPeriodPath,
+	pwmDutyCyclePath,
+	pwmPolarityPath,
 }
 
 var gpioMockPaths = []string{
@@ -58,10 +58,10 @@ var _ gpio.ServoWriter = (*Adaptor)(nil)
 var _ i2c.Connector = (*Adaptor)(nil)
 
 func preparePwmFs(fs *system.MockFilesystem) {
-	fs.Files[pwm2EnablePath].Contents = "0"
-	fs.Files[pwm2PeriodPath].Contents = "0"
-	fs.Files[pwm2DutyCyclePath].Contents = "0"
-	fs.Files[pwm2PolarityPath].Contents = pwmInverted
+	fs.Files[pwmEnablePath].Contents = "0"
+	fs.Files[pwmPeriodPath].Contents = "0"
+	fs.Files[pwmDutyCyclePath].Contents = "0"
+	fs.Files[pwmPolarityPath].Contents = pwmInverted
 }
 
 func initTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *system.MockFilesystem) {
@@ -119,21 +119,21 @@ func TestPwmWrite(t *testing.T) {
 	err := a.PwmWrite("33", 100)
 	gobottest.Assert(t, err, nil)
 
-	gobottest.Assert(t, fs.Files[pwm2ExportPath].Contents, "0")
-	gobottest.Assert(t, fs.Files[pwm2EnablePath].Contents, "1")
-	gobottest.Assert(t, fs.Files[pwm2PeriodPath].Contents, fmt.Sprintf("%d", 10000000))
-	gobottest.Assert(t, fs.Files[pwm2DutyCyclePath].Contents, "3921568")
-	gobottest.Assert(t, fs.Files[pwm2PolarityPath].Contents, "normal")
+	gobottest.Assert(t, fs.Files[pwmExportPath].Contents, "0")
+	gobottest.Assert(t, fs.Files[pwmEnablePath].Contents, "1")
+	gobottest.Assert(t, fs.Files[pwmPeriodPath].Contents, fmt.Sprintf("%d", 10000000))
+	gobottest.Assert(t, fs.Files[pwmDutyCyclePath].Contents, "3921568")
+	gobottest.Assert(t, fs.Files[pwmPolarityPath].Contents, "normal")
 
 	err = a.ServoWrite("33", 0)
 	gobottest.Assert(t, err, nil)
 
-	gobottest.Assert(t, fs.Files[pwm2DutyCyclePath].Contents, "500000")
+	gobottest.Assert(t, fs.Files[pwmDutyCyclePath].Contents, "500000")
 
 	err = a.ServoWrite("33", 180)
 	gobottest.Assert(t, err, nil)
 
-	gobottest.Assert(t, fs.Files[pwm2DutyCyclePath].Contents, "2000000")
+	gobottest.Assert(t, fs.Files[pwmDutyCyclePath].Contents, "2000000")
 	gobottest.Assert(t, a.Finalize(), nil)
 }
 
@@ -147,16 +147,16 @@ func TestSetPeriod(t *testing.T) {
 	err := a.SetPeriod("33", newPeriod)
 	// assert
 	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, fs.Files[pwm2ExportPath].Contents, "0")
-	gobottest.Assert(t, fs.Files[pwm2EnablePath].Contents, "1")
-	gobottest.Assert(t, fs.Files[pwm2PeriodPath].Contents, fmt.Sprintf("%d", newPeriod))
-	gobottest.Assert(t, fs.Files[pwm2DutyCyclePath].Contents, "0")
-	gobottest.Assert(t, fs.Files[pwm2PolarityPath].Contents, "normal")
+	gobottest.Assert(t, fs.Files[pwmExportPath].Contents, "0")
+	gobottest.Assert(t, fs.Files[pwmEnablePath].Contents, "1")
+	gobottest.Assert(t, fs.Files[pwmPeriodPath].Contents, fmt.Sprintf("%d", newPeriod))
+	gobottest.Assert(t, fs.Files[pwmDutyCyclePath].Contents, "0")
+	gobottest.Assert(t, fs.Files[pwmPolarityPath].Contents, "normal")
 
 	// arrange test for automatic adjustment of duty cycle to lower value
 	err = a.PwmWrite("33", 127) // 127 is a little bit smaller than 50% of period
 	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, fs.Files[pwm2DutyCyclePath].Contents, fmt.Sprintf("%d", 1270000))
+	gobottest.Assert(t, fs.Files[pwmDutyCyclePath].Contents, fmt.Sprintf("%d", 1270000))
 	newPeriod = newPeriod / 10
 
 	// act
@@ -164,7 +164,7 @@ func TestSetPeriod(t *testing.T) {
 
 	// assert
 	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, fs.Files[pwm2DutyCyclePath].Contents, fmt.Sprintf("%d", 127000))
+	gobottest.Assert(t, fs.Files[pwmDutyCyclePath].Contents, fmt.Sprintf("%d", 127000))
 
 	// arrange test for automatic adjustment of duty cycle to higher value
 	newPeriod = newPeriod * 20
@@ -174,7 +174,7 @@ func TestSetPeriod(t *testing.T) {
 
 	// assert
 	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, fs.Files[pwm2DutyCyclePath].Contents, fmt.Sprintf("%d", 2540000))
+	gobottest.Assert(t, fs.Files[pwmDutyCyclePath].Contents, fmt.Sprintf("%d", 2540000))
 }
 
 func TestI2c(t *testing.T) {
@@ -267,6 +267,85 @@ func Test_translateDigitalPin(t *testing.T) {
 			gobottest.Assert(t, err, tc.wantErr)
 			gobottest.Assert(t, chip, tc.wantChip)
 			gobottest.Assert(t, line, tc.wantLine)
+		})
+	}
+}
+
+func Test_translatePWMPin(t *testing.T) {
+	basePaths := []string{
+		"/sys/devices/platform/ff680020.pwm/pwm/",
+		"/sys/devices/platform/ff680030.pwm/pwm/",
+	}
+	var tests = map[string]struct {
+		pin         string
+		chip        string
+		wantDir     string
+		wantChannel int
+		wantErr     error
+	}{
+		"32_chip0": {
+			pin:         "32",
+			chip:        "pwmchip0",
+			wantDir:     "/sys/devices/platform/ff680030.pwm/pwm/pwmchip0",
+			wantChannel: 0,
+		},
+		"32_chip1": {
+			pin:         "32",
+			chip:        "pwmchip1",
+			wantDir:     "/sys/devices/platform/ff680030.pwm/pwm/pwmchip1",
+			wantChannel: 0,
+		},
+		"32_chip2": {
+			pin:         "32",
+			chip:        "pwmchip2",
+			wantDir:     "/sys/devices/platform/ff680030.pwm/pwm/pwmchip2",
+			wantChannel: 0,
+		},
+		"32_chip3": {
+			pin:         "32",
+			chip:        "pwmchip3",
+			wantDir:     "/sys/devices/platform/ff680030.pwm/pwm/pwmchip3",
+			wantChannel: 0,
+		},
+		"33_chip0": {
+			pin:         "33",
+			chip:        "pwmchip0",
+			wantDir:     "/sys/devices/platform/ff680020.pwm/pwm/pwmchip0",
+			wantChannel: 0,
+		},
+		"33_chip1": {
+			pin:         "33",
+			chip:        "pwmchip1",
+			wantDir:     "/sys/devices/platform/ff680020.pwm/pwm/pwmchip1",
+			wantChannel: 0,
+		},
+		"33_chip2": {
+			pin:         "33",
+			chip:        "pwmchip2",
+			wantDir:     "/sys/devices/platform/ff680020.pwm/pwm/pwmchip2",
+			wantChannel: 0,
+		},
+		"invalid_pin": {
+			pin:         "7",
+			wantDir:     "",
+			wantChannel: -1,
+			wantErr:     fmt.Errorf("'7' is not a valid id for a PWM pin"),
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			mockedPaths := []string{}
+			for _, base := range basePaths {
+				mockedPaths = append(mockedPaths, base+tc.chip+"/")
+			}
+			a, _ := initTestAdaptorWithMockedFilesystem(mockedPaths)
+			// act
+			dir, channel, err := a.translatePWMPin(tc.pin)
+			// assert
+			gobottest.Assert(t, err, tc.wantErr)
+			gobottest.Assert(t, dir, tc.wantDir)
+			gobottest.Assert(t, channel, tc.wantChannel)
 		})
 	}
 }
