@@ -25,7 +25,7 @@ type Adaptor struct {
 	sys      *system.Accesser
 	revision string
 	*adaptors.DigitalPinsAdaptor
-	pwmPins            map[int]gobot.PWMPinner
+	pwmPins            map[string]gobot.PWMPinner
 	i2cBuses           [2]i2c.I2cDevice
 	spiDevices         [2]spi.Connection
 	spiDefaultMaxSpeed int64
@@ -35,60 +35,64 @@ type Adaptor struct {
 // NewAdaptor creates a Raspi Adaptor
 func NewAdaptor() *Adaptor {
 	sys := system.NewAccesser("cdev")
-	r := &Adaptor{
+	c := &Adaptor{
 		name:            gobot.DefaultName("RaspberryPi"),
 		sys:             sys,
-		pwmPins:         make(map[int]gobot.PWMPinner),
 		PiBlasterPeriod: 10000000,
 	}
-	r.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, r.getPinTranslatorFunction())
-	return r
+	c.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, c.getPinTranslatorFunction())
+	return c
 }
 
 // Name returns the Adaptor's name
-func (r *Adaptor) Name() string {
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
+func (c *Adaptor) Name() string {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 
-	return r.name
+	return c.name
 }
 
 // SetName sets the Adaptor's name
-func (r *Adaptor) SetName(n string) {
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
+func (c *Adaptor) SetName(n string) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 
-	r.name = n
+	c.name = n
 }
 
 // Connect create new connection to board and pins.
-func (r *Adaptor) Connect() error {
-	err := r.DigitalPinsAdaptor.Connect()
-	return err
+func (c *Adaptor) Connect() error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	c.pwmPins = make(map[string]gobot.PWMPinner)
+	return c.DigitalPinsAdaptor.Connect()
 }
 
 // Finalize closes connection to board and pins
-func (r *Adaptor) Finalize() error {
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
+func (c *Adaptor) Finalize() error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 
-	err := r.DigitalPinsAdaptor.Finalize()
+	err := c.DigitalPinsAdaptor.Finalize()
 
-	for _, pin := range r.pwmPins {
+	for _, pin := range c.pwmPins {
 		if pin != nil {
 			if perr := pin.Unexport(); err != nil {
 				err = multierror.Append(err, perr)
 			}
 		}
 	}
-	for _, bus := range r.i2cBuses {
+	c.pwmPins = nil
+
+	for _, bus := range c.i2cBuses {
 		if bus != nil {
 			if e := bus.Close(); e != nil {
 				err = multierror.Append(err, e)
 			}
 		}
 	}
-	for _, dev := range r.spiDevices {
+	for _, dev := range c.spiDevices {
 		if dev != nil {
 			if e := dev.Close(); e != nil {
 				err = multierror.Append(err, e)
@@ -100,30 +104,30 @@ func (r *Adaptor) Finalize() error {
 
 // GetConnection returns an i2c connection to a device on a specified bus.
 // Valid bus number is [0..1] which corresponds to /dev/i2c-0 through /dev/i2c-1.
-func (r *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection, err error) {
+func (c *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection, err error) {
 	if (bus < 0) || (bus > 1) {
 		return nil, fmt.Errorf("Bus number %d out of range", bus)
 	}
 
-	device, err := r.getI2cBus(bus)
+	device, err := c.getI2cBus(bus)
 
 	return i2c.NewConnection(device, address), err
 }
 
-func (r *Adaptor) getI2cBus(bus int) (_ i2c.I2cDevice, err error) {
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
+func (c *Adaptor) getI2cBus(bus int) (_ i2c.I2cDevice, err error) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 
-	if r.i2cBuses[bus] == nil {
-		r.i2cBuses[bus], err = r.sys.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
+	if c.i2cBuses[bus] == nil {
+		c.i2cBuses[bus], err = c.sys.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
 	}
 
-	return r.i2cBuses[bus], err
+	return c.i2cBuses[bus], err
 }
 
 // GetDefaultBus returns the default i2c bus for this platform
-func (r *Adaptor) GetDefaultBus() int {
-	rev := r.readRevision()
+func (c *Adaptor) GetDefaultBus() int {
+	rev := c.readRevision()
 	if rev == "2" || rev == "3" {
 		return 1
 	}
@@ -132,90 +136,85 @@ func (r *Adaptor) GetDefaultBus() int {
 
 // GetSpiConnection returns an spi connection to a device on a specified bus.
 // Valid bus number is [0..1] which corresponds to /dev/spidev0.0 through /dev/spidev0.1.
-func (r *Adaptor) GetSpiConnection(busNum, chipNum, mode, bits int, maxSpeed int64) (connection spi.Connection, err error) {
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
+func (c *Adaptor) GetSpiConnection(busNum, chipNum, mode, bits int, maxSpeed int64) (connection spi.Connection, err error) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 
 	if (busNum < 0) || (busNum > 1) {
 		return nil, fmt.Errorf("Bus number %d out of range", busNum)
 	}
 
-	if r.spiDevices[busNum] == nil {
-		r.spiDevices[busNum], err = spi.GetSpiConnection(busNum, chipNum, mode, bits, maxSpeed)
+	if c.spiDevices[busNum] == nil {
+		c.spiDevices[busNum], err = spi.GetSpiConnection(busNum, chipNum, mode, bits, maxSpeed)
 	}
 
-	return r.spiDevices[busNum], err
+	return c.spiDevices[busNum], err
 }
 
 // GetSpiDefaultBus returns the default spi bus for this platform.
-func (r *Adaptor) GetSpiDefaultBus() int {
+func (c *Adaptor) GetSpiDefaultBus() int {
 	return 0
 }
 
 // GetSpiDefaultChip returns the default spi chip for this platform.
-func (r *Adaptor) GetSpiDefaultChip() int {
+func (c *Adaptor) GetSpiDefaultChip() int {
 	return 0
 }
 
 // GetSpiDefaultMode returns the default spi mode for this platform.
-func (r *Adaptor) GetSpiDefaultMode() int {
+func (c *Adaptor) GetSpiDefaultMode() int {
 	return 0
 }
 
 // GetSpiDefaultBits returns the default spi number of bits for this platform.
-func (r *Adaptor) GetSpiDefaultBits() int {
+func (c *Adaptor) GetSpiDefaultBits() int {
 	return 8
 }
 
 // GetSpiDefaultMaxSpeed returns the default spi bus for this platform.
-func (r *Adaptor) GetSpiDefaultMaxSpeed() int64 {
+func (c *Adaptor) GetSpiDefaultMaxSpeed() int64 {
 	return 500000
 }
 
 // PWMPin returns a raspi.PWMPin which provides the gobot.PWMPinner interface
-func (r *Adaptor) PWMPin(pin string) (gobot.PWMPinner, error) {
-	tf := r.getPinTranslatorFunction()
-	_, i, err := tf(pin)
-	if err != nil {
-		return nil, err
-	}
+func (c *Adaptor) PWMPin(id string) (gobot.PWMPinner, error) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
-
-	if r.pwmPins[i] == nil {
-		r.pwmPins[i] = NewPWMPin(r.sys, "/dev/pi-blaster", strconv.Itoa(i))
-		r.pwmPins[i].SetPeriod(r.PiBlasterPeriod)
-	}
-
-	return r.pwmPins[i], nil
+	return c.pwmPin(id)
 }
 
 // PwmWrite writes a PWM signal to the specified pin
-func (r *Adaptor) PwmWrite(pin string, val byte) (err error) {
-	sysPin, err := r.PWMPin(pin)
+func (c *Adaptor) PwmWrite(pin string, val byte) (err error) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	sysPin, err := c.pwmPin(pin)
 	if err != nil {
 		return err
 	}
 
-	duty := uint32(gobot.FromScale(float64(val), 0, 255) * float64(r.PiBlasterPeriod))
+	duty := uint32(gobot.FromScale(float64(val), 0, 255) * float64(c.PiBlasterPeriod))
 	return sysPin.SetDutyCycle(duty)
 }
 
 // ServoWrite writes a servo signal to the specified pin
-func (r *Adaptor) ServoWrite(pin string, angle byte) (err error) {
-	sysPin, err := r.PWMPin(pin)
+func (c *Adaptor) ServoWrite(pin string, angle byte) (err error) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	sysPin, err := c.pwmPin(pin)
 	if err != nil {
 		return err
 	}
 
-	duty := uint32(gobot.FromScale(float64(angle), 0, 180) * float64(r.PiBlasterPeriod))
+	duty := uint32(gobot.FromScale(float64(angle), 0, 180) * float64(c.PiBlasterPeriod))
 	return sysPin.SetDutyCycle(duty)
 }
 
-func (r *Adaptor) getPinTranslatorFunction() func(string) (string, int, error) {
+func (c *Adaptor) getPinTranslatorFunction() func(string) (string, int, error) {
 	return func(pin string) (chip string, line int, err error) {
-		if val, ok := pins[pin][r.readRevision()]; ok {
+		if val, ok := pins[pin][c.readRevision()]; ok {
 			line = val
 		} else if val, ok := pins[pin]["*"]; ok {
 			line = val
@@ -229,27 +228,44 @@ func (r *Adaptor) getPinTranslatorFunction() func(string) (string, int, error) {
 	}
 }
 
-func (r *Adaptor) readRevision() string {
-	if r.revision == "" {
-		r.revision = "0"
-		content, err := r.sys.ReadFile(infoFile)
+func (c *Adaptor) readRevision() string {
+	if c.revision == "" {
+		c.revision = "0"
+		content, err := c.sys.ReadFile(infoFile)
 		if err != nil {
-			return r.revision
+			return c.revision
 		}
 		for _, v := range strings.Split(string(content), "\n") {
 			if strings.Contains(v, "Revision") {
 				s := strings.Split(string(v), " ")
 				version, _ := strconv.ParseInt("0x"+s[len(s)-1], 0, 64)
 				if version <= 3 {
-					r.revision = "1"
+					c.revision = "1"
 				} else if version <= 15 {
-					r.revision = "2"
+					c.revision = "2"
 				} else {
-					r.revision = "3"
+					c.revision = "3"
 				}
 			}
 		}
 	}
 
-	return r.revision
+	return c.revision
+}
+
+func (c *Adaptor) pwmPin(id string) (gobot.PWMPinner, error) {
+	pin := c.pwmPins[id]
+
+	if pin == nil {
+		tf := c.getPinTranslatorFunction()
+		_, i, err := tf(id)
+		if err != nil {
+			return nil, err
+		}
+		pin = NewPWMPin(c.sys, "/dev/pi-blaster", strconv.Itoa(i))
+		pin.SetPeriod(c.PiBlasterPeriod)
+		c.pwmPins[id] = pin
+	}
+
+	return pin, nil
 }
