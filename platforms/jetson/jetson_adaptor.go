@@ -13,7 +13,7 @@ import (
 	"gobot.io/x/gobot/system"
 )
 
-const pwmDefaultPeriod = 3000000
+const pwmPeriodDefault = 3000000 // 3 ms = 333 Hz
 
 // Adaptor is the Gobot adaptor for the Jetson Nano
 type Adaptor struct {
@@ -30,9 +30,8 @@ type Adaptor struct {
 func NewAdaptor() *Adaptor {
 	sys := system.NewAccesser()
 	c := &Adaptor{
-		name:    gobot.DefaultName("JetsonNano"),
-		sys:     sys,
-		pwmPins: make(map[string]gobot.PWMPinner),
+		name: gobot.DefaultName("JetsonNano"),
+		sys:  sys,
 	}
 	c.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, c.translateDigitalPin)
 	return c
@@ -59,8 +58,8 @@ func (c *Adaptor) Connect() error {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
-	err := c.DigitalPinsAdaptor.Connect()
-	return err
+	c.pwmPins = make(map[string]gobot.PWMPinner)
+	return c.DigitalPinsAdaptor.Connect()
 }
 
 // Finalize closes connection to board and pins
@@ -77,6 +76,7 @@ func (c *Adaptor) Finalize() error {
 			}
 		}
 	}
+	c.pwmPins = nil
 
 	for _, bus := range c.i2cBuses {
 		if bus != nil {
@@ -159,42 +159,34 @@ func (c *Adaptor) PWMPin(pin string) (gobot.PWMPinner, error) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
-	if c.pwmPins[pin] != nil {
-		return c.pwmPins[pin], nil
-	}
-
-	fn, err := c.translatePwmPin(pin)
-	if err != nil {
-		return nil, err
-	}
-
-	c.pwmPins[pin] = NewPWMPin(c.sys, "/sys/class/pwm/pwmchip0", fn)
-	c.pwmPins[pin].Export()
-	c.pwmPins[pin].SetPeriod(pwmDefaultPeriod)
-	c.pwmPins[pin].Enable(true)
-
-	return c.pwmPins[pin], nil
+	return c.pwmPin(pin)
 }
 
 // PwmWrite writes a PWM signal to the specified pin
 func (c *Adaptor) PwmWrite(pin string, val byte) (err error) {
-	sysPin, err := c.PWMPin(pin)
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	sysPin, err := c.pwmPin(pin)
 	if err != nil {
 		return err
 	}
 
-	duty := uint32(gobot.FromScale(float64(val), 0, 255) * float64(pwmDefaultPeriod))
+	duty := uint32(gobot.FromScale(float64(val), 0, 255) * float64(pwmPeriodDefault))
 	return sysPin.SetDutyCycle(duty)
 }
 
 // ServoWrite writes a servo signal to the specified pin
 func (c *Adaptor) ServoWrite(pin string, angle byte) (err error) {
-	sysPin, err := c.PWMPin(pin)
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	sysPin, err := c.pwmPin(pin)
 	if err != nil {
 		return err
 	}
 
-	duty := uint32(gobot.FromScale(float64(angle), 0, 180) * float64(pwmDefaultPeriod))
+	duty := uint32(gobot.FromScale(float64(angle), 0, 180) * float64(pwmPeriodDefault))
 	return sysPin.SetDutyCycle(duty)
 }
 
@@ -207,6 +199,34 @@ func (c *Adaptor) getI2cBus(bus int) (_ i2c.I2cDevice, err error) {
 	}
 
 	return c.i2cBuses[bus], err
+}
+
+func (c *Adaptor) pwmPin(pin string) (gobot.PWMPinner, error) {
+	if c.pwmPins == nil {
+		return nil, fmt.Errorf("not connected")
+	}
+
+	if c.pwmPins[pin] != nil {
+		return c.pwmPins[pin], nil
+	}
+
+	fn, err := c.translatePwmPin(pin)
+	if err != nil {
+		return nil, err
+	}
+
+	c.pwmPins[pin] = NewPWMPin(c.sys, "/sys/class/pwm/pwmchip0", fn)
+	if err := c.pwmPins[pin].Export(); err != nil {
+		return nil, err
+	}
+	if err := c.pwmPins[pin].SetPeriod(pwmPeriodDefault); err != nil {
+		return nil, err
+	}
+	if err := c.pwmPins[pin].SetEnabled(true); err != nil {
+		return nil, err
+	}
+
+	return c.pwmPins[pin], nil
 }
 
 func (c *Adaptor) translateDigitalPin(id string) (string, int, error) {

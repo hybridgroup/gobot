@@ -39,12 +39,10 @@ Switch to root user by "su -".
 
 For Tinkerboard:
 
-* pwmchip0 and pwmchip1 seems to be not usable (unknown, which functionality make use of that, maybe fan?)
-* if there is no pwm2, pwm3, this can be activated. See section [Change available features](#change-available-features)
-* if only one pwm was enabled it will be always "pwmchip2". In this case, the activated pin can be found by
-  investigating the symbolic link of the device. See section [armbian](#armbian)
+* ff680000 and ff680010 seems to be not usable (unknown, which functionality make use of that, maybe fan?)
+* if there is no ff680020, ff680030, this can be activated. See section [Change available features](README.md#change-available-features)
 
-### Creating pwm0
+### Creating pwm0 on pwmchip2
 
 ```sh
 echo 0 > /sys/class/pwm/pwmchip2/export
@@ -83,8 +81,8 @@ echo 1  > /sys/class/pwm/pwmchip2/pwm0/enable
 ```
 
 > Before writing the period, all other write actions will cause an error "-bash: echo: write error: Invalid argument".
-> The "period" is a frequency divider for 1GHz (1000 will produce a frequency of 1MHz, 1000000 will cause a frequency of
-> 1kHz, her we got 100Hz)
+> The "period" is in nanoseconds (or a frequency divider for 1GHz), 1000 will produce a frequency of 1MHz, 1000000 will
+> cause a frequency of 1kHz. For the example 10000000 we have 100Hz.
 
 Now we should measure a value of around 1V with the meter, because the basis value is 3.3V and 30% leads to 1V.
 

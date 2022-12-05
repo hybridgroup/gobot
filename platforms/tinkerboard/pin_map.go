@@ -46,7 +46,7 @@ var gpioPinDefinitions = map[string]gpioPinDefinition{
 
 var pwmPinDefinitions = map[string]pwmPinDefinition{
 	// GPIO7_C6_UART2RX_PWM2
-	"33": pwmPinDefinition{dir: "/sys/devices/platform/ff680020.pwm/pwm/", dirRegexp: "pwmchip2$", channel: 0},
+	"33": pwmPinDefinition{dir: "/sys/devices/platform/ff680020.pwm/pwm/", dirRegexp: "pwmchip[0|1|2]$", channel: 0},
 	// GPIO7_C7_UART2TX_PWM3
-	"32": pwmPinDefinition{dir: "/sys/devices/platform/ff680030.pwm/pwm/", dirRegexp: "pwmchip[2|3]$", channel: 0},
+	"32": pwmPinDefinition{dir: "/sys/devices/platform/ff680030.pwm/pwm/", dirRegexp: "pwmchip[0|1|2|3]$", channel: 0},
 }

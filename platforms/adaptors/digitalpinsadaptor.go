@@ -9,42 +9,43 @@ import (
 	"gobot.io/x/gobot/system"
 )
 
-type translator func(pin string) (chip string, line int, err error)
-type creator func(chip string, line int, o ...func(gobot.DigitalPinOptioner) bool) gobot.DigitalPinner
+type digitalPinTranslator func(pin string) (chip string, line int, err error)
+type digitalPinInitializer func(gobot.DigitalPinner) error
 
 type digitalPinsOption interface {
-	setCreator(creator) // needed e.g. by Beaglebone adaptor
+	setDigitalPinInitializer(digitalPinInitializer)
 }
 
 // DigitalPinsAdaptor is a adaptor for digital pins, normally used for composition in platforms.
 type DigitalPinsAdaptor struct {
-	sys       *system.Accesser
-	translate translator
-	create    creator
-	pins      map[string]gobot.DigitalPinner
-	mutex     sync.Mutex
+	sys        *system.Accesser
+	translate  digitalPinTranslator
+	initialize digitalPinInitializer
+	pins       map[string]gobot.DigitalPinner
+	mutex      sync.Mutex
 }
 
 // NewDigitalPinsAdaptor provides the access to digital pins of the board. It supports sysfs and gpiod system drivers.
-// This is decided by the given accesser. The translator is used to adapt the header naming, which is given by user, to
-// the internal file name or chip/line nomenclature. This varies by each platform. If for some reasons the default
-// creator is not suitable, it can be given by the option "WithPinCreator()". This is especially needed, if some values
-// needs to be adjusted after the pin was created. E.g. for Beaglebone platform.
-func NewDigitalPinsAdaptor(sys *system.Accesser, t translator, options ...func(digitalPinsOption)) *DigitalPinsAdaptor {
-	s := &DigitalPinsAdaptor{
-		translate: t,
-		create:    sys.NewDigitalPin,
+// This is decided by the given accesser. The translator is used to adapt the pin header naming, which is given by user,
+// to the internal file name or chip/line nomenclature. This varies by each platform. If for some reasons the default
+// initializer is not suitable, it can be given by the option "WithDigitalPinInitializer()". This is especially needed,
+// if some values needs to be adjusted after the pin was created but before the pin is exported.
+func NewDigitalPinsAdaptor(sys *system.Accesser, t digitalPinTranslator, options ...func(digitalPinsOption)) *DigitalPinsAdaptor {
+	a := &DigitalPinsAdaptor{
+		sys:        sys,
+		translate:  t,
+		initialize: func(pin gobot.DigitalPinner) error { return pin.Export() },
 	}
 	for _, option := range options {
-		option(s)
+		option(a)
 	}
-	return s
+	return a
 }
 
-// WithPinCreator can be used to substitute the default creator.
-func WithPinCreator(pc creator) func(digitalPinsOption) {
+// WithDigitalPinInitializer can be used to substitute the default initializer.
+func WithDigitalPinInitializer(pc digitalPinInitializer) func(digitalPinsOption) {
 	return func(a digitalPinsOption) {
-		a.setCreator(pc)
+		a.setDigitalPinInitializer(pc)
 	}
 }
 
@@ -106,8 +107,8 @@ func (a *DigitalPinsAdaptor) DigitalWrite(id string, val byte) error {
 	return pin.Write(int(val))
 }
 
-func (a *DigitalPinsAdaptor) setCreator(pc creator) {
-	a.create = pc
+func (a *DigitalPinsAdaptor) setDigitalPinInitializer(pinInit digitalPinInitializer) {
+	a.initialize = pinInit
 }
 
 func (a *DigitalPinsAdaptor) digitalPin(id string, o ...func(gobot.DigitalPinOptioner) bool) (gobot.DigitalPinner, error) {
@@ -122,8 +123,8 @@ func (a *DigitalPinsAdaptor) digitalPin(id string, o ...func(gobot.DigitalPinOpt
 		if err != nil {
 			return nil, err
 		}
-		pin = a.create(chip, line, o...)
-		if err = pin.Export(); err != nil {
+		pin = a.sys.NewDigitalPin(chip, line, o...)
+		if err = a.initialize(pin); err != nil {
 			return nil, err
 		}
 		a.pins[id] = pin

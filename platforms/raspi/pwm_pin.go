@@ -33,33 +33,33 @@ func (p *PWMPin) Export() error {
 	return nil
 }
 
-// Unexport unexports the pin and releases the pin from the operating system
+// Unexport releases the pin from the operating system
 func (p *PWMPin) Unexport() error {
 	return p.writeValue(fmt.Sprintf("release %v\n", p.pin))
 }
 
-// Enable enables/disables the PWM pin
-func (p *PWMPin) Enable(e bool) (err error) {
+// Enabled returns always true for "enabled"
+func (p *PWMPin) Enabled() (bool, error) {
+	return true, nil
+}
+
+// SetEnabled do nothing for PiBlaster
+func (p *PWMPin) SetEnabled(e bool) error {
 	return nil
 }
 
-// Polarity returns the polarity either normal or inverted
-func (p *PWMPin) Polarity() (polarity string, err error) {
-	return "normal", nil
+// Polarity returns always true for "normal"
+func (p *PWMPin) Polarity() (bool, error) {
+	return true, nil
 }
 
 // SetPolarity does not do anything when using PiBlaster
-func (p *PWMPin) SetPolarity(value string) (err error) {
+func (p *PWMPin) SetPolarity(bool) (err error) {
 	return nil
 }
 
-// InvertPolarity does not do anything when using PiBlaster
-func (p *PWMPin) InvertPolarity(invert bool) (err error) {
-	return nil
-}
-
-// Period returns the current PWM period for pin
-func (p *PWMPin) Period() (period uint32, err error) {
+// Period returns the cached PWM period for pin
+func (p *PWMPin) Period() (uint32, error) {
 	if p.period == 0 {
 		return p.period, errors.New("Raspi PWM pin period not set")
 	}
@@ -68,7 +68,7 @@ func (p *PWMPin) Period() (period uint32, err error) {
 }
 
 // SetPeriod uses PiBlaster setting and cannot be changed once set
-func (p *PWMPin) SetPeriod(period uint32) (err error) {
+func (p *PWMPin) SetPeriod(period uint32) error {
 	if p.period != 0 {
 		return errors.New("Cannot set the period of individual PWM pins on Raspi")
 	}
@@ -77,12 +77,12 @@ func (p *PWMPin) SetPeriod(period uint32) (err error) {
 }
 
 // DutyCycle returns the duty cycle for the pin
-func (p *PWMPin) DutyCycle() (duty uint32, err error) {
+func (p *PWMPin) DutyCycle() (uint32, error) {
 	return p.dc, nil
 }
 
 // SetDutyCycle writes the duty cycle to the pin
-func (p *PWMPin) SetDutyCycle(duty uint32) (err error) {
+func (p *PWMPin) SetDutyCycle(duty uint32) error {
 	if p.period == 0 {
 		return errors.New("Raspi PWM pin period not set")
 	}
@@ -90,16 +90,20 @@ func (p *PWMPin) SetDutyCycle(duty uint32) (err error) {
 	if duty > p.period {
 		return errors.New("Duty cycle exceeds period")
 	}
-	p.dc = duty
 
-	val := gobot.FromScale(float64(p.dc), 0, float64(p.period))
-
+	val := gobot.FromScale(float64(duty), 0, float64(p.period))
 	// never go below minimum allowed duty for pi blaster
 	// unless the duty equals to 0
 	if val < 0.05 && val != 0 {
 		val = 0.05
 	}
-	return p.writeValue(fmt.Sprintf("%v=%v\n", p.pin, val))
+
+	if err := p.writeValue(fmt.Sprintf("%v=%v\n", p.pin, val)); err != nil {
+		return err
+	}
+
+	p.dc = duty
+	return nil
 }
 
 func (p *PWMPin) writeValue(data string) (err error) {

@@ -46,27 +46,26 @@ type DigitalPinnerProvider interface {
 
 // PWMPinner is the interface for system PWM interactions
 type PWMPinner interface {
-	// Export exports the pin for use by the operating system
+	// Export exports the PWM pin for use by the operating system
 	Export() error
-	// Unexport unexports the pin and releases the pin from the operating system
+	// Unexport releases the PWM pin from the operating system
 	Unexport() error
-	// Enable enables/disables the PWM pin
-	// TODO: rename to "SetEnable(bool)" according to golang style and allow "Enable()" to be the getter function
-	Enable(bool) (err error)
-	// Polarity returns the polarity either normal or inverted
-	Polarity() (polarity string, err error)
-	// SetPolarity writes value to pwm polarity path
-	SetPolarity(value string) (err error)
-	// InvertPolarity sets the polarity to inverted if called with true
-	InvertPolarity(invert bool) (err error)
-	// Period returns the current PWM period for pin
-	Period() (period uint32, err error)
-	// SetPeriod sets the current PWM period for pin
-	SetPeriod(period uint32) (err error)
-	// DutyCycle returns the duty cycle for the pin
-	DutyCycle() (duty uint32, err error)
-	// SetDutyCycle writes the duty cycle to the pin
-	SetDutyCycle(duty uint32) (err error)
+	// Enabled returns the enabled state of the PWM pin
+	Enabled() (bool, error)
+	// SetEnabled enables/disables the PWM pin
+	SetEnabled(bool) error
+	// Polarity returns true if the polarity of the PWM pin is normal, otherwise false
+	Polarity() (bool, error)
+	// SetPolarity sets the polarity of the PWM pin to normal if called with true and to inverted if called with false
+	SetPolarity(normal bool) error
+	// Period returns the current PWM period in nanoseconds for pin
+	Period() (uint32, error)
+	// SetPeriod sets the current PWM period in nanoseconds for pin
+	SetPeriod(uint32) error
+	// DutyCycle returns the duty cycle in nanoseconds for the PWM pin
+	DutyCycle() (uint32, error)
+	// SetDutyCycle writes the duty cycle in nanoseconds to the PWM pin
+	SetDutyCycle(uint32) error
 }
 
 // PWMPinnerProvider is the interface that an Adaptor should implement to allow
@@ -80,7 +79,7 @@ type Adaptor interface {
 	// Name returns the label for the Adaptor
 	Name() string
 	// SetName sets the label for the Adaptor
-	SetName(n string)
+	SetName(string)
 	// Connect initiates the Adaptor
 	Connect() error
 	// Finalize terminates the Adaptor

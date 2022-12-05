@@ -9,7 +9,18 @@ import (
 	"gobot.io/x/gobot/gobottest"
 )
 
-var _ gobot.PWMPinner = (*PWMPin)(nil)
+var _ gobot.PWMPinner = (*pwmPinSysFs)(nil)
+
+const (
+	normal   = "normal"
+	inverted = "inverted"
+)
+
+func initTestPWMPinSysFsWithMockedFilesystem(mockPaths []string) (*pwmPinSysFs, *MockFilesystem) {
+	fs := newMockFilesystem(mockPaths)
+	pin := newPWMPinSysfs(fs, "/sys/class/pwm/pwmchip0", 10, normal, inverted)
+	return pin, fs
+}
 
 func TestPwmPin(t *testing.T) {
 	mockedPaths := []string{
@@ -20,9 +31,8 @@ func TestPwmPin(t *testing.T) {
 		"/sys/class/pwm/pwmchip0/pwm10/duty_cycle",
 		"/sys/class/pwm/pwmchip0/pwm10/polarity",
 	}
-	fs := newMockFilesystem(mockedPaths)
+	pin, fs := initTestPWMPinSysFsWithMockedFilesystem(mockedPaths)
 
-	pin := newPWMPinSysfs(fs, "/sys/class/pwm/pwmchip0", 10)
 	gobottest.Assert(t, pin.pin, "10")
 
 	err := pin.Unexport()
@@ -33,20 +43,20 @@ func TestPwmPin(t *testing.T) {
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/export"].Contents, "10")
 
-	gobottest.Assert(t, pin.InvertPolarity(true), nil)
-	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/pwm10/polarity"].Contents, "inverted")
+	gobottest.Assert(t, pin.SetPolarity(false), nil)
+	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/pwm10/polarity"].Contents, inverted)
 	pol, _ := pin.Polarity()
-	gobottest.Assert(t, pol, "inverted")
-	gobottest.Assert(t, pin.InvertPolarity(false), nil)
-	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/pwm10/polarity"].Contents, "normal")
+	gobottest.Assert(t, pol, false)
+	gobottest.Assert(t, pin.SetPolarity(true), nil)
+	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/pwm10/polarity"].Contents, normal)
 	pol, _ = pin.Polarity()
-	gobottest.Assert(t, pol, "normal")
+	gobottest.Assert(t, pol, true)
 
 	gobottest.Refute(t, fs.Files["/sys/class/pwm/pwmchip0/pwm10/enable"].Contents, "1")
-	err = pin.Enable(true)
+	err = pin.SetEnabled(true)
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/pwm10/enable"].Contents, "1")
-	err = pin.InvertPolarity(false)
+	err = pin.SetPolarity(true)
 	gobottest.Assert(t, err.Error(), "Cannot set PWM polarity when enabled")
 
 	fs.Files["/sys/class/pwm/pwmchip0/pwm10/period"].Contents = "6"
@@ -72,9 +82,8 @@ func TestPwmPinAlreadyExported(t *testing.T) {
 		"/sys/class/pwm/pwmchip0/pwm10/period",
 		"/sys/class/pwm/pwmchip0/pwm10/duty_cycle",
 	}
-	fs := newMockFilesystem(mockedPaths)
+	pin, _ := initTestPWMPinSysFsWithMockedFilesystem(mockedPaths)
 
-	pin := newPWMPinSysfs(fs, "/sys/class/pwm/pwmchip0", 10)
 	pin.write = func(filesystem, string, []byte) (int, error) {
 		return 0, &os.PathError{Err: syscall.EBUSY}
 	}
@@ -91,9 +100,7 @@ func TestPwmPinExportError(t *testing.T) {
 		"/sys/class/pwm/pwmchip0/pwm10/period",
 		"/sys/class/pwm/pwmchip0/pwm10/duty_cycle",
 	}
-	fs := newMockFilesystem(mockedPaths)
-
-	pin := newPWMPinSysfs(fs, "/sys/class/pwm/pwmchip0", 10)
+	pin, _ := initTestPWMPinSysFsWithMockedFilesystem(mockedPaths)
 
 	pin.write = func(filesystem, string, []byte) (int, error) {
 		return 0, &os.PathError{Err: syscall.EFAULT}
@@ -101,7 +108,7 @@ func TestPwmPinExportError(t *testing.T) {
 
 	// no error indicates that the pin was already exported
 	err := pin.Export()
-	gobottest.Assert(t, err.Error(), "Export() failed for pin 10 with  : bad address")
+	gobottest.Assert(t, err.Error(), "Export() failed for id 10 with  : bad address")
 }
 
 func TestPwmPinUnxportError(t *testing.T) {
@@ -112,16 +119,14 @@ func TestPwmPinUnxportError(t *testing.T) {
 		"/sys/class/pwm/pwmchip0/pwm10/period",
 		"/sys/class/pwm/pwmchip0/pwm10/duty_cycle",
 	}
-	fs := newMockFilesystem(mockedPaths)
-
-	pin := newPWMPinSysfs(fs, "/sys/class/pwm/pwmchip0", 10)
+	pin, _ := initTestPWMPinSysFsWithMockedFilesystem(mockedPaths)
 
 	pin.write = func(filesystem, string, []byte) (int, error) {
 		return 0, &os.PathError{Err: syscall.EBUSY}
 	}
 
 	err := pin.Unexport()
-	gobottest.Assert(t, err.Error(), "Unexport() failed for pin 10 with  : device or resource busy")
+	gobottest.Assert(t, err.Error(), "Unexport() failed for id 10 with  : device or resource busy")
 }
 
 func TestPwmPinPeriodError(t *testing.T) {
@@ -132,16 +137,14 @@ func TestPwmPinPeriodError(t *testing.T) {
 		"/sys/class/pwm/pwmchip0/pwm10/period",
 		"/sys/class/pwm/pwmchip0/pwm10/duty_cycle",
 	}
-	fs := newMockFilesystem(mockedPaths)
-
-	pin := newPWMPinSysfs(fs, "/sys/class/pwm/pwmchip0", 10)
+	pin, _ := initTestPWMPinSysFsWithMockedFilesystem(mockedPaths)
 
 	pin.read = func(filesystem, string) ([]byte, error) {
 		return nil, &os.PathError{Err: syscall.EBUSY}
 	}
 
 	_, err := pin.Period()
-	gobottest.Assert(t, err.Error(), "Period() failed for pin 10 with  : device or resource busy")
+	gobottest.Assert(t, err.Error(), "Period() failed for id 10 with  : device or resource busy")
 }
 
 func TestPwmPinPolarityError(t *testing.T) {
@@ -152,16 +155,14 @@ func TestPwmPinPolarityError(t *testing.T) {
 		"/sys/class/pwm/pwmchip0/pwm10/period",
 		"/sys/class/pwm/pwmchip0/pwm10/duty_cycle",
 	}
-	fs := newMockFilesystem(mockedPaths)
-
-	pin := newPWMPinSysfs(fs, "/sys/class/pwm/pwmchip0", 10)
+	pin, _ := initTestPWMPinSysFsWithMockedFilesystem(mockedPaths)
 
 	pin.read = func(filesystem, string) ([]byte, error) {
 		return nil, &os.PathError{Err: syscall.EBUSY}
 	}
 
 	_, err := pin.Polarity()
-	gobottest.Assert(t, err.Error(), "Polarity() failed for pin 10 with  : device or resource busy")
+	gobottest.Assert(t, err.Error(), "Polarity() failed for id 10 with  : device or resource busy")
 }
 
 func TestPwmPinDutyCycleError(t *testing.T) {
@@ -172,14 +173,12 @@ func TestPwmPinDutyCycleError(t *testing.T) {
 		"/sys/class/pwm/pwmchip0/pwm10/period",
 		"/sys/class/pwm/pwmchip0/pwm10/duty_cycle",
 	}
-	fs := newMockFilesystem(mockedPaths)
-
-	pin := newPWMPinSysfs(fs, "/sys/class/pwm/pwmchip0", 10)
+	pin, _ := initTestPWMPinSysFsWithMockedFilesystem(mockedPaths)
 
 	pin.read = func(filesystem, string) ([]byte, error) {
 		return nil, &os.PathError{Err: syscall.EBUSY}
 	}
 
 	_, err := pin.DutyCycle()
-	gobottest.Assert(t, err.Error(), "DutyCycle() failed for pin 10 with  : device or resource busy")
+	gobottest.Assert(t, err.Error(), "DutyCycle() failed for id 10 with  : device or resource busy")
 }

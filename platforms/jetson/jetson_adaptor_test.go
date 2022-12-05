@@ -62,6 +62,40 @@ func TestFinalize(t *testing.T) {
 	gobottest.Assert(t, a.Finalize(), nil)
 }
 
+func TestPWMPinsConnect(t *testing.T) {
+	a := NewAdaptor()
+	gobottest.Assert(t, a.pwmPins, (map[string]gobot.PWMPinner)(nil))
+
+	err := a.PwmWrite("33", 1)
+	gobottest.Assert(t, err.Error(), "not connected")
+
+	err = a.Connect()
+	gobottest.Assert(t, err, nil)
+	gobottest.Refute(t, a.pwmPins, (map[string]gobot.PWMPinner)(nil))
+	gobottest.Assert(t, len(a.pwmPins), 0)
+}
+
+func TestPWMPinsReConnect(t *testing.T) {
+	// arrange
+	mockPaths := []string{
+		"/sys/class/pwm/pwmchip0/export",
+		"/sys/class/pwm/pwmchip0/unexport",
+		"/sys/class/pwm/pwmchip0/pwm2/duty_cycle",
+		"/sys/class/pwm/pwmchip0/pwm2/period",
+		"/sys/class/pwm/pwmchip0/pwm2/enable",
+	}
+	a, _ := initTestAdaptorWithMockedFilesystem(mockPaths)
+	gobottest.Assert(t, len(a.pwmPins), 0)
+	gobottest.Assert(t, a.PwmWrite("33", 1), nil)
+	gobottest.Assert(t, len(a.pwmPins), 1)
+	gobottest.Assert(t, a.Finalize(), nil)
+	// act
+	err := a.Connect()
+	// assert
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, len(a.pwmPins), 0)
+}
+
 func TestDigitalIO(t *testing.T) {
 	mockPaths := []string{
 		"/sys/class/gpio/export",

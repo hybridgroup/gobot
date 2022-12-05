@@ -297,8 +297,8 @@ func TestFinalizeError(t *testing.T) {
 	err := a.Finalize()
 	gobottest.Assert(t, strings.Contains(err.Error(), "6 errors occurred"), true)
 	gobottest.Assert(t, strings.Contains(err.Error(), "write error"), true)
-	gobottest.Assert(t, strings.Contains(err.Error(), "Enable(false) failed for pin 1 with write error"), true)
-	gobottest.Assert(t, strings.Contains(err.Error(), "Unexport() failed for pin 1 with write error"), true)
+	gobottest.Assert(t, strings.Contains(err.Error(), "SetEnabled(false) failed for id 1 with write error"), true)
+	gobottest.Assert(t, strings.Contains(err.Error(), "Unexport() failed for id 1 with write error"), true)
 }
 
 func TestDigitalIO(t *testing.T) {
@@ -407,7 +407,7 @@ func TestPwm(t *testing.T) {
 	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/pwm1/duty_cycle"].Contents, "1960")
 
 	err = a.PwmWrite("7", 100)
-	gobottest.Assert(t, err, errors.New("Not a PWM pin"))
+	gobottest.Assert(t, err, errors.New("'7' is not a valid id for a PWM pin"))
 }
 
 func TestPwmExportError(t *testing.T) {

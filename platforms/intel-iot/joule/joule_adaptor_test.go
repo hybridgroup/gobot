@@ -172,10 +172,10 @@ func TestPwm(t *testing.T) {
 	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/pwm0/duty_cycle"].Contents, "3921568")
 
 	err = a.PwmWrite("4", 100)
-	gobottest.Assert(t, err, errors.New("Not a valid pin"))
+	gobottest.Assert(t, err, errors.New("'4' is not a valid id for a pin"))
 
 	err = a.PwmWrite("J12_1", 100)
-	gobottest.Assert(t, err, errors.New("Not a PWM pin"))
+	gobottest.Assert(t, err, errors.New("'J12_1' is not a valid id for a PWM pin"))
 }
 
 func TestPwmPinExportError(t *testing.T) {
