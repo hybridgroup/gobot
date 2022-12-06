@@ -2,6 +2,7 @@ package joule
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 	"testing"
 
@@ -103,20 +104,6 @@ func TestName(t *testing.T) {
 	gobottest.Assert(t, a.Name(), "NewName")
 }
 
-func TestConnect(t *testing.T) {
-	a, _ := initTestAdaptorWithMockedFilesystem()
-
-	gobottest.Assert(t, a.GetDefaultBus(), 0)
-}
-
-func TestInvalidBus(t *testing.T) {
-	a, _ := initTestAdaptorWithMockedFilesystem()
-	gobottest.Assert(t, a.Connect(), nil)
-
-	_, err := a.GetConnection(0xff, 10)
-	gobottest.Assert(t, err, errors.New("Bus number 10 out of range"))
-}
-
 func TestFinalize(t *testing.T) {
 	a, _ := initTestAdaptorWithMockedFilesystem()
 
@@ -125,9 +112,11 @@ func TestFinalize(t *testing.T) {
 
 	gobottest.Assert(t, a.Finalize(), nil)
 
-	_, err := a.GetConnection(0xff, 0)
-	gobottest.Assert(t, err, nil)
+	// assert finalize after finalize is working
 	gobottest.Assert(t, a.Finalize(), nil)
+
+	// assert re-connect is working
+	gobottest.Assert(t, a.Connect(), nil)
 }
 
 func TestDigitalIO(t *testing.T) {
@@ -144,24 +133,6 @@ func TestDigitalIO(t *testing.T) {
 
 	_, err = a.DigitalRead("P9_99")
 	gobottest.Assert(t, err, errors.New("'P9_99' is not a valid id for a digital pin"))
-}
-
-func TestI2c(t *testing.T) {
-	a, _ := initTestAdaptorWithMockedFilesystem()
-	a.sys.UseMockSyscall()
-
-	con, err := a.GetConnection(0xff, 0)
-	gobottest.Assert(t, err, nil)
-
-	_, err = con.Write([]byte{0x00, 0x01})
-	gobottest.Assert(t, err, nil)
-
-	data := []byte{42, 42}
-	_, err = con.Read(data)
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, data, []byte{0x00, 0x01})
-
-	gobottest.Assert(t, a.Finalize(), nil)
 }
 
 func TestPwm(t *testing.T) {
@@ -192,4 +163,44 @@ func TestPwmPinEnableError(t *testing.T) {
 
 	err := a.PwmWrite("J12_26", 100)
 	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/pwm/pwmchip0/pwm0/enable: No such file"), true)
+}
+
+func TestI2cGetDefaultBus(t *testing.T) {
+	a := NewAdaptor()
+	gobottest.Assert(t, a.GetDefaultBus(), 0)
+}
+
+func Test_validateI2cBusNumber(t *testing.T) {
+	var tests = map[string]struct {
+		busNr   int
+		wantErr error
+	}{
+		"number_negative_error": {
+			busNr:   -1,
+			wantErr: fmt.Errorf("Bus number -1 out of range"),
+		},
+		"number_0_ok": {
+			busNr: 0,
+		},
+		"number_1_ok": {
+			busNr: 1,
+		},
+		"number_2_ok": {
+			busNr: 2,
+		},
+		"number_3_not_ok": {
+			busNr:   3,
+			wantErr: fmt.Errorf("Bus number 3 out of range"),
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			a := NewAdaptor()
+			// act
+			err := a.validateI2cBusNumber(tc.busNr)
+			// assert
+			gobottest.Assert(t, err, tc.wantErr)
+		})
+	}
 }

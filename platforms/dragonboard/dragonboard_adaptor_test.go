@@ -2,6 +2,7 @@ package dragonboard
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 	"testing"
 
@@ -56,36 +57,6 @@ func TestDigitalIO(t *testing.T) {
 	gobottest.Assert(t, a.Finalize(), nil)
 }
 
-func TestI2c(t *testing.T) {
-	a := initTestAdaptor(t)
-	a.sys.UseMockFilesystem([]string{"/dev/i2c-1"})
-	a.sys.UseMockSyscall()
-
-	con, err := a.GetConnection(0xff, 1)
-	gobottest.Assert(t, err, nil)
-
-	_, err = con.Write([]byte{0x00, 0x01})
-	gobottest.Assert(t, err, nil)
-
-	data := []byte{42, 42}
-	_, err = con.Read(data)
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, data, []byte{0x00, 0x01})
-
-	gobottest.Assert(t, a.Finalize(), nil)
-}
-
-func TestDefaultBus(t *testing.T) {
-	a := initTestAdaptor(t)
-	gobottest.Assert(t, a.GetDefaultBus(), 0)
-}
-
-func TestGetConnectionInvalidBus(t *testing.T) {
-	a := initTestAdaptor(t)
-	_, err := a.GetConnection(0x01, 99)
-	gobottest.Assert(t, err, errors.New("Bus number 99 out of range"))
-}
-
 func TestFinalizeErrorAfterGPIO(t *testing.T) {
 	a := initTestAdaptor(t)
 	mockPaths := []string{
@@ -105,4 +76,41 @@ func TestFinalizeErrorAfterGPIO(t *testing.T) {
 
 	err := a.Finalize()
 	gobottest.Assert(t, strings.Contains(err.Error(), "write error"), true)
+}
+
+func TestI2cDefaultBus(t *testing.T) {
+	a := initTestAdaptor(t)
+	gobottest.Assert(t, a.GetDefaultBus(), 0)
+}
+
+func Test_validateI2cBusNumber(t *testing.T) {
+	var tests = map[string]struct {
+		busNr   int
+		wantErr error
+	}{
+		"number_negative_error": {
+			busNr:   -1,
+			wantErr: fmt.Errorf("Bus number -1 out of range"),
+		},
+		"number_0_ok": {
+			busNr: 0,
+		},
+		"number_1_ok": {
+			busNr: 1,
+		},
+		"number_2_error": {
+			busNr:   2,
+			wantErr: fmt.Errorf("Bus number 2 out of range"),
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			a := NewAdaptor()
+			// act
+			err := a.validateI2cBusNumber(tc.busNr)
+			// assert
+			gobottest.Assert(t, err, tc.wantErr)
+		})
+	}
 }

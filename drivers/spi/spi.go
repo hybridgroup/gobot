@@ -17,6 +17,8 @@ type Operations interface {
 	Tx(w, r []byte) error
 }
 
+// TODO: rename to golang getter spec (no prefix "Get" for simple getters)
+
 // Connector lets Adaptors provide the interface for Drivers
 // to get access to the SPI buses on platforms that support SPI.
 type Connector interface {

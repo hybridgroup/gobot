@@ -6,10 +6,11 @@ import (
 
 	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/platforms/adaptors"
 	"gobot.io/x/gobot/system"
 )
+
+const defaultI2cBusNumber = 0
 
 type sysfsPin struct {
 	pin    int
@@ -23,7 +24,7 @@ type Adaptor struct {
 	mutex sync.Mutex
 	*adaptors.DigitalPinsAdaptor
 	*adaptors.PWMPinsAdaptor
-	i2cBuses [3]i2c.I2cDevice
+	*adaptors.I2cBusAdaptor
 }
 
 // NewAdaptor returns a new Joule Adaptor
@@ -35,6 +36,7 @@ func NewAdaptor() *Adaptor {
 	}
 	c.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, c.translateDigitalPin)
 	c.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, c.translatePWMPin, adaptors.WithPWMPinInitializer(pwmPinInitializer))
+	c.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, c.validateI2cBusNumber, defaultI2cBusNumber)
 	return c
 }
 
@@ -48,6 +50,10 @@ func (c *Adaptor) SetName(n string) { c.name = n }
 func (c *Adaptor) Connect() error {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
+
+	if err := c.I2cBusAdaptor.Connect(); err != nil {
+		return err
+	}
 
 	if err := c.PWMPinsAdaptor.Connect(); err != nil {
 		return err
@@ -66,31 +72,19 @@ func (c *Adaptor) Finalize() error {
 		err = multierror.Append(err, e)
 	}
 
-	for _, bus := range c.i2cBuses {
-		if bus != nil {
-			if errs := bus.Close(); errs != nil {
-				err = multierror.Append(err, errs)
-			}
-		}
+	if e := c.I2cBusAdaptor.Finalize(); e != nil {
+		err = multierror.Append(err, e)
 	}
+
 	return err
 }
 
-// GetConnection returns an i2c connection to a device on a specified bus.
-// Valid bus number is [0..2] which corresponds to /dev/i2c-0 through /dev/i2c-2.
-func (c *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection, err error) {
-	if (bus < 0) || (bus > 2) {
-		return nil, fmt.Errorf("Bus number %d out of range", bus)
+func (c *Adaptor) validateI2cBusNumber(busNr int) error {
+	// Valid bus number is [0..2] which corresponds to /dev/i2c-0 through /dev/i2c-2.
+	if (busNr < 0) || (busNr > 2) {
+		return fmt.Errorf("Bus number %d out of range", busNr)
 	}
-	if c.i2cBuses[bus] == nil {
-		c.i2cBuses[bus], err = c.sys.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
-	}
-	return i2c.NewConnection(c.i2cBuses[bus], address), err
-}
-
-// GetDefaultBus returns the default i2c bus for this platform
-func (c *Adaptor) GetDefaultBus() int {
-	return 0
+	return nil
 }
 
 func (c *Adaptor) translateDigitalPin(id string) (string, int, error) {

@@ -107,6 +107,7 @@ func TestDigitalPinsReConnect(t *testing.T) {
 	err := a.Connect()
 	// assert
 	gobottest.Assert(t, err, nil)
+	gobottest.Refute(t, a.pins, nil)
 	gobottest.Assert(t, len(a.pins), 0)
 }
 

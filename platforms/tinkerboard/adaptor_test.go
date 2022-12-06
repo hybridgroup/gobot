@@ -1,7 +1,6 @@
 package tinkerboard
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 	"testing"
@@ -61,7 +60,7 @@ func preparePwmFs(fs *system.MockFilesystem) {
 	fs.Files[pwmEnablePath].Contents = "0"
 	fs.Files[pwmPeriodPath].Contents = "0"
 	fs.Files[pwmDutyCyclePath].Contents = "0"
-	fs.Files[pwmPolarityPath].Contents = pwmInverted
+	fs.Files[pwmPolarityPath].Contents = pwmInvertedIdentifier
 }
 
 func initTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *system.MockFilesystem) {
@@ -91,7 +90,7 @@ func TestDigitalIO(t *testing.T) {
 	i, _ := a.DigitalRead("10")
 	gobottest.Assert(t, i, 1)
 
-	gobottest.Assert(t, a.DigitalWrite("99", 1), errors.New("'99' is not a valid id for a digital pin"))
+	gobottest.Assert(t, a.DigitalWrite("99", 1), fmt.Errorf("'99' is not a valid id for a digital pin"))
 	gobottest.Assert(t, a.Finalize(), nil)
 }
 
@@ -177,35 +176,6 @@ func TestSetPeriod(t *testing.T) {
 	gobottest.Assert(t, fs.Files[pwmDutyCyclePath].Contents, fmt.Sprintf("%d", 2540000))
 }
 
-func TestI2c(t *testing.T) {
-	a, _ := initTestAdaptorWithMockedFilesystem([]string{"/dev/i2c-1"})
-	a.sys.UseMockSyscall()
-
-	con, err := a.GetConnection(0xff, 1)
-	gobottest.Assert(t, err, nil)
-
-	_, err = con.Write([]byte{0x00, 0x01})
-	gobottest.Assert(t, err, nil)
-
-	data := []byte{42, 42}
-	_, err = con.Read(data)
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, data, []byte{0x00, 0x01})
-
-	gobottest.Assert(t, a.Finalize(), nil)
-}
-
-func TestDefaultBus(t *testing.T) {
-	a := NewAdaptor()
-	gobottest.Assert(t, a.GetDefaultBus(), 1)
-}
-
-func TestGetConnectionInvalidBus(t *testing.T) {
-	a := NewAdaptor()
-	_, err := a.GetConnection(0x01, 99)
-	gobottest.Assert(t, err, errors.New("Bus number 99 out of range"))
-}
-
 func TestFinalizeErrorAfterGPIO(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem(gpioMockPaths)
 
@@ -227,6 +197,52 @@ func TestFinalizeErrorAfterPWM(t *testing.T) {
 
 	err := a.Finalize()
 	gobottest.Assert(t, strings.Contains(err.Error(), "write error"), true)
+}
+
+func TestI2cGetDefaultBus(t *testing.T) {
+	a := NewAdaptor()
+	gobottest.Assert(t, a.GetDefaultBus(), 1)
+}
+
+func Test_validateI2cBusNumber(t *testing.T) {
+	var tests = map[string]struct {
+		busNr   int
+		wantErr error
+	}{
+		"number_negative_error": {
+			busNr:   -1,
+			wantErr: fmt.Errorf("Bus number -1 out of range"),
+		},
+		"number_0_ok": {
+			busNr: 0,
+		},
+		"number_1_ok": {
+			busNr: 1,
+		},
+		"number_2_ok": {
+			busNr: 2,
+		},
+		"number_3_ok": {
+			busNr: 3,
+		},
+		"number_4_ok": {
+			busNr: 4,
+		},
+		"number_5_not_ok": {
+			busNr:   5,
+			wantErr: fmt.Errorf("Bus number 5 out of range"),
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			a := NewAdaptor()
+			// act
+			err := a.validateI2cBusNumber(tc.busNr)
+			// assert
+			gobottest.Assert(t, err, tc.wantErr)
+		})
+	}
 }
 
 func Test_translateDigitalPin(t *testing.T) {

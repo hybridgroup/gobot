@@ -14,8 +14,7 @@ import (
 )
 
 func main() {
-	board := edison.NewAdaptor()
-	board.SetBoard("miniboard")
+	board := edison.NewAdaptor("miniboard")
 
 	accel := i2c.NewGroveAccelerometerDriver(board)
 

@@ -58,6 +58,8 @@ type i2cDevice struct {
 	fs       filesystem
 }
 
+// TODO: possibly rename this to NewI2cDeviceAccess or NewI2cBus
+
 // NewI2cDevice returns an io.ReadWriteCloser with the proper ioctrl given
 // an i2c bus location.
 func (a *Accesser) NewI2cDevice(location string) (*i2cDevice, error) {

@@ -2,6 +2,7 @@ package system
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path"
@@ -19,6 +20,7 @@ type MockFilesystem struct {
 	Files          map[string]*MockFile
 	WithReadError  bool
 	WithWriteError bool
+	WithCloseError bool
 }
 
 // A MockFile represents a mock file that contains a single string.  Any write
@@ -34,8 +36,9 @@ type MockFile struct {
 }
 
 var (
-	errRead  = errors.New("read error")
-	errWrite = errors.New("write error")
+	errRead  = fmt.Errorf("read error")
+	errWrite = fmt.Errorf("write error")
+	errClose = fmt.Errorf("close error")
 )
 
 // Write writes string(b) to f.Contents
@@ -91,6 +94,9 @@ func (f *MockFile) Fd() uintptr {
 
 // Close implements the File interface Close function
 func (f *MockFile) Close() error {
+	if f != nil && f.fs != nil && f.fs.WithCloseError {
+		return errClose
+	}
 	return nil
 }
 

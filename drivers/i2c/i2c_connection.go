@@ -95,11 +95,12 @@ type I2cDevice interface {
 // Connector lets Adaptors provide the interface for Drivers
 // to get access to the I2C buses on platforms that support I2C.
 type Connector interface {
-	// GetConnection returns a connection to device at the specified address
+	// GetConnection creates and returns a connection to device at the specified address
 	// and bus. Bus numbering starts at index 0, the range of valid buses is
 	// platform specific.
-	GetConnection(address int, bus int) (device Connection, err error)
+	GetConnection(address int, busNr int) (device Connection, err error)
 
+	// TODO: rename to golang getter spec (no prefix "Get")
 	// GetDefaultBus returns the default I2C bus index
 	GetDefaultBus() int
 }
