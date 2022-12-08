@@ -127,6 +127,7 @@ var pwmMockPathsMux13Arduino = []string{
 }
 
 var pwmMockPathsMux13ArduinoI2c = []string{
+	"/dev/i2c-6",
 	"/sys/class/gpio/export",
 	"/sys/class/gpio/unexport",
 	"/sys/kernel/debug/gpio_debug/gpio13/current_pinmux",
@@ -550,6 +551,25 @@ func TestI2cWorkflow(t *testing.T) {
 	gobottest.Assert(t, data, []byte{0x00, 0x01})
 
 	gobottest.Assert(t, a.Finalize(), nil)
+}
+
+func TestI2cFinalizeWithErrors(t *testing.T) {
+	// arrange
+	a := NewAdaptor()
+	a.sys.UseMockSyscall()
+	fs := a.sys.UseMockFilesystem(pwmMockPathsMux13ArduinoI2c)
+	gobottest.Assert(t, a.Connect(), nil)
+	con, err := a.GetConnection(0xff, 6)
+	gobottest.Assert(t, err, nil)
+	_, err = con.Write([]byte{0x0A})
+	gobottest.Assert(t, err, nil)
+	fs.WithCloseError = true
+	// act
+	err = a.Finalize()
+	// assert
+	gobottest.Refute(t, err, nil)
+	gobottest.Assert(t, strings.Contains(err.Error(), "close error"), true)
+
 }
 
 func Test_validateI2cBusNumber(t *testing.T) {

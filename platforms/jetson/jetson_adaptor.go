@@ -7,23 +7,25 @@ import (
 
 	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/drivers/spi"
 	"gobot.io/x/gobot/platforms/adaptors"
 	"gobot.io/x/gobot/system"
 )
 
-const pwmPeriodDefault = 3000000 // 3 ms = 333 Hz
+const (
+	pwmPeriodDefault    = 3000000 // 3 ms = 333 Hz
+	defaultI2cBusNumber = 1
+)
 
 // Adaptor is the Gobot adaptor for the Jetson Nano
 type Adaptor struct {
-	name  string
-	sys   *system.Accesser
-	mutex sync.Mutex
-	*adaptors.DigitalPinsAdaptor
+	name       string
+	sys        *system.Accesser
+	mutex      sync.Mutex
 	pwmPins    map[string]gobot.PWMPinner
-	i2cBuses   [2]i2c.I2cDevice
 	spiDevices [2]spi.Connection
+	*adaptors.DigitalPinsAdaptor
+	*adaptors.I2cBusAdaptor
 }
 
 // NewAdaptor creates a Jetson Nano adaptor
@@ -34,6 +36,7 @@ func NewAdaptor() *Adaptor {
 		sys:  sys,
 	}
 	c.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, c.translateDigitalPin)
+	c.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, c.validateI2cBusNumber, defaultI2cBusNumber)
 	return c
 }
 
@@ -58,6 +61,10 @@ func (c *Adaptor) Connect() error {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
+	if err := c.I2cBusAdaptor.Connect(); err != nil {
+		return err
+	}
+
 	c.pwmPins = make(map[string]gobot.PWMPinner)
 	return c.DigitalPinsAdaptor.Connect()
 }
@@ -78,13 +85,10 @@ func (c *Adaptor) Finalize() error {
 	}
 	c.pwmPins = nil
 
-	for _, bus := range c.i2cBuses {
-		if bus != nil {
-			if e := bus.Close(); e != nil {
-				err = multierror.Append(err, e)
-			}
-		}
+	if e := c.I2cBusAdaptor.Finalize(); e != nil {
+		err = multierror.Append(err, e)
 	}
+
 	for _, dev := range c.spiDevices {
 		if dev != nil {
 			if e := dev.Close(); e != nil {
@@ -93,23 +97,6 @@ func (c *Adaptor) Finalize() error {
 		}
 	}
 	return err
-}
-
-// GetConnection returns an i2c connection to a device on a specified bus.
-// Valid bus number is [0..1] which corresponds to /dev/i2c-0 through /dev/i2c-1.
-func (c *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection, err error) {
-	if (bus < 0) || (bus > 1) {
-		return nil, fmt.Errorf("Bus number %d out of range", bus)
-	}
-
-	device, err := c.getI2cBus(bus)
-
-	return i2c.NewConnection(device, address), err
-}
-
-// GetDefaultBus returns the default i2c bus for this platform
-func (c *Adaptor) GetDefaultBus() int {
-	return 1
 }
 
 // GetSpiConnection returns an spi connection to a device on a specified bus.
@@ -190,17 +177,6 @@ func (c *Adaptor) ServoWrite(pin string, angle byte) (err error) {
 	return sysPin.SetDutyCycle(duty)
 }
 
-func (c *Adaptor) getI2cBus(bus int) (_ i2c.I2cDevice, err error) {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-
-	if c.i2cBuses[bus] == nil {
-		c.i2cBuses[bus], err = c.sys.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
-	}
-
-	return c.i2cBuses[bus], err
-}
-
 func (c *Adaptor) pwmPin(pin string) (gobot.PWMPinner, error) {
 	if c.pwmPins == nil {
 		return nil, fmt.Errorf("not connected")
@@ -227,6 +203,14 @@ func (c *Adaptor) pwmPin(pin string) (gobot.PWMPinner, error) {
 	}
 
 	return c.pwmPins[pin], nil
+}
+
+func (c *Adaptor) validateI2cBusNumber(busNr int) error {
+	// Valid bus number is [0..1] which corresponds to /dev/i2c-0 through /dev/i2c-1.
+	if (busNr < 0) || (busNr > 1) {
+		return fmt.Errorf("Bus number %d out of range", busNr)
+	}
+	return nil
 }
 
 func (c *Adaptor) translateDigitalPin(id string) (string, int, error) {

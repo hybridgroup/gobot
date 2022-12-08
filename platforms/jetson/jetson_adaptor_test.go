@@ -2,6 +2,7 @@ package jetson
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 	"testing"
 
@@ -39,7 +40,6 @@ func TestNewAdaptor(t *testing.T) {
 	a := NewAdaptor()
 
 	gobottest.Assert(t, strings.HasPrefix(a.Name(), "JetsonNano"), true)
-	gobottest.Assert(t, a.GetDefaultBus(), 1)
 
 	a.SetName("NewName")
 	gobottest.Assert(t, a.Name(), "NewName")
@@ -121,27 +121,6 @@ func TestDigitalIO(t *testing.T) {
 	gobottest.Assert(t, a.Finalize(), nil)
 }
 
-func TestI2c(t *testing.T) {
-	a, _ := initTestAdaptorWithMockedFilesystem([]string{"/dev/i2c-1"})
-	a.sys.UseMockSyscall()
-
-	con, err := a.GetConnection(0xff, 1)
-	gobottest.Assert(t, err, nil)
-
-	_, err = con.Write([]byte{0x00, 0x01})
-	gobottest.Assert(t, err, nil)
-
-	data := []byte{42, 42}
-	_, err = con.Read(data)
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, data, []byte{0x00, 0x01})
-
-	_, err = a.GetConnection(0xff, 51)
-	gobottest.Assert(t, err, errors.New("Bus number 51 out of range"))
-
-	gobottest.Assert(t, a.GetDefaultBus(), 1)
-}
-
 func TestSPI(t *testing.T) {
 	a := NewAdaptor()
 
@@ -158,7 +137,6 @@ func TestSPI(t *testing.T) {
 }
 
 func TestDigitalPinConcurrency(t *testing.T) {
-
 	oldProcs := runtime.GOMAXPROCS(0)
 	runtime.GOMAXPROCS(8)
 	defer runtime.GOMAXPROCS(oldProcs)
@@ -178,5 +156,57 @@ func TestDigitalPinConcurrency(t *testing.T) {
 		}
 
 		wg.Wait()
+	}
+}
+
+func TestI2cDefaultBus(t *testing.T) {
+	a := NewAdaptor()
+	gobottest.Assert(t, a.GetDefaultBus(), 1)
+}
+
+func TestI2cFinalizeWithErrors(t *testing.T) {
+	// arrange
+	a := NewAdaptor()
+	fs := a.sys.UseMockFilesystem([]string{"/dev/i2c-1"})
+	gobottest.Assert(t, a.Connect(), nil)
+	con, err := a.GetConnection(0xff, 1)
+	gobottest.Assert(t, err, nil)
+	con.Write([]byte{0xbf})
+	fs.WithCloseError = true
+	// act
+	err = a.Finalize()
+	// assert
+	gobottest.Assert(t, strings.Contains(err.Error(), "close error"), true)
+}
+
+func Test_validateI2cBusNumber(t *testing.T) {
+	var tests = map[string]struct {
+		busNr   int
+		wantErr error
+	}{
+		"number_negative_error": {
+			busNr:   -1,
+			wantErr: fmt.Errorf("Bus number -1 out of range"),
+		},
+		"number_0_ok": {
+			busNr: 0,
+		},
+		"number_1_ok": {
+			busNr: 1,
+		},
+		"number_2_not_ok": {
+			busNr:   2,
+			wantErr: fmt.Errorf("Bus number 2 out of range"),
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			a := NewAdaptor()
+			// act
+			err := a.validateI2cBusNumber(tc.busNr)
+			// assert
+			gobottest.Assert(t, err, tc.wantErr)
+		})
 	}
 }

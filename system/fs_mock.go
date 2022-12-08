@@ -1,7 +1,6 @@
 package system
 
 import (
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -95,6 +94,8 @@ func (f *MockFile) Fd() uintptr {
 // Close implements the File interface Close function
 func (f *MockFile) Close() error {
 	if f != nil && f.fs != nil && f.fs.WithCloseError {
+		f.Opened = false
+		f.Closed = false
 		return errClose
 	}
 	return nil
@@ -121,7 +122,8 @@ func (fs *MockFilesystem) openFile(name string, flag int, perm os.FileMode) (fil
 		f.Closed = false
 		return f, nil
 	}
-	return (*MockFile)(nil), &os.PathError{Err: errors.New(name + ": No such file.")}
+
+	return (*MockFile)(nil), &os.PathError{Err: fmt.Errorf("%s: No such file.", name)}
 }
 
 // Stat returns a generic FileInfo for all files in fs.Files.
@@ -153,7 +155,7 @@ func (fs *MockFilesystem) stat(name string) (os.FileInfo, error) {
 		}
 	}
 
-	return nil, &os.PathError{Err: errors.New(name + ": No such file.")}
+	return nil, &os.PathError{Err: fmt.Errorf("%s: No such file.", name)}
 }
 
 // Find returns all items (files or folders) below the given directory matching the given pattern.
@@ -188,7 +190,7 @@ func (fs *MockFilesystem) readFile(name string) ([]byte, error) {
 
 	f, ok := fs.Files[name]
 	if !ok {
-		return nil, &os.PathError{Err: errors.New(name + ": No such file.")}
+		return nil, &os.PathError{Err: fmt.Errorf("%s: No such file.", name)}
 	}
 	return []byte(f.Contents), nil
 }

@@ -145,8 +145,23 @@ func TestPWM(t *testing.T) {
 }
 
 func TestI2cDefaultBus(t *testing.T) {
-	a, _ := initTestAdaptorWithMockedFilesystem()
+	a := NewAdaptor()
 	gobottest.Assert(t, a.GetDefaultBus(), 1)
+}
+
+func TestI2cFinalizeWithErrors(t *testing.T) {
+	// arrange
+	a := NewAdaptor()
+	fs := a.sys.UseMockFilesystem([]string{"/dev/i2c-2"})
+	gobottest.Assert(t, a.Connect(), nil)
+	con, err := a.GetConnection(0xff, 2)
+	gobottest.Assert(t, err, nil)
+	con.Write([]byte{0xbf})
+	fs.WithCloseError = true
+	// act
+	err = a.Finalize()
+	// assert
+	gobottest.Assert(t, strings.Contains(err.Error(), "close error"), true)
 }
 
 func Test_validateI2cBusNumber(t *testing.T) {

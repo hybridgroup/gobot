@@ -165,9 +165,24 @@ func TestPwmPinEnableError(t *testing.T) {
 	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/pwm/pwmchip0/pwm0/enable: No such file"), true)
 }
 
-func TestI2cGetDefaultBus(t *testing.T) {
+func TestI2cDefaultBus(t *testing.T) {
 	a := NewAdaptor()
 	gobottest.Assert(t, a.GetDefaultBus(), 0)
+}
+
+func TestI2cFinalizeWithErrors(t *testing.T) {
+	// arrange
+	a := NewAdaptor()
+	fs := a.sys.UseMockFilesystem([]string{"/dev/i2c-2"})
+	gobottest.Assert(t, a.Connect(), nil)
+	con, err := a.GetConnection(0xff, 2)
+	gobottest.Assert(t, err, nil)
+	con.Write([]byte{0xbf})
+	fs.WithCloseError = true
+	// act
+	err = a.Finalize()
+	// assert
+	gobottest.Assert(t, strings.Contains(err.Error(), "close error"), true)
 }
 
 func Test_validateI2cBusNumber(t *testing.T) {
@@ -188,7 +203,7 @@ func Test_validateI2cBusNumber(t *testing.T) {
 		"number_2_ok": {
 			busNr: 2,
 		},
-		"number_3_not_ok": {
+		"number_3_error": {
 			busNr:   3,
 			wantErr: fmt.Errorf("Bus number 3 out of range"),
 		},
