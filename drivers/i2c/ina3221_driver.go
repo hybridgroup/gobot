@@ -91,7 +91,7 @@ func (i *INA3221Driver) Connection() gobot.Connection {
 // Start initializes the INA3221
 func (i *INA3221Driver) Start() error {
 	var err error
-	bus := i.GetBusOrDefault(i.connector.GetDefaultBus())
+	bus := i.GetBusOrDefault(i.connector.DefaultBus())
 	address := i.GetAddressOrDefault(int(ina3221Address))
 
 	if i.connection, err = i.connector.GetConnection(address, bus); err != nil {

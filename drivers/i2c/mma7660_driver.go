@@ -71,7 +71,7 @@ func (h *MMA7660Driver) Connection() gobot.Connection { return h.connector.(gobo
 
 // Start initialized the mma7660
 func (h *MMA7660Driver) Start() (err error) {
-	bus := h.GetBusOrDefault(h.connector.GetDefaultBus())
+	bus := h.GetBusOrDefault(h.connector.DefaultBus())
 	address := h.GetAddressOrDefault(mma7660Address)
 
 	h.connection, err = h.connector.GetConnection(address, bus)

@@ -141,7 +141,7 @@ func TestFinalizeErrorAfterPWM(t *testing.T) {
 
 func TestI2cDefaultBus(t *testing.T) {
 	a := NewAdaptor()
-	gobottest.Assert(t, a.GetDefaultBus(), 5)
+	gobottest.Assert(t, a.DefaultBus(), 5)
 }
 
 func TestI2cFinalizeWithErrors(t *testing.T) {

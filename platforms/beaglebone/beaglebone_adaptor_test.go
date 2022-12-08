@@ -228,7 +228,7 @@ func TestPocketName(t *testing.T) {
 
 func TestI2cDefaultBus(t *testing.T) {
 	a := NewAdaptor()
-	gobottest.Assert(t, a.GetDefaultBus(), 2)
+	gobottest.Assert(t, a.DefaultBus(), 2)
 }
 
 func TestI2cFinalizeWithErrors(t *testing.T) {

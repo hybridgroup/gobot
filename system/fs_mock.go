@@ -93,10 +93,13 @@ func (f *MockFile) Fd() uintptr {
 
 // Close implements the File interface Close function
 func (f *MockFile) Close() error {
-	if f != nil && f.fs != nil && f.fs.WithCloseError {
+	if f != nil {
 		f.Opened = false
-		f.Closed = false
-		return errClose
+		f.Closed = true
+		if f.fs != nil && f.fs.WithCloseError {
+			f.Closed = false
+			return errClose
+		}
 	}
 	return nil
 }

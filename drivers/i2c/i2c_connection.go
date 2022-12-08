@@ -100,9 +100,8 @@ type Connector interface {
 	// platform specific.
 	GetConnection(address int, busNr int) (device Connection, err error)
 
-	// TODO: rename to golang getter spec (no prefix "Get")
-	// GetDefaultBus returns the default I2C bus index
-	GetDefaultBus() int
+	// DefaultBus returns the default I2C bus index
+	DefaultBus() int
 }
 
 // Connection is a connection to an I2C device with a specified address

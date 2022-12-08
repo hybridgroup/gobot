@@ -110,5 +110,5 @@ func TestI2cReConnect(t *testing.T) {
 
 func TestI2cGetDefaultBus(t *testing.T) {
 	a := NewI2cBusAdaptor(nil, nil, 2)
-	gobottest.Assert(t, a.GetDefaultBus(), 2)
+	gobottest.Assert(t, a.DefaultBus(), 2)
 }

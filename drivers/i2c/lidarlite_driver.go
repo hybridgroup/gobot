@@ -51,7 +51,7 @@ func (h *LIDARLiteDriver) Connection() gobot.Connection { return h.connector.(go
 
 // Start initialized the LIDAR
 func (h *LIDARLiteDriver) Start() (err error) {
-	bus := h.GetBusOrDefault(h.connector.GetDefaultBus())
+	bus := h.GetBusOrDefault(h.connector.DefaultBus())
 	address := h.GetAddressOrDefault(lidarliteAddress)
 
 	h.connection, err = h.connector.GetConnection(address, bus)

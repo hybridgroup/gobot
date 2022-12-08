@@ -167,7 +167,7 @@ func TestPwmPinEnableError(t *testing.T) {
 
 func TestI2cDefaultBus(t *testing.T) {
 	a := NewAdaptor()
-	gobottest.Assert(t, a.GetDefaultBus(), 0)
+	gobottest.Assert(t, a.DefaultBus(), 0)
 }
 
 func TestI2cFinalizeWithErrors(t *testing.T) {

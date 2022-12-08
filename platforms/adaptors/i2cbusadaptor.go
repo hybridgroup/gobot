@@ -81,6 +81,6 @@ func (a *I2cBusAdaptor) GetConnection(address int, busNr int) (connection i2c.Co
 }
 
 // GetDefaultBus returns the default i2c bus number for this platform.
-func (a *I2cBusAdaptor) GetDefaultBus() int {
+func (a *I2cBusAdaptor) DefaultBus() int {
 	return a.defaultBusNumber
 }

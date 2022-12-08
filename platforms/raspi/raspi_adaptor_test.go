@@ -79,7 +79,7 @@ func TestGetDefaultBus(t *testing.T) {
 			fs.Files[infoFile].Contents = fmt.Sprintf(contentPattern, tc.revisionPart)
 			gobottest.Assert(t, a.revision, "")
 			//act, will read and refresh the revision
-			gotBus := a.GetDefaultBus()
+			gotBus := a.DefaultBus()
 			//assert
 			gobottest.Assert(t, a.revision, tc.wantRev)
 			gobottest.Assert(t, gotBus, tc.wantBus)
@@ -258,10 +258,10 @@ func TestI2cDefaultBus(t *testing.T) {
 	a.sys.UseMockSyscall()
 
 	a.revision = "0"
-	gobottest.Assert(t, a.GetDefaultBus(), 0)
+	gobottest.Assert(t, a.DefaultBus(), 0)
 
 	a.revision = "2"
-	gobottest.Assert(t, a.GetDefaultBus(), 1)
+	gobottest.Assert(t, a.DefaultBus(), 1)
 }
 
 func TestI2cFinalizeWithErrors(t *testing.T) {

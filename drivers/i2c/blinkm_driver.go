@@ -76,7 +76,7 @@ func (b *BlinkMDriver) Connection() gobot.Connection { return b.connection.(gobo
 
 // Start starts the Driver up, and writes start command
 func (b *BlinkMDriver) Start() (err error) {
-	bus := b.GetBusOrDefault(b.connector.GetDefaultBus())
+	bus := b.GetBusOrDefault(b.connector.DefaultBus())
 	address := b.GetAddressOrDefault(blinkmAddress)
 
 	b.connection, err = b.connector.GetConnection(address, bus)

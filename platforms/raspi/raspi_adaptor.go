@@ -105,7 +105,7 @@ func (c *Adaptor) Finalize() error {
 
 // GetDefaultBus returns the default i2c bus for this platform.
 // This overrides the base function due to the revision dependency.
-func (c *Adaptor) GetDefaultBus() int {
+func (c *Adaptor) DefaultBus() int {
 	rev := c.readRevision()
 	if rev == "2" || rev == "3" {
 		return 1

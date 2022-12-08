@@ -45,7 +45,7 @@ func (h *HMC6352Driver) Connection() gobot.Connection { return h.connector.(gobo
 
 // Start initializes the hmc6352
 func (h *HMC6352Driver) Start() (err error) {
-	bus := h.GetBusOrDefault(h.connector.GetDefaultBus())
+	bus := h.GetBusOrDefault(h.connector.DefaultBus())
 	address := h.GetAddressOrDefault(hmc6352Address)
 
 	h.connection, err = h.connector.GetConnection(address, bus)

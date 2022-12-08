@@ -231,7 +231,7 @@ func (d *TSL2561Driver) Connection() gobot.Connection {
 
 // Start initializes the device.
 func (d *TSL2561Driver) Start() (err error) {
-	bus := d.GetBusOrDefault(d.connector.GetDefaultBus())
+	bus := d.GetBusOrDefault(d.connector.DefaultBus())
 	address := d.GetAddressOrDefault(TSL2561AddressFloat)
 
 	if d.connection, err = d.connector.GetConnection(address, bus); err != nil {

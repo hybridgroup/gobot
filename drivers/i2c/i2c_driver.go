@@ -63,7 +63,7 @@ func (d *Driver) Start() error {
 	defer d.mutex.Unlock()
 
 	var err error
-	bus := d.GetBusOrDefault(d.connector.GetDefaultBus())
+	bus := d.GetBusOrDefault(d.connector.DefaultBus())
 	address := d.GetAddressOrDefault(int(d.defaultAddress))
 
 	if d.connection, err = d.connector.GetConnection(address, bus); err != nil {

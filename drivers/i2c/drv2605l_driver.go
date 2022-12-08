@@ -136,7 +136,7 @@ func (d *DRV2605LDriver) writeByteRegisters(regValPairs []struct{ reg, val uint8
 }
 
 func (d *DRV2605LDriver) initialize() (err error) {
-	bus := d.GetBusOrDefault(d.connector.GetDefaultBus())
+	bus := d.GetBusOrDefault(d.connector.DefaultBus())
 	address := d.GetAddressOrDefault(drv2605Address)
 
 	d.connection, err = d.connector.GetConnection(address, bus)

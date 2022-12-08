@@ -231,7 +231,7 @@ func TestName(t *testing.T) {
 func TestConnect(t *testing.T) {
 	a, _ := initTestAdaptorWithMockedFilesystem("arduino")
 
-	gobottest.Assert(t, a.GetDefaultBus(), 6)
+	gobottest.Assert(t, a.DefaultBus(), 6)
 	gobottest.Assert(t, a.board, "arduino")
 	gobottest.Assert(t, a.Connect(), nil)
 }
@@ -337,7 +337,7 @@ func TestConnectSparkfun(t *testing.T) {
 	a, _ := initTestAdaptorWithMockedFilesystem("sparkfun")
 
 	gobottest.Assert(t, a.Connect(), nil)
-	gobottest.Assert(t, a.GetDefaultBus(), 1)
+	gobottest.Assert(t, a.DefaultBus(), 1)
 	gobottest.Assert(t, a.board, "sparkfun")
 }
 
@@ -345,7 +345,7 @@ func TestConnectMiniboard(t *testing.T) {
 	a, _ := initTestAdaptorWithMockedFilesystem("miniboard")
 
 	gobottest.Assert(t, a.Connect(), nil)
-	gobottest.Assert(t, a.GetDefaultBus(), 1)
+	gobottest.Assert(t, a.DefaultBus(), 1)
 	gobottest.Assert(t, a.board, "miniboard")
 }
 

@@ -100,7 +100,7 @@ func (p *PCA9685Driver) Connection() gobot.Connection { return p.connector.(gobo
 
 // Start initializes the pca9685
 func (p *PCA9685Driver) Start() (err error) {
-	bus := p.GetBusOrDefault(p.connector.GetDefaultBus())
+	bus := p.GetBusOrDefault(p.connector.DefaultBus())
 	address := p.GetAddressOrDefault(pca9685Address)
 
 	p.connection, err = p.connector.GetConnection(address, bus)

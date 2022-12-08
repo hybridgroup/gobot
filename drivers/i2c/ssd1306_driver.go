@@ -282,7 +282,7 @@ func (s *SSD1306Driver) Start() (err error) {
 		s.initSequence.contrast = 0x9F
 		s.initSequence.prechargePeriod = 0x22
 	}
-	bus := s.GetBusOrDefault(s.connector.GetDefaultBus())
+	bus := s.GetBusOrDefault(s.connector.DefaultBus())
 	address := s.GetAddressOrDefault(ssd1306I2CAddress)
 	s.connection, err = s.connector.GetConnection(address, bus)
 	if err != nil {
