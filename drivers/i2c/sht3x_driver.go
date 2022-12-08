@@ -102,7 +102,7 @@ func (s *SHT3xDriver) Connection() gobot.Connection { return s.connector.(gobot.
 
 // Start initializes the SHT3x
 func (s *SHT3xDriver) Start() (err error) {
-	bus := s.GetBusOrDefault(s.connector.GetDefaultBus())
+	bus := s.GetBusOrDefault(s.connector.DefaultBus())
 	address := s.GetAddressOrDefault(s.sht3xAddress)
 
 	s.connection, err = s.connector.GetConnection(address, bus)

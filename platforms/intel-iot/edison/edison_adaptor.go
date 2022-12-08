@@ -1,7 +1,6 @@
 package edison
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"strconv"
@@ -9,9 +8,13 @@ import (
 
 	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/platforms/adaptors"
 	"gobot.io/x/gobot/system"
+)
+
+const (
+	defaultI2cBusNumber      = 6
+	defaultI2cBusNumberOther = 1
 )
 
 type mux struct {
@@ -29,27 +32,38 @@ type sysfsPin struct {
 
 // Adaptor represents a Gobot Adaptor for an Intel Edison
 type Adaptor struct {
-	name  string
-	board string
-	sys   *system.Accesser
-	*adaptors.PWMPinsAdaptor
+	name        string
+	board       string
+	sys         *system.Accesser
 	mutex       sync.Mutex
 	pinmap      map[string]sysfsPin
 	tristate    gobot.DigitalPinner
 	digitalPins map[int]gobot.DigitalPinner
-	i2cBus      i2c.I2cDevice
+	*adaptors.PWMPinsAdaptor
+	*adaptors.I2cBusAdaptor
+	arduinoI2cInitialized bool
 }
 
-// NewAdaptor returns a new Edison Adaptor
-func NewAdaptor() *Adaptor {
+// NewAdaptor returns a new Edison Adaptor of the given type.
+// Supported types are: "arduino", "miniboard", "sparkfun", an empty string defaults to "arduino"
+func NewAdaptor(boardType ...string) *Adaptor {
 	sys := system.NewAccesser()
 	c := &Adaptor{
 		name:   gobot.DefaultName("Edison"),
+		board:  "arduino",
 		sys:    sys,
 		pinmap: arduinoPinMap,
 	}
+	if len(boardType) > 0 && boardType[0] != "" {
+		c.board = boardType[0]
+	}
 	c.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, c.translateAndMuxPWMPin,
 		adaptors.WithPWMPinInitializer(pwmPinInitializer))
+	defI2cBusNr := defaultI2cBusNumber
+	if c.board != "arduino" {
+		defI2cBusNr = defaultI2cBusNumberOther
+	}
+	c.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, c.validateAndSetupI2cBusNumber, defI2cBusNr)
 	return c
 }
 
@@ -59,15 +73,13 @@ func (c *Adaptor) Name() string { return c.name }
 // SetName sets the Adaptors name
 func (c *Adaptor) SetName(n string) { c.name = n }
 
-// Board returns the Adaptors board name
-func (c *Adaptor) Board() string { return c.board }
-
-// SetBoard sets the Adaptors name
-func (c *Adaptor) SetBoard(n string) { c.board = n }
-
 // Connect initializes the Edison for use with the Arduino breakout board
 func (c *Adaptor) Connect() error {
 	c.digitalPins = make(map[int]gobot.DigitalPinner)
+
+	if err := c.I2cBusAdaptor.Connect(); err != nil {
+		return err
+	}
 
 	if err := c.PWMPinsAdaptor.Connect(); err != nil {
 		return err
@@ -76,7 +88,7 @@ func (c *Adaptor) Connect() error {
 	switch c.board {
 	case "sparkfun":
 		c.pinmap = sparkfunPinMap
-	case "arduino", "":
+	case "arduino":
 		c.board = "arduino"
 		c.pinmap = arduinoPinMap
 		if err := c.arduinoSetup(); err != nil {
@@ -85,8 +97,9 @@ func (c *Adaptor) Connect() error {
 	case "miniboard":
 		c.pinmap = miniboardPinMap
 	default:
-		return errors.New("Unknown board type: " + c.Board())
+		return fmt.Errorf("Unknown board type: %s", c.board)
 	}
+
 	return nil
 }
 
@@ -97,6 +110,8 @@ func (c *Adaptor) Finalize() (err error) {
 			err = multierror.Append(err, errs)
 		}
 	}
+	c.tristate = nil
+
 	for _, pin := range c.digitalPins {
 		if pin != nil {
 			if errs := pin.Unexport(); errs != nil {
@@ -104,14 +119,16 @@ func (c *Adaptor) Finalize() (err error) {
 			}
 		}
 	}
+	c.digitalPins = nil
+
 	if e := c.PWMPinsAdaptor.Finalize(); e != nil {
 		err = multierror.Append(err, e)
 	}
-	if c.i2cBus != nil {
-		if errs := c.i2cBus.Close(); errs != nil {
-			err = multierror.Append(err, errs)
-		}
+
+	if e := c.I2cBusAdaptor.Finalize(); e != nil {
+		err = multierror.Append(err, e)
 	}
+	c.arduinoI2cInitialized = false
 	return
 }
 
@@ -156,32 +173,24 @@ func (c *Adaptor) AnalogRead(pin string) (val int, err error) {
 	return val / 4, err
 }
 
-// GetConnection returns an i2c connection to a device on a specified bus.
-// Valid bus numbers are 1 and 6 (arduino).
-func (c *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection, err error) {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-
-	if !(bus == c.GetDefaultBus()) {
-		return nil, errors.New("Unsupported I2C bus")
-	}
-	if c.i2cBus == nil {
-		if bus == 6 && c.board == "arduino" {
-			c.arduinoI2CSetup()
+func (c *Adaptor) validateAndSetupI2cBusNumber(busNr int) error {
+	// Valid bus number is 6 for "arduino", otherwise 1.
+	if busNr == 6 && c.board == "arduino" {
+		if !c.arduinoI2cInitialized {
+			if err := c.arduinoI2CSetup(); err != nil {
+				return err
+			}
+			c.arduinoI2cInitialized = true
+			return nil
 		}
-		c.i2cBus, err = c.sys.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
-	}
-	return i2c.NewConnection(c.i2cBus, address), err
-}
-
-// GetDefaultBus returns the default i2c bus for this platform
-func (c *Adaptor) GetDefaultBus() int {
-	// Arduino uses bus 6
-	if c.board == "arduino" {
-		return 6
+		return nil
 	}
 
-	return 1
+	if busNr == 1 && c.board != "arduino" {
+		return nil
+	}
+
+	return fmt.Errorf("Unsupported I2C bus '%d'", busNr)
 }
 
 // arduinoSetup does needed setup for the Arduino compatible breakout board
@@ -223,6 +232,10 @@ func (c *Adaptor) arduinoSetup() error {
 }
 
 func (c *Adaptor) arduinoI2CSetup() error {
+	if c.tristate == nil {
+		return fmt.Errorf("not connected")
+	}
+
 	if err := c.tristate.Write(system.LOW); err != nil {
 		return err
 	}

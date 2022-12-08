@@ -189,7 +189,7 @@ func (p *PCF8591Driver) Connection() gobot.Connection { return p.connector.(gobo
 
 // Start initializes the PCF8591
 func (p *PCF8591Driver) Start() (err error) {
-	bus := p.GetBusOrDefault(p.connector.GetDefaultBus())
+	bus := p.GetBusOrDefault(p.connector.DefaultBus())
 	address := p.GetAddressOrDefault(pcf8591DefaultAddress)
 
 	p.connection, err = p.connector.GetConnection(address, bus)

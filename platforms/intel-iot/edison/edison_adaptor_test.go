@@ -1,7 +1,7 @@
 package edison
 
 import (
-	"errors"
+	"fmt"
 	"strings"
 	"testing"
 
@@ -93,6 +93,93 @@ var testPinFiles = []string{
 	"/dev/i2c-6",
 }
 
+var pwmMockPathsMux13Arduino = []string{
+	"/sys/class/gpio/export",
+	"/sys/class/gpio/unexport",
+	"/sys/kernel/debug/gpio_debug/gpio13/current_pinmux",
+	"/sys/kernel/debug/gpio_debug/gpio40/current_pinmux",
+	"/sys/kernel/debug/gpio_debug/gpio109/current_pinmux",
+	"/sys/kernel/debug/gpio_debug/gpio111/current_pinmux",
+	"/sys/kernel/debug/gpio_debug/gpio114/current_pinmux",
+	"/sys/kernel/debug/gpio_debug/gpio115/current_pinmux",
+	"/sys/kernel/debug/gpio_debug/gpio129/current_pinmux",
+	"/sys/kernel/debug/gpio_debug/gpio131/current_pinmux",
+	"/sys/class/gpio/gpio13/direction",
+	"/sys/class/gpio/gpio13/value",
+	"/sys/class/gpio/gpio214/direction",
+	"/sys/class/gpio/gpio214/value",
+	"/sys/class/gpio/gpio221/direction",
+	"/sys/class/gpio/gpio221/value",
+	"/sys/class/gpio/gpio240/direction",
+	"/sys/class/gpio/gpio240/value",
+	"/sys/class/gpio/gpio241/direction",
+	"/sys/class/gpio/gpio241/value",
+	"/sys/class/gpio/gpio242/direction",
+	"/sys/class/gpio/gpio242/value",
+	"/sys/class/gpio/gpio243/direction",
+	"/sys/class/gpio/gpio243/value",
+	"/sys/class/gpio/gpio253/direction",
+	"/sys/class/gpio/gpio253/value",
+	"/sys/class/gpio/gpio262/direction",
+	"/sys/class/gpio/gpio262/value",
+	"/sys/class/gpio/gpio263/direction",
+	"/sys/class/gpio/gpio263/value",
+}
+
+var pwmMockPathsMux13ArduinoI2c = []string{
+	"/dev/i2c-6",
+	"/sys/class/gpio/export",
+	"/sys/class/gpio/unexport",
+	"/sys/kernel/debug/gpio_debug/gpio13/current_pinmux",
+	"/sys/kernel/debug/gpio_debug/gpio27/current_pinmux",
+	"/sys/kernel/debug/gpio_debug/gpio28/current_pinmux",
+	"/sys/kernel/debug/gpio_debug/gpio40/current_pinmux",
+	"/sys/kernel/debug/gpio_debug/gpio109/current_pinmux",
+	"/sys/kernel/debug/gpio_debug/gpio111/current_pinmux",
+	"/sys/kernel/debug/gpio_debug/gpio114/current_pinmux",
+	"/sys/kernel/debug/gpio_debug/gpio115/current_pinmux",
+	"/sys/kernel/debug/gpio_debug/gpio129/current_pinmux",
+	"/sys/kernel/debug/gpio_debug/gpio131/current_pinmux",
+	"/sys/class/gpio/gpio13/direction",
+	"/sys/class/gpio/gpio13/value",
+	"/sys/class/gpio/gpio14/direction",
+	"/sys/class/gpio/gpio14/value",
+	"/sys/class/gpio/gpio28/direction",
+	"/sys/class/gpio/gpio28/value",
+	"/sys/class/gpio/gpio165/direction",
+	"/sys/class/gpio/gpio165/value",
+	"/sys/class/gpio/gpio212/direction",
+	"/sys/class/gpio/gpio212/value",
+	"/sys/class/gpio/gpio213/direction",
+	"/sys/class/gpio/gpio213/value",
+	"/sys/class/gpio/gpio214/direction",
+	"/sys/class/gpio/gpio214/value",
+	"/sys/class/gpio/gpio221/direction",
+	"/sys/class/gpio/gpio221/value",
+	"/sys/class/gpio/gpio236/direction",
+	"/sys/class/gpio/gpio236/value",
+	"/sys/class/gpio/gpio237/direction",
+	"/sys/class/gpio/gpio237/value",
+	"/sys/class/gpio/gpio204/value",
+	"/sys/class/gpio/gpio204/direction",
+	"/sys/class/gpio/gpio205/value",
+	"/sys/class/gpio/gpio205/direction",
+	"/sys/class/gpio/gpio240/direction",
+	"/sys/class/gpio/gpio240/value",
+	"/sys/class/gpio/gpio241/direction",
+	"/sys/class/gpio/gpio241/value",
+	"/sys/class/gpio/gpio242/direction",
+	"/sys/class/gpio/gpio242/value",
+	"/sys/class/gpio/gpio243/direction",
+	"/sys/class/gpio/gpio243/value",
+	"/sys/class/gpio/gpio253/direction",
+	"/sys/class/gpio/gpio253/value",
+	"/sys/class/gpio/gpio262/direction",
+	"/sys/class/gpio/gpio262/value",
+	"/sys/class/gpio/gpio263/direction",
+	"/sys/class/gpio/gpio263/value",
+}
+
 var pwmMockPathsMux13 = []string{
 	"/sys/kernel/debug/gpio_debug/gpio13/current_pinmux",
 	"/sys/class/gpio/export",
@@ -123,8 +210,8 @@ var pwmMockPathsMux40 = []string{
 	"/sys/class/gpio/gpio261/direction",
 }
 
-func initTestAdaptorWithMockedFilesystem() (*Adaptor, *system.MockFilesystem) {
-	a := NewAdaptor()
+func initTestAdaptorWithMockedFilesystem(boardType string) (*Adaptor, *system.MockFilesystem) {
+	a := NewAdaptor(boardType)
 	fs := a.sys.UseMockFilesystem(testPinFiles)
 	fs.Files["/sys/class/pwm/pwmchip0/pwm1/period"].Contents = "5000"
 	if err := a.Connect(); err != nil {
@@ -142,15 +229,15 @@ func TestName(t *testing.T) {
 }
 
 func TestConnect(t *testing.T) {
-	a, _ := initTestAdaptorWithMockedFilesystem()
+	a, _ := initTestAdaptorWithMockedFilesystem("arduino")
 
-	gobottest.Assert(t, a.GetDefaultBus(), 6)
-	gobottest.Assert(t, a.Board(), "arduino")
+	gobottest.Assert(t, a.DefaultBus(), 6)
+	gobottest.Assert(t, a.board, "arduino")
 	gobottest.Assert(t, a.Connect(), nil)
 }
 
 func TestArduinoSetupFail263(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem()
+	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 	delete(fs.Files, "/sys/class/gpio/gpio263/direction")
 
 	err := a.arduinoSetup()
@@ -158,7 +245,7 @@ func TestArduinoSetupFail263(t *testing.T) {
 }
 
 func TestArduinoSetupFail240(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem()
+	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 	delete(fs.Files, "/sys/class/gpio/gpio240/direction")
 
 	err := a.arduinoSetup()
@@ -166,7 +253,7 @@ func TestArduinoSetupFail240(t *testing.T) {
 }
 
 func TestArduinoSetupFail111(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem()
+	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 	delete(fs.Files, "/sys/kernel/debug/gpio_debug/gpio111/current_pinmux")
 
 	err := a.arduinoSetup()
@@ -174,7 +261,7 @@ func TestArduinoSetupFail111(t *testing.T) {
 }
 
 func TestArduinoSetupFail131(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem()
+	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 	delete(fs.Files, "/sys/kernel/debug/gpio_debug/gpio131/current_pinmux")
 
 	err := a.arduinoSetup()
@@ -182,16 +269,16 @@ func TestArduinoSetupFail131(t *testing.T) {
 }
 
 func TestArduinoI2CSetupFailTristate(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem()
+	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 	gobottest.Assert(t, a.arduinoSetup(), nil)
 
 	fs.WithWriteError = true
 	err := a.arduinoI2CSetup()
-	gobottest.Assert(t, err, errors.New("write error"))
+	gobottest.Assert(t, err, fmt.Errorf("write error"))
 }
 
 func TestArduinoI2CSetupFail14(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem()
+	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 
 	gobottest.Assert(t, a.arduinoSetup(), nil)
 	delete(fs.Files, "/sys/class/gpio/gpio14/direction")
@@ -201,7 +288,7 @@ func TestArduinoI2CSetupFail14(t *testing.T) {
 }
 
 func TestArduinoI2CSetupUnexportFail(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem()
+	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 
 	gobottest.Assert(t, a.arduinoSetup(), nil)
 	delete(fs.Files, "/sys/class/gpio/unexport")
@@ -211,7 +298,7 @@ func TestArduinoI2CSetupUnexportFail(t *testing.T) {
 }
 
 func TestArduinoI2CSetupFail236(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem()
+	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 
 	gobottest.Assert(t, a.arduinoSetup(), nil)
 	delete(fs.Files, "/sys/class/gpio/gpio236/direction")
@@ -221,7 +308,7 @@ func TestArduinoI2CSetupFail236(t *testing.T) {
 }
 
 func TestArduinoI2CSetupFail28(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem()
+	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 
 	gobottest.Assert(t, a.arduinoSetup(), nil)
 	delete(fs.Files, "/sys/kernel/debug/gpio_debug/gpio28/current_pinmux")
@@ -231,7 +318,7 @@ func TestArduinoI2CSetupFail28(t *testing.T) {
 }
 
 func TestConnectArduinoError(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem()
+	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 	fs.WithWriteError = true
 
 	err := a.Connect()
@@ -239,7 +326,7 @@ func TestConnectArduinoError(t *testing.T) {
 }
 
 func TestConnectArduinoWriteError(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem()
+	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 	fs.WithWriteError = true
 
 	err := a.Connect()
@@ -247,33 +334,30 @@ func TestConnectArduinoWriteError(t *testing.T) {
 }
 
 func TestConnectSparkfun(t *testing.T) {
-	a, _ := initTestAdaptorWithMockedFilesystem()
+	a, _ := initTestAdaptorWithMockedFilesystem("sparkfun")
 
-	a.SetBoard("sparkfun")
 	gobottest.Assert(t, a.Connect(), nil)
-	gobottest.Assert(t, a.GetDefaultBus(), 1)
-	gobottest.Assert(t, a.Board(), "sparkfun")
+	gobottest.Assert(t, a.DefaultBus(), 1)
+	gobottest.Assert(t, a.board, "sparkfun")
 }
 
 func TestConnectMiniboard(t *testing.T) {
-	a, _ := initTestAdaptorWithMockedFilesystem()
+	a, _ := initTestAdaptorWithMockedFilesystem("miniboard")
 
-	a.SetBoard("miniboard")
 	gobottest.Assert(t, a.Connect(), nil)
-	gobottest.Assert(t, a.GetDefaultBus(), 1)
-	gobottest.Assert(t, a.Board(), "miniboard")
+	gobottest.Assert(t, a.DefaultBus(), 1)
+	gobottest.Assert(t, a.board, "miniboard")
 }
 
 func TestConnectUnknown(t *testing.T) {
-	a, _ := initTestAdaptorWithMockedFilesystem()
-	a.SetBoard("wha")
+	a := NewAdaptor("wha")
 
 	err := a.Connect()
 	gobottest.Assert(t, strings.Contains(err.Error(), "Unknown board type: wha"), true)
 }
 
 func TestFinalize(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem()
+	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 
 	a.DigitalWrite("3", 1)
 	a.PwmWrite("5", 100)
@@ -281,15 +365,20 @@ func TestFinalize(t *testing.T) {
 	a.GetConnection(0xff, 6)
 	gobottest.Assert(t, a.Finalize(), nil)
 
+	// assert that finalize after finalize is working
+	gobottest.Assert(t, a.Finalize(), nil)
+
+	// assert that re-connect is working
+	a.Connect()
 	// remove one file to force Finalize error
 	delete(fs.Files, "/sys/class/gpio/unexport")
 	err := a.Finalize()
-	gobottest.Assert(t, strings.Contains(err.Error(), "4 errors occurred"), true)
+	gobottest.Assert(t, strings.Contains(err.Error(), "1 error occurred"), true)
 	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/unexport"), true)
 }
 
 func TestFinalizeError(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem()
+	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 
 	a.PwmWrite("5", 100)
 
@@ -302,7 +391,7 @@ func TestFinalizeError(t *testing.T) {
 }
 
 func TestDigitalIO(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem()
+	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 
 	a.DigitalWrite("13", 1)
 	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio40/value"].Contents, "1")
@@ -359,23 +448,95 @@ func TestDigitalPinInMuxFileError(t *testing.T) {
 }
 
 func TestDigitalWriteError(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem()
+	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 	fs.WithWriteError = true
 
 	err := a.DigitalWrite("13", 1)
-	gobottest.Assert(t, err, errors.New("write error"))
+	gobottest.Assert(t, err, fmt.Errorf("write error"))
 }
 
 func TestDigitalReadWriteError(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem()
+	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 	fs.WithWriteError = true
 
 	_, err := a.DigitalRead("13")
-	gobottest.Assert(t, err, errors.New("write error"))
+	gobottest.Assert(t, err, fmt.Errorf("write error"))
 }
 
-func TestI2c(t *testing.T) {
-	a, _ := initTestAdaptorWithMockedFilesystem()
+func TestPwm(t *testing.T) {
+	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
+
+	err := a.PwmWrite("5", 100)
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/pwm1/duty_cycle"].Contents, "1960")
+
+	err = a.PwmWrite("7", 100)
+	gobottest.Assert(t, err, fmt.Errorf("'7' is not a valid id for a PWM pin"))
+}
+
+func TestPwmExportError(t *testing.T) {
+	a := NewAdaptor()
+	fs := a.sys.UseMockFilesystem(pwmMockPathsMux13Arduino)
+	delete(fs.Files, "/sys/class/pwm/pwmchip0/export")
+	err := a.Connect()
+	gobottest.Assert(t, err, nil)
+
+	err = a.PwmWrite("5", 100)
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/pwm/pwmchip0/export: No such file"), true)
+}
+
+func TestPwmEnableError(t *testing.T) {
+	a := NewAdaptor()
+	fs := a.sys.UseMockFilesystem(pwmMockPathsMux13)
+	delete(fs.Files, "/sys/class/pwm/pwmchip0/pwm1/enable")
+	a.Connect()
+
+	err := a.PwmWrite("5", 100)
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/pwm/pwmchip0/pwm1/enable: No such file"), true)
+}
+
+func TestPwmWritePinError(t *testing.T) {
+	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
+	fs.WithWriteError = true
+
+	err := a.PwmWrite("5", 100)
+	gobottest.Assert(t, err, fmt.Errorf("write error"))
+}
+
+func TestPwmWriteError(t *testing.T) {
+	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
+	fs.WithWriteError = true
+
+	err := a.PwmWrite("5", 100)
+	gobottest.Assert(t, strings.Contains(err.Error(), "write error"), true)
+}
+
+func TestPwmReadError(t *testing.T) {
+	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
+	fs.WithReadError = true
+
+	err := a.PwmWrite("5", 100)
+	gobottest.Assert(t, strings.Contains(err.Error(), "read error"), true)
+}
+
+func TestAnalog(t *testing.T) {
+	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
+	fs.Files["/sys/bus/iio/devices/iio:device1/in_voltage0_raw"].Contents = "1000\n"
+
+	i, _ := a.AnalogRead("0")
+	gobottest.Assert(t, i, 250)
+}
+
+func TestAnalogError(t *testing.T) {
+	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
+	fs.WithReadError = true
+
+	_, err := a.AnalogRead("0")
+	gobottest.Assert(t, err, fmt.Errorf("read error"))
+}
+
+func TestI2cWorkflow(t *testing.T) {
+	a, _ := initTestAdaptorWithMockedFilesystem("arduino")
 	a.sys.UseMockSyscall()
 
 	con, err := a.GetConnection(0xff, 6)
@@ -392,80 +553,67 @@ func TestI2c(t *testing.T) {
 	gobottest.Assert(t, a.Finalize(), nil)
 }
 
-func TestI2cInvalidBus(t *testing.T) {
-	a, _ := initTestAdaptorWithMockedFilesystem()
-
-	_, err := a.GetConnection(0xff, 3)
-	gobottest.Assert(t, err, errors.New("Unsupported I2C bus"))
-}
-
-func TestPwm(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem()
-
-	err := a.PwmWrite("5", 100)
+func TestI2cFinalizeWithErrors(t *testing.T) {
+	// arrange
+	a := NewAdaptor()
+	a.sys.UseMockSyscall()
+	fs := a.sys.UseMockFilesystem(pwmMockPathsMux13ArduinoI2c)
+	gobottest.Assert(t, a.Connect(), nil)
+	con, err := a.GetConnection(0xff, 6)
 	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/pwm1/duty_cycle"].Contents, "1960")
+	_, err = con.Write([]byte{0x0A})
+	gobottest.Assert(t, err, nil)
+	fs.WithCloseError = true
+	// act
+	err = a.Finalize()
+	// assert
+	gobottest.Refute(t, err, nil)
+	gobottest.Assert(t, strings.Contains(err.Error(), "close error"), true)
 
-	err = a.PwmWrite("7", 100)
-	gobottest.Assert(t, err, errors.New("'7' is not a valid id for a PWM pin"))
 }
 
-func TestPwmExportError(t *testing.T) {
-	a := NewAdaptor()
-	fs := a.sys.UseMockFilesystem(pwmMockPathsMux13)
-	delete(fs.Files, "/sys/class/pwm/pwmchip0/export")
-	a.Connect()
-
-	err := a.PwmWrite("5", 100)
-	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/pwm/pwmchip0/export: No such file"), true)
-}
-
-func TestPwmEnableError(t *testing.T) {
-	a := NewAdaptor()
-	fs := a.sys.UseMockFilesystem(pwmMockPathsMux13)
-	delete(fs.Files, "/sys/class/pwm/pwmchip0/pwm1/enable")
-	a.Connect()
-
-	err := a.PwmWrite("5", 100)
-	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/pwm/pwmchip0/pwm1/enable: No such file"), true)
-}
-
-func TestPwmWritePinError(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem()
-	fs.WithWriteError = true
-
-	err := a.PwmWrite("5", 100)
-	gobottest.Assert(t, err, errors.New("write error"))
-}
-
-func TestPwmWriteError(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem()
-	fs.WithWriteError = true
-
-	err := a.PwmWrite("5", 100)
-	gobottest.Assert(t, strings.Contains(err.Error(), "write error"), true)
-}
-
-func TestPwmReadError(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem()
-	fs.WithReadError = true
-
-	err := a.PwmWrite("5", 100)
-	gobottest.Assert(t, strings.Contains(err.Error(), "read error"), true)
-}
-
-func TestAnalog(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem()
-	fs.Files["/sys/bus/iio/devices/iio:device1/in_voltage0_raw"].Contents = "1000\n"
-
-	i, _ := a.AnalogRead("0")
-	gobottest.Assert(t, i, 250)
-}
-
-func TestAnalogError(t *testing.T) {
-	a, fs := initTestAdaptorWithMockedFilesystem()
-	fs.WithReadError = true
-
-	_, err := a.AnalogRead("0")
-	gobottest.Assert(t, err, errors.New("read error"))
+func Test_validateI2cBusNumber(t *testing.T) {
+	var tests = map[string]struct {
+		board   string
+		busNr   int
+		wantErr error
+	}{
+		"arduino_number_negative_error": {
+			busNr:   -1,
+			wantErr: fmt.Errorf("Unsupported I2C bus '-1'"),
+		},
+		"arduino_number_1_error": {
+			busNr:   1,
+			wantErr: fmt.Errorf("Unsupported I2C bus '1'"),
+		},
+		"arduino_number_6_ok": {
+			busNr: 6,
+		},
+		"sparkfun_number_negative_error": {
+			board:   "sparkfun",
+			busNr:   -1,
+			wantErr: fmt.Errorf("Unsupported I2C bus '-1'"),
+		},
+		"sparkfun_number_1_ok": {
+			board: "sparkfun",
+			busNr: 1,
+		},
+		"miniboard_number_6_error": {
+			board:   "miniboard",
+			busNr:   6,
+			wantErr: fmt.Errorf("Unsupported I2C bus '6'"),
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			a := NewAdaptor(tc.board)
+			a.sys.UseMockFilesystem(pwmMockPathsMux13ArduinoI2c)
+			a.Connect()
+			// act
+			err := a.validateAndSetupI2cBusNumber(tc.busNr)
+			// assert
+			gobottest.Assert(t, err, tc.wantErr)
+		})
+	}
 }

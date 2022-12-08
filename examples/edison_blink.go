@@ -12,13 +12,11 @@ import (
 	"gobot.io/x/gobot/platforms/intel-iot/edison"
 )
 
-func main() {
-	e := edison.NewAdaptor()
-	led := gpio.NewLedDriver(e, "13")
+const boardType = "arduino" // "sparkfun" for a Sparkfun Edison board with the GPIO block
 
-	// Uncomment the line below if you are using a Sparkfun
-	// Edison board with the GPIO block
-	// e.SetBoard("sparkfun")
+func main() {
+	e := edison.NewAdaptor(boardType)
+	led := gpio.NewLedDriver(e, "13")
 
 	work := func() {
 		gobot.Every(1*time.Second, func() {

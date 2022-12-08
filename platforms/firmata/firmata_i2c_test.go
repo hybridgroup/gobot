@@ -238,7 +238,7 @@ func TestWriteBlockData(t *testing.T) {
 
 func TestDefaultBus(t *testing.T) {
 	a := NewAdaptor()
-	gobottest.Assert(t, a.GetDefaultBus(), 0)
+	gobottest.Assert(t, a.DefaultBus(), 0)
 }
 
 func TestGetConnectionInvalidBus(t *testing.T) {

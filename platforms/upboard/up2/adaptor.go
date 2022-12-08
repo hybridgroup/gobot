@@ -8,7 +8,6 @@ import (
 
 	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/drivers/spi"
 	"gobot.io/x/gobot/platforms/adaptors"
 	"gobot.io/x/gobot/system"
@@ -17,15 +16,14 @@ import (
 const (
 	// LEDRed is the built-in red LED.
 	LEDRed = "red"
-
 	// LEDBlue is the built-in blue LED.
 	LEDBlue = "blue"
-
 	// LEDGreen is the built-in green LED.
 	LEDGreen = "green"
-
 	// LEDYellow is the built-in yellow LED.
 	LEDYellow = "yellow"
+
+	defaultI2cBusNumber = 5
 )
 
 type sysfsPin struct {
@@ -35,14 +33,14 @@ type sysfsPin struct {
 
 // Adaptor represents a Gobot Adaptor for the Upboard UP2
 type Adaptor struct {
-	name string
-	sys  *system.Accesser
+	name    string
+	sys     *system.Accesser
+	mutex   sync.Mutex
+	pinmap  map[string]sysfsPin
+	ledPath string
 	*adaptors.DigitalPinsAdaptor
 	*adaptors.PWMPinsAdaptor
-	mutex    sync.Mutex
-	pinmap   map[string]sysfsPin
-	ledPath  string
-	i2cBuses [6]i2c.I2cDevice
+	*adaptors.I2cBusAdaptor
 	spiBuses [2]spi.Connection
 }
 
@@ -57,6 +55,7 @@ func NewAdaptor() *Adaptor {
 	}
 	c.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, c.translateDigitalPin)
 	c.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, c.translatePWMPin)
+	c.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, c.validateI2cBusNumber, defaultI2cBusNumber)
 	return c
 }
 
@@ -70,6 +69,10 @@ func (c *Adaptor) SetName(n string) { c.name = n }
 func (c *Adaptor) Connect() error {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
+
+	if err := c.I2cBusAdaptor.Connect(); err != nil {
+		return err
+	}
 
 	if err := c.PWMPinsAdaptor.Connect(); err != nil {
 		return err
@@ -88,13 +91,10 @@ func (c *Adaptor) Finalize() error {
 		err = multierror.Append(err, e)
 	}
 
-	for _, bus := range c.i2cBuses {
-		if bus != nil {
-			if e := bus.Close(); e != nil {
-				err = multierror.Append(err, e)
-			}
-		}
+	if e := c.I2cBusAdaptor.Finalize(); e != nil {
+		err = multierror.Append(err, e)
 	}
+
 	for _, bus := range c.spiBuses {
 		if bus != nil {
 			if e := bus.Close(); e != nil {
@@ -124,26 +124,6 @@ func (c *Adaptor) DigitalWrite(id string, val byte) error {
 	}
 
 	return c.DigitalPinsAdaptor.DigitalWrite(id, val)
-}
-
-// GetConnection returns a connection to a device on a specified bus.
-// Valid bus number is [5..6] which corresponds to /dev/i2c-5 through /dev/i2c-6.
-func (c *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection, err error) {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-
-	if (bus < 5) || (bus > 6) {
-		return nil, fmt.Errorf("Bus number %d out of range", bus)
-	}
-	if c.i2cBuses[bus] == nil {
-		c.i2cBuses[bus], err = c.sys.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
-	}
-	return i2c.NewConnection(c.i2cBuses[bus], address), err
-}
-
-// GetDefaultBus returns the default i2c bus for this platform
-func (c *Adaptor) GetDefaultBus() int {
-	return 5
 }
 
 // GetSpiConnection returns an spi connection to a device on a specified bus.
@@ -186,6 +166,14 @@ func (c *Adaptor) GetSpiDefaultBits() int {
 // GetSpiDefaultMaxSpeed returns the default spi max speed for this platform.
 func (c *Adaptor) GetSpiDefaultMaxSpeed() int64 {
 	return 500000
+}
+
+func (c *Adaptor) validateI2cBusNumber(busNr int) error {
+	// Valid bus number is [5..6] which corresponds to /dev/i2c-5 through /dev/i2c-6.
+	if (busNr < 5) || (busNr > 6) {
+		return fmt.Errorf("Bus number %d out of range", busNr)
+	}
+	return nil
 }
 
 func (c *Adaptor) translateDigitalPin(id string) (string, int, error) {

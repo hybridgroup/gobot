@@ -118,7 +118,7 @@ func (d *SHT2xDriver) Connection() gobot.Connection { return d.connector.(gobot.
 
 // Start initializes the SHT2x
 func (d *SHT2xDriver) Start() (err error) {
-	bus := d.GetBusOrDefault(d.connector.GetDefaultBus())
+	bus := d.GetBusOrDefault(d.connector.DefaultBus())
 	address := d.GetAddressOrDefault(SHT2xDefaultAddress)
 
 	if d.connection, err = d.connector.GetConnection(address, bus); err != nil {

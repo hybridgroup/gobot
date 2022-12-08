@@ -6,19 +6,20 @@ import (
 
 	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/platforms/adaptors"
 	"gobot.io/x/gobot/system"
 )
 
+const defaultI2cBusNumber = 0
+
 // Adaptor represents a Gobot Adaptor for a DragonBoard 410c
 type Adaptor struct {
-	name  string
-	sys   *system.Accesser
-	mutex sync.Mutex
+	name   string
+	sys    *system.Accesser
+	mutex  sync.Mutex
+	pinMap map[string]int
 	*adaptors.DigitalPinsAdaptor
-	pinMap   map[string]int
-	i2cBuses [3]i2c.I2cDevice
+	*adaptors.I2cBusAdaptor
 }
 
 // Valid pins are the GPIO_A through GPIO_L pins from the
@@ -50,6 +51,7 @@ func NewAdaptor() *Adaptor {
 		sys:  sys,
 	}
 	c.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, c.translateDigitalPin)
+	c.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, c.validateI2cBusNumber, defaultI2cBusNumber)
 	c.pinMap = fixedPins
 	for i := 0; i < 122; i++ {
 		pin := fmt.Sprintf("GPIO_%d", i)
@@ -69,8 +71,11 @@ func (c *Adaptor) Connect() error {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
-	err := c.DigitalPinsAdaptor.Connect()
-	return err
+	if err := c.I2cBusAdaptor.Connect(); err != nil {
+		return err
+	}
+
+	return c.DigitalPinsAdaptor.Connect()
 }
 
 // Finalize closes connection to board and pins
@@ -80,34 +85,19 @@ func (c *Adaptor) Finalize() error {
 
 	err := c.DigitalPinsAdaptor.Finalize()
 
-	for _, bus := range c.i2cBuses {
-		if bus != nil {
-			if e := bus.Close(); e != nil {
-				err = multierror.Append(err, e)
-			}
-		}
+	if e := c.I2cBusAdaptor.Finalize(); e != nil {
+		err = multierror.Append(err, e)
 	}
+
 	return err
 }
 
-// GetConnection returns a connection to a device on a specified bus.
-// Valid bus number is [0..1] which corresponds to /dev/i2c-0 through /dev/i2c-1.
-func (c *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection, err error) {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-
-	if (bus < 0) || (bus > 1) {
-		return nil, fmt.Errorf("Bus number %d out of range", bus)
+func (c *Adaptor) validateI2cBusNumber(busNr int) error {
+	// Valid bus number is [0..1] which corresponds to /dev/i2c-0 through /dev/i2c-1.
+	if (busNr < 0) || (busNr > 1) {
+		return fmt.Errorf("Bus number %d out of range", busNr)
 	}
-	if c.i2cBuses[bus] == nil {
-		c.i2cBuses[bus], err = c.sys.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
-	}
-	return i2c.NewConnection(c.i2cBuses[bus], address), err
-}
-
-// GetDefaultBus returns the default i2c bus for this platform
-func (c *Adaptor) GetDefaultBus() int {
-	return 0
+	return nil
 }
 
 func (c *Adaptor) translateDigitalPin(id string) (string, int, error) {

@@ -221,7 +221,6 @@ func (d *i2cDevice) Write(b []byte) (n int, err error) {
 			return 0, err
 		}
 	}
-
 	return d.file.Write(b)
 }
 

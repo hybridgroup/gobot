@@ -199,7 +199,7 @@ func (a *AdafruitMotorHatDriver) startDriver(connection Connection) (err error) 
 
 // Start initializes both I2C-addressable Adafruit Motor HAT drivers
 func (a *AdafruitMotorHatDriver) Start() (err error) {
-	bus := a.GetBusOrDefault(a.connector.GetDefaultBus())
+	bus := a.GetBusOrDefault(a.connector.DefaultBus())
 
 	err = a.startServoHat(bus)
 	if adafruitDebug && err != nil {

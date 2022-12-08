@@ -120,27 +120,6 @@ func TestProDigitalIO(t *testing.T) {
 	gobottest.Assert(t, a.Finalize(), nil)
 }
 
-func TestI2c(t *testing.T) {
-	a := NewAdaptor()
-	a.sys.UseMockFilesystem([]string{"/dev/i2c-1"})
-	a.sys.UseMockSyscall()
-
-	a.Connect()
-
-	con, err := a.GetConnection(0xff, 1)
-	gobottest.Assert(t, err, nil)
-
-	_, err = con.Write([]byte{0x00, 0x01})
-	gobottest.Assert(t, err, nil)
-
-	data := []byte{42, 42}
-	_, err = con.Read(data)
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, data, []byte{0x00, 0x01})
-
-	gobottest.Assert(t, a.Finalize(), nil)
-}
-
 func TestPWM(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem()
 	a.Connect()
@@ -165,15 +144,61 @@ func TestPWM(t *testing.T) {
 	gobottest.Assert(t, a.Finalize(), nil)
 }
 
-func TestDefaultBus(t *testing.T) {
-	a, _ := initTestAdaptorWithMockedFilesystem()
-	gobottest.Assert(t, a.GetDefaultBus(), 1)
+func TestI2cDefaultBus(t *testing.T) {
+	a := NewAdaptor()
+	gobottest.Assert(t, a.DefaultBus(), 1)
 }
 
-func TestGetConnectionInvalidBus(t *testing.T) {
-	a, _ := initTestAdaptorWithMockedFilesystem()
-	_, err := a.GetConnection(0x01, 99)
-	gobottest.Assert(t, err, errors.New("Bus number 99 out of range"))
+func TestI2cFinalizeWithErrors(t *testing.T) {
+	// arrange
+	a := NewAdaptor()
+	a.sys.UseMockSyscall()
+	fs := a.sys.UseMockFilesystem([]string{"/dev/i2c-2"})
+	gobottest.Assert(t, a.Connect(), nil)
+	con, err := a.GetConnection(0xff, 2)
+	gobottest.Assert(t, err, nil)
+	_, err = con.Write([]byte{0xbf})
+	gobottest.Assert(t, err, nil)
+	fs.WithCloseError = true
+	// act
+	err = a.Finalize()
+	// assert
+	gobottest.Assert(t, strings.Contains(err.Error(), "close error"), true)
+}
+
+func Test_validateI2cBusNumber(t *testing.T) {
+	var tests = map[string]struct {
+		busNr   int
+		wantErr error
+	}{
+		"number_negative_error": {
+			busNr:   -1,
+			wantErr: fmt.Errorf("Bus number -1 out of range"),
+		},
+		"number_0_ok": {
+			busNr: 0,
+		},
+		"number_1_ok": {
+			busNr: 1,
+		},
+		"number_2_ok": {
+			busNr: 2,
+		},
+		"number_3_error": {
+			busNr:   3,
+			wantErr: fmt.Errorf("Bus number 3 out of range"),
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			a := NewAdaptor()
+			// act
+			err := a.validateI2cBusNumber(tc.busNr)
+			// assert
+			gobottest.Assert(t, err, tc.wantErr)
+		})
+	}
 }
 
 func Test_translatePWMPin(t *testing.T) {

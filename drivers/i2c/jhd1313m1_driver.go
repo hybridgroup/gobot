@@ -144,7 +144,7 @@ func (h *JHD1313M1Driver) Connection() gobot.Connection {
 
 // Start starts the backlit and the screen and initializes the states.
 func (h *JHD1313M1Driver) Start() (err error) {
-	bus := h.GetBusOrDefault(h.connector.GetDefaultBus())
+	bus := h.GetBusOrDefault(h.connector.DefaultBus())
 
 	if h.lcdConnection, err = h.connector.GetConnection(h.lcdAddress, bus); err != nil {
 		return err

@@ -1,7 +1,6 @@
 package beaglebone
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"strconv"
@@ -10,7 +9,6 @@ import (
 
 	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/drivers/spi"
 	"gobot.io/x/gobot/platforms/adaptors"
 	"gobot.io/x/gobot/system"
@@ -22,7 +20,10 @@ type pwmPinData struct {
 	dirRegexp string
 }
 
-const pwmPeriodDefault = 500000 // 0.5 ms = 2 kHz
+const (
+	pwmPeriodDefault    = 500000 // 0.5 ms = 2 kHz
+	defaultI2cBusNumber = 2
+)
 
 // Adaptor is the gobot.Adaptor representation for the Beaglebone Black/Green
 type Adaptor struct {
@@ -31,7 +32,7 @@ type Adaptor struct {
 	mutex sync.Mutex
 	*adaptors.DigitalPinsAdaptor
 	*adaptors.PWMPinsAdaptor
-	i2cBuses     map[int]i2c.I2cDevice
+	*adaptors.I2cBusAdaptor
 	usrLed       string
 	analogPath   string
 	pinMap       map[string]int
@@ -46,7 +47,6 @@ func NewAdaptor() *Adaptor {
 	c := &Adaptor{
 		name:         gobot.DefaultName("BeagleboneBlack"),
 		sys:          sys,
-		i2cBuses:     make(map[int]i2c.I2cDevice),
 		pinMap:       bbbPinMap,
 		pwmPinMap:    bbbPwmPinMap,
 		analogPinMap: bbbAnalogPinMap,
@@ -57,6 +57,7 @@ func NewAdaptor() *Adaptor {
 	c.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, c.translateAndMuxDigitalPin)
 	c.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, c.translateAndMuxPWMPin,
 		adaptors.WithPWMPinDefaultPeriod(pwmPeriodDefault))
+	c.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, c.validateI2cBusNumber, defaultI2cBusNumber)
 	return c
 }
 
@@ -70,6 +71,10 @@ func (c *Adaptor) SetName(n string) { c.name = n }
 func (c *Adaptor) Connect() error {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
+
+	if err := c.I2cBusAdaptor.Connect(); err != nil {
+		return err
+	}
 
 	if err := c.PWMPinsAdaptor.Connect(); err != nil {
 		return err
@@ -88,13 +93,10 @@ func (c *Adaptor) Finalize() error {
 		err = multierror.Append(err, e)
 	}
 
-	for _, bus := range c.i2cBuses {
-		if bus != nil {
-			if e := bus.Close(); e != nil {
-				err = multierror.Append(err, e)
-			}
-		}
+	if e := c.I2cBusAdaptor.Finalize(); e != nil {
+		err = multierror.Append(err, e)
 	}
+
 	for _, bus := range c.spiBuses {
 		if bus != nil {
 			if e := bus.Close(); e != nil {
@@ -147,26 +149,6 @@ func (c *Adaptor) AnalogRead(pin string) (val int, err error) {
 	return
 }
 
-// GetConnection returns a connection to a device on a specified bus.
-// Valid bus number is either 0 or 2 which corresponds to /dev/i2c-0 or /dev/i2c-2.
-func (c *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection, err error) {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-
-	if (bus != 0) && (bus != 2) {
-		return nil, fmt.Errorf("Bus number %d out of range", bus)
-	}
-	if c.i2cBuses[bus] == nil {
-		c.i2cBuses[bus], err = c.sys.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
-	}
-	return i2c.NewConnection(c.i2cBuses[bus], address), err
-}
-
-// GetDefaultBus returns the default i2c bus for this platform
-func (c *Adaptor) GetDefaultBus() int {
-	return 2
-}
-
 // GetSpiConnection returns an spi connection to a device on a specified bus.
 // Valid bus number is [0..1] which corresponds to /dev/spidev0.0 through /dev/spidev0.1.
 func (c *Adaptor) GetSpiConnection(busNum, chipNum, mode, bits int, maxSpeed int64) (connection spi.Connection, err error) {
@@ -209,12 +191,20 @@ func (c *Adaptor) GetSpiDefaultMaxSpeed() int64 {
 	return 500000
 }
 
+func (c *Adaptor) validateI2cBusNumber(busNr int) error {
+	// Valid bus number is either 0 or 2 which corresponds to /dev/i2c-0 or /dev/i2c-2.
+	if (busNr != 0) && (busNr != 2) {
+		return fmt.Errorf("Bus number %d out of range", busNr)
+	}
+	return nil
+}
+
 // translateAnalogPin converts analog pin name to pin position
 func (c *Adaptor) translateAnalogPin(pin string) (string, error) {
 	if val, ok := c.analogPinMap[pin]; ok {
 		return val, nil
 	}
-	return "", errors.New("Not a valid analog pin")
+	return "", fmt.Errorf("Not a valid analog pin")
 }
 
 // translatePin converts digital pin name to pin position

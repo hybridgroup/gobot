@@ -6,16 +6,15 @@ import (
 
 	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/platforms/adaptors"
 	"gobot.io/x/gobot/system"
 )
 
-const debug = false
-
 const (
-	pwmNormal   = "normal"
-	pwmInverted = "inversed"
+	debug = false
+
+	defaultI2cBusNumber   = 1
+	pwmInvertedIdentifier = "inversed"
 )
 
 type pwmPinDefinition struct {
@@ -31,7 +30,7 @@ type Adaptor struct {
 	mutex sync.Mutex
 	*adaptors.DigitalPinsAdaptor
 	*adaptors.PWMPinsAdaptor
-	i2cBuses [5]i2c.I2cDevice
+	*adaptors.I2cBusAdaptor
 }
 
 // NewAdaptor creates a Tinkerboard Adaptor
@@ -43,7 +42,8 @@ func NewAdaptor() *Adaptor {
 	}
 	c.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, c.translateDigitalPin)
 	c.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, c.translatePWMPin,
-		adaptors.WithPolarityInvertedIdentifier("inversed"))
+		adaptors.WithPolarityInvertedIdentifier(pwmInvertedIdentifier))
+	c.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, c.validateI2cBusNumber, defaultI2cBusNumber)
 	return c
 }
 
@@ -57,6 +57,10 @@ func (c *Adaptor) SetName(n string) { c.name = n }
 func (c *Adaptor) Connect() error {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
+
+	if err := c.I2cBusAdaptor.Connect(); err != nil {
+		return err
+	}
 
 	if err := c.PWMPinsAdaptor.Connect(); err != nil {
 		return err
@@ -75,35 +79,20 @@ func (c *Adaptor) Finalize() error {
 		err = multierror.Append(err, e)
 	}
 
-	for _, bus := range c.i2cBuses {
-		if bus != nil {
-			if e := bus.Close(); e != nil {
-				err = multierror.Append(err, e)
-			}
-		}
+	if e := c.I2cBusAdaptor.Finalize(); e != nil {
+		err = multierror.Append(err, e)
 	}
+
 	return err
 }
 
-// GetConnection returns a connection to a device on a specified i2c bus.
-// Valid bus number is [0..4] which corresponds to /dev/i2c-0 through /dev/i2c-4.
-// We don't support "/dev/i2c-6 DesignWare HDMI".
-func (c *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection, err error) {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-
-	if (bus < 0) || (bus > 4) {
-		return nil, fmt.Errorf("Bus number %d out of range", bus)
+func (c *Adaptor) validateI2cBusNumber(busNr int) error {
+	// Valid bus number is [0..4] which corresponds to /dev/i2c-0 through /dev/i2c-4.
+	// We don't support "/dev/i2c-6 DesignWare HDMI".
+	if (busNr < 0) || (busNr > 4) {
+		return fmt.Errorf("Bus number %d out of range", busNr)
 	}
-	if c.i2cBuses[bus] == nil {
-		c.i2cBuses[bus], err = c.sys.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
-	}
-	return i2c.NewConnection(c.i2cBuses[bus], address), err
-}
-
-// GetDefaultBus returns the default i2c bus for this platform.
-func (c *Adaptor) GetDefaultBus() int {
-	return 1
+	return nil
 }
 
 func (c *Adaptor) translateDigitalPin(id string) (string, int, error) {
@@ -134,7 +123,8 @@ func (c *Adaptor) translatePWMPin(id string) (string, int, error) {
 func (p pwmPinDefinition) findPWMDir(sys *system.Accesser) (dir string, err error) {
 	items, _ := sys.Find(p.dir, p.dirRegexp)
 	if items == nil || len(items) == 0 {
-		return "", fmt.Errorf("No path found for PWM directory pattern, '%s' in path '%s'. See README.md for activation", p.dirRegexp, p.dir)
+		return "", fmt.Errorf("No path found for PWM directory pattern, '%s' in path '%s'. See README.md for activation",
+			p.dirRegexp, p.dir)
 	}
 
 	dir = items[0]

@@ -86,7 +86,7 @@ func (w *WiichuckDriver) Connection() gobot.Connection { return w.connector.(gob
 // Start initilizes i2c and reads from adaptor
 // using specified interval to update with new value
 func (w *WiichuckDriver) Start() (err error) {
-	bus := w.GetBusOrDefault(w.connector.GetDefaultBus())
+	bus := w.GetBusOrDefault(w.connector.DefaultBus())
 	address := w.GetAddressOrDefault(wiichuckAddress)
 
 	w.connection, err = w.connector.GetConnection(address, bus)

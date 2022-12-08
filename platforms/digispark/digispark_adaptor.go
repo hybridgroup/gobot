@@ -107,6 +107,6 @@ func (d *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection
 }
 
 // GetDefaultBus returns the default i2c bus for this platform
-func (d *Adaptor) GetDefaultBus() int {
+func (d *Adaptor) DefaultBus() int {
 	return 0
 }

@@ -10,10 +10,11 @@ import (
 
 	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/platforms/adaptors"
 	"gobot.io/x/gobot/system"
 )
+
+const defaultI2cBusNumber = 1
 
 // Valids pins are the XIO-P0 through XIO-P7 pins from the
 // extender (pins 13-20 on header 14), as well as the SoC pins
@@ -25,13 +26,13 @@ type sysfsPin struct {
 
 // Adaptor represents a Gobot Adaptor for a C.H.I.P.
 type Adaptor struct {
-	name string
-	sys  *system.Accesser
+	name   string
+	sys    *system.Accesser
+	mutex  sync.Mutex
+	pinmap map[string]sysfsPin
 	*adaptors.DigitalPinsAdaptor
 	*adaptors.PWMPinsAdaptor
-	mutex    sync.Mutex
-	pinmap   map[string]sysfsPin
-	i2cBuses [3]i2c.I2cDevice
+	*adaptors.I2cBusAdaptor
 }
 
 // NewAdaptor creates a C.H.I.P. Adaptor
@@ -51,6 +52,7 @@ func NewAdaptor() *Adaptor {
 
 	c.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, c.translateDigitalPin)
 	c.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, c.translatePWMPin)
+	c.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, c.validateI2cBusNumber, defaultI2cBusNumber)
 	return c
 }
 
@@ -73,6 +75,10 @@ func (c *Adaptor) Connect() error {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
+	if err := c.I2cBusAdaptor.Connect(); err != nil {
+		return err
+	}
+
 	if err := c.PWMPinsAdaptor.Connect(); err != nil {
 		return err
 	}
@@ -90,34 +96,11 @@ func (c *Adaptor) Finalize() error {
 		err = multierror.Append(err, e)
 	}
 
-	for _, bus := range c.i2cBuses {
-		if bus != nil {
-			if e := bus.Close(); e != nil {
-				err = multierror.Append(err, e)
-			}
-		}
+	if e := c.I2cBusAdaptor.Finalize(); e != nil {
+		err = multierror.Append(err, e)
 	}
+
 	return err
-}
-
-// GetConnection returns a connection to a device on a specified bus.
-// Valid bus number is [0..2] which corresponds to /dev/i2c-0 through /dev/i2c-2.
-func (c *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection, err error) {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-
-	if (bus < 0) || (bus > 2) {
-		return nil, fmt.Errorf("Bus number %d out of range", bus)
-	}
-	if c.i2cBuses[bus] == nil {
-		c.i2cBuses[bus], err = c.sys.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
-	}
-	return i2c.NewConnection(c.i2cBuses[bus], address), err
-}
-
-// GetDefaultBus returns the default i2c bus for this platform
-func (c *Adaptor) GetDefaultBus() int {
-	return 1
 }
 
 func getXIOBase() (baseAddr int, err error) {
@@ -148,6 +131,14 @@ func getXIOBase() (baseAddr int, err error) {
 	}
 
 	return baseAddr, nil
+}
+
+func (c *Adaptor) validateI2cBusNumber(busNr int) error {
+	// Valid bus number is [0..2] which corresponds to /dev/i2c-0 through /dev/i2c-2.
+	if (busNr < 0) || (busNr > 2) {
+		return fmt.Errorf("Bus number %d out of range", busNr)
+	}
+	return nil
 }
 
 func (c *Adaptor) translateDigitalPin(id string) (string, int, error) {

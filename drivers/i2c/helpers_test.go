@@ -164,7 +164,7 @@ func (t *i2cTestAdaptor) GetConnection(address int, bus int) (connection Connect
 	return t, nil
 }
 
-func (t *i2cTestAdaptor) GetDefaultBus() int {
+func (t *i2cTestAdaptor) DefaultBus() int {
 	return 0
 }
 
