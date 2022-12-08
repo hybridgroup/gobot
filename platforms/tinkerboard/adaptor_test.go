@@ -207,11 +207,13 @@ func TestI2cDefaultBus(t *testing.T) {
 func TestI2cFinalizeWithErrors(t *testing.T) {
 	// arrange
 	a := NewAdaptor()
+	a.sys.UseMockSyscall()
 	fs := a.sys.UseMockFilesystem([]string{"/dev/i2c-4"})
 	gobottest.Assert(t, a.Connect(), nil)
 	con, err := a.GetConnection(0xff, 4)
 	gobottest.Assert(t, err, nil)
-	con.Write([]byte{0xbf})
+	_, err = con.Write([]byte{0xbf})
+	gobottest.Assert(t, err, nil)
 	fs.WithCloseError = true
 	// act
 	err = a.Finalize()
