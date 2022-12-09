@@ -112,7 +112,6 @@ func (c *Adaptor) Finalize() error {
 	if e := c.SpiBusAdaptor.Finalize(); e != nil {
 		err = multierror.Append(err, e)
 	}
-
 	return err
 }
 
