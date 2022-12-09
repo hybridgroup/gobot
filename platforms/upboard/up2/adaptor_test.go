@@ -80,20 +80,6 @@ func TestDigitalIO(t *testing.T) {
 	gobottest.Assert(t, a.Finalize(), nil)
 }
 
-func TestSPI(t *testing.T) {
-	a := NewAdaptor()
-
-	gobottest.Assert(t, a.GetSpiDefaultBus(), 0)
-	gobottest.Assert(t, a.GetSpiDefaultMode(), 0)
-	gobottest.Assert(t, a.GetSpiDefaultMaxSpeed(), int64(500000))
-
-	_, err := a.GetSpiConnection(10, 0, 0, 8, 500000)
-	gobottest.Assert(t, err.Error(), "Bus number 10 out of range")
-
-	// TODO: tests for real connection currently not possible, because not using system.Accessor using
-	// TODO: test tx/rx here...
-}
-
 func TestPWM(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem(pwmMockPaths)
 
@@ -137,6 +123,46 @@ func TestFinalizeErrorAfterPWM(t *testing.T) {
 
 	err := a.Finalize()
 	gobottest.Assert(t, strings.Contains(err.Error(), "write error"), true)
+}
+
+func TestSpiDefaultValues(t *testing.T) {
+	a := NewAdaptor()
+
+	gobottest.Assert(t, a.GetSpiDefaultBus(), 0)
+	gobottest.Assert(t, a.GetSpiDefaultMode(), 0)
+	gobottest.Assert(t, a.GetSpiDefaultMaxSpeed(), int64(500000))
+}
+
+func Test_validateSpiBusNumber(t *testing.T) {
+	var tests = map[string]struct {
+		busNr   int
+		wantErr error
+	}{
+		"number_negative_error": {
+			busNr:   -1,
+			wantErr: fmt.Errorf("Bus number -1 out of range"),
+		},
+		"number_0_ok": {
+			busNr: 0,
+		},
+		"number_1_ok": {
+			busNr: 1,
+		},
+		"number_2_error": {
+			busNr:   2,
+			wantErr: fmt.Errorf("Bus number 2 out of range"),
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			a := NewAdaptor()
+			// act
+			err := a.validateSpiBusNumber(tc.busNr)
+			// assert
+			gobottest.Assert(t, err, tc.wantErr)
+		})
+	}
 }
 
 func TestI2cDefaultBus(t *testing.T) {
