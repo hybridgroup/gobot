@@ -7,25 +7,31 @@ import (
 
 	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/spi"
 	"gobot.io/x/gobot/platforms/adaptors"
 	"gobot.io/x/gobot/system"
 )
 
 const (
-	pwmPeriodDefault    = 3000000 // 3 ms = 333 Hz
+	pwmPeriodDefault = 3000000 // 3 ms = 333 Hz
+
 	defaultI2cBusNumber = 1
+
+	defaultSpiBusNumber  = 0
+	defaultSpiChipNumber = 0
+	defaultSpiMode       = 0
+	defaultSpiBitsNumber = 8
+	defaultSpiMaxSpeed   = 10000000
 )
 
 // Adaptor is the Gobot adaptor for the Jetson Nano
 type Adaptor struct {
-	name       string
-	sys        *system.Accesser
-	mutex      sync.Mutex
-	pwmPins    map[string]gobot.PWMPinner
-	spiDevices [2]spi.Connection
+	name    string
+	sys     *system.Accesser
+	mutex   sync.Mutex
+	pwmPins map[string]gobot.PWMPinner
 	*adaptors.DigitalPinsAdaptor
 	*adaptors.I2cBusAdaptor
+	*adaptors.SpiBusAdaptor
 }
 
 // NewAdaptor creates a Jetson Nano adaptor
@@ -37,6 +43,8 @@ func NewAdaptor() *Adaptor {
 	}
 	c.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, c.translateDigitalPin)
 	c.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, c.validateI2cBusNumber, defaultI2cBusNumber)
+	c.SpiBusAdaptor = adaptors.NewSpiBusAdaptor(c.validateSpiBusNumber, defaultSpiBusNumber, defaultSpiChipNumber,
+		defaultSpiMode, defaultSpiBitsNumber, defaultSpiMaxSpeed)
 	return c
 }
 
@@ -60,6 +68,10 @@ func (c *Adaptor) SetName(n string) {
 func (c *Adaptor) Connect() error {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
+
+	if err := c.SpiBusAdaptor.Connect(); err != nil {
+		return err
+	}
 
 	if err := c.I2cBusAdaptor.Connect(); err != nil {
 		return err
@@ -89,56 +101,10 @@ func (c *Adaptor) Finalize() error {
 		err = multierror.Append(err, e)
 	}
 
-	for _, dev := range c.spiDevices {
-		if dev != nil {
-			if e := dev.Close(); e != nil {
-				err = multierror.Append(err, e)
-			}
-		}
+	if e := c.SpiBusAdaptor.Finalize(); e != nil {
+		err = multierror.Append(err, e)
 	}
 	return err
-}
-
-// GetSpiConnection returns an spi connection to a device on a specified bus.
-// Valid bus number is [0..1] which corresponds to /dev/spidev0.0 through /dev/spidev0.1.
-func (c *Adaptor) GetSpiConnection(busNum, chipNum, mode, bits int, maxSpeed int64) (connection spi.Connection, err error) {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-
-	if (busNum < 0) || (busNum > 1) {
-		return nil, fmt.Errorf("Bus number %d out of range", busNum)
-	}
-
-	if c.spiDevices[busNum] == nil {
-		c.spiDevices[busNum], err = spi.GetSpiConnection(busNum, chipNum, mode, bits, maxSpeed)
-	}
-
-	return c.spiDevices[busNum], err
-}
-
-// GetSpiDefaultBus returns the default spi bus for this platform.
-func (c *Adaptor) GetSpiDefaultBus() int {
-	return 0
-}
-
-// GetSpiDefaultChip returns the default spi chip for this platform.
-func (c *Adaptor) GetSpiDefaultChip() int {
-	return 0
-}
-
-// GetSpiDefaultMode returns the default spi mode for this platform.
-func (c *Adaptor) GetSpiDefaultMode() int {
-	return 0
-}
-
-// GetSpiDefaultBits returns the default spi number of bits for this platform.
-func (c *Adaptor) GetSpiDefaultBits() int {
-	return 8
-}
-
-// GetSpiDefaultMaxSpeed returns the default spi bus for this platform.
-func (c *Adaptor) GetSpiDefaultMaxSpeed() int64 {
-	return 10000000
 }
 
 //PWMPin returns a Jetson Nano. PWMPin which provides the gobot.PWMPinner interface
@@ -203,6 +169,14 @@ func (c *Adaptor) pwmPin(pin string) (gobot.PWMPinner, error) {
 	}
 
 	return c.pwmPins[pin], nil
+}
+
+func (c *Adaptor) validateSpiBusNumber(busNr int) error {
+	// Valid bus number is [0..1] which corresponds to /dev/spidev0.0 through /dev/spidev0.1.
+	if (busNr < 0) || (busNr > 1) {
+		return fmt.Errorf("Bus number %d out of range", busNr)
+	}
+	return nil
 }
 
 func (c *Adaptor) validateI2cBusNumber(busNr int) error {

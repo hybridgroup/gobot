@@ -210,7 +210,7 @@ func TestPocketName(t *testing.T) {
 	gobottest.Assert(t, strings.HasPrefix(a.Name(), "PocketBeagle"), true)
 }
 
-func TestSPI(t *testing.T) {
+func TestSpiDefaultValues(t *testing.T) {
 	a := NewAdaptor()
 
 	gobottest.Assert(t, a.GetSpiDefaultBus(), 0)
