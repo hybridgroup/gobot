@@ -84,5 +84,5 @@ func (d *APA102Driver) Draw() error {
 		tx[i] = 0xff
 	}
 
-	return d.connection.Tx(tx, nil)
+	return d.connection.ReadData(tx, nil)
 }

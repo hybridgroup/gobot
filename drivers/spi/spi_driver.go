@@ -13,11 +13,15 @@ const (
 
 // Operations are the wrappers around the actual functions used by the SPI device interface
 type Operations interface {
+	// Close the SPI connection.
 	Close() error
-	Tx(w, r []byte) error
-}
 
-// TODO: rename to golang getter spec (no prefix "Get" for simple getters)
+	// ReadData uses the SPI device TX to send/receive data.
+	ReadData(command []byte, data []byte) error
+
+	// WriteData uses the SPI device TX to send data.
+	WriteData(data []byte) error
+}
 
 // Connector lets Adaptors provide the interface for Drivers
 // to get access to the SPI buses on platforms that support SPI.
@@ -27,20 +31,20 @@ type Connector interface {
 	// platform specific. Same with chip numbering.
 	GetSpiConnection(busNum, chip, mode, bits int, maxSpeed int64) (device Connection, err error)
 
-	// GetSpiDefaultBus returns the default SPI bus index
-	GetSpiDefaultBus() int
+	// SpiDefaultBusNumber returns the default SPI bus index
+	SpiDefaultBusNumber() int
 
-	// GetSpiDefaultChip returns the default SPI chip index
-	GetSpiDefaultChip() int
+	// SpiDefaultChipNumber returns the default SPI chip index
+	SpiDefaultChipNumber() int
 
-	// GetDefaultMode returns the default SPI mode (0/1/2/3)
-	GetSpiDefaultMode() int
+	// DefaultMode returns the default SPI mode (0/1/2/3)
+	SpiDefaultMode() int
 
-	// GetDefaultMode returns the default SPI number of bits (8)
-	GetSpiDefaultBits() int
+	// SpiDefaultBitCount returns the default SPI number of bits (8)
+	SpiDefaultBitCount() int
 
-	// GetSpiDefaultMaxSpeed returns the max SPI speed
-	GetSpiDefaultMaxSpeed() int64
+	// SpiDefaultMaxSpeed returns the max SPI speed
+	SpiDefaultMaxSpeed() int64
 }
 
 // Connection is a connection to a SPI device with a specific bus/chip.
@@ -50,37 +54,38 @@ type Connection Operations
 // Config is the interface which describes how a Driver can specify
 // optional SPI params such as which SPI bus it wants to use.
 type Config interface {
-	// WithBus sets which bus to use
-	WithBus(bus int)
+	// SetBusNumber sets which bus to use
+	SetBusNumber(int)
 
-	// GetBusOrDefault gets which bus to use
-	GetBusOrDefault(def int) int
+	// GetBusNumberOrDefault gets which bus to use
+	GetBusNumberOrDefault(def int) int
 
-	// WithChip sets which chip to use
-	WithChip(chip int)
+	// SetChipNumber sets which chip to use
+	SetChipNumber(int)
 
-	// GetChipOrDefault gets which chip to use
-	GetChipOrDefault(def int) int
+	// GetChipNumberOrDefault gets which chip to use
+	GetChipNumberOrDefault(def int) int
 
-	// WithMode sets which mode to use
-	WithMode(mode int)
+	// SetMode sets which mode to use
+	SetMode(int)
 
 	// GetModeOrDefault gets which mode to use
 	GetModeOrDefault(def int) int
 
-	// WithBIts sets how many bits to use
-	WithBits(bits int)
+	// SetUsedBits sets how many bits to use
+	SetBitCount(int)
 
-	// GetBitsOrDefault gets how many bits to use
-	GetBitsOrDefault(def int) int
+	// GetBitCountOrDefault gets how many bits to use
+	GetBitCountOrDefault(def int) int
 
-	// WithSpeed sets which speed to use (in Hz)
-	WithSpeed(speed int64)
+	// SetSpeed sets which speed to use (in Hz)
+	SetSpeed(int64)
 
 	// GetSpeedOrDefault gets which speed to use (in Hz)
 	GetSpeedOrDefault(def int64) int64
 }
 
+// Driver implements the interface gobot.Driver for SPI devices.
 type Driver struct {
 	name       string
 	connector  Connector
@@ -92,6 +97,7 @@ type Driver struct {
 	mutex sync.Mutex
 }
 
+// NewDriver creates a new generic and basic SPI gobot driver.
 func NewDriver(a Connector, name string, options ...func(Config)) *Driver {
 	d := &Driver{
 		name:       gobot.DefaultName(name),
@@ -121,11 +127,11 @@ func (d *Driver) Start() error {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
-	bus := d.GetBusOrDefault(d.connector.GetSpiDefaultBus())
-	chip := d.GetChipOrDefault(d.connector.GetSpiDefaultChip())
-	mode := d.GetModeOrDefault(d.connector.GetSpiDefaultMode())
-	bits := d.GetBitsOrDefault(d.connector.GetSpiDefaultBits())
-	maxSpeed := d.GetSpeedOrDefault(d.connector.GetSpiDefaultMaxSpeed())
+	bus := d.GetBusNumberOrDefault(d.connector.SpiDefaultBusNumber())
+	chip := d.GetChipNumberOrDefault(d.connector.SpiDefaultChipNumber())
+	mode := d.GetModeOrDefault(d.connector.SpiDefaultMode())
+	bits := d.GetBitCountOrDefault(d.connector.SpiDefaultBitCount())
+	maxSpeed := d.GetSpeedOrDefault(d.connector.SpiDefaultMaxSpeed())
 
 	var err error
 	d.connection, err = d.connector.GetSpiConnection(bus, chip, mode, bits, maxSpeed)
@@ -144,5 +150,7 @@ func (d *Driver) Halt() (err error) {
 		return err
 	}
 
-	return d.connection.Close()
+	// currently there is nothing to do here for the driver
+	// the connection will be closed on adaptor Finalize()
+	return nil
 }

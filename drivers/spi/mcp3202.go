@@ -1,7 +1,7 @@
 package spi
 
 import (
-	"errors"
+	"fmt"
 	"strconv"
 
 	"gobot.io/x/gobot"
@@ -40,7 +40,7 @@ func NewMCP3202Driver(a Connector, options ...func(Config)) *MCP3202Driver {
 // Read reads the current analog data for the desired channel.
 func (d *MCP3202Driver) Read(channel int) (result int, err error) {
 	if channel < 0 || channel > MCP3202DriverMaxChannel-1 {
-		return 0, errors.New("Invalid channel for read")
+		return 0, fmt.Errorf("Invalid channel '%d' for read", channel)
 	}
 
 	tx := make([]byte, 3)
@@ -50,7 +50,7 @@ func (d *MCP3202Driver) Read(channel int) (result int, err error) {
 
 	rx := make([]byte, 3)
 
-	err = d.connection.Tx(tx, rx)
+	err = d.connection.ReadData(tx, rx)
 	if err == nil && len(rx) == 3 {
 		result = int((rx[1]&0xf))<<8 + int(rx[2])
 	}

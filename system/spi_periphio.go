@@ -1,6 +1,8 @@
 package system
 
 import (
+	"fmt"
+
 	"periph.io/x/conn/v3/physic"
 	xspi "periph.io/x/conn/v3/spi"
 	xsysfs "periph.io/x/host/v3/sysfs"
@@ -32,7 +34,19 @@ func (c *spiConnectionPeriphIo) Close() error {
 	return c.port.Close()
 }
 
-// Tx uses the SPI device to send/receive data.
-func (c *spiConnectionPeriphIo) Tx(w, r []byte) error {
-	return c.dev.Tx(w, r)
+// ReadData uses the SPI device TX to send/receive data.
+func (c *spiConnectionPeriphIo) ReadData(command []byte, data []byte) error {
+	dataLen := len(data)
+	if err := c.dev.Tx(command, data); err != nil {
+		return err
+	}
+	if len(data) != dataLen {
+		return fmt.Errorf("Read length (%d) differ to expected (%d)", len(data), dataLen)
+	}
+	return nil
+}
+
+// WriteData uses the SPI device TX to send data.
+func (c *spiConnectionPeriphIo) WriteData(data []byte) error {
+	return c.dev.Tx(data, nil)
 }

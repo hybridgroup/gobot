@@ -213,11 +213,11 @@ func TestPocketName(t *testing.T) {
 func TestSpiDefaultValues(t *testing.T) {
 	a := NewAdaptor()
 
-	gobottest.Assert(t, a.GetSpiDefaultBus(), 0)
-	gobottest.Assert(t, a.GetSpiDefaultChip(), 0)
-	gobottest.Assert(t, a.GetSpiDefaultMode(), 0)
-	gobottest.Assert(t, a.GetSpiDefaultBits(), 8)
-	gobottest.Assert(t, a.GetSpiDefaultMaxSpeed(), int64(500000))
+	gobottest.Assert(t, a.SpiDefaultBusNumber(), 0)
+	gobottest.Assert(t, a.SpiDefaultChipNumber(), 0)
+	gobottest.Assert(t, a.SpiDefaultMode(), 0)
+	gobottest.Assert(t, a.SpiDefaultBitCount(), 8)
+	gobottest.Assert(t, a.SpiDefaultMaxSpeed(), int64(500000))
 }
 
 func TestI2cDefaultBus(t *testing.T) {

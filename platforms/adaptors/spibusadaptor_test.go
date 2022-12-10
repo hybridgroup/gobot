@@ -41,11 +41,11 @@ func TestNewSpiAdaptor(t *testing.T) {
 		panic(err)
 	}
 	// act & assert
-	gobottest.Assert(t, a.GetSpiDefaultBus(), 1)
-	gobottest.Assert(t, a.GetSpiDefaultChip(), 2)
-	gobottest.Assert(t, a.GetSpiDefaultMode(), 3)
-	gobottest.Assert(t, a.GetSpiDefaultBits(), 4)
-	gobottest.Assert(t, a.GetSpiDefaultMaxSpeed(), int64(5))
+	gobottest.Assert(t, a.SpiDefaultBusNumber(), 1)
+	gobottest.Assert(t, a.SpiDefaultChipNumber(), 2)
+	gobottest.Assert(t, a.SpiDefaultMode(), 3)
+	gobottest.Assert(t, a.SpiDefaultBitCount(), 4)
+	gobottest.Assert(t, a.SpiDefaultMaxSpeed(), int64(5))
 
 	_, err := a.GetSpiConnection(10, 0, 0, 8, 10000000)
 	gobottest.Assert(t, err.Error(), "10 not valid")

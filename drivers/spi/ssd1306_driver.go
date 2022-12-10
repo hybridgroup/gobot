@@ -1,7 +1,6 @@
 package spi
 
 import (
-	"errors"
 	"fmt"
 	"image"
 	"time"
@@ -245,17 +244,17 @@ func WithExternalVCC(val bool) func(Config) {
 }
 
 // On turns on the display.
-func (s *SSD1306Driver) On() (err error) {
+func (s *SSD1306Driver) On() error {
 	return s.command(ssd1306SetDisplayOn)
 }
 
 // Off turns off the display.
-func (s *SSD1306Driver) Off() (err error) {
+func (s *SSD1306Driver) Off() error {
 	return s.command(ssd1306SetDisplayOff)
 }
 
 // Clear clears the display buffer.
-func (s *SSD1306Driver) Clear() (err error) {
+func (s *SSD1306Driver) Clear() error {
 	s.buffer.Clear()
 	return nil
 }
@@ -266,7 +265,7 @@ func (s *SSD1306Driver) Set(x, y, c int) {
 }
 
 // Reset re-initializes the device to a clean state.
-func (s *SSD1306Driver) Reset() (err error) {
+func (s *SSD1306Driver) Reset() error {
 	s.rstDriver.DigitalWrite(1)
 	time.Sleep(10 * time.Millisecond)
 	s.rstDriver.DigitalWrite(0)
@@ -276,40 +275,40 @@ func (s *SSD1306Driver) Reset() (err error) {
 }
 
 // SetBufferAndDisplay sets the display buffer with the given buffer and displays the image.
-func (s *SSD1306Driver) SetBufferAndDisplay(buf []byte) (err error) {
+func (s *SSD1306Driver) SetBufferAndDisplay(buf []byte) error {
 	s.buffer.Set(buf)
 	return s.Display()
 }
 
 // SetContrast sets the display contrast (0-255).
-func (s *SSD1306Driver) SetContrast(contrast byte) (err error) {
+func (s *SSD1306Driver) SetContrast(contrast byte) error {
 	if contrast < 0 || contrast > 255 {
 		return fmt.Errorf("contrast value must be between 0-255")
 	}
-	if err = s.command(ssd1306SetContrast); err != nil {
+	if err := s.command(ssd1306SetContrast); err != nil {
 		return err
 	}
 	return s.command(contrast)
 }
 
 // Display sends the memory buffer to the display.
-func (s *SSD1306Driver) Display() (err error) {
+func (s *SSD1306Driver) Display() error {
 	s.command(ssd1306ColumnAddr)
 	s.command(0)
 	s.command(uint8(s.DisplayWidth) - 1)
 	s.command(ssd1306PageAddr)
 	s.command(0)
 	s.command(uint8(s.pageSize) - 1)
-	if err = s.dcDriver.DigitalWrite(1); err != nil {
+	if err := s.dcDriver.DigitalWrite(1); err != nil {
 		return err
 	}
-	return s.connection.Tx(append([]byte{0x40}, s.buffer.buffer...), nil)
+	return s.connection.ReadData(append([]byte{0x40}, s.buffer.buffer...), nil)
 }
 
 // ShowImage takes a standard Go image and shows it on the display in monochrome.
-func (s *SSD1306Driver) ShowImage(img image.Image) (err error) {
+func (s *SSD1306Driver) ShowImage(img image.Image) error {
 	if img.Bounds().Dx() != s.DisplayWidth || img.Bounds().Dy() != s.DisplayHeight {
-		return errors.New("Image must match the display width and height")
+		return fmt.Errorf("Image must match the display width and height")
 	}
 
 	s.Clear()
@@ -325,12 +324,11 @@ func (s *SSD1306Driver) ShowImage(img image.Image) (err error) {
 }
 
 // command sends a unique command
-func (s *SSD1306Driver) command(b byte) (err error) {
-	if err = s.dcDriver.DigitalWrite(0); err != nil {
+func (s *SSD1306Driver) command(b byte) error {
+	if err := s.dcDriver.DigitalWrite(0); err != nil {
 		return err
 	}
-	err = s.connection.Tx([]byte{b}, nil)
-	return err
+	return s.connection.WriteData([]byte{b})
 }
 
 // initialize configures the ssd1306 based on the options passed in when the driver was created
@@ -391,7 +389,7 @@ func (s *SSD1306Driver) initialize() error {
 	return nil
 }
 
-func (s *SSD1306Driver) shutdown() (err error) {
+func (s *SSD1306Driver) shutdown() error {
 	s.Reset()
 	s.Off()
 	return nil

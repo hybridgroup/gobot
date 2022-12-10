@@ -1,7 +1,7 @@
 package spi
 
 import (
-	"errors"
+	"fmt"
 	"strconv"
 )
 
@@ -36,9 +36,9 @@ func NewMCP3002Driver(a Connector, options ...func(Config)) *MCP3002Driver {
 }
 
 // Read reads the current analog data for the desired channel.
-func (d *MCP3002Driver) Read(channel int) (result int, err error) {
+func (d *MCP3002Driver) Read(channel int) (int, error) {
 	if channel < 0 || channel > MCP3002DriverMaxChannel-1 {
-		return 0, errors.New("Invalid channel for read")
+		return 0, fmt.Errorf("Invalid channel '%d' for read", channel)
 	}
 
 	tx := make([]byte, 2)
@@ -47,12 +47,11 @@ func (d *MCP3002Driver) Read(channel int) (result int, err error) {
 
 	rx := make([]byte, 2)
 
-	err = d.connection.Tx(tx, rx)
-	if err == nil && len(rx) == 2 {
-		result = int((rx[0]&0x3))<<8 + int(rx[2])
+	if err := d.connection.ReadData(tx, rx); err != nil {
+		return 0, err
 	}
 
-	return result, err
+	return int((rx[0]&0x3))<<8 + int(rx[1]), nil
 }
 
 // AnalogRead returns value from analog reading of specified pin

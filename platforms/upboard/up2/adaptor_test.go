@@ -128,9 +128,9 @@ func TestFinalizeErrorAfterPWM(t *testing.T) {
 func TestSpiDefaultValues(t *testing.T) {
 	a := NewAdaptor()
 
-	gobottest.Assert(t, a.GetSpiDefaultBus(), 0)
-	gobottest.Assert(t, a.GetSpiDefaultMode(), 0)
-	gobottest.Assert(t, a.GetSpiDefaultMaxSpeed(), int64(500000))
+	gobottest.Assert(t, a.SpiDefaultBusNumber(), 0)
+	gobottest.Assert(t, a.SpiDefaultMode(), 0)
+	gobottest.Assert(t, a.SpiDefaultMaxSpeed(), int64(500000))
 }
 
 func Test_validateSpiBusNumber(t *testing.T) {

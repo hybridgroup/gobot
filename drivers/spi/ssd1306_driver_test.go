@@ -113,7 +113,7 @@ func (t *gpioTestAdaptor) SetName(n string)      { t.name = n }
 func (t *gpioTestAdaptor) Port() string          { return t.port }
 
 func newGpioTestAdaptor() *gpioTestAdaptor {
-	a := newSpiTestAdaptor()
+	a := newSpiTestAdaptor([]byte{})
 	return &gpioTestAdaptor{
 		port: "/dev/null",
 		testAdaptorDigitalWrite: func() (err error) {

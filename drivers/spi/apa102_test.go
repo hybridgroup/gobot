@@ -11,7 +11,7 @@ import (
 var _ gobot.Driver = (*APA102Driver)(nil)
 
 func initTestDriver() *APA102Driver {
-	a := newSpiTestAdaptor()
+	a := newSpiTestAdaptor([]byte{})
 	d := NewAPA102Driver(a, 10, 31)
 	return d
 }

@@ -60,9 +60,6 @@ func (a *SpiBusAdaptor) Finalize() error {
 	return err
 }
 
-// TODO: all client get the default values and call GetConnection
-//      --> introduce with Functions to change and remove from Interface
-
 // GetSpiConnection returns an spi connection to a device on a specified bus.
 // Valid bus numbers range between 0 and 65536, valid chip numbers are 0 ... 255.
 func (a *SpiBusAdaptor) GetSpiConnection(busNum, chipNum, mode, bits int, maxSpeed int64) (spi.Connection, error) {
@@ -90,29 +87,27 @@ func (a *SpiBusAdaptor) GetSpiConnection(busNum, chipNum, mode, bits int, maxSpe
 	return con, nil
 }
 
-// TODO: remove Get
-
-// GetSpiDefaultBus returns the default spi bus for this platform.
-func (a *SpiBusAdaptor) GetSpiDefaultBus() int {
+// SpiDefaultBusNumber returns the default spi bus for this platform.
+func (a *SpiBusAdaptor) SpiDefaultBusNumber() int {
 	return a.defaultBusNumber
 }
 
-// GetSpiDefaultChip returns the default spi chip for this platform.
-func (a *SpiBusAdaptor) GetSpiDefaultChip() int {
+// SpiDefaultChipNumber returns the default spi chip for this platform.
+func (a *SpiBusAdaptor) SpiDefaultChipNumber() int {
 	return a.defaultChipNumber
 }
 
-// GetSpiDefaultMode returns the default spi mode for this platform.
-func (a *SpiBusAdaptor) GetSpiDefaultMode() int {
+// SpiDefaultMode returns the default spi mode for this platform.
+func (a *SpiBusAdaptor) SpiDefaultMode() int {
 	return a.defaultMode
 }
 
-// GetSpiDefaultBits returns the default spi number of bits for this platform.
-func (a *SpiBusAdaptor) GetSpiDefaultBits() int {
+// SpiDefaultBitCount returns the default spi number of bits for this platform.
+func (a *SpiBusAdaptor) SpiDefaultBitCount() int {
 	return a.defaultBitsNumber
 }
 
-// GetSpiDefaultMaxSpeed returns the default spi bus for this platform.
-func (a *SpiBusAdaptor) GetSpiDefaultMaxSpeed() int64 {
+// SpiDefaultMaxSpeed returns the default spi bus for this platform.
+func (a *SpiBusAdaptor) SpiDefaultMaxSpeed() int64 {
 	return a.defaultMaxSpeed
 }
