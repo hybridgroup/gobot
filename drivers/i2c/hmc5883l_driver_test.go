@@ -25,6 +25,7 @@ func TestNewHMC5883LDriver(t *testing.T) {
 	}
 	gobottest.Refute(t, d.Driver, nil)
 	gobottest.Assert(t, strings.HasPrefix(d.name, "HMC5883L"), true)
+	gobottest.Assert(t, d.defaultAddress, 0x1E)
 	gobottest.Assert(t, d.samplesAvg, uint8(8))
 	gobottest.Assert(t, d.outputRate, uint32(15000))
 	gobottest.Assert(t, d.applyBias, int8(0))

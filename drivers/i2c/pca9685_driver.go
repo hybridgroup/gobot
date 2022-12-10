@@ -7,7 +7,7 @@ import (
 	"gobot.io/x/gobot"
 )
 
-const pca9685Address = 0x40
+const pca9685DefaultAddress = 0x40
 
 const (
 	PCA9685_MODE1        = 0x00
@@ -38,28 +38,23 @@ const (
 // https://www.adafruit.com/product/815
 //
 type PCA9685Driver struct {
-	name       string
-	connector  Connector
-	connection Connection
-	Config
-	gobot.Commander
+	*Driver
 }
 
 // NewPCA9685Driver creates a new driver with specified i2c interface
 // Params:
-//		conn Connector - the Adaptor to use with this Driver
+//		c Connector - the Adaptor to use with this Driver
 //
 // Optional params:
 //		i2c.WithBus(int):	bus to use with this driver
 //		i2c.WithAddress(int):	address to use with this driver
 //
-func NewPCA9685Driver(a Connector, options ...func(Config)) *PCA9685Driver {
+func NewPCA9685Driver(c Connector, options ...func(Config)) *PCA9685Driver {
 	p := &PCA9685Driver{
-		name:      gobot.DefaultName("PCA9685"),
-		connector: a,
-		Config:    NewConfig(),
-		Commander: gobot.NewCommander(),
+		Driver: NewDriver(c, "PCA9685", pca9685DefaultAddress),
 	}
+	p.afterStart = p.initialize
+	p.beforeHalt = p.shutdown
 
 	for _, option := range options {
 		option(p)
@@ -87,63 +82,6 @@ func NewPCA9685Driver(a Connector, options ...func(Config)) *PCA9685Driver {
 	})
 
 	return p
-}
-
-// Name returns the Name for the Driver
-func (p *PCA9685Driver) Name() string { return p.name }
-
-// SetName sets the Name for the Driver
-func (p *PCA9685Driver) SetName(n string) { p.name = n }
-
-// Connection returns the connection for the Driver
-func (p *PCA9685Driver) Connection() gobot.Connection { return p.connector.(gobot.Connection) }
-
-// Start initializes the pca9685
-func (p *PCA9685Driver) Start() (err error) {
-	bus := p.GetBusOrDefault(p.connector.DefaultBus())
-	address := p.GetAddressOrDefault(pca9685Address)
-
-	p.connection, err = p.connector.GetConnection(address, bus)
-	if err != nil {
-		return err
-	}
-
-	if err := p.SetAllPWM(0, 0); err != nil {
-		return err
-	}
-
-	if _, err := p.connection.Write([]byte{PCA9685_MODE2, PCA9685_OUTDRV}); err != nil {
-		return err
-	}
-
-	if _, err := p.connection.Write([]byte{PCA9685_MODE1, PCA9685_ALLCALL}); err != nil {
-		return err
-	}
-
-	time.Sleep(5 * time.Millisecond)
-
-	if _, err := p.connection.Write([]byte{byte(PCA9685_MODE1)}); err != nil {
-		return err
-	}
-	oldmode, err := p.connection.ReadByte()
-	if err != nil {
-		return err
-	}
-	oldmode = oldmode &^ byte(PCA9685_SLEEP)
-
-	if _, err := p.connection.Write([]byte{PCA9685_MODE1, oldmode}); err != nil {
-		return err
-	}
-
-	time.Sleep(5 * time.Millisecond)
-
-	return
-}
-
-// Halt stops the device
-func (p *PCA9685Driver) Halt() (err error) {
-	_, err = p.connection.Write([]byte{PCA9685_ALLLED_OFF_H, 0x10})
-	return
 }
 
 // SetPWM sets a specific channel to a pwm value from 0-4095.
@@ -270,4 +208,42 @@ func (p *PCA9685Driver) ServoWrite(pin string, val byte) (err error) {
 	}
 	v := gobot.ToScale(gobot.FromScale(float64(val), 0, 180), 200, 500)
 	return p.SetPWM(i, 0, uint16(v))
+}
+
+func (p *PCA9685Driver) initialize() error {
+	if err := p.SetAllPWM(0, 0); err != nil {
+		return err
+	}
+
+	if _, err := p.connection.Write([]byte{PCA9685_MODE2, PCA9685_OUTDRV}); err != nil {
+		return err
+	}
+
+	if _, err := p.connection.Write([]byte{PCA9685_MODE1, PCA9685_ALLCALL}); err != nil {
+		return err
+	}
+
+	time.Sleep(5 * time.Millisecond)
+
+	if _, err := p.connection.Write([]byte{byte(PCA9685_MODE1)}); err != nil {
+		return err
+	}
+	oldmode, err := p.connection.ReadByte()
+	if err != nil {
+		return err
+	}
+	oldmode = oldmode &^ byte(PCA9685_SLEEP)
+
+	if _, err := p.connection.Write([]byte{PCA9685_MODE1, oldmode}); err != nil {
+		return err
+	}
+
+	time.Sleep(5 * time.Millisecond)
+
+	return nil
+}
+
+func (p *PCA9685Driver) shutdown() error {
+	_, err := p.connection.Write([]byte{PCA9685_ALLLED_OFF_H, 0x10})
+	return err
 }

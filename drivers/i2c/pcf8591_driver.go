@@ -4,10 +4,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
-	"sync"
 	"time"
-
-	"gobot.io/x/gobot"
 )
 
 // PCF8591 supports addresses from 0x48 to 0x4F
@@ -101,37 +98,30 @@ var pcf8591ModeMap = map[string]pcf8591ModeChan{
 // This driver was tested with Tinkerboard and the YL-40 driver.
 //
 type PCF8591Driver struct {
-	name       string
-	connector  Connector
-	connection Connection
-	Config
-	gobot.Commander
+	*Driver
 	lastCtrlByte        byte
 	lastAnaOut          byte
 	additionalReadWrite uint8
 	additionalRead      uint8
 	forceRefresh        bool
-	LastRead            [][]byte    // for debugging purposes
-	mutex               *sync.Mutex // mutex needed to ensure write-read sequence of AnalogRead() is not interrupted
+	LastRead            [][]byte // for debugging purposes
 }
 
 // NewPCF8591Driver creates a new driver with specified i2c interface
 // Params:
-//    conn Connector - the Adaptor to use with this Driver
+//    c Connector - the Adaptor to use with this Driver
 //
 // Optional params:
 //    i2c.WithBus(int): bus to use with this driver
 //    i2c.WithAddress(int): address to use with this driver
 //    i2c.WithPCF8591With400kbitStabilization(uint8, uint8): stabilize read in 400 kbit mode
 //
-func NewPCF8591Driver(a Connector, options ...func(Config)) *PCF8591Driver {
+func NewPCF8591Driver(c Connector, options ...func(Config)) *PCF8591Driver {
 	p := &PCF8591Driver{
-		name:      gobot.DefaultName("PCF8591"),
-		connector: a,
-		Config:    NewConfig(),
-		Commander: gobot.NewCommander(),
-		mutex:     &sync.Mutex{},
+		Driver: NewDriver(c, "PCF8591", pcf8591DefaultAddress),
 	}
+	p.afterStart = p.initialize
+	p.beforeHalt = p.shutdown
 
 	for _, option := range options {
 		option(p)
@@ -176,36 +166,6 @@ func WithPCF8591ForceRefresh(val uint8) func(Config) {
 			log.Printf("Trying to set forceRefresh for non-PCF8591Driver %v", c)
 		}
 	}
-}
-
-// Name returns the Name for the Driver
-func (p *PCF8591Driver) Name() string { return p.name }
-
-// SetName sets the Name for the Driver
-func (p *PCF8591Driver) SetName(n string) { p.name = n }
-
-// Connection returns the connection for the Driver
-func (p *PCF8591Driver) Connection() gobot.Connection { return p.connector.(gobot.Connection) }
-
-// Start initializes the PCF8591
-func (p *PCF8591Driver) Start() (err error) {
-	bus := p.GetBusOrDefault(p.connector.DefaultBus())
-	address := p.GetAddressOrDefault(pcf8591DefaultAddress)
-
-	p.connection, err = p.connector.GetConnection(address, bus)
-	if err != nil {
-		return err
-	}
-
-	if err := p.AnalogOutputState(false); err != nil {
-		return err
-	}
-	return
-}
-
-// Halt stops the device
-func (p *PCF8591Driver) Halt() (err error) {
-	return p.AnalogOutputState(false)
 }
 
 // AnalogRead returns value from analog reading of given input description
@@ -312,21 +272,11 @@ func (p *PCF8591Driver) AnalogWrite(pin string, value int) (err error) {
 // Please note that in case of using the internal oscillator
 // and the auto increment mode the output should not switched off.
 // Otherwise conversion errors could occur.
-func (p *PCF8591Driver) AnalogOutputState(state bool) (err error) {
+func (p *PCF8591Driver) AnalogOutputState(state bool) error {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 
-	var ctrlByte uint8
-	if state {
-		ctrlByte = p.lastCtrlByte | byte(pcf8591_ANAON)
-	} else {
-		ctrlByte = p.lastCtrlByte & ^uint8(pcf8591_ANAON)
-	}
-
-	if err = p.writeCtrlByte(ctrlByte, p.forceRefresh); err != nil {
-		return err
-	}
-	return nil
+	return p.analogOutputState(state)
 }
 
 // PCF8591ParseModeChan is used to get a working combination between mode (single, mixed, 2 differential, 3 differential)
@@ -385,4 +335,26 @@ func (mc pcf8591ModeChan) pcf8591IsDiff() bool {
 	default:
 		return false
 	}
+}
+
+func (p *PCF8591Driver) initialize() error {
+	return p.analogOutputState(false)
+}
+
+func (p *PCF8591Driver) shutdown() (err error) {
+	return p.analogOutputState(false)
+}
+
+func (p *PCF8591Driver) analogOutputState(state bool) error {
+	var ctrlByte uint8
+	if state {
+		ctrlByte = p.lastCtrlByte | byte(pcf8591_ANAON)
+	} else {
+		ctrlByte = p.lastCtrlByte & ^uint8(pcf8591_ANAON)
+	}
+
+	if err := p.writeCtrlByte(ctrlByte, p.forceRefresh); err != nil {
+		return err
+	}
+	return nil
 }

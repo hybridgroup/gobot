@@ -231,7 +231,7 @@ func TestName(t *testing.T) {
 func TestConnect(t *testing.T) {
 	a, _ := initTestAdaptorWithMockedFilesystem("arduino")
 
-	gobottest.Assert(t, a.DefaultBus(), 6)
+	gobottest.Assert(t, a.DefaultI2cBus(), 6)
 	gobottest.Assert(t, a.board, "arduino")
 	gobottest.Assert(t, a.Connect(), nil)
 }
@@ -337,7 +337,7 @@ func TestConnectSparkfun(t *testing.T) {
 	a, _ := initTestAdaptorWithMockedFilesystem("sparkfun")
 
 	gobottest.Assert(t, a.Connect(), nil)
-	gobottest.Assert(t, a.DefaultBus(), 1)
+	gobottest.Assert(t, a.DefaultI2cBus(), 1)
 	gobottest.Assert(t, a.board, "sparkfun")
 }
 
@@ -345,7 +345,7 @@ func TestConnectMiniboard(t *testing.T) {
 	a, _ := initTestAdaptorWithMockedFilesystem("miniboard")
 
 	gobottest.Assert(t, a.Connect(), nil)
-	gobottest.Assert(t, a.DefaultBus(), 1)
+	gobottest.Assert(t, a.DefaultI2cBus(), 1)
 	gobottest.Assert(t, a.board, "miniboard")
 }
 
@@ -362,7 +362,7 @@ func TestFinalize(t *testing.T) {
 	a.DigitalWrite("3", 1)
 	a.PwmWrite("5", 100)
 
-	a.GetConnection(0xff, 6)
+	a.GetI2cConnection(0xff, 6)
 	gobottest.Assert(t, a.Finalize(), nil)
 
 	// assert that finalize after finalize is working
@@ -539,7 +539,7 @@ func TestI2cWorkflow(t *testing.T) {
 	a, _ := initTestAdaptorWithMockedFilesystem("arduino")
 	a.sys.UseMockSyscall()
 
-	con, err := a.GetConnection(0xff, 6)
+	con, err := a.GetI2cConnection(0xff, 6)
 	gobottest.Assert(t, err, nil)
 
 	_, err = con.Write([]byte{0x00, 0x01})
@@ -559,7 +559,7 @@ func TestI2cFinalizeWithErrors(t *testing.T) {
 	a.sys.UseMockSyscall()
 	fs := a.sys.UseMockFilesystem(pwmMockPathsMux13ArduinoI2c)
 	gobottest.Assert(t, a.Connect(), nil)
-	con, err := a.GetConnection(0xff, 6)
+	con, err := a.GetI2cConnection(0xff, 6)
 	gobottest.Assert(t, err, nil)
 	_, err = con.Write([]byte{0x0A})
 	gobottest.Assert(t, err, nil)

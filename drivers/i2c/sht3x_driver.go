@@ -26,7 +26,6 @@ import (
 	"time"
 
 	"github.com/sigurn/crc8"
-	"gobot.io/x/gobot"
 )
 
 // SHT3xAddressA is the default address of device
@@ -53,34 +52,26 @@ var (
 
 // SHT3xDriver is a Driver for a SHT3x humidity and temperature sensor
 type SHT3xDriver struct {
-	Units string
-
-	name       string
-	connector  Connector
-	connection Connection
-	Config
-	sht3xAddress int
-	accuracy     byte
-	delay        time.Duration
-	crcTable     *crc8.Table
+	*Driver
+	Units    string
+	accuracy byte
+	delay    time.Duration
+	crcTable *crc8.Table
 }
 
 // NewSHT3xDriver creates a new driver with specified i2c interface
 // Params:
-//		conn Connector - the Adaptor to use with this Driver
+//		c Connector - the Adaptor to use with this Driver
 //
 // Optional params:
 //		i2c.WithBus(int):	bus to use with this driver
 //		i2c.WithAddress(int):	address to use with this driver
 //
-func NewSHT3xDriver(a Connector, options ...func(Config)) *SHT3xDriver {
+func NewSHT3xDriver(c Connector, options ...func(Config)) *SHT3xDriver {
 	s := &SHT3xDriver{
-		Units:        "C",
-		name:         gobot.DefaultName("SHT3x"),
-		connector:    a,
-		Config:       NewConfig(),
-		sht3xAddress: SHT3xAddressA,
-		crcTable:     crc8.MakeTable(crc8Params),
+		Driver:   NewDriver(c, "SHT3x", SHT3xAddressA),
+		Units:    "C",
+		crcTable: crc8.MakeTable(crc8Params),
 	}
 	s.SetAccuracy(SHT3xAccuracyHigh)
 
@@ -90,30 +81,6 @@ func NewSHT3xDriver(a Connector, options ...func(Config)) *SHT3xDriver {
 
 	return s
 }
-
-// Name returns the name for this Driver
-func (s *SHT3xDriver) Name() string { return s.name }
-
-// SetName sets the name for this Driver
-func (s *SHT3xDriver) SetName(n string) { s.name = n }
-
-// Connection returns the connection for this Driver
-func (s *SHT3xDriver) Connection() gobot.Connection { return s.connector.(gobot.Connection) }
-
-// Start initializes the SHT3x
-func (s *SHT3xDriver) Start() (err error) {
-	bus := s.GetBusOrDefault(s.connector.DefaultBus())
-	address := s.GetAddressOrDefault(s.sht3xAddress)
-
-	s.connection, err = s.connector.GetConnection(address, bus)
-	return
-}
-
-// Halt returns true if devices is halted successfully
-func (s *SHT3xDriver) Halt() (err error) { return }
-
-// SetAddress sets the address of the device
-func (s *SHT3xDriver) SetAddress(address int) { s.sht3xAddress = address }
 
 // Accuracy returns the accuracy of the sampling
 func (s *SHT3xDriver) Accuracy() byte { return s.accuracy }

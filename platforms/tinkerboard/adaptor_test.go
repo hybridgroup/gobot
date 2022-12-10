@@ -201,7 +201,7 @@ func TestFinalizeErrorAfterPWM(t *testing.T) {
 
 func TestI2cDefaultBus(t *testing.T) {
 	a := NewAdaptor()
-	gobottest.Assert(t, a.DefaultBus(), 1)
+	gobottest.Assert(t, a.DefaultI2cBus(), 1)
 }
 
 func TestI2cFinalizeWithErrors(t *testing.T) {
@@ -210,7 +210,7 @@ func TestI2cFinalizeWithErrors(t *testing.T) {
 	a.sys.UseMockSyscall()
 	fs := a.sys.UseMockFilesystem([]string{"/dev/i2c-4"})
 	gobottest.Assert(t, a.Connect(), nil)
-	con, err := a.GetConnection(0xff, 4)
+	con, err := a.GetI2cConnection(0xff, 4)
 	gobottest.Assert(t, err, nil)
 	_, err = con.Write([]byte{0xbf})
 	gobottest.Assert(t, err, nil)

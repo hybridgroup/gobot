@@ -18,13 +18,10 @@ const (
 	Z = "z"
 )
 
-const wiichuckAddress = 0x52
+const wiichuckDefaultAddress = 0x52
 
 type WiichuckDriver struct {
-	name       string
-	connector  Connector
-	connection Connection
-	Config
+	*Driver
 	interval  time.Duration
 	pauseTime time.Duration
 	gobot.Eventer
@@ -36,17 +33,15 @@ type WiichuckDriver struct {
 // NewWiichuckDriver creates a WiichuckDriver with specified i2c interface.
 //
 // Params:
-//		conn Connector - the Adaptor to use with this Driver
+//		c Connector - the Adaptor to use with this Driver
 //
 // Optional params:
 //		i2c.WithBus(int):	bus to use with this driver
 //		i2c.WithAddress(int):	address to use with this driver
 //
-func NewWiichuckDriver(a Connector, options ...func(Config)) *WiichuckDriver {
+func NewWiichuckDriver(c Connector, options ...func(Config)) *WiichuckDriver {
 	w := &WiichuckDriver{
-		name:      gobot.DefaultName("Wiichuck"),
-		connector: a,
-		Config:    NewConfig(),
+		Driver:    NewDriver(c, "Wiichuck", wiichuckDefaultAddress),
 		interval:  10 * time.Millisecond,
 		pauseTime: 1 * time.Millisecond,
 		Eventer:   gobot.NewEventer(),
@@ -61,6 +56,7 @@ func NewWiichuckDriver(a Connector, options ...func(Config)) *WiichuckDriver {
 			"c":  0,
 		},
 	}
+	w.afterStart = w.initialize
 
 	for _, option := range options {
 		option(w)
@@ -73,59 +69,6 @@ func NewWiichuckDriver(a Connector, options ...func(Config)) *WiichuckDriver {
 
 	return w
 }
-
-// Name returns the name of the device.
-func (w *WiichuckDriver) Name() string { return w.name }
-
-// SetName sets the name of the device.
-func (w *WiichuckDriver) SetName(n string) { w.name = n }
-
-// Connection returns the connection for the device.
-func (w *WiichuckDriver) Connection() gobot.Connection { return w.connector.(gobot.Connection) }
-
-// Start initilizes i2c and reads from adaptor
-// using specified interval to update with new value
-func (w *WiichuckDriver) Start() (err error) {
-	bus := w.GetBusOrDefault(w.connector.DefaultBus())
-	address := w.GetAddressOrDefault(wiichuckAddress)
-
-	w.connection, err = w.connector.GetConnection(address, bus)
-	if err != nil {
-		return err
-	}
-
-	go func() {
-		for {
-			if _, err := w.connection.Write([]byte{0x40, 0x00}); err != nil {
-				w.Publish(w.Event(Error), err)
-				continue
-			}
-			time.Sleep(w.pauseTime)
-			if _, err := w.connection.Write([]byte{0x00}); err != nil {
-				w.Publish(w.Event(Error), err)
-				continue
-			}
-			time.Sleep(w.pauseTime)
-			newValue := make([]byte, 6)
-			bytesRead, err := w.connection.Read(newValue)
-			if err != nil {
-				w.Publish(w.Event(Error), err)
-				continue
-			}
-			if bytesRead == 6 {
-				if err = w.update(newValue); err != nil {
-					w.Publish(w.Event(Error), err)
-					continue
-				}
-			}
-			time.Sleep(w.interval)
-		}
-	}()
-	return
-}
-
-// Halt returns true if driver is halted successfully
-func (w *WiichuckDriver) Halt() (err error) { return }
 
 // Joystick returns the current value for the joystick
 func (w *WiichuckDriver) Joystick() map[string]float64 {
@@ -209,4 +152,36 @@ func (w *WiichuckDriver) parse(value []byte) {
 	w.data["sy"] = w.decode(value[1])
 	w.data["z"] = float64(uint8(w.decode(value[5])) & 0x01)
 	w.data["c"] = float64(uint8(w.decode(value[5])) & 0x02)
+}
+
+// reads from adaptor using specified interval to update with new value
+func (w *WiichuckDriver) initialize() (err error) {
+	go func() {
+		for {
+			if _, err := w.connection.Write([]byte{0x40, 0x00}); err != nil {
+				w.Publish(w.Event(Error), err)
+				continue
+			}
+			time.Sleep(w.pauseTime)
+			if _, err := w.connection.Write([]byte{0x00}); err != nil {
+				w.Publish(w.Event(Error), err)
+				continue
+			}
+			time.Sleep(w.pauseTime)
+			newValue := make([]byte, 6)
+			bytesRead, err := w.connection.Read(newValue)
+			if err != nil {
+				w.Publish(w.Event(Error), err)
+				continue
+			}
+			if bytesRead == 6 {
+				if err = w.update(newValue); err != nil {
+					w.Publish(w.Event(Error), err)
+					continue
+				}
+			}
+			time.Sleep(w.interval)
+		}
+	}()
+	return
 }

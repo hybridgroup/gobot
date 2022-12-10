@@ -23,7 +23,6 @@ func initTestMPU6050WithStubbedAdaptor() (*MPU6050Driver, *i2cTestAdaptor) {
 }
 
 func TestNewMPU6050Driver(t *testing.T) {
-	// Does it return a pointer to an instance of MPU6050Driver?
 	var di interface{} = NewMPU6050Driver(newI2cTestAdaptor())
 	d, ok := di.(*MPU6050Driver)
 	if !ok {
@@ -31,6 +30,7 @@ func TestNewMPU6050Driver(t *testing.T) {
 	}
 	gobottest.Refute(t, d.Driver, nil)
 	gobottest.Assert(t, strings.HasPrefix(d.name, "MPU6050"), true)
+	gobottest.Assert(t, d.defaultAddress, 0x68)
 	gobottest.Assert(t, d.dlpf, MPU6050DlpfConfig(0x00))
 	gobottest.Assert(t, d.frameSync, MPU6050FrameSyncConfig(0x00))
 	gobottest.Assert(t, d.accelFs, MPU6050AccelFsConfig(0x00))

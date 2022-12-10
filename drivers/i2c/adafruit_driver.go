@@ -199,7 +199,7 @@ func (a *AdafruitMotorHatDriver) startDriver(connection Connection) (err error) 
 
 // Start initializes both I2C-addressable Adafruit Motor HAT drivers
 func (a *AdafruitMotorHatDriver) Start() (err error) {
-	bus := a.GetBusOrDefault(a.connector.DefaultBus())
+	bus := a.GetBusOrDefault(a.connector.DefaultI2cBus())
 
 	err = a.startServoHat(bus)
 	if adafruitDebug && err != nil {
@@ -216,7 +216,7 @@ func (a *AdafruitMotorHatDriver) Start() (err error) {
 
 // startServoHat starts the Servo motors connection.
 func (a *AdafruitMotorHatDriver) startServoHat(bus int) (err error) {
-	if a.servoHatConnection, err = a.connector.GetConnection(servoHatAddress, bus); err != nil {
+	if a.servoHatConnection, err = a.connector.GetI2cConnection(servoHatAddress, bus); err != nil {
 		return
 	}
 
@@ -229,7 +229,7 @@ func (a *AdafruitMotorHatDriver) startServoHat(bus int) (err error) {
 
 // startMotorHat starts the DC motors connection.
 func (a *AdafruitMotorHatDriver) startMotorHat(bus int) (err error) {
-	if a.motorHatConnection, err = a.connector.GetConnection(motorHatAddress, bus); err != nil {
+	if a.motorHatConnection, err = a.connector.GetI2cConnection(motorHatAddress, bus); err != nil {
 		return
 	}
 

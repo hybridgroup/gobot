@@ -2,6 +2,7 @@ package i2c
 
 import (
 	"errors"
+	"strings"
 	"testing"
 
 	"gobot.io/x/gobot"
@@ -33,6 +34,8 @@ func TestNewL3GD20HDriver(t *testing.T) {
 		t.Errorf("NewL3GD20HDriver() should have returned a *L3GD20HDriver")
 	}
 	gobottest.Refute(t, d.Driver, nil)
+	gobottest.Assert(t, strings.HasPrefix(d.Name(), "L3GD20H"), true)
+	gobottest.Assert(t, d.defaultAddress, 0x6b)
 	gobottest.Assert(t, d.Scale(), L3GD20HScale250dps)
 }
 

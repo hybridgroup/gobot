@@ -2,37 +2,29 @@ package i2c
 
 import (
 	"fmt"
-
-	"gobot.io/x/gobot"
 )
 
-const blinkmAddress = 0x09
+const blinkmDefaultAddress = 0x09
 
 // BlinkMDriver is a Gobot Driver for a BlinkM LED
 type BlinkMDriver struct {
-	name       string
-	connector  Connector
-	connection Connection
-	Config
-	gobot.Commander
+	*Driver
 }
 
 // NewBlinkMDriver creates a new BlinkMDriver.
 //
 // Params:
-//		conn Connector - the Adaptor to use with this Driver
+//		c Connector - the Adaptor to use with this Driver
 //
 // Optional params:
 //		i2c.WithBus(int):	bus to use with this driver
 //		i2c.WithAddress(int):	address to use with this driver
 //
-func NewBlinkMDriver(a Connector, options ...func(Config)) *BlinkMDriver {
+func NewBlinkMDriver(c Connector, options ...func(Config)) *BlinkMDriver {
 	b := &BlinkMDriver{
-		name:      gobot.DefaultName("BlinkM"),
-		Commander: gobot.NewCommander(),
-		connector: a,
-		Config:    NewConfig(),
+		Driver: NewDriver(c, "BlinkM", blinkmDefaultAddress),
 	}
+	b.afterStart = b.initialize
 
 	for _, option := range options {
 		option(b)
@@ -64,34 +56,6 @@ func NewBlinkMDriver(a Connector, options ...func(Config)) *BlinkMDriver {
 
 	return b
 }
-
-// Name returns the Name for the Driver
-func (b *BlinkMDriver) Name() string { return b.name }
-
-// SetName sets the Name for the Driver
-func (b *BlinkMDriver) SetName(n string) { b.name = n }
-
-// Connection returns the connection for the Driver
-func (b *BlinkMDriver) Connection() gobot.Connection { return b.connection.(gobot.Connection) }
-
-// Start starts the Driver up, and writes start command
-func (b *BlinkMDriver) Start() (err error) {
-	bus := b.GetBusOrDefault(b.connector.DefaultBus())
-	address := b.GetAddressOrDefault(blinkmAddress)
-
-	b.connection, err = b.connector.GetConnection(address, bus)
-	if err != nil {
-		return
-	}
-
-	if _, err := b.connection.Write([]byte("o")); err != nil {
-		return err
-	}
-	return
-}
-
-// Halt returns true if device is halted successfully
-func (b *BlinkMDriver) Halt() (err error) { return }
 
 // Rgb sets color using r,g,b params
 func (b *BlinkMDriver) Rgb(red byte, green byte, blue byte) (err error) {
@@ -135,4 +99,11 @@ func (b *BlinkMDriver) Color() (color []byte, err error) {
 		return []byte{}, err
 	}
 	return []byte{data[0], data[1], data[2]}, nil
+}
+
+func (b *BlinkMDriver) initialize() error {
+	if _, err := b.connection.Write([]byte("o")); err != nil {
+		return err
+	}
+	return nil
 }

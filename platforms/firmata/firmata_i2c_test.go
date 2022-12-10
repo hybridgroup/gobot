@@ -64,7 +64,7 @@ func newI2cMockFirmataBoard() *i2cMockFirmataBoard {
 func initTestTestAdaptorWithI2cConnection() (i2c.Connection, *i2cMockFirmataBoard) {
 	a := NewAdaptor()
 	a.Board = newI2cMockFirmataBoard()
-	con, err := a.GetConnection(0, 0)
+	con, err := a.GetI2cConnection(0, 0)
 	if err != nil {
 		panic(err)
 	}
@@ -238,11 +238,11 @@ func TestWriteBlockData(t *testing.T) {
 
 func TestDefaultBus(t *testing.T) {
 	a := NewAdaptor()
-	gobottest.Assert(t, a.DefaultBus(), 0)
+	gobottest.Assert(t, a.DefaultI2cBus(), 0)
 }
 
-func TestGetConnectionInvalidBus(t *testing.T) {
+func TestGetI2cConnectionInvalidBus(t *testing.T) {
 	a := NewAdaptor()
-	_, err := a.GetConnection(0x01, 99)
+	_, err := a.GetI2cConnection(0x01, 99)
 	gobottest.Assert(t, err, errors.New("Invalid bus number 99, only 0 is supported"))
 }

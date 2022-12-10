@@ -57,8 +57,8 @@ func (a *I2cBusAdaptor) Finalize() error {
 	return err
 }
 
-// GetConnection returns a connection to a device on a specified i2c bus
-func (a *I2cBusAdaptor) GetConnection(address int, busNr int) (connection i2c.Connection, err error) {
+// GetI2cConnection returns a connection to a device on a specified i2c bus
+func (a *I2cBusAdaptor) GetI2cConnection(address int, busNr int) (connection i2c.Connection, err error) {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
@@ -80,7 +80,7 @@ func (a *I2cBusAdaptor) GetConnection(address int, busNr int) (connection i2c.Co
 	return i2c.NewConnection(bus, address), err
 }
 
-// GetDefaultBus returns the default i2c bus number for this platform.
-func (a *I2cBusAdaptor) DefaultBus() int {
+// DefaultI2cBus returns the default i2c bus number for this platform.
+func (a *I2cBusAdaptor) DefaultI2cBus() int {
 	return a.defaultBusNumber
 }

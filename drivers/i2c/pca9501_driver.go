@@ -151,8 +151,8 @@ func (p *PCA9501Driver) WriteEEPROM(address uint8, val uint8) error {
 
 func (p *PCA9501Driver) initialize() (err error) {
 	// initialize the EEPROM connection
-	bus := p.GetBusOrDefault(p.connector.DefaultBus())
+	bus := p.GetBusOrDefault(p.connector.DefaultI2cBus())
 	addressMem := p.GetAddressOrDefault(pca9501DefaultAddress) | 0x40
-	p.connectionMem, err = p.connector.GetConnection(addressMem, bus)
+	p.connectionMem, err = p.connector.GetI2cConnection(addressMem, bus)
 	return
 }

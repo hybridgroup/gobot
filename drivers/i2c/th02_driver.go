@@ -101,11 +101,6 @@ func WithTH02FastMode(val int) func(Config) {
 	}
 }
 
-// SetAddress sets the address of the device (deprecated, use WithAddress() instead)
-func (s *TH02Driver) SetAddress(address int) {
-	WithAddress(address)(s)
-}
-
 // Accuracy returns the accuracy of the sampling (deprecated, use FastMode() instead)
 func (s *TH02Driver) Accuracy() byte {
 	if s.fastMode {

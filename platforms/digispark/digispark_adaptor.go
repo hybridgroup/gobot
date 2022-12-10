@@ -93,9 +93,9 @@ func (d *Adaptor) ServoWrite(pin string, angle uint8) (err error) {
 	return d.littleWire.servoUpdateLocation(angle, angle)
 }
 
-// GetConnection returns an i2c connection to a device on a specified bus.
+// GetI2cConnection returns an i2c connection to a device on a specified bus.
 // Only supports bus number 0
-func (d *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection, err error) {
+func (d *Adaptor) GetI2cConnection(address int, bus int) (connection i2c.Connection, err error) {
 	if bus != 0 {
 		return nil, fmt.Errorf("Invalid bus number %d, only 0 is supported", bus)
 	}
@@ -106,7 +106,7 @@ func (d *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection
 	return i2c.Connection(c), nil
 }
 
-// GetDefaultBus returns the default i2c bus for this platform
-func (d *Adaptor) DefaultBus() int {
+// DefaultI2cBus returns the default i2c bus for this platform
+func (d *Adaptor) DefaultI2cBus() int {
 	return 0
 }

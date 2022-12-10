@@ -22,7 +22,7 @@ func TestWithBus(t *testing.T) {
 	// arrange
 	c := NewConfig()
 	// act
-	c.WithBus(0x23)
+	c.SetBus(0x23)
 	// assert
 	gobottest.Assert(t, c.(*i2cConfig).bus, 0x23)
 }
@@ -31,7 +31,7 @@ func TestWithAddress(t *testing.T) {
 	// arrange
 	c := NewConfig()
 	// act
-	c.WithAddress(0x24)
+	c.SetAddress(0x24)
 	// assert
 	gobottest.Assert(t, c.(*i2cConfig).address, 0x24)
 }

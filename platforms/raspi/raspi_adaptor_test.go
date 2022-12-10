@@ -79,7 +79,7 @@ func TestGetDefaultBus(t *testing.T) {
 			fs.Files[infoFile].Contents = fmt.Sprintf(contentPattern, tc.revisionPart)
 			gobottest.Assert(t, a.revision, "")
 			//act, will read and refresh the revision
-			gotBus := a.DefaultBus()
+			gotBus := a.DefaultI2cBus()
 			//assert
 			gobottest.Assert(t, a.revision, tc.wantRev)
 			gobottest.Assert(t, gotBus, tc.wantBus)
@@ -102,7 +102,7 @@ func TestFinalize(t *testing.T) {
 	a.DigitalWrite("3", 1)
 	a.PwmWrite("7", 255)
 
-	a.GetConnection(0xff, 0)
+	a.GetI2cConnection(0xff, 0)
 	gobottest.Assert(t, a.Finalize(), nil)
 }
 
@@ -258,10 +258,10 @@ func TestI2cDefaultBus(t *testing.T) {
 	a.sys.UseMockSyscall()
 
 	a.revision = "0"
-	gobottest.Assert(t, a.DefaultBus(), 0)
+	gobottest.Assert(t, a.DefaultI2cBus(), 0)
 
 	a.revision = "2"
-	gobottest.Assert(t, a.DefaultBus(), 1)
+	gobottest.Assert(t, a.DefaultI2cBus(), 1)
 }
 
 func TestI2cFinalizeWithErrors(t *testing.T) {
@@ -270,7 +270,7 @@ func TestI2cFinalizeWithErrors(t *testing.T) {
 	a.sys.UseMockSyscall()
 	fs := a.sys.UseMockFilesystem([]string{"/dev/i2c-1"})
 	gobottest.Assert(t, a.Connect(), nil)
-	con, err := a.GetConnection(0xff, 1)
+	con, err := a.GetI2cConnection(0xff, 1)
 	gobottest.Assert(t, err, nil)
 	_, err = con.Write([]byte{0xbf})
 	gobottest.Assert(t, err, nil)

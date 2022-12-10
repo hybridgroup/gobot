@@ -9,6 +9,33 @@ import (
 	"gobot.io/x/gobot"
 )
 
+// Config is the interface to set and get I2C device related parameters.
+type Config interface {
+	// SetBus sets which bus to use
+	SetBus(bus int)
+
+	// GetBusOrDefault gets which bus to use
+	GetBusOrDefault(def int) int
+
+	// SetAddress sets which address to use
+	SetAddress(address int)
+
+	// GetAddressOrDefault gets which address to use
+	GetAddressOrDefault(def int) int
+}
+
+// Connector lets adaptors (platforms) provide the interface for Drivers to get access to the I2C buses on platforms
+// that support I2C. The "I2C" specifier is part of the name to differentiate to SPI at platform level.
+type Connector interface {
+	// GetI2cConnection creates and returns a connection to device at the specified address
+	// and bus. Bus numbering starts at index 0, the range of valid buses is
+	// platform specific.
+	GetI2cConnection(address int, busNr int) (device Connection, err error)
+
+	// DefaultI2cBus returns the default I2C bus index
+	DefaultI2cBus() int
+}
+
 // Driver implements the interface gobot.Driver.
 type Driver struct {
 	name           string
@@ -63,10 +90,10 @@ func (d *Driver) Start() error {
 	defer d.mutex.Unlock()
 
 	var err error
-	bus := d.GetBusOrDefault(d.connector.DefaultBus())
+	bus := d.GetBusOrDefault(d.connector.DefaultI2cBus())
 	address := d.GetAddressOrDefault(int(d.defaultAddress))
 
-	if d.connection, err = d.connector.GetConnection(address, bus); err != nil {
+	if d.connection, err = d.connector.GetI2cConnection(address, bus); err != nil {
 		return err
 	}
 
