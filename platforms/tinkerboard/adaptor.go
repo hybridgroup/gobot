@@ -104,7 +104,8 @@ func (c *Adaptor) Finalize() error {
 }
 
 func (c *Adaptor) validateSpiBusNumber(busNr int) error {
-	// Valid bus numbers are [0,2] which corresponds to /dev/spidev0.0, /dev/spidev0.2.
+	// Valid bus numbers are [0,2] which corresponds to /dev/spidev0.x, /dev/spidev2.x
+	// x is the chip number <255
 	if (busNr != 0) && (busNr != 2) {
 		return fmt.Errorf("Bus number %d out of range", busNr)
 	}

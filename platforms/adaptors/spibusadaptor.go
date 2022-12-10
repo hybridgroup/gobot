@@ -13,20 +13,20 @@ type spiBusNumberValidator func(busNumber int) error
 
 type SpiBusAdaptor struct {
 	sys               *system.Accesser
-	validateNumber    spiBusNumberValidator
+	validateBusNumber spiBusNumberValidator
 	defaultBusNumber  int
 	defaultChipNumber int
 	defaultMode       int
 	defaultBitsNumber int
 	defaultMaxSpeed   int64
 	mutex             sync.Mutex
-	buses             map[int]spi.Connection
+	connections       map[string]spi.Connection
 }
 
 func NewSpiBusAdaptor(sys *system.Accesser, v spiBusNumberValidator, busNr, chipNum, mode, bits int, maxSpeed int64) *SpiBusAdaptor {
 	a := &SpiBusAdaptor{
 		sys:               sys,
-		validateNumber:    v,
+		validateBusNumber: v,
 		defaultBusNumber:  busNr,
 		defaultChipNumber: chipNum,
 		defaultMode:       mode,
@@ -41,7 +41,7 @@ func (a *SpiBusAdaptor) Connect() error {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
-	a.buses = make(map[int]spi.Connection)
+	a.connections = make(map[string]spi.Connection)
 	return nil
 }
 
@@ -50,9 +50,9 @@ func (a *SpiBusAdaptor) Finalize() error {
 	defer a.mutex.Unlock()
 
 	var err error
-	for _, bus := range a.buses {
-		if bus != nil {
-			if e := bus.Close(); e != nil {
+	for _, con := range a.connections {
+		if con != nil {
+			if e := con.Close(); e != nil {
 				err = multierror.Append(err, e)
 			}
 		}
@@ -64,27 +64,30 @@ func (a *SpiBusAdaptor) Finalize() error {
 //      --> introduce with Functions to change and remove from Interface
 
 // GetSpiConnection returns an spi connection to a device on a specified bus.
-func (a *SpiBusAdaptor) GetSpiConnection(busNr, chipNum, mode, bits int, maxSpeed int64) (spi.Connection, error) {
+// Valid bus numbers range between 0 and 65536, valid chip numbers are 0 ... 255.
+func (a *SpiBusAdaptor) GetSpiConnection(busNum, chipNum, mode, bits int, maxSpeed int64) (spi.Connection, error) {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
-	if a.buses == nil {
+	if a.connections == nil {
 		return nil, fmt.Errorf("not connected")
 	}
 
-	bus := a.buses[busNr]
-	if bus == nil {
-		if err := a.validateNumber(busNr); err != nil {
+	id := fmt.Sprintf("%d_%d", busNum, chipNum)
+
+	con := a.connections[id]
+	if con == nil {
+		if err := a.validateBusNumber(busNum); err != nil {
 			return nil, err
 		}
 		var err error
-		if bus, err = a.sys.NewSpiConnection(busNr, chipNum, mode, bits, maxSpeed); err != nil {
+		if con, err = a.sys.NewSpiConnection(busNum, chipNum, mode, bits, maxSpeed); err != nil {
 			return nil, err
 		}
-		a.buses[busNr] = bus
+		a.connections[id] = con
 	}
 
-	return bus, nil
+	return con, nil
 }
 
 // TODO: remove Get

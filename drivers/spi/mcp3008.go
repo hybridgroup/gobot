@@ -3,8 +3,6 @@ package spi
 import (
 	"errors"
 	"strconv"
-
-	"gobot.io/x/gobot"
 )
 
 // MCP3008DriverMaxChannel is the number of channels of this A/D converter.
@@ -12,11 +10,7 @@ const MCP3008DriverMaxChannel = 8
 
 // MCP3008Driver is a driver for the MCP3008 A/D converter.
 type MCP3008Driver struct {
-	name       string
-	connector  Connector
-	connection Connection
-	Config
-	gobot.Commander
+	*Driver
 }
 
 // NewMCP3008Driver creates a new Gobot Driver for MCP3008Driver A/D converter
@@ -33,43 +27,12 @@ type MCP3008Driver struct {
 //
 func NewMCP3008Driver(a Connector, options ...func(Config)) *MCP3008Driver {
 	d := &MCP3008Driver{
-		name:      gobot.DefaultName("MCP3008"),
-		connector: a,
-		Config:    NewConfig(),
+		Driver: NewDriver(a, "MCP3008"),
 	}
 	for _, option := range options {
 		option(d)
 	}
 	return d
-}
-
-// Name returns the name of the device.
-func (d *MCP3008Driver) Name() string { return d.name }
-
-// SetName sets the name of the device.
-func (d *MCP3008Driver) SetName(n string) { d.name = n }
-
-// Connection returns the Connection of the device.
-func (d *MCP3008Driver) Connection() gobot.Connection { return d.connection.(gobot.Connection) }
-
-// Start initializes the driver.
-func (d *MCP3008Driver) Start() (err error) {
-	bus := d.GetBusOrDefault(d.connector.GetSpiDefaultBus())
-	chip := d.GetChipOrDefault(d.connector.GetSpiDefaultChip())
-	mode := d.GetModeOrDefault(d.connector.GetSpiDefaultMode())
-	bits := d.GetBitsOrDefault(d.connector.GetSpiDefaultBits())
-	maxSpeed := d.GetSpeedOrDefault(d.connector.GetSpiDefaultMaxSpeed())
-
-	d.connection, err = d.connector.GetSpiConnection(bus, chip, mode, bits, maxSpeed)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// Halt stops the driver.
-func (d *MCP3008Driver) Halt() (err error) {
-	return
 }
 
 // Read reads the current analog data for the desired channel.

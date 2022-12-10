@@ -3,18 +3,11 @@ package spi
 import (
 	"image/color"
 	"math"
-
-	"gobot.io/x/gobot"
 )
 
 // APA102Driver is a driver for the APA102 programmable RGB LEDs.
 type APA102Driver struct {
-	name       string
-	connector  Connector
-	connection Connection
-	Config
-	gobot.Commander
-
+	*Driver
 	vals       []color.RGBA
 	brightness uint8
 }
@@ -35,45 +28,14 @@ type APA102Driver struct {
 //
 func NewAPA102Driver(a Connector, count int, bright uint8, options ...func(Config)) *APA102Driver {
 	d := &APA102Driver{
-		name:       gobot.DefaultName("APA102"),
-		connector:  a,
+		Driver:     NewDriver(a, "APA102"),
 		vals:       make([]color.RGBA, count),
 		brightness: uint8(math.Min(float64(bright), 31)),
-		Config:     NewConfig(),
 	}
 	for _, option := range options {
 		option(d)
 	}
 	return d
-}
-
-// Name returns the name of the device.
-func (d *APA102Driver) Name() string { return d.name }
-
-// SetName sets the name of the device.
-func (d *APA102Driver) SetName(n string) { d.name = n }
-
-// Connection returns the Connection of the device.
-func (d *APA102Driver) Connection() gobot.Connection { return d.connection.(gobot.Connection) }
-
-// Start initializes the driver.
-func (d *APA102Driver) Start() (err error) {
-	bus := d.GetBusOrDefault(d.connector.GetSpiDefaultBus())
-	chip := d.GetChipOrDefault(d.connector.GetSpiDefaultChip())
-	mode := d.GetModeOrDefault(d.connector.GetSpiDefaultMode())
-	bits := d.GetBitsOrDefault(d.connector.GetSpiDefaultBits())
-	maxSpeed := d.GetSpeedOrDefault(d.connector.GetSpiDefaultMaxSpeed())
-
-	d.connection, err = d.connector.GetSpiConnection(bus, chip, mode, bits, maxSpeed)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// Halt stops the driver.
-func (d *APA102Driver) Halt() (err error) {
-	return
 }
 
 // SetRGBA sets the ith LED's color to the given RGBA value.

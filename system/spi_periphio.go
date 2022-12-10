@@ -6,16 +6,16 @@ import (
 	xsysfs "periph.io/x/host/v3/sysfs"
 )
 
-// SpiConnection is the implementation of the SPI interface using the periph.io
+// spiConnectionPeriphIo is the implementation of the SPI interface using the periph.io
 // sysfs implementation for Linux.
-type SpiConnection struct {
+type spiConnectionPeriphIo struct {
 	port xspi.PortCloser
 	dev  xspi.Conn
 }
 
-// NewSpiConnection creates and returns a new connection to a specific
+// NewspiConnectionPeriphIo creates and returns a new connection to a specific
 // spi device on a bus/chip using the periph.io interface.
-func (a *Accesser) NewSpiConnection(busNum, chipNum, mode, bits int, maxSpeed int64) (*SpiConnection, error) {
+func (a *Accesser) NewSpiConnection(busNum, chipNum, mode, bits int, maxSpeed int64) (*spiConnectionPeriphIo, error) {
 	p, err := xsysfs.NewSPI(busNum, chipNum)
 	if err != nil {
 		return nil, err
@@ -24,15 +24,15 @@ func (a *Accesser) NewSpiConnection(busNum, chipNum, mode, bits int, maxSpeed in
 	if err != nil {
 		return nil, err
 	}
-	return &SpiConnection{port: p, dev: c}, nil
+	return &spiConnectionPeriphIo{port: p, dev: c}, nil
 }
 
 // Close the SPI connection.
-func (c *SpiConnection) Close() error {
+func (c *spiConnectionPeriphIo) Close() error {
 	return c.port.Close()
 }
 
 // Tx uses the SPI device to send/receive data.
-func (c *SpiConnection) Tx(w, r []byte) error {
+func (c *spiConnectionPeriphIo) Tx(w, r []byte) error {
 	return c.dev.Tx(w, r)
 }

@@ -158,7 +158,8 @@ func (c *Adaptor) AnalogRead(pin string) (val int, err error) {
 }
 
 func (c *Adaptor) validateSpiBusNumber(busNr int) error {
-	// Valid bus number is [0..1] which corresponds to /dev/spidev0.0 through /dev/spidev0.1.
+	// Valid bus numbers are [0,1] which corresponds to /dev/spidev0.x through /dev/spidev1.x.
+	// x is the chip number <255
 	if (busNr < 0) || (busNr > 1) {
 		return fmt.Errorf("Bus number %d out of range", busNr)
 	}

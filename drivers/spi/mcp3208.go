@@ -12,11 +12,7 @@ const MCP3208DriverMaxChannel = 8
 
 // MCP3208Driver is a driver for the MCP3208 A/D converter.
 type MCP3208Driver struct {
-	name       string
-	connector  Connector
-	connection Connection
-	Config
-	gobot.Commander
+	*Driver
 }
 
 // NewMCP3208Driver creates a new Gobot Driver for MCP3208Driver A/D converter
@@ -33,43 +29,12 @@ type MCP3208Driver struct {
 //
 func NewMCP3208Driver(a Connector, options ...func(Config)) *MCP3208Driver {
 	d := &MCP3208Driver{
-		name:      gobot.DefaultName("MCP3208"),
-		connector: a,
-		Config:    NewConfig(),
+		Driver: NewDriver(a, "MCP3208"),
 	}
 	for _, option := range options {
 		option(d)
 	}
 	return d
-}
-
-// Name returns the name of the device.
-func (d *MCP3208Driver) Name() string { return d.name }
-
-// SetName sets the name of the device.
-func (d *MCP3208Driver) SetName(n string) { d.name = n }
-
-// Connection returns the Connection of the device.
-func (d *MCP3208Driver) Connection() gobot.Connection { return d.connection.(gobot.Connection) }
-
-// Start initializes the driver.
-func (d *MCP3208Driver) Start() (err error) {
-	bus := d.GetBusOrDefault(d.connector.GetSpiDefaultBus())
-	chip := d.GetChipOrDefault(d.connector.GetSpiDefaultChip())
-	mode := d.GetModeOrDefault(d.connector.GetSpiDefaultMode())
-	bits := d.GetBitsOrDefault(d.connector.GetSpiDefaultBits())
-	maxSpeed := d.GetSpeedOrDefault(d.connector.GetSpiDefaultMaxSpeed())
-
-	d.connection, err = d.connector.GetSpiConnection(bus, chip, mode, bits, maxSpeed)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// Halt stops the driver.
-func (d *MCP3208Driver) Halt() (err error) {
-	return
 }
 
 // Read reads the current analog data for the desired channel.

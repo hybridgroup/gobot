@@ -55,62 +55,6 @@ const (
 	ssd1306ChargePumpSetting = 0x8D
 )
 
-// ssd1306Init configures the ssd1306 based on the options passed in when the driver was created
-func (s *SSD1306Driver) ssd1306Init() {
-	s.command(ssd1306SetDisplayOff)
-	s.command(ssd1306SetDisplayClock)
-	if s.DisplayHeight == 16 {
-		s.command(0x60)
-	} else {
-		s.command(0x80)
-	}
-	s.command(ssd1306SetMultiplexRatio)
-	s.command(uint8(s.DisplayHeight) - 1)
-	s.command(ssd1306SetDisplayOffset)
-	s.command(0x0)
-	s.command(ssd1306SetStartLine)
-	s.command(0x0)
-	s.command(ssd1306ChargePumpSetting)
-	if s.ExternalVcc {
-		s.command(0x10)
-	} else {
-		s.command(0x14)
-	}
-	s.command(ssd1306SetMemoryAddressingMode)
-	s.command(0x00)
-	s.command(ssd1306SetSegmentRemap0)
-	s.command(0x01)
-	s.command(ssd1306ComScanInc)
-	s.command(ssd1306SetComPins)
-	if s.DisplayHeight == 64 {
-		s.command(0x12)
-	} else {
-		s.command(0x02)
-	}
-	s.command(ssd1306SetContrast)
-	if s.DisplayHeight == 64 {
-		if s.ExternalVcc {
-			s.command(0x9F)
-		} else {
-			s.command(0xCF)
-		}
-	} else {
-		s.command(0x8F)
-	}
-	s.command(ssd1306SetPrechargePeriod)
-	if s.ExternalVcc {
-		s.command(0x22)
-	} else {
-		s.command(0xF1)
-	}
-	s.command(ssd1306SetVComDeselectLevel)
-	s.command(0x40)
-	s.command(ssd1306DisplayOnResumeToRAM)
-	s.command(ssd1306SetDisplayNormal)
-	s.command(ssd1306DeactivateScroll)
-	s.command(ssd1306SetDisplayOn)
-}
-
 // DisplayBuffer represents the display buffer intermediate memory
 type DisplayBuffer struct {
 	width, height, pageSize int
@@ -156,9 +100,7 @@ func (d *DisplayBuffer) Set(buf []byte) {
 
 // SSD1306Driver is a Gobot Driver for a SSD1306 Display
 type SSD1306Driver struct {
-	name          string
-	connector     Connector
-	connection    Connection
+	*Driver
 	dcDriver      *gpio.DirectPinDriver
 	rstDriver     *gpio.DirectPinDriver
 	pageSize      int
@@ -168,8 +110,6 @@ type SSD1306Driver struct {
 	RSTPin        string
 	ExternalVcc   bool
 	buffer        *DisplayBuffer
-	Config
-	gobot.Commander
 }
 
 // NewSSD1306Driver creates a new SSD1306Driver.
@@ -196,16 +136,16 @@ func NewSSD1306Driver(a gobot.Adaptor, options ...func(Config)) *SSD1306Driver {
 		panic("unable to get gobot connector for ssd1306")
 	}
 	s := &SSD1306Driver{
-		name:          gobot.DefaultName("SSD1306"),
-		Commander:     gobot.NewCommander(),
-		connector:     b,
+		Driver:        NewDriver(b, "SSD1306"),
 		DisplayWidth:  ssd1306Width,
 		DisplayHeight: ssd1306Height,
 		DCPin:         ssd1306DcPin,
 		RSTPin:        ssd1306RstPin,
 		ExternalVcc:   ssd1306ExternalVcc,
-		Config:        NewConfig(),
 	}
+	s.afterStart = s.initialize
+	s.beforeHalt = s.shutdown
+
 	for _, option := range options {
 		option(s)
 	}
@@ -242,38 +182,6 @@ func NewSSD1306Driver(a gobot.Adaptor, options ...func(Config)) *SSD1306Driver {
 		return nil
 	})
 	return s
-}
-
-// Name returns the Name for the Driver
-func (s *SSD1306Driver) Name() string { return s.name }
-
-// SetName sets the Name for the Driver
-func (s *SSD1306Driver) SetName(n string) { s.name = n }
-
-// Connection returns the connection for the Driver
-func (s *SSD1306Driver) Connection() gobot.Connection { return s.connector.(gobot.Connection) }
-
-// Start sets up the needed connection, and initialized the device.
-func (s *SSD1306Driver) Start() (err error) {
-	bus := s.GetBusOrDefault(s.connector.GetSpiDefaultBus())
-	chip := s.GetChipOrDefault(s.connector.GetSpiDefaultChip())
-	mode := s.GetModeOrDefault(s.connector.GetSpiDefaultMode())
-	bits := s.GetBitsOrDefault(s.connector.GetSpiDefaultBits())
-	maxSpeed := s.GetSpeedOrDefault(s.connector.GetSpiDefaultMaxSpeed())
-
-	s.connection, err = s.connector.GetSpiConnection(bus, chip, mode, bits, maxSpeed)
-	if err != nil {
-		return err
-	}
-	s.ssd1306Init()
-	return
-}
-
-// Halt returns true if device is halted successfully.
-func (s *SSD1306Driver) Halt() (err error) {
-	s.Reset()
-	s.Off()
-	return nil
 }
 
 // WithDisplayWidth option sets the SSD1306Driver DisplayWidth option.
@@ -423,4 +331,68 @@ func (s *SSD1306Driver) command(b byte) (err error) {
 	}
 	err = s.connection.Tx([]byte{b}, nil)
 	return err
+}
+
+// initialize configures the ssd1306 based on the options passed in when the driver was created
+func (s *SSD1306Driver) initialize() error {
+	s.command(ssd1306SetDisplayOff)
+	s.command(ssd1306SetDisplayClock)
+	if s.DisplayHeight == 16 {
+		s.command(0x60)
+	} else {
+		s.command(0x80)
+	}
+	s.command(ssd1306SetMultiplexRatio)
+	s.command(uint8(s.DisplayHeight) - 1)
+	s.command(ssd1306SetDisplayOffset)
+	s.command(0x0)
+	s.command(ssd1306SetStartLine)
+	s.command(0x0)
+	s.command(ssd1306ChargePumpSetting)
+	if s.ExternalVcc {
+		s.command(0x10)
+	} else {
+		s.command(0x14)
+	}
+	s.command(ssd1306SetMemoryAddressingMode)
+	s.command(0x00)
+	s.command(ssd1306SetSegmentRemap0)
+	s.command(0x01)
+	s.command(ssd1306ComScanInc)
+	s.command(ssd1306SetComPins)
+	if s.DisplayHeight == 64 {
+		s.command(0x12)
+	} else {
+		s.command(0x02)
+	}
+	s.command(ssd1306SetContrast)
+	if s.DisplayHeight == 64 {
+		if s.ExternalVcc {
+			s.command(0x9F)
+		} else {
+			s.command(0xCF)
+		}
+	} else {
+		s.command(0x8F)
+	}
+	s.command(ssd1306SetPrechargePeriod)
+	if s.ExternalVcc {
+		s.command(0x22)
+	} else {
+		s.command(0xF1)
+	}
+	s.command(ssd1306SetVComDeselectLevel)
+	s.command(0x40)
+	s.command(ssd1306DisplayOnResumeToRAM)
+	s.command(ssd1306SetDisplayNormal)
+	s.command(ssd1306DeactivateScroll)
+	s.command(ssd1306SetDisplayOn)
+
+	return nil
+}
+
+func (s *SSD1306Driver) shutdown() (err error) {
+	s.Reset()
+	s.Off()
+	return nil
 }

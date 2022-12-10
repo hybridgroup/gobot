@@ -8,40 +8,6 @@ type spiConfig struct {
 	speed int64
 }
 
-// Config is the interface which describes how a Driver can specify
-// optional SPI params such as which SPI bus it wants to use.
-type Config interface {
-	// WithBus sets which bus to use
-	WithBus(bus int)
-
-	// GetBusOrDefault gets which bus to use
-	GetBusOrDefault(def int) int
-
-	// WithChip sets which chip to use
-	WithChip(chip int)
-
-	// GetChipOrDefault gets which chip to use
-	GetChipOrDefault(def int) int
-
-	// WithMode sets which mode to use
-	WithMode(mode int)
-
-	// GetModeOrDefault gets which mode to use
-	GetModeOrDefault(def int) int
-
-	// WithBIts sets how many bits to use
-	WithBits(bits int)
-
-	// GetBitsOrDefault gets how many bits to use
-	GetBitsOrDefault(def int) int
-
-	// WithSpeed sets which speed to use (in Hz)
-	WithSpeed(speed int64)
-
-	// GetSpeedOrDefault gets which speed to use (in Hz)
-	GetSpeedOrDefault(def int64) int64
-}
-
 // NewConfig returns a new SPI Config.
 func NewConfig() Config {
 	return &spiConfig{
