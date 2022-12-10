@@ -14,7 +14,8 @@ var _ gobot.Driver = (*MCP3202Driver)(nil)
 var _ aio.AnalogReader = (*MCP3202Driver)(nil)
 
 func initTestMCP3202Driver() *MCP3202Driver {
-	d := NewMCP3202Driver(&TestConnector{})
+	a := newSpiTestAdaptor()
+	d := NewMCP3202Driver(a)
 	return d
 }
 

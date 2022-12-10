@@ -64,7 +64,7 @@ func NewAdaptor() *Adaptor {
 	c.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, c.translateAndMuxPWMPin,
 		adaptors.WithPWMPinDefaultPeriod(pwmPeriodDefault))
 	c.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, c.validateI2cBusNumber, defaultI2cBusNumber)
-	c.SpiBusAdaptor = adaptors.NewSpiBusAdaptor(c.validateSpiBusNumber, defaultSpiBusNumber, defaultSpiChipNumber,
+	c.SpiBusAdaptor = adaptors.NewSpiBusAdaptor(sys, c.validateSpiBusNumber, defaultSpiBusNumber, defaultSpiChipNumber,
 		defaultSpiMode, defaultSpiBitsNumber, defaultSpiMaxSpeed)
 	return c
 }

@@ -6,11 +6,13 @@ import (
 
 	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot/drivers/spi"
+	"gobot.io/x/gobot/system"
 )
 
 type spiBusNumberValidator func(busNumber int) error
 
 type SpiBusAdaptor struct {
+	sys               *system.Accesser
 	validateNumber    spiBusNumberValidator
 	defaultBusNumber  int
 	defaultChipNumber int
@@ -21,8 +23,9 @@ type SpiBusAdaptor struct {
 	buses             map[int]spi.Connection
 }
 
-func NewSpiBusAdaptor(v spiBusNumberValidator, busNr, chipNum, mode, bits int, maxSpeed int64) *SpiBusAdaptor {
+func NewSpiBusAdaptor(sys *system.Accesser, v spiBusNumberValidator, busNr, chipNum, mode, bits int, maxSpeed int64) *SpiBusAdaptor {
 	a := &SpiBusAdaptor{
+		sys:               sys,
 		validateNumber:    v,
 		defaultBusNumber:  busNr,
 		defaultChipNumber: chipNum,
@@ -75,7 +78,7 @@ func (a *SpiBusAdaptor) GetSpiConnection(busNr, chipNum, mode, bits int, maxSpee
 			return nil, err
 		}
 		var err error
-		if bus, err = spi.GetSpiConnection(busNr, chipNum, mode, bits, maxSpeed); err != nil {
+		if bus, err = a.sys.NewSpiConnection(busNr, chipNum, mode, bits, maxSpeed); err != nil {
 			return nil, err
 		}
 		a.buses[busNr] = bus

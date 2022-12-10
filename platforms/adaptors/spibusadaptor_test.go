@@ -6,6 +6,7 @@ import (
 
 	"gobot.io/x/gobot/drivers/spi"
 	"gobot.io/x/gobot/gobottest"
+	"gobot.io/x/gobot/system"
 )
 
 // make sure that this SpiBusAdaptor fulfills all the required interfaces
@@ -18,8 +19,8 @@ func initTestSpiBusAdaptorWithMockedFilesystem() *SpiBusAdaptor {
 		}
 		return nil
 	}
-
-	a := NewSpiBusAdaptor(validator, 1, 2, 3, 4, 5)
+	sys := system.NewAccesser()
+	a := NewSpiBusAdaptor(sys, validator, 1, 2, 3, 4, 5)
 	if err := a.Connect(); err != nil {
 		panic(err)
 	}
@@ -28,13 +29,14 @@ func initTestSpiBusAdaptorWithMockedFilesystem() *SpiBusAdaptor {
 
 func TestNewSpiAdaptor(t *testing.T) {
 	// arrange
+	sys := system.NewAccesser()
 	validator := func(busNr int) error {
 		if busNr > 1 {
 			return fmt.Errorf("%d not valid", busNr)
 		}
 		return nil
 	}
-	a := NewSpiBusAdaptor(validator, 1, 2, 3, 4, 5)
+	a := NewSpiBusAdaptor(sys, validator, 1, 2, 3, 4, 5)
 	if err := a.Connect(); err != nil {
 		panic(err)
 	}
