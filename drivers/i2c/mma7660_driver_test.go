@@ -10,95 +10,66 @@ import (
 	"gobot.io/x/gobot/gobottest"
 )
 
+// this ensures that the implementation is based on i2c.Driver, which implements the gobot.Driver
+// and tests all implementations, so no further tests needed here for gobot.Driver interface
 var _ gobot.Driver = (*MMA7660Driver)(nil)
 
-// --------- HELPERS
-func initTestMMA7660Driver() (driver *MMA7660Driver) {
-	driver, _ = initTestMMA7660DriverWithStubbedAdaptor()
-	return
-}
-
 func initTestMMA7660DriverWithStubbedAdaptor() (*MMA7660Driver, *i2cTestAdaptor) {
-	adaptor := newI2cTestAdaptor()
-	return NewMMA7660Driver(adaptor), adaptor
+	a := newI2cTestAdaptor()
+	d := NewMMA7660Driver(a)
+	if err := d.Start(); err != nil {
+		panic(err)
+	}
+	return d, a
 }
-
-// --------- TESTS
 
 func TestNewMMA7660Driver(t *testing.T) {
-	// Does it return a pointer to an instance of MMA7660Driver?
-	var mma interface{} = NewMMA7660Driver(newI2cTestAdaptor())
-	_, ok := mma.(*MMA7660Driver)
+	var di interface{} = NewMMA7660Driver(newI2cTestAdaptor())
+	d, ok := di.(*MMA7660Driver)
 	if !ok {
 		t.Errorf("NewMMA7660Driver() should have returned a *MMA7660Driver")
 	}
+	gobottest.Refute(t, d.Driver, nil)
+	gobottest.Assert(t, strings.HasPrefix(d.Name(), "MMA7660"), true)
 }
 
-// Methods
-func TestMMA7660Driver(t *testing.T) {
-	mma := initTestMMA7660Driver()
-
-	gobottest.Refute(t, mma.Connection(), nil)
-	gobottest.Assert(t, strings.HasPrefix(mma.Name(), "MMA7660"), true)
-}
-
-func TestMMA7660DriverSetName(t *testing.T) {
-	d := initTestMMA7660Driver()
-	d.SetName("TESTME")
-	gobottest.Assert(t, d.Name(), "TESTME")
-}
-
-func TestMMA7660DriverOptions(t *testing.T) {
+func TestMMA7660Options(t *testing.T) {
+	// This is a general test, that options are applied in constructor by using the common WithBus() option and
+	// least one of this driver. Further tests for options can also be done by call of "WithOption(val)(d)".
 	d := NewMMA7660Driver(newI2cTestAdaptor(), WithBus(2))
 	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
 }
 
-func TestMMA7660DriverStart(t *testing.T) {
-	d := initTestMMA7660Driver()
+func TestMMA7660Start(t *testing.T) {
+	d := NewMMA7660Driver(newI2cTestAdaptor())
 	gobottest.Assert(t, d.Start(), nil)
 }
 
-func TestMMA7660StartConnectError(t *testing.T) {
-	d, adaptor := initTestMMA7660DriverWithStubbedAdaptor()
-	adaptor.Testi2cConnectErr(true)
-	gobottest.Assert(t, d.Start(), errors.New("Invalid i2c connection"))
-}
-
-func TestMMA7660DriverStartWriteError(t *testing.T) {
-	mma, adaptor := initTestMMA7660DriverWithStubbedAdaptor()
-	adaptor.i2cWriteImpl = func([]byte) (int, error) {
-		return 0, errors.New("write error")
-	}
-	gobottest.Assert(t, mma.Start(), errors.New("write error"))
-}
-
-func TestMMA7660DriverHalt(t *testing.T) {
-	d := initTestMMA7660Driver()
+func TestMMA7660Halt(t *testing.T) {
+	d, _ := initTestMMA7660DriverWithStubbedAdaptor()
 	gobottest.Assert(t, d.Halt(), nil)
 }
 
-func TestMMA7660DriverAcceleration(t *testing.T) {
-	d := initTestMMA7660Driver()
+func TestMMA7660Acceleration(t *testing.T) {
+	d, _ := initTestMMA7660DriverWithStubbedAdaptor()
 	x, y, z := d.Acceleration(21.0, 21.0, 21.0)
 	gobottest.Assert(t, x, 1.0)
 	gobottest.Assert(t, y, 1.0)
 	gobottest.Assert(t, z, 1.0)
 }
 
-func TestMMA7660DriverNullXYZ(t *testing.T) {
+func TestMMA7660NullXYZ(t *testing.T) {
 	d, _ := initTestMMA7660DriverWithStubbedAdaptor()
-	d.Start()
+
 	x, y, z, _ := d.XYZ()
 	gobottest.Assert(t, x, 0.0)
 	gobottest.Assert(t, y, 0.0)
 	gobottest.Assert(t, z, 0.0)
 }
 
-func TestMMA7660DriverXYZ(t *testing.T) {
-	d, adaptor := initTestMMA7660DriverWithStubbedAdaptor()
-	d.Start()
-
-	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+func TestMMA7660XYZ(t *testing.T) {
+	d, a := initTestMMA7660DriverWithStubbedAdaptor()
+	a.i2cReadImpl = func(b []byte) (int, error) {
 		buf := new(bytes.Buffer)
 		buf.Write([]byte{0x11, 0x12, 0x13})
 		copy(b, buf.Bytes())
@@ -111,11 +82,9 @@ func TestMMA7660DriverXYZ(t *testing.T) {
 	gobottest.Assert(t, z, 19.0)
 }
 
-func TestMMA7660DriverXYZError(t *testing.T) {
-	d, adaptor := initTestMMA7660DriverWithStubbedAdaptor()
-	d.Start()
-
-	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+func TestMMA7660XYZError(t *testing.T) {
+	d, a := initTestMMA7660DriverWithStubbedAdaptor()
+	a.i2cReadImpl = func(b []byte) (int, error) {
 		return 0, errors.New("read error")
 	}
 
@@ -123,11 +92,9 @@ func TestMMA7660DriverXYZError(t *testing.T) {
 	gobottest.Assert(t, err, errors.New("read error"))
 }
 
-func TestMMA7660DriverXYZNotReady(t *testing.T) {
-	d, adaptor := initTestMMA7660DriverWithStubbedAdaptor()
-	d.Start()
-
-	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+func TestMMA7660XYZNotReady(t *testing.T) {
+	d, a := initTestMMA7660DriverWithStubbedAdaptor()
+	a.i2cReadImpl = func(b []byte) (int, error) {
 		buf := new(bytes.Buffer)
 		buf.Write([]byte{0x40, 0x40, 0x40})
 		copy(b, buf.Bytes())

@@ -1,9 +1,5 @@
 package i2c
 
-import (
-	"gobot.io/x/gobot"
-)
-
 // DRV2605Mode - operating mode
 type DRV2605Mode uint8
 
@@ -20,7 +16,7 @@ const (
 )
 
 const (
-	drv2605Address = 0x5A
+	drv2605DefaultAddress = 0x5A
 
 	drv2605RegStatus = 0x00
 	drv2605RegMode   = 0x01
@@ -74,104 +70,30 @@ const (
 //  haptic.Go()
 //
 type DRV2605LDriver struct {
-	name       string
-	connector  Connector
-	connection Connection
-	Config
+	*Driver
 }
 
 // NewDRV2605LDriver creates a new driver for the DRV2605L device.
 //
 // Params:
-//		conn Connector - the Adaptor to use with this Driver
+//		c Connector - the Adaptor to use with this Driver
 //
 // Optional params:
 //		i2c.WithBus(int):	bus to use with this driver
 //		i2c.WithAddress(int):	address to use with this driver
 //
-func NewDRV2605LDriver(conn Connector, options ...func(Config)) *DRV2605LDriver {
-	driver := &DRV2605LDriver{
-		name:      gobot.DefaultName("DRV2605L"),
-		connector: conn,
-		Config:    NewConfig(),
+func NewDRV2605LDriver(c Connector, options ...func(Config)) *DRV2605LDriver {
+	d := &DRV2605LDriver{
+		Driver: NewDriver(c, "DRV2605L", drv2605DefaultAddress),
 	}
+	d.afterStart = d.initialize
+	d.beforeHalt = d.shutdown
 
 	for _, option := range options {
-		option(driver)
+		option(d)
 	}
 
-	return driver
-}
-
-// Name returns the name of the device.
-func (d *DRV2605LDriver) Name() string {
-	return d.name
-}
-
-// SetName sets the name of the device.
-func (d *DRV2605LDriver) SetName(name string) {
-	d.name = name
-}
-
-// Connection returns the connection of the device.
-func (d *DRV2605LDriver) Connection() gobot.Connection {
-	return d.connector.(gobot.Connection)
-}
-
-// Start initializes the device.
-func (d *DRV2605LDriver) Start() (err error) {
-	if err := d.initialize(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (d *DRV2605LDriver) writeByteRegisters(regValPairs []struct{ reg, val uint8 }) (err error) {
-	for _, rv := range regValPairs {
-		if err = d.connection.WriteByteData(rv.reg, rv.val); err != nil {
-			break
-		}
-	}
-	return err
-}
-
-func (d *DRV2605LDriver) initialize() (err error) {
-	bus := d.GetBusOrDefault(d.connector.DefaultBus())
-	address := d.GetAddressOrDefault(drv2605Address)
-
-	d.connection, err = d.connector.GetConnection(address, bus)
-	if err != nil {
-		return
-	}
-
-	feedback, err := d.connection.ReadByteData(drv2605RegFeedback)
-	if err != nil {
-		return
-	}
-
-	control, err := d.connection.ReadByteData(drv2605RegControl3)
-	if err != nil {
-		return
-	}
-
-	err = d.writeByteRegisters([]struct{ reg, val uint8 }{
-		// leave standby, enter "internal trig" mode
-		{drv2605RegMode, 0},
-		// turn off real-time play
-		{drv2605RegRTPin, 0},
-		// init wave sequencer with "strong click"
-		{drv2605RegWaveSeq1, 1},
-		{drv2605RegWaveSeq1, 0},
-		// no physical parameter tweaks
-		{drv2605RegSustainPos, 0},
-		{drv2605RegSustainNeg, 0},
-		{drv2605RegBreak, 0},
-		// set up ERM open loop
-		{drv2605RegFeedback, feedback & 0x7f},
-		{drv2605RegControl3, control | 0x20},
-	})
-
-	return
+	return d
 }
 
 // SetMode sets the device in one of the eight modes as described in the
@@ -255,8 +177,45 @@ func (d *DRV2605LDriver) Go() (err error) {
 	return err
 }
 
-// Halt halts the device.
-func (d *DRV2605LDriver) Halt() (err error) {
+func (d *DRV2605LDriver) writeByteRegisters(regValPairs []struct{ reg, val uint8 }) (err error) {
+	for _, rv := range regValPairs {
+		if err = d.connection.WriteByteData(rv.reg, rv.val); err != nil {
+			break
+		}
+	}
+	return err
+}
+
+func (d *DRV2605LDriver) initialize() error {
+	feedback, err := d.connection.ReadByteData(drv2605RegFeedback)
+	if err != nil {
+		return err
+	}
+
+	control, err := d.connection.ReadByteData(drv2605RegControl3)
+	if err != nil {
+		return err
+	}
+
+	return d.writeByteRegisters([]struct{ reg, val uint8 }{
+		// leave standby, enter "internal trig" mode
+		{drv2605RegMode, 0},
+		// turn off real-time play
+		{drv2605RegRTPin, 0},
+		// init wave sequencer with "strong click"
+		{drv2605RegWaveSeq1, 1},
+		{drv2605RegWaveSeq1, 0},
+		// no physical parameter tweaks
+		{drv2605RegSustainPos, 0},
+		{drv2605RegSustainNeg, 0},
+		{drv2605RegBreak, 0},
+		// set up ERM open loop
+		{drv2605RegFeedback, feedback & 0x7f},
+		{drv2605RegControl3, control | 0x20},
+	})
+}
+
+func (d *DRV2605LDriver) shutdown() (err error) {
 	if d.connection != nil {
 		// stop playback
 		if err = d.connection.WriteByteData(drv2605RegGo, 0); err != nil {

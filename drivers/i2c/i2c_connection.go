@@ -92,18 +92,6 @@ type I2cDevice interface {
 	SetAddress(int) error
 }
 
-// Connector lets Adaptors provide the interface for Drivers
-// to get access to the I2C buses on platforms that support I2C.
-type Connector interface {
-	// GetConnection creates and returns a connection to device at the specified address
-	// and bus. Bus numbering starts at index 0, the range of valid buses is
-	// platform specific.
-	GetConnection(address int, busNr int) (device Connection, err error)
-
-	// DefaultBus returns the default I2C bus index
-	DefaultBus() int
-}
-
 // Connection is a connection to an I2C device with a specified address
 // on a specific bus. Used as an alternative to the I2c interface.
 // Implements I2cOperations to talk to the device, wrapping the

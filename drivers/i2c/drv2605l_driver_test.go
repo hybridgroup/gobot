@@ -4,110 +4,90 @@ import (
 	"bytes"
 	"encoding/binary"
 	"errors"
+	"strings"
 	"testing"
 
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/gobottest"
 )
 
+// this ensures that the implementation is based on i2c.Driver, which implements the gobot.Driver
+// and tests all implementations, so no further tests needed here for gobot.Driver interface
 var _ gobot.Driver = (*DRV2605LDriver)(nil)
 
-// --------- HELPERS
-
-func initTestDriverAndAdaptor() (*DRV2605LDriver, *i2cTestAdaptor) {
-	adaptor := newI2cTestAdaptor()
+func initTestDRV2605LDriverWithStubbedAdaptor() (*DRV2605LDriver, *i2cTestAdaptor) {
+	a := newI2cTestAdaptor()
 	// Prime adapter reader to make "Start()" call happy
-	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+	a.i2cReadImpl = func(b []byte) (int, error) {
 		buf := new(bytes.Buffer)
 		binary.Write(buf, binary.LittleEndian, uint8(42))
 		copy(b, buf.Bytes())
 		return buf.Len(), nil
 	}
-	return NewDRV2605LDriver(adaptor), adaptor
+	d := NewDRV2605LDriver(a)
+	if err := d.Start(); err != nil {
+		panic(err)
+	}
+	return d, a
 }
 
-// --------- TESTS
-
-func TestDRV2605LDriver(t *testing.T) {
-	d, _ := initTestDriverAndAdaptor()
-	gobottest.Refute(t, d.Connection(), nil)
+func TestNewDRV2605LDriver(t *testing.T) {
+	var di interface{} = NewDRV2605LDriver(newI2cTestAdaptor())
+	d, ok := di.(*DRV2605LDriver)
+	if !ok {
+		t.Errorf("NewDRV2605LDriver() should have returned a *DRV2605LDriver")
+	}
+	gobottest.Refute(t, d.Driver, nil)
+	gobottest.Assert(t, strings.HasPrefix(d.Name(), "DRV2605L"), true)
 }
 
-func TestDRV2605LDriverStart(t *testing.T) {
-	d, _ := initTestDriverAndAdaptor()
+func TestDRV2605LOptions(t *testing.T) {
+	// This is a general test, that options are applied in constructor by using the common WithBus() option and
+	// least one of this driver. Further tests for options can also be done by call of "WithOption(val)(d)".
+	d := NewDRV2605LDriver(newI2cTestAdaptor(), WithBus(2))
+	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
+}
+
+func TestDRV2605LStart(t *testing.T) {
+	d := NewDRV2605LDriver(newI2cTestAdaptor())
 	gobottest.Assert(t, d.Start(), nil)
 }
 
-func TestDRV2605LStartConnectError(t *testing.T) {
-	d, adaptor := initTestDriverAndAdaptor()
-	adaptor.Testi2cConnectErr(true)
-	gobottest.Assert(t, d.Start(), errors.New("Invalid i2c connection"))
-}
-
-func TestDRVD2605DriverStartWriteError(t *testing.T) {
-	d, a := initTestDriverAndAdaptor()
-	a.i2cWriteImpl = func(b []byte) (int, error) {
-		return 0, errors.New("write error")
-	}
-	gobottest.Assert(t, d.Start(), errors.New("write error"))
-}
-
-func TestDRVD2605DriverStartReadError(t *testing.T) {
-	d, a := initTestDriverAndAdaptor()
-	a.i2cReadImpl = func(b []byte) (int, error) {
-		return 0, errors.New("read error")
-	}
-	gobottest.Assert(t, d.Start(), errors.New("read error"))
-}
-
-func TestDRV2605LDriverHalt(t *testing.T) {
+func TestDRV2605LHalt(t *testing.T) {
 	writeStopPlaybackData := []byte{drv2605RegGo, 0}
 	// single-byte-read starts with a write operation to set the register for reading
 	// see section 8.5.3.5 of data sheet
 	readCurrentStandbyModeData := byte(drv2605RegMode)
 	writeNewStandbyModeData := []byte{drv2605RegMode, 42 | drv2605Standby}
-	d, adaptor := initTestDriverAndAdaptor()
-	gobottest.Assert(t, d.Start(), nil)
-	adaptor.written = []byte{}
+	d, a := initTestDRV2605LDriverWithStubbedAdaptor()
+	a.written = []byte{}
 	gobottest.Assert(t, d.Halt(), nil)
-	gobottest.Assert(t, adaptor.written, append(append(writeStopPlaybackData, readCurrentStandbyModeData), writeNewStandbyModeData...))
+	gobottest.Assert(t, a.written, append(append(writeStopPlaybackData, readCurrentStandbyModeData), writeNewStandbyModeData...))
 }
 
-func TestDRVD2605DriverHaltWriteError(t *testing.T) {
-	d, a := initTestDriverAndAdaptor()
-	d.Start()
-	a.i2cWriteImpl = func(b []byte) (int, error) {
-		return 0, errors.New("write error")
-	}
-	gobottest.Assert(t, d.Halt(), errors.New("write error"))
-}
-
-func TestDRV2605LDriverGetPause(t *testing.T) {
-	d, _ := initTestDriverAndAdaptor()
-	gobottest.Assert(t, d.Start(), nil)
+func TestDRV2605LGetPause(t *testing.T) {
+	d, _ := initTestDRV2605LDriverWithStubbedAdaptor()
 	gobottest.Assert(t, d.GetPauseWaveform(0), uint8(0x80))
 	gobottest.Assert(t, d.GetPauseWaveform(1), uint8(0x81))
 	gobottest.Assert(t, d.GetPauseWaveform(128), d.GetPauseWaveform(127))
 }
 
-func TestDRV2605LDriverSequenceTermination(t *testing.T) {
-	d, adaptor := initTestDriverAndAdaptor()
-	gobottest.Assert(t, d.Start(), nil)
-	adaptor.written = []byte{}
+func TestDRV2605LSequenceTermination(t *testing.T) {
+	d, a := initTestDRV2605LDriverWithStubbedAdaptor()
+	a.written = []byte{}
 	gobottest.Assert(t, d.SetSequence([]byte{1, 2}), nil)
-	gobottest.Assert(t, adaptor.written, []byte{
+	gobottest.Assert(t, a.written, []byte{
 		drv2605RegWaveSeq1, 1,
 		drv2605RegWaveSeq2, 2,
 		drv2605RegWaveSeq3, 0,
 	})
 }
 
-func TestDRV2605LDriverSequenceTruncation(t *testing.T) {
-	d, adaptor := initTestDriverAndAdaptor()
-	gobottest.Assert(t, d.Start(), nil)
-	adaptor.written = []byte{}
+func TestDRV2605LSequenceTruncation(t *testing.T) {
+	d, a := initTestDRV2605LDriverWithStubbedAdaptor()
+	a.written = []byte{}
 	gobottest.Assert(t, d.SetSequence([]byte{1, 2, 3, 4, 5, 6, 7, 8, 99, 100}), nil)
-	gobottest.Assert(t, adaptor.written, []byte{
+	gobottest.Assert(t, a.written, []byte{
 		drv2605RegWaveSeq1, 1,
 		drv2605RegWaveSeq2, 2,
 		drv2605RegWaveSeq3, 3,
@@ -119,57 +99,38 @@ func TestDRV2605LDriverSequenceTruncation(t *testing.T) {
 	})
 }
 
-func TestDRV2605LDriverSetName(t *testing.T) {
-	d, _ := initTestDriverAndAdaptor()
-	d.SetName("TESTME")
-	gobottest.Assert(t, d.Name(), "TESTME")
-}
-
-func TestDRV2605DriverOptions(t *testing.T) {
-	d := NewDRV2605LDriver(newI2cTestAdaptor(), WithBus(2))
-	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
-}
-
-func TestDRV2605LDriverSetMode(t *testing.T) {
-	d, _ := initTestDriverAndAdaptor()
-	d.Start()
+func TestDRV2605LSetMode(t *testing.T) {
+	d, _ := initTestDRV2605LDriverWithStubbedAdaptor()
 	gobottest.Assert(t, d.SetMode(DRV2605ModeIntTrig), nil)
 }
 
-func TestDRV2605LDriverSetModeReadError(t *testing.T) {
-	d, a := initTestDriverAndAdaptor()
-	d.Start()
-
+func TestDRV2605LSetModeReadError(t *testing.T) {
+	d, a := initTestDRV2605LDriverWithStubbedAdaptor()
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		return 0, errors.New("read error")
 	}
 	gobottest.Assert(t, d.SetMode(DRV2605ModeIntTrig), errors.New("read error"))
 }
 
-func TestDRV2605LDriverSetStandbyMode(t *testing.T) {
-	d, _ := initTestDriverAndAdaptor()
-	d.Start()
+func TestDRV2605LSetStandbyMode(t *testing.T) {
+	d, _ := initTestDRV2605LDriverWithStubbedAdaptor()
 	gobottest.Assert(t, d.SetStandbyMode(true), nil)
 }
 
-func TestDRV2605LDriverSetStandbyModeReadError(t *testing.T) {
-	d, a := initTestDriverAndAdaptor()
-	d.Start()
-
+func TestDRV2605LSetStandbyModeReadError(t *testing.T) {
+	d, a := initTestDRV2605LDriverWithStubbedAdaptor()
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		return 0, errors.New("read error")
 	}
 	gobottest.Assert(t, d.SetStandbyMode(true), errors.New("read error"))
 }
 
-func TestDRV2605LDriverSelectLibrary(t *testing.T) {
-	d, _ := initTestDriverAndAdaptor()
-	d.Start()
+func TestDRV2605LSelectLibrary(t *testing.T) {
+	d, _ := initTestDRV2605LDriverWithStubbedAdaptor()
 	gobottest.Assert(t, d.SelectLibrary(1), nil)
 }
 
-func TestDRV2605LDriverGo(t *testing.T) {
-	d, _ := initTestDriverAndAdaptor()
-	d.Start()
+func TestDRV2605LGo(t *testing.T) {
+	d, _ := initTestDRV2605LDriverWithStubbedAdaptor()
 	gobottest.Assert(t, d.Go(), nil)
 }

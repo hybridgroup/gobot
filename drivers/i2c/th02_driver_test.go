@@ -2,6 +2,7 @@ package i2c
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 	"time"
 
@@ -9,9 +10,11 @@ import (
 	"gobot.io/x/gobot/gobottest"
 )
 
+// this ensures that the implementation is based on i2c.Driver, which implements the gobot.Driver
+// and tests all implementations, so no further tests needed here for gobot.Driver interface
 var _ gobot.Driver = (*TH02Driver)(nil)
 
-func initTH02WithStubbedAdaptor() (*TH02Driver, *i2cTestAdaptor) {
+func initTestTH02DriverWithStubbedAdaptor() (*TH02Driver, *i2cTestAdaptor) {
 	adaptor := newI2cTestAdaptor()
 	driver := NewTH02Driver(adaptor)
 	if err := driver.Start(); err != nil {
@@ -21,15 +24,16 @@ func initTH02WithStubbedAdaptor() (*TH02Driver, *i2cTestAdaptor) {
 }
 
 func TestNewTH02Driver(t *testing.T) {
-	var id interface{} = NewTH02Driver(newI2cTestAdaptor())
-	d, ok := id.(*TH02Driver)
+	var di interface{} = NewTH02Driver(newI2cTestAdaptor())
+	d, ok := di.(*TH02Driver)
 	if !ok {
 		t.Errorf("NewTH02Driver() should have returned a *NewTH02Driver")
 	}
 	gobottest.Refute(t, d.Driver, nil)
+	gobottest.Assert(t, strings.HasPrefix(d.Name(), "TH02"), true)
 }
 
-func TestNewTH02DriverOptions(t *testing.T) {
+func TestTH02Options(t *testing.T) {
 	// This is a general test, that options are applied in constructor by using the common options.
 	// Further tests for options can also be done by call of "WithOption(val)(d)".
 	d := NewTH02Driver(newI2cTestAdaptor(), WithBus(2), WithAddress(0x42))
@@ -38,8 +42,7 @@ func TestNewTH02DriverOptions(t *testing.T) {
 }
 
 func TestTH02SetAccuracy(t *testing.T) {
-	a := newI2cTestAdaptor()
-	b := NewTH02Driver(a)
+	b := NewTH02Driver(newI2cTestAdaptor())
 
 	if b.SetAccuracy(0x42); b.Accuracy() != TH02HighAccuracy {
 		t.Error("Setting an invalid accuracy should resolve to TH02HighAccuracy")
@@ -90,7 +93,7 @@ func TestTH02FastMode(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
-			d, a := initTH02WithStubbedAdaptor()
+			d, a := initTestTH02DriverWithStubbedAdaptor()
 			a.i2cReadImpl = func(b []byte) (int, error) {
 				b[0] = tc.read
 				return len(b), nil
@@ -122,7 +125,7 @@ func TestTH02SetHeater(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
-			d, a := initTH02WithStubbedAdaptor()
+			d, a := initTestTH02DriverWithStubbedAdaptor()
 			// act
 			err := d.SetHeater(tc.heater)
 			// assert
@@ -150,7 +153,7 @@ func TestTH02Heater(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
-			d, a := initTH02WithStubbedAdaptor()
+			d, a := initTestTH02DriverWithStubbedAdaptor()
 			a.i2cReadImpl = func(b []byte) (int, error) {
 				b[0] = tc.read
 				return len(b), nil
@@ -173,7 +176,7 @@ func TestTH02SerialNumber(t *testing.T) {
 	// * use the higher nibble of byte
 
 	// arrange
-	d, a := initTH02WithStubbedAdaptor()
+	d, a := initTestTH02DriverWithStubbedAdaptor()
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		b[0] = 0x4F
 		return len(b), nil
@@ -257,7 +260,7 @@ func TestTH02Sample(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
-			d, a := initTH02WithStubbedAdaptor()
+			d, a := initTestTH02DriverWithStubbedAdaptor()
 			var reg uint8
 			var regVal uint8
 			a.i2cWriteImpl = func(b []byte) (int, error) {
@@ -301,7 +304,7 @@ func TestTH02Sample(t *testing.T) {
 }
 
 func TestTH02_readData(t *testing.T) {
-	d, a := initTH02WithStubbedAdaptor()
+	d, a := initTestTH02DriverWithStubbedAdaptor()
 
 	var callCounter int
 
@@ -418,7 +421,7 @@ func TestTH02_readData(t *testing.T) {
 }
 
 func TestTH02_waitForReadyFailOnTimeout(t *testing.T) {
-	d, a := initTH02WithStubbedAdaptor()
+	d, a := initTestTH02DriverWithStubbedAdaptor()
 
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		time.Sleep(50 * time.Millisecond)
@@ -433,7 +436,7 @@ func TestTH02_waitForReadyFailOnTimeout(t *testing.T) {
 }
 
 func TestTH02_waitForReadyFailOnReadError(t *testing.T) {
-	d, a := initTH02WithStubbedAdaptor()
+	d, a := initTestTH02DriverWithStubbedAdaptor()
 
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		time.Sleep(50 * time.Millisecond)

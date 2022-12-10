@@ -3,66 +3,63 @@ package i2c
 import (
 	"bytes"
 	"errors"
+	"strings"
 	"testing"
 
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/gobottest"
 )
 
+// this ensures that the implementation is based on i2c.Driver, which implements the gobot.Driver
+// and tests all implementations, so no further tests needed here for gobot.Driver interface
 var _ gobot.Driver = (*LIDARLiteDriver)(nil)
 
-// --------- HELPERS
 func initTestLIDARLiteDriver() (driver *LIDARLiteDriver) {
 	driver, _ = initTestLIDARLiteDriverWithStubbedAdaptor()
 	return
 }
 
 func initTestLIDARLiteDriverWithStubbedAdaptor() (*LIDARLiteDriver, *i2cTestAdaptor) {
-	adaptor := newI2cTestAdaptor()
-	return NewLIDARLiteDriver(adaptor), adaptor
+	a := newI2cTestAdaptor()
+	d := NewLIDARLiteDriver(a)
+	if err := d.Start(); err != nil {
+		panic(err)
+	}
+	return d, a
 }
 
-// --------- TESTS
-
 func TestNewLIDARLiteDriver(t *testing.T) {
-	// Does it return a pointer to an instance of LIDARLiteDriver?
-	var bm interface{} = NewLIDARLiteDriver(newI2cTestAdaptor())
-	_, ok := bm.(*LIDARLiteDriver)
+	var di interface{} = NewLIDARLiteDriver(newI2cTestAdaptor())
+	d, ok := di.(*LIDARLiteDriver)
 	if !ok {
 		t.Errorf("NewLIDARLiteDriver() should have returned a *LIDARLiteDriver")
 	}
-
-	b := NewLIDARLiteDriver(newI2cTestAdaptor())
-	gobottest.Refute(t, b.Connection(), nil)
+	gobottest.Refute(t, d.Driver, nil)
+	gobottest.Assert(t, strings.HasPrefix(d.Name(), "LIDARLite"), true)
 }
 
-// Methods
+func TestLIDARLiteDriverOptions(t *testing.T) {
+	// This is a general test, that options are applied in constructor by using the common WithBus() option and
+	// least one of this driver. Further tests for options can also be done by call of "WithOption(val)(d)".
+	d := NewLIDARLiteDriver(newI2cTestAdaptor(), WithBus(2))
+	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
+}
+
 func TestLIDARLiteDriverStart(t *testing.T) {
-	hmc, _ := initTestLIDARLiteDriverWithStubbedAdaptor()
-
-	gobottest.Assert(t, hmc.Start(), nil)
-}
-
-func TestLIDARLiteStartConnectError(t *testing.T) {
-	d, adaptor := initTestLIDARLiteDriverWithStubbedAdaptor()
-	adaptor.Testi2cConnectErr(true)
-	gobottest.Assert(t, d.Start(), errors.New("Invalid i2c connection"))
+	d := NewLIDARLiteDriver(newI2cTestAdaptor())
+	gobottest.Assert(t, d.Start(), nil)
 }
 
 func TestLIDARLiteDriverHalt(t *testing.T) {
-	hmc := initTestLIDARLiteDriver()
-
-	gobottest.Assert(t, hmc.Halt(), nil)
+	d := initTestLIDARLiteDriver()
+	gobottest.Assert(t, d.Halt(), nil)
 }
 
 func TestLIDARLiteDriverDistance(t *testing.T) {
 	// when everything is happy
-	hmc, adaptor := initTestLIDARLiteDriverWithStubbedAdaptor()
-
-	gobottest.Assert(t, hmc.Start(), nil)
-
+	d, a := initTestLIDARLiteDriverWithStubbedAdaptor()
 	first := true
-	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+	a.i2cReadImpl = func(b []byte) (int, error) {
 		if first {
 			first = false
 			copy(b, []byte{99})
@@ -72,96 +69,73 @@ func TestLIDARLiteDriverDistance(t *testing.T) {
 		return 1, nil
 	}
 
-	distance, err := hmc.Distance()
+	distance, err := d.Distance()
 
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, distance, int(25345))
 
 	// when insufficient bytes have been read
-	hmc, adaptor = initTestLIDARLiteDriverWithStubbedAdaptor()
-
-	gobottest.Assert(t, hmc.Start(), nil)
-
-	adaptor.i2cReadImpl = func([]byte) (int, error) {
+	d, a = initTestLIDARLiteDriverWithStubbedAdaptor()
+	a.i2cReadImpl = func([]byte) (int, error) {
 		return 0, nil
 	}
 
-	distance, err = hmc.Distance()
+	distance, err = d.Distance()
 	gobottest.Assert(t, distance, int(0))
 	gobottest.Assert(t, err, ErrNotEnoughBytes)
 
 	// when read error
-	hmc, adaptor = initTestLIDARLiteDriverWithStubbedAdaptor()
-
-	gobottest.Assert(t, hmc.Start(), nil)
-
-	adaptor.i2cReadImpl = func([]byte) (int, error) {
+	d, a = initTestLIDARLiteDriverWithStubbedAdaptor()
+	a.i2cReadImpl = func([]byte) (int, error) {
 		return 0, errors.New("read error")
 	}
 
-	distance, err = hmc.Distance()
+	distance, err = d.Distance()
 	gobottest.Assert(t, distance, int(0))
 	gobottest.Assert(t, err, errors.New("read error"))
 }
 
 func TestLIDARLiteDriverDistanceError1(t *testing.T) {
-	hmc, adaptor := initTestLIDARLiteDriverWithStubbedAdaptor()
-	gobottest.Assert(t, hmc.Start(), nil)
-
-	adaptor.i2cWriteImpl = func([]byte) (int, error) {
+	d, a := initTestLIDARLiteDriverWithStubbedAdaptor()
+	a.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
 	}
 
-	distance, err := hmc.Distance()
+	distance, err := d.Distance()
 	gobottest.Assert(t, distance, int(0))
 	gobottest.Assert(t, err, errors.New("write error"))
 }
 
 func TestLIDARLiteDriverDistanceError2(t *testing.T) {
-	hmc, adaptor := initTestLIDARLiteDriverWithStubbedAdaptor()
-	gobottest.Assert(t, hmc.Start(), nil)
-
-	adaptor.i2cWriteImpl = func(b []byte) (int, error) {
+	d, a := initTestLIDARLiteDriverWithStubbedAdaptor()
+	a.i2cWriteImpl = func(b []byte) (int, error) {
 		if b[0] == 0x0f {
 			return 0, errors.New("write error")
 		}
 		return len(b), nil
 	}
 
-	distance, err := hmc.Distance()
+	distance, err := d.Distance()
 	gobottest.Assert(t, distance, int(0))
 	gobottest.Assert(t, err, errors.New("write error"))
 }
 
 func TestLIDARLiteDriverDistanceError3(t *testing.T) {
-	hmc, adaptor := initTestLIDARLiteDriverWithStubbedAdaptor()
-	gobottest.Assert(t, hmc.Start(), nil)
-
-	adaptor.i2cWriteImpl = func(b []byte) (int, error) {
+	d, a := initTestLIDARLiteDriverWithStubbedAdaptor()
+	a.i2cWriteImpl = func(b []byte) (int, error) {
 		if b[0] == 0x10 {
 			return 0, errors.New("write error")
 		}
 		return len(b), nil
 	}
-	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+	a.i2cReadImpl = func(b []byte) (int, error) {
 		buf := new(bytes.Buffer)
 		buf.Write([]byte{0x03})
 		copy(b, buf.Bytes())
 		return buf.Len(), nil
 	}
 
-	distance, err := hmc.Distance()
+	distance, err := d.Distance()
 	gobottest.Assert(t, distance, int(0))
 	gobottest.Assert(t, err, errors.New("write error"))
-}
-
-func TestLIDARLiteDriverSetName(t *testing.T) {
-	l := initTestLIDARLiteDriver()
-	l.SetName("TESTME")
-	gobottest.Assert(t, l.Name(), "TESTME")
-}
-
-func TestLIDARLiteDriverOptions(t *testing.T) {
-	l := NewLIDARLiteDriver(newI2cTestAdaptor(), WithBus(2))
-	gobottest.Assert(t, l.GetBusOrDefault(1), 2)
 }

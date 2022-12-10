@@ -2,6 +2,7 @@ package i2c
 
 import (
 	"errors"
+	"strings"
 	"testing"
 
 	"gobot.io/x/gobot"
@@ -32,7 +33,9 @@ var (
 func initPCA9501WithStubbedAdaptor() (*PCA9501Driver, *i2cTestAdaptor) {
 	a := newI2cTestAdaptor()
 	d := NewPCA9501Driver(a)
-	d.Start()
+	if err := d.Start(); err != nil {
+		panic(err)
+	}
 	return d, a
 }
 
@@ -45,6 +48,14 @@ func TestNewPCA9501Driver(t *testing.T) {
 		t.Errorf("NewPCA9501Driver() should have returned a *PCA9501Driver")
 	}
 	gobottest.Refute(t, d.Driver, nil)
+	gobottest.Assert(t, strings.HasPrefix(d.Name(), "PCA9501"), true)
+}
+
+func TestPCA9501Options(t *testing.T) {
+	// This is a general test, that options are applied in constructor by using the common WithBus() option and
+	// least one of this driver. Further tests for options can also be done by call of "WithOption(val)(d)".
+	d := NewPCA9501Driver(newI2cTestAdaptor(), WithBus(2))
+	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
 }
 
 func TestPCA9501CommandsWriteGPIO(t *testing.T) {

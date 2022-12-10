@@ -33,26 +33,26 @@ func initTestAdaptorI2c() *Adaptor {
 	return a
 }
 
-func TestDigisparkAdaptorI2cGetConnection(t *testing.T) {
+func TestDigisparkAdaptorI2cGetI2cConnection(t *testing.T) {
 	// arrange
 	var c i2c.Connection
 	var err error
 	a := initTestAdaptorI2c()
 
 	// act
-	c, err = a.GetConnection(availableI2cAddress, a.DefaultBus())
+	c, err = a.GetI2cConnection(availableI2cAddress, a.DefaultI2cBus())
 
 	// assert
 	gobottest.Assert(t, err, nil)
 	gobottest.Refute(t, c, nil)
 }
 
-func TestDigisparkAdaptorI2cGetConnectionFailWithInvalidBus(t *testing.T) {
+func TestDigisparkAdaptorI2cGetI2cConnectionFailWithInvalidBus(t *testing.T) {
 	// arrange
 	a := initTestAdaptorI2c()
 
 	// act
-	c, err := a.GetConnection(0x40, 1)
+	c, err := a.GetI2cConnection(0x40, 1)
 
 	// assert
 	gobottest.Assert(t, err, errors.New("Invalid bus number 1, only 0 is supported"))
@@ -63,7 +63,7 @@ func TestDigisparkAdaptorI2cStartFailWithWrongAddress(t *testing.T) {
 	// arrange
 	data := []byte{0, 1, 2, 3, 4}
 	a := initTestAdaptorI2c()
-	c, err := a.GetConnection(0x39, a.DefaultBus())
+	c, err := a.GetI2cConnection(0x39, a.DefaultI2cBus())
 
 	// act
 	count, err := c.Write(data)
@@ -79,7 +79,7 @@ func TestDigisparkAdaptorI2cWrite(t *testing.T) {
 	data := []byte{0, 1, 2, 3, 4}
 	dataLen := len(data)
 	a := initTestAdaptorI2c()
-	c, err := a.GetConnection(availableI2cAddress, a.DefaultBus())
+	c, err := a.GetI2cConnection(availableI2cAddress, a.DefaultI2cBus())
 
 	// act
 	count, err := c.Write(data)
@@ -99,7 +99,7 @@ func TestDigisparkAdaptorI2cWriteByte(t *testing.T) {
 	// arrange
 	data := byte(0x02)
 	a := initTestAdaptorI2c()
-	c, err := a.GetConnection(availableI2cAddress, a.DefaultBus())
+	c, err := a.GetI2cConnection(availableI2cAddress, a.DefaultI2cBus())
 
 	// act
 	err = c.WriteByte(data)
@@ -119,7 +119,7 @@ func TestDigisparkAdaptorI2cWriteByteData(t *testing.T) {
 	reg := uint8(0x03)
 	data := byte(0x09)
 	a := initTestAdaptorI2c()
-	c, err := a.GetConnection(availableI2cAddress, a.DefaultBus())
+	c, err := a.GetI2cConnection(availableI2cAddress, a.DefaultI2cBus())
 
 	// act
 	err = c.WriteByteData(reg, data)
@@ -139,7 +139,7 @@ func TestDigisparkAdaptorI2cWriteWordData(t *testing.T) {
 	reg := uint8(0x04)
 	data := uint16(0x0508)
 	a := initTestAdaptorI2c()
-	c, err := a.GetConnection(availableI2cAddress, a.DefaultBus())
+	c, err := a.GetI2cConnection(availableI2cAddress, a.DefaultI2cBus())
 
 	// act
 	err = c.WriteWordData(reg, data)
@@ -159,7 +159,7 @@ func TestDigisparkAdaptorI2cWriteBlockData(t *testing.T) {
 	reg := uint8(0x05)
 	data := []byte{0x80, 0x81, 0x82}
 	a := initTestAdaptorI2c()
-	c, err := a.GetConnection(availableI2cAddress, a.DefaultBus())
+	c, err := a.GetI2cConnection(availableI2cAddress, a.DefaultI2cBus())
 
 	// act
 	err = c.WriteBlockData(reg, data)
@@ -179,7 +179,7 @@ func TestDigisparkAdaptorI2cRead(t *testing.T) {
 	data := []byte{0, 1, 2, 3, 4}
 	dataLen := len(data)
 	a := initTestAdaptorI2c()
-	c, err := a.GetConnection(availableI2cAddress, a.DefaultBus())
+	c, err := a.GetI2cConnection(availableI2cAddress, a.DefaultI2cBus())
 
 	// act
 	count, err := c.Read(data)
@@ -198,7 +198,7 @@ func TestDigisparkAdaptorI2cRead(t *testing.T) {
 func TestDigisparkAdaptorI2cReadByte(t *testing.T) {
 	// arrange
 	a := initTestAdaptorI2c()
-	c, err := a.GetConnection(availableI2cAddress, a.DefaultBus())
+	c, err := a.GetI2cConnection(availableI2cAddress, a.DefaultI2cBus())
 
 	// act
 	data, err := c.ReadByte()
@@ -217,7 +217,7 @@ func TestDigisparkAdaptorI2cReadByteData(t *testing.T) {
 	// arrange
 	reg := uint8(0x04)
 	a := initTestAdaptorI2c()
-	c, err := a.GetConnection(availableI2cAddress, a.DefaultBus())
+	c, err := a.GetI2cConnection(availableI2cAddress, a.DefaultI2cBus())
 
 	// act
 	data, err := c.ReadByteData(reg)
@@ -239,7 +239,7 @@ func TestDigisparkAdaptorI2cReadWordData(t *testing.T) {
 	// 2 bytes of i2cData are used swapped
 	expectedValue := uint16(0x0405)
 	a := initTestAdaptorI2c()
-	c, err := a.GetConnection(availableI2cAddress, a.DefaultBus())
+	c, err := a.GetI2cConnection(availableI2cAddress, a.DefaultI2cBus())
 
 	// act
 	data, err := c.ReadWordData(reg)
@@ -261,7 +261,7 @@ func TestDigisparkAdaptorI2cReadBlockData(t *testing.T) {
 	data := []byte{0, 0, 0, 0, 0}
 	dataLen := len(data)
 	a := initTestAdaptorI2c()
-	c, err := a.GetConnection(availableI2cAddress, a.DefaultBus())
+	c, err := a.GetI2cConnection(availableI2cAddress, a.DefaultI2cBus())
 
 	// act
 	err = c.ReadBlockData(reg, data)
@@ -282,7 +282,7 @@ func TestDigisparkAdaptorI2cUpdateDelay(t *testing.T) {
 	var c i2c.Connection
 	var err error
 	a := initTestAdaptorI2c()
-	c, err = a.GetConnection(availableI2cAddress, a.DefaultBus())
+	c, err = a.GetI2cConnection(availableI2cAddress, a.DefaultI2cBus())
 
 	// act
 	err = c.(*digisparkI2cConnection).UpdateDelay(uint(100))
