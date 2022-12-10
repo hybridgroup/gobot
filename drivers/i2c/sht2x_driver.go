@@ -27,10 +27,9 @@ import (
 	"github.com/sigurn/crc8"
 )
 
-const (
-	// SHT2xDefaultAddress is the default I2C address for SHT2x
-	SHT2xDefaultAddress = 0x40
+const sht2xDefaultAddress = 0x40
 
+const (
 	// SHT2xAccuracyLow is the faster, but lower accuracy sample setting
 	//  0/1 = 8bit RH, 12bit Temp
 	SHT2xAccuracyLow = byte(0x01)
@@ -86,9 +85,17 @@ type SHT2xDriver struct {
 //
 func NewSHT2xDriver(c Connector, options ...func(Config)) *SHT2xDriver {
 	// From the document "CRC Checksum Calculation -- For Safe Communication with SHT2x Sensors":
-	crc8Params := crc8.Params{0x31, 0x00, false, false, 0x00, 0x00, "CRC-8/SENSIRION-SHT2x"}
+	crc8Params := crc8.Params{
+		Poly:   0x31,
+		Init:   0x00,
+		RefIn:  false,
+		RefOut: false,
+		XorOut: 0x00,
+		Check:  0x00,
+		Name:   "CRC-8/SENSIRION-SHT2x",
+	}
 	d := &SHT2xDriver{
-		Driver:   NewDriver(c, "SHT2x", SHT2xDefaultAddress),
+		Driver:   NewDriver(c, "SHT2x", sht2xDefaultAddress),
 		Units:    "C",
 		crcTable: crc8.MakeTable(crc8Params),
 	}

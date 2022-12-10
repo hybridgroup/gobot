@@ -31,6 +31,7 @@ func TestNewSHT2xDriver(t *testing.T) {
 	}
 	gobottest.Refute(t, d.Driver, nil)
 	gobottest.Assert(t, strings.HasPrefix(d.Name(), "SHT2x"), true)
+	gobottest.Assert(t, d.defaultAddress, 0x40)
 }
 
 func TestSHT2xOptions(t *testing.T) {

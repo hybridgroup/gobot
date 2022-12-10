@@ -43,6 +43,7 @@ func TestNewGrovePiDriver(t *testing.T) {
 	}
 	gobottest.Refute(t, d.Driver, nil)
 	gobottest.Assert(t, strings.HasPrefix(d.Name(), "GrovePi"), true)
+	gobottest.Assert(t, d.defaultAddress, 0x04)
 	gobottest.Refute(t, d.pins, nil)
 }
 

@@ -28,6 +28,7 @@ func TestNewPCF8583Driver(t *testing.T) {
 	}
 	gobottest.Refute(t, d.Driver, nil)
 	gobottest.Assert(t, strings.HasPrefix(d.name, "PCF8583"), true)
+	gobottest.Assert(t, d.defaultAddress, 0x50)
 	gobottest.Assert(t, d.mode, PCF8583Control(0x00))
 	gobottest.Assert(t, d.yearOffset, 0)
 	gobottest.Assert(t, d.ramOffset, uint8(0x10))

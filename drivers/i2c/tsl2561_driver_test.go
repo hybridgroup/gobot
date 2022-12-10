@@ -17,7 +17,7 @@ var _ gobot.Driver = (*TSL2561Driver)(nil)
 
 func testIdReader(b []byte) (int, error) {
 	buf := new(bytes.Buffer)
-	// Mock d responding 0xA
+	// Mock device responding 0xA
 	binary.Write(buf, binary.LittleEndian, uint8(0x0A))
 	copy(b, buf.Bytes())
 	return buf.Len(), nil
@@ -41,6 +41,7 @@ func TestNewTSL2561Driver(t *testing.T) {
 	}
 	gobottest.Refute(t, d.Driver, nil)
 	gobottest.Assert(t, strings.HasPrefix(d.Name(), "TSL2561"), true)
+	gobottest.Assert(t, d.defaultAddress, 0x39)
 	gobottest.Assert(t, d.autoGain, false)
 	gobottest.Assert(t, d.gain, TSL2561Gain(0))
 	gobottest.Assert(t, d.integrationTime, TSL2561IntegrationTime(2))

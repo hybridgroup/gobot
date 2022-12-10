@@ -30,6 +30,7 @@ func TestNewBlinkMDriver(t *testing.T) {
 	}
 	gobottest.Refute(t, d.Driver, nil)
 	gobottest.Assert(t, strings.HasPrefix(d.Name(), "BlinkM"), true)
+	gobottest.Assert(t, d.defaultAddress, 0x09)
 }
 
 func TestBlinkMOptions(t *testing.T) {

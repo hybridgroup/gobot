@@ -31,6 +31,7 @@ func TestNewPCA953xDriver(t *testing.T) {
 	}
 	gobottest.Refute(t, d.Driver, nil)
 	gobottest.Assert(t, strings.HasPrefix(d.Name(), "PCA953x"), true)
+	gobottest.Assert(t, d.defaultAddress, 0x63)
 }
 
 func TestPCA953xWriteGPIO(t *testing.T) {

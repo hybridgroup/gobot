@@ -30,6 +30,7 @@ func TestNewSHT3xDriver(t *testing.T) {
 	}
 	gobottest.Refute(t, d.Driver, nil)
 	gobottest.Assert(t, strings.HasPrefix(d.Name(), "SHT3x"), true)
+	gobottest.Assert(t, d.defaultAddress, 0x44)
 }
 
 func TestSHT3xOptions(t *testing.T) {

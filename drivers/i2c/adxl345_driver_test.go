@@ -27,6 +27,7 @@ func TestNewADXL345Driver(t *testing.T) {
 	}
 	gobottest.Refute(t, d.Driver, nil)
 	gobottest.Assert(t, strings.HasPrefix(d.Name(), "ADXL345"), true)
+	gobottest.Assert(t, d.defaultAddress, 0x53)
 	gobottest.Assert(t, d.powerCtl.measure, uint8(1))
 	gobottest.Assert(t, d.dataFormat.fullScaleRange, ADXL345FsRangeConfig(0x00))
 	gobottest.Assert(t, d.bwRate.rate, ADXL345RateConfig(0x0A))

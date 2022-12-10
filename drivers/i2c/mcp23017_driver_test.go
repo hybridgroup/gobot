@@ -47,6 +47,7 @@ func TestNewMCP23017Driver(t *testing.T) {
 	}
 	gobottest.Refute(t, d.Driver, nil)
 	gobottest.Assert(t, strings.HasPrefix(d.Name(), "MCP23017"), true)
+	gobottest.Assert(t, d.defaultAddress, 0x20)
 	gobottest.Refute(t, d.mcpConf, nil)
 	gobottest.Refute(t, d.mcpBehav, nil)
 }

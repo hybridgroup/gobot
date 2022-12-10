@@ -49,6 +49,7 @@ func TestNewPCA9501Driver(t *testing.T) {
 	}
 	gobottest.Refute(t, d.Driver, nil)
 	gobottest.Assert(t, strings.HasPrefix(d.Name(), "PCA9501"), true)
+	gobottest.Assert(t, d.defaultAddress, 0x3f)
 }
 
 func TestPCA9501Options(t *testing.T) {

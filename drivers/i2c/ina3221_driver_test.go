@@ -32,6 +32,7 @@ func TestNewINA3221Driver(t *testing.T) {
 	}
 	gobottest.Refute(t, d.Driver, nil)
 	gobottest.Assert(t, strings.HasPrefix(d.Name(), "INA3221"), true)
+	gobottest.Assert(t, d.defaultAddress, 0x40)
 }
 
 func TestINA3221Options(t *testing.T) {

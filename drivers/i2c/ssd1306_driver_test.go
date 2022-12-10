@@ -31,7 +31,9 @@ func TestNewSSD1306Driver(t *testing.T) {
 	if !ok {
 		t.Errorf("new should have returned a *SSD1306Driver")
 	}
+	gobottest.Refute(t, d.Driver, nil)
 	gobottest.Assert(t, strings.HasPrefix(d.Name(), "SSD1306"), true)
+	gobottest.Assert(t, d.defaultAddress, 0x3c)
 }
 
 func TestSSD1306StartDefault(t *testing.T) {

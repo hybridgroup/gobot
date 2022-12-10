@@ -29,6 +29,7 @@ func TestNewWiichuckDriver(t *testing.T) {
 	}
 	gobottest.Refute(t, d.Driver, nil)
 	gobottest.Assert(t, strings.HasPrefix(d.Name(), "Wiichuck"), true)
+	gobottest.Assert(t, d.defaultAddress, 0x52)
 	gobottest.Assert(t, d.interval, 10*time.Millisecond)
 }
 

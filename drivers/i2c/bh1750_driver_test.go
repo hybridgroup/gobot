@@ -32,6 +32,7 @@ func TestNewBH1750Driver(t *testing.T) {
 	}
 	gobottest.Refute(t, d.Driver, nil)
 	gobottest.Assert(t, strings.HasPrefix(d.Name(), "BH1750"), true)
+	gobottest.Assert(t, d.defaultAddress, 0x23)
 }
 
 func TestBH1750Options(t *testing.T) {

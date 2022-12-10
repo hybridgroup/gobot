@@ -31,6 +31,7 @@ func TestNewMMA7660Driver(t *testing.T) {
 	}
 	gobottest.Refute(t, d.Driver, nil)
 	gobottest.Assert(t, strings.HasPrefix(d.Name(), "MMA7660"), true)
+	gobottest.Assert(t, d.defaultAddress, 0x4c)
 }
 
 func TestMMA7660Options(t *testing.T) {

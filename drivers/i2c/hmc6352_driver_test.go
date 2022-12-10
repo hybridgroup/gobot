@@ -30,6 +30,7 @@ func TestNewHMC6352Driver(t *testing.T) {
 	}
 	gobottest.Refute(t, d.Driver, nil)
 	gobottest.Assert(t, strings.HasPrefix(d.Name(), "HMC6352"), true)
+	gobottest.Assert(t, d.defaultAddress, 0x21)
 }
 
 func TestHMC6352Options(t *testing.T) {
