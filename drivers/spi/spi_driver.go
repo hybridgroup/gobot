@@ -108,7 +108,7 @@ func (d *Driver) Name() string { return d.name }
 func (d *Driver) SetName(n string) { d.name = n }
 
 // Connection returns the Connection of the device.
-func (d *Driver) Connection() gobot.Connection { return d.connection.(gobot.Connection) }
+func (d *Driver) Connection() gobot.Connection { return d.connector.(gobot.Connection) }
 
 // Start initializes the driver.
 func (d *Driver) Start() error {

@@ -57,32 +57,6 @@ type gpioTestAdaptor struct {
 	testAdaptorDigitalRead  func() (val int, err error)
 }
 
-func (t *gpioTestAdaptor) TestAdaptorDigitalWrite(f func() (err error)) {
-	t.mtx.Lock()
-	defer t.mtx.Unlock()
-	t.testAdaptorDigitalWrite = f
-}
-func (t *gpioTestAdaptor) TestAdaptorServoWrite(f func() (err error)) {
-	t.mtx.Lock()
-	defer t.mtx.Unlock()
-	t.testAdaptorServoWrite = f
-}
-func (t *gpioTestAdaptor) TestAdaptorPwmWrite(f func() (err error)) {
-	t.mtx.Lock()
-	defer t.mtx.Unlock()
-	t.testAdaptorPwmWrite = f
-}
-func (t *gpioTestAdaptor) TestAdaptorAnalogRead(f func() (val int, err error)) {
-	t.mtx.Lock()
-	defer t.mtx.Unlock()
-	t.testAdaptorAnalogRead = f
-}
-func (t *gpioTestAdaptor) TestAdaptorDigitalRead(f func() (val int, err error)) {
-	t.mtx.Lock()
-	defer t.mtx.Unlock()
-	t.testAdaptorDigitalRead = f
-}
-
 func (t *gpioTestAdaptor) ServoWrite(string, byte) (err error) {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()

@@ -46,3 +46,8 @@ func TestSetName(t *testing.T) {
 	// assert
 	gobottest.Assert(t, d.Name(), "TESTME")
 }
+
+func TestConnection(t *testing.T) {
+	d, _ := initTestDriverWithStubbedAdaptor()
+	gobottest.Refute(t, d.Connection(), nil)
+}
