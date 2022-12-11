@@ -31,8 +31,29 @@ func (spi *MockSpiAccess) createConnection(busNum, chipNum, mode, bits int, maxS
 	return spi.connection, err
 }
 
+// SetReadError can be used to simulate a read error.
+func (spi *MockSpiAccess) SetReadError(val bool) {
+	spi.connection.simReadErr = val
+}
+
+// SetWriteError can be used to simulate a write error.
+func (spi *MockSpiAccess) SetWriteError(val bool) {
+	spi.connection.simWriteErr = val
+}
+
+// SetCloseError can be used to simulate a error on Close().
 func (spi *MockSpiAccess) SetCloseError(val bool) {
 	spi.connection.simCloseErr = val
+}
+
+// SetSimRead is used to set the byte stream for next read.
+func (spi *MockSpiAccess) SetSimRead(val []byte) {
+	spi.connection.simRead = val
+}
+
+// Written returns the byte stream which was last written.
+func (spi *MockSpiAccess) Written() []byte {
+	return spi.connection.written
 }
 
 // spiConnectionMock is the a mock implementation, used in tests

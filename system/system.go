@@ -145,6 +145,7 @@ func (a *Accesser) NewPWMPin(path string, pin int, polNormIdent string, polInvId
 	return newPWMPinSysfs(a.fs, path, pin, polNormIdent, polInvIdent)
 }
 
+// NewSpiConnection returns a new connection to SPI with the given parameters.
 func (a *Accesser) NewSpiConnection(busNum, chipNum, mode, bits int, maxSpeed int64) (gobot.SpiOperations, error) {
 	return a.spiAccess.createConnection(busNum, chipNum, mode, bits, maxSpeed)
 }

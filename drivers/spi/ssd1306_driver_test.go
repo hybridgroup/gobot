@@ -10,6 +10,8 @@ import (
 	"gobot.io/x/gobot/gobottest"
 )
 
+// this ensures that the implementation is based on spi.Driver, which implements the gobot.Driver
+// and tests all implementations, so no further tests needed here for gobot.Driver interface
 var _ gobot.Driver = (*SSD1306Driver)(nil)
 
 func initTestSSDDriver() *SSD1306Driver {
@@ -113,7 +115,7 @@ func (t *gpioTestAdaptor) SetName(n string)      { t.name = n }
 func (t *gpioTestAdaptor) Port() string          { return t.port }
 
 func newGpioTestAdaptor() *gpioTestAdaptor {
-	a := newSpiTestAdaptor([]byte{})
+	a := newSpiTestAdaptor()
 	return &gpioTestAdaptor{
 		port: "/dev/null",
 		testAdaptorDigitalWrite: func() (err error) {
