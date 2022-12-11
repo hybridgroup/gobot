@@ -2,6 +2,7 @@ package adaptors
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"gobot.io/x/gobot/drivers/spi"
@@ -12,9 +13,11 @@ import (
 // make sure that this SpiBusAdaptor fulfills all the required interfaces
 var _ spi.Connector = (*SpiBusAdaptor)(nil)
 
+const spiTestAllowedBus = 15
+
 func initTestSpiBusAdaptorWithMockedSpi() (*SpiBusAdaptor, *system.MockSpiAccess) {
 	validator := func(busNr int) error {
-		if busNr != 15 {
+		if busNr != spiTestAllowedBus {
 			return fmt.Errorf("%d not valid", busNr)
 		}
 		return nil
@@ -44,7 +47,7 @@ func TestNewSpiAdaptor(t *testing.T) {
 func TestGetSpiConnection(t *testing.T) {
 	// arrange
 	const (
-		busNum   = 15
+		busNum   = spiTestAllowedBus
 		chipNum  = 14
 		mode     = 13
 		bits     = 12
@@ -80,16 +83,38 @@ func TestGetSpiConnection(t *testing.T) {
 	gobottest.Assert(t, con, nil)
 }
 
-func TestSpiFinalizeWithErrors(t *testing.T) {
+func TestSpiFinalize(t *testing.T) {
 	// arrange
 	a, _ := initTestSpiBusAdaptorWithMockedSpi()
-	gobottest.Assert(t, a.Connect(), nil)
-	a.GetSpiConnection(1, 2, 3, 4, 5)
-	//gobottest.Assert(t, err, nil)
-	//err = con.Tx([]byte{}, []byte{})
-	//gobottest.Assert(t, err, nil)
+	_, e := a.GetSpiConnection(spiTestAllowedBus, 2, 3, 4, 5)
+	gobottest.Assert(t, e, nil)
+	gobottest.Assert(t, len(a.connections), 1)
 	// act
-	a.Finalize()
+	err := a.Finalize()
 	// assert
-	//gobottest.Assert(t, strings.Contains(err.Error(), "close error"), true)
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, len(a.connections), 0)
+}
+
+func TestSpiFinalizeWithError(t *testing.T) {
+	// arrange
+	a, spi := initTestSpiBusAdaptorWithMockedSpi()
+	_, e := a.GetSpiConnection(spiTestAllowedBus, 2, 3, 4, 5)
+	gobottest.Assert(t, e, nil)
+	spi.SetCloseError(true)
+	// act
+	err := a.Finalize()
+	// assert
+	gobottest.Assert(t, strings.Contains(err.Error(), "error while SPI close"), true)
+}
+
+func TestSpiReConnect(t *testing.T) {
+	// arrange
+	a, _ := initTestSpiBusAdaptorWithMockedSpi()
+	gobottest.Assert(t, a.Finalize(), nil)
+	// act
+	gobottest.Assert(t, a.Connect(), nil)
+	// assert
+	gobottest.Refute(t, a.connections, nil)
+	gobottest.Assert(t, len(a.connections), 0)
 }

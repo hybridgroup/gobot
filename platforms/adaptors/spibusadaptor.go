@@ -62,6 +62,7 @@ func (a *SpiBusAdaptor) Finalize() error {
 			}
 		}
 	}
+	a.connections = nil
 	return err
 }
 
