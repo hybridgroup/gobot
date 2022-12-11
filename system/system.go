@@ -37,25 +37,34 @@ type systemCaller interface {
 	syscall(trap uintptr, f File, signal uintptr, payload unsafe.Pointer) (r1, r2 uintptr, err syscall.Errno)
 }
 
+// digitalPinAccesser represents unexposed interface to allow the switch between different implementations and
+// a mocked one
 type digitalPinAccesser interface {
 	isSupported() bool
 	createPin(chip string, pin int, o ...func(gobot.DigitalPinOptioner) bool) gobot.DigitalPinner
 	setFs(fs filesystem)
 }
 
-// Accesser provides access to system calls and filesystem
+// spiAccesser represents unexposed interface to allow the switch between different implementations and a mocked one
+type spiAccesser interface {
+	createConnection(busNum, chipNum, mode, bits int, maxSpeed int64) (gobot.SpiOperations, error)
+}
+
+// Accesser provides access to system calls, filesystem, implementation for digital pin and SPI
 type Accesser struct {
 	sys              systemCaller
 	fs               filesystem
 	digitalPinAccess digitalPinAccesser
+	spiAccess        spiAccesser
 }
 
 // NewAccesser returns a accesser to native system call, native file system and the chosen digital pin access.
 // Digital pin accesser can be empty or "sysfs", otherwise it will be automatically chosen.
 func NewAccesser(digitalPinAccess ...string) *Accesser {
 	s := Accesser{
-		sys: &nativeSyscall{},
-		fs:  &nativeFilesystem{},
+		sys:       &nativeSyscall{},
+		fs:        &nativeFilesystem{},
+		spiAccess: &periphioSpiAccess{},
 	}
 	a := "sysfs"
 	if len(digitalPinAccess) > 0 && digitalPinAccess[0] != "" {
@@ -110,6 +119,13 @@ func (a *Accesser) UseMockFilesystem(files []string) *MockFilesystem {
 	return fs
 }
 
+// UseMockSpi sets the SPI implementation of the accesser to the mocked one. Used only for tests.
+func (a *Accesser) UseMockSpi() *MockSpiAccess {
+	msc := &MockSpiAccess{}
+	a.spiAccess = msc
+	return msc
+}
+
 // NewDigitalPin returns a new system digital pin, according to the given pin number.
 func (a *Accesser) NewDigitalPin(chip string, pin int,
 	o ...func(gobot.DigitalPinOptioner) bool) gobot.DigitalPinner {
@@ -127,6 +143,10 @@ func (a *Accesser) IsSysfsDigitalPinAccess() bool {
 // NewPWMPin returns a new system PWM pin, according to the given pin number.
 func (a *Accesser) NewPWMPin(path string, pin int, polNormIdent string, polInvIdent string) gobot.PWMPinner {
 	return newPWMPinSysfs(a.fs, path, pin, polNormIdent, polInvIdent)
+}
+
+func (a *Accesser) NewSpiConnection(busNum, chipNum, mode, bits int, maxSpeed int64) (gobot.SpiOperations, error) {
+	return a.spiAccess.createConnection(busNum, chipNum, mode, bits, maxSpeed)
 }
 
 // OpenFile opens file of given name from native or the mocked file system

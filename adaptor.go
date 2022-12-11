@@ -74,6 +74,16 @@ type PWMPinnerProvider interface {
 	PWMPin(id string) (PWMPinner, error)
 }
 
+// SpiOperations are the wrappers around the actual functions used by the SPI device interface
+type SpiOperations interface {
+	// Close the SPI connection.
+	Close() error
+	// ReadData uses the SPI device TX to send/receive data.
+	ReadData(command []byte, data []byte) error
+	// WriteData uses the SPI device TX to send data.
+	WriteData(data []byte) error
+}
+
 // Adaptor is the interface that describes an adaptor in gobot
 type Adaptor interface {
 	// Name returns the label for the Adaptor

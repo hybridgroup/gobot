@@ -11,26 +11,30 @@ import (
 
 type spiBusNumberValidator func(busNumber int) error
 
+// SpiBusAdaptor is a adaptor for SPI bus, normally used for composition in platforms.
 type SpiBusAdaptor struct {
 	sys               *system.Accesser
 	validateBusNumber spiBusNumberValidator
 	defaultBusNumber  int
 	defaultChipNumber int
 	defaultMode       int
-	defaultBitsNumber int
+	defaultBitCount   int
 	defaultMaxSpeed   int64
 	mutex             sync.Mutex
 	connections       map[string]spi.Connection
 }
 
-func NewSpiBusAdaptor(sys *system.Accesser, v spiBusNumberValidator, busNr, chipNum, mode, bits int, maxSpeed int64) *SpiBusAdaptor {
+// NewSpiBusAdaptor provides the access to SPI buses of the board. The validator is used to check the
+// bus number (given by user) to the abilities of the board.
+func NewSpiBusAdaptor(sys *system.Accesser, v spiBusNumberValidator, busNum, chipNum, mode, bits int,
+	maxSpeed int64) *SpiBusAdaptor {
 	a := &SpiBusAdaptor{
 		sys:               sys,
 		validateBusNumber: v,
-		defaultBusNumber:  busNr,
+		defaultBusNumber:  busNum,
 		defaultChipNumber: chipNum,
 		defaultMode:       mode,
-		defaultBitsNumber: bits,
+		defaultBitCount:   bits,
 		defaultMaxSpeed:   maxSpeed,
 	}
 	return a
@@ -45,6 +49,7 @@ func (a *SpiBusAdaptor) Connect() error {
 	return nil
 }
 
+// Finalize closes all SPI connections.
 func (a *SpiBusAdaptor) Finalize() error {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
@@ -87,27 +92,27 @@ func (a *SpiBusAdaptor) GetSpiConnection(busNum, chipNum, mode, bits int, maxSpe
 	return con, nil
 }
 
-// SpiDefaultBusNumber returns the default spi bus for this platform.
+// SpiDefaultBusNumber returns the default bus number for this platform.
 func (a *SpiBusAdaptor) SpiDefaultBusNumber() int {
 	return a.defaultBusNumber
 }
 
-// SpiDefaultChipNumber returns the default spi chip for this platform.
+// SpiDefaultChipNumber returns the default chip number for this platform.
 func (a *SpiBusAdaptor) SpiDefaultChipNumber() int {
 	return a.defaultChipNumber
 }
 
-// SpiDefaultMode returns the default spi mode for this platform.
+// SpiDefaultMode returns the default SPI mode for this platform.
 func (a *SpiBusAdaptor) SpiDefaultMode() int {
 	return a.defaultMode
 }
 
-// SpiDefaultBitCount returns the default spi number of bits for this platform.
+// SpiDefaultBitCount returns the default number of bits used for this platform.
 func (a *SpiBusAdaptor) SpiDefaultBitCount() int {
-	return a.defaultBitsNumber
+	return a.defaultBitCount
 }
 
-// SpiDefaultMaxSpeed returns the default spi bus for this platform.
+// SpiDefaultMaxSpeed returns the default maximal speed for this platform.
 func (a *SpiBusAdaptor) SpiDefaultMaxSpeed() int64 {
 	return a.defaultMaxSpeed
 }

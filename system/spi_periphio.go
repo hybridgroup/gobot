@@ -8,16 +8,15 @@ import (
 	xsysfs "periph.io/x/host/v3/sysfs"
 )
 
-// spiConnectionPeriphIo is the implementation of the SPI interface using the periph.io
-// sysfs implementation for Linux.
+// spiConnectionPeriphIo is the implementation of the SPI interface using the periph.io sysfs implementation for Linux.
 type spiConnectionPeriphIo struct {
 	port xspi.PortCloser
 	dev  xspi.Conn
 }
 
-// NewspiConnectionPeriphIo creates and returns a new connection to a specific
-// spi device on a bus/chip using the periph.io interface.
-func (a *Accesser) NewSpiConnection(busNum, chipNum, mode, bits int, maxSpeed int64) (*spiConnectionPeriphIo, error) {
+// newSpiConnectionPeriphIo creates and returns a new connection to a specific SPI device on a bus/chip
+// using the periph.io interface.
+func newSpiConnectionPeriphIo(busNum, chipNum, mode, bits int, maxSpeed int64) (*spiConnectionPeriphIo, error) {
 	p, err := xsysfs.NewSPI(busNum, chipNum)
 	if err != nil {
 		return nil, err

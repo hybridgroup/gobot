@@ -11,18 +11,6 @@ const (
 	NotInitialized = -1
 )
 
-// Operations are the wrappers around the actual functions used by the SPI device interface
-type Operations interface {
-	// Close the SPI connection.
-	Close() error
-
-	// ReadData uses the SPI device TX to send/receive data.
-	ReadData(command []byte, data []byte) error
-
-	// WriteData uses the SPI device TX to send data.
-	WriteData(data []byte) error
-}
-
 // Connector lets Adaptors provide the interface for Drivers
 // to get access to the SPI buses on platforms that support SPI.
 type Connector interface {
@@ -49,7 +37,7 @@ type Connector interface {
 
 // Connection is a connection to a SPI device with a specific bus/chip.
 // Provided by an Adaptor, usually just by calling the spi package's GetSpiConnection() function.
-type Connection Operations
+type Connection gobot.SpiOperations
 
 // Config is the interface which describes how a Driver can specify
 // optional SPI params such as which SPI bus it wants to use.
@@ -150,7 +138,7 @@ func (d *Driver) Halt() (err error) {
 		return err
 	}
 
-	// currently there is nothing to do here for the driver
-	// the connection will be closed on adaptor Finalize()
+	// currently there is nothing to do here for the driver, the connection is cached on adaptor side
+	// and will be closed on adaptor Finalize()
 	return nil
 }
