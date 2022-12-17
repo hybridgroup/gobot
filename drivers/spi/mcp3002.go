@@ -19,11 +19,11 @@ type MCP3002Driver struct {
 //      a *Adaptor - the Adaptor to use with this Driver
 //
 // Optional params:
-//      spi.WithBus(int):    	bus to use with this driver
-//     	spi.WithChip(int):    	chip to use with this driver
-//      spi.WithMode(int):    	mode to use with this driver
-//      spi.WithBits(int):    	number of bits to use with this driver
-//      spi.WithSpeed(int64):   speed in Hz to use with this driver
+//      spi.WithBusNumber(int):  bus to use with this driver
+//     	spi.WithChipNumber(int): chip to use with this driver
+//      spi.WithMode(int):    	 mode to use with this driver
+//      spi.WithBitCount(int):   number of bits to use with this driver
+//      spi.WithSpeed(int64):    speed in Hz to use with this driver
 //
 func NewMCP3002Driver(a Connector, options ...func(Config)) *MCP3002Driver {
 	d := &MCP3002Driver{
@@ -47,7 +47,7 @@ func (d *MCP3002Driver) Read(channel int) (int, error) {
 
 	rx := make([]byte, 2)
 
-	if err := d.connection.ReadData(tx, rx); err != nil {
+	if err := d.connection.ReadCommandData(tx, rx); err != nil {
 		return 0, err
 	}
 

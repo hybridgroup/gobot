@@ -117,11 +117,11 @@ type SSD1306Driver struct {
 //      conn Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//      spi.WithBus(int):    		bus to use with this driver
-//     	spi.WithChip(int):    		chip to use with this driver
-//      spi.WithMode(int):    		mode to use with this driver
-//      spi.WithBits(int):    		number of bits to use with this driver
-//      spi.WithSpeed(int64):   	speed in Hz to use with this driver
+//      spi.WithBusNumber(int):  bus to use with this driver
+//     	spi.WithChipNumber(int): chip to use with this driver
+//      spi.WithMode(int):    	 mode to use with this driver
+//      spi.WithBitCount(int):   number of bits to use with this driver
+//      spi.WithSpeed(int64):    speed in Hz to use with this driver
 //      spi.WithDisplayWidth(int): 	width of display (defaults to 128)
 //      spi.WithDisplayHeight(int): height of display (defaults to 64)
 //      spi.WithDCPin(string): 		gpio pin number connected to dc pin on display (defaults to "16")
@@ -302,7 +302,7 @@ func (s *SSD1306Driver) Display() error {
 	if err := s.dcDriver.DigitalWrite(1); err != nil {
 		return err
 	}
-	return s.connection.ReadData(append([]byte{0x40}, s.buffer.buffer...), nil)
+	return s.connection.WriteBlockData(0x40, s.buffer.buffer)
 }
 
 // ShowImage takes a standard Go image and shows it on the display in monochrome.
@@ -328,7 +328,7 @@ func (s *SSD1306Driver) command(b byte) error {
 	if err := s.dcDriver.DigitalWrite(0); err != nil {
 		return err
 	}
-	return s.connection.WriteData([]byte{b})
+	return s.connection.WriteByte(b)
 }
 
 // initialize configures the ssd1306 based on the options passed in when the driver was created

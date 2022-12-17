@@ -28,13 +28,13 @@ func newSpiConnectionPeriphIo(busNum, chipNum, mode, bits int, maxSpeed int64) (
 	return &spiConnectionPeriphIo{port: p, dev: c}, nil
 }
 
-// Close the SPI connection.
+// Close the SPI connection. Implements gobot.BusOperations.
 func (c *spiConnectionPeriphIo) Close() error {
 	return c.port.Close()
 }
 
-// ReadData uses the SPI device TX to send/receive data.
-func (c *spiConnectionPeriphIo) ReadData(command []byte, data []byte) error {
+// ReadCommandData uses the SPI device TX to send/receive data.
+func (c *spiConnectionPeriphIo) ReadCommandData(command []byte, data []byte) error {
 	dataLen := len(data)
 	if err := c.dev.Tx(command, data); err != nil {
 		return err
@@ -45,7 +45,20 @@ func (c *spiConnectionPeriphIo) ReadData(command []byte, data []byte) error {
 	return nil
 }
 
-// WriteData uses the SPI device TX to send data.
-func (c *spiConnectionPeriphIo) WriteData(data []byte) error {
+// WriteByte uses the SPI device TX to send a byte value. Implements gobot.BusOperations.
+func (c *spiConnectionPeriphIo) WriteByte(val byte) error {
+	return c.WriteBytes([]byte{val})
+}
+
+// WriteBlockData uses the SPI device TX to send data. Implements gobot.BusOperations.
+func (c *spiConnectionPeriphIo) WriteBlockData(reg byte, data []byte) error {
+	buf := make([]byte, len(data)+1)
+	copy(buf[1:], data)
+	buf[0] = reg
+	return c.WriteBytes(data)
+}
+
+// WriteBytes uses the SPI device TX to send the given data.
+func (c *spiConnectionPeriphIo) WriteBytes(data []byte) error {
 	return c.dev.Tx(data, nil)
 }

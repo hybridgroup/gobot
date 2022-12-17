@@ -1,5 +1,7 @@
 package gobot
 
+import "io"
+
 // DigitalPinOptioner is the interface to provide the possibility to change pin behavior for the next usage
 type DigitalPinOptioner interface {
 	// SetLabel change the pins label
@@ -74,14 +76,73 @@ type PWMPinnerProvider interface {
 	PWMPin(id string) (PWMPinner, error)
 }
 
+// BusOperations are functions provided by a bus device, e.g. SPI, i2c.
+type BusOperations interface {
+	// WriteBlockData writes the given data starting from the given register of bus device.
+	WriteBlockData(reg uint8, data []byte) error
+	// WriteByte writes the given byte value to the current register of a bus device.
+	WriteByte(val byte) error
+	// WriteBytes writes the given data starting from the current register of an bus device.
+	WriteBytes(data []byte) error
+	// Close the connection.
+	Close() error
+}
+
+// I2cOperations represents the i2c methods according to I2C/SMBus specification.
+// Some functions are not in the interface yet:
+// * Process Call (WriteWordDataReadWordData)
+// * Block Write - Block Read (WriteBlockDataReadBlockData)
+// * Host Notify - WriteWordData() can be used instead
+//
+// see: https://docs.kernel.org/i2c/smbus-protocol.html#key-to-symbols
+//
+// S: Start condition; Sr: Repeated start condition, used to switch from write to read mode.
+// P: Stop condition; Rd/Wr (1 bit): Read/Write bit. Rd equals 1, Wr equals 0.
+// A, NA (1 bit): Acknowledge (ACK) and Not Acknowledge (NACK) bit
+// Addr (7 bits): I2C 7 bit address. (10 bit I2C address not yet supported by gobot).
+// Comm (8 bits): Command byte, a data byte which often selects a register on the device.
+// Data (8 bits): A plain data byte. DataLow and DataHigh represent the low and high byte of a 16 bit word.
+// Count (8 bits): A data byte containing the length of a block operation.
+// [..]: Data sent by I2C device, as opposed to data sent by the host adapter.
+//
+// WriteByte must be implemented as the sequence:
+// "S Addr Wr [A] Data [A] P"
+// WriteBlockData must be implemented as the sequence:
+// "S Addr Wr [A] Comm [A] Count [A] Data [A] Data [A] ... [A] Data [A] P"
+type I2cOperations interface {
+	io.ReadWriteCloser
+	BusOperations
+
+	// ReadByte must be implemented as the sequence:
+	// "S Addr Rd [A] [Data] NA P"
+	ReadByte() (byte, error)
+
+	// ReadByteData must be implemented as the sequence:
+	// "S Addr Wr [A] Comm [A] Sr Addr Rd [A] [Data] NA P"
+	ReadByteData(reg uint8) (uint8, error)
+
+	// ReadWordData must be implemented as the sequence:
+	// "S Addr Wr [A] Comm [A] Sr Addr Rd [A] [DataLow] A [DataHigh] NA P"
+	ReadWordData(reg uint8) (uint16, error)
+
+	// ReadBlockData must be implemented as the sequence:
+	// "S Addr Wr [A] Comm [A] Sr Addr Rd [A] [Count] A [Data] A [Data] A ... A [Data] NA P"
+	ReadBlockData(reg uint8, b []byte) error
+
+	// WriteByteData must be implemented as the sequence:
+	// "S Addr Wr [A] Comm [A] Data [A] P"
+	WriteByteData(reg uint8, val uint8) error
+
+	// WriteWordData must be implemented as the sequence:
+	// "S Addr Wr [A] Comm [A] DataLow [A] DataHigh [A] P"
+	WriteWordData(reg uint8, val uint16) error
+}
+
 // SpiOperations are the wrappers around the actual functions used by the SPI device interface
 type SpiOperations interface {
-	// Close the SPI connection.
-	Close() error
-	// ReadData uses the SPI device TX to send/receive data.
-	ReadData(command []byte, data []byte) error
-	// WriteData uses the SPI device TX to send data.
-	WriteData(data []byte) error
+	BusOperations
+	// ReadCommandData uses the SPI device TX to send/receive data.
+	ReadCommandData(command []byte, data []byte) error
 }
 
 // Adaptor is the interface that describes an adaptor in gobot

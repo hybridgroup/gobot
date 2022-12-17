@@ -280,9 +280,11 @@ func (c TestSpiDevice) Close() error {
 	return nil
 }
 
-func (c TestSpiDevice) WriteData(w []byte) error { return nil }
+func (c TestSpiDevice) WriteByte(byte) error              { return nil }
+func (c TestSpiDevice) WriteBlockData(byte, []byte) error { return nil }
+func (c TestSpiDevice) WriteBytes([]byte) error           { return nil }
 
-func (c TestSpiDevice) ReadData(w, r []byte) error {
+func (c TestSpiDevice) ReadCommandData(w, r []byte) error {
 	manName, _ := hex.DecodeString("ff0000a544657874657220496e6475737472696573000000")
 	boardName, _ := hex.DecodeString("ff0000a5476f5069476f3300000000000000000000000000")
 	hwVersion, _ := hex.DecodeString("ff0000a5002dcaab")

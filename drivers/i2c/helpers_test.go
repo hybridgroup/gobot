@@ -155,6 +155,15 @@ func (t *i2cTestAdaptor) WriteBlockData(reg uint8, b []byte) error {
 	return t.writeBytes(buf)
 }
 
+func (t *i2cTestAdaptor) WriteBytes(b []byte) error {
+	t.mtx.Lock()
+	defer t.mtx.Unlock()
+	if len(b) > 32 {
+		b = b[:32]
+	}
+	return t.writeBytes(b)
+}
+
 func (t *i2cTestAdaptor) GetI2cConnection(address int, bus int) (connection Connection, err error) {
 	if t.i2cConnectErr {
 		return nil, errors.New("Invalid i2c connection")

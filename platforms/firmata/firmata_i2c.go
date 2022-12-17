@@ -7,7 +7,7 @@ import (
 	"gobot.io/x/gobot/platforms/firmata/client"
 )
 
-// firmataI2cConnection implements the interface i2c.I2cOperations
+// firmataI2cConnection implements the interface gobot.I2cOperations
 type firmataI2cConnection struct {
 	address int
 	adaptor *Adaptor
@@ -152,6 +152,18 @@ func (c *firmataI2cConnection) WriteBlockData(reg uint8, data []byte) error {
 	buf := make([]byte, len(data)+1)
 	copy(buf[1:], data)
 	buf[0] = reg
+	return c.writeAndCheckCount(buf)
+}
+
+// WriteBytes writes a block of maximum 32 bytes to the current register address of the i2c device.
+func (c *firmataI2cConnection) WriteBytes(buf []byte) error {
+	c.mtx.Lock()
+	defer c.mtx.Unlock()
+
+	if len(buf) > 32 {
+		buf = buf[:32]
+	}
+
 	return c.writeAndCheckCount(buf)
 }
 

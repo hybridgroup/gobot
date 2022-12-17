@@ -72,7 +72,7 @@ func newSpiConnectionMock(busNum, chipNum, mode, bits int, maxSpeed int64) *spiC
 	return &spiConnectionMock{id: fmt.Sprintf("bu:%d, c:%d, m:%d, bi:%d, s:%d", busNum, chipNum, mode, bits, maxSpeed)}
 }
 
-// Close the SPI connection.
+// Close the SPI connection. Implements gobot.BusOperations.
 func (c *spiConnectionMock) Close() error {
 	if c.simCloseErr {
 		return fmt.Errorf("error while SPI close in mock")
@@ -80,8 +80,8 @@ func (c *spiConnectionMock) Close() error {
 	return nil
 }
 
-// ReadData uses the SPI device TX to send/receive data.
-func (c *spiConnectionMock) ReadData(command []byte, data []byte) error {
+// ReadCommandData uses the SPI device TX to send/receive data.
+func (c *spiConnectionMock) ReadCommandData(command []byte, data []byte) error {
 	if c.simReadErr {
 		return fmt.Errorf("error while SPI read in mock")
 	}
@@ -90,8 +90,21 @@ func (c *spiConnectionMock) ReadData(command []byte, data []byte) error {
 	return nil
 }
 
-// WriteData uses the SPI device TX to send data.
-func (c *spiConnectionMock) WriteData(data []byte) error {
+// WriteByte uses the SPI device TX to send a byte value. Implements gobot.BusOperations.
+func (c *spiConnectionMock) WriteByte(val byte) error {
+	return c.WriteBytes([]byte{val})
+}
+
+// WriteBlockData uses the SPI device TX to send data. Implements gobot.BusOperations.
+func (c *spiConnectionMock) WriteBlockData(reg byte, data []byte) error {
+	buf := make([]byte, len(data)+1)
+	copy(buf[1:], data)
+	buf[0] = reg
+	return c.WriteBytes(data)
+}
+
+// WriteBytes uses the SPI device TX to send data. Implements gobot.BusOperations.
+func (c *spiConnectionMock) WriteBytes(data []byte) error {
 	if c.simWriteErr {
 		return fmt.Errorf("error while SPI write in mock")
 	}

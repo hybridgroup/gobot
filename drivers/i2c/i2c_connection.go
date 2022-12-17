@@ -2,8 +2,9 @@ package i2c
 
 import (
 	"errors"
-	"io"
 	"sync"
+
+	"gobot.io/x/gobot"
 )
 
 const (
@@ -33,62 +34,9 @@ const (
 	set            = 0x01
 )
 
-// I2cOperations represents the i2c methods according to I2C/SMBus specification.
-// Some functions are not in the interface yet:
-// * Process Call (WriteWordDataReadWordData)
-// * Block Write - Block Read (WriteBlockDataReadBlockData)
-// * Host Notify - WriteWordData() can be used instead
-//
-// see: https://docs.kernel.org/i2c/smbus-protocol.html#key-to-symbols
-//
-// S: Start condition; Sr: Repeated start condition, used to switch from write to read mode.
-// P: Stop condition; Rd/Wr (1 bit): Read/Write bit. Rd equals 1, Wr equals 0.
-// A, NA (1 bit): Acknowledge (ACK) and Not Acknowledge (NACK) bit
-// Addr (7 bits): I2C 7 bit address. (10 bit I2C address not yet supported by gobot).
-// Comm (8 bits): Command byte, a data byte which often selects a register on the device.
-// Data (8 bits): A plain data byte. DataLow and DataHigh represent the low and high byte of a 16 bit word.
-// Count (8 bits): A data byte containing the length of a block operation.
-// [..]: Data sent by I2C device, as opposed to data sent by the host adapter.
-//
-type I2cOperations interface {
-	io.ReadWriteCloser
-
-	// ReadByte must be implemented as the sequence:
-	// "S Addr Rd [A] [Data] NA P"
-	ReadByte() (val byte, err error)
-
-	// ReadByteData must be implemented as the sequence:
-	// "S Addr Wr [A] Comm [A] Sr Addr Rd [A] [Data] NA P"
-	ReadByteData(reg uint8) (val uint8, err error)
-
-	// ReadWordData must be implemented as the sequence:
-	// "S Addr Wr [A] Comm [A] Sr Addr Rd [A] [DataLow] A [DataHigh] NA P"
-	ReadWordData(reg uint8) (val uint16, err error)
-
-	// ReadBlockData must be implemented as the sequence:
-	// "S Addr Wr [A] Comm [A] Sr Addr Rd [A] [Count] A [Data] A [Data] A ... A [Data] NA P"
-	ReadBlockData(reg uint8, b []byte) (err error)
-
-	// WriteByte must be implemented as the sequence:
-	// "S Addr Wr [A] Data [A] P"
-	WriteByte(val byte) (err error)
-
-	// WriteByteData must be implemented as the sequence:
-	// "S Addr Wr [A] Comm [A] Data [A] P"
-	WriteByteData(reg uint8, val uint8) (err error)
-
-	// WriteWordData must be implemented as the sequence:
-	// "S Addr Wr [A] Comm [A] DataLow [A] DataHigh [A] P"
-	WriteWordData(reg uint8, val uint16) (err error)
-
-	// WriteBlockData must be implemented as the sequence:
-	// "S Addr Wr [A] Comm [A] Count [A] Data [A] Data [A] ... [A] Data [A] P"
-	WriteBlockData(reg uint8, b []byte) (err error)
-}
-
 // I2cDevice is the interface to a specific i2c bus
 type I2cDevice interface {
-	I2cOperations
+	gobot.I2cOperations
 	SetAddress(int) error
 }
 
@@ -97,7 +45,7 @@ type I2cDevice interface {
 // Implements I2cOperations to talk to the device, wrapping the
 // calls in SetAddress to always target the specified device.
 // Provided by an Adaptor by implementing the I2cConnector interface.
-type Connection I2cOperations
+type Connection gobot.I2cOperations
 
 type i2cConnection struct {
 	bus     I2cDevice
@@ -229,6 +177,17 @@ func (c *i2cConnection) WriteBlockData(reg uint8, b []byte) (err error) {
 		return err
 	}
 	return c.bus.WriteBlockData(reg, b)
+}
+
+// WriteBytes writes a block of bytes to the current register on the i2c device.
+func (c *i2cConnection) WriteBytes(b []byte) (err error) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	if err := c.bus.SetAddress(c.address); err != nil {
+		return err
+	}
+	return c.bus.WriteBytes(b)
 }
 
 // setBit is used to set a bit at a given position to 1.
