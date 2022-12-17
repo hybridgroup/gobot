@@ -13,8 +13,15 @@ import (
 const (
 	debug = false
 
-	defaultI2cBusNumber   = 1
 	pwmInvertedIdentifier = "inversed"
+
+	defaultI2cBusNumber = 1
+
+	defaultSpiBusNumber  = 0
+	defaultSpiChipNumber = 0
+	defaultSpiMode       = 0
+	defaultSpiBitsNumber = 8
+	defaultSpiMaxSpeed   = 500000
 )
 
 type pwmPinDefinition struct {
@@ -31,6 +38,7 @@ type Adaptor struct {
 	*adaptors.DigitalPinsAdaptor
 	*adaptors.PWMPinsAdaptor
 	*adaptors.I2cBusAdaptor
+	*adaptors.SpiBusAdaptor
 }
 
 // NewAdaptor creates a Tinkerboard Adaptor
@@ -44,6 +52,8 @@ func NewAdaptor() *Adaptor {
 	c.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, c.translatePWMPin,
 		adaptors.WithPolarityInvertedIdentifier(pwmInvertedIdentifier))
 	c.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, c.validateI2cBusNumber, defaultI2cBusNumber)
+	c.SpiBusAdaptor = adaptors.NewSpiBusAdaptor(sys, c.validateSpiBusNumber, defaultSpiBusNumber, defaultSpiChipNumber,
+		defaultSpiMode, defaultSpiBitsNumber, defaultSpiMaxSpeed)
 	return c
 }
 
@@ -57,6 +67,10 @@ func (c *Adaptor) SetName(n string) { c.name = n }
 func (c *Adaptor) Connect() error {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
+
+	if err := c.SpiBusAdaptor.Connect(); err != nil {
+		return err
+	}
 
 	if err := c.I2cBusAdaptor.Connect(); err != nil {
 		return err
@@ -83,7 +97,19 @@ func (c *Adaptor) Finalize() error {
 		err = multierror.Append(err, e)
 	}
 
+	if e := c.SpiBusAdaptor.Finalize(); e != nil {
+		err = multierror.Append(err, e)
+	}
 	return err
+}
+
+func (c *Adaptor) validateSpiBusNumber(busNr int) error {
+	// Valid bus numbers are [0,2] which corresponds to /dev/spidev0.x, /dev/spidev2.x
+	// x is the chip number <255
+	if (busNr != 0) && (busNr != 2) {
+		return fmt.Errorf("Bus number %d out of range", busNr)
+	}
+	return nil
 }
 
 func (c *Adaptor) validateI2cBusNumber(busNr int) error {

@@ -9,7 +9,6 @@ import (
 
 	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/spi"
 	"gobot.io/x/gobot/platforms/adaptors"
 	"gobot.io/x/gobot/system"
 )
@@ -21,8 +20,15 @@ type pwmPinData struct {
 }
 
 const (
-	pwmPeriodDefault    = 500000 // 0.5 ms = 2 kHz
+	pwmPeriodDefault = 500000 // 0.5 ms = 2 kHz
+
 	defaultI2cBusNumber = 2
+
+	defaultSpiBusNumber  = 0
+	defaultSpiChipNumber = 0
+	defaultSpiMode       = 0
+	defaultSpiBitsNumber = 8
+	defaultSpiMaxSpeed   = 500000
 )
 
 // Adaptor is the gobot.Adaptor representation for the Beaglebone Black/Green
@@ -33,12 +39,12 @@ type Adaptor struct {
 	*adaptors.DigitalPinsAdaptor
 	*adaptors.PWMPinsAdaptor
 	*adaptors.I2cBusAdaptor
+	*adaptors.SpiBusAdaptor
 	usrLed       string
 	analogPath   string
 	pinMap       map[string]int
 	pwmPinMap    map[string]pwmPinData
 	analogPinMap map[string]string
-	spiBuses     [2]spi.Connection
 }
 
 // NewAdaptor returns a new Beaglebone Black/Green Adaptor
@@ -58,6 +64,8 @@ func NewAdaptor() *Adaptor {
 	c.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, c.translateAndMuxPWMPin,
 		adaptors.WithPWMPinDefaultPeriod(pwmPeriodDefault))
 	c.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, c.validateI2cBusNumber, defaultI2cBusNumber)
+	c.SpiBusAdaptor = adaptors.NewSpiBusAdaptor(sys, c.validateSpiBusNumber, defaultSpiBusNumber, defaultSpiChipNumber,
+		defaultSpiMode, defaultSpiBitsNumber, defaultSpiMaxSpeed)
 	return c
 }
 
@@ -71,6 +79,10 @@ func (c *Adaptor) SetName(n string) { c.name = n }
 func (c *Adaptor) Connect() error {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
+
+	if err := c.SpiBusAdaptor.Connect(); err != nil {
+		return err
+	}
 
 	if err := c.I2cBusAdaptor.Connect(); err != nil {
 		return err
@@ -97,12 +109,8 @@ func (c *Adaptor) Finalize() error {
 		err = multierror.Append(err, e)
 	}
 
-	for _, bus := range c.spiBuses {
-		if bus != nil {
-			if e := bus.Close(); e != nil {
-				err = multierror.Append(err, e)
-			}
-		}
+	if e := c.SpiBusAdaptor.Finalize(); e != nil {
+		err = multierror.Append(err, e)
 	}
 	return err
 }
@@ -149,46 +157,13 @@ func (c *Adaptor) AnalogRead(pin string) (val int, err error) {
 	return
 }
 
-// GetSpiConnection returns an spi connection to a device on a specified bus.
-// Valid bus number is [0..1] which corresponds to /dev/spidev0.0 through /dev/spidev0.1.
-func (c *Adaptor) GetSpiConnection(busNum, chipNum, mode, bits int, maxSpeed int64) (connection spi.Connection, err error) {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-
-	if (busNum < 0) || (busNum > 1) {
-		return nil, fmt.Errorf("Bus number %d out of range", busNum)
+func (c *Adaptor) validateSpiBusNumber(busNr int) error {
+	// Valid bus numbers are [0,1] which corresponds to /dev/spidev0.x through /dev/spidev1.x.
+	// x is the chip number <255
+	if (busNr < 0) || (busNr > 1) {
+		return fmt.Errorf("Bus number %d out of range", busNr)
 	}
-
-	if c.spiBuses[busNum] == nil {
-		c.spiBuses[busNum], err = spi.GetSpiConnection(busNum, chipNum, mode, bits, maxSpeed)
-	}
-
-	return c.spiBuses[busNum], err
-}
-
-// GetSpiDefaultBus returns the default spi bus for this platform.
-func (c *Adaptor) GetSpiDefaultBus() int {
-	return 0
-}
-
-// GetSpiDefaultChip returns the default spi chip for this platform.
-func (c *Adaptor) GetSpiDefaultChip() int {
-	return 0
-}
-
-// GetSpiDefaultMode returns the default spi mode for this platform.
-func (c *Adaptor) GetSpiDefaultMode() int {
-	return 0
-}
-
-// GetSpiDefaultBits returns the default spi number of bits for this platform.
-func (c *Adaptor) GetSpiDefaultBits() int {
-	return 8
-}
-
-// GetSpiDefaultMaxSpeed returns the default spi bus for this platform.
-func (c *Adaptor) GetSpiDefaultMaxSpeed() int64 {
-	return 500000
+	return nil
 }
 
 func (c *Adaptor) validateI2cBusNumber(busNr int) error {

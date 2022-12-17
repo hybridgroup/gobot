@@ -169,17 +169,17 @@ type Driver struct {
 //      a *Adaptor - the Adaptor to use with this Driver
 //
 // Optional params:
-//      spi.WithBus(int):    	bus to use with this driver
-//     	spi.WithChip(int):    	chip to use with this driver
-//      spi.WithMode(int):    	mode to use with this driver
-//      spi.WithBits(int):    	number of bits to use with this driver
-//      spi.WithSpeed(int64):   speed in Hz to use with this driver
+//      spi.WithBusNumber(int):  bus to use with this driver
+//     	spi.WithChipNumber(int): chip to use with this driver
+//      spi.WithMode(int):    	 mode to use with this driver
+//      spi.WithBitCount(int):   number of bits to use with this driver
+//      spi.WithSpeed(int64):    speed in Hz to use with this driver
 //
 func NewDriver(a spi.Connector, options ...func(spi.Config)) *Driver {
 	spiConfig := spi.NewConfig()
 	// use /dev/spidev0.1
-	spiConfig.WithBus(0)
-	spiConfig.WithChip(1)
+	spiConfig.SetBusNumber(0)
+	spiConfig.SetChipNumber(1)
 	g := &Driver{
 		name:      gobot.DefaultName("GoPiGo3"),
 		connector: a,
@@ -209,11 +209,11 @@ func (g *Driver) Halt() (err error) {
 
 // Start initializes the GoPiGo3
 func (g *Driver) Start() (err error) {
-	bus := g.GetBusOrDefault(g.connector.GetSpiDefaultBus())
-	chip := g.GetChipOrDefault(g.connector.GetSpiDefaultChip())
-	mode := g.GetModeOrDefault(g.connector.GetSpiDefaultMode())
-	bits := g.GetBitsOrDefault(g.connector.GetSpiDefaultBits())
-	maxSpeed := g.GetSpeedOrDefault(g.connector.GetSpiDefaultMaxSpeed())
+	bus := g.GetBusNumberOrDefault(g.connector.SpiDefaultBusNumber())
+	chip := g.GetChipNumberOrDefault(g.connector.SpiDefaultChipNumber())
+	mode := g.GetModeOrDefault(g.connector.SpiDefaultMode())
+	bits := g.GetBitCountOrDefault(g.connector.SpiDefaultBitCount())
+	maxSpeed := g.GetSpeedOrDefault(g.connector.SpiDefaultMaxSpeed())
 
 	g.connection, err = g.connector.GetSpiConnection(bus, chip, mode, bits, maxSpeed)
 	if err != nil {
@@ -693,7 +693,7 @@ func (g *Driver) readBytes(address byte, msg byte, numBytes int) (val []byte, er
 	w[0] = address
 	w[1] = msg
 	r := make([]byte, len(w))
-	err = g.connection.Tx(w, r)
+	err = g.connection.ReadCommandData(w, r)
 	if err != nil {
 		return val, err
 	}
@@ -723,7 +723,7 @@ func (g *Driver) readUint32(address, msg byte) (val uint32, err error) {
 }
 
 func (g *Driver) writeBytes(w []byte) (err error) {
-	return g.connection.Tx(w, nil)
+	return g.connection.WriteBytes(w)
 }
 
 func (g *Driver) resetAll() {

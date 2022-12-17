@@ -199,6 +199,16 @@ func TestFinalizeErrorAfterPWM(t *testing.T) {
 	gobottest.Assert(t, strings.Contains(err.Error(), "write error"), true)
 }
 
+func TestSpiDefaultValues(t *testing.T) {
+	a := NewAdaptor()
+
+	gobottest.Assert(t, a.SpiDefaultBusNumber(), 0)
+	gobottest.Assert(t, a.SpiDefaultChipNumber(), 0)
+	gobottest.Assert(t, a.SpiDefaultMode(), 0)
+	gobottest.Assert(t, a.SpiDefaultBitCount(), 8)
+	gobottest.Assert(t, a.SpiDefaultMaxSpeed(), int64(500000))
+}
+
 func TestI2cDefaultBus(t *testing.T) {
 	a := NewAdaptor()
 	gobottest.Assert(t, a.DefaultI2cBus(), 1)
@@ -219,6 +229,42 @@ func TestI2cFinalizeWithErrors(t *testing.T) {
 	err = a.Finalize()
 	// assert
 	gobottest.Assert(t, strings.Contains(err.Error(), "close error"), true)
+}
+
+func Test_validateSpiBusNumber(t *testing.T) {
+	var tests = map[string]struct {
+		busNr   int
+		wantErr error
+	}{
+		"number_negative_error": {
+			busNr:   -1,
+			wantErr: fmt.Errorf("Bus number -1 out of range"),
+		},
+		"number_0_ok": {
+			busNr: 0,
+		},
+		"number_1_error": {
+			busNr:   1,
+			wantErr: fmt.Errorf("Bus number 1 out of range"),
+		},
+		"number_2_ok": {
+			busNr: 2,
+		},
+		"number_3_error": {
+			busNr:   3,
+			wantErr: fmt.Errorf("Bus number 3 out of range"),
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			a := NewAdaptor()
+			// act
+			err := a.validateSpiBusNumber(tc.busNr)
+			// assert
+			gobottest.Assert(t, err, tc.wantErr)
+		})
+	}
 }
 
 func Test_validateI2cBusNumber(t *testing.T) {

@@ -201,6 +201,18 @@ func (d *i2cDevice) WriteBlockData(reg uint8, data []byte) error {
 	return d.smbusAccess(I2C_SMBUS_WRITE, reg, I2C_SMBUS_I2C_BLOCK_DATA, unsafe.Pointer(&buf[0]))
 }
 
+// WriteBytes writes the given buffer starting from the current register of an i2c device.
+func (d *i2cDevice) WriteBytes(data []byte) error {
+	n, err := d.Write(data)
+	if err != nil {
+		return err
+	}
+	if n != len(data) {
+		return fmt.Errorf("Write %v bytes to device by sysfs, expected %v", n, len(data))
+	}
+	return nil
+}
+
 // Read implements the io.ReadWriteCloser method by direct I2C read operations.
 func (d *i2cDevice) Read(b []byte) (n int, err error) {
 	// lazy initialization
@@ -240,7 +252,7 @@ func (d *i2cDevice) smbusAccess(readWrite byte, command byte, protocol uint32, d
 }
 
 func (d *i2cDevice) readBlockDataFallback(reg uint8, data []byte) error {
-	if err := d.writeAndCheckCount([]byte{reg}); err != nil {
+	if err := d.WriteBytes([]byte{reg}); err != nil {
 		return err
 	}
 	if err := d.readAndCheckCount(data); err != nil {
@@ -254,7 +266,7 @@ func (d *i2cDevice) writeBlockDataFallback(reg uint8, data []byte) error {
 	copy(buf[1:], data)
 	buf[0] = reg
 
-	if err := d.writeAndCheckCount(buf); err != nil {
+	if err := d.WriteBytes(buf); err != nil {
 		return err
 	}
 	return nil
@@ -267,17 +279,6 @@ func (d *i2cDevice) readAndCheckCount(data []byte) error {
 	}
 	if n != len(data) {
 		return fmt.Errorf("Read %v bytes from device by sysfs, expected %v", n, len(data))
-	}
-	return nil
-}
-
-func (d *i2cDevice) writeAndCheckCount(data []byte) error {
-	n, err := d.Write(data)
-	if err != nil {
-		return err
-	}
-	if n != len(data) {
-		return fmt.Errorf("Write %v bytes to device by sysfs, expected %v", n, len(data))
 	}
 	return nil
 }
