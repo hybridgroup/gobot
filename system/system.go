@@ -47,7 +47,7 @@ type digitalPinAccesser interface {
 
 // spiAccesser represents unexposed interface to allow the switch between different implementations and a mocked one
 type spiAccesser interface {
-	createConnection(busNum, chipNum, mode, bits int, maxSpeed int64) (gobot.SpiOperations, error)
+	createDevice(busNum, chipNum, mode, bits int, maxSpeed int64) (gobot.SpiSystemDevicer, error)
 }
 
 // Accesser provides access to system calls, filesystem, implementation for digital pin and SPI
@@ -145,9 +145,9 @@ func (a *Accesser) NewPWMPin(path string, pin int, polNormIdent string, polInvId
 	return newPWMPinSysfs(a.fs, path, pin, polNormIdent, polInvIdent)
 }
 
-// NewSpiConnection returns a new connection to SPI with the given parameters.
-func (a *Accesser) NewSpiConnection(busNum, chipNum, mode, bits int, maxSpeed int64) (gobot.SpiOperations, error) {
-	return a.spiAccess.createConnection(busNum, chipNum, mode, bits, maxSpeed)
+// NewSpiDevice returns a new connection to SPI with the given parameters.
+func (a *Accesser) NewSpiDevice(busNum, chipNum, mode, bits int, maxSpeed int64) (gobot.SpiSystemDevicer, error) {
+	return a.spiAccess.createDevice(busNum, chipNum, mode, bits, maxSpeed)
 }
 
 // OpenFile opens file of given name from native or the mocked file system

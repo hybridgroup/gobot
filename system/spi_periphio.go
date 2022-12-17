@@ -8,15 +8,15 @@ import (
 	xsysfs "periph.io/x/host/v3/sysfs"
 )
 
-// spiConnectionPeriphIo is the implementation of the SPI interface using the periph.io sysfs implementation for Linux.
-type spiConnectionPeriphIo struct {
+// spiPeriphIo is the implementation of the SPI interface using the periph.io sysfs implementation for Linux.
+type spiPeriphIo struct {
 	port xspi.PortCloser
 	dev  xspi.Conn
 }
 
-// newSpiConnectionPeriphIo creates and returns a new connection to a specific SPI device on a bus/chip
+// newSpiPeriphIo creates and returns a new connection to a specific SPI device on a bus/chip
 // using the periph.io interface.
-func newSpiConnectionPeriphIo(busNum, chipNum, mode, bits int, maxSpeed int64) (*spiConnectionPeriphIo, error) {
+func newSpiPeriphIo(busNum, chipNum, mode, bits int, maxSpeed int64) (*spiPeriphIo, error) {
 	p, err := xsysfs.NewSPI(busNum, chipNum)
 	if err != nil {
 		return nil, err
@@ -25,40 +25,22 @@ func newSpiConnectionPeriphIo(busNum, chipNum, mode, bits int, maxSpeed int64) (
 	if err != nil {
 		return nil, err
 	}
-	return &spiConnectionPeriphIo{port: p, dev: c}, nil
+	return &spiPeriphIo{port: p, dev: c}, nil
 }
 
-// Close the SPI connection. Implements gobot.BusOperations.
-func (c *spiConnectionPeriphIo) Close() error {
-	return c.port.Close()
-}
-
-// ReadCommandData uses the SPI device TX to send/receive data.
-func (c *spiConnectionPeriphIo) ReadCommandData(command []byte, data []byte) error {
-	dataLen := len(data)
-	if err := c.dev.Tx(command, data); err != nil {
+// TxRx uses the SPI device TX to send/receive data. Implements gobot.SpiSystemDevicer.
+func (c *spiPeriphIo) TxRx(tx []byte, rx []byte) error {
+	dataLen := len(rx)
+	if err := c.dev.Tx(tx, rx); err != nil {
 		return err
 	}
-	if len(data) != dataLen {
-		return fmt.Errorf("Read length (%d) differ to expected (%d)", len(data), dataLen)
+	if len(rx) != dataLen {
+		return fmt.Errorf("Read length (%d) differ to expected (%d)", len(rx), dataLen)
 	}
 	return nil
 }
 
-// WriteByte uses the SPI device TX to send a byte value. Implements gobot.BusOperations.
-func (c *spiConnectionPeriphIo) WriteByte(val byte) error {
-	return c.WriteBytes([]byte{val})
-}
-
-// WriteBlockData uses the SPI device TX to send data. Implements gobot.BusOperations.
-func (c *spiConnectionPeriphIo) WriteBlockData(reg byte, data []byte) error {
-	buf := make([]byte, len(data)+1)
-	copy(buf[1:], data)
-	buf[0] = reg
-	return c.WriteBytes(data)
-}
-
-// WriteBytes uses the SPI device TX to send the given data.
-func (c *spiConnectionPeriphIo) WriteBytes(data []byte) error {
-	return c.dev.Tx(data, nil)
+// Close the SPI connection. Implements gobot.SpiSystemDevicer.
+func (c *spiPeriphIo) Close() error {
+	return c.port.Close()
 }

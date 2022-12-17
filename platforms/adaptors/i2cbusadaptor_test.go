@@ -34,11 +34,11 @@ func initTestI2cAdaptorWithMockedFilesystem(mockPaths []string) (*I2cBusAdaptor,
 
 func TestI2cWorkflow(t *testing.T) {
 	a, _ := initTestI2cAdaptorWithMockedFilesystem([]string{i2cBus1})
-	gobottest.Assert(t, len(a.buses), 0)
+	gobottest.Assert(t, len(a.connections), 0)
 
 	con, err := a.GetI2cConnection(0xff, 1)
 	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, len(a.buses), 1)
+	gobottest.Assert(t, len(a.connections), 1)
 
 	_, err = con.Write([]byte{0x00, 0x01})
 	gobottest.Assert(t, err, nil)
@@ -49,7 +49,7 @@ func TestI2cWorkflow(t *testing.T) {
 	gobottest.Assert(t, data, []byte{0x00, 0x01})
 
 	gobottest.Assert(t, a.Finalize(), nil)
-	gobottest.Assert(t, len(a.buses), 0)
+	gobottest.Assert(t, len(a.connections), 0)
 }
 
 func TestI2cGetI2cConnection(t *testing.T) {
@@ -59,18 +59,18 @@ func TestI2cGetI2cConnection(t *testing.T) {
 	c1, e1 := a.GetI2cConnection(0xff, 1)
 	gobottest.Assert(t, e1, nil)
 	gobottest.Refute(t, c1, nil)
-	gobottest.Assert(t, len(a.buses), 1)
+	gobottest.Assert(t, len(a.connections), 1)
 	// assert invalid bus gets error
 	c2, e2 := a.GetI2cConnection(0x01, 99)
 	gobottest.Assert(t, e2, fmt.Errorf("99 not valid"))
 	gobottest.Assert(t, c2, nil)
-	gobottest.Assert(t, len(a.buses), 1)
+	gobottest.Assert(t, len(a.connections), 1)
 	// assert unconnected gets error
 	gobottest.Assert(t, a.Finalize(), nil)
 	c3, e3 := a.GetI2cConnection(0x01, 99)
 	gobottest.Assert(t, e3, fmt.Errorf("not connected"))
 	gobottest.Assert(t, c3, nil)
-	gobottest.Assert(t, len(a.buses), 0)
+	gobottest.Assert(t, len(a.connections), 0)
 }
 
 func TestI2cFinalize(t *testing.T) {
@@ -81,16 +81,16 @@ func TestI2cFinalize(t *testing.T) {
 	// arrange
 	gobottest.Assert(t, a.Connect(), nil)
 	a.GetI2cConnection(0xaf, 1)
-	gobottest.Assert(t, len(a.buses), 1)
+	gobottest.Assert(t, len(a.connections), 1)
 	// assert that Finalize after GetI2cConnection is working and clean up
 	gobottest.Assert(t, a.Finalize(), nil)
-	gobottest.Assert(t, len(a.buses), 0)
+	gobottest.Assert(t, len(a.connections), 0)
 	// assert that finalize after finalize is working
 	gobottest.Assert(t, a.Finalize(), nil)
 	// assert that close error is recognized
 	gobottest.Assert(t, a.Connect(), nil)
 	con, _ := a.GetI2cConnection(0xbf, 1)
-	gobottest.Assert(t, len(a.buses), 1)
+	gobottest.Assert(t, len(a.connections), 1)
 	con.Write([]byte{0xbf})
 	fs.WithCloseError = true
 	err := a.Finalize()
@@ -104,8 +104,8 @@ func TestI2cReConnect(t *testing.T) {
 	// act
 	gobottest.Assert(t, a.Connect(), nil)
 	// assert
-	gobottest.Refute(t, a.buses, nil)
-	gobottest.Assert(t, len(a.buses), 0)
+	gobottest.Refute(t, a.connections, nil)
+	gobottest.Assert(t, len(a.connections), 0)
 }
 
 func TestI2cGetDefaultBus(t *testing.T) {

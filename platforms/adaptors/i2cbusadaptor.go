@@ -17,7 +17,7 @@ type I2cBusAdaptor struct {
 	validateNumber   i2cBusNumberValidator
 	defaultBusNumber int
 	mutex            sync.Mutex
-	buses            map[int]i2c.I2cDevice
+	connections      map[string]i2c.Connection
 }
 
 // NewI2cBusAdaptor provides the access to i2c buses of the board. The validator is used to check the bus number,
@@ -36,7 +36,7 @@ func (a *I2cBusAdaptor) Connect() error {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
-	a.buses = make(map[int]i2c.I2cDevice)
+	a.connections = make(map[string]i2c.Connection)
 	return nil
 }
 
@@ -46,38 +46,41 @@ func (a *I2cBusAdaptor) Finalize() error {
 	defer a.mutex.Unlock()
 
 	var err error
-	for _, bus := range a.buses {
-		if bus != nil {
-			if e := bus.Close(); e != nil {
+	for _, con := range a.connections {
+		if con != nil {
+			if e := con.Close(); e != nil {
 				err = multierror.Append(err, e)
 			}
 		}
 	}
-	a.buses = nil
+	a.connections = nil
 	return err
 }
 
 // GetI2cConnection returns a connection to a device on a specified i2c bus
-func (a *I2cBusAdaptor) GetI2cConnection(address int, busNr int) (connection i2c.Connection, err error) {
+func (a *I2cBusAdaptor) GetI2cConnection(address int, busNum int) (connection i2c.Connection, err error) {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
-	if a.buses == nil {
+	if a.connections == nil {
 		return nil, fmt.Errorf("not connected")
 	}
 
-	bus := a.buses[busNr]
-	if bus == nil {
-		if err := a.validateNumber(busNr); err != nil {
+	id := fmt.Sprintf("%d_%d", busNum, address)
+
+	con := a.connections[id]
+	if con == nil {
+		if err := a.validateNumber(busNum); err != nil {
 			return nil, err
 		}
-		bus, err = a.sys.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", busNr))
+		bus, err := a.sys.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", busNum))
 		if err != nil {
 			return nil, err
 		}
-		a.buses[busNr] = bus
+		con = i2c.NewConnection(bus, address)
+		a.connections[id] = con
 	}
-	return i2c.NewConnection(bus, address), err
+	return con, err
 }
 
 // DefaultI2cBus returns the default i2c bus number for this platform.

@@ -84,9 +84,11 @@ func (a *SpiBusAdaptor) GetSpiConnection(busNum, chipNum, mode, bits int, maxSpe
 			return nil, err
 		}
 		var err error
-		if con, err = a.sys.NewSpiConnection(busNum, chipNum, mode, bits, maxSpeed); err != nil {
+		bus, err := a.sys.NewSpiDevice(busNum, chipNum, mode, bits, maxSpeed)
+		if err != nil {
 			return nil, err
 		}
+		con = spi.NewConnection(bus)
 		a.connections[id] = con
 	}
 

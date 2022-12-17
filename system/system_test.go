@@ -19,7 +19,7 @@ func TestNewAccesser(t *testing.T) {
 	gobottest.Refute(t, perphioSpi, nil)
 }
 
-func TestNewAccesser_NewSpiConnection(t *testing.T) {
+func TestNewAccesser_NewSpiDevice(t *testing.T) {
 	// arrange
 
 	const (
@@ -32,7 +32,7 @@ func TestNewAccesser_NewSpiConnection(t *testing.T) {
 	a := NewAccesser()
 	spi := a.UseMockSpi()
 	// act
-	con, err := a.NewSpiConnection(busNum, chipNum, mode, bits, maxSpeed)
+	con, err := a.NewSpiDevice(busNum, chipNum, mode, bits, maxSpeed)
 	// assert
 	gobottest.Assert(t, err, nil)
 	gobottest.Refute(t, con, nil)

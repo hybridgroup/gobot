@@ -34,12 +34,6 @@ const (
 	set            = 0x01
 )
 
-// I2cDevice is the interface to a specific i2c bus
-type I2cDevice interface {
-	gobot.I2cOperations
-	SetAddress(int) error
-}
-
 // Connection is a connection to an I2C device with a specified address
 // on a specific bus. Used as an alternative to the I2c interface.
 // Implements I2cOperations to talk to the device, wrapping the
@@ -48,15 +42,15 @@ type I2cDevice interface {
 type Connection gobot.I2cOperations
 
 type i2cConnection struct {
-	bus     I2cDevice
+	bus     gobot.I2cSystemDevicer
 	address int
-	mutex   *sync.Mutex
+	mutex   sync.Mutex
 }
 
 // NewConnection creates and returns a new connection to a specific
 // i2c device on a bus and address.
-func NewConnection(bus I2cDevice, address int) (connection *i2cConnection) {
-	return &i2cConnection{bus: bus, address: address, mutex: &sync.Mutex{}}
+func NewConnection(bus gobot.I2cSystemDevicer, address int) (connection *i2cConnection) {
+	return &i2cConnection{bus: bus, address: address}
 }
 
 // Read data from an i2c device.

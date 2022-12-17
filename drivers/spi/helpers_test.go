@@ -35,9 +35,9 @@ func (a *spiTestAdaptor) GetSpiConnection(busNum, chipNum, mode, bits int, maxSp
 		return nil, fmt.Errorf("Invalid SPI connection in helper")
 	}
 	//a.busNum = busNum
-	con, err := a.sys.NewSpiConnection(busNum, chipNum, mode, bits, maxSpeed)
-	a.connection = con
-	return con, err
+	sysdev, err := a.sys.NewSpiDevice(busNum, chipNum, mode, bits, maxSpeed)
+	a.connection = NewConnection(sysdev)
+	return a.connection, err
 }
 
 func (a *spiTestAdaptor) SpiDefaultBusNumber() int  { return 0 }
