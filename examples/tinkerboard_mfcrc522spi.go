@@ -22,12 +22,36 @@ func main() {
 	a := tinkerboard.NewAdaptor()
 	d := spi.NewMFRC522Driver(a, spi.WithBusNumber(2))
 
+	wasCardDetected := false
+	const textToCard = "Hello RFID user!\nThis text was written to card."
+
 	work := func() {
-		var err error
+		if err := d.PrintReaderVersion(); err != nil {
+			fmt.Println("get version err:", err)
+		}
 
 		gobot.Every(2*time.Second, func() {
-			if err = d.Check(); err != nil {
-				fmt.Println(err)
+			if !wasCardDetected {
+				fmt.Println("\n+++ poll for card +++")
+				if err := d.IsCardPresent(); err != nil {
+					fmt.Println("no card found")
+				} else {
+					fmt.Println("\n+++ write card +++")
+					err := d.WriteText(textToCard)
+					if err != nil {
+						fmt.Println("write err:", err)
+					}
+					wasCardDetected = true
+				}
+			} else {
+				fmt.Println("\n+++ read card +++")
+				text, err := d.ReadText()
+				if err != nil {
+					fmt.Println("read err:", err)
+					wasCardDetected = false
+				} else {
+					fmt.Printf("-- start text --\n%s\n-- end  text --\n", text)
+				}
 			}
 		})
 	}

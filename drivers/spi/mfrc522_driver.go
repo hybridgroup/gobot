@@ -37,8 +37,7 @@ func NewMFRC522Driver(a Connector, options ...func(Config)) *MFRC522Driver {
 
 func (d *MFRC522Driver) initialize() error {
 	wrapper := &conWrapper{origCon: d.connection}
-	d.MFRC522Common.Connect(wrapper)
-	return d.MFRC522Common.Initialize()
+	return d.MFRC522Common.Initialize(wrapper)
 }
 
 // this is necessary due to special behavior of shift bytes and set first bit
@@ -46,12 +45,12 @@ type conWrapper struct {
 	origCon Connection
 }
 
-func (w *conWrapper) WriteByteData(reg uint8, val uint8) error {
-	// LSBit not used for first byte (address/register)
-	return w.origCon.WriteByteData(reg<<1, val)
-}
-
 func (w *conWrapper) ReadByteData(reg uint8) (uint8, error) {
 	// MSBit=1 for reading, LSBit not used for first byte (address/register)
 	return w.origCon.ReadByteData(0x80 | (reg << 1))
+}
+
+func (w *conWrapper) WriteByteData(reg uint8, val uint8) error {
+	// LSBit not used for first byte (address/register)
+	return w.origCon.WriteByteData(reg<<1, val)
 }

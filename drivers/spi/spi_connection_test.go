@@ -50,12 +50,29 @@ func TestReadByteData(t *testing.T) {
 		want = uint8(0x41)
 	)
 	c, sysdev := initTestConnectionWithMockedSystem()
-	sysdev.SetSimRead([]byte{want})
+	sysdev.SetSimRead([]byte{0x00, want}) // the answer is one cycle behind
 	// act
 	got, err := c.ReadByteData(reg)
 	// assert
 	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, sysdev.Written(), []byte{reg})
+	gobottest.Assert(t, sysdev.Written(), []byte{reg, 0x00}) // for read register we need n+1 bytes
+	gobottest.Assert(t, got, want)
+}
+
+func TestReadBlockData(t *testing.T) {
+	// arrange
+	const (
+		reg = 0x16
+	)
+	want := []byte{42, 24, 56, 65}
+	c, sysdev := initTestConnectionWithMockedSystem()
+	sysdev.SetSimRead(append([]byte{0x00}, want...)) // the answer is one cycle behind
+	// act
+	got := make([]byte, 4)
+	err := c.ReadBlockData(reg, got)
+	// assert
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, sysdev.Written(), []byte{reg, 0x00, 0x00, 0x00, 0x00}) // for read registers we need n+1 bytes
 	gobottest.Assert(t, got, want)
 }
 

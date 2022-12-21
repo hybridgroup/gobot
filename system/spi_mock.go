@@ -47,8 +47,9 @@ func (spi *MockSpiAccess) SetCloseError(val bool) {
 }
 
 // SetSimRead is used to set the byte stream for next read.
-func (spi *MockSpiAccess) SetSimRead(val []byte) {
-	spi.sysdev.simRead = val
+func (spi *MockSpiAccess) SetSimRead(data []byte) {
+	spi.sysdev.simRead = make([]byte, len(data))
+	copy(spi.sysdev.simRead, data)
 }
 
 // Written returns the byte stream which was last written.
@@ -91,6 +92,8 @@ func (c *spiMock) TxRx(tx []byte, rx []byte) error {
 		return fmt.Errorf("error while SPI read in mock")
 	}
 	c.written = append(c.written, tx...)
+	// TODO: this must be rechecked: copy(rx, append([]byte{0}, c.simRead...))
+	// the answer can be one cycle behind, this must be considered in test setup
 	copy(rx, c.simRead)
 	return nil
 }

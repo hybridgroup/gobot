@@ -93,6 +93,8 @@ type SpiSystemDevicer interface {
 type BusOperations interface {
 	// ReadByteData reads a byte from the given register of bus device.
 	ReadByteData(reg uint8) (uint8, error)
+	// ReadBlockData fills the given buffer with reads starting from the given register of bus device.
+	ReadBlockData(reg uint8, data []byte) error
 	// WriteByteData writes the given byte value to the given register of bus device.
 	WriteByteData(reg uint8, val uint8) error
 	// WriteBlockData writes the given data starting from the given register of bus device.
@@ -122,6 +124,8 @@ type BusOperations interface {
 //
 // ReadByteData must be implemented as the sequence:
 // "S Addr Wr [A] Comm [A] Sr Addr Rd [A] [Data] NA P"
+// ReadBlockData must be implemented as the sequence:
+// "S Addr Wr [A] Comm [A] Sr Addr Rd [A] [Count] A [Data] A [Data] A ... A [Data] NA P"
 // WriteByte must be implemented as the sequence:
 // "S Addr Wr [A] Data [A] P"
 // WriteByteData must be implemented as the sequence:
@@ -139,10 +143,6 @@ type I2cOperations interface {
 	// ReadWordData must be implemented as the sequence:
 	// "S Addr Wr [A] Comm [A] Sr Addr Rd [A] [DataLow] A [DataHigh] NA P"
 	ReadWordData(reg uint8) (uint16, error)
-
-	// ReadBlockData must be implemented as the sequence:
-	// "S Addr Wr [A] Comm [A] Sr Addr Rd [A] [Count] A [Data] A [Data] A ... A [Data] NA P"
-	ReadBlockData(reg uint8, b []byte) error
 
 	// WriteWordData must be implemented as the sequence:
 	// "S Addr Wr [A] Comm [A] DataLow [A] DataHigh [A] P"

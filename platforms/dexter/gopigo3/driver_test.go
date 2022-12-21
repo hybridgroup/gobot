@@ -281,6 +281,7 @@ func (c TestSpiDevice) Close() error {
 }
 
 func (c TestSpiDevice) ReadByteData(byte) (byte, error)   { return 0, nil }
+func (c TestSpiDevice) ReadBlockData(byte, []byte) error  { return nil }
 func (c TestSpiDevice) WriteByte(byte) error              { return nil }
 func (c TestSpiDevice) WriteByteData(byte, byte) error    { return nil }
 func (c TestSpiDevice) WriteBlockData(byte, []byte) error { return nil }
