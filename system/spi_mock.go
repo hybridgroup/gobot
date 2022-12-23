@@ -31,6 +31,10 @@ func (spi *MockSpiAccess) createDevice(busNum, chipNum, mode, bits int, maxSpeed
 	return spi.sysdev, err
 }
 
+func (*MockSpiAccess) isSupported() bool {
+	return true
+}
+
 // SetReadError can be used to simulate a read error.
 func (spi *MockSpiAccess) SetReadError(val bool) {
 	spi.sysdev.simReadErr = val

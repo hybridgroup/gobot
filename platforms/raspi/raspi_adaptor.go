@@ -40,7 +40,7 @@ type Adaptor struct {
 
 // NewAdaptor creates a Raspi Adaptor
 func NewAdaptor() *Adaptor {
-	sys := system.NewAccesser("cdev")
+	sys := system.NewAccesser(system.WithDigitalPinAccess("cdev"))
 	c := &Adaptor{
 		name:            gobot.DefaultName("RaspberryPi"),
 		sys:             sys,

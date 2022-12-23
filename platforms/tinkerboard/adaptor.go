@@ -43,7 +43,7 @@ type Adaptor struct {
 
 // NewAdaptor creates a Tinkerboard Adaptor
 func NewAdaptor() *Adaptor {
-	sys := system.NewAccesser("cdev")
+	sys := system.NewAccesser(system.WithDigitalPinAccess("cdev"))
 	c := &Adaptor{
 		name: gobot.DefaultName("Tinker Board"),
 		sys:  sys,

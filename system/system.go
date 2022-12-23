@@ -1,7 +1,6 @@
 package system
 
 import (
-	"fmt"
 	"os"
 	"syscall"
 	"unsafe"
@@ -48,6 +47,7 @@ type digitalPinAccesser interface {
 // spiAccesser represents unexposed interface to allow the switch between different implementations and a mocked one
 type spiAccesser interface {
 	createDevice(busNum, chipNum, mode, bits int, maxSpeed int64) (gobot.SpiSystemDevicer, error)
+	isSupported() bool
 }
 
 // Accesser provides access to system calls, filesystem, implementation for digital pin and SPI
@@ -60,31 +60,17 @@ type Accesser struct {
 
 // NewAccesser returns a accesser to native system call, native file system and the chosen digital pin access.
 // Digital pin accesser can be empty or "sysfs", otherwise it will be automatically chosen.
-func NewAccesser(digitalPinAccess ...string) *Accesser {
-	s := Accesser{
+func NewAccesser(options ...func(systemOptioner)) *Accesser {
+	s := &Accesser{
 		sys:       &nativeSyscall{},
 		fs:        &nativeFilesystem{},
 		spiAccess: &periphioSpiAccess{},
 	}
-	a := "sysfs"
-	if len(digitalPinAccess) > 0 && digitalPinAccess[0] != "" {
-		a = digitalPinAccess[0]
-	}
-	if a != "sysfs" {
-		dpa := &gpiodDigitalPinAccess{fs: s.fs}
-		if dpa.isSupported() {
-			s.digitalPinAccess = dpa
-			if systemDebug {
-				fmt.Printf("use gpiod driver for digital pins with this chips: %v\n", dpa.chips)
-			}
-			return &s
-		}
-		if systemDebug {
-			fmt.Println("gpiod driver not supported, fallback to sysfs")
-		}
-	}
 	s.digitalPinAccess = &sysfsDigitalPinAccess{fs: s.fs}
-	return &s
+	for _, option := range options {
+		option(s)
+	}
+	return s
 }
 
 // UseDigitalPinAccessWithMockFs sets the digital pin handler accesser to the chosen one. Used only for tests.

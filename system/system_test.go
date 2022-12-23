@@ -73,7 +73,7 @@ func TestNewAccesser_IsSysfsDigitalPinAccess(t *testing.T) {
 				}
 			}
 			// act
-			a := NewAccesser(tc.accesser)
+			a := NewAccesser(WithDigitalPinAccess(tc.accesser))
 			got := a.IsSysfsDigitalPinAccess()
 			// assert
 			gobottest.Refute(t, a, nil)
