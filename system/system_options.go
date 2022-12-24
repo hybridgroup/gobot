@@ -50,11 +50,11 @@ func (a *Accesser) setSpiToGpioAccess(p gobot.DigitalPinnerProvider, sclkPin, ns
 	if gsa.isSupported() {
 		a.spiAccess = gsa
 		if systemDebug {
-			fmt.Printf("use gpiod driver for SPI with this config: %s\n", gsa.cfg)
+			fmt.Printf("use gpio driver for SPI with this config: %s\n", gsa.cfg.String())
 		}
 		return
 	}
 	if systemDebug {
-		fmt.Println("gpiod driver not supported for SPI, fallback to periphio")
+		fmt.Println("gpio driver not supported for SPI, fallback to periphio")
 	}
 }

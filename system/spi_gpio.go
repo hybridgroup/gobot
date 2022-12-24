@@ -2,7 +2,6 @@ package system
 
 import (
 	"fmt"
-	"log"
 	"time"
 
 	"gobot.io/x/gobot"
@@ -16,7 +15,7 @@ type spiGpioConfig struct {
 	misoPinId   string
 }
 
-// spiGpiod is the implementation of the SPI interface using the periph.io sysfs implementation for Linux.
+// spiGpio is the implementation of the SPI interface using GPIO's.
 type spiGpio struct {
 	cfg spiGpioConfig
 	// time between clock edges (i.e. half the cycle time)
@@ -38,10 +37,15 @@ func (s *spiGpio) initializeTime(maxSpeed int64) {
 	// maxSpeed is given in Hz, tclk is half the cycle time, tclk=1/(2*f), tclk[ns]=1 000 000 000/(2*maxSpeed)
 	// but with gpio's a speed of more than ~15kHz is most likely not possible, so we limit to 10kHz
 	if maxSpeed > 10000 {
+		if systemDebug {
+			fmt.Printf("reduce SPI speed for GPIO usage to 10Khz")
+		}
 		maxSpeed = 10000
 	}
 	tclk := time.Duration(1000000000/2/maxSpeed) * time.Nanosecond
-	log.Println("clk", tclk)
+	if systemDebug {
+		fmt.Println("clk", tclk)
+	}
 }
 
 // TxRx uses the SPI device to send/receive data. Implements gobot.SpiSystemDevicer.

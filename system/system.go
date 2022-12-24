@@ -8,7 +8,7 @@ import (
 	"gobot.io/x/gobot"
 )
 
-const systemDebug = true
+const systemDebug = false
 
 // A File represents basic IO interactions with the underlying file system
 type File interface {
