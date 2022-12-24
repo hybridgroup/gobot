@@ -109,7 +109,7 @@ func (d *MFRC522Common) switchAntenna(targetState bool) error {
 	if targetState {
 		val = val | maskForOn
 	} else {
-		val = val & maskForOn
+		val = val & ^maskForOn
 	}
 
 	if err := d.writeByteData(regTxControl, val); err != nil {
