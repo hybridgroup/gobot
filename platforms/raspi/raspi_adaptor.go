@@ -39,14 +39,18 @@ type Adaptor struct {
 }
 
 // NewAdaptor creates a Raspi Adaptor
-func NewAdaptor() *Adaptor {
-	sys := system.NewAccesser(system.WithDigitalPinAccess("cdev"))
+//
+// Optional parameters:
+//		adaptors.WithGpiodAccess():	use character device gpiod driver instead of sysfs (still used by default)
+//		adaptors.WithSpiGpioAccess(sclk, nss, mosi, miso):	use GPIO's instead of /dev/spidev#.#
+func NewAdaptor(opts ...func(adaptors.Optioner)) *Adaptor {
+	sys := system.NewAccesser(system.WithDigitalPinGpiodAccess())
 	c := &Adaptor{
 		name:            gobot.DefaultName("RaspberryPi"),
 		sys:             sys,
 		PiBlasterPeriod: 10000000,
 	}
-	c.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, c.getPinTranslatorFunction())
+	c.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, c.getPinTranslatorFunction(), opts...)
 	c.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, c.validateI2cBusNumber, 1)
 	c.SpiBusAdaptor = adaptors.NewSpiBusAdaptor(sys, c.validateSpiBusNumber, defaultSpiBusNumber, defaultSpiChipNumber,
 		defaultSpiMode, defaultSpiBitsNumber, defaultSpiMaxSpeed)

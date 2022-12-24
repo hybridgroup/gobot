@@ -8,7 +8,7 @@ import (
 	"gobot.io/x/gobot"
 )
 
-const systemDebug = false
+const systemDebug = true
 
 // A File represents basic IO interactions with the underlying file system
 type File interface {
@@ -46,8 +46,8 @@ type digitalPinAccesser interface {
 
 // spiAccesser represents unexposed interface to allow the switch between different implementations and a mocked one
 type spiAccesser interface {
-	createDevice(busNum, chipNum, mode, bits int, maxSpeed int64) (gobot.SpiSystemDevicer, error)
 	isSupported() bool
+	createDevice(busNum, chipNum, mode, bits int, maxSpeed int64) (gobot.SpiSystemDevicer, error)
 }
 
 // Accesser provides access to system calls, filesystem, implementation for digital pin and SPI
@@ -60,12 +60,12 @@ type Accesser struct {
 
 // NewAccesser returns a accesser to native system call, native file system and the chosen digital pin access.
 // Digital pin accesser can be empty or "sysfs", otherwise it will be automatically chosen.
-func NewAccesser(options ...func(systemOptioner)) *Accesser {
+func NewAccesser(options ...func(Optioner)) *Accesser {
 	s := &Accesser{
-		sys:       &nativeSyscall{},
-		fs:        &nativeFilesystem{},
-		spiAccess: &periphioSpiAccess{},
+		sys: &nativeSyscall{},
+		fs:  &nativeFilesystem{},
 	}
+	s.spiAccess = &periphioSpiAccess{fs: s.fs}
 	s.digitalPinAccess = &sysfsDigitalPinAccess{fs: s.fs}
 	for _, option := range options {
 		option(s)

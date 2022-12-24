@@ -96,7 +96,6 @@ func (c *spiMock) TxRx(tx []byte, rx []byte) error {
 		return fmt.Errorf("error while SPI read in mock")
 	}
 	c.written = append(c.written, tx...)
-	// TODO: this must be rechecked: copy(rx, append([]byte{0}, c.simRead...))
 	// the answer can be one cycle behind, this must be considered in test setup
 	copy(rx, c.simRead)
 	return nil

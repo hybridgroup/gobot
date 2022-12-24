@@ -44,36 +44,35 @@ func TestNewAccesser_NewSpiDevice(t *testing.T) {
 }
 
 func TestNewAccesser_IsSysfsDigitalPinAccess(t *testing.T) {
-	const gpiodTestCase = "accesser_gpiod"
 	var tests = map[string]struct {
-		accesser string
-		wantSys  bool
+		gpiodAccesser bool
+		wantSys       bool
 	}{
 		"default_accesser_sysfs": {
 			wantSys: true,
 		},
 		"accesser_sysfs": {
-			accesser: "sysfs",
-			wantSys:  true,
+			wantSys: true,
 		},
-		gpiodTestCase: {
-			accesser: "cdev",
-			wantSys:  false,
+		"accesser_gpiod": {
+			gpiodAccesser: true,
+			wantSys:       false,
 		},
 	}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
-			if name == gpiodTestCase {
+			a := NewAccesser()
+			if tc.gpiodAccesser {
 				// there is no mock at this level, so if the system do not support
 				// character device gpio, we skip the test
 				dpa := &gpiodDigitalPinAccess{fs: &nativeFilesystem{}}
 				if !dpa.isSupported() {
 					t.Skip()
 				}
+				WithDigitalPinGpiodAccess()(a)
 			}
 			// act
-			a := NewAccesser(WithDigitalPinAccess(tc.accesser))
 			got := a.IsSysfsDigitalPinAccess()
 			// assert
 			gobottest.Refute(t, a, nil)

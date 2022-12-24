@@ -2,88 +2,160 @@ package system
 
 import (
 	"fmt"
+	"log"
 	"time"
 
-	"github.com/warthog618/gpiod"
-	xspi "github.com/warthog618/gpiod/spi"
+	"gobot.io/x/gobot"
 )
 
-// spiGpiod is the implementation of the SPI interface using the periph.io sysfs implementation for Linux.
-type spiGpiod struct {
-	xs *xspi.SPI
+type spiGpioConfig struct {
+	pinProvider gobot.DigitalPinnerProvider
+	sclkPinId   string
+	nssPinId    string
+	mosiPinId   string
+	misoPinId   string
 }
 
-// newSpiGpiod creates and returns a new SPI connection based on given GPIO's.
-func newSpiGpiod(chipName string, sclk, ssz, mosi, miso int, tclk time.Duration) (*spiGpiod, error) {
-	c, err := gpiod.NewChip(chipName, gpiod.WithConsumer("spi_emulation"))
-	xs, err := xspi.New(c, sclk, ssz, mosi, miso)
-	xspi.WithTclk(tclk)
-	if err != nil {
-		return nil, err
+// spiGpiod is the implementation of the SPI interface using the periph.io sysfs implementation for Linux.
+type spiGpio struct {
+	cfg spiGpioConfig
+	// time between clock edges (i.e. half the cycle time)
+	tclk    time.Duration
+	sclkPin gobot.DigitalPinner
+	nssPin  gobot.DigitalPinner
+	mosiPin gobot.DigitalPinner
+	misoPin gobot.DigitalPinner
+}
+
+// newSpiGpio creates and returns a new SPI connection based on given GPIO's.
+func newSpiGpio(cfg spiGpioConfig, maxSpeed int64) (*spiGpio, error) {
+	spi := &spiGpio{cfg: cfg}
+	spi.initializeTime(maxSpeed)
+	return spi, spi.initializeGpios()
+}
+
+func (s *spiGpio) initializeTime(maxSpeed int64) {
+	// maxSpeed is given in Hz, tclk is half the cycle time, tclk=1/(2*f), tclk[ns]=1 000 000 000/(2*maxSpeed)
+	// but with gpio's a speed of more than ~15kHz is most likely not possible, so we limit to 10kHz
+	if maxSpeed > 10000 {
+		maxSpeed = 10000
 	}
-	return &spiGpiod{xs: xs}, nil
+	tclk := time.Duration(1000000000/2/maxSpeed) * time.Nanosecond
+	log.Println("clk", tclk)
 }
 
 // TxRx uses the SPI device to send/receive data. Implements gobot.SpiSystemDevicer.
-func (c *spiGpiod) TxRx(tx []byte, rx []byte) error {
-	dataLen := len(rx)
-	if len(tx) != len(rx) {
-		return fmt.Errorf("length of tx (%d) must be the same as length of rx (%d)", len(tx), len(rx))
+func (s *spiGpio) TxRx(tx []byte, rx []byte) error {
+	var doRx bool
+	if rx != nil {
+		doRx = true
+		if len(tx) != len(rx) {
+			return fmt.Errorf("length of tx (%d) must be the same as length of rx (%d)", len(tx), len(rx))
+		}
+	}
+
+	if err := s.nssPin.Write(0); err != nil {
+		return err
 	}
 
 	for idx, b := range tx {
-		if err := c.writeByte(b); err != nil {
-			return err
-		}
-
-		val, err := c.readByte()
+		val, err := s.transferByte(b)
 		if err != nil {
 			return err
 		}
-		rx[idx] = val
+		if doRx {
+			rx[idx] = val
+		}
 	}
 
-	if len(rx) != dataLen {
-		return fmt.Errorf("Read length (%d) differ to expected (%d)", len(rx), dataLen)
-	}
-	return nil
+	return s.nssPin.Write(1)
 }
 
 // Close the SPI connection. Implements gobot.SpiSystemDevicer.
-func (c *spiGpiod) Close() error {
-	c.xs.Close()
-	return nil
-}
-
-func (c *spiGpiod) writeByte(b byte) error {
-	// bit wise clock out the given byte
-	for j := 0; j < 8; j++ {
-		mask := byte(1 << uint(j))
-		if (b & mask) == 0 {
-			if err := c.xs.ClockOut(0); err != nil {
-				return err
-			}
-			continue
-		}
-		if err := c.xs.ClockOut(1); err != nil {
-			return err
-		}
+func (s *spiGpio) Close() error {
+	if s.sclkPin != nil {
+		s.sclkPin.Unexport()
+	}
+	if s.mosiPin != nil {
+		s.mosiPin.Unexport()
+	}
+	if s.misoPin != nil {
+		s.misoPin.Unexport()
+	}
+	if s.nssPin != nil {
+		s.nssPin.Unexport()
 	}
 	return nil
 }
 
-func (c *spiGpiod) readByte() (uint8, error) {
-	// bit wise clock in a byte
-	var b uint8
-	for i := uint(0); i < 8; i++ {
-		v, err := c.xs.ClockIn()
+// transferByte simultaneously transmit and receive a byte
+// polarity and phase are assumed to be both 0 (CPOL=0, CPHA=0), so:
+// * input data is captured on rising edge of SCLK
+// * output data is propagated on falling edge of SCLK
+func (c *spiGpio) transferByte(txByte uint8) (uint8, error) {
+	rxByte := uint8(0)
+	bitMask := uint8(0x80) // start at MSBit
+
+	for i := 0; i < 8; i++ {
+		if err := c.mosiPin.Write(int(txByte & bitMask)); err != nil {
+			return 0, err
+		}
+
+		time.Sleep(c.tclk)
+		if err := c.sclkPin.Write(1); err != nil {
+			return 0, err
+		}
+
+		v, err := c.misoPin.Read()
 		if err != nil {
 			return 0, err
 		}
-		b = b << 1
 		if v != 0 {
-			b = b | 0x01
+			rxByte |= bitMask
 		}
+
+		time.Sleep(c.tclk)
+		if err := c.sclkPin.Write(0); err != nil {
+			return 0, err
+		}
+
+		bitMask = bitMask >> 1 // next lower bit
 	}
-	return b, nil
+
+	return rxByte, nil
+}
+
+func (cfg *spiGpioConfig) String() string {
+	return fmt.Sprintf("sclk: %s, nss: %s, mosi: %s, miso: %s", cfg.sclkPinId, cfg.nssPinId, cfg.mosiPinId, cfg.misoPinId)
+}
+
+func (s *spiGpio) initializeGpios() error {
+	var err error
+	// nss is an output, negotiated (currently not implemented at pin level)
+	s.nssPin, err = s.cfg.pinProvider.DigitalPin(s.cfg.nssPinId)
+	if err != nil {
+		return err
+	}
+	if err := s.nssPin.ApplyOptions(WithDirectionOutput(1)); err != nil {
+		return err
+	}
+	// sclk is an output, CPOL = 0
+	s.sclkPin, err = s.cfg.pinProvider.DigitalPin(s.cfg.sclkPinId)
+	if err != nil {
+		return err
+	}
+	if err := s.sclkPin.ApplyOptions(WithDirectionOutput(0)); err != nil {
+		return err
+	}
+	// miso is an input
+	s.misoPin, err = s.cfg.pinProvider.DigitalPin(s.cfg.misoPinId)
+	if err != nil {
+		return err
+	}
+	// mosi is an output
+	s.mosiPin, err = s.cfg.pinProvider.DigitalPin(s.cfg.mosiPinId)
+	if err != nil {
+		return err
+	}
+	return s.mosiPin.ApplyOptions(WithDirectionOutput(0))
 }

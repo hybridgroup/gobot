@@ -2,6 +2,7 @@ package adaptors
 
 import (
 	"fmt"
+	"log"
 	"sync"
 
 	"github.com/hashicorp/go-multierror"
@@ -12,8 +13,10 @@ import (
 type digitalPinTranslator func(pin string) (chip string, line int, err error)
 type digitalPinInitializer func(gobot.DigitalPinner) error
 
-type digitalPinsOption interface {
+type digitalPinsOptioner interface {
 	setDigitalPinInitializer(digitalPinInitializer)
+	setDigitalPinsForSystemGpiod()
+	setDigitalPinsForSystemSpi(sclkPin, nssPin, mosiPin, misoPin string)
 }
 
 // DigitalPinsAdaptor is a adaptor for digital pins, normally used for composition in platforms.
@@ -30,7 +33,7 @@ type DigitalPinsAdaptor struct {
 // to the internal file name or chip/line nomenclature. This varies by each platform. If for some reasons the default
 // initializer is not suitable, it can be given by the option "WithDigitalPinInitializer()". This is especially needed,
 // if some values needs to be adjusted after the pin was created but before the pin is exported.
-func NewDigitalPinsAdaptor(sys *system.Accesser, t digitalPinTranslator, options ...func(digitalPinsOption)) *DigitalPinsAdaptor {
+func NewDigitalPinsAdaptor(sys *system.Accesser, t digitalPinTranslator, options ...func(Optioner)) *DigitalPinsAdaptor {
 	a := &DigitalPinsAdaptor{
 		sys:        sys,
 		translate:  t,
@@ -43,9 +46,30 @@ func NewDigitalPinsAdaptor(sys *system.Accesser, t digitalPinTranslator, options
 }
 
 // WithDigitalPinInitializer can be used to substitute the default initializer.
-func WithDigitalPinInitializer(pc digitalPinInitializer) func(digitalPinsOption) {
-	return func(a digitalPinsOption) {
-		a.setDigitalPinInitializer(pc)
+func WithDigitalPinInitializer(pc digitalPinInitializer) func(Optioner) {
+	return func(o Optioner) {
+		a, ok := o.(digitalPinsOptioner)
+		if ok {
+			a.setDigitalPinInitializer(pc)
+		}
+	}
+}
+
+func WithGpiodAccess() func(Optioner) {
+	return func(o Optioner) {
+		a, ok := o.(digitalPinsOptioner)
+		if ok {
+			a.setDigitalPinsForSystemGpiod()
+		}
+	}
+}
+
+func WithSpiGpioAccess(sclkPin, nssPin, mosiPin, misoPin string) func(Optioner) {
+	return func(o Optioner) {
+		a, ok := o.(digitalPinsOptioner)
+		if ok {
+			a.setDigitalPinsForSystemSpi(sclkPin, nssPin, mosiPin, misoPin)
+		}
 	}
 }
 
@@ -111,6 +135,14 @@ func (a *DigitalPinsAdaptor) setDigitalPinInitializer(pinInit digitalPinInitiali
 	a.initialize = pinInit
 }
 
+func (a *DigitalPinsAdaptor) setDigitalPinsForSystemGpiod() {
+	system.WithDigitalPinGpiodAccess()(a.sys)
+}
+
+func (a *DigitalPinsAdaptor) setDigitalPinsForSystemSpi(sclkPin, nssPin, mosiPin, misoPin string) {
+	system.WithSpiGpioAccess(a, sclkPin, nssPin, mosiPin, misoPin)(a.sys)
+}
+
 func (a *DigitalPinsAdaptor) digitalPin(id string, o ...func(gobot.DigitalPinOptioner) bool) (gobot.DigitalPinner, error) {
 	if a.pins == nil {
 		return nil, fmt.Errorf("not connected")
@@ -128,6 +160,7 @@ func (a *DigitalPinsAdaptor) digitalPin(id string, o ...func(gobot.DigitalPinOpt
 			return nil, err
 		}
 		a.pins[id] = pin
+		log.Println("new pin done", chip, line)
 	} else {
 		if err := pin.ApplyOptions(o...); err != nil {
 			return nil, err

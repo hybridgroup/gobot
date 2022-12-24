@@ -1,57 +1,56 @@
 package system
 
-import "fmt"
+import (
+	"fmt"
 
-type systemOptioner interface {
-	setDigitalPinAccess(string)
-	setSpiGpiodAccess(sclk, ssz, mosi, miso int)
+	"gobot.io/x/gobot"
+)
+
+type Optioner interface {
+	setDigitalPinToGpiodAccess()
+	setSpiToGpioAccess(p gobot.DigitalPinnerProvider, sclkPin, nssPin, mosiPin, misoPin string)
 }
 
-func WithDigitalPinAccess(val string) func(systemOptioner) {
-	return func(s systemOptioner) {
-		s.setDigitalPinAccess(val)
+func WithDigitalPinGpiodAccess() func(Optioner) {
+	return func(s Optioner) {
+		s.setDigitalPinToGpiodAccess()
 	}
 }
 
-func WithSpiGiodAccess(sclk, ssz, mosi, miso int) func(systemOptioner) {
-	return func(s systemOptioner) {
-		s.setSpiGpiodAccess(sclk, ssz, mosi, miso)
+func WithSpiGpioAccess(p gobot.DigitalPinnerProvider, sclkPin, nssPin, mosiPin, misoPin string) func(Optioner) {
+	return func(s Optioner) {
+		s.setSpiToGpioAccess(p, sclkPin, nssPin, mosiPin, misoPin)
 	}
 }
 
-func (a *Accesser) setDigitalPinAccess(digitalPinAccess string) {
-	if digitalPinAccess == "" {
-		digitalPinAccess = "sysfs"
-	}
-	if digitalPinAccess != "sysfs" {
-		dpa := &gpiodDigitalPinAccess{fs: a.fs}
-		if dpa.isSupported() {
-			a.digitalPinAccess = dpa
-			if systemDebug {
-				fmt.Printf("use gpiod driver for digital pins with this chips: %v\n", dpa.chips)
-			}
-			return
-		}
+func (a *Accesser) setDigitalPinToGpiodAccess() {
+	dpa := &gpiodDigitalPinAccess{fs: a.fs}
+	if dpa.isSupported() {
+		a.digitalPinAccess = dpa
 		if systemDebug {
-			fmt.Println("gpiod driver not supported, fallback to sysfs")
+			fmt.Printf("use gpiod driver for digital pins with this chips: %v\n", dpa.chips)
 		}
+		return
 	}
-	a.digitalPinAccess = &sysfsDigitalPinAccess{fs: a.fs}
+	if systemDebug {
+		fmt.Println("gpiod driver not supported, fallback to sysfs")
+	}
+
 }
 
-func (a *Accesser) setSpiGpiodAccess(sclk, ssz, mosi, miso int) {
-	gsa := &gpiodSpiAccess{
-		sclk: sclk,
-		ssz:  ssz,
-		mosi: mosi,
-		miso: miso,
-		fs:   a.fs,
+func (a *Accesser) setSpiToGpioAccess(p gobot.DigitalPinnerProvider, sclkPin, nssPin, mosiPin, misoPin string) {
+	cfg := spiGpioConfig{
+		pinProvider: p,
+		sclkPinId:   sclkPin,
+		nssPinId:    nssPin,
+		mosiPinId:   mosiPin,
+		misoPinId:   misoPin,
 	}
+	gsa := &gpioSpiAccess{cfg: cfg}
 	if gsa.isSupported() {
 		a.spiAccess = gsa
 		if systemDebug {
-			fmt.Printf("use gpiod driver for SPI with this pins:\n")
-			fmt.Printf("sclk: %d, ssz: %d, mosi: %d, miso: %d\n", gsa.sclk, gsa.ssz, gsa.mosi, gsa.miso)
+			fmt.Printf("use gpiod driver for SPI with this config: %s\n", gsa.cfg)
 		}
 		return
 	}
