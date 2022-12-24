@@ -9,10 +9,10 @@ import (
 
 type spiGpioConfig struct {
 	pinProvider gobot.DigitalPinnerProvider
-	sclkPinId   string
-	nssPinId    string
-	mosiPinId   string
-	misoPinId   string
+	sclkPinID   string
+	nssPinID    string
+	mosiPinID   string
+	misoPinID   string
 }
 
 // spiGpio is the implementation of the SPI interface using GPIO's.
@@ -92,25 +92,29 @@ func (s *spiGpio) Close() error {
 	return nil
 }
 
+func (cfg *spiGpioConfig) String() string {
+	return fmt.Sprintf("sclk: %s, nss: %s, mosi: %s, miso: %s", cfg.sclkPinID, cfg.nssPinID, cfg.mosiPinID, cfg.misoPinID)
+}
+
 // transferByte simultaneously transmit and receive a byte
 // polarity and phase are assumed to be both 0 (CPOL=0, CPHA=0), so:
 // * input data is captured on rising edge of SCLK
 // * output data is propagated on falling edge of SCLK
-func (c *spiGpio) transferByte(txByte uint8) (uint8, error) {
+func (s *spiGpio) transferByte(txByte uint8) (uint8, error) {
 	rxByte := uint8(0)
 	bitMask := uint8(0x80) // start at MSBit
 
 	for i := 0; i < 8; i++ {
-		if err := c.mosiPin.Write(int(txByte & bitMask)); err != nil {
+		if err := s.mosiPin.Write(int(txByte & bitMask)); err != nil {
 			return 0, err
 		}
 
-		time.Sleep(c.tclk)
-		if err := c.sclkPin.Write(1); err != nil {
+		time.Sleep(s.tclk)
+		if err := s.sclkPin.Write(1); err != nil {
 			return 0, err
 		}
 
-		v, err := c.misoPin.Read()
+		v, err := s.misoPin.Read()
 		if err != nil {
 			return 0, err
 		}
@@ -118,8 +122,8 @@ func (c *spiGpio) transferByte(txByte uint8) (uint8, error) {
 			rxByte |= bitMask
 		}
 
-		time.Sleep(c.tclk)
-		if err := c.sclkPin.Write(0); err != nil {
+		time.Sleep(s.tclk)
+		if err := s.sclkPin.Write(0); err != nil {
 			return 0, err
 		}
 
@@ -129,14 +133,10 @@ func (c *spiGpio) transferByte(txByte uint8) (uint8, error) {
 	return rxByte, nil
 }
 
-func (cfg *spiGpioConfig) String() string {
-	return fmt.Sprintf("sclk: %s, nss: %s, mosi: %s, miso: %s", cfg.sclkPinId, cfg.nssPinId, cfg.mosiPinId, cfg.misoPinId)
-}
-
 func (s *spiGpio) initializeGpios() error {
 	var err error
 	// nss is an output, negotiated (currently not implemented at pin level)
-	s.nssPin, err = s.cfg.pinProvider.DigitalPin(s.cfg.nssPinId)
+	s.nssPin, err = s.cfg.pinProvider.DigitalPin(s.cfg.nssPinID)
 	if err != nil {
 		return err
 	}
@@ -144,7 +144,7 @@ func (s *spiGpio) initializeGpios() error {
 		return err
 	}
 	// sclk is an output, CPOL = 0
-	s.sclkPin, err = s.cfg.pinProvider.DigitalPin(s.cfg.sclkPinId)
+	s.sclkPin, err = s.cfg.pinProvider.DigitalPin(s.cfg.sclkPinID)
 	if err != nil {
 		return err
 	}
@@ -152,12 +152,12 @@ func (s *spiGpio) initializeGpios() error {
 		return err
 	}
 	// miso is an input
-	s.misoPin, err = s.cfg.pinProvider.DigitalPin(s.cfg.misoPinId)
+	s.misoPin, err = s.cfg.pinProvider.DigitalPin(s.cfg.misoPinID)
 	if err != nil {
 		return err
 	}
 	// mosi is an output
-	s.mosiPin, err = s.cfg.pinProvider.DigitalPin(s.cfg.mosiPinId)
+	s.mosiPin, err = s.cfg.pinProvider.DigitalPin(s.cfg.mosiPinID)
 	if err != nil {
 		return err
 	}

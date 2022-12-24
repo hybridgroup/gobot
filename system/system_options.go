@@ -6,17 +6,22 @@ import (
 	"gobot.io/x/gobot"
 )
 
+// Optioner is the interface for system options. This provides the possibility for change the systems behavior by the
+// caller/user when creating the system access, e.g. by "NewAccesser()".
 type Optioner interface {
 	setDigitalPinToGpiodAccess()
 	setSpiToGpioAccess(p gobot.DigitalPinnerProvider, sclkPin, nssPin, mosiPin, misoPin string)
 }
 
+// WithDigitalPinGpiodAccess can be used to change the default sysfs implementation for digital pins to the character
+// device Kernel ABI. The access is provided by the gpiod package.
 func WithDigitalPinGpiodAccess() func(Optioner) {
 	return func(s Optioner) {
 		s.setDigitalPinToGpiodAccess()
 	}
 }
 
+// WithSpiGpioAccess can be used to switch the default SPI implementation to GPIO usage.
 func WithSpiGpioAccess(p gobot.DigitalPinnerProvider, sclkPin, nssPin, mosiPin, misoPin string) func(Optioner) {
 	return func(s Optioner) {
 		s.setSpiToGpioAccess(p, sclkPin, nssPin, mosiPin, misoPin)
@@ -41,10 +46,10 @@ func (a *Accesser) setDigitalPinToGpiodAccess() {
 func (a *Accesser) setSpiToGpioAccess(p gobot.DigitalPinnerProvider, sclkPin, nssPin, mosiPin, misoPin string) {
 	cfg := spiGpioConfig{
 		pinProvider: p,
-		sclkPinId:   sclkPin,
-		nssPinId:    nssPin,
-		mosiPinId:   mosiPin,
-		misoPinId:   misoPin,
+		sclkPinID:   sclkPin,
+		nssPinID:    nssPin,
+		mosiPinID:   mosiPin,
+		misoPinID:   misoPin,
 	}
 	gsa := &gpioSpiAccess{cfg: cfg}
 	if gsa.isSupported() {

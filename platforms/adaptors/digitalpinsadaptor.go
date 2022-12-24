@@ -2,7 +2,6 @@ package adaptors
 
 import (
 	"fmt"
-	"log"
 	"sync"
 
 	"github.com/hashicorp/go-multierror"
@@ -55,6 +54,8 @@ func WithDigitalPinInitializer(pc digitalPinInitializer) func(Optioner) {
 	}
 }
 
+// WithGpiodAccess can be used to change the default sysfs implementation to the character device Kernel ABI.
+// The access is provided by the gpiod package.
 func WithGpiodAccess() func(Optioner) {
 	return func(o Optioner) {
 		a, ok := o.(digitalPinsOptioner)
@@ -64,6 +65,7 @@ func WithGpiodAccess() func(Optioner) {
 	}
 }
 
+// WithSpiGpioAccess can be used to switch the default SPI implementation to GPIO usage.
 func WithSpiGpioAccess(sclkPin, nssPin, mosiPin, misoPin string) func(Optioner) {
 	return func(o Optioner) {
 		a, ok := o.(digitalPinsOptioner)
@@ -160,7 +162,6 @@ func (a *DigitalPinsAdaptor) digitalPin(id string, o ...func(gobot.DigitalPinOpt
 			return nil, err
 		}
 		a.pins[id] = pin
-		log.Println("new pin done", chip, line)
 	} else {
 		if err := pin.ApplyOptions(o...); err != nil {
 			return nil, err

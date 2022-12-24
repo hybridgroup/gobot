@@ -9,34 +9,34 @@ const piccDebug = false
 // Commands sent to the PICC, used by the PCD to for communication with several PICCs (ISO 14443-3, Type A, section 6.4)
 const (
 	// Activation
-	piccCommand_RequestA = 0x26 // REQuest command type A, 7 bit frame, invites PICCs in state IDLE to go to READY
-	piccCommand_WakeUpA  = 0x52 // Wake-UP command type A, 7 bit frame, invites PICCs in state IDLE and HALT to go to READY
+	piccCommandRequestA = 0x26 // REQuest command type A, 7 bit frame, invites PICCs in state IDLE to go to READY
+	piccCommandWakeUpA  = 0x52 // Wake-UP command type A, 7 bit frame, invites PICCs in state IDLE and HALT to go to READY
 	// Anticollision and SAK
-	piccCommand_CascadeLevel1 = 0x93 // Select cascade level 1
-	piccCommand_CascadeLevel2 = 0x95 // Select cascade Level 2
-	piccCommand_CascadeLevel3 = 0x97 // Select cascade Level 3
-	piccCascadeTag            = 0x88 // Cascade tag is used during anti collision
-	piccUidNotComplete        = 0x04 // used on SAK call
+	piccCommandCascadeLevel1 = 0x93 // Select cascade level 1
+	piccCommandCascadeLevel2 = 0x95 // Select cascade Level 2
+	piccCommandCascadeLevel3 = 0x97 // Select cascade Level 3
+	piccCascadeTag           = 0x88 // Cascade tag is used during anti collision
+	piccUIDNotComplete       = 0x04 // used on SAK call
 	// Halt
-	piccCommand_HLTA = 0x50 // Halt command, Type A. Instructs an active PICC to go to state HALT.
-	piccCommand_RATS = 0xE0 // Request command for Answer To Reset.
+	piccCommandHLTA = 0x50 // Halt command, Type A. Instructs an active PICC to go to state HALT.
+	piccCommandRATS = 0xE0 // Request command for Answer To Reset.
 	// The commands used for MIFARE Classic (from http://www.mouser.com/ds/2/302/MF1S503x-89574.pdf, Section 9)
 	// Use MFAuthent to authenticate access to a sector, then use these commands to read/write/modify the blocks on
 	// the sector. The read/write commands can also be used for MIFARE Ultralight.
-	piccCommand_MF_AUTH_KEY_A = 0x60 // Perform authentication with Key A
-	piccCommand_MF_AUTH_KEY_B = 0x61 // Perform authentication with Key B
+	piccCommandMFRegAUTHRegKEYRegA = 0x60 // Perform authentication with Key A
+	piccCommandMFRegAUTHRegKEYRegB = 0x61 // Perform authentication with Key B
 	// Reads one 16 byte block from the authenticated sector of the PICC. Also used for MIFARE Ultralight.
-	piccCommand_MF_READ = 0x30
+	piccCommandMFRegREAD = 0x30
 	// Writes one 16 byte block to the authenticated sector of the PICC. Called "COMPATIBILITY WRITE" for MIFARE Ultralight.
-	piccCommand_MF_WRITE     = 0xA0
-	piccWriteAck             = 0x0A // MIFARE Classic: 4 bit ACK, we use any other value as NAK (data sheet: 0h to 9h, Bh to Fh)
-	piccCommand_MF_DECREMENT = 0xC0 // Decrements the contents of a block and stores the result in the internal data register.
-	piccCommand_MF_INCREMENT = 0xC1 // Increments the contents of a block and stores the result in the internal data register.
-	piccCommand_MF_RESTORE   = 0xC2 // Reads the contents of a block into the internal data register.
-	piccCommand_MF_TRANSFER  = 0xB0 // Writes the contents of the internal data register to a block.
-	// The commands used for MIFARE Ultralight (from http://www.nxp.com/documents/data_sheet/MF0ICU1.pdf, Section 8.6)
-	// The piccCommand_MF_READ and piccCommand_MF_WRITE can also be used for MIFARE Ultralight.
-	piccCommand_UL_WRITE = 0xA2 // Writes one 4 byte page to the PICC.
+	piccCommandMFRegWRITE     = 0xA0
+	piccWriteAck              = 0x0A // MIFARE Classic: 4 bit ACK, we use any other value as NAK (data sheet: 0h to 9h, Bh to Fh)
+	piccCommandMFRegDECREMENT = 0xC0 // Decrements the contents of a block and stores the result in the internal data register.
+	piccCommandMFRegINCREMENT = 0xC1 // Increments the contents of a block and stores the result in the internal data register.
+	piccCommandMFRegRESTORE   = 0xC2 // Reads the contents of a block into the internal data register.
+	piccCommandMFRegTRANSFER  = 0xB0 // Writes the contents of the internal data register to a block.
+	// The commands used for MIFARE Ultralight (from http://www.nxp.com/documents/dataRegsheet/MF0ICU1.pdf, Section 8.6)
+	// The piccCommandMFRegREAD and piccCommandMFRegWRITE can also be used for MIFARE Ultralight.
+	piccCommandULRegWRITE = 0xA2 // Writes one 4 byte page to the PICC.
 )
 
 const piccReadWriteAuthBlock = uint8(11)
@@ -51,18 +51,18 @@ var piccCardFromSak = map[uint8]string{0x08: "Classic 1K, Plus 2K-SE-1K(SL1)", 0
 func (d *MFRC522Common) IsCardPresent() error {
 	d.firstCardAccess = true
 
-	if err := d.writeByteData(RegTxMode, RxTxMode_Reset); err != nil {
+	if err := d.writeByteData(regTxMode, rxtxModeRegReset); err != nil {
 		return err
 	}
-	if err := d.writeByteData(RegRxMode, RxTxMode_Reset); err != nil {
+	if err := d.writeByteData(regRxMode, rxtxModeRegReset); err != nil {
 		return err
 	}
-	if err := d.writeByteData(RegModWidth, ModWidth_Reset); err != nil {
+	if err := d.writeByteData(regModWidth, modWidthRegReset); err != nil {
 		return err
 	}
 
 	answer := []byte{0x00, 0x00} // also called ATQA
-	if err := d.piccRequest(piccCommand_WakeUpA, answer); err != nil {
+	if err := d.piccRequest(piccCommandWakeUpA, answer); err != nil {
 		return err
 	}
 
@@ -81,7 +81,7 @@ func (d *MFRC522Common) IsCardPresent() error {
 // TODO: make this more usable, e.g. by given length of text
 func (d *MFRC522Common) ReadText() (string, error) {
 	answer := []byte{0x00, 0x00}
-	if err := d.piccRequest(piccCommand_WakeUpA, answer); err != nil {
+	if err := d.piccRequest(piccCommandWakeUpA, answer); err != nil {
 		return "", err
 	}
 
@@ -126,7 +126,7 @@ func (d *MFRC522Common) ReadText() (string, error) {
 // WriteText writes the given string to the card. All old values will be overwritten.
 func (d *MFRC522Common) WriteText(text string) error {
 	answer := []byte{0x00, 0x00}
-	if err := d.piccRequest(piccCommand_WakeUpA, answer); err != nil {
+	if err := d.piccRequest(piccCommandWakeUpA, answer); err != nil {
 		return err
 	}
 
@@ -171,7 +171,7 @@ func (d *MFRC522Common) piccHalt() error {
 	if piccDebug {
 		fmt.Println("-halt-")
 	}
-	haltCommand := []byte{piccCommand_HLTA, 0x00}
+	haltCommand := []byte{piccCommandHLTA, 0x00}
 	crcResult := []byte{0x00, 0x00}
 	if err := d.calculateCRC(haltCommand, crcResult); err != nil {
 		return err
@@ -179,7 +179,7 @@ func (d *MFRC522Common) piccHalt() error {
 	haltCommand = append(haltCommand, crcResult...)
 
 	txLastBits := uint8(0x00) // we use all 8 bits
-	if err := d.communicateWithPICC(Command_Transceive, haltCommand, []byte{}, txLastBits, false); err != nil {
+	if err := d.communicateWithPICC(commandRegTransceive, haltCommand, []byte{}, txLastBits, false); err != nil {
 		// an error is the sign for successful halt
 		if piccDebug {
 			fmt.Println("this is not treated as error:", err)
@@ -200,7 +200,7 @@ func (d *MFRC522Common) piccWrite(block uint8, blockData []byte) error {
 	}
 	// MIFARE Classic protocol requires two steps to perform a write.
 	// Step 1: Tell the PICC we want to write to block blockAddr.
-	writeDataCommand := []byte{piccCommand_MF_WRITE, block}
+	writeDataCommand := []byte{piccCommandMFRegWRITE, block}
 	crcResult := []byte{0x00, 0x00}
 	if err := d.calculateCRC(writeDataCommand, crcResult); err != nil {
 		return err
@@ -209,7 +209,7 @@ func (d *MFRC522Common) piccWrite(block uint8, blockData []byte) error {
 
 	txLastBits := uint8(0x00) // we use all 8 bits
 	backData := make([]byte, 1)
-	if err := d.communicateWithPICC(Command_Transceive, writeDataCommand, backData, txLastBits, false); err != nil {
+	if err := d.communicateWithPICC(commandRegTransceive, writeDataCommand, backData, txLastBits, false); err != nil {
 		return err
 	}
 	if backData[0]&piccWriteAck != piccWriteAck {
@@ -227,7 +227,7 @@ func (d *MFRC522Common) piccWrite(block uint8, blockData []byte) error {
 	var writeData []byte
 	writeData = append(writeData, blockData...)
 	writeData = append(writeData, crcResult...)
-	if err := d.communicateWithPICC(Command_Transceive, writeData, []byte{}, txLastBits, false); err != nil {
+	if err := d.communicateWithPICC(commandRegTransceive, writeData, []byte{}, txLastBits, false); err != nil {
 		return err
 	}
 
@@ -238,7 +238,7 @@ func (d *MFRC522Common) piccRead(block uint8) ([]byte, error) {
 	if piccDebug {
 		fmt.Println("-read-")
 	}
-	readDataCommand := []byte{piccCommand_MF_READ, block}
+	readDataCommand := []byte{piccCommandMFRegREAD, block}
 	crcResult := []byte{0x00, 0x00}
 	if err := d.calculateCRC(readDataCommand, crcResult); err != nil {
 		return nil, err
@@ -247,7 +247,7 @@ func (d *MFRC522Common) piccRead(block uint8) ([]byte, error) {
 
 	txLastBits := uint8(0x00)    // we use all 8 bits
 	backData := make([]byte, 18) // 16 data byte and 2 byte CRC
-	if err := d.communicateWithPICC(Command_Transceive, readDataCommand, backData, txLastBits, true); err != nil {
+	if err := d.communicateWithPICC(commandRegTransceive, readDataCommand, backData, txLastBits, true); err != nil {
 		return nil, err
 	}
 
@@ -259,11 +259,11 @@ func (d *MFRC522Common) piccAuthenticate(address uint8, key []byte, uid []byte) 
 		fmt.Println("-authenticate-")
 	}
 
-	buf := []byte{piccCommand_MF_AUTH_KEY_A, address}
+	buf := []byte{piccCommandMFRegAUTHRegKEYRegA, address}
 	buf = append(buf, key...)
 	buf = append(buf, uid...)
 
-	if err := d.communicateWithPICC(Command_MFAuthent, buf, []byte{}, 0, false); err != nil {
+	if err := d.communicateWithPICC(commandRegMFAuthent, buf, []byte{}, 0, false); err != nil {
 		return err
 	}
 
@@ -275,10 +275,10 @@ func (d *MFRC522Common) piccAuthenticate(address uint8, key []byte, uid []byte) 
 // see "Card Activation" in https://www.nxp.com/docs/en/application-note/AN10834.pdf.
 // note: the card needs to be in ready state, e.g. by a request or wake up is done before
 func (d *MFRC522Common) piccActivate() ([]byte, error) {
-	if err := d.clearRegisterBitMask(RegColl, Coll_ValuesAfterCollBit); err != nil {
+	if err := d.clearRegisterBitMask(regColl, collRegValuesAfterCollBit); err != nil {
 		return nil, err
 	}
-	if err := d.writeByteData(RegBitFraming, BitFraming_Reset); err != nil {
+	if err := d.writeByteData(regBitFraming, bitFramingRegReset); err != nil {
 		return nil, err
 	}
 
@@ -302,11 +302,11 @@ func (d *MFRC522Common) piccActivate() ([]byte, error) {
 		var piccCommand uint8
 		switch cascadeLevel {
 		case 1:
-			piccCommand = piccCommand_CascadeLevel1
+			piccCommand = piccCommandCascadeLevel1
 		case 2:
-			piccCommand = piccCommand_CascadeLevel2
+			piccCommand = piccCommandCascadeLevel2
 		case 3:
-			piccCommand = piccCommand_CascadeLevel3
+			piccCommand = piccCommandCascadeLevel3
 		default:
 			return nil, fmt.Errorf("unknown cascade level %d", cascadeLevel)
 		}
@@ -314,10 +314,12 @@ func (d *MFRC522Common) piccActivate() ([]byte, error) {
 		if piccDebug {
 			fmt.Println("-anti collision-")
 		}
+
 		txLastBits := uint8(0x00) // we use all 8 bits
 		numValidBits := uint8(4 * 8)
+		sendForAnticol := []byte{piccCommand, numValidBits}
 		backData := []byte{0x00, 0x00, 0x00, 0x00, 0x00} // 4 bytes CT/UID and BCC
-		if err := d.communicateWithPICC(Command_Transceive, []byte{piccCommand, numValidBits}, backData, txLastBits, false); err != nil {
+		if err := d.communicateWithPICC(commandRegTransceive, sendForAnticol, backData, txLastBits, false); err != nil {
 			return nil, err
 		}
 
@@ -356,7 +358,7 @@ func (d *MFRC522Common) piccActivate() ([]byte, error) {
 		}
 		sendCommand = append(sendCommand, crcResult...)
 		sakData := []byte{0x00, 0x00, 0x00}
-		if err := d.communicateWithPICC(Command_Transceive, sendCommand, sakData, txLastBits, false); err != nil {
+		if err := d.communicateWithPICC(commandRegTransceive, sendCommand, sakData, txLastBits, false); err != nil {
 			return nil, err
 		}
 		bcc = byte(0)
@@ -366,7 +368,7 @@ func (d *MFRC522Common) piccActivate() ([]byte, error) {
 		if piccDebug {
 			fmt.Printf("sak data: %v\n", sakData)
 		}
-		if sakData[0] != piccUidNotComplete {
+		if sakData[0] != piccUIDNotComplete {
 			sak = sakData[0]
 			break
 		}
@@ -387,13 +389,13 @@ func (d *MFRC522Common) piccRequest(reqMode uint8, answer []byte) error {
 		return fmt.Errorf("at least 2 bytes room needed for the answer")
 	}
 
-	if err := d.clearRegisterBitMask(RegColl, Coll_ValuesAfterCollBit); err != nil {
+	if err := d.clearRegisterBitMask(regColl, collRegValuesAfterCollBit); err != nil {
 		return err
 	}
 
 	// for request A and wake up the short frame format is used - transmit only 7 bits of the last (and only) byte.
-	txLastBits := uint8(0x07 & BitFraming_TxLastBits)
-	if err := d.communicateWithPICC(Command_Transceive, []byte{reqMode}, answer, txLastBits, false); err != nil {
+	txLastBits := uint8(0x07 & bitFramingRegTxLastBits)
+	if err := d.communicateWithPICC(commandRegTransceive, []byte{reqMode}, answer, txLastBits, false); err != nil {
 		return err
 	}
 

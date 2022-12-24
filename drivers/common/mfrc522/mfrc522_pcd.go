@@ -23,11 +23,12 @@ type busConnection interface {
 var versions = map[uint8]string{0x12: "Counterfeit", 0x88: "FM17522", 0x89: "FM17522E",
 	0x90: "MFRC522 0.0", 0x91: "MFRC522 1.0", 0x92: "MFRC522 2.0", 0xB2: "FM17522 1"}
 
+// MFRC522Common is the Gobot Driver for MFRC522 RFID.
 // datasheet:
 // https://www.nxp.com/docs/en/data-sheet/MFRC522.pdf
 //
 // reference implementations:
-// * https://github.com/OSSLibraries/Arduino_MFRC522v2
+// * https://github.com/OSSLibraries/ArduinoRegMFRC522v2
 // * https://github.com/jdevelop/golang-rpi-extras
 // * https://github.com/pimylifeup/MFRC522-python
 // * https://periph.io/device/mf-rc522/
@@ -46,6 +47,7 @@ func NewMFRC522Common() *MFRC522Common {
 	return d
 }
 
+// Initialize sets the connection and initializes the driver.
 func (d *MFRC522Common) Initialize(c busConnection) error {
 	d.connection = c
 
@@ -54,15 +56,15 @@ func (d *MFRC522Common) Initialize(c busConnection) error {
 	}
 
 	initSequence := [][]byte{
-		{RegTxMode, RxTxMode_Reset},
-		{RegRxMode, RxTxMode_Reset},
-		{RegModWidth, ModWidth_Reset},
-		{RegTMode, TMode_TAutoBit | 0x0F}, // timer starts automatically at the end of the transmission
-		{RegTPrescaler, 0xFF},
-		{RegTReloadL, TReload_Value25ms & 0xFF},
-		{RegTReloadH, TReload_Value25ms >> 8},
-		{RegTxASK, TxASK_Force100ASKBit},
-		{RegMode, Mode_TxWaitRFBit | Mode_PolMFinBit | Mode_CRCPreset6363},
+		{regTxMode, rxtxModeRegReset},
+		{regRxMode, rxtxModeRegReset},
+		{regModWidth, modWidthRegReset},
+		{regTMode, tModeRegTAutoBit | 0x0F}, // timer starts automatically at the end of the transmission
+		{regTPrescaler, 0xFF},
+		{regTReloadL, tReloadRegValue25ms & 0xFF},
+		{regTReloadH, tReloadRegValue25ms >> 8},
+		{regTxASK, txASKRegForce100ASKBit},
+		{regMode, modeRegTxWaitRFBit | modeRegPolMFinBit | modeRegCRCPreset6363},
 	}
 	for _, init := range initSequence {
 		d.writeByteData(init[0], init[1])
@@ -71,13 +73,14 @@ func (d *MFRC522Common) Initialize(c busConnection) error {
 	if err := d.switchAntenna(true); err != nil {
 		return err
 	}
-	if err := d.setAntennaGain(RFCfg_RxGain38dB); err != nil {
+	if err := d.setAntennaGain(rfcCfgRegRxGain38dB); err != nil {
 		return err
 	}
 
 	return nil
 }
 
+// PrintReaderVersion gets and prints the reader (pcd) version.
 func (d *MFRC522Common) PrintReaderVersion() error {
 	version, err := d.getVersion()
 	if err != nil {
@@ -88,15 +91,15 @@ func (d *MFRC522Common) PrintReaderVersion() error {
 }
 
 func (d *MFRC522Common) getVersion() (uint8, error) {
-	return d.readByteData(RegVersion)
+	return d.readByteData(regVersion)
 }
 
 func (d *MFRC522Common) switchAntenna(targetState bool) error {
-	val, err := d.readByteData(RegTxControl)
+	val, err := d.readByteData(regTxControl)
 	if err != nil {
 		return err
 	}
-	maskForOn := uint8(TxControl_Tx2RFEn1outputBit | TxControl_Tx1RFEn1outputBit)
+	maskForOn := uint8(txControlRegTx2RFEn1outputBit | txControlRegTx1RFEn1outputBit)
 	currentState := val&maskForOn == maskForOn
 
 	if targetState == currentState {
@@ -109,7 +112,7 @@ func (d *MFRC522Common) switchAntenna(targetState bool) error {
 		val = val & maskForOn
 	}
 
-	if err := d.writeByteData(RegTxControl, val); err != nil {
+	if err := d.writeByteData(regTxControl, val); err != nil {
 		return err
 	}
 
@@ -121,11 +124,11 @@ func (d *MFRC522Common) switchAntenna(targetState bool) error {
 }
 
 func (d *MFRC522Common) setAntennaGain(val uint8) error {
-	return d.writeByteData(RegRFCfg, val)
+	return d.writeByteData(regRFCfg, val)
 }
 
 func (d *MFRC522Common) softReset() error {
-	if err := d.writeByteData(RegCommand, Command_SoftReset); err != nil {
+	if err := d.writeByteData(regCommand, commandRegSoftReset); err != nil {
 		return err
 	}
 
@@ -133,19 +136,19 @@ func (d *MFRC522Common) softReset() error {
 	// datasheet the oscillator start-up time is the start up time of the crystal + 37.74 us.
 	// TODO: this can be done better by wait until the power down bit is cleared
 	time.Sleep(initTime)
-	val, err := d.readByteData(RegCommand)
+	val, err := d.readByteData(regCommand)
 	if err != nil {
 		return err
 	}
 
-	if val&Command_PowerDownBit > 1 {
+	if val&commandRegPowerDownBit > 1 {
 		return fmt.Errorf("initialization takes longer than %s", initTime)
 	}
 	return nil
 }
 
 func (d *MFRC522Common) stopCrypto1() error {
-	return d.clearRegisterBitMask(RegStatus2, Status2_MFCrypto1OnBit)
+	return d.clearRegisterBitMask(regStatus2, status2RegMFCrypto1OnBit)
 }
 
 func (d *MFRC522Common) communicateWithPICC(command uint8, sendData []byte, backData []byte, txLastBits uint8,
@@ -153,41 +156,41 @@ func (d *MFRC522Common) communicateWithPICC(command uint8, sendData []byte, back
 	irqEn := 0x00
 	waitIRq := uint8(0x00)
 	switch command {
-	case Command_MFAuthent:
-		irqEn = ComIEn_IdleIEnBit | ComIEn_ErrIEnBit
-		waitIRq = ComIrq_IdleIRqBit
-	case Command_Transceive:
-		irqEn = ComIEn_TimerIEnBit | ComIEn_ErrIEnBit | ComIEn_LoAlertIEnBit
-		irqEn = irqEn | ComIEn_IdleIEnBit | ComIEn_RxIEnBit | ComIEn_TxIEnBit
-		waitIRq = uint8(ComIrq_IdleIRqBit | ComIrq_RxIRqBit)
+	case commandRegMFAuthent:
+		irqEn = comIEnRegIdleIEnBit | comIEnRegErrIEnBit
+		waitIRq = comIrqRegIdleIRqBit
+	case commandRegTransceive:
+		irqEn = comIEnRegTimerIEnBit | comIEnRegErrIEnBit | comIEnRegLoAlertIEnBit
+		irqEn = irqEn | comIEnRegIdleIEnBit | comIEnRegRxIEnBit | comIEnRegTxIEnBit
+		waitIRq = uint8(comIrqRegIdleIRqBit | comIrqRegRxIRqBit)
 	}
 
 	// TODO: this is not used at the moment (propagation of IRQ pin)
-	if err := d.writeByteData(RegComIEn, uint8(irqEn|ComIEn_IRqInv)); err != nil {
+	if err := d.writeByteData(regComIEn, uint8(irqEn|comIEnRegIRqInv)); err != nil {
 		return err
 	}
-	if err := d.writeByteData(RegComIrq, ComIrq_ClearAll); err != nil {
+	if err := d.writeByteData(regComIrq, comIrqRegClearAll); err != nil {
 		return err
 	}
-	if err := d.writeByteData(RegFIFOLevel, FIFOLevel_FlushBufferBit); err != nil {
+	if err := d.writeByteData(regFIFOLevel, fifoLevelRegFlushBufferBit); err != nil {
 		return err
 	}
 	// stop any active command
-	if err := d.writeByteData(RegCommand, Command_Idle); err != nil {
+	if err := d.writeByteData(regCommand, commandRegIdle); err != nil {
 		return err
 	}
 	// prepare and start communication
 	if err := d.writeFifo(sendData); err != nil {
 		return err
 	}
-	if err := d.writeByteData(RegBitFraming, txLastBits); err != nil {
+	if err := d.writeByteData(regBitFraming, txLastBits); err != nil {
 		return err
 	}
-	if err := d.writeByteData(RegCommand, command); err != nil {
+	if err := d.writeByteData(regCommand, command); err != nil {
 		return err
 	}
-	if command == Command_Transceive {
-		if err := d.setRegisterBitMask(RegBitFraming, BitFraming_StartSendBit); err != nil {
+	if command == commandRegTransceive {
+		if err := d.setRegisterBitMask(regBitFraming, bitFramingRegStartSendBit); err != nil {
 			return err
 		}
 	}
@@ -197,7 +200,7 @@ func (d *MFRC522Common) communicateWithPICC(command uint8, sendData []byte, back
 	const maxTries = 5
 	i := 0
 	for ; i < maxTries; i++ {
-		irqs, err := d.readByteData(RegComIrq)
+		irqs, err := d.readByteData(regComIrq)
 		if err != nil {
 			return err
 		}
@@ -205,13 +208,13 @@ func (d *MFRC522Common) communicateWithPICC(command uint8, sendData []byte, back
 			// One of the interrupts that signal success has been set.
 			break
 		}
-		if irqs&ComIrq_TimerIRqBit == ComIrq_TimerIRqBit {
+		if irqs&comIrqRegTimerIRqBit == comIrqRegTimerIRqBit {
 			return fmt.Errorf("the timer interrupt occurred")
 		}
 		time.Sleep(time.Millisecond)
 	}
 
-	if err := d.clearRegisterBitMask(RegBitFraming, BitFraming_StartSendBit); err != nil {
+	if err := d.clearRegisterBitMask(regBitFraming, bitFramingRegStartSendBit); err != nil {
 		return err
 	}
 
@@ -219,12 +222,12 @@ func (d *MFRC522Common) communicateWithPICC(command uint8, sendData []byte, back
 		return fmt.Errorf("no data available after %d tries", maxTries)
 	}
 
-	errorRegValue, err := d.readByteData(RegError)
+	errorRegValue, err := d.readByteData(regError)
 	if err != nil {
 		return err
 	}
 	// stop if any errors except collisions were detected.
-	if err := d.getFirstError(errorRegValue &^ Error_CollErrBit); err != nil {
+	if err := d.getFirstError(errorRegValue &^ errorRegCollErrBit); err != nil {
 		return err
 	}
 
@@ -240,7 +243,7 @@ func (d *MFRC522Common) communicateWithPICC(command uint8, sendData []byte, back
 		}
 	}
 
-	if err := d.getFirstError(errorRegValue & Error_CollErrBit); err != nil {
+	if err := d.getFirstError(errorRegValue & errorRegCollErrBit); err != nil {
 		return err
 	}
 
@@ -250,7 +253,7 @@ func (d *MFRC522Common) communicateWithPICC(command uint8, sendData []byte, back
 			return fmt.Errorf("CRC: MIFARE Classic NAK is not OK")
 		}
 		if backLen < 4 || backLen == 4 && rxLastBits != 0 {
-			return fmt.Errorf("CRC: at least the 2 byte CRC_A value and all 8 bits of the last byte must be received")
+			return fmt.Errorf("CRC: at least the 2 byte CRCRegA value and all 8 bits of the last byte must be received")
 		}
 
 		crcResult := []byte{0x00, 0x00}
@@ -271,37 +274,37 @@ func (d *MFRC522Common) communicateWithPICC(command uint8, sendData []byte, back
 // 16 bit CRC will be calculated for the given data
 func (d *MFRC522Common) calculateCRC(data []byte, result []byte) error {
 	// Stop any active command.
-	if err := d.writeByteData(RegCommand, Command_Idle); err != nil {
+	if err := d.writeByteData(regCommand, commandRegIdle); err != nil {
 		return err
 	}
-	if err := d.writeByteData(RegDivIrq, DivIrq_CRCIRqBit); err != nil {
+	if err := d.writeByteData(regDivIrq, divIrqRegCRCIRqBit); err != nil {
 		return err
 	}
-	if err := d.writeByteData(RegFIFOLevel, FIFOLevel_FlushBufferBit); err != nil {
+	if err := d.writeByteData(regFIFOLevel, fifoLevelRegFlushBufferBit); err != nil {
 		return err
 	}
 	if err := d.writeFifo(data); err != nil {
 		return err
 	}
-	if err := d.writeByteData(RegCommand, Command_CalcCRC); err != nil {
+	if err := d.writeByteData(regCommand, commandRegCalcCRC); err != nil {
 		return err
 	}
 
 	const maxTries = 3
 	for i := 0; i < maxTries; i++ {
-		irqs, err := d.readByteData(RegDivIrq)
+		irqs, err := d.readByteData(regDivIrq)
 		if err != nil {
 			return err
 		}
-		if irqs&DivIrq_CRCIRqBit == DivIrq_CRCIRqBit {
-			if err := d.writeByteData(RegCommand, Command_Idle); err != nil {
+		if irqs&divIrqRegCRCIRqBit == divIrqRegCRCIRqBit {
+			if err := d.writeByteData(regCommand, commandRegIdle); err != nil {
 				return err
 			}
-			result[0], err = d.readByteData(RegCRCResultL)
+			result[0], err = d.readByteData(regCRCResultL)
 			if err != nil {
 				return err
 			}
-			result[1], err = d.readByteData(RegCRCResultH)
+			result[1], err = d.readByteData(regCRCResultH)
 			if err != nil {
 				return err
 			}
@@ -316,7 +319,7 @@ func (d *MFRC522Common) calculateCRC(data []byte, result []byte) error {
 func (d *MFRC522Common) writeFifo(fifoData []byte) error {
 	// the register command is always the same, the pointer in FIFO is incremented automatically after each write
 	for _, b := range fifoData {
-		if err := d.writeByteData(RegFIFOData, b); err != nil {
+		if err := d.writeByteData(regFIFOData, b); err != nil {
 			return err
 		}
 	}
@@ -324,7 +327,7 @@ func (d *MFRC522Common) writeFifo(fifoData []byte) error {
 }
 
 func (d *MFRC522Common) readFifo(backData []byte) (uint8, error) {
-	n, err := d.readByteData(RegFIFOLevel) // Number of bytes in the FIFO
+	n, err := d.readByteData(regFIFOLevel) // Number of bytes in the FIFO
 	if n > uint8(len(backData)) {
 		return 0, fmt.Errorf("more data in FIFO (%d) than expected (%d)", n, len(backData))
 	}
@@ -335,18 +338,18 @@ func (d *MFRC522Common) readFifo(backData []byte) (uint8, error) {
 
 	// the register command is always the same, the pointer in FIFO is incremented automatically after each read
 	for i := 0; i < int(n); i++ {
-		byteVal, err := d.readByteData(RegFIFOData)
+		byteVal, err := d.readByteData(regFIFOData)
 		if err != nil {
 			return 0, err
 		}
 		backData[i] = byteVal
 	}
 
-	rxLastBits, err := d.readByteData(RegControl)
+	rxLastBits, err := d.readByteData(regControl)
 	if err != nil {
 		return 0, err
 	}
-	return rxLastBits & Control_RxLastBits, nil
+	return rxLastBits & controlRegRxLastBits, nil
 }
 
 func (d *MFRC522Common) getFirstError(errorRegValue uint8) error {
@@ -354,25 +357,25 @@ func (d *MFRC522Common) getFirstError(errorRegValue uint8) error {
 		return nil
 	}
 
-	if errorRegValue&Error_ProtocolErrBit == Error_ProtocolErrBit {
+	if errorRegValue&errorRegProtocolErrBit == errorRegProtocolErrBit {
 		return fmt.Errorf("a protocol error occurred")
 	}
-	if errorRegValue&Error_ParityErrBit == Error_ParityErrBit {
+	if errorRegValue&errorRegParityErrBit == errorRegParityErrBit {
 		return fmt.Errorf("a parity error occurred")
 	}
-	if errorRegValue&Error_CRCErrBit == Error_CRCErrBit {
+	if errorRegValue&errorRegCRCErrBit == errorRegCRCErrBit {
 		return fmt.Errorf("a CRC error occurred")
 	}
-	if errorRegValue&Error_CollErrBit == Error_CollErrBit {
+	if errorRegValue&errorRegCollErrBit == errorRegCollErrBit {
 		return fmt.Errorf("a collision error occurred")
 	}
-	if errorRegValue&Error_BufferOvflBit == Error_BufferOvflBit {
+	if errorRegValue&errorRegBufferOvflBit == errorRegBufferOvflBit {
 		return fmt.Errorf("a buffer overflow error occurred")
 	}
-	if errorRegValue&Error_TempErrBit == Error_TempErrBit {
+	if errorRegValue&errorRegTempErrBit == errorRegTempErrBit {
 		return fmt.Errorf("a temperature error occurred")
 	}
-	if errorRegValue&Error_WrErrBit == Error_WrErrBit {
+	if errorRegValue&errorRegWrErrBit == errorRegWrErrBit {
 		return fmt.Errorf("a temperature error occurred")
 	}
 	return fmt.Errorf("an unknown error occurred")
