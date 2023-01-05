@@ -1,6 +1,9 @@
 package beaglebone
 
-import "gobot.io/x/gobot"
+import (
+	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/platforms/adaptors"
+)
 
 // PocketBeagleAdaptor is the Gobot Adaptor for the PocketBeagle
 // For more information check out:
@@ -11,8 +14,8 @@ type PocketBeagleAdaptor struct {
 }
 
 // NewPocketBeagleAdaptor creates a new Adaptor for the PocketBeagle
-func NewPocketBeagleAdaptor() *PocketBeagleAdaptor {
-	a := NewAdaptor()
+func NewPocketBeagleAdaptor(opts ...func(adaptors.Optioner)) *PocketBeagleAdaptor {
+	a := NewAdaptor(opts...)
 	a.SetName(gobot.DefaultName("PocketBeagle"))
 	a.pinMap = pocketBeaglePinMap
 	a.pwmPinMap = pocketBeaglePwmPinMap

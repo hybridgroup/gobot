@@ -7,9 +7,11 @@
 [![Go Report Card](https://goreportcard.com/badge/hybridgroup/gobot)](https://goreportcard.com/report/hybridgroup/gobot)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/hybridgroup/gobot/blob/master/LICENSE.txt)
 
-Gobot (https://gobot.io/) is a framework using the Go programming language (https://golang.org/) for robotics, physical computing, and the Internet of Things.
+Gobot (https://gobot.io/) is a framework using the Go programming language (https://golang.org/) for robotics, physical
+computing, and the Internet of Things.
 
-It provides a simple, yet powerful way to create solutions that incorporate multiple, different hardware devices at the same time.
+It provides a simple, yet powerful way to create solutions that incorporate multiple, different hardware devices at the
+same time.
 
 Want to run Go directly on microcontrollers? Check out our sister project TinyGo (https://tinygo.org/)
 
@@ -87,7 +89,8 @@ func main() {
 
 #### "Metal" Gobot
 
-You can use the entire Gobot framework as shown in the examples above ("Classic" Gobot), or you can pick and choose from the various Gobot packages to control hardware with nothing but pure idiomatic Golang code ("Metal" Gobot). For example:
+You can use the entire Gobot framework as shown in the examples above ("Classic" Gobot), or you can pick and choose from
+the various Gobot packages to control hardware with nothing but pure idiomatic Golang code ("Metal" Gobot). For example:
 
 ```go
 package main
@@ -114,7 +117,8 @@ func main() {
 
 #### "Master" Gobot
 
-You can also use the full capabilities of the framework aka "Master Gobot" to control swarms of robots or other features such as the built-in API server. For example:
+You can also use the full capabilities of the framework aka "Master Gobot" to control swarms of robots or other features
+such as the built-in API server. For example:
 
 ```go
 package main
@@ -180,7 +184,9 @@ func main() {
 ```
 
 ## Hardware Support
-Gobot has a extensible system for connecting to hardware devices. The following robotics and physical computing platforms are currently supported:
+
+Gobot has a extensible system for connecting to hardware devices. The following robotics and physical computing
+platforms are currently supported:
 
 - [Arduino](http://www.arduino.cc/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/firmata)
 - Audio <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/audio)
@@ -311,13 +317,15 @@ a shared set of drivers provided using the `gobot/drivers/spi` package:
 	- MCP3204 Analog/Digital Converter
 	- MCP3208 Analog/Digital Converter
 	- MCP3304 Analog/Digital Converter
+	- MFRC522 RFID Card Reader
 	- SSD1306 OLED Display Controller
 
 More platforms and drivers are coming soon...
 
-## API:
+## API
 
-Gobot includes a RESTful API to query the status of any robot running within a group, including the connection and device status, and execute device commands.
+Gobot includes a RESTful API to query the status of any robot running within a group, including the connection and
+device status, and execute device commands.
 
 To activate the API, import the `gobot.io/x/gobot/api` package and instantiate the `API` like this:
 
@@ -327,6 +335,7 @@ To activate the API, import the `gobot.io/x/gobot/api` package and instantiate t
 ```
 
 You can also specify the api host and port, and turn on authentication:
+
 ```go
   master := gobot.NewMaster()
   server := api.NewAPI(master)
@@ -339,29 +348,37 @@ You may access the [robeaux](https://github.com/hybridgroup/robeaux) React.js in
 
 ## CLI
 
-Gobot uses the Gort [http://gort.io](http://gort.io) Command Line Interface (CLI) so you can access important features right from the command line. We call it "RobotOps", aka "DevOps For Robotics". You can scan, connect, update device firmware, and more!
+Gobot uses the Gort [http://gort.io](http://gort.io) Command Line Interface (CLI) so you can access important features
+right from the command line. We call it "RobotOps", aka "DevOps For Robotics". You can scan, connect, update device
+firmware, and more!
 
 Gobot also has its own CLI to generate new platforms, adaptors, and drivers. You can check it out in the `/cli` directory.
 
 ## Documentation
+
 We're always adding documentation to our web site at https://gobot.io/ please check there as we continue to work on Gobot
 
 Thank you!
 
 ## Need help?
+
 * Issues: https://github.com/hybridgroup/gobot/issues
 * Twitter: [@gobotio](https://twitter.com/gobotio)
 * Slack: [https://gophers.slack.com/messages/C0N5HDB08](https://gophers.slack.com/messages/C0N5HDB08)
 * Mailing list: https://groups.google.com/forum/#!forum/gobotio
 
 ## Contributing
+
 For our contribution guidelines, please go to [https://github.com/hybridgroup/gobot/blob/master/CONTRIBUTING.md
 ](https://github.com/hybridgroup/gobot/blob/master/CONTRIBUTING.md
 ).
 
-Gobot is released with a Contributor Code of Conduct. By participating in this project you agree to abide by its terms. [You can read about it here](https://github.com/hybridgroup/gobot/tree/master/CODE_OF_CONDUCT.md).
+Gobot is released with a Contributor Code of Conduct. By participating in this project you agree to abide by its terms.
+[You can read about it here](https://github.com/hybridgroup/gobot/tree/master/CODE_OF_CONDUCT.md).
 
 ## License
+
 Copyright (c) 2013-2020 The Hybrid Group. Licensed under the Apache 2.0 license.
 
-The Contributor Covenant is released under the Creative Commons Attribution 4.0 International Public License, which requires that attribution be included.
+The Contributor Covenant is released under the Creative Commons Attribution 4.0 International Public License, which
+requires that attribution be included.

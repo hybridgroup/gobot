@@ -7,7 +7,7 @@ import (
 	"testing"
 	"unsafe"
 
-	"gobot.io/x/gobot/drivers/i2c"
+	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/gobottest"
 )
 
@@ -62,7 +62,7 @@ func TestNewI2cDevice(t *testing.T) {
 				gobottest.Assert(t, err.Error(), tc.wantErr)
 				gobottest.Assert(t, d, (*i2cDevice)(nil))
 			} else {
-				var _ i2c.I2cDevice = d
+				var _ gobot.I2cSystemDevicer = d
 				gobottest.Assert(t, err, nil)
 			}
 		})

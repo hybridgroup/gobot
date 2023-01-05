@@ -14,50 +14,60 @@ type MockSpiAccess struct {
 	mode        int
 	bits        int
 	maxSpeed    int64
-	connection  *spiConnectionMock
+	sysdev      *spiMock
 }
 
-func (spi *MockSpiAccess) createConnection(busNum, chipNum, mode, bits int, maxSpeed int64) (gobot.SpiOperations, error) {
+func (spi *MockSpiAccess) createDevice(busNum, chipNum, mode, bits int, maxSpeed int64) (gobot.SpiSystemDevicer, error) {
 	spi.busNum = busNum
 	spi.chipNum = chipNum
 	spi.mode = mode
 	spi.bits = bits
 	spi.maxSpeed = maxSpeed
-	spi.connection = newSpiConnectionMock(busNum, chipNum, mode, bits, maxSpeed)
+	spi.sysdev = newSpiMock(busNum, chipNum, mode, bits, maxSpeed)
 	var err error
 	if spi.CreateError {
 		err = fmt.Errorf("error while create SPI connection in mock")
 	}
-	return spi.connection, err
+	return spi.sysdev, err
+}
+
+func (*MockSpiAccess) isSupported() bool {
+	return true
 }
 
 // SetReadError can be used to simulate a read error.
 func (spi *MockSpiAccess) SetReadError(val bool) {
-	spi.connection.simReadErr = val
+	spi.sysdev.simReadErr = val
 }
 
 // SetWriteError can be used to simulate a write error.
 func (spi *MockSpiAccess) SetWriteError(val bool) {
-	spi.connection.simWriteErr = val
+	spi.sysdev.simWriteErr = val
 }
 
 // SetCloseError can be used to simulate a error on Close().
 func (spi *MockSpiAccess) SetCloseError(val bool) {
-	spi.connection.simCloseErr = val
+	spi.sysdev.simCloseErr = val
 }
 
 // SetSimRead is used to set the byte stream for next read.
-func (spi *MockSpiAccess) SetSimRead(val []byte) {
-	spi.connection.simRead = val
+func (spi *MockSpiAccess) SetSimRead(data []byte) {
+	spi.sysdev.simRead = make([]byte, len(data))
+	copy(spi.sysdev.simRead, data)
 }
 
 // Written returns the byte stream which was last written.
 func (spi *MockSpiAccess) Written() []byte {
-	return spi.connection.written
+	return spi.sysdev.written
 }
 
-// spiConnectionMock is the a mock implementation, used in tests
-type spiConnectionMock struct {
+// Reset resets the last written values.
+func (spi *MockSpiAccess) Reset() {
+	spi.sysdev.written = []byte{}
+}
+
+// spiMock is the a mock implementation, used in tests
+type spiMock struct {
 	id          string
 	simReadErr  bool
 	simWriteErr bool
@@ -66,48 +76,27 @@ type spiConnectionMock struct {
 	simRead     []byte
 }
 
-// newspiConnectionMock creates and returns a new connection to a specific
+// newSpiMock creates and returns a new connection to a specific
 // spi device on a bus/chip using the periph.io interface.
-func newSpiConnectionMock(busNum, chipNum, mode, bits int, maxSpeed int64) *spiConnectionMock {
-	return &spiConnectionMock{id: fmt.Sprintf("bu:%d, c:%d, m:%d, bi:%d, s:%d", busNum, chipNum, mode, bits, maxSpeed)}
+func newSpiMock(busNum, chipNum, mode, bits int, maxSpeed int64) *spiMock {
+	return &spiMock{id: fmt.Sprintf("bu:%d, c:%d, m:%d, bi:%d, s:%d", busNum, chipNum, mode, bits, maxSpeed)}
 }
 
-// Close the SPI connection. Implements gobot.BusOperations.
-func (c *spiConnectionMock) Close() error {
+// Close the SPI connection to the device. Implements gobot.SpiSystemDevicer.
+func (c *spiMock) Close() error {
 	if c.simCloseErr {
 		return fmt.Errorf("error while SPI close in mock")
 	}
 	return nil
 }
 
-// ReadCommandData uses the SPI device TX to send/receive data.
-func (c *spiConnectionMock) ReadCommandData(command []byte, data []byte) error {
+// TxRx uses the SPI device TX to send/receive data. gobot.SpiSystemDevicer.
+func (c *spiMock) TxRx(tx []byte, rx []byte) error {
 	if c.simReadErr {
 		return fmt.Errorf("error while SPI read in mock")
 	}
-	c.written = append(c.written, command...)
-	copy(data, c.simRead)
-	return nil
-}
-
-// WriteByte uses the SPI device TX to send a byte value. Implements gobot.BusOperations.
-func (c *spiConnectionMock) WriteByte(val byte) error {
-	return c.WriteBytes([]byte{val})
-}
-
-// WriteBlockData uses the SPI device TX to send data. Implements gobot.BusOperations.
-func (c *spiConnectionMock) WriteBlockData(reg byte, data []byte) error {
-	buf := make([]byte, len(data)+1)
-	copy(buf[1:], data)
-	buf[0] = reg
-	return c.WriteBytes(data)
-}
-
-// WriteBytes uses the SPI device TX to send data. Implements gobot.BusOperations.
-func (c *spiConnectionMock) WriteBytes(data []byte) error {
-	if c.simWriteErr {
-		return fmt.Errorf("error while SPI write in mock")
-	}
-	c.written = append(c.written, data...)
+	c.written = append(c.written, tx...)
+	// the answer can be one cycle behind, this must be considered in test setup
+	copy(rx, c.simRead)
 	return nil
 }

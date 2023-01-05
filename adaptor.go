@@ -76,16 +76,33 @@ type PWMPinnerProvider interface {
 	PWMPin(id string) (PWMPinner, error)
 }
 
+// I2cSystemDevicer is the interface to a i2c bus at system level.
+type I2cSystemDevicer interface {
+	I2cOperations
+	SetAddress(int) error
+}
+
+// SpiSystemDevicer is the interface to a SPI bus at system level.
+type SpiSystemDevicer interface {
+	TxRx(tx []byte, rx []byte) error
+	// Close the SPI connection.
+	Close() error
+}
+
 // BusOperations are functions provided by a bus device, e.g. SPI, i2c.
 type BusOperations interface {
+	// ReadByteData reads a byte from the given register of bus device.
+	ReadByteData(reg uint8) (uint8, error)
+	// ReadBlockData fills the given buffer with reads starting from the given register of bus device.
+	ReadBlockData(reg uint8, data []byte) error
+	// WriteByteData writes the given byte value to the given register of bus device.
+	WriteByteData(reg uint8, val uint8) error
 	// WriteBlockData writes the given data starting from the given register of bus device.
 	WriteBlockData(reg uint8, data []byte) error
-	// WriteByte writes the given byte value to the current register of a bus device.
+	// WriteByte writes the given byte value to the current register of bus device.
 	WriteByte(val byte) error
-	// WriteBytes writes the given data starting from the current register of an bus device.
+	// WriteBytes writes the given data starting from the current register of bus device.
 	WriteBytes(data []byte) error
-	// Close the connection.
-	Close() error
 }
 
 // I2cOperations represents the i2c methods according to I2C/SMBus specification.
@@ -105,8 +122,14 @@ type BusOperations interface {
 // Count (8 bits): A data byte containing the length of a block operation.
 // [..]: Data sent by I2C device, as opposed to data sent by the host adapter.
 //
+// ReadByteData must be implemented as the sequence:
+// "S Addr Wr [A] Comm [A] Sr Addr Rd [A] [Data] NA P"
+// ReadBlockData must be implemented as the sequence:
+// "S Addr Wr [A] Comm [A] Sr Addr Rd [A] [Count] A [Data] A [Data] A ... A [Data] NA P"
 // WriteByte must be implemented as the sequence:
 // "S Addr Wr [A] Data [A] P"
+// WriteByteData must be implemented as the sequence:
+// "S Addr Wr [A] Comm [A] Data [A] P"
 // WriteBlockData must be implemented as the sequence:
 // "S Addr Wr [A] Comm [A] Count [A] Data [A] Data [A] ... [A] Data [A] P"
 type I2cOperations interface {
@@ -117,21 +140,9 @@ type I2cOperations interface {
 	// "S Addr Rd [A] [Data] NA P"
 	ReadByte() (byte, error)
 
-	// ReadByteData must be implemented as the sequence:
-	// "S Addr Wr [A] Comm [A] Sr Addr Rd [A] [Data] NA P"
-	ReadByteData(reg uint8) (uint8, error)
-
 	// ReadWordData must be implemented as the sequence:
 	// "S Addr Wr [A] Comm [A] Sr Addr Rd [A] [DataLow] A [DataHigh] NA P"
 	ReadWordData(reg uint8) (uint16, error)
-
-	// ReadBlockData must be implemented as the sequence:
-	// "S Addr Wr [A] Comm [A] Sr Addr Rd [A] [Count] A [Data] A [Data] A ... A [Data] NA P"
-	ReadBlockData(reg uint8, b []byte) error
-
-	// WriteByteData must be implemented as the sequence:
-	// "S Addr Wr [A] Comm [A] Data [A] P"
-	WriteByteData(reg uint8, val uint8) error
 
 	// WriteWordData must be implemented as the sequence:
 	// "S Addr Wr [A] Comm [A] DataLow [A] DataHigh [A] P"
@@ -143,6 +154,8 @@ type SpiOperations interface {
 	BusOperations
 	// ReadCommandData uses the SPI device TX to send/receive data.
 	ReadCommandData(command []byte, data []byte) error
+	// Close the connection.
+	Close() error
 }
 
 // Adaptor is the interface that describes an adaptor in gobot

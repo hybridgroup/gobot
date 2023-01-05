@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"unsafe"
 
+	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/gobottest"
 	"gobot.io/x/gobot/system"
 )
@@ -41,7 +42,7 @@ func syscallImplFail(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errn
 	return 0, 0, 1
 }
 
-func initI2CDevice() I2cDevice {
+func initI2CDevice() gobot.I2cSystemDevicer {
 	a := system.NewAccesser()
 	a.UseMockFilesystem([]string{dev})
 	msc := a.UseMockSyscall()
@@ -51,7 +52,7 @@ func initI2CDevice() I2cDevice {
 	return d
 }
 
-func initI2CDeviceAddressError() I2cDevice {
+func initI2CDeviceAddressError() gobot.I2cSystemDevicer {
 	a := system.NewAccesser()
 	a.UseMockFilesystem([]string{dev})
 	msc := a.UseMockSyscall()
