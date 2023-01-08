@@ -33,13 +33,13 @@ func Test_newDigitalPinGpiod(t *testing.T) {
 }
 
 func Test_newDigitalPinGpiodWithOptions(t *testing.T) {
-	// This is a general test, that options are applied by using "newDigitalPinGpiod" with the WithLabel() option.
+	// This is a general test, that options are applied by using "newDigitalPinGpiod" with the WithPinLabel() option.
 	// All other configuration options will be tested in tests for "digitalPinConfig".
 	//
 	// arrange
 	const label = "my own label"
 	// act
-	dp := newDigitalPinGpiod("", 9, WithLabel(label))
+	dp := newDigitalPinGpiod("", 9, WithPinLabel(label))
 	// assert
 	gobottest.Assert(t, dp.label, label)
 }
@@ -50,7 +50,7 @@ func TestApplyOptions(t *testing.T) {
 	// arrange
 	d := &digitalPinGpiod{digitalPinConfig: &digitalPinConfig{direction: "in"}}
 	// act
-	d.ApplyOptions(WithDirectionInput())
+	d.ApplyOptions(WithPinDirectionInput())
 	// assert
 	gobottest.Assert(t, d.digitalPinConfig.direction, "in")
 }

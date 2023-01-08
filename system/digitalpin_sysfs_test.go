@@ -47,7 +47,7 @@ func TestDigitalPin(t *testing.T) {
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio10/value"].Contents, "1")
 
-	err = pin.ApplyOptions(WithDirectionInput())
+	err = pin.ApplyOptions(WithPinDirectionInput())
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio10/direction"].Contents, "in")
 

@@ -135,12 +135,12 @@ func (s *spiGpio) transferByte(txByte uint8) (uint8, error) {
 
 func (s *spiGpio) initializeGpios() error {
 	var err error
-	// nss is an output, negotiated (currently not implemented at pin level)
+	// nss is an output, negated (currently not implemented at pin level)
 	s.nssPin, err = s.cfg.pinProvider.DigitalPin(s.cfg.nssPinID)
 	if err != nil {
 		return err
 	}
-	if err := s.nssPin.ApplyOptions(WithDirectionOutput(1)); err != nil {
+	if err := s.nssPin.ApplyOptions(WithPinDirectionOutput(1)); err != nil {
 		return err
 	}
 	// sclk is an output, CPOL = 0
@@ -148,7 +148,7 @@ func (s *spiGpio) initializeGpios() error {
 	if err != nil {
 		return err
 	}
-	if err := s.sclkPin.ApplyOptions(WithDirectionOutput(0)); err != nil {
+	if err := s.sclkPin.ApplyOptions(WithPinDirectionOutput(0)); err != nil {
 		return err
 	}
 	// miso is an input
@@ -161,5 +161,5 @@ func (s *spiGpio) initializeGpios() error {
 	if err != nil {
 		return err
 	}
-	return s.mosiPin.ApplyOptions(WithDirectionOutput(0))
+	return s.mosiPin.ApplyOptions(WithPinDirectionOutput(0))
 }

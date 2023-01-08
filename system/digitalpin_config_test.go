@@ -23,7 +23,17 @@ func Test_newDigitalPinConfig(t *testing.T) {
 	gobottest.Assert(t, d.outInitialState, 0)
 }
 
-func TestWithLabel(t *testing.T) {
+func Test_newDigitalPinConfigWithOption(t *testing.T) {
+	// arrange
+	const label = "gobotio18"
+	// act
+	d := newDigitalPinConfig("not used", WithPinLabel(label))
+	// assert
+	gobottest.Refute(t, d, nil)
+	gobottest.Assert(t, d.label, label)
+}
+
+func TestWithPinLabel(t *testing.T) {
 	const (
 		oldLabel = "old label"
 		newLabel = "my optional label"
@@ -45,7 +55,7 @@ func TestWithLabel(t *testing.T) {
 			// arrange
 			dpc := &digitalPinConfig{label: oldLabel}
 			// act
-			got := WithLabel(tc.setLabel)(dpc)
+			got := WithPinLabel(tc.setLabel)(dpc)
 			// assert
 			gobottest.Assert(t, got, tc.want)
 			gobottest.Assert(t, dpc.label, tc.setLabel)
@@ -53,7 +63,7 @@ func TestWithLabel(t *testing.T) {
 	}
 }
 
-func TestWithDirectionOutput(t *testing.T) {
+func TestWithPinDirectionOutput(t *testing.T) {
 	const (
 		// values other than 0, 1 are normally not useful, just to test
 		oldVal = 3
@@ -79,7 +89,7 @@ func TestWithDirectionOutput(t *testing.T) {
 			// arrange
 			dpc := &digitalPinConfig{direction: tc.oldDir, outInitialState: oldVal}
 			// act
-			got := WithDirectionOutput(newVal)(dpc)
+			got := WithPinDirectionOutput(newVal)(dpc)
 			// assert
 			gobottest.Assert(t, got, tc.want)
 			gobottest.Assert(t, dpc.direction, "out")
@@ -88,7 +98,7 @@ func TestWithDirectionOutput(t *testing.T) {
 	}
 }
 
-func TestWithDirectionInput(t *testing.T) {
+func TestWithPinDirectionInput(t *testing.T) {
 	var tests = map[string]struct {
 		oldDir string
 		want   bool
@@ -107,11 +117,37 @@ func TestWithDirectionInput(t *testing.T) {
 			const initValOut = 2 // 2 is normally not useful, just to test that is not touched
 			dpc := &digitalPinConfig{direction: tc.oldDir, outInitialState: initValOut}
 			// act
-			got := WithDirectionInput()(dpc)
+			got := WithPinDirectionInput()(dpc)
 			// assert
 			gobottest.Assert(t, got, tc.want)
 			gobottest.Assert(t, dpc.direction, "in")
 			gobottest.Assert(t, dpc.outInitialState, initValOut)
+		})
+	}
+}
+
+func TestWithPinActiveLow(t *testing.T) {
+	var tests = map[string]struct {
+		oldActiveLow bool
+		want         bool
+	}{
+		"no_change": {
+			oldActiveLow: true,
+		},
+		"change": {
+			oldActiveLow: false,
+			want:         true,
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			dpc := &digitalPinConfig{activeLow: tc.oldActiveLow}
+			// act
+			got := WithPinActiveLow()(dpc)
+			// assert
+			gobottest.Assert(t, got, tc.want)
+			gobottest.Assert(t, dpc.activeLow, true)
 		})
 	}
 }

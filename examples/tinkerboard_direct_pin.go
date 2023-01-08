@@ -10,26 +10,38 @@ import (
 
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/drivers/gpio"
+	"gobot.io/x/gobot/platforms/adaptors"
 	"gobot.io/x/gobot/platforms/tinkerboard"
 )
 
 // Wiring
 // PWR  Tinkerboard: 1 (+3.3V, VCC), 2(+5V), 6, 9, 14, 20 (GND)
-// GPIO Tinkerboard: header pin 26 used as output
+// GPIO Tinkerboard: header pin 26 used as normal output, pin 27 used as inverted output
 func main() {
-	const pinNo = "26"
-	board := tinkerboard.NewAdaptor()
-	pin := gpio.NewDirectPinDriver(board, pinNo)
+	const (
+		pinNum         = "7"
+		pinInvertedNum = "22"
+	)
+	board := tinkerboard.NewAdaptor(adaptors.WithGpiosActiveLow(pinInvertedNum))
+	pin := gpio.NewDirectPinDriver(board, pinNum)
+	pinInverted := gpio.NewDirectPinDriver(board, pinInvertedNum)
 
 	work := func() {
 		level := byte(1)
 
 		gobot.Every(500*time.Millisecond, func() {
 			err := pin.DigitalWrite(level)
-			fmt.Printf("pin %s is now %d\n", pinNo, level)
+			fmt.Printf("pin %s is now %d\n", pinNum, level)
 			if err != nil {
 				fmt.Println(err)
 			}
+
+			err = pinInverted.DigitalWrite(level)
+			fmt.Printf("pin %s is now not %d\n", pinInvertedNum, level)
+			if err != nil {
+				fmt.Println(err)
+			}
+
 			if level == 1 {
 				level = 0
 			} else {

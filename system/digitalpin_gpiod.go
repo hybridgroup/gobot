@@ -194,17 +194,24 @@ func (d *digitalPinGpiod) reconfigure(forceInput bool) error {
 	}
 	d.line = gpiodLine
 
-	// configure line
+	// configure direction
 	if d.direction == IN || forceInput {
 		if err := gpiodLine.Reconfigure(gpiod.AsInput); err != nil {
 			return fmt.Errorf("gpiod.reconfigure(%s)-l.Reconfigure(gpiod.AsInput): %v", id, err)
 		}
-		return nil
+	} else {
+		if err := gpiodLine.Reconfigure(gpiod.AsOutput(d.outInitialState)); err != nil {
+			return fmt.Errorf("gpiod.reconfigure(%s)-l.Reconfigure(gpiod.AsOutput(%d)): %v", id, d.outInitialState, err)
+		}
 	}
 
-	if err := gpiodLine.Reconfigure(gpiod.AsOutput(d.outInitialState)); err != nil {
-		return fmt.Errorf("gpiod.reconfigure(%s)-l.Reconfigure(gpiod.AsOutput(%d)): %v", id, d.outInitialState, err)
+	// configure inverse logic
+	if d.activeLow {
+		if err := gpiodLine.Reconfigure(gpiod.AsActiveLow); err != nil {
+			return fmt.Errorf("gpiod.reconfigure(%s)-l.Reconfigure(gpiod.AsActiveLow): %v", id, err)
+		}
 	}
+
 	return nil
 }
 

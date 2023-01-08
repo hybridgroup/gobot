@@ -16,6 +16,7 @@ type digitalPinsOptioner interface {
 	setDigitalPinInitializer(digitalPinInitializer)
 	setDigitalPinsForSystemGpiod()
 	setDigitalPinsForSystemSpi(sclkPin, nssPin, mosiPin, misoPin string)
+	prepareDigitalPinsActiveLow(pin string, otherPins ...string)
 }
 
 // DigitalPinsAdaptor is a adaptor for digital pins, normally used for composition in platforms.
@@ -24,6 +25,7 @@ type DigitalPinsAdaptor struct {
 	translate  digitalPinTranslator
 	initialize digitalPinInitializer
 	pins       map[string]gobot.DigitalPinner
+	pinOptions map[string][]func(gobot.DigitalPinOptioner) bool
 	mutex      sync.Mutex
 }
 
@@ -75,6 +77,17 @@ func WithSpiGpioAccess(sclkPin, nssPin, mosiPin, misoPin string) func(Optioner) 
 	}
 }
 
+// WithGpiosActiveLow prepares the given pins for inverse reaction on next initialize.
+// This is working for inputs and outputs.
+func WithGpiosActiveLow(pin string, otherPins ...string) func(Optioner) {
+	return func(o Optioner) {
+		a, ok := o.(digitalPinsOptioner)
+		if ok {
+			a.prepareDigitalPinsActiveLow(pin, otherPins...)
+		}
+	}
+}
+
 // Connect prepare new connection to digital pins.
 func (a *DigitalPinsAdaptor) Connect() error {
 	a.mutex.Lock()
@@ -97,6 +110,7 @@ func (a *DigitalPinsAdaptor) Finalize() (err error) {
 		}
 	}
 	a.pins = nil
+	a.pinOptions = nil
 	return
 }
 
@@ -114,7 +128,7 @@ func (a *DigitalPinsAdaptor) DigitalRead(id string) (int, error) {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
-	pin, err := a.digitalPin(id, system.WithDirectionInput())
+	pin, err := a.digitalPin(id, system.WithPinDirectionInput())
 	if err != nil {
 		return 0, err
 	}
@@ -126,7 +140,7 @@ func (a *DigitalPinsAdaptor) DigitalWrite(id string, val byte) error {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
-	pin, err := a.digitalPin(id, system.WithDirectionOutput(int(val)))
+	pin, err := a.digitalPin(id, system.WithPinDirectionOutput(int(val)))
 	if err != nil {
 		return err
 	}
@@ -145,11 +159,25 @@ func (a *DigitalPinsAdaptor) setDigitalPinsForSystemSpi(sclkPin, nssPin, mosiPin
 	system.WithSpiGpioAccess(a, sclkPin, nssPin, mosiPin, misoPin)(a.sys)
 }
 
-func (a *DigitalPinsAdaptor) digitalPin(id string, o ...func(gobot.DigitalPinOptioner) bool) (gobot.DigitalPinner, error) {
+func (a *DigitalPinsAdaptor) prepareDigitalPinsActiveLow(id string, otherIDs ...string) {
+	ids := []string{id}
+	ids = append(ids, otherIDs...)
+
+	if a.pinOptions == nil {
+		a.pinOptions = make(map[string][]func(gobot.DigitalPinOptioner) bool)
+	}
+
+	for _, i := range ids {
+		a.pinOptions[i] = append(a.pinOptions[i], system.WithPinActiveLow())
+	}
+}
+
+func (a *DigitalPinsAdaptor) digitalPin(id string, opts ...func(gobot.DigitalPinOptioner) bool) (gobot.DigitalPinner, error) {
 	if a.pins == nil {
 		return nil, fmt.Errorf("not connected")
 	}
 
+	o := append(a.pinOptions[id], opts...)
 	pin := a.pins[id]
 
 	if pin == nil {

@@ -10,6 +10,8 @@ type DigitalPinOptioner interface {
 	SetDirectionOutput(initialState int) (changed bool)
 	// SetDirectionInput sets the pins direction to input
 	SetDirectionInput() (changed bool)
+	// SetActiveLow initializes the pin with inverse reaction (applies on input and output).
+	SetActiveLow() (changed bool)
 }
 
 // DigitalPinOptionApplier is the interface to apply options to change pin behavior immediately

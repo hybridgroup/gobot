@@ -24,8 +24,9 @@ type digitalPinSysfs struct {
 	*digitalPinConfig
 	fs filesystem
 
-	dirFile File
-	valFile File
+	dirFile       File
+	valFile       File
+	activeLowFile File
 }
 
 // newDigitalPinSysfs returns a digital pin using for the given number. The name of the sysfs file will prepend "gpio"
@@ -79,6 +80,10 @@ func (d *digitalPinSysfs) Unexport() error {
 	if d.valFile != nil {
 		d.valFile.Close()
 		d.valFile = nil
+	}
+	if d.activeLowFile != nil {
+		d.activeLowFile.Close()
+		d.activeLowFile = nil
 	}
 
 	_, err = writeFile(unexport, []byte(d.pin))
@@ -148,9 +153,19 @@ func (d *digitalPinSysfs) reconfigure() error {
 		d.valFile, err = d.fs.openFile(fmt.Sprintf("%s/%s/value", gpioPath, d.label), os.O_RDWR, 0644)
 	}
 
-	// configure line
+	// configure direction
 	if err == nil {
 		err = d.writeDirectionWithInitialOutput()
+	}
+
+	// configure inverse logic
+	if err == nil {
+		if d.activeLow {
+			d.activeLowFile, err = d.fs.openFile(fmt.Sprintf("%s/%s/active_low", gpioPath, d.label), os.O_RDWR, 0644)
+			if err == nil {
+				_, err = writeFile(d.activeLowFile, []byte("1"))
+			}
+		}
 	}
 
 	if err != nil {
