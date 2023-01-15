@@ -3,6 +3,7 @@ package system
 import (
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"syscall"
@@ -12,6 +13,7 @@ import (
 )
 
 const (
+	systemSysfsDebug = false
 	// gpioPath default linux sysfs gpio path
 	gpioPath = "/sys/class/gpio"
 )
@@ -165,6 +167,13 @@ func (d *digitalPinSysfs) reconfigure() error {
 			if err == nil {
 				_, err = writeFile(d.activeLowFile, []byte("1"))
 			}
+		}
+	}
+
+	// configure bias
+	if err == nil {
+		if d.bias != digitalPinBiasDefault && systemSysfsDebug {
+			log.Printf("bias options (%d) are not supported by sysfs, please use hardware resistors instead\n", d.bias)
 		}
 	}
 

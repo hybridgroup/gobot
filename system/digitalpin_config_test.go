@@ -151,3 +151,57 @@ func TestWithPinActiveLow(t *testing.T) {
 		})
 	}
 }
+
+func TestWithPinPullDown(t *testing.T) {
+	var tests = map[string]struct {
+		oldBias int
+		want    bool
+		wantVal int
+	}{
+		"no_change": {
+			oldBias: digitalPinBiasPullDown,
+		},
+		"change": {
+			oldBias: digitalPinBiasPullUp,
+			want:    true,
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			dpc := &digitalPinConfig{bias: tc.oldBias}
+			// act
+			got := WithPinPullDown()(dpc)
+			// assert
+			gobottest.Assert(t, got, tc.want)
+			gobottest.Assert(t, dpc.bias, digitalPinBiasPullDown)
+		})
+	}
+}
+
+func TestWithPinPullUp(t *testing.T) {
+	var tests = map[string]struct {
+		oldBias int
+		want    bool
+		wantVal int
+	}{
+		"no_change": {
+			oldBias: digitalPinBiasPullUp,
+		},
+		"change": {
+			oldBias: digitalPinBiasPullDown,
+			want:    true,
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			dpc := &digitalPinConfig{bias: tc.oldBias}
+			// act
+			got := WithPinPullUp()(dpc)
+			// assert
+			gobottest.Assert(t, got, tc.want)
+			gobottest.Assert(t, dpc.bias, digitalPinBiasPullUp)
+		})
+	}
+}

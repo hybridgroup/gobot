@@ -211,12 +211,14 @@ func TestDigitalWrite(t *testing.T) {
 	}
 	a, fs := initTestDigitalPinsAdaptorWithMockedFilesystem(mockedPaths)
 
-	// assert write correct value without error
+	// assert write correct value without error and just ignore unsupported options
+	WithGpiosPullUp("7")(a)
 	err := a.DigitalWrite("7", 1)
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio18/value"].Contents, "1")
 
-	// assert second write to same pin without error
+	// assert second write to same pin without error and just ignore unsupported options
+	WithGpiosPullDown("7")(a)
 	err = a.DigitalWrite("7", 1)
 	gobottest.Assert(t, err, nil)
 

@@ -212,6 +212,22 @@ func (d *digitalPinGpiod) reconfigure(forceInput bool) error {
 		}
 	}
 
+	// configure bias
+	switch d.bias {
+	case digitalPinBiasPullDown:
+		if err := gpiodLine.Reconfigure(gpiod.LineBiasPullDown); err != nil {
+			return fmt.Errorf("gpiod.reconfigure(%s)-l.Reconfigure(gpiod.LineBiasPullDown): %v", id, err)
+		}
+	case digitalPinBiasPullUp:
+		if err := gpiodLine.Reconfigure(gpiod.LineBiasPullUp); err != nil {
+			return fmt.Errorf("gpiod.reconfigure(%s)-l.Reconfigure(gpiod.LineBiasPullUp): %v", id, err)
+		}
+	default:
+		if err := gpiodLine.Reconfigure(gpiod.LineBiasUnknown); err != nil {
+			return fmt.Errorf("gpiod.reconfigure(%s)-l.Reconfigure(gpiod.LineBiasUnknown): %v", id, err)
+		}
+	}
+
 	return nil
 }
 

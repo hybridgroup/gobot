@@ -17,6 +17,8 @@ type digitalPinsOptioner interface {
 	setDigitalPinsForSystemGpiod()
 	setDigitalPinsForSystemSpi(sclkPin, nssPin, mosiPin, misoPin string)
 	prepareDigitalPinsActiveLow(pin string, otherPins ...string)
+	prepareDigitalPinsPullDown(pin string, otherPins ...string)
+	prepareDigitalPinsPullUp(pin string, otherPins ...string)
 }
 
 // DigitalPinsAdaptor is a adaptor for digital pins, normally used for composition in platforms.
@@ -84,6 +86,28 @@ func WithGpiosActiveLow(pin string, otherPins ...string) func(Optioner) {
 		a, ok := o.(digitalPinsOptioner)
 		if ok {
 			a.prepareDigitalPinsActiveLow(pin, otherPins...)
+		}
+	}
+}
+
+// WithGpiosPullDown prepares the given pins to be pulled down (high impedance to GND) on next initialize.
+// This is working for inputs and outputs since Kernel 5.5, but will be ignored with sysfs ABI.
+func WithGpiosPullDown(pin string, otherPins ...string) func(Optioner) {
+	return func(o Optioner) {
+		a, ok := o.(digitalPinsOptioner)
+		if ok {
+			a.prepareDigitalPinsPullDown(pin, otherPins...)
+		}
+	}
+}
+
+// WithGpiosPullUp prepares the given pins to be pulled up (high impedance to VDD) on next initialize.
+// This is working for inputs and outputs since Kernel 5.5, but will be ignored with sysfs ABI.
+func WithGpiosPullUp(pin string, otherPins ...string) func(Optioner) {
+	return func(o Optioner) {
+		a, ok := o.(digitalPinsOptioner)
+		if ok {
+			a.prepareDigitalPinsPullUp(pin, otherPins...)
 		}
 	}
 }
@@ -169,6 +193,32 @@ func (a *DigitalPinsAdaptor) prepareDigitalPinsActiveLow(id string, otherIDs ...
 
 	for _, i := range ids {
 		a.pinOptions[i] = append(a.pinOptions[i], system.WithPinActiveLow())
+	}
+}
+
+func (a *DigitalPinsAdaptor) prepareDigitalPinsPullDown(id string, otherIDs ...string) {
+	ids := []string{id}
+	ids = append(ids, otherIDs...)
+
+	if a.pinOptions == nil {
+		a.pinOptions = make(map[string][]func(gobot.DigitalPinOptioner) bool)
+	}
+
+	for _, i := range ids {
+		a.pinOptions[i] = append(a.pinOptions[i], system.WithPinPullDown())
+	}
+}
+
+func (a *DigitalPinsAdaptor) prepareDigitalPinsPullUp(id string, otherIDs ...string) {
+	ids := []string{id}
+	ids = append(ids, otherIDs...)
+
+	if a.pinOptions == nil {
+		a.pinOptions = make(map[string][]func(gobot.DigitalPinOptioner) bool)
+	}
+
+	for _, i := range ids {
+		a.pinOptions[i] = append(a.pinOptions[i], system.WithPinPullUp())
 	}
 }
 
