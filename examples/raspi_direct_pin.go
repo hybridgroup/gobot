@@ -1,7 +1,3 @@
-// +build example
-//
-// Do not build by default.
-
 package main
 
 import (
@@ -11,13 +7,13 @@ import (
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/drivers/gpio"
 	"gobot.io/x/gobot/platforms/adaptors"
-	"gobot.io/x/gobot/platforms/tinkerboard"
+	"gobot.io/x/gobot/platforms/raspi"
 )
 
 // Wiring
-// PWR  Tinkerboard: 1 (+3.3V, VCC), 2(+5V), 6, 9, 14, 20 (GND)
-// GPIO Tinkerboard: header pin 21 is input, pin 24 used as normal output, pin 26 used as inverted output
-// Button: the input pin is wired with a button to GND, an external pull up resistor is needed (e.g. 1K)
+// PWR  Raspi: 1 (+3.3V, VCC), 2(+5V), 6, 9, 14, 20 (GND)
+// GPIO Raspi: header pin 21 (GPIO9) is input, pin 24 (GPIO8) is normal output, pin 26 (GPIO7) is inverted output
+// Button: the input pin is wired with a button to GND, the internal pull up resistor is used
 // LED's: the output pins are wired to the cathode of a LED, the anode is wired with a resistor (70-130Ohm for 20mA) to VCC
 // Expected behavior: always one LED is on, the other in opposite state, on button press the state changes
 func main() {
@@ -26,7 +22,7 @@ func main() {
 		outPinNum         = "24"
 		outPinInvertedNum = "26"
 	)
-	board := tinkerboard.NewAdaptor(adaptors.WithGpiosActiveLow(outPinInvertedNum))
+	board := raspi.NewAdaptor(adaptors.WithGpiosActiveLow(outPinInvertedNum), adaptors.WithGpiosPullUp(inPinNum))
 	inPin := gpio.NewDirectPinDriver(board, inPinNum)
 	outPin := gpio.NewDirectPinDriver(board, outPinNum)
 	outPinInverted := gpio.NewDirectPinDriver(board, outPinInvertedNum)

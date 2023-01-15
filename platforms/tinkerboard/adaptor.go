@@ -46,6 +46,10 @@ type Adaptor struct {
 // Optional parameters:
 //		adaptors.WithGpiodAccess():	use character device gpiod driver instead of sysfs (still used by default)
 //		adaptors.WithSpiGpioAccess(sclk, nss, mosi, miso):	use GPIO's instead of /dev/spidev#.#
+//    adaptors.WithGpiosActiveLow(pin's): invert the pin behavior
+//    adaptors.WithGpiosPullUp/Down(pin's): sets the internal pull resistor
+// note from RK3288 datasheet: "The pull direction (pullup or pulldown) for all of GPIOs are software-programmable", but
+// the latter is not working for any pin (armbian 22.08.7)
 func NewAdaptor(opts ...func(adaptors.Optioner)) *Adaptor {
 	sys := system.NewAccesser(system.WithDigitalPinGpiodAccess())
 	c := &Adaptor{
