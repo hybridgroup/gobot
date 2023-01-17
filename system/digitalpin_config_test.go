@@ -205,3 +205,65 @@ func TestWithPinPullUp(t *testing.T) {
 		})
 	}
 }
+
+func TestWithPinOpenDrain(t *testing.T) {
+	var tests = map[string]struct {
+		oldDrive int
+		want     bool
+		wantVal  int
+	}{
+		"no_change": {
+			oldDrive: digitalPinDriveOpenDrain,
+		},
+		"change_from_pushpull": {
+			oldDrive: digitalPinDrivePushPull,
+			want:     true,
+		},
+		"change_from_opensource": {
+			oldDrive: digitalPinDriveOpenSource,
+			want:     true,
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			dpc := &digitalPinConfig{drive: tc.oldDrive}
+			// act
+			got := WithPinOpenDrain()(dpc)
+			// assert
+			gobottest.Assert(t, got, tc.want)
+			gobottest.Assert(t, dpc.drive, digitalPinDriveOpenDrain)
+		})
+	}
+}
+
+func TestWithPinOpenSource(t *testing.T) {
+	var tests = map[string]struct {
+		oldDrive int
+		want     bool
+		wantVal  int
+	}{
+		"no_change": {
+			oldDrive: digitalPinDriveOpenSource,
+		},
+		"change_from_pushpull": {
+			oldDrive: digitalPinDrivePushPull,
+			want:     true,
+		},
+		"change_from_opendrain": {
+			oldDrive: digitalPinDriveOpenDrain,
+			want:     true,
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			dpc := &digitalPinConfig{drive: tc.oldDrive}
+			// act
+			got := WithPinOpenSource()(dpc)
+			// assert
+			gobottest.Assert(t, got, tc.want)
+			gobottest.Assert(t, dpc.drive, digitalPinDriveOpenSource)
+		})
+	}
+}

@@ -14,6 +14,8 @@ type DigitalPinOptioner interface {
 	SetActiveLow() (changed bool)
 	// SetBias initializes the pin with the given bias (applies on input and output).
 	SetBias(bias int) (changed bool)
+	// SetDrive initializes the pin with the given drive option (applies on output only).
+	SetDrive(drive int) (changed bool)
 }
 
 // DigitalPinOptionApplier is the interface to apply options to change pin behavior immediately

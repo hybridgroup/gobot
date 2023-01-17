@@ -19,6 +19,8 @@ type digitalPinsOptioner interface {
 	prepareDigitalPinsActiveLow(pin string, otherPins ...string)
 	prepareDigitalPinsPullDown(pin string, otherPins ...string)
 	prepareDigitalPinsPullUp(pin string, otherPins ...string)
+	prepareDigitalPinsOpenDrain(pin string, otherPins ...string)
+	prepareDigitalPinsOpenSource(pin string, otherPins ...string)
 }
 
 // DigitalPinsAdaptor is a adaptor for digital pins, normally used for composition in platforms.
@@ -108,6 +110,28 @@ func WithGpiosPullUp(pin string, otherPins ...string) func(Optioner) {
 		a, ok := o.(digitalPinsOptioner)
 		if ok {
 			a.prepareDigitalPinsPullUp(pin, otherPins...)
+		}
+	}
+}
+
+// WithGpiosOpenDrain prepares the given output pins to be driven with open drain/collector on next initialize.
+// This will be ignored for inputs or with sysfs ABI.
+func WithGpiosOpenDrain(pin string, otherPins ...string) func(Optioner) {
+	return func(o Optioner) {
+		a, ok := o.(digitalPinsOptioner)
+		if ok {
+			a.prepareDigitalPinsOpenDrain(pin, otherPins...)
+		}
+	}
+}
+
+// WithGpiosOpenSource prepares the given output pins to be driven with open source/emitter on next initialize.
+// This will be ignored for inputs or with sysfs ABI.
+func WithGpiosOpenSource(pin string, otherPins ...string) func(Optioner) {
+	return func(o Optioner) {
+		a, ok := o.(digitalPinsOptioner)
+		if ok {
+			a.prepareDigitalPinsOpenSource(pin, otherPins...)
 		}
 	}
 }
@@ -219,6 +243,32 @@ func (a *DigitalPinsAdaptor) prepareDigitalPinsPullUp(id string, otherIDs ...str
 
 	for _, i := range ids {
 		a.pinOptions[i] = append(a.pinOptions[i], system.WithPinPullUp())
+	}
+}
+
+func (a *DigitalPinsAdaptor) prepareDigitalPinsOpenDrain(id string, otherIDs ...string) {
+	ids := []string{id}
+	ids = append(ids, otherIDs...)
+
+	if a.pinOptions == nil {
+		a.pinOptions = make(map[string][]func(gobot.DigitalPinOptioner) bool)
+	}
+
+	for _, i := range ids {
+		a.pinOptions[i] = append(a.pinOptions[i], system.WithPinOpenDrain())
+	}
+}
+
+func (a *DigitalPinsAdaptor) prepareDigitalPinsOpenSource(id string, otherIDs ...string) {
+	ids := []string{id}
+	ids = append(ids, otherIDs...)
+
+	if a.pinOptions == nil {
+		a.pinOptions = make(map[string][]func(gobot.DigitalPinOptioner) bool)
+	}
+
+	for _, i := range ids {
+		a.pinOptions[i] = append(a.pinOptions[i], system.WithPinOpenSource())
 	}
 }
 

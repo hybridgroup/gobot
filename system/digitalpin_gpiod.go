@@ -2,6 +2,7 @@ package system
 
 import (
 	"fmt"
+	"log"
 	"strconv"
 	"strings"
 
@@ -182,51 +183,53 @@ func (d *digitalPinGpiod) reconfigure(forceInput bool) error {
 	}
 	defer gpiodChip.Close()
 
-	// acquire line
-	gpiodLine, err := gpiodChip.RequestLine(d.pin)
+	// collect line configuration options
+	var opts []gpiod.LineReqOption
+
+	// configure direction and drive (outputs only)
+	if d.direction == IN || forceInput {
+		opts = append(opts, gpiod.AsInput)
+		if !forceInput && d.drive != digitalPinDrivePushPull && systemGpiodDebug {
+			log.Printf("drive option (%d) is dropped for input %s\n", d.drive, id)
+		}
+	} else {
+		opts = append(opts, gpiod.AsOutput(d.outInitialState))
+		switch d.drive {
+		case digitalPinDriveOpenDrain:
+			opts = append(opts, gpiod.LineDriveOpenDrain)
+		case digitalPinDriveOpenSource:
+			opts = append(opts, gpiod.LineDriveOpenSource)
+		default:
+			opts = append(opts, gpiod.LineDrivePushPull)
+		}
+	}
+
+	// configure inverse logic (inputs and outputs)
+	if d.activeLow {
+		opts = append(opts, gpiod.AsActiveLow)
+	}
+
+	// configure bias (inputs and outputs)
+	switch d.bias {
+	case digitalPinBiasPullDown:
+		opts = append(opts, gpiod.LineBiasPullDown)
+	case digitalPinBiasPullUp:
+		opts = append(opts, gpiod.LineBiasPullUp)
+	default:
+		opts = append(opts, gpiod.LineBiasUnknown)
+	}
+
+	// acquire line with collected options
+	gpiodLine, err := gpiodChip.RequestLine(d.pin, opts...)
 	if err != nil {
 		if gpiodLine != nil {
 			gpiodLine.Close()
 		}
 		d.line = nil
 
-		return fmt.Errorf("gpiod.reconfigure(%s)-c.RequestLine(%d): %v", id, d.pin, err)
+		return fmt.Errorf("gpiod.reconfigure(%s)-c.RequestLine(%d, %v): %v", id, d.pin, opts, err)
 	}
 	d.line = gpiodLine
-
-	// configure direction
-	if d.direction == IN || forceInput {
-		if err := gpiodLine.Reconfigure(gpiod.AsInput); err != nil {
-			return fmt.Errorf("gpiod.reconfigure(%s)-l.Reconfigure(gpiod.AsInput): %v", id, err)
-		}
-	} else {
-		if err := gpiodLine.Reconfigure(gpiod.AsOutput(d.outInitialState)); err != nil {
-			return fmt.Errorf("gpiod.reconfigure(%s)-l.Reconfigure(gpiod.AsOutput(%d)): %v", id, d.outInitialState, err)
-		}
-	}
-
-	// configure inverse logic
-	if d.activeLow {
-		if err := gpiodLine.Reconfigure(gpiod.AsActiveLow); err != nil {
-			return fmt.Errorf("gpiod.reconfigure(%s)-l.Reconfigure(gpiod.AsActiveLow): %v", id, err)
-		}
-	}
-
-	// configure bias
-	switch d.bias {
-	case digitalPinBiasPullDown:
-		if err := gpiodLine.Reconfigure(gpiod.LineBiasPullDown); err != nil {
-			return fmt.Errorf("gpiod.reconfigure(%s)-l.Reconfigure(gpiod.LineBiasPullDown): %v", id, err)
-		}
-	case digitalPinBiasPullUp:
-		if err := gpiodLine.Reconfigure(gpiod.LineBiasPullUp); err != nil {
-			return fmt.Errorf("gpiod.reconfigure(%s)-l.Reconfigure(gpiod.LineBiasPullUp): %v", id, err)
-		}
-	default:
-		if err := gpiodLine.Reconfigure(gpiod.LineBiasUnknown); err != nil {
-			return fmt.Errorf("gpiod.reconfigure(%s)-l.Reconfigure(gpiod.LineBiasUnknown): %v", id, err)
-		}
-	}
 
 	return nil
 }

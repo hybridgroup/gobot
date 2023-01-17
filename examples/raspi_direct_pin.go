@@ -22,7 +22,9 @@ func main() {
 		outPinNum         = "24"
 		outPinInvertedNum = "26"
 	)
-	board := raspi.NewAdaptor(adaptors.WithGpiosActiveLow(outPinInvertedNum), adaptors.WithGpiosPullUp(inPinNum))
+	// note: WithGpiosOpenDrain() is optional, if using WithGpiosOpenSource() the LED's will not light up
+	board := raspi.NewAdaptor(adaptors.WithGpiosActiveLow(outPinInvertedNum),
+		adaptors.WithGpiosPullUp(inPinNum), adaptors.WithGpiosOpenDrain(outPinNum, outPinInvertedNum))
 	inPin := gpio.NewDirectPinDriver(board, inPinNum)
 	outPin := gpio.NewDirectPinDriver(board, outPinNum)
 	outPinInverted := gpio.NewDirectPinDriver(board, outPinInvertedNum)

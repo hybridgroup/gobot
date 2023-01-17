@@ -16,14 +16,17 @@ const (
 )
 
 const (
-	// digitalPinBiasDefault GPIO uses the hardware default
-	digitalPinBiasDefault = 0
-	// digitalPinBiasDisable GPIO has pull disabled
-	digitalPinBiasDisable = 1
-	// digitalPinBiasPullDown GPIO has pull up enabled
-	digitalPinBiasPullDown = 2
-	// digitalPinBiasPullUp GPIO has pull down enabled
-	digitalPinBiasPullUp = 3
+	digitalPinBiasDefault  = 0 // GPIO uses the hardware default
+	digitalPinBiasDisable  = 1 // GPIO has pull disabled
+	digitalPinBiasPullDown = 2 // GPIO has pull up enabled
+	digitalPinBiasPullUp   = 3 // GPIO has pull down enabled
+
+	// open drain and open source allows the connection of output ports with the same mode (OR logic)
+	// * for open drain/collector pull up the ports with an external resistor/load
+	// * for open source/emitter pull down the ports with an external resistor/load
+	digitalPinDrivePushPull   = 0 // the pin will be driven actively high and	low (default)
+	digitalPinDriveOpenDrain  = 1 // the pin will be driven active to low only
+	digitalPinDriveOpenSource = 2 // the pin will be driven active to high only
 )
 
 type digitalPinConfig struct {
@@ -32,6 +35,7 @@ type digitalPinConfig struct {
 	outInitialState int
 	activeLow       bool
 	bias            int
+	drive           int
 }
 
 func newDigitalPinConfig(label string, options ...func(gobot.DigitalPinOptioner) bool) *digitalPinConfig {
@@ -75,6 +79,16 @@ func WithPinPullDown() func(gobot.DigitalPinOptioner) bool {
 // This is working since Kernel 5.5.
 func WithPinPullUp() func(gobot.DigitalPinOptioner) bool {
 	return func(d gobot.DigitalPinOptioner) bool { return d.SetBias(digitalPinBiasPullUp) }
+}
+
+// WithPinOpenDrain initializes the pin to be driven with open drain/collector (applies on output only).
+func WithPinOpenDrain() func(gobot.DigitalPinOptioner) bool {
+	return func(d gobot.DigitalPinOptioner) bool { return d.SetDrive(digitalPinDriveOpenDrain) }
+}
+
+// WithPinOpenSource initializes the pin to be driven with open source/emitter (applies on output only).
+func WithPinOpenSource() func(gobot.DigitalPinOptioner) bool {
+	return func(d gobot.DigitalPinOptioner) bool { return d.SetDrive(digitalPinDriveOpenSource) }
 }
 
 // SetLabel sets the label to use for next reconfigure. The function is intended to use by WithPinLabel().
@@ -125,5 +139,15 @@ func (d *digitalPinConfig) SetBias(bias int) bool {
 		return false
 	}
 	d.bias = bias
+	return true
+}
+
+// SetDrive sets the pin drive mode (applies on output only) for next reconfigure. The function
+// is intended to use by WithPinOpenDrain(), WithPinOpenSource() and WithPinPushPull().
+func (d *digitalPinConfig) SetDrive(drive int) bool {
+	if d.drive == drive {
+		return false
+	}
+	d.drive = drive
 	return true
 }

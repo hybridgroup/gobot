@@ -170,11 +170,16 @@ func (d *digitalPinSysfs) reconfigure() error {
 		}
 	}
 
-	// configure bias
+	// configure bias (unsupported)
 	if err == nil {
 		if d.bias != digitalPinBiasDefault && systemSysfsDebug {
 			log.Printf("bias options (%d) are not supported by sysfs, please use hardware resistors instead\n", d.bias)
 		}
+	}
+
+	// configure drive (unsupported)
+	if d.drive != digitalPinDrivePushPull && systemSysfsDebug {
+		log.Printf("drive options (%d) are not supported by sysfs\n", d.drive)
 	}
 
 	if err != nil {
