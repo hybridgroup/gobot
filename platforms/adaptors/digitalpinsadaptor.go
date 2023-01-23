@@ -3,6 +3,7 @@ package adaptors
 import (
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot"
@@ -21,6 +22,7 @@ type digitalPinsOptioner interface {
 	prepareDigitalPinsPullUp(pin string, otherPins ...string)
 	prepareDigitalPinsOpenDrain(pin string, otherPins ...string)
 	prepareDigitalPinsOpenSource(pin string, otherPins ...string)
+	prepareDigitalPinDebounce(pin string, period time.Duration)
 }
 
 // DigitalPinsAdaptor is a adaptor for digital pins, normally used for composition in platforms.
@@ -132,6 +134,17 @@ func WithGpiosOpenSource(pin string, otherPins ...string) func(Optioner) {
 		a, ok := o.(digitalPinsOptioner)
 		if ok {
 			a.prepareDigitalPinsOpenSource(pin, otherPins...)
+		}
+	}
+}
+
+// WithGpioDebounce prepares the given input pin to be debounced on next initialize.
+// This is working for inputs since Kernel 5.10, but will be ignored for outputs or with sysfs ABI.
+func WithGpioDebounce(pin string, period time.Duration) func(Optioner) {
+	return func(o Optioner) {
+		a, ok := o.(digitalPinsOptioner)
+		if ok {
+			a.prepareDigitalPinDebounce(pin, period)
 		}
 	}
 }
@@ -270,6 +283,14 @@ func (a *DigitalPinsAdaptor) prepareDigitalPinsOpenSource(id string, otherIDs ..
 	for _, i := range ids {
 		a.pinOptions[i] = append(a.pinOptions[i], system.WithPinOpenSource())
 	}
+}
+
+func (a *DigitalPinsAdaptor) prepareDigitalPinDebounce(id string, period time.Duration) {
+	if a.pinOptions == nil {
+		a.pinOptions = make(map[string][]func(gobot.DigitalPinOptioner) bool)
+	}
+
+	a.pinOptions[id] = append(a.pinOptions[id], system.WithPinDebounce(period))
 }
 
 func (a *DigitalPinsAdaptor) digitalPin(id string, opts ...func(gobot.DigitalPinOptioner) bool) (gobot.DigitalPinner, error) {

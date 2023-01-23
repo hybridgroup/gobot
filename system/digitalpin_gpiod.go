@@ -186,21 +186,27 @@ func (d *digitalPinGpiod) reconfigure(forceInput bool) error {
 	// collect line configuration options
 	var opts []gpiod.LineReqOption
 
-	// configure direction and drive (outputs only)
+	// configure direction, debounce period (inputs only) and drive (outputs only)
 	if d.direction == IN || forceInput {
 		opts = append(opts, gpiod.AsInput)
 		if !forceInput && d.drive != digitalPinDrivePushPull && systemGpiodDebug {
 			log.Printf("drive option (%d) is dropped for input %s\n", d.drive, id)
 		}
+		if d.debouncePeriod != 0 {
+			opts = append(opts, gpiod.WithDebounce(d.debouncePeriod))
+		}
 	} else {
 		opts = append(opts, gpiod.AsOutput(d.outInitialState))
 		switch d.drive {
 		case digitalPinDriveOpenDrain:
-			opts = append(opts, gpiod.LineDriveOpenDrain)
+			opts = append(opts, gpiod.AsOpenDrain)
 		case digitalPinDriveOpenSource:
-			opts = append(opts, gpiod.LineDriveOpenSource)
+			opts = append(opts, gpiod.AsOpenSource)
 		default:
-			opts = append(opts, gpiod.LineDrivePushPull)
+			opts = append(opts, gpiod.AsPushPull)
+		}
+		if d.debouncePeriod != 0 && systemGpiodDebug {
+			log.Printf("debounce option (%d) is dropped for output %s\n", d.drive, id)
 		}
 	}
 
@@ -212,11 +218,11 @@ func (d *digitalPinGpiod) reconfigure(forceInput bool) error {
 	// configure bias (inputs and outputs)
 	switch d.bias {
 	case digitalPinBiasPullDown:
-		opts = append(opts, gpiod.LineBiasPullDown)
+		opts = append(opts, gpiod.WithPullDown)
 	case digitalPinBiasPullUp:
-		opts = append(opts, gpiod.LineBiasPullUp)
+		opts = append(opts, gpiod.WithPullUp)
 	default:
-		opts = append(opts, gpiod.LineBiasUnknown)
+		opts = append(opts, gpiod.WithBiasAsIs)
 	}
 
 	// acquire line with collected options

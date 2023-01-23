@@ -2,6 +2,7 @@ package system
 
 import (
 	"testing"
+	"time"
 
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/gobottest"
@@ -264,6 +265,37 @@ func TestWithPinOpenSource(t *testing.T) {
 			// assert
 			gobottest.Assert(t, got, tc.want)
 			gobottest.Assert(t, dpc.drive, digitalPinDriveOpenSource)
+		})
+	}
+}
+
+func TestWithPinDebounce(t *testing.T) {
+	const (
+		oldVal = time.Duration(10)
+		newVal = time.Duration(14)
+	)
+	var tests = map[string]struct {
+		oldDebouncePeriod time.Duration
+		want              bool
+		wantVal           time.Duration
+	}{
+		"no_change": {
+			oldDebouncePeriod: newVal,
+		},
+		"change": {
+			oldDebouncePeriod: oldVal,
+			want:              true,
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			dpc := &digitalPinConfig{debouncePeriod: tc.oldDebouncePeriod}
+			// act
+			got := WithPinDebounce(newVal)(dpc)
+			// assert
+			gobottest.Assert(t, got, tc.want)
+			gobottest.Assert(t, dpc.debouncePeriod, newVal)
 		})
 	}
 }

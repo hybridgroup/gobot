@@ -1,6 +1,9 @@
 package gobot
 
-import "io"
+import (
+	"io"
+	"time"
+)
 
 // DigitalPinOptioner is the interface to provide the possibility to change pin behavior for the next usage
 type DigitalPinOptioner interface {
@@ -14,8 +17,10 @@ type DigitalPinOptioner interface {
 	SetActiveLow() (changed bool)
 	// SetBias initializes the pin with the given bias (applies on input and output).
 	SetBias(bias int) (changed bool)
-	// SetDrive initializes the pin with the given drive option (applies on output only).
+	// SetDrive initializes the output pin with the given drive option.
 	SetDrive(drive int) (changed bool)
+	// SetDebounce initializes the input pin with the given debounce period.
+	SetDebounce(period time.Duration) (changed bool)
 }
 
 // DigitalPinOptionApplier is the interface to apply options to change pin behavior immediately

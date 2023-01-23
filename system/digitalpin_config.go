@@ -1,6 +1,8 @@
 package system
 
 import (
+	"time"
+
 	"gobot.io/x/gobot"
 )
 
@@ -36,6 +38,7 @@ type digitalPinConfig struct {
 	activeLow       bool
 	bias            int
 	drive           int
+	debouncePeriod  time.Duration
 }
 
 func newDigitalPinConfig(label string, options ...func(gobot.DigitalPinOptioner) bool) *digitalPinConfig {
@@ -81,14 +84,19 @@ func WithPinPullUp() func(gobot.DigitalPinOptioner) bool {
 	return func(d gobot.DigitalPinOptioner) bool { return d.SetBias(digitalPinBiasPullUp) }
 }
 
-// WithPinOpenDrain initializes the pin to be driven with open drain/collector (applies on output only).
+// WithPinOpenDrain initializes the output pin to be driven with open drain/collector.
 func WithPinOpenDrain() func(gobot.DigitalPinOptioner) bool {
 	return func(d gobot.DigitalPinOptioner) bool { return d.SetDrive(digitalPinDriveOpenDrain) }
 }
 
-// WithPinOpenSource initializes the pin to be driven with open source/emitter (applies on output only).
+// WithPinOpenSource initializes the output pin to be driven with open source/emitter.
 func WithPinOpenSource() func(gobot.DigitalPinOptioner) bool {
 	return func(d gobot.DigitalPinOptioner) bool { return d.SetDrive(digitalPinDriveOpenSource) }
+}
+
+// WithPinDebounce initializes the input pin to be debounced.
+func WithPinDebounce(period time.Duration) func(gobot.DigitalPinOptioner) bool {
+	return func(d gobot.DigitalPinOptioner) bool { return d.SetDebounce(period) }
 }
 
 // SetLabel sets the label to use for next reconfigure. The function is intended to use by WithPinLabel().
@@ -149,5 +157,15 @@ func (d *digitalPinConfig) SetDrive(drive int) bool {
 		return false
 	}
 	d.drive = drive
+	return true
+}
+
+// SetDebounce sets the input pin with the given debounce period for next reconfigure. The function
+// is intended to use by WithPinDebounce().
+func (d *digitalPinConfig) SetDebounce(period time.Duration) bool {
+	if d.debouncePeriod == period {
+		return false
+	}
+	d.debouncePeriod = period
 	return true
 }

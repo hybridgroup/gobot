@@ -15,7 +15,7 @@ import (
 // GPIO Raspi: header pin 21 (GPIO9) is input, pin 24 (GPIO8) is normal output, pin 26 (GPIO7) is inverted output
 // Button: the input pin is wired with a button to GND, the internal pull up resistor is used
 // LED's: the output pins are wired to the cathode of a LED, the anode is wired with a resistor (70-130Ohm for 20mA) to VCC
-// Expected behavior: always one LED is on, the other in opposite state, on button press the state changes
+// Expected behavior: always one LED is on, the other in opposite state, if button is pressed for >2 seconds the state changes
 func main() {
 	const (
 		inPinNum          = "21"
@@ -24,7 +24,10 @@ func main() {
 	)
 	// note: WithGpiosOpenDrain() is optional, if using WithGpiosOpenSource() the LED's will not light up
 	board := raspi.NewAdaptor(adaptors.WithGpiosActiveLow(outPinInvertedNum),
-		adaptors.WithGpiosPullUp(inPinNum), adaptors.WithGpiosOpenDrain(outPinNum, outPinInvertedNum))
+		adaptors.WithGpiosOpenDrain(outPinNum, outPinInvertedNum),
+		adaptors.WithGpiosPullUp(inPinNum),
+		adaptors.WithGpioDebounce(inPinNum, 2*time.Second))
+
 	inPin := gpio.NewDirectPinDriver(board, inPinNum)
 	outPin := gpio.NewDirectPinDriver(board, outPinNum)
 	outPinInverted := gpio.NewDirectPinDriver(board, outPinInvertedNum)

@@ -182,6 +182,11 @@ func (d *digitalPinSysfs) reconfigure() error {
 		log.Printf("drive options (%d) are not supported by sysfs\n", d.drive)
 	}
 
+	// configure debounce (unsupported)
+	if d.debouncePeriod != 0 && systemSysfsDebug {
+		log.Printf("debounce period option (%d) is not supported by sysfs\n", d.debouncePeriod)
+	}
+
 	if err != nil {
 		d.Unexport()
 	}

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 	"testing"
+	"time"
 
 	"runtime"
 	"strconv"
@@ -221,6 +222,7 @@ func TestDigitalWrite(t *testing.T) {
 	// assert second write to same pin without error and just ignore unsupported options
 	WithGpiosPullDown("7")(a)
 	WithGpiosOpenSource("7")(a)
+	WithGpioDebounce("7", 2*time.Second)(a)
 	err = a.DigitalWrite("7", 1)
 	gobottest.Assert(t, err, nil)
 
