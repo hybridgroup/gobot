@@ -29,16 +29,30 @@ const (
 	digitalPinDrivePushPull   = 0 // the pin will be driven actively high and	low (default)
 	digitalPinDriveOpenDrain  = 1 // the pin will be driven active to low only
 	digitalPinDriveOpenSource = 2 // the pin will be driven active to high only
+
+	digitalPinEventNone          = 0 // no event will be triggered on any pin change (default)
+	digitalPinEventOnFallingEdge = 1 // an event will be triggered on changes from high to low state
+	digitalPinEventOnRisingEdge  = 2 // an event will be triggered on changes from low to high state
+	digitalPinEventOnBothEdges   = 3 // an event will be triggered on all changes
+)
+
+const (
+	// DigitalPinEventRisingEdge indicates an inactive to active event.
+	DigitalPinEventRisingEdge = "rising edge"
+	// DigitalPinEventFallingEdge indicates an active to inactive event.
+	DigitalPinEventFallingEdge = "falling edge"
 )
 
 type digitalPinConfig struct {
-	label           string
-	direction       string
-	outInitialState int
-	activeLow       bool
-	bias            int
-	drive           int
-	debouncePeriod  time.Duration
+	label            string
+	direction        string
+	outInitialState  int
+	activeLow        bool
+	bias             int
+	drive            int
+	debouncePeriod   time.Duration
+	edge             int
+	edgeEventHandler func(lineOffset int, timestamp time.Duration, detectedEdge string, seqno uint32, lseqno uint32)
 }
 
 func newDigitalPinConfig(label string, options ...func(gobot.DigitalPinOptioner) bool) *digitalPinConfig {
@@ -97,6 +111,30 @@ func WithPinOpenSource() func(gobot.DigitalPinOptioner) bool {
 // WithPinDebounce initializes the input pin to be debounced.
 func WithPinDebounce(period time.Duration) func(gobot.DigitalPinOptioner) bool {
 	return func(d gobot.DigitalPinOptioner) bool { return d.SetDebounce(period) }
+}
+
+// WithPinEventOnFallingEdge initializes the input pin for edge detection and call the event handler on falling edges.
+func WithPinEventOnFallingEdge(handler func(lineOffset int, timestamp time.Duration, detectedEdge string, seqno uint32,
+	lseqno uint32)) func(gobot.DigitalPinOptioner) bool {
+	return func(d gobot.DigitalPinOptioner) bool {
+		return d.SetEventHandlerForEdge(handler, digitalPinEventOnFallingEdge)
+	}
+}
+
+// WithPinEventOnRisingEdge initializes the input pin for edge detection and call the event handler on rising edges.
+func WithPinEventOnRisingEdge(handler func(lineOffset int, timestamp time.Duration, detectedEdge string, seqno uint32,
+	lseqno uint32)) func(gobot.DigitalPinOptioner) bool {
+	return func(d gobot.DigitalPinOptioner) bool {
+		return d.SetEventHandlerForEdge(handler, digitalPinEventOnRisingEdge)
+	}
+}
+
+// WithPinEventOnBothEdges initializes the input pin for edge detection and call the event handler on all edges.
+func WithPinEventOnBothEdges(handler func(lineOffset int, timestamp time.Duration, detectedEdge string, seqno uint32,
+	lseqno uint32)) func(gobot.DigitalPinOptioner) bool {
+	return func(d gobot.DigitalPinOptioner) bool {
+		return d.SetEventHandlerForEdge(handler, digitalPinEventOnBothEdges)
+	}
 }
 
 // SetLabel sets the label to use for next reconfigure. The function is intended to use by WithPinLabel().
@@ -167,5 +205,16 @@ func (d *digitalPinConfig) SetDebounce(period time.Duration) bool {
 		return false
 	}
 	d.debouncePeriod = period
+	return true
+}
+
+// SetEventHandlerForEdge sets the input pin to edge detection and to call the event handler on specified edge. The
+// function is intended to use by WithPinEventOnFallingEdge(), WithPinEventOnRisingEdge() and WithPinEventOnBothEdges().
+func (d *digitalPinConfig) SetEventHandlerForEdge(handler func(int, time.Duration, string, uint32, uint32), edge int) bool {
+	if d.edge == edge {
+		return false
+	}
+	d.edge = edge
+	d.edgeEventHandler = handler
 	return true
 }

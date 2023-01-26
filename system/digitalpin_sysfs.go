@@ -187,6 +187,11 @@ func (d *digitalPinSysfs) reconfigure() error {
 		log.Printf("debounce period option (%d) is not supported by sysfs\n", d.debouncePeriod)
 	}
 
+	// configure edge detection (not implemented)
+	if d.edge != 0 && systemSysfsDebug {
+		log.Printf("edge detect option (%d) is not implemented for sysfs\n", d.edge)
+	}
+
 	if err != nil {
 		d.Unexport()
 	}

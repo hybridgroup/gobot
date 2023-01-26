@@ -61,10 +61,10 @@ func TestDigitalPinsConnect(t *testing.T) {
 	gobottest.Assert(t, a.pins, (map[string]gobot.DigitalPinner)(nil))
 
 	_, err := a.DigitalRead("13")
-	gobottest.Assert(t, err.Error(), "not connected")
+	gobottest.Assert(t, err.Error(), "not connected for pin 13")
 
 	err = a.DigitalWrite("7", 1)
-	gobottest.Assert(t, err.Error(), "not connected")
+	gobottest.Assert(t, err.Error(), "not connected for pin 7")
 
 	err = a.Connect()
 	gobottest.Assert(t, err, nil)
@@ -215,6 +215,7 @@ func TestDigitalWrite(t *testing.T) {
 	// assert write correct value without error and just ignore unsupported options
 	WithGpiosPullUp("7")(a)
 	WithGpiosOpenDrain("7")(a)
+	WithGpioEventOnFallingEdge("7", gpioEventHandler)(a)
 	err := a.DigitalWrite("7", 1)
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio18/value"].Contents, "1")
@@ -223,6 +224,7 @@ func TestDigitalWrite(t *testing.T) {
 	WithGpiosPullDown("7")(a)
 	WithGpiosOpenSource("7")(a)
 	WithGpioDebounce("7", 2*time.Second)(a)
+	WithGpioEventOnRisingEdge("7", gpioEventHandler)(a)
 	err = a.DigitalWrite("7", 1)
 	gobottest.Assert(t, err, nil)
 
@@ -280,4 +282,9 @@ func TestDigitalPinConcurrency(t *testing.T) {
 
 		wg.Wait()
 	}
+}
+
+func gpioEventHandler(o int, t time.Duration, et string, sn uint32, lsn uint32) {
+	// the handler should never execute, because used in outputs and not supported by sysfs
+	panic(fmt.Sprintf("event handler was called (%d, %d) unexpected for line %d with '%s' at %s!", sn, lsn, o, t, et))
 }

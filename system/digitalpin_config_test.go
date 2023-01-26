@@ -299,3 +299,102 @@ func TestWithPinDebounce(t *testing.T) {
 		})
 	}
 }
+
+func TestWithPinEventOnFallingEdge(t *testing.T) {
+	const (
+		oldVal = digitalPinEventNone
+		newVal = digitalPinEventOnFallingEdge
+	)
+	var tests = map[string]struct {
+		oldEdge int
+		want    bool
+		wantVal int
+	}{
+		"no_change": {
+			oldEdge: newVal,
+		},
+		"change": {
+			oldEdge: oldVal,
+			want:    true,
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			dpc := &digitalPinConfig{edge: tc.oldEdge}
+			handler := func(lineOffset int, timestamp time.Duration, detectedEdge string, seqno uint32, lseqno uint32) {}
+			// act
+			got := WithPinEventOnFallingEdge(handler)(dpc)
+			// assert
+			gobottest.Assert(t, got, tc.want)
+			gobottest.Assert(t, dpc.edge, newVal)
+			gobottest.Refute(t, dpc.edgeEventHandler, nil)
+		})
+	}
+}
+
+func TestWithPinEventOnRisingEdge(t *testing.T) {
+	const (
+		oldVal = digitalPinEventNone
+		newVal = digitalPinEventOnRisingEdge
+	)
+	var tests = map[string]struct {
+		oldEdge int
+		want    bool
+		wantVal int
+	}{
+		"no_change": {
+			oldEdge: newVal,
+		},
+		"change": {
+			oldEdge: oldVal,
+			want:    true,
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			dpc := &digitalPinConfig{edge: tc.oldEdge}
+			handler := func(lineOffset int, timestamp time.Duration, detectedEdge string, seqno uint32, lseqno uint32) {}
+			// act
+			got := WithPinEventOnRisingEdge(handler)(dpc)
+			// assert
+			gobottest.Assert(t, got, tc.want)
+			gobottest.Assert(t, dpc.edge, newVal)
+			gobottest.Refute(t, dpc.edgeEventHandler, nil)
+		})
+	}
+}
+
+func TestWithPinEventOnBothEdges(t *testing.T) {
+	const (
+		oldVal = digitalPinEventNone
+		newVal = digitalPinEventOnBothEdges
+	)
+	var tests = map[string]struct {
+		oldEdge int
+		want    bool
+		wantVal int
+	}{
+		"no_change": {
+			oldEdge: newVal,
+		},
+		"change": {
+			oldEdge: oldVal,
+			want:    true,
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			dpc := &digitalPinConfig{edge: tc.oldEdge}
+			handler := func(lineOffset int, timestamp time.Duration, detectedEdge string, seqno uint32, lseqno uint32) {}
+			// act
+			got := WithPinEventOnBothEdges(handler)(dpc)
+			// assert
+			gobottest.Assert(t, got, tc.want)
+			gobottest.Assert(t, dpc.edge, newVal)
+			gobottest.Refute(t, dpc.edgeEventHandler, nil)
+		})
+	}
+}

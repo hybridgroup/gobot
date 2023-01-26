@@ -23,6 +23,12 @@ type digitalPinsOptioner interface {
 	prepareDigitalPinsOpenDrain(pin string, otherPins ...string)
 	prepareDigitalPinsOpenSource(pin string, otherPins ...string)
 	prepareDigitalPinDebounce(pin string, period time.Duration)
+	prepareDigitalPinEventOnFallingEdge(pin string, handler func(lineOffset int, timestamp time.Duration,
+		detectedEdge string, seqno uint32, lseqno uint32))
+	prepareDigitalPinEventOnRisingEdge(pin string, handler func(lineOffset int, timestamp time.Duration,
+		detectedEdge string, seqno uint32, lseqno uint32))
+	prepareDigitalPinEventOnBothEdges(pin string, handler func(lineOffset int, timestamp time.Duration,
+		detectedEdge string, seqno uint32, lseqno uint32))
 }
 
 // DigitalPinsAdaptor is a adaptor for digital pins, normally used for composition in platforms.
@@ -145,6 +151,42 @@ func WithGpioDebounce(pin string, period time.Duration) func(Optioner) {
 		a, ok := o.(digitalPinsOptioner)
 		if ok {
 			a.prepareDigitalPinDebounce(pin, period)
+		}
+	}
+}
+
+// WithGpioEventOnFallingEdge prepares the given input pin to be generate an event on falling edge.
+// This is working for inputs since Kernel 5.10, but will be ignored for outputs or with sysfs ABI.
+func WithGpioEventOnFallingEdge(pin string, handler func(lineOffset int, timestamp time.Duration, detectedEdge string,
+	seqno uint32, lseqno uint32)) func(Optioner) {
+	return func(o Optioner) {
+		a, ok := o.(digitalPinsOptioner)
+		if ok {
+			a.prepareDigitalPinEventOnFallingEdge(pin, handler)
+		}
+	}
+}
+
+// WithGpioEventOnRisingEdge prepares the given input pin to be generate an event on rising edge.
+// This is working for inputs since Kernel 5.10, but will be ignored for outputs or with sysfs ABI.
+func WithGpioEventOnRisingEdge(pin string, handler func(lineOffset int, timestamp time.Duration, detectedEdge string,
+	seqno uint32, lseqno uint32)) func(Optioner) {
+	return func(o Optioner) {
+		a, ok := o.(digitalPinsOptioner)
+		if ok {
+			a.prepareDigitalPinEventOnRisingEdge(pin, handler)
+		}
+	}
+}
+
+// WithGpioEventOnBothEdges prepares the given input pin to be generate an event on rising and falling edges.
+// This is working for inputs since Kernel 5.10, but will be ignored for outputs or with sysfs ABI.
+func WithGpioEventOnBothEdges(pin string, handler func(lineOffset int, timestamp time.Duration, detectedEdge string,
+	seqno uint32, lseqno uint32)) func(Optioner) {
+	return func(o Optioner) {
+		a, ok := o.(digitalPinsOptioner)
+		if ok {
+			a.prepareDigitalPinEventOnBothEdges(pin, handler)
 		}
 	}
 }
@@ -293,9 +335,36 @@ func (a *DigitalPinsAdaptor) prepareDigitalPinDebounce(id string, period time.Du
 	a.pinOptions[id] = append(a.pinOptions[id], system.WithPinDebounce(period))
 }
 
+func (a *DigitalPinsAdaptor) prepareDigitalPinEventOnFallingEdge(id string, handler func(int, time.Duration, string,
+	uint32, uint32)) {
+	if a.pinOptions == nil {
+		a.pinOptions = make(map[string][]func(gobot.DigitalPinOptioner) bool)
+	}
+
+	a.pinOptions[id] = append(a.pinOptions[id], system.WithPinEventOnFallingEdge(handler))
+}
+
+func (a *DigitalPinsAdaptor) prepareDigitalPinEventOnRisingEdge(id string, handler func(int, time.Duration, string,
+	uint32, uint32)) {
+	if a.pinOptions == nil {
+		a.pinOptions = make(map[string][]func(gobot.DigitalPinOptioner) bool)
+	}
+
+	a.pinOptions[id] = append(a.pinOptions[id], system.WithPinEventOnRisingEdge(handler))
+}
+
+func (a *DigitalPinsAdaptor) prepareDigitalPinEventOnBothEdges(id string, handler func(int, time.Duration, string,
+	uint32, uint32)) {
+	if a.pinOptions == nil {
+		a.pinOptions = make(map[string][]func(gobot.DigitalPinOptioner) bool)
+	}
+
+	a.pinOptions[id] = append(a.pinOptions[id], system.WithPinEventOnBothEdges(handler))
+}
+
 func (a *DigitalPinsAdaptor) digitalPin(id string, opts ...func(gobot.DigitalPinOptioner) bool) (gobot.DigitalPinner, error) {
 	if a.pins == nil {
-		return nil, fmt.Errorf("not connected")
+		return nil, fmt.Errorf("not connected for pin %s", id)
 	}
 
 	o := append(a.pinOptions[id], opts...)

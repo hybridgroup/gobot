@@ -1,3 +1,7 @@
+// +build example
+//
+// Do not build by default.
+
 package main
 
 import (
@@ -61,7 +65,6 @@ func main() {
 			} else {
 				level = 1
 			}
-
 		})
 	}
 
