@@ -1,6 +1,9 @@
 package gobot
 
-import "io"
+import (
+	"io"
+	"time"
+)
 
 // DigitalPinOptioner is the interface to provide the possibility to change pin behavior for the next usage
 type DigitalPinOptioner interface {
@@ -10,6 +13,20 @@ type DigitalPinOptioner interface {
 	SetDirectionOutput(initialState int) (changed bool)
 	// SetDirectionInput sets the pins direction to input
 	SetDirectionInput() (changed bool)
+	// SetActiveLow initializes the pin with inverse reaction (applies on input and output).
+	SetActiveLow() (changed bool)
+	// SetBias initializes the pin with the given bias (applies on input and output).
+	SetBias(bias int) (changed bool)
+	// SetDrive initializes the output pin with the given drive option.
+	SetDrive(drive int) (changed bool)
+	// SetDebounce initializes the input pin with the given debounce period.
+	SetDebounce(period time.Duration) (changed bool)
+	// SetEventHandlerForEdge initializes the input pin for edge detection and to call the event handler on specified edge.
+	// lineOffset is within the GPIO chip (needs to transformed to the pin id), timestamp is the detection time,
+	// detectedEdge contains the direction of the pin changes, seqno is the sequence number for this event in the sequence
+	// of events for all the lines in this line request, lseqno is the same but for this line
+	SetEventHandlerForEdge(handler func(lineOffset int, timestamp time.Duration, detectedEdge string, seqno uint32,
+		lseqno uint32), edge int) (changed bool)
 }
 
 // DigitalPinOptionApplier is the interface to apply options to change pin behavior immediately

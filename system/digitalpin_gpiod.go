@@ -2,14 +2,16 @@ package system
 
 import (
 	"fmt"
+	"log"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/warthog618/gpiod"
 	"gobot.io/x/gobot"
 )
 
-const systemGpiodDebug = true
+const systemGpiodDebug = false
 
 type cdevLine interface {
 	SetValue(value int) error
@@ -24,23 +26,25 @@ type digitalPinGpiod struct {
 	line cdevLine
 }
 
-var used = map[bool]string{true: "used", false: "unused"}
-var activeLow = map[bool]string{true: "low", false: "high"}
-var debounced = map[bool]string{true: "debounced", false: "not debounced"}
+var digitalPinGpiodReconfigure = digitalPinGpiodReconfigureLine // to allow unit testing
 
-var direction = map[gpiod.LineDirection]string{gpiod.LineDirectionUnknown: "unknown direction",
+var digitalPinGpiodUsed = map[bool]string{true: "used", false: "unused"}
+var digitalPinGpiodActiveLow = map[bool]string{true: "low", false: "high"}
+var digitalPinGpiodDebounced = map[bool]string{true: "debounced", false: "not debounced"}
+
+var digitalPinGpiodDirection = map[gpiod.LineDirection]string{gpiod.LineDirectionUnknown: "unknown direction",
 	gpiod.LineDirectionInput: "input", gpiod.LineDirectionOutput: "output"}
 
-var drive = map[gpiod.LineDrive]string{gpiod.LineDrivePushPull: "push-pull", gpiod.LineDriveOpenDrain: "open-drain",
+var digitalPinGpiodDrive = map[gpiod.LineDrive]string{gpiod.LineDrivePushPull: "push-pull", gpiod.LineDriveOpenDrain: "open-drain",
 	gpiod.LineDriveOpenSource: "open-source"}
 
-var bias = map[gpiod.LineBias]string{gpiod.LineBiasUnknown: "unknown", gpiod.LineBiasDisabled: "disabled",
+var digitalPinGpiodBias = map[gpiod.LineBias]string{gpiod.LineBiasUnknown: "unknown", gpiod.LineBiasDisabled: "disabled",
 	gpiod.LineBiasPullUp: "pull-up", gpiod.LineBiasPullDown: "pull-down"}
 
-var edgeDetect = map[gpiod.LineEdge]string{gpiod.LineEdgeNone: "no", gpiod.LineEdgeRising: "rising",
+var digitalPinGpiodEdgeDetect = map[gpiod.LineEdge]string{gpiod.LineEdgeNone: "no", gpiod.LineEdgeRising: "rising",
 	gpiod.LineEdgeFalling: "falling", gpiod.LineEdgeBoth: "both"}
 
-var eventClock = map[gpiod.LineEventClock]string{gpiod.LineEventClockMonotonic: "monotonic",
+var digitalPinGpiodEventClock = map[gpiod.LineEventClock]string{gpiod.LineEventClockMonotonic: "monotonic",
 	gpiod.LineEventClockRealtime: "realtime"}
 
 // newDigitalPinGpiod returns a digital pin given the pin number, with the label "gobotio" followed by the pin number.
@@ -62,10 +66,10 @@ func newDigitalPinGpiod(chipName string, pin int, options ...func(gobot.DigitalP
 func (d *digitalPinGpiod) ApplyOptions(options ...func(gobot.DigitalPinOptioner) bool) error {
 	anyChange := false
 	for _, option := range options {
-		anyChange = anyChange || option(d)
+		anyChange = option(d) || anyChange
 	}
 	if anyChange {
-		return d.reconfigure(false)
+		return digitalPinGpiodReconfigure(d, false)
 	}
 	return nil
 }
@@ -78,7 +82,7 @@ func (d *digitalPinGpiod) DirectionBehavior() string {
 
 // Export sets the pin as used by this driver. Implements the interface gobot.DigitalPinner.
 func (d *digitalPinGpiod) Export() error {
-	err := d.reconfigure(false)
+	err := digitalPinGpiodReconfigure(d, false)
 	if err != nil {
 		return fmt.Errorf("gpiod.Export(): %v", err)
 	}
@@ -89,7 +93,7 @@ func (d *digitalPinGpiod) Export() error {
 func (d *digitalPinGpiod) Unexport() error {
 	var errs []string
 	if d.line != nil {
-		if err := d.reconfigure(true); err != nil {
+		if err := digitalPinGpiodReconfigure(d, true); err != nil {
 			errs = append(errs, err.Error())
 		}
 		if err := d.line.Close(); err != nil {
@@ -139,7 +143,7 @@ func (d *digitalPinGpiod) ListLines() error {
 		if err != nil {
 			return err
 		}
-		fmt.Println(fmtLine(li))
+		fmt.Println(digitalPinGpiodFmtLine(li))
 	}
 
 	return nil
@@ -161,12 +165,12 @@ func (d *digitalPinGpiod) List() error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(fmtLine(li))
+	fmt.Println(digitalPinGpiodFmtLine(li))
 
 	return nil
 }
 
-func (d *digitalPinGpiod) reconfigure(forceInput bool) error {
+func digitalPinGpiodReconfigureLine(d *digitalPinGpiod, forceInput bool) error {
 	// cleanup old line
 	if d.line != nil {
 		d.line.Close()
@@ -182,43 +186,113 @@ func (d *digitalPinGpiod) reconfigure(forceInput bool) error {
 	}
 	defer gpiodChip.Close()
 
-	// acquire line
-	gpiodLine, err := gpiodChip.RequestLine(d.pin)
+	// collect line configuration options
+	var opts []gpiod.LineReqOption
+
+	// configure direction, debounce period (inputs only), edge detection (inputs only) and drive (outputs only)
+	if d.direction == IN || forceInput {
+		if systemGpiodDebug {
+			log.Printf("input (%s): debounce %s, edge %d, handler %t, inverse %t, bias %d",
+				id, d.debouncePeriod, d.edge, d.edgeEventHandler != nil, d.activeLow == true, d.bias)
+		}
+		opts = append(opts, gpiod.AsInput)
+		if !forceInput && d.drive != digitalPinDrivePushPull && systemGpiodDebug {
+			log.Printf("\n++ drive option (%d) is dropped for input++\n", d.drive)
+		}
+		if d.debouncePeriod != 0 {
+			opts = append(opts, gpiod.WithDebounce(d.debouncePeriod))
+		}
+		// edge detection
+		if d.edgeEventHandler != nil {
+			wrappedHandler := digitalPinGpiodGetWrappedEventHandler(d.edgeEventHandler)
+			switch d.edge {
+			case digitalPinEventOnFallingEdge:
+				opts = append(opts, gpiod.WithEventHandler(wrappedHandler), gpiod.WithFallingEdge)
+			case digitalPinEventOnRisingEdge:
+				opts = append(opts, gpiod.WithEventHandler(wrappedHandler), gpiod.WithRisingEdge)
+			case digitalPinEventOnBothEdges:
+				opts = append(opts, gpiod.WithEventHandler(wrappedHandler), gpiod.WithBothEdges)
+			default:
+				opts = append(opts, gpiod.WithoutEdges)
+			}
+		}
+	} else {
+		if systemGpiodDebug {
+			log.Printf("ouput (%s): ini-state %d, drive %d, inverse %t, bias %d",
+				id, d.outInitialState, d.drive, d.activeLow == true, d.bias)
+		}
+		opts = append(opts, gpiod.AsOutput(d.outInitialState))
+		switch d.drive {
+		case digitalPinDriveOpenDrain:
+			opts = append(opts, gpiod.AsOpenDrain)
+		case digitalPinDriveOpenSource:
+			opts = append(opts, gpiod.AsOpenSource)
+		default:
+			opts = append(opts, gpiod.AsPushPull)
+		}
+		if d.debouncePeriod != 0 && systemGpiodDebug {
+			log.Printf("\n++debounce option (%d) is dropped for output++\n", d.drive)
+		}
+		if d.edgeEventHandler != nil || d.edge != digitalPinEventNone && systemGpiodDebug {
+			log.Printf("\n++edge detection is dropped for output++\n")
+		}
+	}
+
+	// configure inverse logic (inputs and outputs)
+	if d.activeLow {
+		opts = append(opts, gpiod.AsActiveLow)
+	}
+
+	// configure bias (inputs and outputs)
+	switch d.bias {
+	case digitalPinBiasPullDown:
+		opts = append(opts, gpiod.WithPullDown)
+	case digitalPinBiasPullUp:
+		opts = append(opts, gpiod.WithPullUp)
+	default:
+		opts = append(opts, gpiod.WithBiasAsIs)
+	}
+
+	// acquire line with collected options
+	gpiodLine, err := gpiodChip.RequestLine(d.pin, opts...)
 	if err != nil {
 		if gpiodLine != nil {
 			gpiodLine.Close()
 		}
 		d.line = nil
 
-		return fmt.Errorf("gpiod.reconfigure(%s)-c.RequestLine(%d): %v", id, d.pin, err)
+		return fmt.Errorf("gpiod.reconfigure(%s)-c.RequestLine(%d, %v): %v", id, d.pin, opts, err)
 	}
 	d.line = gpiodLine
 
-	// configure line
-	if d.direction == IN || forceInput {
-		if err := gpiodLine.Reconfigure(gpiod.AsInput); err != nil {
-			return fmt.Errorf("gpiod.reconfigure(%s)-l.Reconfigure(gpiod.AsInput): %v", id, err)
-		}
-		return nil
-	}
-
-	if err := gpiodLine.Reconfigure(gpiod.AsOutput(d.outInitialState)); err != nil {
-		return fmt.Errorf("gpiod.reconfigure(%s)-l.Reconfigure(gpiod.AsOutput(%d)): %v", id, d.outInitialState, err)
-	}
 	return nil
 }
 
-func fmtLine(li gpiod.LineInfo) string {
+func digitalPinGpiodGetWrappedEventHandler(handler func(int, time.Duration, string, uint32, uint32)) func(gpiod.LineEvent) {
+	return func(evt gpiod.LineEvent) {
+		detectedEdge := "none"
+		switch evt.Type {
+		case gpiod.LineEventRisingEdge:
+			detectedEdge = DigitalPinEventRisingEdge
+		case gpiod.LineEventFallingEdge:
+			detectedEdge = DigitalPinEventFallingEdge
+		}
+		handler(evt.Offset, evt.Timestamp, detectedEdge, evt.Seqno, evt.LineSeqno)
+	}
+}
+
+func digitalPinGpiodFmtLine(li gpiod.LineInfo) string {
 	var consumer string
 	if li.Consumer != "" {
 		consumer = fmt.Sprintf(" by '%s'", li.Consumer)
 	}
 	return fmt.Sprintf("++ Info line %d '%s', %s%s ++\n Config: %s\n",
-		li.Offset, li.Name, used[li.Used], consumer, fmtLineConfig(li.Config))
+		li.Offset, li.Name, digitalPinGpiodUsed[li.Used], consumer, digitalPinGpiodFmtLineConfig(li.Config))
 }
 
-func fmtLineConfig(cfg gpiod.LineConfig) string {
+func digitalPinGpiodFmtLineConfig(cfg gpiod.LineConfig) string {
 	t := "active-%s, %s, %s, %s bias, %s edge detect, %s, debounce-period: %v, %s event clock"
-	return fmt.Sprintf(t, activeLow[cfg.ActiveLow], direction[cfg.Direction], drive[cfg.Drive], bias[cfg.Bias],
-		edgeDetect[cfg.EdgeDetection], debounced[cfg.Debounced], cfg.DebouncePeriod, eventClock[cfg.EventClock])
+	return fmt.Sprintf(t, digitalPinGpiodActiveLow[cfg.ActiveLow], digitalPinGpiodDirection[cfg.Direction],
+		digitalPinGpiodDrive[cfg.Drive], digitalPinGpiodBias[cfg.Bias], digitalPinGpiodEdgeDetect[cfg.EdgeDetection],
+		digitalPinGpiodDebounced[cfg.Debounced], cfg.DebouncePeriod, digitalPinGpiodEventClock[cfg.EventClock])
 }

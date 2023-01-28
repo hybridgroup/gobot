@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 	"testing"
+	"time"
 
 	"runtime"
 	"strconv"
@@ -40,6 +41,18 @@ func testDigitalPinTranslator(pin string) (string, int, error) {
 	return "", line, err
 }
 
+func TestDigitalPinsWithGpiosActiveLow(t *testing.T) {
+	// This is a general test, that options are applied in constructor. Further tests for options
+	// can also be done by call of "WithOption(val)(d)".
+	// arrange
+	translate := func(pin string) (chip string, line int, err error) { return }
+	sys := system.NewAccesser()
+	// act
+	a := NewDigitalPinsAdaptor(sys, translate, WithGpiosActiveLow("1", "12", "33"))
+	// assert
+	gobottest.Assert(t, len(a.pinOptions), 3)
+}
+
 func TestDigitalPinsConnect(t *testing.T) {
 	translate := func(pin string) (chip string, line int, err error) { return }
 	sys := system.NewAccesser()
@@ -48,10 +61,10 @@ func TestDigitalPinsConnect(t *testing.T) {
 	gobottest.Assert(t, a.pins, (map[string]gobot.DigitalPinner)(nil))
 
 	_, err := a.DigitalRead("13")
-	gobottest.Assert(t, err.Error(), "not connected")
+	gobottest.Assert(t, err.Error(), "not connected for pin 13")
 
 	err = a.DigitalWrite("7", 1)
-	gobottest.Assert(t, err.Error(), "not connected")
+	gobottest.Assert(t, err.Error(), "not connected for pin 7")
 
 	err = a.Connect()
 	gobottest.Assert(t, err, nil)
@@ -129,6 +142,7 @@ func TestDigitalIO(t *testing.T) {
 }
 
 func TestDigitalRead(t *testing.T) {
+	// arrange
 	mockedPaths := []string{
 		"/sys/class/gpio/export",
 		"/sys/class/gpio/unexport",
@@ -138,20 +152,58 @@ func TestDigitalRead(t *testing.T) {
 	a, fs := initTestDigitalPinsAdaptorWithMockedFilesystem(mockedPaths)
 	fs.Files["/sys/class/gpio/gpio24/value"].Contents = "1"
 
+	// assert read correct value without error
 	i, err := a.DigitalRead("13")
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, i, 1)
 
+	// assert error bubbling for read errors
 	fs.WithReadError = true
 	_, err = a.DigitalRead("13")
 	gobottest.Assert(t, err, errors.New("read error"))
 
+	// assert error bubbling for write errors
 	fs.WithWriteError = true
 	_, err = a.DigitalRead("7")
 	gobottest.Assert(t, err, errors.New("write error"))
 }
 
+func TestDigitalReadWithGpiosActiveLow(t *testing.T) {
+	mockedPaths := []string{
+		"/sys/class/gpio/export",
+		"/sys/class/gpio/unexport",
+		"/sys/class/gpio/gpio25/value",
+		"/sys/class/gpio/gpio25/direction",
+		"/sys/class/gpio/gpio25/active_low",
+		"/sys/class/gpio/gpio26/value",
+		"/sys/class/gpio/gpio26/direction",
+	}
+	a, fs := initTestDigitalPinsAdaptorWithMockedFilesystem(mockedPaths)
+	fs.Files["/sys/class/gpio/gpio25/value"].Contents = "1"
+	fs.Files["/sys/class/gpio/gpio25/active_low"].Contents = "5"
+	fs.Files["/sys/class/gpio/gpio26/value"].Contents = "0"
+	WithGpiosActiveLow("14")(a)
+	// creates a new pin without inverted logic
+	if _, err := a.DigitalRead("15"); err != nil {
+		panic(err)
+	}
+	fs.Add("/sys/class/gpio/gpio26/active_low")
+	fs.Files["/sys/class/gpio/gpio26/active_low"].Contents = "6"
+	WithGpiosActiveLow("15")(a)
+	// act
+	got1, err1 := a.DigitalRead("14") // for a new pin
+	got2, err2 := a.DigitalRead("15") // for an existing pin (calls ApplyOptions())
+	// assert
+	gobottest.Assert(t, err1, nil)
+	gobottest.Assert(t, err2, nil)
+	gobottest.Assert(t, got1, 1) // there is no mechanism to negate mocked values
+	gobottest.Assert(t, got2, 0)
+	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio25/active_low"].Contents, "1")
+	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio26/active_low"].Contents, "1")
+}
+
 func TestDigitalWrite(t *testing.T) {
+	// arrange
 	mockedPaths := []string{
 		"/sys/class/gpio/export",
 		"/sys/class/gpio/unexport",
@@ -160,18 +212,49 @@ func TestDigitalWrite(t *testing.T) {
 	}
 	a, fs := initTestDigitalPinsAdaptorWithMockedFilesystem(mockedPaths)
 
+	// assert write correct value without error and just ignore unsupported options
+	WithGpiosPullUp("7")(a)
+	WithGpiosOpenDrain("7")(a)
+	WithGpioEventOnFallingEdge("7", gpioEventHandler)(a)
 	err := a.DigitalWrite("7", 1)
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio18/value"].Contents, "1")
 
+	// assert second write to same pin without error and just ignore unsupported options
+	WithGpiosPullDown("7")(a)
+	WithGpiosOpenSource("7")(a)
+	WithGpioDebounce("7", 2*time.Second)(a)
+	WithGpioEventOnRisingEdge("7", gpioEventHandler)(a)
 	err = a.DigitalWrite("7", 1)
 	gobottest.Assert(t, err, nil)
 
+	// assert error on bad id
 	gobottest.Assert(t, a.DigitalWrite("notexist", 1), errors.New("not a valid pin"))
 
+	// assert error bubbling
 	fs.WithWriteError = true
 	err = a.DigitalWrite("7", 0)
 	gobottest.Assert(t, err, errors.New("write error"))
+}
+
+func TestDigitalWriteWithGpiosActiveLow(t *testing.T) {
+	// arrange
+	mockedPaths := []string{
+		"/sys/class/gpio/export",
+		"/sys/class/gpio/unexport",
+		"/sys/class/gpio/gpio19/value",
+		"/sys/class/gpio/gpio19/direction",
+		"/sys/class/gpio/gpio19/active_low",
+	}
+	a, fs := initTestDigitalPinsAdaptorWithMockedFilesystem(mockedPaths)
+	fs.Files["/sys/class/gpio/gpio19/active_low"].Contents = "5"
+	WithGpiosActiveLow("8")(a)
+	// act
+	err := a.DigitalWrite("8", 2)
+	// assert
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio19/value"].Contents, "2")
+	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio19/active_low"].Contents, "1")
 }
 
 func TestDigitalPinConcurrency(t *testing.T) {
@@ -199,4 +282,9 @@ func TestDigitalPinConcurrency(t *testing.T) {
 
 		wg.Wait()
 	}
+}
+
+func gpioEventHandler(o int, t time.Duration, et string, sn uint32, lsn uint32) {
+	// the handler should never execute, because used in outputs and not supported by sysfs
+	panic(fmt.Sprintf("event handler was called (%d, %d) unexpected for line %d with '%s' at %s!", sn, lsn, o, t, et))
 }

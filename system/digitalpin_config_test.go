@@ -2,6 +2,7 @@ package system
 
 import (
 	"testing"
+	"time"
 
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/gobottest"
@@ -23,7 +24,17 @@ func Test_newDigitalPinConfig(t *testing.T) {
 	gobottest.Assert(t, d.outInitialState, 0)
 }
 
-func TestWithLabel(t *testing.T) {
+func Test_newDigitalPinConfigWithOption(t *testing.T) {
+	// arrange
+	const label = "gobotio18"
+	// act
+	d := newDigitalPinConfig("not used", WithPinLabel(label))
+	// assert
+	gobottest.Refute(t, d, nil)
+	gobottest.Assert(t, d.label, label)
+}
+
+func TestWithPinLabel(t *testing.T) {
 	const (
 		oldLabel = "old label"
 		newLabel = "my optional label"
@@ -45,7 +56,7 @@ func TestWithLabel(t *testing.T) {
 			// arrange
 			dpc := &digitalPinConfig{label: oldLabel}
 			// act
-			got := WithLabel(tc.setLabel)(dpc)
+			got := WithPinLabel(tc.setLabel)(dpc)
 			// assert
 			gobottest.Assert(t, got, tc.want)
 			gobottest.Assert(t, dpc.label, tc.setLabel)
@@ -53,7 +64,7 @@ func TestWithLabel(t *testing.T) {
 	}
 }
 
-func TestWithDirectionOutput(t *testing.T) {
+func TestWithPinDirectionOutput(t *testing.T) {
 	const (
 		// values other than 0, 1 are normally not useful, just to test
 		oldVal = 3
@@ -79,7 +90,7 @@ func TestWithDirectionOutput(t *testing.T) {
 			// arrange
 			dpc := &digitalPinConfig{direction: tc.oldDir, outInitialState: oldVal}
 			// act
-			got := WithDirectionOutput(newVal)(dpc)
+			got := WithPinDirectionOutput(newVal)(dpc)
 			// assert
 			gobottest.Assert(t, got, tc.want)
 			gobottest.Assert(t, dpc.direction, "out")
@@ -88,7 +99,7 @@ func TestWithDirectionOutput(t *testing.T) {
 	}
 }
 
-func TestWithDirectionInput(t *testing.T) {
+func TestWithPinDirectionInput(t *testing.T) {
 	var tests = map[string]struct {
 		oldDir string
 		want   bool
@@ -107,11 +118,283 @@ func TestWithDirectionInput(t *testing.T) {
 			const initValOut = 2 // 2 is normally not useful, just to test that is not touched
 			dpc := &digitalPinConfig{direction: tc.oldDir, outInitialState: initValOut}
 			// act
-			got := WithDirectionInput()(dpc)
+			got := WithPinDirectionInput()(dpc)
 			// assert
 			gobottest.Assert(t, got, tc.want)
 			gobottest.Assert(t, dpc.direction, "in")
 			gobottest.Assert(t, dpc.outInitialState, initValOut)
+		})
+	}
+}
+
+func TestWithPinActiveLow(t *testing.T) {
+	var tests = map[string]struct {
+		oldActiveLow bool
+		want         bool
+	}{
+		"no_change": {
+			oldActiveLow: true,
+		},
+		"change": {
+			oldActiveLow: false,
+			want:         true,
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			dpc := &digitalPinConfig{activeLow: tc.oldActiveLow}
+			// act
+			got := WithPinActiveLow()(dpc)
+			// assert
+			gobottest.Assert(t, got, tc.want)
+			gobottest.Assert(t, dpc.activeLow, true)
+		})
+	}
+}
+
+func TestWithPinPullDown(t *testing.T) {
+	var tests = map[string]struct {
+		oldBias int
+		want    bool
+		wantVal int
+	}{
+		"no_change": {
+			oldBias: digitalPinBiasPullDown,
+		},
+		"change": {
+			oldBias: digitalPinBiasPullUp,
+			want:    true,
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			dpc := &digitalPinConfig{bias: tc.oldBias}
+			// act
+			got := WithPinPullDown()(dpc)
+			// assert
+			gobottest.Assert(t, got, tc.want)
+			gobottest.Assert(t, dpc.bias, digitalPinBiasPullDown)
+		})
+	}
+}
+
+func TestWithPinPullUp(t *testing.T) {
+	var tests = map[string]struct {
+		oldBias int
+		want    bool
+		wantVal int
+	}{
+		"no_change": {
+			oldBias: digitalPinBiasPullUp,
+		},
+		"change": {
+			oldBias: digitalPinBiasPullDown,
+			want:    true,
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			dpc := &digitalPinConfig{bias: tc.oldBias}
+			// act
+			got := WithPinPullUp()(dpc)
+			// assert
+			gobottest.Assert(t, got, tc.want)
+			gobottest.Assert(t, dpc.bias, digitalPinBiasPullUp)
+		})
+	}
+}
+
+func TestWithPinOpenDrain(t *testing.T) {
+	var tests = map[string]struct {
+		oldDrive int
+		want     bool
+		wantVal  int
+	}{
+		"no_change": {
+			oldDrive: digitalPinDriveOpenDrain,
+		},
+		"change_from_pushpull": {
+			oldDrive: digitalPinDrivePushPull,
+			want:     true,
+		},
+		"change_from_opensource": {
+			oldDrive: digitalPinDriveOpenSource,
+			want:     true,
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			dpc := &digitalPinConfig{drive: tc.oldDrive}
+			// act
+			got := WithPinOpenDrain()(dpc)
+			// assert
+			gobottest.Assert(t, got, tc.want)
+			gobottest.Assert(t, dpc.drive, digitalPinDriveOpenDrain)
+		})
+	}
+}
+
+func TestWithPinOpenSource(t *testing.T) {
+	var tests = map[string]struct {
+		oldDrive int
+		want     bool
+		wantVal  int
+	}{
+		"no_change": {
+			oldDrive: digitalPinDriveOpenSource,
+		},
+		"change_from_pushpull": {
+			oldDrive: digitalPinDrivePushPull,
+			want:     true,
+		},
+		"change_from_opendrain": {
+			oldDrive: digitalPinDriveOpenDrain,
+			want:     true,
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			dpc := &digitalPinConfig{drive: tc.oldDrive}
+			// act
+			got := WithPinOpenSource()(dpc)
+			// assert
+			gobottest.Assert(t, got, tc.want)
+			gobottest.Assert(t, dpc.drive, digitalPinDriveOpenSource)
+		})
+	}
+}
+
+func TestWithPinDebounce(t *testing.T) {
+	const (
+		oldVal = time.Duration(10)
+		newVal = time.Duration(14)
+	)
+	var tests = map[string]struct {
+		oldDebouncePeriod time.Duration
+		want              bool
+		wantVal           time.Duration
+	}{
+		"no_change": {
+			oldDebouncePeriod: newVal,
+		},
+		"change": {
+			oldDebouncePeriod: oldVal,
+			want:              true,
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			dpc := &digitalPinConfig{debouncePeriod: tc.oldDebouncePeriod}
+			// act
+			got := WithPinDebounce(newVal)(dpc)
+			// assert
+			gobottest.Assert(t, got, tc.want)
+			gobottest.Assert(t, dpc.debouncePeriod, newVal)
+		})
+	}
+}
+
+func TestWithPinEventOnFallingEdge(t *testing.T) {
+	const (
+		oldVal = digitalPinEventNone
+		newVal = digitalPinEventOnFallingEdge
+	)
+	var tests = map[string]struct {
+		oldEdge int
+		want    bool
+		wantVal int
+	}{
+		"no_change": {
+			oldEdge: newVal,
+		},
+		"change": {
+			oldEdge: oldVal,
+			want:    true,
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			dpc := &digitalPinConfig{edge: tc.oldEdge}
+			handler := func(lineOffset int, timestamp time.Duration, detectedEdge string, seqno uint32, lseqno uint32) {}
+			// act
+			got := WithPinEventOnFallingEdge(handler)(dpc)
+			// assert
+			gobottest.Assert(t, got, tc.want)
+			gobottest.Assert(t, dpc.edge, newVal)
+			gobottest.Refute(t, dpc.edgeEventHandler, nil)
+		})
+	}
+}
+
+func TestWithPinEventOnRisingEdge(t *testing.T) {
+	const (
+		oldVal = digitalPinEventNone
+		newVal = digitalPinEventOnRisingEdge
+	)
+	var tests = map[string]struct {
+		oldEdge int
+		want    bool
+		wantVal int
+	}{
+		"no_change": {
+			oldEdge: newVal,
+		},
+		"change": {
+			oldEdge: oldVal,
+			want:    true,
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			dpc := &digitalPinConfig{edge: tc.oldEdge}
+			handler := func(lineOffset int, timestamp time.Duration, detectedEdge string, seqno uint32, lseqno uint32) {}
+			// act
+			got := WithPinEventOnRisingEdge(handler)(dpc)
+			// assert
+			gobottest.Assert(t, got, tc.want)
+			gobottest.Assert(t, dpc.edge, newVal)
+			gobottest.Refute(t, dpc.edgeEventHandler, nil)
+		})
+	}
+}
+
+func TestWithPinEventOnBothEdges(t *testing.T) {
+	const (
+		oldVal = digitalPinEventNone
+		newVal = digitalPinEventOnBothEdges
+	)
+	var tests = map[string]struct {
+		oldEdge int
+		want    bool
+		wantVal int
+	}{
+		"no_change": {
+			oldEdge: newVal,
+		},
+		"change": {
+			oldEdge: oldVal,
+			want:    true,
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			dpc := &digitalPinConfig{edge: tc.oldEdge}
+			handler := func(lineOffset int, timestamp time.Duration, detectedEdge string, seqno uint32, lseqno uint32) {}
+			// act
+			got := WithPinEventOnBothEdges(handler)(dpc)
+			// assert
+			gobottest.Assert(t, got, tc.want)
+			gobottest.Assert(t, dpc.edge, newVal)
+			gobottest.Refute(t, dpc.edgeEventHandler, nil)
 		})
 	}
 }

@@ -23,7 +23,7 @@ var gpioPinDefinitions = map[string]gpioPinDefinition{
 	"29": gpioPinDefinition{sysfs: 165, cdev: cdevPin{chip: 5, line: 13}}, // GPIO5_B5_SPI0CSN_UART4RTSN - NO, initial 0
 	"13": gpioPinDefinition{sysfs: 166, cdev: cdevPin{chip: 5, line: 14}}, // GPIO5_B6_SPI0_TXD_UART4TX - NO, initial 1
 	"15": gpioPinDefinition{sysfs: 167, cdev: cdevPin{chip: 5, line: 15}}, // GPIO5_B7_SPI0_RXD_UART4RX - IN, initial 1
-	"31": gpioPinDefinition{sysfs: 168, cdev: cdevPin{chip: 5, line: 16}}, // GPIO5_C0_SPI0CSN1 - OK
+	"31": gpioPinDefinition{sysfs: 168, cdev: cdevPin{chip: 5, line: 16}}, // GPIO5_C0_SPI0CSN1 - OK if SPI0 off
 	"22": gpioPinDefinition{sysfs: 171, cdev: cdevPin{chip: 5, line: 19}}, // GPIO5_C3 - OK
 	"12": gpioPinDefinition{sysfs: 184, cdev: cdevPin{chip: 6, line: 0}},  // GPIO6_A0_PCM/I2S_CLK - NO, initial 1
 	"35": gpioPinDefinition{sysfs: 185, cdev: cdevPin{chip: 6, line: 1}},  // GPIO6_A1_PCM/I2S_FS - NO, initial 0
@@ -35,13 +35,13 @@ var gpioPinDefinitions = map[string]gpioPinDefinition{
 	"28": gpioPinDefinition{sysfs: 234, cdev: cdevPin{chip: 7, line: 18}}, // GPIO7_C2_I2C_SCL - OK if I2C4 off
 	"33": gpioPinDefinition{sysfs: 238, cdev: cdevPin{chip: 7, line: 22}}, // GPIO7_C6_UART2RX_PWM2 - IN, initial 1
 	"32": gpioPinDefinition{sysfs: 239, cdev: cdevPin{chip: 7, line: 23}}, // GPIO7_C7_UART2TX_PWM3 - NO, initial 1
-	"26": gpioPinDefinition{sysfs: 251, cdev: cdevPin{chip: 8, line: 3}},  // GPIO8_A3_SPI2CSN1 - OK
+	"26": gpioPinDefinition{sysfs: 251, cdev: cdevPin{chip: 8, line: 3}},  // GPIO8_A3_SPI2CSN1 - OK if SPI2 off
 	"3":  gpioPinDefinition{sysfs: 252, cdev: cdevPin{chip: 8, line: 4}},  // GPIO8_A4_I2C1_SDA - OK if I2C1 off
 	"5":  gpioPinDefinition{sysfs: 253, cdev: cdevPin{chip: 8, line: 5}},  // GPIO8_A5_I2C1_SCL - OK if I2C1 off
-	"23": gpioPinDefinition{sysfs: 254, cdev: cdevPin{chip: 8, line: 6}},  // GPIO8_A6_SPI2CLK - OK
-	"24": gpioPinDefinition{sysfs: 255, cdev: cdevPin{chip: 8, line: 7}},  // GPIO8_A7_SPI2CSN0 - OK
-	"21": gpioPinDefinition{sysfs: 256, cdev: cdevPin{chip: 8, line: 8}},  // GPIO8_B0_SPI2RXD - OK
-	"19": gpioPinDefinition{sysfs: 257, cdev: cdevPin{chip: 8, line: 9}},  // GPIO8_B1_SPI2TXD - OK
+	"23": gpioPinDefinition{sysfs: 254, cdev: cdevPin{chip: 8, line: 6}},  // GPIO8_A6_SPI2CLK - OK if SPI2 off
+	"24": gpioPinDefinition{sysfs: 255, cdev: cdevPin{chip: 8, line: 7}},  // GPIO8_A7_SPI2CSN0 - OK if SPI2 off
+	"21": gpioPinDefinition{sysfs: 256, cdev: cdevPin{chip: 8, line: 8}},  // GPIO8_B0_SPI2RXD - OK if SPI2 off
+	"19": gpioPinDefinition{sysfs: 257, cdev: cdevPin{chip: 8, line: 9}},  // GPIO8_B1_SPI2TXD - OK if SPI2 off
 }
 
 var pwmPinDefinitions = map[string]pwmPinDefinition{

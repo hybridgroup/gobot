@@ -137,7 +137,7 @@ func (c *Adaptor) DigitalRead(pin string) (i int, err error) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
-	sysPin, err := c.digitalPin(pin, system.WithDirectionInput())
+	sysPin, err := c.digitalPin(pin, system.WithPinDirectionInput())
 	if err != nil {
 		return
 	}
@@ -198,20 +198,20 @@ func (c *Adaptor) arduinoSetup() error {
 	// TODO: also check to see if device labels for
 	// /sys/class/gpio/gpiochip{200,216,232,248}/label == "pcal9555a"
 
-	tpin, err := c.newExportedDigitalPin(214, system.WithDirectionOutput(system.LOW))
+	tpin, err := c.newExportedDigitalPin(214, system.WithPinDirectionOutput(system.LOW))
 	if err != nil {
 		return err
 	}
 	c.tristate = tpin
 
 	for _, i := range []int{263, 262} {
-		if err := c.newUnexportedDigitalPin(i, system.WithDirectionOutput(system.HIGH)); err != nil {
+		if err := c.newUnexportedDigitalPin(i, system.WithPinDirectionOutput(system.HIGH)); err != nil {
 			return err
 		}
 	}
 
 	for _, i := range []int{240, 241, 242, 243} {
-		if err := c.newUnexportedDigitalPin(i, system.WithDirectionOutput(system.LOW)); err != nil {
+		if err := c.newUnexportedDigitalPin(i, system.WithPinDirectionOutput(system.LOW)); err != nil {
 			return err
 		}
 	}
@@ -241,13 +241,13 @@ func (c *Adaptor) arduinoI2CSetup() error {
 	}
 
 	for _, i := range []int{14, 165, 212, 213} {
-		if err := c.newUnexportedDigitalPin(i, system.WithDirectionInput()); err != nil {
+		if err := c.newUnexportedDigitalPin(i, system.WithPinDirectionInput()); err != nil {
 			return err
 		}
 	}
 
 	for _, i := range []int{236, 237, 204, 205} {
-		if err := c.newUnexportedDigitalPin(i, system.WithDirectionOutput(system.LOW)); err != nil {
+		if err := c.newUnexportedDigitalPin(i, system.WithPinDirectionOutput(system.LOW)); err != nil {
 			return err
 		}
 	}
@@ -291,9 +291,9 @@ func (c *Adaptor) digitalPin(id string, o ...func(gobot.DigitalPinOptioner) bool
 	}
 	dir := vpin.DirectionBehavior()
 	if i.resistor > 0 {
-		rop := system.WithDirectionOutput(system.LOW)
+		rop := system.WithPinDirectionOutput(system.LOW)
 		if dir == system.OUT {
-			rop = system.WithDirectionInput()
+			rop = system.WithPinDirectionInput()
 		}
 		if err := c.ensureDigitalPin(i.resistor, rop); err != nil {
 			return nil, err
@@ -301,9 +301,9 @@ func (c *Adaptor) digitalPin(id string, o ...func(gobot.DigitalPinOptioner) bool
 	}
 
 	if i.levelShifter > 0 {
-		lop := system.WithDirectionOutput(system.LOW)
+		lop := system.WithPinDirectionOutput(system.LOW)
 		if dir == system.OUT {
-			lop = system.WithDirectionOutput(system.HIGH)
+			lop = system.WithPinDirectionOutput(system.HIGH)
 		}
 		if err := c.ensureDigitalPin(i.levelShifter, lop); err != nil {
 			return nil, err
@@ -312,7 +312,7 @@ func (c *Adaptor) digitalPin(id string, o ...func(gobot.DigitalPinOptioner) bool
 
 	if len(i.mux) > 0 {
 		for _, mux := range i.mux {
-			if err := c.ensureDigitalPin(mux.pin, system.WithDirectionOutput(mux.value)); err != nil {
+			if err := c.ensureDigitalPin(mux.pin, system.WithPinDirectionOutput(mux.value)); err != nil {
 				return nil, err
 			}
 		}
@@ -388,7 +388,7 @@ func (c *Adaptor) changePinMode(pin, mode string) error {
 }
 
 func (c *Adaptor) digitalWrite(pin string, val byte) (err error) {
-	sysPin, err := c.digitalPin(pin, system.WithDirectionOutput(int(val)))
+	sysPin, err := c.digitalPin(pin, system.WithPinDirectionOutput(int(val)))
 	if err != nil {
 		return
 	}

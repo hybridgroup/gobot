@@ -72,28 +72,28 @@ func Test_createAsGpiod(t *testing.T) {
 }
 
 func Test_createPinWithOptionsSysfs(t *testing.T) {
-	// This is a general test, that options are applied by using "create" with the WithLabel() option.
+	// This is a general test, that options are applied by using "create" with the WithPinLabel() option.
 	// All other configuration options will be tested in tests for "digitalPinConfig".
 	//
 	// arrange
 	const label = "my sysfs label"
 	dpa := sysfsDigitalPinAccess{}
 	// act
-	dp := dpa.createPin("", 9, WithLabel(label))
+	dp := dpa.createPin("", 9, WithPinLabel(label))
 	dps := dp.(*digitalPinSysfs)
 	// assert
 	gobottest.Assert(t, dps.label, label)
 }
 
 func Test_createPinWithOptionsGpiod(t *testing.T) {
-	// This is a general test, that options are applied by using "create" with the WithLabel() option.
+	// This is a general test, that options are applied by using "create" with the WithPinLabel() option.
 	// All other configuration options will be tested in tests for "digitalPinConfig".
 	//
 	// arrange
 	const label = "my gpiod label"
 	dpa := gpiodDigitalPinAccess{}
 	// act
-	dp := dpa.createPin("", 19, WithLabel(label))
+	dp := dpa.createPin("", 19, WithPinLabel(label))
 	dpg := dp.(*digitalPinGpiod)
 	// assert
 	gobottest.Assert(t, dpg.label, label)
