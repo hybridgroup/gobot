@@ -16,37 +16,45 @@ import (
 
 const dev = "/dev/i2c-1"
 
-func syscallImpl(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno) {
-	if (trap == syscall.SYS_IOCTL) && (a2 == system.I2C_FUNCS) {
-		var funcPtr *uint64 = (*uint64)(unsafe.Pointer(a3))
-		*funcPtr = system.I2C_FUNC_SMBUS_READ_BYTE | system.I2C_FUNC_SMBUS_READ_BYTE_DATA |
-			system.I2C_FUNC_SMBUS_READ_WORD_DATA |
-			system.I2C_FUNC_SMBUS_WRITE_BYTE | system.I2C_FUNC_SMBUS_WRITE_BYTE_DATA |
-			system.I2C_FUNC_SMBUS_WRITE_WORD_DATA
-	}
-	// Let all operations succeed
-	return 0, 0, 0
-}
+func getSyscallFuncImpl(errorMask byte) func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno) {
+	// bit 0: error on function query
+	// bit 1: error on set address
+	// bit 2: error on command
+	return func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno) {
+		// function query
+		if (trap == syscall.SYS_IOCTL) && (a2 == system.I2C_FUNCS) {
+			if errorMask&0x01 == 0x01 {
+				return 0, 0, 1
+			}
 
-func syscallImplFail(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno) {
-	if (trap == syscall.SYS_IOCTL) && (a2 == system.I2C_FUNCS) {
-		var funcPtr *uint64 = (*uint64)(unsafe.Pointer(a3))
-		*funcPtr = system.I2C_FUNC_SMBUS_READ_BYTE | system.I2C_FUNC_SMBUS_READ_BYTE_DATA |
-			system.I2C_FUNC_SMBUS_READ_WORD_DATA |
-			system.I2C_FUNC_SMBUS_WRITE_BYTE | system.I2C_FUNC_SMBUS_WRITE_BYTE_DATA |
-			system.I2C_FUNC_SMBUS_WRITE_WORD_DATA
-		// retrieve functions call succeed
+			var funcPtr *uint64 = (*uint64)(unsafe.Pointer(a3))
+			*funcPtr = system.I2C_FUNC_SMBUS_READ_BYTE | system.I2C_FUNC_SMBUS_READ_BYTE_DATA |
+				system.I2C_FUNC_SMBUS_READ_WORD_DATA |
+				system.I2C_FUNC_SMBUS_WRITE_BYTE | system.I2C_FUNC_SMBUS_WRITE_BYTE_DATA |
+				system.I2C_FUNC_SMBUS_WRITE_WORD_DATA
+		}
+		// set address
+		if (trap == syscall.SYS_IOCTL) && (a2 == system.I2C_SLAVE) {
+			if errorMask&0x02 == 0x02 {
+				return 0, 0, 1
+			}
+		}
+		// command
+		if (trap == syscall.SYS_IOCTL) && (a2 == system.I2C_SMBUS) {
+			if errorMask&0x04 == 0x04 {
+				return 0, 0, 1
+			}
+		}
+		// Let all operations succeed
 		return 0, 0, 0
 	}
-	// Let all operations fail
-	return 0, 0, 1
 }
 
 func initI2CDevice() gobot.I2cSystemDevicer {
 	a := system.NewAccesser()
 	a.UseMockFilesystem([]string{dev})
 	msc := a.UseMockSyscall()
-	msc.Impl = syscallImpl
+	msc.Impl = getSyscallFuncImpl(0x00)
 
 	d, _ := a.NewI2cDevice(dev)
 	return d
@@ -56,7 +64,7 @@ func initI2CDeviceAddressError() gobot.I2cSystemDevicer {
 	a := system.NewAccesser()
 	a.UseMockFilesystem([]string{dev})
 	msc := a.UseMockSyscall()
-	msc.Impl = syscallImplFail
+	msc.Impl = getSyscallFuncImpl(0x02)
 
 	d, _ := a.NewI2cDevice(dev)
 	return d

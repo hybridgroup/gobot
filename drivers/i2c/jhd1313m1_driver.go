@@ -67,6 +67,8 @@ var CustomLCDChars = map[string][8]byte{
 	"frowney": {0, 0, 10, 0, 0, 0, 14, 17},
 }
 
+var jhd1313m1ErrInvalidPosition = fmt.Errorf("Invalid position value")
+
 // JHD1313M1Driver is a driver for the Jhd1313m1 LCD display which has two i2c addreses,
 // one belongs to a controller and the other controls solely the backlight.
 // This module was tested with the Seed Grove LCD RGB Backlight v2.0 display which requires 5V to operate.
@@ -258,7 +260,7 @@ func (h *JHD1313M1Driver) Write(message string) error {
 // 16..32 are the positions in the second display line.
 func (h *JHD1313M1Driver) SetPosition(pos int) (err error) {
 	if pos < 0 || pos > 31 {
-		err = ErrInvalidPosition
+		err = jhd1313m1ErrInvalidPosition
 		return
 	}
 	offset := byte(pos)

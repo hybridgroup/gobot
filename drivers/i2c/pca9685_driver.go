@@ -147,7 +147,7 @@ func (p *PCA9685Driver) SetPWMFreq(freq float32) error {
 	prescalevel /= 4096
 	// Ratio between desired frequency and maximum
 	prescalevel /= freq
-	prescalevel -= 1
+	prescalevel--
 	// Round value to nearest whole
 	prescale := byte(prescalevel + 0.5)
 

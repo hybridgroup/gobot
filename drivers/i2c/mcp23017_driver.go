@@ -36,9 +36,9 @@ type bank struct {
 	portB port
 }
 
-// MCP23017Config contains the device configuration for the IOCON register.
+// mcp23017Config contains the device configuration for the IOCON register.
 // These fields should only be set with values 0 or 1.
-type MCP23017Config struct {
+type mcp23017Config struct {
 	bank   uint8
 	mirror uint8
 	seqop  uint8
@@ -48,7 +48,7 @@ type MCP23017Config struct {
 	intpol uint8
 }
 
-type MCP23017Behavior struct {
+type mcp23017Behavior struct {
 	forceRefresh bool
 	autoIODirOff bool
 }
@@ -56,8 +56,8 @@ type MCP23017Behavior struct {
 // MCP23017Driver contains the driver configuration parameters.
 type MCP23017Driver struct {
 	*Driver
-	mcpConf  MCP23017Config
-	mcpBehav MCP23017Behavior
+	mcpConf  mcp23017Config
+	mcpBehav mcp23017Behavior
 	gobot.Eventer
 }
 
@@ -79,7 +79,7 @@ type MCP23017Driver struct {
 func NewMCP23017Driver(c Connector, options ...func(Config)) *MCP23017Driver {
 	d := &MCP23017Driver{
 		Driver:  NewDriver(c, "MCP23017", mcp23017DefaultAddress),
-		mcpConf: MCP23017Config{},
+		mcpConf: mcp23017Config{},
 		Eventer: gobot.NewEventer(),
 	}
 	d.afterStart = d.initialize
@@ -321,7 +321,7 @@ func (m *MCP23017Driver) initialize() (err error) {
 func (m *MCP23017Driver) write(reg uint8, pin uint8, state bitState) (err error) {
 	valOrg, err := m.read(reg)
 	if err != nil {
-		return err
+		return fmt.Errorf("MCP write-read: %v", err)
 	}
 
 	var val uint8
@@ -337,7 +337,7 @@ func (m *MCP23017Driver) write(reg uint8, pin uint8, state bitState) (err error)
 				m.mcpBehav.forceRefresh, m.GetAddressOrDefault(mcp23017DefaultAddress), reg, m.getRegName(reg), val)
 		}
 		if err = m.connection.WriteByteData(reg, val); err != nil {
-			return err
+			return fmt.Errorf("MCP write-WriteByteData(reg=%d,val=%d): %v", reg, val, err)
 		}
 	} else {
 		if mcp23017Debug {
@@ -353,7 +353,7 @@ func (m *MCP23017Driver) write(reg uint8, pin uint8, state bitState) (err error)
 func (m *MCP23017Driver) read(reg uint8) (val uint8, err error) {
 	val, err = m.connection.ReadByteData(reg)
 	if err != nil {
-		return val, err
+		return val, fmt.Errorf("MCP write-ReadByteData(reg=%d): %v", reg, err)
 	}
 	if mcp23017Debug {
 		log.Printf("reading done: MCP autoIODirOff: %t, address: 0x%X, register:0x%X, name: %s, value: 0x%X\n",
@@ -377,7 +377,7 @@ func (m *MCP23017Driver) getPort(portStr string) (selectedPort port) {
 }
 
 // getUint8Value returns the configuration data as a packed value.
-func (mc *MCP23017Config) getUint8Value() uint8 {
+func (mc *mcp23017Config) getUint8Value() uint8 {
 	return mc.bank<<7 | mc.mirror<<6 | mc.seqop<<5 | mc.disslw<<4 | mc.haen<<3 | mc.odr<<2 | mc.intpol<<1
 }
 

@@ -15,17 +15,19 @@ const yl40DefaultAddress = 0x48
 
 const yl40Debug = false
 
+// YL40Pin wraps the underlying string type for type safety
 type YL40Pin string
 
 const (
-	// brightness sensor, high brightness - low raw value, scaled to 0..1000 (high brightness - high value)
+	// YL40Bri for brightness sensor, high brightness - low raw value, scaled to 0..1000 (high brightness - high value)
 	YL40Bri YL40Pin = "brightness"
-	// temperature sensor, high temperature - low raw value, scaled to °C
+	// YL40Temp for temperature sensor, high temperature - low raw value, scaled to °C
 	YL40Temp YL40Pin = "temperature"
-	// wired to AOUT, scaled to voltage 3.3V
+	// YL40AIN2 is wired to AOUT, scaled to voltage 3.3V
 	YL40AIN2 YL40Pin = "analog input AIN2"
-	// adjustable resistor, turn clockwise will lower the raw value, scaled to -100..+100% (clockwise)
+	// YL40Poti is adjustable resistor, turn clockwise will lower the raw value, scaled to -100..+100% (clockwise)
 	YL40Poti YL40Pin = "potentiometer"
+	// YL40AOUT is the analog output
 	YL40AOUT YL40Pin = "analog output"
 )
 

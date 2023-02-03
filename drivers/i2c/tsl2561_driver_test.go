@@ -15,7 +15,7 @@ import (
 // and tests all implementations, so no further tests needed here for gobot.Driver interface
 var _ gobot.Driver = (*TSL2561Driver)(nil)
 
-func testIdReader(b []byte) (int, error) {
+func testIDReader(b []byte) (int, error) {
 	buf := new(bytes.Buffer)
 	// Mock device responding 0xA
 	binary.Write(buf, binary.LittleEndian, uint8(0x0A))
@@ -26,7 +26,7 @@ func testIdReader(b []byte) (int, error) {
 func initTestTSL2561Driver() (*TSL2561Driver, *i2cTestAdaptor) {
 	a := newI2cTestAdaptor()
 	d := NewTSL2561Driver(a)
-	a.i2cReadImpl = testIdReader
+	a.i2cReadImpl = testIDReader
 	if err := d.Start(); err != nil {
 		panic(err)
 	}
@@ -58,7 +58,7 @@ func TestTSL2561DriverOptions(t *testing.T) {
 func TestTSL2561DriverStart(t *testing.T) {
 	a := newI2cTestAdaptor()
 	d := NewTSL2561Driver(a)
-	a.i2cReadImpl = testIdReader
+	a.i2cReadImpl = testIDReader
 
 	gobottest.Assert(t, d.Start(), nil)
 }
@@ -82,7 +82,7 @@ func TestTSL2561DriverHalt(t *testing.T) {
 
 func TestTSL2561DriverRead16(t *testing.T) {
 	d, a := initTestTSL2561Driver()
-	a.i2cReadImpl = testIdReader
+	a.i2cReadImpl = testIDReader
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		buf := new(bytes.Buffer)
 		// send low
