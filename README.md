@@ -211,6 +211,7 @@ platforms are currently supported:
 - [MegaPi](http://www.makeblock.com/megapi) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/megapi)
 - [Microbit](http://microbit.org/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/microbit)
 - [MQTT](http://mqtt.org/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/mqtt)
+- [NanoPi NEO](https://wiki.friendlyelec.com/wiki/index.php/NanoPi_NEO) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/nanopi)
 - [NATS](http://nats.io/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/nats)
 - [Neurosky](http://neurosky.com/products-markets/eeg-biosensors/hardware/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/neurosky)
 - [OpenCV](http://opencv.org/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/opencv)
