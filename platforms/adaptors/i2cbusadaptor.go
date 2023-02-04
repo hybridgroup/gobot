@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	multierror "github.com/hashicorp/go-multierror"
+	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/system"
 )
@@ -17,7 +18,7 @@ type I2cBusAdaptor struct {
 	validateNumber   i2cBusNumberValidator
 	defaultBusNumber int
 	mutex            sync.Mutex
-	connections      map[string]i2c.Connection
+	buses            map[int]gobot.I2cSystemDevicer
 }
 
 // NewI2cBusAdaptor provides the access to i2c buses of the board. The validator is used to check the bus number,
@@ -36,51 +37,49 @@ func (a *I2cBusAdaptor) Connect() error {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
-	a.connections = make(map[string]i2c.Connection)
+	a.buses = make(map[int]gobot.I2cSystemDevicer)
 	return nil
 }
 
-// Finalize closes all i2c connections.
+// Finalize closes all i2c buses.
 func (a *I2cBusAdaptor) Finalize() error {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
 	var err error
-	for _, con := range a.connections {
-		if con != nil {
-			if e := con.Close(); e != nil {
+	for _, bus := range a.buses {
+		if bus != nil {
+			if e := bus.Close(); e != nil {
 				err = multierror.Append(err, e)
 			}
 		}
 	}
-	a.connections = nil
+	a.buses = nil
 	return err
 }
 
 // GetI2cConnection returns a connection to a device on a specified i2c bus
-func (a *I2cBusAdaptor) GetI2cConnection(address int, busNum int) (connection i2c.Connection, err error) {
+func (a *I2cBusAdaptor) GetI2cConnection(address int, busNum int) (i2c.Connection, error) {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
-	if a.connections == nil {
+	if a.buses == nil {
 		return nil, fmt.Errorf("not connected")
 	}
 
-	id := fmt.Sprintf("%d_%d", busNum, address)
-
-	con := a.connections[id]
-	if con == nil {
-		if err := a.validateNumber(busNum); err != nil {
-			return nil, err
-		}
-		bus, err := a.sys.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", busNum))
+	bus := a.buses[busNum]
+	if bus == nil {
+		err := a.validateNumber(busNum)
 		if err != nil {
 			return nil, err
 		}
-		con = i2c.NewConnection(bus, address)
-		a.connections[id] = con
+		bus, err = a.sys.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", busNum))
+		if err != nil {
+			return nil, err
+		}
+		a.buses[busNum] = bus
 	}
-	return con, err
+	return i2c.NewConnection(bus, address), nil
 }
 
 // DefaultI2cBus returns the default i2c bus number for this platform.

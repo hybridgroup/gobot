@@ -93,10 +93,67 @@ type PWMPinnerProvider interface {
 	PWMPin(id string) (PWMPinner, error)
 }
 
-// I2cSystemDevicer is the interface to a i2c bus at system level.
+// I2cSystemDevicer is the interface to a i2c bus at system level, according to I2C/SMBus specification.
+// Some functions are not in the interface yet:
+// * Process Call (WriteWordDataReadWordData)
+// * Block Write - Block Read (WriteBlockDataReadBlockData)
+// * Host Notify - WriteWordData() can be used instead
+//
+// see: https://docs.kernel.org/i2c/smbus-protocol.html#key-to-symbols
+//
+// S: Start condition; Sr: Repeated start condition, used to switch from write to read mode.
+// P: Stop condition; Rd/Wr (1 bit): Read/Write bit. Rd equals 1, Wr equals 0.
+// A, NA (1 bit): Acknowledge (ACK) and Not Acknowledge (NACK) bit
+// Addr (7 bits): I2C 7 bit address. (10 bit I2C address not yet supported by gobot).
+// Comm (8 bits): Command byte, a data byte which often selects a register on the device.
+// Data (8 bits): A plain data byte. DataLow and DataHigh represent the low and high byte of a 16 bit word.
+// Count (8 bits): A data byte containing the length of a block operation.
+// [..]: Data sent by I2C device, as opposed to data sent by the host adapter.
+//
 type I2cSystemDevicer interface {
-	I2cOperations
-	SetAddress(int) error
+	// ReadByte must be implemented as the sequence:
+	// "S Addr Rd [A] [Data] NA P"
+	ReadByte(address int) (byte, error)
+
+	// ReadByteData must be implemented as the sequence:
+	// "S Addr Wr [A] Comm [A] Sr Addr Rd [A] [Data] NA P"
+	ReadByteData(address int, reg uint8) (uint8, error)
+
+	// ReadWordData must be implemented as the sequence:
+	// "S Addr Wr [A] Comm [A] Sr Addr Rd [A] [DataLow] A [DataHigh] NA P"
+	ReadWordData(address int, reg uint8) (uint16, error)
+
+	// ReadBlockData must be implemented as the sequence:
+	// "S Addr Wr [A] Comm [A] Sr Addr Rd [A] [Count] A [Data] A [Data] A ... A [Data] NA P"
+	ReadBlockData(address int, reg uint8, data []byte) error
+
+	// WriteByte must be implemented as the sequence:
+	// "S Addr Wr [A] Data [A] P"
+	WriteByte(address int, val byte) error
+
+	// WriteByteData must be implemented as the sequence:
+	// "S Addr Wr [A] Comm [A] Data [A] P"
+	WriteByteData(address int, reg uint8, val uint8) error
+
+	// WriteBlockData must be implemented as the sequence:
+	// "S Addr Wr [A] Comm [A] Count [A] Data [A] Data [A] ... [A] Data [A] P"
+	WriteBlockData(address int, reg uint8, data []byte) error
+
+	// WriteWordData must be implemented as the sequence:
+	// "S Addr Wr [A] Comm [A] DataLow [A] DataHigh [A] P"
+	WriteWordData(address int, reg uint8, val uint16) error
+
+	// WriteBytes writes the given data starting from the current register of bus device.
+	WriteBytes(address int, data []byte) error
+
+	// Read implements direct read operations.
+	Read(address int, b []byte) (int, error)
+
+	// Write implements direct write operations.
+	Write(address int, b []byte) (n int, err error)
+
+	// Close closes the character device file.
+	Close() error
 }
 
 // SpiSystemDevicer is the interface to a SPI bus at system level.
@@ -123,46 +180,14 @@ type BusOperations interface {
 }
 
 // I2cOperations represents the i2c methods according to I2C/SMBus specification.
-// Some functions are not in the interface yet:
-// * Process Call (WriteWordDataReadWordData)
-// * Block Write - Block Read (WriteBlockDataReadBlockData)
-// * Host Notify - WriteWordData() can be used instead
-//
-// see: https://docs.kernel.org/i2c/smbus-protocol.html#key-to-symbols
-//
-// S: Start condition; Sr: Repeated start condition, used to switch from write to read mode.
-// P: Stop condition; Rd/Wr (1 bit): Read/Write bit. Rd equals 1, Wr equals 0.
-// A, NA (1 bit): Acknowledge (ACK) and Not Acknowledge (NACK) bit
-// Addr (7 bits): I2C 7 bit address. (10 bit I2C address not yet supported by gobot).
-// Comm (8 bits): Command byte, a data byte which often selects a register on the device.
-// Data (8 bits): A plain data byte. DataLow and DataHigh represent the low and high byte of a 16 bit word.
-// Count (8 bits): A data byte containing the length of a block operation.
-// [..]: Data sent by I2C device, as opposed to data sent by the host adapter.
-//
-// ReadByteData must be implemented as the sequence:
-// "S Addr Wr [A] Comm [A] Sr Addr Rd [A] [Data] NA P"
-// ReadBlockData must be implemented as the sequence:
-// "S Addr Wr [A] Comm [A] Sr Addr Rd [A] [Count] A [Data] A [Data] A ... A [Data] NA P"
-// WriteByte must be implemented as the sequence:
-// "S Addr Wr [A] Data [A] P"
-// WriteByteData must be implemented as the sequence:
-// "S Addr Wr [A] Comm [A] Data [A] P"
-// WriteBlockData must be implemented as the sequence:
-// "S Addr Wr [A] Comm [A] Count [A] Data [A] Data [A] ... [A] Data [A] P"
 type I2cOperations interface {
 	io.ReadWriteCloser
 	BusOperations
-
-	// ReadByte must be implemented as the sequence:
-	// "S Addr Rd [A] [Data] NA P"
+	// ReadByte reads a byte from the current register of an i2c device.
 	ReadByte() (byte, error)
-
-	// ReadWordData must be implemented as the sequence:
-	// "S Addr Wr [A] Comm [A] Sr Addr Rd [A] [DataLow] A [DataHigh] NA P"
+	// ReadWordData reads a 16 bit value starting from the given register of an i2c device.
 	ReadWordData(reg uint8) (uint16, error)
-
-	// WriteWordData must be implemented as the sequence:
-	// "S Addr Wr [A] Comm [A] DataLow [A] DataHigh [A] P"
+	// WriteWordData writes the given 16 bit value starting from the given register of an i2c device.
 	WriteWordData(reg uint8, val uint16) error
 }
 

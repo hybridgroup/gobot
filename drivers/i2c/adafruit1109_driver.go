@@ -187,7 +187,7 @@ func (d *Adafruit1109Driver) Halt() error {
 // This is called by HD44780 driver to set one gpio output. We redirect the call to the i2c driver MCP23017.
 // The given id is the same as defined in dataPins and has the syntax "<port>_<pin>".
 func (d *Adafruit1109Driver) DigitalWrite(id string, val byte) error {
-	portio := adafruit1109ParseId(id)
+	portio := adafruit1109ParseID(id)
 	return d.writePin(portio, val)
 }
 
@@ -195,7 +195,7 @@ func (d *Adafruit1109Driver) DigitalWrite(id string, val byte) error {
 // This is called by HD44780 driver to read one gpio input. We redirect the call to the i2c driver MCP23017.
 // The given id is the same as defined in dataPins and has the syntax "<port>_<pin>".
 func (d *Adafruit1109Driver) DigitalRead(id string) (int, error) {
-	portio := adafruit1109ParseId(id)
+	portio := adafruit1109ParseID(id)
 	uval, err := d.readPin(portio)
 	if err != nil {
 		return 0, err
@@ -276,7 +276,7 @@ func (ap *adafruit1109PortPin) String() string {
 	return fmt.Sprintf("%s_%d", ap.port, ap.pin)
 }
 
-func adafruit1109ParseId(id string) adafruit1109PortPin {
+func adafruit1109ParseID(id string) adafruit1109PortPin {
 	items := strings.Split(id, "_")
 	io := uint8(0)
 	if io64, err := strconv.ParseUint(items[1], 10, 32); err == nil {

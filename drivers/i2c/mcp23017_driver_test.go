@@ -241,7 +241,7 @@ func TestMCP23017CommandsWriteGPIOErrIODIR(t *testing.T) {
 	// act
 	err := d.WriteGPIO(7, "A", 0)
 	// assert
-	gobottest.Assert(t, err, errors.New("write error"))
+	gobottest.Assert(t, err, errors.New("MCP write-read: MCP write-ReadByteData(reg=0): write error"))
 }
 
 func TestMCP23017CommandsWriteGPIOErrOLAT(t *testing.T) {
@@ -258,7 +258,7 @@ func TestMCP23017CommandsWriteGPIOErrOLAT(t *testing.T) {
 	// act
 	err := d.WriteGPIO(7, "A", 0)
 	// assert
-	gobottest.Assert(t, err, errors.New("write error"))
+	gobottest.Assert(t, err, errors.New("MCP write-read: MCP write-ReadByteData(reg=20): write error"))
 }
 
 func TestMCP23017ReadGPIO(t *testing.T) {
@@ -381,7 +381,7 @@ func TestMCP23017ReadGPIOErr(t *testing.T) {
 	// act
 	_, err := d.ReadGPIO(7, "A")
 	// assert
-	gobottest.Assert(t, err, errors.New("read error"))
+	gobottest.Assert(t, err, errors.New("MCP write-read: MCP write-ReadByteData(reg=0): read error"))
 }
 
 func TestMCP23017SetPinMode(t *testing.T) {
@@ -431,7 +431,7 @@ func TestMCP23017SetPinModeErr(t *testing.T) {
 	// act
 	err := d.SetPinMode(7, "A", 0)
 	// assert
-	gobottest.Assert(t, err, errors.New("write error"))
+	gobottest.Assert(t, err, errors.New("MCP write-read: MCP write-ReadByteData(reg=0): write error"))
 }
 
 func TestMCP23017SetPullUp(t *testing.T) {
@@ -481,7 +481,7 @@ func TestMCP23017SetPullUpErr(t *testing.T) {
 	// act
 	err := d.SetPullUp(7, "A", 0)
 	// assert
-	gobottest.Assert(t, err, errors.New("write error"))
+	gobottest.Assert(t, err, errors.New("MCP write-read: MCP write-ReadByteData(reg=12): write error"))
 }
 
 func TestMCP23017SetGPIOPolarity(t *testing.T) {
@@ -531,7 +531,7 @@ func TestMCP23017SetGPIOPolarityErr(t *testing.T) {
 	// act
 	err := d.SetGPIOPolarity(7, "A", 0)
 	// assert
-	gobottest.Assert(t, err, errors.New("write error"))
+	gobottest.Assert(t, err, errors.New("MCP write-read: MCP write-ReadByteData(reg=2): write error"))
 }
 
 func TestMCP23017_write(t *testing.T) {
@@ -553,7 +553,7 @@ func TestMCP23017_write(t *testing.T) {
 		return 0, errors.New("write error")
 	}
 	err = d.write(port.IODIR, uint8(7), 0)
-	gobottest.Assert(t, err, errors.New("write error"))
+	gobottest.Assert(t, err, errors.New("MCP write-read: MCP write-ReadByteData(reg=1): write error"))
 
 	// read error
 	d, a = initTestMCP23017WithStubbedAdaptor(0)
@@ -561,7 +561,7 @@ func TestMCP23017_write(t *testing.T) {
 		return len(b), errors.New("read error")
 	}
 	err = d.write(port.IODIR, uint8(7), 0)
-	gobottest.Assert(t, err, errors.New("read error"))
+	gobottest.Assert(t, err, errors.New("MCP write-read: MCP write-ReadByteData(reg=1): read error"))
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		return len(b), nil
 	}
@@ -588,7 +588,7 @@ func TestMCP23017_read(t *testing.T) {
 
 	val, err := d.read(port.IODIR)
 	gobottest.Assert(t, val, uint8(0))
-	gobottest.Assert(t, err, errors.New("read error"))
+	gobottest.Assert(t, err, errors.New("MCP write-ReadByteData(reg=0): read error"))
 
 	// read
 	d, a = initTestMCP23017WithStubbedAdaptor(0)

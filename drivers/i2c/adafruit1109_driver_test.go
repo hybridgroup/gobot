@@ -81,7 +81,7 @@ func TestAdafruit1109StartReadErr(t *testing.T) {
 	adaptor.i2cReadImpl = func([]byte) (int, error) {
 		return 0, errors.New("read error")
 	}
-	gobottest.Assert(t, d.Start(), errors.New("read error"))
+	gobottest.Assert(t, d.Start(), errors.New("MCP write-read: MCP write-ReadByteData(reg=0): read error"))
 }
 
 func TestAdafruit1109Halt(t *testing.T) {
@@ -287,7 +287,7 @@ func TestAdafruit1109RightButton(t *testing.T) {
 	}
 }
 
-func TestAdafruit1109_parseId(t *testing.T) {
+func TestAdafruit1109_parseID(t *testing.T) {
 	// arrange
 	ports := []string{"A", "B"}
 	for _, port := range ports {
@@ -295,7 +295,7 @@ func TestAdafruit1109_parseId(t *testing.T) {
 			id := fmt.Sprintf("%s_%d", port, pin)
 			t.Run(id, func(t *testing.T) {
 				// act
-				got := adafruit1109ParseId(id)
+				got := adafruit1109ParseID(id)
 				// assert
 				gobottest.Assert(t, got, adafruit1109PortPin{port, pin})
 			})

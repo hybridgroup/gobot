@@ -13,16 +13,38 @@ import (
 
 const dev = "/dev/i2c-1"
 
-func syscallFuncsImpl(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno) {
-	if (trap == syscall.SYS_IOCTL) && (a2 == I2C_FUNCS) {
-		var funcPtr *uint64 = (*uint64)(unsafe.Pointer(a3))
-		*funcPtr = I2C_FUNC_SMBUS_READ_BYTE | I2C_FUNC_SMBUS_READ_BYTE_DATA |
-			I2C_FUNC_SMBUS_READ_WORD_DATA |
-			I2C_FUNC_SMBUS_WRITE_BYTE | I2C_FUNC_SMBUS_WRITE_BYTE_DATA |
-			I2C_FUNC_SMBUS_WRITE_WORD_DATA
+func getSyscallFuncImpl(errorMask byte) func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno) {
+	// bit 0: error on function query
+	// bit 1: error on set address
+	// bit 2: error on command
+	return func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno) {
+		// function query
+		if (trap == syscall.SYS_IOCTL) && (a2 == I2C_FUNCS) {
+			if errorMask&0x01 == 0x01 {
+				return 0, 0, 1
+			}
+
+			var funcPtr *uint64 = (*uint64)(unsafe.Pointer(a3))
+			*funcPtr = I2C_FUNC_SMBUS_READ_BYTE | I2C_FUNC_SMBUS_READ_BYTE_DATA |
+				I2C_FUNC_SMBUS_READ_WORD_DATA |
+				I2C_FUNC_SMBUS_WRITE_BYTE | I2C_FUNC_SMBUS_WRITE_BYTE_DATA |
+				I2C_FUNC_SMBUS_WRITE_WORD_DATA
+		}
+		// set address
+		if (trap == syscall.SYS_IOCTL) && (a2 == I2C_SLAVE) {
+			if errorMask&0x02 == 0x02 {
+				return 0, 0, 1
+			}
+		}
+		// command
+		if (trap == syscall.SYS_IOCTL) && (a2 == I2C_SMBUS) {
+			if errorMask&0x04 == 0x04 {
+				return 0, 0, 1
+			}
+		}
+		// Let all operations succeed
+		return 0, 0, 0
 	}
-	// Let all operations succeed
-	return 0, 0, 0
 }
 
 func initTestI2cDeviceWithMockedSys() (*i2cDevice, *mockSyscall) {
@@ -76,24 +98,14 @@ func TestClose(t *testing.T) {
 	gobottest.Assert(t, d.Close(), nil)
 }
 
-func TestSetAddress(t *testing.T) {
-	// arrange
-	d, msc := initTestI2cDeviceWithMockedSys()
-	// act
-	err := d.SetAddress(0xff)
-	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, msc.devAddress, uintptr(0xff))
-}
-
 func TestWriteRead(t *testing.T) {
 	// arrange
 	d, _ := initTestI2cDeviceWithMockedSys()
 	wbuf := []byte{0x01, 0x02, 0x03}
 	rbuf := make([]byte, 4)
 	// act
-	wn, werr := d.Write(wbuf)
-	rn, rerr := d.Read(rbuf)
+	wn, werr := d.Write(1, wbuf)
+	rn, rerr := d.Read(1, rbuf)
 	// assert
 	gobottest.Assert(t, werr, nil)
 	gobottest.Assert(t, rerr, nil)
@@ -113,8 +125,8 @@ func TestReadByte(t *testing.T) {
 		},
 		"error_syscall": {
 			funcs:       I2C_FUNC_SMBUS_READ_BYTE,
-			syscallImpl: func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno) { return 0, 0, 1 },
-			wantErr:     "SMBus access failed with syscall.Errno operation not permitted",
+			syscallImpl: getSyscallFuncImpl(0x04),
+			wantErr:     "SMBus access r/w: 1, command: 0, protocol: 1, address: 2 failed with syscall.Errno operation not permitted",
 		},
 		"error_not_supported": {
 			wantErr: "SMBus read byte not supported",
@@ -129,7 +141,7 @@ func TestReadByte(t *testing.T) {
 			const want = byte(5)
 			msc.dataSlice = []byte{want}
 			// act
-			got, err := d.ReadByte()
+			got, err := d.ReadByte(2)
 			// assert
 			if tc.wantErr != "" {
 				gobottest.Assert(t, err.Error(), tc.wantErr)
@@ -157,8 +169,8 @@ func TestReadByteData(t *testing.T) {
 		},
 		"error_syscall": {
 			funcs:       I2C_FUNC_SMBUS_READ_BYTE_DATA,
-			syscallImpl: func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno) { return 0, 0, 1 },
-			wantErr:     "SMBus access failed with syscall.Errno operation not permitted",
+			syscallImpl: getSyscallFuncImpl(0x04),
+			wantErr:     "SMBus access r/w: 1, command: 1, protocol: 2, address: 3 failed with syscall.Errno operation not permitted",
 		},
 		"error_not_supported": {
 			wantErr: "SMBus read byte data not supported",
@@ -176,7 +188,7 @@ func TestReadByteData(t *testing.T) {
 			)
 			msc.dataSlice = []byte{want}
 			// act
-			got, err := d.ReadByteData(reg)
+			got, err := d.ReadByteData(3, reg)
 			// assert
 			if tc.wantErr != "" {
 				gobottest.Assert(t, err.Error(), tc.wantErr)
@@ -204,8 +216,8 @@ func TestReadWordData(t *testing.T) {
 		},
 		"error_syscall": {
 			funcs:       I2C_FUNC_SMBUS_READ_WORD_DATA,
-			syscallImpl: func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno) { return 0, 0, 1 },
-			wantErr:     "SMBus access failed with syscall.Errno operation not permitted",
+			syscallImpl: getSyscallFuncImpl(0x04),
+			wantErr:     "SMBus access r/w: 1, command: 2, protocol: 3, address: 4 failed with syscall.Errno operation not permitted",
 		},
 		"error_not_supported": {
 			wantErr: "SMBus read word data not supported",
@@ -226,7 +238,7 @@ func TestReadWordData(t *testing.T) {
 			// all common drivers read LSByte first
 			msc.dataSlice = []byte{lsbyte, msbyte}
 			// act
-			got, err := d.ReadWordData(reg)
+			got, err := d.ReadWordData(4, reg)
 			// assert
 			if tc.wantErr != "" {
 				gobottest.Assert(t, err.Error(), tc.wantErr)
@@ -268,8 +280,8 @@ func TestReadBlockData(t *testing.T) {
 		},
 		"error_syscall": {
 			funcs:       I2C_FUNC_SMBUS_READ_I2C_BLOCK,
-			syscallImpl: func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno) { return 0, 0, 1 },
-			wantErr:     "SMBus access failed with syscall.Errno operation not permitted",
+			syscallImpl: getSyscallFuncImpl(0x04),
+			wantErr:     "SMBus access r/w: 1, command: 3, protocol: 8, address: 5 failed with syscall.Errno operation not permitted",
 		},
 		"error_from_used_fallback_if_not_supported": {
 			wantErr: "Read 1 bytes from device by sysfs, expected 10",
@@ -284,7 +296,7 @@ func TestReadBlockData(t *testing.T) {
 			msc.dataSlice = []byte{wantB0, wantB1, wantB2, wantB3, wantB4, wantB5, wantB6, wantB7, wantB8, wantB9}
 			buf := []byte{12, 23, 34, 45, 56, 67, 78, 89, 98, 87}
 			// act
-			err := d.ReadBlockData(reg, buf)
+			err := d.ReadBlockData(5, reg, buf)
 			// assert
 			if tc.wantErr != "" {
 				gobottest.Assert(t, err.Error(), tc.wantErr)
@@ -313,8 +325,8 @@ func TestWriteByte(t *testing.T) {
 		},
 		"error_syscall": {
 			funcs:       I2C_FUNC_SMBUS_WRITE_BYTE,
-			syscallImpl: func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno) { return 0, 0, 1 },
-			wantErr:     "SMBus access failed with syscall.Errno operation not permitted",
+			syscallImpl: getSyscallFuncImpl(0x04),
+			wantErr:     "SMBus access r/w: 0, command: 68, protocol: 1, address: 6 failed with syscall.Errno operation not permitted",
 		},
 		"error_not_supported": {
 			wantErr: "SMBus write byte not supported",
@@ -328,7 +340,7 @@ func TestWriteByte(t *testing.T) {
 			d.funcs = tc.funcs
 			const val = byte(0x44)
 			// act
-			err := d.WriteByte(val)
+			err := d.WriteByte(6, val)
 			// assert
 			if tc.wantErr != "" {
 				gobottest.Assert(t, err.Error(), tc.wantErr)
@@ -355,8 +367,8 @@ func TestWriteByteData(t *testing.T) {
 		},
 		"error_syscall": {
 			funcs:       I2C_FUNC_SMBUS_WRITE_BYTE_DATA,
-			syscallImpl: func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno) { return 0, 0, 1 },
-			wantErr:     "SMBus access failed with syscall.Errno operation not permitted",
+			syscallImpl: getSyscallFuncImpl(0x04),
+			wantErr:     "SMBus access r/w: 0, command: 4, protocol: 2, address: 7 failed with syscall.Errno operation not permitted",
 		},
 		"error_not_supported": {
 			wantErr: "SMBus write byte data not supported",
@@ -373,7 +385,7 @@ func TestWriteByteData(t *testing.T) {
 				val = byte(0x55)
 			)
 			// act
-			err := d.WriteByteData(reg, val)
+			err := d.WriteByteData(7, reg, val)
 			// assert
 			if tc.wantErr != "" {
 				gobottest.Assert(t, err.Error(), tc.wantErr)
@@ -402,8 +414,8 @@ func TestWriteWordData(t *testing.T) {
 		},
 		"error_syscall": {
 			funcs:       I2C_FUNC_SMBUS_WRITE_WORD_DATA,
-			syscallImpl: func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno) { return 0, 0, 1 },
-			wantErr:     "SMBus access failed with syscall.Errno operation not permitted",
+			syscallImpl: getSyscallFuncImpl(0x04),
+			wantErr:     "SMBus access r/w: 0, command: 5, protocol: 3, address: 8 failed with syscall.Errno operation not permitted",
 		},
 		"error_not_supported": {
 			wantErr: "SMBus write word data not supported",
@@ -422,7 +434,7 @@ func TestWriteWordData(t *testing.T) {
 				wantMSByte = byte(0xD4)
 			)
 			// act
-			err := d.WriteWordData(reg, val)
+			err := d.WriteWordData(8, reg, val)
 			// assert
 			if tc.wantErr != "" {
 				gobottest.Assert(t, err.Error(), tc.wantErr)
@@ -467,8 +479,8 @@ func TestWriteBlockData(t *testing.T) {
 		},
 		"error_syscall": {
 			funcs:       I2C_FUNC_SMBUS_WRITE_I2C_BLOCK,
-			syscallImpl: func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno) { return 0, 0, 1 },
-			wantErr:     "SMBus access failed with syscall.Errno operation not permitted",
+			syscallImpl: getSyscallFuncImpl(0x04),
+			wantErr:     "SMBus access r/w: 0, command: 6, protocol: 8, address: 9 failed with syscall.Errno operation not permitted",
 		},
 	}
 	for name, tc := range tests {
@@ -479,7 +491,7 @@ func TestWriteBlockData(t *testing.T) {
 			d.funcs = tc.funcs
 			data := []byte{b0, b1, b2, b3, b4, b5, b6, b7, b8, b9}
 			// act
-			err := d.WriteBlockData(reg, data)
+			err := d.WriteBlockData(9, reg, data)
 			// assert
 			if tc.wantErr != "" {
 				gobottest.Assert(t, err.Error(), tc.wantErr)
@@ -502,12 +514,22 @@ func TestWriteBlockDataTooMuch(t *testing.T) {
 	// arrange
 	d, _ := initTestI2cDeviceWithMockedSys()
 	// act
-	err := d.WriteBlockData(0x01, make([]byte, 33))
+	err := d.WriteBlockData(10, 0x01, make([]byte, 33))
 	// assert
 	gobottest.Assert(t, err, errors.New("Writing blocks larger than 32 bytes (33) not supported"))
 }
 
-func Test_lazyInit(t *testing.T) {
+func Test_setAddress(t *testing.T) {
+	// arrange
+	d, msc := initTestI2cDeviceWithMockedSys()
+	// act
+	err := d.setAddress(0xff)
+	// assert
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, msc.devAddress, uintptr(0xff))
+}
+
+func Test_queryFunctionality(t *testing.T) {
 	var tests = map[string]struct {
 		requested   uint64
 		dev         string
@@ -519,18 +541,18 @@ func Test_lazyInit(t *testing.T) {
 		"ok": {
 			requested:   I2C_FUNC_SMBUS_READ_BYTE,
 			dev:         dev,
-			syscallImpl: syscallFuncsImpl,
+			syscallImpl: getSyscallFuncImpl(0x00),
 			wantFile:    true,
 			wantFuncs:   0x7E0000,
 		},
 		"dev_null_error": {
 			dev:         os.DevNull,
-			syscallImpl: syscallFuncsImpl,
+			syscallImpl: getSyscallFuncImpl(0x00),
 			wantErr:     " : /dev/null: No such file.",
 		},
 		"query_funcs_error": {
 			dev:         dev,
-			syscallImpl: func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno) { return 0, 0, 1 },
+			syscallImpl: getSyscallFuncImpl(0x01),
 			wantErr:     "Querying functionality failed with syscall.Errno operation not permitted",
 			wantFile:    true,
 		},

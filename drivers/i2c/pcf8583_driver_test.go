@@ -471,19 +471,19 @@ func TestPCF8583WriteRam(t *testing.T) {
 	// arrange
 	d, a := initTestPCF8583WithStubbedAdaptor()
 	a.written = []byte{} // reset writes of Start() and former test
-	wantRamAddress := uint8(0xFF)
-	wantRamValue := uint8(0xEF)
+	wantRAMAddress := uint8(0xFF)
+	wantRAMValue := uint8(0xEF)
 	// arrange writes
 	a.i2cWriteImpl = func(b []byte) (int, error) {
 		return len(b), nil
 	}
 	// act
-	err := d.WriteRAM(wantRamAddress-pcf8583RamOffset, wantRamValue)
+	err := d.WriteRAM(wantRAMAddress-pcf8583RamOffset, wantRAMValue)
 	// assert
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, len(a.written), 2)
-	gobottest.Assert(t, a.written[0], wantRamAddress)
-	gobottest.Assert(t, a.written[1], wantRamValue)
+	gobottest.Assert(t, a.written[0], wantRAMAddress)
+	gobottest.Assert(t, a.written[1], wantRAMValue)
 }
 
 func TestPCF8583WriteRamAddressOverflowFails(t *testing.T) {
@@ -505,7 +505,7 @@ func TestPCF8583ReadRam(t *testing.T) {
 	// arrange
 	d, a := initTestPCF8583WithStubbedAdaptor()
 	a.written = []byte{} // reset writes of Start() and former test
-	wantRamAddress := uint8(pcf8583RamOffset)
+	wantRAMAddress := uint8(pcf8583RamOffset)
 	want := uint8(0xAB)
 	// arrange writes
 	a.i2cWriteImpl = func(b []byte) (int, error) {
@@ -519,12 +519,12 @@ func TestPCF8583ReadRam(t *testing.T) {
 		return len(b), nil
 	}
 	// act
-	got, err := d.ReadRAM(wantRamAddress - pcf8583RamOffset)
+	got, err := d.ReadRAM(wantRAMAddress - pcf8583RamOffset)
 	// assert
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, got, want)
 	gobottest.Assert(t, len(a.written), 1)
-	gobottest.Assert(t, a.written[0], wantRamAddress)
+	gobottest.Assert(t, a.written[0], wantRAMAddress)
 	gobottest.Assert(t, numCallsRead, 1)
 }
 

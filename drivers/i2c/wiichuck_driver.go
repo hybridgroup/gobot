@@ -1,6 +1,7 @@
 package i2c
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
@@ -20,6 +21,7 @@ const (
 
 const wiichuckDefaultAddress = 0x52
 
+// WiichuckDriver contains the attributes for the i2c driver
 type WiichuckDriver struct {
 	*Driver
 	interval  time.Duration
@@ -82,16 +84,16 @@ func (w *WiichuckDriver) Joystick() map[string]float64 {
 
 // update parses value to update buttons and joystick.
 // If value is encrypted, warning message is printed
-func (w *WiichuckDriver) update(value []byte) (err error) {
+func (w *WiichuckDriver) update(value []byte) error {
 	if w.isEncrypted(value) {
-		return ErrEncryptedBytes
-	} else {
-		w.parse(value)
-		w.adjustOrigins()
-		w.updateButtons()
-		w.updateJoystick()
+		return fmt.Errorf("Encrypted bytes")
 	}
-	return
+
+	w.parse(value)
+	w.adjustOrigins()
+	w.updateButtons()
+	w.updateJoystick()
+	return nil
 }
 
 // setJoystickDefaultValue sets default value if value is -1
