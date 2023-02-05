@@ -9,6 +9,7 @@ import (
 	"gobot.io/x/gobot"
 )
 
+// Commands for the driver
 const (
 	HD44780_CLEARDISPLAY        = 0x01
 	HD44780_RETURNHOME          = 0x02
@@ -40,19 +41,21 @@ const (
 	HD44780_8BITBUS             = 0x10
 )
 
+// Some useful constants for the driver
 const (
 	HD44780_2NDLINEOFFSET = 0x40
 )
 
-// data bus mode
+// HD44780BusMode is the data bus mode
 type HD44780BusMode int
 
+// Bus modes of the driver
 const (
 	HD44780_4BITMODE HD44780BusMode = iota + 1
 	HD44780_8BITMODE
 )
 
-// databit pins
+// HD44780DataPin are the data bit pins
 type HD44780DataPin struct {
 	D0 string // not used if 4Bit mode
 	D1 string // not used if 4Bit mode

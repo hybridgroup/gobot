@@ -157,6 +157,7 @@ func (a *AnalogSensorDriver) RawValue() int {
 	return a.rawValue
 }
 
+// AnalogSensorLinearScaler creates a linear scaler function from the given values.
 func AnalogSensorLinearScaler(fromMin, fromMax int, toMin, toMax float64) func(input int) (value float64) {
 	m := (toMax - toMin) / float64(fromMax-fromMin)
 	n := toMin - m*float64(fromMin)

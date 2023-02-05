@@ -9,6 +9,7 @@ import (
 
 const kelvinOffset = 273.15
 
+// TemperatureSensorNtcConf contains all attributes to calculate key parameters of a NTC thermistor.
 type TemperatureSensorNtcConf struct {
 	TC0 int     // °C
 	R0  float64 // same unit as resistance of NTC (Ohm is recommended)
@@ -44,11 +45,11 @@ func NewTemperatureSensorDriver(a AnalogReader, pin string, v ...time.Duration) 
 	return d
 }
 
-// SetNtcSaler sets a function for typical NTC scaling the read value.
+// SetNtcScaler sets a function for typical NTC scaling the read value.
 // The read value is related to the voltage over the thermistor in an series connection to a resistor.
 // If the thermistor is connected to ground, the reverse flag must be set to true.
 // This means the voltage decreases when temperature gets higher.
-// Currently no negative values are supported.
+// Currently no negative values for voltage are supported.
 func (t *TemperatureSensorDriver) SetNtcScaler(vRef uint, rOhm uint, reverse bool, ntc TemperatureSensorNtcConf) {
 	t.SetScaler(TemperatureSensorNtcScaler(vRef, rOhm, reverse, ntc))
 }
@@ -60,6 +61,11 @@ func (t *TemperatureSensorDriver) SetLinearScaler(fromMin, fromMax int, toMin, t
 	t.SetScaler(AnalogSensorLinearScaler(fromMin, fromMax, toMin, toMax))
 }
 
+// TemperatureSensorNtcScaler creates a function for typical NTC scaling the read value.
+// The read value is related to the voltage over the thermistor in an series connection to a resistor.
+// If the thermistor is connected to ground, the reverse flag must be set to true.
+// This means the voltage decreases when temperature gets higher.
+// Currently no negative values for voltage are supported.
 func TemperatureSensorNtcScaler(vRef uint, rOhm uint, reverse bool, ntc TemperatureSensorNtcConf) func(input int) (value float64) {
 	ntc.initialize()
 	return (func(input int) (value float64) {

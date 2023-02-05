@@ -4,6 +4,7 @@ import (
 	"gobot.io/x/gobot"
 )
 
+// Access and command constants for the driver
 const (
 	MAX7219Digit0 = 0x01
 	MAX7219Digit1 = 0x02
@@ -96,7 +97,7 @@ func (a *MAX7219Driver) ClearAll() {
 	}
 }
 
-// ClearAll turns off all LEDs of the given module
+// ClearOne turns off all LEDs of the given module
 func (a *MAX7219Driver) ClearOne(which uint) {
 	for i := 1; i <= 8; i++ {
 		a.One(which, byte(i), 0)
