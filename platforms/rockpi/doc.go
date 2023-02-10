@@ -1,0 +1,7 @@
+/*
+Package rockpi contains the Gobot adaptor for Radxa's Rock Pi Single Board Computers.
+
+For further information refer to raspi README:
+https://github.com/hybridgroup/gobot/blob/master/platforms/rockpi/README.md
+*/
+package rockpi // import "gobot.io/x/gobot/platforms/rockpi"
