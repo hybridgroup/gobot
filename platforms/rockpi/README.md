@@ -31,7 +31,7 @@ import (
 
         "gobot.io/x/gobot"
         "gobot.io/x/gobot/drivers/gpio"
-        "gobot.io/x/gobot/platforms/raspi"
+        "gobot.io/x/gobot/platforms/rockpi"
 )
 
 func main() {
