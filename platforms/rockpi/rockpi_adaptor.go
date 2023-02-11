@@ -49,7 +49,7 @@ type Adaptor struct {
 //	adaptors.WithGpioDebounce(pin, period): sets the input debouncer
 //	adaptors.WithGpioEventOnFallingEdge/RaisingEdge/BothEdges(pin, handler): activate edge detection
 func NewAdaptor(opts ...func(adaptors.Optioner)) *Adaptor {
-	sys := system.NewAccesser(system.WithDigitalPinGpiodAccess())
+	sys := system.NewAccesser()
 	c := &Adaptor{
 		name: gobot.DefaultName("RockPi"),
 		sys:  sys,

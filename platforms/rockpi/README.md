@@ -64,7 +64,15 @@ i2c := r.GetConnection(address, bus)
 
 There are mapped to `/dev/i2c-[bus]`, just like the Gobot raspi implementation.
 
+### What's currently supported?
+
+- General digital pin GPIO access works, but not through the new character device driver.
+- The I2C buses 2, 6, 7 work
+- SPI buses 1, 2 work
+
 PWM interaction is currently not yet supported. 
+
+Please see the [official Radxa Rock Pi documentation](https://wiki.radxa.com/Rockpi4/dev/libmraa) on how `librmaa` can be utilized in combination with this module, and how these work.
 
 ### Compiling
 
