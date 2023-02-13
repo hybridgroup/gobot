@@ -14,12 +14,12 @@ func initTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *system.
 	return a, fs
 }
 
-func TestI2cDefaultBus(t *testing.T) {
+func TestDefaultI2cBus(t *testing.T) {
 	a, _ := initTestAdaptorWithMockedFilesystem([]string{})
 	gobottest.Assert(t, a.DefaultI2cBus(), 7)
 }
 
-func TestGetPinTranslation(t *testing.T) {
+func Test_getPinTranslatorFunction(t *testing.T) {
 	var cases = map[string]struct {
 		pin          string
 		model        string
@@ -68,7 +68,7 @@ func TestGetPinTranslation(t *testing.T) {
 	}
 }
 
-func TestValidateSpiBusNumber(t *testing.T) {
+func Test_validateSpiBusNumber(t *testing.T) {
 	var cases = map[string]struct {
 		busNr       int
 		expectedErr error
@@ -100,7 +100,7 @@ func TestValidateSpiBusNumber(t *testing.T) {
 	}
 }
 
-func TestValidateI2cBusNumber(t *testing.T) {
+func Test_validateI2cBusNumber(t *testing.T) {
 	var cases = map[string]struct {
 		busNr   int
 		wantErr error

@@ -13,7 +13,9 @@ Check out the output of `cat /proc/device-tree/model` to see which model you hav
 
 ## How to Install
 
-Make sure you've installed an official Linux image from Radxa with working drivers. Some versions or Armbian ISOs do not detect the newer SoC chips! See the [ROCK 4 Installation Wiki](https://wiki.radxa.com/Rock4/install) for your SBC setup.
+Make sure you've installed an official Linux image from Radxa with working drivers. See the [ROCK 4 Installation Wiki](https://wiki.radxa.com/Rock4/install) for your SBC setup.
+
+> Some versions or Armbian ISOs do not detect the newer SoC chips.
 
 As for your Gobot development, treat this as a regular Go package. It can be cross-compiled and copied over, or simply compiled on the SBC itself (tested and working with go 1.15.15 on linux/arm64, RockPi4C+).
 
