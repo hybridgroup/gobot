@@ -60,8 +60,9 @@ func Test_getPinTranslatorFunction(t *testing.T) {
 			fs := a.sys.UseMockFilesystem([]string{procDeviceTreeModel})
 			fs.Files[procDeviceTreeModel].Contents = tc.model
 			// act
-			_, line, err := fn(tc.pin)
+			chip, line, err := fn(tc.pin)
 			// assert
+			gobottest.Assert(t, chip, "")
 			gobottest.Assert(t, err, tc.expectedErr)
 			gobottest.Assert(t, line, tc.expectedLine)
 		})

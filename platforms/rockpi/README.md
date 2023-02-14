@@ -57,11 +57,11 @@ func main() {
 ```
 
 If you want to use I2C, RockPi4 offers three I2C buses: I2C2 (pins 27, 28), I2C6 (pins 29, 31) and I2C7 (pins 3, 5) of which I2C7 is the default.
-Changing this is a matter of passing the right bus number:
+Changing this is a matter of passing the right bus number using `i2c.WithBus`:
 
 ```go
-r := rockpi.NewAdaptor()
-i2c := r.GetConnection(address, bus)
+a := rockpi.NewAdaptor()
+adc2 := i2c.NewADS1115Driver(a, i2c.WithBus(6))
 ```
 
 There are mapped to `/dev/i2c-[bus]`, just like the Gobot raspi implementation.

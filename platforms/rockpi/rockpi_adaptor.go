@@ -134,9 +134,7 @@ func (c *Adaptor) getPinTranslatorFunction() func(string) (string, int, error) {
 			err = errors.New("Not a valid pin")
 			return
 		}
-		// The chipname is only used in char device GPIO access, which is not used by default.
-		// RockPi with an official Debian image and Linux 4.x has trouble getting kernel module to load /dev/gpiochipX.
-		return "gpiochip0", line, nil
+		return "", line, nil
 	}
 }
 
