@@ -96,6 +96,7 @@ func (a *AnalogActuatorDriver) Value() (val float64) {
 	return a.lastValue
 }
 
+// AnalogActuatorLinearScaler creates a linear scaler function from the given values.
 func AnalogActuatorLinearScaler(fromMin, fromMax float64, toMin, toMax int) func(input float64) (value int) {
 	m := float64(toMax-toMin) / (fromMax - fromMin)
 	n := float64(toMin) - m*fromMin

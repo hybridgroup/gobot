@@ -6,6 +6,7 @@ import (
 	"gobot.io/x/gobot"
 )
 
+// Some useful divider
 const (
 	Whole   = 4
 	Half    = 2
@@ -13,6 +14,7 @@ const (
 	Eighth  = 0.500
 )
 
+// Some items of the musical scale
 const (
 	Rest = 0
 	C0   = 16.35
@@ -202,6 +204,7 @@ func (l *BuzzerDriver) Toggle() (err error) {
 	return
 }
 
+// Tone is to make a sound with the given frequency
 func (l *BuzzerDriver) Tone(hz, duration float64) (err error) {
 	// calculation based off https://www.arduino.cc/en/Tutorial/Melody
 	tone := (1.0 / (2.0 * hz)) * 1000000.0

@@ -19,7 +19,6 @@ type DirectPinDriver struct {
 // Adds the following API Commands:
 // 	"DigitalRead" - See DirectPinDriver.DigitalRead
 // 	"DigitalWrite" - See DirectPinDriver.DigitalWrite
-// 	"AnalogWrite" - See DirectPinDriver.AnalogWrite
 // 	"PwmWrite" - See DirectPinDriver.PwmWrite
 // 	"ServoWrite" - See DirectPinDriver.ServoWrite
 func NewDirectPinDriver(a gobot.Connection, pin string) *DirectPinDriver {
@@ -68,7 +67,7 @@ func (d *DirectPinDriver) Start() (err error) { return }
 // Halt implements the Driver interface
 func (d *DirectPinDriver) Halt() (err error) { return }
 
-// Turn Off pin
+// Off turn off pin
 func (d *DirectPinDriver) Off() (err error) {
 	if writer, ok := d.Connection().(DigitalWriter); ok {
 		return writer.DigitalWrite(d.Pin(), byte(0))
@@ -77,7 +76,7 @@ func (d *DirectPinDriver) Off() (err error) {
 	return
 }
 
-// Turn On pin
+// On turn on pin
 func (d *DirectPinDriver) On() (err error) {
 	if writer, ok := d.Connection().(DigitalWriter); ok {
 		return writer.DigitalWrite(d.Pin(), byte(1))

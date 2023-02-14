@@ -6,6 +6,7 @@ import (
 	"gobot.io/x/gobot"
 )
 
+// Commands of the driver
 const (
 	AIP1640DataCmd  = 0x40
 	AIP1640DispCtrl = 0x88
@@ -21,7 +22,7 @@ const (
 //
 // Library ported from: https://github.com/wemos/WEMOS_Matrix_LED_Shield_Arduino_Library
 type AIP1640Driver struct {
-	pinClock  *DirectPinDriver
+	pinClock   *DirectPinDriver
 	pinData    *DirectPinDriver
 	name       string
 	intensity  byte
@@ -34,7 +35,7 @@ type AIP1640Driver struct {
 func NewAIP1640Driver(a gobot.Connection, clockPin string, dataPin string) *AIP1640Driver {
 	t := &AIP1640Driver{
 		name:       gobot.DefaultName("AIP1640Driver"),
-		pinClock:  NewDirectPinDriver(a, clockPin),
+		pinClock:   NewDirectPinDriver(a, clockPin),
 		pinData:    NewDirectPinDriver(a, dataPin),
 		intensity:  7,
 		connection: a,

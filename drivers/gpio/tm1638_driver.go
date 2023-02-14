@@ -8,12 +8,14 @@ import (
 	"gobot.io/x/gobot"
 )
 
+// Colors of the display
 const (
 	TM1638None = iota
 	TM1638Red
 	TM1638Green
 )
 
+// Commands of the driver
 const (
 	TM1638DataCmd  = 0x40
 	TM1638DispCtrl = 0x80
@@ -31,9 +33,8 @@ const (
 // Datasheet CN: http://www.datasheetspdf.com/pdf/775356/TitanMicro/TM1638/1
 //
 // Ported from the Arduino driver https://github.com/rjbatista/tm1638-library
-
 type TM1638Driver struct {
-	pinClock  *DirectPinDriver
+	pinClock   *DirectPinDriver
 	pinData    *DirectPinDriver
 	pinStrobe  *DirectPinDriver
 	fonts      map[string]byte
@@ -46,7 +47,7 @@ type TM1638Driver struct {
 func NewTM1638Driver(a gobot.Connection, clockPin string, dataPin string, strobePin string) *TM1638Driver {
 	t := &TM1638Driver{
 		name:       gobot.DefaultName("TM1638"),
-		pinClock:  NewDirectPinDriver(a, clockPin),
+		pinClock:   NewDirectPinDriver(a, clockPin),
 		pinData:    NewDirectPinDriver(a, dataPin),
 		pinStrobe:  NewDirectPinDriver(a, strobePin),
 		fonts:      NewTM1638Fonts(),
