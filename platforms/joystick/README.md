@@ -9,6 +9,7 @@ Current configurations included:
 - Thrustmaster T-Flight Hotas X Joystick
 - XBox360 game controller
 - XBox360 "Rock Band" drum controller
+- Nintendo Switch Joy-Con controller pair
 
 ## How to Install
 
