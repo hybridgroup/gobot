@@ -1,0 +1,7 @@
+version: 2
+updates:
+  - package-ecosystem: "gomod"    
+    # Raise pull requests for version updates
+    # for go modules against the `dev` branch
+    target-branch: "dev"
+    
