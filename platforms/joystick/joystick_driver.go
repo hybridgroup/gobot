@@ -31,6 +31,12 @@ const (
 
 	// Configuration for the Xbox One controller.
 	XboxOne = "xboxOne"
+
+	// Nvidia Shield TV Controller
+	Shield = "shield"
+
+	// Nintendo Switch Joycon Controller Pair
+	NintendoSwitchPair = "joyconPair"
 )
 
 // Driver represents a joystick
@@ -135,6 +141,10 @@ func (j *Driver) Start() (err error) {
 		j.config = xbox360RockBandDrumsConfig
 	case XboxOne:
 		j.config = xboxOneConfig
+	case Shield:
+		j.config = shieldConfig
+	case NintendoSwitchPair:
+		j.config = joyconPairConfig
 	default:
 		err := j.loadFile()
 		if err != nil {
