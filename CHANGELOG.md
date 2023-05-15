@@ -1,3 +1,83 @@
+2.0.0
+---
+* **bugfix**
+  * I2C connection-bus caching and multiple device usage
+  * raspi pwm cache
+  * new pwm behaviour of tinkerboard
+  * jetson nano pwm feature
+  * examples and gopigo3 driver
+  * i2c.ReadBlockData(), Read_Data() in digispark and some small other fixes
+  * L3GD20H full scale range usage
+  * TH02 wrong register usage for read heater
+  * MPU6050 wrong initialize and reduced temperature resolution
+  * I2C driver typo: change HMC8553L to HMC5883L
+  * HMC5883L driver returns wrong values
+  * ads1x15 driver not working stable when reading multiple inputs
+  * Adafruit1109 driver shows bad characters after Halt()
+  * spi.SpiConnection is not gobot.Connection: missing method Connect
+  * Stopping and Starting Robot with Raspberry Pi Adapter and LED Driver - LED does not toggle on restart
+* **ble**
+  * update to TinyGo Bluetooth package v0.6.0 release
+* **build**
+  * update appveyor for go 1.19
+  * switch to new cimg with golang 1.17
+  * new home path for cimg
+  * check examples in CI ([#884](https://github.com/hybridgroup/gobot/issues/884))
+  * add tests of more platforms to CI
+  * add configuration file for dependabot ([#907](https://github.com/hybridgroup/gobot/issues/907))
+  * add PR template
+* **core**
+  * use base driver for all I2C devices
+  * rename package "sysfs" to "system"
+  * go.mod to 1.17 and all modules incl. code upgrades
+* **dji tello**
+  * Halt does not terminate all the related goroutines and may wait forever when it is called multiple times
+* **docs**
+  * README for gpio, pwm, i2c and add example
+  * document fields for flight data
+* **drivers**
+  * ADXL345 use ReadBlockData()
+  * CCS811 use ReadBlockData()
+  * bmxy8z use ReadBlockData
+  * CCS811 use ReadBlockData()
+  * BMP180, BMP280 BMP388 BME280 use ReadBlockData()
+  * MPL115A2 use ReadBlockData(), WriteByteData()
+  * add generic i2c driver
+  * add PCF8583 i2c driver
+  * add PCA9501 i2c driver
+  * add PCA953x i2c driver
+  * introduce I2cBusAdaptor for composition in platforms
+  * introduce generic i2c.Driver with example for digispark fix missing/wrong entries in README stabilize test
+  * add advanced digital pin options (pull, bias, drive, debounce, event)
+  * add support for new character device Kernel ABI for GPIO
+  * analog sensor driver to prevent ReadValue() to get float64
+  * add read firmware version and DHT sensors for grovepi
+  * SPI using GPIO's plus driver for MFRC522
+* **jetson nano**
+  * add Jetson Nano adpator
+* **joystick**
+  * add Xbox-One controller
+  * add configuration for Nintendo Switch controllers ([#903](https://github.com/hybridgroup/gobot/issues/903))
+  * add Dualsense joystick (PlayStation 5) ([#880](https://github.com/hybridgroup/gobot/issues/880))
+* **nanopi neo**
+  * add platform
+* **piblaster**
+  * add unused but missing interface implementation
+* **radxa rock pi 4(c+)**
+  * add platform ([#902](https://github.com/hybridgroup/gobot/issues/902))
+* **test**
+  * increase some timings to make tests a little less fragile
+  * skip test TestNatsAdaptorFailedConnect when flaky
+  * stabilize "every"-test
+  * stabilize flaky utils_test
+  * stabilize firmata tests
+  * fix tests with sysfs mocks, ReadBlockData, WriteBlockData
+  * fix keyboard tests and exclude opencv
+  * fix PWM related read/write tests
+  * add check for examples in Makefile
+* **BREAKING CANGES**
+  * some interfaces moved, see folder system and adaptor.go
+
 1.16.0
 ---
 * **bugfix**
