@@ -4,21 +4,30 @@ import (
 	"errors"
 	"testing"
 
+	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/gobottest"
-	"gobot.io/x/gobot/sysfs"
+	"gobot.io/x/gobot/system"
 )
 
-var _ sysfs.PWMPinner = (*PWMPin)(nil)
+var _ gobot.PWMPinner = (*PWMPin)(nil)
 
 func TestPwmPin(t *testing.T) {
-	pin := NewPWMPin("1")
+	const path = "/dev/pi-blaster"
+	a := system.NewAccesser()
+	a.UseMockFilesystem([]string{path})
+
+	pin := NewPWMPin(a, path, "1")
+
 	gobottest.Assert(t, pin.Export(), nil)
-	gobottest.Assert(t, pin.Enable(true), nil)
+	gobottest.Assert(t, pin.SetEnabled(true), nil)
+
 	val, _ := pin.Polarity()
-	gobottest.Assert(t, val, "normal")
-	gobottest.Assert(t, pin.InvertPolarity(true), nil)
+	gobottest.Assert(t, val, true)
+
+	gobottest.Assert(t, pin.SetPolarity(false), nil)
+
 	val, _ = pin.Polarity()
-	gobottest.Assert(t, val, "normal")
+	gobottest.Assert(t, val, true)
 
 	period, err := pin.Period()
 	gobottest.Assert(t, err, errors.New("Raspi PWM pin period not set"))
@@ -32,15 +41,14 @@ func TestPwmPin(t *testing.T) {
 	dc, _ := pin.DutyCycle()
 	gobottest.Assert(t, dc, uint32(0))
 
-	// call currently fails in test
-	gobottest.Refute(t, pin.SetDutyCycle(10000), nil)
+	gobottest.Assert(t, pin.SetDutyCycle(10000), nil)
+
 	dc, _ = pin.DutyCycle()
 	gobottest.Assert(t, dc, uint32(10000))
 
-	gobottest.Assert(t, pin.SetDutyCycle(999999999), errors.New("Duty cycle exceeds period."))
+	gobottest.Assert(t, pin.SetDutyCycle(999999999), errors.New("Duty cycle exceeds period"))
 	dc, _ = pin.DutyCycle()
 	gobottest.Assert(t, dc, uint32(10000))
 
-	// call currently fails in test
-	gobottest.Refute(t, pin.Unexport(), nil)
+	gobottest.Assert(t, pin.Unexport(), nil)
 }

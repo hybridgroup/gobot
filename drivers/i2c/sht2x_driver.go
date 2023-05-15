@@ -25,13 +25,11 @@ import (
 	"time"
 
 	"github.com/sigurn/crc8"
-	"gobot.io/x/gobot"
 )
 
-const (
-	// SHT2xDefaultAddress is the default I2C address for SHT2x
-	SHT2xDefaultAddress = 0x40
+const sht2xDefaultAddress = 0x40
 
+const (
 	// SHT2xAccuracyLow is the faster, but lower accuracy sample setting
 	//  0/1 = 8bit RH, 12bit Temp
 	SHT2xAccuracyLow = byte(0x01)
@@ -69,12 +67,8 @@ const (
 
 // SHT2xDriver is a Driver for a SHT2x humidity and temperature sensor
 type SHT2xDriver struct {
-	Units string
-
-	name       string
-	connector  Connector
-	connection Connection
-	Config
+	*Driver
+	Units        string
 	sht2xAddress int
 	accuracy     byte
 	delay        time.Duration
@@ -83,59 +77,36 @@ type SHT2xDriver struct {
 
 // NewSHT2xDriver creates a new driver with specified i2c interface
 // Params:
-//		conn Connector - the Adaptor to use with this Driver
+//		c Connector - the Adaptor to use with this Driver
 //
 // Optional params:
 //		i2c.WithBus(int):	bus to use with this driver
 //		i2c.WithAddress(int):	address to use with this driver
 //
-func NewSHT2xDriver(a Connector, options ...func(Config)) *SHT2xDriver {
+func NewSHT2xDriver(c Connector, options ...func(Config)) *SHT2xDriver {
 	// From the document "CRC Checksum Calculation -- For Safe Communication with SHT2x Sensors":
-	crc8Params := crc8.Params{0x31, 0x00, false, false, 0x00, 0x00, "CRC-8/SENSIRION-SHT2x"}
-	s := &SHT2xDriver{
-		Units:     "C",
-		name:      gobot.DefaultName("SHT2x"),
-		connector: a,
-		Config:    NewConfig(),
-		crcTable:  crc8.MakeTable(crc8Params),
+	crc8Params := crc8.Params{
+		Poly:   0x31,
+		Init:   0x00,
+		RefIn:  false,
+		RefOut: false,
+		XorOut: 0x00,
+		Check:  0x00,
+		Name:   "CRC-8/SENSIRION-SHT2x",
 	}
+	d := &SHT2xDriver{
+		Driver:   NewDriver(c, "SHT2x", sht2xDefaultAddress),
+		Units:    "C",
+		crcTable: crc8.MakeTable(crc8Params),
+	}
+	d.afterStart = d.initialize
 
 	for _, option := range options {
-		option(s)
+		option(d)
 	}
 
-	return s
+	return d
 }
-
-// Name returns the name for this Driver
-func (d *SHT2xDriver) Name() string { return d.name }
-
-// SetName sets the name for this Driver
-func (d *SHT2xDriver) SetName(n string) { d.name = n }
-
-// Connection returns the connection for this Driver
-func (d *SHT2xDriver) Connection() gobot.Connection { return d.connector.(gobot.Connection) }
-
-// Start initializes the SHT2x
-func (d *SHT2xDriver) Start() (err error) {
-	bus := d.GetBusOrDefault(d.connector.GetDefaultBus())
-	address := d.GetAddressOrDefault(SHT2xDefaultAddress)
-
-	if d.connection, err = d.connector.GetConnection(address, bus); err != nil {
-		return
-	}
-
-	if err = d.Reset(); err != nil {
-		return
-	}
-
-	d.sendAccuracy()
-
-	return
-}
-
-// Halt returns true if devices is halted successfully
-func (d *SHT2xDriver) Halt() (err error) { return }
 
 func (d *SHT2xDriver) Accuracy() byte { return d.accuracy }
 
@@ -228,6 +199,16 @@ func (d *SHT2xDriver) readSensor(cmd byte) (read uint16, err error) {
 	read &= 0xfffc // clear two low bits (status bits)
 
 	return
+}
+
+func (d *SHT2xDriver) initialize() error {
+	if err := d.Reset(); err != nil {
+		return err
+	}
+
+	d.sendAccuracy()
+
+	return nil
 }
 
 func (d *SHT2xDriver) sendAccuracy() (err error) {

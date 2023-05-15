@@ -4,12 +4,27 @@ import (
 	"bytes"
 	"encoding/binary"
 	"errors"
+	"log"
 )
 
-const bme280RegisterControlHumidity = 0xF2
-const bme280RegisterHumidityMSB = 0xFD
-const bme280RegisterCalibDigH1 = 0xa1
-const bme280RegisterCalibDigH2LSB = 0xe1
+const bme280Debug = true
+
+type BME280HumidityOversampling uint8
+
+const (
+	bme280RegCalibDigH1      = 0xA1
+	bme280RegCalibDigH2LSB   = 0xE1
+	bme280RegControlHumidity = 0xF2
+	bme280RegHumidityMSB     = 0xFD
+
+	// bits 0, 1, 3 of control humidity register
+	BME280CtrlHumidityNoMeasurement  BME280HumidityOversampling = 0x00 // no measurement (value will be 0x08 0x00 0x00)
+	BME280CtrlHumidityOversampling1  BME280HumidityOversampling = 0x01
+	BME280CtrlHumidityOversampling2  BME280HumidityOversampling = 0x02
+	BME280CtrlHumidityOversampling4  BME280HumidityOversampling = 0x03
+	BME280CtrlHumidityOversampling8  BME280HumidityOversampling = 0x04
+	BME280CtrlHumidityOversampling16 BME280HumidityOversampling = 0x05 // same as 0x06, 0x07
+)
 
 type bmeHumidityCalibrationCoefficients struct {
 	h1 uint8
@@ -28,7 +43,8 @@ type bmeHumidityCalibrationCoefficients struct {
 //
 type BME280Driver struct {
 	*BMP280Driver
-	hc *bmeHumidityCalibrationCoefficients
+	humCalCoeffs    *bmeHumidityCalibrationCoefficients
+	ctrlHumOversamp BME280HumidityOversampling
 }
 
 // NewBME280Driver creates a new driver with specified i2c interface.
@@ -40,28 +56,89 @@ type BME280Driver struct {
 //		i2c.WithAddress(int):	address to use with this driver
 //
 func NewBME280Driver(c Connector, options ...func(Config)) *BME280Driver {
-	b := &BME280Driver{
-		BMP280Driver: NewBMP280Driver(c),
-		hc:           &bmeHumidityCalibrationCoefficients{},
+	d := &BME280Driver{
+		BMP280Driver:    NewBMP280Driver(c),
+		humCalCoeffs:    &bmeHumidityCalibrationCoefficients{},
+		ctrlHumOversamp: BME280CtrlHumidityOversampling16,
 	}
+	d.afterStart = d.initializationBME280
 
+	// this loop is for options of this class, all options of base class BMP280Driver
+	// must be added in this class for usage
 	for _, option := range options {
-		option(b)
+		option(d)
 	}
 
 	// TODO: expose commands to API
-	return b
+	return d
 }
 
-// Start initializes the BME280 and loads the calibration coefficients.
-func (d *BME280Driver) Start() (err error) {
-	bus := d.GetBusOrDefault(d.connector.GetDefaultBus())
-	address := d.GetAddressOrDefault(bmp180Address)
-
-	if d.connection, err = d.connector.GetConnection(address, bus); err != nil {
-		return err
+// WithBME280PressureOversampling option sets the oversampling for pressure.
+// Valid settings are of type "BMP280PressureOversampling"
+func WithBME280PressureOversampling(val BMP280PressureOversampling) func(Config) {
+	return func(c Config) {
+		if d, ok := c.(*BME280Driver); ok {
+			d.ctrlPressOversamp = val
+		} else if bme280Debug {
+			log.Printf("Trying to set pressure oversampling for non-BME280Driver %v", c)
+		}
 	}
+}
 
+// WithBME280TemperatureOversampling option sets oversampling for temperature.
+// Valid settings are of type "BMP280TemperatureOversampling"
+func WithBME280TemperatureOversampling(val BMP280TemperatureOversampling) func(Config) {
+	return func(c Config) {
+		if d, ok := c.(*BME280Driver); ok {
+			d.ctrlTempOversamp = val
+		} else if bme280Debug {
+			log.Printf("Trying to set temperature oversampling for non-BME280Driver %v", c)
+		}
+	}
+}
+
+// WithBME280IIRFilter option sets the count of IIR filter coefficients.
+// Valid settings are of type "BMP280IIRFilter"
+func WithBME280IIRFilter(val BMP280IIRFilter) func(Config) {
+	return func(c Config) {
+		if d, ok := c.(*BME280Driver); ok {
+			d.confFilter = val
+		} else if bme280Debug {
+			log.Printf("Trying to set IIR filter for non-BME280Driver %v", c)
+		}
+	}
+}
+
+// WithBME280HumidityOversampling option sets the oversampling for humidity.
+// Valid settings are of type "BME280HumidityOversampling"
+func WithBME280HumidityOversampling(val BME280HumidityOversampling) func(Config) {
+	return func(c Config) {
+		if d, ok := c.(*BME280Driver); ok {
+			d.ctrlHumOversamp = val
+		} else if bme280Debug {
+			log.Printf("Trying to set humidity oversampling for non-BME280Driver %v", c)
+		}
+	}
+}
+
+// Humidity returns the current humidity in percentage of relative humidity
+func (d *BME280Driver) Humidity() (humidity float32, err error) {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
+
+	var rawH uint32
+	if rawH, err = d.rawHumidity(); err != nil {
+		return 0.0, err
+	}
+	humidity = d.calculateHumidity(rawH)
+	return
+}
+
+func (d *BME280Driver) initializationBME280() (err error) {
+	// call the initialization routine of base class BMP280Driver, which do:
+	// * initializes temperature and pressure calibration coefficients
+	// * set the control register
+	// * set the configuration register
 	if err := d.initialization(); err != nil {
 		return err
 	}
@@ -73,26 +150,17 @@ func (d *BME280Driver) Start() (err error) {
 	return nil
 }
 
-// Humidity returns the current humidity in percentage of relative humidity
-func (d *BME280Driver) Humidity() (humidity float32, err error) {
-	var rawH uint32
-	if rawH, err = d.rawHumidity(); err != nil {
-		return 0.0, err
-	}
-	humidity = d.calculateHumidity(rawH)
-	return
-}
-
 // read the humidity calibration coefficients.
 func (d *BME280Driver) initHumidity() (err error) {
-	var coefficients []byte
-	if coefficients, err = d.read(bme280RegisterCalibDigH1, 1); err != nil {
+	var hch1 byte
+	if hch1, err = d.connection.ReadByteData(bme280RegCalibDigH1); err != nil {
 		return err
 	}
-	buf := bytes.NewBuffer(coefficients)
-	binary.Read(buf, binary.BigEndian, &d.hc.h1)
+	buf := bytes.NewBuffer([]byte{hch1})
+	binary.Read(buf, binary.BigEndian, &d.humCalCoeffs.h1)
 
-	if coefficients, err = d.read(bme280RegisterCalibDigH2LSB, 7); err != nil {
+	coefficients := make([]byte, 7)
+	if err = d.connection.ReadBlockData(bme280RegCalibDigH2LSB, coefficients); err != nil {
 		return err
 	}
 	buf = bytes.NewBuffer(coefficients)
@@ -102,32 +170,32 @@ func (d *BME280Driver) initHumidity() (err error) {
 	var addrE5 byte
 	var addrE6 byte
 
-	binary.Read(buf, binary.LittleEndian, &d.hc.h2) // E1 ...
-	binary.Read(buf, binary.BigEndian, &d.hc.h3)    // E3
-	binary.Read(buf, binary.BigEndian, &addrE4)     // E4
-	binary.Read(buf, binary.BigEndian, &addrE5)     // E5
-	binary.Read(buf, binary.BigEndian, &addrE6)     // E6
-	binary.Read(buf, binary.BigEndian, &d.hc.h6)    // ... E7
+	binary.Read(buf, binary.LittleEndian, &d.humCalCoeffs.h2) // E1 ...
+	binary.Read(buf, binary.BigEndian, &d.humCalCoeffs.h3)    // E3
+	binary.Read(buf, binary.BigEndian, &addrE4)               // E4
+	binary.Read(buf, binary.BigEndian, &addrE5)               // E5
+	binary.Read(buf, binary.BigEndian, &addrE6)               // E6
+	binary.Read(buf, binary.BigEndian, &d.humCalCoeffs.h6)    // ... E7
 
-	d.hc.h4 = 0 + (int16(addrE4) << 4) | (int16(addrE5 & 0x0F))
-	d.hc.h5 = 0 + (int16(addrE6) << 4) | (int16(addrE5) >> 4)
+	d.humCalCoeffs.h4 = 0 + (int16(addrE4) << 4) | (int16(addrE5 & 0x0F))
+	d.humCalCoeffs.h5 = 0 + (int16(addrE6) << 4) | (int16(addrE5) >> 4)
 
-	d.connection.WriteByteData(bme280RegisterControlHumidity, 0x3F)
-
-	// The 'ctrl_hum' register sets the humidity data acquisition options of
+	// The 'ctrl_hum' register (0xF2) sets the humidity data acquisition options of
 	// the device. Changes to this register only become effective after a write
-	// operation to 'ctrl_meas'. Read the current value in, then write it back
+	// operation to 'ctrl_meas' (0xF4). So we read the current value in, then write it back
+	d.connection.WriteByteData(bme280RegControlHumidity, uint8(d.ctrlHumOversamp))
+
 	var cmr uint8
-	cmr, err = d.connection.ReadByteData(bmp280RegisterControl)
+	cmr, err = d.connection.ReadByteData(bmp280RegCtrl)
 	if err == nil {
-		err = d.connection.WriteByteData(bmp280RegisterControl, cmr)
+		err = d.connection.WriteByteData(bmp280RegCtrl, cmr)
 	}
 	return err
 }
 
 func (d *BME280Driver) rawHumidity() (uint32, error) {
-	ret, err := d.read(bme280RegisterHumidityMSB, 2)
-	if err != nil {
+	ret := make([]byte, 2)
+	if err := d.connection.ReadBlockData(bme280RegHumidityMSB, ret); err != nil {
 		return 0, err
 	}
 	if ret[0] == 0x80 && ret[1] == 0x00 {
@@ -158,14 +226,14 @@ func (d *BME280Driver) calculateHumidity(rawH uint32) float32 {
 		return 0 // TODO err is 'invalid data' from Bosch - include errors or not?
 	}
 
-	x := float32(rawH) - (float32(d.hc.h4)*64.0 +
-		(float32(d.hc.h5) / 16384.0 * h))
+	x := float32(rawH) - (float32(d.humCalCoeffs.h4)*64.0 +
+		(float32(d.humCalCoeffs.h5) / 16384.0 * h))
 
-	y := float32(d.hc.h2) / 65536.0 *
-		(1.0 + float32(d.hc.h6)/67108864.0*h*
-			(1.0+float32(d.hc.h3)/67108864.0*h))
+	y := float32(d.humCalCoeffs.h2) / 65536.0 *
+		(1.0 + float32(d.humCalCoeffs.h6)/67108864.0*h*
+			(1.0+float32(d.humCalCoeffs.h3)/67108864.0*h))
 
 	h = x * y
-	h = h * (1 - float32(d.hc.h1)*h/524288)
+	h = h * (1 - float32(d.humCalCoeffs.h1)*h/524288)
 	return h
 }

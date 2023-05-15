@@ -16,12 +16,14 @@ var _ i2c.Connector = (*Adaptor)(nil)
 var i2cData = []byte{5, 4, 3, 2, 1, 0}
 
 type i2cMock struct {
-	address      int
-	duration     uint
-	direction    uint8
-	dataWritten  []byte
-	startWasSend bool
-	stopWasSend  bool
+	address           int
+	duration          uint
+	direction         uint8
+	dataWritten       []byte
+	writeStartWasSend bool
+	writeStopWasSend  bool
+	readStartWasSend  bool
+	readStopWasSend   bool
 }
 
 func initTestAdaptorI2c() *Adaptor {
@@ -31,26 +33,26 @@ func initTestAdaptorI2c() *Adaptor {
 	return a
 }
 
-func TestDigisparkAdaptorI2cGetConnection(t *testing.T) {
+func TestDigisparkAdaptorI2cGetI2cConnection(t *testing.T) {
 	// arrange
 	var c i2c.Connection
 	var err error
 	a := initTestAdaptorI2c()
 
 	// act
-	c, err = a.GetConnection(availableI2cAddress, a.GetDefaultBus())
+	c, err = a.GetI2cConnection(availableI2cAddress, a.DefaultI2cBus())
 
 	// assert
 	gobottest.Assert(t, err, nil)
 	gobottest.Refute(t, c, nil)
 }
 
-func TestDigisparkAdaptorI2cGetConnectionFailWithInvalidBus(t *testing.T) {
+func TestDigisparkAdaptorI2cGetI2cConnectionFailWithInvalidBus(t *testing.T) {
 	// arrange
 	a := initTestAdaptorI2c()
 
 	// act
-	c, err := a.GetConnection(0x40, 1)
+	c, err := a.GetI2cConnection(0x40, 1)
 
 	// assert
 	gobottest.Assert(t, err, errors.New("Invalid bus number 1, only 0 is supported"))
@@ -61,7 +63,7 @@ func TestDigisparkAdaptorI2cStartFailWithWrongAddress(t *testing.T) {
 	// arrange
 	data := []byte{0, 1, 2, 3, 4}
 	a := initTestAdaptorI2c()
-	c, err := a.GetConnection(0x39, a.GetDefaultBus())
+	c, err := a.GetI2cConnection(0x39, a.DefaultI2cBus())
 
 	// act
 	count, err := c.Write(data)
@@ -77,35 +79,39 @@ func TestDigisparkAdaptorI2cWrite(t *testing.T) {
 	data := []byte{0, 1, 2, 3, 4}
 	dataLen := len(data)
 	a := initTestAdaptorI2c()
-	c, err := a.GetConnection(availableI2cAddress, a.GetDefaultBus())
+	c, err := a.GetI2cConnection(availableI2cAddress, a.DefaultI2cBus())
 
 	// act
 	count, err := c.Write(data)
 
 	// assert
 	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, a.littleWire.(*i2cMock).startWasSend, true)
+	gobottest.Assert(t, a.littleWire.(*i2cMock).writeStartWasSend, true)
+	gobottest.Assert(t, a.littleWire.(*i2cMock).readStartWasSend, false)
 	gobottest.Assert(t, a.littleWire.(*i2cMock).direction, uint8(0))
 	gobottest.Assert(t, count, dataLen)
 	gobottest.Assert(t, a.littleWire.(*i2cMock).dataWritten, data)
-	gobottest.Assert(t, a.littleWire.(*i2cMock).stopWasSend, true)
+	gobottest.Assert(t, a.littleWire.(*i2cMock).writeStopWasSend, true)
+	gobottest.Assert(t, a.littleWire.(*i2cMock).readStopWasSend, false)
 }
 
 func TestDigisparkAdaptorI2cWriteByte(t *testing.T) {
 	// arrange
 	data := byte(0x02)
 	a := initTestAdaptorI2c()
-	c, err := a.GetConnection(availableI2cAddress, a.GetDefaultBus())
+	c, err := a.GetI2cConnection(availableI2cAddress, a.DefaultI2cBus())
 
 	// act
 	err = c.WriteByte(data)
 
 	// assert
 	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, a.littleWire.(*i2cMock).startWasSend, true)
+	gobottest.Assert(t, a.littleWire.(*i2cMock).writeStartWasSend, true)
+	gobottest.Assert(t, a.littleWire.(*i2cMock).readStartWasSend, false)
 	gobottest.Assert(t, a.littleWire.(*i2cMock).direction, uint8(0))
 	gobottest.Assert(t, a.littleWire.(*i2cMock).dataWritten, []byte{data})
-	gobottest.Assert(t, a.littleWire.(*i2cMock).stopWasSend, true)
+	gobottest.Assert(t, a.littleWire.(*i2cMock).writeStopWasSend, true)
+	gobottest.Assert(t, a.littleWire.(*i2cMock).readStopWasSend, false)
 }
 
 func TestDigisparkAdaptorI2cWriteByteData(t *testing.T) {
@@ -113,17 +119,19 @@ func TestDigisparkAdaptorI2cWriteByteData(t *testing.T) {
 	reg := uint8(0x03)
 	data := byte(0x09)
 	a := initTestAdaptorI2c()
-	c, err := a.GetConnection(availableI2cAddress, a.GetDefaultBus())
+	c, err := a.GetI2cConnection(availableI2cAddress, a.DefaultI2cBus())
 
 	// act
 	err = c.WriteByteData(reg, data)
 
 	// assert
 	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, a.littleWire.(*i2cMock).startWasSend, true)
+	gobottest.Assert(t, a.littleWire.(*i2cMock).writeStartWasSend, true)
+	gobottest.Assert(t, a.littleWire.(*i2cMock).readStartWasSend, false)
 	gobottest.Assert(t, a.littleWire.(*i2cMock).direction, uint8(0))
 	gobottest.Assert(t, a.littleWire.(*i2cMock).dataWritten, []byte{reg, data})
-	gobottest.Assert(t, a.littleWire.(*i2cMock).stopWasSend, true)
+	gobottest.Assert(t, a.littleWire.(*i2cMock).writeStopWasSend, true)
+	gobottest.Assert(t, a.littleWire.(*i2cMock).readStopWasSend, false)
 }
 
 func TestDigisparkAdaptorI2cWriteWordData(t *testing.T) {
@@ -131,17 +139,39 @@ func TestDigisparkAdaptorI2cWriteWordData(t *testing.T) {
 	reg := uint8(0x04)
 	data := uint16(0x0508)
 	a := initTestAdaptorI2c()
-	c, err := a.GetConnection(availableI2cAddress, a.GetDefaultBus())
+	c, err := a.GetI2cConnection(availableI2cAddress, a.DefaultI2cBus())
 
 	// act
 	err = c.WriteWordData(reg, data)
 
 	// assert
 	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, a.littleWire.(*i2cMock).startWasSend, true)
+	gobottest.Assert(t, a.littleWire.(*i2cMock).writeStartWasSend, true)
+	gobottest.Assert(t, a.littleWire.(*i2cMock).readStartWasSend, false)
 	gobottest.Assert(t, a.littleWire.(*i2cMock).direction, uint8(0))
 	gobottest.Assert(t, a.littleWire.(*i2cMock).dataWritten, []byte{reg, 0x08, 0x05})
-	gobottest.Assert(t, a.littleWire.(*i2cMock).stopWasSend, true)
+	gobottest.Assert(t, a.littleWire.(*i2cMock).writeStopWasSend, true)
+	gobottest.Assert(t, a.littleWire.(*i2cMock).readStopWasSend, false)
+}
+
+func TestDigisparkAdaptorI2cWriteBlockData(t *testing.T) {
+	// arrange
+	reg := uint8(0x05)
+	data := []byte{0x80, 0x81, 0x82}
+	a := initTestAdaptorI2c()
+	c, err := a.GetI2cConnection(availableI2cAddress, a.DefaultI2cBus())
+
+	// act
+	err = c.WriteBlockData(reg, data)
+
+	// assert
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, a.littleWire.(*i2cMock).writeStartWasSend, true)
+	gobottest.Assert(t, a.littleWire.(*i2cMock).readStartWasSend, false)
+	gobottest.Assert(t, a.littleWire.(*i2cMock).direction, uint8(0))
+	gobottest.Assert(t, a.littleWire.(*i2cMock).dataWritten, append([]byte{reg}, data...))
+	gobottest.Assert(t, a.littleWire.(*i2cMock).writeStopWasSend, true)
+	gobottest.Assert(t, a.littleWire.(*i2cMock).readStopWasSend, false)
 }
 
 func TestDigisparkAdaptorI2cRead(t *testing.T) {
@@ -149,7 +179,7 @@ func TestDigisparkAdaptorI2cRead(t *testing.T) {
 	data := []byte{0, 1, 2, 3, 4}
 	dataLen := len(data)
 	a := initTestAdaptorI2c()
-	c, err := a.GetConnection(availableI2cAddress, a.GetDefaultBus())
+	c, err := a.GetI2cConnection(availableI2cAddress, a.DefaultI2cBus())
 
 	// act
 	count, err := c.Read(data)
@@ -157,44 +187,50 @@ func TestDigisparkAdaptorI2cRead(t *testing.T) {
 	// assert
 	gobottest.Assert(t, count, dataLen)
 	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, a.littleWire.(*i2cMock).startWasSend, true)
+	gobottest.Assert(t, a.littleWire.(*i2cMock).writeStartWasSend, false)
+	gobottest.Assert(t, a.littleWire.(*i2cMock).readStartWasSend, true)
 	gobottest.Assert(t, a.littleWire.(*i2cMock).direction, uint8(1))
 	gobottest.Assert(t, data, i2cData[:dataLen])
-	gobottest.Assert(t, a.littleWire.(*i2cMock).stopWasSend, true)
+	gobottest.Assert(t, a.littleWire.(*i2cMock).writeStopWasSend, false)
+	gobottest.Assert(t, a.littleWire.(*i2cMock).readStopWasSend, true)
 }
 
 func TestDigisparkAdaptorI2cReadByte(t *testing.T) {
 	// arrange
 	a := initTestAdaptorI2c()
-	c, err := a.GetConnection(availableI2cAddress, a.GetDefaultBus())
+	c, err := a.GetI2cConnection(availableI2cAddress, a.DefaultI2cBus())
 
 	// act
 	data, err := c.ReadByte()
 
 	// assert
 	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, a.littleWire.(*i2cMock).startWasSend, true)
+	gobottest.Assert(t, a.littleWire.(*i2cMock).writeStartWasSend, false)
+	gobottest.Assert(t, a.littleWire.(*i2cMock).readStartWasSend, true)
 	gobottest.Assert(t, a.littleWire.(*i2cMock).direction, uint8(1))
 	gobottest.Assert(t, data, i2cData[0])
-	gobottest.Assert(t, a.littleWire.(*i2cMock).stopWasSend, true)
+	gobottest.Assert(t, a.littleWire.(*i2cMock).writeStopWasSend, false)
+	gobottest.Assert(t, a.littleWire.(*i2cMock).readStopWasSend, true)
 }
 
 func TestDigisparkAdaptorI2cReadByteData(t *testing.T) {
 	// arrange
 	reg := uint8(0x04)
 	a := initTestAdaptorI2c()
-	c, err := a.GetConnection(availableI2cAddress, a.GetDefaultBus())
+	c, err := a.GetI2cConnection(availableI2cAddress, a.DefaultI2cBus())
 
 	// act
 	data, err := c.ReadByteData(reg)
 
 	// assert
 	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, a.littleWire.(*i2cMock).startWasSend, true)
+	gobottest.Assert(t, a.littleWire.(*i2cMock).writeStartWasSend, true)
+	gobottest.Assert(t, a.littleWire.(*i2cMock).readStartWasSend, true)
 	gobottest.Assert(t, a.littleWire.(*i2cMock).direction, uint8(1))
 	gobottest.Assert(t, a.littleWire.(*i2cMock).dataWritten, []byte{reg})
 	gobottest.Assert(t, data, i2cData[0])
-	gobottest.Assert(t, a.littleWire.(*i2cMock).stopWasSend, true)
+	gobottest.Assert(t, a.littleWire.(*i2cMock).writeStopWasSend, false)
+	gobottest.Assert(t, a.littleWire.(*i2cMock).readStopWasSend, true)
 }
 
 func TestDigisparkAdaptorI2cReadWordData(t *testing.T) {
@@ -203,18 +239,42 @@ func TestDigisparkAdaptorI2cReadWordData(t *testing.T) {
 	// 2 bytes of i2cData are used swapped
 	expectedValue := uint16(0x0405)
 	a := initTestAdaptorI2c()
-	c, err := a.GetConnection(availableI2cAddress, a.GetDefaultBus())
+	c, err := a.GetI2cConnection(availableI2cAddress, a.DefaultI2cBus())
 
 	// act
 	data, err := c.ReadWordData(reg)
 
 	// assert
 	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, a.littleWire.(*i2cMock).startWasSend, true)
+	gobottest.Assert(t, a.littleWire.(*i2cMock).writeStartWasSend, true)
+	gobottest.Assert(t, a.littleWire.(*i2cMock).readStartWasSend, true)
 	gobottest.Assert(t, a.littleWire.(*i2cMock).direction, uint8(1))
 	gobottest.Assert(t, a.littleWire.(*i2cMock).dataWritten, []byte{reg})
 	gobottest.Assert(t, data, expectedValue)
-	gobottest.Assert(t, a.littleWire.(*i2cMock).stopWasSend, true)
+	gobottest.Assert(t, a.littleWire.(*i2cMock).writeStopWasSend, false)
+	gobottest.Assert(t, a.littleWire.(*i2cMock).readStopWasSend, true)
+}
+
+func TestDigisparkAdaptorI2cReadBlockData(t *testing.T) {
+	// arrange
+	reg := uint8(0x05)
+	data := []byte{0, 0, 0, 0, 0}
+	dataLen := len(data)
+	a := initTestAdaptorI2c()
+	c, err := a.GetI2cConnection(availableI2cAddress, a.DefaultI2cBus())
+
+	// act
+	err = c.ReadBlockData(reg, data)
+
+	// assert
+	gobottest.Assert(t, err, nil)
+	gobottest.Assert(t, a.littleWire.(*i2cMock).writeStartWasSend, true)
+	gobottest.Assert(t, a.littleWire.(*i2cMock).readStartWasSend, true)
+	gobottest.Assert(t, a.littleWire.(*i2cMock).direction, uint8(1))
+	gobottest.Assert(t, a.littleWire.(*i2cMock).dataWritten, []byte{reg})
+	gobottest.Assert(t, data, i2cData[:dataLen])
+	gobottest.Assert(t, a.littleWire.(*i2cMock).writeStopWasSend, false)
+	gobottest.Assert(t, a.littleWire.(*i2cMock).readStopWasSend, true)
 }
 
 func TestDigisparkAdaptorI2cUpdateDelay(t *testing.T) {
@@ -222,7 +282,7 @@ func TestDigisparkAdaptorI2cUpdateDelay(t *testing.T) {
 	var c i2c.Connection
 	var err error
 	a := initTestAdaptorI2c()
-	c, err = a.GetConnection(availableI2cAddress, a.GetDefaultBus())
+	c, err = a.GetI2cConnection(availableI2cAddress, a.DefaultI2cBus())
 
 	// act
 	err = c.(*digisparkI2cConnection).UpdateDelay(uint(100))
@@ -246,14 +306,18 @@ func (l *i2cMock) i2cStart(address7bit uint8, direction uint8) error {
 		return err
 	}
 	l.direction = direction
-	l.startWasSend = true
+	if direction == 1 {
+		l.readStartWasSend = true
+	} else {
+		l.writeStartWasSend = true
+	}
 	return nil
 }
 
 func (l *i2cMock) i2cWrite(sendBuffer []byte, length int, endWithStop uint8) error {
 	l.dataWritten = append(l.dataWritten, sendBuffer...)
 	if endWithStop > 0 {
-		l.stopWasSend = true
+		l.writeStopWasSend = true
 	}
 	return l.error()
 }
@@ -268,7 +332,7 @@ func (l *i2cMock) i2cRead(readBuffer []byte, length int, endWithStop uint8) erro
 	copy(readBuffer[:length], i2cData[:length])
 
 	if endWithStop > 0 {
-		l.stopWasSend = true
+		l.readStopWasSend = true
 	}
 	return l.error()
 }

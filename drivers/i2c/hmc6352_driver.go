@@ -1,66 +1,32 @@
 package i2c
 
-import "gobot.io/x/gobot"
-
-const hmc6352Address = 0x21
+const hmc6352DefaultAddress = 0x21
 
 // HMC6352Driver is a Driver for a HMC6352 digital compass
 type HMC6352Driver struct {
-	name       string
-	connector  Connector
-	connection Connection
-	Config
+	*Driver
 }
 
 // NewHMC6352Driver creates a new driver with specified i2c interface
 // Params:
-//		conn Connector - the Adaptor to use with this Driver
+//		c Connector - the Adaptor to use with this Driver
 //
 // Optional params:
 //		i2c.WithBus(int):	bus to use with this driver
 //		i2c.WithAddress(int):	address to use with this driver
 //
-func NewHMC6352Driver(a Connector, options ...func(Config)) *HMC6352Driver {
-	hmc := &HMC6352Driver{
-		name:      gobot.DefaultName("HMC6352"),
-		connector: a,
-		Config:    NewConfig(),
+func NewHMC6352Driver(c Connector, options ...func(Config)) *HMC6352Driver {
+	h := &HMC6352Driver{
+		Driver: NewDriver(c, "HMC6352", hmc6352DefaultAddress),
 	}
+	h.afterStart = h.initialize
 
 	for _, option := range options {
-		option(hmc)
+		option(h)
 	}
 
-	return hmc
+	return h
 }
-
-// Name returns the name for this Driver
-func (h *HMC6352Driver) Name() string { return h.name }
-
-// SetName sets the name for this Driver
-func (h *HMC6352Driver) SetName(n string) { h.name = n }
-
-// Connection returns the connection for this Driver
-func (h *HMC6352Driver) Connection() gobot.Connection { return h.connector.(gobot.Connection) }
-
-// Start initializes the hmc6352
-func (h *HMC6352Driver) Start() (err error) {
-	bus := h.GetBusOrDefault(h.connector.GetDefaultBus())
-	address := h.GetAddressOrDefault(hmc6352Address)
-
-	h.connection, err = h.connector.GetConnection(address, bus)
-	if err != nil {
-		return err
-	}
-
-	if _, err := h.connection.Write([]byte("A")); err != nil {
-		return err
-	}
-	return
-}
-
-// Halt returns true if devices is halted successfully
-func (h *HMC6352Driver) Halt() (err error) { return }
 
 // Heading returns the current heading
 func (h *HMC6352Driver) Heading() (heading uint16, err error) {
@@ -79,4 +45,11 @@ func (h *HMC6352Driver) Heading() (heading uint16, err error) {
 
 	err = ErrNotEnoughBytes
 	return
+}
+
+func (h *HMC6352Driver) initialize() error {
+	if _, err := h.connection.Write([]byte("A")); err != nil {
+		return err
+	}
+	return nil
 }

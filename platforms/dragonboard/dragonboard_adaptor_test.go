@@ -2,6 +2,7 @@ package dragonboard
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 	"testing"
 
@@ -9,42 +10,41 @@ import (
 	"gobot.io/x/gobot/drivers/gpio"
 	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/gobottest"
-	"gobot.io/x/gobot/sysfs"
 )
 
-// make sure that this Adaptor fullfills all the required interfaces
+// make sure that this Adaptor fulfills all the required interfaces
 var _ gobot.Adaptor = (*Adaptor)(nil)
+var _ gobot.DigitalPinnerProvider = (*Adaptor)(nil)
 var _ gpio.DigitalReader = (*Adaptor)(nil)
 var _ gpio.DigitalWriter = (*Adaptor)(nil)
 var _ i2c.Connector = (*Adaptor)(nil)
 
-func initTestDragonBoardAdaptor(t *testing.T) *Adaptor {
+func initTestAdaptor(t *testing.T) *Adaptor {
 	a := NewAdaptor()
 	if err := a.Connect(); err != nil {
-		t.Error(err)
+		panic(err)
 	}
 	return a
 }
 
-func TestDragonBoardAdaptorName(t *testing.T) {
-	a := initTestDragonBoardAdaptor(t)
+func TestName(t *testing.T) {
+	a := initTestAdaptor(t)
 	gobottest.Assert(t, strings.HasPrefix(a.Name(), "DragonBoard"), true)
 	a.SetName("NewName")
 	gobottest.Assert(t, a.Name(), "NewName")
 }
 
-func TestDragonBoardAdaptorDigitalIO(t *testing.T) {
-	a := initTestDragonBoardAdaptor(t)
-	fs := sysfs.NewMockFilesystem([]string{
+func TestDigitalIO(t *testing.T) {
+	a := initTestAdaptor(t)
+	mockPaths := []string{
 		"/sys/class/gpio/export",
 		"/sys/class/gpio/unexport",
 		"/sys/class/gpio/gpio36/value",
 		"/sys/class/gpio/gpio36/direction",
 		"/sys/class/gpio/gpio12/value",
 		"/sys/class/gpio/gpio12/direction",
-	})
-
-	sysfs.SetFilesystem(fs)
+	}
+	fs := a.sys.UseMockFilesystem(mockPaths)
 
 	_ = a.DigitalWrite("GPIO_B", 1)
 	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio12/value"].Contents, "1")
@@ -53,52 +53,21 @@ func TestDragonBoardAdaptorDigitalIO(t *testing.T) {
 	i, _ := a.DigitalRead("GPIO_A")
 	gobottest.Assert(t, i, 1)
 
-	gobottest.Assert(t, a.DigitalWrite("GPIO_M", 1), errors.New("Not a valid pin"))
+	gobottest.Assert(t, a.DigitalWrite("GPIO_M", 1), errors.New("'GPIO_M' is not a valid id for a digital pin"))
 	gobottest.Assert(t, a.Finalize(), nil)
 }
 
-func TestDragonBoardAdaptorI2c(t *testing.T) {
-	a := initTestDragonBoardAdaptor(t)
-	fs := sysfs.NewMockFilesystem([]string{
-		"/dev/i2c-1",
-	})
-	sysfs.SetFilesystem(fs)
-	sysfs.SetSyscall(&sysfs.MockSyscall{})
-
-	con, err := a.GetConnection(0xff, 1)
-	gobottest.Assert(t, err, nil)
-
-	_, _ = con.Write([]byte{0x00, 0x01})
-	data := []byte{42, 42}
-	_, _ = con.Read(data)
-	gobottest.Assert(t, data, []byte{0x00, 0x01})
-
-	gobottest.Assert(t, a.Finalize(), nil)
-}
-
-func TestDragonBoardDefaultBus(t *testing.T) {
-	a := initTestDragonBoardAdaptor(t)
-	gobottest.Assert(t, a.GetDefaultBus(), 0)
-}
-
-func TestDragonBoardGetConnectionInvalidBus(t *testing.T) {
-	a := initTestDragonBoardAdaptor(t)
-	_, err := a.GetConnection(0x01, 99)
-	gobottest.Assert(t, err, errors.New("Bus number 99 out of range"))
-}
-
-func TestAdaptorFinalizeErrorAfterGPIO(t *testing.T) {
-	a := initTestDragonBoardAdaptor(t)
-	fs := sysfs.NewMockFilesystem([]string{
+func TestFinalizeErrorAfterGPIO(t *testing.T) {
+	a := initTestAdaptor(t)
+	mockPaths := []string{
 		"/sys/class/gpio/export",
 		"/sys/class/gpio/unexport",
 		"/sys/class/gpio/gpio36/value",
 		"/sys/class/gpio/gpio36/direction",
 		"/sys/class/gpio/gpio12/value",
 		"/sys/class/gpio/gpio12/direction",
-	})
-
-	sysfs.SetFilesystem(fs)
+	}
+	fs := a.sys.UseMockFilesystem(mockPaths)
 
 	gobottest.Assert(t, a.Connect(), nil)
 	gobottest.Assert(t, a.DigitalWrite("GPIO_B", 1), nil)
@@ -107,4 +76,58 @@ func TestAdaptorFinalizeErrorAfterGPIO(t *testing.T) {
 
 	err := a.Finalize()
 	gobottest.Assert(t, strings.Contains(err.Error(), "write error"), true)
+}
+
+func TestI2cDefaultBus(t *testing.T) {
+	a := initTestAdaptor(t)
+	gobottest.Assert(t, a.DefaultI2cBus(), 0)
+}
+
+func TestI2cFinalizeWithErrors(t *testing.T) {
+	// arrange
+	a := NewAdaptor()
+	a.sys.UseMockSyscall()
+	fs := a.sys.UseMockFilesystem([]string{"/dev/i2c-1"})
+	gobottest.Assert(t, a.Connect(), nil)
+	con, err := a.GetI2cConnection(0xff, 1)
+	gobottest.Assert(t, err, nil)
+	_, err = con.Write([]byte{0xbf})
+	gobottest.Assert(t, err, nil)
+	fs.WithCloseError = true
+	// act
+	err = a.Finalize()
+	// assert
+	gobottest.Assert(t, strings.Contains(err.Error(), "close error"), true)
+}
+
+func Test_validateI2cBusNumber(t *testing.T) {
+	var tests = map[string]struct {
+		busNr   int
+		wantErr error
+	}{
+		"number_negative_error": {
+			busNr:   -1,
+			wantErr: fmt.Errorf("Bus number -1 out of range"),
+		},
+		"number_0_ok": {
+			busNr: 0,
+		},
+		"number_1_ok": {
+			busNr: 1,
+		},
+		"number_2_error": {
+			busNr:   2,
+			wantErr: fmt.Errorf("Bus number 2 out of range"),
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			a := NewAdaptor()
+			// act
+			err := a.validateI2cBusNumber(tc.busNr)
+			// assert
+			gobottest.Assert(t, err, tc.wantErr)
+		})
+	}
 }

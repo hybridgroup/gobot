@@ -1,116 +1,52 @@
 package tinkerboard
 
-var fixedPins = map[string]sysfsPin{
-	"7": {
-		pin:    17, // GPIO0_C1_CLKOUT
-		pwmPin: -1,
-	},
-	"10": {
-		pin:    160, // GPIO5_B0_UART1RX
-		pwmPin: -1,
-	},
-	"8": {
-		pin:    161, // GPIO5_B1_UART1TX
-		pwmPin: -1,
-	},
-	"16": {
-		pin:    162, // GPIO5_B2_UART1CTSN
-		pwmPin: -1,
-	},
-	"18": {
-		pin:    163, // GPIO5_B3_UART1RTSN
-		pwmPin: -1,
-	},
-	"11": {
-		pin:    164, // GPIO5_B4_SPI0CLK_UART4CTSN
-		pwmPin: -1,
-	},
-	"29": {
-		pin:    165, // GPIO5_B5_SPI0CSN_UART4RTSN
-		pwmPin: -1,
-	},
-	"13": {
-		pin:    166, // GPIO5_B6_SPI0_TXD_UART4TX
-		pwmPin: -1,
-	},
-	"15": {
-		pin:    167, // GPIO5_B7_SPI0_RXD_UART4RX
-		pwmPin: -1,
-	},
-	"31": {
-		pin:    168, // GPIO5_C0_SPI0CSN1
-		pwmPin: -1,
-	},
-	"22": {
-		pin:    171, // GPIO5_C3
-		pwmPin: -1,
-	},
-	"12": {
-		pin:    184, // GPIO6_A0_PCM/I2S_CLK
-		pwmPin: -1,
-	},
-	"35": {
-		pin:    185, // GPIO6_A1_PCM/I2S_FS
-		pwmPin: -1,
-	},
-	"38": {
-		pin:    187, // GPIO6_A3_PCM/I2S_SDI
-		pwmPin: -1,
-	},
-	"40": {
-		pin:    188, // GPIO6_A4_PCM/I2S_SDO
-		pwmPin: -1,
-	},
-	"36": {
-		pin:    223, // GPIO7_A7_UART3RX
-		pwmPin: -1,
-	},
-	"37": {
-		pin:    224, // GPIO7_B0_UART3TX
-		pwmPin: -1,
-	},
-	"27": {
-		pin:    233, // GPIO7_C1_I2C4_SDA
-		pwmPin: -1,
-	},
-	"28": {
-		pin:    234, // GPIO7_C2_I2C_SCL
-		pwmPin: -1,
-	},
-	"33": {
-		pin:    238, // GPIO7_C6_UART2RX_PWM2
-		pwmPin: 0,
-	},
-	"32": {
-		pin:    239, // GPIO7_C7_UART2TX_PWM3
-		pwmPin: 1,
-	},
-	"26": {
-		pin:    251, // GPIO8_A3_SPI2CSN1
-		pwmPin: -1,
-	},
-	"3": {
-		pin:    252, // GPIO8_A4_I2C1_SDA
-		pwmPin: -1,
-	},
-	"5": {
-		pin:    253, // GPIO8_A5_I2C1_SCL
-		pwmPin: -1,
-	},
-	"23": {
-		pin:    254, // GPIO8_A6_SPI2CLK
-		pwmPin: -1,
-	},
-	"24": {
-		pin:    255, // GPIO8_A7_SPI2CSN0
-		pwmPin: -1,
-	},
-	"21": {
-		pin:    256, // GPIO8_B0_SPI2RXD
-		pwmPin: -1,
-	},
-	"19": {
-		pin:    257, // GPIO8_B1_SPI2TXD
-		pwmPin: -1,
-	},
+type cdevPin struct {
+	chip uint8
+	line uint8
+}
+
+type gpioPinDefinition struct {
+	sysfs int
+	cdev  cdevPin
+}
+
+// notes for character device
+// pins: A=0+Nr, B=8+Nr, C=16+Nr
+// tested: armbian Linux, OK: work as input and output, IN: work only as input
+var gpioPinDefinitions = map[string]gpioPinDefinition{
+	"7":  gpioPinDefinition{sysfs: 17, cdev: cdevPin{chip: 0, line: 17}},  // GPIO0_C1_CLKOUT - OK
+	"10": gpioPinDefinition{sysfs: 160, cdev: cdevPin{chip: 5, line: 8}},  // GPIO5_B0_UART1RX - IN, initial 1
+	"8":  gpioPinDefinition{sysfs: 161, cdev: cdevPin{chip: 5, line: 9}},  // GPIO5_B1_UART1TX - NO, initial 1
+	"16": gpioPinDefinition{sysfs: 162, cdev: cdevPin{chip: 5, line: 10}}, // GPIO5_B2_UART1CTSN - NO, initial 0
+	"18": gpioPinDefinition{sysfs: 163, cdev: cdevPin{chip: 5, line: 11}}, // GPIO5_B3_UART1RTSN - NO, initial 0
+	"11": gpioPinDefinition{sysfs: 164, cdev: cdevPin{chip: 5, line: 12}}, // GPIO5_B4_SPI0CLK_UART4CTSN - NO, initial 0
+	"29": gpioPinDefinition{sysfs: 165, cdev: cdevPin{chip: 5, line: 13}}, // GPIO5_B5_SPI0CSN_UART4RTSN - NO, initial 0
+	"13": gpioPinDefinition{sysfs: 166, cdev: cdevPin{chip: 5, line: 14}}, // GPIO5_B6_SPI0_TXD_UART4TX - NO, initial 1
+	"15": gpioPinDefinition{sysfs: 167, cdev: cdevPin{chip: 5, line: 15}}, // GPIO5_B7_SPI0_RXD_UART4RX - IN, initial 1
+	"31": gpioPinDefinition{sysfs: 168, cdev: cdevPin{chip: 5, line: 16}}, // GPIO5_C0_SPI0CSN1 - OK if SPI0 off
+	"22": gpioPinDefinition{sysfs: 171, cdev: cdevPin{chip: 5, line: 19}}, // GPIO5_C3 - OK
+	"12": gpioPinDefinition{sysfs: 184, cdev: cdevPin{chip: 6, line: 0}},  // GPIO6_A0_PCM/I2S_CLK - NO, initial 1
+	"35": gpioPinDefinition{sysfs: 185, cdev: cdevPin{chip: 6, line: 1}},  // GPIO6_A1_PCM/I2S_FS - NO, initial 0
+	"38": gpioPinDefinition{sysfs: 187, cdev: cdevPin{chip: 6, line: 3}},  // GPIO6_A3_PCM/I2S_SDI - IN, initial 1
+	"40": gpioPinDefinition{sysfs: 188, cdev: cdevPin{chip: 6, line: 4}},  // GPIO6_A4_PCM/I2S_SDO - NO, initial 0
+	"36": gpioPinDefinition{sysfs: 223, cdev: cdevPin{chip: 7, line: 7}},  // GPIO7_A7_UART3RX - IN, initial 1
+	"37": gpioPinDefinition{sysfs: 224, cdev: cdevPin{chip: 7, line: 8}},  // GPIO7_B0_UART3TX - NO, initial 1
+	"27": gpioPinDefinition{sysfs: 233, cdev: cdevPin{chip: 7, line: 17}}, // GPIO7_C1_I2C4_SDA - OK if I2C4 off
+	"28": gpioPinDefinition{sysfs: 234, cdev: cdevPin{chip: 7, line: 18}}, // GPIO7_C2_I2C_SCL - OK if I2C4 off
+	"33": gpioPinDefinition{sysfs: 238, cdev: cdevPin{chip: 7, line: 22}}, // GPIO7_C6_UART2RX_PWM2 - IN, initial 1
+	"32": gpioPinDefinition{sysfs: 239, cdev: cdevPin{chip: 7, line: 23}}, // GPIO7_C7_UART2TX_PWM3 - NO, initial 1
+	"26": gpioPinDefinition{sysfs: 251, cdev: cdevPin{chip: 8, line: 3}},  // GPIO8_A3_SPI2CSN1 - OK if SPI2 off
+	"3":  gpioPinDefinition{sysfs: 252, cdev: cdevPin{chip: 8, line: 4}},  // GPIO8_A4_I2C1_SDA - OK if I2C1 off
+	"5":  gpioPinDefinition{sysfs: 253, cdev: cdevPin{chip: 8, line: 5}},  // GPIO8_A5_I2C1_SCL - OK if I2C1 off
+	"23": gpioPinDefinition{sysfs: 254, cdev: cdevPin{chip: 8, line: 6}},  // GPIO8_A6_SPI2CLK - OK if SPI2 off
+	"24": gpioPinDefinition{sysfs: 255, cdev: cdevPin{chip: 8, line: 7}},  // GPIO8_A7_SPI2CSN0 - OK if SPI2 off
+	"21": gpioPinDefinition{sysfs: 256, cdev: cdevPin{chip: 8, line: 8}},  // GPIO8_B0_SPI2RXD - OK if SPI2 off
+	"19": gpioPinDefinition{sysfs: 257, cdev: cdevPin{chip: 8, line: 9}},  // GPIO8_B1_SPI2TXD - OK if SPI2 off
+}
+
+var pwmPinDefinitions = map[string]pwmPinDefinition{
+	// GPIO7_C6_UART2RX_PWM2
+	"33": pwmPinDefinition{dir: "/sys/devices/platform/ff680020.pwm/pwm/", dirRegexp: "pwmchip[0|1|2]$", channel: 0},
+	// GPIO7_C7_UART2TX_PWM3
+	"32": pwmPinDefinition{dir: "/sys/devices/platform/ff680030.pwm/pwm/", dirRegexp: "pwmchip[0|1|2|3]$", channel: 0},
 }

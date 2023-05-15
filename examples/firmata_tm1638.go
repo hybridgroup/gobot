@@ -25,10 +25,10 @@ func main() {
 
 	// Even thought the modules are connected among them, they are independent (not chained)
 	modules := make([]*gpio.TM1638Driver, 4)
-	modules[0] = gpio.NewTM1638Driver(esp8266, "9", "8", "7")
-	modules[1] = gpio.NewTM1638Driver(esp8266, "9", "8", "6")
-	modules[2] = gpio.NewTM1638Driver(esp8266, "9", "8", "5")
-	modules[3] = gpio.NewTM1638Driver(esp8266, "9", "8", "4")
+	modules[0] = gpio.NewTM1638Driver(firmataAdaptor, "9", "8", "7")
+	modules[1] = gpio.NewTM1638Driver(firmataAdaptor, "9", "8", "6")
+	modules[2] = gpio.NewTM1638Driver(firmataAdaptor, "9", "8", "5")
+	modules[3] = gpio.NewTM1638Driver(firmataAdaptor, "9", "8", "4")
 
 	var ledInt byte
 	var color byte

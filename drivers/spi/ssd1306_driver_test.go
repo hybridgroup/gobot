@@ -10,6 +10,8 @@ import (
 	"gobot.io/x/gobot/gobottest"
 )
 
+// this ensures that the implementation is based on spi.Driver, which implements the gobot.Driver
+// and tests all implementations, so no further tests needed here for gobot.Driver interface
 var _ gobot.Driver = (*SSD1306Driver)(nil)
 
 func initTestSSDDriver() *SSD1306Driver {
@@ -55,32 +57,6 @@ type gpioTestAdaptor struct {
 	testAdaptorDigitalRead  func() (val int, err error)
 }
 
-func (t *gpioTestAdaptor) TestAdaptorDigitalWrite(f func() (err error)) {
-	t.mtx.Lock()
-	defer t.mtx.Unlock()
-	t.testAdaptorDigitalWrite = f
-}
-func (t *gpioTestAdaptor) TestAdaptorServoWrite(f func() (err error)) {
-	t.mtx.Lock()
-	defer t.mtx.Unlock()
-	t.testAdaptorServoWrite = f
-}
-func (t *gpioTestAdaptor) TestAdaptorPwmWrite(f func() (err error)) {
-	t.mtx.Lock()
-	defer t.mtx.Unlock()
-	t.testAdaptorPwmWrite = f
-}
-func (t *gpioTestAdaptor) TestAdaptorAnalogRead(f func() (val int, err error)) {
-	t.mtx.Lock()
-	defer t.mtx.Unlock()
-	t.testAdaptorAnalogRead = f
-}
-func (t *gpioTestAdaptor) TestAdaptorDigitalRead(f func() (val int, err error)) {
-	t.mtx.Lock()
-	defer t.mtx.Unlock()
-	t.testAdaptorDigitalRead = f
-}
-
 func (t *gpioTestAdaptor) ServoWrite(string, byte) (err error) {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
@@ -113,6 +89,7 @@ func (t *gpioTestAdaptor) SetName(n string)      { t.name = n }
 func (t *gpioTestAdaptor) Port() string          { return t.port }
 
 func newGpioTestAdaptor() *gpioTestAdaptor {
+	a := newSpiTestAdaptor()
 	return &gpioTestAdaptor{
 		port: "/dev/null",
 		testAdaptorDigitalWrite: func() (err error) {
@@ -130,6 +107,6 @@ func newGpioTestAdaptor() *gpioTestAdaptor {
 		testAdaptorDigitalRead: func() (val int, err error) {
 			return 1, nil
 		},
-		Connector: &TestConnector{},
+		Connector: a,
 	}
 }

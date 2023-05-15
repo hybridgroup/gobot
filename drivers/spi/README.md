@@ -1,22 +1,20 @@
 # SPI
 
-This package provides drivers for [spi](https://en.wikipedia.org/wiki/Serial_Peripheral_Interface_Bus) devices. 
-
-It currently must be used along with platforms such as the [Raspberry Pi](https://gobot.io/documentation/platforms/raspi) and [Beaglebone Black](https://gobot.io/documentation/platforms/beaglebone) that have adaptors that implement the needed SPI interface. 
-
-The SPI implementation uses the awesome [periph.io](https://periph.io/) which currently only works on Linux systems.
+This package provides drivers for [SPI](https://en.wikipedia.org/wiki/Serial_Peripheral_Interface_Bus) devices.
 
 ## Getting Started
 
 ## Installing
-```
+
+```sh
 go get -d -u gobot.io/x/gobot/...
 ```
 
 ## Hardware Support
-Gobot has a extensible system for connecting to hardware devices. 
 
-The following spi Devices are currently supported:
+Gobot has a extensible system for connecting to hardware devices.
+
+The following SPI Devices are currently supported:
 
 - APA102 Programmable LEDs
 - MCP3002 Analog/Digital Converter
@@ -26,12 +24,11 @@ The following spi Devices are currently supported:
 - MCP3204 Analog/Digital Converter
 - MCP3208 Analog/Digital Converter
 - MCP3304 Analog/Digital Converter
+- MFRC522 RFID Card Reader
+- SSD1306 OLED Display Controller
 - GoPiGo3 Robot
 
-Drivers wanted! :)
+The following SPI system drivers are currently supported:
 
-The following spi Adaptors are currently supported:
-
-- Raspberry Pi
-
-Adaptors wanted too!
+- SPI by `/dev/spidevX.Y` with the awesome [periph.io](https://periph.io/) which currently only works on Linux systems
+- SPI via GPIO's

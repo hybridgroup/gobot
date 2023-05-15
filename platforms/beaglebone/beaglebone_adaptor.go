@@ -1,250 +1,150 @@
 package beaglebone
 
 import (
-	"errors"
 	"fmt"
 	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"sync"
 
 	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/i2c"
-	"gobot.io/x/gobot/drivers/spi"
-	"gobot.io/x/gobot/sysfs"
+	"gobot.io/x/gobot/platforms/adaptors"
+	"gobot.io/x/gobot/system"
 )
 
 type pwmPinData struct {
-	channel int
-	path    string
+	channel   int
+	dir       string
+	dirRegexp string
 }
 
-const pwmDefaultPeriod = 500000
+const (
+	pwmPeriodDefault = 500000 // 0.5 ms = 2 kHz
+
+	defaultI2cBusNumber = 2
+
+	defaultSpiBusNumber  = 0
+	defaultSpiChipNumber = 0
+	defaultSpiMode       = 0
+	defaultSpiBitsNumber = 8
+	defaultSpiMaxSpeed   = 500000
+)
 
 // Adaptor is the gobot.Adaptor representation for the Beaglebone Black/Green
 type Adaptor struct {
-	name               string
-	digitalPins        []*sysfs.DigitalPin
-	pwmPins            map[string]*sysfs.PWMPin
-	i2cBuses           map[int]i2c.I2cDevice
-	usrLed             string
-	analogPath         string
-	pinMap             map[string]int
-	pwmPinMap          map[string]pwmPinData
-	analogPinMap       map[string]string
-	mutex              *sync.Mutex
-	findPin            func(pinPath string) (string, error)
-	spiDefaultBus      int
-	spiDefaultChip     int
-	spiBuses           [2]spi.Connection
-	spiDefaultMode     int
-	spiDefaultMaxSpeed int64
+	name  string
+	sys   *system.Accesser
+	mutex sync.Mutex
+	*adaptors.DigitalPinsAdaptor
+	*adaptors.PWMPinsAdaptor
+	*adaptors.I2cBusAdaptor
+	*adaptors.SpiBusAdaptor
+	usrLed       string
+	analogPath   string
+	pinMap       map[string]int
+	pwmPinMap    map[string]pwmPinData
+	analogPinMap map[string]string
 }
 
 // NewAdaptor returns a new Beaglebone Black/Green Adaptor
-func NewAdaptor() *Adaptor {
-	b := &Adaptor{
+//
+// Optional parameters:
+//		adaptors.WithGpiodAccess():	use character device gpiod driver instead of sysfs
+//		adaptors.WithSpiGpioAccess(sclk, nss, mosi, miso):	use GPIO's instead of /dev/spidev#.#
+func NewAdaptor(opts ...func(adaptors.Optioner)) *Adaptor {
+	sys := system.NewAccesser()
+	c := &Adaptor{
 		name:         gobot.DefaultName("BeagleboneBlack"),
-		digitalPins:  make([]*sysfs.DigitalPin, 120),
-		pwmPins:      make(map[string]*sysfs.PWMPin),
-		i2cBuses:     make(map[int]i2c.I2cDevice),
-		mutex:        &sync.Mutex{},
+		sys:          sys,
 		pinMap:       bbbPinMap,
 		pwmPinMap:    bbbPwmPinMap,
 		analogPinMap: bbbAnalogPinMap,
-		findPin: func(pinPath string) (string, error) {
-			files, err := filepath.Glob(pinPath)
-			return files[0], err
-		},
+		usrLed:       "/sys/class/leds/beaglebone:green:",
+		analogPath:   "/sys/bus/iio/devices/iio:device0",
 	}
 
-	b.setPaths()
-	return b
-}
-
-func (b *Adaptor) setPaths() {
-	b.usrLed = "/sys/class/leds/beaglebone:green:"
-	b.analogPath = "/sys/bus/iio/devices/iio:device0"
-
-	b.spiDefaultBus = 0
-	b.spiDefaultMode = 0
-	b.spiDefaultMaxSpeed = 500000
+	c.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, c.translateAndMuxDigitalPin, opts...)
+	c.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, c.translateAndMuxPWMPin,
+		adaptors.WithPWMPinDefaultPeriod(pwmPeriodDefault))
+	c.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, c.validateI2cBusNumber, defaultI2cBusNumber)
+	c.SpiBusAdaptor = adaptors.NewSpiBusAdaptor(sys, c.validateSpiBusNumber, defaultSpiBusNumber, defaultSpiChipNumber,
+		defaultSpiMode, defaultSpiBitsNumber, defaultSpiMaxSpeed)
+	return c
 }
 
 // Name returns the Adaptor name
-func (b *Adaptor) Name() string { return b.name }
+func (c *Adaptor) Name() string { return c.name }
 
 // SetName sets the Adaptor name
-func (b *Adaptor) SetName(n string) { b.name = n }
+func (c *Adaptor) SetName(n string) { c.name = n }
 
-// Connect initializes the pwm and analog dts.
-func (b *Adaptor) Connect() error {
-	return nil
+// Connect create new connection to board and pins.
+func (c *Adaptor) Connect() error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	if err := c.SpiBusAdaptor.Connect(); err != nil {
+		return err
+	}
+
+	if err := c.I2cBusAdaptor.Connect(); err != nil {
+		return err
+	}
+
+	if err := c.PWMPinsAdaptor.Connect(); err != nil {
+		return err
+	}
+	return c.DigitalPinsAdaptor.Connect()
 }
 
 // Finalize releases all i2c devices and exported analog, digital, pwm pins.
-func (b *Adaptor) Finalize() (err error) {
-	b.mutex.Lock()
-	defer b.mutex.Unlock()
+func (c *Adaptor) Finalize() error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 
-	for _, pin := range b.digitalPins {
-		if pin != nil {
-			if e := pin.Unexport(); e != nil {
-				err = multierror.Append(err, e)
-			}
-		}
-	}
-	for _, pin := range b.pwmPins {
-		if pin != nil {
-			if e := pin.Unexport(); e != nil {
-				err = multierror.Append(err, e)
-			}
-		}
-	}
-	for _, bus := range b.i2cBuses {
-		if bus != nil {
-			if e := bus.Close(); e != nil {
-				err = multierror.Append(err, e)
-			}
-		}
-	}
-	for _, bus := range b.spiBuses {
-		if bus != nil {
-			if e := bus.Close(); e != nil {
-				err = multierror.Append(err, e)
-			}
-		}
-	}
-	return
-}
+	err := c.DigitalPinsAdaptor.Finalize()
 
-// PwmWrite writes the 0-254 value to the specified pin
-func (b *Adaptor) PwmWrite(pin string, val byte) (err error) {
-	pwmPin, err := b.PWMPin(pin)
-	if err != nil {
-		return
-	}
-	period, err := pwmPin.Period()
-	if err != nil {
-		return err
-	}
-	duty := gobot.FromScale(float64(val), 0, 255.0)
-	return pwmPin.SetDutyCycle(uint32(float64(period) * duty))
-}
-
-// ServoWrite writes a servo signal to the specified pin
-func (b *Adaptor) ServoWrite(pin string, angle byte) (err error) {
-	pwmPin, err := b.PWMPin(pin)
-	if err != nil {
-		return
+	if e := c.PWMPinsAdaptor.Finalize(); e != nil {
+		err = multierror.Append(err, e)
 	}
 
-	// TODO: take into account the actual period setting, not just assume default
-	const minDuty = 100 * 0.0005 * pwmDefaultPeriod
-	const maxDuty = 100 * 0.0020 * pwmDefaultPeriod
-	duty := uint32(gobot.ToScale(gobot.FromScale(float64(angle), 0, 180), minDuty, maxDuty))
-	return pwmPin.SetDutyCycle(duty)
-}
-
-// DigitalRead returns a digital value from specified pin
-func (b *Adaptor) DigitalRead(pin string) (val int, err error) {
-	sysfsPin, err := b.DigitalPin(pin, sysfs.IN)
-	if err != nil {
-		return
+	if e := c.I2cBusAdaptor.Finalize(); e != nil {
+		err = multierror.Append(err, e)
 	}
-	return sysfsPin.Read()
+
+	if e := c.SpiBusAdaptor.Finalize(); e != nil {
+		err = multierror.Append(err, e)
+	}
+	return err
 }
 
 // DigitalWrite writes a digital value to specified pin.
 // valid usr pin values are usr0, usr1, usr2 and usr3
-func (b *Adaptor) DigitalWrite(pin string, val byte) (err error) {
-	if strings.Contains(pin, "usr") {
-		fi, e := sysfs.OpenFile(b.usrLed+pin+"/brightness", os.O_WRONLY|os.O_APPEND, 0666)
+func (c *Adaptor) DigitalWrite(id string, val byte) error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	if strings.Contains(id, "usr") {
+		fi, e := c.sys.OpenFile(c.usrLed+id+"/brightness", os.O_WRONLY|os.O_APPEND, 0666)
 		defer fi.Close()
 		if e != nil {
 			return e
 		}
-		_, err = fi.WriteString(strconv.Itoa(int(val)))
+		_, err := fi.WriteString(strconv.Itoa(int(val)))
 		return err
 	}
-	sysfsPin, err := b.DigitalPin(pin, sysfs.OUT)
-	if err != nil {
-		return err
-	}
-	return sysfsPin.Write(int(val))
-}
 
-// DigitalPin retrieves digital pin value by name
-func (b *Adaptor) DigitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPinner, err error) {
-	b.mutex.Lock()
-	defer b.mutex.Unlock()
-
-	i, err := b.translatePin(pin)
-	if err != nil {
-		return
-	}
-	if b.digitalPins[i] == nil {
-		b.digitalPins[i] = sysfs.NewDigitalPin(i)
-		if err = muxPin(pin, "gpio"); err != nil {
-			return
-		}
-
-		err := b.digitalPins[i].Export()
-		if err != nil {
-			return nil, err
-		}
-	}
-	if err = b.digitalPins[i].Direction(dir); err != nil {
-		return
-	}
-	return b.digitalPins[i], nil
-}
-
-// PWMPin returns matched pwmPin for specified pin number
-func (b *Adaptor) PWMPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
-	b.mutex.Lock()
-	defer b.mutex.Unlock()
-
-	pinInfo, err := b.translatePwmPin(pin)
-	if err != nil {
-		return nil, err
-	}
-
-	if b.pwmPins[pin] == nil {
-		newPin := sysfs.NewPWMPin(pinInfo.channel)
-		if err = muxPin(pin, "pwm"); err != nil {
-			return
-		}
-
-		if newPin.Path, err = b.findPin(pinInfo.path); err != nil {
-			return
-		}
-		if err = newPin.Export(); err != nil {
-			return
-		}
-		if err = newPin.SetPeriod(pwmDefaultPeriod); err != nil {
-			return
-		}
-		if err = newPin.Enable(true); err != nil {
-			return
-		}
-		b.pwmPins[pin] = newPin
-	}
-
-	sysfsPin = b.pwmPins[pin]
-
-	return
+	return c.DigitalPinsAdaptor.DigitalWrite(id, val)
 }
 
 // AnalogRead returns an analog value from specified pin
-func (b *Adaptor) AnalogRead(pin string) (val int, err error) {
-	analogPin, err := b.translateAnalogPin(pin)
+func (c *Adaptor) AnalogRead(pin string) (val int, err error) {
+	analogPin, err := c.translateAnalogPin(pin)
 	if err != nil {
 		return
 	}
-	fi, err := sysfs.OpenFile(fmt.Sprintf("%v/%v", b.analogPath, analogPin), os.O_RDONLY, 0644)
+	fi, err := c.sys.OpenFile(fmt.Sprintf("%v/%v", c.analogPath, analogPin), os.O_RDONLY, 0644)
 	defer fi.Close()
 
 	if err != nil {
@@ -261,100 +161,83 @@ func (b *Adaptor) AnalogRead(pin string) (val int, err error) {
 	return
 }
 
-// GetConnection returns a connection to a device on a specified bus.
-// Valid bus number is either 0 or 2 which corresponds to /dev/i2c-0 or /dev/i2c-2.
-func (b *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection, err error) {
-	b.mutex.Lock()
-	defer b.mutex.Unlock()
-
-	if (bus != 0) && (bus != 2) {
-		return nil, fmt.Errorf("Bus number %d out of range", bus)
+func (c *Adaptor) validateSpiBusNumber(busNr int) error {
+	// Valid bus numbers are [0,1] which corresponds to /dev/spidev0.x through /dev/spidev1.x.
+	// x is the chip number <255
+	if (busNr < 0) || (busNr > 1) {
+		return fmt.Errorf("Bus number %d out of range", busNr)
 	}
-	if b.i2cBuses[bus] == nil {
-		b.i2cBuses[bus], err = sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
+	return nil
+}
+
+func (c *Adaptor) validateI2cBusNumber(busNr int) error {
+	// Valid bus number is either 0 or 2 which corresponds to /dev/i2c-0 or /dev/i2c-2.
+	if (busNr != 0) && (busNr != 2) {
+		return fmt.Errorf("Bus number %d out of range", busNr)
 	}
-	return i2c.NewConnection(b.i2cBuses[bus], address), err
-}
-
-// GetDefaultBus returns the default i2c bus for this platform
-func (b *Adaptor) GetDefaultBus() int {
-	return 2
-}
-
-// GetSpiConnection returns an spi connection to a device on a specified bus.
-// Valid bus number is [0..1] which corresponds to /dev/spidev0.0 through /dev/spidev0.1.
-func (b *Adaptor) GetSpiConnection(busNum, chipNum, mode, bits int, maxSpeed int64) (connection spi.Connection, err error) {
-	b.mutex.Lock()
-	defer b.mutex.Unlock()
-
-	if (busNum < 0) || (busNum > 1) {
-		return nil, fmt.Errorf("Bus number %d out of range", busNum)
-	}
-
-	if b.spiBuses[busNum] == nil {
-		b.spiBuses[busNum], err = spi.GetSpiConnection(busNum, chipNum, mode, bits, maxSpeed)
-	}
-
-	return b.spiBuses[busNum], err
-}
-
-// GetSpiDefaultBus returns the default spi bus for this platform.
-func (b *Adaptor) GetSpiDefaultBus() int {
-	return b.spiDefaultBus
-}
-
-// GetSpiDefaultChip returns the default spi chip for this platform.
-func (b *Adaptor) GetSpiDefaultChip() int {
-	return b.spiDefaultChip
-}
-
-// GetSpiDefaultMode returns the default spi mode for this platform.
-func (b *Adaptor) GetSpiDefaultMode() int {
-	return b.spiDefaultMode
-}
-
-// GetSpiDefaultBits returns the default spi number of bits for this platform.
-func (b *Adaptor) GetSpiDefaultBits() int {
-	return 8
-}
-
-// GetSpiDefaultMaxSpeed returns the default spi bus for this platform.
-func (b *Adaptor) GetSpiDefaultMaxSpeed() int64 {
-	return b.spiDefaultMaxSpeed
-}
-
-// translatePin converts digital pin name to pin position
-func (b *Adaptor) translatePin(pin string) (value int, err error) {
-	if val, ok := b.pinMap[pin]; ok {
-		value = val
-	} else {
-		err = errors.New("Not a valid pin")
-	}
-	return
-}
-
-func (b *Adaptor) translatePwmPin(pin string) (p pwmPinData, err error) {
-	if val, ok := b.pwmPinMap[pin]; ok {
-		p = val
-	} else {
-		err = errors.New("Not a valid PWM pin")
-	}
-	return
+	return nil
 }
 
 // translateAnalogPin converts analog pin name to pin position
-func (b *Adaptor) translateAnalogPin(pin string) (value string, err error) {
-	if val, ok := b.analogPinMap[pin]; ok {
-		value = val
-	} else {
-		err = errors.New("Not a valid analog pin")
+func (c *Adaptor) translateAnalogPin(pin string) (string, error) {
+	if val, ok := c.analogPinMap[pin]; ok {
+		return val, nil
 	}
+	return "", fmt.Errorf("Not a valid analog pin")
+}
+
+// translatePin converts digital pin name to pin position
+func (c *Adaptor) translateAndMuxDigitalPin(id string) (string, int, error) {
+	line, ok := c.pinMap[id]
+	if !ok {
+		return "", -1, fmt.Errorf("'%s' is not a valid id for a digital pin", id)
+	}
+	// mux is done by id, not by line
+	if err := c.muxPin(id, "gpio"); err != nil {
+		return "", -1, err
+	}
+	return "", line, nil
+}
+
+func (c *Adaptor) translateAndMuxPWMPin(id string) (string, int, error) {
+	pinInfo, ok := c.pwmPinMap[id]
+	if !ok {
+		return "", -1, fmt.Errorf("'%s' is not a valid id for a PWM pin", id)
+	}
+
+	path, err := pinInfo.findPWMDir(c.sys)
+	if err != nil {
+		return "", -1, err
+	}
+
+	if err := c.muxPin(id, "pwm"); err != nil {
+		return "", -1, err
+	}
+
+	return path, pinInfo.channel, nil
+}
+
+func (p pwmPinData) findPWMDir(sys *system.Accesser) (dir string, err error) {
+	items, _ := sys.Find(p.dir, p.dirRegexp)
+	if items == nil || len(items) == 0 {
+		return "", fmt.Errorf("No path found for PWM directory pattern, '%s' in path '%s'", p.dirRegexp, p.dir)
+	}
+
+	dir = items[0]
+	info, err := sys.Stat(dir)
+	if err != nil {
+		return "", fmt.Errorf("Error (%v) on access '%s'", err, dir)
+	}
+	if !info.IsDir() {
+		return "", fmt.Errorf("The item '%s' is not a directory, which is not expected", dir)
+	}
+
 	return
 }
 
-func muxPin(pin, cmd string) error {
+func (c *Adaptor) muxPin(pin, cmd string) error {
 	path := fmt.Sprintf("/sys/devices/platform/ocp/ocp:%s_pinmux/state", pin)
-	fi, e := sysfs.OpenFile(path, os.O_WRONLY, 0666)
+	fi, e := c.sys.OpenFile(path, os.O_WRONLY, 0666)
 	defer fi.Close()
 	if e != nil {
 		return e

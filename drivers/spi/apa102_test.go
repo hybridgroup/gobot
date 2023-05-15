@@ -2,33 +2,38 @@ package spi
 
 import (
 	"image/color"
+	"strings"
 	"testing"
 
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/gobottest"
 )
 
+// this ensures that the implementation is based on spi.Driver, which implements the gobot.Driver
+// and tests all implementations, so no further tests needed here for gobot.Driver interface
 var _ gobot.Driver = (*APA102Driver)(nil)
 
-func initTestDriver() *APA102Driver {
-	d := NewAPA102Driver(&TestConnector{}, 10, 31)
+func initTestAPA102DriverWithStubbedAdaptor() *APA102Driver {
+	a := newSpiTestAdaptor()
+	d := NewAPA102Driver(a, 10, 31)
+	if err := d.Start(); err != nil {
+		panic(err)
+	}
 	return d
 }
 
-func TestDriverStart(t *testing.T) {
-	d := initTestDriver()
-	gobottest.Assert(t, d.Start(), nil)
-}
-
-func TestDriverHalt(t *testing.T) {
-	d := initTestDriver()
-	d.Start()
-	gobottest.Assert(t, d.Halt(), nil)
+func TestNewAPA102Driver(t *testing.T) {
+	var di interface{} = NewAPA102Driver(newSpiTestAdaptor(), 10, 31)
+	d, ok := di.(*APA102Driver)
+	if !ok {
+		t.Errorf("NewAPA102Driver() should have returned a *APA102Driver")
+	}
+	gobottest.Refute(t, d.Driver, nil)
+	gobottest.Assert(t, strings.HasPrefix(d.Name(), "APA102"), true)
 }
 
 func TestDriverLEDs(t *testing.T) {
-	d := initTestDriver()
-	d.Start()
+	d := initTestAPA102DriverWithStubbedAdaptor()
 
 	d.SetRGBA(0, color.RGBA{255, 255, 255, 15})
 	d.SetRGBA(1, color.RGBA{255, 255, 255, 15})

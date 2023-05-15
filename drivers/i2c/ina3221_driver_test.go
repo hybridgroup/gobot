@@ -11,58 +11,49 @@ import (
 	"gobot.io/x/gobot/gobottest"
 )
 
+// this ensures that the implementation is based on i2c.Driver, which implements the gobot.Driver
+// and tests all implementations, so no further tests needed here for gobot.Driver interface
 var _ gobot.Driver = (*INA3221Driver)(nil)
-
-func initTestINA3221Driver() *INA3221Driver {
-	d, _ := initTestINA3221DriverWithStubbedAdaptor()
-	return d
-}
 
 func initTestINA3221DriverWithStubbedAdaptor() (*INA3221Driver, *i2cTestAdaptor) {
 	a := newI2cTestAdaptor()
-	return NewINA3221Driver(a), a
+	d := NewINA3221Driver(a)
+	if err := d.Start(); err != nil {
+		panic(err)
+	}
+	return d, a
 }
 
 func TestNewINA3221Driver(t *testing.T) {
-	var d interface{} = NewINA3221Driver(newI2cTestAdaptor())
-	if _, ok := d.(*INA3221Driver); !ok {
+	var di interface{} = NewINA3221Driver(newI2cTestAdaptor())
+	d, ok := di.(*INA3221Driver)
+	if !ok {
 		t.Error("NewINA3221Driver() should return a *INA3221Driver")
 	}
+	gobottest.Refute(t, d.Driver, nil)
+	gobottest.Assert(t, strings.HasPrefix(d.Name(), "INA3221"), true)
+	gobottest.Assert(t, d.defaultAddress, 0x40)
 }
 
-func TestINA3221Driver_Connection(t *testing.T) {
-	d := initTestINA3221Driver()
-	gobottest.Refute(t, d.Connection(), nil)
+func TestINA3221Options(t *testing.T) {
+	// This is a general test, that options are applied in constructor by using the common WithBus() option and
+	// least one of this driver. Further tests for options can also be done by call of "WithOption(val)(d)".
+	d := NewINA3221Driver(newI2cTestAdaptor(), WithBus(2))
+	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
 }
 
-func TestINA3221Driver_Start(t *testing.T) {
-	d := initTestINA3221Driver()
+func TestINA3221Start(t *testing.T) {
+	d := NewINA3221Driver(newI2cTestAdaptor())
 	gobottest.Assert(t, d.Start(), nil)
 }
 
-func TestINA3221Driver_ConnectError(t *testing.T) {
-	d, a := initTestINA3221DriverWithStubbedAdaptor()
-	a.Testi2cConnectErr(true)
-	gobottest.Assert(t, d.Start(), errors.New("Invalid i2c connection"))
-}
-
-func TestINA3221Driver_StartWriteError(t *testing.T) {
-	d, a := initTestINA3221DriverWithStubbedAdaptor()
-	a.i2cWriteImpl = func([]byte) (int, error) {
-		return 0, errors.New("write error")
-	}
-	gobottest.Assert(t, d.Start(), errors.New("write error"))
-}
-
-func TestINA3221Driver_Halt(t *testing.T) {
-	d := initTestINA3221Driver()
+func TestINA3221Halt(t *testing.T) {
+	d, _ := initTestINA3221DriverWithStubbedAdaptor()
 	gobottest.Assert(t, d.Halt(), nil)
 }
 
-func TestINA3221DriverGetBusVoltage(t *testing.T) {
+func TestINA3221GetBusVoltage(t *testing.T) {
 	d, a := initTestINA3221DriverWithStubbedAdaptor()
-	gobottest.Assert(t, d.Start(), nil)
-
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		// bus voltage sensor values from 12V battery
 		copy(b, []byte{0x36, 0x68})
@@ -74,10 +65,8 @@ func TestINA3221DriverGetBusVoltage(t *testing.T) {
 	gobottest.Assert(t, err, nil)
 }
 
-func TestINA3221DriverGetBusVoltageReadError(t *testing.T) {
+func TestINA3221GetBusVoltageReadError(t *testing.T) {
 	d, a := initTestINA3221DriverWithStubbedAdaptor()
-	gobottest.Assert(t, d.Start(), nil)
-
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		return 0, errors.New("read error")
 	}
@@ -86,10 +75,8 @@ func TestINA3221DriverGetBusVoltageReadError(t *testing.T) {
 	gobottest.Assert(t, err, errors.New("read error"))
 }
 
-func TestINA3221DriverGetShuntVoltage(t *testing.T) {
+func TestINA3221GetShuntVoltage(t *testing.T) {
 	d, a := initTestINA3221DriverWithStubbedAdaptor()
-	gobottest.Assert(t, d.Start(), nil)
-
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		// shunt voltage sensor values from 12V battery
 		copy(b, []byte{0x05, 0xD8})
@@ -101,10 +88,8 @@ func TestINA3221DriverGetShuntVoltage(t *testing.T) {
 	gobottest.Assert(t, err, nil)
 }
 
-func TestINA3221DriverGetShuntVoltageReadError(t *testing.T) {
+func TestINA3221GetShuntVoltageReadError(t *testing.T) {
 	d, a := initTestINA3221DriverWithStubbedAdaptor()
-	gobottest.Assert(t, d.Start(), nil)
-
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		return 0, errors.New("read error")
 	}
@@ -113,10 +98,8 @@ func TestINA3221DriverGetShuntVoltageReadError(t *testing.T) {
 	gobottest.Assert(t, err, errors.New("read error"))
 }
 
-func TestINA3221DriverGetCurrent(t *testing.T) {
+func TestINA3221GetCurrent(t *testing.T) {
 	d, a := initTestINA3221DriverWithStubbedAdaptor()
-	gobottest.Assert(t, d.Start(), nil)
-
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		// shunt voltage sensor values from 12V battery
 		copy(b, []byte{0x05, 0x0D8})
@@ -128,10 +111,8 @@ func TestINA3221DriverGetCurrent(t *testing.T) {
 	gobottest.Assert(t, err, nil)
 }
 
-func TestINA3221DriverCurrentReadError(t *testing.T) {
+func TestINA3221CurrentReadError(t *testing.T) {
 	d, a := initTestINA3221DriverWithStubbedAdaptor()
-	gobottest.Assert(t, d.Start(), nil)
-
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		return 0, errors.New("read error")
 	}
@@ -140,10 +121,8 @@ func TestINA3221DriverCurrentReadError(t *testing.T) {
 	gobottest.Assert(t, err, errors.New("read error"))
 }
 
-func TestINA3221DriverGetLoadVoltage(t *testing.T) {
+func TestINA3221GetLoadVoltage(t *testing.T) {
 	d, a := initTestINA3221DriverWithStubbedAdaptor()
-	gobottest.Assert(t, d.Start(), nil)
-
 	i := 0
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		// TODO: return test data as read from actual sensor
@@ -157,25 +136,12 @@ func TestINA3221DriverGetLoadVoltage(t *testing.T) {
 	gobottest.Assert(t, err, nil)
 }
 
-func TestINA3221DriverGetLoadVoltageReadError(t *testing.T) {
+func TestINA3221GetLoadVoltageReadError(t *testing.T) {
 	d, a := initTestINA3221DriverWithStubbedAdaptor()
-	gobottest.Assert(t, d.Start(), nil)
-
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		return 0, errors.New("read error")
 	}
 
 	_, err := d.GetLoadVoltage(INA3221Channel2)
 	gobottest.Assert(t, err, errors.New("read error"))
-}
-
-func TestINA3221DriverName(t *testing.T) {
-	d := initTestINA3221Driver()
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "INA3221"), true)
-}
-
-func TestINA3221DriverSetName(t *testing.T) {
-	d := initTestINA3221Driver()
-	d.SetName("foobot")
-	gobottest.Assert(t, d.Name(), "foobot")
 }

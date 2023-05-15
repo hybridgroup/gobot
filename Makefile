@@ -1,22 +1,29 @@
-.PHONY: test race cover robeaux examples test_with_coverage fmt_check
+# include also examples in other than ./examples folder
+ALL_EXAMPLES := $(shell grep -l -r --include "*.go" 'build example' ./)
+# prevent examples with gocv (opencv) dependencies
+EXAMPLES_NO_GOCV := $(shell grep -L 'gocv' $(ALL_EXAMPLES))
+# prevent examples with joystick (sdl2) and gocv (opencv) dependencies
+EXAMPLES_NO_GOCV_JOYSTICK := $(shell grep -L 'joystick' $$(grep -L 'gocv' $(EXAMPLES_NO_GOCV)))
+# used examples
+EXAMPLES := $(EXAMPLES_NO_GOCV)
 
-excluding_vendor := $(shell go list ./... | grep -v /vendor/)
+.PHONY: test test_race test_cover robeaux version_check fmt_check fmt_fix examples examples_check $(EXAMPLES)
 
-# Run tests on all non-vendor directories
+# opencv platform currently skipped to prevent install of preconditions
+including_except := $(shell go list ./... | grep -v platforms/opencv)
+
+# Run tests on nearly all directories without test cache
 test:
-	go test -v $(excluding_vendor)
+	go test -count=1 -v $(including_except)
 
-# Run tests with race detection on all non-vendor directories
-race:
-	go test -race $(excluding_vendor)
+# Run tests with race detection
+test_race:
+	go test -race $(including_except)
 
-# Check for code well-formedness
-fmt_check:
-	./ci/format.sh
-
-# Test and generate coverage
-test_with_coverage:
-	./ci/test.sh
+# Test, generate and show coverage in browser
+test_cover:
+	go test -v $(including_except) -coverprofile=coverage.txt ; \
+	go tool cover -html=coverage.txt ; \
 
 robeaux:
 ifeq (,$(shell which go-bindata))
@@ -36,9 +43,32 @@ endif
 	rm -rf node_modules/ ; \
 	go fmt ./robeaux/robeaux.go ; \
 
-EXAMPLES := $(shell ls examples/*.go | sed -e 's/examples\///')
+# Check for installed and module version match. Will exit with code 50 if not match.
+# There is nothing bad in general, if you program with a higher version.
+# At least the recipe "fmt_fix" will not work in that case.
+version_check:
+	@gv=$$(echo $$(go version) | sed "s/^.* go\([0-9].[0-9]*\).*/\1/") ; \
+	mv=$$(grep -m 1 'go 1.' ./go.mod | sed "s/^go \([0-9].[0-9]*\).*/\1/") ; \
+	echo "go: $${gv}.*, go.mod: $${mv}" ; \
+	if [ "$${gv}" != "$${mv}" ]; then exit 50; fi ; \
 
-examples:
-	for example in $(EXAMPLES) ; do \
-		go build -o /tmp/$$example examples/$$example ; \
-	done ; \
+# Check for bad code style and other issues
+fmt_check:
+	gofmt -l ./
+	go vet ./...
+
+# Fix bad code style (will only be executed, on version match)
+fmt_fix: version_check
+	go fmt ./...
+
+examples: $(EXAMPLES)
+
+examples_check: 
+	$(MAKE) CHECK=ON examples
+
+$(EXAMPLES):
+ifeq ($(CHECK),ON)
+	go vet ./$@
+else
+	go build -o /tmp/gobot_examples/$@ ./$@
+endif

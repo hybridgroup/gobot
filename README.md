@@ -7,9 +7,11 @@
 [![Go Report Card](https://goreportcard.com/badge/hybridgroup/gobot)](https://goreportcard.com/report/hybridgroup/gobot)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/hybridgroup/gobot/blob/master/LICENSE.txt)
 
-Gobot (https://gobot.io/) is a framework using the Go programming language (https://golang.org/) for robotics, physical computing, and the Internet of Things.
+Gobot (https://gobot.io/) is a framework using the Go programming language (https://golang.org/) for robotics, physical
+computing, and the Internet of Things.
 
-It provides a simple, yet powerful way to create solutions that incorporate multiple, different hardware devices at the same time.
+It provides a simple, yet powerful way to create solutions that incorporate multiple, different hardware devices at the
+same time.
 
 Want to run Go directly on microcontrollers? Check out our sister project TinyGo (https://tinygo.org/)
 
@@ -87,7 +89,8 @@ func main() {
 
 #### "Metal" Gobot
 
-You can use the entire Gobot framework as shown in the examples above ("Classic" Gobot), or you can pick and choose from the various Gobot packages to control hardware with nothing but pure idiomatic Golang code ("Metal" Gobot). For example:
+You can use the entire Gobot framework as shown in the examples above ("Classic" Gobot), or you can pick and choose from
+the various Gobot packages to control hardware with nothing but pure idiomatic Golang code ("Metal" Gobot). For example:
 
 ```go
 package main
@@ -114,7 +117,8 @@ func main() {
 
 #### "Master" Gobot
 
-You can also use the full capabilities of the framework aka "Master Gobot" to control swarms of robots or other features such as the built-in API server. For example:
+You can also use the full capabilities of the framework aka "Master Gobot" to control swarms of robots or other features
+such as the built-in API server. For example:
 
 ```go
 package main
@@ -180,7 +184,9 @@ func main() {
 ```
 
 ## Hardware Support
-Gobot has a extensible system for connecting to hardware devices. The following robotics and physical computing platforms are currently supported:
+
+Gobot has a extensible system for connecting to hardware devices. The following robotics and physical computing
+platforms are currently supported:
 
 - [Arduino](http://www.arduino.cc/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/firmata)
 - Audio <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/audio)
@@ -197,6 +203,7 @@ Gobot has a extensible system for connecting to hardware devices. The following 
 - [Intel Curie](https://www.intel.com/content/www/us/en/products/boards-kits/curie.html) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/intel-iot/curie)
 - [Intel Edison](http://www.intel.com/content/www/us/en/do-it-yourself/edison.html) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/intel-iot/edison)
 - [Intel Joule](http://intel.com/joule/getstarted) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/intel-iot/joule)
+- [Jetson Nano](https://developer.nvidia.com/embedded/jetson-nano/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/jetson)
 - [Joystick](http://en.wikipedia.org/wiki/Joystick) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/joystick)
 - [Keyboard](https://en.wikipedia.org/wiki/Computer_keyboard) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/keyboard)
 - [Leap Motion](https://www.leapmotion.com/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/leap)
@@ -204,6 +211,7 @@ Gobot has a extensible system for connecting to hardware devices. The following 
 - [MegaPi](http://www.makeblock.com/megapi) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/megapi)
 - [Microbit](http://microbit.org/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/microbit)
 - [MQTT](http://mqtt.org/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/mqtt)
+- [NanoPi NEO](https://wiki.friendlyelec.com/wiki/index.php/NanoPi_NEO) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/nanopi)
 - [NATS](http://nats.io/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/nats)
 - [Neurosky](http://neurosky.com/products-markets/eeg-biosensors/hardware/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/neurosky)
 - [OpenCV](http://opencv.org/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/opencv)
@@ -212,6 +220,7 @@ Gobot has a extensible system for connecting to hardware devices. The following 
 - [Parrot Bebop](http://www.parrot.com/usa/products/bebop-drone/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/parrot/bebop)
 - [Parrot Minidrone](https://www.parrot.com/us/minidrones) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/parrot/minidrone)
 - [Pebble](https://www.getpebble.com/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/pebble)
+- [Radxa Rock Pi 4](https://wiki.radxa.com/Rock4/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/rockpi)
 - [Raspberry Pi](http://www.raspberrypi.org/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/raspi)
 - [Sphero](http://www.sphero.com/) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/sphero)
 - [Sphero BB-8](http://www.sphero.com/bb8) <=> [Package](https://github.com/hybridgroup/gobot/tree/master/platforms/sphero/bb8)
@@ -260,6 +269,7 @@ Support for devices that use Inter-Integrated Circuit (I2C) have a shared set of
 drivers provided using the `gobot/drivers/i2c` package:
 
 - [I2C](https://en.wikipedia.org/wiki/I%C2%B2C) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/drivers/i2c)
+	- Adafruit 2x16 RGB-LCD with 5 keys
 	- Adafruit Motor Hat
 	- ADS1015 Analog to Digital Converter
 	- ADS1115 Analog to Digital Converter
@@ -271,25 +281,31 @@ drivers provided using the `gobot/drivers/i2c` package:
 	- BMP280 Barometric Pressure/Temperature/Altitude Sensor
 	- BMP388 Barometric Pressure/Temperature/Altitude Sensor
 	- DRV2605L Haptic Controller
+	- Generic driver for read and write values to/from register address
 	- Grove Digital Accelerometer
 	- GrovePi Expansion Board
 	- Grove RGB LCD
 	- HMC6352 Compass
-	- HMC8553L 3-Axis Digital Compass
+	- HMC5883L 3-Axis Digital Compass
 	- INA3221 Voltage Monitor
 	- JHD1313M1 LCD Display w/RGB Backlight
 	- L3GD20H 3-Axis Gyroscope
 	- LIDAR-Lite
 	- MCP23017 Port Expander
 	- MMA7660 3-Axis Accelerometer
-	- MPL115A2 Barometer
+	- MPL115A2 Barometric Pressure/Temperature
 	- MPU6050 Accelerometer/Gyroscope
+	- PCA9501 8-bit I/O port with interrupt, 2-kbit EEPROM
+	- PCA953x LED Dimmer for PCA9530 (2-bit), PCA9533 (4-bit), PCA9531 (8-bit), PCA9532 (16-bit)
 	- PCA9685 16-channel 12-bit PWM/Servo Driver
+	- PCF8583 clock and calendar or event counter, 240 x 8-bit RAM
+	- PCF8591 8-bit 4xA/D & 1xD/A converter
 	- SHT2x Temperature/Humidity
 	- SHT3x-D Temperature/Humidity
 	- SSD1306 OLED Display Controller
 	- TSL2561 Digital Luminosity/Lux/Light Sensor
 	- Wii Nunchuck Controller
+	- YL-40 Brightness/Temperature sensor, Potentiometer, analog input, analog output Driver
 
 Support for devices that use Serial Peripheral Interface (SPI) have
 a shared set of drivers provided using the `gobot/drivers/spi` package:
@@ -303,13 +319,15 @@ a shared set of drivers provided using the `gobot/drivers/spi` package:
 	- MCP3204 Analog/Digital Converter
 	- MCP3208 Analog/Digital Converter
 	- MCP3304 Analog/Digital Converter
+	- MFRC522 RFID Card Reader
 	- SSD1306 OLED Display Controller
 
 More platforms and drivers are coming soon...
 
-## API:
+## API
 
-Gobot includes a RESTful API to query the status of any robot running within a group, including the connection and device status, and execute device commands.
+Gobot includes a RESTful API to query the status of any robot running within a group, including the connection and
+device status, and execute device commands.
 
 To activate the API, import the `gobot.io/x/gobot/api` package and instantiate the `API` like this:
 
@@ -319,6 +337,7 @@ To activate the API, import the `gobot.io/x/gobot/api` package and instantiate t
 ```
 
 You can also specify the api host and port, and turn on authentication:
+
 ```go
   master := gobot.NewMaster()
   server := api.NewAPI(master)
@@ -331,29 +350,37 @@ You may access the [robeaux](https://github.com/hybridgroup/robeaux) React.js in
 
 ## CLI
 
-Gobot uses the Gort [http://gort.io](http://gort.io) Command Line Interface (CLI) so you can access important features right from the command line. We call it "RobotOps", aka "DevOps For Robotics". You can scan, connect, update device firmware, and more!
+Gobot uses the Gort [http://gort.io](http://gort.io) Command Line Interface (CLI) so you can access important features
+right from the command line. We call it "RobotOps", aka "DevOps For Robotics". You can scan, connect, update device
+firmware, and more!
 
 Gobot also has its own CLI to generate new platforms, adaptors, and drivers. You can check it out in the `/cli` directory.
 
 ## Documentation
+
 We're always adding documentation to our web site at https://gobot.io/ please check there as we continue to work on Gobot
 
 Thank you!
 
 ## Need help?
+
 * Issues: https://github.com/hybridgroup/gobot/issues
 * Twitter: [@gobotio](https://twitter.com/gobotio)
 * Slack: [https://gophers.slack.com/messages/C0N5HDB08](https://gophers.slack.com/messages/C0N5HDB08)
 * Mailing list: https://groups.google.com/forum/#!forum/gobotio
 
 ## Contributing
+
 For our contribution guidelines, please go to [https://github.com/hybridgroup/gobot/blob/master/CONTRIBUTING.md
 ](https://github.com/hybridgroup/gobot/blob/master/CONTRIBUTING.md
 ).
 
-Gobot is released with a Contributor Code of Conduct. By participating in this project you agree to abide by its terms. [You can read about it here](https://github.com/hybridgroup/gobot/tree/master/CODE_OF_CONDUCT.md).
+Gobot is released with a Contributor Code of Conduct. By participating in this project you agree to abide by its terms.
+[You can read about it here](https://github.com/hybridgroup/gobot/tree/master/CODE_OF_CONDUCT.md).
 
 ## License
+
 Copyright (c) 2013-2020 The Hybrid Group. Licensed under the Apache 2.0 license.
 
-The Contributor Covenant is released under the Creative Commons Attribution 4.0 International Public License, which requires that attribution be included.
+The Contributor Covenant is released under the Creative Commons Attribution 4.0 International Public License, which
+requires that attribution be included.

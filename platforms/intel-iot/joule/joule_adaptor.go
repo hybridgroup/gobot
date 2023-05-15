@@ -1,15 +1,16 @@
 package joule
 
 import (
-	"errors"
 	"fmt"
 	"sync"
 
 	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/i2c"
-	"gobot.io/x/gobot/sysfs"
+	"gobot.io/x/gobot/platforms/adaptors"
+	"gobot.io/x/gobot/system"
 )
+
+const defaultI2cBusNumber = 0
 
 type sysfsPin struct {
 	pin    int
@@ -18,175 +19,102 @@ type sysfsPin struct {
 
 // Adaptor represents an Intel Joule
 type Adaptor struct {
-	name        string
-	digitalPins map[int]*sysfs.DigitalPin
-	pwmPins     map[int]*sysfs.PWMPin
-	i2cBuses    [3]i2c.I2cDevice
-	connect     func(e *Adaptor) (err error)
-	mutex       *sync.Mutex
+	name  string
+	sys   *system.Accesser
+	mutex sync.Mutex
+	*adaptors.DigitalPinsAdaptor
+	*adaptors.PWMPinsAdaptor
+	*adaptors.I2cBusAdaptor
 }
 
 // NewAdaptor returns a new Joule Adaptor
-func NewAdaptor() *Adaptor {
-	return &Adaptor{
+//
+// Optional parameters:
+//		adaptors.WithGpiodAccess():	use character device gpiod driver instead of sysfs
+//		adaptors.WithSpiGpioAccess(sclk, nss, mosi, miso):	use GPIO's instead of /dev/spidev#.#
+func NewAdaptor(opts ...func(adaptors.Optioner)) *Adaptor {
+	sys := system.NewAccesser()
+	c := &Adaptor{
 		name: gobot.DefaultName("Joule"),
-		connect: func(e *Adaptor) (err error) {
-			return
-		},
-		mutex: &sync.Mutex{},
+		sys:  sys,
 	}
+	c.DigitalPinsAdaptor = adaptors.NewDigitalPinsAdaptor(sys, c.translateDigitalPin, opts...)
+	c.PWMPinsAdaptor = adaptors.NewPWMPinsAdaptor(sys, c.translatePWMPin, adaptors.WithPWMPinInitializer(pwmPinInitializer))
+	c.I2cBusAdaptor = adaptors.NewI2cBusAdaptor(sys, c.validateI2cBusNumber, defaultI2cBusNumber)
+	return c
 }
 
 // Name returns the Adaptors name
-func (e *Adaptor) Name() string { return e.name }
+func (c *Adaptor) Name() string { return c.name }
 
 // SetName sets the Adaptors name
-func (e *Adaptor) SetName(n string) { e.name = n }
+func (c *Adaptor) SetName(n string) { c.name = n }
 
-// Connect initializes the Joule for use with the Arduino beakout board
-func (e *Adaptor) Connect() (err error) {
-	e.mutex.Lock()
-	defer e.mutex.Unlock()
+// Connect create new connection to board and pins.
+func (c *Adaptor) Connect() error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 
-	e.digitalPins = make(map[int]*sysfs.DigitalPin)
-	e.pwmPins = make(map[int]*sysfs.PWMPin)
-	err = e.connect(e)
-	return
+	if err := c.I2cBusAdaptor.Connect(); err != nil {
+		return err
+	}
+
+	if err := c.PWMPinsAdaptor.Connect(); err != nil {
+		return err
+	}
+	return c.DigitalPinsAdaptor.Connect()
 }
 
 // Finalize releases all i2c devices and exported digital and pwm pins.
-func (e *Adaptor) Finalize() (err error) {
-	e.mutex.Lock()
-	defer e.mutex.Unlock()
+func (c *Adaptor) Finalize() error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 
-	for _, pin := range e.digitalPins {
-		if pin != nil {
-			if errs := pin.Unexport(); errs != nil {
-				err = multierror.Append(err, errs)
-			}
-		}
+	err := c.DigitalPinsAdaptor.Finalize()
+
+	if e := c.PWMPinsAdaptor.Finalize(); e != nil {
+		err = multierror.Append(err, e)
 	}
-	for _, pin := range e.pwmPins {
-		if pin != nil {
-			if errs := pin.Enable(false); errs != nil {
-				err = multierror.Append(err, errs)
-			}
-			if errs := pin.Unexport(); errs != nil {
-				err = multierror.Append(err, errs)
-			}
-		}
+
+	if e := c.I2cBusAdaptor.Finalize(); e != nil {
+		err = multierror.Append(err, e)
 	}
-	for _, bus := range e.i2cBuses {
-		if bus != nil {
-			if errs := bus.Close(); errs != nil {
-				err = multierror.Append(err, errs)
-			}
-		}
-	}
-	return
+
+	return err
 }
 
-// digitalPin returns matched digitalPin for specified values
-func (e *Adaptor) DigitalPin(pin string, dir string) (sysfsPin sysfs.DigitalPinner, err error) {
-	e.mutex.Lock()
-	defer e.mutex.Unlock()
-
-	i := sysfsPinMap[pin]
-	if e.digitalPins[i.pin] == nil {
-		e.digitalPins[i.pin] = sysfs.NewDigitalPin(i.pin)
-		if err = e.digitalPins[i.pin].Export(); err != nil {
-			return
-		}
+func (c *Adaptor) validateI2cBusNumber(busNr int) error {
+	// Valid bus number is [0..2] which corresponds to /dev/i2c-0 through /dev/i2c-2.
+	if (busNr < 0) || (busNr > 2) {
+		return fmt.Errorf("Bus number %d out of range", busNr)
 	}
-
-	if dir == "in" {
-		if err = e.digitalPins[i.pin].Direction(sysfs.IN); err != nil {
-			return
-		}
-	} else if dir == "out" {
-		if err = e.digitalPins[i.pin].Direction(sysfs.OUT); err != nil {
-			return
-		}
-	}
-	return e.digitalPins[i.pin], nil
+	return nil
 }
 
-// DigitalRead reads digital value from pin
-func (e *Adaptor) DigitalRead(pin string) (i int, err error) {
-	sysfsPin, err := e.DigitalPin(pin, "in")
-	if err != nil {
-		return
+func (c *Adaptor) translateDigitalPin(id string) (string, int, error) {
+	if val, ok := sysfsPinMap[id]; ok {
+		return "", val.pin, nil
 	}
-	return sysfsPin.Read()
+	return "", -1, fmt.Errorf("'%s' is not a valid id for a digital pin", id)
 }
 
-// DigitalWrite writes a value to the pin. Acceptable values are 1 or 0.
-func (e *Adaptor) DigitalWrite(pin string, val byte) (err error) {
-	sysfsPin, err := e.DigitalPin(pin, "out")
-	if err != nil {
-		return
+func (c *Adaptor) translatePWMPin(id string) (string, int, error) {
+	sysPin, ok := sysfsPinMap[id]
+	if !ok {
+		return "", -1, fmt.Errorf("'%s' is not a valid id for a pin", id)
 	}
-	return sysfsPin.Write(int(val))
+	if sysPin.pwmPin == -1 {
+		return "", -1, fmt.Errorf("'%s' is not a valid id for a PWM pin", id)
+	}
+	return "/sys/class/pwm/pwmchip0", sysPin.pwmPin, nil
 }
 
-// PwmWrite writes the 0-254 value to the specified pin
-func (e *Adaptor) PwmWrite(pin string, val byte) (err error) {
-	pwmPin, err := e.PWMPin(pin)
-	if err != nil {
-		return
-	}
-	period, err := pwmPin.Period()
-	if err != nil {
+func pwmPinInitializer(pin gobot.PWMPinner) error {
+	if err := pin.Export(); err != nil {
 		return err
 	}
-	duty := gobot.FromScale(float64(val), 0, 255.0)
-	return pwmPin.SetDutyCycle(uint32(float64(period) * duty))
-}
-
-// PWMPin returns a sysfs.PWMPin
-func (e *Adaptor) PWMPin(pin string) (sysfsPin sysfs.PWMPinner, err error) {
-	e.mutex.Lock()
-	defer e.mutex.Unlock()
-
-	sysPin, ok := sysfsPinMap[pin]
-	if !ok {
-		err = errors.New("Not a valid pin")
-		return
+	if err := pin.SetPeriod(10000000); err != nil {
+		return err
 	}
-	if sysPin.pwmPin != -1 {
-		if e.pwmPins[sysPin.pwmPin] == nil {
-			e.pwmPins[sysPin.pwmPin] = sysfs.NewPWMPin(sysPin.pwmPin)
-			if err = e.pwmPins[sysPin.pwmPin].Export(); err != nil {
-				return
-			}
-			if err = e.pwmPins[sysPin.pwmPin].SetPeriod(10000000); err != nil {
-				return
-			}
-			if err = e.pwmPins[sysPin.pwmPin].Enable(true); err != nil {
-				return
-			}
-		}
-
-		sysfsPin = e.pwmPins[sysPin.pwmPin]
-		return
-	}
-	err = errors.New("Not a PWM pin")
-	return
-}
-
-// GetConnection returns an i2c connection to a device on a specified bus.
-// Valid bus number is [0..2] which corresponds to /dev/i2c-0 through /dev/i2c-2.
-func (e *Adaptor) GetConnection(address int, bus int) (connection i2c.Connection, err error) {
-	if (bus < 0) || (bus > 2) {
-		return nil, fmt.Errorf("Bus number %d out of range", bus)
-	}
-	if e.i2cBuses[bus] == nil {
-		e.i2cBuses[bus], err = sysfs.NewI2cDevice(fmt.Sprintf("/dev/i2c-%d", bus))
-	}
-	return i2c.NewConnection(e.i2cBuses[bus], address), err
-}
-
-// GetDefaultBus returns the default i2c bus for this platform
-func (e *Adaptor) GetDefaultBus() int {
-	return 0
+	return pin.SetEnabled(true)
 }

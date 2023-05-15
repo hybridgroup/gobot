@@ -176,7 +176,7 @@ func TestDigitalRead(t *testing.T) {
 
 func TestServoWrite(t *testing.T) {
 	d := initTestDriver()
-	err := d.ServoWrite(SERVO_1, 0x7F)
+	err := d.ServoWrite("SERVO_1", 0x7F)
 	if err != nil {
 		t.Error(err)
 	}
@@ -252,23 +252,23 @@ func (ctr *TestConnector) GetSpiConnection(busNum, chipNum, mode, bits int, maxS
 	return TestSpiDevice{}, nil
 }
 
-func (ctr *TestConnector) GetSpiDefaultBus() int {
+func (ctr *TestConnector) SpiDefaultBusNumber() int {
 	return 0
 }
 
-func (ctr *TestConnector) GetSpiDefaultChip() int {
+func (ctr *TestConnector) SpiDefaultChipNumber() int {
 	return 0
 }
 
-func (ctr *TestConnector) GetSpiDefaultMode() int {
+func (ctr *TestConnector) SpiDefaultMode() int {
 	return 0
 }
 
-func (ctr *TestConnector) GetSpiDefaultBits() int {
+func (ctr *TestConnector) SpiDefaultBitCount() int {
 	return 8
 }
 
-func (ctr *TestConnector) GetSpiDefaultMaxSpeed() int64 {
+func (ctr *TestConnector) SpiDefaultMaxSpeed() int64 {
 	return 0
 }
 
@@ -280,7 +280,14 @@ func (c TestSpiDevice) Close() error {
 	return nil
 }
 
-func (c TestSpiDevice) Tx(w, r []byte) error {
+func (c TestSpiDevice) ReadByteData(byte) (byte, error)   { return 0, nil }
+func (c TestSpiDevice) ReadBlockData(byte, []byte) error  { return nil }
+func (c TestSpiDevice) WriteByte(byte) error              { return nil }
+func (c TestSpiDevice) WriteByteData(byte, byte) error    { return nil }
+func (c TestSpiDevice) WriteBlockData(byte, []byte) error { return nil }
+func (c TestSpiDevice) WriteBytes([]byte) error           { return nil }
+
+func (c TestSpiDevice) ReadCommandData(w, r []byte) error {
 	manName, _ := hex.DecodeString("ff0000a544657874657220496e6475737472696573000000")
 	boardName, _ := hex.DecodeString("ff0000a5476f5069476f3300000000000000000000000000")
 	hwVersion, _ := hex.DecodeString("ff0000a5002dcaab")

@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
+	"sync"
 	"testing"
 	"time"
 
@@ -13,6 +14,15 @@ import (
 )
 
 var _ gobot.Driver = (*Driver)(nil)
+
+type WriteCloserDoNothing struct{}
+
+func (w *WriteCloserDoNothing) Write(p []byte) (n int, err error) {
+	return 0, nil
+}
+func (w *WriteCloserDoNothing) Close() error {
+	return nil
+}
 
 func TestTelloDriver(t *testing.T) {
 	d := NewDriver("8888")
@@ -133,4 +143,50 @@ func TestHandleResponse(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestHaltShouldTerminateAllTheRelatedGoroutines(t *testing.T) {
+	d := NewDriver("8888")
+	d.cmdConn = &WriteCloserDoNothing{}
+
+	var wg sync.WaitGroup
+	wg.Add(3)
+
+	d.addDoneChReaderCount(1)
+	go func() {
+		<-d.doneCh
+		d.addDoneChReaderCount(-1)
+		wg.Done()
+		fmt.Println("Done routine 1.")
+	}()
+
+	d.addDoneChReaderCount(1)
+	go func() {
+		<-d.doneCh
+		d.addDoneChReaderCount(-1)
+		wg.Done()
+		fmt.Println("Done routine 2.")
+	}()
+
+	d.addDoneChReaderCount(1)
+	go func() {
+		<-d.doneCh
+		d.addDoneChReaderCount(-1)
+		wg.Done()
+		fmt.Println("Done routine 3.")
+	}()
+
+	d.Halt()
+	wg.Wait()
+
+	gobottest.Assert(t, d.doneChReaderCount, int32(0))
+}
+
+func TestHaltNotWaitForeverWhenCalledMultipleTimes(t *testing.T) {
+	d := NewDriver("8888")
+	d.cmdConn = &WriteCloserDoNothing{}
+
+	d.Halt()
+	d.Halt()
+	d.Halt()
 }

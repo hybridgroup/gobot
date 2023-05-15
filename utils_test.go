@@ -10,16 +10,16 @@ import (
 
 func TestEvery(t *testing.T) {
 	i := 0
-	begin := time.Now().UnixNano()
-	sem := make(chan int64, 1)
+	begin := time.Now()
+	sem := make(chan time.Time, 1)
 	Every(2*time.Millisecond, func() {
 		i++
 		if i == 2 {
-			sem <- time.Now().UnixNano()
+			sem <- time.Now()
 		}
 	})
-	end := <-sem
-	if end-begin < 4000000 {
+	<-sem
+	if time.Since(begin) < 4*time.Millisecond {
 		t.Error("Test should have taken at least 4 milliseconds")
 	}
 }
@@ -27,19 +27,20 @@ func TestEvery(t *testing.T) {
 func TestEveryWhenStopped(t *testing.T) {
 	sem := make(chan bool)
 
-	done := Every(50*time.Millisecond, func() {
+	done := Every(100*time.Millisecond, func() {
 		sem <- true
 	})
 
 	select {
 	case <-sem:
 		done.Stop()
-	case <-time.After(60 * time.Millisecond):
+	case <-time.After(190 * time.Millisecond):
+		done.Stop()
 		t.Errorf("Every was not called")
 	}
 
 	select {
-	case <-time.After(60 * time.Millisecond):
+	case <-time.After(190 * time.Millisecond):
 	case <-sem:
 		t.Error("Every should have stopped")
 	}
@@ -49,14 +50,14 @@ func TestAfter(t *testing.T) {
 	i := 0
 	sem := make(chan bool)
 
-	After(1*time.Millisecond, func() {
+	After(100*time.Millisecond, func() {
 		i++
 		sem <- true
 	})
 
 	select {
 	case <-sem:
-	case <-time.After(10 * time.Millisecond):
+	case <-time.After(190 * time.Millisecond):
 		t.Errorf("After was not called")
 	}
 

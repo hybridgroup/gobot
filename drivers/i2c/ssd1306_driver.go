@@ -3,9 +3,9 @@ package i2c
 import (
 	"fmt"
 	"image"
-
-	"gobot.io/x/gobot"
 )
+
+const ssd1306DefaultAddress = 0x3c
 
 // register addresses for the ssd1306
 const (
@@ -14,7 +14,6 @@ const (
 	ssd1306Height       = 64
 	ssd1306ExternalVCC  = false
 	ssd1306SetStartLine = 0x40
-	ssd1306I2CAddress   = 0x3c
 	// fundamental commands
 	ssd1306SetComOutput0 = 0xC0
 	ssd1306SetComOutput1 = 0xC1
@@ -179,11 +178,7 @@ func (d *DisplayBuffer) Set(buf []byte) {
 
 // SSD1306Driver is a Gobot Driver for a SSD1306 Display.
 type SSD1306Driver struct {
-	name       string
-	connector  Connector
-	connection Connection
-	Config
-	gobot.Commander
+	*Driver
 	initSequence  *SSD1306Init
 	displayWidth  int
 	displayHeight int
@@ -195,7 +190,7 @@ type SSD1306Driver struct {
 // NewSSD1306Driver creates a new SSD1306Driver.
 //
 // Params:
-//        conn Connector - the Adaptor to use with this Driver
+//        c Connector - the Adaptor to use with this Driver
 //
 // Optional params:
 //        WithBus(int):    			bus to use with this driver
@@ -204,16 +199,15 @@ type SSD1306Driver struct {
 //        WithSSD1306DisplayHeight(int): 	height of display (defaults to 64)
 //        WithSSD1306ExternalVCC:          set true when using an external OLED supply (defaults to false)
 //
-func NewSSD1306Driver(a Connector, options ...func(Config)) *SSD1306Driver {
+func NewSSD1306Driver(c Connector, options ...func(Config)) *SSD1306Driver {
 	s := &SSD1306Driver{
-		name:          gobot.DefaultName("SSD1306"),
-		Commander:     gobot.NewCommander(),
-		connector:     a,
-		Config:        NewConfig(),
+		Driver:        NewDriver(c, "SSD1306", ssd1306DefaultAddress),
 		displayHeight: ssd1306Height,
 		displayWidth:  ssd1306Width,
 		externalVCC:   ssd1306ExternalVCC,
 	}
+	s.afterStart = s.initialize
+
 	// set options
 	for _, option := range options {
 		option(s)
@@ -253,52 +247,6 @@ func NewSSD1306Driver(a Connector, options ...func(Config)) *SSD1306Driver {
 	})
 	return s
 }
-
-// Name returns the Name for the Driver.
-func (s *SSD1306Driver) Name() string { return s.name }
-
-// SetName sets the Name for the Driver.
-func (s *SSD1306Driver) SetName(n string) { s.name = n }
-
-// Connection returns the connection for the Driver.
-func (s *SSD1306Driver) Connection() gobot.Connection { return s.connector.(gobot.Connection) }
-
-// Start starts the Driver up, and writes start command
-func (s *SSD1306Driver) Start() (err error) {
-	// check device size for supported resolutions
-	switch {
-	case s.displayWidth == 128 && s.displayHeight == 64:
-		s.initSequence = ssd1306Init128x64
-	case s.displayWidth == 128 && s.displayHeight == 32:
-		s.initSequence = ssd1306Init128x32
-	case s.displayWidth == 96 && s.displayHeight == 16:
-		s.initSequence = ssd1306Init96x16
-	default:
-		return fmt.Errorf("%dx%d resolution is unsupported, supported resolutions: 128x64, 128x32, 96x16", s.displayWidth, s.displayHeight)
-	}
-	// check for external vcc
-	if s.externalVCC {
-		s.initSequence.chargePumpSetting = 0x10
-		s.initSequence.contrast = 0x9F
-		s.initSequence.prechargePeriod = 0x22
-	}
-	bus := s.GetBusOrDefault(s.connector.GetDefaultBus())
-	address := s.GetAddressOrDefault(ssd1306I2CAddress)
-	s.connection, err = s.connector.GetConnection(address, bus)
-	if err != nil {
-		return err
-	}
-	if err = s.Init(); err != nil {
-		return err
-	}
-	if err = s.On(); err != nil {
-		return err
-	}
-	return nil
-}
-
-// Halt returns true if device is halted successfully
-func (s *SSD1306Driver) Halt() (err error) { return nil }
 
 // WithSSD1306DisplayWidth option sets the SSD1306Driver DisplayWidth option.
 func WithSSD1306DisplayWidth(val int) func(Config) {
@@ -424,4 +372,32 @@ func (s *SSD1306Driver) commands(commands []byte) (err error) {
 	}
 	_, err = s.connection.Write(command)
 	return err
+}
+
+func (s *SSD1306Driver) initialize() (err error) {
+	// check device size for supported resolutions
+	switch {
+	case s.displayWidth == 128 && s.displayHeight == 64:
+		s.initSequence = ssd1306Init128x64
+	case s.displayWidth == 128 && s.displayHeight == 32:
+		s.initSequence = ssd1306Init128x32
+	case s.displayWidth == 96 && s.displayHeight == 16:
+		s.initSequence = ssd1306Init96x16
+	default:
+		return fmt.Errorf("%dx%d resolution is unsupported, supported resolutions: 128x64, 128x32, 96x16",
+			s.displayWidth, s.displayHeight)
+	}
+	// check for external vcc
+	if s.externalVCC {
+		s.initSequence.chargePumpSetting = 0x10
+		s.initSequence.contrast = 0x9F
+		s.initSequence.prechargePeriod = 0x22
+	}
+	if err = s.Init(); err != nil {
+		return err
+	}
+	if err = s.On(); err != nil {
+		return err
+	}
+	return nil
 }

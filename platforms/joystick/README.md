@@ -5,9 +5,11 @@ You can use Gobot with any USB joystick or game controller that is compatible wi
 Current configurations included:
 - Dualshock3 game controller
 - Dualshock4 game controller
+- Dualsense game controller
 - Thrustmaster T-Flight Hotas X Joystick
 - XBox360 game controller
 - XBox360 "Rock Band" drum controller
+- Nintendo Switch Joy-Con controller pair
 
 ## How to Install
 
@@ -155,7 +157,7 @@ func main() {
 In the `bin` directory for this package is a CLI utility program that scans for SDL joystick events, and displays the ID and value:
 
 ```
-$ go run ./platforms/joystick/bin/scanner.go 
+$ go run ./platforms/joystick/bin/scanner.go
 Joystick 0 connected
 [6625 ms] Axis: 1       value:-22686
 [6641 ms] Axis: 1       value:-32768

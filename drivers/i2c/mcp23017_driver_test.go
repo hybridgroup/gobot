@@ -2,12 +2,15 @@ package i2c
 
 import (
 	"errors"
+	"strings"
 	"testing"
 
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/gobottest"
 )
 
+// this ensures that the implementation is based on i2c.Driver, which implements the gobot.Driver
+// and tests all implementations, so no further tests needed here for gobot.Driver interface
 var _ gobot.Driver = (*MCP23017Driver)(nil)
 
 var pinValPort = map[string]interface{}{
@@ -21,130 +24,107 @@ var pinPort = map[string]interface{}{
 	"port": "A",
 }
 
-func initTestMCP23017Driver(b uint8) (driver *MCP23017Driver) {
+func initTestMCP23017(b uint8) (driver *MCP23017Driver) {
 	// create the driver without starting it
-	adaptor := newI2cTestAdaptor()
-	mcp := NewMCP23017Driver(adaptor, WithMCP23017Bank(b))
-	return mcp
+	a := newI2cTestAdaptor()
+	d := NewMCP23017Driver(a, WithMCP23017Bank(b))
+	return d
 }
 
-func initTestMCP23017DriverWithStubbedAdaptor(b uint8) (*MCP23017Driver, *i2cTestAdaptor) {
+func initTestMCP23017WithStubbedAdaptor(b uint8) (*MCP23017Driver, *i2cTestAdaptor) {
 	// create the driver, ready to use for tests
-	adaptor := newI2cTestAdaptor()
-	mcp := NewMCP23017Driver(adaptor, WithMCP23017Bank(b))
-	mcp.Start()
-	return mcp, adaptor
+	a := newI2cTestAdaptor()
+	d := NewMCP23017Driver(a, WithMCP23017Bank(b))
+	d.Start()
+	return d, a
 }
 
 func TestNewMCP23017Driver(t *testing.T) {
-	var bm interface{} = NewMCP23017Driver(newI2cTestAdaptor())
-	_, ok := bm.(*MCP23017Driver)
+	var di interface{} = NewMCP23017Driver(newI2cTestAdaptor())
+	d, ok := di.(*MCP23017Driver)
 	if !ok {
 		t.Errorf("NewMCP23017Driver() should have returned a *MCP23017Driver")
 	}
-
-	b := NewMCP23017Driver(newI2cTestAdaptor())
-	gobottest.Refute(t, b.Connection(), nil)
+	gobottest.Refute(t, d.Driver, nil)
+	gobottest.Assert(t, strings.HasPrefix(d.Name(), "MCP23017"), true)
+	gobottest.Assert(t, d.defaultAddress, 0x20)
+	gobottest.Refute(t, d.mcpConf, nil)
+	gobottest.Refute(t, d.mcpBehav, nil)
 }
 
-func TestNewMCP23017DriverBank(t *testing.T) {
+func TestWithMCP23017Bank(t *testing.T) {
 	b := NewMCP23017Driver(newI2cTestAdaptor(), WithMCP23017Bank(1))
 	gobottest.Assert(t, b.mcpConf.bank, uint8(1))
 }
 
-func TestNewMCP23017DriverMirror(t *testing.T) {
+func TestWithMCP23017Mirror(t *testing.T) {
 	b := NewMCP23017Driver(newI2cTestAdaptor(), WithMCP23017Mirror(1))
 	gobottest.Assert(t, b.mcpConf.mirror, uint8(1))
 }
 
-func TestNewMCP23017DriverSeqop(t *testing.T) {
+func TestWithMCP23017Seqop(t *testing.T) {
 	b := NewMCP23017Driver(newI2cTestAdaptor(), WithMCP23017Seqop(1))
 	gobottest.Assert(t, b.mcpConf.seqop, uint8(1))
 }
 
-func TestNewMCP23017DriverDisslw(t *testing.T) {
+func TestWithMCP23017Disslw(t *testing.T) {
 	b := NewMCP23017Driver(newI2cTestAdaptor(), WithMCP23017Disslw(1))
 	gobottest.Assert(t, b.mcpConf.disslw, uint8(1))
 }
 
-func TestNewMCP23017DriverHaen(t *testing.T) {
+func TestWithMCP23017Haen(t *testing.T) {
 	b := NewMCP23017Driver(newI2cTestAdaptor(), WithMCP23017Haen(1))
 	gobottest.Assert(t, b.mcpConf.haen, uint8(1))
 }
 
-func TestNewMCP23017DriverOdr(t *testing.T) {
+func TestWithMCP23017Odr(t *testing.T) {
 	b := NewMCP23017Driver(newI2cTestAdaptor(), WithMCP23017Odr(1))
 	gobottest.Assert(t, b.mcpConf.odr, uint8(1))
 }
 
-func TestNewMCP23017DriverIntpol(t *testing.T) {
+func TestWithMCP23017Intpol(t *testing.T) {
 	b := NewMCP23017Driver(newI2cTestAdaptor(), WithMCP23017Intpol(1))
 	gobottest.Assert(t, b.mcpConf.intpol, uint8(1))
 }
 
-func TestNewMCP23017DriverForceRefresh(t *testing.T) {
+func TestWithMCP23017ForceRefresh(t *testing.T) {
 	b := NewMCP23017Driver(newI2cTestAdaptor(), WithMCP23017ForceRefresh(1))
 	gobottest.Assert(t, b.mcpBehav.forceRefresh, true)
 }
 
-func TestNewMCP23017DriverAutoIODirOff(t *testing.T) {
+func TestWithMCP23017AutoIODirOff(t *testing.T) {
 	b := NewMCP23017Driver(newI2cTestAdaptor(), WithMCP23017AutoIODirOff(1))
 	gobottest.Assert(t, b.mcpBehav.autoIODirOff, true)
 }
 
-func TestMCP23017DriverStart(t *testing.T) {
+func TestMCP23017CommandsWriteGPIO(t *testing.T) {
 	// arrange
-	mcp := initTestMCP23017Driver(0)
-	// act & assert
-	gobottest.Assert(t, mcp.Start(), nil)
-}
-
-func TestMCP23017DriverStartErr(t *testing.T) {
-	// arrange
-	adaptor := newI2cTestAdaptor()
-	mcp := NewMCP23017Driver(adaptor, WithMCP23017Bank(0))
-	adaptor.i2cWriteImpl = func([]byte) (int, error) {
-		return 0, errors.New("write error")
-	}
+	d, _ := initTestMCP23017WithStubbedAdaptor(0)
 	// act
-	err := mcp.Start()
-	// assert
-	gobottest.Assert(t, err, errors.New("write error"))
-}
-
-func TestMCP23017DriverHalt(t *testing.T) {
-	mcp := initTestMCP23017Driver(0)
-	gobottest.Assert(t, mcp.Halt(), nil)
-}
-
-func TestMCP23017DriverCommandsWriteGPIO(t *testing.T) {
-	// arrange
-	mcp, _ := initTestMCP23017DriverWithStubbedAdaptor(0)
-	// act
-	result := mcp.Command("WriteGPIO")(pinValPort)
+	result := d.Command("WriteGPIO")(pinValPort)
 	// assert
 	gobottest.Assert(t, result.(map[string]interface{})["err"], nil)
 }
 
-func TestMCP23017DriverCommandsReadGPIO(t *testing.T) {
+func TestMCP23017CommandsReadGPIO(t *testing.T) {
 	// arrange
-	mcp, _ := initTestMCP23017DriverWithStubbedAdaptor(0)
+	d, _ := initTestMCP23017WithStubbedAdaptor(0)
 	// act
-	result := mcp.Command("ReadGPIO")(pinPort)
+	result := d.Command("ReadGPIO")(pinPort)
 	// assert
 	gobottest.Assert(t, result.(map[string]interface{})["err"], nil)
 }
 
-func TestMCP23017DriverWriteGPIO(t *testing.T) {
+func TestMCP23017WriteGPIO(t *testing.T) {
 	// sequence to write (we force the refresh by preset with inverse bit state):
-	// * read current state of IODIR (write reg, read val) => see also PinMode()
-	// * set IODIR of pin to input (manipulate val, write reg, write val) => see also PinMode()
+	// * read current state of IODIR (write reg, read val) => see also SetPinMode()
+	// * set IODIR of pin to input (manipulate val, write reg, write val) => see also SetPinMode()
 	// * read current state of OLAT (write reg, read val)
 	// * write OLAT (manipulate val, write reg, write val)
 	// arrange
-	mcp, adaptor := initTestMCP23017DriverWithStubbedAdaptor(0)
+	d, a := initTestMCP23017WithStubbedAdaptor(0)
 	for bitState := 0; bitState <= 1; bitState++ {
-		adaptor.written = []byte{} // reset writes of Start() and former test
+		a.written = []byte{} // reset writes of Start() and former test
 		// arrange some values
 		testPort := "A"
 		testPin := uint8(7)
@@ -159,34 +139,34 @@ func TestMCP23017DriverWriteGPIO(t *testing.T) {
 		}
 		// arrange reads
 		numCallsRead := 0
-		adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		a.i2cReadImpl = func(b []byte) (int, error) {
 			numCallsRead++
 			b[len(b)-1] = returnRead[numCallsRead-1]
 			return len(b), nil
 		}
 		// act
-		err := mcp.WriteGPIO(testPin, uint8(bitState), testPort)
+		err := d.WriteGPIO(testPin, testPort, uint8(bitState))
 		// assert
 		gobottest.Assert(t, err, nil)
-		gobottest.Assert(t, len(adaptor.written), 6)
-		gobottest.Assert(t, adaptor.written[0], wantReg1)
-		gobottest.Assert(t, adaptor.written[1], wantReg1)
-		gobottest.Assert(t, adaptor.written[2], wantReg1Val)
-		gobottest.Assert(t, adaptor.written[3], wantReg2)
-		gobottest.Assert(t, adaptor.written[4], wantReg2)
-		gobottest.Assert(t, adaptor.written[5], wantReg2Val)
+		gobottest.Assert(t, len(a.written), 6)
+		gobottest.Assert(t, a.written[0], wantReg1)
+		gobottest.Assert(t, a.written[1], wantReg1)
+		gobottest.Assert(t, a.written[2], wantReg1Val)
+		gobottest.Assert(t, a.written[3], wantReg2)
+		gobottest.Assert(t, a.written[4], wantReg2)
+		gobottest.Assert(t, a.written[5], wantReg2Val)
 		gobottest.Assert(t, numCallsRead, 2)
 	}
 }
 
-func TestMCP23017DriverWriteGPIONoRefresh(t *testing.T) {
+func TestMCP23017WriteGPIONoRefresh(t *testing.T) {
 	// sequence to write with take advantage of refresh optimization (see forceRefresh):
-	// * read current state of IODIR (write reg, read val) => by PinMode()
+	// * read current state of IODIR (write reg, read val) => by SetPinMode()
 	// * read current state of OLAT (write reg, read val)
 	// arrange
-	mcp, adaptor := initTestMCP23017DriverWithStubbedAdaptor(0)
+	d, a := initTestMCP23017WithStubbedAdaptor(0)
 	for bitState := 0; bitState <= 1; bitState++ {
-		adaptor.written = []byte{} // reset writes of Start() and former test
+		a.written = []byte{} // reset writes of Start() and former test
 		// arrange some values
 		testPort := "B"
 		testPin := uint8(3)
@@ -198,31 +178,31 @@ func TestMCP23017DriverWriteGPIONoRefresh(t *testing.T) {
 		}
 		// arrange reads
 		numCallsRead := 0
-		adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		a.i2cReadImpl = func(b []byte) (int, error) {
 			numCallsRead++
 			b[len(b)-1] = returnRead[numCallsRead-1]
 			return len(b), nil
 		}
 		// act
-		err := mcp.WriteGPIO(testPin, uint8(bitState), testPort)
+		err := d.WriteGPIO(testPin, testPort, uint8(bitState))
 		// assert
 		gobottest.Assert(t, err, nil)
-		gobottest.Assert(t, len(adaptor.written), 2)
-		gobottest.Assert(t, adaptor.written[0], wantReg1)
-		gobottest.Assert(t, adaptor.written[1], wantReg2)
+		gobottest.Assert(t, len(a.written), 2)
+		gobottest.Assert(t, a.written[0], wantReg1)
+		gobottest.Assert(t, a.written[1], wantReg2)
 		gobottest.Assert(t, numCallsRead, 2)
 	}
 }
 
-func TestMCP23017DriverWriteGPIONoAutoDir(t *testing.T) {
+func TestMCP23017WriteGPIONoAutoDir(t *testing.T) {
 	// sequence to write with suppressed automatic setting of IODIR:
 	// * read current state of OLAT (write reg, read val)
 	// * write OLAT (manipulate val, write reg, write val)
 	// arrange
-	mcp, adaptor := initTestMCP23017DriverWithStubbedAdaptor(0)
-	mcp.mcpBehav.autoIODirOff = true
+	d, a := initTestMCP23017WithStubbedAdaptor(0)
+	d.mcpBehav.autoIODirOff = true
 	for bitState := 0; bitState <= 1; bitState++ {
-		adaptor.written = []byte{} // reset writes of Start() and former test
+		a.written = []byte{} // reset writes of Start() and former test
 		// arrange some values
 		testPort := "A"
 		testPin := uint8(7)
@@ -235,40 +215,40 @@ func TestMCP23017DriverWriteGPIONoAutoDir(t *testing.T) {
 		}
 		// arrange reads
 		numCallsRead := 0
-		adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		a.i2cReadImpl = func(b []byte) (int, error) {
 			numCallsRead++
 			b[len(b)-1] = returnRead
 			return len(b), nil
 		}
 		// act
-		err := mcp.WriteGPIO(testPin, uint8(bitState), testPort)
+		err := d.WriteGPIO(testPin, testPort, uint8(bitState))
 		// assert
 		gobottest.Assert(t, err, nil)
-		gobottest.Assert(t, len(adaptor.written), 3)
-		gobottest.Assert(t, adaptor.written[0], wantReg)
-		gobottest.Assert(t, adaptor.written[1], wantReg)
-		gobottest.Assert(t, adaptor.written[2], wantRegVal)
+		gobottest.Assert(t, len(a.written), 3)
+		gobottest.Assert(t, a.written[0], wantReg)
+		gobottest.Assert(t, a.written[1], wantReg)
+		gobottest.Assert(t, a.written[2], wantRegVal)
 		gobottest.Assert(t, numCallsRead, 1)
 	}
 }
 
-func TestMCP23017DriverCommandsWriteGPIOErrIODIR(t *testing.T) {
+func TestMCP23017CommandsWriteGPIOErrIODIR(t *testing.T) {
 	// arrange
-	mcp, adaptor := initTestMCP23017DriverWithStubbedAdaptor(0)
-	adaptor.i2cWriteImpl = func([]byte) (int, error) {
+	d, a := initTestMCP23017WithStubbedAdaptor(0)
+	a.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
 	}
 	// act
-	err := mcp.WriteGPIO(7, 0, "A")
+	err := d.WriteGPIO(7, "A", 0)
 	// assert
-	gobottest.Assert(t, err, errors.New("write error"))
+	gobottest.Assert(t, err, errors.New("MCP write-read: MCP write-ReadByteData(reg=0): write error"))
 }
 
-func TestMCP23017DriverCommandsWriteGPIOErrOLAT(t *testing.T) {
+func TestMCP23017CommandsWriteGPIOErrOLAT(t *testing.T) {
 	// arrange
-	mcp, adaptor := initTestMCP23017DriverWithStubbedAdaptor(0)
+	d, a := initTestMCP23017WithStubbedAdaptor(0)
 	numCalls := 1
-	adaptor.i2cWriteImpl = func([]byte) (int, error) {
+	a.i2cWriteImpl = func([]byte) (int, error) {
 		if numCalls == 2 {
 			return 0, errors.New("write error")
 		}
@@ -276,20 +256,20 @@ func TestMCP23017DriverCommandsWriteGPIOErrOLAT(t *testing.T) {
 		return 0, nil
 	}
 	// act
-	err := mcp.WriteGPIO(7, 0, "A")
+	err := d.WriteGPIO(7, "A", 0)
 	// assert
-	gobottest.Assert(t, err, errors.New("write error"))
+	gobottest.Assert(t, err, errors.New("MCP write-read: MCP write-ReadByteData(reg=20): write error"))
 }
 
-func TestMCP23017DriverReadGPIO(t *testing.T) {
+func TestMCP23017ReadGPIO(t *testing.T) {
 	// sequence to read:
-	// * read current state of IODIR (write reg, read val) => see also PinMode()
-	// * set IODIR of pin to input (manipulate val, write reg, write val) => see also PinMode()
+	// * read current state of IODIR (write reg, read val) => see also SetPinMode()
+	// * set IODIR of pin to input (manipulate val, write reg, write val) => see also SetPinMode()
 	// * read GPIO (write reg, read val)
 	// arrange
-	mcp, adaptor := initTestMCP23017DriverWithStubbedAdaptor(0)
+	d, a := initTestMCP23017WithStubbedAdaptor(0)
 	for bitState := 0; bitState <= 1; bitState++ {
-		adaptor.written = []byte{} // reset writes of Start() and former test
+		a.written = []byte{} // reset writes of Start() and former test
 		// arrange some values
 		testPort := "A"
 		testPin := uint8(7)
@@ -302,33 +282,33 @@ func TestMCP23017DriverReadGPIO(t *testing.T) {
 		}
 		// arrange reads
 		numCallsRead := 0
-		adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		a.i2cReadImpl = func(b []byte) (int, error) {
 			numCallsRead++
 			b[len(b)-1] = returnRead[numCallsRead-1]
 			return len(b), nil
 		}
 		// act
-		val, err := mcp.ReadGPIO(testPin, testPort)
+		val, err := d.ReadGPIO(testPin, testPort)
 		// assert
 		gobottest.Assert(t, err, nil)
 		gobottest.Assert(t, numCallsRead, 2)
-		gobottest.Assert(t, len(adaptor.written), 4)
-		gobottest.Assert(t, adaptor.written[0], wantReg1)
-		gobottest.Assert(t, adaptor.written[1], wantReg1)
-		gobottest.Assert(t, adaptor.written[2], wantReg1Val)
-		gobottest.Assert(t, adaptor.written[3], wantReg2)
+		gobottest.Assert(t, len(a.written), 4)
+		gobottest.Assert(t, a.written[0], wantReg1)
+		gobottest.Assert(t, a.written[1], wantReg1)
+		gobottest.Assert(t, a.written[2], wantReg1Val)
+		gobottest.Assert(t, a.written[3], wantReg2)
 		gobottest.Assert(t, val, uint8(bitState))
 	}
 }
 
-func TestMCP23017DriverReadGPIONoRefresh(t *testing.T) {
+func TestMCP23017ReadGPIONoRefresh(t *testing.T) {
 	// sequence to read with take advantage of refresh optimization (see forceRefresh):
-	// * read current state of IODIR (write reg, read val) => by PinMode()
+	// * read current state of IODIR (write reg, read val) => by SetPinMode()
 	// * read GPIO (write reg, read val)
 	// arrange
-	mcp, adaptor := initTestMCP23017DriverWithStubbedAdaptor(0)
+	d, a := initTestMCP23017WithStubbedAdaptor(0)
 	for bitState := 0; bitState <= 1; bitState++ {
-		adaptor.written = []byte{} // reset writes of Start() and former test
+		a.written = []byte{} // reset writes of Start() and former test
 		// arrange some values
 		testPort := "A"
 		testPin := uint8(7)
@@ -340,31 +320,31 @@ func TestMCP23017DriverReadGPIONoRefresh(t *testing.T) {
 		}
 		// arrange reads
 		numCallsRead := 0
-		adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		a.i2cReadImpl = func(b []byte) (int, error) {
 			numCallsRead++
 			b[len(b)-1] = returnRead[numCallsRead-1]
 			return len(b), nil
 		}
 		// act
-		val, err := mcp.ReadGPIO(testPin, testPort)
+		val, err := d.ReadGPIO(testPin, testPort)
 		// assert
 		gobottest.Assert(t, err, nil)
 		gobottest.Assert(t, numCallsRead, 2)
-		gobottest.Assert(t, len(adaptor.written), 2)
-		gobottest.Assert(t, adaptor.written[0], wantReg1)
-		gobottest.Assert(t, adaptor.written[1], wantReg2)
+		gobottest.Assert(t, len(a.written), 2)
+		gobottest.Assert(t, a.written[0], wantReg1)
+		gobottest.Assert(t, a.written[1], wantReg2)
 		gobottest.Assert(t, val, uint8(bitState))
 	}
 }
 
-func TestMCP23017DriverReadGPIONoAutoDir(t *testing.T) {
+func TestMCP23017ReadGPIONoAutoDir(t *testing.T) {
 	// sequence to read with suppressed automatic setting of IODIR:
 	// * read GPIO (write reg, read val)
 	// arrange
-	mcp, adaptor := initTestMCP23017DriverWithStubbedAdaptor(0)
-	mcp.mcpBehav.autoIODirOff = true
+	d, a := initTestMCP23017WithStubbedAdaptor(0)
+	d.mcpBehav.autoIODirOff = true
 	for bitState := 0; bitState <= 1; bitState++ {
-		adaptor.written = []byte{} // reset writes of Start() and former test
+		a.written = []byte{} // reset writes of Start() and former test
 		// arrange some values
 		testPort := "A"
 		testPin := uint8(7)
@@ -375,44 +355,44 @@ func TestMCP23017DriverReadGPIONoAutoDir(t *testing.T) {
 		}
 		// arrange reads
 		numCallsRead := 0
-		adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		a.i2cReadImpl = func(b []byte) (int, error) {
 			numCallsRead++
 			b[len(b)-1] = returnRead
 			return len(b), nil
 		}
 		// act
-		val, err := mcp.ReadGPIO(testPin, testPort)
+		val, err := d.ReadGPIO(testPin, testPort)
 		// assert
 		gobottest.Assert(t, err, nil)
 		gobottest.Assert(t, numCallsRead, 1)
-		gobottest.Assert(t, len(adaptor.written), 1)
-		gobottest.Assert(t, adaptor.written[0], wantReg2)
+		gobottest.Assert(t, len(a.written), 1)
+		gobottest.Assert(t, a.written[0], wantReg2)
 		gobottest.Assert(t, val, uint8(bitState))
 	}
 }
 
-func TestMCP23017DriverReadGPIOErr(t *testing.T) {
+func TestMCP23017ReadGPIOErr(t *testing.T) {
 	// arrange
-	mcp, adaptor := initTestMCP23017DriverWithStubbedAdaptor(0)
+	d, a := initTestMCP23017WithStubbedAdaptor(0)
 	// arrange reads
-	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+	a.i2cReadImpl = func(b []byte) (int, error) {
 		return len(b), errors.New("read error")
 	}
 	// act
-	_, err := mcp.ReadGPIO(7, "A")
+	_, err := d.ReadGPIO(7, "A")
 	// assert
-	gobottest.Assert(t, err, errors.New("read error"))
+	gobottest.Assert(t, err, errors.New("MCP write-read: MCP write-ReadByteData(reg=0): read error"))
 }
 
-func TestMCP23017DriverPinMode(t *testing.T) {
+func TestMCP23017SetPinMode(t *testing.T) {
 	// sequence for setting pin direction:
 	// * read current state of IODIR (write reg, read val)
 	// * set IODIR of pin to input or output (manipulate val, write reg, write val)
 	// TODO: can be optimized by not writing, when value is already fine
 	// arrange
-	mcp, adaptor := initTestMCP23017DriverWithStubbedAdaptor(0)
+	d, a := initTestMCP23017WithStubbedAdaptor(0)
 	for bitState := 0; bitState <= 1; bitState++ {
-		adaptor.written = []byte{} // reset writes of Start() and former test
+		a.written = []byte{} // reset writes of Start() and former test
 		// arrange some values
 		testPort := "A"
 		testPin := uint8(7)
@@ -425,44 +405,44 @@ func TestMCP23017DriverPinMode(t *testing.T) {
 		}
 		// arrange reads
 		numCallsRead := 0
-		adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		a.i2cReadImpl = func(b []byte) (int, error) {
 			numCallsRead++
 			b[len(b)-1] = returnRead
 			return len(b), nil
 		}
 		// act
-		err := mcp.PinMode(testPin, uint8(bitState), testPort)
+		err := d.SetPinMode(testPin, testPort, uint8(bitState))
 		// assert
 		gobottest.Assert(t, err, nil)
-		gobottest.Assert(t, len(adaptor.written), 3)
-		gobottest.Assert(t, adaptor.written[0], wantReg)
-		gobottest.Assert(t, adaptor.written[1], wantReg)
-		gobottest.Assert(t, adaptor.written[2], wantRegVal)
+		gobottest.Assert(t, len(a.written), 3)
+		gobottest.Assert(t, a.written[0], wantReg)
+		gobottest.Assert(t, a.written[1], wantReg)
+		gobottest.Assert(t, a.written[2], wantRegVal)
 		gobottest.Assert(t, numCallsRead, 1)
 	}
 }
 
-func TestMCP23017DriverPinModeErr(t *testing.T) {
+func TestMCP23017SetPinModeErr(t *testing.T) {
 	// arrange
-	mcp, adaptor := initTestMCP23017DriverWithStubbedAdaptor(0)
-	adaptor.i2cWriteImpl = func([]byte) (int, error) {
+	d, a := initTestMCP23017WithStubbedAdaptor(0)
+	a.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
 	}
 	// act
-	err := mcp.PinMode(7, 0, "A")
+	err := d.SetPinMode(7, "A", 0)
 	// assert
-	gobottest.Assert(t, err, errors.New("write error"))
+	gobottest.Assert(t, err, errors.New("MCP write-read: MCP write-ReadByteData(reg=0): write error"))
 }
 
-func TestMCP23017DriverSetPullUp(t *testing.T) {
+func TestMCP23017SetPullUp(t *testing.T) {
 	// sequence for setting input pin pull up:
 	// * read current state of GPPU (write reg, read val)
 	// * set GPPU of pin to target state (manipulate val, write reg, write val)
 	// TODO: can be optimized by not writing, when value is already fine
 	// arrange
-	mcp, adaptor := initTestMCP23017DriverWithStubbedAdaptor(0)
+	d, a := initTestMCP23017WithStubbedAdaptor(0)
 	for bitState := 0; bitState <= 1; bitState++ {
-		adaptor.written = []byte{} // reset writes of Start()
+		a.written = []byte{} // reset writes of Start()
 		// arrange some values
 		testPort := "A"
 		wantReg := uint8(0x0C) // GPPUA
@@ -475,44 +455,44 @@ func TestMCP23017DriverSetPullUp(t *testing.T) {
 		}
 		// arrange reads
 		numCallsRead := 0
-		adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		a.i2cReadImpl = func(b []byte) (int, error) {
 			numCallsRead++
 			b[len(b)-1] = returnRead
 			return len(b), nil
 		}
 		// act
-		err := mcp.SetPullUp(testPin, uint8(bitState), testPort)
+		err := d.SetPullUp(testPin, testPort, uint8(bitState))
 		// assert
 		gobottest.Assert(t, err, nil)
-		gobottest.Assert(t, len(adaptor.written), 3)
-		gobottest.Assert(t, adaptor.written[0], wantReg)
-		gobottest.Assert(t, adaptor.written[1], wantReg)
-		gobottest.Assert(t, adaptor.written[2], wantSetVal)
+		gobottest.Assert(t, len(a.written), 3)
+		gobottest.Assert(t, a.written[0], wantReg)
+		gobottest.Assert(t, a.written[1], wantReg)
+		gobottest.Assert(t, a.written[2], wantSetVal)
 		gobottest.Assert(t, numCallsRead, 1)
 	}
 }
 
-func TestMCP23017DriverSetPullUpErr(t *testing.T) {
+func TestMCP23017SetPullUpErr(t *testing.T) {
 	// arrange
-	mcp, adaptor := initTestMCP23017DriverWithStubbedAdaptor(0)
-	adaptor.i2cWriteImpl = func([]byte) (int, error) {
+	d, a := initTestMCP23017WithStubbedAdaptor(0)
+	a.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
 	}
 	// act
-	err := mcp.SetPullUp(7, 0, "A")
+	err := d.SetPullUp(7, "A", 0)
 	// assert
-	gobottest.Assert(t, err, errors.New("write error"))
+	gobottest.Assert(t, err, errors.New("MCP write-read: MCP write-ReadByteData(reg=12): write error"))
 }
 
-func TestMCP23017DriverSetGPIOPolarity(t *testing.T) {
+func TestMCP23017SetGPIOPolarity(t *testing.T) {
 	// sequence for setting input pin polarity:
 	// * read current state of IPOL (write reg, read val)
 	// * set IPOL of pin to target state (manipulate val, write reg, write val)
 	// TODO: can be optimized by not writing, when value is already fine
 	// arrange
-	mcp, adaptor := initTestMCP23017DriverWithStubbedAdaptor(0)
+	d, a := initTestMCP23017WithStubbedAdaptor(0)
 	for bitState := 0; bitState <= 1; bitState++ {
-		adaptor.written = []byte{} // reset writes of Start()
+		a.written = []byte{} // reset writes of Start()
 		// arrange some values
 		testPort := "B"
 		wantReg := uint8(0x03) // IPOLB
@@ -525,130 +505,124 @@ func TestMCP23017DriverSetGPIOPolarity(t *testing.T) {
 		}
 		// arrange reads
 		numCallsRead := 0
-		adaptor.i2cReadImpl = func(b []byte) (int, error) {
+		a.i2cReadImpl = func(b []byte) (int, error) {
 			numCallsRead++
 			b[len(b)-1] = returnRead
 			return len(b), nil
 		}
 		// act
-		err := mcp.SetGPIOPolarity(testPin, uint8(bitState), testPort)
+		err := d.SetGPIOPolarity(testPin, testPort, uint8(bitState))
 		// assert
 		gobottest.Assert(t, err, nil)
-		gobottest.Assert(t, len(adaptor.written), 3)
-		gobottest.Assert(t, adaptor.written[0], wantReg)
-		gobottest.Assert(t, adaptor.written[1], wantReg)
-		gobottest.Assert(t, adaptor.written[2], wantSetVal)
+		gobottest.Assert(t, len(a.written), 3)
+		gobottest.Assert(t, a.written[0], wantReg)
+		gobottest.Assert(t, a.written[1], wantReg)
+		gobottest.Assert(t, a.written[2], wantSetVal)
 		gobottest.Assert(t, numCallsRead, 1)
 	}
 }
 
-func TestMCP23017DriverSetGPIOPolarityErr(t *testing.T) {
+func TestMCP23017SetGPIOPolarityErr(t *testing.T) {
 	// arrange
-	mcp, adaptor := initTestMCP23017DriverWithStubbedAdaptor(0)
-	adaptor.i2cWriteImpl = func([]byte) (int, error) {
+	d, a := initTestMCP23017WithStubbedAdaptor(0)
+	a.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
 	}
 	// act
-	err := mcp.SetGPIOPolarity(7, 0, "A")
+	err := d.SetGPIOPolarity(7, "A", 0)
 	// assert
-	gobottest.Assert(t, err, errors.New("write error"))
+	gobottest.Assert(t, err, errors.New("MCP write-read: MCP write-ReadByteData(reg=2): write error"))
 }
 
-func TestMCP23017DriverSetName(t *testing.T) {
-	d := initTestMCP23017Driver(0)
-	d.SetName("TESTME")
-	gobottest.Assert(t, d.Name(), "TESTME")
-}
-
-func TestMCP23017Driver_write(t *testing.T) {
+func TestMCP23017_write(t *testing.T) {
 	// clear bit
-	mcp, adaptor := initTestMCP23017DriverWithStubbedAdaptor(0)
-	port := mcp.getPort("A")
-	err := mcp.write(port.IODIR, uint8(7), 0)
+	d, a := initTestMCP23017WithStubbedAdaptor(0)
+	port := d.getPort("A")
+	err := d.write(port.IODIR, uint8(7), 0)
 	gobottest.Assert(t, err, nil)
 
 	// set bit
-	mcp, adaptor = initTestMCP23017DriverWithStubbedAdaptor(0)
-	port = mcp.getPort("B")
-	err = mcp.write(port.IODIR, uint8(7), 1)
+	d, a = initTestMCP23017WithStubbedAdaptor(0)
+	port = d.getPort("B")
+	err = d.write(port.IODIR, uint8(7), 1)
 	gobottest.Assert(t, err, nil)
 
 	// write error
-	mcp, adaptor = initTestMCP23017DriverWithStubbedAdaptor(0)
-	adaptor.i2cWriteImpl = func([]byte) (int, error) {
+	d, a = initTestMCP23017WithStubbedAdaptor(0)
+	a.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
 	}
-	err = mcp.write(port.IODIR, uint8(7), 0)
-	gobottest.Assert(t, err, errors.New("write error"))
+	err = d.write(port.IODIR, uint8(7), 0)
+	gobottest.Assert(t, err, errors.New("MCP write-read: MCP write-ReadByteData(reg=1): write error"))
 
 	// read error
-	mcp, adaptor = initTestMCP23017DriverWithStubbedAdaptor(0)
-	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+	d, a = initTestMCP23017WithStubbedAdaptor(0)
+	a.i2cReadImpl = func(b []byte) (int, error) {
 		return len(b), errors.New("read error")
 	}
-	err = mcp.write(port.IODIR, uint8(7), 0)
-	gobottest.Assert(t, err, errors.New("read error"))
-	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+	err = d.write(port.IODIR, uint8(7), 0)
+	gobottest.Assert(t, err, errors.New("MCP write-read: MCP write-ReadByteData(reg=1): read error"))
+	a.i2cReadImpl = func(b []byte) (int, error) {
 		return len(b), nil
 	}
-	err = mcp.write(port.IODIR, uint8(7), 1)
+	err = d.write(port.IODIR, uint8(7), 1)
 	gobottest.Assert(t, err, nil)
 }
 
-func TestMCP23017Driver_read(t *testing.T) {
+func TestMCP23017_read(t *testing.T) {
 	// read
-	mcp, adaptor := initTestMCP23017DriverWithStubbedAdaptor(0)
-	port := mcp.getPort("A")
-	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+	d, a := initTestMCP23017WithStubbedAdaptor(0)
+	port := d.getPort("A")
+	a.i2cReadImpl = func(b []byte) (int, error) {
 		copy(b, []byte{255})
 		return 1, nil
 	}
-	val, _ := mcp.read(port.IODIR)
+	val, _ := d.read(port.IODIR)
 	gobottest.Assert(t, val, uint8(255))
 
 	// read error
-	mcp, adaptor = initTestMCP23017DriverWithStubbedAdaptor(0)
-	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+	d, a = initTestMCP23017WithStubbedAdaptor(0)
+	a.i2cReadImpl = func(b []byte) (int, error) {
 		return len(b), errors.New("read error")
 	}
 
-	val, err := mcp.read(port.IODIR)
+	val, err := d.read(port.IODIR)
 	gobottest.Assert(t, val, uint8(0))
-	gobottest.Assert(t, err, errors.New("read error"))
+	gobottest.Assert(t, err, errors.New("MCP write-ReadByteData(reg=0): read error"))
 
 	// read
-	mcp, adaptor = initTestMCP23017DriverWithStubbedAdaptor(0)
-	port = mcp.getPort("A")
-	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+	d, a = initTestMCP23017WithStubbedAdaptor(0)
+	port = d.getPort("A")
+	a.i2cReadImpl = func(b []byte) (int, error) {
 		copy(b, []byte{255})
 		return 1, nil
 	}
-	val, _ = mcp.read(port.IODIR)
+	val, _ = d.read(port.IODIR)
 	gobottest.Assert(t, val, uint8(255))
 }
 
-func TestMCP23017Driver_getPort(t *testing.T) {
+func TestMCP23017_getPort(t *testing.T) {
 	// port A
-	mcp := initTestMCP23017Driver(0)
-	expectedPort := getBank(0).portA
-	actualPort := mcp.getPort("A")
+	d := initTestMCP23017(0)
+	expectedPort := mcp23017GetBank(0).portA
+	actualPort := d.getPort("A")
 	gobottest.Assert(t, expectedPort, actualPort)
 
 	// port B
-	mcp = initTestMCP23017Driver(0)
-	expectedPort = getBank(0).portB
-	actualPort = mcp.getPort("B")
+	d = initTestMCP23017(0)
+	expectedPort = mcp23017GetBank(0).portB
+	actualPort = d.getPort("B")
 	gobottest.Assert(t, expectedPort, actualPort)
 
 	// default
-	mcp = initTestMCP23017Driver(0)
-	expectedPort = getBank(0).portA
-	actualPort = mcp.getPort("")
+	d = initTestMCP23017(0)
+	expectedPort = mcp23017GetBank(0).portA
+	actualPort = d.getPort("")
 	gobottest.Assert(t, expectedPort, actualPort)
 
 	// port A bank 1
-	mcp = initTestMCP23017Driver(1)
-	expectedPort = getBank(1).portA
-	actualPort = mcp.getPort("")
+	d = initTestMCP23017(1)
+	expectedPort = mcp23017GetBank(1).portA
+	actualPort = d.getPort("")
 	gobottest.Assert(t, expectedPort, actualPort)
 }

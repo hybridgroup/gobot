@@ -7,15 +7,11 @@ package i2c
 //
 // This module was tested with SwitchDoc Labs INA3221 breakout board found at http://www.switchdoc.com/
 
-import (
-	"gobot.io/x/gobot"
-)
-
 // INA3221Channel type that defines which INA3221 channel to read from.
 type INA3221Channel uint8
 
 const (
-	ina3221Address            uint8   = 0x40 // 1000000 (A0+A1=GND)
+	ina3221DefaultAddress             = 0x40 // 1000000 (A0+A1=GND)
 	ina3221Read               uint8   = 0x01
 	ina3221RegConfig          uint8   = 0x00   // CONFIG REGISTER (R/W)
 	ina3221ConfigReset        uint16  = 0x8000 // Reset Bit
@@ -45,69 +41,28 @@ const (
 
 // INA3221Driver is a driver for the INA3221 three-channel current and bus voltage monitoring device.
 type INA3221Driver struct {
-	name       string
-	connector  Connector
-	connection Connection
-	Config
+	*Driver
 	halt chan bool
 }
 
 // NewINA3221Driver creates a new driver with the specified i2c interface.
 // Params:
-//		conn Connector - the Adaptor to use with this Driver
+//		c Connector - the Adaptor to use with this Driver
 //
 // Optional params:
 //		i2c.WithBus(int):		bus to use with this driver
 //		i2c.WithAddress(int):		address to use with this driver
 func NewINA3221Driver(c Connector, options ...func(Config)) *INA3221Driver {
 	i := &INA3221Driver{
-		name:      gobot.DefaultName("INA3221"),
-		connector: c,
-		Config:    NewConfig(),
+		Driver: NewDriver(c, "INA3221", ina3221DefaultAddress),
 	}
+	i.afterStart = i.initialize
 
 	for _, option := range options {
 		option(i)
 	}
 
 	return i
-}
-
-// Name returns the name of the device.
-func (i *INA3221Driver) Name() string {
-	return i.name
-}
-
-// SetName sets the name of the device.
-func (i *INA3221Driver) SetName(name string) {
-	i.name = name
-}
-
-// Connection returns the connection of the device.
-func (i *INA3221Driver) Connection() gobot.Connection {
-	return i.connector.(gobot.Connection)
-}
-
-// Start initializes the INA3221
-func (i *INA3221Driver) Start() error {
-	var err error
-	bus := i.GetBusOrDefault(i.connector.GetDefaultBus())
-	address := i.GetAddressOrDefault(int(ina3221Address))
-
-	if i.connection, err = i.connector.GetConnection(address, bus); err != nil {
-		return err
-	}
-
-	if err := i.initialize(); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// Halt halts the device.
-func (i *INA3221Driver) Halt() error {
-	return nil
 }
 
 // GetBusVoltage gets the bus voltage in Volts

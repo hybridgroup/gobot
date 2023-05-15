@@ -3,187 +3,171 @@ package i2c
 import (
 	"bytes"
 	"errors"
+	"strings"
 	"testing"
 
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/gobottest"
 )
 
+// this ensures that the implementation is based on i2c.Driver, which implements the gobot.Driver
+// and tests all implementations, so no further tests needed here for gobot.Driver interface
 var _ gobot.Driver = (*SHT2xDriver)(nil)
 
-// --------- HELPERS
-func initTestSHT2xDriver() (driver *SHT2xDriver) {
-	driver, _ = initTestSHT2xDriverWithStubbedAdaptor()
-	return
-}
-
 func initTestSHT2xDriverWithStubbedAdaptor() (*SHT2xDriver, *i2cTestAdaptor) {
-	adaptor := newI2cTestAdaptor()
-	return NewSHT2xDriver(adaptor), adaptor
+	a := newI2cTestAdaptor()
+	d := NewSHT2xDriver(a)
+	if err := d.Start(); err != nil {
+		panic(err)
+	}
+	return d, a
 }
-
-// --------- TESTS
 
 func TestNewSHT2xDriver(t *testing.T) {
-	// Does it return a pointer to an instance of SHT2xDriver?
-	var sht2x interface{} = NewSHT2xDriver(newI2cTestAdaptor())
-	_, ok := sht2x.(*SHT2xDriver)
+	var di interface{} = NewSHT2xDriver(newI2cTestAdaptor())
+	d, ok := di.(*SHT2xDriver)
 	if !ok {
 		t.Errorf("NewSHT2xDriver() should have returned a *SHT2xDriver")
 	}
+	gobottest.Refute(t, d.Driver, nil)
+	gobottest.Assert(t, strings.HasPrefix(d.Name(), "SHT2x"), true)
+	gobottest.Assert(t, d.defaultAddress, 0x40)
 }
 
-func TestSHT2xDriver(t *testing.T) {
-	sht2x := initTestSHT2xDriver()
-	gobottest.Refute(t, sht2x.Connection(), nil)
+func TestSHT2xOptions(t *testing.T) {
+	// This is a general test, that options are applied in constructor by using the common WithBus() option and
+	// least one of this driver. Further tests for options can also be done by call of "WithOption(val)(d)".
+	b := NewSHT2xDriver(newI2cTestAdaptor(), WithBus(2))
+	gobottest.Assert(t, b.GetBusOrDefault(1), 2)
 }
 
-func TestSHT2xDriverStart(t *testing.T) {
-	sht2x, _ := initTestSHT2xDriverWithStubbedAdaptor()
-
-	gobottest.Assert(t, sht2x.Start(), nil)
+func TestSHT2xStart(t *testing.T) {
+	d := NewSHT2xDriver(newI2cTestAdaptor())
+	gobottest.Assert(t, d.Start(), nil)
 }
 
-func TestSHT2xStartConnectError(t *testing.T) {
-	d, adaptor := initTestSHT2xDriverWithStubbedAdaptor()
-	adaptor.Testi2cConnectErr(true)
-	gobottest.Assert(t, d.Start(), errors.New("Invalid i2c connection"))
+func TestSHT2xHalt(t *testing.T) {
+	d, _ := initTestSHT2xDriverWithStubbedAdaptor()
+	gobottest.Assert(t, d.Halt(), nil)
 }
 
-func TestSHT2xDriverHalt(t *testing.T) {
-	sht2x := initTestSHT2xDriver()
-
-	gobottest.Assert(t, sht2x.Halt(), nil)
-}
-
-func TestSHT2xDriverReset(t *testing.T) {
-	sht2x, adaptor := initTestSHT2xDriverWithStubbedAdaptor()
-	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+func TestSHT2xReset(t *testing.T) {
+	d, a := initTestSHT2xDriverWithStubbedAdaptor()
+	a.i2cReadImpl = func(b []byte) (int, error) {
 		return 0, nil
 	}
-	sht2x.Start()
-	err := sht2x.Reset()
+	d.Start()
+	err := d.Reset()
 	gobottest.Assert(t, err, nil)
 }
 
-func TestSHT2xDriverMeasurements(t *testing.T) {
-	sht2x, adaptor := initTestSHT2xDriverWithStubbedAdaptor()
-	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+func TestSHT2xMeasurements(t *testing.T) {
+	d, a := initTestSHT2xDriverWithStubbedAdaptor()
+	a.i2cReadImpl = func(b []byte) (int, error) {
 		buf := new(bytes.Buffer)
 		// Values produced by dumping data from actual sensor
-		if adaptor.written[len(adaptor.written)-1] == SHT2xTriggerTempMeasureNohold {
+		if a.written[len(a.written)-1] == SHT2xTriggerTempMeasureNohold {
 			buf.Write([]byte{95, 168, 59})
-		} else if adaptor.written[len(adaptor.written)-1] == SHT2xTriggerHumdMeasureNohold {
+		} else if a.written[len(a.written)-1] == SHT2xTriggerHumdMeasureNohold {
 			buf.Write([]byte{94, 202, 22})
 		}
 		copy(b, buf.Bytes())
 		return buf.Len(), nil
 	}
-	sht2x.Start()
-	temp, err := sht2x.Temperature()
+	d.Start()
+	temp, err := d.Temperature()
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, temp, float32(18.809052))
-	hum, err := sht2x.Humidity()
+	hum, err := d.Humidity()
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, hum, float32(40.279907))
 }
 
-func TestSHT2xDriverAccuracy(t *testing.T) {
-	sht2x, adaptor := initTestSHT2xDriverWithStubbedAdaptor()
-	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+func TestSHT2xAccuracy(t *testing.T) {
+	d, a := initTestSHT2xDriverWithStubbedAdaptor()
+	a.i2cReadImpl = func(b []byte) (int, error) {
 		buf := new(bytes.Buffer)
-		if adaptor.written[len(adaptor.written)-1] == SHT2xReadUserReg {
+		if a.written[len(a.written)-1] == SHT2xReadUserReg {
 			buf.Write([]byte{0x3a})
-		} else if adaptor.written[len(adaptor.written)-2] == SHT2xWriteUserReg {
-			buf.Write([]byte{adaptor.written[len(adaptor.written)-1]})
+		} else if a.written[len(a.written)-2] == SHT2xWriteUserReg {
+			buf.Write([]byte{a.written[len(a.written)-1]})
 		} else {
 			return 0, nil
 		}
 		copy(b, buf.Bytes())
 		return buf.Len(), nil
 	}
-	sht2x.Start()
-	sht2x.SetAccuracy(SHT2xAccuracyLow)
-	gobottest.Assert(t, sht2x.Accuracy(), SHT2xAccuracyLow)
-	err := sht2x.sendAccuracy()
+	d.Start()
+	d.SetAccuracy(SHT2xAccuracyLow)
+	gobottest.Assert(t, d.Accuracy(), SHT2xAccuracyLow)
+	err := d.sendAccuracy()
 	gobottest.Assert(t, err, nil)
 }
 
-func TestSHT2xDriverTemperatureCrcError(t *testing.T) {
-	sht2x, adaptor := initTestSHT2xDriverWithStubbedAdaptor()
-	sht2x.Start()
+func TestSHT2xTemperatureCrcError(t *testing.T) {
+	d, a := initTestSHT2xDriverWithStubbedAdaptor()
+	d.Start()
 
-	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+	a.i2cReadImpl = func(b []byte) (int, error) {
 		buf := new(bytes.Buffer)
-		if adaptor.written[len(adaptor.written)-1] == SHT2xTriggerTempMeasureNohold {
+		if a.written[len(a.written)-1] == SHT2xTriggerTempMeasureNohold {
 			buf.Write([]byte{95, 168, 0})
 		}
 		copy(b, buf.Bytes())
 		return buf.Len(), nil
 	}
-	temp, err := sht2x.Temperature()
+	temp, err := d.Temperature()
 	gobottest.Assert(t, err, errors.New("Invalid crc"))
 	gobottest.Assert(t, temp, float32(0.0))
 }
 
-func TestSHT2xDriverHumidityCrcError(t *testing.T) {
-	sht2x, adaptor := initTestSHT2xDriverWithStubbedAdaptor()
-	sht2x.Start()
+func TestSHT2xHumidityCrcError(t *testing.T) {
+	d, a := initTestSHT2xDriverWithStubbedAdaptor()
+	d.Start()
 
-	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+	a.i2cReadImpl = func(b []byte) (int, error) {
 		buf := new(bytes.Buffer)
-		if adaptor.written[len(adaptor.written)-1] == SHT2xTriggerHumdMeasureNohold {
+		if a.written[len(a.written)-1] == SHT2xTriggerHumdMeasureNohold {
 			buf.Write([]byte{94, 202, 0})
 		}
 		copy(b, buf.Bytes())
 		return buf.Len(), nil
 	}
-	hum, err := sht2x.Humidity()
+	hum, err := d.Humidity()
 	gobottest.Assert(t, err, errors.New("Invalid crc"))
 	gobottest.Assert(t, hum, float32(0.0))
 }
 
-func TestSHT2xDriverTemperatureLengthError(t *testing.T) {
-	sht2x, adaptor := initTestSHT2xDriverWithStubbedAdaptor()
-	sht2x.Start()
+func TestSHT2xTemperatureLengthError(t *testing.T) {
+	d, a := initTestSHT2xDriverWithStubbedAdaptor()
+	d.Start()
 
-	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+	a.i2cReadImpl = func(b []byte) (int, error) {
 		buf := new(bytes.Buffer)
-		if adaptor.written[len(adaptor.written)-1] == SHT2xTriggerTempMeasureNohold {
+		if a.written[len(a.written)-1] == SHT2xTriggerTempMeasureNohold {
 			buf.Write([]byte{95, 168})
 		}
 		copy(b, buf.Bytes())
 		return buf.Len(), nil
 	}
-	temp, err := sht2x.Temperature()
+	temp, err := d.Temperature()
 	gobottest.Assert(t, err, ErrNotEnoughBytes)
 	gobottest.Assert(t, temp, float32(0.0))
 }
 
-func TestSHT2xDriverHumidityLengthError(t *testing.T) {
-	sht2x, adaptor := initTestSHT2xDriverWithStubbedAdaptor()
-	sht2x.Start()
+func TestSHT2xHumidityLengthError(t *testing.T) {
+	d, a := initTestSHT2xDriverWithStubbedAdaptor()
+	d.Start()
 
-	adaptor.i2cReadImpl = func(b []byte) (int, error) {
+	a.i2cReadImpl = func(b []byte) (int, error) {
 		buf := new(bytes.Buffer)
-		if adaptor.written[len(adaptor.written)-1] == SHT2xTriggerHumdMeasureNohold {
+		if a.written[len(a.written)-1] == SHT2xTriggerHumdMeasureNohold {
 			buf.Write([]byte{94, 202})
 		}
 		copy(b, buf.Bytes())
 		return buf.Len(), nil
 	}
-	hum, err := sht2x.Humidity()
+	hum, err := d.Humidity()
 	gobottest.Assert(t, err, ErrNotEnoughBytes)
 	gobottest.Assert(t, hum, float32(0.0))
-}
-
-func TestSHT2xDriverSetName(t *testing.T) {
-	b := initTestSHT2xDriver()
-	b.SetName("TESTME")
-	gobottest.Assert(t, b.Name(), "TESTME")
-}
-
-func TestSHT2xDriverOptions(t *testing.T) {
-	b := NewSHT2xDriver(newI2cTestAdaptor(), WithBus(2))
-	gobottest.Assert(t, b.GetBusOrDefault(1), 2)
 }

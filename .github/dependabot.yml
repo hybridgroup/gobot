@@ -1,0 +1,11 @@
+# package-ecosystem, directory and schedule is mandatory
+
+version: 2
+updates:
+  - package-ecosystem: "gomod"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    # Raise pull requests for version updates
+    # for go modules against the `dev` branch
+    target-branch: "dev"

@@ -2,6 +2,7 @@ package joule
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 	"testing"
 
@@ -9,21 +10,21 @@ import (
 	"gobot.io/x/gobot/drivers/gpio"
 	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/gobottest"
-	"gobot.io/x/gobot/sysfs"
+	"gobot.io/x/gobot/system"
 )
 
-// make sure that this Adaptor fullfills all the required interfaces
+// make sure that this Adaptor fulfills all the required interfaces
 var _ gobot.Adaptor = (*Adaptor)(nil)
+var _ gobot.DigitalPinnerProvider = (*Adaptor)(nil)
+var _ gobot.PWMPinnerProvider = (*Adaptor)(nil)
 var _ gpio.DigitalReader = (*Adaptor)(nil)
 var _ gpio.DigitalWriter = (*Adaptor)(nil)
 var _ gpio.PwmWriter = (*Adaptor)(nil)
-var _ sysfs.DigitalPinnerProvider = (*Adaptor)(nil)
-var _ sysfs.PWMPinnerProvider = (*Adaptor)(nil)
 var _ i2c.Connector = (*Adaptor)(nil)
 
-func initTestAdaptor() (*Adaptor, *sysfs.MockFilesystem) {
+func initTestAdaptorWithMockedFilesystem() (*Adaptor, *system.MockFilesystem) {
 	a := NewAdaptor()
-	fs := sysfs.NewMockFilesystem([]string{
+	mockPaths := []string{
 		"/sys/class/pwm/pwmchip0/export",
 		"/sys/class/pwm/pwmchip0/unexport",
 		"/sys/class/pwm/pwmchip0/pwm0/duty_cycle",
@@ -86,120 +87,137 @@ func initTestAdaptor() (*Adaptor, *sysfs.MockFilesystem) {
 		"/sys/class/gpio/gpio451/direction",
 		"/sys/class/gpio/gpio451/value",
 		"/dev/i2c-0",
-	})
-	sysfs.SetFilesystem(fs)
+	}
+	fs := a.sys.UseMockFilesystem(mockPaths)
 	fs.Files["/sys/class/pwm/pwmchip0/pwm0/period"].Contents = "5000"
-	a.Connect()
+	if err := a.Connect(); err != nil {
+		panic(err)
+	}
 	return a, fs
 }
 
-func TestJouleAdaptorName(t *testing.T) {
-	a, _ := initTestAdaptor()
+func TestName(t *testing.T) {
+	a, _ := initTestAdaptorWithMockedFilesystem()
+
 	gobottest.Assert(t, strings.HasPrefix(a.Name(), "Joule"), true)
 	a.SetName("NewName")
 	gobottest.Assert(t, a.Name(), "NewName")
 }
 
-func TestAdaptorConnect(t *testing.T) {
-	a, _ := initTestAdaptor()
-	gobottest.Assert(t, a.Connect(), nil)
-	gobottest.Assert(t, a.GetDefaultBus(), 0)
-}
+func TestFinalize(t *testing.T) {
+	a, _ := initTestAdaptorWithMockedFilesystem()
 
-func TestAdaptorInvalidBus(t *testing.T) {
-	a, _ := initTestAdaptor()
-	gobottest.Assert(t, a.Connect(), nil)
-
-	_, err := a.GetConnection(0xff, 10)
-	gobottest.Assert(t, err, errors.New("Bus number 10 out of range"))
-}
-
-func TestAdaptorFinalize(t *testing.T) {
-	a, _ := initTestAdaptor()
 	a.DigitalWrite("J12_1", 1)
 	a.PwmWrite("J12_26", 100)
 
-	sysfs.SetSyscall(&sysfs.MockSyscall{})
-	gobottest.Assert(t, a.Finalize(), nil)
-	_, err := a.GetConnection(0xff, 0)
-	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, a.Finalize(), nil)
 
-	sysfs.SetFilesystem(sysfs.NewMockFilesystem([]string{}))
-	gobottest.Refute(t, a.Finalize(), nil)
+	// assert finalize after finalize is working
+	gobottest.Assert(t, a.Finalize(), nil)
+
+	// assert re-connect is working
+	gobottest.Assert(t, a.Connect(), nil)
 }
 
-func TestAdaptorDigitalIO(t *testing.T) {
-	a, fs := initTestAdaptor()
+func TestDigitalIO(t *testing.T) {
+	a, fs := initTestAdaptorWithMockedFilesystem()
 
 	a.DigitalWrite("J12_1", 1)
 	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio451/value"].Contents, "1")
 
 	a.DigitalWrite("J12_1", 0)
+
 	i, err := a.DigitalRead("J12_1")
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, i, 0)
+
+	_, err = a.DigitalRead("P9_99")
+	gobottest.Assert(t, err, errors.New("'P9_99' is not a valid id for a digital pin"))
 }
 
-func TestAdaptorDigitalWriteError(t *testing.T) {
-	a, fs := initTestAdaptor()
-	fs.WithWriteError = true
-
-	err := a.DigitalWrite("13", 1)
-	gobottest.Assert(t, err, errors.New("write error"))
-}
-
-func TestAdaptorDigitalReadWriteError(t *testing.T) {
-	a, fs := initTestAdaptor()
-	fs.WithWriteError = true
-
-	_, err := a.DigitalRead("13")
-	gobottest.Assert(t, err, errors.New("write error"))
-}
-
-func TestAdaptorI2c(t *testing.T) {
-	a, _ := initTestAdaptor()
-
-	sysfs.SetSyscall(&sysfs.MockSyscall{})
-	con, err := a.GetConnection(0xff, 0)
-	gobottest.Assert(t, err, nil)
-
-	con.Write([]byte{0x00, 0x01})
-	data := []byte{42, 42}
-	con.Read(data)
-	gobottest.Assert(t, data, []byte{0x00, 0x01})
-
-	gobottest.Assert(t, a.Finalize(), nil)
-}
-
-func TestAdaptorPwm(t *testing.T) {
-	a, fs := initTestAdaptor()
+func TestPwm(t *testing.T) {
+	a, fs := initTestAdaptorWithMockedFilesystem()
 
 	err := a.PwmWrite("J12_26", 100)
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/pwm0/duty_cycle"].Contents, "3921568")
 
 	err = a.PwmWrite("4", 100)
-	gobottest.Assert(t, err, errors.New("Not a valid pin"))
+	gobottest.Assert(t, err, errors.New("'4' is not a valid id for a pin"))
 
 	err = a.PwmWrite("J12_1", 100)
-	gobottest.Assert(t, err, errors.New("Not a PWM pin"))
+	gobottest.Assert(t, err, errors.New("'J12_1' is not a valid id for a PWM pin"))
 }
 
-func TestAdaptorPwmPinExportError(t *testing.T) {
-	a, fs := initTestAdaptor()
-
+func TestPwmPinExportError(t *testing.T) {
+	a, fs := initTestAdaptorWithMockedFilesystem()
 	delete(fs.Files, "/sys/class/pwm/pwmchip0/export")
 
 	err := a.PwmWrite("J12_26", 100)
 	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/pwm/pwmchip0/export: No such file"), true)
 }
 
-func TestAdaptorPwmPinEnableError(t *testing.T) {
-	a, fs := initTestAdaptor()
-
+func TestPwmPinEnableError(t *testing.T) {
+	a, fs := initTestAdaptorWithMockedFilesystem()
 	delete(fs.Files, "/sys/class/pwm/pwmchip0/pwm0/enable")
 
 	err := a.PwmWrite("J12_26", 100)
 	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/pwm/pwmchip0/pwm0/enable: No such file"), true)
+}
+
+func TestI2cDefaultBus(t *testing.T) {
+	a := NewAdaptor()
+	gobottest.Assert(t, a.DefaultI2cBus(), 0)
+}
+
+func TestI2cFinalizeWithErrors(t *testing.T) {
+	// arrange
+	a := NewAdaptor()
+	a.sys.UseMockSyscall()
+	fs := a.sys.UseMockFilesystem([]string{"/dev/i2c-2"})
+	gobottest.Assert(t, a.Connect(), nil)
+	con, err := a.GetI2cConnection(0xff, 2)
+	gobottest.Assert(t, err, nil)
+	_, err = con.Write([]byte{0xbf})
+	gobottest.Assert(t, err, nil)
+	fs.WithCloseError = true
+	// act
+	err = a.Finalize()
+	// assert
+	gobottest.Assert(t, strings.Contains(err.Error(), "close error"), true)
+}
+
+func Test_validateI2cBusNumber(t *testing.T) {
+	var tests = map[string]struct {
+		busNr   int
+		wantErr error
+	}{
+		"number_negative_error": {
+			busNr:   -1,
+			wantErr: fmt.Errorf("Bus number -1 out of range"),
+		},
+		"number_0_ok": {
+			busNr: 0,
+		},
+		"number_1_ok": {
+			busNr: 1,
+		},
+		"number_2_ok": {
+			busNr: 2,
+		},
+		"number_3_error": {
+			busNr:   3,
+			wantErr: fmt.Errorf("Bus number 3 out of range"),
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			// arrange
+			a := NewAdaptor()
+			// act
+			err := a.validateI2cBusNumber(tc.busNr)
+			// assert
+			gobottest.Assert(t, err, tc.wantErr)
+		})
+	}
 }

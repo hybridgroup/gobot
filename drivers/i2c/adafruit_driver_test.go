@@ -9,6 +9,7 @@ import (
 	"gobot.io/x/gobot/gobottest"
 )
 
+// this ensures that the implementation implements the gobot.Driver interface
 var _ gobot.Driver = (*AdafruitMotorHatDriver)(nil)
 
 // --------- HELPERS
@@ -24,14 +25,12 @@ func initTestAdafruitMotorHatDriverWithStubbedAdaptor() (*AdafruitMotorHatDriver
 
 // --------- TESTS
 func TestNewAdafruitMotorHatDriver(t *testing.T) {
-	var adafruit interface{} = NewAdafruitMotorHatDriver(newI2cTestAdaptor())
-	_, ok := adafruit.(*AdafruitMotorHatDriver)
+	var di interface{} = NewAdafruitMotorHatDriver(newI2cTestAdaptor())
+	d, ok := di.(*AdafruitMotorHatDriver)
 	if !ok {
 		t.Errorf("AdafruitMotorHatDriver() should have returned a *AdafruitMotorHatDriver")
 	}
-
-	a := NewAdafruitMotorHatDriver(newI2cTestAdaptor())
-	gobottest.Assert(t, strings.HasPrefix(a.Name(), "AdafruitMotorHat"), true)
+	gobottest.Assert(t, strings.HasPrefix(d.Name(), "AdafruitMotorHat"), true)
 }
 
 // Methods

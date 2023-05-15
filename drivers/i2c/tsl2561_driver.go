@@ -3,8 +3,6 @@ package i2c
 import (
 	"fmt"
 	"time"
-
-	"gobot.io/x/gobot"
 )
 
 const (
@@ -114,10 +112,7 @@ const (
 // Ported from the Adafruit driver at https://github.com/adafruit/Adafruit_TSL2561 by
 // K. Townsend
 type TSL2561Driver struct {
-	name       string
-	connector  Connector
-	connection Connection
-	Config
+	*Driver
 	autoGain        bool
 	gain            TSL2561Gain
 	integrationTime TSL2561IntegrationTime
@@ -126,7 +121,7 @@ type TSL2561Driver struct {
 // NewTSL2561Driver creates a new driver for the TSL2561 device.
 //
 // Params:
-//		conn Connector - the Adaptor to use with this Driver
+//		c Connector - the Adaptor to use with this Driver
 //
 // Optional params:
 //		i2c.WithBus(int):		bus to use with this driver
@@ -138,21 +133,20 @@ type TSL2561Driver struct {
 //		i2c.WithTSL2561IntegrationTime101MS: 	sets integration time to 101ms
 //		i2c.WithTSL2561IntegrationTime402MS: 	sets integration time to 402ms
 //
-func NewTSL2561Driver(conn Connector, options ...func(Config)) *TSL2561Driver {
-	driver := &TSL2561Driver{
-		name:            gobot.DefaultName("TSL2561"),
-		connector:       conn,
-		Config:          NewConfig(),
+func NewTSL2561Driver(c Connector, options ...func(Config)) *TSL2561Driver {
+	d := &TSL2561Driver{
+		Driver:          NewDriver(c, "TSL2561", TSL2561AddressFloat),
 		integrationTime: TSL2561IntegrationTime402MS,
 		gain:            TSL2561Gain1X,
 		autoGain:        false,
 	}
+	d.afterStart = d.initialize
 
 	for _, option := range options {
-		option(driver)
+		option(d)
 	}
 
-	return driver
+	return d
 }
 
 // WithTSL2561Gain1X option sets the TSL2561Driver gain to 1X
@@ -212,61 +206,6 @@ func WithTSL2561IntegrationTime101MS(c Config) {
 // to 402ms
 func WithTSL2561IntegrationTime402MS(c Config) {
 	withTSL2561IntegrationTime(TSL2561IntegrationTime402MS)(c)
-}
-
-// Name returns the name of the device.
-func (d *TSL2561Driver) Name() string {
-	return d.name
-}
-
-// SetName sets the name of the device.
-func (d *TSL2561Driver) SetName(name string) {
-	d.name = name
-}
-
-// Connection returns the connection of the device.
-func (d *TSL2561Driver) Connection() gobot.Connection {
-	return d.connector.(gobot.Connection)
-}
-
-// Start initializes the device.
-func (d *TSL2561Driver) Start() (err error) {
-	bus := d.GetBusOrDefault(d.connector.GetDefaultBus())
-	address := d.GetAddressOrDefault(TSL2561AddressFloat)
-
-	if d.connection, err = d.connector.GetConnection(address, bus); err != nil {
-		return err
-	}
-
-	if err = d.enable(); err != nil {
-		return err
-	}
-
-	var initialized byte
-	if initialized, err = d.connection.ReadByteData(tsl2561RegisterID); err != nil {
-		return err
-	} else if (initialized & 0x0A) == 0 {
-		return fmt.Errorf("TSL2561 device not found (0x%X)", initialized)
-	}
-
-	if err = d.SetIntegrationTime(d.integrationTime); err != nil {
-		return err
-	}
-
-	if err = d.SetGain(d.gain); err != nil {
-		return err
-	}
-
-	if err = d.disable(); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// Halt stops the device
-func (d *TSL2561Driver) Halt() error {
-	return nil
 }
 
 // SetIntegrationTime sets integrations time for the TSL2561
@@ -507,4 +446,30 @@ func (d *TSL2561Driver) waitForADC() {
 		time.Sleep(450 * time.Millisecond)
 	}
 	return
+}
+
+func (d *TSL2561Driver) initialize() error {
+	if err := d.enable(); err != nil {
+		return err
+	}
+
+	if initialized, err := d.connection.ReadByteData(tsl2561RegisterID); err != nil {
+		return err
+	} else if (initialized & 0x0A) == 0 {
+		return fmt.Errorf("TSL2561 device not found (0x%X)", initialized)
+	}
+
+	if err := d.SetIntegrationTime(d.integrationTime); err != nil {
+		return err
+	}
+
+	if err := d.SetGain(d.gain); err != nil {
+		return err
+	}
+
+	if err := d.disable(); err != nil {
+		return err
+	}
+
+	return nil
 }

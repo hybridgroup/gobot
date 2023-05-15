@@ -1,35 +1,28 @@
 package i2c
 
 import (
-	"gobot.io/x/gobot"
-
 	"time"
 )
 
-const lidarliteAddress = 0x62
+const lidarliteDefaultAddress = 0x62
 
 // LIDARLiteDriver is the Gobot driver for the LIDARLite I2C LIDAR device.
 type LIDARLiteDriver struct {
-	name       string
-	connector  Connector
-	connection Connection
-	Config
+	*Driver
 }
 
 // NewLIDARLiteDriver creates a new driver for the LIDARLite I2C LIDAR device.
 //
 // Params:
-//		conn Connector - the Adaptor to use with this Driver
+//		c Connector - the Adaptor to use with this Driver
 //
 // Optional params:
 //		i2c.WithBus(int):	bus to use with this driver
 //		i2c.WithAddress(int):	address to use with this driver
 //
-func NewLIDARLiteDriver(a Connector, options ...func(Config)) *LIDARLiteDriver {
+func NewLIDARLiteDriver(c Connector, options ...func(Config)) *LIDARLiteDriver {
 	l := &LIDARLiteDriver{
-		name:      gobot.DefaultName("LIDARLite"),
-		connector: a,
-		Config:    NewConfig(),
+		Driver: NewDriver(c, "LIDARLite", lidarliteDefaultAddress),
 	}
 
 	for _, option := range options {
@@ -39,30 +32,6 @@ func NewLIDARLiteDriver(a Connector, options ...func(Config)) *LIDARLiteDriver {
 	// TODO: add commands to API
 	return l
 }
-
-// Name returns the Name for the Driver
-func (h *LIDARLiteDriver) Name() string { return h.name }
-
-// SetName sets the Name for the Driver
-func (h *LIDARLiteDriver) SetName(n string) { h.name = n }
-
-// Connection returns the connection for the Driver
-func (h *LIDARLiteDriver) Connection() gobot.Connection { return h.connector.(gobot.Connection) }
-
-// Start initialized the LIDAR
-func (h *LIDARLiteDriver) Start() (err error) {
-	bus := h.GetBusOrDefault(h.connector.GetDefaultBus())
-	address := h.GetAddressOrDefault(lidarliteAddress)
-
-	h.connection, err = h.connector.GetConnection(address, bus)
-	if err != nil {
-		return err
-	}
-	return
-}
-
-// Halt returns true if devices is halted successfully
-func (h *LIDARLiteDriver) Halt() (err error) { return }
 
 // Distance returns the current distance in cm
 func (h *LIDARLiteDriver) Distance() (distance int, err error) {
