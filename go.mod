@@ -19,7 +19,7 @@ require (
 	github.com/warthog618/gpiod v0.8.0
 	go.bug.st/serial v1.4.0
 	gocv.io/x/gocv v0.31.0
-	golang.org/x/net v0.1.0
+	golang.org/x/net v0.10.0
 	periph.io/x/conn/v3 v3.6.10
 	periph.io/x/host/v3 v3.7.2
 	tinygo.org/x/bluetooth v0.6.0
@@ -46,7 +46,7 @@ require (
 	github.com/tinygo-org/cbgo v0.0.4 // indirect
 	golang.org/x/crypto v0.1.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
-	golang.org/x/sys v0.1.0 // indirect
+	golang.org/x/sys v0.8.0 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
