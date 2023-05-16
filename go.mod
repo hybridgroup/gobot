@@ -6,7 +6,7 @@ require (
 	github.com/bmizerany/pat v0.0.0-20210406213842-e4b6760bdd6f
 	github.com/donovanhide/eventsource v0.0.0-20210830082556-c59027999da0
 	github.com/eclipse/paho.mqtt.golang v1.4.1
-	github.com/gofrs/uuid v4.3.0+incompatible
+	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/hybridgroup/go-ardrone v0.0.0-20140402002621-b9750d8d7b78
 	github.com/hybridgroup/mjpeg v0.0.0-20140228234708-4680f319790e
