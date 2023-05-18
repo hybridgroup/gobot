@@ -40,6 +40,7 @@ func (t *bleTestClientAdaptor) WriteCharacteristic(cUUID string, data []byte) (e
 	return t.testWriteCharacteristic(cUUID, data)
 }
 
+//nolint:revive // in tests it is be helpful to see the meaning of the parameters by name
 func (t *bleTestClientAdaptor) Subscribe(cUUID string, f func([]byte, error)) (err error) {
 	t.testSubscribe = f
 	return
@@ -72,8 +73,6 @@ func NewBleTestAdaptor() *bleTestClientAdaptor {
 		testWriteCharacteristic: func(cUUID string, data []byte) (e error) {
 			return
 		},
-		testSubscribe: func([]byte, error) {
-			return
-		},
+		testSubscribe: func([]byte, error) {},
 	}
 }

@@ -154,7 +154,7 @@ func TestPwmPinExportError(t *testing.T) {
 	delete(fs.Files, "/sys/class/pwm/pwmchip0/export")
 
 	err := a.PwmWrite("J12_26", 100)
-	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/pwm/pwmchip0/export: No such file"), true)
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/pwm/pwmchip0/export: no such file"), true)
 }
 
 func TestPwmPinEnableError(t *testing.T) {
@@ -162,7 +162,7 @@ func TestPwmPinEnableError(t *testing.T) {
 	delete(fs.Files, "/sys/class/pwm/pwmchip0/pwm0/enable")
 
 	err := a.PwmWrite("J12_26", 100)
-	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/pwm/pwmchip0/pwm0/enable: No such file"), true)
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/pwm/pwmchip0/pwm0/enable: no such file"), true)
 }
 
 func TestI2cDefaultBus(t *testing.T) {

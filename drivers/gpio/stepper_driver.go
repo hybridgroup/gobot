@@ -111,7 +111,7 @@ func (s *StepperDriver) Start() (err error) { return }
 // Run continuously runs the stepper
 func (s *StepperDriver) Run() (err error) {
 	//halt if already moving
-	if s.moving == true {
+	if s.moving {
 		s.Halt()
 	}
 
@@ -123,7 +123,7 @@ func (s *StepperDriver) Run() (err error) {
 
 	go func() {
 		for {
-			if s.moving == false {
+			if !s.moving {
 				break
 			}
 			s.step()
@@ -191,7 +191,7 @@ func (s *StepperDriver) Move(stepsToMove int) error {
 		return s.Halt()
 	}
 
-	if s.moving == true {
+	if s.moving {
 		//stop previous motion
 		s.Halt()
 	}

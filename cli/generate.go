@@ -30,7 +30,7 @@ func Generate() cli.Command {
 					valid = true
 				}
 			}
-			if valid == false {
+			if !valid {
 				fmt.Println("Invalid/no subcommand supplied.")
 				fmt.Println("Usage:")
 				fmt.Println(" gobot generate adaptor <name> [package] # generate a new Gobot adaptor")
@@ -149,11 +149,11 @@ func generatePlatform(c config) error {
 
 	c.dir = dir
 
-	if exp, err := ioutil.ReadFile(exampleDir + "/main.go"); err != nil {
+	exp, err := ioutil.ReadFile(exampleDir + "/main.go")
+	if err != nil {
 		return err
-	} else {
-		c.Example = string(exp)
 	}
+	c.Example = string(exp)
 
 	return generate(c, "README.md", readme())
 }

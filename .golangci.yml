@@ -41,3 +41,12 @@ linters:
     - ineffassign
     - staticcheck
     - unused
+
+linters-settings:
+  revive:
+    rules:
+      # https://github.com/mgechev/revive/blob/master/RULES_DESCRIPTIONS.md#unexported-return
+      # disable this rule, because sometimes it has its justification
+      - name: unexported-return
+        severity: warning
+        disabled: true

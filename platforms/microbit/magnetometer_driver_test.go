@@ -30,7 +30,7 @@ func TestMagnetometerDriverStartAndHalt(t *testing.T) {
 }
 
 func TestMagnetometerDriverReadData(t *testing.T) {
-	sem := make(chan bool, 0)
+	sem := make(chan bool)
 	a := NewBleTestAdaptor()
 	d := NewMagnetometerDriver(a)
 	d.Start()

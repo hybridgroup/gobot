@@ -90,7 +90,7 @@ func NewDriver(a *Adaptor, config string, v ...time.Duration) *Driver {
 			return sdl.PollEvent()
 		},
 		interval: 10 * time.Millisecond,
-		halt:     make(chan bool, 0),
+		halt:     make(chan bool),
 	}
 
 	if len(v) > 0 {

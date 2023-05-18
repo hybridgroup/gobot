@@ -22,10 +22,9 @@ func NewCommander() Commander {
 	}
 }
 
-// Command returns the command interface whene passed a valid command name
-func (c *commander) Command(name string) (command func(map[string]interface{}) interface{}) {
-	command, _ = c.commands[name]
-	return
+// Command returns the command interface when passed a valid command name
+func (c *commander) Command(name string) func(map[string]interface{}) interface{} {
+	return c.commands[name]
 }
 
 // Commands returns the entire map of valid commands

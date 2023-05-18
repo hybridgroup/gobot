@@ -267,7 +267,7 @@ func (d *GrovePiDriver) SetPinMode(pin byte, mode string) error {
 func getPin(pin string) string {
 	if len(pin) > 1 {
 		if strings.ToUpper(pin[0:1]) == "A" || strings.ToUpper(pin[0:1]) == "D" {
-			return pin[1:len(pin)]
+			return pin[1:]
 		}
 	}
 

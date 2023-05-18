@@ -445,7 +445,6 @@ func (d *TSL2561Driver) waitForADC() {
 	case TSL2561IntegrationTime402MS:
 		time.Sleep(450 * time.Millisecond)
 	}
-	return
 }
 
 func (d *TSL2561Driver) initialize() error {

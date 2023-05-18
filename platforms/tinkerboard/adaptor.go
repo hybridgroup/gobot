@@ -156,7 +156,7 @@ func (c *Adaptor) translatePWMPin(id string) (string, int, error) {
 
 func (p pwmPinDefinition) findPWMDir(sys *system.Accesser) (dir string, err error) {
 	items, _ := sys.Find(p.dir, p.dirRegexp)
-	if items == nil || len(items) == 0 {
+	if len(items) == 0 {
 		return "", fmt.Errorf("No path found for PWM directory pattern, '%s' in path '%s'. See README.md for activation",
 			p.dirRegexp, p.dir)
 	}

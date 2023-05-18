@@ -241,7 +241,7 @@ func TestArduinoSetupFail263(t *testing.T) {
 	delete(fs.Files, "/sys/class/gpio/gpio263/direction")
 
 	err := a.arduinoSetup()
-	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/gpio263/direction: No such file"), true)
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/gpio263/direction: no such file"), true)
 }
 
 func TestArduinoSetupFail240(t *testing.T) {
@@ -249,7 +249,7 @@ func TestArduinoSetupFail240(t *testing.T) {
 	delete(fs.Files, "/sys/class/gpio/gpio240/direction")
 
 	err := a.arduinoSetup()
-	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/gpio240/direction: No such file"), true)
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/gpio240/direction: no such file"), true)
 }
 
 func TestArduinoSetupFail111(t *testing.T) {
@@ -257,7 +257,7 @@ func TestArduinoSetupFail111(t *testing.T) {
 	delete(fs.Files, "/sys/kernel/debug/gpio_debug/gpio111/current_pinmux")
 
 	err := a.arduinoSetup()
-	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/kernel/debug/gpio_debug/gpio111/current_pinmux: No such file"), true)
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/kernel/debug/gpio_debug/gpio111/current_pinmux: no such file"), true)
 }
 
 func TestArduinoSetupFail131(t *testing.T) {
@@ -265,7 +265,7 @@ func TestArduinoSetupFail131(t *testing.T) {
 	delete(fs.Files, "/sys/kernel/debug/gpio_debug/gpio131/current_pinmux")
 
 	err := a.arduinoSetup()
-	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/kernel/debug/gpio_debug/gpio131/current_pinmux: No such file"), true)
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/kernel/debug/gpio_debug/gpio131/current_pinmux: no such file"), true)
 }
 
 func TestArduinoI2CSetupFailTristate(t *testing.T) {
@@ -284,7 +284,7 @@ func TestArduinoI2CSetupFail14(t *testing.T) {
 	delete(fs.Files, "/sys/class/gpio/gpio14/direction")
 
 	err := a.arduinoI2CSetup()
-	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/gpio14/direction: No such file"), true)
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/gpio14/direction: no such file"), true)
 }
 
 func TestArduinoI2CSetupUnexportFail(t *testing.T) {
@@ -294,7 +294,7 @@ func TestArduinoI2CSetupUnexportFail(t *testing.T) {
 	delete(fs.Files, "/sys/class/gpio/unexport")
 
 	err := a.arduinoI2CSetup()
-	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/unexport: No such file"), true)
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/unexport: no such file"), true)
 }
 
 func TestArduinoI2CSetupFail236(t *testing.T) {
@@ -304,7 +304,7 @@ func TestArduinoI2CSetupFail236(t *testing.T) {
 	delete(fs.Files, "/sys/class/gpio/gpio236/direction")
 
 	err := a.arduinoI2CSetup()
-	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/gpio236/direction: No such file"), true)
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/gpio236/direction: no such file"), true)
 }
 
 func TestArduinoI2CSetupFail28(t *testing.T) {
@@ -314,7 +314,7 @@ func TestArduinoI2CSetupFail28(t *testing.T) {
 	delete(fs.Files, "/sys/kernel/debug/gpio_debug/gpio28/current_pinmux")
 
 	err := a.arduinoI2CSetup()
-	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/kernel/debug/gpio_debug/gpio28/current_pinmux: No such file"), true)
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/kernel/debug/gpio_debug/gpio28/current_pinmux: no such file"), true)
 }
 
 func TestConnectArduinoError(t *testing.T) {
@@ -410,7 +410,7 @@ func TestDigitalPinInFileError(t *testing.T) {
 	a.Connect()
 
 	_, err := a.DigitalPin("13")
-	gobottest.Assert(t, strings.Contains(err.Error(), "No such file"), true)
+	gobottest.Assert(t, strings.Contains(err.Error(), "no such file"), true)
 
 }
 
@@ -422,7 +422,7 @@ func TestDigitalPinInResistorFileError(t *testing.T) {
 	a.Connect()
 
 	_, err := a.DigitalPin("13")
-	gobottest.Assert(t, strings.Contains(err.Error(), "No such file"), true)
+	gobottest.Assert(t, strings.Contains(err.Error(), "no such file"), true)
 }
 
 func TestDigitalPinInLevelShifterFileError(t *testing.T) {
@@ -433,7 +433,7 @@ func TestDigitalPinInLevelShifterFileError(t *testing.T) {
 	a.Connect()
 
 	_, err := a.DigitalPin("13")
-	gobottest.Assert(t, strings.Contains(err.Error(), "No such file"), true)
+	gobottest.Assert(t, strings.Contains(err.Error(), "no such file"), true)
 }
 
 func TestDigitalPinInMuxFileError(t *testing.T) {
@@ -444,7 +444,7 @@ func TestDigitalPinInMuxFileError(t *testing.T) {
 	a.Connect()
 
 	_, err := a.DigitalPin("13")
-	gobottest.Assert(t, strings.Contains(err.Error(), "No such file"), true)
+	gobottest.Assert(t, strings.Contains(err.Error(), "no such file"), true)
 }
 
 func TestDigitalWriteError(t *testing.T) {
@@ -482,7 +482,7 @@ func TestPwmExportError(t *testing.T) {
 	gobottest.Assert(t, err, nil)
 
 	err = a.PwmWrite("5", 100)
-	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/pwm/pwmchip0/export: No such file"), true)
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/pwm/pwmchip0/export: no such file"), true)
 }
 
 func TestPwmEnableError(t *testing.T) {
@@ -492,7 +492,7 @@ func TestPwmEnableError(t *testing.T) {
 	a.Connect()
 
 	err := a.PwmWrite("5", 100)
-	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/pwm/pwmchip0/pwm1/enable: No such file"), true)
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/pwm/pwmchip0/pwm1/enable: no such file"), true)
 }
 
 func TestPwmWritePinError(t *testing.T) {

@@ -193,7 +193,7 @@ func digitalPinGpiodReconfigureLine(d *digitalPinGpiod, forceInput bool) error {
 	if d.direction == IN || forceInput {
 		if systemGpiodDebug {
 			log.Printf("input (%s): debounce %s, edge %d, handler %t, inverse %t, bias %d",
-				id, d.debouncePeriod, d.edge, d.edgeEventHandler != nil, d.activeLow == true, d.bias)
+				id, d.debouncePeriod, d.edge, d.edgeEventHandler != nil, d.activeLow, d.bias)
 		}
 		opts = append(opts, gpiod.AsInput)
 		if !forceInput && d.drive != digitalPinDrivePushPull && systemGpiodDebug {
@@ -219,7 +219,7 @@ func digitalPinGpiodReconfigureLine(d *digitalPinGpiod, forceInput bool) error {
 	} else {
 		if systemGpiodDebug {
 			log.Printf("ouput (%s): ini-state %d, drive %d, inverse %t, bias %d",
-				id, d.outInitialState, d.drive, d.activeLow == true, d.bias)
+				id, d.outInitialState, d.drive, d.activeLow, d.bias)
 		}
 		opts = append(opts, gpiod.AsOutput(d.outInitialState))
 		switch d.drive {

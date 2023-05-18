@@ -138,11 +138,7 @@ func (a *Adaptor) Finalize() (err error) {
 // Publish a message under a specific topic
 func (a *Adaptor) Publish(topic string, message []byte) bool {
 	_, err := a.PublishWithQOS(topic, a.qos, message)
-	if err != nil {
-		return false
-	}
-
-	return true
+	return err == nil
 }
 
 // PublishAndRetain publishes a message under a specific topic with retain flag
@@ -181,10 +177,7 @@ func (a *Adaptor) OnWithQOS(event string, qos int, f func(msg Message)) (paho.To
 // On subscribes to a topic, and then calls the message handler function when data is received
 func (a *Adaptor) On(event string, f func(msg Message)) bool {
 	_, err := a.OnWithQOS(event, a.qos, f)
-	if err != nil {
-		return false
-	}
-	return true
+	return err == nil
 }
 
 func (a *Adaptor) createClientOptions() *paho.ClientOptions {

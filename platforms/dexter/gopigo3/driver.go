@@ -234,7 +234,7 @@ func (g *Driver) GetManufacturerName() (mName string, err error) {
 	}
 	mf := response[4:23]
 	mf = bytes.Trim(mf, "\x00")
-	return fmt.Sprintf("%s", string(mf)), nil
+	return string(mf), nil
 }
 
 // GetBoardName returns the board name from the firmware.
@@ -249,7 +249,7 @@ func (g *Driver) GetBoardName() (bName string, err error) {
 	}
 	mf := response[4:23]
 	mf = bytes.Trim(mf, "\x00")
-	return fmt.Sprintf("%s", string(mf)), nil
+	return string(mf), nil
 }
 
 // GetHardwareVersion returns the hardware version from the firmware.

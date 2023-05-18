@@ -348,16 +348,12 @@ func (d *ADS1x15Driver) AnalogRead(pin string) (value int, err error) {
 	switch pin {
 	case "0-1":
 		channel = 0
-		break
 	case "0-3":
 		channel = 1
-		break
 	case "1-3":
 		channel = 2
-		break
 	case "2-3":
 		channel = 3
-		break
 	default:
 		// read the voltage at a specific pin, compared to the ground
 		channel, err = strconv.Atoi(pin)

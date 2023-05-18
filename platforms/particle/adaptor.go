@@ -175,11 +175,9 @@ func (s *Adaptor) EventStream(source string, name string) (event *gobot.Event, e
 
 	go func() {
 		for {
-			select {
-			case ev := <-events:
-				if ev.Event() != "" && ev.Data() != "" {
-					s.Publish(ev.Event(), ev.Data())
-				}
+			ev := <-events
+			if ev.Event() != "" && ev.Data() != "" {
+				s.Publish(ev.Event(), ev.Data())
 			}
 		}
 	}()
@@ -195,14 +193,13 @@ func (s *Adaptor) Variable(name string) (result string, err error) {
 		return
 	}
 
-	val := resp["result"]
-	switch val.(type) {
+	switch val := resp["result"].(type) {
 	case bool:
-		result = strconv.FormatBool(val.(bool))
+		result = strconv.FormatBool(val)
 	case float64:
-		result = strconv.FormatFloat(val.(float64), 'f', -1, 64)
+		result = strconv.FormatFloat(val, 'f', -1, 64)
 	case string:
-		result = val.(string)
+		result = val
 	}
 
 	return

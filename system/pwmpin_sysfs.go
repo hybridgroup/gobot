@@ -260,7 +260,7 @@ func (p *pwmPinSysFs) printState() {
 	fmt.Printf("DutyCycle: %v, ", duty)
 	var powerPercent float64
 	if enabled {
-		if polarity == true {
+		if polarity {
 			powerPercent = float64(duty) / float64(period) * 100
 		} else {
 			powerPercent = float64(period) / float64(duty) * 100
