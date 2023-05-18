@@ -25,7 +25,7 @@ run:
 
   # note: examples will be currently omitted by the build tag
   skip-dirs:
-    - platforms/opencv/
+    - platforms/opencv
 
 linters:
   # Enable specific linter
