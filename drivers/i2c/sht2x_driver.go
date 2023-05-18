@@ -211,13 +211,13 @@ func (d *SHT2xDriver) initialize() error {
 	return nil
 }
 
-func (d *SHT2xDriver) sendAccuracy() (err error) {
-	if err = d.connection.WriteByte(SHT2xReadUserReg); err != nil {
-		return
+func (d *SHT2xDriver) sendAccuracy() error {
+	if err := d.connection.WriteByte(SHT2xReadUserReg); err != nil {
+		return err
 	}
 	userRegister, err := d.connection.ReadByte()
 	if err != nil {
-		return
+		return err
 	}
 
 	userRegister &= 0x7e //Turn off the resolution bits
@@ -226,15 +226,13 @@ func (d *SHT2xDriver) sendAccuracy() (err error) {
 	userRegister |= acc //Mask in the requested resolution bits
 
 	//Request a write to user register
-	_, err = d.connection.Write([]byte{SHT2xWriteUserReg, userRegister})
-	if err != nil {
-		return
+	if _, err := d.connection.Write([]byte{SHT2xWriteUserReg, userRegister}); err != nil {
+		return err
 	}
 
-	userRegister, err = d.connection.ReadByte()
-	if err != nil {
-		return
+	if _, err := d.connection.ReadByte(); err != nil {
+		return err
 	}
 
-	return
+	return nil
 }

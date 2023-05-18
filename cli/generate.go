@@ -102,7 +102,7 @@ func generate(c config, file string, tmpl string) error {
 	fmt.Println("Creating", fileLocation)
 
 	f, err := os.Create(fileLocation)
-	defer f.Close()
+	defer f.Close() //nolint:staticcheck // for historical reasons
 	if err != nil {
 		return err
 	}

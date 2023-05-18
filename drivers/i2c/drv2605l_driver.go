@@ -6,13 +6,13 @@ type DRV2605Mode uint8
 // Operating modes, for use in SetMode()
 const (
 	DRV2605ModeIntTrig     DRV2605Mode = 0x00
-	DRV2605ModeExtTrigEdge             = 0x01
-	DRV2605ModeExtTrigLvl              = 0x02
-	DRV2605ModePWMAnalog               = 0x03
-	DRV2605ModeAudioVibe               = 0x04
-	DRV2605ModeRealtime                = 0x05
-	DRV2605ModeDiagnose                = 0x06
-	DRV2605ModeAutocal                 = 0x07
+	DRV2605ModeExtTrigEdge DRV2605Mode = 0x01
+	DRV2605ModeExtTrigLvl  DRV2605Mode = 0x02
+	DRV2605ModePWMAnalog   DRV2605Mode = 0x03
+	DRV2605ModeAudioVibe   DRV2605Mode = 0x04
+	DRV2605ModeRealtime    DRV2605Mode = 0x05
+	DRV2605ModeDiagnose    DRV2605Mode = 0x06
+	DRV2605ModeAutocal     DRV2605Mode = 0x07
 )
 
 const (

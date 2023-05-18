@@ -109,7 +109,6 @@ func (a *API) Start() {
 
 // StartWithoutDefaults initializes the api without setting up the default routes.
 // Good for custom web interfaces.
-//
 func (a *API) StartWithoutDefaults() {
 	a.start(a)
 }
@@ -117,7 +116,6 @@ func (a *API) StartWithoutDefaults() {
 // AddC3PIORoutes adds all of the standard C3PIO routes to the API.
 // For more information, please see:
 // http://cppp.io/
-//
 func (a *API) AddC3PIORoutes() {
 	mcpCommandRoute := "/api/commands/:command"
 	robotDeviceCommandRoute := "/api/robots/:robot/devices/:device/commands/:command"
@@ -250,10 +248,8 @@ func (a *API) robotDevice(res http.ResponseWriter, req *http.Request) {
 
 func (a *API) robotDeviceEvent(res http.ResponseWriter, req *http.Request) {
 	f, _ := res.(http.Flusher)
-	c, _ := res.(http.CloseNotifier)
 
 	dataChan := make(chan string)
-	closer := c.CloseNotify()
 
 	res.Header().Set("Content-Type", "text/event-stream")
 	res.Header().Set("Cache-Control", "no-cache")
@@ -275,7 +271,7 @@ func (a *API) robotDeviceEvent(res http.ResponseWriter, req *http.Request) {
 			case data := <-dataChan:
 				fmt.Fprintf(res, "data: %v\n\n", data)
 				f.Flush()
-			case <-closer:
+			case <-req.Context().Done():
 				log.Println("Closing connection")
 				return
 			}

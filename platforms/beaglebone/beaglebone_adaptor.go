@@ -50,8 +50,9 @@ type Adaptor struct {
 // NewAdaptor returns a new Beaglebone Black/Green Adaptor
 //
 // Optional parameters:
-//		adaptors.WithGpiodAccess():	use character device gpiod driver instead of sysfs
-//		adaptors.WithSpiGpioAccess(sclk, nss, mosi, miso):	use GPIO's instead of /dev/spidev#.#
+//
+//	adaptors.WithGpiodAccess():	use character device gpiod driver instead of sysfs
+//	adaptors.WithSpiGpioAccess(sclk, nss, mosi, miso):	use GPIO's instead of /dev/spidev#.#
 func NewAdaptor(opts ...func(adaptors.Optioner)) *Adaptor {
 	sys := system.NewAccesser()
 	c := &Adaptor{
@@ -127,7 +128,7 @@ func (c *Adaptor) DigitalWrite(id string, val byte) error {
 
 	if strings.Contains(id, "usr") {
 		fi, e := c.sys.OpenFile(c.usrLed+id+"/brightness", os.O_WRONLY|os.O_APPEND, 0666)
-		defer fi.Close()
+		defer fi.Close() //nolint:staticcheck // for historical reasons
 		if e != nil {
 			return e
 		}
@@ -145,7 +146,7 @@ func (c *Adaptor) AnalogRead(pin string) (val int, err error) {
 		return
 	}
 	fi, err := c.sys.OpenFile(fmt.Sprintf("%v/%v", c.analogPath, analogPin), os.O_RDONLY, 0644)
-	defer fi.Close()
+	defer fi.Close() //nolint:staticcheck // for historical reasons
 
 	if err != nil {
 		return
@@ -238,7 +239,7 @@ func (p pwmPinData) findPWMDir(sys *system.Accesser) (dir string, err error) {
 func (c *Adaptor) muxPin(pin, cmd string) error {
 	path := fmt.Sprintf("/sys/devices/platform/ocp/ocp:%s_pinmux/state", pin)
 	fi, e := c.sys.OpenFile(path, os.O_WRONLY, 0666)
-	defer fi.Close()
+	defer fi.Close() //nolint:staticcheck // for historical reasons
 	if e != nil {
 		return e
 	}

@@ -3,6 +3,7 @@ package system
 import (
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"strconv"
@@ -238,7 +239,7 @@ var readFile = func(f File) ([]byte, error) {
 	// TODO: Examine if seek is needed if full buffer is read from sysfs file.
 
 	buf := make([]byte, 2)
-	_, err := f.Seek(0, os.SEEK_SET)
+	_, err := f.Seek(0, io.SeekStart)
 	if err == nil {
 		_, err = f.Read(buf)
 	}

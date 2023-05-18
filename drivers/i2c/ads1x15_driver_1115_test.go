@@ -103,7 +103,7 @@ func TestADS1115AnalogRead(t *testing.T) {
 	gobottest.Assert(t, val, 32767)
 	gobottest.Assert(t, err, nil)
 
-	val, err = d.AnalogRead("3-2")
+	_, err = d.AnalogRead("3-2")
 	gobottest.Refute(t, err.Error(), nil)
 }
 

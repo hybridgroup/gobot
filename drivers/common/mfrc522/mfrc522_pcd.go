@@ -328,6 +328,9 @@ func (d *MFRC522Common) writeFifo(fifoData []byte) error {
 
 func (d *MFRC522Common) readFifo(backData []byte) (uint8, error) {
 	n, err := d.readByteData(regFIFOLevel) // Number of bytes in the FIFO
+	if err != nil {
+		return 0, err
+	}
 	if n > uint8(len(backData)) {
 		return 0, fmt.Errorf("more data in FIFO (%d) than expected (%d)", n, len(backData))
 	}

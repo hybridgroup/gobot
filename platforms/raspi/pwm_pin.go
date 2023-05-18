@@ -108,7 +108,7 @@ func (p *PWMPin) SetDutyCycle(duty uint32) error {
 
 func (p *PWMPin) writeValue(data string) (err error) {
 	fi, err := p.sys.OpenFile(p.path, os.O_WRONLY|os.O_APPEND, 0644)
-	defer fi.Close()
+	defer fi.Close() //nolint:staticcheck // for historical reasons
 
 	if err != nil {
 		return err

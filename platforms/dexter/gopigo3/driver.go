@@ -138,10 +138,10 @@ type GroveType int
 
 const (
 	CUSTOM        GroveType = 1
-	IR_DI_REMOTE            = 2
-	IR_EV3_REMOTE           = 3
-	US                      = 4
-	I2C                     = 5
+	IR_DI_REMOTE  GroveType = 2
+	IR_EV3_REMOTE GroveType = 3
+	US            GroveType = 4
+	I2C           GroveType = 5
 )
 
 // GroveState contains the state of a grove device.
@@ -336,9 +336,6 @@ func (g *Driver) ServoWrite(port string, angle byte) error {
 	if angle > 180 {
 		angle = 180
 	}
-	if angle < 0 {
-		angle = 0
-	}
 	pulseWidth := ((1500 - (pulseWidthRange / 2)) + ((pulseWidthRange / 180) * int(angle)))
 	return g.SetServo(srvo, uint16(pulseWidth))
 }
@@ -419,19 +416,19 @@ func (g *Driver) GetMotorStatus(motor Motor) (flags uint8, power uint16, encoder
 	enc[1] = response[8]
 	enc[0] = response[9]
 	e := binary.LittleEndian.Uint32(enc)
+	encoder = int(e)
 	if e&0x80000000 == 0x80000000 {
 		encoder = int(uint64(e) - 0x100000000)
 	}
-	encoder = int(e)
 	//get dps
 	d := make([]byte, 4)
 	d[1] = response[10]
 	d[0] = response[11]
 	ds := binary.LittleEndian.Uint32(d)
+	dps = int(ds)
 	if ds&0x8000 == 0x8000 {
 		dps = int(ds - 0x10000)
 	}
-	dps = int(ds)
 	return flags, power, encoder / MOTOR_TICKS_PER_DEGREE, dps / MOTOR_TICKS_PER_DEGREE, nil
 }
 
@@ -489,9 +486,6 @@ func (g *Driver) SetGroveMode(port Grove, mode GroveMode) error {
 
 // SetPWMDuty sets the pwm duty cycle for the given pin/port.
 func (g *Driver) SetPWMDuty(port Grove, duty uint16) (err error) {
-	if duty < 0 {
-		duty = 0
-	}
 	if duty > 100 {
 		duty = 100
 	}

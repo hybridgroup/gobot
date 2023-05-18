@@ -223,7 +223,7 @@ func (p *pwmPinSysFs) pwmPolarityPath() string {
 
 func writePwmFile(fs filesystem, path string, data []byte) (int, error) {
 	file, err := fs.openFile(path, os.O_WRONLY, 0644)
-	defer file.Close()
+	defer file.Close() //nolint:staticcheck // for historical reasons
 	if err != nil {
 		return 0, err
 	}
@@ -233,7 +233,7 @@ func writePwmFile(fs filesystem, path string, data []byte) (int, error) {
 
 func readPwmFile(fs filesystem, path string) ([]byte, error) {
 	file, err := fs.openFile(path, os.O_RDONLY, 0644)
-	defer file.Close()
+	defer file.Close() //nolint:staticcheck // for historical reasons
 	if err != nil {
 		return make([]byte, 0), err
 	}

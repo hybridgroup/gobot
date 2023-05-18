@@ -52,8 +52,9 @@ type Adaptor struct {
 // NewAdaptor creates a UP2 Adaptor
 //
 // Optional parameters:
-//		adaptors.WithGpiodAccess():	use character device gpiod driver instead of sysfs
-//		adaptors.WithSpiGpioAccess(sclk, nss, mosi, miso):	use GPIO's instead of /dev/spidev#.#
+//
+//	adaptors.WithGpiodAccess():	use character device gpiod driver instead of sysfs
+//	adaptors.WithSpiGpioAccess(sclk, nss, mosi, miso):	use GPIO's instead of /dev/spidev#.#
 func NewAdaptor(opts ...func(adaptors.Optioner)) *Adaptor {
 	sys := system.NewAccesser()
 	c := &Adaptor{
@@ -125,7 +126,7 @@ func (c *Adaptor) DigitalWrite(id string, val byte) error {
 	if id == LEDRed || id == LEDBlue || id == LEDGreen || id == LEDYellow {
 		pinPath := fmt.Sprintf(c.ledPath, id)
 		fi, err := c.sys.OpenFile(pinPath, os.O_WRONLY|os.O_APPEND, 0666)
-		defer fi.Close()
+		defer fi.Close() //nolint:staticcheck // for historical reasons
 		if err != nil {
 			return err
 		}

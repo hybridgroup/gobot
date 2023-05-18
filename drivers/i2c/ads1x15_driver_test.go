@@ -96,9 +96,9 @@ func TestADS1x15CommandsAnalogRead(t *testing.T) {
 }
 
 func TestADS1x15_ads1x15BestGainForVoltage(t *testing.T) {
-	g, err := ads1x15BestGainForVoltage(1.5)
+	g, _ := ads1x15BestGainForVoltage(1.5)
 	gobottest.Assert(t, g, 2)
 
-	g, err = ads1x15BestGainForVoltage(20.0)
+	_, err := ads1x15BestGainForVoltage(20.0)
 	gobottest.Assert(t, err, errors.New("The maximum voltage which can be read is 6.144000"))
 }
