@@ -2,10 +2,12 @@
 ALL_EXAMPLES := $(shell grep -l -r --include "*.go" 'build example' ./)
 # prevent examples with gocv (opencv) dependencies
 EXAMPLES_NO_GOCV := $(shell grep -L 'gocv' $(ALL_EXAMPLES))
+# prevent examples with joystick (sdl2) dependencies
+EXAMPLES_NO_JOYSTICK := $(shell grep -L 'joystick' $(ALL_EXAMPLES))
 # prevent examples with joystick (sdl2) and gocv (opencv) dependencies
 EXAMPLES_NO_GOCV_JOYSTICK := $(shell grep -L 'joystick' $$(grep -L 'gocv' $(EXAMPLES_NO_GOCV)))
 # used examples
-EXAMPLES := $(EXAMPLES_NO_GOCV)
+EXAMPLES := $(EXAMPLES_NO_GOCV_JOYSTICK)
 
 .PHONY: test test_race test_cover robeaux version_check fmt_check fmt_fix examples examples_check $(EXAMPLES)
 
@@ -54,8 +56,8 @@ version_check:
 
 # Check for bad code style and other issues
 fmt_check:
-	gofmt -l ./
-	go vet ./...
+	gofmt -l ./	
+	golangci-lint run -v
 
 # Fix bad code style (will only be executed, on version match)
 fmt_fix: version_check

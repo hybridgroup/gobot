@@ -1,0 +1,43 @@
+run:
+  # Timeout for analysis, e.g. 30s, 5m.
+  # gobot is very expensive, on a machine with heavy load it takes some minutes
+  # for first run or after empty the cache by 'golangci-lint cache clean'
+  # Default: 1m
+  timeout: 5m
+
+  # If set we pass it to "go list -mod={option}". From "go help modules":
+  # If invoked with -mod=readonly, the go command is disallowed from the implicit
+  # automatic updating of go.mod described above. Instead, it fails when any changes
+  # to go.mod are needed. This setting is most useful to check that go.mod does
+  # not need updates, such as in a continuous integration and testing system.
+  # If invoked with -mod=vendor, the go command assumes that the vendor
+  # directory holds the correct copies of dependencies and ignores
+  # the dependency descriptions in go.mod.
+  #
+  # Allowed values: readonly|vendor|mod
+  # By default, it isn't set.
+  modules-download-mode: readonly
+
+  # Enables skipping of directories:
+  # - vendor$, third_party$, testdata$, examples$, Godeps$, builtin$
+  # Default: true
+  skip-dirs-use-default: false
+
+  # note: examples will be currently omitted by the build tag
+  skip-dirs:
+    - platforms/opencv
+
+linters:
+  # Enable specific linter
+  # https://golangci-lint.run/usage/linters/#enabled-by-default
+  # note: typecheck can not be disabled, it is used to check code compilation
+  #
+  # TODO: this default linters needs to be disabled to run successfully, we have to fix
+  #       all issues step by step to enable at least the default linters
+  disable:
+    - errcheck
+    - gosimple
+    #- govet
+    - ineffassign
+    - staticcheck
+    - unused
