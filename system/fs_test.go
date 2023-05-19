@@ -9,7 +9,7 @@ import (
 
 func TestFilesystemOpen(t *testing.T) {
 	fs := &nativeFilesystem{}
-	file, err := fs.openFile(os.DevNull, os.O_RDONLY, 666)
+	file, err := fs.openFile(os.DevNull, os.O_RDONLY, 0666)
 	gobottest.Assert(t, err, nil)
 	var _ File = file
 }

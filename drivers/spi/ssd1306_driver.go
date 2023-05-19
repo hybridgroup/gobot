@@ -282,9 +282,6 @@ func (s *SSD1306Driver) SetBufferAndDisplay(buf []byte) error {
 
 // SetContrast sets the display contrast (0-255).
 func (s *SSD1306Driver) SetContrast(contrast byte) error {
-	if contrast < 0 || contrast > 255 {
-		return fmt.Errorf("contrast value must be between 0-255")
-	}
 	if err := s.command(ssd1306SetContrast); err != nil {
 		return err
 	}

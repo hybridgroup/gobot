@@ -81,7 +81,7 @@ func TestIndex(t *testing.T) {
 	a.ServeHTTP(response, request)
 
 	gobottest.Assert(t, http.StatusMovedPermanently, response.Code)
-	gobottest.Assert(t, "/index.html", response.HeaderMap["Location"][0])
+	gobottest.Assert(t, "/index.html", response.Header()["Location"][0])
 }
 
 func TestMcp(t *testing.T) {

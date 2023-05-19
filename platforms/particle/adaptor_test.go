@@ -404,8 +404,8 @@ func TestAdaptorEventStream(t *testing.T) {
 	_, err = a.EventStream("devices", "")
 	gobottest.Assert(t, err.Error(), "error connecting sse")
 
-	eventChan := make(chan eventsource.Event, 0)
-	errorChan := make(chan error, 0)
+	eventChan := make(chan eventsource.Event)
+	errorChan := make(chan error)
 
 	eventSource = func(u string) (chan eventsource.Event, chan error, error) {
 		return eventChan, errorChan, nil

@@ -108,7 +108,7 @@ func TestDigitalPinExportError(t *testing.T) {
 	}
 
 	err := pin.Export()
-	gobottest.Assert(t, err.Error(), " : /sys/class/gpio/gpio10/direction: No such file.")
+	gobottest.Assert(t, err.Error(), " : /sys/class/gpio/gpio10/direction: no such file")
 }
 
 func TestDigitalPinUnexportError(t *testing.T) {

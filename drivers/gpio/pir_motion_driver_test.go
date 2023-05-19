@@ -35,7 +35,7 @@ func TestPIRMotionDriver(t *testing.T) {
 }
 
 func TestPIRMotionDriverStart(t *testing.T) {
-	sem := make(chan bool, 0)
+	sem := make(chan bool)
 	a := newGpioTestAdaptor()
 	d := NewPIRMotionDriver(a, "1")
 

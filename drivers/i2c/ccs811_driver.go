@@ -12,10 +12,10 @@ type CCS811DriveMode uint8
 // Operating modes which dictate how often measurements are being made. If 0x00 is used as an operating mode, measurements will be disabled
 const (
 	CCS811DriveModeIdle  CCS811DriveMode = 0x00
-	CCS811DriveMode1Sec                  = 0x01
-	CCS811DriveMode10Sec                 = 0x02
-	CCS811DriveMode60Sec                 = 0x03
-	CCS811DriveMode250MS                 = 0x04
+	CCS811DriveMode1Sec  CCS811DriveMode = 0x01
+	CCS811DriveMode10Sec CCS811DriveMode = 0x02
+	CCS811DriveMode60Sec CCS811DriveMode = 0x03
+	CCS811DriveMode250MS CCS811DriveMode = 0x04
 )
 
 const (

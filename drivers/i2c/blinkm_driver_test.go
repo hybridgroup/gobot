@@ -124,7 +124,7 @@ func TestBlinkMFirmwareVersion(t *testing.T) {
 		return 0, errors.New("write error")
 	}
 
-	version, err := d.FirmwareVersion()
+	_, err := d.FirmwareVersion()
 	gobottest.Assert(t, err, errors.New("write error"))
 }
 
@@ -152,7 +152,7 @@ func TestBlinkMColor(t *testing.T) {
 		return 0, errors.New("write error")
 	}
 
-	color, err := d.Color()
+	_, err := d.Color()
 	gobottest.Assert(t, err, errors.New("write error"))
 
 }

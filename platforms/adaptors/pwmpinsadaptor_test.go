@@ -145,7 +145,7 @@ func TestPWMPinsFinalize(t *testing.T) {
 	gobottest.Assert(t, a.PwmWrite("33", 2), nil)
 	delete(fs.Files, pwmUnexportPath)
 	err = a.Finalize()
-	gobottest.Assert(t, strings.Contains(err.Error(), pwmUnexportPath+": No such file"), true)
+	gobottest.Assert(t, strings.Contains(err.Error(), pwmUnexportPath+": no such file"), true)
 	// arrange write error
 	gobottest.Assert(t, a.Connect(), nil)
 	gobottest.Assert(t, a.PwmWrite("33", 2), nil)
@@ -283,14 +283,14 @@ func Test_PWMPin(t *testing.T) {
 			mockPaths: []string{},
 			translate: translator,
 			pin:       "33",
-			wantErr:   "Export() failed for id 44 with  : /sys/devices/platform/ff680020.pwm/pwm/pwmchip3/export: No such file.",
+			wantErr:   "Export() failed for id 44 with  : /sys/devices/platform/ff680020.pwm/pwm/pwmchip3/export: no such file",
 		},
 		"init_setenabled_error": {
 			mockPaths: []string{pwmExportPath, pwmPeriodPath},
 			period:    "1000",
 			translate: translator,
 			pin:       "33",
-			wantErr:   "SetEnabled(false) failed for id 44 with  : /sys/devices/platform/ff680020.pwm/pwm/pwmchip3/pwm44/enable: No such file.",
+			wantErr:   "SetEnabled(false) failed for id 44 with  : /sys/devices/platform/ff680020.pwm/pwm/pwmchip3/pwm44/enable: no such file",
 		},
 		"init_setperiod_dutycycle_no_error": {
 			mockPaths: []string{pwmExportPath, pwmEnablePath, pwmPeriodPath, pwmPolarityPath},
@@ -301,13 +301,13 @@ func Test_PWMPin(t *testing.T) {
 			mockPaths: []string{pwmExportPath, pwmEnablePath},
 			translate: translator,
 			pin:       "33",
-			wantErr:   "SetPeriod(10000000) failed for id 44 with  : /sys/devices/platform/ff680020.pwm/pwm/pwmchip3/pwm44/period: No such file.",
+			wantErr:   "SetPeriod(10000000) failed for id 44 with  : /sys/devices/platform/ff680020.pwm/pwm/pwmchip3/pwm44/period: no such file",
 		},
 		"init_setpolarity_error": {
 			mockPaths: []string{pwmExportPath, pwmEnablePath, pwmPeriodPath, pwmDutyCyclePath},
 			translate: translator,
 			pin:       "33",
-			wantErr:   "SetPolarity(normal) failed for id 44 with  : /sys/devices/platform/ff680020.pwm/pwm/pwmchip3/pwm44/polarity: No such file.",
+			wantErr:   "SetPolarity(normal) failed for id 44 with  : /sys/devices/platform/ff680020.pwm/pwm/pwmchip3/pwm44/polarity: no such file",
 		},
 		"translate_error": {
 			translate: func(string) (string, int, error) { return "", -1, fmt.Errorf(translateErr) },

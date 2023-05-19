@@ -29,7 +29,7 @@ func NewDriver(a *Adaptor, filename string) *Driver {
 		connection: a,
 		interval:   500 * time.Millisecond,
 		filename:   filename,
-		halt:       make(chan bool, 0),
+		halt:       make(chan bool),
 		Eventer:    gobot.NewEventer(),
 		Commander:  gobot.NewCommander(),
 	}

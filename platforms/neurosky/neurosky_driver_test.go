@@ -36,7 +36,7 @@ func TestNeuroskyDriverName(t *testing.T) {
 }
 
 func TestNeuroskyDriverStart(t *testing.T) {
-	sem := make(chan bool, 0)
+	sem := make(chan bool)
 
 	rwc := &NullReadWriteCloser{}
 	a := NewAdaptor("/dev/null")

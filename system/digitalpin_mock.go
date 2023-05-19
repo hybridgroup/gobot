@@ -20,7 +20,6 @@ func (h *mockDigitalPinAccess) createPin(chip string, pin int,
 
 func (h *mockDigitalPinAccess) setFs(fs filesystem) {
 	// do nothing
-	return
 }
 
 func (d *digitalPinMock) ApplyOptions(options ...func(gobot.DigitalPinOptioner) bool) error {

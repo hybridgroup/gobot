@@ -65,7 +65,7 @@ func (s *ServoDriver) Halt() (err error) { return }
 
 // Move sets the servo to the specified angle. Acceptable angles are 0-180
 func (s *ServoDriver) Move(angle uint8) (err error) {
-	if !(angle >= 0 && angle <= 180) {
+	if angle > 180 {
 		return ErrServoOutOfRange
 	}
 	s.CurrentAngle = angle

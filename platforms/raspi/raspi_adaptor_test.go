@@ -230,7 +230,7 @@ func TestPWMPinsReConnect(t *testing.T) {
 	// assert
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, len(a.pwmPins), 0)
-	_, err = a.PWMPin("35")
+	_, _ = a.PWMPin("35")
 	_, err = a.PWMPin("36")
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, len(a.pwmPins), 2)

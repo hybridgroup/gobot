@@ -50,4 +50,4 @@ func (a *spiTestAdaptor) SpiDefaultMaxSpeed() int64 { return 0 }
 func (a *spiTestAdaptor) Connect() error  { return nil }
 func (a *spiTestAdaptor) Finalize() error { return nil }
 func (a *spiTestAdaptor) Name() string    { return "board name" }
-func (a *spiTestAdaptor) SetName(string)  { return }
+func (a *spiTestAdaptor) SetName(string)  {}

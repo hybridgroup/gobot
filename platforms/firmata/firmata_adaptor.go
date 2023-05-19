@@ -70,11 +70,11 @@ func NewAdaptor(args ...interface{}) *Adaptor {
 	}
 
 	for _, arg := range args {
-		switch arg.(type) {
+		switch a := arg.(type) {
 		case string:
-			f.port = arg.(string)
+			f.port = a
 		case io.ReadWriteCloser:
-			f.conn = arg.(io.ReadWriteCloser)
+			f.conn = a
 		}
 	}
 

@@ -20,7 +20,7 @@ func TestMockFilesystemOpen(t *testing.T) {
 	gobottest.Assert(t, err, nil)
 
 	_, err = fs.openFile("bar", 0, 0666)
-	gobottest.Assert(t, err.Error(), " : bar: No such file.")
+	gobottest.Assert(t, err.Error(), " : bar: no such file")
 
 	fs.Add("bar")
 	f4, _ := fs.openFile("bar", 0, 0666)
@@ -39,7 +39,7 @@ func TestMockFilesystemStat(t *testing.T) {
 	gobottest.Assert(t, dirStat.IsDir(), true)
 
 	_, err = fs.stat("plonk")
-	gobottest.Assert(t, err.Error(), " : plonk: No such file.")
+	gobottest.Assert(t, err.Error(), " : plonk: no such file")
 }
 
 func TestMockFilesystemFind(t *testing.T) {
