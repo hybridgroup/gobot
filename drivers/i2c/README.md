@@ -1,15 +1,19 @@
 # I2C
 
-This package provides drivers for [i2c](https://en.wikipedia.org/wiki/I%C2%B2C)devices. It must be used along with an adaptor such as [firmata](https://gobot.io/x/gobot/v2/platforms/firmata) that supports the needed interfaces for i2c devices.
+This package provides drivers for [i2c](https://en.wikipedia.org/wiki/I%C2%B2C)devices. It must be used along with an
+adaptor such as [Tinker Board](https://gobot.io/documentation/platforms/tinkerboard/) that supports the needed
+interfaces for i2c devices.
 
 ## Getting Started
 
 ## Installing
-```
+
+```sh
 go get -d -u gobot.io/x/gobot/v2/...
 ```
 
 ## Hardware Support
+
 Gobot has a extensible system for connecting to hardware devices. The following i2c devices are currently supported:
 
 - Adafruit 2x16 RGB-LCD with 5 keys
@@ -54,7 +58,8 @@ More drivers are coming soon...
 
 ## Using A Different Bus or Address
 
-You can set a different I2C address or I2C bus than the default when initializing your I2C drivers by using optional parameters. Here is an example:
+You can set a different I2C address or I2C bus than the default when initializing your I2C drivers by using optional
+parameters. Here is an example:
 
 ```go
 blinkm := i2c.NewBlinkMDriver(e, i2c.WithBus(0), i2c.WithAddress(0x09))

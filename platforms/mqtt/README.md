@@ -1,16 +1,18 @@
 # MQTT
 
-MQTT is an Internet of Things connectivity protocol featuring a lightweight publish/subscribe messaging transport. It is useful for its small code footprint and minimal network bandwidth usage.
+MQTT is an Internet of Things connectivity protocol featuring a lightweight publish/subscribe messaging transport. It is
+useful for its small code footprint and minimal network bandwidth usage.
 
-This repository contains the Gobot adaptor/driver to connect to MQTT servers. It uses the Paho MQTT Golang client package (https://eclipse.org/paho/) created and maintained by the Eclipse Foundation (https://github.com/eclipse) thank you!
+This repository contains the Gobot adaptor/driver to connect to MQTT servers. It uses the Paho MQTT Golang client package
+(<https://eclipse.org/paho/>) created and maintained by the Eclipse Foundation (<https://github.com/eclipse>) thank you!
 
-For more info about the MQTT machine to machine messaging standard, go to http://mqtt.org/
+For more info about the MQTT machine to machine messaging standard, go to <http://mqtt.org/>.
 
 ## How to Install
 
 Install running:
 
-```
+```sh
 go get -d -u gobot.io/x/gobot/v2/...
 ```
 
@@ -60,10 +62,6 @@ func main() {
 
 * Publish messages
 * Respond to incoming message events
-
-## Contributing
-
-For our contribution guidelines, please go to https://gobot.io/x/gobot/v2/blob/master/CONTRIBUTING.md
 
 ## License
 
