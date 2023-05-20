@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/v2"
 )
 
 const (
@@ -35,12 +35,13 @@ type WiichuckDriver struct {
 // NewWiichuckDriver creates a WiichuckDriver with specified i2c interface.
 //
 // Params:
-//		c Connector - the Adaptor to use with this Driver
+//
+//	c Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//		i2c.WithBus(int):	bus to use with this driver
-//		i2c.WithAddress(int):	address to use with this driver
 //
+//	i2c.WithBus(int):	bus to use with this driver
+//	i2c.WithAddress(int):	address to use with this driver
 func NewWiichuckDriver(c Connector, options ...func(Config)) *WiichuckDriver {
 	w := &WiichuckDriver{
 		Driver:    NewDriver(c, "Wiichuck", wiichuckDefaultAddress),

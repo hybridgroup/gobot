@@ -10,7 +10,7 @@ import (
 	"strconv"
 
 	"github.com/donovanhide/eventsource"
-	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/v2"
 )
 
 // Adaptor is the Gobot Adaptor for Particle

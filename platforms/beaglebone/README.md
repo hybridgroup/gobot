@@ -18,7 +18,7 @@ We recommend updating to the latest Debian OS when using the BeagleBone. The cur
 You would normally install Go and Gobot on your workstation. Once installed, cross compile your program on your workstation, transfer the final executable to your BeagleBone, and run the program on the BeagleBone itself as documented here.
 
 ```
-go get -d -u gobot.io/x/gobot/...
+go get -d -u gobot.io/x/gobot/v2/...
 ```
 
 ## How to Use
@@ -33,9 +33,9 @@ package main
 import (
 	"time"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/gpio"
-	"gobot.io/x/gobot/platforms/beaglebone"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/drivers/gpio"
+	"gobot.io/x/gobot/v2/platforms/beaglebone"
 )
 
 func main() {
@@ -66,9 +66,9 @@ package main
 import (
 	"time"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/gpio"
-	"gobot.io/x/gobot/platforms/beaglebone"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/drivers/gpio"
+	"gobot.io/x/gobot/v2/platforms/beaglebone"
 )
 
 func main() {

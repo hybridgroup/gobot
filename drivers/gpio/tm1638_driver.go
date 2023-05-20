@@ -5,7 +5,7 @@ import (
 
 	"strings"
 
-	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/v2"
 )
 
 // Colors of the display

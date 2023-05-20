@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"testing"
 
-	"gobot.io/x/gobot/drivers/i2c"
-	"gobot.io/x/gobot/gobottest"
+	"gobot.io/x/gobot/v2/drivers/i2c"
+	"gobot.io/x/gobot/v2/gobottest"
 )
 
 const availableI2cAddress = 0x40

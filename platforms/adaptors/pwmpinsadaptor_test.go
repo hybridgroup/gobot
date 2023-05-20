@@ -8,10 +8,10 @@ import (
 	"sync"
 	"testing"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/gpio"
-	"gobot.io/x/gobot/gobottest"
-	"gobot.io/x/gobot/system"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/drivers/gpio"
+	"gobot.io/x/gobot/v2/gobottest"
+	"gobot.io/x/gobot/v2/system"
 )
 
 const (

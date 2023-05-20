@@ -10,4 +10,4 @@ It also includes drivers for several well-known BLE Services:
 For more information refer to the README:
 https://github.com/hybridgroup/gobot/blob/master/platforms/ble/README.md
 */
-package ble // import "gobot.io/x/gobot/platforms/ble"
+package ble // import "gobot.io/x/gobot/v2/platforms/ble"

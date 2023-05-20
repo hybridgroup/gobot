@@ -1,6 +1,6 @@
 package gpio
 
-import "gobot.io/x/gobot"
+import "gobot.io/x/gobot/v2"
 
 // ServoDriver Represents a Servo
 type ServoDriver struct {
@@ -14,7 +14,8 @@ type ServoDriver struct {
 // NewServoDriver returns a new ServoDriver given a ServoWriter and pin.
 //
 // Adds the following API Commands:
-// 	"Move" - See ServoDriver.Move
+//
+//	"Move" - See ServoDriver.Move
 //		"Min" - See ServoDriver.Min
 //		"Center" - See ServoDriver.Center
 //		"Max" - See ServoDriver.Max

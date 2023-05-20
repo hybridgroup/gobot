@@ -1,6 +1,6 @@
 package gpio
 
-import "gobot.io/x/gobot"
+import "gobot.io/x/gobot/v2"
 
 // LedDriver represents a digital Led
 type LedDriver struct {
@@ -14,6 +14,7 @@ type LedDriver struct {
 // NewLedDriver return a new LedDriver given a DigitalWriter and pin.
 //
 // Adds the following API Commands:
+//
 //	"Brightness" - See LedDriver.Brightness
 //	"Toggle" - See LedDriver.Toggle
 //	"On" - See LedDriver.On

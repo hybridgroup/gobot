@@ -4,7 +4,7 @@ import (
 	"math"
 	"time"
 
-	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/v2"
 )
 
 const kelvinOffset = 273.15
@@ -31,11 +31,13 @@ type TemperatureSensorDriver struct {
 // Linear scaling and NTC scaling is supported.
 //
 // Optionally accepts:
-// 	time.Duration: Interval at which the sensor is polled for new information (given 0 switch the polling off)
+//
+//	time.Duration: Interval at which the sensor is polled for new information (given 0 switch the polling off)
 //
 // Adds the following API Commands:
-// 	"Read"      - See AnalogDriverSensor.Read
-// 	"ReadValue" - See AnalogDriverSensor.ReadValue
+//
+//	"Read"      - See AnalogDriverSensor.Read
+//	"ReadValue" - See AnalogDriverSensor.ReadValue
 func NewTemperatureSensorDriver(a AnalogReader, pin string, v ...time.Duration) *TemperatureSensorDriver {
 	ad := NewAnalogSensorDriver(a, pin, v...)
 

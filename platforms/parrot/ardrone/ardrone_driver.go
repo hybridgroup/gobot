@@ -1,7 +1,7 @@
 package ardrone
 
 import (
-	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/v2"
 )
 
 const (
@@ -19,7 +19,8 @@ type Driver struct {
 // NewDriver creates an Driver for the ARDrone.
 //
 // It add the following events:
-//     'flying' - Sent when the device has taken off.
+//
+//	'flying' - Sent when the device has taken off.
 func NewDriver(connection *Adaptor) *Driver {
 	d := &Driver{
 		name:       gobot.DefaultName("ARDrone"),

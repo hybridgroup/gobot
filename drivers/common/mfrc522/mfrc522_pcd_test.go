@@ -3,7 +3,7 @@ package mfrc522
 import (
 	"testing"
 
-	"gobot.io/x/gobot/gobottest"
+	"gobot.io/x/gobot/v2/gobottest"
 )
 
 type busConnMock struct {

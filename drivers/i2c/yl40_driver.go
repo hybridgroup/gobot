@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/aio"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/drivers/aio"
 )
 
 // All address pins are connected to ground.
@@ -64,7 +64,6 @@ var yl40Pins = map[YL40Pin]string{
 //
 // This driver was tested with Tinkerboard and this board with temperature & brightness sensor:
 // https://www.makershop.de/download/YL_40_yl40.pdf
-//
 type YL40Driver struct {
 	*PCF8591Driver
 	conf yl40Config
@@ -78,14 +77,15 @@ type YL40Driver struct {
 
 // NewYL40Driver creates a new driver with specified i2c interface
 // Params:
-//    conn Connector - the Adaptor to use with this Driver
+//
+//	conn Connector - the Adaptor to use with this Driver
 //
 // Optional parameters:
-//  refer to PCF8591Driver for i2c specific options
-// 	refer to TemperatureSensorDriver for temperature sensor specific options
-// 	refer to AnalogSensorDriver for analog input specific options
-//  refer to AnalogActuatorDriver for analog output specific options
 //
+//	 refer to PCF8591Driver for i2c specific options
+//		refer to TemperatureSensorDriver for temperature sensor specific options
+//		refer to AnalogSensorDriver for analog input specific options
+//	 refer to AnalogActuatorDriver for analog output specific options
 func NewYL40Driver(a Connector, options ...func(Config)) *YL40Driver {
 	options = append(options, WithAddress(yl40DefaultAddress))
 	pcf := NewPCF8591Driver(a, options...)

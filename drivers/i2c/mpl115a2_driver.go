@@ -1,7 +1,7 @@
 package i2c
 
 import (
-	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/v2"
 
 	"bytes"
 	"encoding/binary"
@@ -47,12 +47,13 @@ type MPL115A2Driver struct {
 // I2C Pressure/Temperature sensor.
 //
 // Params:
-//		c Connector - the Adaptor to use with this Driver
+//
+//	c Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//		i2c.WithBus(int):	bus to use with this driver
-//		i2c.WithAddress(int):	address to use with this driver
 //
+//	i2c.WithBus(int):	bus to use with this driver
+//	i2c.WithAddress(int):	address to use with this driver
 func NewMPL115A2Driver(c Connector, options ...func(Config)) *MPL115A2Driver {
 	d := &MPL115A2Driver{
 		Driver:  NewDriver(c, "MPL115A2", mpl115a2DefaultAddress),

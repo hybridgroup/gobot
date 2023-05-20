@@ -3,7 +3,7 @@ package i2c
 import (
 	"testing"
 
-	"gobot.io/x/gobot/gobottest"
+	"gobot.io/x/gobot/v2/gobottest"
 )
 
 func TestNewConfig(t *testing.T) {

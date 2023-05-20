@@ -3,7 +3,7 @@ package i2c
 import (
 	"fmt"
 
-	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/v2"
 )
 
 const (

@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/v2"
 )
 
 const (
@@ -44,16 +44,17 @@ type SpheroDriver struct {
 // NewSpheroDriver returns a new SpheroDriver given a Sphero Adaptor.
 //
 // Adds the following API Commands:
-// 	"ConfigureLocator" - See SpheroDriver.ConfigureLocator
-// 	"Roll" - See SpheroDriver.Roll
-// 	"Stop" - See SpheroDriver.Stop
-// 	"GetRGB" - See SpheroDriver.GetRGB
-//	"ReadLocator" - See SpheroDriver.ReadLocator
-// 	"SetBackLED" - See SpheroDriver.SetBackLED
-// 	"SetHeading" - See SpheroDriver.SetHeading
-// 	"SetStabilization" - See SpheroDriver.SetStabilization
-//  "SetDataStreaming" - See SpheroDriver.SetDataStreaming
-//  "SetRotationRate" - See SpheroDriver.SetRotationRate
+//
+//		"ConfigureLocator" - See SpheroDriver.ConfigureLocator
+//		"Roll" - See SpheroDriver.Roll
+//		"Stop" - See SpheroDriver.Stop
+//		"GetRGB" - See SpheroDriver.GetRGB
+//		"ReadLocator" - See SpheroDriver.ReadLocator
+//		"SetBackLED" - See SpheroDriver.SetBackLED
+//		"SetHeading" - See SpheroDriver.SetHeading
+//		"SetStabilization" - See SpheroDriver.SetStabilization
+//	 "SetDataStreaming" - See SpheroDriver.SetDataStreaming
+//	 "SetRotationRate" - See SpheroDriver.SetRotationRate
 func NewSpheroDriver(a *Adaptor) *SpheroDriver {
 	s := &SpheroDriver{
 		name:            gobot.DefaultName("Sphero"),
@@ -161,9 +162,10 @@ func (s *SpheroDriver) adaptor() *Adaptor {
 // Returns true on successful start.
 //
 // Emits the Events:
-// 	Collision  sphero.CollisionPacket - On Collision Detected
-// 	SensorData sphero.DataStreamingPacket - On Data Streaming event
-// 	Error      error- On error while processing asynchronous response
+//
+//	Collision  sphero.CollisionPacket - On Collision Detected
+//	SensorData sphero.DataStreamingPacket - On Data Streaming event
+//	Error      error- On error while processing asynchronous response
 func (s *SpheroDriver) Start() (err error) {
 	go func() {
 		for {

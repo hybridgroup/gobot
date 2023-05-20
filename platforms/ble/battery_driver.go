@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"log"
 
-	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/v2"
 )
 
 // BatteryDriver represents the Battery Service for a BLE Peripheral

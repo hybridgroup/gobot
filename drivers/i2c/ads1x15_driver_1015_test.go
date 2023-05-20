@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"gobot.io/x/gobot/gobottest"
+	"gobot.io/x/gobot/v2/gobottest"
 )
 
 func initTestADS1015DriverWithStubbedAdaptor() (*ADS1x15Driver, *i2cTestAdaptor) {

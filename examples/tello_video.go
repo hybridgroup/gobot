@@ -1,4 +1,6 @@
+//go:build example
 // +build example
+
 //
 // Do not build by default.
 
@@ -18,8 +20,8 @@ import (
 	"os/exec"
 	"time"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/platforms/dji/tello"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/platforms/dji/tello"
 )
 
 func main() {

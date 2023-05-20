@@ -1,4 +1,6 @@
+//go:build example
 // +build example
+
 //
 // Do not build by default.
 
@@ -6,14 +8,15 @@ package main
 
 import (
 	"fmt"
+	"image"
 	"math"
 	"path"
 	"runtime"
 	"time"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/platforms/opencv"
-	"gobot.io/x/gobot/platforms/parrot/ardrone"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/platforms/opencv"
+	"gobot.io/x/gobot/v2/platforms/parrot/ardrone"
 	"gocv.io/x/gocv"
 )
 

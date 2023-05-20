@@ -13,7 +13,7 @@ We recommend updating to the latest jetson-nano OS when using the Jetson Nano, h
 You would normally install Go and Gobot on your workstation. Once installed, cross compile your program on your workstation, transfer the final executable to your Jetson Nano, and run the program on the Jetson Nano as documented here.
 
 ```
-go get -d -u gobot.io/x/gobot/...
+go get -d -u gobot.io/x/gobot/v2/...
 ```
 
 ## How to Use
@@ -26,9 +26,9 @@ package main
 import (
 	"time"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/gpio"
-	"gobot.io/x/gobot/platforms/jetson"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/drivers/gpio"
+	"gobot.io/x/gobot/v2/platforms/jetson"
 )
 
 func main() {

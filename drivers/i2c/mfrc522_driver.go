@@ -1,7 +1,7 @@
 package i2c
 
 import (
-	"gobot.io/x/gobot/drivers/common/mfrc522"
+	"gobot.io/x/gobot/v2/drivers/common/mfrc522"
 )
 
 const mfrc522DefaultAddress = 0x00
@@ -16,11 +16,13 @@ type MFRC522Driver struct {
 // NewMFRC522Driver creates a new Gobot Driver for MFRC522 RFID with i2c connection
 //
 // Params:
-//		c Connector - the Adaptor to use with this Driver
+//
+//	c Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//		i2c.WithBus(int):	bus to use with this driver
-//		i2c.WithAddress(int):	address to use with this driver
+//
+//	i2c.WithBus(int):	bus to use with this driver
+//	i2c.WithAddress(int):	address to use with this driver
 func NewMFRC522Driver(c Connector, options ...func(Config)) *MFRC522Driver {
 	d := &MFRC522Driver{
 		Driver: NewDriver(c, "MFRC522", mfrc522DefaultAddress),

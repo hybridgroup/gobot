@@ -4,9 +4,9 @@ import (
 	"errors"
 	"testing"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/aio"
-	"gobot.io/x/gobot/gobottest"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/drivers/aio"
+	"gobot.io/x/gobot/v2/gobottest"
 )
 
 // this ensures that the implementation is based on i2c.Driver, which implements the gobot.Driver

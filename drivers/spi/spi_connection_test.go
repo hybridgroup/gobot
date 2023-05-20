@@ -3,9 +3,9 @@ package spi
 import (
 	"testing"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/gobottest"
-	"gobot.io/x/gobot/system"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/gobottest"
+	"gobot.io/x/gobot/v2/system"
 )
 
 var _ gobot.SpiOperations = (*spiConnection)(nil)

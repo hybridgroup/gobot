@@ -1,4 +1,6 @@
+//go:build example
 // +build example
+
 //
 // Do not build by default.
 
@@ -9,9 +11,9 @@ import (
 	"strconv"
 	"time"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/i2c"
-	"gobot.io/x/gobot/platforms/digispark"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/drivers/i2c"
+	"gobot.io/x/gobot/v2/platforms/digispark"
 )
 
 // This is an example for using the generic I2C driver to write and read values

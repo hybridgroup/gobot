@@ -3,9 +3,9 @@ Package gpio provides Gobot drivers for General Purpose Input/Output devices.
 
 Installing:
 
-	go get -d -u gobot.io/x/gobot
+	go get -d -u gobot.io/x/gobot/v2
 
 For further information refer to gpio README:
 https://github.com/hybridgroup/gobot/blob/master/platforms/gpio/README.md
 */
-package gpio // import "gobot.io/x/gobot/drivers/gpio"
+package gpio // import "gobot.io/x/gobot/v2/drivers/gpio"

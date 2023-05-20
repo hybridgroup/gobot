@@ -1,4 +1,6 @@
+//go:build example
 // +build example
+
 //
 // Do not build by default.
 
@@ -7,8 +9,8 @@ package main
 import (
 	"time"
 
-	"gobot.io/x/gobot/drivers/gpio"
-	"gobot.io/x/gobot/platforms/intel-iot/edison"
+	"gobot.io/x/gobot/v2/drivers/gpio"
+	"gobot.io/x/gobot/v2/platforms/intel-iot/edison"
 )
 
 // Example of a simple led toggle without the initialization of

@@ -1,4 +1,6 @@
+//go:build example
 // +build example
+
 //
 // Do not build by default.
 
@@ -9,10 +11,10 @@ import (
 	"strconv"
 	"time"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/platforms/ble"
-	"gobot.io/x/gobot/platforms/mqtt"
-	"gobot.io/x/gobot/platforms/sphero/ollie"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/platforms/ble"
+	"gobot.io/x/gobot/v2/platforms/mqtt"
+	"gobot.io/x/gobot/v2/platforms/sphero/ollie"
 )
 
 const (

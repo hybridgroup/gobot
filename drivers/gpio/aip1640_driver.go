@@ -3,7 +3,7 @@ package gpio
 import (
 	"time"
 
-	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/v2"
 )
 
 // Commands of the driver

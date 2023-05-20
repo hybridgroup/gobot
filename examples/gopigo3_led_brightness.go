@@ -1,4 +1,6 @@
+//go:build example
 // +build example
+
 //
 // Do not build by default.
 
@@ -7,10 +9,10 @@ package main
 import (
 	"time"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/gpio"
-	"gobot.io/x/gobot/platforms/dexter/gopigo3"
-	"gobot.io/x/gobot/platforms/raspi"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/drivers/gpio"
+	"gobot.io/x/gobot/v2/platforms/dexter/gopigo3"
+	"gobot.io/x/gobot/v2/platforms/raspi"
 )
 
 func main() {

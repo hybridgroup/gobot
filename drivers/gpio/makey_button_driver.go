@@ -3,7 +3,7 @@ package gpio
 import (
 	"time"
 
-	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/v2"
 )
 
 // MakeyButtonDriver Represents a Makey Button
@@ -21,7 +21,8 @@ type MakeyButtonDriver struct {
 // 10 Milliseconds given a DigitalReader and pin.
 //
 // Optionally accepts:
-//  time.Duration: Interval at which the ButtonDriver is polled for new information
+//
+//	time.Duration: Interval at which the ButtonDriver is polled for new information
 func NewMakeyButtonDriver(a DigitalReader, pin string, v ...time.Duration) *MakeyButtonDriver {
 	m := &MakeyButtonDriver{
 		name:       gobot.DefaultName("MakeyButton"),
@@ -59,7 +60,8 @@ func (b *MakeyButtonDriver) Connection() gobot.Connection { return b.connection.
 // Start starts the MakeyButtonDriver and polls the state of the button at the given interval.
 //
 // Emits the Events:
-// 	Push int - On button push
+//
+//	Push int - On button push
 //	Release int - On button release
 //	Error error - On button error
 func (b *MakeyButtonDriver) Start() (err error) {

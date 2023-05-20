@@ -32,7 +32,7 @@ https://gocv.io/getting-started/windows/
 Now you can install the Gobot package itself with
 
 ```
-go get -d -u gobot.io/x/gobot/...
+go get -d -u gobot.io/x/gobot/v2/...
 ```
 
 ## How to Use
@@ -43,8 +43,8 @@ Here is an example using the camera:
 package main
 
 import (
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/platforms/opencv"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/platforms/opencv"
 	"gocv.io/x/gocv"
 )
 

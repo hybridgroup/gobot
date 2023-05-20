@@ -1,7 +1,7 @@
 package pebble
 
 import (
-	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/v2"
 )
 
 type Driver struct {
@@ -14,13 +14,16 @@ type Driver struct {
 
 // NewDriver creates a new pebble driver
 // Adds following events:
-//		button - Sent when a pebble button is pressed
-//		accel - Pebble watch acceleromenter data
-//		tab - When a pebble watch tap event is detected
+//
+//	button - Sent when a pebble button is pressed
+//	accel - Pebble watch acceleromenter data
+//	tab - When a pebble watch tap event is detected
+//
 // And the following API commands:
-//		"publish_event"
-//		"send_notification"
-//		"pending_message"
+//
+//	"publish_event"
+//	"send_notification"
+//	"pending_message"
 func NewDriver(adaptor *Adaptor) *Driver {
 	p := &Driver{
 		name:       "Pebble",

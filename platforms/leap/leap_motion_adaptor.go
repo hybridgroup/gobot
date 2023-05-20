@@ -3,7 +3,7 @@ package leap
 import (
 	"io"
 
-	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/v2"
 
 	"golang.org/x/net/websocket"
 )

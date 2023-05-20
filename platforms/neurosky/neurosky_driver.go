@@ -3,7 +3,7 @@ package neurosky
 import (
 	"bytes"
 
-	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/v2"
 )
 
 const (
@@ -78,13 +78,13 @@ type EEGData struct {
 // NewDriver creates a Neurosky Driver
 // and adds the following events:
 //
-//   extended - user's current extended level
-//   signal - shows signal strength
-//   attention - user's current attention level
-//   meditation - user's current meditation level
-//   blink - user's current blink level
-//   wave - shows wave data
-//   eeg - showing eeg data
+//	extended - user's current extended level
+//	signal - shows signal strength
+//	attention - user's current attention level
+//	meditation - user's current meditation level
+//	blink - user's current blink level
+//	wave - shows wave data
+//	eeg - showing eeg data
 func NewDriver(a *Adaptor) *Driver {
 	n := &Driver{
 		name:       "Neurosky",

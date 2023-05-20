@@ -5,9 +5,9 @@ import (
 	"strings"
 	"testing"
 
-	"gobot.io/x/gobot/drivers/spi"
-	"gobot.io/x/gobot/gobottest"
-	"gobot.io/x/gobot/system"
+	"gobot.io/x/gobot/v2/drivers/spi"
+	"gobot.io/x/gobot/v2/gobottest"
+	"gobot.io/x/gobot/v2/system"
 )
 
 // make sure that this SpiBusAdaptor fulfills all the required interfaces

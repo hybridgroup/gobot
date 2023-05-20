@@ -5,11 +5,11 @@ import (
 	"sync"
 
 	multierror "github.com/hashicorp/go-multierror"
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/system"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/system"
 )
 
-//note for period in nano seconds:
+// note for period in nano seconds:
 // 100000000ns = 100ms = 10Hz, 10000000ns = 10ms = 100Hz,  1000000ns = 1ms = 1kHz,
 // 100000ns = 100us = 10kHz, 10000ns = 10us = 100kHz, 1000ns = 1us = 1MHz,
 // 100ns = 10MHz, 10ns = 100MHz, 1ns = 1GHz

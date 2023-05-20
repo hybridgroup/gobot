@@ -1,4 +1,6 @@
+//go:build example
 // +build example
+
 //
 // Do not build by default.
 
@@ -8,9 +10,9 @@ import (
 	"log"
 	"time"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/i2c"
-	"gobot.io/x/gobot/platforms/raspi"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/drivers/i2c"
+	"gobot.io/x/gobot/v2/platforms/raspi"
 )
 
 var (

@@ -7,9 +7,9 @@ import (
 	"sync"
 	"time"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/platforms/ble"
-	"gobot.io/x/gobot/platforms/sphero"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/platforms/ble"
+	"gobot.io/x/gobot/v2/platforms/sphero"
 )
 
 // Driver is the Gobot driver for the Sphero Ollie robot
@@ -343,7 +343,7 @@ func (b *Driver) ConfigureCollisionDetection(cc sphero.CollisionConfig) {
 	b.packetChannel <- b.craftPacket([]uint8{cc.Method, cc.Xt, cc.Yt, cc.Xs, cc.Ys, cc.Dead}, 0x02, 0x12)
 }
 
-//SetDataStreamingConfig passes the config to the sphero to stream sensor data
+// SetDataStreamingConfig passes the config to the sphero to stream sensor data
 func (b *Driver) SetDataStreamingConfig(d sphero.DataStreamingConfig) {
 	buf := new(bytes.Buffer)
 	binary.Write(buf, binary.BigEndian, d)

@@ -3,7 +3,7 @@ package gpio
 import (
 	"strconv"
 
-	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/v2"
 )
 
 // DirectPinDriver represents a GPIO pin
@@ -17,10 +17,11 @@ type DirectPinDriver struct {
 // NewDirectPinDriver return a new DirectPinDriver given a Connection and pin.
 //
 // Adds the following API Commands:
-// 	"DigitalRead" - See DirectPinDriver.DigitalRead
-// 	"DigitalWrite" - See DirectPinDriver.DigitalWrite
-// 	"PwmWrite" - See DirectPinDriver.PwmWrite
-// 	"ServoWrite" - See DirectPinDriver.ServoWrite
+//
+//	"DigitalRead" - See DirectPinDriver.DigitalRead
+//	"DigitalWrite" - See DirectPinDriver.DigitalWrite
+//	"PwmWrite" - See DirectPinDriver.PwmWrite
+//	"ServoWrite" - See DirectPinDriver.ServoWrite
 func NewDirectPinDriver(a gobot.Connection, pin string) *DirectPinDriver {
 	d := &DirectPinDriver{
 		name:       gobot.DefaultName("DirectPin"),
