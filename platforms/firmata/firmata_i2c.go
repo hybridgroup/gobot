@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sync"
 
-	"gobot.io/x/gobot/platforms/firmata/client"
+	"gobot.io/x/gobot/v2/platforms/firmata/client"
 )
 
 // firmataI2cConnection implements the interface gobot.I2cOperations
@@ -56,8 +56,9 @@ func (c *firmataI2cConnection) ReadByte() (byte, error) {
 
 // ReadByteData reads one byte of the given register address from the i2c device.
 // TODO: implement the specification, because some devices will not work with this
-//       current:  "S Addr Wr [A] Comm [A] P S Addr Rd [A] [Data] NA P"
-//       required: "S Addr Wr [A] Comm [A] S Addr Rd [A] [Data] NA P"
+//
+//	current:  "S Addr Wr [A] Comm [A] P S Addr Rd [A] [Data] NA P"
+//	required: "S Addr Wr [A] Comm [A] S Addr Rd [A] [Data] NA P"
 func (c *firmataI2cConnection) ReadByteData(reg uint8) (uint8, error) {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
@@ -75,8 +76,9 @@ func (c *firmataI2cConnection) ReadByteData(reg uint8) (uint8, error) {
 
 // ReadWordData reads two bytes of the given register address from the i2c device.
 // TODO: implement the specification, because some devices will not work with this
-//       current:  "S Addr Wr [A] Comm [A] P S Addr Rd [A] [DataLow] A [DataHigh] NA P"
-//       required: "S Addr Wr [A] Comm [A] S Addr Rd [A] [DataLow] A [DataHigh] NA P"
+//
+//	current:  "S Addr Wr [A] Comm [A] P S Addr Rd [A] [DataLow] A [DataHigh] NA P"
+//	required: "S Addr Wr [A] Comm [A] S Addr Rd [A] [DataLow] A [DataHigh] NA P"
 func (c *firmataI2cConnection) ReadWordData(reg uint8) (uint16, error) {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
@@ -95,8 +97,9 @@ func (c *firmataI2cConnection) ReadWordData(reg uint8) (uint16, error) {
 
 // ReadBlockData reads a block of maximum 32 bytes from the given register address of the i2c device.
 // TODO: implement the specification, because some devices will not work with this
-//       current:  "S Addr Wr [A] Comm [A] P S Addr Rd [A] [Count] A [Data] A [Data] A ... A [Data] NA P"
-//       required: "S Addr Wr [A] Comm [A] S Addr Rd [A] [Count] A [Data] A [Data] A ... A [Data] NA P"
+//
+//	current:  "S Addr Wr [A] Comm [A] P S Addr Rd [A] [Count] A [Data] A [Data] A ... A [Data] NA P"
+//	required: "S Addr Wr [A] Comm [A] S Addr Rd [A] [Count] A [Data] A [Data] A ... A [Data] NA P"
 func (c *firmataI2cConnection) ReadBlockData(reg uint8, data []byte) error {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()

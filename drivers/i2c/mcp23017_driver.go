@@ -5,7 +5,7 @@ import (
 	"log"
 	"strings"
 
-	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/v2"
 )
 
 // default address for device when a2/a1/a0 pins are all tied to ground
@@ -63,19 +63,20 @@ type MCP23017Driver struct {
 
 // NewMCP23017Driver creates a new Gobot Driver to the MCP23017 i2c port expander.
 // Params:
-//		c Connector - the Adaptor to use with this Driver
+//
+//	c Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//		i2c.WithBus(int):	bus to use with this driver
-//		i2c.WithAddress(int):	address to use with this driver
-//		i2c.WithMCP23017Bank(int):	MCP23017 bank to use with this driver
-//		i2c.WithMCP23017Mirror(int):	MCP23017 mirror to use with this driver
-//		i2c.WithMCP23017Seqop(int):	MCP23017 seqop to use with this driver
-//		i2c.WithMCP23017Disslw(int):	MCP23017 disslw to use with this driver
-//		i2c.WithMCP23017Haen(int):	MCP23017 haen to use with this driver
-//		i2c.WithMCP23017Odr(int):	MCP23017 odr to use with this driver
-//		i2c.WithMCP23017Intpol(int):	MCP23017 intpol to use with this driver
 //
+//	i2c.WithBus(int):	bus to use with this driver
+//	i2c.WithAddress(int):	address to use with this driver
+//	i2c.WithMCP23017Bank(int):	MCP23017 bank to use with this driver
+//	i2c.WithMCP23017Mirror(int):	MCP23017 mirror to use with this driver
+//	i2c.WithMCP23017Seqop(int):	MCP23017 seqop to use with this driver
+//	i2c.WithMCP23017Disslw(int):	MCP23017 disslw to use with this driver
+//	i2c.WithMCP23017Haen(int):	MCP23017 haen to use with this driver
+//	i2c.WithMCP23017Odr(int):	MCP23017 odr to use with this driver
+//	i2c.WithMCP23017Intpol(int):	MCP23017 intpol to use with this driver
 func NewMCP23017Driver(c Connector, options ...func(Config)) *MCP23017Driver {
 	d := &MCP23017Driver{
 		Driver:  NewDriver(c, "MCP23017", mcp23017DefaultAddress),

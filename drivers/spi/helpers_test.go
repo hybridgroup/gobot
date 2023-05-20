@@ -3,8 +3,8 @@ package spi
 import (
 	"fmt"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/system"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/system"
 )
 
 // make sure that this SpiBusAdaptor fulfills all the required interfaces

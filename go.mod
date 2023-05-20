@@ -1,4 +1,4 @@
-module gobot.io/x/gobot
+module gobot.io/x/gobot/v2
 
 go 1.17
 

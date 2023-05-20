@@ -1,6 +1,6 @@
 package bb8
 
-import "gobot.io/x/gobot/platforms/sphero"
+import "gobot.io/x/gobot/v2/platforms/sphero"
 
 // DefaultCollisionConfig returns a CollisionConfig with sensible collision defaults
 func DefaultCollisionConfig() sphero.CollisionConfig {

@@ -7,7 +7,7 @@ It uses the Pebble 2.0 SDK, and requires the 2.0 iOS or Android app, and that th
 ## How to Install
 
 ```
-go get -d -u gobot.io/x/gobot/...
+go get -d -u gobot.io/x/gobot/v2/...
 ```
 
 * Install Pebble 2.0 iOS or Android app. (If you haven't already)
@@ -23,9 +23,9 @@ package main
 import (
 	"fmt"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/api"
-	"gobot.io/x/gobot/platforms/pebble"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/api"
+	"gobot.io/x/gobot/v2/platforms/pebble"
 )
 
 func main() {

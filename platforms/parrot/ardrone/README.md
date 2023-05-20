@@ -6,7 +6,7 @@ For more info about the ARDrone platform click [here](http://ardrone2.parrot.com
 
 ## How to Install
 ```
-go get -d -u gobot.io/x/gobot/...
+go get -d -u gobot.io/x/gobot/v2/...
 ```
 
 ## How to Use
@@ -16,8 +16,8 @@ package main
 import (
 	"time"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/platforms/parrot/ardrone"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/platforms/parrot/ardrone"
 )
 
 func main() {

@@ -1,7 +1,7 @@
 package spi
 
 import (
-	"gobot.io/x/gobot/drivers/common/mfrc522"
+	"gobot.io/x/gobot/v2/drivers/common/mfrc522"
 )
 
 // MFRC522Driver is a wrapper for SPI bus usage. Please refer to the mfrc522.MFRC522Common package
@@ -14,15 +14,16 @@ type MFRC522Driver struct {
 // NewMFRC522Driver creates a new Gobot Driver for MFRC522 RFID with SPI connection
 //
 // Params:
-//      a *Adaptor - the Adaptor to use with this Driver
+//
+//	a *Adaptor - the Adaptor to use with this Driver
 //
 // Optional params:
-//      spi.WithBusNumber(int):  bus to use with this driver
-//     	spi.WithChipNumber(int): chip to use with this driver
-//      spi.WithMode(int):    	 mode to use with this driver
-//      spi.WithBitCount(int):   number of bits to use with this driver
-//      spi.WithSpeed(int64):    speed in Hz to use with this driver
 //
+//	 spi.WithBusNumber(int):  bus to use with this driver
+//		spi.WithChipNumber(int): chip to use with this driver
+//	 spi.WithMode(int):    	 mode to use with this driver
+//	 spi.WithBitCount(int):   number of bits to use with this driver
+//	 spi.WithSpeed(int64):    speed in Hz to use with this driver
 func NewMFRC522Driver(a Connector, options ...func(Config)) *MFRC522Driver {
 	d := &MFRC522Driver{
 		Driver: NewDriver(a, "MFRC522"),

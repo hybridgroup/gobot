@@ -1,4 +1,6 @@
+//go:build example
 // +build example
+
 //
 // Do not build by default.
 
@@ -8,8 +10,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/api"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/api"
 )
 
 func main() {

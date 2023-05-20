@@ -3,7 +3,7 @@ Package mavlink contains the Gobot adaptor and driver for the MAVlink Communicat
 
 Installing:
 
-	go get gobot.io/x/gobot/platforms/mavlink
+	go get gobot.io/x/gobot/v2/platforms/mavlink
 
 Example:
 
@@ -12,9 +12,9 @@ Example:
 	import (
 		"fmt"
 
-		"gobot.io/x/gobot"
-		"gobot.io/x/gobot/platforms/mavlink"
-		common "gobot.io/x/gobot/platforms/mavlink/common"
+		"gobot.io/x/gobot/v2"
+		"gobot.io/x/gobot/v2/platforms/mavlink"
+		common "gobot.io/x/gobot/v2/platforms/mavlink/common"
 	)
 
 	func main() {
@@ -65,4 +65,4 @@ Example:
 For further information refer to mavlink README:
 https://github.com/hybridgroup/gobot/blob/master/platforms/mavlink/README.md
 */
-package mavlink // import "gobot.io/x/gobot/platforms/mavlink"
+package mavlink // import "gobot.io/x/gobot/v2/platforms/mavlink"

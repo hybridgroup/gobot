@@ -5,10 +5,10 @@ import (
 	"strings"
 	"testing"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/aio"
-	"gobot.io/x/gobot/drivers/gpio"
-	"gobot.io/x/gobot/gobottest"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/drivers/aio"
+	"gobot.io/x/gobot/v2/drivers/gpio"
+	"gobot.io/x/gobot/v2/gobottest"
 )
 
 // this ensures that the implementation is based on i2c.Driver, which implements the gobot.Driver
@@ -70,67 +70,67 @@ func TestGrovePiSomeRead(t *testing.T) {
 		"DigitalRead": {
 			usedPin:       2,
 			wantWritten:   []uint8{commandSetPinMode, 2, 0, 0, commandReadDigital, 2, 0, 0},
-			simResponse:   [][]uint8{[]uint8{0}, []uint8{commandReadDigital, 3}},
+			simResponse:   [][]uint8{{0}, {commandReadDigital, 3}},
 			wantCallsRead: 2,
 			wantResult:    3,
 		},
 		"AnalogRead": {
 			usedPin:     3,
 			wantWritten: []uint8{commandSetPinMode, 3, 0, 0, commandReadAnalog, 3, 0, 0},
-			simResponse: [][]uint8{[]uint8{0}, []uint8{commandReadAnalog, 4, 5}},
+			simResponse: [][]uint8{{0}, {commandReadAnalog, 4, 5}},
 			wantResult:  1029,
 		},
 		"UltrasonicRead": {
 			usedPin:     4,
 			wantWritten: []uint8{commandSetPinMode, 4, 0, 0, commandReadUltrasonic, 4, 0, 0},
-			simResponse: [][]uint8{[]uint8{0}, []uint8{commandReadUltrasonic, 5, 6}},
+			simResponse: [][]uint8{{0}, {commandReadUltrasonic, 5, 6}},
 			wantResult:  1281,
 		},
 		"FirmwareVersionRead": {
 			wantWritten:      []uint8{commandReadFirmwareVersion, 0, 0, 0},
-			simResponse:      [][]uint8{[]uint8{commandReadFirmwareVersion, 7, 8, 9}},
+			simResponse:      [][]uint8{{commandReadFirmwareVersion, 7, 8, 9}},
 			wantResultString: "7.8.9",
 		},
 		"DHTRead": {
 			usedPin:      5,
 			wantWritten:  []uint8{commandSetPinMode, 5, 0, 0, commandReadDHT, 5, 1, 0},
-			simResponse:  [][]uint8{[]uint8{0}, []uint8{commandReadDHT, 164, 112, 69, 193, 20, 174, 54, 66}},
+			simResponse:  [][]uint8{{0}, {commandReadDHT, 164, 112, 69, 193, 20, 174, 54, 66}},
 			wantResultF1: -12.34,
 			wantResultF2: 45.67,
 		},
 		"DigitalRead_error_wrong_return_cmd": {
 			usedPin:     15,
 			wantWritten: []uint8{commandSetPinMode, 15, 0, 0, commandReadDigital, 15, 0, 0},
-			simResponse: [][]uint8{[]uint8{0}, []uint8{0, 2}},
+			simResponse: [][]uint8{{0}, {0, 2}},
 			wantErr:     fmt.Errorf("answer (0) was not for command (1)"),
 		},
 		"AnalogRead_error_wrong_return_cmd": {
 			usedPin:     16,
 			wantWritten: []uint8{commandSetPinMode, 16, 0, 0, commandReadAnalog, 16, 0, 0},
-			simResponse: [][]uint8{[]uint8{0}, []uint8{0, 3, 4}},
+			simResponse: [][]uint8{{0}, {0, 3, 4}},
 			wantErr:     fmt.Errorf("answer (0) was not for command (3)"),
 		},
 		"UltrasonicRead_error_wrong_return_cmd": {
 			usedPin:     17,
 			wantWritten: []uint8{commandSetPinMode, 17, 0, 0, commandReadUltrasonic, 17, 0, 0},
-			simResponse: [][]uint8{[]uint8{0}, []uint8{0, 5, 6}},
+			simResponse: [][]uint8{{0}, {0, 5, 6}},
 			wantErr:     fmt.Errorf("answer (0) was not for command (7)"),
 		},
 		"FirmwareVersionRead_error_wrong_return_cmd": {
 			wantWritten: []uint8{commandReadFirmwareVersion, 0, 0, 0},
-			simResponse: [][]uint8{[]uint8{0, 7, 8, 9}},
+			simResponse: [][]uint8{{0, 7, 8, 9}},
 			wantErr:     fmt.Errorf("answer (0) was not for command (8)"),
 		},
 		"DHTRead_error_wrong_return_cmd": {
 			usedPin:     18,
 			wantWritten: []uint8{commandSetPinMode, 18, 0, 0, commandReadDHT, 18, 1, 0},
-			simResponse: [][]uint8{[]uint8{0}, []uint8{0, 164, 112, 69, 193, 20, 174, 54, 66}},
+			simResponse: [][]uint8{{0}, {0, 164, 112, 69, 193, 20, 174, 54, 66}},
 			wantErr:     fmt.Errorf("answer (0) was not for command (40)"),
 		},
 		"DigitalRead_error_wrong_data_count": {
 			usedPin:     28,
 			wantWritten: []uint8{commandSetPinMode, 28, 0, 0, commandReadDigital, 28, 0, 0},
-			simResponse: [][]uint8{[]uint8{0}, []uint8{commandReadDigital, 2, 3}},
+			simResponse: [][]uint8{{0}, {commandReadDigital, 2, 3}},
 			wantErr:     fmt.Errorf("read count mismatch (3 should be 2)"),
 		},
 	}

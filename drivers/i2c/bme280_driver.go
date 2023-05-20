@@ -39,8 +39,8 @@ type bmeHumidityCalibrationCoefficients struct {
 // It implements all of the same functions as the BMP280Driver, but also
 // adds the Humidity() function by reading the BME280's humidity sensor.
 // For details on the BMP280Driver please see:
-// 	https://godoc.org/gobot.io/x/gobot/drivers/i2c#BMP280Driver
 //
+//	https://godoc.org/gobot.io/x/gobot/v2/drivers/i2c#BMP280Driver
 type BME280Driver struct {
 	*BMP280Driver
 	humCalCoeffs    *bmeHumidityCalibrationCoefficients
@@ -49,12 +49,13 @@ type BME280Driver struct {
 
 // NewBME280Driver creates a new driver with specified i2c interface.
 // Params:
-//		conn Connector - the Adaptor to use with this Driver
+//
+//	conn Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//		i2c.WithBus(int):	bus to use with this driver
-//		i2c.WithAddress(int):	address to use with this driver
 //
+//	i2c.WithBus(int):	bus to use with this driver
+//	i2c.WithAddress(int):	address to use with this driver
 func NewBME280Driver(c Connector, options ...func(Config)) *BME280Driver {
 	d := &BME280Driver{
 		BMP280Driver:    NewBMP280Driver(c),

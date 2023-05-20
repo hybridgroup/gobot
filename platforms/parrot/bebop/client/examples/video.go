@@ -1,21 +1,25 @@
+//go:build example
 // +build example
+
 //
 // Do not build by default.
 
 /*
-	This example will connect to the Bebop and stream its video to a webpage
-	via ffserver. This requires you to have both ffmpeg and ffserver installed
-	on your computer.
+This example will connect to the Bebop and stream its video to a webpage
+via ffserver. This requires you to have both ffmpeg and ffserver installed
+on your computer.
 
-	In order to run this example you will first need to  start ffserver with:
-		$ ffserver -f ff.conf
+In order to run this example you will first need to  start ffserver with:
 
-	then in a separate terminal run this program:
-		$ go run video.go
+	$ ffserver -f ff.conf
 
-	You will then be able to view the video feed by navigation to
-	http://localhost:8090/bebop.mjpeg in a web browser. *NOTE* firefox works
-	best for viewing the video feed.
+then in a separate terminal run this program:
+
+	$ go run video.go
+
+You will then be able to view the video feed by navigation to
+http://localhost:8090/bebop.mjpeg in a web browser. *NOTE* firefox works
+best for viewing the video feed.
 */
 package main
 
@@ -25,7 +29,7 @@ import (
 	"os/exec"
 	"time"
 
-	"gobot.io/x/gobot/platforms/parrot/bebop/client"
+	"gobot.io/x/gobot/v2/platforms/parrot/bebop/client"
 )
 
 func main() {

@@ -3,11 +3,11 @@ Package opencv contains the Gobot drivers for opencv.
 
 Installing:
 
-This package requires `opencv` to be installed on your system
+# This package requires `opencv` to be installed on your system
 
 Then you can install the package with:
 
-	go get gobot.io/x/gobot && go install gobot.io/x/gobot/platforms/opencv
+	go get gobot.io/x/gobot/v2 && go install gobot.io/x/gobot/v2/platforms/opencv
 
 Example:
 
@@ -15,8 +15,8 @@ Example:
 
 	import (
 		cv "gobot.io/x/go-opencv/opencv"
-		"gobot.io/x/gobot"
-		"gobot.io/x/gobot/platforms/opencv"
+		"gobot.io/x/gobot/v2"
+		"gobot.io/x/gobot/v2/platforms/opencv"
 	)
 
 	func main() {
@@ -40,4 +40,4 @@ Example:
 For further information refer to opencv README:
 https://github.com/hybridgroup/gobot/blob/master/platforms/opencv/README.md
 */
-package opencv // import "gobot.io/x/gobot/platforms/opencv"
+package opencv // import "gobot.io/x/gobot/v2/platforms/opencv"

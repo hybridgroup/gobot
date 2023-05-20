@@ -1,4 +1,6 @@
+//go:build example
 // +build example
+
 //
 // Do not build by default.
 
@@ -8,7 +10,7 @@ import (
 	"fmt"
 	"time"
 
-	"gobot.io/x/gobot/platforms/parrot/bebop/client"
+	"gobot.io/x/gobot/v2/platforms/parrot/bebop/client"
 )
 
 func main() {

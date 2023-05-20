@@ -1,4 +1,6 @@
+//go:build example
 // +build example
+
 //
 // Do not build by default.
 
@@ -17,8 +19,8 @@ import (
 
 	"fmt"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/platforms/firmata"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/platforms/firmata"
 )
 
 func main() {

@@ -11,7 +11,7 @@ For more info about the Arduino platform, go to [http://arduino.cc/](http://ardu
 ## How to Install
 
 ```
-go get -d -u gobot.io/x/gobot/...
+go get -d -u gobot.io/x/gobot/v2/...
 ```
 
 You must install Firmata on your microcontroller before you can connect to it using Gobot. You can do this in many cases using Gort ([http://gort.io](http://gort.io)).
@@ -28,9 +28,9 @@ package main
 import (
 	"time"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/gpio"
-	"gobot.io/x/gobot/platforms/firmata"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/drivers/gpio"
+	"gobot.io/x/gobot/v2/platforms/firmata"
 )
 
 func main() {
@@ -61,9 +61,9 @@ package main
 import (
 	"time"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/gpio"
-	"gobot.io/x/gobot/platforms/firmata"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/drivers/gpio"
+	"gobot.io/x/gobot/v2/platforms/firmata"
 )
 
 func main() {

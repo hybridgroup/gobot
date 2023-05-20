@@ -4,7 +4,7 @@ import (
 	"sort"
 	"testing"
 
-	"gobot.io/x/gobot/gobottest"
+	"gobot.io/x/gobot/v2/gobottest"
 )
 
 func TestMockFilesystemOpen(t *testing.T) {

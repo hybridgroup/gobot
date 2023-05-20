@@ -3,7 +3,7 @@ package gpio
 import (
 	"time"
 
-	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/v2"
 )
 
 // ButtonDriver Represents a digital Button
@@ -22,7 +22,8 @@ type ButtonDriver struct {
 // 10 Milliseconds given a DigitalReader and pin.
 //
 // Optionally accepts:
-//  time.Duration: Interval at which the ButtonDriver is polled for new information
+//
+//	time.Duration: Interval at which the ButtonDriver is polled for new information
 func NewButtonDriver(a DigitalReader, pin string, v ...time.Duration) *ButtonDriver {
 	b := &ButtonDriver{
 		name:         gobot.DefaultName("Button"),
@@ -49,7 +50,8 @@ func NewButtonDriver(a DigitalReader, pin string, v ...time.Duration) *ButtonDri
 // Start starts the ButtonDriver and polls the state of the button at the given interval.
 //
 // Emits the Events:
-// 	Push int - On button push
+//
+//	Push int - On button push
 //	Release int - On button release
 //	Error error - On button error
 func (b *ButtonDriver) Start() (err error) {

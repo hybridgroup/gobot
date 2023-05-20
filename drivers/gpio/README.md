@@ -1,12 +1,12 @@
 # GPIO
 
-This package provides drivers for [General Purpose Input/Output (GPIO)](https://en.wikipedia.org/wiki/General_Purpose_Input/Output) devices. It is normally used by connecting an adaptor such as [firmata](https://gobot.io/x/gobot/platforms/firmata) that supports the needed interfaces for GPIO devices.
+This package provides drivers for [General Purpose Input/Output (GPIO)](https://en.wikipedia.org/wiki/General_Purpose_Input/Output) devices. It is normally used by connecting an adaptor such as [firmata](https://gobot.io/x/gobot/v2/platforms/firmata) that supports the needed interfaces for GPIO devices.
 
 ## Getting Started
 
 ## Installing
 ```
-go get -d -u gobot.io/x/gobot/...
+go get -d -u gobot.io/x/gobot/v2/...
 ```
 
 ## Hardware Support

@@ -9,9 +9,9 @@ import (
 	"sync"
 
 	multierror "github.com/hashicorp/go-multierror"
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/platforms/adaptors"
-	"gobot.io/x/gobot/system"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/platforms/adaptors"
+	"gobot.io/x/gobot/v2/system"
 )
 
 const (
@@ -41,13 +41,14 @@ type Adaptor struct {
 // NewAdaptor creates a Raspi Adaptor
 //
 // Optional parameters:
-//		adaptors.WithGpiodAccess():	use character device gpiod driver instead of sysfs (still used by default)
-//		adaptors.WithSpiGpioAccess(sclk, nss, mosi, miso):	use GPIO's instead of /dev/spidev#.#
-//    adaptors.WithGpiosActiveLow(pin's): invert the pin behavior
-//    adaptors.WithGpiosPullUp/Down(pin's): sets the internal pull resistor
-//    adaptors.WithGpiosOpenDrain/Source(pin's): sets the output behavior
-//    adaptors.WithGpioDebounce(pin, period): sets the input debouncer
-//    adaptors.WithGpioEventOnFallingEdge/RaisingEdge/BothEdges(pin, handler): activate edge detection
+//
+//			adaptors.WithGpiodAccess():	use character device gpiod driver instead of sysfs (still used by default)
+//			adaptors.WithSpiGpioAccess(sclk, nss, mosi, miso):	use GPIO's instead of /dev/spidev#.#
+//	   adaptors.WithGpiosActiveLow(pin's): invert the pin behavior
+//	   adaptors.WithGpiosPullUp/Down(pin's): sets the internal pull resistor
+//	   adaptors.WithGpiosOpenDrain/Source(pin's): sets the output behavior
+//	   adaptors.WithGpioDebounce(pin, period): sets the input debouncer
+//	   adaptors.WithGpioEventOnFallingEdge/RaisingEdge/BothEdges(pin, handler): activate edge detection
 func NewAdaptor(opts ...func(adaptors.Optioner)) *Adaptor {
 	sys := system.NewAccesser(system.WithDigitalPinGpiodAccess())
 	c := &Adaptor{

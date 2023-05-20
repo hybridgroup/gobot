@@ -1,4 +1,6 @@
+//go:build example
 // +build example
+
 //
 // Do not build by default.
 
@@ -9,9 +11,9 @@ import (
 	"reflect"
 	"time"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/i2c"
-	"gobot.io/x/gobot/platforms/tinkerboard"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/drivers/i2c"
+	"gobot.io/x/gobot/v2/platforms/tinkerboard"
 )
 
 // Attention! Possibly this will not work, because the current kernel of Tinker-OS 4.4.194 (2021-10-06) needs the

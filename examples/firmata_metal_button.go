@@ -1,21 +1,24 @@
+//go:build example
 // +build example
+
 //
 // Do not build by default.
 
 // TO RUN:
+//
 //	firmata_metal_button <PORT>
 //
 // EXAMPLE:
-//	go run ./examples/firmata_metal_button /dev/ttyACM0
 //
+//	go run ./examples/firmata_metal_button /dev/ttyACM0
 package main
 
 import (
 	"fmt"
 	"os"
 
-	"gobot.io/x/gobot/drivers/gpio"
-	"gobot.io/x/gobot/platforms/firmata"
+	"gobot.io/x/gobot/v2/drivers/gpio"
+	"gobot.io/x/gobot/v2/platforms/firmata"
 )
 
 func main() {

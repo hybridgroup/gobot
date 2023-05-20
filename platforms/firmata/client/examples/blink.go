@@ -1,4 +1,6 @@
+//go:build example
 // +build example
+
 //
 // Do not build by default.
 
@@ -9,7 +11,7 @@ import (
 	"time"
 
 	"go.bug.st/serial"
-	"gobot.io/x/gobot/platforms/firmata/client"
+	"gobot.io/x/gobot/v2/platforms/firmata/client"
 )
 
 func main() {

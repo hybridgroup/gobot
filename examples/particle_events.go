@@ -1,4 +1,6 @@
+//go:build example
 // +build example
+
 //
 // Do not build by default.
 
@@ -15,8 +17,8 @@ import (
 	"fmt"
 	"os"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/platforms/particle"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/platforms/particle"
 )
 
 func main() {

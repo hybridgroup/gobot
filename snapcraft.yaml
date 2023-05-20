@@ -19,8 +19,8 @@ parts:
   gobot:
     source: .
     plugin: go
-    go-packages: [gobot.io/x/gobot/cli]
-    go-importpath: gobot.io/x/gobot
+    go-packages: [gobot.io/x/gobot/v2/cli]
+    go-importpath: gobot.io/x/gobot/v2
     organize:
       bin/cli: bin/gobot
     after: [go]

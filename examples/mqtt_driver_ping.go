@@ -1,13 +1,16 @@
+//go:build example
 // +build example
+
 //
 // Do not build by default.
 
 // TO RUN:
-//  go run ./examples/mqtt_driver_ping.go <SERVER>
+//
+//	go run ./examples/mqtt_driver_ping.go <SERVER>
 //
 // EXAMPLE:
-//	go run ./examples/mqtt_driver_ping.go ssl://iot.eclipse.org:8883
 //
+//	go run ./examples/mqtt_driver_ping.go ssl://iot.eclipse.org:8883
 package main
 
 import (
@@ -15,8 +18,8 @@ import (
 	"os"
 	"time"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/platforms/mqtt"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/platforms/mqtt"
 )
 
 func main() {

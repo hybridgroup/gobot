@@ -5,7 +5,7 @@ The GoPiGo3 is a robotics controller by Dexter Industries that is compatible wit
 ## How to Install
 
 ```
-go get -d -u gobot.io/x/gobot/...
+go get -d -u gobot.io/x/gobot/v2/...
 ```
 
 ## How to Use
@@ -18,9 +18,9 @@ import (
 	"fmt"
 	"time"
 
-	"gobot.io/x/gobot"
-	g "gobot.io/x/gobot/platforms/dexter/gopigo3"
-	"gobot.io/x/gobot/platforms/raspi"
+	"gobot.io/x/gobot/v2"
+	g "gobot.io/x/gobot/v2/platforms/dexter/gopigo3"
+	"gobot.io/x/gobot/v2/platforms/raspi"
 )
 
 func main() {

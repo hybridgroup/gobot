@@ -5,129 +5,129 @@ Package gobot is the primary entrypoint for Gobot (http://gobot.io), a framework
 
 It provides a simple, yet powerful way to create solutions that incorporate multiple, different hardware devices at the same time.
 
-Classic Gobot
+# Classic Gobot
 
 Here is a "Classic Gobot" program that blinks an LED using an Arduino:
 
     package main
 
     import (
-    	"time"
+        "time"
 
-    	"gobot.io/x/gobot"
-    	"gobot.io/x/gobot/drivers/gpio"
-    	"gobot.io/x/gobot/platforms/firmata"
+        "gobot.io/x/gobot/v2"
+        "gobot.io/x/gobot/v2/drivers/gpio"
+        "gobot.io/x/gobot/v2/platforms/firmata"
     )
 
     func main() {
-    	firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
-    	led := gpio.NewLedDriver(firmataAdaptor, "13")
+        firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
+        led := gpio.NewLedDriver(firmataAdaptor, "13")
 
-    	work := func() {
-    		gobot.Every(1*time.Second, func() {
-    			led.Toggle()
-    		})
-    	}
+        work := func() {
+            gobot.Every(1*time.Second, func() {
+                led.Toggle()
+            })
+        }
 
-    	robot := gobot.NewRobot("bot",
-    		[]gobot.Connection{firmataAdaptor},
-    		[]gobot.Device{led},
-    		work,
-    	)
+        robot := gobot.NewRobot("bot",
+            []gobot.Connection{firmataAdaptor},
+            []gobot.Device{led},
+            work,
+        )
 
-    	robot.Start()
+        robot.Start()
     }
 
-Metal Gobot
+# Metal Gobot
 
 You can also use Metal Gobot and pick and choose from the various Gobot packages to control hardware with nothing but pure idiomatic Golang code. For example:
 
     package main
 
     import (
-    	"gobot.io/x/gobot/drivers/gpio"
-    	"gobot.io/x/gobot/platforms/intel-iot/edison"
-    	"time"
+        "gobot.io/x/gobot/v2/drivers/gpio"
+        "gobot.io/x/gobot/v2/platforms/intel-iot/edison"
+        "time"
     )
 
     func main() {
-    	e := edison.NewAdaptor()
-    	e.Connect()
+        e := edison.NewAdaptor()
+        e.Connect()
 
-    	led := gpio.NewLedDriver(e, "13")
-    	led.Start()
+        led := gpio.NewLedDriver(e, "13")
+        led.Start()
 
-    	for {
-    		led.Toggle()
-    		time.Sleep(1000 * time.Millisecond)
-    	}
+        for {
+            led.Toggle()
+            time.Sleep(1000 * time.Millisecond)
+        }
     }
 
-Master Gobot
+# Master Gobot
 
 Finally, you can use Master Gobot to add the complete Gobot API or control swarms of Robots:
 
     package main
 
     import (
-    	"fmt"
-    	"time"
+        "fmt"
+        "time"
 
-    	"gobot.io/x/gobot"
-    	"gobot.io/x/gobot/api"
-    	"gobot.io/x/gobot/platforms/sphero"
+        "gobot.io/x/gobot/v2"
+        "gobot.io/x/gobot/v2/api"
+        "gobot.io/x/gobot/v2/platforms/sphero"
     )
 
     func NewSwarmBot(port string) *gobot.Robot {
-    	spheroAdaptor := sphero.NewAdaptor(port)
-    	spheroDriver := sphero.NewSpheroDriver(spheroAdaptor)
-    	spheroDriver.SetName("Sphero" + port)
+        spheroAdaptor := sphero.NewAdaptor(port)
+        spheroDriver := sphero.NewSpheroDriver(spheroAdaptor)
+        spheroDriver.SetName("Sphero" + port)
 
-    	work := func() {
-    		spheroDriver.Stop()
+        work := func() {
+            spheroDriver.Stop()
 
-    		spheroDriver.On(sphero.Collision, func(data interface{}) {
-    			fmt.Println("Collision Detected!")
-    		})
+            spheroDriver.On(sphero.Collision, func(data interface{}) {
+                fmt.Println("Collision Detected!")
+            })
 
-    		gobot.Every(1*time.Second, func() {
-    			spheroDriver.Roll(100, uint16(gobot.Rand(360)))
-    		})
-    		gobot.Every(3*time.Second, func() {
-    			spheroDriver.SetRGB(uint8(gobot.Rand(255)),
-    				uint8(gobot.Rand(255)),
-    				uint8(gobot.Rand(255)),
-    			)
-    		})
-    	}
+            gobot.Every(1*time.Second, func() {
+                spheroDriver.Roll(100, uint16(gobot.Rand(360)))
+            })
+            gobot.Every(3*time.Second, func() {
+                spheroDriver.SetRGB(uint8(gobot.Rand(255)),
+                    uint8(gobot.Rand(255)),
+                    uint8(gobot.Rand(255)),
+                )
+            })
+        }
 
-    	robot := gobot.NewRobot("sphero",
-    		[]gobot.Connection{spheroAdaptor},
-    		[]gobot.Device{spheroDriver},
-    		work,
-    	)
+        robot := gobot.NewRobot("sphero",
+            []gobot.Connection{spheroAdaptor},
+            []gobot.Device{spheroDriver},
+            work,
+        )
 
-    	return robot
+        return robot
     }
 
     func main() {
-    	master := gobot.NewMaster()
-    	api.NewAPI(master).Start()
+        master := gobot.NewMaster()
+        api.NewAPI(master).Start()
 
-    	spheros := []string{
-    		"/dev/rfcomm0",
-    		"/dev/rfcomm1",
-    		"/dev/rfcomm2",
-    		"/dev/rfcomm3",
-    	}
+        spheros := []string{
+            "/dev/rfcomm0",
+            "/dev/rfcomm1",
+            "/dev/rfcomm2",
+            "/dev/rfcomm3",
+        }
 
-    	for _, port := range spheros {
-    		master.AddRobot(NewSwarmBot(port))
-    	}
+        for _, port := range spheros {
+            master.AddRobot(NewSwarmBot(port))
+        }
 
-    	master.Start()
+        master.Start()
     }
 
 Copyright (c) 2013-2018 The Hybrid Group. Licensed under the Apache 2.0 license.
 */
-package gobot // import "gobot.io/x/gobot"
+package gobot // import "gobot.io/x/gobot/v2"

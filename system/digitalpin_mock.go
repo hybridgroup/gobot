@@ -1,7 +1,7 @@
 package system
 
 import (
-	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/v2"
 )
 
 type mockDigitalPinAccess struct {

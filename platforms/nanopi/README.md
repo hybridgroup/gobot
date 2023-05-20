@@ -15,7 +15,7 @@ You would normally install Go and Gobot on your workstation. Once installed, cro
 workstation, transfer the final executable to your board, and run the program on the board as documented here.
 
 ```sh
-go get -d -u gobot.io/x/gobot/...
+go get -d -u gobot.io/x/gobot/v2/...
 ```
 
 ### System access and configuration basics

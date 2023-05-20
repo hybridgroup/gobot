@@ -2,7 +2,7 @@ package ardrone
 
 import (
 	client "github.com/hybridgroup/go-ardrone/client"
-	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/v2"
 )
 
 // drone defines expected drone behaviour
@@ -30,8 +30,7 @@ type Adaptor struct {
 
 // NewAdaptor returns a new ardrone.Adaptor and optionally accepts:
 //
-//  string: The ardrones IP Address
-//
+//	string: The ardrones IP Address
 func NewAdaptor(v ...string) *Adaptor {
 	a := &Adaptor{
 		name: gobot.DefaultName("ARDrone"),

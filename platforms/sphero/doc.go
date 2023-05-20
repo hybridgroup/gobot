@@ -3,7 +3,7 @@ Package sphero provides the Gobot adaptor and driver for the Sphero.
 
 Installing:
 
-	go get gobot.io/x/gobot/platforms/sphero
+	go get gobot.io/x/gobot/v2/platforms/sphero
 
 Example:
 
@@ -13,8 +13,8 @@ Example:
 		"fmt"
 		"time"
 
-		"gobot.io/x/gobot"
-		"gobot.io/x/gobot/platforms/sphero"
+		"gobot.io/x/gobot/v2"
+		"gobot.io/x/gobot/v2/platforms/sphero"
 	)
 
 	func main() {
@@ -39,4 +39,4 @@ Example:
 For further information refer to sphero readme:
 https://github.com/hybridgroup/gobot/blob/master/platforms/sphero/README.md
 */
-package sphero // import "gobot.io/x/gobot/platforms/sphero"
+package sphero // import "gobot.io/x/gobot/v2/platforms/sphero"

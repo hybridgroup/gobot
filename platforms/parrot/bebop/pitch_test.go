@@ -3,7 +3,7 @@ package bebop
 import (
 	"testing"
 
-	"gobot.io/x/gobot/gobottest"
+	"gobot.io/x/gobot/v2/gobottest"
 )
 
 func TestBebopValidatePitchWhenEqualOffset(t *testing.T) {

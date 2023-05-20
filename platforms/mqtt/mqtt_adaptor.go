@@ -5,7 +5,7 @@ import (
 	"crypto/x509"
 	"io/ioutil"
 
-	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/v2"
 
 	paho "github.com/eclipse/paho.mqtt.golang"
 	multierror "github.com/hashicorp/go-multierror"

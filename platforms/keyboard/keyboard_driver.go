@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/v2"
 )
 
 const (
@@ -22,7 +22,6 @@ type Driver struct {
 }
 
 // NewDriver returns a new keyboard Driver.
-//
 func NewDriver() *Driver {
 	k := &Driver{
 		name: gobot.DefaultName("Keyboard"),

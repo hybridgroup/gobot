@@ -3,7 +3,7 @@ package gpio
 import (
 	"time"
 
-	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/v2"
 )
 
 // PIRMotionDriver represents a digital Proximity Infra Red (PIR) motion detecter
@@ -21,7 +21,8 @@ type PIRMotionDriver struct {
 // 10 Milliseconds given a DigitalReader and pin.
 //
 // Optionally accepts:
-//  time.Duration: Interval at which the PIRMotionDriver is polled for new information
+//
+//	time.Duration: Interval at which the PIRMotionDriver is polled for new information
 func NewPIRMotionDriver(a DigitalReader, pin string, v ...time.Duration) *PIRMotionDriver {
 	b := &PIRMotionDriver{
 		name:       gobot.DefaultName("PIRMotion"),
@@ -47,7 +48,8 @@ func NewPIRMotionDriver(a DigitalReader, pin string, v ...time.Duration) *PIRMot
 // Start starts the PIRMotionDriver and polls the state of the sensor at the given interval.
 //
 // Emits the Events:
-// 	MotionDetected - On motion detected
+//
+//	MotionDetected - On motion detected
 //	MotionStopped int - On motion stopped
 //	Error error - On button error
 //

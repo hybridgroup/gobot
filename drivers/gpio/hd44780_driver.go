@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/v2"
 )
 
 // Commands for the driver

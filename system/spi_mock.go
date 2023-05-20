@@ -3,7 +3,7 @@ package system
 import (
 	"fmt"
 
-	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/v2"
 )
 
 // MockSpiAccess contains parameters of mocked SPI access

@@ -11,8 +11,8 @@ import (
 	"math"
 	"time"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/spi"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/drivers/spi"
 )
 
 // spi address for gopigo3
@@ -166,15 +166,16 @@ type Driver struct {
 // NewDriver creates a new Gobot Driver for the GoPiGo3 board.
 //
 // Params:
-//      a *Adaptor - the Adaptor to use with this Driver
+//
+//	a *Adaptor - the Adaptor to use with this Driver
 //
 // Optional params:
-//      spi.WithBusNumber(int):  bus to use with this driver
-//     	spi.WithChipNumber(int): chip to use with this driver
-//      spi.WithMode(int):    	 mode to use with this driver
-//      spi.WithBitCount(int):   number of bits to use with this driver
-//      spi.WithSpeed(int64):    speed in Hz to use with this driver
 //
+//	 spi.WithBusNumber(int):  bus to use with this driver
+//		spi.WithChipNumber(int): chip to use with this driver
+//	 spi.WithMode(int):    	 mode to use with this driver
+//	 spi.WithBitCount(int):   number of bits to use with this driver
+//	 spi.WithSpeed(int64):    speed in Hz to use with this driver
 func NewDriver(a spi.Connector, options ...func(spi.Config)) *Driver {
 	spiConfig := spi.NewConfig()
 	// use /dev/spidev0.1

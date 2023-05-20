@@ -8,7 +8,7 @@ import (
 	"os/exec"
 	"path"
 
-	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/v2"
 )
 
 // Adaptor is gobot Adaptor connection to audio playback
@@ -17,7 +17,6 @@ type Adaptor struct {
 }
 
 // NewAdaptor returns a new audio Adaptor
-//
 func NewAdaptor() *Adaptor {
 	return &Adaptor{name: gobot.DefaultName("Audio")}
 }
@@ -36,7 +35,7 @@ func (a *Adaptor) Finalize() error { return nil }
 
 // Sound plays a sound and accepts:
 //
-//  string: The filename of the audio to start playing
+//	string: The filename of the audio to start playing
 func (a *Adaptor) Sound(fileName string) []error {
 	var errorsList []error
 
@@ -74,7 +73,7 @@ func (a *Adaptor) Sound(fileName string) []error {
 
 // CommandName defines the playback command for a sound and accepts:
 //
-//  string: The filename of the audio that needs playback
+//	string: The filename of the audio that needs playback
 func CommandName(fileName string) (commandName string, err error) {
 	fileType := path.Ext(fileName)
 	if fileType == ".mp3" {
@@ -90,8 +89,8 @@ var execCommand = exec.Command
 
 // RunCommand executes the playback command for a sound file and accepts:
 //
-//  string: The audio command to be use for playback
-//  string: The filename of the audio that needs playback
+//	string: The audio command to be use for playback
+//	string: The filename of the audio that needs playback
 func RunCommand(audioCommand string, filename string) error {
 	cmd := execCommand(audioCommand, filename)
 	err := cmd.Start()

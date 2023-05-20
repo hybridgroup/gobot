@@ -1,4 +1,6 @@
+//go:build example
 // +build example
+
 //
 // Do not build by default.
 
@@ -28,9 +30,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/platforms/dji/tello"
-	"gobot.io/x/gobot/platforms/joystick"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/platforms/dji/tello"
+	"gobot.io/x/gobot/v2/platforms/joystick"
 	"gocv.io/x/gocv"
 )
 

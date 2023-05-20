@@ -1,6 +1,6 @@
 package gpio
 
-import "gobot.io/x/gobot"
+import "gobot.io/x/gobot/v2"
 
 // RgbLedDriver represents a digital RGB Led
 type RgbLedDriver struct {
@@ -20,6 +20,7 @@ type RgbLedDriver struct {
 // 3 pins: redPin, greenPin, and bluePin
 //
 // Adds the following API Commands:
+//
 //	"SetRGB" - See RgbLedDriver.SetRGB
 //	"Toggle" - See RgbLedDriver.Toggle
 //	"On" - See RgbLedDriver.On
@@ -70,7 +71,9 @@ func (l *RgbLedDriver) Name() string { return l.name }
 func (l *RgbLedDriver) SetName(n string) { l.name = n }
 
 // Pin returns the RgbLedDrivers pins
-func (l *RgbLedDriver) Pin() string { return "r=" + l.pinRed + ", g=" + l.pinGreen + ", b=" + l.pinBlue }
+func (l *RgbLedDriver) Pin() string {
+	return "r=" + l.pinRed + ", g=" + l.pinGreen + ", b=" + l.pinBlue
+}
 
 // RedPin returns the RgbLedDrivers redPin
 func (l *RgbLedDriver) RedPin() string { return l.pinRed }

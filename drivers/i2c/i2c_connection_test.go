@@ -1,3 +1,4 @@
+//go:build !windows
 // +build !windows
 
 package i2c
@@ -9,9 +10,9 @@ import (
 	"syscall"
 	"unsafe"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/gobottest"
-	"gobot.io/x/gobot/system"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/gobottest"
+	"gobot.io/x/gobot/v2/system"
 )
 
 const dev = "/dev/i2c-1"

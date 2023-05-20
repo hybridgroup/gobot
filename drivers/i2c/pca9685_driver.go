@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"time"
 
-	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/v2"
 )
 
 const pca9685DefaultAddress = 0x40
@@ -36,19 +36,19 @@ const (
 //
 // For example, here is the Adafruit board that uses this chip:
 // https://www.adafruit.com/product/815
-//
 type PCA9685Driver struct {
 	*Driver
 }
 
 // NewPCA9685Driver creates a new driver with specified i2c interface
 // Params:
-//		c Connector - the Adaptor to use with this Driver
+//
+//	c Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//		i2c.WithBus(int):	bus to use with this driver
-//		i2c.WithAddress(int):	address to use with this driver
 //
+//	i2c.WithBus(int):	bus to use with this driver
+//	i2c.WithAddress(int):	address to use with this driver
 func NewPCA9685Driver(c Connector, options ...func(Config)) *PCA9685Driver {
 	p := &PCA9685Driver{
 		Driver: NewDriver(c, "PCA9685", pca9685DefaultAddress),
@@ -86,12 +86,12 @@ func NewPCA9685Driver(c Connector, options ...func(Config)) *PCA9685Driver {
 
 // SetPWM sets a specific channel to a pwm value from 0-4095.
 // Params:
-//		channel int - the channel to send the pulse
-//		on uint16 - the time to start the pulse
-//		off uint16 - the time to stop the pulse
+//
+//	channel int - the channel to send the pulse
+//	on uint16 - the time to start the pulse
+//	off uint16 - the time to stop the pulse
 //
 // Most typically you set "on" to a zero value, and then set "off" to your desired duty.
-//
 func (p *PCA9685Driver) SetPWM(channel int, on uint16, off uint16) (err error) {
 	if _, err := p.connection.Write([]byte{byte(PCA9685_LED0_ON_L + 4*channel), byte(on) & 0xFF}); err != nil {
 		return err
@@ -114,11 +114,11 @@ func (p *PCA9685Driver) SetPWM(channel int, on uint16, off uint16) (err error) {
 
 // SetAllPWM sets all channels to a pwm value from 0-4095.
 // Params:
-//		on uint16 - the time to start the pulse
-//		off uint16 - the time to stop the pulse
+//
+//	on uint16 - the time to start the pulse
+//	off uint16 - the time to stop the pulse
 //
 // Most typically you set "on" to a zero value, and then set "off" to your desired duty.
-//
 func (p *PCA9685Driver) SetAllPWM(on uint16, off uint16) (err error) {
 	if _, err := p.connection.Write([]byte{byte(PCA9685_ALLLED_ON_L), byte(on) & 0xFF}); err != nil {
 		return err
@@ -187,7 +187,6 @@ func (p *PCA9685Driver) SetPWMFreq(freq float32) error {
 // PwmWrite writes a PWM signal to the specified channel aka "pin".
 // Value values are from 0-255, to conform to the PwmWriter interface.
 // If you need finer control, please look at SetPWM().
-//
 func (p *PCA9685Driver) PwmWrite(pin string, val byte) (err error) {
 	i, err := strconv.Atoi(pin)
 	if err != nil {
@@ -200,7 +199,6 @@ func (p *PCA9685Driver) PwmWrite(pin string, val byte) (err error) {
 // ServoWrite writes a servo signal to the specified channel aka "pin".
 // Valid values are from 0-180, to conform to the ServoWriter interface.
 // If you need finer control, please look at SetPWM().
-//
 func (p *PCA9685Driver) ServoWrite(pin string, val byte) (err error) {
 	i, err := strconv.Atoi(pin)
 	if err != nil {

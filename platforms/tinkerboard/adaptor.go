@@ -5,9 +5,9 @@ import (
 	"sync"
 
 	multierror "github.com/hashicorp/go-multierror"
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/platforms/adaptors"
-	"gobot.io/x/gobot/system"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/platforms/adaptors"
+	"gobot.io/x/gobot/v2/system"
 )
 
 const (
@@ -44,10 +44,12 @@ type Adaptor struct {
 // NewAdaptor creates a Tinkerboard Adaptor
 //
 // Optional parameters:
-//		adaptors.WithGpiodAccess():	use character device gpiod driver instead of sysfs (still used by default)
-//		adaptors.WithSpiGpioAccess(sclk, nss, mosi, miso):	use GPIO's instead of /dev/spidev#.#
-//    adaptors.WithGpiosActiveLow(pin's): invert the pin behavior
-//    adaptors.WithGpiosPullUp/Down(pin's): sets the internal pull resistor
+//
+//			adaptors.WithGpiodAccess():	use character device gpiod driver instead of sysfs (still used by default)
+//			adaptors.WithSpiGpioAccess(sclk, nss, mosi, miso):	use GPIO's instead of /dev/spidev#.#
+//	   adaptors.WithGpiosActiveLow(pin's): invert the pin behavior
+//	   adaptors.WithGpiosPullUp/Down(pin's): sets the internal pull resistor
+//
 // note from RK3288 datasheet: "The pull direction (pullup or pulldown) for all of GPIOs are software-programmable", but
 // the latter is not working for any pin (armbian 22.08.7)
 func NewAdaptor(opts ...func(adaptors.Optioner)) *Adaptor {

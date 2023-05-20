@@ -6,7 +6,7 @@ import (
 	"math"
 	"time"
 
-	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/v2"
 )
 
 // AdafruitDirection declares a type for specification of the motor direction
@@ -97,12 +97,13 @@ const (
 // NewAdafruitMotorHatDriver initializes the internal DCMotor and StepperMotor types.
 // Again the Adafruit Motor Hat supports up to four DC motors and up to two stepper motors.
 // Params:
-//		conn Connector - the Adaptor to use with this Driver
+//
+//	conn Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//		i2c.WithBus(int):	bus to use with this driver
-//		i2c.WithAddress(int):	address to use with this driver
 //
+//	i2c.WithBus(int):	bus to use with this driver
+//	i2c.WithAddress(int):	address to use with this driver
 func NewAdafruitMotorHatDriver(conn Connector, options ...func(Config)) *AdafruitMotorHatDriver {
 	var dc []adaFruitDCMotor
 	var st []adaFruitStepperMotor

@@ -6,8 +6,8 @@ import (
 	"os"
 	"path"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/system"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/system"
 )
 
 const (
