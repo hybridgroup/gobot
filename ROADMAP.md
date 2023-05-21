@@ -6,7 +6,7 @@ Requests for changes to the roadmap should be made in the form of pull requests 
 
 Anything tied to any implementation, including requests for platform support, bug reports, or other specifics should still be made by creating a new issue here:
 
-https://github.com/hybridgroup/gobot/issues
+<https://github.com/hybridgroup/gobot/issues>
 
 ## core
 
@@ -34,15 +34,13 @@ https://github.com/hybridgroup/gobot/issues
 
 ## i2c
 
-- ensure that SMBUS operations are working as expected.
-- add support for the following i2c devices:
-   - LSM303DLHC
-   - MAG3110
-   - MMA8452
-   - PCF8591
-   - T5403
-   - TMP006
-   - VCNL4000
+add support for the following i2c devices:
+
+- MAG3110
+- MMA8452
+- T5403
+- TMP006
+- VCNL4000
 
 ## 1-wire
 
