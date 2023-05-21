@@ -3,7 +3,7 @@ package system
 import (
 	"strconv"
 
-	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/v2"
 )
 
 // sysfsDitalPinHandler represents the sysfs implementation

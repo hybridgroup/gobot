@@ -3,7 +3,7 @@ package i2c
 import (
 	"fmt"
 
-	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/v2"
 )
 
 const (
@@ -30,7 +30,7 @@ type bitState uint8
 
 const (
 	clear bitState = 0x00
-	set            = 0x01
+	set   bitState = 0x01
 )
 
 // Connection is a connection to an I2C device with a specified address

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/system"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/system"
 )
 
 // PWMPin is the Raspberry Pi implementation of the PWMPinner interface.
@@ -108,7 +108,7 @@ func (p *PWMPin) SetDutyCycle(duty uint32) error {
 
 func (p *PWMPin) writeValue(data string) (err error) {
 	fi, err := p.sys.OpenFile(p.path, os.O_WRONLY|os.O_APPEND, 0644)
-	defer fi.Close()
+	defer fi.Close() //nolint:staticcheck // for historical reasons
 
 	if err != nil {
 		return err

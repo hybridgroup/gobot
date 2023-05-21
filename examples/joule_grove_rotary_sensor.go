@@ -1,4 +1,6 @@
+//go:build example
 // +build example
+
 //
 // Do not build by default.
 
@@ -7,10 +9,10 @@ package main
 import (
 	"fmt"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/aio"
-	"gobot.io/x/gobot/drivers/i2c"
-	"gobot.io/x/gobot/platforms/intel-iot/joule"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/drivers/aio"
+	"gobot.io/x/gobot/v2/drivers/i2c"
+	"gobot.io/x/gobot/v2/platforms/intel-iot/joule"
 )
 
 func main() {

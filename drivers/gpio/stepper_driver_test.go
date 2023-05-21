@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"gobot.io/x/gobot/gobottest"
+	"gobot.io/x/gobot/v2/gobottest"
 )
 
 const (
@@ -58,7 +58,7 @@ func TestStepperDriverDefaultDirection(t *testing.T) {
 func TestStepperDriverInvalidDirection(t *testing.T) {
 	d := initStepperMotorDriver()
 	err := d.SetDirection("reverse")
-	gobottest.Assert(t, err.(error), errors.New("Invalid direction. Value should be forward or backward"))
+	gobottest.Assert(t, err, errors.New("Invalid direction. Value should be forward or backward"))
 }
 
 func TestStepperDriverMoveForward(t *testing.T) {

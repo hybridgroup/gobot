@@ -6,7 +6,7 @@ Installing:
 * First install the [Leap Motion Software](https://www.leapmotion.com/setup).
 * Then install the package:
 
-	go get gobot.io/x/gobot/platforms/leap
+	go get gobot.io/x/gobot/v2/platforms/leap
 
 Example:
 
@@ -15,8 +15,8 @@ Example:
 	import (
 		"fmt"
 
-		"gobot.io/x/gobot"
-		"gobot.io/x/gobot/platforms/leap"
+		"gobot.io/x/gobot/v2"
+		"gobot.io/x/gobot/v2/platforms/leap"
 	)
 
 	func main() {
@@ -41,4 +41,4 @@ Example:
 For more information refer to the leap README:
 https://github.com/hybridgroup/gobot/blob/master/platforms/leap/README.md
 */
-package leap // import "gobot.io/x/gobot/platforms/leap"
+package leap // import "gobot.io/x/gobot/v2/platforms/leap"

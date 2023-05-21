@@ -5,8 +5,8 @@ import (
 	"sync"
 
 	multierror "github.com/hashicorp/go-multierror"
-	"gobot.io/x/gobot/drivers/spi"
-	"gobot.io/x/gobot/system"
+	"gobot.io/x/gobot/v2/drivers/spi"
+	"gobot.io/x/gobot/v2/system"
 )
 
 type spiBusNumberValidator func(busNumber int) error

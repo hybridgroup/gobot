@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"go.bug.st/serial"
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/i2c"
-	"gobot.io/x/gobot/platforms/firmata/client"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/drivers/i2c"
+	"gobot.io/x/gobot/v2/platforms/firmata/client"
 )
 
 type firmataBoard interface {
@@ -70,11 +70,11 @@ func NewAdaptor(args ...interface{}) *Adaptor {
 	}
 
 	for _, arg := range args {
-		switch arg.(type) {
+		switch a := arg.(type) {
 		case string:
-			f.port = arg.(string)
+			f.port = a
 		case io.ReadWriteCloser:
-			f.conn = arg.(io.ReadWriteCloser)
+			f.conn = a
 		}
 	}
 

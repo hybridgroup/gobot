@@ -1,25 +1,29 @@
+//go:build example
 // +build example
+
 //
 // Do not build by default.
 
 /*
-	This example will connect to the Parrot Bebop allowing you to control
-	it using a PS3 controller.
+This example will connect to the Parrot Bebop allowing you to control
+it using a PS3 controller.
 
-	It also streams the drone video to a webpage via ffserver.
+It also streams the drone video to a webpage via ffserver.
 
-	This requires you to have both ffmpeg and ffserver installed
-	on your computer.
+This requires you to have both ffmpeg and ffserver installed
+on your computer.
 
-	In order to run this example you will first need to start ffserver with:
-		$ ffserver -f ff.conf
+In order to run this example you will first need to start ffserver with:
 
-	then in a separate terminal run this program:
-		$ go run bebop_ps3_video.go
+	$ ffserver -f ff.conf
 
-	You can view the video feed by navigating to
-	http://localhost:8090/bebop.mjpeg in a web browser.
-	*NOTE* firefox works best for viewing the video feed.
+then in a separate terminal run this program:
+
+	$ go run bebop_ps3_video.go
+
+You can view the video feed by navigating to
+http://localhost:8090/bebop.mjpeg in a web browser.
+*NOTE* firefox works best for viewing the video feed.
 */
 package main
 
@@ -31,9 +35,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/platforms/joystick"
-	"gobot.io/x/gobot/platforms/parrot/bebop"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/platforms/joystick"
+	"gobot.io/x/gobot/v2/platforms/parrot/bebop"
 )
 
 type pair struct {

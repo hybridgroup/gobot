@@ -6,11 +6,11 @@ import (
 	"strings"
 	"testing"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/gpio"
-	"gobot.io/x/gobot/drivers/i2c"
-	"gobot.io/x/gobot/gobottest"
-	"gobot.io/x/gobot/system"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/drivers/gpio"
+	"gobot.io/x/gobot/v2/drivers/i2c"
+	"gobot.io/x/gobot/v2/gobottest"
+	"gobot.io/x/gobot/v2/system"
 )
 
 // make sure that this Adaptor fulfills all the required interfaces
@@ -154,7 +154,7 @@ func TestPwmPinExportError(t *testing.T) {
 	delete(fs.Files, "/sys/class/pwm/pwmchip0/export")
 
 	err := a.PwmWrite("J12_26", 100)
-	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/pwm/pwmchip0/export: No such file"), true)
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/pwm/pwmchip0/export: no such file"), true)
 }
 
 func TestPwmPinEnableError(t *testing.T) {
@@ -162,7 +162,7 @@ func TestPwmPinEnableError(t *testing.T) {
 	delete(fs.Files, "/sys/class/pwm/pwmchip0/pwm0/enable")
 
 	err := a.PwmWrite("J12_26", 100)
-	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/pwm/pwmchip0/pwm0/enable: No such file"), true)
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/pwm/pwmchip0/pwm0/enable: no such file"), true)
 }
 
 func TestI2cDefaultBus(t *testing.T) {

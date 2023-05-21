@@ -5,8 +5,8 @@ import (
 	"image"
 	"time"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/gpio"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/drivers/gpio"
 )
 
 const (
@@ -114,20 +114,21 @@ type SSD1306Driver struct {
 // NewSSD1306Driver creates a new SSD1306Driver.
 //
 // Params:
-//      conn Connector - the Adaptor to use with this Driver
+//
+//	conn Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//      spi.WithBusNumber(int):  bus to use with this driver
-//     	spi.WithChipNumber(int): chip to use with this driver
-//      spi.WithMode(int):    	 mode to use with this driver
-//      spi.WithBitCount(int):   number of bits to use with this driver
-//      spi.WithSpeed(int64):    speed in Hz to use with this driver
-//      spi.WithDisplayWidth(int): 	width of display (defaults to 128)
-//      spi.WithDisplayHeight(int): height of display (defaults to 64)
-//      spi.WithDCPin(string): 		gpio pin number connected to dc pin on display (defaults to "16")
-//      spi.WithRstPin(string): 	gpio pin number connected to rst pin on display (defaults to "18")
-//      spi.WithExternalVCC(bool): 	set to true if using external vcc (defaults to false)
 //
+//	 spi.WithBusNumber(int):  bus to use with this driver
+//		spi.WithChipNumber(int): chip to use with this driver
+//	 spi.WithMode(int):    	 mode to use with this driver
+//	 spi.WithBitCount(int):   number of bits to use with this driver
+//	 spi.WithSpeed(int64):    speed in Hz to use with this driver
+//	 spi.WithDisplayWidth(int): 	width of display (defaults to 128)
+//	 spi.WithDisplayHeight(int): height of display (defaults to 64)
+//	 spi.WithDCPin(string): 		gpio pin number connected to dc pin on display (defaults to "16")
+//	 spi.WithRstPin(string): 	gpio pin number connected to rst pin on display (defaults to "18")
+//	 spi.WithExternalVCC(bool): 	set to true if using external vcc (defaults to false)
 func NewSSD1306Driver(a gobot.Adaptor, options ...func(Config)) *SSD1306Driver {
 	// cast adaptor to spi connector since we also need the adaptor for gpio
 	b, ok := a.(Connector)
@@ -282,9 +283,6 @@ func (s *SSD1306Driver) SetBufferAndDisplay(buf []byte) error {
 
 // SetContrast sets the display contrast (0-255).
 func (s *SSD1306Driver) SetContrast(contrast byte) error {
-	if contrast < 0 || contrast > 255 {
-		return fmt.Errorf("contrast value must be between 0-255")
-	}
 	if err := s.command(ssd1306SetContrast); err != nil {
 		return err
 	}

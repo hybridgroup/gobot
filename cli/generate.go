@@ -30,7 +30,7 @@ func Generate() cli.Command {
 					valid = true
 				}
 			}
-			if valid == false {
+			if !valid {
 				fmt.Println("Invalid/no subcommand supplied.")
 				fmt.Println("Usage:")
 				fmt.Println(" gobot generate adaptor <name> [package] # generate a new Gobot adaptor")
@@ -102,7 +102,7 @@ func generate(c config, file string, tmpl string) error {
 	fmt.Println("Creating", fileLocation)
 
 	f, err := os.Create(fileLocation)
-	defer f.Close()
+	defer f.Close() //nolint:staticcheck // for historical reasons
 	if err != nil {
 		return err
 	}
@@ -149,11 +149,11 @@ func generatePlatform(c config) error {
 
 	c.dir = dir
 
-	if exp, err := ioutil.ReadFile(exampleDir + "/main.go"); err != nil {
+	exp, err := ioutil.ReadFile(exampleDir + "/main.go")
+	if err != nil {
 		return err
-	} else {
-		c.Example = string(exp)
 	}
+	c.Example = string(exp)
 
 	return generate(c, "README.md", readme())
 }
@@ -189,7 +189,7 @@ func driver() string {
 import (
 	"time"
 
-	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/v2"
 )
 
 const Hello string = "hello"
@@ -274,7 +274,7 @@ import (
   "fmt"
   "time"
 
-  "gobot.io/x/gobot"
+  "gobot.io/x/gobot/v2"
 )
 
 func main() {
@@ -313,8 +313,8 @@ import (
 	"testing"
 	"time"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/gobottest"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Driver = (*{{.UpperName}}Driver)(nil)
@@ -368,8 +368,8 @@ func adaptorTest() string {
 import (
 	"testing"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/gobottest"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Adaptor = (*{{.UpperName}}Adaptor)(nil)
@@ -398,7 +398,7 @@ Gobot (http://gobot.io/) is a framework for robotics and physical computing usin
 This repository contains the Gobot adaptor and driver for {{.Package}}.
 
 For more information about Gobot, check out the github repo at
-https://gobot.io/x/gobot
+https://gobot.io/x/gobot/v2
 
 ## Installing
 ` + "```bash\ngo get path/to/repo/{{.Package}}\n```" + `

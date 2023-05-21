@@ -4,7 +4,7 @@ package audio
 import (
 	"time"
 
-	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/v2"
 )
 
 // Driver is gobot software device for audio playback
@@ -21,15 +21,15 @@ type Driver struct {
 // NewDriver returns a new audio Driver. It accepts:
 //
 // *Adaptor: The audio adaptor to use for the driver
-//  string: The filename of the audio to start playing
 //
+//	string: The filename of the audio to start playing
 func NewDriver(a *Adaptor, filename string) *Driver {
 	return &Driver{
 		name:       gobot.DefaultName("Audio"),
 		connection: a,
 		interval:   500 * time.Millisecond,
 		filename:   filename,
-		halt:       make(chan bool, 0),
+		halt:       make(chan bool),
 		Eventer:    gobot.NewEventer(),
 		Commander:  gobot.NewCommander(),
 	}
@@ -51,7 +51,7 @@ func (d *Driver) Connection() gobot.Connection {
 
 // Sound plays back a sound file. It accepts:
 //
-//  string: The filename of the audio to start playing
+//	string: The filename of the audio to start playing
 func (d *Driver) Sound(fileName string) []error {
 	return d.Connection().(*Adaptor).Sound(fileName)
 }

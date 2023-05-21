@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"gobot.io/x/gobot/gobottest"
+	"gobot.io/x/gobot/v2/gobottest"
 )
 
 func initTestADS1015DriverWithStubbedAdaptor() (*ADS1x15Driver, *i2cTestAdaptor) {
@@ -103,7 +103,7 @@ func TestADS1015AnalogRead(t *testing.T) {
 	gobottest.Assert(t, val, 32767)
 	gobottest.Assert(t, err, nil)
 
-	val, err = d.AnalogRead("3-2")
+	_, err = d.AnalogRead("3-2")
 	gobottest.Refute(t, err.Error(), nil)
 }
 

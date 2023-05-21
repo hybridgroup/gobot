@@ -1,6 +1,6 @@
 package gpio
 
-import "gobot.io/x/gobot"
+import "gobot.io/x/gobot/v2"
 
 // RelayDriver represents a digital relay
 type RelayDriver struct {
@@ -15,6 +15,7 @@ type RelayDriver struct {
 // NewRelayDriver return a new RelayDriver given a DigitalWriter and pin.
 //
 // Adds the following API Commands:
+//
 //	"Toggle" - See RelayDriver.Toggle
 //	"On" - See RelayDriver.On
 //	"Off" - See RelayDriver.Off

@@ -7,7 +7,7 @@ This package provides drivers for [SPI](https://en.wikipedia.org/wiki/Serial_Per
 ## Installing
 
 ```sh
-go get -d -u gobot.io/x/gobot/...
+go get -d -u gobot.io/x/gobot/v2/...
 ```
 
 ## Hardware Support

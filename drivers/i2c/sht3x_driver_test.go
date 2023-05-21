@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/gobottest"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/gobottest"
 )
 
 // this ensures that the implementation is based on i2c.Driver, which implements the gobot.Driver
@@ -174,7 +174,7 @@ func TestSHT3xHeater(t *testing.T) {
 		return 3, nil
 	}
 
-	status, err = d.Heater()
+	_, err = d.Heater()
 	gobottest.Assert(t, err, ErrInvalidCrc)
 
 	// heater read failed
@@ -183,7 +183,7 @@ func TestSHT3xHeater(t *testing.T) {
 		return 2, nil
 	}
 
-	status, err = d.Heater()
+	_, err = d.Heater()
 	gobottest.Refute(t, err, nil)
 }
 

@@ -44,7 +44,9 @@ const SHT3xAccuracyMedium = 0x0b
 const SHT3xAccuracyHigh = 0x00
 
 var (
-	crc8Params         = crc8.Params{0x31, 0xff, false, false, 0x00, 0xf7, "CRC-8/SENSIRON"}
+	crc8Params = crc8.Params{
+		Poly: 0x31, Init: 0xff, RefIn: false, RefOut: false, XorOut: 0x00, Check: 0xf7, Name: "CRC-8/SENSIRON",
+	}
 	ErrInvalidAccuracy = errors.New("Invalid accuracy")
 	ErrInvalidCrc      = errors.New("Invalid crc")
 	ErrInvalidTemp     = errors.New("Invalid temperature units")
@@ -128,7 +130,7 @@ func (s *SHT3xDriver) Heater() (status bool, err error) {
 // SetHeater enables or disables the heater on the device
 func (s *SHT3xDriver) SetHeater(enabled bool) (err error) {
 	out := []byte{0x30, 0x66}
-	if true == enabled {
+	if enabled {
 		out[1] = 0x6d
 	}
 	_, err = s.connection.Write(out)

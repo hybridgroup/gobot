@@ -1,4 +1,6 @@
+//go:build example
 // +build example
+
 //
 // Do not build by default.
 
@@ -7,9 +9,9 @@ package main
 import (
 	"fmt"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/platforms/mavlink"
-	common "gobot.io/x/gobot/platforms/mavlink/common"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/platforms/mavlink"
+	common "gobot.io/x/gobot/v2/platforms/mavlink/common"
 )
 
 func main() {

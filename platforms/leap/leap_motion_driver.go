@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"io"
 
-	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/v2"
 	"golang.org/x/net/websocket"
 )
 
@@ -28,9 +28,10 @@ type Driver struct {
 // NewDriver creates a new leap motion driver
 //
 // Adds the following events:
-//		"message" - Gets triggered when receiving a message from leap motion
-//		"hand" - Gets triggered per-message when leap motion detects a hand
-//		"gesture" - Gets triggered per-message when leap motion detects a gesture
+//
+//	"message" - Gets triggered when receiving a message from leap motion
+//	"hand" - Gets triggered per-message when leap motion detects a hand
+//	"gesture" - Gets triggered per-message when leap motion detects a gesture
 func NewDriver(a *Adaptor) *Driver {
 	l := &Driver{
 		name:       gobot.DefaultName("LeapMotion"),
@@ -79,15 +80,16 @@ func enableFeature(l *Driver, feature string) (err error) {
 // and listening from incoming messages.
 //
 // Publishes the following events:
-//		"message" - Emits Frame on new message received from Leap.
-//		"hand" - Emits Hand when detected in message from Leap.
-//		"gesture" - Emits Gesture when detected in message from Leap.
+//
+//	"message" - Emits Frame on new message received from Leap.
+//	"hand" - Emits Hand when detected in message from Leap.
+//	"gesture" - Emits Gesture when detected in message from Leap.
 func (l *Driver) Start() (err error) {
-	err = enableFeature(l,"enableGestures")
+	err = enableFeature(l, "enableGestures")
 	if err != nil {
 		return err
 	}
-	err = enableFeature(l,"background")
+	err = enableFeature(l, "background")
 	if err != nil {
 		return err
 	}

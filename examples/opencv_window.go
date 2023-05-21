@@ -1,12 +1,14 @@
+//go:build example
 // +build example
+
 //
 // Do not build by default.
 
 package main
 
 import (
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/platforms/opencv"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/platforms/opencv"
 	"gocv.io/x/gocv"
 )
 

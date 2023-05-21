@@ -8,11 +8,11 @@ import (
 	"strings"
 	"testing"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/aio"
-	"gobot.io/x/gobot/drivers/gpio"
-	"gobot.io/x/gobot/gobottest"
-	"gobot.io/x/gobot/platforms/firmata/client"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/drivers/aio"
+	"gobot.io/x/gobot/v2/drivers/gpio"
+	"gobot.io/x/gobot/v2/gobottest"
+	"gobot.io/x/gobot/v2/platforms/firmata/client"
 )
 
 // make sure that this Adaptor fulfills all required analog and digital interfaces

@@ -1,4 +1,6 @@
+//go:build example
 // +build example
+
 //
 // Do not build by default.
 
@@ -13,8 +15,8 @@ package main
 import (
 	"time"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/platforms/holystone/hs200"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/platforms/holystone/hs200"
 )
 
 func main() {

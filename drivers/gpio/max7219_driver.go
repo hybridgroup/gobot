@@ -1,7 +1,7 @@
 package gpio
 
 import (
-	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/v2"
 )
 
 // Access and command constants for the driver

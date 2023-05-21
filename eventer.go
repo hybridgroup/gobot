@@ -63,14 +63,12 @@ func NewEventer() Eventer {
 	// goroutine to cascade "in" events to all "out" event channels
 	go func() {
 		for {
-			select {
-			case evt := <-evtr.in:
-				evtr.eventsMutex.Lock()
-				for _, out := range evtr.outs {
-					out <- evt
-				}
-				evtr.eventsMutex.Unlock()
+			evt := <-evtr.in
+			evtr.eventsMutex.Lock()
+			for _, out := range evtr.outs {
+				out <- evt
 			}
+			evtr.eventsMutex.Unlock()
 		}
 	}()
 
@@ -125,11 +123,9 @@ func (e *eventer) On(n string, f func(s interface{})) (err error) {
 	out := e.Subscribe()
 	go func() {
 		for {
-			select {
-			case evt := <-out:
-				if evt.Name == n {
-					f(evt.Data)
-				}
+			evt := <-out
+			if evt.Name == n {
+				f(evt.Data)
 			}
 		}
 	}()

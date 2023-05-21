@@ -7,8 +7,8 @@ import (
 	"testing"
 	"unsafe"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/gobottest"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/gobottest"
 )
 
 const dev = "/dev/i2c-1"
@@ -548,7 +548,7 @@ func Test_queryFunctionality(t *testing.T) {
 		"dev_null_error": {
 			dev:         os.DevNull,
 			syscallImpl: getSyscallFuncImpl(0x00),
-			wantErr:     " : /dev/null: No such file.",
+			wantErr:     " : /dev/null: no such file",
 		},
 		"query_funcs_error": {
 			dev:         dev,

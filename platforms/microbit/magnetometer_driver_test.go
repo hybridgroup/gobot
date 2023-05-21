@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/gobottest"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Driver = (*MagnetometerDriver)(nil)
@@ -30,7 +30,7 @@ func TestMagnetometerDriverStartAndHalt(t *testing.T) {
 }
 
 func TestMagnetometerDriverReadData(t *testing.T) {
-	sem := make(chan bool, 0)
+	sem := make(chan bool)
 	a := NewBleTestAdaptor()
 	d := NewMagnetometerDriver(a)
 	d.Start()

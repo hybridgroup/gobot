@@ -78,7 +78,7 @@ The current UP2 firmware is not able to scan for I2C devices using the `i2cdetec
 You would normally install Go and Gobot on your local workstation. Once installed, cross compile your program on your workstation, transfer the final executable to your UP2, and run the program on the UP2 as documented below.
 
 ```
-go get -d -u gobot.io/x/gobot/...
+go get -d -u gobot.io/x/gobot/v2/...
 ```
 
 ## How to Use

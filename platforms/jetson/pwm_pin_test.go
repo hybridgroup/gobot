@@ -4,9 +4,9 @@ import (
 	"errors"
 	"testing"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/gobottest"
-	"gobot.io/x/gobot/system"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/gobottest"
+	"gobot.io/x/gobot/v2/system"
 )
 
 var _ gobot.PWMPinner = (*PWMPin)(nil)
@@ -31,12 +31,12 @@ func TestPwmPin(t *testing.T) {
 	val, _ = pin.Polarity()
 	gobottest.Assert(t, val, true)
 
-	period, err := pin.Period()
+	_, err := pin.Period()
 	gobottest.Assert(t, err, errors.New("Jetson PWM pin period not set"))
 	gobottest.Assert(t, pin.SetDutyCycle(10000), errors.New("Jetson PWM pin period not set"))
 
 	gobottest.Assert(t, pin.SetPeriod(20000000), nil)
-	period, _ = pin.Period()
+	period, _ := pin.Period()
 	gobottest.Assert(t, period, uint32(20000000))
 	gobottest.Assert(t, pin.SetPeriod(10000000), errors.New("Cannot set the period of individual PWM pins on Jetson"))
 

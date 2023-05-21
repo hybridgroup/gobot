@@ -6,7 +6,7 @@ Installing:
 This package requires `sdl2` to be installed on your system
 Then install package with:
 
-	go get gobot.io/x/gobot/platforms/joystick
+	go get gobot.io/x/gobot/v2/platforms/joystick
 
 Example:
 
@@ -15,8 +15,8 @@ Example:
 	import (
 		"fmt"
 
-		"gobot.io/x/gobot"
-		"gobot.io/x/gobot/platforms/joystick"
+		"gobot.io/x/gobot/v2"
+		"gobot.io/x/gobot/v2/platforms/joystick"
 	)
 
 	func main() {
@@ -64,4 +64,4 @@ Example:
 For further information refer to joystick README:
 https://github.com/hybridgroup/gobot/blob/master/platforms/joystick/README.md
 */
-package joystick // import "gobot.io/x/gobot/platforms/joystick"
+package joystick // import "gobot.io/x/gobot/v2/platforms/joystick"

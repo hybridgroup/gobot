@@ -3,8 +3,8 @@ package mavlink
 import (
 	"time"
 
-	"gobot.io/x/gobot"
-	common "gobot.io/x/gobot/platforms/mavlink/common"
+	"gobot.io/x/gobot/v2"
+	common "gobot.io/x/gobot/v2/platforms/mavlink/common"
 )
 
 const (
@@ -31,6 +31,7 @@ type MavlinkInterface interface {
 // NewDriver creates a new mavlink driver.
 //
 // It add the following events:
+//
 //	"packet" - triggered when a new packet is read
 //	"message" - triggered when a new valid message is processed
 func NewDriver(a BaseAdaptor, v ...time.Duration) *Driver {

@@ -17,10 +17,8 @@ func Every(t time.Duration, f func()) *time.Ticker {
 
 	go func() {
 		for {
-			select {
-			case <-ticker.C:
-				f()
-			}
+			<-ticker.C
+			f()
 		}
 	}()
 

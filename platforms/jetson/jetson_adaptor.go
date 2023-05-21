@@ -6,9 +6,9 @@ import (
 	"sync"
 
 	multierror "github.com/hashicorp/go-multierror"
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/platforms/adaptors"
-	"gobot.io/x/gobot/system"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/platforms/adaptors"
+	"gobot.io/x/gobot/v2/system"
 )
 
 const (
@@ -37,8 +37,9 @@ type Adaptor struct {
 // NewAdaptor creates a Jetson Nano adaptor
 //
 // Optional parameters:
-//		adaptors.WithGpiodAccess():	use character device gpiod driver instead of sysfs
-//		adaptors.WithSpiGpioAccess(sclk, nss, mosi, miso):	use GPIO's instead of /dev/spidev#.#
+//
+//	adaptors.WithGpiodAccess():	use character device gpiod driver instead of sysfs
+//	adaptors.WithSpiGpioAccess(sclk, nss, mosi, miso):	use GPIO's instead of /dev/spidev#.#
 func NewAdaptor(opts ...func(adaptors.Optioner)) *Adaptor {
 	sys := system.NewAccesser()
 	c := &Adaptor{
@@ -111,7 +112,7 @@ func (c *Adaptor) Finalize() error {
 	return err
 }
 
-//PWMPin returns a Jetson Nano. PWMPin which provides the gobot.PWMPinner interface
+// PWMPin returns a Jetson Nano. PWMPin which provides the gobot.PWMPinner interface
 func (c *Adaptor) PWMPin(pin string) (gobot.PWMPinner, error) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()

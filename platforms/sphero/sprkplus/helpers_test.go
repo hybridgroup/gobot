@@ -3,7 +3,7 @@ package sprkplus
 import (
 	"sync"
 
-	"gobot.io/x/gobot/platforms/ble"
+	"gobot.io/x/gobot/v2/platforms/ble"
 )
 
 var _ ble.BLEConnector = (*bleTestClientAdaptor)(nil)

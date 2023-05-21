@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/v2"
 
 	"tinygo.org/x/bluetooth"
 )
@@ -100,12 +100,10 @@ func (b *ClientAdaptor) Connect() (err error) {
 	}
 
 	// wait to connect to peripheral device
-	select {
-	case result := <-ch:
-		b.device, err = b.adpt.Connect(result.Address, bluetooth.ConnectionParams{})
-		if err != nil {
-			return err
-		}
+	result := <-ch
+	b.device, err = b.adpt.Connect(result.Address, bluetooth.ConnectionParams{})
+	if err != nil {
+		return err
 	}
 
 	// get all services/characteristics

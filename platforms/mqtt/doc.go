@@ -3,9 +3,9 @@ Package mqtt provides Gobot adaptor for the mqtt message service.
 
 Installing:
 
-  go get gobot.io/x/gobot/platforms/mqtt
+  go get gobot.io/x/gobot/v2/platforms/mqtt
 
 For further information refer to mqtt README:
 https://github.com/hybridgroup/gobot/blob/master/platforms/mqtt/README.md
 */
-package mqtt // import "gobot.io/x/gobot/platforms/mqtt"
+package mqtt // import "gobot.io/x/gobot/v2/platforms/mqtt"

@@ -6,13 +6,13 @@ import (
 	"strings"
 	"testing"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/aio"
-	"gobot.io/x/gobot/drivers/gpio"
-	"gobot.io/x/gobot/drivers/i2c"
-	"gobot.io/x/gobot/drivers/spi"
-	"gobot.io/x/gobot/gobottest"
-	"gobot.io/x/gobot/system"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/drivers/aio"
+	"gobot.io/x/gobot/v2/drivers/gpio"
+	"gobot.io/x/gobot/v2/drivers/i2c"
+	"gobot.io/x/gobot/v2/drivers/spi"
+	"gobot.io/x/gobot/v2/gobottest"
+	"gobot.io/x/gobot/v2/system"
 )
 
 // make sure that this Adaptor fulfills all the required interfaces
@@ -135,7 +135,7 @@ func TestDigitalIO(t *testing.T) {
 
 	// no such LED
 	err := a.DigitalWrite("usr10101", 1)
-	gobottest.Assert(t, err.Error(), " : /sys/class/leds/beaglebone:green:usr10101/brightness: No such file.")
+	gobottest.Assert(t, err.Error(), " : /sys/class/leds/beaglebone:green:usr10101/brightness: no such file")
 
 	a.DigitalWrite("P9_12", 1)
 	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio60/value"].Contents, "1")
@@ -168,7 +168,7 @@ func TestAnalogReadFileError(t *testing.T) {
 	a, _ := initTestAdaptorWithMockedFilesystem(mockPaths)
 
 	_, err := a.AnalogRead("P9_40")
-	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/bus/iio/devices/iio:device0/in_voltage1_raw: No such file."), true)
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/bus/iio/devices/iio:device0/in_voltage1_raw: no such file"), true)
 }
 
 func TestDigitalPinDirectionFileError(t *testing.T) {
@@ -181,7 +181,7 @@ func TestDigitalPinDirectionFileError(t *testing.T) {
 	a, _ := initTestAdaptorWithMockedFilesystem(mockPaths)
 
 	err := a.DigitalWrite("P9_12", 1)
-	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/gpio60/direction: No such file."), true)
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/gpio60/direction: no such file"), true)
 
 	// no pin added after previous problem, so no pin to unexport in finalize
 	err = a.Finalize()
@@ -202,7 +202,7 @@ func TestDigitalPinFinalizeFileError(t *testing.T) {
 	gobottest.Assert(t, err, nil)
 
 	err = a.Finalize()
-	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/unexport: No such file."), true)
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/unexport: no such file"), true)
 }
 
 func TestPocketName(t *testing.T) {

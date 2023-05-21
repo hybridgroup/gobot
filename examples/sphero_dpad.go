@@ -1,4 +1,6 @@
+//go:build example
 // +build example
+
 //
 // Do not build by default.
 
@@ -7,9 +9,9 @@ package main
 import (
 	"time"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/api"
-	"gobot.io/x/gobot/platforms/sphero"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/api"
+	"gobot.io/x/gobot/v2/platforms/sphero"
 )
 
 func main() {

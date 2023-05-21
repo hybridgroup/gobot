@@ -1,6 +1,6 @@
 package mqtt
 
-import "gobot.io/x/gobot"
+import "gobot.io/x/gobot/v2"
 
 const (
 	// Data event when data is available for Driver

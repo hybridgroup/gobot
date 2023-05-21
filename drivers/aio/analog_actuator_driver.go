@@ -3,7 +3,7 @@ package aio
 import (
 	"strconv"
 
-	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/v2"
 )
 
 // AnalogActuatorDriver represents an analog actuator
@@ -23,8 +23,9 @@ type AnalogActuatorDriver struct {
 // The default scaling is 1:1. An adjustable linear scaler is provided by the driver.
 //
 // Adds the following API Commands:
-// 	"Write"    - See AnalogActuator.Write
-// 	"RawWrite" - See AnalogActuator.RawWrite
+//
+//	"Write"    - See AnalogActuator.Write
+//	"RawWrite" - See AnalogActuator.RawWrite
 func NewAnalogActuatorDriver(a AnalogWriter, pin string) *AnalogActuatorDriver {
 	d := &AnalogActuatorDriver{
 		name:       gobot.DefaultName("AnalogActuator"),

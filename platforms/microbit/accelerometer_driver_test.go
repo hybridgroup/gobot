@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/gobottest"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Driver = (*AccelerometerDriver)(nil)
@@ -30,7 +30,7 @@ func TestAccelerometerDriverStartAndHalt(t *testing.T) {
 }
 
 func TestAccelerometerDriverReadData(t *testing.T) {
-	sem := make(chan bool, 0)
+	sem := make(chan bool)
 	a := NewBleTestAdaptor()
 	d := NewAccelerometerDriver(a)
 	d.Start()

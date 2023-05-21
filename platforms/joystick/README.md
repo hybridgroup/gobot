@@ -41,7 +41,7 @@ cd SDL2-2.0.8/
 Now you can install the package with
 
 ```
-go get -d -u gobot.io/x/gobot/...
+go get -d -u gobot.io/x/gobot/v2/...
 ```
 
 ## How to Use
@@ -65,8 +65,8 @@ package main
 import (
 	"fmt"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/platforms/joystick"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/platforms/joystick"
 )
 
 func main() {

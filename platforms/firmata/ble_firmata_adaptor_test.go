@@ -1,3 +1,4 @@
+//go:build !windows
 // +build !windows
 
 package firmata
@@ -6,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/gobottest"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Adaptor = (*BLEAdaptor)(nil)

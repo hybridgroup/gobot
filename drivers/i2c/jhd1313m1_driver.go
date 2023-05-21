@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"time"
 
-	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/v2"
 )
 
 const (
@@ -86,11 +86,12 @@ type JHD1313M1Driver struct {
 
 // NewJHD1313M1Driver creates a new driver with specified i2c interface.
 // Params:
-//		conn Connector - the Adaptor to use with this Driver
+//
+//	conn Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//		i2c.WithBus(int):	bus to use with this driver
 //
+//	i2c.WithBus(int):	bus to use with this driver
 func NewJHD1313M1Driver(a Connector, options ...func(Config)) *JHD1313M1Driver {
 	j := &JHD1313M1Driver{
 		name:       gobot.DefaultName("JHD1313M1"),

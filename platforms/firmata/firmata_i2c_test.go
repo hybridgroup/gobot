@@ -6,10 +6,10 @@ import (
 	"testing"
 	"time"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/i2c"
-	"gobot.io/x/gobot/gobottest"
-	"gobot.io/x/gobot/platforms/firmata/client"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/drivers/i2c"
+	"gobot.io/x/gobot/v2/gobottest"
+	"gobot.io/x/gobot/v2/platforms/firmata/client"
 )
 
 // make sure that this Adaptor fulfills all required I2C interfaces

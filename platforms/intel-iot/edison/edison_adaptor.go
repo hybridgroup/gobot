@@ -7,9 +7,9 @@ import (
 	"sync"
 
 	multierror "github.com/hashicorp/go-multierror"
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/platforms/adaptors"
-	"gobot.io/x/gobot/system"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/platforms/adaptors"
+	"gobot.io/x/gobot/v2/system"
 )
 
 const (
@@ -263,7 +263,7 @@ func (c *Adaptor) arduinoI2CSetup() error {
 
 func (c *Adaptor) readFile(path string) ([]byte, error) {
 	file, err := c.sys.OpenFile(path, os.O_RDONLY, 0644)
-	defer file.Close()
+	defer file.Close() //nolint:staticcheck // for historical reasons
 	if err != nil {
 		return make([]byte, 0), err
 	}
@@ -379,7 +379,7 @@ func (c *Adaptor) newExportedDigitalPin(pin int, o ...func(gobot.DigitalPinOptio
 // changePinMode writes pin mode to current_pinmux file
 func (c *Adaptor) changePinMode(pin, mode string) error {
 	file, err := c.sys.OpenFile("/sys/kernel/debug/gpio_debug/gpio"+pin+"/current_pinmux", os.O_WRONLY, 0644)
-	defer file.Close()
+	defer file.Close() //nolint:staticcheck // for historical reasons
 	if err != nil {
 		return err
 	}

@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/platforms/ble"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/platforms/ble"
 )
 
 // Driver is the Gobot interface to the Parrot Minidrone
@@ -396,11 +396,11 @@ func (b *Driver) LeftFlip() (err error) {
 // LightControl controls lights on those Minidrone models which
 // have the correct hardware, such as the Maclane, Blaze, & Swat.
 // Params:
-//		id - always 0
-//		mode - either LightFixed, LightBlinked, or LightOscillated
-//		intensity - Light intensity from 0 (OFF) to 100 (Max intensity).
-// 					Only used in LightFixed mode.
 //
+//	id - always 0
+//	mode - either LightFixed, LightBlinked, or LightOscillated
+//	intensity - Light intensity from 0 (OFF) to 100 (Max intensity).
+//				Only used in LightFixed mode.
 func (b *Driver) LightControl(id uint8, mode uint8, intensity uint8) (err error) {
 	b.stepsfa0b++
 	buf := []byte{0x02, byte(b.stepsfa0b) & 0xff, 0x02, 0x10, 0x00, id, mode, intensity, 0x00}
@@ -410,9 +410,9 @@ func (b *Driver) LightControl(id uint8, mode uint8, intensity uint8) (err error)
 
 // ClawControl controls the claw on the Parrot Mambo
 // Params:
-//		id - always 0
-//		mode - either ClawOpen or ClawClosed
 //
+//	id - always 0
+//	mode - either ClawOpen or ClawClosed
 func (b *Driver) ClawControl(id uint8, mode uint8) (err error) {
 	b.stepsfa0b++
 	buf := []byte{0x02, byte(b.stepsfa0b) & 0xff, 0x02, 0x10, 0x01, id, mode, 0x00}
@@ -422,8 +422,8 @@ func (b *Driver) ClawControl(id uint8, mode uint8) (err error) {
 
 // GunControl fires the gun on the Parrot Mambo
 // Params:
-//		id - always 0
 //
+//	id - always 0
 func (b *Driver) GunControl(id uint8) (err error) {
 	b.stepsfa0b++
 	buf := []byte{0x02, byte(b.stepsfa0b) & 0xff, 0x02, 0x10, 0x02, id, 0x00}

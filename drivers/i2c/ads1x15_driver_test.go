@@ -4,9 +4,9 @@ import (
 	"errors"
 	"testing"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/aio"
-	"gobot.io/x/gobot/gobottest"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/drivers/aio"
+	"gobot.io/x/gobot/v2/gobottest"
 )
 
 // this ensures that the implementation is based on i2c.Driver, which implements the gobot.Driver
@@ -96,9 +96,9 @@ func TestADS1x15CommandsAnalogRead(t *testing.T) {
 }
 
 func TestADS1x15_ads1x15BestGainForVoltage(t *testing.T) {
-	g, err := ads1x15BestGainForVoltage(1.5)
+	g, _ := ads1x15BestGainForVoltage(1.5)
 	gobottest.Assert(t, g, 2)
 
-	g, err = ads1x15BestGainForVoltage(20.0)
+	_, err := ads1x15BestGainForVoltage(20.0)
 	gobottest.Assert(t, err, errors.New("The maximum voltage which can be read is 6.144000"))
 }

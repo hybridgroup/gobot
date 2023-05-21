@@ -118,7 +118,7 @@ func newMockFilesystem(items []string) *MockFilesystem {
 }
 
 // OpenFile opens file name from fs.Files, if the file does not exist it returns an os.PathError
-func (fs *MockFilesystem) openFile(name string, flag int, perm os.FileMode) (file File, err error) {
+func (fs *MockFilesystem) openFile(name string, _ int, _ os.FileMode) (file File, err error) {
 	f, ok := fs.Files[name]
 	if ok {
 		f.Opened = true
@@ -126,7 +126,7 @@ func (fs *MockFilesystem) openFile(name string, flag int, perm os.FileMode) (fil
 		return f, nil
 	}
 
-	return (*MockFile)(nil), &os.PathError{Err: fmt.Errorf("%s: No such file.", name)}
+	return (*MockFile)(nil), &os.PathError{Err: fmt.Errorf("%s: no such file", name)}
 }
 
 // Stat returns a generic FileInfo for all files in fs.Files.
@@ -158,7 +158,7 @@ func (fs *MockFilesystem) stat(name string) (os.FileInfo, error) {
 		}
 	}
 
-	return nil, &os.PathError{Err: fmt.Errorf("%s: No such file.", name)}
+	return nil, &os.PathError{Err: fmt.Errorf("%s: no such file", name)}
 }
 
 // Find returns all items (files or folders) below the given directory matching the given pattern.
@@ -173,10 +173,8 @@ func (fs *MockFilesystem) find(baseDir string, pattern string) ([]string, error)
 		if !strings.HasPrefix(name, baseDir) {
 			continue
 		}
-		item := name[len(baseDir):]
-		if strings.HasPrefix(item, "/") {
-			item = item[1:]
-		}
+		item := strings.TrimPrefix(name[len(baseDir):], "/")
+
 		firstItem := strings.Split(item, "/")[0]
 		if reg.MatchString(firstItem) {
 			found = append(found, path.Join(baseDir, firstItem))
@@ -193,7 +191,7 @@ func (fs *MockFilesystem) readFile(name string) ([]byte, error) {
 
 	f, ok := fs.Files[name]
 	if !ok {
-		return nil, &os.PathError{Err: fmt.Errorf("%s: No such file.", name)}
+		return nil, &os.PathError{Err: fmt.Errorf("%s: no such file", name)}
 	}
 	return []byte(f.Contents), nil
 }

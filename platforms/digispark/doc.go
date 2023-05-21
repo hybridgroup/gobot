@@ -6,7 +6,7 @@ Installing:
 This package requires installing `libusb`.
 Then you can install the package with:
 
-	go get -u -d gobot.io/x/gobot/platforms/digispark
+	go get -u -d gobot.io/x/gobot/v2/platforms/digispark
 
 Example:
 
@@ -15,9 +15,9 @@ Example:
 	import (
 		"time"
 
-		"gobot.io/x/gobot"
-		"gobot.io/x/gobot/drivers/gpio"
-		"gobot.io/x/gobot/platforms/digispark"
+		"gobot.io/x/gobot/v2"
+		"gobot.io/x/gobot/v2/drivers/gpio"
+		"gobot.io/x/gobot/v2/platforms/digispark"
 	)
 
 	func main() {
@@ -42,4 +42,4 @@ Example:
 For further information refer to digispark README:
 https://github.com/hybridgroup/gobot/blob/master/platforms/digispark/README.md
 */
-package digispark // import "gobot.io/x/gobot/platforms/digispark"
+package digispark // import "gobot.io/x/gobot/v2/platforms/digispark"

@@ -5,9 +5,9 @@ import (
 	"sync"
 
 	multierror "github.com/hashicorp/go-multierror"
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/platforms/adaptors"
-	"gobot.io/x/gobot/system"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/platforms/adaptors"
+	"gobot.io/x/gobot/v2/system"
 )
 
 const defaultI2cBusNumber = 0
@@ -46,8 +46,9 @@ var fixedPins = map[string]int{
 // NewAdaptor creates a DragonBoard 410c Adaptor
 //
 // Optional parameters:
-//		adaptors.WithGpiodAccess():	use character device gpiod driver instead of sysfs
-//		adaptors.WithSpiGpioAccess(sclk, nss, mosi, miso):	use GPIO's instead of /dev/spidev#.#
+//
+//	adaptors.WithGpiodAccess():	use character device gpiod driver instead of sysfs
+//	adaptors.WithSpiGpioAccess(sclk, nss, mosi, miso):	use GPIO's instead of /dev/spidev#.#
 func NewAdaptor(opts ...func(adaptors.Optioner)) *Adaptor {
 	sys := system.NewAccesser()
 	c := &Adaptor{

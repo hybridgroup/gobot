@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/gobottest"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Driver = (*ButtonDriver)(nil)
@@ -35,7 +35,7 @@ func TestButtonDriver(t *testing.T) {
 }
 
 func TestButtonDriverStart(t *testing.T) {
-	sem := make(chan bool, 0)
+	sem := make(chan bool)
 	a := newGpioTestAdaptor()
 	d := NewButtonDriver(a, "1")
 
@@ -107,7 +107,7 @@ func TestButtonDriverStart(t *testing.T) {
 }
 
 func TestButtonDriverDefaultState(t *testing.T) {
-	sem := make(chan bool, 0)
+	sem := make(chan bool)
 	a := newGpioTestAdaptor()
 	d := NewButtonDriver(a, "1")
 	d.DefaultState = 1

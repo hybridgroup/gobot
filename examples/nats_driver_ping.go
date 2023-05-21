@@ -1,13 +1,16 @@
+//go:build example
 // +build example
+
 //
 // Do not build by default.
 
 // TO RUN:
-//  go run ./examples/nats_driver_ping.go <SERVER>
+//
+//	go run ./examples/nats_driver_ping.go <SERVER>
 //
 // EXAMPLE:
-//	go run ./examples/nats_driver_ping.go tls://nats.demo.io:4443
 //
+//	go run ./examples/nats_driver_ping.go tls://nats.demo.io:4443
 package main
 
 import (
@@ -15,8 +18,8 @@ import (
 	"os"
 	"time"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/platforms/nats"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/platforms/nats"
 )
 
 func main() {

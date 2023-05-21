@@ -11,10 +11,10 @@ import (
 	"strconv"
 	"sync"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/gpio"
-	"gobot.io/x/gobot/gobottest"
-	"gobot.io/x/gobot/system"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/drivers/gpio"
+	"gobot.io/x/gobot/v2/gobottest"
+	"gobot.io/x/gobot/v2/system"
 )
 
 // make sure that this adaptor fulfills all the required interfaces
@@ -101,7 +101,7 @@ func TestDigitalPinsFinalize(t *testing.T) {
 	gobottest.Assert(t, a.DigitalWrite("3", 2), nil)
 	delete(fs.Files, "/sys/class/gpio/unexport")
 	err = a.Finalize()
-	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/unexport: No such file"), true)
+	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/unexport: no such file"), true)
 }
 
 func TestDigitalPinsReConnect(t *testing.T) {

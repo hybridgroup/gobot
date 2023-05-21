@@ -3,7 +3,7 @@ package aio
 import (
 	"time"
 
-	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/v2"
 )
 
 // AnalogSensorDriver represents an Analog Sensor
@@ -26,11 +26,13 @@ type AnalogSensorDriver struct {
 // The default scaling is 1:1. An adjustable linear scaler is provided by the driver.
 //
 // Optionally accepts:
-// 	time.Duration: Interval at which the AnalogSensor is polled for new information
+//
+//	time.Duration: Interval at which the AnalogSensor is polled for new information
 //
 // Adds the following API Commands:
-// 	"Read"    - See AnalogDriverSensor.Read
-// 	"ReadRaw" - See AnalogDriverSensor.ReadRaw
+//
+//	"Read"    - See AnalogDriverSensor.Read
+//	"ReadRaw" - See AnalogDriverSensor.ReadRaw
 func NewAnalogSensorDriver(a AnalogReader, pin string, v ...time.Duration) *AnalogSensorDriver {
 	d := &AnalogSensorDriver{
 		name:       gobot.DefaultName("AnalogSensor"),
@@ -66,6 +68,7 @@ func NewAnalogSensorDriver(a AnalogReader, pin string, v ...time.Duration) *Anal
 
 // Start starts the AnalogSensorDriver and reads the sensor at the given interval.
 // Emits the Events:
+//
 //	Data int - Event is emitted on change and represents the current raw reading from the sensor.
 //	Value float64 - Event is emitted on change and represents the current reading from the sensor.
 //	Error error - Event is emitted on error reading from the sensor.

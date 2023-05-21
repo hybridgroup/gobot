@@ -3,7 +3,7 @@ package aio
 import (
 	"time"
 
-	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/v2"
 )
 
 var _ gobot.Driver = (*GroveTemperatureSensorDriver)(nil)
@@ -18,11 +18,13 @@ type GroveTemperatureSensorDriver struct {
 // 10 Milliseconds given an AnalogReader and pin.
 //
 // Optionally accepts:
-// 	time.Duration: Interval at which the sensor is polled for new information (given 0 switch the polling off)
+//
+//	time.Duration: Interval at which the sensor is polled for new information (given 0 switch the polling off)
 //
 // Adds the following API Commands:
-// 	"Read"      - See AnalogDriverSensor.Read
-// 	"ReadValue" - See AnalogDriverSensor.ReadValue
+//
+//	"Read"      - See AnalogDriverSensor.Read
+//	"ReadValue" - See AnalogDriverSensor.ReadValue
 func NewGroveTemperatureSensorDriver(a AnalogReader, pin string, v ...time.Duration) *GroveTemperatureSensorDriver {
 	t := NewTemperatureSensorDriver(a, pin, v...)
 	ntc := TemperatureSensorNtcConf{TC0: 25, R0: 10000.0, B: 3975} //Ohm, R25=10k

@@ -1,4 +1,6 @@
+//go:build example
 // +build example
+
 //
 // Do not build by default.
 
@@ -8,10 +10,10 @@ import (
 	"fmt"
 	"time"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/spi"
-	"gobot.io/x/gobot/platforms/adaptors"
-	"gobot.io/x/gobot/platforms/tinkerboard"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/drivers/spi"
+	"gobot.io/x/gobot/v2/platforms/adaptors"
+	"gobot.io/x/gobot/v2/platforms/tinkerboard"
 )
 
 // Wiring

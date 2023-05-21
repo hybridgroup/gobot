@@ -1,14 +1,14 @@
 package beaglebone
 
 import (
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/platforms/adaptors"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/platforms/adaptors"
 )
 
 // PocketBeagleAdaptor is the Gobot Adaptor for the PocketBeagle
 // For more information check out:
-// 		http://beagleboard.org/pocket
 //
+//	http://beagleboard.org/pocket
 type PocketBeagleAdaptor struct {
 	*Adaptor
 }

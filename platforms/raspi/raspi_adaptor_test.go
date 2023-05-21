@@ -10,12 +10,12 @@ import (
 	"strconv"
 	"sync"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/drivers/gpio"
-	"gobot.io/x/gobot/drivers/i2c"
-	"gobot.io/x/gobot/drivers/spi"
-	"gobot.io/x/gobot/gobottest"
-	"gobot.io/x/gobot/system"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/drivers/gpio"
+	"gobot.io/x/gobot/v2/drivers/i2c"
+	"gobot.io/x/gobot/v2/drivers/spi"
+	"gobot.io/x/gobot/v2/gobottest"
+	"gobot.io/x/gobot/v2/system"
 )
 
 // make sure that this Adaptor fulfills all the required interfaces
@@ -230,7 +230,7 @@ func TestPWMPinsReConnect(t *testing.T) {
 	// assert
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, len(a.pwmPins), 0)
-	_, err = a.PWMPin("35")
+	_, _ = a.PWMPin("35")
 	_, err = a.PWMPin("36")
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, len(a.pwmPins), 2)

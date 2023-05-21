@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"gobot.io/x/gobot"
-	"gobot.io/x/gobot/gobottest"
+	"gobot.io/x/gobot/v2"
+	"gobot.io/x/gobot/v2/gobottest"
 )
 
 // this ensures that the implementation is based on i2c.Driver, which implements the gobot.Driver
@@ -536,19 +536,19 @@ func TestMCP23017SetGPIOPolarityErr(t *testing.T) {
 
 func TestMCP23017_write(t *testing.T) {
 	// clear bit
-	d, a := initTestMCP23017WithStubbedAdaptor(0)
+	d, _ := initTestMCP23017WithStubbedAdaptor(0)
 	port := d.getPort("A")
 	err := d.write(port.IODIR, uint8(7), 0)
 	gobottest.Assert(t, err, nil)
 
 	// set bit
-	d, a = initTestMCP23017WithStubbedAdaptor(0)
+	d, _ = initTestMCP23017WithStubbedAdaptor(0)
 	port = d.getPort("B")
 	err = d.write(port.IODIR, uint8(7), 1)
 	gobottest.Assert(t, err, nil)
 
 	// write error
-	d, a = initTestMCP23017WithStubbedAdaptor(0)
+	d, a := initTestMCP23017WithStubbedAdaptor(0)
 	a.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
 	}

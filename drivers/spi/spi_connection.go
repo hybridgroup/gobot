@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sync"
 
-	"gobot.io/x/gobot"
+	"gobot.io/x/gobot/v2"
 )
 
 const (
