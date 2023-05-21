@@ -11,3 +11,6 @@ count.out
 vendor/
 .idea/
 coverage.txt
+.chglog/chglog_tmp*.md
+.chglog/CHANGELOG.tpl*.md
+.chglog/config.yml
