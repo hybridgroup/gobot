@@ -1,26 +1,30 @@
 # CHANGELOG
 
-## [Unreleased](https://github.com/hybridgroup/gobot/compare/v2.0.0...HEAD)
+## [Unreleased](https://github.com/hybridgroup/gobot/compare/v2.0.1...HEAD)
+
+## [v2.0.1](https://github.com/hybridgroup/gobot/compare/v2.0.0...v2.0.1) (2023-05-21)
+
+### Build
+
+* **style:** add golangci-lint workflow configuration ([#916](https://github.com/hybridgroup/gobot/issues/916))
+* **style:** fix linter findings of "gosimple", "govet" and "staticcheck" ([#917](https://github.com/hybridgroup/gobot/issues/917))
+
+### Bump
+
+* periph.io/x/conn/v3 from 3.6.10 to 3.7.0 ([#913](https://github.com/hybridgroup/gobot/issues/913))
+* github.com/gofrs/uuid from 4.3.0+incompatible to 4.4.0+incompatible ([#914](https://github.com/hybridgroup/gobot/issues/914))
+* golang.org/x/net from 0.1.0 to 0.10.0 ([#915](https://github.com/hybridgroup/gobot/issues/915))
+* github.com/nats-io/nats-server/v2 from 2.1.0 to 2.7.4 ([#906](https://github.com/hybridgroup/gobot/issues/906))
+
+### Core
+
+* fix Semantic Import Versioning for v2 ([#921](https://github.com/hybridgroup/gobot/issues/921))
+
+### Docs
+
+* **core:** adjust changelog generation ([#924](https://github.com/hybridgroup/gobot/issues/924))
 
 ## [v2.0.0](https://github.com/hybridgroup/gobot/compare/v1.16.0...v2.0.0) (2023-05-15)
-
-### bugfix
-
-* I2C connection-bus caching and multiple device usage
-* raspi pwm cache
-* new pwm behaviour of tinkerboard
-* jetson nano pwm feature
-* examples and gopigo3 driver
-* i2c.ReadBlockData(), Read_Data() in digispark and some small other fixes
-* L3GD20H full scale range usage
-* TH02 wrong register usage for read heater
-* MPU6050 wrong initialize and reduced temperature resolution
-* I2C driver typo: change HMC8553L to HMC5883L
-* HMC5883L driver returns wrong values
-* ads1x15 driver not working stable when reading multiple inputs
-* Adafruit1109 driver shows bad characters after Halt()
-* spi.SpiConnection is not gobot.Connection: missing method Connect
-* Stopping and Starting Robot with Raspberry Pi Adapter and LED Driver * LED does not toggle on restart
 
 ### ble
 
@@ -42,6 +46,11 @@
 * rename package "sysfs" to "system"
 * go.mod to 1.17 and all modules incl. code upgrades
 
+## digispark
+
+* add example for generic i2c.Driver
+* fix i2c.ReadBlockData(), Read_Data() and some small other fixes
+
 ### dji tello
 
 * Halt does not terminate all the related goroutines and may wait forever when it is called multiple times
@@ -51,29 +60,45 @@
 * README for gpio, pwm, i2c and add example
 * document fields for flight data
 
-### drivers
+### aio
 
-* ADXL345 use ReadBlockData()
-* CCS811 use ReadBlockData()
-* bmxy8z use ReadBlockData
-* CCS811 use ReadBlockData()
-* BMP180, BMP280 BMP388 BME280 use ReadBlockData()
-* MPL115A2 use ReadBlockData(), WriteByteData()
-* add generic i2c driver
-* add PCF8583 i2c driver
-* add PCA9501 i2c driver
-* add PCA953x i2c driver
-* introduce I2cBusAdaptor for composition in platforms
-* introduce generic i2c.Driver with example for digispark fix missing/wrong entries in README stabilize test
+* analog sensor driver to prevent ReadValue() to get float64
+
+### gopigo3
+
+* fix examples and driver
+
+### gpio
+
 * add advanced digital pin options (pull, bias, drive, debounce, event)
 * add support for new character device Kernel ABI for GPIO
-* analog sensor driver to prevent ReadValue() to get float64
 * add read firmware version and DHT sensors for grovepi
-* SPI using GPIO's plus driver for MFRC522
+
+### i2c
+
+* add generic i2c driver
+* fix I2C connection-bus caching and multiple device usage
+* introduce I2cBusAdaptor for composition in platforms
+* **Adafruit1109:** fix driver shows bad characters after Halt()
+* **ads1x15:** fix driver not working stable when reading multiple inputs
+* **ADXL345:** use ReadBlockData()
+* **bmxy8z:** use ReadBlockData
+* **BMP180, BMP280 BMP388 BME280:** use ReadBlockData()
+* **CCS811:** use ReadBlockData()
+* **HMC5883L:** fix I2C driver typo: change from HMC8553L
+* **HMC5883L:** fix driver returns wrong values
+* **L3GD20H:** fix full scale range usage
+* **MPL115A2:** use ReadBlockData(), WriteByteData()
+* **MPU6050:** fix wrong initialize and reduced temperature resolution
+* **PCA9501:** add driver
+* **PCA953x:** add driver
+* **PCF8583:** add driver
+* **TH02:** fix wrong register usage for read heater
 
 ### jetson nano
 
 * add Jetson Nano adpator
+* fix pwm feature
 
 ### joystick
 
@@ -93,6 +118,17 @@
 
 * add platform ([#902](https://github.com/hybridgroup/gobot/issues/902))
 
+### raspi
+
+* fix  pwm cache
+* fix Stopping and Starting Robot and LED Driver/LED does not toggle on restart
+
+### spi
+
+* fix spi.SpiConnection is not gobot.Connection: missing method Connect
+* using GPIO's is now possible
+* **MFRC522:** add driver
+
 ### test
 
 * increase some timings to make tests a little less fragile
@@ -104,6 +140,10 @@
 * fix keyboard tests and exclude opencv
 * fix PWM related read/write tests
 * add check for examples in Makefile
+
+### tinkerboard
+
+* fix new pwm behaviour
 
 ### BREAKING CANGES
 
