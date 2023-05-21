@@ -4,39 +4,73 @@
 
 We using <https://github.com/git-chglog/git-chglog>, so refer to this side for installation instructions.
 
+It is possible to test the tool by `git-chglog --init` without overriding anything.
+
 ## Usage
 
-Example for a new release "v2.0.0":
+Example for a new release "v2.0.1":
 
 ```sh
+git checkout release
+git pull
 git fetch --tags
-git-chglog --no-case --next-tag 2.0.0 v1.16.0.. > .chglog/chglog_tmp.md
+git checkout dev
+git pull upstream  dev
+git-chglog --config .chglog/config_gobot.yml --no-case --next-tag v2.0.1 v2.0.0.. > .chglog/chglog_tmp.md
 ```
 
 ## Compare
 
 If unsure about any result of running git-chglog, just use:
-`git log  --since=2022-05-02 --pretty="- %s`
+`git log  --since=2022-05-15 --pretty="- %s`
 
 ## Manual adjustment
 
-Because there is no commit style guide yet, some manual work is needed to bring the items in the correct position.
-Please refer to the current CHANGELOG.md to find the correct way. In general we try to use this style:
+Most likely some manual work is needed to bring the items in the correct position. We use the style from
+["keep a changelog"](https://keepachangelog.com/en/1.1.0/), together with the [standard template](https://github.com/git-chglog/example-type-scope-subject/blob/master/CHANGELOG.standard.md).
+The changelog will be generated based on the commit messages, so please follow the
+[Convention for Pull Request Descriptions](../CONTRIBUTING.md).
 
-* titles will be converted to lower case
-* titles are lexical ordered
-* each platform has its own title (e.g. **raspi**)
-* fixes has the title **bugfix**
-* title **api**, **drivers** or **example** is used for changes below related folder
-* title **core** is used for changes of common code, e.g. utilities, system
-* further special titles **build**, **docs** and **test** can be used
+An example for the following commits:
+
+* type(scope): description
+* i2c(PCF8583): added
+* gpio(HD44780): fix wrong constants
+* raspi(PWM): refactor usage
+* docs(core): usage of Kernel driver
+* or alternative: core(docs): usage of Kernel driver
+* build(style): adjust rule for golangci-lint
+
+```md
+### build
+
+* **style**: adjust rule for golangci-lint
+
+### docs
+
+* **core**: usage of Kernel driver
+
+### i2c
+
+* **PCF8583**: added
+
+
+### gpio
+
+* **HD44780**: fix wrong constants
+
+### raspi
+
+* **PWM**: refactor usage
+
+### Type
+
+* **scope:** description
+```
+
+If in doubt, please refer to the current CHANGELOG.md to find the correct way.
 
 ## Finalization
 
 After all work is done in the temporary changelog file, the content can be moved to the real one and the "chglog_tmp.md"
 file can be removed.
-
-## TODO's
-
-* introduce a commit style guide
-* convert the changelog format to a more common style, see <https://github.com/git-chglog/example-type-scope-subject/tree/master>
