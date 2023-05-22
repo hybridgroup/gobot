@@ -50,6 +50,7 @@ func (d *Devices) Each(f func(Device)) {
 	for _, device := range *d {
 		f(device)
 	}
+	return
 }
 
 // Start calls Start on each Device in d
