@@ -15,7 +15,6 @@ jobs:
   "test_core_and_drivers_with_coverage":
     docker:
       - image: cimg/go:1.17
-    working_directory: ./v2
     steps:
       - checkout
       - run:
@@ -23,7 +22,9 @@ jobs:
           command: go version
       - run:
           name: Core and drivers tests
-          command: go test -v -coverprofile=coverage.txt -covermode=atomic . ./drivers/...
+          command:  |
+            cd ./v2
+            go test -v -coverprofile=coverage.txt -covermode=atomic . ./drivers/...
       - run:
           name: Code coverage
           command: |
@@ -32,7 +33,6 @@ jobs:
   "test_platforms":
     docker:
       - image: cimg/go:1.17
-    working_directory: ./v2
     steps:
       - checkout
       - run:
@@ -41,12 +41,13 @@ jobs:
       - run:
           # digispark needs libusb, joystick needs sdl2, opencv needs opencv
           name: Platform tests (except digispark, joystick, opencv)
-          command: go test -v $(go list ./platforms/... | grep -v platforms/digispark | grep -v platforms/joystick | grep -v platforms/opencv)
+          command: |
+            cd ./v2
+            go test -v $(go list ./platforms/... | grep -v platforms/digispark | grep -v platforms/joystick | grep -v platforms/opencv)
   
   "check_examples":
     docker:
       - image: cimg/go:1.17
-    working_directory: ./v2
     steps:
       - checkout
       - run:
@@ -56,6 +57,7 @@ jobs:
           # digispark needs libusb, joystick needs sdl2, opencv needs opencv
           name: Check examples (except digispark, joystick, opencv)
           command: |
+            cd ./v2
             ALL=$(grep -l -r --include "*.go" 'build example' ./)
             SOME=$(grep -L 'digispark' $(grep -L 'joystick' $(grep -L 'gocv' ${ALL})))
             for e in ${SOME} ; do go vet "${e}" ; done
