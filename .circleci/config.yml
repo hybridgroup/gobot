@@ -15,6 +15,7 @@ jobs:
   "test_core_and_drivers_with_coverage":
     docker:
       - image: cimg/go:1.17
+    working_directory: ./v2
     steps:
       - checkout
       - run:
@@ -31,6 +32,7 @@ jobs:
   "test_platforms":
     docker:
       - image: cimg/go:1.17
+    working_directory: ./v2
     steps:
       - checkout
       - run:
@@ -44,6 +46,7 @@ jobs:
   "check_examples":
     docker:
       - image: cimg/go:1.17
+    working_directory: ./v2
     steps:
       - checkout
       - run:
