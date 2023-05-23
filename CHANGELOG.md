@@ -1,6 +1,12 @@
 # CHANGELOG
 
-## [Unreleased](https://github.com/hybridgroup/gobot/compare/v2.0.1...HEAD)
+## [Unreleased](https://github.com/hybridgroup/gobot/compare/v2.0.2...HEAD)
+
+## [v2.0.2](https://github.com/hybridgroup/gobot/compare/v2.0.1...v2.0.2) (2023-05-22)
+
+### Build
+
+* **v2:** fix usage by moving code to a v2 subfolder ([#927](https://github.com/hybridgroup/gobot/issues/927))
 
 ## [v2.0.1](https://github.com/hybridgroup/gobot/compare/v2.0.0...v2.0.1) (2023-05-21)
 
