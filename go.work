@@ -1,0 +1,5 @@
+go 1.17
+
+// this helps go tools and golangci-lint to find the subfolder
+// it is working since Go 1.18 is installed
+use ./v2
