@@ -236,6 +236,7 @@ func NewDriverWithIP(ip string, port string) *Driver {
 		respPort:  port,
 		videoPort: "11111",
 		Eventer:   gobot.NewEventer(),
+		doneCh:    make(chan struct{}, 1),
 	}
 
 	d.AddEvent(ConnectedEvent)
