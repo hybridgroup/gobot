@@ -13,10 +13,10 @@ require (
 	github.com/nats-io/nats.go v1.18.0
 	github.com/pkg/errors v0.9.1
 	github.com/sigurn/crc8 v0.0.0-20220107193325-2243fe600f9f
-	github.com/stretchr/testify v1.8.0
+	github.com/stretchr/testify v1.8.1
 	github.com/urfave/cli v1.22.10
 	github.com/veandco/go-sdl2 v0.4.25
-	github.com/warthog618/gpiod v0.8.0
+	github.com/warthog618/gpiod v0.8.1
 	go.bug.st/serial v1.4.0
 	gocv.io/x/gocv v0.31.0
 	golang.org/x/net v0.10.0
