@@ -21,7 +21,7 @@ require (
 	gocv.io/x/gocv v0.31.0
 	golang.org/x/net v0.10.0
 	periph.io/x/conn/v3 v3.7.0
-	periph.io/x/host/v3 v3.7.2
+	periph.io/x/host/v3 v3.8.2
 	tinygo.org/x/bluetooth v0.6.0
 )
 
