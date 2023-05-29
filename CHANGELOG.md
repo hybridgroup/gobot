@@ -1,12 +1,22 @@
 # CHANGELOG
 
-## [Unreleased](https://github.com/hybridgroup/gobot/compare/v2.0.2...HEAD)
+## [Unreleased](https://github.com/hybridgroup/gobot/compare/v2.1.0...HEAD)
+
+## [v2.1.0](https://github.com/hybridgroup/gobot/compare/v2.0.2...v2.0.3) (2023-05-29)
+
+### Build
+
+* **v2:** revert of [#927](https://github.com/hybridgroup/gobot/pull/927), no usage of a v2 subfolder anymore (issues [#919](https://github.com/hybridgroup/gobot/issues/919), [#920](https://github.com/hybridgroup/gobot/issues/920))
+
+## [v2.0.3](https://github.com/hybridgroup/gobot/compare/v2.0.2...v2.0.3) (2023-05-24)
+
+* accidentally created release without any changes
 
 ## [v2.0.2](https://github.com/hybridgroup/gobot/compare/v2.0.1...v2.0.2) (2023-05-22)
 
 ### Build
 
-* **v2:** fix usage by moving code to a v2 subfolder ([#927](https://github.com/hybridgroup/gobot/issues/927))
+* **v2:** fix usage by moving code to a v2 subfolder ([#927](https://github.com/hybridgroup/gobot/pull/927))
 
 ## [v2.0.1](https://github.com/hybridgroup/gobot/compare/v2.0.0...v2.0.1) (2023-05-21)
 

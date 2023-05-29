@@ -23,7 +23,6 @@ jobs:
       - run:
           name: Core and drivers tests
           command:  |
-            cd ./v2
             go test -v -coverprofile=coverage.txt -covermode=atomic . ./drivers/...
       - run:
           name: Code coverage
@@ -42,7 +41,6 @@ jobs:
           # digispark needs libusb, joystick needs sdl2, opencv needs opencv
           name: Platform tests (except digispark, joystick, opencv)
           command: |
-            cd ./v2
             go test -v $(go list ./platforms/... | grep -v platforms/digispark | grep -v platforms/joystick | grep -v platforms/opencv)
   
   "check_examples":
@@ -57,7 +55,6 @@ jobs:
           # digispark needs libusb, joystick needs sdl2, opencv needs opencv
           name: Check examples (except digispark, joystick, opencv)
           command: |
-            cd ./v2
             ALL=$(grep -l -r --include "*.go" 'build example' ./)
             SOME=$(grep -L 'digispark' $(grep -L 'joystick' $(grep -L 'gocv' ${ALL})))
             for e in ${SOME} ; do go vet "${e}" ; done

@@ -13,7 +13,6 @@ before_test:
   - go env
 
 build_script:
-  - cd ./v2
   - go test -v -cpu=2 .
   - go test -v -cpu=2 ./drivers/aio/...
   - go test -v -cpu=2 ./drivers/i2c/...
