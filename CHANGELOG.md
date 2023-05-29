@@ -6,7 +6,7 @@
 
 ### Build
 
-* **v2:** revert of [#927](https://github.com/hybridgroup/gobot/pull/927), no usage of a v2 subfolder anymore (issues [#919](https://github.com/hybridgroup/gobot/issues/919), [#920](https://github.com/hybridgroup/gobot/issues/920))
+* **v2:** revert of [#927](https://github.com/hybridgroup/gobot/pull/927), no usage of a v2 subfolder anymore (issue [#920](https://github.com/hybridgroup/gobot/issues/920))
 
 ## [v2.0.3](https://github.com/hybridgroup/gobot/compare/v2.0.2...v2.0.3) (2023-05-24)
 
