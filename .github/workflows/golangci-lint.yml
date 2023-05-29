@@ -27,7 +27,7 @@ jobs:
           version: v1.52.2
 
           # Optional: working directory, useful for monorepos
-          working-directory: v2
+          # working-directory: v2
 
           # Optional: golangci-lint command line arguments.
           # mostly there is no problem locally, but on server: "could not import C (cgo preprocessing failed) (typecheck)"
