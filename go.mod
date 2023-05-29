@@ -14,7 +14,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/sigurn/crc8 v0.0.0-20220107193325-2243fe600f9f
 	github.com/stretchr/testify v1.8.3
-	github.com/urfave/cli v1.22.10
+	github.com/urfave/cli v1.22.13
 	github.com/veandco/go-sdl2 v0.4.25
 	github.com/warthog618/gpiod v0.8.1
 	go.bug.st/serial v1.5.0
