@@ -18,7 +18,7 @@ require (
 	github.com/veandco/go-sdl2 v0.4.25
 	github.com/warthog618/gpiod v0.8.1
 	go.bug.st/serial v1.5.0
-	gocv.io/x/gocv v0.31.0
+	gocv.io/x/gocv v0.32.1
 	golang.org/x/net v0.10.0
 	periph.io/x/conn/v3 v3.7.0
 	periph.io/x/host/v3 v3.7.2
