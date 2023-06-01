@@ -2,9 +2,6 @@ module gobot.io/x/gobot/v2
 
 go 1.18
 
-// this causes problems during tests
-exclude github.com/nats-io/nats.go v1.26.0
-
 require (
 	github.com/bmizerany/pat v0.0.0-20210406213842-e4b6760bdd6f
 	github.com/donovanhide/eventsource v0.0.0-20210830082556-c59027999da0
@@ -13,10 +10,10 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/hybridgroup/go-ardrone v0.0.0-20140402002621-b9750d8d7b78
 	github.com/hybridgroup/mjpeg v0.0.0-20140228234708-4680f319790e
-	github.com/nats-io/nats.go v1.25.0
+	github.com/nats-io/nats.go v1.26.0
 	github.com/pkg/errors v0.9.1
 	github.com/sigurn/crc8 v0.0.0-20220107193325-2243fe600f9f
-	github.com/stretchr/testify v1.8.3
+	github.com/stretchr/testify v1.8.4
 	github.com/urfave/cli v1.22.13
 	github.com/veandco/go-sdl2 v0.4.35
 	github.com/warthog618/gpiod v0.8.1
