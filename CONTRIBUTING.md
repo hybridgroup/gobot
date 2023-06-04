@@ -59,9 +59,9 @@ The basics are as follows:
 
 1. Fork the project via the GitHub UI
 
-2. `go get` the upstream repo and set it up as the `upstream` remote and your own repo as the `origin` remote:
+2. `git clone` the upstream repo and set it up as the `upstream` remote and your own repo as the `origin` remote:
 
-    `go get gobot.io/x/gobot/v2`
+    `git clone https://github.com/hybridgroup/gobot.git`
     `cd $GOPATH/src/gobot.io/x/gobot`
     `git remote rename origin upstream`
     `git remote add origin git@github.com/YOUR_GITHUB_NAME/gobot`

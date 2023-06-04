@@ -4,7 +4,7 @@ The Gobot BLE adaptor makes it easy to interact with Bluetooth LE aka Bluetooth 
 
 It is written using the [TinyGo Bluetooh](tinygo.org/x/bluetooth) package.
 
-Learn more about Bluetooth LE at http://en.wikipedia.org/wiki/Bluetooth_low_energy
+Learn more about Bluetooth LE at <http://en.wikipedia.org/wiki/Bluetooth_low_energy>
 
 This package also includes drivers for several well-known BLE Services:
 
@@ -13,13 +13,13 @@ This package also includes drivers for several well-known BLE Services:
 - Generic Access Service
 
 ## How to Install
-```
-go get -d -u gobot.io/x/gobot/v2/...
-```
+
+Please refer to the main [README.md](https://github.com/hybridgroup/gobot/blob/release/README.md)
 
 ### macOS
 
-You need to have XCode installed to be able to compile code that uses the Gobot BLE adaptor on macOS. This is because the `bluetooth` package uses a CGo based implementation.
+You need to have XCode installed to be able to compile code that uses the Gobot BLE adaptor on macOS. This is because the
+`bluetooth` package uses a CGo based implementation.
 
 ### Ubuntu
 
@@ -27,24 +27,28 @@ Everything should already just compile on most Linux systems.
 
 ### Windows
 
-You will need to have a GCC compiler such as [mingw-w64](https://github.com/mingw-w64/mingw-w64) installed in order to use BLE on Windows.
+You will need to have a GCC compiler such as [mingw-w64](https://github.com/mingw-w64/mingw-w64) installed in order to use
+BLE on Windows.
 
 ## How To Connect
 
-When using BLE a "peripheral" aka "server" is something you connect to such a a pulse meter. A "central" aka "client" is what does the connecting, such as your computer or mobile phone.
+When using BLE a "peripheral" aka "server" is something you connect to such a a pulse meter. A "central" aka "client" is
+what does the connecting, such as your computer or mobile phone.
 
-You need to know the BLE ID of the peripheral you want to connect to. The Gobot BLE client adaptor also lets you connect to a peripheral by friendly name.
+You need to know the BLE ID of the peripheral you want to connect to. The Gobot BLE client adaptor also lets you connect
+to a peripheral by friendly name.
 
-### Ubuntu
+### Connect on Ubuntu
 
-On Linux the BLE code will need to run as a root user account. The easiest way to accomplish this is probably to use `go build` to build your program, and then to run the requesting executable using `sudo`.
+On Linux the BLE code will need to run as a root user account. The easiest way to accomplish this is probably to use
+`go build` to build your program, and then to run the requesting executable using `sudo`.
 
 For example:
 
     go build examples/minidrone.go
     sudo ./minidrone AA:BB:CC:DD:EE
 
-### Windows
+### Connect on Windows
 
 Hopefully coming soon...
 
@@ -56,30 +60,30 @@ Here is an example that uses the BLE "Battery" service to retrieve the current c
 package main
 
 import (
-	"fmt"
-	"os"
-	"time"
+  "fmt"
+  "os"
+  "time"
 
-	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/platforms/ble"
+  "gobot.io/x/gobot/v2"
+  "gobot.io/x/gobot/v2/platforms/ble"
 )
 
 func main() {
-	bleAdaptor := ble.NewClientAdaptor(os.Args[1])
-	battery := ble.NewBatteryDriver(bleAdaptor)
+  bleAdaptor := ble.NewClientAdaptor(os.Args[1])
+  battery := ble.NewBatteryDriver(bleAdaptor)
 
-	work := func() {
-		gobot.Every(5*time.Second, func() {
-			fmt.Println("Battery level:", battery.GetBatteryLevel())
-		})
-	}
+  work := func() {
+    gobot.Every(5*time.Second, func() {
+      fmt.Println("Battery level:", battery.GetBatteryLevel())
+    })
+  }
 
-	robot := gobot.NewRobot("bleBot",
-		[]gobot.Connection{bleAdaptor},
-		[]gobot.Device{battery},
-		work,
-	)
+  robot := gobot.NewRobot("bleBot",
+    []gobot.Connection{bleAdaptor},
+    []gobot.Device{battery},
+    work,
+  )
 
-	robot.Start()
+  robot.Start()
 }
 ```

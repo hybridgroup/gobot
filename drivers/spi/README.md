@@ -4,11 +4,7 @@ This package provides drivers for [SPI](https://en.wikipedia.org/wiki/Serial_Per
 
 ## Getting Started
 
-## Installing
-
-```sh
-go get -d -u gobot.io/x/gobot/v2/...
-```
+Please refer to the main [README.md](https://github.com/hybridgroup/gobot/blob/release/README.md)
 
 ## Hardware Support
 

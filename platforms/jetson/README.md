@@ -8,13 +8,10 @@ For more info about the Jetson Nano platform, click [here](https://developer.nvi
 
 ## How to Install
 
-We recommend updating to the latest jetson-nano OS when using the Jetson Nano, however Gobot should also support older versions of the OS, should your application require this.
+Please refer to the main [README.md](https://github.com/hybridgroup/gobot/blob/release/README.md)
 
-You would normally install Go and Gobot on your workstation. Once installed, cross compile your program on your workstation, transfer the final executable to your Jetson Nano, and run the program on the Jetson Nano as documented here.
-
-```
-go get -d -u gobot.io/x/gobot/v2/...
-```
+We recommend updating to the latest jetson-nano OS when using the Jetson Nano, however Gobot should also support older
+versions of the OS, should your application require this.
 
 ## How to Use
 
@@ -24,30 +21,30 @@ The pin numbering used by your Gobot program should match the way your board is 
 package main
 
 import (
-	"time"
+  "time"
 
-	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/drivers/gpio"
-	"gobot.io/x/gobot/v2/platforms/jetson"
+  "gobot.io/x/gobot/v2"
+  "gobot.io/x/gobot/v2/drivers/gpio"
+  "gobot.io/x/gobot/v2/platforms/jetson"
 )
 
 func main() {
-	r := jetson.NewAdaptor()
-	led := gpio.NewLedDriver(r, "40")
+  r := jetson.NewAdaptor()
+  led := gpio.NewLedDriver(r, "40")
 
-	work := func() {
-		gobot.Every(1*time.Second, func() {
-			led.Toggle()
-		})
-	}
+  work := func() {
+    gobot.Every(1*time.Second, func() {
+      led.Toggle()
+    })
+  }
 
-	robot := gobot.NewRobot("blinkBot",
-		[]gobot.Connection{r},
-		[]gobot.Device{led},
-		work,
-	)
+  robot := gobot.NewRobot("blinkBot",
+    []gobot.Connection{r},
+    []gobot.Device{led},
+    work,
+  )
 
-	robot.Start()
+  robot.Start()
 
 }
 ```
@@ -56,9 +53,10 @@ func main() {
 
 ### Compiling
 
-Once you have compiled your code, you can upload your program and execute it on the Jetson Nano from your workstation using the `scp` and `ssh` commands like this:
+Once you have compiled your code, you can upload your program and execute it on the Jetson Nano from your workstation using
+the `scp` and `ssh` commands like this:
 
-```bash
-$ scp jetson-nano_blink jn@192.168.1.xxx:/home/jn/
-$ ssh -t jn@192.168.1.xxx "./jetson-nano_blink"
+```sh
+scp jetson-nano_blink jn@192.168.1.xxx:/home/jn/
+ssh -t jn@192.168.1.xxx "./jetson-nano_blink"
 ```

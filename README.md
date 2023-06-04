@@ -27,12 +27,13 @@ git checkout release
 ```
 
 Afterwards have a look at the [examples directory](./examples). You need to find an example matching your platform for your
-first test (e.g. "raspi_blink.go"). Than build the binary, transfer it to your target and run it.
+first test (e.g. "raspi_blink.go"). Than build the binary (cross compile), transfer it to your target and run it.
 
 `env GOOS=linux GOARCH=arm GOARM=5 go build -o ./output/my_raspi_bink examples/raspi_blink.go`
 
 > Building the code on your local machine with the example code above will create a binary for ARMv5. This is probably not
-> what you need for your specific target platform.
+> what you need for your specific target platform. Please read also the platform specific documentation in the platform
+> subfolders.
 
 ### Create your first project
 
