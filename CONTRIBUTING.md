@@ -47,6 +47,7 @@ Descriptions for each of these will eventually be provided below.
   * If there are commits after yours use “git rebase -i <new_head_branch>”
   * If you have local changes you may need to use “git stash”
   * For git help see [progit](http://git-scm.com/book) which is an awesome (and free) book on git
+* Use one of the latest existing platforms/drivers etc. as a blueprint for creating a new one
 
 ## Creating Pull Requests
 
