@@ -3,7 +3,7 @@ Package neurosky contains the Gobot adaptor and driver for the Neurosky Mindwave
 
 Installing:
 
-	go get gobot.io/x/gobot/v2/platforms/neurosky
+	Please refer to the main [README.md](https://github.com/hybridgroup/gobot/blob/release/README.md)
 
 Example:
 

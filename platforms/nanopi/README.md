@@ -7,16 +7,11 @@ For more info about the NanoPi Boards, go to [https://wiki.friendlyelec.com/wiki
 
 ## How to Install
 
+Please refer to the main [README.md](https://github.com/hybridgroup/gobot/blob/release/README.md)
+
 Tested OS:
 
 * [armbian](https://www.armbian.com/nanopi-neo/) with Debian or Ubuntu
-
-You would normally install Go and Gobot on your workstation. Once installed, cross compile your program on your
-workstation, transfer the final executable to your board, and run the program on the board as documented here.
-
-```sh
-go get -d -u gobot.io/x/gobot/v2/...
-```
 
 ### System access and configuration basics
 

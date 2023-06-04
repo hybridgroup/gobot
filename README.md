@@ -7,87 +7,122 @@
 [![Go Report Card](https://goreportcard.com/badge/hybridgroup/gobot)](https://goreportcard.com/report/hybridgroup/gobot)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/hybridgroup/gobot/blob/master/LICENSE.txt)
 
-Gobot (https://gobot.io/) is a framework using the Go programming language (https://golang.org/) for robotics, physical
+Gobot (<https://gobot.io/>) is a framework using the Go programming language (<https://golang.org/>) for robotics, physical
 computing, and the Internet of Things.
 
 It provides a simple, yet powerful way to create solutions that incorporate multiple, different hardware devices at the
 same time.
 
-Want to run Go directly on microcontrollers? Check out our sister project TinyGo (https://tinygo.org/)
+Want to run Go directly on microcontrollers? Check out our sister project TinyGo (<https://tinygo.org/>)
 
 ## Getting Started
 
-Get the Gobot package by running this command: `go get -d -u gobot.io/x/gobot/v2`
+### Get in touch
+
+Get the Gobot source code by running this commands:
+
+```sh
+git clone https://github.com/hybridgroup/gobot.git
+git checkout release
+```
+
+Afterwards have a look at the [examples directory](./examples). You need to find an example matching your platform for your
+first test (e.g. "raspi_blink.go"). Than build the binary (cross compile), transfer it to your target and run it.
+
+`env GOOS=linux GOARCH=arm GOARM=5 go build -o ./output/my_raspi_bink examples/raspi_blink.go`
+
+> Building the code on your local machine with the example code above will create a binary for ARMv5. This is probably not
+> what you need for your specific target platform. Please read also the platform specific documentation in the platform
+> subfolders.
+
+### Create your first project
+
+Create a new folder and a new Go module project.
+
+```sh
+mkdir ~/my_gobot_example
+go mod init my.gobot.example.com
+```
+
+Copy your example file besides the go.mod file, import the requirements and build.
+
+```sh
+go mod tidy
+env GOOS=linux GOARCH=arm GOARM=5 go build -o ./output/my_raspi_bink raspi_blink.go
+```
+
+Now you are ready to modify the example and test your changes. Start by removing the build directives at the beginning
+of the file.
 
 ## Examples
 
-#### Gobot with Arduino
+### Gobot with Arduino
 
 ```go
 package main
 
 import (
-	"time"
+  "time"
 
-	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/drivers/gpio"
-	"gobot.io/x/gobot/v2/platforms/firmata"
+  "gobot.io/x/gobot/v2"
+  "gobot.io/x/gobot/v2/drivers/gpio"
+  "gobot.io/x/gobot/v2/platforms/firmata"
 )
 
 func main() {
-	firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
-	led := gpio.NewLedDriver(firmataAdaptor, "13")
+  firmataAdaptor := firmata.NewAdaptor("/dev/ttyACM0")
+  led := gpio.NewLedDriver(firmataAdaptor, "13")
 
-	work := func() {
-		gobot.Every(1*time.Second, func() {
-			led.Toggle()
-		})
-	}
+  work := func() {
+    gobot.Every(1*time.Second, func() {
+      led.Toggle()
+    })
+  }
 
-	robot := gobot.NewRobot("bot",
-		[]gobot.Connection{firmataAdaptor},
-		[]gobot.Device{led},
-		work,
-	)
+  robot := gobot.NewRobot("bot",
+    []gobot.Connection{firmataAdaptor},
+    []gobot.Device{led},
+    work,
+  )
 
-	robot.Start()
+  robot.Start()
 }
 ```
 
-#### Gobot with Sphero
+### Gobot with Sphero
 
 ```go
 package main
 
 import (
-	"fmt"
-	"time"
+  "fmt"
+  "time"
 
-	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/platforms/sphero"
+  "gobot.io/x/gobot/v2"
+  "gobot.io/x/gobot/v2/platforms/sphero"
 )
 
 func main() {
-	adaptor := sphero.NewAdaptor("/dev/rfcomm0")
-	driver := sphero.NewSpheroDriver(adaptor)
+  adaptor := sphero.NewAdaptor("/dev/rfcomm0")
+  driver := sphero.NewSpheroDriver(adaptor)
 
-	work := func() {
-		gobot.Every(3*time.Second, func() {
-			driver.Roll(30, uint16(gobot.Rand(360)))
-		})
-	}
+  work := func() {
+    gobot.Every(3*time.Second, func() {
+      driver.Roll(30, uint16(gobot.Rand(360)))
+    })
+  }
 
-	robot := gobot.NewRobot("sphero",
-		[]gobot.Connection{adaptor},
-		[]gobot.Device{driver},
-		work,
-	)
+  robot := gobot.NewRobot("sphero",
+    []gobot.Connection{adaptor},
+    []gobot.Device{driver},
+    work,
+  )
 
-	robot.Start()
+  robot.Start()
 }
 ```
 
-#### "Metal" Gobot
+### "Metal" Gobot
 
 You can use the entire Gobot framework as shown in the examples above ("Classic" Gobot), or you can pick and choose from
 the various Gobot packages to control hardware with nothing but pure idiomatic Golang code ("Metal" Gobot). For example:
@@ -96,26 +131,26 @@ the various Gobot packages to control hardware with nothing but pure idiomatic G
 package main
 
 import (
-	"gobot.io/x/gobot/v2/drivers/gpio"
-	"gobot.io/x/gobot/v2/platforms/intel-iot/edison"
-	"time"
+  "gobot.io/x/gobot/v2/drivers/gpio"
+  "gobot.io/x/gobot/v2/platforms/intel-iot/edison"
+  "time"
 )
 
 func main() {
-	e := edison.NewAdaptor()
-	e.Connect()
+  e := edison.NewAdaptor()
+  e.Connect()
 
-	led := gpio.NewLedDriver(e, "13")
-	led.Start()
+  led := gpio.NewLedDriver(e, "13")
+  led.Start()
 
-	for {
-		led.Toggle()
-		time.Sleep(1000 * time.Millisecond)
-	}
+  for {
+    led.Toggle()
+    time.Sleep(1000 * time.Millisecond)
+  }
 }
 ```
 
-#### "Master" Gobot
+### "Master" Gobot
 
 You can also use the full capabilities of the framework aka "Master Gobot" to control swarms of robots or other features
 such as the built-in API server. For example:
@@ -124,62 +159,62 @@ such as the built-in API server. For example:
 package main
 
 import (
-	"fmt"
-	"time"
+  "fmt"
+  "time"
 
-	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/api"
-	"gobot.io/x/gobot/v2/platforms/sphero"
+  "gobot.io/x/gobot/v2"
+  "gobot.io/x/gobot/v2/api"
+  "gobot.io/x/gobot/v2/platforms/sphero"
 )
 
 func NewSwarmBot(port string) *gobot.Robot {
-	spheroAdaptor := sphero.NewAdaptor(port)
-	spheroDriver := sphero.NewSpheroDriver(spheroAdaptor)
-	spheroDriver.SetName("Sphero" + port)
+  spheroAdaptor := sphero.NewAdaptor(port)
+  spheroDriver := sphero.NewSpheroDriver(spheroAdaptor)
+  spheroDriver.SetName("Sphero" + port)
 
-	work := func() {
-		spheroDriver.Stop()
+  work := func() {
+    spheroDriver.Stop()
 
-		spheroDriver.On(sphero.Collision, func(data interface{}) {
-			fmt.Println("Collision Detected!")
-		})
+    spheroDriver.On(sphero.Collision, func(data interface{}) {
+      fmt.Println("Collision Detected!")
+    })
 
-		gobot.Every(1*time.Second, func() {
-			spheroDriver.Roll(100, uint16(gobot.Rand(360)))
-		})
-		gobot.Every(3*time.Second, func() {
-			spheroDriver.SetRGB(uint8(gobot.Rand(255)),
-				uint8(gobot.Rand(255)),
-				uint8(gobot.Rand(255)),
-			)
-		})
-	}
+    gobot.Every(1*time.Second, func() {
+      spheroDriver.Roll(100, uint16(gobot.Rand(360)))
+    })
+    gobot.Every(3*time.Second, func() {
+      spheroDriver.SetRGB(uint8(gobot.Rand(255)),
+        uint8(gobot.Rand(255)),
+        uint8(gobot.Rand(255)),
+      )
+    })
+  }
 
-	robot := gobot.NewRobot("sphero",
-		[]gobot.Connection{spheroAdaptor},
-		[]gobot.Device{spheroDriver},
-		work,
-	)
+  robot := gobot.NewRobot("sphero",
+    []gobot.Connection{spheroAdaptor},
+    []gobot.Device{spheroDriver},
+    work,
+  )
 
-	return robot
+  return robot
 }
 
 func main() {
-	master := gobot.NewMaster()
-	api.NewAPI(master).Start()
+  master := gobot.NewMaster()
+  api.NewAPI(master).Start()
 
-	spheros := []string{
-		"/dev/rfcomm0",
-		"/dev/rfcomm1",
-		"/dev/rfcomm2",
-		"/dev/rfcomm3",
-	}
+  spheros := []string{
+    "/dev/rfcomm0",
+    "/dev/rfcomm1",
+    "/dev/rfcomm2",
+    "/dev/rfcomm3",
+  }
 
-	for _, port := range spheros {
-		master.AddRobot(NewSwarmBot(port))
-	}
+  for _, port := range spheros {
+    master.AddRobot(NewSwarmBot(port))
+  }
 
-	master.Start()
+  master.Start()
 }
 ```
 
@@ -233,94 +268,94 @@ Support for many devices that use General Purpose Input/Output (GPIO) have
 a shared set of drivers provided using the `gobot/drivers/gpio` package:
 
 - [GPIO](https://en.wikipedia.org/wiki/General_Purpose_Input/Output) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/drivers/gpio)
-	- AIP1640 LED
-	- Button
-	- Buzzer
-	- Direct Pin
-	- EasyDriver
-	- Grove Button
-	- Grove Buzzer
-	- Grove LED
-	- Grove Magnetic Switch
-	- Grove Relay
-	- Grove Touch Sensor
-	- LED
-	- Makey Button
-	- Motor
-	- Proximity Infra Red (PIR) Motion Sensor
-	- Relay
-	- RGB LED
-	- Servo
-	- Stepper Motor
-	- TM1638 LED Controller
+  - AIP1640 LED
+  - Button
+  - Buzzer
+  - Direct Pin
+  - EasyDriver
+  - Grove Button
+  - Grove Buzzer
+  - Grove LED
+  - Grove Magnetic Switch
+  - Grove Relay
+  - Grove Touch Sensor
+  - LED
+  - Makey Button
+  - Motor
+  - Proximity Infra Red (PIR) Motion Sensor
+  - Relay
+  - RGB LED
+  - Servo
+  - Stepper Motor
+  - TM1638 LED Controller
 
 Support for many devices that use Analog Input/Output (AIO) have
 a shared set of drivers provided using the `gobot/drivers/aio` package:
 
 - [AIO](https://en.wikipedia.org/wiki/Analog-to-digital_converter) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/drivers/aio)
-	- Analog Sensor
-	- Grove Light Sensor
-	- Grove Piezo Vibration Sensor
-	- Grove Rotary Dial
-	- Grove Sound Sensor
-	- Grove Temperature Sensor
+  - Analog Sensor
+  - Grove Light Sensor
+  - Grove Piezo Vibration Sensor
+  - Grove Rotary Dial
+  - Grove Sound Sensor
+  - Grove Temperature Sensor
 
 Support for devices that use Inter-Integrated Circuit (I2C) have a shared set of
 drivers provided using the `gobot/drivers/i2c` package:
 
 - [I2C](https://en.wikipedia.org/wiki/I%C2%B2C) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/drivers/i2c)
-	- Adafruit 2x16 RGB-LCD with 5 keys
-	- Adafruit Motor Hat
-	- ADS1015 Analog to Digital Converter
-	- ADS1115 Analog to Digital Converter
-	- ADXL345 Digital Accelerometer
-	- BH1750 Digital Luminosity/Lux/Light Sensor
-	- BlinkM LED
-	- BME280 Barometric Pressure/Temperature/Altitude/Humidity Sensor
-	- BMP180 Barometric Pressure/Temperature/Altitude Sensor
-	- BMP280 Barometric Pressure/Temperature/Altitude Sensor
-	- BMP388 Barometric Pressure/Temperature/Altitude Sensor
-	- DRV2605L Haptic Controller
-	- Generic driver for read and write values to/from register address
-	- Grove Digital Accelerometer
-	- GrovePi Expansion Board
-	- Grove RGB LCD
-	- HMC6352 Compass
-	- HMC5883L 3-Axis Digital Compass
-	- INA3221 Voltage Monitor
-	- JHD1313M1 LCD Display w/RGB Backlight
-	- L3GD20H 3-Axis Gyroscope
-	- LIDAR-Lite
-	- MCP23017 Port Expander
-	- MMA7660 3-Axis Accelerometer
-	- MPL115A2 Barometric Pressure/Temperature
-	- MPU6050 Accelerometer/Gyroscope
-	- PCA9501 8-bit I/O port with interrupt, 2-kbit EEPROM
-	- PCA953x LED Dimmer for PCA9530 (2-bit), PCA9533 (4-bit), PCA9531 (8-bit), PCA9532 (16-bit)
-	- PCA9685 16-channel 12-bit PWM/Servo Driver
-	- PCF8583 clock and calendar or event counter, 240 x 8-bit RAM
-	- PCF8591 8-bit 4xA/D & 1xD/A converter
-	- SHT2x Temperature/Humidity
-	- SHT3x-D Temperature/Humidity
-	- SSD1306 OLED Display Controller
-	- TSL2561 Digital Luminosity/Lux/Light Sensor
-	- Wii Nunchuck Controller
-	- YL-40 Brightness/Temperature sensor, Potentiometer, analog input, analog output Driver
+  - Adafruit 2x16 RGB-LCD with 5 keys
+  - Adafruit Motor Hat
+  - ADS1015 Analog to Digital Converter
+  - ADS1115 Analog to Digital Converter
+  - ADXL345 Digital Accelerometer
+  - BH1750 Digital Luminosity/Lux/Light Sensor
+  - BlinkM LED
+  - BME280 Barometric Pressure/Temperature/Altitude/Humidity Sensor
+  - BMP180 Barometric Pressure/Temperature/Altitude Sensor
+  - BMP280 Barometric Pressure/Temperature/Altitude Sensor
+  - BMP388 Barometric Pressure/Temperature/Altitude Sensor
+  - DRV2605L Haptic Controller
+  - Generic driver for read and write values to/from register address
+  - Grove Digital Accelerometer
+  - GrovePi Expansion Board
+  - Grove RGB LCD
+  - HMC6352 Compass
+  - HMC5883L 3-Axis Digital Compass
+  - INA3221 Voltage Monitor
+  - JHD1313M1 LCD Display w/RGB Backlight
+  - L3GD20H 3-Axis Gyroscope
+  - LIDAR-Lite
+  - MCP23017 Port Expander
+  - MMA7660 3-Axis Accelerometer
+  - MPL115A2 Barometric Pressure/Temperature
+  - MPU6050 Accelerometer/Gyroscope
+  - PCA9501 8-bit I/O port with interrupt, 2-kbit EEPROM
+  - PCA953x LED Dimmer for PCA9530 (2-bit), PCA9533 (4-bit), PCA9531 (8-bit), PCA9532 (16-bit)
+  - PCA9685 16-channel 12-bit PWM/Servo Driver
+  - PCF8583 clock and calendar or event counter, 240 x 8-bit RAM
+  - PCF8591 8-bit 4xA/D & 1xD/A converter
+  - SHT2x Temperature/Humidity
+  - SHT3x-D Temperature/Humidity
+  - SSD1306 OLED Display Controller
+  - TSL2561 Digital Luminosity/Lux/Light Sensor
+  - Wii Nunchuck Controller
+  - YL-40 Brightness/Temperature sensor, Potentiometer, analog input, analog output Driver
 
 Support for devices that use Serial Peripheral Interface (SPI) have
 a shared set of drivers provided using the `gobot/drivers/spi` package:
 
 - [SPI](https://en.wikipedia.org/wiki/Serial_Peripheral_Interface_Bus) <=> [Drivers](https://github.com/hybridgroup/gobot/tree/master/drivers/spi)
-	- APA102 Programmable LEDs
-	- MCP3002 Analog/Digital Converter
-	- MCP3004 Analog/Digital Converter
-	- MCP3008 Analog/Digital Converter
-	- MCP3202 Analog/Digital Converter
-	- MCP3204 Analog/Digital Converter
-	- MCP3208 Analog/Digital Converter
-	- MCP3304 Analog/Digital Converter
-	- MFRC522 RFID Card Reader
-	- SSD1306 OLED Display Controller
+  - APA102 Programmable LEDs
+  - MCP3002 Analog/Digital Converter
+  - MCP3004 Analog/Digital Converter
+  - MCP3008 Analog/Digital Converter
+  - MCP3202 Analog/Digital Converter
+  - MCP3204 Analog/Digital Converter
+  - MCP3208 Analog/Digital Converter
+  - MCP3304 Analog/Digital Converter
+  - MFRC522 RFID Card Reader
+  - SSD1306 OLED Display Controller
 
 More platforms and drivers are coming soon...
 
@@ -354,20 +389,18 @@ Gobot uses the Gort [http://gort.io](http://gort.io) Command Line Interface (CLI
 right from the command line. We call it "RobotOps", aka "DevOps For Robotics". You can scan, connect, update device
 firmware, and more!
 
-Gobot also has its own CLI to generate new platforms, adaptors, and drivers. You can check it out in the `/cli` directory.
-
 ## Documentation
 
-We're always adding documentation to our web site at https://gobot.io/ please check there as we continue to work on Gobot
+We're always adding documentation to our web site at <https://gobot.io/> please check there as we continue to work on Gobot
 
 Thank you!
 
 ## Need help?
 
-* Issues: https://github.com/hybridgroup/gobot/issues
-* Twitter: [@gobotio](https://twitter.com/gobotio)
-* Slack: [https://gophers.slack.com/messages/C0N5HDB08](https://gophers.slack.com/messages/C0N5HDB08)
-* Mailing list: https://groups.google.com/forum/#!forum/gobotio
+- Issues: <https://github.com/hybridgroup/gobot/issues>
+- Twitter: [@gobotio](https://twitter.com/gobotio)
+- Slack: [https://gophers.slack.com/messages/C0N5HDB08](https://gophers.slack.com/messages/C0N5HDB08)
+- Mailing list: <https://groups.google.com/forum/#!forum/gobotio>
 
 ## Contributing
 
