@@ -4,7 +4,7 @@ separate Adaptor for the PocketBeagle.
 
 Installing:
 
-	go get gobot.io/x/gobot/v2/platforms/beaglebone
+	Please refer to the main [README.md](https://github.com/hybridgroup/gobot/blob/release/README.md)
 
 Example:
 

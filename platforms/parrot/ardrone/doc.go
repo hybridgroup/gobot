@@ -3,7 +3,7 @@ Package ardrone provides the Gobot adaptor and driver for the Parrot Ardrone.
 
 Installing:
 
-	go get -d -u gobot.io/x/gobot/v2/... && go install gobot.io/x/gobot/v2/platforms/parrot/ardrone
+	Please refer to the main [README.md](https://github.com/hybridgroup/gobot/blob/release/README.md)
 
 Example:
 

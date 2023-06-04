@@ -1,14 +1,14 @@
 .sass-cache
 *.test
 *.swp
+*.snap
 profile.cov
 count.out
-*.swp
-*.snap
 /parts
 /prime
 /stage
 vendor/
+output/
 .idea/
 coverage.txt
 .chglog/chglog_tmp*.md

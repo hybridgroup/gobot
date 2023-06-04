@@ -3,7 +3,7 @@ Package mavlink contains the Gobot adaptor and driver for the MAVlink Communicat
 
 Installing:
 
-	go get gobot.io/x/gobot/v2/platforms/mavlink
+	Please refer to the main [README.md](https://github.com/hybridgroup/gobot/blob/release/README.md)
 
 Example:
 

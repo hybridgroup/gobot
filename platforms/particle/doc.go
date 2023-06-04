@@ -3,7 +3,7 @@ Package particle provides the Gobot adaptor for the Particle Photon and Electron
 
 Installing:
 
-	go get gobot.io/x/gobot/v2 && go install gobot.io/x/gobot/v2/platforms/particle
+	Please refer to the main [README.md](https://github.com/hybridgroup/gobot/blob/release/README.md)
 
 Example:
 

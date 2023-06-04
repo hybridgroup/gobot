@@ -3,7 +3,7 @@ Package firmata provides the Gobot adaptor for microcontrollers that support the
 
 Installing:
 
-	go get -d -u gobot.io/x/gobot/v2/... && go get gobot.io/x/gobot/v2/platforms/firmata
+	Please refer to the main [README.md](https://github.com/hybridgroup/gobot/blob/release/README.md)
 
 Example:
 

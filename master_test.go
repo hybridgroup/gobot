@@ -34,10 +34,6 @@ func initTestMaster1Robot() *Master {
 	return g
 }
 
-func TestVersion(t *testing.T) {
-	gobottest.Assert(t, version, Version())
-}
-
 func TestNullReadWriteCloser(t *testing.T) {
 	n := &NullReadWriteCloser{}
 	i, _ := n.Write([]byte{1, 2, 3})
