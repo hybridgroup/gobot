@@ -465,12 +465,11 @@ func (b *Bebop) generatePcmd() *bytes.Buffer {
 	//
 
 	cmd := &bytes.Buffer{}
-	tmp := &bytes.Buffer{}
 
 	cmd.WriteByte(ARCOMMANDS_ID_PROJECT_ARDRONE3)
 	cmd.WriteByte(ARCOMMANDS_ID_ARDRONE3_CLASS_PILOTING)
 
-	tmp = &bytes.Buffer{}
+	tmp := &bytes.Buffer{}
 	binary.Write(tmp, binary.LittleEndian, uint16(ARCOMMANDS_ID_ARDRONE3_PILOTING_CMD_PCMD))
 	cmd.Write(tmp.Bytes())
 
