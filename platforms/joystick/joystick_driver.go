@@ -3,7 +3,7 @@ package joystick
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"time"
 
 	"github.com/veandco/go-sdl2/sdl"
@@ -250,7 +250,7 @@ func (j *Driver) findHatName(id uint8, hat uint8, list []hat) string {
 
 // loadFile load the joystick config from a .json file
 func (j *Driver) loadFile() error {
-	file, e := ioutil.ReadFile(j.configPath)
+	file, e := os.ReadFile(j.configPath)
 	if e != nil {
 		return e
 	}

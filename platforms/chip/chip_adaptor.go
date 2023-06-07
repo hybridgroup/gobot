@@ -2,7 +2,7 @@ package chip
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -119,14 +119,14 @@ func getXIOBase() (baseAddr int, err error) {
 	}
 
 	for _, labelPath := range labels {
-		label, err := ioutil.ReadFile(labelPath)
+		label, err := os.ReadFile(labelPath)
 		if err != nil {
 			return baseAddr, err
 		}
 		if strings.HasPrefix(string(label), expanderID) {
 			expanderPath, _ := filepath.Split(labelPath)
 			basePath := filepath.Join(expanderPath, "base")
-			base, err := ioutil.ReadFile(basePath)
+			base, err := os.ReadFile(basePath)
 			if err != nil {
 				return baseAddr, err
 			}

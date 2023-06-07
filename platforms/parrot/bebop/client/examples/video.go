@@ -25,7 +25,7 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os/exec"
 	"time"
 
@@ -73,7 +73,7 @@ func main() {
 
 	go func() {
 		for {
-			buf, err := ioutil.ReadAll(ffmpegErr)
+			buf, err := io.ReadAll(ffmpegErr)
 			if err != nil {
 				fmt.Println(err)
 			}

@@ -3,7 +3,7 @@ package leap
 import (
 	"errors"
 	"io"
-	"io/ioutil"
+	"os"
 	"strings"
 	"sync"
 	"testing"
@@ -47,7 +47,7 @@ func initTestLeapMotionDriver() (*Driver, *NullReadWriteCloser) {
 
 	d := NewDriver(a)
 	d.receive = func(ws io.ReadWriteCloser, buf *[]byte) {
-		file, _ := ioutil.ReadFile("./test/support/example_frame.json")
+		file, _ := os.ReadFile("./test/support/example_frame.json")
 		copy(*buf, file)
 	}
 	return d, rwc
@@ -82,7 +82,7 @@ func TestLeapMotionDriverHalt(t *testing.T) {
 
 func TestLeapMotionDriverParser(t *testing.T) {
 	d, _ := initTestLeapMotionDriver()
-	file, _ := ioutil.ReadFile("./test/support/example_frame.json")
+	file, _ := os.ReadFile("./test/support/example_frame.json")
 	parsedFrame := d.ParseFrame(file)
 
 	if parsedFrame.Hands == nil || parsedFrame.Pointables == nil || parsedFrame.Gestures == nil {
