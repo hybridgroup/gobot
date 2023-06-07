@@ -6,7 +6,6 @@ import (
 	"strings"
 	"testing"
 
-	multierror "github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/gobottest"
 )
@@ -87,10 +86,7 @@ func TestMqttAdaptorConnectSSLError(t *testing.T) {
 
 func TestMqttAdaptorConnectWithAuthError(t *testing.T) {
 	a := NewAdaptorWithAuth("xyz://localhost:1883", "client", "user", "pass")
-	var expected error
-	expected = multierror.Append(expected, errors.New("network Error : unknown protocol"))
-
-	gobottest.Assert(t, a.Connect(), expected)
+	gobottest.Assert(t, a.Connect(), errors.New("network Error : unknown protocol"))
 }
 
 func TestMqttAdaptorFinalize(t *testing.T) {
@@ -106,7 +102,7 @@ func TestMqttAdaptorCannotPublishUnlessConnected(t *testing.T) {
 
 func TestMqttAdaptorPublishWhenConnected(t *testing.T) {
 	a := initTestMqttAdaptor()
-	a.Connect()
+	_ = a.Connect()
 	data := []byte("o")
 	gobottest.Assert(t, a.Publish("test", data), true)
 }
@@ -120,7 +116,7 @@ func TestMqttAdaptorCannotOnUnlessConnected(t *testing.T) {
 
 func TestMqttAdaptorOnWhenConnected(t *testing.T) {
 	a := initTestMqttAdaptor()
-	a.Connect()
+	_ = a.Connect()
 	gobottest.Assert(t, a.On("hola", func(msg Message) {
 		fmt.Println("hola")
 	}), true)

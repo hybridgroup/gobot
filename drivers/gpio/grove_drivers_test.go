@@ -59,10 +59,10 @@ func TestDigitalDriverHalt(t *testing.T) {
 		}
 
 		// Start the driver and allow for multiple digital reads
-		driver.Start()
+		_ = driver.Start()
 		time.Sleep(20 * time.Millisecond)
 
-		driver.Halt()
+		_ = driver.Halt()
 		lastCallCount := atomic.LoadInt32(&callCount)
 		// If driver was not halted, digital reads would still continue
 		time.Sleep(20 * time.Millisecond)
@@ -94,7 +94,7 @@ func TestDriverPublishesError(t *testing.T) {
 		gobottest.Assert(t, driver.Start(), nil)
 
 		// expect error
-		driver.Once(driver.Event(Error), func(data interface{}) {
+		_ = driver.Once(driver.Event(Error), func(data interface{}) {
 			gobottest.Assert(t, data.(error).Error(), "read error")
 			close(sem)
 		})
@@ -106,7 +106,7 @@ func TestDriverPublishesError(t *testing.T) {
 		}
 
 		// Cleanup
-		driver.Halt()
+		_ = driver.Halt()
 	}
 }
 

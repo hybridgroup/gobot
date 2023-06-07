@@ -69,19 +69,19 @@ func TestSpheroAdaptor(t *testing.T) {
 
 func TestSpheroAdaptorReconnect(t *testing.T) {
 	a, _ := initTestSpheroAdaptor()
-	a.Connect()
+	_ = a.Connect()
 	gobottest.Assert(t, a.connected, true)
-	a.Reconnect()
+	_ = a.Reconnect()
 	gobottest.Assert(t, a.connected, true)
-	a.Disconnect()
+	_ = a.Disconnect()
 	gobottest.Assert(t, a.connected, false)
-	a.Reconnect()
+	_ = a.Reconnect()
 	gobottest.Assert(t, a.connected, true)
 }
 
 func TestSpheroAdaptorFinalize(t *testing.T) {
 	a, rwc := initTestSpheroAdaptor()
-	a.Connect()
+	_ = a.Connect()
 	gobottest.Assert(t, a.Finalize(), nil)
 
 	rwc.testAdaptorClose = func() error {

@@ -205,7 +205,9 @@ func (d *SHT2xDriver) initialize() error {
 		return err
 	}
 
-	d.sendAccuracy()
+	if err := d.sendAccuracy(); err != nil {
+		return err
+	}
 
 	return nil
 }

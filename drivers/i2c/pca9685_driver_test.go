@@ -137,7 +137,7 @@ func TestPCA9685Commands(t *testing.T) {
 		copy(b, []byte{0x01})
 		return 1, nil
 	}
-	d.Start()
+	_ = d.Start()
 
 	err := d.Command("PwmWrite")(map[string]interface{}{"pin": "1", "val": "1"})
 	gobottest.Assert(t, err, nil)

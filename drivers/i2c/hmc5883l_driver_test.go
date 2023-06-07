@@ -111,7 +111,7 @@ func TestHMC5883LRead(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			d := NewHMC5883LDriver(a, WithHMC5883LGain(int(tc.gain)))
-			d.Start()
+			_ = d.Start()
 			// arrange reads
 			returnRead := append(append(tc.inputX, tc.inputZ...), tc.inputY...)
 			a.i2cReadImpl = func(b []byte) (int, error) {
@@ -162,7 +162,7 @@ func TestHMC5883L_readRawData(t *testing.T) {
 		},
 	}
 	d, a := initTestHMC5883LWithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			a.written = []byte{} // reset writes of former test and start

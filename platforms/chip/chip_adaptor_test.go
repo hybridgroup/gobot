@@ -92,9 +92,9 @@ func TestFinalizeErrorAfterPWM(t *testing.T) {
 
 func TestDigitalIO(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem()
-	a.Connect()
+	_ = a.Connect()
 
-	a.DigitalWrite("CSID7", 1)
+	_ = a.DigitalWrite("CSID7", 1)
 	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio139/value"].Contents, "1")
 
 	fs.Files["/sys/class/gpio/gpio50/value"].Contents = "1"
@@ -107,9 +107,9 @@ func TestDigitalIO(t *testing.T) {
 
 func TestProDigitalIO(t *testing.T) {
 	a, fs := initTestProAdaptorWithMockedFilesystem()
-	a.Connect()
+	_ = a.Connect()
 
-	a.DigitalWrite("CSID7", 1)
+	_ = a.DigitalWrite("CSID7", 1)
 	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio139/value"].Contents, "1")
 
 	fs.Files["/sys/class/gpio/gpio50/value"].Contents = "1"
@@ -122,7 +122,7 @@ func TestProDigitalIO(t *testing.T) {
 
 func TestPWM(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem()
-	a.Connect()
+	_ = a.Connect()
 
 	err := a.PwmWrite("PWM0", 100)
 	gobottest.Assert(t, err, nil)

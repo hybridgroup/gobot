@@ -53,7 +53,7 @@ func TestMPL115A2ReadData(t *testing.T) {
 	//
 	// arrange
 	d, a := initTestMPL115A2DriverWithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 	a.written = []byte{}
 	// arrange coefficients according the example from data sheet
 	d.a0 = 2009.75
@@ -94,7 +94,7 @@ func TestMPL115A2ReadData(t *testing.T) {
 
 func TestMPL115A2ReadDataError(t *testing.T) {
 	d, a := initTestMPL115A2DriverWithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 
 	a.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")

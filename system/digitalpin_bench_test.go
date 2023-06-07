@@ -15,10 +15,10 @@ func BenchmarkDigitalRead(b *testing.B) {
 	a.UseMockFilesystem(mockPaths)
 
 	pin := a.NewDigitalPin("", 10)
-	pin.Write(1)
+	_ = pin.Write(1)
 
 	for i := 0; i < b.N; i++ {
-		pin.Read()
+		_, _ = pin.Read()
 	}
 
 }

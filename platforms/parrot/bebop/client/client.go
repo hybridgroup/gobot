@@ -69,7 +69,9 @@ func NewARStreamFrame(buf []byte) ARStreamFrame {
 	}
 
 	var number uint16
-	binary.Read(bytes.NewReader(buf[0:2]), binary.LittleEndian, &number)
+	if err := binary.Read(bytes.NewReader(buf[0:2]), binary.LittleEndian, &number); err != nil {
+		panic(err)
+	}
 
 	frame.FrameNumber = int(number)
 
@@ -95,7 +97,9 @@ func NewNetworkFrame(buf []byte) NetworkFrame {
 	}
 
 	var size uint32
-	binary.Read(bytes.NewReader(buf[3:7]), binary.LittleEndian, &size)
+	if err := binary.Read(bytes.NewReader(buf[3:7]), binary.LittleEndian, &size); err != nil {
+		panic(err)
+	}
 	frame.Size = int(size)
 
 	frame.Data = buf[7:frame.Size]
@@ -136,7 +140,9 @@ func networkFrameGenerator() func(*bytes.Buffer, byte, byte) *bytes.Buffer {
 		ret.WriteByte(seq[id])
 
 		size := &bytes.Buffer{}
-		binary.Write(size, binary.LittleEndian, uint32(cmd.Len()+hlen))
+		if err := binary.Write(size, binary.LittleEndian, uint32(cmd.Len()+hlen)); err != nil {
+			panic(err)
+		}
 
 		ret.Write(size.Bytes())
 		ret.Write(cmd.Bytes())
@@ -203,18 +209,16 @@ func (b *Bebop) write(buf []byte) (int, error) {
 
 func (b *Bebop) Discover() error {
 	addr, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("%s:%d", b.IP, b.DiscoveryPort))
-
 	if err != nil {
 		return err
 	}
 
 	b.discoveryClient, err = net.DialTCP("tcp", nil, addr)
-
 	if err != nil {
 		return err
 	}
 
-	b.discoveryClient.Write(
+	if _, err := b.discoveryClient.Write(
 		[]byte(
 			fmt.Sprintf(`{
 						"controller_type": "computer",
@@ -227,7 +231,9 @@ func (b *Bebop) Discover() error {
 				b.RTPStreamPort,
 				b.RTPControlPort),
 		),
-	)
+	); err != nil {
+		return err
+	}
 
 	data := make([]byte, 10240)
 
@@ -325,7 +331,9 @@ func (b *Bebop) FlatTrim() error {
 	cmd.WriteByte(ARCOMMANDS_ID_ARDRONE3_CLASS_PILOTING)
 
 	tmp := &bytes.Buffer{}
-	binary.Write(tmp, binary.LittleEndian, uint16(ARCOMMANDS_ID_ARDRONE3_PILOTING_CMD_FLATTRIM))
+	if err := binary.Write(tmp, binary.LittleEndian, uint16(ARCOMMANDS_ID_ARDRONE3_PILOTING_CMD_FLATTRIM)); err != nil {
+		return err
+	}
 
 	cmd.Write(tmp.Bytes())
 
@@ -344,7 +352,9 @@ func (b *Bebop) GenerateAllStates() error {
 	cmd.WriteByte(ARCOMMANDS_ID_COMMON_CLASS_COMMON)
 
 	tmp := &bytes.Buffer{}
-	binary.Write(tmp, binary.LittleEndian, uint16(ARCOMMANDS_ID_COMMON_COMMON_CMD_ALLSTATES))
+	if err := binary.Write(tmp, binary.LittleEndian, uint16(ARCOMMANDS_ID_COMMON_COMMON_CMD_ALLSTATES)); err != nil {
+		return err
+	}
 
 	cmd.Write(tmp.Bytes())
 
@@ -363,7 +373,9 @@ func (b *Bebop) TakeOff() error {
 	cmd.WriteByte(ARCOMMANDS_ID_ARDRONE3_CLASS_PILOTING)
 
 	tmp := &bytes.Buffer{}
-	binary.Write(tmp, binary.LittleEndian, uint16(ARCOMMANDS_ID_ARDRONE3_PILOTING_CMD_TAKEOFF))
+	if err := binary.Write(tmp, binary.LittleEndian, uint16(ARCOMMANDS_ID_ARDRONE3_PILOTING_CMD_TAKEOFF)); err != nil {
+		return err
+	}
 
 	cmd.Write(tmp.Bytes())
 
@@ -382,7 +394,9 @@ func (b *Bebop) Land() error {
 	cmd.WriteByte(ARCOMMANDS_ID_ARDRONE3_CLASS_PILOTING)
 
 	tmp := &bytes.Buffer{}
-	binary.Write(tmp, binary.LittleEndian, uint16(ARCOMMANDS_ID_ARDRONE3_PILOTING_CMD_LANDING))
+	if err := binary.Write(tmp, binary.LittleEndian, uint16(ARCOMMANDS_ID_ARDRONE3_PILOTING_CMD_LANDING)); err != nil {
+		return err
+	}
 
 	cmd.Write(tmp.Bytes())
 
@@ -470,31 +484,45 @@ func (b *Bebop) generatePcmd() *bytes.Buffer {
 	cmd.WriteByte(ARCOMMANDS_ID_ARDRONE3_CLASS_PILOTING)
 
 	tmp := &bytes.Buffer{}
-	binary.Write(tmp, binary.LittleEndian, uint16(ARCOMMANDS_ID_ARDRONE3_PILOTING_CMD_PCMD))
+	if err := binary.Write(tmp, binary.LittleEndian, uint16(ARCOMMANDS_ID_ARDRONE3_PILOTING_CMD_PCMD)); err != nil {
+		panic(err)
+	}
 	cmd.Write(tmp.Bytes())
 
 	tmp = &bytes.Buffer{}
-	binary.Write(tmp, binary.LittleEndian, uint8(b.Pcmd.Flag))
+	if err := binary.Write(tmp, binary.LittleEndian, uint8(b.Pcmd.Flag)); err != nil {
+		panic(err)
+	}
 	cmd.Write(tmp.Bytes())
 
 	tmp = &bytes.Buffer{}
-	binary.Write(tmp, binary.LittleEndian, int8(b.Pcmd.Roll))
+	if err := binary.Write(tmp, binary.LittleEndian, int8(b.Pcmd.Roll)); err != nil {
+		panic(err)
+	}
 	cmd.Write(tmp.Bytes())
 
 	tmp = &bytes.Buffer{}
-	binary.Write(tmp, binary.LittleEndian, int8(b.Pcmd.Pitch))
+	if err := binary.Write(tmp, binary.LittleEndian, int8(b.Pcmd.Pitch)); err != nil {
+		panic(err)
+	}
 	cmd.Write(tmp.Bytes())
 
 	tmp = &bytes.Buffer{}
-	binary.Write(tmp, binary.LittleEndian, int8(b.Pcmd.Yaw))
+	if err := binary.Write(tmp, binary.LittleEndian, int8(b.Pcmd.Yaw)); err != nil {
+		panic(err)
+	}
 	cmd.Write(tmp.Bytes())
 
 	tmp = &bytes.Buffer{}
-	binary.Write(tmp, binary.LittleEndian, int8(b.Pcmd.Gaz))
+	if err := binary.Write(tmp, binary.LittleEndian, int8(b.Pcmd.Gaz)); err != nil {
+		panic(err)
+	}
 	cmd.Write(tmp.Bytes())
 
 	tmp = &bytes.Buffer{}
-	binary.Write(tmp, binary.LittleEndian, uint32(b.Pcmd.Psi))
+	if err := binary.Write(tmp, binary.LittleEndian, uint32(b.Pcmd.Psi)); err != nil {
+		panic(err)
+	}
 	cmd.Write(tmp.Bytes())
 
 	return b.networkFrameGenerator(cmd, ARNETWORKAL_FRAME_TYPE_DATA, BD_NET_CD_NONACK_ID)
@@ -564,15 +592,15 @@ func (b *Bebop) packetReceiver(buf []byte) {
 func (b *Bebop) StartRecording() error {
 	buf := b.videoRecord(ARCOMMANDS_ARDRONE3_MEDIARECORD_VIDEO_RECORD_START)
 
-	b.write(b.networkFrameGenerator(buf, ARNETWORKAL_FRAME_TYPE_DATA, BD_NET_CD_NONACK_ID).Bytes())
-	return nil
+	_, err := b.write(b.networkFrameGenerator(buf, ARNETWORKAL_FRAME_TYPE_DATA, BD_NET_CD_NONACK_ID).Bytes())
+	return err
 }
 
 func (b *Bebop) StopRecording() error {
 	buf := b.videoRecord(ARCOMMANDS_ARDRONE3_MEDIARECORD_VIDEO_RECORD_STOP)
 
-	b.write(b.networkFrameGenerator(buf, ARNETWORKAL_FRAME_TYPE_DATA, BD_NET_CD_NONACK_ID).Bytes())
-	return nil
+	_, err := b.write(b.networkFrameGenerator(buf, ARNETWORKAL_FRAME_TYPE_DATA, BD_NET_CD_NONACK_ID).Bytes())
+	return err
 }
 
 func (b *Bebop) videoRecord(state byte) *bytes.Buffer {
@@ -586,15 +614,19 @@ func (b *Bebop) videoRecord(state byte) *bytes.Buffer {
 	cmd.WriteByte(ARCOMMANDS_ID_ARDRONE3_CLASS_MEDIARECORD)
 
 	tmp := &bytes.Buffer{}
-	binary.Write(tmp,
+	if err := binary.Write(tmp,
 		binary.LittleEndian,
 		uint16(ARCOMMANDS_ID_ARDRONE3_MEDIARECORD_CMD_VIDEO),
-	)
+	); err != nil {
+		panic(err)
+	}
 
 	cmd.Write(tmp.Bytes())
 
 	tmp = &bytes.Buffer{}
-	binary.Write(tmp, binary.LittleEndian, uint32(state))
+	if err := binary.Write(tmp, binary.LittleEndian, uint32(state)); err != nil {
+		panic(err)
+	}
 
 	cmd.Write(tmp.Bytes())
 
@@ -618,15 +650,19 @@ func (b *Bebop) HullProtection(protect bool) error {
 	cmd.WriteByte(ARCOMMANDS_ID_ARDRONE3_CLASS_SPEEDSETTINGS)
 
 	tmp := &bytes.Buffer{}
-	binary.Write(tmp,
+	if err := binary.Write(tmp,
 		binary.LittleEndian,
 		uint16(ARCOMMANDS_ID_ARDRONE3_SPEEDSETTINGS_CMD_HULLPROTECTION),
-	)
+	); err != nil {
+		return err
+	}
 
 	cmd.Write(tmp.Bytes())
 
 	tmp = &bytes.Buffer{}
-	binary.Write(tmp, binary.LittleEndian, bool2int8(protect))
+	if err := binary.Write(tmp, binary.LittleEndian, bool2int8(protect)); err != nil {
+		return err
+	}
 	cmd.Write(tmp.Bytes())
 
 	_, err := b.write(b.networkFrameGenerator(cmd, ARNETWORKAL_FRAME_TYPE_DATA, BD_NET_CD_NONACK_ID).Bytes())
@@ -644,15 +680,19 @@ func (b *Bebop) Outdoor(outdoor bool) error {
 	cmd.WriteByte(ARCOMMANDS_ID_ARDRONE3_CLASS_SPEEDSETTINGS)
 
 	tmp := &bytes.Buffer{}
-	binary.Write(tmp,
+	if err := binary.Write(tmp,
 		binary.LittleEndian,
 		uint16(ARCOMMANDS_ID_ARDRONE3_SPEEDSETTINGS_CMD_OUTDOOR),
-	)
+	); err != nil {
+		return err
+	}
 
 	cmd.Write(tmp.Bytes())
 
 	tmp = &bytes.Buffer{}
-	binary.Write(tmp, binary.LittleEndian, bool2int8(outdoor))
+	if err := binary.Write(tmp, binary.LittleEndian, bool2int8(outdoor)); err != nil {
+		return err
+	}
 	cmd.Write(tmp.Bytes())
 
 	_, err := b.write(b.networkFrameGenerator(cmd, ARNETWORKAL_FRAME_TYPE_DATA, BD_NET_CD_NONACK_ID).Bytes())
@@ -666,15 +706,19 @@ func (b *Bebop) VideoEnable(enable bool) error {
 	cmd.WriteByte(ARCOMMANDS_ID_ARDRONE3_CLASS_MEDIASTREAMING)
 
 	tmp := &bytes.Buffer{}
-	binary.Write(tmp,
+	if err := binary.Write(tmp,
 		binary.LittleEndian,
 		uint16(ARCOMMANDS_ID_ARDRONE3_MEDIASTREAMING_CMD_VIDEOENABLE),
-	)
+	); err != nil {
+		return err
+	}
 
 	cmd.Write(tmp.Bytes())
 
 	tmp = &bytes.Buffer{}
-	binary.Write(tmp, binary.LittleEndian, bool2int8(enable))
+	if err := binary.Write(tmp, binary.LittleEndian, bool2int8(enable)); err != nil {
+		return err
+	}
 	cmd.Write(tmp.Bytes())
 
 	_, err := b.write(b.networkFrameGenerator(cmd, ARNETWORKAL_FRAME_TYPE_DATA, BD_NET_CD_NONACK_ID).Bytes())
@@ -688,15 +732,19 @@ func (b *Bebop) VideoStreamMode(mode int8) error {
 	cmd.WriteByte(ARCOMMANDS_ID_ARDRONE3_CLASS_MEDIASTREAMING)
 
 	tmp := &bytes.Buffer{}
-	binary.Write(tmp,
+	if err := binary.Write(tmp,
 		binary.LittleEndian,
 		uint16(ARCOMMANDS_ID_ARDRONE3_MEDIASTREAMING_CMD_VIDEOSTREAMMODE),
-	)
+	); err != nil {
+		return err
+	}
 
 	cmd.Write(tmp.Bytes())
 
 	tmp = &bytes.Buffer{}
-	binary.Write(tmp, binary.LittleEndian, mode)
+	if err := binary.Write(tmp, binary.LittleEndian, mode); err != nil {
+		return err
+	}
 	cmd.Write(tmp.Bytes())
 
 	_, err := b.write(b.networkFrameGenerator(cmd, ARNETWORKAL_FRAME_TYPE_DATA, BD_NET_CD_NONACK_ID).Bytes())
@@ -780,15 +828,21 @@ func (b *Bebop) createARStreamACK(frame ARStreamFrame) *bytes.Buffer {
 	ackPacket := &bytes.Buffer{}
 	tmp := &bytes.Buffer{}
 
-	binary.Write(tmp, binary.LittleEndian, uint16(b.tmpFrame.arstreamACK.FrameNumber))
+	if err := binary.Write(tmp, binary.LittleEndian, uint16(b.tmpFrame.arstreamACK.FrameNumber)); err != nil {
+		panic(err)
+	}
 	ackPacket.Write(tmp.Bytes())
 
 	tmp = &bytes.Buffer{}
-	binary.Write(tmp, binary.LittleEndian, uint64(b.tmpFrame.arstreamACK.HighPacketsAck))
+	if err := binary.Write(tmp, binary.LittleEndian, uint64(b.tmpFrame.arstreamACK.HighPacketsAck)); err != nil {
+		panic(err)
+	}
 	ackPacket.Write(tmp.Bytes())
 
 	tmp = &bytes.Buffer{}
-	binary.Write(tmp, binary.LittleEndian, uint64(b.tmpFrame.arstreamACK.LowPacketsAck))
+	if err := binary.Write(tmp, binary.LittleEndian, uint64(b.tmpFrame.arstreamACK.LowPacketsAck)); err != nil {
+		panic(err)
+	}
 	ackPacket.Write(tmp.Bytes())
 
 	return b.networkFrameGenerator(ackPacket, ARNETWORKAL_FRAME_TYPE_DATA, BD_NET_CD_VIDEO_ACK_ID)

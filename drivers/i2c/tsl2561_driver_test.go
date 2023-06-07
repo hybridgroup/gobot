@@ -18,7 +18,7 @@ var _ gobot.Driver = (*TSL2561Driver)(nil)
 func testIDReader(b []byte) (int, error) {
 	buf := new(bytes.Buffer)
 	// Mock device responding 0xA
-	binary.Write(buf, binary.LittleEndian, uint8(0x0A))
+	_ = binary.Write(buf, binary.LittleEndian, uint8(0x0A))
 	copy(b, buf.Bytes())
 	return buf.Len(), nil
 }
@@ -86,9 +86,9 @@ func TestTSL2561DriverRead16(t *testing.T) {
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		buf := new(bytes.Buffer)
 		// send low
-		binary.Write(buf, binary.LittleEndian, uint8(0xEA))
+		_ = binary.Write(buf, binary.LittleEndian, uint8(0xEA))
 		// send high
-		binary.Write(buf, binary.LittleEndian, uint8(0xAE))
+		_ = binary.Write(buf, binary.LittleEndian, uint8(0xAE))
 		copy(b, buf.Bytes())
 		return buf.Len(), nil
 	}
@@ -200,7 +200,7 @@ func TestTSL2561DriverGetLuminocityAutoGain(t *testing.T) {
 		return buf.Len(), nil
 	}
 
-	d.Start()
+	_ = d.Start()
 	bb, ir, err := d.GetLuminocity()
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, bb, uint16(12365))

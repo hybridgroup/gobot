@@ -359,17 +359,17 @@ func TestConnectUnknown(t *testing.T) {
 func TestFinalize(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 
-	a.DigitalWrite("3", 1)
-	a.PwmWrite("5", 100)
+	_ = a.DigitalWrite("3", 1)
+	_ = a.PwmWrite("5", 100)
 
-	a.GetI2cConnection(0xff, 6)
+	_, _ = a.GetI2cConnection(0xff, 6)
 	gobottest.Assert(t, a.Finalize(), nil)
 
 	// assert that finalize after finalize is working
 	gobottest.Assert(t, a.Finalize(), nil)
 
 	// assert that re-connect is working
-	a.Connect()
+	_ = a.Connect()
 	// remove one file to force Finalize error
 	delete(fs.Files, "/sys/class/gpio/unexport")
 	err := a.Finalize()
@@ -380,7 +380,7 @@ func TestFinalize(t *testing.T) {
 func TestFinalizeError(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 
-	a.PwmWrite("5", 100)
+	_ = a.PwmWrite("5", 100)
 
 	fs.WithWriteError = true
 	err := a.Finalize()
@@ -393,10 +393,10 @@ func TestFinalizeError(t *testing.T) {
 func TestDigitalIO(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 
-	a.DigitalWrite("13", 1)
+	_ = a.DigitalWrite("13", 1)
 	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio40/value"].Contents, "1")
 
-	a.DigitalWrite("2", 0)
+	_ = a.DigitalWrite("2", 0)
 	i, err := a.DigitalRead("2")
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, i, 0)
@@ -407,7 +407,7 @@ func TestDigitalPinInFileError(t *testing.T) {
 	fs := a.sys.UseMockFilesystem(pwmMockPathsMux40)
 	delete(fs.Files, "/sys/class/gpio/gpio40/value")
 	delete(fs.Files, "/sys/class/gpio/gpio40/direction")
-	a.Connect()
+	_ = a.Connect()
 
 	_, err := a.DigitalPin("13")
 	gobottest.Assert(t, strings.Contains(err.Error(), "no such file"), true)
@@ -419,7 +419,7 @@ func TestDigitalPinInResistorFileError(t *testing.T) {
 	fs := a.sys.UseMockFilesystem(pwmMockPathsMux40)
 	delete(fs.Files, "/sys/class/gpio/gpio229/value")
 	delete(fs.Files, "/sys/class/gpio/gpio229/direction")
-	a.Connect()
+	_ = a.Connect()
 
 	_, err := a.DigitalPin("13")
 	gobottest.Assert(t, strings.Contains(err.Error(), "no such file"), true)
@@ -430,7 +430,7 @@ func TestDigitalPinInLevelShifterFileError(t *testing.T) {
 	fs := a.sys.UseMockFilesystem(pwmMockPathsMux40)
 	delete(fs.Files, "/sys/class/gpio/gpio261/value")
 	delete(fs.Files, "/sys/class/gpio/gpio261/direction")
-	a.Connect()
+	_ = a.Connect()
 
 	_, err := a.DigitalPin("13")
 	gobottest.Assert(t, strings.Contains(err.Error(), "no such file"), true)
@@ -441,7 +441,7 @@ func TestDigitalPinInMuxFileError(t *testing.T) {
 	fs := a.sys.UseMockFilesystem(pwmMockPathsMux40)
 	delete(fs.Files, "/sys/class/gpio/gpio243/value")
 	delete(fs.Files, "/sys/class/gpio/gpio243/direction")
-	a.Connect()
+	_ = a.Connect()
 
 	_, err := a.DigitalPin("13")
 	gobottest.Assert(t, strings.Contains(err.Error(), "no such file"), true)
@@ -489,7 +489,7 @@ func TestPwmEnableError(t *testing.T) {
 	a := NewAdaptor()
 	fs := a.sys.UseMockFilesystem(pwmMockPathsMux13)
 	delete(fs.Files, "/sys/class/pwm/pwmchip0/pwm1/enable")
-	a.Connect()
+	_ = a.Connect()
 
 	err := a.PwmWrite("5", 100)
 	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/pwm/pwmchip0/pwm1/enable: no such file"), true)
@@ -609,7 +609,7 @@ func Test_validateI2cBusNumber(t *testing.T) {
 			// arrange
 			a := NewAdaptor(tc.board)
 			a.sys.UseMockFilesystem(pwmMockPathsMux13ArduinoI2c)
-			a.Connect()
+			_ = a.Connect()
 			// act
 			err := a.validateAndSetupI2cBusNumber(tc.busNr)
 			// assert

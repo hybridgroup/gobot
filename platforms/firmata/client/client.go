@@ -128,7 +128,7 @@ func (b *Client) setConnected(c bool) {
 }
 
 // Disconnect disconnects the Client
-func (b *Client) Disconnect() (err error) {
+func (b *Client) Disconnect() error {
 	b.setConnected(false)
 	return b.connection.Close()
 }
@@ -151,51 +151,67 @@ func (b *Client) Pins() []Pin {
 // Connect connects to the Client given conn. It first resets the firmata board
 // then continuously polls the firmata board for new information when it's
 // available.
-func (b *Client) Connect(conn io.ReadWriteCloser) (err error) {
+func (b *Client) Connect(conn io.ReadWriteCloser) error {
 	if b.Connected() {
 		return ErrConnected
 	}
 
 	b.connection = conn
-	b.Reset()
+	if err := b.Reset(); err != nil {
+		return err
+	}
 	connected := make(chan bool, 1)
 	connectError := make(chan error, 1)
 
-	b.Once(b.Event("ProtocolVersion"), func(data interface{}) {
+	if err := b.Once(b.Event("ProtocolVersion"), func(data interface{}) {
 		e := b.FirmwareQuery()
 		if e != nil {
 			b.setConnecting(false)
 			connectError <- e
 		}
-	})
+	}); err != nil {
+		return err
+	}
 
-	b.Once(b.Event("FirmwareQuery"), func(data interface{}) {
+	if err := b.Once(b.Event("FirmwareQuery"), func(data interface{}) {
 		e := b.CapabilitiesQuery()
 		if e != nil {
 			b.setConnecting(false)
 			connectError <- e
 		}
-	})
+	}); err != nil {
+		return err
+	}
 
-	b.Once(b.Event("CapabilityQuery"), func(data interface{}) {
+	if err := b.Once(b.Event("CapabilityQuery"), func(data interface{}) {
 		e := b.AnalogMappingQuery()
 		if e != nil {
 			b.setConnecting(false)
 			connectError <- e
 		}
-	})
+	}); err != nil {
+		return err
+	}
 
-	b.Once(b.Event("AnalogMappingQuery"), func(data interface{}) {
-		b.ReportDigital(0, 1)
-		b.ReportDigital(1, 1)
+	if err := b.Once(b.Event("AnalogMappingQuery"), func(data interface{}) {
+		if err := b.ReportDigital(0, 1); err != nil {
+			panic(err)
+		}
+		if err := b.ReportDigital(1, 1); err != nil {
+			panic(err)
+		}
 		b.setConnecting(false)
 		b.setConnected(true)
 		connected <- true
-	})
+	}); err != nil {
+		return err
+	}
 
 	// start it off...
 	b.setConnecting(true)
-	b.ProtocolVersionQuery()
+	if err := b.ProtocolVersionQuery(); err != nil {
+		return err
+	}
 
 	go func() {
 		for {
@@ -230,7 +246,7 @@ func (b *Client) Connect(conn io.ReadWriteCloser) (err error) {
 		}
 	}()
 
-	return
+	return nil
 }
 
 // Reset sends the SystemReset sysex code.
@@ -337,34 +353,33 @@ func (b *Client) I2cConfig(delay int) error {
 	return b.WriteSysex([]byte{I2CConfig, byte(delay & 0xFF), byte((delay >> 8) & 0xFF)})
 }
 
-func (b *Client) togglePinReporting(pin int, state int, mode byte) (err error) {
+func (b *Client) togglePinReporting(pin int, state int, mode byte) error {
 	if state != 0 {
 		state = 1
 	} else {
 		state = 0
 	}
 
-	err = b.write([]byte{byte(mode) | byte(pin), byte(state)})
-	return
+	return b.write([]byte{byte(mode) | byte(pin), byte(state)})
 }
 
 // WriteSysex writes an arbitrary Sysex command to the microcontroller.
-func (b *Client) WriteSysex(data []byte) (err error) {
+func (b *Client) WriteSysex(data []byte) error {
 	return b.write(append([]byte{StartSysex}, append(data, EndSysex)...))
 }
 
-func (b *Client) write(data []byte) (err error) {
-	_, err = b.connection.Write(data[:])
-	return
+func (b *Client) write(data []byte) error {
+	_, err := b.connection.Write(data[:])
+	return err
 }
 
-func (b *Client) read(n int) (buf []byte, err error) {
-	buf = make([]byte, n)
-	_, err = io.ReadFull(b.connection, buf)
-	return
+func (b *Client) read(n int) ([]byte, error) {
+	buf := make([]byte, n)
+	_, err := io.ReadFull(b.connection, buf)
+	return buf, err
 }
 
-func (b *Client) process() (err error) {
+func (b *Client) process() error {
 	msgBuf, err := b.read(1)
 	if err != nil {
 		return err
@@ -524,5 +539,5 @@ func (b *Client) process() (err error) {
 			b.Publish("SysexResponse", data)
 		}
 	}
-	return
+	return nil
 }

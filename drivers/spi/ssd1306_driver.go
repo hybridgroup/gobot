@@ -267,11 +267,17 @@ func (s *SSD1306Driver) Set(x, y, c int) {
 
 // Reset re-initializes the device to a clean state.
 func (s *SSD1306Driver) Reset() error {
-	s.rstDriver.DigitalWrite(1)
+	if err := s.rstDriver.DigitalWrite(1); err != nil {
+		return err
+	}
 	time.Sleep(10 * time.Millisecond)
-	s.rstDriver.DigitalWrite(0)
+	if err := s.rstDriver.DigitalWrite(0); err != nil {
+		return err
+	}
 	time.Sleep(10 * time.Millisecond)
-	s.rstDriver.DigitalWrite(1)
+	if err := s.rstDriver.DigitalWrite(1); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -291,12 +297,24 @@ func (s *SSD1306Driver) SetContrast(contrast byte) error {
 
 // Display sends the memory buffer to the display.
 func (s *SSD1306Driver) Display() error {
-	s.command(ssd1306ColumnAddr)
-	s.command(0)
-	s.command(uint8(s.DisplayWidth) - 1)
-	s.command(ssd1306PageAddr)
-	s.command(0)
-	s.command(uint8(s.pageSize) - 1)
+	if err := s.command(ssd1306ColumnAddr); err != nil {
+		return err
+	}
+	if err := s.command(0); err != nil {
+		return err
+	}
+	if err := s.command(uint8(s.DisplayWidth) - 1); err != nil {
+		return err
+	}
+	if err := s.command(ssd1306PageAddr); err != nil {
+		return err
+	}
+	if err := s.command(0); err != nil {
+		return err
+	}
+	if err := s.command(uint8(s.pageSize) - 1); err != nil {
+		return err
+	}
 	if err := s.dcDriver.DigitalWrite(1); err != nil {
 		return err
 	}
@@ -309,7 +327,9 @@ func (s *SSD1306Driver) ShowImage(img image.Image) error {
 		return fmt.Errorf("Image must match the display width and height")
 	}
 
-	s.Clear()
+	if err := s.Clear(); err != nil {
+		return err
+	}
 	for y, w, h := 0, img.Bounds().Dx(), img.Bounds().Dy(); y < h; y++ {
 		for x := 0; x < w; x++ {
 			c := img.At(x, y)
@@ -331,64 +351,129 @@ func (s *SSD1306Driver) command(b byte) error {
 
 // initialize configures the ssd1306 based on the options passed in when the driver was created
 func (s *SSD1306Driver) initialize() error {
-	s.command(ssd1306SetDisplayOff)
-	s.command(ssd1306SetDisplayClock)
+	if err := s.command(ssd1306SetDisplayOff); err != nil {
+		return err
+	}
+	if err := s.command(ssd1306SetDisplayClock); err != nil {
+		return err
+	}
 	if s.DisplayHeight == 16 {
-		s.command(0x60)
-	} else {
-		s.command(0x80)
-	}
-	s.command(ssd1306SetMultiplexRatio)
-	s.command(uint8(s.DisplayHeight) - 1)
-	s.command(ssd1306SetDisplayOffset)
-	s.command(0x0)
-	s.command(ssd1306SetStartLine)
-	s.command(0x0)
-	s.command(ssd1306ChargePumpSetting)
-	if s.ExternalVcc {
-		s.command(0x10)
-	} else {
-		s.command(0x14)
-	}
-	s.command(ssd1306SetMemoryAddressingMode)
-	s.command(0x00)
-	s.command(ssd1306SetSegmentRemap0)
-	s.command(0x01)
-	s.command(ssd1306ComScanInc)
-	s.command(ssd1306SetComPins)
-	if s.DisplayHeight == 64 {
-		s.command(0x12)
-	} else {
-		s.command(0x02)
-	}
-	s.command(ssd1306SetContrast)
-	if s.DisplayHeight == 64 {
-		if s.ExternalVcc {
-			s.command(0x9F)
-		} else {
-			s.command(0xCF)
+		if err := s.command(0x60); err != nil {
+			return err
 		}
 	} else {
-		s.command(0x8F)
+		if err := s.command(0x80); err != nil {
+			return err
+		}
 	}
-	s.command(ssd1306SetPrechargePeriod)
+	if err := s.command(ssd1306SetMultiplexRatio); err != nil {
+		return err
+	}
+	if err := s.command(uint8(s.DisplayHeight) - 1); err != nil {
+		return err
+	}
+	if err := s.command(ssd1306SetDisplayOffset); err != nil {
+		return err
+	}
+	if err := s.command(0x0); err != nil {
+		return err
+	}
+	if err := s.command(ssd1306SetStartLine); err != nil {
+		return err
+	}
+	if err := s.command(0x0); err != nil {
+		return err
+	}
+	if err := s.command(ssd1306ChargePumpSetting); err != nil {
+		return err
+	}
 	if s.ExternalVcc {
-		s.command(0x22)
+		if err := s.command(0x10); err != nil {
+			return err
+		}
 	} else {
-		s.command(0xF1)
+		if err := s.command(0x14); err != nil {
+			return err
+		}
 	}
-	s.command(ssd1306SetVComDeselectLevel)
-	s.command(0x40)
-	s.command(ssd1306DisplayOnResumeToRAM)
-	s.command(ssd1306SetDisplayNormal)
-	s.command(ssd1306DeactivateScroll)
-	s.command(ssd1306SetDisplayOn)
-
-	return nil
+	if err := s.command(ssd1306SetMemoryAddressingMode); err != nil {
+		return err
+	}
+	if err := s.command(0x00); err != nil {
+		return err
+	}
+	if err := s.command(ssd1306SetSegmentRemap0); err != nil {
+		return err
+	}
+	if err := s.command(0x01); err != nil {
+		return err
+	}
+	if err := s.command(ssd1306ComScanInc); err != nil {
+		return err
+	}
+	if err := s.command(ssd1306SetComPins); err != nil {
+		return err
+	}
+	if s.DisplayHeight == 64 {
+		if err := s.command(0x12); err != nil {
+			return err
+		}
+	} else {
+		if err := s.command(0x02); err != nil {
+			return err
+		}
+	}
+	if err := s.command(ssd1306SetContrast); err != nil {
+		return err
+	}
+	if s.DisplayHeight == 64 {
+		if s.ExternalVcc {
+			if err := s.command(0x9F); err != nil {
+				return err
+			}
+		} else {
+			if err := s.command(0xCF); err != nil {
+				return err
+			}
+		}
+	} else {
+		if err := s.command(0x8F); err != nil {
+			return err
+		}
+	}
+	if err := s.command(ssd1306SetPrechargePeriod); err != nil {
+		return err
+	}
+	if s.ExternalVcc {
+		if err := s.command(0x22); err != nil {
+			return err
+		}
+	} else {
+		if err := s.command(0xF1); err != nil {
+			return err
+		}
+	}
+	if err := s.command(ssd1306SetVComDeselectLevel); err != nil {
+		return err
+	}
+	if err := s.command(0x40); err != nil {
+		return err
+	}
+	if err := s.command(ssd1306DisplayOnResumeToRAM); err != nil {
+		return err
+	}
+	if err := s.command(ssd1306SetDisplayNormal); err != nil {
+		return err
+	}
+	if err := s.command(ssd1306DeactivateScroll); err != nil {
+		return err
+	}
+	return s.command(ssd1306SetDisplayOn)
 }
 
 func (s *SSD1306Driver) shutdown() error {
-	s.Reset()
-	s.Off()
-	return nil
+	if err := s.Reset(); err != nil {
+		return err
+	}
+	return s.Off()
 }

@@ -33,8 +33,8 @@ func TestButtonDriverReadData(t *testing.T) {
 	sem := make(chan bool)
 	a := NewBleTestAdaptor()
 	d := NewButtonDriver(a)
-	d.Start()
-	d.On(ButtonB, func(data interface{}) {
+	_ = d.Start()
+	_ = d.On(ButtonB, func(data interface{}) {
 		sem <- true
 	})
 

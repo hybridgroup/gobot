@@ -61,26 +61,38 @@ func NewTM1638Driver(a gobot.Connection, clockPin string, dataPin string, strobe
 }
 
 // Start initializes the tm1638, it uses a SPI-like communication protocol
-func (t *TM1638Driver) Start() (err error) {
+func (t *TM1638Driver) Start() error {
 
-	t.pinStrobe.On()
-	t.pinClock.On()
-
-	t.sendCommand(TM1638DataCmd)
-	t.sendCommand(TM1638DispCtrl | 8 | 7)
-
-	t.pinStrobe.Off()
-	t.send(TM1638AddrCmd)
-	for i := 0; i < 16; i++ {
-		t.send(TM1638WriteDisp)
+	if err := t.pinStrobe.On(); err != nil {
+		return err
 	}
-	t.pinStrobe.On()
+	if err := t.pinClock.On(); err != nil {
+		return err
+	}
 
-	return
+	if err := t.sendCommand(TM1638DataCmd); err != nil {
+		return err
+	}
+	if err := t.sendCommand(TM1638DispCtrl | 8 | 7); err != nil {
+		return err
+	}
+
+	if err := t.pinStrobe.Off(); err != nil {
+		return err
+	}
+	if err := t.send(TM1638AddrCmd); err != nil {
+		return err
+	}
+	for i := 0; i < 16; i++ {
+		if err := t.send(TM1638WriteDisp); err != nil {
+			return err
+		}
+	}
+	return t.pinStrobe.On()
 }
 
 // Halt implements the Driver interface
-func (t *TM1638Driver) Halt() (err error) { return }
+func (t *TM1638Driver) Halt() error { return nil }
 
 // Name returns the TM1638Drivers name
 func (t *TM1638Driver) Name() string { return t.name }
@@ -94,75 +106,104 @@ func (t *TM1638Driver) Connection() gobot.Connection {
 }
 
 // sendCommand is an auxiliary function to send commands to the TM1638 module
-func (t *TM1638Driver) sendCommand(cmd byte) {
-	t.pinStrobe.Off()
-	t.send(cmd)
-	t.pinStrobe.On()
+func (t *TM1638Driver) sendCommand(cmd byte) error {
+	if err := t.pinStrobe.Off(); err != nil {
+		return err
+	}
+	if err := t.send(cmd); err != nil {
+		return err
+	}
+	return t.pinStrobe.On()
 }
 
 // send writes data on the module
-func (t *TM1638Driver) send(data byte) {
+func (t *TM1638Driver) send(data byte) error {
 	for i := 0; i < 8; i++ {
-		t.pinClock.Off()
+		if err := t.pinClock.Off(); err != nil {
+			return err
+		}
 
 		if (data & 1) > 0 {
-			t.pinData.On()
+			if err := t.pinData.On(); err != nil {
+				return err
+			}
 		} else {
-			t.pinData.Off()
+			if err := t.pinData.Off(); err != nil {
+				return err
+			}
 		}
 		data >>= 1
 
-		t.pinClock.On()
+		if err := t.pinClock.On(); err != nil {
+			return err
+		}
 	}
+
+	return nil
 }
 
 // sendData is an auxiliary function to send data to the TM1638 module
-func (t *TM1638Driver) sendData(address byte, data byte) {
-	t.sendCommand(TM1638DataCmd | TM1638FixedAddr)
-	t.pinStrobe.Off()
-	t.send(TM1638AddrCmd | address)
-	t.send(data)
-	t.pinStrobe.On()
+func (t *TM1638Driver) sendData(address byte, data byte) error {
+	if err := t.sendCommand(TM1638DataCmd | TM1638FixedAddr); err != nil {
+		return err
+	}
+	if err := t.pinStrobe.Off(); err != nil {
+		return err
+	}
+	if err := t.send(TM1638AddrCmd | address); err != nil {
+		return err
+	}
+	if err := t.send(data); err != nil {
+		return err
+	}
+	return t.pinStrobe.On()
 }
 
 // SetLED changes the color (TM1638None, TM1638Red, TM1638Green) of the specific LED
-func (t *TM1638Driver) SetLED(color byte, pos byte) {
+func (t *TM1638Driver) SetLED(color byte, pos byte) error {
 	if pos > 7 {
-		return
+		return nil
 	}
-	t.sendData((pos<<1)+1, color)
+	return t.sendData((pos<<1)+1, color)
 }
 
 // SetDisplay cuts and sends a byte array to the display (without dots)
-func (t *TM1638Driver) SetDisplay(data []byte) {
+func (t *TM1638Driver) SetDisplay(data []byte) error {
 	minLength := int(math.Min(8, float64(len(data))))
 	for i := 0; i < minLength; i++ {
-		t.SendChar(byte(i), data[i], false)
+		if err := t.SendChar(byte(i), data[i], false); err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
 // SetDisplayText cuts and sends a string to the display (without dots)
-func (t *TM1638Driver) SetDisplayText(text string) {
+func (t *TM1638Driver) SetDisplayText(text string) error {
 	data := t.fromStringToByteArray(text)
 	minLength := int(math.Min(8, float64(len(data))))
 	for i := 0; i < minLength; i++ {
-		t.SendChar(byte(i), data[i], false)
+		if err := t.SendChar(byte(i), data[i], false); err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
 // SendChar sends one byte to the specific position in the display
-func (t *TM1638Driver) SendChar(pos byte, data byte, dot bool) {
+func (t *TM1638Driver) SendChar(pos byte, data byte, dot bool) error {
 	if pos > 7 {
-		return
+		return nil
 	}
 	var dotData byte
 	if dot {
 		dotData = TM1638DispCtrl
 	}
-	t.sendData(pos<<1, data|(dotData))
+	return t.sendData(pos<<1, data|(dotData))
 }
 
-// fromStringToByteArray translates a string to a byte array with the corresponding representation for the 7-segment LCD, return and empty character if the font is not available
+// fromStringToByteArray translates a string to a byte array with the corresponding representation
+// for the 7-segment LCD, return and empty character if the font is not available
 func (t *TM1638Driver) fromStringToByteArray(str string) []byte {
 	chars := strings.Split(str, "")
 	data := make([]byte, len(chars))

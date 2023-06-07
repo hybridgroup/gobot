@@ -94,7 +94,7 @@ func initTestAdaptor() *Adaptor {
 	a.PortOpener = func(port string) (io.ReadWriteCloser, error) {
 		return &readWriteCloser{}, nil
 	}
-	a.Connect()
+	_ = a.Connect()
 	return a
 }
 

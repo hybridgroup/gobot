@@ -107,8 +107,8 @@ func TestName(t *testing.T) {
 func TestFinalize(t *testing.T) {
 	a, _ := initTestAdaptorWithMockedFilesystem()
 
-	a.DigitalWrite("J12_1", 1)
-	a.PwmWrite("J12_26", 100)
+	_ = a.DigitalWrite("J12_1", 1)
+	_ = a.PwmWrite("J12_26", 100)
 
 	gobottest.Assert(t, a.Finalize(), nil)
 
@@ -122,10 +122,10 @@ func TestFinalize(t *testing.T) {
 func TestDigitalIO(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem()
 
-	a.DigitalWrite("J12_1", 1)
+	_ = a.DigitalWrite("J12_1", 1)
 	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio451/value"].Contents, "1")
 
-	a.DigitalWrite("J12_1", 0)
+	_ = a.DigitalWrite("J12_1", 0)
 
 	i, err := a.DigitalRead("J12_1")
 	gobottest.Assert(t, err, nil)

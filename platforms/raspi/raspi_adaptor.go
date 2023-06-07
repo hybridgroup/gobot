@@ -235,7 +235,9 @@ func (c *Adaptor) pwmPin(id string) (gobot.PWMPinner, error) {
 			return nil, err
 		}
 		pin = NewPWMPin(c.sys, "/dev/pi-blaster", strconv.Itoa(i))
-		pin.SetPeriod(c.PiBlasterPeriod)
+		if err := pin.SetPeriod(c.PiBlasterPeriod); err != nil {
+			return nil, err
+		}
 		c.pwmPins[id] = pin
 	}
 

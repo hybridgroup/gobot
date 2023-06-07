@@ -1,6 +1,7 @@
 package gpio
 
 import (
+	"github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -53,23 +54,37 @@ func NewMAX7219Driver(a gobot.Connection, clockPin string, dataPin string, csPin
 }
 
 // Start initializes the max7219, it uses a SPI-like communication protocol
-func (a *MAX7219Driver) Start() (err error) {
-	a.pinData.On()
-	a.pinClock.On()
-	a.pinCS.On()
+func (a *MAX7219Driver) Start() error {
+	if err := a.pinData.On(); err != nil {
+		return err
+	}
+	if err := a.pinClock.On(); err != nil {
+		return err
+	}
+	if err := a.pinCS.On(); err != nil {
+		return err
+	}
 
-	a.All(MAX7219ScanLimit, 0x07)
-	a.All(MAX7219DecodeMode, 0x00)
-	a.All(MAX7219Shutdown, 0x01)
-	a.All(MAX7219DisplayTest, 0x00)
-	a.ClearAll()
-	a.All(MAX7219Intensity, 0x0f)
-
-	return
+	if err := a.All(MAX7219ScanLimit, 0x07); err != nil {
+		return err
+	}
+	if err := a.All(MAX7219DecodeMode, 0x00); err != nil {
+		return err
+	}
+	if err := a.All(MAX7219Shutdown, 0x01); err != nil {
+		return err
+	}
+	if err := a.All(MAX7219DisplayTest, 0x00); err != nil {
+		return err
+	}
+	if err := a.ClearAll(); err != nil {
+		return err
+	}
+	return a.All(MAX7219Intensity, 0x0f)
 }
 
 // Halt implements the Driver interface
-func (a *MAX7219Driver) Halt() (err error) { return }
+func (a *MAX7219Driver) Halt() error { return nil }
 
 // Name returns the MAX7219Drivers name
 func (a *MAX7219Driver) Name() string { return a.name }
@@ -83,66 +98,102 @@ func (a *MAX7219Driver) Connection() gobot.Connection {
 }
 
 // SetIntensity changes the intensity (from 1 to 7) of the display
-func (a *MAX7219Driver) SetIntensity(level byte) {
+func (a *MAX7219Driver) SetIntensity(level byte) error {
 	if level > 15 {
 		level = 15
 	}
-	a.All(MAX7219Intensity, level)
+	return a.All(MAX7219Intensity, level)
 }
 
 // ClearAll turns off all LEDs of all modules
-func (a *MAX7219Driver) ClearAll() {
+func (a *MAX7219Driver) ClearAll() error {
+	var err error
 	for i := 1; i <= 8; i++ {
-		a.All(byte(i), 0)
+		if e := a.All(byte(i), 0); e != nil {
+			err = multierror.Append(err, e)
+		}
 	}
+
+	return err
 }
 
 // ClearOne turns off all LEDs of the given module
-func (a *MAX7219Driver) ClearOne(which uint) {
+func (a *MAX7219Driver) ClearOne(which uint) error {
+	var err error
 	for i := 1; i <= 8; i++ {
-		a.One(which, byte(i), 0)
+		if e := a.One(which, byte(i), 0); e != nil {
+			err = multierror.Append(err, e)
+		}
 	}
+
+	return err
 }
 
 // send writes data on the module
-func (a *MAX7219Driver) send(data byte) {
+func (a *MAX7219Driver) send(data byte) error {
 	var i byte
 	for i = 8; i > 0; i-- {
 		mask := byte(0x01 << (i - 1))
 
-		a.pinClock.Off()
-		if data&mask > 0 {
-			a.pinData.On()
-		} else {
-			a.pinData.Off()
+		if err := a.pinClock.Off(); err != nil {
+			return err
 		}
-		a.pinClock.On()
+		if data&mask > 0 {
+			if err := a.pinData.On(); err != nil {
+				return err
+			}
+		} else {
+			if err := a.pinData.Off(); err != nil {
+				return err
+			}
+		}
+		if err := a.pinClock.On(); err != nil {
+			return err
+		}
 	}
+
+	return nil
 }
 
 // All sends the same data to all the modules
-func (a *MAX7219Driver) All(address byte, data byte) {
-	a.pinCS.Off()
+func (a *MAX7219Driver) All(address byte, data byte) error {
+	if err := a.pinCS.Off(); err != nil {
+		return err
+	}
 	var c uint
 	for c = 0; c < a.count; c++ {
-		a.send(address)
-		a.send(data)
+		if err := a.send(address); err != nil {
+			return err
+		}
+		if err := a.send(data); err != nil {
+			return err
+		}
 	}
-	a.pinCS.On()
+	return a.pinCS.On()
 }
 
 // One sends data to a specific module
-func (a *MAX7219Driver) One(which uint, address byte, data byte) {
-	a.pinCS.Off()
+func (a *MAX7219Driver) One(which uint, address byte, data byte) error {
+	if err := a.pinCS.Off(); err != nil {
+		return err
+	}
 	var c uint
 	for c = 0; c < a.count; c++ {
 		if c == which {
-			a.send(address)
-			a.send(data)
+			if err := a.send(address); err != nil {
+				return err
+			}
+			if err := a.send(data); err != nil {
+				return err
+			}
 		} else {
-			a.send(0)
-			a.send(0)
+			if err := a.send(0); err != nil {
+				return err
+			}
+			if err := a.send(0); err != nil {
+				return err
+			}
 		}
 	}
-	a.pinCS.On()
+	return a.pinCS.On()
 }

@@ -116,7 +116,10 @@ func checksum(c []byte) byte {
 func (d *Driver) sendUDP() {
 	d.mutex.RLock()
 	defer d.mutex.RUnlock()
-	d.udpconn.Write(d.cmd)
+
+	if _, err := d.udpconn.Write(d.cmd); err != nil {
+		panic(err)
+	}
 }
 
 // Enable enables the drone to start flying.

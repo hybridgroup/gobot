@@ -194,38 +194,40 @@ func (c *firmataI2cConnection) writeAndCheckCount(buf []byte) error {
 	return nil
 }
 
-func (c *firmataI2cConnection) readInternal(b []byte) (read int, err error) {
+func (c *firmataI2cConnection) readInternal(b []byte) (int, error) {
 	ret := make(chan []byte)
 
-	if err = c.adaptor.Board.I2cRead(c.address, len(b)); err != nil {
-		return
+	if err := c.adaptor.Board.I2cRead(c.address, len(b)); err != nil {
+		return 0, err
 	}
 
-	c.adaptor.Board.Once(c.adaptor.Board.Event("I2cReply"), func(data interface{}) {
+	if err := c.adaptor.Board.Once(c.adaptor.Board.Event("I2cReply"), func(data interface{}) {
 		ret <- data.(client.I2cReply).Data
-	})
+	}); err != nil {
+		return 0, err
+	}
 
 	result := <-ret
 	copy(b, result)
 
-	read = len(result)
-
-	return
+	return len(result), nil
 }
 
-func (c *firmataI2cConnection) writeInternal(data []byte) (written int, err error) {
+func (c *firmataI2cConnection) writeInternal(data []byte) (int, error) {
 	var chunk []byte
+	var written int
 	for len(data) >= 16 {
 		chunk, data = data[:16], data[16:]
-		err = c.adaptor.Board.I2cWrite(c.address, chunk)
-		if err != nil {
-			return
+		if err := c.adaptor.Board.I2cWrite(c.address, chunk); err != nil {
+			return written, err
 		}
 		written += len(chunk)
 	}
 	if len(data) > 0 {
-		err = c.adaptor.Board.I2cWrite(c.address, data[:])
+		if err := c.adaptor.Board.I2cWrite(c.address, data[:]); err != nil {
+			return written, err
+		}
 		written += len(data)
 	}
-	return
+	return written, nil
 }

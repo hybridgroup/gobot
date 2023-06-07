@@ -14,7 +14,7 @@ var negativeEncoder = false
 
 func initTestDriver() *Driver {
 	d := NewDriver(&TestConnector{})
-	d.Start()
+	_ = d.Start()
 	return d
 }
 

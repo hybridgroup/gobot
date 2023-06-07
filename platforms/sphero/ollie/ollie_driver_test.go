@@ -62,10 +62,10 @@ func TestLocatorData(t *testing.T) {
 func TestDataStreaming(t *testing.T) {
 	d := initTestOllieDriver()
 
-	d.SetDataStreamingConfig(sphero.DefaultDataStreamingConfig())
+	_ = d.SetDataStreamingConfig(sphero.DefaultDataStreamingConfig())
 
 	response := false
-	d.On("sensordata", func(data interface{}) {
+	_ = d.On("sensordata", func(data interface{}) {
 		cont := data.(DataStreamingPacket)
 		fmt.Printf("got streaming packet: %+v \n", cont)
 		gobottest.Assert(t, cont.RawAccX, int16(10))

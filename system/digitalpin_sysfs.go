@@ -64,8 +64,7 @@ func (d *digitalPinSysfs) DirectionBehavior() string {
 
 // Export sets the pin as exported with the configured direction
 func (d *digitalPinSysfs) Export() error {
-	err := d.reconfigure()
-	return err
+	return d.reconfigure()
 }
 
 // Unexport release the pin
@@ -194,7 +193,7 @@ func (d *digitalPinSysfs) reconfigure() error {
 	}
 
 	if err != nil {
-		d.Unexport()
+		return d.Unexport()
 	}
 
 	return err

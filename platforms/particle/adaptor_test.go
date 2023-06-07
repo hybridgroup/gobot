@@ -19,20 +19,20 @@ func createTestServer(handler func(w http.ResponseWriter, r *http.Request)) *htt
 	return httptest.NewServer(http.HandlerFunc(handler))
 }
 
-func getDummyResponseForPath(path string, dummy_response string, t *testing.T) *httptest.Server {
-	dummy_data := []byte(dummy_response)
+func getDummyResponseForPath(path string, dummyResponse string, t *testing.T) *httptest.Server {
+	dummyData := []byte(dummyResponse)
 
 	return createTestServer(func(w http.ResponseWriter, r *http.Request) {
 		actualPath := "/v1/devices" + path
 		if r.URL.Path != actualPath {
 			t.Errorf("Path doesn't match, expected %#v, got %#v", actualPath, r.URL.Path)
 		}
-		w.Write(dummy_data)
+		_, _ = w.Write(dummyData)
 	})
 }
 
-func getDummyResponseForPathWithParams(path string, params []string, dummy_response string, t *testing.T) *httptest.Server {
-	dummy_data := []byte(dummy_response)
+func getDummyResponseForPathWithParams(path string, params []string, dummyResponse string, t *testing.T) *httptest.Server {
+	dummyData := []byte(dummyResponse)
 
 	return createTestServer(func(w http.ResponseWriter, r *http.Request) {
 		actualPath := "/v1/devices" + path
@@ -40,14 +40,14 @@ func getDummyResponseForPathWithParams(path string, params []string, dummy_respo
 			t.Errorf("Path doesn't match, expected %#v, got %#v", actualPath, r.URL.Path)
 		}
 
-		r.ParseForm()
+		_ = r.ParseForm()
 
 		for key, value := range params {
 			if r.Form["params"][key] != value {
 				t.Error("Expected param to be " + r.Form["params"][key] + " but was " + value)
 			}
 		}
-		w.Write(dummy_data)
+		_, _ = w.Write(dummyData)
 	})
 }
 
@@ -93,7 +93,7 @@ func TestAdaptorConnect(t *testing.T) {
 
 func TestAdaptorFinalize(t *testing.T) {
 	a := initTestAdaptor()
-	a.Connect()
+	_ = a.Connect()
 	gobottest.Assert(t, a.Finalize(), nil)
 }
 
@@ -134,7 +134,7 @@ func TestAdaptorPwmWrite(t *testing.T) {
 	defer testServer.Close()
 
 	a.setAPIServer(testServer.URL)
-	a.PwmWrite("A1", 1)
+	_ = a.PwmWrite("A1", 1)
 }
 
 func TestAdaptorAnalogWrite(t *testing.T) {
@@ -146,7 +146,7 @@ func TestAdaptorAnalogWrite(t *testing.T) {
 	defer testServer.Close()
 
 	a.setAPIServer(testServer.URL)
-	a.AnalogWrite("A1", 1)
+	_ = a.AnalogWrite("A1", 1)
 }
 
 func TestAdaptorDigitalWrite(t *testing.T) {
@@ -158,7 +158,7 @@ func TestAdaptorDigitalWrite(t *testing.T) {
 	testServer := getDummyResponseForPathWithParams("/"+a.DeviceID+"/digitalwrite", params, response, t)
 
 	a.setAPIServer(testServer.URL)
-	a.DigitalWrite("D7", 1)
+	_ = a.DigitalWrite("D7", 1)
 
 	testServer.Close()
 	// When LOW
@@ -168,7 +168,7 @@ func TestAdaptorDigitalWrite(t *testing.T) {
 	defer testServer.Close()
 
 	a.setAPIServer(testServer.URL)
-	a.DigitalWrite("D7", 0)
+	_ = a.DigitalWrite("D7", 0)
 }
 
 func TestAdaptorServoOpen(t *testing.T) {
@@ -180,7 +180,7 @@ func TestAdaptorServoOpen(t *testing.T) {
 	defer testServer.Close()
 
 	a.setAPIServer(testServer.URL)
-	a.servoPinOpen("1")
+	_ = a.servoPinOpen("1")
 }
 
 func TestAdaptorServoWrite(t *testing.T) {
@@ -192,7 +192,7 @@ func TestAdaptorServoWrite(t *testing.T) {
 	defer testServer.Close()
 
 	a.setAPIServer(testServer.URL)
-	a.ServoWrite("1", 128)
+	_ = a.ServoWrite("1", 128)
 }
 
 func TestAdaptorDigitalRead(t *testing.T) {
@@ -376,13 +376,13 @@ func TestAdaptorEventStream(t *testing.T) {
 		url = u
 		return nil, nil, nil
 	}
-	a.EventStream("all", "ping")
+	_, _ = a.EventStream("all", "ping")
 	gobottest.Assert(t, url, "https://api.particle.io/v1/events/ping?access_token=token")
 
-	a.EventStream("devices", "ping")
+	_, _ = a.EventStream("devices", "ping")
 	gobottest.Assert(t, url, "https://api.particle.io/v1/devices/events/ping?access_token=token")
 
-	a.EventStream("device", "ping")
+	_, _ = a.EventStream("device", "ping")
 	gobottest.Assert(t, url, "https://api.particle.io/v1/devices/myDevice/events/ping?access_token=token")
 
 	_, err := a.EventStream("nothing", "ping")

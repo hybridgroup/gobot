@@ -62,19 +62,16 @@ func (b *IOPinDriver) adaptor() ble.BLEConnector {
 }
 
 // Start tells driver to get ready to do work
-func (b *IOPinDriver) Start() (err error) {
-	_, err = b.ReadPinADConfig()
-	if err != nil {
-		return
+func (b *IOPinDriver) Start() error {
+	if _, err := b.ReadPinADConfig(); err != nil {
+		return err
 	}
-	_, err = b.ReadPinIOConfig()
-	return
+	_, err := b.ReadPinIOConfig()
+	return err
 }
 
 // Halt stops driver (void)
-func (b *IOPinDriver) Halt() (err error) {
-	return
-}
+func (b *IOPinDriver) Halt() error { return nil }
 
 // ReadAllPinData reads and returns the pin data for all pins
 func (b *IOPinDriver) ReadAllPinData() (pins []PinData) {
@@ -93,10 +90,10 @@ func (b *IOPinDriver) ReadAllPinData() (pins []PinData) {
 }
 
 // WritePinData writes the pin data for a single pin
-func (b *IOPinDriver) WritePinData(pin string, data byte) (err error) {
+func (b *IOPinDriver) WritePinData(pin string, data byte) error {
 	i, err := strconv.Atoi(pin)
 	if err != nil {
-		return
+		return err
 	}
 
 	buf := []byte{byte(i), data}
@@ -105,10 +102,10 @@ func (b *IOPinDriver) WritePinData(pin string, data byte) (err error) {
 }
 
 // ReadPinADConfig reads and returns the pin A/D config mask for all pins
-func (b *IOPinDriver) ReadPinADConfig() (config int, err error) {
-	c, e := b.adaptor().ReadCharacteristic(pinADConfigCharacteristic)
-	if e != nil {
-		return 0, e
+func (b *IOPinDriver) ReadPinADConfig() (int, error) {
+	c, err := b.adaptor().ReadCharacteristic(pinADConfigCharacteristic)
+	if err != nil {
+		return 0, err
 	}
 	var result byte
 	for i := 0; i < 4; i++ {
@@ -120,19 +117,21 @@ func (b *IOPinDriver) ReadPinADConfig() (config int, err error) {
 }
 
 // WritePinADConfig writes the pin A/D config mask for all pins
-func (b *IOPinDriver) WritePinADConfig(config int) (err error) {
+func (b *IOPinDriver) WritePinADConfig(config int) error {
 	b.adMask = config
 	data := &bytes.Buffer{}
-	binary.Write(data, binary.LittleEndian, uint32(config))
-	err = b.adaptor().WriteCharacteristic(pinADConfigCharacteristic, data.Bytes())
-	return
+	if err := binary.Write(data, binary.LittleEndian, uint32(config)); err != nil {
+		return err
+	}
+
+	return b.adaptor().WriteCharacteristic(pinADConfigCharacteristic, data.Bytes())
 }
 
 // ReadPinIOConfig reads and returns the pin IO config mask for all pins
-func (b *IOPinDriver) ReadPinIOConfig() (config int, err error) {
-	c, e := b.adaptor().ReadCharacteristic(pinIOConfigCharacteristic)
-	if e != nil {
-		return 0, e
+func (b *IOPinDriver) ReadPinIOConfig() (int, error) {
+	c, err := b.adaptor().ReadCharacteristic(pinIOConfigCharacteristic)
+	if err != nil {
+		return 0, err
 	}
 
 	var result byte
@@ -145,77 +144,99 @@ func (b *IOPinDriver) ReadPinIOConfig() (config int, err error) {
 }
 
 // WritePinIOConfig writes the pin I/O config mask for all pins
-func (b *IOPinDriver) WritePinIOConfig(config int) (err error) {
+func (b *IOPinDriver) WritePinIOConfig(config int) error {
 	b.ioMask = config
 	data := &bytes.Buffer{}
-	binary.Write(data, binary.LittleEndian, uint32(config))
-	err = b.adaptor().WriteCharacteristic(pinIOConfigCharacteristic, data.Bytes())
-	return
+	if err := binary.Write(data, binary.LittleEndian, uint32(config)); err != nil {
+		return err
+	}
+
+	return b.adaptor().WriteCharacteristic(pinIOConfigCharacteristic, data.Bytes())
 }
 
 // DigitalRead reads from a pin
-func (b *IOPinDriver) DigitalRead(pin string) (val int, err error) {
+func (b *IOPinDriver) DigitalRead(pin string) (int, error) {
 	p, err := validatedPin(pin)
 	if err != nil {
-		return
+		return 0, err
 	}
 
-	b.ensureDigital(p)
-	b.ensureInput(p)
+	if err := b.ensureDigital(p); err != nil {
+		return 0, err
+	}
+	if err := b.ensureInput(p); err != nil {
+		return 0, err
+	}
 
 	pins := b.ReadAllPinData()
 	return int(pins[p].value), nil
 }
 
 // DigitalWrite writes to a pin
-func (b *IOPinDriver) DigitalWrite(pin string, level byte) (err error) {
+func (b *IOPinDriver) DigitalWrite(pin string, level byte) error {
 	p, err := validatedPin(pin)
 	if err != nil {
-		return
+		return err
 	}
 
-	b.ensureDigital(p)
-	b.ensureOutput(p)
+	if err := b.ensureDigital(p); err != nil {
+		return err
+	}
+	if err := b.ensureOutput(p); err != nil {
+		return err
+	}
 
 	return b.WritePinData(pin, level)
 }
 
 // AnalogRead reads from a pin
-func (b *IOPinDriver) AnalogRead(pin string) (val int, err error) {
+func (b *IOPinDriver) AnalogRead(pin string) (int, error) {
 	p, err := validatedPin(pin)
 	if err != nil {
-		return
+		return 0, err
 	}
 
-	b.ensureAnalog(p)
-	b.ensureInput(p)
+	if err := b.ensureAnalog(p); err != nil {
+		return 0, err
+	}
+	if err := b.ensureInput(p); err != nil {
+		return 0, err
+	}
 
 	pins := b.ReadAllPinData()
 	return int(pins[p].value), nil
 }
 
-func (b *IOPinDriver) ensureDigital(pin int) {
+func (b *IOPinDriver) ensureDigital(pin int) error {
 	if hasBit(b.adMask, pin) {
-		b.WritePinADConfig(clearBit(b.adMask, pin))
+		return b.WritePinADConfig(clearBit(b.adMask, pin))
 	}
+
+	return nil
 }
 
-func (b *IOPinDriver) ensureAnalog(pin int) {
+func (b *IOPinDriver) ensureAnalog(pin int) error {
 	if !hasBit(b.adMask, pin) {
-		b.WritePinADConfig(setBit(b.adMask, pin))
+		return b.WritePinADConfig(setBit(b.adMask, pin))
 	}
+
+	return nil
 }
 
-func (b *IOPinDriver) ensureInput(pin int) {
+func (b *IOPinDriver) ensureInput(pin int) error {
 	if !hasBit(b.ioMask, pin) {
-		b.WritePinIOConfig(setBit(b.ioMask, pin))
+		return b.WritePinIOConfig(setBit(b.ioMask, pin))
 	}
+
+	return nil
 }
 
-func (b *IOPinDriver) ensureOutput(pin int) {
+func (b *IOPinDriver) ensureOutput(pin int) error {
 	if hasBit(b.ioMask, pin) {
-		b.WritePinIOConfig(clearBit(b.ioMask, pin))
+		return b.WritePinIOConfig(clearBit(b.ioMask, pin))
 	}
+
+	return nil
 }
 
 func validatedPin(pin string) (int, error) {

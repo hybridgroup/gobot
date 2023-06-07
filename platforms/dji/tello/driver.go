@@ -267,10 +267,18 @@ func (d *Driver) Start() error {
 	go func() {
 		defer d.addDoneChReaderCount(-1)
 
-		d.On(d.Event(ConnectedEvent), func(interface{}) {
-			d.SendDateTime()
-			d.processVideo()
+		err := d.On(d.Event(ConnectedEvent), func(interface{}) {
+			if err := d.SendDateTime(); err != nil {
+				panic(err)
+			}
+			if err := d.processVideo(); err != nil {
+				panic(err)
+			}
 		})
+
+		if err != nil {
+			panic(err)
+		}
 
 	cmdLoop:
 		for {
@@ -287,7 +295,9 @@ func (d *Driver) Start() error {
 	}()
 
 	// starts notifications coming from drone to video port normally 11111
-	d.SendCommand(d.connectionString())
+	if err := d.SendCommand(d.connectionString()); err != nil {
+		return err
+	}
 
 	// send stick commands
 	d.addDoneChReaderCount(1)
@@ -300,8 +310,7 @@ func (d *Driver) Start() error {
 			case <-d.doneCh:
 				break stickCmdLoop
 			default:
-				err := d.SendStickCommand()
-				if err != nil {
+				if err := d.SendStickCommand(); err != nil {
 					fmt.Println("stick command error:", err)
 				}
 				time.Sleep(20 * time.Millisecond)
@@ -313,10 +322,12 @@ func (d *Driver) Start() error {
 }
 
 // Halt stops the driver.
-func (d *Driver) Halt() (err error) {
+func (d *Driver) Halt() error {
 	// send a landing command when we disconnect, and give it 500ms to be received before we shutdown
 	if d.cmdConn != nil {
-		d.Land()
+		if err := d.Land(); err != nil {
+			return err
+		}
 	}
 	time.Sleep(500 * time.Millisecond)
 
@@ -332,103 +343,146 @@ func (d *Driver) Halt() (err error) {
 		d.doneCh <- struct{}{}
 	}
 
-	return
+	return nil
 }
 
 // TakeOff tells drones to liftoff and start flying.
-func (d *Driver) TakeOff() (err error) {
+func (d *Driver) TakeOff() error {
 	buf, _ := d.createPacket(takeoffCommand, 0x68, 0)
 	d.seq++
-	binary.Write(buf, binary.LittleEndian, d.seq)
-	binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes()))
+	if err := binary.Write(buf, binary.LittleEndian, d.seq); err != nil {
+		return err
+	}
+	if err := binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes())); err != nil {
+		return err
+	}
 
-	_, err = d.cmdConn.Write(buf.Bytes())
-	return
+	_, err := d.cmdConn.Write(buf.Bytes())
+	return err
 }
 
 // Throw & Go support
-func (d *Driver) ThrowTakeOff() (err error) {
+func (d *Driver) ThrowTakeOff() error {
 	buf, _ := d.createPacket(throwtakeoffCommand, 0x48, 0)
 	d.seq++
-	binary.Write(buf, binary.LittleEndian, d.seq)
-	binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes()))
+	if err := binary.Write(buf, binary.LittleEndian, d.seq); err != nil {
+		return err
+	}
+	if err := binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes())); err != nil {
+		return err
+	}
 
-	_, err = d.cmdConn.Write(buf.Bytes())
-	return
+	_, err := d.cmdConn.Write(buf.Bytes())
+	return err
 }
 
 // Land tells drone to come in for landing.
-func (d *Driver) Land() (err error) {
+func (d *Driver) Land() error {
 	buf, _ := d.createPacket(landCommand, 0x68, 1)
 	d.seq++
-	binary.Write(buf, binary.LittleEndian, d.seq)
-	binary.Write(buf, binary.LittleEndian, byte(0x00))
-	binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes()))
+	if err := binary.Write(buf, binary.LittleEndian, d.seq); err != nil {
+		return err
+	}
+	if err := binary.Write(buf, binary.LittleEndian, byte(0x00)); err != nil {
+		return err
+	}
+	if err := binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes())); err != nil {
+		return err
+	}
 
-	_, err = d.cmdConn.Write(buf.Bytes())
-	return
+	_, err := d.cmdConn.Write(buf.Bytes())
+	return err
 }
 
 // StopLanding tells drone to stop landing.
-func (d *Driver) StopLanding() (err error) {
+func (d *Driver) StopLanding() error {
 	buf, _ := d.createPacket(landCommand, 0x68, 1)
 	d.seq++
-	binary.Write(buf, binary.LittleEndian, d.seq)
-	binary.Write(buf, binary.LittleEndian, byte(0x01))
-	binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes()))
+	if err := binary.Write(buf, binary.LittleEndian, d.seq); err != nil {
+		return err
+	}
+	if err := binary.Write(buf, binary.LittleEndian, byte(0x01)); err != nil {
+		return err
+	}
+	if err := binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes())); err != nil {
+		return err
+	}
 
-	_, err = d.cmdConn.Write(buf.Bytes())
-	return
+	_, err := d.cmdConn.Write(buf.Bytes())
+	return err
 }
 
 // PalmLand tells drone to come in for a hand landing.
-func (d *Driver) PalmLand() (err error) {
+func (d *Driver) PalmLand() error {
 	buf, _ := d.createPacket(palmLandCommand, 0x68, 1)
 	d.seq++
-	binary.Write(buf, binary.LittleEndian, d.seq)
-	binary.Write(buf, binary.LittleEndian, byte(0x00))
-	binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes()))
+	if err := binary.Write(buf, binary.LittleEndian, d.seq); err != nil {
+		return err
+	}
+	if err := binary.Write(buf, binary.LittleEndian, byte(0x00)); err != nil {
+		return err
+	}
+	if err := binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes())); err != nil {
+		return err
+	}
 
-	_, err = d.cmdConn.Write(buf.Bytes())
-	return
+	_, err := d.cmdConn.Write(buf.Bytes())
+	return err
 }
 
 // StartVideo tells Tello to send start info (SPS/PPS) for video stream.
-func (d *Driver) StartVideo() (err error) {
+func (d *Driver) StartVideo() error {
 	buf, _ := d.createPacket(videoStartCommand, 0x60, 0)
-	binary.Write(buf, binary.LittleEndian, int16(0x00)) // seq = 0
-	binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes()))
+	// seq = 0
+	if err := binary.Write(buf, binary.LittleEndian, int16(0x00)); err != nil {
+		return err
+	}
+	if err := binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes())); err != nil {
+		return err
+	}
 
-	_, err = d.cmdConn.Write(buf.Bytes())
-	return
+	_, err := d.cmdConn.Write(buf.Bytes())
+	return err
 }
 
 // SetExposure sets the drone camera exposure level. Valid levels are 0, 1, and 2.
-func (d *Driver) SetExposure(level int) (err error) {
+func (d *Driver) SetExposure(level int) error {
 	if level < 0 || level > 2 {
 		return errors.New("Invalid exposure level")
 	}
 
 	buf, _ := d.createPacket(exposureCommand, 0x48, 1)
 	d.seq++
-	binary.Write(buf, binary.LittleEndian, d.seq)
-	binary.Write(buf, binary.LittleEndian, byte(level))
-	binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes()))
+	if err := binary.Write(buf, binary.LittleEndian, d.seq); err != nil {
+		return err
+	}
+	if err := binary.Write(buf, binary.LittleEndian, byte(level)); err != nil {
+		return err
+	}
+	if err := binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes())); err != nil {
+		return err
+	}
 
-	_, err = d.cmdConn.Write(buf.Bytes())
-	return
+	_, err := d.cmdConn.Write(buf.Bytes())
+	return err
 }
 
 // SetVideoEncoderRate sets the drone video encoder rate.
-func (d *Driver) SetVideoEncoderRate(rate VideoBitRate) (err error) {
+func (d *Driver) SetVideoEncoderRate(rate VideoBitRate) error {
 	buf, _ := d.createPacket(videoEncoderRateCommand, 0x68, 1)
 	d.seq++
-	binary.Write(buf, binary.LittleEndian, d.seq)
-	binary.Write(buf, binary.LittleEndian, byte(rate))
-	binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes()))
+	if err := binary.Write(buf, binary.LittleEndian, d.seq); err != nil {
+		return err
+	}
+	if err := binary.Write(buf, binary.LittleEndian, byte(rate)); err != nil {
+		return err
+	}
+	if err := binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes())); err != nil {
+		return err
+	}
 
-	_, err = d.cmdConn.Write(buf.Bytes())
-	return
+	_, err := d.cmdConn.Write(buf.Bytes())
+	return err
 }
 
 // SetFastMode sets the drone throttle to 1.
@@ -450,14 +504,18 @@ func (d *Driver) SetSlowMode() error {
 }
 
 // Rate queries the current video bit rate.
-func (d *Driver) Rate() (err error) {
+func (d *Driver) Rate() error {
 	buf, _ := d.createPacket(videoRateQuery, 0x48, 0)
 	d.seq++
-	binary.Write(buf, binary.LittleEndian, d.seq)
-	binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes()))
+	if err := binary.Write(buf, binary.LittleEndian, d.seq); err != nil {
+		return err
+	}
+	if err := binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes())); err != nil {
+		return err
+	}
 
-	_, err = d.cmdConn.Write(buf.Bytes())
-	return
+	_, err := d.cmdConn.Write(buf.Bytes())
+	return err
 }
 
 // bound is a naive implementation that returns the smaller of x or y.
@@ -650,89 +708,98 @@ func (d *Driver) CeaseRotation() {
 }
 
 // Bounce tells drone to start/stop performing the bouncing action
-func (d *Driver) Bounce() (err error) {
+func (d *Driver) Bounce() error {
 	buf, _ := d.createPacket(bounceCommand, 0x68, 1)
 	d.seq++
-	binary.Write(buf, binary.LittleEndian, d.seq)
-	if d.bouncing {
-		binary.Write(buf, binary.LittleEndian, byte(0x31))
-	} else {
-		binary.Write(buf, binary.LittleEndian, byte(0x30))
+	if err := binary.Write(buf, binary.LittleEndian, d.seq); err != nil {
+		return err
 	}
-	binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes()))
-	_, err = d.cmdConn.Write(buf.Bytes())
+
+	if d.bouncing {
+		if err := binary.Write(buf, binary.LittleEndian, byte(0x31)); err != nil {
+			return err
+		}
+	} else {
+		if err := binary.Write(buf, binary.LittleEndian, byte(0x30)); err != nil {
+			return err
+		}
+	}
+	if err := binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes())); err != nil {
+		return err
+	}
+	_, err := d.cmdConn.Write(buf.Bytes())
 	d.bouncing = !d.bouncing
-	return
+	return err
 }
 
 // Flip tells drone to flip
-func (d *Driver) Flip(direction FlipType) (err error) {
+func (d *Driver) Flip(direction FlipType) error {
 	buf, _ := d.createPacket(flipCommand, 0x70, 1)
 	d.seq++
-	binary.Write(buf, binary.LittleEndian, d.seq)
-	binary.Write(buf, binary.LittleEndian, byte(direction))
-	binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes()))
+	if err := binary.Write(buf, binary.LittleEndian, d.seq); err != nil {
+		return err
+	}
+	if err := binary.Write(buf, binary.LittleEndian, byte(direction)); err != nil {
+		return err
+	}
+	if err := binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes())); err != nil {
+		return err
+	}
 
-	_, err = d.cmdConn.Write(buf.Bytes())
-	return
+	_, err := d.cmdConn.Write(buf.Bytes())
+	return err
 }
 
 // FrontFlip tells the drone to perform a front flip.
-func (d *Driver) FrontFlip() (err error) {
+func (d *Driver) FrontFlip() error {
 	return d.Flip(FlipFront)
 }
 
 // BackFlip tells the drone to perform a back flip.
-func (d *Driver) BackFlip() (err error) {
+func (d *Driver) BackFlip() error {
 	return d.Flip(FlipBack)
 }
 
 // RightFlip tells the drone to perform a flip to the right.
-func (d *Driver) RightFlip() (err error) {
+func (d *Driver) RightFlip() error {
 	return d.Flip(FlipRight)
 }
 
 // LeftFlip tells the drone to perform a flip to the left.
-func (d *Driver) LeftFlip() (err error) {
+func (d *Driver) LeftFlip() error {
 	return d.Flip(FlipLeft)
 }
 
 // ParseFlightData from drone
-func (d *Driver) ParseFlightData(b []byte) (fd *FlightData, err error) {
+func (d *Driver) ParseFlightData(b []byte) (*FlightData, error) {
 	buf := bytes.NewReader(b)
-	fd = &FlightData{}
+	fd := &FlightData{}
 	var data byte
 
 	if buf.Len() < 24 {
-		err = errors.New("Invalid buffer length for flight data packet")
+		err := errors.New("Invalid buffer length for flight data packet")
 		fmt.Println(err)
-		return
+		return fd, err
 	}
 
-	err = binary.Read(buf, binary.LittleEndian, &fd.Height)
-	if err != nil {
-		return
+	if err := binary.Read(buf, binary.LittleEndian, &fd.Height); err != nil {
+		return fd, err
 	}
-	err = binary.Read(buf, binary.LittleEndian, &fd.NorthSpeed)
-	if err != nil {
-		return
+	if err := binary.Read(buf, binary.LittleEndian, &fd.NorthSpeed); err != nil {
+		return fd, err
 	}
-	err = binary.Read(buf, binary.LittleEndian, &fd.EastSpeed)
-	if err != nil {
-		return
+	if err := binary.Read(buf, binary.LittleEndian, &fd.EastSpeed); err != nil {
+		return fd, err
 	}
-	err = binary.Read(buf, binary.LittleEndian, &fd.VerticalSpeed)
-	if err != nil {
-		return
+	if err := binary.Read(buf, binary.LittleEndian, &fd.VerticalSpeed); err != nil {
+		return fd, err
 	}
-	err = binary.Read(buf, binary.LittleEndian, &fd.FlyTime)
-	if err != nil {
-		return
+	if err := binary.Read(buf, binary.LittleEndian, &fd.FlyTime); err != nil {
+		return fd, err
 	}
 
-	err = binary.Read(buf, binary.LittleEndian, &data)
-	if err != nil {
-		return
+	if err := binary.Read(buf, binary.LittleEndian, &data); err != nil {
+		return fd, err
 	}
 	fd.ImuState = (data >> 0 & 0x1) == 1
 	fd.PressureState = (data >> 1 & 0x1) == 1
@@ -742,26 +809,21 @@ func (d *Driver) ParseFlightData(b []byte) (fd *FlightData, err error) {
 	fd.GravityState = (data >> 5 & 0x1) == 1
 	fd.WindState = (data >> 7 & 0x1) == 1
 
-	err = binary.Read(buf, binary.LittleEndian, &fd.ImuCalibrationState)
-	if err != nil {
-		return
+	if err := binary.Read(buf, binary.LittleEndian, &fd.ImuCalibrationState); err != nil {
+		return fd, err
 	}
-	err = binary.Read(buf, binary.LittleEndian, &fd.BatteryPercentage)
-	if err != nil {
-		return
+	if err := binary.Read(buf, binary.LittleEndian, &fd.BatteryPercentage); err != nil {
+		return fd, err
 	}
-	err = binary.Read(buf, binary.LittleEndian, &fd.DroneFlyTimeLeft)
-	if err != nil {
-		return
+	if err := binary.Read(buf, binary.LittleEndian, &fd.DroneFlyTimeLeft); err != nil {
+		return fd, err
 	}
-	err = binary.Read(buf, binary.LittleEndian, &fd.DroneBatteryLeft)
-	if err != nil {
-		return
+	if err := binary.Read(buf, binary.LittleEndian, &fd.DroneBatteryLeft); err != nil {
+		return fd, err
 	}
 
-	err = binary.Read(buf, binary.LittleEndian, &data)
-	if err != nil {
-		return
+	if err := binary.Read(buf, binary.LittleEndian, &data); err != nil {
+		return fd, err
 	}
 	fd.Flying = (data >> 0 & 0x1) == 1
 	fd.OnGround = (data >> 1 & 0x1) == 1
@@ -772,49 +834,46 @@ func (d *Driver) ParseFlightData(b []byte) (fd *FlightData, err error) {
 	fd.BatteryLower = (data >> 6 & 0x1) == 1
 	fd.FactoryMode = (data >> 7 & 0x1) == 1
 
-	err = binary.Read(buf, binary.LittleEndian, &fd.FlyMode)
-	if err != nil {
-		return
+	if err := binary.Read(buf, binary.LittleEndian, &fd.FlyMode); err != nil {
+		return fd, err
 	}
-	err = binary.Read(buf, binary.LittleEndian, &fd.ThrowFlyTimer)
-	if err != nil {
-		return
+	if err := binary.Read(buf, binary.LittleEndian, &fd.ThrowFlyTimer); err != nil {
+		return fd, err
 	}
-	err = binary.Read(buf, binary.LittleEndian, &fd.CameraState)
-	if err != nil {
-		return
+	if err := binary.Read(buf, binary.LittleEndian, &fd.CameraState); err != nil {
+		return fd, err
 	}
 
-	err = binary.Read(buf, binary.LittleEndian, &data)
-	if err != nil {
-		return
+	if err := binary.Read(buf, binary.LittleEndian, &data); err != nil {
+		return fd, err
 	}
 	fd.ElectricalMachineryState = int16(data & 0xff)
 
-	err = binary.Read(buf, binary.LittleEndian, &data)
-	if err != nil {
-		return
+	if err := binary.Read(buf, binary.LittleEndian, &data); err != nil {
+		return fd, err
 	}
 	fd.FrontIn = (data >> 0 & 0x1) == 1
 	fd.FrontOut = (data >> 1 & 0x1) == 1
 	fd.FrontLSC = (data >> 2 & 0x1) == 1
 
-	err = binary.Read(buf, binary.LittleEndian, &data)
-	if err != nil {
-		return
+	if err := binary.Read(buf, binary.LittleEndian, &data); err != nil {
+		return fd, err
 	}
 	fd.TemperatureHigh = (data >> 0 & 0x1) == 1
 
-	return
+	return fd, nil
 }
 
 // SendStickCommand sends the joystick command packet to the drone.
-func (d *Driver) SendStickCommand() (err error) {
+func (d *Driver) SendStickCommand() error {
 	d.cmdMutex.Lock()
 	defer d.cmdMutex.Unlock()
 
 	buf, _ := d.createPacket(stickCommand, 0x60, 11)
-	binary.Write(buf, binary.LittleEndian, int16(0x00)) // seq = 0
+	// seq = 0
+	if err := binary.Write(buf, binary.LittleEndian, int16(0x00)); err != nil {
+		return err
+	}
 
 	// RightX center=1024 left =364 right =-364
 	axis1 := int16(660.0*d.rx + 1024.0)
@@ -832,54 +891,94 @@ func (d *Driver) SendStickCommand() (err error) {
 	axis5 := int16(d.throttle)
 
 	packedAxis := int64(axis1)&0x7FF | int64(axis2&0x7FF)<<11 | 0x7FF&int64(axis3)<<22 | 0x7FF&int64(axis4)<<33 | int64(axis5)<<44
-	binary.Write(buf, binary.LittleEndian, byte(0xFF&packedAxis))
-	binary.Write(buf, binary.LittleEndian, byte(packedAxis>>8&0xFF))
-	binary.Write(buf, binary.LittleEndian, byte(packedAxis>>16&0xFF))
-	binary.Write(buf, binary.LittleEndian, byte(packedAxis>>24&0xFF))
-	binary.Write(buf, binary.LittleEndian, byte(packedAxis>>32&0xFF))
-	binary.Write(buf, binary.LittleEndian, byte(packedAxis>>40&0xFF))
+	if err := binary.Write(buf, binary.LittleEndian, byte(0xFF&packedAxis)); err != nil {
+		return err
+	}
+	if err := binary.Write(buf, binary.LittleEndian, byte(packedAxis>>8&0xFF)); err != nil {
+		return err
+	}
+	if err := binary.Write(buf, binary.LittleEndian, byte(packedAxis>>16&0xFF)); err != nil {
+		return err
+	}
+	if err := binary.Write(buf, binary.LittleEndian, byte(packedAxis>>24&0xFF)); err != nil {
+		return err
+	}
+	if err := binary.Write(buf, binary.LittleEndian, byte(packedAxis>>32&0xFF)); err != nil {
+		return err
+	}
+	if err := binary.Write(buf, binary.LittleEndian, byte(packedAxis>>40&0xFF)); err != nil {
+		return err
+	}
 
 	now := time.Now()
-	binary.Write(buf, binary.LittleEndian, byte(now.Hour()))
-	binary.Write(buf, binary.LittleEndian, byte(now.Minute()))
-	binary.Write(buf, binary.LittleEndian, byte(now.Second()))
-	binary.Write(buf, binary.LittleEndian, byte(now.UnixNano()/int64(time.Millisecond)&0xff))
-	binary.Write(buf, binary.LittleEndian, byte(now.UnixNano()/int64(time.Millisecond)>>8))
+	if err := binary.Write(buf, binary.LittleEndian, byte(now.Hour())); err != nil {
+		return err
+	}
+	if err := binary.Write(buf, binary.LittleEndian, byte(now.Minute())); err != nil {
+		return err
+	}
+	if err := binary.Write(buf, binary.LittleEndian, byte(now.Second())); err != nil {
+		return err
+	}
+	if err := binary.Write(buf, binary.LittleEndian, byte(now.UnixNano()/int64(time.Millisecond)&0xff)); err != nil {
+		return err
+	}
+	if err := binary.Write(buf, binary.LittleEndian, byte(now.UnixNano()/int64(time.Millisecond)>>8)); err != nil {
+		return err
+	}
 
-	binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes()))
+	if err := binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes())); err != nil {
+		return err
+	}
 
-	_, err = d.cmdConn.Write(buf.Bytes())
+	_, err := d.cmdConn.Write(buf.Bytes())
 
-	return
+	return err
 }
 
 // SendDateTime sends the current date/time to the drone.
-func (d *Driver) SendDateTime() (err error) {
+func (d *Driver) SendDateTime() error {
 	d.cmdMutex.Lock()
 	defer d.cmdMutex.Unlock()
 
 	buf, _ := d.createPacket(timeCommand, 0x50, 11)
 	d.seq++
-	binary.Write(buf, binary.LittleEndian, d.seq)
+	if err := binary.Write(buf, binary.LittleEndian, d.seq); err != nil {
+		return err
+	}
 
 	now := time.Now()
-	binary.Write(buf, binary.LittleEndian, byte(0x00))
-	binary.Write(buf, binary.LittleEndian, int16(now.Hour()))
-	binary.Write(buf, binary.LittleEndian, int16(now.Minute()))
-	binary.Write(buf, binary.LittleEndian, int16(now.Second()))
-	binary.Write(buf, binary.LittleEndian, int16(now.UnixNano()/int64(time.Millisecond)&0xff))
-	binary.Write(buf, binary.LittleEndian, int16(now.UnixNano()/int64(time.Millisecond)>>8))
+	if err := binary.Write(buf, binary.LittleEndian, byte(0x00)); err != nil {
+		return err
+	}
+	if err := binary.Write(buf, binary.LittleEndian, int16(now.Hour())); err != nil {
+		return err
+	}
+	if err := binary.Write(buf, binary.LittleEndian, int16(now.Minute())); err != nil {
+		return err
+	}
+	if err := binary.Write(buf, binary.LittleEndian, int16(now.Second())); err != nil {
+		return err
+	}
+	if err := binary.Write(buf, binary.LittleEndian, int16(now.UnixNano()/int64(time.Millisecond)&0xff)); err != nil {
+		return err
+	}
+	if err := binary.Write(buf, binary.LittleEndian, int16(now.UnixNano()/int64(time.Millisecond)>>8)); err != nil {
+		return err
+	}
 
-	binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes()))
+	if err := binary.Write(buf, binary.LittleEndian, CalculateCRC16(buf.Bytes())); err != nil {
+		return err
+	}
 
-	_, err = d.cmdConn.Write(buf.Bytes())
-	return
+	_, err := d.cmdConn.Write(buf.Bytes())
+	return err
 }
 
 // SendCommand is used to send a text command such as the initial connection request to the drone.
-func (d *Driver) SendCommand(cmd string) (err error) {
-	_, err = d.cmdConn.Write([]byte(cmd))
-	return
+func (d *Driver) SendCommand(cmd string) error {
+	_, err := d.cmdConn.Write([]byte(cmd))
+	return err
 }
 
 func (d *Driver) handleResponse(r io.Reader) error {
@@ -897,13 +996,15 @@ func (d *Driver) handleResponse(r io.Reader) error {
 		case wifiMessage:
 			buf := bytes.NewReader(buf[9:10])
 			wd := &WifiData{}
-			binary.Read(buf, binary.LittleEndian, &wd.Strength)
-			binary.Read(buf, binary.LittleEndian, &wd.Disturb)
+			// TODO: do not drop err, see #948
+			_ = binary.Read(buf, binary.LittleEndian, &wd.Strength)
+			_ = binary.Read(buf, binary.LittleEndian, &wd.Disturb)
 			d.Publish(d.Event(WifiDataEvent), wd)
 		case lightMessage:
 			buf := bytes.NewReader(buf[9:9])
 			var ld int8
-			binary.Read(buf, binary.LittleEndian, &ld)
+			// TODO: do not drop err, see #948
+			_ = binary.Read(buf, binary.LittleEndian, &ld)
 			d.Publish(d.Event(LightStrengthEvent), ld)
 		case logMessage:
 			d.Publish(d.Event(LogEvent), buf[9:])
@@ -975,15 +1076,25 @@ func (d *Driver) processVideo() error {
 	return nil
 }
 
-func (d *Driver) createPacket(cmd int16, pktType byte, len int16) (buf *bytes.Buffer, err error) {
+func (d *Driver) createPacket(cmd int16, pktType byte, len int16) (*bytes.Buffer, error) {
 	l := len + 11
-	buf = &bytes.Buffer{}
+	buf := &bytes.Buffer{}
 
-	binary.Write(buf, binary.LittleEndian, byte(messageStart))
-	binary.Write(buf, binary.LittleEndian, l<<3)
-	binary.Write(buf, binary.LittleEndian, CalculateCRC8(buf.Bytes()[0:3]))
-	binary.Write(buf, binary.LittleEndian, pktType)
-	binary.Write(buf, binary.LittleEndian, cmd)
+	if err := binary.Write(buf, binary.LittleEndian, byte(messageStart)); err != nil {
+		return buf, err
+	}
+	if err := binary.Write(buf, binary.LittleEndian, l<<3); err != nil {
+		return buf, err
+	}
+	if err := binary.Write(buf, binary.LittleEndian, CalculateCRC8(buf.Bytes()[0:3])); err != nil {
+		return buf, err
+	}
+	if err := binary.Write(buf, binary.LittleEndian, pktType); err != nil {
+		return buf, err
+	}
+	if err := binary.Write(buf, binary.LittleEndian, cmd); err != nil {
+		return buf, err
+	}
 
 	return buf, nil
 }

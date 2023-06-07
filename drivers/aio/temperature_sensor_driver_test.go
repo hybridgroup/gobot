@@ -100,7 +100,7 @@ func TestTempSensorPublishesTemperatureInCelsius(t *testing.T) {
 		val = 585
 		return
 	})
-	d.Once(d.Event(Value), func(data interface{}) {
+	_ = d.Once(d.Event(Value), func(data interface{}) {
 		gobottest.Assert(t, fmt.Sprintf("%.2f", data.(float64)), "31.62")
 		sem <- true
 	})
@@ -129,7 +129,7 @@ func TestTempSensorPublishesError(t *testing.T) {
 	gobottest.Assert(t, d.Start(), nil)
 
 	// expect error
-	d.Once(d.Event(Error), func(data interface{}) {
+	_ = d.Once(d.Event(Error), func(data interface{}) {
 		gobottest.Assert(t, data.(error).Error(), "read error")
 		sem <- true
 	})

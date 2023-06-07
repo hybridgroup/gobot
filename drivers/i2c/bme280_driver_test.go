@@ -70,7 +70,7 @@ func TestBME280Measurements(t *testing.T) {
 		copy(b, buf.Bytes())
 		return buf.Len(), nil
 	}
-	bme280.Start()
+	_ = bme280.Start()
 	hum, err := bme280.Humidity()
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, hum, float32(51.20179))
@@ -116,7 +116,7 @@ func TestBME280InitH2Error(t *testing.T) {
 
 func TestBME280HumidityWriteError(t *testing.T) {
 	bme280, adaptor := initTestBME280WithStubbedAdaptor()
-	bme280.Start()
+	_ = bme280.Start()
 
 	adaptor.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
@@ -128,7 +128,7 @@ func TestBME280HumidityWriteError(t *testing.T) {
 
 func TestBME280HumidityReadError(t *testing.T) {
 	bme280, adaptor := initTestBME280WithStubbedAdaptor()
-	bme280.Start()
+	_ = bme280.Start()
 
 	adaptor.i2cReadImpl = func([]byte) (int, error) {
 		return 0, errors.New("read error")
@@ -157,7 +157,7 @@ func TestBME280HumidityNotEnabled(t *testing.T) {
 		copy(b, buf.Bytes())
 		return buf.Len(), nil
 	}
-	bme280.Start()
+	_ = bme280.Start()
 	hum, err := bme280.Humidity()
 	gobottest.Assert(t, err, errors.New("Humidity disabled"))
 	gobottest.Assert(t, hum, float32(0.0))

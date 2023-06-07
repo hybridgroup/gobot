@@ -61,7 +61,9 @@ func (megaPi *Adaptor) Connect() error {
 		for {
 			select {
 			case bytes := <-megaPi.writeBytesChannel:
-				megaPi.connection.Write(bytes)
+				if _, err := megaPi.connection.Write(bytes); err != nil {
+					panic(err)
+				}
 				time.Sleep(10 * time.Millisecond)
 			case <-megaPi.finalizeChannel:
 				megaPi.finalizeChannel <- struct{}{}

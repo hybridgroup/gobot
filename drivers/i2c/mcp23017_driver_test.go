@@ -35,7 +35,7 @@ func initTestMCP23017WithStubbedAdaptor(b uint8) (*MCP23017Driver, *i2cTestAdapt
 	// create the driver, ready to use for tests
 	a := newI2cTestAdaptor()
 	d := NewMCP23017Driver(a, WithMCP23017Bank(b))
-	d.Start()
+	_ = d.Start()
 	return d, a
 }
 

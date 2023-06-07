@@ -56,7 +56,7 @@ func TestPWM(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem(mockPaths)
 
 	gobottest.Assert(t, a.PwmWrite("P9_99", 175), errors.New("'P9_99' is not a valid id for a PWM pin"))
-	a.PwmWrite("P9_21", 175)
+	_ = a.PwmWrite("P9_21", 175)
 	gobottest.Assert(
 		t,
 		fs.Files["/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/period"].Contents,
@@ -68,7 +68,7 @@ func TestPWM(t *testing.T) {
 		"343137",
 	)
 
-	a.ServoWrite("P9_21", 100)
+	_ = a.ServoWrite("P9_21", 100)
 	gobottest.Assert(
 		t,
 		fs.Files["/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/period"].Contents,
@@ -127,7 +127,7 @@ func TestDigitalIO(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem(mockPaths)
 
 	// DigitalIO
-	a.DigitalWrite("usr1", 1)
+	_ = a.DigitalWrite("usr1", 1)
 	gobottest.Assert(t,
 		fs.Files["/sys/class/leds/beaglebone:green:usr1/brightness"].Contents,
 		"1",
@@ -137,7 +137,7 @@ func TestDigitalIO(t *testing.T) {
 	err := a.DigitalWrite("usr10101", 1)
 	gobottest.Assert(t, err.Error(), " : /sys/class/leds/beaglebone:green:usr10101/brightness: no such file")
 
-	a.DigitalWrite("P9_12", 1)
+	_ = a.DigitalWrite("P9_12", 1)
 	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio60/value"].Contents, "1")
 
 	gobottest.Assert(t, a.DigitalWrite("P9_99", 1), errors.New("'P9_99' is not a valid id for a digital pin"))

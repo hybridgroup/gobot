@@ -73,19 +73,19 @@ func TestJHD1313MDriverStartWriteError(t *testing.T) {
 
 func TestJHD1313MDriverHalt(t *testing.T) {
 	d := initTestJHD1313M1Driver()
-	d.Start()
+	_ = d.Start()
 	gobottest.Assert(t, d.Halt(), nil)
 }
 
 func TestJHD1313MDriverSetRgb(t *testing.T) {
 	d, _ := initTestJHD1313M1DriverWithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 	gobottest.Assert(t, d.SetRGB(0x00, 0x00, 0x00), nil)
 }
 
 func TestJHD1313MDriverSetRgbError(t *testing.T) {
 	d, a := initTestJHD1313M1DriverWithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 
 	a.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
@@ -95,13 +95,13 @@ func TestJHD1313MDriverSetRgbError(t *testing.T) {
 
 func TestJHD1313MDriverClear(t *testing.T) {
 	d, _ := initTestJHD1313M1DriverWithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 	gobottest.Assert(t, d.Clear(), nil)
 }
 
 func TestJHD1313MDriverClearError(t *testing.T) {
 	d, a := initTestJHD1313M1DriverWithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 
 	a.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
@@ -111,19 +111,19 @@ func TestJHD1313MDriverClearError(t *testing.T) {
 
 func TestJHD1313MDriverHome(t *testing.T) {
 	d, _ := initTestJHD1313M1DriverWithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 	gobottest.Assert(t, d.Home(), nil)
 }
 
 func TestJHD1313MDriverWrite(t *testing.T) {
 	d, _ := initTestJHD1313M1DriverWithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 	gobottest.Assert(t, d.Write("Hello"), nil)
 }
 
 func TestJHD1313MDriverWriteError(t *testing.T) {
 	d, a := initTestJHD1313M1DriverWithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 	a.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
 	}
@@ -133,13 +133,13 @@ func TestJHD1313MDriverWriteError(t *testing.T) {
 
 func TestJHD1313MDriverWriteTwoLines(t *testing.T) {
 	d, _ := initTestJHD1313M1DriverWithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 	gobottest.Assert(t, d.Write("Hello\nthere"), nil)
 }
 
 func TestJHD1313MDriverWriteTwoLinesError(t *testing.T) {
 	d, a := initTestJHD1313M1DriverWithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 
 	a.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
@@ -149,52 +149,52 @@ func TestJHD1313MDriverWriteTwoLinesError(t *testing.T) {
 
 func TestJHD1313MDriverSetPosition(t *testing.T) {
 	d, _ := initTestJHD1313M1DriverWithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 	gobottest.Assert(t, d.SetPosition(2), nil)
 }
 
 func TestJHD1313MDriverSetSecondLinePosition(t *testing.T) {
 	d, _ := initTestJHD1313M1DriverWithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 	gobottest.Assert(t, d.SetPosition(18), nil)
 }
 
 func TestJHD1313MDriverSetPositionInvalid(t *testing.T) {
 	d, _ := initTestJHD1313M1DriverWithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 	gobottest.Assert(t, d.SetPosition(-1), jhd1313m1ErrInvalidPosition)
 	gobottest.Assert(t, d.SetPosition(32), jhd1313m1ErrInvalidPosition)
 }
 
 func TestJHD1313MDriverScroll(t *testing.T) {
 	d, _ := initTestJHD1313M1DriverWithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 	gobottest.Assert(t, d.Scroll(true), nil)
 }
 
 func TestJHD1313MDriverReverseScroll(t *testing.T) {
 	d, _ := initTestJHD1313M1DriverWithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 	gobottest.Assert(t, d.Scroll(false), nil)
 }
 
 func TestJHD1313MDriverSetCustomChar(t *testing.T) {
 	d, _ := initTestJHD1313M1DriverWithStubbedAdaptor()
 	data := [8]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
-	d.Start()
+	_ = d.Start()
 	gobottest.Assert(t, d.SetCustomChar(0, data), nil)
 }
 
 func TestJHD1313MDriverSetCustomCharError(t *testing.T) {
 	d, _ := initTestJHD1313M1DriverWithStubbedAdaptor()
 	data := [8]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
-	d.Start()
+	_ = d.Start()
 	gobottest.Assert(t, d.SetCustomChar(10, data), errors.New("can't set a custom character at a position greater than 7"))
 }
 
 func TestJHD1313MDriverSetCustomCharWriteError(t *testing.T) {
 	d, a := initTestJHD1313M1DriverWithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 
 	a.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
@@ -205,7 +205,7 @@ func TestJHD1313MDriverSetCustomCharWriteError(t *testing.T) {
 
 func TestJHD1313MDriverCommands(t *testing.T) {
 	d, _ := initTestJHD1313M1DriverWithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 
 	err := d.Command("SetRGB")(map[string]interface{}{"r": "1", "g": "1", "b": "1"})
 	gobottest.Assert(t, err, nil)

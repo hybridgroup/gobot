@@ -68,30 +68,30 @@ func (r *Robots) Len() int {
 	return len(*r)
 }
 
-// Start calls the Start method of each Robot in the collection
-func (r *Robots) Start(args ...interface{}) (err error) {
+// Start calls the Start method of each Robot in the collection. We return on first error.
+func (r *Robots) Start(args ...interface{}) error {
 	autoRun := true
 	if args[0] != nil {
 		autoRun = args[0].(bool)
 	}
 	for _, robot := range *r {
-		if rerr := robot.Start(autoRun); rerr != nil {
-			err = multierror.Append(err, rerr)
-			return
+		if err := robot.Start(autoRun); err != nil {
+			return err
 		}
 	}
-	return
+	return nil
 }
 
-// Stop calls the Stop method of each Robot in the collection
-func (r *Robots) Stop() (err error) {
+// Stop calls the Stop method of each Robot in the collection. We try to stop all robots and
+// collect the errors.
+func (r *Robots) Stop() error {
+	var err error
 	for _, robot := range *r {
-		if rerr := robot.Stop(); rerr != nil {
-			err = multierror.Append(err, rerr)
-			return
+		if e := robot.Stop(); e != nil {
+			err = multierror.Append(err, e)
 		}
 	}
-	return
+	return err
 }
 
 // Each enumerates through the Robots and calls specified callback function.
@@ -104,10 +104,9 @@ func (r *Robots) Each(f func(*Robot)) {
 // NewRobot returns a new Robot. It supports the following optional params:
 //
 //		name:	string with the name of the Robot. A name will be automatically generated if no name is supplied.
-// 	[]Connection: Connections which are automatically started and stopped with the robot
+//		[]Connection: Connections which are automatically started and stopped with the robot
 //		[]Device: Devices which are automatically started and stopped with the robot
 //		func(): The work routine the robot will execute once all devices and connections have been initialized and started
-//
 func NewRobot(v ...interface{}) *Robot {
 	r := &Robot{
 		Name:        fmt.Sprintf("%X", Rand(int(^uint(0)>>1))),
@@ -156,22 +155,23 @@ func NewRobot(v ...interface{}) *Robot {
 	return r
 }
 
-// Start a Robot's Connections, Devices, and work.
-func (r *Robot) Start(args ...interface{}) (err error) {
+// Start a Robot's Connections, Devices, and work. We stop initialization of
+// connections and devices on first error.
+func (r *Robot) Start(args ...interface{}) error {
 	if len(args) > 0 && args[0] != nil {
 		r.AutoRun = args[0].(bool)
 	}
 	log.Println("Starting Robot", r.Name, "...")
-	if cerr := r.Connections().Start(); cerr != nil {
-		err = multierror.Append(err, cerr)
+	if err := r.Connections().Start(); err != nil {
 		log.Println(err)
-		return
+		return err
 	}
-	if derr := r.Devices().Start(); derr != nil {
-		err = multierror.Append(err, derr)
+
+	if err := r.Devices().Start(); err != nil {
 		log.Println(err)
-		return
+		return err
 	}
+
 	if r.Work == nil {
 		r.Work = func() {}
 	}
@@ -183,36 +183,36 @@ func (r *Robot) Start(args ...interface{}) (err error) {
 	}()
 
 	r.running.Store(true)
-	if r.AutoRun {
-		c := make(chan os.Signal, 1)
-		r.trap(c)
 
-		// waiting for interrupt coming on the channel
-		<-c
-
-		// Stop calls the Stop method on itself, if we are "auto-running".
-		r.Stop()
+	if !r.AutoRun {
+		return nil
 	}
 
-	return
+	c := make(chan os.Signal, 1)
+	r.trap(c)
+
+	// waiting for interrupt coming on the channel
+	<-c
+
+	// Stop calls the Stop method on itself, if we are "auto-running".
+	return r.Stop()
 }
 
-// Stop stops a Robot's connections and Devices
+// Stop stops a Robot's connections and devices. We try to stop all items and
+// collect all errors.
 func (r *Robot) Stop() error {
-	var result error
+	var err error
 	log.Println("Stopping Robot", r.Name, "...")
-	err := r.Devices().Halt()
-	if err != nil {
-		result = multierror.Append(result, err)
+	if e := r.Devices().Halt(); e != nil {
+		err = multierror.Append(err, e)
 	}
-	err = r.Connections().Finalize()
-	if err != nil {
-		result = multierror.Append(result, err)
+	if e := r.Connections().Finalize(); e != nil {
+		err = multierror.Append(err, e)
 	}
 
 	r.done <- true
 	r.running.Store(false)
-	return result
+	return err
 }
 
 // Running returns if the Robot is currently started or not

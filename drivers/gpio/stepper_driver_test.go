@@ -19,15 +19,15 @@ func initStepperMotorDriver() *StepperDriver {
 
 func TestStepperDriverRun(t *testing.T) {
 	d := initStepperMotorDriver()
-	d.Run()
+	_ = d.Run()
 	gobottest.Assert(t, d.IsMoving(), true)
 }
 
 func TestStepperDriverHalt(t *testing.T) {
 	d := initStepperMotorDriver()
-	d.Run()
+	_ = d.Run()
 	time.Sleep(200 * time.Millisecond)
-	d.Halt()
+	_ = d.Halt()
 	gobottest.Assert(t, d.IsMoving(), false)
 }
 
@@ -46,7 +46,7 @@ func TestStepperDriverSetName(t *testing.T) {
 func TestStepperDriverSetDirection(t *testing.T) {
 	dir := "backward"
 	d := initStepperMotorDriver()
-	d.SetDirection(dir)
+	_ = d.SetDirection(dir)
 	gobottest.Assert(t, d.direction, dir)
 }
 
@@ -63,25 +63,25 @@ func TestStepperDriverInvalidDirection(t *testing.T) {
 
 func TestStepperDriverMoveForward(t *testing.T) {
 	d := initStepperMotorDriver()
-	d.Move(1)
+	_ = d.Move(1)
 	gobottest.Assert(t, d.GetCurrentStep(), 1)
 
-	d.Move(10)
+	_ = d.Move(10)
 	gobottest.Assert(t, d.GetCurrentStep(), 11)
 }
 
 func TestStepperDriverMoveBackward(t *testing.T) {
 	d := initStepperMotorDriver()
-	d.Move(-1)
+	_ = d.Move(-1)
 	gobottest.Assert(t, d.GetCurrentStep(), stepsInRev-1)
 
-	d.Move(-10)
+	_ = d.Move(-10)
 	gobottest.Assert(t, d.GetCurrentStep(), stepsInRev-11)
 }
 
 func TestStepperDriverMoveFullRotation(t *testing.T) {
 	d := initStepperMotorDriver()
-	d.Move(stepsInRev)
+	_ = d.Move(stepsInRev)
 	gobottest.Assert(t, d.GetCurrentStep(), 0)
 }
 
@@ -89,7 +89,7 @@ func TestStepperDriverMotorSetSpeedMoreThanMax(t *testing.T) {
 	d := initStepperMotorDriver()
 	m := d.GetMaxSpeed()
 
-	d.SetSpeed(m + 1)
+	_ = d.SetSpeed(m + 1)
 	gobottest.Assert(t, m, d.speed)
 }
 
@@ -97,9 +97,9 @@ func TestStepperDriverMotorSetSpeedLessOrEqualMax(t *testing.T) {
 	d := initStepperMotorDriver()
 	m := d.GetMaxSpeed()
 
-	d.SetSpeed(m - 1)
+	_ = d.SetSpeed(m - 1)
 	gobottest.Assert(t, m-1, d.speed)
 
-	d.SetSpeed(m)
+	_ = d.SetSpeed(m)
 	gobottest.Assert(t, m, d.speed)
 }

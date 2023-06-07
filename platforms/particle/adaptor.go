@@ -58,17 +58,13 @@ func (s *Adaptor) Name() string { return s.name }
 func (s *Adaptor) SetName(n string) { s.name = n }
 
 // Connect returns true if connection to Particle Photon or Electron is successful
-func (s *Adaptor) Connect() (err error) {
-	return
-}
+func (s *Adaptor) Connect() error { return nil }
 
 // Finalize returns true if connection to Particle Photon or Electron is finalized successfully
-func (s *Adaptor) Finalize() (err error) {
-	return
-}
+func (s *Adaptor) Finalize() error { return nil }
 
 // AnalogRead reads analog ping value using Particle cloud api
-func (s *Adaptor) AnalogRead(pin string) (val int, err error) {
+func (s *Adaptor) AnalogRead(pin string) (int, error) {
 	params := url.Values{
 		"params":       {pin},
 		"access_token": {s.AccessToken},
@@ -78,63 +74,61 @@ func (s *Adaptor) AnalogRead(pin string) (val int, err error) {
 
 	resp, err := s.request("POST", url, params)
 	if err == nil {
-		val = int(resp["return_value"].(float64))
-		return
+		return int(resp["return_value"].(float64)), nil
 	}
 
 	return 0, err
 }
 
 // PwmWrite writes in pin using analog write api
-func (s *Adaptor) PwmWrite(pin string, level byte) (err error) {
+func (s *Adaptor) PwmWrite(pin string, level byte) error {
 	return s.AnalogWrite(pin, level)
 }
 
 // AnalogWrite writes analog pin with specified level using Particle cloud api
-func (s *Adaptor) AnalogWrite(pin string, level byte) (err error) {
+func (s *Adaptor) AnalogWrite(pin string, level byte) error {
 	params := url.Values{
 		"params":       {fmt.Sprintf("%v,%v", pin, level)},
 		"access_token": {s.AccessToken},
 	}
 	url := fmt.Sprintf("%v/analogwrite", s.deviceURL())
-	_, err = s.request("POST", url, params)
-	return
+	_, err := s.request("POST", url, params)
+	return err
 }
 
 // DigitalWrite writes to a digital pin using Particle cloud api
-func (s *Adaptor) DigitalWrite(pin string, level byte) (err error) {
+func (s *Adaptor) DigitalWrite(pin string, level byte) error {
 	params := url.Values{
 		"params":       {fmt.Sprintf("%v,%v", pin, s.pinLevel(level))},
 		"access_token": {s.AccessToken},
 	}
 	url := fmt.Sprintf("%v/digitalwrite", s.deviceURL())
-	_, err = s.request("POST", url, params)
+	_, err := s.request("POST", url, params)
 	return err
 }
 
 // DigitalRead reads from digital pin using Particle cloud api
-func (s *Adaptor) DigitalRead(pin string) (val int, err error) {
+func (s *Adaptor) DigitalRead(pin string) (int, error) {
 	params := url.Values{
 		"params":       {pin},
 		"access_token": {s.AccessToken},
 	}
 	url := fmt.Sprintf("%v/digitalread", s.deviceURL())
 	resp, err := s.request("POST", url, params)
-	if err == nil {
-		val = int(resp["return_value"].(float64))
-		return
+	if err != nil {
+		return -1, err
 	}
-	return -1, err
+
+	return int(resp["return_value"].(float64)), nil
 }
 
 // ServoWrite writes the 0-180 degree angle to the specified pin.
 // To use it requires installing the "tinker-servo" sketch on your
 // Particle device. not just the default "tinker".
-func (s *Adaptor) ServoWrite(pin string, angle byte) (err error) {
+func (s *Adaptor) ServoWrite(pin string, angle byte) error {
 	if _, present := s.servoPins[pin]; !present {
-		err = s.servoPinOpen(pin)
-		if err != nil {
-			return
+		if err := s.servoPinOpen(pin); err != nil {
+			return err
 		}
 	}
 
@@ -143,7 +137,7 @@ func (s *Adaptor) ServoWrite(pin string, angle byte) (err error) {
 		"access_token": {s.AccessToken},
 	}
 	url := fmt.Sprintf("%v/servoSet", s.deviceURL())
-	_, err = s.request("POST", url, params)
+	_, err := s.request("POST", url, params)
 	return err
 }
 
@@ -209,7 +203,7 @@ func (s *Adaptor) Variable(name string) (result string, err error) {
 // returns value from request.
 // Takes a String as the only argument and returns an Int.
 // If function is not defined in core, it will time out
-func (s *Adaptor) Function(name string, args string) (val int, err error) {
+func (s *Adaptor) Function(name string, args string) (int, error) {
 	params := url.Values{
 		"args":         {args},
 		"access_token": {s.AccessToken},
@@ -217,13 +211,11 @@ func (s *Adaptor) Function(name string, args string) (val int, err error) {
 
 	url := fmt.Sprintf("%s/%s", s.deviceURL(), name)
 	resp, err := s.request("POST", url, params)
-
 	if err != nil {
 		return -1, err
 	}
 
-	val = int(resp["return_value"].(float64))
-	return
+	return int(resp["return_value"].(float64)), nil
 }
 
 // setAPIServer sets Particle cloud api server, this can be used to change from default api.spark.io
@@ -268,7 +260,9 @@ func (s *Adaptor) request(method string, url string, params url.Values) (m map[s
 		return
 	}
 
-	json.Unmarshal(buf, &m)
+	if err := json.Unmarshal(buf, &m); err != nil {
+		return m, err
+	}
 
 	if resp.Status != "200 OK" {
 		err = fmt.Errorf("%v: error communicating to the Particle cloud", resp.Status)

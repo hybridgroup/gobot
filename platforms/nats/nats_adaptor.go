@@ -1,6 +1,7 @@
 package nats
 
 import (
+	"log"
 	"net/url"
 	"strings"
 
@@ -86,23 +87,23 @@ func (a *Adaptor) Name() string { return a.name }
 func (a *Adaptor) SetName(n string) { a.name = n }
 
 // Connect makes a connection to the Nats server.
-func (a *Adaptor) Connect() (err error) {
+func (a *Adaptor) Connect() error {
+	var err error
 	a.client, err = a.connect()
-	return
+	return err
 }
 
 // Disconnect from the nats server.
-func (a *Adaptor) Disconnect() (err error) {
+func (a *Adaptor) Disconnect() error {
 	if a.client != nil {
 		a.client.Close()
 	}
-	return
+	return nil
 }
 
 // Finalize is simply a helper method for the disconnect.
-func (a *Adaptor) Finalize() (err error) {
-	a.Disconnect()
-	return
+func (a *Adaptor) Finalize() error {
+	return a.Disconnect()
 }
 
 // Publish sends a message with the particular topic to the nats server.
@@ -110,7 +111,12 @@ func (a *Adaptor) Publish(topic string, message []byte) bool {
 	if a.client == nil {
 		return false
 	}
-	a.client.Publish(topic, message)
+
+	if err := a.client.Publish(topic, message); err != nil {
+		log.Println(err)
+		return false
+	}
+
 	return true
 }
 
@@ -120,9 +126,12 @@ func (a *Adaptor) On(event string, f func(msg Message)) bool {
 	if a.client == nil {
 		return false
 	}
-	a.client.Subscribe(event, func(msg *nats.Msg) {
+	if _, err := a.client.Subscribe(event, func(msg *nats.Msg) {
 		f(msg)
-	})
+	}); err != nil {
+		log.Println(err)
+		return false
+	}
 
 	return true
 }

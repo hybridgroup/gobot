@@ -106,13 +106,15 @@ func (s *StepperDriver) SetName(n string) { s.name = n }
 func (s *StepperDriver) Connection() gobot.Connection { return s.connection.(gobot.Connection) }
 
 // Start implements the Driver interface and keeps running the stepper till halt is called
-func (s *StepperDriver) Start() (err error) { return }
+func (s *StepperDriver) Start() error { return nil }
 
 // Run continuously runs the stepper
-func (s *StepperDriver) Run() (err error) {
+func (s *StepperDriver) Run() error {
 	//halt if already moving
 	if s.moving {
-		s.Halt()
+		if err := s.Halt(); err != nil {
+			return err
+		}
 	}
 
 	s.mutex.Lock()
@@ -126,16 +128,18 @@ func (s *StepperDriver) Run() (err error) {
 			if !s.moving {
 				break
 			}
-			s.step()
+			if err := s.step(); err != nil {
+				panic(err)
+			}
 			time.Sleep(delay)
 		}
 	}()
 
-	return
+	return nil
 }
 
 // Halt implements the Driver interface and halts the motion of the Stepper
-func (s *StepperDriver) Halt() (err error) {
+func (s *StepperDriver) Halt() error {
 	s.mutex.Lock()
 	s.moving = false
 	s.mutex.Unlock()
@@ -193,7 +197,9 @@ func (s *StepperDriver) Move(stepsToMove int) error {
 
 	if s.moving {
 		//stop previous motion
-		s.Halt()
+		if err := s.Halt(); err != nil {
+			return err
+		}
 	}
 
 	s.mutex.Lock()

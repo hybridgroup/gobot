@@ -17,7 +17,7 @@ var _ gobot.Driver = (*PCA953xDriver)(nil)
 func initPCA953xTestDriverWithStubbedAdaptor() (*PCA953xDriver, *i2cTestAdaptor) {
 	a := newI2cTestAdaptor()
 	d := NewPCA953xDriver(a)
-	d.Start()
+	_ = d.Start()
 	return d, a
 }
 

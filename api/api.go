@@ -38,11 +38,15 @@ func NewAPI(m *gobot.Master) *API {
 
 			go func() {
 				if a.Cert != "" && a.Key != "" {
-					http.ListenAndServeTLS(a.Host+":"+a.Port, a.Cert, a.Key, nil)
+					if err := http.ListenAndServeTLS(a.Host+":"+a.Port, a.Cert, a.Key, nil); err != nil {
+						panic(err)
+					}
 				} else {
 					log.Println("WARNING: API using insecure connection. " +
 						"We recommend using an SSL certificate with Gobot.")
-					http.ListenAndServe(a.Host+":"+a.Port, nil)
+					if err := http.ListenAndServe(a.Host+":"+a.Port, nil); err != nil {
+						panic(err)
+					}
 				}
 			}()
 		},
@@ -177,7 +181,9 @@ func (a *API) robeaux(res http.ResponseWriter, req *http.Request) {
 	} else if t[len(t)-1] == "html" {
 		res.Header().Set("Content-Type", "text/html; charset=utf-8")
 	}
-	res.Write(buf)
+	if _, err := res.Write(buf); err != nil {
+		panic(err)
+	}
 }
 
 // mcp returns MCP route handler.
@@ -261,10 +267,12 @@ func (a *API) robotDeviceEvent(res http.ResponseWriter, req *http.Request) {
 	if event := a.master.Robot(req.URL.Query().Get(":robot")).
 		Device(req.URL.Query().Get(":device")).(gobot.Eventer).
 		Event(req.URL.Query().Get(":event")); len(event) > 0 {
-		device.(gobot.Eventer).On(event, func(data interface{}) {
+		if err := device.(gobot.Eventer).On(event, func(data interface{}) {
 			d, _ := json.Marshal(data)
 			dataChan <- string(d)
-		})
+		}); err != nil {
+			panic(err)
+		}
 
 		for {
 			select {
@@ -363,7 +371,9 @@ func (a *API) executeCommand(f func(map[string]interface{}) interface{},
 ) {
 
 	body := make(map[string]interface{})
-	json.NewDecoder(req.Body).Decode(&body)
+	if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
+		panic(err)
+	}
 
 	if f != nil {
 		a.writeJSON(map[string]interface{}{"result": f(body)}, res)
@@ -376,7 +386,9 @@ func (a *API) executeCommand(f func(map[string]interface{}) interface{},
 func (a *API) writeJSON(j interface{}, res http.ResponseWriter) {
 	data, _ := json.Marshal(j)
 	res.Header().Set("Content-Type", "application/json; charset=utf-8")
-	res.Write(data)
+	if _, err := res.Write(data); err != nil {
+		panic(err)
+	}
 }
 
 // Debug add handler to api that prints each request

@@ -3,6 +3,7 @@ package leap
 import (
 	"encoding/json"
 	"io"
+	"log"
 
 	"gobot.io/x/gobot/v2"
 	"golang.org/x/net/websocket"
@@ -38,7 +39,9 @@ func NewDriver(a *Adaptor) *Driver {
 		connection: a,
 		Eventer:    gobot.NewEventer(),
 		receive: func(ws io.ReadWriteCloser, msg *[]byte) {
-			websocket.Message.Receive(ws.(*websocket.Conn), msg)
+			if err := websocket.Message.Receive(ws.(*websocket.Conn), msg); err != nil {
+				panic(err)
+			}
 		},
 	}
 
@@ -62,15 +65,14 @@ func (l *Driver) adaptor() *Adaptor {
 	return l.Connection().(*Adaptor)
 }
 
-func enableFeature(l *Driver, feature string) (err error) {
+func enableFeature(l *Driver, feature string) error {
 	command := map[string]bool{feature: true}
-	b, e := json.Marshal(command)
-	if e != nil {
-		return e
+	b, err := json.Marshal(command)
+	if err != nil {
+		return err
 	}
-	_, e = l.adaptor().ws.Write(b)
-	if e != nil {
-		return e
+	if _, err = l.adaptor().ws.Write(b); err != nil {
+		return err
 	}
 
 	return nil
@@ -84,22 +86,26 @@ func enableFeature(l *Driver, feature string) (err error) {
 //	"message" - Emits Frame on new message received from Leap.
 //	"hand" - Emits Hand when detected in message from Leap.
 //	"gesture" - Emits Gesture when detected in message from Leap.
-func (l *Driver) Start() (err error) {
-	err = enableFeature(l, "enableGestures")
-	if err != nil {
+func (l *Driver) Start() error {
+	if err := enableFeature(l, "enableGestures"); err != nil {
 		return err
 	}
-	err = enableFeature(l, "background")
-	if err != nil {
+	if err := enableFeature(l, "background"); err != nil {
 		return err
 	}
 
 	go func() {
 		var msg []byte
 		var frame Frame
+		var err error
 		for {
 			l.receive(l.adaptor().ws, &msg)
-			frame = l.ParseFrame(msg)
+			frame, err = l.ParseFrame(msg)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+
 			l.Publish(MessageEvent, frame)
 
 			for _, hand := range frame.Hands {
@@ -112,8 +118,8 @@ func (l *Driver) Start() (err error) {
 		}
 	}()
 
-	return
+	return nil
 }
 
 // Halt returns nil if driver is halted successfully
-func (l *Driver) Halt() (errs error) { return }
+func (l *Driver) Halt() error { return nil }

@@ -137,7 +137,7 @@ func TestGrovePiSomeRead(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			g, a := initGrovePiDriverWithStubbedAdaptor()
-			g.Start()
+			_ = g.Start()
 			a.written = []byte{} // reset writes of former test and start
 			numCallsRead := 0
 			a.i2cReadImpl = func(bytes []byte) (i int, e error) {
@@ -201,7 +201,7 @@ func TestGrovePiSomeWrite(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			g, a := initGrovePiDriverWithStubbedAdaptor()
-			g.Start()
+			_ = g.Start()
 			a.written = []byte{} // reset writes of former test and start
 			a.i2cReadImpl = func(bytes []byte) (i int, e error) {
 				copy(bytes, tc.simResponse)

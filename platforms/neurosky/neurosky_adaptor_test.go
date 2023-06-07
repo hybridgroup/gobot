@@ -19,12 +19,6 @@ type NullReadWriteCloser struct {
 	closeError error
 }
 
-// func NewNullReadWriteCloser() *NullReadWriteCloser {
-// 	return NullReadWriteCloser{
-//
-// 	}
-// }
-
 func (n *NullReadWriteCloser) ReadError(e error) {
 	n.mtx.Lock()
 	defer n.mtx.Unlock()
@@ -89,10 +83,10 @@ func TestNeuroskyAdaptorFinalize(t *testing.T) {
 	a.connect = func(n *Adaptor) (io.ReadWriteCloser, error) {
 		return rwc, nil
 	}
-	a.Connect()
+	_ = a.Connect()
 	gobottest.Assert(t, a.Finalize(), nil)
 
 	rwc.CloseError(errors.New("close error"))
-	a.Connect()
+	_ = a.Connect()
 	gobottest.Assert(t, a.Finalize(), errors.New("close error"))
 }

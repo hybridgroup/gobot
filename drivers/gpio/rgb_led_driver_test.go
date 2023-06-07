@@ -66,10 +66,10 @@ func TestRgbLedDriverHalt(t *testing.T) {
 
 func TestRgbLedDriverToggle(t *testing.T) {
 	d := initTestRgbLedDriver()
-	d.Off()
-	d.Toggle()
+	_ = d.Off()
+	_ = d.Toggle()
 	gobottest.Assert(t, d.State(), true)
-	d.Toggle()
+	_ = d.Toggle()
 	gobottest.Assert(t, d.State(), false)
 }
 

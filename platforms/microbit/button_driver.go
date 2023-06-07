@@ -56,21 +56,19 @@ func (b *ButtonDriver) adaptor() ble.BLEConnector {
 }
 
 // Start tells driver to get ready to do work
-func (b *ButtonDriver) Start() (err error) {
+func (b *ButtonDriver) Start() error {
 	// subscribe to button A notifications
-	b.adaptor().Subscribe(buttonACharacteristic, func(data []byte, e error) {
+	if err := b.adaptor().Subscribe(buttonACharacteristic, func(data []byte, e error) {
 		b.Publish(b.Event(ButtonA), data)
-	})
+	}); err != nil {
+		return err
+	}
 
 	// subscribe to button B notifications
-	b.adaptor().Subscribe(buttonBCharacteristic, func(data []byte, e error) {
+	return b.adaptor().Subscribe(buttonBCharacteristic, func(data []byte, e error) {
 		b.Publish(b.Event(ButtonB), data)
 	})
-
-	return
 }
 
 // Halt stops LED driver (void)
-func (b *ButtonDriver) Halt() (err error) {
-	return
-}
+func (b *ButtonDriver) Halt() error { return nil }
