@@ -61,10 +61,6 @@ func (d *Driver) Play() []error {
 	return d.Sound(d.Filename())
 }
 
-func (d *Driver) adaptor() *Adaptor {
-	return d.Connection().(*Adaptor)
-}
-
 // Start starts the Driver
 func (d *Driver) Start() (err error) {
 	return

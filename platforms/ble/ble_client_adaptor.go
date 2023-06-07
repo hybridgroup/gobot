@@ -42,7 +42,6 @@ type ClientAdaptor struct {
 	characteristics map[string]bluetooth.DeviceCharacteristic
 
 	connected        bool
-	ready            chan struct{}
 	withoutResponses bool
 }
 

@@ -29,7 +29,7 @@ type AccelerometerData struct {
 
 const (
 	// BLE services
-	accelerometerService = "e95d0753251d470aa062fa1922dfa9a8"
+	//accelerometerService = "e95d0753251d470aa062fa1922dfa9a8"
 
 	// BLE characteristics
 	accelerometerCharacteristic = "e95dca4b251d470aa062fa1922dfa9a8"

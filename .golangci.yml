@@ -37,8 +37,7 @@ linters:
   #       all issues step by step to enable at least the default linters
   disable:
     - errcheck
-    #- ineffassign
-    - unused
+    #- unused
 
   enable:
     - nolintlint

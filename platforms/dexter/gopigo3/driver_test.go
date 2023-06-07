@@ -273,7 +273,6 @@ func (ctr *TestConnector) SpiDefaultMaxSpeed() int64 {
 }
 
 type TestSpiDevice struct {
-	bus spi.Connection
 }
 
 func (c TestSpiDevice) Close() error {

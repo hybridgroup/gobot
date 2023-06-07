@@ -2,7 +2,6 @@ package ollie
 
 import (
 	"fmt"
-	"math"
 	"strconv"
 	"testing"
 	"time"
@@ -99,15 +98,4 @@ func TestDataStreaming(t *testing.T) {
 	if response == false {
 		t.Error("no response recieved")
 	}
-}
-
-func parseBytes(s string) (f byte) {
-	i, err := strconv.ParseUint(s, 16, 32)
-	if err != nil {
-		return
-	}
-
-	f = byte(math.Float32frombits(uint32(i)))
-
-	return
 }

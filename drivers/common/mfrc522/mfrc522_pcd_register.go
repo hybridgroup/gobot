@@ -12,8 +12,8 @@ const (
 	commandRegCalcCRC          = 0x03 // activates the CRC coprocessor or performs a self-test
 	commandRegTransmit         = 0x04 // transmits data from the FIFO buffer
 	// 0x05, 0x06 not used
-	commandRegNoCmdChange = 0x07 // no command change, can be used to modify the Command register bits without
-	commandRegReceive     = 0x08 // activates the receiver circuits
+	//commandRegNoCmdChange = 0x07 // no command change, can be used to modify the Command register bits without
+	//commandRegReceive     = 0x08 // activates the receiver circuits
 	// 0x09..0x0B not used
 	commandRegTransceive = 0x0C // transmits data from FIFO buffer to antenna and automatically activates the receiver after transmission
 	// 0x0D reserved
@@ -44,8 +44,8 @@ const (
 )
 
 const (
-	// ------------ unused commands --------------------
-	regDivIEn = 0x03 // enable and disable the passing of interrupt requests to IRQ pin
+// ------------ unused commands --------------------
+// regDivIEn = 0x03 // enable and disable the passing of interrupt requests to IRQ pin
 )
 
 const (
@@ -57,10 +57,10 @@ const (
 	comIrqRegErrIRq1anyBit = 0x02 // bit 1: error bit in the Error register is set, if 1
 	// Status1 register’s LoAlert bit is set in opposition to the LoAlert bit, the LoAlertIRq bit stores this event and
 	// can only be reset as indicated by the Set1 bit in this register
-	comIrqRegLoAlertIRqBit = 0x04 // bit 2: if 1, see above
+	//comIrqRegLoAlertIRqBit = 0x04 // bit 2: if 1, see above
 	// the Status1 register’s HiAlert bit is set in opposition to the HiAlert bit, the HiAlertIRq bit stores this event
 	// and can only be reset as indicated by the Set1 bit in this register
-	comIrqRegHiAlertIRqBit = 0x08 // bit 3: if 1, see above
+	//comIrqRegHiAlertIRqBit = 0x08 // bit 3: if 1, see above
 	// If a command terminates, for example, when the Command register changes its value from any command to Idle command.
 	// If an unknown command is started, the Command register Command[3:0] value changes to the idle state and the
 	// IdleIRq bit is set. The microcontroller starting the Idle command does not set the IdleIRq bit.
@@ -71,28 +71,28 @@ const (
 	comIrqRegTxIRqBit = 0x40 // bit 6: set to 1, immediately after the last bit of the transmitted data was sent out
 	// 1: indicates that the marked bits in the register are set
 	// 0: indicates that the marked bits in the register are cleared
-	comIrqRegSet1Bit = 0x80 // bit 7: see above
+	//comIrqRegSet1Bit = 0x80 // bit 7: see above
 )
 
 const (
 	regDivIrq = 0x05 // diverse interrupt request bits
 	// ------------ values --------------------
-	divIrqRegReset = 0x00 // see table 31 of data sheet
+	//divIrqRegReset = 0x00 // see table 31 of data sheet
 	//divIrqRegReserved01 = 0x03
 	divIrqRegCRCIRqBit = 0x04 // bit 2: the CalcCRC command is active and all data is processed
 	//divIrqRegReservedBit3 = 0x08
 	// this interrupt is set when either a rising or falling signal edge is detected
-	divIrqRegMfinActIRqBit = 0x10 // bit 4: MFIN is active; see above
+	//divIrqRegMfinActIRqBit = 0x10 // bit 4: MFIN is active; see above
 	//divIrqRegReserved56 = 0x60
 	// 1: indicates that the marked bits in the register are set
 	// 0: indicates that the marked bits in the register are cleared
-	divIrqRegSet2Bit = 0x80 // bit 7: see above
+	//divIrqRegSet2Bit = 0x80 // bit 7: see above
 )
 
 const (
 	regError = 0x06 // error bits showing the error status of the last command executed
 	// ------------ values --------------------
-	errorRegReset = 0x00 // see table 33 of data sheet
+	//errorRegReset = 0x00 // see table 33 of data sheet
 	// set to logic 1 if the SOF is incorrect automatically cleared during receiver start-up phase bit is only valid for
 	// 106 kBd; during the MFAuthent command, the ProtocolErr bit is set to logic 1 if the number of bytes received in one
 	// data stream is incorrect
@@ -118,32 +118,32 @@ const (
 )
 
 const (
-	// ------------ unused commands --------------------
-	regStatus1 = 0x07 // communication status bits
+// ------------ unused commands --------------------
+// regStatus1 = 0x07 // communication status bits
 )
 
 const (
 	regStatus2 = 0x08 // receiver and transmitter status bits
 	// ------------ values --------------------
-	status2RegReset = 0x00 // see table 37 of data sheet
+	//status2RegReset = 0x00 // see table 37 of data sheet
 	// bit 0..2 shows the state of the transmitter and receiver state machines
-	status2RegModemStateIdle = 0x00 // idle
-	status2RegModemStateWait = 0x01 // wait for the BitFraming register’s StartSend bit
+	//status2RegModemStateIdle = 0x00 // idle
+	//status2RegModemStateWait = 0x01 // wait for the BitFraming register’s StartSend bit
 	// the minimum time for TxWait is defined by the TxWait register
-	status2RegModemStateTxWait       = 0x02 // wait until RF field is present if the TMode register’s TxWaitRF bit is set to logic 1
-	status2RegModemStateTransmitting = 0x03
+	//status2RegModemStateTxWait       = 0x02 // wait until RF field is present if the TMode register’s TxWaitRF bit is set to logic 1
+	//status2RegModemStateTransmitting = 0x03
 	// the minimum time for RxWait is defined by the RxWait register
-	status2RegModemStateRxWait      = 0x04 // wait until RF field is present if the TMode register’s TxWaitRF bit is set to logic 1
-	status2RegModemStateWaitForData = 0x05
-	status2RegModemStateReceiving   = 0x06
+	//status2RegModemStateRxWait      = 0x04 // wait until RF field is present if the TMode register’s TxWaitRF bit is set to logic 1
+	//status2RegModemStateWaitForData = 0x05
+	//status2RegModemStateReceiving   = 0x06
 	// all data communication with the card is encrypted; can only be set to logic 1 by a successful execution of the
 	// MFAuthent command; only valid in Read/Write mode for MIFARE standard cards; this bit is cleared by software
 	status2RegMFCrypto1OnBit = 0x08 // bit 3: indicates that the MIFARE Crypto1 unit is switched on and, see above
 	//status2RegReserved45 = 0x30
 	// 1: the I2C-bus input filter is set to the High-speed mode independent of the I2C-bus protocol
 	// 0: the I2C-bus input filter is set to the I2C-bus protocol used
-	status2RegI2cForceHSBit     = 0x40 // I2C-bus input filter settings, see above
-	status2RegTempSensClear1Bit = 0x80 // clears the temperature error if the temperature is below the alarm limit of 125C
+	//status2RegI2cForceHSBit     = 0x40 // I2C-bus input filter settings, see above
+	//status2RegTempSensClear1Bit = 0x80 // clears the temperature error if the temperature is below the alarm limit of 125C
 )
 
 const (
@@ -153,30 +153,30 @@ const (
 const (
 	regFIFOLevel = 0x0A // number of bytes stored in the FIFO buffer
 	// ------------ values --------------------
-	fifoLevelRegReset = 0x00 // see table 41 of data sheet
+	//fifoLevelRegReset = 0x00 // see table 41 of data sheet
 	// indicates the number of bytes stored in the FIFO buffer writing to the FIFOData register increments and reading
 	// decrements the FIFOLevel value
-	fifoLevelRegValue = 0x7F // bit 0..6: see above
+	//fifoLevelRegValue = 0x7F // bit 0..6: see above
 	// immediately clears the internal FIFO buffer’s read and write pointer and Error register’s BufferOvfl bit reading
 	// this bit always returns 0
 	fifoLevelRegFlushBufferBit = 0x80 // bit 7: see above
 )
 
 const (
-	// ------------ unused commands --------------------
-	regWaterLevel = 0x0B // level for FIFO underflow and overflow warning
+// ------------ unused commands --------------------
+// regWaterLevel = 0x0B // level for FIFO underflow and overflow warning
 )
 
 const (
 	regControl = 0x0C // miscellaneous control registers
 	// ------------ values --------------------
-	controlRegReset = 0x10 // see table 45 of data sheet
+	//controlRegReset = 0x10 // see table 45 of data sheet
 	// indicates the number of valid bits in the last received byte
 	// if this value is 000b, the whole byte is valid
 	controlRegRxLastBits = 0x07 // bit 0..2: see above
 	//controlRegReserved3to5 = 0x38
-	controlRegTStartNowBit = 0x40 // bit 6: timer starts immediately, if 1; reading always returns logic 0
-	controlRegTStopNow     = 0x80 // bit 7: timer stops immediately, if 1; reading always returns logic 0
+	//controlRegTStartNowBit = 0x40 // bit 6: timer starts immediately, if 1; reading always returns logic 0
+	//controlRegTStopNow     = 0x80 // bit 7: timer stops immediately, if 1; reading always returns logic 0
 )
 
 const (
@@ -194,7 +194,7 @@ const (
 	// 7: LSB of the received bit is stored at bit position 7, the second received bit is stored in the next byte that
 	// follows at bit position 0
 	// These bits are only to be used for bitwise anticollision at 106 kBd, for all other modes they are set to 0
-	bitFramingRegRxAlign = 0x70 // bit 4..6: see above
+	//bitFramingRegRxAlign = 0x70 // bit 4..6: see above
 	//starts the transmission of data, only valid in combination with the Transceive command
 	bitFramingRegStartSendBit = 0x80 // bit 7: see above
 )
@@ -207,9 +207,9 @@ const (
 	// 01: indicates a bit-collision in the 1st bit
 	// 08: indicates a bit-collision in the 8th bit
 	// These bits will only be interpreted if the CollPosNotValid bit is set to logic 0
-	collRegCollPos = 0x1F // bit 0..4: read-only, see above
+	//collRegCollPos = 0x1F // bit 0..4: read-only, see above
 	// no collision detected or the position of the collision is out of the range of CollPos[4:0], if set to 1
-	collRegCollPosNotValidBit = 0x20 // bit 5: read-only, see above
+	//collRegCollPosNotValidBit = 0x20 // bit 5: read-only, see above
 	//collRegReservedBit6       = 0x40
 	// all received bits will be cleared after a collision only used during bitwise anticollision at 106 kBd, otherwise it
 	// is set to logic 1
@@ -223,7 +223,7 @@ const (
 const (
 	regMode = 0x11 // defines general modes for transmitting and receiving
 	// ------------ values --------------------
-	modeRegReset = 0x3F // see table 55 of data sheet
+	//modeRegReset = 0x3F // see table 55 of data sheet
 	// bit 0..1: defines the preset value for the CRC coprocessor for the CalcCRC command; Remark: during any
 	// communication, the preset values are selected automatically according to the definition of bits in the rxModeReg
 	// and TxMode registers
@@ -240,7 +240,7 @@ const (
 	//modeRegReservedBit6 = 0x40
 	// CRC coprocessor calculates the CRC with MSB first 0 in the CRCResult register the values for the CRCResultMSB[7:0]
 	// bits and the CRCResultLSB[7:0] bits are bit reversed; Remark: during RF communication this bit is ignored
-	modeRegMSBFirstBit = 0x80 // bit 7: see above, if set to 1
+	//modeRegMSBFirstBit = 0x80 // bit 7: see above, if set to 1
 )
 
 const (
@@ -258,28 +258,28 @@ const (
 	// end of a received data stream which is a copy of the Error register value. For the  version 2.0 the
 	// CRC status is reflected in the signal CRCOk, which indicates the actual status of the CRC coprocessor. For the
 	//  version 1.0 the CRC status is reflected in the signal CRCErr.
-	rxModeRegRxMultipleBit = 0x04
-	// an invalid received data stream (less than 4 bits received) will be ignored and the receiver remains active
-	rxModeRegRxNoErrBit = 0x08 // bit 3
-	txModeRegInvModBit  = 0x08 // bit 3: modulation of transmitted data is inverted, if 1
-	// bit 4..6: defines the bit rate during data transmission; the  handles transfer speeds up to 848 kBd
-	rxtxModeRegSpeed106kBd = 0x00 //106 kBd
-	rxtxModeRegSpeed212kBd = 0x10 //212 kBd
-	rxtxModeRegSpeed424kBd = 0x20 //424 kBd
-	rxtxModeRegSpeed848kBd = 0x30 //848 kBd
-	rxtxModeRegSpeedRes1   = 0x40 //reserved
-	rxtxModeRegSpeedRes2   = 0x50 //reserved
-	rxtxModeRegSpeedRes3   = 0x60 //reserved
-	rxtxModeRegSpeedRes4   = 0x70 //reserved
-	// RX: enables the CRC calculation during reception
-	// TX: enables CRC generation during data transmission
-	rxtxModeRegTxCRCEnBit = 0x80 // bit 7: can only be set to logic 0 at 106 kBd
+//	rxModeRegRxMultipleBit = 0x04
+// an invalid received data stream (less than 4 bits received) will be ignored and the receiver remains active
+//rxModeRegRxNoErrBit = 0x08 // bit 3
+//txModeRegInvModBit  = 0x08 // bit 3: modulation of transmitted data is inverted, if 1
+// bit 4..6: defines the bit rate during data transmission; the  handles transfer speeds up to 848 kBd
+//rxtxModeRegSpeed106kBd = 0x00 //106 kBd
+//rxtxModeRegSpeed212kBd = 0x10 //212 kBd
+//rxtxModeRegSpeed424kBd = 0x20 //424 kBd
+//rxtxModeRegSpeed848kBd = 0x30 //848 kBd
+//rxtxModeRegSpeedRes1   = 0x40 //reserved
+//rxtxModeRegSpeedRes2   = 0x50 //reserved
+//rxtxModeRegSpeedRes3   = 0x60 //reserved
+//rxtxModeRegSpeedRes4   = 0x70 //reserved
+// RX: enables the CRC calculation during reception
+// TX: enables CRC generation during data transmission
+//rxtxModeRegTxCRCEnBit = 0x80 // bit 7: can only be set to logic 0 at 106 kBd
 )
 
 const (
 	regTxControl = 0x14 // controls the logical behavior of the antenna driver pins TX1 and TX2
 	// ------------ values --------------------
-	regtxControlRegReset = 0x80 // see table 61 of data sheet
+	//regtxControlRegReset = 0x80 // see table 61 of data sheet
 	// signal on pin TX1 delivers the 13.56 MHz energy carrier modulated by the transmission data
 	txControlRegTx1RFEn1outputBit = 0x01 // bit 0: see above
 	// signal on pin TX2 delivers the 13.56 MHz energy carrier modulated by the transmission data
@@ -287,33 +287,33 @@ const (
 	//txControlRegReservedBit2 = 0x04
 	// signal on pin TX2 continuously delivers the unmodulated 13.56 MHz energy carrier0Tx2CW bit is enabled to modulate
 	// the 13.56 MHz energy carrier
-	txControlRegTx2CW1outputBit = 0x08 // bit 3: see above
-	txControlRegInvTx1RFOffBit  = 0x10 // bit 4: output signal on pin TX1 inverted if driver TX1 is disabled, if 1
-	txControlRegInvTx2RFOffBit  = 0x20 // bit 5: output signal on pin TX2 inverted if driver TX2 is disabled, if 1
-	txControlRegInvTx1RFOnBit   = 0x40 // bit 6: output signal on pin TX1 inverted if driver TX1 is enabled, if 1
-	txControlRegInvTx2RFOnBit   = 0x80 // bit 7: output signal on pin TX2 inverted if driver TX2 is enabled, if 1
+	//txControlRegTx2CW1outputBit = 0x08 // bit 3: see above
+	//txControlRegInvTx1RFOffBit  = 0x10 // bit 4: output signal on pin TX1 inverted if driver TX1 is disabled, if 1
+	//txControlRegInvTx2RFOffBit  = 0x20 // bit 5: output signal on pin TX2 inverted if driver TX2 is disabled, if 1
+	//txControlRegInvTx1RFOnBit   = 0x40 // bit 6: output signal on pin TX1 inverted if driver TX1 is enabled, if 1
+	//txControlRegInvTx2RFOnBit   = 0x80 // bit 7: output signal on pin TX2 inverted if driver TX2 is enabled, if 1
 )
 
 const (
 	regTxASK = 0x15 // controls the setting of the transmission modulation
 	// ------------ values --------------------
-	txASKRegReset = 0x00 // see table 63 of data sheet
+	//txASKRegReset = 0x00 // see table 63 of data sheet
 	//txASKRegReserved = 0x3F // bit 0..5
 	txASKRegForce100ASKBit = 0x40 // bit 6: forces a 100 % ASK modulation independent of the ModGsP register
 	//txASKRegReservedBit7 = 0x80
 )
 
 const (
-	regTxSel       = 0x16 // selects the internal sources for the antenna driver
-	regRxSel       = 0x17 // selects internal receiver settings
-	regRxThreshold = 0x18 // selects thresholds for the bit decoder
-	regDemod       = 0x19 // defines demodulator settings
+	//regTxSel       = 0x16 // selects the internal sources for the antenna driver
+	//regRxSel       = 0x17 // selects internal receiver settings
+	//regRxThreshold = 0x18 // selects thresholds for the bit decoder
+	//regDemod       = 0x19 // defines demodulator settings
 	//               0x1A     // reserved for future use
 	//               0x1B     // reserved for future use
-	regMfTx = 0x1C // controls some MIFARE communication transmit parameters
-	regMfRx = 0x1D // controls some MIFARE communication receive parameters
+	//regMfTx = 0x1C // controls some MIFARE communication transmit parameters
+	//regMfRx = 0x1D // controls some MIFARE communication receive parameters
 	//               0x1E     // reserved for future use
-	regSerialSpeed = 0x1F // selects the speed of the serial UART interface
+	//regSerialSpeed = 0x1F // selects the speed of the serial UART interface
 
 	// Page 2: Configuration
 	//               0x20 // reserved for future use
@@ -333,7 +333,7 @@ const (
 const (
 	regRFCfg = 0x26 // configures the receiver gain
 	// ------------ values --------------------
-	rfcCfgRegReset = 0x48 // see table 97 of data sheet
+	//rfcCfgRegReset = 0x48 // see table 97 of data sheet
 	//rfcCfgRegReserved03 = 0x07
 	// bit 4..6: defines the receiver’s signal voltage gain factor
 	rfcCfgRegRxGain18dB  = 0x00
@@ -348,18 +348,18 @@ const (
 )
 
 const (
-	// ------------ unused commands --------------------
-	regGsN    = 0x27 // selects the conductance of the antenna driver pins TX1 and TX2 for modulation
-	regCWGsP  = 0x28 // defines the conductance of the p-driver output during periods of no modulation
-	regModGsP = 0x29 // defines the conductance of the p-driver output during periods of modulation
+// ------------ unused commands --------------------
+//regGsN    = 0x27 // selects the conductance of the antenna driver pins TX1 and TX2 for modulation
+//regCWGsP  = 0x28 // defines the conductance of the p-driver output during periods of no modulation
+//regModGsP = 0x29 // defines the conductance of the p-driver output during periods of modulation
 
 )
 const (
 	regTMode      = 0x2A // defines settings for the internal timer
 	regTPrescaler = 0x2B // the lower 8 bits of the TPrescaler value. The 4 high bits are in tModeReg.
 	// ------------ values --------------------
-	tModeRegReset      = 0x00 // see table 105 of data sheet
-	tPrescalerRegReset = 0x00 // see table 107 of data sheet
+	//tModeRegReset      = 0x00 // see table 105 of data sheet
+	//tPrescalerRegReset = 0x00 // see table 107 of data sheet
 	// timer starts automatically at the end of the transmission in all communication modes at all speeds; if the
 	// RxMode register’s RxMultiple bit is not set, the timer stops immediately after receiving the 5th bit (1 start
 	// bit, 4 data bits); if the RxMultiple bit is set to logic 1 the timer never stops, in which case the timer can be
@@ -368,22 +368,22 @@ const (
 	// bit 6,5: indicates that the timer is not influenced by the protocol; internal timer is running in
 	// gated mode; Remark: in gated mode, the Status1 register’s TRunning bit is logic 1 when the timer is enabled by
 	// the TMode register’s TGated bits; this bit does not influence the gating signal
-	tModeRegTGatedNon  = 0x00 // non-gated mode
-	tModeRegTGatedMFIN = 0x20 // gated by pin MFIN
-	tModeRegTGatedAUX1 = 0x40 // gated by pin AUX1
+	//tModeRegTGatedNon  = 0x00 // non-gated mode
+	//tModeRegTGatedMFIN = 0x20 // gated by pin MFIN
+	//tModeRegTGatedAUX1 = 0x40 // gated by pin AUX1
 	// 1: timer automatically restarts its count-down from the 16-bit timer reload value instead of counting down to zero
 	// 0: timer decrements to 0 and the ComIrq register’s TimerIRq bit is set to logic 1
-	tModeRegTAutoRestartBit = 0x10 // bit 4, see above
+	//tModeRegTAutoRestartBit = 0x10 // bit 4, see above
 	// defines the higher 4 bits of the TPrescaler value; The following formula is used to calculate the timer
 	// frequency if the Demod register’s TPrescalEven bit in Demot register’s set to logic 0:
 	// ftimer = 13.56 MHz / (2*TPreScaler+1); TPreScaler = [tPrescalerRegHi:tPrescalerRegLo]
 	// TPrescaler value on 12 bits) (Default TPrescalEven bit is logic 0)
 	// The following formula is used to calculate the timer frequency if the Demod register’s TPrescalEven bit is set
 	// to logic 1: ftimer = 13.56 MHz / (2*TPreScaler+2).
-	tModeRegtPrescalerRegValue25us  = 0x0A9 // 169  => fRegtimer=40kHz, timer period of 25μs.
-	tModeRegtPrescalerRegValue38us  = 0x0FF // 255  => fRegtimer=26kHz, timer period of 38μs.
-	tModeRegtPrescalerRegValue500us = 0xD3E // 3390 => fRegtimer= 2kHz, timer period of 500us.
-	tModeRegtPrescalerRegValue604us = 0xFFF // 4095 => fRegtimer=1.65kHz, timer period of 604us.
+	//tModeRegtPrescalerRegValue25us  = 0x0A9 // 169  => fRegtimer=40kHz, timer period of 25μs.
+	//tModeRegtPrescalerRegValue38us  = 0x0FF // 255  => fRegtimer=26kHz, timer period of 38μs.
+	//tModeRegtPrescalerRegValue500us = 0xD3E // 3390 => fRegtimer= 2kHz, timer period of 500us.
+	//tModeRegtPrescalerRegValue604us = 0xFFF // 4095 => fRegtimer=1.65kHz, timer period of 604us.
 )
 
 const (
@@ -399,8 +399,8 @@ const (
 
 const (
 	// ------------ unused commands --------------------
-	regTCounterValueH = 0x2E // shows the 16-bit timer value
-	regTCounterValueL = 0x2F
+	//regTCounterValueH = 0x2E // shows the 16-bit timer value
+	//regTCounterValueL = 0x2F
 
 	// Page 3: Test Registers
 	//               0x30      // reserved for future use

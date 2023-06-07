@@ -34,8 +34,7 @@ type Adaptor struct {
 	*adaptors.DigitalPinsAdaptor
 	*adaptors.I2cBusAdaptor
 	*adaptors.SpiBusAdaptor
-	spiDefaultMaxSpeed int64
-	PiBlasterPeriod    uint32
+	PiBlasterPeriod uint32
 }
 
 // NewAdaptor creates a Raspi Adaptor

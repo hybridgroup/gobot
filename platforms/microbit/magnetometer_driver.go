@@ -29,7 +29,7 @@ type MagnetometerData struct {
 
 const (
 	// BLE services
-	magnetometerService = "e95df2d8251d470aa062fa1922dfa9a8"
+	//magnetometerService = "e95df2d8251d470aa062fa1922dfa9a8"
 
 	// BLE characteristics
 	magnetometerCharacteristic = "e95dfb11251d470aa062fa1922dfa9a8"

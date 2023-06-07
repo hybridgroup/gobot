@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"math"
-	"sync"
 	"sync/atomic"
 	"time"
 
@@ -71,8 +70,6 @@ type Client struct {
 	connection      io.ReadWriteCloser
 	analogPins      []int
 	ConnectTimeout  time.Duration
-	initFunc        func() error
-	initMutex       sync.Mutex
 	gobot.Eventer
 }
 

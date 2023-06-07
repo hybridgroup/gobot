@@ -43,11 +43,6 @@ type ads1x15ChanCfg struct {
 	dataRate int
 }
 
-type ads1x15GainCfg struct {
-	bits      uint16
-	fullrange float64
-}
-
 // ADS1x15Driver is the Gobot driver for the ADS1015/ADS1115 ADC
 // datasheet:
 // https://www.ti.com/lit/gpn/ads1115

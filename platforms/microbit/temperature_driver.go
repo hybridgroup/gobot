@@ -16,7 +16,7 @@ type TemperatureDriver struct {
 
 const (
 	// BLE services
-	temperatureService = "e95d6100251d470aa062fa1922dfa9a8"
+	//temperatureService = "e95d6100251d470aa062fa1922dfa9a8"
 
 	// BLE characteristics
 	temperatureCharacteristic = "e95d9250251d470aa062fa1922dfa9a8"

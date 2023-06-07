@@ -29,8 +29,8 @@ type Driver struct {
 
 const (
 	// bluetooth service IDs
-	spheroBLEService    = "22bb746f2bb075542d6f726568705327"
-	robotControlService = "22bb746f2ba075542d6f726568705327"
+	//spheroBLEService    = "22bb746f2bb075542d6f726568705327"
+	//robotControlService = "22bb746f2ba075542d6f726568705327"
 
 	// BLE characteristic IDs
 	wakeCharacteristic     = "22bb746f2bbf75542d6f726568705327"

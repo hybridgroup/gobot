@@ -14,7 +14,7 @@ type ButtonDriver struct {
 
 const (
 	// BLE services
-	buttonService = "e95d9882251d470aa062fa1922dfa9a8"
+	//buttonService = "e95d9882251d470aa062fa1922dfa9a8"
 
 	// BLE characteristics
 	buttonACharacteristic = "e95dda90251d470aa062fa1922dfa9a8"

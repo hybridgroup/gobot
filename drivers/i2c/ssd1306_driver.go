@@ -26,12 +26,12 @@ const (
 	ssd1306SetComOutput8 = 0xC8
 	ssd1306SetContrast   = 0x81
 	// scrolling commands
-	ssd1306ContinuousHScrollRight  = 0x26
-	ssd1306ContinuousHScrollLeft   = 0x27
-	ssd1306ContinuousVHScrollRight = 0x29
-	ssd1306ContinuousVHScrollLeft  = 0x2A
-	ssd1306StopScroll              = 0x2E
-	ssd1306StartScroll             = 0x2F
+	//ssd1306ContinuousHScrollRight  = 0x26
+	//ssd1306ContinuousHScrollLeft   = 0x27
+	//ssd1306ContinuousVHScrollRight = 0x29
+	//ssd1306ContinuousVHScrollLeft  = 0x2A
+	//ssd1306StopScroll              = 0x2E
+	//ssd1306StartScroll             = 0x2F
 	// adressing settings commands
 	ssd1306SetMemoryAddressingMode = 0x20
 	ssd1306ColumnAddr              = 0x21
@@ -190,15 +190,16 @@ type SSD1306Driver struct {
 // NewSSD1306Driver creates a new SSD1306Driver.
 //
 // Params:
-//        c Connector - the Adaptor to use with this Driver
+//
+//	c Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//        WithBus(int):    			bus to use with this driver
-//        WithAddress(int):    		address to use with this driver
-//        WithSSD1306DisplayWidth(int): 	width of display (defaults to 128)
-//        WithSSD1306DisplayHeight(int): 	height of display (defaults to 64)
-//        WithSSD1306ExternalVCC:          set true when using an external OLED supply (defaults to false)
 //
+//	WithBus(int):    			bus to use with this driver
+//	WithAddress(int):    		address to use with this driver
+//	WithSSD1306DisplayWidth(int): 	width of display (defaults to 128)
+//	WithSSD1306DisplayHeight(int): 	height of display (defaults to 64)
+//	WithSSD1306ExternalVCC:          set true when using an external OLED supply (defaults to false)
 func NewSSD1306Driver(c Connector, options ...func(Config)) *SSD1306Driver {
 	s := &SSD1306Driver{
 		Driver:        NewDriver(c, "SSD1306", ssd1306DefaultAddress),

@@ -104,14 +104,6 @@ func (a *MAX7219Driver) ClearOne(which uint) {
 	}
 }
 
-// sendData is an auxiliary function to send data to the MAX7219Driver module
-func (a *MAX7219Driver) sendData(address byte, data byte) {
-	a.pinCS.Off()
-	a.send(address)
-	a.send(data)
-	a.pinCS.On()
-}
-
 // send writes data on the module
 func (a *MAX7219Driver) send(data byte) {
 	var i byte

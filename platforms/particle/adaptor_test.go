@@ -369,15 +369,6 @@ func TestAdaptorPostToparticle(t *testing.T) {
 	}
 }
 
-type testEventSource struct {
-	event string
-	data  string
-}
-
-func (testEventSource) Id() string      { return "" }
-func (t testEventSource) Event() string { return t.event }
-func (t testEventSource) Data() string  { return t.data }
-
 func TestAdaptorEventStream(t *testing.T) {
 	a := initTestAdaptor()
 	var url string

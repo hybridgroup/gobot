@@ -25,8 +25,8 @@ type Driver struct {
 
 const (
 	// BLE services
-	droneCommandService      = "9a66fa000800919111e4012d1540cb8e"
-	droneNotificationService = "9a66fb000800919111e4012d1540cb8e"
+	//droneCommandService      = "9a66fa000800919111e4012d1540cb8e"
+	//droneNotificationService = "9a66fb000800919111e4012d1540cb8e"
 
 	// send characteristics
 	pcmdCharacteristic     = "9a66fa0a0800919111e4012d1540cb8e"

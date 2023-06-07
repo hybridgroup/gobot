@@ -40,7 +40,7 @@ const (
 	th02Reg_Config  = 0x03
 	th02Reg_ID      = 0x11
 
-	th02Status_ReadyBit = 0x01 // D0 is /RDY
+	//th02Status_ReadyBit = 0x01 // D0 is /RDY
 
 	th02Config_StartBit = 0x01 // D0 is START
 	th02Config_HeatBit  = 0x02 // D1 is HEAT
@@ -48,7 +48,7 @@ const (
 	th02Config_FastBit  = 0x20 // D5 is FAST (if set use 18 ms, but lower accuracy T: 13 bit, H: 11 bit)
 )
 
-//Accuracy constants for the TH02 devices (deprecated, use WithFastMode() instead)
+// Accuracy constants for the TH02 devices (deprecated, use WithFastMode() instead)
 const (
 	TH02HighAccuracy = 0 //High Accuracy (T: 14 bit, H: 12 bit), normal (35 ms)
 	TH02LowAccuracy  = 1 //Lower Accuracy (T: 13 bit, H: 11 bit), fast (18 ms)
@@ -64,15 +64,17 @@ type TH02Driver struct {
 
 // NewTH02Driver creates a new driver with specified i2c interface.
 // Defaults to:
-//	- Using high accuracy (lower speed) measurements cycles.
-//  - Emitting values in "C". If you want F, set Units to "F"
+//   - Using high accuracy (lower speed) measurements cycles.
+//   - Emitting values in "C". If you want F, set Units to "F"
+//
 // Params:
-//		conn Connector - the Adaptor to use with this Driver
+//
+//	conn Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//		i2c.WithBus(int):	bus to use with this driver
-//		i2c.WithAddress(int):	address to use with this driver
 //
+//	i2c.WithBus(int):	bus to use with this driver
+//	i2c.WithAddress(int):	address to use with this driver
 func NewTH02Driver(a Connector, options ...func(Config)) *TH02Driver {
 	s := &TH02Driver{
 		Driver:   NewDriver(a, "TH02", th02DefaultAddress, options...),
