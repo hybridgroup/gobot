@@ -34,7 +34,8 @@ Descriptions for each of these will eventually be provided below.
 * All patches must be provided under the Apache 2.0 License
 * Please use the -S option in git to "sign off" that the commit is your work and you are providing it under the
   Apache 2.0 License
-* Submit a Github Pull Request to the appropriate branch and ideally discuss the changes with us in IRC.
+* Submit a Github Pull Request to the appropriate branch and describe the changes sufficient.
+* Please follow our naming conventions for Pull Requests.
 * We will look at the patch, test it out, and give you feedback.
 * Avoid doing minor whitespace changes, renamings, etc. along with merged content. These will be done by the maintainers
   from time to time but they can complicate merges and should be done separately.
@@ -46,6 +47,7 @@ Descriptions for each of these will eventually be provided below.
   * If there are commits after yours use “git rebase -i <new_head_branch>”
   * If you have local changes you may need to use “git stash”
   * For git help see [progit](http://git-scm.com/book) which is an awesome (and free) book on git
+* Use one of the latest existing platforms/drivers etc. as a blueprint for creating a new one
 
 ## Creating Pull Requests
 
@@ -57,9 +59,9 @@ The basics are as follows:
 
 1. Fork the project via the GitHub UI
 
-2. `go get` the upstream repo and set it up as the `upstream` remote and your own repo as the `origin` remote:
+2. `git clone` the upstream repo and set it up as the `upstream` remote and your own repo as the `origin` remote:
 
-    `go get gobot.io/x/gobot/v2`
+    `git clone https://github.com/hybridgroup/gobot.git`
     `cd $GOPATH/src/gobot.io/x/gobot`
     `git remote rename origin upstream`
     `git remote add origin git@github.com/YOUR_GITHUB_NAME/gobot`
@@ -95,6 +97,31 @@ The basics are as follows:
 4. Review the PR as normal
 
 5. Land when you're ready via the GitHub UI
+
+## Convention for Pull Request Descriptions
+
+Making unified descriptions helps a lot to generate the [CHANGELOG](./CHANGELOG.md) for the next release.
+We support the style from <https://www.conventionalcommits.org>, so you can use something like this:
+
+* type(scope): description
+* i2c(PCF8583): added
+* gpio(HD44780): fix wrong constants
+* raspi(PWM): refactor usage
+* docs(core): usage of Kernel driver
+* or alternative: core(docs): usage of Kernel driver
+* build(style): adjust rule for golangci-lint
+
+We try to keep it as simple as possible:
+
+* Do not use "fix" or "bugfix" for `type`
+* Please assign "fix", "style", "refactor", "perf", "test" etc. to the related `type` (driver-type/platform-name etc.),
+  and start the description with e.g. "fix...", "test..." etc.
+* For `type` use the name of the deepest folder (e.g. i2c/raspi/system). Feel free to order "examples" to the
+  related driver.
+* Further values for `type` are: "docs", "build", "core"
+* Please use "build" instead of "CI"
+* For the `scope` use the name of the driver or feature (e.g. grove/PWM).
+* If unsure don't panic, follow your feeling. Possibly the reviewer will correct it or suggest a better description.
 
 ## Developer's Certificate of Origin 1.0
 

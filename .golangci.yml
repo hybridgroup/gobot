@@ -1,3 +1,4 @@
+# note: GolangCI-Lint also searches for config files in all directories from the directory of the first analyzed path up to the root.
 run:
   # Timeout for analysis, e.g. 30s, 5m.
   # gobot is very expensive, on a machine with heavy load it takes some minutes

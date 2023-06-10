@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"strings"
 	"text/template"
@@ -148,7 +149,7 @@ func generatePlatform(c config) error {
 
 	c.dir = dir
 
-	exp, err := os.ReadFile(exampleDir + "/main.go")
+	exp, err := ioutil.ReadFile(exampleDir + "/main.go")
 	if err != nil {
 		return err
 	}

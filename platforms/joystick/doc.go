@@ -3,10 +3,9 @@ Package joystick provides the Gobot adaptor and drivers for game controllers tha
 
 Installing:
 
-This package requires `sdl2` to be installed on your system
-Then install package with:
+    This package requires `sdl2` to be installed on your system
 
-	go get gobot.io/x/gobot/v2/platforms/joystick
+    Please refer to the main [README.md](https://github.com/hybridgroup/gobot/blob/release/README.md)
 
 Example:
 

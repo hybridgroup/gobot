@@ -74,7 +74,9 @@ func TestNatsAdapterSetsRootCAs(t *testing.T) {
 	gobottest.Assert(t, a.Host, "tls://localhost:4242")
 	a.Connect()
 	o := a.client.Opts
-	gobottest.Assert(t, len(o.TLSConfig.RootCAs.Subjects()), 1)
+	casPool, err := o.RootCAsCB()
+	gobottest.Assert(t, err, nil)
+	gobottest.Refute(t, casPool, nil)
 	gobottest.Assert(t, o.Secure, true)
 }
 
@@ -82,8 +84,10 @@ func TestNatsAdapterSetsClientCerts(t *testing.T) {
 	a := initTestNatsAdaptorTLS(nats.ClientCert("test_certs/client-cert.pem", "test_certs/client-key.pem"))
 	gobottest.Assert(t, a.Host, "tls://localhost:4242")
 	a.Connect()
-	certs := a.client.Opts.TLSConfig.Certificates
-	gobottest.Assert(t, len(certs), 1)
+	cert, err := a.client.Opts.TLSCertCB()
+	gobottest.Assert(t, err, nil)
+	gobottest.Refute(t, cert, nil)
+	gobottest.Refute(t, cert.Leaf, nil)
 	gobottest.Assert(t, a.client.Opts.Secure, true)
 }
 
@@ -91,8 +95,10 @@ func TestNatsAdapterSetsClientCertsWithUserInfo(t *testing.T) {
 	a := initTestNatsAdaptorTLS(nats.ClientCert("test_certs/client-cert.pem", "test_certs/client-key.pem"), nats.UserInfo("test", "testwd"))
 	gobottest.Assert(t, a.Host, "tls://localhost:4242")
 	a.Connect()
-	certs := a.client.Opts.TLSConfig.Certificates
-	gobottest.Assert(t, len(certs), 1)
+	cert, err := a.client.Opts.TLSCertCB()
+	gobottest.Assert(t, err, nil)
+	gobottest.Refute(t, cert, nil)
+	gobottest.Refute(t, cert.Leaf, nil)
 	gobottest.Assert(t, a.client.Opts.Secure, true)
 	gobottest.Assert(t, a.client.Opts.User, "test")
 	gobottest.Assert(t, a.client.Opts.Password, "testwd")

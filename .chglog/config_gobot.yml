@@ -1,0 +1,15 @@
+style: github
+template: CHANGELOG.gobot.md
+info:
+  title: Auto-Generated Changelog
+  repository_url: https://github.com/hybridgroup/gobot
+options:
+  header:
+    pattern: "^(\\w*)(?:\\(([\\w\\$\\.\\-\\*\\s]*)\\))?\\:?\\s(.*)$"
+    pattern_maps:
+      - Type
+      - Scope
+      - Subject
+  notes:
+    keywords:
+      - BREAKING CHANGE

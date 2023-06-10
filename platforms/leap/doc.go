@@ -3,10 +3,9 @@ Package leap provides the Gobot adaptor and driver for the Leap Motion.
 
 Installing:
 
-* First install the [Leap Motion Software](https://www.leapmotion.com/setup).
-* Then install the package:
-
-	go get gobot.io/x/gobot/v2/platforms/leap
+	Please refer to the main [README.md](https://github.com/hybridgroup/gobot/blob/release/README.md)
+	
+	Install the [Leap Motion Software](https://www.leapmotion.com/setup).
 
 Example:
 

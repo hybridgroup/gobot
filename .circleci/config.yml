@@ -14,7 +14,7 @@ version: 2
 jobs:
   "test_core_and_drivers_with_coverage":
     docker:
-      - image: cimg/go:1.17
+      - image: cimg/go:1.18
     steps:
       - checkout
       - run:
@@ -22,7 +22,8 @@ jobs:
           command: go version
       - run:
           name: Core and drivers tests
-          command: go test -v -coverprofile=coverage.txt -covermode=atomic . ./drivers/...
+          command:  |
+            go test -v -coverprofile=coverage.txt -covermode=atomic . ./drivers/...
       - run:
           name: Code coverage
           command: |
@@ -30,7 +31,7 @@ jobs:
 
   "test_platforms":
     docker:
-      - image: cimg/go:1.17
+      - image: cimg/go:1.18
     steps:
       - checkout
       - run:
@@ -39,11 +40,12 @@ jobs:
       - run:
           # digispark needs libusb, joystick needs sdl2, opencv needs opencv
           name: Platform tests (except digispark, joystick, opencv)
-          command: go test -v $(go list ./platforms/... | grep -v platforms/digispark | grep -v platforms/joystick | grep -v platforms/opencv)
+          command: |
+            go test -v $(go list ./platforms/... | grep -v platforms/digispark | grep -v platforms/joystick | grep -v platforms/opencv)
   
   "check_examples":
     docker:
-      - image: cimg/go:1.17
+      - image: cimg/go:1.18
     steps:
       - checkout
       - run:

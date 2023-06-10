@@ -6,7 +6,7 @@ Installing:
 It requires the 2.x iOS or Android app, and "watchbot" app (https://gobot.io/x/watchbot)
 installed on Pebble watch. Then install running:
 
-	go get gobot.io/x/gobot/v2/platforms/pebble
+	Please refer to the main [README.md](https://github.com/hybridgroup/gobot/blob/release/README.md)
 
 Example:
 
