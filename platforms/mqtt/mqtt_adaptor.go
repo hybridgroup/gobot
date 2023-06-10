@@ -3,7 +3,7 @@ package mqtt
 import (
 	"crypto/tls"
 	"crypto/x509"
-	"io/ioutil"
+	"os"
 
 	"gobot.io/x/gobot/v2"
 
@@ -204,7 +204,7 @@ func (a *Adaptor) newTLSConfig() *tls.Config {
 	var certpool *x509.CertPool
 	if len(a.ServerCert()) > 0 {
 		certpool = x509.NewCertPool()
-		pemCerts, err := ioutil.ReadFile(a.ServerCert())
+		pemCerts, err := os.ReadFile(a.ServerCert())
 		if err == nil {
 			certpool.AppendCertsFromPEM(pemCerts)
 		}
