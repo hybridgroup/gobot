@@ -41,12 +41,10 @@ func (b *GenericAccessDriver) adaptor() BLEConnector {
 }
 
 // Start tells driver to get ready to do work
-func (b *GenericAccessDriver) Start() (err error) {
-	return
-}
+func (b *GenericAccessDriver) Start() error { return nil }
 
 // Halt stops driver (void)
-func (b *GenericAccessDriver) Halt() (err error) { return }
+func (b *GenericAccessDriver) Halt() error { return nil }
 
 // GetDeviceName returns the device name for the BLE Peripheral
 func (b *GenericAccessDriver) GetDeviceName() string {
@@ -72,7 +70,9 @@ func (b *GenericAccessDriver) GetAppearance() string {
 	buf := bytes.NewBuffer(c)
 
 	var val uint16
-	binary.Read(buf, binary.LittleEndian, &val)
+	if err := binary.Read(buf, binary.LittleEndian, &val); err != nil {
+		panic(err)
+	}
 	return appearances[val]
 }
 

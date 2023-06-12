@@ -96,12 +96,13 @@ type BMP280Driver struct {
 
 // NewBMP280Driver creates a new driver with specified i2c interface.
 // Params:
-//		c Connector - the Adaptor to use with this Driver
+//
+//	c Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//		i2c.WithBus(int):	bus to use with this driver
-//		i2c.WithAddress(int):	address to use with this driver
 //
+//	i2c.WithBus(int):	bus to use with this driver
+//	i2c.WithAddress(int):	address to use with this driver
 func NewBMP280Driver(c Connector, options ...func(Config)) *BMP280Driver {
 	d := &BMP280Driver{
 		Driver:            NewDriver(c, "BMP280", bmp280DefaultAddress),
@@ -190,7 +191,8 @@ func (d *BMP280Driver) Pressure() (press float32, err error) {
 // Altitude returns the current altitude in meters based on the
 // current barometric pressure and estimated pressure at sea level.
 // Calculation is based on code from Adafruit BME280 library
-// 	https://github.com/adafruit/Adafruit_BME280_Library
+//
+//	https://github.com/adafruit/Adafruit_BME280_Library
 func (d *BMP280Driver) Altitude() (alt float32, err error) {
 	atmP, _ := d.Pressure()
 	atmP /= 100.0
@@ -200,66 +202,98 @@ func (d *BMP280Driver) Altitude() (alt float32, err error) {
 }
 
 // initialization reads the calibration coefficients.
-func (d *BMP280Driver) initialization() (err error) {
+func (d *BMP280Driver) initialization() error {
 	coefficients := make([]byte, 24)
-	if err = d.connection.ReadBlockData(bmp280RegCalib00, coefficients); err != nil {
+	if err := d.connection.ReadBlockData(bmp280RegCalib00, coefficients); err != nil {
 		return err
 	}
 	buf := bytes.NewBuffer(coefficients)
-	binary.Read(buf, binary.LittleEndian, &d.calCoeffs.t1)
-	binary.Read(buf, binary.LittleEndian, &d.calCoeffs.t2)
-	binary.Read(buf, binary.LittleEndian, &d.calCoeffs.t3)
-	binary.Read(buf, binary.LittleEndian, &d.calCoeffs.p1)
-	binary.Read(buf, binary.LittleEndian, &d.calCoeffs.p2)
-	binary.Read(buf, binary.LittleEndian, &d.calCoeffs.p3)
-	binary.Read(buf, binary.LittleEndian, &d.calCoeffs.p4)
-	binary.Read(buf, binary.LittleEndian, &d.calCoeffs.p5)
-	binary.Read(buf, binary.LittleEndian, &d.calCoeffs.p6)
-	binary.Read(buf, binary.LittleEndian, &d.calCoeffs.p7)
-	binary.Read(buf, binary.LittleEndian, &d.calCoeffs.p8)
-	binary.Read(buf, binary.LittleEndian, &d.calCoeffs.p9)
+	if err := binary.Read(buf, binary.LittleEndian, &d.calCoeffs.t1); err != nil {
+		return err
+	}
+	if err := binary.Read(buf, binary.LittleEndian, &d.calCoeffs.t2); err != nil {
+		return err
+	}
+	if err := binary.Read(buf, binary.LittleEndian, &d.calCoeffs.t3); err != nil {
+		return err
+	}
+	if err := binary.Read(buf, binary.LittleEndian, &d.calCoeffs.p1); err != nil {
+		return err
+	}
+	if err := binary.Read(buf, binary.LittleEndian, &d.calCoeffs.p2); err != nil {
+		return err
+	}
+	if err := binary.Read(buf, binary.LittleEndian, &d.calCoeffs.p3); err != nil {
+		return err
+	}
+	if err := binary.Read(buf, binary.LittleEndian, &d.calCoeffs.p4); err != nil {
+		return err
+	}
+	if err := binary.Read(buf, binary.LittleEndian, &d.calCoeffs.p5); err != nil {
+		return err
+	}
+	if err := binary.Read(buf, binary.LittleEndian, &d.calCoeffs.p6); err != nil {
+		return err
+	}
+	if err := binary.Read(buf, binary.LittleEndian, &d.calCoeffs.p7); err != nil {
+		return err
+	}
+	if err := binary.Read(buf, binary.LittleEndian, &d.calCoeffs.p8); err != nil {
+		return err
+	}
+	if err := binary.Read(buf, binary.LittleEndian, &d.calCoeffs.p9); err != nil {
+		return err
+	}
 
 	ctrlReg := uint8(d.ctrlPwrMode) | uint8(d.ctrlPressOversamp)<<2 | uint8(d.ctrlTempOversamp)<<5
-	d.connection.WriteByteData(bmp280RegCtrl, ctrlReg)
+	if err := d.connection.WriteByteData(bmp280RegCtrl, ctrlReg); err != nil {
+		return err
+	}
 
 	confReg := uint8(bmp280ConfStandBy0005)<<2 | uint8(d.confFilter)<<5
-	d.connection.WriteByteData(bmp280RegConf, confReg & ^uint8(bmp280ConfSPIBit))
-
-	return nil
+	return d.connection.WriteByteData(bmp280RegConf, confReg & ^uint8(bmp280ConfSPIBit))
 }
 
-func (d *BMP280Driver) rawTemp() (temp int32, err error) {
+func (d *BMP280Driver) rawTemp() (int32, error) {
 	var tp0, tp1, tp2 byte
 
 	data := make([]byte, 3)
-	if err = d.connection.ReadBlockData(bmp280RegTempData, data); err != nil {
+	if err := d.connection.ReadBlockData(bmp280RegTempData, data); err != nil {
 		return 0, err
 	}
 	buf := bytes.NewBuffer(data)
-	binary.Read(buf, binary.LittleEndian, &tp0)
-	binary.Read(buf, binary.LittleEndian, &tp1)
-	binary.Read(buf, binary.LittleEndian, &tp2)
+	if err := binary.Read(buf, binary.LittleEndian, &tp0); err != nil {
+		return 0, err
+	}
+	if err := binary.Read(buf, binary.LittleEndian, &tp1); err != nil {
+		return 0, err
+	}
+	if err := binary.Read(buf, binary.LittleEndian, &tp2); err != nil {
+		return 0, err
+	}
 
-	temp = ((int32(tp2) >> 4) | (int32(tp1) << 4) | (int32(tp0) << 12))
-
-	return
+	return ((int32(tp2) >> 4) | (int32(tp1) << 4) | (int32(tp0) << 12)), nil
 }
 
-func (d *BMP280Driver) rawPressure() (press int32, err error) {
+func (d *BMP280Driver) rawPressure() (int32, error) {
 	var tp0, tp1, tp2 byte
 
 	data := make([]byte, 3)
-	if err = d.connection.ReadBlockData(bmp280RegPressureData, data); err != nil {
+	if err := d.connection.ReadBlockData(bmp280RegPressureData, data); err != nil {
 		return 0, err
 	}
 	buf := bytes.NewBuffer(data)
-	binary.Read(buf, binary.LittleEndian, &tp0)
-	binary.Read(buf, binary.LittleEndian, &tp1)
-	binary.Read(buf, binary.LittleEndian, &tp2)
+	if err := binary.Read(buf, binary.LittleEndian, &tp0); err != nil {
+		return 0, err
+	}
+	if err := binary.Read(buf, binary.LittleEndian, &tp1); err != nil {
+		return 0, err
+	}
+	if err := binary.Read(buf, binary.LittleEndian, &tp2); err != nil {
+		return 0, err
+	}
 
-	press = ((int32(tp2) >> 4) | (int32(tp1) << 4) | (int32(tp0) << 12))
-
-	return
+	return ((int32(tp2) >> 4) | (int32(tp1) << 4) | (int32(tp0) << 12)), nil
 }
 
 func (d *BMP280Driver) calculateTemp(rawTemp int32) (float32, int32) {

@@ -48,15 +48,15 @@ func NewAIP1640Driver(a gobot.Connection, clockPin string, dataPin string) *AIP1
 }
 
 // Start initializes the tm1638, it uses a SPI-like communication protocol
-func (a *AIP1640Driver) Start() (err error) {
-	a.pinData.On()
-	a.pinClock.On()
-
-	return
+func (a *AIP1640Driver) Start() error {
+	if err := a.pinData.On(); err != nil {
+		return err
+	}
+	return a.pinClock.On()
 }
 
 // Halt implements the Driver interface
-func (a *AIP1640Driver) Halt() (err error) { return }
+func (a *AIP1640Driver) Halt() error { return nil }
 
 // Name returns the AIP1640Drivers name
 func (a *AIP1640Driver) Name() string { return a.name }
@@ -78,18 +78,28 @@ func (a *AIP1640Driver) SetIntensity(level byte) {
 }
 
 // Display sends the buffer to the display (ie. turns on/off the corresponding LEDs)
-func (a *AIP1640Driver) Display() {
+func (a *AIP1640Driver) Display() error {
 	for i := 0; i < 8; i++ {
-		a.sendData(byte(i), a.buffer[i])
+		if err := a.sendData(byte(i), a.buffer[i]); err != nil {
+			return err
+		}
 
-		a.pinData.Off()
-		a.pinClock.Off()
+		if err := a.pinData.Off(); err != nil {
+			return err
+		}
+		if err := a.pinClock.Off(); err != nil {
+			return err
+		}
 		time.Sleep(1 * time.Millisecond)
-		a.pinClock.On()
-		a.pinData.On()
+		if err := a.pinClock.On(); err != nil {
+			return err
+		}
+		if err := a.pinData.On(); err != nil {
+			return err
+		}
 	}
 
-	a.sendCommand(AIP1640DispCtrl | a.intensity)
+	return a.sendCommand(AIP1640DispCtrl | a.intensity)
 }
 
 // Clear empties the buffer (turns off all the LEDs)
@@ -128,33 +138,55 @@ func (a *AIP1640Driver) DrawMatrix(data [8]byte) {
 }
 
 // sendCommand is an auxiliary function to send commands to the AIP1640Driver module
-func (a *AIP1640Driver) sendCommand(cmd byte) {
-	a.pinData.Off()
-	a.send(cmd)
-	a.pinData.On()
+func (a *AIP1640Driver) sendCommand(cmd byte) error {
+	if err := a.pinData.Off(); err != nil {
+		return err
+	}
+	if err := a.send(cmd); err != nil {
+		return err
+	}
+	return a.pinData.On()
 }
 
 // sendData is an auxiliary function to send data to the AIP1640Driver module
-func (a *AIP1640Driver) sendData(address byte, data byte) {
-	a.sendCommand(AIP1640DataCmd | AIP1640FixedAddr)
-	a.pinData.Off()
-	a.send(AIP1640AddrCmd | address)
-	a.send(data)
-	a.pinData.On()
+func (a *AIP1640Driver) sendData(address byte, data byte) error {
+	if err := a.sendCommand(AIP1640DataCmd | AIP1640FixedAddr); err != nil {
+		return err
+	}
+	if err := a.pinData.Off(); err != nil {
+		return err
+	}
+	if err := a.send(AIP1640AddrCmd | address); err != nil {
+		return err
+	}
+	if err := a.send(data); err != nil {
+		return err
+	}
+	return a.pinData.On()
 }
 
 // send writes data on the module
-func (a *AIP1640Driver) send(data byte) {
+func (a *AIP1640Driver) send(data byte) error {
 	for i := 0; i < 8; i++ {
-		a.pinClock.Off()
+		if err := a.pinClock.Off(); err != nil {
+			return err
+		}
 
 		if (data & 1) > 0 {
-			a.pinData.On()
+			if err := a.pinData.On(); err != nil {
+				return err
+			}
 		} else {
-			a.pinData.Off()
+			if err := a.pinData.Off(); err != nil {
+				return err
+			}
 		}
 		data >>= 1
 
-		a.pinClock.On()
+		if err := a.pinClock.On(); err != nil {
+			return err
+		}
 	}
+
+	return nil
 }

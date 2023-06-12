@@ -120,7 +120,7 @@ func (n *Driver) adaptor() *Adaptor {
 
 // Start creates a go routine to listen from serial port
 // and parse buffer readings
-func (n *Driver) Start() (err error) {
+func (n *Driver) Start() error {
 	go func() {
 		for {
 			buff := make([]byte, 1024)
@@ -128,34 +128,42 @@ func (n *Driver) Start() (err error) {
 			if err != nil {
 				n.Publish(n.Event("error"), err)
 			} else {
-				n.parse(bytes.NewBuffer(buff))
+				if err := n.parse(bytes.NewBuffer(buff)); err != nil {
+					panic(err)
+				}
 			}
 		}
 	}()
-	return
+	return nil
 }
 
 // Halt stops neurosky driver (void)
-func (n *Driver) Halt() (err error) { return }
+func (n *Driver) Halt() error { return nil }
 
 // parse converts bytes buffer into packets until no more data is present
-func (n *Driver) parse(buf *bytes.Buffer) {
+func (n *Driver) parse(buf *bytes.Buffer) error {
 	for buf.Len() > 2 {
 		b1, _ := buf.ReadByte()
 		b2, _ := buf.ReadByte()
 		if b1 == BTSync && b2 == BTSync {
 			length, _ := buf.ReadByte()
 			payload := make([]byte, length)
-			buf.Read(payload)
+			if _, err := buf.Read(payload); err != nil {
+				return err
+			}
 			//checksum, _ := buf.ReadByte()
 			buf.Next(1)
-			n.parsePacket(bytes.NewBuffer(payload))
+			if err := n.parsePacket(bytes.NewBuffer(payload)); err != nil {
+				panic(err)
+			}
 		}
 	}
+
+	return nil
 }
 
 // parsePacket publishes event according to data parsed
-func (n *Driver) parsePacket(buf *bytes.Buffer) {
+func (n *Driver) parsePacket(buf *bytes.Buffer) error {
 	for buf.Len() > 0 {
 		b, _ := buf.ReadByte()
 		switch b {
@@ -176,7 +184,9 @@ func (n *Driver) parsePacket(buf *bytes.Buffer) {
 		case CodeWave:
 			buf.Next(1)
 			var ret = make([]byte, 2)
-			buf.Read(ret)
+			if _, err := buf.Read(ret); err != nil {
+				return err
+			}
 			n.Publish(n.Event("wave"), int16(ret[0])<<8|int16(ret[1]))
 		case CodeAsicEEG:
 			ret := make([]byte, 25)
@@ -186,6 +196,8 @@ func (n *Driver) parsePacket(buf *bytes.Buffer) {
 			}
 		}
 	}
+
+	return nil
 }
 
 // parseEEG returns data converted into EEG map

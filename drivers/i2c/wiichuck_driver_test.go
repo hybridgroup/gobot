@@ -76,7 +76,7 @@ func TestWiichuckDriverCanParse(t *testing.T) {
 
 	// ------ When value is not encrypted
 	decryptedValue := []byte{1, 2, 3, 4, 5, 6}
-	d.update(decryptedValue)
+	_ = d.update(decryptedValue)
 
 	// - This should be done by WiichuckDriver.parse
 	gobottest.Assert(t, d.data["sx"], float64(45))
@@ -90,7 +90,7 @@ func TestWiichuckDriverCanAdjustOrigins(t *testing.T) {
 
 	// ------ When value is not encrypted
 	decryptedValue := []byte{1, 2, 3, 4, 5, 6}
-	d.update(decryptedValue)
+	_ = d.update(decryptedValue)
 
 	// - This should be done by WiichuckDriver.adjustOrigins
 	gobottest.Assert(t, d.Joystick()["sx_origin"], float64(45))
@@ -102,17 +102,17 @@ func TestWiichuckDriverCButton(t *testing.T) {
 
 	// ------ When value is not encrypted
 	decryptedValue := []byte{1, 2, 3, 4, 5, 6}
-	d.update(decryptedValue)
+	_ = d.update(decryptedValue)
 
 	// - This should be done by WiichuckDriver.updateButtons
 	done := make(chan bool)
 
-	d.On(d.Event(C), func(data interface{}) {
+	_ = d.On(d.Event(C), func(data interface{}) {
 		gobottest.Assert(t, data, true)
 		done <- true
 	})
 
-	d.update(decryptedValue)
+	_ = d.update(decryptedValue)
 
 	select {
 	case <-done:
@@ -126,16 +126,16 @@ func TestWiichuckDriverZButton(t *testing.T) {
 
 	// ------ When value is not encrypted
 	decryptedValue := []byte{1, 2, 3, 4, 5, 6}
-	d.update(decryptedValue)
+	_ = d.update(decryptedValue)
 
 	done := make(chan bool)
 
-	d.On(d.Event(Z), func(data interface{}) {
+	_ = d.On(d.Event(Z), func(data interface{}) {
 		gobottest.Assert(t, data, true)
 		done <- true
 	})
 
-	d.update(decryptedValue)
+	_ = d.update(decryptedValue)
 
 	select {
 	case <-done:
@@ -158,12 +158,12 @@ func TestWiichuckDriverUpdateJoystick(t *testing.T) {
 
 	done := make(chan bool)
 
-	d.On(d.Event(Joystick), func(data interface{}) {
+	_ = d.On(d.Event(Joystick), func(data interface{}) {
 		gobottest.Assert(t, data, expectedData)
 		done <- true
 	})
 
-	d.update(decryptedValue)
+	_ = d.update(decryptedValue)
 
 	select {
 	case <-done:
@@ -176,7 +176,7 @@ func TestWiichuckDriverEncrypted(t *testing.T) {
 	d := initTestWiichuckDriverWithStubbedAdaptor()
 	encryptedValue := []byte{1, 1, 2, 2, 3, 3}
 
-	d.update(encryptedValue)
+	_ = d.update(encryptedValue)
 
 	gobottest.Assert(t, d.data["sx"], float64(0))
 	gobottest.Assert(t, d.data["sy"], float64(0))

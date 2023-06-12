@@ -68,21 +68,20 @@ const (
 // SHT2xDriver is a Driver for a SHT2x humidity and temperature sensor
 type SHT2xDriver struct {
 	*Driver
-	Units        string
-	sht2xAddress int
-	accuracy     byte
-	delay        time.Duration
-	crcTable     *crc8.Table
+	Units    string
+	accuracy byte
+	crcTable *crc8.Table
 }
 
 // NewSHT2xDriver creates a new driver with specified i2c interface
 // Params:
-//		c Connector - the Adaptor to use with this Driver
+//
+//	c Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//		i2c.WithBus(int):	bus to use with this driver
-//		i2c.WithAddress(int):	address to use with this driver
 //
+//	i2c.WithBus(int):	bus to use with this driver
+//	i2c.WithAddress(int):	address to use with this driver
 func NewSHT2xDriver(c Connector, options ...func(Config)) *SHT2xDriver {
 	// From the document "CRC Checksum Calculation -- For Safe Communication with SHT2x Sensors":
 	crc8Params := crc8.Params{
@@ -206,7 +205,9 @@ func (d *SHT2xDriver) initialize() error {
 		return err
 	}
 
-	d.sendAccuracy()
+	if err := d.sendAccuracy(); err != nil {
+		return err
+	}
 
 	return nil
 }

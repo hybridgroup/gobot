@@ -56,7 +56,7 @@ func TestSHT2xReset(t *testing.T) {
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		return 0, nil
 	}
-	d.Start()
+	_ = d.Start()
 	err := d.Reset()
 	gobottest.Assert(t, err, nil)
 }
@@ -74,7 +74,7 @@ func TestSHT2xMeasurements(t *testing.T) {
 		copy(b, buf.Bytes())
 		return buf.Len(), nil
 	}
-	d.Start()
+	_ = d.Start()
 	temp, err := d.Temperature()
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, temp, float32(18.809052))
@@ -97,8 +97,8 @@ func TestSHT2xAccuracy(t *testing.T) {
 		copy(b, buf.Bytes())
 		return buf.Len(), nil
 	}
-	d.Start()
-	d.SetAccuracy(SHT2xAccuracyLow)
+	_ = d.Start()
+	_ = d.SetAccuracy(SHT2xAccuracyLow)
 	gobottest.Assert(t, d.Accuracy(), SHT2xAccuracyLow)
 	err := d.sendAccuracy()
 	gobottest.Assert(t, err, nil)
@@ -106,7 +106,7 @@ func TestSHT2xAccuracy(t *testing.T) {
 
 func TestSHT2xTemperatureCrcError(t *testing.T) {
 	d, a := initTestSHT2xDriverWithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		buf := new(bytes.Buffer)
@@ -123,7 +123,7 @@ func TestSHT2xTemperatureCrcError(t *testing.T) {
 
 func TestSHT2xHumidityCrcError(t *testing.T) {
 	d, a := initTestSHT2xDriverWithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		buf := new(bytes.Buffer)
@@ -140,7 +140,7 @@ func TestSHT2xHumidityCrcError(t *testing.T) {
 
 func TestSHT2xTemperatureLengthError(t *testing.T) {
 	d, a := initTestSHT2xDriverWithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		buf := new(bytes.Buffer)
@@ -157,7 +157,7 @@ func TestSHT2xTemperatureLengthError(t *testing.T) {
 
 func TestSHT2xHumidityLengthError(t *testing.T) {
 	d, a := initTestSHT2xDriverWithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		buf := new(bytes.Buffer)

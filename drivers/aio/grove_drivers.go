@@ -13,10 +13,12 @@ type GroveRotaryDriver struct {
 // 10 Milliseconds given an AnalogReader and pin.
 //
 // Optionally accepts:
-// 	time.Duration: Interval at which the AnalogSensor is polled for new information
+//
+//	time.Duration: Interval at which the AnalogSensor is polled for new information
 //
 // Adds the following API Commands:
-// 	"Read" - See AnalogSensor.Read
+//
+//	"Read" - See AnalogSensor.Read
 func NewGroveRotaryDriver(a AnalogReader, pin string, v ...time.Duration) *GroveRotaryDriver {
 	return &GroveRotaryDriver{
 		AnalogSensorDriver: NewAnalogSensorDriver(a, pin, v...),
@@ -33,10 +35,12 @@ type GroveLightSensorDriver struct {
 // 10 Milliseconds given an AnalogReader and pin.
 //
 // Optionally accepts:
-// 	time.Duration: Interval at which the AnalogSensor is polled for new information
+//
+//	time.Duration: Interval at which the AnalogSensor is polled for new information
 //
 // Adds the following API Commands:
-// 	"Read" - See AnalogSensor.Read
+//
+//	"Read" - See AnalogSensor.Read
 func NewGroveLightSensorDriver(a AnalogReader, pin string, v ...time.Duration) *GroveLightSensorDriver {
 	return &GroveLightSensorDriver{
 		AnalogSensorDriver: NewAnalogSensorDriver(a, pin, v...),
@@ -53,10 +57,12 @@ type GrovePiezoVibrationSensorDriver struct {
 // 10 Milliseconds given an AnalogReader and pin.
 //
 // Optionally accepts:
-// 	time.Duration: Interval at which the AnalogSensor is polled for new information
+//
+//	time.Duration: Interval at which the AnalogSensor is polled for new information
 //
 // Adds the following API Commands:
-// 	"Read" - See AnalogSensor.Read
+//
+//	"Read" - See AnalogSensor.Read
 func NewGrovePiezoVibrationSensorDriver(a AnalogReader, pin string, v ...time.Duration) *GrovePiezoVibrationSensorDriver {
 	sensor := &GrovePiezoVibrationSensorDriver{
 		AnalogSensorDriver: NewAnalogSensorDriver(a, pin, v...),
@@ -64,11 +70,13 @@ func NewGrovePiezoVibrationSensorDriver(a AnalogReader, pin string, v ...time.Du
 
 	sensor.AddEvent(Vibration)
 
-	sensor.On(sensor.Event(Data), func(data interface{}) {
+	if err := sensor.On(sensor.Event(Data), func(data interface{}) {
 		if data.(int) > 1000 {
 			sensor.Publish(sensor.Event(Vibration), data)
 		}
-	})
+	}); err != nil {
+		panic(err)
+	}
 
 	return sensor
 }
@@ -83,10 +91,12 @@ type GroveSoundSensorDriver struct {
 // 10 Milliseconds given an AnalogReader and pin.
 //
 // Optionally accepts:
-// 	time.Duration: Interval at which the AnalogSensor is polled for new information
+//
+//	time.Duration: Interval at which the AnalogSensor is polled for new information
 //
 // Adds the following API Commands:
-// 	"Read" - See AnalogSensor.Read
+//
+//	"Read" - See AnalogSensor.Read
 func NewGroveSoundSensorDriver(a AnalogReader, pin string, v ...time.Duration) *GroveSoundSensorDriver {
 	return &GroveSoundSensorDriver{
 		AnalogSensorDriver: NewAnalogSensorDriver(a, pin, v...),

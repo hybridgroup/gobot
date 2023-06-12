@@ -49,28 +49,28 @@ func TestBMP180Measurements(t *testing.T) {
 		buf := new(bytes.Buffer)
 		// Values from the datasheet example.
 		if adaptor.written[len(adaptor.written)-1] == bmp180RegisterAC1MSB {
-			binary.Write(buf, binary.BigEndian, int16(408))
-			binary.Write(buf, binary.BigEndian, int16(-72))
-			binary.Write(buf, binary.BigEndian, int16(-14383))
-			binary.Write(buf, binary.BigEndian, uint16(32741))
-			binary.Write(buf, binary.BigEndian, uint16(32757))
-			binary.Write(buf, binary.BigEndian, uint16(23153))
-			binary.Write(buf, binary.BigEndian, int16(6190))
-			binary.Write(buf, binary.BigEndian, int16(4))
-			binary.Write(buf, binary.BigEndian, int16(-32768))
-			binary.Write(buf, binary.BigEndian, int16(-8711))
-			binary.Write(buf, binary.BigEndian, int16(2868))
+			_ = binary.Write(buf, binary.BigEndian, int16(408))
+			_ = binary.Write(buf, binary.BigEndian, int16(-72))
+			_ = binary.Write(buf, binary.BigEndian, int16(-14383))
+			_ = binary.Write(buf, binary.BigEndian, uint16(32741))
+			_ = binary.Write(buf, binary.BigEndian, uint16(32757))
+			_ = binary.Write(buf, binary.BigEndian, uint16(23153))
+			_ = binary.Write(buf, binary.BigEndian, int16(6190))
+			_ = binary.Write(buf, binary.BigEndian, int16(4))
+			_ = binary.Write(buf, binary.BigEndian, int16(-32768))
+			_ = binary.Write(buf, binary.BigEndian, int16(-8711))
+			_ = binary.Write(buf, binary.BigEndian, int16(2868))
 		} else if adaptor.written[len(adaptor.written)-2] == bmp180CtlTemp && adaptor.written[len(adaptor.written)-1] == bmp180RegisterDataMSB {
-			binary.Write(buf, binary.BigEndian, int16(27898))
+			_ = binary.Write(buf, binary.BigEndian, int16(27898))
 		} else if adaptor.written[len(adaptor.written)-2] == bmp180CtlPressure && adaptor.written[len(adaptor.written)-1] == bmp180RegisterDataMSB {
-			binary.Write(buf, binary.BigEndian, int16(23843))
+			_ = binary.Write(buf, binary.BigEndian, int16(23843))
 			// XLSB, not used in this test.
 			buf.WriteByte(0)
 		}
 		copy(b, buf.Bytes())
 		return buf.Len(), nil
 	}
-	bmp180.Start()
+	_ = bmp180.Start()
 	temp, err := bmp180.Temperature()
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, temp, float32(15.0))
@@ -85,28 +85,28 @@ func TestBMP180TemperatureError(t *testing.T) {
 		buf := new(bytes.Buffer)
 		// Values from the datasheet example.
 		if adaptor.written[len(adaptor.written)-1] == bmp180RegisterAC1MSB {
-			binary.Write(buf, binary.BigEndian, int16(408))
-			binary.Write(buf, binary.BigEndian, int16(-72))
-			binary.Write(buf, binary.BigEndian, int16(-14383))
-			binary.Write(buf, binary.BigEndian, uint16(32741))
-			binary.Write(buf, binary.BigEndian, uint16(32757))
-			binary.Write(buf, binary.BigEndian, uint16(23153))
-			binary.Write(buf, binary.BigEndian, int16(6190))
-			binary.Write(buf, binary.BigEndian, int16(4))
-			binary.Write(buf, binary.BigEndian, int16(-32768))
-			binary.Write(buf, binary.BigEndian, int16(-8711))
-			binary.Write(buf, binary.BigEndian, int16(2868))
+			_ = binary.Write(buf, binary.BigEndian, int16(408))
+			_ = binary.Write(buf, binary.BigEndian, int16(-72))
+			_ = binary.Write(buf, binary.BigEndian, int16(-14383))
+			_ = binary.Write(buf, binary.BigEndian, uint16(32741))
+			_ = binary.Write(buf, binary.BigEndian, uint16(32757))
+			_ = binary.Write(buf, binary.BigEndian, uint16(23153))
+			_ = binary.Write(buf, binary.BigEndian, int16(6190))
+			_ = binary.Write(buf, binary.BigEndian, int16(4))
+			_ = binary.Write(buf, binary.BigEndian, int16(-32768))
+			_ = binary.Write(buf, binary.BigEndian, int16(-8711))
+			_ = binary.Write(buf, binary.BigEndian, int16(2868))
 		} else if adaptor.written[len(adaptor.written)-2] == bmp180CtlTemp && adaptor.written[len(adaptor.written)-1] == bmp180RegisterDataMSB {
 			return 0, errors.New("temp error")
 		} else if adaptor.written[len(adaptor.written)-2] == bmp180CtlPressure && adaptor.written[len(adaptor.written)-1] == bmp180RegisterDataMSB {
-			binary.Write(buf, binary.BigEndian, int16(23843))
+			_ = binary.Write(buf, binary.BigEndian, int16(23843))
 			// XLSB, not used in this test.
 			buf.WriteByte(0)
 		}
 		copy(b, buf.Bytes())
 		return buf.Len(), nil
 	}
-	bmp180.Start()
+	_ = bmp180.Start()
 	_, err := bmp180.Temperature()
 	gobottest.Assert(t, err, errors.New("temp error"))
 }
@@ -117,33 +117,33 @@ func TestBMP180PressureError(t *testing.T) {
 		buf := new(bytes.Buffer)
 		// Values from the datasheet example.
 		if adaptor.written[len(adaptor.written)-1] == bmp180RegisterAC1MSB {
-			binary.Write(buf, binary.BigEndian, int16(408))
-			binary.Write(buf, binary.BigEndian, int16(-72))
-			binary.Write(buf, binary.BigEndian, int16(-14383))
-			binary.Write(buf, binary.BigEndian, uint16(32741))
-			binary.Write(buf, binary.BigEndian, uint16(32757))
-			binary.Write(buf, binary.BigEndian, uint16(23153))
-			binary.Write(buf, binary.BigEndian, int16(6190))
-			binary.Write(buf, binary.BigEndian, int16(4))
-			binary.Write(buf, binary.BigEndian, int16(-32768))
-			binary.Write(buf, binary.BigEndian, int16(-8711))
-			binary.Write(buf, binary.BigEndian, int16(2868))
+			_ = binary.Write(buf, binary.BigEndian, int16(408))
+			_ = binary.Write(buf, binary.BigEndian, int16(-72))
+			_ = binary.Write(buf, binary.BigEndian, int16(-14383))
+			_ = binary.Write(buf, binary.BigEndian, uint16(32741))
+			_ = binary.Write(buf, binary.BigEndian, uint16(32757))
+			_ = binary.Write(buf, binary.BigEndian, uint16(23153))
+			_ = binary.Write(buf, binary.BigEndian, int16(6190))
+			_ = binary.Write(buf, binary.BigEndian, int16(4))
+			_ = binary.Write(buf, binary.BigEndian, int16(-32768))
+			_ = binary.Write(buf, binary.BigEndian, int16(-8711))
+			_ = binary.Write(buf, binary.BigEndian, int16(2868))
 		} else if adaptor.written[len(adaptor.written)-2] == bmp180CtlTemp && adaptor.written[len(adaptor.written)-1] == bmp180RegisterDataMSB {
-			binary.Write(buf, binary.BigEndian, int16(27898))
+			_ = binary.Write(buf, binary.BigEndian, int16(27898))
 		} else if adaptor.written[len(adaptor.written)-2] == bmp180CtlPressure && adaptor.written[len(adaptor.written)-1] == bmp180RegisterDataMSB {
 			return 0, errors.New("press error")
 		}
 		copy(b, buf.Bytes())
 		return buf.Len(), nil
 	}
-	bmp180.Start()
+	_ = bmp180.Start()
 	_, err := bmp180.Pressure()
 	gobottest.Assert(t, err, errors.New("press error"))
 }
 
 func TestBMP180PressureWriteError(t *testing.T) {
 	bmp180, adaptor := initTestBMP180WithStubbedAdaptor()
-	bmp180.Start()
+	_ = bmp180.Start()
 
 	adaptor.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")

@@ -105,13 +105,13 @@ func TestSSD1306Options(t *testing.T) {
 
 func TestSSD1306Display(t *testing.T) {
 	s, _ := initTestSSD1306DriverWithStubbedAdaptor(96, 16, false)
-	s.Start()
+	_ = s.Start()
 	gobottest.Assert(t, s.Display(), nil)
 }
 
 func TestSSD1306ShowImage(t *testing.T) {
 	s, _ := initTestSSD1306DriverWithStubbedAdaptor(128, 64, false)
-	s.Start()
+	_ = s.Start()
 	img := image.NewRGBA(image.Rect(0, 0, 640, 480))
 	gobottest.Assert(t, s.ShowImage(img), errors.New("image must match display width and height: 128x64"))
 
@@ -121,7 +121,7 @@ func TestSSD1306ShowImage(t *testing.T) {
 
 func TestSSD1306Command(t *testing.T) {
 	s, a := initTestSSD1306DriverWithStubbedAdaptor(128, 64, false)
-	s.Start()
+	_ = s.Start()
 
 	a.i2cWriteImpl = func(got []byte) (int, error) {
 		expected := []byte{0x80, 0xFF}
@@ -137,7 +137,7 @@ func TestSSD1306Command(t *testing.T) {
 
 func TestSSD1306Commands(t *testing.T) {
 	s, a := initTestSSD1306DriverWithStubbedAdaptor(128, 64, false)
-	s.Start()
+	_ = s.Start()
 
 	a.i2cWriteImpl = func(got []byte) (int, error) {
 		expected := []byte{0x80, 0x00, 0x80, 0xFF}
@@ -153,7 +153,7 @@ func TestSSD1306Commands(t *testing.T) {
 
 func TestSSD1306On(t *testing.T) {
 	s, a := initTestSSD1306DriverWithStubbedAdaptor(128, 64, false)
-	s.Start()
+	_ = s.Start()
 
 	a.i2cWriteImpl = func(got []byte) (int, error) {
 		expected := []byte{0x80, ssd1306SetDisplayOn}
@@ -169,7 +169,7 @@ func TestSSD1306On(t *testing.T) {
 
 func TestSSD1306Off(t *testing.T) {
 	s, a := initTestSSD1306DriverWithStubbedAdaptor(128, 64, false)
-	s.Start()
+	_ = s.Start()
 
 	a.i2cWriteImpl = func(got []byte) (int, error) {
 		expected := []byte{0x80, ssd1306SetDisplayOff}
@@ -185,7 +185,7 @@ func TestSSD1306Off(t *testing.T) {
 
 func TestSSD1306Reset(t *testing.T) {
 	s, a := initTestSSD1306DriverWithStubbedAdaptor(128, 64, false)
-	s.Start()
+	_ = s.Start()
 
 	a.i2cWriteImpl = func(got []byte) (int, error) {
 		expectedOff := []byte{0x80, ssd1306SetDisplayOff}

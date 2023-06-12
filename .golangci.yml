@@ -32,15 +32,6 @@ linters:
   # Enable specific linter
   # https://golangci-lint.run/usage/linters/#enabled-by-default
   # note: typecheck can not be disabled, it is used to check code compilation
-  #
-  # TODO: this default linters needs to be disabled to run successfully, we have to fix
-  #       all issues step by step to enable at least the default linters
-  disable:
-    - errcheck
-    - ineffassign
-    #- staticcheck
-    - unused
-
   enable:
     - nolintlint
 

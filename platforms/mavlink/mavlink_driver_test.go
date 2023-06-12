@@ -46,16 +46,16 @@ func TestMavlinkDriverStart(t *testing.T) {
 	packet := make(chan *common.MAVLinkPacket)
 	message := make(chan common.MAVLinkMessage)
 
-	d.On(PacketEvent, func(data interface{}) {
+	_ = d.On(PacketEvent, func(data interface{}) {
 		packet <- data.(*common.MAVLinkPacket)
 	})
-	d.On(MessageEvent, func(data interface{}) {
+	_ = d.On(MessageEvent, func(data interface{}) {
 		message <- data.(common.MAVLinkMessage)
 	})
-	d.On(ErrorIOEvent, func(data interface{}) {
+	_ = d.On(ErrorIOEvent, func(data interface{}) {
 		err <- data.(error)
 	})
-	d.On(ErrorMAVLinkEvent, func(data interface{}) {
+	_ = d.On(ErrorMAVLinkEvent, func(data interface{}) {
 		err <- data.(error)
 	})
 

@@ -120,12 +120,13 @@ var mpu6050GyroGain = map[MPU6050GyroFsConfig]float64{
 // NewMPU6050Driver creates a new Gobot Driver for an MPU6050 I2C Accelerometer/Gyroscope/Temperature sensor.
 //
 // Params:
-//		conn Connector - the Adaptor to use with this Driver
+//
+//	conn Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//		i2c.WithBus(int):	bus to use with this driver
-//		i2c.WithAddress(int):	address to use with this driver
 //
+//	i2c.WithBus(int):	bus to use with this driver
+//	i2c.WithAddress(int):	address to use with this driver
 func NewMPU6050Driver(a Connector, options ...func(Config)) *MPU6050Driver {
 	m := &MPU6050Driver{
 		Driver:    NewDriver(a, "MPU6050", mpu6050DefaultAddress),
@@ -219,14 +220,13 @@ func WithMPU6050Gravity(val float64) func(Config) {
 }
 
 // GetData fetches the latest data from the MPU6050
-func (m *MPU6050Driver) GetData() (err error) {
+func (m *MPU6050Driver) GetData() error {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 
 	data := make([]byte, 14)
-	err = m.connection.ReadBlockData(mpu6050Reg_AccelXoutH, data)
-	if err != nil {
-		return
+	if err := m.connection.ReadBlockData(mpu6050Reg_AccelXoutH, data); err != nil {
+		return err
 	}
 
 	var accel struct {
@@ -242,9 +242,15 @@ func (m *MPU6050Driver) GetData() (err error) {
 	}
 
 	buf := bytes.NewBuffer(data)
-	binary.Read(buf, binary.BigEndian, &accel)
-	binary.Read(buf, binary.BigEndian, &temp)
-	binary.Read(buf, binary.BigEndian, &gyro)
+	if err := binary.Read(buf, binary.BigEndian, &accel); err != nil {
+		return err
+	}
+	if err := binary.Read(buf, binary.BigEndian, &temp); err != nil {
+		return err
+	}
+	if err := binary.Read(buf, binary.BigEndian, &gyro); err != nil {
+		return err
+	}
 
 	ag := float64(mpu6050AccelGain[m.accelFs]) / m.gravity
 	m.Accelerometer.X = float64(accel.X) / ag
@@ -258,7 +264,7 @@ func (m *MPU6050Driver) GetData() (err error) {
 	m.Gyroscope.Y = float64(gyro.Y) / gg
 	m.Gyroscope.Z = float64(gyro.Z) / gg
 
-	return
+	return nil
 }
 
 func (m *MPU6050Driver) waitForReset() error {
@@ -275,43 +281,40 @@ func (m *MPU6050Driver) waitForReset() error {
 	}
 }
 
-func (m *MPU6050Driver) initialize() (err error) {
+func (m *MPU6050Driver) initialize() error {
 	// reset device and wait for reset is finished
-	if err = m.connection.WriteByteData(mpu6050Reg_PwrMgmt1, mpu6050Pwr1_DeviceResetBit); err != nil {
-		return
+	if err := m.connection.WriteByteData(mpu6050Reg_PwrMgmt1, mpu6050Pwr1_DeviceResetBit); err != nil {
+		return err
 	}
-	if err = m.waitForReset(); err != nil {
-		return
+	if err := m.waitForReset(); err != nil {
+		return err
 	}
 
 	// reset signal path register
 	reset := uint8(mpu6050SignalReset_TempBit | mpu6050SignalReset_AccelBit | mpu6050SignalReset_GyroBit)
-	if err = m.connection.WriteByteData(mpu6050Reg_SignalPathReset, reset); err != nil {
-		return
+	if err := m.connection.WriteByteData(mpu6050Reg_SignalPathReset, reset); err != nil {
+		return err
 	}
 	time.Sleep(100 * time.Millisecond)
 
 	// configure digital filter bandwidth and external frame synchronization (bits 3...5 are used)
 	generalConf := uint8(m.dlpf) | uint8(m.frameSync)<<3
-	if err = m.connection.WriteByteData(mpu6050Reg_GeneralConfig, generalConf); err != nil {
-		return
+	if err := m.connection.WriteByteData(mpu6050Reg_GeneralConfig, generalConf); err != nil {
+		return err
 	}
 
 	// set full scale range of gyroscope (bits 3 and 4 are used)
-	if err = m.connection.WriteByteData(mpu6050Reg_GyroConfig, uint8(m.gyroFs)<<3); err != nil {
-		return
+	if err := m.connection.WriteByteData(mpu6050Reg_GyroConfig, uint8(m.gyroFs)<<3); err != nil {
+		return err
 	}
 
 	// set full scale range of accelerometer (bits 3 and 4 are used)
-	if err = m.connection.WriteByteData(mpu6050Reg_AccelConfig, uint8(m.accelFs)<<3); err != nil {
-		return
+	if err := m.connection.WriteByteData(mpu6050Reg_AccelConfig, uint8(m.accelFs)<<3); err != nil {
+		return err
 	}
 
 	// set clock source and reset sleep
 	pwr1 := uint8(m.clock) & ^uint8(mpu6050Pwr1_SleepOnBit)
-	if err = m.connection.WriteByteData(mpu6050Reg_PwrMgmt1, pwr1); err != nil {
-		return
-	}
 
-	return
+	return m.connection.WriteByteData(mpu6050Reg_PwrMgmt1, pwr1)
 }

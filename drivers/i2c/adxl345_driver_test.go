@@ -75,7 +75,7 @@ func TestADXL345UseLowPower(t *testing.T) {
 	// * set value in data rate structure
 	// * write the data rate register (0x2C)
 	d, a := initTestADXL345WithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 	a.written = []byte{} // reset writes of former test
 	setVal := !d.bwRate.lowPower
 	const (
@@ -97,7 +97,7 @@ func TestADXL345SetRate(t *testing.T) {
 	// * set value in data rate structure
 	// * write the data rate register (0x2C)
 	d, a := initTestADXL345WithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 	a.written = []byte{} // reset writes of former test
 	const (
 		setVal  = ADXL345RateConfig(0x0F) // 3.2kHz
@@ -119,7 +119,7 @@ func TestADXL345SetRange(t *testing.T) {
 	// * set value in data format structure
 	// * write the data format register (0x31)
 	d, a := initTestADXL345WithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 	a.written = []byte{} // reset writes of former test
 	const (
 		setVal  = ADXL345FsRangeConfig(0x03) // +/- 16 g
@@ -169,7 +169,7 @@ func TestADXL345RawXYZ(t *testing.T) {
 		},
 	}
 	d, a := initTestADXL345WithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			a.written = []byte{} // reset writes of former test and start
@@ -198,7 +198,7 @@ func TestADXL345RawXYZ(t *testing.T) {
 func TestADXL345RawXYZError(t *testing.T) {
 	// arrange
 	d, a := initTestADXL345WithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		return 0, errors.New("read error")
 	}
@@ -239,7 +239,7 @@ func TestADXL345XYZ(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			// arrange
 			d, a := initTestADXL345WithStubbedAdaptor()
-			d.Start()
+			_ = d.Start()
 			a.written = []byte{} // reset writes of former test and start
 			// arrange reads
 			returnRead := append(append(tc.inputX, tc.inputY...), tc.inputZ...)
@@ -262,7 +262,7 @@ func TestADXL345XYZ(t *testing.T) {
 func TestADXL345XYZError(t *testing.T) {
 	// arrange
 	d, a := initTestADXL345WithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		return 0, errors.New("read error")
 	}
@@ -307,7 +307,7 @@ func TestADXL345_shutdown(t *testing.T) {
 	// * reset the measurement bit in structure
 	// * write the power control register (0x2D)
 	d, a := initTestADXL345WithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 	a.written = []byte{} // reset writes of former test
 	const (
 		wantReg = uint8(0x2D)

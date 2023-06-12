@@ -1,3 +1,4 @@
+//nolint:errcheck // to much code to fix it immediately
 package mavlink
 
 //
@@ -160,7 +161,6 @@ func read(r io.Reader, length int) ([]byte, error) {
 	return buf, nil
 }
 
-//
 // Accumulate the X.25 CRC by adding one char at a time.
 //
 // The checksum function adds the hash of one char at a time to the
@@ -168,7 +168,6 @@ func read(r io.Reader, length int) ([]byte, error) {
 //
 // data to hash
 // crcAccum the already accumulated checksum
-//
 func crcAccumulate(data uint8, crcAccum uint16) uint16 {
 	/*Accumulate one byte of data into the CRC*/
 	var tmp uint8
@@ -179,18 +178,14 @@ func crcAccumulate(data uint8, crcAccum uint16) uint16 {
 	return crcAccum
 }
 
-//
 // Initiliaze the buffer for the X.25 CRC
-//
 func crcInit() uint16 {
 	return X25_INIT_CRC
 }
 
-//
 // Calculates the X.25 checksum on a byte buffer
 //
 // return the checksum over the buffer bytes
-//
 func crcCalculate(m *MAVLinkPacket) uint16 {
 	crc := crcInit()
 

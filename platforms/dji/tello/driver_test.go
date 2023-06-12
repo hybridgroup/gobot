@@ -176,7 +176,7 @@ func TestHaltShouldTerminateAllTheRelatedGoroutines(t *testing.T) {
 		fmt.Println("Done routine 3.")
 	}()
 
-	d.Halt()
+	_ = d.Halt()
 	wg.Wait()
 
 	gobottest.Assert(t, d.doneChReaderCount, int32(0))
@@ -186,7 +186,7 @@ func TestHaltNotWaitForeverWhenCalledMultipleTimes(t *testing.T) {
 	d := NewDriver("8888")
 	d.cmdConn = &WriteCloserDoNothing{}
 
-	d.Halt()
-	d.Halt()
-	d.Halt()
+	_ = d.Halt()
+	_ = d.Halt()
+	_ = d.Halt()
 }

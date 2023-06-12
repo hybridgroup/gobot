@@ -36,7 +36,7 @@ const (
 	piccCommandMFRegTRANSFER  = 0xB0 // Writes the contents of the internal data register to a block.
 	// The commands used for MIFARE Ultralight (from http://www.nxp.com/documents/dataRegsheet/MF0ICU1.pdf, Section 8.6)
 	// The piccCommandMFRegREAD and piccCommandMFRegWRITE can also be used for MIFARE Ultralight.
-	piccCommandULRegWRITE = 0xA2 // Writes one 4 byte page to the PICC.
+	//piccCommandULRegWRITE = 0xA2 // Writes one 4 byte page to the PICC.
 )
 
 const piccReadWriteAuthBlock = uint8(11)

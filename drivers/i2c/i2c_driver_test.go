@@ -90,7 +90,7 @@ func TestWrite(t *testing.T) {
 		value       = 0x25
 	)
 	d, a := initDriverWithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 	// prepare all writes
 	numCallsWrite := 0
 	a.i2cWriteImpl = func([]byte) (int, error) {
@@ -114,7 +114,7 @@ func TestRead(t *testing.T) {
 		want        = uint8(0x44)
 	)
 	d, a := initDriverWithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 	// prepare all writes
 	numCallsWrite := 0
 	a.i2cWriteImpl = func(b []byte) (int, error) {

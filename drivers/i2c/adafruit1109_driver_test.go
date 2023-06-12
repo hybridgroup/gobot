@@ -86,7 +86,7 @@ func TestAdafruit1109StartReadErr(t *testing.T) {
 
 func TestAdafruit1109Halt(t *testing.T) {
 	d, _ := initTestAdafruit1109WithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 	gobottest.Assert(t, d.Halt(), nil)
 }
 
@@ -116,7 +116,7 @@ func TestAdafruit1109DigitalRead(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			// arrange
 			d, a := initTestAdafruit1109WithStubbedAdaptor()
-			d.Start()
+			_ = d.Start()
 			a.written = []byte{} // reset writes of Start() and former test
 			// arrange reads
 			numCallsRead := 0
@@ -149,7 +149,7 @@ func TestAdafruit1109SelectButton(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			// arrange
 			d, a := initTestAdafruit1109WithStubbedAdaptor()
-			d.Start()
+			_ = d.Start()
 			// arrange reads
 			numCallsRead := 0
 			a.i2cReadImpl = func(b []byte) (int, error) {
@@ -179,7 +179,7 @@ func TestAdafruit1109UpButton(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			// arrange
 			d, a := initTestAdafruit1109WithStubbedAdaptor()
-			d.Start()
+			_ = d.Start()
 			// arrange reads
 			numCallsRead := 0
 			a.i2cReadImpl = func(b []byte) (int, error) {
@@ -209,7 +209,7 @@ func TestAdafruit1109DownButton(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			// arrange
 			d, a := initTestAdafruit1109WithStubbedAdaptor()
-			d.Start()
+			_ = d.Start()
 			// arrange reads
 			numCallsRead := 0
 			a.i2cReadImpl = func(b []byte) (int, error) {
@@ -239,7 +239,7 @@ func TestAdafruit1109LeftButton(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			// arrange
 			d, a := initTestAdafruit1109WithStubbedAdaptor()
-			d.Start()
+			_ = d.Start()
 			// arrange reads
 			numCallsRead := 0
 			a.i2cReadImpl = func(b []byte) (int, error) {
@@ -269,7 +269,7 @@ func TestAdafruit1109RightButton(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			// arrange
 			d, a := initTestAdafruit1109WithStubbedAdaptor()
-			d.Start()
+			_ = d.Start()
 			// arrange reads
 			numCallsRead := 0
 			a.i2cReadImpl = func(b []byte) (int, error) {

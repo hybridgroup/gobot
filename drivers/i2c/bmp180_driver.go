@@ -59,12 +59,13 @@ type BMP180Driver struct {
 
 // NewBMP180Driver creates a new driver with the i2c interface for the BMP180 device.
 // Params:
-//		conn Connector - the Adaptor to use with this Driver
+//
+//	conn Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//		i2c.WithBus(int):	bus to use with this driver
-//		i2c.WithAddress(int):	address to use with this driver
 //
+//	i2c.WithBus(int):	bus to use with this driver
+//	i2c.WithAddress(int):	address to use with this driver
 func NewBMP180Driver(c Connector, options ...func(Config)) *BMP180Driver {
 	d := &BMP180Driver{
 		Driver:       NewDriver(c, "BMP180", bmp180DefaultAddress),
@@ -121,26 +122,45 @@ func (d *BMP180Driver) Pressure() (pressure float32, err error) {
 	return d.calculatePressure(rawTemp, rawPressure, d.oversampling), nil
 }
 
-func (d *BMP180Driver) initialization() (err error) {
+func (d *BMP180Driver) initialization() error {
 	// read the 11 calibration coefficients.
 	coefficients := make([]byte, 22)
-	if err = d.connection.ReadBlockData(bmp180RegisterAC1MSB, coefficients); err != nil {
+	if err := d.connection.ReadBlockData(bmp180RegisterAC1MSB, coefficients); err != nil {
 		return err
 	}
 	buf := bytes.NewBuffer(coefficients)
-	binary.Read(buf, binary.BigEndian, &d.calCoeffs.ac1)
-	binary.Read(buf, binary.BigEndian, &d.calCoeffs.ac2)
-	binary.Read(buf, binary.BigEndian, &d.calCoeffs.ac3)
-	binary.Read(buf, binary.BigEndian, &d.calCoeffs.ac4)
-	binary.Read(buf, binary.BigEndian, &d.calCoeffs.ac5)
-	binary.Read(buf, binary.BigEndian, &d.calCoeffs.ac6)
-	binary.Read(buf, binary.BigEndian, &d.calCoeffs.b1)
-	binary.Read(buf, binary.BigEndian, &d.calCoeffs.b2)
-	binary.Read(buf, binary.BigEndian, &d.calCoeffs.mb)
-	binary.Read(buf, binary.BigEndian, &d.calCoeffs.mc)
-	binary.Read(buf, binary.BigEndian, &d.calCoeffs.md)
+	if err := binary.Read(buf, binary.BigEndian, &d.calCoeffs.ac1); err != nil {
+		return err
+	}
+	if err := binary.Read(buf, binary.BigEndian, &d.calCoeffs.ac2); err != nil {
+		return err
+	}
+	if err := binary.Read(buf, binary.BigEndian, &d.calCoeffs.ac3); err != nil {
+		return err
+	}
+	if err := binary.Read(buf, binary.BigEndian, &d.calCoeffs.ac4); err != nil {
+		return err
+	}
+	if err := binary.Read(buf, binary.BigEndian, &d.calCoeffs.ac5); err != nil {
+		return err
+	}
+	if err := binary.Read(buf, binary.BigEndian, &d.calCoeffs.ac6); err != nil {
+		return err
+	}
+	if err := binary.Read(buf, binary.BigEndian, &d.calCoeffs.b1); err != nil {
+		return err
+	}
+	if err := binary.Read(buf, binary.BigEndian, &d.calCoeffs.b2); err != nil {
+		return err
+	}
+	if err := binary.Read(buf, binary.BigEndian, &d.calCoeffs.mb); err != nil {
+		return err
+	}
+	if err := binary.Read(buf, binary.BigEndian, &d.calCoeffs.mc); err != nil {
+		return err
+	}
+	return binary.Read(buf, binary.BigEndian, &d.calCoeffs.md)
 
-	return nil
 }
 
 func (d *BMP180Driver) rawTemp() (int16, error) {
@@ -155,7 +175,9 @@ func (d *BMP180Driver) rawTemp() (int16, error) {
 	}
 	buf := bytes.NewBuffer(ret)
 	var rawTemp int16
-	binary.Read(buf, binary.BigEndian, &rawTemp)
+	if err := binary.Read(buf, binary.BigEndian, &rawTemp); err != nil {
+		return 0, err
+	}
 	return rawTemp, nil
 }
 

@@ -16,7 +16,7 @@ type TemperatureDriver struct {
 
 const (
 	// BLE services
-	temperatureService = "e95d6100251d470aa062fa1922dfa9a8"
+	//temperatureService = "e95d6100251d470aa062fa1922dfa9a8"
 
 	// BLE characteristics
 	temperatureCharacteristic = "e95d9250251d470aa062fa1922dfa9a8"
@@ -53,9 +53,9 @@ func (b *TemperatureDriver) adaptor() ble.BLEConnector {
 }
 
 // Start tells driver to get ready to do work
-func (b *TemperatureDriver) Start() (err error) {
+func (b *TemperatureDriver) Start() error {
 	// subscribe to temperature notifications
-	b.adaptor().Subscribe(temperatureCharacteristic, func(data []byte, e error) {
+	return b.adaptor().Subscribe(temperatureCharacteristic, func(data []byte, e error) {
 		var l int8
 		buf := bytes.NewBuffer(data)
 		val, _ := buf.ReadByte()
@@ -63,11 +63,7 @@ func (b *TemperatureDriver) Start() (err error) {
 
 		b.Publish(b.Event(Temperature), l)
 	})
-
-	return
 }
 
 // Halt stops Temperature driver (void)
-func (b *TemperatureDriver) Halt() (err error) {
-	return
-}
+func (b *TemperatureDriver) Halt() error { return nil }

@@ -77,7 +77,7 @@ func TestMockFilesystemWrite(t *testing.T) {
 	// Never been read or written.
 	gobottest.Assert(t, f1.Seq <= 0, true)
 
-	f2.WriteString("testing")
+	_, _ = f2.WriteString("testing")
 	// Was written.
 	gobottest.Assert(t, f1.Seq > 0, true)
 	gobottest.Assert(t, f1.Contents, "testing")

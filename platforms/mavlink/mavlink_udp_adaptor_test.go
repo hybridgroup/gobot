@@ -71,8 +71,8 @@ func TestMavlinkUDPAdaptorConnectAndFinalize(t *testing.T) {
 
 func TestMavlinkUDPAdaptorWrite(t *testing.T) {
 	a := initTestMavlinkUDPAdaptor()
-	a.Connect()
-	defer a.Finalize()
+	_ = a.Connect()
+	defer func() { _ = a.Finalize() }()
 
 	m := NewMockUDPConnection()
 	m.TestWriteTo = func([]byte, net.Addr) (int, error) {
@@ -87,8 +87,8 @@ func TestMavlinkUDPAdaptorWrite(t *testing.T) {
 
 func TestMavlinkReadMAVLinkReadDefaultPacket(t *testing.T) {
 	a := initTestMavlinkUDPAdaptor()
-	a.Connect()
-	defer a.Finalize()
+	_ = a.Connect()
+	defer func() { _ = a.Finalize() }()
 
 	m := NewMockUDPConnection()
 
@@ -106,8 +106,8 @@ func TestMavlinkReadMAVLinkReadDefaultPacket(t *testing.T) {
 
 func TestMavlinkReadMAVLinkPacketReadError(t *testing.T) {
 	a := initTestMavlinkUDPAdaptor()
-	a.Connect()
-	defer a.Finalize()
+	_ = a.Connect()
+	defer func() { _ = a.Finalize() }()
 
 	m := NewMockUDPConnection()
 

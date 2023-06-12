@@ -41,7 +41,7 @@ func TestPIRMotionDriverStart(t *testing.T) {
 
 	gobottest.Assert(t, d.Start(), nil)
 
-	d.Once(MotionDetected, func(data interface{}) {
+	_ = d.Once(MotionDetected, func(data interface{}) {
 		gobottest.Assert(t, d.Active, true)
 		sem <- true
 	})
@@ -57,7 +57,7 @@ func TestPIRMotionDriverStart(t *testing.T) {
 		t.Errorf("PIRMotionDriver Event \"MotionDetected\" was not published")
 	}
 
-	d.Once(MotionStopped, func(data interface{}) {
+	_ = d.Once(MotionStopped, func(data interface{}) {
 		gobottest.Assert(t, d.Active, false)
 		sem <- true
 	})
@@ -73,7 +73,7 @@ func TestPIRMotionDriverStart(t *testing.T) {
 		t.Errorf("PIRMotionDriver Event \"MotionStopped\" was not published")
 	}
 
-	d.Once(Error, func(data interface{}) {
+	_ = d.Once(Error, func(data interface{}) {
 		sem <- true
 	})
 

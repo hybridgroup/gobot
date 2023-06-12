@@ -25,7 +25,7 @@ func initTestBMP388WithStubbedAdaptor() (*BMP388Driver, *i2cTestAdaptor) {
 			buf := new(bytes.Buffer)
 			// Simulate returning of 0x50 for the
 			// ReadByteData(bmp388RegChipID) call in initialisation()
-			binary.Write(buf, binary.LittleEndian, uint8(0x50))
+			_ = binary.Write(buf, binary.LittleEndian, uint8(0x50))
 			copy(b, buf.Bytes())
 			return buf.Len(), nil
 		}
@@ -69,7 +69,7 @@ func TestBMP388Measurements(t *testing.T) {
 		case bmp388RegChipID:
 			// Simulate returning of 0x50 for the
 			// ReadByteData(bmp388RegChipID) call in initialisation()
-			binary.Write(buf, binary.LittleEndian, uint8(0x50))
+			_ = binary.Write(buf, binary.LittleEndian, uint8(0x50))
 		case bmp388RegCalib00:
 			// Values produced by dumping data from actual sensor
 			buf.Write([]byte{36, 107, 156, 73, 246, 104, 255, 189, 245, 35, 0, 151, 101, 184, 122, 243, 246, 211, 64, 14, 196, 0, 0, 0})
@@ -82,7 +82,7 @@ func TestBMP388Measurements(t *testing.T) {
 		copy(b, buf.Bytes())
 		return buf.Len(), nil
 	}
-	d.Start()
+	_ = d.Start()
 	temp, err := d.Temperature(2)
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, temp, float32(22.906143))
@@ -96,7 +96,7 @@ func TestBMP388Measurements(t *testing.T) {
 
 func TestBMP388TemperatureWriteError(t *testing.T) {
 	d, a := initTestBMP388WithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 
 	a.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
@@ -108,7 +108,7 @@ func TestBMP388TemperatureWriteError(t *testing.T) {
 
 func TestBMP388TemperatureReadError(t *testing.T) {
 	d, a := initTestBMP388WithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 
 	a.i2cReadImpl = func([]byte) (int, error) {
 		return 0, errors.New("read error")
@@ -120,7 +120,7 @@ func TestBMP388TemperatureReadError(t *testing.T) {
 
 func TestBMP388PressureWriteError(t *testing.T) {
 	d, a := initTestBMP388WithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 
 	a.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
@@ -132,7 +132,7 @@ func TestBMP388PressureWriteError(t *testing.T) {
 
 func TestBMP388PressureReadError(t *testing.T) {
 	d, a := initTestBMP388WithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 
 	a.i2cReadImpl = func([]byte) (int, error) {
 		return 0, errors.New("read error")

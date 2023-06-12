@@ -41,76 +41,76 @@ func TestMotorDriverIsOn(t *testing.T) {
 
 func TestMotorDriverIsOff(t *testing.T) {
 	d := initTestMotorDriver()
-	d.Off()
+	_ = d.Off()
 	gobottest.Assert(t, d.IsOff(), true)
 }
 
 func TestMotorDriverOn(t *testing.T) {
 	d := initTestMotorDriver()
 	d.CurrentMode = "digital"
-	d.On()
+	_ = d.On()
 	gobottest.Assert(t, d.CurrentState, uint8(1))
 	d.CurrentMode = "analog"
 	d.CurrentSpeed = 0
-	d.On()
+	_ = d.On()
 	gobottest.Assert(t, d.CurrentSpeed, uint8(255))
 }
 
 func TestMotorDriverOff(t *testing.T) {
 	d := initTestMotorDriver()
 	d.CurrentMode = "digital"
-	d.Off()
+	_ = d.Off()
 	gobottest.Assert(t, d.CurrentState, uint8(0))
 	d.CurrentMode = "analog"
 	d.CurrentSpeed = 100
-	d.Off()
+	_ = d.Off()
 	gobottest.Assert(t, d.CurrentSpeed, uint8(0))
 }
 
 func TestMotorDriverToggle(t *testing.T) {
 	d := initTestMotorDriver()
-	d.Off()
-	d.Toggle()
+	_ = d.Off()
+	_ = d.Toggle()
 	gobottest.Assert(t, d.IsOn(), true)
-	d.Toggle()
+	_ = d.Toggle()
 	gobottest.Assert(t, d.IsOn(), false)
 }
 
 func TestMotorDriverMin(t *testing.T) {
 	d := initTestMotorDriver()
-	d.Min()
+	_ = d.Min()
 }
 
 func TestMotorDriverMax(t *testing.T) {
 	d := initTestMotorDriver()
-	d.Max()
+	_ = d.Max()
 }
 
 func TestMotorDriverSpeed(t *testing.T) {
 	d := initTestMotorDriver()
-	d.Speed(100)
+	_ = d.Speed(100)
 }
 
 func TestMotorDriverForward(t *testing.T) {
 	d := initTestMotorDriver()
-	d.Forward(100)
+	_ = d.Forward(100)
 	gobottest.Assert(t, d.CurrentSpeed, uint8(100))
 	gobottest.Assert(t, d.CurrentDirection, "forward")
 }
 
 func TestMotorDriverBackward(t *testing.T) {
 	d := initTestMotorDriver()
-	d.Backward(100)
+	_ = d.Backward(100)
 	gobottest.Assert(t, d.CurrentSpeed, uint8(100))
 	gobottest.Assert(t, d.CurrentDirection, "backward")
 }
 
 func TestMotorDriverDirection(t *testing.T) {
 	d := initTestMotorDriver()
-	d.Direction("none")
+	_ = d.Direction("none")
 	d.DirectionPin = "2"
-	d.Direction("forward")
-	d.Direction("backward")
+	_ = d.Direction("forward")
+	_ = d.Direction("backward")
 }
 
 func TestMotorDriverDigital(t *testing.T) {
@@ -120,9 +120,9 @@ func TestMotorDriverDigital(t *testing.T) {
 	d.ForwardPin = "2"
 	d.BackwardPin = "3"
 
-	d.On()
+	_ = d.On()
 	gobottest.Assert(t, d.CurrentState, uint8(1))
-	d.Off()
+	_ = d.Off()
 	gobottest.Assert(t, d.CurrentState, uint8(0))
 }
 

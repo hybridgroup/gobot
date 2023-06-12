@@ -39,7 +39,7 @@ func TestDriver(t *testing.T) {
 	gobottest.Assert(t, d.PendingMessage(), "World")
 	gobottest.Assert(t, d.PendingMessage(), "")
 
-	d.On(d.Event("button"), func(data interface{}) {
+	_ = d.On(d.Event("button"), func(data interface{}) {
 		sem <- true
 	})
 
@@ -51,7 +51,7 @@ func TestDriver(t *testing.T) {
 		t.Errorf("Button Event was not published")
 	}
 
-	d.On(d.Event("accel"), func(data interface{}) {
+	_ = d.On(d.Event("accel"), func(data interface{}) {
 		sem <- true
 	})
 

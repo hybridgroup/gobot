@@ -57,12 +57,13 @@ type L3GD20HDriver struct {
 // L3GD20H I2C Triple-Axis Gyroscope.
 //
 // Params:
-//		c Connector - the Adaptor to use with this Driver
+//
+//	c Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//		i2c.WithBus(int):	bus to use with this driver
-//		i2c.WithAddress(int):	address to use with this driver
 //
+//	i2c.WithBus(int):	bus to use with this driver
+//	i2c.WithAddress(int):	address to use with this driver
 func NewL3GD20HDriver(c Connector, options ...func(Config)) *L3GD20HDriver {
 	l := &L3GD20HDriver{
 		Driver: NewDriver(c, "L3GD20H", l3gd20hDefaultAddress, options...),
@@ -116,7 +117,7 @@ func (d *L3GD20HDriver) XYZ() (x float32, y float32, z float32, err error) {
 
 	measurements := make([]byte, 6)
 	reg := l3gd20hReg_OutXLSB | 0x80 // set auto-increment bit
-	if err = d.connection.ReadBlockData(uint8(reg), measurements); err != nil {
+	if err := d.connection.ReadBlockData(uint8(reg), measurements); err != nil {
 		return 0, 0, 0, err
 	}
 
@@ -124,16 +125,22 @@ func (d *L3GD20HDriver) XYZ() (x float32, y float32, z float32, err error) {
 	var rawY int16
 	var rawZ int16
 	buf := bytes.NewBuffer(measurements)
-	binary.Read(buf, binary.LittleEndian, &rawX)
-	binary.Read(buf, binary.LittleEndian, &rawY)
-	binary.Read(buf, binary.LittleEndian, &rawZ)
+	if err := binary.Read(buf, binary.LittleEndian, &rawX); err != nil {
+		return 0, 0, 0, err
+	}
+	if err := binary.Read(buf, binary.LittleEndian, &rawY); err != nil {
+		return 0, 0, 0, err
+	}
+	if err := binary.Read(buf, binary.LittleEndian, &rawZ); err != nil {
+		return 0, 0, 0, err
+	}
 
 	sensitivity := l3gdhSensibility[d.scale]
 
 	return float32(rawX) * sensitivity, float32(rawY) * sensitivity, float32(rawZ) * sensitivity, nil
 }
 
-func (d *L3GD20HDriver) initialize() (err error) {
+func (d *L3GD20HDriver) initialize() error {
 	// reset the gyroscope.
 	if err := d.connection.WriteByteData(l3gd20hReg_Ctl1, 0x00); err != nil {
 		return err
