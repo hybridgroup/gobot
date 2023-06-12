@@ -63,14 +63,14 @@ func TestName(t *testing.T) {
 func TestDigitalIO(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem(gpioMockPaths)
 
-	a.DigitalWrite("7", 1)
+	_ = a.DigitalWrite("7", 1)
 	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio462/value"].Contents, "1")
 
 	fs.Files["/sys/class/gpio/gpio432/value"].Contents = "1"
 	i, _ := a.DigitalRead("13")
 	gobottest.Assert(t, i, 1)
 
-	a.DigitalWrite("green", 1)
+	_ = a.DigitalWrite("green", 1)
 	gobottest.Assert(t,
 		fs.Files["/sys/class/leds/upboard:green:/brightness"].Contents,
 		"1",

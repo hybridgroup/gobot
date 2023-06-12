@@ -2,6 +2,7 @@ package gobot
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"os"
 	"testing"
@@ -76,7 +77,7 @@ func TestMasterStart(t *testing.T) {
 func TestMasterStartAutoRun(t *testing.T) {
 	g := NewMaster()
 	g.AddRobot(newTestRobot("Robot99"))
-	go g.Start()
+	go func() { _ = g.Start() }()
 	time.Sleep(10 * time.Millisecond)
 	gobottest.Assert(t, g.Running(), true)
 
@@ -92,12 +93,12 @@ func TestMasterStartDriverErrors(t *testing.T) {
 		return e
 	}
 
-	var expected error
-	expected = multierror.Append(expected, e)
-	expected = multierror.Append(expected, e)
-	expected = multierror.Append(expected, e)
+	var want error
+	want = multierror.Append(want, e)
+	want = multierror.Append(want, e)
+	want = multierror.Append(want, e)
 
-	gobottest.Assert(t, g.Start(), expected)
+	gobottest.Assert(t, g.Start(), want)
 	gobottest.Assert(t, g.Stop(), nil)
 
 	testDriverStart = func() (err error) { return }
@@ -105,36 +106,38 @@ func TestMasterStartDriverErrors(t *testing.T) {
 
 func TestMasterHaltFromRobotDriverErrors(t *testing.T) {
 	g := initTestMaster1Robot()
-	e := errors.New("driver halt error 1")
+	var ec int
 	testDriverHalt = func() (err error) {
-		return e
+		ec++
+		return fmt.Errorf("driver halt error %d", ec)
+	}
+	defer func() { testDriverHalt = func() error { return nil } }()
+
+	var want error
+	for i := 1; i <= 3; i++ {
+		e := fmt.Errorf("driver halt error %d", i)
+		want = multierror.Append(want, e)
 	}
 
-	var expected error
-	expected = multierror.Append(expected, e)
-	expected = multierror.Append(expected, e)
-	expected = multierror.Append(expected, e)
-
-	gobottest.Assert(t, g.Start(), nil)
-	gobottest.Assert(t, g.Stop(), expected)
-
-	testDriverHalt = func() (err error) { return }
+	gobottest.Assert(t, g.Start(), want)
 }
 
 func TestMasterStartRobotAdaptorErrors(t *testing.T) {
 	g := initTestMaster1Robot()
-	e := errors.New("adaptor start error 1")
-
+	var ec int
 	testAdaptorConnect = func() (err error) {
-		return e
+		ec++
+		return fmt.Errorf("adaptor start error %d", ec)
+	}
+	defer func() { testAdaptorConnect = func() error { return nil } }()
+
+	var want error
+	for i := 1; i <= 3; i++ {
+		e := fmt.Errorf("adaptor start error %d", i)
+		want = multierror.Append(want, e)
 	}
 
-	var expected error
-	expected = multierror.Append(expected, e)
-	expected = multierror.Append(expected, e)
-	expected = multierror.Append(expected, e)
-
-	gobottest.Assert(t, g.Start(), expected)
+	gobottest.Assert(t, g.Start(), want)
 	gobottest.Assert(t, g.Stop(), nil)
 
 	testAdaptorConnect = func() (err error) { return }
@@ -142,21 +145,18 @@ func TestMasterStartRobotAdaptorErrors(t *testing.T) {
 
 func TestMasterFinalizeErrors(t *testing.T) {
 	g := initTestMaster1Robot()
-	e := errors.New("adaptor finalize error 2")
-
+	var ec int
 	testAdaptorFinalize = func() (err error) {
-		return e
+		ec++
+		return fmt.Errorf("adaptor finalize error %d", ec)
+	}
+	defer func() { testAdaptorFinalize = func() error { return nil } }()
+
+	var want error
+	for i := 1; i <= 3; i++ {
+		e := fmt.Errorf("adaptor finalize error %d", i)
+		want = multierror.Append(want, e)
 	}
 
-	var expected error
-	expected = multierror.Append(expected, e)
-	expected = multierror.Append(expected, e)
-	expected = multierror.Append(expected, e)
-
-	gobottest.Assert(t, g.Start(), nil)
-	gobottest.Assert(t, g.Stop(), expected)
-
-	testAdaptorFinalize = func() (err error) {
-		return nil
-	}
+	gobottest.Assert(t, g.Start(), want)
 }

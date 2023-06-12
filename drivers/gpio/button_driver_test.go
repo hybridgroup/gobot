@@ -39,7 +39,7 @@ func TestButtonDriverStart(t *testing.T) {
 	a := newGpioTestAdaptor()
 	d := NewButtonDriver(a, "1")
 
-	d.Once(ButtonPush, func(data interface{}) {
+	_ = d.Once(ButtonPush, func(data interface{}) {
 		gobottest.Assert(t, d.Active, true)
 		sem <- true
 	})
@@ -57,7 +57,7 @@ func TestButtonDriverStart(t *testing.T) {
 		t.Errorf("Button Event \"Push\" was not published")
 	}
 
-	d.Once(ButtonRelease, func(data interface{}) {
+	_ = d.Once(ButtonRelease, func(data interface{}) {
 		gobottest.Assert(t, d.Active, false)
 		sem <- true
 	})
@@ -73,7 +73,7 @@ func TestButtonDriverStart(t *testing.T) {
 		t.Errorf("Button Event \"Release\" was not published")
 	}
 
-	d.Once(Error, func(data interface{}) {
+	_ = d.Once(Error, func(data interface{}) {
 		sem <- true
 	})
 
@@ -88,7 +88,7 @@ func TestButtonDriverStart(t *testing.T) {
 		t.Errorf("Button Event \"Error\" was not published")
 	}
 
-	d.Once(ButtonPush, func(data interface{}) {
+	_ = d.Once(ButtonPush, func(data interface{}) {
 		sem <- true
 	})
 
@@ -112,7 +112,7 @@ func TestButtonDriverDefaultState(t *testing.T) {
 	d := NewButtonDriver(a, "1")
 	d.DefaultState = 1
 
-	d.Once(ButtonPush, func(data interface{}) {
+	_ = d.Once(ButtonPush, func(data interface{}) {
 		gobottest.Assert(t, d.Active, true)
 		sem <- true
 	})
@@ -130,7 +130,7 @@ func TestButtonDriverDefaultState(t *testing.T) {
 		t.Errorf("Button Event \"Push\" was not published")
 	}
 
-	d.Once(ButtonRelease, func(data interface{}) {
+	_ = d.Once(ButtonRelease, func(data interface{}) {
 		gobottest.Assert(t, d.Active, false)
 		sem <- true
 	})

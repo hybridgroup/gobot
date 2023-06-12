@@ -11,6 +11,7 @@ import (
 	"math"
 	"time"
 
+	"github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/spi"
 )
@@ -202,25 +203,23 @@ func (g *Driver) SetName(n string) { g.name = n }
 func (g *Driver) Connection() gobot.Connection { return g.connection.(gobot.Connection) }
 
 // Halt stops the driver.
-func (g *Driver) Halt() (err error) {
-	g.resetAll()
+func (g *Driver) Halt() error {
+	err := g.resetAll()
 	time.Sleep(10 * time.Millisecond)
-	return
+	return err
 }
 
 // Start initializes the GoPiGo3
-func (g *Driver) Start() (err error) {
+func (g *Driver) Start() error {
 	bus := g.GetBusNumberOrDefault(g.connector.SpiDefaultBusNumber())
 	chip := g.GetChipNumberOrDefault(g.connector.SpiDefaultChipNumber())
 	mode := g.GetModeOrDefault(g.connector.SpiDefaultMode())
 	bits := g.GetBitCountOrDefault(g.connector.SpiDefaultBitCount())
 	maxSpeed := g.GetSpeedOrDefault(g.connector.SpiDefaultMaxSpeed())
 
+	var err error
 	g.connection, err = g.connector.GetSpiConnection(bus, chip, mode, bits, maxSpeed)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // GetManufacturerName returns the manufacturer from the firmware.
@@ -486,7 +485,7 @@ func (g *Driver) SetGroveMode(port Grove, mode GroveMode) error {
 }
 
 // SetPWMDuty sets the pwm duty cycle for the given pin/port.
-func (g *Driver) SetPWMDuty(port Grove, duty uint16) (err error) {
+func (g *Driver) SetPWMDuty(port Grove, duty uint16) error {
 	if duty > 100 {
 		duty = 100
 	}
@@ -518,26 +517,23 @@ func (g *Driver) SetPWMFreq(port Grove, freq uint16) error {
 }
 
 // PwmWrite implents the pwm interface for the gopigo3.
-func (g *Driver) PwmWrite(pin string, val byte) (err error) {
+func (g *Driver) PwmWrite(pin string, val byte) error {
 	var (
 		grovePin, grovePort Grove
+		err                 error
 	)
-	grovePin, grovePort, _, _, err = getGroveAddresses(pin)
-	if err != nil {
+	if grovePin, grovePort, _, _, err = getGroveAddresses(pin); err != nil {
 		return err
 	}
-	err = g.SetGroveType(grovePort, CUSTOM)
-	if err != nil {
-		return err
-	}
-	time.Sleep(10 * time.Millisecond)
-	err = g.SetGroveMode(grovePin, GROVE_OUTPUT_PWM)
-	if err != nil {
+	if err := g.SetGroveType(grovePort, CUSTOM); err != nil {
 		return err
 	}
 	time.Sleep(10 * time.Millisecond)
-	err = g.SetPWMFreq(grovePin, 24000)
-	if err != nil {
+	if err = g.SetGroveMode(grovePin, GROVE_OUTPUT_PWM); err != nil {
+		return err
+	}
+	time.Sleep(10 * time.Millisecond)
+	if err = g.SetPWMFreq(grovePin, 24000); err != nil {
 		return err
 	}
 	val64 := math.Float64frombits(uint64(val))
@@ -555,13 +551,11 @@ func (g *Driver) AnalogRead(pin string) (value int, err error) {
 	if err != nil {
 		return value, err
 	}
-	err = g.SetGroveType(grovePort, CUSTOM)
-	if err != nil {
+	if err := g.SetGroveType(grovePort, CUSTOM); err != nil {
 		return value, err
 	}
 	time.Sleep(10 * time.Millisecond)
-	err = g.SetGroveMode(grovePin, GROVE_INPUT_ANALOG)
-	if err != nil {
+	if err := g.SetGroveMode(grovePin, GROVE_INPUT_ANALOG); err != nil {
 		return value, err
 	}
 	time.Sleep(10 * time.Millisecond)
@@ -581,31 +575,29 @@ func (g *Driver) AnalogRead(pin string) (value int, err error) {
 }
 
 // DigitalWrite writes a 0/1 value to the given pin.
-func (g *Driver) DigitalWrite(pin string, val byte) (err error) {
+func (g *Driver) DigitalWrite(pin string, val byte) error {
 	var (
 		grovePin, grovePort Grove
+		err                 error
 	)
 	grovePin, grovePort, _, _, err = getGroveAddresses(pin)
 	if err != nil {
 		return err
 	}
-	err = g.SetGroveType(grovePort, CUSTOM)
-	if err != nil {
+	if err := g.SetGroveType(grovePort, CUSTOM); err != nil {
 		return err
 	}
 	time.Sleep(10 * time.Millisecond)
-	err = g.SetGroveMode(grovePin, GROVE_OUTPUT_DIGITAL)
-	if err != nil {
+	if err := g.SetGroveMode(grovePin, GROVE_OUTPUT_DIGITAL); err != nil {
 		return err
 	}
 	time.Sleep(10 * time.Millisecond)
-	err = g.writeBytes([]byte{
+	return g.writeBytes([]byte{
 		goPiGo3Address,
 		SET_GROVE_STATE,
 		byte(grovePin),
 		byte(val),
 	})
-	return err
 }
 
 // DigitalRead reads the 0/1 value from the given pin.
@@ -717,17 +709,29 @@ func (g *Driver) readUint32(address, msg byte) (val uint32, err error) {
 	return uint32(r[4])<<24 | uint32(r[5])<<16 | uint32(r[6])<<8 | uint32(r[7]), nil
 }
 
-func (g *Driver) writeBytes(w []byte) (err error) {
+func (g *Driver) writeBytes(w []byte) error {
 	return g.connection.WriteBytes(w)
 }
 
-func (g *Driver) resetAll() {
-	g.SetGroveType(AD_1_G+AD_2_G, CUSTOM)
+func (g *Driver) resetAll() error {
+	err := g.SetGroveType(AD_1_G+AD_2_G, CUSTOM)
 	time.Sleep(10 * time.Millisecond)
-	g.SetGroveMode(AD_1_G+AD_2_G, GROVE_INPUT_DIGITAL)
+	if e := g.SetGroveMode(AD_1_G+AD_2_G, GROVE_INPUT_DIGITAL); e != nil {
+		err = multierror.Append(err, e)
+	}
 	time.Sleep(10 * time.Millisecond)
-	g.SetMotorPower(MOTOR_LEFT+MOTOR_RIGHT, 0.0)
-	g.SetMotorLimits(MOTOR_LEFT+MOTOR_RIGHT, 0, 0)
-	g.SetServo(SERVO_1+SERVO_2, 0)
-	g.SetLED(LED_EYE_LEFT+LED_EYE_RIGHT+LED_BLINKER_LEFT+LED_BLINKER_RIGHT, 0, 0, 0)
+	if e := g.SetMotorPower(MOTOR_LEFT+MOTOR_RIGHT, 0.0); e != nil {
+		err = multierror.Append(err, e)
+	}
+	if e := g.SetMotorLimits(MOTOR_LEFT+MOTOR_RIGHT, 0, 0); e != nil {
+		err = multierror.Append(err, e)
+	}
+	if e := g.SetServo(SERVO_1+SERVO_2, 0); e != nil {
+		err = multierror.Append(err, e)
+	}
+	if e := g.SetLED(LED_EYE_LEFT+LED_EYE_RIGHT+LED_BLINKER_LEFT+LED_BLINKER_RIGHT, 0, 0, 0); e != nil {
+		err = multierror.Append(err, e)
+	}
+
+	return err
 }

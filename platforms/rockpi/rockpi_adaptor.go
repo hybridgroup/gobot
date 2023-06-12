@@ -32,7 +32,6 @@ type Adaptor struct {
 	*adaptors.DigitalPinsAdaptor
 	*adaptors.I2cBusAdaptor
 	*adaptors.SpiBusAdaptor
-	spiDefaultMaxSpeed int64
 }
 
 // NewAdaptor creates a RockPi Adaptor

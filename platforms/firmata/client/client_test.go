@@ -95,7 +95,7 @@ func initTestFirmataWithReadWriteCloser(name string, data ...[]byte) (*Client, r
 
 	for _, d := range data {
 		rwc.addTestReadData(d)
-		b.process()
+		_ = b.process()
 	}
 
 	b.setConnected(true)
@@ -128,12 +128,12 @@ func TestProcessProtocolVersion(t *testing.T) {
 	b, rwc := initTestFirmataWithReadWriteCloser(t.Name())
 	rwc.addTestReadData(testDataProtocolResponse)
 
-	b.Once(b.Event("ProtocolVersion"), func(data interface{}) {
+	_ = b.Once(b.Event("ProtocolVersion"), func(data interface{}) {
 		gobottest.Assert(t, data, "2.3")
 		sem <- true
 	})
 
-	b.process()
+	_ = b.process()
 
 	select {
 	case <-sem:
@@ -147,12 +147,12 @@ func TestProcessAnalogRead0(t *testing.T) {
 	b, rwc := initTestFirmataWithReadWriteCloser(t.Name(), testDataCapabilitiesResponse, testDataAnalogMappingResponse)
 	rwc.addTestReadData([]byte{0xE0, 0x23, 0x05})
 
-	b.Once(b.Event("AnalogRead0"), func(data interface{}) {
+	_ = b.Once(b.Event("AnalogRead0"), func(data interface{}) {
 		gobottest.Assert(t, data, 675)
 		sem <- true
 	})
 
-	b.process()
+	_ = b.process()
 
 	select {
 	case <-sem:
@@ -166,12 +166,12 @@ func TestProcessAnalogRead1(t *testing.T) {
 	b, rwc := initTestFirmataWithReadWriteCloser(t.Name(), testDataCapabilitiesResponse, testDataAnalogMappingResponse)
 	rwc.addTestReadData([]byte{0xE1, 0x23, 0x06})
 
-	b.Once(b.Event("AnalogRead1"), func(data interface{}) {
+	_ = b.Once(b.Event("AnalogRead1"), func(data interface{}) {
 		gobottest.Assert(t, data, 803)
 		sem <- true
 	})
 
-	b.process()
+	_ = b.process()
 
 	select {
 	case <-sem:
@@ -186,12 +186,12 @@ func TestProcessDigitalRead2(t *testing.T) {
 	b.pins[2].Mode = Input
 	rwc.addTestReadData([]byte{0x90, 0x04, 0x00})
 
-	b.Once(b.Event("DigitalRead2"), func(data interface{}) {
+	_ = b.Once(b.Event("DigitalRead2"), func(data interface{}) {
 		gobottest.Assert(t, data, 1)
 		sem <- true
 	})
 
-	b.process()
+	_ = b.process()
 
 	select {
 	case <-sem:
@@ -206,12 +206,12 @@ func TestProcessDigitalRead4(t *testing.T) {
 	b.pins[4].Mode = Input
 	rwc.addTestReadData([]byte{0x90, 0x16, 0x00})
 
-	b.Once(b.Event("DigitalRead4"), func(data interface{}) {
+	_ = b.Once(b.Event("DigitalRead4"), func(data interface{}) {
 		gobottest.Assert(t, data, 1)
 		sem <- true
 	})
 
-	b.process()
+	_ = b.process()
 
 	select {
 	case <-sem:
@@ -246,12 +246,12 @@ func TestProcessPinState13(t *testing.T) {
 	b, rwc := initTestFirmataWithReadWriteCloser(t.Name(), testDataCapabilitiesResponse, testDataAnalogMappingResponse)
 	rwc.addTestReadData([]byte{240, 110, 13, 1, 1, 247})
 
-	b.Once(b.Event("PinState13"), func(data interface{}) {
+	_ = b.Once(b.Event("PinState13"), func(data interface{}) {
 		gobottest.Assert(t, data, Pin{[]int{0, 1, 4}, 1, 0, 1, 127})
 		sem <- true
 	})
 
-	b.process()
+	_ = b.process()
 
 	select {
 	case <-sem:
@@ -285,7 +285,7 @@ func TestProcessI2cReply(t *testing.T) {
 	b, rwc := initTestFirmataWithReadWriteCloser(t.Name())
 	rwc.addTestReadData([]byte{240, 119, 9, 0, 0, 0, 24, 1, 1, 0, 26, 1, 247})
 
-	b.Once(b.Event("I2cReply"), func(data interface{}) {
+	_ = b.Once(b.Event("I2cReply"), func(data interface{}) {
 		gobottest.Assert(t, data, I2cReply{
 			Address:  9,
 			Register: 0,
@@ -294,7 +294,7 @@ func TestProcessI2cReply(t *testing.T) {
 		sem <- true
 	})
 
-	b.process()
+	_ = b.process()
 
 	select {
 	case <-sem:
@@ -308,12 +308,12 @@ func TestProcessFirmwareQuery(t *testing.T) {
 	b, rwc := initTestFirmataWithReadWriteCloser(t.Name())
 	rwc.addTestReadData(testDataFirmwareResponse)
 
-	b.Once(b.Event("FirmwareQuery"), func(data interface{}) {
+	_ = b.Once(b.Event("FirmwareQuery"), func(data interface{}) {
 		gobottest.Assert(t, data, "StandardFirmata.ino")
 		sem <- true
 	})
 
-	b.process()
+	_ = b.process()
 
 	select {
 	case <-sem:
@@ -327,12 +327,12 @@ func TestProcessStringData(t *testing.T) {
 	b, rwc := initTestFirmataWithReadWriteCloser(t.Name())
 	rwc.addTestReadData(append([]byte{240, 0x71}, append([]byte("Hello Firmata!"), 247)...))
 
-	b.Once(b.Event("StringData"), func(data interface{}) {
+	_ = b.Once(b.Event("StringData"), func(data interface{}) {
 		gobottest.Assert(t, data, "Hello Firmata!")
 		sem <- true
 	})
 
-	b.process()
+	_ = b.process()
 
 	select {
 	case <-sem:
@@ -347,19 +347,19 @@ func TestConnect(t *testing.T) {
 
 	rwc.addTestReadData(testDataProtocolResponse)
 
-	b.Once(b.Event("ProtocolVersion"), func(data interface{}) {
+	_ = b.Once(b.Event("ProtocolVersion"), func(data interface{}) {
 		rwc.addTestReadData(testDataFirmwareResponse)
 	})
 
-	b.Once(b.Event("FirmwareQuery"), func(data interface{}) {
+	_ = b.Once(b.Event("FirmwareQuery"), func(data interface{}) {
 		rwc.addTestReadData(testDataCapabilitiesResponse)
 	})
 
-	b.Once(b.Event("CapabilityQuery"), func(data interface{}) {
+	_ = b.Once(b.Event("CapabilityQuery"), func(data interface{}) {
 		rwc.addTestReadData(testDataAnalogMappingResponse)
 	})
 
-	b.Once(b.Event("AnalogMappingQuery"), func(data interface{}) {
+	_ = b.Once(b.Event("AnalogMappingQuery"), func(data interface{}) {
 		rwc.addTestReadData(testDataProtocolResponse)
 	})
 
@@ -412,12 +412,12 @@ func TestProcessSysexData(t *testing.T) {
 	b, rwc := initTestFirmataWithReadWriteCloser(t.Name())
 	rwc.addTestReadData([]byte{240, 17, 1, 2, 3, 247})
 
-	b.Once("SysexResponse", func(data interface{}) {
+	_ = b.Once("SysexResponse", func(data interface{}) {
 		gobottest.Assert(t, data, []byte{240, 17, 1, 2, 3, 247})
 		sem <- true
 	})
 
-	b.process()
+	_ = b.process()
 
 	select {
 	case <-sem:

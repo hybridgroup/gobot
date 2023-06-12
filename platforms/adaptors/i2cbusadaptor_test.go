@@ -80,7 +80,7 @@ func TestI2cFinalize(t *testing.T) {
 	gobottest.Assert(t, a.Finalize(), nil)
 	// arrange
 	gobottest.Assert(t, a.Connect(), nil)
-	a.GetI2cConnection(0xaf, 1)
+	_, _ = a.GetI2cConnection(0xaf, 1)
 	gobottest.Assert(t, len(a.buses), 1)
 	// assert that Finalize after GetI2cConnection is working and clean up
 	gobottest.Assert(t, a.Finalize(), nil)
@@ -91,7 +91,7 @@ func TestI2cFinalize(t *testing.T) {
 	gobottest.Assert(t, a.Connect(), nil)
 	con, _ := a.GetI2cConnection(0xbf, 1)
 	gobottest.Assert(t, len(a.buses), 1)
-	con.Write([]byte{0xbf})
+	_, _ = con.Write([]byte{0xbf})
 	fs.WithCloseError = true
 	err := a.Finalize()
 	gobottest.Assert(t, strings.Contains(err.Error(), "close error"), true)

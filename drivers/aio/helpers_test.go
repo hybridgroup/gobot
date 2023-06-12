@@ -2,13 +2,6 @@ package aio
 
 import "sync"
 
-type aioTestBareAdaptor struct{}
-
-func (t *aioTestBareAdaptor) Connect() (err error)  { return }
-func (t *aioTestBareAdaptor) Finalize() (err error) { return }
-func (t *aioTestBareAdaptor) Name() string          { return "" }
-func (t *aioTestBareAdaptor) SetName(n string)      {}
-
 type aioTestAdaptor struct {
 	name                   string
 	port                   string

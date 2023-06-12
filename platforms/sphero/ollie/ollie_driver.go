@@ -29,8 +29,8 @@ type Driver struct {
 
 const (
 	// bluetooth service IDs
-	spheroBLEService    = "22bb746f2bb075542d6f726568705327"
-	robotControlService = "22bb746f2ba075542d6f726568705327"
+	//spheroBLEService    = "22bb746f2bb075542d6f726568705327"
+	//robotControlService = "22bb746f2ba075542d6f726568705327"
 
 	// BLE characteristic IDs
 	wakeCharacteristic     = "22bb746f2bbf75542d6f726568705327"
@@ -121,8 +121,10 @@ func (b *Driver) adaptor() ble.BLEConnector {
 }
 
 // Start tells driver to get ready to do work
-func (b *Driver) Start() (err error) {
-	b.Init()
+func (b *Driver) Start() error {
+	if err := b.Init(); err != nil {
+		return err
+	}
 
 	// send commands
 	go func() {
@@ -137,74 +139,77 @@ func (b *Driver) Start() (err error) {
 
 	go func() {
 		for {
-			b.adaptor().ReadCharacteristic(responseCharacteristic)
+			if _, err := b.adaptor().ReadCharacteristic(responseCharacteristic); err != nil {
+				panic(err)
+			}
 			time.Sleep(100 * time.Millisecond)
 		}
 	}()
 
 	b.ConfigureCollisionDetection(DefaultCollisionConfig())
 
-	return
+	return nil
 }
 
 // Halt stops Ollie driver (void)
-func (b *Driver) Halt() (err error) {
+func (b *Driver) Halt() error {
 	b.Sleep()
 	time.Sleep(750 * time.Microsecond)
-	return
+	return nil
 }
 
 // Init is used to initialize the Ollie
-func (b *Driver) Init() (err error) {
-	b.AntiDOSOff()
-	b.SetTXPower(7)
-	b.Wake()
+func (b *Driver) Init() error {
+	if err := b.AntiDOSOff(); err != nil {
+		return err
+	}
+	if err := b.SetTXPower(7); err != nil {
+		return err
+	}
+	if err := b.Wake(); err != nil {
+		return err
+	}
 
 	// subscribe to Sphero response notifications
-	b.adaptor().Subscribe(responseCharacteristic, b.HandleResponses)
-
-	return
+	return b.adaptor().Subscribe(responseCharacteristic, b.HandleResponses)
 }
 
 // AntiDOSOff turns off Anti-DOS code so we can control Ollie
-func (b *Driver) AntiDOSOff() (err error) {
+func (b *Driver) AntiDOSOff() error {
 	str := "011i3"
 	buf := &bytes.Buffer{}
 	buf.WriteString(str)
 
-	err = b.adaptor().WriteCharacteristic(antiDosCharacteristic, buf.Bytes())
-	if err != nil {
+	if err := b.adaptor().WriteCharacteristic(antiDosCharacteristic, buf.Bytes()); err != nil {
 		fmt.Println("AntiDOSOff error:", err)
 		return err
 	}
 
-	return
+	return nil
 }
 
 // Wake wakes Ollie up so we can play
-func (b *Driver) Wake() (err error) {
+func (b *Driver) Wake() error {
 	buf := []byte{0x01}
 
-	err = b.adaptor().WriteCharacteristic(wakeCharacteristic, buf)
-	if err != nil {
+	if err := b.adaptor().WriteCharacteristic(wakeCharacteristic, buf); err != nil {
 		fmt.Println("Wake error:", err)
 		return err
 	}
 
-	return
+	return nil
 }
 
 // SetTXPower sets transmit level
-func (b *Driver) SetTXPower(level int) (err error) {
+func (b *Driver) SetTXPower(level int) error {
 	buf := []byte{byte(level)}
 
-	err = b.adaptor().WriteCharacteristic(txPowerCharacteristic, buf)
-	if err != nil {
+	if err := b.adaptor().WriteCharacteristic(txPowerCharacteristic, buf); err != nil {
 		fmt.Println("SetTXLevel error:", err)
 		return err
 	}
 
-	return
+	return nil
 }
 
 // HandleResponses handles responses returned from Ollie
@@ -270,7 +275,9 @@ func (b *Driver) handleDataStreaming(data []byte) {
 	//only difference in communication is that the "newer" spheros use BLE for communinations
 	var dataPacket DataStreamingPacket
 	buffer := bytes.NewBuffer(data[5:]) // skip header
-	binary.Read(buffer, binary.BigEndian, &dataPacket)
+	if err := binary.Read(buffer, binary.BigEndian, &dataPacket); err != nil {
+		panic(err)
+	}
 
 	b.Publish(SensorData, dataPacket)
 }
@@ -344,17 +351,19 @@ func (b *Driver) ConfigureCollisionDetection(cc sphero.CollisionConfig) {
 }
 
 // SetDataStreamingConfig passes the config to the sphero to stream sensor data
-func (b *Driver) SetDataStreamingConfig(d sphero.DataStreamingConfig) {
+func (b *Driver) SetDataStreamingConfig(d sphero.DataStreamingConfig) error {
 	buf := new(bytes.Buffer)
-	binary.Write(buf, binary.BigEndian, d)
+	if err := binary.Write(buf, binary.BigEndian, d); err != nil {
+		return err
+	}
 	b.PacketChannel() <- b.craftPacket(buf.Bytes(), 0x02, 0x11)
+	return nil
 }
 
-func (b *Driver) write(packet *Packet) (err error) {
+func (b *Driver) write(packet *Packet) error {
 	buf := append(packet.Header, packet.Body...)
 	buf = append(buf, packet.Checksum)
-	err = b.adaptor().WriteCharacteristic(commandsCharacteristic, buf)
-	if err != nil {
+	if err := b.adaptor().WriteCharacteristic(commandsCharacteristic, buf); err != nil {
 		fmt.Println("send command error:", err)
 		return err
 	}
@@ -362,7 +371,7 @@ func (b *Driver) write(packet *Packet) (err error) {
 	b.mtx.Lock()
 	defer b.mtx.Unlock()
 	b.seq++
-	return
+	return nil
 }
 
 func (b *Driver) craftPacket(body []uint8, did byte, cid byte) *Packet {
@@ -381,7 +390,9 @@ func (b *Driver) handlePowerStateDetected(data []uint8) {
 
 	var dataPacket PowerStatePacket
 	buffer := bytes.NewBuffer(data[5:]) // skip header
-	binary.Read(buffer, binary.BigEndian, &dataPacket)
+	if err := binary.Read(buffer, binary.BigEndian, &dataPacket); err != nil {
+		panic(err)
+	}
 
 	b.powerstateCallback(dataPacket)
 }
@@ -454,7 +465,9 @@ func (b *Driver) handleCollisionDetected(data []uint8) {
 
 	var collision sphero.CollisionPacket
 	buffer := bytes.NewBuffer(b.collisionResponse[5:]) // skip header
-	binary.Read(buffer, binary.BigEndian, &collision)
+	if err := binary.Read(buffer, binary.BigEndian, &collision); err != nil {
+		panic(err)
+	}
 	b.collisionResponse = nil // clear the current response
 
 	b.Publish(Collision, collision)

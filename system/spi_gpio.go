@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/hashicorp/go-multierror"
 	"gobot.io/x/gobot/v2"
 )
 
@@ -77,19 +78,28 @@ func (s *spiGpio) TxRx(tx []byte, rx []byte) error {
 
 // Close the SPI connection. Implements gobot.SpiSystemDevicer.
 func (s *spiGpio) Close() error {
+	var err error
 	if s.sclkPin != nil {
-		s.sclkPin.Unexport()
+		if e := s.sclkPin.Unexport(); e != nil {
+			err = multierror.Append(err, e)
+		}
 	}
 	if s.mosiPin != nil {
-		s.mosiPin.Unexport()
+		if e := s.mosiPin.Unexport(); e != nil {
+			err = multierror.Append(err, e)
+		}
 	}
 	if s.misoPin != nil {
-		s.misoPin.Unexport()
+		if e := s.misoPin.Unexport(); e != nil {
+			err = multierror.Append(err, e)
+		}
 	}
 	if s.nssPin != nil {
-		s.nssPin.Unexport()
+		if e := s.nssPin.Unexport(); e != nil {
+			err = multierror.Append(err, e)
+		}
 	}
-	return nil
+	return err
 }
 
 func (cfg *spiGpioConfig) String() string {

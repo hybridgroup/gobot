@@ -20,7 +20,6 @@ type i2cMockFirmataBoard struct {
 	i2cDataForRead []byte
 	numBytesToRead int
 	i2cWritten     []byte
-	i2cWriteImpl   func([]byte) (int, error)
 }
 
 // setup mock for i2c tests

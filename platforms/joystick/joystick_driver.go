@@ -256,7 +256,10 @@ func (j *Driver) loadFile() error {
 	}
 
 	var jsontype joystickConfig
-	json.Unmarshal(file, &jsontype)
+	if err := json.Unmarshal(file, &jsontype); err != nil {
+		return err
+	}
+
 	j.config = jsontype
 	return nil
 }

@@ -41,7 +41,8 @@ type MFRC522Common struct {
 // The device supports SPI, I2C and UART (not implemented yet at gobot system level).
 //
 // Params:
-//      c BusConnection - the bus connection to use with this driver
+//
+//	c BusConnection - the bus connection to use with this driver
 func NewMFRC522Common() *MFRC522Common {
 	d := &MFRC522Common{}
 	return d
@@ -67,7 +68,9 @@ func (d *MFRC522Common) Initialize(c busConnection) error {
 		{regMode, modeRegTxWaitRFBit | modeRegPolMFinBit | modeRegCRCPreset6363},
 	}
 	for _, init := range initSequence {
-		d.writeByteData(init[0], init[1])
+		if err := d.writeByteData(init[0], init[1]); err != nil {
+			return err
+		}
 	}
 
 	if err := d.switchAntenna(true); err != nil {

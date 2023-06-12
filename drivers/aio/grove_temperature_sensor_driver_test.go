@@ -62,7 +62,7 @@ func TestGroveTempSensorPublishesTemperatureInCelsius(t *testing.T) {
 		val = 585
 		return
 	})
-	d.Once(d.Event(Value), func(data interface{}) {
+	_ = d.Once(d.Event(Value), func(data interface{}) {
 		gobottest.Assert(t, fmt.Sprintf("%.2f", data.(float64)), "31.62")
 		sem <- true
 	})

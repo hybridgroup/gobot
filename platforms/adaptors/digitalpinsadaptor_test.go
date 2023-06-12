@@ -268,7 +268,7 @@ func TestDigitalPinConcurrency(t *testing.T) {
 	for retry := 0; retry < 20; retry++ {
 
 		a := NewDigitalPinsAdaptor(sys, translate)
-		a.Connect()
+		_ = a.Connect()
 		var wg sync.WaitGroup
 
 		for i := 0; i < 20; i++ {
@@ -276,7 +276,7 @@ func TestDigitalPinConcurrency(t *testing.T) {
 			pinAsString := strconv.Itoa(i)
 			go func(pin string) {
 				defer wg.Done()
-				a.DigitalPin(pin)
+				_, _ = a.DigitalPin(pin)
 			}(pinAsString)
 		}
 

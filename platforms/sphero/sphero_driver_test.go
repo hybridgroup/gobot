@@ -14,7 +14,7 @@ var _ gobot.Driver = (*SpheroDriver)(nil)
 
 func initTestSpheroDriver() *SpheroDriver {
 	a, _ := initTestSpheroAdaptor()
-	a.Connect()
+	_ = a.Connect()
 	return NewSpheroDriver(a)
 }
 
@@ -100,7 +100,7 @@ func TestSpheroDriverSetDataStreaming(t *testing.T) {
 	data := <-d.packetChannel
 
 	buf := new(bytes.Buffer)
-	binary.Write(buf, binary.BigEndian, DefaultDataStreamingConfig())
+	_ = binary.Write(buf, binary.BigEndian, DefaultDataStreamingConfig())
 
 	gobottest.Assert(t, data.body, buf.Bytes())
 
@@ -118,7 +118,7 @@ func TestSpheroDriverSetDataStreaming(t *testing.T) {
 
 	dconfig := DataStreamingConfig{N: 100, M: 200, Mask: 300, Pcnt: 255, Mask2: 400}
 	buf = new(bytes.Buffer)
-	binary.Write(buf, binary.BigEndian, dconfig)
+	_ = binary.Write(buf, binary.BigEndian, dconfig)
 
 	gobottest.Assert(t, data.body, buf.Bytes())
 }
@@ -129,7 +129,7 @@ func TestConfigureLocator(t *testing.T) {
 	data := <-d.packetChannel
 
 	buf := new(bytes.Buffer)
-	binary.Write(buf, binary.BigEndian, DefaultLocatorConfig())
+	_ = binary.Write(buf, binary.BigEndian, DefaultLocatorConfig())
 
 	gobottest.Assert(t, data.body, buf.Bytes())
 
@@ -146,7 +146,7 @@ func TestConfigureLocator(t *testing.T) {
 
 	lconfig := LocatorConfig{Flags: 1, X: 100, Y: 100, YawTare: 0}
 	buf = new(bytes.Buffer)
-	binary.Write(buf, binary.BigEndian, lconfig)
+	_ = binary.Write(buf, binary.BigEndian, lconfig)
 
 	gobottest.Assert(t, data.body, buf.Bytes())
 }

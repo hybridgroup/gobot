@@ -97,12 +97,12 @@ func TestAnalogSensorDriverStart(t *testing.T) {
 	d.SetScaler(func(input int) float64 { return float64(input * input) })
 
 	// expect data to be received
-	d.Once(d.Event(Data), func(data interface{}) {
+	_ = d.Once(d.Event(Data), func(data interface{}) {
 		gobottest.Assert(t, data.(int), 100)
 		sem <- true
 	})
 
-	d.Once(d.Event(Value), func(data interface{}) {
+	_ = d.Once(d.Event(Value), func(data interface{}) {
 		gobottest.Assert(t, data.(float64), 10000.0)
 		sem <- true
 	})
@@ -122,7 +122,7 @@ func TestAnalogSensorDriverStart(t *testing.T) {
 	}
 
 	// expect error to be received
-	d.Once(d.Event(Error), func(data interface{}) {
+	_ = d.Once(d.Event(Error), func(data interface{}) {
 		gobottest.Assert(t, data.(error).Error(), "read error")
 		sem <- true
 	})
@@ -140,11 +140,11 @@ func TestAnalogSensorDriverStart(t *testing.T) {
 	}
 
 	// send a halt message
-	d.Once(d.Event(Data), func(data interface{}) {
+	_ = d.Once(d.Event(Data), func(data interface{}) {
 		sem <- true
 	})
 
-	d.Once(d.Event(Value), func(data interface{}) {
+	_ = d.Once(d.Event(Value), func(data interface{}) {
 		sem <- true
 	})
 

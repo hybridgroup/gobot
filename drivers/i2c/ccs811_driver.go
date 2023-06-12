@@ -31,9 +31,9 @@ const (
 	//This multi-byte read only register contains the calculated eCO2 (ppm) and eTVOC (ppb) values followed by the STATUS register, ERROR_ID register and the RAW_DATA register.
 	ccs811RegAlgResultData = 0x02
 	//Two byte read only register which contains the latest readings from the sensor.
-	ccs811RegRawData = 0x03
+	//ccs811RegRawData = 0x03
 	//A multi-byte register that can be written with the current Humidity and Temperature values if known.
-	ccs811RegEnvData = 0x05
+	//ccs811RegEnvData = 0x05
 	//Register that holds the NTC value used for temperature calcualtions
 	ccs811RegNtc = 0x06
 	//Asserting the SW_RESET will restart the CCS811 in Boot mode to enable new application firmware to be downloaded.
@@ -72,7 +72,7 @@ type CCS811Status struct {
 	FwMode byte
 }
 
-//NewCCS811Status returns a new instance of the package ccs811 status definition
+// NewCCS811Status returns a new instance of the package ccs811 status definition
 func NewCCS811Status(data uint8) *CCS811Status {
 	return &CCS811Status{
 		HasError:  data & 0x01,
@@ -82,9 +82,9 @@ func NewCCS811Status(data uint8) *CCS811Status {
 	}
 }
 
-//CCS811MeasMode represents the current measurement configuration.
-//The following definitions were taken from the bit fields of the ccs811RegMeasMode defined in
-//https://ams.com/documents/20143/36005/CCS811_DS000459_6-00.pdf/c7091525-c7e5-37ac-eedb-b6c6828b0dcf#page=16
+// CCS811MeasMode represents the current measurement configuration.
+// The following definitions were taken from the bit fields of the ccs811RegMeasMode defined in
+// https://ams.com/documents/20143/36005/CCS811_DS000459_6-00.pdf/c7091525-c7e5-37ac-eedb-b6c6828b0dcf#page=16
 type CCS811MeasMode struct {
 	//If intThresh is 1 a data measurement will only be taken when the sensor value meets the threshold constraint.
 	//The threshold value is set in the threshold register (0x10)
@@ -95,8 +95,8 @@ type CCS811MeasMode struct {
 	driveMode CCS811DriveMode
 }
 
-//NewCCS811MeasMode returns a new instance of the package ccs811 measurement mode configuration. This represents the desired initial
-//state of the measurement mode register.
+// NewCCS811MeasMode returns a new instance of the package ccs811 measurement mode configuration. This represents the desired initial
+// state of the measurement mode register.
 func NewCCS811MeasMode() *CCS811MeasMode {
 	return &CCS811MeasMode{
 		// Disable this by default as this library does not contain the functionality to use the internal interrupt feature.
@@ -111,14 +111,14 @@ func (mm *CCS811MeasMode) GetMeasMode() byte {
 	return (mm.intThresh << 2) | (mm.intDataRdy << 3) | uint8((mm.driveMode << 4))
 }
 
-//CCS811Driver is the Gobot driver for the CCS811 (air quality sensor) Adafruit breakout board
+// CCS811Driver is the Gobot driver for the CCS811 (air quality sensor) Adafruit breakout board
 type CCS811Driver struct {
 	*Driver
 	measMode           *CCS811MeasMode
 	ntcResistanceValue uint32
 }
 
-//NewCCS811Driver creates a new driver for the CCS811 (air quality sensor)
+// NewCCS811Driver creates a new driver for the CCS811 (air quality sensor)
 func NewCCS811Driver(c Connector, options ...func(Config)) *CCS811Driver {
 	d := &CCS811Driver{
 		Driver:   NewDriver(c, "CCS811", ccs811DefaultAddress),
@@ -135,7 +135,7 @@ func NewCCS811Driver(c Connector, options ...func(Config)) *CCS811Driver {
 	return d
 }
 
-//WithCCS811MeasMode sets the sampling rate of the device
+// WithCCS811MeasMode sets the sampling rate of the device
 func WithCCS811MeasMode(mode CCS811DriveMode) func(Config) {
 	return func(c Config) {
 		d, _ := c.(*CCS811Driver)
@@ -143,8 +143,8 @@ func WithCCS811MeasMode(mode CCS811DriveMode) func(Config) {
 	}
 }
 
-//WithCCS811NTCResistance sets reistor value used in the temperature calculations.
-//This resistor must be placed between pin 4 and pin 8 of the chip
+// WithCCS811NTCResistance sets reistor value used in the temperature calculations.
+// This resistor must be placed between pin 4 and pin 8 of the chip
 func WithCCS811NTCResistance(val uint32) func(Config) {
 	return func(c Config) {
 		d, _ := c.(*CCS811Driver)
@@ -152,7 +152,7 @@ func WithCCS811NTCResistance(val uint32) func(Config) {
 	}
 }
 
-//GetHardwareVersion returns the hardware version of the device in the form of 0x1X
+// GetHardwareVersion returns the hardware version of the device in the form of 0x1X
 func (d *CCS811Driver) GetHardwareVersion() (uint8, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
@@ -165,7 +165,7 @@ func (d *CCS811Driver) GetHardwareVersion() (uint8, error) {
 	return v, nil
 }
 
-//GetFirmwareBootVersion returns the bootloader version
+// GetFirmwareBootVersion returns the bootloader version
 func (d *CCS811Driver) GetFirmwareBootVersion() (uint16, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
@@ -178,7 +178,7 @@ func (d *CCS811Driver) GetFirmwareBootVersion() (uint16, error) {
 	return v, nil
 }
 
-//GetFirmwareAppVersion returns the app code version
+// GetFirmwareAppVersion returns the app code version
 func (d *CCS811Driver) GetFirmwareAppVersion() (uint16, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
@@ -191,7 +191,7 @@ func (d *CCS811Driver) GetFirmwareAppVersion() (uint16, error) {
 	return v, nil
 }
 
-//GetStatus returns the current status of the device
+// GetStatus returns the current status of the device
 func (d *CCS811Driver) GetStatus() (*CCS811Status, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
@@ -205,8 +205,8 @@ func (d *CCS811Driver) GetStatus() (*CCS811Status, error) {
 	return cs, nil
 }
 
-//GetTemperature returns the device temperature in celcius.
-//If you do not have an NTC resistor installed, this function should not be called
+// GetTemperature returns the device temperature in celcius.
+// If you do not have an NTC resistor installed, this function should not be called
 func (d *CCS811Driver) GetTemperature() (float32, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
@@ -230,8 +230,8 @@ func (d *CCS811Driver) GetTemperature() (float32, error) {
 	return ntcTemp, nil
 }
 
-//GetGasData returns the data for the gas sensor.
-//eco2 is returned in ppm and tvoc is returned in ppb
+// GetGasData returns the data for the gas sensor.
+// eco2 is returned in ppm and tvoc is returned in ppb
 func (d *CCS811Driver) GetGasData() (uint16, uint16, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
@@ -249,7 +249,7 @@ func (d *CCS811Driver) GetGasData() (uint16, uint16, error) {
 	return eco2, tvoC, nil
 }
 
-//HasData returns true if the device has not errored and temperature/gas data is available
+// HasData returns true if the device has not errored and temperature/gas data is available
 func (d *CCS811Driver) HasData() (bool, error) {
 	s, err := d.GetStatus()
 	if err != nil {
@@ -263,7 +263,7 @@ func (d *CCS811Driver) HasData() (bool, error) {
 	return true, nil
 }
 
-//EnableExternalInterrupt enables the external output hardware interrupt pin 3.
+// EnableExternalInterrupt enables the external output hardware interrupt pin 3.
 func (d *CCS811Driver) EnableExternalInterrupt() error {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
@@ -272,7 +272,7 @@ func (d *CCS811Driver) EnableExternalInterrupt() error {
 	return d.connection.WriteByteData(ccs811RegMeasMode, d.measMode.GetMeasMode())
 }
 
-//DisableExternalInterrupt disables the external output hardware interrupt pin 3.
+// DisableExternalInterrupt disables the external output hardware interrupt pin 3.
 func (d *CCS811Driver) DisableExternalInterrupt() error {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
@@ -310,21 +310,21 @@ func (d *CCS811Driver) initialize() error {
 	return nil
 }
 
-//ResetDevice does a software reset of the device. After this operation is done,
-//the user must start the app code before the sensor can take any measurements
+// ResetDevice does a software reset of the device. After this operation is done,
+// the user must start the app code before the sensor can take any measurements
 func (d *CCS811Driver) resetDevice() error {
 	return d.connection.WriteBlockData(ccs811RegSwReset, ccs811SwResetSequence)
 }
 
-//startApp starts the app code in the device. This operation has to be done after a
-//software reset to start taking sensor measurements.
+// startApp starts the app code in the device. This operation has to be done after a
+// software reset to start taking sensor measurements.
 func (d *CCS811Driver) startApp() error {
 	//Write without data is needed to start the app code
 	_, err := d.connection.Write([]byte{ccs811RegAppStart})
 	return err
 }
 
-//updateMeasMode writes the current value of measMode to the measurement mode register.
+// updateMeasMode writes the current value of measMode to the measurement mode register.
 func (d *CCS811Driver) updateMeasMode() error {
 	return d.connection.WriteByteData(ccs811RegMeasMode, d.measMode.GetMeasMode())
 }

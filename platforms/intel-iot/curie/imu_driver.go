@@ -73,18 +73,17 @@ func NewIMUDriver(a *firmata.Adaptor) *IMUDriver {
 }
 
 // Start starts up the IMUDriver
-func (imu *IMUDriver) Start() (err error) {
-	imu.connection.On("SysexResponse", func(res interface{}) {
+func (imu *IMUDriver) Start() error {
+	return imu.connection.On("SysexResponse", func(res interface{}) {
 		data := res.([]byte)
-		imu.handleEvent(data)
+		if err := imu.handleEvent(data); err != nil {
+			panic(err)
+		}
 	})
-	return
 }
 
 // Halt stops the IMUDriver
-func (imu *IMUDriver) Halt() (err error) {
-	return
-}
+func (imu *IMUDriver) Halt() error { return nil }
 
 // Name returns the IMUDriver's name
 func (imu *IMUDriver) Name() string { return imu.name }
@@ -149,47 +148,54 @@ func (imu *IMUDriver) ReadMotion() error {
 	return imu.connection.WriteSysex([]byte{CURIE_IMU, CURIE_IMU_READ_MOTION})
 }
 
-func (imu *IMUDriver) handleEvent(data []byte) (err error) {
+func (imu *IMUDriver) handleEvent(data []byte) error {
 	if data[1] == CURIE_IMU {
 		switch data[2] {
 		case CURIE_IMU_READ_ACCEL:
-			val, err := parseAccelerometerData(data)
-			if err == nil {
+			if val, err := parseAccelerometerData(data); err == nil {
 				imu.Publish("Accelerometer", val)
+			} else {
+				return err
 			}
 		case CURIE_IMU_READ_GYRO:
-			val, err := parseGyroscopeData(data)
-			if err == nil {
+			if val, err := parseGyroscopeData(data); err == nil {
 				imu.Publish("Gyroscope", val)
+			} else {
+				return err
 			}
 		case CURIE_IMU_READ_TEMP:
-			val, err := parseTemperatureData(data)
-			if err == nil {
+			if val, err := parseTemperatureData(data); err == nil {
 				imu.Publish("Temperature", val)
+			} else {
+				return err
 			}
 		case CURIE_IMU_SHOCK_DETECT:
-			val, err := parseShockData(data)
-			if err == nil {
+			if val, err := parseShockData(data); err == nil {
 				imu.Publish("Shock", val)
+			} else {
+				return err
 			}
 		case CURIE_IMU_STEP_COUNTER:
-			val, err := parseStepData(data)
-			if err == nil {
+			if val, err := parseStepData(data); err == nil {
 				imu.Publish("Steps", val)
+			} else {
+				return err
 			}
 		case CURIE_IMU_TAP_DETECT:
-			val, err := parseTapData(data)
-			if err == nil {
+			if val, err := parseTapData(data); err == nil {
 				imu.Publish("Tap", val)
+			} else {
+				return err
 			}
 		case CURIE_IMU_READ_MOTION:
-			val, err := parseMotionData(data)
-			if err == nil {
+			if val, err := parseMotionData(data); err == nil {
 				imu.Publish("Motion", val)
+			} else {
+				return err
 			}
 		}
 	}
-	return
+	return nil
 }
 
 func parseAccelerometerData(data []byte) (*AccelerometerData, error) {

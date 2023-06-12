@@ -25,8 +25,8 @@ type Driver struct {
 
 const (
 	// BLE services
-	droneCommandService      = "9a66fa000800919111e4012d1540cb8e"
-	droneNotificationService = "9a66fb000800919111e4012d1540cb8e"
+	//droneCommandService      = "9a66fa000800919111e4012d1540cb8e"
+	//droneNotificationService = "9a66fb000800919111e4012d1540cb8e"
 
 	// send characteristics
 	pcmdCharacteristic     = "9a66fa0a0800919111e4012d1540cb8e"
@@ -151,93 +151,86 @@ func (b *Driver) adaptor() ble.BLEConnector {
 }
 
 // Start tells driver to get ready to do work
-func (b *Driver) Start() (err error) {
+func (b *Driver) Start() error {
 	b.adaptor().WithoutResponses(true)
-	b.Init()
-	b.FlatTrim()
-	b.StartPcmd()
-	b.FlatTrim()
+	if err := b.Init(); err != nil {
+		return err
+	}
+	if err := b.FlatTrim(); err != nil {
+		return err
+	}
 
-	return
+	b.StartPcmd()
+
+	return b.FlatTrim()
 }
 
 // Halt stops minidrone driver (void)
-func (b *Driver) Halt() (err error) {
-	b.Land()
-
+func (b *Driver) Halt() error {
+	err := b.Land()
 	time.Sleep(500 * time.Millisecond)
-	return
+	return err
 }
 
 // Init initializes the BLE insterfaces used by the Minidrone
-func (b *Driver) Init() (err error) {
-	b.GenerateAllStates()
+func (b *Driver) Init() error {
+	if err := b.GenerateAllStates(); err != nil {
+		return err
+	}
 
 	// subscribe to battery notifications
-	b.adaptor().Subscribe(batteryCharacteristic, func(data []byte, e error) {
+	if err := b.adaptor().Subscribe(batteryCharacteristic, func(data []byte, e error) {
 		b.Publish(b.Event(Battery), data[len(data)-1])
-	})
+	}); err != nil {
+		return err
+	}
 
 	// subscribe to flying status notifications
-	b.adaptor().Subscribe(flightStatusCharacteristic, func(data []byte, e error) {
+	return b.adaptor().Subscribe(flightStatusCharacteristic, func(data []byte, e error) {
 		b.processFlightStatus(data)
 	})
-
-	return
 }
 
 // GenerateAllStates sets up all the default states aka settings on the drone
-func (b *Driver) GenerateAllStates() (err error) {
+func (b *Driver) GenerateAllStates() error {
 	b.stepsfa0b++
 	buf := []byte{0x04, byte(b.stepsfa0b), 0x00, 0x04, 0x01, 0x00, 0x32, 0x30, 0x31, 0x34, 0x2D, 0x31, 0x30, 0x2D, 0x32, 0x38, 0x00}
-	err = b.adaptor().WriteCharacteristic(commandCharacteristic, buf)
-
-	return
+	return b.adaptor().WriteCharacteristic(commandCharacteristic, buf)
 }
 
 // TakeOff tells the Minidrone to takeoff
-func (b *Driver) TakeOff() (err error) {
+func (b *Driver) TakeOff() error {
 	b.stepsfa0b++
 	buf := []byte{0x02, byte(b.stepsfa0b) & 0xff, 0x02, 0x00, 0x01, 0x00}
-	err = b.adaptor().WriteCharacteristic(commandCharacteristic, buf)
-
-	return
+	return b.adaptor().WriteCharacteristic(commandCharacteristic, buf)
 }
 
 // Land tells the Minidrone to land
-func (b *Driver) Land() (err error) {
+func (b *Driver) Land() error {
 	b.stepsfa0b++
 	buf := []byte{0x02, byte(b.stepsfa0b) & 0xff, 0x02, 0x00, 0x03, 0x00}
-	err = b.adaptor().WriteCharacteristic(commandCharacteristic, buf)
-
-	return err
+	return b.adaptor().WriteCharacteristic(commandCharacteristic, buf)
 }
 
 // FlatTrim calibrates the Minidrone to use its current position as being level
-func (b *Driver) FlatTrim() (err error) {
+func (b *Driver) FlatTrim() error {
 	b.stepsfa0b++
 	buf := []byte{0x02, byte(b.stepsfa0b) & 0xff, 0x02, 0x00, 0x00, 0x00}
-	err = b.adaptor().WriteCharacteristic(commandCharacteristic, buf)
-
-	return err
+	return b.adaptor().WriteCharacteristic(commandCharacteristic, buf)
 }
 
 // Emergency sets the Minidrone into emergency mode
-func (b *Driver) Emergency() (err error) {
+func (b *Driver) Emergency() error {
 	b.stepsfa0b++
 	buf := []byte{0x02, byte(b.stepsfa0b) & 0xff, 0x02, 0x00, 0x04, 0x00}
-	err = b.adaptor().WriteCharacteristic(priorityCharacteristic, buf)
-
-	return err
+	return b.adaptor().WriteCharacteristic(priorityCharacteristic, buf)
 }
 
 // TakePicture tells the Minidrone to take a picture
-func (b *Driver) TakePicture() (err error) {
+func (b *Driver) TakePicture() error {
 	b.stepsfa0b++
 	buf := []byte{0x02, byte(b.stepsfa0b) & 0xff, 0x02, 0x06, 0x01, 0x00}
-	err = b.adaptor().WriteCharacteristic(commandCharacteristic, buf)
-
-	return err
+	return b.adaptor().WriteCharacteristic(commandCharacteristic, buf)
 }
 
 // StartPcmd starts the continuous Pcmd communication with the Minidrone
@@ -374,22 +367,22 @@ func (b *Driver) Outdoor(outdoor bool) error {
 }
 
 // FrontFlip tells the drone to perform a front flip
-func (b *Driver) FrontFlip() (err error) {
+func (b *Driver) FrontFlip() error {
 	return b.adaptor().WriteCharacteristic(commandCharacteristic, b.generateAnimation(0).Bytes())
 }
 
 // BackFlip tells the drone to perform a backflip
-func (b *Driver) BackFlip() (err error) {
+func (b *Driver) BackFlip() error {
 	return b.adaptor().WriteCharacteristic(commandCharacteristic, b.generateAnimation(1).Bytes())
 }
 
 // RightFlip tells the drone to perform a flip to the right
-func (b *Driver) RightFlip() (err error) {
+func (b *Driver) RightFlip() error {
 	return b.adaptor().WriteCharacteristic(commandCharacteristic, b.generateAnimation(2).Bytes())
 }
 
 // LeftFlip tells the drone to perform a flip to the left
-func (b *Driver) LeftFlip() (err error) {
+func (b *Driver) LeftFlip() error {
 	return b.adaptor().WriteCharacteristic(commandCharacteristic, b.generateAnimation(3).Bytes())
 }
 
@@ -401,11 +394,10 @@ func (b *Driver) LeftFlip() (err error) {
 //	mode - either LightFixed, LightBlinked, or LightOscillated
 //	intensity - Light intensity from 0 (OFF) to 100 (Max intensity).
 //				Only used in LightFixed mode.
-func (b *Driver) LightControl(id uint8, mode uint8, intensity uint8) (err error) {
+func (b *Driver) LightControl(id uint8, mode uint8, intensity uint8) error {
 	b.stepsfa0b++
 	buf := []byte{0x02, byte(b.stepsfa0b) & 0xff, 0x02, 0x10, 0x00, id, mode, intensity, 0x00}
-	err = b.adaptor().WriteCharacteristic(commandCharacteristic, buf)
-	return
+	return b.adaptor().WriteCharacteristic(commandCharacteristic, buf)
 }
 
 // ClawControl controls the claw on the Parrot Mambo
@@ -413,22 +405,21 @@ func (b *Driver) LightControl(id uint8, mode uint8, intensity uint8) (err error)
 //
 //	id - always 0
 //	mode - either ClawOpen or ClawClosed
-func (b *Driver) ClawControl(id uint8, mode uint8) (err error) {
+func (b *Driver) ClawControl(id uint8, mode uint8) error {
 	b.stepsfa0b++
 	buf := []byte{0x02, byte(b.stepsfa0b) & 0xff, 0x02, 0x10, 0x01, id, mode, 0x00}
-	err = b.adaptor().WriteCharacteristic(commandCharacteristic, buf)
-	return
+	return b.adaptor().WriteCharacteristic(commandCharacteristic, buf)
 }
 
 // GunControl fires the gun on the Parrot Mambo
 // Params:
 //
 //	id - always 0
-func (b *Driver) GunControl(id uint8) (err error) {
+func (b *Driver) GunControl(id uint8) error {
 	b.stepsfa0b++
 	buf := []byte{0x02, byte(b.stepsfa0b) & 0xff, 0x02, 0x10, 0x02, id, 0x00}
-	err = b.adaptor().WriteCharacteristic(commandCharacteristic, buf)
-	return
+	return b.adaptor().WriteCharacteristic(commandCharacteristic, buf)
+
 }
 
 func (b *Driver) generateAnimation(direction int8) *bytes.Buffer {
@@ -444,20 +435,48 @@ func (b *Driver) generatePcmd() *bytes.Buffer {
 	pcmd := b.Pcmd
 
 	cmd := &bytes.Buffer{}
-	binary.Write(cmd, binary.LittleEndian, int8(2))
-	binary.Write(cmd, binary.LittleEndian, int8(b.stepsfa0a))
-	binary.Write(cmd, binary.LittleEndian, int8(2))
-	binary.Write(cmd, binary.LittleEndian, int8(0))
-	binary.Write(cmd, binary.LittleEndian, int8(2))
-	binary.Write(cmd, binary.LittleEndian, int8(0))
-	binary.Write(cmd, binary.LittleEndian, int8(pcmd.Flag))
-	binary.Write(cmd, binary.LittleEndian, int8(pcmd.Roll))
-	binary.Write(cmd, binary.LittleEndian, int8(pcmd.Pitch))
-	binary.Write(cmd, binary.LittleEndian, int8(pcmd.Yaw))
-	binary.Write(cmd, binary.LittleEndian, int8(pcmd.Gaz))
-	binary.Write(cmd, binary.LittleEndian, float32(pcmd.Psi))
-	binary.Write(cmd, binary.LittleEndian, int16(0))
-	binary.Write(cmd, binary.LittleEndian, int16(0))
+	if err := binary.Write(cmd, binary.LittleEndian, int8(2)); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(cmd, binary.LittleEndian, int8(b.stepsfa0a)); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(cmd, binary.LittleEndian, int8(2)); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(cmd, binary.LittleEndian, int8(0)); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(cmd, binary.LittleEndian, int8(2)); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(cmd, binary.LittleEndian, int8(0)); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(cmd, binary.LittleEndian, int8(pcmd.Flag)); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(cmd, binary.LittleEndian, int8(pcmd.Roll)); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(cmd, binary.LittleEndian, int8(pcmd.Pitch)); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(cmd, binary.LittleEndian, int8(pcmd.Yaw)); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(cmd, binary.LittleEndian, int8(pcmd.Gaz)); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(cmd, binary.LittleEndian, float32(pcmd.Psi)); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(cmd, binary.LittleEndian, int16(0)); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(cmd, binary.LittleEndian, int16(0)); err != nil {
+		panic(err)
+	}
 
 	return cmd
 }

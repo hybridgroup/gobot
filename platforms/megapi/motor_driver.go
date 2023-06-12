@@ -45,8 +45,7 @@ func (m *MotorDriver) Start() error {
 	m.syncRoot.Lock()
 	defer m.syncRoot.Unlock()
 	m.halted = false
-	m.speedHelper(0)
-	return nil
+	return m.speedHelper(0)
 }
 
 // Halt terminates the Driver interface
@@ -54,8 +53,7 @@ func (m *MotorDriver) Halt() error {
 	m.syncRoot.Lock()
 	defer m.syncRoot.Unlock()
 	m.halted = true
-	m.speedHelper(0)
-	return nil
+	return m.speedHelper(0)
 }
 
 // Connection returns the Connection associated with the Driver
@@ -70,25 +68,30 @@ func (m *MotorDriver) Speed(speed int16) error {
 	if m.halted {
 		return nil
 	}
-	m.speedHelper(speed)
-	return nil
+	return m.speedHelper(speed)
 }
 
 // there is some sort of bug on the hardware such that you cannot
 // send the exact same speed to 2 different motors consecutively
 // hence we ensure we always alternate speeds
-func (m *MotorDriver) speedHelper(speed int16) {
-	m.sendSpeed(speed - 1)
-	m.sendSpeed(speed)
+func (m *MotorDriver) speedHelper(speed int16) error {
+	if err := m.sendSpeed(speed - 1); err != nil {
+		return err
+	}
+	return m.sendSpeed(speed)
 }
 
 // sendSpeed sets the motors speed to the specified value
-func (m *MotorDriver) sendSpeed(speed int16) {
+func (m *MotorDriver) sendSpeed(speed int16) error {
 	bufOut := new(bytes.Buffer)
 
 	// byte sequence: 0xff, 0x55, id, action, device, port
 	bufOut.Write([]byte{0xff, 0x55, 0x6, 0x0, 0x2, 0xa, m.port})
-	binary.Write(bufOut, binary.LittleEndian, speed)
+	if err := binary.Write(bufOut, binary.LittleEndian, speed); err != nil {
+		return err
+	}
 	bufOut.Write([]byte{0xa})
 	m.megaPi.writeBytesChannel <- bufOut.Bytes()
+
+	return nil
 }

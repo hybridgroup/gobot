@@ -32,7 +32,7 @@ var _ spi.Connector = (*Adaptor)(nil)
 func initTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *system.MockFilesystem) {
 	a := NewAdaptor()
 	fs := a.sys.UseMockFilesystem(mockPaths)
-	a.Connect()
+	_ = a.Connect()
 	return a, fs
 }
 
@@ -99,10 +99,10 @@ func TestFinalize(t *testing.T) {
 	}
 	a, _ := initTestAdaptorWithMockedFilesystem(mockedPaths)
 
-	a.DigitalWrite("3", 1)
-	a.PwmWrite("7", 255)
+	_ = a.DigitalWrite("3", 1)
+	_ = a.PwmWrite("7", 255)
 
-	a.GetI2cConnection(0xff, 0)
+	_, _ = a.GetI2cConnection(0xff, 0)
 	gobottest.Assert(t, a.Finalize(), nil)
 }
 
@@ -179,7 +179,7 @@ func TestDigitalPinConcurrency(t *testing.T) {
 			pinAsString := strconv.Itoa(i)
 			go func(pin string) {
 				defer wg.Done()
-				a.DigitalPin(pin)
+				_, _ = a.DigitalPin(pin)
 			}(pinAsString)
 		}
 

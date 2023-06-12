@@ -25,19 +25,19 @@ func TestDriverSSDStart(t *testing.T) {
 
 func TestDriverSSDHalt(t *testing.T) {
 	d := initTestSSDDriver()
-	d.Start()
+	_ = d.Start()
 	gobottest.Assert(t, d.Halt(), nil)
 }
 
 func TestDriverSSDDisplay(t *testing.T) {
 	d := initTestSSDDriver()
-	d.Start()
+	_ = d.Start()
 	gobottest.Assert(t, d.Display(), nil)
 }
 
 func TestSSD1306DriverShowImage(t *testing.T) {
 	d := initTestSSDDriver()
-	d.Start()
+	_ = d.Start()
 	img := image.NewRGBA(image.Rect(0, 0, 640, 480))
 	gobottest.Assert(t, d.ShowImage(img), errors.New("Image must match the display width and height"))
 

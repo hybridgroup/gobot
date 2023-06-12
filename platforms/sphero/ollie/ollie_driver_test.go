@@ -2,7 +2,6 @@ package ollie
 
 import (
 	"fmt"
-	"math"
 	"strconv"
 	"testing"
 	"time"
@@ -63,10 +62,10 @@ func TestLocatorData(t *testing.T) {
 func TestDataStreaming(t *testing.T) {
 	d := initTestOllieDriver()
 
-	d.SetDataStreamingConfig(sphero.DefaultDataStreamingConfig())
+	_ = d.SetDataStreamingConfig(sphero.DefaultDataStreamingConfig())
 
 	response := false
-	d.On("sensordata", func(data interface{}) {
+	_ = d.On("sensordata", func(data interface{}) {
 		cont := data.(DataStreamingPacket)
 		fmt.Printf("got streaming packet: %+v \n", cont)
 		gobottest.Assert(t, cont.RawAccX, int16(10))
@@ -99,15 +98,4 @@ func TestDataStreaming(t *testing.T) {
 	if response == false {
 		t.Error("no response recieved")
 	}
-}
-
-func parseBytes(s string) (f byte) {
-	i, err := strconv.ParseUint(s, 16, 32)
-	if err != nil {
-		return
-	}
-
-	f = byte(math.Float32frombits(uint32(i)))
-
-	return
 }

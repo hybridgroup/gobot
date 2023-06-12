@@ -1,3 +1,4 @@
+//nolint:errcheck // to much code to fix it immediately
 package mavlink
 
 //
@@ -634,7 +635,6 @@ const (
 	MAV_DISTANCE_SENSOR_ENUM_END   = 2 //  |
 )
 
-//
 // MESSAGE HEARTBEAT
 //
 // MAVLINK_MSG_ID_HEARTBEAT 0
@@ -642,8 +642,6 @@ const (
 // MAVLINK_MSG_ID_HEARTBEAT_LEN 9
 //
 // MAVLINK_MSG_ID_HEARTBEAT_CRC 50
-//
-//
 type Heartbeat struct {
 	CUSTOM_MODE     uint32 // A bitfield for use for autopilot-specific flags.
 	TYPE            uint8  // Type of the MAV (quadrotor, helicopter, etc., up to 15 types, defined in MAV_TYPE ENUM)
@@ -703,7 +701,6 @@ func (m *Heartbeat) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.MAVLINK_VERSION)
 }
 
-//
 // MESSAGE SYS_STATUS
 //
 // MAVLINK_MSG_ID_SYS_STATUS 1
@@ -711,8 +708,6 @@ func (m *Heartbeat) Decode(buf []byte) {
 // MAVLINK_MSG_ID_SYS_STATUS_LEN 31
 //
 // MAVLINK_MSG_ID_SYS_STATUS_CRC 124
-//
-//
 type SysStatus struct {
 	ONBOARD_CONTROL_SENSORS_PRESENT uint32 // Bitmask showing which onboard controllers and sensors are present. Value of 0: not present. Value of 1: present. Indices defined by ENUM MAV_SYS_STATUS_SENSOR
 	ONBOARD_CONTROL_SENSORS_ENABLED uint32 // Bitmask showing which onboard controllers and sensors are enabled:  Value of 0: not enabled. Value of 1: enabled. Indices defined by ENUM MAV_SYS_STATUS_SENSOR
@@ -800,7 +795,6 @@ func (m *SysStatus) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.BATTERY_REMAINING)
 }
 
-//
 // MESSAGE SYSTEM_TIME
 //
 // MAVLINK_MSG_ID_SYSTEM_TIME 2
@@ -808,8 +802,6 @@ func (m *SysStatus) Decode(buf []byte) {
 // MAVLINK_MSG_ID_SYSTEM_TIME_LEN 12
 //
 // MAVLINK_MSG_ID_SYSTEM_TIME_CRC 137
-//
-//
 type SystemTime struct {
 	TIME_UNIX_USEC uint64 // Timestamp of the master clock in microseconds since UNIX epoch.
 	TIME_BOOT_MS   uint32 // Timestamp of the component clock since boot time in milliseconds.
@@ -853,7 +845,6 @@ func (m *SystemTime) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS)
 }
 
-//
 // MESSAGE PING
 //
 // MAVLINK_MSG_ID_PING 4
@@ -861,8 +852,6 @@ func (m *SystemTime) Decode(buf []byte) {
 // MAVLINK_MSG_ID_PING_LEN 14
 //
 // MAVLINK_MSG_ID_PING_CRC 237
-//
-//
 type Ping struct {
 	TIME_USEC        uint64 // Unix timestamp in microseconds
 	SEQ              uint32 // PING sequence
@@ -914,7 +903,6 @@ func (m *Ping) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
 }
 
-//
 // MESSAGE CHANGE_OPERATOR_CONTROL
 //
 // MAVLINK_MSG_ID_CHANGE_OPERATOR_CONTROL 5
@@ -922,8 +910,6 @@ func (m *Ping) Decode(buf []byte) {
 // MAVLINK_MSG_ID_CHANGE_OPERATOR_CONTROL_LEN 28
 //
 // MAVLINK_MSG_ID_CHANGE_OPERATOR_CONTROL_CRC 217
-//
-//
 type ChangeOperatorControl struct {
 	TARGET_SYSTEM   uint8     // System the GCS requests control for
 	CONTROL_REQUEST uint8     // 0: request control of this MAV, 1: Release control of this MAV
@@ -979,7 +965,6 @@ const (
 	MAVLINK_MSG_CHANGE_OPERATOR_CONTROL_FIELD_passkey_LEN = 25
 )
 
-//
 // MESSAGE CHANGE_OPERATOR_CONTROL_ACK
 //
 // MAVLINK_MSG_ID_CHANGE_OPERATOR_CONTROL_ACK 6
@@ -987,8 +972,6 @@ const (
 // MAVLINK_MSG_ID_CHANGE_OPERATOR_CONTROL_ACK_LEN 3
 //
 // MAVLINK_MSG_ID_CHANGE_OPERATOR_CONTROL_ACK_CRC 104
-//
-//
 type ChangeOperatorControlAck struct {
 	GCS_SYSTEM_ID   uint8 // ID of the GCS this message
 	CONTROL_REQUEST uint8 // 0: request control of this MAV, 1: Release control of this MAV
@@ -1036,7 +1019,6 @@ func (m *ChangeOperatorControlAck) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.ACK)
 }
 
-//
 // MESSAGE AUTH_KEY
 //
 // MAVLINK_MSG_ID_AUTH_KEY 7
@@ -1044,8 +1026,6 @@ func (m *ChangeOperatorControlAck) Decode(buf []byte) {
 // MAVLINK_MSG_ID_AUTH_KEY_LEN 32
 //
 // MAVLINK_MSG_ID_AUTH_KEY_CRC 119
-//
-//
 type AuthKey struct {
 	KEY [32]uint8 // key
 }
@@ -1089,7 +1069,6 @@ const (
 	MAVLINK_MSG_AUTH_KEY_FIELD_key_LEN = 32
 )
 
-//
 // MESSAGE SET_MODE
 //
 // MAVLINK_MSG_ID_SET_MODE 11
@@ -1097,8 +1076,6 @@ const (
 // MAVLINK_MSG_ID_SET_MODE_LEN 6
 //
 // MAVLINK_MSG_ID_SET_MODE_CRC 89
-//
-//
 type SetMode struct {
 	CUSTOM_MODE   uint32 // The new autopilot-specific mode. This field can be ignored by an autopilot.
 	TARGET_SYSTEM uint8  // The system setting the mode
@@ -1146,7 +1123,6 @@ func (m *SetMode) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.BASE_MODE)
 }
 
-//
 // MESSAGE PARAM_REQUEST_READ
 //
 // MAVLINK_MSG_ID_PARAM_REQUEST_READ 20
@@ -1154,8 +1130,6 @@ func (m *SetMode) Decode(buf []byte) {
 // MAVLINK_MSG_ID_PARAM_REQUEST_READ_LEN 20
 //
 // MAVLINK_MSG_ID_PARAM_REQUEST_READ_CRC 214
-//
-//
 type ParamRequestRead struct {
 	PARAM_INDEX      int16     // Parameter index. Send -1 to use the param ID field as identifier (else the param id will be ignored)
 	TARGET_SYSTEM    uint8     // System ID
@@ -1211,7 +1185,6 @@ const (
 	MAVLINK_MSG_PARAM_REQUEST_READ_FIELD_param_id_LEN = 16
 )
 
-//
 // MESSAGE PARAM_REQUEST_LIST
 //
 // MAVLINK_MSG_ID_PARAM_REQUEST_LIST 21
@@ -1219,8 +1192,6 @@ const (
 // MAVLINK_MSG_ID_PARAM_REQUEST_LIST_LEN 2
 //
 // MAVLINK_MSG_ID_PARAM_REQUEST_LIST_CRC 159
-//
-//
 type ParamRequestList struct {
 	TARGET_SYSTEM    uint8 // System ID
 	TARGET_COMPONENT uint8 // Component ID
@@ -1264,7 +1235,6 @@ func (m *ParamRequestList) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
 }
 
-//
 // MESSAGE PARAM_VALUE
 //
 // MAVLINK_MSG_ID_PARAM_VALUE 22
@@ -1272,8 +1242,6 @@ func (m *ParamRequestList) Decode(buf []byte) {
 // MAVLINK_MSG_ID_PARAM_VALUE_LEN 25
 //
 // MAVLINK_MSG_ID_PARAM_VALUE_CRC 220
-//
-//
 type ParamValue struct {
 	PARAM_VALUE float32   // Onboard parameter value
 	PARAM_COUNT uint16    // Total number of onboard parameters
@@ -1333,7 +1301,6 @@ const (
 	MAVLINK_MSG_PARAM_VALUE_FIELD_param_id_LEN = 16
 )
 
-//
 // MESSAGE PARAM_SET
 //
 // MAVLINK_MSG_ID_PARAM_SET 23
@@ -1341,8 +1308,6 @@ const (
 // MAVLINK_MSG_ID_PARAM_SET_LEN 23
 //
 // MAVLINK_MSG_ID_PARAM_SET_CRC 168
-//
-//
 type ParamSet struct {
 	PARAM_VALUE      float32   // Onboard parameter value
 	TARGET_SYSTEM    uint8     // System ID
@@ -1402,7 +1367,6 @@ const (
 	MAVLINK_MSG_PARAM_SET_FIELD_param_id_LEN = 16
 )
 
-//
 // MESSAGE GPS_RAW_INT
 //
 // MAVLINK_MSG_ID_GPS_RAW_INT 24
@@ -1410,8 +1374,6 @@ const (
 // MAVLINK_MSG_ID_GPS_RAW_INT_LEN 30
 //
 // MAVLINK_MSG_ID_GPS_RAW_INT_CRC 24
-//
-//
 type GpsRawInt struct {
 	TIME_USEC          uint64 // Timestamp (microseconds since UNIX epoch or microseconds since system boot)
 	LAT                int32  // Latitude (WGS84), in degrees * 1E7
@@ -1487,7 +1449,6 @@ func (m *GpsRawInt) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.SATELLITES_VISIBLE)
 }
 
-//
 // MESSAGE GPS_STATUS
 //
 // MAVLINK_MSG_ID_GPS_STATUS 25
@@ -1495,8 +1456,6 @@ func (m *GpsRawInt) Decode(buf []byte) {
 // MAVLINK_MSG_ID_GPS_STATUS_LEN 101
 //
 // MAVLINK_MSG_ID_GPS_STATUS_CRC 23
-//
-//
 type GpsStatus struct {
 	SATELLITES_VISIBLE  uint8     // Number of satellites visible
 	SATELLITE_PRN       [20]uint8 // Global satellite ID
@@ -1564,7 +1523,6 @@ const (
 	MAVLINK_MSG_GPS_STATUS_FIELD_satellite_snr_LEN       = 20
 )
 
-//
 // MESSAGE SCALED_IMU
 //
 // MAVLINK_MSG_ID_SCALED_IMU 26
@@ -1572,8 +1530,6 @@ const (
 // MAVLINK_MSG_ID_SCALED_IMU_LEN 22
 //
 // MAVLINK_MSG_ID_SCALED_IMU_CRC 170
-//
-//
 type ScaledImu struct {
 	TIME_BOOT_MS uint32 // Timestamp (milliseconds since system boot)
 	XACC         int16  // X acceleration (mg)
@@ -1649,7 +1605,6 @@ func (m *ScaledImu) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.ZMAG)
 }
 
-//
 // MESSAGE RAW_IMU
 //
 // MAVLINK_MSG_ID_RAW_IMU 27
@@ -1657,8 +1612,6 @@ func (m *ScaledImu) Decode(buf []byte) {
 // MAVLINK_MSG_ID_RAW_IMU_LEN 26
 //
 // MAVLINK_MSG_ID_RAW_IMU_CRC 144
-//
-//
 type RawImu struct {
 	TIME_USEC uint64 // Timestamp (microseconds since UNIX epoch or microseconds since system boot)
 	XACC      int16  // X acceleration (raw)
@@ -1734,7 +1687,6 @@ func (m *RawImu) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.ZMAG)
 }
 
-//
 // MESSAGE RAW_PRESSURE
 //
 // MAVLINK_MSG_ID_RAW_PRESSURE 28
@@ -1742,8 +1694,6 @@ func (m *RawImu) Decode(buf []byte) {
 // MAVLINK_MSG_ID_RAW_PRESSURE_LEN 16
 //
 // MAVLINK_MSG_ID_RAW_PRESSURE_CRC 67
-//
-//
 type RawPressure struct {
 	TIME_USEC   uint64 // Timestamp (microseconds since UNIX epoch or microseconds since system boot)
 	PRESS_ABS   int16  // Absolute pressure (raw)
@@ -1799,7 +1749,6 @@ func (m *RawPressure) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.TEMPERATURE)
 }
 
-//
 // MESSAGE SCALED_PRESSURE
 //
 // MAVLINK_MSG_ID_SCALED_PRESSURE 29
@@ -1807,8 +1756,6 @@ func (m *RawPressure) Decode(buf []byte) {
 // MAVLINK_MSG_ID_SCALED_PRESSURE_LEN 14
 //
 // MAVLINK_MSG_ID_SCALED_PRESSURE_CRC 115
-//
-//
 type ScaledPressure struct {
 	TIME_BOOT_MS uint32  // Timestamp (milliseconds since system boot)
 	PRESS_ABS    float32 // Absolute pressure (hectopascal)
@@ -1860,7 +1807,6 @@ func (m *ScaledPressure) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.TEMPERATURE)
 }
 
-//
 // MESSAGE ATTITUDE
 //
 // MAVLINK_MSG_ID_ATTITUDE 30
@@ -1868,8 +1814,6 @@ func (m *ScaledPressure) Decode(buf []byte) {
 // MAVLINK_MSG_ID_ATTITUDE_LEN 28
 //
 // MAVLINK_MSG_ID_ATTITUDE_CRC 39
-//
-//
 type Attitude struct {
 	TIME_BOOT_MS uint32  // Timestamp (milliseconds since system boot)
 	ROLL         float32 // Roll angle (rad, -pi..+pi)
@@ -1933,7 +1877,6 @@ func (m *Attitude) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.YAWSPEED)
 }
 
-//
 // MESSAGE ATTITUDE_QUATERNION
 //
 // MAVLINK_MSG_ID_ATTITUDE_QUATERNION 31
@@ -1941,8 +1884,6 @@ func (m *Attitude) Decode(buf []byte) {
 // MAVLINK_MSG_ID_ATTITUDE_QUATERNION_LEN 32
 //
 // MAVLINK_MSG_ID_ATTITUDE_QUATERNION_CRC 246
-//
-//
 type AttitudeQuaternion struct {
 	TIME_BOOT_MS uint32  // Timestamp (milliseconds since system boot)
 	Q1           float32 // Quaternion component 1, w (1 in null-rotation)
@@ -2010,7 +1951,6 @@ func (m *AttitudeQuaternion) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.YAWSPEED)
 }
 
-//
 // MESSAGE LOCAL_POSITION_NED
 //
 // MAVLINK_MSG_ID_LOCAL_POSITION_NED 32
@@ -2018,8 +1958,6 @@ func (m *AttitudeQuaternion) Decode(buf []byte) {
 // MAVLINK_MSG_ID_LOCAL_POSITION_NED_LEN 28
 //
 // MAVLINK_MSG_ID_LOCAL_POSITION_NED_CRC 185
-//
-//
 type LocalPositionNed struct {
 	TIME_BOOT_MS uint32  // Timestamp (milliseconds since system boot)
 	X            float32 // X Position
@@ -2083,7 +2021,6 @@ func (m *LocalPositionNed) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.VZ)
 }
 
-//
 // MESSAGE GLOBAL_POSITION_INT
 //
 // MAVLINK_MSG_ID_GLOBAL_POSITION_INT 33
@@ -2091,8 +2028,6 @@ func (m *LocalPositionNed) Decode(buf []byte) {
 // MAVLINK_MSG_ID_GLOBAL_POSITION_INT_LEN 28
 //
 // MAVLINK_MSG_ID_GLOBAL_POSITION_INT_CRC 104
-//
-//
 type GlobalPositionInt struct {
 	TIME_BOOT_MS uint32 // Timestamp (milliseconds since system boot)
 	LAT          int32  // Latitude, expressed as * 1E7
@@ -2164,7 +2099,6 @@ func (m *GlobalPositionInt) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.HDG)
 }
 
-//
 // MESSAGE RC_CHANNELS_SCALED
 //
 // MAVLINK_MSG_ID_RC_CHANNELS_SCALED 34
@@ -2172,8 +2106,6 @@ func (m *GlobalPositionInt) Decode(buf []byte) {
 // MAVLINK_MSG_ID_RC_CHANNELS_SCALED_LEN 22
 //
 // MAVLINK_MSG_ID_RC_CHANNELS_SCALED_CRC 237
-//
-//
 type RcChannelsScaled struct {
 	TIME_BOOT_MS uint32 // Timestamp (milliseconds since system boot)
 	CHAN1_SCALED int16  // RC channel 1 value scaled, (-100%) -10000, (0%) 0, (100%) 10000, (invalid) INT16_MAX.
@@ -2253,7 +2185,6 @@ func (m *RcChannelsScaled) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.RSSI)
 }
 
-//
 // MESSAGE RC_CHANNELS_RAW
 //
 // MAVLINK_MSG_ID_RC_CHANNELS_RAW 35
@@ -2261,8 +2192,6 @@ func (m *RcChannelsScaled) Decode(buf []byte) {
 // MAVLINK_MSG_ID_RC_CHANNELS_RAW_LEN 22
 //
 // MAVLINK_MSG_ID_RC_CHANNELS_RAW_CRC 244
-//
-//
 type RcChannelsRaw struct {
 	TIME_BOOT_MS uint32 // Timestamp (milliseconds since system boot)
 	CHAN1_RAW    uint16 // RC channel 1 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
@@ -2342,7 +2271,6 @@ func (m *RcChannelsRaw) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.RSSI)
 }
 
-//
 // MESSAGE SERVO_OUTPUT_RAW
 //
 // MAVLINK_MSG_ID_SERVO_OUTPUT_RAW 36
@@ -2350,8 +2278,6 @@ func (m *RcChannelsRaw) Decode(buf []byte) {
 // MAVLINK_MSG_ID_SERVO_OUTPUT_RAW_LEN 21
 //
 // MAVLINK_MSG_ID_SERVO_OUTPUT_RAW_CRC 222
-//
-//
 type ServoOutputRaw struct {
 	TIME_USEC  uint32 // Timestamp (microseconds since system boot)
 	SERVO1_RAW uint16 // Servo output 1 value, in microseconds
@@ -2427,7 +2353,6 @@ func (m *ServoOutputRaw) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.PORT)
 }
 
-//
 // MESSAGE MISSION_REQUEST_PARTIAL_LIST
 //
 // MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST 37
@@ -2435,8 +2360,6 @@ func (m *ServoOutputRaw) Decode(buf []byte) {
 // MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST_LEN 6
 //
 // MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST_CRC 212
-//
-//
 type MissionRequestPartialList struct {
 	START_INDEX      int16 // Start index, 0 by default
 	END_INDEX        int16 // End index, -1 by default (-1: send list to end). Else a valid index of the list
@@ -2488,7 +2411,6 @@ func (m *MissionRequestPartialList) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
 }
 
-//
 // MESSAGE MISSION_WRITE_PARTIAL_LIST
 //
 // MAVLINK_MSG_ID_MISSION_WRITE_PARTIAL_LIST 38
@@ -2496,8 +2418,6 @@ func (m *MissionRequestPartialList) Decode(buf []byte) {
 // MAVLINK_MSG_ID_MISSION_WRITE_PARTIAL_LIST_LEN 6
 //
 // MAVLINK_MSG_ID_MISSION_WRITE_PARTIAL_LIST_CRC 9
-//
-//
 type MissionWritePartialList struct {
 	START_INDEX      int16 // Start index, 0 by default and smaller / equal to the largest index of the current onboard list.
 	END_INDEX        int16 // End index, equal or greater than start index.
@@ -2549,7 +2469,6 @@ func (m *MissionWritePartialList) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
 }
 
-//
 // MESSAGE MISSION_ITEM
 //
 // MAVLINK_MSG_ID_MISSION_ITEM 39
@@ -2557,8 +2476,6 @@ func (m *MissionWritePartialList) Decode(buf []byte) {
 // MAVLINK_MSG_ID_MISSION_ITEM_LEN 37
 //
 // MAVLINK_MSG_ID_MISSION_ITEM_CRC 254
-//
-//
 type MissionItem struct {
 	PARAM1           float32 // PARAM1, see MAV_CMD enum
 	PARAM2           float32 // PARAM2, see MAV_CMD enum
@@ -2650,7 +2567,6 @@ func (m *MissionItem) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.AUTOCONTINUE)
 }
 
-//
 // MESSAGE MISSION_REQUEST
 //
 // MAVLINK_MSG_ID_MISSION_REQUEST 40
@@ -2658,8 +2574,6 @@ func (m *MissionItem) Decode(buf []byte) {
 // MAVLINK_MSG_ID_MISSION_REQUEST_LEN 4
 //
 // MAVLINK_MSG_ID_MISSION_REQUEST_CRC 230
-//
-//
 type MissionRequest struct {
 	SEQ              uint16 // Sequence
 	TARGET_SYSTEM    uint8  // System ID
@@ -2707,7 +2621,6 @@ func (m *MissionRequest) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
 }
 
-//
 // MESSAGE MISSION_SET_CURRENT
 //
 // MAVLINK_MSG_ID_MISSION_SET_CURRENT 41
@@ -2715,8 +2628,6 @@ func (m *MissionRequest) Decode(buf []byte) {
 // MAVLINK_MSG_ID_MISSION_SET_CURRENT_LEN 4
 //
 // MAVLINK_MSG_ID_MISSION_SET_CURRENT_CRC 28
-//
-//
 type MissionSetCurrent struct {
 	SEQ              uint16 // Sequence
 	TARGET_SYSTEM    uint8  // System ID
@@ -2764,7 +2675,6 @@ func (m *MissionSetCurrent) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
 }
 
-//
 // MESSAGE MISSION_CURRENT
 //
 // MAVLINK_MSG_ID_MISSION_CURRENT 42
@@ -2772,8 +2682,6 @@ func (m *MissionSetCurrent) Decode(buf []byte) {
 // MAVLINK_MSG_ID_MISSION_CURRENT_LEN 2
 //
 // MAVLINK_MSG_ID_MISSION_CURRENT_CRC 28
-//
-//
 type MissionCurrent struct {
 	SEQ uint16 // Sequence
 }
@@ -2813,7 +2721,6 @@ func (m *MissionCurrent) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.SEQ)
 }
 
-//
 // MESSAGE MISSION_REQUEST_LIST
 //
 // MAVLINK_MSG_ID_MISSION_REQUEST_LIST 43
@@ -2821,8 +2728,6 @@ func (m *MissionCurrent) Decode(buf []byte) {
 // MAVLINK_MSG_ID_MISSION_REQUEST_LIST_LEN 2
 //
 // MAVLINK_MSG_ID_MISSION_REQUEST_LIST_CRC 132
-//
-//
 type MissionRequestList struct {
 	TARGET_SYSTEM    uint8 // System ID
 	TARGET_COMPONENT uint8 // Component ID
@@ -2866,7 +2771,6 @@ func (m *MissionRequestList) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
 }
 
-//
 // MESSAGE MISSION_COUNT
 //
 // MAVLINK_MSG_ID_MISSION_COUNT 44
@@ -2874,8 +2778,6 @@ func (m *MissionRequestList) Decode(buf []byte) {
 // MAVLINK_MSG_ID_MISSION_COUNT_LEN 4
 //
 // MAVLINK_MSG_ID_MISSION_COUNT_CRC 221
-//
-//
 type MissionCount struct {
 	COUNT            uint16 // Number of mission items in the sequence
 	TARGET_SYSTEM    uint8  // System ID
@@ -2923,7 +2825,6 @@ func (m *MissionCount) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
 }
 
-//
 // MESSAGE MISSION_CLEAR_ALL
 //
 // MAVLINK_MSG_ID_MISSION_CLEAR_ALL 45
@@ -2931,8 +2832,6 @@ func (m *MissionCount) Decode(buf []byte) {
 // MAVLINK_MSG_ID_MISSION_CLEAR_ALL_LEN 2
 //
 // MAVLINK_MSG_ID_MISSION_CLEAR_ALL_CRC 232
-//
-//
 type MissionClearAll struct {
 	TARGET_SYSTEM    uint8 // System ID
 	TARGET_COMPONENT uint8 // Component ID
@@ -2976,7 +2875,6 @@ func (m *MissionClearAll) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
 }
 
-//
 // MESSAGE MISSION_ITEM_REACHED
 //
 // MAVLINK_MSG_ID_MISSION_ITEM_REACHED 46
@@ -2984,8 +2882,6 @@ func (m *MissionClearAll) Decode(buf []byte) {
 // MAVLINK_MSG_ID_MISSION_ITEM_REACHED_LEN 2
 //
 // MAVLINK_MSG_ID_MISSION_ITEM_REACHED_CRC 11
-//
-//
 type MissionItemReached struct {
 	SEQ uint16 // Sequence
 }
@@ -3025,7 +2921,6 @@ func (m *MissionItemReached) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.SEQ)
 }
 
-//
 // MESSAGE MISSION_ACK
 //
 // MAVLINK_MSG_ID_MISSION_ACK 47
@@ -3033,8 +2928,6 @@ func (m *MissionItemReached) Decode(buf []byte) {
 // MAVLINK_MSG_ID_MISSION_ACK_LEN 3
 //
 // MAVLINK_MSG_ID_MISSION_ACK_CRC 153
-//
-//
 type MissionAck struct {
 	TARGET_SYSTEM    uint8 // System ID
 	TARGET_COMPONENT uint8 // Component ID
@@ -3082,7 +2975,6 @@ func (m *MissionAck) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.TYPE)
 }
 
-//
 // MESSAGE SET_GPS_GLOBAL_ORIGIN
 //
 // MAVLINK_MSG_ID_SET_GPS_GLOBAL_ORIGIN 48
@@ -3090,8 +2982,6 @@ func (m *MissionAck) Decode(buf []byte) {
 // MAVLINK_MSG_ID_SET_GPS_GLOBAL_ORIGIN_LEN 13
 //
 // MAVLINK_MSG_ID_SET_GPS_GLOBAL_ORIGIN_CRC 41
-//
-//
 type SetGpsGlobalOrigin struct {
 	LATITUDE      int32 // Latitude (WGS84), in degrees * 1E7
 	LONGITUDE     int32 // Longitude (WGS84, in degrees * 1E7
@@ -3143,7 +3033,6 @@ func (m *SetGpsGlobalOrigin) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM)
 }
 
-//
 // MESSAGE GPS_GLOBAL_ORIGIN
 //
 // MAVLINK_MSG_ID_GPS_GLOBAL_ORIGIN 49
@@ -3151,8 +3040,6 @@ func (m *SetGpsGlobalOrigin) Decode(buf []byte) {
 // MAVLINK_MSG_ID_GPS_GLOBAL_ORIGIN_LEN 12
 //
 // MAVLINK_MSG_ID_GPS_GLOBAL_ORIGIN_CRC 39
-//
-//
 type GpsGlobalOrigin struct {
 	LATITUDE  int32 // Latitude (WGS84), in degrees * 1E7
 	LONGITUDE int32 // Longitude (WGS84), in degrees * 1E7
@@ -3200,7 +3087,6 @@ func (m *GpsGlobalOrigin) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.ALTITUDE)
 }
 
-//
 // MESSAGE SET_LOCAL_POSITION_SETPOINT
 //
 // MAVLINK_MSG_ID_SET_LOCAL_POSITION_SETPOINT 50
@@ -3208,8 +3094,6 @@ func (m *GpsGlobalOrigin) Decode(buf []byte) {
 // MAVLINK_MSG_ID_SET_LOCAL_POSITION_SETPOINT_LEN 19
 //
 // MAVLINK_MSG_ID_SET_LOCAL_POSITION_SETPOINT_CRC 214
-//
-//
 type SetLocalPositionSetpoint struct {
 	X                float32 // x position
 	Y                float32 // y position
@@ -3273,7 +3157,6 @@ func (m *SetLocalPositionSetpoint) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.COORDINATE_FRAME)
 }
 
-//
 // MESSAGE LOCAL_POSITION_SETPOINT
 //
 // MAVLINK_MSG_ID_LOCAL_POSITION_SETPOINT 51
@@ -3281,8 +3164,6 @@ func (m *SetLocalPositionSetpoint) Decode(buf []byte) {
 // MAVLINK_MSG_ID_LOCAL_POSITION_SETPOINT_LEN 17
 //
 // MAVLINK_MSG_ID_LOCAL_POSITION_SETPOINT_CRC 223
-//
-//
 type LocalPositionSetpoint struct {
 	X                float32 // x position
 	Y                float32 // y position
@@ -3338,7 +3219,6 @@ func (m *LocalPositionSetpoint) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.COORDINATE_FRAME)
 }
 
-//
 // MESSAGE GLOBAL_POSITION_SETPOINT_INT
 //
 // MAVLINK_MSG_ID_GLOBAL_POSITION_SETPOINT_INT 52
@@ -3346,8 +3226,6 @@ func (m *LocalPositionSetpoint) Decode(buf []byte) {
 // MAVLINK_MSG_ID_GLOBAL_POSITION_SETPOINT_INT_LEN 15
 //
 // MAVLINK_MSG_ID_GLOBAL_POSITION_SETPOINT_INT_CRC 141
-//
-//
 type GlobalPositionSetpointInt struct {
 	LATITUDE         int32 // Latitude (WGS84), in degrees * 1E7
 	LONGITUDE        int32 // Longitude (WGS84), in degrees * 1E7
@@ -3403,7 +3281,6 @@ func (m *GlobalPositionSetpointInt) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.COORDINATE_FRAME)
 }
 
-//
 // MESSAGE SET_GLOBAL_POSITION_SETPOINT_INT
 //
 // MAVLINK_MSG_ID_SET_GLOBAL_POSITION_SETPOINT_INT 53
@@ -3411,8 +3288,6 @@ func (m *GlobalPositionSetpointInt) Decode(buf []byte) {
 // MAVLINK_MSG_ID_SET_GLOBAL_POSITION_SETPOINT_INT_LEN 15
 //
 // MAVLINK_MSG_ID_SET_GLOBAL_POSITION_SETPOINT_INT_CRC 33
-//
-//
 type SetGlobalPositionSetpointInt struct {
 	LATITUDE         int32 // Latitude (WGS84), in degrees * 1E7
 	LONGITUDE        int32 // Longitude (WGS84), in degrees * 1E7
@@ -3468,7 +3343,6 @@ func (m *SetGlobalPositionSetpointInt) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.COORDINATE_FRAME)
 }
 
-//
 // MESSAGE SAFETY_SET_ALLOWED_AREA
 //
 // MAVLINK_MSG_ID_SAFETY_SET_ALLOWED_AREA 54
@@ -3476,8 +3350,6 @@ func (m *SetGlobalPositionSetpointInt) Decode(buf []byte) {
 // MAVLINK_MSG_ID_SAFETY_SET_ALLOWED_AREA_LEN 27
 //
 // MAVLINK_MSG_ID_SAFETY_SET_ALLOWED_AREA_CRC 15
-//
-//
 type SafetySetAllowedArea struct {
 	P1X              float32 // x position 1 / Latitude 1
 	P1Y              float32 // y position 1 / Longitude 1
@@ -3549,7 +3421,6 @@ func (m *SafetySetAllowedArea) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.FRAME)
 }
 
-//
 // MESSAGE SAFETY_ALLOWED_AREA
 //
 // MAVLINK_MSG_ID_SAFETY_ALLOWED_AREA 55
@@ -3557,8 +3428,6 @@ func (m *SafetySetAllowedArea) Decode(buf []byte) {
 // MAVLINK_MSG_ID_SAFETY_ALLOWED_AREA_LEN 25
 //
 // MAVLINK_MSG_ID_SAFETY_ALLOWED_AREA_CRC 3
-//
-//
 type SafetyAllowedArea struct {
 	P1X   float32 // x position 1 / Latitude 1
 	P1Y   float32 // y position 1 / Longitude 1
@@ -3622,7 +3491,6 @@ func (m *SafetyAllowedArea) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.FRAME)
 }
 
-//
 // MESSAGE SET_ROLL_PITCH_YAW_THRUST
 //
 // MAVLINK_MSG_ID_SET_ROLL_PITCH_YAW_THRUST 56
@@ -3630,8 +3498,6 @@ func (m *SafetyAllowedArea) Decode(buf []byte) {
 // MAVLINK_MSG_ID_SET_ROLL_PITCH_YAW_THRUST_LEN 18
 //
 // MAVLINK_MSG_ID_SET_ROLL_PITCH_YAW_THRUST_CRC 100
-//
-//
 type SetRollPitchYawThrust struct {
 	ROLL             float32 // Desired roll angle in radians
 	PITCH            float32 // Desired pitch angle in radians
@@ -3691,7 +3557,6 @@ func (m *SetRollPitchYawThrust) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
 }
 
-//
 // MESSAGE SET_ROLL_PITCH_YAW_SPEED_THRUST
 //
 // MAVLINK_MSG_ID_SET_ROLL_PITCH_YAW_SPEED_THRUST 57
@@ -3699,8 +3564,6 @@ func (m *SetRollPitchYawThrust) Decode(buf []byte) {
 // MAVLINK_MSG_ID_SET_ROLL_PITCH_YAW_SPEED_THRUST_LEN 18
 //
 // MAVLINK_MSG_ID_SET_ROLL_PITCH_YAW_SPEED_THRUST_CRC 24
-//
-//
 type SetRollPitchYawSpeedThrust struct {
 	ROLL_SPEED       float32 // Desired roll angular speed in rad/s
 	PITCH_SPEED      float32 // Desired pitch angular speed in rad/s
@@ -3760,7 +3623,6 @@ func (m *SetRollPitchYawSpeedThrust) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
 }
 
-//
 // MESSAGE ROLL_PITCH_YAW_THRUST_SETPOINT
 //
 // MAVLINK_MSG_ID_ROLL_PITCH_YAW_THRUST_SETPOINT 58
@@ -3768,8 +3630,6 @@ func (m *SetRollPitchYawSpeedThrust) Decode(buf []byte) {
 // MAVLINK_MSG_ID_ROLL_PITCH_YAW_THRUST_SETPOINT_LEN 20
 //
 // MAVLINK_MSG_ID_ROLL_PITCH_YAW_THRUST_SETPOINT_CRC 239
-//
-//
 type RollPitchYawThrustSetpoint struct {
 	TIME_BOOT_MS uint32  // Timestamp in milliseconds since system boot
 	ROLL         float32 // Desired roll angle in radians
@@ -3825,7 +3685,6 @@ func (m *RollPitchYawThrustSetpoint) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.THRUST)
 }
 
-//
 // MESSAGE ROLL_PITCH_YAW_SPEED_THRUST_SETPOINT
 //
 // MAVLINK_MSG_ID_ROLL_PITCH_YAW_SPEED_THRUST_SETPOINT 59
@@ -3833,8 +3692,6 @@ func (m *RollPitchYawThrustSetpoint) Decode(buf []byte) {
 // MAVLINK_MSG_ID_ROLL_PITCH_YAW_SPEED_THRUST_SETPOINT_LEN 20
 //
 // MAVLINK_MSG_ID_ROLL_PITCH_YAW_SPEED_THRUST_SETPOINT_CRC 238
-//
-//
 type RollPitchYawSpeedThrustSetpoint struct {
 	TIME_BOOT_MS uint32  // Timestamp in milliseconds since system boot
 	ROLL_SPEED   float32 // Desired roll angular speed in rad/s
@@ -3890,7 +3747,6 @@ func (m *RollPitchYawSpeedThrustSetpoint) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.THRUST)
 }
 
-//
 // MESSAGE SET_QUAD_MOTORS_SETPOINT
 //
 // MAVLINK_MSG_ID_SET_QUAD_MOTORS_SETPOINT 60
@@ -3898,8 +3754,6 @@ func (m *RollPitchYawSpeedThrustSetpoint) Decode(buf []byte) {
 // MAVLINK_MSG_ID_SET_QUAD_MOTORS_SETPOINT_LEN 9
 //
 // MAVLINK_MSG_ID_SET_QUAD_MOTORS_SETPOINT_CRC 30
-//
-//
 type SetQuadMotorsSetpoint struct {
 	MOTOR_FRONT_NW uint16 // Front motor in + configuration, front left motor in x configuration
 	MOTOR_RIGHT_NE uint16 // Right motor in + configuration, front right motor in x configuration
@@ -3955,7 +3809,6 @@ func (m *SetQuadMotorsSetpoint) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM)
 }
 
-//
 // MESSAGE SET_QUAD_SWARM_ROLL_PITCH_YAW_THRUST
 //
 // MAVLINK_MSG_ID_SET_QUAD_SWARM_ROLL_PITCH_YAW_THRUST 61
@@ -3963,8 +3816,6 @@ func (m *SetQuadMotorsSetpoint) Decode(buf []byte) {
 // MAVLINK_MSG_ID_SET_QUAD_SWARM_ROLL_PITCH_YAW_THRUST_LEN 34
 //
 // MAVLINK_MSG_ID_SET_QUAD_SWARM_ROLL_PITCH_YAW_THRUST_CRC 240
-//
-//
 type SetQuadSwarmRollPitchYawThrust struct {
 	ROLL   [4]int16  // Desired roll angle in radians +-PI (+-INT16_MAX)
 	PITCH  [4]int16  // Desired pitch angle in radians +-PI (+-INT16_MAX)
@@ -4031,7 +3882,6 @@ const (
 	MAVLINK_MSG_SET_QUAD_SWARM_ROLL_PITCH_YAW_THRUST_FIELD_thrust_LEN = 4
 )
 
-//
 // MESSAGE NAV_CONTROLLER_OUTPUT
 //
 // MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT 62
@@ -4039,8 +3889,6 @@ const (
 // MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_LEN 26
 //
 // MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_CRC 183
-//
-//
 type NavControllerOutput struct {
 	NAV_ROLL       float32 // Current desired roll in degrees
 	NAV_PITCH      float32 // Current desired pitch in degrees
@@ -4108,7 +3956,6 @@ func (m *NavControllerOutput) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.WP_DIST)
 }
 
-//
 // MESSAGE SET_QUAD_SWARM_LED_ROLL_PITCH_YAW_THRUST
 //
 // MAVLINK_MSG_ID_SET_QUAD_SWARM_LED_ROLL_PITCH_YAW_THRUST 63
@@ -4116,8 +3963,6 @@ func (m *NavControllerOutput) Decode(buf []byte) {
 // MAVLINK_MSG_ID_SET_QUAD_SWARM_LED_ROLL_PITCH_YAW_THRUST_LEN 46
 //
 // MAVLINK_MSG_ID_SET_QUAD_SWARM_LED_ROLL_PITCH_YAW_THRUST_CRC 130
-//
-//
 type SetQuadSwarmLedRollPitchYawThrust struct {
 	ROLL      [4]int16  // Desired roll angle in radians +-PI (+-INT16_MAX)
 	PITCH     [4]int16  // Desired pitch angle in radians +-PI (+-INT16_MAX)
@@ -4199,7 +4044,6 @@ const (
 	MAVLINK_MSG_SET_QUAD_SWARM_LED_ROLL_PITCH_YAW_THRUST_FIELD_led_green_LEN = 4
 )
 
-//
 // MESSAGE STATE_CORRECTION
 //
 // MAVLINK_MSG_ID_STATE_CORRECTION 64
@@ -4207,8 +4051,6 @@ const (
 // MAVLINK_MSG_ID_STATE_CORRECTION_LEN 36
 //
 // MAVLINK_MSG_ID_STATE_CORRECTION_CRC 130
-//
-//
 type StateCorrection struct {
 	XERR     float32 // x position error
 	YERR     float32 // y position error
@@ -4280,7 +4122,6 @@ func (m *StateCorrection) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.VZERR)
 }
 
-//
 // MESSAGE RC_CHANNELS
 //
 // MAVLINK_MSG_ID_RC_CHANNELS 65
@@ -4288,8 +4129,6 @@ func (m *StateCorrection) Decode(buf []byte) {
 // MAVLINK_MSG_ID_RC_CHANNELS_LEN 42
 //
 // MAVLINK_MSG_ID_RC_CHANNELS_CRC 118
-//
-//
 type RcChannels struct {
 	TIME_BOOT_MS uint32 // Timestamp (milliseconds since system boot)
 	CHAN1_RAW    uint16 // RC channel 1 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
@@ -4409,7 +4248,6 @@ func (m *RcChannels) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.RSSI)
 }
 
-//
 // MESSAGE REQUEST_DATA_STREAM
 //
 // MAVLINK_MSG_ID_REQUEST_DATA_STREAM 66
@@ -4417,8 +4255,6 @@ func (m *RcChannels) Decode(buf []byte) {
 // MAVLINK_MSG_ID_REQUEST_DATA_STREAM_LEN 6
 //
 // MAVLINK_MSG_ID_REQUEST_DATA_STREAM_CRC 148
-//
-//
 type RequestDataStream struct {
 	REQ_MESSAGE_RATE uint16 // The requested interval between two messages of this type
 	TARGET_SYSTEM    uint8  // The target requested to send the message stream.
@@ -4474,7 +4310,6 @@ func (m *RequestDataStream) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.START_STOP)
 }
 
-//
 // MESSAGE DATA_STREAM
 //
 // MAVLINK_MSG_ID_DATA_STREAM 67
@@ -4482,8 +4317,6 @@ func (m *RequestDataStream) Decode(buf []byte) {
 // MAVLINK_MSG_ID_DATA_STREAM_LEN 4
 //
 // MAVLINK_MSG_ID_DATA_STREAM_CRC 21
-//
-//
 type DataStream struct {
 	MESSAGE_RATE uint16 // The requested interval between two messages of this type
 	STREAM_ID    uint8  // The ID of the requested data stream
@@ -4531,7 +4364,6 @@ func (m *DataStream) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.ON_OFF)
 }
 
-//
 // MESSAGE MANUAL_CONTROL
 //
 // MAVLINK_MSG_ID_MANUAL_CONTROL 69
@@ -4539,8 +4371,6 @@ func (m *DataStream) Decode(buf []byte) {
 // MAVLINK_MSG_ID_MANUAL_CONTROL_LEN 11
 //
 // MAVLINK_MSG_ID_MANUAL_CONTROL_CRC 243
-//
-//
 type ManualControl struct {
 	X       int16  // X-axis, normalized to the range [-1000,1000]. A value of INT16_MAX indicates that this axis is invalid. Generally corresponds to forward(1000)-backward(-1000) movement on a joystick and the pitch of a vehicle.
 	Y       int16  // Y-axis, normalized to the range [-1000,1000]. A value of INT16_MAX indicates that this axis is invalid. Generally corresponds to left(-1000)-right(1000) movement on a joystick and the roll of a vehicle.
@@ -4600,7 +4430,6 @@ func (m *ManualControl) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.TARGET)
 }
 
-//
 // MESSAGE RC_CHANNELS_OVERRIDE
 //
 // MAVLINK_MSG_ID_RC_CHANNELS_OVERRIDE 70
@@ -4608,8 +4437,6 @@ func (m *ManualControl) Decode(buf []byte) {
 // MAVLINK_MSG_ID_RC_CHANNELS_OVERRIDE_LEN 18
 //
 // MAVLINK_MSG_ID_RC_CHANNELS_OVERRIDE_CRC 124
-//
-//
 type RcChannelsOverride struct {
 	CHAN1_RAW        uint16 // RC channel 1 value, in microseconds. A value of UINT16_MAX means to ignore this field.
 	CHAN2_RAW        uint16 // RC channel 2 value, in microseconds. A value of UINT16_MAX means to ignore this field.
@@ -4685,7 +4512,6 @@ func (m *RcChannelsOverride) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
 }
 
-//
 // MESSAGE VFR_HUD
 //
 // MAVLINK_MSG_ID_VFR_HUD 74
@@ -4693,8 +4519,6 @@ func (m *RcChannelsOverride) Decode(buf []byte) {
 // MAVLINK_MSG_ID_VFR_HUD_LEN 20
 //
 // MAVLINK_MSG_ID_VFR_HUD_CRC 20
-//
-//
 type VfrHud struct {
 	AIRSPEED    float32 // Current airspeed in m/s
 	GROUNDSPEED float32 // Current ground speed in m/s
@@ -4754,7 +4578,6 @@ func (m *VfrHud) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.THROTTLE)
 }
 
-//
 // MESSAGE COMMAND_LONG
 //
 // MAVLINK_MSG_ID_COMMAND_LONG 76
@@ -4762,8 +4585,6 @@ func (m *VfrHud) Decode(buf []byte) {
 // MAVLINK_MSG_ID_COMMAND_LONG_LEN 33
 //
 // MAVLINK_MSG_ID_COMMAND_LONG_CRC 152
-//
-//
 type CommandLong struct {
 	PARAM1           float32 // Parameter 1, as defined by MAV_CMD enum.
 	PARAM2           float32 // Parameter 2, as defined by MAV_CMD enum.
@@ -4843,7 +4664,6 @@ func (m *CommandLong) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.CONFIRMATION)
 }
 
-//
 // MESSAGE COMMAND_ACK
 //
 // MAVLINK_MSG_ID_COMMAND_ACK 77
@@ -4851,8 +4671,6 @@ func (m *CommandLong) Decode(buf []byte) {
 // MAVLINK_MSG_ID_COMMAND_ACK_LEN 3
 //
 // MAVLINK_MSG_ID_COMMAND_ACK_CRC 143
-//
-//
 type CommandAck struct {
 	COMMAND uint16 // Command ID, as defined by MAV_CMD enum.
 	RESULT  uint8  // See MAV_RESULT enum
@@ -4896,7 +4714,6 @@ func (m *CommandAck) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.RESULT)
 }
 
-//
 // MESSAGE ROLL_PITCH_YAW_RATES_THRUST_SETPOINT
 //
 // MAVLINK_MSG_ID_ROLL_PITCH_YAW_RATES_THRUST_SETPOINT 80
@@ -4904,8 +4721,6 @@ func (m *CommandAck) Decode(buf []byte) {
 // MAVLINK_MSG_ID_ROLL_PITCH_YAW_RATES_THRUST_SETPOINT_LEN 20
 //
 // MAVLINK_MSG_ID_ROLL_PITCH_YAW_RATES_THRUST_SETPOINT_CRC 127
-//
-//
 type RollPitchYawRatesThrustSetpoint struct {
 	TIME_BOOT_MS uint32  // Timestamp in milliseconds since system boot
 	ROLL_RATE    float32 // Desired roll rate in radians per second
@@ -4961,7 +4776,6 @@ func (m *RollPitchYawRatesThrustSetpoint) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.THRUST)
 }
 
-//
 // MESSAGE MANUAL_SETPOINT
 //
 // MAVLINK_MSG_ID_MANUAL_SETPOINT 81
@@ -4969,8 +4783,6 @@ func (m *RollPitchYawRatesThrustSetpoint) Decode(buf []byte) {
 // MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN 22
 //
 // MAVLINK_MSG_ID_MANUAL_SETPOINT_CRC 106
-//
-//
 type ManualSetpoint struct {
 	TIME_BOOT_MS           uint32  // Timestamp in milliseconds since system boot
 	ROLL                   float32 // Desired roll rate in radians per second
@@ -5034,7 +4846,6 @@ func (m *ManualSetpoint) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.MANUAL_OVERRIDE_SWITCH)
 }
 
-//
 // MESSAGE ATTITUDE_SETPOINT_EXTERNAL
 //
 // MAVLINK_MSG_ID_ATTITUDE_SETPOINT_EXTERNAL 82
@@ -5042,8 +4853,6 @@ func (m *ManualSetpoint) Decode(buf []byte) {
 // MAVLINK_MSG_ID_ATTITUDE_SETPOINT_EXTERNAL_LEN 39
 //
 // MAVLINK_MSG_ID_ATTITUDE_SETPOINT_EXTERNAL_CRC 147
-//
-//
 type AttitudeSetpointExternal struct {
 	TIME_BOOT_MS     uint32     // Timestamp in milliseconds since system boot
 	Q                [4]float32 // Attitude quaternion (w, x, y, z order, zero-rotation is 1, 0, 0, 0)
@@ -5119,7 +4928,6 @@ const (
 	MAVLINK_MSG_ATTITUDE_SETPOINT_EXTERNAL_FIELD_q_LEN = 4
 )
 
-//
 // MESSAGE LOCAL_NED_POSITION_SETPOINT_EXTERNAL
 //
 // MAVLINK_MSG_ID_LOCAL_NED_POSITION_SETPOINT_EXTERNAL 83
@@ -5127,8 +4935,6 @@ const (
 // MAVLINK_MSG_ID_LOCAL_NED_POSITION_SETPOINT_EXTERNAL_LEN 45
 //
 // MAVLINK_MSG_ID_LOCAL_NED_POSITION_SETPOINT_EXTERNAL_CRC 211
-//
-//
 type LocalNedPositionSetpointExternal struct {
 	TIME_BOOT_MS     uint32  // Timestamp in milliseconds since system boot
 	X                float32 // X Position in NED frame in meters
@@ -5220,7 +5026,6 @@ func (m *LocalNedPositionSetpointExternal) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.COORDINATE_FRAME)
 }
 
-//
 // MESSAGE GLOBAL_POSITION_SETPOINT_EXTERNAL_INT
 //
 // MAVLINK_MSG_ID_GLOBAL_POSITION_SETPOINT_EXTERNAL_INT 84
@@ -5228,8 +5033,6 @@ func (m *LocalNedPositionSetpointExternal) Decode(buf []byte) {
 // MAVLINK_MSG_ID_GLOBAL_POSITION_SETPOINT_EXTERNAL_INT_LEN 44
 //
 // MAVLINK_MSG_ID_GLOBAL_POSITION_SETPOINT_EXTERNAL_INT_CRC 198
-//
-//
 type GlobalPositionSetpointExternalInt struct {
 	TIME_BOOT_MS     uint32  // Timestamp in milliseconds since system boot. The rationale for the timestamp in the setpoint is to allow the system to compensate for the transport delay of the setpoint. This allows the system to compensate processing latency.
 	LAT_INT          int32   // X Position in WGS84 frame in 1e7 * meters
@@ -5317,7 +5120,6 @@ func (m *GlobalPositionSetpointExternalInt) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
 }
 
-//
 // MESSAGE LOCAL_POSITION_NED_SYSTEM_GLOBAL_OFFSET
 //
 // MAVLINK_MSG_ID_LOCAL_POSITION_NED_SYSTEM_GLOBAL_OFFSET 89
@@ -5325,8 +5127,6 @@ func (m *GlobalPositionSetpointExternalInt) Decode(buf []byte) {
 // MAVLINK_MSG_ID_LOCAL_POSITION_NED_SYSTEM_GLOBAL_OFFSET_LEN 28
 //
 // MAVLINK_MSG_ID_LOCAL_POSITION_NED_SYSTEM_GLOBAL_OFFSET_CRC 231
-//
-//
 type LocalPositionNedSystemGlobalOffset struct {
 	TIME_BOOT_MS uint32  // Timestamp (milliseconds since system boot)
 	X            float32 // X Position
@@ -5390,7 +5190,6 @@ func (m *LocalPositionNedSystemGlobalOffset) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.YAW)
 }
 
-//
 // MESSAGE HIL_STATE
 //
 // MAVLINK_MSG_ID_HIL_STATE 90
@@ -5398,8 +5197,6 @@ func (m *LocalPositionNedSystemGlobalOffset) Decode(buf []byte) {
 // MAVLINK_MSG_ID_HIL_STATE_LEN 56
 //
 // MAVLINK_MSG_ID_HIL_STATE_CRC 183
-//
-//
 type HilState struct {
 	TIME_USEC  uint64  // Timestamp (microseconds since UNIX epoch or microseconds since system boot)
 	ROLL       float32 // Roll angle (rad)
@@ -5499,7 +5296,6 @@ func (m *HilState) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.ZACC)
 }
 
-//
 // MESSAGE HIL_CONTROLS
 //
 // MAVLINK_MSG_ID_HIL_CONTROLS 91
@@ -5507,8 +5303,6 @@ func (m *HilState) Decode(buf []byte) {
 // MAVLINK_MSG_ID_HIL_CONTROLS_LEN 42
 //
 // MAVLINK_MSG_ID_HIL_CONTROLS_CRC 63
-//
-//
 type HilControls struct {
 	TIME_USEC      uint64  // Timestamp (microseconds since UNIX epoch or microseconds since system boot)
 	ROLL_AILERONS  float32 // Control output -1 .. 1
@@ -5588,7 +5382,6 @@ func (m *HilControls) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.NAV_MODE)
 }
 
-//
 // MESSAGE HIL_RC_INPUTS_RAW
 //
 // MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW 92
@@ -5596,8 +5389,6 @@ func (m *HilControls) Decode(buf []byte) {
 // MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_LEN 33
 //
 // MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_CRC 54
-//
-//
 type HilRcInputsRaw struct {
 	TIME_USEC  uint64 // Timestamp (microseconds since UNIX epoch or microseconds since system boot)
 	CHAN1_RAW  uint16 // RC channel 1 value, in microseconds
@@ -5689,7 +5480,6 @@ func (m *HilRcInputsRaw) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.RSSI)
 }
 
-//
 // MESSAGE OPTICAL_FLOW
 //
 // MAVLINK_MSG_ID_OPTICAL_FLOW 100
@@ -5697,8 +5487,6 @@ func (m *HilRcInputsRaw) Decode(buf []byte) {
 // MAVLINK_MSG_ID_OPTICAL_FLOW_LEN 26
 //
 // MAVLINK_MSG_ID_OPTICAL_FLOW_CRC 175
-//
-//
 type OpticalFlow struct {
 	TIME_USEC       uint64  // Timestamp (UNIX)
 	FLOW_COMP_M_X   float32 // Flow in meters in x-sensor direction, angular-speed compensated
@@ -5766,7 +5554,6 @@ func (m *OpticalFlow) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.QUALITY)
 }
 
-//
 // MESSAGE GLOBAL_VISION_POSITION_ESTIMATE
 //
 // MAVLINK_MSG_ID_GLOBAL_VISION_POSITION_ESTIMATE 101
@@ -5774,8 +5561,6 @@ func (m *OpticalFlow) Decode(buf []byte) {
 // MAVLINK_MSG_ID_GLOBAL_VISION_POSITION_ESTIMATE_LEN 32
 //
 // MAVLINK_MSG_ID_GLOBAL_VISION_POSITION_ESTIMATE_CRC 102
-//
-//
 type GlobalVisionPositionEstimate struct {
 	USEC  uint64  // Timestamp (microseconds, synced to UNIX time or since system boot)
 	X     float32 // Global X position
@@ -5839,7 +5624,6 @@ func (m *GlobalVisionPositionEstimate) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.YAW)
 }
 
-//
 // MESSAGE VISION_POSITION_ESTIMATE
 //
 // MAVLINK_MSG_ID_VISION_POSITION_ESTIMATE 102
@@ -5847,8 +5631,6 @@ func (m *GlobalVisionPositionEstimate) Decode(buf []byte) {
 // MAVLINK_MSG_ID_VISION_POSITION_ESTIMATE_LEN 32
 //
 // MAVLINK_MSG_ID_VISION_POSITION_ESTIMATE_CRC 158
-//
-//
 type VisionPositionEstimate struct {
 	USEC  uint64  // Timestamp (microseconds, synced to UNIX time or since system boot)
 	X     float32 // Global X position
@@ -5912,7 +5694,6 @@ func (m *VisionPositionEstimate) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.YAW)
 }
 
-//
 // MESSAGE VISION_SPEED_ESTIMATE
 //
 // MAVLINK_MSG_ID_VISION_SPEED_ESTIMATE 103
@@ -5920,8 +5701,6 @@ func (m *VisionPositionEstimate) Decode(buf []byte) {
 // MAVLINK_MSG_ID_VISION_SPEED_ESTIMATE_LEN 20
 //
 // MAVLINK_MSG_ID_VISION_SPEED_ESTIMATE_CRC 208
-//
-//
 type VisionSpeedEstimate struct {
 	USEC uint64  // Timestamp (microseconds, synced to UNIX time or since system boot)
 	X    float32 // Global X speed
@@ -5973,7 +5752,6 @@ func (m *VisionSpeedEstimate) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.Z)
 }
 
-//
 // MESSAGE VICON_POSITION_ESTIMATE
 //
 // MAVLINK_MSG_ID_VICON_POSITION_ESTIMATE 104
@@ -5981,8 +5759,6 @@ func (m *VisionSpeedEstimate) Decode(buf []byte) {
 // MAVLINK_MSG_ID_VICON_POSITION_ESTIMATE_LEN 32
 //
 // MAVLINK_MSG_ID_VICON_POSITION_ESTIMATE_CRC 56
-//
-//
 type ViconPositionEstimate struct {
 	USEC  uint64  // Timestamp (microseconds, synced to UNIX time or since system boot)
 	X     float32 // Global X position
@@ -6046,7 +5822,6 @@ func (m *ViconPositionEstimate) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.YAW)
 }
 
-//
 // MESSAGE HIGHRES_IMU
 //
 // MAVLINK_MSG_ID_HIGHRES_IMU 105
@@ -6054,8 +5829,6 @@ func (m *ViconPositionEstimate) Decode(buf []byte) {
 // MAVLINK_MSG_ID_HIGHRES_IMU_LEN 62
 //
 // MAVLINK_MSG_ID_HIGHRES_IMU_CRC 93
-//
-//
 type HighresImu struct {
 	TIME_USEC      uint64  // Timestamp (microseconds, synced to UNIX time or since system boot)
 	XACC           float32 // X acceleration (m/s^2)
@@ -6151,7 +5924,6 @@ func (m *HighresImu) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.FIELDS_UPDATED)
 }
 
-//
 // MESSAGE OMNIDIRECTIONAL_FLOW
 //
 // MAVLINK_MSG_ID_OMNIDIRECTIONAL_FLOW 106
@@ -6159,8 +5931,6 @@ func (m *HighresImu) Decode(buf []byte) {
 // MAVLINK_MSG_ID_OMNIDIRECTIONAL_FLOW_LEN 54
 //
 // MAVLINK_MSG_ID_OMNIDIRECTIONAL_FLOW_CRC 211
-//
-//
 type OmnidirectionalFlow struct {
 	TIME_USEC        uint64    // Timestamp (microseconds, synced to UNIX time or since system boot)
 	FRONT_DISTANCE_M float32   // Front distance in meters. Positive value (including zero): distance known. Negative value: Unknown distance
@@ -6225,7 +5995,6 @@ const (
 	MAVLINK_MSG_OMNIDIRECTIONAL_FLOW_FIELD_right_LEN = 10
 )
 
-//
 // MESSAGE HIL_SENSOR
 //
 // MAVLINK_MSG_ID_HIL_SENSOR 107
@@ -6233,8 +6002,6 @@ const (
 // MAVLINK_MSG_ID_HIL_SENSOR_LEN 64
 //
 // MAVLINK_MSG_ID_HIL_SENSOR_CRC 108
-//
-//
 type HilSensor struct {
 	TIME_USEC      uint64  // Timestamp (microseconds, synced to UNIX time or since system boot)
 	XACC           float32 // X acceleration (m/s^2)
@@ -6330,7 +6097,6 @@ func (m *HilSensor) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.FIELDS_UPDATED)
 }
 
-//
 // MESSAGE SIM_STATE
 //
 // MAVLINK_MSG_ID_SIM_STATE 108
@@ -6338,8 +6104,6 @@ func (m *HilSensor) Decode(buf []byte) {
 // MAVLINK_MSG_ID_SIM_STATE_LEN 84
 //
 // MAVLINK_MSG_ID_SIM_STATE_CRC 32
-//
-//
 type SimState struct {
 	Q1           float32 // True attitude quaternion component 1, w (1 in null-rotation)
 	Q2           float32 // True attitude quaternion component 2, x (0 in null-rotation)
@@ -6459,7 +6223,6 @@ func (m *SimState) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.VD)
 }
 
-//
 // MESSAGE RADIO_STATUS
 //
 // MAVLINK_MSG_ID_RADIO_STATUS 109
@@ -6467,8 +6230,6 @@ func (m *SimState) Decode(buf []byte) {
 // MAVLINK_MSG_ID_RADIO_STATUS_LEN 9
 //
 // MAVLINK_MSG_ID_RADIO_STATUS_CRC 185
-//
-//
 type RadioStatus struct {
 	RXERRORS uint16 // receive errors
 	FIXED    uint16 // count of error corrected packets
@@ -6532,7 +6293,6 @@ func (m *RadioStatus) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.REMNOISE)
 }
 
-//
 // MESSAGE FILE_TRANSFER_START
 //
 // MAVLINK_MSG_ID_FILE_TRANSFER_START 110
@@ -6540,8 +6300,6 @@ func (m *RadioStatus) Decode(buf []byte) {
 // MAVLINK_MSG_ID_FILE_TRANSFER_START_LEN 254
 //
 // MAVLINK_MSG_ID_FILE_TRANSFER_START_CRC 235
-//
-//
 type FileTransferStart struct {
 	TRANSFER_UID uint64     // Unique transfer ID
 	FILE_SIZE    uint32     // File size in bytes
@@ -6601,7 +6359,6 @@ const (
 	MAVLINK_MSG_FILE_TRANSFER_START_FIELD_dest_path_LEN = 240
 )
 
-//
 // MESSAGE FILE_TRANSFER_DIR_LIST
 //
 // MAVLINK_MSG_ID_FILE_TRANSFER_DIR_LIST 111
@@ -6609,8 +6366,6 @@ const (
 // MAVLINK_MSG_ID_FILE_TRANSFER_DIR_LIST_LEN 249
 //
 // MAVLINK_MSG_ID_FILE_TRANSFER_DIR_LIST_CRC 93
-//
-//
 type FileTransferDirList struct {
 	TRANSFER_UID uint64     // Unique transfer ID
 	DIR_PATH     [240]uint8 // Directory path to list
@@ -6662,7 +6417,6 @@ const (
 	MAVLINK_MSG_FILE_TRANSFER_DIR_LIST_FIELD_dir_path_LEN = 240
 )
 
-//
 // MESSAGE FILE_TRANSFER_RES
 //
 // MAVLINK_MSG_ID_FILE_TRANSFER_RES 112
@@ -6670,8 +6424,6 @@ const (
 // MAVLINK_MSG_ID_FILE_TRANSFER_RES_LEN 9
 //
 // MAVLINK_MSG_ID_FILE_TRANSFER_RES_CRC 124
-//
-//
 type FileTransferRes struct {
 	TRANSFER_UID uint64 // Unique transfer ID
 	RESULT       uint8  // 0: OK, 1: not permitted, 2: bad path / file name, 3: no space left on device
@@ -6715,7 +6467,6 @@ func (m *FileTransferRes) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.RESULT)
 }
 
-//
 // MESSAGE HIL_GPS
 //
 // MAVLINK_MSG_ID_HIL_GPS 113
@@ -6723,8 +6474,6 @@ func (m *FileTransferRes) Decode(buf []byte) {
 // MAVLINK_MSG_ID_HIL_GPS_LEN 36
 //
 // MAVLINK_MSG_ID_HIL_GPS_CRC 124
-//
-//
 type HilGps struct {
 	TIME_USEC          uint64 // Timestamp (microseconds since UNIX epoch or microseconds since system boot)
 	LAT                int32  // Latitude (WGS84), in degrees * 1E7
@@ -6812,7 +6561,6 @@ func (m *HilGps) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.SATELLITES_VISIBLE)
 }
 
-//
 // MESSAGE HIL_OPTICAL_FLOW
 //
 // MAVLINK_MSG_ID_HIL_OPTICAL_FLOW 114
@@ -6820,8 +6568,6 @@ func (m *HilGps) Decode(buf []byte) {
 // MAVLINK_MSG_ID_HIL_OPTICAL_FLOW_LEN 26
 //
 // MAVLINK_MSG_ID_HIL_OPTICAL_FLOW_CRC 119
-//
-//
 type HilOpticalFlow struct {
 	TIME_USEC       uint64  // Timestamp (UNIX)
 	FLOW_COMP_M_X   float32 // Flow in meters in x-sensor direction, angular-speed compensated
@@ -6889,7 +6635,6 @@ func (m *HilOpticalFlow) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.QUALITY)
 }
 
-//
 // MESSAGE HIL_STATE_QUATERNION
 //
 // MAVLINK_MSG_ID_HIL_STATE_QUATERNION 115
@@ -6897,8 +6642,6 @@ func (m *HilOpticalFlow) Decode(buf []byte) {
 // MAVLINK_MSG_ID_HIL_STATE_QUATERNION_LEN 64
 //
 // MAVLINK_MSG_ID_HIL_STATE_QUATERNION_CRC 4
-//
-//
 type HilStateQuaternion struct {
 	TIME_USEC           uint64     // Timestamp (microseconds since UNIX epoch or microseconds since system boot)
 	ATTITUDE_QUATERNION [4]float32 // Vehicle attitude expressed as normalized quaternion in w, x, y, z order (with 1 0 0 0 being the null-rotation)
@@ -7002,7 +6745,6 @@ const (
 	MAVLINK_MSG_HIL_STATE_QUATERNION_FIELD_attitude_quaternion_LEN = 4
 )
 
-//
 // MESSAGE SCALED_IMU2
 //
 // MAVLINK_MSG_ID_SCALED_IMU2 116
@@ -7010,8 +6752,6 @@ const (
 // MAVLINK_MSG_ID_SCALED_IMU2_LEN 22
 //
 // MAVLINK_MSG_ID_SCALED_IMU2_CRC 76
-//
-//
 type ScaledImu2 struct {
 	TIME_BOOT_MS uint32 // Timestamp (milliseconds since system boot)
 	XACC         int16  // X acceleration (mg)
@@ -7087,7 +6827,6 @@ func (m *ScaledImu2) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.ZMAG)
 }
 
-//
 // MESSAGE LOG_REQUEST_LIST
 //
 // MAVLINK_MSG_ID_LOG_REQUEST_LIST 117
@@ -7095,8 +6834,6 @@ func (m *ScaledImu2) Decode(buf []byte) {
 // MAVLINK_MSG_ID_LOG_REQUEST_LIST_LEN 6
 //
 // MAVLINK_MSG_ID_LOG_REQUEST_LIST_CRC 128
-//
-//
 type LogRequestList struct {
 	START            uint16 // First log id (0 for first available)
 	END              uint16 // Last log id (0xffff for last available)
@@ -7148,7 +6885,6 @@ func (m *LogRequestList) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
 }
 
-//
 // MESSAGE LOG_ENTRY
 //
 // MAVLINK_MSG_ID_LOG_ENTRY 118
@@ -7156,8 +6892,6 @@ func (m *LogRequestList) Decode(buf []byte) {
 // MAVLINK_MSG_ID_LOG_ENTRY_LEN 14
 //
 // MAVLINK_MSG_ID_LOG_ENTRY_CRC 56
-//
-//
 type LogEntry struct {
 	TIME_UTC     uint32 // UTC timestamp of log in seconds since 1970, or 0 if not available
 	SIZE         uint32 // Size of the log (may be approximate) in bytes
@@ -7213,7 +6947,6 @@ func (m *LogEntry) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.LAST_LOG_NUM)
 }
 
-//
 // MESSAGE LOG_REQUEST_DATA
 //
 // MAVLINK_MSG_ID_LOG_REQUEST_DATA 119
@@ -7221,8 +6954,6 @@ func (m *LogEntry) Decode(buf []byte) {
 // MAVLINK_MSG_ID_LOG_REQUEST_DATA_LEN 12
 //
 // MAVLINK_MSG_ID_LOG_REQUEST_DATA_CRC 116
-//
-//
 type LogRequestData struct {
 	OFS              uint32 // Offset into the log
 	COUNT            uint32 // Number of bytes
@@ -7278,7 +7009,6 @@ func (m *LogRequestData) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
 }
 
-//
 // MESSAGE LOG_DATA
 //
 // MAVLINK_MSG_ID_LOG_DATA 120
@@ -7286,8 +7016,6 @@ func (m *LogRequestData) Decode(buf []byte) {
 // MAVLINK_MSG_ID_LOG_DATA_LEN 97
 //
 // MAVLINK_MSG_ID_LOG_DATA_CRC 134
-//
-//
 type LogData struct {
 	OFS   uint32    // Offset into the log
 	ID    uint16    // Log id (from LOG_ENTRY reply)
@@ -7343,7 +7071,6 @@ const (
 	MAVLINK_MSG_LOG_DATA_FIELD_data_LEN = 90
 )
 
-//
 // MESSAGE LOG_ERASE
 //
 // MAVLINK_MSG_ID_LOG_ERASE 121
@@ -7351,8 +7078,6 @@ const (
 // MAVLINK_MSG_ID_LOG_ERASE_LEN 2
 //
 // MAVLINK_MSG_ID_LOG_ERASE_CRC 237
-//
-//
 type LogErase struct {
 	TARGET_SYSTEM    uint8 // System ID
 	TARGET_COMPONENT uint8 // Component ID
@@ -7396,7 +7121,6 @@ func (m *LogErase) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
 }
 
-//
 // MESSAGE LOG_REQUEST_END
 //
 // MAVLINK_MSG_ID_LOG_REQUEST_END 122
@@ -7404,8 +7128,6 @@ func (m *LogErase) Decode(buf []byte) {
 // MAVLINK_MSG_ID_LOG_REQUEST_END_LEN 2
 //
 // MAVLINK_MSG_ID_LOG_REQUEST_END_CRC 203
-//
-//
 type LogRequestEnd struct {
 	TARGET_SYSTEM    uint8 // System ID
 	TARGET_COMPONENT uint8 // Component ID
@@ -7449,7 +7171,6 @@ func (m *LogRequestEnd) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
 }
 
-//
 // MESSAGE GPS_INJECT_DATA
 //
 // MAVLINK_MSG_ID_GPS_INJECT_DATA 123
@@ -7457,8 +7178,6 @@ func (m *LogRequestEnd) Decode(buf []byte) {
 // MAVLINK_MSG_ID_GPS_INJECT_DATA_LEN 113
 //
 // MAVLINK_MSG_ID_GPS_INJECT_DATA_CRC 250
-//
-//
 type GpsInjectData struct {
 	TARGET_SYSTEM    uint8      // System ID
 	TARGET_COMPONENT uint8      // Component ID
@@ -7514,7 +7233,6 @@ const (
 	MAVLINK_MSG_GPS_INJECT_DATA_FIELD_data_LEN = 110
 )
 
-//
 // MESSAGE GPS2_RAW
 //
 // MAVLINK_MSG_ID_GPS2_RAW 124
@@ -7522,8 +7240,6 @@ const (
 // MAVLINK_MSG_ID_GPS2_RAW_LEN 35
 //
 // MAVLINK_MSG_ID_GPS2_RAW_CRC 87
-//
-//
 type Gps2Raw struct {
 	TIME_USEC          uint64 // Timestamp (microseconds since UNIX epoch or microseconds since system boot)
 	LAT                int32  // Latitude (WGS84), in degrees * 1E7
@@ -7607,7 +7323,6 @@ func (m *Gps2Raw) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.DGPS_NUMCH)
 }
 
-//
 // MESSAGE POWER_STATUS
 //
 // MAVLINK_MSG_ID_POWER_STATUS 125
@@ -7615,8 +7330,6 @@ func (m *Gps2Raw) Decode(buf []byte) {
 // MAVLINK_MSG_ID_POWER_STATUS_LEN 6
 //
 // MAVLINK_MSG_ID_POWER_STATUS_CRC 203
-//
-//
 type PowerStatus struct {
 	VCC    uint16 // 5V rail voltage in millivolts
 	VSERVO uint16 // servo rail voltage in millivolts
@@ -7664,7 +7377,6 @@ func (m *PowerStatus) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.FLAGS)
 }
 
-//
 // MESSAGE SERIAL_CONTROL
 //
 // MAVLINK_MSG_ID_SERIAL_CONTROL 126
@@ -7672,8 +7384,6 @@ func (m *PowerStatus) Decode(buf []byte) {
 // MAVLINK_MSG_ID_SERIAL_CONTROL_LEN 79
 //
 // MAVLINK_MSG_ID_SERIAL_CONTROL_CRC 220
-//
-//
 type SerialControl struct {
 	BAUDRATE uint32    // Baudrate of transfer. Zero means no change.
 	TIMEOUT  uint16    // Timeout for reply data in milliseconds
@@ -7737,7 +7447,6 @@ const (
 	MAVLINK_MSG_SERIAL_CONTROL_FIELD_data_LEN = 70
 )
 
-//
 // MESSAGE GPS_RTK
 //
 // MAVLINK_MSG_ID_GPS_RTK 127
@@ -7745,8 +7454,6 @@ const (
 // MAVLINK_MSG_ID_GPS_RTK_LEN 35
 //
 // MAVLINK_MSG_ID_GPS_RTK_CRC 25
-//
-//
 type GpsRtk struct {
 	TIME_LAST_BASELINE_MS uint32 // Time since boot of last baseline message received in ms.
 	TOW                   uint32 // GPS Time of Week of last baseline
@@ -7834,7 +7541,6 @@ func (m *GpsRtk) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.BASELINE_COORDS_TYPE)
 }
 
-//
 // MESSAGE GPS2_RTK
 //
 // MAVLINK_MSG_ID_GPS2_RTK 128
@@ -7842,8 +7548,6 @@ func (m *GpsRtk) Decode(buf []byte) {
 // MAVLINK_MSG_ID_GPS2_RTK_LEN 35
 //
 // MAVLINK_MSG_ID_GPS2_RTK_CRC 226
-//
-//
 type Gps2Rtk struct {
 	TIME_LAST_BASELINE_MS uint32 // Time since boot of last baseline message received in ms.
 	TOW                   uint32 // GPS Time of Week of last baseline
@@ -7931,7 +7635,6 @@ func (m *Gps2Rtk) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.BASELINE_COORDS_TYPE)
 }
 
-//
 // MESSAGE DATA_TRANSMISSION_HANDSHAKE
 //
 // MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE 130
@@ -7939,8 +7642,6 @@ func (m *Gps2Rtk) Decode(buf []byte) {
 // MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE_LEN 13
 //
 // MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE_CRC 29
-//
-//
 type DataTransmissionHandshake struct {
 	SIZE        uint32 // total data size in bytes (set on ACK only)
 	WIDTH       uint16 // Width of a matrix or image
@@ -8004,7 +7705,6 @@ func (m *DataTransmissionHandshake) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.JPG_QUALITY)
 }
 
-//
 // MESSAGE ENCAPSULATED_DATA
 //
 // MAVLINK_MSG_ID_ENCAPSULATED_DATA 131
@@ -8012,8 +7712,6 @@ func (m *DataTransmissionHandshake) Decode(buf []byte) {
 // MAVLINK_MSG_ID_ENCAPSULATED_DATA_LEN 255
 //
 // MAVLINK_MSG_ID_ENCAPSULATED_DATA_CRC 223
-//
-//
 type EncapsulatedData struct {
 	SEQNR uint16     // sequence number (starting with 0 on every transmission)
 	DATA  [253]uint8 // image data bytes
@@ -8061,7 +7759,6 @@ const (
 	MAVLINK_MSG_ENCAPSULATED_DATA_FIELD_data_LEN = 253
 )
 
-//
 // MESSAGE DISTANCE_SENSOR
 //
 // MAVLINK_MSG_ID_DISTANCE_SENSOR 132
@@ -8069,8 +7766,6 @@ const (
 // MAVLINK_MSG_ID_DISTANCE_SENSOR_LEN 14
 //
 // MAVLINK_MSG_ID_DISTANCE_SENSOR_CRC 85
-//
-//
 type DistanceSensor struct {
 	TIME_BOOT_MS     uint32 // Time since system boot
 	MIN_DISTANCE     uint16 // Minimum distance the sensor can measure in centimeters
@@ -8138,7 +7833,6 @@ func (m *DistanceSensor) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.COVARIANCE)
 }
 
-//
 // MESSAGE TERRAIN_REQUEST
 //
 // MAVLINK_MSG_ID_TERRAIN_REQUEST 133
@@ -8146,8 +7840,6 @@ func (m *DistanceSensor) Decode(buf []byte) {
 // MAVLINK_MSG_ID_TERRAIN_REQUEST_LEN 18
 //
 // MAVLINK_MSG_ID_TERRAIN_REQUEST_CRC 6
-//
-//
 type TerrainRequest struct {
 	MASK         uint64 // Bitmask of requested 4x4 grids (row major 8x7 array of grids, 56 bits)
 	LAT          int32  // Latitude of SW corner of first grid (degrees *10^7)
@@ -8199,7 +7891,6 @@ func (m *TerrainRequest) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.GRID_SPACING)
 }
 
-//
 // MESSAGE TERRAIN_DATA
 //
 // MAVLINK_MSG_ID_TERRAIN_DATA 134
@@ -8207,8 +7898,6 @@ func (m *TerrainRequest) Decode(buf []byte) {
 // MAVLINK_MSG_ID_TERRAIN_DATA_LEN 43
 //
 // MAVLINK_MSG_ID_TERRAIN_DATA_CRC 229
-//
-//
 type TerrainData struct {
 	LAT          int32     // Latitude of SW corner of first grid (degrees *10^7)
 	LON          int32     // Longitude of SW corner of first grid (in degrees *10^7)
@@ -8268,7 +7957,6 @@ const (
 	MAVLINK_MSG_TERRAIN_DATA_FIELD_data_LEN = 16
 )
 
-//
 // MESSAGE TERRAIN_CHECK
 //
 // MAVLINK_MSG_ID_TERRAIN_CHECK 135
@@ -8276,8 +7964,6 @@ const (
 // MAVLINK_MSG_ID_TERRAIN_CHECK_LEN 8
 //
 // MAVLINK_MSG_ID_TERRAIN_CHECK_CRC 203
-//
-//
 type TerrainCheck struct {
 	LAT int32 // Latitude (degrees *10^7)
 	LON int32 // Longitude (degrees *10^7)
@@ -8321,7 +8007,6 @@ func (m *TerrainCheck) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.LON)
 }
 
-//
 // MESSAGE TERRAIN_REPORT
 //
 // MAVLINK_MSG_ID_TERRAIN_REPORT 136
@@ -8329,8 +8014,6 @@ func (m *TerrainCheck) Decode(buf []byte) {
 // MAVLINK_MSG_ID_TERRAIN_REPORT_LEN 22
 //
 // MAVLINK_MSG_ID_TERRAIN_REPORT_CRC 1
-//
-//
 type TerrainReport struct {
 	LAT            int32   // Latitude (degrees *10^7)
 	LON            int32   // Longitude (degrees *10^7)
@@ -8394,7 +8077,6 @@ func (m *TerrainReport) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.LOADED)
 }
 
-//
 // MESSAGE BATTERY_STATUS
 //
 // MAVLINK_MSG_ID_BATTERY_STATUS 147
@@ -8402,8 +8084,6 @@ func (m *TerrainReport) Decode(buf []byte) {
 // MAVLINK_MSG_ID_BATTERY_STATUS_LEN 24
 //
 // MAVLINK_MSG_ID_BATTERY_STATUS_CRC 177
-//
-//
 type BatteryStatus struct {
 	CURRENT_CONSUMED  int32  // Consumed charge, in milliampere hours (1 = 1 mAh), -1: autopilot does not provide mAh consumption estimate
 	ENERGY_CONSUMED   int32  // Consumed energy, in 100*Joules (integrated U*I*dt)  (1 = 100 Joule), -1: autopilot does not provide energy consumption estimate
@@ -8483,7 +8163,6 @@ func (m *BatteryStatus) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.BATTERY_REMAINING)
 }
 
-//
 // MESSAGE SETPOINT_8DOF
 //
 // MAVLINK_MSG_ID_SETPOINT_8DOF 148
@@ -8491,8 +8170,6 @@ func (m *BatteryStatus) Decode(buf []byte) {
 // MAVLINK_MSG_ID_SETPOINT_8DOF_LEN 33
 //
 // MAVLINK_MSG_ID_SETPOINT_8DOF_CRC 241
-//
-//
 type Setpoint8Dof struct {
 	VAL1          float32 // Value 1
 	VAL2          float32 // Value 2
@@ -8564,7 +8241,6 @@ func (m *Setpoint8Dof) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM)
 }
 
-//
 // MESSAGE SETPOINT_6DOF
 //
 // MAVLINK_MSG_ID_SETPOINT_6DOF 149
@@ -8572,8 +8248,6 @@ func (m *Setpoint8Dof) Decode(buf []byte) {
 // MAVLINK_MSG_ID_SETPOINT_6DOF_LEN 25
 //
 // MAVLINK_MSG_ID_SETPOINT_6DOF_CRC 15
-//
-//
 type Setpoint6Dof struct {
 	TRANS_X       float32 // Translational Component in x
 	TRANS_Y       float32 // Translational Component in y
@@ -8637,7 +8311,6 @@ func (m *Setpoint6Dof) Decode(buf []byte) {
 	binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM)
 }
 
-//
 // MESSAGE MEMORY_VECT
 //
 // MAVLINK_MSG_ID_MEMORY_VECT 249
@@ -8645,8 +8318,6 @@ func (m *Setpoint6Dof) Decode(buf []byte) {
 // MAVLINK_MSG_ID_MEMORY_VECT_LEN 36
 //
 // MAVLINK_MSG_ID_MEMORY_VECT_CRC 204
-//
-//
 type MemoryVect struct {
 	ADDRESS uint16   // Starting address of the debug variables
 	VER     uint8    // Version code of the type variable. 0=unknown, type ignored and assumed int16_t. 1=as below
@@ -8702,7 +8373,6 @@ const (
 	MAVLINK_MSG_MEMORY_VECT_FIELD_value_LEN = 32
 )
 
-//
 // MESSAGE DEBUG_VECT
 //
 // MAVLINK_MSG_ID_DEBUG_VECT 250
@@ -8710,8 +8380,6 @@ const (
 // MAVLINK_MSG_ID_DEBUG_VECT_LEN 30
 //
 // MAVLINK_MSG_ID_DEBUG_VECT_CRC 49
-//
-//
 type DebugVect struct {
 	TIME_USEC uint64    // Timestamp
 	X         float32   // x
@@ -8771,7 +8439,6 @@ const (
 	MAVLINK_MSG_DEBUG_VECT_FIELD_name_LEN = 10
 )
 
-//
 // MESSAGE NAMED_VALUE_FLOAT
 //
 // MAVLINK_MSG_ID_NAMED_VALUE_FLOAT 251
@@ -8779,8 +8446,6 @@ const (
 // MAVLINK_MSG_ID_NAMED_VALUE_FLOAT_LEN 18
 //
 // MAVLINK_MSG_ID_NAMED_VALUE_FLOAT_CRC 170
-//
-//
 type NamedValueFloat struct {
 	TIME_BOOT_MS uint32    // Timestamp (milliseconds since system boot)
 	VALUE        float32   // Floating point value
@@ -8832,7 +8497,6 @@ const (
 	MAVLINK_MSG_NAMED_VALUE_FLOAT_FIELD_name_LEN = 10
 )
 
-//
 // MESSAGE NAMED_VALUE_INT
 //
 // MAVLINK_MSG_ID_NAMED_VALUE_INT 252
@@ -8840,8 +8504,6 @@ const (
 // MAVLINK_MSG_ID_NAMED_VALUE_INT_LEN 18
 //
 // MAVLINK_MSG_ID_NAMED_VALUE_INT_CRC 44
-//
-//
 type NamedValueInt struct {
 	TIME_BOOT_MS uint32    // Timestamp (milliseconds since system boot)
 	VALUE        int32     // Signed integer value
@@ -8893,7 +8555,6 @@ const (
 	MAVLINK_MSG_NAMED_VALUE_INT_FIELD_name_LEN = 10
 )
 
-//
 // MESSAGE STATUSTEXT
 //
 // MAVLINK_MSG_ID_STATUSTEXT 253
@@ -8901,8 +8562,6 @@ const (
 // MAVLINK_MSG_ID_STATUSTEXT_LEN 51
 //
 // MAVLINK_MSG_ID_STATUSTEXT_CRC 83
-//
-//
 type Statustext struct {
 	SEVERITY uint8     // Severity of status. Relies on the definitions within RFC-5424. See enum MAV_SEVERITY.
 	TEXT     [50]uint8 // Status text message, without null termination character
@@ -8950,7 +8609,6 @@ const (
 	MAVLINK_MSG_STATUSTEXT_FIELD_text_LEN = 50
 )
 
-//
 // MESSAGE DEBUG
 //
 // MAVLINK_MSG_ID_DEBUG 254
@@ -8958,8 +8616,6 @@ const (
 // MAVLINK_MSG_ID_DEBUG_LEN 9
 //
 // MAVLINK_MSG_ID_DEBUG_CRC 46
-//
-//
 type Debug struct {
 	TIME_BOOT_MS uint32  // Timestamp (milliseconds since system boot)
 	VALUE        float32 // DEBUG value

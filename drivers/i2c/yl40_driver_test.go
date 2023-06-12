@@ -12,7 +12,7 @@ func initTestYL40DriverWithStubbedAdaptor() (*YL40Driver, *i2cTestAdaptor) {
 	adaptor := newI2cTestAdaptor()
 	yl := NewYL40Driver(adaptor, WithPCF8591With400kbitStabilization(0, 2))
 	WithPCF8591ForceRefresh(1)(yl.PCF8591Driver)
-	yl.Start()
+	_ = yl.Start()
 	return yl, adaptor
 }
 

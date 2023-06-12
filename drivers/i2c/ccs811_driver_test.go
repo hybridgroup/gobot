@@ -86,7 +86,7 @@ func TestCCS811GetGasData(t *testing.T) {
 			d, a := initTestCCS811WithStubbedAdaptor()
 			// Create stub function as it is needed by read submethod in driver code
 			a.i2cWriteImpl = func([]byte) (int, error) { return 0, nil }
-			d.Start()
+			_ = d.Start()
 			a.i2cReadImpl = tc.readReturn
 			// act
 			eco2, tvoc, err := d.GetGasData()
@@ -143,7 +143,7 @@ func TestCCS811GetTemperature(t *testing.T) {
 			d, a := initTestCCS811WithStubbedAdaptor()
 			// Create stub function as it is needed by read submethod in driver code
 			a.i2cWriteImpl = func([]byte) (int, error) { return 0, nil }
-			d.Start()
+			_ = d.Start()
 			a.i2cReadImpl = tc.readReturn
 			// act
 			temp, err := d.GetTemperature()
@@ -207,7 +207,7 @@ func TestCCS811HasData(t *testing.T) {
 			d, a := initTestCCS811WithStubbedAdaptor()
 			// Create stub function as it is needed by read submethod in driver code
 			a.i2cWriteImpl = func([]byte) (int, error) { return 0, nil }
-			d.Start()
+			_ = d.Start()
 			a.i2cReadImpl = tc.readReturn
 			// act
 			result, err := d.HasData()

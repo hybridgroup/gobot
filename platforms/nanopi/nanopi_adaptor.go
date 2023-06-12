@@ -11,8 +11,6 @@ import (
 )
 
 const (
-	debug = false
-
 	pwmInvertedIdentifier = "inversed"
 
 	defaultI2cBusNumber = 0

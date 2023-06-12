@@ -4,8 +4,6 @@ import (
 	"os"
 	"os/signal"
 	"sync/atomic"
-
-	multierror "github.com/hashicorp/go-multierror"
 )
 
 // JSONMaster is a JSON representation of a Gobot Master.
@@ -60,36 +58,32 @@ func NewMaster() *Master {
 // Start calls the Start method on each robot in its collection of robots. On
 // error, call Stop to ensure that all robots are returned to a sane, stopped
 // state.
-func (g *Master) Start() (err error) {
-	if rerr := g.robots.Start(!g.AutoRun); rerr != nil {
-		err = multierror.Append(err, rerr)
-		return
+func (g *Master) Start() error {
+	if err := g.robots.Start(!g.AutoRun); err != nil {
+		return err
 	}
 
 	g.running.Store(true)
 
-	if g.AutoRun {
-		c := make(chan os.Signal, 1)
-		g.trap(c)
-
-		// waiting for interrupt coming on the channel
-		<-c
-
-		// Stop calls the Stop method on each robot in its collection of robots.
-		g.Stop()
+	if !g.AutoRun {
+		return nil
 	}
 
-	return err
+	c := make(chan os.Signal, 1)
+	g.trap(c)
+
+	// waiting for interrupt coming on the channel
+	<-c
+
+	// Stop calls the Stop method on each robot in its collection of robots.
+	return g.Stop()
 }
 
 // Stop calls the Stop method on each robot in its collection of robots.
-func (g *Master) Stop() (err error) {
-	if rerr := g.robots.Stop(); rerr != nil {
-		err = multierror.Append(err, rerr)
-	}
-
+func (g *Master) Stop() error {
+	err := g.robots.Stop()
 	g.running.Store(false)
-	return
+	return err
 }
 
 // Running returns if the Master is currently started or not

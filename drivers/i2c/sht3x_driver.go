@@ -63,19 +63,22 @@ type SHT3xDriver struct {
 
 // NewSHT3xDriver creates a new driver with specified i2c interface
 // Params:
-//		c Connector - the Adaptor to use with this Driver
+//
+//	c Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//		i2c.WithBus(int):	bus to use with this driver
-//		i2c.WithAddress(int):	address to use with this driver
 //
+//	i2c.WithBus(int):	bus to use with this driver
+//	i2c.WithAddress(int):	address to use with this driver
 func NewSHT3xDriver(c Connector, options ...func(Config)) *SHT3xDriver {
 	s := &SHT3xDriver{
 		Driver:   NewDriver(c, "SHT3x", SHT3xAddressA),
 		Units:    "C",
 		crcTable: crc8.MakeTable(crc8Params),
 	}
-	s.SetAccuracy(SHT3xAccuracyHigh)
+	if err := s.SetAccuracy(SHT3xAccuracyHigh); err != nil {
+		panic(err)
+	}
 
 	for _, option := range options {
 		option(s)

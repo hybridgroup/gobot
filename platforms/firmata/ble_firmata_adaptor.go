@@ -40,7 +40,9 @@ func NewBLEAdaptor(args ...interface{}) *BLEAdaptor {
 	a.SetName(gobot.DefaultName("BLEFirmata"))
 	a.PortOpener = func(port string) (io.ReadWriteCloser, error) {
 		sp := ble.NewSerialPort(address, rid, wid)
-		sp.Open()
+		if err := sp.Open(); err != nil {
+			return sp, err
+		}
 		return sp, nil
 	}
 

@@ -21,18 +21,19 @@ func NewSerialPort(address string, rid string, tid string) *SerialPort {
 }
 
 // Open opens a connection to a BLE serial device
-func (p *SerialPort) Open() (err error) {
+func (p *SerialPort) Open() error {
 	p.client = NewClientAdaptor(p.address)
 
-	err = p.client.Connect()
+	if err := p.client.Connect(); err != nil {
+		return err
+	}
 
 	// subscribe to response notifications
-	p.client.Subscribe(p.rid, func(data []byte, e error) {
+	return p.client.Subscribe(p.rid, func(data []byte, e error) {
 		p.responseMutex.Lock()
 		p.responseData = append(p.responseData, data...)
 		p.responseMutex.Unlock()
 	})
-	return
 }
 
 // Read reads bytes from BLE serial port connection
@@ -66,9 +67,8 @@ func (p *SerialPort) Write(b []byte) (n int, err error) {
 }
 
 // Close closes the BLE serial port connection
-func (p *SerialPort) Close() (err error) {
-	p.client.Disconnect()
-	return
+func (p *SerialPort) Close() error {
+	return p.client.Disconnect()
 }
 
 // Address returns the BLE address

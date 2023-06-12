@@ -16,7 +16,6 @@ var _ i2c.Connector = (*Adaptor)(nil)
 var i2cData = []byte{5, 4, 3, 2, 1, 0}
 
 type i2cMock struct {
-	address           int
 	duration          uint
 	direction         uint8
 	dataWritten       []byte
