@@ -14,11 +14,10 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/sigurn/crc8 v0.0.0-20220107193325-2243fe600f9f
 	github.com/stretchr/testify v1.8.4
-	github.com/urfave/cli v1.22.13
 	github.com/veandco/go-sdl2 v0.4.35
 	github.com/warthog618/gpiod v0.8.1
 	go.bug.st/serial v1.5.0
-	gocv.io/x/gocv v0.32.1
+	gocv.io/x/gocv v0.33.0
 	golang.org/x/net v0.10.0
 	periph.io/x/conn/v3 v3.7.0
 	periph.io/x/host/v3 v3.8.2
@@ -26,7 +25,6 @@ require (
 )
 
 require (
-	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
 	github.com/creack/goselect v0.1.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fatih/structs v1.1.0 // indirect
@@ -41,7 +39,6 @@ require (
 	github.com/nats-io/nkeys v0.4.4 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/saltosystems/winrt-go v0.0.0-20230510070731-e096b9afa761 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/tinygo-org/cbgo v0.0.4 // indirect
