@@ -24,122 +24,114 @@ func (w *WriteCloserDoNothing) Close() error {
 	return nil
 }
 
-func TestTelloDriver(t *testing.T) {
+func TestNewDriver(t *testing.T) {
 	d := NewDriver("8888")
 
 	gobottest.Assert(t, d.respPort, "8888")
 }
 
-func statusMessage(msgType uint16, msgAfter7 ...byte) []byte {
-	msg := make([]byte, 7, len(msgAfter7)+7)
-	msg[0] = messageStart
-	binary.LittleEndian.PutUint16(msg[5:7], msgType)
-	msg = append(msg, msgAfter7...)
-	return msg
-}
-
-func TestHandleResponse(t *testing.T) {
-	cc := []struct {
-		name   string
-		msg    io.Reader
-		events []gobot.Event
-		err    error
+func Test_handleResponse(t *testing.T) {
+	tests := map[string]struct {
+		msg       []byte
+		wantEvent string
+		wantData  (interface{})
+		err       error
 	}{
-		{
-			name: "[empty messsage]",
-			msg:  bytes.NewReader(nil),
-			err:  io.EOF,
+		"[empty message]": {
+			msg: nil,
+			err: io.EOF,
 		},
-		{
-			name:   "wifiMessage",
-			msg:    bytes.NewReader(statusMessage(wifiMessage)),
-			events: []gobot.Event{{Name: WifiDataEvent}},
+		"wifiMessage": {
+			msg:       statusMessage(wifiMessage, 0x07, 0x08, 0xA3, 0x0A),
+			wantEvent: WifiDataEvent,
+			wantData:  &WifiData{Strength: -93, Disturb: 10},
 		},
-		{
-			name:   "lightMessage",
-			msg:    bytes.NewReader(statusMessage(lightMessage)),
-			events: []gobot.Event{{Name: LightStrengthEvent}},
+		"lightMessage": {
+			msg:       statusMessage(lightMessage, 0x17, 0x18, 0xFF),
+			wantEvent: LightStrengthEvent,
+			wantData:  int8(-1),
 		},
-		{
-			name:   "logMessage",
-			msg:    bytes.NewReader(statusMessage(logMessage)),
-			events: []gobot.Event{{Name: LogEvent}},
+		"logMessage": {
+			msg:       statusMessage(logMessage),
+			wantEvent: LogEvent,
+			wantData:  make([]byte, 2048-9),
 		},
-		{
-			name:   "timeCommand",
-			msg:    bytes.NewReader(statusMessage(timeCommand)),
-			events: []gobot.Event{{Name: TimeEvent}},
+		"timeCommand": {
+			msg:       statusMessage(timeCommand, 0x27),
+			wantEvent: TimeEvent,
+			wantData:  []uint8{0x27},
 		},
-		{
-			name:   "bounceCommand",
-			msg:    bytes.NewReader(statusMessage(bounceCommand)),
-			events: []gobot.Event{{Name: BounceEvent}},
+		"bounceCommand": {
+			msg:       statusMessage(bounceCommand, 0x37),
+			wantEvent: BounceEvent,
+			wantData:  []uint8{0x37},
 		},
-		{
-			name:   "takeoffCommand",
-			msg:    bytes.NewReader(statusMessage(takeoffCommand)),
-			events: []gobot.Event{{Name: TakeoffEvent}},
+		"takeoffCommand": {
+			msg:       statusMessage(takeoffCommand, 0x47),
+			wantEvent: TakeoffEvent,
+			wantData:  []uint8{0x47},
 		},
-		{
-			name:   "landCommand",
-			msg:    bytes.NewReader(statusMessage(landCommand)),
-			events: []gobot.Event{{Name: LandingEvent}},
+		"landCommand": {
+			msg:       statusMessage(landCommand, 0x57),
+			wantEvent: LandingEvent,
+			wantData:  []uint8{0x57},
 		},
-		{
-			name:   "palmLandCommand",
-			msg:    bytes.NewReader(statusMessage(palmLandCommand)),
-			events: []gobot.Event{{Name: PalmLandingEvent}},
+		"palmLandCommand": {
+			msg:       statusMessage(palmLandCommand, 0x67),
+			wantEvent: PalmLandingEvent,
+			wantData:  []uint8{0x67},
 		},
-		{
-			name:   "flipCommand",
-			msg:    bytes.NewReader(statusMessage(flipCommand)),
-			events: []gobot.Event{{Name: FlipEvent}},
+		"flipCommand": {
+			msg:       statusMessage(flipCommand, 0x77),
+			wantEvent: FlipEvent,
+			wantData:  []uint8{0x77},
 		},
-		{
-			name:   "flightMessage",
-			msg:    bytes.NewReader(statusMessage(flightMessage)),
-			events: []gobot.Event{{Name: FlightDataEvent}},
+		"flightMessage": {
+			msg:       statusMessage(flightMessage, 0x87, 0x88, 0x60, 0xA4),
+			wantEvent: FlightDataEvent,
+			wantData:  &FlightData{Height: -23456},
 		},
-		{
-			name:   "exposureCommand",
-			msg:    bytes.NewReader(statusMessage(exposureCommand)),
-			events: []gobot.Event{{Name: SetExposureEvent}},
+		"exposureCommand": {
+			msg:       statusMessage(exposureCommand, 0x97),
+			wantEvent: SetExposureEvent,
+			wantData:  []uint8{0x97},
 		},
-		{
-			name:   "videoEncoderRateCommand",
-			msg:    bytes.NewReader(statusMessage(videoEncoderRateCommand)),
-			events: []gobot.Event{{Name: SetVideoEncoderRateEvent}},
+		"videoEncoderRateCommand": {
+			msg:       statusMessage(videoEncoderRateCommand, 0xa7),
+			wantEvent: SetVideoEncoderRateEvent,
+			wantData:  []uint8{0xA7},
 		},
-		{
-			name:   "ConnectedEvent",
-			msg:    bytes.NewReader([]byte{0x63, 0x6f, 0x6e}),
-			events: []gobot.Event{{Name: ConnectedEvent}},
+		"ConnectedEvent": {
+			msg:       []byte{0x63, 0x6f, 0x6e},
+			wantEvent: ConnectedEvent,
+			wantData:  nil,
 		},
 	}
-
-	for _, c := range cc {
-		t.Run(c.name, func(t *testing.T) {
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
 			d := NewDriver("8888")
 			events := d.Subscribe()
-			err := d.handleResponse(c.msg)
-			if c.err != err {
-				t.Errorf("expected '%v' error, got: %v", c.err, err)
+			err := d.handleResponse(bytes.NewReader(tc.msg))
+			if tc.err != err {
+				t.Errorf("expected '%v' error, got: %v", tc.err, err)
 			}
-			for i, cev := range c.events {
-				t.Run(fmt.Sprintf("event %d", i), func(t *testing.T) {
-					t.Logf("expect: %#v", cev)
-					select {
-					case ev, ok := <-events:
-						if !ok {
-							t.Error("subscription channel is closed")
-						}
-						if ev.Name != cev.Name {
-							t.Errorf("got: %s", ev.Name)
-						}
-					case <-time.After(time.Millisecond):
-						t.Error("subscription channel seems empty")
+			if tc.wantEvent != "" {
+				select {
+				case ev, ok := <-events:
+					if !ok {
+						t.Error("subscription channel is closed")
 					}
-				})
+					if ev.Name != tc.wantEvent {
+						t.Errorf("\ngot: %s\nwant: %s\n", ev.Name, tc.wantEvent)
+					}
+					got := fmt.Sprintf("%T %+[1]v", ev.Data)
+					want := fmt.Sprintf("%T %+[1]v", tc.wantData)
+					if got != want {
+						t.Errorf("\ngot: %s\nwant: %s\n", got, want)
+					}
+				case <-time.After(time.Millisecond):
+					t.Error("subscription channel seems empty")
+				}
 			}
 		})
 	}
@@ -189,4 +181,12 @@ func TestHaltNotWaitForeverWhenCalledMultipleTimes(t *testing.T) {
 	_ = d.Halt()
 	_ = d.Halt()
 	_ = d.Halt()
+}
+
+func statusMessage(msgType uint16, msgAfter7 ...byte) []byte {
+	msg := make([]byte, 7, len(msgAfter7)+7)
+	msg[0] = messageStart
+	binary.LittleEndian.PutUint16(msg[5:7], msgType)
+	msg = append(msg, msgAfter7...)
+	return msg
 }
