@@ -1,4 +1,3 @@
-//nolint:errcheck // to much code to fix it immediately
 package mavlink
 
 //
@@ -117,14 +116,28 @@ func (m *MAVLinkPacket) MAVLinkMessage() (MAVLinkMessage, error) {
 // Pack returns a packed byte array which represents the MAVLinkPacket
 func (m *MAVLinkPacket) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.Protocol)
-	binary.Write(data, binary.LittleEndian, m.Length)
-	binary.Write(data, binary.LittleEndian, m.Sequence)
-	binary.Write(data, binary.LittleEndian, m.SystemID)
-	binary.Write(data, binary.LittleEndian, m.ComponentID)
-	binary.Write(data, binary.LittleEndian, m.MessageID)
+	if err := binary.Write(data, binary.LittleEndian, m.Protocol); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.Length); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.Sequence); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.SystemID); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ComponentID); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.MessageID); err != nil {
+		panic(err)
+	}
 	data.Write(m.Data)
-	binary.Write(data, binary.LittleEndian, m.Checksum)
+	if err := binary.Write(data, binary.LittleEndian, m.Checksum); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
@@ -148,15 +161,16 @@ func read(r io.Reader, length int) ([]byte, error) {
 		i, err := r.Read(tmp[:])
 		if err != nil {
 			return nil, err
-		} else {
-			length -= i
-			buf = append(buf, tmp...)
-			if length != i {
-				time.Sleep(1 * time.Millisecond)
-			} else {
-				break
-			}
 		}
+
+		length -= i
+		buf = append(buf, tmp...)
+		if length != i {
+			time.Sleep(1 * time.Millisecond)
+		} else {
+			break
+		}
+
 	}
 	return buf, nil
 }
