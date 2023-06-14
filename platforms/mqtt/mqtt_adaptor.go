@@ -3,17 +3,17 @@ package mqtt
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"fmt"
 	"os"
 
 	"gobot.io/x/gobot/v2"
 
 	paho "github.com/eclipse/paho.mqtt.golang"
-	"github.com/pkg/errors"
 )
 
 var (
 	// ErrNilClient is returned when a client action can't be taken because the struct has no client
-	ErrNilClient = errors.New("no MQTT client available")
+	ErrNilClient = fmt.Errorf("no MQTT client available")
 )
 
 // Message is a message received from the broker.
