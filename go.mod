@@ -11,10 +11,8 @@ require (
 	github.com/hybridgroup/go-ardrone v0.0.0-20140402002621-b9750d8d7b78
 	github.com/hybridgroup/mjpeg v0.0.0-20140228234708-4680f319790e
 	github.com/nats-io/nats.go v1.26.0
-	github.com/pkg/errors v0.9.1
 	github.com/sigurn/crc8 v0.0.0-20220107193325-2243fe600f9f
 	github.com/stretchr/testify v1.8.4
-	github.com/urfave/cli v1.22.13
 	github.com/veandco/go-sdl2 v0.4.35
 	github.com/warthog618/gpiod v0.8.1
 	go.bug.st/serial v1.5.0
@@ -26,7 +24,6 @@ require (
 )
 
 require (
-	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
 	github.com/creack/goselect v0.1.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fatih/structs v1.1.0 // indirect
@@ -41,7 +38,6 @@ require (
 	github.com/nats-io/nkeys v0.4.4 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/saltosystems/winrt-go v0.0.0-20230510070731-e096b9afa761 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/tinygo-org/cbgo v0.0.4 // indirect

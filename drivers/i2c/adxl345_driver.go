@@ -2,9 +2,8 @@ package i2c
 
 import (
 	"encoding/binary"
+	"fmt"
 	"log"
-
-	"github.com/pkg/errors"
 )
 
 const adxl345Debug = false
@@ -117,12 +116,13 @@ type adxl345BwRate struct {
 
 // NewADXL345Driver creates a new driver with specified i2c interface
 // Params:
-//		c Connector - the Adaptor to use with this Driver
+//
+//	c Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//		i2c.WithBus(int):	bus to use with this driver
-//		i2c.WithAddress(int):	address to use with this driver
 //
+//	i2c.WithBus(int):	bus to use with this driver
+//	i2c.WithAddress(int):	address to use with this driver
 func NewADXL345Driver(c Connector, options ...func(Config)) *ADXL345Driver {
 	d := &ADXL345Driver{
 		Driver: NewDriver(c, "ADXL345", adxl345DefaultAddress),
@@ -232,7 +232,7 @@ func (d *ADXL345Driver) XYZ() (float64, float64, float64, error) {
 	return d.dataFormat.convertToG(xr), d.dataFormat.convertToG(yr), d.dataFormat.convertToG(zr), nil
 }
 
-// XYZ returns the raw x,y and z axis
+// RawXYZ returns the raw x,y and z axis
 func (d *ADXL345Driver) RawXYZ() (int16, int16, int16, error) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
@@ -269,7 +269,7 @@ func (d *ADXL345Driver) initialize() error {
 func (d *ADXL345Driver) shutdown() error {
 	d.powerCtl.measure = 0
 	if d.connection == nil {
-		return errors.New("connection not available")
+		return fmt.Errorf("connection not available")
 	}
 	return d.connection.WriteByteData(adxl345Reg_POWER_CTL, d.powerCtl.toByte())
 }
