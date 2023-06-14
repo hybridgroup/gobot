@@ -6,7 +6,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/pkg/errors"
 	"gobot.io/x/gobot/v2"
 
 	"tinygo.org/x/bluetooth"
@@ -79,7 +78,7 @@ func (b *ClientAdaptor) Connect() error {
 	// enable adaptor
 	b.adpt, err = getBLEAdapter(b.AdapterName)
 	if err != nil {
-		return errors.Wrap(err, "can't enable adapter "+b.AdapterName)
+		return fmt.Errorf("can't get adapter %s: %w", b.AdapterName, err)
 	}
 
 	// handle address
@@ -212,7 +211,7 @@ func (b *ClientAdaptor) Subscribe(cUUID string, f func([]byte, error)) error {
 	return fmt.Errorf("Unknown characteristic: %s", cUUID)
 }
 
-// getBLEDevice is singleton for bluetooth adapter connection
+// getBLEAdapter is singleton for bluetooth adapter connection
 func getBLEAdapter(impl string) (*bluetooth.Adapter, error) {
 	if currentAdapter != nil {
 		return currentAdapter, nil
@@ -221,7 +220,7 @@ func getBLEAdapter(impl string) (*bluetooth.Adapter, error) {
 	currentAdapter = bluetooth.DefaultAdapter
 	err := currentAdapter.Enable()
 	if err != nil {
-		return nil, errors.Wrap(err, "can't get device")
+		return nil, err
 	}
 
 	return currentAdapter, nil
