@@ -1,6 +1,6 @@
 # Mavlink
 
-For information on the MAVlink communication protocol click [here](http://qgroundcontrol.org/mavlink/start).
+For information on the MAVlink communication protocol click [here](https://mavlink.io/).
 
 This package supports Mavlink over serial (such as a
 [SiK modem](http://ardupilot.org/copter/docs/common-sik-telemetry-radio.html))
@@ -13,6 +13,8 @@ multiple simultaneous clients such as the robot and
 As at 2018-04, this package supports Mavlink 1.0 only.  If the robot
 doesn't receiving data then check that the other devices are
 configured to send version 1.0 frames.
+
+For Mavlink 2.0 please refer to [gomavlib](https://github.com/bluenviron/gomavlib).
 
 ## How to Install
 
