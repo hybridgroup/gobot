@@ -994,18 +994,13 @@ func (d *Driver) handleResponse(r io.Reader) error {
 		msgType = (uint16(buf[6]) << 8) | uint16(buf[5])
 		switch msgType {
 		case wifiMessage:
-			buf := bytes.NewReader(buf[9:10])
-			wd := &WifiData{}
-			// TODO: do not drop err, see #948
-			_ = binary.Read(buf, binary.LittleEndian, &wd.Strength)
-			_ = binary.Read(buf, binary.LittleEndian, &wd.Disturb)
+			wd := &WifiData{
+				Strength: int8(buf[9:10][0]),
+				Disturb:  int8(buf[10:11][0]),
+			}
 			d.Publish(d.Event(WifiDataEvent), wd)
 		case lightMessage:
-			buf := bytes.NewReader(buf[9:9])
-			var ld int8
-			// TODO: do not drop err, see #948
-			_ = binary.Read(buf, binary.LittleEndian, &ld)
-			d.Publish(d.Event(LightStrengthEvent), ld)
+			d.Publish(d.Event(LightStrengthEvent), int8(buf[9:10][0]))
 		case logMessage:
 			d.Publish(d.Event(LogEvent), buf[9:])
 		case timeCommand:
