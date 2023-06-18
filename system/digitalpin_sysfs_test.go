@@ -3,7 +3,6 @@ package system
 import (
 	"errors"
 	"os"
-	"syscall"
 	"testing"
 
 	"gobot.io/x/gobot/v2"
@@ -63,7 +62,7 @@ func TestDigitalPin(t *testing.T) {
 	gobottest.Assert(t, data, 0)
 
 	writeFile = func(File, []byte) (int, error) {
-		return 0, &os.PathError{Err: syscall.EINVAL}
+		return 0, &os.PathError{Err: Syscall_EINVAL}
 	}
 
 	err = pin.Unexport()
@@ -81,7 +80,7 @@ func TestDigitalPin(t *testing.T) {
 	writeFile = func(File, []byte) (int, error) {
 		cnt++
 		if cnt == 1 {
-			return 0, &os.PathError{Err: syscall.EBUSY}
+			return 0, &os.PathError{Err: Syscall_EBUSY}
 		}
 		return 0, nil
 	}
@@ -104,7 +103,7 @@ func TestDigitalPinExportError(t *testing.T) {
 	pin, _ := initTestDigitalPinSysFsWithMockedFilesystem(mockPaths)
 
 	writeFile = func(File, []byte) (int, error) {
-		return 0, &os.PathError{Err: syscall.EBUSY}
+		return 0, &os.PathError{Err: Syscall_EBUSY}
 	}
 
 	err := pin.Export()
@@ -118,7 +117,7 @@ func TestDigitalPinUnexportError(t *testing.T) {
 	pin, _ := initTestDigitalPinSysFsWithMockedFilesystem(mockPaths)
 
 	writeFile = func(File, []byte) (int, error) {
-		return 0, &os.PathError{Err: syscall.EBUSY}
+		return 0, &os.PathError{Err: Syscall_EBUSY}
 	}
 
 	err := pin.Unexport()

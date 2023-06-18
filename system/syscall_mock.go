@@ -1,7 +1,6 @@
 package system
 
 import (
-	"syscall"
 	"unsafe"
 )
 
@@ -14,11 +13,11 @@ type mockSyscall struct {
 	smbus      *i2cSmbusIoctlData
 	sliceSize  uint8
 	dataSlice  []byte
-	Impl       func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno)
+	Impl       func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno)
 }
 
 // Syscall calls the user defined implementation, used for tests, implements the SystemCaller interface
-func (sys *mockSyscall) syscall(trap uintptr, f File, signal uintptr, payload unsafe.Pointer) (r1, r2 uintptr, err syscall.Errno) {
+func (sys *mockSyscall) syscall(trap uintptr, f File, signal uintptr, payload unsafe.Pointer) (r1, r2 uintptr, err SyscallErrno) {
 	sys.lastTrap = trap     // points to the used syscall (e.g. "SYS_IOCTL")
 	sys.lastFile = f        // a character device file (e.g. file to path "/dev/i2c-1")
 	sys.lastSignal = signal // points to used function type (e.g. I2C_SMBUS, I2C_RDWR)

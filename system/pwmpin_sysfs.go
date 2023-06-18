@@ -6,7 +6,6 @@ import (
 	"os"
 	"path"
 	"strconv"
-	"syscall"
 	"time"
 )
 
@@ -50,7 +49,7 @@ func (p *pwmPinSysFs) Export() error {
 	if err != nil {
 		// If EBUSY then the pin has already been exported
 		e, ok := err.(*os.PathError)
-		if !ok || e.Err != syscall.EBUSY {
+		if !ok || e.Err != Syscall_EBUSY {
 			return fmt.Errorf(pwmPinErrorPattern, "Export", p.pin, err)
 		}
 	}
