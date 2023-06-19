@@ -32,7 +32,7 @@ linters:
   # currently active linters:
   #
   #INFO [lintersdb] Active 35 linters: [asasalint asciicheck bidichk contextcheck decorder depguard durationcheck errcheck exportloopref
-  # gocheckcompilerdirectives gomoddirectives gomodguard goprintffuncname gosimple govet grouper importas ineffassign mirror musttag
+  # gocheckcompilerdirectives gomoddirectives gomodguard goprintffuncname gosimple govet grouper ineffassign mirror musttag
   # nilerr nilnil nolintlint nosprintfhostport prealloc reassign revive staticcheck tagalign tenv testableexamples tparallel typecheck unused wastedassign]
 
   enable-all: true
@@ -62,6 +62,7 @@ linters:
     - goerr113 # not used (we allow error creation at return statement)
     - gofumpt # not used (we use "go fmt" or "gofmt" not gofumpt"
     - gosmopolitan # not needed (report i18n/l10n anti-patterns)
+    - importas # not needed (there is no alias rule at the moment)
     - ireturn # not used (we allow return interfaces)
     - loggercheck # not needed (relates to kitlog, klog, logr, zap)
     - paralleltest # not used
