@@ -3,7 +3,6 @@ package system
 import (
 	"errors"
 	"os"
-	"syscall"
 	"testing"
 	"unsafe"
 
@@ -13,13 +12,13 @@ import (
 
 const dev = "/dev/i2c-1"
 
-func getSyscallFuncImpl(errorMask byte) func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno) {
+func getSyscallFuncImpl(errorMask byte) func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno) {
 	// bit 0: error on function query
 	// bit 1: error on set address
 	// bit 2: error on command
-	return func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno) {
+	return func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno) {
 		// function query
-		if (trap == syscall.SYS_IOCTL) && (a2 == I2C_FUNCS) {
+		if (trap == Syscall_SYS_IOCTL) && (a2 == I2C_FUNCS) {
 			if errorMask&0x01 == 0x01 {
 				return 0, 0, 1
 			}
@@ -31,13 +30,13 @@ func getSyscallFuncImpl(errorMask byte) func(trap, a1, a2, a3 uintptr) (r1, r2 u
 				I2C_FUNC_SMBUS_WRITE_WORD_DATA
 		}
 		// set address
-		if (trap == syscall.SYS_IOCTL) && (a2 == I2C_SLAVE) {
+		if (trap == Syscall_SYS_IOCTL) && (a2 == I2C_SLAVE) {
 			if errorMask&0x02 == 0x02 {
 				return 0, 0, 1
 			}
 		}
 		// command
-		if (trap == syscall.SYS_IOCTL) && (a2 == I2C_SMBUS) {
+		if (trap == Syscall_SYS_IOCTL) && (a2 == I2C_SMBUS) {
 			if errorMask&0x04 == 0x04 {
 				return 0, 0, 1
 			}
@@ -117,7 +116,7 @@ func TestWriteRead(t *testing.T) {
 func TestReadByte(t *testing.T) {
 	var tests = map[string]struct {
 		funcs       uint64
-		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno)
+		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno)
 		wantErr     string
 	}{
 		"read_byte_ok": {
@@ -161,7 +160,7 @@ func TestReadByte(t *testing.T) {
 func TestReadByteData(t *testing.T) {
 	var tests = map[string]struct {
 		funcs       uint64
-		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno)
+		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno)
 		wantErr     string
 	}{
 		"read_byte_data_ok": {
@@ -208,7 +207,7 @@ func TestReadByteData(t *testing.T) {
 func TestReadWordData(t *testing.T) {
 	var tests = map[string]struct {
 		funcs       uint64
-		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno)
+		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno)
 		wantErr     string
 	}{
 		"read_word_data_ok": {
@@ -272,7 +271,7 @@ func TestReadBlockData(t *testing.T) {
 	)
 	var tests = map[string]struct {
 		funcs       uint64
-		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno)
+		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno)
 		wantErr     string
 	}{
 		"read_block_data_ok": {
@@ -317,7 +316,7 @@ func TestReadBlockData(t *testing.T) {
 func TestWriteByte(t *testing.T) {
 	var tests = map[string]struct {
 		funcs       uint64
-		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno)
+		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno)
 		wantErr     string
 	}{
 		"write_byte_ok": {
@@ -359,7 +358,7 @@ func TestWriteByte(t *testing.T) {
 func TestWriteByteData(t *testing.T) {
 	var tests = map[string]struct {
 		funcs       uint64
-		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno)
+		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno)
 		wantErr     string
 	}{
 		"write_byte_data_ok": {
@@ -406,7 +405,7 @@ func TestWriteByteData(t *testing.T) {
 func TestWriteWordData(t *testing.T) {
 	var tests = map[string]struct {
 		funcs       uint64
-		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno)
+		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno)
 		wantErr     string
 	}{
 		"write_word_data_ok": {
@@ -471,7 +470,7 @@ func TestWriteBlockData(t *testing.T) {
 	)
 	var tests = map[string]struct {
 		funcs       uint64
-		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno)
+		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno)
 		wantErr     string
 	}{
 		"write_block_data_ok": {
@@ -533,7 +532,7 @@ func Test_queryFunctionality(t *testing.T) {
 	var tests = map[string]struct {
 		requested   uint64
 		dev         string
-		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno)
+		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno)
 		wantErr     string
 		wantFile    bool
 		wantFuncs   uint64

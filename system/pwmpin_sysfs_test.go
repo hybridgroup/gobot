@@ -2,7 +2,6 @@ package system
 
 import (
 	"os"
-	"syscall"
 	"testing"
 
 	"gobot.io/x/gobot/v2"
@@ -85,7 +84,7 @@ func TestPwmPinAlreadyExported(t *testing.T) {
 	pin, _ := initTestPWMPinSysFsWithMockedFilesystem(mockedPaths)
 
 	pin.write = func(filesystem, string, []byte) (int, error) {
-		return 0, &os.PathError{Err: syscall.EBUSY}
+		return 0, &os.PathError{Err: Syscall_EBUSY}
 	}
 
 	// no error indicates that the pin was already exported
@@ -103,7 +102,7 @@ func TestPwmPinExportError(t *testing.T) {
 	pin, _ := initTestPWMPinSysFsWithMockedFilesystem(mockedPaths)
 
 	pin.write = func(filesystem, string, []byte) (int, error) {
-		return 0, &os.PathError{Err: syscall.EFAULT}
+		return 0, &os.PathError{Err: Syscall_EFAULT}
 	}
 
 	// no error indicates that the pin was already exported
@@ -122,7 +121,7 @@ func TestPwmPinUnxportError(t *testing.T) {
 	pin, _ := initTestPWMPinSysFsWithMockedFilesystem(mockedPaths)
 
 	pin.write = func(filesystem, string, []byte) (int, error) {
-		return 0, &os.PathError{Err: syscall.EBUSY}
+		return 0, &os.PathError{Err: Syscall_EBUSY}
 	}
 
 	err := pin.Unexport()
@@ -140,7 +139,7 @@ func TestPwmPinPeriodError(t *testing.T) {
 	pin, _ := initTestPWMPinSysFsWithMockedFilesystem(mockedPaths)
 
 	pin.read = func(filesystem, string) ([]byte, error) {
-		return nil, &os.PathError{Err: syscall.EBUSY}
+		return nil, &os.PathError{Err: Syscall_EBUSY}
 	}
 
 	_, err := pin.Period()
@@ -158,7 +157,7 @@ func TestPwmPinPolarityError(t *testing.T) {
 	pin, _ := initTestPWMPinSysFsWithMockedFilesystem(mockedPaths)
 
 	pin.read = func(filesystem, string) ([]byte, error) {
-		return nil, &os.PathError{Err: syscall.EBUSY}
+		return nil, &os.PathError{Err: Syscall_EBUSY}
 	}
 
 	_, err := pin.Polarity()
@@ -176,7 +175,7 @@ func TestPwmPinDutyCycleError(t *testing.T) {
 	pin, _ := initTestPWMPinSysFsWithMockedFilesystem(mockedPaths)
 
 	pin.read = func(filesystem, string) ([]byte, error) {
-		return nil, &os.PathError{Err: syscall.EBUSY}
+		return nil, &os.PathError{Err: Syscall_EBUSY}
 	}
 
 	_, err := pin.DutyCycle()
