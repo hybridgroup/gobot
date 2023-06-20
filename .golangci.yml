@@ -32,7 +32,7 @@ linters:
   # currently active linters:
   #
   #INFO [lintersdb] Active 35 linters: [asasalint asciicheck bidichk contextcheck decorder depguard durationcheck errcheck exportloopref
-  # gocheckcompilerdirectives gomoddirectives gomodguard goprintffuncname gosimple govet grouper ineffassign mirror musttag
+  # gocheckcompilerdirectives gomoddirectives gomodguard goprintffuncname gosimple govet grouper ineffassign makezero mirror musttag
   # nilerr nilnil nolintlint nosprintfhostport prealloc reassign revive staticcheck tagalign tenv testableexamples tparallel typecheck unused wastedassign]
 
   enable-all: true
@@ -74,7 +74,6 @@ linters:
     - zerologlint # not needed (related to zerolog package)
     # important to have
     - gofmt # important to prevent "format tsunami" ("gofmt -s -w" missed), disabled due to "https://github.com/golangci/golangci-lint-action/issues/535"
-    - makezero # very important (find/reduce bugs, e.g. in robot_work_test.go)
     - nakedret # very useful together with "nonamedreturns" (reduce bugs)
     - nonamedreturns # very useful (reduce bugs)
     - unconvert # very useful (reduce bugs, simplify code)

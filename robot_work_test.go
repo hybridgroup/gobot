@@ -94,8 +94,10 @@ func TestRobotAutomationFunctions(t *testing.T) {
 
 func collectStringKeysFromWorkRegistry(rwr *RobotWorkRegistry) []string {
 	keys := make([]string, len(rwr.r))
-	for k := range rwr.r {
-		keys = append(keys, k)
+	var idx int
+	for key := range rwr.r {
+		keys[idx] = key
+		idx++
 	}
 	return keys
 }
