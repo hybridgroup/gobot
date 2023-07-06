@@ -41,12 +41,14 @@ Create a new folder and a new Go module project.
 
 ```sh
 mkdir ~/my_gobot_example
+cd ~/my_gobot_example
 go mod init my.gobot.example.com
 ```
 
 Copy your example file besides the go.mod file, import the requirements and build.
 
 ```sh
+cp /<path to gobot folder>/examples/raspi_blink.go ~/my_gobot_example/
 go mod tidy
 env GOOS=linux GOARCH=arm GOARM=5 go build -o ./output/my_raspi_bink raspi_blink.go
 ```
