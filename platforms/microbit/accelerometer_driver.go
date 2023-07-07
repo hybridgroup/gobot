@@ -29,7 +29,7 @@ type AccelerometerData struct {
 
 const (
 	// BLE services
-	accelerometerService = "e95d0753251d470aa062fa1922dfa9a8"
+	//accelerometerService = "e95d0753251d470aa062fa1922dfa9a8"
 
 	// BLE characteristics
 	accelerometerCharacteristic = "e95dca4b251d470aa062fa1922dfa9a8"
@@ -66,15 +66,21 @@ func (b *AccelerometerDriver) adaptor() ble.BLEConnector {
 }
 
 // Start tells driver to get ready to do work
-func (b *AccelerometerDriver) Start() (err error) {
+func (b *AccelerometerDriver) Start() error {
 	// subscribe to accelerometer notifications
-	b.adaptor().Subscribe(accelerometerCharacteristic, func(data []byte, e error) {
+	return b.adaptor().Subscribe(accelerometerCharacteristic, func(data []byte, e error) {
 		a := &RawAccelerometerData{X: 0, Y: 0, Z: 0}
 
 		buf := bytes.NewBuffer(data)
-		binary.Read(buf, binary.LittleEndian, &a.X)
-		binary.Read(buf, binary.LittleEndian, &a.Y)
-		binary.Read(buf, binary.LittleEndian, &a.Z)
+		if err := binary.Read(buf, binary.LittleEndian, &a.X); err != nil {
+			panic(err)
+		}
+		if err := binary.Read(buf, binary.LittleEndian, &a.Y); err != nil {
+			panic(err)
+		}
+		if err := binary.Read(buf, binary.LittleEndian, &a.Z); err != nil {
+			panic(err)
+		}
 
 		result := &AccelerometerData{
 			X: float32(a.X) / 1000.0,
@@ -83,11 +89,7 @@ func (b *AccelerometerDriver) Start() (err error) {
 
 		b.Publish(b.Event(Accelerometer), result)
 	})
-
-	return
 }
 
 // Halt stops LED driver (void)
-func (b *AccelerometerDriver) Halt() (err error) {
-	return
-}
+func (b *AccelerometerDriver) Halt() error { return nil }

@@ -634,7 +634,6 @@ const (
 	MAV_DISTANCE_SENSOR_ENUM_END   = 2 //  |
 )
 
-//
 // MESSAGE HEARTBEAT
 //
 // MAVLINK_MSG_ID_HEARTBEAT 0
@@ -642,8 +641,6 @@ const (
 // MAVLINK_MSG_ID_HEARTBEAT_LEN 9
 //
 // MAVLINK_MSG_ID_HEARTBEAT_CRC 50
-//
-//
 type Heartbeat struct {
 	CUSTOM_MODE     uint32 // A bitfield for use for autopilot-specific flags.
 	TYPE            uint8  // Type of the MAV (quadrotor, helicopter, etc., up to 15 types, defined in MAV_TYPE ENUM)
@@ -683,27 +680,50 @@ func (*Heartbeat) Crc() uint8 {
 // Pack returns a packed byte array which represents a Heartbeat payload
 func (m *Heartbeat) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.CUSTOM_MODE)
-	binary.Write(data, binary.LittleEndian, m.TYPE)
-	binary.Write(data, binary.LittleEndian, m.AUTOPILOT)
-	binary.Write(data, binary.LittleEndian, m.BASE_MODE)
-	binary.Write(data, binary.LittleEndian, m.SYSTEM_STATUS)
-	binary.Write(data, binary.LittleEndian, m.MAVLINK_VERSION)
+	if err := binary.Write(data, binary.LittleEndian, m.CUSTOM_MODE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TYPE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.AUTOPILOT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.BASE_MODE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.SYSTEM_STATUS); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.MAVLINK_VERSION); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the Heartbeat
 func (m *Heartbeat) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.CUSTOM_MODE)
-	binary.Read(data, binary.LittleEndian, &m.TYPE)
-	binary.Read(data, binary.LittleEndian, &m.AUTOPILOT)
-	binary.Read(data, binary.LittleEndian, &m.BASE_MODE)
-	binary.Read(data, binary.LittleEndian, &m.SYSTEM_STATUS)
-	binary.Read(data, binary.LittleEndian, &m.MAVLINK_VERSION)
+	if err := binary.Read(data, binary.LittleEndian, &m.CUSTOM_MODE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TYPE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.AUTOPILOT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.BASE_MODE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.SYSTEM_STATUS); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.MAVLINK_VERSION); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE SYS_STATUS
 //
 // MAVLINK_MSG_ID_SYS_STATUS 1
@@ -711,8 +731,6 @@ func (m *Heartbeat) Decode(buf []byte) {
 // MAVLINK_MSG_ID_SYS_STATUS_LEN 31
 //
 // MAVLINK_MSG_ID_SYS_STATUS_CRC 124
-//
-//
 type SysStatus struct {
 	ONBOARD_CONTROL_SENSORS_PRESENT uint32 // Bitmask showing which onboard controllers and sensors are present. Value of 0: not present. Value of 1: present. Indices defined by ENUM MAV_SYS_STATUS_SENSOR
 	ONBOARD_CONTROL_SENSORS_ENABLED uint32 // Bitmask showing which onboard controllers and sensors are enabled:  Value of 0: not enabled. Value of 1: enabled. Indices defined by ENUM MAV_SYS_STATUS_SENSOR
@@ -766,41 +784,92 @@ func (*SysStatus) Crc() uint8 {
 // Pack returns a packed byte array which represents a SysStatus payload
 func (m *SysStatus) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.ONBOARD_CONTROL_SENSORS_PRESENT)
-	binary.Write(data, binary.LittleEndian, m.ONBOARD_CONTROL_SENSORS_ENABLED)
-	binary.Write(data, binary.LittleEndian, m.ONBOARD_CONTROL_SENSORS_HEALTH)
-	binary.Write(data, binary.LittleEndian, m.LOAD)
-	binary.Write(data, binary.LittleEndian, m.VOLTAGE_BATTERY)
-	binary.Write(data, binary.LittleEndian, m.CURRENT_BATTERY)
-	binary.Write(data, binary.LittleEndian, m.DROP_RATE_COMM)
-	binary.Write(data, binary.LittleEndian, m.ERRORS_COMM)
-	binary.Write(data, binary.LittleEndian, m.ERRORS_COUNT1)
-	binary.Write(data, binary.LittleEndian, m.ERRORS_COUNT2)
-	binary.Write(data, binary.LittleEndian, m.ERRORS_COUNT3)
-	binary.Write(data, binary.LittleEndian, m.ERRORS_COUNT4)
-	binary.Write(data, binary.LittleEndian, m.BATTERY_REMAINING)
+	if err := binary.Write(data, binary.LittleEndian, m.ONBOARD_CONTROL_SENSORS_PRESENT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ONBOARD_CONTROL_SENSORS_ENABLED); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ONBOARD_CONTROL_SENSORS_HEALTH); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.LOAD); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VOLTAGE_BATTERY); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CURRENT_BATTERY); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.DROP_RATE_COMM); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ERRORS_COMM); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ERRORS_COUNT1); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ERRORS_COUNT2); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ERRORS_COUNT3); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ERRORS_COUNT4); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.BATTERY_REMAINING); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the SysStatus
 func (m *SysStatus) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.ONBOARD_CONTROL_SENSORS_PRESENT)
-	binary.Read(data, binary.LittleEndian, &m.ONBOARD_CONTROL_SENSORS_ENABLED)
-	binary.Read(data, binary.LittleEndian, &m.ONBOARD_CONTROL_SENSORS_HEALTH)
-	binary.Read(data, binary.LittleEndian, &m.LOAD)
-	binary.Read(data, binary.LittleEndian, &m.VOLTAGE_BATTERY)
-	binary.Read(data, binary.LittleEndian, &m.CURRENT_BATTERY)
-	binary.Read(data, binary.LittleEndian, &m.DROP_RATE_COMM)
-	binary.Read(data, binary.LittleEndian, &m.ERRORS_COMM)
-	binary.Read(data, binary.LittleEndian, &m.ERRORS_COUNT1)
-	binary.Read(data, binary.LittleEndian, &m.ERRORS_COUNT2)
-	binary.Read(data, binary.LittleEndian, &m.ERRORS_COUNT3)
-	binary.Read(data, binary.LittleEndian, &m.ERRORS_COUNT4)
-	binary.Read(data, binary.LittleEndian, &m.BATTERY_REMAINING)
+	if err := binary.Read(data, binary.LittleEndian, &m.ONBOARD_CONTROL_SENSORS_PRESENT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ONBOARD_CONTROL_SENSORS_ENABLED); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ONBOARD_CONTROL_SENSORS_HEALTH); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.LOAD); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VOLTAGE_BATTERY); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CURRENT_BATTERY); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.DROP_RATE_COMM); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ERRORS_COMM); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ERRORS_COUNT1); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ERRORS_COUNT2); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ERRORS_COUNT3); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ERRORS_COUNT4); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.BATTERY_REMAINING); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE SYSTEM_TIME
 //
 // MAVLINK_MSG_ID_SYSTEM_TIME 2
@@ -808,8 +877,6 @@ func (m *SysStatus) Decode(buf []byte) {
 // MAVLINK_MSG_ID_SYSTEM_TIME_LEN 12
 //
 // MAVLINK_MSG_ID_SYSTEM_TIME_CRC 137
-//
-//
 type SystemTime struct {
 	TIME_UNIX_USEC uint64 // Timestamp of the master clock in microseconds since UNIX epoch.
 	TIME_BOOT_MS   uint32 // Timestamp of the component clock since boot time in milliseconds.
@@ -841,19 +908,26 @@ func (*SystemTime) Crc() uint8 {
 // Pack returns a packed byte array which represents a SystemTime payload
 func (m *SystemTime) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_UNIX_USEC)
-	binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_UNIX_USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the SystemTime
 func (m *SystemTime) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_UNIX_USEC)
-	binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_UNIX_USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE PING
 //
 // MAVLINK_MSG_ID_PING 4
@@ -861,8 +935,6 @@ func (m *SystemTime) Decode(buf []byte) {
 // MAVLINK_MSG_ID_PING_LEN 14
 //
 // MAVLINK_MSG_ID_PING_CRC 237
-//
-//
 type Ping struct {
 	TIME_USEC        uint64 // Unix timestamp in microseconds
 	SEQ              uint32 // PING sequence
@@ -898,23 +970,38 @@ func (*Ping) Crc() uint8 {
 // Pack returns a packed byte array which represents a Ping payload
 func (m *Ping) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_USEC)
-	binary.Write(data, binary.LittleEndian, m.SEQ)
-	binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM)
-	binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.SEQ); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the Ping
 func (m *Ping) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_USEC)
-	binary.Read(data, binary.LittleEndian, &m.SEQ)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.SEQ); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE CHANGE_OPERATOR_CONTROL
 //
 // MAVLINK_MSG_ID_CHANGE_OPERATOR_CONTROL 5
@@ -922,8 +1009,6 @@ func (m *Ping) Decode(buf []byte) {
 // MAVLINK_MSG_ID_CHANGE_OPERATOR_CONTROL_LEN 28
 //
 // MAVLINK_MSG_ID_CHANGE_OPERATOR_CONTROL_CRC 217
-//
-//
 type ChangeOperatorControl struct {
 	TARGET_SYSTEM   uint8     // System the GCS requests control for
 	CONTROL_REQUEST uint8     // 0: request control of this MAV, 1: Release control of this MAV
@@ -959,27 +1044,42 @@ func (*ChangeOperatorControl) Crc() uint8 {
 // Pack returns a packed byte array which represents a ChangeOperatorControl payload
 func (m *ChangeOperatorControl) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM)
-	binary.Write(data, binary.LittleEndian, m.CONTROL_REQUEST)
-	binary.Write(data, binary.LittleEndian, m.VERSION)
-	binary.Write(data, binary.LittleEndian, m.PASSKEY)
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CONTROL_REQUEST); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VERSION); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PASSKEY); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the ChangeOperatorControl
 func (m *ChangeOperatorControl) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM)
-	binary.Read(data, binary.LittleEndian, &m.CONTROL_REQUEST)
-	binary.Read(data, binary.LittleEndian, &m.VERSION)
-	binary.Read(data, binary.LittleEndian, &m.PASSKEY)
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CONTROL_REQUEST); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VERSION); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PASSKEY); err != nil {
+		panic(err)
+	}
 }
 
 const (
 	MAVLINK_MSG_CHANGE_OPERATOR_CONTROL_FIELD_passkey_LEN = 25
 )
 
-//
 // MESSAGE CHANGE_OPERATOR_CONTROL_ACK
 //
 // MAVLINK_MSG_ID_CHANGE_OPERATOR_CONTROL_ACK 6
@@ -987,8 +1087,6 @@ const (
 // MAVLINK_MSG_ID_CHANGE_OPERATOR_CONTROL_ACK_LEN 3
 //
 // MAVLINK_MSG_ID_CHANGE_OPERATOR_CONTROL_ACK_CRC 104
-//
-//
 type ChangeOperatorControlAck struct {
 	GCS_SYSTEM_ID   uint8 // ID of the GCS this message
 	CONTROL_REQUEST uint8 // 0: request control of this MAV, 1: Release control of this MAV
@@ -1022,21 +1120,32 @@ func (*ChangeOperatorControlAck) Crc() uint8 {
 // Pack returns a packed byte array which represents a ChangeOperatorControlAck payload
 func (m *ChangeOperatorControlAck) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.GCS_SYSTEM_ID)
-	binary.Write(data, binary.LittleEndian, m.CONTROL_REQUEST)
-	binary.Write(data, binary.LittleEndian, m.ACK)
+	if err := binary.Write(data, binary.LittleEndian, m.GCS_SYSTEM_ID); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CONTROL_REQUEST); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ACK); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the ChangeOperatorControlAck
 func (m *ChangeOperatorControlAck) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.GCS_SYSTEM_ID)
-	binary.Read(data, binary.LittleEndian, &m.CONTROL_REQUEST)
-	binary.Read(data, binary.LittleEndian, &m.ACK)
+	if err := binary.Read(data, binary.LittleEndian, &m.GCS_SYSTEM_ID); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CONTROL_REQUEST); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ACK); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE AUTH_KEY
 //
 // MAVLINK_MSG_ID_AUTH_KEY 7
@@ -1044,8 +1153,6 @@ func (m *ChangeOperatorControlAck) Decode(buf []byte) {
 // MAVLINK_MSG_ID_AUTH_KEY_LEN 32
 //
 // MAVLINK_MSG_ID_AUTH_KEY_CRC 119
-//
-//
 type AuthKey struct {
 	KEY [32]uint8 // key
 }
@@ -1075,21 +1182,24 @@ func (*AuthKey) Crc() uint8 {
 // Pack returns a packed byte array which represents a AuthKey payload
 func (m *AuthKey) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.KEY)
+	if err := binary.Write(data, binary.LittleEndian, m.KEY); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the AuthKey
 func (m *AuthKey) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.KEY)
+	if err := binary.Read(data, binary.LittleEndian, &m.KEY); err != nil {
+		panic(err)
+	}
 }
 
 const (
 	MAVLINK_MSG_AUTH_KEY_FIELD_key_LEN = 32
 )
 
-//
 // MESSAGE SET_MODE
 //
 // MAVLINK_MSG_ID_SET_MODE 11
@@ -1097,8 +1207,6 @@ const (
 // MAVLINK_MSG_ID_SET_MODE_LEN 6
 //
 // MAVLINK_MSG_ID_SET_MODE_CRC 89
-//
-//
 type SetMode struct {
 	CUSTOM_MODE   uint32 // The new autopilot-specific mode. This field can be ignored by an autopilot.
 	TARGET_SYSTEM uint8  // The system setting the mode
@@ -1132,21 +1240,32 @@ func (*SetMode) Crc() uint8 {
 // Pack returns a packed byte array which represents a SetMode payload
 func (m *SetMode) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.CUSTOM_MODE)
-	binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM)
-	binary.Write(data, binary.LittleEndian, m.BASE_MODE)
+	if err := binary.Write(data, binary.LittleEndian, m.CUSTOM_MODE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.BASE_MODE); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the SetMode
 func (m *SetMode) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.CUSTOM_MODE)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM)
-	binary.Read(data, binary.LittleEndian, &m.BASE_MODE)
+	if err := binary.Read(data, binary.LittleEndian, &m.CUSTOM_MODE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.BASE_MODE); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE PARAM_REQUEST_READ
 //
 // MAVLINK_MSG_ID_PARAM_REQUEST_READ 20
@@ -1154,8 +1273,6 @@ func (m *SetMode) Decode(buf []byte) {
 // MAVLINK_MSG_ID_PARAM_REQUEST_READ_LEN 20
 //
 // MAVLINK_MSG_ID_PARAM_REQUEST_READ_CRC 214
-//
-//
 type ParamRequestRead struct {
 	PARAM_INDEX      int16     // Parameter index. Send -1 to use the param ID field as identifier (else the param id will be ignored)
 	TARGET_SYSTEM    uint8     // System ID
@@ -1191,27 +1308,42 @@ func (*ParamRequestRead) Crc() uint8 {
 // Pack returns a packed byte array which represents a ParamRequestRead payload
 func (m *ParamRequestRead) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.PARAM_INDEX)
-	binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM)
-	binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT)
-	binary.Write(data, binary.LittleEndian, m.PARAM_ID)
+	if err := binary.Write(data, binary.LittleEndian, m.PARAM_INDEX); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PARAM_ID); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the ParamRequestRead
 func (m *ParamRequestRead) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.PARAM_INDEX)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
-	binary.Read(data, binary.LittleEndian, &m.PARAM_ID)
+	if err := binary.Read(data, binary.LittleEndian, &m.PARAM_INDEX); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PARAM_ID); err != nil {
+		panic(err)
+	}
 }
 
 const (
 	MAVLINK_MSG_PARAM_REQUEST_READ_FIELD_param_id_LEN = 16
 )
 
-//
 // MESSAGE PARAM_REQUEST_LIST
 //
 // MAVLINK_MSG_ID_PARAM_REQUEST_LIST 21
@@ -1219,8 +1351,6 @@ const (
 // MAVLINK_MSG_ID_PARAM_REQUEST_LIST_LEN 2
 //
 // MAVLINK_MSG_ID_PARAM_REQUEST_LIST_CRC 159
-//
-//
 type ParamRequestList struct {
 	TARGET_SYSTEM    uint8 // System ID
 	TARGET_COMPONENT uint8 // Component ID
@@ -1252,19 +1382,26 @@ func (*ParamRequestList) Crc() uint8 {
 // Pack returns a packed byte array which represents a ParamRequestList payload
 func (m *ParamRequestList) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM)
-	binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT)
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the ParamRequestList
 func (m *ParamRequestList) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE PARAM_VALUE
 //
 // MAVLINK_MSG_ID_PARAM_VALUE 22
@@ -1272,8 +1409,6 @@ func (m *ParamRequestList) Decode(buf []byte) {
 // MAVLINK_MSG_ID_PARAM_VALUE_LEN 25
 //
 // MAVLINK_MSG_ID_PARAM_VALUE_CRC 220
-//
-//
 type ParamValue struct {
 	PARAM_VALUE float32   // Onboard parameter value
 	PARAM_COUNT uint16    // Total number of onboard parameters
@@ -1311,29 +1446,48 @@ func (*ParamValue) Crc() uint8 {
 // Pack returns a packed byte array which represents a ParamValue payload
 func (m *ParamValue) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.PARAM_VALUE)
-	binary.Write(data, binary.LittleEndian, m.PARAM_COUNT)
-	binary.Write(data, binary.LittleEndian, m.PARAM_INDEX)
-	binary.Write(data, binary.LittleEndian, m.PARAM_ID)
-	binary.Write(data, binary.LittleEndian, m.PARAM_TYPE)
+	if err := binary.Write(data, binary.LittleEndian, m.PARAM_VALUE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PARAM_COUNT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PARAM_INDEX); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PARAM_ID); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PARAM_TYPE); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the ParamValue
 func (m *ParamValue) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.PARAM_VALUE)
-	binary.Read(data, binary.LittleEndian, &m.PARAM_COUNT)
-	binary.Read(data, binary.LittleEndian, &m.PARAM_INDEX)
-	binary.Read(data, binary.LittleEndian, &m.PARAM_ID)
-	binary.Read(data, binary.LittleEndian, &m.PARAM_TYPE)
+	if err := binary.Read(data, binary.LittleEndian, &m.PARAM_VALUE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PARAM_COUNT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PARAM_INDEX); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PARAM_ID); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PARAM_TYPE); err != nil {
+		panic(err)
+	}
 }
 
 const (
 	MAVLINK_MSG_PARAM_VALUE_FIELD_param_id_LEN = 16
 )
 
-//
 // MESSAGE PARAM_SET
 //
 // MAVLINK_MSG_ID_PARAM_SET 23
@@ -1341,8 +1495,6 @@ const (
 // MAVLINK_MSG_ID_PARAM_SET_LEN 23
 //
 // MAVLINK_MSG_ID_PARAM_SET_CRC 168
-//
-//
 type ParamSet struct {
 	PARAM_VALUE      float32   // Onboard parameter value
 	TARGET_SYSTEM    uint8     // System ID
@@ -1380,29 +1532,48 @@ func (*ParamSet) Crc() uint8 {
 // Pack returns a packed byte array which represents a ParamSet payload
 func (m *ParamSet) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.PARAM_VALUE)
-	binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM)
-	binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT)
-	binary.Write(data, binary.LittleEndian, m.PARAM_ID)
-	binary.Write(data, binary.LittleEndian, m.PARAM_TYPE)
+	if err := binary.Write(data, binary.LittleEndian, m.PARAM_VALUE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PARAM_ID); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PARAM_TYPE); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the ParamSet
 func (m *ParamSet) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.PARAM_VALUE)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
-	binary.Read(data, binary.LittleEndian, &m.PARAM_ID)
-	binary.Read(data, binary.LittleEndian, &m.PARAM_TYPE)
+	if err := binary.Read(data, binary.LittleEndian, &m.PARAM_VALUE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PARAM_ID); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PARAM_TYPE); err != nil {
+		panic(err)
+	}
 }
 
 const (
 	MAVLINK_MSG_PARAM_SET_FIELD_param_id_LEN = 16
 )
 
-//
 // MESSAGE GPS_RAW_INT
 //
 // MAVLINK_MSG_ID_GPS_RAW_INT 24
@@ -1410,8 +1581,6 @@ const (
 // MAVLINK_MSG_ID_GPS_RAW_INT_LEN 30
 //
 // MAVLINK_MSG_ID_GPS_RAW_INT_CRC 24
-//
-//
 type GpsRawInt struct {
 	TIME_USEC          uint64 // Timestamp (microseconds since UNIX epoch or microseconds since system boot)
 	LAT                int32  // Latitude (WGS84), in degrees * 1E7
@@ -1459,35 +1628,74 @@ func (*GpsRawInt) Crc() uint8 {
 // Pack returns a packed byte array which represents a GpsRawInt payload
 func (m *GpsRawInt) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_USEC)
-	binary.Write(data, binary.LittleEndian, m.LAT)
-	binary.Write(data, binary.LittleEndian, m.LON)
-	binary.Write(data, binary.LittleEndian, m.ALT)
-	binary.Write(data, binary.LittleEndian, m.EPH)
-	binary.Write(data, binary.LittleEndian, m.EPV)
-	binary.Write(data, binary.LittleEndian, m.VEL)
-	binary.Write(data, binary.LittleEndian, m.COG)
-	binary.Write(data, binary.LittleEndian, m.FIX_TYPE)
-	binary.Write(data, binary.LittleEndian, m.SATELLITES_VISIBLE)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.LAT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.LON); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ALT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.EPH); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.EPV); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VEL); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.COG); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.FIX_TYPE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.SATELLITES_VISIBLE); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the GpsRawInt
 func (m *GpsRawInt) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_USEC)
-	binary.Read(data, binary.LittleEndian, &m.LAT)
-	binary.Read(data, binary.LittleEndian, &m.LON)
-	binary.Read(data, binary.LittleEndian, &m.ALT)
-	binary.Read(data, binary.LittleEndian, &m.EPH)
-	binary.Read(data, binary.LittleEndian, &m.EPV)
-	binary.Read(data, binary.LittleEndian, &m.VEL)
-	binary.Read(data, binary.LittleEndian, &m.COG)
-	binary.Read(data, binary.LittleEndian, &m.FIX_TYPE)
-	binary.Read(data, binary.LittleEndian, &m.SATELLITES_VISIBLE)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.LAT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.LON); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ALT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.EPH); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.EPV); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VEL); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.COG); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.FIX_TYPE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.SATELLITES_VISIBLE); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE GPS_STATUS
 //
 // MAVLINK_MSG_ID_GPS_STATUS 25
@@ -1495,8 +1703,6 @@ func (m *GpsRawInt) Decode(buf []byte) {
 // MAVLINK_MSG_ID_GPS_STATUS_LEN 101
 //
 // MAVLINK_MSG_ID_GPS_STATUS_CRC 23
-//
-//
 type GpsStatus struct {
 	SATELLITES_VISIBLE  uint8     // Number of satellites visible
 	SATELLITE_PRN       [20]uint8 // Global satellite ID
@@ -1536,24 +1742,48 @@ func (*GpsStatus) Crc() uint8 {
 // Pack returns a packed byte array which represents a GpsStatus payload
 func (m *GpsStatus) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.SATELLITES_VISIBLE)
-	binary.Write(data, binary.LittleEndian, m.SATELLITE_PRN)
-	binary.Write(data, binary.LittleEndian, m.SATELLITE_USED)
-	binary.Write(data, binary.LittleEndian, m.SATELLITE_ELEVATION)
-	binary.Write(data, binary.LittleEndian, m.SATELLITE_AZIMUTH)
-	binary.Write(data, binary.LittleEndian, m.SATELLITE_SNR)
+	if err := binary.Write(data, binary.LittleEndian, m.SATELLITES_VISIBLE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.SATELLITE_PRN); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.SATELLITE_USED); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.SATELLITE_ELEVATION); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.SATELLITE_AZIMUTH); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.SATELLITE_SNR); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the GpsStatus
 func (m *GpsStatus) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.SATELLITES_VISIBLE)
-	binary.Read(data, binary.LittleEndian, &m.SATELLITE_PRN)
-	binary.Read(data, binary.LittleEndian, &m.SATELLITE_USED)
-	binary.Read(data, binary.LittleEndian, &m.SATELLITE_ELEVATION)
-	binary.Read(data, binary.LittleEndian, &m.SATELLITE_AZIMUTH)
-	binary.Read(data, binary.LittleEndian, &m.SATELLITE_SNR)
+	if err := binary.Read(data, binary.LittleEndian, &m.SATELLITES_VISIBLE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.SATELLITE_PRN); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.SATELLITE_USED); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.SATELLITE_ELEVATION); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.SATELLITE_AZIMUTH); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.SATELLITE_SNR); err != nil {
+		panic(err)
+	}
 }
 
 const (
@@ -1564,7 +1794,6 @@ const (
 	MAVLINK_MSG_GPS_STATUS_FIELD_satellite_snr_LEN       = 20
 )
 
-//
 // MESSAGE SCALED_IMU
 //
 // MAVLINK_MSG_ID_SCALED_IMU 26
@@ -1572,8 +1801,6 @@ const (
 // MAVLINK_MSG_ID_SCALED_IMU_LEN 22
 //
 // MAVLINK_MSG_ID_SCALED_IMU_CRC 170
-//
-//
 type ScaledImu struct {
 	TIME_BOOT_MS uint32 // Timestamp (milliseconds since system boot)
 	XACC         int16  // X acceleration (mg)
@@ -1621,35 +1848,74 @@ func (*ScaledImu) Crc() uint8 {
 // Pack returns a packed byte array which represents a ScaledImu payload
 func (m *ScaledImu) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS)
-	binary.Write(data, binary.LittleEndian, m.XACC)
-	binary.Write(data, binary.LittleEndian, m.YACC)
-	binary.Write(data, binary.LittleEndian, m.ZACC)
-	binary.Write(data, binary.LittleEndian, m.XGYRO)
-	binary.Write(data, binary.LittleEndian, m.YGYRO)
-	binary.Write(data, binary.LittleEndian, m.ZGYRO)
-	binary.Write(data, binary.LittleEndian, m.XMAG)
-	binary.Write(data, binary.LittleEndian, m.YMAG)
-	binary.Write(data, binary.LittleEndian, m.ZMAG)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.XACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ZACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.XGYRO); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YGYRO); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ZGYRO); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.XMAG); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YMAG); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ZMAG); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the ScaledImu
 func (m *ScaledImu) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS)
-	binary.Read(data, binary.LittleEndian, &m.XACC)
-	binary.Read(data, binary.LittleEndian, &m.YACC)
-	binary.Read(data, binary.LittleEndian, &m.ZACC)
-	binary.Read(data, binary.LittleEndian, &m.XGYRO)
-	binary.Read(data, binary.LittleEndian, &m.YGYRO)
-	binary.Read(data, binary.LittleEndian, &m.ZGYRO)
-	binary.Read(data, binary.LittleEndian, &m.XMAG)
-	binary.Read(data, binary.LittleEndian, &m.YMAG)
-	binary.Read(data, binary.LittleEndian, &m.ZMAG)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.XACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ZACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.XGYRO); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YGYRO); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ZGYRO); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.XMAG); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YMAG); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ZMAG); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE RAW_IMU
 //
 // MAVLINK_MSG_ID_RAW_IMU 27
@@ -1657,8 +1923,6 @@ func (m *ScaledImu) Decode(buf []byte) {
 // MAVLINK_MSG_ID_RAW_IMU_LEN 26
 //
 // MAVLINK_MSG_ID_RAW_IMU_CRC 144
-//
-//
 type RawImu struct {
 	TIME_USEC uint64 // Timestamp (microseconds since UNIX epoch or microseconds since system boot)
 	XACC      int16  // X acceleration (raw)
@@ -1706,35 +1970,74 @@ func (*RawImu) Crc() uint8 {
 // Pack returns a packed byte array which represents a RawImu payload
 func (m *RawImu) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_USEC)
-	binary.Write(data, binary.LittleEndian, m.XACC)
-	binary.Write(data, binary.LittleEndian, m.YACC)
-	binary.Write(data, binary.LittleEndian, m.ZACC)
-	binary.Write(data, binary.LittleEndian, m.XGYRO)
-	binary.Write(data, binary.LittleEndian, m.YGYRO)
-	binary.Write(data, binary.LittleEndian, m.ZGYRO)
-	binary.Write(data, binary.LittleEndian, m.XMAG)
-	binary.Write(data, binary.LittleEndian, m.YMAG)
-	binary.Write(data, binary.LittleEndian, m.ZMAG)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.XACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ZACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.XGYRO); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YGYRO); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ZGYRO); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.XMAG); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YMAG); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ZMAG); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the RawImu
 func (m *RawImu) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_USEC)
-	binary.Read(data, binary.LittleEndian, &m.XACC)
-	binary.Read(data, binary.LittleEndian, &m.YACC)
-	binary.Read(data, binary.LittleEndian, &m.ZACC)
-	binary.Read(data, binary.LittleEndian, &m.XGYRO)
-	binary.Read(data, binary.LittleEndian, &m.YGYRO)
-	binary.Read(data, binary.LittleEndian, &m.ZGYRO)
-	binary.Read(data, binary.LittleEndian, &m.XMAG)
-	binary.Read(data, binary.LittleEndian, &m.YMAG)
-	binary.Read(data, binary.LittleEndian, &m.ZMAG)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.XACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ZACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.XGYRO); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YGYRO); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ZGYRO); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.XMAG); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YMAG); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ZMAG); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE RAW_PRESSURE
 //
 // MAVLINK_MSG_ID_RAW_PRESSURE 28
@@ -1742,8 +2045,6 @@ func (m *RawImu) Decode(buf []byte) {
 // MAVLINK_MSG_ID_RAW_PRESSURE_LEN 16
 //
 // MAVLINK_MSG_ID_RAW_PRESSURE_CRC 67
-//
-//
 type RawPressure struct {
 	TIME_USEC   uint64 // Timestamp (microseconds since UNIX epoch or microseconds since system boot)
 	PRESS_ABS   int16  // Absolute pressure (raw)
@@ -1781,25 +2082,44 @@ func (*RawPressure) Crc() uint8 {
 // Pack returns a packed byte array which represents a RawPressure payload
 func (m *RawPressure) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_USEC)
-	binary.Write(data, binary.LittleEndian, m.PRESS_ABS)
-	binary.Write(data, binary.LittleEndian, m.PRESS_DIFF1)
-	binary.Write(data, binary.LittleEndian, m.PRESS_DIFF2)
-	binary.Write(data, binary.LittleEndian, m.TEMPERATURE)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PRESS_ABS); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PRESS_DIFF1); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PRESS_DIFF2); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TEMPERATURE); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the RawPressure
 func (m *RawPressure) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_USEC)
-	binary.Read(data, binary.LittleEndian, &m.PRESS_ABS)
-	binary.Read(data, binary.LittleEndian, &m.PRESS_DIFF1)
-	binary.Read(data, binary.LittleEndian, &m.PRESS_DIFF2)
-	binary.Read(data, binary.LittleEndian, &m.TEMPERATURE)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PRESS_ABS); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PRESS_DIFF1); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PRESS_DIFF2); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TEMPERATURE); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE SCALED_PRESSURE
 //
 // MAVLINK_MSG_ID_SCALED_PRESSURE 29
@@ -1807,8 +2127,6 @@ func (m *RawPressure) Decode(buf []byte) {
 // MAVLINK_MSG_ID_SCALED_PRESSURE_LEN 14
 //
 // MAVLINK_MSG_ID_SCALED_PRESSURE_CRC 115
-//
-//
 type ScaledPressure struct {
 	TIME_BOOT_MS uint32  // Timestamp (milliseconds since system boot)
 	PRESS_ABS    float32 // Absolute pressure (hectopascal)
@@ -1844,23 +2162,38 @@ func (*ScaledPressure) Crc() uint8 {
 // Pack returns a packed byte array which represents a ScaledPressure payload
 func (m *ScaledPressure) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS)
-	binary.Write(data, binary.LittleEndian, m.PRESS_ABS)
-	binary.Write(data, binary.LittleEndian, m.PRESS_DIFF)
-	binary.Write(data, binary.LittleEndian, m.TEMPERATURE)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PRESS_ABS); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PRESS_DIFF); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TEMPERATURE); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the ScaledPressure
 func (m *ScaledPressure) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS)
-	binary.Read(data, binary.LittleEndian, &m.PRESS_ABS)
-	binary.Read(data, binary.LittleEndian, &m.PRESS_DIFF)
-	binary.Read(data, binary.LittleEndian, &m.TEMPERATURE)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PRESS_ABS); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PRESS_DIFF); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TEMPERATURE); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE ATTITUDE
 //
 // MAVLINK_MSG_ID_ATTITUDE 30
@@ -1868,8 +2201,6 @@ func (m *ScaledPressure) Decode(buf []byte) {
 // MAVLINK_MSG_ID_ATTITUDE_LEN 28
 //
 // MAVLINK_MSG_ID_ATTITUDE_CRC 39
-//
-//
 type Attitude struct {
 	TIME_BOOT_MS uint32  // Timestamp (milliseconds since system boot)
 	ROLL         float32 // Roll angle (rad, -pi..+pi)
@@ -1911,29 +2242,56 @@ func (*Attitude) Crc() uint8 {
 // Pack returns a packed byte array which represents a Attitude payload
 func (m *Attitude) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS)
-	binary.Write(data, binary.LittleEndian, m.ROLL)
-	binary.Write(data, binary.LittleEndian, m.PITCH)
-	binary.Write(data, binary.LittleEndian, m.YAW)
-	binary.Write(data, binary.LittleEndian, m.ROLLSPEED)
-	binary.Write(data, binary.LittleEndian, m.PITCHSPEED)
-	binary.Write(data, binary.LittleEndian, m.YAWSPEED)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ROLL); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PITCH); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ROLLSPEED); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PITCHSPEED); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YAWSPEED); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the Attitude
 func (m *Attitude) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS)
-	binary.Read(data, binary.LittleEndian, &m.ROLL)
-	binary.Read(data, binary.LittleEndian, &m.PITCH)
-	binary.Read(data, binary.LittleEndian, &m.YAW)
-	binary.Read(data, binary.LittleEndian, &m.ROLLSPEED)
-	binary.Read(data, binary.LittleEndian, &m.PITCHSPEED)
-	binary.Read(data, binary.LittleEndian, &m.YAWSPEED)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ROLL); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PITCH); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ROLLSPEED); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PITCHSPEED); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YAWSPEED); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE ATTITUDE_QUATERNION
 //
 // MAVLINK_MSG_ID_ATTITUDE_QUATERNION 31
@@ -1941,8 +2299,6 @@ func (m *Attitude) Decode(buf []byte) {
 // MAVLINK_MSG_ID_ATTITUDE_QUATERNION_LEN 32
 //
 // MAVLINK_MSG_ID_ATTITUDE_QUATERNION_CRC 246
-//
-//
 type AttitudeQuaternion struct {
 	TIME_BOOT_MS uint32  // Timestamp (milliseconds since system boot)
 	Q1           float32 // Quaternion component 1, w (1 in null-rotation)
@@ -1986,31 +2342,62 @@ func (*AttitudeQuaternion) Crc() uint8 {
 // Pack returns a packed byte array which represents a AttitudeQuaternion payload
 func (m *AttitudeQuaternion) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS)
-	binary.Write(data, binary.LittleEndian, m.Q1)
-	binary.Write(data, binary.LittleEndian, m.Q2)
-	binary.Write(data, binary.LittleEndian, m.Q3)
-	binary.Write(data, binary.LittleEndian, m.Q4)
-	binary.Write(data, binary.LittleEndian, m.ROLLSPEED)
-	binary.Write(data, binary.LittleEndian, m.PITCHSPEED)
-	binary.Write(data, binary.LittleEndian, m.YAWSPEED)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.Q1); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.Q2); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.Q3); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.Q4); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ROLLSPEED); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PITCHSPEED); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YAWSPEED); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the AttitudeQuaternion
 func (m *AttitudeQuaternion) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS)
-	binary.Read(data, binary.LittleEndian, &m.Q1)
-	binary.Read(data, binary.LittleEndian, &m.Q2)
-	binary.Read(data, binary.LittleEndian, &m.Q3)
-	binary.Read(data, binary.LittleEndian, &m.Q4)
-	binary.Read(data, binary.LittleEndian, &m.ROLLSPEED)
-	binary.Read(data, binary.LittleEndian, &m.PITCHSPEED)
-	binary.Read(data, binary.LittleEndian, &m.YAWSPEED)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.Q1); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.Q2); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.Q3); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.Q4); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ROLLSPEED); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PITCHSPEED); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YAWSPEED); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE LOCAL_POSITION_NED
 //
 // MAVLINK_MSG_ID_LOCAL_POSITION_NED 32
@@ -2018,8 +2405,6 @@ func (m *AttitudeQuaternion) Decode(buf []byte) {
 // MAVLINK_MSG_ID_LOCAL_POSITION_NED_LEN 28
 //
 // MAVLINK_MSG_ID_LOCAL_POSITION_NED_CRC 185
-//
-//
 type LocalPositionNed struct {
 	TIME_BOOT_MS uint32  // Timestamp (milliseconds since system boot)
 	X            float32 // X Position
@@ -2061,29 +2446,56 @@ func (*LocalPositionNed) Crc() uint8 {
 // Pack returns a packed byte array which represents a LocalPositionNed payload
 func (m *LocalPositionNed) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS)
-	binary.Write(data, binary.LittleEndian, m.X)
-	binary.Write(data, binary.LittleEndian, m.Y)
-	binary.Write(data, binary.LittleEndian, m.Z)
-	binary.Write(data, binary.LittleEndian, m.VX)
-	binary.Write(data, binary.LittleEndian, m.VY)
-	binary.Write(data, binary.LittleEndian, m.VZ)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.X); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.Z); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VX); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VY); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VZ); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the LocalPositionNed
 func (m *LocalPositionNed) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS)
-	binary.Read(data, binary.LittleEndian, &m.X)
-	binary.Read(data, binary.LittleEndian, &m.Y)
-	binary.Read(data, binary.LittleEndian, &m.Z)
-	binary.Read(data, binary.LittleEndian, &m.VX)
-	binary.Read(data, binary.LittleEndian, &m.VY)
-	binary.Read(data, binary.LittleEndian, &m.VZ)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.X); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.Z); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VX); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VY); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VZ); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE GLOBAL_POSITION_INT
 //
 // MAVLINK_MSG_ID_GLOBAL_POSITION_INT 33
@@ -2091,8 +2503,6 @@ func (m *LocalPositionNed) Decode(buf []byte) {
 // MAVLINK_MSG_ID_GLOBAL_POSITION_INT_LEN 28
 //
 // MAVLINK_MSG_ID_GLOBAL_POSITION_INT_CRC 104
-//
-//
 type GlobalPositionInt struct {
 	TIME_BOOT_MS uint32 // Timestamp (milliseconds since system boot)
 	LAT          int32  // Latitude, expressed as * 1E7
@@ -2138,33 +2548,68 @@ func (*GlobalPositionInt) Crc() uint8 {
 // Pack returns a packed byte array which represents a GlobalPositionInt payload
 func (m *GlobalPositionInt) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS)
-	binary.Write(data, binary.LittleEndian, m.LAT)
-	binary.Write(data, binary.LittleEndian, m.LON)
-	binary.Write(data, binary.LittleEndian, m.ALT)
-	binary.Write(data, binary.LittleEndian, m.RELATIVE_ALT)
-	binary.Write(data, binary.LittleEndian, m.VX)
-	binary.Write(data, binary.LittleEndian, m.VY)
-	binary.Write(data, binary.LittleEndian, m.VZ)
-	binary.Write(data, binary.LittleEndian, m.HDG)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.LAT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.LON); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ALT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.RELATIVE_ALT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VX); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VY); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VZ); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.HDG); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the GlobalPositionInt
 func (m *GlobalPositionInt) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS)
-	binary.Read(data, binary.LittleEndian, &m.LAT)
-	binary.Read(data, binary.LittleEndian, &m.LON)
-	binary.Read(data, binary.LittleEndian, &m.ALT)
-	binary.Read(data, binary.LittleEndian, &m.RELATIVE_ALT)
-	binary.Read(data, binary.LittleEndian, &m.VX)
-	binary.Read(data, binary.LittleEndian, &m.VY)
-	binary.Read(data, binary.LittleEndian, &m.VZ)
-	binary.Read(data, binary.LittleEndian, &m.HDG)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.LAT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.LON); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ALT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.RELATIVE_ALT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VX); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VY); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VZ); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.HDG); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE RC_CHANNELS_SCALED
 //
 // MAVLINK_MSG_ID_RC_CHANNELS_SCALED 34
@@ -2172,8 +2617,6 @@ func (m *GlobalPositionInt) Decode(buf []byte) {
 // MAVLINK_MSG_ID_RC_CHANNELS_SCALED_LEN 22
 //
 // MAVLINK_MSG_ID_RC_CHANNELS_SCALED_CRC 237
-//
-//
 type RcChannelsScaled struct {
 	TIME_BOOT_MS uint32 // Timestamp (milliseconds since system boot)
 	CHAN1_SCALED int16  // RC channel 1 value scaled, (-100%) -10000, (0%) 0, (100%) 10000, (invalid) INT16_MAX.
@@ -2223,37 +2666,80 @@ func (*RcChannelsScaled) Crc() uint8 {
 // Pack returns a packed byte array which represents a RcChannelsScaled payload
 func (m *RcChannelsScaled) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS)
-	binary.Write(data, binary.LittleEndian, m.CHAN1_SCALED)
-	binary.Write(data, binary.LittleEndian, m.CHAN2_SCALED)
-	binary.Write(data, binary.LittleEndian, m.CHAN3_SCALED)
-	binary.Write(data, binary.LittleEndian, m.CHAN4_SCALED)
-	binary.Write(data, binary.LittleEndian, m.CHAN5_SCALED)
-	binary.Write(data, binary.LittleEndian, m.CHAN6_SCALED)
-	binary.Write(data, binary.LittleEndian, m.CHAN7_SCALED)
-	binary.Write(data, binary.LittleEndian, m.CHAN8_SCALED)
-	binary.Write(data, binary.LittleEndian, m.PORT)
-	binary.Write(data, binary.LittleEndian, m.RSSI)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN1_SCALED); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN2_SCALED); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN3_SCALED); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN4_SCALED); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN5_SCALED); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN6_SCALED); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN7_SCALED); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN8_SCALED); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PORT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.RSSI); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the RcChannelsScaled
 func (m *RcChannelsScaled) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS)
-	binary.Read(data, binary.LittleEndian, &m.CHAN1_SCALED)
-	binary.Read(data, binary.LittleEndian, &m.CHAN2_SCALED)
-	binary.Read(data, binary.LittleEndian, &m.CHAN3_SCALED)
-	binary.Read(data, binary.LittleEndian, &m.CHAN4_SCALED)
-	binary.Read(data, binary.LittleEndian, &m.CHAN5_SCALED)
-	binary.Read(data, binary.LittleEndian, &m.CHAN6_SCALED)
-	binary.Read(data, binary.LittleEndian, &m.CHAN7_SCALED)
-	binary.Read(data, binary.LittleEndian, &m.CHAN8_SCALED)
-	binary.Read(data, binary.LittleEndian, &m.PORT)
-	binary.Read(data, binary.LittleEndian, &m.RSSI)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN1_SCALED); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN2_SCALED); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN3_SCALED); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN4_SCALED); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN5_SCALED); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN6_SCALED); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN7_SCALED); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN8_SCALED); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PORT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.RSSI); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE RC_CHANNELS_RAW
 //
 // MAVLINK_MSG_ID_RC_CHANNELS_RAW 35
@@ -2261,8 +2747,6 @@ func (m *RcChannelsScaled) Decode(buf []byte) {
 // MAVLINK_MSG_ID_RC_CHANNELS_RAW_LEN 22
 //
 // MAVLINK_MSG_ID_RC_CHANNELS_RAW_CRC 244
-//
-//
 type RcChannelsRaw struct {
 	TIME_BOOT_MS uint32 // Timestamp (milliseconds since system boot)
 	CHAN1_RAW    uint16 // RC channel 1 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
@@ -2312,37 +2796,80 @@ func (*RcChannelsRaw) Crc() uint8 {
 // Pack returns a packed byte array which represents a RcChannelsRaw payload
 func (m *RcChannelsRaw) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS)
-	binary.Write(data, binary.LittleEndian, m.CHAN1_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN2_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN3_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN4_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN5_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN6_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN7_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN8_RAW)
-	binary.Write(data, binary.LittleEndian, m.PORT)
-	binary.Write(data, binary.LittleEndian, m.RSSI)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN1_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN2_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN3_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN4_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN5_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN6_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN7_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN8_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PORT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.RSSI); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the RcChannelsRaw
 func (m *RcChannelsRaw) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS)
-	binary.Read(data, binary.LittleEndian, &m.CHAN1_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN2_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN3_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN4_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN5_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN6_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN7_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN8_RAW)
-	binary.Read(data, binary.LittleEndian, &m.PORT)
-	binary.Read(data, binary.LittleEndian, &m.RSSI)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN1_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN2_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN3_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN4_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN5_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN6_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN7_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN8_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PORT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.RSSI); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE SERVO_OUTPUT_RAW
 //
 // MAVLINK_MSG_ID_SERVO_OUTPUT_RAW 36
@@ -2350,8 +2877,6 @@ func (m *RcChannelsRaw) Decode(buf []byte) {
 // MAVLINK_MSG_ID_SERVO_OUTPUT_RAW_LEN 21
 //
 // MAVLINK_MSG_ID_SERVO_OUTPUT_RAW_CRC 222
-//
-//
 type ServoOutputRaw struct {
 	TIME_USEC  uint32 // Timestamp (microseconds since system boot)
 	SERVO1_RAW uint16 // Servo output 1 value, in microseconds
@@ -2399,35 +2924,74 @@ func (*ServoOutputRaw) Crc() uint8 {
 // Pack returns a packed byte array which represents a ServoOutputRaw payload
 func (m *ServoOutputRaw) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_USEC)
-	binary.Write(data, binary.LittleEndian, m.SERVO1_RAW)
-	binary.Write(data, binary.LittleEndian, m.SERVO2_RAW)
-	binary.Write(data, binary.LittleEndian, m.SERVO3_RAW)
-	binary.Write(data, binary.LittleEndian, m.SERVO4_RAW)
-	binary.Write(data, binary.LittleEndian, m.SERVO5_RAW)
-	binary.Write(data, binary.LittleEndian, m.SERVO6_RAW)
-	binary.Write(data, binary.LittleEndian, m.SERVO7_RAW)
-	binary.Write(data, binary.LittleEndian, m.SERVO8_RAW)
-	binary.Write(data, binary.LittleEndian, m.PORT)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.SERVO1_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.SERVO2_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.SERVO3_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.SERVO4_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.SERVO5_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.SERVO6_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.SERVO7_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.SERVO8_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PORT); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the ServoOutputRaw
 func (m *ServoOutputRaw) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_USEC)
-	binary.Read(data, binary.LittleEndian, &m.SERVO1_RAW)
-	binary.Read(data, binary.LittleEndian, &m.SERVO2_RAW)
-	binary.Read(data, binary.LittleEndian, &m.SERVO3_RAW)
-	binary.Read(data, binary.LittleEndian, &m.SERVO4_RAW)
-	binary.Read(data, binary.LittleEndian, &m.SERVO5_RAW)
-	binary.Read(data, binary.LittleEndian, &m.SERVO6_RAW)
-	binary.Read(data, binary.LittleEndian, &m.SERVO7_RAW)
-	binary.Read(data, binary.LittleEndian, &m.SERVO8_RAW)
-	binary.Read(data, binary.LittleEndian, &m.PORT)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.SERVO1_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.SERVO2_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.SERVO3_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.SERVO4_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.SERVO5_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.SERVO6_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.SERVO7_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.SERVO8_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PORT); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE MISSION_REQUEST_PARTIAL_LIST
 //
 // MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST 37
@@ -2435,8 +2999,6 @@ func (m *ServoOutputRaw) Decode(buf []byte) {
 // MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST_LEN 6
 //
 // MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST_CRC 212
-//
-//
 type MissionRequestPartialList struct {
 	START_INDEX      int16 // Start index, 0 by default
 	END_INDEX        int16 // End index, -1 by default (-1: send list to end). Else a valid index of the list
@@ -2472,23 +3034,38 @@ func (*MissionRequestPartialList) Crc() uint8 {
 // Pack returns a packed byte array which represents a MissionRequestPartialList payload
 func (m *MissionRequestPartialList) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.START_INDEX)
-	binary.Write(data, binary.LittleEndian, m.END_INDEX)
-	binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM)
-	binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT)
+	if err := binary.Write(data, binary.LittleEndian, m.START_INDEX); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.END_INDEX); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the MissionRequestPartialList
 func (m *MissionRequestPartialList) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.START_INDEX)
-	binary.Read(data, binary.LittleEndian, &m.END_INDEX)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
+	if err := binary.Read(data, binary.LittleEndian, &m.START_INDEX); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.END_INDEX); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE MISSION_WRITE_PARTIAL_LIST
 //
 // MAVLINK_MSG_ID_MISSION_WRITE_PARTIAL_LIST 38
@@ -2496,8 +3073,6 @@ func (m *MissionRequestPartialList) Decode(buf []byte) {
 // MAVLINK_MSG_ID_MISSION_WRITE_PARTIAL_LIST_LEN 6
 //
 // MAVLINK_MSG_ID_MISSION_WRITE_PARTIAL_LIST_CRC 9
-//
-//
 type MissionWritePartialList struct {
 	START_INDEX      int16 // Start index, 0 by default and smaller / equal to the largest index of the current onboard list.
 	END_INDEX        int16 // End index, equal or greater than start index.
@@ -2533,23 +3108,38 @@ func (*MissionWritePartialList) Crc() uint8 {
 // Pack returns a packed byte array which represents a MissionWritePartialList payload
 func (m *MissionWritePartialList) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.START_INDEX)
-	binary.Write(data, binary.LittleEndian, m.END_INDEX)
-	binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM)
-	binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT)
+	if err := binary.Write(data, binary.LittleEndian, m.START_INDEX); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.END_INDEX); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the MissionWritePartialList
 func (m *MissionWritePartialList) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.START_INDEX)
-	binary.Read(data, binary.LittleEndian, &m.END_INDEX)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
+	if err := binary.Read(data, binary.LittleEndian, &m.START_INDEX); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.END_INDEX); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE MISSION_ITEM
 //
 // MAVLINK_MSG_ID_MISSION_ITEM 39
@@ -2557,8 +3147,6 @@ func (m *MissionWritePartialList) Decode(buf []byte) {
 // MAVLINK_MSG_ID_MISSION_ITEM_LEN 37
 //
 // MAVLINK_MSG_ID_MISSION_ITEM_CRC 254
-//
-//
 type MissionItem struct {
 	PARAM1           float32 // PARAM1, see MAV_CMD enum
 	PARAM2           float32 // PARAM2, see MAV_CMD enum
@@ -2614,43 +3202,98 @@ func (*MissionItem) Crc() uint8 {
 // Pack returns a packed byte array which represents a MissionItem payload
 func (m *MissionItem) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.PARAM1)
-	binary.Write(data, binary.LittleEndian, m.PARAM2)
-	binary.Write(data, binary.LittleEndian, m.PARAM3)
-	binary.Write(data, binary.LittleEndian, m.PARAM4)
-	binary.Write(data, binary.LittleEndian, m.X)
-	binary.Write(data, binary.LittleEndian, m.Y)
-	binary.Write(data, binary.LittleEndian, m.Z)
-	binary.Write(data, binary.LittleEndian, m.SEQ)
-	binary.Write(data, binary.LittleEndian, m.COMMAND)
-	binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM)
-	binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT)
-	binary.Write(data, binary.LittleEndian, m.FRAME)
-	binary.Write(data, binary.LittleEndian, m.CURRENT)
-	binary.Write(data, binary.LittleEndian, m.AUTOCONTINUE)
+	if err := binary.Write(data, binary.LittleEndian, m.PARAM1); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PARAM2); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PARAM3); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PARAM4); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.X); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.Z); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.SEQ); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.COMMAND); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.FRAME); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CURRENT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.AUTOCONTINUE); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the MissionItem
 func (m *MissionItem) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.PARAM1)
-	binary.Read(data, binary.LittleEndian, &m.PARAM2)
-	binary.Read(data, binary.LittleEndian, &m.PARAM3)
-	binary.Read(data, binary.LittleEndian, &m.PARAM4)
-	binary.Read(data, binary.LittleEndian, &m.X)
-	binary.Read(data, binary.LittleEndian, &m.Y)
-	binary.Read(data, binary.LittleEndian, &m.Z)
-	binary.Read(data, binary.LittleEndian, &m.SEQ)
-	binary.Read(data, binary.LittleEndian, &m.COMMAND)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
-	binary.Read(data, binary.LittleEndian, &m.FRAME)
-	binary.Read(data, binary.LittleEndian, &m.CURRENT)
-	binary.Read(data, binary.LittleEndian, &m.AUTOCONTINUE)
+	if err := binary.Read(data, binary.LittleEndian, &m.PARAM1); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PARAM2); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PARAM3); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PARAM4); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.X); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.Z); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.SEQ); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.COMMAND); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.FRAME); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CURRENT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.AUTOCONTINUE); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE MISSION_REQUEST
 //
 // MAVLINK_MSG_ID_MISSION_REQUEST 40
@@ -2658,8 +3301,6 @@ func (m *MissionItem) Decode(buf []byte) {
 // MAVLINK_MSG_ID_MISSION_REQUEST_LEN 4
 //
 // MAVLINK_MSG_ID_MISSION_REQUEST_CRC 230
-//
-//
 type MissionRequest struct {
 	SEQ              uint16 // Sequence
 	TARGET_SYSTEM    uint8  // System ID
@@ -2693,21 +3334,32 @@ func (*MissionRequest) Crc() uint8 {
 // Pack returns a packed byte array which represents a MissionRequest payload
 func (m *MissionRequest) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.SEQ)
-	binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM)
-	binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT)
+	if err := binary.Write(data, binary.LittleEndian, m.SEQ); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the MissionRequest
 func (m *MissionRequest) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.SEQ)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
+	if err := binary.Read(data, binary.LittleEndian, &m.SEQ); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE MISSION_SET_CURRENT
 //
 // MAVLINK_MSG_ID_MISSION_SET_CURRENT 41
@@ -2715,8 +3367,6 @@ func (m *MissionRequest) Decode(buf []byte) {
 // MAVLINK_MSG_ID_MISSION_SET_CURRENT_LEN 4
 //
 // MAVLINK_MSG_ID_MISSION_SET_CURRENT_CRC 28
-//
-//
 type MissionSetCurrent struct {
 	SEQ              uint16 // Sequence
 	TARGET_SYSTEM    uint8  // System ID
@@ -2750,21 +3400,32 @@ func (*MissionSetCurrent) Crc() uint8 {
 // Pack returns a packed byte array which represents a MissionSetCurrent payload
 func (m *MissionSetCurrent) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.SEQ)
-	binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM)
-	binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT)
+	if err := binary.Write(data, binary.LittleEndian, m.SEQ); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the MissionSetCurrent
 func (m *MissionSetCurrent) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.SEQ)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
+	if err := binary.Read(data, binary.LittleEndian, &m.SEQ); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE MISSION_CURRENT
 //
 // MAVLINK_MSG_ID_MISSION_CURRENT 42
@@ -2772,8 +3433,6 @@ func (m *MissionSetCurrent) Decode(buf []byte) {
 // MAVLINK_MSG_ID_MISSION_CURRENT_LEN 2
 //
 // MAVLINK_MSG_ID_MISSION_CURRENT_CRC 28
-//
-//
 type MissionCurrent struct {
 	SEQ uint16 // Sequence
 }
@@ -2803,17 +3462,20 @@ func (*MissionCurrent) Crc() uint8 {
 // Pack returns a packed byte array which represents a MissionCurrent payload
 func (m *MissionCurrent) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.SEQ)
+	if err := binary.Write(data, binary.LittleEndian, m.SEQ); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the MissionCurrent
 func (m *MissionCurrent) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.SEQ)
+	if err := binary.Read(data, binary.LittleEndian, &m.SEQ); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE MISSION_REQUEST_LIST
 //
 // MAVLINK_MSG_ID_MISSION_REQUEST_LIST 43
@@ -2821,8 +3483,6 @@ func (m *MissionCurrent) Decode(buf []byte) {
 // MAVLINK_MSG_ID_MISSION_REQUEST_LIST_LEN 2
 //
 // MAVLINK_MSG_ID_MISSION_REQUEST_LIST_CRC 132
-//
-//
 type MissionRequestList struct {
 	TARGET_SYSTEM    uint8 // System ID
 	TARGET_COMPONENT uint8 // Component ID
@@ -2854,19 +3514,26 @@ func (*MissionRequestList) Crc() uint8 {
 // Pack returns a packed byte array which represents a MissionRequestList payload
 func (m *MissionRequestList) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM)
-	binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT)
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the MissionRequestList
 func (m *MissionRequestList) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE MISSION_COUNT
 //
 // MAVLINK_MSG_ID_MISSION_COUNT 44
@@ -2874,8 +3541,6 @@ func (m *MissionRequestList) Decode(buf []byte) {
 // MAVLINK_MSG_ID_MISSION_COUNT_LEN 4
 //
 // MAVLINK_MSG_ID_MISSION_COUNT_CRC 221
-//
-//
 type MissionCount struct {
 	COUNT            uint16 // Number of mission items in the sequence
 	TARGET_SYSTEM    uint8  // System ID
@@ -2909,21 +3574,32 @@ func (*MissionCount) Crc() uint8 {
 // Pack returns a packed byte array which represents a MissionCount payload
 func (m *MissionCount) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.COUNT)
-	binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM)
-	binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT)
+	if err := binary.Write(data, binary.LittleEndian, m.COUNT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the MissionCount
 func (m *MissionCount) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.COUNT)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
+	if err := binary.Read(data, binary.LittleEndian, &m.COUNT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE MISSION_CLEAR_ALL
 //
 // MAVLINK_MSG_ID_MISSION_CLEAR_ALL 45
@@ -2931,8 +3607,6 @@ func (m *MissionCount) Decode(buf []byte) {
 // MAVLINK_MSG_ID_MISSION_CLEAR_ALL_LEN 2
 //
 // MAVLINK_MSG_ID_MISSION_CLEAR_ALL_CRC 232
-//
-//
 type MissionClearAll struct {
 	TARGET_SYSTEM    uint8 // System ID
 	TARGET_COMPONENT uint8 // Component ID
@@ -2964,19 +3638,26 @@ func (*MissionClearAll) Crc() uint8 {
 // Pack returns a packed byte array which represents a MissionClearAll payload
 func (m *MissionClearAll) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM)
-	binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT)
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the MissionClearAll
 func (m *MissionClearAll) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE MISSION_ITEM_REACHED
 //
 // MAVLINK_MSG_ID_MISSION_ITEM_REACHED 46
@@ -2984,8 +3665,6 @@ func (m *MissionClearAll) Decode(buf []byte) {
 // MAVLINK_MSG_ID_MISSION_ITEM_REACHED_LEN 2
 //
 // MAVLINK_MSG_ID_MISSION_ITEM_REACHED_CRC 11
-//
-//
 type MissionItemReached struct {
 	SEQ uint16 // Sequence
 }
@@ -3015,17 +3694,20 @@ func (*MissionItemReached) Crc() uint8 {
 // Pack returns a packed byte array which represents a MissionItemReached payload
 func (m *MissionItemReached) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.SEQ)
+	if err := binary.Write(data, binary.LittleEndian, m.SEQ); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the MissionItemReached
 func (m *MissionItemReached) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.SEQ)
+	if err := binary.Read(data, binary.LittleEndian, &m.SEQ); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE MISSION_ACK
 //
 // MAVLINK_MSG_ID_MISSION_ACK 47
@@ -3033,8 +3715,6 @@ func (m *MissionItemReached) Decode(buf []byte) {
 // MAVLINK_MSG_ID_MISSION_ACK_LEN 3
 //
 // MAVLINK_MSG_ID_MISSION_ACK_CRC 153
-//
-//
 type MissionAck struct {
 	TARGET_SYSTEM    uint8 // System ID
 	TARGET_COMPONENT uint8 // Component ID
@@ -3068,21 +3748,32 @@ func (*MissionAck) Crc() uint8 {
 // Pack returns a packed byte array which represents a MissionAck payload
 func (m *MissionAck) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM)
-	binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT)
-	binary.Write(data, binary.LittleEndian, m.TYPE)
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TYPE); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the MissionAck
 func (m *MissionAck) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
-	binary.Read(data, binary.LittleEndian, &m.TYPE)
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TYPE); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE SET_GPS_GLOBAL_ORIGIN
 //
 // MAVLINK_MSG_ID_SET_GPS_GLOBAL_ORIGIN 48
@@ -3090,8 +3781,6 @@ func (m *MissionAck) Decode(buf []byte) {
 // MAVLINK_MSG_ID_SET_GPS_GLOBAL_ORIGIN_LEN 13
 //
 // MAVLINK_MSG_ID_SET_GPS_GLOBAL_ORIGIN_CRC 41
-//
-//
 type SetGpsGlobalOrigin struct {
 	LATITUDE      int32 // Latitude (WGS84), in degrees * 1E7
 	LONGITUDE     int32 // Longitude (WGS84, in degrees * 1E7
@@ -3127,23 +3816,38 @@ func (*SetGpsGlobalOrigin) Crc() uint8 {
 // Pack returns a packed byte array which represents a SetGpsGlobalOrigin payload
 func (m *SetGpsGlobalOrigin) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.LATITUDE)
-	binary.Write(data, binary.LittleEndian, m.LONGITUDE)
-	binary.Write(data, binary.LittleEndian, m.ALTITUDE)
-	binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM)
+	if err := binary.Write(data, binary.LittleEndian, m.LATITUDE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.LONGITUDE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ALTITUDE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the SetGpsGlobalOrigin
 func (m *SetGpsGlobalOrigin) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.LATITUDE)
-	binary.Read(data, binary.LittleEndian, &m.LONGITUDE)
-	binary.Read(data, binary.LittleEndian, &m.ALTITUDE)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM)
+	if err := binary.Read(data, binary.LittleEndian, &m.LATITUDE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.LONGITUDE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ALTITUDE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE GPS_GLOBAL_ORIGIN
 //
 // MAVLINK_MSG_ID_GPS_GLOBAL_ORIGIN 49
@@ -3151,8 +3855,6 @@ func (m *SetGpsGlobalOrigin) Decode(buf []byte) {
 // MAVLINK_MSG_ID_GPS_GLOBAL_ORIGIN_LEN 12
 //
 // MAVLINK_MSG_ID_GPS_GLOBAL_ORIGIN_CRC 39
-//
-//
 type GpsGlobalOrigin struct {
 	LATITUDE  int32 // Latitude (WGS84), in degrees * 1E7
 	LONGITUDE int32 // Longitude (WGS84), in degrees * 1E7
@@ -3186,21 +3888,32 @@ func (*GpsGlobalOrigin) Crc() uint8 {
 // Pack returns a packed byte array which represents a GpsGlobalOrigin payload
 func (m *GpsGlobalOrigin) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.LATITUDE)
-	binary.Write(data, binary.LittleEndian, m.LONGITUDE)
-	binary.Write(data, binary.LittleEndian, m.ALTITUDE)
+	if err := binary.Write(data, binary.LittleEndian, m.LATITUDE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.LONGITUDE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ALTITUDE); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the GpsGlobalOrigin
 func (m *GpsGlobalOrigin) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.LATITUDE)
-	binary.Read(data, binary.LittleEndian, &m.LONGITUDE)
-	binary.Read(data, binary.LittleEndian, &m.ALTITUDE)
+	if err := binary.Read(data, binary.LittleEndian, &m.LATITUDE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.LONGITUDE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ALTITUDE); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE SET_LOCAL_POSITION_SETPOINT
 //
 // MAVLINK_MSG_ID_SET_LOCAL_POSITION_SETPOINT 50
@@ -3208,8 +3921,6 @@ func (m *GpsGlobalOrigin) Decode(buf []byte) {
 // MAVLINK_MSG_ID_SET_LOCAL_POSITION_SETPOINT_LEN 19
 //
 // MAVLINK_MSG_ID_SET_LOCAL_POSITION_SETPOINT_CRC 214
-//
-//
 type SetLocalPositionSetpoint struct {
 	X                float32 // x position
 	Y                float32 // y position
@@ -3251,29 +3962,56 @@ func (*SetLocalPositionSetpoint) Crc() uint8 {
 // Pack returns a packed byte array which represents a SetLocalPositionSetpoint payload
 func (m *SetLocalPositionSetpoint) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.X)
-	binary.Write(data, binary.LittleEndian, m.Y)
-	binary.Write(data, binary.LittleEndian, m.Z)
-	binary.Write(data, binary.LittleEndian, m.YAW)
-	binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM)
-	binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT)
-	binary.Write(data, binary.LittleEndian, m.COORDINATE_FRAME)
+	if err := binary.Write(data, binary.LittleEndian, m.X); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.Z); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.COORDINATE_FRAME); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the SetLocalPositionSetpoint
 func (m *SetLocalPositionSetpoint) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.X)
-	binary.Read(data, binary.LittleEndian, &m.Y)
-	binary.Read(data, binary.LittleEndian, &m.Z)
-	binary.Read(data, binary.LittleEndian, &m.YAW)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
-	binary.Read(data, binary.LittleEndian, &m.COORDINATE_FRAME)
+	if err := binary.Read(data, binary.LittleEndian, &m.X); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.Z); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.COORDINATE_FRAME); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE LOCAL_POSITION_SETPOINT
 //
 // MAVLINK_MSG_ID_LOCAL_POSITION_SETPOINT 51
@@ -3281,8 +4019,6 @@ func (m *SetLocalPositionSetpoint) Decode(buf []byte) {
 // MAVLINK_MSG_ID_LOCAL_POSITION_SETPOINT_LEN 17
 //
 // MAVLINK_MSG_ID_LOCAL_POSITION_SETPOINT_CRC 223
-//
-//
 type LocalPositionSetpoint struct {
 	X                float32 // x position
 	Y                float32 // y position
@@ -3320,25 +4056,44 @@ func (*LocalPositionSetpoint) Crc() uint8 {
 // Pack returns a packed byte array which represents a LocalPositionSetpoint payload
 func (m *LocalPositionSetpoint) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.X)
-	binary.Write(data, binary.LittleEndian, m.Y)
-	binary.Write(data, binary.LittleEndian, m.Z)
-	binary.Write(data, binary.LittleEndian, m.YAW)
-	binary.Write(data, binary.LittleEndian, m.COORDINATE_FRAME)
+	if err := binary.Write(data, binary.LittleEndian, m.X); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.Z); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.COORDINATE_FRAME); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the LocalPositionSetpoint
 func (m *LocalPositionSetpoint) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.X)
-	binary.Read(data, binary.LittleEndian, &m.Y)
-	binary.Read(data, binary.LittleEndian, &m.Z)
-	binary.Read(data, binary.LittleEndian, &m.YAW)
-	binary.Read(data, binary.LittleEndian, &m.COORDINATE_FRAME)
+	if err := binary.Read(data, binary.LittleEndian, &m.X); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.Z); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.COORDINATE_FRAME); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE GLOBAL_POSITION_SETPOINT_INT
 //
 // MAVLINK_MSG_ID_GLOBAL_POSITION_SETPOINT_INT 52
@@ -3346,8 +4101,6 @@ func (m *LocalPositionSetpoint) Decode(buf []byte) {
 // MAVLINK_MSG_ID_GLOBAL_POSITION_SETPOINT_INT_LEN 15
 //
 // MAVLINK_MSG_ID_GLOBAL_POSITION_SETPOINT_INT_CRC 141
-//
-//
 type GlobalPositionSetpointInt struct {
 	LATITUDE         int32 // Latitude (WGS84), in degrees * 1E7
 	LONGITUDE        int32 // Longitude (WGS84), in degrees * 1E7
@@ -3385,25 +4138,44 @@ func (*GlobalPositionSetpointInt) Crc() uint8 {
 // Pack returns a packed byte array which represents a GlobalPositionSetpointInt payload
 func (m *GlobalPositionSetpointInt) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.LATITUDE)
-	binary.Write(data, binary.LittleEndian, m.LONGITUDE)
-	binary.Write(data, binary.LittleEndian, m.ALTITUDE)
-	binary.Write(data, binary.LittleEndian, m.YAW)
-	binary.Write(data, binary.LittleEndian, m.COORDINATE_FRAME)
+	if err := binary.Write(data, binary.LittleEndian, m.LATITUDE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.LONGITUDE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ALTITUDE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.COORDINATE_FRAME); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the GlobalPositionSetpointInt
 func (m *GlobalPositionSetpointInt) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.LATITUDE)
-	binary.Read(data, binary.LittleEndian, &m.LONGITUDE)
-	binary.Read(data, binary.LittleEndian, &m.ALTITUDE)
-	binary.Read(data, binary.LittleEndian, &m.YAW)
-	binary.Read(data, binary.LittleEndian, &m.COORDINATE_FRAME)
+	if err := binary.Read(data, binary.LittleEndian, &m.LATITUDE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.LONGITUDE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ALTITUDE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.COORDINATE_FRAME); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE SET_GLOBAL_POSITION_SETPOINT_INT
 //
 // MAVLINK_MSG_ID_SET_GLOBAL_POSITION_SETPOINT_INT 53
@@ -3411,8 +4183,6 @@ func (m *GlobalPositionSetpointInt) Decode(buf []byte) {
 // MAVLINK_MSG_ID_SET_GLOBAL_POSITION_SETPOINT_INT_LEN 15
 //
 // MAVLINK_MSG_ID_SET_GLOBAL_POSITION_SETPOINT_INT_CRC 33
-//
-//
 type SetGlobalPositionSetpointInt struct {
 	LATITUDE         int32 // Latitude (WGS84), in degrees * 1E7
 	LONGITUDE        int32 // Longitude (WGS84), in degrees * 1E7
@@ -3450,25 +4220,44 @@ func (*SetGlobalPositionSetpointInt) Crc() uint8 {
 // Pack returns a packed byte array which represents a SetGlobalPositionSetpointInt payload
 func (m *SetGlobalPositionSetpointInt) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.LATITUDE)
-	binary.Write(data, binary.LittleEndian, m.LONGITUDE)
-	binary.Write(data, binary.LittleEndian, m.ALTITUDE)
-	binary.Write(data, binary.LittleEndian, m.YAW)
-	binary.Write(data, binary.LittleEndian, m.COORDINATE_FRAME)
+	if err := binary.Write(data, binary.LittleEndian, m.LATITUDE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.LONGITUDE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ALTITUDE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.COORDINATE_FRAME); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the SetGlobalPositionSetpointInt
 func (m *SetGlobalPositionSetpointInt) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.LATITUDE)
-	binary.Read(data, binary.LittleEndian, &m.LONGITUDE)
-	binary.Read(data, binary.LittleEndian, &m.ALTITUDE)
-	binary.Read(data, binary.LittleEndian, &m.YAW)
-	binary.Read(data, binary.LittleEndian, &m.COORDINATE_FRAME)
+	if err := binary.Read(data, binary.LittleEndian, &m.LATITUDE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.LONGITUDE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ALTITUDE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.COORDINATE_FRAME); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE SAFETY_SET_ALLOWED_AREA
 //
 // MAVLINK_MSG_ID_SAFETY_SET_ALLOWED_AREA 54
@@ -3476,8 +4265,6 @@ func (m *SetGlobalPositionSetpointInt) Decode(buf []byte) {
 // MAVLINK_MSG_ID_SAFETY_SET_ALLOWED_AREA_LEN 27
 //
 // MAVLINK_MSG_ID_SAFETY_SET_ALLOWED_AREA_CRC 15
-//
-//
 type SafetySetAllowedArea struct {
 	P1X              float32 // x position 1 / Latitude 1
 	P1Y              float32 // y position 1 / Longitude 1
@@ -3523,33 +4310,68 @@ func (*SafetySetAllowedArea) Crc() uint8 {
 // Pack returns a packed byte array which represents a SafetySetAllowedArea payload
 func (m *SafetySetAllowedArea) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.P1X)
-	binary.Write(data, binary.LittleEndian, m.P1Y)
-	binary.Write(data, binary.LittleEndian, m.P1Z)
-	binary.Write(data, binary.LittleEndian, m.P2X)
-	binary.Write(data, binary.LittleEndian, m.P2Y)
-	binary.Write(data, binary.LittleEndian, m.P2Z)
-	binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM)
-	binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT)
-	binary.Write(data, binary.LittleEndian, m.FRAME)
+	if err := binary.Write(data, binary.LittleEndian, m.P1X); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.P1Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.P1Z); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.P2X); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.P2Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.P2Z); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.FRAME); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the SafetySetAllowedArea
 func (m *SafetySetAllowedArea) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.P1X)
-	binary.Read(data, binary.LittleEndian, &m.P1Y)
-	binary.Read(data, binary.LittleEndian, &m.P1Z)
-	binary.Read(data, binary.LittleEndian, &m.P2X)
-	binary.Read(data, binary.LittleEndian, &m.P2Y)
-	binary.Read(data, binary.LittleEndian, &m.P2Z)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
-	binary.Read(data, binary.LittleEndian, &m.FRAME)
+	if err := binary.Read(data, binary.LittleEndian, &m.P1X); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.P1Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.P1Z); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.P2X); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.P2Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.P2Z); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.FRAME); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE SAFETY_ALLOWED_AREA
 //
 // MAVLINK_MSG_ID_SAFETY_ALLOWED_AREA 55
@@ -3557,8 +4379,6 @@ func (m *SafetySetAllowedArea) Decode(buf []byte) {
 // MAVLINK_MSG_ID_SAFETY_ALLOWED_AREA_LEN 25
 //
 // MAVLINK_MSG_ID_SAFETY_ALLOWED_AREA_CRC 3
-//
-//
 type SafetyAllowedArea struct {
 	P1X   float32 // x position 1 / Latitude 1
 	P1Y   float32 // y position 1 / Longitude 1
@@ -3600,29 +4420,56 @@ func (*SafetyAllowedArea) Crc() uint8 {
 // Pack returns a packed byte array which represents a SafetyAllowedArea payload
 func (m *SafetyAllowedArea) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.P1X)
-	binary.Write(data, binary.LittleEndian, m.P1Y)
-	binary.Write(data, binary.LittleEndian, m.P1Z)
-	binary.Write(data, binary.LittleEndian, m.P2X)
-	binary.Write(data, binary.LittleEndian, m.P2Y)
-	binary.Write(data, binary.LittleEndian, m.P2Z)
-	binary.Write(data, binary.LittleEndian, m.FRAME)
+	if err := binary.Write(data, binary.LittleEndian, m.P1X); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.P1Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.P1Z); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.P2X); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.P2Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.P2Z); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.FRAME); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the SafetyAllowedArea
 func (m *SafetyAllowedArea) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.P1X)
-	binary.Read(data, binary.LittleEndian, &m.P1Y)
-	binary.Read(data, binary.LittleEndian, &m.P1Z)
-	binary.Read(data, binary.LittleEndian, &m.P2X)
-	binary.Read(data, binary.LittleEndian, &m.P2Y)
-	binary.Read(data, binary.LittleEndian, &m.P2Z)
-	binary.Read(data, binary.LittleEndian, &m.FRAME)
+	if err := binary.Read(data, binary.LittleEndian, &m.P1X); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.P1Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.P1Z); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.P2X); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.P2Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.P2Z); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.FRAME); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE SET_ROLL_PITCH_YAW_THRUST
 //
 // MAVLINK_MSG_ID_SET_ROLL_PITCH_YAW_THRUST 56
@@ -3630,8 +4477,6 @@ func (m *SafetyAllowedArea) Decode(buf []byte) {
 // MAVLINK_MSG_ID_SET_ROLL_PITCH_YAW_THRUST_LEN 18
 //
 // MAVLINK_MSG_ID_SET_ROLL_PITCH_YAW_THRUST_CRC 100
-//
-//
 type SetRollPitchYawThrust struct {
 	ROLL             float32 // Desired roll angle in radians
 	PITCH            float32 // Desired pitch angle in radians
@@ -3671,27 +4516,50 @@ func (*SetRollPitchYawThrust) Crc() uint8 {
 // Pack returns a packed byte array which represents a SetRollPitchYawThrust payload
 func (m *SetRollPitchYawThrust) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.ROLL)
-	binary.Write(data, binary.LittleEndian, m.PITCH)
-	binary.Write(data, binary.LittleEndian, m.YAW)
-	binary.Write(data, binary.LittleEndian, m.THRUST)
-	binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM)
-	binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT)
+	if err := binary.Write(data, binary.LittleEndian, m.ROLL); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PITCH); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.THRUST); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the SetRollPitchYawThrust
 func (m *SetRollPitchYawThrust) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.ROLL)
-	binary.Read(data, binary.LittleEndian, &m.PITCH)
-	binary.Read(data, binary.LittleEndian, &m.YAW)
-	binary.Read(data, binary.LittleEndian, &m.THRUST)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
+	if err := binary.Read(data, binary.LittleEndian, &m.ROLL); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PITCH); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.THRUST); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE SET_ROLL_PITCH_YAW_SPEED_THRUST
 //
 // MAVLINK_MSG_ID_SET_ROLL_PITCH_YAW_SPEED_THRUST 57
@@ -3699,8 +4567,6 @@ func (m *SetRollPitchYawThrust) Decode(buf []byte) {
 // MAVLINK_MSG_ID_SET_ROLL_PITCH_YAW_SPEED_THRUST_LEN 18
 //
 // MAVLINK_MSG_ID_SET_ROLL_PITCH_YAW_SPEED_THRUST_CRC 24
-//
-//
 type SetRollPitchYawSpeedThrust struct {
 	ROLL_SPEED       float32 // Desired roll angular speed in rad/s
 	PITCH_SPEED      float32 // Desired pitch angular speed in rad/s
@@ -3740,27 +4606,50 @@ func (*SetRollPitchYawSpeedThrust) Crc() uint8 {
 // Pack returns a packed byte array which represents a SetRollPitchYawSpeedThrust payload
 func (m *SetRollPitchYawSpeedThrust) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.ROLL_SPEED)
-	binary.Write(data, binary.LittleEndian, m.PITCH_SPEED)
-	binary.Write(data, binary.LittleEndian, m.YAW_SPEED)
-	binary.Write(data, binary.LittleEndian, m.THRUST)
-	binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM)
-	binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT)
+	if err := binary.Write(data, binary.LittleEndian, m.ROLL_SPEED); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PITCH_SPEED); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YAW_SPEED); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.THRUST); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the SetRollPitchYawSpeedThrust
 func (m *SetRollPitchYawSpeedThrust) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.ROLL_SPEED)
-	binary.Read(data, binary.LittleEndian, &m.PITCH_SPEED)
-	binary.Read(data, binary.LittleEndian, &m.YAW_SPEED)
-	binary.Read(data, binary.LittleEndian, &m.THRUST)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
+	if err := binary.Read(data, binary.LittleEndian, &m.ROLL_SPEED); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PITCH_SPEED); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YAW_SPEED); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.THRUST); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE ROLL_PITCH_YAW_THRUST_SETPOINT
 //
 // MAVLINK_MSG_ID_ROLL_PITCH_YAW_THRUST_SETPOINT 58
@@ -3768,8 +4657,6 @@ func (m *SetRollPitchYawSpeedThrust) Decode(buf []byte) {
 // MAVLINK_MSG_ID_ROLL_PITCH_YAW_THRUST_SETPOINT_LEN 20
 //
 // MAVLINK_MSG_ID_ROLL_PITCH_YAW_THRUST_SETPOINT_CRC 239
-//
-//
 type RollPitchYawThrustSetpoint struct {
 	TIME_BOOT_MS uint32  // Timestamp in milliseconds since system boot
 	ROLL         float32 // Desired roll angle in radians
@@ -3807,25 +4694,44 @@ func (*RollPitchYawThrustSetpoint) Crc() uint8 {
 // Pack returns a packed byte array which represents a RollPitchYawThrustSetpoint payload
 func (m *RollPitchYawThrustSetpoint) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS)
-	binary.Write(data, binary.LittleEndian, m.ROLL)
-	binary.Write(data, binary.LittleEndian, m.PITCH)
-	binary.Write(data, binary.LittleEndian, m.YAW)
-	binary.Write(data, binary.LittleEndian, m.THRUST)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ROLL); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PITCH); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.THRUST); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the RollPitchYawThrustSetpoint
 func (m *RollPitchYawThrustSetpoint) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS)
-	binary.Read(data, binary.LittleEndian, &m.ROLL)
-	binary.Read(data, binary.LittleEndian, &m.PITCH)
-	binary.Read(data, binary.LittleEndian, &m.YAW)
-	binary.Read(data, binary.LittleEndian, &m.THRUST)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ROLL); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PITCH); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.THRUST); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE ROLL_PITCH_YAW_SPEED_THRUST_SETPOINT
 //
 // MAVLINK_MSG_ID_ROLL_PITCH_YAW_SPEED_THRUST_SETPOINT 59
@@ -3833,8 +4739,6 @@ func (m *RollPitchYawThrustSetpoint) Decode(buf []byte) {
 // MAVLINK_MSG_ID_ROLL_PITCH_YAW_SPEED_THRUST_SETPOINT_LEN 20
 //
 // MAVLINK_MSG_ID_ROLL_PITCH_YAW_SPEED_THRUST_SETPOINT_CRC 238
-//
-//
 type RollPitchYawSpeedThrustSetpoint struct {
 	TIME_BOOT_MS uint32  // Timestamp in milliseconds since system boot
 	ROLL_SPEED   float32 // Desired roll angular speed in rad/s
@@ -3872,25 +4776,44 @@ func (*RollPitchYawSpeedThrustSetpoint) Crc() uint8 {
 // Pack returns a packed byte array which represents a RollPitchYawSpeedThrustSetpoint payload
 func (m *RollPitchYawSpeedThrustSetpoint) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS)
-	binary.Write(data, binary.LittleEndian, m.ROLL_SPEED)
-	binary.Write(data, binary.LittleEndian, m.PITCH_SPEED)
-	binary.Write(data, binary.LittleEndian, m.YAW_SPEED)
-	binary.Write(data, binary.LittleEndian, m.THRUST)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ROLL_SPEED); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PITCH_SPEED); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YAW_SPEED); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.THRUST); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the RollPitchYawSpeedThrustSetpoint
 func (m *RollPitchYawSpeedThrustSetpoint) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS)
-	binary.Read(data, binary.LittleEndian, &m.ROLL_SPEED)
-	binary.Read(data, binary.LittleEndian, &m.PITCH_SPEED)
-	binary.Read(data, binary.LittleEndian, &m.YAW_SPEED)
-	binary.Read(data, binary.LittleEndian, &m.THRUST)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ROLL_SPEED); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PITCH_SPEED); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YAW_SPEED); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.THRUST); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE SET_QUAD_MOTORS_SETPOINT
 //
 // MAVLINK_MSG_ID_SET_QUAD_MOTORS_SETPOINT 60
@@ -3898,8 +4821,6 @@ func (m *RollPitchYawSpeedThrustSetpoint) Decode(buf []byte) {
 // MAVLINK_MSG_ID_SET_QUAD_MOTORS_SETPOINT_LEN 9
 //
 // MAVLINK_MSG_ID_SET_QUAD_MOTORS_SETPOINT_CRC 30
-//
-//
 type SetQuadMotorsSetpoint struct {
 	MOTOR_FRONT_NW uint16 // Front motor in + configuration, front left motor in x configuration
 	MOTOR_RIGHT_NE uint16 // Right motor in + configuration, front right motor in x configuration
@@ -3937,25 +4858,44 @@ func (*SetQuadMotorsSetpoint) Crc() uint8 {
 // Pack returns a packed byte array which represents a SetQuadMotorsSetpoint payload
 func (m *SetQuadMotorsSetpoint) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.MOTOR_FRONT_NW)
-	binary.Write(data, binary.LittleEndian, m.MOTOR_RIGHT_NE)
-	binary.Write(data, binary.LittleEndian, m.MOTOR_BACK_SE)
-	binary.Write(data, binary.LittleEndian, m.MOTOR_LEFT_SW)
-	binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM)
+	if err := binary.Write(data, binary.LittleEndian, m.MOTOR_FRONT_NW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.MOTOR_RIGHT_NE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.MOTOR_BACK_SE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.MOTOR_LEFT_SW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the SetQuadMotorsSetpoint
 func (m *SetQuadMotorsSetpoint) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.MOTOR_FRONT_NW)
-	binary.Read(data, binary.LittleEndian, &m.MOTOR_RIGHT_NE)
-	binary.Read(data, binary.LittleEndian, &m.MOTOR_BACK_SE)
-	binary.Read(data, binary.LittleEndian, &m.MOTOR_LEFT_SW)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM)
+	if err := binary.Read(data, binary.LittleEndian, &m.MOTOR_FRONT_NW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.MOTOR_RIGHT_NE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.MOTOR_BACK_SE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.MOTOR_LEFT_SW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE SET_QUAD_SWARM_ROLL_PITCH_YAW_THRUST
 //
 // MAVLINK_MSG_ID_SET_QUAD_SWARM_ROLL_PITCH_YAW_THRUST 61
@@ -3963,8 +4903,6 @@ func (m *SetQuadMotorsSetpoint) Decode(buf []byte) {
 // MAVLINK_MSG_ID_SET_QUAD_SWARM_ROLL_PITCH_YAW_THRUST_LEN 34
 //
 // MAVLINK_MSG_ID_SET_QUAD_SWARM_ROLL_PITCH_YAW_THRUST_CRC 240
-//
-//
 type SetQuadSwarmRollPitchYawThrust struct {
 	ROLL   [4]int16  // Desired roll angle in radians +-PI (+-INT16_MAX)
 	PITCH  [4]int16  // Desired pitch angle in radians +-PI (+-INT16_MAX)
@@ -4004,24 +4942,48 @@ func (*SetQuadSwarmRollPitchYawThrust) Crc() uint8 {
 // Pack returns a packed byte array which represents a SetQuadSwarmRollPitchYawThrust payload
 func (m *SetQuadSwarmRollPitchYawThrust) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.ROLL)
-	binary.Write(data, binary.LittleEndian, m.PITCH)
-	binary.Write(data, binary.LittleEndian, m.YAW)
-	binary.Write(data, binary.LittleEndian, m.THRUST)
-	binary.Write(data, binary.LittleEndian, m.GROUP)
-	binary.Write(data, binary.LittleEndian, m.MODE)
+	if err := binary.Write(data, binary.LittleEndian, m.ROLL); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PITCH); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.THRUST); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.GROUP); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.MODE); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the SetQuadSwarmRollPitchYawThrust
 func (m *SetQuadSwarmRollPitchYawThrust) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.ROLL)
-	binary.Read(data, binary.LittleEndian, &m.PITCH)
-	binary.Read(data, binary.LittleEndian, &m.YAW)
-	binary.Read(data, binary.LittleEndian, &m.THRUST)
-	binary.Read(data, binary.LittleEndian, &m.GROUP)
-	binary.Read(data, binary.LittleEndian, &m.MODE)
+	if err := binary.Read(data, binary.LittleEndian, &m.ROLL); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PITCH); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.THRUST); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.GROUP); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.MODE); err != nil {
+		panic(err)
+	}
 }
 
 const (
@@ -4031,7 +4993,6 @@ const (
 	MAVLINK_MSG_SET_QUAD_SWARM_ROLL_PITCH_YAW_THRUST_FIELD_thrust_LEN = 4
 )
 
-//
 // MESSAGE NAV_CONTROLLER_OUTPUT
 //
 // MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT 62
@@ -4039,8 +5000,6 @@ const (
 // MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_LEN 26
 //
 // MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_CRC 183
-//
-//
 type NavControllerOutput struct {
 	NAV_ROLL       float32 // Current desired roll in degrees
 	NAV_PITCH      float32 // Current desired pitch in degrees
@@ -4084,31 +5043,62 @@ func (*NavControllerOutput) Crc() uint8 {
 // Pack returns a packed byte array which represents a NavControllerOutput payload
 func (m *NavControllerOutput) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.NAV_ROLL)
-	binary.Write(data, binary.LittleEndian, m.NAV_PITCH)
-	binary.Write(data, binary.LittleEndian, m.ALT_ERROR)
-	binary.Write(data, binary.LittleEndian, m.ASPD_ERROR)
-	binary.Write(data, binary.LittleEndian, m.XTRACK_ERROR)
-	binary.Write(data, binary.LittleEndian, m.NAV_BEARING)
-	binary.Write(data, binary.LittleEndian, m.TARGET_BEARING)
-	binary.Write(data, binary.LittleEndian, m.WP_DIST)
+	if err := binary.Write(data, binary.LittleEndian, m.NAV_ROLL); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.NAV_PITCH); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ALT_ERROR); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ASPD_ERROR); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.XTRACK_ERROR); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.NAV_BEARING); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_BEARING); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.WP_DIST); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the NavControllerOutput
 func (m *NavControllerOutput) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.NAV_ROLL)
-	binary.Read(data, binary.LittleEndian, &m.NAV_PITCH)
-	binary.Read(data, binary.LittleEndian, &m.ALT_ERROR)
-	binary.Read(data, binary.LittleEndian, &m.ASPD_ERROR)
-	binary.Read(data, binary.LittleEndian, &m.XTRACK_ERROR)
-	binary.Read(data, binary.LittleEndian, &m.NAV_BEARING)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_BEARING)
-	binary.Read(data, binary.LittleEndian, &m.WP_DIST)
+	if err := binary.Read(data, binary.LittleEndian, &m.NAV_ROLL); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.NAV_PITCH); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ALT_ERROR); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ASPD_ERROR); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.XTRACK_ERROR); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.NAV_BEARING); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_BEARING); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.WP_DIST); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE SET_QUAD_SWARM_LED_ROLL_PITCH_YAW_THRUST
 //
 // MAVLINK_MSG_ID_SET_QUAD_SWARM_LED_ROLL_PITCH_YAW_THRUST 63
@@ -4116,8 +5106,6 @@ func (m *NavControllerOutput) Decode(buf []byte) {
 // MAVLINK_MSG_ID_SET_QUAD_SWARM_LED_ROLL_PITCH_YAW_THRUST_LEN 46
 //
 // MAVLINK_MSG_ID_SET_QUAD_SWARM_LED_ROLL_PITCH_YAW_THRUST_CRC 130
-//
-//
 type SetQuadSwarmLedRollPitchYawThrust struct {
 	ROLL      [4]int16  // Desired roll angle in radians +-PI (+-INT16_MAX)
 	PITCH     [4]int16  // Desired pitch angle in radians +-PI (+-INT16_MAX)
@@ -4163,30 +5151,66 @@ func (*SetQuadSwarmLedRollPitchYawThrust) Crc() uint8 {
 // Pack returns a packed byte array which represents a SetQuadSwarmLedRollPitchYawThrust payload
 func (m *SetQuadSwarmLedRollPitchYawThrust) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.ROLL)
-	binary.Write(data, binary.LittleEndian, m.PITCH)
-	binary.Write(data, binary.LittleEndian, m.YAW)
-	binary.Write(data, binary.LittleEndian, m.THRUST)
-	binary.Write(data, binary.LittleEndian, m.GROUP)
-	binary.Write(data, binary.LittleEndian, m.MODE)
-	binary.Write(data, binary.LittleEndian, m.LED_RED)
-	binary.Write(data, binary.LittleEndian, m.LED_BLUE)
-	binary.Write(data, binary.LittleEndian, m.LED_GREEN)
+	if err := binary.Write(data, binary.LittleEndian, m.ROLL); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PITCH); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.THRUST); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.GROUP); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.MODE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.LED_RED); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.LED_BLUE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.LED_GREEN); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the SetQuadSwarmLedRollPitchYawThrust
 func (m *SetQuadSwarmLedRollPitchYawThrust) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.ROLL)
-	binary.Read(data, binary.LittleEndian, &m.PITCH)
-	binary.Read(data, binary.LittleEndian, &m.YAW)
-	binary.Read(data, binary.LittleEndian, &m.THRUST)
-	binary.Read(data, binary.LittleEndian, &m.GROUP)
-	binary.Read(data, binary.LittleEndian, &m.MODE)
-	binary.Read(data, binary.LittleEndian, &m.LED_RED)
-	binary.Read(data, binary.LittleEndian, &m.LED_BLUE)
-	binary.Read(data, binary.LittleEndian, &m.LED_GREEN)
+	if err := binary.Read(data, binary.LittleEndian, &m.ROLL); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PITCH); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.THRUST); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.GROUP); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.MODE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.LED_RED); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.LED_BLUE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.LED_GREEN); err != nil {
+		panic(err)
+	}
 }
 
 const (
@@ -4199,7 +5223,6 @@ const (
 	MAVLINK_MSG_SET_QUAD_SWARM_LED_ROLL_PITCH_YAW_THRUST_FIELD_led_green_LEN = 4
 )
 
-//
 // MESSAGE STATE_CORRECTION
 //
 // MAVLINK_MSG_ID_STATE_CORRECTION 64
@@ -4207,8 +5230,6 @@ const (
 // MAVLINK_MSG_ID_STATE_CORRECTION_LEN 36
 //
 // MAVLINK_MSG_ID_STATE_CORRECTION_CRC 130
-//
-//
 type StateCorrection struct {
 	XERR     float32 // x position error
 	YERR     float32 // y position error
@@ -4254,33 +5275,68 @@ func (*StateCorrection) Crc() uint8 {
 // Pack returns a packed byte array which represents a StateCorrection payload
 func (m *StateCorrection) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.XERR)
-	binary.Write(data, binary.LittleEndian, m.YERR)
-	binary.Write(data, binary.LittleEndian, m.ZERR)
-	binary.Write(data, binary.LittleEndian, m.ROLLERR)
-	binary.Write(data, binary.LittleEndian, m.PITCHERR)
-	binary.Write(data, binary.LittleEndian, m.YAWERR)
-	binary.Write(data, binary.LittleEndian, m.VXERR)
-	binary.Write(data, binary.LittleEndian, m.VYERR)
-	binary.Write(data, binary.LittleEndian, m.VZERR)
+	if err := binary.Write(data, binary.LittleEndian, m.XERR); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YERR); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ZERR); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ROLLERR); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PITCHERR); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YAWERR); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VXERR); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VYERR); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VZERR); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the StateCorrection
 func (m *StateCorrection) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.XERR)
-	binary.Read(data, binary.LittleEndian, &m.YERR)
-	binary.Read(data, binary.LittleEndian, &m.ZERR)
-	binary.Read(data, binary.LittleEndian, &m.ROLLERR)
-	binary.Read(data, binary.LittleEndian, &m.PITCHERR)
-	binary.Read(data, binary.LittleEndian, &m.YAWERR)
-	binary.Read(data, binary.LittleEndian, &m.VXERR)
-	binary.Read(data, binary.LittleEndian, &m.VYERR)
-	binary.Read(data, binary.LittleEndian, &m.VZERR)
+	if err := binary.Read(data, binary.LittleEndian, &m.XERR); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YERR); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ZERR); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ROLLERR); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PITCHERR); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YAWERR); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VXERR); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VYERR); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VZERR); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE RC_CHANNELS
 //
 // MAVLINK_MSG_ID_RC_CHANNELS 65
@@ -4288,8 +5344,6 @@ func (m *StateCorrection) Decode(buf []byte) {
 // MAVLINK_MSG_ID_RC_CHANNELS_LEN 42
 //
 // MAVLINK_MSG_ID_RC_CHANNELS_CRC 118
-//
-//
 type RcChannels struct {
 	TIME_BOOT_MS uint32 // Timestamp (milliseconds since system boot)
 	CHAN1_RAW    uint16 // RC channel 1 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
@@ -4359,57 +5413,140 @@ func (*RcChannels) Crc() uint8 {
 // Pack returns a packed byte array which represents a RcChannels payload
 func (m *RcChannels) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS)
-	binary.Write(data, binary.LittleEndian, m.CHAN1_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN2_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN3_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN4_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN5_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN6_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN7_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN8_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN9_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN10_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN11_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN12_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN13_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN14_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN15_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN16_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN17_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN18_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHANCOUNT)
-	binary.Write(data, binary.LittleEndian, m.RSSI)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN1_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN2_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN3_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN4_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN5_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN6_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN7_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN8_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN9_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN10_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN11_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN12_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN13_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN14_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN15_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN16_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN17_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN18_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHANCOUNT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.RSSI); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the RcChannels
 func (m *RcChannels) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS)
-	binary.Read(data, binary.LittleEndian, &m.CHAN1_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN2_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN3_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN4_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN5_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN6_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN7_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN8_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN9_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN10_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN11_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN12_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN13_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN14_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN15_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN16_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN17_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN18_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHANCOUNT)
-	binary.Read(data, binary.LittleEndian, &m.RSSI)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN1_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN2_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN3_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN4_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN5_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN6_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN7_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN8_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN9_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN10_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN11_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN12_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN13_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN14_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN15_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN16_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN17_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN18_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHANCOUNT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.RSSI); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE REQUEST_DATA_STREAM
 //
 // MAVLINK_MSG_ID_REQUEST_DATA_STREAM 66
@@ -4417,8 +5554,6 @@ func (m *RcChannels) Decode(buf []byte) {
 // MAVLINK_MSG_ID_REQUEST_DATA_STREAM_LEN 6
 //
 // MAVLINK_MSG_ID_REQUEST_DATA_STREAM_CRC 148
-//
-//
 type RequestDataStream struct {
 	REQ_MESSAGE_RATE uint16 // The requested interval between two messages of this type
 	TARGET_SYSTEM    uint8  // The target requested to send the message stream.
@@ -4456,25 +5591,44 @@ func (*RequestDataStream) Crc() uint8 {
 // Pack returns a packed byte array which represents a RequestDataStream payload
 func (m *RequestDataStream) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.REQ_MESSAGE_RATE)
-	binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM)
-	binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT)
-	binary.Write(data, binary.LittleEndian, m.REQ_STREAM_ID)
-	binary.Write(data, binary.LittleEndian, m.START_STOP)
+	if err := binary.Write(data, binary.LittleEndian, m.REQ_MESSAGE_RATE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.REQ_STREAM_ID); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.START_STOP); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the RequestDataStream
 func (m *RequestDataStream) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.REQ_MESSAGE_RATE)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
-	binary.Read(data, binary.LittleEndian, &m.REQ_STREAM_ID)
-	binary.Read(data, binary.LittleEndian, &m.START_STOP)
+	if err := binary.Read(data, binary.LittleEndian, &m.REQ_MESSAGE_RATE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.REQ_STREAM_ID); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.START_STOP); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE DATA_STREAM
 //
 // MAVLINK_MSG_ID_DATA_STREAM 67
@@ -4482,8 +5636,6 @@ func (m *RequestDataStream) Decode(buf []byte) {
 // MAVLINK_MSG_ID_DATA_STREAM_LEN 4
 //
 // MAVLINK_MSG_ID_DATA_STREAM_CRC 21
-//
-//
 type DataStream struct {
 	MESSAGE_RATE uint16 // The requested interval between two messages of this type
 	STREAM_ID    uint8  // The ID of the requested data stream
@@ -4517,21 +5669,32 @@ func (*DataStream) Crc() uint8 {
 // Pack returns a packed byte array which represents a DataStream payload
 func (m *DataStream) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.MESSAGE_RATE)
-	binary.Write(data, binary.LittleEndian, m.STREAM_ID)
-	binary.Write(data, binary.LittleEndian, m.ON_OFF)
+	if err := binary.Write(data, binary.LittleEndian, m.MESSAGE_RATE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.STREAM_ID); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ON_OFF); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the DataStream
 func (m *DataStream) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.MESSAGE_RATE)
-	binary.Read(data, binary.LittleEndian, &m.STREAM_ID)
-	binary.Read(data, binary.LittleEndian, &m.ON_OFF)
+	if err := binary.Read(data, binary.LittleEndian, &m.MESSAGE_RATE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.STREAM_ID); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ON_OFF); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE MANUAL_CONTROL
 //
 // MAVLINK_MSG_ID_MANUAL_CONTROL 69
@@ -4539,8 +5702,6 @@ func (m *DataStream) Decode(buf []byte) {
 // MAVLINK_MSG_ID_MANUAL_CONTROL_LEN 11
 //
 // MAVLINK_MSG_ID_MANUAL_CONTROL_CRC 243
-//
-//
 type ManualControl struct {
 	X       int16  // X-axis, normalized to the range [-1000,1000]. A value of INT16_MAX indicates that this axis is invalid. Generally corresponds to forward(1000)-backward(-1000) movement on a joystick and the pitch of a vehicle.
 	Y       int16  // Y-axis, normalized to the range [-1000,1000]. A value of INT16_MAX indicates that this axis is invalid. Generally corresponds to left(-1000)-right(1000) movement on a joystick and the roll of a vehicle.
@@ -4580,27 +5741,50 @@ func (*ManualControl) Crc() uint8 {
 // Pack returns a packed byte array which represents a ManualControl payload
 func (m *ManualControl) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.X)
-	binary.Write(data, binary.LittleEndian, m.Y)
-	binary.Write(data, binary.LittleEndian, m.Z)
-	binary.Write(data, binary.LittleEndian, m.R)
-	binary.Write(data, binary.LittleEndian, m.BUTTONS)
-	binary.Write(data, binary.LittleEndian, m.TARGET)
+	if err := binary.Write(data, binary.LittleEndian, m.X); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.Z); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.R); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.BUTTONS); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the ManualControl
 func (m *ManualControl) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.X)
-	binary.Read(data, binary.LittleEndian, &m.Y)
-	binary.Read(data, binary.LittleEndian, &m.Z)
-	binary.Read(data, binary.LittleEndian, &m.R)
-	binary.Read(data, binary.LittleEndian, &m.BUTTONS)
-	binary.Read(data, binary.LittleEndian, &m.TARGET)
+	if err := binary.Read(data, binary.LittleEndian, &m.X); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.Z); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.R); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.BUTTONS); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE RC_CHANNELS_OVERRIDE
 //
 // MAVLINK_MSG_ID_RC_CHANNELS_OVERRIDE 70
@@ -4608,8 +5792,6 @@ func (m *ManualControl) Decode(buf []byte) {
 // MAVLINK_MSG_ID_RC_CHANNELS_OVERRIDE_LEN 18
 //
 // MAVLINK_MSG_ID_RC_CHANNELS_OVERRIDE_CRC 124
-//
-//
 type RcChannelsOverride struct {
 	CHAN1_RAW        uint16 // RC channel 1 value, in microseconds. A value of UINT16_MAX means to ignore this field.
 	CHAN2_RAW        uint16 // RC channel 2 value, in microseconds. A value of UINT16_MAX means to ignore this field.
@@ -4657,35 +5839,74 @@ func (*RcChannelsOverride) Crc() uint8 {
 // Pack returns a packed byte array which represents a RcChannelsOverride payload
 func (m *RcChannelsOverride) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.CHAN1_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN2_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN3_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN4_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN5_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN6_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN7_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN8_RAW)
-	binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM)
-	binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT)
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN1_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN2_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN3_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN4_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN5_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN6_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN7_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN8_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the RcChannelsOverride
 func (m *RcChannelsOverride) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.CHAN1_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN2_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN3_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN4_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN5_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN6_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN7_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN8_RAW)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN1_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN2_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN3_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN4_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN5_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN6_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN7_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN8_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE VFR_HUD
 //
 // MAVLINK_MSG_ID_VFR_HUD 74
@@ -4693,8 +5914,6 @@ func (m *RcChannelsOverride) Decode(buf []byte) {
 // MAVLINK_MSG_ID_VFR_HUD_LEN 20
 //
 // MAVLINK_MSG_ID_VFR_HUD_CRC 20
-//
-//
 type VfrHud struct {
 	AIRSPEED    float32 // Current airspeed in m/s
 	GROUNDSPEED float32 // Current ground speed in m/s
@@ -4734,27 +5953,50 @@ func (*VfrHud) Crc() uint8 {
 // Pack returns a packed byte array which represents a VfrHud payload
 func (m *VfrHud) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.AIRSPEED)
-	binary.Write(data, binary.LittleEndian, m.GROUNDSPEED)
-	binary.Write(data, binary.LittleEndian, m.ALT)
-	binary.Write(data, binary.LittleEndian, m.CLIMB)
-	binary.Write(data, binary.LittleEndian, m.HEADING)
-	binary.Write(data, binary.LittleEndian, m.THROTTLE)
+	if err := binary.Write(data, binary.LittleEndian, m.AIRSPEED); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.GROUNDSPEED); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ALT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CLIMB); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.HEADING); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.THROTTLE); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the VfrHud
 func (m *VfrHud) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.AIRSPEED)
-	binary.Read(data, binary.LittleEndian, &m.GROUNDSPEED)
-	binary.Read(data, binary.LittleEndian, &m.ALT)
-	binary.Read(data, binary.LittleEndian, &m.CLIMB)
-	binary.Read(data, binary.LittleEndian, &m.HEADING)
-	binary.Read(data, binary.LittleEndian, &m.THROTTLE)
+	if err := binary.Read(data, binary.LittleEndian, &m.AIRSPEED); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.GROUNDSPEED); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ALT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CLIMB); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.HEADING); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.THROTTLE); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE COMMAND_LONG
 //
 // MAVLINK_MSG_ID_COMMAND_LONG 76
@@ -4762,8 +6004,6 @@ func (m *VfrHud) Decode(buf []byte) {
 // MAVLINK_MSG_ID_COMMAND_LONG_LEN 33
 //
 // MAVLINK_MSG_ID_COMMAND_LONG_CRC 152
-//
-//
 type CommandLong struct {
 	PARAM1           float32 // Parameter 1, as defined by MAV_CMD enum.
 	PARAM2           float32 // Parameter 2, as defined by MAV_CMD enum.
@@ -4813,37 +6053,80 @@ func (*CommandLong) Crc() uint8 {
 // Pack returns a packed byte array which represents a CommandLong payload
 func (m *CommandLong) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.PARAM1)
-	binary.Write(data, binary.LittleEndian, m.PARAM2)
-	binary.Write(data, binary.LittleEndian, m.PARAM3)
-	binary.Write(data, binary.LittleEndian, m.PARAM4)
-	binary.Write(data, binary.LittleEndian, m.PARAM5)
-	binary.Write(data, binary.LittleEndian, m.PARAM6)
-	binary.Write(data, binary.LittleEndian, m.PARAM7)
-	binary.Write(data, binary.LittleEndian, m.COMMAND)
-	binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM)
-	binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT)
-	binary.Write(data, binary.LittleEndian, m.CONFIRMATION)
+	if err := binary.Write(data, binary.LittleEndian, m.PARAM1); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PARAM2); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PARAM3); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PARAM4); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PARAM5); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PARAM6); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PARAM7); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.COMMAND); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CONFIRMATION); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the CommandLong
 func (m *CommandLong) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.PARAM1)
-	binary.Read(data, binary.LittleEndian, &m.PARAM2)
-	binary.Read(data, binary.LittleEndian, &m.PARAM3)
-	binary.Read(data, binary.LittleEndian, &m.PARAM4)
-	binary.Read(data, binary.LittleEndian, &m.PARAM5)
-	binary.Read(data, binary.LittleEndian, &m.PARAM6)
-	binary.Read(data, binary.LittleEndian, &m.PARAM7)
-	binary.Read(data, binary.LittleEndian, &m.COMMAND)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
-	binary.Read(data, binary.LittleEndian, &m.CONFIRMATION)
+	if err := binary.Read(data, binary.LittleEndian, &m.PARAM1); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PARAM2); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PARAM3); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PARAM4); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PARAM5); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PARAM6); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PARAM7); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.COMMAND); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CONFIRMATION); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE COMMAND_ACK
 //
 // MAVLINK_MSG_ID_COMMAND_ACK 77
@@ -4851,8 +6134,6 @@ func (m *CommandLong) Decode(buf []byte) {
 // MAVLINK_MSG_ID_COMMAND_ACK_LEN 3
 //
 // MAVLINK_MSG_ID_COMMAND_ACK_CRC 143
-//
-//
 type CommandAck struct {
 	COMMAND uint16 // Command ID, as defined by MAV_CMD enum.
 	RESULT  uint8  // See MAV_RESULT enum
@@ -4884,19 +6165,26 @@ func (*CommandAck) Crc() uint8 {
 // Pack returns a packed byte array which represents a CommandAck payload
 func (m *CommandAck) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.COMMAND)
-	binary.Write(data, binary.LittleEndian, m.RESULT)
+	if err := binary.Write(data, binary.LittleEndian, m.COMMAND); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.RESULT); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the CommandAck
 func (m *CommandAck) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.COMMAND)
-	binary.Read(data, binary.LittleEndian, &m.RESULT)
+	if err := binary.Read(data, binary.LittleEndian, &m.COMMAND); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.RESULT); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE ROLL_PITCH_YAW_RATES_THRUST_SETPOINT
 //
 // MAVLINK_MSG_ID_ROLL_PITCH_YAW_RATES_THRUST_SETPOINT 80
@@ -4904,8 +6192,6 @@ func (m *CommandAck) Decode(buf []byte) {
 // MAVLINK_MSG_ID_ROLL_PITCH_YAW_RATES_THRUST_SETPOINT_LEN 20
 //
 // MAVLINK_MSG_ID_ROLL_PITCH_YAW_RATES_THRUST_SETPOINT_CRC 127
-//
-//
 type RollPitchYawRatesThrustSetpoint struct {
 	TIME_BOOT_MS uint32  // Timestamp in milliseconds since system boot
 	ROLL_RATE    float32 // Desired roll rate in radians per second
@@ -4943,25 +6229,44 @@ func (*RollPitchYawRatesThrustSetpoint) Crc() uint8 {
 // Pack returns a packed byte array which represents a RollPitchYawRatesThrustSetpoint payload
 func (m *RollPitchYawRatesThrustSetpoint) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS)
-	binary.Write(data, binary.LittleEndian, m.ROLL_RATE)
-	binary.Write(data, binary.LittleEndian, m.PITCH_RATE)
-	binary.Write(data, binary.LittleEndian, m.YAW_RATE)
-	binary.Write(data, binary.LittleEndian, m.THRUST)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ROLL_RATE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PITCH_RATE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YAW_RATE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.THRUST); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the RollPitchYawRatesThrustSetpoint
 func (m *RollPitchYawRatesThrustSetpoint) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS)
-	binary.Read(data, binary.LittleEndian, &m.ROLL_RATE)
-	binary.Read(data, binary.LittleEndian, &m.PITCH_RATE)
-	binary.Read(data, binary.LittleEndian, &m.YAW_RATE)
-	binary.Read(data, binary.LittleEndian, &m.THRUST)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ROLL_RATE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PITCH_RATE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YAW_RATE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.THRUST); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE MANUAL_SETPOINT
 //
 // MAVLINK_MSG_ID_MANUAL_SETPOINT 81
@@ -4969,8 +6274,6 @@ func (m *RollPitchYawRatesThrustSetpoint) Decode(buf []byte) {
 // MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN 22
 //
 // MAVLINK_MSG_ID_MANUAL_SETPOINT_CRC 106
-//
-//
 type ManualSetpoint struct {
 	TIME_BOOT_MS           uint32  // Timestamp in milliseconds since system boot
 	ROLL                   float32 // Desired roll rate in radians per second
@@ -5012,29 +6315,56 @@ func (*ManualSetpoint) Crc() uint8 {
 // Pack returns a packed byte array which represents a ManualSetpoint payload
 func (m *ManualSetpoint) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS)
-	binary.Write(data, binary.LittleEndian, m.ROLL)
-	binary.Write(data, binary.LittleEndian, m.PITCH)
-	binary.Write(data, binary.LittleEndian, m.YAW)
-	binary.Write(data, binary.LittleEndian, m.THRUST)
-	binary.Write(data, binary.LittleEndian, m.MODE_SWITCH)
-	binary.Write(data, binary.LittleEndian, m.MANUAL_OVERRIDE_SWITCH)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ROLL); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PITCH); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.THRUST); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.MODE_SWITCH); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.MANUAL_OVERRIDE_SWITCH); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the ManualSetpoint
 func (m *ManualSetpoint) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS)
-	binary.Read(data, binary.LittleEndian, &m.ROLL)
-	binary.Read(data, binary.LittleEndian, &m.PITCH)
-	binary.Read(data, binary.LittleEndian, &m.YAW)
-	binary.Read(data, binary.LittleEndian, &m.THRUST)
-	binary.Read(data, binary.LittleEndian, &m.MODE_SWITCH)
-	binary.Read(data, binary.LittleEndian, &m.MANUAL_OVERRIDE_SWITCH)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ROLL); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PITCH); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.THRUST); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.MODE_SWITCH); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.MANUAL_OVERRIDE_SWITCH); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE ATTITUDE_SETPOINT_EXTERNAL
 //
 // MAVLINK_MSG_ID_ATTITUDE_SETPOINT_EXTERNAL 82
@@ -5042,8 +6372,6 @@ func (m *ManualSetpoint) Decode(buf []byte) {
 // MAVLINK_MSG_ID_ATTITUDE_SETPOINT_EXTERNAL_LEN 39
 //
 // MAVLINK_MSG_ID_ATTITUDE_SETPOINT_EXTERNAL_CRC 147
-//
-//
 type AttitudeSetpointExternal struct {
 	TIME_BOOT_MS     uint32     // Timestamp in milliseconds since system boot
 	Q                [4]float32 // Attitude quaternion (w, x, y, z order, zero-rotation is 1, 0, 0, 0)
@@ -5089,37 +6417,72 @@ func (*AttitudeSetpointExternal) Crc() uint8 {
 // Pack returns a packed byte array which represents a AttitudeSetpointExternal payload
 func (m *AttitudeSetpointExternal) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS)
-	binary.Write(data, binary.LittleEndian, m.Q)
-	binary.Write(data, binary.LittleEndian, m.BODY_ROLL_RATE)
-	binary.Write(data, binary.LittleEndian, m.BODY_PITCH_RATE)
-	binary.Write(data, binary.LittleEndian, m.BODY_YAW_RATE)
-	binary.Write(data, binary.LittleEndian, m.THRUST)
-	binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM)
-	binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT)
-	binary.Write(data, binary.LittleEndian, m.TYPE_MASK)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.Q); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.BODY_ROLL_RATE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.BODY_PITCH_RATE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.BODY_YAW_RATE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.THRUST); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TYPE_MASK); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the AttitudeSetpointExternal
 func (m *AttitudeSetpointExternal) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS)
-	binary.Read(data, binary.LittleEndian, &m.Q)
-	binary.Read(data, binary.LittleEndian, &m.BODY_ROLL_RATE)
-	binary.Read(data, binary.LittleEndian, &m.BODY_PITCH_RATE)
-	binary.Read(data, binary.LittleEndian, &m.BODY_YAW_RATE)
-	binary.Read(data, binary.LittleEndian, &m.THRUST)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
-	binary.Read(data, binary.LittleEndian, &m.TYPE_MASK)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.Q); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.BODY_ROLL_RATE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.BODY_PITCH_RATE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.BODY_YAW_RATE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.THRUST); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TYPE_MASK); err != nil {
+		panic(err)
+	}
 }
 
 const (
 	MAVLINK_MSG_ATTITUDE_SETPOINT_EXTERNAL_FIELD_q_LEN = 4
 )
 
-//
 // MESSAGE LOCAL_NED_POSITION_SETPOINT_EXTERNAL
 //
 // MAVLINK_MSG_ID_LOCAL_NED_POSITION_SETPOINT_EXTERNAL 83
@@ -5127,8 +6490,6 @@ const (
 // MAVLINK_MSG_ID_LOCAL_NED_POSITION_SETPOINT_EXTERNAL_LEN 45
 //
 // MAVLINK_MSG_ID_LOCAL_NED_POSITION_SETPOINT_EXTERNAL_CRC 211
-//
-//
 type LocalNedPositionSetpointExternal struct {
 	TIME_BOOT_MS     uint32  // Timestamp in milliseconds since system boot
 	X                float32 // X Position in NED frame in meters
@@ -5184,43 +6545,98 @@ func (*LocalNedPositionSetpointExternal) Crc() uint8 {
 // Pack returns a packed byte array which represents a LocalNedPositionSetpointExternal payload
 func (m *LocalNedPositionSetpointExternal) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS)
-	binary.Write(data, binary.LittleEndian, m.X)
-	binary.Write(data, binary.LittleEndian, m.Y)
-	binary.Write(data, binary.LittleEndian, m.Z)
-	binary.Write(data, binary.LittleEndian, m.VX)
-	binary.Write(data, binary.LittleEndian, m.VY)
-	binary.Write(data, binary.LittleEndian, m.VZ)
-	binary.Write(data, binary.LittleEndian, m.AFX)
-	binary.Write(data, binary.LittleEndian, m.AFY)
-	binary.Write(data, binary.LittleEndian, m.AFZ)
-	binary.Write(data, binary.LittleEndian, m.TYPE_MASK)
-	binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM)
-	binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT)
-	binary.Write(data, binary.LittleEndian, m.COORDINATE_FRAME)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.X); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.Z); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VX); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VY); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VZ); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.AFX); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.AFY); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.AFZ); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TYPE_MASK); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.COORDINATE_FRAME); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the LocalNedPositionSetpointExternal
 func (m *LocalNedPositionSetpointExternal) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS)
-	binary.Read(data, binary.LittleEndian, &m.X)
-	binary.Read(data, binary.LittleEndian, &m.Y)
-	binary.Read(data, binary.LittleEndian, &m.Z)
-	binary.Read(data, binary.LittleEndian, &m.VX)
-	binary.Read(data, binary.LittleEndian, &m.VY)
-	binary.Read(data, binary.LittleEndian, &m.VZ)
-	binary.Read(data, binary.LittleEndian, &m.AFX)
-	binary.Read(data, binary.LittleEndian, &m.AFY)
-	binary.Read(data, binary.LittleEndian, &m.AFZ)
-	binary.Read(data, binary.LittleEndian, &m.TYPE_MASK)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
-	binary.Read(data, binary.LittleEndian, &m.COORDINATE_FRAME)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.X); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.Z); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VX); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VY); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VZ); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.AFX); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.AFY); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.AFZ); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TYPE_MASK); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.COORDINATE_FRAME); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE GLOBAL_POSITION_SETPOINT_EXTERNAL_INT
 //
 // MAVLINK_MSG_ID_GLOBAL_POSITION_SETPOINT_EXTERNAL_INT 84
@@ -5228,8 +6644,6 @@ func (m *LocalNedPositionSetpointExternal) Decode(buf []byte) {
 // MAVLINK_MSG_ID_GLOBAL_POSITION_SETPOINT_EXTERNAL_INT_LEN 44
 //
 // MAVLINK_MSG_ID_GLOBAL_POSITION_SETPOINT_EXTERNAL_INT_CRC 198
-//
-//
 type GlobalPositionSetpointExternalInt struct {
 	TIME_BOOT_MS     uint32  // Timestamp in milliseconds since system boot. The rationale for the timestamp in the setpoint is to allow the system to compensate for the transport delay of the setpoint. This allows the system to compensate processing latency.
 	LAT_INT          int32   // X Position in WGS84 frame in 1e7 * meters
@@ -5283,41 +6697,92 @@ func (*GlobalPositionSetpointExternalInt) Crc() uint8 {
 // Pack returns a packed byte array which represents a GlobalPositionSetpointExternalInt payload
 func (m *GlobalPositionSetpointExternalInt) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS)
-	binary.Write(data, binary.LittleEndian, m.LAT_INT)
-	binary.Write(data, binary.LittleEndian, m.LON_INT)
-	binary.Write(data, binary.LittleEndian, m.ALT)
-	binary.Write(data, binary.LittleEndian, m.VX)
-	binary.Write(data, binary.LittleEndian, m.VY)
-	binary.Write(data, binary.LittleEndian, m.VZ)
-	binary.Write(data, binary.LittleEndian, m.AFX)
-	binary.Write(data, binary.LittleEndian, m.AFY)
-	binary.Write(data, binary.LittleEndian, m.AFZ)
-	binary.Write(data, binary.LittleEndian, m.TYPE_MASK)
-	binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM)
-	binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.LAT_INT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.LON_INT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ALT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VX); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VY); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VZ); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.AFX); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.AFY); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.AFZ); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TYPE_MASK); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the GlobalPositionSetpointExternalInt
 func (m *GlobalPositionSetpointExternalInt) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS)
-	binary.Read(data, binary.LittleEndian, &m.LAT_INT)
-	binary.Read(data, binary.LittleEndian, &m.LON_INT)
-	binary.Read(data, binary.LittleEndian, &m.ALT)
-	binary.Read(data, binary.LittleEndian, &m.VX)
-	binary.Read(data, binary.LittleEndian, &m.VY)
-	binary.Read(data, binary.LittleEndian, &m.VZ)
-	binary.Read(data, binary.LittleEndian, &m.AFX)
-	binary.Read(data, binary.LittleEndian, &m.AFY)
-	binary.Read(data, binary.LittleEndian, &m.AFZ)
-	binary.Read(data, binary.LittleEndian, &m.TYPE_MASK)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.LAT_INT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.LON_INT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ALT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VX); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VY); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VZ); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.AFX); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.AFY); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.AFZ); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TYPE_MASK); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE LOCAL_POSITION_NED_SYSTEM_GLOBAL_OFFSET
 //
 // MAVLINK_MSG_ID_LOCAL_POSITION_NED_SYSTEM_GLOBAL_OFFSET 89
@@ -5325,8 +6790,6 @@ func (m *GlobalPositionSetpointExternalInt) Decode(buf []byte) {
 // MAVLINK_MSG_ID_LOCAL_POSITION_NED_SYSTEM_GLOBAL_OFFSET_LEN 28
 //
 // MAVLINK_MSG_ID_LOCAL_POSITION_NED_SYSTEM_GLOBAL_OFFSET_CRC 231
-//
-//
 type LocalPositionNedSystemGlobalOffset struct {
 	TIME_BOOT_MS uint32  // Timestamp (milliseconds since system boot)
 	X            float32 // X Position
@@ -5368,29 +6831,56 @@ func (*LocalPositionNedSystemGlobalOffset) Crc() uint8 {
 // Pack returns a packed byte array which represents a LocalPositionNedSystemGlobalOffset payload
 func (m *LocalPositionNedSystemGlobalOffset) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS)
-	binary.Write(data, binary.LittleEndian, m.X)
-	binary.Write(data, binary.LittleEndian, m.Y)
-	binary.Write(data, binary.LittleEndian, m.Z)
-	binary.Write(data, binary.LittleEndian, m.ROLL)
-	binary.Write(data, binary.LittleEndian, m.PITCH)
-	binary.Write(data, binary.LittleEndian, m.YAW)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.X); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.Z); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ROLL); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PITCH); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YAW); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the LocalPositionNedSystemGlobalOffset
 func (m *LocalPositionNedSystemGlobalOffset) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS)
-	binary.Read(data, binary.LittleEndian, &m.X)
-	binary.Read(data, binary.LittleEndian, &m.Y)
-	binary.Read(data, binary.LittleEndian, &m.Z)
-	binary.Read(data, binary.LittleEndian, &m.ROLL)
-	binary.Read(data, binary.LittleEndian, &m.PITCH)
-	binary.Read(data, binary.LittleEndian, &m.YAW)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.X); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.Z); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ROLL); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PITCH); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YAW); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE HIL_STATE
 //
 // MAVLINK_MSG_ID_HIL_STATE 90
@@ -5398,8 +6888,6 @@ func (m *LocalPositionNedSystemGlobalOffset) Decode(buf []byte) {
 // MAVLINK_MSG_ID_HIL_STATE_LEN 56
 //
 // MAVLINK_MSG_ID_HIL_STATE_CRC 183
-//
-//
 type HilState struct {
 	TIME_USEC  uint64  // Timestamp (microseconds since UNIX epoch or microseconds since system boot)
 	ROLL       float32 // Roll angle (rad)
@@ -5459,47 +6947,110 @@ func (*HilState) Crc() uint8 {
 // Pack returns a packed byte array which represents a HilState payload
 func (m *HilState) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_USEC)
-	binary.Write(data, binary.LittleEndian, m.ROLL)
-	binary.Write(data, binary.LittleEndian, m.PITCH)
-	binary.Write(data, binary.LittleEndian, m.YAW)
-	binary.Write(data, binary.LittleEndian, m.ROLLSPEED)
-	binary.Write(data, binary.LittleEndian, m.PITCHSPEED)
-	binary.Write(data, binary.LittleEndian, m.YAWSPEED)
-	binary.Write(data, binary.LittleEndian, m.LAT)
-	binary.Write(data, binary.LittleEndian, m.LON)
-	binary.Write(data, binary.LittleEndian, m.ALT)
-	binary.Write(data, binary.LittleEndian, m.VX)
-	binary.Write(data, binary.LittleEndian, m.VY)
-	binary.Write(data, binary.LittleEndian, m.VZ)
-	binary.Write(data, binary.LittleEndian, m.XACC)
-	binary.Write(data, binary.LittleEndian, m.YACC)
-	binary.Write(data, binary.LittleEndian, m.ZACC)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ROLL); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PITCH); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ROLLSPEED); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PITCHSPEED); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YAWSPEED); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.LAT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.LON); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ALT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VX); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VY); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VZ); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.XACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ZACC); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the HilState
 func (m *HilState) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_USEC)
-	binary.Read(data, binary.LittleEndian, &m.ROLL)
-	binary.Read(data, binary.LittleEndian, &m.PITCH)
-	binary.Read(data, binary.LittleEndian, &m.YAW)
-	binary.Read(data, binary.LittleEndian, &m.ROLLSPEED)
-	binary.Read(data, binary.LittleEndian, &m.PITCHSPEED)
-	binary.Read(data, binary.LittleEndian, &m.YAWSPEED)
-	binary.Read(data, binary.LittleEndian, &m.LAT)
-	binary.Read(data, binary.LittleEndian, &m.LON)
-	binary.Read(data, binary.LittleEndian, &m.ALT)
-	binary.Read(data, binary.LittleEndian, &m.VX)
-	binary.Read(data, binary.LittleEndian, &m.VY)
-	binary.Read(data, binary.LittleEndian, &m.VZ)
-	binary.Read(data, binary.LittleEndian, &m.XACC)
-	binary.Read(data, binary.LittleEndian, &m.YACC)
-	binary.Read(data, binary.LittleEndian, &m.ZACC)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ROLL); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PITCH); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ROLLSPEED); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PITCHSPEED); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YAWSPEED); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.LAT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.LON); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ALT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VX); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VY); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VZ); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.XACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ZACC); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE HIL_CONTROLS
 //
 // MAVLINK_MSG_ID_HIL_CONTROLS 91
@@ -5507,8 +7058,6 @@ func (m *HilState) Decode(buf []byte) {
 // MAVLINK_MSG_ID_HIL_CONTROLS_LEN 42
 //
 // MAVLINK_MSG_ID_HIL_CONTROLS_CRC 63
-//
-//
 type HilControls struct {
 	TIME_USEC      uint64  // Timestamp (microseconds since UNIX epoch or microseconds since system boot)
 	ROLL_AILERONS  float32 // Control output -1 .. 1
@@ -5558,37 +7107,80 @@ func (*HilControls) Crc() uint8 {
 // Pack returns a packed byte array which represents a HilControls payload
 func (m *HilControls) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_USEC)
-	binary.Write(data, binary.LittleEndian, m.ROLL_AILERONS)
-	binary.Write(data, binary.LittleEndian, m.PITCH_ELEVATOR)
-	binary.Write(data, binary.LittleEndian, m.YAW_RUDDER)
-	binary.Write(data, binary.LittleEndian, m.THROTTLE)
-	binary.Write(data, binary.LittleEndian, m.AUX1)
-	binary.Write(data, binary.LittleEndian, m.AUX2)
-	binary.Write(data, binary.LittleEndian, m.AUX3)
-	binary.Write(data, binary.LittleEndian, m.AUX4)
-	binary.Write(data, binary.LittleEndian, m.MODE)
-	binary.Write(data, binary.LittleEndian, m.NAV_MODE)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ROLL_AILERONS); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PITCH_ELEVATOR); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YAW_RUDDER); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.THROTTLE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.AUX1); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.AUX2); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.AUX3); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.AUX4); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.MODE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.NAV_MODE); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the HilControls
 func (m *HilControls) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_USEC)
-	binary.Read(data, binary.LittleEndian, &m.ROLL_AILERONS)
-	binary.Read(data, binary.LittleEndian, &m.PITCH_ELEVATOR)
-	binary.Read(data, binary.LittleEndian, &m.YAW_RUDDER)
-	binary.Read(data, binary.LittleEndian, &m.THROTTLE)
-	binary.Read(data, binary.LittleEndian, &m.AUX1)
-	binary.Read(data, binary.LittleEndian, &m.AUX2)
-	binary.Read(data, binary.LittleEndian, &m.AUX3)
-	binary.Read(data, binary.LittleEndian, &m.AUX4)
-	binary.Read(data, binary.LittleEndian, &m.MODE)
-	binary.Read(data, binary.LittleEndian, &m.NAV_MODE)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ROLL_AILERONS); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PITCH_ELEVATOR); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YAW_RUDDER); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.THROTTLE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.AUX1); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.AUX2); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.AUX3); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.AUX4); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.MODE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.NAV_MODE); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE HIL_RC_INPUTS_RAW
 //
 // MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW 92
@@ -5596,8 +7188,6 @@ func (m *HilControls) Decode(buf []byte) {
 // MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_LEN 33
 //
 // MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_CRC 54
-//
-//
 type HilRcInputsRaw struct {
 	TIME_USEC  uint64 // Timestamp (microseconds since UNIX epoch or microseconds since system boot)
 	CHAN1_RAW  uint16 // RC channel 1 value, in microseconds
@@ -5653,43 +7243,98 @@ func (*HilRcInputsRaw) Crc() uint8 {
 // Pack returns a packed byte array which represents a HilRcInputsRaw payload
 func (m *HilRcInputsRaw) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_USEC)
-	binary.Write(data, binary.LittleEndian, m.CHAN1_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN2_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN3_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN4_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN5_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN6_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN7_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN8_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN9_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN10_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN11_RAW)
-	binary.Write(data, binary.LittleEndian, m.CHAN12_RAW)
-	binary.Write(data, binary.LittleEndian, m.RSSI)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN1_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN2_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN3_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN4_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN5_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN6_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN7_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN8_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN9_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN10_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN11_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CHAN12_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.RSSI); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the HilRcInputsRaw
 func (m *HilRcInputsRaw) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_USEC)
-	binary.Read(data, binary.LittleEndian, &m.CHAN1_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN2_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN3_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN4_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN5_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN6_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN7_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN8_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN9_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN10_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN11_RAW)
-	binary.Read(data, binary.LittleEndian, &m.CHAN12_RAW)
-	binary.Read(data, binary.LittleEndian, &m.RSSI)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN1_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN2_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN3_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN4_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN5_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN6_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN7_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN8_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN9_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN10_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN11_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CHAN12_RAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.RSSI); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE OPTICAL_FLOW
 //
 // MAVLINK_MSG_ID_OPTICAL_FLOW 100
@@ -5697,8 +7342,6 @@ func (m *HilRcInputsRaw) Decode(buf []byte) {
 // MAVLINK_MSG_ID_OPTICAL_FLOW_LEN 26
 //
 // MAVLINK_MSG_ID_OPTICAL_FLOW_CRC 175
-//
-//
 type OpticalFlow struct {
 	TIME_USEC       uint64  // Timestamp (UNIX)
 	FLOW_COMP_M_X   float32 // Flow in meters in x-sensor direction, angular-speed compensated
@@ -5742,31 +7385,62 @@ func (*OpticalFlow) Crc() uint8 {
 // Pack returns a packed byte array which represents a OpticalFlow payload
 func (m *OpticalFlow) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_USEC)
-	binary.Write(data, binary.LittleEndian, m.FLOW_COMP_M_X)
-	binary.Write(data, binary.LittleEndian, m.FLOW_COMP_M_Y)
-	binary.Write(data, binary.LittleEndian, m.GROUND_DISTANCE)
-	binary.Write(data, binary.LittleEndian, m.FLOW_X)
-	binary.Write(data, binary.LittleEndian, m.FLOW_Y)
-	binary.Write(data, binary.LittleEndian, m.SENSOR_ID)
-	binary.Write(data, binary.LittleEndian, m.QUALITY)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.FLOW_COMP_M_X); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.FLOW_COMP_M_Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.GROUND_DISTANCE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.FLOW_X); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.FLOW_Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.SENSOR_ID); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.QUALITY); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the OpticalFlow
 func (m *OpticalFlow) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_USEC)
-	binary.Read(data, binary.LittleEndian, &m.FLOW_COMP_M_X)
-	binary.Read(data, binary.LittleEndian, &m.FLOW_COMP_M_Y)
-	binary.Read(data, binary.LittleEndian, &m.GROUND_DISTANCE)
-	binary.Read(data, binary.LittleEndian, &m.FLOW_X)
-	binary.Read(data, binary.LittleEndian, &m.FLOW_Y)
-	binary.Read(data, binary.LittleEndian, &m.SENSOR_ID)
-	binary.Read(data, binary.LittleEndian, &m.QUALITY)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.FLOW_COMP_M_X); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.FLOW_COMP_M_Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.GROUND_DISTANCE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.FLOW_X); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.FLOW_Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.SENSOR_ID); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.QUALITY); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE GLOBAL_VISION_POSITION_ESTIMATE
 //
 // MAVLINK_MSG_ID_GLOBAL_VISION_POSITION_ESTIMATE 101
@@ -5774,8 +7448,6 @@ func (m *OpticalFlow) Decode(buf []byte) {
 // MAVLINK_MSG_ID_GLOBAL_VISION_POSITION_ESTIMATE_LEN 32
 //
 // MAVLINK_MSG_ID_GLOBAL_VISION_POSITION_ESTIMATE_CRC 102
-//
-//
 type GlobalVisionPositionEstimate struct {
 	USEC  uint64  // Timestamp (microseconds, synced to UNIX time or since system boot)
 	X     float32 // Global X position
@@ -5817,29 +7489,56 @@ func (*GlobalVisionPositionEstimate) Crc() uint8 {
 // Pack returns a packed byte array which represents a GlobalVisionPositionEstimate payload
 func (m *GlobalVisionPositionEstimate) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.USEC)
-	binary.Write(data, binary.LittleEndian, m.X)
-	binary.Write(data, binary.LittleEndian, m.Y)
-	binary.Write(data, binary.LittleEndian, m.Z)
-	binary.Write(data, binary.LittleEndian, m.ROLL)
-	binary.Write(data, binary.LittleEndian, m.PITCH)
-	binary.Write(data, binary.LittleEndian, m.YAW)
+	if err := binary.Write(data, binary.LittleEndian, m.USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.X); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.Z); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ROLL); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PITCH); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YAW); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the GlobalVisionPositionEstimate
 func (m *GlobalVisionPositionEstimate) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.USEC)
-	binary.Read(data, binary.LittleEndian, &m.X)
-	binary.Read(data, binary.LittleEndian, &m.Y)
-	binary.Read(data, binary.LittleEndian, &m.Z)
-	binary.Read(data, binary.LittleEndian, &m.ROLL)
-	binary.Read(data, binary.LittleEndian, &m.PITCH)
-	binary.Read(data, binary.LittleEndian, &m.YAW)
+	if err := binary.Read(data, binary.LittleEndian, &m.USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.X); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.Z); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ROLL); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PITCH); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YAW); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE VISION_POSITION_ESTIMATE
 //
 // MAVLINK_MSG_ID_VISION_POSITION_ESTIMATE 102
@@ -5847,8 +7546,6 @@ func (m *GlobalVisionPositionEstimate) Decode(buf []byte) {
 // MAVLINK_MSG_ID_VISION_POSITION_ESTIMATE_LEN 32
 //
 // MAVLINK_MSG_ID_VISION_POSITION_ESTIMATE_CRC 158
-//
-//
 type VisionPositionEstimate struct {
 	USEC  uint64  // Timestamp (microseconds, synced to UNIX time or since system boot)
 	X     float32 // Global X position
@@ -5890,29 +7587,56 @@ func (*VisionPositionEstimate) Crc() uint8 {
 // Pack returns a packed byte array which represents a VisionPositionEstimate payload
 func (m *VisionPositionEstimate) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.USEC)
-	binary.Write(data, binary.LittleEndian, m.X)
-	binary.Write(data, binary.LittleEndian, m.Y)
-	binary.Write(data, binary.LittleEndian, m.Z)
-	binary.Write(data, binary.LittleEndian, m.ROLL)
-	binary.Write(data, binary.LittleEndian, m.PITCH)
-	binary.Write(data, binary.LittleEndian, m.YAW)
+	if err := binary.Write(data, binary.LittleEndian, m.USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.X); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.Z); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ROLL); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PITCH); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YAW); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the VisionPositionEstimate
 func (m *VisionPositionEstimate) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.USEC)
-	binary.Read(data, binary.LittleEndian, &m.X)
-	binary.Read(data, binary.LittleEndian, &m.Y)
-	binary.Read(data, binary.LittleEndian, &m.Z)
-	binary.Read(data, binary.LittleEndian, &m.ROLL)
-	binary.Read(data, binary.LittleEndian, &m.PITCH)
-	binary.Read(data, binary.LittleEndian, &m.YAW)
+	if err := binary.Read(data, binary.LittleEndian, &m.USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.X); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.Z); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ROLL); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PITCH); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YAW); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE VISION_SPEED_ESTIMATE
 //
 // MAVLINK_MSG_ID_VISION_SPEED_ESTIMATE 103
@@ -5920,8 +7644,6 @@ func (m *VisionPositionEstimate) Decode(buf []byte) {
 // MAVLINK_MSG_ID_VISION_SPEED_ESTIMATE_LEN 20
 //
 // MAVLINK_MSG_ID_VISION_SPEED_ESTIMATE_CRC 208
-//
-//
 type VisionSpeedEstimate struct {
 	USEC uint64  // Timestamp (microseconds, synced to UNIX time or since system boot)
 	X    float32 // Global X speed
@@ -5957,23 +7679,38 @@ func (*VisionSpeedEstimate) Crc() uint8 {
 // Pack returns a packed byte array which represents a VisionSpeedEstimate payload
 func (m *VisionSpeedEstimate) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.USEC)
-	binary.Write(data, binary.LittleEndian, m.X)
-	binary.Write(data, binary.LittleEndian, m.Y)
-	binary.Write(data, binary.LittleEndian, m.Z)
+	if err := binary.Write(data, binary.LittleEndian, m.USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.X); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.Z); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the VisionSpeedEstimate
 func (m *VisionSpeedEstimate) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.USEC)
-	binary.Read(data, binary.LittleEndian, &m.X)
-	binary.Read(data, binary.LittleEndian, &m.Y)
-	binary.Read(data, binary.LittleEndian, &m.Z)
+	if err := binary.Read(data, binary.LittleEndian, &m.USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.X); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.Z); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE VICON_POSITION_ESTIMATE
 //
 // MAVLINK_MSG_ID_VICON_POSITION_ESTIMATE 104
@@ -5981,8 +7718,6 @@ func (m *VisionSpeedEstimate) Decode(buf []byte) {
 // MAVLINK_MSG_ID_VICON_POSITION_ESTIMATE_LEN 32
 //
 // MAVLINK_MSG_ID_VICON_POSITION_ESTIMATE_CRC 56
-//
-//
 type ViconPositionEstimate struct {
 	USEC  uint64  // Timestamp (microseconds, synced to UNIX time or since system boot)
 	X     float32 // Global X position
@@ -6024,29 +7759,56 @@ func (*ViconPositionEstimate) Crc() uint8 {
 // Pack returns a packed byte array which represents a ViconPositionEstimate payload
 func (m *ViconPositionEstimate) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.USEC)
-	binary.Write(data, binary.LittleEndian, m.X)
-	binary.Write(data, binary.LittleEndian, m.Y)
-	binary.Write(data, binary.LittleEndian, m.Z)
-	binary.Write(data, binary.LittleEndian, m.ROLL)
-	binary.Write(data, binary.LittleEndian, m.PITCH)
-	binary.Write(data, binary.LittleEndian, m.YAW)
+	if err := binary.Write(data, binary.LittleEndian, m.USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.X); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.Z); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ROLL); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PITCH); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YAW); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the ViconPositionEstimate
 func (m *ViconPositionEstimate) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.USEC)
-	binary.Read(data, binary.LittleEndian, &m.X)
-	binary.Read(data, binary.LittleEndian, &m.Y)
-	binary.Read(data, binary.LittleEndian, &m.Z)
-	binary.Read(data, binary.LittleEndian, &m.ROLL)
-	binary.Read(data, binary.LittleEndian, &m.PITCH)
-	binary.Read(data, binary.LittleEndian, &m.YAW)
+	if err := binary.Read(data, binary.LittleEndian, &m.USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.X); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.Z); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ROLL); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PITCH); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YAW); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE HIGHRES_IMU
 //
 // MAVLINK_MSG_ID_HIGHRES_IMU 105
@@ -6054,8 +7816,6 @@ func (m *ViconPositionEstimate) Decode(buf []byte) {
 // MAVLINK_MSG_ID_HIGHRES_IMU_LEN 62
 //
 // MAVLINK_MSG_ID_HIGHRES_IMU_CRC 93
-//
-//
 type HighresImu struct {
 	TIME_USEC      uint64  // Timestamp (microseconds, synced to UNIX time or since system boot)
 	XACC           float32 // X acceleration (m/s^2)
@@ -6113,45 +7873,104 @@ func (*HighresImu) Crc() uint8 {
 // Pack returns a packed byte array which represents a HighresImu payload
 func (m *HighresImu) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_USEC)
-	binary.Write(data, binary.LittleEndian, m.XACC)
-	binary.Write(data, binary.LittleEndian, m.YACC)
-	binary.Write(data, binary.LittleEndian, m.ZACC)
-	binary.Write(data, binary.LittleEndian, m.XGYRO)
-	binary.Write(data, binary.LittleEndian, m.YGYRO)
-	binary.Write(data, binary.LittleEndian, m.ZGYRO)
-	binary.Write(data, binary.LittleEndian, m.XMAG)
-	binary.Write(data, binary.LittleEndian, m.YMAG)
-	binary.Write(data, binary.LittleEndian, m.ZMAG)
-	binary.Write(data, binary.LittleEndian, m.ABS_PRESSURE)
-	binary.Write(data, binary.LittleEndian, m.DIFF_PRESSURE)
-	binary.Write(data, binary.LittleEndian, m.PRESSURE_ALT)
-	binary.Write(data, binary.LittleEndian, m.TEMPERATURE)
-	binary.Write(data, binary.LittleEndian, m.FIELDS_UPDATED)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.XACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ZACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.XGYRO); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YGYRO); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ZGYRO); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.XMAG); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YMAG); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ZMAG); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ABS_PRESSURE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.DIFF_PRESSURE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PRESSURE_ALT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TEMPERATURE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.FIELDS_UPDATED); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the HighresImu
 func (m *HighresImu) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_USEC)
-	binary.Read(data, binary.LittleEndian, &m.XACC)
-	binary.Read(data, binary.LittleEndian, &m.YACC)
-	binary.Read(data, binary.LittleEndian, &m.ZACC)
-	binary.Read(data, binary.LittleEndian, &m.XGYRO)
-	binary.Read(data, binary.LittleEndian, &m.YGYRO)
-	binary.Read(data, binary.LittleEndian, &m.ZGYRO)
-	binary.Read(data, binary.LittleEndian, &m.XMAG)
-	binary.Read(data, binary.LittleEndian, &m.YMAG)
-	binary.Read(data, binary.LittleEndian, &m.ZMAG)
-	binary.Read(data, binary.LittleEndian, &m.ABS_PRESSURE)
-	binary.Read(data, binary.LittleEndian, &m.DIFF_PRESSURE)
-	binary.Read(data, binary.LittleEndian, &m.PRESSURE_ALT)
-	binary.Read(data, binary.LittleEndian, &m.TEMPERATURE)
-	binary.Read(data, binary.LittleEndian, &m.FIELDS_UPDATED)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.XACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ZACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.XGYRO); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YGYRO); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ZGYRO); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.XMAG); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YMAG); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ZMAG); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ABS_PRESSURE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.DIFF_PRESSURE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PRESSURE_ALT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TEMPERATURE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.FIELDS_UPDATED); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE OMNIDIRECTIONAL_FLOW
 //
 // MAVLINK_MSG_ID_OMNIDIRECTIONAL_FLOW 106
@@ -6159,8 +7978,6 @@ func (m *HighresImu) Decode(buf []byte) {
 // MAVLINK_MSG_ID_OMNIDIRECTIONAL_FLOW_LEN 54
 //
 // MAVLINK_MSG_ID_OMNIDIRECTIONAL_FLOW_CRC 211
-//
-//
 type OmnidirectionalFlow struct {
 	TIME_USEC        uint64    // Timestamp (microseconds, synced to UNIX time or since system boot)
 	FRONT_DISTANCE_M float32   // Front distance in meters. Positive value (including zero): distance known. Negative value: Unknown distance
@@ -6200,24 +8017,48 @@ func (*OmnidirectionalFlow) Crc() uint8 {
 // Pack returns a packed byte array which represents a OmnidirectionalFlow payload
 func (m *OmnidirectionalFlow) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_USEC)
-	binary.Write(data, binary.LittleEndian, m.FRONT_DISTANCE_M)
-	binary.Write(data, binary.LittleEndian, m.LEFT)
-	binary.Write(data, binary.LittleEndian, m.RIGHT)
-	binary.Write(data, binary.LittleEndian, m.SENSOR_ID)
-	binary.Write(data, binary.LittleEndian, m.QUALITY)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.FRONT_DISTANCE_M); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.LEFT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.RIGHT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.SENSOR_ID); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.QUALITY); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the OmnidirectionalFlow
 func (m *OmnidirectionalFlow) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_USEC)
-	binary.Read(data, binary.LittleEndian, &m.FRONT_DISTANCE_M)
-	binary.Read(data, binary.LittleEndian, &m.LEFT)
-	binary.Read(data, binary.LittleEndian, &m.RIGHT)
-	binary.Read(data, binary.LittleEndian, &m.SENSOR_ID)
-	binary.Read(data, binary.LittleEndian, &m.QUALITY)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.FRONT_DISTANCE_M); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.LEFT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.RIGHT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.SENSOR_ID); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.QUALITY); err != nil {
+		panic(err)
+	}
 }
 
 const (
@@ -6225,7 +8066,6 @@ const (
 	MAVLINK_MSG_OMNIDIRECTIONAL_FLOW_FIELD_right_LEN = 10
 )
 
-//
 // MESSAGE HIL_SENSOR
 //
 // MAVLINK_MSG_ID_HIL_SENSOR 107
@@ -6233,8 +8073,6 @@ const (
 // MAVLINK_MSG_ID_HIL_SENSOR_LEN 64
 //
 // MAVLINK_MSG_ID_HIL_SENSOR_CRC 108
-//
-//
 type HilSensor struct {
 	TIME_USEC      uint64  // Timestamp (microseconds, synced to UNIX time or since system boot)
 	XACC           float32 // X acceleration (m/s^2)
@@ -6292,45 +8130,104 @@ func (*HilSensor) Crc() uint8 {
 // Pack returns a packed byte array which represents a HilSensor payload
 func (m *HilSensor) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_USEC)
-	binary.Write(data, binary.LittleEndian, m.XACC)
-	binary.Write(data, binary.LittleEndian, m.YACC)
-	binary.Write(data, binary.LittleEndian, m.ZACC)
-	binary.Write(data, binary.LittleEndian, m.XGYRO)
-	binary.Write(data, binary.LittleEndian, m.YGYRO)
-	binary.Write(data, binary.LittleEndian, m.ZGYRO)
-	binary.Write(data, binary.LittleEndian, m.XMAG)
-	binary.Write(data, binary.LittleEndian, m.YMAG)
-	binary.Write(data, binary.LittleEndian, m.ZMAG)
-	binary.Write(data, binary.LittleEndian, m.ABS_PRESSURE)
-	binary.Write(data, binary.LittleEndian, m.DIFF_PRESSURE)
-	binary.Write(data, binary.LittleEndian, m.PRESSURE_ALT)
-	binary.Write(data, binary.LittleEndian, m.TEMPERATURE)
-	binary.Write(data, binary.LittleEndian, m.FIELDS_UPDATED)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.XACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ZACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.XGYRO); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YGYRO); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ZGYRO); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.XMAG); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YMAG); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ZMAG); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ABS_PRESSURE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.DIFF_PRESSURE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PRESSURE_ALT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TEMPERATURE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.FIELDS_UPDATED); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the HilSensor
 func (m *HilSensor) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_USEC)
-	binary.Read(data, binary.LittleEndian, &m.XACC)
-	binary.Read(data, binary.LittleEndian, &m.YACC)
-	binary.Read(data, binary.LittleEndian, &m.ZACC)
-	binary.Read(data, binary.LittleEndian, &m.XGYRO)
-	binary.Read(data, binary.LittleEndian, &m.YGYRO)
-	binary.Read(data, binary.LittleEndian, &m.ZGYRO)
-	binary.Read(data, binary.LittleEndian, &m.XMAG)
-	binary.Read(data, binary.LittleEndian, &m.YMAG)
-	binary.Read(data, binary.LittleEndian, &m.ZMAG)
-	binary.Read(data, binary.LittleEndian, &m.ABS_PRESSURE)
-	binary.Read(data, binary.LittleEndian, &m.DIFF_PRESSURE)
-	binary.Read(data, binary.LittleEndian, &m.PRESSURE_ALT)
-	binary.Read(data, binary.LittleEndian, &m.TEMPERATURE)
-	binary.Read(data, binary.LittleEndian, &m.FIELDS_UPDATED)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.XACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ZACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.XGYRO); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YGYRO); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ZGYRO); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.XMAG); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YMAG); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ZMAG); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ABS_PRESSURE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.DIFF_PRESSURE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PRESSURE_ALT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TEMPERATURE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.FIELDS_UPDATED); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE SIM_STATE
 //
 // MAVLINK_MSG_ID_SIM_STATE 108
@@ -6338,8 +8235,6 @@ func (m *HilSensor) Decode(buf []byte) {
 // MAVLINK_MSG_ID_SIM_STATE_LEN 84
 //
 // MAVLINK_MSG_ID_SIM_STATE_CRC 32
-//
-//
 type SimState struct {
 	Q1           float32 // True attitude quaternion component 1, w (1 in null-rotation)
 	Q2           float32 // True attitude quaternion component 2, x (0 in null-rotation)
@@ -6409,57 +8304,140 @@ func (*SimState) Crc() uint8 {
 // Pack returns a packed byte array which represents a SimState payload
 func (m *SimState) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.Q1)
-	binary.Write(data, binary.LittleEndian, m.Q2)
-	binary.Write(data, binary.LittleEndian, m.Q3)
-	binary.Write(data, binary.LittleEndian, m.Q4)
-	binary.Write(data, binary.LittleEndian, m.ROLL)
-	binary.Write(data, binary.LittleEndian, m.PITCH)
-	binary.Write(data, binary.LittleEndian, m.YAW)
-	binary.Write(data, binary.LittleEndian, m.XACC)
-	binary.Write(data, binary.LittleEndian, m.YACC)
-	binary.Write(data, binary.LittleEndian, m.ZACC)
-	binary.Write(data, binary.LittleEndian, m.XGYRO)
-	binary.Write(data, binary.LittleEndian, m.YGYRO)
-	binary.Write(data, binary.LittleEndian, m.ZGYRO)
-	binary.Write(data, binary.LittleEndian, m.LAT)
-	binary.Write(data, binary.LittleEndian, m.LON)
-	binary.Write(data, binary.LittleEndian, m.ALT)
-	binary.Write(data, binary.LittleEndian, m.STD_DEV_HORZ)
-	binary.Write(data, binary.LittleEndian, m.STD_DEV_VERT)
-	binary.Write(data, binary.LittleEndian, m.VN)
-	binary.Write(data, binary.LittleEndian, m.VE)
-	binary.Write(data, binary.LittleEndian, m.VD)
+	if err := binary.Write(data, binary.LittleEndian, m.Q1); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.Q2); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.Q3); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.Q4); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ROLL); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PITCH); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.XACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ZACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.XGYRO); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YGYRO); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ZGYRO); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.LAT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.LON); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ALT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.STD_DEV_HORZ); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.STD_DEV_VERT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VN); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VD); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the SimState
 func (m *SimState) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.Q1)
-	binary.Read(data, binary.LittleEndian, &m.Q2)
-	binary.Read(data, binary.LittleEndian, &m.Q3)
-	binary.Read(data, binary.LittleEndian, &m.Q4)
-	binary.Read(data, binary.LittleEndian, &m.ROLL)
-	binary.Read(data, binary.LittleEndian, &m.PITCH)
-	binary.Read(data, binary.LittleEndian, &m.YAW)
-	binary.Read(data, binary.LittleEndian, &m.XACC)
-	binary.Read(data, binary.LittleEndian, &m.YACC)
-	binary.Read(data, binary.LittleEndian, &m.ZACC)
-	binary.Read(data, binary.LittleEndian, &m.XGYRO)
-	binary.Read(data, binary.LittleEndian, &m.YGYRO)
-	binary.Read(data, binary.LittleEndian, &m.ZGYRO)
-	binary.Read(data, binary.LittleEndian, &m.LAT)
-	binary.Read(data, binary.LittleEndian, &m.LON)
-	binary.Read(data, binary.LittleEndian, &m.ALT)
-	binary.Read(data, binary.LittleEndian, &m.STD_DEV_HORZ)
-	binary.Read(data, binary.LittleEndian, &m.STD_DEV_VERT)
-	binary.Read(data, binary.LittleEndian, &m.VN)
-	binary.Read(data, binary.LittleEndian, &m.VE)
-	binary.Read(data, binary.LittleEndian, &m.VD)
+	if err := binary.Read(data, binary.LittleEndian, &m.Q1); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.Q2); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.Q3); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.Q4); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ROLL); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PITCH); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YAW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.XACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ZACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.XGYRO); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YGYRO); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ZGYRO); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.LAT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.LON); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ALT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.STD_DEV_HORZ); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.STD_DEV_VERT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VN); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VD); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE RADIO_STATUS
 //
 // MAVLINK_MSG_ID_RADIO_STATUS 109
@@ -6467,8 +8445,6 @@ func (m *SimState) Decode(buf []byte) {
 // MAVLINK_MSG_ID_RADIO_STATUS_LEN 9
 //
 // MAVLINK_MSG_ID_RADIO_STATUS_CRC 185
-//
-//
 type RadioStatus struct {
 	RXERRORS uint16 // receive errors
 	FIXED    uint16 // count of error corrected packets
@@ -6510,29 +8486,56 @@ func (*RadioStatus) Crc() uint8 {
 // Pack returns a packed byte array which represents a RadioStatus payload
 func (m *RadioStatus) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.RXERRORS)
-	binary.Write(data, binary.LittleEndian, m.FIXED)
-	binary.Write(data, binary.LittleEndian, m.RSSI)
-	binary.Write(data, binary.LittleEndian, m.REMRSSI)
-	binary.Write(data, binary.LittleEndian, m.TXBUF)
-	binary.Write(data, binary.LittleEndian, m.NOISE)
-	binary.Write(data, binary.LittleEndian, m.REMNOISE)
+	if err := binary.Write(data, binary.LittleEndian, m.RXERRORS); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.FIXED); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.RSSI); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.REMRSSI); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TXBUF); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.NOISE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.REMNOISE); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the RadioStatus
 func (m *RadioStatus) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.RXERRORS)
-	binary.Read(data, binary.LittleEndian, &m.FIXED)
-	binary.Read(data, binary.LittleEndian, &m.RSSI)
-	binary.Read(data, binary.LittleEndian, &m.REMRSSI)
-	binary.Read(data, binary.LittleEndian, &m.TXBUF)
-	binary.Read(data, binary.LittleEndian, &m.NOISE)
-	binary.Read(data, binary.LittleEndian, &m.REMNOISE)
+	if err := binary.Read(data, binary.LittleEndian, &m.RXERRORS); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.FIXED); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.RSSI); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.REMRSSI); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TXBUF); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.NOISE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.REMNOISE); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE FILE_TRANSFER_START
 //
 // MAVLINK_MSG_ID_FILE_TRANSFER_START 110
@@ -6540,8 +8543,6 @@ func (m *RadioStatus) Decode(buf []byte) {
 // MAVLINK_MSG_ID_FILE_TRANSFER_START_LEN 254
 //
 // MAVLINK_MSG_ID_FILE_TRANSFER_START_CRC 235
-//
-//
 type FileTransferStart struct {
 	TRANSFER_UID uint64     // Unique transfer ID
 	FILE_SIZE    uint32     // File size in bytes
@@ -6579,29 +8580,48 @@ func (*FileTransferStart) Crc() uint8 {
 // Pack returns a packed byte array which represents a FileTransferStart payload
 func (m *FileTransferStart) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TRANSFER_UID)
-	binary.Write(data, binary.LittleEndian, m.FILE_SIZE)
-	binary.Write(data, binary.LittleEndian, m.DEST_PATH)
-	binary.Write(data, binary.LittleEndian, m.DIRECTION)
-	binary.Write(data, binary.LittleEndian, m.FLAGS)
+	if err := binary.Write(data, binary.LittleEndian, m.TRANSFER_UID); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.FILE_SIZE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.DEST_PATH); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.DIRECTION); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.FLAGS); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the FileTransferStart
 func (m *FileTransferStart) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TRANSFER_UID)
-	binary.Read(data, binary.LittleEndian, &m.FILE_SIZE)
-	binary.Read(data, binary.LittleEndian, &m.DEST_PATH)
-	binary.Read(data, binary.LittleEndian, &m.DIRECTION)
-	binary.Read(data, binary.LittleEndian, &m.FLAGS)
+	if err := binary.Read(data, binary.LittleEndian, &m.TRANSFER_UID); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.FILE_SIZE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.DEST_PATH); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.DIRECTION); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.FLAGS); err != nil {
+		panic(err)
+	}
 }
 
 const (
 	MAVLINK_MSG_FILE_TRANSFER_START_FIELD_dest_path_LEN = 240
 )
 
-//
 // MESSAGE FILE_TRANSFER_DIR_LIST
 //
 // MAVLINK_MSG_ID_FILE_TRANSFER_DIR_LIST 111
@@ -6609,8 +8629,6 @@ const (
 // MAVLINK_MSG_ID_FILE_TRANSFER_DIR_LIST_LEN 249
 //
 // MAVLINK_MSG_ID_FILE_TRANSFER_DIR_LIST_CRC 93
-//
-//
 type FileTransferDirList struct {
 	TRANSFER_UID uint64     // Unique transfer ID
 	DIR_PATH     [240]uint8 // Directory path to list
@@ -6644,25 +8662,36 @@ func (*FileTransferDirList) Crc() uint8 {
 // Pack returns a packed byte array which represents a FileTransferDirList payload
 func (m *FileTransferDirList) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TRANSFER_UID)
-	binary.Write(data, binary.LittleEndian, m.DIR_PATH)
-	binary.Write(data, binary.LittleEndian, m.FLAGS)
+	if err := binary.Write(data, binary.LittleEndian, m.TRANSFER_UID); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.DIR_PATH); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.FLAGS); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the FileTransferDirList
 func (m *FileTransferDirList) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TRANSFER_UID)
-	binary.Read(data, binary.LittleEndian, &m.DIR_PATH)
-	binary.Read(data, binary.LittleEndian, &m.FLAGS)
+	if err := binary.Read(data, binary.LittleEndian, &m.TRANSFER_UID); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.DIR_PATH); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.FLAGS); err != nil {
+		panic(err)
+	}
 }
 
 const (
 	MAVLINK_MSG_FILE_TRANSFER_DIR_LIST_FIELD_dir_path_LEN = 240
 )
 
-//
 // MESSAGE FILE_TRANSFER_RES
 //
 // MAVLINK_MSG_ID_FILE_TRANSFER_RES 112
@@ -6670,8 +8699,6 @@ const (
 // MAVLINK_MSG_ID_FILE_TRANSFER_RES_LEN 9
 //
 // MAVLINK_MSG_ID_FILE_TRANSFER_RES_CRC 124
-//
-//
 type FileTransferRes struct {
 	TRANSFER_UID uint64 // Unique transfer ID
 	RESULT       uint8  // 0: OK, 1: not permitted, 2: bad path / file name, 3: no space left on device
@@ -6703,19 +8730,26 @@ func (*FileTransferRes) Crc() uint8 {
 // Pack returns a packed byte array which represents a FileTransferRes payload
 func (m *FileTransferRes) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TRANSFER_UID)
-	binary.Write(data, binary.LittleEndian, m.RESULT)
+	if err := binary.Write(data, binary.LittleEndian, m.TRANSFER_UID); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.RESULT); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the FileTransferRes
 func (m *FileTransferRes) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TRANSFER_UID)
-	binary.Read(data, binary.LittleEndian, &m.RESULT)
+	if err := binary.Read(data, binary.LittleEndian, &m.TRANSFER_UID); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.RESULT); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE HIL_GPS
 //
 // MAVLINK_MSG_ID_HIL_GPS 113
@@ -6723,8 +8757,6 @@ func (m *FileTransferRes) Decode(buf []byte) {
 // MAVLINK_MSG_ID_HIL_GPS_LEN 36
 //
 // MAVLINK_MSG_ID_HIL_GPS_CRC 124
-//
-//
 type HilGps struct {
 	TIME_USEC          uint64 // Timestamp (microseconds since UNIX epoch or microseconds since system boot)
 	LAT                int32  // Latitude (WGS84), in degrees * 1E7
@@ -6778,41 +8810,92 @@ func (*HilGps) Crc() uint8 {
 // Pack returns a packed byte array which represents a HilGps payload
 func (m *HilGps) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_USEC)
-	binary.Write(data, binary.LittleEndian, m.LAT)
-	binary.Write(data, binary.LittleEndian, m.LON)
-	binary.Write(data, binary.LittleEndian, m.ALT)
-	binary.Write(data, binary.LittleEndian, m.EPH)
-	binary.Write(data, binary.LittleEndian, m.EPV)
-	binary.Write(data, binary.LittleEndian, m.VEL)
-	binary.Write(data, binary.LittleEndian, m.VN)
-	binary.Write(data, binary.LittleEndian, m.VE)
-	binary.Write(data, binary.LittleEndian, m.VD)
-	binary.Write(data, binary.LittleEndian, m.COG)
-	binary.Write(data, binary.LittleEndian, m.FIX_TYPE)
-	binary.Write(data, binary.LittleEndian, m.SATELLITES_VISIBLE)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.LAT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.LON); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ALT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.EPH); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.EPV); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VEL); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VN); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VD); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.COG); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.FIX_TYPE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.SATELLITES_VISIBLE); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the HilGps
 func (m *HilGps) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_USEC)
-	binary.Read(data, binary.LittleEndian, &m.LAT)
-	binary.Read(data, binary.LittleEndian, &m.LON)
-	binary.Read(data, binary.LittleEndian, &m.ALT)
-	binary.Read(data, binary.LittleEndian, &m.EPH)
-	binary.Read(data, binary.LittleEndian, &m.EPV)
-	binary.Read(data, binary.LittleEndian, &m.VEL)
-	binary.Read(data, binary.LittleEndian, &m.VN)
-	binary.Read(data, binary.LittleEndian, &m.VE)
-	binary.Read(data, binary.LittleEndian, &m.VD)
-	binary.Read(data, binary.LittleEndian, &m.COG)
-	binary.Read(data, binary.LittleEndian, &m.FIX_TYPE)
-	binary.Read(data, binary.LittleEndian, &m.SATELLITES_VISIBLE)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.LAT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.LON); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ALT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.EPH); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.EPV); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VEL); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VN); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VD); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.COG); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.FIX_TYPE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.SATELLITES_VISIBLE); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE HIL_OPTICAL_FLOW
 //
 // MAVLINK_MSG_ID_HIL_OPTICAL_FLOW 114
@@ -6820,8 +8903,6 @@ func (m *HilGps) Decode(buf []byte) {
 // MAVLINK_MSG_ID_HIL_OPTICAL_FLOW_LEN 26
 //
 // MAVLINK_MSG_ID_HIL_OPTICAL_FLOW_CRC 119
-//
-//
 type HilOpticalFlow struct {
 	TIME_USEC       uint64  // Timestamp (UNIX)
 	FLOW_COMP_M_X   float32 // Flow in meters in x-sensor direction, angular-speed compensated
@@ -6865,31 +8946,62 @@ func (*HilOpticalFlow) Crc() uint8 {
 // Pack returns a packed byte array which represents a HilOpticalFlow payload
 func (m *HilOpticalFlow) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_USEC)
-	binary.Write(data, binary.LittleEndian, m.FLOW_COMP_M_X)
-	binary.Write(data, binary.LittleEndian, m.FLOW_COMP_M_Y)
-	binary.Write(data, binary.LittleEndian, m.GROUND_DISTANCE)
-	binary.Write(data, binary.LittleEndian, m.FLOW_X)
-	binary.Write(data, binary.LittleEndian, m.FLOW_Y)
-	binary.Write(data, binary.LittleEndian, m.SENSOR_ID)
-	binary.Write(data, binary.LittleEndian, m.QUALITY)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.FLOW_COMP_M_X); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.FLOW_COMP_M_Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.GROUND_DISTANCE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.FLOW_X); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.FLOW_Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.SENSOR_ID); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.QUALITY); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the HilOpticalFlow
 func (m *HilOpticalFlow) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_USEC)
-	binary.Read(data, binary.LittleEndian, &m.FLOW_COMP_M_X)
-	binary.Read(data, binary.LittleEndian, &m.FLOW_COMP_M_Y)
-	binary.Read(data, binary.LittleEndian, &m.GROUND_DISTANCE)
-	binary.Read(data, binary.LittleEndian, &m.FLOW_X)
-	binary.Read(data, binary.LittleEndian, &m.FLOW_Y)
-	binary.Read(data, binary.LittleEndian, &m.SENSOR_ID)
-	binary.Read(data, binary.LittleEndian, &m.QUALITY)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.FLOW_COMP_M_X); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.FLOW_COMP_M_Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.GROUND_DISTANCE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.FLOW_X); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.FLOW_Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.SENSOR_ID); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.QUALITY); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE HIL_STATE_QUATERNION
 //
 // MAVLINK_MSG_ID_HIL_STATE_QUATERNION 115
@@ -6897,8 +9009,6 @@ func (m *HilOpticalFlow) Decode(buf []byte) {
 // MAVLINK_MSG_ID_HIL_STATE_QUATERNION_LEN 64
 //
 // MAVLINK_MSG_ID_HIL_STATE_QUATERNION_CRC 4
-//
-//
 type HilStateQuaternion struct {
 	TIME_USEC           uint64     // Timestamp (microseconds since UNIX epoch or microseconds since system boot)
 	ATTITUDE_QUATERNION [4]float32 // Vehicle attitude expressed as normalized quaternion in w, x, y, z order (with 1 0 0 0 being the null-rotation)
@@ -6958,51 +9068,114 @@ func (*HilStateQuaternion) Crc() uint8 {
 // Pack returns a packed byte array which represents a HilStateQuaternion payload
 func (m *HilStateQuaternion) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_USEC)
-	binary.Write(data, binary.LittleEndian, m.ATTITUDE_QUATERNION)
-	binary.Write(data, binary.LittleEndian, m.ROLLSPEED)
-	binary.Write(data, binary.LittleEndian, m.PITCHSPEED)
-	binary.Write(data, binary.LittleEndian, m.YAWSPEED)
-	binary.Write(data, binary.LittleEndian, m.LAT)
-	binary.Write(data, binary.LittleEndian, m.LON)
-	binary.Write(data, binary.LittleEndian, m.ALT)
-	binary.Write(data, binary.LittleEndian, m.VX)
-	binary.Write(data, binary.LittleEndian, m.VY)
-	binary.Write(data, binary.LittleEndian, m.VZ)
-	binary.Write(data, binary.LittleEndian, m.IND_AIRSPEED)
-	binary.Write(data, binary.LittleEndian, m.TRUE_AIRSPEED)
-	binary.Write(data, binary.LittleEndian, m.XACC)
-	binary.Write(data, binary.LittleEndian, m.YACC)
-	binary.Write(data, binary.LittleEndian, m.ZACC)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ATTITUDE_QUATERNION); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ROLLSPEED); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PITCHSPEED); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YAWSPEED); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.LAT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.LON); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ALT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VX); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VY); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VZ); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.IND_AIRSPEED); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TRUE_AIRSPEED); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.XACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ZACC); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the HilStateQuaternion
 func (m *HilStateQuaternion) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_USEC)
-	binary.Read(data, binary.LittleEndian, &m.ATTITUDE_QUATERNION)
-	binary.Read(data, binary.LittleEndian, &m.ROLLSPEED)
-	binary.Read(data, binary.LittleEndian, &m.PITCHSPEED)
-	binary.Read(data, binary.LittleEndian, &m.YAWSPEED)
-	binary.Read(data, binary.LittleEndian, &m.LAT)
-	binary.Read(data, binary.LittleEndian, &m.LON)
-	binary.Read(data, binary.LittleEndian, &m.ALT)
-	binary.Read(data, binary.LittleEndian, &m.VX)
-	binary.Read(data, binary.LittleEndian, &m.VY)
-	binary.Read(data, binary.LittleEndian, &m.VZ)
-	binary.Read(data, binary.LittleEndian, &m.IND_AIRSPEED)
-	binary.Read(data, binary.LittleEndian, &m.TRUE_AIRSPEED)
-	binary.Read(data, binary.LittleEndian, &m.XACC)
-	binary.Read(data, binary.LittleEndian, &m.YACC)
-	binary.Read(data, binary.LittleEndian, &m.ZACC)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ATTITUDE_QUATERNION); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ROLLSPEED); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PITCHSPEED); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YAWSPEED); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.LAT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.LON); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ALT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VX); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VY); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VZ); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.IND_AIRSPEED); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TRUE_AIRSPEED); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.XACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ZACC); err != nil {
+		panic(err)
+	}
 }
 
 const (
 	MAVLINK_MSG_HIL_STATE_QUATERNION_FIELD_attitude_quaternion_LEN = 4
 )
 
-//
 // MESSAGE SCALED_IMU2
 //
 // MAVLINK_MSG_ID_SCALED_IMU2 116
@@ -7010,8 +9183,6 @@ const (
 // MAVLINK_MSG_ID_SCALED_IMU2_LEN 22
 //
 // MAVLINK_MSG_ID_SCALED_IMU2_CRC 76
-//
-//
 type ScaledImu2 struct {
 	TIME_BOOT_MS uint32 // Timestamp (milliseconds since system boot)
 	XACC         int16  // X acceleration (mg)
@@ -7059,35 +9230,74 @@ func (*ScaledImu2) Crc() uint8 {
 // Pack returns a packed byte array which represents a ScaledImu2 payload
 func (m *ScaledImu2) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS)
-	binary.Write(data, binary.LittleEndian, m.XACC)
-	binary.Write(data, binary.LittleEndian, m.YACC)
-	binary.Write(data, binary.LittleEndian, m.ZACC)
-	binary.Write(data, binary.LittleEndian, m.XGYRO)
-	binary.Write(data, binary.LittleEndian, m.YGYRO)
-	binary.Write(data, binary.LittleEndian, m.ZGYRO)
-	binary.Write(data, binary.LittleEndian, m.XMAG)
-	binary.Write(data, binary.LittleEndian, m.YMAG)
-	binary.Write(data, binary.LittleEndian, m.ZMAG)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.XACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ZACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.XGYRO); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YGYRO); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ZGYRO); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.XMAG); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.YMAG); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ZMAG); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the ScaledImu2
 func (m *ScaledImu2) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS)
-	binary.Read(data, binary.LittleEndian, &m.XACC)
-	binary.Read(data, binary.LittleEndian, &m.YACC)
-	binary.Read(data, binary.LittleEndian, &m.ZACC)
-	binary.Read(data, binary.LittleEndian, &m.XGYRO)
-	binary.Read(data, binary.LittleEndian, &m.YGYRO)
-	binary.Read(data, binary.LittleEndian, &m.ZGYRO)
-	binary.Read(data, binary.LittleEndian, &m.XMAG)
-	binary.Read(data, binary.LittleEndian, &m.YMAG)
-	binary.Read(data, binary.LittleEndian, &m.ZMAG)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.XACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ZACC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.XGYRO); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YGYRO); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ZGYRO); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.XMAG); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.YMAG); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ZMAG); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE LOG_REQUEST_LIST
 //
 // MAVLINK_MSG_ID_LOG_REQUEST_LIST 117
@@ -7095,8 +9305,6 @@ func (m *ScaledImu2) Decode(buf []byte) {
 // MAVLINK_MSG_ID_LOG_REQUEST_LIST_LEN 6
 //
 // MAVLINK_MSG_ID_LOG_REQUEST_LIST_CRC 128
-//
-//
 type LogRequestList struct {
 	START            uint16 // First log id (0 for first available)
 	END              uint16 // Last log id (0xffff for last available)
@@ -7132,23 +9340,38 @@ func (*LogRequestList) Crc() uint8 {
 // Pack returns a packed byte array which represents a LogRequestList payload
 func (m *LogRequestList) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.START)
-	binary.Write(data, binary.LittleEndian, m.END)
-	binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM)
-	binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT)
+	if err := binary.Write(data, binary.LittleEndian, m.START); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.END); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the LogRequestList
 func (m *LogRequestList) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.START)
-	binary.Read(data, binary.LittleEndian, &m.END)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
+	if err := binary.Read(data, binary.LittleEndian, &m.START); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.END); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE LOG_ENTRY
 //
 // MAVLINK_MSG_ID_LOG_ENTRY 118
@@ -7156,8 +9379,6 @@ func (m *LogRequestList) Decode(buf []byte) {
 // MAVLINK_MSG_ID_LOG_ENTRY_LEN 14
 //
 // MAVLINK_MSG_ID_LOG_ENTRY_CRC 56
-//
-//
 type LogEntry struct {
 	TIME_UTC     uint32 // UTC timestamp of log in seconds since 1970, or 0 if not available
 	SIZE         uint32 // Size of the log (may be approximate) in bytes
@@ -7195,25 +9416,44 @@ func (*LogEntry) Crc() uint8 {
 // Pack returns a packed byte array which represents a LogEntry payload
 func (m *LogEntry) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_UTC)
-	binary.Write(data, binary.LittleEndian, m.SIZE)
-	binary.Write(data, binary.LittleEndian, m.ID)
-	binary.Write(data, binary.LittleEndian, m.NUM_LOGS)
-	binary.Write(data, binary.LittleEndian, m.LAST_LOG_NUM)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_UTC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.SIZE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ID); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.NUM_LOGS); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.LAST_LOG_NUM); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the LogEntry
 func (m *LogEntry) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_UTC)
-	binary.Read(data, binary.LittleEndian, &m.SIZE)
-	binary.Read(data, binary.LittleEndian, &m.ID)
-	binary.Read(data, binary.LittleEndian, &m.NUM_LOGS)
-	binary.Read(data, binary.LittleEndian, &m.LAST_LOG_NUM)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_UTC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.SIZE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ID); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.NUM_LOGS); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.LAST_LOG_NUM); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE LOG_REQUEST_DATA
 //
 // MAVLINK_MSG_ID_LOG_REQUEST_DATA 119
@@ -7221,8 +9461,6 @@ func (m *LogEntry) Decode(buf []byte) {
 // MAVLINK_MSG_ID_LOG_REQUEST_DATA_LEN 12
 //
 // MAVLINK_MSG_ID_LOG_REQUEST_DATA_CRC 116
-//
-//
 type LogRequestData struct {
 	OFS              uint32 // Offset into the log
 	COUNT            uint32 // Number of bytes
@@ -7260,25 +9498,44 @@ func (*LogRequestData) Crc() uint8 {
 // Pack returns a packed byte array which represents a LogRequestData payload
 func (m *LogRequestData) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.OFS)
-	binary.Write(data, binary.LittleEndian, m.COUNT)
-	binary.Write(data, binary.LittleEndian, m.ID)
-	binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM)
-	binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT)
+	if err := binary.Write(data, binary.LittleEndian, m.OFS); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.COUNT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ID); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the LogRequestData
 func (m *LogRequestData) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.OFS)
-	binary.Read(data, binary.LittleEndian, &m.COUNT)
-	binary.Read(data, binary.LittleEndian, &m.ID)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
+	if err := binary.Read(data, binary.LittleEndian, &m.OFS); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.COUNT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ID); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE LOG_DATA
 //
 // MAVLINK_MSG_ID_LOG_DATA 120
@@ -7286,8 +9543,6 @@ func (m *LogRequestData) Decode(buf []byte) {
 // MAVLINK_MSG_ID_LOG_DATA_LEN 97
 //
 // MAVLINK_MSG_ID_LOG_DATA_CRC 134
-//
-//
 type LogData struct {
 	OFS   uint32    // Offset into the log
 	ID    uint16    // Log id (from LOG_ENTRY reply)
@@ -7323,27 +9578,42 @@ func (*LogData) Crc() uint8 {
 // Pack returns a packed byte array which represents a LogData payload
 func (m *LogData) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.OFS)
-	binary.Write(data, binary.LittleEndian, m.ID)
-	binary.Write(data, binary.LittleEndian, m.COUNT)
-	binary.Write(data, binary.LittleEndian, m.DATA)
+	if err := binary.Write(data, binary.LittleEndian, m.OFS); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ID); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.COUNT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.DATA); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the LogData
 func (m *LogData) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.OFS)
-	binary.Read(data, binary.LittleEndian, &m.ID)
-	binary.Read(data, binary.LittleEndian, &m.COUNT)
-	binary.Read(data, binary.LittleEndian, &m.DATA)
+	if err := binary.Read(data, binary.LittleEndian, &m.OFS); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ID); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.COUNT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.DATA); err != nil {
+		panic(err)
+	}
 }
 
 const (
 	MAVLINK_MSG_LOG_DATA_FIELD_data_LEN = 90
 )
 
-//
 // MESSAGE LOG_ERASE
 //
 // MAVLINK_MSG_ID_LOG_ERASE 121
@@ -7351,8 +9621,6 @@ const (
 // MAVLINK_MSG_ID_LOG_ERASE_LEN 2
 //
 // MAVLINK_MSG_ID_LOG_ERASE_CRC 237
-//
-//
 type LogErase struct {
 	TARGET_SYSTEM    uint8 // System ID
 	TARGET_COMPONENT uint8 // Component ID
@@ -7384,19 +9652,26 @@ func (*LogErase) Crc() uint8 {
 // Pack returns a packed byte array which represents a LogErase payload
 func (m *LogErase) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM)
-	binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT)
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the LogErase
 func (m *LogErase) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE LOG_REQUEST_END
 //
 // MAVLINK_MSG_ID_LOG_REQUEST_END 122
@@ -7404,8 +9679,6 @@ func (m *LogErase) Decode(buf []byte) {
 // MAVLINK_MSG_ID_LOG_REQUEST_END_LEN 2
 //
 // MAVLINK_MSG_ID_LOG_REQUEST_END_CRC 203
-//
-//
 type LogRequestEnd struct {
 	TARGET_SYSTEM    uint8 // System ID
 	TARGET_COMPONENT uint8 // Component ID
@@ -7437,19 +9710,26 @@ func (*LogRequestEnd) Crc() uint8 {
 // Pack returns a packed byte array which represents a LogRequestEnd payload
 func (m *LogRequestEnd) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM)
-	binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT)
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the LogRequestEnd
 func (m *LogRequestEnd) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE GPS_INJECT_DATA
 //
 // MAVLINK_MSG_ID_GPS_INJECT_DATA 123
@@ -7457,8 +9737,6 @@ func (m *LogRequestEnd) Decode(buf []byte) {
 // MAVLINK_MSG_ID_GPS_INJECT_DATA_LEN 113
 //
 // MAVLINK_MSG_ID_GPS_INJECT_DATA_CRC 250
-//
-//
 type GpsInjectData struct {
 	TARGET_SYSTEM    uint8      // System ID
 	TARGET_COMPONENT uint8      // Component ID
@@ -7494,27 +9772,42 @@ func (*GpsInjectData) Crc() uint8 {
 // Pack returns a packed byte array which represents a GpsInjectData payload
 func (m *GpsInjectData) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM)
-	binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT)
-	binary.Write(data, binary.LittleEndian, m.LEN)
-	binary.Write(data, binary.LittleEndian, m.DATA)
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.LEN); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.DATA); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the GpsInjectData
 func (m *GpsInjectData) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT)
-	binary.Read(data, binary.LittleEndian, &m.LEN)
-	binary.Read(data, binary.LittleEndian, &m.DATA)
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_COMPONENT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.LEN); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.DATA); err != nil {
+		panic(err)
+	}
 }
 
 const (
 	MAVLINK_MSG_GPS_INJECT_DATA_FIELD_data_LEN = 110
 )
 
-//
 // MESSAGE GPS2_RAW
 //
 // MAVLINK_MSG_ID_GPS2_RAW 124
@@ -7522,8 +9815,6 @@ const (
 // MAVLINK_MSG_ID_GPS2_RAW_LEN 35
 //
 // MAVLINK_MSG_ID_GPS2_RAW_CRC 87
-//
-//
 type Gps2Raw struct {
 	TIME_USEC          uint64 // Timestamp (microseconds since UNIX epoch or microseconds since system boot)
 	LAT                int32  // Latitude (WGS84), in degrees * 1E7
@@ -7575,39 +9866,86 @@ func (*Gps2Raw) Crc() uint8 {
 // Pack returns a packed byte array which represents a Gps2Raw payload
 func (m *Gps2Raw) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_USEC)
-	binary.Write(data, binary.LittleEndian, m.LAT)
-	binary.Write(data, binary.LittleEndian, m.LON)
-	binary.Write(data, binary.LittleEndian, m.ALT)
-	binary.Write(data, binary.LittleEndian, m.DGPS_AGE)
-	binary.Write(data, binary.LittleEndian, m.EPH)
-	binary.Write(data, binary.LittleEndian, m.EPV)
-	binary.Write(data, binary.LittleEndian, m.VEL)
-	binary.Write(data, binary.LittleEndian, m.COG)
-	binary.Write(data, binary.LittleEndian, m.FIX_TYPE)
-	binary.Write(data, binary.LittleEndian, m.SATELLITES_VISIBLE)
-	binary.Write(data, binary.LittleEndian, m.DGPS_NUMCH)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.LAT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.LON); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ALT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.DGPS_AGE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.EPH); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.EPV); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VEL); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.COG); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.FIX_TYPE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.SATELLITES_VISIBLE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.DGPS_NUMCH); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the Gps2Raw
 func (m *Gps2Raw) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_USEC)
-	binary.Read(data, binary.LittleEndian, &m.LAT)
-	binary.Read(data, binary.LittleEndian, &m.LON)
-	binary.Read(data, binary.LittleEndian, &m.ALT)
-	binary.Read(data, binary.LittleEndian, &m.DGPS_AGE)
-	binary.Read(data, binary.LittleEndian, &m.EPH)
-	binary.Read(data, binary.LittleEndian, &m.EPV)
-	binary.Read(data, binary.LittleEndian, &m.VEL)
-	binary.Read(data, binary.LittleEndian, &m.COG)
-	binary.Read(data, binary.LittleEndian, &m.FIX_TYPE)
-	binary.Read(data, binary.LittleEndian, &m.SATELLITES_VISIBLE)
-	binary.Read(data, binary.LittleEndian, &m.DGPS_NUMCH)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.LAT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.LON); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ALT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.DGPS_AGE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.EPH); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.EPV); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VEL); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.COG); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.FIX_TYPE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.SATELLITES_VISIBLE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.DGPS_NUMCH); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE POWER_STATUS
 //
 // MAVLINK_MSG_ID_POWER_STATUS 125
@@ -7615,8 +9953,6 @@ func (m *Gps2Raw) Decode(buf []byte) {
 // MAVLINK_MSG_ID_POWER_STATUS_LEN 6
 //
 // MAVLINK_MSG_ID_POWER_STATUS_CRC 203
-//
-//
 type PowerStatus struct {
 	VCC    uint16 // 5V rail voltage in millivolts
 	VSERVO uint16 // servo rail voltage in millivolts
@@ -7650,21 +9986,32 @@ func (*PowerStatus) Crc() uint8 {
 // Pack returns a packed byte array which represents a PowerStatus payload
 func (m *PowerStatus) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.VCC)
-	binary.Write(data, binary.LittleEndian, m.VSERVO)
-	binary.Write(data, binary.LittleEndian, m.FLAGS)
+	if err := binary.Write(data, binary.LittleEndian, m.VCC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VSERVO); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.FLAGS); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the PowerStatus
 func (m *PowerStatus) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.VCC)
-	binary.Read(data, binary.LittleEndian, &m.VSERVO)
-	binary.Read(data, binary.LittleEndian, &m.FLAGS)
+	if err := binary.Read(data, binary.LittleEndian, &m.VCC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VSERVO); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.FLAGS); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE SERIAL_CONTROL
 //
 // MAVLINK_MSG_ID_SERIAL_CONTROL 126
@@ -7672,8 +10019,6 @@ func (m *PowerStatus) Decode(buf []byte) {
 // MAVLINK_MSG_ID_SERIAL_CONTROL_LEN 79
 //
 // MAVLINK_MSG_ID_SERIAL_CONTROL_CRC 220
-//
-//
 type SerialControl struct {
 	BAUDRATE uint32    // Baudrate of transfer. Zero means no change.
 	TIMEOUT  uint16    // Timeout for reply data in milliseconds
@@ -7713,31 +10058,54 @@ func (*SerialControl) Crc() uint8 {
 // Pack returns a packed byte array which represents a SerialControl payload
 func (m *SerialControl) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.BAUDRATE)
-	binary.Write(data, binary.LittleEndian, m.TIMEOUT)
-	binary.Write(data, binary.LittleEndian, m.DEVICE)
-	binary.Write(data, binary.LittleEndian, m.FLAGS)
-	binary.Write(data, binary.LittleEndian, m.COUNT)
-	binary.Write(data, binary.LittleEndian, m.DATA)
+	if err := binary.Write(data, binary.LittleEndian, m.BAUDRATE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TIMEOUT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.DEVICE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.FLAGS); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.COUNT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.DATA); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the SerialControl
 func (m *SerialControl) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.BAUDRATE)
-	binary.Read(data, binary.LittleEndian, &m.TIMEOUT)
-	binary.Read(data, binary.LittleEndian, &m.DEVICE)
-	binary.Read(data, binary.LittleEndian, &m.FLAGS)
-	binary.Read(data, binary.LittleEndian, &m.COUNT)
-	binary.Read(data, binary.LittleEndian, &m.DATA)
+	if err := binary.Read(data, binary.LittleEndian, &m.BAUDRATE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TIMEOUT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.DEVICE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.FLAGS); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.COUNT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.DATA); err != nil {
+		panic(err)
+	}
 }
 
 const (
 	MAVLINK_MSG_SERIAL_CONTROL_FIELD_data_LEN = 70
 )
 
-//
 // MESSAGE GPS_RTK
 //
 // MAVLINK_MSG_ID_GPS_RTK 127
@@ -7745,8 +10113,6 @@ const (
 // MAVLINK_MSG_ID_GPS_RTK_LEN 35
 //
 // MAVLINK_MSG_ID_GPS_RTK_CRC 25
-//
-//
 type GpsRtk struct {
 	TIME_LAST_BASELINE_MS uint32 // Time since boot of last baseline message received in ms.
 	TOW                   uint32 // GPS Time of Week of last baseline
@@ -7800,41 +10166,92 @@ func (*GpsRtk) Crc() uint8 {
 // Pack returns a packed byte array which represents a GpsRtk payload
 func (m *GpsRtk) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_LAST_BASELINE_MS)
-	binary.Write(data, binary.LittleEndian, m.TOW)
-	binary.Write(data, binary.LittleEndian, m.BASELINE_A_MM)
-	binary.Write(data, binary.LittleEndian, m.BASELINE_B_MM)
-	binary.Write(data, binary.LittleEndian, m.BASELINE_C_MM)
-	binary.Write(data, binary.LittleEndian, m.ACCURACY)
-	binary.Write(data, binary.LittleEndian, m.IAR_NUM_HYPOTHESES)
-	binary.Write(data, binary.LittleEndian, m.WN)
-	binary.Write(data, binary.LittleEndian, m.RTK_RECEIVER_ID)
-	binary.Write(data, binary.LittleEndian, m.RTK_HEALTH)
-	binary.Write(data, binary.LittleEndian, m.RTK_RATE)
-	binary.Write(data, binary.LittleEndian, m.NSATS)
-	binary.Write(data, binary.LittleEndian, m.BASELINE_COORDS_TYPE)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_LAST_BASELINE_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TOW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.BASELINE_A_MM); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.BASELINE_B_MM); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.BASELINE_C_MM); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ACCURACY); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.IAR_NUM_HYPOTHESES); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.WN); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.RTK_RECEIVER_ID); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.RTK_HEALTH); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.RTK_RATE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.NSATS); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.BASELINE_COORDS_TYPE); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the GpsRtk
 func (m *GpsRtk) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_LAST_BASELINE_MS)
-	binary.Read(data, binary.LittleEndian, &m.TOW)
-	binary.Read(data, binary.LittleEndian, &m.BASELINE_A_MM)
-	binary.Read(data, binary.LittleEndian, &m.BASELINE_B_MM)
-	binary.Read(data, binary.LittleEndian, &m.BASELINE_C_MM)
-	binary.Read(data, binary.LittleEndian, &m.ACCURACY)
-	binary.Read(data, binary.LittleEndian, &m.IAR_NUM_HYPOTHESES)
-	binary.Read(data, binary.LittleEndian, &m.WN)
-	binary.Read(data, binary.LittleEndian, &m.RTK_RECEIVER_ID)
-	binary.Read(data, binary.LittleEndian, &m.RTK_HEALTH)
-	binary.Read(data, binary.LittleEndian, &m.RTK_RATE)
-	binary.Read(data, binary.LittleEndian, &m.NSATS)
-	binary.Read(data, binary.LittleEndian, &m.BASELINE_COORDS_TYPE)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_LAST_BASELINE_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TOW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.BASELINE_A_MM); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.BASELINE_B_MM); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.BASELINE_C_MM); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ACCURACY); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.IAR_NUM_HYPOTHESES); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.WN); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.RTK_RECEIVER_ID); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.RTK_HEALTH); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.RTK_RATE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.NSATS); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.BASELINE_COORDS_TYPE); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE GPS2_RTK
 //
 // MAVLINK_MSG_ID_GPS2_RTK 128
@@ -7842,8 +10259,6 @@ func (m *GpsRtk) Decode(buf []byte) {
 // MAVLINK_MSG_ID_GPS2_RTK_LEN 35
 //
 // MAVLINK_MSG_ID_GPS2_RTK_CRC 226
-//
-//
 type Gps2Rtk struct {
 	TIME_LAST_BASELINE_MS uint32 // Time since boot of last baseline message received in ms.
 	TOW                   uint32 // GPS Time of Week of last baseline
@@ -7897,41 +10312,92 @@ func (*Gps2Rtk) Crc() uint8 {
 // Pack returns a packed byte array which represents a Gps2Rtk payload
 func (m *Gps2Rtk) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_LAST_BASELINE_MS)
-	binary.Write(data, binary.LittleEndian, m.TOW)
-	binary.Write(data, binary.LittleEndian, m.BASELINE_A_MM)
-	binary.Write(data, binary.LittleEndian, m.BASELINE_B_MM)
-	binary.Write(data, binary.LittleEndian, m.BASELINE_C_MM)
-	binary.Write(data, binary.LittleEndian, m.ACCURACY)
-	binary.Write(data, binary.LittleEndian, m.IAR_NUM_HYPOTHESES)
-	binary.Write(data, binary.LittleEndian, m.WN)
-	binary.Write(data, binary.LittleEndian, m.RTK_RECEIVER_ID)
-	binary.Write(data, binary.LittleEndian, m.RTK_HEALTH)
-	binary.Write(data, binary.LittleEndian, m.RTK_RATE)
-	binary.Write(data, binary.LittleEndian, m.NSATS)
-	binary.Write(data, binary.LittleEndian, m.BASELINE_COORDS_TYPE)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_LAST_BASELINE_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TOW); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.BASELINE_A_MM); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.BASELINE_B_MM); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.BASELINE_C_MM); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ACCURACY); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.IAR_NUM_HYPOTHESES); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.WN); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.RTK_RECEIVER_ID); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.RTK_HEALTH); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.RTK_RATE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.NSATS); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.BASELINE_COORDS_TYPE); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the Gps2Rtk
 func (m *Gps2Rtk) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_LAST_BASELINE_MS)
-	binary.Read(data, binary.LittleEndian, &m.TOW)
-	binary.Read(data, binary.LittleEndian, &m.BASELINE_A_MM)
-	binary.Read(data, binary.LittleEndian, &m.BASELINE_B_MM)
-	binary.Read(data, binary.LittleEndian, &m.BASELINE_C_MM)
-	binary.Read(data, binary.LittleEndian, &m.ACCURACY)
-	binary.Read(data, binary.LittleEndian, &m.IAR_NUM_HYPOTHESES)
-	binary.Read(data, binary.LittleEndian, &m.WN)
-	binary.Read(data, binary.LittleEndian, &m.RTK_RECEIVER_ID)
-	binary.Read(data, binary.LittleEndian, &m.RTK_HEALTH)
-	binary.Read(data, binary.LittleEndian, &m.RTK_RATE)
-	binary.Read(data, binary.LittleEndian, &m.NSATS)
-	binary.Read(data, binary.LittleEndian, &m.BASELINE_COORDS_TYPE)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_LAST_BASELINE_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TOW); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.BASELINE_A_MM); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.BASELINE_B_MM); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.BASELINE_C_MM); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ACCURACY); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.IAR_NUM_HYPOTHESES); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.WN); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.RTK_RECEIVER_ID); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.RTK_HEALTH); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.RTK_RATE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.NSATS); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.BASELINE_COORDS_TYPE); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE DATA_TRANSMISSION_HANDSHAKE
 //
 // MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE 130
@@ -7939,8 +10405,6 @@ func (m *Gps2Rtk) Decode(buf []byte) {
 // MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE_LEN 13
 //
 // MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE_CRC 29
-//
-//
 type DataTransmissionHandshake struct {
 	SIZE        uint32 // total data size in bytes (set on ACK only)
 	WIDTH       uint16 // Width of a matrix or image
@@ -7982,29 +10446,56 @@ func (*DataTransmissionHandshake) Crc() uint8 {
 // Pack returns a packed byte array which represents a DataTransmissionHandshake payload
 func (m *DataTransmissionHandshake) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.SIZE)
-	binary.Write(data, binary.LittleEndian, m.WIDTH)
-	binary.Write(data, binary.LittleEndian, m.HEIGHT)
-	binary.Write(data, binary.LittleEndian, m.PACKETS)
-	binary.Write(data, binary.LittleEndian, m.TYPE)
-	binary.Write(data, binary.LittleEndian, m.PAYLOAD)
-	binary.Write(data, binary.LittleEndian, m.JPG_QUALITY)
+	if err := binary.Write(data, binary.LittleEndian, m.SIZE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.WIDTH); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.HEIGHT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PACKETS); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TYPE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PAYLOAD); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.JPG_QUALITY); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the DataTransmissionHandshake
 func (m *DataTransmissionHandshake) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.SIZE)
-	binary.Read(data, binary.LittleEndian, &m.WIDTH)
-	binary.Read(data, binary.LittleEndian, &m.HEIGHT)
-	binary.Read(data, binary.LittleEndian, &m.PACKETS)
-	binary.Read(data, binary.LittleEndian, &m.TYPE)
-	binary.Read(data, binary.LittleEndian, &m.PAYLOAD)
-	binary.Read(data, binary.LittleEndian, &m.JPG_QUALITY)
+	if err := binary.Read(data, binary.LittleEndian, &m.SIZE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.WIDTH); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.HEIGHT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PACKETS); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TYPE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PAYLOAD); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.JPG_QUALITY); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE ENCAPSULATED_DATA
 //
 // MAVLINK_MSG_ID_ENCAPSULATED_DATA 131
@@ -8012,8 +10503,6 @@ func (m *DataTransmissionHandshake) Decode(buf []byte) {
 // MAVLINK_MSG_ID_ENCAPSULATED_DATA_LEN 255
 //
 // MAVLINK_MSG_ID_ENCAPSULATED_DATA_CRC 223
-//
-//
 type EncapsulatedData struct {
 	SEQNR uint16     // sequence number (starting with 0 on every transmission)
 	DATA  [253]uint8 // image data bytes
@@ -8045,23 +10534,30 @@ func (*EncapsulatedData) Crc() uint8 {
 // Pack returns a packed byte array which represents a EncapsulatedData payload
 func (m *EncapsulatedData) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.SEQNR)
-	binary.Write(data, binary.LittleEndian, m.DATA)
+	if err := binary.Write(data, binary.LittleEndian, m.SEQNR); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.DATA); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the EncapsulatedData
 func (m *EncapsulatedData) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.SEQNR)
-	binary.Read(data, binary.LittleEndian, &m.DATA)
+	if err := binary.Read(data, binary.LittleEndian, &m.SEQNR); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.DATA); err != nil {
+		panic(err)
+	}
 }
 
 const (
 	MAVLINK_MSG_ENCAPSULATED_DATA_FIELD_data_LEN = 253
 )
 
-//
 // MESSAGE DISTANCE_SENSOR
 //
 // MAVLINK_MSG_ID_DISTANCE_SENSOR 132
@@ -8069,8 +10565,6 @@ const (
 // MAVLINK_MSG_ID_DISTANCE_SENSOR_LEN 14
 //
 // MAVLINK_MSG_ID_DISTANCE_SENSOR_CRC 85
-//
-//
 type DistanceSensor struct {
 	TIME_BOOT_MS     uint32 // Time since system boot
 	MIN_DISTANCE     uint16 // Minimum distance the sensor can measure in centimeters
@@ -8114,31 +10608,62 @@ func (*DistanceSensor) Crc() uint8 {
 // Pack returns a packed byte array which represents a DistanceSensor payload
 func (m *DistanceSensor) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS)
-	binary.Write(data, binary.LittleEndian, m.MIN_DISTANCE)
-	binary.Write(data, binary.LittleEndian, m.MAX_DISTANCE)
-	binary.Write(data, binary.LittleEndian, m.CURRENT_DISTANCE)
-	binary.Write(data, binary.LittleEndian, m.TYPE)
-	binary.Write(data, binary.LittleEndian, m.ID)
-	binary.Write(data, binary.LittleEndian, m.ORIENTATION)
-	binary.Write(data, binary.LittleEndian, m.COVARIANCE)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.MIN_DISTANCE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.MAX_DISTANCE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CURRENT_DISTANCE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TYPE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ID); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ORIENTATION); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.COVARIANCE); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the DistanceSensor
 func (m *DistanceSensor) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS)
-	binary.Read(data, binary.LittleEndian, &m.MIN_DISTANCE)
-	binary.Read(data, binary.LittleEndian, &m.MAX_DISTANCE)
-	binary.Read(data, binary.LittleEndian, &m.CURRENT_DISTANCE)
-	binary.Read(data, binary.LittleEndian, &m.TYPE)
-	binary.Read(data, binary.LittleEndian, &m.ID)
-	binary.Read(data, binary.LittleEndian, &m.ORIENTATION)
-	binary.Read(data, binary.LittleEndian, &m.COVARIANCE)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.MIN_DISTANCE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.MAX_DISTANCE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CURRENT_DISTANCE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TYPE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ID); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ORIENTATION); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.COVARIANCE); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE TERRAIN_REQUEST
 //
 // MAVLINK_MSG_ID_TERRAIN_REQUEST 133
@@ -8146,8 +10671,6 @@ func (m *DistanceSensor) Decode(buf []byte) {
 // MAVLINK_MSG_ID_TERRAIN_REQUEST_LEN 18
 //
 // MAVLINK_MSG_ID_TERRAIN_REQUEST_CRC 6
-//
-//
 type TerrainRequest struct {
 	MASK         uint64 // Bitmask of requested 4x4 grids (row major 8x7 array of grids, 56 bits)
 	LAT          int32  // Latitude of SW corner of first grid (degrees *10^7)
@@ -8183,23 +10706,38 @@ func (*TerrainRequest) Crc() uint8 {
 // Pack returns a packed byte array which represents a TerrainRequest payload
 func (m *TerrainRequest) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.MASK)
-	binary.Write(data, binary.LittleEndian, m.LAT)
-	binary.Write(data, binary.LittleEndian, m.LON)
-	binary.Write(data, binary.LittleEndian, m.GRID_SPACING)
+	if err := binary.Write(data, binary.LittleEndian, m.MASK); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.LAT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.LON); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.GRID_SPACING); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the TerrainRequest
 func (m *TerrainRequest) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.MASK)
-	binary.Read(data, binary.LittleEndian, &m.LAT)
-	binary.Read(data, binary.LittleEndian, &m.LON)
-	binary.Read(data, binary.LittleEndian, &m.GRID_SPACING)
+	if err := binary.Read(data, binary.LittleEndian, &m.MASK); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.LAT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.LON); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.GRID_SPACING); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE TERRAIN_DATA
 //
 // MAVLINK_MSG_ID_TERRAIN_DATA 134
@@ -8207,8 +10745,6 @@ func (m *TerrainRequest) Decode(buf []byte) {
 // MAVLINK_MSG_ID_TERRAIN_DATA_LEN 43
 //
 // MAVLINK_MSG_ID_TERRAIN_DATA_CRC 229
-//
-//
 type TerrainData struct {
 	LAT          int32     // Latitude of SW corner of first grid (degrees *10^7)
 	LON          int32     // Longitude of SW corner of first grid (in degrees *10^7)
@@ -8246,29 +10782,48 @@ func (*TerrainData) Crc() uint8 {
 // Pack returns a packed byte array which represents a TerrainData payload
 func (m *TerrainData) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.LAT)
-	binary.Write(data, binary.LittleEndian, m.LON)
-	binary.Write(data, binary.LittleEndian, m.GRID_SPACING)
-	binary.Write(data, binary.LittleEndian, m.DATA)
-	binary.Write(data, binary.LittleEndian, m.GRIDBIT)
+	if err := binary.Write(data, binary.LittleEndian, m.LAT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.LON); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.GRID_SPACING); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.DATA); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.GRIDBIT); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the TerrainData
 func (m *TerrainData) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.LAT)
-	binary.Read(data, binary.LittleEndian, &m.LON)
-	binary.Read(data, binary.LittleEndian, &m.GRID_SPACING)
-	binary.Read(data, binary.LittleEndian, &m.DATA)
-	binary.Read(data, binary.LittleEndian, &m.GRIDBIT)
+	if err := binary.Read(data, binary.LittleEndian, &m.LAT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.LON); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.GRID_SPACING); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.DATA); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.GRIDBIT); err != nil {
+		panic(err)
+	}
 }
 
 const (
 	MAVLINK_MSG_TERRAIN_DATA_FIELD_data_LEN = 16
 )
 
-//
 // MESSAGE TERRAIN_CHECK
 //
 // MAVLINK_MSG_ID_TERRAIN_CHECK 135
@@ -8276,8 +10831,6 @@ const (
 // MAVLINK_MSG_ID_TERRAIN_CHECK_LEN 8
 //
 // MAVLINK_MSG_ID_TERRAIN_CHECK_CRC 203
-//
-//
 type TerrainCheck struct {
 	LAT int32 // Latitude (degrees *10^7)
 	LON int32 // Longitude (degrees *10^7)
@@ -8309,19 +10862,26 @@ func (*TerrainCheck) Crc() uint8 {
 // Pack returns a packed byte array which represents a TerrainCheck payload
 func (m *TerrainCheck) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.LAT)
-	binary.Write(data, binary.LittleEndian, m.LON)
+	if err := binary.Write(data, binary.LittleEndian, m.LAT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.LON); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the TerrainCheck
 func (m *TerrainCheck) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.LAT)
-	binary.Read(data, binary.LittleEndian, &m.LON)
+	if err := binary.Read(data, binary.LittleEndian, &m.LAT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.LON); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE TERRAIN_REPORT
 //
 // MAVLINK_MSG_ID_TERRAIN_REPORT 136
@@ -8329,8 +10889,6 @@ func (m *TerrainCheck) Decode(buf []byte) {
 // MAVLINK_MSG_ID_TERRAIN_REPORT_LEN 22
 //
 // MAVLINK_MSG_ID_TERRAIN_REPORT_CRC 1
-//
-//
 type TerrainReport struct {
 	LAT            int32   // Latitude (degrees *10^7)
 	LON            int32   // Longitude (degrees *10^7)
@@ -8372,29 +10930,56 @@ func (*TerrainReport) Crc() uint8 {
 // Pack returns a packed byte array which represents a TerrainReport payload
 func (m *TerrainReport) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.LAT)
-	binary.Write(data, binary.LittleEndian, m.LON)
-	binary.Write(data, binary.LittleEndian, m.TERRAIN_HEIGHT)
-	binary.Write(data, binary.LittleEndian, m.CURRENT_HEIGHT)
-	binary.Write(data, binary.LittleEndian, m.SPACING)
-	binary.Write(data, binary.LittleEndian, m.PENDING)
-	binary.Write(data, binary.LittleEndian, m.LOADED)
+	if err := binary.Write(data, binary.LittleEndian, m.LAT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.LON); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TERRAIN_HEIGHT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CURRENT_HEIGHT); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.SPACING); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.PENDING); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.LOADED); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the TerrainReport
 func (m *TerrainReport) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.LAT)
-	binary.Read(data, binary.LittleEndian, &m.LON)
-	binary.Read(data, binary.LittleEndian, &m.TERRAIN_HEIGHT)
-	binary.Read(data, binary.LittleEndian, &m.CURRENT_HEIGHT)
-	binary.Read(data, binary.LittleEndian, &m.SPACING)
-	binary.Read(data, binary.LittleEndian, &m.PENDING)
-	binary.Read(data, binary.LittleEndian, &m.LOADED)
+	if err := binary.Read(data, binary.LittleEndian, &m.LAT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.LON); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TERRAIN_HEIGHT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CURRENT_HEIGHT); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.SPACING); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.PENDING); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.LOADED); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE BATTERY_STATUS
 //
 // MAVLINK_MSG_ID_BATTERY_STATUS 147
@@ -8402,8 +10987,6 @@ func (m *TerrainReport) Decode(buf []byte) {
 // MAVLINK_MSG_ID_BATTERY_STATUS_LEN 24
 //
 // MAVLINK_MSG_ID_BATTERY_STATUS_CRC 177
-//
-//
 type BatteryStatus struct {
 	CURRENT_CONSUMED  int32  // Consumed charge, in milliampere hours (1 = 1 mAh), -1: autopilot does not provide mAh consumption estimate
 	ENERGY_CONSUMED   int32  // Consumed energy, in 100*Joules (integrated U*I*dt)  (1 = 100 Joule), -1: autopilot does not provide energy consumption estimate
@@ -8453,37 +11036,80 @@ func (*BatteryStatus) Crc() uint8 {
 // Pack returns a packed byte array which represents a BatteryStatus payload
 func (m *BatteryStatus) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.CURRENT_CONSUMED)
-	binary.Write(data, binary.LittleEndian, m.ENERGY_CONSUMED)
-	binary.Write(data, binary.LittleEndian, m.VOLTAGE_CELL_1)
-	binary.Write(data, binary.LittleEndian, m.VOLTAGE_CELL_2)
-	binary.Write(data, binary.LittleEndian, m.VOLTAGE_CELL_3)
-	binary.Write(data, binary.LittleEndian, m.VOLTAGE_CELL_4)
-	binary.Write(data, binary.LittleEndian, m.VOLTAGE_CELL_5)
-	binary.Write(data, binary.LittleEndian, m.VOLTAGE_CELL_6)
-	binary.Write(data, binary.LittleEndian, m.CURRENT_BATTERY)
-	binary.Write(data, binary.LittleEndian, m.ACCU_ID)
-	binary.Write(data, binary.LittleEndian, m.BATTERY_REMAINING)
+	if err := binary.Write(data, binary.LittleEndian, m.CURRENT_CONSUMED); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ENERGY_CONSUMED); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VOLTAGE_CELL_1); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VOLTAGE_CELL_2); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VOLTAGE_CELL_3); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VOLTAGE_CELL_4); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VOLTAGE_CELL_5); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VOLTAGE_CELL_6); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.CURRENT_BATTERY); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ACCU_ID); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.BATTERY_REMAINING); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the BatteryStatus
 func (m *BatteryStatus) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.CURRENT_CONSUMED)
-	binary.Read(data, binary.LittleEndian, &m.ENERGY_CONSUMED)
-	binary.Read(data, binary.LittleEndian, &m.VOLTAGE_CELL_1)
-	binary.Read(data, binary.LittleEndian, &m.VOLTAGE_CELL_2)
-	binary.Read(data, binary.LittleEndian, &m.VOLTAGE_CELL_3)
-	binary.Read(data, binary.LittleEndian, &m.VOLTAGE_CELL_4)
-	binary.Read(data, binary.LittleEndian, &m.VOLTAGE_CELL_5)
-	binary.Read(data, binary.LittleEndian, &m.VOLTAGE_CELL_6)
-	binary.Read(data, binary.LittleEndian, &m.CURRENT_BATTERY)
-	binary.Read(data, binary.LittleEndian, &m.ACCU_ID)
-	binary.Read(data, binary.LittleEndian, &m.BATTERY_REMAINING)
+	if err := binary.Read(data, binary.LittleEndian, &m.CURRENT_CONSUMED); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ENERGY_CONSUMED); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VOLTAGE_CELL_1); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VOLTAGE_CELL_2); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VOLTAGE_CELL_3); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VOLTAGE_CELL_4); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VOLTAGE_CELL_5); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VOLTAGE_CELL_6); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.CURRENT_BATTERY); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ACCU_ID); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.BATTERY_REMAINING); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE SETPOINT_8DOF
 //
 // MAVLINK_MSG_ID_SETPOINT_8DOF 148
@@ -8491,8 +11117,6 @@ func (m *BatteryStatus) Decode(buf []byte) {
 // MAVLINK_MSG_ID_SETPOINT_8DOF_LEN 33
 //
 // MAVLINK_MSG_ID_SETPOINT_8DOF_CRC 241
-//
-//
 type Setpoint8Dof struct {
 	VAL1          float32 // Value 1
 	VAL2          float32 // Value 2
@@ -8538,33 +11162,68 @@ func (*Setpoint8Dof) Crc() uint8 {
 // Pack returns a packed byte array which represents a Setpoint8Dof payload
 func (m *Setpoint8Dof) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.VAL1)
-	binary.Write(data, binary.LittleEndian, m.VAL2)
-	binary.Write(data, binary.LittleEndian, m.VAL3)
-	binary.Write(data, binary.LittleEndian, m.VAL4)
-	binary.Write(data, binary.LittleEndian, m.VAL5)
-	binary.Write(data, binary.LittleEndian, m.VAL6)
-	binary.Write(data, binary.LittleEndian, m.VAL7)
-	binary.Write(data, binary.LittleEndian, m.VAL8)
-	binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM)
+	if err := binary.Write(data, binary.LittleEndian, m.VAL1); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VAL2); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VAL3); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VAL4); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VAL5); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VAL6); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VAL7); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VAL8); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the Setpoint8Dof
 func (m *Setpoint8Dof) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.VAL1)
-	binary.Read(data, binary.LittleEndian, &m.VAL2)
-	binary.Read(data, binary.LittleEndian, &m.VAL3)
-	binary.Read(data, binary.LittleEndian, &m.VAL4)
-	binary.Read(data, binary.LittleEndian, &m.VAL5)
-	binary.Read(data, binary.LittleEndian, &m.VAL6)
-	binary.Read(data, binary.LittleEndian, &m.VAL7)
-	binary.Read(data, binary.LittleEndian, &m.VAL8)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM)
+	if err := binary.Read(data, binary.LittleEndian, &m.VAL1); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VAL2); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VAL3); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VAL4); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VAL5); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VAL6); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VAL7); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VAL8); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE SETPOINT_6DOF
 //
 // MAVLINK_MSG_ID_SETPOINT_6DOF 149
@@ -8572,8 +11231,6 @@ func (m *Setpoint8Dof) Decode(buf []byte) {
 // MAVLINK_MSG_ID_SETPOINT_6DOF_LEN 25
 //
 // MAVLINK_MSG_ID_SETPOINT_6DOF_CRC 15
-//
-//
 type Setpoint6Dof struct {
 	TRANS_X       float32 // Translational Component in x
 	TRANS_Y       float32 // Translational Component in y
@@ -8615,29 +11272,56 @@ func (*Setpoint6Dof) Crc() uint8 {
 // Pack returns a packed byte array which represents a Setpoint6Dof payload
 func (m *Setpoint6Dof) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TRANS_X)
-	binary.Write(data, binary.LittleEndian, m.TRANS_Y)
-	binary.Write(data, binary.LittleEndian, m.TRANS_Z)
-	binary.Write(data, binary.LittleEndian, m.ROT_X)
-	binary.Write(data, binary.LittleEndian, m.ROT_Y)
-	binary.Write(data, binary.LittleEndian, m.ROT_Z)
-	binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM)
+	if err := binary.Write(data, binary.LittleEndian, m.TRANS_X); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TRANS_Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TRANS_Z); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ROT_X); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ROT_Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ROT_Z); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the Setpoint6Dof
 func (m *Setpoint6Dof) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TRANS_X)
-	binary.Read(data, binary.LittleEndian, &m.TRANS_Y)
-	binary.Read(data, binary.LittleEndian, &m.TRANS_Z)
-	binary.Read(data, binary.LittleEndian, &m.ROT_X)
-	binary.Read(data, binary.LittleEndian, &m.ROT_Y)
-	binary.Read(data, binary.LittleEndian, &m.ROT_Z)
-	binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM)
+	if err := binary.Read(data, binary.LittleEndian, &m.TRANS_X); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TRANS_Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TRANS_Z); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ROT_X); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ROT_Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.ROT_Z); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TARGET_SYSTEM); err != nil {
+		panic(err)
+	}
 }
 
-//
 // MESSAGE MEMORY_VECT
 //
 // MAVLINK_MSG_ID_MEMORY_VECT 249
@@ -8645,8 +11329,6 @@ func (m *Setpoint6Dof) Decode(buf []byte) {
 // MAVLINK_MSG_ID_MEMORY_VECT_LEN 36
 //
 // MAVLINK_MSG_ID_MEMORY_VECT_CRC 204
-//
-//
 type MemoryVect struct {
 	ADDRESS uint16   // Starting address of the debug variables
 	VER     uint8    // Version code of the type variable. 0=unknown, type ignored and assumed int16_t. 1=as below
@@ -8682,27 +11364,42 @@ func (*MemoryVect) Crc() uint8 {
 // Pack returns a packed byte array which represents a MemoryVect payload
 func (m *MemoryVect) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.ADDRESS)
-	binary.Write(data, binary.LittleEndian, m.VER)
-	binary.Write(data, binary.LittleEndian, m.TYPE)
-	binary.Write(data, binary.LittleEndian, m.VALUE)
+	if err := binary.Write(data, binary.LittleEndian, m.ADDRESS); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VER); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TYPE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VALUE); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the MemoryVect
 func (m *MemoryVect) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.ADDRESS)
-	binary.Read(data, binary.LittleEndian, &m.VER)
-	binary.Read(data, binary.LittleEndian, &m.TYPE)
-	binary.Read(data, binary.LittleEndian, &m.VALUE)
+	if err := binary.Read(data, binary.LittleEndian, &m.ADDRESS); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VER); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TYPE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VALUE); err != nil {
+		panic(err)
+	}
 }
 
 const (
 	MAVLINK_MSG_MEMORY_VECT_FIELD_value_LEN = 32
 )
 
-//
 // MESSAGE DEBUG_VECT
 //
 // MAVLINK_MSG_ID_DEBUG_VECT 250
@@ -8710,8 +11407,6 @@ const (
 // MAVLINK_MSG_ID_DEBUG_VECT_LEN 30
 //
 // MAVLINK_MSG_ID_DEBUG_VECT_CRC 49
-//
-//
 type DebugVect struct {
 	TIME_USEC uint64    // Timestamp
 	X         float32   // x
@@ -8749,29 +11444,48 @@ func (*DebugVect) Crc() uint8 {
 // Pack returns a packed byte array which represents a DebugVect payload
 func (m *DebugVect) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_USEC)
-	binary.Write(data, binary.LittleEndian, m.X)
-	binary.Write(data, binary.LittleEndian, m.Y)
-	binary.Write(data, binary.LittleEndian, m.Z)
-	binary.Write(data, binary.LittleEndian, m.NAME)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.X); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.Z); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.NAME); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the DebugVect
 func (m *DebugVect) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_USEC)
-	binary.Read(data, binary.LittleEndian, &m.X)
-	binary.Read(data, binary.LittleEndian, &m.Y)
-	binary.Read(data, binary.LittleEndian, &m.Z)
-	binary.Read(data, binary.LittleEndian, &m.NAME)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_USEC); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.X); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.Y); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.Z); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.NAME); err != nil {
+		panic(err)
+	}
 }
 
 const (
 	MAVLINK_MSG_DEBUG_VECT_FIELD_name_LEN = 10
 )
 
-//
 // MESSAGE NAMED_VALUE_FLOAT
 //
 // MAVLINK_MSG_ID_NAMED_VALUE_FLOAT 251
@@ -8779,8 +11493,6 @@ const (
 // MAVLINK_MSG_ID_NAMED_VALUE_FLOAT_LEN 18
 //
 // MAVLINK_MSG_ID_NAMED_VALUE_FLOAT_CRC 170
-//
-//
 type NamedValueFloat struct {
 	TIME_BOOT_MS uint32    // Timestamp (milliseconds since system boot)
 	VALUE        float32   // Floating point value
@@ -8814,25 +11526,36 @@ func (*NamedValueFloat) Crc() uint8 {
 // Pack returns a packed byte array which represents a NamedValueFloat payload
 func (m *NamedValueFloat) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS)
-	binary.Write(data, binary.LittleEndian, m.VALUE)
-	binary.Write(data, binary.LittleEndian, m.NAME)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VALUE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.NAME); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the NamedValueFloat
 func (m *NamedValueFloat) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS)
-	binary.Read(data, binary.LittleEndian, &m.VALUE)
-	binary.Read(data, binary.LittleEndian, &m.NAME)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VALUE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.NAME); err != nil {
+		panic(err)
+	}
 }
 
 const (
 	MAVLINK_MSG_NAMED_VALUE_FLOAT_FIELD_name_LEN = 10
 )
 
-//
 // MESSAGE NAMED_VALUE_INT
 //
 // MAVLINK_MSG_ID_NAMED_VALUE_INT 252
@@ -8840,8 +11563,6 @@ const (
 // MAVLINK_MSG_ID_NAMED_VALUE_INT_LEN 18
 //
 // MAVLINK_MSG_ID_NAMED_VALUE_INT_CRC 44
-//
-//
 type NamedValueInt struct {
 	TIME_BOOT_MS uint32    // Timestamp (milliseconds since system boot)
 	VALUE        int32     // Signed integer value
@@ -8875,25 +11596,36 @@ func (*NamedValueInt) Crc() uint8 {
 // Pack returns a packed byte array which represents a NamedValueInt payload
 func (m *NamedValueInt) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS)
-	binary.Write(data, binary.LittleEndian, m.VALUE)
-	binary.Write(data, binary.LittleEndian, m.NAME)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VALUE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.NAME); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the NamedValueInt
 func (m *NamedValueInt) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS)
-	binary.Read(data, binary.LittleEndian, &m.VALUE)
-	binary.Read(data, binary.LittleEndian, &m.NAME)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VALUE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.NAME); err != nil {
+		panic(err)
+	}
 }
 
 const (
 	MAVLINK_MSG_NAMED_VALUE_INT_FIELD_name_LEN = 10
 )
 
-//
 // MESSAGE STATUSTEXT
 //
 // MAVLINK_MSG_ID_STATUSTEXT 253
@@ -8901,8 +11633,6 @@ const (
 // MAVLINK_MSG_ID_STATUSTEXT_LEN 51
 //
 // MAVLINK_MSG_ID_STATUSTEXT_CRC 83
-//
-//
 type Statustext struct {
 	SEVERITY uint8     // Severity of status. Relies on the definitions within RFC-5424. See enum MAV_SEVERITY.
 	TEXT     [50]uint8 // Status text message, without null termination character
@@ -8934,23 +11664,30 @@ func (*Statustext) Crc() uint8 {
 // Pack returns a packed byte array which represents a Statustext payload
 func (m *Statustext) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.SEVERITY)
-	binary.Write(data, binary.LittleEndian, m.TEXT)
+	if err := binary.Write(data, binary.LittleEndian, m.SEVERITY); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.TEXT); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the Statustext
 func (m *Statustext) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.SEVERITY)
-	binary.Read(data, binary.LittleEndian, &m.TEXT)
+	if err := binary.Read(data, binary.LittleEndian, &m.SEVERITY); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.TEXT); err != nil {
+		panic(err)
+	}
 }
 
 const (
 	MAVLINK_MSG_STATUSTEXT_FIELD_text_LEN = 50
 )
 
-//
 // MESSAGE DEBUG
 //
 // MAVLINK_MSG_ID_DEBUG 254
@@ -8958,8 +11695,6 @@ const (
 // MAVLINK_MSG_ID_DEBUG_LEN 9
 //
 // MAVLINK_MSG_ID_DEBUG_CRC 46
-//
-//
 type Debug struct {
 	TIME_BOOT_MS uint32  // Timestamp (milliseconds since system boot)
 	VALUE        float32 // DEBUG value
@@ -8993,16 +11728,28 @@ func (*Debug) Crc() uint8 {
 // Pack returns a packed byte array which represents a Debug payload
 func (m *Debug) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS)
-	binary.Write(data, binary.LittleEndian, m.VALUE)
-	binary.Write(data, binary.LittleEndian, m.IND)
+	if err := binary.Write(data, binary.LittleEndian, m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.VALUE); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.IND); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
 // Decode accepts a packed byte array and populates the fields of the Debug
 func (m *Debug) Decode(buf []byte) {
 	data := bytes.NewBuffer(buf)
-	binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS)
-	binary.Read(data, binary.LittleEndian, &m.VALUE)
-	binary.Read(data, binary.LittleEndian, &m.IND)
+	if err := binary.Read(data, binary.LittleEndian, &m.TIME_BOOT_MS); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.VALUE); err != nil {
+		panic(err)
+	}
+	if err := binary.Read(data, binary.LittleEndian, &m.IND); err != nil {
+		panic(err)
+	}
 }

@@ -42,16 +42,17 @@ const (
 // INA3221Driver is a driver for the INA3221 three-channel current and bus voltage monitoring device.
 type INA3221Driver struct {
 	*Driver
-	halt chan bool
 }
 
 // NewINA3221Driver creates a new driver with the specified i2c interface.
 // Params:
-//		c Connector - the Adaptor to use with this Driver
+//
+//	c Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//		i2c.WithBus(int):		bus to use with this driver
-//		i2c.WithAddress(int):		address to use with this driver
+//
+//	i2c.WithBus(int):		bus to use with this driver
+//	i2c.WithAddress(int):		address to use with this driver
 func NewINA3221Driver(c Connector, options ...func(Config)) *INA3221Driver {
 	i := &INA3221Driver{
 		Driver: NewDriver(c, "INA3221", ina3221DefaultAddress),

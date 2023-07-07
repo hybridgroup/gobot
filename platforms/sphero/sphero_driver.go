@@ -295,7 +295,9 @@ func (s *SpheroDriver) Roll(speed uint8, heading uint16) {
 // ConfigureLocator configures and enables the Locator
 func (s *SpheroDriver) ConfigureLocator(d LocatorConfig) {
 	buf := new(bytes.Buffer)
-	binary.Write(buf, binary.BigEndian, d)
+	if err := binary.Write(buf, binary.BigEndian, d); err != nil {
+		panic(err)
+	}
 
 	s.packetChannel <- s.craftPacket(buf.Bytes(), 0x02, 0x13)
 }
@@ -303,7 +305,9 @@ func (s *SpheroDriver) ConfigureLocator(d LocatorConfig) {
 // SetDataStreaming enables sensor data streaming
 func (s *SpheroDriver) SetDataStreaming(d DataStreamingConfig) {
 	buf := new(bytes.Buffer)
-	binary.Write(buf, binary.BigEndian, d)
+	if err := binary.Write(buf, binary.BigEndian, d); err != nil {
+		panic(err)
+	}
 
 	s.packetChannel <- s.craftPacket(buf.Bytes(), 0x02, 0x11)
 }
@@ -329,7 +333,9 @@ func (s *SpheroDriver) handleCollisionDetected(data []uint8) {
 	}
 	var collision CollisionPacket
 	buffer := bytes.NewBuffer(data[5:]) // skip header
-	binary.Read(buffer, binary.BigEndian, &collision)
+	if err := binary.Read(buffer, binary.BigEndian, &collision); err != nil {
+		panic(err)
+	}
 	s.Publish(Collision, collision)
 }
 
@@ -340,7 +346,9 @@ func (s *SpheroDriver) handleDataStreaming(data []uint8) {
 	}
 	var dataPacket DataStreamingPacket
 	buffer := bytes.NewBuffer(data[5:]) // skip header
-	binary.Read(buffer, binary.BigEndian, &dataPacket)
+	if err := binary.Read(buffer, binary.BigEndian, &dataPacket); err != nil {
+		panic(err)
+	}
 	s.Publish(SensorData, dataPacket)
 }
 

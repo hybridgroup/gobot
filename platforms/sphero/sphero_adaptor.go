@@ -57,7 +57,9 @@ func (a *Adaptor) Connect() (err error) {
 // Returns true on Successful reconnection
 func (a *Adaptor) Reconnect() (err error) {
 	if a.connected {
-		a.Disconnect()
+		if err := a.Disconnect(); err != nil {
+			return err
+		}
 	}
 	return a.Connect()
 }

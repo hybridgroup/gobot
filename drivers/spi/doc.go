@@ -3,7 +3,7 @@ Package spi provides Gobot drivers for spi devices.
 Uses periph.io for spi
 Installing:
 
-	go get -d -u gobot.io/x/gobot/v2
+	Please refer to the main [README.md](https://github.com/hybridgroup/gobot/blob/release/README.md)
 
 For further information refer to spi README:
 https://github.com/hybridgroup/gobot/blob/master/drivers/spi/README.md

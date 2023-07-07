@@ -93,12 +93,13 @@ type BMP388Driver struct {
 
 // NewBMP388Driver creates a new driver with specified i2c interface.
 // Params:
-//		c Connector - the Adaptor to use with this Driver
+//
+//	c Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//		i2c.WithBus(int):	bus to use with this driver
-//		i2c.WithAddress(int):	address to use with this driver
 //
+//	i2c.WithBus(int):	bus to use with this driver
+//	i2c.WithAddress(int):	address to use with this driver
 func NewBMP388Driver(c Connector, options ...func(Config)) *BMP388Driver {
 	d := &BMP388Driver{
 		Driver:      NewDriver(c, "BMP388", bmp388DefaultAddress),
@@ -192,9 +193,10 @@ func (d *BMP388Driver) Altitude(accuracy BMP388Accuracy) (alt float32, err error
 }
 
 // initialization reads the calibration coefficients.
-func (d *BMP388Driver) initialization() (err error) {
-	var chipID uint8
-	if chipID, err = d.connection.ReadByteData(bmp388RegChipID); err != nil {
+func (d *BMP388Driver) initialization() error {
+
+	chipID, err := d.connection.ReadByteData(bmp388RegChipID)
+	if err != nil {
 		return err
 	}
 
@@ -225,20 +227,48 @@ func (d *BMP388Driver) initialization() (err error) {
 	}
 	buf := bytes.NewBuffer(coefficients)
 
-	binary.Read(buf, binary.LittleEndian, &t1)
-	binary.Read(buf, binary.LittleEndian, &t2)
-	binary.Read(buf, binary.LittleEndian, &t3)
-	binary.Read(buf, binary.LittleEndian, &p1)
-	binary.Read(buf, binary.LittleEndian, &p2)
-	binary.Read(buf, binary.LittleEndian, &p3)
-	binary.Read(buf, binary.LittleEndian, &p4)
-	binary.Read(buf, binary.LittleEndian, &p5)
-	binary.Read(buf, binary.LittleEndian, &p6)
-	binary.Read(buf, binary.LittleEndian, &p7)
-	binary.Read(buf, binary.LittleEndian, &p8)
-	binary.Read(buf, binary.LittleEndian, &p9)
-	binary.Read(buf, binary.LittleEndian, &p10)
-	binary.Read(buf, binary.LittleEndian, &p11)
+	if err := binary.Read(buf, binary.LittleEndian, &t1); err != nil {
+		return err
+	}
+	if err := binary.Read(buf, binary.LittleEndian, &t2); err != nil {
+		return err
+	}
+	if err := binary.Read(buf, binary.LittleEndian, &t3); err != nil {
+		return err
+	}
+	if err := binary.Read(buf, binary.LittleEndian, &p1); err != nil {
+		return err
+	}
+	if err := binary.Read(buf, binary.LittleEndian, &p2); err != nil {
+		return err
+	}
+	if err := binary.Read(buf, binary.LittleEndian, &p3); err != nil {
+		return err
+	}
+	if err := binary.Read(buf, binary.LittleEndian, &p4); err != nil {
+		return err
+	}
+	if err := binary.Read(buf, binary.LittleEndian, &p5); err != nil {
+		return err
+	}
+	if err := binary.Read(buf, binary.LittleEndian, &p6); err != nil {
+		return err
+	}
+	if err := binary.Read(buf, binary.LittleEndian, &p7); err != nil {
+		return err
+	}
+	if err := binary.Read(buf, binary.LittleEndian, &p8); err != nil {
+		return err
+	}
+	if err := binary.Read(buf, binary.LittleEndian, &p9); err != nil {
+		return err
+	}
+	if err := binary.Read(buf, binary.LittleEndian, &p10); err != nil {
+		return err
+	}
+	if err := binary.Read(buf, binary.LittleEndian, &p11); err != nil {
+		return err
+	}
 
 	d.calCoeffs.t1 = float32(float64(t1) / math.Pow(2, -8))
 	d.calCoeffs.t2 = float32(float64(t2) / math.Pow(2, 30))
@@ -255,50 +285,59 @@ func (d *BMP388Driver) initialization() (err error) {
 	d.calCoeffs.p10 = float32(float64(p10) / math.Pow(2, 48))
 	d.calCoeffs.p11 = float32(float64(p11) / math.Pow(2, 65))
 
-	if err = d.connection.WriteByteData(bmp388RegCMD, bmp388CMDSoftReset); err != nil {
+	if err := d.connection.WriteByteData(bmp388RegCMD, bmp388CMDSoftReset); err != nil {
 		return err
 	}
 
-	if err = d.connection.WriteByteData(bmp388RegConf, uint8(d.confFilter)<<1); err != nil {
-		return err
-	}
-
-	return nil
+	return d.connection.WriteByteData(bmp388RegConf, uint8(d.confFilter)<<1)
 }
 
-func (d *BMP388Driver) rawTemp() (temp int32, err error) {
+func (d *BMP388Driver) rawTemp() (int32, error) {
 	var tp0, tp1, tp2 byte
 
 	data := make([]byte, 3)
-	if err = d.connection.ReadBlockData(bmp388RegTempData, data); err != nil {
+	if err := d.connection.ReadBlockData(bmp388RegTempData, data); err != nil {
 		return 0, err
 	}
 	buf := bytes.NewBuffer(data)
+	// XLSB
+	if err := binary.Read(buf, binary.LittleEndian, &tp0); err != nil {
+		return 0, err
+	}
+	// LSB
+	if err := binary.Read(buf, binary.LittleEndian, &tp1); err != nil {
+		return 0, err
+	}
+	// MSB
+	if err := binary.Read(buf, binary.LittleEndian, &tp2); err != nil {
+		return 0, err
+	}
 
-	binary.Read(buf, binary.LittleEndian, &tp0) // XLSB
-	binary.Read(buf, binary.LittleEndian, &tp1) // LSB
-	binary.Read(buf, binary.LittleEndian, &tp2) // MSB
-
-	temp = ((int32(tp2) << 16) | (int32(tp1) << 8) | int32(tp0))
-	return
+	return ((int32(tp2) << 16) | (int32(tp1) << 8) | int32(tp0)), nil
 }
 
-func (d *BMP388Driver) rawPressure() (press int32, err error) {
+func (d *BMP388Driver) rawPressure() (int32, error) {
 	var tp0, tp1, tp2 byte
 
 	data := make([]byte, 3)
-	if err = d.connection.ReadBlockData(bmp388RegPressureData, data); err != nil {
+	if err := d.connection.ReadBlockData(bmp388RegPressureData, data); err != nil {
 		return 0, err
 	}
 	buf := bytes.NewBuffer(data)
+	// XLSB
+	if err := binary.Read(buf, binary.LittleEndian, &tp0); err != nil {
+		return 0, err
+	}
+	// LSB
+	if err := binary.Read(buf, binary.LittleEndian, &tp1); err != nil {
+		return 0, err
+	}
+	// MSB
+	if err := binary.Read(buf, binary.LittleEndian, &tp2); err != nil {
+		return 0, err
+	}
 
-	binary.Read(buf, binary.LittleEndian, &tp0) // XLSB
-	binary.Read(buf, binary.LittleEndian, &tp1) // LSB
-	binary.Read(buf, binary.LittleEndian, &tp2) // MSB
-
-	press = ((int32(tp2) << 16) | (int32(tp1) << 8) | int32(tp0))
-
-	return
+	return ((int32(tp2) << 16) | (int32(tp1) << 8) | int32(tp0)), nil
 }
 
 func (d *BMP388Driver) calculateTemp(rawTemp int32) float32 {

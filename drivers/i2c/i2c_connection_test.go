@@ -7,7 +7,6 @@ import (
 	"errors"
 	"testing"
 
-	"syscall"
 	"unsafe"
 
 	"gobot.io/x/gobot/v2"
@@ -17,13 +16,13 @@ import (
 
 const dev = "/dev/i2c-1"
 
-func getSyscallFuncImpl(errorMask byte) func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno) {
+func getSyscallFuncImpl(errorMask byte) func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err system.SyscallErrno) {
 	// bit 0: error on function query
 	// bit 1: error on set address
 	// bit 2: error on command
-	return func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err syscall.Errno) {
+	return func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err system.SyscallErrno) {
 		// function query
-		if (trap == syscall.SYS_IOCTL) && (a2 == system.I2C_FUNCS) {
+		if (trap == system.Syscall_SYS_IOCTL) && (a2 == system.I2C_FUNCS) {
 			if errorMask&0x01 == 0x01 {
 				return 0, 0, 1
 			}
@@ -35,13 +34,13 @@ func getSyscallFuncImpl(errorMask byte) func(trap, a1, a2, a3 uintptr) (r1, r2 u
 				system.I2C_FUNC_SMBUS_WRITE_WORD_DATA
 		}
 		// set address
-		if (trap == syscall.SYS_IOCTL) && (a2 == system.I2C_SLAVE) {
+		if (trap == system.Syscall_SYS_IOCTL) && (a2 == system.I2C_SLAVE) {
 			if errorMask&0x02 == 0x02 {
 				return 0, 0, 1
 			}
 		}
 		// command
-		if (trap == syscall.SYS_IOCTL) && (a2 == system.I2C_SMBUS) {
+		if (trap == system.Syscall_SYS_IOCTL) && (a2 == system.I2C_SMBUS) {
 			if errorMask&0x04 == 0x04 {
 				return 0, 0, 1
 			}

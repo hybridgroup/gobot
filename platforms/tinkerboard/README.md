@@ -7,6 +7,8 @@ For more info about the Tinker Board, go to [https://www.asus.com/uk/Single-Boar
 
 ## How to Install
 
+Please refer to the main [README.md](https://github.com/hybridgroup/gobot/blob/release/README.md)
+
 Tested OS:
 
 * [Debian TinkerOS](https://github.com/TinkerBoard/debian_kernel/releases)
@@ -14,13 +16,6 @@ Tested OS:
 
 > The latest "Tinker Board Debian 10 V3.0.11" is official discontinued. Nevertheless it is well tested with gobot. There
 > is a known i2c issue with the Kernel 4.4.194 if using block reads. armbian is known to work in this area.
-
-You would normally install Go and Gobot on your workstation. Once installed, cross compile your program on your
-workstation, transfer the final executable to your Tinker Board, and run the program on the Tinker Board as documented here.
-
-```sh
-go get -d -u gobot.io/x/gobot/v2/...
-```
 
 ### System access and configuration basics
 

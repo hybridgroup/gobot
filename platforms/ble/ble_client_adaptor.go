@@ -6,7 +6,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/pkg/errors"
 	"gobot.io/x/gobot/v2"
 
 	"tinygo.org/x/bluetooth"
@@ -42,7 +41,6 @@ type ClientAdaptor struct {
 	characteristics map[string]bluetooth.DeviceCharacteristic
 
 	connected        bool
-	ready            chan struct{}
 	withoutResponses bool
 }
 
@@ -72,14 +70,15 @@ func (b *ClientAdaptor) Address() string { return b.address }
 func (b *ClientAdaptor) WithoutResponses(use bool) { b.withoutResponses = use }
 
 // Connect initiates a connection to the BLE peripheral. Returns true on successful connection.
-func (b *ClientAdaptor) Connect() (err error) {
+func (b *ClientAdaptor) Connect() error {
 	bleMutex.Lock()
 	defer bleMutex.Unlock()
 
+	var err error
 	// enable adaptor
 	b.adpt, err = getBLEAdapter(b.AdapterName)
 	if err != nil {
-		return errors.Wrap(err, "can't enable adapter "+b.AdapterName)
+		return fmt.Errorf("can't get adapter %s: %w", b.AdapterName, err)
 	}
 
 	// handle address
@@ -89,7 +88,9 @@ func (b *ClientAdaptor) Connect() (err error) {
 	ch := make(chan bluetooth.ScanResult, 1)
 	err = b.adpt.Scan(func(adapter *bluetooth.Adapter, result bluetooth.ScanResult) {
 		if result.Address.String() == b.Address() {
-			b.adpt.StopScan()
+			if err := b.adpt.StopScan(); err != nil {
+				panic(err)
+			}
 			b.SetName(result.LocalName())
 			ch <- result
 		}
@@ -108,6 +109,9 @@ func (b *ClientAdaptor) Connect() (err error) {
 
 	// get all services/characteristics
 	srvcs, err := b.device.DiscoverServices(nil)
+	if err != nil {
+		return err
+	}
 	for _, srvc := range srvcs {
 		chars, err := srvc.DiscoverCharacteristics(nil)
 		if err != nil {
@@ -120,28 +124,30 @@ func (b *ClientAdaptor) Connect() (err error) {
 	}
 
 	b.connected = true
-	return
+	return nil
 }
 
 // Reconnect attempts to reconnect to the BLE peripheral. If it has an active connection
 // it will first close that connection and then establish a new connection.
 // Returns true on Successful reconnection
-func (b *ClientAdaptor) Reconnect() (err error) {
+func (b *ClientAdaptor) Reconnect() error {
 	if b.connected {
-		b.Disconnect()
+		if err := b.Disconnect(); err != nil {
+			return err
+		}
 	}
 	return b.Connect()
 }
 
 // Disconnect terminates the connection to the BLE peripheral. Returns true on successful disconnect.
-func (b *ClientAdaptor) Disconnect() (err error) {
-	err = b.device.Disconnect()
+func (b *ClientAdaptor) Disconnect() error {
+	err := b.device.Disconnect()
 	time.Sleep(500 * time.Millisecond)
-	return
+	return err
 }
 
 // Finalize finalizes the BLEAdaptor
-func (b *ClientAdaptor) Finalize() (err error) {
+func (b *ClientAdaptor) Finalize() error {
 	return b.Disconnect()
 }
 
@@ -149,8 +155,7 @@ func (b *ClientAdaptor) Finalize() (err error) {
 // requested characteristic uuid
 func (b *ClientAdaptor) ReadCharacteristic(cUUID string) (data []byte, err error) {
 	if !b.connected {
-		log.Fatalf("Cannot read from BLE device until connected")
-		return
+		return nil, fmt.Errorf("Cannot read from BLE device until connected")
 	}
 
 	cUUID = convertUUID(cUUID)
@@ -169,10 +174,9 @@ func (b *ClientAdaptor) ReadCharacteristic(cUUID string) (data []byte, err error
 
 // WriteCharacteristic writes bytes to the BLE device for the
 // requested service and characteristic
-func (b *ClientAdaptor) WriteCharacteristic(cUUID string, data []byte) (err error) {
+func (b *ClientAdaptor) WriteCharacteristic(cUUID string, data []byte) error {
 	if !b.connected {
-		log.Println("Cannot write to BLE device until connected")
-		return
+		return fmt.Errorf("Cannot write to BLE device until connected")
 	}
 
 	cUUID = convertUUID(cUUID)
@@ -190,10 +194,9 @@ func (b *ClientAdaptor) WriteCharacteristic(cUUID string, data []byte) (err erro
 
 // Subscribe subscribes to notifications from the BLE device for the
 // requested service and characteristic
-func (b *ClientAdaptor) Subscribe(cUUID string, f func([]byte, error)) (err error) {
+func (b *ClientAdaptor) Subscribe(cUUID string, f func([]byte, error)) error {
 	if !b.connected {
-		log.Fatalf("Cannot subscribe to BLE device until connected")
-		return
+		return fmt.Errorf("Cannot subscribe to BLE device until connected")
 	}
 
 	cUUID = convertUUID(cUUID)
@@ -202,14 +205,13 @@ func (b *ClientAdaptor) Subscribe(cUUID string, f func([]byte, error)) (err erro
 		fn := func(d []byte) {
 			f(d, nil)
 		}
-		err = char.EnableNotifications(fn)
-		return
+		return char.EnableNotifications(fn)
 	}
 
 	return fmt.Errorf("Unknown characteristic: %s", cUUID)
 }
 
-// getBLEDevice is singleton for bluetooth adapter connection
+// getBLEAdapter is singleton for bluetooth adapter connection
 func getBLEAdapter(impl string) (*bluetooth.Adapter, error) {
 	if currentAdapter != nil {
 		return currentAdapter, nil
@@ -218,7 +220,7 @@ func getBLEAdapter(impl string) (*bluetooth.Adapter, error) {
 	currentAdapter = bluetooth.DefaultAdapter
 	err := currentAdapter.Enable()
 	if err != nil {
-		return nil, errors.Wrap(err, "can't get device")
+		return nil, err
 	}
 
 	return currentAdapter, nil

@@ -116,14 +116,28 @@ func (m *MAVLinkPacket) MAVLinkMessage() (MAVLinkMessage, error) {
 // Pack returns a packed byte array which represents the MAVLinkPacket
 func (m *MAVLinkPacket) Pack() []byte {
 	data := new(bytes.Buffer)
-	binary.Write(data, binary.LittleEndian, m.Protocol)
-	binary.Write(data, binary.LittleEndian, m.Length)
-	binary.Write(data, binary.LittleEndian, m.Sequence)
-	binary.Write(data, binary.LittleEndian, m.SystemID)
-	binary.Write(data, binary.LittleEndian, m.ComponentID)
-	binary.Write(data, binary.LittleEndian, m.MessageID)
+	if err := binary.Write(data, binary.LittleEndian, m.Protocol); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.Length); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.Sequence); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.SystemID); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.ComponentID); err != nil {
+		panic(err)
+	}
+	if err := binary.Write(data, binary.LittleEndian, m.MessageID); err != nil {
+		panic(err)
+	}
 	data.Write(m.Data)
-	binary.Write(data, binary.LittleEndian, m.Checksum)
+	if err := binary.Write(data, binary.LittleEndian, m.Checksum); err != nil {
+		panic(err)
+	}
 	return data.Bytes()
 }
 
@@ -147,20 +161,20 @@ func read(r io.Reader, length int) ([]byte, error) {
 		i, err := r.Read(tmp[:])
 		if err != nil {
 			return nil, err
-		} else {
-			length -= i
-			buf = append(buf, tmp...)
-			if length != i {
-				time.Sleep(1 * time.Millisecond)
-			} else {
-				break
-			}
 		}
+
+		length -= i
+		buf = append(buf, tmp...)
+		if length != i {
+			time.Sleep(1 * time.Millisecond)
+		} else {
+			break
+		}
+
 	}
 	return buf, nil
 }
 
-//
 // Accumulate the X.25 CRC by adding one char at a time.
 //
 // The checksum function adds the hash of one char at a time to the
@@ -168,7 +182,6 @@ func read(r io.Reader, length int) ([]byte, error) {
 //
 // data to hash
 // crcAccum the already accumulated checksum
-//
 func crcAccumulate(data uint8, crcAccum uint16) uint16 {
 	/*Accumulate one byte of data into the CRC*/
 	var tmp uint8
@@ -179,18 +192,14 @@ func crcAccumulate(data uint8, crcAccum uint16) uint16 {
 	return crcAccum
 }
 
-//
 // Initiliaze the buffer for the X.25 CRC
-//
 func crcInit() uint16 {
 	return X25_INIT_CRC
 }
 
-//
 // Calculates the X.25 checksum on a byte buffer
 //
 // return the checksum over the buffer bytes
-//
 func crcCalculate(m *MAVLinkPacket) uint16 {
 	crc := crcInit()
 

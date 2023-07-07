@@ -18,7 +18,7 @@ func initTestDriver(config string) *Driver {
 		j.joystick = &testJoystick{}
 		return nil
 	}
-	a.Connect()
+	_ = a.Connect()
 	d := NewDriver(a, config)
 	d.poll = func() sdl.Event {
 		return nil
@@ -51,14 +51,14 @@ func TestDriverHalt(t *testing.T) {
 func TestDriverHandleEvent(t *testing.T) {
 	sem := make(chan bool)
 	d := initTestDriver("./configs/xbox360_power_a_mini_proex.json")
-	d.Start()
+	_ = d.Start()
 
 	// left x stick
-	d.On(d.Event("left_x"), func(data interface{}) {
+	_ = d.On(d.Event("left_x"), func(data interface{}) {
 		gobottest.Assert(t, int16(100), data.(int16))
 		sem <- true
 	})
-	d.handleEvent(&sdl.JoyAxisEvent{
+	_ = d.handleEvent(&sdl.JoyAxisEvent{
 		Which: 0,
 		Axis:  0,
 		Value: 100,
@@ -70,10 +70,10 @@ func TestDriverHandleEvent(t *testing.T) {
 	}
 
 	// x button press
-	d.On(d.Event("x_press"), func(data interface{}) {
+	_ = d.On(d.Event("x_press"), func(data interface{}) {
 		sem <- true
 	})
-	d.handleEvent(&sdl.JoyButtonEvent{
+	_ = d.handleEvent(&sdl.JoyButtonEvent{
 		Which:  0,
 		Button: 2,
 		State:  1,
@@ -85,10 +85,10 @@ func TestDriverHandleEvent(t *testing.T) {
 	}
 
 	// x button  release
-	d.On(d.Event("x_release"), func(data interface{}) {
+	_ = d.On(d.Event("x_release"), func(data interface{}) {
 		sem <- true
 	})
-	d.handleEvent(&sdl.JoyButtonEvent{
+	_ = d.handleEvent(&sdl.JoyButtonEvent{
 		Which:  0,
 		Button: 2,
 		State:  0,
@@ -100,10 +100,10 @@ func TestDriverHandleEvent(t *testing.T) {
 	}
 
 	// down button press
-	d.On(d.Event("down_press"), func(data interface{}) {
+	_ = d.On(d.Event("down_press"), func(data interface{}) {
 		sem <- true
 	})
-	d.handleEvent(&sdl.JoyHatEvent{
+	_ = d.handleEvent(&sdl.JoyHatEvent{
 		Which: 0,
 		Hat:   0,
 		Value: 4,

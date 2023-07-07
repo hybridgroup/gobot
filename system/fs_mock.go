@@ -2,7 +2,6 @@ package system
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"regexp"
@@ -135,7 +134,7 @@ func (fs *MockFilesystem) stat(name string) (os.FileInfo, error) {
 	_, ok := fs.Files[name]
 	if ok {
 		// return file based mock FileInfo
-		tmpFile, err := ioutil.TempFile("", name)
+		tmpFile, err := os.CreateTemp("", name)
 		if err != nil {
 			return nil, err
 		}
@@ -148,7 +147,7 @@ func (fs *MockFilesystem) stat(name string) (os.FileInfo, error) {
 	for path := range fs.Files {
 		if strings.HasPrefix(path, dirName) {
 			// return dir based mock FileInfo, TempDir don't like "/" in between
-			tmpDir, err := ioutil.TempDir("", strings.ReplaceAll(name, "/", "_"))
+			tmpDir, err := os.MkdirTemp("", strings.ReplaceAll(name, "/", "_"))
 			if err != nil {
 				return nil, err
 			}

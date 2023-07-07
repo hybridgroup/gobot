@@ -115,7 +115,7 @@ func TestIMUDriverConnection(t *testing.T) {
 
 func TestIMUDriverReadAccelerometer(t *testing.T) {
 	d := initTestIMUDriver()
-	d.Start()
+	_ = d.Start()
 	gobottest.Assert(t, d.ReadAccelerometer(), nil)
 }
 
@@ -130,7 +130,7 @@ func TestIMUDriverReadAccelerometerData(t *testing.T) {
 
 func TestIMUDriverReadGyroscope(t *testing.T) {
 	d := initTestIMUDriver()
-	d.Start()
+	_ = d.Start()
 	gobottest.Assert(t, d.ReadGyroscope(), nil)
 }
 
@@ -145,7 +145,7 @@ func TestIMUDriverReadGyroscopeData(t *testing.T) {
 
 func TestIMUDriverReadTemperature(t *testing.T) {
 	d := initTestIMUDriver()
-	d.Start()
+	_ = d.Start()
 	gobottest.Assert(t, d.ReadTemperature(), nil)
 }
 
@@ -160,7 +160,7 @@ func TestIMUDriverReadTemperatureData(t *testing.T) {
 
 func TestIMUDriverEnableShockDetection(t *testing.T) {
 	d := initTestIMUDriver()
-	d.Start()
+	_ = d.Start()
 	gobottest.Assert(t, d.EnableShockDetection(true), nil)
 }
 
@@ -175,7 +175,7 @@ func TestIMUDriverShockDetectData(t *testing.T) {
 
 func TestIMUDriverEnableStepCounter(t *testing.T) {
 	d := initTestIMUDriver()
-	d.Start()
+	_ = d.Start()
 	gobottest.Assert(t, d.EnableStepCounter(true), nil)
 }
 
@@ -190,7 +190,7 @@ func TestIMUDriverStepCountData(t *testing.T) {
 
 func TestIMUDriverEnableTapDetection(t *testing.T) {
 	d := initTestIMUDriver()
-	d.Start()
+	_ = d.Start()
 	gobottest.Assert(t, d.EnableTapDetection(true), nil)
 }
 
@@ -205,7 +205,7 @@ func TestIMUDriverTapDetectData(t *testing.T) {
 
 func TestIMUDriverEnableReadMotion(t *testing.T) {
 	d := initTestIMUDriver()
-	d.Start()
+	_ = d.Start()
 	gobottest.Assert(t, d.ReadMotion(), nil)
 }
 
@@ -220,7 +220,7 @@ func TestIMUDriverReadMotionData(t *testing.T) {
 
 func TestIMUDriverHandleEvents(t *testing.T) {
 	d := initTestIMUDriver()
-	d.Start()
+	_ = d.Start()
 
 	gobottest.Assert(t, d.handleEvent([]byte{0xF0, 0x11, 0x00, 0x00, 0x0f, 0x00, 0x0f, 0x00, 0x0f, 0xf7}), nil)
 	gobottest.Assert(t, d.handleEvent([]byte{0xF0, 0x11, 0x01, 0x00, 0x0f, 0x00, 0x0f, 0x00, 0x0f, 0xf7}), nil)

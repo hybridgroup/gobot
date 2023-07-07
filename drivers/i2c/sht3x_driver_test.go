@@ -189,8 +189,8 @@ func TestSHT3xHeater(t *testing.T) {
 
 func TestSHT3xSetHeater(t *testing.T) {
 	d, _ := initTestSHT3xDriverWithStubbedAdaptor()
-	d.SetHeater(false)
-	d.SetHeater(true)
+	_ = d.SetHeater(false)
+	_ = d.SetHeater(true)
 }
 
 func TestSHT3xSetAccuracy(t *testing.T) {

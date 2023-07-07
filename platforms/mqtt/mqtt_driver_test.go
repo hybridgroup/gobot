@@ -37,16 +37,16 @@ func TestMqttDriverTopic(t *testing.T) {
 func TestMqttDriverPublish(t *testing.T) {
 	a := initTestMqttAdaptor()
 	d := NewDriver(a, "/test/topic")
-	a.Connect()
-	d.Start()
-	defer d.Halt()
+	_ = a.Connect()
+	_ = d.Start()
+	defer func() { _ = d.Halt() }()
 	gobottest.Assert(t, d.Publish([]byte{0x01, 0x02, 0x03}), true)
 }
 
 func TestMqttDriverPublishError(t *testing.T) {
 	a := initTestMqttAdaptor()
 	d := NewDriver(a, "/test/topic")
-	d.Start()
-	defer d.Halt()
+	_ = d.Start()
+	defer func() { _ = d.Halt() }()
 	gobottest.Assert(t, d.Publish([]byte{0x01, 0x02, 0x03}), false)
 }

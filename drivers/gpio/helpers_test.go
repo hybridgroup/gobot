@@ -9,12 +9,6 @@ func (t *gpioTestBareAdaptor) Finalize() (err error) { return }
 func (t *gpioTestBareAdaptor) Name() string          { return "" }
 func (t *gpioTestBareAdaptor) SetName(n string)      {}
 
-type gpioTestDigitalWriter struct {
-	gpioTestBareAdaptor
-}
-
-func (t *gpioTestDigitalWriter) DigitalWrite(string, byte) (err error) { return }
-
 type gpioTestAdaptor struct {
 	name                    string
 	port                    string

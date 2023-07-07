@@ -135,7 +135,7 @@ func (d *BME280Driver) Humidity() (humidity float32, err error) {
 	return
 }
 
-func (d *BME280Driver) initializationBME280() (err error) {
+func (d *BME280Driver) initializationBME280() error {
 	// call the initialization routine of base class BMP280Driver, which do:
 	// * initializes temperature and pressure calibration coefficients
 	// * set the control register
@@ -152,13 +152,15 @@ func (d *BME280Driver) initializationBME280() (err error) {
 }
 
 // read the humidity calibration coefficients.
-func (d *BME280Driver) initHumidity() (err error) {
-	var hch1 byte
-	if hch1, err = d.connection.ReadByteData(bme280RegCalibDigH1); err != nil {
+func (d *BME280Driver) initHumidity() error {
+	hch1, err := d.connection.ReadByteData(bme280RegCalibDigH1)
+	if err != nil {
 		return err
 	}
 	buf := bytes.NewBuffer([]byte{hch1})
-	binary.Read(buf, binary.BigEndian, &d.humCalCoeffs.h1)
+	if err := binary.Read(buf, binary.BigEndian, &d.humCalCoeffs.h1); err != nil {
+		return err
+	}
 
 	coefficients := make([]byte, 7)
 	if err = d.connection.ReadBlockData(bme280RegCalibDigH2LSB, coefficients); err != nil {
@@ -170,13 +172,30 @@ func (d *BME280Driver) initHumidity() (err error) {
 	var addrE4 byte
 	var addrE5 byte
 	var addrE6 byte
-
-	binary.Read(buf, binary.LittleEndian, &d.humCalCoeffs.h2) // E1 ...
-	binary.Read(buf, binary.BigEndian, &d.humCalCoeffs.h3)    // E3
-	binary.Read(buf, binary.BigEndian, &addrE4)               // E4
-	binary.Read(buf, binary.BigEndian, &addrE5)               // E5
-	binary.Read(buf, binary.BigEndian, &addrE6)               // E6
-	binary.Read(buf, binary.BigEndian, &d.humCalCoeffs.h6)    // ... E7
+	// E1 ...
+	if err := binary.Read(buf, binary.LittleEndian, &d.humCalCoeffs.h2); err != nil {
+		return err
+	}
+	// E3
+	if err := binary.Read(buf, binary.BigEndian, &d.humCalCoeffs.h3); err != nil {
+		return err
+	}
+	// E4
+	if err := binary.Read(buf, binary.BigEndian, &addrE4); err != nil {
+		return err
+	}
+	// E5
+	if err := binary.Read(buf, binary.BigEndian, &addrE5); err != nil {
+		return err
+	}
+	// E6
+	if err := binary.Read(buf, binary.BigEndian, &addrE6); err != nil {
+		return err
+	}
+	// ... E7
+	if err := binary.Read(buf, binary.BigEndian, &d.humCalCoeffs.h6); err != nil {
+		return err
+	}
 
 	d.humCalCoeffs.h4 = 0 + (int16(addrE4) << 4) | (int16(addrE5 & 0x0F))
 	d.humCalCoeffs.h5 = 0 + (int16(addrE6) << 4) | (int16(addrE5) >> 4)
@@ -184,14 +203,17 @@ func (d *BME280Driver) initHumidity() (err error) {
 	// The 'ctrl_hum' register (0xF2) sets the humidity data acquisition options of
 	// the device. Changes to this register only become effective after a write
 	// operation to 'ctrl_meas' (0xF4). So we read the current value in, then write it back
-	d.connection.WriteByteData(bme280RegControlHumidity, uint8(d.ctrlHumOversamp))
-
-	var cmr uint8
-	cmr, err = d.connection.ReadByteData(bmp280RegCtrl)
-	if err == nil {
-		err = d.connection.WriteByteData(bmp280RegCtrl, cmr)
+	if err := d.connection.WriteByteData(bme280RegControlHumidity, uint8(d.ctrlHumOversamp)); err != nil {
+		return err
 	}
-	return err
+
+	cmr, err := d.connection.ReadByteData(bmp280RegCtrl)
+	if err != nil {
+		return err
+	}
+
+	return d.connection.WriteByteData(bmp280RegCtrl, cmr)
+
 }
 
 func (d *BME280Driver) rawHumidity() (uint32, error) {
@@ -204,7 +226,9 @@ func (d *BME280Driver) rawHumidity() (uint32, error) {
 	}
 	buf := bytes.NewBuffer(ret)
 	var rawH uint16
-	binary.Read(buf, binary.BigEndian, &rawH)
+	if err := binary.Read(buf, binary.BigEndian, &rawH); err != nil {
+		return 0, err
+	}
 	return uint32(rawH), nil
 }
 

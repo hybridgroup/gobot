@@ -33,8 +33,8 @@ func TestTemperatureDriverReadData(t *testing.T) {
 	sem := make(chan bool)
 	a := NewBleTestAdaptor()
 	d := NewTemperatureDriver(a)
-	d.Start()
-	d.On(Temperature, func(data interface{}) {
+	_ = d.Start()
+	_ = d.On(Temperature, func(data interface{}) {
 		gobottest.Assert(t, data, int8(0x22))
 		sem <- true
 	})

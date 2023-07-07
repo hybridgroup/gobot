@@ -37,6 +37,6 @@ func TestAdaptorConnect(t *testing.T) {
 
 func TestAdaptorFinalize(t *testing.T) {
 	a := initTestAdaptor()
-	a.Connect()
+	_ = a.Connect()
 	gobottest.Assert(t, a.Finalize(), nil)
 }

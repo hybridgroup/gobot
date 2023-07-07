@@ -1,18 +1,15 @@
 # Leap
 
-The Leap Motion is a user-interface device that tracks the user's hand motions, and translates them into events that can control robots and physical computing hardware.
+The Leap Motion is a user-interface device that tracks the user's hand motions, and translates them into events that can
+control robots and physical computing hardware.
 
 For more info about the Leap Motion platform click [Leap Motion](https://www.leapmotion.com/)
 
 ## How to Install
 
+Please refer to the main [README.md](https://github.com/hybridgroup/gobot/blob/release/README.md)
+
 First install the [Leap Motion Software](https://www.leapmotion.com/setup)
-
-Now you can install the package with:
-
-```
-go get -d -u gobot.io/x/gobot/v2/...
-```
 
 ## How to Use
 
@@ -20,29 +17,29 @@ go get -d -u gobot.io/x/gobot/v2/...
 package main
 
 import (
-	"fmt"
+  "fmt"
 
-	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/platforms/leap"
+  "gobot.io/x/gobot/v2"
+  "gobot.io/x/gobot/v2/platforms/leap"
 )
 
 func main() {
-	leapMotionAdaptor := leap.NewAdaptor("127.0.0.1:6437")
-	l := leap.NewDriver(leapMotionAdaptor)
+  leapMotionAdaptor := leap.NewAdaptor("127.0.0.1:6437")
+  l := leap.NewDriver(leapMotionAdaptor)
 
-	work := func() {
-		l.On(l.Event("message"), func(data interface{}) {
-			fmt.Println(data.(leap.Frame))
-		})
-	}
+  work := func() {
+    l.On(l.Event("message"), func(data interface{}) {
+      fmt.Println(data.(leap.Frame))
+    })
+  }
 
-	robot := gobot.NewRobot("leapBot",
-		[]gobot.Connection{leapMotionAdaptor},
-		[]gobot.Device{l},
-		work,
-	)
+  robot := gobot.NewRobot("leapBot",
+    []gobot.Connection{leapMotionAdaptor},
+    []gobot.Device{l},
+    work,
+  )
 
-	robot.Start()
+  robot.Start()
 }
 ```
 
@@ -54,16 +51,17 @@ This driver works out of the box with the vanilla installation of the Leap Motio
 
 The main steps are:
 
-*   Run Leap Motion.app to open a websocket connection in port 6437.
-*   Connect your Computer and Leap Motion Controller.
-*   Connect to the device via Gobot.
+* Run Leap Motion.app to open a websocket connection in port 6437.
+* Connect your Computer and Leap Motion Controller.
+* Connect to the device via Gobot.
 
 ### Ubuntu
 
-The Linux download of the Leap Motion software can be obtained from [Leap Motion Dev Center](https://developer.leapmotion.com/downloads) (requires free signup)
+The Linux download of the Leap Motion software can be obtained from [Leap Motion Dev Center](https://developer.leapmotion.com/downloads)
+(requires free signup).
 
 The main steps are:
 
-*   Run the leapd daemon, to open a websocket connection in port 6437.
-*   Connect your computer and the Leap Motion controller
-*   Connect to the device via Gobot
+* Run the leapd daemon, to open a websocket connection in port 6437.
+* Connect your computer and the Leap Motion controller
+* Connect to the device via Gobot

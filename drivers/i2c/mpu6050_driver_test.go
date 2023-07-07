@@ -86,7 +86,7 @@ func TestMPU6050GetData(t *testing.T) {
 
 	// arrange
 	d, adaptor := initTestMPU6050WithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 
 	accData := []byte{0x00, 0x01, 0x02, 0x04, 0x08, 0x16}
 	tempData := []byte{0x32, 0x64}
@@ -109,7 +109,7 @@ func TestMPU6050GetData(t *testing.T) {
 		return len(b), nil
 	}
 	// act
-	d.GetData()
+	_ = d.GetData()
 	// assert
 	gobottest.Assert(t, d.Accelerometer, wantAccel)
 	gobottest.Assert(t, d.Gyroscope, wantGyro)
@@ -118,7 +118,7 @@ func TestMPU6050GetData(t *testing.T) {
 
 func TestMPU6050GetDataReadError(t *testing.T) {
 	d, adaptor := initTestMPU6050WithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 
 	adaptor.i2cReadImpl = func(b []byte) (int, error) {
 		return 0, errors.New("read error")
@@ -129,7 +129,7 @@ func TestMPU6050GetDataReadError(t *testing.T) {
 
 func TestMPU6050GetDataWriteError(t *testing.T) {
 	d, adaptor := initTestMPU6050WithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 
 	adaptor.i2cWriteImpl = func(b []byte) (int, error) {
 		return 0, errors.New("write error")

@@ -3,18 +3,17 @@ package mqtt
 import (
 	"crypto/tls"
 	"crypto/x509"
-	"io/ioutil"
+	"fmt"
+	"os"
 
 	"gobot.io/x/gobot/v2"
 
 	paho "github.com/eclipse/paho.mqtt.golang"
-	multierror "github.com/hashicorp/go-multierror"
-	"github.com/pkg/errors"
 )
 
 var (
 	// ErrNilClient is returned when a client action can't be taken because the struct has no client
-	ErrNilClient = errors.New("no MQTT client available")
+	ErrNilClient = fmt.Errorf("no MQTT client available")
 )
 
 // Message is a message received from the broker.
@@ -112,27 +111,26 @@ func (a *Adaptor) ClientKey() string { return a.clientKey }
 func (a *Adaptor) SetClientKey(val string) { a.clientKey = val }
 
 // Connect returns true if connection to mqtt is established
-func (a *Adaptor) Connect() (err error) {
+func (a *Adaptor) Connect() error {
 	a.client = paho.NewClient(a.createClientOptions())
 	if token := a.client.Connect(); token.Wait() && token.Error() != nil {
-		err = multierror.Append(err, token.Error())
+		return token.Error()
 	}
 
-	return
+	return nil
 }
 
 // Disconnect returns true if connection to mqtt is closed
-func (a *Adaptor) Disconnect() (err error) {
+func (a *Adaptor) Disconnect() error {
 	if a.client != nil {
 		a.client.Disconnect(500)
 	}
-	return
+	return nil
 }
 
 // Finalize returns true if connection to mqtt is finalized successfully
-func (a *Adaptor) Finalize() (err error) {
-	a.Disconnect()
-	return
+func (a *Adaptor) Finalize() error {
+	return a.Disconnect()
 }
 
 // Publish a message under a specific topic
@@ -204,7 +202,7 @@ func (a *Adaptor) newTLSConfig() *tls.Config {
 	var certpool *x509.CertPool
 	if len(a.ServerCert()) > 0 {
 		certpool = x509.NewCertPool()
-		pemCerts, err := ioutil.ReadFile(a.ServerCert())
+		pemCerts, err := os.ReadFile(a.ServerCert())
 		if err == nil {
 			certpool.AppendCertsFromPEM(pemCerts)
 		}

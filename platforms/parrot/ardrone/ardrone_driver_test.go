@@ -16,7 +16,7 @@ func initTestArdroneDriver() *Driver {
 	}
 	d := NewDriver(a)
 	d.SetName("mydrone")
-	a.Connect()
+	_ = a.Connect()
 	return d
 }
 

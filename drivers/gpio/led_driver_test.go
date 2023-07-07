@@ -63,10 +63,10 @@ func TestLedDriverHalt(t *testing.T) {
 
 func TestLedDriverToggle(t *testing.T) {
 	d := initTestLedDriver()
-	d.Off()
-	d.Toggle()
+	_ = d.Off()
+	_ = d.Toggle()
 	gobottest.Assert(t, d.State(), true)
-	d.Toggle()
+	_ = d.Toggle()
 	gobottest.Assert(t, d.State(), false)
 }
 

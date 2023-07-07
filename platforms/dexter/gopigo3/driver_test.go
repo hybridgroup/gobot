@@ -14,7 +14,7 @@ var negativeEncoder = false
 
 func initTestDriver() *Driver {
 	d := NewDriver(&TestConnector{})
-	d.Start()
+	_ = d.Start()
 	return d
 }
 
@@ -273,7 +273,6 @@ func (ctr *TestConnector) SpiDefaultMaxSpeed() int64 {
 }
 
 type TestSpiDevice struct {
-	bus spi.Connection
 }
 
 func (c TestSpiDevice) Close() error {

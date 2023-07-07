@@ -1,4 +1,6 @@
+//go:build utils
 // +build utils
+
 //
 // Do not build by default.
 //

@@ -30,7 +30,6 @@ package main
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os/exec"
 	"sync/atomic"
 	"time"
@@ -70,7 +69,7 @@ func ffmpeg() (stdin io.WriteCloser, stderr io.ReadCloser, err error) {
 
 	go func() {
 		for {
-			buf, err := ioutil.ReadAll(stderr)
+			buf, err := io.ReadAll(stderr)
 			if err != nil {
 				fmt.Println(err)
 			}

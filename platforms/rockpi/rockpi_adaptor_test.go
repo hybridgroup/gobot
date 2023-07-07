@@ -11,7 +11,7 @@ import (
 func initTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *system.MockFilesystem) {
 	a := NewAdaptor()
 	fs := a.sys.UseMockFilesystem(mockPaths)
-	a.Connect()
+	_ = a.Connect()
 	return a, fs
 }
 

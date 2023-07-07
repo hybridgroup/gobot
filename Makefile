@@ -16,7 +16,7 @@ including_except := $(shell go list ./... | grep -v platforms/opencv)
 
 # Run tests on nearly all directories without test cache
 test:
-	go test -count=1 -v $(including_except)
+	go test -failfast -count=1 -v $(including_except)
 
 # Run tests with race detection
 test_race:
@@ -56,12 +56,12 @@ version_check:
 
 # Check for bad code style and other issues
 fmt_check:
-	gofmt -l ./	
+	gofmt -l -s .
 	golangci-lint run -v
 
 # Fix bad code style (will only be executed, on version match)
 fmt_fix: version_check
-	go fmt ./...
+	gofmt -l -s -w .
 
 examples: $(EXAMPLES)
 

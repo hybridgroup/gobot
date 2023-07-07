@@ -3,7 +3,7 @@ Package sphero provides the Gobot adaptor and driver for the Sphero.
 
 Installing:
 
-	go get gobot.io/x/gobot/v2/platforms/sphero
+	Please refer to the main [README.md](https://github.com/hybridgroup/gobot/blob/release/README.md)
 
 Example:
 

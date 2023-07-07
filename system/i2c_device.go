@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 	"sync"
-	"syscall"
 	"unsafe"
 )
 
@@ -375,7 +374,7 @@ func (d *i2cDevice) syscallIoctl(signal uintptr, payload unsafe.Pointer, sender 
 	if err := d.openFileLazy(sender); err != nil {
 		return err
 	}
-	if _, _, errno := d.sys.syscall(syscall.SYS_IOCTL, d.file, signal, payload); errno != 0 {
+	if _, _, errno := d.sys.syscall(Syscall_SYS_IOCTL, d.file, signal, payload); errno != 0 {
 		return fmt.Errorf("%s failed with syscall.Errno %v", sender, errno)
 	}
 

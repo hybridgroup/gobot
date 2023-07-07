@@ -86,7 +86,7 @@ func TestBMP280Measurements(t *testing.T) {
 		copy(b, buf.Bytes())
 		return buf.Len(), nil
 	}
-	d.Start()
+	_ = d.Start()
 	temp, err := d.Temperature()
 	gobottest.Assert(t, err, nil)
 	gobottest.Assert(t, temp, float32(25.014637))
@@ -100,7 +100,7 @@ func TestBMP280Measurements(t *testing.T) {
 
 func TestBMP280TemperatureWriteError(t *testing.T) {
 	d, adaptor := initTestBMP280WithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 
 	adaptor.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
@@ -112,7 +112,7 @@ func TestBMP280TemperatureWriteError(t *testing.T) {
 
 func TestBMP280TemperatureReadError(t *testing.T) {
 	d, adaptor := initTestBMP280WithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 
 	adaptor.i2cReadImpl = func([]byte) (int, error) {
 		return 0, errors.New("read error")
@@ -124,7 +124,7 @@ func TestBMP280TemperatureReadError(t *testing.T) {
 
 func TestBMP280PressureWriteError(t *testing.T) {
 	d, adaptor := initTestBMP280WithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 
 	adaptor.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
@@ -136,7 +136,7 @@ func TestBMP280PressureWriteError(t *testing.T) {
 
 func TestBMP280PressureReadError(t *testing.T) {
 	d, adaptor := initTestBMP280WithStubbedAdaptor()
-	d.Start()
+	_ = d.Start()
 
 	adaptor.i2cReadImpl = func([]byte) (int, error) {
 		return 0, errors.New("read error")

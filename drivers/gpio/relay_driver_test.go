@@ -54,13 +54,13 @@ func TestRelayDriverToggle(t *testing.T) {
 		return nil
 	})
 
-	d.Off()
+	_ = d.Off()
 	gobottest.Assert(t, d.State(), false)
 	gobottest.Assert(t, lastVal, byte(0))
-	d.Toggle()
+	_ = d.Toggle()
 	gobottest.Assert(t, d.State(), true)
 	gobottest.Assert(t, lastVal, byte(1))
-	d.Toggle()
+	_ = d.Toggle()
 	gobottest.Assert(t, d.State(), false)
 	gobottest.Assert(t, lastVal, byte(0))
 }
@@ -74,13 +74,13 @@ func TestRelayDriverToggleInverted(t *testing.T) {
 	})
 
 	d.Inverted = true
-	d.Off()
+	_ = d.Off()
 	gobottest.Assert(t, d.State(), false)
 	gobottest.Assert(t, lastVal, byte(1))
-	d.Toggle()
+	_ = d.Toggle()
 	gobottest.Assert(t, d.State(), true)
 	gobottest.Assert(t, lastVal, byte(0))
-	d.Toggle()
+	_ = d.Toggle()
 	gobottest.Assert(t, d.State(), false)
 	gobottest.Assert(t, lastVal, byte(1))
 }

@@ -212,7 +212,7 @@ func TestL3GD20HMeasurementError(t *testing.T) {
 		return 0, errors.New("read error")
 	}
 
-	d.Start()
+	_ = d.Start()
 	_, _, _, err := d.XYZ()
 	gobottest.Assert(t, err, errors.New("read error"))
 }

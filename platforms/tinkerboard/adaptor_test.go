@@ -83,7 +83,7 @@ func TestDigitalIO(t *testing.T) {
 	// only basic tests needed, further tests are done in "digitalpinsadaptor.go"
 	a, fs := initTestAdaptorWithMockedFilesystem(gpioMockPaths)
 
-	a.DigitalWrite("7", 1)
+	_ = a.DigitalWrite("7", 1)
 	gobottest.Assert(t, fs.Files[gpio17Path+"value"].Contents, "1")
 
 	fs.Files[gpio160Path+"value"].Contents = "1"

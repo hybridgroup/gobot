@@ -3,7 +3,7 @@ package leap
 import (
 	"errors"
 	"io"
-	"io/ioutil"
+	"os"
 	"strings"
 	"sync"
 	"testing"
@@ -43,11 +43,11 @@ func initTestLeapMotionDriver() (*Driver, *NullReadWriteCloser) {
 	a.connect = func(port string) (io.ReadWriteCloser, error) {
 		return rwc, nil
 	}
-	a.Connect()
+	_ = a.Connect()
 
 	d := NewDriver(a)
 	d.receive = func(ws io.ReadWriteCloser, buf *[]byte) {
-		file, _ := ioutil.ReadFile("./test/support/example_frame.json")
+		file, _ := os.ReadFile("./test/support/example_frame.json")
 		copy(*buf, file)
 	}
 	return d, rwc
@@ -82,8 +82,8 @@ func TestLeapMotionDriverHalt(t *testing.T) {
 
 func TestLeapMotionDriverParser(t *testing.T) {
 	d, _ := initTestLeapMotionDriver()
-	file, _ := ioutil.ReadFile("./test/support/example_frame.json")
-	parsedFrame := d.ParseFrame(file)
+	file, _ := os.ReadFile("./test/support/example_frame.json")
+	parsedFrame, _ := d.ParseFrame(file)
 
 	if parsedFrame.Hands == nil || parsedFrame.Pointables == nil || parsedFrame.Gestures == nil {
 		t.Errorf("ParseFrame incorrectly parsed frame")

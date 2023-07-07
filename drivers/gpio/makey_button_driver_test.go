@@ -49,7 +49,7 @@ func TestMakeyButtonDriverStart(t *testing.T) {
 
 	gobottest.Assert(t, d.Start(), nil)
 
-	d.Once(ButtonPush, func(data interface{}) {
+	_ = d.Once(ButtonPush, func(data interface{}) {
 		gobottest.Assert(t, d.Active, true)
 		sem <- true
 	})
@@ -65,7 +65,7 @@ func TestMakeyButtonDriverStart(t *testing.T) {
 		t.Errorf("MakeyButton Event \"Push\" was not published")
 	}
 
-	d.Once(ButtonRelease, func(data interface{}) {
+	_ = d.Once(ButtonRelease, func(data interface{}) {
 		gobottest.Assert(t, d.Active, false)
 		sem <- true
 	})
@@ -81,7 +81,7 @@ func TestMakeyButtonDriverStart(t *testing.T) {
 		t.Errorf("MakeyButton Event \"Release\" was not published")
 	}
 
-	d.Once(Error, func(data interface{}) {
+	_ = d.Once(Error, func(data interface{}) {
 		gobottest.Assert(t, data.(error).Error(), "digital read error")
 		sem <- true
 	})
@@ -98,7 +98,7 @@ func TestMakeyButtonDriverStart(t *testing.T) {
 	}
 
 	// send a halt message
-	d.Once(ButtonRelease, func(data interface{}) {
+	_ = d.Once(ButtonRelease, func(data interface{}) {
 		sem <- true
 	})
 

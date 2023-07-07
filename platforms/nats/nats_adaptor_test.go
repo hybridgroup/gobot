@@ -72,27 +72,33 @@ func TestNatsAdaptorWithAuth(t *testing.T) {
 func TestNatsAdapterSetsRootCAs(t *testing.T) {
 	a := initTestNatsAdaptorTLS(nats.RootCAs("test_certs/catest.pem"))
 	gobottest.Assert(t, a.Host, "tls://localhost:4242")
-	a.Connect()
+	_ = a.Connect()
 	o := a.client.Opts
-	gobottest.Assert(t, len(o.TLSConfig.RootCAs.Subjects()), 1)
+	casPool, err := o.RootCAsCB()
+	gobottest.Assert(t, err, nil)
+	gobottest.Refute(t, casPool, nil)
 	gobottest.Assert(t, o.Secure, true)
 }
 
 func TestNatsAdapterSetsClientCerts(t *testing.T) {
 	a := initTestNatsAdaptorTLS(nats.ClientCert("test_certs/client-cert.pem", "test_certs/client-key.pem"))
 	gobottest.Assert(t, a.Host, "tls://localhost:4242")
-	a.Connect()
-	certs := a.client.Opts.TLSConfig.Certificates
-	gobottest.Assert(t, len(certs), 1)
+	_ = a.Connect()
+	cert, err := a.client.Opts.TLSCertCB()
+	gobottest.Assert(t, err, nil)
+	gobottest.Refute(t, cert, nil)
+	gobottest.Refute(t, cert.Leaf, nil)
 	gobottest.Assert(t, a.client.Opts.Secure, true)
 }
 
 func TestNatsAdapterSetsClientCertsWithUserInfo(t *testing.T) {
 	a := initTestNatsAdaptorTLS(nats.ClientCert("test_certs/client-cert.pem", "test_certs/client-key.pem"), nats.UserInfo("test", "testwd"))
 	gobottest.Assert(t, a.Host, "tls://localhost:4242")
-	a.Connect()
-	certs := a.client.Opts.TLSConfig.Certificates
-	gobottest.Assert(t, len(certs), 1)
+	_ = a.Connect()
+	cert, err := a.client.Opts.TLSCertCB()
+	gobottest.Assert(t, err, nil)
+	gobottest.Refute(t, cert, nil)
+	gobottest.Refute(t, cert.Leaf, nil)
 	gobottest.Assert(t, a.client.Opts.Secure, true)
 	gobottest.Assert(t, a.client.Opts.User, "test")
 	gobottest.Assert(t, a.client.Opts.Password, "testwd")
@@ -102,7 +108,7 @@ func TestNatsAdapterSetsClientCertsWithUserInfo(t *testing.T) {
 func TestNatsAdaptorPublishWhenConnected(t *testing.T) {
 	t.Skip("TODO: implement this test without requiring actual server connection")
 	a := initTestNatsAdaptor()
-	a.Connect()
+	_ = a.Connect()
 	data := []byte("o")
 	gobottest.Assert(t, a.Publish("test", data), true)
 }
@@ -111,7 +117,7 @@ func TestNatsAdaptorPublishWhenConnected(t *testing.T) {
 func TestNatsAdaptorOnWhenConnected(t *testing.T) {
 	t.Skip("TODO: implement this test without requiring actual server connection")
 	a := initTestNatsAdaptor()
-	a.Connect()
+	_ = a.Connect()
 	gobottest.Assert(t, a.On("hola", func(msg Message) {
 		fmt.Println("hola")
 	}), true)
@@ -121,7 +127,7 @@ func TestNatsAdaptorOnWhenConnected(t *testing.T) {
 func TestNatsAdaptorPublishWhenConnectedWithAuth(t *testing.T) {
 	t.Skip("TODO: implement this test without requiring actual server connection")
 	a := NewAdaptorWithAuth("localhost:4222", 49999, "test", "testwd")
-	a.Connect()
+	_ = a.Connect()
 	data := []byte("o")
 	gobottest.Assert(t, a.Publish("test", data), true)
 }
@@ -131,7 +137,7 @@ func TestNatsAdaptorOnWhenConnectedWithAuth(t *testing.T) {
 	t.Skip("TODO: implement this test without requiring actual server connection")
 	log.Println("###not skipped###")
 	a := NewAdaptorWithAuth("localhost:4222", 59999, "test", "testwd")
-	a.Connect()
+	_ = a.Connect()
 	gobottest.Assert(t, a.On("hola", func(msg Message) {
 		fmt.Println("hola")
 	}), true)

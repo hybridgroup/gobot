@@ -30,8 +30,8 @@ type firmataBoard interface {
 }
 
 type FirmataAdaptor interface {
-	Connect() (err error)
-	Finalize() (err error)
+	Connect() error
+	Finalize() error
 	Name() string
 	SetName(n string)
 	WriteSysex(data []byte) error
@@ -82,27 +82,25 @@ func NewAdaptor(args ...interface{}) *Adaptor {
 }
 
 // Connect starts a connection to the board.
-func (f *Adaptor) Connect() (err error) {
+func (f *Adaptor) Connect() error {
 	if f.conn == nil {
-		sp, e := f.PortOpener(f.Port())
-		if e != nil {
-			return e
+		sp, err := f.PortOpener(f.Port())
+		if err != nil {
+			return err
 		}
 		f.conn = sp
 	}
-	if err = f.Board.Connect(f.conn); err != nil {
+	if err := f.Board.Connect(f.conn); err != nil {
 		return err
 	}
 
-	f.Board.On("SysexResponse", func(data interface{}) {
+	return f.Board.On("SysexResponse", func(data interface{}) {
 		f.Publish("SysexResponse", data)
 	})
-
-	return
 }
 
 // Disconnect closes the io connection to the Board
-func (f *Adaptor) Disconnect() (err error) {
+func (f *Adaptor) Disconnect() error {
 	if f.Board != nil {
 		return f.Board.Disconnect()
 	}
@@ -110,9 +108,8 @@ func (f *Adaptor) Disconnect() (err error) {
 }
 
 // Finalize terminates the firmata connection
-func (f *Adaptor) Finalize() (err error) {
-	err = f.Disconnect()
-	return err
+func (f *Adaptor) Finalize() error {
+	return f.Disconnect()
 }
 
 // Port returns the Firmata Adaptors port
@@ -135,7 +132,7 @@ func (f *Adaptor) ServoConfig(pin string, min, max int) error {
 }
 
 // ServoWrite writes the 0-180 degree angle to the specified pin.
-func (f *Adaptor) ServoWrite(pin string, angle byte) (err error) {
+func (f *Adaptor) ServoWrite(pin string, angle byte) error {
 	p, err := strconv.Atoi(pin)
 	if err != nil {
 		return err
@@ -147,12 +144,12 @@ func (f *Adaptor) ServoWrite(pin string, angle byte) (err error) {
 			return err
 		}
 	}
-	err = f.Board.AnalogWrite(p, int(angle))
-	return
+
+	return f.Board.AnalogWrite(p, int(angle))
 }
 
 // PwmWrite writes the 0-254 value to the specified pin
-func (f *Adaptor) PwmWrite(pin string, level byte) (err error) {
+func (f *Adaptor) PwmWrite(pin string, level byte) error {
 	p, err := strconv.Atoi(pin)
 	if err != nil {
 		return err
@@ -164,26 +161,24 @@ func (f *Adaptor) PwmWrite(pin string, level byte) (err error) {
 			return err
 		}
 	}
-	err = f.Board.AnalogWrite(p, int(level))
-	return
+
+	return f.Board.AnalogWrite(p, int(level))
 }
 
 // DigitalWrite writes a value to the pin. Acceptable values are 1 or 0.
-func (f *Adaptor) DigitalWrite(pin string, level byte) (err error) {
+func (f *Adaptor) DigitalWrite(pin string, level byte) error {
 	p, err := strconv.Atoi(pin)
 	if err != nil {
-		return
+		return err
 	}
 
 	if f.Board.Pins()[p].Mode != client.Output {
-		err = f.Board.SetPinMode(p, client.Output)
-		if err != nil {
-			return
+		if err = f.Board.SetPinMode(p, client.Output); err != nil {
+			return err
 		}
 	}
 
-	err = f.Board.DigitalWrite(p, int(level))
-	return
+	return f.Board.DigitalWrite(p, int(level))
 }
 
 // DigitalRead retrieves digital value from specified pin.
@@ -209,21 +204,21 @@ func (f *Adaptor) DigitalRead(pin string) (val int, err error) {
 
 // AnalogRead retrieves value from analog pin.
 // Returns -1 if the response from the board has timed out
-func (f *Adaptor) AnalogRead(pin string) (val int, err error) {
+func (f *Adaptor) AnalogRead(pin string) (int, error) {
 	p, err := strconv.Atoi(pin)
 	if err != nil {
-		return
+		return 0, err
 	}
 
 	p = f.digitalPin(p)
 
 	if f.Board.Pins()[p].Mode != client.Analog {
-		if err = f.Board.SetPinMode(p, client.Analog); err != nil {
-			return
+		if err := f.Board.SetPinMode(p, client.Analog); err != nil {
+			return 0, err
 		}
 
-		if err = f.Board.ReportAnalog(p, 1); err != nil {
-			return
+		if err := f.Board.ReportAnalog(p, 1); err != nil {
+			return 0, err
 		}
 		<-time.After(10 * time.Millisecond)
 	}
@@ -242,12 +237,14 @@ func (f *Adaptor) digitalPin(pin int) int {
 
 // GetI2cConnection returns an i2c connection to a device on a specified bus.
 // Only supports bus number 0
-func (f *Adaptor) GetI2cConnection(address int, bus int) (connection i2c.Connection, err error) {
+func (f *Adaptor) GetI2cConnection(address int, bus int) (i2c.Connection, error) {
 	if bus != 0 {
 		return nil, fmt.Errorf("Invalid bus number %d, only 0 is supported", bus)
 	}
-	err = f.Board.I2cConfig(0)
-	return NewFirmataI2cConnection(f, address), err
+	if err := f.Board.I2cConfig(0); err != nil {
+		return nil, err
+	}
+	return NewFirmataI2cConnection(f, address), nil
 }
 
 // DefaultI2cBus returns the default i2c bus for this platform

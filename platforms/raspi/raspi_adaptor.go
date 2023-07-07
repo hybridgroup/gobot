@@ -34,8 +34,7 @@ type Adaptor struct {
 	*adaptors.DigitalPinsAdaptor
 	*adaptors.I2cBusAdaptor
 	*adaptors.SpiBusAdaptor
-	spiDefaultMaxSpeed int64
-	PiBlasterPeriod    uint32
+	PiBlasterPeriod uint32
 }
 
 // NewAdaptor creates a Raspi Adaptor
@@ -236,7 +235,9 @@ func (c *Adaptor) pwmPin(id string) (gobot.PWMPinner, error) {
 			return nil, err
 		}
 		pin = NewPWMPin(c.sys, "/dev/pi-blaster", strconv.Itoa(i))
-		pin.SetPeriod(c.PiBlasterPeriod)
+		if err := pin.SetPeriod(c.PiBlasterPeriod); err != nil {
+			return nil, err
+		}
 		c.pwmPins[id] = pin
 	}
 

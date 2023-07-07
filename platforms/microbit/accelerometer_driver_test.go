@@ -33,8 +33,8 @@ func TestAccelerometerDriverReadData(t *testing.T) {
 	sem := make(chan bool)
 	a := NewBleTestAdaptor()
 	d := NewAccelerometerDriver(a)
-	d.Start()
-	d.On(Accelerometer, func(data interface{}) {
+	_ = d.Start()
+	_ = d.On(Accelerometer, func(data interface{}) {
 		gobottest.Assert(t, data.(*AccelerometerData).X, float32(8.738))
 		gobottest.Assert(t, data.(*AccelerometerData).Y, float32(8.995))
 		gobottest.Assert(t, data.(*AccelerometerData).Z, float32(9.252))

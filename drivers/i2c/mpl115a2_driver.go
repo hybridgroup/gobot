@@ -89,10 +89,10 @@ func (d *MPL115A2Driver) Temperature() (t float32, err error) {
 	return
 }
 
-func (d *MPL115A2Driver) initialization() (err error) {
+func (d *MPL115A2Driver) initialization() error {
 	data := make([]byte, 8)
-	if err = d.connection.ReadBlockData(mpl115A2Reg_A0_MSB, data); err != nil {
-		return
+	if err := d.connection.ReadBlockData(mpl115A2Reg_A0_MSB, data); err != nil {
+		return err
 	}
 
 	var coA0 int16
@@ -101,10 +101,18 @@ func (d *MPL115A2Driver) initialization() (err error) {
 	var coC12 int16
 
 	buf := bytes.NewBuffer(data)
-	binary.Read(buf, binary.BigEndian, &coA0)
-	binary.Read(buf, binary.BigEndian, &coB1)
-	binary.Read(buf, binary.BigEndian, &coB2)
-	binary.Read(buf, binary.BigEndian, &coC12)
+	if err := binary.Read(buf, binary.BigEndian, &coA0); err != nil {
+		return err
+	}
+	if err := binary.Read(buf, binary.BigEndian, &coB1); err != nil {
+		return err
+	}
+	if err := binary.Read(buf, binary.BigEndian, &coB2); err != nil {
+		return err
+	}
+	if err := binary.Read(buf, binary.BigEndian, &coC12); err != nil {
+		return err
+	}
 
 	coC12 = coC12 >> 2
 
@@ -113,7 +121,7 @@ func (d *MPL115A2Driver) initialization() (err error) {
 	d.b2 = float32(coB2) / 16384.0
 	d.c12 = float32(coC12) / 4194304.0
 
-	return
+	return nil
 }
 
 // getData fetches the latest data from the MPL115A2
@@ -123,7 +131,7 @@ func (d *MPL115A2Driver) getData() (p, t float32, err error) {
 	var pressureComp float32
 
 	if err = d.connection.WriteByteData(mpl115A2Reg_StartConversion, 0); err != nil {
-		return
+		return 0, 0, err
 	}
 	time.Sleep(5 * time.Millisecond)
 
@@ -133,8 +141,12 @@ func (d *MPL115A2Driver) getData() (p, t float32, err error) {
 	}
 
 	buf := bytes.NewBuffer(data)
-	binary.Read(buf, binary.BigEndian, &pressure)
-	binary.Read(buf, binary.BigEndian, &temperature)
+	if err := binary.Read(buf, binary.BigEndian, &pressure); err != nil {
+		return 0, 0, err
+	}
+	if err := binary.Read(buf, binary.BigEndian, &temperature); err != nil {
+		return 0, 0, err
+	}
 
 	temperature = temperature >> 6
 	pressure = pressure >> 6

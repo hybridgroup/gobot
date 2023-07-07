@@ -20,7 +20,7 @@ func initTestDRV2605LDriverWithStubbedAdaptor() (*DRV2605LDriver, *i2cTestAdapto
 	// Prime adapter reader to make "Start()" call happy
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		buf := new(bytes.Buffer)
-		binary.Write(buf, binary.LittleEndian, uint8(42))
+		_ = binary.Write(buf, binary.LittleEndian, uint8(42))
 		copy(b, buf.Bytes())
 		return buf.Len(), nil
 	}

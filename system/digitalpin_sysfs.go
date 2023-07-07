@@ -7,7 +7,6 @@ import (
 	"log"
 	"os"
 	"strconv"
-	"syscall"
 	"time"
 
 	"gobot.io/x/gobot/v2"
@@ -64,8 +63,7 @@ func (d *digitalPinSysfs) DirectionBehavior() string {
 
 // Export sets the pin as exported with the configured direction
 func (d *digitalPinSysfs) Export() error {
-	err := d.reconfigure()
-	return err
+	return d.reconfigure()
 }
 
 // Unexport release the pin
@@ -93,7 +91,7 @@ func (d *digitalPinSysfs) Unexport() error {
 	if err != nil {
 		// If EINVAL then the pin is reserved in the system and can't be unexported
 		e, ok := err.(*os.PathError)
-		if !ok || e.Err != syscall.EINVAL {
+		if !ok || e.Err != Syscall_EINVAL {
 			return err
 		}
 	}
@@ -127,7 +125,7 @@ func (d *digitalPinSysfs) reconfigure() error {
 	if err != nil {
 		// If EBUSY then the pin has already been exported
 		e, ok := err.(*os.PathError)
-		if !ok || e.Err != syscall.EBUSY {
+		if !ok || e.Err != Syscall_EBUSY {
 			return err
 		}
 	}
@@ -194,7 +192,7 @@ func (d *digitalPinSysfs) reconfigure() error {
 	}
 
 	if err != nil {
-		d.Unexport()
+		return d.Unexport()
 	}
 
 	return err

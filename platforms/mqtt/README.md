@@ -10,11 +10,7 @@ For more info about the MQTT machine to machine messaging standard, go to <http:
 
 ## How to Install
 
-Install running:
-
-```sh
-go get -d -u gobot.io/x/gobot/v2/...
-```
+Please refer to the main [README.md](https://github.com/hybridgroup/gobot/blob/release/README.md)
 
 ## How to Use
 
