@@ -40,43 +40,8 @@ Reboot the device to make sure the init script loads the overlay on boot.
 
 ## How to Use
 
+Please refer to one example for your platform, e.g. [chip_button.go](https://github.com/hybridgroup/gobot/blob/release/examples/chip_button.go).
 The pin numbering used by your Gobot program should match the way your board is labeled right on the board itself.
-
-```go
-package main
-
-import (
-    "fmt"
-
-    "gobot.io/x/gobot/v2"
-    "gobot.io/x/gobot/v2/drivers/gpio"
-    "gobot.io/x/gobot/v2/platforms/chip"
-)
-
-func main() {
-    chipAdaptor := chip.NewAdaptor()
-    button := gpio.NewButtonDriver(chipAdaptor, "XIO-P0")
-
-    work := func() {
-        gobot.On(button.Event("push"), func(data interface{}) {
-            fmt.Println("button pressed")
-        })
-
-        gobot.On(button.Event("release"), func(data interface{}) {
-            fmt.Println("button released")
-        })
-    }
-
-    robot := gobot.NewRobot("buttonBot",
-        []gobot.Connection{chipAdaptor},
-        []gobot.Device{button},
-        work,
-    )
-
-    robot.Start()
-}
-```
-
 If you want to use the C.H.I.P. Pro, use the `NewProAdaptor()` function like this:
 
 ```go

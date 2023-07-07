@@ -16,42 +16,8 @@ transfer the final executable to your DragonBoard and run the program on the Dra
 
 ## How to Use
 
+Please refer to one example for your platform, e.g. [dragonboard_button.go](https://github.com/hybridgroup/gobot/blob/release/examples/dragonboard_button.go).
 The pin numbering used by your Gobot program should match the way your board is labeled right on the board itself. See [here](https://www.96boards.org/db410c-getting-started/HardwareDocs/HWUserManual.md/).
-
-```go
-package main
-
-import (
-    "fmt"
-
-    "gobot.io/x/gobot/v2"
-    "gobot.io/x/gobot/v2/drivers/gpio"
-    "gobot.io/x/gobot/v2/platforms/dragonboard"
-)
-
-func main() {
-    dragonAdaptor := dragonboard.NewAdaptor()
-    button := gpio.NewButtonDriver(dragonAdaptor, "GPIO_A")
-
-    work := func() {
-        gobot.On(button.Event("push"), func(data interface{}) {
-            fmt.Println("button pressed")
-        })
-
-        gobot.On(button.Event("release"), func(data interface{}) {
-            fmt.Println("button released")
-        })
-    }
-
-    robot := gobot.NewRobot("buttonBot",
-        []gobot.Connection{chipAdaptor},
-        []gobot.Device{button},
-        work,
-    )
-
-    robot.Start()
-}
-```
 
 ## How to Connect
 
@@ -60,13 +26,13 @@ func main() {
 Compile your Gobot program on your workstation like this:
 
 ```sh
-GOARCH=arm64 GOOS=linux go build examples/dragon_button.go
+GOARCH=arm64 GOOS=linux go build examples/dragonboard_button.go
 ```
 
 Once you have compiled your code, you can you can upload your program and execute it on the DragonBoard from your workstation
 using the `scp` and `ssh` commands like this:
 
 ```sh
-scp dragon_button root@192.168.1.xx:
-ssh -t root@192.168.1.xx "./dragon_button"
+scp dragonboard_button root@192.168.1.xx:
+ssh -t root@192.168.1.xx "./dragonboard_button"
 ```
