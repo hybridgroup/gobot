@@ -1,6 +1,45 @@
 # CHANGELOG
 
-## [Unreleased](https://github.com/hybridgroup/gobot/compare/v2.1.0...HEAD)
+## [Unreleased](https://github.com/hybridgroup/gobot/compare/v2.1.1...HEAD)
+
+## [v2.1.1](https://github.com/hybridgroup/gobot/compare/v2.1.0...v2.1.1) (2023-07-07)
+
+### All
+
+* upgrade modules
+* substitute deprecated ioutil methods ([#923](https://github.com/hybridgroup/gobot/issues/923))
+* **linter:** activate linters "errcheck", "ineffassign", "unused" and fix issues ([#950](https://github.com/hybridgroup/gobot/issues/950))
+* **linter, format:** format code and list of linter todo's ([#962](https://github.com/hybridgroup/gobot/issues/962))
+* **linter:** activate linter "makezero" and fix issue ([#965](https://github.com/hybridgroup/gobot/issues/965))
+
+### Ble
+
+* simplify and substitute errors.Wrap() ([#958](https://github.com/hybridgroup/gobot/issues/958))
+
+### Build
+
+* **go:** switch to Go 1.18 ([#940](https://github.com/hybridgroup/gobot/issues/940))
+
+### Core
+
+* CLI removed ([#946](https://github.com/hybridgroup/gobot/issues/946))
+
+### Doc
+
+* fix and improve documentation regarding to installation ([#946](https://github.com/hybridgroup/gobot/issues/946), [#970](https://github.com/hybridgroup/gobot/issues/970))
+
+### Mavlink
+
+* fix linter issues of errcheck ([#959](https://github.com/hybridgroup/gobot/issues/959))
+
+### System
+
+* **syscall:** switch to x/sys ([#963](https://github.com/hybridgroup/gobot/issues/963))
+
+### Tello
+
+* fix wifiMessage and lightMessage ([#957](https://github.com/hybridgroup/gobot/issues/957))
+* fix partially [#793](https://github.com/hybridgroup/gobot/issues/793) by initialize doneCh in NewDriverWithIP ([#931](https://github.com/hybridgroup/gobot/issues/931))
 
 ## [v2.1.0](https://github.com/hybridgroup/gobot/compare/v2.0.3...v2.1.0) (2023-05-29)
 
