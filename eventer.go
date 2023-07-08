@@ -1,6 +1,9 @@
 package gobot
 
-import "sync"
+import (
+	"errors"
+	"sync"
+)
 
 type eventChannel chan *Event
 
@@ -14,11 +17,18 @@ type eventer struct {
 	// map of out channels used by subscribers
 	outs map[eventChannel]eventChannel
 
+	// the in/out channel length
+	bufferSize int
+
 	// mutex to protect the eventChannel map
 	eventsMutex sync.Mutex
 }
 
-const eventChanBufferSize = 10
+const (
+	eventChanBufferSize    = 10
+	maxEventChanBufferSize = 10240
+	maxChanWorkerCount     = 128
+)
 
 // Eventer is the interface which describes how a Driver or Adaptor
 // handles events.
@@ -54,10 +64,19 @@ type Eventer interface {
 
 // NewEventer returns a new Eventer.
 func NewEventer() Eventer {
+	return NewEventerWithBufferSize(eventChanBufferSize)
+}
+
+func NewEventerWithBufferSize(bufferSize int) Eventer {
+	if bufferSize >= maxEventChanBufferSize {
+		bufferSize = maxEventChanBufferSize
+	}
+
 	evtr := &eventer{
 		eventnames: make(map[string]string),
-		in:         make(eventChannel, eventChanBufferSize),
+		in:         make(eventChannel, bufferSize),
 		outs:       make(map[eventChannel]eventChannel),
+		bufferSize: bufferSize,
 	}
 
 	// goroutine to cascade "in" events to all "out" event channels
@@ -108,7 +127,7 @@ func (e *eventer) Publish(name string, data interface{}) {
 func (e *eventer) Subscribe() eventChannel {
 	e.eventsMutex.Lock()
 	defer e.eventsMutex.Unlock()
-	out := make(eventChannel, eventChanBufferSize)
+	out := make(eventChannel, e.bufferSize)
 	e.outs[out] = out
 	return out
 }
@@ -122,17 +141,27 @@ func (e *eventer) Unsubscribe(events eventChannel) {
 
 // On executes the event handler f when e is Published to.
 func (e *eventer) On(n string, f func(s interface{})) (err error) {
+	return e.OnWithParallel(n, 1, f)
+}
+
+// Multi goroutines On executes the event handler f when e is Published to.
+func (e *eventer) OnWithParallel(n string, workerCnt int, f func(s interface{})) (err error) {
+	if workerCnt > maxChanWorkerCount {
+		return errors.New("out of max worker count")
+	}
 	out := e.Subscribe()
-	go func() {
-		for {
-			select {
-			case evt := <-out:
-				if evt.Name == n {
-					f(evt.Data)
+	for i := 0; i < workerCnt; i++ {
+		go func() {
+			for {
+				select {
+				case evt := <-out:
+					if evt.Name == n {
+						f(evt.Data)
+					}
 				}
 			}
-		}
-	}()
+		}()
+	}
 
 	return
 }
