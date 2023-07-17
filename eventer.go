@@ -28,6 +28,7 @@ const (
 	eventChanBufferSize    = 10
 	maxEventChanBufferSize = 10240
 	maxChanWorkerCount     = 128
+	EventCrash             = "crash"
 )
 
 // Eventer is the interface which describes how a Driver or Adaptor
@@ -152,6 +153,13 @@ func (e *eventer) OnWithParallel(n string, workerCnt int, f func(s interface{}))
 	out := e.Subscribe()
 	for i := 0; i < workerCnt; i++ {
 		go func() {
+			// 增加goroutine的panic处理，防止因回调f引起panic
+			defer func() {
+				if r := recover(); r != nil {
+					e.Publish(EventCrash, r)
+				}
+			}()
+
 			for {
 				select {
 				case evt := <-out:
