@@ -19,9 +19,6 @@ func initTestDriver(config string) *Driver {
 	}
 	_ = a.Connect()
 	d := NewDriver(a, config)
-	// d.poll = func() sdl.Event {
-	// 	return nil
-	// }
 	return d
 }
 

@@ -54,5 +54,4 @@ var xbox360RockBandDrumsConfig = joystickConfig{
 			ID:   14,
 		},
 	},
-	Hats: []hat{},
 }

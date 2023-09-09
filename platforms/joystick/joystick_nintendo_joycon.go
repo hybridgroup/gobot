@@ -111,5 +111,4 @@ var joyconPairConfig = joystickConfig{
 			ID:   6,
 		},
 	},
-	Hats: []hat{},
 }

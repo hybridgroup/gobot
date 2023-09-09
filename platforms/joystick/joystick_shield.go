@@ -75,31 +75,4 @@ var shieldConfig = joystickConfig{
 			ID:   9,
 		},
 	},
-	Hats: []hat{
-		{
-			Hat:  0,
-			Name: "down",
-			ID:   4,
-		},
-		{
-			Hat:  0,
-			Name: "up",
-			ID:   1,
-		},
-		{
-			Hat:  0,
-			Name: "left",
-			ID:   8,
-		},
-		{
-			Hat:  0,
-			Name: "right",
-			ID:   2,
-		},
-		{
-			Hat:  0,
-			Name: "released",
-			ID:   0,
-		},
-	},
 }

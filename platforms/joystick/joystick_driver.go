@@ -59,20 +59,12 @@ type pair struct {
 	ID   int    `json:"id"`
 }
 
-// hat is a JSON representation of hat, name and id
-type hat struct {
-	Hat  int    `json:"hat"`
-	Name string `json:"name"`
-	ID   int    `json:"id"`
-}
-
 // joystickConfig is a JSON representation of configuration values
 type joystickConfig struct {
 	Name    string `json:"name"`
 	GUID    string `json:"guid"`
 	Axis    []pair `json:"axis"`
 	Buttons []pair `json:"buttons"`
-	Hats    []hat  `json:"Hats"`
 }
 
 // NewDriver returns a new Driver with a polling interval of
@@ -187,8 +179,6 @@ func (j *Driver) Halt() (err error) {
 	j.halt <- true
 	return
 }
-
-var previousHat = ""
 
 func (j *Driver) handleButtons(state js.State) error {
 	for button := 0; button < j.adaptor().joystick.ButtonCount(); button++ {

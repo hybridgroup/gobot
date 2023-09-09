@@ -91,5 +91,4 @@ var dualsenseConfig = joystickConfig{
 			ID:   15,
 		},
 	},
-	Hats: []hat{},
 }
