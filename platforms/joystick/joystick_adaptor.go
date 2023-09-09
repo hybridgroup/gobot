@@ -1,38 +1,40 @@
 package joystick
 
 import (
-	"errors"
+	"fmt"
 
 	"gobot.io/x/gobot/v2"
 
-	"github.com/veandco/go-sdl2/sdl"
+	js "github.com/0xcafed00d/joystick"
 )
 
 type joystick interface {
 	Close()
-	InstanceID() sdl.JoystickID
+	ID() int
 }
 
 // Adaptor represents a connection to a joystick
 type Adaptor struct {
 	name     string
-	joystick joystick
+	id int
+	joystick js.Joystick
 	connect  func(*Adaptor) error
 }
 
 // NewAdaptor returns a new Joystick Adaptor.
-func NewAdaptor() *Adaptor {
+// Pass in the ID of the joystick you wish to connect to.
+func NewAdaptor(id int) *Adaptor {
 	return &Adaptor{
 		name: gobot.DefaultName("Joystick"),
 		connect: func(j *Adaptor) error {
-			if err := sdl.Init(sdl.INIT_JOYSTICK); err != nil {
-				return err
+			joy, err := js.Open(id)
+			if err != nil {
+				return fmt.Errorf("No joystick available: %v", err)
 			}
-			if sdl.NumJoysticks() > 0 {
-				j.joystick = sdl.JoystickOpen(0)
-				return nil
-			}
-			return errors.New("No joystick available")
+
+			j.id = id
+			j.joystick = joy
+			return nil
 		},
 	}
 }

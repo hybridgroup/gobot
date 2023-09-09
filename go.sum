@@ -1,3 +1,5 @@
+github.com/0xcafed00d/joystick v1.0.1 h1:r4p2cRp4MHJWu1gArhGtumbkPxmr3tcOUTFqybEhplM=
+github.com/0xcafed00d/joystick v1.0.1/go.mod h1:gzszjNgzP6jtCAeSdC9OqPVO5rO7TJuaw4P7eAjNzx8=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/bgould/http v0.0.0-20190627042742-d268792bdee7/go.mod h1:BTqvVegvwifopl4KTEDth6Zezs9eR+lCWhvGKvkxJHE=
 github.com/bmizerany/pat v0.0.0-20210406213842-e4b6760bdd6f h1:gOO/tNZMjjvTKZWpY7YnXC72ULNLErRtp94LountVE8=

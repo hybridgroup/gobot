@@ -3,6 +3,7 @@ module gobot.io/x/gobot/v2
 go 1.18
 
 require (
+	github.com/0xcafed00d/joystick v1.0.1
 	github.com/bmizerany/pat v0.0.0-20210406213842-e4b6760bdd6f
 	github.com/donovanhide/eventsource v0.0.0-20210830082556-c59027999da0
 	github.com/eclipse/paho.mqtt.golang v1.4.2

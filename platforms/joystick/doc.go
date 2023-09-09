@@ -19,7 +19,7 @@ Example:
 	)
 
 	func main() {
-		joystickAdaptor := joystick.NewAdaptor()
+		joystickAdaptor := joystick.NewAdaptor(0)
 		joystick := joystick.NewDriver(joystickAdaptor,
 			"./platforms/joystick/configs/dualshock3.json",
 		)

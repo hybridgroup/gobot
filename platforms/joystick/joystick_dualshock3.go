@@ -13,12 +13,20 @@ var dualshock3Config = joystickConfig{
 			ID:   1,
 		},
 		{
+			Name: "l2",
+			ID:   2,
+		},
+		{
 			Name: "right_x",
 			ID:   3,
 		},
 		{
 			Name: "right_y",
 			ID:   4,
+		},
+		{
+			Name: "r2",
+			ID:   5,
 		},
 	},
 	Buttons: []pair{

@@ -6,8 +6,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/veandco/go-sdl2/sdl"
 	"gobot.io/x/gobot/v2"
+	js "github.com/0xcafed00d/joystick"
 )
 
 const (
@@ -46,7 +46,9 @@ type Driver struct {
 	connection gobot.Connection
 	configPath string
 	config     joystickConfig
-	poll       func() sdl.Event
+	buttonState map[int]bool
+	axisState map[int]int
+
 	halt       chan bool
 	gobot.Eventer
 }
@@ -86,9 +88,9 @@ func NewDriver(a *Adaptor, config string, v ...time.Duration) *Driver {
 		connection: a,
 		Eventer:    gobot.NewEventer(),
 		configPath: config,
-		poll: func() sdl.Event {
-			return sdl.PollEvent()
-		},
+		buttonState: make(map[int]bool),
+		axisState: make(map[int]int),
+
 		interval: 10 * time.Millisecond,
 		halt:     make(chan bool),
 	}
@@ -159,18 +161,17 @@ func (j *Driver) Start() (err error) {
 	for _, value := range j.config.Axis {
 		j.AddEvent(value.Name)
 	}
-	for _, value := range j.config.Hats {
-		j.AddEvent(fmt.Sprintf("%s_press", value.Name))
-		j.AddEvent(fmt.Sprintf("%s_release", value.Name))
-	}
 
 	go func() {
 		for {
-			for event := j.poll(); event != nil; event = j.poll() {
-				if errs := j.handleEvent(event); errs != nil {
-					j.Publish(j.Event("error"), errs)
-				}
+			state, err := j.adaptor().joystick.Read()
+			if err != nil {
+				j.Publish(j.Event("error"), err)
+				break
 			}
+			j.handleButtons(state)
+			j.handleAxes(state)
+
 			select {
 			case <-time.After(j.interval):
 			case <-j.halt:
@@ -189,60 +190,52 @@ func (j *Driver) Halt() (err error) {
 
 var previousHat = ""
 
-// HandleEvent publishes an specific event according to data received
-func (j *Driver) handleEvent(event sdl.Event) error {
-	switch data := event.(type) {
-	case *sdl.JoyAxisEvent:
-		if data.Which == j.adaptor().joystick.InstanceID() {
-			axis := j.findName(data.Axis, j.config.Axis)
-			if axis == "" {
-				return fmt.Errorf("Unknown Axis: %v", data.Axis)
+func (j *Driver) handleButtons(state js.State) error {
+	for button := 0; button < j.adaptor().joystick.ButtonCount(); button++ {
+		switch {
+		case state.Buttons&(1<<uint32(button)) != 0 && !j.buttonState[button]:
+			j.buttonState[button] = true
+			name := j.findName(uint8(button), j.config.Buttons)
+			if name == "" {
+				return fmt.Errorf("Unknown button: %v", button)
 			}
-			j.Publish(j.Event(axis), data.Value)
-		}
-	case *sdl.JoyButtonEvent:
-		if data.Which == j.adaptor().joystick.InstanceID() {
-			button := j.findName(data.Button, j.config.Buttons)
-			if button == "" {
-				return fmt.Errorf("Unknown Button: %v", data.Button)
+
+			j.Publish(j.Event(fmt.Sprintf("%s_press", name)), nil)
+		case state.Buttons&(1<<uint32(button)) == 0 && j.buttonState[button]:
+			j.buttonState[button] = false
+			name := j.findName(uint8(button), j.config.Buttons)
+			if name == "" {
+				return fmt.Errorf("Unknown button: %v", button)
 			}
-			if data.State == 1 {
-				j.Publish(j.Event(fmt.Sprintf("%s_press", button)), nil)
-			} else {
-				j.Publish(j.Event(fmt.Sprintf("%s_release", button)), nil)
-			}
-		}
-	case *sdl.JoyHatEvent:
-		if data.Which == j.adaptor().joystick.InstanceID() {
-			hat := j.findHatName(data.Value, data.Hat, j.config.Hats)
-			if hat == "" {
-				return fmt.Errorf("Unknown Hat: %v %v", data.Hat, data.Value)
-			} else if hat == "released" {
-				hat = previousHat
-				j.Publish(j.Event(fmt.Sprintf("%s_release", hat)), true)
-			} else {
-				previousHat = hat
-				j.Publish(j.Event(fmt.Sprintf("%s_press", hat)), true)
-			}
+
+			j.Publish(j.Event(fmt.Sprintf("%s_release", name)), nil)
 		}
 	}
+
 	return nil
 }
 
+func (j *Driver) handleAxes(state js.State) error {
+	for axis := 0; axis < j.adaptor().joystick.AxisCount(); axis++ {
+		name := j.findName(uint8(axis), j.config.Axis)
+		if name == "" {
+			return fmt.Errorf("Unknown Axis: %v", axis)
+		}
+
+		if j.axisState[axis] != state.AxisData[axis] {
+			j.axisState[axis] = state.AxisData[axis]
+			j.Publish(name, state.AxisData[axis])
+		}
+	}
+
+	return nil
+}
+
+// findName returns name from button or axis found by id in provided list
 func (j *Driver) findName(id uint8, list []pair) string {
 	for _, value := range list {
 		if int(id) == value.ID {
 			return value.Name
-		}
-	}
-	return ""
-}
-
-// findHatName returns name from hat found by id in provided list
-func (j *Driver) findHatName(id uint8, hat uint8, list []hat) string {
-	for _, lHat := range list {
-		if int(id) == lHat.ID && int(hat) == lHat.Hat {
-			return lHat.Name
 		}
 	}
 	return ""

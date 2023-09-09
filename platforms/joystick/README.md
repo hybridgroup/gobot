@@ -1,6 +1,6 @@
 # Joystick
 
-You can use Gobot with any USB joystick or game controller that is compatible with [Simple DirectMedia Layer](http://www.libsdl.org/).
+You can use Gobot with many USB joysticks and game controllers.
 
 Current configurations included:
 
@@ -14,41 +14,24 @@ Current configurations included:
 
 ## How to Install
 
-This package requires `sdl2` to be installed on your system
+Any platform specific info here...
 
 ### macOS
 
-To install `sdl2` on macOS using Homebrew:
-
-```sh
-brew install sdl2
-```
-
-To use an XBox360 controller on macOS, you will most likely need to install additional software such as [https://github.com/360Controller/360Controller](https://github.com/360Controller/360Controller).
 
 ### Linux (Ubuntu and Raspbian)
 
-Please refer to the main [README.md](https://github.com/hybridgroup/gobot/blob/release/README.md)
 
-You must be running a Linux kernel that is v4.14+ in order for the various controller mappings to work as expected.
+### Windows
 
-Then you must install the latest SDL2 v2.0.8 or greater:
-
-```sh
-wget https://www.libsdl.org/release/SDL2-2.0.8.tar.gz
-tar -zxvf SDL2-2.0.8.tar.gz
-cd SDL2-2.0.8/
-./configure && make && sudo make install
-```
 
 ## How to Use
 
-Controller configurations are stored in Gobot it, but you can also use external file in JSON format. Take a look at the
-`configs` directory for examples.
+Controller configurations are stored in Gobot, but you can also use external file in JSON format. Take a look at the `configs` directory for examples.
 
 ## How to Connect
 
-Plug your USB joystick or game controller into your USB port. If your device is supported by SDL, you are now ready.
+Plug your USB joystick or game controller into your USB port. If your device is supported by your operating system, it might prompt you to install some system drivers.
 
 For the Dualshock4, you must pair the device with your computers Bluetooth interface first, before running your Gobot program.
 
@@ -67,7 +50,7 @@ import (
 )
 
 func main() {
-  joystickAdaptor := joystick.NewAdaptor()
+  joystickAdaptor := joystick.NewAdaptor(0)
   stick := joystick.NewDriver(joystickAdaptor, "dualshock3",
   )
 
@@ -151,25 +134,4 @@ func main() {
 
 ## How to Add A New Joystick
 
-In the `bin` directory for this package is a CLI utility program that scans for SDL joystick events, and displays the ID
-and value:
-
-```sh
-$ go run ./platforms/joystick/bin/scanner.go
-Joystick 0 connected
-[6625 ms] Axis: 1       value:-22686
-[6641 ms] Axis: 1       value:-32768
-[6836 ms] Axis: 1       value:-18317
-[6852 ms] Axis: 1       value:0
-[8663 ms] Axis: 3       value:-32768
-[8873 ms] Axis: 3       value:0
-[10183 ms] Axis: 0      value:-24703
-[10183 ms] Axis: 0      value:-32768
-[10313 ms] Axis: 1      value:-3193
-[10329 ms] Axis: 1      value:0
-[10345 ms] Axis: 0      value:0
-```
-
-You can use the output from this program to create a JSON file for the various buttons and axes on your joystick/gamepad.
-You could also create a file similar to `joystick_dualshock3.go` and submit a pull request with the new configuration so
-others can use it as well.
+You can create a file similar to `joystick_dualshock3.go` and submit a pull request with the new configuration so others can use it as well.
