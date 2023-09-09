@@ -43,7 +43,7 @@ var leftX, leftY, rightX, rightY atomic.Value
 const offset = 32767.0
 
 func main() {
-	joystickAdaptor := joystick.NewAdaptor()
+	joystickAdaptor := joystick.NewAdaptor(0)
 	stick := joystick.NewDriver(joystickAdaptor,
 		"./platforms/joystick/configs/dualshock3.json",
 	)

@@ -74,7 +74,7 @@ var (
 	flightData *tello.FlightData
 
 	// joystick
-	joyAdaptor                   = joystick.NewAdaptor()
+	joyAdaptor                   = joystick.NewAdaptor(0)
 	stick                        = joystick.NewDriver(joyAdaptor, "dualshock4")
 	leftX, leftY, rightX, rightY atomic.Value
 )

@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-	joystickAdaptor := joystick.NewAdaptor()
+	joystickAdaptor := joystick.NewAdaptor(0)
 	stick := joystick.NewDriver(joystickAdaptor, joystick.Dualshock3)
 
 	work := func() {
@@ -64,14 +64,26 @@ func main() {
 		stick.On(joystick.RightPress, func(data interface{}) {
 			fmt.Println("right_press")
 		})
+		stick.On(joystick.RightRelease, func(data interface{}) {
+			fmt.Println("right_release")
+		})
 		stick.On(joystick.LeftPress, func(data interface{}) {
 			fmt.Println("left_press")
+		})
+		stick.On(joystick.LeftRelease, func(data interface{}) {
+			fmt.Println("left_release")
 		})
 		stick.On(joystick.UpPress, func(data interface{}) {
 			fmt.Println("up_press")
 		})
+		stick.On(joystick.UpRelease, func(data interface{}) {
+			fmt.Println("up_release")
+		})
 		stick.On(joystick.DownPress, func(data interface{}) {
 			fmt.Println("down_press")
+		})
+		stick.On(joystick.DownRelease, func(data interface{}) {
+			fmt.Println("down_release")
 		})
 
 		// joysticks
@@ -92,14 +104,26 @@ func main() {
 		stick.On(joystick.R1Press, func(data interface{}) {
 			fmt.Println("R1Press", data)
 		})
+		stick.On(joystick.R1Release, func(data interface{}) {
+			fmt.Println("R1Release", data)
+		})
 		stick.On(joystick.R2Press, func(data interface{}) {
 			fmt.Println("R2Press", data)
+		})
+		stick.On(joystick.R2Release, func(data interface{}) {
+			fmt.Println("R2Release", data)
 		})
 		stick.On(joystick.L1Press, func(data interface{}) {
 			fmt.Println("L1Press", data)
 		})
+		stick.On(joystick.L1Release, func(data interface{}) {
+			fmt.Println("L1Release", data)
+		})
 		stick.On(joystick.L2Press, func(data interface{}) {
 			fmt.Println("L2Press", data)
+		})
+		stick.On(joystick.L2Release, func(data interface{}) {
+			fmt.Println("L2Release", data)
 		})
 	}
 
