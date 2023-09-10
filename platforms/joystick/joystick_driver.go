@@ -120,39 +120,11 @@ func (j *Driver) adaptor() *Adaptor {
 //		[button]_release
 //		[axis]
 func (j *Driver) Start() (err error) {
-	switch j.configPath {
-	case Dualshock3:
-		j.config = dualshock3Config
-	case Dualshock4:
-		j.config = dualshock4Config
-	case Dualsense:
-		j.config = dualsenseConfig
-	case TFlightHotasX:
-		j.config = tflightHotasXConfig
-	case Xbox360:
-		j.config = xbox360Config
-	case Xbox360RockBandDrums:
-		j.config = xbox360RockBandDrumsConfig
-	case XboxOne:
-		j.config = xboxOneConfig
-	case Shield:
-		j.config = shieldConfig
-	case NintendoSwitchPair:
-		j.config = joyconPairConfig
-	default:
-		err := j.loadFile()
-		if err != nil {
-			return err
-		}
+	if err := j.initConfig(); err != nil {
+		return err
 	}
 
-	for _, value := range j.config.Buttons {
-		j.AddEvent(fmt.Sprintf("%s_press", value.Name))
-		j.AddEvent(fmt.Sprintf("%s_release", value.Name))
-	}
-	for _, value := range j.config.Axis {
-		j.AddEvent(value.Name)
-	}
+	j.initEvents()
 
 	go func() {
 		for {
@@ -180,6 +152,46 @@ func (j *Driver) Start() (err error) {
 		}
 	}()
 	return
+}
+
+func (j *Driver) initConfig() error {
+	switch j.configPath {
+	case Dualshock3:
+		j.config = dualshock3Config
+	case Dualshock4:
+		j.config = dualshock4Config
+	case Dualsense:
+		j.config = dualsenseConfig
+	case TFlightHotasX:
+		j.config = tflightHotasXConfig
+	case Xbox360:
+		j.config = xbox360Config
+	case Xbox360RockBandDrums:
+		j.config = xbox360RockBandDrumsConfig
+	case XboxOne:
+		j.config = xboxOneConfig
+	case Shield:
+		j.config = shieldConfig
+	case NintendoSwitchPair:
+		j.config = joyconPairConfig
+	default:
+		err := j.loadFile()
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (j *Driver) initEvents() {
+	for _, value := range j.config.Buttons {
+		j.AddEvent(fmt.Sprintf("%s_press", value.Name))
+		j.AddEvent(fmt.Sprintf("%s_release", value.Name))
+	}
+	for _, value := range j.config.Axis {
+		j.AddEvent(value.Name)
+	}
 }
 
 // Halt stops joystick driver
