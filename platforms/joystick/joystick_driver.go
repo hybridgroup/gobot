@@ -6,8 +6,8 @@ import (
 	"os"
 	"time"
 
-	"gobot.io/x/gobot/v2"
 	js "github.com/0xcafed00d/joystick"
+	"gobot.io/x/gobot/v2"
 )
 
 const (
@@ -41,15 +41,15 @@ const (
 
 // Driver represents a joystick
 type Driver struct {
-	name       string
-	interval   time.Duration
-	connection gobot.Connection
-	configPath string
-	config     joystickConfig
+	name        string
+	interval    time.Duration
+	connection  gobot.Connection
+	configPath  string
+	config      joystickConfig
 	buttonState map[int]bool
-	axisState map[int]int
+	axisState   map[int]int
 
-	halt       chan bool
+	halt chan bool
 	gobot.Eventer
 }
 
@@ -76,12 +76,12 @@ type joystickConfig struct {
 //	time.Duration: Interval at which the Driver is polled for new information
 func NewDriver(a *Adaptor, config string, v ...time.Duration) *Driver {
 	d := &Driver{
-		name:       gobot.DefaultName("Joystick"),
-		connection: a,
-		Eventer:    gobot.NewEventer(),
-		configPath: config,
+		name:        gobot.DefaultName("Joystick"),
+		connection:  a,
+		Eventer:     gobot.NewEventer(),
+		configPath:  config,
 		buttonState: make(map[int]bool),
-		axisState: make(map[int]int),
+		axisState:   make(map[int]int),
 
 		interval: 10 * time.Millisecond,
 		halt:     make(chan bool),
@@ -161,8 +161,16 @@ func (j *Driver) Start() (err error) {
 				j.Publish(j.Event("error"), err)
 				break
 			}
-			j.handleButtons(state)
-			j.handleAxes(state)
+
+			// might just be missing a button definition, so keep going
+			if err := j.handleButtons(state); err != nil {
+				j.Publish(j.Event("error"), err)
+			}
+
+			// might just be missing an axis definition, so keep going
+			if err := j.handleAxes(state); err != nil {
+				j.Publish(j.Event("error"), err)
+			}
 
 			select {
 			case <-time.After(j.interval):

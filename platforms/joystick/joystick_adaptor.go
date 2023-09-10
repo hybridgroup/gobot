@@ -8,15 +8,10 @@ import (
 	js "github.com/0xcafed00d/joystick"
 )
 
-type joystick interface {
-	Close()
-	ID() int
-}
-
 // Adaptor represents a connection to a joystick
 type Adaptor struct {
 	name     string
-	id int
+	id       int
 	joystick js.Joystick
 	connect  func(*Adaptor) error
 }

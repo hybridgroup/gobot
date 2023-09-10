@@ -3,9 +3,7 @@ Package joystick provides the Gobot adaptor and drivers for game controllers tha
 
 Installing:
 
-    This package requires `sdl2` to be installed on your system
-
-    Please refer to the main [README.md](https://github.com/hybridgroup/gobot/blob/release/README.md)
+	Please refer to the main [README.md](https://github.com/hybridgroup/gobot/blob/release/README.md)
 
 Example:
 
@@ -20,9 +18,7 @@ Example:
 
 	func main() {
 		joystickAdaptor := joystick.NewAdaptor(0)
-		joystick := joystick.NewDriver(joystickAdaptor,
-			"./platforms/joystick/configs/dualshock3.json",
-		)
+		joystick := joystick.NewDriver(joystickAdaptor, "dualshock3")
 
 		work := func() {
 			joystick.On(joystick.Event("square_press"), func(data interface{}) {
