@@ -56,7 +56,7 @@ func TestDriverHandleEvent(t *testing.T) {
 	if err := d.initConfig(); err != nil {
 		t.Errorf("initConfig() error: %v", err)
 	}
-	
+
 	d.initEvents()
 
 	// left x stick
@@ -106,5 +106,5 @@ func TestDriverHandleEvent(t *testing.T) {
 func TestDriverInvalidConfig(t *testing.T) {
 	d, _ := initTestDriver("./configs/doesnotexist")
 	err := d.Start()
-	gobottest.Assert(t, strings.Contains(err.Error(), "open ./configs/doesnotexist: no such file or directory"), true)
+	gobottest.Assert(t, strings.Contains(err.Error(), "loadfile error"), true)
 }

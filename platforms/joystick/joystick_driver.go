@@ -177,7 +177,7 @@ func (j *Driver) initConfig() error {
 	default:
 		err := j.loadFile()
 		if err != nil {
-			return err
+			return fmt.Errorf("loadfile error: %w", err)
 		}
 	}
 
