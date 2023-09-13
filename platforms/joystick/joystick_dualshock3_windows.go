@@ -13,82 +13,74 @@ var dualshock3Config = joystickConfig{
 			ID:   1,
 		},
 		{
-			Name: "l2",
+			Name: "right_x",
 			ID:   2,
 		},
 		{
-			Name: "right_x",
-			ID:   3,
-		},
-		{
 			Name: "right_y",
-			ID:   4,
-		},
-		{
-			Name: "r2",
-			ID:   5,
+			ID:   3,
 		},
 	},
 	Buttons: []pair{
 		{
 			Name: "square",
-			ID:   3,
-		},
-		{
-			Name: "triangle",
-			ID:   2,
-		},
-		{
-			Name: "circle",
-			ID:   1,
-		},
-		{
-			Name: "x",
-			ID:   0,
-		},
-		{
-			Name: "up",
-			ID:   13,
-		},
-		{
-			Name: "down",
-			ID:   14,
-		},
-		{
-			Name: "left",
 			ID:   15,
 		},
 		{
-			Name: "right",
-			ID:   16,
+			Name: "triangle",
+			ID:   12,
 		},
 		{
-			Name: "l1",
+			Name: "circle",
+			ID:   13,
+		},
+		{
+			Name: "x",
+			ID:   14,
+		},
+		{
+			Name: "up",
 			ID:   4,
 		},
 		{
-			Name: "l2",
+			Name: "down",
 			ID:   6,
 		},
 		{
-			Name: "r1",
+			Name: "left",
+			ID:   17,
+		},
+		{
+			Name: "right",
 			ID:   5,
 		},
 		{
-			Name: "r2",
-			ID:   7,
+			Name: "l1",
+			ID:   10,
 		},
 		{
-			Name: "start",
-			ID:   9,
-		},
-		{
-			Name: "select",
+			Name: "l2",
 			ID:   8,
 		},
 		{
+			Name: "r1",
+			ID:   11,
+		},
+		{
+			Name: "r2",
+			ID:   9,
+		},
+		{
+			Name: "start",
+			ID:   3,
+		},
+		{
+			Name: "select",
+			ID:   0,
+		},
+		{
 			Name: "home",
-			ID:   10,
+			ID:   16,
 		},
 	},
 }
