@@ -12,9 +12,9 @@ require (
 	github.com/hybridgroup/go-ardrone v0.0.0-20140402002621-b9750d8d7b78
 	github.com/hybridgroup/mjpeg v0.0.0-20140228234708-4680f319790e
 	github.com/nats-io/nats.go v1.27.1
+	github.com/nsf/termbox-go v1.1.1
 	github.com/sigurn/crc8 v0.0.0-20220107193325-2243fe600f9f
 	github.com/stretchr/testify v1.8.4
-	github.com/veandco/go-sdl2 v0.4.35
 	github.com/warthog618/gpiod v0.8.1
 	go.bug.st/serial v1.5.0
 	gocv.io/x/gocv v0.33.0
@@ -40,7 +40,6 @@ require (
 	github.com/nats-io/nats-server/v2 v2.7.4 // indirect
 	github.com/nats-io/nkeys v0.4.4 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
-	github.com/nsf/termbox-go v1.1.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/saltosystems/winrt-go v0.0.0-20230613063811-c792451fa808 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
