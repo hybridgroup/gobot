@@ -5,9 +5,8 @@
 // Do not build by default.
 //
 // Joystick scanner
-// Based on original code from Jacky Boen
-// https://github.com/veandco/go-sdl2/blob/master/examples/events/events.go
-
+// Based on original code from
+// https://github.com/0xcafed00d/joystick/blob/master/joysticktest/joysticktest.go
 // Simple program that displays the state of the specified joystick
 //
 //     go run joysticktest.go 2

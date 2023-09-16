@@ -5,8 +5,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 
 	js "github.com/0xcafed00d/joystick"
 )
@@ -14,7 +15,7 @@ import (
 var _ gobot.Driver = (*Driver)(nil)
 
 func initTestDriver(config string) (*Driver, *testJoystick) {
-	a := NewAdaptor(6)
+	a := NewAdaptor("6")
 	tj := &testJoystick{}
 	a.connect = func(j *Adaptor) (err error) {
 		j.joystick = tj
@@ -27,15 +28,15 @@ func initTestDriver(config string) (*Driver, *testJoystick) {
 
 func TestJoystickDriverName(t *testing.T) {
 	d, _ := initTestDriver("./configs/dualshock3.json")
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "Joystick"), true)
+	assert.True(t, strings.HasPrefix(d.Name(), "Joystick"))
 	d.SetName("NewName")
-	gobottest.Assert(t, d.Name(), "NewName")
+	assert.Equal(t, d.Name(), "NewName")
 }
 
 func TestDriverStart(t *testing.T) {
 	d, _ := initTestDriver("./configs/dualshock3.json")
 	d.interval = 1 * time.Millisecond
-	gobottest.Assert(t, d.Start(), nil)
+	assert.Nil(t, d.Start())
 	time.Sleep(2 * time.Millisecond)
 }
 
@@ -44,10 +45,66 @@ func TestDriverHalt(t *testing.T) {
 	go func() {
 		<-d.halt
 	}()
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.Nil(t, d.Halt())
 }
 
 func TestDriverHandleEvent(t *testing.T) {
+	sem := make(chan bool)
+	d, tj := initTestDriver("dualshock3")
+	tj.axisCount = 6
+	tj.buttonCount = 17
+
+	if err := d.initConfig(); err != nil {
+		t.Errorf("initConfig() error: %v", err)
+	}
+
+	d.initEvents()
+
+	// left x stick
+	_ = d.On(d.Event("left_x"), func(data interface{}) {
+		assert.Equal(t, int(255), data.(int))
+		sem <- true
+	})
+	_ = d.handleAxes(js.State{
+		AxisData: []int{255, 0, 0, 0, 0, 0},
+		Buttons:  0,
+	})
+	select {
+	case <-sem:
+	case <-time.After(1 * time.Second):
+		t.Errorf("Button Event \"left_x\" was not published")
+	}
+
+	// square button press
+	_ = d.On(d.Event("square_press"), func(data interface{}) {
+		sem <- true
+	})
+	_ = d.handleButtons(js.State{
+		AxisData: []int{255, 0, 0, 0, 0, 0},
+		Buttons:  1 << d.findID("square", d.config.Buttons),
+	})
+	select {
+	case <-sem:
+	case <-time.After(1 * time.Second):
+		t.Errorf("Button Event \"square_press\" was not published")
+	}
+
+	// square button release
+	_ = d.On(d.Event("square_release"), func(data interface{}) {
+		sem <- true
+	})
+	_ = d.handleButtons(js.State{
+		AxisData: []int{255, 0, 0, 0, 0, 0},
+		Buttons:  0,
+	})
+	select {
+	case <-sem:
+	case <-time.After(1 * time.Second):
+		t.Errorf("Button Event \"square_release\" was not published")
+	}
+}
+
+func TestDriverHandleEventJSON(t *testing.T) {
 	sem := make(chan bool)
 	d, tj := initTestDriver("./configs/dualshock3.json")
 	tj.axisCount = 6
@@ -61,7 +118,7 @@ func TestDriverHandleEvent(t *testing.T) {
 
 	// left x stick
 	_ = d.On(d.Event("left_x"), func(data interface{}) {
-		gobottest.Assert(t, int(255), data.(int))
+		assert.Equal(t, int(255), data.(int))
 		sem <- true
 	})
 	_ = d.handleAxes(js.State{
@@ -74,22 +131,22 @@ func TestDriverHandleEvent(t *testing.T) {
 		t.Errorf("Button Event \"left_x\" was not published")
 	}
 
-	// x button press
-	_ = d.On(d.Event("x_press"), func(data interface{}) {
+	// square button press
+	_ = d.On(d.Event("square_press"), func(data interface{}) {
 		sem <- true
 	})
 	_ = d.handleButtons(js.State{
 		AxisData: []int{255, 0, 0, 0, 0, 0},
-		Buttons:  1 << 14,
+		Buttons:  1 << d.findID("square", d.config.Buttons),
 	})
 	select {
 	case <-sem:
 	case <-time.After(1 * time.Second):
-		t.Errorf("Button Event \"x_press\" was not published")
+		t.Errorf("Button Event \"square_press\" was not published")
 	}
 
-	// x button release
-	_ = d.On(d.Event("x_release"), func(data interface{}) {
+	// square button release
+	_ = d.On(d.Event("square_release"), func(data interface{}) {
 		sem <- true
 	})
 	_ = d.handleButtons(js.State{
@@ -99,12 +156,12 @@ func TestDriverHandleEvent(t *testing.T) {
 	select {
 	case <-sem:
 	case <-time.After(1 * time.Second):
-		t.Errorf("Button Event \"x_release\" was not published")
+		t.Errorf("Button Event \"square_release\" was not published")
 	}
 }
 
 func TestDriverInvalidConfig(t *testing.T) {
 	d, _ := initTestDriver("./configs/doesnotexist")
 	err := d.Start()
-	gobottest.Assert(t, strings.Contains(err.Error(), "loadfile error"), true)
+	assert.True(t, strings.Contains(err.Error(), "loadfile error"))
 }

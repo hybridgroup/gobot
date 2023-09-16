@@ -119,7 +119,7 @@ func (j *Driver) adaptor() *Adaptor {
 //		[button]_press
 //		[button]_release
 //		[axis]
-func (j *Driver) Start() (err error) {
+func (j *Driver) Start() error {
 	if err := j.initConfig(); err != nil {
 		return err
 	}
@@ -151,7 +151,8 @@ func (j *Driver) Start() (err error) {
 			}
 		}
 	}()
-	return
+
+	return nil
 }
 
 func (j *Driver) initConfig() error {
@@ -202,23 +203,19 @@ func (j *Driver) Halt() (err error) {
 
 func (j *Driver) handleButtons(state js.State) error {
 	for button := 0; button < j.adaptor().joystick.ButtonCount(); button++ {
-		switch {
-		case state.Buttons&(1<<uint32(button)) != 0 && !j.buttonState[button]:
-			j.buttonState[button] = true
+		buttonPressed := state.Buttons&(1<<uint32(button)) != 0
+		if buttonPressed != j.buttonState[button] {
+			j.buttonState[button] = buttonPressed
 			name := j.findName(uint8(button), j.config.Buttons)
 			if name == "" {
 				return fmt.Errorf("Unknown button: %v", button)
 			}
 
-			j.Publish(j.Event(fmt.Sprintf("%s_press", name)), nil)
-		case state.Buttons&(1<<uint32(button)) == 0 && j.buttonState[button]:
-			j.buttonState[button] = false
-			name := j.findName(uint8(button), j.config.Buttons)
-			if name == "" {
-				return fmt.Errorf("Unknown button: %v", button)
+			if buttonPressed {
+				j.Publish(j.Event(fmt.Sprintf("%s_press", name)), nil)
+			} else {
+				j.Publish(j.Event(fmt.Sprintf("%s_release", name)), nil)
 			}
-
-			j.Publish(j.Event(fmt.Sprintf("%s_release", name)), nil)
 		}
 	}
 
@@ -249,6 +246,16 @@ func (j *Driver) findName(id uint8, list []pair) string {
 		}
 	}
 	return ""
+}
+
+// findID returns the ID based on the name from button or axis.
+func (j *Driver) findID(name string, list []pair) int {
+	for _, value := range list {
+		if name == value.Name {
+			return value.ID
+		}
+	}
+	return 0
 }
 
 // loadFile load the joystick config from a .json file

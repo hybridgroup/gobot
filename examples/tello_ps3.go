@@ -37,7 +37,7 @@ var leftX, leftY, rightX, rightY atomic.Value
 const offset = 32767.0
 
 func main() {
-	joystickAdaptor := joystick.NewAdaptor(0)
+	joystickAdaptor := joystick.NewAdaptor("0")
 	stick := joystick.NewDriver(joystickAdaptor, "dualshock3")
 
 	drone := tello.NewDriver("8888")

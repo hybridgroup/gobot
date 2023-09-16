@@ -2,6 +2,7 @@ package joystick
 
 import (
 	"fmt"
+	"strconv"
 
 	"gobot.io/x/gobot/v2"
 
@@ -11,18 +12,23 @@ import (
 // Adaptor represents a connection to a joystick
 type Adaptor struct {
 	name     string
-	id       int
+	id       string
 	joystick js.Joystick
 	connect  func(*Adaptor) error
 }
 
 // NewAdaptor returns a new Joystick Adaptor.
 // Pass in the ID of the joystick you wish to connect to.
-func NewAdaptor(id int) *Adaptor {
+func NewAdaptor(id string) *Adaptor {
 	return &Adaptor{
 		name: gobot.DefaultName("Joystick"),
 		connect: func(j *Adaptor) error {
-			joy, err := js.Open(id)
+			i, err := strconv.Atoi(id)
+			if err != nil {
+				return fmt.Errorf("Invalid joystick ID: %v", err)
+			}
+
+			joy, err := js.Open(i)
 			if err != nil {
 				return fmt.Errorf("No joystick available: %v", err)
 			}

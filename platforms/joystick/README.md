@@ -50,7 +50,7 @@ import (
 )
 
 func main() {
-  joystickAdaptor := joystick.NewAdaptor(0)
+  joystickAdaptor := joystick.NewAdaptor("0")
   stick := joystick.NewDriver(joystickAdaptor, "dualshock3",
   )
 

@@ -1,5 +1,5 @@
 /*
-Package joystick provides the Gobot adaptor and drivers for game controllers that are compatible with SDL.
+Package joystick provides the Gobot adaptor and drivers for game controllers and joysticks.
 
 Installing:
 
@@ -17,7 +17,7 @@ Example:
 	)
 
 	func main() {
-		joystickAdaptor := joystick.NewAdaptor(0)
+		joystickAdaptor := joystick.NewAdaptor("0")
 		joystick := joystick.NewDriver(joystickAdaptor, "dualshock3")
 
 		work := func() {
