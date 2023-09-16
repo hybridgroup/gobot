@@ -48,7 +48,7 @@ func TestDriverHalt(t *testing.T) {
 	assert.Nil(t, d.Halt())
 }
 
-func TestDriverHandleEvent(t *testing.T) {
+func TestDriverHandleEventDS3(t *testing.T) {
 	sem := make(chan bool)
 	d, tj := initTestDriver("dualshock3")
 	tj.axisCount = 6
@@ -104,9 +104,65 @@ func TestDriverHandleEvent(t *testing.T) {
 	}
 }
 
-func TestDriverHandleEventJSON(t *testing.T) {
+func TestDriverHandleEventJSONDS3(t *testing.T) {
 	sem := make(chan bool)
 	d, tj := initTestDriver("./configs/dualshock3.json")
+	tj.axisCount = 6
+	tj.buttonCount = 17
+
+	if err := d.initConfig(); err != nil {
+		t.Errorf("initConfig() error: %v", err)
+	}
+
+	d.initEvents()
+
+	// left x stick
+	_ = d.On(d.Event("left_x"), func(data interface{}) {
+		assert.Equal(t, int(255), data.(int))
+		sem <- true
+	})
+	_ = d.handleAxes(js.State{
+		AxisData: []int{255, 0, 0, 0, 0, 0},
+		Buttons:  0,
+	})
+	select {
+	case <-sem:
+	case <-time.After(1 * time.Second):
+		t.Errorf("Button Event \"left_x\" was not published")
+	}
+
+	// square button press
+	_ = d.On(d.Event("square_press"), func(data interface{}) {
+		sem <- true
+	})
+	_ = d.handleButtons(js.State{
+		AxisData: []int{255, 0, 0, 0, 0, 0},
+		Buttons:  1 << d.findID("square", d.config.Buttons),
+	})
+	select {
+	case <-sem:
+	case <-time.After(1 * time.Second):
+		t.Errorf("Button Event \"square_press\" was not published")
+	}
+
+	// square button release
+	_ = d.On(d.Event("square_release"), func(data interface{}) {
+		sem <- true
+	})
+	_ = d.handleButtons(js.State{
+		AxisData: []int{255, 0, 0, 0, 0, 0},
+		Buttons:  0,
+	})
+	select {
+	case <-sem:
+	case <-time.After(1 * time.Second):
+		t.Errorf("Button Event \"square_release\" was not published")
+	}
+}
+
+func TestDriverHandleEventDS4(t *testing.T) {
+	sem := make(chan bool)
+	d, tj := initTestDriver("dualshock4")
 	tj.axisCount = 6
 	tj.buttonCount = 17
 

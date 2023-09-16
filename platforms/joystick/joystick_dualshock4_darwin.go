@@ -14,15 +14,15 @@ var dualshock4Config = joystickConfig{
 		},
 		{
 			Name: "right_x",
-			ID:   3,
+			ID:   2,
 		},
 		{
 			Name: "right_y",
-			ID:   4,
+			ID:   3,
 		},
 		{
 			Name: "l2",
-			ID:   2,
+			ID:   4,
 		},
 		{
 			Name: "r2",
@@ -32,19 +32,19 @@ var dualshock4Config = joystickConfig{
 	Buttons: []pair{
 		{
 			Name: "square",
-			ID:   3,
+			ID:   0,
 		},
 		{
 			Name: "triangle",
-			ID:   2,
+			ID:   3,
 		},
 		{
 			Name: "circle",
-			ID:   1,
+			ID:   2,
 		},
 		{
 			Name: "x",
-			ID:   0,
+			ID:   1,
 		},
 		{
 			Name: "l1",
@@ -64,7 +64,7 @@ var dualshock4Config = joystickConfig{
 		},
 		{
 			Name: "share",
-			ID:   8,
+			ID:   13,
 		},
 		{
 			Name: "options",
@@ -72,7 +72,19 @@ var dualshock4Config = joystickConfig{
 		},
 		{
 			Name: "home",
+			ID:   12,
+		},
+		{
+			Name: "left_joystick",
 			ID:   10,
+		},
+		{
+			Name: "right_joystick",
+			ID:   11,
+		},
+		{
+			Name: "panel",
+			ID:   13,
 		},
 	},
 }
