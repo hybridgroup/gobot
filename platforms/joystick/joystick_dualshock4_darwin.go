@@ -1,8 +1,8 @@
 package joystick
 
-var dualsenseConfig = joystickConfig{
-	Name: "Dualsense Controller",
-	GUID: "E7D56FCA-A01F-4A14-B0D0-4FDAFD847E5E",
+var dualshock4Config = joystickConfig{
+	Name: "Dualshock4 Controller",
+	GUID: "2222",
 	Axis: []pair{
 		{
 			Name: "left_x",
@@ -31,31 +31,31 @@ var dualsenseConfig = joystickConfig{
 	},
 	Buttons: []pair{
 		{
-			Name: "x",
-			ID:   0,
-		},
-		{
-			Name: "circle",
-			ID:   1,
-		},
-		{
 			Name: "square",
-			ID:   2,
+			ID:   0,
 		},
 		{
 			Name: "triangle",
 			ID:   3,
 		},
 		{
-			Name: "create",
+			Name: "circle",
+			ID:   2,
+		},
+		{
+			Name: "x",
+			ID:   1,
+		},
+		{
+			Name: "l1",
 			ID:   4,
 		},
 		{
-			Name: "options",
+			Name: "l2",
 			ID:   6,
 		},
 		{
-			Name: "ps",
+			Name: "r1",
 			ID:   5,
 		},
 		{
@@ -63,32 +63,28 @@ var dualsenseConfig = joystickConfig{
 			ID:   7,
 		},
 		{
-			Name: "l1",
-			ID:   9,
-		},
-		{
-			Name: "r1",
-			ID:   10,
-		},
-		{
-			Name: "up",
-			ID:   11,
-		},
-		{
-			Name: "down",
-			ID:   12,
-		},
-		{
-			Name: "left",
+			Name: "share",
 			ID:   13,
 		},
 		{
-			Name: "right",
-			ID:   14,
+			Name: "options",
+			ID:   9,
 		},
 		{
-			Name: "trackpad",
-			ID:   15,
+			Name: "home",
+			ID:   12,
+		},
+		{
+			Name: "left_joystick",
+			ID:   10,
+		},
+		{
+			Name: "right_joystick",
+			ID:   11,
+		},
+		{
+			Name: "panel",
+			ID:   13,
 		},
 	},
 }
