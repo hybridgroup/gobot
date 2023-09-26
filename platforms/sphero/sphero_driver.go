@@ -37,6 +37,7 @@ type SpheroDriver struct {
 	syncResponse    [][]uint8
 	packetChannel   chan *packet
 	responseChannel chan []uint8
+	originalColor   []uint8 // Only used for calibration.
 	gobot.Eventer
 	gobot.Commander
 }
@@ -320,6 +321,40 @@ func (s *SpheroDriver) Stop() {
 // ConfigureCollisionDetection configures the sensitivity of the detection.
 func (s *SpheroDriver) ConfigureCollisionDetection(cc CollisionConfig) {
 	s.packetChannel <- s.craftPacket([]uint8{cc.Method, cc.Xt, cc.Yt, cc.Xs, cc.Ys, cc.Dead}, 0x02, 0x12)
+}
+
+// SetCalibration sets up Sphero for manual heading calibration.
+// It does this by turning on the tail light (so you can tell where it's
+// facing) and disabling stabilization (so you can adjust the heading).
+//
+// When done, call FinishCalibration to set the new heading, and re-enable
+// stabilization.
+func (s *SpheroDriver) StartCalibration() {
+	s.mtx.Lock()
+	s.originalColor = s.GetRGB()
+	s.SetRGB(0, 0, 0)
+	s.SetBackLED(127)
+	s.SetStabilization(false)
+	s.mtx.Unlock()
+}
+
+// FinishCalibration ends Sphero's calibration mode, by setting
+// the new heading as current, and re-enabling normal defaults. This is a NOP
+// in case StartCalibration was not called.
+func (s *SpheroDriver) FinishCalibration() {
+	s.mtx.Lock()
+	if s.originalColor == nil {
+		// Piggybacking on the original color being set to know if we are
+		// calibrating or not.
+		return
+	}
+
+	s.SetHeading(0)
+	s.SetRGB(s.originalColor[0], s.originalColor[1], s.originalColor[2])
+	s.SetBackLED(0)
+	s.SetStabilization(true)
+	s.originalColor = nil
+	s.mtx.Unlock()
 }
 
 func (s *SpheroDriver) enableStopOnDisconnect() {
