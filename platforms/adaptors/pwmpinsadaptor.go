@@ -191,7 +191,7 @@ func (a *PWMPinsAdaptor) getDefaultInitializer() func(gobot.PWMPinner) error {
 				return err
 			}
 		}
-		if err := setPeriod(pin, a.periodDefault, false); err != nil {
+		if err := setPeriod(pin, a.periodDefault, a.adjustDutyOnSetPeriod); err != nil {
 			return err
 		}
 		// period needs to be set >1 before all next statements

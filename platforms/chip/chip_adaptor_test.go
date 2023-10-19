@@ -81,6 +81,9 @@ func TestFinalizeErrorAfterGPIO(t *testing.T) {
 
 func TestFinalizeErrorAfterPWM(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem()
+	fs.Files["/sys/class/pwm/pwmchip0/pwm0/duty_cycle"].Contents = "0"
+	fs.Files["/sys/class/pwm/pwmchip0/pwm0/period"].Contents = "0"
+
 	gobottest.Assert(t, a.Connect(), nil)
 	gobottest.Assert(t, a.PwmWrite("PWM0", 100), nil)
 
@@ -122,6 +125,9 @@ func TestProDigitalIO(t *testing.T) {
 
 func TestPWM(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem()
+	fs.Files["/sys/class/pwm/pwmchip0/pwm0/duty_cycle"].Contents = "0"
+	fs.Files["/sys/class/pwm/pwmchip0/pwm0/period"].Contents = "0"
+
 	_ = a.Connect()
 
 	err := a.PwmWrite("PWM0", 100)
@@ -130,17 +136,21 @@ func TestPWM(t *testing.T) {
 	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/export"].Contents, "0")
 	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/pwm0/enable"].Contents, "1")
 	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/pwm0/duty_cycle"].Contents, "3921568")
+	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/pwm0/period"].Contents, "10000000") // pwmPeriodDefault
 	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/pwm0/polarity"].Contents, "normal")
 
 	err = a.ServoWrite("PWM0", 0)
 	gobottest.Assert(t, err, nil)
 
 	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/pwm0/duty_cycle"].Contents, "500000")
+	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/pwm0/period"].Contents, "10000000")
 
 	err = a.ServoWrite("PWM0", 180)
 	gobottest.Assert(t, err, nil)
 
 	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/pwm0/duty_cycle"].Contents, "2000000")
+	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/pwm0/period"].Contents, "10000000") // pwmPeriodDefault
+
 	gobottest.Assert(t, a.Finalize(), nil)
 }
 
