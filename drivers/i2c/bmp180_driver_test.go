@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 // this ensures that the implementation is based on i2c.Driver, which implements the gobot.Driver
@@ -28,19 +28,19 @@ func TestNewBMP180Driver(t *testing.T) {
 	if !ok {
 		t.Errorf("NewBMP180Driver() should have returned a *BMP180Driver")
 	}
-	gobottest.Refute(t, d.Driver, nil)
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "BMP180"), true)
-	gobottest.Assert(t, d.defaultAddress, 0x77)
-	gobottest.Assert(t, d.oversampling, BMP180OversamplingMode(0x00))
-	gobottest.Refute(t, d.calCoeffs, nil)
+	assert.NotNil(t, d.Driver)
+	assert.True(t, strings.HasPrefix(d.Name(), "BMP180"))
+	assert.Equal(t, 0x77, d.defaultAddress)
+	assert.Equal(t, BMP180OversamplingMode(0x00), d.oversampling)
+	assert.NotNil(t, d.calCoeffs)
 }
 
 func TestBMP180Options(t *testing.T) {
 	// This is a general test, that options are applied in constructor by using the common WithBus() option and
 	// least one of this driver. Further tests for options can also be done by call of "WithOption(val)(d)".
 	d := NewBMP180Driver(newI2cTestAdaptor(), WithBus(2), WithBMP180OversamplingMode(0x01))
-	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
-	gobottest.Assert(t, d.oversampling, BMP180OversamplingMode(0x01))
+	assert.Equal(t, 2, d.GetBusOrDefault(1))
+	assert.Equal(t, BMP180OversamplingMode(0x01), d.oversampling)
 }
 
 func TestBMP180Measurements(t *testing.T) {
@@ -72,11 +72,11 @@ func TestBMP180Measurements(t *testing.T) {
 	}
 	_ = bmp180.Start()
 	temp, err := bmp180.Temperature()
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, temp, float32(15.0))
+	assert.Nil(t, err)
+	assert.Equal(t, float32(15.0), temp)
 	pressure, err := bmp180.Pressure()
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, pressure, float32(69964))
+	assert.Nil(t, err)
+	assert.Equal(t, float32(69964), pressure)
 }
 
 func TestBMP180TemperatureError(t *testing.T) {
@@ -108,7 +108,7 @@ func TestBMP180TemperatureError(t *testing.T) {
 	}
 	_ = bmp180.Start()
 	_, err := bmp180.Temperature()
-	gobottest.Assert(t, err, errors.New("temp error"))
+	assert.Errorf(t, err, "temp error")
 }
 
 func TestBMP180PressureError(t *testing.T) {
@@ -138,7 +138,7 @@ func TestBMP180PressureError(t *testing.T) {
 	}
 	_ = bmp180.Start()
 	_, err := bmp180.Pressure()
-	gobottest.Assert(t, err, errors.New("press error"))
+	assert.Errorf(t, err, "press error")
 }
 
 func TestBMP180PressureWriteError(t *testing.T) {
@@ -150,7 +150,7 @@ func TestBMP180PressureWriteError(t *testing.T) {
 	}
 
 	_, err := bmp180.Pressure()
-	gobottest.Assert(t, err, errors.New("write error"))
+	assert.Errorf(t, err, "write error")
 }
 
 func TestBMP180_initialization(t *testing.T) {
@@ -183,26 +183,26 @@ func TestBMP180_initialization(t *testing.T) {
 	// act, assert - initialization() must be called on Start()
 	err := d.Start()
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, numCallsRead, 1)
-	gobottest.Assert(t, len(a.written), 1)
-	gobottest.Assert(t, a.written[0], uint8(0xAA))
-	gobottest.Assert(t, d.calCoeffs.ac1, int16(408))
-	gobottest.Assert(t, d.calCoeffs.ac2, int16(-72))
-	gobottest.Assert(t, d.calCoeffs.ac3, int16(-14383))
-	gobottest.Assert(t, d.calCoeffs.ac4, uint16(32741))
-	gobottest.Assert(t, d.calCoeffs.ac5, uint16(32757))
-	gobottest.Assert(t, d.calCoeffs.ac6, uint16(23153))
-	gobottest.Assert(t, d.calCoeffs.b1, int16(6190))
-	gobottest.Assert(t, d.calCoeffs.b2, int16(4))
-	gobottest.Assert(t, d.calCoeffs.mb, int16(-32768))
-	gobottest.Assert(t, d.calCoeffs.mc, int16(-8711))
-	gobottest.Assert(t, d.calCoeffs.md, int16(2868))
+	assert.Nil(t, err)
+	assert.Equal(t, 1, numCallsRead)
+	assert.Equal(t, 1, len(a.written))
+	assert.Equal(t, uint8(0xAA), a.written[0])
+	assert.Equal(t, int16(408), d.calCoeffs.ac1)
+	assert.Equal(t, int16(-72), d.calCoeffs.ac2)
+	assert.Equal(t, int16(-14383), d.calCoeffs.ac3)
+	assert.Equal(t, uint16(32741), d.calCoeffs.ac4)
+	assert.Equal(t, uint16(32757), d.calCoeffs.ac5)
+	assert.Equal(t, uint16(23153), d.calCoeffs.ac6)
+	assert.Equal(t, int16(6190), d.calCoeffs.b1)
+	assert.Equal(t, int16(4), d.calCoeffs.b2)
+	assert.Equal(t, int16(-32768), d.calCoeffs.mb)
+	assert.Equal(t, int16(-8711), d.calCoeffs.mc)
+	assert.Equal(t, int16(2868), d.calCoeffs.md)
 }
 
 func TestBMP180_bmp180PauseForReading(t *testing.T) {
-	gobottest.Assert(t, bmp180PauseForReading(BMP180UltraLowPower), time.Duration(5*time.Millisecond))
-	gobottest.Assert(t, bmp180PauseForReading(BMP180Standard), time.Duration(8*time.Millisecond))
-	gobottest.Assert(t, bmp180PauseForReading(BMP180HighResolution), time.Duration(14*time.Millisecond))
-	gobottest.Assert(t, bmp180PauseForReading(BMP180UltraHighResolution), time.Duration(26*time.Millisecond))
+	assert.Equal(t, time.Duration(5*time.Millisecond), bmp180PauseForReading(BMP180UltraLowPower))
+	assert.Equal(t, time.Duration(8*time.Millisecond), bmp180PauseForReading(BMP180Standard))
+	assert.Equal(t, time.Duration(14*time.Millisecond), bmp180PauseForReading(BMP180HighResolution))
+	assert.Equal(t, time.Duration(26*time.Millisecond), bmp180PauseForReading(BMP180UltraHighResolution))
 }

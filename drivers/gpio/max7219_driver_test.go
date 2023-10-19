@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Driver = (*MAX7219Driver)(nil)
@@ -32,21 +32,21 @@ func TestMAX7219Driver(t *testing.T) {
 
 func TestMAX7219DriverStart(t *testing.T) {
 	d := initTestMAX7219Driver()
-	gobottest.Assert(t, d.Start(), nil)
+	assert.Nil(t, d.Start())
 }
 
 func TestMAX7219DriverHalt(t *testing.T) {
 	d := initTestMAX7219Driver()
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.Nil(t, d.Halt())
 }
 
 func TestMAX7219DriverDefaultName(t *testing.T) {
 	d := initTestMAX7219Driver()
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "MAX7219Driver"), true)
+	assert.True(t, strings.HasPrefix(d.Name(), "MAX7219Driver"))
 }
 
 func TestMAX7219DriverSetName(t *testing.T) {
 	d := initTestMAX7219Driver()
 	d.SetName("mybot")
-	gobottest.Assert(t, d.Name(), "mybot")
+	assert.Equal(t, "mybot", d.Name())
 }

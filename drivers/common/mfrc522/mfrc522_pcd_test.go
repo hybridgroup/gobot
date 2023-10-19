@@ -3,7 +3,7 @@ package mfrc522
 import (
 	"testing"
 
-	"gobot.io/x/gobot/v2/gobottest"
+	"github.com/stretchr/testify/assert"
 )
 
 type busConnMock struct {
@@ -49,7 +49,7 @@ func TestNewMFRC522Common(t *testing.T) {
 	// act
 	d := NewMFRC522Common()
 	// assert
-	gobottest.Refute(t, d, nil)
+	assert.NotNil(t, d)
 }
 
 func TestInitialize(t *testing.T) {
@@ -63,12 +63,12 @@ func TestInitialize(t *testing.T) {
 	// act
 	err := d.Initialize(c)
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, d.connection, c)
-	gobottest.Assert(t, c.written[:3], wantSoftReset)
-	gobottest.Assert(t, c.written[3:21], wantInit)
-	gobottest.Assert(t, c.written[21:24], wantAntennaOn)
-	gobottest.Assert(t, c.written[24:], wantGain)
+	assert.Nil(t, err)
+	assert.Equal(t, c, d.connection)
+	assert.Equal(t, wantSoftReset, c.written[:3])
+	assert.Equal(t, wantInit, c.written[3:21])
+	assert.Equal(t, wantAntennaOn, c.written[21:24])
+	assert.Equal(t, wantGain, c.written[24:])
 }
 
 func Test_getVersion(t *testing.T) {
@@ -80,9 +80,9 @@ func Test_getVersion(t *testing.T) {
 	// act
 	got, err := d.getVersion()
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, got, want)
-	gobottest.Assert(t, c.written, wantWritten)
+	assert.Nil(t, err)
+	assert.Equal(t, want, got)
+	assert.Equal(t, wantWritten, c.written)
 }
 
 func Test_switchAntenna(t *testing.T) {
@@ -120,8 +120,8 @@ func Test_switchAntenna(t *testing.T) {
 			// act
 			err := d.switchAntenna(tc.target)
 			// assert
-			gobottest.Assert(t, err, nil)
-			gobottest.Assert(t, c.written, tc.wantWritten)
+			assert.Nil(t, err)
+			assert.Equal(t, tc.wantWritten, c.written)
 		})
 	}
 }
@@ -134,8 +134,8 @@ func Test_stopCrypto1(t *testing.T) {
 	// act
 	err := d.stopCrypto1()
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, c.written, wantWritten)
+	assert.Nil(t, err)
+	assert.Equal(t, wantWritten, c.written)
 }
 
 func Test_communicateWithPICC(t *testing.T) {
@@ -158,14 +158,14 @@ func Test_communicateWithPICC(t *testing.T) {
 	// transceive, all 8 bits, no CRC
 	err := d.communicateWithPICC(0x0C, dataToFifo, backData, 0x00, false)
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, c.written[:8], writtenPrepare)
-	gobottest.Assert(t, c.written[8:12], writtenWriteFifo)
-	gobottest.Assert(t, c.written[12:16], writtenTransceive)
-	gobottest.Assert(t, c.written[16:19], writtenBitFramingStart)
-	gobottest.Assert(t, c.written[19:24], writtenWaitAndFinish)
-	gobottest.Assert(t, c.written[24:], writtenReadFifo)
-	gobottest.Assert(t, backData, []byte{0x11, 0x22})
+	assert.Nil(t, err)
+	assert.Equal(t, writtenPrepare, c.written[:8])
+	assert.Equal(t, writtenWriteFifo, c.written[8:12])
+	assert.Equal(t, writtenTransceive, c.written[12:16])
+	assert.Equal(t, writtenBitFramingStart, c.written[16:19])
+	assert.Equal(t, writtenWaitAndFinish, c.written[19:24])
+	assert.Equal(t, writtenReadFifo, c.written[24:])
+	assert.Equal(t, []byte{0x11, 0x22}, backData)
 }
 
 func Test_calculateCRC(t *testing.T) {
@@ -181,12 +181,12 @@ func Test_calculateCRC(t *testing.T) {
 	// act
 	err := d.calculateCRC(dataToFifo, gotCrcBack)
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, c.written[:6], writtenPrepare)
-	gobottest.Assert(t, c.written[6:10], writtenFifo)
-	gobottest.Assert(t, c.written[10:15], writtenCalc)
-	gobottest.Assert(t, c.written[15:], writtenGetResult)
-	gobottest.Assert(t, gotCrcBack, []byte{0x11, 0x22})
+	assert.Nil(t, err)
+	assert.Equal(t, writtenPrepare, c.written[:6])
+	assert.Equal(t, writtenFifo, c.written[6:10])
+	assert.Equal(t, writtenCalc, c.written[10:15])
+	assert.Equal(t, writtenGetResult, c.written[15:])
+	assert.Equal(t, []byte{0x11, 0x22}, gotCrcBack)
 }
 
 func Test_writeFifo(t *testing.T) {
@@ -197,8 +197,8 @@ func Test_writeFifo(t *testing.T) {
 	// act
 	err := d.writeFifo(dataToFifo)
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, c.written, wantWritten)
+	assert.Nil(t, err)
+	assert.Equal(t, wantWritten, c.written)
 }
 
 func Test_readFifo(t *testing.T) {
@@ -210,7 +210,7 @@ func Test_readFifo(t *testing.T) {
 	// act
 	_, err := d.readFifo(backData)
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, c.written, wantWritten)
-	gobottest.Assert(t, backData, c.simFifo)
+	assert.Nil(t, err)
+	assert.Equal(t, wantWritten, c.written)
+	assert.Equal(t, c.simFifo, backData)
 }

@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Driver = (*AccelerometerDriver)(nil)
@@ -18,15 +18,15 @@ func initTestAccelerometerDriver() *AccelerometerDriver {
 
 func TestAccelerometerDriver(t *testing.T) {
 	d := initTestAccelerometerDriver()
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "Microbit Accelerometer"), true)
+	assert.True(t, strings.HasPrefix(d.Name(), "Microbit Accelerometer"))
 	d.SetName("NewName")
-	gobottest.Assert(t, d.Name(), "NewName")
+	assert.Equal(t, "NewName", d.Name())
 }
 
 func TestAccelerometerDriverStartAndHalt(t *testing.T) {
 	d := initTestAccelerometerDriver()
-	gobottest.Assert(t, d.Start(), nil)
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.Nil(t, d.Start())
+	assert.Nil(t, d.Halt())
 }
 
 func TestAccelerometerDriverReadData(t *testing.T) {
@@ -35,9 +35,9 @@ func TestAccelerometerDriverReadData(t *testing.T) {
 	d := NewAccelerometerDriver(a)
 	_ = d.Start()
 	_ = d.On(Accelerometer, func(data interface{}) {
-		gobottest.Assert(t, data.(*AccelerometerData).X, float32(8.738))
-		gobottest.Assert(t, data.(*AccelerometerData).Y, float32(8.995))
-		gobottest.Assert(t, data.(*AccelerometerData).Z, float32(9.252))
+		assert.Equal(t, float32(8.738), data.(*AccelerometerData).X)
+		assert.Equal(t, float32(8.995), data.(*AccelerometerData).Y)
+		assert.Equal(t, float32(9.252), data.(*AccelerometerData).Z)
 		sem <- true
 	})
 

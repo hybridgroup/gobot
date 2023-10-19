@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Adaptor = (*TCPAdaptor)(nil)
@@ -17,5 +17,5 @@ func initTestTCPAdaptor() *TCPAdaptor {
 
 func TestFirmataTCPAdaptor(t *testing.T) {
 	a := initTestTCPAdaptor()
-	gobottest.Assert(t, strings.HasPrefix(a.Name(), "TCPFirmata"), true)
+	assert.True(t, strings.HasPrefix(a.Name(), "TCPFirmata"))
 }

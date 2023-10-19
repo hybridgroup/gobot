@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Driver = (*Driver)(nil)
@@ -23,22 +23,22 @@ func initTestKeyboardDriver() *Driver {
 
 func TestKeyboardDriver(t *testing.T) {
 	d := initTestKeyboardDriver()
-	gobottest.Assert(t, d.Connection(), (gobot.Connection)(nil))
+	assert.Equal(t, (gobot.Connection)(nil), d.Connection())
 }
 
 func TestKeyboardDriverName(t *testing.T) {
 	d := initTestKeyboardDriver()
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "Keyboard"), true)
+	assert.True(t, strings.HasPrefix(d.Name(), "Keyboard"))
 	d.SetName("NewName")
-	gobottest.Assert(t, d.Name(), "NewName")
+	assert.Equal(t, "NewName", d.Name())
 }
 
 func TestKeyboardDriverStart(t *testing.T) {
 	d := initTestKeyboardDriver()
-	gobottest.Assert(t, d.Start(), nil)
+	assert.Nil(t, d.Start())
 }
 
 func TestKeyboardDriverHalt(t *testing.T) {
 	d := initTestKeyboardDriver()
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.Nil(t, d.Halt())
 }

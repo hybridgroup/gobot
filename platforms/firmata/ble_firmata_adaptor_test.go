@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Adaptor = (*BLEAdaptor)(nil)
@@ -20,5 +20,5 @@ func initTestBLEAdaptor() *BLEAdaptor {
 
 func TestFirmataBLEAdaptor(t *testing.T) {
 	a := initTestBLEAdaptor()
-	gobottest.Assert(t, strings.HasPrefix(a.Name(), "BLEFirmata"), true)
+	assert.True(t, strings.HasPrefix(a.Name(), "BLEFirmata"))
 }

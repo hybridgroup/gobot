@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 // this ensures that the implementation is based on i2c.Driver, which implements the gobot.Driver
@@ -44,20 +44,20 @@ func TestNewBMP388Driver(t *testing.T) {
 	if !ok {
 		t.Errorf("NewBMP388Driver() should have returned a *BMP388Driver")
 	}
-	gobottest.Refute(t, d.Driver, nil)
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "BMP388"), true)
-	gobottest.Assert(t, d.defaultAddress, 0x77)
-	gobottest.Assert(t, d.ctrlPwrMode, uint8(0x01))          // forced mode
-	gobottest.Assert(t, d.confFilter, BMP388IIRFilter(0x00)) // filter off
-	gobottest.Refute(t, d.calCoeffs, nil)
+	assert.NotNil(t, d.Driver)
+	assert.True(t, strings.HasPrefix(d.Name(), "BMP388"))
+	assert.Equal(t, 0x77, d.defaultAddress)
+	assert.Equal(t, uint8(0x01), d.ctrlPwrMode)          // forced mode
+	assert.Equal(t, BMP388IIRFilter(0x00), d.confFilter) // filter off
+	assert.NotNil(t, d.calCoeffs)
 }
 
 func TestBMP388Options(t *testing.T) {
 	// This is a general test, that options are applied in constructor by using the common WithBus() option and
 	// least one of this driver. Further tests for options can also be done by call of "WithOption(val)(d)".
 	d := NewBMP388Driver(newI2cTestAdaptor(), WithBus(2), WithBMP388IIRFilter(BMP388IIRFilter(0x03)))
-	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
-	gobottest.Assert(t, d.confFilter, BMP388IIRFilter(0x03))
+	assert.Equal(t, 2, d.GetBusOrDefault(1))
+	assert.Equal(t, BMP388IIRFilter(0x03), d.confFilter)
 }
 
 func TestBMP388Measurements(t *testing.T) {
@@ -84,14 +84,14 @@ func TestBMP388Measurements(t *testing.T) {
 	}
 	_ = d.Start()
 	temp, err := d.Temperature(2)
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, temp, float32(22.906143))
+	assert.Nil(t, err)
+	assert.Equal(t, float32(22.906143), temp)
 	pressure, err := d.Pressure(2)
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, pressure, float32(98874.85))
+	assert.Nil(t, err)
+	assert.Equal(t, float32(98874.85), pressure)
 	alt, err := d.Altitude(2)
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, alt, float32(205.89395))
+	assert.Nil(t, err)
+	assert.Equal(t, float32(205.89395), alt)
 }
 
 func TestBMP388TemperatureWriteError(t *testing.T) {
@@ -102,8 +102,8 @@ func TestBMP388TemperatureWriteError(t *testing.T) {
 		return 0, errors.New("write error")
 	}
 	temp, err := d.Temperature(2)
-	gobottest.Assert(t, err, errors.New("write error"))
-	gobottest.Assert(t, temp, float32(0.0))
+	assert.Errorf(t, err, "write error")
+	assert.Equal(t, float32(0.0), temp)
 }
 
 func TestBMP388TemperatureReadError(t *testing.T) {
@@ -114,8 +114,8 @@ func TestBMP388TemperatureReadError(t *testing.T) {
 		return 0, errors.New("read error")
 	}
 	temp, err := d.Temperature(2)
-	gobottest.Assert(t, err, errors.New("read error"))
-	gobottest.Assert(t, temp, float32(0.0))
+	assert.Errorf(t, err, "read error")
+	assert.Equal(t, float32(0.0), temp)
 }
 
 func TestBMP388PressureWriteError(t *testing.T) {
@@ -126,8 +126,8 @@ func TestBMP388PressureWriteError(t *testing.T) {
 		return 0, errors.New("write error")
 	}
 	press, err := d.Pressure(2)
-	gobottest.Assert(t, err, errors.New("write error"))
-	gobottest.Assert(t, press, float32(0.0))
+	assert.Errorf(t, err, "write error")
+	assert.Equal(t, float32(0.0), press)
 }
 
 func TestBMP388PressureReadError(t *testing.T) {
@@ -138,8 +138,8 @@ func TestBMP388PressureReadError(t *testing.T) {
 		return 0, errors.New("read error")
 	}
 	press, err := d.Pressure(2)
-	gobottest.Assert(t, err, errors.New("read error"))
-	gobottest.Assert(t, press, float32(0.0))
+	assert.Errorf(t, err, "read error")
+	assert.Equal(t, float32(0.0), press)
 }
 
 func TestBMP388_initialization(t *testing.T) {
@@ -176,25 +176,25 @@ func TestBMP388_initialization(t *testing.T) {
 	// act, assert - initialization() must be called on Start()
 	err := d.Start()
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, numCallsRead, 2)
-	gobottest.Assert(t, len(a.written), 6)
-	gobottest.Assert(t, a.written[0], wantChipIDReg)
-	gobottest.Assert(t, a.written[1], wantCalibReg)
-	gobottest.Assert(t, a.written[2], wantCommandReg)
-	gobottest.Assert(t, a.written[3], wantCommandRegVal)
-	gobottest.Assert(t, a.written[4], wantConfReg)
-	gobottest.Assert(t, a.written[5], wantConfRegVal)
-	gobottest.Assert(t, d.calCoeffs.t1, float32(7.021568e+06))
-	gobottest.Assert(t, d.calCoeffs.t2, float32(1.7549843e-05))
-	gobottest.Assert(t, d.calCoeffs.t3, float32(-3.5527137e-14))
-	gobottest.Assert(t, d.calCoeffs.p1, float32(-0.015769958))
-	gobottest.Assert(t, d.calCoeffs.p2, float32(-3.5410747e-05))
-	gobottest.Assert(t, d.calCoeffs.p3, float32(8.1490725e-09))
-	gobottest.Assert(t, d.calCoeffs.p4, float32(0))
-	gobottest.Assert(t, d.calCoeffs.p5, float32(208056))
-	gobottest.Assert(t, d.calCoeffs.p6, float32(490.875))
-	gobottest.Assert(t, d.calCoeffs.p7, float32(-0.05078125))
-	gobottest.Assert(t, d.calCoeffs.p8, float32(-0.00030517578))
-	gobottest.Assert(t, d.calCoeffs.p9, float32(5.8957283e-11))
+	assert.Nil(t, err)
+	assert.Equal(t, 2, numCallsRead)
+	assert.Equal(t, 6, len(a.written))
+	assert.Equal(t, wantChipIDReg, a.written[0])
+	assert.Equal(t, wantCalibReg, a.written[1])
+	assert.Equal(t, wantCommandReg, a.written[2])
+	assert.Equal(t, wantCommandRegVal, a.written[3])
+	assert.Equal(t, wantConfReg, a.written[4])
+	assert.Equal(t, wantConfRegVal, a.written[5])
+	assert.Equal(t, float32(7.021568e+06), d.calCoeffs.t1)
+	assert.Equal(t, float32(1.7549843e-05), d.calCoeffs.t2)
+	assert.Equal(t, float32(-3.5527137e-14), d.calCoeffs.t3)
+	assert.Equal(t, float32(-0.015769958), d.calCoeffs.p1)
+	assert.Equal(t, float32(-3.5410747e-05), d.calCoeffs.p2)
+	assert.Equal(t, float32(8.1490725e-09), d.calCoeffs.p3)
+	assert.Equal(t, float32(0), d.calCoeffs.p4)
+	assert.Equal(t, float32(208056), d.calCoeffs.p5)
+	assert.Equal(t, float32(490.875), d.calCoeffs.p6)
+	assert.Equal(t, float32(-0.05078125), d.calCoeffs.p7)
+	assert.Equal(t, float32(-0.00030517578), d.calCoeffs.p8)
+	assert.Equal(t, float32(5.8957283e-11), d.calCoeffs.p9)
 }

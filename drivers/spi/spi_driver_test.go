@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Driver = (*Driver)(nil)
@@ -25,17 +25,17 @@ func TestNewDriver(t *testing.T) {
 	if !ok {
 		t.Errorf("NewDriver() should have returned a *Driver")
 	}
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "SPI_BASIC"), true)
+	assert.True(t, strings.HasPrefix(d.Name(), "SPI_BASIC"))
 }
 
 func TestStart(t *testing.T) {
 	d := NewDriver(newSpiTestAdaptor(), "SPI_BASIC")
-	gobottest.Assert(t, d.Start(), nil)
+	assert.Nil(t, d.Start())
 }
 
 func TestHalt(t *testing.T) {
 	d, _ := initTestDriverWithStubbedAdaptor()
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.Nil(t, d.Halt())
 }
 
 func TestSetName(t *testing.T) {
@@ -44,10 +44,10 @@ func TestSetName(t *testing.T) {
 	// act
 	d.SetName("TESTME")
 	// assert
-	gobottest.Assert(t, d.Name(), "TESTME")
+	assert.Equal(t, "TESTME", d.Name())
 }
 
 func TestConnection(t *testing.T) {
 	d, _ := initTestDriverWithStubbedAdaptor()
-	gobottest.Refute(t, d.Connection(), nil)
+	assert.NotNil(t, d.Connection())
 }

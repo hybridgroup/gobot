@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Adaptor = (*Adaptor)(nil)
@@ -22,23 +22,23 @@ func initTestBebopAdaptor() *Adaptor {
 
 func TestBebopAdaptorName(t *testing.T) {
 	a := NewAdaptor()
-	gobottest.Assert(t, strings.HasPrefix(a.Name(), "Bebop"), true)
+	assert.True(t, strings.HasPrefix(a.Name(), "Bebop"))
 	a.SetName("NewName")
-	gobottest.Assert(t, a.Name(), "NewName")
+	assert.Equal(t, "NewName", a.Name())
 }
 
 func TestBebopAdaptorConnect(t *testing.T) {
 	a := initTestBebopAdaptor()
-	gobottest.Assert(t, a.Connect(), nil)
+	assert.Nil(t, a.Connect())
 
 	a.connect = func(a *Adaptor) error {
 		return errors.New("connection error")
 	}
-	gobottest.Assert(t, a.Connect(), errors.New("connection error"))
+	assert.Errorf(t, a.Connect(), "connection error")
 }
 
 func TestBebopAdaptorFinalize(t *testing.T) {
 	a := initTestBebopAdaptor()
 	_ = a.Connect()
-	gobottest.Assert(t, a.Finalize(), nil)
+	assert.Nil(t, a.Finalize())
 }

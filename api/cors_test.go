@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"gobot.io/x/gobot/v2/gobottest"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestCORSIsOriginAllowed(t *testing.T) {
@@ -13,50 +13,50 @@ func TestCORSIsOriginAllowed(t *testing.T) {
 	cors.generatePatterns()
 
 	// When all the origins are accepted
-	gobottest.Assert(t, cors.isOriginAllowed("http://localhost:8000"), true)
-	gobottest.Assert(t, cors.isOriginAllowed("http://localhost:3001"), true)
-	gobottest.Assert(t, cors.isOriginAllowed("http://server.com"), true)
+	assert.True(t, cors.isOriginAllowed("http://localhost:8000"))
+	assert.True(t, cors.isOriginAllowed("http://localhost:3001"))
+	assert.True(t, cors.isOriginAllowed("http://server.com"))
 
 	// When one origin is accepted
 	cors = &CORS{AllowOrigins: []string{"http://localhost:8000"}}
 	cors.generatePatterns()
 
-	gobottest.Assert(t, cors.isOriginAllowed("http://localhost:8000"), true)
-	gobottest.Assert(t, cors.isOriginAllowed("http://localhost:3001"), false)
-	gobottest.Assert(t, cors.isOriginAllowed("http://server.com"), false)
+	assert.True(t, cors.isOriginAllowed("http://localhost:8000"))
+	assert.False(t, cors.isOriginAllowed("http://localhost:3001"))
+	assert.False(t, cors.isOriginAllowed("http://server.com"))
 
 	// When several origins are accepted
 	cors = &CORS{AllowOrigins: []string{"http://localhost:*", "http://server.com"}}
 	cors.generatePatterns()
 
-	gobottest.Assert(t, cors.isOriginAllowed("http://localhost:8000"), true)
-	gobottest.Assert(t, cors.isOriginAllowed("http://localhost:3001"), true)
-	gobottest.Assert(t, cors.isOriginAllowed("http://server.com"), true)
+	assert.True(t, cors.isOriginAllowed("http://localhost:8000"))
+	assert.True(t, cors.isOriginAllowed("http://localhost:3001"))
+	assert.True(t, cors.isOriginAllowed("http://server.com"))
 
 	// When several origins are accepted within the same domain
 	cors = &CORS{AllowOrigins: []string{"http://*.server.com"}}
 	cors.generatePatterns()
 
-	gobottest.Assert(t, cors.isOriginAllowed("http://localhost:8000"), false)
-	gobottest.Assert(t, cors.isOriginAllowed("http://localhost:3001"), false)
-	gobottest.Assert(t, cors.isOriginAllowed("http://foo.server.com"), true)
-	gobottest.Assert(t, cors.isOriginAllowed("http://api.server.com"), true)
+	assert.False(t, cors.isOriginAllowed("http://localhost:8000"))
+	assert.False(t, cors.isOriginAllowed("http://localhost:3001"))
+	assert.True(t, cors.isOriginAllowed("http://foo.server.com"))
+	assert.True(t, cors.isOriginAllowed("http://api.server.com"))
 }
 
 func TestCORSAllowedHeaders(t *testing.T) {
 	cors := &CORS{AllowOrigins: []string{"*"}, AllowHeaders: []string{"Header1", "Header2"}}
 
-	gobottest.Assert(t, cors.AllowedHeaders(), "Header1,Header2")
+	assert.Equal(t, "Header1,Header2", cors.AllowedHeaders())
 }
 
 func TestCORSAllowedMethods(t *testing.T) {
 	cors := &CORS{AllowOrigins: []string{"*"}, AllowMethods: []string{"GET", "POST"}}
 
-	gobottest.Assert(t, cors.AllowedMethods(), "GET,POST")
+	assert.Equal(t, "GET,POST", cors.AllowedMethods())
 
 	cors.AllowMethods = []string{"GET", "POST", "PUT"}
 
-	gobottest.Assert(t, cors.AllowedMethods(), "GET,POST,PUT")
+	assert.Equal(t, "GET,POST,PUT", cors.AllowedMethods())
 }
 
 func TestCORS(t *testing.T) {
@@ -70,7 +70,7 @@ func TestCORS(t *testing.T) {
 	request.Header.Set("Origin", allowedOrigin[0])
 	response := httptest.NewRecorder()
 	api.ServeHTTP(response, request)
-	gobottest.Assert(t, response.Header()["Access-Control-Allow-Origin"], allowedOrigin)
+	assert.Equal(t, allowedOrigin, response.Header()["Access-Control-Allow-Origin"])
 
 	// Not accepted Origin
 	disallowedOrigin := []string{"http://disallowed.com"}
@@ -78,6 +78,6 @@ func TestCORS(t *testing.T) {
 	request.Header.Set("Origin", disallowedOrigin[0])
 	response = httptest.NewRecorder()
 	api.ServeHTTP(response, request)
-	gobottest.Refute(t, response.Header()["Access-Control-Allow-Origin"], disallowedOrigin)
-	gobottest.Refute(t, response.Header()["Access-Control-Allow-Origin"], allowedOrigin)
+	assert.NotEqual(t, disallowedOrigin, response.Header()["Access-Control-Allow-Origin"])
+	assert.NotEqual(t, allowedOrigin, response.Header()["Access-Control-Allow-Origin"])
 }

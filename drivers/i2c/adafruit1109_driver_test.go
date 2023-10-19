@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Driver = (*Adafruit1109Driver)(nil)
@@ -23,49 +23,49 @@ func TestNewAdafruit1109Driver(t *testing.T) {
 	if !ok {
 		t.Errorf("NewAdafruit1109Driver() should have returned a *Adafruit1109Driver")
 	}
-	gobottest.Refute(t, d.Driver, nil)
-	gobottest.Refute(t, d.Connection(), nil)
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "Adafruit1109"), true)
-	gobottest.Assert(t, strings.Contains(d.Name(), "MCP23017"), true)
-	gobottest.Assert(t, strings.Contains(d.Name(), "HD44780"), true)
-	gobottest.Refute(t, d.MCP23017Driver, nil)
-	gobottest.Refute(t, d.HD44780Driver, nil)
-	gobottest.Refute(t, d.redPin, nil)
-	gobottest.Refute(t, d.greenPin, nil)
-	gobottest.Refute(t, d.bluePin, nil)
-	gobottest.Refute(t, d.selectPin, nil)
-	gobottest.Refute(t, d.upPin, nil)
-	gobottest.Refute(t, d.downPin, nil)
-	gobottest.Refute(t, d.leftPin, nil)
-	gobottest.Refute(t, d.rightPin, nil)
-	gobottest.Refute(t, d.rwPin, nil)
-	gobottest.Refute(t, d.rsPin, nil)
-	gobottest.Refute(t, d.enPin, nil)
-	gobottest.Refute(t, d.dataPinD4, nil)
-	gobottest.Refute(t, d.dataPinD5, nil)
-	gobottest.Refute(t, d.dataPinD6, nil)
-	gobottest.Refute(t, d.dataPinD7, nil)
+	assert.NotNil(t, d.Driver)
+	assert.NotNil(t, d.Connection())
+	assert.True(t, strings.HasPrefix(d.Name(), "Adafruit1109"))
+	assert.Contains(t, d.Name(), "MCP23017")
+	assert.Contains(t, d.Name(), "HD44780")
+	assert.NotNil(t, d.MCP23017Driver)
+	assert.NotNil(t, d.HD44780Driver)
+	assert.NotNil(t, d.redPin)
+	assert.NotNil(t, d.greenPin)
+	assert.NotNil(t, d.bluePin)
+	assert.NotNil(t, d.selectPin)
+	assert.NotNil(t, d.upPin)
+	assert.NotNil(t, d.downPin)
+	assert.NotNil(t, d.leftPin)
+	assert.NotNil(t, d.rightPin)
+	assert.NotNil(t, d.rwPin)
+	assert.NotNil(t, d.rsPin)
+	assert.NotNil(t, d.enPin)
+	assert.NotNil(t, d.dataPinD4)
+	assert.NotNil(t, d.dataPinD5)
+	assert.NotNil(t, d.dataPinD6)
+	assert.NotNil(t, d.dataPinD7)
 }
 
 func TestAdafruit1109Connect(t *testing.T) {
 	d, _ := initTestAdafruit1109WithStubbedAdaptor()
-	gobottest.Assert(t, d.Connect(), nil)
+	assert.Nil(t, d.Connect())
 }
 
 func TestAdafruit1109Finalize(t *testing.T) {
 	d, _ := initTestAdafruit1109WithStubbedAdaptor()
-	gobottest.Assert(t, d.Finalize(), nil)
+	assert.Nil(t, d.Finalize())
 }
 
 func TestAdafruit1109SetName(t *testing.T) {
 	d, _ := initTestAdafruit1109WithStubbedAdaptor()
 	d.SetName("foo")
-	gobottest.Assert(t, d.name, "foo")
+	assert.Equal(t, "foo", d.name)
 }
 
 func TestAdafruit1109Start(t *testing.T) {
 	d, _ := initTestAdafruit1109WithStubbedAdaptor()
-	gobottest.Assert(t, d.Start(), nil)
+	assert.Nil(t, d.Start())
 }
 
 func TestAdafruit1109StartWriteErr(t *testing.T) {
@@ -73,7 +73,7 @@ func TestAdafruit1109StartWriteErr(t *testing.T) {
 	adaptor.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
 	}
-	gobottest.Assert(t, d.Start(), errors.New("write error"))
+	assert.Errorf(t, d.Start(), "write error")
 }
 
 func TestAdafruit1109StartReadErr(t *testing.T) {
@@ -81,13 +81,13 @@ func TestAdafruit1109StartReadErr(t *testing.T) {
 	adaptor.i2cReadImpl = func([]byte) (int, error) {
 		return 0, errors.New("read error")
 	}
-	gobottest.Assert(t, d.Start(), errors.New("MCP write-read: MCP write-ReadByteData(reg=0): read error"))
+	assert.Errorf(t, d.Start(), "MCP write-read: MCP write-ReadByteData(reg=0): read error")
 }
 
 func TestAdafruit1109Halt(t *testing.T) {
 	d, _ := initTestAdafruit1109WithStubbedAdaptor()
 	_ = d.Start()
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.Nil(t, d.Halt())
 }
 
 func TestAdafruit1109DigitalRead(t *testing.T) {
@@ -128,11 +128,11 @@ func TestAdafruit1109DigitalRead(t *testing.T) {
 			// act
 			got, err := d.DigitalRead(name)
 			// assert
-			gobottest.Assert(t, err, nil)
-			gobottest.Assert(t, numCallsRead, 1)
-			gobottest.Assert(t, len(a.written), 1)
-			gobottest.Assert(t, a.written[0], tc.wantReg)
-			gobottest.Assert(t, got, 1)
+			assert.Nil(t, err)
+			assert.Equal(t, 1, numCallsRead)
+			assert.Equal(t, 1, len(a.written))
+			assert.Equal(t, tc.wantReg, a.written[0])
+			assert.Equal(t, 1, got)
 		})
 	}
 }
@@ -160,9 +160,9 @@ func TestAdafruit1109SelectButton(t *testing.T) {
 			// act
 			got, err := d.SelectButton()
 			// assert
-			gobottest.Assert(t, err, nil)
-			gobottest.Assert(t, numCallsRead, 1)
-			gobottest.Assert(t, got, tc.want)
+			assert.Nil(t, err)
+			assert.Equal(t, 1, numCallsRead)
+			assert.Equal(t, tc.want, got)
 		})
 	}
 }
@@ -190,9 +190,9 @@ func TestAdafruit1109UpButton(t *testing.T) {
 			// act
 			got, err := d.UpButton()
 			// assert
-			gobottest.Assert(t, err, nil)
-			gobottest.Assert(t, numCallsRead, 1)
-			gobottest.Assert(t, got, tc.want)
+			assert.Nil(t, err)
+			assert.Equal(t, 1, numCallsRead)
+			assert.Equal(t, tc.want, got)
 		})
 	}
 }
@@ -220,9 +220,9 @@ func TestAdafruit1109DownButton(t *testing.T) {
 			// act
 			got, err := d.DownButton()
 			// assert
-			gobottest.Assert(t, err, nil)
-			gobottest.Assert(t, numCallsRead, 1)
-			gobottest.Assert(t, got, tc.want)
+			assert.Nil(t, err)
+			assert.Equal(t, 1, numCallsRead)
+			assert.Equal(t, tc.want, got)
 		})
 	}
 }
@@ -250,9 +250,9 @@ func TestAdafruit1109LeftButton(t *testing.T) {
 			// act
 			got, err := d.LeftButton()
 			// assert
-			gobottest.Assert(t, err, nil)
-			gobottest.Assert(t, numCallsRead, 1)
-			gobottest.Assert(t, got, tc.want)
+			assert.Nil(t, err)
+			assert.Equal(t, 1, numCallsRead)
+			assert.Equal(t, tc.want, got)
 		})
 	}
 }
@@ -280,9 +280,9 @@ func TestAdafruit1109RightButton(t *testing.T) {
 			// act
 			got, err := d.RightButton()
 			// assert
-			gobottest.Assert(t, err, nil)
-			gobottest.Assert(t, numCallsRead, 1)
-			gobottest.Assert(t, got, tc.want)
+			assert.Nil(t, err)
+			assert.Equal(t, 1, numCallsRead)
+			assert.Equal(t, tc.want, got)
 		})
 	}
 }
@@ -297,7 +297,7 @@ func TestAdafruit1109_parseID(t *testing.T) {
 				// act
 				got := adafruit1109ParseID(id)
 				// assert
-				gobottest.Assert(t, got, adafruit1109PortPin{port, pin})
+				assert.Equal(t, adafruit1109PortPin{port, pin}, got)
 			})
 		}
 	}

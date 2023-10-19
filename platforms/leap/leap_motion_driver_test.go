@@ -8,8 +8,8 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Driver = (*Driver)(nil)
@@ -55,29 +55,29 @@ func initTestLeapMotionDriver() (*Driver, *NullReadWriteCloser) {
 
 func TestLeapMotionDriver(t *testing.T) {
 	d, _ := initTestLeapMotionDriver()
-	gobottest.Refute(t, d.Connection(), nil)
+	assert.NotNil(t, d.Connection())
 }
 
 func TestLeapMotionDriverName(t *testing.T) {
 	d, _ := initTestLeapMotionDriver()
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "Leap"), true)
+	assert.True(t, strings.HasPrefix(d.Name(), "Leap"))
 	d.SetName("NewName")
-	gobottest.Assert(t, d.Name(), "NewName")
+	assert.Equal(t, "NewName", d.Name())
 }
 
 func TestLeapMotionDriverStart(t *testing.T) {
 	d, _ := initTestLeapMotionDriver()
-	gobottest.Assert(t, d.Start(), nil)
+	assert.Nil(t, d.Start())
 
 	d2, rwc := initTestLeapMotionDriver()
 	e := errors.New("write error")
 	rwc.WriteError(e)
-	gobottest.Assert(t, d2.Start(), e)
+	assert.Equal(t, e, d2.Start())
 }
 
 func TestLeapMotionDriverHalt(t *testing.T) {
 	d, _ := initTestLeapMotionDriver()
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.Nil(t, d.Halt())
 }
 
 func TestLeapMotionDriverParser(t *testing.T) {
@@ -89,18 +89,18 @@ func TestLeapMotionDriverParser(t *testing.T) {
 		t.Errorf("ParseFrame incorrectly parsed frame")
 	}
 
-	gobottest.Assert(t, parsedFrame.Timestamp, uint64(134211791358))
-	gobottest.Assert(t, parsedFrame.Hands[0].X(), 247.410)
-	gobottest.Assert(t, parsedFrame.Hands[0].Y(), 275.868)
-	gobottest.Assert(t, parsedFrame.Hands[0].Z(), 132.843)
+	assert.Equal(t, uint64(134211791358), parsedFrame.Timestamp)
+	assert.Equal(t, 247.410, parsedFrame.Hands[0].X())
+	assert.Equal(t, 275.868, parsedFrame.Hands[0].Y())
+	assert.Equal(t, 132.843, parsedFrame.Hands[0].Z())
 
-	gobottest.Assert(t, parsedFrame.Pointables[0].BTipPosition[0], 214.293)
-	gobottest.Assert(t, parsedFrame.Pointables[0].BTipPosition[1], 213.865)
-	gobottest.Assert(t, parsedFrame.Pointables[0].BTipPosition[2], 95.0224)
+	assert.Equal(t, 214.293, parsedFrame.Pointables[0].BTipPosition[0])
+	assert.Equal(t, 213.865, parsedFrame.Pointables[0].BTipPosition[1])
+	assert.Equal(t, 95.0224, parsedFrame.Pointables[0].BTipPosition[2])
 
-	gobottest.Assert(t, parsedFrame.Pointables[0].Bases[0][0][0], -0.468069)
-	gobottest.Assert(t, parsedFrame.Pointables[0].Bases[0][0][1], 0.807844)
-	gobottest.Assert(t, parsedFrame.Pointables[0].Bases[0][0][2], -0.358190)
+	assert.Equal(t, -0.468069, parsedFrame.Pointables[0].Bases[0][0][0])
+	assert.Equal(t, 0.807844, parsedFrame.Pointables[0].Bases[0][0][1])
+	assert.Equal(t, -0.358190, parsedFrame.Pointables[0].Bases[0][0][2])
 
-	gobottest.Assert(t, parsedFrame.Pointables[0].Width, 19.7871)
+	assert.Equal(t, 19.7871, parsedFrame.Pointables[0].Width)
 }

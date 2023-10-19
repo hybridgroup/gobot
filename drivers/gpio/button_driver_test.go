@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Driver = (*ButtonDriver)(nil)
@@ -23,15 +23,15 @@ func TestButtonDriverHalt(t *testing.T) {
 	go func() {
 		<-d.halt
 	}()
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.Nil(t, d.Halt())
 }
 
 func TestButtonDriver(t *testing.T) {
 	d := NewButtonDriver(newGpioTestAdaptor(), "1")
-	gobottest.Refute(t, d.Connection(), nil)
+	assert.NotNil(t, d.Connection())
 
 	d = NewButtonDriver(newGpioTestAdaptor(), "1", 30*time.Second)
-	gobottest.Assert(t, d.interval, 30*time.Second)
+	assert.Equal(t, 30*time.Second, d.interval)
 }
 
 func TestButtonDriverStart(t *testing.T) {
@@ -40,7 +40,7 @@ func TestButtonDriverStart(t *testing.T) {
 	d := NewButtonDriver(a, "1")
 
 	_ = d.Once(ButtonPush, func(data interface{}) {
-		gobottest.Assert(t, d.Active, true)
+		assert.True(t, d.Active)
 		sem <- true
 	})
 
@@ -49,7 +49,7 @@ func TestButtonDriverStart(t *testing.T) {
 		return
 	})
 
-	gobottest.Assert(t, d.Start(), nil)
+	assert.Nil(t, d.Start())
 
 	select {
 	case <-sem:
@@ -58,7 +58,7 @@ func TestButtonDriverStart(t *testing.T) {
 	}
 
 	_ = d.Once(ButtonRelease, func(data interface{}) {
-		gobottest.Assert(t, d.Active, false)
+		assert.False(t, d.Active)
 		sem <- true
 	})
 
@@ -113,7 +113,7 @@ func TestButtonDriverDefaultState(t *testing.T) {
 	d.DefaultState = 1
 
 	_ = d.Once(ButtonPush, func(data interface{}) {
-		gobottest.Assert(t, d.Active, true)
+		assert.True(t, d.Active)
 		sem <- true
 	})
 
@@ -122,7 +122,7 @@ func TestButtonDriverDefaultState(t *testing.T) {
 		return
 	})
 
-	gobottest.Assert(t, d.Start(), nil)
+	assert.Nil(t, d.Start())
 
 	select {
 	case <-sem:
@@ -131,7 +131,7 @@ func TestButtonDriverDefaultState(t *testing.T) {
 	}
 
 	_ = d.Once(ButtonRelease, func(data interface{}) {
-		gobottest.Assert(t, d.Active, false)
+		assert.False(t, d.Active)
 		sem <- true
 	})
 
@@ -149,11 +149,11 @@ func TestButtonDriverDefaultState(t *testing.T) {
 
 func TestButtonDriverDefaultName(t *testing.T) {
 	g := initTestButtonDriver()
-	gobottest.Assert(t, strings.HasPrefix(g.Name(), "Button"), true)
+	assert.True(t, strings.HasPrefix(g.Name(), "Button"))
 }
 
 func TestButtonDriverSetName(t *testing.T) {
 	g := initTestButtonDriver()
 	g.SetName("mybot")
-	gobottest.Assert(t, g.Name(), "mybot")
+	assert.Equal(t, "mybot", g.Name())
 }

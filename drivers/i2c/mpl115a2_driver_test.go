@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 // this ensures that the implementation is based on i2c.Driver, which implements the gobot.Driver
@@ -24,16 +24,16 @@ func TestNewMPL115A2Driver(t *testing.T) {
 	if !ok {
 		t.Errorf("NewMPL115A2Driver() should have returned a *MPL115A2Driver")
 	}
-	gobottest.Refute(t, d.Connection(), nil)
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "MPL115A2"), true)
-	gobottest.Assert(t, d.defaultAddress, 0x60)
+	assert.NotNil(t, d.Connection())
+	assert.True(t, strings.HasPrefix(d.Name(), "MPL115A2"))
+	assert.Equal(t, 0x60, d.defaultAddress)
 }
 
 func TestMPL115A2Options(t *testing.T) {
 	// This is a general test, that options are applied in constructor by using the common WithBus() option and
 	// least one of this driver. Further tests for options can also be done by call of "WithOption(val)(d)".
 	d := NewMPL115A2Driver(newI2cTestAdaptor(), WithBus(2))
-	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
+	assert.Equal(t, 2, d.GetBusOrDefault(1))
 }
 
 func TestMPL115A2ReadData(t *testing.T) {
@@ -78,18 +78,18 @@ func TestMPL115A2ReadData(t *testing.T) {
 	press, errP := d.Pressure()
 	temp, errT := d.Temperature()
 	// assert
-	gobottest.Assert(t, errP, nil)
-	gobottest.Assert(t, errT, nil)
-	gobottest.Assert(t, readCallCounter, 2)
-	gobottest.Assert(t, len(a.written), 6)
-	gobottest.Assert(t, a.written[0], uint8(0x12))
-	gobottest.Assert(t, a.written[1], uint8(0x00))
-	gobottest.Assert(t, a.written[2], uint8(0x00))
-	gobottest.Assert(t, a.written[3], uint8(0x12))
-	gobottest.Assert(t, a.written[4], uint8(0x00))
-	gobottest.Assert(t, a.written[5], uint8(0x00))
-	gobottest.Assert(t, press, float32(96.585915))
-	gobottest.Assert(t, temp, float32(23.317757))
+	assert.Nil(t, errP)
+	assert.Nil(t, errT)
+	assert.Equal(t, 2, readCallCounter)
+	assert.Equal(t, 6, len(a.written))
+	assert.Equal(t, uint8(0x12), a.written[0])
+	assert.Equal(t, uint8(0x00), a.written[1])
+	assert.Equal(t, uint8(0x00), a.written[2])
+	assert.Equal(t, uint8(0x12), a.written[3])
+	assert.Equal(t, uint8(0x00), a.written[4])
+	assert.Equal(t, uint8(0x00), a.written[5])
+	assert.Equal(t, float32(96.585915), press)
+	assert.Equal(t, float32(23.317757), temp)
 }
 
 func TestMPL115A2ReadDataError(t *testing.T) {
@@ -101,7 +101,7 @@ func TestMPL115A2ReadDataError(t *testing.T) {
 	}
 	_, err := d.Pressure()
 
-	gobottest.Assert(t, err, errors.New("write error"))
+	assert.Errorf(t, err, "write error")
 }
 
 func TestMPL115A2_initialization(t *testing.T) {
@@ -124,12 +124,12 @@ func TestMPL115A2_initialization(t *testing.T) {
 	// act, assert - initialization() must be called on Start()
 	err := d.Start()
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, readCallCounter, 1)
-	gobottest.Assert(t, len(a.written), 1)
-	gobottest.Assert(t, a.written[0], uint8(0x04))
-	gobottest.Assert(t, d.a0, float32(2009.75))
-	gobottest.Assert(t, d.b1, float32(-2.3758545))
-	gobottest.Assert(t, d.b2, float32(-0.9204712))
-	gobottest.Assert(t, d.c12, float32(0.0007901192))
+	assert.Nil(t, err)
+	assert.Equal(t, 1, readCallCounter)
+	assert.Equal(t, 1, len(a.written))
+	assert.Equal(t, uint8(0x04), a.written[0])
+	assert.Equal(t, float32(2009.75), d.a0)
+	assert.Equal(t, float32(-2.3758545), d.b1)
+	assert.Equal(t, float32(-0.9204712), d.b2)
+	assert.Equal(t, float32(0.0007901192), d.c12)
 }

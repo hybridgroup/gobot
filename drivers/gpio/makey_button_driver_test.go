@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Driver = (*MakeyButtonDriver)(nil)
@@ -24,7 +24,7 @@ func TestMakeyButtonDriverHalt(t *testing.T) {
 		<-d.halt
 		close(done)
 	}()
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.Nil(t, d.Halt())
 	select {
 	case <-done:
 	case <-time.After(makeyTestDelay * time.Millisecond):
@@ -34,12 +34,12 @@ func TestMakeyButtonDriverHalt(t *testing.T) {
 
 func TestMakeyButtonDriver(t *testing.T) {
 	d := initTestMakeyButtonDriver()
-	gobottest.Assert(t, d.Pin(), "1")
-	gobottest.Refute(t, d.Connection(), nil)
-	gobottest.Assert(t, d.interval, 10*time.Millisecond)
+	assert.Equal(t, "1", d.Pin())
+	assert.NotNil(t, d.Connection())
+	assert.Equal(t, 10*time.Millisecond, d.interval)
 
 	d = NewMakeyButtonDriver(newGpioTestAdaptor(), "1", 30*time.Second)
-	gobottest.Assert(t, d.interval, 30*time.Second)
+	assert.Equal(t, 30*time.Second, d.interval)
 }
 
 func TestMakeyButtonDriverStart(t *testing.T) {
@@ -47,10 +47,10 @@ func TestMakeyButtonDriverStart(t *testing.T) {
 	a := newGpioTestAdaptor()
 	d := NewMakeyButtonDriver(a, "1")
 
-	gobottest.Assert(t, d.Start(), nil)
+	assert.Nil(t, d.Start())
 
 	_ = d.Once(ButtonPush, func(data interface{}) {
-		gobottest.Assert(t, d.Active, true)
+		assert.True(t, d.Active)
 		sem <- true
 	})
 
@@ -66,7 +66,7 @@ func TestMakeyButtonDriverStart(t *testing.T) {
 	}
 
 	_ = d.Once(ButtonRelease, func(data interface{}) {
-		gobottest.Assert(t, d.Active, false)
+		assert.False(t, d.Active)
 		sem <- true
 	})
 
@@ -82,7 +82,7 @@ func TestMakeyButtonDriverStart(t *testing.T) {
 	}
 
 	_ = d.Once(Error, func(data interface{}) {
-		gobottest.Assert(t, data.(error).Error(), "digital read error")
+		assert.Equal(t, "digital read error", data.(error).Error())
 		sem <- true
 	})
 

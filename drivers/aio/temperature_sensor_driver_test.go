@@ -7,15 +7,15 @@ import (
 	"testing"
 	"time"
 
-	"gobot.io/x/gobot/v2/gobottest"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestTemperatureSensorDriver(t *testing.T) {
 	testAdaptor := newAioTestAdaptor()
 	d := NewTemperatureSensorDriver(testAdaptor, "123")
-	gobottest.Assert(t, d.Connection(), testAdaptor)
-	gobottest.Assert(t, d.Pin(), "123")
-	gobottest.Assert(t, d.interval, 10*time.Millisecond)
+	assert.Equal(t, testAdaptor, d.Connection())
+	assert.Equal(t, "123", d.Pin())
+	assert.Equal(t, 10*time.Millisecond, d.interval)
 }
 
 func TestTemperatureSensorDriverNtcScaling(t *testing.T) {
@@ -48,8 +48,8 @@ func TestTemperatureSensorDriverNtcScaling(t *testing.T) {
 			// act
 			got, err := d.Read()
 			// assert
-			gobottest.Assert(t, err, nil)
-			gobottest.Assert(t, got, tt.want)
+			assert.Nil(t, err)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -83,8 +83,8 @@ func TestTemperatureSensorDriverLinearScaling(t *testing.T) {
 			// act
 			got, err := d.Read()
 			// assert
-			gobottest.Assert(t, err, nil)
-			gobottest.Assert(t, got, tt.want)
+			assert.Nil(t, err)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -101,10 +101,10 @@ func TestTempSensorPublishesTemperatureInCelsius(t *testing.T) {
 		return
 	})
 	_ = d.Once(d.Event(Value), func(data interface{}) {
-		gobottest.Assert(t, fmt.Sprintf("%.2f", data.(float64)), "31.62")
+		assert.Equal(t, "31.62", fmt.Sprintf("%.2f", data.(float64)))
 		sem <- true
 	})
-	gobottest.Assert(t, d.Start(), nil)
+	assert.Nil(t, d.Start())
 
 	select {
 	case <-sem:
@@ -112,7 +112,7 @@ func TestTempSensorPublishesTemperatureInCelsius(t *testing.T) {
 		t.Errorf(" Temperature Sensor Event \"Data\" was not published")
 	}
 
-	gobottest.Assert(t, d.Value(), 31.61532462352477)
+	assert.Equal(t, 31.61532462352477, d.Value())
 }
 
 func TestTempSensorPublishesError(t *testing.T) {
@@ -126,11 +126,11 @@ func TestTempSensorPublishesError(t *testing.T) {
 		return
 	})
 
-	gobottest.Assert(t, d.Start(), nil)
+	assert.Nil(t, d.Start())
 
 	// expect error
 	_ = d.Once(d.Event(Error), func(data interface{}) {
-		gobottest.Assert(t, data.(error).Error(), "read error")
+		assert.Equal(t, "read error", data.(error).Error())
 		sem <- true
 	})
 
@@ -148,7 +148,7 @@ func TestTempSensorHalt(t *testing.T) {
 		<-d.halt
 		close(done)
 	}()
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.Nil(t, d.Halt())
 	select {
 	case <-done:
 	case <-time.After(100 * time.Millisecond):
@@ -158,13 +158,13 @@ func TestTempSensorHalt(t *testing.T) {
 
 func TestTempDriverDefaultName(t *testing.T) {
 	d := NewTemperatureSensorDriver(newAioTestAdaptor(), "1")
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "TemperatureSensor"), true)
+	assert.True(t, strings.HasPrefix(d.Name(), "TemperatureSensor"))
 }
 
 func TestTempDriverSetName(t *testing.T) {
 	d := NewTemperatureSensorDriver(newAioTestAdaptor(), "1")
 	d.SetName("mybot")
-	gobottest.Assert(t, d.Name(), "mybot")
+	assert.Equal(t, "mybot", d.Name())
 }
 
 func TestTempDriver_initialize(t *testing.T) {
@@ -208,7 +208,7 @@ func TestTempDriver_initialize(t *testing.T) {
 			// act
 			ntc.initialize()
 			// assert
-			gobottest.Assert(t, ntc, tt.want)
+			assert.Equal(t, tt.want, ntc)
 		})
 	}
 }

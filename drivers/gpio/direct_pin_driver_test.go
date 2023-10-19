@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Driver = (*DirectPinDriver)(nil)
@@ -34,138 +34,138 @@ func TestDirectPinDriver(t *testing.T) {
 	var err interface{}
 
 	d := initTestDirectPinDriver()
-	gobottest.Assert(t, d.Pin(), "1")
-	gobottest.Refute(t, d.Connection(), nil)
+	assert.Equal(t, "1", d.Pin())
+	assert.NotNil(t, d.Connection())
 
 	ret = d.Command("DigitalRead")(nil).(map[string]interface{})
 
-	gobottest.Assert(t, ret["val"].(int), 1)
-	gobottest.Assert(t, ret["err"], nil)
+	assert.Equal(t, 1, ret["val"].(int))
+	assert.Nil(t, ret["err"])
 
 	err = d.Command("DigitalWrite")(map[string]interface{}{"level": "1"})
-	gobottest.Assert(t, err.(error), errors.New("write error"))
+	assert.Errorf(t, err.(error), "write error")
 
 	err = d.Command("PwmWrite")(map[string]interface{}{"level": "1"})
-	gobottest.Assert(t, err.(error), errors.New("write error"))
+	assert.Errorf(t, err.(error), "write error")
 
 	err = d.Command("ServoWrite")(map[string]interface{}{"level": "1"})
-	gobottest.Assert(t, err.(error), errors.New("write error"))
+	assert.Errorf(t, err.(error), "write error")
 }
 
 func TestDirectPinDriverStart(t *testing.T) {
 	d := initTestDirectPinDriver()
-	gobottest.Assert(t, d.Start(), nil)
+	assert.Nil(t, d.Start())
 }
 
 func TestDirectPinDriverHalt(t *testing.T) {
 	d := initTestDirectPinDriver()
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.Nil(t, d.Halt())
 }
 
 func TestDirectPinDriverOff(t *testing.T) {
 	d := initTestDirectPinDriver()
-	gobottest.Refute(t, d.Off(), nil)
+	assert.NotNil(t, d.Off())
 
 	a := newGpioTestAdaptor()
 	d = NewDirectPinDriver(a, "1")
-	gobottest.Assert(t, d.Off(), nil)
+	assert.Nil(t, d.Off())
 }
 
 func TestDirectPinDriverOffNotSupported(t *testing.T) {
 	a := &gpioTestBareAdaptor{}
 	d := NewDirectPinDriver(a, "1")
-	gobottest.Assert(t, d.Off(), errors.New("DigitalWrite is not supported by this platform"))
+	assert.Errorf(t, d.Off(), "DigitalWrite is not supported by this platform")
 }
 
 func TestDirectPinDriverOn(t *testing.T) {
 	a := newGpioTestAdaptor()
 	d := NewDirectPinDriver(a, "1")
-	gobottest.Assert(t, d.On(), nil)
+	assert.Nil(t, d.On())
 }
 
 func TestDirectPinDriverOnError(t *testing.T) {
 	d := initTestDirectPinDriver()
-	gobottest.Refute(t, d.On(), nil)
+	assert.NotNil(t, d.On())
 }
 
 func TestDirectPinDriverOnNotSupported(t *testing.T) {
 	a := &gpioTestBareAdaptor{}
 	d := NewDirectPinDriver(a, "1")
-	gobottest.Assert(t, d.On(), errors.New("DigitalWrite is not supported by this platform"))
+	assert.Errorf(t, d.On(), "DigitalWrite is not supported by this platform")
 }
 
 func TestDirectPinDriverDigitalWrite(t *testing.T) {
 	adaptor := newGpioTestAdaptor()
 	d := NewDirectPinDriver(adaptor, "1")
-	gobottest.Assert(t, d.DigitalWrite(1), nil)
+	assert.Nil(t, d.DigitalWrite(1))
 }
 
 func TestDirectPinDriverDigitalWriteNotSupported(t *testing.T) {
 	a := &gpioTestBareAdaptor{}
 	d := NewDirectPinDriver(a, "1")
-	gobottest.Assert(t, d.DigitalWrite(1), errors.New("DigitalWrite is not supported by this platform"))
+	assert.Errorf(t, d.DigitalWrite(1), "DigitalWrite is not supported by this platform")
 }
 
 func TestDirectPinDriverDigitalWriteError(t *testing.T) {
 	d := initTestDirectPinDriver()
-	gobottest.Refute(t, d.DigitalWrite(1), nil)
+	assert.NotNil(t, d.DigitalWrite(1))
 }
 
 func TestDirectPinDriverDigitalRead(t *testing.T) {
 	d := initTestDirectPinDriver()
 	ret, err := d.DigitalRead()
-	gobottest.Assert(t, ret, 1)
-	gobottest.Assert(t, err, nil)
+	assert.Equal(t, 1, ret)
+	assert.Nil(t, err)
 }
 
 func TestDirectPinDriverDigitalReadNotSupported(t *testing.T) {
 	a := &gpioTestBareAdaptor{}
 	d := NewDirectPinDriver(a, "1")
 	_, e := d.DigitalRead()
-	gobottest.Assert(t, e, errors.New("DigitalRead is not supported by this platform"))
+	assert.Errorf(t, e, "DigitalRead is not supported by this platform")
 }
 
 func TestDirectPinDriverPwmWrite(t *testing.T) {
 	a := newGpioTestAdaptor()
 	d := NewDirectPinDriver(a, "1")
-	gobottest.Assert(t, d.PwmWrite(1), nil)
+	assert.Nil(t, d.PwmWrite(1))
 }
 
 func TestDirectPinDriverPwmWriteNotSupported(t *testing.T) {
 	a := &gpioTestBareAdaptor{}
 	d := NewDirectPinDriver(a, "1")
-	gobottest.Assert(t, d.PwmWrite(1), errors.New("PwmWrite is not supported by this platform"))
+	assert.Errorf(t, d.PwmWrite(1), "PwmWrite is not supported by this platform")
 }
 
 func TestDirectPinDriverPwmWriteError(t *testing.T) {
 	d := initTestDirectPinDriver()
-	gobottest.Refute(t, d.PwmWrite(1), nil)
+	assert.NotNil(t, d.PwmWrite(1))
 }
 
 func TestDirectPinDriverServoWrite(t *testing.T) {
 	a := newGpioTestAdaptor()
 	d := NewDirectPinDriver(a, "1")
-	gobottest.Assert(t, d.ServoWrite(1), nil)
+	assert.Nil(t, d.ServoWrite(1))
 }
 
 func TestDirectPinDriverServoWriteNotSupported(t *testing.T) {
 	a := &gpioTestBareAdaptor{}
 	d := NewDirectPinDriver(a, "1")
-	gobottest.Assert(t, d.ServoWrite(1), errors.New("ServoWrite is not supported by this platform"))
+	assert.Errorf(t, d.ServoWrite(1), "ServoWrite is not supported by this platform")
 }
 
 func TestDirectPinDriverServoWriteError(t *testing.T) {
 	d := initTestDirectPinDriver()
-	gobottest.Refute(t, d.ServoWrite(1), nil)
+	assert.NotNil(t, d.ServoWrite(1))
 }
 
 func TestDirectPinDriverDefaultName(t *testing.T) {
 	d := initTestDirectPinDriver()
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "Direct"), true)
+	assert.True(t, strings.HasPrefix(d.Name(), "Direct"))
 }
 
 func TestDirectPinDriverSetName(t *testing.T) {
 	d := initTestDirectPinDriver()
 	d.SetName("mybot")
-	gobottest.Assert(t, d.Name(), "mybot")
+	assert.Equal(t, "mybot", d.Name())
 }

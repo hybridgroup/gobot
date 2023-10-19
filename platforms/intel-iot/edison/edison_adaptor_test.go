@@ -5,11 +5,11 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/aio"
 	"gobot.io/x/gobot/v2/drivers/gpio"
 	"gobot.io/x/gobot/v2/drivers/i2c"
-	"gobot.io/x/gobot/v2/gobottest"
 	"gobot.io/x/gobot/v2/system"
 )
 
@@ -223,17 +223,17 @@ func initTestAdaptorWithMockedFilesystem(boardType string) (*Adaptor, *system.Mo
 func TestName(t *testing.T) {
 	a := NewAdaptor()
 
-	gobottest.Assert(t, strings.HasPrefix(a.Name(), "Edison"), true)
+	assert.True(t, strings.HasPrefix(a.Name(), "Edison"))
 	a.SetName("NewName")
-	gobottest.Assert(t, a.Name(), "NewName")
+	assert.Equal(t, "NewName", a.Name())
 }
 
 func TestConnect(t *testing.T) {
 	a, _ := initTestAdaptorWithMockedFilesystem("arduino")
 
-	gobottest.Assert(t, a.DefaultI2cBus(), 6)
-	gobottest.Assert(t, a.board, "arduino")
-	gobottest.Assert(t, a.Connect(), nil)
+	assert.Equal(t, 6, a.DefaultI2cBus())
+	assert.Equal(t, "arduino", a.board)
+	assert.Nil(t, a.Connect())
 }
 
 func TestArduinoSetupFail263(t *testing.T) {
@@ -241,7 +241,7 @@ func TestArduinoSetupFail263(t *testing.T) {
 	delete(fs.Files, "/sys/class/gpio/gpio263/direction")
 
 	err := a.arduinoSetup()
-	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/gpio263/direction: no such file"), true)
+	assert.Contains(t, err.Error(), "/sys/class/gpio/gpio263/direction: no such file")
 }
 
 func TestArduinoSetupFail240(t *testing.T) {
@@ -249,7 +249,7 @@ func TestArduinoSetupFail240(t *testing.T) {
 	delete(fs.Files, "/sys/class/gpio/gpio240/direction")
 
 	err := a.arduinoSetup()
-	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/gpio240/direction: no such file"), true)
+	assert.Contains(t, err.Error(), "/sys/class/gpio/gpio240/direction: no such file")
 }
 
 func TestArduinoSetupFail111(t *testing.T) {
@@ -257,7 +257,7 @@ func TestArduinoSetupFail111(t *testing.T) {
 	delete(fs.Files, "/sys/kernel/debug/gpio_debug/gpio111/current_pinmux")
 
 	err := a.arduinoSetup()
-	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/kernel/debug/gpio_debug/gpio111/current_pinmux: no such file"), true)
+	assert.Contains(t, err.Error(), "/sys/kernel/debug/gpio_debug/gpio111/current_pinmux: no such file")
 }
 
 func TestArduinoSetupFail131(t *testing.T) {
@@ -265,56 +265,56 @@ func TestArduinoSetupFail131(t *testing.T) {
 	delete(fs.Files, "/sys/kernel/debug/gpio_debug/gpio131/current_pinmux")
 
 	err := a.arduinoSetup()
-	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/kernel/debug/gpio_debug/gpio131/current_pinmux: no such file"), true)
+	assert.Contains(t, err.Error(), "/sys/kernel/debug/gpio_debug/gpio131/current_pinmux: no such file")
 }
 
 func TestArduinoI2CSetupFailTristate(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
-	gobottest.Assert(t, a.arduinoSetup(), nil)
+	assert.Nil(t, a.arduinoSetup())
 
 	fs.WithWriteError = true
 	err := a.arduinoI2CSetup()
-	gobottest.Assert(t, err, fmt.Errorf("write error"))
+	assert.Errorf(t, err, "write error")
 }
 
 func TestArduinoI2CSetupFail14(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 
-	gobottest.Assert(t, a.arduinoSetup(), nil)
+	assert.Nil(t, a.arduinoSetup())
 	delete(fs.Files, "/sys/class/gpio/gpio14/direction")
 
 	err := a.arduinoI2CSetup()
-	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/gpio14/direction: no such file"), true)
+	assert.Contains(t, err.Error(), "/sys/class/gpio/gpio14/direction: no such file")
 }
 
 func TestArduinoI2CSetupUnexportFail(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 
-	gobottest.Assert(t, a.arduinoSetup(), nil)
+	assert.Nil(t, a.arduinoSetup())
 	delete(fs.Files, "/sys/class/gpio/unexport")
 
 	err := a.arduinoI2CSetup()
-	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/unexport: no such file"), true)
+	assert.Contains(t, err.Error(), "/sys/class/gpio/unexport: no such file")
 }
 
 func TestArduinoI2CSetupFail236(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 
-	gobottest.Assert(t, a.arduinoSetup(), nil)
+	assert.Nil(t, a.arduinoSetup())
 	delete(fs.Files, "/sys/class/gpio/gpio236/direction")
 
 	err := a.arduinoI2CSetup()
-	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/gpio236/direction: no such file"), true)
+	assert.Contains(t, err.Error(), "/sys/class/gpio/gpio236/direction: no such file")
 }
 
 func TestArduinoI2CSetupFail28(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 
-	gobottest.Assert(t, a.arduinoSetup(), nil)
+	assert.Nil(t, a.arduinoSetup())
 	delete(fs.Files, "/sys/kernel/debug/gpio_debug/gpio28/current_pinmux")
 
 	err := a.arduinoI2CSetup()
-	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/kernel/debug/gpio_debug/gpio28/current_pinmux: no such file"), true)
+	assert.Contains(t, err.Error(), "/sys/kernel/debug/gpio_debug/gpio28/current_pinmux: no such file")
 }
 
 func TestConnectArduinoError(t *testing.T) {
@@ -322,7 +322,7 @@ func TestConnectArduinoError(t *testing.T) {
 	fs.WithWriteError = true
 
 	err := a.Connect()
-	gobottest.Assert(t, strings.Contains(err.Error(), "write error"), true)
+	assert.Contains(t, err.Error(), "write error")
 }
 
 func TestConnectArduinoWriteError(t *testing.T) {
@@ -330,30 +330,30 @@ func TestConnectArduinoWriteError(t *testing.T) {
 	fs.WithWriteError = true
 
 	err := a.Connect()
-	gobottest.Assert(t, strings.Contains(err.Error(), "write error"), true)
+	assert.Contains(t, err.Error(), "write error")
 }
 
 func TestConnectSparkfun(t *testing.T) {
 	a, _ := initTestAdaptorWithMockedFilesystem("sparkfun")
 
-	gobottest.Assert(t, a.Connect(), nil)
-	gobottest.Assert(t, a.DefaultI2cBus(), 1)
-	gobottest.Assert(t, a.board, "sparkfun")
+	assert.Nil(t, a.Connect())
+	assert.Equal(t, 1, a.DefaultI2cBus())
+	assert.Equal(t, "sparkfun", a.board)
 }
 
 func TestConnectMiniboard(t *testing.T) {
 	a, _ := initTestAdaptorWithMockedFilesystem("miniboard")
 
-	gobottest.Assert(t, a.Connect(), nil)
-	gobottest.Assert(t, a.DefaultI2cBus(), 1)
-	gobottest.Assert(t, a.board, "miniboard")
+	assert.Nil(t, a.Connect())
+	assert.Equal(t, 1, a.DefaultI2cBus())
+	assert.Equal(t, "miniboard", a.board)
 }
 
 func TestConnectUnknown(t *testing.T) {
 	a := NewAdaptor("wha")
 
 	err := a.Connect()
-	gobottest.Assert(t, strings.Contains(err.Error(), "Unknown board type: wha"), true)
+	assert.Contains(t, err.Error(), "Unknown board type: wha")
 }
 
 func TestFinalize(t *testing.T) {
@@ -363,18 +363,18 @@ func TestFinalize(t *testing.T) {
 	_ = a.PwmWrite("5", 100)
 
 	_, _ = a.GetI2cConnection(0xff, 6)
-	gobottest.Assert(t, a.Finalize(), nil)
+	assert.Nil(t, a.Finalize())
 
 	// assert that finalize after finalize is working
-	gobottest.Assert(t, a.Finalize(), nil)
+	assert.Nil(t, a.Finalize())
 
 	// assert that re-connect is working
 	_ = a.Connect()
 	// remove one file to force Finalize error
 	delete(fs.Files, "/sys/class/gpio/unexport")
 	err := a.Finalize()
-	gobottest.Assert(t, strings.Contains(err.Error(), "1 error occurred"), true)
-	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/unexport"), true)
+	assert.Contains(t, err.Error(), "1 error occurred")
+	assert.Contains(t, err.Error(), "/sys/class/gpio/unexport")
 }
 
 func TestFinalizeError(t *testing.T) {
@@ -384,22 +384,22 @@ func TestFinalizeError(t *testing.T) {
 
 	fs.WithWriteError = true
 	err := a.Finalize()
-	gobottest.Assert(t, strings.Contains(err.Error(), "6 errors occurred"), true)
-	gobottest.Assert(t, strings.Contains(err.Error(), "write error"), true)
-	gobottest.Assert(t, strings.Contains(err.Error(), "SetEnabled(false) failed for id 1 with write error"), true)
-	gobottest.Assert(t, strings.Contains(err.Error(), "Unexport() failed for id 1 with write error"), true)
+	assert.Contains(t, err.Error(), "6 errors occurred")
+	assert.Contains(t, err.Error(), "write error")
+	assert.Contains(t, err.Error(), "SetEnabled(false) failed for id 1 with write error")
+	assert.Contains(t, err.Error(), "Unexport() failed for id 1 with write error")
 }
 
 func TestDigitalIO(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 
 	_ = a.DigitalWrite("13", 1)
-	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio40/value"].Contents, "1")
+	assert.Equal(t, "1", fs.Files["/sys/class/gpio/gpio40/value"].Contents)
 
 	_ = a.DigitalWrite("2", 0)
 	i, err := a.DigitalRead("2")
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, i, 0)
+	assert.Nil(t, err)
+	assert.Equal(t, 0, i)
 }
 
 func TestDigitalPinInFileError(t *testing.T) {
@@ -410,7 +410,7 @@ func TestDigitalPinInFileError(t *testing.T) {
 	_ = a.Connect()
 
 	_, err := a.DigitalPin("13")
-	gobottest.Assert(t, strings.Contains(err.Error(), "no such file"), true)
+	assert.Contains(t, err.Error(), "no such file")
 
 }
 
@@ -422,7 +422,7 @@ func TestDigitalPinInResistorFileError(t *testing.T) {
 	_ = a.Connect()
 
 	_, err := a.DigitalPin("13")
-	gobottest.Assert(t, strings.Contains(err.Error(), "no such file"), true)
+	assert.Contains(t, err.Error(), "no such file")
 }
 
 func TestDigitalPinInLevelShifterFileError(t *testing.T) {
@@ -433,7 +433,7 @@ func TestDigitalPinInLevelShifterFileError(t *testing.T) {
 	_ = a.Connect()
 
 	_, err := a.DigitalPin("13")
-	gobottest.Assert(t, strings.Contains(err.Error(), "no such file"), true)
+	assert.Contains(t, err.Error(), "no such file")
 }
 
 func TestDigitalPinInMuxFileError(t *testing.T) {
@@ -444,7 +444,7 @@ func TestDigitalPinInMuxFileError(t *testing.T) {
 	_ = a.Connect()
 
 	_, err := a.DigitalPin("13")
-	gobottest.Assert(t, strings.Contains(err.Error(), "no such file"), true)
+	assert.Contains(t, err.Error(), "no such file")
 }
 
 func TestDigitalWriteError(t *testing.T) {
@@ -452,7 +452,7 @@ func TestDigitalWriteError(t *testing.T) {
 	fs.WithWriteError = true
 
 	err := a.DigitalWrite("13", 1)
-	gobottest.Assert(t, err, fmt.Errorf("write error"))
+	assert.Errorf(t, err, "write error")
 }
 
 func TestDigitalReadWriteError(t *testing.T) {
@@ -460,18 +460,18 @@ func TestDigitalReadWriteError(t *testing.T) {
 	fs.WithWriteError = true
 
 	_, err := a.DigitalRead("13")
-	gobottest.Assert(t, err, fmt.Errorf("write error"))
+	assert.Errorf(t, err, "write error")
 }
 
 func TestPwm(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem("arduino")
 
 	err := a.PwmWrite("5", 100)
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/pwm1/duty_cycle"].Contents, "1960")
+	assert.Nil(t, err)
+	assert.Equal(t, "1960", fs.Files["/sys/class/pwm/pwmchip0/pwm1/duty_cycle"].Contents)
 
 	err = a.PwmWrite("7", 100)
-	gobottest.Assert(t, err, fmt.Errorf("'7' is not a valid id for a PWM pin"))
+	assert.Errorf(t, err, "'7' is not a valid id for a PWM pin")
 }
 
 func TestPwmExportError(t *testing.T) {
@@ -479,10 +479,10 @@ func TestPwmExportError(t *testing.T) {
 	fs := a.sys.UseMockFilesystem(pwmMockPathsMux13Arduino)
 	delete(fs.Files, "/sys/class/pwm/pwmchip0/export")
 	err := a.Connect()
-	gobottest.Assert(t, err, nil)
+	assert.Nil(t, err)
 
 	err = a.PwmWrite("5", 100)
-	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/pwm/pwmchip0/export: no such file"), true)
+	assert.Contains(t, err.Error(), "/sys/class/pwm/pwmchip0/export: no such file")
 }
 
 func TestPwmEnableError(t *testing.T) {
@@ -492,7 +492,7 @@ func TestPwmEnableError(t *testing.T) {
 	_ = a.Connect()
 
 	err := a.PwmWrite("5", 100)
-	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/pwm/pwmchip0/pwm1/enable: no such file"), true)
+	assert.Contains(t, err.Error(), "/sys/class/pwm/pwmchip0/pwm1/enable: no such file")
 }
 
 func TestPwmWritePinError(t *testing.T) {
@@ -500,7 +500,7 @@ func TestPwmWritePinError(t *testing.T) {
 	fs.WithWriteError = true
 
 	err := a.PwmWrite("5", 100)
-	gobottest.Assert(t, err, fmt.Errorf("write error"))
+	assert.Errorf(t, err, "write error")
 }
 
 func TestPwmWriteError(t *testing.T) {
@@ -508,7 +508,7 @@ func TestPwmWriteError(t *testing.T) {
 	fs.WithWriteError = true
 
 	err := a.PwmWrite("5", 100)
-	gobottest.Assert(t, strings.Contains(err.Error(), "write error"), true)
+	assert.Contains(t, err.Error(), "write error")
 }
 
 func TestPwmReadError(t *testing.T) {
@@ -516,7 +516,7 @@ func TestPwmReadError(t *testing.T) {
 	fs.WithReadError = true
 
 	err := a.PwmWrite("5", 100)
-	gobottest.Assert(t, strings.Contains(err.Error(), "read error"), true)
+	assert.Contains(t, err.Error(), "read error")
 }
 
 func TestAnalog(t *testing.T) {
@@ -524,7 +524,7 @@ func TestAnalog(t *testing.T) {
 	fs.Files["/sys/bus/iio/devices/iio:device1/in_voltage0_raw"].Contents = "1000\n"
 
 	i, _ := a.AnalogRead("0")
-	gobottest.Assert(t, i, 250)
+	assert.Equal(t, 250, i)
 }
 
 func TestAnalogError(t *testing.T) {
@@ -532,7 +532,7 @@ func TestAnalogError(t *testing.T) {
 	fs.WithReadError = true
 
 	_, err := a.AnalogRead("0")
-	gobottest.Assert(t, err, fmt.Errorf("read error"))
+	assert.Errorf(t, err, "read error")
 }
 
 func TestI2cWorkflow(t *testing.T) {
@@ -540,17 +540,17 @@ func TestI2cWorkflow(t *testing.T) {
 	a.sys.UseMockSyscall()
 
 	con, err := a.GetI2cConnection(0xff, 6)
-	gobottest.Assert(t, err, nil)
+	assert.Nil(t, err)
 
 	_, err = con.Write([]byte{0x00, 0x01})
-	gobottest.Assert(t, err, nil)
+	assert.Nil(t, err)
 
 	data := []byte{42, 42}
 	_, err = con.Read(data)
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, data, []byte{0x00, 0x01})
+	assert.Nil(t, err)
+	assert.Equal(t, []byte{0x00, 0x01}, data)
 
-	gobottest.Assert(t, a.Finalize(), nil)
+	assert.Nil(t, a.Finalize())
 }
 
 func TestI2cFinalizeWithErrors(t *testing.T) {
@@ -558,17 +558,17 @@ func TestI2cFinalizeWithErrors(t *testing.T) {
 	a := NewAdaptor()
 	a.sys.UseMockSyscall()
 	fs := a.sys.UseMockFilesystem(pwmMockPathsMux13ArduinoI2c)
-	gobottest.Assert(t, a.Connect(), nil)
+	assert.Nil(t, a.Connect())
 	con, err := a.GetI2cConnection(0xff, 6)
-	gobottest.Assert(t, err, nil)
+	assert.Nil(t, err)
 	_, err = con.Write([]byte{0x0A})
-	gobottest.Assert(t, err, nil)
+	assert.Nil(t, err)
 	fs.WithCloseError = true
 	// act
 	err = a.Finalize()
 	// assert
-	gobottest.Refute(t, err, nil)
-	gobottest.Assert(t, strings.Contains(err.Error(), "close error"), true)
+	assert.NotNil(t, err)
+	assert.Contains(t, err.Error(), "close error")
 
 }
 
@@ -613,7 +613,7 @@ func Test_validateI2cBusNumber(t *testing.T) {
 			// act
 			err := a.validateAndSetupI2cBusNumber(tc.busNr)
 			// assert
-			gobottest.Assert(t, err, tc.wantErr)
+			assert.Equal(t, tc.wantErr, err)
 		})
 	}
 }

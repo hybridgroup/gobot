@@ -5,8 +5,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.DigitalPinner = (*digitalPinSysfs)(nil)
@@ -29,51 +29,51 @@ func TestDigitalPin(t *testing.T) {
 	}
 	pin, fs := initTestDigitalPinSysFsWithMockedFilesystem(mockPaths)
 
-	gobottest.Assert(t, pin.pin, "10")
-	gobottest.Assert(t, pin.label, "gpio10")
-	gobottest.Assert(t, pin.valFile, nil)
+	assert.Equal(t, "10", pin.pin)
+	assert.Equal(t, "gpio10", pin.label)
+	assert.Nil(t, pin.valFile)
 
 	err := pin.Unexport()
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, fs.Files["/sys/class/gpio/unexport"].Contents, "10")
+	assert.Nil(t, err)
+	assert.Equal(t, "10", fs.Files["/sys/class/gpio/unexport"].Contents)
 
 	err = pin.Export()
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, fs.Files["/sys/class/gpio/export"].Contents, "10")
-	gobottest.Refute(t, pin.valFile, nil)
+	assert.Nil(t, err)
+	assert.Equal(t, "10", fs.Files["/sys/class/gpio/export"].Contents)
+	assert.NotNil(t, pin.valFile)
 
 	err = pin.Write(1)
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio10/value"].Contents, "1")
+	assert.Nil(t, err)
+	assert.Equal(t, "1", fs.Files["/sys/class/gpio/gpio10/value"].Contents)
 
 	err = pin.ApplyOptions(WithPinDirectionInput())
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio10/direction"].Contents, "in")
+	assert.Nil(t, err)
+	assert.Equal(t, "in", fs.Files["/sys/class/gpio/gpio10/direction"].Contents)
 
 	data, _ := pin.Read()
-	gobottest.Assert(t, 1, data)
+	assert.Equal(t, data, 1)
 
 	pin2 := newDigitalPinSysfs(fs, "30")
 	err = pin2.Write(1)
-	gobottest.Assert(t, err.Error(), "pin has not been exported")
+	assert.Errorf(t, err, "pin has not been exported")
 
 	data, err = pin2.Read()
-	gobottest.Assert(t, err.Error(), "pin has not been exported")
-	gobottest.Assert(t, data, 0)
+	assert.Errorf(t, err, "pin has not been exported")
+	assert.Equal(t, 0, data)
 
 	writeFile = func(File, []byte) (int, error) {
 		return 0, &os.PathError{Err: Syscall_EINVAL}
 	}
 
 	err = pin.Unexport()
-	gobottest.Assert(t, err, nil)
+	assert.Nil(t, err)
 
 	writeFile = func(File, []byte) (int, error) {
 		return 0, &os.PathError{Err: errors.New("write error")}
 	}
 
 	err = pin.Unexport()
-	gobottest.Assert(t, err.(*os.PathError).Err, errors.New("write error"))
+	assert.Errorf(t, err.(*os.PathError).Err, "write error")
 
 	// assert a busy error is dropped (just means "already exported")
 	cnt := 0
@@ -85,14 +85,14 @@ func TestDigitalPin(t *testing.T) {
 		return 0, nil
 	}
 	err = pin.Export()
-	gobottest.Assert(t, err, nil)
+	assert.Nil(t, err)
 
 	// assert write error on export
 	writeFile = func(File, []byte) (int, error) {
 		return 0, &os.PathError{Err: errors.New("write error")}
 	}
 	err = pin.Export()
-	gobottest.Assert(t, err.(*os.PathError).Err, errors.New("write error"))
+	assert.Errorf(t, err.(*os.PathError).Err, "write error")
 }
 
 func TestDigitalPinExportError(t *testing.T) {
@@ -107,7 +107,7 @@ func TestDigitalPinExportError(t *testing.T) {
 	}
 
 	err := pin.Export()
-	gobottest.Assert(t, err.Error(), " : /sys/class/gpio/gpio10/direction: no such file")
+	assert.Errorf(t, err, " : /sys/class/gpio/gpio10/direction: no such file")
 }
 
 func TestDigitalPinUnexportError(t *testing.T) {
@@ -121,5 +121,5 @@ func TestDigitalPinUnexportError(t *testing.T) {
 	}
 
 	err := pin.Unexport()
-	gobottest.Assert(t, err.Error(), " : device or resource busy")
+	assert.Errorf(t, err, " : device or resource busy")
 }

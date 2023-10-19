@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Driver = (*LedDriver)(nil)
@@ -27,8 +27,8 @@ func TestLedDriver(t *testing.T) {
 	a := newGpioTestAdaptor()
 	d := NewLedDriver(a, "1")
 
-	gobottest.Assert(t, d.Pin(), "1")
-	gobottest.Refute(t, d.Connection(), nil)
+	assert.Equal(t, "1", d.Pin())
+	assert.NotNil(t, d.Connection())
 
 	a.testAdaptorDigitalWrite = func(string, byte) (err error) {
 		return errors.New("write error")
@@ -38,36 +38,36 @@ func TestLedDriver(t *testing.T) {
 	}
 
 	err = d.Command("Toggle")(nil)
-	gobottest.Assert(t, err.(error), errors.New("write error"))
+	assert.Errorf(t, err.(error), "write error")
 
 	err = d.Command("On")(nil)
-	gobottest.Assert(t, err.(error), errors.New("write error"))
+	assert.Errorf(t, err.(error), "write error")
 
 	err = d.Command("Off")(nil)
-	gobottest.Assert(t, err.(error), errors.New("write error"))
+	assert.Errorf(t, err.(error), "write error")
 
 	err = d.Command("Brightness")(map[string]interface{}{"level": 100.0})
-	gobottest.Assert(t, err.(error), errors.New("pwm error"))
+	assert.Errorf(t, err.(error), "pwm error")
 
 }
 
 func TestLedDriverStart(t *testing.T) {
 	d := initTestLedDriver()
-	gobottest.Assert(t, d.Start(), nil)
+	assert.Nil(t, d.Start())
 }
 
 func TestLedDriverHalt(t *testing.T) {
 	d := initTestLedDriver()
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.Nil(t, d.Halt())
 }
 
 func TestLedDriverToggle(t *testing.T) {
 	d := initTestLedDriver()
 	_ = d.Off()
 	_ = d.Toggle()
-	gobottest.Assert(t, d.State(), true)
+	assert.True(t, d.State())
 	_ = d.Toggle()
-	gobottest.Assert(t, d.State(), false)
+	assert.False(t, d.State())
 }
 
 func TestLedDriverBrightness(t *testing.T) {
@@ -77,18 +77,18 @@ func TestLedDriverBrightness(t *testing.T) {
 		err = errors.New("pwm error")
 		return
 	}
-	gobottest.Assert(t, d.Brightness(150), errors.New("pwm error"))
+	assert.Errorf(t, d.Brightness(150), "pwm error")
 }
 
 func TestLEDDriverDefaultName(t *testing.T) {
 	a := newGpioTestAdaptor()
 	d := NewLedDriver(a, "1")
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "LED"), true)
+	assert.True(t, strings.HasPrefix(d.Name(), "LED"))
 }
 
 func TestLEDDriverSetName(t *testing.T) {
 	a := newGpioTestAdaptor()
 	d := NewLedDriver(a, "1")
 	d.SetName("mybot")
-	gobottest.Assert(t, d.Name(), "mybot")
+	assert.Equal(t, "mybot", d.Name())
 }

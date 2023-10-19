@@ -3,8 +3,8 @@ package pebble
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Adaptor = (*Adaptor)(nil)
@@ -15,14 +15,14 @@ func initTestAdaptor() *Adaptor {
 
 func TestAdaptor(t *testing.T) {
 	a := initTestAdaptor()
-	gobottest.Assert(t, a.Name(), "Pebble")
+	assert.Equal(t, "Pebble", a.Name())
 }
 func TestAdaptorConnect(t *testing.T) {
 	a := initTestAdaptor()
-	gobottest.Assert(t, a.Connect(), nil)
+	assert.Nil(t, a.Connect())
 }
 
 func TestAdaptorFinalize(t *testing.T) {
 	a := initTestAdaptor()
-	gobottest.Assert(t, a.Finalize(), nil)
+	assert.Nil(t, a.Finalize())
 }

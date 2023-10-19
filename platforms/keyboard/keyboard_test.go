@@ -3,65 +3,65 @@ package keyboard
 import (
 	"testing"
 
-	"gobot.io/x/gobot/v2/gobottest"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestParseSpace(t *testing.T) {
-	gobottest.Assert(t, Parse(bytes{32, 0, 0}).Key, Spacebar)
+	assert.Equal(t, Spacebar, Parse(bytes{32, 0, 0}).Key)
 }
 
 func TestParseEscape(t *testing.T) {
-	gobottest.Assert(t, Parse(bytes{27, 0, 0}).Key, Escape)
+	assert.Equal(t, Escape, Parse(bytes{27, 0, 0}).Key)
 }
 
 func TestParseHyphen(t *testing.T) {
-	gobottest.Assert(t, Parse(bytes{45, 0, 0}).Key, Hyphen)
+	assert.Equal(t, Hyphen, Parse(bytes{45, 0, 0}).Key)
 }
 
 func TestParseAsterisk(t *testing.T) {
-	gobottest.Assert(t, Parse(bytes{42, 0, 0}).Key, Asterisk)
+	assert.Equal(t, Asterisk, Parse(bytes{42, 0, 0}).Key)
 }
 
 func TestParsePlus(t *testing.T) {
-	gobottest.Assert(t, Parse(bytes{43, 0, 0}).Key, Plus)
+	assert.Equal(t, Plus, Parse(bytes{43, 0, 0}).Key)
 }
 
 func TestParseSlash(t *testing.T) {
-	gobottest.Assert(t, Parse(bytes{47, 0, 0}).Key, Slash)
+	assert.Equal(t, Slash, Parse(bytes{47, 0, 0}).Key)
 }
 
 func TestParseDot(t *testing.T) {
-	gobottest.Assert(t, Parse(bytes{46, 0, 0}).Key, Dot)
+	assert.Equal(t, Dot, Parse(bytes{46, 0, 0}).Key)
 }
 
 func TestParseNotEscape(t *testing.T) {
-	gobottest.Refute(t, Parse(bytes{27, 91, 65}).Key, Escape)
+	assert.NotEqual(t, Escape, Parse(bytes{27, 91, 65}).Key)
 }
 
 func TestParseNumberKeys(t *testing.T) {
-	gobottest.Assert(t, Parse(bytes{48, 0, 0}).Key, 48)
-	gobottest.Assert(t, Parse(bytes{50, 0, 0}).Key, 50)
-	gobottest.Assert(t, Parse(bytes{57, 0, 0}).Key, 57)
+	assert.Equal(t, 48, Parse(bytes{48, 0, 0}).Key)
+	assert.Equal(t, 50, Parse(bytes{50, 0, 0}).Key)
+	assert.Equal(t, 57, Parse(bytes{57, 0, 0}).Key)
 }
 
 func TestParseAlphaKeys(t *testing.T) {
-	gobottest.Assert(t, Parse(bytes{97, 0, 0}).Key, 97)
-	gobottest.Assert(t, Parse(bytes{101, 0, 0}).Key, 101)
-	gobottest.Assert(t, Parse(bytes{122, 0, 0}).Key, 122)
+	assert.Equal(t, 97, Parse(bytes{97, 0, 0}).Key)
+	assert.Equal(t, 101, Parse(bytes{101, 0, 0}).Key)
+	assert.Equal(t, 122, Parse(bytes{122, 0, 0}).Key)
 }
 
 func TestParseNotAlphaKeys(t *testing.T) {
-	gobottest.Refute(t, Parse(bytes{132, 0, 0}).Key, 132)
+	assert.NotEqual(t, 132, Parse(bytes{132, 0, 0}).Key)
 }
 
 func TestParseArrowKeys(t *testing.T) {
-	gobottest.Assert(t, Parse(bytes{27, 91, 65}).Key, 65)
-	gobottest.Assert(t, Parse(bytes{27, 91, 66}).Key, 66)
-	gobottest.Assert(t, Parse(bytes{27, 91, 67}).Key, 67)
-	gobottest.Assert(t, Parse(bytes{27, 91, 68}).Key, 68)
+	assert.Equal(t, 65, Parse(bytes{27, 91, 65}).Key)
+	assert.Equal(t, 66, Parse(bytes{27, 91, 66}).Key)
+	assert.Equal(t, 67, Parse(bytes{27, 91, 67}).Key)
+	assert.Equal(t, 68, Parse(bytes{27, 91, 68}).Key)
 }
 
 func TestParseNotArrowKeys(t *testing.T) {
-	gobottest.Refute(t, Parse(bytes{27, 91, 65}).Key, Escape)
-	gobottest.Refute(t, Parse(bytes{27, 91, 70}).Key, 70)
+	assert.NotEqual(t, Escape, Parse(bytes{27, 91, 65}).Key)
+	assert.NotEqual(t, 70, Parse(bytes{27, 91, 70}).Key)
 }

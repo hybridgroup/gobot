@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"gobot.io/x/gobot/v2/gobottest"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestRobotConnectionEach(t *testing.T) {
@@ -14,7 +14,7 @@ func TestRobotConnectionEach(t *testing.T) {
 	r.Connections().Each(func(conn Connection) {
 		i++
 	})
-	gobottest.Assert(t, r.Connections().Len(), i)
+	assert.Equal(t, i, r.Connections().Len())
 }
 
 func TestRobotToJSON(t *testing.T) {
@@ -23,25 +23,25 @@ func TestRobotToJSON(t *testing.T) {
 		return nil
 	})
 	json := NewJSONRobot(r)
-	gobottest.Assert(t, len(json.Devices), r.Devices().Len())
-	gobottest.Assert(t, len(json.Commands), len(r.Commands()))
+	assert.Equal(t, r.Devices().Len(), len(json.Devices))
+	assert.Equal(t, len(r.Commands()), len(json.Commands))
 }
 
 func TestRobotDevicesToJSON(t *testing.T) {
 	r := newTestRobot("Robot99")
 	json := NewJSONRobot(r)
-	gobottest.Assert(t, len(json.Devices), r.Devices().Len())
-	gobottest.Assert(t, json.Devices[0].Name, "Device1")
-	gobottest.Assert(t, json.Devices[0].Driver, "*gobot.testDriver")
-	gobottest.Assert(t, json.Devices[0].Connection, "Connection1")
-	gobottest.Assert(t, len(json.Devices[0].Commands), 1)
+	assert.Equal(t, r.Devices().Len(), len(json.Devices))
+	assert.Equal(t, "Device1", json.Devices[0].Name)
+	assert.Equal(t, "*gobot.testDriver", json.Devices[0].Driver)
+	assert.Equal(t, "Connection1", json.Devices[0].Connection)
+	assert.Equal(t, 1, len(json.Devices[0].Commands))
 }
 
 func TestRobotStart(t *testing.T) {
 	r := newTestRobot("Robot99")
-	gobottest.Assert(t, r.Start(), nil)
-	gobottest.Assert(t, r.Stop(), nil)
-	gobottest.Assert(t, r.Running(), false)
+	assert.Nil(t, r.Start())
+	assert.Nil(t, r.Stop())
+	assert.False(t, r.Running())
 }
 
 func TestRobotStartAutoRun(t *testing.T) {
@@ -55,13 +55,13 @@ func TestRobotStartAutoRun(t *testing.T) {
 	)
 
 	go func() {
-		gobottest.Assert(t, r.Start(), nil)
+		assert.Nil(t, r.Start())
 	}()
 
 	time.Sleep(10 * time.Millisecond)
-	gobottest.Assert(t, r.Running(), true)
+	assert.True(t, r.Running())
 
 	// stop it
-	gobottest.Assert(t, r.Stop(), nil)
-	gobottest.Assert(t, r.Running(), false)
+	assert.Nil(t, r.Stop())
+	assert.False(t, r.Running())
 }

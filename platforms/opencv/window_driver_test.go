@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 	"gocv.io/x/gocv"
 )
 
@@ -20,25 +20,25 @@ func initTestWindowDriver() *WindowDriver {
 
 func TestWindowDriver(t *testing.T) {
 	d := initTestWindowDriver()
-	gobottest.Assert(t, d.Name(), "Window")
-	gobottest.Assert(t, d.Connection(), (gobot.Connection)(nil))
+	assert.Equal(t, "Window", d.Name())
+	assert.Equal(t, (gobot.Connection)(nil), d.Connection())
 }
 
 func TestWindowDriverName(t *testing.T) {
 	d := initTestWindowDriver()
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "Window"), true)
+	assert.True(t, strings.HasPrefix(d.Name(), "Window"))
 	d.SetName("NewName")
-	gobottest.Assert(t, d.Name(), "NewName")
+	assert.Equal(t, "NewName", d.Name())
 }
 
 func TestWindowDriverStart(t *testing.T) {
 	d := initTestWindowDriver()
-	gobottest.Assert(t, d.Start(), nil)
+	assert.Nil(t, d.Start())
 }
 
 func TestWindowDriverHalt(t *testing.T) {
 	d := initTestWindowDriver()
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.Nil(t, d.Halt())
 }
 
 func TestWindowDriverShowImage(t *testing.T) {

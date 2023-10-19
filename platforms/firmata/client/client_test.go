@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"gobot.io/x/gobot/v2/gobottest"
+	"github.com/stretchr/testify/assert"
 )
 
 const semPublishWait = 10 * time.Millisecond
@@ -104,23 +104,23 @@ func initTestFirmataWithReadWriteCloser(name string, data ...[]byte) (*Client, r
 
 func TestPins(t *testing.T) {
 	b, _ := initTestFirmataWithReadWriteCloser(t.Name(), testDataCapabilitiesResponse, testDataAnalogMappingResponse)
-	gobottest.Assert(t, len(b.Pins()), 20)
-	gobottest.Assert(t, len(b.analogPins), 6)
+	assert.Equal(t, 20, len(b.Pins()))
+	assert.Equal(t, 6, len(b.analogPins))
 }
 
 func TestProtocolVersionQuery(t *testing.T) {
 	b, _ := initTestFirmataWithReadWriteCloser(t.Name())
-	gobottest.Assert(t, b.ProtocolVersionQuery(), nil)
+	assert.Nil(t, b.ProtocolVersionQuery())
 }
 
 func TestFirmwareQuery(t *testing.T) {
 	b, _ := initTestFirmataWithReadWriteCloser(t.Name())
-	gobottest.Assert(t, b.FirmwareQuery(), nil)
+	assert.Nil(t, b.FirmwareQuery())
 }
 
 func TestPinStateQuery(t *testing.T) {
 	b, _ := initTestFirmataWithReadWriteCloser(t.Name())
-	gobottest.Assert(t, b.PinStateQuery(1), nil)
+	assert.Nil(t, b.PinStateQuery(1))
 }
 
 func TestProcessProtocolVersion(t *testing.T) {
@@ -129,7 +129,7 @@ func TestProcessProtocolVersion(t *testing.T) {
 	rwc.addTestReadData(testDataProtocolResponse)
 
 	_ = b.Once(b.Event("ProtocolVersion"), func(data interface{}) {
-		gobottest.Assert(t, data, "2.3")
+		assert.Equal(t, "2.3", data)
 		sem <- true
 	})
 
@@ -148,7 +148,7 @@ func TestProcessAnalogRead0(t *testing.T) {
 	rwc.addTestReadData([]byte{0xE0, 0x23, 0x05})
 
 	_ = b.Once(b.Event("AnalogRead0"), func(data interface{}) {
-		gobottest.Assert(t, data, 675)
+		assert.Equal(t, 675, data)
 		sem <- true
 	})
 
@@ -167,7 +167,7 @@ func TestProcessAnalogRead1(t *testing.T) {
 	rwc.addTestReadData([]byte{0xE1, 0x23, 0x06})
 
 	_ = b.Once(b.Event("AnalogRead1"), func(data interface{}) {
-		gobottest.Assert(t, data, 803)
+		assert.Equal(t, 803, data)
 		sem <- true
 	})
 
@@ -187,7 +187,7 @@ func TestProcessDigitalRead2(t *testing.T) {
 	rwc.addTestReadData([]byte{0x90, 0x04, 0x00})
 
 	_ = b.Once(b.Event("DigitalRead2"), func(data interface{}) {
-		gobottest.Assert(t, data, 1)
+		assert.Equal(t, 1, data)
 		sem <- true
 	})
 
@@ -207,7 +207,7 @@ func TestProcessDigitalRead4(t *testing.T) {
 	rwc.addTestReadData([]byte{0x90, 0x16, 0x00})
 
 	_ = b.Once(b.Event("DigitalRead4"), func(data interface{}) {
-		gobottest.Assert(t, data, 1)
+		assert.Equal(t, 1, data)
 		sem <- true
 	})
 
@@ -222,23 +222,23 @@ func TestProcessDigitalRead4(t *testing.T) {
 
 func TestDigitalWrite(t *testing.T) {
 	b, _ := initTestFirmataWithReadWriteCloser(t.Name(), testDataCapabilitiesResponse)
-	gobottest.Assert(t, b.DigitalWrite(13, 0), nil)
+	assert.Nil(t, b.DigitalWrite(13, 0))
 }
 
 func TestSetPinMode(t *testing.T) {
 	b, _ := initTestFirmataWithReadWriteCloser(t.Name(), testDataCapabilitiesResponse)
-	gobottest.Assert(t, b.SetPinMode(13, Output), nil)
+	assert.Nil(t, b.SetPinMode(13, Output))
 }
 
 func TestAnalogWrite(t *testing.T) {
 	b, _ := initTestFirmataWithReadWriteCloser(t.Name(), testDataCapabilitiesResponse)
-	gobottest.Assert(t, b.AnalogWrite(0, 128), nil)
+	assert.Nil(t, b.AnalogWrite(0, 128))
 }
 
 func TestReportAnalog(t *testing.T) {
 	b, _ := initTestFirmataWithReadWriteCloser(t.Name())
-	gobottest.Assert(t, b.ReportAnalog(0, 1), nil)
-	gobottest.Assert(t, b.ReportAnalog(0, 0), nil)
+	assert.Nil(t, b.ReportAnalog(0, 1))
+	assert.Nil(t, b.ReportAnalog(0, 0))
 }
 
 func TestProcessPinState13(t *testing.T) {
@@ -247,7 +247,7 @@ func TestProcessPinState13(t *testing.T) {
 	rwc.addTestReadData([]byte{240, 110, 13, 1, 1, 247})
 
 	_ = b.Once(b.Event("PinState13"), func(data interface{}) {
-		gobottest.Assert(t, data, Pin{[]int{0, 1, 4}, 1, 0, 1, 127})
+		assert.Equal(t, Pin{[]int{0, 1, 4}, 1, 0, 1, 127}, data)
 		sem <- true
 	})
 
@@ -262,22 +262,22 @@ func TestProcessPinState13(t *testing.T) {
 
 func TestI2cConfig(t *testing.T) {
 	b, _ := initTestFirmataWithReadWriteCloser(t.Name())
-	gobottest.Assert(t, b.I2cConfig(100), nil)
+	assert.Nil(t, b.I2cConfig(100))
 }
 
 func TestI2cWrite(t *testing.T) {
 	b, _ := initTestFirmataWithReadWriteCloser(t.Name())
-	gobottest.Assert(t, b.I2cWrite(0x00, []byte{0x01, 0x02}), nil)
+	assert.Nil(t, b.I2cWrite(0x00, []byte{0x01, 0x02}))
 }
 
 func TestI2cRead(t *testing.T) {
 	b, _ := initTestFirmataWithReadWriteCloser(t.Name())
-	gobottest.Assert(t, b.I2cRead(0x00, 10), nil)
+	assert.Nil(t, b.I2cRead(0x00, 10))
 }
 
 func TestWriteSysex(t *testing.T) {
 	b, _ := initTestFirmataWithReadWriteCloser(t.Name())
-	gobottest.Assert(t, b.WriteSysex([]byte{0x01, 0x02}), nil)
+	assert.Nil(t, b.WriteSysex([]byte{0x01, 0x02}))
 }
 
 func TestProcessI2cReply(t *testing.T) {
@@ -286,11 +286,11 @@ func TestProcessI2cReply(t *testing.T) {
 	rwc.addTestReadData([]byte{240, 119, 9, 0, 0, 0, 24, 1, 1, 0, 26, 1, 247})
 
 	_ = b.Once(b.Event("I2cReply"), func(data interface{}) {
-		gobottest.Assert(t, data, I2cReply{
+		assert.Equal(t, I2cReply{
 			Address:  9,
 			Register: 0,
 			Data:     []byte{152, 1, 154},
-		})
+		}, data)
 		sem <- true
 	})
 
@@ -309,7 +309,7 @@ func TestProcessFirmwareQuery(t *testing.T) {
 	rwc.addTestReadData(testDataFirmwareResponse)
 
 	_ = b.Once(b.Event("FirmwareQuery"), func(data interface{}) {
-		gobottest.Assert(t, data, "StandardFirmata.ino")
+		assert.Equal(t, "StandardFirmata.ino", data)
 		sem <- true
 	})
 
@@ -328,7 +328,7 @@ func TestProcessStringData(t *testing.T) {
 	rwc.addTestReadData(append([]byte{240, 0x71}, append([]byte("Hello Firmata!"), 247)...))
 
 	_ = b.Once(b.Event("StringData"), func(data interface{}) {
-		gobottest.Assert(t, data, "Hello Firmata!")
+		assert.Equal(t, "Hello Firmata!", data)
 		sem <- true
 	})
 
@@ -363,9 +363,9 @@ func TestConnect(t *testing.T) {
 		rwc.addTestReadData(testDataProtocolResponse)
 	})
 
-	gobottest.Assert(t, b.Connect(rwc), nil)
+	assert.Nil(t, b.Connect(rwc))
 	time.Sleep(150 * time.Millisecond)
-	gobottest.Assert(t, b.Disconnect(), nil)
+	assert.Nil(t, b.Disconnect())
 }
 
 func TestServoConfig(t *testing.T) {
@@ -401,8 +401,8 @@ func TestServoConfig(t *testing.T) {
 		writeDataMutex.Unlock()
 		err := b.ServoConfig(test.arguments[0], test.arguments[1], test.arguments[2])
 		writeDataMutex.Lock()
-		gobottest.Assert(t, testWriteData.Bytes(), test.expected)
-		gobottest.Assert(t, err, test.result)
+		assert.Equal(t, test.expected, testWriteData.Bytes())
+		assert.Equal(t, test.result, err)
 		writeDataMutex.Unlock()
 	}
 }
@@ -413,7 +413,7 @@ func TestProcessSysexData(t *testing.T) {
 	rwc.addTestReadData([]byte{240, 17, 1, 2, 3, 247})
 
 	_ = b.Once("SysexResponse", func(data interface{}) {
-		gobottest.Assert(t, data, []byte{240, 17, 1, 2, 3, 247})
+		assert.Equal(t, []byte{240, 17, 1, 2, 3, 247}, data)
 		sem <- true
 	})
 

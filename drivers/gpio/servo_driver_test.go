@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Driver = (*ServoDriver)(nil)
@@ -21,69 +21,69 @@ func TestServoDriver(t *testing.T) {
 	a := newGpioTestAdaptor()
 	d := NewServoDriver(a, "1")
 
-	gobottest.Assert(t, d.Pin(), "1")
-	gobottest.Refute(t, d.Connection(), nil)
+	assert.Equal(t, "1", d.Pin())
+	assert.NotNil(t, d.Connection())
 
 	a.testAdaptorServoWrite = func(string, byte) (err error) {
 		return errors.New("pwm error")
 	}
 
 	err = d.Command("Min")(nil)
-	gobottest.Assert(t, err.(error), errors.New("pwm error"))
+	assert.Errorf(t, err.(error), "pwm error")
 
 	err = d.Command("Center")(nil)
-	gobottest.Assert(t, err.(error), errors.New("pwm error"))
+	assert.Errorf(t, err.(error), "pwm error")
 
 	err = d.Command("Max")(nil)
-	gobottest.Assert(t, err.(error), errors.New("pwm error"))
+	assert.Errorf(t, err.(error), "pwm error")
 
 	err = d.Command("Move")(map[string]interface{}{"angle": 100.0})
-	gobottest.Assert(t, err.(error), errors.New("pwm error"))
+	assert.Errorf(t, err.(error), "pwm error")
 }
 
 func TestServoDriverStart(t *testing.T) {
 	d := initTestServoDriver()
-	gobottest.Assert(t, d.Start(), nil)
+	assert.Nil(t, d.Start())
 }
 
 func TestServoDriverHalt(t *testing.T) {
 	d := initTestServoDriver()
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.Nil(t, d.Halt())
 }
 
 func TestServoDriverMove(t *testing.T) {
 	d := initTestServoDriver()
 	_ = d.Move(100)
-	gobottest.Assert(t, d.CurrentAngle, uint8(100))
+	assert.Equal(t, uint8(100), d.CurrentAngle)
 	err := d.Move(200)
-	gobottest.Assert(t, err, ErrServoOutOfRange)
+	assert.Equal(t, ErrServoOutOfRange, err)
 }
 
 func TestServoDriverMin(t *testing.T) {
 	d := initTestServoDriver()
 	_ = d.Min()
-	gobottest.Assert(t, d.CurrentAngle, uint8(0))
+	assert.Equal(t, uint8(0), d.CurrentAngle)
 }
 
 func TestServoDriverMax(t *testing.T) {
 	d := initTestServoDriver()
 	_ = d.Max()
-	gobottest.Assert(t, d.CurrentAngle, uint8(180))
+	assert.Equal(t, uint8(180), d.CurrentAngle)
 }
 
 func TestServoDriverCenter(t *testing.T) {
 	d := initTestServoDriver()
 	_ = d.Center()
-	gobottest.Assert(t, d.CurrentAngle, uint8(90))
+	assert.Equal(t, uint8(90), d.CurrentAngle)
 }
 
 func TestServoDriverDefaultName(t *testing.T) {
 	d := initTestServoDriver()
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "Servo"), true)
+	assert.True(t, strings.HasPrefix(d.Name(), "Servo"))
 }
 
 func TestServoDriverSetName(t *testing.T) {
 	d := initTestServoDriver()
 	d.SetName("mybot")
-	gobottest.Assert(t, d.Name(), "mybot")
+	assert.Equal(t, "mybot", d.Name())
 }

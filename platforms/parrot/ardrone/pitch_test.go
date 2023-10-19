@@ -3,17 +3,17 @@ package ardrone
 import (
 	"testing"
 
-	"gobot.io/x/gobot/v2/gobottest"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestArdroneValidatePitchWhenEqualOffset(t *testing.T) {
-	gobottest.Assert(t, ValidatePitch(32767.0, 32767.0), 1.0)
+	assert.Equal(t, 1.0, ValidatePitch(32767.0, 32767.0))
 }
 
 func TestArdroneValidatePitchWhenTiny(t *testing.T) {
-	gobottest.Assert(t, ValidatePitch(1.1, 32767.0), 0.0)
+	assert.Equal(t, 0.0, ValidatePitch(1.1, 32767.0))
 }
 
 func TestArdroneValidatePitchWhenCentered(t *testing.T) {
-	gobottest.Assert(t, ValidatePitch(16383.5, 32767.0), 0.5)
+	assert.Equal(t, 0.5, ValidatePitch(16383.5, 32767.0))
 }

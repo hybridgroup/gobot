@@ -3,7 +3,7 @@ package system
 import (
 	"testing"
 
-	"gobot.io/x/gobot/v2/gobottest"
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_isSupportedSysfs(t *testing.T) {
@@ -12,7 +12,7 @@ func Test_isSupportedSysfs(t *testing.T) {
 	// act
 	got := dpa.isSupported()
 	// assert
-	gobottest.Assert(t, got, true)
+	assert.True(t, got)
 }
 
 func Test_isSupportedGpiod(t *testing.T) {
@@ -37,7 +37,7 @@ func Test_isSupportedGpiod(t *testing.T) {
 			// act
 			got := dpa.isSupported()
 			// assert
-			gobottest.Assert(t, got, tc.want)
+			assert.Equal(t, tc.want, got)
 		})
 	}
 }
@@ -48,10 +48,10 @@ func Test_createAsSysfs(t *testing.T) {
 	// act
 	dp := dpa.createPin("chip", 8)
 	// assert
-	gobottest.Refute(t, dp, nil)
+	assert.NotNil(t, dp)
 	dps := dp.(*digitalPinSysfs)
 	// chip is dropped
-	gobottest.Assert(t, dps.label, "gpio8")
+	assert.Equal(t, "gpio8", dps.label)
 }
 
 func Test_createAsGpiod(t *testing.T) {
@@ -65,10 +65,10 @@ func Test_createAsGpiod(t *testing.T) {
 	// act
 	dp := dpa.createPin(chip, 18)
 	// assert
-	gobottest.Refute(t, dp, nil)
+	assert.NotNil(t, dp)
 	dpg := dp.(*digitalPinGpiod)
-	gobottest.Assert(t, dpg.label, label)
-	gobottest.Assert(t, dpg.chipName, chip)
+	assert.Equal(t, label, dpg.label)
+	assert.Equal(t, chip, dpg.chipName)
 }
 
 func Test_createPinWithOptionsSysfs(t *testing.T) {
@@ -82,7 +82,7 @@ func Test_createPinWithOptionsSysfs(t *testing.T) {
 	dp := dpa.createPin("", 9, WithPinLabel(label))
 	dps := dp.(*digitalPinSysfs)
 	// assert
-	gobottest.Assert(t, dps.label, label)
+	assert.Equal(t, label, dps.label)
 }
 
 func Test_createPinWithOptionsGpiod(t *testing.T) {
@@ -96,7 +96,7 @@ func Test_createPinWithOptionsGpiod(t *testing.T) {
 	dp := dpa.createPin("", 19, WithPinLabel(label))
 	dpg := dp.(*digitalPinGpiod)
 	// assert
-	gobottest.Assert(t, dpg.label, label)
+	assert.Equal(t, label, dpg.label)
 	// test fallback for empty chip
-	gobottest.Assert(t, dpg.chipName, "gpiochip0")
+	assert.Equal(t, "gpiochip0", dpg.chipName)
 }

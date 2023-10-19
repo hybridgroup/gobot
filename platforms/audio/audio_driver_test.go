@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Driver = (*Driver)(nil)
@@ -16,35 +16,35 @@ var _ gobot.Driver = (*Driver)(nil)
 func TestAudioDriver(t *testing.T) {
 	d := NewDriver(NewAdaptor(), "../../examples/laser.mp3")
 
-	gobottest.Assert(t, d.Filename(), "../../examples/laser.mp3")
+	assert.Equal(t, "../../examples/laser.mp3", d.Filename())
 
-	gobottest.Refute(t, d.Connection(), nil)
+	assert.NotNil(t, d.Connection())
 
-	gobottest.Assert(t, d.Start(), nil)
+	assert.Nil(t, d.Start())
 
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.Nil(t, d.Halt())
 }
 
 func TestAudioDriverName(t *testing.T) {
 	d := NewDriver(NewAdaptor(), "")
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "Audio"), true)
+	assert.True(t, strings.HasPrefix(d.Name(), "Audio"))
 	d.SetName("NewName")
-	gobottest.Assert(t, d.Name(), "NewName")
+	assert.Equal(t, "NewName", d.Name())
 }
 
 func TestAudioDriverSoundWithNoFilename(t *testing.T) {
 	d := NewDriver(NewAdaptor(), "")
 
 	errors := d.Sound("")
-	gobottest.Assert(t, errors[0].Error(), "Requires filename for audio file.")
+	assert.Equal(t, "Requires filename for audio file.", errors[0].Error())
 }
 
 func TestAudioDriverSoundWithDefaultFilename(t *testing.T) {
-	execCommand = gobottest.ExecCommand
+	execCommand = myExecCommand
 	defer func() { execCommand = exec.Command }()
 
 	d := NewDriver(NewAdaptor(), "../../examples/laser.mp3")
 
 	errors := d.Play()
-	gobottest.Assert(t, len(errors), 0)
+	assert.Equal(t, 0, len(errors))
 }

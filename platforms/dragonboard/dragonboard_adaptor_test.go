@@ -1,15 +1,14 @@
 package dragonboard
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/gpio"
 	"gobot.io/x/gobot/v2/drivers/i2c"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 // make sure that this Adaptor fulfills all the required interfaces
@@ -29,9 +28,9 @@ func initTestAdaptor(t *testing.T) *Adaptor {
 
 func TestName(t *testing.T) {
 	a := initTestAdaptor(t)
-	gobottest.Assert(t, strings.HasPrefix(a.Name(), "DragonBoard"), true)
+	assert.True(t, strings.HasPrefix(a.Name(), "DragonBoard"))
 	a.SetName("NewName")
-	gobottest.Assert(t, a.Name(), "NewName")
+	assert.Equal(t, "NewName", a.Name())
 }
 
 func TestDigitalIO(t *testing.T) {
@@ -47,14 +46,14 @@ func TestDigitalIO(t *testing.T) {
 	fs := a.sys.UseMockFilesystem(mockPaths)
 
 	_ = a.DigitalWrite("GPIO_B", 1)
-	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio12/value"].Contents, "1")
+	assert.Equal(t, "1", fs.Files["/sys/class/gpio/gpio12/value"].Contents)
 
 	fs.Files["/sys/class/gpio/gpio36/value"].Contents = "1"
 	i, _ := a.DigitalRead("GPIO_A")
-	gobottest.Assert(t, i, 1)
+	assert.Equal(t, 1, i)
 
-	gobottest.Assert(t, a.DigitalWrite("GPIO_M", 1), errors.New("'GPIO_M' is not a valid id for a digital pin"))
-	gobottest.Assert(t, a.Finalize(), nil)
+	assert.Errorf(t, a.DigitalWrite("GPIO_M", 1), "'GPIO_M' is not a valid id for a digital pin")
+	assert.Nil(t, a.Finalize())
 }
 
 func TestFinalizeErrorAfterGPIO(t *testing.T) {
@@ -69,18 +68,18 @@ func TestFinalizeErrorAfterGPIO(t *testing.T) {
 	}
 	fs := a.sys.UseMockFilesystem(mockPaths)
 
-	gobottest.Assert(t, a.Connect(), nil)
-	gobottest.Assert(t, a.DigitalWrite("GPIO_B", 1), nil)
+	assert.Nil(t, a.Connect())
+	assert.Nil(t, a.DigitalWrite("GPIO_B", 1))
 
 	fs.WithWriteError = true
 
 	err := a.Finalize()
-	gobottest.Assert(t, strings.Contains(err.Error(), "write error"), true)
+	assert.Contains(t, err.Error(), "write error")
 }
 
 func TestI2cDefaultBus(t *testing.T) {
 	a := initTestAdaptor(t)
-	gobottest.Assert(t, a.DefaultI2cBus(), 0)
+	assert.Equal(t, 0, a.DefaultI2cBus())
 }
 
 func TestI2cFinalizeWithErrors(t *testing.T) {
@@ -88,16 +87,16 @@ func TestI2cFinalizeWithErrors(t *testing.T) {
 	a := NewAdaptor()
 	a.sys.UseMockSyscall()
 	fs := a.sys.UseMockFilesystem([]string{"/dev/i2c-1"})
-	gobottest.Assert(t, a.Connect(), nil)
+	assert.Nil(t, a.Connect())
 	con, err := a.GetI2cConnection(0xff, 1)
-	gobottest.Assert(t, err, nil)
+	assert.Nil(t, err)
 	_, err = con.Write([]byte{0xbf})
-	gobottest.Assert(t, err, nil)
+	assert.Nil(t, err)
 	fs.WithCloseError = true
 	// act
 	err = a.Finalize()
 	// assert
-	gobottest.Assert(t, strings.Contains(err.Error(), "close error"), true)
+	assert.Contains(t, err.Error(), "close error")
 }
 
 func Test_validateI2cBusNumber(t *testing.T) {
@@ -127,7 +126,7 @@ func Test_validateI2cBusNumber(t *testing.T) {
 			// act
 			err := a.validateI2cBusNumber(tc.busNr)
 			// assert
-			gobottest.Assert(t, err, tc.wantErr)
+			assert.Equal(t, tc.wantErr, err)
 		})
 	}
 }

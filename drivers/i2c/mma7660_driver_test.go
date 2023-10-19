@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 // this ensures that the implementation is based on i2c.Driver, which implements the gobot.Driver
@@ -29,43 +29,43 @@ func TestNewMMA7660Driver(t *testing.T) {
 	if !ok {
 		t.Errorf("NewMMA7660Driver() should have returned a *MMA7660Driver")
 	}
-	gobottest.Refute(t, d.Driver, nil)
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "MMA7660"), true)
-	gobottest.Assert(t, d.defaultAddress, 0x4c)
+	assert.NotNil(t, d.Driver)
+	assert.True(t, strings.HasPrefix(d.Name(), "MMA7660"))
+	assert.Equal(t, 0x4c, d.defaultAddress)
 }
 
 func TestMMA7660Options(t *testing.T) {
 	// This is a general test, that options are applied in constructor by using the common WithBus() option and
 	// least one of this driver. Further tests for options can also be done by call of "WithOption(val)(d)".
 	d := NewMMA7660Driver(newI2cTestAdaptor(), WithBus(2))
-	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
+	assert.Equal(t, 2, d.GetBusOrDefault(1))
 }
 
 func TestMMA7660Start(t *testing.T) {
 	d := NewMMA7660Driver(newI2cTestAdaptor())
-	gobottest.Assert(t, d.Start(), nil)
+	assert.Nil(t, d.Start())
 }
 
 func TestMMA7660Halt(t *testing.T) {
 	d, _ := initTestMMA7660DriverWithStubbedAdaptor()
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.Nil(t, d.Halt())
 }
 
 func TestMMA7660Acceleration(t *testing.T) {
 	d, _ := initTestMMA7660DriverWithStubbedAdaptor()
 	x, y, z := d.Acceleration(21.0, 21.0, 21.0)
-	gobottest.Assert(t, x, 1.0)
-	gobottest.Assert(t, y, 1.0)
-	gobottest.Assert(t, z, 1.0)
+	assert.Equal(t, 1.0, x)
+	assert.Equal(t, 1.0, y)
+	assert.Equal(t, 1.0, z)
 }
 
 func TestMMA7660NullXYZ(t *testing.T) {
 	d, _ := initTestMMA7660DriverWithStubbedAdaptor()
 
 	x, y, z, _ := d.XYZ()
-	gobottest.Assert(t, x, 0.0)
-	gobottest.Assert(t, y, 0.0)
-	gobottest.Assert(t, z, 0.0)
+	assert.Equal(t, 0.0, x)
+	assert.Equal(t, 0.0, y)
+	assert.Equal(t, 0.0, z)
 }
 
 func TestMMA7660XYZ(t *testing.T) {
@@ -78,9 +78,9 @@ func TestMMA7660XYZ(t *testing.T) {
 	}
 
 	x, y, z, _ := d.XYZ()
-	gobottest.Assert(t, x, 17.0)
-	gobottest.Assert(t, y, 18.0)
-	gobottest.Assert(t, z, 19.0)
+	assert.Equal(t, 17.0, x)
+	assert.Equal(t, 18.0, y)
+	assert.Equal(t, 19.0, z)
 }
 
 func TestMMA7660XYZError(t *testing.T) {
@@ -90,7 +90,7 @@ func TestMMA7660XYZError(t *testing.T) {
 	}
 
 	_, _, _, err := d.XYZ()
-	gobottest.Assert(t, err, errors.New("read error"))
+	assert.Errorf(t, err, "read error")
 }
 
 func TestMMA7660XYZNotReady(t *testing.T) {
@@ -103,5 +103,5 @@ func TestMMA7660XYZNotReady(t *testing.T) {
 	}
 
 	_, _, _, err := d.XYZ()
-	gobottest.Assert(t, err, ErrNotReady)
+	assert.Equal(t, ErrNotReady, err)
 }

@@ -1,11 +1,10 @@
 package gobot
 
 import (
-	"strings"
 	"testing"
 	"time"
 
-	"gobot.io/x/gobot/v2/gobottest"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestEvery(t *testing.T) {
@@ -61,22 +60,22 @@ func TestAfter(t *testing.T) {
 		t.Errorf("After was not called")
 	}
 
-	gobottest.Assert(t, i, 1)
+	assert.Equal(t, 1, i)
 }
 
 func TestFromScale(t *testing.T) {
-	gobottest.Assert(t, FromScale(5, 0, 10), 0.5)
+	assert.Equal(t, 0.5, FromScale(5, 0, 10))
 }
 
 func TestToScale(t *testing.T) {
-	gobottest.Assert(t, ToScale(500, 0, 10), 10.0)
-	gobottest.Assert(t, ToScale(-1, 0, 10), 0.0)
-	gobottest.Assert(t, ToScale(0.5, 0, 10), 5.0)
+	assert.Equal(t, 10.0, ToScale(500, 0, 10))
+	assert.Equal(t, 0.0, ToScale(-1, 0, 10))
+	assert.Equal(t, 5.0, ToScale(0.5, 0, 10))
 }
 
 func TestRescale(t *testing.T) {
-	gobottest.Assert(t, Rescale(500, 0, 1000, 0, 10), 5.0)
-	gobottest.Assert(t, Rescale(-1.0, -1, 0, 490, 350), 490.0)
+	assert.Equal(t, 5.0, Rescale(500, 0, 1000, 0, 10))
+	assert.Equal(t, 490.0, Rescale(-1.0, -1, 0, 490, 350))
 }
 
 func TestRand(t *testing.T) {
@@ -89,5 +88,5 @@ func TestRand(t *testing.T) {
 
 func TestDefaultName(t *testing.T) {
 	name := DefaultName("tester")
-	gobottest.Assert(t, strings.Contains(name, "tester"), true)
+	assert.Contains(t, name, "tester")
 }
