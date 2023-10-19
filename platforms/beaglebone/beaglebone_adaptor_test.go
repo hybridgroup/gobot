@@ -54,6 +54,8 @@ func TestPWM(t *testing.T) {
 	}
 
 	a, fs := initTestAdaptorWithMockedFilesystem(mockPaths)
+	fs.Files["/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/duty_cycle"].Contents = "0"
+	fs.Files["/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/period"].Contents = "0"
 
 	gobottest.Assert(t, a.PwmWrite("P9_99", 175), errors.New("'P9_99' is not a valid id for a PWM pin"))
 	_ = a.PwmWrite("P9_21", 175)

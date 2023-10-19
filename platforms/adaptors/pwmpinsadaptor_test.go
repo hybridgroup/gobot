@@ -2,6 +2,7 @@ package adaptors
 
 import (
 	"fmt"
+	"log"
 	"runtime"
 	"strconv"
 	"strings"
@@ -127,6 +128,8 @@ func TestPWMPinsFinalize(t *testing.T) {
 	sys := system.NewAccesser()
 	fs := sys.UseMockFilesystem(pwmMockPaths)
 	a := NewPWMPinsAdaptor(sys, testPWMPinTranslator)
+	fs.Files[pwmPeriodPath].Contents = "0"
+	fs.Files[pwmDutyCyclePath].Contents = "0"
 	// assert that finalize before connect is working
 	gobottest.Assert(t, a.Finalize(), nil)
 	// arrange
@@ -270,12 +273,15 @@ func Test_PWMPin(t *testing.T) {
 	var tests = map[string]struct {
 		mockPaths []string
 		period    string
+		dutyCycle string
 		translate func(string) (string, int, error)
 		pin       string
 		wantErr   string
 	}{
 		"pin_ok": {
 			mockPaths: []string{pwmExportPath, pwmEnablePath, pwmPeriodPath, pwmDutyCyclePath, pwmPolarityPath},
+			period:    "0",
+			dutyCycle: "0",
 			translate: translator,
 			pin:       "33",
 		},
@@ -293,18 +299,23 @@ func Test_PWMPin(t *testing.T) {
 			wantErr:   "SetEnabled(false) failed for id 44 with  : /sys/devices/platform/ff680020.pwm/pwm/pwmchip3/pwm44/enable: no such file",
 		},
 		"init_setperiod_dutycycle_no_error": {
-			mockPaths: []string{pwmExportPath, pwmEnablePath, pwmPeriodPath, pwmPolarityPath},
+			mockPaths: []string{pwmExportPath, pwmEnablePath, pwmPeriodPath, pwmDutyCyclePath, pwmPolarityPath},
+			period:    "0",
+			dutyCycle: "0",
 			translate: translator,
 			pin:       "33",
 		},
 		"init_setperiod_error": {
-			mockPaths: []string{pwmExportPath, pwmEnablePath},
+			mockPaths: []string{pwmExportPath, pwmEnablePath, pwmDutyCyclePath},
+			dutyCycle: "0",
 			translate: translator,
 			pin:       "33",
 			wantErr:   "SetPeriod(10000000) failed for id 44 with  : /sys/devices/platform/ff680020.pwm/pwm/pwmchip3/pwm44/period: no such file",
 		},
 		"init_setpolarity_error": {
 			mockPaths: []string{pwmExportPath, pwmEnablePath, pwmPeriodPath, pwmDutyCyclePath},
+			period:    "0",
+			dutyCycle: "0",
 			translate: translator,
 			pin:       "33",
 			wantErr:   "SetPolarity(normal) failed for id 44 with  : /sys/devices/platform/ff680020.pwm/pwm/pwmchip3/pwm44/polarity: no such file",
@@ -322,6 +333,9 @@ func Test_PWMPin(t *testing.T) {
 			if tc.period != "" {
 				fs.Files[pwmPeriodPath].Contents = tc.period
 			}
+			if tc.dutyCycle != "" {
+				fs.Files[pwmDutyCyclePath].Contents = tc.dutyCycle
+			}
 			a := NewPWMPinsAdaptor(sys, tc.translate)
 			if err := a.Connect(); err != nil {
 				panic(err)
@@ -333,6 +347,9 @@ func Test_PWMPin(t *testing.T) {
 				gobottest.Assert(t, err, nil)
 				gobottest.Refute(t, got, nil)
 			} else {
+				if !strings.Contains(err.Error(), tc.wantErr) {
+					log.Println(err.Error())
+				}
 				gobottest.Assert(t, strings.Contains(err.Error(), tc.wantErr), true)
 				gobottest.Assert(t, got, nil)
 			}
