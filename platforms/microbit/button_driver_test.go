@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Driver = (*ButtonDriver)(nil)
@@ -18,15 +18,15 @@ func initTestButtonDriver() *ButtonDriver {
 
 func TestButtonDriver(t *testing.T) {
 	d := initTestButtonDriver()
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "Microbit Button"), true)
+	assert.True(t, strings.HasPrefix(d.Name(), "Microbit Button"))
 	d.SetName("NewName")
-	gobottest.Assert(t, d.Name(), "NewName")
+	assert.Equal(t, "NewName", d.Name())
 }
 
 func TestButtonDriverStartAndHalt(t *testing.T) {
 	d := initTestButtonDriver()
-	gobottest.Assert(t, d.Start(), nil)
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.Nil(t, d.Start())
+	assert.Nil(t, d.Halt())
 }
 
 func TestButtonDriverReadData(t *testing.T) {

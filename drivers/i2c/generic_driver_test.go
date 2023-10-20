@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Driver = (*GenericDriver)(nil)
@@ -20,6 +20,6 @@ func TestNewGenericDriver(t *testing.T) {
 	if !ok {
 		t.Errorf("NewGenericDriver() should have returned a *GenericDriver")
 	}
-	gobottest.Refute(t, d.Driver, nil)
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "GenericI2C"), true)
+	assert.NotNil(t, d.Driver)
+	assert.True(t, strings.HasPrefix(d.Name(), "GenericI2C"))
 }

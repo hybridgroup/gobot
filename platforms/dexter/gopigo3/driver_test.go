@@ -4,9 +4,9 @@ import (
 	"encoding/hex"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/spi"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Driver = (*Driver)(nil)
@@ -20,12 +20,12 @@ func initTestDriver() *Driver {
 
 func TestDriverStart(t *testing.T) {
 	d := initTestDriver()
-	gobottest.Assert(t, d.Start(), nil)
+	assert.Nil(t, d.Start())
 }
 
 func TestDriverHalt(t *testing.T) {
 	d := initTestDriver()
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.Nil(t, d.Halt())
 }
 
 func TestDriverManufacturerName(t *testing.T) {

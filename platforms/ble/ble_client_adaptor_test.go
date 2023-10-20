@@ -4,20 +4,20 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Adaptor = (*ClientAdaptor)(nil)
 
 func TestBLEClientAdaptor(t *testing.T) {
 	a := NewClientAdaptor("D7:99:5A:26:EC:38")
-	gobottest.Assert(t, a.Address(), "D7:99:5A:26:EC:38")
-	gobottest.Assert(t, strings.HasPrefix(a.Name(), "BLEClient"), true)
+	assert.Equal(t, "D7:99:5A:26:EC:38", a.Address())
+	assert.True(t, strings.HasPrefix(a.Name(), "BLEClient"))
 }
 
 func TestBLEClientAdaptorName(t *testing.T) {
 	a := NewClientAdaptor("D7:99:5A:26:EC:38")
 	a.SetName("awesome")
-	gobottest.Assert(t, a.Name(), "awesome")
+	assert.Equal(t, "awesome", a.Name())
 }

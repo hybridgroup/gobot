@@ -1,15 +1,14 @@
 package joule
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/gpio"
 	"gobot.io/x/gobot/v2/drivers/i2c"
-	"gobot.io/x/gobot/v2/gobottest"
 	"gobot.io/x/gobot/v2/system"
 )
 
@@ -99,9 +98,9 @@ func initTestAdaptorWithMockedFilesystem() (*Adaptor, *system.MockFilesystem) {
 func TestName(t *testing.T) {
 	a, _ := initTestAdaptorWithMockedFilesystem()
 
-	gobottest.Assert(t, strings.HasPrefix(a.Name(), "Joule"), true)
+	assert.True(t, strings.HasPrefix(a.Name(), "Joule"))
 	a.SetName("NewName")
-	gobottest.Assert(t, a.Name(), "NewName")
+	assert.Equal(t, "NewName", a.Name())
 }
 
 func TestFinalize(t *testing.T) {
@@ -110,43 +109,43 @@ func TestFinalize(t *testing.T) {
 	_ = a.DigitalWrite("J12_1", 1)
 	_ = a.PwmWrite("J12_26", 100)
 
-	gobottest.Assert(t, a.Finalize(), nil)
+	assert.Nil(t, a.Finalize())
 
 	// assert finalize after finalize is working
-	gobottest.Assert(t, a.Finalize(), nil)
+	assert.Nil(t, a.Finalize())
 
 	// assert re-connect is working
-	gobottest.Assert(t, a.Connect(), nil)
+	assert.Nil(t, a.Connect())
 }
 
 func TestDigitalIO(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem()
 
 	_ = a.DigitalWrite("J12_1", 1)
-	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio451/value"].Contents, "1")
+	assert.Equal(t, "1", fs.Files["/sys/class/gpio/gpio451/value"].Contents)
 
 	_ = a.DigitalWrite("J12_1", 0)
 
 	i, err := a.DigitalRead("J12_1")
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, i, 0)
+	assert.Nil(t, err)
+	assert.Equal(t, 0, i)
 
 	_, err = a.DigitalRead("P9_99")
-	gobottest.Assert(t, err, errors.New("'P9_99' is not a valid id for a digital pin"))
+	assert.Errorf(t, err, "'P9_99' is not a valid id for a digital pin")
 }
 
 func TestPwm(t *testing.T) {
 	a, fs := initTestAdaptorWithMockedFilesystem()
 
 	err := a.PwmWrite("J12_26", 100)
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, fs.Files["/sys/class/pwm/pwmchip0/pwm0/duty_cycle"].Contents, "3921568")
+	assert.Nil(t, err)
+	assert.Equal(t, "3921568", fs.Files["/sys/class/pwm/pwmchip0/pwm0/duty_cycle"].Contents)
 
 	err = a.PwmWrite("4", 100)
-	gobottest.Assert(t, err, errors.New("'4' is not a valid id for a pin"))
+	assert.Errorf(t, err, "'4' is not a valid id for a pin")
 
 	err = a.PwmWrite("J12_1", 100)
-	gobottest.Assert(t, err, errors.New("'J12_1' is not a valid id for a PWM pin"))
+	assert.Errorf(t, err, "'J12_1' is not a valid id for a PWM pin")
 }
 
 func TestPwmPinExportError(t *testing.T) {
@@ -154,7 +153,7 @@ func TestPwmPinExportError(t *testing.T) {
 	delete(fs.Files, "/sys/class/pwm/pwmchip0/export")
 
 	err := a.PwmWrite("J12_26", 100)
-	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/pwm/pwmchip0/export: no such file"), true)
+	assert.Contains(t, err.Error(), "/sys/class/pwm/pwmchip0/export: no such file")
 }
 
 func TestPwmPinEnableError(t *testing.T) {
@@ -162,12 +161,12 @@ func TestPwmPinEnableError(t *testing.T) {
 	delete(fs.Files, "/sys/class/pwm/pwmchip0/pwm0/enable")
 
 	err := a.PwmWrite("J12_26", 100)
-	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/pwm/pwmchip0/pwm0/enable: no such file"), true)
+	assert.Contains(t, err.Error(), "/sys/class/pwm/pwmchip0/pwm0/enable: no such file")
 }
 
 func TestI2cDefaultBus(t *testing.T) {
 	a := NewAdaptor()
-	gobottest.Assert(t, a.DefaultI2cBus(), 0)
+	assert.Equal(t, 0, a.DefaultI2cBus())
 }
 
 func TestI2cFinalizeWithErrors(t *testing.T) {
@@ -175,16 +174,16 @@ func TestI2cFinalizeWithErrors(t *testing.T) {
 	a := NewAdaptor()
 	a.sys.UseMockSyscall()
 	fs := a.sys.UseMockFilesystem([]string{"/dev/i2c-2"})
-	gobottest.Assert(t, a.Connect(), nil)
+	assert.Nil(t, a.Connect())
 	con, err := a.GetI2cConnection(0xff, 2)
-	gobottest.Assert(t, err, nil)
+	assert.Nil(t, err)
 	_, err = con.Write([]byte{0xbf})
-	gobottest.Assert(t, err, nil)
+	assert.Nil(t, err)
 	fs.WithCloseError = true
 	// act
 	err = a.Finalize()
 	// assert
-	gobottest.Assert(t, strings.Contains(err.Error(), "close error"), true)
+	assert.Contains(t, err.Error(), "close error")
 }
 
 func Test_validateI2cBusNumber(t *testing.T) {
@@ -217,7 +216,7 @@ func Test_validateI2cBusNumber(t *testing.T) {
 			// act
 			err := a.validateI2cBusNumber(tc.busNr)
 			// assert
-			gobottest.Assert(t, err, tc.wantErr)
+			assert.Equal(t, tc.wantErr, err)
 		})
 	}
 }

@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Driver = (*Driver)(nil)
@@ -27,7 +27,7 @@ func (w *WriteCloserDoNothing) Close() error {
 func TestNewDriver(t *testing.T) {
 	d := NewDriver("8888")
 
-	gobottest.Assert(t, d.respPort, "8888")
+	assert.Equal(t, "8888", d.respPort)
 }
 
 func Test_handleResponse(t *testing.T) {
@@ -171,7 +171,7 @@ func TestHaltShouldTerminateAllTheRelatedGoroutines(t *testing.T) {
 	_ = d.Halt()
 	wg.Wait()
 
-	gobottest.Assert(t, d.doneChReaderCount, int32(0))
+	assert.Equal(t, int32(0), d.doneChReaderCount)
 }
 
 func TestHaltNotWaitForeverWhenCalledMultipleTimes(t *testing.T) {

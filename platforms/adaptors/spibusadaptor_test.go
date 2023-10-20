@@ -2,11 +2,10 @@ package adaptors
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2/drivers/spi"
-	"gobot.io/x/gobot/v2/gobottest"
 	"gobot.io/x/gobot/v2/system"
 )
 
@@ -35,13 +34,13 @@ func TestNewSpiAdaptor(t *testing.T) {
 	// arrange
 	a := NewSpiBusAdaptor(nil, nil, 1, 2, 3, 4, 5)
 	// act & assert
-	gobottest.Assert(t, a.SpiDefaultBusNumber(), 1)
-	gobottest.Assert(t, a.SpiDefaultChipNumber(), 2)
-	gobottest.Assert(t, a.SpiDefaultMode(), 3)
-	gobottest.Assert(t, a.SpiDefaultBitCount(), 4)
-	gobottest.Assert(t, a.SpiDefaultMaxSpeed(), int64(5))
+	assert.Equal(t, 1, a.SpiDefaultBusNumber())
+	assert.Equal(t, 2, a.SpiDefaultChipNumber())
+	assert.Equal(t, 3, a.SpiDefaultMode())
+	assert.Equal(t, 4, a.SpiDefaultBitCount())
+	assert.Equal(t, int64(5), a.SpiDefaultMaxSpeed())
 	_, err := a.GetSpiConnection(10, 0, 0, 8, 10000000)
-	gobottest.Assert(t, err.Error(), "not connected")
+	assert.Errorf(t, err, "not connected")
 }
 
 func TestGetSpiConnection(t *testing.T) {
@@ -54,67 +53,67 @@ func TestGetSpiConnection(t *testing.T) {
 		maxSpeed = int64(11)
 	)
 	a, spi := initTestSpiBusAdaptorWithMockedSpi()
-	gobottest.Assert(t, len(a.connections), 0)
+	assert.Equal(t, 0, len(a.connections))
 	// act
 	con1, err1 := a.GetSpiConnection(busNum, chipNum, mode, bits, maxSpeed)
 	// assert
-	gobottest.Assert(t, err1, nil)
-	gobottest.Refute(t, con1, nil)
-	gobottest.Assert(t, len(a.connections), 1)
+	assert.Nil(t, err1)
+	assert.NotNil(t, con1)
+	assert.Equal(t, 1, len(a.connections))
 	// assert cached connection
 	con1a, err2 := a.GetSpiConnection(busNum, chipNum, mode, bits, maxSpeed)
-	gobottest.Assert(t, err2, nil)
-	gobottest.Assert(t, con1a, con1)
-	gobottest.Assert(t, len(a.connections), 1)
+	assert.Nil(t, err2)
+	assert.Equal(t, con1, con1a)
+	assert.Equal(t, 1, len(a.connections))
 	// assert second connection
 	con2, err3 := a.GetSpiConnection(busNum, chipNum+1, mode, bits, maxSpeed)
-	gobottest.Assert(t, err3, nil)
-	gobottest.Refute(t, con2, nil)
-	gobottest.Refute(t, con2, con1)
-	gobottest.Assert(t, len(a.connections), 2)
+	assert.Nil(t, err3)
+	assert.NotNil(t, con2)
+	assert.NotEqual(t, con1, con2)
+	assert.Equal(t, 2, len(a.connections))
 	// assert bus validation error
 	con, err := a.GetSpiConnection(busNum+1, chipNum, mode, bits, maxSpeed)
-	gobottest.Assert(t, err.Error(), "16 not valid")
-	gobottest.Assert(t, con, nil)
+	assert.Errorf(t, err, "16 not valid")
+	assert.Nil(t, con)
 	// assert create error
 	spi.CreateError = true
 	con, err = a.GetSpiConnection(busNum, chipNum+2, mode, bits, maxSpeed)
-	gobottest.Assert(t, err.Error(), "error while create SPI connection in mock")
-	gobottest.Assert(t, con, nil)
+	assert.Errorf(t, err, "error while create SPI connection in mock")
+	assert.Nil(t, con)
 }
 
 func TestSpiFinalize(t *testing.T) {
 	// arrange
 	a, _ := initTestSpiBusAdaptorWithMockedSpi()
 	_, e := a.GetSpiConnection(spiTestAllowedBus, 2, 3, 4, 5)
-	gobottest.Assert(t, e, nil)
-	gobottest.Assert(t, len(a.connections), 1)
+	assert.Nil(t, e)
+	assert.Equal(t, 1, len(a.connections))
 	// act
 	err := a.Finalize()
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, len(a.connections), 0)
+	assert.Nil(t, err)
+	assert.Equal(t, 0, len(a.connections))
 }
 
 func TestSpiFinalizeWithError(t *testing.T) {
 	// arrange
 	a, spi := initTestSpiBusAdaptorWithMockedSpi()
 	_, e := a.GetSpiConnection(spiTestAllowedBus, 2, 3, 4, 5)
-	gobottest.Assert(t, e, nil)
+	assert.Nil(t, e)
 	spi.SetCloseError(true)
 	// act
 	err := a.Finalize()
 	// assert
-	gobottest.Assert(t, strings.Contains(err.Error(), "error while SPI close"), true)
+	assert.Contains(t, err.Error(), "error while SPI close")
 }
 
 func TestSpiReConnect(t *testing.T) {
 	// arrange
 	a, _ := initTestSpiBusAdaptorWithMockedSpi()
-	gobottest.Assert(t, a.Finalize(), nil)
+	assert.Nil(t, a.Finalize())
 	// act
-	gobottest.Assert(t, a.Connect(), nil)
+	assert.Nil(t, a.Connect())
 	// assert
-	gobottest.Refute(t, a.connections, nil)
-	gobottest.Assert(t, len(a.connections), 0)
+	assert.NotNil(t, a.connections)
+	assert.Equal(t, 0, len(a.connections))
 }

@@ -2,12 +2,13 @@
 package audio
 
 import (
+	"os"
 	"os/exec"
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Adaptor = (*Adaptor)(nil)
@@ -15,54 +16,62 @@ var _ gobot.Adaptor = (*Adaptor)(nil)
 func TestAudioAdaptor(t *testing.T) {
 	a := NewAdaptor()
 
-	gobottest.Assert(t, a.Connect(), nil)
-	gobottest.Assert(t, a.Finalize(), nil)
+	assert.Nil(t, a.Connect())
+	assert.Nil(t, a.Finalize())
 }
 
 func TestAudioAdaptorName(t *testing.T) {
 	a := NewAdaptor()
-	gobottest.Assert(t, strings.HasPrefix(a.Name(), "Audio"), true)
+	assert.True(t, strings.HasPrefix(a.Name(), "Audio"))
 	a.SetName("NewName")
-	gobottest.Assert(t, a.Name(), "NewName")
+	assert.Equal(t, "NewName", a.Name())
 }
 
 func TestAudioAdaptorCommandsWav(t *testing.T) {
 	cmd, _ := CommandName("whatever.wav")
-	gobottest.Assert(t, cmd, "aplay")
+	assert.Equal(t, "aplay", cmd)
 }
 
 func TestAudioAdaptorCommandsMp3(t *testing.T) {
 	cmd, _ := CommandName("whatever.mp3")
-	gobottest.Assert(t, cmd, "mpg123")
+	assert.Equal(t, "mpg123", cmd)
 }
 
 func TestAudioAdaptorCommandsUnknown(t *testing.T) {
 	cmd, err := CommandName("whatever.unk")
-	gobottest.Refute(t, cmd, "mpg123")
-	gobottest.Assert(t, err.Error(), "Unknown filetype for audio file.")
+	assert.NotEqual(t, "mpg123", cmd)
+	assert.Errorf(t, err, "Unknown filetype for audio file.")
 }
 
 func TestAudioAdaptorSoundWithNoFilename(t *testing.T) {
 	a := NewAdaptor()
 
 	errors := a.Sound("")
-	gobottest.Assert(t, errors[0].Error(), "Requires filename for audio file.")
+	assert.Equal(t, "Requires filename for audio file.", errors[0].Error())
 }
 
 func TestAudioAdaptorSoundWithNonexistingFilename(t *testing.T) {
 	a := NewAdaptor()
 
 	errors := a.Sound("doesnotexist.mp3")
-	gobottest.Assert(t, errors[0].Error(), "stat doesnotexist.mp3: no such file or directory")
+	assert.Equal(t, "stat doesnotexist.mp3: no such file or directory", errors[0].Error())
 }
 
 func TestAudioAdaptorSoundWithValidMP3Filename(t *testing.T) {
-	execCommand = gobottest.ExecCommand
+	execCommand = myExecCommand
 
 	a := NewAdaptor()
 	defer func() { execCommand = exec.Command }()
 
 	errors := a.Sound("../../examples/laser.mp3")
 
-	gobottest.Assert(t, len(errors), 0)
+	assert.Equal(t, 0, len(errors))
+}
+
+func myExecCommand(command string, args ...string) *exec.Cmd {
+	cs := []string{"-test.run=TestHelperProcess", "--", command}
+	cs = append(cs, args...)
+	cmd := exec.Command(os.Args[0], cs...)
+	cmd.Env = []string{"GO_WANT_HELPER_PROCESS=1"}
+	return cmd
 }

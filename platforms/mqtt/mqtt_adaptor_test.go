@@ -1,13 +1,12 @@
 package mqtt
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Adaptor = (*Adaptor)(nil)
@@ -18,112 +17,112 @@ func initTestMqttAdaptor() *Adaptor {
 
 func TestMqttAdaptorName(t *testing.T) {
 	a := initTestMqttAdaptor()
-	gobottest.Assert(t, strings.HasPrefix(a.Name(), "MQTT"), true)
+	assert.True(t, strings.HasPrefix(a.Name(), "MQTT"))
 	a.SetName("NewName")
-	gobottest.Assert(t, a.Name(), "NewName")
+	assert.Equal(t, "NewName", a.Name())
 }
 
 func TestMqttAdaptorPort(t *testing.T) {
 	a := initTestMqttAdaptor()
-	gobottest.Assert(t, a.Port(), "tcp://localhost:1883")
+	assert.Equal(t, "tcp://localhost:1883", a.Port())
 }
 
 func TestMqttAdaptorAutoReconnect(t *testing.T) {
 	a := initTestMqttAdaptor()
-	gobottest.Assert(t, a.AutoReconnect(), false)
+	assert.False(t, a.AutoReconnect())
 	a.SetAutoReconnect(true)
-	gobottest.Assert(t, a.AutoReconnect(), true)
+	assert.True(t, a.AutoReconnect())
 }
 
 func TestMqttAdaptorCleanSession(t *testing.T) {
 	a := initTestMqttAdaptor()
-	gobottest.Assert(t, a.CleanSession(), true)
+	assert.True(t, a.CleanSession())
 	a.SetCleanSession(false)
-	gobottest.Assert(t, a.CleanSession(), false)
+	assert.False(t, a.CleanSession())
 }
 
 func TestMqttAdaptorUseSSL(t *testing.T) {
 	a := initTestMqttAdaptor()
-	gobottest.Assert(t, a.UseSSL(), false)
+	assert.False(t, a.UseSSL())
 	a.SetUseSSL(true)
-	gobottest.Assert(t, a.UseSSL(), true)
+	assert.True(t, a.UseSSL())
 }
 
 func TestMqttAdaptorUseServerCert(t *testing.T) {
 	a := initTestMqttAdaptor()
-	gobottest.Assert(t, a.ServerCert(), "")
+	assert.Equal(t, "", a.ServerCert())
 	a.SetServerCert("/path/to/server.cert")
-	gobottest.Assert(t, a.ServerCert(), "/path/to/server.cert")
+	assert.Equal(t, "/path/to/server.cert", a.ServerCert())
 }
 
 func TestMqttAdaptorUseClientCert(t *testing.T) {
 	a := initTestMqttAdaptor()
-	gobottest.Assert(t, a.ClientCert(), "")
+	assert.Equal(t, "", a.ClientCert())
 	a.SetClientCert("/path/to/client.cert")
-	gobottest.Assert(t, a.ClientCert(), "/path/to/client.cert")
+	assert.Equal(t, "/path/to/client.cert", a.ClientCert())
 }
 
 func TestMqttAdaptorUseClientKey(t *testing.T) {
 	a := initTestMqttAdaptor()
-	gobottest.Assert(t, a.ClientKey(), "")
+	assert.Equal(t, "", a.ClientKey())
 	a.SetClientKey("/path/to/client.key")
-	gobottest.Assert(t, a.ClientKey(), "/path/to/client.key")
+	assert.Equal(t, "/path/to/client.key", a.ClientKey())
 }
 
 func TestMqttAdaptorConnectError(t *testing.T) {
 	a := NewAdaptor("tcp://localhost:1884", "client")
 
 	err := a.Connect()
-	gobottest.Assert(t, strings.Contains(err.Error(), "connection refused"), true)
+	assert.Contains(t, err.Error(), "connection refused")
 }
 
 func TestMqttAdaptorConnectSSLError(t *testing.T) {
 	a := NewAdaptor("tcp://localhost:1884", "client")
 	a.SetUseSSL(true)
 	err := a.Connect()
-	gobottest.Assert(t, strings.Contains(err.Error(), "connection refused"), true)
+	assert.Contains(t, err.Error(), "connection refused")
 }
 
 func TestMqttAdaptorConnectWithAuthError(t *testing.T) {
 	a := NewAdaptorWithAuth("xyz://localhost:1883", "client", "user", "pass")
-	gobottest.Assert(t, a.Connect(), errors.New("network Error : unknown protocol"))
+	assert.Errorf(t, a.Connect(), "network Error : unknown protocol")
 }
 
 func TestMqttAdaptorFinalize(t *testing.T) {
 	a := initTestMqttAdaptor()
-	gobottest.Assert(t, a.Finalize(), nil)
+	assert.Nil(t, a.Finalize())
 }
 
 func TestMqttAdaptorCannotPublishUnlessConnected(t *testing.T) {
 	a := initTestMqttAdaptor()
 	data := []byte("o")
-	gobottest.Assert(t, a.Publish("test", data), false)
+	assert.False(t, a.Publish("test", data))
 }
 
 func TestMqttAdaptorPublishWhenConnected(t *testing.T) {
 	a := initTestMqttAdaptor()
 	_ = a.Connect()
 	data := []byte("o")
-	gobottest.Assert(t, a.Publish("test", data), true)
+	assert.True(t, a.Publish("test", data))
 }
 
 func TestMqttAdaptorCannotOnUnlessConnected(t *testing.T) {
 	a := initTestMqttAdaptor()
-	gobottest.Assert(t, a.On("hola", func(msg Message) {
+	assert.False(t, a.On("hola", func(msg Message) {
 		fmt.Println("hola")
-	}), false)
+	}))
 }
 
 func TestMqttAdaptorOnWhenConnected(t *testing.T) {
 	a := initTestMqttAdaptor()
 	_ = a.Connect()
-	gobottest.Assert(t, a.On("hola", func(msg Message) {
+	assert.True(t, a.On("hola", func(msg Message) {
 		fmt.Println("hola")
-	}), true)
+	}))
 }
 
 func TestMqttAdaptorQoS(t *testing.T) {
 	a := initTestMqttAdaptor()
 	a.SetQoS(1)
-	gobottest.Assert(t, 1, a.qos)
+	assert.Equal(t, a.qos, 1)
 }

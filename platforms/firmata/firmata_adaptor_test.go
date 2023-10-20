@@ -8,10 +8,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/aio"
 	"gobot.io/x/gobot/v2/drivers/gpio"
-	"gobot.io/x/gobot/v2/gobottest"
 	"gobot.io/x/gobot/v2/platforms/firmata/client"
 )
 
@@ -100,16 +100,16 @@ func initTestAdaptor() *Adaptor {
 
 func TestNewAdaptor(t *testing.T) {
 	a := NewAdaptor("/dev/null")
-	gobottest.Assert(t, a.Port(), "/dev/null")
+	assert.Equal(t, "/dev/null", a.Port())
 }
 
 func TestAdaptorFinalize(t *testing.T) {
 	a := initTestAdaptor()
-	gobottest.Assert(t, a.Finalize(), nil)
+	assert.Nil(t, a.Finalize())
 
 	a = initTestAdaptor()
 	a.Board.(*mockFirmataBoard).disconnectError = errors.New("close error")
-	gobottest.Assert(t, a.Finalize(), errors.New("close error"))
+	assert.Errorf(t, a.Finalize(), "close error")
 }
 
 func TestAdaptorConnect(t *testing.T) {
@@ -119,94 +119,94 @@ func TestAdaptorConnect(t *testing.T) {
 	a := NewAdaptor("/dev/null")
 	a.PortOpener = openSP
 	a.Board = newMockFirmataBoard()
-	gobottest.Assert(t, a.Connect(), nil)
+	assert.Nil(t, a.Connect())
 
 	a = NewAdaptor("/dev/null")
 	a.Board = newMockFirmataBoard()
 	a.PortOpener = func(port string) (io.ReadWriteCloser, error) {
 		return nil, errors.New("connect error")
 	}
-	gobottest.Assert(t, a.Connect(), errors.New("connect error"))
+	assert.Errorf(t, a.Connect(), "connect error")
 
 	a = NewAdaptor(&readWriteCloser{})
 	a.Board = newMockFirmataBoard()
-	gobottest.Assert(t, a.Connect(), nil)
+	assert.Nil(t, a.Connect())
 
 	a = NewAdaptor("/dev/null")
 	a.Board = nil
-	gobottest.Assert(t, a.Disconnect(), nil)
+	assert.Nil(t, a.Disconnect())
 }
 
 func TestAdaptorServoWrite(t *testing.T) {
 	a := initTestAdaptor()
-	gobottest.Assert(t, a.ServoWrite("1", 50), nil)
+	assert.Nil(t, a.ServoWrite("1", 50))
 }
 
 func TestAdaptorServoWriteBadPin(t *testing.T) {
 	a := initTestAdaptor()
-	gobottest.Refute(t, a.ServoWrite("xyz", 50), nil)
+	assert.NotNil(t, a.ServoWrite("xyz", 50))
 }
 
 func TestAdaptorPwmWrite(t *testing.T) {
 	a := initTestAdaptor()
-	gobottest.Assert(t, a.PwmWrite("1", 50), nil)
+	assert.Nil(t, a.PwmWrite("1", 50))
 }
 
 func TestAdaptorPwmWriteBadPin(t *testing.T) {
 	a := initTestAdaptor()
-	gobottest.Refute(t, a.PwmWrite("xyz", 50), nil)
+	assert.NotNil(t, a.PwmWrite("xyz", 50))
 }
 
 func TestAdaptorDigitalWrite(t *testing.T) {
 	a := initTestAdaptor()
-	gobottest.Assert(t, a.DigitalWrite("1", 1), nil)
+	assert.Nil(t, a.DigitalWrite("1", 1))
 }
 
 func TestAdaptorDigitalWriteBadPin(t *testing.T) {
 	a := initTestAdaptor()
-	gobottest.Refute(t, a.DigitalWrite("xyz", 50), nil)
+	assert.NotNil(t, a.DigitalWrite("xyz", 50))
 }
 
 func TestAdaptorDigitalRead(t *testing.T) {
 	a := initTestAdaptor()
 	val, err := a.DigitalRead("1")
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, val, 1)
+	assert.Nil(t, err)
+	assert.Equal(t, 1, val)
 
 	val, err = a.DigitalRead("0")
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, val, 0)
+	assert.Nil(t, err)
+	assert.Equal(t, 0, val)
 }
 
 func TestAdaptorDigitalReadBadPin(t *testing.T) {
 	a := initTestAdaptor()
 	_, err := a.DigitalRead("xyz")
-	gobottest.Refute(t, err, nil)
+	assert.NotNil(t, err)
 }
 
 func TestAdaptorAnalogRead(t *testing.T) {
 	a := initTestAdaptor()
 	val, err := a.AnalogRead("1")
-	gobottest.Assert(t, val, 133)
-	gobottest.Assert(t, err, nil)
+	assert.Equal(t, 133, val)
+	assert.Nil(t, err)
 
 	val, err = a.AnalogRead("0")
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, val, 0)
+	assert.Nil(t, err)
+	assert.Equal(t, 0, val)
 }
 
 func TestAdaptorAnalogReadBadPin(t *testing.T) {
 	a := initTestAdaptor()
 	_, err := a.AnalogRead("xyz")
-	gobottest.Refute(t, err, nil)
+	assert.NotNil(t, err)
 }
 
 func TestServoConfig(t *testing.T) {
 	a := initTestAdaptor()
 	err := a.ServoConfig("9", 0, 0)
-	gobottest.Assert(t, err, nil)
+	assert.Nil(t, err)
 
 	// test atoi error
 	err = a.ServoConfig("a", 0, 0)
-	gobottest.Assert(t, true, strings.Contains(fmt.Sprintf("%v", err), "invalid syntax"))
+	assert.Equal(t, strings.Contains(fmt.Sprintf("%v", err), "invalid syntax"), true)
 }

@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Driver = (*RelayDriver)(nil)
@@ -26,24 +26,24 @@ func initTestRelayDriver() (*RelayDriver, *gpioTestAdaptor) {
 
 func TestRelayDriverDefaultName(t *testing.T) {
 	g, _ := initTestRelayDriver()
-	gobottest.Refute(t, g.Connection(), nil)
-	gobottest.Assert(t, strings.HasPrefix(g.Name(), "Relay"), true)
+	assert.NotNil(t, g.Connection())
+	assert.True(t, strings.HasPrefix(g.Name(), "Relay"))
 }
 
 func TestRelayDriverSetName(t *testing.T) {
 	g, _ := initTestRelayDriver()
 	g.SetName("mybot")
-	gobottest.Assert(t, g.Name(), "mybot")
+	assert.Equal(t, "mybot", g.Name())
 }
 
 func TestRelayDriverStart(t *testing.T) {
 	d, _ := initTestRelayDriver()
-	gobottest.Assert(t, d.Start(), nil)
+	assert.Nil(t, d.Start())
 }
 
 func TestRelayDriverHalt(t *testing.T) {
 	d, _ := initTestRelayDriver()
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.Nil(t, d.Halt())
 }
 
 func TestRelayDriverToggle(t *testing.T) {
@@ -55,14 +55,14 @@ func TestRelayDriverToggle(t *testing.T) {
 	})
 
 	_ = d.Off()
-	gobottest.Assert(t, d.State(), false)
-	gobottest.Assert(t, lastVal, byte(0))
+	assert.False(t, d.State())
+	assert.Equal(t, byte(0), lastVal)
 	_ = d.Toggle()
-	gobottest.Assert(t, d.State(), true)
-	gobottest.Assert(t, lastVal, byte(1))
+	assert.True(t, d.State())
+	assert.Equal(t, byte(1), lastVal)
 	_ = d.Toggle()
-	gobottest.Assert(t, d.State(), false)
-	gobottest.Assert(t, lastVal, byte(0))
+	assert.False(t, d.State())
+	assert.Equal(t, byte(0), lastVal)
 }
 
 func TestRelayDriverToggleInverted(t *testing.T) {
@@ -75,14 +75,14 @@ func TestRelayDriverToggleInverted(t *testing.T) {
 
 	d.Inverted = true
 	_ = d.Off()
-	gobottest.Assert(t, d.State(), false)
-	gobottest.Assert(t, lastVal, byte(1))
+	assert.False(t, d.State())
+	assert.Equal(t, byte(1), lastVal)
 	_ = d.Toggle()
-	gobottest.Assert(t, d.State(), true)
-	gobottest.Assert(t, lastVal, byte(0))
+	assert.True(t, d.State())
+	assert.Equal(t, byte(0), lastVal)
 	_ = d.Toggle()
-	gobottest.Assert(t, d.State(), false)
-	gobottest.Assert(t, lastVal, byte(1))
+	assert.False(t, d.State())
+	assert.Equal(t, byte(1), lastVal)
 }
 
 func TestRelayDriverCommands(t *testing.T) {
@@ -93,17 +93,17 @@ func TestRelayDriverCommands(t *testing.T) {
 		return nil
 	})
 
-	gobottest.Assert(t, d.Command("Off")(nil), nil)
-	gobottest.Assert(t, d.State(), false)
-	gobottest.Assert(t, lastVal, byte(0))
+	assert.Nil(t, d.Command("Off")(nil))
+	assert.False(t, d.State())
+	assert.Equal(t, byte(0), lastVal)
 
-	gobottest.Assert(t, d.Command("On")(nil), nil)
-	gobottest.Assert(t, d.State(), true)
-	gobottest.Assert(t, lastVal, byte(1))
+	assert.Nil(t, d.Command("On")(nil))
+	assert.True(t, d.State())
+	assert.Equal(t, byte(1), lastVal)
 
-	gobottest.Assert(t, d.Command("Toggle")(nil), nil)
-	gobottest.Assert(t, d.State(), false)
-	gobottest.Assert(t, lastVal, byte(0))
+	assert.Nil(t, d.Command("Toggle")(nil))
+	assert.False(t, d.State())
+	assert.Equal(t, byte(0), lastVal)
 }
 
 func TestRelayDriverCommandsInverted(t *testing.T) {
@@ -115,18 +115,18 @@ func TestRelayDriverCommandsInverted(t *testing.T) {
 	})
 	d.Inverted = true
 
-	gobottest.Assert(t, d.Command("Off")(nil), nil)
-	gobottest.Assert(t, d.High(), true)
-	gobottest.Assert(t, d.State(), false)
-	gobottest.Assert(t, lastVal, byte(1))
+	assert.Nil(t, d.Command("Off")(nil))
+	assert.True(t, d.High())
+	assert.False(t, d.State())
+	assert.Equal(t, byte(1), lastVal)
 
-	gobottest.Assert(t, d.Command("On")(nil), nil)
-	gobottest.Assert(t, d.High(), false)
-	gobottest.Assert(t, d.State(), true)
-	gobottest.Assert(t, lastVal, byte(0))
+	assert.Nil(t, d.Command("On")(nil))
+	assert.False(t, d.High())
+	assert.True(t, d.State())
+	assert.Equal(t, byte(0), lastVal)
 
-	gobottest.Assert(t, d.Command("Toggle")(nil), nil)
-	gobottest.Assert(t, d.High(), true)
-	gobottest.Assert(t, d.State(), false)
-	gobottest.Assert(t, lastVal, byte(1))
+	assert.Nil(t, d.Command("Toggle")(nil))
+	assert.True(t, d.High())
+	assert.False(t, d.State())
+	assert.Equal(t, byte(1), lastVal)
 }

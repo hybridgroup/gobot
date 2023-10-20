@@ -5,9 +5,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/gpio"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 // this ensures that the implementation is based on i2c.Driver, which implements the gobot.Driver
@@ -33,16 +33,16 @@ func TestNewPCA9685Driver(t *testing.T) {
 	if !ok {
 		t.Errorf("NewPCA9685Driver() should have returned a *PCA9685Driver")
 	}
-	gobottest.Refute(t, d.Driver, nil)
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "PCA9685"), true)
-	gobottest.Assert(t, d.defaultAddress, 0x40)
+	assert.NotNil(t, d.Driver)
+	assert.True(t, strings.HasPrefix(d.Name(), "PCA9685"))
+	assert.Equal(t, 0x40, d.defaultAddress)
 }
 
 func TestPCA9685Options(t *testing.T) {
 	// This is a general test, that options are applied in constructor by using the common WithBus() option and
 	// least one of this driver. Further tests for options can also be done by call of "WithOption(val)(d)".
 	d := NewPCA9685Driver(newI2cTestAdaptor(), WithBus(2))
-	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
+	assert.Equal(t, 2, d.GetBusOrDefault(1))
 }
 
 func TestPCA9685Start(t *testing.T) {
@@ -52,7 +52,7 @@ func TestPCA9685Start(t *testing.T) {
 		copy(b, []byte{0x01})
 		return 1, nil
 	}
-	gobottest.Assert(t, d.Start(), nil)
+	assert.Nil(t, d.Start())
 }
 
 func TestPCA9685Halt(t *testing.T) {
@@ -61,8 +61,8 @@ func TestPCA9685Halt(t *testing.T) {
 		copy(b, []byte{0x01})
 		return 1, nil
 	}
-	gobottest.Assert(t, d.Start(), nil)
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.Nil(t, d.Start())
+	assert.Nil(t, d.Halt())
 }
 
 func TestPCA9685SetPWM(t *testing.T) {
@@ -71,8 +71,8 @@ func TestPCA9685SetPWM(t *testing.T) {
 		copy(b, []byte{0x01})
 		return 1, nil
 	}
-	gobottest.Assert(t, d.Start(), nil)
-	gobottest.Assert(t, d.SetPWM(0, 0, 256), nil)
+	assert.Nil(t, d.Start())
+	assert.Nil(t, d.SetPWM(0, 0, 256))
 }
 
 func TestPCA9685SetPWMError(t *testing.T) {
@@ -81,11 +81,11 @@ func TestPCA9685SetPWMError(t *testing.T) {
 		copy(b, []byte{0x01})
 		return 1, nil
 	}
-	gobottest.Assert(t, d.Start(), nil)
+	assert.Nil(t, d.Start())
 	a.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
 	}
-	gobottest.Assert(t, d.SetPWM(0, 0, 256), errors.New("write error"))
+	assert.Errorf(t, d.SetPWM(0, 0, 256), "write error")
 }
 
 func TestPCA9685SetPWMFreq(t *testing.T) {
@@ -94,13 +94,13 @@ func TestPCA9685SetPWMFreq(t *testing.T) {
 		copy(b, []byte{0x01})
 		return 1, nil
 	}
-	gobottest.Assert(t, d.Start(), nil)
+	assert.Nil(t, d.Start())
 
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		copy(b, []byte{0x01})
 		return 1, nil
 	}
-	gobottest.Assert(t, d.SetPWMFreq(60), nil)
+	assert.Nil(t, d.SetPWMFreq(60))
 }
 
 func TestPCA9685SetPWMFreqReadError(t *testing.T) {
@@ -109,12 +109,12 @@ func TestPCA9685SetPWMFreqReadError(t *testing.T) {
 		copy(b, []byte{0x01})
 		return 1, nil
 	}
-	gobottest.Assert(t, d.Start(), nil)
+	assert.Nil(t, d.Start())
 
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		return 0, errors.New("read error")
 	}
-	gobottest.Assert(t, d.SetPWMFreq(60), errors.New("read error"))
+	assert.Errorf(t, d.SetPWMFreq(60), "read error")
 }
 
 func TestPCA9685SetPWMFreqWriteError(t *testing.T) {
@@ -123,12 +123,12 @@ func TestPCA9685SetPWMFreqWriteError(t *testing.T) {
 		copy(b, []byte{0x01})
 		return 1, nil
 	}
-	gobottest.Assert(t, d.Start(), nil)
+	assert.Nil(t, d.Start())
 
 	a.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
 	}
-	gobottest.Assert(t, d.SetPWMFreq(60), errors.New("write error"))
+	assert.Errorf(t, d.SetPWMFreq(60), "write error")
 }
 
 func TestPCA9685Commands(t *testing.T) {
@@ -140,14 +140,14 @@ func TestPCA9685Commands(t *testing.T) {
 	_ = d.Start()
 
 	err := d.Command("PwmWrite")(map[string]interface{}{"pin": "1", "val": "1"})
-	gobottest.Assert(t, err, nil)
+	assert.Nil(t, err)
 
 	err = d.Command("ServoWrite")(map[string]interface{}{"pin": "1", "val": "1"})
-	gobottest.Assert(t, err, nil)
+	assert.Nil(t, err)
 
 	err = d.Command("SetPWM")(map[string]interface{}{"channel": "1", "on": "0", "off": "1024"})
-	gobottest.Assert(t, err, nil)
+	assert.Nil(t, err)
 
 	err = d.Command("SetPWMFreq")(map[string]interface{}{"freq": "60"})
-	gobottest.Assert(t, err, nil)
+	assert.Nil(t, err)
 }

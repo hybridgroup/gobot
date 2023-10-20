@@ -1,13 +1,12 @@
 package system
 
 import (
-	"errors"
 	"os"
 	"testing"
 	"unsafe"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 const dev = "/dev/i2c-1"
@@ -80,11 +79,11 @@ func TestNewI2cDevice(t *testing.T) {
 			d, err := a.NewI2cDevice(tc.dev)
 			// assert
 			if tc.wantErr != "" {
-				gobottest.Assert(t, err.Error(), tc.wantErr)
-				gobottest.Assert(t, d, (*i2cDevice)(nil))
+				assert.Errorf(t, err, tc.wantErr)
+				assert.Equal(t, (*i2cDevice)(nil), d)
 			} else {
 				var _ gobot.I2cSystemDevicer = d
-				gobottest.Assert(t, err, nil)
+				assert.Nil(t, err)
 			}
 		})
 	}
@@ -94,7 +93,7 @@ func TestClose(t *testing.T) {
 	// arrange
 	d, _ := initTestI2cDeviceWithMockedSys()
 	// act & assert
-	gobottest.Assert(t, d.Close(), nil)
+	assert.Nil(t, d.Close())
 }
 
 func TestWriteRead(t *testing.T) {
@@ -106,11 +105,11 @@ func TestWriteRead(t *testing.T) {
 	wn, werr := d.Write(1, wbuf)
 	rn, rerr := d.Read(1, rbuf)
 	// assert
-	gobottest.Assert(t, werr, nil)
-	gobottest.Assert(t, rerr, nil)
-	gobottest.Assert(t, wn, len(wbuf))
-	gobottest.Assert(t, rn, len(wbuf)) // will read only the written values
-	gobottest.Assert(t, wbuf, rbuf[:len(wbuf)])
+	assert.Nil(t, werr)
+	assert.Nil(t, rerr)
+	assert.Equal(t, len(wbuf), wn)
+	assert.Equal(t, len(wbuf), rn) // will read only the written values
+	assert.Equal(t, rbuf[:len(wbuf)], wbuf)
 }
 
 func TestReadByte(t *testing.T) {
@@ -143,15 +142,15 @@ func TestReadByte(t *testing.T) {
 			got, err := d.ReadByte(2)
 			// assert
 			if tc.wantErr != "" {
-				gobottest.Assert(t, err.Error(), tc.wantErr)
+				assert.Errorf(t, err, tc.wantErr)
 			} else {
-				gobottest.Assert(t, err, nil)
-				gobottest.Assert(t, got, want)
-				gobottest.Assert(t, msc.lastFile, d.file)
-				gobottest.Assert(t, msc.lastSignal, uintptr(I2C_SMBUS))
-				gobottest.Assert(t, msc.smbus.readWrite, byte(I2C_SMBUS_READ))
-				gobottest.Assert(t, msc.smbus.command, byte(0)) // register is set to 0 in that case
-				gobottest.Assert(t, msc.smbus.protocol, uint32(I2C_SMBUS_BYTE))
+				assert.Nil(t, err)
+				assert.Equal(t, want, got)
+				assert.Equal(t, d.file, msc.lastFile)
+				assert.Equal(t, uintptr(I2C_SMBUS), msc.lastSignal)
+				assert.Equal(t, byte(I2C_SMBUS_READ), msc.smbus.readWrite)
+				assert.Equal(t, byte(0), msc.smbus.command) // register is set to 0 in that case
+				assert.Equal(t, uint32(I2C_SMBUS_BYTE), msc.smbus.protocol)
 			}
 		})
 	}
@@ -190,15 +189,15 @@ func TestReadByteData(t *testing.T) {
 			got, err := d.ReadByteData(3, reg)
 			// assert
 			if tc.wantErr != "" {
-				gobottest.Assert(t, err.Error(), tc.wantErr)
+				assert.Errorf(t, err, tc.wantErr)
 			} else {
-				gobottest.Assert(t, err, nil)
-				gobottest.Assert(t, got, want)
-				gobottest.Assert(t, msc.lastFile, d.file)
-				gobottest.Assert(t, msc.lastSignal, uintptr(I2C_SMBUS))
-				gobottest.Assert(t, msc.smbus.readWrite, byte(I2C_SMBUS_READ))
-				gobottest.Assert(t, msc.smbus.command, reg)
-				gobottest.Assert(t, msc.smbus.protocol, uint32(I2C_SMBUS_BYTE_DATA))
+				assert.Nil(t, err)
+				assert.Equal(t, want, got)
+				assert.Equal(t, d.file, msc.lastFile)
+				assert.Equal(t, uintptr(I2C_SMBUS), msc.lastSignal)
+				assert.Equal(t, byte(I2C_SMBUS_READ), msc.smbus.readWrite)
+				assert.Equal(t, reg, msc.smbus.command)
+				assert.Equal(t, uint32(I2C_SMBUS_BYTE_DATA), msc.smbus.protocol)
 			}
 		})
 	}
@@ -240,15 +239,15 @@ func TestReadWordData(t *testing.T) {
 			got, err := d.ReadWordData(4, reg)
 			// assert
 			if tc.wantErr != "" {
-				gobottest.Assert(t, err.Error(), tc.wantErr)
+				assert.Errorf(t, err, tc.wantErr)
 			} else {
-				gobottest.Assert(t, err, nil)
-				gobottest.Assert(t, got, want)
-				gobottest.Assert(t, msc.lastFile, d.file)
-				gobottest.Assert(t, msc.lastSignal, uintptr(I2C_SMBUS))
-				gobottest.Assert(t, msc.smbus.readWrite, byte(I2C_SMBUS_READ))
-				gobottest.Assert(t, msc.smbus.command, reg)
-				gobottest.Assert(t, msc.smbus.protocol, uint32(I2C_SMBUS_WORD_DATA))
+				assert.Nil(t, err)
+				assert.Equal(t, want, got)
+				assert.Equal(t, d.file, msc.lastFile)
+				assert.Equal(t, uintptr(I2C_SMBUS), msc.lastSignal)
+				assert.Equal(t, byte(I2C_SMBUS_READ), msc.smbus.readWrite)
+				assert.Equal(t, reg, msc.smbus.command)
+				assert.Equal(t, uint32(I2C_SMBUS_WORD_DATA), msc.smbus.protocol)
 			}
 		})
 	}
@@ -298,16 +297,16 @@ func TestReadBlockData(t *testing.T) {
 			err := d.ReadBlockData(5, reg, buf)
 			// assert
 			if tc.wantErr != "" {
-				gobottest.Assert(t, err.Error(), tc.wantErr)
+				assert.Errorf(t, err, tc.wantErr)
 			} else {
-				gobottest.Assert(t, err, nil)
-				gobottest.Assert(t, buf, msc.dataSlice)
-				gobottest.Assert(t, msc.lastFile, d.file)
-				gobottest.Assert(t, msc.lastSignal, uintptr(I2C_SMBUS))
-				gobottest.Assert(t, msc.sliceSize, uint8(len(buf)+1))
-				gobottest.Assert(t, msc.smbus.readWrite, byte(I2C_SMBUS_READ))
-				gobottest.Assert(t, msc.smbus.command, reg)
-				gobottest.Assert(t, msc.smbus.protocol, uint32(I2C_SMBUS_I2C_BLOCK_DATA))
+				assert.Nil(t, err)
+				assert.Equal(t, msc.dataSlice, buf)
+				assert.Equal(t, d.file, msc.lastFile)
+				assert.Equal(t, uintptr(I2C_SMBUS), msc.lastSignal)
+				assert.Equal(t, uint8(len(buf)+1), msc.sliceSize)
+				assert.Equal(t, byte(I2C_SMBUS_READ), msc.smbus.readWrite)
+				assert.Equal(t, reg, msc.smbus.command)
+				assert.Equal(t, uint32(I2C_SMBUS_I2C_BLOCK_DATA), msc.smbus.protocol)
 			}
 		})
 	}
@@ -342,14 +341,14 @@ func TestWriteByte(t *testing.T) {
 			err := d.WriteByte(6, val)
 			// assert
 			if tc.wantErr != "" {
-				gobottest.Assert(t, err.Error(), tc.wantErr)
+				assert.Errorf(t, err, tc.wantErr)
 			} else {
-				gobottest.Assert(t, err, nil)
-				gobottest.Assert(t, msc.lastFile, d.file)
-				gobottest.Assert(t, msc.lastSignal, uintptr(I2C_SMBUS))
-				gobottest.Assert(t, msc.smbus.readWrite, byte(I2C_SMBUS_WRITE))
-				gobottest.Assert(t, msc.smbus.command, val) // in byte write, the register/command is used for the value
-				gobottest.Assert(t, msc.smbus.protocol, uint32(I2C_SMBUS_BYTE))
+				assert.Nil(t, err)
+				assert.Equal(t, d.file, msc.lastFile)
+				assert.Equal(t, uintptr(I2C_SMBUS), msc.lastSignal)
+				assert.Equal(t, byte(I2C_SMBUS_WRITE), msc.smbus.readWrite)
+				assert.Equal(t, val, msc.smbus.command) // in byte write, the register/command is used for the value
+				assert.Equal(t, uint32(I2C_SMBUS_BYTE), msc.smbus.protocol)
 			}
 		})
 	}
@@ -387,16 +386,16 @@ func TestWriteByteData(t *testing.T) {
 			err := d.WriteByteData(7, reg, val)
 			// assert
 			if tc.wantErr != "" {
-				gobottest.Assert(t, err.Error(), tc.wantErr)
+				assert.Errorf(t, err, tc.wantErr)
 			} else {
-				gobottest.Assert(t, err, nil)
-				gobottest.Assert(t, msc.lastFile, d.file)
-				gobottest.Assert(t, msc.lastSignal, uintptr(I2C_SMBUS))
-				gobottest.Assert(t, msc.smbus.readWrite, byte(I2C_SMBUS_WRITE))
-				gobottest.Assert(t, msc.smbus.command, reg)
-				gobottest.Assert(t, msc.smbus.protocol, uint32(I2C_SMBUS_BYTE_DATA))
-				gobottest.Assert(t, len(msc.dataSlice), 1)
-				gobottest.Assert(t, msc.dataSlice[0], val)
+				assert.Nil(t, err)
+				assert.Equal(t, d.file, msc.lastFile)
+				assert.Equal(t, uintptr(I2C_SMBUS), msc.lastSignal)
+				assert.Equal(t, byte(I2C_SMBUS_WRITE), msc.smbus.readWrite)
+				assert.Equal(t, reg, msc.smbus.command)
+				assert.Equal(t, uint32(I2C_SMBUS_BYTE_DATA), msc.smbus.protocol)
+				assert.Equal(t, 1, len(msc.dataSlice))
+				assert.Equal(t, val, msc.dataSlice[0])
 			}
 		})
 	}
@@ -436,18 +435,18 @@ func TestWriteWordData(t *testing.T) {
 			err := d.WriteWordData(8, reg, val)
 			// assert
 			if tc.wantErr != "" {
-				gobottest.Assert(t, err.Error(), tc.wantErr)
+				assert.Errorf(t, err, tc.wantErr)
 			} else {
-				gobottest.Assert(t, err, nil)
-				gobottest.Assert(t, msc.lastFile, d.file)
-				gobottest.Assert(t, msc.lastSignal, uintptr(I2C_SMBUS))
-				gobottest.Assert(t, msc.smbus.readWrite, byte(I2C_SMBUS_WRITE))
-				gobottest.Assert(t, msc.smbus.command, reg)
-				gobottest.Assert(t, msc.smbus.protocol, uint32(I2C_SMBUS_WORD_DATA))
-				gobottest.Assert(t, len(msc.dataSlice), 2)
+				assert.Nil(t, err)
+				assert.Equal(t, d.file, msc.lastFile)
+				assert.Equal(t, uintptr(I2C_SMBUS), msc.lastSignal)
+				assert.Equal(t, byte(I2C_SMBUS_WRITE), msc.smbus.readWrite)
+				assert.Equal(t, reg, msc.smbus.command)
+				assert.Equal(t, uint32(I2C_SMBUS_WORD_DATA), msc.smbus.protocol)
+				assert.Equal(t, 2, len(msc.dataSlice))
 				// all common drivers write LSByte first
-				gobottest.Assert(t, msc.dataSlice[0], wantLSByte)
-				gobottest.Assert(t, msc.dataSlice[1], wantMSByte)
+				assert.Equal(t, wantLSByte, msc.dataSlice[0])
+				assert.Equal(t, wantMSByte, msc.dataSlice[1])
 			}
 		})
 	}
@@ -493,17 +492,17 @@ func TestWriteBlockData(t *testing.T) {
 			err := d.WriteBlockData(9, reg, data)
 			// assert
 			if tc.wantErr != "" {
-				gobottest.Assert(t, err.Error(), tc.wantErr)
+				assert.Errorf(t, err, tc.wantErr)
 			} else {
-				gobottest.Assert(t, err, nil)
-				gobottest.Assert(t, msc.lastFile, d.file)
-				gobottest.Assert(t, msc.lastSignal, uintptr(I2C_SMBUS))
-				gobottest.Assert(t, msc.sliceSize, uint8(len(data)+1)) // including size element
-				gobottest.Assert(t, msc.smbus.readWrite, byte(I2C_SMBUS_WRITE))
-				gobottest.Assert(t, msc.smbus.command, reg)
-				gobottest.Assert(t, msc.smbus.protocol, uint32(I2C_SMBUS_I2C_BLOCK_DATA))
-				gobottest.Assert(t, msc.dataSlice[0], uint8(len(data))) // data size
-				gobottest.Assert(t, msc.dataSlice[1:], data)
+				assert.Nil(t, err)
+				assert.Equal(t, d.file, msc.lastFile)
+				assert.Equal(t, uintptr(I2C_SMBUS), msc.lastSignal)
+				assert.Equal(t, uint8(len(data)+1), msc.sliceSize) // including size element
+				assert.Equal(t, byte(I2C_SMBUS_WRITE), msc.smbus.readWrite)
+				assert.Equal(t, reg, msc.smbus.command)
+				assert.Equal(t, uint32(I2C_SMBUS_I2C_BLOCK_DATA), msc.smbus.protocol)
+				assert.Equal(t, uint8(len(data)), msc.dataSlice[0]) // data size
+				assert.Equal(t, data, msc.dataSlice[1:])
 			}
 		})
 	}
@@ -515,7 +514,7 @@ func TestWriteBlockDataTooMuch(t *testing.T) {
 	// act
 	err := d.WriteBlockData(10, 0x01, make([]byte, 33))
 	// assert
-	gobottest.Assert(t, err, errors.New("Writing blocks larger than 32 bytes (33) not supported"))
+	assert.Errorf(t, err, "Writing blocks larger than 32 bytes (33) not supported")
 }
 
 func Test_setAddress(t *testing.T) {
@@ -524,8 +523,8 @@ func Test_setAddress(t *testing.T) {
 	// act
 	err := d.setAddress(0xff)
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, msc.devAddress, uintptr(0xff))
+	assert.Nil(t, err)
+	assert.Equal(t, uintptr(0xff), msc.devAddress)
 }
 
 func Test_queryFunctionality(t *testing.T) {
@@ -566,16 +565,16 @@ func Test_queryFunctionality(t *testing.T) {
 			err := d.queryFunctionality(tc.requested, "test"+name)
 			// assert
 			if tc.wantErr != "" {
-				gobottest.Assert(t, err.Error(), tc.wantErr)
+				assert.Errorf(t, err, tc.wantErr)
 			} else {
-				gobottest.Assert(t, err, nil)
+				assert.Nil(t, err)
 			}
 			if tc.wantFile {
-				gobottest.Refute(t, d.file, nil)
+				assert.NotNil(t, d.file)
 			} else {
-				gobottest.Assert(t, d.file, (*MockFile)(nil))
+				assert.Equal(t, (*MockFile)(nil), d.file)
 			}
-			gobottest.Assert(t, d.funcs, tc.wantFuncs)
+			assert.Equal(t, tc.wantFuncs, d.funcs)
 		})
 	}
 }

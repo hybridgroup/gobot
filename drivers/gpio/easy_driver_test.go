@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"gobot.io/x/gobot/v2/gobottest"
+	"github.com/stretchr/testify/assert"
 )
 
 const (
@@ -22,18 +22,18 @@ func initEasyDriver() *EasyDriver {
 
 func TestEasyDriver_Connection(t *testing.T) {
 	d := initEasyDriver()
-	gobottest.Assert(t, d.Connection(), adapter)
+	assert.Equal(t, adapter, d.Connection())
 }
 
 func TestEasyDriverDefaultName(t *testing.T) {
 	d := initEasyDriver()
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "EasyDriver"), true)
+	assert.True(t, strings.HasPrefix(d.Name(), "EasyDriver"))
 }
 
 func TestEasyDriverSetName(t *testing.T) {
 	d := initEasyDriver()
 	d.SetName("OtherDriver")
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "OtherDriver"), true)
+	assert.True(t, strings.HasPrefix(d.Name(), "OtherDriver"))
 }
 
 func TestEasyDriverStart(t *testing.T) {
@@ -45,142 +45,142 @@ func TestEasyDriverStart(t *testing.T) {
 func TestEasyDriverHalt(t *testing.T) {
 	d := initEasyDriver()
 	_ = d.Run()
-	gobottest.Assert(t, d.IsMoving(), true)
+	assert.True(t, d.IsMoving())
 	_ = d.Halt()
-	gobottest.Assert(t, d.IsMoving(), false)
+	assert.False(t, d.IsMoving())
 }
 
 func TestEasyDriverMove(t *testing.T) {
 	d := initEasyDriver()
 	_ = d.Move(2)
 	time.Sleep(2 * time.Millisecond)
-	gobottest.Assert(t, d.GetCurrentStep(), 4)
-	gobottest.Assert(t, d.IsMoving(), false)
+	assert.Equal(t, 4, d.GetCurrentStep())
+	assert.False(t, d.IsMoving())
 }
 
 func TestEasyDriverRun(t *testing.T) {
 	d := initEasyDriver()
 	_ = d.Run()
-	gobottest.Assert(t, d.IsMoving(), true)
+	assert.True(t, d.IsMoving())
 	_ = d.Run()
-	gobottest.Assert(t, d.IsMoving(), true)
+	assert.True(t, d.IsMoving())
 }
 
 func TestEasyDriverStop(t *testing.T) {
 	d := initEasyDriver()
 	_ = d.Run()
-	gobottest.Assert(t, d.IsMoving(), true)
+	assert.True(t, d.IsMoving())
 	_ = d.Stop()
-	gobottest.Assert(t, d.IsMoving(), false)
+	assert.False(t, d.IsMoving())
 }
 
 func TestEasyDriverStep(t *testing.T) {
 	d := initEasyDriver()
 	_ = d.Step()
-	gobottest.Assert(t, d.GetCurrentStep(), 1)
+	assert.Equal(t, 1, d.GetCurrentStep())
 	_ = d.Step()
 	_ = d.Step()
 	_ = d.Step()
-	gobottest.Assert(t, d.GetCurrentStep(), 4)
+	assert.Equal(t, 4, d.GetCurrentStep())
 	_ = d.SetDirection("ccw")
 	_ = d.Step()
-	gobottest.Assert(t, d.GetCurrentStep(), 3)
+	assert.Equal(t, 3, d.GetCurrentStep())
 }
 
 func TestEasyDriverSetDirection(t *testing.T) {
 	d := initEasyDriver()
-	gobottest.Assert(t, d.dir, int8(1))
+	assert.Equal(t, int8(1), d.dir)
 	_ = d.SetDirection("cw")
-	gobottest.Assert(t, d.dir, int8(1))
+	assert.Equal(t, int8(1), d.dir)
 	_ = d.SetDirection("ccw")
-	gobottest.Assert(t, d.dir, int8(-1))
+	assert.Equal(t, int8(-1), d.dir)
 	_ = d.SetDirection("nothing")
-	gobottest.Assert(t, d.dir, int8(1))
+	assert.Equal(t, int8(1), d.dir)
 }
 
 func TestEasyDriverSetDirectionNoPin(t *testing.T) {
 	d := initEasyDriver()
 	d.dirPin = ""
 	err := d.SetDirection("cw")
-	gobottest.Refute(t, err, nil)
+	assert.NotNil(t, err)
 }
 
 func TestEasyDriverSetSpeed(t *testing.T) {
 	d := initEasyDriver()
-	gobottest.Assert(t, d.rpm, uint(stepsPerRev/4)) // default speed of 720/4
+	assert.Equal(t, uint(stepsPerRev/4), d.rpm) // default speed of 720/4
 	_ = d.SetSpeed(0)
-	gobottest.Assert(t, d.rpm, uint(1))
+	assert.Equal(t, uint(1), d.rpm)
 	_ = d.SetSpeed(200)
-	gobottest.Assert(t, d.rpm, uint(200))
+	assert.Equal(t, uint(200), d.rpm)
 	_ = d.SetSpeed(1000)
-	gobottest.Assert(t, d.rpm, uint(stepsPerRev))
+	assert.Equal(t, uint(stepsPerRev), d.rpm)
 }
 
 func TestEasyDriverGetMaxSpeed(t *testing.T) {
 	d := initEasyDriver()
-	gobottest.Assert(t, d.GetMaxSpeed(), uint(stepsPerRev))
+	assert.Equal(t, uint(stepsPerRev), d.GetMaxSpeed())
 }
 
 func TestEasyDriverSleep(t *testing.T) {
 	// let's test basic functionality
 	d := initEasyDriver()
 	_ = d.Sleep()
-	gobottest.Assert(t, d.IsSleeping(), true)
+	assert.True(t, d.IsSleeping())
 
 	// let's make sure it stops first
 	d = initEasyDriver()
 	_ = d.Run()
 	_ = d.Sleep()
-	gobottest.Assert(t, d.IsSleeping(), true)
-	gobottest.Assert(t, d.IsMoving(), false)
+	assert.True(t, d.IsSleeping())
+	assert.False(t, d.IsMoving())
 }
 
 func TestEasyDriverSleepNoPin(t *testing.T) {
 	d := initEasyDriver()
 	d.sleepPin = ""
 	err := d.Sleep()
-	gobottest.Refute(t, err, nil)
+	assert.NotNil(t, err)
 	err = d.Wake()
-	gobottest.Refute(t, err, nil)
+	assert.NotNil(t, err)
 }
 
 func TestEasyDriverWake(t *testing.T) {
 	// let's test basic functionality
 	d := initEasyDriver()
 	_ = d.Sleep()
-	gobottest.Assert(t, d.IsSleeping(), true)
+	assert.True(t, d.IsSleeping())
 	_ = d.Wake()
-	gobottest.Assert(t, d.IsSleeping(), false)
+	assert.False(t, d.IsSleeping())
 }
 
 func TestEasyDriverEnable(t *testing.T) {
 	// let's test basic functionality
 	d := initEasyDriver()
 	_ = d.Disable()
-	gobottest.Assert(t, d.IsEnabled(), false)
+	assert.False(t, d.IsEnabled())
 	_ = d.Enable()
-	gobottest.Assert(t, d.IsEnabled(), true)
+	assert.True(t, d.IsEnabled())
 }
 
 func TestEasyDriverEnableNoPin(t *testing.T) {
 	d := initEasyDriver()
 	d.enPin = ""
 	err := d.Disable()
-	gobottest.Refute(t, err, nil)
+	assert.NotNil(t, err)
 	err = d.Enable()
-	gobottest.Refute(t, err, nil)
+	assert.NotNil(t, err)
 }
 
 func TestEasyDriverDisable(t *testing.T) {
 	// let's test basic functionality
 	d := initEasyDriver()
 	_ = d.Disable()
-	gobottest.Assert(t, d.IsEnabled(), false)
+	assert.False(t, d.IsEnabled())
 
 	// let's make sure it stops first
 	d = initEasyDriver()
 	_ = d.Run()
 	_ = d.Disable()
-	gobottest.Assert(t, d.IsEnabled(), false)
-	gobottest.Assert(t, d.IsMoving(), false)
+	assert.False(t, d.IsEnabled())
+	assert.False(t, d.IsMoving())
 }

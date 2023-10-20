@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Driver = (*TemperatureDriver)(nil)
@@ -18,15 +18,15 @@ func initTestTemperatureDriver() *TemperatureDriver {
 
 func TestTemperatureDriver(t *testing.T) {
 	d := initTestTemperatureDriver()
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "Microbit Temperature"), true)
+	assert.True(t, strings.HasPrefix(d.Name(), "Microbit Temperature"))
 	d.SetName("NewName")
-	gobottest.Assert(t, d.Name(), "NewName")
+	assert.Equal(t, "NewName", d.Name())
 }
 
 func TestTemperatureDriverStartAndHalt(t *testing.T) {
 	d := initTestTemperatureDriver()
-	gobottest.Assert(t, d.Start(), nil)
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.Nil(t, d.Start())
+	assert.Nil(t, d.Halt())
 }
 
 func TestTemperatureDriverReadData(t *testing.T) {
@@ -35,7 +35,7 @@ func TestTemperatureDriverReadData(t *testing.T) {
 	d := NewTemperatureDriver(a)
 	_ = d.Start()
 	_ = d.On(Temperature, func(data interface{}) {
-		gobottest.Assert(t, data, int8(0x22))
+		assert.Equal(t, int8(0x22), data)
 		sem <- true
 	})
 

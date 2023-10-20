@@ -3,17 +3,17 @@ package bebop
 import (
 	"testing"
 
-	"gobot.io/x/gobot/v2/gobottest"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestBebopValidatePitchWhenEqualOffset(t *testing.T) {
-	gobottest.Assert(t, ValidatePitch(32767.0, 32767.0), 100)
+	assert.Equal(t, 100, ValidatePitch(32767.0, 32767.0))
 }
 
 func TestBebopValidatePitchWhenTiny(t *testing.T) {
-	gobottest.Assert(t, ValidatePitch(1.1, 32767.0), 0)
+	assert.Equal(t, 0, ValidatePitch(1.1, 32767.0))
 }
 
 func TestBebopValidatePitchWhenCentered(t *testing.T) {
-	gobottest.Assert(t, ValidatePitch(16383.5, 32767.0), 50)
+	assert.Equal(t, 50, ValidatePitch(16383.5, 32767.0))
 }

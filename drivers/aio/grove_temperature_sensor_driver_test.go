@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Driver = (*GroveTemperatureSensorDriver)(nil)
@@ -15,9 +15,9 @@ var _ gobot.Driver = (*GroveTemperatureSensorDriver)(nil)
 func TestGroveTemperatureSensorDriver(t *testing.T) {
 	testAdaptor := newAioTestAdaptor()
 	d := NewGroveTemperatureSensorDriver(testAdaptor, "123")
-	gobottest.Assert(t, d.Connection(), testAdaptor)
-	gobottest.Assert(t, d.Pin(), "123")
-	gobottest.Assert(t, d.interval, 10*time.Millisecond)
+	assert.Equal(t, testAdaptor, d.Connection())
+	assert.Equal(t, "123", d.Pin())
+	assert.Equal(t, 10*time.Millisecond, d.interval)
 }
 
 func TestGroveTemperatureSensorDriverScaling(t *testing.T) {
@@ -47,8 +47,8 @@ func TestGroveTemperatureSensorDriverScaling(t *testing.T) {
 			// act
 			got, err := d.Read()
 			// assert
-			gobottest.Assert(t, err, nil)
-			gobottest.Assert(t, got, tt.want)
+			assert.Nil(t, err)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -63,10 +63,10 @@ func TestGroveTempSensorPublishesTemperatureInCelsius(t *testing.T) {
 		return
 	})
 	_ = d.Once(d.Event(Value), func(data interface{}) {
-		gobottest.Assert(t, fmt.Sprintf("%.2f", data.(float64)), "31.62")
+		assert.Equal(t, "31.62", fmt.Sprintf("%.2f", data.(float64)))
 		sem <- true
 	})
-	gobottest.Assert(t, d.Start(), nil)
+	assert.Nil(t, d.Start())
 
 	select {
 	case <-sem:
@@ -74,10 +74,10 @@ func TestGroveTempSensorPublishesTemperatureInCelsius(t *testing.T) {
 		t.Errorf("Grove Temperature Sensor Event \"Data\" was not published")
 	}
 
-	gobottest.Assert(t, d.Temperature(), 31.61532462352477)
+	assert.Equal(t, 31.61532462352477, d.Temperature())
 }
 
 func TestGroveTempDriverDefaultName(t *testing.T) {
 	d := NewGroveTemperatureSensorDriver(newAioTestAdaptor(), "1")
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "GroveTemperatureSensor"), true)
+	assert.True(t, strings.HasPrefix(d.Name(), "GroveTemperatureSensor"))
 }

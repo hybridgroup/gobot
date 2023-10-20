@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 	mavlink "gobot.io/x/gobot/v2/platforms/mavlink/common"
 )
 
@@ -53,20 +53,20 @@ func initTestMavlinkUDPAdaptor() *UDPAdaptor {
 
 func TestMavlinkUDPAdaptor(t *testing.T) {
 	a := initTestMavlinkUDPAdaptor()
-	gobottest.Assert(t, a.Port(), ":14550")
+	assert.Equal(t, ":14550", a.Port())
 }
 
 func TestMavlinkUDPAdaptorName(t *testing.T) {
 	a := initTestMavlinkUDPAdaptor()
-	gobottest.Assert(t, strings.HasPrefix(a.Name(), "Mavlink"), true)
+	assert.True(t, strings.HasPrefix(a.Name(), "Mavlink"))
 	a.SetName("NewName")
-	gobottest.Assert(t, a.Name(), "NewName")
+	assert.Equal(t, "NewName", a.Name())
 }
 
 func TestMavlinkUDPAdaptorConnectAndFinalize(t *testing.T) {
 	a := initTestMavlinkUDPAdaptor()
-	gobottest.Assert(t, a.Connect(), nil)
-	gobottest.Assert(t, a.Finalize(), nil)
+	assert.Nil(t, a.Connect())
+	assert.Nil(t, a.Finalize())
 }
 
 func TestMavlinkUDPAdaptorWrite(t *testing.T) {
@@ -81,8 +81,8 @@ func TestMavlinkUDPAdaptorWrite(t *testing.T) {
 	a.sock = m
 
 	i, err := a.Write([]byte{0x01, 0x02, 0x03})
-	gobottest.Assert(t, i, 3)
-	gobottest.Assert(t, err, nil)
+	assert.Equal(t, 3, i)
+	assert.Nil(t, err)
 }
 
 func TestMavlinkReadMAVLinkReadDefaultPacket(t *testing.T) {
@@ -101,7 +101,7 @@ func TestMavlinkReadMAVLinkReadDefaultPacket(t *testing.T) {
 	a.sock = m
 
 	p, _ := a.ReadMAVLinkPacket()
-	gobottest.Assert(t, p.Protocol, uint8(254))
+	assert.Equal(t, uint8(254), p.Protocol)
 }
 
 func TestMavlinkReadMAVLinkPacketReadError(t *testing.T) {
@@ -136,5 +136,5 @@ func TestMavlinkReadMAVLinkPacketReadError(t *testing.T) {
 	a.sock = m
 
 	_, err := a.ReadMAVLinkPacket()
-	gobottest.Assert(t, err, errors.New("read error"))
+	assert.Errorf(t, err, "read error")
 }

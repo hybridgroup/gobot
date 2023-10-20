@@ -1,13 +1,12 @@
 package spi
 
 import (
-	"errors"
 	"image"
 	"sync"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 // this ensures that the implementation is based on spi.Driver, which implements the gobot.Driver
@@ -20,29 +19,29 @@ func initTestSSDDriver() *SSD1306Driver {
 
 func TestDriverSSDStart(t *testing.T) {
 	d := initTestSSDDriver()
-	gobottest.Assert(t, d.Start(), nil)
+	assert.Nil(t, d.Start())
 }
 
 func TestDriverSSDHalt(t *testing.T) {
 	d := initTestSSDDriver()
 	_ = d.Start()
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.Nil(t, d.Halt())
 }
 
 func TestDriverSSDDisplay(t *testing.T) {
 	d := initTestSSDDriver()
 	_ = d.Start()
-	gobottest.Assert(t, d.Display(), nil)
+	assert.Nil(t, d.Display())
 }
 
 func TestSSD1306DriverShowImage(t *testing.T) {
 	d := initTestSSDDriver()
 	_ = d.Start()
 	img := image.NewRGBA(image.Rect(0, 0, 640, 480))
-	gobottest.Assert(t, d.ShowImage(img), errors.New("Image must match the display width and height"))
+	assert.Errorf(t, d.ShowImage(img), "Image must match the display width and height")
 
 	img = image.NewRGBA(image.Rect(0, 0, 128, 64))
-	gobottest.Assert(t, d.ShowImage(img), nil)
+	assert.Nil(t, d.ShowImage(img))
 }
 
 type gpioTestAdaptor struct {

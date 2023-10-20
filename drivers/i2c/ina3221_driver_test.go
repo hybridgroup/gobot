@@ -7,8 +7,8 @@ import (
 
 	"strings"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 // this ensures that the implementation is based on i2c.Driver, which implements the gobot.Driver
@@ -30,26 +30,26 @@ func TestNewINA3221Driver(t *testing.T) {
 	if !ok {
 		t.Error("NewINA3221Driver() should return a *INA3221Driver")
 	}
-	gobottest.Refute(t, d.Driver, nil)
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "INA3221"), true)
-	gobottest.Assert(t, d.defaultAddress, 0x40)
+	assert.NotNil(t, d.Driver)
+	assert.True(t, strings.HasPrefix(d.Name(), "INA3221"))
+	assert.Equal(t, 0x40, d.defaultAddress)
 }
 
 func TestINA3221Options(t *testing.T) {
 	// This is a general test, that options are applied in constructor by using the common WithBus() option and
 	// least one of this driver. Further tests for options can also be done by call of "WithOption(val)(d)".
 	d := NewINA3221Driver(newI2cTestAdaptor(), WithBus(2))
-	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
+	assert.Equal(t, 2, d.GetBusOrDefault(1))
 }
 
 func TestINA3221Start(t *testing.T) {
 	d := NewINA3221Driver(newI2cTestAdaptor())
-	gobottest.Assert(t, d.Start(), nil)
+	assert.Nil(t, d.Start())
 }
 
 func TestINA3221Halt(t *testing.T) {
 	d, _ := initTestINA3221DriverWithStubbedAdaptor()
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.Nil(t, d.Halt())
 }
 
 func TestINA3221GetBusVoltage(t *testing.T) {
@@ -61,8 +61,8 @@ func TestINA3221GetBusVoltage(t *testing.T) {
 	}
 
 	v, err := d.GetBusVoltage(INA3221Channel1)
-	gobottest.Assert(t, v, float64(13.928))
-	gobottest.Assert(t, err, nil)
+	assert.Equal(t, float64(13.928), v)
+	assert.Nil(t, err)
 }
 
 func TestINA3221GetBusVoltageReadError(t *testing.T) {
@@ -72,7 +72,7 @@ func TestINA3221GetBusVoltageReadError(t *testing.T) {
 	}
 
 	_, err := d.GetBusVoltage(INA3221Channel1)
-	gobottest.Assert(t, err, errors.New("read error"))
+	assert.Errorf(t, err, "read error")
 }
 
 func TestINA3221GetShuntVoltage(t *testing.T) {
@@ -84,8 +84,8 @@ func TestINA3221GetShuntVoltage(t *testing.T) {
 	}
 
 	v, err := d.GetShuntVoltage(INA3221Channel1)
-	gobottest.Assert(t, v, float64(7.48))
-	gobottest.Assert(t, err, nil)
+	assert.Equal(t, float64(7.48), v)
+	assert.Nil(t, err)
 }
 
 func TestINA3221GetShuntVoltageReadError(t *testing.T) {
@@ -95,7 +95,7 @@ func TestINA3221GetShuntVoltageReadError(t *testing.T) {
 	}
 
 	_, err := d.GetShuntVoltage(INA3221Channel1)
-	gobottest.Assert(t, err, errors.New("read error"))
+	assert.Errorf(t, err, "read error")
 }
 
 func TestINA3221GetCurrent(t *testing.T) {
@@ -107,8 +107,8 @@ func TestINA3221GetCurrent(t *testing.T) {
 	}
 
 	v, err := d.GetCurrent(INA3221Channel1)
-	gobottest.Assert(t, v, float64(74.8))
-	gobottest.Assert(t, err, nil)
+	assert.Equal(t, float64(74.8), v)
+	assert.Nil(t, err)
 }
 
 func TestINA3221CurrentReadError(t *testing.T) {
@@ -118,7 +118,7 @@ func TestINA3221CurrentReadError(t *testing.T) {
 	}
 
 	_, err := d.GetCurrent(INA3221Channel1)
-	gobottest.Assert(t, err, errors.New("read error"))
+	assert.Errorf(t, err, "read error")
 }
 
 func TestINA3221GetLoadVoltage(t *testing.T) {
@@ -132,8 +132,8 @@ func TestINA3221GetLoadVoltage(t *testing.T) {
 	}
 
 	v, err := d.GetLoadVoltage(INA3221Channel2)
-	gobottest.Assert(t, v, float64(13.935480))
-	gobottest.Assert(t, err, nil)
+	assert.Equal(t, float64(13.935480), v)
+	assert.Nil(t, err)
 }
 
 func TestINA3221GetLoadVoltageReadError(t *testing.T) {
@@ -143,5 +143,5 @@ func TestINA3221GetLoadVoltageReadError(t *testing.T) {
 	}
 
 	_, err := d.GetLoadVoltage(INA3221Channel2)
-	gobottest.Assert(t, err, errors.New("read error"))
+	assert.Errorf(t, err, "read error")
 }

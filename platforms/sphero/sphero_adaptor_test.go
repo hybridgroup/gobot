@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Adaptor = (*Adaptor)(nil)
@@ -56,49 +56,49 @@ func initTestSpheroAdaptor() (*Adaptor, *nullReadWriteCloser) {
 
 func TestSpheroAdaptorName(t *testing.T) {
 	a, _ := initTestSpheroAdaptor()
-	gobottest.Assert(t, strings.HasPrefix(a.Name(), "Sphero"), true)
+	assert.True(t, strings.HasPrefix(a.Name(), "Sphero"))
 	a.SetName("NewName")
-	gobottest.Assert(t, a.Name(), "NewName")
+	assert.Equal(t, "NewName", a.Name())
 }
 
 func TestSpheroAdaptor(t *testing.T) {
 	a, _ := initTestSpheroAdaptor()
-	gobottest.Assert(t, strings.HasPrefix(a.Name(), "Sphero"), true)
-	gobottest.Assert(t, a.Port(), "/dev/null")
+	assert.True(t, strings.HasPrefix(a.Name(), "Sphero"))
+	assert.Equal(t, "/dev/null", a.Port())
 }
 
 func TestSpheroAdaptorReconnect(t *testing.T) {
 	a, _ := initTestSpheroAdaptor()
 	_ = a.Connect()
-	gobottest.Assert(t, a.connected, true)
+	assert.True(t, a.connected)
 	_ = a.Reconnect()
-	gobottest.Assert(t, a.connected, true)
+	assert.True(t, a.connected)
 	_ = a.Disconnect()
-	gobottest.Assert(t, a.connected, false)
+	assert.False(t, a.connected)
 	_ = a.Reconnect()
-	gobottest.Assert(t, a.connected, true)
+	assert.True(t, a.connected)
 }
 
 func TestSpheroAdaptorFinalize(t *testing.T) {
 	a, rwc := initTestSpheroAdaptor()
 	_ = a.Connect()
-	gobottest.Assert(t, a.Finalize(), nil)
+	assert.Nil(t, a.Finalize())
 
 	rwc.testAdaptorClose = func() error {
 		return errors.New("close error")
 	}
 
 	a.connected = true
-	gobottest.Assert(t, a.Finalize(), errors.New("close error"))
+	assert.Errorf(t, a.Finalize(), "close error")
 }
 
 func TestSpheroAdaptorConnect(t *testing.T) {
 	a, _ := initTestSpheroAdaptor()
-	gobottest.Assert(t, a.Connect(), nil)
+	assert.Nil(t, a.Connect())
 
 	a.connect = func(string) (io.ReadWriteCloser, error) {
 		return nil, errors.New("connect error")
 	}
 
-	gobottest.Assert(t, a.Connect(), errors.New("connect error"))
+	assert.Errorf(t, a.Connect(), "connect error")
 }

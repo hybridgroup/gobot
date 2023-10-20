@@ -219,5 +219,5 @@ func TestDriverHandleEventDS4(t *testing.T) {
 func TestDriverInvalidConfig(t *testing.T) {
 	d, _ := initTestDriver("./configs/doesnotexist")
 	err := d.Start()
-	assert.True(t, strings.Contains(err.Error(), "loadfile error"))
+	assert.Contains(t, err.Error(), "loadfile error")
 }

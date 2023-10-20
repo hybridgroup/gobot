@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 // this ensures that the implementation is based on i2c.Driver, which implements the gobot.Driver
@@ -33,17 +33,17 @@ func TestNewL3GD20HDriver(t *testing.T) {
 	if !ok {
 		t.Errorf("NewL3GD20HDriver() should have returned a *L3GD20HDriver")
 	}
-	gobottest.Refute(t, d.Driver, nil)
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "L3GD20H"), true)
-	gobottest.Assert(t, d.defaultAddress, 0x6b)
-	gobottest.Assert(t, d.Scale(), L3GD20HScale250dps)
+	assert.NotNil(t, d.Driver)
+	assert.True(t, strings.HasPrefix(d.Name(), "L3GD20H"))
+	assert.Equal(t, 0x6b, d.defaultAddress)
+	assert.Equal(t, L3GD20HScale250dps, d.Scale())
 }
 
 func TestL3GD20HOptions(t *testing.T) {
 	// This is a general test, that options are applied in constructor by using the common WithBus() option.
 	// Further tests for options can also be done by call of "WithOption(val)(d)".
 	d := NewL3GD20HDriver(newI2cTestAdaptor(), WithBus(2))
-	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
+	assert.Equal(t, 2, d.GetBusOrDefault(1))
 }
 
 func TestL3GD20HWithL3GD20HFullScaleRange(t *testing.T) {
@@ -75,7 +75,7 @@ func TestL3GD20HWithL3GD20HFullScaleRange(t *testing.T) {
 			// act
 			WithL3GD20HFullScaleRange(tc.scale)(d)
 			// assert
-			gobottest.Assert(t, d.scale, L3GD20HScale(tc.want))
+			assert.Equal(t, L3GD20HScale(tc.want), d.scale)
 		})
 	}
 }
@@ -109,7 +109,7 @@ func TestL3GD20HScale(t *testing.T) {
 			// act
 			d.SetScale(tc.scale)
 			// assert
-			gobottest.Assert(t, d.scale, L3GD20HScale(tc.want))
+			assert.Equal(t, L3GD20HScale(tc.want), d.scale)
 		})
 	}
 }
@@ -130,10 +130,10 @@ func TestL3GD20HFullScaleRange(t *testing.T) {
 	// act
 	got, err := d.FullScaleRange()
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, len(a.written), 1)
-	gobottest.Assert(t, a.written[0], uint8(0x23))
-	gobottest.Assert(t, got, readValue)
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(a.written))
+	assert.Equal(t, uint8(0x23), a.written[0])
+	assert.Equal(t, readValue, got)
 }
 
 func TestL3GD20HMeasurement(t *testing.T) {
@@ -196,12 +196,12 @@ func TestL3GD20HMeasurement(t *testing.T) {
 			// act
 			x, y, z, err := d.XYZ()
 			// assert
-			gobottest.Assert(t, err, nil)
-			gobottest.Assert(t, len(a.written), 1)
-			gobottest.Assert(t, a.written[0], uint8(0xA8))
-			gobottest.Assert(t, x, tc.wantX)
-			gobottest.Assert(t, y, tc.wantY)
-			gobottest.Assert(t, z, tc.wantZ)
+			assert.Nil(t, err)
+			assert.Equal(t, 1, len(a.written))
+			assert.Equal(t, uint8(0xA8), a.written[0])
+			assert.Equal(t, tc.wantX, x)
+			assert.Equal(t, tc.wantY, y)
+			assert.Equal(t, tc.wantZ, z)
 		})
 	}
 }
@@ -214,7 +214,7 @@ func TestL3GD20HMeasurementError(t *testing.T) {
 
 	_ = d.Start()
 	_, _, _, err := d.XYZ()
-	gobottest.Assert(t, err, errors.New("read error"))
+	assert.Errorf(t, err, "read error")
 }
 
 func TestL3GD20HMeasurementWriteError(t *testing.T) {
@@ -223,7 +223,7 @@ func TestL3GD20HMeasurementWriteError(t *testing.T) {
 		return 0, errors.New("write error")
 	}
 	_, _, _, err := d.XYZ()
-	gobottest.Assert(t, err, errors.New("write error"))
+	assert.Errorf(t, err, "write error")
 }
 
 func TestL3GD20H_initialize(t *testing.T) {
@@ -250,11 +250,11 @@ func TestL3GD20H_initialize(t *testing.T) {
 	// arrange, act - initialize() must be called on Start()
 	_, a := initL3GD20HWithStubbedAdaptor()
 	// assert
-	gobottest.Assert(t, len(a.written), 6)
-	gobottest.Assert(t, a.written[0], uint8(0x20))
-	gobottest.Assert(t, a.written[1], uint8(0x00))
-	gobottest.Assert(t, a.written[2], uint8(0x20))
-	gobottest.Assert(t, a.written[3], uint8(0x0F))
-	gobottest.Assert(t, a.written[4], uint8(0x23))
-	gobottest.Assert(t, a.written[5], uint8(0x00))
+	assert.Equal(t, 6, len(a.written))
+	assert.Equal(t, uint8(0x20), a.written[0])
+	assert.Equal(t, uint8(0x00), a.written[1])
+	assert.Equal(t, uint8(0x20), a.written[2])
+	assert.Equal(t, uint8(0x0F), a.written[3])
+	assert.Equal(t, uint8(0x23), a.written[4])
+	assert.Equal(t, uint8(0x00), a.written[5])
 }

@@ -2,11 +2,10 @@ package system
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.DigitalPinner = (*digitalPinGpiod)(nil)
@@ -24,12 +23,12 @@ func Test_newDigitalPinGpiod(t *testing.T) {
 	// act
 	d := newDigitalPinGpiod(chip, pin)
 	// assert
-	gobottest.Refute(t, d, nil)
-	gobottest.Assert(t, d.chipName, chip)
-	gobottest.Assert(t, d.pin, pin)
-	gobottest.Assert(t, d.label, label)
-	gobottest.Assert(t, d.direction, IN)
-	gobottest.Assert(t, d.outInitialState, 0)
+	assert.NotNil(t, d)
+	assert.Equal(t, chip, d.chipName)
+	assert.Equal(t, pin, d.pin)
+	assert.Equal(t, label, d.label)
+	assert.Equal(t, IN, d.direction)
+	assert.Equal(t, 0, d.outInitialState)
 }
 
 func Test_newDigitalPinGpiodWithOptions(t *testing.T) {
@@ -41,7 +40,7 @@ func Test_newDigitalPinGpiodWithOptions(t *testing.T) {
 	// act
 	dp := newDigitalPinGpiod("", 9, WithPinLabel(label))
 	// assert
-	gobottest.Assert(t, dp.label, label)
+	assert.Equal(t, label, dp.label)
 }
 
 func TestApplyOptions(t *testing.T) {
@@ -102,12 +101,12 @@ func TestApplyOptions(t *testing.T) {
 			// act
 			err := d.ApplyOptions(optionFunction1, optionFunction2)
 			// assert
-			gobottest.Assert(t, err, tc.wantErr)
-			gobottest.Assert(t, d.digitalPinConfig.direction, "test")
-			gobottest.Assert(t, d.digitalPinConfig.drive, 15)
-			gobottest.Assert(t, reconfigured, tc.wantReconfigured)
+			assert.Equal(t, tc.wantErr, err)
+			assert.Equal(t, "test", d.digitalPinConfig.direction)
+			assert.Equal(t, 15, d.digitalPinConfig.drive)
+			assert.Equal(t, tc.wantReconfigured, reconfigured)
 			if reconfigured > 0 {
-				gobottest.Assert(t, inputForced, false)
+				assert.False(t, inputForced)
 			}
 		})
 	}
@@ -147,9 +146,9 @@ func TestExport(t *testing.T) {
 			// act
 			err := d.Export()
 			// assert
-			gobottest.Assert(t, err, tc.wantErr)
-			gobottest.Assert(t, inputForced, false)
-			gobottest.Assert(t, reconfigured, tc.wantReconfigured)
+			assert.Equal(t, tc.wantErr, err)
+			assert.False(t, inputForced)
+			assert.Equal(t, tc.wantReconfigured, reconfigured)
 		})
 	}
 }
@@ -207,10 +206,10 @@ func TestUnexport(t *testing.T) {
 			// act
 			err := dp.Unexport()
 			// assert
-			gobottest.Assert(t, err, tc.wantErr)
-			gobottest.Assert(t, reconfigured, tc.wantReconfigured)
+			assert.Equal(t, tc.wantErr, err)
+			assert.Equal(t, tc.wantReconfigured, reconfigured)
 			if reconfigured > 0 {
-				gobottest.Assert(t, inputForced, true)
+				assert.True(t, inputForced)
 			}
 		})
 	}
@@ -255,12 +254,12 @@ func TestWrite(t *testing.T) {
 			// assert
 			if tc.wantErr != nil {
 				for _, want := range tc.wantErr {
-					gobottest.Assert(t, strings.Contains(err.Error(), want), true)
+					assert.Contains(t, err.Error(), want)
 				}
 			} else {
-				gobottest.Assert(t, err, nil)
+				assert.Nil(t, err)
 			}
-			gobottest.Assert(t, lm.lastVal, tc.want)
+			assert.Equal(t, tc.want, lm.lastVal)
 		})
 	}
 }
@@ -290,12 +289,12 @@ func TestRead(t *testing.T) {
 			// assert
 			if tc.wantErr != nil {
 				for _, want := range tc.wantErr {
-					gobottest.Assert(t, strings.Contains(err.Error(), want), true)
+					assert.Contains(t, err.Error(), want)
 				}
 			} else {
-				gobottest.Assert(t, err, nil)
+				assert.Nil(t, err)
 			}
-			gobottest.Assert(t, tc.simVal, got)
+			assert.Equal(t, got, tc.simVal)
 		})
 	}
 }

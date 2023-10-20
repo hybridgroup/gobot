@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Driver = (*AnalogSensorDriver)(nil)
@@ -15,29 +15,29 @@ var _ gobot.Driver = (*AnalogSensorDriver)(nil)
 func TestAnalogSensorDriver(t *testing.T) {
 	a := newAioTestAdaptor()
 	d := NewAnalogSensorDriver(a, "1")
-	gobottest.Refute(t, d.Connection(), nil)
+	assert.NotNil(t, d.Connection())
 
 	// default interval
-	gobottest.Assert(t, d.interval, 10*time.Millisecond)
+	assert.Equal(t, 10*time.Millisecond, d.interval)
 
 	// commands
 	a = newAioTestAdaptor()
 	d = NewAnalogSensorDriver(a, "42", 30*time.Second)
 	d.SetScaler(func(input int) float64 { return 2.5*float64(input) - 3 })
-	gobottest.Assert(t, d.Pin(), "42")
-	gobottest.Assert(t, d.interval, 30*time.Second)
+	assert.Equal(t, "42", d.Pin())
+	assert.Equal(t, 30*time.Second, d.interval)
 
 	a.TestAdaptorAnalogRead(func() (val int, err error) {
 		val = 100
 		return
 	})
 	ret := d.Command("ReadRaw")(nil).(map[string]interface{})
-	gobottest.Assert(t, ret["val"].(int), 100)
-	gobottest.Assert(t, ret["err"], nil)
+	assert.Equal(t, 100, ret["val"].(int))
+	assert.Nil(t, ret["err"])
 
 	ret = d.Command("Read")(nil).(map[string]interface{})
-	gobottest.Assert(t, ret["val"].(float64), 247.0)
-	gobottest.Assert(t, ret["err"], nil)
+	assert.Equal(t, 247.0, ret["val"].(float64))
+	assert.Nil(t, ret["err"])
 
 	// refresh value on read
 	a = newAioTestAdaptor()
@@ -46,12 +46,12 @@ func TestAnalogSensorDriver(t *testing.T) {
 		val = 150
 		return
 	})
-	gobottest.Assert(t, d.Value(), 0.0)
+	assert.Equal(t, 0.0, d.Value())
 	val, err := d.Read()
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, val, 150.0)
-	gobottest.Assert(t, d.Value(), 150.0)
-	gobottest.Assert(t, d.RawValue(), 150)
+	assert.Nil(t, err)
+	assert.Equal(t, 150.0, val)
+	assert.Equal(t, 150.0, d.Value())
+	assert.Equal(t, 150, d.RawValue())
 }
 
 func TestAnalogSensorDriverWithLinearScaler(t *testing.T) {
@@ -84,8 +84,8 @@ func TestAnalogSensorDriverWithLinearScaler(t *testing.T) {
 			// act
 			got, err := d.Read()
 			// assert
-			gobottest.Assert(t, err, nil)
-			gobottest.Assert(t, got, tt.want)
+			assert.Nil(t, err)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -98,12 +98,12 @@ func TestAnalogSensorDriverStart(t *testing.T) {
 
 	// expect data to be received
 	_ = d.Once(d.Event(Data), func(data interface{}) {
-		gobottest.Assert(t, data.(int), 100)
+		assert.Equal(t, 100, data.(int))
 		sem <- true
 	})
 
 	_ = d.Once(d.Event(Value), func(data interface{}) {
-		gobottest.Assert(t, data.(float64), 10000.0)
+		assert.Equal(t, 10000.0, data.(float64))
 		sem <- true
 	})
 
@@ -113,7 +113,7 @@ func TestAnalogSensorDriverStart(t *testing.T) {
 		return
 	})
 
-	gobottest.Assert(t, d.Start(), nil)
+	assert.Nil(t, d.Start())
 
 	select {
 	case <-sem:
@@ -123,7 +123,7 @@ func TestAnalogSensorDriverStart(t *testing.T) {
 
 	// expect error to be received
 	_ = d.Once(d.Event(Error), func(data interface{}) {
-		gobottest.Assert(t, data.(error).Error(), "read error")
+		assert.Equal(t, "read error", data.(error).Error())
 		sem <- true
 	})
 
@@ -169,7 +169,7 @@ func TestAnalogSensorDriverHalt(t *testing.T) {
 		<-d.halt
 		close(done)
 	}()
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.Nil(t, d.Halt())
 	select {
 	case <-done:
 	case <-time.After(100 * time.Millisecond):
@@ -179,11 +179,11 @@ func TestAnalogSensorDriverHalt(t *testing.T) {
 
 func TestAnalogSensorDriverDefaultName(t *testing.T) {
 	d := NewAnalogSensorDriver(newAioTestAdaptor(), "1")
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "AnalogSensor"), true)
+	assert.True(t, strings.HasPrefix(d.Name(), "AnalogSensor"))
 }
 
 func TestAnalogSensorDriverSetName(t *testing.T) {
 	d := NewAnalogSensorDriver(newAioTestAdaptor(), "1")
 	d.SetName("mybot")
-	gobottest.Assert(t, d.Name(), "mybot")
+	assert.Equal(t, "mybot", d.Name())
 }

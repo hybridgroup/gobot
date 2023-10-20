@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Driver = (*GroveLcdDriver)(nil)
@@ -33,24 +33,24 @@ func initGroveAccelerometerDriverWithStubbedAdaptor() (*GroveAccelerometerDriver
 
 func TestGroveLcdDriverName(t *testing.T) {
 	g := initTestGroveLcdDriver()
-	gobottest.Refute(t, g.Connection(), nil)
-	gobottest.Assert(t, strings.HasPrefix(g.Name(), "JHD1313M1"), true)
+	assert.NotNil(t, g.Connection())
+	assert.True(t, strings.HasPrefix(g.Name(), "JHD1313M1"))
 }
 
 func TestLcdDriverWithAddress(t *testing.T) {
 	adaptor := newI2cTestAdaptor()
 	g := NewGroveLcdDriver(adaptor, WithAddress(0x66))
-	gobottest.Assert(t, g.GetAddressOrDefault(0x33), 0x66)
+	assert.Equal(t, 0x66, g.GetAddressOrDefault(0x33))
 }
 
 func TestGroveAccelerometerDriverName(t *testing.T) {
 	g := initTestGroveAccelerometerDriver()
-	gobottest.Refute(t, g.Connection(), nil)
-	gobottest.Assert(t, strings.HasPrefix(g.Name(), "MMA7660"), true)
+	assert.NotNil(t, g.Connection())
+	assert.True(t, strings.HasPrefix(g.Name(), "MMA7660"))
 }
 
 func TestGroveAccelerometerDriverWithAddress(t *testing.T) {
 	adaptor := newI2cTestAdaptor()
 	g := NewGroveAccelerometerDriver(adaptor, WithAddress(0x66))
-	gobottest.Assert(t, g.GetAddressOrDefault(0x33), 0x66)
+	assert.Equal(t, 0x66, g.GetAddressOrDefault(0x33))
 }

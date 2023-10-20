@@ -4,27 +4,27 @@ import (
 	"strings"
 	"testing"
 
-	"gobot.io/x/gobot/v2/gobottest"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestAnalogActuatorDriver(t *testing.T) {
 	a := newAioTestAdaptor()
 	d := NewAnalogActuatorDriver(a, "47")
 
-	gobottest.Refute(t, d.Connection(), nil)
-	gobottest.Assert(t, d.Pin(), "47")
+	assert.NotNil(t, d.Connection())
+	assert.Equal(t, "47", d.Pin())
 
 	err := d.RawWrite(100)
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, len(a.written), 1)
-	gobottest.Assert(t, a.written[0], 100)
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(a.written))
+	assert.Equal(t, 100, a.written[0])
 
 	err = d.Write(247.0)
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, len(a.written), 2)
-	gobottest.Assert(t, a.written[1], 247)
-	gobottest.Assert(t, d.RawValue(), 247)
-	gobottest.Assert(t, d.Value(), 247.0)
+	assert.Nil(t, err)
+	assert.Equal(t, 2, len(a.written))
+	assert.Equal(t, 247, a.written[1])
+	assert.Equal(t, 247, d.RawValue())
+	assert.Equal(t, 247.0, d.Value())
 }
 
 func TestAnalogActuatorDriverWithScaler(t *testing.T) {
@@ -34,14 +34,14 @@ func TestAnalogActuatorDriverWithScaler(t *testing.T) {
 	d.SetScaler(func(input float64) int { return int((input + 3) / 2.5) })
 
 	err := d.Command("RawWrite")(map[string]interface{}{"val": "100"})
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, len(a.written), 1)
-	gobottest.Assert(t, a.written[0], 100)
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(a.written))
+	assert.Equal(t, 100, a.written[0])
 
 	err = d.Command("Write")(map[string]interface{}{"val": "247.0"})
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, len(a.written), 2)
-	gobottest.Assert(t, a.written[1], 100)
+	assert.Nil(t, err)
+	assert.Equal(t, 2, len(a.written))
+	assert.Equal(t, 100, a.written[1])
 }
 
 func TestAnalogActuatorDriverLinearScaler(t *testing.T) {
@@ -76,30 +76,30 @@ func TestAnalogActuatorDriverLinearScaler(t *testing.T) {
 			// act
 			err := d.Write(tt.input)
 			// assert
-			gobottest.Assert(t, err, nil)
-			gobottest.Assert(t, len(a.written), 1)
-			gobottest.Assert(t, a.written[0], tt.want)
+			assert.Nil(t, err)
+			assert.Equal(t, 1, len(a.written))
+			assert.Equal(t, tt.want, a.written[0])
 		})
 	}
 }
 
 func TestAnalogActuatorDriverStart(t *testing.T) {
 	d := NewAnalogActuatorDriver(newAioTestAdaptor(), "1")
-	gobottest.Assert(t, d.Start(), nil)
+	assert.Nil(t, d.Start())
 }
 
 func TestAnalogActuatorDriverHalt(t *testing.T) {
 	d := NewAnalogActuatorDriver(newAioTestAdaptor(), "1")
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.Nil(t, d.Halt())
 }
 
 func TestAnalogActuatorDriverDefaultName(t *testing.T) {
 	d := NewAnalogActuatorDriver(newAioTestAdaptor(), "1")
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "AnalogActuator"), true)
+	assert.True(t, strings.HasPrefix(d.Name(), "AnalogActuator"))
 }
 
 func TestAnalogActuatorDriverSetName(t *testing.T) {
 	d := NewAnalogActuatorDriver(newAioTestAdaptor(), "1")
 	d.SetName("mybot")
-	gobottest.Assert(t, d.Name(), "mybot")
+	assert.Equal(t, "mybot", d.Name())
 }

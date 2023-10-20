@@ -1,12 +1,11 @@
 package i2c
 
 import (
-	"errors"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/aio"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 // this ensures that the implementation is based on i2c.Driver, which implements the gobot.Driver
@@ -48,8 +47,8 @@ func TestADS1x15CommandsReadDifferenceWithDefaults(t *testing.T) {
 	// act
 	result := d.Command("ReadDifferenceWithDefaults")(ads1x15TestChannel)
 	// assert
-	gobottest.Assert(t, result.(map[string]interface{})["err"], nil)
-	gobottest.Assert(t, result.(map[string]interface{})["val"], -4.096)
+	assert.Nil(t, result.(map[string]interface{})["err"])
+	assert.Equal(t, -4.096, result.(map[string]interface{})["val"])
 }
 
 func TestADS1x15CommandsReadDifference(t *testing.T) {
@@ -58,8 +57,8 @@ func TestADS1x15CommandsReadDifference(t *testing.T) {
 	// act
 	result := d.Command("ReadDifference")(ads1x15TestChannelGainDataRate)
 	// assert
-	gobottest.Assert(t, result.(map[string]interface{})["err"], nil)
-	gobottest.Assert(t, result.(map[string]interface{})["val"], -2.048)
+	assert.Nil(t, result.(map[string]interface{})["err"])
+	assert.Equal(t, -2.048, result.(map[string]interface{})["val"])
 }
 
 func TestADS1x15CommandsReadWithDefaults(t *testing.T) {
@@ -68,8 +67,8 @@ func TestADS1x15CommandsReadWithDefaults(t *testing.T) {
 	// act
 	result := d.Command("ReadWithDefaults")(ads1x15TestChannel)
 	// assert
-	gobottest.Assert(t, result.(map[string]interface{})["err"], nil)
-	gobottest.Assert(t, result.(map[string]interface{})["val"], -4.096)
+	assert.Nil(t, result.(map[string]interface{})["err"])
+	assert.Equal(t, -4.096, result.(map[string]interface{})["val"])
 }
 
 func TestADS1x15CommandsRead(t *testing.T) {
@@ -78,8 +77,8 @@ func TestADS1x15CommandsRead(t *testing.T) {
 	// act
 	result := d.Command("Read")(ads1x15TestChannelGainDataRate)
 	// assert
-	gobottest.Assert(t, result.(map[string]interface{})["err"], nil)
-	gobottest.Assert(t, result.(map[string]interface{})["val"], -2.048)
+	assert.Nil(t, result.(map[string]interface{})["err"])
+	assert.Equal(t, -2.048, result.(map[string]interface{})["val"])
 }
 
 func TestADS1x15CommandsAnalogRead(t *testing.T) {
@@ -91,14 +90,14 @@ func TestADS1x15CommandsAnalogRead(t *testing.T) {
 	// act
 	result := d.Command("AnalogRead")(ads1x15TestPin)
 	// assert
-	gobottest.Assert(t, result.(map[string]interface{})["err"], nil)
-	gobottest.Assert(t, result.(map[string]interface{})["val"], -32768)
+	assert.Nil(t, result.(map[string]interface{})["err"])
+	assert.Equal(t, -32768, result.(map[string]interface{})["val"])
 }
 
 func TestADS1x15_ads1x15BestGainForVoltage(t *testing.T) {
 	g, _ := ads1x15BestGainForVoltage(1.5)
-	gobottest.Assert(t, g, 2)
+	assert.Equal(t, 2, g)
 
 	_, err := ads1x15BestGainForVoltage(20.0)
-	gobottest.Assert(t, err, errors.New("The maximum voltage which can be read is 6.144000"))
+	assert.Errorf(t, err, "The maximum voltage which can be read is 6.144000")
 }

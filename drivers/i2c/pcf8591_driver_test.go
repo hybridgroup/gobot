@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 // this ensures that the implementation is based on i2c.Driver, which implements the gobot.Driver
@@ -28,25 +28,25 @@ func TestNewPCF8591Driver(t *testing.T) {
 	if !ok {
 		t.Errorf("NewPCF8591Driver() should have returned a *PCF8591Driver")
 	}
-	gobottest.Refute(t, d.Driver, nil)
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "PCF8591"), true)
-	gobottest.Assert(t, d.defaultAddress, 0x48)
+	assert.NotNil(t, d.Driver)
+	assert.True(t, strings.HasPrefix(d.Name(), "PCF8591"))
+	assert.Equal(t, 0x48, d.defaultAddress)
 }
 
 func TestPCF8591Start(t *testing.T) {
 	d := NewPCF8591Driver(newI2cTestAdaptor())
-	gobottest.Assert(t, d.Start(), nil)
+	assert.Nil(t, d.Start())
 }
 
 func TestPCF8591Halt(t *testing.T) {
 	d := NewPCF8591Driver(newI2cTestAdaptor())
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.Nil(t, d.Halt())
 }
 
 func TestPCF8591WithPCF8591With400kbitStabilization(t *testing.T) {
 	d := NewPCF8591Driver(newI2cTestAdaptor(), WithPCF8591With400kbitStabilization(5, 6))
-	gobottest.Assert(t, d.additionalReadWrite, uint8(5))
-	gobottest.Assert(t, d.additionalRead, uint8(6))
+	assert.Equal(t, uint8(5), d.additionalReadWrite)
+	assert.Equal(t, uint8(6), d.additionalRead)
 }
 
 func TestPCF8591AnalogReadSingle(t *testing.T) {
@@ -78,11 +78,11 @@ func TestPCF8591AnalogReadSingle(t *testing.T) {
 	// act
 	got, err := d.AnalogRead(description)
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, len(a.written), 1)
-	gobottest.Assert(t, a.written[0], ctrlByteOn)
-	gobottest.Assert(t, numCallsRead, 2)
-	gobottest.Assert(t, got, want)
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(a.written))
+	assert.Equal(t, ctrlByteOn, a.written[0])
+	assert.Equal(t, 2, numCallsRead)
+	assert.Equal(t, want, got)
 }
 
 func TestPCF8591AnalogReadDiff(t *testing.T) {
@@ -120,11 +120,11 @@ func TestPCF8591AnalogReadDiff(t *testing.T) {
 	// act
 	got, err := d.AnalogRead(description)
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, len(a.written), 1)
-	gobottest.Assert(t, a.written[0], ctrlByteOn)
-	gobottest.Assert(t, numCallsRead, 2)
-	gobottest.Assert(t, got, want)
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(a.written))
+	assert.Equal(t, ctrlByteOn, a.written[0])
+	assert.Equal(t, 2, numCallsRead)
+	assert.Equal(t, want, got)
 }
 
 func TestPCF8591AnalogWrite(t *testing.T) {
@@ -146,10 +146,10 @@ func TestPCF8591AnalogWrite(t *testing.T) {
 	// act
 	err := d.AnalogWrite("", int(want))
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, len(a.written), 2)
-	gobottest.Assert(t, a.written[0], ctrlByteOn)
-	gobottest.Assert(t, a.written[1], want)
+	assert.Nil(t, err)
+	assert.Equal(t, 2, len(a.written))
+	assert.Equal(t, ctrlByteOn, a.written[0])
+	assert.Equal(t, want, a.written[1])
 }
 
 func TestPCF8591AnalogOutputState(t *testing.T) {
@@ -171,8 +171,8 @@ func TestPCF8591AnalogOutputState(t *testing.T) {
 		// act
 		err := d.AnalogOutputState(bitState == 1)
 		// assert
-		gobottest.Assert(t, err, nil)
-		gobottest.Assert(t, len(a.written), 1)
-		gobottest.Assert(t, a.written[0], wantCtrlByteVal)
+		assert.Nil(t, err)
+		assert.Equal(t, 1, len(a.written))
+		assert.Equal(t, wantCtrlByteVal, a.written[0])
 	}
 }

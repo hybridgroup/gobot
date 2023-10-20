@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 type DriverAndPinner interface {
@@ -33,8 +33,8 @@ func TestDriverDefaults(t *testing.T) {
 	}
 
 	for _, driver := range drivers {
-		gobottest.Assert(t, driver.Connection(), testAdaptor)
-		gobottest.Assert(t, driver.Pin(), pin)
+		assert.Equal(t, testAdaptor, driver.Connection())
+		assert.Equal(t, pin, driver.Pin())
 	}
 }
 
@@ -90,11 +90,11 @@ func TestDriverPublishesError(t *testing.T) {
 		}
 		testAdaptor.TestAdaptorAnalogRead(returnErr)
 
-		gobottest.Assert(t, driver.Start(), nil)
+		assert.Nil(t, driver.Start())
 
 		// expect error
 		_ = driver.Once(driver.Event(Error), func(data interface{}) {
-			gobottest.Assert(t, data.(error).Error(), "read error")
+			assert.Equal(t, "read error", data.(error).Error())
 			close(sem)
 		})
 

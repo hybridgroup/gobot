@@ -1,9 +1,7 @@
 package adaptors
 
 import (
-	"errors"
 	"fmt"
-	"strings"
 	"testing"
 	"time"
 
@@ -11,9 +9,9 @@ import (
 	"strconv"
 	"sync"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/gpio"
-	"gobot.io/x/gobot/v2/gobottest"
 	"gobot.io/x/gobot/v2/system"
 )
 
@@ -50,7 +48,7 @@ func TestDigitalPinsWithGpiosActiveLow(t *testing.T) {
 	// act
 	a := NewDigitalPinsAdaptor(sys, translate, WithGpiosActiveLow("1", "12", "33"))
 	// assert
-	gobottest.Assert(t, len(a.pinOptions), 3)
+	assert.Equal(t, 3, len(a.pinOptions))
 }
 
 func TestDigitalPinsConnect(t *testing.T) {
@@ -58,18 +56,18 @@ func TestDigitalPinsConnect(t *testing.T) {
 	sys := system.NewAccesser()
 
 	a := NewDigitalPinsAdaptor(sys, translate)
-	gobottest.Assert(t, a.pins, (map[string]gobot.DigitalPinner)(nil))
+	assert.Equal(t, (map[string]gobot.DigitalPinner)(nil), a.pins)
 
 	_, err := a.DigitalRead("13")
-	gobottest.Assert(t, err.Error(), "not connected for pin 13")
+	assert.Errorf(t, err, "not connected for pin 13")
 
 	err = a.DigitalWrite("7", 1)
-	gobottest.Assert(t, err.Error(), "not connected for pin 7")
+	assert.Errorf(t, err, "not connected for pin 7")
 
 	err = a.Connect()
-	gobottest.Assert(t, err, nil)
-	gobottest.Refute(t, a.pins, (map[string]gobot.DigitalPinner)(nil))
-	gobottest.Assert(t, len(a.pins), 0)
+	assert.Nil(t, err)
+	assert.NotEqual(t, (map[string]gobot.DigitalPinner)(nil), a.pins)
+	assert.Equal(t, 0, len(a.pins))
 }
 
 func TestDigitalPinsFinalize(t *testing.T) {
@@ -84,24 +82,24 @@ func TestDigitalPinsFinalize(t *testing.T) {
 	fs := sys.UseMockFilesystem(mockedPaths)
 	a := NewDigitalPinsAdaptor(sys, testDigitalPinTranslator)
 	// assert that finalize before connect is working
-	gobottest.Assert(t, a.Finalize(), nil)
+	assert.Nil(t, a.Finalize())
 	// arrange
-	gobottest.Assert(t, a.Connect(), nil)
-	gobottest.Assert(t, a.DigitalWrite("3", 1), nil)
-	gobottest.Assert(t, len(a.pins), 1)
+	assert.Nil(t, a.Connect())
+	assert.Nil(t, a.DigitalWrite("3", 1))
+	assert.Equal(t, 1, len(a.pins))
 	// act
 	err := a.Finalize()
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, len(a.pins), 0)
+	assert.Nil(t, err)
+	assert.Equal(t, 0, len(a.pins))
 	// assert that finalize after finalize is working
-	gobottest.Assert(t, a.Finalize(), nil)
+	assert.Nil(t, a.Finalize())
 	// arrange missing sysfs file
-	gobottest.Assert(t, a.Connect(), nil)
-	gobottest.Assert(t, a.DigitalWrite("3", 2), nil)
+	assert.Nil(t, a.Connect())
+	assert.Nil(t, a.DigitalWrite("3", 2))
 	delete(fs.Files, "/sys/class/gpio/unexport")
 	err = a.Finalize()
-	gobottest.Assert(t, strings.Contains(err.Error(), "/sys/class/gpio/unexport: no such file"), true)
+	assert.Contains(t, err.Error(), "/sys/class/gpio/unexport: no such file")
 }
 
 func TestDigitalPinsReConnect(t *testing.T) {
@@ -113,15 +111,15 @@ func TestDigitalPinsReConnect(t *testing.T) {
 		"/sys/class/gpio/gpio15/value",
 	}
 	a, _ := initTestDigitalPinsAdaptorWithMockedFilesystem(mockedPaths)
-	gobottest.Assert(t, a.DigitalWrite("4", 1), nil)
-	gobottest.Assert(t, len(a.pins), 1)
-	gobottest.Assert(t, a.Finalize(), nil)
+	assert.Nil(t, a.DigitalWrite("4", 1))
+	assert.Equal(t, 1, len(a.pins))
+	assert.Nil(t, a.Finalize())
 	// act
 	err := a.Connect()
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Refute(t, a.pins, nil)
-	gobottest.Assert(t, len(a.pins), 0)
+	assert.Nil(t, err)
+	assert.NotNil(t, a.pins)
+	assert.Equal(t, 0, len(a.pins))
 }
 
 func TestDigitalIO(t *testing.T) {
@@ -134,11 +132,11 @@ func TestDigitalIO(t *testing.T) {
 	a, _ := initTestDigitalPinsAdaptorWithMockedFilesystem(mockedPaths)
 
 	err := a.DigitalWrite("14", 1)
-	gobottest.Assert(t, err, nil)
+	assert.Nil(t, err)
 
 	i, err := a.DigitalRead("14")
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, i, 1)
+	assert.Nil(t, err)
+	assert.Equal(t, 1, i)
 }
 
 func TestDigitalRead(t *testing.T) {
@@ -154,18 +152,18 @@ func TestDigitalRead(t *testing.T) {
 
 	// assert read correct value without error
 	i, err := a.DigitalRead("13")
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, i, 1)
+	assert.Nil(t, err)
+	assert.Equal(t, 1, i)
 
 	// assert error bubbling for read errors
 	fs.WithReadError = true
 	_, err = a.DigitalRead("13")
-	gobottest.Assert(t, err, errors.New("read error"))
+	assert.Errorf(t, err, "read error")
 
 	// assert error bubbling for write errors
 	fs.WithWriteError = true
 	_, err = a.DigitalRead("7")
-	gobottest.Assert(t, err, errors.New("write error"))
+	assert.Errorf(t, err, "write error")
 }
 
 func TestDigitalReadWithGpiosActiveLow(t *testing.T) {
@@ -194,12 +192,12 @@ func TestDigitalReadWithGpiosActiveLow(t *testing.T) {
 	got1, err1 := a.DigitalRead("14") // for a new pin
 	got2, err2 := a.DigitalRead("15") // for an existing pin (calls ApplyOptions())
 	// assert
-	gobottest.Assert(t, err1, nil)
-	gobottest.Assert(t, err2, nil)
-	gobottest.Assert(t, got1, 1) // there is no mechanism to negate mocked values
-	gobottest.Assert(t, got2, 0)
-	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio25/active_low"].Contents, "1")
-	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio26/active_low"].Contents, "1")
+	assert.Nil(t, err1)
+	assert.Nil(t, err2)
+	assert.Equal(t, 1, got1) // there is no mechanism to negate mocked values
+	assert.Equal(t, 0, got2)
+	assert.Equal(t, "1", fs.Files["/sys/class/gpio/gpio25/active_low"].Contents)
+	assert.Equal(t, "1", fs.Files["/sys/class/gpio/gpio26/active_low"].Contents)
 }
 
 func TestDigitalWrite(t *testing.T) {
@@ -217,8 +215,8 @@ func TestDigitalWrite(t *testing.T) {
 	WithGpiosOpenDrain("7")(a)
 	WithGpioEventOnFallingEdge("7", gpioEventHandler)(a)
 	err := a.DigitalWrite("7", 1)
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio18/value"].Contents, "1")
+	assert.Nil(t, err)
+	assert.Equal(t, "1", fs.Files["/sys/class/gpio/gpio18/value"].Contents)
 
 	// assert second write to same pin without error and just ignore unsupported options
 	WithGpiosPullDown("7")(a)
@@ -226,15 +224,15 @@ func TestDigitalWrite(t *testing.T) {
 	WithGpioDebounce("7", 2*time.Second)(a)
 	WithGpioEventOnRisingEdge("7", gpioEventHandler)(a)
 	err = a.DigitalWrite("7", 1)
-	gobottest.Assert(t, err, nil)
+	assert.Nil(t, err)
 
 	// assert error on bad id
-	gobottest.Assert(t, a.DigitalWrite("notexist", 1), errors.New("not a valid pin"))
+	assert.Errorf(t, a.DigitalWrite("notexist", 1), "not a valid pin")
 
 	// assert error bubbling
 	fs.WithWriteError = true
 	err = a.DigitalWrite("7", 0)
-	gobottest.Assert(t, err, errors.New("write error"))
+	assert.Errorf(t, err, "write error")
 }
 
 func TestDigitalWriteWithGpiosActiveLow(t *testing.T) {
@@ -252,9 +250,9 @@ func TestDigitalWriteWithGpiosActiveLow(t *testing.T) {
 	// act
 	err := a.DigitalWrite("8", 2)
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio19/value"].Contents, "2")
-	gobottest.Assert(t, fs.Files["/sys/class/gpio/gpio19/active_low"].Contents, "1")
+	assert.Nil(t, err)
+	assert.Equal(t, "2", fs.Files["/sys/class/gpio/gpio19/value"].Contents)
+	assert.Equal(t, "1", fs.Files["/sys/class/gpio/gpio19/active_low"].Contents)
 }
 
 func TestDigitalPinConcurrency(t *testing.T) {

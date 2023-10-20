@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 // this ensures that the implementation is based on i2c.Driver, which implements the gobot.Driver
@@ -29,17 +29,17 @@ func TestNewTH02Driver(t *testing.T) {
 	if !ok {
 		t.Errorf("NewTH02Driver() should have returned a *NewTH02Driver")
 	}
-	gobottest.Refute(t, d.Driver, nil)
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "TH02"), true)
-	gobottest.Assert(t, d.defaultAddress, 0x40)
+	assert.NotNil(t, d.Driver)
+	assert.True(t, strings.HasPrefix(d.Name(), "TH02"))
+	assert.Equal(t, 0x40, d.defaultAddress)
 }
 
 func TestTH02Options(t *testing.T) {
 	// This is a general test, that options are applied in constructor by using the common options.
 	// Further tests for options can also be done by call of "WithOption(val)(d)".
 	d := NewTH02Driver(newI2cTestAdaptor(), WithBus(2), WithAddress(0x42))
-	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
-	gobottest.Assert(t, d.GetAddressOrDefault(0x33), 0x42)
+	assert.Equal(t, 2, d.GetBusOrDefault(1))
+	assert.Equal(t, 0x42, d.GetAddressOrDefault(0x33))
 }
 
 func TestTH02SetAccuracy(t *testing.T) {
@@ -74,7 +74,7 @@ func TestTH02WithFastMode(t *testing.T) {
 			// act
 			WithTH02FastMode(tc.value)(d)
 			// assert
-			gobottest.Assert(t, d.fastMode, tc.want)
+			assert.Equal(t, tc.want, d.fastMode)
 		})
 	}
 }
@@ -102,10 +102,10 @@ func TestTH02FastMode(t *testing.T) {
 			// act
 			got, err := d.FastMode()
 			// assert
-			gobottest.Assert(t, err, nil)
-			gobottest.Assert(t, len(a.written), 1)
-			gobottest.Assert(t, a.written[0], uint8(0x03))
-			gobottest.Assert(t, got, tc.want)
+			assert.Nil(t, err)
+			assert.Equal(t, 1, len(a.written))
+			assert.Equal(t, uint8(0x03), a.written[0])
+			assert.Equal(t, tc.want, got)
 		})
 	}
 }
@@ -130,11 +130,11 @@ func TestTH02SetHeater(t *testing.T) {
 			// act
 			err := d.SetHeater(tc.heater)
 			// assert
-			gobottest.Assert(t, err, nil)
-			gobottest.Assert(t, d.heating, tc.heater)
-			gobottest.Assert(t, len(a.written), 2)
-			gobottest.Assert(t, a.written[0], uint8(0x03))
-			gobottest.Assert(t, a.written[1], tc.want)
+			assert.Nil(t, err)
+			assert.Equal(t, tc.heater, d.heating)
+			assert.Equal(t, 2, len(a.written))
+			assert.Equal(t, uint8(0x03), a.written[0])
+			assert.Equal(t, tc.want, a.written[1])
 		})
 	}
 }
@@ -162,10 +162,10 @@ func TestTH02Heater(t *testing.T) {
 			// act
 			got, err := d.Heater()
 			// assert
-			gobottest.Assert(t, err, nil)
-			gobottest.Assert(t, len(a.written), 1)
-			gobottest.Assert(t, a.written[0], uint8(0x03))
-			gobottest.Assert(t, got, tc.want)
+			assert.Nil(t, err)
+			assert.Equal(t, 1, len(a.written))
+			assert.Equal(t, uint8(0x03), a.written[0])
+			assert.Equal(t, tc.want, got)
 		})
 	}
 }
@@ -186,10 +186,10 @@ func TestTH02SerialNumber(t *testing.T) {
 	// act
 	sn, err := d.SerialNumber()
 	// assert
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, len(a.written), 1)
-	gobottest.Assert(t, a.written[0], uint8(0x11))
-	gobottest.Assert(t, sn, want)
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(a.written))
+	assert.Equal(t, uint8(0x11), a.written[0])
+	assert.Equal(t, want, sn)
 }
 
 func TestTH02Sample(t *testing.T) {
@@ -289,7 +289,7 @@ func TestTH02Sample(t *testing.T) {
 					b[0] = byte(data >> 8)   // first read MSB from register 0x01
 					b[1] = byte(data & 0xFF) // second read LSB from register 0x02
 				default:
-					gobottest.Assert(t, fmt.Sprintf("unexpected register %d", reg), "only register 0 and 1 expected")
+					assert.Equal(t, "only register 0 and 1 expected", fmt.Sprintf("unexpected register %d", reg))
 					return 0, nil
 				}
 				return len(b), nil
@@ -297,9 +297,9 @@ func TestTH02Sample(t *testing.T) {
 			// act
 			temp, rh, err := d.Sample()
 			// assert
-			gobottest.Assert(t, err, nil)
-			gobottest.Assert(t, rh, float32(tc.wantRH))
-			gobottest.Assert(t, temp, float32(tc.wantT))
+			assert.Nil(t, err)
+			assert.Equal(t, float32(tc.wantRH), rh)
+			assert.Equal(t, float32(tc.wantT), temp)
 		})
 	}
 }
@@ -415,8 +415,8 @@ func TestTH02_readData(t *testing.T) {
 			// act
 			got, err := d.waitAndReadData()
 			// assert
-			gobottest.Assert(t, err, tc.wantErr)
-			gobottest.Assert(t, got, tc.rtn)
+			assert.Equal(t, tc.wantErr, err)
+			assert.Equal(t, tc.rtn, got)
 		})
 	}
 }
@@ -485,7 +485,7 @@ func TestTH02_createConfig(t *testing.T) {
 			d.fastMode = tc.fast
 			d.heating = tc.heating
 			got := d.createConfig(tc.meas, tc.readTemp)
-			gobottest.Assert(t, tc.want, got)
+			assert.Equal(t, got, tc.want)
 		})
 	}
 }

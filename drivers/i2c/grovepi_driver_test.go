@@ -5,10 +5,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/drivers/aio"
 	"gobot.io/x/gobot/v2/drivers/gpio"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 // this ensures that the implementation is based on i2c.Driver, which implements the gobot.Driver
@@ -41,17 +41,17 @@ func TestNewGrovePiDriver(t *testing.T) {
 	if !ok {
 		t.Errorf("NewGrovePiDriver() should have returned a *GrovePiDriver")
 	}
-	gobottest.Refute(t, d.Driver, nil)
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "GrovePi"), true)
-	gobottest.Assert(t, d.defaultAddress, 0x04)
-	gobottest.Refute(t, d.pins, nil)
+	assert.NotNil(t, d.Driver)
+	assert.True(t, strings.HasPrefix(d.Name(), "GrovePi"))
+	assert.Equal(t, 0x04, d.defaultAddress)
+	assert.NotNil(t, d.pins)
 }
 
 func TestGrovePiOptions(t *testing.T) {
 	// This is a general test, that options are applied in constructor by using the common WithBus() option and
 	// least one of this driver. Further tests for options can also be done by call of "WithOption(val)(d)".
 	d := NewGrovePiDriver(newI2cTestAdaptor(), WithBus(2))
-	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
+	assert.Equal(t, 2, d.GetBusOrDefault(1))
 }
 
 func TestGrovePiSomeRead(t *testing.T) {
@@ -166,13 +166,13 @@ func TestGrovePiSomeRead(t *testing.T) {
 				return
 			}
 			// assert
-			gobottest.Assert(t, err, tc.wantErr)
-			gobottest.Assert(t, a.written, tc.wantWritten)
-			gobottest.Assert(t, numCallsRead, len(tc.simResponse))
-			gobottest.Assert(t, got, tc.wantResult)
-			gobottest.Assert(t, gotF1, tc.wantResultF1)
-			gobottest.Assert(t, gotF2, tc.wantResultF2)
-			gobottest.Assert(t, gotString, tc.wantResultString)
+			assert.Equal(t, tc.wantErr, err)
+			assert.Equal(t, tc.wantWritten, a.written)
+			assert.Equal(t, len(tc.simResponse), numCallsRead)
+			assert.Equal(t, tc.wantResult, got)
+			assert.Equal(t, tc.wantResultF1, gotF1)
+			assert.Equal(t, tc.wantResultF2, gotF2)
+			assert.Equal(t, tc.wantResultString, gotString)
 		})
 	}
 }
@@ -219,16 +219,16 @@ func TestGrovePiSomeWrite(t *testing.T) {
 				return
 			}
 			// assert
-			gobottest.Assert(t, err, nil)
-			gobottest.Assert(t, a.written, tc.wantWritten)
+			assert.Nil(t, err)
+			assert.Equal(t, tc.wantWritten, a.written)
 		})
 	}
 }
 
 func TestGrovePi_getPin(t *testing.T) {
-	gobottest.Assert(t, getPin("a1"), "1")
-	gobottest.Assert(t, getPin("A16"), "16")
-	gobottest.Assert(t, getPin("D3"), "3")
-	gobottest.Assert(t, getPin("d22"), "22")
-	gobottest.Assert(t, getPin("22"), "22")
+	assert.Equal(t, "1", getPin("a1"))
+	assert.Equal(t, "16", getPin("A16"))
+	assert.Equal(t, "3", getPin("D3"))
+	assert.Equal(t, "22", getPin("d22"))
+	assert.Equal(t, "22", getPin("22"))
 }

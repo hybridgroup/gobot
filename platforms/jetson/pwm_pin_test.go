@@ -1,11 +1,10 @@
 package jetson
 
 import (
-	"errors"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 	"gobot.io/x/gobot/v2/system"
 )
 
@@ -23,33 +22,33 @@ func TestPwmPin(t *testing.T) {
 	a.UseMockFilesystem(mockPaths)
 
 	pin := NewPWMPin(a, "/sys/class/pwm/pwmchip0", "0")
-	gobottest.Assert(t, pin.Export(), nil)
-	gobottest.Assert(t, pin.SetEnabled(true), nil)
+	assert.Nil(t, pin.Export())
+	assert.Nil(t, pin.SetEnabled(true))
 	val, _ := pin.Polarity()
-	gobottest.Assert(t, val, true)
-	gobottest.Assert(t, pin.SetPolarity(false), nil)
+	assert.True(t, val)
+	assert.Nil(t, pin.SetPolarity(false))
 	val, _ = pin.Polarity()
-	gobottest.Assert(t, val, true)
+	assert.True(t, val)
 
 	_, err := pin.Period()
-	gobottest.Assert(t, err, errors.New("Jetson PWM pin period not set"))
-	gobottest.Assert(t, pin.SetDutyCycle(10000), errors.New("Jetson PWM pin period not set"))
+	assert.Errorf(t, err, "Jetson PWM pin period not set")
+	assert.Errorf(t, pin.SetDutyCycle(10000), "Jetson PWM pin period not set")
 
-	gobottest.Assert(t, pin.SetPeriod(20000000), nil)
+	assert.Nil(t, pin.SetPeriod(20000000))
 	period, _ := pin.Period()
-	gobottest.Assert(t, period, uint32(20000000))
-	gobottest.Assert(t, pin.SetPeriod(10000000), errors.New("Cannot set the period of individual PWM pins on Jetson"))
+	assert.Equal(t, uint32(20000000), period)
+	assert.Errorf(t, pin.SetPeriod(10000000), "Cannot set the period of individual PWM pins on Jetson")
 
 	dc, _ := pin.DutyCycle()
-	gobottest.Assert(t, dc, uint32(0))
+	assert.Equal(t, uint32(0), dc)
 
-	gobottest.Assert(t, pin.SetDutyCycle(10000), nil)
+	assert.Nil(t, pin.SetDutyCycle(10000))
 	dc, _ = pin.DutyCycle()
-	gobottest.Assert(t, dc, uint32(10000))
+	assert.Equal(t, uint32(10000), dc)
 
-	gobottest.Assert(t, pin.SetDutyCycle(999999999), errors.New("Duty cycle exceeds period"))
+	assert.Errorf(t, pin.SetDutyCycle(999999999), "Duty cycle exceeds period")
 	dc, _ = pin.DutyCycle()
-	gobottest.Assert(t, dc, uint32(10000))
+	assert.Equal(t, uint32(10000), dc)
 
-	gobottest.Assert(t, pin.Unexport(), nil)
+	assert.Nil(t, pin.Unexport())
 }

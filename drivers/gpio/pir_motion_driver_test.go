@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 var _ gobot.Driver = (*PIRMotionDriver)(nil)
@@ -23,15 +23,15 @@ func TestPIRMotionDriverHalt(t *testing.T) {
 	go func() {
 		<-d.halt
 	}()
-	gobottest.Assert(t, d.Halt(), nil)
+	assert.Nil(t, d.Halt())
 }
 
 func TestPIRMotionDriver(t *testing.T) {
 	d := NewPIRMotionDriver(newGpioTestAdaptor(), "1")
-	gobottest.Refute(t, d.Connection(), nil)
+	assert.NotNil(t, d.Connection())
 
 	d = NewPIRMotionDriver(newGpioTestAdaptor(), "1", 30*time.Second)
-	gobottest.Assert(t, d.interval, 30*time.Second)
+	assert.Equal(t, 30*time.Second, d.interval)
 }
 
 func TestPIRMotionDriverStart(t *testing.T) {
@@ -39,10 +39,10 @@ func TestPIRMotionDriverStart(t *testing.T) {
 	a := newGpioTestAdaptor()
 	d := NewPIRMotionDriver(a, "1")
 
-	gobottest.Assert(t, d.Start(), nil)
+	assert.Nil(t, d.Start())
 
 	_ = d.Once(MotionDetected, func(data interface{}) {
-		gobottest.Assert(t, d.Active, true)
+		assert.True(t, d.Active)
 		sem <- true
 	})
 
@@ -58,7 +58,7 @@ func TestPIRMotionDriverStart(t *testing.T) {
 	}
 
 	_ = d.Once(MotionStopped, func(data interface{}) {
-		gobottest.Assert(t, d.Active, false)
+		assert.False(t, d.Active)
 		sem <- true
 	})
 
@@ -91,11 +91,11 @@ func TestPIRMotionDriverStart(t *testing.T) {
 
 func TestPIRDriverDefaultName(t *testing.T) {
 	d := initTestPIRMotionDriver()
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "PIR"), true)
+	assert.True(t, strings.HasPrefix(d.Name(), "PIR"))
 }
 
 func TestPIRDriverSetName(t *testing.T) {
 	d := initTestPIRMotionDriver()
 	d.SetName("mybot")
-	gobottest.Assert(t, d.Name(), "mybot")
+	assert.Equal(t, "mybot", d.Name())
 }

@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
-	"gobot.io/x/gobot/v2/gobottest"
 )
 
 // this ensures that the implementation is based on i2c.Driver, which implements the gobot.Driver
@@ -25,15 +25,15 @@ func TestNewBME280Driver(t *testing.T) {
 	if !ok {
 		t.Errorf("NewBME280Driver() should have returned a *BME280Driver")
 	}
-	gobottest.Refute(t, d.Driver, nil)
-	gobottest.Assert(t, strings.HasPrefix(d.Name(), "BMP280"), true)
-	gobottest.Assert(t, d.defaultAddress, 0x77)
-	gobottest.Assert(t, d.ctrlPwrMode, uint8(0x03))
-	gobottest.Assert(t, d.ctrlPressOversamp, BMP280PressureOversampling(0x05))
-	gobottest.Assert(t, d.ctrlTempOversamp, BMP280TemperatureOversampling(0x01))
-	gobottest.Assert(t, d.ctrlHumOversamp, BME280HumidityOversampling(0x05))
-	gobottest.Assert(t, d.confFilter, BMP280IIRFilter(0x00))
-	gobottest.Refute(t, d.calCoeffs, nil)
+	assert.NotNil(t, d.Driver)
+	assert.True(t, strings.HasPrefix(d.Name(), "BMP280"))
+	assert.Equal(t, 0x77, d.defaultAddress)
+	assert.Equal(t, uint8(0x03), d.ctrlPwrMode)
+	assert.Equal(t, BMP280PressureOversampling(0x05), d.ctrlPressOversamp)
+	assert.Equal(t, BMP280TemperatureOversampling(0x01), d.ctrlTempOversamp)
+	assert.Equal(t, BME280HumidityOversampling(0x05), d.ctrlHumOversamp)
+	assert.Equal(t, BMP280IIRFilter(0x00), d.confFilter)
+	assert.NotNil(t, d.calCoeffs)
 }
 
 func TestBME280Options(t *testing.T) {
@@ -44,11 +44,11 @@ func TestBME280Options(t *testing.T) {
 		WithBME280TemperatureOversampling(0x02),
 		WithBME280IIRFilter(0x03),
 		WithBME280HumidityOversampling(0x04))
-	gobottest.Assert(t, d.GetBusOrDefault(1), 2)
-	gobottest.Assert(t, d.ctrlPressOversamp, BMP280PressureOversampling(0x01))
-	gobottest.Assert(t, d.ctrlTempOversamp, BMP280TemperatureOversampling(0x02))
-	gobottest.Assert(t, d.confFilter, BMP280IIRFilter(0x03))
-	gobottest.Assert(t, d.ctrlHumOversamp, BME280HumidityOversampling(0x04))
+	assert.Equal(t, 2, d.GetBusOrDefault(1))
+	assert.Equal(t, BMP280PressureOversampling(0x01), d.ctrlPressOversamp)
+	assert.Equal(t, BMP280TemperatureOversampling(0x02), d.ctrlTempOversamp)
+	assert.Equal(t, BMP280IIRFilter(0x03), d.confFilter)
+	assert.Equal(t, BME280HumidityOversampling(0x04), d.ctrlHumOversamp)
 }
 
 func TestBME280Measurements(t *testing.T) {
@@ -72,8 +72,8 @@ func TestBME280Measurements(t *testing.T) {
 	}
 	_ = bme280.Start()
 	hum, err := bme280.Humidity()
-	gobottest.Assert(t, err, nil)
-	gobottest.Assert(t, hum, float32(51.20179))
+	assert.Nil(t, err)
+	assert.Equal(t, float32(51.20179), hum)
 }
 
 func TestBME280InitH1Error(t *testing.T) {
@@ -92,7 +92,7 @@ func TestBME280InitH1Error(t *testing.T) {
 		return buf.Len(), nil
 	}
 
-	gobottest.Assert(t, bme280.Start(), errors.New("h1 read error"))
+	assert.Errorf(t, bme280.Start(), "h1 read error")
 }
 
 func TestBME280InitH2Error(t *testing.T) {
@@ -111,7 +111,7 @@ func TestBME280InitH2Error(t *testing.T) {
 		return buf.Len(), nil
 	}
 
-	gobottest.Assert(t, bme280.Start(), errors.New("h2 read error"))
+	assert.Errorf(t, bme280.Start(), "h2 read error")
 }
 
 func TestBME280HumidityWriteError(t *testing.T) {
@@ -122,8 +122,8 @@ func TestBME280HumidityWriteError(t *testing.T) {
 		return 0, errors.New("write error")
 	}
 	hum, err := bme280.Humidity()
-	gobottest.Assert(t, err, errors.New("write error"))
-	gobottest.Assert(t, hum, float32(0.0))
+	assert.Errorf(t, err, "write error")
+	assert.Equal(t, float32(0.0), hum)
 }
 
 func TestBME280HumidityReadError(t *testing.T) {
@@ -134,8 +134,8 @@ func TestBME280HumidityReadError(t *testing.T) {
 		return 0, errors.New("read error")
 	}
 	hum, err := bme280.Humidity()
-	gobottest.Assert(t, err, errors.New("read error"))
-	gobottest.Assert(t, hum, float32(0.0))
+	assert.Errorf(t, err, "read error")
+	assert.Equal(t, float32(0.0), hum)
 }
 
 func TestBME280HumidityNotEnabled(t *testing.T) {
@@ -159,8 +159,8 @@ func TestBME280HumidityNotEnabled(t *testing.T) {
 	}
 	_ = bme280.Start()
 	hum, err := bme280.Humidity()
-	gobottest.Assert(t, err, errors.New("Humidity disabled"))
-	gobottest.Assert(t, hum, float32(0.0))
+	assert.Errorf(t, err, "Humidity disabled")
+	assert.Equal(t, float32(0.0), hum)
 }
 
 func TestBME280_initializationBME280(t *testing.T) {
@@ -186,5 +186,5 @@ func TestBME280_initializationBME280(t *testing.T) {
 		}
 		return 0, nil
 	}
-	gobottest.Assert(t, bme280.Start(), nil)
+	assert.Nil(t, bme280.Start())
 }
