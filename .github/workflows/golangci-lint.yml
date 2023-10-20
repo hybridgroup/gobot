@@ -31,7 +31,8 @@ jobs:
 
           # Optional: golangci-lint command line arguments.
           # mostly there is no problem locally, but on server: "could not import C (cgo preprocessing failed) (typecheck)"
-          args: --skip-files platforms/digispark/littleWire.go
+          # and the digispark adaptor can not be build since switch to linter version 1.54.2
+          args: --skip-files="platforms/digispark/littleWire.go,platforms/digispark/digispark_adaptor.go"
 
           # Optional: show only new issues if it's a pull request. The default value is `false`.
           # only-new-issues: true
