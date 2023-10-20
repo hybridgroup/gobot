@@ -110,7 +110,7 @@ scp beaglebone_blink debian@192.168.7.2:/home/debian/
 ssh -t debian@192.168.7.2 "./beaglebone_blink"
 ```
 
-In order to run the preceeding commands, you must be running the official Debian Linux through the usb->ethernet connection,
+In order to run the preceding commands, you must be running the official Debian Linux through the usb->ethernet connection,
 or be connected to the board using WiFi.
 
 You must also configure hardware settings as described below.
