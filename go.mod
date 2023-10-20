@@ -1,6 +1,6 @@
 module gobot.io/x/gobot/v2
 
-go 1.18
+go 1.19
 
 require (
 	github.com/0xcafed00d/joystick v1.0.1
