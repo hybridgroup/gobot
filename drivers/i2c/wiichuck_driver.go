@@ -108,7 +108,7 @@ func (w *WiichuckDriver) setJoystickDefaultValue(joystickAxis string, defaultVal
 
 // calculateJoystickValue returns distance between axis and origin
 func (w *WiichuckDriver) calculateJoystickValue(axis float64, origin float64) float64 {
-	return float64(axis - origin)
+	return axis - origin
 }
 
 // isEncrypted returns true if value is encrypted

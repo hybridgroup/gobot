@@ -11,10 +11,8 @@ import (
 	paho "github.com/eclipse/paho.mqtt.golang"
 )
 
-var (
-	// ErrNilClient is returned when a client action can't be taken because the struct has no client
-	ErrNilClient = fmt.Errorf("no MQTT client available")
-)
+// ErrNilClient is returned when a client action can't be taken because the struct has no client
+var ErrNilClient = fmt.Errorf("no MQTT client available")
 
 // Message is a message received from the broker.
 type Message paho.Message
@@ -234,5 +232,8 @@ func (a *Adaptor) newTLSConfig() *tls.Config {
 		InsecureSkipVerify: false,
 		// Certificates = list of certs client sends to server.
 		Certificates: certs,
+		// MinVersion contains the minimum TLS version that is acceptable.
+		// TLS 1.2 is currently used as the minimum when acting as a client.
+		MinVersion: tls.VersionTLS12,
 	}
 }

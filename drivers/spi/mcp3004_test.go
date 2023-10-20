@@ -37,7 +37,7 @@ func TestNewMCP3004Driver(t *testing.T) {
 }
 
 func TestMCP3004Read(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		chanNum     int
 		simRead     []byte
 		want        int

@@ -62,7 +62,6 @@ func main() {
 			} else {
 				level = 1
 			}
-
 		})
 	}
 

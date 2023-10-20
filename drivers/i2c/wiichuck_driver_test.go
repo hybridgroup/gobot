@@ -63,7 +63,6 @@ func TestWiichuckDriverStart(t *testing.T) {
 	case <-time.After(100 * time.Millisecond):
 		t.Errorf("origin not read correctly")
 	}
-
 }
 
 func TestWiichuckDriverHalt(t *testing.T) {

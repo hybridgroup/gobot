@@ -43,7 +43,6 @@ func NewServoDriver(a ServoWriter, pin string) *ServoDriver {
 	})
 
 	return s
-
 }
 
 // Name returns the ServoDrivers name

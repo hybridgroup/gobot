@@ -56,7 +56,7 @@ func TestGrovePiOptions(t *testing.T) {
 
 func TestGrovePiSomeRead(t *testing.T) {
 	// arrange
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		usedPin          int
 		wantWritten      []uint8
 		simResponse      [][]uint8
@@ -179,7 +179,7 @@ func TestGrovePiSomeRead(t *testing.T) {
 
 func TestGrovePiSomeWrite(t *testing.T) {
 	// arrange
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		usedPin     int
 		usedValue   int
 		wantWritten []uint8

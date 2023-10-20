@@ -125,7 +125,7 @@ func (c *Adaptor) DigitalWrite(id string, val byte) error {
 	// is it one of the built-in LEDs?
 	if id == LEDRed || id == LEDBlue || id == LEDGreen || id == LEDYellow {
 		pinPath := fmt.Sprintf(c.ledPath, id)
-		fi, err := c.sys.OpenFile(pinPath, os.O_WRONLY|os.O_APPEND, 0666)
+		fi, err := c.sys.OpenFile(pinPath, os.O_WRONLY|os.O_APPEND, 0o666)
 		defer fi.Close() //nolint:staticcheck // for historical reasons
 		if err != nil {
 			return err
@@ -170,5 +170,4 @@ func (c *Adaptor) translatePWMPin(id string) (string, int, error) {
 		return "", -1, fmt.Errorf("'%s' is not a valid id for a PWM pin", id)
 	}
 	return "/sys/class/pwm/pwmchip0", sysPin.pwmPin, nil
-
 }

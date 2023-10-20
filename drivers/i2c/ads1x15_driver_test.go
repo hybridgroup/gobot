@@ -15,7 +15,7 @@ var _ gobot.Driver = (*ADS1x15Driver)(nil)
 // that supports the AnalogReader interface
 var _ aio.AnalogReader = (*ADS1x15Driver)(nil)
 
-func initTestADS1x15DriverWithStubbedAdaptor() (*ADS1x15Driver, *i2cTestAdaptor) {
+func initTestADS1x15DriverWithStubbedAdaptor() (*ADS1x15Driver, *i2cTestAdaptor) { //nolint:unparam // keep for tests
 	a := newI2cTestAdaptor()
 	const defaultDataRate = 3
 	dataRates := map[int]uint16{defaultDataRate: 0x0003}

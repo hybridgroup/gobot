@@ -165,10 +165,10 @@ func (d *SHT2xDriver) readSensor(cmd byte) (read uint16, err error) {
 		return
 	}
 
-	//Hang out while measurement is taken. 85ms max, page 9 of datasheet.
+	// Hang out while measurement is taken. 85ms max, page 9 of datasheet.
 	time.Sleep(85 * time.Millisecond)
 
-	//Comes back in three bytes, data(MSB) / data(LSB) / Checksum
+	// Comes back in three bytes, data(MSB) / data(LSB) / Checksum
 	buf := make([]byte, 3)
 	counter := 0
 	for {
@@ -188,7 +188,7 @@ func (d *SHT2xDriver) readSensor(cmd byte) (read uint16, err error) {
 		time.Sleep(1 * time.Millisecond)
 	}
 
-	//Store the result
+	// Store the result
 	crc := crc8.Checksum(buf[0:2], d.crcTable)
 	if buf[2] != crc {
 		err = errors.New("Invalid crc")
@@ -221,12 +221,12 @@ func (d *SHT2xDriver) sendAccuracy() error {
 		return err
 	}
 
-	userRegister &= 0x7e //Turn off the resolution bits
+	userRegister &= 0x7e // Turn off the resolution bits
 	acc := d.accuracy
-	acc &= 0x81         //Turn off all other bits but resolution bits
-	userRegister |= acc //Mask in the requested resolution bits
+	acc &= 0x81         // Turn off all other bits but resolution bits
+	userRegister |= acc // Mask in the requested resolution bits
 
-	//Request a write to user register
+	// Request a write to user register
 	if _, err := d.connection.Write([]byte{SHT2xWriteUserReg, userRegister}); err != nil {
 		return err
 	}

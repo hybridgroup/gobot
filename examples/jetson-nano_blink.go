@@ -31,5 +31,4 @@ func main() {
 	)
 
 	robot.Start()
-
 }

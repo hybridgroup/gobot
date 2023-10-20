@@ -49,7 +49,6 @@ func main() {
 
 	work := func() {
 		gobot.Every(5*time.Second, func() {
-
 			dcMotor := 2 // 0-based
 			adafruitDCMotorRunner(adaFruit, dcMotor)
 		})

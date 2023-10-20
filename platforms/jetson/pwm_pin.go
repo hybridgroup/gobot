@@ -126,7 +126,7 @@ func (p *PWMPin) SetDutyCycle(duty uint32) error {
 
 func (p *PWMPin) writeFile(subpath string, value string) error {
 	sysfspath := path.Join(p.path, subpath)
-	fi, err := p.sys.OpenFile(sysfspath, os.O_WRONLY|os.O_APPEND, 0644)
+	fi, err := p.sys.OpenFile(sysfspath, os.O_WRONLY|os.O_APPEND, 0o644)
 	defer fi.Close() //nolint:staticcheck // for historical reasons
 
 	if err != nil {

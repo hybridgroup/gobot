@@ -91,7 +91,7 @@ func (d *Driver) Start() error {
 
 	var err error
 	bus := d.GetBusOrDefault(d.connector.DefaultI2cBus())
-	address := d.GetAddressOrDefault(int(d.defaultAddress))
+	address := d.GetAddressOrDefault(d.defaultAddress)
 
 	if d.connection, err = d.connector.GetI2cConnection(address, bus); err != nil {
 		return err

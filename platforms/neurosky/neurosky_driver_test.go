@@ -160,9 +160,11 @@ func TestNeuroskyDriverParse(t *testing.T) {
 	// CodeAsicEEG
 	go func() {
 		time.Sleep(5 * time.Millisecond)
-		_ = d.parse(bytes.NewBuffer([]byte{0xAA, 0xAA, 30, 0x83, 24, 1, 121, 89, 0,
+		_ = d.parse(bytes.NewBuffer([]byte{
+			0xAA, 0xAA, 30, 0x83, 24, 1, 121, 89, 0,
 			97, 26, 0, 30, 189, 0, 57, 1, 0, 62, 160, 0, 31, 127, 0, 18, 207, 0, 13,
-			108, 0x00}))
+			108, 0x00,
+		}))
 	}()
 
 	_ = d.On(d.Event(EEG), func(data interface{}) {

@@ -57,7 +57,6 @@ func TestBuzzerDriverOnError(t *testing.T) {
 		return errors.New("write error")
 	})
 
-	//assert.Errorf(t, d.On(), "write error")
 	assert.Errorf(t, d.On(), "write error")
 }
 

@@ -27,7 +27,6 @@ func main() {
 			fmt.Println("Turning", i)
 			servo.Move(i)
 		})
-
 	}
 
 	robot := gobot.NewRobot("gopigo3servo",

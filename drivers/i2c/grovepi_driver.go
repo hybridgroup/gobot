@@ -29,9 +29,8 @@ const (
 // GrovePiDriver is a driver for the GrovePi+ for I²C bus interface.
 // https://www.dexterindustries.com/grovepi/
 //
-// To use this driver with the GrovePi, it must be running the firmware >= 1.4.0 and and the system version >=3.
+// To use this driver with the GrovePi, it must be running the firmware >= 1.4.0 and the system version >=3.
 // https://github.com/DexterInd/GrovePi/blob/master/README.md
-//
 type GrovePiDriver struct {
 	*Driver
 	pins map[int]string
@@ -39,12 +38,13 @@ type GrovePiDriver struct {
 
 // NewGrovePiDriver creates a new driver with specified i2c interface
 // Params:
-//		conn Connector - the Adaptor to use with this Driver
+//
+//	conn Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//		i2c.WithBus(int):	bus to use with this driver
-//		i2c.WithAddress(int):	address to use with this driver
 //
+//	i2c.WithBus(int):	bus to use with this driver
+//	i2c.WithAddress(int):	address to use with this driver
 func NewGrovePiDriver(c Connector, options ...func(Config)) *GrovePiDriver {
 	d := &GrovePiDriver{
 		Driver: NewDriver(c, "GrovePi", grovePiDefaultAddress),

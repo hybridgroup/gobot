@@ -64,8 +64,10 @@ type testAdaptor struct {
 	port string
 }
 
-var testAdaptorConnect = func() (err error) { return }
-var testAdaptorFinalize = func() (err error) { return }
+var (
+	testAdaptorConnect  = func() (err error) { return }
+	testAdaptorFinalize = func() (err error) { return }
+)
 
 func (t *testAdaptor) Finalize() (err error) { return testAdaptorFinalize() }
 func (t *testAdaptor) Connect() (err error)  { return testAdaptorConnect() }

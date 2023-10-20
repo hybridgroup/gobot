@@ -2,12 +2,11 @@ package jetson
 
 import (
 	"fmt"
-	"strings"
-	"testing"
-
 	"runtime"
 	"strconv"
+	"strings"
 	"sync"
+	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
@@ -18,13 +17,15 @@ import (
 )
 
 // make sure that this Adaptor fulfills all the required interfaces
-var _ gobot.Adaptor = (*Adaptor)(nil)
-var _ gobot.DigitalPinnerProvider = (*Adaptor)(nil)
-var _ gobot.PWMPinnerProvider = (*Adaptor)(nil)
-var _ gpio.DigitalReader = (*Adaptor)(nil)
-var _ gpio.DigitalWriter = (*Adaptor)(nil)
-var _ i2c.Connector = (*Adaptor)(nil)
-var _ spi.Connector = (*Adaptor)(nil)
+var (
+	_ gobot.Adaptor               = (*Adaptor)(nil)
+	_ gobot.DigitalPinnerProvider = (*Adaptor)(nil)
+	_ gobot.PWMPinnerProvider     = (*Adaptor)(nil)
+	_ gpio.DigitalReader          = (*Adaptor)(nil)
+	_ gpio.DigitalWriter          = (*Adaptor)(nil)
+	_ i2c.Connector               = (*Adaptor)(nil)
+	_ spi.Connector               = (*Adaptor)(nil)
+)
 
 func initTestAdaptorWithMockedFilesystem(mockPaths []string) (*Adaptor, *system.MockFilesystem) {
 	a := NewAdaptor()
@@ -175,7 +176,7 @@ func TestI2cFinalizeWithErrors(t *testing.T) {
 }
 
 func Test_validateSpiBusNumber(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		busNr   int
 		wantErr error
 	}{
@@ -207,7 +208,7 @@ func Test_validateSpiBusNumber(t *testing.T) {
 }
 
 func Test_validateI2cBusNumber(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		busNr   int
 		wantErr error
 	}{

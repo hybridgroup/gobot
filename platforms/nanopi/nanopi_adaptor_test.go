@@ -18,7 +18,7 @@ const (
 )
 
 const (
-	pwmDir           = "/sys/devices/platform/soc/1c21400.pwm/pwm/pwmchip0/"
+	pwmDir           = "/sys/devices/platform/soc/1c21400.pwm/pwm/pwmchip0/" //nolint:gosec // false positive
 	pwmPwmDir        = pwmDir + "pwm0/"
 	pwmExportPath    = pwmDir + "export"
 	pwmUnexportPath  = pwmDir + "unexport"
@@ -47,14 +47,16 @@ var gpioMockPaths = []string{
 }
 
 // make sure that this Adaptor fulfills all the required interfaces
-var _ gobot.Adaptor = (*Adaptor)(nil)
-var _ gobot.DigitalPinnerProvider = (*Adaptor)(nil)
-var _ gobot.PWMPinnerProvider = (*Adaptor)(nil)
-var _ gpio.DigitalReader = (*Adaptor)(nil)
-var _ gpio.DigitalWriter = (*Adaptor)(nil)
-var _ gpio.PwmWriter = (*Adaptor)(nil)
-var _ gpio.ServoWriter = (*Adaptor)(nil)
-var _ i2c.Connector = (*Adaptor)(nil)
+var (
+	_ gobot.Adaptor               = (*Adaptor)(nil)
+	_ gobot.DigitalPinnerProvider = (*Adaptor)(nil)
+	_ gobot.PWMPinnerProvider     = (*Adaptor)(nil)
+	_ gpio.DigitalReader          = (*Adaptor)(nil)
+	_ gpio.DigitalWriter          = (*Adaptor)(nil)
+	_ gpio.PwmWriter              = (*Adaptor)(nil)
+	_ gpio.ServoWriter            = (*Adaptor)(nil)
+	_ i2c.Connector               = (*Adaptor)(nil)
+)
 
 func preparePwmFs(fs *system.MockFilesystem) {
 	fs.Files[pwmEnablePath].Contents = "0"
@@ -232,7 +234,7 @@ func TestI2cFinalizeWithErrors(t *testing.T) {
 }
 
 func Test_validateSpiBusNumber(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		busNr   int
 		wantErr error
 	}{
@@ -261,7 +263,7 @@ func Test_validateSpiBusNumber(t *testing.T) {
 }
 
 func Test_validateI2cBusNumber(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		busNr   int
 		wantErr error
 	}{
@@ -296,7 +298,7 @@ func Test_validateI2cBusNumber(t *testing.T) {
 }
 
 func Test_translateDigitalPin(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		access   string
 		pin      string
 		wantChip string
@@ -339,7 +341,7 @@ func Test_translateDigitalPin(t *testing.T) {
 
 func Test_translatePWMPin(t *testing.T) {
 	basePaths := []string{"/sys/devices/platform/soc/1c21400.pwm/pwm/"}
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		pin         string
 		chip        string
 		wantDir     string

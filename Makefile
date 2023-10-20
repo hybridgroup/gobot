@@ -50,14 +50,14 @@ version_check:
 	echo "go: $${gv}.*, go.mod: $${mv}" ; \
 	if [ "$${gv}" != "$${mv}" ]; then exit 50; fi ; \
 
-# Check for bad code style and other issues
+# Check for bad code style and other issues (gofumpt and gofmt check is activated for the linter)
 fmt_check:
-	gofmt -l -s .
 	golangci-lint run -v
 
-# Fix bad code style (will only be executed, on version match)
-fmt_fix: version_check
-	gofmt -l -s -w .
+# Fix bad code style (the go version will be automatically obtained from go.mod)
+fmt_fix: 
+	$(MAKE) version_check || true
+	gofumpt -l -w .
 
 examples: $(EXAMPLES)
 

@@ -16,15 +16,16 @@ type MCP3004Driver struct {
 // NewMCP3004Driver creates a new Gobot Driver for MCP3004 A/D converter
 //
 // Params:
-//      a *Adaptor - the Adaptor to use with this Driver
+//
+//	a *Adaptor - the Adaptor to use with this Driver
 //
 // Optional params:
-//      spi.WithBusNumber(int):  bus to use with this driver
-//     	spi.WithChipNumber(int): chip to use with this driver
-//      spi.WithMode(int):    	 mode to use with this driver
-//      spi.WithBitCount(int):   number of bits to use with this driver
-//      spi.WithSpeed(int64):    speed in Hz to use with this driver
 //
+//	 spi.WithBusNumber(int):  bus to use with this driver
+//		spi.WithChipNumber(int): chip to use with this driver
+//	 spi.WithMode(int):    	 mode to use with this driver
+//	 spi.WithBitCount(int):   number of bits to use with this driver
+//	 spi.WithSpeed(int64):    speed in Hz to use with this driver
 func NewMCP3004Driver(a Connector, options ...func(Config)) *MCP3004Driver {
 	d := &MCP3004Driver{
 		Driver: NewDriver(a, "MCP3004"),

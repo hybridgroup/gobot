@@ -19,21 +19,21 @@ var StepperModes = struct {
 	DualPhaseStepping   [][4]byte
 	HalfStepping        [][4]byte
 }{
-	//1 cycle = 4 steps with lesser torque
+	// 1 cycle = 4 steps with lesser torque
 	SinglePhaseStepping: [][4]byte{
 		{1, 0, 0, 0},
 		{0, 1, 0, 0},
 		{0, 0, 1, 0},
 		{0, 0, 0, 1},
 	},
-	//1 cycle = 4 steps with higher torque and current
+	// 1 cycle = 4 steps with higher torque and current
 	DualPhaseStepping: [][4]byte{
 		{1, 0, 0, 1},
 		{1, 1, 0, 0},
 		{0, 1, 1, 0},
 		{0, 0, 1, 1},
 	},
-	//1 cycle = 8 steps with lesser torque than full stepping
+	// 1 cycle = 8 steps with lesser torque than full stepping
 	HalfStepping: [][4]byte{
 		{1, 0, 0, 1},
 		{1, 0, 0, 0},
@@ -110,7 +110,7 @@ func (s *StepperDriver) Start() error { return nil }
 
 // Run continuously runs the stepper
 func (s *StepperDriver) Run() error {
-	//halt if already moving
+	// halt if already moving
 	if s.moving {
 		if err := s.Halt(); err != nil {
 			return err
@@ -196,7 +196,7 @@ func (s *StepperDriver) Move(stepsToMove int) error {
 	}
 
 	if s.moving {
-		//stop previous motion
+		// stop previous motion
 		if err := s.Halt(); err != nil {
 			return err
 		}
@@ -228,7 +228,7 @@ func (s *StepperDriver) Move(stepsToMove int) error {
 
 // getDelayPerStep gives the delay per step
 func (s *StepperDriver) getDelayPerStep() time.Duration {
-	//Do not remove *1000 and change duration to time.Millisecond. It has been done for a reason
+	// Do not remove *1000 and change duration to time.Millisecond. It has been done for a reason
 	return time.Duration(60000*1000/(s.stepsPerRev*s.speed)) * time.Microsecond
 }
 
@@ -239,7 +239,7 @@ func (s *StepperDriver) GetCurrentStep() int {
 
 // GetMaxSpeed gives the max RPM of motor
 func (s *StepperDriver) GetMaxSpeed() uint {
-	//considering time for 1 rev as no of steps per rev * 1.5 (min time req between each step)
+	// considering time for 1 rev as no of steps per rev * 1.5 (min time req between each step)
 	return uint(60000 / (float64(s.stepsPerRev) * 1.5))
 }
 

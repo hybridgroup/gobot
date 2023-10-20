@@ -14,14 +14,16 @@ import (
 )
 
 // make sure that this Adaptor fulfills all the required interfaces
-var _ gobot.Adaptor = (*Adaptor)(nil)
-var _ gobot.DigitalPinnerProvider = (*Adaptor)(nil)
-var _ gobot.PWMPinnerProvider = (*Adaptor)(nil)
-var _ gpio.DigitalReader = (*Adaptor)(nil)
-var _ gpio.DigitalWriter = (*Adaptor)(nil)
-var _ aio.AnalogReader = (*Adaptor)(nil)
-var _ gpio.PwmWriter = (*Adaptor)(nil)
-var _ i2c.Connector = (*Adaptor)(nil)
+var (
+	_ gobot.Adaptor               = (*Adaptor)(nil)
+	_ gobot.DigitalPinnerProvider = (*Adaptor)(nil)
+	_ gobot.PWMPinnerProvider     = (*Adaptor)(nil)
+	_ gpio.DigitalReader          = (*Adaptor)(nil)
+	_ gpio.DigitalWriter          = (*Adaptor)(nil)
+	_ aio.AnalogReader            = (*Adaptor)(nil)
+	_ gpio.PwmWriter              = (*Adaptor)(nil)
+	_ i2c.Connector               = (*Adaptor)(nil)
+)
 
 var testPinFiles = []string{
 	"/sys/bus/iio/devices/iio:device1/in_voltage0_raw",
@@ -411,7 +413,6 @@ func TestDigitalPinInFileError(t *testing.T) {
 
 	_, err := a.DigitalPin("13")
 	assert.Contains(t, err.Error(), "no such file")
-
 }
 
 func TestDigitalPinInResistorFileError(t *testing.T) {
@@ -569,11 +570,10 @@ func TestI2cFinalizeWithErrors(t *testing.T) {
 	// assert
 	assert.NotNil(t, err)
 	assert.Contains(t, err.Error(), "close error")
-
 }
 
 func Test_validateI2cBusNumber(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		board   string
 		busNr   int
 		wantErr error

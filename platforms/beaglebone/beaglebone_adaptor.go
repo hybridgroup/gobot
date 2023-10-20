@@ -127,7 +127,7 @@ func (c *Adaptor) DigitalWrite(id string, val byte) error {
 	defer c.mutex.Unlock()
 
 	if strings.Contains(id, "usr") {
-		fi, e := c.sys.OpenFile(c.usrLed+id+"/brightness", os.O_WRONLY|os.O_APPEND, 0666)
+		fi, e := c.sys.OpenFile(c.usrLed+id+"/brightness", os.O_WRONLY|os.O_APPEND, 0o666)
 		defer fi.Close() //nolint:staticcheck // for historical reasons
 		if e != nil {
 			return e
@@ -145,14 +145,14 @@ func (c *Adaptor) AnalogRead(pin string) (val int, err error) {
 	if err != nil {
 		return
 	}
-	fi, err := c.sys.OpenFile(fmt.Sprintf("%v/%v", c.analogPath, analogPin), os.O_RDONLY, 0644)
+	fi, err := c.sys.OpenFile(fmt.Sprintf("%v/%v", c.analogPath, analogPin), os.O_RDONLY, 0o644)
 	defer fi.Close() //nolint:staticcheck // for historical reasons
 
 	if err != nil {
 		return
 	}
 
-	var buf = make([]byte, 1024)
+	buf := make([]byte, 1024)
 	_, err = fi.Read(buf)
 	if err != nil {
 		return
@@ -238,7 +238,7 @@ func (p pwmPinData) findPWMDir(sys *system.Accesser) (dir string, err error) {
 
 func (c *Adaptor) muxPin(pin, cmd string) error {
 	path := fmt.Sprintf("/sys/devices/platform/ocp/ocp:%s_pinmux/state", pin)
-	fi, e := c.sys.OpenFile(path, os.O_WRONLY, 0666)
+	fi, e := c.sys.OpenFile(path, os.O_WRONLY, 0o666)
 	defer fi.Close() //nolint:staticcheck // for historical reasons
 	if e != nil {
 		return e

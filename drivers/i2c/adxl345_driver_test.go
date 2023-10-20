@@ -143,7 +143,7 @@ func TestADXL345RawXYZ(t *testing.T) {
 	// * apply two's complement converter
 	//
 	// arrange
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		inputX []uint8
 		inputY []uint8
 		inputZ []uint8
@@ -210,7 +210,7 @@ func TestADXL345RawXYZError(t *testing.T) {
 
 func TestADXL345XYZ(t *testing.T) {
 	// arrange
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		inputX []uint8
 		inputY []uint8
 		inputZ []uint8

@@ -133,7 +133,7 @@ func TestTSL2561DriverEvenMoreOptions(t *testing.T) {
 
 	assert.NotNil(t, d)
 	assert.False(t, d.autoGain)
-	assert.Equal(t, TSL2561Gain(TSL2561Gain1X), d.gain)
+	assert.Equal(t, TSL2561Gain1X, d.gain)
 	assert.Equal(t, TSL2561IntegrationTime13MS, d.integrationTime)
 }
 

@@ -333,7 +333,6 @@ func TestExecuteRobotDeviceCommand(t *testing.T) {
 
 	_ = json.NewDecoder(response.Body).Decode(&body)
 	assert.Equal(t, "No Device found with the name UnknownDevice1", body.(map[string]interface{})["error"])
-
 }
 
 func TestRobotConnections(t *testing.T) {

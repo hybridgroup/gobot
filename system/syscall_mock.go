@@ -35,13 +35,13 @@ func (sys *mockSyscall) syscall(trap uintptr, f File, signal uintptr, payload un
 
 			if sys.smbus.readWrite == I2C_SMBUS_WRITE {
 				// get the data object payload as byte slice
-				sys.dataSlice = unsafe.Slice((*byte)(unsafe.Pointer(sys.smbus.data)), sys.sliceSize)
+				sys.dataSlice = unsafe.Slice((*byte)(sys.smbus.data), sys.sliceSize)
 			}
 
 			if sys.smbus.readWrite == I2C_SMBUS_READ {
 				// fill data object with data from given slice to simulate reading
 				if sys.dataSlice != nil {
-					slc := unsafe.Slice((*byte)(unsafe.Pointer(sys.smbus.data)), sys.sliceSize)
+					slc := unsafe.Slice((*byte)(sys.smbus.data), sys.sliceSize)
 					if sys.smbus.protocol == I2C_SMBUS_BLOCK_DATA || sys.smbus.protocol == I2C_SMBUS_I2C_BLOCK_DATA {
 						copy(slc[1:], sys.dataSlice)
 					} else {
@@ -54,7 +54,7 @@ func (sys *mockSyscall) syscall(trap uintptr, f File, signal uintptr, payload un
 
 	// call mock implementation
 	if sys.Impl != nil {
-		return sys.Impl(trap, f.Fd(), signal, uintptr(unsafe.Pointer(payload)))
+		return sys.Impl(trap, f.Fd(), signal, uintptr(payload))
 	}
 	return 0, 0, 0
 }
@@ -69,6 +69,6 @@ func (sys *mockSyscall) retrieveSliceSize() uint8 {
 		return 2
 	default:
 		// for I2C_SMBUS_BLOCK_DATA, I2C_SMBUS_I2C_BLOCK_DATA
-		return *(*byte)(unsafe.Pointer(sys.smbus.data)) + 1 // first data element contains data size
+		return *(*byte)(sys.smbus.data) + 1 // first data element contains data size
 	}
 }

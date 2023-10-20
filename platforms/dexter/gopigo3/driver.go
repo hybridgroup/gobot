@@ -307,9 +307,9 @@ func (g *Driver) SetLED(led Led, red, green, blue uint8) error {
 		goPiGo3Address,
 		SET_LED,
 		byte(led),
-		byte(red),
-		byte(green),
-		byte(blue),
+		red,
+		green,
+		blue,
 	})
 }
 
@@ -403,7 +403,7 @@ func (g *Driver) GetMotorStatus(motor Motor) (flags uint8, power uint16, encoder
 		return flags, power, encoder, dps, err
 	}
 	// get flags
-	flags = uint8(response[4])
+	flags = response[4]
 	// get power
 	power = uint16(response[5])
 	if power&0x80 == 0x80 {
@@ -420,7 +420,7 @@ func (g *Driver) GetMotorStatus(motor Motor) (flags uint8, power uint16, encoder
 	if e&0x80000000 == 0x80000000 {
 		encoder = int(uint64(e) - 0x100000000)
 	}
-	//get dps
+	// get dps
 	d := make([]byte, 4)
 	d[1] = response[10]
 	d[0] = response[11]
@@ -596,7 +596,7 @@ func (g *Driver) DigitalWrite(pin string, val byte) error {
 		goPiGo3Address,
 		SET_GROVE_STATE,
 		byte(grovePin),
-		byte(val),
+		val,
 	})
 }
 

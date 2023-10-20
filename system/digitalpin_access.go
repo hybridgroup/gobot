@@ -23,7 +23,8 @@ func (h *sysfsDigitalPinAccess) isSupported() bool {
 }
 
 func (h *sysfsDigitalPinAccess) createPin(chip string, pin int,
-	o ...func(gobot.DigitalPinOptioner) bool) gobot.DigitalPinner {
+	o ...func(gobot.DigitalPinOptioner) bool,
+) gobot.DigitalPinner {
 	return newDigitalPinSysfs(h.fs, strconv.Itoa(pin), o...)
 }
 
@@ -41,7 +42,8 @@ func (h *gpiodDigitalPinAccess) isSupported() bool {
 }
 
 func (h *gpiodDigitalPinAccess) createPin(chip string, pin int,
-	o ...func(gobot.DigitalPinOptioner) bool) gobot.DigitalPinner {
+	o ...func(gobot.DigitalPinOptioner) bool,
+) gobot.DigitalPinner {
 	return newDigitalPinGpiod(chip, pin, o...)
 }
 

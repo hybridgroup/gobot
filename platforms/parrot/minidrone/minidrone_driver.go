@@ -25,8 +25,8 @@ type Driver struct {
 
 const (
 	// BLE services
-	//droneCommandService      = "9a66fa000800919111e4012d1540cb8e"
-	//droneNotificationService = "9a66fb000800919111e4012d1540cb8e"
+	// droneCommandService      = "9a66fa000800919111e4012d1540cb8e"
+	// droneNotificationService = "9a66fb000800919111e4012d1540cb8e"
 
 	// send characteristics
 	pcmdCharacteristic     = "9a66fa0a0800919111e4012d1540cb8e"
@@ -419,7 +419,6 @@ func (b *Driver) GunControl(id uint8) error {
 	b.stepsfa0b++
 	buf := []byte{0x02, byte(b.stepsfa0b) & 0xff, 0x02, 0x10, 0x02, id, 0x00}
 	return b.adaptor().WriteCharacteristic(commandCharacteristic, buf)
-
 }
 
 func (b *Driver) generateAnimation(direction int8) *bytes.Buffer {
@@ -468,7 +467,7 @@ func (b *Driver) generatePcmd() *bytes.Buffer {
 	if err := binary.Write(cmd, binary.LittleEndian, int8(pcmd.Gaz)); err != nil {
 		panic(err)
 	}
-	if err := binary.Write(cmd, binary.LittleEndian, float32(pcmd.Psi)); err != nil {
+	if err := binary.Write(cmd, binary.LittleEndian, pcmd.Psi); err != nil {
 		panic(err)
 	}
 	if err := binary.Write(cmd, binary.LittleEndian, int16(0)); err != nil {

@@ -26,7 +26,6 @@ func main() {
 		button.On(gpio.ButtonRelease, func(data interface{}) {
 			fmt.Println("Off!")
 		})
-
 	}
 
 	robot := gobot.NewRobot("bot",

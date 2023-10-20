@@ -40,7 +40,6 @@ func (a *Accesser) setDigitalPinToGpiodAccess() {
 	if systemDebug {
 		fmt.Println("gpiod driver not supported, fallback to sysfs")
 	}
-
 }
 
 func (a *Accesser) setSpiToGpioAccess(p gobot.DigitalPinnerProvider, sclkPin, nssPin, mosiPin, misoPin string) {

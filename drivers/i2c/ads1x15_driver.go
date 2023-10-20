@@ -1,13 +1,12 @@
 package i2c
 
 import (
+	"fmt"
 	"log"
 	"math"
 	"sort"
 	"strconv"
 	"time"
-
-	"fmt"
 )
 
 const ads1x15DefaultAddress = 0x48

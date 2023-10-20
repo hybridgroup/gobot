@@ -25,7 +25,6 @@ func main() {
 	pcf := i2c.NewPCF8583Driver(board, i2c.WithBus(1), i2c.WithPCF8583Mode(i2c.PCF8583CtrlModeClock50))
 
 	work := func() {
-
 		currentTime := time.Now()
 		log.Println(currentTime)
 

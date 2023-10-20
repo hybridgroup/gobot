@@ -192,7 +192,7 @@ func WithMCP23017Intpol(val uint8) func(Config) {
 	}
 }
 
-// WithMCP23017ForceWrite option modifies the MCP23017Driver forceRefresh option
+// WithMCP23017ForceRefresh option modifies the MCP23017Driver forceRefresh option
 // Setting to true (1) will force refresh operation to register, although there is no change.
 // Normally this is not needed, so default is off (0).
 // When there is something flaky, there is a small chance to stabilize by setting this flag to true.
@@ -209,7 +209,7 @@ func WithMCP23017ForceRefresh(val uint8) func(Config) {
 }
 
 // WithMCP23017AutoIODirOff option modifies the MCP23017Driver autoIODirOff option
-// Set IO direction at each read or write operation ensures the correct direction, which is the the default setting.
+// Set IO direction at each read or write operation ensures the correct direction, which is the default setting.
 // Most hardware is configured statically, so this can avoided by setting the direction using SetPinMode(),
 // e.g. in the start up sequence. If this way is taken, the automatic set of direction at each call can
 // be safely deactivated with this flag (set to true, 1).
@@ -234,7 +234,7 @@ func (m *MCP23017Driver) SetPinMode(pin uint8, portStr string, val uint8) (err e
 
 	selectedPort := m.getPort(portStr)
 	// Set IODIR register bit for given pin to an output/input.
-	if err = m.write(selectedPort.IODIR, uint8(pin), bitState(val)); err != nil {
+	if err = m.write(selectedPort.IODIR, pin, bitState(val)); err != nil {
 		return
 	}
 	return
@@ -271,7 +271,7 @@ func (m *MCP23017Driver) WriteGPIO(pin uint8, portStr string, val uint8) (err er
 	if !m.mcpBehav.autoIODirOff {
 		// Set IODIR register bit for given pin to an output by clearing bit.
 		// can't call SetPinMode() because mutex will cause deadlock
-		if err = m.write(selectedPort.IODIR, uint8(pin), clear); err != nil {
+		if err = m.write(selectedPort.IODIR, pin, clear); err != nil {
 			return err
 		}
 	}
@@ -292,7 +292,7 @@ func (m *MCP23017Driver) ReadGPIO(pin uint8, portStr string) (val uint8, err err
 	if !m.mcpBehav.autoIODirOff {
 		// Set IODIR register bit for given pin to an input by set bit.
 		// can't call SetPinMode() because mutex will cause deadlock
-		if err = m.write(selectedPort.IODIR, uint8(pin), set); err != nil {
+		if err = m.write(selectedPort.IODIR, pin, set); err != nil {
 			return 0, err
 		}
 	}
@@ -300,7 +300,7 @@ func (m *MCP23017Driver) ReadGPIO(pin uint8, portStr string) (val uint8, err err
 	if err != nil {
 		return val, err
 	}
-	val = 1 << uint8(pin) & val
+	val = 1 << pin & val
 	if val > 1 {
 		val = 1
 	}

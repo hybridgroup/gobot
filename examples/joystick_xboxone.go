@@ -18,7 +18,6 @@ func main() {
 	joystick := joystick.NewDriver(joystickAdaptor, joystick.XboxOne)
 
 	work := func() {
-
 		// start button
 		joystick.On(joystick.Event("start_press"), func(data interface{}) {
 			fmt.Println("start_press")
@@ -117,7 +116,7 @@ func main() {
 			fmt.Println("lb_release")
 		})
 
-		//rb button
+		// rb button
 		joystick.On(joystick.Event("rb_press"), func(data interface{}) {
 			fmt.Println("rb_press")
 		})
@@ -130,7 +129,7 @@ func main() {
 			fmt.Println("right_x", data)
 		})
 
-		//ry stick
+		// ry stick
 		joystick.On(joystick.Event("right_y"), func(data interface{}) {
 			fmt.Println("right_y", data)
 		})
@@ -143,12 +142,12 @@ func main() {
 			fmt.Println("right_stick_release")
 		})
 
-		//lx stick
+		// lx stick
 		joystick.On(joystick.Event("left_x"), func(data interface{}) {
 			fmt.Println("left_x", data)
 		})
 
-		//ly stick
+		// ly stick
 		joystick.On(joystick.Event("left_y"), func(data interface{}) {
 			fmt.Println("left_y", data)
 		})
@@ -160,7 +159,6 @@ func main() {
 		joystick.On(joystick.Event("left_stick_release"), func(data interface{}) {
 			fmt.Println("left_stick_release")
 		})
-
 	}
 
 	robot := gobot.NewRobot("joystickBot",

@@ -149,7 +149,7 @@ func (i *INA3221Driver) readWordFromRegister(reg uint8) (uint16, error) {
 		return 0, err
 	}
 
-	return uint16(((val & 0x00FF) << 8) | ((val & 0xFF00) >> 8)), nil
+	return ((val & 0x00FF) << 8) | ((val & 0xFF00) >> 8), nil
 }
 
 // initialize initializes the INA3221 device

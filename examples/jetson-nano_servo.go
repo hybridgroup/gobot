@@ -21,7 +21,6 @@ import (
 )
 
 func main() {
-
 	jetsonAdaptor := jetson.NewAdaptor()
 	servo := gpio.NewServoDriver(jetsonAdaptor, "32")
 
@@ -29,7 +28,6 @@ func main() {
 	flg := true
 	work := func() {
 		gobot.Every(100*time.Millisecond, func() {
-
 			log.Println("Turning", counter)
 			servo.Move(uint8(counter))
 			if counter == 140 {
@@ -42,10 +40,8 @@ func main() {
 				counter = counter + 1
 			} else {
 				counter = counter - 1
-
 			}
 		})
-
 	}
 
 	robot := gobot.NewRobot("Jetsonservo",

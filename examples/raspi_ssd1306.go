@@ -23,7 +23,6 @@ func main() {
 	stage := false
 
 	work := func() {
-
 		gobot.Every(1*time.Second, func() {
 			oled.Clear()
 			if stage {

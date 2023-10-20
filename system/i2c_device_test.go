@@ -59,7 +59,7 @@ func initTestI2cDeviceWithMockedSys() (*i2cDevice, *mockSyscall) {
 }
 
 func TestNewI2cDevice(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		dev     string
 		wantErr string
 	}{
@@ -113,7 +113,7 @@ func TestWriteRead(t *testing.T) {
 }
 
 func TestReadByte(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		funcs       uint64
 		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno)
 		wantErr     string
@@ -157,7 +157,7 @@ func TestReadByte(t *testing.T) {
 }
 
 func TestReadByteData(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		funcs       uint64
 		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno)
 		wantErr     string
@@ -204,7 +204,7 @@ func TestReadByteData(t *testing.T) {
 }
 
 func TestReadWordData(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		funcs       uint64
 		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno)
 		wantErr     string
@@ -268,7 +268,7 @@ func TestReadBlockData(t *testing.T) {
 		wantB8 = byte(99)
 		wantB9 = byte(111)
 	)
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		funcs       uint64
 		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno)
 		wantErr     string
@@ -313,7 +313,7 @@ func TestReadBlockData(t *testing.T) {
 }
 
 func TestWriteByte(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		funcs       uint64
 		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno)
 		wantErr     string
@@ -355,7 +355,7 @@ func TestWriteByte(t *testing.T) {
 }
 
 func TestWriteByteData(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		funcs       uint64
 		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno)
 		wantErr     string
@@ -402,7 +402,7 @@ func TestWriteByteData(t *testing.T) {
 }
 
 func TestWriteWordData(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		funcs       uint64
 		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno)
 		wantErr     string
@@ -467,7 +467,7 @@ func TestWriteBlockData(t *testing.T) {
 		b8  = byte(0x88)
 		b9  = byte(0x99)
 	)
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		funcs       uint64
 		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno)
 		wantErr     string
@@ -528,7 +528,7 @@ func Test_setAddress(t *testing.T) {
 }
 
 func Test_queryFunctionality(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		requested   uint64
 		dev         string
 		syscallImpl func(trap, a1, a2, a3 uintptr) (r1, r2 uintptr, err SyscallErrno)

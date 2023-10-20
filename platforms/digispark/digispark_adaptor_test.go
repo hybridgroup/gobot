@@ -12,9 +12,11 @@ import (
 
 var _ gobot.Adaptor = (*Adaptor)(nil)
 
-var _ gpio.DigitalWriter = (*Adaptor)(nil)
-var _ gpio.PwmWriter = (*Adaptor)(nil)
-var _ gpio.ServoWriter = (*Adaptor)(nil)
+var (
+	_ gpio.DigitalWriter = (*Adaptor)(nil)
+	_ gpio.PwmWriter     = (*Adaptor)(nil)
+	_ gpio.ServoWriter   = (*Adaptor)(nil)
+)
 
 type mock struct {
 	locationA         uint8
@@ -33,6 +35,7 @@ func (l *mock) digitalWrite(pin uint8, state uint8) error {
 	l.state = state
 	return l.error()
 }
+
 func (l *mock) pinMode(pin uint8, mode uint8) error {
 	l.pin = pin
 	l.mode = mode
@@ -48,6 +51,7 @@ func (l *mock) pwmUpdateCompare(channelA uint8, channelB uint8) error {
 	l.pwmChannelB = channelB
 	return l.error()
 }
+
 func (l *mock) pwmUpdatePrescaler(value uint) error {
 	l.pwmPrescalerValue = value
 	return l.error()

@@ -208,7 +208,8 @@ func NewDriver(port string) *Driver {
 // NewDriverWithIP creates a driver for the Tello EDU drone. Pass in the ip address and UDP port to use for the responses
 // from the drone.
 func NewDriverWithIP(ip string, port string) *Driver {
-	d := &Driver{name: gobot.DefaultName("Tello"),
+	d := &Driver{
+		name:      gobot.DefaultName("Tello"),
 		reqAddr:   ip + ":8889",
 		respPort:  port,
 		videoPort: "11111",
@@ -275,7 +276,6 @@ func (d *Driver) Start() error {
 				panic(err)
 			}
 		})
-
 		if err != nil {
 			panic(err)
 		}
@@ -519,7 +519,7 @@ func (d *Driver) Rate() error {
 }
 
 // bound is a naive implementation that returns the smaller of x or y.
-func bound(x, y float32) float32 {
+func bound(x, y float32) float32 { //nolint:unparam // keep y as parameter
 	if x < -y {
 		return -y
 	}

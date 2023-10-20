@@ -20,8 +20,10 @@ type busConnection interface {
 	WriteByteData(reg byte, data byte) error
 }
 
-var versions = map[uint8]string{0x12: "Counterfeit", 0x88: "FM17522", 0x89: "FM17522E",
-	0x90: "MFRC522 0.0", 0x91: "MFRC522 1.0", 0x92: "MFRC522 2.0", 0xB2: "FM17522 1"}
+var versions = map[uint8]string{
+	0x12: "Counterfeit", 0x88: "FM17522", 0x89: "FM17522E",
+	0x90: "MFRC522 0.0", 0x91: "MFRC522 1.0", 0x92: "MFRC522 2.0", 0xB2: "FM17522 1",
+}
 
 // MFRC522Common is the Gobot Driver for MFRC522 RFID.
 // datasheet:
@@ -155,7 +157,8 @@ func (d *MFRC522Common) stopCrypto1() error {
 }
 
 func (d *MFRC522Common) communicateWithPICC(command uint8, sendData []byte, backData []byte, txLastBits uint8,
-	checkCRC bool) error {
+	checkCRC bool,
+) error {
 	irqEn := 0x00
 	waitIRq := uint8(0x00)
 	switch command {

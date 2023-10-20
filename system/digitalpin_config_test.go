@@ -39,7 +39,7 @@ func TestWithPinLabel(t *testing.T) {
 		oldLabel = "old label"
 		newLabel = "my optional label"
 	)
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		setLabel string
 		want     bool
 	}{
@@ -70,7 +70,7 @@ func TestWithPinDirectionOutput(t *testing.T) {
 		oldVal = 3
 		newVal = 5
 	)
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		oldDir  string
 		want    bool
 		wantVal int
@@ -100,7 +100,7 @@ func TestWithPinDirectionOutput(t *testing.T) {
 }
 
 func TestWithPinDirectionInput(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		oldDir string
 		want   bool
 	}{
@@ -128,7 +128,7 @@ func TestWithPinDirectionInput(t *testing.T) {
 }
 
 func TestWithPinActiveLow(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		oldActiveLow bool
 		want         bool
 	}{
@@ -154,7 +154,7 @@ func TestWithPinActiveLow(t *testing.T) {
 }
 
 func TestWithPinPullDown(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		oldBias int
 		want    bool
 		wantVal int
@@ -181,7 +181,7 @@ func TestWithPinPullDown(t *testing.T) {
 }
 
 func TestWithPinPullUp(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		oldBias int
 		want    bool
 		wantVal int
@@ -208,7 +208,7 @@ func TestWithPinPullUp(t *testing.T) {
 }
 
 func TestWithPinOpenDrain(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		oldDrive int
 		want     bool
 		wantVal  int
@@ -239,7 +239,7 @@ func TestWithPinOpenDrain(t *testing.T) {
 }
 
 func TestWithPinOpenSource(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		oldDrive int
 		want     bool
 		wantVal  int
@@ -274,7 +274,7 @@ func TestWithPinDebounce(t *testing.T) {
 		oldVal = time.Duration(10)
 		newVal = time.Duration(14)
 	)
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		oldDebouncePeriod time.Duration
 		want              bool
 		wantVal           time.Duration
@@ -305,7 +305,7 @@ func TestWithPinEventOnFallingEdge(t *testing.T) {
 		oldVal = digitalPinEventNone
 		newVal = digitalPinEventOnFallingEdge
 	)
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		oldEdge int
 		want    bool
 		wantVal int
@@ -343,7 +343,7 @@ func TestWithPinEventOnRisingEdge(t *testing.T) {
 		oldVal = digitalPinEventNone
 		newVal = digitalPinEventOnRisingEdge
 	)
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		oldEdge int
 		want    bool
 		wantVal int
@@ -381,7 +381,7 @@ func TestWithPinEventOnBothEdges(t *testing.T) {
 		oldVal = digitalPinEventNone
 		newVal = digitalPinEventOnBothEdges
 	)
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		oldEdge int
 		want    bool
 		wantVal int

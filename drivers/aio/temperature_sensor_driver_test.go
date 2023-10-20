@@ -19,7 +19,7 @@ func TestTemperatureSensorDriver(t *testing.T) {
 }
 
 func TestTemperatureSensorDriverNtcScaling(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		input int
 		want  float64
 	}{
@@ -36,8 +36,8 @@ func TestTemperatureSensorDriverNtcScaling(t *testing.T) {
 	}
 	a := newAioTestAdaptor()
 	d := NewTemperatureSensorDriver(a, "4")
-	ntc1 := TemperatureSensorNtcConf{TC0: 25, R0: 10000.0, B: 3950} //Ohm, R25=10k, B=3950
-	d.SetNtcScaler(255, 1000, true, ntc1)                           //Ohm, reference value: 3300, series R: 1k
+	ntc1 := TemperatureSensorNtcConf{TC0: 25, R0: 10000.0, B: 3950} // Ohm, R25=10k, B=3950
+	d.SetNtcScaler(255, 1000, true, ntc1)                           // Ohm, reference value: 3300, series R: 1k
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			// arrange
@@ -55,7 +55,7 @@ func TestTemperatureSensorDriverNtcScaling(t *testing.T) {
 }
 
 func TestTemperatureSensorDriverLinearScaling(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		input int
 		want  float64
 	}{
@@ -93,8 +93,8 @@ func TestTempSensorPublishesTemperatureInCelsius(t *testing.T) {
 	sem := make(chan bool, 1)
 	a := newAioTestAdaptor()
 	d := NewTemperatureSensorDriver(a, "1")
-	ntc := TemperatureSensorNtcConf{TC0: 25, R0: 10000.0, B: 3975} //Ohm, R25=10k
-	d.SetNtcScaler(1023, 10000, false, ntc)                        //Ohm, reference value: 1023, series R: 10k
+	ntc := TemperatureSensorNtcConf{TC0: 25, R0: 10000.0, B: 3975} // Ohm, R25=10k
+	d.SetNtcScaler(1023, 10000, false, ntc)                        // Ohm, reference value: 1023, series R: 10k
 
 	a.TestAdaptorAnalogRead(func() (val int, err error) {
 		val = 585
@@ -168,7 +168,7 @@ func TestTempDriverSetName(t *testing.T) {
 }
 
 func TestTempDriver_initialize(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		input TemperatureSensorNtcConf
 		want  TemperatureSensorNtcConf
 	}{

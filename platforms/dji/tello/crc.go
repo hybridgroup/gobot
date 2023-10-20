@@ -23,7 +23,7 @@ var crc8table = []byte{
 func CalculateCRC8(pkt []byte) byte {
 	crc := byte(0x77)
 	for _, val := range pkt {
-		crc = crc8table[(crc^byte(val))&0xff]
+		crc = crc8table[(crc^val)&0xff]
 	}
 
 	return crc

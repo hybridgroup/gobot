@@ -2,12 +2,11 @@ package adaptors
 
 import (
 	"fmt"
-	"testing"
-	"time"
-
 	"runtime"
 	"strconv"
 	"sync"
+	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"
@@ -16,9 +15,11 @@ import (
 )
 
 // make sure that this adaptor fulfills all the required interfaces
-var _ gobot.DigitalPinnerProvider = (*DigitalPinsAdaptor)(nil)
-var _ gpio.DigitalReader = (*DigitalPinsAdaptor)(nil)
-var _ gpio.DigitalWriter = (*DigitalPinsAdaptor)(nil)
+var (
+	_ gobot.DigitalPinnerProvider = (*DigitalPinsAdaptor)(nil)
+	_ gpio.DigitalReader          = (*DigitalPinsAdaptor)(nil)
+	_ gpio.DigitalWriter          = (*DigitalPinsAdaptor)(nil)
+)
 
 func initTestDigitalPinsAdaptorWithMockedFilesystem(mockPaths []string) (*DigitalPinsAdaptor, *system.MockFilesystem) {
 	sys := system.NewAccesser()

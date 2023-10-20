@@ -61,21 +61,25 @@ func (t *gpioTestAdaptor) ServoWrite(string, byte) (err error) {
 	defer t.mtx.Unlock()
 	return t.testAdaptorServoWrite()
 }
+
 func (t *gpioTestAdaptor) PwmWrite(string, byte) (err error) {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 	return t.testAdaptorPwmWrite()
 }
+
 func (t *gpioTestAdaptor) AnalogRead(string) (val int, err error) {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 	return t.testAdaptorAnalogRead()
 }
+
 func (t *gpioTestAdaptor) DigitalRead(string) (val int, err error) {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 	return t.testAdaptorDigitalRead()
 }
+
 func (t *gpioTestAdaptor) DigitalWrite(string, byte) (err error) {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()

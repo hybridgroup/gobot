@@ -41,6 +41,7 @@ func TestArdroneDriverHalt(t *testing.T) {
 	d := initTestArdroneDriver()
 	assert.Nil(t, d.Halt())
 }
+
 func TestArdroneDriverTakeOff(t *testing.T) {
 	d := initTestArdroneDriver()
 	d.TakeOff()

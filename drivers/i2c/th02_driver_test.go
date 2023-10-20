@@ -59,7 +59,7 @@ func TestTH02SetAccuracy(t *testing.T) {
 }
 
 func TestTH02WithFastMode(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		value int
 		want  bool
 	}{
@@ -84,7 +84,7 @@ func TestTH02FastMode(t *testing.T) {
 	// * write config register address (0x03)
 	// * read register content
 	// * if sixth bit (D5) is set, the fast mode is configured on, otherwise off
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		read uint8
 		want bool
 	}{
@@ -116,7 +116,7 @@ func TestTH02SetHeater(t *testing.T) {
 	// * write config register address (0x03)
 	// * prepare config value by set/reset the heater bit (0x02, D1)
 	// * write the config value
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		heater bool
 		want   uint8
 	}{
@@ -144,7 +144,7 @@ func TestTH02Heater(t *testing.T) {
 	// * write config register address (0x03)
 	// * read register content
 	// * if second bit (D1) is set, the heater is configured on, otherwise off
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		read uint8
 		want bool
 	}{
@@ -207,7 +207,7 @@ func TestTH02Sample(t *testing.T) {
 
 	// test table according to data sheet page 15, 17
 	// operating range of the temperature sensor is -40..85 °C (F-grade 0..70 °C)
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		hData  uint16
 		tData  uint16
 		wantRH float32
@@ -298,8 +298,8 @@ func TestTH02Sample(t *testing.T) {
 			temp, rh, err := d.Sample()
 			// assert
 			assert.Nil(t, err)
-			assert.Equal(t, float32(tc.wantRH), rh)
-			assert.Equal(t, float32(tc.wantT), temp)
+			assert.Equal(t, tc.wantRH, rh)
+			assert.Equal(t, tc.wantT, temp)
 		})
 	}
 }
@@ -309,7 +309,7 @@ func TestTH02_readData(t *testing.T) {
 
 	var callCounter int
 
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		rd      func([]byte) (int, error)
 		wr      func([]byte) (int, error)
 		rtn     uint16
@@ -455,7 +455,7 @@ func TestTH02_waitForReadyFailOnReadError(t *testing.T) {
 func TestTH02_createConfig(t *testing.T) {
 	d := &TH02Driver{}
 
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		meas     bool
 		fast     bool
 		readTemp bool

@@ -9,10 +9,12 @@ import (
 	"gobot.io/x/gobot/v2"
 )
 
-var _ gobot.DigitalPinner = (*digitalPinSysfs)(nil)
-var _ gobot.DigitalPinValuer = (*digitalPinSysfs)(nil)
-var _ gobot.DigitalPinOptioner = (*digitalPinSysfs)(nil)
-var _ gobot.DigitalPinOptionApplier = (*digitalPinSysfs)(nil)
+var (
+	_ gobot.DigitalPinner           = (*digitalPinSysfs)(nil)
+	_ gobot.DigitalPinValuer        = (*digitalPinSysfs)(nil)
+	_ gobot.DigitalPinOptioner      = (*digitalPinSysfs)(nil)
+	_ gobot.DigitalPinOptionApplier = (*digitalPinSysfs)(nil)
+)
 
 func initTestDigitalPinSysFsWithMockedFilesystem(mockPaths []string) (*digitalPinSysfs, *MockFilesystem) {
 	fs := newMockFilesystem(mockPaths)

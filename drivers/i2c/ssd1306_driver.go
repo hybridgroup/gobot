@@ -26,13 +26,13 @@ const (
 	ssd1306SetComOutput8 = 0xC8
 	ssd1306SetContrast   = 0x81
 	// scrolling commands
-	//ssd1306ContinuousHScrollRight  = 0x26
-	//ssd1306ContinuousHScrollLeft   = 0x27
-	//ssd1306ContinuousVHScrollRight = 0x29
-	//ssd1306ContinuousVHScrollLeft  = 0x2A
-	//ssd1306StopScroll              = 0x2E
-	//ssd1306StartScroll             = 0x2F
-	// adressing settings commands
+	// ssd1306ContinuousHScrollRight  = 0x26
+	// ssd1306ContinuousHScrollLeft   = 0x27
+	// ssd1306ContinuousVHScrollRight = 0x29
+	// ssd1306ContinuousVHScrollLeft  = 0x2A
+	// ssd1306StopScroll              = 0x2E
+	// ssd1306StartScroll             = 0x2F
+	// addressing settings commands
 	ssd1306SetMemoryAddressingMode = 0x20
 	ssd1306ColumnAddr              = 0x21
 	ssd1306PageAddr                = 0x22
@@ -235,14 +235,14 @@ func NewSSD1306Driver(c Connector, options ...func(Config)) *SSD1306Driver {
 		return map[string]interface{}{}
 	})
 	s.AddCommand("SetContrast", func(params map[string]interface{}) interface{} {
-		contrast := byte(params["contrast"].(byte))
+		contrast := params["contrast"].(byte)
 		err := s.SetContrast(contrast)
 		return map[string]interface{}{"err": err}
 	})
 	s.AddCommand("Set", func(params map[string]interface{}) interface{} {
-		x := int(params["x"].(int))
-		y := int(params["y"].(int))
-		c := int(params["c"].(int))
+		x := params["x"].(int)
+		y := params["y"].(int)
+		c := params["c"].(int)
 		s.Set(x, y, c)
 		return nil
 	})

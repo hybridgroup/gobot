@@ -25,21 +25,25 @@ func (t *gpioTestAdaptor) TestAdaptorDigitalWrite(f func(pin string, val byte) (
 	defer t.mtx.Unlock()
 	t.testAdaptorDigitalWrite = f
 }
+
 func (t *gpioTestAdaptor) TestAdaptorServoWrite(f func(pin string, val byte) (err error)) {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 	t.testAdaptorServoWrite = f
 }
+
 func (t *gpioTestAdaptor) TestAdaptorPwmWrite(f func(pin string, val byte) (err error)) {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 	t.testAdaptorPwmWrite = f
 }
+
 func (t *gpioTestAdaptor) TestAdaptorAnalogRead(f func(pin string) (val int, err error)) {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 	t.testAdaptorAnalogRead = f
 }
+
 func (t *gpioTestAdaptor) TestAdaptorDigitalRead(f func(pin string) (val int, err error)) {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
@@ -51,21 +55,25 @@ func (t *gpioTestAdaptor) ServoWrite(pin string, val byte) (err error) {
 	defer t.mtx.Unlock()
 	return t.testAdaptorServoWrite(pin, val)
 }
+
 func (t *gpioTestAdaptor) PwmWrite(pin string, val byte) (err error) {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 	return t.testAdaptorPwmWrite(pin, val)
 }
+
 func (t *gpioTestAdaptor) AnalogRead(pin string) (val int, err error) {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 	return t.testAdaptorAnalogRead(pin)
 }
+
 func (t *gpioTestAdaptor) DigitalRead(pin string) (val int, err error) {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 	return t.testAdaptorDigitalRead(pin)
 }
+
 func (t *gpioTestAdaptor) DigitalWrite(pin string, val byte) (err error) {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()

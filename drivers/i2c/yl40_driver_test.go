@@ -19,7 +19,7 @@ func initTestYL40DriverWithStubbedAdaptor() (*YL40Driver, *i2cTestAdaptor) {
 func TestYL40Driver(t *testing.T) {
 	// arrange, act
 	yl := NewYL40Driver(newI2cTestAdaptor())
-	//assert
+	// assert
 	assert.NotNil(t, yl.PCF8591Driver)
 	assert.Equal(t, time.Duration(0), yl.conf.sensors[YL40Bri].interval)
 	assert.NotNil(t, yl.conf.sensors[YL40Bri].scaler)
@@ -59,7 +59,7 @@ func TestYL40DriverWithYL40InputScaler(t *testing.T) {
 	f2 := func(input int) (value float64) { return 0.2 }
 	f3 := func(input int) (value float64) { return 0.3 }
 	f4 := func(input int) (value float64) { return 0.4 }
-	//act
+	// act
 	WithYL40InputScaler(YL40Bri, f1)(yl)
 	WithYL40InputScaler(YL40Temp, f2)(yl)
 	WithYL40InputScaler(YL40AIN2, f3)(yl)
@@ -75,7 +75,7 @@ func TestYL40DriverWithYL40WithYL40OutputScaler(t *testing.T) {
 	// arrange
 	yl := NewYL40Driver(newI2cTestAdaptor())
 	fo := func(input float64) (value int) { return 123 }
-	//act
+	// act
 	WithYL40OutputScaler(fo)(yl)
 	// assert
 	assert.True(t, fEqual(yl.conf.aOutScaler, fo))

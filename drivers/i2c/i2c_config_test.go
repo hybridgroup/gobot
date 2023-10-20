@@ -37,7 +37,7 @@ func TestWithAddress(t *testing.T) {
 }
 
 func TestGetBusOrDefaultWithBusOption(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		init int
 		bus  int
 		want int
@@ -59,7 +59,7 @@ func TestGetBusOrDefaultWithBusOption(t *testing.T) {
 }
 
 func TestGetAddressOrDefaultWithAddressOption(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		init    int
 		address int
 		want    int

@@ -333,16 +333,18 @@ func (b *Client) ReportAnalog(pin int, state int) error {
 
 // I2cRead reads numBytes from address once.
 func (b *Client) I2cRead(address int, numBytes int) error {
-	return b.WriteSysex([]byte{I2CRequest, byte(address), (I2CModeRead << 3),
-		byte(numBytes) & 0x7F, (byte(numBytes) >> 7) & 0x7F})
+	return b.WriteSysex([]byte{
+		I2CRequest, byte(address), (I2CModeRead << 3),
+		byte(numBytes) & 0x7F, (byte(numBytes) >> 7) & 0x7F,
+	})
 }
 
 // I2cWrite writes data to address.
 func (b *Client) I2cWrite(address int, data []byte) error {
 	ret := []byte{I2CRequest, byte(address), (I2CModeWrite << 3)}
 	for _, val := range data {
-		ret = append(ret, byte(val&0x7F))
-		ret = append(ret, byte((val>>7)&0x7F))
+		ret = append(ret, val&0x7F)
+		ret = append(ret, (val>>7)&0x7F)
 	}
 	return b.WriteSysex(ret)
 }
@@ -360,7 +362,7 @@ func (b *Client) togglePinReporting(pin int, state int, mode byte) error {
 		state = 0
 	}
 
-	return b.write([]byte{byte(mode) | byte(pin), byte(state)})
+	return b.write([]byte{mode | byte(pin), byte(state)})
 }
 
 // WriteSysex writes an arbitrary Sysex command to the microcontroller.
@@ -421,7 +423,7 @@ func (b *Client) process() error {
 		portValue := buf[0] | (buf[1] << 7)
 
 		for i := 0; i < 8; i++ {
-			pinNumber := int((8*byte(port) + byte(i)))
+			pinNumber := int((8*port + byte(i)))
 			if len(b.pins) > pinNumber {
 				if b.pins[pinNumber].Mode == Input {
 					b.pins[pinNumber].Value = int((portValue >> (byte(i) & 0x07)) & 0x01)
@@ -505,9 +507,9 @@ func (b *Client) process() error {
 			b.Publish(b.Event(fmt.Sprintf("PinState%v", pin)), b.pins[pin])
 		case I2CReply:
 			reply := I2cReply{
-				Address:  int(byte(currentBuffer[2]) | byte(currentBuffer[3])<<7),
-				Register: int(byte(currentBuffer[4]) | byte(currentBuffer[5])<<7),
-				Data:     []byte{byte(currentBuffer[6]) | byte(currentBuffer[7])<<7},
+				Address:  int(currentBuffer[2] | currentBuffer[3]<<7),
+				Register: int(currentBuffer[4] | currentBuffer[5]<<7),
+				Data:     []byte{currentBuffer[6] | currentBuffer[7]<<7},
 			}
 			for i := 8; i < len(currentBuffer); i = i + 2 {
 				if currentBuffer[i] == byte(0xF7) {
@@ -517,7 +519,7 @@ func (b *Client) process() error {
 					break
 				}
 				reply.Data = append(reply.Data,
-					byte(currentBuffer[i])|byte(currentBuffer[i+1])<<7,
+					currentBuffer[i]|currentBuffer[i+1]<<7,
 				)
 			}
 			b.Publish(b.Event("I2cReply"), reply)

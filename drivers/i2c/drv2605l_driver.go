@@ -65,10 +65,9 @@ const (
 //
 // Basic use:
 //
-//  haptic := i2c.NewDRV2605Driver(adaptor)
-//  haptic.SetSequence([]byte{1, 13})
-//  haptic.Go()
-//
+//	haptic := i2c.NewDRV2605Driver(adaptor)
+//	haptic.SetSequence([]byte{1, 13})
+//	haptic.Go()
 type DRV2605LDriver struct {
 	*Driver
 }
@@ -76,12 +75,13 @@ type DRV2605LDriver struct {
 // NewDRV2605LDriver creates a new driver for the DRV2605L device.
 //
 // Params:
-//		c Connector - the Adaptor to use with this Driver
+//
+//	c Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//		i2c.WithBus(int):	bus to use with this driver
-//		i2c.WithAddress(int):	address to use with this driver
 //
+//	i2c.WithBus(int):	bus to use with this driver
+//	i2c.WithAddress(int):	address to use with this driver
 func NewDRV2605LDriver(c Connector, options ...func(Config)) *DRV2605LDriver {
 	d := &DRV2605LDriver{
 		Driver: NewDriver(c, "DRV2605L", drv2605DefaultAddress),

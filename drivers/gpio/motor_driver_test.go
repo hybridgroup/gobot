@@ -17,8 +17,8 @@ func initTestMotorDriver() *MotorDriver {
 func TestMotorDriver(t *testing.T) {
 	d := NewMotorDriver(newGpioTestAdaptor(), "1")
 	assert.NotNil(t, d.Connection())
-
 }
+
 func TestMotorDriverStart(t *testing.T) {
 	d := initTestMotorDriver()
 	assert.Nil(t, d.Start())

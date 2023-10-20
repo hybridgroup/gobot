@@ -41,7 +41,7 @@ Descriptions for each of these will eventually be provided below.
   from time to time but they can complicate merges and should be done separately.
 * Take care to maintain the existing coding style.
 * `golangci-lint` your code, see [instruction for local installation](https://golangci-lint.run/usage/install/#local-installation)
-* `go fmt` your code (with the go version of go.mod)
+* `gofumpt` your code (the go version will be automatically obtained from go.mod), see [instructions](https://github.com/mvdan/gofumpt/blob/master/README.md)
 * Add unit tests for any new or changed functionality.
 * All pull requests should be "fast forward"
   * If there are commits after yours use “git rebase -i <new_head_branch>”

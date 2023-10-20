@@ -16,7 +16,7 @@ func Test_isSupportedSysfs(t *testing.T) {
 }
 
 func Test_isSupportedGpiod(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		mockPaths []string
 		want      bool
 	}{

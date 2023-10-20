@@ -29,7 +29,6 @@ func main() {
 	bb := bb8.NewDriver(bleAdaptor)
 
 	work := func() {
-
 		bb.On("collision", func(data interface{}) {
 			fmt.Printf("collision detected = %+v \n", data)
 			bb.SetRGB(255, 0, 0)
@@ -46,5 +45,4 @@ func main() {
 	)
 
 	robot.Start()
-
 }

@@ -15,8 +15,10 @@ const (
 	adxl345DefaultAddress = 0x53
 )
 
-type ADXL345RateConfig uint8
-type ADXL345FsRangeConfig uint8
+type (
+	ADXL345RateConfig    uint8
+	ADXL345FsRangeConfig uint8
+)
 
 const (
 	// registers are named according to the datasheet

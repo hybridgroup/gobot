@@ -182,7 +182,6 @@ func (s *Adaptor) EventStream(source string, name string) (event *gobot.Event, e
 func (s *Adaptor) Variable(name string) (result string, err error) {
 	url := fmt.Sprintf("%v/%s?access_token=%s", s.deviceURL(), name, s.AccessToken)
 	resp, err := s.request("GET", url, nil)
-
 	if err != nil {
 		return
 	}
@@ -245,9 +244,9 @@ func (s *Adaptor) request(method string, url string, params url.Values) (m map[s
 	var resp *http.Response
 
 	if method == "POST" {
-		resp, err = http.PostForm(url, params)
+		resp, err = http.PostForm(url, params) //nolint:gosec // accepted, because local function and no exposed routing
 	} else if method == "GET" {
-		resp, err = http.Get(url)
+		resp, err = http.Get(url) //nolint:gosec // accepted, because local function and no exposed routing
 	}
 
 	if err != nil {
@@ -255,7 +254,6 @@ func (s *Adaptor) request(method string, url string, params url.Values) (m map[s
 	}
 
 	buf, err := io.ReadAll(resp.Body)
-
 	if err != nil {
 		return
 	}

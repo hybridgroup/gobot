@@ -213,7 +213,6 @@ func (d *BME280Driver) initHumidity() error {
 	}
 
 	return d.connection.WriteByteData(bmp280RegCtrl, cmr)
-
 }
 
 func (d *BME280Driver) rawHumidity() (uint32, error) {

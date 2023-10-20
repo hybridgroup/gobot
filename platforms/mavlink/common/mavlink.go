@@ -188,7 +188,7 @@ func crcAccumulate(data uint8, crcAccum uint16) uint16 {
 
 	tmp = data ^ (uint8)(crcAccum&0xff)
 	tmp ^= (tmp << 4)
-	crcAccum = (uint16(crcAccum) >> 8) ^ (uint16(tmp) << 8) ^ (uint16(tmp) << 3) ^ (uint16(tmp) >> 4)
+	crcAccum = (crcAccum >> 8) ^ (uint16(tmp) << 8) ^ (uint16(tmp) << 3) ^ (uint16(tmp) >> 4)
 	return crcAccum
 }
 

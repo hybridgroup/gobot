@@ -23,8 +23,10 @@ type testDriver struct {
 	Commander
 }
 
-var testDriverStart = func() (err error) { return }
-var testDriverHalt = func() (err error) { return }
+var (
+	testDriverStart = func() (err error) { return }
+	testDriverHalt  = func() (err error) { return }
+)
 
 func (t *testDriver) Start() (err error)     { return testDriverStart() }
 func (t *testDriver) Halt() (err error)      { return testDriverHalt() }
@@ -51,8 +53,10 @@ type testAdaptor struct {
 	port string
 }
 
-var testAdaptorConnect = func() (err error) { return }
-var testAdaptorFinalize = func() (err error) { return }
+var (
+	testAdaptorConnect  = func() (err error) { return }
+	testAdaptorFinalize = func() (err error) { return }
+)
 
 func (t *testAdaptor) Finalize() (err error) { return testAdaptorFinalize() }
 func (t *testAdaptor) Connect() (err error)  { return testAdaptorConnect() }
@@ -60,7 +64,7 @@ func (t *testAdaptor) Name() string          { return t.name }
 func (t *testAdaptor) SetName(n string)      { t.name = n }
 func (t *testAdaptor) Port() string          { return t.port }
 
-func newTestAdaptor(name string, port string) *testAdaptor {
+func newTestAdaptor(name string, port string) *testAdaptor { //nolint:unparam // keep for tests
 	return &testAdaptor{
 		name: name,
 		port: port,

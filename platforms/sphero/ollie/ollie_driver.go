@@ -29,8 +29,8 @@ type Driver struct {
 
 const (
 	// bluetooth service IDs
-	//spheroBLEService    = "22bb746f2bb075542d6f726568705327"
-	//robotControlService = "22bb746f2ba075542d6f726568705327"
+	// spheroBLEService    = "22bb746f2bb075542d6f726568705327"
+	// robotControlService = "22bb746f2ba075542d6f726568705327"
 
 	// BLE characteristic IDs
 	wakeCharacteristic     = "22bb746f2bbf75542d6f726568705327"
@@ -214,16 +214,15 @@ func (b *Driver) SetTXPower(level int) error {
 
 // HandleResponses handles responses returned from Ollie
 func (b *Driver) HandleResponses(data []byte, e error) {
-
-	//since packets can only be 20 bytes long, we have to puzzle them together
+	// since packets can only be 20 bytes long, we have to puzzle them together
 	newMessage := false
 
-	//append message parts to existing
+	// append message parts to existing
 	if len(data) > 0 && data[0] != 0xFF {
 		b.asyncBuffer = append(b.asyncBuffer, data...)
 	}
 
-	//clear message when new one begins (first byte is always 0xFF)
+	// clear message when new one begins (first byte is always 0xFF)
 	if len(data) > 0 && data[0] == 0xFF {
 		b.asyncMessage = b.asyncBuffer
 		b.asyncBuffer = data
@@ -231,14 +230,14 @@ func (b *Driver) HandleResponses(data []byte, e error) {
 	}
 
 	parts := b.asyncMessage
-	//3 is the id of data streaming, located at index 2 byte
+	// 3 is the id of data streaming, located at index 2 byte
 	if newMessage && len(parts) > 2 && parts[2] == 3 {
 		b.handleDataStreaming(parts)
 	}
 
-	//index 1 is the type of the message, 0xFF being a direct response, 0xFE an asynchronous message
+	// index 1 is the type of the message, 0xFF being a direct response, 0xFE an asynchronous message
 	if len(data) > 4 && data[1] == 0xFF && data[0] == 0xFF {
-		//locator request
+		// locator request
 		if data[4] == 0x0B && len(data) == 16 {
 			b.handleLocatorDetected(data)
 		}
@@ -253,14 +252,14 @@ func (b *Driver) HandleResponses(data []byte, e error) {
 
 // GetLocatorData calls the passed function with the data from the locator
 func (b *Driver) GetLocatorData(f func(p Point2D)) {
-	//CID 0x15 is the code for the locator request
+	// CID 0x15 is the code for the locator request
 	b.PacketChannel() <- b.craftPacket([]uint8{}, 0x02, 0x15)
 	b.locatorCallback = f
 }
 
 // GetPowerState calls the passed function with the Power State information from the sphero
 func (b *Driver) GetPowerState(f func(p PowerStatePacket)) {
-	//CID 0x20 is the code for the power state
+	// CID 0x20 is the code for the power state
 	b.PacketChannel() <- b.craftPacket([]uint8{}, 0x00, 0x20)
 	b.powerstateCallback = f
 }
@@ -271,8 +270,8 @@ func (b *Driver) handleDataStreaming(data []byte) {
 		return
 	}
 
-	//data packet is the same as for the normal sphero, since the same communication api is used
-	//only difference in communication is that the "newer" spheros use BLE for communinations
+	// data packet is the same as for the normal sphero, since the same communication api is used
+	// only difference in communication is that the "newer" spheros use BLE for communinations
 	var dataPacket DataStreamingPacket
 	buffer := bytes.NewBuffer(data[5:]) // skip header
 	if err := binary.Read(buffer, binary.BigEndian, &dataPacket); err != nil {
@@ -387,7 +386,6 @@ func (b *Driver) craftPacket(body []uint8, did byte, cid byte) *Packet {
 }
 
 func (b *Driver) handlePowerStateDetected(data []uint8) {
-
 	var dataPacket PowerStatePacket
 	buffer := bytes.NewBuffer(data[5:]) // skip header
 	if err := binary.Read(buffer, binary.BigEndian, &dataPacket); err != nil {
@@ -398,11 +396,11 @@ func (b *Driver) handlePowerStateDetected(data []uint8) {
 }
 
 func (b *Driver) handleLocatorDetected(data []uint8) {
-	//read the unsigned raw values
+	// read the unsigned raw values
 	ux := binary.BigEndian.Uint16(data[5:7])
 	uy := binary.BigEndian.Uint16(data[7:9])
 
-	//convert to signed values
+	// convert to signed values
 	var x, y int16
 
 	if ux > 32255 {
@@ -417,7 +415,7 @@ func (b *Driver) handleLocatorDetected(data []uint8) {
 		y = int16(uy)
 	}
 
-	//create point obj
+	// create point obj
 	p := new(Point2D)
 	p.X = x
 	p.Y = y
@@ -428,7 +426,6 @@ func (b *Driver) handleLocatorDetected(data []uint8) {
 }
 
 func (b *Driver) handleCollisionDetected(data []uint8) {
-
 	if len(data) == ResponsePacketMaxSize {
 		// Check if this is the header of collision response. (i.e. first part of data)
 		// Collision response is 22 bytes long. (individual packet size is maxed at 20)

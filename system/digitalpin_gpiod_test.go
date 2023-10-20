@@ -8,10 +8,12 @@ import (
 	"gobot.io/x/gobot/v2"
 )
 
-var _ gobot.DigitalPinner = (*digitalPinGpiod)(nil)
-var _ gobot.DigitalPinValuer = (*digitalPinGpiod)(nil)
-var _ gobot.DigitalPinOptioner = (*digitalPinGpiod)(nil)
-var _ gobot.DigitalPinOptionApplier = (*digitalPinGpiod)(nil)
+var (
+	_ gobot.DigitalPinner           = (*digitalPinGpiod)(nil)
+	_ gobot.DigitalPinValuer        = (*digitalPinGpiod)(nil)
+	_ gobot.DigitalPinOptioner      = (*digitalPinGpiod)(nil)
+	_ gobot.DigitalPinOptionApplier = (*digitalPinGpiod)(nil)
+)
 
 func Test_newDigitalPinGpiod(t *testing.T) {
 	// arrange
@@ -44,7 +46,7 @@ func Test_newDigitalPinGpiodWithOptions(t *testing.T) {
 }
 
 func TestApplyOptions(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		changed          []bool
 		simErr           error
 		wantReconfigured int
@@ -113,7 +115,7 @@ func TestApplyOptions(t *testing.T) {
 }
 
 func TestExport(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		simErr           error
 		wantReconfigured int
 		wantErr          error
@@ -154,7 +156,7 @@ func TestExport(t *testing.T) {
 }
 
 func TestUnexport(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		simNoLine        bool
 		simReconfErr     error
 		simCloseErr      error
@@ -216,7 +218,7 @@ func TestUnexport(t *testing.T) {
 }
 
 func TestWrite(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		val     int
 		simErr  error
 		want    int
@@ -265,7 +267,7 @@ func TestWrite(t *testing.T) {
 }
 
 func TestRead(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		simVal  int
 		simErr  error
 		wantErr []string

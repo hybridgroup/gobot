@@ -14,7 +14,7 @@ type LEDDriver struct {
 
 const (
 	// BLE services
-	//ledService = "e95dd91d251d470aa062fa1922dfa9a8"
+	// ledService = "e95dd91d251d470aa062fa1922dfa9a8"
 
 	// BLE characteristics
 	ledMatrixStateCharacteristic    = "e95d7b77251d470aa062fa1922dfa9a8"

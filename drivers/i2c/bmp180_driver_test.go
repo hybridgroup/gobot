@@ -201,8 +201,8 @@ func TestBMP180_initialization(t *testing.T) {
 }
 
 func TestBMP180_bmp180PauseForReading(t *testing.T) {
-	assert.Equal(t, time.Duration(5*time.Millisecond), bmp180PauseForReading(BMP180UltraLowPower))
-	assert.Equal(t, time.Duration(8*time.Millisecond), bmp180PauseForReading(BMP180Standard))
-	assert.Equal(t, time.Duration(14*time.Millisecond), bmp180PauseForReading(BMP180HighResolution))
-	assert.Equal(t, time.Duration(26*time.Millisecond), bmp180PauseForReading(BMP180UltraHighResolution))
+	assert.Equal(t, 5*time.Millisecond, bmp180PauseForReading(BMP180UltraLowPower))
+	assert.Equal(t, 8*time.Millisecond, bmp180PauseForReading(BMP180Standard))
+	assert.Equal(t, 14*time.Millisecond, bmp180PauseForReading(BMP180HighResolution))
+	assert.Equal(t, 26*time.Millisecond, bmp180PauseForReading(BMP180UltraHighResolution))
 }

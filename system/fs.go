@@ -35,7 +35,6 @@ func (fs *nativeFilesystem) find(baseDir string, pattern string) ([]string, erro
 	for _, item := range items {
 		if reg.MatchString(item.Name()) {
 			found = append(found, path.Join(baseDir, item.Name()))
-
 		}
 	}
 	return found, nil

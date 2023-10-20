@@ -151,7 +151,7 @@ func (n *Driver) parse(buf *bytes.Buffer) error {
 			if _, err := buf.Read(payload); err != nil {
 				return err
 			}
-			//checksum, _ := buf.ReadByte()
+			// checksum, _ := buf.ReadByte()
 			buf.Next(1)
 			if err := n.parsePacket(bytes.NewBuffer(payload)); err != nil {
 				panic(err)
@@ -183,7 +183,7 @@ func (n *Driver) parsePacket(buf *bytes.Buffer) error {
 			n.Publish(n.Event("blink"), ret)
 		case CodeWave:
 			buf.Next(1)
-			var ret = make([]byte, 2)
+			ret := make([]byte, 2)
 			if _, err := buf.Read(ret); err != nil {
 				return err
 			}
