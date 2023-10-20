@@ -90,7 +90,7 @@ func TestMMA7660XYZError(t *testing.T) {
 	}
 
 	_, _, _, err := d.XYZ()
-	assert.Errorf(t, err, "read error")
+	assert.Error(t, err, "read error")
 }
 
 func TestMMA7660XYZNotReady(t *testing.T) {

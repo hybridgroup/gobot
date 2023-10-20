@@ -116,7 +116,7 @@ func TestSHT2xTemperatureCrcError(t *testing.T) {
 		return buf.Len(), nil
 	}
 	temp, err := d.Temperature()
-	assert.Errorf(t, err, "Invalid crc")
+	assert.Error(t, err, "Invalid crc")
 	assert.Equal(t, float32(0.0), temp)
 }
 
@@ -133,7 +133,7 @@ func TestSHT2xHumidityCrcError(t *testing.T) {
 		return buf.Len(), nil
 	}
 	hum, err := d.Humidity()
-	assert.Errorf(t, err, "Invalid crc")
+	assert.Error(t, err, "Invalid crc")
 	assert.Equal(t, float32(0.0), hum)
 }
 

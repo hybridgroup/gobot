@@ -57,7 +57,7 @@ func TestStepperDriverDefaultDirection(t *testing.T) {
 func TestStepperDriverInvalidDirection(t *testing.T) {
 	d := initStepperMotorDriver()
 	err := d.SetDirection("reverse")
-	assert.Errorf(t, err, "Invalid direction. Value should be forward or backward")
+	assert.Error(t, err, "Invalid direction. Value should be forward or backward")
 }
 
 func TestStepperDriverMoveForward(t *testing.T) {

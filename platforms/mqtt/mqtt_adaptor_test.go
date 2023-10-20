@@ -85,7 +85,7 @@ func TestMqttAdaptorConnectSSLError(t *testing.T) {
 
 func TestMqttAdaptorConnectWithAuthError(t *testing.T) {
 	a := NewAdaptorWithAuth("xyz://localhost:1883", "client", "user", "pass")
-	assert.Errorf(t, a.Connect(), "network Error : unknown protocol")
+	assert.Error(t, a.Connect(), "network Error : unknown protocol")
 }
 
 func TestMqttAdaptorFinalize(t *testing.T) {

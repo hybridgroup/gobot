@@ -115,7 +115,7 @@ func TestAdaptorFinalize(t *testing.T) {
 
 	a = initTestAdaptor()
 	a.Board.(*mockFirmataBoard).disconnectError = errors.New("close error")
-	assert.Errorf(t, a.Finalize(), "close error")
+	assert.Error(t, a.Finalize(), "close error")
 }
 
 func TestAdaptorConnect(t *testing.T) {
@@ -132,7 +132,7 @@ func TestAdaptorConnect(t *testing.T) {
 	a.PortOpener = func(port string) (io.ReadWriteCloser, error) {
 		return nil, errors.New("connect error")
 	}
-	assert.Errorf(t, a.Connect(), "connect error")
+	assert.Error(t, a.Connect(), "connect error")
 
 	a = NewAdaptor(&readWriteCloser{})
 	a.Board = newMockFirmataBoard()

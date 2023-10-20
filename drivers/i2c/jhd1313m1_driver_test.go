@@ -60,7 +60,7 @@ func TestJHD1313MDriverStart(t *testing.T) {
 func TestJHD1313MStartConnectError(t *testing.T) {
 	d, adaptor := initTestJHD1313M1DriverWithStubbedAdaptor()
 	adaptor.Testi2cConnectErr(true)
-	assert.Errorf(t, d.Start(), "Invalid i2c connection")
+	assert.Error(t, d.Start(), "Invalid i2c connection")
 }
 
 func TestJHD1313MDriverStartWriteError(t *testing.T) {
@@ -68,7 +68,7 @@ func TestJHD1313MDriverStartWriteError(t *testing.T) {
 	adaptor.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
 	}
-	assert.Errorf(t, d.Start(), "write error")
+	assert.Error(t, d.Start(), "write error")
 }
 
 func TestJHD1313MDriverHalt(t *testing.T) {
@@ -90,7 +90,7 @@ func TestJHD1313MDriverSetRgbError(t *testing.T) {
 	a.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
 	}
-	assert.Errorf(t, d.SetRGB(0x00, 0x00, 0x00), "write error")
+	assert.Error(t, d.SetRGB(0x00, 0x00, 0x00), "write error")
 }
 
 func TestJHD1313MDriverClear(t *testing.T) {
@@ -106,7 +106,7 @@ func TestJHD1313MDriverClearError(t *testing.T) {
 	a.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
 	}
-	assert.Errorf(t, d.Clear(), "write error")
+	assert.Error(t, d.Clear(), "write error")
 }
 
 func TestJHD1313MDriverHome(t *testing.T) {
@@ -128,7 +128,7 @@ func TestJHD1313MDriverWriteError(t *testing.T) {
 		return 0, errors.New("write error")
 	}
 
-	assert.Errorf(t, d.Write("Hello"), "write error")
+	assert.Error(t, d.Write("Hello"), "write error")
 }
 
 func TestJHD1313MDriverWriteTwoLines(t *testing.T) {
@@ -144,7 +144,7 @@ func TestJHD1313MDriverWriteTwoLinesError(t *testing.T) {
 	a.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
 	}
-	assert.Errorf(t, d.Write("Hello\nthere"), "write error")
+	assert.Error(t, d.Write("Hello\nthere"), "write error")
 }
 
 func TestJHD1313MDriverSetPosition(t *testing.T) {
@@ -189,7 +189,7 @@ func TestJHD1313MDriverSetCustomCharError(t *testing.T) {
 	d, _ := initTestJHD1313M1DriverWithStubbedAdaptor()
 	data := [8]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
 	_ = d.Start()
-	assert.Errorf(t, d.SetCustomChar(10, data), "can't set a custom character at a position greater than 7")
+	assert.Error(t, d.SetCustomChar(10, data), "can't set a custom character at a position greater than 7")
 }
 
 func TestJHD1313MDriverSetCustomCharWriteError(t *testing.T) {
@@ -200,7 +200,7 @@ func TestJHD1313MDriverSetCustomCharWriteError(t *testing.T) {
 		return 0, errors.New("write error")
 	}
 	data := [8]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
-	assert.Errorf(t, d.SetCustomChar(0, data), "write error")
+	assert.Error(t, d.SetCustomChar(0, data), "write error")
 }
 
 func TestJHD1313MDriverCommands(t *testing.T) {

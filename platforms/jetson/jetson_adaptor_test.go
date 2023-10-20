@@ -67,7 +67,7 @@ func TestPWMPinsConnect(t *testing.T) {
 	assert.Equal(t, (map[string]gobot.PWMPinner)(nil), a.pwmPins)
 
 	err := a.PwmWrite("33", 1)
-	assert.Errorf(t, err, "not connected")
+	assert.Error(t, err, "not connected")
 
 	err = a.Connect()
 	assert.Nil(t, err)
@@ -117,7 +117,7 @@ func TestDigitalIO(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, 1, i)
 
-	assert.Errorf(t, a.DigitalWrite("notexist", 1), "'notexist' is not a valid id for a digital pin")
+	assert.Error(t, a.DigitalWrite("notexist", 1), "'notexist' is not a valid id for a digital pin")
 	assert.Nil(t, a.Finalize())
 }
 

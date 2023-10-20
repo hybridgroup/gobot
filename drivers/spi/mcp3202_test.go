@@ -87,6 +87,6 @@ func TestMCP3202ReadWithError(t *testing.T) {
 	// act
 	got, err := d.Read(0)
 	// assert
-	assert.Errorf(t, err, "error while SPI read in mock")
+	assert.Error(t, err, "error while SPI read in mock")
 	assert.Equal(t, 0, got)
 }

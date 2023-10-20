@@ -124,7 +124,7 @@ func TestMPU6050GetDataReadError(t *testing.T) {
 		return 0, errors.New("read error")
 	}
 
-	assert.Errorf(t, d.GetData(), "read error")
+	assert.Error(t, d.GetData(), "read error")
 }
 
 func TestMPU6050GetDataWriteError(t *testing.T) {
@@ -135,7 +135,7 @@ func TestMPU6050GetDataWriteError(t *testing.T) {
 		return 0, errors.New("write error")
 	}
 
-	assert.Errorf(t, d.GetData(), "write error")
+	assert.Error(t, d.GetData(), "write error")
 }
 
 func TestMPU6050_initialize(t *testing.T) {

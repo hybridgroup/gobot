@@ -133,7 +133,7 @@ func TestDigitalIO(t *testing.T) {
 	assert.Equal(t, 0, i)
 
 	_, err = a.DigitalRead("P9_99")
-	assert.Errorf(t, err, "'P9_99' is not a valid id for a digital pin")
+	assert.Error(t, err, "'P9_99' is not a valid id for a digital pin")
 }
 
 func TestPwm(t *testing.T) {
@@ -144,10 +144,10 @@ func TestPwm(t *testing.T) {
 	assert.Equal(t, "3921568", fs.Files["/sys/class/pwm/pwmchip0/pwm0/duty_cycle"].Contents)
 
 	err = a.PwmWrite("4", 100)
-	assert.Errorf(t, err, "'4' is not a valid id for a pin")
+	assert.Error(t, err, "'4' is not a valid id for a pin")
 
 	err = a.PwmWrite("J12_1", 100)
-	assert.Errorf(t, err, "'J12_1' is not a valid id for a PWM pin")
+	assert.Error(t, err, "'J12_1' is not a valid id for a PWM pin")
 }
 
 func TestPwmPinExportError(t *testing.T) {

@@ -123,7 +123,7 @@ func TestIMUDriverReadAccelerometer(t *testing.T) {
 
 func TestIMUDriverReadAccelerometerData(t *testing.T) {
 	_, err := parseAccelerometerData([]byte{})
-	assert.Errorf(t, err, "Invalid data")
+	assert.Error(t, err, "Invalid data")
 
 	result, err := parseAccelerometerData([]byte{0xF0, 0x11, 0x00, 0x00, 0x0f, 0x00, 0x0f, 0x00, 0x0f, 0xf7})
 	assert.Nil(t, err)
@@ -138,7 +138,7 @@ func TestIMUDriverReadGyroscope(t *testing.T) {
 
 func TestIMUDriverReadGyroscopeData(t *testing.T) {
 	_, err := parseGyroscopeData([]byte{})
-	assert.Errorf(t, err, "Invalid data")
+	assert.Error(t, err, "Invalid data")
 
 	result, err := parseGyroscopeData([]byte{0xF0, 0x11, 0x01, 0x00, 0x0f, 0x00, 0x0f, 0x00, 0x0f, 0xf7})
 	assert.Nil(t, err)
@@ -153,7 +153,7 @@ func TestIMUDriverReadTemperature(t *testing.T) {
 
 func TestIMUDriverReadTemperatureData(t *testing.T) {
 	_, err := parseTemperatureData([]byte{})
-	assert.Errorf(t, err, "Invalid data")
+	assert.Error(t, err, "Invalid data")
 
 	result, err := parseTemperatureData([]byte{0xF0, 0x11, 0x02, 0x00, 0x02, 0x03, 0x04, 0xf7})
 	assert.Nil(t, err)
@@ -168,7 +168,7 @@ func TestIMUDriverEnableShockDetection(t *testing.T) {
 
 func TestIMUDriverShockDetectData(t *testing.T) {
 	_, err := parseShockData([]byte{})
-	assert.Errorf(t, err, "Invalid data")
+	assert.Error(t, err, "Invalid data")
 
 	result, err := parseShockData([]byte{0xF0, 0x11, 0x03, 0x00, 0x02, 0xf7})
 	assert.Nil(t, err)
@@ -183,7 +183,7 @@ func TestIMUDriverEnableStepCounter(t *testing.T) {
 
 func TestIMUDriverStepCountData(t *testing.T) {
 	_, err := parseStepData([]byte{})
-	assert.Errorf(t, err, "Invalid data")
+	assert.Error(t, err, "Invalid data")
 
 	result, err := parseStepData([]byte{0xF0, 0x11, 0x04, 0x00, 0x02, 0xf7})
 	assert.Nil(t, err)
@@ -198,7 +198,7 @@ func TestIMUDriverEnableTapDetection(t *testing.T) {
 
 func TestIMUDriverTapDetectData(t *testing.T) {
 	_, err := parseTapData([]byte{})
-	assert.Errorf(t, err, "Invalid data")
+	assert.Error(t, err, "Invalid data")
 
 	result, err := parseTapData([]byte{0xF0, 0x11, 0x05, 0x00, 0x02, 0xf7})
 	assert.Nil(t, err)
@@ -213,7 +213,7 @@ func TestIMUDriverEnableReadMotion(t *testing.T) {
 
 func TestIMUDriverReadMotionData(t *testing.T) {
 	_, err := parseMotionData([]byte{})
-	assert.Errorf(t, err, "Invalid data")
+	assert.Error(t, err, "Invalid data")
 
 	result, err := parseMotionData([]byte{0xF0, 0x11, 0x06, 0x00, 0x0f, 0x00, 0x0f, 0x00, 0x0f, 0x00, 0x0f, 0x00, 0x0f, 0x00, 0x0f, 0xf7})
 	assert.Nil(t, err)

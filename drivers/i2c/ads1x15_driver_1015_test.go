@@ -115,14 +115,14 @@ func TestADS1x15AnalogReadError(t *testing.T) {
 	}
 
 	_, err := d.AnalogRead("0")
-	assert.Errorf(t, err, "read error")
+	assert.Error(t, err, "read error")
 }
 
 func TestADS1x15AnalogReadInvalidPin(t *testing.T) {
 	d, _ := initTestADS1015DriverWithStubbedAdaptor()
 
 	_, err := d.AnalogRead("99")
-	assert.Errorf(t, err, "Invalid channel (99), must be between 0 and 3")
+	assert.Error(t, err, "Invalid channel (99), must be between 0 and 3")
 }
 
 func TestADS1x15AnalogReadWriteError(t *testing.T) {
@@ -133,41 +133,41 @@ func TestADS1x15AnalogReadWriteError(t *testing.T) {
 	}
 
 	_, err := d.AnalogRead("0")
-	assert.Errorf(t, err, "write error")
+	assert.Error(t, err, "write error")
 
 	_, err = d.AnalogRead("0-1")
-	assert.Errorf(t, err, "write error")
+	assert.Error(t, err, "write error")
 
 	_, err = d.AnalogRead("2-3")
-	assert.Errorf(t, err, "write error")
+	assert.Error(t, err, "write error")
 }
 
 func TestADS1x15ReadInvalidChannel(t *testing.T) {
 	d, _ := initTestADS1015DriverWithStubbedAdaptor()
 
 	_, err := d.Read(9, 1, 1600)
-	assert.Errorf(t, err, "Invalid channel (9), must be between 0 and 3")
+	assert.Error(t, err, "Invalid channel (9), must be between 0 and 3")
 }
 
 func TestADS1x15ReadInvalidGain(t *testing.T) {
 	d, _ := initTestADS1015DriverWithStubbedAdaptor()
 
 	_, err := d.Read(0, 8, 1600)
-	assert.Errorf(t, err, "Gain (8) must be one of: [0 1 2 3 4 5 6 7]")
+	assert.Error(t, err, "Gain (8) must be one of: [0 1 2 3 4 5 6 7]")
 }
 
 func TestADS1x15ReadInvalidDataRate(t *testing.T) {
 	d, _ := initTestADS1015DriverWithStubbedAdaptor()
 
 	_, err := d.Read(0, 1, 321)
-	assert.Errorf(t, err, "Invalid data rate (321). Accepted values: [128 250 490 920 1600 2400 3300]")
+	assert.Error(t, err, "Invalid data rate (321). Accepted values: [128 250 490 920 1600 2400 3300]")
 }
 
 func TestADS1x15ReadDifferenceInvalidChannel(t *testing.T) {
 	d, _ := initTestADS1015DriverWithStubbedAdaptor()
 
 	_, err := d.ReadDifference(9, 1, 1600)
-	assert.Errorf(t, err, "Invalid channel (9), must be between 0 and 3")
+	assert.Error(t, err, "Invalid channel (9), must be between 0 and 3")
 }
 
 func TestADS1015_rawRead(t *testing.T) {

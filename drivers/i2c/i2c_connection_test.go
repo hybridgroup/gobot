@@ -87,7 +87,7 @@ func TestI2CRead(t *testing.T) {
 func TestI2CReadAddressError(t *testing.T) {
 	c := NewConnection(initI2CDeviceAddressError(), 0x06)
 	_, err := c.Read([]byte{})
-	assert.Errorf(t, err, "Setting address failed with syscall.Errno operation not permitted")
+	assert.Error(t, err, "Setting address failed with syscall.Errno operation not permitted")
 }
 
 func TestI2CWrite(t *testing.T) {
@@ -99,7 +99,7 @@ func TestI2CWrite(t *testing.T) {
 func TestI2CWriteAddressError(t *testing.T) {
 	c := NewConnection(initI2CDeviceAddressError(), 0x06)
 	_, err := c.Write([]byte{0x01})
-	assert.Errorf(t, err, "Setting address failed with syscall.Errno operation not permitted")
+	assert.Error(t, err, "Setting address failed with syscall.Errno operation not permitted")
 }
 
 func TestI2CReadByte(t *testing.T) {
@@ -111,7 +111,7 @@ func TestI2CReadByte(t *testing.T) {
 func TestI2CReadByteAddressError(t *testing.T) {
 	c := NewConnection(initI2CDeviceAddressError(), 0x06)
 	_, err := c.ReadByte()
-	assert.Errorf(t, err, "Setting address failed with syscall.Errno operation not permitted")
+	assert.Error(t, err, "Setting address failed with syscall.Errno operation not permitted")
 }
 
 func TestI2CReadByteData(t *testing.T) {
@@ -123,7 +123,7 @@ func TestI2CReadByteData(t *testing.T) {
 func TestI2CReadByteDataAddressError(t *testing.T) {
 	c := NewConnection(initI2CDeviceAddressError(), 0x06)
 	_, err := c.ReadByteData(0x01)
-	assert.Errorf(t, err, "Setting address failed with syscall.Errno operation not permitted")
+	assert.Error(t, err, "Setting address failed with syscall.Errno operation not permitted")
 }
 
 func TestI2CReadWordData(t *testing.T) {
@@ -135,7 +135,7 @@ func TestI2CReadWordData(t *testing.T) {
 func TestI2CReadWordDataAddressError(t *testing.T) {
 	c := NewConnection(initI2CDeviceAddressError(), 0x06)
 	_, err := c.ReadWordData(0x01)
-	assert.Errorf(t, err, "Setting address failed with syscall.Errno operation not permitted")
+	assert.Error(t, err, "Setting address failed with syscall.Errno operation not permitted")
 }
 
 func TestI2CWriteByte(t *testing.T) {
@@ -147,7 +147,7 @@ func TestI2CWriteByte(t *testing.T) {
 func TestI2CWriteByteAddressError(t *testing.T) {
 	c := NewConnection(initI2CDeviceAddressError(), 0x06)
 	err := c.WriteByte(0x01)
-	assert.Errorf(t, err, "Setting address failed with syscall.Errno operation not permitted")
+	assert.Error(t, err, "Setting address failed with syscall.Errno operation not permitted")
 }
 
 func TestI2CWriteByteData(t *testing.T) {
@@ -159,7 +159,7 @@ func TestI2CWriteByteData(t *testing.T) {
 func TestI2CWriteByteDataAddressError(t *testing.T) {
 	c := NewConnection(initI2CDeviceAddressError(), 0x06)
 	err := c.WriteByteData(0x01, 0x01)
-	assert.Errorf(t, err, "Setting address failed with syscall.Errno operation not permitted")
+	assert.Error(t, err, "Setting address failed with syscall.Errno operation not permitted")
 }
 
 func TestI2CWriteWordData(t *testing.T) {
@@ -171,7 +171,7 @@ func TestI2CWriteWordData(t *testing.T) {
 func TestI2CWriteWordDataAddressError(t *testing.T) {
 	c := NewConnection(initI2CDeviceAddressError(), 0x06)
 	err := c.WriteWordData(0x01, 0x01)
-	assert.Errorf(t, err, "Setting address failed with syscall.Errno operation not permitted")
+	assert.Error(t, err, "Setting address failed with syscall.Errno operation not permitted")
 }
 
 func TestI2CWriteBlockData(t *testing.T) {
@@ -183,7 +183,7 @@ func TestI2CWriteBlockData(t *testing.T) {
 func TestI2CWriteBlockDataAddressError(t *testing.T) {
 	c := NewConnection(initI2CDeviceAddressError(), 0x06)
 	err := c.WriteBlockData(0x01, []byte{0x01, 0x02})
-	assert.Errorf(t, err, "Setting address failed with syscall.Errno operation not permitted")
+	assert.Error(t, err, "Setting address failed with syscall.Errno operation not permitted")
 }
 
 func Test_setBit(t *testing.T) {
