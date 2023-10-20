@@ -403,7 +403,7 @@ func (s *SpheroDriver) getSyncResponse(packet *packet) []byte {
 	return []byte{}
 }
 
-func (s *SpheroDriver) craftPacket(body []uint8, did byte, cid byte) *packet {
+func (s *SpheroDriver) craftPacket(body []uint8, did byte, cid byte) *packet { //nolint:unparam // keep did as parameter
 	s.mtx.Lock()
 	defer s.mtx.Unlock()
 	packet := new(packet)

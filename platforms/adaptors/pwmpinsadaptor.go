@@ -15,8 +15,10 @@ import (
 // 100ns = 10MHz, 10ns = 100MHz, 1ns = 1GHz
 const pwmPeriodDefault = 10000000 // 10 ms = 100 Hz
 
-type pwmPinTranslator func(pin string) (path string, channel int, err error)
-type pwmPinInitializer func(gobot.PWMPinner) error
+type (
+	pwmPinTranslator  func(pin string) (path string, channel int, err error)
+	pwmPinInitializer func(gobot.PWMPinner) error
+)
 
 type pwmPinsOption interface {
 	setInitializer(pwmPinInitializer)
@@ -228,7 +230,7 @@ func (a *PWMPinsAdaptor) pwmPin(id string) (gobot.PWMPinner, error) {
 // also this value will be adjusted in the same ratio. The order of writing the values must be observed, otherwise an
 // error occur "write error: Invalid argument".
 func setPeriod(pin gobot.PWMPinner, period uint32, adjustDuty bool) error {
-	var errorBase = fmt.Sprintf("setPeriod(%v, %d) failed", pin, period)
+	errorBase := fmt.Sprintf("setPeriod(%v, %d) failed", pin, period)
 
 	var oldDuty uint32
 	var err error
@@ -255,11 +257,11 @@ func setPeriod(pin gobot.PWMPinner, period uint32, adjustDuty bool) error {
 			if err := pin.SetPeriod(period); err != nil {
 				return fmt.Errorf("%s with '%v'", errorBase, err)
 			}
-			if err := pin.SetDutyCycle(uint32(duty)); err != nil {
+			if err := pin.SetDutyCycle(duty); err != nil {
 				return fmt.Errorf("%s with '%v'", errorBase, err)
 			}
 		} else {
-			if err := pin.SetDutyCycle(uint32(duty)); err != nil {
+			if err := pin.SetDutyCycle(duty); err != nil {
 				return fmt.Errorf("%s with '%v'", errorBase, err)
 			}
 			if err := pin.SetPeriod(period); err != nil {

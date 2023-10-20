@@ -16,13 +16,15 @@ import (
 )
 
 // make sure that this Adaptor fulfills all required analog and digital interfaces
-var _ gobot.Adaptor = (*Adaptor)(nil)
-var _ gpio.DigitalReader = (*Adaptor)(nil)
-var _ gpio.DigitalWriter = (*Adaptor)(nil)
-var _ aio.AnalogReader = (*Adaptor)(nil)
-var _ gpio.PwmWriter = (*Adaptor)(nil)
-var _ gpio.ServoWriter = (*Adaptor)(nil)
-var _ FirmataAdaptor = (*Adaptor)(nil)
+var (
+	_ gobot.Adaptor      = (*Adaptor)(nil)
+	_ gpio.DigitalReader = (*Adaptor)(nil)
+	_ gpio.DigitalWriter = (*Adaptor)(nil)
+	_ aio.AnalogReader   = (*Adaptor)(nil)
+	_ gpio.PwmWriter     = (*Adaptor)(nil)
+	_ gpio.ServoWriter   = (*Adaptor)(nil)
+	_ FirmataAdaptor     = (*Adaptor)(nil)
+)
 
 type readWriteCloser struct{}
 
@@ -30,15 +32,17 @@ func (readWriteCloser) Write(p []byte) (int, error) {
 	return testWriteData.Write(p)
 }
 
-var testReadData = []byte{}
-var testWriteData = bytes.Buffer{}
+var (
+	testReadData  = []byte{}
+	testWriteData = bytes.Buffer{}
+)
 
 func (readWriteCloser) Read(b []byte) (int, error) {
 	size := len(b)
 	if len(testReadData) < size {
 		size = len(testReadData)
 	}
-	copy(b, []byte(testReadData)[:size])
+	copy(b, testReadData[:size])
 	testReadData = testReadData[size:]
 
 	return size, nil
@@ -69,9 +73,11 @@ func newMockFirmataBoard() *mockFirmataBoard {
 
 // setup mock for GPIO, PWM and servo tests
 func (mockFirmataBoard) Connect(io.ReadWriteCloser) error { return nil }
+
 func (m mockFirmataBoard) Disconnect() error {
 	return m.disconnectError
 }
+
 func (m mockFirmataBoard) Pins() []client.Pin {
 	return m.pins
 }
@@ -113,7 +119,7 @@ func TestAdaptorFinalize(t *testing.T) {
 }
 
 func TestAdaptorConnect(t *testing.T) {
-	var openSP = func(port string) (io.ReadWriteCloser, error) {
+	openSP := func(port string) (io.ReadWriteCloser, error) {
 		return &readWriteCloser{}, nil
 	}
 	a := NewAdaptor("/dev/null")

@@ -24,7 +24,7 @@ type PowerStatePacket struct {
 	BattVoltage uint16
 	// Number of charges in the total lifetime of the sphero
 	NumCharges uint16
-	//Seconds awake since last charge
+	// Seconds awake since last charge
 	TimeSinceChg uint16
 }
 

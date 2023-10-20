@@ -90,7 +90,7 @@ func NewYL40Driver(a Connector, options ...func(Config)) *YL40Driver {
 	options = append(options, WithAddress(yl40DefaultAddress))
 	pcf := NewPCF8591Driver(a, options...)
 
-	ntc := aio.TemperatureSensorNtcConf{TC0: 25, R0: 10000.0, B: 3950} //Ohm, R25=10k, B=3950
+	ntc := aio.TemperatureSensorNtcConf{TC0: 25, R0: 10000.0, B: 3950} // Ohm, R25=10k, B=3950
 	defTempScaler := aio.TemperatureSensorNtcScaler(255, 1000, true, ntc)
 
 	defConf := yl40Config{

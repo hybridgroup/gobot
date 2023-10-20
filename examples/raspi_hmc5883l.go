@@ -27,7 +27,6 @@ func main() {
 
 	work := func() {
 		gobot.Every(200*time.Millisecond, func() {
-
 			// get heading in radians, to convert to degrees multiply by 180/math.Pi
 			heading, _ := hmc5883l.Heading()
 			fmt.Println("Heading", heading)

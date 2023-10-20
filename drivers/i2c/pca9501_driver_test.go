@@ -114,7 +114,7 @@ func TestPCA9501CommandsReadEEPROM(t *testing.T) {
 }
 
 func TestPCA9501WriteGPIO(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		setVal          uint8
 		ioDirAllInput   uint8
 		ioStateAllInput uint8
@@ -223,7 +223,7 @@ func TestPCA9501WriteGPIOErrorAtWriteValue(t *testing.T) {
 }
 
 func TestPCA9501ReadGPIO(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		ctrlState uint8
 		want      uint8
 	}{

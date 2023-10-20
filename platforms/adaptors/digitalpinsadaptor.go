@@ -10,8 +10,10 @@ import (
 	"gobot.io/x/gobot/v2/system"
 )
 
-type digitalPinTranslator func(pin string) (chip string, line int, err error)
-type digitalPinInitializer func(gobot.DigitalPinner) error
+type (
+	digitalPinTranslator  func(pin string) (chip string, line int, err error)
+	digitalPinInitializer func(gobot.DigitalPinner) error
+)
 
 type digitalPinsOptioner interface {
 	setDigitalPinInitializer(digitalPinInitializer)
@@ -158,7 +160,8 @@ func WithGpioDebounce(pin string, period time.Duration) func(Optioner) {
 // WithGpioEventOnFallingEdge prepares the given input pin to be generate an event on falling edge.
 // This is working for inputs since Kernel 5.10, but will be ignored for outputs or with sysfs ABI.
 func WithGpioEventOnFallingEdge(pin string, handler func(lineOffset int, timestamp time.Duration, detectedEdge string,
-	seqno uint32, lseqno uint32)) func(Optioner) {
+	seqno uint32, lseqno uint32),
+) func(Optioner) {
 	return func(o Optioner) {
 		a, ok := o.(digitalPinsOptioner)
 		if ok {
@@ -170,7 +173,8 @@ func WithGpioEventOnFallingEdge(pin string, handler func(lineOffset int, timesta
 // WithGpioEventOnRisingEdge prepares the given input pin to be generate an event on rising edge.
 // This is working for inputs since Kernel 5.10, but will be ignored for outputs or with sysfs ABI.
 func WithGpioEventOnRisingEdge(pin string, handler func(lineOffset int, timestamp time.Duration, detectedEdge string,
-	seqno uint32, lseqno uint32)) func(Optioner) {
+	seqno uint32, lseqno uint32),
+) func(Optioner) {
 	return func(o Optioner) {
 		a, ok := o.(digitalPinsOptioner)
 		if ok {
@@ -182,7 +186,8 @@ func WithGpioEventOnRisingEdge(pin string, handler func(lineOffset int, timestam
 // WithGpioEventOnBothEdges prepares the given input pin to be generate an event on rising and falling edges.
 // This is working for inputs since Kernel 5.10, but will be ignored for outputs or with sysfs ABI.
 func WithGpioEventOnBothEdges(pin string, handler func(lineOffset int, timestamp time.Duration, detectedEdge string,
-	seqno uint32, lseqno uint32)) func(Optioner) {
+	seqno uint32, lseqno uint32),
+) func(Optioner) {
 	return func(o Optioner) {
 		a, ok := o.(digitalPinsOptioner)
 		if ok {
@@ -336,7 +341,8 @@ func (a *DigitalPinsAdaptor) prepareDigitalPinDebounce(id string, period time.Du
 }
 
 func (a *DigitalPinsAdaptor) prepareDigitalPinEventOnFallingEdge(id string, handler func(int, time.Duration, string,
-	uint32, uint32)) {
+	uint32, uint32),
+) {
 	if a.pinOptions == nil {
 		a.pinOptions = make(map[string][]func(gobot.DigitalPinOptioner) bool)
 	}
@@ -345,7 +351,8 @@ func (a *DigitalPinsAdaptor) prepareDigitalPinEventOnFallingEdge(id string, hand
 }
 
 func (a *DigitalPinsAdaptor) prepareDigitalPinEventOnRisingEdge(id string, handler func(int, time.Duration, string,
-	uint32, uint32)) {
+	uint32, uint32),
+) {
 	if a.pinOptions == nil {
 		a.pinOptions = make(map[string][]func(gobot.DigitalPinOptioner) bool)
 	}
@@ -354,7 +361,8 @@ func (a *DigitalPinsAdaptor) prepareDigitalPinEventOnRisingEdge(id string, handl
 }
 
 func (a *DigitalPinsAdaptor) prepareDigitalPinEventOnBothEdges(id string, handler func(int, time.Duration, string,
-	uint32, uint32)) {
+	uint32, uint32),
+) {
 	if a.pinOptions == nil {
 		a.pinOptions = make(map[string][]func(gobot.DigitalPinOptioner) bool)
 	}

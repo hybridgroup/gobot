@@ -13,7 +13,8 @@ type digitalPinMock struct{}
 func (h *mockDigitalPinAccess) isSupported() bool { return true }
 
 func (h *mockDigitalPinAccess) createPin(chip string, pin int,
-	o ...func(gobot.DigitalPinOptioner) bool) gobot.DigitalPinner {
+	o ...func(gobot.DigitalPinOptioner) bool,
+) gobot.DigitalPinner {
 	dpm := &digitalPinMock{}
 	return dpm
 }

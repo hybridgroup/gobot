@@ -20,6 +20,7 @@ type WriteCloserDoNothing struct{}
 func (w *WriteCloserDoNothing) Write(p []byte) (n int, err error) {
 	return 0, nil
 }
+
 func (w *WriteCloserDoNothing) Close() error {
 	return nil
 }

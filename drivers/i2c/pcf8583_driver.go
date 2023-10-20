@@ -49,7 +49,7 @@ const (
 // 0 1 0 1 0 0 0 A0|rd
 // Lowest bit (rd) is mapped to switch between write(0)/read(1), it is not part of the "real" address.
 //
-// PCF8583 is mainly compatible to PCF8593, so this driver should also work for PCF8593 except RAM calls
+// # PCF8583 is mainly compatible to PCF8593, so this driver should also work for PCF8593 except RAM calls
 //
 // This driver was tested with Tinkerboard.
 type PCF8583Driver struct {
@@ -61,13 +61,14 @@ type PCF8583Driver struct {
 
 // NewPCF8583Driver creates a new driver with specified i2c interface
 // Params:
-//    c Connector - the Adaptor to use with this Driver
+//
+//	c Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//    i2c.WithBus(int):	bus to use with this driver
-//    i2c.WithAddress(int):	address to use with this driver
-//    i2c.WithPCF8583Mode(PCF8583Control): mode of this driver
 //
+//	i2c.WithBus(int):	bus to use with this driver
+//	i2c.WithAddress(int):	address to use with this driver
+//	i2c.WithPCF8583Mode(PCF8583Control): mode of this driver
 func NewPCF8583Driver(c Connector, options ...func(Config)) *PCF8583Driver {
 	d := &PCF8583Driver{
 		Driver:    NewDriver(c, "PCF8583", pcf8583DefaultAddress),
@@ -149,7 +150,8 @@ func (d *PCF8583Driver) WriteTime(val time.Time) error {
 	}
 	year, month, day := val.Date()
 	err = d.connection.WriteBlockData(uint8(pcf8583Reg_CTRL),
-		[]byte{ctrlRegVal | uint8(pcf8583CtrlStopCounting),
+		[]byte{
+			ctrlRegVal | uint8(pcf8583CtrlStopCounting),
 			pcf8583encodeBcd(uint8(val.Nanosecond() / 1000000 / 10)), // sub seconds in 1/10th seconds
 			pcf8583encodeBcd(uint8(val.Second())),
 			pcf8583encodeBcd(uint8(val.Minute())),
@@ -216,7 +218,8 @@ func (d *PCF8583Driver) WriteCounter(val int32) error {
 		return fmt.Errorf("%s: can't write counter because the device is in wrong mode 0x%02x", d.name, ctrlRegVal)
 	}
 	err = d.connection.WriteBlockData(uint8(pcf8583Reg_CTRL),
-		[]byte{ctrlRegVal | uint8(pcf8583CtrlStopCounting), // stop
+		[]byte{
+			ctrlRegVal | uint8(pcf8583CtrlStopCounting),  // stop
 			pcf8583encodeBcd(uint8(val % 100)),           // 2 lowest digits
 			pcf8583encodeBcd(uint8((val / 100) % 100)),   // 2 middle digits
 			pcf8583encodeBcd(uint8((val / 10000) % 100)), // 2 highest digits
@@ -329,13 +332,13 @@ func pcf8583encodeBcd(val byte) byte {
 			log.Printf("PCF8583 BCD value (%d) exceeds limit of 99, now limited.", val)
 		}
 	}
-	hi, lo := byte(val/10), byte(val%10)
+	hi, lo := val/10, val%10
 	return hi<<4 | lo
 }
 
 func pcf8583decodeBcd(bcd byte) byte {
 	// 0x12 => decimal 12
-	hi, lo := byte(bcd>>4), byte(bcd&0x0f)
+	hi, lo := bcd>>4, bcd&0x0f
 	if hi > 9 {
 		hi = 9
 		if pcf8583Debug {

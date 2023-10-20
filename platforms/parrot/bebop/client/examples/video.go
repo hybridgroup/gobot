@@ -53,14 +53,12 @@ func main() {
 	ffmpeg := exec.Command("ffmpeg", "-i", "pipe:0", "http://localhost:8090/bebop.ffm")
 
 	ffmpegErr, err := ffmpeg.StderrPipe()
-
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
 	ffmpegIn, err := ffmpeg.StdinPipe()
-
 	if err != nil {
 		fmt.Println(err)
 		return

@@ -29,7 +29,7 @@ type MagnetometerData struct {
 
 const (
 	// BLE services
-	//magnetometerService = "e95df2d8251d470aa062fa1922dfa9a8"
+	// magnetometerService = "e95df2d8251d470aa062fa1922dfa9a8"
 
 	// BLE characteristics
 	magnetometerCharacteristic = "e95dfb11251d470aa062fa1922dfa9a8"
@@ -85,7 +85,8 @@ func (b *MagnetometerDriver) Start() error {
 		result := &MagnetometerData{
 			X: float32(a.X) / 1000.0,
 			Y: float32(a.Y) / 1000.0,
-			Z: float32(a.Z) / 1000.0}
+			Z: float32(a.Z) / 1000.0,
+		}
 
 		b.Publish(b.Event(Magnetometer), result)
 	})

@@ -56,7 +56,7 @@ func TestAnalogSensorDriver(t *testing.T) {
 
 func TestAnalogSensorDriverWithLinearScaler(t *testing.T) {
 	// the input scales per default from 0...255
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		toMin float64
 		toMax float64
 		input int

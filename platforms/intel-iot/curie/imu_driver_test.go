@@ -21,15 +21,17 @@ func (readWriteCloser) Write(p []byte) (int, error) {
 	return testWriteData.Write(p)
 }
 
-var testReadData = []byte{}
-var testWriteData = bytes.Buffer{}
+var (
+	testReadData  = []byte{}
+	testWriteData = bytes.Buffer{}
+)
 
 func (readWriteCloser) Read(b []byte) (int, error) {
 	size := len(b)
 	if len(testReadData) < size {
 		size = len(testReadData)
 	}
-	copy(b, []byte(testReadData)[:size])
+	copy(b, testReadData[:size])
 	testReadData = testReadData[size:]
 
 	return size, nil
@@ -63,6 +65,7 @@ func (mockFirmataBoard) Connect(io.ReadWriteCloser) error { return nil }
 func (m mockFirmataBoard) Disconnect() error {
 	return m.disconnectError
 }
+
 func (m mockFirmataBoard) Pins() []client.Pin {
 	return m.pins
 }

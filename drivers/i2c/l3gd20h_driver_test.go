@@ -47,7 +47,7 @@ func TestL3GD20HOptions(t *testing.T) {
 }
 
 func TestL3GD20HWithL3GD20HFullScaleRange(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		scale L3GD20HScale
 		want  uint8
 	}{
@@ -81,7 +81,7 @@ func TestL3GD20HWithL3GD20HFullScaleRange(t *testing.T) {
 }
 
 func TestL3GD20HScale(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		scale L3GD20HScale
 		want  uint8
 	}{
@@ -146,7 +146,7 @@ func TestL3GD20HMeasurement(t *testing.T) {
 	//
 	// data table according to data sheet AN4506 example in table 7, supplemented with FS limit values
 	sensitivity := float32(0.00875) // FS=245 dps
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		gyroData []byte
 		wantX    float32
 		wantY    float32

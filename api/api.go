@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"time"
 
 	"github.com/bmizerany/pat"
 	"gobot.io/x/gobot/v2"
@@ -35,16 +36,20 @@ func NewAPI(m *gobot.Master) *API {
 		start: func(a *API) {
 			log.Println("Initializing API on " + a.Host + ":" + a.Port + "...")
 			http.Handle("/", a)
+			server := &http.Server{
+				Addr:              a.Host + ":" + a.Port,
+				ReadHeaderTimeout: 30 * time.Second,
+			}
 
 			go func() {
 				if a.Cert != "" && a.Key != "" {
-					if err := http.ListenAndServeTLS(a.Host+":"+a.Port, a.Cert, a.Key, nil); err != nil {
+					if err := server.ListenAndServeTLS(a.Cert, a.Key); err != nil {
 						panic(err)
 					}
 				} else {
 					log.Println("WARNING: API using insecure connection. " +
 						"We recommend using an SSL certificate with Gobot.")
-					if err := http.ListenAndServe(a.Host+":"+a.Port, nil); err != nil {
+					if err := server.ListenAndServe(); err != nil {
 						panic(err)
 					}
 				}
@@ -313,7 +318,6 @@ func (a *API) robotConnections(res http.ResponseWriter, req *http.Request) {
 	} else {
 		a.writeJSON(map[string]interface{}{"error": "No Robot found with the name " + req.URL.Query().Get(":robot")}, res)
 	}
-
 }
 
 // robotConnection returns connection route handler
@@ -369,7 +373,6 @@ func (a *API) executeCommand(f func(map[string]interface{}) interface{},
 	res http.ResponseWriter,
 	req *http.Request,
 ) {
-
 	body := make(map[string]interface{})
 	if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
 		panic(err)

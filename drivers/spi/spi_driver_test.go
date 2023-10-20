@@ -10,7 +10,7 @@ import (
 
 var _ gobot.Driver = (*Driver)(nil)
 
-func initTestDriverWithStubbedAdaptor() (*Driver, *spiTestAdaptor) {
+func initTestDriverWithStubbedAdaptor() (*Driver, *spiTestAdaptor) { //nolint:unparam // keep for further tests
 	a := newSpiTestAdaptor()
 	d := NewDriver(a, "SPI_BASIC")
 	if err := d.Start(); err != nil {

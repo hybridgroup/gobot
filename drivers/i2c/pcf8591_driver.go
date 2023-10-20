@@ -15,8 +15,10 @@ const (
 	pcf8591Debug = false
 )
 
-type pcf8591Mode uint8
-type PCF8591Channel uint8
+type (
+	pcf8591Mode    uint8
+	PCF8591Channel uint8
+)
 
 const (
 	pcf8591_CHAN0 PCF8591Channel = 0x00
@@ -96,7 +98,6 @@ var pcf8591ModeMap = map[string]pcf8591ModeChan{
 // https://www.adafruit.com/product/4648
 //
 // This driver was tested with Tinkerboard and the YL-40 driver.
-//
 type PCF8591Driver struct {
 	*Driver
 	lastCtrlByte        byte
@@ -109,13 +110,14 @@ type PCF8591Driver struct {
 
 // NewPCF8591Driver creates a new driver with specified i2c interface
 // Params:
-//    c Connector - the Adaptor to use with this Driver
+//
+//	c Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//    i2c.WithBus(int): bus to use with this driver
-//    i2c.WithAddress(int): address to use with this driver
-//    i2c.WithPCF8591With400kbitStabilization(uint8, uint8): stabilize read in 400 kbit mode
 //
+//	i2c.WithBus(int): bus to use with this driver
+//	i2c.WithAddress(int): address to use with this driver
+//	i2c.WithPCF8591With400kbitStabilization(uint8, uint8): stabilize read in 400 kbit mode
 func NewPCF8591Driver(c Connector, options ...func(Config)) *PCF8591Driver {
 	p := &PCF8591Driver{
 		Driver: NewDriver(c, "PCF8591", pcf8591DefaultAddress),
@@ -182,11 +184,11 @@ func WithPCF8591ForceRefresh(val uint8) func(Config) {
 // An i2c bus extender (LTC4311) don't fix it (it seems rather the opposite).
 //
 // This leads to following behavior:
-// * the control byte is not written correctly
-// * the transition process takes an additional cycle, very often
-// * some circuits takes one cycle longer transition time in addition
-// * reading more than one byte by Read([]byte), e.g. to calculate an average, is not sufficient,
-//   because some missing integration steps in each conversion (each byte value is a little bit lower than expected)
+//   - the control byte is not written correctly
+//   - the transition process takes an additional cycle, very often
+//   - some circuits takes one cycle longer transition time in addition
+//   - reading more than one byte by Read([]byte), e.g. to calculate an average, is not sufficient,
+//     because some missing integration steps in each conversion (each byte value is a little bit lower than expected)
 //
 // So, for default, we drop the first three bytes to get the right value.
 func (p *PCF8591Driver) AnalogRead(description string) (value int, err error) {

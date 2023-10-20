@@ -68,7 +68,7 @@ func TestPCF8583CommandsReadTime(t *testing.T) {
 	d, a := initTestPCF8583WithStubbedAdaptor()
 	d.yearOffset = 2019
 	milliSec := 550 * time.Millisecond // 0.55 sec = 550 ms
-	want := time.Date(2021, time.December, 24, 18, 00, 00, int(milliSec), time.UTC)
+	want := time.Date(2021, time.December, 24, 18, 0, 0, int(milliSec), time.UTC)
 	reg0Val := uint8(0x00) // clock mode 32.768 kHz
 	reg1Val := uint8(0x55) // BCD: 1/10 and 1/100 sec (55)
 	reg2Val := uint8(0x00) // BCD: 10 and 1 sec (00)
@@ -152,7 +152,7 @@ func TestPCF8583CommandsReadCounter(t *testing.T) {
 func TestPCF8583CommandsWriteRAM(t *testing.T) {
 	// arrange
 	d, _ := initTestPCF8583WithStubbedAdaptor()
-	var addressValue = map[string]interface{}{
+	addressValue := map[string]interface{}{
 		"address": uint8(0x12),
 		"val":     uint8(0x45),
 	}
@@ -165,7 +165,7 @@ func TestPCF8583CommandsWriteRAM(t *testing.T) {
 func TestPCF8583CommandsReadRAM(t *testing.T) {
 	// arrange
 	d, _ := initTestPCF8583WithStubbedAdaptor()
-	var address = map[string]interface{}{
+	address := map[string]interface{}{
 		"address": uint8(0x34),
 	}
 	// act
@@ -609,5 +609,5 @@ func TestPCF8583_initializeWithModeSwitch(t *testing.T) {
 	assert.Equal(t, 3, len(a.written))
 	assert.Equal(t, uint8(pcf8583Reg_CTRL), a.written[0])
 	assert.Equal(t, uint8(pcf8583Reg_CTRL), a.written[1])
-	assert.Equal(t, uint8(wantReg0Val), a.written[2])
+	assert.Equal(t, wantReg0Val, a.written[2])
 }

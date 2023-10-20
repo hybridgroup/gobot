@@ -162,7 +162,7 @@ func (p *PCA9685Driver) SetPWMFreq(freq float32) error {
 	// Put oscillator in sleep mode, clear bit 7 here to avoid overwriting
 	// previous setting
 	newmode := (oldmode & 0x7F) | 0x10
-	if _, err := p.connection.Write([]byte{byte(PCA9685_MODE1), byte(newmode)}); err != nil {
+	if _, err := p.connection.Write([]byte{byte(PCA9685_MODE1), newmode}); err != nil {
 		return err
 	}
 	// Write prescaler value
@@ -170,14 +170,14 @@ func (p *PCA9685Driver) SetPWMFreq(freq float32) error {
 		return err
 	}
 	// Put back to old settings
-	if _, err := p.connection.Write([]byte{byte(PCA9685_MODE1), byte(oldmode)}); err != nil {
+	if _, err := p.connection.Write([]byte{byte(PCA9685_MODE1), oldmode}); err != nil {
 		return err
 	}
 
 	time.Sleep(5 * time.Millisecond)
 
 	// Enable response to All Call address, enable auto-increment, clear restart
-	if _, err := p.connection.Write([]byte{byte(PCA9685_MODE1), byte(oldmode | 0x80)}); err != nil {
+	if _, err := p.connection.Write([]byte{byte(PCA9685_MODE1), oldmode | 0x80}); err != nil {
 		return err
 	}
 

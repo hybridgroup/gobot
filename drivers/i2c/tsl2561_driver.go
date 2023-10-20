@@ -121,18 +121,19 @@ type TSL2561Driver struct {
 // NewTSL2561Driver creates a new driver for the TSL2561 device.
 //
 // Params:
-//		c Connector - the Adaptor to use with this Driver
+//
+//	c Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//		i2c.WithBus(int):		bus to use with this driver
-//		i2c.WithAddress(int):		address to use with this driver
-//		i2c.WithTSL2561Gain1X:		sets the gain to 1X
-//		i2c.WithTSL2561Gain16X:		sets the gain to 16X
-//		i2c.WithTSL2561AutoGain:	turns on auto gain
-//		i2c.WithTSL2561IntegrationTime13MS:	sets integration time to 13ms
-//		i2c.WithTSL2561IntegrationTime101MS: 	sets integration time to 101ms
-//		i2c.WithTSL2561IntegrationTime402MS: 	sets integration time to 402ms
 //
+//	i2c.WithBus(int):		bus to use with this driver
+//	i2c.WithAddress(int):		address to use with this driver
+//	i2c.WithTSL2561Gain1X:		sets the gain to 1X
+//	i2c.WithTSL2561Gain16X:		sets the gain to 16X
+//	i2c.WithTSL2561AutoGain:	turns on auto gain
+//	i2c.WithTSL2561IntegrationTime13MS:	sets integration time to 13ms
+//	i2c.WithTSL2561IntegrationTime101MS: 	sets integration time to 101ms
+//	i2c.WithTSL2561IntegrationTime402MS: 	sets integration time to 402ms
 func NewTSL2561Driver(c Connector, options ...func(Config)) *TSL2561Driver {
 	d := &TSL2561Driver{
 		Driver:          NewDriver(c, "TSL2561", TSL2561AddressFloat),
@@ -282,7 +283,7 @@ func (d *TSL2561Driver) GetLuminocity() (broadband uint16, ir uint16, err error)
 		} else {
 			// If we've already adjusted the gain once, just return the new results.
 			// This avoids endless loops where a value is at one extreme pre-gain,
-			// and the the other extreme post-gain
+			// and the other extreme post-gain
 			valid = true
 		}
 

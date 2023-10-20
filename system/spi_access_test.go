@@ -16,7 +16,7 @@ func TestGpioSpi_isSupported(t *testing.T) {
 }
 
 func TestPeriphioSpi_isSupported(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		mockPaths []string
 		want      bool
 	}{

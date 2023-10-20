@@ -30,9 +30,11 @@ func (n *NullReadWriteCloser) Write(p []byte) (int, error) {
 	defer n.mtx.Unlock()
 	return len(p), n.writeError
 }
+
 func (n *NullReadWriteCloser) Read(b []byte) (int, error) {
 	return len(b), nil
 }
+
 func (n *NullReadWriteCloser) Close() error {
 	return nil
 }

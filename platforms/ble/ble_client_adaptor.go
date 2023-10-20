@@ -11,8 +11,10 @@ import (
 	"tinygo.org/x/bluetooth"
 )
 
-var currentAdapter *bluetooth.Adapter
-var bleMutex sync.Mutex
+var (
+	currentAdapter *bluetooth.Adapter
+	bleMutex       sync.Mutex
+)
 
 // BLEConnector is the interface that a BLE ClientAdaptor must implement
 type BLEConnector interface {
@@ -212,7 +214,7 @@ func (b *ClientAdaptor) Subscribe(cUUID string, f func([]byte, error)) error {
 }
 
 // getBLEAdapter is singleton for bluetooth adapter connection
-func getBLEAdapter(impl string) (*bluetooth.Adapter, error) {
+func getBLEAdapter(impl string) (*bluetooth.Adapter, error) { //nolint:unparam // TODO: impl is unused, maybe an error
 	if currentAdapter != nil {
 		return currentAdapter, nil
 	}

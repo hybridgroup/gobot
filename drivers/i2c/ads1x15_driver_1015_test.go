@@ -177,7 +177,7 @@ func TestADS1015_rawRead(t *testing.T) {
 	// * read config register (16 bit, MSByte first) and wait for bit 15 is set
 	// * read conversion register (16 bit, MSByte first) for the value
 	// * apply two's complement converter, relates to one digit resolution (1/2^15), voltage multiplier
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		input      []uint8
 		gain       int
 		dataRate   int

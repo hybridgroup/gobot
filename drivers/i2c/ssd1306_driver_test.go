@@ -15,9 +15,13 @@ import (
 // and tests all implementations, so no further tests needed here for gobot.Driver interface
 var _ gobot.Driver = (*SSD1306Driver)(nil)
 
-func initTestSSD1306DriverWithStubbedAdaptor(width, height int, externalVCC bool) (*SSD1306Driver, *i2cTestAdaptor) {
+func initTestSSD1306DriverWithStubbedAdaptor(
+	width, height int,
+	externalVCC bool, //nolint:unparam // keep for tests
+) (*SSD1306Driver, *i2cTestAdaptor) {
 	a := newI2cTestAdaptor()
-	d := NewSSD1306Driver(a, WithSSD1306DisplayWidth(width), WithSSD1306DisplayHeight(height), WithSSD1306ExternalVCC(externalVCC))
+	d := NewSSD1306Driver(a, WithSSD1306DisplayWidth(width), WithSSD1306DisplayHeight(height),
+		WithSSD1306ExternalVCC(externalVCC))
 	if err := d.Start(); err != nil {
 		panic(err)
 	}

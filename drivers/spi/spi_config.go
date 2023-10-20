@@ -15,7 +15,8 @@ func NewConfig() Config {
 		chip:  NotInitialized,
 		mode:  NotInitialized,
 		bits:  NotInitialized,
-		speed: NotInitialized}
+		speed: NotInitialized,
+	}
 }
 
 // WithBusNumber sets which bus to use as a optional param.

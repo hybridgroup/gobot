@@ -12,18 +12,18 @@ func TestMockFilesystemOpen(t *testing.T) {
 	f1 := fs.Files["foo"]
 
 	assert.False(t, f1.Opened)
-	f2, err := fs.openFile("foo", 0, 0666)
+	f2, err := fs.openFile("foo", 0, 0o666)
 	assert.Equal(t, f2, f1)
 	assert.Nil(t, err)
 
 	err = f2.Sync()
 	assert.Nil(t, err)
 
-	_, err = fs.openFile("bar", 0, 0666)
+	_, err = fs.openFile("bar", 0, 0o666)
 	assert.Errorf(t, err, " : bar: no such file")
 
 	fs.Add("bar")
-	f4, _ := fs.openFile("bar", 0, 0666)
+	f4, _ := fs.openFile("bar", 0, 0o666)
 	assert.NotEqual(t, f1.Fd(), f4.Fd())
 }
 
@@ -45,7 +45,7 @@ func TestMockFilesystemStat(t *testing.T) {
 func TestMockFilesystemFind(t *testing.T) {
 	// arrange
 	fs := newMockFilesystem([]string{"/foo", "/bar/foo", "/bar/foo/baz", "/bar/baz/foo", "/bar/foo/bak"})
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		baseDir string
 		pattern string
 		want    []string
@@ -72,7 +72,7 @@ func TestMockFilesystemWrite(t *testing.T) {
 	fs := newMockFilesystem([]string{"bar"})
 	f1 := fs.Files["bar"]
 
-	f2, err := fs.openFile("bar", 0, 0666)
+	f2, err := fs.openFile("bar", 0, 0o666)
 	assert.Nil(t, err)
 	// Never been read or written.
 	assert.True(t, f1.Seq <= 0)
@@ -88,7 +88,7 @@ func TestMockFilesystemRead(t *testing.T) {
 	f1 := fs.Files["bar"]
 	f1.Contents = "Yip"
 
-	f2, err := fs.openFile("bar", 0, 0666)
+	f2, err := fs.openFile("bar", 0, 0o666)
 	assert.Nil(t, err)
 	// Never been read or written.
 	assert.True(t, f1.Seq <= 0)

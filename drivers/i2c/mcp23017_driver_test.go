@@ -31,7 +31,7 @@ func initTestMCP23017(b uint8) (driver *MCP23017Driver) {
 	return d
 }
 
-func initTestMCP23017WithStubbedAdaptor(b uint8) (*MCP23017Driver, *i2cTestAdaptor) {
+func initTestMCP23017WithStubbedAdaptor(b uint8) (*MCP23017Driver, *i2cTestAdaptor) { //nolint:unparam // keep for tests
 	// create the driver, ready to use for tests
 	a := newI2cTestAdaptor()
 	d := NewMCP23017Driver(a, WithMCP23017Bank(b))

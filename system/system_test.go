@@ -44,7 +44,7 @@ func TestNewAccesser_NewSpiDevice(t *testing.T) {
 }
 
 func TestNewAccesser_IsSysfsDigitalPinAccess(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		gpiodAccesser bool
 		wantSys       bool
 	}{

@@ -86,7 +86,7 @@ func Test_getVersion(t *testing.T) {
 }
 
 func Test_switchAntenna(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		target      bool
 		simRead     byte
 		wantWritten []byte

@@ -31,6 +31,7 @@ func (t *i2cMockFirmataBoard) I2cRead(address int, numBytes int) error {
 	}()
 	return nil
 }
+
 func (t *i2cMockFirmataBoard) I2cWrite(address int, data []byte) error {
 	t.i2cWritten = append(t.i2cWritten, data...)
 	return nil

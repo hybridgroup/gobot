@@ -16,33 +16,43 @@ type readWriteCloser struct {
 	id string
 }
 
-var testWriteData = bytes.Buffer{}
-var writeDataMutex sync.Mutex
+var (
+	testWriteData  = bytes.Buffer{}
+	writeDataMutex sync.Mutex
+)
 
 // do not set this data directly, use always addTestReadData()
-var testReadDataMap = make(map[string][]byte)
-var rwDataMapMutex sync.Mutex
+var (
+	testReadDataMap = make(map[string][]byte)
+	rwDataMapMutex  sync.Mutex
+)
 
 // arduino uno r3 protocol response "2.3"
 var testDataProtocolResponse = []byte{249, 2, 3}
 
 // arduino uno r3 firmware response "StandardFirmata.ino"
-var testDataFirmwareResponse = []byte{240, 121, 2, 3, 83, 0, 116, 0, 97, 0, 110, 0, 100, 0, 97,
+var testDataFirmwareResponse = []byte{
+	240, 121, 2, 3, 83, 0, 116, 0, 97, 0, 110, 0, 100, 0, 97,
 	0, 114, 0, 100, 0, 70, 0, 105, 0, 114, 0, 109, 0, 97, 0, 116, 0, 97, 0, 46,
-	0, 105, 0, 110, 0, 111, 0, 247}
+	0, 105, 0, 110, 0, 111, 0, 247,
+}
 
 // arduino uno r3 capabilities response
-var testDataCapabilitiesResponse = []byte{240, 108, 127, 127, 0, 1, 1, 1, 4, 14, 127, 0, 1, 1, 1, 3,
+var testDataCapabilitiesResponse = []byte{
+	240, 108, 127, 127, 0, 1, 1, 1, 4, 14, 127, 0, 1, 1, 1, 3,
 	8, 4, 14, 127, 0, 1, 1, 1, 4, 14, 127, 0, 1, 1, 1, 3, 8, 4, 14, 127, 0, 1,
 	1, 1, 3, 8, 4, 14, 127, 0, 1, 1, 1, 4, 14, 127, 0, 1, 1, 1, 4, 14, 127, 0,
 	1, 1, 1, 3, 8, 4, 14, 127, 0, 1, 1, 1, 3, 8, 4, 14, 127, 0, 1, 1, 1, 3, 8,
 	4, 14, 127, 0, 1, 1, 1, 4, 14, 127, 0, 1, 1, 1, 4, 14, 127, 0, 1, 1, 1, 2,
 	10, 127, 0, 1, 1, 1, 2, 10, 127, 0, 1, 1, 1, 2, 10, 127, 0, 1, 1, 1, 2, 10,
-	127, 0, 1, 1, 1, 2, 10, 6, 1, 127, 0, 1, 1, 1, 2, 10, 6, 1, 127, 247}
+	127, 0, 1, 1, 1, 2, 10, 6, 1, 127, 0, 1, 1, 1, 2, 10, 6, 1, 127, 247,
+}
 
 // arduino uno r3 analog mapping response
-var testDataAnalogMappingResponse = []byte{240, 106, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127,
-	127, 127, 127, 127, 0, 1, 2, 3, 4, 5, 247}
+var testDataAnalogMappingResponse = []byte{
+	240, 106, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127,
+	127, 127, 127, 127, 0, 1, 2, 3, 4, 5, 247,
+}
 
 func (readWriteCloser) Write(p []byte) (int, error) {
 	writeDataMutex.Lock()
@@ -79,7 +89,7 @@ func (rwc readWriteCloser) Read(b []byte) (int, error) {
 	if len(data) < size {
 		size = len(data)
 	}
-	copy(b, []byte(data)[:size])
+	copy(b, data[:size])
 	testReadDataMap[rwc.id] = data[size:]
 	return size, nil
 }

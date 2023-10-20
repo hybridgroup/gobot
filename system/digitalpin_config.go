@@ -115,7 +115,8 @@ func WithPinDebounce(period time.Duration) func(gobot.DigitalPinOptioner) bool {
 
 // WithPinEventOnFallingEdge initializes the input pin for edge detection and call the event handler on falling edges.
 func WithPinEventOnFallingEdge(handler func(lineOffset int, timestamp time.Duration, detectedEdge string, seqno uint32,
-	lseqno uint32)) func(gobot.DigitalPinOptioner) bool {
+	lseqno uint32),
+) func(gobot.DigitalPinOptioner) bool {
 	return func(d gobot.DigitalPinOptioner) bool {
 		return d.SetEventHandlerForEdge(handler, digitalPinEventOnFallingEdge)
 	}
@@ -123,7 +124,8 @@ func WithPinEventOnFallingEdge(handler func(lineOffset int, timestamp time.Durat
 
 // WithPinEventOnRisingEdge initializes the input pin for edge detection and call the event handler on rising edges.
 func WithPinEventOnRisingEdge(handler func(lineOffset int, timestamp time.Duration, detectedEdge string, seqno uint32,
-	lseqno uint32)) func(gobot.DigitalPinOptioner) bool {
+	lseqno uint32),
+) func(gobot.DigitalPinOptioner) bool {
 	return func(d gobot.DigitalPinOptioner) bool {
 		return d.SetEventHandlerForEdge(handler, digitalPinEventOnRisingEdge)
 	}
@@ -131,7 +133,8 @@ func WithPinEventOnRisingEdge(handler func(lineOffset int, timestamp time.Durati
 
 // WithPinEventOnBothEdges initializes the input pin for edge detection and call the event handler on all edges.
 func WithPinEventOnBothEdges(handler func(lineOffset int, timestamp time.Duration, detectedEdge string, seqno uint32,
-	lseqno uint32)) func(gobot.DigitalPinOptioner) bool {
+	lseqno uint32),
+) func(gobot.DigitalPinOptioner) bool {
 	return func(d gobot.DigitalPinOptioner) bool {
 		return d.SetEventHandlerForEdge(handler, digitalPinEventOnBothEdges)
 	}

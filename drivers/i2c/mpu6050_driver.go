@@ -14,11 +14,13 @@ const (
 	mpu6050EarthStandardGravity = 9.80665 // [m/s²] standard gravity (pole: 9.834,  equator: 9.764)
 )
 
-type MPU6050DlpfConfig uint8
-type MPU6050FrameSyncConfig uint8
-type MPU6050GyroFsConfig uint8
-type MPU6050AccelFsConfig uint8
-type MPU6050Pwr1ClockConfig uint8
+type (
+	MPU6050DlpfConfig      uint8
+	MPU6050FrameSyncConfig uint8
+	MPU6050GyroFsConfig    uint8
+	MPU6050AccelFsConfig   uint8
+	MPU6050Pwr1ClockConfig uint8
+)
 
 const (
 	mpu6050Reg_GeneralConfig   = 0x1A // external frame synchronization and digital low pass filter

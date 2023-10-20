@@ -21,7 +21,7 @@ func TestGroveTemperatureSensorDriver(t *testing.T) {
 }
 
 func TestGroveTemperatureSensorDriverScaling(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		input int
 		want  float64
 	}{

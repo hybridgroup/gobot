@@ -20,7 +20,6 @@ const (
 )
 
 // BH1750Driver is a driver for the BH1750 digital Ambient Light Sensor IC for I²C bus interface.
-//
 type BH1750Driver struct {
 	*Driver
 	mode byte
@@ -28,12 +27,13 @@ type BH1750Driver struct {
 
 // NewBH1750Driver creates a new driver with specified i2c interface
 // Params:
-//		c Connector - the Adaptor to use with this Driver
+//
+//	c Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//		i2c.WithBus(int):	bus to use with this driver
-//		i2c.WithAddress(int):	address to use with this driver
 //
+//	i2c.WithBus(int):	bus to use with this driver
+//	i2c.WithAddress(int):	address to use with this driver
 func NewBH1750Driver(c Connector, options ...func(Config)) *BH1750Driver {
 	h := &BH1750Driver{
 		Driver: NewDriver(c, "BH1750", bh1750DefaultAddress),
@@ -51,7 +51,6 @@ func NewBH1750Driver(c Connector, options ...func(Config)) *BH1750Driver {
 
 // RawSensorData returns the raw value from the bh1750
 func (h *BH1750Driver) RawSensorData() (level int, err error) {
-
 	buf := []byte{0, 0}
 	bytesRead, err := h.connection.Read(buf)
 	if bytesRead != 2 {
@@ -68,7 +67,6 @@ func (h *BH1750Driver) RawSensorData() (level int, err error) {
 
 // Lux returns the adjusted value from the bh1750
 func (h *BH1750Driver) Lux() (lux int, err error) {
-
 	lux, err = h.RawSensorData()
 	lux = int(float64(lux) / 1.2)
 

@@ -77,8 +77,8 @@ func (a *AnalogSensorDriver) Start() (err error) {
 		// cyclic reading deactivated
 		return
 	}
-	var oldRawValue = 0
-	var oldValue = 0.0
+	oldRawValue := 0
+	oldValue := 0.0
 	go func() {
 		timer := time.NewTimer(a.interval)
 		timer.Stop()

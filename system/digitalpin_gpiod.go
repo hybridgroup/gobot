@@ -28,24 +28,36 @@ type digitalPinGpiod struct {
 
 var digitalPinGpiodReconfigure = digitalPinGpiodReconfigureLine // to allow unit testing
 
-var digitalPinGpiodUsed = map[bool]string{true: "used", false: "unused"}
-var digitalPinGpiodActiveLow = map[bool]string{true: "low", false: "high"}
-var digitalPinGpiodDebounced = map[bool]string{true: "debounced", false: "not debounced"}
+var (
+	digitalPinGpiodUsed      = map[bool]string{true: "used", false: "unused"}
+	digitalPinGpiodActiveLow = map[bool]string{true: "low", false: "high"}
+	digitalPinGpiodDebounced = map[bool]string{true: "debounced", false: "not debounced"}
+)
 
-var digitalPinGpiodDirection = map[gpiod.LineDirection]string{gpiod.LineDirectionUnknown: "unknown direction",
-	gpiod.LineDirectionInput: "input", gpiod.LineDirectionOutput: "output"}
+var digitalPinGpiodDirection = map[gpiod.LineDirection]string{
+	gpiod.LineDirectionUnknown: "unknown direction",
+	gpiod.LineDirectionInput:   "input", gpiod.LineDirectionOutput: "output",
+}
 
-var digitalPinGpiodDrive = map[gpiod.LineDrive]string{gpiod.LineDrivePushPull: "push-pull", gpiod.LineDriveOpenDrain: "open-drain",
-	gpiod.LineDriveOpenSource: "open-source"}
+var digitalPinGpiodDrive = map[gpiod.LineDrive]string{
+	gpiod.LineDrivePushPull: "push-pull", gpiod.LineDriveOpenDrain: "open-drain",
+	gpiod.LineDriveOpenSource: "open-source",
+}
 
-var digitalPinGpiodBias = map[gpiod.LineBias]string{gpiod.LineBiasUnknown: "unknown", gpiod.LineBiasDisabled: "disabled",
-	gpiod.LineBiasPullUp: "pull-up", gpiod.LineBiasPullDown: "pull-down"}
+var digitalPinGpiodBias = map[gpiod.LineBias]string{
+	gpiod.LineBiasUnknown: "unknown", gpiod.LineBiasDisabled: "disabled",
+	gpiod.LineBiasPullUp: "pull-up", gpiod.LineBiasPullDown: "pull-down",
+}
 
-var digitalPinGpiodEdgeDetect = map[gpiod.LineEdge]string{gpiod.LineEdgeNone: "no", gpiod.LineEdgeRising: "rising",
-	gpiod.LineEdgeFalling: "falling", gpiod.LineEdgeBoth: "both"}
+var digitalPinGpiodEdgeDetect = map[gpiod.LineEdge]string{
+	gpiod.LineEdgeNone: "no", gpiod.LineEdgeRising: "rising",
+	gpiod.LineEdgeFalling: "falling", gpiod.LineEdgeBoth: "both",
+}
 
-var digitalPinGpiodEventClock = map[gpiod.LineEventClock]string{gpiod.LineEventClockMonotonic: "monotonic",
-	gpiod.LineEventClockRealtime: "realtime"}
+var digitalPinGpiodEventClock = map[gpiod.LineEventClock]string{
+	gpiod.LineEventClockMonotonic: "monotonic",
+	gpiod.LineEventClockRealtime:  "realtime",
+}
 
 // newDigitalPinGpiod returns a digital pin given the pin number, with the label "gobotio" followed by the pin number.
 // The pin label can be modified optionally. The pin is handled by the character device Kernel ABI.
@@ -53,7 +65,7 @@ func newDigitalPinGpiod(chipName string, pin int, options ...func(gobot.DigitalP
 	if chipName == "" {
 		chipName = "gpiochip0"
 	}
-	cfg := newDigitalPinConfig("gobotio"+strconv.Itoa(int(pin)), options...)
+	cfg := newDigitalPinConfig("gobotio"+strconv.Itoa(pin), options...)
 	d := &digitalPinGpiod{
 		chipName:         chipName,
 		pin:              pin,
@@ -218,7 +230,7 @@ func digitalPinGpiodReconfigureLine(d *digitalPinGpiod, forceInput bool) error {
 		}
 	} else {
 		if systemGpiodDebug {
-			log.Printf("ouput (%s): ini-state %d, drive %d, inverse %t, bias %d",
+			log.Printf("output (%s): ini-state %d, drive %d, inverse %t, bias %d",
 				id, d.outInitialState, d.drive, d.activeLow, d.bias)
 		}
 		opts = append(opts, gpiod.AsOutput(d.outInitialState))

@@ -8,11 +8,15 @@ import (
 	"gobot.io/x/gobot/v2/drivers/i2c"
 )
 
-const availableI2cAddress = 0x40
-const maxUint8 = ^uint8(0)
+const (
+	availableI2cAddress = 0x40
+	maxUint8            = ^uint8(0)
+)
 
-var _ i2c.Connector = (*Adaptor)(nil)
-var i2cData = []byte{5, 4, 3, 2, 1, 0}
+var (
+	_       i2c.Connector = (*Adaptor)(nil)
+	i2cData               = []byte{5, 4, 3, 2, 1, 0}
+)
 
 type i2cMock struct {
 	duration          uint

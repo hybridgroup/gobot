@@ -78,7 +78,7 @@ const (
 var originalState string
 
 func Parse(input bytes) KeyEvent {
-	var event = KeyEvent{Bytes: input, Char: string(input[:])}
+	event := KeyEvent{Bytes: input, Char: string(input[:])}
 
 	var code byte
 

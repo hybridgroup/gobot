@@ -91,7 +91,7 @@ func TestAdafruit1109Halt(t *testing.T) {
 }
 
 func TestAdafruit1109DigitalRead(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		read    uint8
 		wantReg uint8
 	}{
@@ -138,7 +138,7 @@ func TestAdafruit1109DigitalRead(t *testing.T) {
 }
 
 func TestAdafruit1109SelectButton(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		read uint8
 		want uint8
 	}{
@@ -168,7 +168,7 @@ func TestAdafruit1109SelectButton(t *testing.T) {
 }
 
 func TestAdafruit1109UpButton(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		read uint8
 		want uint8
 	}{
@@ -198,7 +198,7 @@ func TestAdafruit1109UpButton(t *testing.T) {
 }
 
 func TestAdafruit1109DownButton(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		read uint8
 		want uint8
 	}{
@@ -228,7 +228,7 @@ func TestAdafruit1109DownButton(t *testing.T) {
 }
 
 func TestAdafruit1109LeftButton(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		read uint8
 		want uint8
 	}{
@@ -258,7 +258,7 @@ func TestAdafruit1109LeftButton(t *testing.T) {
 }
 
 func TestAdafruit1109RightButton(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		read uint8
 		want uint8
 	}{

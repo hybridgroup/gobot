@@ -17,6 +17,7 @@ func TestAdaptor(t *testing.T) {
 	a := initTestAdaptor()
 	assert.Equal(t, "Pebble", a.Name())
 }
+
 func TestAdaptorConnect(t *testing.T) {
 	a := initTestAdaptor()
 	assert.Nil(t, a.Connect())

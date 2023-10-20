@@ -170,14 +170,14 @@ func NewSSD1306Driver(a gobot.Adaptor, options ...func(Config)) *SSD1306Driver {
 		return map[string]interface{}{"err": err}
 	})
 	s.AddCommand("SetContrast", func(params map[string]interface{}) interface{} {
-		contrast := byte(params["contrast"].(byte))
+		contrast := params["contrast"].(byte)
 		err := s.SetContrast(contrast)
 		return map[string]interface{}{"err": err}
 	})
 	s.AddCommand("Set", func(params map[string]interface{}) interface{} {
-		x := int(params["x"].(int))
-		y := int(params["y"].(int))
-		c := int(params["c"].(int))
+		x := params["x"].(int)
+		y := params["y"].(int)
+		c := params["c"].(int)
 		s.Set(x, y, c)
 		return nil
 	})

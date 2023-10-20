@@ -16,7 +16,6 @@ const pca9501DefaultAddress = 0x3F // this applies, if all 6 address pins left o
 // please refer to data sheet: https://www.nxp.com/docs/en/data-sheet/PCA9501.pdf
 //
 // PCA9501 is the replacement for PCF8574, so this driver should also work for PCF8574 except EEPROM calls
-//
 type PCA9501Driver struct {
 	connectionMem Connection
 	*Driver
@@ -24,12 +23,13 @@ type PCA9501Driver struct {
 
 // NewPCA9501Driver creates a new driver with specified i2c interface
 // Params:
-//		a Connector - the Adaptor to use with this Driver
+//
+//	a Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//		i2c.WithBus(int):	bus to use with this driver
-//		i2c.WithAddress(int):	address to use with this driver
 //
+//	i2c.WithBus(int):	bus to use with this driver
+//	i2c.WithAddress(int):	address to use with this driver
 func NewPCA9501Driver(a Connector, options ...func(Config)) *PCA9501Driver {
 	p := &PCA9501Driver{
 		Driver: NewDriver(a, "PCA9501", pca9501DefaultAddress, options...),
@@ -76,9 +76,9 @@ func (p *PCA9501Driver) WriteGPIO(pin uint8, val uint8) error {
 		return err
 	}
 	// set pin as output by clearing bit
-	iodirVal := clearBit(iodir, uint8(pin))
+	iodirVal := clearBit(iodir, pin)
 	// write CTRL register
-	err = p.connection.WriteByte(uint8(iodirVal))
+	err = p.connection.WriteByte(iodirVal)
 	if err != nil {
 		return err
 	}
@@ -90,12 +90,12 @@ func (p *PCA9501Driver) WriteGPIO(pin uint8, val uint8) error {
 	// set or reset the bit in value
 	var nVal uint8
 	if val == 0 {
-		nVal = clearBit(cVal, uint8(pin))
+		nVal = clearBit(cVal, pin)
 	} else {
-		nVal = setBit(cVal, uint8(pin))
+		nVal = setBit(cVal, pin)
 	}
 	// write new value to port
-	err = p.connection.WriteByte(uint8(nVal))
+	err = p.connection.WriteByte(nVal)
 	if err != nil {
 		return err
 	}
@@ -113,9 +113,9 @@ func (p *PCA9501Driver) ReadGPIO(pin uint8) (uint8, error) {
 		return 0, err
 	}
 	// set pin as input by setting bit
-	iodirVal := setBit(iodir, uint8(pin))
+	iodirVal := setBit(iodir, pin)
 	// write CTRL register
-	err = p.connection.WriteByte(uint8(iodirVal))
+	err = p.connection.WriteByte(iodirVal)
 	if err != nil {
 		return 0, err
 	}
@@ -124,7 +124,7 @@ func (p *PCA9501Driver) ReadGPIO(pin uint8) (uint8, error) {
 	if err != nil {
 		return val, err
 	}
-	val = 1 << uint8(pin) & val
+	val = 1 << pin & val
 	if val > 1 {
 		val = 1
 	}

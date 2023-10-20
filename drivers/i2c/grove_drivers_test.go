@@ -8,8 +8,10 @@ import (
 	"gobot.io/x/gobot/v2"
 )
 
-var _ gobot.Driver = (*GroveLcdDriver)(nil)
-var _ gobot.Driver = (*GroveAccelerometerDriver)(nil)
+var (
+	_ gobot.Driver = (*GroveLcdDriver)(nil)
+	_ gobot.Driver = (*GroveAccelerometerDriver)(nil)
+)
 
 func initTestGroveLcdDriver() (driver *GroveLcdDriver) {
 	driver, _ = initGroveLcdDriverWithStubbedAdaptor()

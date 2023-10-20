@@ -45,8 +45,10 @@ func NewDriver(tcpaddress string, udpaddress string) *Driver {
 	}
 	command[10] = checksum(command)
 
-	return &Driver{name: gobot.DefaultName("HS200"), stopc: make(chan struct{}),
-		tcpaddress: tcpaddress, udpaddress: udpaddress, cmd: command, mutex: &sync.RWMutex{}}
+	return &Driver{
+		name: gobot.DefaultName("HS200"), stopc: make(chan struct{}),
+		tcpaddress: tcpaddress, udpaddress: udpaddress, cmd: command, mutex: &sync.RWMutex{},
+	}
 }
 
 // Name returns the name of the device.

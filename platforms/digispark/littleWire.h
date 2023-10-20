@@ -405,7 +405,7 @@ void i2c_write(littleWire* lwHandle, unsigned char* sendBuffer, unsigned char le
 void i2c_read(littleWire* lwHandle, unsigned char* readBuffer, unsigned char length, unsigned char endWithStop);
 
 /**
-  * Update i2c signal delay amount. Tune if neccessary to fit your requirements.
+  * Update i2c signal delay amount. Tune if necessary to fit your requirements.
   * 
   * @param lwHandle littleWire device pointer
   * @param duration Delay amount

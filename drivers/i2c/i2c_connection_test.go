@@ -5,7 +5,6 @@ package i2c
 
 import (
 	"testing"
-
 	"unsafe"
 
 	"github.com/stretchr/testify/assert"

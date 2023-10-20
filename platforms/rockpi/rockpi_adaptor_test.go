@@ -21,7 +21,7 @@ func TestDefaultI2cBus(t *testing.T) {
 }
 
 func Test_getPinTranslatorFunction(t *testing.T) {
-	var cases = map[string]struct {
+	cases := map[string]struct {
 		pin          string
 		model        string
 		expectedLine int
@@ -71,7 +71,7 @@ func Test_getPinTranslatorFunction(t *testing.T) {
 }
 
 func Test_validateSpiBusNumber(t *testing.T) {
-	var cases = map[string]struct {
+	cases := map[string]struct {
 		busNr       int
 		expectedErr error
 	}{
@@ -103,7 +103,7 @@ func Test_validateSpiBusNumber(t *testing.T) {
 }
 
 func Test_validateI2cBusNumber(t *testing.T) {
-	var cases = map[string]struct {
+	cases := map[string]struct {
 		busNr   int
 		wantErr error
 	}{

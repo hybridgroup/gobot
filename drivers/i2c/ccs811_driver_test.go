@@ -42,11 +42,11 @@ func TestCCS811Options(t *testing.T) {
 
 func TestCCS811WithCCS811MeasMode(t *testing.T) {
 	d := NewCCS811Driver(newI2cTestAdaptor(), WithCCS811MeasMode(CCS811DriveMode10Sec))
-	assert.Equal(t, CCS811DriveMode(CCS811DriveMode10Sec), d.measMode.driveMode)
+	assert.Equal(t, CCS811DriveMode10Sec, d.measMode.driveMode)
 }
 
 func TestCCS811GetGasData(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		readReturn func([]byte) (int, error)
 		eco2       uint16
 		tvoc       uint16
@@ -99,7 +99,7 @@ func TestCCS811GetGasData(t *testing.T) {
 }
 
 func TestCCS811GetTemperature(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		readReturn func([]byte) (int, error)
 		temp       float32
 		err        error
@@ -155,7 +155,7 @@ func TestCCS811GetTemperature(t *testing.T) {
 }
 
 func TestCCS811HasData(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		readReturn func([]byte) (int, error)
 		result     bool
 		err        error

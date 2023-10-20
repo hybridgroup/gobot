@@ -40,7 +40,7 @@ func TestPCA953xWriteGPIO(t *testing.T) {
 	// * read current state of LED select register (write reg, read val)
 	// * modify 2 bits according to given index of GPIO
 	// * write the new state to the LED select register (write reg, write val)
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		idx         uint8
 		ls0State    uint8
 		ls1State    uint8
@@ -109,7 +109,7 @@ func TestPCA953xReadGPIO(t *testing.T) {
 	// sequence to read:
 	// * read current state of INPUT register (write reg 0x00, read val)
 	// * convert bit position to output value
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		idx     uint8
 		want    uint8
 		wantErr error
@@ -171,7 +171,7 @@ func TestPCA953xWritePeriod(t *testing.T) {
 	// * calculate PSC value (0..255) from given value in seconds, valid values are 0.00658 ... 1.68 [s]
 	// * choose PSC0 (0x01) or PSC1 (0x03) frequency prescaler register by the given index
 	// * write the value to the register (write reg, write val)
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		idx         uint8
 		val         float32
 		wantWritten []uint8
@@ -186,7 +186,7 @@ func TestPCA953xWritePeriod(t *testing.T) {
 			val:         0.5,
 			wantWritten: []byte{0x03, 75},
 		},
-		"write_shrinked_noerror": {
+		"write_limited_noerror": {
 			idx:         0,
 			val:         2,
 			wantWritten: []byte{0x01, 255},
@@ -211,7 +211,7 @@ func TestPCA953xReadPeriod(t *testing.T) {
 	// * choose PSC0 (0x01) or PSC1 (0x03) frequency prescaler register by the given index
 	// * read the value from the register (write reg, write val)
 	// * calculate value in seconds from PSC value
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		idx         uint8
 		val         uint8
 		want        float32
@@ -262,7 +262,7 @@ func TestPCA953xWriteFrequency(t *testing.T) {
 	// * calculate PSC value (0..255) from given value in Hz, valid values are 0.6 ... 152 [Hz]
 	// * choose PSC0 (0x01) or PSC1 (0x03) frequency prescaler register by the given index
 	// * write the value to the register (write reg, write val)
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		idx         uint8
 		val         float32
 		wantWritten []uint8
@@ -277,7 +277,7 @@ func TestPCA953xWriteFrequency(t *testing.T) {
 			val:         2,
 			wantWritten: []byte{0x03, 75},
 		},
-		"write_shrinked_noerror": {
+		"write_limited_noerror": {
 			idx:         0,
 			val:         153,
 			wantWritten: []byte{0x01, 0},
@@ -302,7 +302,7 @@ func TestPCA953xReadFrequency(t *testing.T) {
 	// * choose PSC0 (0x01) or PSC1 (0x03) frequency prescaler register by the given index
 	// * read the value from the register (write reg, write val)
 	// * calculate value in Hz from PSC value
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		idx         uint8
 		val         uint8
 		want        float32
@@ -353,7 +353,7 @@ func TestPCA953xWriteDutyCyclePercent(t *testing.T) {
 	// * calculate PWM value (0..255) from given value in percent, valid values are 0 ... 100 [%]
 	// * choose PWM0 (0x02) or PWM1 (0x04) pwm register by the given index
 	// * write the value to the register (write reg, write val)
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		idx         uint8
 		val         float32
 		wantWritten []uint8
@@ -368,7 +368,7 @@ func TestPCA953xWriteDutyCyclePercent(t *testing.T) {
 			val:         50,
 			wantWritten: []byte{0x04, 128},
 		},
-		"write_shrinked_noerror": {
+		"write_limited_noerror": {
 			idx:         1,
 			val:         101,
 			wantWritten: []byte{0x04, 255},
@@ -393,7 +393,7 @@ func TestPCA953xReadDutyCyclePercent(t *testing.T) {
 	// * choose PWM0 (0x02) or PWM1 (0x04) pwm register by the given index
 	// * read the value from the register (write reg, write val)
 	// * calculate value percent from PWM value
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		idx         uint8
 		val         uint8
 		want        float32
@@ -496,7 +496,7 @@ func TestPCA953x_writeRegister(t *testing.T) {
 	assert.Equal(t, 1, numCallsWrite)
 	assert.Equal(t, wantByteCount, len(a.written))
 	assert.Equal(t, uint8(wantRegAddress), a.written[0])
-	assert.Equal(t, uint8(wantRegVal), a.written[1])
+	assert.Equal(t, wantRegVal, a.written[1])
 }
 
 func TestPCA953x_pca953xCalcPsc(t *testing.T) {

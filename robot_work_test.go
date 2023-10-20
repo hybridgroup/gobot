@@ -3,7 +3,6 @@ package gobot
 import (
 	"context"
 	"testing"
-
 	"time"
 
 	"github.com/gofrs/uuid"

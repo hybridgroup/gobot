@@ -3,9 +3,8 @@ package gobot
 import (
 	"context"
 	"fmt"
-	"time"
-
 	"sync"
+	"time"
 
 	"github.com/gofrs/uuid"
 )
@@ -30,7 +29,7 @@ const (
 //
 //	someWork := myRobot.Every(context.Background(), time.Second * 2, func(){
 //		fmt.Println("Here I am doing work")
-// 	})
+//	})
 //
 //	someWork.CallCancelFunc() // Cancel next tick and remove from work registry
 //
@@ -38,7 +37,7 @@ const (
 //
 //	someWork2 := myRobot.Every(context.Background(), time.Second * 2, func(){
 //		fmt.Println("Here I am doing more work")
-// 	})
+//	})
 //
 //	somework2.CallCancelFunc()
 //

@@ -23,7 +23,6 @@ import (
 )
 
 func main() {
-
 	firmataAdaptor := firmata.NewAdaptor(os.Args[1])
 	// In the WEMOS D1 Mini LED Matrix Shield clockPin = 14, dataPin = 13
 	aip1640 := gpio.NewAIP1640Driver(firmataAdaptor, "14", "13")

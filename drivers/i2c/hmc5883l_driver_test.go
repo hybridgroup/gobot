@@ -61,7 +61,7 @@ func TestHMC5883LWithHMC5883LGain(t *testing.T) {
 
 func TestHMC5883LRead(t *testing.T) {
 	// arrange
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		inputX []uint8
 		inputY []uint8
 		inputZ []uint8
@@ -136,7 +136,7 @@ func TestHMC5883L_readRawData(t *testing.T) {
 	// * apply two's complement converter
 	//
 	// arrange
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		inputX []uint8
 		inputY []uint8
 		inputZ []uint8

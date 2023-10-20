@@ -45,7 +45,7 @@ func TestAnalogActuatorDriverWithScaler(t *testing.T) {
 }
 
 func TestAnalogActuatorDriverLinearScaler(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		fromMin float64
 		fromMax float64
 		input   float64

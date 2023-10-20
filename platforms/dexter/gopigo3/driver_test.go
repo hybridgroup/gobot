@@ -9,8 +9,10 @@ import (
 	"gobot.io/x/gobot/v2/drivers/spi"
 )
 
-var _ gobot.Driver = (*Driver)(nil)
-var negativeEncoder = false
+var (
+	_               gobot.Driver = (*Driver)(nil)
+	negativeEncoder              = false
+)
 
 func initTestDriver() *Driver {
 	d := NewDriver(&TestConnector{})
@@ -272,8 +274,7 @@ func (ctr *TestConnector) SpiDefaultMaxSpeed() int64 {
 	return 0
 }
 
-type TestSpiDevice struct {
-}
+type TestSpiDevice struct{}
 
 func (c TestSpiDevice) Close() error {
 	return nil

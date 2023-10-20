@@ -49,7 +49,7 @@ func TestLocatorData(t *testing.T) {
 	}
 
 	for _, point := range tables {
-		//0x0B is the locator ID
+		// 0x0B is the locator ID
 		packet := []byte{0xFF, 0xFF, 0x00, 0x00, 0x0B, point.x1, point.x2, point.y1, point.y2, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
 
 		d.GetLocatorData(func(p Point2D) {
@@ -72,8 +72,9 @@ func TestDataStreaming(t *testing.T) {
 		response = true
 	})
 
-	//example data packet
-	p1 := []string{"FFFE030053000A003900FAFFFE0007FFFF000000",
+	// example data packet
+	p1 := []string{
+		"FFFE030053000A003900FAFFFE0007FFFF000000",
 		"000000000000000000FFECFFFB00010000004B01",
 		"BD1034FFFF000300000000000000000000000000",
 		"0000002701FDE500560000000000000065000000",
@@ -92,10 +93,10 @@ func TestDataStreaming(t *testing.T) {
 
 	}
 
-	//send empty packet to indicate start of next message
+	// send empty packet to indicate start of next message
 	d.HandleResponses([]byte{0xFF}, nil)
 	time.Sleep(10 * time.Millisecond)
 	if response == false {
-		t.Error("no response recieved")
+		t.Error("no response received")
 	}
 }

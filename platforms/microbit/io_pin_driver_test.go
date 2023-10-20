@@ -15,9 +15,11 @@ import (
 var _ gobot.Driver = (*IOPinDriver)(nil)
 
 // that supports the DigitalReader, DigitalWriter, & AnalogReader interfaces
-var _ gpio.DigitalReader = (*IOPinDriver)(nil)
-var _ gpio.DigitalWriter = (*IOPinDriver)(nil)
-var _ aio.AnalogReader = (*IOPinDriver)(nil)
+var (
+	_ gpio.DigitalReader = (*IOPinDriver)(nil)
+	_ gpio.DigitalWriter = (*IOPinDriver)(nil)
+	_ aio.AnalogReader   = (*IOPinDriver)(nil)
+)
 
 func initTestIOPinDriver() *IOPinDriver {
 	d := NewIOPinDriver(NewBleTestAdaptor())

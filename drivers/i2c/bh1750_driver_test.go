@@ -1,11 +1,10 @@
 package i2c
 
 import (
+	"bytes"
 	"errors"
 	"strings"
 	"testing"
-
-	"bytes"
 
 	"github.com/stretchr/testify/assert"
 	"gobot.io/x/gobot/v2"

@@ -14,12 +14,13 @@ type BlinkMDriver struct {
 // NewBlinkMDriver creates a new BlinkMDriver.
 //
 // Params:
-//		c Connector - the Adaptor to use with this Driver
+//
+//	c Connector - the Adaptor to use with this Driver
 //
 // Optional params:
-//		i2c.WithBus(int):	bus to use with this driver
-//		i2c.WithAddress(int):	address to use with this driver
 //
+//	i2c.WithBus(int):	bus to use with this driver
+//	i2c.WithAddress(int):	address to use with this driver
 func NewBlinkMDriver(c Connector, options ...func(Config)) *BlinkMDriver {
 	b := &BlinkMDriver{
 		Driver: NewDriver(c, "BlinkM", blinkmDefaultAddress),

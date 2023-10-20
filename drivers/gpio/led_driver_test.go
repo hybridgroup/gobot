@@ -48,7 +48,6 @@ func TestLedDriver(t *testing.T) {
 
 	err = d.Command("Brightness")(map[string]interface{}{"level": 100.0})
 	assert.Errorf(t, err.(error), "pwm error")
-
 }
 
 func TestLedDriverStart(t *testing.T) {

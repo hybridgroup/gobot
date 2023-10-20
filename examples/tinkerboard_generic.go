@@ -84,7 +84,6 @@ func main() {
 			if read && write {
 				if reflect.DeepEqual(wData, rData) {
 					fmt.Printf("EEPROM addr: %d equal: %v\n", eepromAddr, rData)
-
 				} else {
 					fmt.Printf("EEPROM addr: %d wr: %v differ rd: %v\n", eepromAddr, wData, rData)
 				}

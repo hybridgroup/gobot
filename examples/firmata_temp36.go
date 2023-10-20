@@ -14,10 +14,9 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"time"
-
-	"fmt"
 
 	"gobot.io/x/gobot/v2"
 	"gobot.io/x/gobot/v2/platforms/firmata"

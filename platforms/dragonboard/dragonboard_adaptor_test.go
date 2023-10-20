@@ -12,13 +12,15 @@ import (
 )
 
 // make sure that this Adaptor fulfills all the required interfaces
-var _ gobot.Adaptor = (*Adaptor)(nil)
-var _ gobot.DigitalPinnerProvider = (*Adaptor)(nil)
-var _ gpio.DigitalReader = (*Adaptor)(nil)
-var _ gpio.DigitalWriter = (*Adaptor)(nil)
-var _ i2c.Connector = (*Adaptor)(nil)
+var (
+	_ gobot.Adaptor               = (*Adaptor)(nil)
+	_ gobot.DigitalPinnerProvider = (*Adaptor)(nil)
+	_ gpio.DigitalReader          = (*Adaptor)(nil)
+	_ gpio.DigitalWriter          = (*Adaptor)(nil)
+	_ i2c.Connector               = (*Adaptor)(nil)
+)
 
-func initTestAdaptor(t *testing.T) *Adaptor {
+func initTestAdaptor() *Adaptor {
 	a := NewAdaptor()
 	if err := a.Connect(); err != nil {
 		panic(err)
@@ -27,14 +29,14 @@ func initTestAdaptor(t *testing.T) *Adaptor {
 }
 
 func TestName(t *testing.T) {
-	a := initTestAdaptor(t)
+	a := initTestAdaptor()
 	assert.True(t, strings.HasPrefix(a.Name(), "DragonBoard"))
 	a.SetName("NewName")
 	assert.Equal(t, "NewName", a.Name())
 }
 
 func TestDigitalIO(t *testing.T) {
-	a := initTestAdaptor(t)
+	a := initTestAdaptor()
 	mockPaths := []string{
 		"/sys/class/gpio/export",
 		"/sys/class/gpio/unexport",
@@ -57,7 +59,7 @@ func TestDigitalIO(t *testing.T) {
 }
 
 func TestFinalizeErrorAfterGPIO(t *testing.T) {
-	a := initTestAdaptor(t)
+	a := initTestAdaptor()
 	mockPaths := []string{
 		"/sys/class/gpio/export",
 		"/sys/class/gpio/unexport",
@@ -78,7 +80,7 @@ func TestFinalizeErrorAfterGPIO(t *testing.T) {
 }
 
 func TestI2cDefaultBus(t *testing.T) {
-	a := initTestAdaptor(t)
+	a := initTestAdaptor()
 	assert.Equal(t, 0, a.DefaultI2cBus())
 }
 
@@ -100,7 +102,7 @@ func TestI2cFinalizeWithErrors(t *testing.T) {
 }
 
 func Test_validateI2cBusNumber(t *testing.T) {
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		busNr   int
 		wantErr error
 	}{

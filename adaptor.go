@@ -109,7 +109,6 @@ type PWMPinnerProvider interface {
 // Data (8 bits): A plain data byte. DataLow and DataHigh represent the low and high byte of a 16 bit word.
 // Count (8 bits): A data byte containing the length of a block operation.
 // [..]: Data sent by I2C device, as opposed to data sent by the host adapter.
-//
 type I2cSystemDevicer interface {
 	// ReadByte must be implemented as the sequence:
 	// "S Addr Rd [A] [Data] NA P"

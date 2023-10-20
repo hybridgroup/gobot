@@ -1,11 +1,11 @@
 package i2c
 
 import (
-	"gobot.io/x/gobot/v2"
-
 	"bytes"
 	"encoding/binary"
 	"time"
+
+	"gobot.io/x/gobot/v2"
 )
 
 const mpl115a2DefaultAddress = 0x60

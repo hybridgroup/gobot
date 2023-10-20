@@ -22,7 +22,7 @@ type IOPinDriver struct {
 
 const (
 	// BLE services
-	//ioPinService = "e95d127b251d470aa062fa1922dfa9a8"
+	// ioPinService = "e95d127b251d470aa062fa1922dfa9a8"
 
 	// BLE characteristics
 	pinDataCharacteristic     = "e95d8d00251d470aa062fa1922dfa9a8"

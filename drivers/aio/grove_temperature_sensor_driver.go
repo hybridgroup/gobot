@@ -27,8 +27,8 @@ type GroveTemperatureSensorDriver struct {
 //	"ReadValue" - See AnalogDriverSensor.ReadValue
 func NewGroveTemperatureSensorDriver(a AnalogReader, pin string, v ...time.Duration) *GroveTemperatureSensorDriver {
 	t := NewTemperatureSensorDriver(a, pin, v...)
-	ntc := TemperatureSensorNtcConf{TC0: 25, R0: 10000.0, B: 3975} //Ohm, R25=10k
-	t.SetNtcScaler(1023, 10000, false, ntc)                        //Ohm, reference value: 1023, series R: 10k
+	ntc := TemperatureSensorNtcConf{TC0: 25, R0: 10000.0, B: 3975} // Ohm, R25=10k
+	t.SetNtcScaler(1023, 10000, false, ntc)                        // Ohm, reference value: 1023, series R: 10k
 
 	d := &GroveTemperatureSensorDriver{
 		TemperatureSensorDriver: t,

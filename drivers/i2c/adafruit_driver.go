@@ -111,12 +111,16 @@ func NewAdafruitMotorHatDriver(conn Connector, options ...func(Config)) *Adafrui
 		switch {
 		case i == 0:
 			dc = append(dc, adaFruitDCMotor{pwmPin: 8, in1Pin: 10, in2Pin: 9})
-			st = append(st, adaFruitStepperMotor{pwmPinA: 8, pwmPinB: 13,
-				ain1: 10, ain2: 9, bin1: 11, bin2: 12, revSteps: 200, secPerStep: 0.1})
+			st = append(st, adaFruitStepperMotor{
+				pwmPinA: 8, pwmPinB: 13,
+				ain1: 10, ain2: 9, bin1: 11, bin2: 12, revSteps: 200, secPerStep: 0.1,
+			})
 		case i == 1:
 			dc = append(dc, adaFruitDCMotor{pwmPin: 13, in1Pin: 11, in2Pin: 12})
-			st = append(st, adaFruitStepperMotor{pwmPinA: 2, pwmPinB: 7,
-				ain1: 4, ain2: 3, bin1: 5, bin2: 6, revSteps: 200, secPerStep: 0.1})
+			st = append(st, adaFruitStepperMotor{
+				pwmPinA: 2, pwmPinB: 7,
+				ain1: 4, ain2: 3, bin1: 5, bin2: 6, revSteps: 200, secPerStep: 0.1,
+			})
 		case i == 2:
 			dc = append(dc, adaFruitDCMotor{pwmPin: 2, in1Pin: 4, in2Pin: 3})
 		case i == 3:
@@ -249,10 +253,10 @@ func (a *AdafruitMotorHatDriver) Halt() (err error) { return }
 func (a *AdafruitMotorHatDriver) setPWM(conn Connection, pin byte, on, off int32) (err error) {
 	// register and values to be written to that register
 	regVals := make(map[int][]byte)
-	regVals[0] = []byte{byte(_LedZeroOnL + 4*pin), byte(on & 0xff)}
-	regVals[1] = []byte{byte(_LedZeroOnH + 4*pin), byte(on >> 8)}
-	regVals[2] = []byte{byte(_LedZeroOffL + 4*pin), byte(off & 0xff)}
-	regVals[3] = []byte{byte(_LedZeroOffH + 4*pin), byte(off >> 8)}
+	regVals[0] = []byte{_LedZeroOnL + 4*pin, byte(on & 0xff)}
+	regVals[1] = []byte{_LedZeroOnH + 4*pin, byte(on >> 8)}
+	regVals[2] = []byte{_LedZeroOffL + 4*pin, byte(off & 0xff)}
+	regVals[3] = []byte{_LedZeroOffH + 4*pin, byte(off >> 8)}
 	for i := 0; i < len(regVals); i++ {
 		if _, err = conn.Write(regVals[i]); err != nil {
 			return
@@ -363,7 +367,6 @@ func (a *AdafruitMotorHatDriver) SetDCMotorSpeed(dcMotor int, speed int32) (err 
 // RunDCMotor will set the appropriate pins to run the specified DC motor for
 // the given direction
 func (a *AdafruitMotorHatDriver) RunDCMotor(dcMotor int, dir AdafruitDirection) (err error) {
-
 	switch {
 	case dir == AdafruitForward:
 		if err = a.setPin(a.motorHatConnection, a.dcMotors[dcMotor].in2Pin, 0); err != nil {
@@ -460,13 +463,13 @@ func (a *AdafruitMotorHatDriver) oneStep(motor int, dir AdafruitDirection, style
 			pwmA = stepperMicrostepCurve[currStep-stepperMicrosteps*3]
 			pwmB = stepperMicrostepCurve[stepperMicrosteps*4-currStep]
 		}
-	} //switch
+	} // switch
 
-	//go to next 'step' and wrap around
+	// go to next 'step' and wrap around
 	a.stepperMotors[motor].currentStep += stepperMicrosteps * 4
 	a.stepperMotors[motor].currentStep %= stepperMicrosteps * 4
 
-	//only really used for microstepping, otherwise always on!
+	// only really used for microstepping, otherwise always on!
 	if err = a.setPWM(a.motorHatConnection, a.stepperMotors[motor].pwmPinA, 0, int32(pwmA*16)); err != nil {
 		return
 	}

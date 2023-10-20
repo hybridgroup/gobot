@@ -47,11 +47,11 @@ func TestRobotStart(t *testing.T) {
 func TestRobotStartAutoRun(t *testing.T) {
 	adaptor1 := newTestAdaptor("Connection1", "/dev/null")
 	driver1 := newTestDriver(adaptor1, "Device1", "0")
-	//work := func() {}
+	// work := func() {}
 	r := NewRobot("autorun",
 		[]Connection{adaptor1},
 		[]Device{driver1},
-		//work,
+		// work,
 	)
 
 	go func() {

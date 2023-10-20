@@ -160,7 +160,6 @@ func (d *BMP180Driver) initialization() error {
 		return err
 	}
 	return binary.Read(buf, binary.BigEndian, &d.calCoeffs.md)
-
 }
 
 func (d *BMP180Driver) rawTemp() (int16, error) {

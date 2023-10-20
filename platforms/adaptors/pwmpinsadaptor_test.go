@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	pwmDir           = "/sys/devices/platform/ff680020.pwm/pwm/pwmchip3/"
+	pwmDir           = "/sys/devices/platform/ff680020.pwm/pwm/pwmchip3/" //nolint:gosec // false positive
 	pwmPwm0Dir       = pwmDir + "pwm44/"
 	pwmExportPath    = pwmDir + "export"
 	pwmUnexportPath  = pwmDir + "unexport"
@@ -36,9 +36,11 @@ var pwmMockPaths = []string{
 }
 
 // make sure that this PWMPinsAdaptor fulfills all the required interfaces
-var _ gobot.PWMPinnerProvider = (*PWMPinsAdaptor)(nil)
-var _ gpio.PwmWriter = (*PWMPinsAdaptor)(nil)
-var _ gpio.ServoWriter = (*PWMPinsAdaptor)(nil)
+var (
+	_ gobot.PWMPinnerProvider = (*PWMPinsAdaptor)(nil)
+	_ gpio.PwmWriter          = (*PWMPinsAdaptor)(nil)
+	_ gpio.ServoWriter        = (*PWMPinsAdaptor)(nil)
+)
 
 func initTestPWMPinsAdaptorWithMockedFilesystem(mockPaths []string) (*PWMPinsAdaptor, *system.MockFilesystem) {
 	sys := system.NewAccesser()
@@ -270,7 +272,7 @@ func TestSetPeriod(t *testing.T) {
 func Test_PWMPin(t *testing.T) {
 	translateErr := "translator_error"
 	translator := func(string) (string, int, error) { return pwmDir, 44, nil }
-	var tests = map[string]struct {
+	tests := map[string]struct {
 		mockPaths []string
 		period    string
 		dutyCycle string
@@ -353,7 +355,6 @@ func Test_PWMPin(t *testing.T) {
 				assert.Contains(t, err.Error(), tc.wantErr)
 				assert.Nil(t, got)
 			}
-
 		})
 	}
 }

@@ -38,7 +38,7 @@ func (c *digisparkI2cConnection) Test(address uint8) error {
 	return c.adaptor.littleWire.i2cStart(address, 0)
 }
 
-// UpdateDelay updates i2c signal delay amount; tune if neccessary to fit your requirements
+// UpdateDelay updates i2c signal delay amount; tune if necessary to fit your requirements
 func (c *digisparkI2cConnection) UpdateDelay(duration uint) error {
 	if !c.adaptor.i2c {
 		return errors.New("Digispark i2c not initialized")

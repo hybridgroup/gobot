@@ -27,7 +27,8 @@ type SpiBusAdaptor struct {
 // NewSpiBusAdaptor provides the access to SPI buses of the board. The validator is used to check the
 // bus number (given by user) to the abilities of the board.
 func NewSpiBusAdaptor(sys *system.Accesser, v spiBusNumberValidator, busNum, chipNum, mode, bits int,
-	maxSpeed int64) *SpiBusAdaptor {
+	maxSpeed int64,
+) *SpiBusAdaptor {
 	a := &SpiBusAdaptor{
 		sys:               sys,
 		validateBusNumber: v,

@@ -68,7 +68,7 @@ func (d *digitalPinSysfs) Export() error {
 
 // Unexport release the pin
 func (d *digitalPinSysfs) Unexport() error {
-	unexport, err := d.fs.openFile(gpioPath+"/unexport", os.O_WRONLY, 0644)
+	unexport, err := d.fs.openFile(gpioPath+"/unexport", os.O_WRONLY, 0o644)
 	if err != nil {
 		return err
 	}
@@ -115,7 +115,7 @@ func (d *digitalPinSysfs) Read() (int, error) {
 }
 
 func (d *digitalPinSysfs) reconfigure() error {
-	exportFile, err := d.fs.openFile(gpioPath+"/export", os.O_WRONLY, 0644)
+	exportFile, err := d.fs.openFile(gpioPath+"/export", os.O_WRONLY, 0o644)
 	if err != nil {
 		return err
 	}
@@ -137,7 +137,7 @@ func (d *digitalPinSysfs) reconfigure() error {
 	attempt := 0
 	for {
 		attempt++
-		d.dirFile, err = d.fs.openFile(fmt.Sprintf("%s/%s/direction", gpioPath, d.label), os.O_RDWR, 0644)
+		d.dirFile, err = d.fs.openFile(fmt.Sprintf("%s/%s/direction", gpioPath, d.label), os.O_RDWR, 0o644)
 		if err == nil {
 			break
 		}
@@ -151,7 +151,7 @@ func (d *digitalPinSysfs) reconfigure() error {
 		d.valFile.Close()
 	}
 	if err == nil {
-		d.valFile, err = d.fs.openFile(fmt.Sprintf("%s/%s/value", gpioPath, d.label), os.O_RDWR, 0644)
+		d.valFile, err = d.fs.openFile(fmt.Sprintf("%s/%s/value", gpioPath, d.label), os.O_RDWR, 0o644)
 	}
 
 	// configure direction
@@ -162,7 +162,7 @@ func (d *digitalPinSysfs) reconfigure() error {
 	// configure inverse logic
 	if err == nil {
 		if d.activeLow {
-			d.activeLowFile, err = d.fs.openFile(fmt.Sprintf("%s/%s/active_low", gpioPath, d.label), os.O_RDWR, 0644)
+			d.activeLowFile, err = d.fs.openFile(fmt.Sprintf("%s/%s/active_low", gpioPath, d.label), os.O_RDWR, 0o644)
 			if err == nil {
 				_, err = writeFile(d.activeLowFile, []byte("1"))
 			}

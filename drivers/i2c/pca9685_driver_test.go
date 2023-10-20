@@ -15,8 +15,10 @@ import (
 var _ gobot.Driver = (*PCA9685Driver)(nil)
 
 // and also the PwmWriter and ServoWriter interfaces
-var _ gpio.PwmWriter = (*PCA9685Driver)(nil)
-var _ gpio.ServoWriter = (*PCA9685Driver)(nil)
+var (
+	_ gpio.PwmWriter   = (*PCA9685Driver)(nil)
+	_ gpio.ServoWriter = (*PCA9685Driver)(nil)
+)
 
 func initTestPCA9685DriverWithStubbedAdaptor() (*PCA9685Driver, *i2cTestAdaptor) {
 	a := newI2cTestAdaptor()
