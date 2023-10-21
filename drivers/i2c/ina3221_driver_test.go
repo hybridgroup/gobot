@@ -70,7 +70,7 @@ func TestINA3221GetBusVoltageReadError(t *testing.T) {
 	}
 
 	_, err := d.GetBusVoltage(INA3221Channel1)
-	assert.Errorf(t, err, "read error")
+	assert.Error(t, err, "read error")
 }
 
 func TestINA3221GetShuntVoltage(t *testing.T) {
@@ -93,7 +93,7 @@ func TestINA3221GetShuntVoltageReadError(t *testing.T) {
 	}
 
 	_, err := d.GetShuntVoltage(INA3221Channel1)
-	assert.Errorf(t, err, "read error")
+	assert.Error(t, err, "read error")
 }
 
 func TestINA3221GetCurrent(t *testing.T) {
@@ -116,7 +116,7 @@ func TestINA3221CurrentReadError(t *testing.T) {
 	}
 
 	_, err := d.GetCurrent(INA3221Channel1)
-	assert.Errorf(t, err, "read error")
+	assert.Error(t, err, "read error")
 }
 
 func TestINA3221GetLoadVoltage(t *testing.T) {
@@ -141,5 +141,5 @@ func TestINA3221GetLoadVoltageReadError(t *testing.T) {
 	}
 
 	_, err := d.GetLoadVoltage(INA3221Channel2)
-	assert.Errorf(t, err, "read error")
+	assert.Error(t, err, "read error")
 }

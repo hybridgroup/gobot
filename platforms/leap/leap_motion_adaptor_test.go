@@ -37,7 +37,7 @@ func TestLeapMotionAdaptorConnect(t *testing.T) {
 	a.connect = func(port string) (io.ReadWriteCloser, error) {
 		return nil, errors.New("connection error")
 	}
-	assert.Errorf(t, a.Connect(), "connection error")
+	assert.Error(t, a.Connect(), "connection error")
 }
 
 func TestLeapMotionAdaptorFinalize(t *testing.T) {

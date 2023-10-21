@@ -34,7 +34,7 @@ func TestBebopAdaptorConnect(t *testing.T) {
 	a.connect = func(a *Adaptor) error {
 		return errors.New("connection error")
 	}
-	assert.Errorf(t, a.Connect(), "connection error")
+	assert.Error(t, a.Connect(), "connection error")
 }
 
 func TestBebopAdaptorFinalize(t *testing.T) {

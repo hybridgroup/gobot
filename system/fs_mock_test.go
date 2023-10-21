@@ -20,7 +20,7 @@ func TestMockFilesystemOpen(t *testing.T) {
 	assert.Nil(t, err)
 
 	_, err = fs.openFile("bar", 0, 0o666)
-	assert.Errorf(t, err, " : bar: no such file")
+	assert.Error(t, err, " : bar: no such file")
 
 	fs.Add("bar")
 	f4, _ := fs.openFile("bar", 0, 0o666)
@@ -39,7 +39,7 @@ func TestMockFilesystemStat(t *testing.T) {
 	assert.True(t, dirStat.IsDir())
 
 	_, err = fs.stat("plonk")
-	assert.Errorf(t, err, " : plonk: no such file")
+	assert.Error(t, err, " : plonk: no such file")
 }
 
 func TestMockFilesystemFind(t *testing.T) {

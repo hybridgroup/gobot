@@ -105,7 +105,7 @@ func TestDigitalIO(t *testing.T) {
 	i, _ := a.DigitalRead("TWI2-SDA")
 	assert.Equal(t, 1, i)
 
-	assert.Errorf(t, a.DigitalWrite("XIO-P10", 1), "'XIO-P10' is not a valid id for a digital pin")
+	assert.Error(t, a.DigitalWrite("XIO-P10", 1), "'XIO-P10' is not a valid id for a digital pin")
 	assert.Nil(t, a.Finalize())
 }
 
@@ -120,7 +120,7 @@ func TestProDigitalIO(t *testing.T) {
 	i, _ := a.DigitalRead("TWI2-SDA")
 	assert.Equal(t, 1, i)
 
-	assert.Errorf(t, a.DigitalWrite("XIO-P0", 1), "'XIO-P0' is not a valid id for a digital pin")
+	assert.Error(t, a.DigitalWrite("XIO-P0", 1), "'XIO-P0' is not a valid id for a digital pin")
 	assert.Nil(t, a.Finalize())
 }
 

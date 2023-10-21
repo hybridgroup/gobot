@@ -102,7 +102,7 @@ func TestBMP388TemperatureWriteError(t *testing.T) {
 		return 0, errors.New("write error")
 	}
 	temp, err := d.Temperature(2)
-	assert.Errorf(t, err, "write error")
+	assert.Error(t, err, "write error")
 	assert.Equal(t, float32(0.0), temp)
 }
 
@@ -114,7 +114,7 @@ func TestBMP388TemperatureReadError(t *testing.T) {
 		return 0, errors.New("read error")
 	}
 	temp, err := d.Temperature(2)
-	assert.Errorf(t, err, "read error")
+	assert.Error(t, err, "read error")
 	assert.Equal(t, float32(0.0), temp)
 }
 
@@ -126,7 +126,7 @@ func TestBMP388PressureWriteError(t *testing.T) {
 		return 0, errors.New("write error")
 	}
 	press, err := d.Pressure(2)
-	assert.Errorf(t, err, "write error")
+	assert.Error(t, err, "write error")
 	assert.Equal(t, float32(0.0), press)
 }
 
@@ -138,7 +138,7 @@ func TestBMP388PressureReadError(t *testing.T) {
 		return 0, errors.New("read error")
 	}
 	press, err := d.Pressure(2)
-	assert.Errorf(t, err, "read error")
+	assert.Error(t, err, "read error")
 	assert.Equal(t, float32(0.0), press)
 }
 

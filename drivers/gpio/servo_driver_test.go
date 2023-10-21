@@ -29,16 +29,16 @@ func TestServoDriver(t *testing.T) {
 	}
 
 	err = d.Command("Min")(nil)
-	assert.Errorf(t, err.(error), "pwm error")
+	assert.Error(t, err.(error), "pwm error")
 
 	err = d.Command("Center")(nil)
-	assert.Errorf(t, err.(error), "pwm error")
+	assert.Error(t, err.(error), "pwm error")
 
 	err = d.Command("Max")(nil)
-	assert.Errorf(t, err.(error), "pwm error")
+	assert.Error(t, err.(error), "pwm error")
 
 	err = d.Command("Move")(map[string]interface{}{"angle": 100.0})
-	assert.Errorf(t, err.(error), "pwm error")
+	assert.Error(t, err.(error), "pwm error")
 }
 
 func TestServoDriverStart(t *testing.T) {

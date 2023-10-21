@@ -93,7 +93,7 @@ func TestLIDARLiteDriverDistance(t *testing.T) {
 
 	distance, err = d.Distance()
 	assert.Equal(t, int(0), distance)
-	assert.Errorf(t, err, "read error")
+	assert.Error(t, err, "read error")
 }
 
 func TestLIDARLiteDriverDistanceError1(t *testing.T) {
@@ -104,7 +104,7 @@ func TestLIDARLiteDriverDistanceError1(t *testing.T) {
 
 	distance, err := d.Distance()
 	assert.Equal(t, int(0), distance)
-	assert.Errorf(t, err, "write error")
+	assert.Error(t, err, "write error")
 }
 
 func TestLIDARLiteDriverDistanceError2(t *testing.T) {
@@ -118,7 +118,7 @@ func TestLIDARLiteDriverDistanceError2(t *testing.T) {
 
 	distance, err := d.Distance()
 	assert.Equal(t, int(0), distance)
-	assert.Errorf(t, err, "write error")
+	assert.Error(t, err, "write error")
 }
 
 func TestLIDARLiteDriverDistanceError3(t *testing.T) {
@@ -138,5 +138,5 @@ func TestLIDARLiteDriverDistanceError3(t *testing.T) {
 
 	distance, err := d.Distance()
 	assert.Equal(t, int(0), distance)
-	assert.Errorf(t, err, "write error")
+	assert.Error(t, err, "write error")
 }

@@ -34,7 +34,7 @@ func TestArdroneAdaptorConnect(t *testing.T) {
 	a.connect = func(a *Adaptor) (drone, error) {
 		return nil, errors.New("connection error")
 	}
-	assert.Errorf(t, a.Connect(), "connection error")
+	assert.Error(t, a.Connect(), "connection error")
 }
 
 func TestArdroneAdaptorName(t *testing.T) {

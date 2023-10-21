@@ -69,7 +69,7 @@ func TestMavlinkAdaptorConnect(t *testing.T) {
 	assert.Nil(t, a.Connect())
 
 	a.connect = func(port string) (io.ReadWriteCloser, error) { return nil, errors.New("connect error") }
-	assert.Errorf(t, a.Connect(), "connect error")
+	assert.Error(t, a.Connect(), "connect error")
 }
 
 func TestMavlinkAdaptorFinalize(t *testing.T) {
@@ -79,5 +79,5 @@ func TestMavlinkAdaptorFinalize(t *testing.T) {
 	testAdaptorClose = func() error {
 		return errors.New("close error")
 	}
-	assert.Errorf(t, a.Finalize(), "close error")
+	assert.Error(t, a.Finalize(), "close error")
 }

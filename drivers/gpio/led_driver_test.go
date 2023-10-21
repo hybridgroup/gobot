@@ -38,16 +38,16 @@ func TestLedDriver(t *testing.T) {
 	}
 
 	err = d.Command("Toggle")(nil)
-	assert.Errorf(t, err.(error), "write error")
+	assert.Error(t, err.(error), "write error")
 
 	err = d.Command("On")(nil)
-	assert.Errorf(t, err.(error), "write error")
+	assert.Error(t, err.(error), "write error")
 
 	err = d.Command("Off")(nil)
-	assert.Errorf(t, err.(error), "write error")
+	assert.Error(t, err.(error), "write error")
 
 	err = d.Command("Brightness")(map[string]interface{}{"level": 100.0})
-	assert.Errorf(t, err.(error), "pwm error")
+	assert.Error(t, err.(error), "pwm error")
 }
 
 func TestLedDriverStart(t *testing.T) {
@@ -76,7 +76,7 @@ func TestLedDriverBrightness(t *testing.T) {
 		err = errors.New("pwm error")
 		return
 	}
-	assert.Errorf(t, d.Brightness(150), "pwm error")
+	assert.Error(t, d.Brightness(150), "pwm error")
 }
 
 func TestLEDDriverDefaultName(t *testing.T) {

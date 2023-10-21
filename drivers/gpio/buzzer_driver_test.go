@@ -57,7 +57,7 @@ func TestBuzzerDriverOnError(t *testing.T) {
 		return errors.New("write error")
 	})
 
-	assert.Errorf(t, d.On(), "write error")
+	assert.Error(t, d.On(), "write error")
 }
 
 func TestBuzzerDriverOffError(t *testing.T) {
@@ -67,7 +67,7 @@ func TestBuzzerDriverOffError(t *testing.T) {
 		return errors.New("write error")
 	})
 
-	assert.Errorf(t, d.Off(), "write error")
+	assert.Error(t, d.Off(), "write error")
 }
 
 func TestBuzzerDriverToneError(t *testing.T) {
@@ -77,5 +77,5 @@ func TestBuzzerDriverToneError(t *testing.T) {
 		return errors.New("write error")
 	})
 
-	assert.Errorf(t, d.Tone(100, 0.01), "write error")
+	assert.Error(t, d.Tone(100, 0.01), "write error")
 }

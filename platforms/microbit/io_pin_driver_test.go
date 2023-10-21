@@ -49,7 +49,7 @@ func TestIOPinDriverStartError(t *testing.T) {
 	a.TestReadCharacteristic(func(cUUID string) ([]byte, error) {
 		return nil, errors.New("read error")
 	})
-	assert.Errorf(t, d.Start(), "read error")
+	assert.Error(t, d.Start(), "read error")
 }
 
 func TestIOPinDriverDigitalRead(t *testing.T) {
@@ -74,7 +74,7 @@ func TestIOPinDriverDigitalReadInvalidPin(t *testing.T) {
 	assert.NotNil(t, err)
 
 	_, err = d.DigitalRead("6")
-	assert.Errorf(t, err, "Invalid pin.")
+	assert.Error(t, err, "Invalid pin.")
 }
 
 func TestIOPinDriverDigitalWrite(t *testing.T) {
@@ -90,7 +90,7 @@ func TestIOPinDriverDigitalWriteInvalidPin(t *testing.T) {
 	d := NewIOPinDriver(a)
 
 	assert.NotNil(t, d.DigitalWrite("A3", 1))
-	assert.Errorf(t, d.DigitalWrite("6", 1), "Invalid pin.")
+	assert.Error(t, d.DigitalWrite("6", 1), "Invalid pin.")
 }
 
 func TestIOPinDriverAnalogRead(t *testing.T) {
@@ -115,7 +115,7 @@ func TestIOPinDriverAnalogReadInvalidPin(t *testing.T) {
 	assert.NotNil(t, err)
 
 	_, err = d.AnalogRead("6")
-	assert.Errorf(t, err, "Invalid pin.")
+	assert.Error(t, err, "Invalid pin.")
 }
 
 func TestIOPinDriverDigitalAnalogRead(t *testing.T) {

@@ -243,5 +243,5 @@ func TestDefaultBus(t *testing.T) {
 func TestGetI2cConnectionInvalidBus(t *testing.T) {
 	a := NewAdaptor()
 	_, err := a.GetI2cConnection(0x01, 99)
-	assert.Errorf(t, err, "Invalid bus number 99, only 0 is supported")
+	assert.Error(t, err, "Invalid bus number 99, only 0 is supported")
 }

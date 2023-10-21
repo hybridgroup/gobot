@@ -108,7 +108,7 @@ func TestBMP180TemperatureError(t *testing.T) {
 	}
 	_ = bmp180.Start()
 	_, err := bmp180.Temperature()
-	assert.Errorf(t, err, "temp error")
+	assert.Error(t, err, "temp error")
 }
 
 func TestBMP180PressureError(t *testing.T) {
@@ -138,7 +138,7 @@ func TestBMP180PressureError(t *testing.T) {
 	}
 	_ = bmp180.Start()
 	_, err := bmp180.Pressure()
-	assert.Errorf(t, err, "press error")
+	assert.Error(t, err, "press error")
 }
 
 func TestBMP180PressureWriteError(t *testing.T) {
@@ -150,7 +150,7 @@ func TestBMP180PressureWriteError(t *testing.T) {
 	}
 
 	_, err := bmp180.Pressure()
-	assert.Errorf(t, err, "write error")
+	assert.Error(t, err, "write error")
 }
 
 func TestBMP180_initialization(t *testing.T) {

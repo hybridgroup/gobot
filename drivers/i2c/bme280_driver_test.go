@@ -92,7 +92,7 @@ func TestBME280InitH1Error(t *testing.T) {
 		return buf.Len(), nil
 	}
 
-	assert.Errorf(t, bme280.Start(), "h1 read error")
+	assert.Error(t, bme280.Start(), "h1 read error")
 }
 
 func TestBME280InitH2Error(t *testing.T) {
@@ -111,7 +111,7 @@ func TestBME280InitH2Error(t *testing.T) {
 		return buf.Len(), nil
 	}
 
-	assert.Errorf(t, bme280.Start(), "h2 read error")
+	assert.Error(t, bme280.Start(), "h2 read error")
 }
 
 func TestBME280HumidityWriteError(t *testing.T) {
@@ -122,7 +122,7 @@ func TestBME280HumidityWriteError(t *testing.T) {
 		return 0, errors.New("write error")
 	}
 	hum, err := bme280.Humidity()
-	assert.Errorf(t, err, "write error")
+	assert.Error(t, err, "write error")
 	assert.Equal(t, float32(0.0), hum)
 }
 
@@ -134,7 +134,7 @@ func TestBME280HumidityReadError(t *testing.T) {
 		return 0, errors.New("read error")
 	}
 	hum, err := bme280.Humidity()
-	assert.Errorf(t, err, "read error")
+	assert.Error(t, err, "read error")
 	assert.Equal(t, float32(0.0), hum)
 }
 
@@ -159,7 +159,7 @@ func TestBME280HumidityNotEnabled(t *testing.T) {
 	}
 	_ = bme280.Start()
 	hum, err := bme280.Humidity()
-	assert.Errorf(t, err, "Humidity disabled")
+	assert.Error(t, err, "Humidity disabled")
 	assert.Equal(t, float32(0.0), hum)
 }
 

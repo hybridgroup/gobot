@@ -45,7 +45,7 @@ func TestAdafruitMotorHatDriverStartWriteError(t *testing.T) {
 	adaptor.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
 	}
-	assert.Errorf(t, d.Start(), "write error")
+	assert.Error(t, d.Start(), "write error")
 }
 
 func TestAdafruitMotorHatDriverStartReadError(t *testing.T) {
@@ -53,13 +53,13 @@ func TestAdafruitMotorHatDriverStartReadError(t *testing.T) {
 	adaptor.i2cReadImpl = func([]byte) (int, error) {
 		return 0, errors.New("read error")
 	}
-	assert.Errorf(t, d.Start(), "read error")
+	assert.Error(t, d.Start(), "read error")
 }
 
 func TestAdafruitMotorHatDriverStartConnectError(t *testing.T) {
 	d, adaptor := initTestAdafruitMotorHatDriverWithStubbedAdaptor()
 	adaptor.Testi2cConnectErr(true)
-	assert.Errorf(t, d.Start(), "Invalid i2c connection")
+	assert.Error(t, d.Start(), "Invalid i2c connection")
 }
 
 func TestAdafruitMotorHatDriverHalt(t *testing.T) {
@@ -96,7 +96,7 @@ func TestAdafruitMotorHatDriverSetServoMotorFreqError(t *testing.T) {
 	}
 
 	freq := 60.0
-	assert.Errorf(t, ada.SetServoMotorFreq(freq), "write error")
+	assert.Error(t, ada.SetServoMotorFreq(freq), "write error")
 }
 
 func TestAdafruitMotorHatDriverSetServoMotorPulse(t *testing.T) {
@@ -122,7 +122,7 @@ func TestAdafruitMotorHatDriverSetServoMotorPulseError(t *testing.T) {
 	var channel byte = 7
 	var on int32 = 1234
 	var off int32 = 4321
-	assert.Errorf(t, ada.SetServoMotorPulse(channel, on, off), "write error")
+	assert.Error(t, ada.SetServoMotorPulse(channel, on, off), "write error")
 }
 
 func TestAdafruitMotorHatDriverSetDCMotorSpeed(t *testing.T) {
@@ -144,7 +144,7 @@ func TestAdafruitMotorHatDriverSetDCMotorSpeedError(t *testing.T) {
 		return 0, errors.New("write error")
 	}
 
-	assert.Errorf(t, ada.SetDCMotorSpeed(1, 255), "write error")
+	assert.Error(t, ada.SetDCMotorSpeed(1, 255), "write error")
 }
 
 func TestAdafruitMotorHatDriverRunDCMotor(t *testing.T) {
@@ -166,9 +166,9 @@ func TestAdafruitMotorHatDriverRunDCMotorError(t *testing.T) {
 	}
 
 	dcMotor := 1
-	assert.Errorf(t, ada.RunDCMotor(dcMotor, AdafruitForward), "write error")
-	assert.Errorf(t, ada.RunDCMotor(dcMotor, AdafruitBackward), "write error")
-	assert.Errorf(t, ada.RunDCMotor(dcMotor, AdafruitRelease), "write error")
+	assert.Error(t, ada.RunDCMotor(dcMotor, AdafruitForward), "write error")
+	assert.Error(t, ada.RunDCMotor(dcMotor, AdafruitBackward), "write error")
+	assert.Error(t, ada.RunDCMotor(dcMotor, AdafruitRelease), "write error")
 }
 
 func TestAdafruitMotorHatDriverSetStepperMotorSpeed(t *testing.T) {

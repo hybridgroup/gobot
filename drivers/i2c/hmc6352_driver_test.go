@@ -80,7 +80,7 @@ func TestHMC6352Heading(t *testing.T) {
 
 	heading, err = d.Heading()
 	assert.Equal(t, uint16(0), heading)
-	assert.Errorf(t, err, "read error")
+	assert.Error(t, err, "read error")
 
 	// when write error
 	d, a = initTestHMC6352DriverWithStubbedAdaptor()
@@ -90,5 +90,5 @@ func TestHMC6352Heading(t *testing.T) {
 
 	heading, err = d.Heading()
 	assert.Equal(t, uint16(0), heading)
-	assert.Errorf(t, err, "write error")
+	assert.Error(t, err, "write error")
 }

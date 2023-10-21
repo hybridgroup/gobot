@@ -61,13 +61,13 @@ func TestI2cGetI2cConnection(t *testing.T) {
 	assert.Equal(t, 1, len(a.buses))
 	// assert invalid bus gets error
 	c2, e2 := a.GetI2cConnection(0x01, 99)
-	assert.Errorf(t, e2, "99 not valid")
+	assert.Error(t, e2, "99 not valid")
 	assert.Nil(t, c2)
 	assert.Equal(t, 1, len(a.buses))
 	// assert unconnected gets error
 	assert.Nil(t, a.Finalize())
 	c3, e3 := a.GetI2cConnection(0x01, 99)
-	assert.Errorf(t, e3, "not connected")
+	assert.Error(t, e3, "not connected")
 	assert.Nil(t, c3)
 	assert.Equal(t, 0, len(a.buses))
 }

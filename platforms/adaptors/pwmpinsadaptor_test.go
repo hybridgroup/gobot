@@ -117,7 +117,7 @@ func TestPWMPinsConnect(t *testing.T) {
 	assert.Equal(t, (map[string]gobot.PWMPinner)(nil), a.pins)
 
 	err := a.PwmWrite("33", 1)
-	assert.Errorf(t, err, "not connected")
+	assert.Error(t, err, "not connected")
 
 	err = a.Connect()
 	assert.Nil(t, err)
@@ -186,7 +186,7 @@ func TestPwmWrite(t *testing.T) {
 	assert.Equal(t, "normal", fs.Files[pwmPolarityPath].Contents)
 
 	err = a.PwmWrite("notexist", 42)
-	assert.Errorf(t, err, "'notexist' is not a valid id of a PWM pin")
+	assert.Error(t, err, "'notexist' is not a valid id of a PWM pin")
 
 	fs.WithWriteError = true
 	err = a.PwmWrite("33", 100)
@@ -214,7 +214,7 @@ func TestServoWrite(t *testing.T) {
 	assert.Equal(t, "2000000", fs.Files[pwmDutyCyclePath].Contents)
 
 	err = a.ServoWrite("notexist", 42)
-	assert.Errorf(t, err, "'notexist' is not a valid id of a PWM pin")
+	assert.Error(t, err, "'notexist' is not a valid id of a PWM pin")
 
 	fs.WithWriteError = true
 	err = a.ServoWrite("33", 100)
@@ -266,7 +266,7 @@ func TestSetPeriod(t *testing.T) {
 	// act
 	err = a.SetPeriod("not_exist", newPeriod)
 	// assert
-	assert.Errorf(t, err, "'not_exist' is not a valid id of a PWM pin")
+	assert.Error(t, err, "'not_exist' is not a valid id of a PWM pin")
 }
 
 func Test_PWMPin(t *testing.T) {

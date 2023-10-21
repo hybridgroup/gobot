@@ -56,7 +56,7 @@ func TestPwmPin(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "1", fs.Files["/sys/class/pwm/pwmchip0/pwm10/enable"].Contents)
 	err = pin.SetPolarity(true)
-	assert.Errorf(t, err, "Cannot set PWM polarity when enabled")
+	assert.Error(t, err, "Cannot set PWM polarity when enabled")
 
 	fs.Files["/sys/class/pwm/pwmchip0/pwm10/period"].Contents = "6"
 	data, _ := pin.Period()
@@ -107,7 +107,7 @@ func TestPwmPinExportError(t *testing.T) {
 
 	// no error indicates that the pin was already exported
 	err := pin.Export()
-	assert.Errorf(t, err, "Export() failed for id 10 with  : bad address")
+	assert.Error(t, err, "Export() failed for id 10 with  : bad address")
 }
 
 func TestPwmPinUnxportError(t *testing.T) {
@@ -125,7 +125,7 @@ func TestPwmPinUnxportError(t *testing.T) {
 	}
 
 	err := pin.Unexport()
-	assert.Errorf(t, err, "Unexport() failed for id 10 with  : device or resource busy")
+	assert.Error(t, err, "Unexport() failed for id 10 with  : device or resource busy")
 }
 
 func TestPwmPinPeriodError(t *testing.T) {
@@ -143,7 +143,7 @@ func TestPwmPinPeriodError(t *testing.T) {
 	}
 
 	_, err := pin.Period()
-	assert.Errorf(t, err, "Period() failed for id 10 with  : device or resource busy")
+	assert.Error(t, err, "Period() failed for id 10 with  : device or resource busy")
 }
 
 func TestPwmPinPolarityError(t *testing.T) {
@@ -161,7 +161,7 @@ func TestPwmPinPolarityError(t *testing.T) {
 	}
 
 	_, err := pin.Polarity()
-	assert.Errorf(t, err, "Polarity() failed for id 10 with  : device or resource busy")
+	assert.Error(t, err, "Polarity() failed for id 10 with  : device or resource busy")
 }
 
 func TestPwmPinDutyCycleError(t *testing.T) {
@@ -179,5 +179,5 @@ func TestPwmPinDutyCycleError(t *testing.T) {
 	}
 
 	_, err := pin.DutyCycle()
-	assert.Errorf(t, err, "DutyCycle() failed for id 10 with  : device or resource busy")
+	assert.Error(t, err, "DutyCycle() failed for id 10 with  : device or resource busy")
 }

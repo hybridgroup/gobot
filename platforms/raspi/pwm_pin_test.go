@@ -29,13 +29,13 @@ func TestPwmPin(t *testing.T) {
 	assert.True(t, val)
 
 	_, err := pin.Period()
-	assert.Errorf(t, err, "Raspi PWM pin period not set")
-	assert.Errorf(t, pin.SetDutyCycle(10000), "Raspi PWM pin period not set")
+	assert.Error(t, err, "Raspi PWM pin period not set")
+	assert.Error(t, pin.SetDutyCycle(10000), "Raspi PWM pin period not set")
 
 	assert.Nil(t, pin.SetPeriod(20000000))
 	period, _ := pin.Period()
 	assert.Equal(t, uint32(20000000), period)
-	assert.Errorf(t, pin.SetPeriod(10000000), "Cannot set the period of individual PWM pins on Raspi")
+	assert.Error(t, pin.SetPeriod(10000000), "Cannot set the period of individual PWM pins on Raspi")
 
 	dc, _ := pin.DutyCycle()
 	assert.Equal(t, uint32(0), dc)
@@ -45,7 +45,7 @@ func TestPwmPin(t *testing.T) {
 	dc, _ = pin.DutyCycle()
 	assert.Equal(t, uint32(10000), dc)
 
-	assert.Errorf(t, pin.SetDutyCycle(999999999), "Duty cycle exceeds period")
+	assert.Error(t, pin.SetDutyCycle(999999999), "Duty cycle exceeds period")
 	dc, _ = pin.DutyCycle()
 	assert.Equal(t, uint32(10000), dc)
 

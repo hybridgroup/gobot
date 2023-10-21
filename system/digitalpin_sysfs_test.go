@@ -57,10 +57,10 @@ func TestDigitalPin(t *testing.T) {
 
 	pin2 := newDigitalPinSysfs(fs, "30")
 	err = pin2.Write(1)
-	assert.Errorf(t, err, "pin has not been exported")
+	assert.Error(t, err, "pin has not been exported")
 
 	data, err = pin2.Read()
-	assert.Errorf(t, err, "pin has not been exported")
+	assert.Error(t, err, "pin has not been exported")
 	assert.Equal(t, 0, data)
 
 	writeFile = func(File, []byte) (int, error) {
@@ -75,7 +75,7 @@ func TestDigitalPin(t *testing.T) {
 	}
 
 	err = pin.Unexport()
-	assert.Errorf(t, err.(*os.PathError).Err, "write error")
+	assert.Error(t, err.(*os.PathError).Err, "write error")
 
 	// assert a busy error is dropped (just means "already exported")
 	cnt := 0
@@ -94,7 +94,7 @@ func TestDigitalPin(t *testing.T) {
 		return 0, &os.PathError{Err: errors.New("write error")}
 	}
 	err = pin.Export()
-	assert.Errorf(t, err.(*os.PathError).Err, "write error")
+	assert.Error(t, err.(*os.PathError).Err, "write error")
 }
 
 func TestDigitalPinExportError(t *testing.T) {
@@ -109,7 +109,7 @@ func TestDigitalPinExportError(t *testing.T) {
 	}
 
 	err := pin.Export()
-	assert.Errorf(t, err, " : /sys/class/gpio/gpio10/direction: no such file")
+	assert.Error(t, err, " : /sys/class/gpio/gpio10/direction: no such file")
 }
 
 func TestDigitalPinUnexportError(t *testing.T) {
@@ -123,5 +123,5 @@ func TestDigitalPinUnexportError(t *testing.T) {
 	}
 
 	err := pin.Unexport()
-	assert.Errorf(t, err, " : device or resource busy")
+	assert.Error(t, err, " : device or resource busy")
 }

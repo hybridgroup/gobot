@@ -79,7 +79,7 @@ func TestNewI2cDevice(t *testing.T) {
 			d, err := a.NewI2cDevice(tc.dev)
 			// assert
 			if tc.wantErr != "" {
-				assert.Errorf(t, err, tc.wantErr)
+				assert.Error(t, err, tc.wantErr)
 				assert.Equal(t, (*i2cDevice)(nil), d)
 			} else {
 				var _ gobot.I2cSystemDevicer = d
@@ -142,7 +142,7 @@ func TestReadByte(t *testing.T) {
 			got, err := d.ReadByte(2)
 			// assert
 			if tc.wantErr != "" {
-				assert.Errorf(t, err, tc.wantErr)
+				assert.Error(t, err, tc.wantErr)
 			} else {
 				assert.Nil(t, err)
 				assert.Equal(t, want, got)
@@ -189,7 +189,7 @@ func TestReadByteData(t *testing.T) {
 			got, err := d.ReadByteData(3, reg)
 			// assert
 			if tc.wantErr != "" {
-				assert.Errorf(t, err, tc.wantErr)
+				assert.Error(t, err, tc.wantErr)
 			} else {
 				assert.Nil(t, err)
 				assert.Equal(t, want, got)
@@ -239,7 +239,7 @@ func TestReadWordData(t *testing.T) {
 			got, err := d.ReadWordData(4, reg)
 			// assert
 			if tc.wantErr != "" {
-				assert.Errorf(t, err, tc.wantErr)
+				assert.Error(t, err, tc.wantErr)
 			} else {
 				assert.Nil(t, err)
 				assert.Equal(t, want, got)
@@ -297,7 +297,7 @@ func TestReadBlockData(t *testing.T) {
 			err := d.ReadBlockData(5, reg, buf)
 			// assert
 			if tc.wantErr != "" {
-				assert.Errorf(t, err, tc.wantErr)
+				assert.Error(t, err, tc.wantErr)
 			} else {
 				assert.Nil(t, err)
 				assert.Equal(t, msc.dataSlice, buf)
@@ -341,7 +341,7 @@ func TestWriteByte(t *testing.T) {
 			err := d.WriteByte(6, val)
 			// assert
 			if tc.wantErr != "" {
-				assert.Errorf(t, err, tc.wantErr)
+				assert.Error(t, err, tc.wantErr)
 			} else {
 				assert.Nil(t, err)
 				assert.Equal(t, d.file, msc.lastFile)
@@ -386,7 +386,7 @@ func TestWriteByteData(t *testing.T) {
 			err := d.WriteByteData(7, reg, val)
 			// assert
 			if tc.wantErr != "" {
-				assert.Errorf(t, err, tc.wantErr)
+				assert.Error(t, err, tc.wantErr)
 			} else {
 				assert.Nil(t, err)
 				assert.Equal(t, d.file, msc.lastFile)
@@ -435,7 +435,7 @@ func TestWriteWordData(t *testing.T) {
 			err := d.WriteWordData(8, reg, val)
 			// assert
 			if tc.wantErr != "" {
-				assert.Errorf(t, err, tc.wantErr)
+				assert.Error(t, err, tc.wantErr)
 			} else {
 				assert.Nil(t, err)
 				assert.Equal(t, d.file, msc.lastFile)
@@ -492,7 +492,7 @@ func TestWriteBlockData(t *testing.T) {
 			err := d.WriteBlockData(9, reg, data)
 			// assert
 			if tc.wantErr != "" {
-				assert.Errorf(t, err, tc.wantErr)
+				assert.Error(t, err, tc.wantErr)
 			} else {
 				assert.Nil(t, err)
 				assert.Equal(t, d.file, msc.lastFile)
@@ -514,7 +514,7 @@ func TestWriteBlockDataTooMuch(t *testing.T) {
 	// act
 	err := d.WriteBlockData(10, 0x01, make([]byte, 33))
 	// assert
-	assert.Errorf(t, err, "Writing blocks larger than 32 bytes (33) not supported")
+	assert.Error(t, err, "Writing blocks larger than 32 bytes (33) not supported")
 }
 
 func Test_setAddress(t *testing.T) {
@@ -565,7 +565,7 @@ func Test_queryFunctionality(t *testing.T) {
 			err := d.queryFunctionality(tc.requested, "test"+name)
 			// assert
 			if tc.wantErr != "" {
-				assert.Errorf(t, err, tc.wantErr)
+				assert.Error(t, err, tc.wantErr)
 			} else {
 				assert.Nil(t, err)
 			}
