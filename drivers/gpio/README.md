@@ -12,17 +12,22 @@ Please refer to the main [README.md](https://github.com/hybridgroup/gobot/blob/r
 
 Gobot has a extensible system for connecting to hardware devices. The following GPIO devices are currently supported:
 
+- AIP1640 LED Dot Matrix/7 Segment Controller
 - Button
 - Buzzer
 - Direct Pin
+- EasyDriver
 - Grove Button
 - Grove Buzzer
 - Grove LED
 - Grove Magnetic Switch
 - Grove Relay
 - Grove Touch Sensor
+- HC-SR04 Ultrasonic Ranging Module
+- HD44780 LCD controller
 - LED
 - Makey Button
+- MAX7219 LED Dot Matrix
 - Motor
 - Proximity Infra Red (PIR) Motion Sensor
 - Relay
@@ -30,5 +35,3 @@ Gobot has a extensible system for connecting to hardware devices. The following 
 - Servo
 - Stepper Motor
 - TM1638 LED Controller
-
-More drivers are coming soon...
