@@ -114,7 +114,7 @@ func TestApplyOptions(t *testing.T) {
 	}
 }
 
-func TestExport(t *testing.T) {
+func TestExportGpiod(t *testing.T) {
 	tests := map[string]struct {
 		simErr           error
 		wantReconfigured int
@@ -155,7 +155,7 @@ func TestExport(t *testing.T) {
 	}
 }
 
-func TestUnexport(t *testing.T) {
+func TestUnexportGpiod(t *testing.T) {
 	tests := map[string]struct {
 		simNoLine        bool
 		simReconfErr     error
@@ -217,7 +217,7 @@ func TestUnexport(t *testing.T) {
 	}
 }
 
-func TestWrite(t *testing.T) {
+func TestWriteGpiod(t *testing.T) {
 	tests := map[string]struct {
 		val     int
 		simErr  error
@@ -266,7 +266,7 @@ func TestWrite(t *testing.T) {
 	}
 }
 
-func TestRead(t *testing.T) {
+func TestReadGpiod(t *testing.T) {
 	tests := map[string]struct {
 		simVal  int
 		simErr  error

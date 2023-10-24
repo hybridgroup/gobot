@@ -215,7 +215,8 @@ func digitalPinGpiodReconfigureLine(d *digitalPinGpiod, forceInput bool) error {
 			opts = append(opts, gpiod.WithDebounce(d.debouncePeriod))
 		}
 		// edge detection
-		if d.edgeEventHandler != nil {
+		if d.edgeEventHandler != nil && d.pollInterval <= 0 {
+			// use edge detection provided by gpiod
 			wrappedHandler := digitalPinGpiodGetWrappedEventHandler(d.edgeEventHandler)
 			switch d.edge {
 			case digitalPinEventOnFallingEdge:
@@ -277,10 +278,20 @@ func digitalPinGpiodReconfigureLine(d *digitalPinGpiod, forceInput bool) error {
 	}
 	d.line = gpiodLine
 
+	// start discrete polling function and wait for first read is done
+	if (d.direction == IN || forceInput) && d.pollInterval > 0 {
+		if err := startEdgePolling(d.label, d.Read, d.pollInterval, d.edge, d.edgeEventHandler,
+			d.pollQuitChan); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
-func digitalPinGpiodGetWrappedEventHandler(handler func(int, time.Duration, string, uint32, uint32)) func(gpiod.LineEvent) {
+func digitalPinGpiodGetWrappedEventHandler(
+	handler func(int, time.Duration, string, uint32, uint32),
+) func(gpiod.LineEvent) {
 	return func(evt gpiod.LineEvent) {
 		detectedEdge := "none"
 		switch evt.Type {

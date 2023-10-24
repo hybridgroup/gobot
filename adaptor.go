@@ -21,12 +21,18 @@ type DigitalPinOptioner interface {
 	SetDrive(drive int) (changed bool)
 	// SetDebounce initializes the input pin with the given debounce period.
 	SetDebounce(period time.Duration) (changed bool)
-	// SetEventHandlerForEdge initializes the input pin for edge detection and to call the event handler on specified edge.
+	// SetEventHandlerForEdge initializes the input pin for edge detection to call the event handler on specified edge.
 	// lineOffset is within the GPIO chip (needs to transformed to the pin id), timestamp is the detection time,
 	// detectedEdge contains the direction of the pin changes, seqno is the sequence number for this event in the sequence
 	// of events for all the lines in this line request, lseqno is the same but for this line
 	SetEventHandlerForEdge(handler func(lineOffset int, timestamp time.Duration, detectedEdge string, seqno uint32,
 		lseqno uint32), edge int) (changed bool)
+	// SetPollForEdgeDetection use a discrete input polling method to detect edges. A poll interval of zero or smaller
+	// will deactivate this function. Please note: Using this feature is CPU consuming and less accurate than using cdev
+	// event handler (gpiod implementation) and should be done only if the former is not implemented or not working for
+	// the adaptor. E.g. sysfs driver in gobot has not implemented edge detection yet. The function is only useful
+	// together with SetEventHandlerForEdge() and its corresponding With*() functions.
+	SetPollForEdgeDetection(pollInterval time.Duration, pollQuitChan chan struct{}) (changed bool)
 }
 
 // DigitalPinOptionApplier is the interface to apply options to change pin behavior immediately

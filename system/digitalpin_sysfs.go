@@ -47,7 +47,7 @@ func newDigitalPinSysfs(fs filesystem, pin string, options ...func(gobot.Digital
 func (d *digitalPinSysfs) ApplyOptions(options ...func(gobot.DigitalPinOptioner) bool) error {
 	anyChange := false
 	for _, option := range options {
-		anyChange = anyChange || option(d)
+		anyChange = option(d) || anyChange
 	}
 	if anyChange {
 		return d.reconfigure()
@@ -87,7 +87,7 @@ func (d *digitalPinSysfs) Unexport() error {
 		d.activeLowFile = nil
 	}
 
-	_, err = writeFile(unexport, []byte(d.pin))
+	err = writeFile(unexport, []byte(d.pin))
 	if err != nil {
 		// If EINVAL then the pin is reserved in the system and can't be unexported
 		e, ok := err.(*os.PathError)
@@ -101,7 +101,7 @@ func (d *digitalPinSysfs) Unexport() error {
 
 // Write writes the given value to the character device
 func (d *digitalPinSysfs) Write(b int) error {
-	_, err := writeFile(d.valFile, []byte(strconv.Itoa(b)))
+	err := writeFile(d.valFile, []byte(strconv.Itoa(b)))
 	return err
 }
 
@@ -121,7 +121,7 @@ func (d *digitalPinSysfs) reconfigure() error {
 	}
 	defer exportFile.Close()
 
-	_, err = writeFile(exportFile, []byte(d.pin))
+	err = writeFile(exportFile, []byte(d.pin))
 	if err != nil {
 		// If EBUSY then the pin has already been exported
 		e, ok := err.(*os.PathError)
@@ -142,7 +142,7 @@ func (d *digitalPinSysfs) reconfigure() error {
 			break
 		}
 		if attempt > 10 {
-			return err
+			break
 		}
 		time.Sleep(10 * time.Millisecond)
 	}
@@ -164,45 +164,59 @@ func (d *digitalPinSysfs) reconfigure() error {
 		if d.activeLow {
 			d.activeLowFile, err = d.fs.openFile(fmt.Sprintf("%s/%s/active_low", gpioPath, d.label), os.O_RDWR, 0o644)
 			if err == nil {
-				_, err = writeFile(d.activeLowFile, []byte("1"))
+				err = writeFile(d.activeLowFile, []byte("1"))
 			}
 		}
 	}
 
-	// configure bias (unsupported)
+	// configure bias (inputs and outputs, unsupported)
 	if err == nil {
 		if d.bias != digitalPinBiasDefault && systemSysfsDebug {
 			log.Printf("bias options (%d) are not supported by sysfs, please use hardware resistors instead\n", d.bias)
 		}
 	}
 
-	// configure drive (unsupported)
-	if d.drive != digitalPinDrivePushPull && systemSysfsDebug {
-		log.Printf("drive options (%d) are not supported by sysfs\n", d.drive)
-	}
+	// configure debounce period (inputs only), edge detection (inputs only) and drive (outputs only)
+	if d.direction == IN {
+		// configure debounce (unsupported)
+		if d.debouncePeriod != 0 && systemSysfsDebug {
+			log.Printf("debounce period option (%d) is not supported by sysfs\n", d.debouncePeriod)
+		}
 
-	// configure debounce (unsupported)
-	if d.debouncePeriod != 0 && systemSysfsDebug {
-		log.Printf("debounce period option (%d) is not supported by sysfs\n", d.debouncePeriod)
-	}
+		// configure edge detection
+		if err == nil {
+			if d.edge != 0 && d.pollInterval <= 0 {
+				err = fmt.Errorf("edge detect option (%d) is not implemented for sysfs without discrete polling", d.edge)
+			}
+		}
 
-	// configure edge detection (not implemented)
-	if d.edge != 0 && systemSysfsDebug {
-		log.Printf("edge detect option (%d) is not implemented for sysfs\n", d.edge)
+		// start discrete polling function and wait for first read is done
+		if err == nil {
+			if d.pollInterval > 0 {
+				err = startEdgePolling(d.label, d.Read, d.pollInterval, d.edge, d.edgeEventHandler, d.pollQuitChan)
+			}
+		}
+	} else {
+		// configure drive (unsupported)
+		if d.drive != digitalPinDrivePushPull && systemSysfsDebug {
+			log.Printf("drive options (%d) are not supported by sysfs\n", d.drive)
+		}
 	}
 
 	if err != nil {
-		return d.Unexport()
+		if e := d.Unexport(); e != nil {
+			err = fmt.Errorf("unexport error '%v' after '%v'", e, err)
+		}
 	}
 
 	return err
 }
 
 func (d *digitalPinSysfs) writeDirectionWithInitialOutput() error {
-	if _, err := writeFile(d.dirFile, []byte(d.direction)); err != nil || d.direction == IN {
+	if err := writeFile(d.dirFile, []byte(d.direction)); err != nil || d.direction == IN {
 		return err
 	}
-	_, err := writeFile(d.valFile, []byte(strconv.Itoa(d.outInitialState)))
+	err := writeFile(d.valFile, []byte(strconv.Itoa(d.outInitialState)))
 	return err
 }
 
@@ -210,9 +224,9 @@ func (d *digitalPinSysfs) writeDirectionWithInitialOutput() error {
 //  https://www.kernel.org/doc/Documentation/filesystems/sysfs.txt
 //  https://www.kernel.org/doc/Documentation/gpio/sysfs.txt
 
-var writeFile = func(f File, data []byte) (i int, err error) {
+var writeFile = func(f File, data []byte) error {
 	if f == nil {
-		return 0, errNotExported
+		return errNotExported
 	}
 
 	// sysfs docs say:
@@ -221,8 +235,9 @@ var writeFile = func(f File, data []byte) (i int, err error) {
 	// > entire buffer back.
 	// however, this seems outdated/inaccurate (docs are from back in the Kernel BitKeeper days).
 
-	i, err = f.Write(data)
-	return i, err
+	// Write() returns already a non-nil error when n != len(b).
+	_, err := f.Write(data)
+	return err
 }
 
 var readFile = func(f File) ([]byte, error) {
