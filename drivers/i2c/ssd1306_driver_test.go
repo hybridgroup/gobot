@@ -91,7 +91,7 @@ func TestSSD1306StartSizeError(t *testing.T) {
 	)
 	d := NewSSD1306Driver(newI2cTestAdaptor(),
 		WithSSD1306DisplayWidth(width), WithSSD1306DisplayHeight(height), WithSSD1306ExternalVCC(externalVCC))
-	assert.Error(t, d.Start(), "128x54 resolution is unsupported, supported resolutions: 128x64, 128x32, 96x16")
+	assert.ErrorContains(t, d.Start(), "128x54 resolution is unsupported, supported resolutions: 128x64, 128x32, 96x16")
 }
 
 func TestSSD1306Halt(t *testing.T) {
@@ -116,7 +116,7 @@ func TestSSD1306ShowImage(t *testing.T) {
 	s, _ := initTestSSD1306DriverWithStubbedAdaptor(128, 64, false)
 	_ = s.Start()
 	img := image.NewRGBA(image.Rect(0, 0, 640, 480))
-	assert.Error(t, s.ShowImage(img), "image must match display width and height: 128x64")
+	assert.ErrorContains(t, s.ShowImage(img), "image must match display width and height: 128x64")
 
 	img = image.NewRGBA(image.Rect(0, 0, 128, 64))
 	assert.Nil(t, s.ShowImage(img))

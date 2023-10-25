@@ -70,7 +70,7 @@ func TestStartConnectError(t *testing.T) {
 	d, a := initDriverWithStubbedAdaptor()
 	a.Testi2cConnectErr(true)
 	// act, assert
-	assert.Error(t, d.Start(), "Invalid i2c connection")
+	assert.ErrorContains(t, d.Start(), "Invalid i2c connection")
 }
 
 func TestHalt(t *testing.T) {

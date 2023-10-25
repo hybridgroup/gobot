@@ -60,10 +60,10 @@ func TestDigitalPinsConnect(t *testing.T) {
 	assert.Equal(t, (map[string]gobot.DigitalPinner)(nil), a.pins)
 
 	_, err := a.DigitalRead("13")
-	assert.Error(t, err, "not connected for pin 13")
+	assert.ErrorContains(t, err, "not connected for pin 13")
 
 	err = a.DigitalWrite("7", 1)
-	assert.Error(t, err, "not connected for pin 7")
+	assert.ErrorContains(t, err, "not connected for pin 7")
 
 	err = a.Connect()
 	assert.Nil(t, err)
@@ -159,12 +159,12 @@ func TestDigitalRead(t *testing.T) {
 	// assert error bubbling for read errors
 	fs.WithReadError = true
 	_, err = a.DigitalRead("13")
-	assert.Error(t, err, "read error")
+	assert.ErrorContains(t, err, "read error")
 
 	// assert error bubbling for write errors
 	fs.WithWriteError = true
 	_, err = a.DigitalRead("7")
-	assert.Error(t, err, "write error")
+	assert.ErrorContains(t, err, "write error")
 }
 
 func TestDigitalReadWithGpiosActiveLow(t *testing.T) {
@@ -228,12 +228,12 @@ func TestDigitalWrite(t *testing.T) {
 	assert.Nil(t, err)
 
 	// assert error on bad id
-	assert.Error(t, a.DigitalWrite("notexist", 1), "not a valid pin")
+	assert.ErrorContains(t, a.DigitalWrite("notexist", 1), "not a valid pin")
 
 	// assert error bubbling
 	fs.WithWriteError = true
 	err = a.DigitalWrite("7", 0)
-	assert.Error(t, err, "write error")
+	assert.ErrorContains(t, err, "write error")
 }
 
 func TestDigitalWriteWithGpiosActiveLow(t *testing.T) {

@@ -42,16 +42,16 @@ func TestRgbLedDriver(t *testing.T) {
 	}
 
 	err = d.Command("Toggle")(nil)
-	assert.Error(t, err.(error), "pwm error")
+	assert.ErrorContains(t, err.(error), "pwm error")
 
 	err = d.Command("On")(nil)
-	assert.Error(t, err.(error), "pwm error")
+	assert.ErrorContains(t, err.(error), "pwm error")
 
 	err = d.Command("Off")(nil)
-	assert.Error(t, err.(error), "pwm error")
+	assert.ErrorContains(t, err.(error), "pwm error")
 
 	err = d.Command("SetRGB")(map[string]interface{}{"r": 0xff, "g": 0xff, "b": 0xff})
-	assert.Error(t, err.(error), "pwm error")
+	assert.ErrorContains(t, err.(error), "pwm error")
 }
 
 func TestRgbLedDriverStart(t *testing.T) {
@@ -83,7 +83,7 @@ func TestRgbLedDriverSetLevel(t *testing.T) {
 		err = errors.New("pwm error")
 		return
 	}
-	assert.Error(t, d.SetLevel("1", 150), "pwm error")
+	assert.ErrorContains(t, d.SetLevel("1", 150), "pwm error")
 }
 
 func TestRgbLedDriverDefaultName(t *testing.T) {

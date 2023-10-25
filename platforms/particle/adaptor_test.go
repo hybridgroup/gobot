@@ -254,7 +254,7 @@ func TestAdaptorFunction(t *testing.T) {
 	a.setAPIServer(testServer.URL)
 
 	_, err := a.Function("hello", "")
-	assert.Error(t, err, "timeout")
+	assert.ErrorContains(t, err, "timeout")
 
 	testServer.Close()
 }
@@ -309,7 +309,7 @@ func TestAdaptorVariable(t *testing.T) {
 	a.setAPIServer(testServer.URL)
 
 	_, err := a.Variable("not_existent")
-	assert.Error(t, err, "Variable not found")
+	assert.ErrorContains(t, err, "Variable not found")
 
 	testServer.Close()
 }
@@ -386,14 +386,14 @@ func TestAdaptorEventStream(t *testing.T) {
 	assert.Equal(t, "https://api.particle.io/v1/devices/myDevice/events/ping?access_token=token", url)
 
 	_, err := a.EventStream("nothing", "ping")
-	assert.Error(t, err, "source param should be: all, devices or device")
+	assert.ErrorContains(t, err, "source param should be: all, devices or device")
 
 	eventSource = func(u string) (chan eventsource.Event, chan error, error) {
 		return nil, nil, errors.New("error connecting sse")
 	}
 
 	_, err = a.EventStream("devices", "")
-	assert.Error(t, err, "error connecting sse")
+	assert.ErrorContains(t, err, "error connecting sse")
 
 	eventChan := make(chan eventsource.Event)
 	errorChan := make(chan error)

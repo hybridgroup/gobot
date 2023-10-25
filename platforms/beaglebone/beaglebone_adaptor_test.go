@@ -58,7 +58,7 @@ func TestPWM(t *testing.T) {
 	fs.Files["/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/duty_cycle"].Contents = "0"
 	fs.Files["/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm1/period"].Contents = "0"
 
-	assert.Error(t, a.PwmWrite("P9_99", 175), "'P9_99' is not a valid id for a PWM pin")
+	assert.ErrorContains(t, a.PwmWrite("P9_99", 175), "'P9_99' is not a valid id for a PWM pin")
 	_ = a.PwmWrite("P9_21", 175)
 	assert.Equal(
 		t,
@@ -99,11 +99,11 @@ func TestAnalog(t *testing.T) {
 	assert.Nil(t, err)
 
 	_, err = a.AnalogRead("P9_99")
-	assert.Error(t, err, "Not a valid analog pin")
+	assert.ErrorContains(t, err, "Not a valid analog pin")
 
 	fs.WithReadError = true
 	_, err = a.AnalogRead("P9_40")
-	assert.Error(t, err, "read error")
+	assert.ErrorContains(t, err, "read error")
 	fs.WithReadError = false
 
 	assert.Nil(t, a.Finalize())
@@ -138,15 +138,15 @@ func TestDigitalIO(t *testing.T) {
 
 	// no such LED
 	err := a.DigitalWrite("usr10101", 1)
-	assert.Error(t, err, " : /sys/class/leds/beaglebone:green:usr10101/brightness: no such file")
+	assert.ErrorContains(t, err, " : /sys/class/leds/beaglebone:green:usr10101/brightness: no such file")
 
 	_ = a.DigitalWrite("P9_12", 1)
 	assert.Equal(t, "1", fs.Files["/sys/class/gpio/gpio60/value"].Contents)
 
-	assert.Error(t, a.DigitalWrite("P9_99", 1), "'P9_99' is not a valid id for a digital pin")
+	assert.ErrorContains(t, a.DigitalWrite("P9_99", 1), "'P9_99' is not a valid id for a digital pin")
 
 	_, err = a.DigitalRead("P9_99")
-	assert.Error(t, err, "'P9_99' is not a valid id for a digital pin")
+	assert.ErrorContains(t, err, "'P9_99' is not a valid id for a digital pin")
 
 	fs.Files["/sys/class/gpio/gpio66/value"].Contents = "1"
 	i, err := a.DigitalRead("P8_07")

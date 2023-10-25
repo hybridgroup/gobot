@@ -136,5 +136,5 @@ func TestMavlinkReadMAVLinkPacketReadError(t *testing.T) {
 	a.sock = m
 
 	_, err := a.ReadMAVLinkPacket()
-	assert.Error(t, err, "read error")
+	assert.ErrorContains(t, err, "read error")
 }

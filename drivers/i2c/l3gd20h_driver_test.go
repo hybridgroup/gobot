@@ -214,7 +214,7 @@ func TestL3GD20HMeasurementError(t *testing.T) {
 
 	_ = d.Start()
 	_, _, _, err := d.XYZ()
-	assert.Error(t, err, "read error")
+	assert.ErrorContains(t, err, "read error")
 }
 
 func TestL3GD20HMeasurementWriteError(t *testing.T) {
@@ -223,7 +223,7 @@ func TestL3GD20HMeasurementWriteError(t *testing.T) {
 		return 0, errors.New("write error")
 	}
 	_, _, _, err := d.XYZ()
-	assert.Error(t, err, "write error")
+	assert.ErrorContains(t, err, "write error")
 }
 
 func TestL3GD20H_initialize(t *testing.T) {

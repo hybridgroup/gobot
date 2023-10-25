@@ -77,7 +77,7 @@ func TestDigitalIO(t *testing.T) {
 		fs.Files["/sys/class/leds/upboard:green:/brightness"].Contents,
 	)
 
-	assert.Error(t, a.DigitalWrite("99", 1), "'99' is not a valid id for a digital pin")
+	assert.ErrorContains(t, a.DigitalWrite("99", 1), "'99' is not a valid id for a digital pin")
 	assert.Nil(t, a.Finalize())
 }
 

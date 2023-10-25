@@ -101,7 +101,7 @@ func TestMPL115A2ReadDataError(t *testing.T) {
 	}
 	_, err := d.Pressure()
 
-	assert.Error(t, err, "write error")
+	assert.ErrorContains(t, err, "write error")
 }
 
 func TestMPL115A2_initialization(t *testing.T) {

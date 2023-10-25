@@ -54,7 +54,7 @@ func TestDigitalIO(t *testing.T) {
 	i, _ := a.DigitalRead("GPIO_A")
 	assert.Equal(t, 1, i)
 
-	assert.Error(t, a.DigitalWrite("GPIO_M", 1), "'GPIO_M' is not a valid id for a digital pin")
+	assert.ErrorContains(t, a.DigitalWrite("GPIO_M", 1), "'GPIO_M' is not a valid id for a digital pin")
 	assert.Nil(t, a.Finalize())
 }
 

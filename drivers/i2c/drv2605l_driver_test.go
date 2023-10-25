@@ -110,7 +110,7 @@ func TestDRV2605LSetModeReadError(t *testing.T) {
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		return 0, errors.New("read error")
 	}
-	assert.Error(t, d.SetMode(DRV2605ModeIntTrig), "read error")
+	assert.ErrorContains(t, d.SetMode(DRV2605ModeIntTrig), "read error")
 }
 
 func TestDRV2605LSetStandbyMode(t *testing.T) {
@@ -123,7 +123,7 @@ func TestDRV2605LSetStandbyModeReadError(t *testing.T) {
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		return 0, errors.New("read error")
 	}
-	assert.Error(t, d.SetStandbyMode(true), "read error")
+	assert.ErrorContains(t, d.SetStandbyMode(true), "read error")
 }
 
 func TestDRV2605LSelectLibrary(t *testing.T) {

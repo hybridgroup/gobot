@@ -72,7 +72,7 @@ func TestTSL2561DriverStartNotFound(t *testing.T) {
 		copy(b, buf.Bytes())
 		return buf.Len(), nil
 	}
-	assert.Error(t, d.Start(), "TSL2561 device not found (0x1)")
+	assert.ErrorContains(t, d.Start(), "TSL2561 device not found (0x1)")
 }
 
 func TestTSL2561DriverHalt(t *testing.T) {
@@ -157,7 +157,7 @@ func TestTSL2561DriverGetDataWriteError(t *testing.T) {
 	}
 
 	_, _, err := d.getData()
-	assert.Error(t, err, "write error")
+	assert.ErrorContains(t, err, "write error")
 }
 
 func TestTSL2561DriverGetDataReadError(t *testing.T) {
@@ -167,7 +167,7 @@ func TestTSL2561DriverGetDataReadError(t *testing.T) {
 	}
 
 	_, _, err := d.getData()
-	assert.Error(t, err, "read error")
+	assert.ErrorContains(t, err, "read error")
 }
 
 func TestTSL2561DriverGetLuminocity(t *testing.T) {
@@ -213,7 +213,7 @@ func TestTSL2561SetIntegrationTimeError(t *testing.T) {
 	a.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
 	}
-	assert.Error(t, d.SetIntegrationTime(TSL2561IntegrationTime101MS), "write error")
+	assert.ErrorContains(t, d.SetIntegrationTime(TSL2561IntegrationTime101MS), "write error")
 }
 
 func TestTSL2561SetGainError(t *testing.T) {
@@ -221,7 +221,7 @@ func TestTSL2561SetGainError(t *testing.T) {
 	a.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
 	}
-	assert.Error(t, d.SetGain(TSL2561Gain16X), "write error")
+	assert.ErrorContains(t, d.SetGain(TSL2561Gain16X), "write error")
 }
 
 func TestTSL2561getHiLo13MS(t *testing.T) {

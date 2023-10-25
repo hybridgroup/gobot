@@ -112,7 +112,7 @@ func TestDigisparkAdaptorDigitalWrite(t *testing.T) {
 
 	errorFunc = func() error { return errors.New("pin mode error") }
 	err = a.DigitalWrite("0", uint8(1))
-	assert.Error(t, err, "pin mode error")
+	assert.ErrorContains(t, err, "pin mode error")
 }
 
 func TestDigisparkAdaptorServoWrite(t *testing.T) {
@@ -125,7 +125,7 @@ func TestDigisparkAdaptorServoWrite(t *testing.T) {
 	a = initTestAdaptor()
 	errorFunc = func() error { return errors.New("servo error") }
 	err = a.ServoWrite("2", uint8(80))
-	assert.Error(t, err, "servo error")
+	assert.ErrorContains(t, err, "servo error")
 }
 
 func TestDigisparkAdaptorPwmWrite(t *testing.T) {
@@ -138,10 +138,10 @@ func TestDigisparkAdaptorPwmWrite(t *testing.T) {
 	a = initTestAdaptor()
 	pwmInitErrorFunc = func() error { return errors.New("pwminit error") }
 	err = a.PwmWrite("1", uint8(100))
-	assert.Error(t, err, "pwminit error")
+	assert.ErrorContains(t, err, "pwminit error")
 
 	a = initTestAdaptor()
 	errorFunc = func() error { return errors.New("pwm error") }
 	err = a.PwmWrite("1", uint8(100))
-	assert.Error(t, err, "pwm error")
+	assert.ErrorContains(t, err, "pwm error")
 }
