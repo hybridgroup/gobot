@@ -89,7 +89,7 @@ func TestSpheroAdaptorFinalize(t *testing.T) {
 	}
 
 	a.connected = true
-	assert.Error(t, a.Finalize(), "close error")
+	assert.ErrorContains(t, a.Finalize(), "close error")
 }
 
 func TestSpheroAdaptorConnect(t *testing.T) {
@@ -100,5 +100,5 @@ func TestSpheroAdaptorConnect(t *testing.T) {
 		return nil, errors.New("connect error")
 	}
 
-	assert.Error(t, a.Connect(), "connect error")
+	assert.ErrorContains(t, a.Connect(), "connect error")
 }

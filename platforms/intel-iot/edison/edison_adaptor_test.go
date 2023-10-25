@@ -276,7 +276,7 @@ func TestArduinoI2CSetupFailTristate(t *testing.T) {
 
 	fs.WithWriteError = true
 	err := a.arduinoI2CSetup()
-	assert.Error(t, err, "write error")
+	assert.ErrorContains(t, err, "write error")
 }
 
 func TestArduinoI2CSetupFail14(t *testing.T) {
@@ -453,7 +453,7 @@ func TestDigitalWriteError(t *testing.T) {
 	fs.WithWriteError = true
 
 	err := a.DigitalWrite("13", 1)
-	assert.Error(t, err, "write error")
+	assert.ErrorContains(t, err, "write error")
 }
 
 func TestDigitalReadWriteError(t *testing.T) {
@@ -461,7 +461,7 @@ func TestDigitalReadWriteError(t *testing.T) {
 	fs.WithWriteError = true
 
 	_, err := a.DigitalRead("13")
-	assert.Error(t, err, "write error")
+	assert.ErrorContains(t, err, "write error")
 }
 
 func TestPwm(t *testing.T) {
@@ -472,7 +472,7 @@ func TestPwm(t *testing.T) {
 	assert.Equal(t, "1960", fs.Files["/sys/class/pwm/pwmchip0/pwm1/duty_cycle"].Contents)
 
 	err = a.PwmWrite("7", 100)
-	assert.Error(t, err, "'7' is not a valid id for a PWM pin")
+	assert.ErrorContains(t, err, "'7' is not a valid id for a PWM pin")
 }
 
 func TestPwmExportError(t *testing.T) {
@@ -501,7 +501,7 @@ func TestPwmWritePinError(t *testing.T) {
 	fs.WithWriteError = true
 
 	err := a.PwmWrite("5", 100)
-	assert.Error(t, err, "write error")
+	assert.ErrorContains(t, err, "write error")
 }
 
 func TestPwmWriteError(t *testing.T) {
@@ -533,7 +533,7 @@ func TestAnalogError(t *testing.T) {
 	fs.WithReadError = true
 
 	_, err := a.AnalogRead("0")
-	assert.Error(t, err, "read error")
+	assert.ErrorContains(t, err, "read error")
 }
 
 func TestI2cWorkflow(t *testing.T) {

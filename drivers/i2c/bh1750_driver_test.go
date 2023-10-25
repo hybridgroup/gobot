@@ -96,7 +96,7 @@ func TestBH1750LuxError(t *testing.T) {
 	}
 
 	_, err := d.Lux()
-	assert.Error(t, err, "wrong number of bytes read")
+	assert.ErrorContains(t, err, "wrong number of bytes read")
 }
 
 func TestBH1750RawSensorDataError(t *testing.T) {
@@ -106,5 +106,5 @@ func TestBH1750RawSensorDataError(t *testing.T) {
 	}
 
 	_, err := d.RawSensorData()
-	assert.Error(t, err, "wrong number of bytes read")
+	assert.ErrorContains(t, err, "wrong number of bytes read")
 }

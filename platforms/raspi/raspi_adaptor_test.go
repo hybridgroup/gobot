@@ -125,8 +125,8 @@ func TestDigitalPWM(t *testing.T) {
 
 	assert.Equal(t, "17=0.5", strings.Split(fs.Files["/dev/pi-blaster"].Contents, "\n")[0])
 
-	assert.Error(t, a.PwmWrite("notexist", 1), "Not a valid pin")
-	assert.Error(t, a.ServoWrite("notexist", 1), "Not a valid pin")
+	assert.ErrorContains(t, a.PwmWrite("notexist", 1), "Not a valid pin")
+	assert.ErrorContains(t, a.ServoWrite("notexist", 1), "Not a valid pin")
 
 	pin, _ = a.PWMPin("12")
 	period, _ = pin.Period()
@@ -160,7 +160,7 @@ func TestDigitalIO(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, 1, i)
 
-	assert.Error(t, a.DigitalWrite("notexist", 1), "Not a valid pin")
+	assert.ErrorContains(t, a.DigitalWrite("notexist", 1), "Not a valid pin")
 	assert.Nil(t, a.Finalize())
 }
 

@@ -125,7 +125,7 @@ func TestBlinkMFirmwareVersion(t *testing.T) {
 	}
 
 	_, err := d.FirmwareVersion()
-	assert.Error(t, err, "write error")
+	assert.ErrorContains(t, err, "write error")
 }
 
 func TestBlinkMColor(t *testing.T) {
@@ -153,7 +153,7 @@ func TestBlinkMColor(t *testing.T) {
 	}
 
 	_, err := d.Color()
-	assert.Error(t, err, "write error")
+	assert.ErrorContains(t, err, "write error")
 }
 
 func TestBlinkMFade(t *testing.T) {
@@ -163,7 +163,7 @@ func TestBlinkMFade(t *testing.T) {
 	}
 
 	err := d.Fade(100, 100, 100)
-	assert.Error(t, err, "write error")
+	assert.ErrorContains(t, err, "write error")
 }
 
 func TestBlinkMRGB(t *testing.T) {
@@ -173,5 +173,5 @@ func TestBlinkMRGB(t *testing.T) {
 	}
 
 	err := d.Rgb(100, 100, 100)
-	assert.Error(t, err, "write error")
+	assert.ErrorContains(t, err, "write error")
 }

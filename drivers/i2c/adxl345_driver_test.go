@@ -205,7 +205,7 @@ func TestADXL345RawXYZError(t *testing.T) {
 	// act
 	_, _, _, err := d.RawXYZ()
 	// assert
-	assert.Error(t, err, "read error")
+	assert.ErrorContains(t, err, "read error")
 }
 
 func TestADXL345XYZ(t *testing.T) {
@@ -269,7 +269,7 @@ func TestADXL345XYZError(t *testing.T) {
 	// act
 	_, _, _, err := d.XYZ()
 	// assert
-	assert.Error(t, err, "read error")
+	assert.ErrorContains(t, err, "read error")
 }
 
 func TestADXL345_initialize(t *testing.T) {

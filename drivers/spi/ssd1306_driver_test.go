@@ -38,7 +38,7 @@ func TestSSD1306DriverShowImage(t *testing.T) {
 	d := initTestSSDDriver()
 	_ = d.Start()
 	img := image.NewRGBA(image.Rect(0, 0, 640, 480))
-	assert.Error(t, d.ShowImage(img), "Image must match the display width and height")
+	assert.ErrorContains(t, d.ShowImage(img), "Image must match the display width and height")
 
 	img = image.NewRGBA(image.Rect(0, 0, 128, 64))
 	assert.Nil(t, d.ShowImage(img))

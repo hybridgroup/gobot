@@ -148,7 +148,7 @@ func TestNatsAdaptorFailedConnect(t *testing.T) {
 	if err != nil && strings.Contains(err.Error(), "cannot assign requested address") {
 		t.Skip("FLAKY: Can not test, because IP or port is in use.")
 	}
-	assert.Error(t, err, "nats: no servers available for connection")
+	assert.ErrorContains(t, err, "nats: no servers available for connection")
 }
 
 func TestNatsAdaptorFinalize(t *testing.T) {

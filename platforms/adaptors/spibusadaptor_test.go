@@ -40,7 +40,7 @@ func TestNewSpiAdaptor(t *testing.T) {
 	assert.Equal(t, 4, a.SpiDefaultBitCount())
 	assert.Equal(t, int64(5), a.SpiDefaultMaxSpeed())
 	_, err := a.GetSpiConnection(10, 0, 0, 8, 10000000)
-	assert.Error(t, err, "not connected")
+	assert.ErrorContains(t, err, "not connected")
 }
 
 func TestGetSpiConnection(t *testing.T) {
@@ -73,12 +73,12 @@ func TestGetSpiConnection(t *testing.T) {
 	assert.Equal(t, 2, len(a.connections))
 	// assert bus validation error
 	con, err := a.GetSpiConnection(busNum+1, chipNum, mode, bits, maxSpeed)
-	assert.Error(t, err, "16 not valid")
+	assert.ErrorContains(t, err, "16 not valid")
 	assert.Nil(t, con)
 	// assert create error
 	spi.CreateError = true
 	con, err = a.GetSpiConnection(busNum, chipNum+2, mode, bits, maxSpeed)
-	assert.Error(t, err, "error while create SPI connection in mock")
+	assert.ErrorContains(t, err, "error while create SPI connection in mock")
 	assert.Nil(t, con)
 }
 

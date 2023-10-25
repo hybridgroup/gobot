@@ -87,7 +87,7 @@ func TestPCA9685SetPWMError(t *testing.T) {
 	a.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
 	}
-	assert.Error(t, d.SetPWM(0, 0, 256), "write error")
+	assert.ErrorContains(t, d.SetPWM(0, 0, 256), "write error")
 }
 
 func TestPCA9685SetPWMFreq(t *testing.T) {
@@ -116,7 +116,7 @@ func TestPCA9685SetPWMFreqReadError(t *testing.T) {
 	a.i2cReadImpl = func(b []byte) (int, error) {
 		return 0, errors.New("read error")
 	}
-	assert.Error(t, d.SetPWMFreq(60), "read error")
+	assert.ErrorContains(t, d.SetPWMFreq(60), "read error")
 }
 
 func TestPCA9685SetPWMFreqWriteError(t *testing.T) {
@@ -130,7 +130,7 @@ func TestPCA9685SetPWMFreqWriteError(t *testing.T) {
 	a.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
 	}
-	assert.Error(t, d.SetPWMFreq(60), "write error")
+	assert.ErrorContains(t, d.SetPWMFreq(60), "write error")
 }
 
 func TestPCA9685Commands(t *testing.T) {

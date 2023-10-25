@@ -74,7 +74,7 @@ func TestNeuroskyAdaptorConnect(t *testing.T) {
 	a.connect = func(n *Adaptor) (io.ReadWriteCloser, error) {
 		return nil, errors.New("connection error")
 	}
-	assert.Error(t, a.Connect(), "connection error")
+	assert.ErrorContains(t, a.Connect(), "connection error")
 }
 
 func TestNeuroskyAdaptorFinalize(t *testing.T) {
@@ -88,5 +88,5 @@ func TestNeuroskyAdaptorFinalize(t *testing.T) {
 
 	rwc.CloseError(errors.New("close error"))
 	_ = a.Connect()
-	assert.Error(t, a.Finalize(), "close error")
+	assert.ErrorContains(t, a.Finalize(), "close error")
 }

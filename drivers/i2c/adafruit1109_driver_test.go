@@ -73,7 +73,7 @@ func TestAdafruit1109StartWriteErr(t *testing.T) {
 	adaptor.i2cWriteImpl = func([]byte) (int, error) {
 		return 0, errors.New("write error")
 	}
-	assert.Error(t, d.Start(), "write error")
+	assert.ErrorContains(t, d.Start(), "write error")
 }
 
 func TestAdafruit1109StartReadErr(t *testing.T) {
@@ -81,7 +81,7 @@ func TestAdafruit1109StartReadErr(t *testing.T) {
 	adaptor.i2cReadImpl = func([]byte) (int, error) {
 		return 0, errors.New("read error")
 	}
-	assert.Error(t, d.Start(), "MCP write-read: MCP write-ReadByteData(reg=0): read error")
+	assert.ErrorContains(t, d.Start(), "MCP write-read: MCP write-ReadByteData(reg=0): read error")
 }
 
 func TestAdafruit1109Halt(t *testing.T) {

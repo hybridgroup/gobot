@@ -92,7 +92,7 @@ func TestDigitalIO(t *testing.T) {
 	i, _ := a.DigitalRead("10")
 	assert.Equal(t, 1, i)
 
-	assert.Error(t, a.DigitalWrite("99", 1), "'99' is not a valid id for a digital pin")
+	assert.ErrorContains(t, a.DigitalWrite("99", 1), "'99' is not a valid id for a digital pin")
 	assert.Nil(t, a.Finalize())
 }
 
@@ -101,16 +101,16 @@ func TestInvalidPWMPin(t *testing.T) {
 	preparePwmFs(fs)
 
 	err := a.PwmWrite("666", 42)
-	assert.Error(t, err, "'666' is not a valid id for a PWM pin")
+	assert.ErrorContains(t, err, "'666' is not a valid id for a PWM pin")
 
 	err = a.ServoWrite("666", 120)
-	assert.Error(t, err, "'666' is not a valid id for a PWM pin")
+	assert.ErrorContains(t, err, "'666' is not a valid id for a PWM pin")
 
 	err = a.PwmWrite("3", 42)
-	assert.Error(t, err, "'3' is not a valid id for a PWM pin")
+	assert.ErrorContains(t, err, "'3' is not a valid id for a PWM pin")
 
 	err = a.ServoWrite("3", 120)
-	assert.Error(t, err, "'3' is not a valid id for a PWM pin")
+	assert.ErrorContains(t, err, "'3' is not a valid id for a PWM pin")
 }
 
 func TestPwmWrite(t *testing.T) {

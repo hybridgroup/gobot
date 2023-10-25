@@ -40,7 +40,7 @@ func TestAudioAdaptorCommandsMp3(t *testing.T) {
 func TestAudioAdaptorCommandsUnknown(t *testing.T) {
 	cmd, err := CommandName("whatever.unk")
 	assert.NotEqual(t, "mpg123", cmd)
-	assert.Error(t, err, "Unknown filetype for audio file.")
+	assert.ErrorContains(t, err, "Unknown filetype for audio file.")
 }
 
 func TestAudioAdaptorSoundWithNoFilename(t *testing.T) {

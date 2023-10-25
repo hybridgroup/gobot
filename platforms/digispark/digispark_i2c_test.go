@@ -57,7 +57,7 @@ func TestDigisparkAdaptorI2cGetI2cConnectionFailWithInvalidBus(t *testing.T) {
 	c, err := a.GetI2cConnection(0x40, 1)
 
 	// assert
-	assert.Error(t, err, "Invalid bus number 1, only 0 is supported")
+	assert.ErrorContains(t, err, "Invalid bus number 1, only 0 is supported")
 	assert.Nil(t, c)
 }
 
@@ -72,7 +72,7 @@ func TestDigisparkAdaptorI2cStartFailWithWrongAddress(t *testing.T) {
 
 	// assert
 	assert.Equal(t, 0, count)
-	assert.Error(t, err, "Invalid address, only %d is supported", availableI2cAddress)
+	assert.ErrorContains(t, err, fmt.Sprintf("Invalid address, only %d is supported", availableI2cAddress))
 	assert.Equal(t, maxUint8, a.littleWire.(*i2cMock).direction)
 }
 
